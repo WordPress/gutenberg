@@ -1,0 +1,165 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 7a04f41a29b050..bd9175782a224a 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -45,7 +45,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+   font-weight: 500;
+   line-height: 1.4;
+   text-transform: uppercase;
+-  display: inline-block;
++  display: block;
+   margin-bottom: calc(4px * 2);
+   padding: 0;
+ }
+diff --git a/packages/block-library/src/gallery/editor.scss b/packages/block-library/src/gallery/editor.scss
+index 9efaf88e5acc71..025e86277f7edc 100644
+--- a/packages/block-library/src/gallery/editor.scss
++++ b/packages/block-library/src/gallery/editor.scss
+@@ -70,7 +70,6 @@
+ 
+ .gallery-image-sizes {
+ 	.components-base-control__label {
+-		display: block;
+ 		margin-bottom: 4px;
+ 	}
+ 
+diff --git a/packages/block-library/src/latest-posts/editor.scss b/packages/block-library/src/latest-posts/editor.scss
+index d3f0b5275653e3..02651ee8495125 100644
+--- a/packages/block-library/src/latest-posts/editor.scss
++++ b/packages/block-library/src/latest-posts/editor.scss
+@@ -10,10 +10,6 @@
+ }
+ 
+ .editor-latest-posts-image-alignment-control {
+-	.components-base-control__label {
+-		display: block;
+-	}
+-
+ 	.components-toolbar {
+ 		border-radius: $radius-block-ui;
+ 	}
+diff --git a/packages/block-library/src/video/editor.scss b/packages/block-library/src/video/editor.scss
+index bfdeadab4d3322..792939356b1de9 100644
+--- a/packages/block-library/src/video/editor.scss
++++ b/packages/block-library/src/video/editor.scss
+@@ -57,10 +57,6 @@
+ }
+ 
+ .editor-video-poster-control {
+-	.components-base-control__label {
+-		display: block;
+-	}
+-
+ 	.components-button {
+ 		margin-right: $grid-unit-10;
+ 	}
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index aa11a7c90e2632..4ff29e33487a70 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `BaseControl`: change label's `display` to `block`. ([#63911](https://github.com/WordPress/gutenberg/pull/63911))
+ -   `ComboboxControl`: Fix ComboboxControl reset button when using the keyboard. ([#63410](https://github.com/WordPress/gutenberg/pull/63410))
+ -   `Button`: Never apply `aria-disabled` to anchor ([#63376](https://github.com/WordPress/gutenberg/pull/63376)).
+ -   `SelectControl`: Fix hover/focus color in wp-admin ([#63855](https://github.com/WordPress/gutenberg/pull/63855)).
+diff --git a/packages/components/src/base-control/styles/base-control-styles.ts b/packages/components/src/base-control/styles/base-control-styles.ts
+index 6ddfe10229fdbb..d633fcdd7e7a77 100644
+--- a/packages/components/src/base-control/styles/base-control-styles.ts
++++ b/packages/components/src/base-control/styles/base-control-styles.ts
+@@ -37,7 +37,7 @@ export const StyledField = styled.div`
+ const labelStyles = css`
+ 	${ baseLabelTypography };
+ 
+-	display: inline-block;
++	display: block;
+ 	margin-bottom: ${ space( 2 ) };
+ 	/**
+ 	 * Removes Chrome/Safari/Firefox user agent stylesheet padding from
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index 6a8892e78ef553..28669ebf3ccc78 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -16,10 +16,6 @@ import {
+ 
+ import type { Border } from './types';
+ 
+-const labelStyles = css`
+-	font-weight: 500;
+-`;
+-
+ const focusBoxShadow = css`
+ 	box-shadow: inset ${ CONFIG.controlBoxShadowFocus };
+ `;
+@@ -140,7 +136,6 @@ export const borderControlPopoverControls = css`
+ 
+ 	> div:first-of-type > ${ StyledLabel } {
+ 		margin-bottom: 0;
+-		${ labelStyles }
+ 	}
+ 
+ 	&& ${ StyledLabel } + button:not( .has-text ) {
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index cdfa4b1883cc16..908e15927e3b86 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -33,7 +33,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   font-weight: 500;
+   line-height: 1.4;
+   text-transform: uppercase;
+-  display: inline-block;
++  display: block;
+   margin-bottom: calc(4px * 2);
+   padding: 0;
+ }
+@@ -369,7 +369,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+   font-weight: 500;
+   line-height: 1.4;
+   text-transform: uppercase;
+-  display: inline-block;
++  display: block;
+   margin-bottom: calc(4px * 2);
+   padding: 0;
+ }
+@@ -593,7 +593,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   font-weight: 500;
+   line-height: 1.4;
+   text-transform: uppercase;
+-  display: inline-block;
++  display: block;
+   margin-bottom: calc(4px * 2);
+   padding: 0;
+ }
+@@ -923,7 +923,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+   font-weight: 500;
+   line-height: 1.4;
+   text-transform: uppercase;
+-  display: inline-block;
++  display: block;
+   margin-bottom: calc(4px * 2);
+   padding: 0;
+ }
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index 7f31c97018d092..42fc0f7fe0f245 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -22,7 +22,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+   font-weight: 500;
+   line-height: 1.4;
+   text-transform: uppercase;
+-  display: inline-block;
++  display: block;
+   margin-bottom: calc(4px * 2);
+   padding: 0;
+ }
+@@ -214,7 +214,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+   font-weight: 500;
+   line-height: 1.4;
+   text-transform: uppercase;
+-  display: inline-block;
++  display: block;
+   margin-bottom: calc(4px * 2);
+   padding: 0;
+ }

@@ -1,0 +1,71 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 23f851b98978bd..45b98850e80f69 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Bug Fixes
+ 
+ -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
++-   `ColorPicker`: Fix issue where clearing the hex input entirely doesn't reset the selected color to black ([#77912](https://github.com/WordPress/gutenberg/pull/77912)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/color-picker/hex-input.tsx b/packages/components/src/color-picker/hex-input.tsx
+index ef8b5356c0edc1..161722d6f55f7b 100644
+--- a/packages/components/src/color-picker/hex-input.tsx
++++ b/packages/components/src/color-picker/hex-input.tsx
+@@ -20,7 +20,7 @@ import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
+ 
+ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+ 	const handleChange = ( nextValue: string | undefined ) => {
+-		if ( ! nextValue ) {
++		if ( nextValue === undefined ) {
+ 			return;
+ 		}
+ 		const hexValue = nextValue.startsWith( '#' )
+diff --git a/packages/components/src/color-picker/test/index.tsx b/packages/components/src/color-picker/test/index.tsx
+index 6c9501f3ba6498..33f72d2445cc05 100644
+--- a/packages/components/src/color-picker/test/index.tsx
++++ b/packages/components/src/color-picker/test/index.tsx
+@@ -95,7 +95,7 @@ describe( 'ColorPicker', () => {
+ 			await user.clear( hexInput );
+ 			await user.type( hexInput, '1ab' );
+ 
+-			expect( onChangeComplete ).toHaveBeenCalledTimes( 3 );
++			expect( onChangeComplete ).toHaveBeenCalledTimes( 4 );
+ 			expect( onChangeComplete ).toHaveBeenLastCalledWith(
+ 				legacyColorMatcher
+ 			);
+@@ -126,9 +126,31 @@ describe( 'ColorPicker', () => {
+ 			await user.clear( hexInput );
+ 			await user.type( hexInput, '1ab' );
+ 
+-			expect( onChange ).toHaveBeenCalledTimes( 3 );
++			expect( onChange ).toHaveBeenCalledTimes( 4 );
+ 			expect( onChange ).toHaveBeenLastCalledWith( '#11aabb' );
+ 		} );
++
++		it( 'should reset color to black when the hex input is completely cleared', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++			const color = '#11aabb';
++
++			render(
++				<ColorPicker
++					onChange={ onChange }
++					color={ color }
++					enableAlpha={ false }
++				/>
++			);
++
++			const formatSelector = screen.getByRole( 'combobox' );
++			await user.selectOptions( formatSelector, 'hex' );
++
++			const hexInput = screen.getByRole( 'textbox' );
++			await user.clear( hexInput );
++
++			expect( onChange ).toHaveBeenLastCalledWith( '#000000' );
++		} );
+ 	} );
+ 
+ 	describe.each( [

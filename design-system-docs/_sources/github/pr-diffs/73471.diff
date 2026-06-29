@@ -1,0 +1,274 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6116a6b4dd7d8c..8f9e071b620034 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ 
+ -   `Menu` and othr menu items: change default size to be 32px tall rather than 40px to improve menu density. ([#73429](https://github.com/WordPress/gutenberg/pull/73429)).
+ -   Unify padding using for DataViews, Modals and other container components. ([#73334](https://github.com/WordPress/gutenberg/pull/73334))
++-   Validated form controls: Suppress native error popover ([#73471](https://github.com/WordPress/gutenberg/pull/73471)).
+ -   `Snackbar`: Shorten timeout duration ([#73814](https://github.com/WordPress/gutenberg/pull/73814)).
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/validated-form-controls/components/stories/overview.story.tsx b/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
+index 09550685ac96b4..687967aed50786 100644
+--- a/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
+@@ -17,11 +17,12 @@ import { debounce } from '@wordpress/compose';
+ import { ValidatedInputControl } from '..';
+ import { formDecorator } from './story-utils';
+ import type { ControlWithError } from '../../control-with-error';
++import { Button } from '../../../button';
++import { VStack } from '../../../v-stack';
+ 
+ const meta: Meta< typeof ControlWithError > = {
+ 	title: 'Components/Selection & Input/Validated Form Controls/Overview',
+ 	id: 'components-validated-form-controls-overview',
+-	decorators: formDecorator,
+ };
+ export default meta;
+ 
+@@ -32,6 +33,7 @@ type Story = StoryObj< typeof ControlWithError >;
+  * move focus to the first control with an error.
+  */
+ export const WithMultipleControls: Story = {
++	decorators: formDecorator,
+ 	render: function Template() {
+ 		const [ text, setText ] = useState< string | undefined >( '' );
+ 		const [ text2, setText2 ] = useState< string | undefined >( '' );
+@@ -78,6 +80,7 @@ export const WithMultipleControls: Story = {
+  * will depend on context.
+  */
+ export const WithHelpTextReplacement: Story = {
++	decorators: formDecorator,
+ 	render: function Template() {
+ 		const [ text, setText ] = useState< string | undefined >( '' );
+ 		const isInvalid = text?.toLowerCase() === 'error';
+@@ -130,6 +133,7 @@ export const WithHelpTextReplacement: Story = {
+  * They may be unnecessary when responses are generally quick.
+  */
+ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
++	decorators: formDecorator,
+ 	render: function Template( { ...args } ) {
+ 		const [ text, setText ] = useState( '' );
+ 		const [ customValidity, setCustomValidity ] =
+@@ -195,6 +199,7 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
+ // eslint-disable-next-line @typescript-eslint/no-unused-vars
+ const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
+ 	...AsyncValidation,
++	decorators: formDecorator,
+ 	play: async ( { canvasElement } ) => {
+ 		const canvas = within( canvasElement );
+ 		await userEvent.click( canvas.getByRole( 'textbox' ) );
+@@ -276,6 +281,7 @@ const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
+  * even if the input has never been interacted with.
+  */
+ export const CustomErrorsOnSubmit: StoryObj< typeof ValidatedInputControl > = {
++	decorators: formDecorator,
+ 	args: {
+ 		label: 'Text',
+ 		required: true,
+@@ -303,3 +309,51 @@ export const CustomErrorsOnSubmit: StoryObj< typeof ValidatedInputControl > = {
+ 		);
+ 	},
+ };
++
++/**
++ * While it is recommended to rely on the built-in behavior for showing errors by
++ * using a `form` element and `type="submit"` button around validated fields,
++ * it is also possible to show errors at arbitrary times.
++ * This can be done by calling the [`reportValidity()` method](https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/reportValidity)
++ * on a ref of the field itself, or the wrapping `form` element.
++ */
++export const ShowingErrorsAtArbitraryTimes: StoryObj<
++	typeof ValidatedInputControl
++> = {
++	args: {
++		label: 'Text',
++		required: true,
++		help: 'The word "error" will trigger an error.',
++	},
++	decorators: [],
++	render: function Template( { ...args } ) {
++		const [ text, setText ] = useState< string | undefined >( 'error' );
++		const ref = useRef< HTMLInputElement >( null );
++
++		return (
++			<VStack spacing={ 4 } alignment="left">
++				<ValidatedInputControl
++					ref={ ref }
++					{ ...args }
++					value={ text }
++					onChange={ setText }
++					customValidity={
++						text === 'error'
++							? {
++									type: 'invalid',
++									message: 'The word "error" is not allowed.',
++							  }
++							: undefined
++					}
++				/>
++				<Button
++					__next40pxDefaultSize
++					variant="secondary"
++					onClick={ () => ref.current?.reportValidity() }
++				>
++					Report validity
++				</Button>
++			</VStack>
++		);
++	},
++};
+diff --git a/packages/components/src/validated-form-controls/control-with-error.tsx b/packages/components/src/validated-form-controls/control-with-error.tsx
+index 82e6d886a67ad8..0e5c22c162ffa2 100644
+--- a/packages/components/src/validated-form-controls/control-with-error.tsx
++++ b/packages/components/src/validated-form-controls/control-with-error.tsx
+@@ -36,7 +36,9 @@ function appendRequiredIndicator(
+ 	}
+ 	return label;
+ }
++
+ const VALIDITY_VISIBLE_ATTRIBUTE = 'data-validity-visible';
++const className = 'components-validated-control';
+ 
+ /**
+  * HTML elements that support the Constraint Validation API.
+@@ -109,6 +111,53 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		return () => validityTarget?.removeEventListener( 'invalid', handler );
+ 	}, [ getValidityTarget ] );
+ 
++	// Suppress the native error popover, while keeping the focus behavior intact.
++	useEffect( () => {
++		const validityTarget = getValidityTarget();
++
++		const suppressNativePopover = ( event: Event ) => {
++			event.preventDefault();
++
++			const target = event.target as ValidityTarget;
++			const firstErrorInForm = Array.from(
++				target.form?.elements ?? []
++			).find( ( el ) => ! ( el as ValidityTarget ).validity.valid );
++
++			if ( ! target.form || firstErrorInForm === target ) {
++				target.focus();
++			}
++		};
++
++		// Radio inputs need special handling because all radio inputs with the
++		// same `name` will be marked as invalid. Without this handling, the last radio option
++		// will be focused with an unsuppressed native popover.
++		const radioSibilings =
++			validityTarget?.type === 'radio' && validityTarget?.name
++				? Array.from(
++						validityTarget
++							?.closest( `.${ className }` )
++							?.querySelectorAll< HTMLInputElement >(
++								`input[type="radio"][name="${ validityTarget?.name }"]`
++							) ?? []
++				  ).filter( ( sibling ) => sibling !== validityTarget )
++				: [];
++
++		validityTarget?.addEventListener( 'invalid', suppressNativePopover );
++		radioSibilings.forEach( ( sibling ) =>
++			sibling.addEventListener( 'invalid', suppressNativePopover )
++		);
++
++		return () => {
++			validityTarget?.removeEventListener(
++				'invalid',
++				suppressNativePopover
++			);
++			radioSibilings.forEach( ( sibling ) =>
++				sibling.removeEventListener( 'invalid', suppressNativePopover )
++			);
++		};
++	}, [ getValidityTarget ] );
++
+ 	// Handle validity messages.
+ 	useEffect( () => {
+ 		const validityTarget = getValidityTarget();
+@@ -207,11 +256,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 	};
+ 
+ 	return (
+-		<div
+-			className="components-validated-control"
+-			ref={ forwardedRef }
+-			onBlur={ onBlur }
+-		>
++		<div className={ className } ref={ forwardedRef } onBlur={ onBlur }>
+ 			{ cloneElement( children, {
+ 				label: appendRequiredIndicator(
+ 					children.props.label,
+diff --git a/packages/components/src/validated-form-controls/test/control-with-error.tsx b/packages/components/src/validated-form-controls/test/control-with-error.tsx
+index 316d5dd161cd23..580907f0fd4f07 100644
+--- a/packages/components/src/validated-form-controls/test/control-with-error.tsx
++++ b/packages/components/src/validated-form-controls/test/control-with-error.tsx
+@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * WordPress dependencies
+  */
+-import { useState, useCallback } from '@wordpress/element';
++import { useState, useCallback, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -282,4 +282,57 @@ describe( 'ControlWithError', () => {
+ 			expect( onSubmit ).not.toHaveBeenCalled();
+ 		} );
+ 	} );
++
++	describe( 'Focus behavior', () => {
++		it( 'should focus the first error in the form', async () => {
++			const user = userEvent.setup();
++			render(
++				<form>
++					<ValidatedInputControl label="Text1" required />
++					<ValidatedInputControl label="Text2" required />
++					<button type="submit">Submit</button>
++				</form>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Submit' } )
++			);
++
++			expect(
++				screen.getByRole( 'textbox', { name: /^Text1/ } )
++			).toHaveFocus();
++		} );
++
++		it( 'should focus the field on an `invalid` event, even if there is no enclosing form', async () => {
++			const user = userEvent.setup();
++			function ValidatedInputControlWithRef(
++				props: React.ComponentProps< typeof ValidatedInputControl >
++			) {
++				const ref = useRef< HTMLInputElement >( null );
++				return (
++					<>
++						<ValidatedInputControl ref={ ref } { ...props } />
++						<button
++							type="button"
++							onClick={ () => ref.current?.reportValidity() }
++						>
++							Report Validity
++						</button>
++					</>
++				);
++			}
++
++			render( <ValidatedInputControlWithRef label="Text" required /> );
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Report Validity' } )
++			);
++
++			await waitFor( () => {
++				expect(
++					screen.getByRole( 'textbox', { name: /^Text/ } )
++				).toHaveFocus();
++			} );
++		} );
++	} );
+ } );

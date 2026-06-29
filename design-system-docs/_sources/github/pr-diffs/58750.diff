@@ -1,0 +1,219 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e86b4079fdffd6..4a555aa476ead4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -39,6 +39,7 @@
+ -   `Composite`: Removing Reakit `Composite` implementation ([#58620](https://github.com/WordPress/gutenberg/pull/58620)).
+ -   Removing Reakit as a dependency of the components package ([#58631](https://github.com/WordPress/gutenberg/pull/58631)).
+ -   `CustomSelect`: add unit tests ([#58583](https://github.com/WordPress/gutenberg/pull/58583)).
++-   `InputBase`: Add `isBorderless` prop ([#58750](https://github.com/WordPress/gutenberg/pull/58750)).
+ 
+ ## 25.16.0 (2024-01-24)
+ 
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index 9827e818b332fb..85aa4b82bf31ea 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -188,9 +188,9 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+       class="components-base-control__field emotion-2 emotion-3"
+     >
+       <div
+-        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
++        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+         data-wp-c16t="true"
+-        data-wp-component="Flex"
++        data-wp-component="InputBase"
+       >
+         <div
+           class="components-flex-item emotion-7 emotion-8 emotion-6"
+@@ -459,9 +459,9 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+       class="components-base-control__field emotion-2 emotion-3"
+     >
+       <div
+-        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
++        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+         data-wp-c16t="true"
+-        data-wp-component="Flex"
++        data-wp-component="InputBase"
+       >
+         <div
+           class="components-flex-item emotion-7 emotion-8 emotion-6"
+@@ -740,9 +740,9 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+       class="components-base-control__field emotion-2 emotion-3"
+     >
+       <div
+-        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
++        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+         data-wp-c16t="true"
+-        data-wp-component="Flex"
++        data-wp-component="InputBase"
+       >
+         <div
+           class="components-flex-item emotion-7 emotion-8 emotion-6"
+@@ -1033,9 +1033,9 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+       class="components-base-control__field emotion-2 emotion-3"
+     >
+       <div
+-        class="components-flex components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
++        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6"
+         data-wp-c16t="true"
+-        data-wp-component="Flex"
++        data-wp-component="InputBase"
+       >
+         <div
+           class="components-flex-item emotion-7 emotion-8 emotion-6"
+diff --git a/packages/components/src/input-control/backdrop.tsx b/packages/components/src/input-control/backdrop.tsx
+index c85efad03a8052..9ef9138f196528 100644
+--- a/packages/components/src/input-control/backdrop.tsx
++++ b/packages/components/src/input-control/backdrop.tsx
+@@ -7,12 +7,17 @@ import { memo } from '@wordpress/element';
+  */
+ import { BackdropUI } from './styles/input-control-styles';
+ 
+-function Backdrop( { disabled = false, isFocused = false } ) {
++function Backdrop( {
++	disabled = false,
++	isBorderless = false,
++	isFocused = false,
++} ) {
+ 	return (
+ 		<BackdropUI
+ 			aria-hidden="true"
+ 			className="components-input-control__backdrop"
+ 			disabled={ disabled }
++			isBorderless={ isBorderless }
+ 			isFocused={ isFocused }
+ 		/>
+ 	);
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index 64544971840b34..ec468ce7fdc4d1 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { forwardRef, useMemo } from '@wordpress/element';
++import { useMemo } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -23,7 +23,11 @@ import {
+ } from './styles/input-control-styles';
+ import type { InputBaseProps, LabelPosition } from './types';
+ import type { WordPressComponentProps } from '../context';
+-import { ContextSystemProvider } from '../context';
++import {
++	ContextSystemProvider,
++	contextConnect,
++	useContextSystem,
++} from '../context';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ 
+ function useUniqueId( idProp?: string ) {
+@@ -73,6 +77,7 @@ export function InputBase(
+ 		hideLabelFromVision = false,
+ 		labelPosition,
+ 		id: idProp,
++		isBorderless = false,
+ 		isFocused = false,
+ 		label,
+ 		prefix,
+@@ -80,7 +85,7 @@ export function InputBase(
+ 		suffix,
+ 		...restProps
+ 	} = useDeprecated36pxDefaultSizeProp(
+-		props,
++		useContextSystem( props, 'InputBase' ),
+ 		'wp.components.InputBase',
+ 		'6.4'
+ 	);
+@@ -138,10 +143,14 @@ export function InputBase(
+ 						</Suffix>
+ 					) }
+ 				</ContextSystemProvider>
+-				<Backdrop disabled={ disabled } isFocused={ isFocused } />
++				<Backdrop
++					disabled={ disabled }
++					isBorderless={ isBorderless }
++					isFocused={ isFocused }
++				/>
+ 			</Container>
+ 		</Root>
+ 	);
+ }
+ 
+-export default forwardRef( InputBase );
++export default contextConnect( InputBase, 'InputBase' );
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index a71c458c6bbc4d..90f4ab92e3f704 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -213,7 +213,7 @@ export const Input = styled.input< InputProps >`
+ 		box-sizing: border-box;
+ 		border: none;
+ 		box-shadow: none !important;
+-		color: ${ COLORS.gray[ 900 ] };
++		color: ${ COLORS.theme.foreground };
+ 		display: block;
+ 		font-family: inherit;
+ 		margin: 0;
+@@ -263,20 +263,23 @@ export const LabelWrapper = styled( FlexItem )`
+ 
+ type BackdropProps = {
+ 	disabled?: boolean;
++	isBorderless?: boolean;
+ 	isFocused?: boolean;
+ };
+ 
+ const backdropFocusedStyles = ( {
+ 	disabled,
++	isBorderless,
+ 	isFocused,
+ }: BackdropProps ): SerializedStyles => {
+-	let borderColor = isFocused ? COLORS.ui.borderFocus : COLORS.ui.border;
++	let borderColor = isBorderless ? 'transparent' : COLORS.ui.border;
+ 
+ 	let boxShadow;
+ 	let outline;
+ 	let outlineOffset;
+ 
+ 	if ( isFocused ) {
++		borderColor = COLORS.ui.borderFocus;
+ 		boxShadow = CONFIG.controlBoxShadowFocus;
+ 		// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 		outline = `2px solid transparent`;
+@@ -284,7 +287,7 @@ const backdropFocusedStyles = ( {
+ 	}
+ 
+ 	if ( disabled ) {
+-		borderColor = COLORS.ui.borderDisabled;
++		borderColor = isBorderless ? 'transparent' : COLORS.ui.borderDisabled;
+ 	}
+ 
+ 	return css( {
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index 2056b69ae3e3dc..c6b02f6d0212d9 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -176,10 +176,19 @@ export interface InputBaseProps extends BaseProps, FlexProps {
+ 	 * If this property is added, a label will be generated using label property as the content.
+ 	 */
+ 	label?: ReactNode;
++	/**
++	 * Whether to hide the border when not focused.
++	 *
++	 * @default false
++	 */
++	isBorderless?: boolean;
+ }
+ 
+ export interface InputControlProps
+-	extends Omit< InputBaseProps, 'children' | 'isFocused' | keyof FlexProps >,
++	extends Omit<
++			InputBaseProps,
++			'children' | 'isBorderless' | 'isFocused' | keyof FlexProps
++		>,
+ 		Pick< BaseControlProps, 'help' >,
+ 		/**
+ 		 * The `prefix` prop in `WordPressComponentProps< InputFieldProps, 'input', false >` comes from the

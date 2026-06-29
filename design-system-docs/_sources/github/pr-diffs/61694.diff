@@ -1,0 +1,171 @@
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index 1e33e7c6740ded..467b4485acd797 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { usePrevious } from '@wordpress/compose';
++import { useEvent, usePrevious } from '@wordpress/compose';
+ import {
+ 	useCallback,
+ 	useEffect,
+@@ -31,8 +31,8 @@ export function useToolsPanelItem(
+ 		label,
+ 		panelId,
+ 		resetAllFilter = noop,
+-		onDeselect,
+-		onSelect,
++		onDeselect: onDeselectProp,
++		onSelect: onSelectProp,
+ 		...otherProps
+ 	} = useContextSystem( props, 'ToolsPanelItem' );
+ 
+@@ -44,7 +44,6 @@ export function useToolsPanelItem(
+ 		registerPanelItem,
+ 		deregisterPanelItem,
+ 		flagItemCustomization,
+-		isResetting,
+ 		shouldRenderPlaceholderItems: shouldRenderPlaceholder,
+ 		firstDisplayedItem,
+ 		lastDisplayedItem,
+@@ -60,6 +59,8 @@ export function useToolsPanelItem(
+ 	// dependency to the useCallback hook! If needed, we should use a ref.
+ 	// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
++	const onDeselect = useEvent( onDeselectProp );
++	const onSelect = useEvent( onSelectProp );
+ 	const previousPanelId = usePrevious( currentPanelId );
+ 
+ 	const hasMatchingPanel =
+@@ -78,6 +79,8 @@ export function useToolsPanelItem(
+ 				isShownByDefault,
+ 				label,
+ 				panelId,
++				onDeselect,
++				onSelect,
+ 			} );
+ 		}
+ 
+@@ -99,6 +102,8 @@ export function useToolsPanelItem(
+ 		previousPanelId,
+ 		registerPanelItem,
+ 		deregisterPanelItem,
++		onDeselect,
++		onSelect,
+ 	] );
+ 
+ 	useEffect( () => {
+@@ -121,7 +126,6 @@ export function useToolsPanelItem(
+ 	// `ToolsPanel`.
+ 	const menuGroup = isShownByDefault ? 'default' : 'optional';
+ 	const isMenuItemChecked = menuItems?.[ menuGroup ]?.[ label ];
+-	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
+ 	const isRegistered = menuItems?.[ menuGroup ]?.[ label ] !== undefined;
+ 
+ 	const isValueSet = hasValue();
+@@ -141,40 +145,10 @@ export function useToolsPanelItem(
+ 		isShownByDefault,
+ 	] );
+ 
+-	// Determine if the panel item's corresponding menu is being toggled and
+-	// trigger appropriate callback if it is.
+-	useEffect( () => {
+-		// We check whether this item is currently registered as items rendered
+-		// via fills can persist through the parent panel being remounted.
+-		// See: https://github.com/WordPress/gutenberg/pull/45673
+-		if ( ! isRegistered || isResetting || ! hasMatchingPanel ) {
+-			return;
+-		}
+-
+-		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
+-			onSelect?.();
+-		}
+-
+-		if ( ! isMenuItemChecked && isValueSet && wasMenuItemChecked ) {
+-			onDeselect?.();
+-		}
+-	}, [
+-		hasMatchingPanel,
+-		isMenuItemChecked,
+-		isRegistered,
+-		isResetting,
+-		isValueSet,
+-		wasMenuItemChecked,
+-		onSelect,
+-		onDeselect,
+-	] );
+-
+ 	// The item is shown if it is a default control regardless of whether it
+ 	// has a value. Optional items are shown when they are checked or have
+ 	// a value.
+-	const isShown = isShownByDefault
+-		? menuItems?.[ menuGroup ]?.[ label ] !== undefined
+-		: isMenuItemChecked;
++	const isShown = isShownByDefault ? isRegistered : isMenuItemChecked;
+ 
+ 	const cx = useCx();
+ 	const classes = useMemo( () => {
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.ts b/packages/components/src/tools-panel/tools-panel/hook.ts
+index 583a079ab20026..03f7758e4ee3d5 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel/hook.ts
+@@ -357,9 +357,22 @@ export function useToolsPanel(
+ 
+ 	// Toggle the checked state of a menu item which is then used to determine
+ 	// display of the item within the panel.
+-	const toggleItem = useCallback( ( label: string ) => {
+-		panelDispatch( { type: 'TOGGLE_VALUE', label } );
+-	}, [] );
++	const toggleItem = useCallback(
++		( label: string ) => {
++			panelDispatch( { type: 'TOGGLE_VALUE', label } );
++			const currentItem = panelItems.find(
++				( item ) => item.label === label
++			);
++			if ( currentItem ) {
++				const { isShownByDefault, onDeselect, onSelect } = currentItem;
++				const menuGroup = isShownByDefault ? 'default' : 'optional';
++				const hasValue = menuItems[ menuGroup ][ label ];
++				const callback = hasValue ? onDeselect : onSelect;
++				callback?.();
++			}
++		},
++		[ menuItems, panelItems ]
++	);
+ 
+ 	// Resets display of children and executes resetAll callback if available.
+ 	const resetAllItems = useCallback( () => {
+diff --git a/packages/components/src/tools-panel/types.ts b/packages/components/src/tools-panel/types.ts
+index e8e2f950de9a30..a5308f7dc05ff7 100644
+--- a/packages/components/src/tools-panel/types.ts
++++ b/packages/components/src/tools-panel/types.ts
+@@ -133,13 +133,6 @@ export type ToolsPanelItem = {
+ 	 * from a shared source.
+ 	 */
+ 	panelId?: string | null;
+-};
+-
+-export type ToolsPanelItemProps = ToolsPanelItem & {
+-	/**
+-	 * The child elements.
+-	 */
+-	children?: ReactNode;
+ 	/**
+ 	 * Called when this item is deselected in the `ToolsPanel` menu. This is
+ 	 * normally used to reset the panel item control's value.
+@@ -150,6 +143,13 @@ export type ToolsPanelItemProps = ToolsPanelItem & {
+ 	 * menu.
+ 	 */
+ 	onSelect?: () => void;
++};
++
++export type ToolsPanelItemProps = ToolsPanelItem & {
++	/**
++	 * The child elements.
++	 */
++	children?: ReactNode;
+ 
+ 	/**
+ 	 * A `ToolsPanel` will collect each item's `resetAllFilter` and pass an

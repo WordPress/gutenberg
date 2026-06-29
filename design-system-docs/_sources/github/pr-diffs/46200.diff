@@ -1,0 +1,605 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index d61eef9009fd8e..1d00d8a9031779 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -119,6 +119,7 @@ module.exports = {
+ 							'invoke',
+ 							'isArray',
+ 							'isBoolean',
++							'isEqual',
+ 							'isFinite',
+ 							'isFunction',
+ 							'isMatch',
+diff --git a/package-lock.json b/package-lock.json
+index 2f6ddaab8bfed7..c5f6b1b9dd0d68 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -18079,6 +18079,7 @@
+ 				"colord": "^2.7.0",
+ 				"diff": "^4.0.2",
+ 				"dom-scroll-into-view": "^1.2.1",
++				"fast-deep-equal": "^3.1.3",
+ 				"inherits": "^2.0.3",
+ 				"lodash": "^4.17.21",
+ 				"react-autosize-textarea": "^7.1.0",
+@@ -18124,6 +18125,7 @@
+ 				"colord": "^2.7.0",
+ 				"escape-html": "^1.0.3",
+ 				"fast-average-color": "^9.1.1",
++				"fast-deep-equal": "^3.1.3",
+ 				"lodash": "^4.17.21",
+ 				"memize": "^1.1.0",
+ 				"micromodal": "^0.4.10",
+@@ -18162,6 +18164,7 @@
+ 				"@wordpress/shortcode": "file:packages/shortcode",
+ 				"change-case": "^4.1.2",
+ 				"colord": "^2.7.0",
++				"fast-deep-equal": "^3.1.3",
+ 				"hpq": "^1.3.0",
+ 				"is-plain-object": "^5.0.0",
+ 				"lodash": "^4.17.21",
+@@ -18210,6 +18213,7 @@
+ 				"date-fns": "^2.28.0",
+ 				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^6.0.15",
++				"fast-deep-equal": "^3.1.3",
+ 				"framer-motion": "^7.6.1",
+ 				"gradient-parser": "^0.1.5",
+ 				"highlight-words-core": "^1.2.2",
+@@ -18264,6 +18268,7 @@
+ 				"@wordpress/url": "file:packages/url",
+ 				"change-case": "^4.1.2",
+ 				"equivalent-key-map": "^0.2.2",
++				"fast-deep-equal": "^3.1.3",
+ 				"lodash": "^4.17.21",
+ 				"memize": "^1.1.0",
+ 				"rememo": "^4.0.0",
+@@ -18317,6 +18322,7 @@
+ 				"@wordpress/preferences": "file:packages/preferences",
+ 				"@wordpress/widgets": "file:packages/widgets",
+ 				"classnames": "^2.3.1",
++				"fast-deep-equal": "^3.1.3",
+ 				"lodash": "^4.17.21"
+ 			}
+ 		},
+@@ -18540,6 +18546,7 @@
+ 				"classnames": "^2.3.1",
+ 				"colord": "^2.9.2",
+ 				"downloadjs": "^1.4.7",
++				"fast-deep-equal": "^3.1.3",
+ 				"history": "^5.1.0",
+ 				"lodash": "^4.17.21",
+ 				"react-autosize-textarea": "^7.1.0",
+@@ -19575,6 +19582,7 @@
+ 				"@wordpress/element": "file:packages/element",
+ 				"@wordpress/i18n": "file:packages/i18n",
+ 				"@wordpress/url": "file:packages/url",
++				"fast-deep-equal": "^3.1.3",
+ 				"lodash": "^4.17.21"
+ 			}
+ 		},
+@@ -35760,8 +35768,7 @@
+ 		"fast-deep-equal": {
+ 			"version": "3.1.3",
+ 			"resolved": "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz",
+-			"integrity": "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==",
+-			"dev": true
++			"integrity": "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
+ 		},
+ 		"fast-diff": {
+ 			"version": "1.2.0",
+diff --git a/packages/block-editor/package.json b/packages/block-editor/package.json
+index f62afa7a1d4b84..dce5352d5812a6 100644
+--- a/packages/block-editor/package.json
++++ b/packages/block-editor/package.json
+@@ -65,6 +65,7 @@
+ 		"colord": "^2.7.0",
+ 		"diff": "^4.0.2",
+ 		"dom-scroll-into-view": "^1.2.1",
++		"fast-deep-equal": "^3.1.3",
+ 		"inherits": "^2.0.3",
+ 		"lodash": "^4.17.21",
+ 		"react-autosize-textarea": "^7.1.0",
+diff --git a/packages/block-editor/src/components/inner-blocks/use-inner-block-template-sync.js b/packages/block-editor/src/components/inner-blocks/use-inner-block-template-sync.js
+index c9ccfe7faaf0e4..7b8d04167981b9 100644
+--- a/packages/block-editor/src/components/inner-blocks/use-inner-block-template-sync.js
++++ b/packages/block-editor/src/components/inner-blocks/use-inner-block-template-sync.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEqual } from 'lodash';
++import fastDeepEqual from 'fast-deep-equal/es6';
+ 
+ /**
+  * WordPress dependencies
+@@ -66,7 +66,7 @@ export default function useInnerBlockTemplateSync(
+ 				templateLock === 'all' ||
+ 				templateLock === 'contentOnly';
+ 
+-			const hasTemplateChanged = ! isEqual(
++			const hasTemplateChanged = ! fastDeepEqual(
+ 				template,
+ 				existingTemplate.current
+ 			);
+@@ -81,7 +81,7 @@ export default function useInnerBlockTemplateSync(
+ 				template
+ 			);
+ 
+-			if ( ! isEqual( nextBlocks, currentInnerBlocks ) ) {
++			if ( ! fastDeepEqual( nextBlocks, currentInnerBlocks ) ) {
+ 				__unstableMarkNextChangeAsNotPersistent();
+ 				replaceInnerBlocks(
+ 					clientId,
+diff --git a/packages/block-editor/src/store/reducer.js b/packages/block-editor/src/store/reducer.js
+index cd38981d9784e6..fcbb1c4cf33017 100644
+--- a/packages/block-editor/src/store/reducer.js
++++ b/packages/block-editor/src/store/reducer.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { omit, mapValues, isEqual, isEmpty } from 'lodash';
++import fastDeepEqual from 'fast-deep-equal/es6';
++import { omit, mapValues, isEmpty } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -121,7 +122,7 @@ function getFlattenedBlockAttributes( blocks ) {
+  * @return {boolean} Whether the two objects have the same keys.
+  */
+ export function hasSameKeys( a, b ) {
+-	return isEqual( Object.keys( a ), Object.keys( b ) );
++	return fastDeepEqual( Object.keys( a ), Object.keys( b ) );
+ }
+ 
+ /**
+@@ -139,7 +140,7 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
+ 		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
+ 		lastAction !== undefined &&
+ 		lastAction.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
+-		isEqual( action.clientIds, lastAction.clientIds ) &&
++		fastDeepEqual( action.clientIds, lastAction.clientIds ) &&
+ 		hasSameKeys( action.attributes, lastAction.attributes )
+ 	);
+ }
+@@ -1491,7 +1492,7 @@ export function insertionPoint( state = null, action ) {
+ 			};
+ 
+ 			// Bail out updates if the states are the same.
+-			return isEqual( state, nextState ) ? state : nextState;
++			return fastDeepEqual( state, nextState ) ? state : nextState;
+ 		}
+ 
+ 		case 'HIDE_INSERTION_POINT':
+@@ -1616,7 +1617,7 @@ export const blockListSettings = ( state = {}, action ) => {
+ 				return state;
+ 			}
+ 
+-			if ( isEqual( state[ clientId ], action.settings ) ) {
++			if ( fastDeepEqual( state[ clientId ], action.settings ) ) {
+ 				return state;
+ 			}
+ 
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index 8cc902851fa330..7510c3b22a7c20 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -63,6 +63,7 @@
+ 		"colord": "^2.7.0",
+ 		"escape-html": "^1.0.3",
+ 		"fast-average-color": "^9.1.1",
++		"fast-deep-equal": "^3.1.3",
+ 		"lodash": "^4.17.21",
+ 		"memize": "^1.1.0",
+ 		"micromodal": "^0.4.10",
+diff --git a/packages/block-library/src/table-of-contents/edit.js b/packages/block-library/src/table-of-contents/edit.js
+index 92f2d39dd98cf5..dab35fdd0ce3d9 100644
+--- a/packages/block-library/src/table-of-contents/edit.js
++++ b/packages/block-library/src/table-of-contents/edit.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEqual } from 'lodash';
++import fastDeepEqual from 'fast-deep-equal/es6';
+ 
+ /**
+  * WordPress dependencies
+@@ -204,7 +204,7 @@ export default function TableOfContentsEdit( {
+ 				}
+ 			}
+ 
+-			if ( isEqual( headings, _latestHeadings ) ) {
++			if ( fastDeepEqual( headings, _latestHeadings ) ) {
+ 				return null;
+ 			}
+ 			return _latestHeadings;
+diff --git a/packages/blocks/package.json b/packages/blocks/package.json
+index 2b1e65365b392c..028f2eb47af905 100644
+--- a/packages/blocks/package.json
++++ b/packages/blocks/package.json
+@@ -44,6 +44,7 @@
+ 		"@wordpress/shortcode": "file:../shortcode",
+ 		"change-case": "^4.1.2",
+ 		"colord": "^2.7.0",
++		"fast-deep-equal": "^3.1.3",
+ 		"hpq": "^1.3.0",
+ 		"is-plain-object": "^5.0.0",
+ 		"lodash": "^4.17.21",
+diff --git a/packages/blocks/src/api/validation/index.js b/packages/blocks/src/api/validation/index.js
+index 6f64c5f3923abe..abea733fe44715 100644
+--- a/packages/blocks/src/api/validation/index.js
++++ b/packages/blocks/src/api/validation/index.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { Tokenizer } from 'simple-html-tokenizer';
+-import { isEqual } from 'lodash';
++import fastDeepEqual from 'fast-deep-equal/es6';
+ 
+ /**
+  * WordPress dependencies
+@@ -423,7 +423,9 @@ export const isEqualAttributesOfName = {
+ 		return actualDiff.length === 0 && expectedDiff.length === 0;
+ 	},
+ 	style: ( actual, expected ) => {
+-		return isEqual( ...[ actual, expected ].map( getStyleProperties ) );
++		return fastDeepEqual(
++			...[ actual, expected ].map( getStyleProperties )
++		);
+ 	},
+ 	// For each boolean attribute, mere presence of attribute in both is enough
+ 	// to assume equivalence.
+diff --git a/packages/components/package.json b/packages/components/package.json
+index fe31eecd878112..ca77fb07450e79 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -59,6 +59,7 @@
+ 		"date-fns": "^2.28.0",
+ 		"dom-scroll-into-view": "^1.2.1",
+ 		"downshift": "^6.0.15",
++		"fast-deep-equal": "^3.1.3",
+ 		"framer-motion": "^7.6.1",
+ 		"gradient-parser": "^0.1.5",
+ 		"highlight-words-core": "^1.2.2",
+diff --git a/packages/components/src/duotone-picker/duotone-picker.js b/packages/components/src/duotone-picker/duotone-picker.js
+index 39e1733460f2ae..4f9e5ea7b23ce6 100644
+--- a/packages/components/src/duotone-picker/duotone-picker.js
++++ b/packages/components/src/duotone-picker/duotone-picker.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEqual } from 'lodash';
++import fastDeepEqual from 'fast-deep-equal/es6';
+ 
+ /**
+  * WordPress dependencies
+@@ -69,7 +69,7 @@ function DuotonePicker( {
+ 					name
+ 			  )
+ 			: tooltipText;
+-		const isSelected = isEqual( colors, value );
++		const isSelected = fastDeepEqual( colors, value );
+ 
+ 		return (
+ 			<CircularOptionPicker.Option
+diff --git a/packages/components/src/higher-order/with-fallback-styles/index.js b/packages/components/src/higher-order/with-fallback-styles/index.js
+index 57532b9915874d..6f16275498ca1b 100644
+--- a/packages/components/src/higher-order/with-fallback-styles/index.js
++++ b/packages/components/src/higher-order/with-fallback-styles/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEqual } from 'lodash';
++import fastDeepEqual from 'fast-deep-equal/es6';
+ 
+ /**
+  * WordPress dependencies
+@@ -46,7 +46,9 @@ export default ( mapNodeToProps ) =>
+ 						this.props
+ 					);
+ 
+-					if ( ! isEqual( newFallbackStyles, fallbackStyles ) ) {
++					if (
++						! fastDeepEqual( newFallbackStyles, fallbackStyles )
++					) {
+ 						this.setState( {
+ 							fallbackStyles: newFallbackStyles,
+ 							grabStylesCompleted:
+diff --git a/packages/components/src/mobile/keyboard-aware-flat-list/index.ios.js b/packages/components/src/mobile/keyboard-aware-flat-list/index.ios.js
+index a8e84aaf1c2a49..05ff4c8bb65191 100644
+--- a/packages/components/src/mobile/keyboard-aware-flat-list/index.ios.js
++++ b/packages/components/src/mobile/keyboard-aware-flat-list/index.ios.js
+@@ -3,7 +3,7 @@
+  */
+ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+ import { FlatList } from 'react-native';
+-import { isEqual } from 'lodash';
++import fastDeepEqual from 'fast-deep-equal/es6';
+ import Animated, {
+ 	useAnimatedScrollHandler,
+ 	useSharedValue,
+@@ -14,7 +14,7 @@ import Animated, {
+  */
+ import { memo, useCallback, useRef } from '@wordpress/element';
+ 
+-const List = memo( FlatList, isEqual );
++const List = memo( FlatList, fastDeepEqual );
+ const AnimatedKeyboardAwareScrollView = Animated.createAnimatedComponent(
+ 	KeyboardAwareScrollView
+ );
+diff --git a/packages/components/src/ui/context/context-system-provider.js b/packages/components/src/ui/context/context-system-provider.js
+index 6fe0053dbcd8c7..33f8ded8526d6d 100644
+--- a/packages/components/src/ui/context/context-system-provider.js
++++ b/packages/components/src/ui/context/context-system-provider.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { isEqual, merge } from 'lodash';
++import fastDeepEqual from 'fast-deep-equal/es6';
++import { merge } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -42,7 +43,7 @@ function useContextSystemBridge( { value } ) {
+ 	useUpdateEffect( () => {
+ 		if (
+ 			// Objects are equivalent.
+-			isEqual( valueRef.current, value ) &&
++			fastDeepEqual( valueRef.current, value ) &&
+ 			// But not the same reference.
+ 			valueRef.current !== value
+ 		) {
+diff --git a/packages/core-data/package.json b/packages/core-data/package.json
+index 867c0e91d81619..441237788e5208 100644
+--- a/packages/core-data/package.json
++++ b/packages/core-data/package.json
+@@ -43,6 +43,7 @@
+ 		"@wordpress/url": "file:../url",
+ 		"change-case": "^4.1.2",
+ 		"equivalent-key-map": "^0.2.2",
++		"fast-deep-equal": "^3.1.3",
+ 		"lodash": "^4.17.21",
+ 		"memize": "^1.1.0",
+ 		"rememo": "^4.0.0",
+diff --git a/packages/core-data/src/actions.js b/packages/core-data/src/actions.js
+index 97fc0b41ddaf52..550264d6232ae3 100644
+--- a/packages/core-data/src/actions.js
++++ b/packages/core-data/src/actions.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { isEqual, find } from 'lodash';
++import fastDeepEqual from 'fast-deep-equal/es6';
++import { find } from 'lodash';
+ import { v4 as uuid } from 'uuid';
+ 
+ /**
+@@ -355,7 +356,9 @@ export const editEntityRecord =
+ 				const value = mergedEdits[ key ]
+ 					? { ...editedRecordValue, ...edits[ key ] }
+ 					: edits[ key ];
+-				acc[ key ] = isEqual( recordValue, value ) ? undefined : value;
++				acc[ key ] = fastDeepEqual( recordValue, value )
++					? undefined
++					: value;
+ 				return acc;
+ 			}, {} ),
+ 			transientEdits,
+diff --git a/packages/core-data/src/reducer.js b/packages/core-data/src/reducer.js
+index 276c878c926f8f..21ecaff436c72c 100644
+--- a/packages/core-data/src/reducer.js
++++ b/packages/core-data/src/reducer.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { map, groupBy, isEqual, get } from 'lodash';
++import fastDeepEqual from 'fast-deep-equal/es6';
++import { map, groupBy, get } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -245,7 +246,7 @@ function entity( entityConfig ) {
+ 										// Edits are the "raw" attribute values, but records may have
+ 										// objects with more properties, so we use `get` here for the
+ 										// comparison.
+-										! isEqual(
++										! fastDeepEqual(
+ 											edits[ key ],
+ 											get(
+ 												record[ key ],
+@@ -256,7 +257,7 @@ function entity( entityConfig ) {
+ 										// Sometimes the server alters the sent value which means
+ 										// we need to also remove the edits before the api request.
+ 										( ! action.persistedEdits ||
+-											! isEqual(
++											! fastDeepEqual(
+ 												edits[ key ],
+ 												action.persistedEdits[ key ]
+ 											) )
+diff --git a/packages/core-data/src/utils/conservative-map-item.js b/packages/core-data/src/utils/conservative-map-item.js
+index 133a2e7d8d9d6b..2a3297b5b32ab8 100644
+--- a/packages/core-data/src/utils/conservative-map-item.js
++++ b/packages/core-data/src/utils/conservative-map-item.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEqual } from 'lodash';
++import fastDeepEqual from 'fast-deep-equal/es6';
+ 
+ /**
+  * Given the current and next item entity record, returns the minimally "modified"
+@@ -22,7 +22,7 @@ export default function conservativeMapItem( item, nextItem ) {
+ 	let hasChanges = false;
+ 	const result = {};
+ 	for ( const key in nextItem ) {
+-		if ( isEqual( item[ key ], nextItem[ key ] ) ) {
++		if ( fastDeepEqual( item[ key ], nextItem[ key ] ) ) {
+ 			result[ key ] = item[ key ];
+ 		} else {
+ 			hasChanges = true;
+diff --git a/packages/customize-widgets/package.json b/packages/customize-widgets/package.json
+index fe6d3a03e423be..b2da830c27dbf5 100644
+--- a/packages/customize-widgets/package.json
++++ b/packages/customize-widgets/package.json
+@@ -44,6 +44,7 @@
+ 		"@wordpress/preferences": "file:../preferences",
+ 		"@wordpress/widgets": "file:../widgets",
+ 		"classnames": "^2.3.1",
++		"fast-deep-equal": "^3.1.3",
+ 		"lodash": "^4.17.21"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js b/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js
+index d91ec2ac092ca0..7d6856004982b8 100644
+--- a/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js
++++ b/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEqual } from 'lodash';
++import fastDeepEqual from 'fast-deep-equal/es6';
+ 
+ /**
+  * WordPress dependencies
+@@ -82,7 +82,10 @@ export default function useSidebarBlockEditor( sidebar ) {
+ 
+ 						// Bail out updates by returning the previous widgets.
+ 						// Deep equality is necessary until the block editor's internals changes.
+-						if ( isEqual( nextBlock, prevBlock ) && prevWidget ) {
++						if (
++							fastDeepEqual( nextBlock, prevBlock ) &&
++							prevWidget
++						) {
+ 							return prevWidget;
+ 						}
+ 
+diff --git a/packages/edit-site/package.json b/packages/edit-site/package.json
+index 36b56e6d09b4c6..6f42f00b2c625e 100644
+--- a/packages/edit-site/package.json
++++ b/packages/edit-site/package.json
+@@ -57,6 +57,7 @@
+ 		"classnames": "^2.3.1",
+ 		"colord": "^2.9.2",
+ 		"downloadjs": "^1.4.7",
++		"fast-deep-equal": "^3.1.3",
+ 		"history": "^5.1.0",
+ 		"lodash": "^4.17.21",
+ 		"react-autosize-textarea": "^7.1.0",
+diff --git a/packages/edit-site/src/components/global-styles/hooks.js b/packages/edit-site/src/components/global-styles/hooks.js
+index 2de36fbb60b728..86e8aa2d2a6413 100644
+--- a/packages/edit-site/src/components/global-styles/hooks.js
++++ b/packages/edit-site/src/components/global-styles/hooks.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { get, set, isEqual } from 'lodash';
++import fastDeepEqual from 'fast-deep-equal/es6';
++import { get, set } from 'lodash';
+ import { colord, extend } from 'colord';
+ import a11yPlugin from 'colord/plugins/a11y';
+ 
+@@ -29,7 +30,7 @@ const EMPTY_CONFIG = { settings: {}, styles: {} };
+ 
+ export const useGlobalStylesReset = () => {
+ 	const { user: config, setUserConfig } = useContext( GlobalStylesContext );
+-	const canReset = !! config && ! isEqual( config, EMPTY_CONFIG );
++	const canReset = !! config && ! fastDeepEqual( config, EMPTY_CONFIG );
+ 	return [
+ 		canReset,
+ 		useCallback(
+diff --git a/packages/edit-site/src/components/global-styles/screen-style-variations.js b/packages/edit-site/src/components/global-styles/screen-style-variations.js
+index dfdc6f67f340cb..b88b81a0c08d17 100644
+--- a/packages/edit-site/src/components/global-styles/screen-style-variations.js
++++ b/packages/edit-site/src/components/global-styles/screen-style-variations.js
+@@ -1,8 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { isEqual } from 'lodash';
+ import classnames from 'classnames';
++import fastDeepEqual from 'fast-deep-equal/es6';
+ 
+ /**
+  * WordPress dependencies
+@@ -34,7 +34,10 @@ import StylesPreview from './preview';
+ import ScreenHeader from './header';
+ 
+ function compareVariations( a, b ) {
+-	return isEqual( a.styles, b.styles ) && isEqual( a.settings, b.settings );
++	return (
++		fastDeepEqual( a.styles, b.styles ) &&
++		fastDeepEqual( a.settings, b.settings )
++	);
+ }
+ 
+ function Variation( { variation } ) {
+diff --git a/packages/is-shallow-equal/README.md b/packages/is-shallow-equal/README.md
+index 5827408baf1360..2908803a7804b2 100644
+--- a/packages/is-shallow-equal/README.md
++++ b/packages/is-shallow-equal/README.md
+@@ -29,18 +29,18 @@ import { isShallowEqualArrays } from '@wordpress/is-shallow-equal';
+ import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
+ ```
+ 
+-Shallow comparison differs from deep comparison by the fact that it compares members from each as being strictly equal to the other, meaning that arrays and objects will be compared by their _references_, not by their values (see also [_Object Equality in JavaScript_.](http://adripofjavascript.com/blog/drips/object-equality-in-javascript.html)) In situations where nested objects must be compared by value, consider using [Lodash's `isEqual`](https://lodash.com/docs/4.17.11#isEqual) instead.
++Shallow comparison differs from deep comparison by the fact that it compares members from each as being strictly equal to the other, meaning that arrays and objects will be compared by their _references_, not by their values (see also [_Object Equality in JavaScript_.](http://adripofjavascript.com/blog/drips/object-equality-in-javascript.html)) In situations where nested objects must be compared by value, consider using [`fast-deep-equal`](https://github.com/epoberezkin/fast-deep-equal) instead.
+ 
+ ```js
+ import isShallowEqual from '@wordpress/is-shallow-equal';
+-import { isEqual } from 'lodash'; // deep comparison
++import fastDeepEqual from 'fast-deep-equal/es6'; // deep comparison
+ 
+ let object = { a: 1 };
+ 
+ isShallowEqual( [ { a: 1 } ], [ { a: 1 } ] );
+ // ⇒ false
+ 
+-isEqual( [ { a: 1 } ], [ { a: 1 } ] );
++fastDeepEqual( [ { a: 1 } ], [ { a: 1 } ] );
+ // ⇒ true
+ 
+ isShallowEqual( [ object ], [ object ] );
+diff --git a/packages/server-side-render/package.json b/packages/server-side-render/package.json
+index 2ceeb7140e7072..00376e06365981 100644
+--- a/packages/server-side-render/package.json
++++ b/packages/server-side-render/package.json
+@@ -36,6 +36,7 @@
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/url": "file:../url",
++		"fast-deep-equal": "^3.1.3",
+ 		"lodash": "^4.17.21"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/server-side-render/src/server-side-render.js b/packages/server-side-render/src/server-side-render.js
+index 07d120e11440d4..69a2183036dd14 100644
+--- a/packages/server-side-render/src/server-side-render.js
++++ b/packages/server-side-render/src/server-side-render.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEqual } from 'lodash';
++import fastDeepEqual from 'fast-deep-equal/es6';
+ 
+ /**
+  * WordPress dependencies
+@@ -187,7 +187,7 @@ export default function ServerSideRender( props ) {
+ 		// shows data as soon as possible.
+ 		if ( prevProps === undefined ) {
+ 			fetchData();
+-		} else if ( ! isEqual( prevProps, props ) ) {
++		} else if ( ! fastDeepEqual( prevProps, props ) ) {
+ 			debouncedFetchData();
+ 		}
+ 	} );

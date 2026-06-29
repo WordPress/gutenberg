@@ -1,0 +1,110 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a5cf55e2ac9edb..5b9334388a177f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Bug Fix
+ 
+ -   `Autocomplete`: Fix unexpected block insertion during IME composition ([#45510](https://github.com/WordPress/gutenberg/pull/45510)).
++-   `Icon`: Making size prop work for icon components using dash icon strings ([#45593](https://github.com/WordPress/gutenberg/pull/45593))
+ -   `ToolsPanelItem`: Prevent unintended calls to onDeselect when parent panel is remounted and item is rendered via SlotFill ([#45673](https://github.com/WordPress/gutenberg/pull/45673))
+ -   `ColorPicker`: Prevent all number fields from becoming "0" when one of them is an empty string ([#45649](https://github.com/WordPress/gutenberg/pull/45649)).
+ 
+diff --git a/packages/components/src/dashicon/index.js b/packages/components/src/dashicon/index.js
+index c57ec0255bf628..9fc5fddae5b316 100644
+--- a/packages/components/src/dashicon/index.js
++++ b/packages/components/src/dashicon/index.js
+@@ -3,6 +3,7 @@
+  *
+  * @property {import('./types').IconKey} icon        Icon name
+  * @property {string}                    [className] Class name
++ * @property {number}                    [size] Size of the icon
+  */
+ /** @typedef {import('react').ComponentPropsWithoutRef<'span'> & OwnProps} Props */
+ 
+@@ -10,7 +11,8 @@
+  * @param {Props} props
+  * @return {JSX.Element} Element
+  */
+-function Dashicon( { icon, className, ...extraProps } ) {
++
++function Dashicon( { icon, className, size = 20, style = {}, ...extraProps } ) {
+ 	const iconClass = [
+ 		'dashicon',
+ 		'dashicons',
+@@ -20,7 +22,24 @@ function Dashicon( { icon, className, ...extraProps } ) {
+ 		.filter( Boolean )
+ 		.join( ' ' );
+ 
+-	return <span className={ iconClass } { ...extraProps } />;
++	// For retro-compatibility reasons (for example if people are overriding icon size with CSS), we add inline styles just if the size is different to the default
++	const sizeStyles =
++		// using `!=` to catch both 20 and "20"
++		// eslint-disable-next-line eqeqeq
++		20 != size
++			? {
++					fontSize: `${ size }px`,
++					width: `${ size }px`,
++					height: `${ size }px`,
++			  }
++			: {};
++
++	const styles = {
++		...sizeStyles,
++		...style,
++	};
++
++	return <span className={ iconClass } style={ styles } { ...extraProps } />;
+ }
+ 
+ export default Dashicon;
+diff --git a/packages/components/src/icon/index.tsx b/packages/components/src/icon/index.tsx
+index 504a30444e16ed..15b41063fdb1fc 100644
+--- a/packages/components/src/icon/index.tsx
++++ b/packages/components/src/icon/index.tsx
+@@ -33,7 +33,7 @@ interface BaseProps< P > {
+ 	/**
+ 	 * The size (width and height) of the icon.
+ 	 *
+-	 * @default 24
++	 * @default `20` when a Dashicon is rendered, `24` for all other icons.
+ 	 */
+ 	size?: number;
+ }
+@@ -48,13 +48,14 @@ export type Props< P > = BaseProps< P > & AdditionalProps< IconType< P > >;
+ 
+ function Icon< P >( {
+ 	icon = null,
+-	size = 24,
++	size = 'string' === typeof icon ? 20 : 24,
+ 	...additionalProps
+ }: Props< P > ) {
+ 	if ( 'string' === typeof icon ) {
+ 		return (
+ 			<Dashicon
+ 				icon={ icon }
++				size={ size }
+ 				{ ...( additionalProps as HTMLProps< HTMLSpanElement > ) }
+ 			/>
+ 		);
+diff --git a/packages/components/src/icon/test/index.js b/packages/components/src/icon/test/index.js
+index 5fc897576db1c7..9faff9e74116df 100644
+--- a/packages/components/src/icon/test/index.js
++++ b/packages/components/src/icon/test/index.js
+@@ -32,6 +32,16 @@ describe( 'Icon', () => {
+ 		);
+ 	} );
+ 
++	it( 'renders a dashicon with custom size', () => {
++		render(
++			<Icon data-testid={ testId } icon="format-image" size={ 10 } />
++		);
++
++		expect( screen.getByTestId( testId ) ).toHaveStyle( 'width:10px' );
++		expect( screen.getByTestId( testId ) ).toHaveStyle( 'height:10px' );
++		expect( screen.getByTestId( testId ) ).toHaveStyle( 'font-size:10px' );
++	} );
++
+ 	it( 'renders a function', () => {
+ 		render( <Icon icon={ () => <span data-testid={ testId } /> } /> );
+ 

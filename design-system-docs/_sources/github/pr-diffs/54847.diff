@@ -1,0 +1,2388 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 36ba45825e54fd..2931965ea0ba98 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ -   `Tooltip`, `Shortcut`: Remove unused `ui/` components from the codebase ([#54573](https://github.com/WordPress/gutenberg/pull/54573))
+ -   Refactor ariakit usages to use the `render` prop instead of `as` and to use the namespace import ([#54696](https://github.com/WordPress/gutenberg/pull/54696)).
+ -   Update `uuid` package to 9.0.1 ([#54725](https://github.com/WordPress/gutenberg/pull/54725)).
++-   `ContextSystemProvider`: Move out of `ui/` ([#54847](https://github.com/WordPress/gutenberg/pull/54847)).
+ 
+ ## 25.8.0 (2023-09-20)
+ 
+diff --git a/packages/components/CONTRIBUTING.md b/packages/components/CONTRIBUTING.md
+index 5a94194fa63585..3d682c584f383d 100644
+--- a/packages/components/CONTRIBUTING.md
++++ b/packages/components/CONTRIBUTING.md
+@@ -328,7 +328,7 @@ An example of how this is used can be found in the [`Card` component family](/pa
+ //=========================================================================
+ // Simplified snippet from `packages/components/src/card/card/hook.ts`
+ //=========================================================================
+-import { useContextSystem } from '../../ui/context';
++import { useContextSystem } from '../../context';
+ 
+ export function useCard( props ) {
+ 	// Read any derived registered prop from the Context System in the `Card` namespace
+@@ -342,7 +342,7 @@ export function useCard( props ) {
+ //=========================================================================
+ // Simplified snippet from `packages/components/src/card/card/component.ts`
+ //=========================================================================
+-import { contextConnect, ContextSystemProvider } from '../../ui/context';
++import { contextConnect, ContextSystemProvider } from '../../context';
+ 
+ function Card( props, forwardedRef ) {
+ 	const {
+@@ -379,7 +379,7 @@ export default ConnectedCard;
+ //=========================================================================
+ // Simplified snippet from `packages/components/src/card/card-body/hook.ts`
+ //=========================================================================
+-import { useContextSystem } from '../../ui/context';
++import { useContextSystem } from '../../context';
+ 
+ export function useCardBody( props ) {
+ 	// Read any derived registered prop from the Context System in the `CardBody` namespace.
+@@ -581,7 +581,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
+ 	6. If the component forwards its `...restProps` to an underlying element/component, you should use the `WordPressComponentProps` type for the component's props:
+ 
+ 		```tsx
+-		import type { WordPressComponentProps } from '../ui/context';
++		import type { WordPressComponentProps } from '../context';
+ 		import type { ComponentOwnProps } from './types';
+ 
+ 		function UnconnectedMyComponent(
+diff --git a/packages/components/src/alignment-matrix-control/cell.tsx b/packages/components/src/alignment-matrix-control/cell.tsx
+index b6e19c56022915..00daa6fb316954 100644
+--- a/packages/components/src/alignment-matrix-control/cell.tsx
++++ b/packages/components/src/alignment-matrix-control/cell.tsx
+@@ -14,7 +14,7 @@ import {
+ 	Point,
+ } from './styles/alignment-matrix-control-styles';
+ import type { AlignmentMatrixControlCellProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ export default function Cell( {
+ 	isActive = false,
+diff --git a/packages/components/src/alignment-matrix-control/icon.tsx b/packages/components/src/alignment-matrix-control/icon.tsx
+index b294bc7551e19d..33528e63fc87f0 100644
+--- a/packages/components/src/alignment-matrix-control/icon.tsx
++++ b/packages/components/src/alignment-matrix-control/icon.tsx
+@@ -13,7 +13,7 @@ import {
+ 	Point,
+ } from './styles/alignment-matrix-control-icon-styles';
+ import type { AlignmentMatrixControlIconProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ const BASE_SIZE = 24;
+ 
+diff --git a/packages/components/src/alignment-matrix-control/index.tsx b/packages/components/src/alignment-matrix-control/index.tsx
+index 0e34e4052346da..2d52bb0e248435 100644
+--- a/packages/components/src/alignment-matrix-control/index.tsx
++++ b/packages/components/src/alignment-matrix-control/index.tsx
+@@ -18,7 +18,7 @@ import { Composite, CompositeGroup, useCompositeState } from '../composite';
+ import { Root, Row } from './styles/alignment-matrix-control-styles';
+ import AlignmentMatrixControlIcon from './icon';
+ import { GRID, getItemId } from './utils';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type {
+ 	AlignmentMatrixControlProps,
+ 	AlignmentMatrixControlValue,
+diff --git a/packages/components/src/angle-picker-control/angle-circle.tsx b/packages/components/src/angle-picker-control/angle-circle.tsx
+index 77518efb21bc1a..8558b23279302d 100644
+--- a/packages/components/src/angle-picker-control/angle-circle.tsx
++++ b/packages/components/src/angle-picker-control/angle-circle.tsx
+@@ -13,7 +13,7 @@ import {
+ 	CircleIndicator,
+ } from './styles/angle-picker-control-styles';
+ 
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { AngleCircleProps } from './types';
+ 
+ type UseDraggingArgumentType = Parameters< typeof useDragging >[ 0 ];
+diff --git a/packages/components/src/angle-picker-control/index.tsx b/packages/components/src/angle-picker-control/index.tsx
+index 1fb17f86acfd2d..f90394b12078f4 100644
+--- a/packages/components/src/angle-picker-control/index.tsx
++++ b/packages/components/src/angle-picker-control/index.tsx
+@@ -20,7 +20,7 @@ import NumberControl from '../number-control';
+ import AngleCircle from './angle-circle';
+ import { Root, UnitText } from './styles/angle-picker-control-styles';
+ 
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { AnglePickerControlProps } from './types';
+ 
+ function UnforwardedAnglePickerControl(
+diff --git a/packages/components/src/base-control/index.tsx b/packages/components/src/base-control/index.tsx
+index fa2df39bddd458..29251a114e0343 100644
+--- a/packages/components/src/base-control/index.tsx
++++ b/packages/components/src/base-control/index.tsx
+@@ -15,7 +15,7 @@ import {
+ 	StyledHelp,
+ 	StyledVisualLabel,
+ } from './styles/base-control-styles';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ export { useBaseControlProps } from './hooks';
+ 
+diff --git a/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx b/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
+index f782fb89340200..ee76c39742d417 100644
+--- a/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
+@@ -10,8 +10,8 @@ import { __ } from '@wordpress/i18n';
+ import Button from '../../button';
+ import Tooltip from '../../tooltip';
+ import { View } from '../../view';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { useBorderBoxControlLinkedButton } from './hook';
+ 
+ import type { LinkedButtonProps } from '../types';
+diff --git a/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts b/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts
+index cd65758416ca13..3d535a6583a13c 100644
+--- a/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts
+@@ -7,8 +7,8 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import * as styles from '../styles';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ import type { LinkedButtonProps } from '../types';
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index 922f0b39c09c97..ee7a6d86cb33fb 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -11,8 +11,8 @@ import { useMergeRefs } from '@wordpress/compose';
+ import BorderBoxControlVisualizer from '../border-box-control-visualizer';
+ import { BorderControl } from '../../border-control';
+ import { Grid } from '../../grid';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { useBorderBoxControlSplitControls } from './hook';
+ 
+ import type { BorderControlProps } from '../../border-control/types';
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts b/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts
+index ff152c9bc674ad..3a8194819ef0c8 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/hook.ts
+@@ -7,8 +7,8 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import * as styles from '../styles';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import { useCx } from '../../utils/';
+ 
+ import type { SplitControlsProps } from '../types';
+diff --git a/packages/components/src/border-box-control/border-box-control-visualizer/component.tsx b/packages/components/src/border-box-control/border-box-control-visualizer/component.tsx
+index d815b0b8c088e8..2656911d765797 100644
+--- a/packages/components/src/border-box-control/border-box-control-visualizer/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-visualizer/component.tsx
+@@ -7,8 +7,8 @@ import { __ } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import { View } from '../../view';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { useBorderBoxControlVisualizer } from './hook';
+ 
+ import type { VisualizerProps } from '../types';
+diff --git a/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts b/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts
+index d7ae390dcd146d..8cc678c7e2708c 100644
+--- a/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts
+@@ -7,8 +7,8 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import * as styles from '../styles';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import { useCx } from '../../utils';
+ 
+ import type { VisualizerProps } from '../types';
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index ad3162851c2670..4f3517937f2046 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -14,8 +14,8 @@ import { BorderControl } from '../../border-control';
+ import { StyledLabel } from '../../base-control/styles/base-control-styles';
+ import { View } from '../../view';
+ import { VisuallyHidden } from '../../visually-hidden';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { useBorderBoxControl } from './hook';
+ 
+ import type { BorderBoxControlProps } from '../types';
+diff --git a/packages/components/src/border-box-control/border-box-control/hook.ts b/packages/components/src/border-box-control/border-box-control/hook.ts
+index cf5aae4e09f725..a303e7d5a39e8b 100644
+--- a/packages/components/src/border-box-control/border-box-control/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control/hook.ts
+@@ -16,8 +16,8 @@ import {
+ 	isCompleteBorder,
+ 	isEmptyBorder,
+ } from '../utils';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ import type { Border } from '../../border-control/types';
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index 4a34d6ed7ffe34..4f43a6ed0ce55d 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -19,8 +19,8 @@ import ColorPalette from '../../color-palette';
+ import Dropdown from '../../dropdown';
+ import { HStack } from '../../h-stack';
+ import { VStack } from '../../v-stack';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { useBorderControlDropdown } from './hook';
+ import { StyledLabel } from '../../base-control/styles/base-control-styles';
+ import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
+diff --git a/packages/components/src/border-control/border-control-dropdown/hook.ts b/packages/components/src/border-control/border-control-dropdown/hook.ts
+index 99309bb3374c58..b60aa52a34e2eb 100644
+--- a/packages/components/src/border-control/border-control-dropdown/hook.ts
++++ b/packages/components/src/border-control/border-control-dropdown/hook.ts
+@@ -8,8 +8,8 @@ import { useMemo } from '@wordpress/element';
+  */
+ import * as styles from '../styles';
+ import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ import type { DropdownProps } from '../types';
+diff --git a/packages/components/src/border-control/border-control-style-picker/component.tsx b/packages/components/src/border-control/border-control-style-picker/component.tsx
+index 66858531f62cab..ffb44855be9fa4 100644
+--- a/packages/components/src/border-control/border-control-style-picker/component.tsx
++++ b/packages/components/src/border-control/border-control-style-picker/component.tsx
+@@ -12,8 +12,8 @@ import { StyledLabel } from '../../base-control/styles/base-control-styles';
+ import { View } from '../../view';
+ import { Flex } from '../../flex';
+ import { VisuallyHidden } from '../../visually-hidden';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { useBorderControlStylePicker } from './hook';
+ 
+ import type { LabelProps, StylePickerProps } from '../types';
+diff --git a/packages/components/src/border-control/border-control-style-picker/hook.ts b/packages/components/src/border-control/border-control-style-picker/hook.ts
+index 7a77c735b9c2c9..27233c40309a3a 100644
+--- a/packages/components/src/border-control/border-control-style-picker/hook.ts
++++ b/packages/components/src/border-control/border-control-style-picker/hook.ts
+@@ -7,8 +7,8 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import * as styles from '../styles';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ import type { StylePickerProps } from '../types';
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 617ff5dd5997c2..960be4bf171ea4 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -13,8 +13,8 @@ import { HStack } from '../../h-stack';
+ import { StyledLabel } from '../../base-control/styles/base-control-styles';
+ import { View } from '../../view';
+ import { VisuallyHidden } from '../../visually-hidden';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { useBorderControl } from './hook';
+ 
+ import type { BorderControlProps, LabelProps } from '../types';
+diff --git a/packages/components/src/border-control/border-control/hook.ts b/packages/components/src/border-control/border-control/hook.ts
+index 39917793de72de..63034527cfa1a8 100644
+--- a/packages/components/src/border-control/border-control/hook.ts
++++ b/packages/components/src/border-control/border-control/hook.ts
+@@ -8,8 +8,8 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
+  */
+ import * as styles from '../styles';
+ import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ import type { Border, BorderControlProps } from '../types';
+diff --git a/packages/components/src/box-control/icon.tsx b/packages/components/src/box-control/icon.tsx
+index 6cb893648d68ab..480235aa7c0ad8 100644
+--- a/packages/components/src/box-control/icon.tsx
++++ b/packages/components/src/box-control/icon.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import {
+ 	Root,
+ 	Viewbox,
+diff --git a/packages/components/src/button-group/index.tsx b/packages/components/src/button-group/index.tsx
+index 6185792b6e4d90..2eb7451e3e00db 100644
+--- a/packages/components/src/button-group/index.tsx
++++ b/packages/components/src/button-group/index.tsx
+@@ -13,7 +13,7 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { ButtonGroupProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ function UnforwardedButtonGroup(
+ 	props: WordPressComponentProps< ButtonGroupProps, 'div', false >,
+diff --git a/packages/components/src/button/types.ts b/packages/components/src/button/types.ts
+index 13b3fa5e00207e..b781786cc12711 100644
+--- a/packages/components/src/button/types.ts
++++ b/packages/components/src/button/types.ts
+@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
+  */
+ import type { Props as IconProps } from '../icon';
+ import type { PopoverProps } from '../popover/types';
+-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
++import type { WordPressComponentProps } from '../context/wordpress-component';
+ 
+ export type ButtonProps =
+ 	| WordPressComponentProps< ButtonAsButtonProps, 'button', false >
+diff --git a/packages/components/src/card/card-body/component.tsx b/packages/components/src/card/card-body/component.tsx
+index f515162bbc1b76..44f96ec951123c 100644
+--- a/packages/components/src/card/card-body/component.tsx
++++ b/packages/components/src/card/card-body/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { Scrollable } from '../../scrollable';
+ import { View } from '../../view';
+ import { useCardBody } from './hook';
+diff --git a/packages/components/src/card/card-body/hook.ts b/packages/components/src/card/card-body/hook.ts
+index 1418571fb71f58..d4cefb9ed9e670 100644
+--- a/packages/components/src/card/card-body/hook.ts
++++ b/packages/components/src/card/card-body/hook.ts
+@@ -6,8 +6,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { BodyProps } from '../types';
+diff --git a/packages/components/src/card/card-divider/component.tsx b/packages/components/src/card/card-divider/component.tsx
+index 494d3451bb5ca9..8716f7caa9f238 100644
+--- a/packages/components/src/card/card-divider/component.tsx
++++ b/packages/components/src/card/card-divider/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import type { DividerProps } from '../../divider';
+ import { Divider } from '../../divider';
+ import { useCardDivider } from './hook';
+diff --git a/packages/components/src/card/card-divider/hook.ts b/packages/components/src/card/card-divider/hook.ts
+index 969bdf0a43b71d..e7eb5c92b08cbe 100644
+--- a/packages/components/src/card/card-divider/hook.ts
++++ b/packages/components/src/card/card-divider/hook.ts
+@@ -6,8 +6,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { DividerProps } from '../../divider';
+diff --git a/packages/components/src/card/card-footer/component.tsx b/packages/components/src/card/card-footer/component.tsx
+index 1507c7139cda27..74834eb1ca72ed 100644
+--- a/packages/components/src/card/card-footer/component.tsx
++++ b/packages/components/src/card/card-footer/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { Flex } from '../../flex';
+ import { useCardFooter } from './hook';
+ import type { FooterProps } from '../types';
+diff --git a/packages/components/src/card/card-footer/hook.ts b/packages/components/src/card/card-footer/hook.ts
+index 1530faccaf15ce..844417848b8aee 100644
+--- a/packages/components/src/card/card-footer/hook.ts
++++ b/packages/components/src/card/card-footer/hook.ts
+@@ -6,8 +6,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { FooterProps } from '../types';
+diff --git a/packages/components/src/card/card-header/component.tsx b/packages/components/src/card/card-header/component.tsx
+index 01c7942e438f2c..2ba12b5ed854f5 100644
+--- a/packages/components/src/card/card-header/component.tsx
++++ b/packages/components/src/card/card-header/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { Flex } from '../../flex';
+ import { useCardHeader } from './hook';
+ import type { HeaderProps } from '../types';
+diff --git a/packages/components/src/card/card-header/hook.ts b/packages/components/src/card/card-header/hook.ts
+index 4804e76262d1dd..b45d75ff5467d0 100644
+--- a/packages/components/src/card/card-header/hook.ts
++++ b/packages/components/src/card/card-header/hook.ts
+@@ -6,8 +6,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { HeaderProps } from '../types';
+diff --git a/packages/components/src/card/card-media/component.tsx b/packages/components/src/card/card-media/component.tsx
+index 13e453c2aedcd6..36b645d98d822d 100644
+--- a/packages/components/src/card/card-media/component.tsx
++++ b/packages/components/src/card/card-media/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { View } from '../../view';
+ import { useCardMedia } from './hook';
+ import type { MediaProps } from '../types';
+diff --git a/packages/components/src/card/card-media/hook.ts b/packages/components/src/card/card-media/hook.ts
+index dfe67b8ed19731..b9f3a7b2edff47 100644
+--- a/packages/components/src/card/card-media/hook.ts
++++ b/packages/components/src/card/card-media/hook.ts
+@@ -6,8 +6,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { MediaProps } from '../types';
+diff --git a/packages/components/src/card/card/component.tsx b/packages/components/src/card/card/component.tsx
+index b4f3831ce2f7e4..8fefc33bd48027 100644
+--- a/packages/components/src/card/card/component.tsx
++++ b/packages/components/src/card/card/component.tsx
+@@ -12,8 +12,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect, ContextSystemProvider } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect, ContextSystemProvider } from '../../context';
+ import { Elevation } from '../../elevation';
+ import { View } from '../../view';
+ import * as styles from '../styles';
+diff --git a/packages/components/src/card/card/hook.ts b/packages/components/src/card/card/hook.ts
+index eb4580941d01c3..93e313934b22a2 100644
+--- a/packages/components/src/card/card/hook.ts
++++ b/packages/components/src/card/card/hook.ts
+@@ -7,8 +7,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import { useSurface } from '../../surface';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+diff --git a/packages/components/src/checkbox-control/index.tsx b/packages/components/src/checkbox-control/index.tsx
+index 1b7cae04cd81f6..cd70bb8485ac7e 100644
+--- a/packages/components/src/checkbox-control/index.tsx
++++ b/packages/components/src/checkbox-control/index.tsx
+@@ -17,7 +17,7 @@ import { Icon, check, reset } from '@wordpress/icons';
+  */
+ import BaseControl from '../base-control';
+ import type { CheckboxControlProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ /**
+  * Checkboxes allow the user to select one or more items from a set.
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-actions.tsx b/packages/components/src/circular-option-picker/circular-option-picker-actions.tsx
+index 2817569b0564ed..a9c86b4240ee9b 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker-actions.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker-actions.tsx
+@@ -9,7 +9,7 @@ import classnames from 'classnames';
+ import Button from '../button';
+ import Dropdown from '../dropdown';
+ import type { DropdownLinkActionProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { ButtonAsButtonProps } from '../button/types';
+ 
+ export function DropdownLinkAction( {
+diff --git a/packages/components/src/circular-option-picker/types.ts b/packages/components/src/circular-option-picker/types.ts
+index da443c7691a95b..cd9d9dca6be8df 100644
+--- a/packages/components/src/circular-option-picker/types.ts
++++ b/packages/components/src/circular-option-picker/types.ts
+@@ -13,7 +13,7 @@ import type { Icon } from '@wordpress/icons';
+  */
+ import type { ButtonAsButtonProps } from '../button/types';
+ import type { DropdownProps } from '../dropdown/types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { CompositeState } from '../composite';
+ 
+ type CommonCircularOptionPickerProps = {
+diff --git a/packages/components/src/clipboard-button/index.tsx b/packages/components/src/clipboard-button/index.tsx
+index ded4e9ad45d1a6..5a9cec30f7d49d 100644
+--- a/packages/components/src/clipboard-button/index.tsx
++++ b/packages/components/src/clipboard-button/index.tsx
+@@ -15,7 +15,7 @@ import deprecated from '@wordpress/deprecated';
+  */
+ import Button from '../button';
+ import type { ClipboardButtonProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ const TIMEOUT = 4000;
+ 
+diff --git a/packages/components/src/color-indicator/index.tsx b/packages/components/src/color-indicator/index.tsx
+index fc402eac03f8c1..00312a39cdc7de 100644
+--- a/packages/components/src/color-indicator/index.tsx
++++ b/packages/components/src/color-indicator/index.tsx
+@@ -12,7 +12,7 @@ import { forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { ColorIndicatorProps } from './types';
+ 
+ function UnforwardedColorIndicator(
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index 60aeb6ed4d39ed..86f52305587c06 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -32,7 +32,7 @@ import type {
+ 	PaletteObject,
+ 	SinglePaletteProps,
+ } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { DropdownProps } from '../dropdown/types';
+ import {
+ 	extractColorNameFromCurrentValue,
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index b4183dd071bfda..cff3b5d9c8ae4f 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem, contextConnect } from '../ui/context';
++import { useContextSystem, contextConnect } from '../context';
+ import {
+ 	ColorfulWrapper,
+ 	SelectControl,
+diff --git a/packages/components/src/color-picker/types.ts b/packages/components/src/color-picker/types.ts
+index 83f1f1621a76ba..5f98404c528444 100644
+--- a/packages/components/src/color-picker/types.ts
++++ b/packages/components/src/color-picker/types.ts
+@@ -13,7 +13,7 @@ import type { HslaColor } from 'react-colorful';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { useDeprecatedProps } from './use-deprecated-props';
+ 
+ export type ColorType = 'rgb' | 'hsl' | 'hex';
+diff --git a/packages/components/src/confirm-dialog/component.tsx b/packages/components/src/confirm-dialog/component.tsx
+index 1de1c08ffbcf40..4a8efd06e139c7 100644
+--- a/packages/components/src/confirm-dialog/component.tsx
++++ b/packages/components/src/confirm-dialog/component.tsx
+@@ -14,8 +14,8 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+  */
+ import Modal from '../modal';
+ import type { OwnProps, DialogInputEvent } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
+-import { useContextSystem, contextConnect } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { useContextSystem, contextConnect } from '../context';
+ import { Flex } from '../flex';
+ import Button from '../button';
+ import { Text } from '../text';
+diff --git a/packages/components/src/ui/context/constants.js b/packages/components/src/context/constants.js
+similarity index 100%
+rename from packages/components/src/ui/context/constants.js
+rename to packages/components/src/context/constants.js
+diff --git a/packages/components/src/ui/context/context-connect.ts b/packages/components/src/context/context-connect.ts
+similarity index 97%
+rename from packages/components/src/ui/context/context-connect.ts
+rename to packages/components/src/context/context-connect.ts
+index 8db2bbc987c0df..f938fa0b1f3241 100644
+--- a/packages/components/src/ui/context/context-connect.ts
++++ b/packages/components/src/context/context-connect.ts
+@@ -99,7 +99,7 @@ function _contextConnect<
+ 	}
+ 
+ 	// @ts-expect-error We can't rely on inferred types here because of the
+-	// `as` prop polymorphism we're handling in https://github.com/WordPress/gutenberg/blob/9620bae6fef4fde7cc2b7833f416e240207cda29/packages/components/src/ui/context/wordpress-component.ts#L32-L33
++	// `as` prop polymorphism we're handling in https://github.com/WordPress/gutenberg/blob/4f3a11243c365f94892e479bff0b922ccc4ccda3/packages/components/src/context/wordpress-component.ts#L32-L33
+ 	return Object.assign( WrappedComponent, {
+ 		[ CONNECT_STATIC_NAMESPACE ]: [ ...new Set( mergedNamespace ) ],
+ 		displayName: namespace,
+diff --git a/packages/components/src/ui/context/context-system-provider.js b/packages/components/src/context/context-system-provider.js
+similarity index 98%
+rename from packages/components/src/ui/context/context-system-provider.js
+rename to packages/components/src/context/context-system-provider.js
+index b03a8c63228286..741d2d833227fa 100644
+--- a/packages/components/src/ui/context/context-system-provider.js
++++ b/packages/components/src/context/context-system-provider.js
+@@ -20,7 +20,7 @@ import warn from '@wordpress/warning';
+ /**
+  * Internal dependencies
+  */
+-import { useUpdateEffect } from '../../utils';
++import { useUpdateEffect } from '../utils';
+ 
+ export const ComponentsContext = createContext(
+ 	/** @type {Record<string, any>} */ ( {} )
+diff --git a/packages/components/src/ui/context/get-styled-class-name-from-key.ts b/packages/components/src/context/get-styled-class-name-from-key.ts
+similarity index 100%
+rename from packages/components/src/ui/context/get-styled-class-name-from-key.ts
+rename to packages/components/src/context/get-styled-class-name-from-key.ts
+diff --git a/packages/components/src/ui/context/index.ts b/packages/components/src/context/index.ts
+similarity index 100%
+rename from packages/components/src/ui/context/index.ts
+rename to packages/components/src/context/index.ts
+diff --git a/packages/components/src/ui/context/stories/ComponentsProvider.stories.js b/packages/components/src/context/stories/ComponentsProvider.stories.js
+similarity index 100%
+rename from packages/components/src/ui/context/stories/ComponentsProvider.stories.js
+rename to packages/components/src/context/stories/ComponentsProvider.stories.js
+diff --git a/packages/components/src/ui/context/test/__snapshots__/context-system-provider.js.snap b/packages/components/src/context/test/__snapshots__/context-system-provider.js.snap
+similarity index 100%
+rename from packages/components/src/ui/context/test/__snapshots__/context-system-provider.js.snap
+rename to packages/components/src/context/test/__snapshots__/context-system-provider.js.snap
+diff --git a/packages/components/src/ui/context/test/context-connect.tsx b/packages/components/src/context/test/context-connect.tsx
+similarity index 100%
+rename from packages/components/src/ui/context/test/context-connect.tsx
+rename to packages/components/src/context/test/context-connect.tsx
+diff --git a/packages/components/src/ui/context/test/context-system-provider.js b/packages/components/src/context/test/context-system-provider.js
+similarity index 100%
+rename from packages/components/src/ui/context/test/context-system-provider.js
+rename to packages/components/src/context/test/context-system-provider.js
+diff --git a/packages/components/src/ui/context/test/wordpress-component.tsx b/packages/components/src/context/test/wordpress-component.tsx
+similarity index 100%
+rename from packages/components/src/ui/context/test/wordpress-component.tsx
+rename to packages/components/src/context/test/wordpress-component.tsx
+diff --git a/packages/components/src/ui/context/use-context-system.js b/packages/components/src/context/use-context-system.js
+similarity index 98%
+rename from packages/components/src/ui/context/use-context-system.js
+rename to packages/components/src/context/use-context-system.js
+index 07297ddb30f7e9..213d4ad67a2f55 100644
+--- a/packages/components/src/ui/context/use-context-system.js
++++ b/packages/components/src/context/use-context-system.js
+@@ -9,7 +9,7 @@ import warn from '@wordpress/warning';
+ import { useComponentsContext } from './context-system-provider';
+ import { getNamespace, getConnectedNamespace } from './utils';
+ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
+-import { useCx } from '../../utils/hooks/use-cx';
++import { useCx } from '../utils/hooks/use-cx';
+ 
+ /**
+  * @template TProps
+diff --git a/packages/components/src/ui/context/utils.js b/packages/components/src/context/utils.js
+similarity index 100%
+rename from packages/components/src/ui/context/utils.js
+rename to packages/components/src/context/utils.js
+diff --git a/packages/components/src/ui/context/wordpress-component.ts b/packages/components/src/context/wordpress-component.ts
+similarity index 100%
+rename from packages/components/src/ui/context/wordpress-component.ts
+rename to packages/components/src/context/wordpress-component.ts
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+index 4d09f256620219..291776b91f2ff1 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+@@ -34,7 +34,7 @@ import {
+ 	MINIMUM_SIGNIFICANT_MOVE,
+ 	KEYBOARD_CONTROL_POINT_VARIATION,
+ } from './constants';
+-import type { WordPressComponentProps } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
+ import type {
+ 	ControlPointButtonProps,
+ 	ControlPointMoveState,
+diff --git a/packages/components/src/dashicon/index.tsx b/packages/components/src/dashicon/index.tsx
+index ab56548108fa83..d0abe7374da10d 100644
+--- a/packages/components/src/dashicon/index.tsx
++++ b/packages/components/src/dashicon/index.tsx
+@@ -9,7 +9,7 @@
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { DashiconProps } from './types';
+ 
+ function Dashicon( {
+diff --git a/packages/components/src/disabled/index.tsx b/packages/components/src/disabled/index.tsx
+index 91c4316f3a6d82..32baac3411054c 100644
+--- a/packages/components/src/disabled/index.tsx
++++ b/packages/components/src/disabled/index.tsx
+@@ -8,7 +8,7 @@ import { createContext } from '@wordpress/element';
+  */
+ import { disabledStyles } from './styles/disabled-styles';
+ import type { DisabledProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import { useCx } from '../utils';
+ 
+ const Context = createContext< boolean >( false );
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 98b4edd61d4937..4ac2524456ab75 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -8,8 +8,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { contextConnect, useContextSystem } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { contextConnect, useContextSystem } from '../context';
+ import { DividerView } from './styles';
+ import type { DividerProps } from './types';
+ 
+diff --git a/packages/components/src/drop-zone/index.tsx b/packages/components/src/drop-zone/index.tsx
+index b6d35f79ac4a39..f620e6a03c6b85 100644
+--- a/packages/components/src/drop-zone/index.tsx
++++ b/packages/components/src/drop-zone/index.tsx
+@@ -23,7 +23,7 @@ import {
+ 	__unstableAnimatePresence as AnimatePresence,
+ } from '../animation';
+ import type { DropType, DropZoneProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ /**
+  * `DropZone` is a component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event.
+diff --git a/packages/components/src/dropdown-menu-v2/index.tsx b/packages/components/src/dropdown-menu-v2/index.tsx
+index 02f8322aa6a52f..085a1f2c144cce 100644
+--- a/packages/components/src/dropdown-menu-v2/index.tsx
++++ b/packages/components/src/dropdown-menu-v2/index.tsx
+@@ -19,7 +19,7 @@ import { SVG, Circle } from '@wordpress/primitives';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem, contextConnectWithoutRef } from '../ui/context';
++import { useContextSystem, contextConnectWithoutRef } from '../context';
+ import { useSlot } from '../slot-fill';
+ import Icon from '../icon';
+ import { SLOT_NAME as POPOVER_DEFAULT_SLOT_NAME } from '../popover';
+diff --git a/packages/components/src/dropdown-menu-v2/stories/index.story.tsx b/packages/components/src/dropdown-menu-v2/stories/index.story.tsx
+index 78aee12bf1f93a..9c76a6f6f0f72f 100644
+--- a/packages/components/src/dropdown-menu-v2/stories/index.story.tsx
++++ b/packages/components/src/dropdown-menu-v2/stories/index.story.tsx
+@@ -32,7 +32,7 @@ import { menu, wordpress } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import Icon from '../../icon';
+-import { ContextSystemProvider } from '../../ui/context';
++import { ContextSystemProvider } from '../../context';
+ 
+ const meta: Meta< typeof DropdownMenu > = {
+ 	title: 'Components (Experimental)/DropdownMenu v2',
+diff --git a/packages/components/src/dropdown-menu/index.tsx b/packages/components/src/dropdown-menu/index.tsx
+index 9105555927f47c..5d0e69f528204a 100644
+--- a/packages/components/src/dropdown-menu/index.tsx
++++ b/packages/components/src/dropdown-menu/index.tsx
+@@ -11,7 +11,7 @@ import { menu } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import { contextConnectWithoutRef, useContextSystem } from '../ui/context';
++import { contextConnectWithoutRef, useContextSystem } from '../context';
+ import Button from '../button';
+ import Dropdown from '../dropdown';
+ import { NavigableMenu } from '../navigable-container';
+diff --git a/packages/components/src/dropdown-menu/types.ts b/packages/components/src/dropdown-menu/types.ts
+index 7b141c97acf580..7deb08abaa28ec 100644
+--- a/packages/components/src/dropdown-menu/types.ts
++++ b/packages/components/src/dropdown-menu/types.ts
+@@ -6,7 +6,7 @@ import type { HTMLAttributes, ReactNode } from 'react';
+  * Internal dependencies
+  */
+ import type { ButtonAsButtonProps } from '../button/types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { DropdownProps } from '../dropdown/types';
+ import type { Props as IconProps } from '../icon';
+ import type { NavigableMenuProps } from '../navigable-container/types';
+diff --git a/packages/components/src/dropdown/dropdown-content-wrapper.tsx b/packages/components/src/dropdown/dropdown-content-wrapper.tsx
+index ba9a15218f6f3a..ce41f24081f819 100644
+--- a/packages/components/src/dropdown/dropdown-content-wrapper.tsx
++++ b/packages/components/src/dropdown/dropdown-content-wrapper.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { contextConnect, useContextSystem } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { contextConnect, useContextSystem } from '../context';
+ import { DropdownContentWrapperDiv } from './styles';
+ import type { DropdownContentWrapperProps } from './types';
+ 
+diff --git a/packages/components/src/dropdown/index.tsx b/packages/components/src/dropdown/index.tsx
+index 0a870049a5b697..0527f4f0c2cd8d 100644
+--- a/packages/components/src/dropdown/index.tsx
++++ b/packages/components/src/dropdown/index.tsx
+@@ -14,7 +14,7 @@ import deprecated from '@wordpress/deprecated';
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect, useContextSystem } from '../ui/context';
++import { contextConnect, useContextSystem } from '../context';
+ import { useControlledValue } from '../utils/hooks';
+ import Popover from '../popover';
+ import type { DropdownProps, DropdownInternalContext } from './types';
+diff --git a/packages/components/src/elevation/component.tsx b/packages/components/src/elevation/component.tsx
+index 269929820824f3..d116859d9a303a 100644
+--- a/packages/components/src/elevation/component.tsx
++++ b/packages/components/src/elevation/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { contextConnect } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { contextConnect } from '../context';
+ import { View } from '../view';
+ import { useElevation } from './hook';
+ import type { ElevationProps } from './types';
+diff --git a/packages/components/src/elevation/hook.ts b/packages/components/src/elevation/hook.ts
+index 1aa97c9167bc93..1eeda29cb600f2 100644
+--- a/packages/components/src/elevation/hook.ts
++++ b/packages/components/src/elevation/hook.ts
+@@ -12,8 +12,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { useContextSystem } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { useContextSystem } from '../context';
+ import * as styles from './styles';
+ import { CONFIG, reduceMotion } from '../utils';
+ import { useCx } from '../utils/hooks/use-cx';
+diff --git a/packages/components/src/external-link/index.tsx b/packages/components/src/external-link/index.tsx
+index d11f7e1eb71f67..312aa88f491d24 100644
+--- a/packages/components/src/external-link/index.tsx
++++ b/packages/components/src/external-link/index.tsx
+@@ -17,7 +17,7 @@ import { external } from '@wordpress/icons';
+ import { VisuallyHidden } from '../visually-hidden';
+ import { StyledIcon } from './styles/external-link-styles';
+ import type { ExternalLinkProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ function UnforwardedExternalLink(
+ 	props: Omit<
+diff --git a/packages/components/src/flex/flex-block/component.tsx b/packages/components/src/flex/flex-block/component.tsx
+index 4d01f16e3abd94..c156b0af5a01f1 100644
+--- a/packages/components/src/flex/flex-block/component.tsx
++++ b/packages/components/src/flex/flex-block/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { View } from '../../view';
+ import type { FlexBlockProps } from '../types';
+ import { useFlexBlock } from './hook';
+diff --git a/packages/components/src/flex/flex-block/hook.ts b/packages/components/src/flex/flex-block/hook.ts
+index 1c0497ac56d0fd..aa702e752a8121 100644
+--- a/packages/components/src/flex/flex-block/hook.ts
++++ b/packages/components/src/flex/flex-block/hook.ts
+@@ -1,8 +1,8 @@
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import { useFlexItem } from '../flex-item';
+ import type { FlexBlockProps } from '../types';
+ 
+diff --git a/packages/components/src/flex/flex-item/component.tsx b/packages/components/src/flex/flex-item/component.tsx
+index 446e2b94839705..c02d3dda7cb8f6 100644
+--- a/packages/components/src/flex/flex-item/component.tsx
++++ b/packages/components/src/flex/flex-item/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { View } from '../../view';
+ import { useFlexItem } from './hook';
+ import type { FlexItemProps } from '../types';
+diff --git a/packages/components/src/flex/flex-item/hook.ts b/packages/components/src/flex/flex-item/hook.ts
+index db130f0b62aa0a..4de791905a4065 100644
+--- a/packages/components/src/flex/flex-item/hook.ts
++++ b/packages/components/src/flex/flex-item/hook.ts
+@@ -7,8 +7,8 @@ import { css } from '@emotion/react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import { useFlexContext } from '../context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+diff --git a/packages/components/src/flex/flex/component.tsx b/packages/components/src/flex/flex/component.tsx
+index 8fce9ea144c704..c1802c102cc764 100644
+--- a/packages/components/src/flex/flex/component.tsx
++++ b/packages/components/src/flex/flex/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { useFlex } from './hook';
+ import { FlexContext } from './../context';
+ import { View } from '../../view';
+diff --git a/packages/components/src/flex/flex/hook.ts b/packages/components/src/flex/flex/hook.ts
+index 6ac032f75dc4c1..9b670d8a8ec017 100644
+--- a/packages/components/src/flex/flex/hook.ts
++++ b/packages/components/src/flex/flex/hook.ts
+@@ -12,8 +12,8 @@ import deprecated from '@wordpress/deprecated';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import { useResponsiveValue } from '../../ui/utils/use-responsive-value';
+ import { space } from '../../ui/utils/space';
+ import * as styles from '../styles';
+diff --git a/packages/components/src/focal-point-picker/focal-point.tsx b/packages/components/src/focal-point-picker/focal-point.tsx
+index 21a25f5a832f34..5b82bef4bfb2ea 100644
+--- a/packages/components/src/focal-point-picker/focal-point.tsx
++++ b/packages/components/src/focal-point-picker/focal-point.tsx
+@@ -8,7 +8,7 @@ import { PointerCircle } from './styles/focal-point-style';
+  */
+ import classnames from 'classnames';
+ import type { FocalPointProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ export default function FocalPoint( {
+ 	left = '50%',
+diff --git a/packages/components/src/focal-point-picker/grid.tsx b/packages/components/src/focal-point-picker/grid.tsx
+index 9b7ef9cff25f50..a52f5b11c1b2fd 100644
+--- a/packages/components/src/focal-point-picker/grid.tsx
++++ b/packages/components/src/focal-point-picker/grid.tsx
+@@ -7,7 +7,7 @@ import {
+ 	GridLineY,
+ } from './styles/focal-point-picker-style';
+ import type { FocalPointPickerGridProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
++import type { WordPressComponentProps } from '../context/wordpress-component';
+ 
+ export default function FocalPointPickerGrid( {
+ 	bounds,
+diff --git a/packages/components/src/focal-point-picker/index.tsx b/packages/components/src/focal-point-picker/index.tsx
+index 1c9077483dfda3..65efdc322cf0c6 100644
+--- a/packages/components/src/focal-point-picker/index.tsx
++++ b/packages/components/src/focal-point-picker/index.tsx
+@@ -28,7 +28,7 @@ import {
+ } from './styles/focal-point-picker-style';
+ import { INITIAL_BOUNDS } from './utils';
+ import { useUpdateEffect } from '../utils/hooks';
+-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
++import type { WordPressComponentProps } from '../context/wordpress-component';
+ import type {
+ 	FocalPoint as FocalPointType,
+ 	FocalPointPickerProps,
+diff --git a/packages/components/src/form-file-upload/index.tsx b/packages/components/src/form-file-upload/index.tsx
+index 608fdf837300f4..0600e47d7324c3 100644
+--- a/packages/components/src/form-file-upload/index.tsx
++++ b/packages/components/src/form-file-upload/index.tsx
+@@ -7,7 +7,7 @@ import { useRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Button from '../button';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { FormFileUploadProps } from './types';
+ 
+ /**
+diff --git a/packages/components/src/form-toggle/index.tsx b/packages/components/src/form-toggle/index.tsx
+index e7ee1ae0bebdee..19cb828023ad89 100644
+--- a/packages/components/src/form-toggle/index.tsx
++++ b/packages/components/src/form-toggle/index.tsx
+@@ -7,7 +7,7 @@ import classnames from 'classnames';
+  * Internal dependencies
+  */
+ import type { FormToggleProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ export const noop = () => {};
+ 
+diff --git a/packages/components/src/form-token-field/token-input.tsx b/packages/components/src/form-token-field/token-input.tsx
+index 196ac03c799af8..a8367695670b20 100644
+--- a/packages/components/src/form-token-field/token-input.tsx
++++ b/packages/components/src/form-token-field/token-input.tsx
+@@ -12,7 +12,7 @@ import { forwardRef, useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { TokenInputProps } from './types';
+ 
+ export function UnForwardedTokenInput(
+diff --git a/packages/components/src/grid/component.tsx b/packages/components/src/grid/component.tsx
+index 3ea6db0ba85448..f18909c8e1c9ae 100644
+--- a/packages/components/src/grid/component.tsx
++++ b/packages/components/src/grid/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { contextConnect } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { contextConnect } from '../context';
+ import { View } from '../view';
+ import useGrid from './hook';
+ import type { GridProps } from './types';
+diff --git a/packages/components/src/grid/hook.ts b/packages/components/src/grid/hook.ts
+index 7fd54d6c4f19eb..26f1eb1ae95647 100644
+--- a/packages/components/src/grid/hook.ts
++++ b/packages/components/src/grid/hook.ts
+@@ -11,8 +11,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { useContextSystem } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { useContextSystem } from '../context';
+ import { getAlignmentProps } from './utils';
+ import { useResponsiveValue } from '../ui/utils/use-responsive-value';
+ import CONFIG from '../utils/config-values';
+diff --git a/packages/components/src/guide/page.tsx b/packages/components/src/guide/page.tsx
+index dcad2780203c8a..04dbabb34854ac 100644
+--- a/packages/components/src/guide/page.tsx
++++ b/packages/components/src/guide/page.tsx
+@@ -7,7 +7,7 @@ import deprecated from '@wordpress/deprecated';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ export default function GuidePage(
+ 	props: WordPressComponentProps< {}, 'div', false >
+diff --git a/packages/components/src/h-stack/component.tsx b/packages/components/src/h-stack/component.tsx
+index 51b25486f0b389..1d1efebe8a0912 100644
+--- a/packages/components/src/h-stack/component.tsx
++++ b/packages/components/src/h-stack/component.tsx
+@@ -1,8 +1,8 @@
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { contextConnect } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { contextConnect } from '../context';
+ import { View } from '../view';
+ import { useHStack } from './hook';
+ import type { Props } from './types';
+diff --git a/packages/components/src/h-stack/hook.tsx b/packages/components/src/h-stack/hook.tsx
+index cab7df1cad79c5..be30502a57b13e 100644
+--- a/packages/components/src/h-stack/hook.tsx
++++ b/packages/components/src/h-stack/hook.tsx
+@@ -6,8 +6,8 @@ import type { ReactElement } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { hasConnectNamespace, useContextSystem } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { hasConnectNamespace, useContextSystem } from '../context';
+ import { FlexItem, useFlex } from '../flex';
+ import { getAlignmentProps } from './utils';
+ import { getValidChildren } from '../ui/utils/get-valid-children';
+diff --git a/packages/components/src/heading/component.tsx b/packages/components/src/heading/component.tsx
+index b15739f9c17b87..a42af8b05f471d 100644
+--- a/packages/components/src/heading/component.tsx
++++ b/packages/components/src/heading/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { contextConnect } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { contextConnect } from '../context';
+ import { View } from '../view';
+ import { useHeading } from './hook';
+ import type { HeadingProps } from './types';
+diff --git a/packages/components/src/heading/hook.ts b/packages/components/src/heading/hook.ts
+index 13153bc8530381..81cb95fa34a621 100644
+--- a/packages/components/src/heading/hook.ts
++++ b/packages/components/src/heading/hook.ts
+@@ -1,8 +1,8 @@
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { useContextSystem } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { useContextSystem } from '../context';
+ import { useText } from '../text';
+ import { getHeadingFontSize } from '../ui/utils/font-size';
+ import { CONFIG, COLORS } from '../utils';
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index f0a89b92772a5b..03adfec1b07ab3 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -22,8 +22,8 @@ import {
+ 	getSizeConfig,
+ } from './styles/input-control-styles';
+ import type { InputBaseProps, LabelPosition } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
+-import { ContextSystemProvider } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { ContextSystemProvider } from '../context';
+ 
+ function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( InputBase );
+diff --git a/packages/components/src/input-control/input-field.tsx b/packages/components/src/input-control/input-field.tsx
+index a2bed23e149a48..37e2bf4351c002 100644
+--- a/packages/components/src/input-control/input-field.tsx
++++ b/packages/components/src/input-control/input-field.tsx
+@@ -19,7 +19,7 @@ import { forwardRef, useRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import { useDragCursor } from './utils';
+ import { Input } from './styles/input-control-styles';
+ import { useInputControlStateReducer } from './reducer/reducer';
+diff --git a/packages/components/src/input-control/input-prefix-wrapper.tsx b/packages/components/src/input-control/input-prefix-wrapper.tsx
+index 7f888bd9b74440..23d9e823da932d 100644
+--- a/packages/components/src/input-control/input-prefix-wrapper.tsx
++++ b/packages/components/src/input-control/input-prefix-wrapper.tsx
+@@ -7,8 +7,8 @@ import type { ForwardedRef } from 'react';
+  * Internal dependencies
+  */
+ import { Spacer } from '../spacer';
+-import type { WordPressComponentProps } from '../ui/context';
+-import { contextConnect, useContextSystem } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { contextConnect, useContextSystem } from '../context';
+ import type { InputControlPrefixWrapperProps } from './types';
+ 
+ function UnconnectedInputControlPrefixWrapper(
+diff --git a/packages/components/src/input-control/input-suffix-wrapper.tsx b/packages/components/src/input-control/input-suffix-wrapper.tsx
+index 000457aefc3149..1be352f562e369 100644
+--- a/packages/components/src/input-control/input-suffix-wrapper.tsx
++++ b/packages/components/src/input-control/input-suffix-wrapper.tsx
+@@ -7,8 +7,8 @@ import type { ForwardedRef } from 'react';
+  * Internal dependencies
+  */
+ import { Spacer } from '../spacer';
+-import type { WordPressComponentProps } from '../ui/context';
+-import { contextConnect, useContextSystem } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { contextConnect, useContextSystem } from '../context';
+ import type { InputControlSuffixWrapperProps } from './types';
+ 
+ function UnconnectedInputControlSuffixWrapper(
+diff --git a/packages/components/src/input-control/label.tsx b/packages/components/src/input-control/label.tsx
+index c0a79f83d95995..9c82d4d7902730 100644
+--- a/packages/components/src/input-control/label.tsx
++++ b/packages/components/src/input-control/label.tsx
+@@ -6,7 +6,7 @@ import {
+ 	Label as BaseLabel,
+ 	LabelWrapper,
+ } from './styles/input-control-styles';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { InputControlLabelProps } from './types';
+ 
+ export default function Label( {
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 1bc75e2d82043b..1f3e16f9dde406 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -9,7 +9,7 @@ import type { CSSProperties, ReactNode } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
+ import { Flex, FlexItem } from '../../flex';
+ import { Text } from '../../text';
+ import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index dbbc0567b3d158..44c791f263e46e 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -13,7 +13,7 @@ import type { useDrag } from '@use-gesture/react';
+  * Internal dependencies
+  */
+ import type { StateReducer } from './reducer/state';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { FlexProps } from '../flex/types';
+ import type { BaseControlProps } from '../base-control/types';
+ 
+diff --git a/packages/components/src/item-group/item-group/component.tsx b/packages/components/src/item-group/item-group/component.tsx
+index 34f73c38e2b57a..6bfae11dd4f85f 100644
+--- a/packages/components/src/item-group/item-group/component.tsx
++++ b/packages/components/src/item-group/item-group/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { useItemGroup } from './hook';
+ import { ItemGroupContext, useItemGroupContext } from '../context';
+ import { View } from '../../view';
+diff --git a/packages/components/src/item-group/item-group/hook.ts b/packages/components/src/item-group/item-group/hook.ts
+index 77327b91df5a6c..0078e009050fc4 100644
+--- a/packages/components/src/item-group/item-group/hook.ts
++++ b/packages/components/src/item-group/item-group/hook.ts
+@@ -1,8 +1,8 @@
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/item-group/item/component.tsx b/packages/components/src/item-group/item/component.tsx
+index 9104f5340377bd..f3f11617312a7c 100644
+--- a/packages/components/src/item-group/item/component.tsx
++++ b/packages/components/src/item-group/item/component.tsx
+@@ -8,8 +8,8 @@ import type { ForwardedRef } from 'react';
+  */
+ import type { ItemProps } from '../types';
+ import { useItem } from './hook';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { View } from '../../view';
+ 
+ function UnconnectedItem(
+diff --git a/packages/components/src/item-group/item/hook.ts b/packages/components/src/item-group/item/hook.ts
+index d1bc632ddb7f3e..188b575e072c87 100644
+--- a/packages/components/src/item-group/item/hook.ts
++++ b/packages/components/src/item-group/item/hook.ts
+@@ -11,8 +11,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import * as styles from '../styles';
+ import { useItemGroupContext } from '../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+diff --git a/packages/components/src/menu-item/index.tsx b/packages/components/src/menu-item/index.tsx
+index 2904763cc6c58b..644d5bff2b023e 100644
+--- a/packages/components/src/menu-item/index.tsx
++++ b/packages/components/src/menu-item/index.tsx
+@@ -15,7 +15,7 @@ import { cloneElement, forwardRef } from '@wordpress/element';
+ import Shortcut from '../shortcut';
+ import Button from '../button';
+ import Icon from '../icon';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { MenuItemProps } from './types';
+ 
+ function UnforwardedMenuItem(
+diff --git a/packages/components/src/navigable-container/types.ts b/packages/components/src/navigable-container/types.ts
+index e64ff575069acd..709aee447d3e04 100644
+--- a/packages/components/src/navigable-container/types.ts
++++ b/packages/components/src/navigable-container/types.ts
+@@ -6,7 +6,7 @@ import type { ForwardedRef, ReactNode } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ type BaseProps = {
+ 	/**
+diff --git a/packages/components/src/navigator/navigator-back-button/component.tsx b/packages/components/src/navigator/navigator-back-button/component.tsx
+index bf005413fdf718..71c5ac14cd00d9 100644
+--- a/packages/components/src/navigator/navigator-back-button/component.tsx
++++ b/packages/components/src/navigator/navigator-back-button/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { View } from '../../view';
+ import { useNavigatorBackButton } from './hook';
+ import type { NavigatorBackButtonProps } from '../types';
+diff --git a/packages/components/src/navigator/navigator-back-button/hook.ts b/packages/components/src/navigator/navigator-back-button/hook.ts
+index 255a83997d071e..edf55be0f15f5b 100644
+--- a/packages/components/src/navigator/navigator-back-button/hook.ts
++++ b/packages/components/src/navigator/navigator-back-button/hook.ts
+@@ -6,8 +6,8 @@ import { useCallback } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import Button from '../../button';
+ import useNavigator from '../use-navigator';
+ import type { NavigatorBackButtonHookProps } from '../types';
+diff --git a/packages/components/src/navigator/navigator-button/component.tsx b/packages/components/src/navigator/navigator-button/component.tsx
+index d591758333aa9f..1b84a2315c04d3 100644
+--- a/packages/components/src/navigator/navigator-button/component.tsx
++++ b/packages/components/src/navigator/navigator-button/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { View } from '../../view';
+ import { useNavigatorButton } from './hook';
+ import type { NavigatorButtonProps } from '../types';
+diff --git a/packages/components/src/navigator/navigator-button/hook.ts b/packages/components/src/navigator/navigator-button/hook.ts
+index 9b32c07b293c53..3952dc3fd56ba5 100644
+--- a/packages/components/src/navigator/navigator-button/hook.ts
++++ b/packages/components/src/navigator/navigator-button/hook.ts
+@@ -7,8 +7,8 @@ import { escapeAttribute } from '@wordpress/escape-html';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import Button from '../../button';
+ import useNavigator from '../use-navigator';
+ import type { NavigatorButtonProps } from '../types';
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index 2d27605eab15a0..cccbb84f0d093a 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -20,8 +20,8 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect, useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect, useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import { View } from '../../view';
+ import { NavigatorContext } from '../context';
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 7a920bd7e2bc5f..ed4ab9629d3a8d 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -26,8 +26,8 @@ import { escapeAttribute } from '@wordpress/escape-html';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect, useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect, useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import { View } from '../../view';
+ import { NavigatorContext } from '../context';
+diff --git a/packages/components/src/navigator/navigator-to-parent-button/component.tsx b/packages/components/src/navigator/navigator-to-parent-button/component.tsx
+index a717df22c74131..e73a3619f3d494 100644
+--- a/packages/components/src/navigator/navigator-to-parent-button/component.tsx
++++ b/packages/components/src/navigator/navigator-to-parent-button/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { View } from '../../view';
+ import { useNavigatorBackButton } from '../navigator-back-button/hook';
+ import type { NavigatorToParentButtonProps } from '../types';
+diff --git a/packages/components/src/notice/list.tsx b/packages/components/src/notice/list.tsx
+index 6129db8434ee41..5b92b6902a847d 100644
+--- a/packages/components/src/notice/list.tsx
++++ b/packages/components/src/notice/list.tsx
+@@ -7,7 +7,7 @@ import classnames from 'classnames';
+  * Internal dependencies
+  */
+ import Notice from '.';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { NoticeListProps } from './types';
+ 
+ const noop = () => {};
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index a70fc500d4134f..e0a09ec06a8295 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -20,7 +20,7 @@ import { Input, SpinButton, styles } from './styles/number-control-styles';
+ import * as inputControlActionTypes from '../input-control/reducer/actions';
+ import { add, subtract, roundClamp } from '../utils/math';
+ import { ensureNumber, isValueEmpty } from '../utils/values';
+-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
++import type { WordPressComponentProps } from '../context/wordpress-component';
+ import type { NumberControlProps } from './types';
+ import { HStack } from '../h-stack';
+ import { Spacer } from '../spacer';
+diff --git a/packages/components/src/panel/body.tsx b/packages/components/src/panel/body.tsx
+index f5ea844754cddd..46841f428fac19 100644
+--- a/packages/components/src/panel/body.tsx
++++ b/packages/components/src/panel/body.tsx
+@@ -14,7 +14,7 @@ import { chevronUp, chevronDown } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import type { PanelBodyProps, PanelBodyTitleProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import Button from '../button';
+ import Icon from '../icon';
+ import { useControlledState, useUpdateEffect } from '../utils';
+diff --git a/packages/components/src/panel/types.ts b/packages/components/src/panel/types.ts
+index 9059aad53fa0a1..6b7ab35a57520a 100644
+--- a/packages/components/src/panel/types.ts
++++ b/packages/components/src/panel/types.ts
+@@ -2,7 +2,7 @@
+  * Internal dependencies
+  */
+ import type { ButtonAsButtonProps } from '../button/types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ export type PanelProps = {
+ 	/**
+diff --git a/packages/components/src/placeholder/index.tsx b/packages/components/src/placeholder/index.tsx
+index cdb845710251dc..d55741f1f41578 100644
+--- a/packages/components/src/placeholder/index.tsx
++++ b/packages/components/src/placeholder/index.tsx
+@@ -16,7 +16,7 @@ import { speak } from '@wordpress/a11y';
+  */
+ import Icon from '../icon';
+ import type { PlaceholderProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ const PlaceholderIllustration = (
+ 	<SVG
+diff --git a/packages/components/src/placeholder/test/index.tsx b/packages/components/src/placeholder/test/index.tsx
+index dbb88a48826348..6d9427af00b4c5 100644
+--- a/packages/components/src/placeholder/test/index.tsx
++++ b/packages/components/src/placeholder/test/index.tsx
+@@ -14,7 +14,7 @@ import { speak } from '@wordpress/a11y';
+  * Internal dependencies
+  */
+ import BasePlaceholder from '../';
+-import type { WordPressComponentProps } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
+ import type { PlaceholderProps } from '../types';
+ 
+ jest.mock( '@wordpress/compose', () => {
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index bb51252b549c52..3dc450e9bcb143 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -53,7 +53,7 @@ import {
+ 	placementToMotionAnimationProps,
+ 	getReferenceElement,
+ } from './utils';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type {
+ 	PopoverProps,
+ 	PopoverAnchorRefReference,
+diff --git a/packages/components/src/popover/test/utils/index.tsx b/packages/components/src/popover/test/utils/index.tsx
+index 53af9af21b838a..91fa26d8102437 100644
+--- a/packages/components/src/popover/test/utils/index.tsx
++++ b/packages/components/src/popover/test/utils/index.tsx
+@@ -8,7 +8,7 @@ import { createPortal, useState } from '@wordpress/element';
+  */
+ import Popover from '../..';
+ import { Provider as SlotFillProvider } from '../../../slot-fill';
+-import type { WordPressComponentProps } from '../../../ui/context';
++import type { WordPressComponentProps } from '../../../context';
+ 
+ const GenericIframe = ( {
+ 	children,
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 6e17abde0c627e..38707860e1ce91 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -22,7 +22,7 @@ import {
+ 	DropdownSubMenu as DropdownSubMenuV2,
+ 	DropdownSubMenuTrigger as DropdownSubMenuTriggerV2,
+ } from './dropdown-menu-v2';
+-import { ComponentsContext } from './ui/context/context-system-provider';
++import { ComponentsContext } from './context/context-system-provider';
+ import Theme from './theme';
+ 
+ export const { lock, unlock } =
+diff --git a/packages/components/src/progress-bar/index.tsx b/packages/components/src/progress-bar/index.tsx
+index 16f2630953840a..b5bd9ad46c34d3 100644
+--- a/packages/components/src/progress-bar/index.tsx
++++ b/packages/components/src/progress-bar/index.tsx
+@@ -14,7 +14,7 @@ import { forwardRef } from '@wordpress/element';
+  */
+ import * as ProgressBarStyled from './styles';
+ import type { ProgressBarProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ function UnforwardedProgressBar(
+ 	props: WordPressComponentProps< ProgressBarProps, 'progress', false >,
+diff --git a/packages/components/src/radio-control/index.tsx b/packages/components/src/radio-control/index.tsx
+index bbc2b2c04ed43b..4a8875bce0a2a3 100644
+--- a/packages/components/src/radio-control/index.tsx
++++ b/packages/components/src/radio-control/index.tsx
+@@ -13,7 +13,7 @@ import { useInstanceId } from '@wordpress/compose';
+  * Internal dependencies
+  */
+ import BaseControl from '../base-control';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { RadioControlProps } from './types';
+ import { VStack } from '../v-stack';
+ 
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index fbf472b66d38fd..534ae36af67ca4 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -36,7 +36,7 @@ import {
+ } from './styles/range-control-styles';
+ 
+ import type { RangeControlProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import { space } from '../ui/utils/space';
+ 
+ const noop = () => {};
+diff --git a/packages/components/src/range-control/input-range.tsx b/packages/components/src/range-control/input-range.tsx
+index 1daa351444686a..028f08294f3eb4 100644
+--- a/packages/components/src/range-control/input-range.tsx
++++ b/packages/components/src/range-control/input-range.tsx
+@@ -9,7 +9,7 @@ import { forwardRef } from '@wordpress/element';
+ import { InputRange as BaseInputRange } from './styles/range-control-styles';
+ 
+ import type { InputRangeProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ function InputRange(
+ 	props: WordPressComponentProps< InputRangeProps, 'input' >,
+diff --git a/packages/components/src/range-control/mark.tsx b/packages/components/src/range-control/mark.tsx
+index 892a3b3679df1e..856b540b70e1b5 100644
+--- a/packages/components/src/range-control/mark.tsx
++++ b/packages/components/src/range-control/mark.tsx
+@@ -9,7 +9,7 @@ import classnames from 'classnames';
+ import { Mark, MarkLabel } from './styles/range-control-styles';
+ 
+ import type { RangeMarkProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ export default function RangeMark(
+ 	props: WordPressComponentProps< RangeMarkProps, 'span' >
+diff --git a/packages/components/src/range-control/rail.tsx b/packages/components/src/range-control/rail.tsx
+index c284415630906c..a59cc0849246f4 100644
+--- a/packages/components/src/range-control/rail.tsx
++++ b/packages/components/src/range-control/rail.tsx
+@@ -9,7 +9,7 @@ import { isRTL } from '@wordpress/i18n';
+ import RangeMark from './mark';
+ import { MarksWrapper, Rail } from './styles/range-control-styles';
+ 
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type {
+ 	MarksProps,
+ 	RangeMarkProps,
+diff --git a/packages/components/src/range-control/tooltip.tsx b/packages/components/src/range-control/tooltip.tsx
+index 3c8403d1275c66..c5428baab52179 100644
+--- a/packages/components/src/range-control/tooltip.tsx
++++ b/packages/components/src/range-control/tooltip.tsx
+@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from '@wordpress/element';
+ import { Tooltip } from './styles/range-control-styles';
+ 
+ import type { TooltipProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ export default function SimpleTooltip(
+ 	props: WordPressComponentProps< TooltipProps, 'span' >
+diff --git a/packages/components/src/scrollable/component.tsx b/packages/components/src/scrollable/component.tsx
+index 902d315e9deee2..415ea6d4628e19 100644
+--- a/packages/components/src/scrollable/component.tsx
++++ b/packages/components/src/scrollable/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { contextConnect } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { contextConnect } from '../context';
+ import { View } from '../view';
+ import { useScrollable } from './hook';
+ import type { ScrollableProps } from './types';
+diff --git a/packages/components/src/scrollable/hook.ts b/packages/components/src/scrollable/hook.ts
+index 7d8002dc624dd5..1e86370b742ca6 100644
+--- a/packages/components/src/scrollable/hook.ts
++++ b/packages/components/src/scrollable/hook.ts
+@@ -6,8 +6,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { useContextSystem } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { useContextSystem } from '../context';
+ import * as styles from './styles';
+ import { useCx } from '../utils/hooks/use-cx';
+ import type { ScrollableProps } from './types';
+diff --git a/packages/components/src/search-control/index.tsx b/packages/components/src/search-control/index.tsx
+index 723d754ba78ea1..a896ca1aa3d8fe 100644
+--- a/packages/components/src/search-control/index.tsx
++++ b/packages/components/src/search-control/index.tsx
+@@ -16,7 +16,7 @@ import { forwardRef, useRef } from '@wordpress/element';
+  */
+ import Button from '../button';
+ import BaseControl from '../base-control';
+-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
++import type { WordPressComponentProps } from '../context/wordpress-component';
+ import type { SearchControlProps } from './types';
+ import type { ForwardedRef } from 'react';
+ 
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 769e2ab4f7ebd9..c7408ea26f18a2 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -15,7 +15,7 @@ import { useState, forwardRef } from '@wordpress/element';
+ import BaseControl from '../base-control';
+ import InputBase from '../input-control/input-base';
+ import { Select } from './styles/select-control-styles';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { SelectControlProps } from './types';
+ import SelectControlChevronDown from './chevron-down';
+ 
+diff --git a/packages/components/src/snackbar/index.tsx b/packages/components/src/snackbar/index.tsx
+index b03828e7b01e95..45f1800bb2249f 100644
+--- a/packages/components/src/snackbar/index.tsx
++++ b/packages/components/src/snackbar/index.tsx
+@@ -18,7 +18,7 @@ import warning from '@wordpress/warning';
+ import Button from '../button';
+ import type { SnackbarProps } from './types';
+ import type { NoticeAction } from '../notice/types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ const NOTICE_TIMEOUT = 10000;
+ 
+diff --git a/packages/components/src/snackbar/list.tsx b/packages/components/src/snackbar/list.tsx
+index 631cf48d953a23..e423cf6c3a7f7e 100644
+--- a/packages/components/src/snackbar/list.tsx
++++ b/packages/components/src/snackbar/list.tsx
+@@ -18,7 +18,7 @@ import {
+ 	__unstableAnimatePresence as AnimatePresence,
+ } from '../animation';
+ import type { SnackbarListProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ const SNACKBAR_VARIANTS = {
+ 	init: {
+diff --git a/packages/components/src/spacer/component.tsx b/packages/components/src/spacer/component.tsx
+index b4f532a0fd4787..afb4f8675933a5 100644
+--- a/packages/components/src/spacer/component.tsx
++++ b/packages/components/src/spacer/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { contextConnect } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { contextConnect } from '../context';
+ import { View } from '../view';
+ import { useSpacer } from './hook';
+ import type { SpacerProps } from './types';
+diff --git a/packages/components/src/spacer/hook.ts b/packages/components/src/spacer/hook.ts
+index e43d45cb31f531..715089455f4fa9 100644
+--- a/packages/components/src/spacer/hook.ts
++++ b/packages/components/src/spacer/hook.ts
+@@ -6,8 +6,8 @@ import { css } from '@emotion/react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { useContextSystem } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { useContextSystem } from '../context';
+ import { space } from '../ui/utils/space';
+ import { rtl, useCx } from '../utils';
+ import type { SpacerProps } from './types';
+diff --git a/packages/components/src/spinner/index.tsx b/packages/components/src/spinner/index.tsx
+index 9eee9dde18ef23..9864819fa3d97f 100644
+--- a/packages/components/src/spinner/index.tsx
++++ b/packages/components/src/spinner/index.tsx
+@@ -8,7 +8,7 @@ import type { ForwardedRef } from 'react';
+  * Internal dependencies
+  */
+ import { StyledSpinner, SpinnerTrack, SpinnerIndicator } from './styles';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/surface/component.tsx b/packages/components/src/surface/component.tsx
+index 5b86494c991f5d..ba0745a40b5044 100644
+--- a/packages/components/src/surface/component.tsx
++++ b/packages/components/src/surface/component.tsx
+@@ -6,11 +6,11 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect } from '../ui/context';
++import { contextConnect } from '../context';
+ import { View } from '../view';
+ import { useSurface } from './hook';
+ import type { SurfaceProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ function UnconnectedSurface(
+ 	props: WordPressComponentProps< SurfaceProps, 'div' >,
+diff --git a/packages/components/src/surface/hook.ts b/packages/components/src/surface/hook.ts
+index 3cad00d4a7f69f..bacc2f2b291348 100644
+--- a/packages/components/src/surface/hook.ts
++++ b/packages/components/src/surface/hook.ts
+@@ -6,11 +6,11 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../ui/context';
++import { useContextSystem } from '../context';
+ import * as styles from './styles';
+ import { useCx } from '../utils/hooks/use-cx';
+ import type { SurfaceProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ export function useSurface(
+ 	props: WordPressComponentProps< SurfaceProps, 'div' >
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index eb34ed1fe7df93..f4abd1c121b2f9 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -23,7 +23,7 @@ import { useInstanceId, usePrevious } from '@wordpress/compose';
+ 
+ import Button from '../button';
+ import type { TabPanelProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ // Separate the actual tab name from the instance ID. This is
+ // necessary because Ariakit internally uses the element ID when
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+index 34c9028c1cb8bc..31b1462a3b3a43 100644
+--- a/packages/components/src/text-control/index.tsx
++++ b/packages/components/src/text-control/index.tsx
+@@ -13,7 +13,7 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import BaseControl from '../base-control';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { TextControlProps } from './types';
+ 
+ function UnforwardedTextControl(
+diff --git a/packages/components/src/text/component.js b/packages/components/src/text/component.js
+index b729f73bf640e8..f1ce842dae9153 100644
+--- a/packages/components/src/text/component.js
++++ b/packages/components/src/text/component.js
+@@ -1,13 +1,13 @@
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect } from '../ui/context';
++import { contextConnect } from '../context';
+ import { View } from '../view';
+ import useText from './hook';
+ 
+ /**
+- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
+- * @param {import('react').ForwardedRef<any>}                                                forwardedRef
++ * @param {import('../context').WordPressComponentProps<import('./types').Props, 'span'>} props
++ * @param {import('react').ForwardedRef<any>}                                             forwardedRef
+  */
+ function Text( props, forwardedRef ) {
+ 	const textProps = useText( props );
+diff --git a/packages/components/src/text/hook.js b/packages/components/src/text/hook.js
+index 7a83bc9c336999..4cfeaa7943b314 100644
+--- a/packages/components/src/text/hook.js
++++ b/packages/components/src/text/hook.js
+@@ -11,7 +11,7 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { hasConnectNamespace, useContextSystem } from '../ui/context';
++import { hasConnectNamespace, useContextSystem } from '../context';
+ import { useTruncate } from '../truncate';
+ import { getOptimalTextShade } from '../ui/utils';
+ import * as styles from './styles';
+@@ -22,7 +22,7 @@ import { getLineHeight } from './get-line-height';
+ import { useCx } from '../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
++ * @param {import('../context').WordPressComponentProps<import('./types').Props, 'span'>} props
+  */
+ export default function useText( props ) {
+ 	const {
+diff --git a/packages/components/src/textarea-control/index.tsx b/packages/components/src/textarea-control/index.tsx
+index 92374d67fd5af9..64c2da7ecd11dd 100644
+--- a/packages/components/src/textarea-control/index.tsx
++++ b/packages/components/src/textarea-control/index.tsx
+@@ -14,7 +14,7 @@ import { useInstanceId } from '@wordpress/compose';
+ import BaseControl from '../base-control';
+ import { StyledTextarea } from './styles/textarea-control-styles';
+ import type { TextareaControlProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ /**
+  * TextareaControls are TextControls that allow for multiple lines of text, and
+diff --git a/packages/components/src/theme/index.tsx b/packages/components/src/theme/index.tsx
+index ce1e11246e0d3c..fbb92f59278d1b 100644
+--- a/packages/components/src/theme/index.tsx
++++ b/packages/components/src/theme/index.tsx
+@@ -7,7 +7,7 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { ThemeProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import { colorVariables, Wrapper } from './styles';
+ import { generateThemeVariables } from './color-algorithms';
+ import { useCx } from '../utils';
+diff --git a/packages/components/src/toggle-control/index.tsx b/packages/components/src/toggle-control/index.tsx
+index f71c807b9d4fca..f5a76c55a7bb96 100644
+--- a/packages/components/src/toggle-control/index.tsx
++++ b/packages/components/src/toggle-control/index.tsx
+@@ -15,7 +15,7 @@ import { useInstanceId } from '@wordpress/compose';
+ import { FlexBlock } from '../flex';
+ import FormToggle from '../form-toggle';
+ import BaseControl from '../base-control';
+-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
++import type { WordPressComponentProps } from '../context/wordpress-component';
+ import type { ToggleControlProps } from './types';
+ import { HStack } from '../h-stack';
+ import { useCx } from '../utils';
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index 302e54e01e4ddc..8795565692c1c8 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -16,8 +16,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect, useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect, useContextSystem } from '../../context';
+ import type {
+ 	ToggleGroupControlOptionBaseProps,
+ 	WithToolTipProps,
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+index 283ef884b77672..ec009d82344c39 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+@@ -11,7 +11,7 @@ import { forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
+ import type { ToggleGroupControlOptionIconProps } from '../types';
+ import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
+ import Icon from '../../icon';
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+index 52d85d08be8f59..e4b9cff4b80330 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+@@ -11,7 +11,7 @@ import { forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
+ import type { ToggleGroupControlOptionProps } from '../types';
+ import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
+ 
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
+index 7836cfa116a6fa..b3f56bccd07c5f 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
+@@ -9,7 +9,7 @@ import { forwardRef, useMemo } from '@wordpress/element';
+  */
+ import { View } from '../../view';
+ import { useControlledValue } from '../../utils';
+-import type { WordPressComponentProps } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
+ import ToggleGroupControlContext from '../context';
+ import { useComputeControlledOrUncontrolledValue } from './utils';
+ import type {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+index 93412fb80fd996..24a40527abdc41 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+@@ -15,7 +15,7 @@ import { forwardRef, useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { View } from '../../view';
+-import type { WordPressComponentProps } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
+ import ToggleGroupControlContext from '../context';
+ import { useComputeControlledOrUncontrolledValue } from './utils';
+ import type {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index e3ebf3e677b78f..924c5ecb587466 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -15,8 +15,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect, useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect, useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks';
+ import BaseControl from '../../base-control';
+ import type { ToggleGroupControlProps } from '../types';
+diff --git a/packages/components/src/toolbar/toolbar-button/index.tsx b/packages/components/src/toolbar/toolbar-button/index.tsx
+index 35696d80e73eb0..3d77e9cbc8cf6f 100644
+--- a/packages/components/src/toolbar/toolbar-button/index.tsx
++++ b/packages/components/src/toolbar/toolbar-button/index.tsx
+@@ -17,7 +17,7 @@ import ToolbarItem from '../toolbar-item';
+ import ToolbarContext from '../toolbar-context';
+ import ToolbarButtonContainer from './toolbar-button-container';
+ import type { ToolbarButtonProps } from './types';
+-import type { WordPressComponentProps } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
+ 
+ function UnforwardedToolbarButton(
+ 	{
+diff --git a/packages/components/src/toolbar/toolbar-group/toolbar-group-container.tsx b/packages/components/src/toolbar/toolbar-group/toolbar-group-container.tsx
+index faddda8a83101a..040a771d4ce039 100644
+--- a/packages/components/src/toolbar/toolbar-group/toolbar-group-container.tsx
++++ b/packages/components/src/toolbar/toolbar-group/toolbar-group-container.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
+ import type { ToolbarGroupContainerProps } from './types';
+ 
+ const ToolbarGroupContainer = ( {
+diff --git a/packages/components/src/toolbar/toolbar/index.tsx b/packages/components/src/toolbar/toolbar/index.tsx
+index 2eac5c5e614e3b..b6e83dcf6da2a6 100644
+--- a/packages/components/src/toolbar/toolbar/index.tsx
++++ b/packages/components/src/toolbar/toolbar/index.tsx
+@@ -16,8 +16,8 @@ import deprecated from '@wordpress/deprecated';
+ import ToolbarGroup from '../toolbar-group';
+ import ToolbarContainer from './toolbar-container';
+ import type { ToolbarProps } from './types';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { ContextSystemProvider } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { ContextSystemProvider } from '../../context';
+ 
+ const CONTEXT_SYSTEM_VALUE = {
+ 	DropdownMenu: {
+diff --git a/packages/components/src/toolbar/toolbar/toolbar-container.tsx b/packages/components/src/toolbar/toolbar/toolbar-container.tsx
+index fb60b8e8b496d5..5f64ecb3d20cd0 100644
+--- a/packages/components/src/toolbar/toolbar/toolbar-container.tsx
++++ b/packages/components/src/toolbar/toolbar/toolbar-container.tsx
+@@ -16,7 +16,7 @@ import { isRTL } from '@wordpress/i18n';
+  */
+ import ToolbarContext from '../toolbar-context';
+ import type { ToolbarProps } from './types';
+-import type { WordPressComponentProps } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
+ 
+ function UnforwardedToolbarContainer(
+ 	{ label, ...props }: WordPressComponentProps< ToolbarProps, 'div', false >,
+diff --git a/packages/components/src/tools-panel/tools-panel-header/component.tsx b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+index 35f27983c18135..a48ddac3bc34a0 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+@@ -19,8 +19,8 @@ import MenuItem from '../../menu-item';
+ import { HStack } from '../../h-stack';
+ import { Heading } from '../../heading';
+ import { useToolsPanelHeader } from './hook';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import { ResetLabel } from '../styles';
+ import type {
+ 	ToolsPanelControlsGroupProps,
+diff --git a/packages/components/src/tools-panel/tools-panel-header/hook.ts b/packages/components/src/tools-panel/tools-panel-header/hook.ts
+index 056258eed5d009..8f5fb0dcdee574 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-header/hook.ts
+@@ -8,8 +8,8 @@ import { useMemo } from '@wordpress/element';
+  */
+ import * as styles from '../styles';
+ import { useToolsPanelContext } from '../context';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { ToolsPanelHeaderProps } from '../types';
+ 
+diff --git a/packages/components/src/tools-panel/tools-panel-item/component.tsx b/packages/components/src/tools-panel/tools-panel-item/component.tsx
+index fb4d1c4fae295a..a44514824ebef6 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel-item/component.tsx
+@@ -8,8 +8,8 @@ import type { ForwardedRef } from 'react';
+  */
+ import { useToolsPanelItem } from './hook';
+ import { View } from '../../view';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import type { ToolsPanelItemProps } from '../types';
+ 
+ // This wraps controls to be conditionally displayed within a tools panel. It
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index bfd59e5b953aa7..95958ae9f48608 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -9,8 +9,8 @@ import { useCallback, useEffect, useMemo } from '@wordpress/element';
+  */
+ import * as styles from '../styles';
+ import { useToolsPanelContext } from '../context';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { ToolsPanelItemProps } from '../types';
+ 
+diff --git a/packages/components/src/tools-panel/tools-panel/component.tsx b/packages/components/src/tools-panel/tools-panel/component.tsx
+index 42028b48f862bf..660a782e810214 100644
+--- a/packages/components/src/tools-panel/tools-panel/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel/component.tsx
+@@ -10,8 +10,8 @@ import ToolsPanelHeader from '../tools-panel-header';
+ import { ToolsPanelContext } from '../context';
+ import { useToolsPanel } from './hook';
+ import { Grid } from '../../grid';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { contextConnect } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { contextConnect } from '../../context';
+ import type { ToolsPanelProps } from '../types';
+ 
+ const UnconnectedToolsPanel = (
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.ts b/packages/components/src/tools-panel/tools-panel/hook.ts
+index 8377376a861a59..8a38a15084b33c 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel/hook.ts
+@@ -13,8 +13,8 @@ import {
+  * Internal dependencies
+  */
+ import * as styles from '../styles';
+-import type { WordPressComponentProps } from '../../ui/context';
+-import { useContextSystem } from '../../ui/context';
++import type { WordPressComponentProps } from '../../context';
++import { useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type {
+ 	ToolsPanelItem,
+diff --git a/packages/components/src/tree-grid/cell.tsx b/packages/components/src/tree-grid/cell.tsx
+index f33e8e8d9c6eb1..a9883eb0512266 100644
+--- a/packages/components/src/tree-grid/cell.tsx
++++ b/packages/components/src/tree-grid/cell.tsx
+@@ -7,7 +7,7 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import TreeGridItem from './item';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { TreeGridCellProps } from './types';
+ 
+ function UnforwardedTreeGridCell(
+diff --git a/packages/components/src/tree-grid/index.tsx b/packages/components/src/tree-grid/index.tsx
+index 6a258eb9b1e319..6a02f333854941 100644
+--- a/packages/components/src/tree-grid/index.tsx
++++ b/packages/components/src/tree-grid/index.tsx
+@@ -10,7 +10,7 @@ import { UP, DOWN, LEFT, RIGHT, HOME, END } from '@wordpress/keycodes';
+  */
+ import RovingTabIndexContainer from './roving-tab-index';
+ import type { TreeGridProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ /**
+  * Return focusables in a row element, excluding those from other branches
+diff --git a/packages/components/src/tree-grid/row.tsx b/packages/components/src/tree-grid/row.tsx
+index a4b69cd46e1797..a6ea0624fa6a86 100644
+--- a/packages/components/src/tree-grid/row.tsx
++++ b/packages/components/src/tree-grid/row.tsx
+@@ -6,7 +6,7 @@ import { forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import type { TreeGridRowProps } from './types';
+ 
+ function UnforwardedTreeGridRow(
+diff --git a/packages/components/src/truncate/component.tsx b/packages/components/src/truncate/component.tsx
+index dfe6cd37b3e9a3..4b6c721f92c70c 100644
+--- a/packages/components/src/truncate/component.tsx
++++ b/packages/components/src/truncate/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { contextConnect } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { contextConnect } from '../context';
+ import { View } from '../view';
+ import useTruncate from './hook';
+ import type { TruncateProps } from './types';
+diff --git a/packages/components/src/truncate/hook.ts b/packages/components/src/truncate/hook.ts
+index c6afef52c09088..3877e216ba5801 100644
+--- a/packages/components/src/truncate/hook.ts
++++ b/packages/components/src/truncate/hook.ts
+@@ -11,8 +11,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { useContextSystem } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { useContextSystem } from '../context';
+ import * as styles from './styles';
+ import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
+ import { useCx } from '../utils/hooks/use-cx';
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index ed57f4cc703fe6..24b849199946db 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import { ValueInput } from './styles/unit-control-styles';
+ import UnitSelectControl from './unit-select-control';
+ import {
+diff --git a/packages/components/src/unit-control/unit-select-control.tsx b/packages/components/src/unit-control/unit-select-control.tsx
+index 99f481ae506fd0..c3019fb830c224 100644
+--- a/packages/components/src/unit-control/unit-select-control.tsx
++++ b/packages/components/src/unit-control/unit-select-control.tsx
+@@ -12,7 +12,7 @@ import { forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ import { UnitSelect, UnitLabel } from './styles/unit-control-styles';
+ import { CSS_UNITS, hasUnits } from './utils';
+ import type { UnitSelectControlProps } from './types';
+diff --git a/packages/components/src/v-stack/component.tsx b/packages/components/src/v-stack/component.tsx
+index 5c51043eba7261..c3ae9fece97dc0 100644
+--- a/packages/components/src/v-stack/component.tsx
++++ b/packages/components/src/v-stack/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { contextConnect } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { contextConnect } from '../context';
+ import { View } from '../view';
+ import { useVStack } from './hook';
+ import type { VStackProps } from './types';
+diff --git a/packages/components/src/v-stack/hook.ts b/packages/components/src/v-stack/hook.ts
+index f9c592e8f02851..f05a63328f848f 100644
+--- a/packages/components/src/v-stack/hook.ts
++++ b/packages/components/src/v-stack/hook.ts
+@@ -1,8 +1,8 @@
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { useContextSystem } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { useContextSystem } from '../context';
+ import { useHStack } from '../h-stack';
+ import type { VStackProps } from './types';
+ 
+diff --git a/packages/components/src/view/component.tsx b/packages/components/src/view/component.tsx
+index da7efc69e38590..a970c5c757431f 100644
+--- a/packages/components/src/view/component.tsx
++++ b/packages/components/src/view/component.tsx
+@@ -7,7 +7,7 @@ import type { RefAttributes } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponent } from '../ui/context/wordpress-component';
++import type { WordPressComponent } from '../context/wordpress-component';
+ import type { ViewProps } from './types';
+ 
+ /**
+diff --git a/packages/components/src/visually-hidden/component.tsx b/packages/components/src/visually-hidden/component.tsx
+index c5cb9c0fd00677..ddf697c9373db6 100644
+--- a/packages/components/src/visually-hidden/component.tsx
++++ b/packages/components/src/visually-hidden/component.tsx
+@@ -6,8 +6,8 @@ import type { ForwardedRef } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponentProps } from '../ui/context';
+-import { useContextSystem, contextConnect } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
++import { useContextSystem, contextConnect } from '../context';
+ import { visuallyHidden } from './styles';
+ import { View } from '../view';
+ import type { VisuallyHiddenProps } from './types';
+diff --git a/packages/components/src/z-stack/component.tsx b/packages/components/src/z-stack/component.tsx
+index e087f8536e3401..4c29fa69b748e3 100644
+--- a/packages/components/src/z-stack/component.tsx
++++ b/packages/components/src/z-stack/component.tsx
+@@ -12,10 +12,10 @@ import { isValidElement } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { getValidChildren } from '../ui/utils/get-valid-children';
+-import { contextConnect, useContextSystem } from '../ui/context';
++import { contextConnect, useContextSystem } from '../context';
+ import { ZStackView, ZStackChildView } from './styles';
+ import type { ZStackProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../context';
+ 
+ function UnconnectedZStack(
+ 	props: WordPressComponentProps< ZStackProps, 'div' >,

@@ -1,0 +1,114 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 95d841a4e185f1..dcb3ab2bd6ef9e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ 
+ -   `Autocomplete`: Refactor `useAutocomplete` to use `useReducer` ([#77020](https://github.com/WordPress/gutenberg/pull/77020)).
+ -   `Button`: Remove obsolete Safari + VoiceOver workaround for visually hidden text ([#77107](https://github.com/WordPress/gutenberg/pull/77107)).
++-   `BoxControl`: Remove unused state for icon side ([#77143](https://github.com/WordPress/gutenberg/pull/77143)).
+ 
+ ## 32.5.0 (2026-04-01)
+ 
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index 9d37558d2b2408..74c19cc7344ab8 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -21,17 +21,12 @@ import {
+ import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
+ import {
+ 	DEFAULT_VALUES,
+-	getInitialSide,
+ 	isValueMixed,
+ 	isValuesDefined,
+ 	getAllowedSides,
+ } from './utils';
+ import { useControlledState } from '../utils/hooks';
+-import type {
+-	BoxControlIconProps,
+-	BoxControlProps,
+-	BoxControlValue,
+-} from './types';
++import type { BoxControlProps, BoxControlValue } from './types';
+ import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ const defaultInputProps = {
+@@ -101,10 +96,6 @@ function BoxControl( {
+ 		! hasInitialValue || ! isValueMixed( inputValues ) || hasOneSide
+ 	);
+ 
+-	const [ side, setSide ] = useState< BoxControlIconProps[ 'side' ] >(
+-		getInitialSide( isLinked, splitOnAxis )
+-	);
+-
+ 	// Tracking selected units via internal state allows filtering of CSS unit
+ 	// only values from being saved while maintaining preexisting unit selection
+ 	// behaviour. Filtering CSS only values prevents invalid style values.
+@@ -120,14 +111,6 @@ function BoxControl( {
+ 
+ 	const toggleLinked = () => {
+ 		setIsLinked( ! isLinked );
+-		setSide( getInitialSide( ! isLinked, splitOnAxis ) );
+-	};
+-
+-	const handleOnFocus = (
+-		_event: React.FocusEvent< HTMLInputElement >,
+-		{ side: nextSide }: { side: typeof side }
+-	) => {
+-		setSide( nextSide );
+ 	};
+ 
+ 	const handleOnChange = ( nextValues: BoxControlValue ) => {
+@@ -148,7 +131,6 @@ function BoxControl( {
+ 		onMouseOut,
+ 		...inputProps,
+ 		onChange: handleOnChange,
+-		onFocus: handleOnFocus,
+ 		isLinked,
+ 		units,
+ 		selectedUnits,
+diff --git a/packages/components/src/box-control/utils.ts b/packages/components/src/box-control/utils.ts
+index 26bdae4e559511..be5c4ae0042c38 100644
+--- a/packages/components/src/box-control/utils.ts
++++ b/packages/components/src/box-control/utils.ts
+@@ -1,6 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
++import deprecated from '@wordpress/deprecated';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+@@ -13,7 +14,6 @@ import type {
+ 	CustomValueUnits,
+ 	Preset,
+ } from './types';
+-import deprecated from '@wordpress/deprecated';
+ 
+ export const CUSTOM_VALUE_SETTINGS: CustomValueUnits = {
+ 	px: { max: 300, step: 1 },
+@@ -160,24 +160,6 @@ export function isValuesDefined( values?: BoxControlValue ) {
+ 	);
+ }
+ 
+-/**
+- * Get initial selected side, factoring in whether the sides are linked,
+- * and whether the vertical / horizontal directions are grouped via splitOnAxis.
+- *
+- * @param isLinked    Whether the box control's fields are linked.
+- * @param splitOnAxis Whether splitting by horizontal or vertical axis.
+- * @return The initial side.
+- */
+-export function getInitialSide( isLinked: boolean, splitOnAxis: boolean ) {
+-	let initialSide: keyof typeof LABELS = 'all';
+-
+-	if ( ! isLinked ) {
+-		initialSide = splitOnAxis ? 'vertical' : 'top';
+-	}
+-
+-	return initialSide;
+-}
+-
+ /**
+  * Normalizes provided sides configuration to an array containing only top,
+  * right, bottom and left. This essentially just maps `horizontal` or `vertical`

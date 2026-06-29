@@ -1,0 +1,193 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 94e84cf3a1e6ee..799703d001b613 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,9 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++-   `FontSizePicker`: Allow custom units for custom font size control ([#48468](https://github.com/WordPress/gutenberg/pull/48468)).
++
+ ### Internal
+ 
+ -   `Guide`: Convert to TypeScript ([#47493](https://github.com/WordPress/gutenberg/pull/47493)).
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index 5f74dd09a28193..3eee5683407075 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -49,22 +49,20 @@ const MyFontSizePicker = () => {
+ 
+ The component accepts the following props:
+ 
+-### disableCustomFontSizes
++### `disableCustomFontSizes`: `boolean`
+ 
+ If `true`, it will not be possible to choose a custom fontSize. The user will be forced to pick one of the pre-defined sizes passed in fontSizes.
+ 
+--   Type: `Boolean`
+ -   Required: no
+ -   Default: `false`
+ 
+-### fallbackFontSize
++### `fallbackFontSize`: `number`
+ 
+ If no value exists, this prop defines the starting position for the font size picker slider. Only relevant if `withSlider` is `true`.
+ 
+--   Type: `Number`
+ -   Required: No
+ 
+-### fontSizes
++### `fontSizes`: `FontSize[]`
+ 
+ An array of font size objects. The object should contain properties size, name, and slug.
+ The property `size` contains a number with the font size value, in `px` or a string specifying the font size CSS property that should be used eg: "13px", "1em", or "clamp(12px, 5vw, 100px)".
+@@ -73,44 +71,52 @@ The `slug` property is a string with a unique identifier for the font size. Used
+ 
+ **Note:** The slugs `default` and `custom` are reserved and cannot be used.
+ 
+--   Type: `Array`
+ -   Required: No
++-   Default: `[]`
+ 
+-### onChange
++### `onChange`: `( value: number | string | undefined, selectedItem?: FontSize ) => void`
+ 
+ A function that receives the new font size value.
+ If onChange is called without any parameter, it should reset the value, attending to what reset means in that context, e.g., set the font size to undefined or set the font size a starting value.
+ 
+--   Type: `function`
+ -   Required: Yes
+ 
+-### value
++### `size`: `'default' | '__unstable-large'`
+ 
+-The current font size value.
++Size of the control.
+ 
+--   Type: `Number | String`
+ -   Required: No
++-   Default: `'default'`
+ 
+-### withSlider
++### `units`: `string[]`
+ 
+-If `true`, a slider will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
++Available units for custom font size selection.
+ 
+--   Type: `Boolean`
+--   Required: no
+--   Default: `false`
++-   Required: No
++
++### `value`: `number | string`
++
++The current font size value.
+ 
+-### withReset
++-   Required: No
++
++### `withReset`: `boolean`
+ 
+ If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
+ 
+--   Type: `Boolean`
+ -   Required: no
+ -   Default: `true`
+ 
+-### __nextHasNoMarginBottom
++### `withSlider`: `boolean`
++
++If `true`, a slider will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
++
++-   Required: no
++-   Default: `false`
++
++### `__nextHasNoMarginBottom`: `boolean`
+ 
+ Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
+ 
+--   Type: `Boolean`
+ -   Required: no
+ -   Default: `false`
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index 06a0b7fcf112f3..a06a6529b0dbce 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -50,6 +50,7 @@ const UnforwardedFontSizePicker = (
+ 		disableCustomFontSizes = false,
+ 		onChange,
+ 		size = 'default',
++		units: unitsProp,
+ 		value,
+ 		withSlider = false,
+ 		withReset = true,
+@@ -64,7 +65,7 @@ const UnforwardedFontSizePicker = (
+ 	}
+ 
+ 	const units = useCustomUnits( {
+-		availableUnits: [ 'px', 'em', 'rem' ],
++		availableUnits: unitsProp || [ 'px', 'em', 'rem' ],
+ 	} );
+ 
+ 	const shouldUseSelectControl = fontSizes.length > 5;
+diff --git a/packages/components/src/font-size-picker/stories/index.tsx b/packages/components/src/font-size-picker/stories/index.tsx
+index 894a619e036868..db7101ab0c4462 100644
+--- a/packages/components/src/font-size-picker/stories/index.tsx
++++ b/packages/components/src/font-size-picker/stories/index.tsx
+@@ -85,6 +85,7 @@ Default.args = {
+ 			size: 26,
+ 		},
+ 	],
++	units: [ 'px', 'em', 'rem' ],
+ 	value: 16,
+ 	withSlider: false,
+ };
+diff --git a/packages/components/src/font-size-picker/test/index.tsx b/packages/components/src/font-size-picker/test/index.tsx
+index 58330083b41904..0d7816399b3652 100644
+--- a/packages/components/src/font-size-picker/test/index.tsx
++++ b/packages/components/src/font-size-picker/test/index.tsx
+@@ -699,5 +699,28 @@ describe( 'FontSizePicker', () => {
+ 				screen.queryByRole( 'button', { name: 'Reset' } )
+ 			).not.toBeInTheDocument();
+ 		} );
++
++		it( 'applies custom units to custom font size control', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<FontSizePicker
++					__nextHasNoMarginBottom
++					fontSizes={ fontSizes }
++					value={ fontSizes[ 0 ].size }
++					units={ [ 'px', 'ch', 'ex' ] }
++				/>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Set custom size' } )
++			);
++
++			const units = screen.getAllByRole( 'option' );
++			expect( units ).toHaveLength( 3 );
++			expect( units[ 0 ] ).toHaveAccessibleName( 'px' );
++			expect( units[ 1 ] ).toHaveAccessibleName( 'ch' );
++			expect( units[ 2 ] ).toHaveAccessibleName( 'ex' );
++		} );
+ 	}
+ } );
+diff --git a/packages/components/src/font-size-picker/types.ts b/packages/components/src/font-size-picker/types.ts
+index 24c66efe1bee28..f4d00c2d3ce674 100644
+--- a/packages/components/src/font-size-picker/types.ts
++++ b/packages/components/src/font-size-picker/types.ts
+@@ -26,6 +26,10 @@ export type FontSizePickerProps = {
+ 		value: number | string | undefined,
+ 		selectedItem?: FontSize
+ 	) => void;
++	/**
++	 * Available units for custom font size selection.
++	 */
++	units?: string[];
+ 	/**
+ 	 * The current font size value.
+ 	 */

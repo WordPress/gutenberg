@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f1ff788eaab384..e81230d52c0967 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `ToggleGroupControl`: Fix hover styles on disabled items ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
+ -   `FormTokenField`: Fixed incorrect height of input field when rendered on pages using WordPress 7.0 form styles ([#75880](https://github.com/WordPress/gutenberg/pull/75880)).
+ -   `SelectControl`: Fixed misalignment of option label on some variants when rendered on pages using WordPress 7.0 form styles ([#75880](https://github.com/WordPress/gutenberg/pull/75880)).
++-   `DateTimePicker`: Fix day text wrapping ([#76084](https://github.com/WordPress/gutenberg/pull/76084)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/date-time/date/styles.ts b/packages/components/src/date-time/date/styles.ts
+index 2a65d88494f4a5..63ca757dabbe3b 100644
+--- a/packages/components/src/date-time/date/styles.ts
++++ b/packages/components/src/date-time/date/styles.ts
+@@ -68,6 +68,7 @@ export const DayButton = styled( Button, {
+ 	grid-column: ${ ( props ) => props.column };
+ 	position: relative;
+ 	justify-content: center;
++	padding: 0;
+ 
+ 	${ ( props ) =>
+ 		props.disabled &&

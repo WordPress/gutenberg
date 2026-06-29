@@ -1,0 +1,43 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8c710eb93a9ee5..7d243cddddbf04 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,8 @@
+ -   `Navigation`: Upsize back buttons ([#68157](https://github.com/WordPress/gutenberg/pull/68157)).
+ -   `Heading`: Fix text contrast for dark mode ([#68349](https://github.com/WordPress/gutenberg/pull/68349)).
+ -   `Text`: Fix text contrast for dark mode ([#68349](https://github.com/WordPress/gutenberg/pull/68349)).
++-   `Heading`: Revert text contrast fix for dark mode with optimizeReadabilityFor ([#68472](https://github.com/WordPress/gutenberg/pull/68472)).
++-   `Text`: Revert text contrast fix for dark mode with optimizeReadabilityFor ([#68472](https://github.com/WordPress/gutenberg/pull/68472)).
+ 
+ ### Deprecations
+ 
+diff --git a/packages/components/src/text/hook.ts b/packages/components/src/text/hook.ts
+index 243b00202460eb..76314686eb963b 100644
+--- a/packages/components/src/text/hook.ts
++++ b/packages/components/src/text/hook.ts
+@@ -104,9 +104,10 @@ export default function useText(
+ 			const isOptimalTextColorDark =
+ 				getOptimalTextShade( optimizeReadabilityFor ) === 'dark';
+ 
++			// Should not use theme colors
+ 			sx.optimalTextColor = isOptimalTextColorDark
+-				? css( { color: COLORS.theme.foreground } )
+-				: css( { color: COLORS.theme.foregroundInverted } );
++				? css( { color: COLORS.gray[ 900 ] } )
++				: css( { color: COLORS.white } );
+ 		}
+ 
+ 		return cx(
+diff --git a/packages/components/src/text/test/index.tsx b/packages/components/src/text/test/index.tsx
+index e6f6423b6b572d..5fad5582f4d46e 100644
+--- a/packages/components/src/text/test/index.tsx
++++ b/packages/components/src/text/test/index.tsx
+@@ -25,7 +25,7 @@ describe( 'Text', () => {
+ 			</Text>
+ 		);
+ 		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
+-			color: 'rgb( 255, 255, 255 )',
++			color: COLORS.white,
+ 		} );
+ 	} );
+ 

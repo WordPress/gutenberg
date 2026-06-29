@@ -1,0 +1,22 @@
+diff --git a/packages/components/src/ui/context/wordpress-component.ts b/packages/components/src/ui/context/wordpress-component.ts
+index 2fd97b518bda0c..c4b3ad5bd7ab67 100644
+--- a/packages/components/src/ui/context/wordpress-component.ts
++++ b/packages/components/src/ui/context/wordpress-component.ts
+@@ -20,7 +20,7 @@ export type WordPressComponentProps<
+ 		? {
+ 				as?: T | keyof JSX.IntrinsicElements;
+ 		  }
+-		: { as?: never } );
++		: {} );
+ 
+ export type WordPressComponent<
+ 	T extends React.ElementType,
+@@ -29,7 +29,7 @@ export type WordPressComponent<
+ > = {
+ 	< TT extends React.ElementType >(
+ 		props: WordPressComponentProps< O, TT, IsPolymorphic > &
+-			( IsPolymorphic extends true ? { as: TT } : { as: never } )
++			( IsPolymorphic extends true ? { as: TT } : {} )
+ 	): JSX.Element | null;
+ 	(
+ 		props: WordPressComponentProps< O, T, IsPolymorphic >

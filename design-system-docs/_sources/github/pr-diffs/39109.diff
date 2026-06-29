@@ -1,0 +1,137 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 85be68b0598ce3..665c5e7b3b5df4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ 
+ -   `TreeGrid`: Add tests for `onCollapseRow`, `onExpandRow`, and `onFocusRow` callback functions. ([#38942](https://github.com/WordPress/gutenberg/pull/38942)).
+ -   `TreeGrid`: Update callback tests to use `TreeGridRow` and `TreeGridCell` sub-components. ([#39002](https://github.com/WordPress/gutenberg/pull/39002)).
++-   InputControl: Allow `onBlur` for empty values to commit the change when `isPressEnterToChange` is true, and move reset behavior to the ESCAPE key. ([#39109](https://github.com/WordPress/gutenberg/pull/39109)).
+ 
+ ## 19.4.0 (2022-02-10)
+ 
+diff --git a/packages/components/src/box-control/test/index.js b/packages/components/src/box-control/test/index.js
+index 98ad40d63a2fb7..4515c4885c90f7 100644
+--- a/packages/components/src/box-control/test/index.js
++++ b/packages/components/src/box-control/test/index.js
+@@ -124,6 +124,26 @@ describe( 'BoxControl', () => {
+ 			expect( input.value ).toBe( '' );
+ 			expect( unitSelect.value ).toBe( 'px' );
+ 		} );
++
++		it( 'should persist cleared value when focus changes', () => {
++			render( <BoxControl /> );
++			const input = screen.getByLabelText( 'Box Control', {
++				selector: 'input',
++			} );
++			const unitSelect = screen.getByLabelText( 'Select unit' );
++
++			input.focus();
++			fireEvent.change( input, { target: { value: '100%' } } );
++			fireEvent.keyDown( input, { keyCode: ENTER } );
++
++			expect( input.value ).toBe( '100' );
++			expect( unitSelect.value ).toBe( '%' );
++
++			fireEvent.change( input, { target: { value: '' } } );
++			fireEvent.blur( input );
++
++			expect( input.value ).toBe( '' );
++		} );
+ 	} );
+ 
+ 	describe( 'Unlinked Sides', () => {
+diff --git a/packages/components/src/input-control/input-field.tsx b/packages/components/src/input-control/input-field.tsx
+index 7e1b68af89f8be..39811391bbdb0d 100644
+--- a/packages/components/src/input-control/input-field.tsx
++++ b/packages/components/src/input-control/input-field.tsx
+@@ -17,7 +17,7 @@ import type {
+  * WordPress dependencies
+  */
+ import { forwardRef, useRef } from '@wordpress/element';
+-import { UP, DOWN, ENTER } from '@wordpress/keycodes';
++import { UP, DOWN, ENTER, ESCAPE } from '@wordpress/keycodes';
+ /**
+  * Internal dependencies
+  */
+@@ -25,7 +25,6 @@ import type { WordPressComponentProps } from '../ui/context';
+ import { useDragCursor } from './utils';
+ import { Input } from './styles/input-control-styles';
+ import { useInputControlStateReducer } from './reducer/reducer';
+-import { isValueEmpty } from '../utils/values';
+ import { useUpdateEffect } from '../utils';
+ import type { InputFieldProps } from './types';
+ 
+@@ -112,11 +111,7 @@ function InputField(
+ 		 */
+ 		if ( isPressEnterToChange && isDirty ) {
+ 			wasDirtyOnBlur.current = true;
+-			if ( ! isValueEmpty( value ) ) {
+-				handleOnCommit( event );
+-			} else {
+-				reset( valueProp, event );
+-			}
++			handleOnCommit( event );
+ 		}
+ 	};
+ 
+@@ -162,6 +157,13 @@ function InputField(
+ 					handleOnCommit( event );
+ 				}
+ 				break;
++
++			case ESCAPE:
++				if ( isPressEnterToChange && isDirty ) {
++					event.preventDefault();
++					reset( valueProp, event );
++				}
++				break;
+ 		}
+ 	};
+ 
+diff --git a/packages/components/src/unit-control/test/index.js b/packages/components/src/unit-control/test/index.js
+index 87bbff13bf1e2a..2efee9ea337590 100644
+--- a/packages/components/src/unit-control/test/index.js
++++ b/packages/components/src/unit-control/test/index.js
+@@ -6,7 +6,7 @@ import { render, fireEvent } from '@testing-library/react';
+ /**
+  * WordPress dependencies
+  */
+-import { UP, DOWN, ENTER } from '@wordpress/keycodes';
++import { UP, DOWN, ENTER, ESCAPE } from '@wordpress/keycodes';
+ 
+ /**
+  * Internal dependencies
+@@ -126,6 +126,32 @@ describe( 'UnitControl', () => {
+ 
+ 			expect( state ).toBe( '40px' );
+ 		} );
++
++		it( 'should cancel change when ESCAPE key is pressed', () => {
++			let state = 50;
++			const setState = ( nextState ) => ( state = nextState );
++
++			render(
++				<UnitControl
++					value={ state }
++					onChange={ setState }
++					isPressEnterToChange
++				/>
++			);
++
++			const input = getInput();
++			input.focus();
++
++			fireEvent.change( input, { target: { value: '300px' } } );
++
++			expect( input.value ).toBe( '300px' );
++			expect( state ).toBe( 50 );
++
++			fireKeyDown( { keyCode: ESCAPE } );
++
++			expect( input.value ).toBe( '50' );
++			expect( state ).toBe( 50 );
++		} );
+ 	} );
+ 
+ 	describe( 'Unit', () => {

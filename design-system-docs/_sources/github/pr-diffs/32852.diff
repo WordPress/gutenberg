@@ -1,0 +1,388 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 1328665a03eb5d..b74637bc7ff68e 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -7,7 +7,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+ }
+ 
+ .emotion-0 {
+-  margin-bottom: 8px;
++  margin-bottom: calc(4px * 2);
+ }
+ 
+ .components-panel__row .emotion-0 {
+diff --git a/packages/components/src/base-control/styles/base-control-styles.js b/packages/components/src/base-control/styles/base-control-styles.js
+index a6142d0139821f..e47410d44d260d 100644
+--- a/packages/components/src/base-control/styles/base-control-styles.js
++++ b/packages/components/src/base-control/styles/base-control-styles.js
+@@ -6,7 +6,8 @@ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+  */
+-import { font, space, COLORS } from '../../utils';
++import { font, COLORS } from '../../utils';
++import { space } from '../../ui/utils/space';
+ 
+ export const Wrapper = styled.div`
+ 	font-family: ${ font( 'default.fontFamily' ) };
+@@ -14,7 +15,7 @@ export const Wrapper = styled.div`
+ `;
+ 
+ export const StyledField = styled.div`
+-	margin-bottom: ${ space( 1 ) };
++	margin-bottom: ${ space( 2 ) };
+ 
+ 	.components-panel__row & {
+ 		margin-bottom: inherit;
+@@ -23,7 +24,7 @@ export const StyledField = styled.div`
+ 
+ export const StyledLabel = styled.label`
+ 	display: inline-block;
+-	margin-bottom: ${ space( 1 ) };
++	margin-bottom: ${ space( 2 ) };
+ `;
+ 
+ export const StyledHelp = styled.p`
+diff --git a/packages/components/src/color-picker/test/__snapshots__/index.js.snap b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+index 98a90fc9593486..e085a2a8f03ba8 100644
+--- a/packages/components/src/color-picker/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+@@ -96,10 +96,10 @@ Snapshot Diff:
+             </div>
+ @@ -119,22 +119,22 @@
+             <div
+-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
++              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
+             >
+               <label
+-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
++                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
+ -               htmlFor="inspector-text-control-4"
+ +               htmlFor="inspector-text-control-3"
+               >
+@@ -218,10 +218,10 @@ Snapshot Diff:
+             </div>
+ @@ -119,22 +119,22 @@
+             <div
+-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
++              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
+             >
+               <label
+-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
++                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
+ -               htmlFor="inspector-text-control-8"
+ +               htmlFor="inspector-text-control-7"
+               >
+@@ -340,10 +340,10 @@ Snapshot Diff:
+             </div>
+ @@ -119,22 +119,22 @@
+             <div
+-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
++              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
+             >
+               <label
+-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
++                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
+ -               htmlFor="inspector-text-control-10"
+ +               htmlFor="inspector-text-control-9"
+               >
+@@ -462,10 +462,10 @@ Snapshot Diff:
+             </div>
+ @@ -119,22 +119,22 @@
+             <div
+-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
++              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
+             >
+               <label
+-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
++                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
+ -               htmlFor="inspector-text-control-6"
+ +               htmlFor="inspector-text-control-5"
+               >
+@@ -547,10 +547,10 @@ Snapshot Diff:
+             </div>
+ @@ -119,22 +119,22 @@
+             <div
+-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
++              className="components-base-control__field css-igk9ll-StyledField e1puf3u1"
+             >
+               <label
+-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
++                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u2"
+ -               htmlFor="inspector-text-control-2"
+ +               htmlFor="inspector-text-control-1"
+               >
+@@ -580,7 +580,7 @@ exports[`ColorPicker should render color picker 1`] = `
+ }
+ 
+ .emotion-2 {
+-  margin-bottom: 8px;
++  margin-bottom: calc(4px * 2);
+ }
+ 
+ .components-panel__row .emotion-2 {
+@@ -589,7 +589,7 @@ exports[`ColorPicker should render color picker 1`] = `
+ 
+ .emotion-0 {
+   display: inline-block;
+-  margin-bottom: 8px;
++  margin-bottom: calc(4px * 2);
+ }
+ 
+ <div
+diff --git a/packages/components/src/navigation/styles/navigation-styles.js b/packages/components/src/navigation/styles/navigation-styles.js
+index 806083ac64bd03..12603f6d4d108e 100644
+--- a/packages/components/src/navigation/styles/navigation-styles.js
++++ b/packages/components/src/navigation/styles/navigation-styles.js
+@@ -14,20 +14,21 @@ import { isRTL } from '@wordpress/i18n';
+ import { G2, UI } from '../../utils/colors-values';
+ import Button from '../../button';
+ import { Text } from '../../text';
+-import { reduceMotion, space, rtl } from '../../utils';
++import { reduceMotion, rtl } from '../../utils';
++import { space } from '../../ui/utils/space';
+ 
+ export const NavigationUI = styled.div`
+ 	width: 100%;
+ 	background-color: ${ G2.darkGray.primary };
+ 	box-sizing: border-box;
+ 	color: #f0f0f0;
+-	padding: 0 ${ space( 2 ) };
++	padding: 0 ${ space( 4 ) };
+ 	overflow: hidden;
+ `;
+ 
+ export const MenuUI = styled.div`
+-	margin-top: ${ space( 3 ) };
+-	margin-bottom: ${ space( 3 ) };
++	margin-top: ${ space( 6 ) };
++	margin-bottom: ${ space( 6 ) };
+ 	display: flex;
+ 	flex-direction: column;
+ 	ul {
+@@ -36,11 +37,11 @@ export const MenuUI = styled.div`
+ 		list-style: none;
+ 	}
+ 	.components-navigation__back-button {
+-		margin-bottom: ${ space( 3 ) };
++		margin-bottom: ${ space( 6 ) };
+ 	}
+ 
+ 	.components-navigation__group + .components-navigation__group {
+-		margin-top: ${ space( 3 ) };
++		margin-top: ${ space( 6 ) };
+ 	}
+ `;
+ 
+@@ -70,23 +71,21 @@ export const MenuTitleHeadingUI = styled( Text )`
+ 	color: ${ G2.gray[ 100 ] };
+ 	display: flex;
+ 	justify-content: space-between;
+-	margin-bottom: ${ space( 1 ) };
++	margin-bottom: ${ space( 2 ) };
+ 	padding: ${ () =>
+ 		isRTL()
+-			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } ${ space(
+-					1.5
+-			  ) }`
+-			: `${ space( 0.5 ) } ${ space( 1.5 ) } ${ space( 0.5 ) } ${ space(
+-					2
++			? `${ space( 1 ) } ${ space( 4 ) } ${ space( 1 ) } ${ space( 3 ) }`
++			: `${ space( 1 ) } ${ space( 3 ) } ${ space( 1 ) } ${ space(
++					4
+ 			  ) }` };
+ `;
+ 
+ export const MenuTitleActionsUI = styled.span`
+-	height: ${ space( 3 ) }; // 24px, same height as the buttons inside
++	height: ${ space( 6 ) }; // 24px, same height as the buttons inside
+ 
+ 	.components-button.is-small {
+ 		color: ${ G2.lightGray.ui };
+-		margin-right: ${ space( 0.5 ) }; // Avoid hiding the focus outline
++		margin-right: ${ space( 1 ) }; // Avoid hiding the focus outline
+ 		padding: 0;
+ 
+ 		&:active:not( :disabled ) {
+@@ -105,11 +104,11 @@ export const MenuTitleSearchUI = styled.div`
+ 	position: relative;
+ 
+ 	input {
+-		height: ${ space( 4.5 ) }; // 36px, same height as MenuTitle
+-		margin-bottom: ${ space( 1 ) };
+-		padding-left: ${ space( 4 ) }; // Leave room for the search icon
++		height: ${ space( 9 ) }; // 36px, same height as MenuTitle
++		margin-bottom: ${ space( 2 ) };
++		padding-left: ${ space( 8 ) }; // Leave room for the search icon
+ 		padding-right: ${ space(
+-			4
++			8
+ 		) }; // Leave room for the close search button
+ 
+ 		&::-webkit-search-decoration,
+@@ -121,7 +120,7 @@ export const MenuTitleSearchUI = styled.div`
+ 	}
+ 
+ 	> svg {
+-		left: ${ space( 0.5 ) };
++		left: ${ space( 1 ) };
+ 		position: absolute;
+ 		top: 6px;
+ 	}
+@@ -130,7 +129,7 @@ export const MenuTitleSearchUI = styled.div`
+ 		height: 30px;
+ 		padding: 0;
+ 		position: absolute;
+-		right: ${ space( 1 ) };
++		right: ${ space( 2 ) };
+ 		top: 3px;
+ 
+ 		&:active:not( :disabled ) {
+@@ -143,11 +142,11 @@ export const MenuTitleSearchUI = styled.div`
+ `;
+ 
+ export const GroupTitleUI = styled( Text )`
+-	margin-top: ${ space( 1 ) };
++	margin-top: ${ space( 2 ) };
+ 	padding: ${ () =>
+ 		isRTL()
+-			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } 0`
+-			: `${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) }` };
++			? `${ space( 1 ) } ${ space( 4 ) } ${ space( 1 ) } 0`
++			: `${ space( 1 ) } 0 ${ space( 1 ) } ${ space( 4 ) }` };
+ 	text-transform: uppercase;
+ 	color: ${ G2.gray[ 100 ] };
+ `;
+@@ -162,7 +161,7 @@ export const ItemBaseUI = styled.li`
+ 	a {
+ 		width: 100%;
+ 		color: ${ G2.lightGray.ui };
+-		padding: ${ space( 1 ) } ${ space( 2 ) }; /* 8px 16px */
++		padding: ${ space( 2 ) } ${ space( 4 ) }; /* 8px 16px */
+ 		${ rtl( { textAlign: 'left' }, { textAlign: 'right' } ) }
+ 
+ 		&:hover,
+@@ -193,7 +192,7 @@ export const ItemUI = styled.div`
+ 	height: auto;
+ 	min-height: 40px;
+ 	margin: 0;
+-	padding: ${ space( 0.75 ) } ${ space( 2 ) };
++	padding: ${ space( 1.5 ) } ${ space( 4 ) };
+ 	font-weight: 400;
+ 	line-height: 20px;
+ 	width: 100%;
+@@ -201,10 +200,10 @@ export const ItemUI = styled.div`
+ `;
+ 
+ export const ItemBadgeUI = styled.span`
+-	margin-left: ${ () => ( isRTL() ? '0' : space( 1 ) ) };
+-	margin-right: ${ () => ( isRTL() ? space( 1 ) : '0' ) };
++	margin-left: ${ () => ( isRTL() ? '0' : space( 2 ) ) };
++	margin-right: ${ () => ( isRTL() ? space( 2 ) : '0' ) };
+ 	display: inline-flex;
+-	padding: ${ space( 0.5 ) } ${ space( 1.5 ) };
++	padding: ${ space( 1 ) } ${ space( 3 ) };
+ 	border-radius: 2px;
+ 	animation: fade-in 250ms ease-out;
+ 
+diff --git a/packages/components/src/range-control/styles/range-control-styles.js b/packages/components/src/range-control/styles/range-control-styles.js
+index abf3f3cbefb26d..d2c109aef7f440 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.js
++++ b/packages/components/src/range-control/styles/range-control-styles.js
+@@ -8,7 +8,8 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import NumberControl from '../../number-control';
+-import { COLORS, reduceMotion, rtl, space } from '../../utils';
++import { COLORS, reduceMotion, rtl } from '../../utils';
++import { space } from '../../ui/utils/space';
+ 
+ const rangeHeight = () => css( { height: 30, minHeight: 30 } );
+ const thumbSize = 20;
+@@ -276,13 +277,13 @@ export const InputNumber = styled( NumberControl )`
+ 	display: inline-block;
+ 	font-size: 13px;
+ 	margin-top: 0;
+-	width: ${ space( 8 ) } !important;
++	width: ${ space( 16 ) } !important;
+ 
+ 	input[type='number']& {
+ 		${ rangeHeight };
+ 	}
+ 
+-	${ rtl( { marginLeft: `${ space( 2 ) } !important` } ) }
++	${ rtl( { marginLeft: `${ space( 4 ) } !important` } ) }
+ `;
+ 
+ export const ActionRightWrapper = styled.span`
+diff --git a/packages/components/src/utils/space.js b/packages/components/src/utils/space.js
+deleted file mode 100644
+index cfe8d2f0488d59..00000000000000
+--- a/packages/components/src/utils/space.js
++++ /dev/null
+@@ -1,13 +0,0 @@
+-const SPACE_GRID_BASE = 8;
+-
+-/**
+- * Creates a spacing CSS value (px) based on grid system values.
+- *
+- * @param {number} [value=1] Multiplier against the grid base value (8)
+- * @return {string} The spacing value (px).
+- */
+-export function space( value = 1 ) {
+-	if ( isNaN( value ) ) return `${ SPACE_GRID_BASE }px`;
+-
+-	return `${ SPACE_GRID_BASE * value }px`;
+-}
+diff --git a/packages/components/src/utils/style-mixins.js b/packages/components/src/utils/style-mixins.js
+index a70a304b2d2718..dfacc79b0fb399 100644
+--- a/packages/components/src/utils/style-mixins.js
++++ b/packages/components/src/utils/style-mixins.js
+@@ -1,7 +1,6 @@
+ export { rgba } from './colors';
+ export { reduceMotion } from './reduce-motion';
+ export { rtl } from './rtl';
+-export { space } from './space';
+ export { font } from './font';
+ export { breakpoint } from './breakpoint';
+ export { default as CONFIG } from './config-values';
+diff --git a/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap b/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
+index c9f64347ae092b..06beb13729f86e 100644
+--- a/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
+@@ -7,7 +7,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+ }
+ 
+ .emotion-0 {
+-  margin-bottom: 8px;
++  margin-bottom: calc(4px * 2);
+ }
+ 
+ .components-panel__row .emotion-0 {
+@@ -70,7 +70,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+ }
+ 
+ .emotion-0 {
+-  margin-bottom: 8px;
++  margin-bottom: calc(4px * 2);
+ }
+ 
+ .components-panel__row .emotion-0 {
+@@ -119,7 +119,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+ }
+ 
+ .emotion-0 {
+-  margin-bottom: 8px;
++  margin-bottom: calc(4px * 2);
+ }
+ 
+ .components-panel__row .emotion-0 {
+@@ -182,7 +182,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
+ }
+ 
+ .emotion-0 {
+-  margin-bottom: 8px;
++  margin-bottom: calc(4px * 2);
+ }
+ 
+ .components-panel__row .emotion-0 {

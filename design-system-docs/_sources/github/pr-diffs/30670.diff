@@ -1,0 +1,12 @@
+diff --git a/packages/base-styles/_mixins.scss b/packages/base-styles/_mixins.scss
+index 030645e2f81fa3..c1c4215c4f48f4 100644
+--- a/packages/base-styles/_mixins.scss
++++ b/packages/base-styles/_mixins.scss
+@@ -357,6 +357,7 @@
+ 	}
+ 
+ 	&:checked::before {
++		box-sizing: inherit;
+ 		width: 8px;
+ 		height: 8px;
+ 		transform: translate(7px, 7px);

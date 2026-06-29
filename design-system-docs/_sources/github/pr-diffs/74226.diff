@@ -1,0 +1,645 @@
+diff --git a/.stylelintignore b/.stylelintignore
+index 801a210d64800a..a612f149f3a1b3 100644
+--- a/.stylelintignore
++++ b/.stylelintignore
+@@ -2,3 +2,4 @@ build
+ build-style
+ node_modules
+ packages/stylelint-config/test
++packages/theme/src/stylelint-plugins/test/fixtures
+diff --git a/package-lock.json b/package-lock.json
+index 9b2592f77c29b3..be1ce4e0268ad4 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -56024,6 +56024,7 @@
+ 			"license": "MIT",
+ 			"dependencies": {
+ 				"@stylistic/stylelint-plugin": "^3.0.1",
++				"@wordpress/theme": "file:../theme",
+ 				"stylelint-config-recommended": "^14.0.1",
+ 				"stylelint-config-recommended-scss": "^14.1.0"
+ 			},
+@@ -56173,7 +56174,13 @@
+ 			},
+ 			"peerDependencies": {
+ 				"react": "^18.0.0",
+-				"react-dom": "^18.0.0"
++				"react-dom": "^18.0.0",
++				"stylelint": "^16.8.2"
++			},
++			"peerDependenciesMeta": {
++				"stylelint": {
++					"optional": true
++				}
+ 			}
+ 		},
+ 		"packages/token-list": {
+diff --git a/packages/stylelint-config/CHANGELOG.md b/packages/stylelint-config/CHANGELOG.md
+index c5ab626fa23229..7f20dffb18a0ac 100644
+--- a/packages/stylelint-config/CHANGELOG.md
++++ b/packages/stylelint-config/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   Added `plugin-wpds/no-unknown-ds-tokens` and `plugin-wpds/no-setting-wpds-custom-properties` rules from `@wordpress/theme` to catch design token misuse ([#74226](https://github.com/WordPress/gutenberg/pull/74226)).
++
+ ## 23.28.0 (2025-11-26)
+ 
+ ## 23.27.0 (2025-11-12)
+diff --git a/packages/stylelint-config/index.js b/packages/stylelint-config/index.js
+index 3e5e00b05a2a49..d7134ab08a8cbf 100644
+--- a/packages/stylelint-config/index.js
++++ b/packages/stylelint-config/index.js
+@@ -3,6 +3,10 @@
+ /** @type {import('stylelint').Config} */
+ module.exports = {
+ 	extends: [ 'stylelint-config-recommended' ].map( require.resolve ),
++	plugins: [
++		'@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens',
++		'@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties',
++	],
+ 	rules: {
+ 		'at-rule-empty-line-before': [
+ 			'always',
+@@ -68,6 +72,8 @@ module.exports = {
+ 		'selector-pseudo-element-colon-notation': 'double',
+ 		'selector-type-case': 'lower',
+ 		'value-keyword-case': 'lower',
++		'plugin-wpds/no-setting-wpds-custom-properties': true,
++		'plugin-wpds/no-unknown-ds-tokens': true,
+ 
+ 		/* Disable new rules from stylelint-config-recommended 7 > 14 */
+ 		'function-no-unknown': null,
+diff --git a/packages/stylelint-config/package.json b/packages/stylelint-config/package.json
+index f176f0f5cb8c80..efe78e336adf98 100644
+--- a/packages/stylelint-config/package.json
++++ b/packages/stylelint-config/package.json
+@@ -42,6 +42,7 @@
+ 	},
+ 	"dependencies": {
+ 		"@stylistic/stylelint-plugin": "^3.0.1",
++		"@wordpress/theme": "file:../theme",
+ 		"stylelint-config-recommended": "^14.0.1",
+ 		"stylelint-config-recommended-scss": "^14.1.0"
+ 	},
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index c55184c479bcde..5b32e801649b80 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -4,4 +4,5 @@
+ 
+ ### New Features
+ 
++-   Added stylelint plugins for design token linting: `no-unknown-ds-tokens` to catch references to non-existent design tokens, and `no-setting-wpds-custom-properties` to prevent reassignments of design token variables ([#74226](https://github.com/WordPress/gutenberg/pull/74226)).
+ -   Expose `ThemeProvider` TypeScript type from package. While the component is still experimental, this makes it easier to use TypeScript typings in your code, which would otherwise be inaccessible. ([#74011](https://github.com/WordPress/gutenberg/pull/74011))
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index 4e51a2a649646e..ab21a53d6aefb3 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -196,6 +196,60 @@ The files generated in this step will all be committed to the repo.
+ 
+ After the prebuild step, the package will be built into its final form via the repo's standard package build script.
+ 
++## Stylelint Plugins
++
++This package provides Stylelint plugins to help enforce consistent usage of design tokens. To use them, add the plugins to your Stylelint configuration:
++
++```json
++{
++	"plugins": [
++		"@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens",
++		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties"
++	],
++	"rules": {
++		"plugin-wpds/no-unknown-ds-tokens": true,
++		"plugin-wpds/no-setting-wpds-custom-properties": true
++	}
++}
++```
++
++### `plugin-wpds/no-unknown-ds-tokens`
++
++This rule reports an error when a CSS value references a `--wpds-*` custom property that is not a valid design token. This helps catch typos and ensures that only valid design tokens are used.
++
++```css
++/* ✗ Error: '--wpds-unknown-token' is not a valid Design System token */
++.example {
++	color: var(--wpds-unknown-token);
++}
++
++/* ✓ OK */
++.example {
++	color: var(--wpds-color-fg-content-neutral);
++}
++```
++
++### `plugin-wpds/no-setting-wpds-custom-properties`
++
++This rule reports an error when a CSS declaration sets (defines) a custom property in the `--wpds-*` namespace. The design system tokens should only be consumed, not defined or overridden in consuming code.
++
++```css
++/* ✗ Error: Do not set CSS custom properties using the Design System tokens namespace */
++.example {
++	--wpds-my-token: red;
++}
++
++/* ✗ Error: Overriding existing tokens is also not allowed */
++.example {
++	--wpds-color-fg-content-neutral: red;
++}
++
++/* ✓ OK */
++.example {
++	--my-custom-token: red;
++}
++```
++
+ ## Contributing to this package
+ 
+ This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index 96c66862c06146..ae8bda23a5503a 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -40,6 +40,8 @@
+ 		},
+ 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
+ 		"./design-tokens.js": "./src/prebuilt/js/design-tokens.js",
++		"./stylelint-plugins/no-unknown-ds-tokens": "./src/stylelint-plugins/no-unknown-ds-tokens.js",
++		"./stylelint-plugins/no-setting-wpds-custom-properties": "./src/stylelint-plugins/no-setting-wpds-custom-properties.js",
+ 		"./package.json": "./package.json"
+ 	},
+ 	"react-native": "src/index",
+@@ -64,7 +66,13 @@
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0",
+-		"react-dom": "^18.0.0"
++		"react-dom": "^18.0.0",
++		"stylelint": "^16.8.2"
++	},
++	"peerDependenciesMeta": {
++		"stylelint": {
++			"optional": true
++		}
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/theme/src/stylelint-plugins/no-setting-wpds-custom-properties.js b/packages/theme/src/stylelint-plugins/no-setting-wpds-custom-properties.js
+new file mode 100644
+index 00000000000000..36bce12e3e0649
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/no-setting-wpds-custom-properties.js
+@@ -0,0 +1,45 @@
++import stylelint from 'stylelint';
++
++const {
++	createPlugin,
++	utils: { report, ruleMessages, validateOptions },
++} = stylelint;
++
++const ruleName = 'plugin-wpds/no-setting-wpds-custom-properties';
++
++const messages = ruleMessages( ruleName, {
++	rejected: () =>
++		`Do not set CSS custom properties using the Design System tokens namespace (i.e. beginning with --wpds-*).`,
++} );
++
++/** @type {import('stylelint').Rule} */
++const ruleFunction = ( primary ) => {
++	return ( root, result ) => {
++		const validOptions = validateOptions( result, ruleName, {
++			actual: primary,
++			possible: [ true ],
++		} );
++
++		if ( ! validOptions ) {
++			return;
++		}
++
++		root.walkDecls( ( ruleNode ) => {
++			const { prop } = ruleNode;
++			if ( prop.startsWith( '--wpds-' ) ) {
++				report( {
++					message: messages.rejected(),
++					node: ruleNode,
++					result,
++					ruleName,
++				} );
++			}
++		} );
++	};
++};
++
++ruleFunction.ruleName = ruleName;
++ruleFunction.messages = messages;
++
++/** @type {import('stylelint').Plugin} */
++export default createPlugin( ruleName, ruleFunction );
+diff --git a/packages/theme/src/stylelint-plugins/no-unknown-ds-tokens.js b/packages/theme/src/stylelint-plugins/no-unknown-ds-tokens.js
+new file mode 100644
+index 00000000000000..7c4748c6e61b5f
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/no-unknown-ds-tokens.js
+@@ -0,0 +1,101 @@
++import stylelint from 'stylelint';
++import tokenList from '../prebuilt/js/design-tokens.js';
++
++const DS_TOKEN_PREFIX = 'wpds-';
++
++/**
++ * Extracts all unique CSS custom properties (variables) from a given CSS value string,
++ * including those in fallback positions, optionally filtering by a specific prefix.
++ *
++ * @param {string} value       - The CSS value string to search for variables.
++ * @param {string} [prefix=''] - Optional prefix to filter variables (e.g., 'wpds-').
++ * @return {Set<string>} A Set of unique matched CSS variable names (e.g., Set { '--wpds-token' }).
++ *
++ * @example
++ * extractCSSVariables(
++ *   'border: 1px solid var(--wpds-border-color, var(--wpds-border-fallback)); ' +
++ *   'color: var(--wpds-color-fg, black); ' +
++ *   'background: var(--unrelated-bg);',
++ *   'wpds'
++ * );
++ * // → Set { '--wpds-border-color', '--wpds-border-fallback', '--wpds-color-fg' }
++ */
++function extractCSSVariables( value, prefix = '' ) {
++	const regex = /--[\w-]+/g;
++	/** @type {Set<string>} */
++	const variables = new Set();
++
++	let match;
++	while ( ( match = regex.exec( value ) ) !== null ) {
++		const variableName = match[ 0 ];
++		if ( variableName.startsWith( `--${ prefix }` ) ) {
++			variables.add( variableName );
++		}
++	}
++
++	return variables;
++}
++
++const knownTokens = new Set( tokenList );
++const wpdsTokensRegex = new RegExp( `[^\\w]--${ DS_TOKEN_PREFIX }`, 'i' );
++
++const {
++	createPlugin,
++	utils: { report, ruleMessages, validateOptions },
++} = stylelint;
++
++const ruleName = 'plugin-wpds/no-unknown-ds-tokens';
++
++const messages = ruleMessages( ruleName, {
++	rejected: ( tokenNames ) =>
++		`The following CSS variables are not valid Design System tokens: ${ tokenNames }`,
++} );
++
++/** @type {import('stylelint').Rule} */
++const ruleFunction = ( primary ) => {
++	return ( root, result ) => {
++		const validOptions = validateOptions( result, ruleName, {
++			actual: primary,
++			possible: [ true ],
++		} );
++
++		if ( ! validOptions ) {
++			return;
++		}
++
++		root.walkDecls( ( ruleNode ) => {
++			const { value } = ruleNode;
++			// Early match for WPDS tokens to avoid unnecessary processing.
++			if ( wpdsTokensRegex.test( value ) ) {
++				const usedTokens = extractCSSVariables(
++					value,
++					DS_TOKEN_PREFIX
++				);
++				const unknownTokens = new Set(
++					[ ...usedTokens ].filter(
++						( token ) => ! knownTokens.has( token )
++					)
++				);
++
++				if ( unknownTokens.size > 0 ) {
++					report( {
++						message: messages.rejected(
++							Array.from( unknownTokens )
++								.map( ( token ) => `'${ token }'` )
++								.join( ', ' )
++						),
++						node: ruleNode,
++						result,
++						ruleName,
++					} );
++				}
++			}
++		} );
++	};
++};
++
++ruleFunction.ruleName = ruleName;
++ruleFunction.messages = messages;
++
++/** @type {import('stylelint').Plugin} */
++export default createPlugin( ruleName, ruleFunction );
+diff --git a/packages/theme/src/stylelint-plugins/test/.stylelintignore b/packages/theme/src/stylelint-plugins/test/.stylelintignore
+new file mode 100644
+index 00000000000000..f74c877ecba44c
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/.stylelintignore
+@@ -0,0 +1 @@
++# This file needs to exist so test files have a way to unignore the files in this folder.
+diff --git a/packages/theme/src/stylelint-plugins/test/.stylelintrc.json b/packages/theme/src/stylelint-plugins/test/.stylelintrc.json
+new file mode 100644
+index 00000000000000..6e9e08d6e453b6
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/.stylelintrc.json
+@@ -0,0 +1,10 @@
++{
++	"plugins": [
++		"../no-unknown-ds-tokens.js",
++		"../no-setting-wpds-custom-properties.js"
++	],
++	"rules": {
++		"plugin-wpds/no-unknown-ds-tokens": true,
++		"plugin-wpds/no-setting-wpds-custom-properties": true
++	}
++}
+diff --git a/packages/theme/src/stylelint-plugins/test/__snapshots__/no-setting-wpds-custom-properties.test.ts.snap b/packages/theme/src/stylelint-plugins/test/__snapshots__/no-setting-wpds-custom-properties.test.ts.snap
+new file mode 100644
+index 00000000000000..5fd6ef4ff1d291
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/__snapshots__/no-setting-wpds-custom-properties.test.ts.snap
+@@ -0,0 +1,24 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`flags warnings with invalid wpds custom properties css snapshot matches warnings 1`] = `
++[
++  {
++    "column": 2,
++    "endColumn": 31,
++    "endLine": 3,
++    "line": 3,
++    "rule": "plugin-wpds/no-setting-wpds-custom-properties",
++    "severity": "error",
++    "text": "Do not set CSS custom properties using the Design System tokens namespace (i.e. beginning with --wpds-*). (plugin-wpds/no-setting-wpds-custom-properties)",
++  },
++  {
++    "column": 2,
++    "endColumn": 27,
++    "endLine": 7,
++    "line": 7,
++    "rule": "plugin-wpds/no-setting-wpds-custom-properties",
++    "severity": "error",
++    "text": "Do not set CSS custom properties using the Design System tokens namespace (i.e. beginning with --wpds-*). (plugin-wpds/no-setting-wpds-custom-properties)",
++  },
++]
++`;
+diff --git a/packages/theme/src/stylelint-plugins/test/__snapshots__/no-unknown-ds-tokens.test.ts.snap b/packages/theme/src/stylelint-plugins/test/__snapshots__/no-unknown-ds-tokens.test.ts.snap
+new file mode 100644
+index 00000000000000..b39860e86f26fb
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/__snapshots__/no-unknown-ds-tokens.test.ts.snap
+@@ -0,0 +1,24 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`flags warnings with invalid wpds tokens css snapshot matches warnings 1`] = `
++[
++  {
++    "column": 2,
++    "endColumn": 39,
++    "endLine": 3,
++    "line": 3,
++    "rule": "plugin-wpds/no-unknown-ds-tokens",
++    "severity": "error",
++    "text": "The following CSS variables are not valid Design System tokens: '--wpds-nonexistent-token' (plugin-wpds/no-unknown-ds-tokens)",
++  },
++  {
++    "column": 2,
++    "endColumn": 40,
++    "endLine": 7,
++    "line": 7,
++    "rule": "plugin-wpds/no-unknown-ds-tokens",
++    "severity": "error",
++    "text": "The following CSS variables are not valid Design System tokens: '--wpds-made-up-color' (plugin-wpds/no-unknown-ds-tokens)",
++  },
++]
++`;
+diff --git a/packages/theme/src/stylelint-plugins/test/fixtures/no-setting-wpds-custom-properties-invalid.css b/packages/theme/src/stylelint-plugins/test/fixtures/no-setting-wpds-custom-properties-invalid.css
+new file mode 100644
+index 00000000000000..aa963386380cf9
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/fixtures/no-setting-wpds-custom-properties-invalid.css
+@@ -0,0 +1,9 @@
++/* Invalid: Setting wpds custom properties is not allowed */
++:root {
++	--wpds-custom-override: #f00;
++}
++
++.example {
++	--wpds-local-token: #00f;
++}
++
+diff --git a/packages/theme/src/stylelint-plugins/test/fixtures/no-setting-wpds-custom-properties-valid.css b/packages/theme/src/stylelint-plugins/test/fixtures/no-setting-wpds-custom-properties-valid.css
+new file mode 100644
+index 00000000000000..4b8339fc003f6d
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/fixtures/no-setting-wpds-custom-properties-valid.css
+@@ -0,0 +1,12 @@
++/* Valid: Using wpds tokens as values is allowed */
++.example {
++	color: var(--wpds-color-fg-content-neutral);
++	background-color: var(--wpds-color-bg-surface-neutral);
++}
++
++/* Valid: Setting non-wpds custom properties is allowed */
++:root {
++	--my-custom-color: #f00;
++	--another-property: 10px;
++}
++
+diff --git a/packages/theme/src/stylelint-plugins/test/fixtures/no-unknown-ds-tokens-invalid.css b/packages/theme/src/stylelint-plugins/test/fixtures/no-unknown-ds-tokens-invalid.css
+new file mode 100644
+index 00000000000000..9d6f3f2e0b5e05
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/fixtures/no-unknown-ds-tokens-invalid.css
+@@ -0,0 +1,9 @@
++/* Invalid: Using unknown design system tokens */
++.example {
++	color: var(--wpds-nonexistent-token);
++}
++
++.another {
++	background: var(--wpds-made-up-color);
++}
++
+diff --git a/packages/theme/src/stylelint-plugins/test/fixtures/no-unknown-ds-tokens-valid.css b/packages/theme/src/stylelint-plugins/test/fixtures/no-unknown-ds-tokens-valid.css
+new file mode 100644
+index 00000000000000..12ba5c35aecbcf
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/fixtures/no-unknown-ds-tokens-valid.css
+@@ -0,0 +1,19 @@
++/* Valid: Using known design system tokens */
++.example {
++	background-color: var(--wpds-color-bg-surface-neutral);
++	color: var(--wpds-color-fg-content-neutral);
++	border-radius: var(--wpds-border-radius-surface-sm);
++	padding: var(--wpds-dimension-padding-surface-md);
++}
++
++/* Valid: Using tokens with fallbacks */
++.with-fallback {
++	color: var(--wpds-color-fg-content-neutral, inherit);
++}
++
++/* Valid: Non-wpds custom properties are ignored */
++.other-vars {
++	color: var(--my-custom-color);
++	background: var(--some-other-var);
++}
++
+diff --git a/packages/theme/src/stylelint-plugins/test/no-setting-wpds-custom-properties.test.ts b/packages/theme/src/stylelint-plugins/test/no-setting-wpds-custom-properties.test.ts
+new file mode 100644
+index 00000000000000..860a80c3517135
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/no-setting-wpds-custom-properties.test.ts
+@@ -0,0 +1,47 @@
++import { getStylelintResult } from './utils';
++
++describe( 'flags no warnings with valid wpds custom properties css', () => {
++	let result: ReturnType< typeof getStylelintResult >;
++
++	beforeEach( () => {
++		result = getStylelintResult(
++			'./fixtures/no-setting-wpds-custom-properties-valid.css'
++		);
++	} );
++
++	it( 'did not error', () => {
++		return result.then( ( data ) => expect( data.errored ).toBeFalsy() );
++	} );
++
++	it( 'flags no warnings', () => {
++		return result.then( ( data ) =>
++			expect( data.results[ 0 ].warnings ).toHaveLength( 0 )
++		);
++	} );
++} );
++
++describe( 'flags warnings with invalid wpds custom properties css', () => {
++	let result: ReturnType< typeof getStylelintResult >;
++
++	beforeEach( () => {
++		result = getStylelintResult(
++			'./fixtures/no-setting-wpds-custom-properties-invalid.css'
++		);
++	} );
++
++	it( 'did error', () => {
++		return result.then( ( data ) => expect( data.errored ).toBeTruthy() );
++	} );
++
++	it( 'flags correct number of warnings', () => {
++		return result.then( ( data ) =>
++			expect( data.results[ 0 ].warnings ).toHaveLength( 2 )
++		);
++	} );
++
++	it( 'snapshot matches warnings', () => {
++		return result.then( ( data ) =>
++			expect( data.results[ 0 ].warnings ).toMatchSnapshot()
++		);
++	} );
++} );
+diff --git a/packages/theme/src/stylelint-plugins/test/no-unknown-ds-tokens.test.ts b/packages/theme/src/stylelint-plugins/test/no-unknown-ds-tokens.test.ts
+new file mode 100644
+index 00000000000000..ce280c3e22fe43
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/no-unknown-ds-tokens.test.ts
+@@ -0,0 +1,47 @@
++import { getStylelintResult } from './utils';
++
++describe( 'flags no warnings with valid wpds tokens css', () => {
++	let result: ReturnType< typeof getStylelintResult >;
++
++	beforeEach( () => {
++		result = getStylelintResult(
++			'./fixtures/no-unknown-ds-tokens-valid.css'
++		);
++	} );
++
++	it( 'did not error', () => {
++		return result.then( ( data ) => expect( data.errored ).toBeFalsy() );
++	} );
++
++	it( 'flags no warnings', () => {
++		return result.then( ( data ) =>
++			expect( data.results[ 0 ].warnings ).toHaveLength( 0 )
++		);
++	} );
++} );
++
++describe( 'flags warnings with invalid wpds tokens css', () => {
++	let result: ReturnType< typeof getStylelintResult >;
++
++	beforeEach( () => {
++		result = getStylelintResult(
++			'./fixtures/no-unknown-ds-tokens-invalid.css'
++		);
++	} );
++
++	it( 'did error', () => {
++		return result.then( ( data ) => expect( data.errored ).toBeTruthy() );
++	} );
++
++	it( 'flags correct number of warnings', () => {
++		return result.then( ( data ) =>
++			expect( data.results[ 0 ].warnings ).toHaveLength( 2 )
++		);
++	} );
++
++	it( 'snapshot matches warnings', () => {
++		return result.then( ( data ) =>
++			expect( data.results[ 0 ].warnings ).toMatchSnapshot()
++		);
++	} );
++} );
+diff --git a/packages/theme/src/stylelint-plugins/test/utils/index.ts b/packages/theme/src/stylelint-plugins/test/utils/index.ts
+new file mode 100644
+index 00000000000000..300ce828716510
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/utils/index.ts
+@@ -0,0 +1,29 @@
++import util from 'node:util';
++import path from 'node:path';
++import childProcess from 'node:child_process';
++
++const execute = util.promisify( childProcess.exec );
++
++const generateStylelintCommand = ( filename: string ): string =>
++	'npx stylelint ' +
++	path.resolve( __dirname, '../', filename ) +
++	' -c ' +
++	path.resolve( __dirname, '../', './.stylelintrc.json' ) +
++	' --formatter json' +
++	' --ignore-path ' +
++	path.resolve( __dirname, '../', './.stylelintignore' );
++
++export const getStylelintResult = ( filename: string ) =>
++	execute( generateStylelintCommand( filename ) )
++		.then( ( { stderr } ) => {
++			return {
++				errored: false,
++				results: JSON.parse( stderr as string ),
++			};
++		} )
++		.catch( ( { stderr } ) => {
++			return {
++				errored: true,
++				results: JSON.parse( stderr ),
++			};
++		} );

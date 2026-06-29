@@ -1,0 +1,109 @@
+diff --git a/packages/base-styles/_variables.scss b/packages/base-styles/_variables.scss
+index 1a23bf77fb8a66..fcfc2356168274 100644
+--- a/packages/base-styles/_variables.scss
++++ b/packages/base-styles/_variables.scss
+@@ -46,6 +46,7 @@ $grid-unit-80: 8 * $grid-unit;		// 64px
+ 
+ $icon-size: 24px;
+ $button-size: 36px;
++$button-size-next-default-40px: 40px; // transitionary variable for next default button size
+ $button-size-small: 24px;
+ $header-height: 60px;
+ $panel-header-height: $grid-unit-60;
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d473c14e6a6c06..efe212f5d991d5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,14 +2,6 @@
+ 
+ ## Unreleased
+ 
+-### Enhancements
+-
+--   Change the default color scheme to use the new WP Blueberry color. See PR description for instructions on how to restore the previous color scheme when using in a non-WordPress context ([#50193](https://github.com/WordPress/gutenberg/pull/50193)).
+--   `CheckboxControl`, `CustomGradientPicker`, `FormToggle`, : Refactor and correct the focus style for consistency ([#50127](https://github.com/WordPress/gutenberg/pull/50127)).
+--   `Button`, update spacing values in `has-text has-icon` buttons. ([#50277](https://github.com/WordPress/gutenberg/pull/50277)).
+--   `Button`, remove custom padding applied to `tertiary` variant. ([#50276](https://github.com/WordPress/gutenberg/pull/50276)).
+--   `Modal`: Correct padding for title less confirm variant. ([#50283](https://github.com/WordPress/gutenberg/pull/50283)).
+-
+ ### Breaking Changes
+ 
+ -   `onDragStart` in `<Draggable>` is now a synchronous function to allow setting additional data for `event.dataTransfer` ([#49673](https://github.com/WordPress/gutenberg/pull/49673)).
+@@ -34,7 +26,13 @@
+ 
+ -   `FormTokenField`, `ComboboxControl`: Add `__next40pxDefaultSize` prop to opt into the new 40px default size, superseding the `__next36pxDefaultSize` prop ([#50261](https://github.com/WordPress/gutenberg/pull/50261)).
+ -   `Modal`: Add css class to children container ([#50099](https://github.com/WordPress/gutenberg/pull/50099)).
++-   `Button`: Add `__next40pxDefaultSize` prop to opt into the new 40px default size ([#50254](https://github.com/WordPress/gutenberg/pull/50254)).
+ -   `PaletteEdit`: Allow custom popover configuration ([#49975](https://github.com/WordPress/gutenberg/pull/49975)).
++-   Change the default color scheme to use the new WP Blueberry color. See PR description for instructions on how to restore the previous color scheme when using in a non-WordPress context ([#50193](https://github.com/WordPress/gutenberg/pull/50193)).
++-   `CheckboxControl`, `CustomGradientPicker`, `FormToggle`, : Refactor and correct the focus style for consistency ([#50127](https://github.com/WordPress/gutenberg/pull/50127)).
++-   `Button`, update spacing values in `has-text has-icon` buttons. ([#50277](https://github.com/WordPress/gutenberg/pull/50277)).
++-   `Button`, remove custom padding applied to `tertiary` variant. ([#50276](https://github.com/WordPress/gutenberg/pull/50276)).
++-   `Modal`: Correct padding for title less confirm variant. ([#50283](https://github.com/WordPress/gutenberg/pull/50283)).
+ 
+ ## 23.9.0 (2023-04-26)
+ 
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index 5ffc22d3020e1c..098f6eaac3b1cf 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -75,6 +75,7 @@ export function UnforwardedButton(
+ 	ref: ForwardedRef< any >
+ ) {
+ 	const {
++		__next40pxDefaultSize,
+ 		isSmall,
+ 		isPressed,
+ 		isBusy,
+@@ -115,6 +116,7 @@ export function UnforwardedButton(
+ 			children?.[ 0 ]?.props?.className !== 'components-tooltip' );
+ 
+ 	const classes = classnames( 'components-button', className, {
++		'is-next-40px-default-size': __next40pxDefaultSize,
+ 		'is-secondary': variant === 'secondary',
+ 		'is-primary': variant === 'primary',
+ 		'is-small': isSmall,
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 6e687d2dd37e42..3ec844906b0390 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -18,6 +18,10 @@
+ 	border-radius: $radius-block-ui;
+ 	color: $components-color-foreground;
+ 
++	&.is-next-40px-default-size {
++		height: $button-size-next-default-40px;
++	}
++
+ 	&[aria-expanded="true"],
+ 	&:hover {
+ 		color: $components-color-accent;
+@@ -285,6 +289,10 @@
+ 		min-width: $button-size;
+ 		justify-content: center;
+ 
++		&.is-next-40px-default-size {
++			min-width: $button-size-next-default-40px;
++		}
++
+ 		.dashicon {
+ 			display: inline-block;
+ 			flex: 0 0 auto;
+diff --git a/packages/components/src/button/types.ts b/packages/components/src/button/types.ts
+index 7bddf3b9d8f6f8..57e2a3df6ee61e 100644
+--- a/packages/components/src/button/types.ts
++++ b/packages/components/src/button/types.ts
+@@ -18,6 +18,13 @@ export type ButtonAsButtonProps = BaseButtonProps & _ButtonProps;
+ export type ButtonAsAnchorProps = BaseButtonProps & AnchorProps;
+ 
+ type BaseButtonProps = {
++	/**
++	 * Start opting into the larger default height that will become the
++	 * default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next40pxDefaultSize?: boolean;
+ 	/**
+ 	 * The button's children.
+ 	 */

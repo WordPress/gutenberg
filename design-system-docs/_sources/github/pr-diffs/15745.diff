@@ -1,0 +1,1072 @@
+diff --git a/docs/designers-developers/developers/data/data-core-notices.md b/docs/designers-developers/developers/data/data-core-notices.md
+index 5721292549b704..876977576f69bd 100644
+--- a/docs/designers-developers/developers/data/data-core-notices.md
++++ b/docs/designers-developers/developers/data/data-core-notices.md
+@@ -65,7 +65,7 @@ _Returns_
+ 
+ <a name="createNotice" href="#createNotice">#</a> **createNotice**
+ 
+-Yields action objects used in signalling that a notice is to be created.
++Returns an action object used in signalling that a notice is to be created.
+ 
+ _Parameters_
+ 
+@@ -79,6 +79,10 @@ _Parameters_
+ -   _options.speak_ `[boolean]`: Whether the notice content should be announced to screen readers.
+ -   _options.actions_ `[Array<WPNoticeAction>]`: User actions to be presented with notice.
+ 
++_Returns_
++
++-   `Object`: Action object.
++
+ <a name="createSuccessNotice" href="#createSuccessNotice">#</a> **createSuccessNotice**
+ 
+ Returns an action object used in signalling that a success notice is to be
+diff --git a/npm b/npm
+new file mode 100644
+index 00000000000000..e69de29bb2d1d6
+diff --git a/packages/block-editor/src/components/contrast-checker/index.js b/packages/block-editor/src/components/contrast-checker/index.js
+index e75eb24278dd9b..5c73c5568c0678 100644
+--- a/packages/block-editor/src/components/contrast-checker/index.js
++++ b/packages/block-editor/src/components/contrast-checker/index.js
+@@ -25,12 +25,22 @@ function ContrastCheckerMessage( {
+ 			: __(
+ 					'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+ 			  );
++
++	// Note: The `Notice` component can speak messages via its `spokenMessage`
++	// prop, but the contrast checker requires granular control over when the
++	// announcements are made. Notably, the message will be re-announced if a
++	// new color combination is selected and the contrast is still insufficient.
+ 	useEffect( () => {
+ 		speak( __( 'This color combination may be hard for people to read.' ) );
+ 	}, [ backgroundColor, textColor ] );
++
+ 	return (
+ 		<div className="block-editor-contrast-checker">
+-			<Notice status="warning" isDismissible={ false }>
++			<Notice
++				spokenMessage={ null }
++				status="warning"
++				isDismissible={ false }
++			>
+ 				{ msg }
+ 			</Notice>
+ 		</div>
+diff --git a/packages/block-editor/src/components/contrast-checker/test/index.js b/packages/block-editor/src/components/contrast-checker/test/index.js
+index 8d358437e4d9c5..a21a353572ae9d 100644
+--- a/packages/block-editor/src/components/contrast-checker/test/index.js
++++ b/packages/block-editor/src/components/contrast-checker/test/index.js
+@@ -2,17 +2,22 @@
+  * External dependencies
+  */
+ import { mount } from 'enzyme';
++import { render } from 'react-dom';
++import { act } from 'react-dom/test-utils';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { Notice } from '@wordpress/components';
++import { speak } from '@wordpress/a11y';
+ 
+ /**
+  * Internal dependencies
+  */
+ import ContrastChecker from '../';
+ 
++jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
++
+ describe( 'ContrastChecker', () => {
+ 	const backgroundColor = '#ffffff';
+ 	const textColor = '#000000';
+@@ -22,6 +27,10 @@ describe( 'ContrastChecker', () => {
+ 	const sameShade = '#666';
+ 	const colorWithTransparency = 'rgba(102,102,102,0.5)';
+ 
++	beforeEach( () => {
++		speak.mockReset();
++	} );
++
+ 	test( 'should render null when no colors are provided', () => {
+ 		expect( mount( <ContrastChecker /> ).html() ).toBeNull();
+ 	} );
+@@ -37,6 +46,7 @@ describe( 'ContrastChecker', () => {
+ 			/>
+ 		);
+ 
++		expect( speak ).not.toHaveBeenCalled();
+ 		expect( wrapper.html() ).toBeNull();
+ 	} );
+ 
+@@ -51,6 +61,9 @@ describe( 'ContrastChecker', () => {
+ 			/>
+ 		);
+ 
++		expect( speak ).toHaveBeenCalledWith(
++			'This color combination may be hard for people to read.'
++		);
+ 		expect(
+ 			wrapper
+ 				.find( Notice )
+@@ -72,6 +85,7 @@ describe( 'ContrastChecker', () => {
+ 			/>
+ 		);
+ 
++		expect( speak ).not.toHaveBeenCalled();
+ 		expect( wrapper.html() ).toBeNull();
+ 	} );
+ 
+@@ -86,6 +100,7 @@ describe( 'ContrastChecker', () => {
+ 			/>
+ 		);
+ 
++		expect( speak ).not.toHaveBeenCalled();
+ 		expect( wrapper.html() ).toBeNull();
+ 	} );
+ 
+@@ -102,6 +117,9 @@ describe( 'ContrastChecker', () => {
+ 			/>
+ 		);
+ 
++		expect( speak ).toHaveBeenCalledWith(
++			'This color combination may be hard for people to read.'
++		);
+ 		expect(
+ 			wrapper
+ 				.find( Notice )
+@@ -121,6 +139,9 @@ describe( 'ContrastChecker', () => {
+ 			/>
+ 		);
+ 
++		expect( speak ).toHaveBeenCalledWith(
++			'This color combination may be hard for people to read.'
++		);
+ 		expect(
+ 			wrapperSmallText
+ 				.find( Notice )
+@@ -150,6 +171,9 @@ describe( 'ContrastChecker', () => {
+ 			/>
+ 		);
+ 
++		expect( speak ).toHaveBeenCalledWith(
++			'This color combination may be hard for people to read.'
++		);
+ 		expect(
+ 			wrapperSmallFontSize
+ 				.find( Notice )
+@@ -180,6 +204,7 @@ describe( 'ContrastChecker', () => {
+ 			/>
+ 		);
+ 
++		expect( speak ).not.toHaveBeenCalled();
+ 		expect( wrapper.html() ).toBeNull();
+ 
+ 		const wrapperNoLargeText = mount(
+@@ -191,6 +216,9 @@ describe( 'ContrastChecker', () => {
+ 			/>
+ 		);
+ 
++		expect( speak ).toHaveBeenCalledWith(
++			'This color combination may be hard for people to read.'
++		);
+ 		expect(
+ 			wrapperNoLargeText
+ 				.find( Notice )
+@@ -210,6 +238,7 @@ describe( 'ContrastChecker', () => {
+ 			/>
+ 		);
+ 
++		expect( speak ).not.toHaveBeenCalled();
+ 		expect( wrapper.html() ).toBeNull();
+ 	} );
+ 
+@@ -221,6 +250,9 @@ describe( 'ContrastChecker', () => {
+ 			/>
+ 		);
+ 
++		expect( speak ).toHaveBeenCalledWith(
++			'This color combination may be hard for people to read.'
++		);
+ 		expect(
+ 			wrapper
+ 				.find( Notice )
+@@ -230,4 +262,30 @@ describe( 'ContrastChecker', () => {
+ 			'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.'
+ 		);
+ 	} );
++
++	test( 'should re-announce if colors change, but still insufficient contrast', () => {
++		const appRoot = document.createElement( 'div' );
++
++		act( () => {
++			render(
++				<ContrastChecker
++					textColor={ textColor }
++					fallbackBackgroundColor={ textColor }
++				/>,
++				appRoot
++			);
++		} );
++
++		act( () => {
++			render(
++				<ContrastChecker
++					textColor={ backgroundColor }
++					fallbackBackgroundColor={ backgroundColor }
++				/>,
++				appRoot
++			);
++		} );
++
++		expect( speak ).toHaveBeenCalledTimes( 2 );
++	} );
+ } );
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d069ffb0f5f571..8e57d9ac4f7632 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -1,3 +1,15 @@
++## Master
++
++### Enhancements
++
++- The `Notice` component will speak its message. With this new feature, a developer can control either the `spokenMessage` spoken message, or the `politeness` politeness level of the message.
++- The `Snackbar` component will speak its message. With this new feature, a developer can control either the `spokenMessage` spoken message, or the `politeness` politeness level of the message.
++- A `Notice` `actions` member can now assign `isPrimary` to render a primary button action associated with a notice message.
++
++### Bug Fixes
++
++- Notice will assume a default status of 'info' if none is provided. This resolves an issue where the notice would be assigned a class name `is-undefined`. This was previously the effective default by styled appearance and should not be considered a breaking change in that regard.
++
+ ## 9.0.0 (2020-01-13)
+ 
+ ### New Features
+diff --git a/packages/components/src/notice/README.md b/packages/components/src/notice/README.md
+index 16de133c4346ae..1312536fb75b72 100644
+--- a/packages/components/src/notice/README.md
++++ b/packages/components/src/notice/README.md
+@@ -97,12 +97,17 @@ const MyNotice = () => (
+ 
+ #### Props
+ 
+-The following props are used to control the display of the component.
++The following props are used to control the behavior of the component.
+ 
+-* `status`: (string) can be `warning` (yellow), `success` (green), `error` (red).
++* `children`: (string) The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
++* `spokenMessage`: (string) Used to provide a custom spoken message in place of the `children` default.
++* `status`: (string) can be `warning` (yellow), `success` (green), `error` (red), or `info`. Defaults to `info`.
+ * `onRemove`: function called when dismissing the notice
++* `politeness`: (string) A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live). If not provided, a sensible default is used based on the notice status. Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.
++  * A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
++  * A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
+ * `isDismissible`: (boolean) defaults to true, whether the notice should be dismissible or not
+-* `actions`: (array) an array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function. A `className` property can be used to add custom classes to the button styles. By default, some classes are used (e.g: is-link or is-default) the default classes can be removed by setting property `noDefaultClasses` to `false`.
++* `actions`: (array) an array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function. A `className` property can be used to add custom classes to the button styles. The default appearance of the button is inferred based on whether `url` or `onClick` are provided, rendering the button as a link if appropriate. A `noDefaultClasses` property value of `true` will remove all default styling. You can denote a primary button action for a notice by assigning a `isPrimary` value of `true`.
+ 
+ ## Related components
+ 
+diff --git a/packages/components/src/notice/index.js b/packages/components/src/notice/index.js
+index 95df8cd4da8f58..bac5e758580811 100644
+--- a/packages/components/src/notice/index.js
++++ b/packages/components/src/notice/index.js
+@@ -8,7 +8,8 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { RawHTML } from '@wordpress/element';
++import { RawHTML, useEffect, renderToString } from '@wordpress/element';
++import { speak } from '@wordpress/a11y';
+ import { close } from '@wordpress/icons';
+ 
+ /**
+@@ -16,15 +17,60 @@ import { close } from '@wordpress/icons';
+  */
+ import { Button } from '../';
+ 
++/** @typedef {import('@wordpress/element').WPElement} WPElement */
++
++/**
++ * Custom hook which announces the message with the given politeness, if a
++ * valid message is provided.
++ *
++ * @param {string|WPElement}     [message]  Message to announce.
++ * @param {'polite'|'assertive'} politeness Politeness to announce.
++ */
++function useSpokenMessage( message, politeness ) {
++	const spokenMessage =
++		typeof message === 'string' ? message : renderToString( message );
++
++	useEffect( () => {
++		if ( spokenMessage ) {
++			speak( spokenMessage, politeness );
++		}
++	}, [ spokenMessage, politeness ] );
++}
++
++/**
++ * Given a notice status, returns an assumed default politeness for the status.
++ * Defaults to 'assertive'.
++ *
++ * @param {string} [status] Notice status.
++ *
++ * @return {'polite'|'assertive'} Notice politeness.
++ */
++function getDefaultPoliteness( status ) {
++	switch ( status ) {
++		case 'success':
++		case 'warning':
++		case 'info':
++			return 'polite';
++
++		case 'error':
++		default:
++			return 'assertive';
++	}
++}
++
+ function Notice( {
+ 	className,
+-	status,
++	status = 'info',
+ 	children,
++	spokenMessage = children,
+ 	onRemove = noop,
+ 	isDismissible = true,
+ 	actions = [],
++	politeness = getDefaultPoliteness( status ),
+ 	__unstableHTML,
+ } ) {
++	useSpokenMessage( spokenMessage, politeness );
++
+ 	const classes = classnames(
+ 		className,
+ 		'components-notice',
+@@ -47,6 +93,7 @@ function Notice( {
+ 						{
+ 							className: buttonCustomClasses,
+ 							label,
++							isPrimary,
+ 							noDefaultClasses = false,
+ 							onClick,
+ 							url,
+@@ -57,6 +104,7 @@ function Notice( {
+ 							<Button
+ 								key={ index }
+ 								href={ url }
++								isPrimary={ isPrimary }
+ 								isSecondary={ ! noDefaultClasses && ! url }
+ 								isLink={ ! noDefaultClasses && !! url }
+ 								onClick={ url ? undefined : onClick }
+diff --git a/packages/components/src/notice/test/__snapshots__/index.js.snap b/packages/components/src/notice/test/__snapshots__/index.js.snap
+index 2cd34e65e1d90a..2e287ecaef1202 100644
+--- a/packages/components/src/notice/test/__snapshots__/index.js.snap
++++ b/packages/components/src/notice/test/__snapshots__/index.js.snap
+@@ -14,7 +14,24 @@ exports[`Notice should match snapshot 1`] = `
+       isLink={true}
+       isSecondary={false}
+     >
+-      View
++      More information
++    </ForwardRef(Button)>
++    <ForwardRef(Button)
++      className="components-notice__action"
++      isLink={false}
++      isSecondary={true}
++      onClick={[Function]}
++    >
++      Cancel
++    </ForwardRef(Button)>
++    <ForwardRef(Button)
++      className="components-notice__action"
++      isLink={false}
++      isPrimary={true}
++      isSecondary={true}
++      onClick={[Function]}
++    >
++      Submit
+     </ForwardRef(Button)>
+   </div>
+   <ForwardRef(Button)
+diff --git a/packages/components/src/notice/test/index.js b/packages/components/src/notice/test/index.js
+index 2090ed50e6887a..07841f8c5dc737 100644
+--- a/packages/components/src/notice/test/index.js
++++ b/packages/components/src/notice/test/index.js
+@@ -2,25 +2,37 @@
+  * External dependencies
+  */
+ import ShallowRenderer from 'react-test-renderer/shallow';
++import { create } from 'react-test-renderer';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import TokenList from '@wordpress/token-list';
++import { speak } from '@wordpress/a11y';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Notice from '../index';
+ 
++jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
++
+ describe( 'Notice', () => {
++	beforeEach( () => {
++		speak.mockReset();
++	} );
++
+ 	it( 'should match snapshot', () => {
+ 		const renderer = new ShallowRenderer();
+ 
+ 		renderer.render(
+ 			<Notice
+ 				status="success"
+-				actions={ [ { label: 'View', url: 'https://example.com' } ] }
++				actions={ [
++					{ label: 'More information', url: 'https://example.com' },
++					{ label: 'Cancel', onClick() {} },
++					{ label: 'Submit', onClick() {}, isPrimary: true },
++				] }
+ 			>
+ 				Example
+ 			</Notice>
+@@ -40,4 +52,85 @@ describe( 'Notice', () => {
+ 		expect( classes.contains( 'components-notice' ) ).toBe( true );
+ 		expect( classes.contains( 'is-dismissible' ) ).toBe( false );
+ 	} );
++
++	it( 'should default to info status', () => {
++		const renderer = new ShallowRenderer();
++
++		renderer.render( <Notice /> );
++
++		const classes = new TokenList(
++			renderer.getRenderOutput().props.className
++		);
++		expect( classes.contains( 'is-info' ) ).toBe( true );
++	} );
++
++	describe( 'useSpokenMessage', () => {
++		it( 'should speak the given message', () => {
++			const tree = create( <Notice>FYI</Notice> );
++			tree.update();
++
++			expect( speak ).toHaveBeenCalledWith( 'FYI', 'polite' );
++		} );
++
++		it( 'should speak the given message by explicit politeness', () => {
++			const tree = create(
++				<Notice politeness="assertive">Uh oh!</Notice>
++			);
++			tree.update();
++
++			expect( speak ).toHaveBeenCalledWith( 'Uh oh!', 'assertive' );
++		} );
++
++		it( 'should speak the given message by implicit politeness by status', () => {
++			const tree = create( <Notice status="error">Uh oh!</Notice> );
++			tree.update();
++
++			expect( speak ).toHaveBeenCalledWith( 'Uh oh!', 'assertive' );
++		} );
++
++		it( 'should speak the given message, preferring explicit to implicit politeness', () => {
++			const tree = create(
++				<Notice politeness="polite" status="error">
++					No need to panic
++				</Notice>
++			);
++			tree.update();
++
++			expect( speak ).toHaveBeenCalledWith(
++				'No need to panic',
++				'polite'
++			);
++		} );
++
++		it( 'should coerce a message to a string', () => {
++			// This test assumes that `@wordpress/a11y` is capable of handling
++			// markup strings appropriately.
++			const tree = create(
++				<Notice>
++					With <em>emphasis</em> this time.
++				</Notice>
++			);
++			tree.update();
++
++			expect( speak ).toHaveBeenCalledWith(
++				'With <em>emphasis</em> this time.',
++				'polite'
++			);
++		} );
++
++		it( 'should not re-speak an effectively equivalent element message', () => {
++			const tree = create(
++				<Notice>
++					With <em>emphasis</em> this time.
++				</Notice>
++			);
++			tree.update(
++				<Notice>
++					With <em>emphasis</em> this time.
++				</Notice>
++			);
++
++			expect( speak ).toHaveBeenCalledTimes( 1 );
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/snackbar/README.md b/packages/components/src/snackbar/README.md
+index 8ae5c4ec0b2778..c3aef2fbb7b1db 100644
+--- a/packages/components/src/snackbar/README.md
++++ b/packages/components/src/snackbar/README.md
+@@ -40,6 +40,11 @@ const MySnackbarNotice = () => (
+ 
+ The following props are used to control the display of the component.
+ 
++* `children`: (string) The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
++* `spokenMessage`: (string) Used to provide a custom spoken message in place of the `children` default.
++* `politeness`: (string) A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live). Defaults to `"polite"`. Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.
++  * A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
++  * A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
+ * `onRemove`: function called when dismissing the notice.
+ * `actions`: (array) an array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function.
+ 
+diff --git a/packages/components/src/snackbar/index.js b/packages/components/src/snackbar/index.js
+index 6b89b897277b1a..45b8bd8e24a946 100644
+--- a/packages/components/src/snackbar/index.js
++++ b/packages/components/src/snackbar/index.js
+@@ -7,7 +7,8 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { useEffect, forwardRef } from '@wordpress/element';
++import { speak } from '@wordpress/a11y';
++import { useEffect, forwardRef, renderToString } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import warning from '@wordpress/warning';
+ 
+@@ -18,10 +19,38 @@ import { Button } from '../';
+ 
+ const NOTICE_TIMEOUT = 10000;
+ 
++/** @typedef {import('@wordpress/element').WPElement} WPElement */
++
++/**
++ * Custom hook which announces the message with the given politeness, if a
++ * valid message is provided.
++ *
++ * @param {string|WPElement}     [message]  Message to announce.
++ * @param {'polite'|'assertive'} politeness Politeness to announce.
++ */
++function useSpokenMessage( message, politeness ) {
++	const spokenMessage =
++		typeof message === 'string' ? message : renderToString( message );
++
++	useEffect( () => {
++		if ( spokenMessage ) {
++			speak( spokenMessage, politeness );
++		}
++	}, [ spokenMessage, politeness ] );
++}
++
+ function Snackbar(
+-	{ className, children, actions = [], onRemove = noop },
++	{
++		className,
++		children,
++		spokenMessage = children,
++		politeness = 'polite',
++		actions = [],
++		onRemove = noop,
++	},
+ 	ref
+ ) {
++	useSpokenMessage( spokenMessage, politeness );
+ 	useEffect( () => {
+ 		const timeoutHandle = setTimeout( () => {
+ 			onRemove();
+diff --git a/packages/e2e-tests/specs/editor/plugins/cpt-locking.test.js b/packages/e2e-tests/specs/editor/plugins/cpt-locking.test.js
+index 9233dd71572695..843131dbe5070a 100644
+--- a/packages/e2e-tests/specs/editor/plugins/cpt-locking.test.js
++++ b/packages/e2e-tests/specs/editor/plugins/cpt-locking.test.js
+@@ -86,13 +86,13 @@ describe( 'cpt locking', () => {
+ 				'<!-- /wp:image -->'
+ 			);
+ 			await setPostContent( contentWithoutImage );
+-			const VALIDATION_PARAGRAPH_SELECTOR =
+-				'.editor-template-validation-notice .components-notice__content p';
+-			await page.waitForSelector( VALIDATION_PARAGRAPH_SELECTOR );
++			const noticeContent = await page.waitForSelector(
++				'.editor-template-validation-notice .components-notice__content'
++			);
+ 			expect(
+ 				await page.evaluate(
+-					( element ) => element.textContent,
+-					await page.$( VALIDATION_PARAGRAPH_SELECTOR )
++					( _noticeContent ) => _noticeContent.firstChild.nodeValue,
++					noticeContent
+ 				)
+ 			).toEqual(
+ 				'The content of your post doesn’t match the template assigned to your post type.'
+diff --git a/packages/editor/src/components/template-validation-notice/index.js b/packages/editor/src/components/template-validation-notice/index.js
+index a71833466abea8..6b6d74fa554d71 100644
+--- a/packages/editor/src/components/template-validation-notice/index.js
++++ b/packages/editor/src/components/template-validation-notice/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { Notice, Button } from '@wordpress/components';
++import { Notice } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import { withSelect, withDispatch } from '@wordpress/data';
+ import { compose } from '@wordpress/compose';
+@@ -29,20 +29,21 @@ function TemplateValidationNotice( { isValid, ...props } ) {
+ 			className="editor-template-validation-notice"
+ 			isDismissible={ false }
+ 			status="warning"
++			actions={ [
++				{
++					label: __( 'Keep it as is' ),
++					onClick: props.resetTemplateValidity,
++				},
++				{
++					label: __( 'Reset the template' ),
++					onClick: confirmSynchronization,
++					isPrimary: true,
++				},
++			] }
+ 		>
+-			<p>
+-				{ __(
+-					'The content of your post doesn’t match the template assigned to your post type.'
+-				) }
+-			</p>
+-			<div>
+-				<Button isSecondary onClick={ props.resetTemplateValidity }>
+-					{ __( 'Keep it as is' ) }
+-				</Button>
+-				<Button onClick={ confirmSynchronization } isPrimary>
+-					{ __( 'Reset the template' ) }
+-				</Button>
+-			</div>
++			{ __(
++				'The content of your post doesn’t match the template assigned to your post type.'
++			) }
+ 		</Notice>
+ 	);
+ }
+diff --git a/packages/notices/CHANGELOG.md b/packages/notices/CHANGELOG.md
+index 16695a45dd0122..c1b586a696b67a 100644
+--- a/packages/notices/CHANGELOG.md
++++ b/packages/notices/CHANGELOG.md
+@@ -1,3 +1,9 @@
++## Master
++
++### Breaking Change
++
++- A notices message is no longer spoken as a result of notice creation, but rather by its display in the interface by its corresponding [`Notice` component](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/notice).
++
+ ## 1.5.0 (2019-06-12)
+ 
+ ### New Features
+diff --git a/packages/notices/src/store/actions.js b/packages/notices/src/store/actions.js
+index ec665cf359ac40..9f9acc3665e277 100644
+--- a/packages/notices/src/store/actions.js
++++ b/packages/notices/src/store/actions.js
+@@ -20,7 +20,7 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
+  */
+ 
+ /**
+- * Yields action objects used in signalling that a notice is to be created.
++ * Returns an action object used in signalling that a notice is to be created.
+  *
+  * @param {string}                [status='info']              Notice status.
+  * @param {string}                content                      Notice message.
+@@ -40,12 +40,10 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
+  *                                                             readers.
+  * @param {Array<WPNoticeAction>} [options.actions]            User actions to be
+  *                                                             presented with notice.
++ *
++ * @return {Object} Action object.
+  */
+-export function* createNotice(
+-	status = DEFAULT_STATUS,
+-	content,
+-	options = {}
+-) {
++export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
+ 	const {
+ 		speak = true,
+ 		isDismissible = true,
+@@ -61,21 +59,14 @@ export function* createNotice(
+ 	// supported, cast to a string.
+ 	content = String( content );
+ 
+-	if ( speak ) {
+-		yield {
+-			type: 'SPEAK',
+-			message: content,
+-			ariaLive: type === 'snackbar' ? 'polite' : 'assertive',
+-		};
+-	}
+-
+-	yield {
++	return {
+ 		type: 'CREATE_NOTICE',
+ 		context,
+ 		notice: {
+ 			id,
+ 			status,
+ 			content,
++			spokenMessage: speak ? content : null,
+ 			__unstableHTML,
+ 			isDismissible,
+ 			actions,
+diff --git a/packages/notices/src/store/index.js b/packages/notices/src/store/index.js
+index c2afb86b4b79c6..22a70e02ebb903 100644
+--- a/packages/notices/src/store/index.js
++++ b/packages/notices/src/store/index.js
+@@ -9,11 +9,9 @@ import { registerStore } from '@wordpress/data';
+ import reducer from './reducer';
+ import * as actions from './actions';
+ import * as selectors from './selectors';
+-import controls from './controls';
+ 
+ export default registerStore( 'core/notices', {
+ 	reducer,
+ 	actions,
+ 	selectors,
+-	controls,
+ } );
+diff --git a/packages/notices/src/store/selectors.js b/packages/notices/src/store/selectors.js
+index 879f745ffe06d0..0517d931714321 100644
+--- a/packages/notices/src/store/selectors.js
++++ b/packages/notices/src/store/selectors.js
+@@ -24,6 +24,8 @@ const DEFAULT_NOTICES = [];
+  *                                      `info`, `error`, or `warning`. Defaults
+  *                                      to `info`.
+  * @property {string}  content          Notice message.
++ * @property {string}  spokenMessage    Audibly announced message text used by
++ *                                      assistive technologies.
+  * @property {string}  __unstableHTML   Notice message as raw HTML. Intended to
+  *                                      serve primarily for compatibility of
+  *                                      server-rendered notices, and SHOULD NOT
+diff --git a/packages/notices/src/store/test/actions.js b/packages/notices/src/store/test/actions.js
+index 082949031cbd96..44923e66a36274 100644
+--- a/packages/notices/src/store/test/actions.js
++++ b/packages/notices/src/store/test/actions.js
+@@ -17,15 +17,10 @@ describe( 'actions', () => {
+ 		const status = 'status';
+ 		const content = 'my message';
+ 
+-		it( 'yields actions when options is empty', () => {
++		it( 'returns an action when options is empty', () => {
+ 			const result = createNotice( status, content );
+ 
+-			expect( result.next().value ).toMatchObject( {
+-				type: 'SPEAK',
+-				message: content,
+-			} );
+-
+-			expect( result.next().value ).toMatchObject( {
++			expect( result ).toMatchObject( {
+ 				type: 'CREATE_NOTICE',
+ 				context: DEFAULT_CONTEXT,
+ 				notice: {
+@@ -42,12 +37,7 @@ describe( 'actions', () => {
+ 		it( 'normalizes content to string', () => {
+ 			const result = createNotice( status, <strong>Hello</strong> );
+ 
+-			expect( result.next().value ).toMatchObject( {
+-				type: 'SPEAK',
+-				message: expect.any( String ),
+-			} );
+-
+-			expect( result.next().value ).toMatchObject( {
++			expect( result ).toMatchObject( {
+ 				type: 'CREATE_NOTICE',
+ 				context: DEFAULT_CONTEXT,
+ 				notice: {
+@@ -61,7 +51,7 @@ describe( 'actions', () => {
+ 			} );
+ 		} );
+ 
+-		it( 'yields actions when options passed', () => {
++		it( 'returns an action when options passed', () => {
+ 			const context = 'foo';
+ 			const options = {
+ 				id,
+@@ -71,18 +61,14 @@ describe( 'actions', () => {
+ 
+ 			const result = createNotice( status, content, options );
+ 
+-			expect( result.next().value ).toMatchObject( {
+-				type: 'SPEAK',
+-				message: content,
+-			} );
+-
+-			expect( result.next().value ).toEqual( {
++			expect( result ).toEqual( {
+ 				type: 'CREATE_NOTICE',
+ 				context,
+ 				notice: {
+ 					id,
+ 					status,
+ 					content,
++					spokenMessage: content,
+ 					isDismissible: false,
+ 					actions: [],
+ 					type: 'default',
+@@ -90,7 +76,7 @@ describe( 'actions', () => {
+ 			} );
+ 		} );
+ 
+-		it( 'yields action when speak disabled', () => {
++		it( 'returns an action when speak disabled', () => {
+ 			const result = createNotice(
+ 				undefined,
+ 				'my <strong>message</strong>',
+@@ -102,13 +88,14 @@ describe( 'actions', () => {
+ 				}
+ 			);
+ 
+-			expect( result.next().value ).toEqual( {
++			expect( result ).toEqual( {
+ 				type: 'CREATE_NOTICE',
+ 				context: DEFAULT_CONTEXT,
+ 				notice: {
+ 					id,
+ 					status: DEFAULT_STATUS,
+ 					content: 'my <strong>message</strong>',
++					spokenMessage: null,
+ 					__unstableHTML: true,
+ 					isDismissible: false,
+ 					actions: [],
+@@ -124,12 +111,7 @@ describe( 'actions', () => {
+ 
+ 			const result = createSuccessNotice( content );
+ 
+-			expect( result.next().value ).toMatchObject( {
+-				type: 'SPEAK',
+-				message: content,
+-			} );
+-
+-			expect( result.next().value ).toMatchObject( {
++			expect( result ).toMatchObject( {
+ 				type: 'CREATE_NOTICE',
+ 				context: DEFAULT_CONTEXT,
+ 				notice: {
+@@ -149,12 +131,7 @@ describe( 'actions', () => {
+ 
+ 			const result = createInfoNotice( content );
+ 
+-			expect( result.next().value ).toMatchObject( {
+-				type: 'SPEAK',
+-				message: content,
+-			} );
+-
+-			expect( result.next().value ).toMatchObject( {
++			expect( result ).toMatchObject( {
+ 				type: 'CREATE_NOTICE',
+ 				context: DEFAULT_CONTEXT,
+ 				notice: {
+@@ -174,12 +151,7 @@ describe( 'actions', () => {
+ 
+ 			const result = createErrorNotice( content );
+ 
+-			expect( result.next().value ).toMatchObject( {
+-				type: 'SPEAK',
+-				message: content,
+-			} );
+-
+-			expect( result.next().value ).toMatchObject( {
++			expect( result ).toMatchObject( {
+ 				type: 'CREATE_NOTICE',
+ 				context: DEFAULT_CONTEXT,
+ 				notice: {
+@@ -199,12 +171,7 @@ describe( 'actions', () => {
+ 
+ 			const result = createWarningNotice( content );
+ 
+-			expect( result.next().value ).toMatchObject( {
+-				type: 'SPEAK',
+-				message: content,
+-			} );
+-
+-			expect( result.next().value ).toMatchObject( {
++			expect( result ).toMatchObject( {
+ 				type: 'CREATE_NOTICE',
+ 				context: DEFAULT_CONTEXT,
+ 				notice: {
+diff --git a/packages/notices/src/store/test/reducer.js b/packages/notices/src/store/test/reducer.js
+index 1a845d58b158fb..4ae106de4314fa 100644
+--- a/packages/notices/src/store/test/reducer.js
++++ b/packages/notices/src/store/test/reducer.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import deepFreeze from 'deep-freeze';
+-import { matchesProperty, find } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+@@ -12,9 +11,6 @@ import { createNotice, removeNotice } from '../actions';
+ import { getNotices } from '../selectors';
+ import { DEFAULT_CONTEXT } from '../constants';
+ 
+-const getYieldedOfType = ( generatorAction, type ) =>
+-	find( Array.from( generatorAction ), matchesProperty( [ 'type' ], type ) );
+-
+ describe( 'reducer', () => {
+ 	it( 'should default to an empty object', () => {
+ 		const state = reducer( undefined, {} );
+@@ -23,10 +19,7 @@ describe( 'reducer', () => {
+ 	} );
+ 
+ 	it( 'should track a notice', () => {
+-		const action = getYieldedOfType(
+-			createNotice( 'error', 'save error' ),
+-			'CREATE_NOTICE'
+-		);
++		const action = createNotice( 'error', 'save error' );
+ 		const state = reducer( undefined, action );
+ 
+ 		expect( state ).toEqual( {
+@@ -34,6 +27,7 @@ describe( 'reducer', () => {
+ 				{
+ 					id: expect.any( String ),
+ 					content: 'save error',
++					spokenMessage: 'save error',
+ 					status: 'error',
+ 					isDismissible: true,
+ 					actions: [],
+@@ -44,10 +38,9 @@ describe( 'reducer', () => {
+ 	} );
+ 
+ 	it( 'should track a notice by context', () => {
+-		const action = getYieldedOfType(
+-			createNotice( 'error', 'save error', { context: 'foo' } ),
+-			'CREATE_NOTICE'
+-		);
++		const action = createNotice( 'error', 'save error', {
++			context: 'foo',
++		} );
+ 		const state = reducer( undefined, action );
+ 
+ 		expect( state ).toEqual( {
+@@ -55,6 +48,7 @@ describe( 'reducer', () => {
+ 				{
+ 					id: expect.any( String ),
+ 					content: 'save error',
++					spokenMessage: 'save error',
+ 					status: 'error',
+ 					isDismissible: true,
+ 					actions: [],
+@@ -65,16 +59,10 @@ describe( 'reducer', () => {
+ 	} );
+ 
+ 	it( 'should track notices, respecting order by which they were created', () => {
+-		let action = getYieldedOfType(
+-			createNotice( 'error', 'save error' ),
+-			'CREATE_NOTICE'
+-		);
++		let action = createNotice( 'error', 'save error' );
+ 		const original = deepFreeze( reducer( undefined, action ) );
+ 
+-		action = getYieldedOfType(
+-			createNotice( 'success', 'successfully saved' ),
+-			'CREATE_NOTICE'
+-		);
++		action = createNotice( 'success', 'successfully saved' );
+ 		const state = reducer( original, action );
+ 
+ 		expect( state ).toEqual( {
+@@ -82,6 +70,7 @@ describe( 'reducer', () => {
+ 				{
+ 					id: expect.any( String ),
+ 					content: 'save error',
++					spokenMessage: 'save error',
+ 					status: 'error',
+ 					isDismissible: true,
+ 					actions: [],
+@@ -90,6 +79,7 @@ describe( 'reducer', () => {
+ 				{
+ 					id: expect.any( String ),
+ 					content: 'successfully saved',
++					spokenMessage: 'successfully saved',
+ 					status: 'success',
+ 					isDismissible: true,
+ 					actions: [],
+@@ -100,10 +90,7 @@ describe( 'reducer', () => {
+ 	} );
+ 
+ 	it( 'should omit a removed notice', () => {
+-		const action = getYieldedOfType(
+-			createNotice( 'error', 'save error' ),
+-			'CREATE_NOTICE'
+-		);
++		const action = createNotice( 'error', 'save error' );
+ 		const original = deepFreeze( reducer( undefined, action ) );
+ 		const id = getNotices( original )[ 0 ].id;
+ 
+@@ -115,10 +102,9 @@ describe( 'reducer', () => {
+ 	} );
+ 
+ 	it( 'should omit a removed notice by context', () => {
+-		const action = getYieldedOfType(
+-			createNotice( 'error', 'save error', { context: 'foo' } ),
+-			'CREATE_NOTICE'
+-		);
++		const action = createNotice( 'error', 'save error', {
++			context: 'foo',
++		} );
+ 		const original = deepFreeze( reducer( undefined, action ) );
+ 		const id = getNotices( original, 'foo' )[ 0 ].id;
+ 
+@@ -130,10 +116,7 @@ describe( 'reducer', () => {
+ 	} );
+ 
+ 	it( 'should omit a removed notice across contexts', () => {
+-		const action = getYieldedOfType(
+-			createNotice( 'error', 'save error' ),
+-			'CREATE_NOTICE'
+-		);
++		const action = createNotice( 'error', 'save error' );
+ 		const original = deepFreeze( reducer( undefined, action ) );
+ 		const id = getNotices( original )[ 0 ].id;
+ 
+@@ -143,16 +126,14 @@ describe( 'reducer', () => {
+ 	} );
+ 
+ 	it( 'should dedupe distinct ids, preferring new', () => {
+-		let action = getYieldedOfType(
+-			createNotice( 'error', 'save error (1)', { id: 'error-message' } ),
+-			'CREATE_NOTICE'
+-		);
++		let action = createNotice( 'error', 'save error (1)', {
++			id: 'error-message',
++		} );
+ 		const original = deepFreeze( reducer( undefined, action ) );
+ 
+-		action = getYieldedOfType(
+-			createNotice( 'error', 'save error (2)', { id: 'error-message' } ),
+-			'CREATE_NOTICE'
+-		);
++		action = createNotice( 'error', 'save error (2)', {
++			id: 'error-message',
++		} );
+ 		const state = reducer( original, action );
+ 
+ 		expect( state ).toEqual( {
+@@ -160,6 +141,7 @@ describe( 'reducer', () => {
+ 				{
+ 					id: 'error-message',
+ 					content: 'save error (2)',
++					spokenMessage: 'save error (2)',
+ 					status: 'error',
+ 					isDismissible: true,
+ 					actions: [],

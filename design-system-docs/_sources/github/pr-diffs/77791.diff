@@ -1,0 +1,150 @@
+diff --git a/packages/ui/src/form/primitives/field/description.tsx b/packages/ui/src/form/primitives/field/description.tsx
+index 4c9609708d4bdb..87bd624ba14132 100644
+--- a/packages/ui/src/form/primitives/field/description.tsx
++++ b/packages/ui/src/form/primitives/field/description.tsx
+@@ -1,7 +1,7 @@
+ import clsx from 'clsx';
+ import { Field as _Field } from '@base-ui/react/field';
+ import { forwardRef } from '@wordpress/element';
+-import defenseStyles from '../../../utils/css/global-css-defense.module.css';
++import { Text } from '../../../text';
+ import fieldStyles from '../../../utils/css/field.module.css';
+ import type { FieldDescriptionProps } from './types';
+ 
+@@ -10,14 +10,10 @@ export const Description = forwardRef<
+ 	FieldDescriptionProps
+ >( function Description( { className, ...restProps }, ref ) {
+ 	return (
+-		<_Field.Description
+-			ref={ ref }
+-			className={ clsx(
+-				defenseStyles.p,
+-				fieldStyles.description,
+-				className
+-			) }
+-			{ ...restProps }
++		<Text
++			render={ <_Field.Description ref={ ref } { ...restProps } /> }
++			variant="body-sm"
++			className={ clsx( fieldStyles.description, className ) }
+ 		/>
+ 	);
+ } );
+diff --git a/packages/ui/src/form/primitives/field/details.tsx b/packages/ui/src/form/primitives/field/details.tsx
+index 847124f467c9df..d2a0723c097495 100644
+--- a/packages/ui/src/form/primitives/field/details.tsx
++++ b/packages/ui/src/form/primitives/field/details.tsx
+@@ -2,6 +2,7 @@ import clsx from 'clsx';
+ import { Field as _Field } from '@base-ui/react/field';
+ import { forwardRef } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
++import { Text } from '../../../text';
+ import fieldStyles from '../../../utils/css/field.module.css';
+ import type { FieldDetailsProps } from './types';
+ import { VisuallyHidden } from '../../../visually-hidden';
+@@ -27,11 +28,11 @@ export const Details = forwardRef< HTMLDivElement, FieldDetailsProps >(
+ 				<VisuallyHidden render={ <_Field.Description /> }>
+ 					{ __( 'More details follow the field.' ) }
+ 				</VisuallyHidden>
+-				<div
+-					ref={ ref }
++				<Text
++					render={ <div ref={ ref } { ...restProps } /> }
++					variant="body-sm"
+ 					className={ clsx( fieldStyles.description, className ) }
+-					{ ...restProps }
+-				></div>
++				/>
+ 			</>
+ 		);
+ 	}
+diff --git a/packages/ui/src/form/primitives/fieldset/description.tsx b/packages/ui/src/form/primitives/fieldset/description.tsx
+index a21ed50454e692..3250510baca85e 100644
+--- a/packages/ui/src/form/primitives/fieldset/description.tsx
++++ b/packages/ui/src/form/primitives/fieldset/description.tsx
+@@ -1,8 +1,7 @@
+ import clsx from 'clsx';
+-import { mergeProps, useRender } from '@base-ui/react';
+ import { forwardRef, useEffect, useId } from '@wordpress/element';
+-import defenseStyles from '../../../utils/css/global-css-defense.module.css';
+ import fieldStyles from '../../../utils/css/field.module.css';
++import { Text } from '../../../text';
+ import { useFieldsetContext } from './context';
+ import type { FieldsetDescriptionProps } from './types';
+ 
+@@ -23,22 +22,11 @@ export const FieldsetDescription = forwardRef<
+ 		return unregisterDescriptionId;
+ 	}, [ registerDescriptionId, unregisterDescriptionId, id ] );
+ 
+-	const element = useRender( {
+-		defaultTagName: 'p',
+-		render,
+-		ref,
+-		props: mergeProps< 'p' >(
+-			{
+-				className: clsx(
+-					defenseStyles.p,
+-					fieldStyles.description,
+-					className
+-				),
+-				id,
+-			},
+-			restProps
+-		),
+-	} );
+-
+-	return element;
++	return (
++		<Text
++			render={ render ?? <p ref={ ref } id={ id } { ...restProps } /> }
++			variant="body-sm"
++			className={ clsx( fieldStyles.description, className ) }
++		/>
++	);
+ } );
+diff --git a/packages/ui/src/form/primitives/fieldset/details.tsx b/packages/ui/src/form/primitives/fieldset/details.tsx
+index 5b26cd1d731fe8..560c6e430f3052 100644
+--- a/packages/ui/src/form/primitives/fieldset/details.tsx
++++ b/packages/ui/src/form/primitives/fieldset/details.tsx
+@@ -1,7 +1,6 @@
+-import clsx from 'clsx';
+ import { forwardRef, useEffect, useId } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+-import fieldStyles from '../../../utils/css/field.module.css';
++import { Text } from '../../../text';
+ import { useFieldsetContext } from './context';
+ import { VisuallyHidden } from '../../../visually-hidden';
+ import type { FieldsetDetailsProps } from './types';
+@@ -36,10 +35,10 @@ export const FieldsetDetails = forwardRef<
+ 			<VisuallyHidden id={ id }>
+ 				{ __( 'More details follow.' ) }
+ 			</VisuallyHidden>
+-			<div
+-				ref={ ref }
+-				className={ clsx( fieldStyles.description, className ) }
+-				{ ...restProps }
++			<Text
++				render={ <div ref={ ref } { ...restProps } /> }
++				variant="body-sm"
++				className={ className }
+ 			/>
+ 		</>
+ 	);
+diff --git a/packages/ui/src/utils/css/field.module.css b/packages/ui/src/utils/css/field.module.css
+index 7456982f0585a4..7bd9ca896d9629 100644
+--- a/packages/ui/src/utils/css/field.module.css
++++ b/packages/ui/src/utils/css/field.module.css
+@@ -18,13 +18,6 @@
+ 	}
+ 
+ 	.description {
+-		--_gcd-p-font-size: var(--wpds-typography-font-size-sm);
+-		--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
+-		--_gcd-p-margin: 0;
+-
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-sm);
+-		line-height: var(--wpds-typography-line-height-xs);
+ 		color: var(--wpds-color-fg-content-neutral-weak);
+ 	}
+ }

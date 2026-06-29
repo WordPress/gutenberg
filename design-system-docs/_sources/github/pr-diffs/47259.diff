@@ -1,0 +1,421 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index df0efd8ebeabc7..02ab9466bb24d4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ 
+ -   `Toolbar`: unify Storybook examples under one file, migrate from knobs to controls ([47117](https://github.com/WordPress/gutenberg/pull/47117)).
+ -   `DropdownMenu`: migrate Storybook to controls ([47149](https://github.com/WordPress/gutenberg/pull/47149)).
++-   `Panel`, `PanelHeader`, `PanelRow`: Convert to TypeScript ([#47259](https://github.com/WordPress/gutenberg/pull/47259)).
+ -   Removed deprecated `@storybook/addon-knobs` dependency from the package ([47152](https://github.com/WordPress/gutenberg/pull/47152)).
+ -   `ColorListPicker`: Convert to TypeScript ([#46358](https://github.com/WordPress/gutenberg/pull/46358)).
+ -   `KeyboardShortcuts`: Convert to TypeScript ([#47429](https://github.com/WordPress/gutenberg/pull/47429)).
+diff --git a/packages/components/src/panel/README.md b/packages/components/src/panel/README.md
+index 7cfc2eb8a5e6ea..04cf6d6eeeda1e 100644
+--- a/packages/components/src/panel/README.md
++++ b/packages/components/src/panel/README.md
+@@ -161,7 +161,7 @@ Props that are passed to the `Button` component in the `PanelBodyTitle` within t
+ 
+ #### PanelRow
+ 
+-The `PanelRow` is a generic container for panel content. Default styles add a top margin and arrange items in a flex row.
++`PanelRow` is a generic container for rows within a `PanelBody`. It is a flex container with a top margin for spacing.
+ 
+ ##### Props
+ 
+@@ -182,7 +182,7 @@ PanelRow accepts a forwarded ref that will be added to the wrapper div. Usage:
+ 
+ #### PanelHeader
+ 
+-This is a simple container for a header component. This is used by the `Panel` component under the hood, so it does not typically need to be used.
++`PanelHeader` renders the header for the `Panel`. This is used by the `Panel` component under the hood, so it does not typically need to be used.
+ 
+ ##### Props
+ 
+diff --git a/packages/components/src/panel/header.js b/packages/components/src/panel/header.js
+deleted file mode 100644
+index d26812e8b6289e..00000000000000
+--- a/packages/components/src/panel/header.js
++++ /dev/null
+@@ -1,10 +0,0 @@
+-function PanelHeader( { label, children } ) {
+-	return (
+-		<div className="components-panel__header">
+-			{ label && <h2>{ label }</h2> }
+-			{ children }
+-		</div>
+-	);
+-}
+-
+-export default PanelHeader;
+diff --git a/packages/components/src/panel/header.tsx b/packages/components/src/panel/header.tsx
+new file mode 100644
+index 00000000000000..428626225ada11
+--- /dev/null
++++ b/packages/components/src/panel/header.tsx
+@@ -0,0 +1,20 @@
++/**
++ * Internal dependencies
++ */
++import type { PanelHeaderProps } from './types';
++
++/**
++ * `PanelHeader` renders the header for the `Panel`.
++ * This is used by the `Panel` component under the hood,
++ * so it does not typically need to be used.
++ */
++function PanelHeader( { label, children }: PanelHeaderProps ) {
++	return (
++		<div className="components-panel__header">
++			{ label && <h2>{ label }</h2> }
++			{ children }
++		</div>
++	);
++}
++
++export default PanelHeader;
+diff --git a/packages/components/src/panel/index.js b/packages/components/src/panel/index.js
+deleted file mode 100644
+index 581a8632072c03..00000000000000
+--- a/packages/components/src/panel/index.js
++++ /dev/null
+@@ -1,26 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import PanelHeader from './header';
+-
+-function Panel( { header, className, children }, ref ) {
+-	const classNames = classnames( className, 'components-panel' );
+-	return (
+-		<div className={ classNames } ref={ ref }>
+-			{ header && <PanelHeader label={ header } /> }
+-			{ children }
+-		</div>
+-	);
+-}
+-
+-export default forwardRef( Panel );
+diff --git a/packages/components/src/panel/index.tsx b/packages/components/src/panel/index.tsx
+new file mode 100644
+index 00000000000000..aa15d043647ec4
+--- /dev/null
++++ b/packages/components/src/panel/index.tsx
+@@ -0,0 +1,48 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import PanelHeader from './header';
++import type { PanelProps } from './types';
++
++function UnforwardedPanel(
++	{ header, className, children }: PanelProps,
++	ref: React.ForwardedRef< HTMLDivElement >
++) {
++	const classNames = classnames( className, 'components-panel' );
++	return (
++		<div className={ classNames } ref={ ref }>
++			{ header && <PanelHeader label={ header } /> }
++			{ children }
++		</div>
++	);
++}
++
++/**
++ * `Panel` expands and collapses multiple sections of content.
++ *
++ * ```jsx
++ * import { Panel, PanelBody, PanelRow } from '@wordpress/components';
++ * import { more } from '@wordpress/icons';
++ *
++ * const MyPanel = () => (
++ * 	<Panel header="My Panel">
++ * 		<PanelBody title="My Block Settings" icon={ more } initialOpen={ true }>
++ * 			<PanelRow>My Panel Inputs and Labels</PanelRow>
++ * 		</PanelBody>
++ * 	</Panel>
++ * );
++ * ```
++ */
++export const Panel = forwardRef( UnforwardedPanel );
++
++export default Panel;
+diff --git a/packages/components/src/panel/row.js b/packages/components/src/panel/row.js
+deleted file mode 100644
+index 353c19302194b7..00000000000000
+--- a/packages/components/src/panel/row.js
++++ /dev/null
+@@ -1,20 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-
+-const PanelRow = ( { className, children }, ref ) => (
+-	<div
+-		className={ classnames( 'components-panel__row', className ) }
+-		ref={ ref }
+-	>
+-		{ children }
+-	</div>
+-);
+-
+-export default forwardRef( PanelRow );
+diff --git a/packages/components/src/panel/row.tsx b/packages/components/src/panel/row.tsx
+new file mode 100644
+index 00000000000000..72f0e392e90b04
+--- /dev/null
++++ b/packages/components/src/panel/row.tsx
+@@ -0,0 +1,37 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++import type { ForwardedRef } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { PanelRowProps } from './types';
++
++function UnforwardedPanelRow(
++	{ className, children }: PanelRowProps,
++	ref: ForwardedRef< HTMLDivElement >
++) {
++	return (
++		<div
++			className={ classnames( 'components-panel__row', className ) }
++			ref={ ref }
++		>
++			{ children }
++		</div>
++	);
++}
++
++/**
++ * `PanelRow` is a generic container for rows within a `PanelBody`.
++ * It is a flex container with a top margin for spacing.
++ */
++export const PanelRow = forwardRef( UnforwardedPanelRow );
++
++export default PanelRow;
+diff --git a/packages/components/src/panel/stories/index.js b/packages/components/src/panel/stories/index.js
+index d7af2fc718c6c6..29dab9b293bed3 100644
+--- a/packages/components/src/panel/stories/index.js
++++ b/packages/components/src/panel/stories/index.js
+@@ -4,6 +4,7 @@
+ import Panel from '../';
+ import PanelRow from '../row';
+ import PanelBody from '../body';
++import InputControl from '../../input-control';
+ 
+ /**
+  * WordPress dependencies
+@@ -56,6 +57,27 @@ Default.args = {
+ 	),
+ };
+ 
++/**
++ * `PanelRow` is a generic container for rows within a `PanelBody`.
++ * It is a flex container with a top margin for spacing.
++ */
++export const _PanelRow = Template.bind( {} );
++_PanelRow.args = {
++	children: (
++		<PanelBody title="My Profile">
++			<PanelRow>
++				<InputControl label="First name" />
++				<InputControl label="Last name" />
++			</PanelRow>
++			<PanelRow>
++				<div style={ { flex: 1 } }>
++					<InputControl label="Email" />
++				</div>
++			</PanelRow>
++		</PanelBody>
++	),
++};
++
+ export const DisabledSection = Template.bind( {} );
+ DisabledSection.args = {
+ 	...Default.args,
+diff --git a/packages/components/src/panel/test/__snapshots__/header.js.snap b/packages/components/src/panel/test/__snapshots__/header.tsx.snap
+similarity index 100%
+rename from packages/components/src/panel/test/__snapshots__/header.js.snap
+rename to packages/components/src/panel/test/__snapshots__/header.tsx.snap
+diff --git a/packages/components/src/panel/test/__snapshots__/index.js.snap b/packages/components/src/panel/test/__snapshots__/index.tsx.snap
+similarity index 100%
+rename from packages/components/src/panel/test/__snapshots__/index.js.snap
+rename to packages/components/src/panel/test/__snapshots__/index.tsx.snap
+diff --git a/packages/components/src/panel/test/__snapshots__/row.js.snap b/packages/components/src/panel/test/__snapshots__/row.tsx.snap
+similarity index 100%
+rename from packages/components/src/panel/test/__snapshots__/row.js.snap
+rename to packages/components/src/panel/test/__snapshots__/row.tsx.snap
+diff --git a/packages/components/src/panel/test/header.js b/packages/components/src/panel/test/header.tsx
+similarity index 97%
+rename from packages/components/src/panel/test/header.js
+rename to packages/components/src/panel/test/header.tsx
+index 0179012e00242e..8f93eb44b074c4 100644
+--- a/packages/components/src/panel/test/header.js
++++ b/packages/components/src/panel/test/header.tsx
+@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import PanelHeader from '../header.js';
++import PanelHeader from '../header';
+ 
+ describe( 'PanelHeader', () => {
+ 	describe( 'basic rendering', () => {
+diff --git a/packages/components/src/panel/test/index.js b/packages/components/src/panel/test/index.tsx
+similarity index 85%
+rename from packages/components/src/panel/test/index.js
+rename to packages/components/src/panel/test/index.tsx
+index 4247af577ca568..a48c88c36cb50d 100644
+--- a/packages/components/src/panel/test/index.js
++++ b/packages/components/src/panel/test/index.tsx
+@@ -6,18 +6,18 @@ import { render, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import Panel from '../';
++import Panel from '..';
+ 
+ describe( 'Panel', () => {
+ 	describe( 'basic rendering', () => {
+ 		it( 'should render an empty div without any provided props', () => {
+-			const { container } = render( <Panel /> );
++			const { container } = render( <Panel children={ null } /> );
+ 
+ 			expect( container ).toMatchSnapshot();
+ 		} );
+ 
+ 		it( 'should render a heading when provided text in the header prop', () => {
+-			render( <Panel header="Header Label" /> );
++			render( <Panel header="Header Label" children={ null } /> );
+ 
+ 			const heading = screen.getByRole( 'heading' );
+ 			expect( heading ).toBeVisible();
+@@ -25,7 +25,9 @@ describe( 'Panel', () => {
+ 		} );
+ 
+ 		it( 'should render an additional className', () => {
+-			const { container } = render( <Panel className="the-panel" /> );
++			const { container } = render(
++				<Panel className="the-panel" children={ null } />
++			);
+ 
+ 			expect( container ).toMatchSnapshot();
+ 		} );
+diff --git a/packages/components/src/panel/test/row.js b/packages/components/src/panel/test/row.tsx
+similarity index 80%
+rename from packages/components/src/panel/test/row.js
+rename to packages/components/src/panel/test/row.tsx
+index 2dbf09782e70fb..ee052e78dfd512 100644
+--- a/packages/components/src/panel/test/row.js
++++ b/packages/components/src/panel/test/row.tsx
+@@ -10,13 +10,15 @@ import PanelRow from '../row';
+ 
+ describe( 'PanelRow', () => {
+ 	it( 'should render with the default class name', () => {
+-		const { container } = render( <PanelRow /> );
++		const { container } = render( <PanelRow children={ null } /> );
+ 
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ 
+ 	it( 'should render with the custom class name', () => {
+-		const { container } = render( <PanelRow className="custom" /> );
++		const { container } = render(
++			<PanelRow className="custom" children={ null } />
++		);
+ 
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+diff --git a/packages/components/src/panel/types.ts b/packages/components/src/panel/types.ts
+new file mode 100644
+index 00000000000000..fe41ad378d62bb
+--- /dev/null
++++ b/packages/components/src/panel/types.ts
+@@ -0,0 +1,38 @@
++export type PanelProps = {
++	/**
++	 * The text that will be rendered as the title of the panel.
++	 * Text will be rendered inside an `<h2>` tag.
++	 */
++	header?: PanelHeaderProps[ 'label' ];
++	/**
++	 * The CSS class to apply to the wrapper element.
++	 */
++	className?: string;
++	/**
++	 * The content to display within the panel.
++	 */
++	children: React.ReactNode;
++};
++
++export type PanelHeaderProps = {
++	/**
++	 * The text that will be rendered as the title of the panel.
++	 * Will be rendered in an `<h2>` tag.
++	 */
++	label?: string;
++	/**
++	 * The content to display within the panel header.
++	 */
++	children?: React.ReactNode;
++};
++
++export type PanelRowProps = {
++	/**
++	 * The CSS class to apply to the wrapper element.
++	 */
++	className?: string;
++	/**
++	 * The content to display within the panel row.
++	 */
++	children: React.ReactNode;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 85525c25b6d1e9..5ae3fd611935fa 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -58,7 +58,7 @@
+ 		"src/menu-items-choice",
+ 		"src/navigation",
+ 		"src/palette-edit",
+-		"src/panel",
++		"src/panel/body.js",
+ 		"src/toolbar",
+ 		"src/tree-grid"
+ 	]

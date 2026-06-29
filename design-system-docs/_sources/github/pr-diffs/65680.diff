@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 94633ec7078108..73f005b653841a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ -   `MenuGroup`: Simplify the MenuGroup styles within dropdown menus. ([#65561](https://github.com/WordPress/gutenberg/pull/65561)).
+ -   `DatePicker`: Use compact button size. ([#65653](https://github.com/WordPress/gutenberg/pull/65653)).
+ -   `Navigator`: add support for exit animation ([#64777](https://github.com/WordPress/gutenberg/pull/64777)).
++-   `Guide`: Update finish button to use the new default size ([#65680](https://github.com/WordPress/gutenberg/pull/65680)).
+ 
+ ## 28.8.0 (2024-09-19)
+ 
+diff --git a/packages/components/src/guide/index.tsx b/packages/components/src/guide/index.tsx
+index 0ca5957fd3a656..121c9f22330e88 100644
+--- a/packages/components/src/guide/index.tsx
++++ b/packages/components/src/guide/index.tsx
+@@ -164,6 +164,7 @@ function Guide( {
+ 							className="components-guide__finish-button"
+ 							variant="primary"
+ 							onClick={ onFinish }
++							__next40pxDefaultSize
+ 						>
+ 							{ finishButtonText }
+ 						</Button>

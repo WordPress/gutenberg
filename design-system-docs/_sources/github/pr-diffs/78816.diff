@@ -1,0 +1,743 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 91030a40ee0ed3..19239e090fdee1 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### New Features
+ 
+ -   Add `--wpds-border-radius-xl` for page and app shell surfaces so nested cards and notices can stay on `--wpds-border-radius-lg` without matching the parent radius ([#78913](https://github.com/WordPress/gutenberg/pull/78913)).
++-   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `subtle`, `moderate`, `pronounced`) via prebuilt design token modes. [#78816](https://github.com/WordPress/gutenberg/pull/78816).
+ 
+ ## 0.15.0 (2026-06-10)
+ 
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index dcc32bb4b622aa..1578b47fb52305 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -104,7 +104,9 @@ The `cursor` prop accepts an object with the following optional properties:
+ 
+ -   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
+ 
+-When the `color` or `cursor` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
++The `cornerRadius` prop sets the overall roundness preset for the theme subtree. Accepts `'none'` (square corners), `'subtle'`, `'moderate'`, or `'pronounced'` (most rounded) (default: `'subtle'`). This scales the primitive `--wpds-border-radius-*` tokens for the provider subtree. The preset sets the overall amount of roundness, not an individual border-radius token size.
++
++When the `color`, `cursor`, or `cornerRadius` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+ 
+ ### Nesting Providers
+ 
+diff --git a/packages/theme/src/context.ts b/packages/theme/src/context.ts
+index 2193f3fbe85336..0c3a8aaac2f589 100644
+--- a/packages/theme/src/context.ts
++++ b/packages/theme/src/context.ts
+@@ -9,5 +9,6 @@ export const ThemeContext = createContext< ThemeContextType >( {
+ 	resolvedSettings: {
+ 		color: {},
+ 		cursor: undefined,
++		cornerRadius: undefined,
+ 	},
+ } );
+diff --git a/packages/theme/src/index.ts b/packages/theme/src/index.ts
+index bbb188438895fb..638fa24da3870e 100644
+--- a/packages/theme/src/index.ts
++++ b/packages/theme/src/index.ts
+@@ -1,3 +1,4 @@
+ export { privateApis } from './private-apis';
+ export type * from './prebuilt/ts/token-types';
+ export { type ThemeProvider } from './theme-provider';
++export type { CornerRadiusPreset } from './types';
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index f3b07dfe9c27f2..0414897e8eb655 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -333,3 +333,55 @@
+ 		--wpds-border-width-focus: 1.5px;
+ 	}
+ }
++
++[data-wpds-corner-radius='none'] {
++	/* Buttons and other elements nested inside controls. */
++	--wpds-border-radius-xs: 0;
++	/* Standalone buttons, inputs, and compact controls. */
++	--wpds-border-radius-sm: 0;
++	/* Menus, popovers, and other small portaled overlays. */
++	--wpds-border-radius-md: 0;
++	/* Cards, dialogs, notices, and other larger content containers. */
++	--wpds-border-radius-lg: 0;
++	/* Page and app shell surfaces. */
++	--wpds-border-radius-xl: 0;
++}
++
++[data-wpds-corner-radius='subtle'] {
++	/* Buttons and other elements nested inside controls. */
++	--wpds-border-radius-xs: 1px;
++	/* Standalone buttons, inputs, and compact controls. */
++	--wpds-border-radius-sm: 2px;
++	/* Menus, popovers, and other small portaled overlays. */
++	--wpds-border-radius-md: 4px;
++	/* Cards, dialogs, notices, and other larger content containers. */
++	--wpds-border-radius-lg: 8px;
++	/* Page and app shell surfaces. */
++	--wpds-border-radius-xl: 12px;
++}
++
++[data-wpds-corner-radius='moderate'] {
++	/* Buttons and other elements nested inside controls. */
++	--wpds-border-radius-xs: 6px;
++	/* Standalone buttons, inputs, and compact controls. */
++	--wpds-border-radius-sm: 8px;
++	/* Menus, popovers, and other small portaled overlays. */
++	--wpds-border-radius-md: 12px;
++	/* Cards, dialogs, notices, and other larger content containers. */
++	--wpds-border-radius-lg: 16px;
++	/* Page and app shell surfaces. */
++	--wpds-border-radius-xl: 20px;
++}
++
++[data-wpds-corner-radius='pronounced'] {
++	/* Buttons and other elements nested inside controls. */
++	--wpds-border-radius-xs: 18px;
++	/* Standalone buttons, inputs, and compact controls. */
++	--wpds-border-radius-sm: 20px;
++	/* Menus, popovers, and other small portaled overlays. */
++	--wpds-border-radius-md: 22px;
++	/* Cards, dialogs, notices, and other larger content containers. */
++	--wpds-border-radius-lg: 24px;
++	/* Page and app shell surfaces. */
++	--wpds-border-radius-xl: 26px;
++}
+diff --git a/packages/theme/src/theme-provider.tsx b/packages/theme/src/theme-provider.tsx
+index 9fbfb7607b842b..d034cbf24b4979 100644
+--- a/packages/theme/src/theme-provider.tsx
++++ b/packages/theme/src/theme-provider.tsx
+@@ -38,6 +38,7 @@ export const ThemeProvider = ( {
+ 	children,
+ 	color = {},
+ 	cursor,
++	cornerRadius,
+ 	isRoot = false,
+ }: ThemeProviderProps ) => {
+ 	const instanceId = useId();
+@@ -45,8 +46,11 @@ export const ThemeProvider = ( {
+ 	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
+ 		color,
+ 		cursor,
++		cornerRadius,
+ 	} );
+ 
++	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';
++
+ 	const contextValue = useMemo(
+ 		() => ( {
+ 			resolvedSettings,
+@@ -67,6 +71,7 @@ export const ThemeProvider = ( {
+ 			<div
+ 				data-wpds-theme-provider-id={ instanceId }
+ 				data-wpds-root-provider={ isRoot }
++				data-wpds-corner-radius={ cornerRadiusPreset }
+ 				className={ styles.root }
+ 			>
+ 				<ThemeContext.Provider value={ contextValue }>
+diff --git a/packages/theme/src/types.ts b/packages/theme/src/types.ts
+index edaf1e205bff85..064ed43f170f20 100644
+--- a/packages/theme/src/types.ts
++++ b/packages/theme/src/types.ts
+@@ -1,5 +1,7 @@
+ import { type ReactNode } from 'react';
+ 
++export type CornerRadiusPreset = 'none' | 'subtle' | 'moderate' | 'pronounced';
++
+ export interface ThemeProviderSettings {
+ 	/**
+ 	 * The set of color options to apply to the theme.
+@@ -36,6 +38,19 @@ export interface ThemeProviderSettings {
+ 		 */
+ 		control?: 'default' | 'pointer';
+ 	};
++
++	/**
++	 * Overall roundness preset for the theme subtree: `none` (square corners),
++	 * `subtle`, `moderate`, or `pronounced` (most rounded).
++	 *
++	 * This scales the individual `--wpds-border-radius-*` token sizes for the
++	 * subtree; it sets the overall amount of roundness, not a single token
++	 * size.
++	 *
++	 * By default, it inherits from the parent `ThemeProvider`,
++	 * and falls back to the prebuilt default (`subtle`).
++	 */
++	cornerRadius?: CornerRadiusPreset;
+ }
+ 
+ export interface ThemeProviderProps extends ThemeProviderSettings {
+diff --git a/packages/theme/src/use-theme-provider-styles.ts b/packages/theme/src/use-theme-provider-styles.ts
+index 22037bb31c18db..982585ee6e63a7 100644
+--- a/packages/theme/src/use-theme-provider-styles.ts
++++ b/packages/theme/src/use-theme-provider-styles.ts
+@@ -161,9 +161,11 @@ function generateStyles( {
+ export function useThemeProviderStyles( {
+ 	color = {},
+ 	cursor,
++	cornerRadius,
+ }: {
+ 	color?: ThemeProviderProps[ 'color' ];
+ 	cursor?: ThemeProviderProps[ 'cursor' ];
++	cornerRadius?: ThemeProviderProps[ 'cornerRadius' ];
+ } = {} ) {
+ 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
+ 
+@@ -180,6 +182,8 @@ export function useThemeProviderStyles( {
+ 		inheritedSettings.color?.background ??
+ 		DEFAULT_SEED_COLORS.background;
+ 	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
++	const cornerRadiusPreset =
++		cornerRadius ?? inheritedSettings.cornerRadius ?? 'subtle';
+ 
+ 	const resolvedSettings = useMemo(
+ 		() => ( {
+@@ -188,8 +192,9 @@ export function useThemeProviderStyles( {
+ 				background,
+ 			},
+ 			cursor: cursorControl ? { control: cursorControl } : undefined,
++			cornerRadius: cornerRadiusPreset,
+ 		} ),
+-		[ primary, background, cursorControl ]
++		[ primary, background, cursorControl, cornerRadiusPreset ]
+ 	);
+ 
+ 	const colorStyles = useMemo( () => {
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index 1faa38185a7513..5ff0ed7f6fa6bf 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -69,6 +69,22 @@ const config: Config = {
+ 						'@media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi )',
+ 					],
+ 				},
++				{
++					mode: 'corner-radius-none',
++					selectors: [ '[data-wpds-corner-radius="none"]' ],
++				},
++				{
++					mode: 'corner-radius-subtle',
++					selectors: [ '[data-wpds-corner-radius="subtle"]' ],
++				},
++				{
++					mode: 'corner-radius-moderate',
++					selectors: [ '[data-wpds-corner-radius="moderate"]' ],
++				},
++				{
++					mode: 'corner-radius-pronounced',
++					selectors: [ '[data-wpds-corner-radius="pronounced"]' ],
++				},
+ 			],
+ 			legacyHex: true,
+ 		} ),
+diff --git a/packages/theme/tokens/border.json b/packages/theme/tokens/border.json
+index c9065e9647acc3..3354a8a9f48766 100644
+--- a/packages/theme/tokens/border.json
++++ b/packages/theme/tokens/border.json
+@@ -5,23 +5,83 @@
+ 			"$description": "Border radius scale for elegant hierarchical nesting. Outer surfaces use larger steps; nested elements use smaller ones so concentric corners stay visually harmonious.",
+ 			"xs": {
+ 				"$value": { "value": 1, "unit": "px" },
+-				"$description": "Buttons and other elements nested inside controls."
++				"$description": "Buttons and other elements nested inside controls.",
++				"$extensions": {
++					"mode": {
++						"corner-radius-none": { "value": 0, "unit": "px" },
++						"corner-radius-subtle": { "value": 1, "unit": "px" },
++						"corner-radius-moderate": { "value": 6, "unit": "px" },
++						"corner-radius-pronounced": {
++							"value": 18,
++							"unit": "px"
++						}
++					},
++					"com.figma.scopes": [ "CORNER_RADIUS" ]
++				}
+ 			},
+ 			"sm": {
+ 				"$value": { "value": 2, "unit": "px" },
+-				"$description": "Standalone buttons, inputs, and compact controls."
++				"$description": "Standalone buttons, inputs, and compact controls.",
++				"$extensions": {
++					"mode": {
++						"corner-radius-none": { "value": 0, "unit": "px" },
++						"corner-radius-subtle": { "value": 2, "unit": "px" },
++						"corner-radius-moderate": { "value": 8, "unit": "px" },
++						"corner-radius-pronounced": {
++							"value": 20,
++							"unit": "px"
++						}
++					},
++					"com.figma.scopes": [ "CORNER_RADIUS" ]
++				}
+ 			},
+ 			"md": {
+ 				"$value": { "value": 4, "unit": "px" },
+-				"$description": "Menus, popovers, and other small portaled overlays."
++				"$description": "Menus, popovers, and other small portaled overlays.",
++				"$extensions": {
++					"mode": {
++						"corner-radius-none": { "value": 0, "unit": "px" },
++						"corner-radius-subtle": { "value": 4, "unit": "px" },
++						"corner-radius-moderate": { "value": 12, "unit": "px" },
++						"corner-radius-pronounced": {
++							"value": 22,
++							"unit": "px"
++						}
++					},
++					"com.figma.scopes": [ "CORNER_RADIUS" ]
++				}
+ 			},
+ 			"lg": {
+ 				"$value": { "value": 8, "unit": "px" },
+-				"$description": "Cards, dialogs, notices, and other larger content containers."
++				"$description": "Cards, dialogs, notices, and other larger content containers.",
++				"$extensions": {
++					"mode": {
++						"corner-radius-none": { "value": 0, "unit": "px" },
++						"corner-radius-subtle": { "value": 8, "unit": "px" },
++						"corner-radius-moderate": { "value": 16, "unit": "px" },
++						"corner-radius-pronounced": {
++							"value": 24,
++							"unit": "px"
++						}
++					},
++					"com.figma.scopes": [ "CORNER_RADIUS" ]
++				}
+ 			},
+ 			"xl": {
+ 				"$value": { "value": 12, "unit": "px" },
+-				"$description": "Page and app shell surfaces."
++				"$description": "Page and app shell surfaces.",
++				"$extensions": {
++					"mode": {
++						"corner-radius-none": { "value": 0, "unit": "px" },
++						"corner-radius-subtle": { "value": 12, "unit": "px" },
++						"corner-radius-moderate": { "value": 20, "unit": "px" },
++						"corner-radius-pronounced": {
++							"value": 26,
++							"unit": "px"
++						}
++					},
++					"com.figma.scopes": [ "CORNER_RADIUS" ]
++				}
+ 			},
+ 			"$extensions": {
+ 				"com.figma.scopes": [ "CORNER_RADIUS" ]
+diff --git a/packages/theme/tokens/modes/border.corner-radius-moderate.json b/packages/theme/tokens/modes/border.corner-radius-moderate.json
+new file mode 100644
+index 00000000000000..c0741b4692bef3
+--- /dev/null
++++ b/packages/theme/tokens/modes/border.corner-radius-moderate.json
+@@ -0,0 +1,41 @@
++{
++	"wpds-border": {
++		"radius": {
++			"xs": {
++				"$type": "dimension",
++				"$value": {
++					"value": 6,
++					"unit": "px"
++				}
++			},
++			"sm": {
++				"$type": "dimension",
++				"$value": {
++					"value": 8,
++					"unit": "px"
++				}
++			},
++			"md": {
++				"$type": "dimension",
++				"$value": {
++					"value": 12,
++					"unit": "px"
++				}
++			},
++			"lg": {
++				"$type": "dimension",
++				"$value": {
++					"value": 16,
++					"unit": "px"
++				}
++			},
++			"xl": {
++				"$type": "dimension",
++				"$value": {
++					"value": 20,
++					"unit": "px"
++				}
++			}
++		}
++	}
++}
+diff --git a/packages/theme/tokens/modes/border.corner-radius-none.json b/packages/theme/tokens/modes/border.corner-radius-none.json
+new file mode 100644
+index 00000000000000..e9ca244f299828
+--- /dev/null
++++ b/packages/theme/tokens/modes/border.corner-radius-none.json
+@@ -0,0 +1,41 @@
++{
++	"wpds-border": {
++		"radius": {
++			"xs": {
++				"$type": "dimension",
++				"$value": {
++					"value": 0,
++					"unit": "px"
++				}
++			},
++			"sm": {
++				"$type": "dimension",
++				"$value": {
++					"value": 0,
++					"unit": "px"
++				}
++			},
++			"md": {
++				"$type": "dimension",
++				"$value": {
++					"value": 0,
++					"unit": "px"
++				}
++			},
++			"lg": {
++				"$type": "dimension",
++				"$value": {
++					"value": 0,
++					"unit": "px"
++				}
++			},
++			"xl": {
++				"$type": "dimension",
++				"$value": {
++					"value": 0,
++					"unit": "px"
++				}
++			}
++		}
++	}
++}
+diff --git a/packages/theme/tokens/modes/border.corner-radius-pronounced.json b/packages/theme/tokens/modes/border.corner-radius-pronounced.json
+new file mode 100644
+index 00000000000000..0a0ccdabed33d8
+--- /dev/null
++++ b/packages/theme/tokens/modes/border.corner-radius-pronounced.json
+@@ -0,0 +1,41 @@
++{
++	"wpds-border": {
++		"radius": {
++			"xs": {
++				"$type": "dimension",
++				"$value": {
++					"value": 18,
++					"unit": "px"
++				}
++			},
++			"sm": {
++				"$type": "dimension",
++				"$value": {
++					"value": 20,
++					"unit": "px"
++				}
++			},
++			"md": {
++				"$type": "dimension",
++				"$value": {
++					"value": 22,
++					"unit": "px"
++				}
++			},
++			"lg": {
++				"$type": "dimension",
++				"$value": {
++					"value": 24,
++					"unit": "px"
++				}
++			},
++			"xl": {
++				"$type": "dimension",
++				"$value": {
++					"value": 26,
++					"unit": "px"
++				}
++			}
++		}
++	}
++}
+diff --git a/packages/theme/tokens/modes/border.corner-radius-subtle.json b/packages/theme/tokens/modes/border.corner-radius-subtle.json
+new file mode 100644
+index 00000000000000..4e1b6156aafcf3
+--- /dev/null
++++ b/packages/theme/tokens/modes/border.corner-radius-subtle.json
+@@ -0,0 +1,41 @@
++{
++	"wpds-border": {
++		"radius": {
++			"xs": {
++				"$type": "dimension",
++				"$value": {
++					"value": 1,
++					"unit": "px"
++				}
++			},
++			"sm": {
++				"$type": "dimension",
++				"$value": {
++					"value": 2,
++					"unit": "px"
++				}
++			},
++			"md": {
++				"$type": "dimension",
++				"$value": {
++					"value": 4,
++					"unit": "px"
++				}
++			},
++			"lg": {
++				"$type": "dimension",
++				"$value": {
++					"value": 8,
++					"unit": "px"
++				}
++			},
++			"xl": {
++				"$type": "dimension",
++				"$value": {
++					"value": 12,
++					"unit": "px"
++				}
++			}
++		}
++	}
++}
+diff --git a/storybook/addons/design-system-theme/manager.ts b/storybook/addons/design-system-theme/manager.ts
+index 909bd77f69b2c5..595eea861ef82c 100644
+--- a/storybook/addons/design-system-theme/manager.ts
++++ b/storybook/addons/design-system-theme/manager.ts
+@@ -33,6 +33,14 @@ const CURSOR_CONTROL_OPTIONS: ThemeOption[] = [
+ 	{ id: 'pointer', title: 'Pointer' },
+ ];
+ 
++const CORNER_RADIUS_OPTIONS: ThemeOption[] = [
++	{ id: '', title: 'Default' },
++	{ id: 'none', title: 'None' },
++	{ id: 'subtle', title: 'Subtle' },
++	{ id: 'moderate', title: 'Moderate' },
++	{ id: 'pronounced', title: 'Pronounced' },
++];
++
+ function ThemeTooltipMessage( {
+ 	title,
+ 	globalName,
+@@ -69,6 +77,11 @@ const ThemeTool = () => {
+ 			title: 'Cursor control',
+ 			globalName: 'dsCursorControl',
+ 			options: CURSOR_CONTROL_OPTIONS,
++		} ),
++		createElement( ThemeTooltipMessage, {
++			title: 'Corner radius',
++			globalName: 'dsCornerRadius',
++			options: CORNER_RADIUS_OPTIONS,
+ 		} )
+ 	);
+ 
+diff --git a/storybook/decorators/with-design-system-theme.tsx b/storybook/decorators/with-design-system-theme.tsx
+index 277523e6b47307..d4fdf761699f3b 100644
+--- a/storybook/decorators/with-design-system-theme.tsx
++++ b/storybook/decorators/with-design-system-theme.tsx
+@@ -1,3 +1,4 @@
++import type { CornerRadiusPreset } from '@wordpress/theme';
+ import { privateApis as themeApis } from '@wordpress/theme';
+ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+ import type { StoryContext } from 'storybook/internal/types';
+@@ -30,6 +31,8 @@ export function WithDesignSystemTheme(
+ 
+ 	const colorTheme = context.globals.dsColorTheme;
+ 	const cursorControl = context.globals.dsCursorControl || undefined;
++	const cornerRadiusPreset =
++		( context.globals.dsCornerRadius as CornerRadiusPreset ) || undefined;
+ 
+ 	let color;
+ 	if ( colorTheme === 'dark' ) {
+@@ -40,6 +43,7 @@ export function WithDesignSystemTheme(
+ 		<ThemeProvider
+ 			color={ color }
+ 			cursor={ cursorControl ? { control: cursorControl } : undefined }
++			cornerRadius={ cornerRadiusPreset }
+ 			isRoot
+ 		>
+ 			<div
+diff --git a/storybook/preview.jsx b/storybook/preview.jsx
+index 2b07d27bcc2e21..6cd95e304d4edd 100644
+--- a/storybook/preview.jsx
++++ b/storybook/preview.jsx
+@@ -59,6 +59,7 @@ export const globalTypes = {
+ 	},
+ 	dsColorTheme: {},
+ 	dsCursorControl: {},
++	dsCornerRadius: {},
+ };
+ 
+ export const decorators = [
+diff --git a/storybook/stories/design-system/theme-example-application.story.tsx b/storybook/stories/design-system/theme-example-application.story.tsx
+index 5197ec8772ebf9..0d8f9dd40afc5c 100644
+--- a/storybook/stories/design-system/theme-example-application.story.tsx
++++ b/storybook/stories/design-system/theme-example-application.story.tsx
+@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { Breadcrumbs, Page } from '@wordpress/admin-ui';
+ import { useState } from '@wordpress/element';
+ import { wordpress } from '@wordpress/icons';
++import type { CornerRadiusPreset } from '@wordpress/theme';
+ import { privateApis as themeApis } from '@wordpress/theme';
+ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+ import {
+@@ -9,8 +10,10 @@ import {
+ 	Button,
+ 	Card,
+ 	Icon,
++	InputControl,
+ 	Link,
+ 	Notice,
++	SelectControl,
+ 	Stack,
+ 	Tabs,
+ 	Text,
+@@ -34,6 +37,14 @@ const sidebarNavItems = [
+ 	'Settings',
+ ];
+ 
++const siteLanguageOptions = [
++	{ value: 'en-US', label: 'English (United States)' },
++	{ value: 'en-GB', label: 'English (United Kingdom)' },
++	{ value: 'fr-FR', label: 'Français' },
++	{ value: 'de-DE', label: 'Deutsch' },
++	{ value: 'ja', label: '日本語' },
++];
++
+ const meta: Meta< typeof ThemeProvider > = {
+ 	title: 'Design System/Theme/Theme Provider/Example Application',
+ 	component: ThemeProvider,
+@@ -47,13 +58,15 @@ export default meta;
+ /**
+  * A mock application page demonstrating how `ThemeProvider` affects
+  * `@wordpress/ui` and `@wordpress/admin-ui` components in concert. Use the inline controls to adjust
+- * the `primary` and `background` seed colors, and observe how every surface, text
++ * the `primary` and `background` seed colors, the corner radius preset, and observe how every surface, text
+  * element, and interactive control adapts accordingly.
+  */
+ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
+ 	render: () => {
+ 		const [ primary, setPrimary ] = useState< string | undefined >();
+ 		const [ background, setBackground ] = useState< string | undefined >();
++		const [ cornerRadiusPreset, setCornerRadiusPreset ] =
++			useState< CornerRadiusPreset >( 'subtle' );
+ 
+ 		return (
+ 			<div>
+@@ -101,9 +114,35 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
+ 							}
+ 						/>
+ 					</label>
++					<label
++						style={ {
++							display: 'inline-flex',
++							alignItems: 'center',
++							gap: '6px',
++						} }
++					>
++						Corner radius
++						<select
++							value={ cornerRadiusPreset }
++							onChange={ ( e ) =>
++								setCornerRadiusPreset(
++									e.target.value as typeof cornerRadiusPreset
++								)
++							}
++						>
++							<option value="none">None</option>
++							<option value="subtle">Subtle</option>
++							<option value="moderate">Moderate</option>
++							<option value="pronounced">Pronounced</option>
++						</select>
++					</label>
+ 					{ /* eslint-enable jsx-a11y/label-has-associated-control */ }
+ 				</div>
+-				<ThemeProvider color={ { primary, background } } isRoot>
++				<ThemeProvider
++					color={ { primary, background } }
++					cornerRadius={ cornerRadiusPreset }
++					isRoot
++				>
+ 					<div
+ 						style={ {
+ 							display: 'grid',
+@@ -190,6 +229,7 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
+ 								direction="column"
+ 								gap="lg"
+ 								style={ {
++									width: '100%',
+ 									maxWidth: '640px',
+ 									marginInline: 'auto',
+ 								} }
+@@ -213,22 +253,43 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
+ 										<Stack direction="column" gap="md">
+ 											<Text>
+ 												Configure the basic settings for
+-												your site. You can update your{ ' ' }
+-												<Link href="#">site title</Link>
+-												, tagline, and{ ' ' }
+-												<Link href="#">
+-													admin email address
+-												</Link>{ ' ' }
+-												at any time.
+-											</Text>
+-											<Text>
+-												For more advanced options, visit
+-												the{ ' ' }
+-												<Link href="#">
+-													developer documentation
+-												</Link>
+-												.
++												your site. The fields below
++												adopt the corner radius preset
++												alongside cards, buttons, and
++												other surfaces.
+ 											</Text>
++											<InputControl
++												label="Site title"
++												placeholder="My WordPress site"
++												defaultValue="My WordPress site"
++											/>
++											<InputControl
++												label="Tagline"
++												description="A short phrase shown below the site title."
++												placeholder="Just another WordPress site"
++											/>
++											<InputControl
++												label="Admin email address"
++												type="email"
++												placeholder="you@example.com"
++												defaultValue="admin@example.com"
++											/>
++											<SelectControl
++												label="Site language"
++												description="The default language for the site interface."
++												items={ siteLanguageOptions }
++												defaultValue={
++													siteLanguageOptions[ 0 ]
++												}
++											/>
++											<Stack
++												direction="row"
++												style={ {
++													justifyContent: 'flex-end',
++												} }
++											>
++												<Button>Save</Button>
++											</Stack>
+ 										</Stack>
+ 									</Card.Content>
+ 								</Card.Root>

@@ -1,0 +1,51 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e8beb4717d1e00..09daedac2822f3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ -   `Truncate`: improve handling of non-string `children` ([#57261](https://github.com/WordPress/gutenberg/pull/57261)).
+ -   `PaletteEdit`: Don't discard colors with default name and slug ([#54332](https://github.com/WordPress/gutenberg/pull/54332)).
+ -   `RadioControl`: Fully encapsulate styles ([#57347](https://github.com/WordPress/gutenberg/pull/57347)).
++-   `DuotonePicker`: Remove top margin when no duotone options ([#57489](https://github.com/WordPress/gutenberg/pull/57489)).
+ -   `Snackbar`: Fix icon positioning ([#57377](https://github.com/WordPress/gutenberg/pull/57377)).
+ -   `GradientPicker`: Use slug while iterating over gradient entries to avoid React "duplicated key" warning ([#57361](https://github.com/WordPress/gutenberg/pull/57361)).
+ -   `NavigatorProvider`: Exclude `size` value from `contain` CSS rule ([#57498](https://github.com/WordPress/gutenberg/pull/57498)).
+diff --git a/packages/components/src/duotone-picker/duotone-picker.tsx b/packages/components/src/duotone-picker/duotone-picker.tsx
+index 759c517b4759e1..ee54c9cdf4235e 100644
+--- a/packages/components/src/duotone-picker/duotone-picker.tsx
++++ b/packages/components/src/duotone-picker/duotone-picker.tsx
+@@ -91,7 +91,7 @@ function DuotonePicker( {
+ 		/>
+ 	);
+ 
+-	const options = duotonePalette.map( ( { colors, slug, name } ) => {
++	const duotoneOptions = duotonePalette.map( ( { colors, slug, name } ) => {
+ 		const style = {
+ 			background: getGradientFromCSSColors( colors, '135deg' ),
+ 			color: 'transparent',
+@@ -155,11 +155,15 @@ function DuotonePicker( {
+ 		}
+ 	}
+ 
++	const options = unsetable
++		? [ unsetOption, ...duotoneOptions ]
++		: duotoneOptions;
++
+ 	return (
+ 		<CircularOptionPicker
+ 			{ ...otherProps }
+ 			{ ...metaProps }
+-			options={ unsetable ? [ unsetOption, ...options ] : options }
++			options={ options }
+ 			actions={
+ 				!! clearable && (
+ 					<CircularOptionPicker.ButtonAction
+@@ -170,7 +174,7 @@ function DuotonePicker( {
+ 				)
+ 			}
+ 		>
+-			<Spacer paddingTop={ 4 }>
++			<Spacer paddingTop={ options.length === 0 ? 0 : 4 }>
+ 				<VStack spacing={ 3 }>
+ 					{ ! disableCustomColors && ! disableCustomDuotone && (
+ 						<CustomDuotoneBar

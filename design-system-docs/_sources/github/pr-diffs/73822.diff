@@ -1,0 +1,3247 @@
+diff --git a/.github/setup-node/action.yml b/.github/setup-node/action.yml
+index 2b07a1453c05dc..4645603e910f6c 100644
+--- a/.github/setup-node/action.yml
++++ b/.github/setup-node/action.yml
+@@ -28,7 +28,7 @@ runs:
+           uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+           with:
+               path: '**/node_modules'
+-              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
++              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
+ 
+         - name: Install npm dependencies
+           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
+diff --git a/packages/a11y/package.json b/packages/a11y/package.json
+index b2d2f552f12a91..1e450e9dcd0e58 100644
+--- a/packages/a11y/package.json
++++ b/packages/a11y/package.json
+@@ -24,13 +24,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/abilities/package.json b/packages/abilities/package.json
+index 39666a728b5eb4..c0beb1aaddc629 100644
+--- a/packages/abilities/package.json
++++ b/packages/abilities/package.json
+@@ -24,19 +24,20 @@
+ 		"npm": ">=8.19.2"
+ 	},
+ 	"files": [
++		"src",
+ 		"build",
+ 		"build-module",
+ 		"build-types",
+-		"src",
+ 		"*.md"
+ 	],
+-	"main": "build/index.js",
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/admin-ui/package.json b/packages/admin-ui/package.json
+index 8dac345c1b23bf..24698997615d1e 100644
+--- a/packages/admin-ui/package.json
++++ b/packages/admin-ui/package.json
+@@ -22,13 +22,22 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+ 		"./build-style/": "./build-style/"
+diff --git a/packages/annotations/package.json b/packages/annotations/package.json
+index 182ba3a9744e93..0c448857183fd9 100644
+--- a/packages/annotations/package.json
++++ b/packages/annotations/package.json
+@@ -22,12 +22,20 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/api-fetch/package.json b/packages/api-fetch/package.json
+index d9e6936dd8f8fb..d0f429969299fe 100644
+--- a/packages/api-fetch/package.json
++++ b/packages/api-fetch/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/api-fetch/src/index.ts b/packages/api-fetch/src/index.ts
+index 46363ddcbca0fd..4924507b490dcb 100644
+--- a/packages/api-fetch/src/index.ts
++++ b/packages/api-fetch/src/index.ts
+@@ -205,4 +205,4 @@ apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
+ apiFetch.createThemePreviewMiddleware = createThemePreviewMiddleware;
+ 
+ export default apiFetch;
+-export * from './types';
++export type * from './types';
+diff --git a/packages/asset-loader/package.json b/packages/asset-loader/package.json
+index 505f661e0a99c7..31552328e39c45 100644
+--- a/packages/asset-loader/package.json
++++ b/packages/asset-loader/package.json
+@@ -25,13 +25,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"default": "./build/index.js"
++			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/autop/package.json b/packages/autop/package.json
+index 1ab71fca9ee8aa..bd1b858fc56436 100644
+--- a/packages/autop/package.json
++++ b/packages/autop/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/blob/package.json b/packages/blob/package.json
+index 508d38ffcbe7a6..3a34440e403ced 100644
+--- a/packages/blob/package.json
++++ b/packages/blob/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/block-directory/package.json b/packages/block-directory/package.json
+index ca580d0640ba5e..6a771506b9c113 100644
+--- a/packages/block-directory/package.json
++++ b/packages/block-directory/package.json
+@@ -22,12 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/block-editor/package.json b/packages/block-editor/package.json
+index 4453377e320e0b..010a9ced57f3da 100644
+--- a/packages/block-editor/package.json
++++ b/packages/block-editor/package.json
+@@ -23,12 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+ 		"./build-style/": "./build-style/"
+@@ -44,8 +53,8 @@
+ 		"src/index.js",
+ 		"src/store/index.js",
+ 		"src/hooks/**",
+-		"build/index.js",
+-		"build/store/index.js",
++		"build/index.cjs",
++		"build/store/index.cjs",
+ 		"build/hooks/**",
+ 		"build-module/index.js",
+ 		"build-module/store/index.js",
+diff --git a/packages/block-editor/src/components/inner-blocks/use-nested-settings-update.js b/packages/block-editor/src/components/inner-blocks/use-nested-settings-update.js
+index bc07a5a1829e2b..942c78977fca69 100644
+--- a/packages/block-editor/src/components/inner-blocks/use-nested-settings-update.js
++++ b/packages/block-editor/src/components/inner-blocks/use-nested-settings-update.js
+@@ -4,7 +4,7 @@
+ import { useLayoutEffect, useState } from '@wordpress/element';
+ import { useRegistry } from '@wordpress/data';
+ import deprecated from '@wordpress/deprecated';
+-import isShallowEqual from '@wordpress/is-shallow-equal';
++import { isShallowEqual } from '@wordpress/is-shallow-equal';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/block-editor/src/components/list-view/block.js b/packages/block-editor/src/components/list-view/block.js
+index e917ff4059e2a6..b617fd2c8ffa1b 100644
+--- a/packages/block-editor/src/components/list-view/block.js
++++ b/packages/block-editor/src/components/list-view/block.js
+@@ -27,7 +27,7 @@ import {
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import { __ } from '@wordpress/i18n';
+ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+-import isShallowEqual from '@wordpress/is-shallow-equal';
++import { isShallowEqual } from '@wordpress/is-shallow-equal';
+ import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+ import { speak } from '@wordpress/a11y';
+ 
+diff --git a/packages/block-editor/src/hooks/spacing-visualizer.js b/packages/block-editor/src/hooks/spacing-visualizer.js
+index f144857b45f00c..050b349152e60a 100644
+--- a/packages/block-editor/src/hooks/spacing-visualizer.js
++++ b/packages/block-editor/src/hooks/spacing-visualizer.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useState, useRef, useEffect, useReducer } from '@wordpress/element';
+-import isShallowEqual from '@wordpress/is-shallow-equal';
++import { isShallowEqual } from '@wordpress/is-shallow-equal';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/block-library/babel-plugin.js b/packages/block-library/babel-plugin.cjs
+similarity index 94%
+rename from packages/block-library/babel-plugin.js
+rename to packages/block-library/babel-plugin.cjs
+index 1f32af321cec98..36ac22985e0312 100644
+--- a/packages/block-library/babel-plugin.js
++++ b/packages/block-library/babel-plugin.cjs
+@@ -3,11 +3,6 @@
+  */
+ const fs = require( 'fs' );
+ 
+-/**
+- * Internal dependencies
+- */
+-const isBlockMetadataExperimental = require( './src/utils/is-block-metadata-experimental' );
+-
+ /**
+  * Creates a babel plugin that replaces experimental block imports with
+  * null variable declarations.
+@@ -142,11 +137,12 @@ function isImportDeclarationAnExperimentalBlock( path ) {
+ 		);
+ 		throw e;
+ 	}
+-	if ( ! isBlockMetadataExperimental( blockJSON ) ) {
+-		return false;
+-	}
+ 
+-	return true;
++	return (
++		blockJSON &&
++		'__experimental' in blockJSON &&
++		blockJSON.__experimental !== false
++	);
+ }
+ 
+ const babelPlugin = createBabelPlugin();
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index 253264e9fd6b11..e1f2d9c7e794b7 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -22,14 +22,24 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md",
++		"babel-plugin.cjs"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+-		"./babel-plugin": "./babel-plugin.js",
++		"./babel-plugin": "./babel-plugin.cjs",
+ 		"./build-module/*": "./build-module/*",
+ 		"./build-style/*": "./build-style/*",
+ 		"./package.json": "./package.json"
+diff --git a/packages/block-library/src/utils/is-block-metadata-experimental.js b/packages/block-library/src/utils/is-block-metadata-experimental.js
+index 39f86bfb4881da..6c305a59bb075e 100644
+--- a/packages/block-library/src/utils/is-block-metadata-experimental.js
++++ b/packages/block-library/src/utils/is-block-metadata-experimental.js
+@@ -2,18 +2,13 @@
+  * Checks if the block is experimental based on the metadata loaded
+  * from block.json.
+  *
+- * This function is in a separate file and uses the older JS syntax so
+- * that it can be imported in both:
+- * – block-library/src/index.js
+- * – block-library/src/babel-plugin.js
+- *
+  * @param {Object} metadata Parsed block.json metadata.
+  * @return {boolean} Is the block experimental?
+  */
+-module.exports = function isBlockMetadataExperimental( metadata ) {
++export default function isBlockMetadataExperimental( metadata ) {
+ 	return (
+ 		metadata &&
+ 		'__experimental' in metadata &&
+ 		metadata.__experimental !== false
+ 	);
+-};
++}
+diff --git a/packages/block-serialization-default-parser/package.json b/packages/block-serialization-default-parser/package.json
+index 112673dae173d4..e69be8430313ea 100644
+--- a/packages/block-serialization-default-parser/package.json
++++ b/packages/block-serialization-default-parser/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/blocks/package.json b/packages/blocks/package.json
+index 7f50cf8988fef6..d9bc151c9bb2bd 100644
+--- a/packages/blocks/package.json
++++ b/packages/blocks/package.json
+@@ -22,12 +22,20 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+@@ -36,8 +44,8 @@
+ 	"sideEffects": [
+ 		"src/index.js",
+ 		"src/store/index.js",
+-		"build/index.js",
+-		"build/store/index.js",
++		"build/index.cjs",
++		"build/store/index.cjs",
+ 		"build-module/index.js",
+ 		"build-module/store/index.js"
+ 	],
+diff --git a/packages/blocks/src/api/serializer.js b/packages/blocks/src/api/serializer.js
+index f9ab5d6da4fa62..256e149f9f09ab 100644
+--- a/packages/blocks/src/api/serializer.js
++++ b/packages/blocks/src/api/serializer.js
+@@ -8,7 +8,7 @@ import {
+ 	RawHTML,
+ } from '@wordpress/element';
+ import { hasFilter, applyFilters } from '@wordpress/hooks';
+-import isShallowEqual from '@wordpress/is-shallow-equal';
++import { isShallowEqual } from '@wordpress/is-shallow-equal';
+ import { removep } from '@wordpress/autop';
+ import deprecated from '@wordpress/deprecated';
+ 
+diff --git a/packages/boot/package.json b/packages/boot/package.json
+index 4ef1113119653e..722450e0fcbf49 100644
+--- a/packages/boot/package.json
++++ b/packages/boot/package.json
+@@ -22,6 +22,14 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
++	"files": [
++		"src",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+diff --git a/packages/commands/package.json b/packages/commands/package.json
+index b6ebab24b8a5c8..1ea5d9f9259367 100644
+--- a/packages/commands/package.json
++++ b/packages/commands/package.json
+@@ -23,12 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+ 		"./build-style/": "./build-style/"
+diff --git a/packages/components/.stylelintrc.js b/packages/components/.stylelintrc.js
+index b4b26bea568950..0cf1cdcb7d20ed 100644
+--- a/packages/components/.stylelintrc.js
++++ b/packages/components/.stylelintrc.js
+@@ -1,5 +1,5 @@
+ /** @type {import('stylelint').Config} */
+-module.exports = {
++export default {
+ 	extends: '../../.stylelintrc.js',
+ 	rules: {
+ 		'declaration-property-value-disallowed-list': [
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a75887bc5175fa..6131133f8774f2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -31,6 +31,7 @@
+ -   `Popover`: Update animation, also affecting `Autocomplete`, `BorderControl`, `CircularOptionPicker`, `ColorPalette`, `Dropdown`, `DropdownMenu`, and `PaletteEdit` ([#74082](https://github.com/WordPress/gutenberg/pull/74082)).
+ -   `Autocomplete`: Add offset to popover ([#74084](https://github.com/WordPress/gutenberg/pull/74084)).
+ -   `Button`: Hide focus style when `:active` ([#74106](https://github.com/WordPress/gutenberg/pull/74106)).
++-   Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 7a0a0b28fcd3f4..f5e1a156a9cd76 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -22,13 +22,22 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./README.md": "./README.md",
+ 		"./CONTRIBUTING.md": "./CONTRIBUTING.md",
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 8ce13a78c6c0f6..cd1f46117e362b 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
+ import { __, _n, sprintf } from '@wordpress/i18n';
+ import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
+ import { speak } from '@wordpress/a11y';
+-import isShallowEqual from '@wordpress/is-shallow-equal';
++import { isShallowEqual } from '@wordpress/is-shallow-equal';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/navigator/navigator/component.tsx b/packages/components/src/navigator/navigator/component.tsx
+index bd49b3682fb144..a52fa79e54fffd 100644
+--- a/packages/components/src/navigator/navigator/component.tsx
++++ b/packages/components/src/navigator/navigator/component.tsx
+@@ -6,8 +6,9 @@ import type { ForwardedRef } from 'react';
+ /**
+  * WordPress dependencies
+  */
++import deprecated from '@wordpress/deprecated';
+ import { useMemo, useReducer } from '@wordpress/element';
+-import isShallowEqual from '@wordpress/is-shallow-equal';
++import { isShallowEqual } from '@wordpress/is-shallow-equal';
+ import warning from '@wordpress/warning';
+ 
+ /**
+@@ -28,7 +29,6 @@ import type {
+ 	Screen,
+ 	NavigateToParentOptions,
+ } from '../types';
+-import deprecated from '@wordpress/deprecated';
+ 
+ type MatchedPath = ReturnType< typeof patternMatch >;
+ 
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx
+index cf692700eef79c..98860361c01fd5 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
+-import isShallowEqual from '@wordpress/is-shallow-equal';
++import { isShallowEqual } from '@wordpress/is-shallow-equal';
+ import { observableMap } from '@wordpress/compose';
+ 
+ /**
+diff --git a/packages/compose/package.json b/packages/compose/package.json
+index 91da5e4466b126..045aadcb5efc8d 100644
+--- a/packages/compose/package.json
++++ b/packages/compose/package.json
+@@ -24,13 +24,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/compose/src/higher-order/pure/index.tsx b/packages/compose/src/higher-order/pure/index.tsx
+index 38a85a5eebe9ab..f0a32d6e34df1f 100644
+--- a/packages/compose/src/higher-order/pure/index.tsx
++++ b/packages/compose/src/higher-order/pure/index.tsx
+@@ -6,7 +6,7 @@ import type { ComponentType, ComponentClass } from 'react';
+ /**
+  * WordPress dependencies
+  */
+-import isShallowEqual from '@wordpress/is-shallow-equal';
++import { isShallowEqual } from '@wordpress/is-shallow-equal';
+ import { Component } from '@wordpress/element';
+ 
+ /**
+diff --git a/packages/core-abilities/package.json b/packages/core-abilities/package.json
+index 5fb7bb59460a89..1579c627670908 100644
+--- a/packages/core-abilities/package.json
++++ b/packages/core-abilities/package.json
+@@ -24,19 +24,20 @@
+ 		"npm": ">=8.19.2"
+ 	},
+ 	"files": [
++		"src",
+ 		"build",
+ 		"build-module",
+ 		"build-types",
+-		"src",
+ 		"*.md"
+ 	],
+-	"main": "build/index.js",
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/core-commands/package.json b/packages/core-commands/package.json
+index bd34f79640768b..7984f44439d1dc 100644
+--- a/packages/core-commands/package.json
++++ b/packages/core-commands/package.json
+@@ -22,12 +22,20 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/core-data/package.json b/packages/core-data/package.json
+index 08a7021d4b12a1..9be29a0f84d9f0 100644
+--- a/packages/core-data/package.json
++++ b/packages/core-data/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+@@ -38,7 +46,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": [
+ 		"src/index.js",
+-		"build/index.js",
++		"build/index.cjs",
+ 		"build-module/index.js"
+ 	],
+ 	"dependencies": {
+diff --git a/packages/customize-widgets/package.json b/packages/customize-widgets/package.json
+index 1b9f49eb2f1516..d322faec981322 100644
+--- a/packages/customize-widgets/package.json
++++ b/packages/customize-widgets/package.json
+@@ -20,12 +20,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"default": "./build/index.js"
++			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js b/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js
+index 7d6856004982b8..f7fef23fa7f386 100644
+--- a/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js
++++ b/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js
+@@ -7,7 +7,7 @@ import fastDeepEqual from 'fast-deep-equal/es6';
+  * WordPress dependencies
+  */
+ import { useState, useEffect, useCallback } from '@wordpress/element';
+-import isShallowEqual from '@wordpress/is-shallow-equal';
++import { isShallowEqual } from '@wordpress/is-shallow-equal';
+ import { getWidgetIdFromBlock, addWidgetIdToBlock } from '@wordpress/widgets';
+ 
+ /**
+diff --git a/packages/data-controls/package.json b/packages/data-controls/package.json
+index 7ba9c669e53915..96210f8abab5de 100644
+--- a/packages/data-controls/package.json
++++ b/packages/data-controls/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/data/package.json b/packages/data/package.json
+index b772b51d2b56e6..84409ba20cda58 100644
+--- a/packages/data/package.json
++++ b/packages/data/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/data/src/components/use-select/index.js b/packages/data/src/components/use-select/index.js
+index 0795b03d1a645b..f7eda689d9abaf 100644
+--- a/packages/data/src/components/use-select/index.js
++++ b/packages/data/src/components/use-select/index.js
+@@ -9,7 +9,7 @@ import {
+ 	useSyncExternalStore,
+ 	useDebugValue,
+ } from '@wordpress/element';
+-import isShallowEqual from '@wordpress/is-shallow-equal';
++import { isShallowEqual } from '@wordpress/is-shallow-equal';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/data/src/index.ts b/packages/data/src/index.ts
+index 935604b15052dc..94880f94676ee6 100644
+--- a/packages/data/src/index.ts
++++ b/packages/data/src/index.ts
+@@ -39,7 +39,7 @@ export { default as createReduxStore } from './redux-store';
+ export { dispatch } from './dispatch';
+ export { select } from './select';
+ 
+-export * from './types';
++export type * from './types';
+ 
+ /**
+  * Object of available plugins to use with a registry.
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 00045896abdb5b..f49c5870670279 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -26,6 +26,7 @@
+ - DataViews: Update padding to 24px for consistency. [#73334](https://github.com/WordPress/gutenberg/pull/73334)
+ - DataViews: Simplify list layout field color styles. [#73884](https://github.com/WordPress/gutenberg/pull/73884)
+ - DataViews: Add panel form layout validation. [#73700](https://github.com/WordPress/gutenberg/pull/73700)
++- Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822))
+ 
+ ## 11.0.0 (2025-11-26)
+ 
+diff --git a/packages/dataviews/build.js b/packages/dataviews/build.cjs
+similarity index 100%
+rename from packages/dataviews/build.js
+rename to packages/dataviews/build.cjs
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index 8172cfd960f43f..62b94d5315c005 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -22,13 +22,23 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"build-wp",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./wp": {
+ 			"types": "./build-types/index.d.ts",
+@@ -74,6 +84,6 @@
+ 		"access": "public"
+ 	},
+ 	"scripts": {
+-		"build:wp": "node build"
++		"build:wp": "node build.cjs"
+ 	}
+ }
+diff --git a/packages/date/package.json b/packages/date/package.json
+index 8fce28344e8bf3..3ca4b2ac190cde 100644
+--- a/packages/date/package.json
++++ b/packages/date/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/date/src/index.ts b/packages/date/src/index.ts
+index 60f7d77c9b04b7..d511ef854b10b4 100644
+--- a/packages/date/src/index.ts
++++ b/packages/date/src/index.ts
+@@ -15,7 +15,7 @@ import deprecated from '@wordpress/deprecated';
+  */
+ import type { DateSettings } from './types';
+ 
+-export * from './types';
++export type * from './types';
+ 
+ const WP_ZONE = 'WP';
+ 
+diff --git a/packages/deprecated/package.json b/packages/deprecated/package.json
+index 5e1fb52c327c36..7ffd634eca9e48 100644
+--- a/packages/deprecated/package.json
++++ b/packages/deprecated/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/dom-ready/package.json b/packages/dom-ready/package.json
+index 0c13c377d511e0..fd4a4629ac4225 100644
+--- a/packages/dom-ready/package.json
++++ b/packages/dom-ready/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/dom/package.json b/packages/dom/package.json
+index fcb06b97db9cc5..0cb15d4657712e 100644
+--- a/packages/dom/package.json
++++ b/packages/dom/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/e2e-test-utils-playwright/src/index.ts b/packages/e2e-test-utils-playwright/src/index.ts
+index 9b099711634d93..17989c9613b508 100644
+--- a/packages/e2e-test-utils-playwright/src/index.ts
++++ b/packages/e2e-test-utils-playwright/src/index.ts
+@@ -1,4 +1,4 @@
+-export * from './types';
++export type * from './types';
+ export { Admin } from './admin';
+ export { Editor } from './editor';
+ export { PageUtils } from './page-utils';
+diff --git a/packages/edit-post/package.json b/packages/edit-post/package.json
+index 034e85f55a8cbb..2918e9a84807f2 100644
+--- a/packages/edit-post/package.json
++++ b/packages/edit-post/package.json
+@@ -23,12 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"default": "./build/index.js"
++			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/edit-site-init/package.json b/packages/edit-site-init/package.json
+index 0e7d61f7531928..6008c45995f236 100644
+--- a/packages/edit-site-init/package.json
++++ b/packages/edit-site-init/package.json
+@@ -21,7 +21,15 @@
+ 		"node": ">=20.10.0",
+ 		"npm": ">=10.2.3"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"wpScriptModuleExports": "./build-module/index.js",
+ 	"dependencies": {
+diff --git a/packages/edit-site/package.json b/packages/edit-site/package.json
+index b4fb5289d00eac..888439a61aed82 100644
+--- a/packages/edit-site/package.json
++++ b/packages/edit-site/package.json
+@@ -23,13 +23,22 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"default": "./build/index.js"
++			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/edit-widgets/package.json b/packages/edit-widgets/package.json
+index 468ed52c33aa6f..b8f53c9f4b6e5f 100644
+--- a/packages/edit-widgets/package.json
++++ b/packages/edit-widgets/package.json
+@@ -23,12 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"default": "./build/index.js"
++			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/editor/package.json b/packages/editor/package.json
+index 31e7b15e4d3a17..93762948dbeb59 100644
+--- a/packages/editor/package.json
++++ b/packages/editor/package.json
+@@ -22,13 +22,22 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+@@ -42,8 +51,8 @@
+ 		"src/store/index.js",
+ 		"src/hooks/**",
+ 		"src/bindings/**",
+-		"build/index.js",
+-		"build/store/index.js",
++		"build/index.cjs",
++		"build/store/index.cjs",
+ 		"build/hooks/**",
+ 		"build/bindings/**",
+ 		"build-module/index.js",
+diff --git a/packages/element/package.json b/packages/element/package.json
+index 4a20d91f74da1c..d314bb1f0fc0b4 100644
+--- a/packages/element/package.json
++++ b/packages/element/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/env/package.json b/packages/env/package.json
+index 9a298ccdea0fb5..a3a777a40c76de 100644
+--- a/packages/env/package.json
++++ b/packages/env/package.json
+@@ -35,6 +35,7 @@
+ 	"exports": {
+ 		".": "./lib/env.js",
+ 		"./lib/cli.js": "./lib/cli.js",
++		"./lib/config": "./lib/config/index.js",
+ 		"./package.json": "./package.json"
+ 	},
+ 	"bin": {
+diff --git a/packages/escape-html/package.json b/packages/escape-html/package.json
+index 8dff24668a3748..de146661be84d3 100644
+--- a/packages/escape-html/package.json
++++ b/packages/escape-html/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/fields/package.json b/packages/fields/package.json
+index e812b14067c21c..2a93d3e9ec779d 100644
+--- a/packages/fields/package.json
++++ b/packages/fields/package.json
+@@ -22,13 +22,22 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/format-library/package.json b/packages/format-library/package.json
+index c6d9af62fc0bb1..3fa53955fa0ea3 100644
+--- a/packages/format-library/package.json
++++ b/packages/format-library/package.json
+@@ -22,12 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/global-styles-engine/package.json b/packages/global-styles-engine/package.json
+index da72d2ce6a8ce9..b0985cefee4f81 100644
+--- a/packages/global-styles-engine/package.json
++++ b/packages/global-styles-engine/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/global-styles-ui/package.json b/packages/global-styles-ui/package.json
+index 5159e00ee54f25..1e13938fe40399 100644
+--- a/packages/global-styles-ui/package.json
++++ b/packages/global-styles-ui/package.json
+@@ -23,13 +23,22 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"default": "./build/index.js"
++			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+ 		"./build-style/": "./build-style/"
+diff --git a/packages/global-styles-ui/src/font-library/lib/inflate.js b/packages/global-styles-ui/src/font-library/lib/inflate.js
+index a80bc507e0db7b..1e5f4a8a0b1379 100644
+--- a/packages/global-styles-ui/src/font-library/lib/inflate.js
++++ b/packages/global-styles-ui/src/font-library/lib/inflate.js
+@@ -30,25 +30,8 @@
+ 
+ /* eslint eslint-comments/no-unlimited-disable: 0 */
+ /* eslint-disable */
+-/* pako 1.0.10 nodeca/pako */ ( function ( f ) {
+-	if ( typeof exports === 'object' && typeof module !== 'undefined' ) {
+-		module.exports = f();
+-	} else if ( typeof define === 'function' && define.amd ) {
+-		define( [], f );
+-	} else {
+-		var g;
+-		if ( typeof window !== 'undefined' ) {
+-			g = window;
+-		} else if ( typeof global !== 'undefined' ) {
+-			g = global;
+-		} else if ( typeof self !== 'undefined' ) {
+-			g = self;
+-		} else {
+-			g = this;
+-		}
+-		g.pako = f();
+-	}
+-} )( function () {
++/* pako 1.0.10 nodeca/pako */
++export default ( function () {
+ 	var define, module, exports;
+ 	return ( function () {
+ 		function r( e, n, t ) {
+@@ -4108,5 +4091,5 @@
+ 		{},
+ 		[]
+ 	)( '/lib/inflate.js' );
+-} );
++} )();
+ /* eslint-enable */
+diff --git a/packages/global-styles-ui/src/font-library/lib/unbrotli.js b/packages/global-styles-ui/src/font-library/lib/unbrotli.js
+index 13fb4f650bfa4f..3158c8795c1514 100644
+--- a/packages/global-styles-ui/src/font-library/lib/unbrotli.js
++++ b/packages/global-styles-ui/src/font-library/lib/unbrotli.js
+@@ -30,25 +30,7 @@
+ 
+ /* eslint eslint-comments/no-unlimited-disable: 0 */
+ /* eslint-disable */
+-( function ( f ) {
+-	if ( typeof exports === 'object' && typeof module !== 'undefined' ) {
+-		module.exports = f();
+-	} else if ( typeof define === 'function' && define.amd ) {
+-		define( [], f );
+-	} else {
+-		var g;
+-		if ( typeof window !== 'undefined' ) {
+-			g = window;
+-		} else if ( typeof global !== 'undefined' ) {
+-			g = global;
+-		} else if ( typeof self !== 'undefined' ) {
+-			g = self;
+-		} else {
+-			g = this;
+-		}
+-		g.unbrotli = f();
+-	}
+-} )( function () {
++export default ( function () {
+ 	var define, module, exports;
+ 	return ( function () {
+ 		function r( e, n, t ) {
+@@ -2702,5 +2684,5 @@
+ 		{},
+ 		[ 12 ]
+ 	)( 12 );
+-} );
++} )();
+ /* eslint-enable */
+diff --git a/packages/hooks/package.json b/packages/hooks/package.json
+index db4da08d3d7141..b215fd95fdf6af 100644
+--- a/packages/hooks/package.json
++++ b/packages/hooks/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/hooks/src/index.ts b/packages/hooks/src/index.ts
+index b9684276c6f1c5..27d660821add30 100644
+--- a/packages/hooks/src/index.ts
++++ b/packages/hooks/src/index.ts
+@@ -3,7 +3,7 @@
+  */
+ import createHooks from './createHooks';
+ 
+-export * from './types';
++export type * from './types';
+ 
+ export const defaultHooks = createHooks();
+ 
+diff --git a/packages/html-entities/package.json b/packages/html-entities/package.json
+index a9f8e418a00749..b0384b786e310b 100644
+--- a/packages/html-entities/package.json
++++ b/packages/html-entities/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/i18n/package.json b/packages/i18n/package.json
+index 6ef04adef28ce7..dc374c1539f9a6 100644
+--- a/packages/i18n/package.json
++++ b/packages/i18n/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/icons/lib/build-worker-utils.js b/packages/icons/lib/build-worker-utils.cjs
+similarity index 100%
+rename from packages/icons/lib/build-worker-utils.js
+rename to packages/icons/lib/build-worker-utils.cjs
+diff --git a/packages/icons/lib/generate-library.js b/packages/icons/lib/generate-library.cjs
+similarity index 100%
+rename from packages/icons/lib/generate-library.js
+rename to packages/icons/lib/generate-library.cjs
+diff --git a/packages/icons/package.json b/packages/icons/package.json
+index a78549255182e6..fd137a555a67bb 100644
+--- a/packages/icons/package.json
++++ b/packages/icons/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+@@ -49,6 +57,6 @@
+ 	"scripts": {
+ 		"prelint": "npm run build",
+ 		"prepare": "npm run build",
+-		"build": "node lib/generate-library"
++		"build": "node lib/generate-library.cjs"
+ 	}
+ }
+diff --git a/packages/image-cropper/package.json b/packages/image-cropper/package.json
+index ef436ded62be05..68fe92bf7dfed1 100644
+--- a/packages/image-cropper/package.json
++++ b/packages/image-cropper/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/image-cropper/src/index.ts b/packages/image-cropper/src/index.ts
+index 617de0d6cc5518..8e9c6b417b78ac 100644
+--- a/packages/image-cropper/src/index.ts
++++ b/packages/image-cropper/src/index.ts
+@@ -1,4 +1,4 @@
+ export { default as ImageCropper } from './components/image-cropper';
+ export { useImageCropper, default as ImageCropperProvider } from './provider';
+-export * from './types';
++export type * from './types';
+ export { normalizeRotation } from './utils';
+diff --git a/packages/interactivity-router/package.json b/packages/interactivity-router/package.json
+index 7c007d3818999b..1185a21015ac31 100644
+--- a/packages/interactivity-router/package.json
++++ b/packages/interactivity-router/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/interface/package.json b/packages/interface/package.json
+index 2a466453e8485a..6742d1ff6eb480 100644
+--- a/packages/interface/package.json
++++ b/packages/interface/package.json
+@@ -23,12 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+ 		"./build-style/": "./build-style/"
+@@ -39,8 +48,8 @@
+ 		"src/**/*.scss",
+ 		"src/index.js",
+ 		"src/store/index.js",
+-		"build/index.js",
+-		"build/store/index.js",
++		"build/index.cjs",
++		"build/store/index.cjs",
+ 		"build-module/index.js",
+ 		"build-module/store/index.js"
+ 	],
+diff --git a/packages/is-shallow-equal/package.json b/packages/is-shallow-equal/package.json
+index beee5953d8e102..d159c66cc92897 100644
+--- a/packages/is-shallow-equal/package.json
++++ b/packages/is-shallow-equal/package.json
+@@ -25,19 +25,20 @@
+ 		"npm": ">=8.19.2"
+ 	},
+ 	"files": [
++		"src",
+ 		"build",
+ 		"build-module",
+ 		"build-types",
+-		"src",
+ 		"*.md"
+ 	],
+-	"main": "build/index.js",
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/is-shallow-equal/src/index.ts b/packages/is-shallow-equal/src/index.ts
+index 1da14d3d993b8d..5136638ef38c72 100644
+--- a/packages/is-shallow-equal/src/index.ts
++++ b/packages/is-shallow-equal/src/index.ts
+@@ -4,9 +4,6 @@
+ import isShallowEqualObjects from './objects';
+ import isShallowEqualArrays from './arrays';
+ 
+-export { default as isShallowEqualObjects } from './objects';
+-export { default as isShallowEqualArrays } from './arrays';
+-
+ export type ComparableObject = Record< string, any >;
+ 
+ /**
+@@ -29,3 +26,7 @@ export default function isShallowEqual( a: unknown, b: unknown ): boolean {
+ 
+ 	return a === b;
+ }
++
++// `isShallowEqual` is exported also as a named export because esbuild cannot
++// expose the default export from the `window.wp.isShallowEqual` global.
++export { isShallowEqual, isShallowEqualObjects, isShallowEqualArrays };
+diff --git a/packages/is-shallow-equal/test/index.ts b/packages/is-shallow-equal/test/index.ts
+index ea99282111946f..377a85d52f42dd 100644
+--- a/packages/is-shallow-equal/test/index.ts
++++ b/packages/is-shallow-equal/test/index.ts
+@@ -1,7 +1,8 @@
+ /**
+  * Internal dependencies
+  */
+-import isShallowEqual, {
++import {
++	isShallowEqual,
+ 	isShallowEqualArrays,
+ 	isShallowEqualObjects,
+ } from '../src';
+diff --git a/packages/jest-console/package.json b/packages/jest-console/package.json
+index 38e611e468a486..643fdf0eb5e8ab 100644
+--- a/packages/jest-console/package.json
++++ b/packages/jest-console/package.json
+@@ -25,17 +25,19 @@
+ 		"npm": ">=8.19.2"
+ 	},
+ 	"files": [
++		"src",
+ 		"build",
+ 		"build-module",
+ 		"build-types"
+ 	],
+-	"main": "build/index.js",
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/jest-puppeteer-axe/package.json b/packages/jest-puppeteer-axe/package.json
+index 407dbf52e6a46a..5158143aae5b28 100644
+--- a/packages/jest-puppeteer-axe/package.json
++++ b/packages/jest-puppeteer-axe/package.json
+@@ -26,16 +26,18 @@
+ 		"npm": ">=8.19.2"
+ 	},
+ 	"files": [
++		"src",
+ 		"build",
+ 		"build-module"
+ 	],
+-	"main": "build/index.js",
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/keyboard-shortcuts/package.json b/packages/keyboard-shortcuts/package.json
+index daa058b84436c4..b8f0a48f151890 100644
+--- a/packages/keyboard-shortcuts/package.json
++++ b/packages/keyboard-shortcuts/package.json
+@@ -22,12 +22,20 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/keycodes/package.json b/packages/keycodes/package.json
+index 7e05e972e444ef..b3a0f160cb1bf1 100644
+--- a/packages/keycodes/package.json
++++ b/packages/keycodes/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/latex-to-mathml/package.json b/packages/latex-to-mathml/package.json
+index 7da8e4f457bc3e..71e3f275603d61 100644
+--- a/packages/latex-to-mathml/package.json
++++ b/packages/latex-to-mathml/package.json
+@@ -24,13 +24,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/lazy-editor/package.json b/packages/lazy-editor/package.json
+index 8238953e1b7684..204ab9b1be4e51 100644
+--- a/packages/lazy-editor/package.json
++++ b/packages/lazy-editor/package.json
+@@ -24,13 +24,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"default": "./build/index.js"
++			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/list-reusable-blocks/package.json b/packages/list-reusable-blocks/package.json
+index 29bc10b6f00ef6..9d20cb375d6099 100644
+--- a/packages/list-reusable-blocks/package.json
++++ b/packages/list-reusable-blocks/package.json
+@@ -23,12 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+ 		"./build-style/": "./build-style/"
+diff --git a/packages/media-fields/package.json b/packages/media-fields/package.json
+index 78db528ccc1d18..55d47c4e1ff5a4 100644
+--- a/packages/media-fields/package.json
++++ b/packages/media-fields/package.json
+@@ -24,13 +24,22 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/media-utils/package.json b/packages/media-utils/package.json
+index 4fd5fda26e7b15..7ad233ad704589 100644
+--- a/packages/media-utils/package.json
++++ b/packages/media-utils/package.json
+@@ -23,13 +23,22 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/notices/package.json b/packages/notices/package.json
+index 2394e7aeeaccac..f81b899e10e3ef 100644
+--- a/packages/notices/package.json
++++ b/packages/notices/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/nux/package.json b/packages/nux/package.json
+index fd1ea55efa32fe..00b4da061fb214 100644
+--- a/packages/nux/package.json
++++ b/packages/nux/package.json
+@@ -22,12 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+ 		"./build-style/": "./build-style/"
+@@ -39,8 +48,8 @@
+ 		"src/**/*.scss",
+ 		"src/index.js",
+ 		"src/store/index.js",
+-		"build/index.js",
+-		"build/store/index.js",
++		"build/index.cjs",
++		"build/store/index.cjs",
+ 		"build-module/index.js",
+ 		"build-module/store/index.js"
+ 	],
+diff --git a/packages/patterns/package.json b/packages/patterns/package.json
+index c5ff5f4b8e7d3c..5bec03193a9038 100644
+--- a/packages/patterns/package.json
++++ b/packages/patterns/package.json
+@@ -22,12 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+@@ -38,8 +47,8 @@
+ 		"src/**/*.scss",
+ 		"src/index.js",
+ 		"src/store/index.js",
+-		"build/index.js",
+-		"build/store/index.js",
++		"build/index.cjs",
++		"build/store/index.cjs",
+ 		"build-module/index.js",
+ 		"build-module/store/index.js"
+ 	],
+diff --git a/packages/plugins/package.json b/packages/plugins/package.json
+index cfcb1d686ecb07..d36eed2294fc54 100644
+--- a/packages/plugins/package.json
++++ b/packages/plugins/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/plugins/src/components/plugin-area/index.tsx b/packages/plugins/src/components/plugin-area/index.tsx
+index 406ba6724b6a13..e7cf1ab9b126c0 100644
+--- a/packages/plugins/src/components/plugin-area/index.tsx
++++ b/packages/plugins/src/components/plugin-area/index.tsx
+@@ -8,7 +8,7 @@ import memoize from 'memize';
+  */
+ import { useMemo, useSyncExternalStore } from '@wordpress/element';
+ import { addAction, removeAction } from '@wordpress/hooks';
+-import isShallowEqual from '@wordpress/is-shallow-equal';
++import { isShallowEqual } from '@wordpress/is-shallow-equal';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/preferences-persistence/package.json b/packages/preferences-persistence/package.json
+index 9792974d972737..1460f601ca4f3b 100644
+--- a/packages/preferences-persistence/package.json
++++ b/packages/preferences-persistence/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/preferences/package.json b/packages/preferences/package.json
+index 72aa1c5098e927..cea84c30619d86 100644
+--- a/packages/preferences/package.json
++++ b/packages/preferences/package.json
+@@ -24,13 +24,22 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+ 		"./build-style/": "./build-style/"
+diff --git a/packages/primitives/package.json b/packages/primitives/package.json
+index bdab83d1a2fa7f..9f70f1bc8ab2fb 100644
+--- a/packages/primitives/package.json
++++ b/packages/primitives/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/priority-queue/package.json b/packages/priority-queue/package.json
+index 6d6d247a442841..7b2bf18b9265a5 100644
+--- a/packages/priority-queue/package.json
++++ b/packages/priority-queue/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/private-apis/package.json b/packages/private-apis/package.json
+index d72faf69fa57f4..7ecaeafa0236f8 100644
+--- a/packages/private-apis/package.json
++++ b/packages/private-apis/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/react-i18n/package.json b/packages/react-i18n/package.json
+index 91b342f49de930..781b16cc6dccd0 100644
+--- a/packages/react-i18n/package.json
++++ b/packages/react-i18n/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/redux-routine/package.json b/packages/redux-routine/package.json
+index 5a07db9e7a6055..8a58a21ce75d45 100644
+--- a/packages/redux-routine/package.json
++++ b/packages/redux-routine/package.json
+@@ -24,13 +24,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/reusable-blocks/package.json b/packages/reusable-blocks/package.json
+index 94215fe2e0c9cf..490bec11af00ad 100644
+--- a/packages/reusable-blocks/package.json
++++ b/packages/reusable-blocks/package.json
+@@ -22,12 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+@@ -36,8 +45,8 @@
+ 	"sideEffects": [
+ 		"src/index.js",
+ 		"src/store/index.js",
+-		"build/index.js",
+-		"build/store/index.js",
++		"build/index.cjs",
++		"build/store/index.cjs",
+ 		"build-module/index.js",
+ 		"build-module/store/index.js"
+ 	],
+diff --git a/packages/rich-text/package.json b/packages/rich-text/package.json
+index 25b8de7cedda53..1aeca9adf83349 100644
+--- a/packages/rich-text/package.json
++++ b/packages/rich-text/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+@@ -39,8 +47,8 @@
+ 		"src/**/*.scss",
+ 		"src/index.js",
+ 		"src/store/index.js",
+-		"build/index.js",
+-		"build/store/index.js",
++		"build/index.cjs",
++		"build/store/index.cjs",
+ 		"build-module/index.js",
+ 		"build-module/store/index.js"
+ 	],
+diff --git a/packages/route/package.json b/packages/route/package.json
+index 86f809902147cf..b58e9aebe22dcf 100644
+--- a/packages/route/package.json
++++ b/packages/route/package.json
+@@ -21,13 +21,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"default": "./build/index.js"
++			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/router/package.json b/packages/router/package.json
+index aa71c2214dc531..a76a3c0f356537 100644
+--- a/packages/router/package.json
++++ b/packages/router/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/scripts/scripts/test-playwright.js b/packages/scripts/scripts/test-playwright.js
+index d48623c0e9c6be..82860f7e263b38 100644
+--- a/packages/scripts/scripts/test-playwright.js
++++ b/packages/scripts/scripts/test-playwright.js
+@@ -14,7 +14,6 @@ process.on( 'unhandledRejection', ( err ) => {
+  */
+ const { resolve } = require( 'node:path' );
+ const { sync: spawn } = require( 'cross-spawn' );
+-const path = require( 'path' );
+ 
+ /**
+  * Internal dependencies
+@@ -40,7 +39,7 @@ let loadConfig = null;
+ 
+ try {
+ 	// First, try to load the package installed from among the optional peerDependencies.
+-	loadConfig = require( '@wordpress/env/lib/config/load-config' );
++	loadConfig = require( '@wordpress/env/lib/config' ).loadConfig;
+ } catch ( error ) {
+ 	// eslint-disable-next-line no-console
+ 	console.log(
+@@ -93,7 +92,7 @@ function spawnProcess() {
+ }
+ 
+ if ( loadConfig ) {
+-	loadConfig( path.resolve( '.' ) ).then( ( envConfig ) => {
++	loadConfig( resolve( '.' ) ).then( ( envConfig ) => {
+ 		if ( ! process.env.WP_BASE_URL && envConfig?.env?.tests?.port ) {
+ 			process.env.WP_BASE_URL = `http://localhost:${ envConfig.env.tests.port }`;
+ 		}
+diff --git a/packages/server-side-render/package.json b/packages/server-side-render/package.json
+index adfb35a7c7e0c9..4076595592c5ea 100644
+--- a/packages/server-side-render/package.json
++++ b/packages/server-side-render/package.json
+@@ -23,12 +23,20 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/shortcode/package.json b/packages/shortcode/package.json
+index d38802ca1d3d18..4b615fd84f253e 100644
+--- a/packages/shortcode/package.json
++++ b/packages/shortcode/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/style-engine/package.json b/packages/style-engine/package.json
+index f8f6f0bc321fe0..078168f92f4afa 100644
+--- a/packages/style-engine/package.json
++++ b/packages/style-engine/package.json
+@@ -24,19 +24,26 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+ 	"react-native": "src/index",
+ 	"wpScript": true,
+-	"types": "build-types",
+ 	"wpCopyFiles": {
+ 		"files": [
+ 			"src/*.php"
+@@ -56,6 +63,7 @@
+ 			}
+ 		}
+ 	},
++	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+ 		"change-case": "^4.1.2"
+diff --git a/packages/sync/package.json b/packages/sync/package.json
+index fa02fb1beaf024..b87f2a52049ff7 100644
+--- a/packages/sync/package.json
++++ b/packages/sync/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index 65a34bd1788877..ed9c2f459044de 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"default": "./build/index.js"
++			"default": "./build/index.cjs"
+ 		},
+ 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
+ 		"./design-tokens.js": "./src/prebuilt/js/design-tokens.js",
+diff --git a/packages/token-list/package.json b/packages/token-list/package.json
+index bf782d96b4ff5a..82d05e32387f39 100644
+--- a/packages/token-list/package.json
++++ b/packages/token-list/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 30027b29ee955f..6eac838d30f809 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=20.10.0",
+ 		"npm": ">=10.2.3"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"default": "./build/index.js"
++			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/undo-manager/package.json b/packages/undo-manager/package.json
+index 3fcc2cdccf2562..16af931d8216ea 100644
+--- a/packages/undo-manager/package.json
++++ b/packages/undo-manager/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/undo-manager/src/index.ts b/packages/undo-manager/src/index.ts
+index 8b861987e7e0db..d30891b00f9795 100644
+--- a/packages/undo-manager/src/index.ts
++++ b/packages/undo-manager/src/index.ts
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import isShallowEqual from '@wordpress/is-shallow-equal';
++import { isShallowEqual } from '@wordpress/is-shallow-equal';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/upload-media/package.json b/packages/upload-media/package.json
+index 7dc7bfea927b6d..b81143adb67717 100644
+--- a/packages/upload-media/package.json
++++ b/packages/upload-media/package.json
+@@ -21,13 +21,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/url/package.json b/packages/url/package.json
+index 112e28fca22000..972092ecfbb7cf 100644
+--- a/packages/url/package.json
++++ b/packages/url/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/viewport/package.json b/packages/viewport/package.json
+index 09006d85756472..eea4f2f17ead9c 100644
+--- a/packages/viewport/package.json
++++ b/packages/viewport/package.json
+@@ -22,12 +22,20 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/views/package.json b/packages/views/package.json
+index 3e0a99b772ffc6..8d57e538731e2c 100644
+--- a/packages/views/package.json
++++ b/packages/views/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/vips/package.json b/packages/vips/package.json
+index 6723cbd7f75de9..ff0e4a762a6e09 100644
+--- a/packages/vips/package.json
++++ b/packages/vips/package.json
+@@ -23,13 +23,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"default": "./build/index.js"
++			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/warning/babel-plugin.js b/packages/warning/babel-plugin.cjs
+similarity index 100%
+rename from packages/warning/babel-plugin.js
+rename to packages/warning/babel-plugin.cjs
+diff --git a/packages/warning/package.json b/packages/warning/package.json
+index 49c9ec598c52d4..8035eda8b5d547 100644
+--- a/packages/warning/package.json
++++ b/packages/warning/package.json
+@@ -22,16 +22,25 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md",
++		"babel-plugin.cjs"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+-		"./babel-plugin": "./babel-plugin.js"
++		"./babel-plugin": "./babel-plugin.cjs"
+ 	},
+ 	"react-native": "src/index",
+ 	"wpScript": true,
+diff --git a/packages/widgets/package.json b/packages/widgets/package.json
+index 39da9b95bcbaef..23f4308af98d2e 100644
+--- a/packages/widgets/package.json
++++ b/packages/widgets/package.json
+@@ -20,12 +20,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-style",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/wordcount/package.json b/packages/wordcount/package.json
+index 9280360e824984..1f6e347a1a5e6b 100644
+--- a/packages/wordcount/package.json
++++ b/packages/wordcount/package.json
+@@ -22,13 +22,21 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/wordcount/src/index.ts b/packages/wordcount/src/index.ts
+index 17360ed34c2fc5..e8b2f58de20022 100644
+--- a/packages/wordcount/src/index.ts
++++ b/packages/wordcount/src/index.ts
+@@ -137,4 +137,4 @@ export function count(
+ }
+ 
+ // Export types for external usage
+-export * from './types';
++export type * from './types';
+diff --git a/packages/workflow/package.json b/packages/workflow/package.json
+index b9b10b2c4c2b82..1e5901b87b9098 100644
+--- a/packages/workflow/package.json
++++ b/packages/workflow/package.json
+@@ -25,12 +25,20 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"type": "module",
++	"main": "build/index.cjs",
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+ 			"import": "./build-module/index.js",
+-			"require": "./build/index.js"
++			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+ 		"./build-style/": "./build-style/"
+diff --git a/packages/wp-build/src/build.mjs b/packages/wp-build/src/build.mjs
+index fac8b37571d420..1878eda3bac595 100755
+--- a/packages/wp-build/src/build.mjs
++++ b/packages/wp-build/src/build.mjs
+@@ -1022,7 +1022,12 @@ async function transpilePackage( packageName ) {
+ 		name: 'externalize-except-css',
+ 		setup( build ) {
+ 			// Externalize all non-CSS imports
+-			build.onResolve( { filter: /.*/ }, ( args ) => {
++			build.onResolve( { filter: /.*/ }, async ( args ) => {
++				// Skip recursive calls.
++				if ( args.pluginData?.__fromExternalize ) {
++					return null;
++				}
++
+ 				// Skip entry points
+ 				if ( args.kind === 'entry-point' ) {
+ 					return null;
+@@ -1033,6 +1038,44 @@ async function transpilePackage( packageName ) {
+ 					return null;
+ 				}
+ 
++				// Fully resolve local dependencies without file extension
++				// and replace the extension with the target extension.
++				if ( args.path.startsWith( '.' ) ) {
++					const resolved = await build.resolve( args.path, {
++						namespace: args.namespace,
++						importer: args.importer,
++						kind: args.kind,
++						resolveDir: args.resolveDir,
++						with: args.with,
++						pluginData: {
++							...args.pluginData,
++							__fromExternalize: true,
++						},
++					} );
++
++					if ( resolved.errors.length > 0 ) {
++						return resolved;
++					}
++
++					// Relativize path: make it relative to resolveDir with leading ./
++					let relativePath = normalizePath(
++						path.relative( args.resolveDir, resolved.path )
++					);
++					if ( ! relativePath.startsWith( '.' ) ) {
++						relativePath = './' + relativePath;
++					}
++
++					// Replace extension: make sure that file extension is always `.js` or `.cjs`.
++					const newExt =
++						build.initialOptions.format === 'cjs' ? '.cjs' : '.js';
++					relativePath = relativePath.replace( /\.[jt]sx?$/, newExt );
++
++					return {
++						path: relativePath,
++						external: true,
++					};
++				}
++
+ 				// Externalize everything else (keep imports as-is)
+ 				return { path: args.path, external: true };
+ 			} );
+@@ -1050,6 +1093,7 @@ async function transpilePackage( packageName ) {
+ 				entryPoints: srcFiles,
+ 				outdir: buildDir,
+ 				outbase: srcDir,
++				outExtension: { '.js': '.cjs' },
+ 				bundle: true,
+ 				platform: 'node',
+ 				format: 'cjs',
+@@ -1057,9 +1101,7 @@ async function transpilePackage( packageName ) {
+ 				target,
+ 				jsx: 'automatic',
+ 				jsxImportSource: 'react',
+-				loader: {
+-					'.js': 'jsx',
+-				},
++				loader: { '.js': 'jsx' },
+ 				plugins,
+ 			} )
+ 		);
+@@ -1089,9 +1131,7 @@ async function transpilePackage( packageName ) {
+ 				target,
+ 				jsx: 'automatic',
+ 				jsxImportSource: 'react',
+-				loader: {
+-					'.js': 'jsx',
+-				},
++				loader: { '.js': 'jsx' },
+ 				plugins,
+ 			} )
+ 		);
+diff --git a/patches/README.md b/patches/README.md
+index b811c824532c37..1e97a7bee67ae0 100644
+--- a/patches/README.md
++++ b/patches/README.md
+@@ -22,6 +22,9 @@ to remove those events as well.
+ 
+ See https://github.com/facebook/react/pull/17883.
+ 
++The package also uses a way of doing default exports from a CJS package that is not compatible with
++Node.js ES modules. The patch also fixes this.
++
+ ### `patches/react-devtools-core+4.28.5.patch`
+ 
+ The mobile editor relies upon `jsdom-jscore-rn` to create a partial DOM
+diff --git a/patches/react-autosize-textarea+7.1.0.patch b/patches/react-autosize-textarea+7.1.0.patch
+index 7d67e58fd5fab6..b1b97ad7576c5c 100644
+--- a/patches/react-autosize-textarea+7.1.0.patch
++++ b/patches/react-autosize-textarea+7.1.0.patch
+@@ -11,3 +11,13 @@ index ad6ff3f..e0a6d51 100644
+      /** Called whenever the textarea resizes */
+      onResize?: ((e: Event) => void) | undefined;
+      /** Minimum number of visible rows */
++diff --git a/node_modules/react-autosize-textarea/lib/index.js b/node_modules/react-autosize-textarea/lib/index.js
++index 5ca03f1..6d4037e 100644
++--- a/node_modules/react-autosize-textarea/lib/index.js
+++++ b/node_modules/react-autosize-textarea/lib/index.js
++@@ -1,4 +1,3 @@
++ "use strict";
++-exports.__esModule = true;
++ var TextareaAutosize_1 = require("./TextareaAutosize");
++-exports["default"] = TextareaAutosize_1.TextareaAutosize;
+++module.exports = TextareaAutosize_1.TextareaAutosize;
+diff --git a/test/e2e/specs/site-editor/preload.spec.js b/test/e2e/specs/site-editor/preload.spec.js
+index 0b68c9332e9f3d..90f4a7894986d5 100644
+--- a/test/e2e/specs/site-editor/preload.spec.js
++++ b/test/e2e/specs/site-editor/preload.spec.js
+@@ -51,9 +51,6 @@ test.describe( 'Preload', () => {
+ 			'/wp-abilities/v1/abilities?per_page=100&context=edit',
+ 			// Seems to be coming from `enableComplementaryArea`.
+ 			'/wp/v2/users/me',
+-			// There are two separate settings OPTIONS requests. We should fix
+-			// so the one for canUser and getEntityRecord are reused.
+-			'/wp/v2/settings',
+ 		] );
+ 	} );
+ } );

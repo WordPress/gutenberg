@@ -1,0 +1,119 @@
+diff --git a/packages/components/src/checkbox-control/index.tsx b/packages/components/src/checkbox-control/index.tsx
+index a24d1abaab45a7..eafac462b10985 100644
+--- a/packages/components/src/checkbox-control/index.tsx
++++ b/packages/components/src/checkbox-control/index.tsx
+@@ -53,6 +53,7 @@ export function CheckboxControl(
+ 		indeterminate,
+ 		help,
+ 		id: idProp,
++		disabled,
+ 		onChange,
+ 		...additionalProps
+ 	} = props;
+@@ -89,8 +90,13 @@ export function CheckboxControl(
+ 		'inspector-checkbox-control',
+ 		idProp
+ 	);
+-	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
++	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) => {
++		if ( disabled ) {
++			return;
++		}
++
+ 		onChange( event.target.checked );
++	};
+ 
+ 	return (
+ 		<BaseControl
+@@ -108,7 +114,14 @@ export function CheckboxControl(
+ 			className={ clsx( 'components-checkbox-control', className ) }
+ 		>
+ 			<HStack spacing={ 0 } justify="start" alignment="top">
+-				<span className="components-checkbox-control__input-container">
++				<span
++					className={ clsx(
++						'components-checkbox-control__input-container',
++						{
++							'is-disabled': disabled,
++						}
++					) }
++				>
+ 					<input
+ 						ref={ ref }
+ 						id={ id }
+@@ -116,6 +129,7 @@ export function CheckboxControl(
+ 						type="checkbox"
+ 						value="1"
+ 						onChange={ onChangeValue }
++						aria-disabled={ disabled }
+ 						checked={ checked }
+ 						aria-describedby={ !! help ? id + '__help' : undefined }
+ 						{ ...additionalProps }
+@@ -137,7 +151,12 @@ export function CheckboxControl(
+ 				</span>
+ 				{ label && (
+ 					<label
+-						className="components-checkbox-control__label"
++						className={ clsx(
++							'components-checkbox-control__label',
++							{
++								'is-disabled': disabled,
++							}
++						) }
+ 						htmlFor={ id }
+ 					>
+ 						{ label }
+diff --git a/packages/components/src/checkbox-control/stories/index.story.tsx b/packages/components/src/checkbox-control/stories/index.story.tsx
+index a2936654c8629a..8f191da970ded1 100644
+--- a/packages/components/src/checkbox-control/stories/index.story.tsx
++++ b/packages/components/src/checkbox-control/stories/index.story.tsx
+@@ -27,6 +27,7 @@ const meta: Meta< typeof CheckboxControl > = {
+ 			control: false,
+ 		},
+ 		help: { control: { type: 'text' } },
++		disabled: { control: { type: 'boolean' } },
+ 	},
+ 	parameters: {
+ 		controls: {
+diff --git a/packages/components/src/checkbox-control/style.scss b/packages/components/src/checkbox-control/style.scss
+index 63cd023302bcb1..a0d7bc801018f0 100644
+--- a/packages/components/src/checkbox-control/style.scss
++++ b/packages/components/src/checkbox-control/style.scss
+@@ -12,7 +12,10 @@
+ .components-checkbox-control__label {
+ 	// Ensure label is aligned with checkbox along X axis
+ 	line-height: var(--checkbox-input-size);
+-	cursor: pointer;
++
++	&:not(.is-disabled) {
++		cursor: pointer;
++	}
+ }
+ 
+ .components-checkbox-control__input[type="checkbox"] {
+@@ -66,6 +69,11 @@
+ 	aspect-ratio: 1;
+ 	line-height: 1; // maintains proper height even with WP common.css
+ 	flex-shrink: 0;
++
++	// Disabled state:
++	&.is-disabled {
++		opacity: 0.3;
++	}
+ }
+ 
+ svg.components-checkbox-control__checked,
+diff --git a/packages/components/src/checkbox-control/types.ts b/packages/components/src/checkbox-control/types.ts
+index 07ab55493fc661..8f052b1ce6dd2b 100644
+--- a/packages/components/src/checkbox-control/types.ts
++++ b/packages/components/src/checkbox-control/types.ts
+@@ -36,4 +36,9 @@ export type CheckboxControlProps = Pick<
+ 	 * @deprecated
+ 	 */
+ 	heading?: ReactNode;
++	/**
++	 * If disabled is true the checkbox will be disabled and apply the appropriate
++	 * styles.
++	 */
++	disabled?: boolean;
+ };

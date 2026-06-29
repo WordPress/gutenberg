@@ -1,0 +1,3202 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d85d01a72fdfa2..85e0a4aff77db5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,9 +2,18 @@
+ 
+ ## Unreleased
+ 
++### New Feature
++
++-   Update the border color used in `CardBody`, `CardHeader`, `CardFooter`, and `CardDivider` to a different shade of gray, in order to match the color used in other components ([#32566](https://github.com/WordPress/gutenberg/pull/32566)).
++
+ ### Deprecation
+ 
+ -   `isPrimary`, `isSecondary`, `isTertiary` and `isLink` props in `Button` have been deprecated. Use `variant` instead ([#31713](https://github.com/WordPress/gutenberg/pull/31713)).
++-   `isElevated` prop in `Card` has been deprecated. Use `elevation` instead ([#32566](https://github.com/WordPress/gutenberg/pull/32566)).
++
++### Internal
++
++-   `Card`, `CardBody`, `CardHeader`, `CardFooter`, `CardMedia`, and `CardDivider` components have been re-written from the ground up ([#32566](https://github.com/WordPress/gutenberg/pull/32566)).
+ 
+ ## 14.1.0 (2021-05-20)
+ 
+diff --git a/packages/components/src/card/card-body/README.md b/packages/components/src/card/card-body/README.md
+index 73b450f7604d83..014720bcc52c03 100644
+--- a/packages/components/src/card/card-body/README.md
++++ b/packages/components/src/card/card-body/README.md
+@@ -1,6 +1,6 @@
+ # CardBody
+ 
+-CardBody renders an optional content area for a [`<Card />`](../).
++`CardBody` renders an optional content area for a [`Card`](/packages/components/src/card/card/README.md). Multiple `CardBody` components can be used within `Card` if needed.
+ 
+ ## Usage
+ 
+@@ -16,20 +16,26 @@ const Example = () => (
+ 
+ ## Props
+ 
+-### isShady
++Note: This component is connected to [`Card`'s Context](/packages/components/src/card/card/README.md#context). The value of the `size` prop is derived from the `Card` parent component (if there is one). Setting this prop directly on this component will override any derived values.
++
++### `isScrollable`: `boolean`
++
++Determines if the component is scrollable.
++
++-   Required: No
++-   Default: `true`
++
++### `isShady`: `boolean`
+ 
+ Renders with a light gray background color.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ -   Default: `false`
+ 
+-### size
++### `size`: `string`
+ 
+ Determines the amount of padding within the component.
+ 
+--   Type: `String`
+--   Required: No
+--   Default: `medium`
+-
+-Note: This component is connected to [`<Card />`'s Context](../card/README.md#context). Passing props directly to this component will override the props derived from context.
++- Required: No
++- Default: `medium`
++- Allowed values: `xSmall`, `small`, `medium`, `large`
+diff --git a/packages/components/src/card/card-body/component.js b/packages/components/src/card/card-body/component.js
+new file mode 100644
+index 00000000000000..455ddc85ef5b20
+--- /dev/null
++++ b/packages/components/src/card/card-body/component.js
+@@ -0,0 +1,40 @@
++/**
++ * Internal dependencies
++ */
++import { contextConnect } from '../../ui/context';
++import { Scrollable } from '../../scrollable';
++import { View } from '../../view';
++import { useCardBody } from './hook';
++
++/**
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').BodyProps, 'div'>} props
++ * @param {import('react').Ref<any>}                                                                  forwardedRef
++ */
++function CardBody( props, forwardedRef ) {
++	const { isScrollable, ...otherProps } = useCardBody( props );
++
++	if ( isScrollable ) {
++		return <Scrollable { ...otherProps } ref={ forwardedRef } />;
++	}
++
++	return <View { ...otherProps } ref={ forwardedRef } />;
++}
++
++/**
++ * `CardBody` renders an optional content area for a `Card`.
++ * Multiple `CardBody` components can be used within `Card` if needed.
++ *
++ * @example
++ * ```jsx
++ * import { Card, CardBody } from `@wordpress/components`;
++ *
++ * <Card>
++ * 	<CardBody>
++ * 		...
++ * 	</CardBody>
++ * </Card>
++ * ```
++ */
++const ConnectedCardBody = contextConnect( CardBody, 'CardBody' );
++
++export default ConnectedCardBody;
+diff --git a/packages/components/src/card/card-body/hook.js b/packages/components/src/card/card-body/hook.js
+new file mode 100644
+index 00000000000000..3a524d1a8d8d9c
+--- /dev/null
++++ b/packages/components/src/card/card-body/hook.js
+@@ -0,0 +1,48 @@
++/**
++ * External dependencies
++ */
++import { cx } from 'emotion';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem } from '../../ui/context';
++import * as styles from '../styles';
++
++/**
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').BodyProps, 'div'>} props
++ */
++export function useCardBody( props ) {
++	const {
++		className,
++		isScrollable = true,
++		isShady = false,
++		size = 'medium',
++		...otherProps
++	} = useContextSystem( props, 'CardBody' );
++
++	const classes = useMemo(
++		() =>
++			cx(
++				styles.Body,
++				styles.borderRadius,
++				styles.cardPaddings[ size ],
++				isShady && styles.shady,
++				// This classname is added for legacy compatibility reasons.
++				'components-card__body',
++				className
++			),
++		[ className, isShady, size ]
++	);
++
++	return {
++		...otherProps,
++		className: classes,
++		isScrollable,
++	};
++}
+diff --git a/packages/components/src/card/card-body/index.js b/packages/components/src/card/card-body/index.js
+index b31d7e1a7487cf..7d6f9023b1e87f 100644
+--- a/packages/components/src/card/card-body/index.js
++++ b/packages/components/src/card/card-body/index.js
+@@ -1,37 +1,2 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * Internal dependencies
+- */
+-import { BodyUI } from '../styles';
+-import { useCardContext } from '../context';
+-
+-export const defaultProps = {
+-	isShady: false,
+-	size: 'medium',
+-};
+-
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * @param { import('../types').BodyProps & JSX.IntrinsicElements['div'] } props
+- */
+-export function CardBody( props ) {
+-	/* eslint-enable jsdoc/valid-types */
+-	const { className, isShady, ...additionalProps } = props;
+-	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
+-	const { size } = mergedProps;
+-
+-	const classes = classnames(
+-		'components-card__body',
+-		isShady && 'is-shady',
+-		size && `is-size-${ size }`,
+-		className
+-	);
+-
+-	return <BodyUI { ...additionalProps } className={ classes } />;
+-}
+-
+-export default CardBody;
++export { default } from './component';
++export { useCardBody } from './hook';
+diff --git a/packages/components/src/card/card-divider/README.md b/packages/components/src/card/card-divider/README.md
+index 05dd2207a38e39..05900ce69bb456 100644
+--- a/packages/components/src/card/card-divider/README.md
++++ b/packages/components/src/card/card-divider/README.md
+@@ -1,6 +1,6 @@
+ # CardDivider
+ 
+-CardDivider renders an optional divider within a [`<Card />`](../card/README.md).
++`CardDivider` renders an optional divider within a [`Card`](/packages/components/src/card/card/README.md). It is typically used to divide multiple `CardBody` components from each other.
+ 
+ ## Usage
+ 
+@@ -15,3 +15,9 @@ const Example = () => (
+ 	</Card>
+ );
+ ```
++
++## Props
++
++### Inherited props
++
++`CardDivider` inherits all of the [`Divider` props](/packages/components/src/divider/README.md#props).
+diff --git a/packages/components/src/card/card-divider/component.js b/packages/components/src/card/card-divider/component.js
+new file mode 100644
+index 00000000000000..17cd18fd7caaf3
+--- /dev/null
++++ b/packages/components/src/card/card-divider/component.js
+@@ -0,0 +1,35 @@
++/**
++ * Internal dependencies
++ */
++import { contextConnect } from '../../ui/context';
++import { Divider } from '../../divider';
++import { useCardDivider } from './hook';
++
++/**
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr'>} props
++ * @param {import('react').Ref<any>}                                                                         forwardedRef
++ */
++function CardDivider( props, forwardedRef ) {
++	const dividerProps = useCardDivider( props );
++
++	return <Divider { ...dividerProps } ref={ forwardedRef } />;
++}
++
++/**
++ * `CardDivider` renders an optional divider within a `Card`.
++ * It is typically used to divide multiple `CardBody` components from each other.
++ *
++ * @example
++ * ```jsx
++ * import { Card, CardBody, CardDivider } from `@wordpress/components`;
++ *
++ * <Card>
++ *  <CardBody>...</CardBody>
++ *  <CardDivider />
++ *  <CardBody>...</CardBody>
++ * </Card>
++ * ```
++ */
++const ConnectedCardDivider = contextConnect( CardDivider, 'CardDivider' );
++
++export default ConnectedCardDivider;
+diff --git a/packages/components/src/card/card-divider/hook.js b/packages/components/src/card/card-divider/hook.js
+new file mode 100644
+index 00000000000000..bb737d9c2eae7e
+--- /dev/null
++++ b/packages/components/src/card/card-divider/hook.js
+@@ -0,0 +1,42 @@
++/**
++ * External dependencies
++ */
++import { cx } from 'emotion';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem } from '../../ui/context';
++import * as styles from '../styles';
++
++/**
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr'>} props
++ */
++export function useCardDivider( props ) {
++	const { className, ...otherProps } = useContextSystem(
++		props,
++		'CardDivider'
++	);
++
++	const classes = useMemo(
++		() =>
++			cx(
++				styles.Divider,
++				styles.borderColor,
++				// This classname is added for legacy compatibility reasons.
++				'components-card__divider',
++				className
++			),
++		[ className ]
++	);
++
++	return {
++		...otherProps,
++		className: classes,
++	};
++}
+diff --git a/packages/components/src/card/card-divider/index.js b/packages/components/src/card/card-divider/index.js
+index 8ca003a5ab290c..cbf57806c3d6fd 100644
+--- a/packages/components/src/card/card-divider/index.js
++++ b/packages/components/src/card/card-divider/index.js
+@@ -1,31 +1,2 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * Internal dependencies
+- */
+-import { DividerUI } from '../styles';
+-
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * @param { JSX.IntrinsicElements['hr'] } props
+- */
+-export function CardDivider( props ) {
+-	/* eslint-enable jsdoc/valid-types */
+-	const { className, ...additionalProps } = props;
+-
+-	const classes = classnames( 'components-card__divider', className );
+-
+-	return (
+-		<DividerUI
+-			{ ...additionalProps }
+-			children={ null }
+-			className={ classes }
+-			role="separator"
+-		/>
+-	);
+-}
+-
+-export default CardDivider;
++export { default } from './component';
++export { useCardDivider } from './hook';
+diff --git a/packages/components/src/card/card-footer/README.md b/packages/components/src/card/card-footer/README.md
+index 0a350c6f2c0b11..e7f15d846b4fbd 100644
+--- a/packages/components/src/card/card-footer/README.md
++++ b/packages/components/src/card/card-footer/README.md
+@@ -1,6 +1,6 @@
+ # CardFooter
+ 
+-CardFooter renders an optional footer within a [`<Card />`](../card/README.md).
++`CardFooter` renders an optional footer within a [`Card`](/packages/components/src/card/card/README.md).
+ 
+ ## Usage
+ 
+@@ -9,14 +9,15 @@ import { Card, CardFooter } from '@wordpress/components';
+ 
+ const Example = () => (
+ 	<Card>
+-		<CardFooter>...</CardFooter>
++ 		<CardBody>...</CardBody>
++ 		<CardFooter>...</CardFooter>
+ 	</Card>
+ );
+ ```
+ 
+ ### Flex
+ 
+-Underneath, CardFooter uses the layout component [`<Flex/>`](../../flex/flex/README.md). This improves the alignment of child items within the component.
++Underneath, `CardFooter` uses the [`Flex` layout component](/packages/components/src/flex/flex/README.md). This improves the alignment of child items within the component.
+ 
+ ```jsx
+ import {
+@@ -29,6 +30,7 @@ import {
+ 
+ const Example = () => (
+ 	<Card>
++		<CardBody>...</CardBody>
+ 		<CardFooter>
+ 			<FlexBlock>Content</FlexBlock>
+ 			<FlexItem>
+@@ -39,40 +41,34 @@ const Example = () => (
+ );
+ ```
+ 
+-Check out [the documentation](../../flex/flex/README.md) on `<Flex/>` for more details on layout composition.
++Check out [the documentation](/packages/components/src/flex/flex/README.md) on `Flex` for more details on layout composition.
+ 
+ ## Props
+ 
+-### isBorderless
++Note: This component is connected to [`Card`'s Context](/packages/components/src/card/card/README.md#context). The value of the `size` and `isBorderless` props is derived from the `Card` parent component (if there is one). Setting these props directly on this component will override any derived values.
+ 
+-Determines the border style of the card.
++### `isBorderless`: `boolean`
+ 
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
+-
+-### isElevated
++Renders without a border.
+ 
+-Determines the elevation style of the card.
+-
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
++- Required: No
++- Default: `false`
+ 
+-### isShady
++### `isShady`: `boolean`
+ 
+ Renders with a light gray background color.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ -   Default: `false`
+ 
+-### size
++### `justify`: `CSSProperties[ 'justifyContent' ]`
+ 
+-Determines the amount of padding within the component.
++See the documentation for the `justify` prop for the [`Flex` component](/packages/components/src/flex/flex/README.md#justify)
+ 
+--   Type: `String`
+--   Required: No
+--   Default: `medium`
++### `size`: `string`
++
++Determines the amount of padding within the component.
+ 
+-Note: This component is connected to [`<Card />`'s Context](../card/README.md#context). Passing props directly to this component will override the props derived from context.
++- Required: No
++- Default: `medium`
++- Allowed values: `xSmall`, `small`, `medium`, `large`
+diff --git a/packages/components/src/card/card-footer/component.js b/packages/components/src/card/card-footer/component.js
+new file mode 100644
+index 00000000000000..b5ef215eb3964a
+--- /dev/null
++++ b/packages/components/src/card/card-footer/component.js
+@@ -0,0 +1,33 @@
++/**
++ * Internal dependencies
++ */
++import { contextConnect } from '../../ui/context';
++import { Flex } from '../../flex';
++import { useCardFooter } from './hook';
++
++/**
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FooterProps, 'div'>} props
++ * @param {import('react').Ref<any>}                                                                    forwardedRef
++ */
++function CardFooter( props, forwardedRef ) {
++	const footerProps = useCardFooter( props );
++
++	return <Flex { ...footerProps } ref={ forwardedRef } />;
++}
++
++/**
++ * `CardFooter` renders an optional footer within a `Card`.
++ *
++ * @example
++ * ```jsx
++ * import { Card, CardBody, CardFooter } from `@wordpress/components`;
++ *
++ * <Card>
++ * 	<CardBody>...</CardBody>
++ * 	<CardFooter>...</CardFooter>
++ * </Card>
++ * ```
++ */
++const ConnectedCardFooter = contextConnect( CardFooter, 'CardFooter' );
++
++export default ConnectedCardFooter;
+diff --git a/packages/components/src/card/card-footer/hook.js b/packages/components/src/card/card-footer/hook.js
+new file mode 100644
+index 00000000000000..410d2ec2582d71
+--- /dev/null
++++ b/packages/components/src/card/card-footer/hook.js
+@@ -0,0 +1,51 @@
++/**
++ * External dependencies
++ */
++import { cx } from 'emotion';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem } from '../../ui/context';
++import * as styles from '../styles';
++
++/**
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FooterProps, 'div'>} props
++ */
++export function useCardFooter( props ) {
++	const {
++		className,
++		justify,
++		isBorderless = false,
++		isShady = false,
++		size = 'medium',
++		...otherProps
++	} = useContextSystem( props, 'CardFooter' );
++
++	const classes = useMemo(
++		() =>
++			cx(
++				styles.Footer,
++				styles.borderRadius,
++				styles.borderColor,
++				styles.cardPaddings[ size ],
++				isBorderless && styles.borderless,
++				isShady && styles.shady,
++				// This classname is added for legacy compatibility reasons.
++				'components-card__footer',
++				className
++			),
++		[ className, isBorderless, isShady, size ]
++	);
++
++	return {
++		...otherProps,
++		className: classes,
++		justify,
++	};
++}
+diff --git a/packages/components/src/card/card-footer/index.js b/packages/components/src/card/card-footer/index.js
+index 581cf7bb66dd4a..11fc4c6b991b11 100644
+--- a/packages/components/src/card/card-footer/index.js
++++ b/packages/components/src/card/card-footer/index.js
+@@ -1,37 +1,2 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * Internal dependencies
+- */
+-import { FooterUI } from '../styles';
+-import { useCardContext } from '../context';
+-
+-export const defaultProps = {
+-	isBorderless: false,
+-	isShady: false,
+-	size: 'medium',
+-};
+-
+-/**
+- * @param { import('../types').FooterProps } props
+- */
+-export function CardFooter( props ) {
+-	const { className, isShady, ...additionalProps } = props;
+-	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
+-	const { isBorderless, size } = mergedProps;
+-
+-	const classes = classnames(
+-		'components-card__footer',
+-		isBorderless && 'is-borderless',
+-		isShady && 'is-shady',
+-		size && `is-size-${ size }`,
+-		className
+-	);
+-
+-	return <FooterUI { ...additionalProps } className={ classes } />;
+-}
+-
+-export default CardFooter;
++export { default } from './component';
++export { useCardFooter } from './hook';
+diff --git a/packages/components/src/card/card-header/README.md b/packages/components/src/card/card-header/README.md
+index 911c8fb2892bf2..87f2f6178a9c82 100644
+--- a/packages/components/src/card/card-header/README.md
++++ b/packages/components/src/card/card-header/README.md
+@@ -1,6 +1,6 @@
+ # CardHeader
+ 
+-CardHeader renders an optional header within a [`<Card />`](../card/README.md).
++`CardHeader` renders an optional header within a [`Card`](/packages/components/src/card/card/README.md).
+ 
+ ## Usage
+ 
+@@ -9,70 +9,34 @@ import { Card, CardHeader } from '@wordpress/components';
+ 
+ const Example = () => (
+ 	<Card>
+-		<CardHeader>...</CardHeader>
++ 		<CardHeader>...</CardHeader>
++ 		<CardBody>...</CardBody>
+ 	</Card>
+ );
+ ```
+ 
+-### Flex
+-
+-Underneath, CardHeader uses the layout component [`<Flex/>`](../../flex/flex/README.md). This improves the alignment of child items within the component.
+-
+-```jsx
+-import {
+-	Button,
+-	Card,
+-	CardHeader,
+-	FlexItem,
+-	FlexBlock,
+-} from '@wordpress/components';
+-
+-const Example = () => (
+-	<Card>
+-		<CardHeader>
+-			<FlexBlock>Content</FlexBlock>
+-			<FlexItem>
+-				<Button>Action</Button>
+-			</FlexItem>
+-		</CardHeader>
+-	</Card>
+-);
+-```
+-
+-Check out [the documentation](../../flex/flex/README.md) on `<Flex/>` for more details on layout composition.
+-
+ ## Props
+ 
+-### isBorderless
++Note: This component is connected to [`Card`'s Context](/packages/components/src/card/card/README.md#context). The value of the `size` and `isBorderless` props is derived from the `Card` parent component (if there is one). Setting these props directly on this component will override any derived values.
+ 
+-Determines the border style of the card.
++### `isBorderless`: `boolean`
+ 
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
++Renders without a border.
+ 
+-### isElevated
++- Required: No
++- Default: `false`
+ 
+-Determines the elevation style of the card.
+-
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
+-
+-### isShady
++### `isShady`: `boolean`
+ 
+ Renders with a light gray background color.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ -   Default: `false`
+ 
+-### size
++### `size`: `string`
+ 
+ Determines the amount of padding within the component.
+ 
+--   Type: `String`
+--   Required: No
+--   Default: `medium`
+-
+-Note: This component is connected to [`<Card />`'s Context](../card/README.md#context). Passing props directly to this component will override the props derived from context.
++- Required: No
++- Default: `medium`
++- Allowed values: `xSmall`, `small`, `medium`, `large`
+diff --git a/packages/components/src/card/card-header/component.js b/packages/components/src/card/card-header/component.js
+new file mode 100644
+index 00000000000000..621448d82856a1
+--- /dev/null
++++ b/packages/components/src/card/card-header/component.js
+@@ -0,0 +1,33 @@
++/**
++ * Internal dependencies
++ */
++import { contextConnect } from '../../ui/context';
++import { Flex } from '../../flex';
++import { useCardHeader } from './hook';
++
++/**
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').HeaderProps, 'div'>} props
++ * @param {import('react').Ref<any>}                                                                    forwardedRef
++ */
++function CardHeader( props, forwardedRef ) {
++	const headerProps = useCardHeader( props );
++
++	return <Flex { ...headerProps } ref={ forwardedRef } />;
++}
++
++/**
++ * `CardHeader` renders an optional header within a `Card`.
++ *
++ * @example
++ * ```jsx
++ * import { Card, CardBody, CardHeader } from `@wordpress/components`;
++ *
++ * <Card>
++ * 	<CardHeader>...</CardHeader>
++ * 	<CardBody>...</CardBody>
++ * </Card>
++ * ```
++ */
++const ConnectedCardHeader = contextConnect( CardHeader, 'CardHeader' );
++
++export default ConnectedCardHeader;
+diff --git a/packages/components/src/card/card-header/hook.js b/packages/components/src/card/card-header/hook.js
+new file mode 100644
+index 00000000000000..2cf37307c74606
+--- /dev/null
++++ b/packages/components/src/card/card-header/hook.js
+@@ -0,0 +1,49 @@
++/**
++ * External dependencies
++ */
++import { cx } from 'emotion';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem } from '../../ui/context';
++import * as styles from '../styles';
++
++/**
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').HeaderProps, 'div'>} props
++ */
++export function useCardHeader( props ) {
++	const {
++		className,
++		isBorderless = false,
++		isShady = false,
++		size = 'medium',
++		...otherProps
++	} = useContextSystem( props, 'CardHeader' );
++
++	const classes = useMemo(
++		() =>
++			cx(
++				styles.Header,
++				styles.borderRadius,
++				styles.borderColor,
++				styles.cardPaddings[ size ],
++				isBorderless && styles.borderless,
++				isShady && styles.shady,
++				// This classname is added for legacy compatibility reasons.
++				'components-card__header',
++				className
++			),
++		[ className, isBorderless, isShady, size ]
++	);
++
++	return {
++		...otherProps,
++		className: classes,
++	};
++}
+diff --git a/packages/components/src/card/card-header/index.js b/packages/components/src/card/card-header/index.js
+index 4d65462f9ec0b5..0cf1892570444e 100644
+--- a/packages/components/src/card/card-header/index.js
++++ b/packages/components/src/card/card-header/index.js
+@@ -1,37 +1,2 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * Internal dependencies
+- */
+-import { HeaderUI } from '../styles';
+-import { useCardContext } from '../context';
+-
+-export const defaultProps = {
+-	isBorderless: false,
+-	isShady: false,
+-	size: 'medium',
+-};
+-
+-/**
+- * @param { import('../types').HeaderProps } props
+- */
+-export function CardHeader( props ) {
+-	const { className, isShady, ...additionalProps } = props;
+-	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
+-	const { isBorderless, size } = mergedProps;
+-
+-	const classes = classnames(
+-		'components-card__header',
+-		isBorderless && 'is-borderless',
+-		isShady && 'is-shady',
+-		size && `is-size-${ size }`,
+-		className
+-	);
+-
+-	return <HeaderUI { ...additionalProps } className={ classes } />;
+-}
+-
+-export default CardHeader;
++export { default } from './component';
++export { useCardHeader } from './hook';
+diff --git a/packages/components/src/card/card-media/README.md b/packages/components/src/card/card-media/README.md
+index a93fd81ff8a68e..ce3db969fec518 100644
+--- a/packages/components/src/card/card-media/README.md
++++ b/packages/components/src/card/card-media/README.md
+@@ -1,6 +1,6 @@
+ # CardMedia
+ 
+-CardMedia provides a container for media elements, and renders within a [`<Card />`](../card/README.md).
++`CardMedia` provides a container for media elements within a [`Card`](/packages/components/src/card/card/README.md).
+ 
+ ## Usage
+ 
+@@ -19,66 +19,4 @@ const Example = () => (
+ 
+ ## Placement
+ 
+-`<CardMedia />` can be placed in any order as a direct child of a `<Card />`. The styles will automatically round the corners of the inner media element.
+-
+-### Top
+-
+-```jsx
+-import { Card, CardBody, CardMedia } from '@wordpress/components';
+-
+-const Example = () => (
+-	<Card>
+-		<CardMedia>
+-			<img src="..." />
+-		</CardMedia>
+-		<CardBody>...</CardBody>
+-	</Card>
+-);
+-```
+-
+-### Center
+-
+-```jsx
+-import { Card, CardBody, CardMedia } from '@wordpress/components';
+-
+-const Example = () => (
+-	<Card>
+-		<CardBody>...</CardBody>
+-		<CardMedia>
+-			<img src="..." />
+-		</CardMedia>
+-		<CardBody>...</CardBody>
+-	</Card>
+-);
+-```
+-
+-### Bottom
+-
+-```jsx
+-import { Card, CardBody, CardMedia } from '@wordpress/components';
+-
+-const Example = () => (
+-	<Card>
+-		<CardBody>...</CardBody>
+-		<CardMedia>
+-			<img src="..." />
+-		</CardMedia>
+-	</Card>
+-);
+-```
+-
+-### Only
+-
+-`<CardMedia />` can also exist as the only child component of `<Card />`.
+-
+-```jsx
+-import { Card, CardMedia } from '@wordpress/components';
+-
+-const Example = () => (
+-	<Card>
+-		<CardMedia>
+-			<img src="..." />
+-		</CardMedia>
+-	</Card>
+-);
+-```
++`CardMedia` can be placed in any order as a direct child of a `Card` (it can also exist as the only child component). The styles will automatically round the corners of the inner media element.
+diff --git a/packages/components/src/card/card-media/component.js b/packages/components/src/card/card-media/component.js
+new file mode 100644
+index 00000000000000..3c562604eb964b
+--- /dev/null
++++ b/packages/components/src/card/card-media/component.js
+@@ -0,0 +1,30 @@
++/**
++ * Internal dependencies
++ */
++import { createComponent } from '../../ui/utils';
++import { useCardMedia } from './hook';
++
++/**
++ * `CardMedia` provides a container for media elements within a `Card`.
++ *
++ * @example
++ * ```jsx
++ * import { Card, CardBody, CardMedia } from '@wordpress/components';
++ *
++ * const Example = () => (
++ *  <Card>
++ *	  <CardMedia>
++ *		  <img src="..." />
++ *    </CardMedia>
++ *    <CardBody>...</CardBody>
++ *  </Card>
++ * );
++ * ```
++ */
++const CardMedia = createComponent( {
++	as: 'div',
++	useHook: useCardMedia,
++	name: 'CardMedia',
++} );
++
++export default CardMedia;
+diff --git a/packages/components/src/card/card-media/hook.js b/packages/components/src/card/card-media/hook.js
+new file mode 100644
+index 00000000000000..4ecb50acf1ae8c
+--- /dev/null
++++ b/packages/components/src/card/card-media/hook.js
+@@ -0,0 +1,39 @@
++/**
++ * External dependencies
++ */
++import { cx } from 'emotion';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem } from '../../ui/context';
++import * as styles from '../styles';
++
++/**
++ * @param {import('../../ui/context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
++ */
++export function useCardMedia( props ) {
++	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
++
++	const classes = useMemo(
++		() =>
++			cx(
++				styles.Media,
++				styles.borderRadius,
++				// This classname is added for legacy compatibility reasons.
++				'components-card__media',
++				className
++			),
++		[ className ]
++	);
++
++	return {
++		...otherProps,
++		className: classes,
++	};
++}
+diff --git a/packages/components/src/card/card-media/index.js b/packages/components/src/card/card-media/index.js
+index 11ed6f90923632..96ad735f79121c 100644
+--- a/packages/components/src/card/card-media/index.js
++++ b/packages/components/src/card/card-media/index.js
+@@ -1,24 +1,2 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * Internal dependencies
+- */
+-import { MediaUI } from '../styles';
+-
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * @param { JSX.IntrinsicElements['div'] } props
+- */
+-export function CardMedia( props ) {
+-	/* eslint-enable jsdoc/valid-types */
+-	const { className, ...additionalProps } = props;
+-
+-	const classes = classnames( 'components-card__media', className );
+-
+-	return <MediaUI { ...additionalProps } className={ classes } />;
+-}
+-
+-export default CardMedia;
++export { default } from './component';
++export { useCardMedia } from './hook';
+diff --git a/packages/components/src/card/card/README.md b/packages/components/src/card/card/README.md
+index 6a755a167eb229..8b9f507464150b 100644
+--- a/packages/components/src/card/card/README.md
++++ b/packages/components/src/card/card/README.md
+@@ -1,54 +1,82 @@
+ # Card
+ 
+-Card provides a flexible and extensible content container.
++`Card` provides a flexible and extensible content container.
+ 
+ ## Usage
+ 
+-```jsx
+-import { Card, CardBody } from '@wordpress/components';
++`Card` also provides a convenient set of [sub-components](#sub-components) such as `CardBody`, `CardHeader`, `CardFooter`, and more (see below).
+ 
+-const Example = () => (
+-	<Card>
+-		<CardBody>...</CardBody>
+-	</Card>
+-);
++```jsx live
++import {
++	Card,
++	CardHeader,
++	CardBody,
++	CardFooter,
++	Text,
++	Heading,
++} from '@wordpress/components';
++
++function Example() {
++	return (
++		<Card>
++			<CardHeader>
++				<Heading size={ 4 }>Card Title</Heading>
++			</CardHeader>
++			<CardBody>
++				<Text>Card Content</Text>
++			</CardBody>
++			<CardFooter>
++				<Text>Card Footer</Text>
++			</CardFooter>
++		</Card>
++	);
++}
+ ```
+ 
+ ## Props
+ 
+-### isBorderless
++### `elevation`: `number`
++
++Size of the elevation shadow, based on the Style system's elevation system. This may be helpful in highlighting certain content. For more information, check out [`Elevation`](/packages/components/src/elevation/README.md).
+ 
+-Determines the border style of the card.
++- Required: No
++- Default: `0`
+ 
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
++### `isBorderless`: `boolean`
+ 
+-### isElevated
++Renders without a border.
+ 
+-Determines the elevation style of the card.
++- Required: No
++- Default: `false`
+ 
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
++### `isRounded`: `boolean`
+ 
+-### size
++Renders with rounded corners.
++
++- Required: No
++- Default: `true`
++
++### `size`: `string`
+ 
+ Determines the amount of padding within the component.
+ 
+--   Type: `String`
+--   Required: No
+--   Default: `medium`
++- Required: No
++- Default: `medium`
++- Allowed values: `xSmall`, `small`, `medium`, `large`
++
++### Inherited props
++
++`Card` also inherits all of the [`Surface` props](/packages/components/src/ui/surface/README.md#props).
+ 
+ ## Sub-Components
+ 
+ This component provides a collection of sub-component that can be used to compose various interfaces.
+ 
+--   [`<CardBody />`](../card-body/README.md)
+--   [`<CardDivider />`](../card-divider/README.md)
+--   [`<CardFooter />`](../card-footer/README.md)
+--   [`<CardHeader />`](../card-header/README.md)
+--   [`<CardMedia />`](../card-media/README.md)
++-   [`<CardBody />`](/packages/components/src/card/card-body/README.md)
++-   [`<CardDivider />`](/packages/components/src/card/card-divider/README.md)
++-   [`<CardFooter />`](/packages/components/src/card/card-footer/README.md))
++-   [`<CardHeader />`](/packages/components/src/card/card-header/README.md))
++-   [`<CardMedia />`](/packages/components/src/card/card-media/README.md))
+ 
+ ### Sub-Components Example
+ 
+@@ -78,7 +106,7 @@ const Example = () => (
+ 
+ ### Context
+ 
+-`<Card />`'s sub-components are connected to `<Card />` using [Context](https://reactjs.org/docs/context.html). Certain props like `size` and `variant` are passed through to the sub-components.
++`<Card />`'s sub-components are connected to `<Card />` using [Context](https://reactjs.org/docs/context.html). Certain props like `size` and `isBorderless` are passed through to some of the sub-components.
+ 
+ In the following example, the `<CardBody />` will render with a size of `small`:
+ 
+diff --git a/packages/components/src/card/card/component.js b/packages/components/src/card/card/component.js
+new file mode 100644
+index 00000000000000..db1085d823d6a3
+--- /dev/null
++++ b/packages/components/src/card/card/component.js
+@@ -0,0 +1,107 @@
++/**
++ * External dependencies
++ */
++import { css } from 'emotion';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { contextConnect, ContextSystemProvider } from '../../ui/context';
++import { Elevation } from '../../elevation';
++import { View } from '../../view';
++import * as styles from '../styles';
++import { useCard } from './hook';
++import CONFIG from '../../utils/config-values';
++
++/**
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
++ * @param {import('react').Ref<any>}                                                              forwardedRef
++ */
++function Card( props, forwardedRef ) {
++	const {
++		children,
++		elevation,
++		isBorderless,
++		isRounded,
++		size,
++		...otherProps
++	} = useCard( props );
++	const elevationBorderRadius = isRounded ? CONFIG.cardBorderRadius : 0;
++
++	const elevationClassName = useMemo(
++		() => css( { borderRadius: elevationBorderRadius } ),
++		[ elevationBorderRadius ]
++	);
++
++	const contextProviderValue = useMemo( () => {
++		const contextProps = {
++			size,
++			isBorderless,
++		};
++		return {
++			CardBody: contextProps,
++			CardHeader: contextProps,
++			CardFooter: contextProps,
++		};
++	}, [ isBorderless, size ] );
++
++	return (
++		<ContextSystemProvider value={ contextProviderValue }>
++			<View { ...otherProps } ref={ forwardedRef }>
++				<View className={ styles.Content }>{ children }</View>
++				<Elevation
++					className={ elevationClassName }
++					isInteractive={ false }
++					value={ elevation ? 1 : 0 }
++				/>
++				<Elevation
++					className={ elevationClassName }
++					isInteractive={ false }
++					value={ elevation }
++				/>
++			</View>
++		</ContextSystemProvider>
++	);
++}
++
++/**
++ * `Card` provides a flexible and extensible content container.
++ * `Card` also provides a convenient set of sub-components such as `CardBody`,
++ * `CardHeader`, `CardFooter`, and more.
++ *
++ * @example
++ * ```jsx
++ * import {
++ *   Card,
++ *   CardHeader,
++ *   CardBody,
++ *   CardFooter,
++ *   Text,
++ *   Heading,
++ * } from `@wordpress/components`;
++ *
++ * function Example() {
++ *   return (
++ *     <Card>
++ *       <CardHeader>
++ *         <Heading size={ 4 }>Card Title</Heading>
++ *       </CardHeader>
++ *       <CardBody>
++ *         <Text>Card Content</Text>
++ *       </CardBody>
++ *       <CardFooter>
++ *         <Text>Card Footer</Text>
++ *       </CardFooter>
++ *     </Card>
++ *   );
++ * }
++ * ```
++ */
++const ConnectedCard = contextConnect( Card, 'Card' );
++
++export default ConnectedCard;
+diff --git a/packages/components/src/card/card/hook.js b/packages/components/src/card/card/hook.js
+new file mode 100644
+index 00000000000000..9809dd440c8550
+--- /dev/null
++++ b/packages/components/src/card/card/hook.js
+@@ -0,0 +1,79 @@
++/**
++ * External dependencies
++ */
++import { cx } from 'emotion';
++
++/**
++ * WordPress dependencies
++ */
++import deprecated from '@wordpress/deprecated';
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem } from '../../ui/context';
++import { useSurface } from '../../surface';
++import * as styles from '../styles';
++
++/**
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
++ */
++function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
++	/**@type {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} */
++	const propsToReturn = {
++		...otherProps,
++	};
++	let computedElevation = elevation;
++
++	if ( isElevated ) {
++		deprecated( 'Card isElevated prop', {
++			since: '5.9',
++			alternative: 'elevation',
++		} );
++		computedElevation ??= 2;
++	}
++
++	// The `elevation` prop should only be passed when it's not `undefined`,
++	// otherwise it will override the value that gets derived from `useContextSystem`.
++	if ( typeof computedElevation !== 'undefined' ) {
++		propsToReturn.elevation = computedElevation;
++	}
++
++	return propsToReturn;
++}
++
++/**
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
++ */
++export function useCard( props ) {
++	const {
++		className,
++		elevation = 0,
++		isBorderless = false,
++		isRounded = true,
++		size = 'medium',
++		...otherProps
++	} = useContextSystem( useDeprecatedProps( props ), 'Card' );
++
++	const classes = useMemo( () => {
++		return cx(
++			styles.Card,
++			isBorderless && styles.boxShadowless,
++			isRounded && styles.rounded,
++			// This classname is added for legacy compatibility reasons.
++			'components-card',
++			className
++		);
++	}, [ className, isBorderless, isRounded ] );
++
++	const surfaceProps = useSurface( { ...otherProps, className: classes } );
++
++	return {
++		...surfaceProps,
++		elevation,
++		isBorderless,
++		isRounded,
++		size,
++	};
++}
+diff --git a/packages/components/src/card/card/index.js b/packages/components/src/card/card/index.js
+index 800137d27a3a92..666dcafcb235f3 100644
+--- a/packages/components/src/card/card/index.js
++++ b/packages/components/src/card/card/index.js
+@@ -1,56 +1,2 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * Internal dependencies
+- */
+-import { CardContext } from '../context';
+-import { CardUI } from '../styles';
+-
+-export const defaultProps = {
+-	isBorderless: false,
+-	isElevated: false,
+-	size: 'medium',
+-};
+-
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * @param { import('../types').Props & JSX.IntrinsicElements['div'] } props
+- */
+-export function Card( props ) {
+-	/* eslint-enable jsdoc/valid-types */
+-	const {
+-		className,
+-		isBorderless,
+-		isElevated,
+-		size,
+-		...additionalProps
+-	} = props;
+-	const { Provider } = CardContext;
+-
+-	const contextProps = {
+-		isBorderless,
+-		isElevated,
+-		size,
+-	};
+-
+-	const classes = classnames(
+-		'components-card',
+-		isBorderless && 'is-borderless',
+-		isElevated && 'is-elevated',
+-		size && `is-size-${ size }`,
+-		className
+-	);
+-
+-	return (
+-		<Provider value={ contextProps }>
+-			<CardUI { ...additionalProps } className={ classes } />
+-		</Provider>
+-	);
+-}
+-
+-Card.defaultProps = defaultProps;
+-
+-export default Card;
++export { default } from './component';
++export { useCard } from './hook';
+diff --git a/packages/components/src/card/index.js b/packages/components/src/card/index.js
+index 7101c549e9bceb..53d9e06532e706 100644
+--- a/packages/components/src/card/index.js
++++ b/packages/components/src/card/index.js
+@@ -1,6 +1,6 @@
+-export { default as Card } from './card';
+-export { default as CardBody } from './card-body';
+-export { default as CardDivider } from './card-divider';
+-export { default as CardFooter } from './card-footer';
+-export { default as CardHeader } from './card-header';
+-export { default as CardMedia } from './card-media';
++export { default as Card, useCard } from './card';
++export { default as CardBody, useCardBody } from './card-body';
++export { default as CardDivider, useCardDivider } from './card-divider';
++export { default as CardFooter, useCardFooter } from './card-footer';
++export { default as CardHeader, useCardHeader } from './card-header';
++export { default as CardMedia, useCardMedia } from './card-media';
+diff --git a/packages/components/src/card/styles.js b/packages/components/src/card/styles.js
+index 8be50a25c36007..823d7e16fce8bf 100644
+--- a/packages/components/src/card/styles.js
++++ b/packages/components/src/card/styles.js
+@@ -1,58 +1,44 @@
+ /**
+  * External dependencies
+  */
+-import styled from '@emotion/styled';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { HorizontalRule } from '@wordpress/primitives';
++import { css } from 'emotion';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { Flex } from '../flex';
+-import { COLORS, space } from '../utils';
+-
+-export const styleProps = {
+-	borderColor: COLORS.lightGray[ 500 ],
+-	borderRadius: '3px',
+-	backgroundShady: COLORS.lightGray[ 200 ],
+-};
++import { COLORS, CONFIG } from '../utils';
+ 
+-const { borderColor, borderRadius, backgroundShady } = styleProps;
+-
+-export const CardUI = styled.div`
+-	background: ${ COLORS.white };
+-	box-sizing: border-box;
+-	border-radius: ${ borderRadius };
+-	border: 1px solid ${ borderColor };
++export const Card = css`
++	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };
++	outline: none;
++`;
+ 
+-	${ handleBorderless };
++export const Header = css`
++	border-bottom: 1px solid;
+ 
+-	&.is-elevated {
+-		box-shadow: 0px 1px 3px 0px rgba( 0, 0, 0, 0.2 ),
+-			0px 1px 1px 0px rgba( 0, 0, 0, 0.14 ),
+-			0px 2px 1px -1px rgba( 0, 0, 0, 0.12 );
++	&:last-child {
++		border-bottom: none;
+ 	}
+ `;
+ 
+-export const HeaderUI = styled( Flex )`
+-	border-bottom: 1px solid ${ borderColor };
+-	border-top-left-radius: ${ borderRadius };
+-	border-top-right-radius: ${ borderRadius };
+-	box-sizing: border-box;
++export const Footer = css`
++	border-top: 1px solid;
+ 
+-	&:last-child {
+-		border-bottom: none;
++	&:first-child {
++		border-top: none;
+ 	}
++`;
+ 
+-	${ headerFooterSizes };
+-	${ handleBorderless };
+-	${ handleShady };
++export const Content = css`
++	height: 100%;
+ `;
+ 
+-export const MediaUI = styled.div`
++export const Body = css`
++	height: auto;
++	max-height: 100%;
++`;
++
++export const Media = css`
+ 	box-sizing: border-box;
+ 	overflow: hidden;
+ 
+@@ -63,99 +49,57 @@ export const MediaUI = styled.div`
+ 		max-width: 100%;
+ 		width: 100%;
+ 	}
++`;
+ 
++export const Divider = css`
++	box-sizing: border-box;
++	display: block;
++	width: 100%;
++`;
++
++export const borderRadius = css`
+ 	&:first-of-type {
+-		border-top-left-radius: ${ borderRadius };
+-		border-top-right-radius: ${ borderRadius };
++		border-top-left-radius: ${ CONFIG.cardBorderRadius };
++		border-top-right-radius: ${ CONFIG.cardBorderRadius };
+ 	}
+ 
+ 	&:last-of-type {
+-		border-bottom-left-radius: ${ borderRadius };
+-		border-bottom-right-radius: ${ borderRadius };
++		border-bottom-left-radius: ${ CONFIG.cardBorderRadius };
++		border-bottom-right-radius: ${ CONFIG.cardBorderRadius };
+ 	}
+ `;
+ 
+-export const BodyUI = styled.div`
+-	box-sizing: border-box;
+-
+-	${ bodySize };
+-	${ handleShady };
++export const borderColor = css`
++	border-color: ${ CONFIG.colorDivider };
+ `;
+ 
+-export const FooterUI = styled( Flex )`
+-	border-top: 1px solid ${ borderColor };
+-	border-bottom-left-radius: ${ borderRadius };
+-	border-bottom-right-radius: ${ borderRadius };
+-	box-sizing: border-box;
+-
+-	&:first-of-type {
+-		border-top: none;
+-	}
++export const boxShadowless = css`
++	box-shadow: none;
++`;
+ 
+-	${ headerFooterSizes };
+-	${ handleBorderless };
+-	${ handleShady };
++export const borderless = css`
++	border: none;
+ `;
+ 
+-export const DividerUI = styled( HorizontalRule )`
+-	all: unset;
+-	border-top: 1px solid ${ borderColor };
+-	box-sizing: border-box;
+-	display: block;
+-	height: 0;
+-	width: 100%;
++export const rounded = css`
++	border-radius: ${ CONFIG.cardBorderRadius };
+ `;
+ 
+-export function bodySize() {
+-	return `
+-		&.is-size {
+-			&-large {
+-				padding: ${ space( 3 ) } ${ space( 4 ) };
+-			}
+-			&-medium {
+-				padding: ${ space( 2 ) } ${ space( 3 ) };
+-			}
+-			&-small {
+-				padding: ${ space( 2 ) };
+-			}
+-			&-extraSmall {
+-				padding: ${ space( 1 ) };
+-			}
+-		}
+-	`;
+-}
+-
+-export function headerFooterSizes() {
+-	return `
+-		&.is-size {
+-			&-large {
+-				padding: ${ space( 3 ) } ${ space( 4 ) };
+-			}
+-			&-medium {
+-				padding: ${ space( 2 ) } ${ space( 3 ) };
+-			}
+-			&-small {
+-				padding: ${ space( 2 ) };
+-			}
+-			&-extraSmall {
+-				padding: ${ space( 1 ) };
+-			}
+-		}
+-	`;
+-}
+-
+-export function handleBorderless() {
+-	return `
+-		&.is-borderless {
+-			border: none;
+-		}
+-	`;
+-}
+-
+-export function handleShady() {
+-	return `
+-		&.is-shady {
+-			background: ${ backgroundShady };
+-		}
+-	`;
+-}
++export const cardPaddings = {
++	large: css`
++		padding: ${ CONFIG.cardPaddingLarge };
++	`,
++	medium: css`
++		padding: ${ CONFIG.cardPaddingMedium };
++	`,
++	small: css`
++		padding: ${ CONFIG.cardPaddingSmall };
++	`,
++	xSmall: css`
++		padding: ${ CONFIG.cardPaddingXSmall };
++	`,
++};
++
++export const shady = css`
++	background-color: ${ COLORS.lightGray[ 200 ] };
++`;
+diff --git a/packages/components/src/card/test/__snapshots__/index.js.snap b/packages/components/src/card/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..08976fd361cd50
+--- /dev/null
++++ b/packages/components/src/card/test/__snapshots__/index.js.snap
+@@ -0,0 +1,910 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`Card Card component CardBody should allow scrolling content with the scrollable prop is true 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,8 +1,8 @@
++  <div>
++    <div
++-     class="components-card__body components-card-body css-1uubjz8-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
+++     class="components-scrollable components-card__body components-card-body css-1s8bpb2-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
++      data-wp-c16t="true"
++      data-wp-component="CardBody"
++    >
++      Body
++    </div>
++`;
++
++exports[`Card Card component CardBody should render with a darker background color when isShady is true 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,8 +1,8 @@
++  <div>
++    <div
++-     class="components-scrollable components-card__body components-card-body css-1s8bpb2-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
+++     class="components-scrollable components-card__body components-card-body css-1pwiwal-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium-shady css-1mm2cvy-View em57xhy0"
++      data-wp-c16t="true"
++      data-wp-component="CardBody"
++    >
++      Body
++    </div>
++`;
++
++exports[`Card Card component CardFooter should render with a darker background color when isShady is true 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,8 +1,8 @@
++  <div>
++    <div
++-     class="components-flex components-card__footer components-card-footer css-ctsuoo-Flex-ItemsRow-Footer-borderRadius-borderColor-medium css-1mm2cvy-View em57xhy0"
+++     class="components-flex components-card__footer components-card-footer css-1avfr23-Flex-ItemsRow-Footer-borderRadius-borderColor-medium-shady css-1mm2cvy-View em57xhy0"
++      data-wp-c16t="true"
++      data-wp-component="CardFooter"
++    >
++      Footer
++    </div>
++`;
++
++exports[`Card Card component CardFooter should use the justify prop to align its content, like a Flex container 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,8 +1,8 @@
++  <div>
++    <div
++-     class="components-flex components-card__footer components-card-footer css-ctsuoo-Flex-ItemsRow-Footer-borderRadius-borderColor-medium css-1mm2cvy-View em57xhy0"
+++     class="components-flex components-card__footer components-card-footer css-6eqo6x-Flex-ItemsRow-Footer-borderRadius-borderColor-medium css-1mm2cvy-View em57xhy0"
++      data-wp-c16t="true"
++      data-wp-component="CardFooter"
++    >
++      Footer
++    </div>
++`;
++
++exports[`Card Card component CardHeader should render with a darker background color when isShady is true 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,8 +1,8 @@
++  <div>
++    <div
++-     class="components-flex components-card__header components-card-header css-z1wxd8-Flex-ItemsRow-Header-borderRadius-borderColor-medium css-1mm2cvy-View em57xhy0"
+++     class="components-flex components-card__header components-card-header css-bwsf1l-Flex-ItemsRow-Header-borderRadius-borderColor-medium-shady css-1mm2cvy-View em57xhy0"
++      data-wp-c16t="true"
++      data-wp-component="CardHeader"
++    >
++      Header
++    </div>
++`;
++
++exports[`Card Card component should add different amounts of white space when using the size prop 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -5,18 +5,18 @@
++  >
++    <div
++      class="css-l50fc7-Content css-1mm2cvy-View em57xhy0"
++    >
++      <div
++-       class="components-flex components-card__header components-card-header css-z1wxd8-Flex-ItemsRow-Header-borderRadius-borderColor-medium css-1mm2cvy-View em57xhy0"
+++       class="components-flex components-card__header components-card-header css-xx0c0v-Flex-ItemsRow-Header-borderRadius-borderColor-large css-1mm2cvy-View em57xhy0"
++        data-wp-c16t="true"
++        data-wp-component="CardHeader"
++      >
++        Header
++      </div>
++      <div
++-       class="components-scrollable components-card__body components-card-body css-1s8bpb2-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
+++       class="components-scrollable components-card__body components-card-body css-ocisz3-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-large css-1mm2cvy-View em57xhy0"
++        data-wp-c16t="true"
++        data-wp-component="CardBody"
++      >
++        Code is Poetry
++      </div>
++`;
++
++exports[`Card Card component should get the isBorderless and isSize props (passed from its context) overriddenwhen the same props is specified directly on the component 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -6,25 +6,25 @@
++    >
++      <div
++        class="css-l50fc7-Content css-1mm2cvy-View em57xhy0"
++      >
++        <div
++-         class="components-flex components-card__header components-card-header css-17shmr-Flex-ItemsRow-Header-borderRadius-borderColor-large-borderless css-1mm2cvy-View em57xhy0"
+++         class="components-flex components-card__header components-card-header css-1q1p97i-Flex-ItemsRow-Header-borderRadius-borderColor-small css-1mm2cvy-View em57xhy0"
++          data-wp-c16t="true"
++          data-wp-component="CardHeader"
++        >
++          Header
++        </div>
++        <div
++-         class="components-scrollable components-card__body components-card-body css-ocisz3-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-large css-1mm2cvy-View em57xhy0"
+++         class="components-scrollable components-card__body components-card-body css-1s8bpb2-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium css-1mm2cvy-View em57xhy0"
++          data-wp-c16t="true"
++          data-wp-component="CardBody"
++        >
++          Body
++        </div>
++        <div
++-         class="components-flex components-card__footer components-card-footer css-1oq281b-Flex-ItemsRow-Footer-borderRadius-borderColor-large-borderless css-1mm2cvy-View em57xhy0"
+++         class="components-flex components-card__footer components-card-footer css-uc1271-Flex-ItemsRow-Footer-borderRadius-borderColor-xSmall css-1mm2cvy-View em57xhy0"
++          data-wp-c16t="true"
++          data-wp-component="CardFooter"
++        >
++          Footer
++        </div>
++`;
++
++exports[`Card Card component should pass the isBorderless and isSize props from its context to its sub-components 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,30 +1,30 @@
++  <div>
++    <div
++-     class="components-surface components-card components-card css-gjqzbn-Surface-primary-Card-boxShadowless-rounded css-1mm2cvy-View em57xhy0"
+++     class="components-surface components-card components-card css-dva0xd-Surface-primary-Card-rounded css-1mm2cvy-View em57xhy0"
++      data-wp-c16t="true"
++      data-wp-component="Card"
++    >
++      <div
++        class="css-l50fc7-Content css-1mm2cvy-View em57xhy0"
++      >
++        <div
++-         class="components-flex components-card__header components-card-header css-17shmr-Flex-ItemsRow-Header-borderRadius-borderColor-large-borderless css-1mm2cvy-View em57xhy0"
+++         class="components-flex components-card__header components-card-header css-1q1p97i-Flex-ItemsRow-Header-borderRadius-borderColor-small css-1mm2cvy-View em57xhy0"
++          data-wp-c16t="true"
++          data-wp-component="CardHeader"
++        >
++          Header
++        </div>
++        <div
++-         class="components-scrollable components-card__body components-card-body css-ocisz3-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-large css-1mm2cvy-View em57xhy0"
+++         class="components-scrollable components-card__body components-card-body css-1fj1vbo-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-small css-1mm2cvy-View em57xhy0"
++          data-wp-c16t="true"
++          data-wp-component="CardBody"
++        >
++          Body
++        </div>
++        <div
++-         class="components-flex components-card__footer components-card-footer css-1oq281b-Flex-ItemsRow-Footer-borderRadius-borderColor-large-borderless css-1mm2cvy-View em57xhy0"
+++         class="components-flex components-card__footer components-card-footer css-eq6go-Flex-ItemsRow-Footer-borderRadius-borderColor-small css-1mm2cvy-View em57xhy0"
++          data-wp-c16t="true"
++          data-wp-component="CardFooter"
++        >
++          Footer
++        </div>
++`;
++
++exports[`Card Card component should render correctly 1`] = `
++Object {
++  "asFragment": [Function],
++  "baseElement": .emotion-19 {
++  height: 100%;
++}
++
++.emotion-28 {
++  background-color: #fff;
++  color: #000;
++  position: relative;
++  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
++  outline: none;
++  border-radius: 2px;
++}
++
++.emotion-0 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  border-bottom: 1px solid;
++  border-color: rgba(0,0,0,0.1);
++  padding: calc(4px * 4) calc(4px * 6);
++}
++
++.emotion-0 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-0 > * {
++  min-width: 0;
++}
++
++.emotion-0:last-child {
++  border-bottom: none;
++}
++
++.emotion-0:first-of-type {
++  border-top-left-radius: 2px;
++  border-top-right-radius: 2px;
++}
++
++.emotion-0:last-of-type {
++  border-bottom-left-radius: 2px;
++  border-bottom-right-radius: 2px;
++}
++
++.emotion-3 {
++  height: 100%;
++  overflow-x: hidden;
++  overflow-y: auto;
++  height: auto;
++  max-height: 100%;
++  padding: calc(4px * 4) calc(4px * 6);
++}
++
++@media only screen and ( min-device-width:40em ) {
++  .emotion-3::-webkit-scrollbar {
++    height: 12px;
++    width: 12px;
++  }
++
++  .emotion-3::-webkit-scrollbar-track {
++    background-color: transparent;
++  }
++
++  .emotion-3::-webkit-scrollbar-track {
++    background: rgba(0,0,0,0.04);
++    border-radius: 8px;
++  }
++
++  .emotion-3::-webkit-scrollbar-thumb {
++    background-clip: padding-box;
++    background-color: rgba(0,0,0,0.2);
++    border: 2px solid rgba( 0,0,0,0 );
++    border-radius: 7px;
++  }
++
++  .emotion-3:hover::-webkit-scrollbar-thumb {
++    background-color: rgba(0,0,0,0.5);
++  }
++}
++
++.emotion-3:first-of-type {
++  border-top-left-radius: 2px;
++  border-top-right-radius: 2px;
++}
++
++.emotion-3:last-of-type {
++  border-bottom-left-radius: 2px;
++  border-bottom-right-radius: 2px;
++}
++
++.emotion-9 {
++  border-color: rgba(0,0,0,0.1);
++  border-width: 0 0 1px 0;
++  height: 0;
++  margin: 0;
++  width: auto;
++  box-sizing: border-box;
++  display: block;
++  width: 100%;
++  border-color: rgba(0,0,0,0.1);
++}
++
++.emotion-13 {
++  box-sizing: border-box;
++  overflow: hidden;
++}
++
++.emotion-13 > img,
++.emotion-13 > iframe {
++  display: block;
++  height: auto;
++  max-width: 100%;
++  width: 100%;
++}
++
++.emotion-13:first-of-type {
++  border-top-left-radius: 2px;
++  border-top-right-radius: 2px;
++}
++
++.emotion-13:last-of-type {
++  border-bottom-left-radius: 2px;
++  border-bottom-right-radius: 2px;
++}
++
++.emotion-16 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  border-top: 1px solid;
++  border-color: rgba(0,0,0,0.1);
++  padding: calc(4px * 4) calc(4px * 6);
++}
++
++.emotion-16 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-16 > * {
++  min-width: 0;
++}
++
++.emotion-16:first-child {
++  border-top: none;
++}
++
++.emotion-16:first-of-type {
++  border-top-left-radius: 2px;
++  border-top-right-radius: 2px;
++}
++
++.emotion-16:last-of-type {
++  border-bottom-left-radius: 2px;
++  border-bottom-right-radius: 2px;
++}
++
++.emotion-22 {
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
++  opacity: 1;
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  border-radius: 2px;
++}
++
++<body>
++    <div>
++      <div
++        class="components-surface components-card components-card emotion-28 emotion-1 emotion-2"
++        data-wp-c16t="true"
++        data-wp-component="Card"
++      >
++        <div
++          class="emotion-19 emotion-1 emotion-2"
++        >
++          <div
++            class="components-flex components-card__header components-card-header emotion-0 emotion-1 emotion-2"
++            data-wp-c16t="true"
++            data-wp-component="CardHeader"
++          >
++            Card Header
++          </div>
++          <div
++            class="components-scrollable components-card__body components-card-body emotion-3 emotion-1 emotion-2"
++            data-wp-c16t="true"
++            data-wp-component="CardBody"
++          >
++            Card Body 1
++          </div>
++          <div
++            class="components-scrollable components-card__body components-card-body emotion-3 emotion-1 emotion-2"
++            data-wp-c16t="true"
++            data-wp-component="CardBody"
++          >
++            Card Body 2
++          </div>
++          <hr
++            aria-orientation="horizontal"
++            class="components-divider components-card__divider components-card-divider emotion-9"
++            data-wp-c16t="true"
++            data-wp-component="CardDivider"
++            role="separator"
++          />
++          <div
++            class="components-scrollable components-card__body components-card-body emotion-3 emotion-1 emotion-2"
++            data-wp-c16t="true"
++            data-wp-component="CardBody"
++          >
++            Card Body 3
++          </div>
++          <div
++            class="components-card__media components-card-media emotion-13 emotion-1 emotion-2"
++            data-wp-c16t="true"
++            data-wp-component="CardMedia"
++          >
++            <img
++              alt="Card Media"
++              src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
++            />
++          </div>
++          <div
++            class="components-flex components-card__footer components-card-footer emotion-16 emotion-1 emotion-2"
++            data-wp-c16t="true"
++            data-wp-component="CardFooter"
++          >
++            Card Footer
++          </div>
++        </div>
++        <div
++          aria-hidden="true"
++          class="components-elevation emotion-22 emotion-1 emotion-2"
++          data-wp-c16t="true"
++          data-wp-component="Elevation"
++        />
++        <div
++          aria-hidden="true"
++          class="components-elevation emotion-22 emotion-1 emotion-2"
++          data-wp-c16t="true"
++          data-wp-component="Elevation"
++        />
++      </div>
++    </div>
++  </body>,
++  "container": .emotion-19 {
++  height: 100%;
++}
++
++.emotion-28 {
++  background-color: #fff;
++  color: #000;
++  position: relative;
++  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
++  outline: none;
++  border-radius: 2px;
++}
++
++.emotion-0 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  border-bottom: 1px solid;
++  border-color: rgba(0,0,0,0.1);
++  padding: calc(4px * 4) calc(4px * 6);
++}
++
++.emotion-0 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-0 > * {
++  min-width: 0;
++}
++
++.emotion-0:last-child {
++  border-bottom: none;
++}
++
++.emotion-0:first-of-type {
++  border-top-left-radius: 2px;
++  border-top-right-radius: 2px;
++}
++
++.emotion-0:last-of-type {
++  border-bottom-left-radius: 2px;
++  border-bottom-right-radius: 2px;
++}
++
++.emotion-3 {
++  height: 100%;
++  overflow-x: hidden;
++  overflow-y: auto;
++  height: auto;
++  max-height: 100%;
++  padding: calc(4px * 4) calc(4px * 6);
++}
++
++@media only screen and ( min-device-width:40em ) {
++  .emotion-3::-webkit-scrollbar {
++    height: 12px;
++    width: 12px;
++  }
++
++  .emotion-3::-webkit-scrollbar-track {
++    background-color: transparent;
++  }
++
++  .emotion-3::-webkit-scrollbar-track {
++    background: rgba(0,0,0,0.04);
++    border-radius: 8px;
++  }
++
++  .emotion-3::-webkit-scrollbar-thumb {
++    background-clip: padding-box;
++    background-color: rgba(0,0,0,0.2);
++    border: 2px solid rgba( 0,0,0,0 );
++    border-radius: 7px;
++  }
++
++  .emotion-3:hover::-webkit-scrollbar-thumb {
++    background-color: rgba(0,0,0,0.5);
++  }
++}
++
++.emotion-3:first-of-type {
++  border-top-left-radius: 2px;
++  border-top-right-radius: 2px;
++}
++
++.emotion-3:last-of-type {
++  border-bottom-left-radius: 2px;
++  border-bottom-right-radius: 2px;
++}
++
++.emotion-9 {
++  border-color: rgba(0,0,0,0.1);
++  border-width: 0 0 1px 0;
++  height: 0;
++  margin: 0;
++  width: auto;
++  box-sizing: border-box;
++  display: block;
++  width: 100%;
++  border-color: rgba(0,0,0,0.1);
++}
++
++.emotion-13 {
++  box-sizing: border-box;
++  overflow: hidden;
++}
++
++.emotion-13 > img,
++.emotion-13 > iframe {
++  display: block;
++  height: auto;
++  max-width: 100%;
++  width: 100%;
++}
++
++.emotion-13:first-of-type {
++  border-top-left-radius: 2px;
++  border-top-right-radius: 2px;
++}
++
++.emotion-13:last-of-type {
++  border-bottom-left-radius: 2px;
++  border-bottom-right-radius: 2px;
++}
++
++.emotion-16 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  border-top: 1px solid;
++  border-color: rgba(0,0,0,0.1);
++  padding: calc(4px * 4) calc(4px * 6);
++}
++
++.emotion-16 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-16 > * {
++  min-width: 0;
++}
++
++.emotion-16:first-child {
++  border-top: none;
++}
++
++.emotion-16:first-of-type {
++  border-top-left-radius: 2px;
++  border-top-right-radius: 2px;
++}
++
++.emotion-16:last-of-type {
++  border-bottom-left-radius: 2px;
++  border-bottom-right-radius: 2px;
++}
++
++.emotion-22 {
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
++  opacity: 1;
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  border-radius: 2px;
++}
++
++<div>
++    <div
++      class="components-surface components-card components-card emotion-28 emotion-1 emotion-2"
++      data-wp-c16t="true"
++      data-wp-component="Card"
++    >
++      <div
++        class="emotion-19 emotion-1 emotion-2"
++      >
++        <div
++          class="components-flex components-card__header components-card-header emotion-0 emotion-1 emotion-2"
++          data-wp-c16t="true"
++          data-wp-component="CardHeader"
++        >
++          Card Header
++        </div>
++        <div
++          class="components-scrollable components-card__body components-card-body emotion-3 emotion-1 emotion-2"
++          data-wp-c16t="true"
++          data-wp-component="CardBody"
++        >
++          Card Body 1
++        </div>
++        <div
++          class="components-scrollable components-card__body components-card-body emotion-3 emotion-1 emotion-2"
++          data-wp-c16t="true"
++          data-wp-component="CardBody"
++        >
++          Card Body 2
++        </div>
++        <hr
++          aria-orientation="horizontal"
++          class="components-divider components-card__divider components-card-divider emotion-9"
++          data-wp-c16t="true"
++          data-wp-component="CardDivider"
++          role="separator"
++        />
++        <div
++          class="components-scrollable components-card__body components-card-body emotion-3 emotion-1 emotion-2"
++          data-wp-c16t="true"
++          data-wp-component="CardBody"
++        >
++          Card Body 3
++        </div>
++        <div
++          class="components-card__media components-card-media emotion-13 emotion-1 emotion-2"
++          data-wp-c16t="true"
++          data-wp-component="CardMedia"
++        >
++          <img
++            alt="Card Media"
++            src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
++          />
++        </div>
++        <div
++          class="components-flex components-card__footer components-card-footer emotion-16 emotion-1 emotion-2"
++          data-wp-c16t="true"
++          data-wp-component="CardFooter"
++        >
++          Card Footer
++        </div>
++      </div>
++      <div
++        aria-hidden="true"
++        class="components-elevation emotion-22 emotion-1 emotion-2"
++        data-wp-c16t="true"
++        data-wp-component="Elevation"
++      />
++      <div
++        aria-hidden="true"
++        class="components-elevation emotion-22 emotion-1 emotion-2"
++        data-wp-c16t="true"
++        data-wp-component="Elevation"
++      />
++    </div>
++  </div>,
++  "debug": [Function],
++  "findAllByAltText": [Function],
++  "findAllByDisplayValue": [Function],
++  "findAllByLabelText": [Function],
++  "findAllByPlaceholderText": [Function],
++  "findAllByRole": [Function],
++  "findAllByTestId": [Function],
++  "findAllByText": [Function],
++  "findAllByTitle": [Function],
++  "findByAltText": [Function],
++  "findByDisplayValue": [Function],
++  "findByLabelText": [Function],
++  "findByPlaceholderText": [Function],
++  "findByRole": [Function],
++  "findByTestId": [Function],
++  "findByText": [Function],
++  "findByTitle": [Function],
++  "getAllByAltText": [Function],
++  "getAllByDisplayValue": [Function],
++  "getAllByLabelText": [Function],
++  "getAllByPlaceholderText": [Function],
++  "getAllByRole": [Function],
++  "getAllByTestId": [Function],
++  "getAllByText": [Function],
++  "getAllByTitle": [Function],
++  "getByAltText": [Function],
++  "getByDisplayValue": [Function],
++  "getByLabelText": [Function],
++  "getByPlaceholderText": [Function],
++  "getByRole": [Function],
++  "getByTestId": [Function],
++  "getByText": [Function],
++  "getByTitle": [Function],
++  "queryAllByAltText": [Function],
++  "queryAllByDisplayValue": [Function],
++  "queryAllByLabelText": [Function],
++  "queryAllByPlaceholderText": [Function],
++  "queryAllByRole": [Function],
++  "queryAllByTestId": [Function],
++  "queryAllByText": [Function],
++  "queryAllByTitle": [Function],
++  "queryByAltText": [Function],
++  "queryByDisplayValue": [Function],
++  "queryByLabelText": [Function],
++  "queryByPlaceholderText": [Function],
++  "queryByRole": [Function],
++  "queryByTestId": [Function],
++  "queryByText": [Function],
++  "queryByTitle": [Function],
++  "rerender": [Function],
++  "unmount": [Function],
++}
++`;
++
++exports[`Card Card component should show a box shadow when the elevation prop is greater than 0 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -8,16 +8,16 @@
++    >
++      Code is Poetry
++    </div>
++    <div
++      aria-hidden="true"
++-     class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View em57xhy0"
+++     class="components-elevation css-xtff41-Elevation css-1mm2cvy-View em57xhy0"
++      data-wp-c16t="true"
++      data-wp-component="Elevation"
++    />
++    <div
++      aria-hidden="true"
++-     class="components-elevation css-h09uz6-Elevation css-1mm2cvy-View em57xhy0"
+++     class="components-elevation css-xtff41-Elevation css-1mm2cvy-View em57xhy0"
++      data-wp-c16t="true"
++      data-wp-component="Elevation"
++    />
++  </div>
++`;
++
++exports[`Card Card component should warn when the isElevated prop is passed 1`] = `
++.emotion-0 {
++  height: 100%;
++}
++
++.emotion-9 {
++  background-color: #fff;
++  color: #000;
++  position: relative;
++  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
++  outline: none;
++  border-radius: 2px;
++}
++
++.emotion-3 {
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
++  opacity: 1;
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  border-radius: 2px;
++}
++
++.emotion-6 {
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 2px 4px 0 rgba(0 ,0,0,0.1);
++  opacity: 1;
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  border-radius: 2px;
++}
++
++<div>
++  <div
++    class="components-surface components-card components-card emotion-9 emotion-1 emotion-2"
++    data-wp-c16t="true"
++    data-wp-component="Card"
++  >
++    <div
++      class="emotion-0 emotion-1 emotion-2"
++    >
++      Code is Poetry
++    </div>
++    <div
++      aria-hidden="true"
++      class="components-elevation emotion-3 emotion-1 emotion-2"
++      data-wp-c16t="true"
++      data-wp-component="Elevation"
++    />
++    <div
++      aria-hidden="true"
++      class="components-elevation emotion-6 emotion-1 emotion-2"
++      data-wp-c16t="true"
++      data-wp-component="Elevation"
++    />
++  </div>
++</div>
++`;
+diff --git a/packages/components/src/card/test/body.js b/packages/components/src/card/test/body.js
+deleted file mode 100644
+index a88823a216bbf5..00000000000000
+--- a/packages/components/src/card/test/body.js
++++ /dev/null
+@@ -1,48 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { shallow } from 'enzyme';
+-
+-/**
+- * Internal dependencies
+- */
+-import { CardBody } from '../';
+-
+-describe( 'CardBody', () => {
+-	describe( 'basic rendering', () => {
+-		test( 'should have components-card className', () => {
+-			const wrapper = shallow( <CardBody /> );
+-			const cardBody = wrapper.find( '.components-card__body' );
+-
+-			expect( cardBody.length ).toBe( 1 );
+-		} );
+-
+-		test( 'should be able to render content', () => {
+-			const cardBody = shallow(
+-				<CardBody>
+-					<div className="content">Hello</div>
+-				</CardBody>
+-			);
+-			const content = cardBody.find( '.content' );
+-
+-			expect( content.length ).toBe( 1 );
+-			expect( content.text() ).toBe( 'Hello' );
+-		} );
+-	} );
+-
+-	describe( 'modifiers', () => {
+-		test( 'should be able to render size modifier', () => {
+-			const wrapper = shallow( <CardBody size="large" /> );
+-			const cardBody = wrapper.find( '.components-card__body' );
+-
+-			expect( cardBody.hasClass( 'is-size-large' ) ).toBe( true );
+-		} );
+-
+-		test( 'should be able to render shady modifier', () => {
+-			const wrapper = shallow( <CardBody isShady /> );
+-			const cardBody = wrapper.find( '.components-card__body' );
+-
+-			expect( cardBody.hasClass( 'is-shady' ) ).toBe( true );
+-		} );
+-	} );
+-} );
+diff --git a/packages/components/src/card/test/divider.js b/packages/components/src/card/test/divider.js
+deleted file mode 100644
+index 8d39242d9fa145..00000000000000
+--- a/packages/components/src/card/test/divider.js
++++ /dev/null
+@@ -1,38 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { shallow } from 'enzyme';
+-
+-/**
+- * Internal dependencies
+- */
+-import { CardDivider } from '../';
+-
+-describe( 'CardDivider', () => {
+-	describe( 'basic rendering', () => {
+-		test( 'should have components-card className', () => {
+-			const wrapper = shallow( <CardDivider /> );
+-			const cardDivider = wrapper.find( '.components-card__divider' );
+-
+-			expect( cardDivider.length ).toBe( 1 );
+-		} );
+-
+-		test( 'should not render child content', () => {
+-			const cardDivider = shallow(
+-				<CardDivider>
+-					<div className="content">Hello</div>
+-				</CardDivider>
+-			);
+-			const content = cardDivider.find( '.content' );
+-
+-			expect( content.length ).toBe( 0 );
+-		} );
+-
+-		test( 'should have role of separator', () => {
+-			const wrapper = shallow( <CardDivider /> );
+-			const cardDivider = wrapper.find( '.components-card__divider' );
+-
+-			expect( cardDivider.prop( 'role' ) ).toBe( 'separator' );
+-		} );
+-	} );
+-} );
+diff --git a/packages/components/src/card/test/footer.js b/packages/components/src/card/test/footer.js
+deleted file mode 100644
+index 88f9ac55402e64..00000000000000
+--- a/packages/components/src/card/test/footer.js
++++ /dev/null
+@@ -1,55 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { shallow } from 'enzyme';
+-
+-/**
+- * Internal dependencies
+- */
+-import { CardFooter } from '../';
+-
+-describe( 'CardFooter', () => {
+-	describe( 'basic rendering', () => {
+-		test( 'should have components-card className', () => {
+-			const wrapper = shallow( <CardFooter /> );
+-			const cardFooter = wrapper.find( '.components-card__footer' );
+-
+-			expect( cardFooter.length ).toBe( 1 );
+-		} );
+-
+-		test( 'should be able to render content', () => {
+-			const cardFooter = shallow(
+-				<CardFooter>
+-					<div className="content">Hello</div>
+-				</CardFooter>
+-			);
+-			const content = cardFooter.find( '.content' );
+-
+-			expect( content.length ).toBe( 1 );
+-			expect( content.text() ).toBe( 'Hello' );
+-		} );
+-	} );
+-
+-	describe( 'modifiers', () => {
+-		test( 'should be able to render size modifier', () => {
+-			const wrapper = shallow( <CardFooter size="large" /> );
+-			const cardFooter = wrapper.find( '.components-card__footer' );
+-
+-			expect( cardFooter.hasClass( 'is-size-large' ) ).toBe( true );
+-		} );
+-
+-		test( 'should be able to render shady modifier', () => {
+-			const wrapper = shallow( <CardFooter isShady /> );
+-			const cardFooter = wrapper.find( '.components-card__footer' );
+-
+-			expect( cardFooter.hasClass( 'is-shady' ) ).toBe( true );
+-		} );
+-
+-		test( 'should be able to render borderless modifier', () => {
+-			const wrapper = shallow( <CardFooter isBorderless /> );
+-			const cardFooter = wrapper.find( '.components-card__footer' );
+-
+-			expect( cardFooter.hasClass( 'is-borderless' ) ).toBe( true );
+-		} );
+-	} );
+-} );
+diff --git a/packages/components/src/card/test/header.js b/packages/components/src/card/test/header.js
+deleted file mode 100644
+index 440ab1707e1885..00000000000000
+--- a/packages/components/src/card/test/header.js
++++ /dev/null
+@@ -1,55 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { shallow } from 'enzyme';
+-
+-/**
+- * Internal dependencies
+- */
+-import { CardHeader } from '../';
+-
+-describe( 'CardHeader', () => {
+-	describe( 'basic rendering', () => {
+-		test( 'should have components-card className', () => {
+-			const wrapper = shallow( <CardHeader /> );
+-			const cardHeader = wrapper.find( '.components-card__header' );
+-
+-			expect( cardHeader.length ).toBe( 1 );
+-		} );
+-
+-		test( 'should be able to render content', () => {
+-			const cardHeader = shallow(
+-				<CardHeader>
+-					<div className="content">Hello</div>
+-				</CardHeader>
+-			);
+-			const content = cardHeader.find( '.content' );
+-
+-			expect( content.length ).toBe( 1 );
+-			expect( content.text() ).toBe( 'Hello' );
+-		} );
+-	} );
+-
+-	describe( 'modifiers', () => {
+-		test( 'should be able to render size modifier', () => {
+-			const wrapper = shallow( <CardHeader size="large" /> );
+-			const cardHeader = wrapper.find( '.components-card__header' );
+-
+-			expect( cardHeader.hasClass( 'is-size-large' ) ).toBe( true );
+-		} );
+-
+-		test( 'should be able to render shady modifier', () => {
+-			const wrapper = shallow( <CardHeader isShady /> );
+-			const cardHeader = wrapper.find( '.components-card__header' );
+-
+-			expect( cardHeader.hasClass( 'is-shady' ) ).toBe( true );
+-		} );
+-
+-		test( 'should be able to render borderless modifier', () => {
+-			const wrapper = shallow( <CardHeader isBorderless /> );
+-			const cardHeader = wrapper.find( '.components-card__header' );
+-
+-			expect( cardHeader.hasClass( 'is-borderless' ) ).toBe( true );
+-		} );
+-	} );
+-} );
+diff --git a/packages/components/src/card/test/index.js b/packages/components/src/card/test/index.js
+index 2ce59a9fa7f317..170e758ae2f49e 100644
+--- a/packages/components/src/card/test/index.js
++++ b/packages/components/src/card/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { mount, shallow } from 'enzyme';
++import { render } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -14,184 +14,181 @@ import {
+ 	CardHeader,
+ 	CardMedia,
+ } from '../';
++import { CONFIG } from '../../utils';
+ 
+ describe( 'Card', () => {
+-	describe( 'basic rendering', () => {
+-		test( 'should have components-card className', () => {
+-			const wrapper = shallow( <Card /> );
+-			const card = wrapper.find( '.components-card' );
+-
+-			expect( card.length ).toBeTruthy();
+-		} );
+-
+-		test( 'should be able to render content', () => {
+-			const card = shallow(
++	describe( 'Card component', () => {
++		it( 'should render correctly', () => {
++			const wrapper = render(
+ 				<Card>
+-					<div className="content">Hello</div>
++					<CardHeader>Card Header</CardHeader>
++					<CardBody>Card Body 1</CardBody>
++					<CardBody>Card Body 2</CardBody>
++					<CardDivider />
++					<CardBody>Card Body 3</CardBody>
++					<CardMedia>
++						<img
++							alt="Card Media"
++							src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
++						/>
++					</CardMedia>
++					<CardFooter>Card Footer</CardFooter>
+ 				</Card>
+ 			);
+-			const content = card.find( '.content' );
+-
+-			expect( content.length ).toBe( 1 );
+-			expect( content.text() ).toBe( 'Hello' );
++			expect( wrapper ).toMatchSnapshot();
+ 		} );
+-	} );
+-
+-	describe( 'styles', () => {
+-		test( 'should render borderless', () => {
+-			const wrapper = shallow( <Card isBorderless /> );
+-			const card = wrapper.find( '.components-card' );
+-
+-			expect( card.hasClass( 'is-borderless' ) ).toBe( true );
+-		} );
+-
+-		test( 'should render elevated styles', () => {
+-			const wrapper = shallow( <Card isElevated /> );
+-			const card = wrapper.find( '.components-card' );
+-
+-			expect( card.hasClass( 'is-elevated' ) ).toBe( true );
+-		} );
+-	} );
+ 
+-	describe( 'CardBody', () => {
+-		test( 'should be able to render', () => {
+-			const card = mount(
+-				<Card>
+-					<CardBody>Hello</CardBody>
+-				</Card>
++		it( 'should remove borders when the isBorderless prop is true', () => {
++			const { rerender, container } = render(
++				<Card>Code is Poetry</Card>
++			);
++			expect( container.firstChild ).not.toHaveStyle(
++				'box-shadow: none'
+ 			);
+-			const cardBody = card.find( 'CardBody' );
+ 
+-			expect( cardBody.length ).toBe( 1 );
+-			expect( cardBody.text() ).toBe( 'Hello' );
++			rerender( <Card isBorderless={ true }>Code is Poetry</Card> );
++			expect( container.firstChild ).toHaveStyle( 'box-shadow: none' );
+ 		} );
+ 
+-		test( 'should receive modifier props from context', () => {
+-			const card = mount(
+-				<Card size="extraSmall">
+-					<CardBody>Hello</CardBody>
+-				</Card>
++		it( 'should add rounded border when the isRounded prop is true', () => {
++			const { container } = render(
++				<Card isRounded={ true }>Code is Poetry</Card>
+ 			);
+-			const cardBody = card.find( '.components-card__body' ).first();
+-
+-			expect( cardBody.hasClass( 'is-size-extraSmall' ) ).toBe( true );
++			expect( container.firstChild ).toHaveStyle( {
++				borderRadius: CONFIG.cardBorderRadius,
++			} );
+ 		} );
+ 
+-		test( 'should be able to override props from context', () => {
+-			const card = mount(
+-				<Card size="extraSmall">
+-					<CardBody size="large">Hello</CardBody>
+-				</Card>
++		it( 'should show a box shadow when the elevation prop is greater than 0', () => {
++			const { container: withElevation } = render(
++				<Card elevation={ 2 }>Code is Poetry</Card>
++			);
++			// The `elevation` prop has a default value of "0"
++			const { container: withoutElevation } = render(
++				<Card>Code is Poetry</Card>
+ 			);
+-			const cardBody = card.find( '.components-card__body' ).first();
+ 
+-			expect( cardBody.hasClass( 'is-size-large' ) ).toBe( true );
++			expect( withElevation.firstChild ).toMatchDiffSnapshot(
++				withoutElevation.firstChild
++			);
+ 		} );
+-	} );
+ 
+-	describe( 'CardHeader', () => {
+-		test( 'should be able to render', () => {
+-			const card = mount(
++		it( 'should add different amounts of white space when using the size prop', () => {
++			// The `size` prop has a default value of "medium"
++			const { container: withSizeDefault } = render(
+ 				<Card>
+-					<CardHeader>Hello</CardHeader>
++					<CardHeader>Header</CardHeader>
++					<CardBody>Code is Poetry</CardBody>
+ 				</Card>
+ 			);
+-			const cardHeader = card.find( 'CardHeader' );
+-
+-			expect( cardHeader.length ).toBe( 1 );
+-			expect( cardHeader.text() ).toBe( 'Hello' );
+-		} );
+-
+-		test( 'should receive modifier props from context', () => {
+-			const card = mount(
+-				<Card size="extraSmall" isBorderless={ true }>
+-					<CardHeader>Hello</CardHeader>
++			const { container: withSizeLarge } = render(
++				<Card size="large">
++					<CardHeader>Header</CardHeader>
++					<CardBody>Code is Poetry</CardBody>
+ 				</Card>
+ 			);
+-			const cardHeader = card.find( '.components-card__header' ).first();
+ 
+-			expect( cardHeader.hasClass( 'is-size-extraSmall' ) ).toBe( true );
+-			expect( cardHeader.hasClass( 'is-borderless' ) ).toBe( true );
++			expect( withSizeDefault.firstChild ).toMatchDiffSnapshot(
++				withSizeLarge.firstChild
++			);
+ 		} );
+ 
+-		test( 'should be able to override props from context', () => {
+-			const card = mount(
+-				<Card size="extraSmall" isBorderless={ true }>
+-					<CardHeader size="large" isBorderless={ false }>
+-						Hello
+-					</CardHeader>
+-				</Card>
++		it( 'should warn when the isElevated prop is passed', () => {
++			// `isElevated` is automatically converted to `elevation="2"`
++			const { container } = render(
++				<Card isElevated={ true }>Code is Poetry</Card>
+ 			);
+-			const cardHeader = card.find( '.components-card__header' ).first();
++			expect( container ).toMatchSnapshot();
+ 
+-			expect( cardHeader.hasClass( 'is-size-large' ) ).toBe( true );
+-			expect( cardHeader.hasClass( 'is-borderless' ) ).toBe( false );
++			expect( console ).toHaveWarned();
+ 		} );
+-	} );
+ 
+-	describe( 'CardFooter', () => {
+-		test( 'should be able to render', () => {
+-			const card = mount(
+-				<Card>
+-					<CardFooter>Hello</CardFooter>
++		it( 'should pass the isBorderless and isSize props from its context to its sub-components', () => {
++			const { container: withoutBorderLarge } = render(
++				<Card isBorderless={ true } size="large">
++					<CardHeader>Header</CardHeader>
++					<CardBody>Body</CardBody>
++					<CardFooter>Footer</CardFooter>
+ 				</Card>
+ 			);
+-			const cardFooter = card.find( 'CardFooter' );
+-
+-			expect( cardFooter.length ).toBe( 1 );
+-			expect( cardFooter.text() ).toBe( 'Hello' );
+-		} );
+-
+-		test( 'should receive modifier props from context', () => {
+-			const card = mount(
+-				<Card size="extraSmall" isBorderless={ true }>
+-					<CardFooter>Hello</CardFooter>
++			const { container: withBorderSmall } = render(
++				<Card isBorderless={ false } size="small">
++					<CardHeader>Header</CardHeader>
++					<CardBody>Body</CardBody>
++					<CardFooter>Footer</CardFooter>
+ 				</Card>
+ 			);
+-			const cardFooter = card.find( '.components-card__footer' ).first();
+-
+-			expect( cardFooter.hasClass( 'is-size-extraSmall' ) ).toBe( true );
+-			expect( cardFooter.hasClass( 'is-borderless' ) ).toBe( true );
++			expect( withoutBorderLarge ).toMatchDiffSnapshot( withBorderSmall );
+ 		} );
+ 
+-		test( 'should be able to override props from context', () => {
+-			const card = mount(
+-				<Card size="extraSmall" isBorderless={ true }>
+-					<CardFooter size="large" isBorderless={ false }>
+-						Hello
+-					</CardFooter>
++		it( 'should get the isBorderless and isSize props (passed from its context) overriddenwhen the same props is specified directly on the component', () => {
++			const { container: withoutBorder } = render(
++				<Card isBorderless={ true } size="large">
++					<CardHeader>Header</CardHeader>
++					<CardBody>Body</CardBody>
++					<CardFooter>Footer</CardFooter>
+ 				</Card>
+ 			);
+-			const cardFooter = card.find( '.components-card__footer' ).first();
+-
+-			expect( cardFooter.hasClass( 'is-size-large' ) ).toBe( true );
+-			expect( cardFooter.hasClass( 'is-borderless' ) ).toBe( false );
+-		} );
+-	} );
+-
+-	describe( 'CardDivider', () => {
+-		test( 'should be able to render', () => {
+-			const card = mount(
+-				<Card>
+-					<CardDivider />
++			const { container: withBorder } = render(
++				<Card isBorderless={ true } size="large">
++					<CardHeader isBorderless={ false } size="small">
++						Header
++					</CardHeader>
++					<CardBody size="medium">Body</CardBody>
++					<CardFooter isBorderless={ false } size="xSmall">
++						Footer
++					</CardFooter>
+ 				</Card>
+ 			);
+-			const cardBody = card.find( 'CardDivider' );
++			expect( withoutBorder ).toMatchDiffSnapshot( withBorder );
++		} );
+ 
+-			expect( cardBody.length ).toBe( 1 );
++		describe( 'CardHeader', () => {
++			it( 'should render with a darker background color when isShady is true', () => {
++				const { container } = render( <CardHeader>Header</CardHeader> );
++				const { container: containerShady } = render(
++					<CardHeader isShady={ true }>Header</CardHeader>
++				);
++				expect( container ).toMatchDiffSnapshot( containerShady );
++			} );
+ 		} );
+-	} );
+ 
+-	describe( 'CardMedia', () => {
+-		test( 'should be able to render', () => {
+-			const card = mount(
+-				<Card>
+-					<CardMedia />
+-				</Card>
+-			);
+-			const cardBody = card.find( 'CardMedia' );
++		describe( 'CardFooter', () => {
++			it( 'should render with a darker background color when isShady is true', () => {
++				const { container } = render( <CardFooter>Footer</CardFooter> );
++				const { container: containerShady } = render(
++					<CardFooter isShady={ true }>Footer</CardFooter>
++				);
++				expect( container ).toMatchDiffSnapshot( containerShady );
++			} );
++
++			it( 'should use the justify prop to align its content, like a Flex container', () => {
++				const { container } = render( <CardFooter>Footer</CardFooter> );
++				const { container: containerWithFlexEnd } = render(
++					<CardFooter justify="flex-end">Footer</CardFooter>
++				);
++				expect( container ).toMatchDiffSnapshot( containerWithFlexEnd );
++			} );
++		} );
+ 
+-			expect( cardBody.length ).toBe( 1 );
++		describe( 'CardBody', () => {
++			it( 'should render with a darker background color when isShady is true', () => {
++				const { container } = render( <CardBody>Body</CardBody> );
++				const { container: containerShady } = render(
++					<CardBody isShady={ true }>Body</CardBody>
++				);
++				expect( container ).toMatchDiffSnapshot( containerShady );
++			} );
++
++			it( 'should allow scrolling content with the scrollable prop is true', () => {
++				const { container: containerScrollable } = render(
++					<CardBody>Body</CardBody>
++				);
++				const { container } = render(
++					<CardBody isScrollable={ false }>Body</CardBody>
++				);
++				expect( container ).toMatchDiffSnapshot( containerScrollable );
++			} );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/card/test/media.js b/packages/components/src/card/test/media.js
+deleted file mode 100644
+index c9e118f68e6df1..00000000000000
+--- a/packages/components/src/card/test/media.js
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { shallow } from 'enzyme';
+-
+-/**
+- * Internal dependencies
+- */
+-import { CardMedia } from '../';
+-
+-describe( 'CardMedia', () => {
+-	describe( 'basic rendering', () => {
+-		test( 'should have components-card className', () => {
+-			const wrapper = shallow( <CardMedia /> );
+-			const cardMedia = wrapper.find( '.components-card__media' );
+-
+-			expect( cardMedia.length ).toBe( 1 );
+-		} );
+-
+-		test( 'should be able to render content', () => {
+-			const cardBody = shallow(
+-				<CardMedia>
+-					<div className="content">Hello</div>
+-				</CardMedia>
+-			);
+-			const content = cardBody.find( '.content' );
+-
+-			expect( content.length ).toBe( 1 );
+-			expect( content.text() ).toBe( 'Hello' );
+-		} );
+-	} );
+-} );
+diff --git a/packages/components/src/card/types.ts b/packages/components/src/card/types.ts
+index 30b2d3e94cdfee..eed2958c90d07c 100644
+--- a/packages/components/src/card/types.ts
++++ b/packages/components/src/card/types.ts
+@@ -22,6 +22,15 @@ type SizeableProps = {
+ 
+ export type Props = SurfaceProps &
+ 	SizeableProps & {
++		/**
++		 * Size of the elevation shadow, based on the Style system's elevation system.
++		 * Elevating a `Card` can be done by adjusting the `elevation` prop. This may
++		 * be helpful in highlighting certain content. For more information, check out
++		 * `Elevation`.
++		 *
++		 * @default 0
++		 */
++		elevation?: number;
+ 		/**
+ 		 * Renders without a border.
+ 		 *
+@@ -38,6 +47,7 @@ export type Props = SurfaceProps &
+ 		 * Renders with elevation styles (box shadow).
+ 		 *
+ 		 * @default false
++		 * @deprecated
+ 		 */
+ 		isElevated?: boolean;
+ 	};
+@@ -71,7 +81,6 @@ type MarginalSubComponentProps = BaseSubComponentProps & {
+ 	 * @default false
+ 	 */
+ 	isBorderless?: boolean;
+-	className?: string;
+ };
+ 
+ export type HeaderProps = MarginalSubComponentProps;
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 28bfb5885df69e..feb59b7f382796 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -54,6 +54,10 @@ export default {
+ 	cardPaddingX: CARD_PADDING_X,
+ 	cardPaddingY: CARD_PADDING_Y,
+ 	cardPadding: `${ CARD_PADDING_X } ${ CARD_PADDING_Y }`,
++	cardPaddingXSmall: `${ space( 2 ) }`,
++	cardPaddingSmall: `${ space( 4 ) }`,
++	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,
++	cardPaddingLarge: `${ space( 6 ) } ${ space( 8 ) }`,
+ 	cardHeaderFooterPaddingY: space( 1 ),
+ 	cardHeaderHeight: '44px',
+ 	surfaceBackgroundColor: COLORS.white,

@@ -1,0 +1,234 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 37dd824c6b6247..825839531b0bdc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,8 @@
+ -   `ColorPicker`: fix layout overflow [#42992](https://github.com/WordPress/gutenberg/pull/42992)).
+ -   `ToolsPanel`: Constrain grid columns to 50% max-width ([#42795](https://github.com/WordPress/gutenberg/pull/42795)).
+ -   `Popover`: anchor correctly to parent node when no explicit anchor is passed ([#42971](https://github.com/WordPress/gutenberg/pull/42971)).
++-   `ColorPalette`: forward correctly `popoverProps` in the `CustomColorPickerDropdown` component [#42989](https://github.com/WordPress/gutenberg/pull/42989)).
++-   `ColorPalette`, `CustomGradientBar`: restore correct color picker popover position [#42989](https://github.com/WordPress/gutenberg/pull/42989)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/color-palette/index.js b/packages/components/src/color-palette/index.js
+index 024fabdb672028..876c9ccbf1f3bb 100644
+--- a/packages/components/src/color-palette/index.js
++++ b/packages/components/src/color-palette/index.js
+@@ -112,19 +112,35 @@ function MultiplePalettes( {
+ 	);
+ }
+ 
+-export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
++export function CustomColorPickerDropdown( {
++	isRenderedInSidebar,
++	popoverProps: receivedPopoverProps,
++	...props
++} ) {
++	const popoverProps = useMemo(
++		() => ( {
++			__unstableShift: true,
++			...( isRenderedInSidebar
++				? {
++						// When in the sidebar: open to the left (stacking),
++						// leaving the same gap as the parent popover.
++						placement: 'left-start',
++						offset: 34,
++				  }
++				: {
++						// Default behavior: open below the anchor
++						placement: 'bottom',
++						offset: 8,
++				  } ),
++			...receivedPopoverProps,
++		} ),
++		[ isRenderedInSidebar, receivedPopoverProps ]
++	);
++
+ 	return (
+ 		<Dropdown
+ 			contentClassName="components-color-palette__custom-color-dropdown-content"
+-			popoverProps={
+-				isRenderedInSidebar
+-					? {
+-							placement: 'left-start',
+-							offset: 20,
+-							__unstableShift: true,
+-					  }
+-					: undefined
+-			}
++			popoverProps={ popoverProps }
+ 			{ ...props }
+ 		/>
+ 	);
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.js.snap b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+index cca33e76e0e926..f229e98a0278fa 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+@@ -357,6 +357,13 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+ 
+ <Dropdown
+   contentClassName="components-color-palette__custom-color-dropdown-content"
++  popoverProps={
++    Object {
++      "__unstableShift": true,
++      "offset": 8,
++      "placement": "bottom",
++    }
++  }
+   renderContent={[Function]}
+   renderToggle={[Function]}
+ >
+@@ -728,6 +735,13 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+         >
+           <Dropdown
+             contentClassName="components-color-palette__custom-color-dropdown-content"
++            popoverProps={
++              Object {
++                "__unstableShift": true,
++                "offset": 8,
++                "placement": "bottom",
++              }
++            }
+             renderContent={[Function]}
+             renderToggle={[Function]}
+           >
+diff --git a/packages/components/src/custom-gradient-bar/control-points.js b/packages/components/src/custom-gradient-bar/control-points.js
+index 65856d3069f6a9..44e31ef4f784ff 100644
+--- a/packages/components/src/custom-gradient-bar/control-points.js
++++ b/packages/components/src/custom-gradient-bar/control-points.js
+@@ -17,6 +17,7 @@ import { LEFT, RIGHT } from '@wordpress/keycodes';
+  * Internal dependencies
+  */
+ import Button from '../button';
++import { HStack } from '../h-stack';
+ import { ColorPicker } from '../color-picker';
+ import { VisuallyHidden } from '../visually-hidden';
+ import { CustomColorPickerDropdown } from '../color-palette';
+@@ -73,23 +74,16 @@ function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
+ 	);
+ }
+ 
+-function GradientColorPickerDropdown( {
+-	isRenderedInSidebar,
+-	gradientPickerDomRef,
+-	...props
+-} ) {
+-	const popoverProps = useMemo( () => {
+-		const result = {
+-			className:
+-				'components-custom-gradient-picker__color-picker-popover',
+-			position: 'top',
+-		};
+-		if ( isRenderedInSidebar ) {
+-			result.anchorRef = gradientPickerDomRef.current;
+-			result.position = 'bottom left';
+-		}
+-		return result;
+-	}, [ gradientPickerDomRef, isRenderedInSidebar ] );
++function GradientColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
++	// Open the popover below the gradient control/insertion point
++	const popoverProps = useMemo(
++		() => ( {
++			placement: 'bottom',
++			offset: 8,
++		} ),
++		[]
++	);
++
+ 	return (
+ 		<CustomColorPickerDropdown
+ 			isRenderedInSidebar={ isRenderedInSidebar }
+@@ -163,7 +157,6 @@ function ControlPoints( {
+ 		return (
+ 			ignoreMarkerPosition !== initialPosition && (
+ 				<GradientColorPickerDropdown
+-					gradientPickerDomRef={ gradientPickerDomRef }
+ 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
+ 					key={ index }
+ 					onClose={ onStopControlPointChange }
+@@ -256,21 +249,25 @@ function ControlPoints( {
+ 								} }
+ 							/>
+ 							{ ! disableRemove && controlPoints.length > 2 && (
+-								<Button
+-									className="components-custom-gradient-picker__remove-control-point"
+-									onClick={ () => {
+-										onChange(
+-											removeControlPoint(
+-												controlPoints,
+-												index
+-											)
+-										);
+-										onClose();
+-									} }
+-									variant="link"
++								<HStack
++									className="components-custom-gradient-picker__remove-control-point-wrapper"
++									alignment="center"
+ 								>
+-									{ __( 'Remove Control Point' ) }
+-								</Button>
++									<Button
++										onClick={ () => {
++											onChange(
++												removeControlPoint(
++													controlPoints,
++													index
++												)
++											);
++											onClose();
++										} }
++										variant="link"
++									>
++										{ __( 'Remove Control Point' ) }
++									</Button>
++								</HStack>
+ 							) }
+ 						</>
+ 					) }
+@@ -288,12 +285,10 @@ function InsertPoint( {
+ 	insertPosition,
+ 	disableAlpha,
+ 	__experimentalIsRenderedInSidebar,
+-	gradientPickerDomRef,
+ } ) {
+ 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
+ 	return (
+ 		<GradientColorPickerDropdown
+-			gradientPickerDomRef={ gradientPickerDomRef }
+ 			isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
+ 			className="components-custom-gradient-picker__inserter"
+ 			onClose={ () => {
+diff --git a/packages/components/src/custom-gradient-bar/index.js b/packages/components/src/custom-gradient-bar/index.js
+index 088ccd994297a5..6898619e086431 100644
+--- a/packages/components/src/custom-gradient-bar/index.js
++++ b/packages/components/src/custom-gradient-bar/index.js
+@@ -136,9 +136,6 @@ export default function CustomGradientBar( {
+ 							__experimentalIsRenderedInSidebar={
+ 								__experimentalIsRenderedInSidebar
+ 							}
+-							gradientPickerDomRef={
+-								gradientMarkersContainerDomRef
+-							}
+ 							disableAlpha={ disableAlpha }
+ 							insertPosition={ gradientBarState.insertPosition }
+ 							value={ controlPoints }
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index 10d15992566aa6..2b62dfcf7debe0 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -59,11 +59,8 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ 	}
+ }
+ 
+-.components-custom-gradient-picker__color-picker-popover .components-custom-gradient-picker__remove-control-point {
+-	margin-left: auto;
+-	margin-right: auto;
+-	display: block;
+-	margin-bottom: $grid-unit-10;
++.components-custom-gradient-picker__remove-control-point-wrapper {
++	padding-bottom: $grid-unit-10;
+ }
+ 
+ .components-custom-gradient-picker__inserter {

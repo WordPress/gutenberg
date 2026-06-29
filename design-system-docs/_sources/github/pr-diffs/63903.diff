@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index aa11a7c90e2632..00c8503caf1680 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `ComboboxControl`: Fix ComboboxControl reset button when using the keyboard. ([#63410](https://github.com/WordPress/gutenberg/pull/63410))
+ -   `Button`: Never apply `aria-disabled` to anchor ([#63376](https://github.com/WordPress/gutenberg/pull/63376)).
+ -   `SelectControl`: Fix hover/focus color in wp-admin ([#63855](https://github.com/WordPress/gutenberg/pull/63855)).
++-   `ToggleControl`: Fix indentation ([#63903](https://github.com/WordPress/gutenberg/pull/63903)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/toggle-control/style.scss b/packages/components/src/toggle-control/style.scss
+index 263a372b00fe84..68733b53a9bc94 100644
+--- a/packages/components/src/toggle-control/style.scss
++++ b/packages/components/src/toggle-control/style.scss
+@@ -7,5 +7,6 @@
+ }
+ 
+ .components-toggle-control__help {
+-	margin-left: $toggle-width + $grid-unit-10;
++	display: inline-block;
++	margin-inline-start: $toggle-width + $grid-unit-10;
+ }

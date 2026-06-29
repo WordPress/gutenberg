@@ -1,0 +1,120 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..ded5075c493d43 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `UnitControl`: Remove "experimental" designation ([#61071](https://github.com/WordPress/gutenberg/pull/61071)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..3c385c197b5e73 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -183,9 +183,13 @@ export {
+ export { default as TreeSelect } from './tree-select';
+ export { Truncate as __experimentalTruncate } from './truncate';
+ export {
++	/**
++	 * @deprecated Import `UnitControl` instead.
++	 */
+ 	default as __experimentalUnitControl,
+ 	useCustomUnits as __experimentalUseCustomUnits,
+ 	parseQuantityAndUnitFromRawValue as __experimentalParseQuantityAndUnitFromRawValue,
++	UnitControl,
+ } from './unit-control';
+ export { View as __experimentalView } from './view';
+ export { VisuallyHidden } from './visually-hidden';
+diff --git a/packages/components/src/tools-panel/tools-panel/README.md b/packages/components/src/tools-panel/tools-panel/README.md
+index df41b623eefb6c..0048e534437f1a 100644
+--- a/packages/components/src/tools-panel/tools-panel/README.md
++++ b/packages/components/src/tools-panel/tools-panel/README.md
+@@ -63,7 +63,7 @@ import {
+ 	__experimentalBoxControl as BoxControl,
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+-	__experimentalUnitControl as UnitControl,
++	UnitControl,
+ } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ 
+diff --git a/packages/components/src/tools-panel/tools-panel/component.tsx b/packages/components/src/tools-panel/tools-panel/component.tsx
+index 4e01e39ffffb43..e098c70e43735c 100644
+--- a/packages/components/src/tools-panel/tools-panel/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel/component.tsx
+@@ -55,7 +55,7 @@ const UnconnectedToolsPanel = (
+  * import {
+  *   __experimentalToolsPanel as ToolsPanel,
+  *   __experimentalToolsPanelItem as ToolsPanelItem,
+- *   __experimentalUnitControl as UnitControl
++ *   UnitControl
+  * } from '@wordpress/components';
+  *
+  * function Example() {
+diff --git a/packages/components/src/unit-control/README.md b/packages/components/src/unit-control/README.md
+index b3c0496f86b800..296d87a4c13e0a 100644
+--- a/packages/components/src/unit-control/README.md
++++ b/packages/components/src/unit-control/README.md
+@@ -10,7 +10,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ ```jsx
+ import { useState } from 'react';
+-import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
++import { UnitControl } from '@wordpress/components';
+ 
+ const Example = () => {
+ 	const [ value, setValue ] = useState( '10px' );
+@@ -116,7 +116,7 @@ Example:
+ 
+ ```jsx
+ import { useState } from 'react';
+-import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
++import { UnitControl } from '@wordpress/components';
+ 
+ const Example = () => {
+ 	const [ value, setValue ] = useState( '10px' );
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 93ec2c358ecf15..b7b01ff7690df2 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -235,7 +235,7 @@ function UnforwardedUnitControl(
+  *
+  *
+  * ```jsx
+- * import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
++ * import { UnitControl } from '@wordpress/components';
+  * import { useState } from '@wordpress/element';
+  *
+  * const Example = () => {
+diff --git a/packages/components/src/unit-control/stories/index.story.tsx b/packages/components/src/unit-control/stories/index.story.tsx
+index 5134d4902144da..7773f385369055 100644
+--- a/packages/components/src/unit-control/stories/index.story.tsx
++++ b/packages/components/src/unit-control/stories/index.story.tsx
+@@ -16,7 +16,7 @@ import { CSS_UNITS } from '../utils';
+ 
+ const meta: Meta< typeof UnitControl > = {
+ 	component: UnitControl,
+-	title: 'Components (Experimental)/UnitControl',
++	title: 'Components/UnitControl',
+ 	argTypes: {
+ 		__unstableInputWidth: { control: { type: 'text' } },
+ 		__unstableStateReducer: { control: { type: null } },
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..dbc14194d1e179 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'unitcontrol',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

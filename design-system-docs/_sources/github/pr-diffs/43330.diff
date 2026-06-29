@@ -1,0 +1,340 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index b17346875ca097..554d52e2f5299d 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -144,6 +144,7 @@ module.exports = {
+ 							'toString',
+ 							'trim',
+ 							'truncate',
++							'uniq',
+ 							'uniqBy',
+ 							'uniqueId',
+ 							'uniqWith',
+diff --git a/bin/plugin/commands/changelog.js b/bin/plugin/commands/changelog.js
+index 6e189352201ef0..778286db23a884 100644
+--- a/bin/plugin/commands/changelog.js
++++ b/bin/plugin/commands/changelog.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-const { groupBy, escapeRegExp, uniq, flow, sortBy } = require( 'lodash' );
++const { groupBy, escapeRegExp, flow, sortBy } = require( 'lodash' );
+ const Octokit = require( '@octokit/rest' );
+ const { sprintf } = require( 'sprintf-js' );
+ const semver = require( 'semver' );
+@@ -194,13 +194,15 @@ const REWORD_TERMS = {
+  * @return {string[]} Type candidates.
+  */
+ function getTypesByLabels( labels ) {
+-	return uniq(
+-		labels
+-			.filter( ( label ) =>
+-				Object.keys( LABEL_TYPE_MAPPING ).includes( label )
+-			)
+-			.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
+-	);
++	return [
++		...new Set(
++			labels
++				.filter( ( label ) =>
++					Object.keys( LABEL_TYPE_MAPPING ).includes( label )
++				)
++				.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
++		),
++	];
+ }
+ 
+ /**
+diff --git a/packages/babel-plugin-makepot/index.js b/packages/babel-plugin-makepot/index.js
+index 2e72d69dee35ba..52bb2dabf135bc 100644
+--- a/packages/babel-plugin-makepot/index.js
++++ b/packages/babel-plugin-makepot/index.js
+@@ -36,7 +36,6 @@ const { po } = require( 'gettext-parser' );
+ const {
+ 	pick,
+ 	reduce,
+-	uniq,
+ 	forEach,
+ 	sortBy,
+ 	isEqual,
+@@ -347,8 +346,8 @@ module.exports = () => {
+ 												memo[ msgctxt ][ msgid ]
+ 											)
+ 										) {
+-											translation.comments.reference =
+-												uniq(
++											translation.comments.reference = [
++												...new Set(
+ 													[
+ 														memo[ msgctxt ][ msgid ]
+ 															.comments.reference,
+@@ -357,7 +356,8 @@ module.exports = () => {
+ 													]
+ 														.join( '\n' )
+ 														.split( '\n' )
+-												).join( '\n' );
++												),
++											].join( '\n' );
+ 										}
+ 
+ 										memo[ msgctxt ][ msgid ] = translation;
+diff --git a/packages/block-editor/src/components/block-switcher/index.js b/packages/block-editor/src/components/block-switcher/index.js
+index 692cf9cfb6d42a..dd3eb055ebd671 100644
+--- a/packages/block-editor/src/components/block-switcher/index.js
++++ b/packages/block-editor/src/components/block-switcher/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { castArray, uniq } from 'lodash';
++import { castArray } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -64,7 +64,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
+ 				_icon = blockInformation?.icon; // Take into account active block variations.
+ 			} else {
+ 				const isSelectionOfSameType =
+-					uniq( blocks.map( ( { name } ) => name ) ).length === 1;
++					new Set( blocks.map( ( { name } ) => name ) ).size === 1;
+ 				// When selection consists of blocks of multiple types, display an
+ 				// appropriate icon to communicate the non-uniformity.
+ 				_icon = isSelectionOfSameType
+diff --git a/packages/block-editor/src/components/date-format-picker/index.js b/packages/block-editor/src/components/date-format-picker/index.js
+index 7d5ae7f53e5e55..555910d70f76ce 100644
+--- a/packages/block-editor/src/components/date-format-picker/index.js
++++ b/packages/block-editor/src/components/date-format-picker/index.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { uniq } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -83,15 +78,17 @@ function NonDefaultControls( { format, onChange } ) {
+ 	// 2022) in German (de). The resultant array is de-duplicated as some
+ 	// languages will use the same format string for short, medium, and long
+ 	// formats.
+-	const suggestedFormats = uniq( [
+-		'Y-m-d',
+-		_x( 'n/j/Y', 'short date format' ),
+-		_x( 'n/j/Y g:i A', 'short date format with time' ),
+-		_x( 'M j, Y', 'medium date format' ),
+-		_x( 'M j, Y g:i A', 'medium date format with time' ),
+-		_x( 'F j, Y', 'long date format' ),
+-		_x( 'M j', 'short date format without the year' ),
+-	] );
++	const suggestedFormats = [
++		...new Set( [
++			'Y-m-d',
++			_x( 'n/j/Y', 'short date format' ),
++			_x( 'n/j/Y g:i A', 'short date format with time' ),
++			_x( 'M j, Y', 'medium date format' ),
++			_x( 'M j, Y g:i A', 'medium date format with time' ),
++			_x( 'F j, Y', 'long date format' ),
++			_x( 'M j', 'short date format without the year' ),
++		] ),
++	];
+ 
+ 	const suggestedOptions = suggestedFormats.map(
+ 		( suggestedFormat, index ) => ( {
+diff --git a/packages/block-editor/src/hooks/generated-class-name.js b/packages/block-editor/src/hooks/generated-class-name.js
+index b5ca340cc3b4c2..0f4e5f43576fa9 100644
+--- a/packages/block-editor/src/hooks/generated-class-name.js
++++ b/packages/block-editor/src/hooks/generated-class-name.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { uniq } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -26,10 +21,12 @@ export function addGeneratedClassName( extraProps, blockType ) {
+ 			// We have some extra classes and want to add the default classname
+ 			// We use uniq to prevent duplicate classnames.
+ 
+-			extraProps.className = uniq( [
+-				getBlockDefaultClassName( blockType.name ),
+-				...extraProps.className.split( ' ' ),
+-			] )
++			extraProps.className = [
++				...new Set( [
++					getBlockDefaultClassName( blockType.name ),
++					...extraProps.className.split( ' ' ),
++				] ),
++			]
+ 				.join( ' ' )
+ 				.trim();
+ 		} else {
+diff --git a/packages/blocks/src/api/factory.js b/packages/blocks/src/api/factory.js
+index 71b370f79c1cbd..e7e8e9f114a10a 100644
+--- a/packages/blocks/src/api/factory.js
++++ b/packages/blocks/src/api/factory.js
+@@ -9,7 +9,6 @@ import {
+ 	filter,
+ 	first,
+ 	has,
+-	uniq,
+ 	isEmpty,
+ 	map,
+ } from 'lodash';
+@@ -348,10 +347,12 @@ export function getPossibleBlockTransformations( blocks ) {
+ 	const blockTypesForToTransforms =
+ 		getBlockTypesForPossibleToTransforms( blocks );
+ 
+-	return uniq( [
+-		...blockTypesForFromTransforms,
+-		...blockTypesForToTransforms,
+-	] );
++	return [
++		...new Set( [
++			...blockTypesForFromTransforms,
++			...blockTypesForToTransforms,
++		] ),
++	];
+ }
+ 
+ /**
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3d0002b5554054..25ab007fa04d87 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -23,6 +23,9 @@
+ -   `DateTimePicker`, `TimePicker`, `DatePicker`: Switch from `moment` to `date-fns` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
+ -   `DatePicker`: Switch from `react-dates` to `use-lilius` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
+ -   `convertLTRToRTL()`: Refactor away from `_.mapKeys()` ([#43258](https://github.com/WordPress/gutenberg/pull/43258/)).
++-   `FormTokenField`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
++-   `contextConnect`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
++-   `ColorPalette`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
+ 
+ ## 19.17.0 (2022-08-10)
+ 
+diff --git a/packages/components/src/color-palette/index.native.js b/packages/components/src/color-palette/index.native.js
+index 10b0b0df94de61..5ce545b3c64ffa 100644
+--- a/packages/components/src/color-palette/index.native.js
++++ b/packages/components/src/color-palette/index.native.js
+@@ -11,7 +11,7 @@ import {
+ 	Platform,
+ 	Text,
+ } from 'react-native';
+-import { map, uniq } from 'lodash';
++import { map } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -63,11 +63,15 @@ function ColorPalette( {
+ 	const scale = useRef( new Animated.Value( 1 ) ).current;
+ 	const opacity = useRef( new Animated.Value( 1 ) ).current;
+ 
+-	const defaultColors = uniq( map( defaultSettings.colors, 'color' ) );
+-	const mergedColors = uniq( map( defaultSettings.allColors, 'color' ) );
+-	const defaultGradientColors = uniq(
+-		map( defaultSettings.gradients, 'gradient' )
+-	);
++	const defaultColors = [
++		...new Set( map( defaultSettings.colors, 'color' ) ),
++	];
++	const mergedColors = [
++		...new Set( map( defaultSettings.allColors, 'color' ) ),
++	];
++	const defaultGradientColors = [
++		...new Set( map( defaultSettings.gradients, 'gradient' ) ),
++	];
+ 	const colors = isGradientSegment ? defaultGradientColors : defaultColors;
+ 
+ 	const customIndicatorColor = isGradientSegment
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 29475ec7d4ee71..12bfa781ed6117 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { last, clone, uniq, map, some } from 'lodash';
++import { last, clone, map, some } from 'lodash';
+ import classnames from 'classnames';
+ import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
+ 
+@@ -409,12 +409,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 	}
+ 
+ 	function addNewTokens( tokens: string[] ) {
+-		const tokensToAdd = uniq(
+-			tokens
+-				.map( saveTransform )
+-				.filter( Boolean )
+-				.filter( ( token ) => ! valueContainsToken( token ) )
+-		);
++		const tokensToAdd = [
++			...new Set(
++				tokens
++					.map( saveTransform )
++					.filter( Boolean )
++					.filter( ( token ) => ! valueContainsToken( token ) )
++			),
++		];
+ 
+ 		if ( tokensToAdd.length > 0 ) {
+ 			const newValue = clone( value );
+diff --git a/packages/components/src/ui/context/context-connect.ts b/packages/components/src/ui/context/context-connect.ts
+index 63aba66e42d778..563f90e1eecb4b 100644
+--- a/packages/components/src/ui/context/context-connect.ts
++++ b/packages/components/src/ui/context/context-connect.ts
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { uniq } from 'lodash';
+ import type { ForwardedRef, ReactChild, ReactNode } from 'react';
+ 
+ /**
+@@ -70,7 +69,9 @@ export function contextConnect< P >(
+ 	WrappedComponent.displayName = namespace;
+ 
+ 	// @ts-ignore internal property
+-	WrappedComponent[ CONNECT_STATIC_NAMESPACE ] = uniq( mergedNamespace );
++	WrappedComponent[ CONNECT_STATIC_NAMESPACE ] = [
++		...new Set( mergedNamespace ),
++	];
+ 
+ 	// @ts-ignore WordPressComponent property
+ 	WrappedComponent.selector = `.${ getStyledClassNameFromKey( namespace ) }`;
+diff --git a/test/integration/fixtures/utils.js b/test/integration/fixtures/utils.js
+index afbe494c3dad17..7b8d5fc2c9e055 100644
+--- a/test/integration/fixtures/utils.js
++++ b/test/integration/fixtures/utils.js
+@@ -3,7 +3,6 @@
+  */
+ import fs from 'fs';
+ import path from 'path';
+-import { uniq } from 'lodash';
+ 
+ const FIXTURES_DIR = path.join( __dirname, 'blocks' );
+ 
+@@ -31,12 +30,14 @@ export function getAvailableBlockFixturesBasenames() {
+ 	//  - fixture.json            : blocks structure
+ 	//  - fixture.serialized.html : re-serialized content
+ 	// Get the "base" name for each fixture first.
+-	return uniq(
+-		fs
+-			.readdirSync( FIXTURES_DIR )
+-			.filter( ( f ) => /(\.html|\.json)$/.test( f ) )
+-			.map( ( f ) => f.replace( /\..+$/, '' ) )
+-	);
++	return [
++		...new Set(
++			fs
++				.readdirSync( FIXTURES_DIR )
++				.filter( ( f ) => /(\.html|\.json)$/.test( f ) )
++				.map( ( f ) => f.replace( /\..+$/, '' ) )
++		),
++	];
+ }
+ 
+ /**

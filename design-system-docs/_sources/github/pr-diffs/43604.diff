@@ -1,0 +1,242 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index dd236130446a3c..20a1cb6f6bc77c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Internal
+ 
+ -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
++-   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
+ 
+ ## 20.0.0 (2022-08-24)
+ 
+diff --git a/packages/components/src/guide/index.js b/packages/components/src/guide/index.js
+index 91e4b0d147ff18..4669f13471801b 100644
+--- a/packages/components/src/guide/index.js
++++ b/packages/components/src/guide/index.js
+@@ -9,7 +9,6 @@ import classnames from 'classnames';
+ import { useState, useEffect, Children, useRef } from '@wordpress/element';
+ import deprecated from '@wordpress/deprecated';
+ import { __ } from '@wordpress/i18n';
+-import { LEFT, RIGHT } from '@wordpress/keycodes';
+ import { focus } from '@wordpress/dom';
+ 
+ /**
+@@ -76,10 +75,14 @@ export default function Guide( {
+ 			contentLabel={ contentLabel }
+ 			onRequestClose={ onFinish }
+ 			onKeyDown={ ( event ) => {
+-				if ( event.keyCode === LEFT ) {
++				if ( event.code === 'ArrowLeft' ) {
+ 					goBack();
+-				} else if ( event.keyCode === RIGHT ) {
++					// Do not scroll the modal's contents.
++					event.preventDefault();
++				} else if ( event.code === 'ArrowRight' ) {
+ 					goForward();
++					// Do not scroll the modal's contents.
++					event.preventDefault();
+ 				}
+ 			} }
+ 			ref={ guideContainer }
+diff --git a/packages/components/src/guide/test/index.js b/packages/components/src/guide/test/index.js
+index bd36752959ff69..852c09ed280887 100644
+--- a/packages/components/src/guide/test/index.js
++++ b/packages/components/src/guide/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen } from '@testing-library/react';
++import { render, screen, within } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+ /**
+@@ -118,4 +118,141 @@ describe( 'Guide', () => {
+ 
+ 		expect( onFinish ).toHaveBeenCalled();
+ 	} );
++
++	describe( 'page navigation', () => {
++		it( 'renders an empty list when there are no pages', () => {
++			render( <Guide pages={ [] } /> );
++			expect(
++				screen.queryByRole( 'list', {
++					name: 'Guide controls',
++				} )
++			).not.toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'button', {
++					name: /page \d of \d/i,
++				} )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'renders a button for each page', () => {
++			render(
++				<Guide
++					pages={ [
++						{ content: <p>Page 1</p> },
++						{ content: <p>Page 2</p> },
++						{ content: <p>Page 3</p> },
++						{ content: <p>Page 4</p> },
++					] }
++				/>
++			);
++			const listContainer = screen.getByRole( 'list', {
++				name: 'Guide controls',
++			} );
++			expect(
++				within( listContainer ).getAllByRole( 'button', {
++					name: /page \d of \d/i,
++				} )
++			).toHaveLength( 4 );
++		} );
++
++		it( 'sets the current page when a button is clicked', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render(
++				<Guide
++					pages={ [
++						{ content: <p>Page 1</p> },
++						{ content: <p>Page 2</p> },
++						{ content: <p>Page 3</p> },
++					] }
++				/>
++			);
++
++			expect( screen.getByText( 'Page 1' ) ).toBeVisible();
++			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Page 2 of 3' } )
++			);
++
++			expect( screen.getByText( 'Page 2' ) ).toBeVisible();
++			expect( screen.queryByText( 'Page 1' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Page 3 of 3' } )
++			);
++
++			expect( screen.getByText( 'Page 3' ) ).toBeVisible();
++			expect( screen.queryByText( 'Page 1' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Page 1 of 3' } )
++			);
++
++			expect( screen.getByText( 'Page 1' ) ).toBeVisible();
++			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
++		} );
++
++		it( 'allows navigating through the pages with the left and right arrows', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render(
++				<Guide
++					pages={ [
++						{ content: <p>Page 1</p> },
++						{ content: <p>Page 2</p> },
++						{ content: <p>Page 3</p> },
++					] }
++				/>
++			);
++
++			expect( screen.getByText( 'Page 1' ) ).toBeVisible();
++			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
++
++			await user.keyboard( '[ArrowLeft]' );
++
++			expect( screen.getByText( 'Page 1' ) ).toBeVisible();
++			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
++
++			await user.keyboard( '[ArrowRight]' );
++
++			expect( screen.getByText( 'Page 2' ) ).toBeVisible();
++			expect( screen.queryByText( 'Page 1' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
++
++			await user.keyboard( '[ArrowRight]' );
++
++			expect( screen.getByText( 'Page 3' ) ).toBeVisible();
++			expect( screen.queryByText( 'Page 1' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
++
++			await user.keyboard( '[ArrowRight]' );
++
++			expect( screen.getByText( 'Page 3' ) ).toBeVisible();
++			expect( screen.queryByText( 'Page 1' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
++
++			await user.keyboard( '[ArrowLeft]' );
++
++			expect( screen.getByText( 'Page 2' ) ).toBeVisible();
++			expect( screen.queryByText( 'Page 1' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
++
++			await user.keyboard( '[ArrowLeft]' );
++
++			expect( screen.getByText( 'Page 1' ) ).toBeVisible();
++			expect( screen.queryByText( 'Page 2' ) ).not.toBeInTheDocument();
++			expect( screen.queryByText( 'Page 3' ) ).not.toBeInTheDocument();
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/guide/test/page-control.js b/packages/components/src/guide/test/page-control.js
+deleted file mode 100644
+index caeb3dd005476a..00000000000000
+--- a/packages/components/src/guide/test/page-control.js
++++ /dev/null
+@@ -1,40 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, screen } from '@testing-library/react';
+-import userEvent from '@testing-library/user-event';
+-
+-/**
+- * Internal dependencies
+- */
+-import PageControl from '../page-control';
+-
+-describe( 'PageControl', () => {
+-	it( 'renders an empty list when there are no pages', () => {
+-		render( <PageControl currentPage={ 0 } numberOfPages={ 0 } /> );
+-		expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
+-	} );
+-
+-	it( 'renders a button for each page', () => {
+-		render( <PageControl currentPage={ 0 } numberOfPages={ 5 } /> );
+-		expect( screen.getAllByRole( 'button' ) ).toHaveLength( 5 );
+-	} );
+-
+-	it( 'sets the current page when a button is clicked', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
+-		const setCurrentPage = jest.fn();
+-		render(
+-			<PageControl
+-				currentPage={ 0 }
+-				numberOfPages={ 2 }
+-				setCurrentPage={ setCurrentPage }
+-			/>
+-		);
+-
+-		await user.click( screen.getAllByRole( 'button' )[ 1 ] );
+-
+-		expect( setCurrentPage ).toHaveBeenCalledWith( 1 );
+-	} );
+-} );

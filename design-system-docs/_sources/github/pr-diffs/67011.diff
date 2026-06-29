@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ff4a8b714c9a52..d7741f4caa9886 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -35,6 +35,7 @@
+ 
+ -   `SlotFill`: fix dependencies of `Fill` registration effects ([#67071](https://github.com/WordPress/gutenberg/pull/67071)).
+ -   `SlotFill`: rewrite the `Slot` component from class component to functional ([#67153](https://github.com/WordPress/gutenberg/pull/67153)).
++-   `Menu.ItemHelpText`: Fix text wrapping to prevent unintended word breaks ([#67011](https://github.com/WordPress/gutenberg/pull/67011)).
+ 
+ ## 28.12.0 (2024-11-16)
+ 
+diff --git a/packages/components/src/menu/styles.ts b/packages/components/src/menu/styles.ts
+index 3312c8cb2de161..0e0752bf24cd10 100644
+--- a/packages/components/src/menu/styles.ts
++++ b/packages/components/src/menu/styles.ts
+@@ -380,7 +380,7 @@ export const MenuItemHelpText = styled( Truncate )`
+ 	font-size: ${ font( 'helpText.fontSize' ) };
+ 	line-height: 16px;
+ 	color: ${ LIGHTER_TEXT_COLOR };
+-	word-break: break-all;
++	overflow-wrap: anywhere;
+ 
+ 	[data-active-item]:not( [data-focus-visible] )
+ 		*:not( ${ MenuPopoverInnerWrapper } )

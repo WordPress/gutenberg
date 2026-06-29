@@ -1,0 +1,36 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0c1195083e30dd..3a377f84853347 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -   `Button`: Stabilize `__experimentalIsFocusable` prop as `accessibleWhenDisabled` ([#62282](https://github.com/WordPress/gutenberg/pull/62282)).
+ -   `ToolbarButton`: Always keep focusable when disabled ([#63102](https://github.com/WordPress/gutenberg/pull/63102)).
+ -   `ProgressBar`: Fix indeterminate RTL support. ([#63129](https://github.com/WordPress/gutenberg/pull/63129)).
++-   `RangeControl`: Fix RTL support for custom marks ([#63198](https://github.com/WordPress/gutenberg/pull/63198)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index e00003a47568e3..89f4864aee2ea6 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -168,13 +168,17 @@ const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
+ 
+ export const MarkLabel = styled.span`
+ 	color: ${ COLORS.gray[ 300 ] };
+-	left: 0;
+ 	font-size: 11px;
+ 	position: absolute;
+ 	top: 12px;
+-	transform: translateX( -50% );
+ 	white-space: nowrap;
+ 
++	${ rtl( { left: 0 } ) };
++	${ rtl(
++		{ transform: 'translateX( -50% )' },
++		{ transform: 'translateX( 50% )' }
++	) };
++
+ 	${ markLabelFill };
+ `;
+ 

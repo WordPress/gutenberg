@@ -1,0 +1,4261 @@
+diff --git a/docs/reference-guides/block-api/block-supports.md b/docs/reference-guides/block-api/block-supports.md
+index eb726c426bdfc9..81ebd9bc48e23c 100644
+--- a/docs/reference-guides/block-api/block-supports.md
++++ b/docs/reference-guides/block-api/block-supports.md
+@@ -1169,3 +1169,18 @@ is only meant for simple text blocks such as paragraphs and headings with a
+ single `RichText` field. RichText in the `edit` function _must_ have an
+ `identifier` prop that matches the attribute key of the text, so that it updates
+ the selection correctly and we know where to split.
++
++## visibility
++
++_**Note:** Since WordPress 6.9._
++
++-   Type: `boolean`
++-   Default value: `true`
++
++By default, a block can be hidden by a user from the block 'Options' dropdown. To disable this behavior, set visibility to false.
++
++```js
++supports: {
++	visibility: false,
++}
++```
+diff --git a/docs/reference-guides/core-blocks.md b/docs/reference-guides/core-blocks.md
+index 97f3a79316093f..268a475ca058a4 100644
+--- a/docs/reference-guides/core-blocks.md
++++ b/docs/reference-guides/core-blocks.md
+@@ -382,7 +382,7 @@ Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenbe
+ 
+ -	**Name:** core/freeform
+ -	**Category:** text
+--	**Supports:** ~~className~~, ~~customClassName~~, ~~html~~, ~~lock~~, ~~renaming~~, ~~reusable~~, ~~visibility~~
++-	**Supports:** ~~className~~, ~~customClassName~~, ~~lock~~, ~~renaming~~, ~~reusable~~, ~~visibility~~
+ -	**Attributes:** content
+ 
+ ## Gallery
+diff --git a/lib/client-assets.php b/lib/client-assets.php
+index 456b17d9c852d6..0d98ea3358c8f3 100644
+--- a/lib/client-assets.php
++++ b/lib/client-assets.php
+@@ -397,6 +397,16 @@ function gutenberg_register_packages_styles( $styles ) {
+ 	);
+ 	$styles->add_data( 'wp-block-library-theme', 'rtl', 'replace' );
+ 
++	gutenberg_override_style(
++		$styles,
++		'classic-theme-styles',
++		gutenberg_url( 'build/block-library/classic.css' ),
++		array(),
++		$version
++	);
++	$styles->add_data( 'classic-theme-styles', 'rtl', 'replace' );
++	$styles->add_data( 'classic-theme-styles', 'path', gutenberg_dir_path() . 'build/block-library/classic.css' );
++
+ 	gutenberg_override_style(
+ 		$styles,
+ 		'wp-list-reusable-blocks',
+diff --git a/packages/block-editor/README.md b/packages/block-editor/README.md
+index a8d6b67d30f981..96d271a5f82062 100644
+--- a/packages/block-editor/README.md
++++ b/packages/block-editor/README.md
+@@ -847,6 +847,10 @@ _Related_
+ 
+ -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
+ 
++### ToolSelector
++
++This component has been deprecated and no longer renders anything.
++
+ ### transformStyles
+ 
+ Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.
+diff --git a/packages/block-editor/src/components/block-controls/test/index.js b/packages/block-editor/src/components/block-controls/test/index.js
+index bbd987cbeb20e8..56fe49fcc5a7e5 100644
+--- a/packages/block-editor/src/components/block-controls/test/index.js
++++ b/packages/block-editor/src/components/block-controls/test/index.js
+@@ -43,6 +43,7 @@ describe( 'BlockControls', () => {
+ 		const edit = ( { children } ) => <>{ children }</>;
+ 
+ 		registerBlockType( 'core/test-block', {
++			apiVersion: 3,
+ 			save: () => {},
+ 			category: 'text',
+ 			title: 'block title',
+diff --git a/packages/block-editor/src/components/block-edit/test/edit.js b/packages/block-editor/src/components/block-edit/test/edit.js
+index 76afbcb852ac19..285d721db38349 100644
+--- a/packages/block-editor/src/components/block-edit/test/edit.js
++++ b/packages/block-editor/src/components/block-edit/test/edit.js
+@@ -37,6 +37,7 @@ describe( 'Edit', () => {
+ 		const edit = () => <div data-testid="foo-bar" />;
+ 
+ 		registerBlockType( 'core/test-block', {
++			apiVersion: 3,
+ 			save: noop,
+ 			category: 'text',
+ 			title: 'block title',
+@@ -52,6 +53,7 @@ describe( 'Edit', () => {
+ 		const save = () => <div data-testid="foo-bar" />;
+ 
+ 		registerBlockType( 'core/test-block', {
++			apiVersion: 3,
+ 			save,
+ 			category: 'text',
+ 			title: 'block title',
+@@ -79,6 +81,13 @@ describe( 'Edit', () => {
+ 
+ 		render( <Edit name="core/test-block" attributes={ attributes } /> );
+ 
++		// This test is for API version 1 blocks, so the console warning is intentional.
++		// API version 1 blocks automatically receive the default block class name,
++		// while API version 2+ blocks require useBlockProps() to be used explicitly.
++		expect( console ).toHaveWarnedWith(
++			'Block with API version 2 or lower is deprecated since version 6.9. See: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility/ Note: The block "core/test-block" is registered with API version 1. This means that the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, set the `apiVersion` field to 3 and test the block inside the iframe editor.'
++		);
++
+ 		const editElement = screen.getByTestId( 'foo-bar' );
+ 		expect( editElement ).toHaveClass( 'wp-block-test-block' );
+ 		expect( editElement ).toHaveClass( 'my-class' );
+@@ -87,6 +96,7 @@ describe( 'Edit', () => {
+ 	it( 'should assign context', () => {
+ 		const edit = ( { context } ) => context.value;
+ 		registerBlockType( 'core/test-block', {
++			apiVersion: 3,
+ 			category: 'text',
+ 			title: 'block title',
+ 			usesContext: [ 'value' ],
+diff --git a/packages/block-editor/src/components/block-preview/test/index.js b/packages/block-editor/src/components/block-preview/test/index.js
+index fcd5f48e8a0fc6..22545b244e2137 100644
+--- a/packages/block-editor/src/components/block-preview/test/index.js
++++ b/packages/block-editor/src/components/block-preview/test/index.js
+@@ -16,22 +16,26 @@ import {
+  * Internal dependencies
+  */
+ import { useBlockPreview } from '../';
++import { useBlockProps } from '../../block-list/use-block-props';
+ 
+ describe( 'useBlockPreview', () => {
+ 	beforeAll( () => {
+ 		registerBlockType( 'core/test-block', {
++			apiVersion: 3,
+ 			save: () => (
+-				<div>
++				<div { ...useBlockProps.save() }>
+ 					Test block save view
+ 					<button>Button</button>
+ 				</div>
+ 			),
+-			edit: () => (
+-				<div>
+-					Test block edit view
+-					<button>Button</button>
+-				</div>
+-			),
++			edit: function Edit() {
++				return (
++					<div { ...useBlockProps() }>
++						Test block edit view
++						<button>Button</button>
++					</div>
++				);
++			},
+ 			category: 'text',
+ 			title: 'test block',
+ 		} );
+diff --git a/packages/block-editor/src/components/block-switcher/test/index.js b/packages/block-editor/src/components/block-switcher/test/index.js
+index bc1b7d1a4a3640..99d04dcba80c19 100644
+--- a/packages/block-editor/src/components/block-switcher/test/index.js
++++ b/packages/block-editor/src/components/block-switcher/test/index.js
+@@ -33,6 +33,7 @@ describe( 'BlockSwitcher', () => {
+ 		clientId: 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9',
+ 	};
+ 	const headingBlockType = {
++		apiVersion: 3,
+ 		category: 'text',
+ 		title: 'Heading',
+ 		edit: () => {},
+@@ -54,6 +55,7 @@ describe( 'BlockSwitcher', () => {
+ 		},
+ 	};
+ 	const paragraphBlockType = {
++		apiVersion: 3,
+ 		category: 'text',
+ 		title: 'Paragraph',
+ 		edit: () => {},
+diff --git a/packages/block-editor/src/components/block-switcher/test/use-transformed.patterns.js b/packages/block-editor/src/components/block-switcher/test/use-transformed.patterns.js
+index 4d63c763174791..92075da9ccea20 100644
+--- a/packages/block-editor/src/components/block-switcher/test/use-transformed.patterns.js
++++ b/packages/block-editor/src/components/block-switcher/test/use-transformed.patterns.js
+@@ -14,6 +14,7 @@ import {
+ describe( 'use-transformed-patterns', () => {
+ 	beforeAll( () => {
+ 		registerBlockType( 'core/test-block-1', {
++			apiVersion: 3,
+ 			attributes: {
+ 				align: {
+ 					type: 'string',
+@@ -36,6 +37,7 @@ describe( 'use-transformed-patterns', () => {
+ 			title: 'test block 1',
+ 		} );
+ 		registerBlockType( 'core/test-block-2', {
++			apiVersion: 3,
+ 			attributes: {
+ 				align: { type: 'string' },
+ 				content: { type: 'boolean' },
+diff --git a/packages/block-editor/src/components/block-switcher/test/utils.js b/packages/block-editor/src/components/block-switcher/test/utils.js
+index eafe5e8a4d9378..d0c4826e4489bc 100644
+--- a/packages/block-editor/src/components/block-switcher/test/utils.js
++++ b/packages/block-editor/src/components/block-switcher/test/utils.js
+@@ -12,6 +12,7 @@ describe( 'BlockSwitcher - utils', () => {
+ 	describe( 'getRetainedBlockAttributes', () => {
+ 		beforeAll( () => {
+ 			registerBlockType( 'core/test-block-1', {
++				apiVersion: 3,
+ 				attributes: {
+ 					align: {
+ 						type: 'string',
+@@ -34,6 +35,7 @@ describe( 'BlockSwitcher - utils', () => {
+ 				title: 'test block 1',
+ 			} );
+ 			registerBlockType( 'core/test-block-2', {
++				apiVersion: 3,
+ 				attributes: {
+ 					align: { type: 'string' },
+ 					content: { type: 'boolean' },
+diff --git a/packages/block-editor/src/components/colors-gradients/style.scss b/packages/block-editor/src/components/colors-gradients/style.scss
+index b8143d16e61244..43f076345ac58b 100644
+--- a/packages/block-editor/src/components/colors-gradients/style.scss
++++ b/packages/block-editor/src/components/colors-gradients/style.scss
+@@ -49,6 +49,11 @@ $swatch-gap: 12px;
+ }
+ 
+ .block-editor-panel-color-gradient-settings__dropdown-content {
++	// Set minimum height to prevent content from being squashed when
++	// the popover is triggered near the bottom of the page, and flip
++	// the position accordingly.
++	min-height: 160px;
++
+ 	.block-editor-color-gradient-control__panel {
+ 		$panelPadding: $grid-unit-20;
+ 
+diff --git a/packages/block-editor/src/components/global-styles/color-panel.js b/packages/block-editor/src/components/global-styles/color-panel.js
+index 4cfc6079b1955d..5d5c02d179307d 100644
+--- a/packages/block-editor/src/components/global-styles/color-panel.js
++++ b/packages/block-editor/src/components/global-styles/color-panel.js
+@@ -155,8 +155,6 @@ const popoverProps = {
+ 	placement: 'left-start',
+ 	offset: 36,
+ 	shift: true,
+-	flip: true,
+-	resize: false,
+ };
+ 
+ const { Tabs } = unlock( componentsPrivateApis );
+diff --git a/packages/block-editor/src/components/global-styles/test/get-global-styles-changes.js b/packages/block-editor/src/components/global-styles/test/get-global-styles-changes.js
+index 9c220da7ead12e..57ade6a13d7e9b 100644
+--- a/packages/block-editor/src/components/global-styles/test/get-global-styles-changes.js
++++ b/packages/block-editor/src/components/global-styles/test/get-global-styles-changes.js
+@@ -194,6 +194,7 @@ describe( 'getGlobalStylesChanges and utils', () => {
+ 
+ 	beforeEach( () => {
+ 		registerBlockType( 'core/test-fiori-di-zucca', {
++			apiVersion: 3,
+ 			save: () => {},
+ 			category: 'text',
+ 			title: 'Test pumpkin flowers',
+diff --git a/packages/block-editor/src/components/global-styles/typography-panel.js b/packages/block-editor/src/components/global-styles/typography-panel.js
+index d06c79d5127085..78223242faa142 100644
+--- a/packages/block-editor/src/components/global-styles/typography-panel.js
++++ b/packages/block-editor/src/components/global-styles/typography-panel.js
+@@ -8,7 +8,7 @@ import {
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+-import { useCallback, useMemo, useEffect } from '@wordpress/element';
++import { useCallback, useMemo } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -27,6 +27,7 @@ import {
+ 	getMergedFontFamiliesAndFontFamilyFaces,
+ 	findNearestStyleAndWeight,
+ } from './typography-utils';
++import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
+ 
+ const MIN_TEXT_COLUMNS = 1;
+ const MAX_TEXT_COLUMNS = 6;
+@@ -194,15 +195,57 @@ export default function TypographyPanel( {
+ 		const slug = fontFamilies?.find(
+ 			( { fontFamily: f } ) => f === newValue
+ 		)?.slug;
+-		onChange(
+-			setImmutably(
+-				value,
+-				[ 'typography', 'fontFamily' ],
+-				slug
+-					? `var:preset|font-family|${ slug }`
+-					: newValue || undefined
+-			)
++		let updatedValue = setImmutably(
++			value,
++			[ 'typography', 'fontFamily' ],
++			slug ? `var:preset|font-family|${ slug }` : newValue || undefined
++		);
++
++		// Check if current font style/weight are available in the new font family.
++		const newFontFamilyFaces =
++			fontFamilies?.find( ( { fontFamily: f } ) => f === newValue )
++				?.fontFace ?? [];
++		const { fontStyles, fontWeights } =
++			getFontStylesAndWeights( newFontFamilyFaces );
++		const hasFontStyle = fontStyles?.some(
++			( { value: fs } ) => fs === fontStyle
++		);
++		const hasFontWeight = fontWeights?.some(
++			( { value: fw } ) => fw?.toString() === fontWeight?.toString()
+ 		);
++
++		// Find the nearest available font style/weight if not available.
++		if ( ! hasFontStyle || ! hasFontWeight ) {
++			const { nearestFontStyle, nearestFontWeight } =
++				findNearestStyleAndWeight(
++					newFontFamilyFaces,
++					fontStyle,
++					fontWeight
++				);
++			if ( nearestFontStyle || nearestFontWeight ) {
++				// Update to the nearest available font style/weight in the new font family.
++				updatedValue = {
++					...updatedValue,
++					typography: {
++						...updatedValue?.typography,
++						fontStyle: nearestFontStyle || undefined,
++						fontWeight: nearestFontWeight || undefined,
++					},
++				};
++			} else if ( fontStyle || fontWeight ) {
++				// Reset if no available styles/weights found.
++				updatedValue = {
++					...updatedValue,
++					typography: {
++						...updatedValue?.typography,
++						fontStyle: undefined,
++						fontWeight: undefined,
++					},
++				};
++			}
++		}
++
++		onChange( updatedValue );
+ 	};
+ 	const hasFontFamily = () => !! value?.typography?.fontFamily;
+ 	const resetFontFamily = () => setFontFamily( undefined );
+@@ -260,11 +303,6 @@ export default function TypographyPanel( {
+ 	const hasFontWeights = settings?.typography?.fontWeight;
+ 	const fontStyle = decodeValue( inheritedValue?.typography?.fontStyle );
+ 	const fontWeight = decodeValue( inheritedValue?.typography?.fontWeight );
+-	const { nearestFontStyle, nearestFontWeight } = findNearestStyleAndWeight(
+-		fontFamilyFaces,
+-		fontStyle,
+-		fontWeight
+-	);
+ 	const setFontAppearance = useCallback(
+ 		( { fontStyle: newFontStyle, fontWeight: newFontWeight } ) => {
+ 			// Only update the font style and weight if they have changed.
+@@ -287,24 +325,6 @@ export default function TypographyPanel( {
+ 		setFontAppearance( {} );
+ 	}, [ setFontAppearance ] );
+ 
+-	// Check if previous font style and weight values are available in the new font family.
+-	useEffect( () => {
+-		if ( nearestFontStyle && nearestFontWeight ) {
+-			setFontAppearance( {
+-				fontStyle: nearestFontStyle,
+-				fontWeight: nearestFontWeight,
+-			} );
+-		} else {
+-			// Reset font appearance if there are no available styles or weights.
+-			resetFontAppearance();
+-		}
+-	}, [
+-		nearestFontStyle,
+-		nearestFontWeight,
+-		resetFontAppearance,
+-		setFontAppearance,
+-	] );
+-
+ 	// Line Height
+ 	const hasLineHeightEnabled = useHasLineHeightControl( settings );
+ 	const lineHeight = decodeValue( inheritedValue?.typography?.lineHeight );
+diff --git a/packages/block-editor/src/components/index.js b/packages/block-editor/src/components/index.js
+index 52aeac32802b82..91e209ccf04985 100644
+--- a/packages/block-editor/src/components/index.js
++++ b/packages/block-editor/src/components/index.js
+@@ -172,3 +172,7 @@ export { useBlockEditingMode } from './block-editing-mode';
+ export { default as BlockEditorProvider } from './provider';
+ export { useSettings, useSetting } from './use-settings';
+ export { useBlockCommands } from './use-block-commands';
++
++// This component is no longer used in Gutenberg,
++// but kept for backwards compatibility.
++export { default as ToolSelector } from './tool-selector';
+diff --git a/packages/block-editor/src/components/inner-blocks/test/index.js b/packages/block-editor/src/components/inner-blocks/test/index.js
+index c9d9279db27450..6da5ddcbb80fe3 100644
+--- a/packages/block-editor/src/components/inner-blocks/test/index.js
++++ b/packages/block-editor/src/components/inner-blocks/test/index.js
+@@ -27,6 +27,7 @@ describe( 'InnerBlocks', () => {
+ 
+ 	it( 'should return element as string, with inner blocks', () => {
+ 		registerBlockType( 'core/fruit', {
++			apiVersion: 3,
+ 			category: 'text',
+ 
+ 			title: 'fruit',
+@@ -62,6 +63,7 @@ describe( 'InnerBlocks', () => {
+ 
+ 	it( 'should force serialize for invalid block with inner blocks', () => {
+ 		const blockType = {
++			apiVersion: 3,
+ 			attributes: {
+ 				throw: {
+ 					type: 'boolean',
+diff --git a/packages/block-editor/src/components/provider/test/use-block-sync.js b/packages/block-editor/src/components/provider/test/use-block-sync.js
+index b2afdb942e66fa..e3a599505aa98b 100644
+--- a/packages/block-editor/src/components/provider/test/use-block-sync.js
++++ b/packages/block-editor/src/components/provider/test/use-block-sync.js
+@@ -39,6 +39,7 @@ const TestWrapper = withRegistryProvider( ( props ) => {
+ describe( 'useBlockSync hook', () => {
+ 	beforeAll( () => {
+ 		registerBlockType( 'test/test-block', {
++			apiVersion: 3,
+ 			title: 'Test block',
+ 			attributes: {
+ 				foo: { type: 'number' },
+diff --git a/packages/block-editor/src/components/tool-selector/index.js b/packages/block-editor/src/components/tool-selector/index.js
+new file mode 100644
+index 00000000000000..4d5ab659009c3e
+--- /dev/null
++++ b/packages/block-editor/src/components/tool-selector/index.js
+@@ -0,0 +1,19 @@
++/**
++ * WordPress dependencies
++ */
++import deprecated from '@wordpress/deprecated';
++import { forwardRef } from '@wordpress/element';
++
++function ToolSelector() {
++	deprecated( 'wp.blockEditor.ToolSelector', {
++		since: '6.9',
++		hint: 'The ToolSelector component no longer renders anything.',
++	} );
++
++	return null;
++}
++
++/**
++ * This component has been deprecated and no longer renders anything.
++ */
++export default forwardRef( ToolSelector );
+diff --git a/packages/block-editor/src/hooks/fit-text.js b/packages/block-editor/src/hooks/fit-text.js
+index e09bd7126c6447..9f73a8332c56c2 100644
+--- a/packages/block-editor/src/hooks/fit-text.js
++++ b/packages/block-editor/src/hooks/fit-text.js
+@@ -58,18 +58,25 @@ function useFitText( { fitText, name, clientId } ) {
+ 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
+ 	const blockElement = useBlockElement( clientId );
+ 
+-	// Monitor block attribute changes, and parent changes.
++	// Monitor block attribute changes, parent changes, and block mode.
+ 	// Any attribute or parent change may change the available space.
+-	const { blockAttributes, parentId } = useSelect(
++	// Block mode is needed to disable fit text when in HTML editing mode.
++	const { blockAttributes, parentId, blockMode } = useSelect(
+ 		( select ) => {
+ 			if ( ! clientId || ! hasFitTextSupport || ! fitText ) {
+ 				return EMPTY_OBJECT;
+ 			}
++			const _blockMode =
++				select( blockEditorStore ).getBlockMode( clientId );
++			if ( _blockMode === 'html' ) {
++				return { blockMode: _blockMode };
++			}
+ 			return {
+ 				blockAttributes:
+ 					select( blockEditorStore ).getBlockAttributes( clientId ),
+ 				parentId:
+ 					select( blockEditorStore ).getBlockRootClientId( clientId ),
++				blockMode: _blockMode,
+ 			};
+ 		},
+ 		[ clientId, hasFitTextSupport, fitText ]
+@@ -107,7 +114,8 @@ function useFitText( { fitText, name, clientId } ) {
+ 			! fitText ||
+ 			! blockElement ||
+ 			! clientId ||
+-			! hasFitTextSupport
++			! hasFitTextSupport ||
++			blockMode === 'html'
+ 		) {
+ 			return;
+ 		}
+@@ -178,11 +186,17 @@ function useFitText( { fitText, name, clientId } ) {
+ 		applyFitText,
+ 		blockElement,
+ 		hasFitTextSupport,
++		blockMode,
+ 	] );
+ 
+ 	// Trigger fit text recalculation when content changes
+ 	useEffect( () => {
+-		if ( fitText && blockElement && hasFitTextSupport ) {
++		if (
++			fitText &&
++			blockElement &&
++			hasFitTextSupport &&
++			blockMode !== 'html'
++		) {
+ 			// Wait for next frame to ensure DOM has updated after content changes
+ 			const frameId = window.requestAnimationFrame( () => {
+ 				if ( blockElement ) {
+@@ -198,6 +212,7 @@ function useFitText( { fitText, name, clientId } ) {
+ 		applyFitText,
+ 		blockElement,
+ 		hasFitTextSupport,
++		blockMode,
+ 	] );
+ }
+ 
+diff --git a/packages/block-editor/src/hooks/test/align.js b/packages/block-editor/src/hooks/test/align.js
+index 73c55133a4b29b..3ccf1d63fc228f 100644
+--- a/packages/block-editor/src/hooks/test/align.js
++++ b/packages/block-editor/src/hooks/test/align.js
+@@ -17,6 +17,7 @@ const noop = () => {};
+ 
+ describe( 'align', () => {
+ 	const blockSettings = {
++		apiVersion: 3,
+ 		save: noop,
+ 		category: 'text',
+ 		title: 'block title',
+diff --git a/packages/block-editor/src/hooks/test/allowed-blocks.js b/packages/block-editor/src/hooks/test/allowed-blocks.js
+index 080132f9d37ad2..c1c0bd582f8798 100644
+--- a/packages/block-editor/src/hooks/test/allowed-blocks.js
++++ b/packages/block-editor/src/hooks/test/allowed-blocks.js
+@@ -22,6 +22,7 @@ describe( 'allowedBlocks', () => {
+ 	describe( 'addTransforms()', () => {
+ 		it( 'should not preserve allowedBlocks in wrapping transforms', () => {
+ 			registerBlockType( 'core/bar', {
++				apiVersion: 3,
+ 				title: 'Bar',
+ 				supports: { allowedBlocks: true },
+ 			} );
+@@ -53,6 +54,7 @@ describe( 'allowedBlocks', () => {
+ 
+ 		it( 'should not preserve allowedBlocks in one-to-many transforms', () => {
+ 			registerBlockType( 'core/bar', {
++				apiVersion: 3,
+ 				title: 'Bar',
+ 				supports: { allowedBlocks: true },
+ 			} );
+@@ -83,6 +85,7 @@ describe( 'allowedBlocks', () => {
+ 
+ 		it( 'should not preserve allowedBlocks in many-to-one transforms', () => {
+ 			registerBlockType( 'core/bar', {
++				apiVersion: 3,
+ 				title: 'Bar',
+ 				supports: { allowedBlocks: true },
+ 			} );
+@@ -114,6 +117,7 @@ describe( 'allowedBlocks', () => {
+ 
+ 		it( 'should not preserve allowedBlocks in many-to-many transforms with different counts', () => {
+ 			registerBlockType( 'core/bar', {
++				apiVersion: 3,
+ 				title: 'Bar',
+ 				supports: { allowedBlocks: true },
+ 			} );
+@@ -155,6 +159,7 @@ describe( 'allowedBlocks', () => {
+ 
+ 		it( 'should preserve allowedBlocks in many-to-many transforms with same counts', () => {
+ 			registerBlockType( 'core/bar', {
++				apiVersion: 3,
+ 				title: 'Bar',
+ 				supports: { allowedBlocks: true },
+ 			} );
+@@ -194,6 +199,7 @@ describe( 'allowedBlocks', () => {
+ 
+ 		it( "should filter allowedBlocks based on destination block's allowedBlocks", () => {
+ 			registerBlockType( 'core/bar', {
++				apiVersion: 3,
+ 				title: 'Bar',
+ 				supports: { allowedBlocks: true },
+ 				allowedBlocks: [ 'core/paragraph' ],
+@@ -227,6 +233,7 @@ describe( 'allowedBlocks', () => {
+ 
+ 		it( 'should not override existing allowedBlocks in target block', () => {
+ 			registerBlockType( 'core/bar', {
++				apiVersion: 3,
+ 				title: 'Bar',
+ 				supports: { allowedBlocks: true },
+ 			} );
+@@ -253,6 +260,7 @@ describe( 'allowedBlocks', () => {
+ 
+ 		it( 'should not preserve allowedBlocks when target block does not support allowedBlocks', () => {
+ 			registerBlockType( 'core/bar', {
++				apiVersion: 3,
+ 				title: 'Bar',
+ 			} );
+ 
+diff --git a/packages/block-editor/src/hooks/test/font-size.js b/packages/block-editor/src/hooks/test/font-size.js
+index dc3fc9100e4759..ae485cc3d064c4 100644
+--- a/packages/block-editor/src/hooks/test/font-size.js
++++ b/packages/block-editor/src/hooks/test/font-size.js
+@@ -39,6 +39,7 @@ function addUseSettingFilter( callback ) {
+ 
+ describe( 'useBlockProps', () => {
+ 	const blockSettings = {
++		apiVersion: 3,
+ 		save: () => noop,
+ 		category: 'text',
+ 		title: 'font size title',
+diff --git a/packages/block-editor/src/hooks/test/metadata.js b/packages/block-editor/src/hooks/test/metadata.js
+index 945f8b4d60f240..4840d94c79c779 100644
+--- a/packages/block-editor/src/hooks/test/metadata.js
++++ b/packages/block-editor/src/hooks/test/metadata.js
+@@ -174,6 +174,7 @@ describe( 'metadata', () => {
+ 
+ 		it( 'should preserve custom name metadata', () => {
+ 			registerBlockType( 'core/bar', {
++				apiVersion: 3,
+ 				title: 'Bar',
+ 			} );
+ 			const source = [
+@@ -199,6 +200,7 @@ describe( 'metadata', () => {
+ 
+ 		it( 'should not preserve custom name metadata when target block does not support renaming', () => {
+ 			registerBlockType( 'core/bar', {
++				apiVersion: 3,
+ 				title: 'Bar',
+ 				supports: {
+ 					renaming: false,
+@@ -226,6 +228,7 @@ describe( 'metadata', () => {
+ 
+ 		it( 'should preserve block visibility metadata', () => {
+ 			registerBlockType( 'core/bar', {
++				apiVersion: 3,
+ 				title: 'Bar',
+ 			} );
+ 
+@@ -252,6 +255,7 @@ describe( 'metadata', () => {
+ 
+ 		it( 'should not preserve block visibility metadata when target block does not support it', () => {
+ 			registerBlockType( 'core/bar', {
++				apiVersion: 3,
+ 				title: 'Bar',
+ 				supports: {
+ 					visibility: false,
+diff --git a/packages/block-editor/src/hooks/test/text-align.js b/packages/block-editor/src/hooks/test/text-align.js
+index 3b7d338193b30b..711fc08b09eb9e 100644
+--- a/packages/block-editor/src/hooks/test/text-align.js
++++ b/packages/block-editor/src/hooks/test/text-align.js
+@@ -16,6 +16,7 @@ const noop = () => {};
+ 
+ describe( 'textAlign', () => {
+ 	const blockSettings = {
++		apiVersion: 3,
+ 		save: noop,
+ 		category: 'text',
+ 		title: 'block title',
+diff --git a/packages/block-editor/src/store/test/actions.js b/packages/block-editor/src/store/test/actions.js
+index a8df7ff300ddee..ad464d1382da3b 100644
+--- a/packages/block-editor/src/store/test/actions.js
++++ b/packages/block-editor/src/store/test/actions.js
+@@ -60,6 +60,7 @@ const {
+ 
+ describe( 'actions', () => {
+ 	const defaultBlockSettings = {
++		apiVersion: 3,
+ 		attributes: {
+ 			content: {},
+ 		},
+@@ -863,6 +864,7 @@ describe( 'actions', () => {
+ 
+ 		it( 'should merge the blocks if blocks of the same type', () => {
+ 			registerBlockType( 'core/test-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					content: {},
+ 				},
+@@ -933,6 +935,7 @@ describe( 'actions', () => {
+ 
+ 		it( 'should not merge the blocks have different types without transformation', () => {
+ 			registerBlockType( 'core/test-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					content: {},
+ 				},
+@@ -986,6 +989,7 @@ describe( 'actions', () => {
+ 
+ 		it( 'should transform and merge the blocks', () => {
+ 			registerBlockType( 'core/test-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					content: {
+ 						type: 'string',
+@@ -1004,6 +1008,7 @@ describe( 'actions', () => {
+ 				title: 'test block',
+ 			} );
+ 			registerBlockType( 'core/test-block-2', {
++				apiVersion: 3,
+ 				attributes: {
+ 					content2: {
+ 						type: 'string',
+@@ -1081,6 +1086,7 @@ describe( 'actions', () => {
+ 
+ 		it( 'should not merge the blocks if blockB editing mode is `disabled`', () => {
+ 			registerBlockType( 'core/test-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					content: {},
+ 				},
+@@ -1140,6 +1146,7 @@ describe( 'actions', () => {
+ 
+ 		it( 'should not merge the blocks if blockA editing mode is `disabled`', () => {
+ 			registerBlockType( 'core/test-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					content: {},
+ 				},
+diff --git a/packages/block-editor/src/store/test/reducer.js b/packages/block-editor/src/store/test/reducer.js
+index 9fe39022f41ae7..ac09bd7c51a9f0 100644
+--- a/packages/block-editor/src/store/test/reducer.js
++++ b/packages/block-editor/src/store/test/reducer.js
+@@ -199,6 +199,7 @@ describe( 'state', () => {
+ 	describe( 'blocks()', () => {
+ 		beforeAll( () => {
+ 			registerBlockType( 'core/test-block', {
++				apiVersion: 3,
+ 				save: noop,
+ 				edit: noop,
+ 				category: 'text',
+@@ -213,12 +214,14 @@ describe( 'state', () => {
+ 		describe( 'replace inner blocks', () => {
+ 			beforeAll( () => {
+ 				registerBlockType( 'core/test-parent-block', {
++					apiVersion: 3,
+ 					save: noop,
+ 					edit: noop,
+ 					category: 'text',
+ 					title: 'test parent block',
+ 				} );
+ 				registerBlockType( 'core/test-child-block', {
++					apiVersion: 3,
+ 					save: noop,
+ 					edit: noop,
+ 					category: 'text',
+@@ -2994,6 +2997,7 @@ describe( 'state', () => {
+ 						blockAttributes?.fruit === variationAttributes.fruit,
+ 				} ) );
+ 				registerBlockType( blockWithVariations, {
++					apiVersion: 3,
+ 					save: noop,
+ 					edit: noop,
+ 					title: 'Fruit with variations',
+diff --git a/packages/block-editor/src/store/test/registry-selectors.js b/packages/block-editor/src/store/test/registry-selectors.js
+index 89115c75f05144..b06755aae8649e 100644
+--- a/packages/block-editor/src/store/test/registry-selectors.js
++++ b/packages/block-editor/src/store/test/registry-selectors.js
+@@ -12,6 +12,7 @@ import { store } from '../';
+ describe( 'selectors', () => {
+ 	beforeEach( () => {
+ 		registerBlockType( 'core/test-block-a', {
++			apiVersion: 3,
+ 			save: ( props ) => props.attributes.text,
+ 			category: 'design',
+ 			title: 'Test Block A',
+@@ -20,6 +21,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/test-block-b', {
++			apiVersion: 3,
+ 			save: ( props ) => props.attributes.text,
+ 			category: 'text',
+ 			title: 'Test Block B',
+diff --git a/packages/block-editor/src/store/test/selectors.js b/packages/block-editor/src/store/test/selectors.js
+index 0a8ba06773ace0..f6c85fa4065497 100644
+--- a/packages/block-editor/src/store/test/selectors.js
++++ b/packages/block-editor/src/store/test/selectors.js
+@@ -85,6 +85,7 @@ describe( 'selectors', () => {
+ 
+ 	beforeEach( () => {
+ 		registerBlockType( 'core/block', {
++			apiVersion: 3,
+ 			save: () => null,
+ 			category: 'reusable',
+ 			title: 'Reusable Block Stub',
+@@ -94,6 +95,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/test-block-a', {
++			apiVersion: 3,
+ 			save: ( props ) => props.attributes.text,
+ 			category: 'design',
+ 			title: 'Test Block A',
+@@ -102,6 +104,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/test-block-b', {
++			apiVersion: 3,
+ 			save: ( props ) => props.attributes.text,
+ 			category: 'text',
+ 			title: 'Test Block B',
+@@ -113,6 +116,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/test-block-c', {
++			apiVersion: 3,
+ 			save: ( props ) => props.attributes.text,
+ 			category: 'text',
+ 			title: 'Test Block C',
+@@ -122,6 +126,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/freeform', {
++			apiVersion: 3,
+ 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
+ 			category: 'text',
+ 			title: 'Test Freeform Content Handler',
+@@ -134,6 +139,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/post-content-child', {
++			apiVersion: 3,
+ 			save: () => null,
+ 			category: 'text',
+ 			title: 'Test Block Post Content Child',
+@@ -143,6 +149,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/test-block-ancestor', {
++			apiVersion: 3,
+ 			save: ( props ) => props.attributes.text,
+ 			category: 'text',
+ 			title: 'Test Block required as ancestor',
+@@ -151,6 +158,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/test-block-parent', {
++			apiVersion: 3,
+ 			save: ( props ) => props.attributes.text,
+ 			category: 'text',
+ 			title: 'Test Block required as parent',
+@@ -159,6 +167,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/test-block-requires-ancestor', {
++			apiVersion: 3,
+ 			save: ( props ) => props.attributes.text,
+ 			category: 'text',
+ 			title: 'Test Block that requires ancestor',
+@@ -168,6 +177,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/test-block-requires-ancestor-parent', {
++			apiVersion: 3,
+ 			save: ( props ) => props.attributes.text,
+ 			category: 'text',
+ 			title: 'Test Block that requires both ancestor and parent',
+@@ -3548,6 +3558,7 @@ describe( 'selectors', () => {
+ 	describe( 'getBlockTransformItems', () => {
+ 		beforeAll( () => {
+ 			registerBlockType( 'core/with-tranforms-a', {
++				apiVersion: 3,
+ 				category: 'text',
+ 				title: 'Transforms a',
+ 				edit: () => {},
+@@ -3577,6 +3588,7 @@ describe( 'selectors', () => {
+ 				},
+ 			} );
+ 			registerBlockType( 'core/with-tranforms-b', {
++				apiVersion: 3,
+ 				category: 'text',
+ 				title: 'Transforms b',
+ 				edit: () => {},
+@@ -3592,6 +3604,7 @@ describe( 'selectors', () => {
+ 				},
+ 			} );
+ 			registerBlockType( 'core/with-tranforms-c', {
++				apiVersion: 3,
+ 				category: 'text',
+ 				title: 'Transforms c',
+ 				edit: () => {},
+@@ -4246,18 +4259,21 @@ describe( 'getInserterItems with core blocks prioritization', () => {
+ 	// the core blocks (usually by using the `init` action), thus affecting the display order.
+ 	beforeEach( () => {
+ 		registerBlockType( 'plugin/block-a', {
++			apiVersion: 3,
+ 			save() {},
+ 			category: 'text',
+ 			title: 'Plugin Block A',
+ 			icon: 'test',
+ 		} );
+ 		registerBlockType( 'another-plugin/block-b', {
++			apiVersion: 3,
+ 			save() {},
+ 			category: 'text',
+ 			title: 'Another Plugin Block B',
+ 			icon: 'test',
+ 		} );
+ 		registerBlockType( 'plugin/block-c-with-variations', {
++			apiVersion: 3,
+ 			save() {},
+ 			category: 'text',
+ 			title: 'Plugin Block C with variations',
+@@ -4265,11 +4281,13 @@ describe( 'getInserterItems with core blocks prioritization', () => {
+ 			variations: [ { name: 'variation-a' }, { name: 'variation-b' } ],
+ 		} );
+ 		registerBlockType( 'core/block', {
++			apiVersion: 3,
+ 			save() {},
+ 			category: 'text',
+ 			title: 'Core Block A',
+ 		} );
+ 		registerBlockType( 'core/test-block-a', {
++			apiVersion: 3,
+ 			save: ( props ) => props.attributes.text,
+ 			category: 'design',
+ 			title: 'Core Block B',
+@@ -4277,6 +4295,7 @@ describe( 'getInserterItems with core blocks prioritization', () => {
+ 			keywords: [ 'testing' ],
+ 		} );
+ 		registerBlockType( 'core/test-block-with-variations', {
++			apiVersion: 3,
+ 			save() {},
+ 			category: 'text',
+ 			title: 'Core Block C with variations',
+diff --git a/packages/block-editor/src/utils/fit-text-utils.js b/packages/block-editor/src/utils/fit-text-utils.js
+index a0bd90431b2cda..4f5adbb9b44e59 100644
+--- a/packages/block-editor/src/utils/fit-text-utils.js
++++ b/packages/block-editor/src/utils/fit-text-utils.js
+@@ -18,11 +18,26 @@ function findOptimalFontSize( textElement, applyFontSize ) {
+ 	let bestSize = minSize;
+ 
+ 	const computedStyle = window.getComputedStyle( textElement );
+-	const paddingLeft = parseFloat( computedStyle.paddingLeft ) || 0;
+-	const paddingRight = parseFloat( computedStyle.paddingRight ) || 0;
++	let paddingLeft = parseFloat( computedStyle.paddingLeft ) || 0;
++	let paddingRight = parseFloat( computedStyle.paddingRight ) || 0;
+ 	const range = document.createRange();
+ 	range.selectNodeContents( textElement );
+ 
++	let referenceElement = textElement;
++	const parentElement = textElement.parentElement;
++	if ( parentElement ) {
++		const parentElementComputedStyle =
++			window.getComputedStyle( parentElement );
++		if ( parentElementComputedStyle?.display === 'flex' ) {
++			referenceElement = parentElement;
++			paddingLeft +=
++				parseFloat( parentElementComputedStyle.paddingLeft ) || 0;
++			paddingRight +=
++				parseFloat( parentElementComputedStyle.paddingRight ) || 0;
++		}
++	}
++	let maxclientHeight = referenceElement.clientHeight;
++
+ 	while ( minSize <= maxSize ) {
+ 		const midSize = Math.floor( ( minSize + maxSize ) / 2 );
+ 		applyFontSize( midSize );
+@@ -36,12 +51,23 @@ function findOptimalFontSize( textElement, applyFontSize ) {
+ 		// Check if text fits within the element's width and is not
+ 		// overflowing into the padding area.
+ 		const fitsWidth =
+-			textElement.scrollWidth <= textElement.clientWidth &&
+-			textWidth <= textElement.clientWidth - paddingLeft - paddingRight;
++			textElement.scrollWidth <= referenceElement.clientWidth &&
++			textWidth <=
++				referenceElement.clientWidth - paddingLeft - paddingRight;
+ 		// Check if text fits within the element's height.
+ 		const fitsHeight =
+ 			alreadyHasScrollableHeight ||
+-			textElement.scrollHeight <= textElement.clientHeight;
++			textElement.scrollHeight <= referenceElement.clientHeight ||
++			textElement.scrollHeight <= maxclientHeight;
++
++		// When there are calculated line heights, text may jump in height
++		// the available space may decrease while the font size decreases,
++		// making text not fit.
++		// We store a maximum reference height: the maximum reference element height that was observed
++		// during the loop to avoid issues with such jumps.
++		if ( referenceElement.clientHeight > maxclientHeight ) {
++			maxclientHeight = referenceElement.clientHeight;
++		}
+ 
+ 		if ( fitsWidth && fitsHeight ) {
+ 			bestSize = midSize;
+diff --git a/packages/block-library/src/accordion-heading/deprecated.js b/packages/block-library/src/accordion-heading/deprecated.js
+index d005e078745efb..0960cfa48a72c8 100644
+--- a/packages/block-library/src/accordion-heading/deprecated.js
++++ b/packages/block-library/src/accordion-heading/deprecated.js
+@@ -5,6 +5,7 @@ import {
+ 	useBlockProps,
+ 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
+ 	RichText,
++	getTypographyClassesAndStyles,
+ } from '@wordpress/block-editor';
+ 
+ const v1 = {
+@@ -116,4 +117,124 @@ const v1 = {
+ 	},
+ };
+ 
+-export default [ v1 ];
++const v2 = {
++	attributes: {
++		openByDefault: {
++			type: 'boolean',
++			default: false,
++		},
++		title: {
++			type: 'rich-text',
++			source: 'rich-text',
++			selector: '.wp-block-accordion-heading__toggle-title',
++			role: 'content',
++		},
++		level: {
++			type: 'number',
++		},
++		iconPosition: {
++			type: 'string',
++			enum: [ 'left', 'right' ],
++			default: 'right',
++		},
++		showIcon: {
++			type: 'boolean',
++			default: true,
++		},
++	},
++	supports: {
++		anchor: true,
++		color: {
++			background: true,
++			gradients: true,
++		},
++		align: false,
++		interactivity: true,
++		spacing: {
++			padding: true,
++			__experimentalDefaultControls: {
++				padding: true,
++			},
++			__experimentalSkipSerialization: true,
++			__experimentalSelector: '.wp-block-accordion-heading__toggle',
++		},
++		__experimentalBorder: {
++			color: true,
++			radius: true,
++			style: true,
++			width: true,
++			__experimentalDefaultControls: {
++				color: true,
++				radius: true,
++				style: true,
++				width: true,
++			},
++		},
++		typography: {
++			__experimentalSkipSerialization: [
++				'textDecoration',
++				'letterSpacing',
++			],
++			fontSize: true,
++			__experimentalFontFamily: true,
++			__experimentalFontWeight: true,
++			__experimentalFontStyle: true,
++			__experimentalTextTransform: true,
++			__experimentalTextDecoration: true,
++			__experimentalLetterSpacing: true,
++			__experimentalDefaultControls: {
++				fontSize: true,
++				fontFamily: true,
++			},
++		},
++		shadow: true,
++		visibility: false,
++		lock: false,
++	},
++	save( { attributes } ) {
++		const { level, title, iconPosition, showIcon } = attributes;
++		const TagName = 'h' + ( level || 3 );
++		const typographyProps = getTypographyClassesAndStyles( attributes );
++
++		const blockProps = useBlockProps.save();
++		const spacingProps = getSpacingClassesAndStyles( attributes );
++
++		return (
++			<TagName { ...blockProps }>
++				<button
++					className="wp-block-accordion-heading__toggle"
++					style={ spacingProps.style }
++				>
++					{ showIcon && iconPosition === 'left' && (
++						<span
++							className="wp-block-accordion-heading__toggle-icon"
++							aria-hidden="true"
++						>
++							+
++						</span>
++					) }
++					<RichText.Content
++						className="wp-block-accordion-heading__toggle-title"
++						tagName="span"
++						value={ title }
++						style={ {
++							letterSpacing: typographyProps.style.letterSpacing,
++							textDecoration:
++								typographyProps.style.textDecoration,
++						} }
++					/>
++					{ showIcon && iconPosition === 'right' && (
++						<span
++							className="wp-block-accordion-heading__toggle-icon"
++							aria-hidden="true"
++						>
++							+
++						</span>
++					) }
++				</button>
++			</TagName>
++		);
++	},
++};
++
++export default [ v1, v2 ];
+diff --git a/packages/block-library/src/accordion-heading/save.js b/packages/block-library/src/accordion-heading/save.js
+index 67ed13b8daa4c9..4f196409929a05 100644
+--- a/packages/block-library/src/accordion-heading/save.js
++++ b/packages/block-library/src/accordion-heading/save.js
+@@ -19,6 +19,7 @@ export default function save( { attributes } ) {
+ 	return (
+ 		<TagName { ...blockProps }>
+ 			<button
++				type="button"
+ 				className="wp-block-accordion-heading__toggle"
+ 				style={ spacingProps.style }
+ 			>
+diff --git a/packages/block-library/src/accordion-heading/style.scss b/packages/block-library/src/accordion-heading/style.scss
+index 67c5d477154a59..2da9c06f16b4e4 100644
+--- a/packages/block-library/src/accordion-heading/style.scss
++++ b/packages/block-library/src/accordion-heading/style.scss
+@@ -1,9 +1,3 @@
+-.wp-block-accordion-heading {
+-	// Some classic themes apply default margins to heading elements,
+-	// so those styles need to be reset.
+-	margin: 0;
+-}
+-
+ .wp-block-accordion-heading__toggle {
+ 	font-family: inherit;
+ 	font-size: inherit;
+@@ -14,7 +8,9 @@
+ 	text-decoration: inherit;
+ 	word-spacing: inherit;
+ 	font-style: inherit;
++	background: none;
+ 	border: none;
++	color: inherit;
+ 	padding: var(--wp--preset--spacing--20, 1em) 0;
+ 	cursor: pointer;
+ 	overflow: hidden;
+@@ -23,34 +19,10 @@
+ 	text-align: inherit;
+ 	width: 100%;
+ 
+-	// Some themes may apply colors to button elements with a particularly
+-	// high CSS specificity. Since it's impossible to predict this specificity,
+-	// we reset the colors using `!important`.
+-	background-color: inherit !important;
+-	color: inherit !important;
+-
+ 	&:not(:focus-visible) {
+ 		outline: none;
+ 	}
+ 
+-	&:hover,
+-	&:focus {
+-		// Some themes may apply styles when a button element is hovered
+-		// over or focused. This is not intended for accordion toggle
+-		// buttons, so we reset it here.
+-		text-decoration: none;
+-		background-color: inherit !important;
+-		box-shadow: none;
+-		color: inherit;
+-		border: none;
+-		padding: var(--wp--preset--spacing--20, 1em) 0;
+-	}
+-
+-	&:focus-visible {
+-		outline: auto;
+-		outline-offset: 0;
+-	}
+-
+ 	&:hover .wp-block-accordion-heading__toggle-title {
+ 		text-decoration: underline;
+ 	}
+diff --git a/packages/block-library/src/classic.scss b/packages/block-library/src/classic.scss
+index ace23d9dfdae38..7b9ac61e6cbba8 100644
+--- a/packages/block-library/src/classic.scss
++++ b/packages/block-library/src/classic.scss
+@@ -20,3 +20,41 @@
+ 	background: #32373c;
+ 	color: $white;
+ }
++
++// These rules are needed to enforce the default styling of
++// the Accordion Heading block in the classic theme.
++.wp-block-accordion-heading {
++	// Heading elements may have default margins applied, so those
++	// styles need to be reset.
++	margin: 0;
++}
++
++.wp-block-accordion-heading__toggle {
++	// Button elements can have colors applied with high CSS specificity,
++	// and since this specificity is impossible to predict, we use
++	// `!important` to reset the color.
++	background-color: inherit !important;
++	color: inherit !important;
++
++	&:not(:focus-visible) {
++		outline: none;
++	}
++
++	&:hover,
++	&:focus {
++		// Sometimes styles are applied when the button element is
++		// hovered over or focused. This isn't expected for accordion
++		// toggle buttons, so reset those styles here.
++		text-decoration: none;
++		background-color: inherit !important;
++		box-shadow: none;
++		color: inherit;
++		border: none;
++		padding: var(--wp--preset--spacing--20, 1em) 0;
++	}
++
++	&:focus-visible {
++		outline-offset: 0;
++		outline: auto;
++	}
++}
+diff --git a/packages/block-library/src/embed/test/index.js b/packages/block-library/src/embed/test/index.js
+index 7c09d7656454d9..2710ed26212864 100644
+--- a/packages/block-library/src/embed/test/index.js
++++ b/packages/block-library/src/embed/test/index.js
+@@ -30,6 +30,7 @@ jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {} ) );
+ describe( 'utils', () => {
+ 	beforeAll( () => {
+ 		registerBlockType( DEFAULT_EMBED_BLOCK, {
++			apiVersion: 3,
+ 			title: 'Embed',
+ 			category: 'embed',
+ 			attributes,
+@@ -148,6 +149,7 @@ describe( 'utils', () => {
+ 				).toBeUndefined();
+ 
+ 				registerBlockType( DEFAULT_EMBED_BLOCK, {
++					apiVersion: 3,
+ 					title: 'Embed',
+ 					category: 'embed',
+ 					attributes,
+diff --git a/packages/block-library/src/freeform/block.json b/packages/block-library/src/freeform/block.json
+index 6d549cf9aadfae..3a0b575ce4d342 100644
+--- a/packages/block-library/src/freeform/block.json
++++ b/packages/block-library/src/freeform/block.json
+@@ -13,7 +13,6 @@
+ 		}
+ 	},
+ 	"supports": {
+-		"html": false,
+ 		"className": false,
+ 		"customClassName": false,
+ 		"lock": false,
+diff --git a/packages/block-library/src/media-text/style.scss b/packages/block-library/src/media-text/style.scss
+index bf3e55d0c569ac..be50b5317df6f4 100644
+--- a/packages/block-library/src/media-text/style.scss
++++ b/packages/block-library/src/media-text/style.scss
+@@ -108,6 +108,7 @@
+ 
+ /* Image fill for versions 8 and onwards */
+ .wp-block-media-text.is-image-fill-element > .wp-block-media-text__media {
++	position: relative;
+ 	height: 100%;
+ 	min-height: 250px;
+ }
+@@ -118,6 +119,7 @@
+ }
+ 
+ .wp-block-media-text.is-image-fill-element > .wp-block-media-text__media img {
++	position: absolute;
+ 	width: 100%;
+ 	height: 100%;
+ 	object-fit: cover;
+diff --git a/packages/block-library/src/term-template/index.php b/packages/block-library/src/term-template/index.php
+index 3cbe21f60c0d4e..c6fa390c4ec476 100644
+--- a/packages/block-library/src/term-template/index.php
++++ b/packages/block-library/src/term-template/index.php
+@@ -59,7 +59,7 @@ function render_block_core_term_template( $attributes, $content, $block ) {
+ 			$query_args['include'] = array_unique( array_map( 'intval', $query['include'] ) );
+ 			$query_args['orderby'] = 'include';
+ 			$query_args['order']   = 'asc';
+-		} elseif ( empty( $query['showNested'] ) ) {
++		} elseif ( is_taxonomy_hierarchical( $query['taxonomy'] ) && empty( $query['showNested'] ) ) {
+ 			// We set parent only when inheriting from the taxonomy archive context or not
+ 			// showing nested terms, otherwise nested terms are not displayed.
+ 			$query_args['parent'] = 0;
+diff --git a/packages/blocks/src/api/parser/test/apply-block-deprecated-versions.js b/packages/blocks/src/api/parser/test/apply-block-deprecated-versions.js
+index 0d451c142e9569..9d4a2159de9794 100644
+--- a/packages/blocks/src/api/parser/test/apply-block-deprecated-versions.js
++++ b/packages/blocks/src/api/parser/test/apply-block-deprecated-versions.js
+@@ -17,6 +17,7 @@ import {
+ 
+ describe( 'applyBlockDeprecatedVersions', () => {
+ 	const defaultBlockSettings = {
++		apiVersion: 3,
+ 		attributes: {
+ 			fruit: {
+ 				type: 'string',
+diff --git a/packages/blocks/src/api/parser/test/get-block-attributes.js b/packages/blocks/src/api/parser/test/get-block-attributes.js
+index 7b48db67fdb940..f2e4fab5322dc0 100644
+--- a/packages/blocks/src/api/parser/test/get-block-attributes.js
++++ b/packages/blocks/src/api/parser/test/get-block-attributes.js
+@@ -382,6 +382,7 @@ describe( 'attributes parsing', () => {
+ 
+ 		it( 'should work when block type is passed as string', () => {
+ 			registerBlockType( 'core/meal', {
++				apiVersion: 3,
+ 				title: 'Meal',
+ 				category: 'widgets',
+ 				attributes: {
+diff --git a/packages/blocks/src/api/parser/test/index.js b/packages/blocks/src/api/parser/test/index.js
+index 452fca329af76b..33643efd9909bc 100644
+--- a/packages/blocks/src/api/parser/test/index.js
++++ b/packages/blocks/src/api/parser/test/index.js
+@@ -14,6 +14,7 @@ import serialize from '../../serializer';
+ 
+ describe( 'block parser', () => {
+ 	const defaultBlockSettings = {
++		apiVersion: 3,
+ 		attributes: {
+ 			fruit: {
+ 				type: 'string',
+@@ -25,6 +26,7 @@ describe( 'block parser', () => {
+ 	};
+ 
+ 	const unknownBlockSettings = {
++		apiVersion: 3,
+ 		category: 'text',
+ 		title: 'unknown block',
+ 		attributes: {
+@@ -262,6 +264,7 @@ describe( 'block parser', () => {
+ 		// Run the test cases using the PegJS defined parser.
+ 		it( 'should parse the post content, including block attributes', () => {
+ 			registerBlockType( 'core/test-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					content: {
+ 						type: 'string',
+@@ -301,6 +304,7 @@ describe( 'block parser', () => {
+ 
+ 		it( 'should parse the post content, ignoring unknown blocks', () => {
+ 			registerBlockType( 'core/test-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					content: {
+ 						type: 'string',
+@@ -434,6 +438,7 @@ describe( 'block parser', () => {
+ 
+ 		it( 'should parse with unicode escaped returned to original representation', () => {
+ 			registerBlockType( 'core/code', {
++				apiVersion: 3,
+ 				category: 'text',
+ 				title: 'Code Block',
+ 				attributes: {
+diff --git a/packages/blocks/src/api/raw-handling/test/utils.js b/packages/blocks/src/api/raw-handling/test/utils.js
+index d02d8e7d0602be..891320fa097cf9 100644
+--- a/packages/blocks/src/api/raw-handling/test/utils.js
++++ b/packages/blocks/src/api/raw-handling/test/utils.js
+@@ -35,6 +35,7 @@ describe( 'isPlain', () => {
+ describe( 'getBlockContentSchema', () => {
+ 	beforeAll( () => {
+ 		registerBlockType( 'core/paragraph', {
++			apiVersion: 3,
+ 			title: 'Paragraph',
+ 			supports: {
+ 				anchor: true,
+diff --git a/packages/blocks/src/api/test/factory.js b/packages/blocks/src/api/test/factory.js
+index 22d069205113bf..454a5e1563d6c8 100644
+--- a/packages/blocks/src/api/test/factory.js
++++ b/packages/blocks/src/api/test/factory.js
+@@ -31,6 +31,7 @@ const noop = () => {};
+ 
+ describe( 'block factory', () => {
+ 	const defaultBlockSettings = {
++		apiVersion: 3,
+ 		attributes: {
+ 			value: {
+ 				type: 'string',
+@@ -55,6 +56,7 @@ describe( 'block factory', () => {
+ 	describe( 'createBlock()', () => {
+ 		it( 'should create a block given its blockType, attributes, inner blocks', () => {
+ 			registerBlockType( 'core/test-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					align: {
+ 						type: 'string',
+@@ -206,6 +208,7 @@ describe( 'block factory', () => {
+ 					...defaultBlockSettings,
+ 				} );
+ 				registerBlockType( 'core/test-paragraph', {
++					apiVersion: 3,
+ 					...defaultBlockSettings,
+ 					attributes: {
+ 						content: {
+@@ -286,6 +289,7 @@ describe( 'block factory', () => {
+ 	describe( 'cloneBlock()', () => {
+ 		it( 'should merge attributes into the existing block', () => {
+ 			registerBlockType( 'core/test-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					align: {
+ 						type: 'string',
+@@ -352,6 +356,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should replace inner blocks of the existing block', () => {
+ 			registerBlockType( 'core/test-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					align: {
+ 						type: 'string',
+@@ -384,6 +389,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should clone innerBlocks if innerBlocks are not passed', () => {
+ 			registerBlockType( 'core/test-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					align: {
+ 						type: 'string',
+@@ -454,6 +460,7 @@ describe( 'block factory', () => {
+ 	describe( 'getPossibleBlockTransformations()', () => {
+ 		it( 'should show as available a simple "from" transformation"', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -490,6 +497,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should show as available a simple "to" transformation"', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -524,6 +532,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block (for a "from" transform)', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -562,6 +571,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block (for a "to" transform)', () => {
+ 			registerBlockType( 'core/text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -603,6 +613,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should show a transformation as available if multiple blocks are passed and the transformation accepts multiple blocks (for a "from" transform)', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -645,6 +656,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should show a transformation as available if multiple blocks are passed and the transformation accepts multiple blocks (for a "to" transform)', () => {
+ 			registerBlockType( 'core/text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -690,6 +702,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should show multiple possible transformations', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -738,6 +751,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should show multiple possible transformations when multiple blocks have a matching `from` transform', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -758,6 +772,7 @@ describe( 'block factory', () => {
+ 				title: 'updated text block',
+ 			} );
+ 			registerBlockType( 'core/another-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -798,6 +813,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should show multiple possible transformations for a single `to` transform object with multiple block names', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -842,6 +858,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'returns a single transformation for a "from" transform that has a `isMatch` function returning `true`', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -879,6 +896,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'returns no transformations for a "from" transform with a `isMatch` function returning `false`', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -913,6 +931,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'returns a single transformation for a "to" transform that has a `isMatch` function returning `true`', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -948,6 +967,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'returns no transformations for a "to" transform with a `isMatch` function returning `false`', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -984,6 +1004,7 @@ describe( 'block factory', () => {
+ 			const isMatch = jest.fn();
+ 
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1018,6 +1039,7 @@ describe( 'block factory', () => {
+ 			const isMatch = jest.fn();
+ 
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1059,6 +1081,7 @@ describe( 'block factory', () => {
+ 		describe( 'wildcard block transforms', () => {
+ 			beforeEach( () => {
+ 				registerBlockType( 'core/group', {
++					apiVersion: 3,
+ 					attributes: {
+ 						value: {
+ 							type: 'string',
+@@ -1142,6 +1165,7 @@ describe( 'block factory', () => {
+ 	describe( 'switchToBlockType()', () => {
+ 		it( 'should switch the blockType of a block using the "transform form"', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1192,6 +1216,7 @@ describe( 'block factory', () => {
+ 				defaultBlockSettings
+ 			);
+ 			registerBlockType( 'core/text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1256,6 +1281,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should reject transformations that return null', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1293,6 +1319,7 @@ describe( 'block factory', () => {
+ 				defaultBlockSettings
+ 			);
+ 			registerBlockType( 'core/text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					matches: {
+ 						type: 'boolean',
+@@ -1339,6 +1366,7 @@ describe( 'block factory', () => {
+ 				defaultBlockSettings
+ 			);
+ 			registerBlockType( 'core/text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					matches: {
+ 						type: 'boolean',
+@@ -1381,6 +1409,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should reject transformations that return an empty array', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1414,6 +1443,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should reject single transformations that do not include block types', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1453,6 +1483,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should reject array transformations that do not include block types', () => {
+ 			registerBlockType( 'core/updated-text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1501,6 +1532,7 @@ describe( 'block factory', () => {
+ 				defaultBlockSettings
+ 			);
+ 			registerBlockType( 'core/text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1541,6 +1573,7 @@ describe( 'block factory', () => {
+ 				defaultBlockSettings
+ 			);
+ 			registerBlockType( 'core/text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1586,6 +1619,7 @@ describe( 'block factory', () => {
+ 				defaultBlockSettings
+ 			);
+ 			registerBlockType( 'core/text-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1645,6 +1679,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should pass through inner blocks to transform', () => {
+ 			registerBlockType( 'core/updated-columns-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1694,6 +1729,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should pass through inner blocks to transform (multi)', () => {
+ 			registerBlockType( 'core/updated-columns-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1762,6 +1798,7 @@ describe( 'block factory', () => {
+ 
+ 		it( 'should pass entire block object(s) to the "__experimentalConvert" method if defined', () => {
+ 			registerBlockType( 'core/test-group-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1840,6 +1877,7 @@ describe( 'block factory', () => {
+ 			const transformSpy = jest.fn();
+ 
+ 			registerBlockType( 'core/test-group-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1903,6 +1941,7 @@ describe( 'block factory', () => {
+ 			const transformSpy = jest.fn();
+ 
+ 			registerBlockType( 'core/test-group-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -1963,6 +2002,7 @@ describe( 'block factory', () => {
+ 			const transformSpy = jest.fn();
+ 
+ 			registerBlockType( 'core/test-group-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -2023,6 +2063,7 @@ describe( 'block factory', () => {
+ 			const transformSpy = jest.fn();
+ 
+ 			registerBlockType( 'core/test-group-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -2070,6 +2111,7 @@ describe( 'block factory', () => {
+ 		beforeEach( () => {
+ 			registerBlockType( 'core/text-block', defaultBlockSettings );
+ 			registerBlockType( 'core/transform-from-text-block-1', {
++				apiVersion: 3,
+ 				transforms: {
+ 					from: [
+ 						{
+@@ -2082,6 +2124,7 @@ describe( 'block factory', () => {
+ 				title: 'updated text block',
+ 			} );
+ 			registerBlockType( 'core/transform-from-text-block-2', {
++				apiVersion: 3,
+ 				transforms: {
+ 					from: [
+ 						{
+@@ -2245,6 +2288,7 @@ describe( 'block factory', () => {
+ 	describe( 'isContainerGroupBlock', () => {
+ 		beforeEach( () => {
+ 			registerBlockType( 'core/registered-grouping-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					value: {
+ 						type: 'string',
+@@ -2281,12 +2325,15 @@ describe( 'block factory', () => {
+ 	describe( 'getBlockFromExample', () => {
+ 		it( 'should replace unregistered block with core/missing block', () => {
+ 			registerBlockType( 'core/missing', {
++				apiVersion: 3,
+ 				title: 'Unsupported',
+ 			} );
+ 			registerBlockType( 'core/paragraph', {
++				apiVersion: 3,
+ 				title: 'Paragraph',
+ 			} );
+ 			registerBlockType( 'core/group', {
++				apiVersion: 3,
+ 				title: 'A block that groups other blocks.',
+ 			} );
+ 			const example = {
+diff --git a/packages/blocks/src/api/test/registration.js b/packages/blocks/src/api/test/registration.js
+index a537dc3065115f..5c96d356e575f4 100644
+--- a/packages/blocks/src/api/test/registration.js
++++ b/packages/blocks/src/api/test/registration.js
+@@ -50,6 +50,7 @@ const pick = ( obj, keys ) =>
+ 
+ describe( 'blocks', () => {
+ 	const defaultBlockSettings = {
++		apiVersion: 3,
+ 		save: noop,
+ 		category: 'text',
+ 		title: 'block title',
+@@ -141,7 +142,7 @@ describe( 'blocks', () => {
+ 			);
+ 			expect( console ).not.toHaveWarned();
+ 			expect( block ).toEqual( {
+-				apiVersion: 1,
++				apiVersion: 3,
+ 				name: 'my-plugin/fancy-block-4',
+ 				icon: { src: BLOCK_ICON_DEFAULT },
+ 				attributes: {},
+@@ -203,6 +204,7 @@ describe( 'blocks', () => {
+ 
+ 		it( 'should canonicalize legacy block category.', () => {
+ 			const blockType = {
++					apiVersion: 3,
+ 					save: noop,
+ 					category: 'common',
+ 					title: 'block title',
+@@ -216,6 +218,7 @@ describe( 'blocks', () => {
+ 
+ 		it( 'should unset category of blocks with non registered category.', () => {
+ 			const blockType = {
++					apiVersion: 3,
+ 					save: noop,
+ 					category: 'custom-category-slug',
+ 					title: 'block title',
+@@ -287,6 +290,10 @@ describe( 'blocks', () => {
+ 				category: 'text',
+ 			} );
+ 
++			// This warning is expected because the default apiVersion is 1 when not explicitly specified.
++			expect( console ).toHaveWarnedWith(
++				'Block with API version 2 or lower is deprecated since version 6.9. See: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility/ Note: The block "core/test-block-with-defaults" is registered with API version 1. This means that the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, set the `apiVersion` field to 3 and test the block inside the iframe editor.'
++			);
+ 			expect( getBlockType( 'core/test-block-with-defaults' ) ).toEqual( {
+ 				apiVersion: 1,
+ 				name: 'core/test-block-with-defaults',
+@@ -313,6 +320,7 @@ describe( 'blocks', () => {
+ 			} );
+ 
+ 			const blockType = {
++				apiVersion: 3,
+ 				settingName: 'settingValue',
+ 				save: noop,
+ 				category: 'text',
+@@ -321,7 +329,7 @@ describe( 'blocks', () => {
+ 			registerBlockType( 'core/test-block-with-attributes', blockType );
+ 			expect( getBlockType( 'core/test-block-with-attributes' ) ).toEqual(
+ 				{
+-					apiVersion: 1,
++					apiVersion: 3,
+ 					name: 'core/test-block-with-attributes',
+ 					settingName: 'settingValue',
+ 					save: noop,
+@@ -358,11 +366,12 @@ describe( 'blocks', () => {
+ 			} );
+ 
+ 			const blockType = {
++				apiVersion: 3,
+ 				title: 'block title',
+ 			};
+ 			registerBlockType( blockName, blockType );
+ 			expect( getBlockType( blockName ) ).toEqual( {
+-				apiVersion: 1,
++				apiVersion: 3,
+ 				name: blockName,
+ 				save: expect.any( Function ),
+ 				title: 'block title',
+@@ -432,6 +441,7 @@ describe( 'blocks', () => {
+ 			} );
+ 
+ 			const blockType = {
++				apiVersion: 3,
+ 				title: 'block settings merge',
+ 				variations: [
+ 					{ name: 'bar', label: 'Bar' },
+@@ -440,7 +450,7 @@ describe( 'blocks', () => {
+ 			};
+ 			registerBlockType( blockName, blockType );
+ 			expect( getBlockType( blockName ) ).toEqual( {
+-				apiVersion: 1,
++				apiVersion: 3,
+ 				name: blockName,
+ 				save: expect.any( Function ),
+ 				title: 'block settings merge',
+@@ -488,6 +498,10 @@ describe( 'blocks', () => {
+ 				},
+ 				blockType
+ 			);
++			// This test is for API version 1 blocks, so the console warning is intentional.
++			expect( console ).toHaveWarnedWith(
++				'Block with API version 2 or lower is deprecated since version 6.9. See: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility/ Note: The block "tests/hooked-block" is registered with API version 1. This means that the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, set the `apiVersion` field to 3 and test the block inside the iframe editor.'
++			);
+ 			expect( getBlockType( blockName ) ).toEqual( {
+ 				apiVersion: 1,
+ 				name: blockName,
+@@ -526,6 +540,7 @@ describe( 'blocks', () => {
+ 
+ 		it( 'should normalize the icon containing an element', () => {
+ 			const blockType = {
++				apiVersion: 3,
+ 				save: noop,
+ 				category: 'text',
+ 				title: 'block title',
+@@ -549,7 +564,7 @@ describe( 'blocks', () => {
+ 			expect(
+ 				getBlockType( 'core/test-block-icon-normalize-element' )
+ 			).toEqual( {
+-				apiVersion: 1,
++				apiVersion: 3,
+ 				name: 'core/test-block-icon-normalize-element',
+ 				save: noop,
+ 				category: 'text',
+@@ -582,6 +597,7 @@ describe( 'blocks', () => {
+ 
+ 		it( 'should normalize the icon containing a string', () => {
+ 			const blockType = {
++				apiVersion: 3,
+ 				save: noop,
+ 				category: 'text',
+ 				title: 'block title',
+@@ -594,7 +610,7 @@ describe( 'blocks', () => {
+ 			expect(
+ 				getBlockType( 'core/test-block-icon-normalize-string' )
+ 			).toEqual( {
+-				apiVersion: 1,
++				apiVersion: 3,
+ 				name: 'core/test-block-icon-normalize-string',
+ 				save: noop,
+ 				category: 'text',
+@@ -630,6 +646,7 @@ describe( 'blocks', () => {
+ 				);
+ 			};
+ 			const blockType = {
++				apiVersion: 3,
+ 				save: noop,
+ 				category: 'text',
+ 				title: 'block title',
+@@ -642,7 +659,7 @@ describe( 'blocks', () => {
+ 			expect(
+ 				getBlockType( 'core/test-block-icon-normalize-function' )
+ 			).toEqual( {
+-				apiVersion: 1,
++				apiVersion: 3,
+ 				name: 'core/test-block-icon-normalize-function',
+ 				save: noop,
+ 				category: 'text',
+@@ -664,6 +681,7 @@ describe( 'blocks', () => {
+ 
+ 		it( 'should correctly register an icon with background and a custom svg', () => {
+ 			const blockType = {
++				apiVersion: 3,
+ 				save: noop,
+ 				category: 'text',
+ 				title: 'block title',
+@@ -690,7 +708,7 @@ describe( 'blocks', () => {
+ 			expect(
+ 				getBlockType( 'core/test-block-icon-normalize-background' )
+ 			).toEqual( {
+-				apiVersion: 1,
++				apiVersion: 3,
+ 				name: 'core/test-block-icon-normalize-background',
+ 				save: noop,
+ 				category: 'text',
+@@ -726,6 +744,7 @@ describe( 'blocks', () => {
+ 
+ 		it( 'should store a copy of block type', () => {
+ 			const blockType = {
++				apiVersion: 3,
+ 				settingName: 'settingValue',
+ 				save: noop,
+ 				category: 'text',
+@@ -734,7 +753,7 @@ describe( 'blocks', () => {
+ 			registerBlockType( 'core/test-block-with-settings', blockType );
+ 			blockType.mutated = true;
+ 			expect( getBlockType( 'core/test-block-with-settings' ) ).toEqual( {
+-				apiVersion: 1,
++				apiVersion: 3,
+ 				name: 'core/test-block-with-settings',
+ 				settingName: 'settingValue',
+ 				save: noop,
+@@ -755,6 +774,7 @@ describe( 'blocks', () => {
+ 
+ 		it( 'should transform parent string to array', () => {
+ 			const blockType = {
++				apiVersion: 3,
+ 				save: noop,
+ 				category: 'text',
+ 				title: 'block title',
+@@ -768,7 +788,7 @@ describe( 'blocks', () => {
+ 				'Parent must be undefined or an array of strings (block types), but it is a string.'
+ 			);
+ 			expect( block ).toEqual( {
+-				apiVersion: 1,
++				apiVersion: 3,
+ 				name: 'core/test-block-parent-string',
+ 				save: noop,
+ 				category: 'text',
+@@ -1006,6 +1026,7 @@ describe( 'blocks', () => {
+ 			const Edit = () => 'test';
+ 			const block = registerBlockType(
+ 				{
++					apiVersion: 3,
+ 					name: 'test/block-from-metadata',
+ 					title: 'Block from metadata',
+ 					category: 'text',
+@@ -1025,7 +1046,7 @@ describe( 'blocks', () => {
+ 				}
+ 			);
+ 			expect( block ).toEqual( {
+-				apiVersion: 1,
++				apiVersion: 3,
+ 				name: 'test/block-from-metadata',
+ 				title: 'Block from metadata',
+ 				category: 'text',
+@@ -1062,6 +1083,7 @@ describe( 'blocks', () => {
+ 			const Edit = () => 'test';
+ 			const block = registerBlockType(
+ 				{
++					apiVersion: 3,
+ 					name: 'test/block-from-metadata-i18n',
+ 					title: 'I18n title from metadata',
+ 					description: 'I18n description from metadata',
+@@ -1094,7 +1116,7 @@ describe( 'blocks', () => {
+ 			);
+ 
+ 			expect( block ).toEqual( {
+-				apiVersion: 1,
++				apiVersion: 3,
+ 				name: 'test/block-from-metadata-i18n',
+ 				title: 'I18n title from metadata (translated)',
+ 				description: 'I18n description from metadata (translated)',
+@@ -1163,7 +1185,7 @@ describe( 'blocks', () => {
+ 			registerBlockType( 'core/test-block', defaultBlockSettings );
+ 			expect( getBlockTypes() ).toEqual( [
+ 				{
+-					apiVersion: 1,
++					apiVersion: 3,
+ 					name: 'core/test-block',
+ 					save: noop,
+ 					category: 'text',
+@@ -1183,7 +1205,7 @@ describe( 'blocks', () => {
+ 			const oldBlock = unregisterBlockType( 'core/test-block' );
+ 			expect( console ).not.toHaveWarned();
+ 			expect( oldBlock ).toEqual( {
+-				apiVersion: 1,
++				apiVersion: 3,
+ 				name: 'core/test-block',
+ 				save: noop,
+ 				category: 'text',
+@@ -1265,7 +1287,7 @@ describe( 'blocks', () => {
+ 		it( 'should return { name, save } for blocks with minimum settings', () => {
+ 			registerBlockType( 'core/test-block', defaultBlockSettings );
+ 			expect( getBlockType( 'core/test-block' ) ).toEqual( {
+-				apiVersion: 1,
++				apiVersion: 3,
+ 				name: 'core/test-block',
+ 				save: noop,
+ 				category: 'text',
+@@ -1285,6 +1307,7 @@ describe( 'blocks', () => {
+ 
+ 		it( 'should return all block type elements', () => {
+ 			const blockType = {
++				apiVersion: 3,
+ 				settingName: 'settingValue',
+ 				save: noop,
+ 				category: 'text',
+@@ -1292,7 +1315,7 @@ describe( 'blocks', () => {
+ 			};
+ 			registerBlockType( 'core/test-block-with-settings', blockType );
+ 			expect( getBlockType( 'core/test-block-with-settings' ) ).toEqual( {
+-				apiVersion: 1,
++				apiVersion: 3,
+ 				name: 'core/test-block-with-settings',
+ 				settingName: 'settingValue',
+ 				save: noop,
+@@ -1320,6 +1343,7 @@ describe( 'blocks', () => {
+ 		it( 'should return all registered blocks', () => {
+ 			registerBlockType( 'core/test-block', defaultBlockSettings );
+ 			const blockType = {
++				apiVersion: 3,
+ 				settingName: 'settingValue',
+ 				save: noop,
+ 				category: 'text',
+@@ -1328,7 +1352,7 @@ describe( 'blocks', () => {
+ 			registerBlockType( 'core/test-block-with-settings', blockType );
+ 			expect( getBlockTypes() ).toEqual( [
+ 				{
+-					apiVersion: 1,
++					apiVersion: 3,
+ 					name: 'core/test-block',
+ 					save: noop,
+ 					category: 'text',
+@@ -1345,7 +1369,7 @@ describe( 'blocks', () => {
+ 					blockHooks: {},
+ 				},
+ 				{
+-					apiVersion: 1,
++					apiVersion: 3,
+ 					name: 'core/test-block-with-settings',
+ 					settingName: 'settingValue',
+ 					save: noop,
+diff --git a/packages/blocks/src/api/test/serializer.js b/packages/blocks/src/api/test/serializer.js
+index 9b2f2ba667e2fb..0585a54cc8e673 100644
+--- a/packages/blocks/src/api/test/serializer.js
++++ b/packages/blocks/src/api/test/serializer.js
+@@ -56,6 +56,7 @@ describe( 'block serializer', () => {
+ 
+ 			it( 'should work when block type is passed as string', () => {
+ 				registerBlockType( 'core/fruit', {
++					apiVersion: 3,
+ 					title: 'Fruit',
+ 					category: 'widgets',
+ 					save: fruitBlockSave,
+@@ -281,6 +282,7 @@ describe( 'block serializer', () => {
+ 	describe( 'serializeBlock()', () => {
+ 		it( 'serializes the freeform content fallback block without comment delimiters', () => {
+ 			registerBlockType( 'core/freeform', {
++				apiVersion: 3,
+ 				category: 'text',
+ 				title: 'freeform block',
+ 				attributes: {
+@@ -301,6 +303,7 @@ describe( 'block serializer', () => {
+ 		} );
+ 		it( 'serializes the freeform content fallback block with comment delimiters in nested context', () => {
+ 			registerBlockType( 'core/freeform', {
++				apiVersion: 3,
+ 				category: 'text',
+ 				title: 'freeform block',
+ 				attributes: {
+@@ -325,6 +328,7 @@ describe( 'block serializer', () => {
+ 		} );
+ 		it( 'serializes the unregistered fallback block without comment delimiters', () => {
+ 			registerBlockType( 'core/unregistered-block', {
++				apiVersion: 3,
+ 				category: 'text',
+ 				title: 'unregistered block',
+ 				attributes: {
+@@ -345,6 +349,7 @@ describe( 'block serializer', () => {
+ 		} );
+ 		it( 'preserves content from invalid blocks when source information is present', () => {
+ 			registerBlockType( 'core/quote', {
++				apiVersion: 3,
+ 				category: 'text',
+ 				title: 'Quote',
+ 				attributes: { content: 'string' },
+@@ -370,6 +375,7 @@ describe( 'block serializer', () => {
+ 		} );
+ 		it( 're-generates content from invalid blocks when source information is missing (losing content)', () => {
+ 			registerBlockType( 'core/quote', {
++				apiVersion: 3,
+ 				category: 'text',
+ 				title: 'Quote',
+ 				attributes: { content: 'string' },
+@@ -390,6 +396,7 @@ describe( 'block serializer', () => {
+ 	describe( 'serialize()', () => {
+ 		beforeEach( () => {
+ 			const blockType = {
++				apiVersion: 3,
+ 				attributes: {
+ 					throw: {
+ 						type: 'boolean',
+@@ -461,6 +468,7 @@ describe( 'block serializer', () => {
+ 	describe( 'getBlockInnerHTML', () => {
+ 		it( "should return the block's serialized inner HTML", () => {
+ 			const blockType = {
++				apiVersion: 3,
+ 				attributes: {
+ 					content: {
+ 						type: 'string',
+diff --git a/packages/blocks/src/api/test/templates.js b/packages/blocks/src/api/test/templates.js
+index 0a23505f0ac036..4823c6f2de499f 100644
+--- a/packages/blocks/src/api/test/templates.js
++++ b/packages/blocks/src/api/test/templates.js
+@@ -28,6 +28,7 @@ describe( 'templates', () => {
+ 
+ 	beforeEach( () => {
+ 		registerBlockType( 'core/test-block', {
++			apiVersion: 3,
+ 			attributes: {},
+ 			save: noop,
+ 			category: 'text',
+@@ -35,6 +36,7 @@ describe( 'templates', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/test-block-2', {
++			apiVersion: 3,
+ 			attributes: {},
+ 			save: noop,
+ 			category: 'text',
+@@ -42,6 +44,7 @@ describe( 'templates', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/missing', {
++			apiVersion: 3,
+ 			attributes: {},
+ 			save: noop,
+ 			category: 'text',
+diff --git a/packages/blocks/src/api/test/utils.js b/packages/blocks/src/api/test/utils.js
+index 71f4000ea105de..e990e2ab3bc457 100644
+--- a/packages/blocks/src/api/test/utils.js
++++ b/packages/blocks/src/api/test/utils.js
+@@ -37,6 +37,7 @@ describe( 'block helpers', () => {
+ 	describe( 'isUnmodifiedDefaultBlock()', () => {
+ 		it( 'should return true if the default block is unmodified', () => {
+ 			registerBlockType( 'core/test-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					align: {
+ 						type: 'string',
+@@ -57,6 +58,7 @@ describe( 'block helpers', () => {
+ 
+ 		it( 'should return false if the default block is updated', () => {
+ 			registerBlockType( 'core/test-block', {
++				apiVersion: 3,
+ 				attributes: {
+ 					align: {
+ 						type: 'string',
+@@ -79,6 +81,7 @@ describe( 'block helpers', () => {
+ 
+ 		it( 'should invalidate cache if the default block name changed', () => {
+ 			registerBlockType( 'core/test-block1', {
++				apiVersion: 3,
+ 				attributes: {
+ 					includesDefault1: {
+ 						type: 'boolean',
+@@ -90,6 +93,7 @@ describe( 'block helpers', () => {
+ 				title: 'test block',
+ 			} );
+ 			registerBlockType( 'core/test-block2', {
++				apiVersion: 3,
+ 				attributes: {
+ 					includesDefault2: {
+ 						type: 'boolean',
+@@ -217,7 +221,10 @@ describe( 'getAccessibleBlockLabel', () => {
+ 
+ describe( 'isBlockRegistered', () => {
+ 	it( 'returns true if the block is registered', () => {
+-		registerBlockType( 'core/test-block', { title: 'Test block' } );
++		registerBlockType( 'core/test-block', {
++			apiVersion: 3,
++			title: 'Test block',
++		} );
+ 		expect( isBlockRegistered( 'core/test-block' ) ).toBe( true );
+ 		unregisterBlockType( 'core/test-block' );
+ 	} );
+@@ -238,6 +245,7 @@ describe( 'sanitizeBlockAttributes', () => {
+ 
+ 	it( 'sanitize block attributes not defined in the block type', () => {
+ 		registerBlockType( 'core/test-block', {
++			apiVersion: 3,
+ 			attributes: {
+ 				defined: {
+ 					type: 'string',
+@@ -272,6 +280,7 @@ describe( 'sanitizeBlockAttributes', () => {
+ 
+ 	it( 'handles undefined values and default values', () => {
+ 		registerBlockType( 'core/test-block', {
++			apiVersion: 3,
+ 			attributes: {
+ 				hasDefaultValue: {
+ 					type: 'string',
+@@ -296,6 +305,7 @@ describe( 'sanitizeBlockAttributes', () => {
+ 
+ 	it( 'handles node and children sources as arrays', () => {
+ 		registerBlockType( 'core/test-block', {
++			apiVersion: 3,
+ 			attributes: {
+ 				nodeContent: {
+ 					source: 'node',
+@@ -329,6 +339,7 @@ describe( 'sanitizeBlockAttributes', () => {
+ describe( 'getBlockAttributesNamesByRole', () => {
+ 	beforeAll( () => {
+ 		registerBlockType( 'core/test-block-1', {
++			apiVersion: 3,
+ 			attributes: {
+ 				align: {
+ 					type: 'string',
+@@ -351,6 +362,7 @@ describe( 'getBlockAttributesNamesByRole', () => {
+ 			title: 'test block 1',
+ 		} );
+ 		registerBlockType( 'core/test-block-2', {
++			apiVersion: 3,
+ 			attributes: {
+ 				align: { type: 'string' },
+ 				content: { type: 'boolean' },
+@@ -361,6 +373,7 @@ describe( 'getBlockAttributesNamesByRole', () => {
+ 			title: 'test block 2',
+ 		} );
+ 		registerBlockType( 'core/test-block-3', {
++			apiVersion: 3,
+ 			save: noop,
+ 			category: 'text',
+ 			title: 'test block 3',
+@@ -403,6 +416,7 @@ describe( 'getBlockAttributesNamesByRole', () => {
+ describe( 'isContentBlock', () => {
+ 	it( 'returns true if the block has a content role attribute', () => {
+ 		registerBlockType( 'core/test-content-block', {
++			apiVersion: 3,
+ 			attributes: {
+ 				content: {
+ 					type: 'string',
+@@ -421,6 +435,7 @@ describe( 'isContentBlock', () => {
+ 
+ 	it( 'returns false if the block does not have a content role attribute', () => {
+ 		registerBlockType( 'core/test-non-content-block', {
++			apiVersion: 3,
+ 			attributes: {
+ 				content: {
+ 					type: 'string',
+@@ -440,6 +455,7 @@ describe( 'isContentBlock', () => {
+ describe( 'isUnmodifiedBlock', () => {
+ 	beforeAll( () => {
+ 		registerBlockType( 'core/test-block', {
++			apiVersion: 3,
+ 			attributes: {
+ 				align: {
+ 					type: 'string',
+@@ -495,6 +511,14 @@ describe( 'isUnmodifiedBlock', () => {
+ 		expect( isUnmodifiedBlock( block, 'non-existent-role' ) ).toBe( true );
+ 	} );
+ 
++	it( 'should return false if no attributes exist for the role and some are modified', () => {
++		const block = createBlock( 'core/test-block', {
++			align: 'center',
++			content: 'Updated content',
++		} );
++		expect( isUnmodifiedBlock( block, 'non-existent-role' ) ).toBe( false );
++	} );
++
+ 	it( 'should return true if metadata attributes is not modified for role content', () => {
+ 		const block = createBlock( 'core/test-block' );
+ 		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( true );
+diff --git a/packages/blocks/src/api/test/validation.js b/packages/blocks/src/api/test/validation.js
+index d4006f4a9c6819..bbe13f77ce0002 100644
+--- a/packages/blocks/src/api/test/validation.js
++++ b/packages/blocks/src/api/test/validation.js
+@@ -28,6 +28,7 @@ import {
+ 
+ describe( 'validation', () => {
+ 	const defaultBlockSettings = {
++		apiVersion: 3,
+ 		save: ( { attributes } ) => attributes.fruit,
+ 		category: 'text',
+ 		title: 'block title',
+diff --git a/packages/blocks/src/api/utils.js b/packages/blocks/src/api/utils.js
+index d9b7da0094ed96..55b104c569227a 100644
+--- a/packages/blocks/src/api/utils.js
++++ b/packages/blocks/src/api/utils.js
+@@ -43,13 +43,16 @@ export function isUnmodifiedBlock( block, role ) {
+ 	const blockAttributes = getBlockType( block.name )?.attributes ?? {};
+ 
+ 	// Filter attributes by role if a role is provided.
+-	const attributesToCheck = role
++	const attributesByRole = role
+ 		? Object.entries( blockAttributes ).filter( ( [ key, definition ] ) => {
+ 				// A special case for the metadata attribute.
+ 				// It can include block bindings that serve as a source of content,
+ 				// without directly modifying content attributes.
+ 				if ( role === 'content' && key === 'metadata' ) {
+-					return true;
++					return (
++						Object.keys( block.attributes[ key ]?.bindings ?? {} )
++							.length > 0
++					);
+ 				}
+ 
+ 				return (
+@@ -57,6 +60,10 @@ export function isUnmodifiedBlock( block, role ) {
+ 					definition.__experimentalRole === role
+ 				);
+ 		  } )
++		: [];
++	// Fallback to all attributes if no attributes match the role.
++	const attributesToCheck = !! attributesByRole.length
++		? attributesByRole
+ 		: Object.entries( blockAttributes );
+ 
+ 	return attributesToCheck.every( ( [ key, definition ] ) => {
+diff --git a/packages/blocks/src/store/process-block-type.js b/packages/blocks/src/store/process-block-type.js
+index 04259be4d33d56..c3528d56315f0a 100644
+--- a/packages/blocks/src/store/process-block-type.js
++++ b/packages/blocks/src/store/process-block-type.js
+@@ -111,11 +111,11 @@ export const processBlockType =
+ 		);
+ 
+ 		if ( settings.apiVersion <= 2 ) {
+-			warning(
+-				`The block "${ name }" is registered with API version 2 or lower. This means that the post editor may work as a non-iframe editor.\n` +
+-					`Since all editors are planned to work as iframes in the future, set the \`apiVersion\` field to 3 and test the block inside the iframe editor.\n` +
+-					`See: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/#version-3-wordpress-6-3`
+-			);
++			deprecated( 'Block with API version 2 or lower', {
++				since: '6.9',
++				hint: `The block "${ name }" is registered with API version ${ settings.apiVersion }. This means that the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, set the \`apiVersion\` field to 3 and test the block inside the iframe editor.`,
++				link: 'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility/',
++			} );
+ 		}
+ 
+ 		if (
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 76fff5f0b07581..8c998fdad77e0c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,8 @@
+ -   `Badge`: Add max-width for text truncation ([#72653](https://github.com/WordPress/gutenberg/pull/72653)).
+ -   `Button`: Revert disabled primary button state to its previous one ([#73037](https://github.com/WordPress/gutenberg/pull/73037)).
+ -   `NumberControl`: Fix crash when min prop is string and step prop contains decimal ([#73107](https://github.com/WordPress/gutenberg/pull/73107)).
++-   `Popover`: Fix `onDialogClose` logic to only close the popover if the blur event targets the specific popover instance ([#72376](https://github.com/WordPress/gutenberg/pull/72376)).
++-   `Popover`: Fix bug where clicking outside nested popovers only closed the inner one. ([#74340](https://github.com/WordPress/gutenberg/pull/74340))
+ 
+ ## 30.6.0 (2025-10-17)
+ 
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index ac03ae882531d7..393b0744c6ac6d 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -268,9 +268,38 @@ const UnforwardedPopover = (
+ 		onDialogClose = ( type: string | undefined, event: SyntheticEvent ) => {
+ 			// Ideally the popover should have just a single onClose prop and
+ 			// not three props that potentially do the same thing.
+-			if ( type === 'focus-outside' && onFocusOutside ) {
+-				onFocusOutside( event );
++			if ( type === 'focus-outside' ) {
++				// Check if this blur event is actually relevant to this popover
++				const blurTarget = event?.target as Element;
++				const referenceElement = refs.reference.current;
++				const floatingElement = refs.floating.current;
++
++				// Check if blur is from this popover's reference element or its floating content
++				const isBlurFromThisPopover =
++					( referenceElement &&
++						'contains' in referenceElement &&
++						referenceElement.contains( blurTarget ) ) ||
++					floatingElement?.contains( blurTarget );
++				// Ignore blur events that don't originate from this popover when there's no
++				// relatedTarget (next focus target) and focus moves to document.body.
++				// This prevents incorrectly closing the popover when clicking on elements
++				// that don't accept focus (like clicking outside to empty space).
++				const ownerDocument = floatingElement?.ownerDocument;
++				if (
++					! isBlurFromThisPopover &&
++					! ( 'relatedTarget' in event && event.relatedTarget ) &&
++					ownerDocument?.activeElement === ownerDocument?.body
++				) {
++					return;
++				}
++				// Call onFocusOutside if defined or call onClose.
++				if ( onFocusOutside ) {
++					onFocusOutside( event );
++				} else if ( onClose ) {
++					onClose();
++				}
+ 			} else if ( onClose ) {
++				// onClose should be called for other event types if it exists.
+ 				onClose();
+ 			}
+ 		};
+diff --git a/packages/components/src/popover/test/index.tsx b/packages/components/src/popover/test/index.tsx
+index eac0f942df2f6e..a78382d098f3a2 100644
+--- a/packages/components/src/popover/test/index.tsx
++++ b/packages/components/src/popover/test/index.tsx
+@@ -578,4 +578,89 @@ describe( 'Popover', () => {
+ 			}
+ 		);
+ 	} );
++
++	describe( 'closing all nested popovers', () => {
++		// Test component that simulates the nested popover scenario:
++		// A parent popover (like ColorGradient dropdown) containing a trigger
++		// that opens a nested popover (like custom color picker dropdown)
++		function NestedPopoverTestComponent( {
++			onParentFocusOutside,
++			onNestedFocusOutside,
++		}: {
++			onParentFocusOutside: jest.Mock;
++			onNestedFocusOutside: jest.Mock;
++		} ) {
++			const [ isNestedOpen, setIsNestedOpen ] = useState( false );
++
++			return (
++				<>
++					<button data-testid="external-button">
++						External Button
++					</button>
++					<Popover
++						data-testid="parent-popover"
++						onFocusOutside={ onParentFocusOutside }
++						focusOnMount={ false }
++					>
++						<button
++							data-testid="parent-button"
++							onClick={ () => setIsNestedOpen( ! isNestedOpen ) }
++						>
++							Open Nested
++						</button>
++						{ isNestedOpen && (
++							<Popover
++								data-testid="nested-popover"
++								onFocusOutside={ onNestedFocusOutside }
++								focusOnMount={ false }
++							>
++								<button data-testid="nested-dummy-button">
++									Nested Dummy Button
++								</button>
++							</Popover>
++						) }
++					</Popover>
++				</>
++			);
++		}
++
++		it( 'should call parent onFocusOutside when focus moves from nested popover to external element', async () => {
++			const user = userEvent.setup();
++			const onParentFocusOutside = jest.fn();
++			const onNestedFocusOutside = jest.fn();
++
++			render(
++				<NestedPopoverTestComponent
++					onParentFocusOutside={ onParentFocusOutside }
++					onNestedFocusOutside={ onNestedFocusOutside }
++				/>
++			);
++
++			await waitFor( () => {
++				expect(
++					screen.getByTestId( 'parent-popover' )
++				).toBeInTheDocument();
++			} );
++
++			await user.click( screen.getByTestId( 'parent-button' ) );
++
++			await waitFor( () => {
++				expect(
++					screen.getByTestId( 'nested-popover' )
++				).toBeInTheDocument();
++			} );
++
++			await user.click( screen.getByTestId( 'nested-dummy-button' ) );
++
++			await user.click( screen.getByTestId( 'external-button' ) );
++
++			await waitFor( () => {
++				expect( onNestedFocusOutside ).toHaveBeenCalledTimes( 1 );
++			} );
++
++			await waitFor( () => {
++				expect( onParentFocusOutside ).toHaveBeenCalledTimes( 1 );
++			} );
++		} );
++	} );
+ } );
+diff --git a/packages/core-data/src/test/entity-provider.js b/packages/core-data/src/test/entity-provider.js
+index 4dc0d8a51663e8..dc4150a982ae6d 100644
+--- a/packages/core-data/src/test/entity-provider.js
++++ b/packages/core-data/src/test/entity-provider.js
+@@ -86,6 +86,7 @@ describe( 'useEntityBlockEditor', () => {
+ 		const edit = ( { children } ) => <>{ children }</>;
+ 
+ 		registerBlockType( 'core/test-block', {
++			apiVersion: 3,
+ 			supports: {
+ 				className: false,
+ 			},
+@@ -112,6 +113,7 @@ describe( 'useEntityBlockEditor', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/test-block-with-array-of-strings', {
++			apiVersion: 3,
+ 			supports: {
+ 				className: false,
+ 			},
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/block.json b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/block.json
+new file mode 100644
+index 00000000000000..43f82fcd037531
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/block.json
+@@ -0,0 +1,15 @@
++{
++	"$schema": "https://schemas.wp.org/trunk/block.json",
++	"apiVersion": 3,
++	"name": "test/hydration-timing-async",
++	"title": "E2E Interactivity tests - hydration timing async import",
++	"category": "text",
++	"icon": "heart",
++	"description": "",
++	"supports": {
++		"interactivity": true
++	},
++	"textdomain": "e2e-interactivity",
++	"viewScriptModule": "file:./view.js",
++	"render": "file:./render.php"
++}
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/render.php b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/render.php
+new file mode 100644
+index 00000000000000..aca58b514a177a
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/render.php
+@@ -0,0 +1,36 @@
++<?php
++/**
++ * HTML for testing hydration timing - async import block.
++ *
++ * This block's view module dynamically imports @wordpress/interactivity
++ * on DOMContentLoaded, simulating a lazy-loading scenario. The test verifies
++ * that hydration still occurs even when the library is loaded after
++ * DOMContentLoaded has fired.
++ *
++ * @package gutenberg-test-interactive-blocks
++ *
++ * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
++ */
++?>
++
++<div
++	data-wp-interactive="test/hydration-timing-async"
++	<?php echo wp_interactivity_data_wp_context( array( 'hydrated' => false ) ); ?>
++>
++	<p
++		data-wp-text="state.asyncModuleLoaded"
++		data-testid="async-module-loaded"
++	>no</p>
++
++	<p
++		data-wp-text="context.hydrated"
++		data-testid="async-hydrated"
++	>no</p>
++
++	<div
++		data-wp-init="callbacks.init"
++		data-testid="async-hydration-status"
++	>
++		Async import hydration test block
++	</div>
++</div>
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/view.asset.php b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/view.asset.php
+new file mode 100644
+index 00000000000000..2f77c98026b0a8
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/view.asset.php
+@@ -0,0 +1,8 @@
++<?php return array(
++	'dependencies' => array(
++		array(
++			'id'     => '@wordpress/interactivity',
++			'import' => 'dynamic',
++		),
++	),
++);
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/view.js b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/view.js
+new file mode 100644
+index 00000000000000..6b776581c44156
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/view.js
+@@ -0,0 +1,29 @@
++/**
++ * This module dynamically imports @wordpress/interactivity on DOMContentLoaded.
++ *
++ * This simulates a lazy-loading scenario where the Interactivity API is not
++ * statically imported. The test verifies that hydration still occurs even
++ * when the library is loaded after DOMContentLoaded has already fired.
++ */
++
++const initStore = async () => {
++	const { store, getContext } = await import( '@wordpress/interactivity' );
++
++	store( 'test/hydration-timing-async', {
++		state: {
++			asyncModuleLoaded: 'yes',
++		},
++		callbacks: {
++			// TODO: this could be unavailable during hydration. Fix
++			// `data-wp-init` to support that case.
++			init() {
++				const context = getContext();
++				context.hydrated = true;
++			},
++		},
++	} );
++};
++
++document.addEventListener( 'DOMContentLoaded', () =>
++	setTimeout( initStore, 1 )
++);
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/block.json b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/block.json
+new file mode 100644
+index 00000000000000..ca316cd33ec51f
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/block.json
+@@ -0,0 +1,15 @@
++{
++	"$schema": "https://schemas.wp.org/trunk/block.json",
++	"apiVersion": 3,
++	"name": "test/hydration-timing-slow",
++	"title": "E2E Interactivity tests - hydration timing slow module",
++	"category": "text",
++	"icon": "heart",
++	"description": "",
++	"supports": {
++		"interactivity": true
++	},
++	"textdomain": "e2e-interactivity",
++	"viewScriptModule": "file:./view.js",
++	"render": "file:./render.php"
++}
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/render.php b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/render.php
+new file mode 100644
+index 00000000000000..4d8ff1ff417425
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/render.php
+@@ -0,0 +1,36 @@
++<?php
++/**
++ * HTML for testing hydration timing - slow module block.
++ *
++ * This block's view module will be artificially delayed in the test
++ * to simulate a slow network connection. The test verifies that
++ * hydration waits for this module to load even when other modules
++ * that import @wordpress/interactivity have already been evaluated.
++ *
++ * @package gutenberg-test-interactive-blocks
++ *
++ * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
++ */
++?>
++
++<div
++	data-wp-interactive="test/hydration-timing"
++	<?php echo wp_interactivity_data_wp_context( array( 'slowInitialized' => false ) ); ?>
++>
++	<p
++		data-wp-text="state.slowModuleLoaded"
++		data-testid="slow-module-loaded"
++	>no</p>
++
++	<p
++		data-wp-text="context.slowInitialized"
++		data-testid="slow-context-initialized"
++	>no</p>
++
++	<div
++		data-wp-init="callbacks.slowInit"
++		data-testid="slow-hydration-status"
++	>
++		Slow module hydration test block
++	</div>
++</div>
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/view.asset.php b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/view.asset.php
+new file mode 100644
+index 00000000000000..db23afdf657a19
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/view.asset.php
+@@ -0,0 +1 @@
++<?php return array( 'dependencies' => array( '@wordpress/interactivity' ) );
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/view.js b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/view.js
+new file mode 100644
+index 00000000000000..95a174c1fc6835
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/view.js
+@@ -0,0 +1,22 @@
++/**
++ * WordPress dependencies
++ */
++import { store, getContext } from '@wordpress/interactivity';
++
++// This module will be artificially delayed in the test.
++// It also imports @wordpress/interactivity, so when it's evaluated,
++// the interactivity runtime will have already been initialized by
++// the fast module. The test verifies that hydration waits for this
++// module to finish loading before running.
++
++store( 'test/hydration-timing', {
++	state: {
++		slowModuleLoaded: 'yes',
++	},
++	callbacks: {
++		slowInit() {
++			const context = getContext();
++			context.slowInitialized = true;
++		},
++	},
++} );
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/block.json b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/block.json
+new file mode 100644
+index 00000000000000..32370018e63cfb
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/block.json
+@@ -0,0 +1,15 @@
++{
++	"$schema": "https://schemas.wp.org/trunk/block.json",
++	"apiVersion": 3,
++	"name": "test/hydration-timing",
++	"title": "E2E Interactivity tests - hydration timing",
++	"category": "text",
++	"icon": "heart",
++	"description": "",
++	"supports": {
++		"interactivity": true
++	},
++	"textdomain": "e2e-interactivity",
++	"viewScriptModule": "file:./view.js",
++	"render": "file:./render.php"
++}
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/render.php b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/render.php
+new file mode 100644
+index 00000000000000..0ffeb9ea10c413
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/render.php
+@@ -0,0 +1,31 @@
++<?php
++/**
++ * HTML for testing hydration timing with delayed module loading.
++ *
++ * @package gutenberg-test-interactive-blocks
++ *
++ * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
++ */
++?>
++
++<div
++	data-wp-interactive="test/hydration-timing"
++	<?php echo wp_interactivity_data_wp_context( array( 'initialized' => false ) ); ?>
++>
++	<p
++		data-wp-text="state.moduleLoaded"
++		data-testid="module-loaded"
++	>no</p>
++
++	<p
++		data-wp-text="context.initialized"
++		data-testid="context-initialized"
++	>no</p>
++
++	<div
++		data-wp-init="callbacks.init"
++		data-testid="hydration-status"
++	>
++		Hydration test block
++	</div>
++</div>
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/view.asset.php b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/view.asset.php
+new file mode 100644
+index 00000000000000..db23afdf657a19
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/view.asset.php
+@@ -0,0 +1 @@
++<?php return array( 'dependencies' => array( '@wordpress/interactivity' ) );
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/view.js b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/view.js
+new file mode 100644
+index 00000000000000..c48856312bb994
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/view.js
+@@ -0,0 +1,23 @@
++/**
++ * WordPress dependencies
++ */
++import { store, getContext } from '@wordpress/interactivity';
++
++// This is the "fast" module that loads immediately. It imports
++// @wordpress/interactivity, which initializes the runtime.
++//
++// The test pairs this with a "slow" module (hydration-timing-slow) that is
++// artificially delayed. The race condition occurs when this fast module
++// triggers hydration before the slow module has finished loading.
++
++store( 'test/hydration-timing', {
++	state: {
++		moduleLoaded: 'yes',
++	},
++	callbacks: {
++		init() {
++			const context = getContext();
++			context.initialized = true;
++		},
++	},
++} );
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/router-regions/render.php b/packages/e2e-tests/plugins/interactive-blocks/router-regions/render.php
+index 3b9f8429c18823..b8fd920d8ea56b 100644
+--- a/packages/e2e-tests/plugins/interactive-blocks/router-regions/render.php
++++ b/packages/e2e-tests/plugins/interactive-blocks/router-regions/render.php
+@@ -11,6 +11,7 @@
+ <section>
+ 	<h2>Region 1</h2>
+ 	<div
++		data-testid="region-1"
+ 		data-wp-interactive="router-regions"
+ 		data-wp-router-region="region-1"
+ 	>
+@@ -54,8 +55,11 @@
+ <section>
+ 	<h2>Region 2</h2>
+ 	<div
++		data-testid="region-2"
++		data-wp-key="region-2"
+ 		data-wp-interactive="router-regions"
+ 		data-wp-router-region="region-2"
++		data-wp-run="callbacks.nope"
+ 	>
+ 		<p
+ 			data-testid="region-2-text"
+@@ -113,6 +117,7 @@
+ 	<!-- Router region inside data-wp-interactive -->
+ 	<div
+ 		data-testid="valid-inside-interactive"
++		data-wp-key="valid-inside-interactive"
+ 		data-wp-interactive="router-regions"
+ 		data-wp-router-region="valid-inside-interactive"
+ 		data-wp-context='{ "counter": { "value": 0 } }'
+@@ -131,6 +136,7 @@
+ 		<!-- Router region inside data-wp-router-region -->
+ 		<div
+ 			data-testid="valid-inside-router-region"
++			data-wp-key="valid-inside-router-region"
+ 			data-wp-interactive="router-regions"
+ 			data-wp-router-region="valid-inside-router-region"
+ 			data-wp-context='{ "counter": { "value": 0 } }'
+@@ -192,6 +198,7 @@
+ 			data-wp-interactive="router-regions"
+ 			data-wp-router-region='$region_data'
+ 			data-testid="$region_id"
++			data-wp-key="$region_id"
+ 			$has_directives
+ 		>
+ 			<div $context_data>
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/router-regions/view.js b/packages/e2e-tests/plugins/interactive-blocks/router-regions/view.js
+index 836bb8366a58bd..80dd0dc263bc8f 100644
+--- a/packages/e2e-tests/plugins/interactive-blocks/router-regions/view.js
++++ b/packages/e2e-tests/plugins/interactive-blocks/router-regions/view.js
+@@ -64,5 +64,8 @@ const { state } = store( 'router-regions', {
+ 		init() {
+ 			state.initCount += 1;
+ 		},
++		nope() {
++			// This function does nothing.
++		},
+ 	},
+ } );
+diff --git a/packages/edit-site/src/components/page-patterns/index.js b/packages/edit-site/src/components/page-patterns/index.js
+index d05835e22c3e32..ae8c8dd05fc4cc 100644
+--- a/packages/edit-site/src/components/page-patterns/index.js
++++ b/packages/edit-site/src/components/page-patterns/index.js
+@@ -11,6 +11,8 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
+ import { privateApis as routerPrivateApis } from '@wordpress/router';
+ import { useView } from '@wordpress/views';
+ import { useSelect } from '@wordpress/data';
++import { addQueryArgs } from '@wordpress/url';
++import { Button } from '@wordpress/components';
+ 
+ /**
+  * Internal dependencies
+@@ -32,9 +34,7 @@ import {
+ 	previewField,
+ 	templatePartAuthorField,
+ } from './fields';
+-import { addQueryArgs } from '@wordpress/url';
+ import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
+-import { Button } from '@wordpress/components';
+ 
+ const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+ const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
+@@ -214,7 +214,10 @@ export default function DataviewsPatterns() {
+ 								{ __( 'Reset view' ) }
+ 							</Button>
+ 						) }
+-						<PatternsActions />
++						<PatternsActions
++							categoryId={ categoryId }
++							postType={ postType }
++						/>
+ 					</>
+ 				}
+ 			>
+diff --git a/packages/editor/src/components/collab-sidebar/comments.js b/packages/editor/src/components/collab-sidebar/comments.js
+index 3984c643ea8e88..e24727fd41bf5a 100644
+--- a/packages/editor/src/components/collab-sidebar/comments.js
++++ b/packages/editor/src/components/collab-sidebar/comments.js
+@@ -69,22 +69,29 @@ export function Comments( {
+ 	const { selectBlock, toggleBlockSpotlight } = unlock(
+ 		useDispatch( blockEditorStore )
+ 	);
+-	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
+-		useSelect( ( select ) => {
+-			const {
+-				getBlockAttributes,
+-				getSelectedBlockClientId,
+-				getClientIdsWithDescendants,
+-			} = select( blockEditorStore );
+-			const clientId = getSelectedBlockClientId();
+-			return {
+-				blockCommentId: clientId
+-					? getBlockAttributes( clientId )?.metadata?.noteId
+-					: null,
+-				selectedBlockClientId: clientId,
+-				orderedBlockIds: getClientIdsWithDescendants(),
+-			};
+-		}, [] );
++
++	const {
++		blockCommentId,
++		selectedBlockClientId,
++		orderedBlockIds,
++		blockMode,
++	} = useSelect( ( select ) => {
++		const {
++			getBlockAttributes,
++			getSelectedBlockClientId,
++			getClientIdsWithDescendants,
++			getBlockMode,
++		} = select( blockEditorStore );
++		const clientId = getSelectedBlockClientId();
++		return {
++			blockCommentId: clientId
++				? getBlockAttributes( clientId )?.metadata?.noteId
++				: null,
++			selectedBlockClientId: clientId,
++			orderedBlockIds: getClientIdsWithDescendants(),
++			blockMode: clientId ? getBlockMode( clientId ) : null,
++		};
++	}, [] );
+ 
+ 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
+ 
+@@ -311,6 +318,7 @@ export function Comments( {
+ 		threads,
+ 		selectedThread,
+ 		setCanvasMinHeight,
++		blockMode,
+ 	] );
+ 
+ 	const handleThreadNavigation = ( event, thread, isSelected ) => {
+diff --git a/packages/editor/src/components/collab-sidebar/hooks.js b/packages/editor/src/components/collab-sidebar/hooks.js
+index 5eae27ad0c68e6..82e18822c826f4 100644
+--- a/packages/editor/src/components/collab-sidebar/hooks.js
++++ b/packages/editor/src/components/collab-sidebar/hooks.js
+@@ -372,6 +372,17 @@ export function useFloatingThread( {
+ 	const blockRef = useRef();
+ 	useBlockElementRef( thread.blockClientId, blockRef );
+ 
++	const blockMode = useSelect(
++		( select ) => {
++			return thread.blockClientId
++				? select( blockEditorStore ).getBlockMode(
++						thread.blockClientId
++				  )
++				: null;
++		},
++		[ thread.blockClientId ]
++	);
++
+ 	const updateHeight = useCallback(
+ 		( id, newHeight ) => {
+ 			setHeights( ( prev ) => {
+@@ -400,7 +411,7 @@ export function useFloatingThread( {
+ 		if ( blockRef.current ) {
+ 			refs.setReference( blockRef.current );
+ 		}
+-	}, [ blockRef, refs, commentLastUpdated ] );
++	}, [ blockRef, refs, commentLastUpdated, blockMode ] );
+ 
+ 	// Track thread heights.
+ 	useEffect( () => {
+diff --git a/packages/editor/src/store/test/selectors.js b/packages/editor/src/store/test/selectors.js
+index a24afe636d6090..b6b7fe1ac58e8a 100644
+--- a/packages/editor/src/store/test/selectors.js
++++ b/packages/editor/src/store/test/selectors.js
+@@ -206,6 +206,7 @@ describe( 'selectors', () => {
+ 
+ 	beforeEach( () => {
+ 		registerBlockType( 'core/block', {
++			apiVersion: 3,
+ 			save: () => null,
+ 			category: 'reusable',
+ 			title: 'Reusable Block Stub',
+@@ -215,6 +216,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/test-block-a', {
++			apiVersion: 3,
+ 			save: ( props ) => props.attributes.text,
+ 			category: 'design',
+ 			title: 'Test Block A',
+@@ -223,6 +225,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/test-block-b', {
++			apiVersion: 3,
+ 			save: ( props ) => props.attributes.text,
+ 			category: 'text',
+ 			title: 'Test Block B',
+@@ -234,6 +237,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/test-block-c', {
++			apiVersion: 3,
+ 			save: ( props ) => props.attributes.text,
+ 			category: 'text',
+ 			title: 'Test Block C',
+@@ -243,6 +247,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/freeform', {
++			apiVersion: 3,
+ 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
+ 			category: 'text',
+ 			title: 'Test Freeform Content Handler',
+@@ -258,6 +263,7 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/test-default', {
++			apiVersion: 3,
+ 			category: 'text',
+ 			title: 'default',
+ 			attributes: {
+@@ -2332,6 +2338,7 @@ describe( 'selectors', () => {
+ 			originalDefaultBlockName = getDefaultBlockName();
+ 
+ 			registerBlockType( 'core/default', {
++				apiVersion: 3,
+ 				category: 'text',
+ 				title: 'default',
+ 				attributes: {
+diff --git a/packages/fields/src/actions/reorder-page.tsx b/packages/fields/src/actions/reorder-page.tsx
+index cce7b24ef38935..edb67f2e5f9b82 100644
+--- a/packages/fields/src/actions/reorder-page.tsx
++++ b/packages/fields/src/actions/reorder-page.tsx
+@@ -35,8 +35,7 @@ interface Action< Item > {
+ function isItemValid( item: BasePost ): boolean {
+ 	return (
+ 		typeof item.menu_order === 'number' &&
+-		Number.isInteger( item.menu_order ) &&
+-		item.menu_order > 0
++		Number.isInteger( item.menu_order )
+ 	);
+ }
+ 
+diff --git a/packages/interactivity-router/CHANGELOG.md b/packages/interactivity-router/CHANGELOG.md
+index 3c5103b730e3d4..44400d4ef78d16 100644
+--- a/packages/interactivity-router/CHANGELOG.md
++++ b/packages/interactivity-router/CHANGELOG.md
+@@ -2,6 +2,11 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   Prevent router regions with data-wp-key from being recreated on navigation. ([#74750](https://github.com/WordPress/gutenberg/pull/74750))
++-   Fix initial router regions with `attachTo` being duplicated after `navigate()`. ([#74857](https://github.com/WordPress/gutenberg/pull/74857))
++
+ ## 2.33.0 (2025-10-17)
+ 
+ ## 2.32.0 (2025-10-01)
+diff --git a/packages/interactivity-router/src/index.ts b/packages/interactivity-router/src/index.ts
+index 424027c5fd7a56..19e589f83d2fe7 100644
+--- a/packages/interactivity-router/src/index.ts
++++ b/packages/interactivity-router/src/index.ts
+@@ -23,7 +23,7 @@ const {
+ 	populateServerData,
+ 	batch,
+ 	routerRegions,
+-	cloneElement,
++	h: createElement,
+ 	navigationSignal,
+ } = privateApis(
+ 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+@@ -117,7 +117,7 @@ const cloneRouterRegionContent = ( vdom: any ) => {
+ 			: allPriorityLevels;
+ 
+ 	return priorityLevels.length > 0
+-		? cloneElement( vdom, {
++		? createElement( vdom.type, {
+ 				...vdom.props,
+ 				priorityLevels,
+ 		  } )
+@@ -137,6 +137,15 @@ const regionsToAttachByParent = new WeakMap< Element, string[] >();
+  */
+ const rootFragmentsByParent = new WeakMap< Element, any >();
+ 
++/**
++ * Set of router regions using the `attachTo` property that are present in the
++ * initial page.
++ *
++ * These regions should be treated as regular regions without the `attachTo`
++ * attribute as they don't need to be appended; they are already in the HTML.
++ */
++const initialRegionsToAttach = new Set< string >();
++
+ /**
+  * Fetches and prepares a page from a given URL.
+  *
+@@ -201,7 +210,7 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
+ 				: toVdom( region );
+ 		}
+ 
+-		if ( attachTo ) {
++		if ( attachTo && ! initialRegionsToAttach.has( id ) ) {
+ 			regionsToAttach[ id ] = attachTo;
+ 		}
+ 	} );
+@@ -336,6 +345,16 @@ window.addEventListener( 'popstate', async () => {
+ 	}
+ } );
+ 
++// Detect router regions with `attachTo` in the initial page. This step should
++// be done before the initial page is processed with `preparePage()` so this
++// function treats them as regular router regions.
++document.querySelectorAll( regionsSelector ).forEach( ( region ) => {
++	const { id, attachTo } = parseRegionAttribute( region );
++	if ( attachTo ) {
++		initialRegionsToAttach.add( id );
++	}
++} );
++
+ // Initialize the router and cache the initial page using the initial vDOM.
+ window.document
+ 	.querySelectorAll< HTMLScriptElement >( 'script[type=module][src]' )
+diff --git a/packages/interactivity/CHANGELOG.md b/packages/interactivity/CHANGELOG.md
+index dc419bece7bd69..d02d931f7d2044 100644
+--- a/packages/interactivity/CHANGELOG.md
++++ b/packages/interactivity/CHANGELOG.md
+@@ -7,6 +7,8 @@
+ -   Return a deep-clone object from `getServerState` and `getServerContext` functions. ([#73437](https://github.com/WordPress/gutenberg/pull/73437))
+ -   Fix using `getServerContext` in derived state getters. ([#73518](https://github.com/WordPress/gutenberg/pull/73518))
+ -   Fix derived state closures processing on client-side navigation. ([#72725](https://github.com/WordPress/gutenberg/pull/72725))
++-   Fix and refactor runtime initialization logic. ([#71123](https://github.com/WordPress/gutenberg/pull/71123))
++-   Update deprecation warning for unique ID format. ([#74580](https://github.com/WordPress/gutenberg/pull/74580))
+ 
+ ## 6.33.0 (2025-10-17)
+ 
+@@ -34,7 +36,7 @@
+ 
+ ### Deprecations
+ 
+--   Deprecated the `"data-wp-ignore"` directive of the Interactivity API.([#70945](https://github.com/WordPress/gutenberg/pull/70945))  
++-   Deprecated the `"data-wp-ignore"` directive of the Interactivity API.([#70945](https://github.com/WordPress/gutenberg/pull/70945))
+     It is deprecated as of WordPress 6.9 and will be removed in version 7.0.
+ 
+ ### Bug Fixes
+diff --git a/packages/interactivity/src/directives.tsx b/packages/interactivity/src/directives.tsx
+index 88847be49419b5..2fef7a4dc9c9b4 100644
+--- a/packages/interactivity/src/directives.tsx
++++ b/packages/interactivity/src/directives.tsx
+@@ -46,7 +46,7 @@ const warnUniqueIdWithTwoHyphens = (
+ 		warn(
+ 			`The usage of data-wp-${ prefix }--${ suffix }${
+ 				uniqueId ? `--${ uniqueId }` : ''
+-			} (two hyphens for unique ID) is deprecated and will stop working in WordPress 7.0. Please use data-wp-${ prefix }${
++			} (two hyphens for unique ID) is deprecated and will stop working in WordPress 7.1. Please use data-wp-${ prefix }${
+ 				uniqueId ? `--${ suffix }---${ uniqueId }` : `---${ suffix }`
+ 			} (three hyphens for unique ID) from now on.`
+ 		);
+diff --git a/packages/interactivity/src/init.ts b/packages/interactivity/src/hydration.ts
+similarity index 66%
+rename from packages/interactivity/src/init.ts
+rename to packages/interactivity/src/hydration.ts
+index 91e2ac63808e2b..c0ee553d1e105b 100644
+--- a/packages/interactivity/src/init.ts
++++ b/packages/interactivity/src/hydration.ts
+@@ -30,20 +30,9 @@ export const getRegionRootFragment = (
+ export const initialVdom = new WeakMap< Element, ComponentChild >();
+ 
+ // Initialize the router with the initial DOM.
+-export const init = async () => {
++export const hydrateRegions = async () => {
+ 	const nodes = document.querySelectorAll( `[data-wp-interactive]` );
+ 
+-	/*
+-	 * This `await` with setTimeout is required to apparently ensure that the interactive blocks have their stores
+-	 * fully initialized prior to hydrating the blocks. If this is not present, then an error occurs, for example:
+-	 * > view.js:46 Uncaught (in promise) ReferenceError: Cannot access 'state' before initialization
+-	 * This occurs when splitTask() is implemented with scheduler.yield() as opposed to setTimeout(), as with the former
+-	 * split tasks are added to the front of the task queue whereas with the latter they are added to the end of the queue.
+-	 */
+-	await new Promise( ( resolve ) => {
+-		setTimeout( resolve, 0 );
+-	} );
+-
+ 	for ( const node of nodes ) {
+ 		if ( ! hydratedIslands.has( node ) ) {
+ 			await splitTask();
+diff --git a/packages/interactivity/src/index.ts b/packages/interactivity/src/index.ts
+index bc42af1fdcdde3..d32b455d889323 100644
+--- a/packages/interactivity/src/index.ts
++++ b/packages/interactivity/src/index.ts
+@@ -8,13 +8,17 @@ import { batch } from '@preact/signals';
+  * Internal dependencies
+  */
+ import registerDirectives, { routerRegions } from './directives';
+-import { init, getRegionRootFragment, initialVdom } from './init';
++import {
++	initialVdom,
++	hydrateRegions,
++	getRegionRootFragment,
++} from './hydration';
+ import { toVdom } from './vdom';
+ import { directive } from './hooks';
+ import { getNamespace } from './namespaces';
+ import { parseServerData, populateServerData } from './store';
+ import { proxifyState } from './proxies';
+-import { deepReadOnly, navigationSignal } from './utils';
++import { deepReadOnly, navigationSignal, onDOMReady } from './utils';
+ 
+ export {
+ 	store,
+@@ -67,5 +71,15 @@ export const privateApis = (
+ 	throw new Error( 'Forbidden access.' );
+ };
+ 
++// Parses and populates the initial state and config. All the core directives
++// are registered at this point as well.
++populateServerData( parseServerData() );
+ registerDirectives();
+-init();
++
++// Hydrates all interactive regions when `DOMContentLoaded` is dispatched, or as
++// soon as the `@wordpress/interactivity` module is evaluated in the case that
++// the event was already dispatched. This ensures synchronous modules had the
++// opportunity to register their stores before hydration takes place. For
++// asynchronous modules, or modules importing this module asynchronously, this
++// cannot be guaranteed.
++onDOMReady( hydrateRegions );
+diff --git a/packages/interactivity/src/store.ts b/packages/interactivity/src/store.ts
+index f5a3885ae0babd..2ad2f66e708591 100644
+--- a/packages/interactivity/src/store.ts
++++ b/packages/interactivity/src/store.ts
+@@ -329,7 +329,3 @@ export const populateServerData = ( data?: {
+ 		);
+ 	}
+ };
+-
+-// Parse and populate the initial state and config.
+-const data = parseServerData();
+-populateServerData( data );
+diff --git a/packages/interactivity/src/utils.ts b/packages/interactivity/src/utils.ts
+index c522fdccbbe877..9c5095ffe6b29f 100644
+--- a/packages/interactivity/src/utils.ts
++++ b/packages/interactivity/src/utils.ts
+@@ -68,6 +68,27 @@ export const splitTask =
+ 					setTimeout( resolve, 0 );
+ 				} );
+ 		  };
++/**
++ * Executes the passed callback on `DOMContentLoaded`, or immediately if that
++ * event has already been triggered.
++ *
++ * This function depends on `PerformanceNavigationTiming` (see
++ * https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigationTiming) to
++ * detect whether the event has been dispatched.
++ *
++ * @param callback Function to execute on `DOMContentLoaded`.
++ */
++export const onDOMReady = ( callback: () => void ) => {
++	const [ navigation ] = performance.getEntriesByType( 'navigation' );
++	if (
++		( navigation as PerformanceNavigationTiming )
++			.domContentLoadedEventStart > 0
++	) {
++		callback();
++	} else {
++		document.addEventListener( 'DOMContentLoaded', callback );
++	}
++};
+ 
+ /**
+  * Creates a Flusher object that can be used to flush computed values and notify listeners.
+diff --git a/packages/reusable-blocks/src/store/test/actions.js b/packages/reusable-blocks/src/store/test/actions.js
+index debd6568683891..79c22a30663eef 100644
+--- a/packages/reusable-blocks/src/store/test/actions.js
++++ b/packages/reusable-blocks/src/store/test/actions.js
+@@ -50,6 +50,7 @@ function createRegistryWithStores() {
+ describe( 'Actions', () => {
+ 	beforeAll( () => {
+ 		registerBlockType( 'core/test-block', {
++			apiVersion: 3,
+ 			title: 'Test block',
+ 			category: 'text',
+ 			save: () => null,
+@@ -59,6 +60,7 @@ describe( 'Actions', () => {
+ 		} );
+ 
+ 		registerBlockType( 'core/block', {
++			apiVersion: 3,
+ 			title: 'Reusable block',
+ 			category: 'text',
+ 			save: () => null,
+diff --git a/schemas/json/block.json b/schemas/json/block.json
+index fc810bbc5eec14..7375d7dc727eb6 100644
+--- a/schemas/json/block.json
++++ b/schemas/json/block.json
+@@ -16,7 +16,7 @@
+ 			"type": "string"
+ 		},
+ 		"apiVersion": {
+-			"description": "The version of the Block API used by the block. If the block is registered with API version 2 or lower, the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, it is recommended to set the `apiVersion` field to 3 and test the block inside the iframe editor.\n\nSee the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/ for more details.",
++			"description": "The version of the Block API used by the block. If the block is registered with API version 2 or lower, the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, it is recommended to set the `apiVersion` field to 3 and test the block inside the iframe editor.\n\nSee the API versions documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility/ for more details.",
+ 			"type": "integer",
+ 			"const": 3
+ 		},
+@@ -372,6 +372,11 @@
+ 					"type": "boolean",
+ 					"default": true
+ 				},
++				"visibility": {
++					"description": "By default, a block can be hidden by a user from the block 'Options' dropdown. To disable this behavior, set visibility to false.",
++					"type": "boolean",
++					"default": true
++				},
+ 				"layout": {
+ 					"description": "This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.",
+ 					"oneOf": [
+diff --git a/test/e2e/specs/editor/various/font-appearance-control.spec.js b/test/e2e/specs/editor/various/font-appearance-control.spec.js
+index 4b148b6dd8587c..050f06020f178e 100644
+--- a/test/e2e/specs/editor/various/font-appearance-control.spec.js
++++ b/test/e2e/specs/editor/various/font-appearance-control.spec.js
+@@ -80,9 +80,6 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
+ 		await page
+ 			.getByRole( 'button', { name: 'Typography options' } )
+ 			.click();
+-		await page
+-			.getByRole( 'menuitemcheckbox', { name: 'Show Appearance' } )
+-			.click();
+ 		await expect(
+ 			page.getByRole( 'combobox', { name: 'Appearance' } )
+ 		).toHaveText( 'Default' );
+diff --git a/test/e2e/specs/interactivity/fixtures/interactivity-utils.ts b/test/e2e/specs/interactivity/fixtures/interactivity-utils.ts
+index 74436673f10b79..97245fee045626 100644
+--- a/test/e2e/specs/interactivity/fixtures/interactivity-utils.ts
++++ b/test/e2e/specs/interactivity/fixtures/interactivity-utils.ts
+@@ -41,12 +41,10 @@ export default class InteractivityUtils {
+ 		this.requestUtils = requestUtils;
+ 	}
+ 
+-	getLink( blockName: string ) {
+-		const link = this.links.get( blockName );
++	getLink( alias: string ) {
++		const link = this.links.get( alias );
+ 		if ( ! link ) {
+-			throw new Error(
+-				`No link found for post with block '${ blockName }'`
+-			);
++			throw new Error( `No link found for post with alias '${ alias }'` );
+ 		}
+ 
+ 		/*
+diff --git a/test/e2e/specs/interactivity/hydration-timing.spec.ts b/test/e2e/specs/interactivity/hydration-timing.spec.ts
+new file mode 100644
+index 00000000000000..867ab0146e1f69
+--- /dev/null
++++ b/test/e2e/specs/interactivity/hydration-timing.spec.ts
+@@ -0,0 +1,100 @@
++/**
++ * Internal dependencies
++ */
++import { test, expect } from './fixtures';
++
++test.describe( 'hydration timing', () => {
++	test.beforeAll( async ( { interactivityUtils: utils } ) => {
++		await utils.activatePlugins();
++		// Create a post with both blocks using a core/group wrapper.
++		// The "fast" block's module loads immediately, while the "slow"
++		// block's module will be delayed in the test to simulate slow
++		// network conditions.
++		await utils.addPostWithBlock( 'core/group', {
++			alias: 'hydration-timing',
++			innerBlocks: [
++				[ 'test/hydration-timing' ],
++				[ 'test/hydration-timing-slow' ],
++			],
++		} );
++
++		// Create a separate post with only the async block.
++		// This block dynamically imports @wordpress/interactivity on
++		// DOMContentLoaded, so there are no static imports of the library.
++		await utils.addPostWithBlock( 'test/hydration-timing-async', {
++			alias: 'hydration-timing-async',
++		} );
++	} );
++
++	test.afterAll( async ( { interactivityUtils: utils } ) => {
++		await utils.deactivatePlugins();
++		await utils.deleteAllPosts();
++	} );
++
++	test( 'should wait for all static imports before hydrating even with delayed module loading', async ( {
++		interactivityUtils: utils,
++		page,
++	} ) => {
++		// Delay only the "slow" module to simulate slow network conditions.
++		// The "fast" module loads immediately and imports @wordpress/interactivity,
++		// which could trigger hydration before the slow module finishes loading.
++		await page.route(
++			/hydration-timing-slow\/view\.js/,
++			async ( route ) => {
++				// Add a noticeable delay to simulate slow module loading.
++				await new Promise( ( resolve ) => setTimeout( resolve, 3000 ) );
++				await route.continue();
++			}
++		);
++
++		await page.goto( utils.getLink( 'hydration-timing' ) );
++
++		// Wait for the hydration status elements to be present.
++		const fastHydrationStatus = page.getByTestId( 'hydration-status' );
++		await expect( fastHydrationStatus ).toBeVisible();
++
++		const slowHydrationStatus = page.getByTestId( 'slow-hydration-status' );
++		await expect( slowHydrationStatus ).toBeVisible();
++
++		// Ensure both modules have loaded.
++		const moduleLoaded = page.getByTestId( 'module-loaded' );
++		const slowModuleLoaded = page.getByTestId( 'slow-module-loaded' );
++		await expect( moduleLoaded ).toHaveText( 'yes' );
++		await expect( slowModuleLoaded ).toHaveText( 'yes' );
++
++		// Both init callbacks should have run during hydration.
++		const contextInitialized = page.getByTestId( 'context-initialized' );
++		const slowContextInitialized = page.getByTestId(
++			'slow-context-initialized'
++		);
++		await expect( contextInitialized ).toHaveText( 'true' );
++		await expect( slowContextInitialized ).toHaveText( 'true' );
++	} );
++
++	test( 'should hydrate when the Interactivity API is loaded asynchronously after DOMContentLoaded', async ( {
++		interactivityUtils: utils,
++		page,
++	} ) => {
++		// This test uses a block that dynamically imports @wordpress/interactivity
++		// on DOMContentLoaded. Since there are no static imports of the library
++		// on this page, the library will be loaded after DOMContentLoaded fires.
++		// This verifies that hydration is not skipped when the library is loaded
++		// after that event.
++		await page.goto( utils.getLink( 'hydration-timing-async' ) );
++
++		// Wait for the async hydration status element to be present.
++		const asyncHydrationStatus = page.getByTestId(
++			'async-hydration-status'
++		);
++		await expect( asyncHydrationStatus ).toBeVisible();
++
++		// The async module should have loaded after DOMContentLoaded.
++		const asyncModuleLoaded = page.getByTestId( 'async-module-loaded' );
++		await expect( asyncModuleLoaded ).toHaveText( 'yes' );
++
++		// Hydration should have occurred even though the library was loaded
++		// after DOMContentLoaded.
++		const asyncHydrated = page.getByTestId( 'async-hydrated' );
++		await expect( asyncHydrated ).toHaveText( 'true' );
++	} );
++} );
+diff --git a/test/e2e/specs/interactivity/router-regions.spec.ts b/test/e2e/specs/interactivity/router-regions.spec.ts
+index 130547518b72b1..9b3a000c818a1e 100644
+--- a/test/e2e/specs/interactivity/router-regions.spec.ts
++++ b/test/e2e/specs/interactivity/router-regions.spec.ts
+@@ -15,7 +15,7 @@ test.describe( 'Router regions', () => {
+ 			alias: 'router regions - page 2',
+ 			attributes: { page: 2 },
+ 		} );
+-		await utils.addPostWithBlock( 'test/router-regions', {
++		const page1 = await utils.addPostWithBlock( 'test/router-regions', {
+ 			alias: 'router regions - page 1',
+ 			attributes: { page: 1, next },
+ 		} );
+@@ -53,9 +53,10 @@ test.describe( 'Router regions', () => {
+ 		const pageAttachTo2 = await utils.addPostWithBlock(
+ 			'test/router-regions',
+ 			{
+-				alias: 'router regions - page 2',
++				alias: 'router regions - page 2 - attachTo',
+ 				attributes: {
+ 					page: 'attachTo2',
++					next: page1,
+ 					regionsWithAttachTo: [
+ 						region3,
+ 						region4,
+@@ -71,7 +72,7 @@ test.describe( 'Router regions', () => {
+ 		const pageAttachTo1 = await utils.addPostWithBlock(
+ 			'test/router-regions',
+ 			{
+-				alias: 'router regions - page 2',
++				alias: 'router regions - page 1 - attachTo',
+ 				attributes: {
+ 					page: 'attachTo1',
+ 					next: pageAttachTo2,
+@@ -80,7 +81,7 @@ test.describe( 'Router regions', () => {
+ 			}
+ 		);
+ 		await utils.addPostWithBlock( 'test/router-regions', {
+-			alias: 'router regions - page 1 - attachTo',
++			alias: 'router regions - main - attachTo',
+ 			attributes: { page: 1, next: pageAttachTo1 },
+ 		} );
+ 	} );
+@@ -124,6 +125,7 @@ test.describe( 'Router regions', () => {
+ 
+ 	test( 'should preserve state across pages', async ( { page } ) => {
+ 		const counter = page.getByTestId( 'state-counter' );
++
+ 		await expect( counter ).toHaveText( '0' );
+ 
+ 		await counter.click( { clickCount: 3, delay: 50 } );
+@@ -253,9 +255,7 @@ test.describe( 'Router regions', () => {
+ 		page,
+ 		interactivityUtils: utils,
+ 	} ) => {
+-		await page.goto(
+-			utils.getLink( 'router regions - page 1 - attachTo' )
+-		);
++		await page.goto( utils.getLink( 'router regions - main - attachTo' ) );
+ 
+ 		const bodyLocator = page.locator( 'body' );
+ 		const regionsLocator = page.locator( '#regions-with-attach-to' );
+@@ -390,9 +390,7 @@ test.describe( 'Router regions', () => {
+ 		page,
+ 		interactivityUtils: utils,
+ 	} ) => {
+-		await page.goto(
+-			utils.getLink( 'router regions - page 1 - attachTo' )
+-		);
++		await page.goto( utils.getLink( 'router regions - main - attachTo' ) );
+ 
+ 		const region7 = page.locator( 'body' ).getByTestId( 'region7' );
+ 		const region8 = page
+@@ -477,4 +475,238 @@ test.describe( 'Router regions', () => {
+ 		await expect( region7 ).toBeVisible();
+ 		await expect( region8 ).toBeVisible();
+ 	} );
++
++	test( 'should be preserved on first navigation without `data-wp-key`', async ( {
++		page,
++	} ) => {
++		const region1 = page.getByTestId( 'region-1' );
++		const region1Text = page.getByTestId( 'region-1-text' );
++		await expect( region1Text ).toHaveText( 'hydrated' );
++
++		// Adds a tag to know whether the counter element was replaced.
++		await region1.evaluate( ( ref ) => {
++			if ( ref instanceof HTMLElement ) {
++				ref.dataset.tag = 'region-1';
++			}
++		} );
++
++		// Navigate to the next page.
++		await page.getByTestId( 'next' ).click();
++		await expect( page ).toHaveTitle(
++			'router regions – page 2 – gutenberg'
++		);
++
++		// The region element should retain the same attributes when it doesn't change.
++		await expect( region1 ).toHaveAttribute( 'data-tag', 'region-1' );
++	} );
++
++	test( 'should be preserved on first navigation with `data-wp-key` and other directives ', async ( {
++		page,
++	} ) => {
++		const region2 = page.getByTestId( 'region-2' );
++		const validInsideInteractive = page.getByTestId(
++			'valid-inside-interactive'
++		);
++		const validInsideRouterRegion = page.getByTestId(
++			'valid-inside-router-region'
++		);
++
++		// Add tags to know whether the region elements were replaced.
++		await region2.evaluate( ( el ) => {
++			el.dataset.tag = 'region-2';
++		} );
++		await validInsideInteractive.evaluate( ( el ) => {
++			el.dataset.tag = 'valid-inside-interactive';
++		} );
++		await validInsideRouterRegion.evaluate( ( el ) => {
++			el.dataset.tag = 'valid-inside-router-region';
++		} );
++
++		// Navigate to the next page.
++		await page.getByTestId( 'next' ).click();
++		await expect( page ).toHaveTitle(
++			'router regions – page 2 – gutenberg'
++		);
++
++		// Regions with `data-wp-key` and other directives should not be recreated.
++		await expect( region2 ).toHaveAttribute( 'data-tag', 'region-2' );
++		await expect( validInsideInteractive ).toHaveAttribute(
++			'data-tag',
++			'valid-inside-interactive'
++		);
++		await expect( validInsideRouterRegion ).toHaveAttribute(
++			'data-tag',
++			'valid-inside-router-region'
++		);
++	} );
++
++	test( 'should be preserved on first navigation with `data-wp-key` and `attachTo`', async ( {
++		page,
++		interactivityUtils: utils,
++	} ) => {
++		await page.goto(
++			utils.getLink( 'router regions - page 1 - attachTo' )
++		);
++
++		const bodyLocator = page.locator( 'body' );
++		const regionsLocator = page.locator( '#regions-with-attach-to' );
++
++		const region3 = bodyLocator.getByTestId( 'region3' );
++		const region4 = regionsLocator.getByTestId( 'region4' );
++		const region5 = bodyLocator.getByTestId( 'region5' );
++		const region6 = regionsLocator.getByTestId( 'region6' );
++
++		const regions: Record< string, Locator > = {
++			region3,
++			region4,
++			region5,
++			region6,
++		};
++
++		// The text of this element is used to check a navigation is completed.
++		const region1Ssr = page.getByTestId( 'region-1-ssr' );
++
++		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
++
++		// Navigate to "Page attachTo 1".
++		await page.getByTestId( 'next' ).click();
++		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
++
++		// Add tags to know whether the region elements were replaced.
++		for ( const regionId in regions ) {
++			const region = regions[ regionId ];
++			await region.evaluate( ( el, id ) => {
++				el.dataset.tag = id;
++			}, regionId );
++		}
++
++		// Navigate to "Page attachTo 2".
++		await page.getByTestId( 'next' ).click();
++		await expect( region1Ssr ).toHaveText( 'content from page attachTo2' );
++
++		// Regions with `data-wp-key` and other directives should not be recreated.
++		for ( const regionId in regions ) {
++			const region = regions[ regionId ];
++			await expect( region ).toHaveAttribute( 'data-tag', regionId );
++		}
++	} );
++
++	test( 'should not be duplicated after `navigate()` when they use `attachTo` and appeared in the initial page', async ( {
++		page,
++		interactivityUtils: utils,
++	} ) => {
++		const bodyLocator = page.locator( 'body' );
++		const regionsLocator = page.locator( '#regions-with-attach-to' );
++
++		const regionsPage1: Record< string, Locator > = {
++			region3: bodyLocator.getByTestId( 'region3' ),
++			region4: regionsLocator.getByTestId( 'region4' ),
++			region5: bodyLocator.getByTestId( 'region5' ),
++			region6: regionsLocator.getByTestId( 'region6' ),
++		};
++
++		const regionsPage2: Record< string, Locator > = {
++			region7: bodyLocator.getByTestId( 'region7' ),
++			region8: regionsLocator.getByTestId( 'region8' ),
++		};
++
++		const allRegions: Record< string, Locator > = {
++			...regionsPage1,
++			...regionsPage2,
++		};
++
++		// The text of this element is used to check a navigation is completed.
++		const region1Ssr = page.getByTestId( 'region-1-ssr' );
++
++		// 1. Visit page 1 - attachTo using "goto".
++		await page.goto(
++			utils.getLink( 'router regions - page 1 - attachTo' )
++		);
++		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
++
++		// 2. Ensure regions 3 to 6 are unique and interactive.
++		for ( const regionId in regionsPage1 ) {
++			const region = regionsPage1[ regionId ];
++			await expect( region ).toBeVisible();
++			await expect( region ).toHaveCount( 1 );
++
++			const text = region.getByTestId( 'text' );
++			const clientCounter = region.getByTestId( 'client-counter' );
++
++			await expect( text ).toHaveText( regionId );
++			await expect( clientCounter ).toHaveText( '0' );
++
++			await clientCounter.click( { clickCount: 3, delay: 50 } );
++			await expect( clientCounter ).toHaveText( '3' );
++		}
++
++		// 3. Navigate to page 2 - attachTo.
++		await page.getByTestId( 'next' ).click();
++		await expect( region1Ssr ).toHaveText( 'content from page attachTo2' );
++
++		// 4. Ensure regions 3 to 6 are unique and still interactive.
++		for ( const regionId in regionsPage1 ) {
++			const region = regionsPage1[ regionId ];
++			await expect( region ).toBeVisible();
++			await expect( region ).toHaveCount( 1 );
++
++			const text = region.getByTestId( 'text' );
++			const clientCounter = region.getByTestId( 'client-counter' );
++
++			await expect( text ).toHaveText( regionId );
++			// Counter state is preserved from step 2.
++			await expect( clientCounter ).toHaveText( '3' );
++
++			await clientCounter.click( { clickCount: 3, delay: 50 } );
++			await expect( clientCounter ).toHaveText( '6' );
++		}
++
++		// 5. Ensure regions 7 and 8 are visible, unique, and interactive.
++		for ( const regionId in regionsPage2 ) {
++			const region = regionsPage2[ regionId ];
++			await expect( region ).toBeVisible();
++			await expect( region ).toHaveCount( 1 );
++
++			const text = region.getByTestId( 'text' );
++			const clientCounter = region.getByTestId( 'client-counter' );
++
++			await expect( text ).toHaveText( regionId );
++			// Counter for page 2 regions starts at 10.
++			await expect( clientCounter ).toHaveText( '10' );
++
++			await clientCounter.click( { clickCount: 3, delay: 50 } );
++			await expect( clientCounter ).toHaveText( '13' );
++		}
++
++		// 6. Navigate to page 1 (no regions with `attachTo`).
++		await page.getByTestId( 'next' ).click();
++		await expect( region1Ssr ).toHaveText( 'content from page 1' );
++
++		// 7. Ensure all regions have been unmounted after navigation.
++		for ( const regionId in allRegions ) {
++			const region = allRegions[ regionId ];
++			await expect( region ).toBeHidden();
++		}
++
++		// 8. Navigate back to page 2 - attachTo.
++		await page.goBack();
++		await expect( region1Ssr ).toHaveText( 'content from page attachTo2' );
++
++		// 9. Ensure all regions are there again, are interactive, and there are no duplications.
++		for ( const regionId in allRegions ) {
++			const region = allRegions[ regionId ];
++			await expect( region ).toBeVisible();
++			await expect( region ).toHaveCount( 1 );
++
++			const text = region.getByTestId( 'text' );
++			const clientCounter = region.getByTestId( 'client-counter' );
++
++			await expect( text ).toHaveText( regionId );
++			// After a full page reload, all counters start at 10 (server value).
++			await expect( clientCounter ).toHaveText( '10' );
++
++			await clientCounter.click( { clickCount: 3, delay: 50 } );
++			await expect( clientCounter ).toHaveText( '13' );
++		}
++	} );
+ } );
+diff --git a/test/e2e/specs/site-editor/pages.spec.js b/test/e2e/specs/site-editor/pages.spec.js
+index 7f70bc6da58973..53bd0c14fb4c8a 100644
+--- a/test/e2e/specs/site-editor/pages.spec.js
++++ b/test/e2e/specs/site-editor/pages.spec.js
+@@ -321,4 +321,76 @@ test.describe( 'Pages', () => {
+ 				.getByText( 'Change template' )
+ 		).toBeDisabled();
+ 	} );
++
++	// Regression test for https://github.com/WordPress/gutenberg/issues/73820
++	test( 'should allow setting page order to zero and negative values', async ( {
++		admin,
++		page,
++		requestUtils,
++	} ) => {
++		// Create a published page for testing
++		await requestUtils.createPage( {
++			title: 'Order Test Page',
++			status: 'publish',
++		} );
++
++		await admin.visitSiteEditor();
++		await page.getByRole( 'button', { name: 'Pages' } ).click();
++
++		// Switch to table layout to access actions
++		await page.getByRole( 'button', { name: 'Layout' } ).click();
++		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
++
++		// Open actions menu for the test page
++		let row = page.getByRole( 'row', { name: /Order Test Page/ } );
++		await row.getByRole( 'button', { name: 'Actions' } ).click();
++
++		// Click on Order action
++		await page.getByRole( 'menuitem', { name: 'Order' } ).click();
++
++		// Get the order input and save button
++		let orderInput = page.getByRole( 'spinbutton', { name: 'Order' } );
++		const saveButton = page.getByRole( 'button', { name: 'Save' } );
++
++		// Test that 0 is valid
++		await orderInput.fill( '0' );
++		await expect( saveButton ).toBeEnabled();
++
++		// Test that negative values are valid
++		await orderInput.fill( '-1' );
++		await expect( saveButton ).toBeEnabled();
++
++		await orderInput.fill( '-100' );
++		await expect( saveButton ).toBeEnabled();
++
++		// Test that positive values are still valid
++		await orderInput.fill( '5' );
++		await expect( saveButton ).toBeEnabled();
++
++		// Save with a negative value to verify it persists
++		await orderInput.fill( '-5' );
++		await saveButton.click();
++
++		// Verify success notice
++		await expect(
++			page.locator(
++				'role=button[name="Dismiss this notice"i] >> text="Order updated."'
++			)
++		).toBeVisible();
++
++		// Reload the page to verify the value persisted
++		await admin.visitSiteEditor();
++		await page.getByRole( 'button', { name: 'Pages' } ).click();
++		await page.getByRole( 'button', { name: 'Layout' } ).click();
++		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
++
++		// Open Order action again for the same page
++		row = page.getByRole( 'row', { name: /Order Test Page/ } );
++		await row.getByRole( 'button', { name: 'Actions' } ).click();
++		await page.getByRole( 'menuitem', { name: 'Order' } ).click();
++
++		// Verify the negative value was persisted
++		orderInput = page.getByRole( 'spinbutton', { name: 'Order' } );
++		await expect( orderInput ).toHaveValue( '-5' );
++	} );
+ } );
+diff --git a/test/integration/blocks-raw-handling.test.js b/test/integration/blocks-raw-handling.test.js
+index 70af14f3290460..ca9a8a9c7cf4e6 100644
+--- a/test/integration/blocks-raw-handling.test.js
++++ b/test/integration/blocks-raw-handling.test.js
+@@ -29,6 +29,7 @@ describe( 'Blocks raw handling', () => {
+ 		require( '../../packages/editor/src/hooks' );
+ 		registerCoreBlocks();
+ 		registerBlockType( 'test/gallery', {
++			apiVersion: 3,
+ 			title: 'Test Gallery',
+ 			category: 'text',
+ 			attributes: {
+@@ -62,6 +63,7 @@ describe( 'Blocks raw handling', () => {
+ 		} );
+ 
+ 		registerBlockType( 'test/non-inline-block', {
++			apiVersion: 3,
+ 			title: 'Test Non Inline Block',
+ 			category: 'text',
+ 			supports: {
+@@ -88,6 +90,7 @@ describe( 'Blocks raw handling', () => {
+ 		} );
+ 
+ 		registerBlockType( 'test/transform-to-multiple-blocks', {
++			apiVersion: 3,
+ 			title: 'Test Transform to Multiple Blocks',
+ 			category: 'text',
+ 			transforms: {
+diff --git a/test/integration/fixtures/blocks/core__accordion-heading.html b/test/integration/fixtures/blocks/core__accordion-heading.html
+index da2dc43197fde5..bc65f31a201251 100644
+--- a/test/integration/fixtures/blocks/core__accordion-heading.html
++++ b/test/integration/fixtures/blocks/core__accordion-heading.html
+@@ -1,5 +1,5 @@
+ <!-- wp:accordion-heading -->
+ <h3 class="wp-block-accordion-heading">
+-	<button class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button>
++	<button type="button" class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button>
+ </h3>
+ <!-- /wp:accordion-heading -->
+diff --git a/test/integration/fixtures/blocks/core__accordion-heading.parsed.json b/test/integration/fixtures/blocks/core__accordion-heading.parsed.json
+index 35b118c2ae4f6b..24e33a4fa784f8 100644
+--- a/test/integration/fixtures/blocks/core__accordion-heading.parsed.json
++++ b/test/integration/fixtures/blocks/core__accordion-heading.parsed.json
+@@ -3,9 +3,9 @@
+ 		"blockName": "core/accordion-heading",
+ 		"attrs": {},
+ 		"innerBlocks": [],
+-		"innerHTML": "\n<h3 class=\"wp-block-accordion-heading\">\n\t<button class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n</h3>\n",
++		"innerHTML": "\n<h3 class=\"wp-block-accordion-heading\">\n\t<button type=\"button\" class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n</h3>\n",
+ 		"innerContent": [
+-			"\n<h3 class=\"wp-block-accordion-heading\">\n\t<button class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n</h3>\n"
++			"\n<h3 class=\"wp-block-accordion-heading\">\n\t<button type=\"button\" class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n</h3>\n"
+ 		]
+ 	}
+ ]
+diff --git a/test/integration/fixtures/blocks/core__accordion-heading.serialized.html b/test/integration/fixtures/blocks/core__accordion-heading.serialized.html
+index 25caeb2b81a8a8..bd0c89eeb98b2c 100644
+--- a/test/integration/fixtures/blocks/core__accordion-heading.serialized.html
++++ b/test/integration/fixtures/blocks/core__accordion-heading.serialized.html
+@@ -1,3 +1,3 @@
+ <!-- wp:accordion-heading -->
+-<h3 class="wp-block-accordion-heading"><button class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3>
++<h3 class="wp-block-accordion-heading"><button type="button" class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3>
+ <!-- /wp:accordion-heading -->
+diff --git a/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v1.serialized.html b/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v1.serialized.html
+index 4d3cfb572732bb..c00974be3a7280 100644
+--- a/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v1.serialized.html
++++ b/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v1.serialized.html
+@@ -1,3 +1,3 @@
+ <!-- wp:accordion-heading {"style":{"typography":{"letterSpacing":"39px","textDecoration":"underline","fontStyle":"normal","fontWeight":"100","fontSize":"3.19rem"}}} -->
+-<h3 class="wp-block-accordion-heading" style="font-size:3.19rem;font-style:normal;font-weight:100"><button class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title" style="letter-spacing:39px;text-decoration:underline">title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3>
++<h3 class="wp-block-accordion-heading" style="font-size:3.19rem;font-style:normal;font-weight:100"><button type="button" class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title" style="letter-spacing:39px;text-decoration:underline">title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3>
+ <!-- /wp:accordion-heading -->
+diff --git a/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v2.html b/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v2.html
+new file mode 100644
+index 00000000000000..da2dc43197fde5
+--- /dev/null
++++ b/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v2.html
+@@ -0,0 +1,5 @@
++<!-- wp:accordion-heading -->
++<h3 class="wp-block-accordion-heading">
++	<button class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button>
++</h3>
++<!-- /wp:accordion-heading -->
+diff --git a/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v2.json b/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v2.json
+new file mode 100644
+index 00000000000000..d48b393e0e04fd
+--- /dev/null
++++ b/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v2.json
+@@ -0,0 +1,13 @@
++[
++	{
++		"name": "core/accordion-heading",
++		"isValid": true,
++		"attributes": {
++			"openByDefault": false,
++			"title": "Accordion Title",
++			"iconPosition": "right",
++			"showIcon": true
++		},
++		"innerBlocks": []
++	}
++]
+diff --git a/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v2.parsed.json b/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v2.parsed.json
+new file mode 100644
+index 00000000000000..35b118c2ae4f6b
+--- /dev/null
++++ b/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v2.parsed.json
+@@ -0,0 +1,11 @@
++[
++	{
++		"blockName": "core/accordion-heading",
++		"attrs": {},
++		"innerBlocks": [],
++		"innerHTML": "\n<h3 class=\"wp-block-accordion-heading\">\n\t<button class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n</h3>\n",
++		"innerContent": [
++			"\n<h3 class=\"wp-block-accordion-heading\">\n\t<button class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n</h3>\n"
++		]
++	}
++]
+diff --git a/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v2.serialized.html b/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v2.serialized.html
+new file mode 100644
+index 00000000000000..bd0c89eeb98b2c
+--- /dev/null
++++ b/test/integration/fixtures/blocks/core__accordion-heading__deprecated-v2.serialized.html
+@@ -0,0 +1,3 @@
++<!-- wp:accordion-heading -->
++<h3 class="wp-block-accordion-heading"><button type="button" class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3>
++<!-- /wp:accordion-heading -->
+diff --git a/test/integration/fixtures/blocks/core__accordion-item.html b/test/integration/fixtures/blocks/core__accordion-item.html
+index faebd9aa8acd3a..45c2ec13e88219 100644
+--- a/test/integration/fixtures/blocks/core__accordion-item.html
++++ b/test/integration/fixtures/blocks/core__accordion-item.html
+@@ -2,7 +2,7 @@
+ <div class="wp-block-accordion-item">
+ 	<!-- wp:accordion-heading -->
+ 	<h3 class="wp-block-accordion-heading">
+-		<button class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button>
++		<button type="button" class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button>
+ 	</h3>
+ 	<!-- /wp:accordion-heading -->
+ 	<!-- wp:accordion-panel -->
+diff --git a/test/integration/fixtures/blocks/core__accordion-item.parsed.json b/test/integration/fixtures/blocks/core__accordion-item.parsed.json
+index 1b84d47f564ad9..ee4b7c3621ec21 100644
+--- a/test/integration/fixtures/blocks/core__accordion-item.parsed.json
++++ b/test/integration/fixtures/blocks/core__accordion-item.parsed.json
+@@ -7,9 +7,9 @@
+ 				"blockName": "core/accordion-heading",
+ 				"attrs": {},
+ 				"innerBlocks": [],
+-				"innerHTML": "\n\t<h3 class=\"wp-block-accordion-heading\">\n\t\t<button class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n\t</h3>\n\t",
++				"innerHTML": "\n\t<h3 class=\"wp-block-accordion-heading\">\n\t\t<button type=\"button\" class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n\t</h3>\n\t",
+ 				"innerContent": [
+-					"\n\t<h3 class=\"wp-block-accordion-heading\">\n\t\t<button class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n\t</h3>\n\t"
++					"\n\t<h3 class=\"wp-block-accordion-heading\">\n\t\t<button type=\"button\" class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n\t</h3>\n\t"
+ 				]
+ 			},
+ 			{
+diff --git a/test/integration/fixtures/blocks/core__accordion-item.serialized.html b/test/integration/fixtures/blocks/core__accordion-item.serialized.html
+index 353750a8dbec30..2aedbc95bf43fd 100644
+--- a/test/integration/fixtures/blocks/core__accordion-item.serialized.html
++++ b/test/integration/fixtures/blocks/core__accordion-item.serialized.html
+@@ -1,6 +1,6 @@
+ <!-- wp:accordion-item -->
+ <div class="wp-block-accordion-item"><!-- wp:accordion-heading -->
+-<h3 class="wp-block-accordion-heading"><button class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3>
++<h3 class="wp-block-accordion-heading"><button type="button" class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3>
+ <!-- /wp:accordion-heading -->
+ 
+ <!-- wp:accordion-panel -->
+diff --git a/test/integration/fixtures/blocks/core__accordion.html b/test/integration/fixtures/blocks/core__accordion.html
+index 10796c48c28651..7e639472e598e0 100644
+--- a/test/integration/fixtures/blocks/core__accordion.html
++++ b/test/integration/fixtures/blocks/core__accordion.html
+@@ -4,7 +4,7 @@
+ 	<div class="wp-block-accordion-item">
+ 		<!-- wp:accordion-heading -->
+ 		<h3 class="wp-block-accordion-heading">
+-			<button class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button>
++			<button type="button" class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button>
+ 		</h3>
+ 		<!-- /wp:accordion-heading -->
+ 		<!-- wp:accordion-panel -->
+diff --git a/test/integration/fixtures/blocks/core__accordion.parsed.json b/test/integration/fixtures/blocks/core__accordion.parsed.json
+index 83d4d6f2fb5494..cd11c7513595c4 100644
+--- a/test/integration/fixtures/blocks/core__accordion.parsed.json
++++ b/test/integration/fixtures/blocks/core__accordion.parsed.json
+@@ -11,9 +11,9 @@
+ 						"blockName": "core/accordion-heading",
+ 						"attrs": {},
+ 						"innerBlocks": [],
+-						"innerHTML": "\n\t\t<h3 class=\"wp-block-accordion-heading\">\n\t\t\t<button class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n\t\t</h3>\n\t\t",
++						"innerHTML": "\n\t\t<h3 class=\"wp-block-accordion-heading\">\n\t\t\t<button type=\"button\" class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n\t\t</h3>\n\t\t",
+ 						"innerContent": [
+-							"\n\t\t<h3 class=\"wp-block-accordion-heading\">\n\t\t\t<button class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n\t\t</h3>\n\t\t"
++							"\n\t\t<h3 class=\"wp-block-accordion-heading\">\n\t\t\t<button type=\"button\" class=\"wp-block-accordion-heading__toggle\"><span class=\"wp-block-accordion-heading__toggle-title\">Accordion Title</span><span class=\"wp-block-accordion-heading__toggle-icon\" aria-hidden=\"true\">+</span></button>\n\t\t</h3>\n\t\t"
+ 						]
+ 					},
+ 					{
+diff --git a/test/integration/fixtures/blocks/core__accordion.serialized.html b/test/integration/fixtures/blocks/core__accordion.serialized.html
+index c67c365a329820..cf521b55b5c4b0 100644
+--- a/test/integration/fixtures/blocks/core__accordion.serialized.html
++++ b/test/integration/fixtures/blocks/core__accordion.serialized.html
+@@ -1,7 +1,7 @@
+ <!-- wp:accordion -->
+ <div role="group" class="wp-block-accordion"><!-- wp:accordion-item -->
+ <div class="wp-block-accordion-item"><!-- wp:accordion-heading -->
+-<h3 class="wp-block-accordion-heading"><button class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3>
++<h3 class="wp-block-accordion-heading"><button type="button" class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Accordion Title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3>
+ <!-- /wp:accordion-heading -->
+ 
+ <!-- wp:accordion-panel -->
+diff --git a/test/integration/is-valid-block.test.js b/test/integration/is-valid-block.test.js
+index b2eb845603252e..4ee394ce370929 100644
+--- a/test/integration/is-valid-block.test.js
++++ b/test/integration/is-valid-block.test.js
+@@ -8,6 +8,7 @@ import {
+ 	unregisterBlockType,
+ 	validateBlock,
+ } from '@wordpress/blocks';
++import { useBlockProps } from '@wordpress/block-editor';
+ 
+ describe( 'validateBlock', () => {
+ 	beforeAll( () => {
+@@ -23,8 +24,9 @@ describe( 'validateBlock', () => {
+ 
+ 	it( 'should use the namespace in the classname for non-core blocks', () => {
+ 		registerBlockType( 'myplugin/fruit', {
++			apiVersion: 3,
+ 			save: ( { attributes } ) =>
+-				createElement( 'div', null, attributes.fruit ),
++				createElement( 'div', useBlockProps.save(), attributes.fruit ),
+ 			name: 'myplugin/fruit',
+ 			category: 'text',
+ 			title: 'Fruit block',
+@@ -44,12 +46,13 @@ describe( 'validateBlock', () => {
+ 
+ 	it( 'should include additional classes in block attributes', () => {
+ 		registerBlockType( 'muplugin/fruit', {
++			apiVersion: 3,
+ 			save: ( { attributes } ) =>
+ 				createElement(
+ 					'div',
+-					{
++					useBlockProps.save( {
+ 						className: 'fruit',
+-					},
++					} ),
+ 					attributes.fruit
+ 				),
+ 			name: 'myplugin/fruit',
+@@ -69,8 +72,9 @@ describe( 'validateBlock', () => {
+ 
+ 	it( 'should not add a className if falsy', () => {
+ 		registerBlockType( 'myplugin/fruit', {
++			apiVersion: 3,
+ 			save: ( { attributes } ) =>
+-				createElement( 'div', null, attributes.fruit ),
++				createElement( 'div', useBlockProps.save(), attributes.fruit ),
+ 			name: 'myplugin/fruit',
+ 			category: 'text',
+ 			title: 'Fruit block',
+diff --git a/test/integration/shortcode-converter.test.js b/test/integration/shortcode-converter.test.js
+index 318a6b017dfcbd..95e28cd33be11a 100644
+--- a/test/integration/shortcode-converter.test.js
++++ b/test/integration/shortcode-converter.test.js
+@@ -13,6 +13,7 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
+ 	beforeAll( () => {
+ 		registerCoreBlocks();
+ 		registerBlockType( 'test/gallery', {
++			apiVersion: 3,
+ 			title: 'Test Gallery',
+ 			category: 'text',
+ 			attributes: {
+@@ -41,6 +42,7 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
+ 			save: () => null,
+ 		} );
+ 		registerBlockType( 'test/broccoli', {
++			apiVersion: 3,
+ 			title: 'Test Broccoli',
+ 			category: 'text',
+ 			attributes: {
+@@ -69,6 +71,7 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
+ 			save: () => null,
+ 		} );
+ 		registerBlockType( 'test/fallback-broccoli', {
++			apiVersion: 3,
+ 			title: 'Test Fallback Broccoli',
+ 			category: 'text',
+ 			attributes: {
+diff --git a/test/unit/config/suppress-browser-warnings.js b/test/unit/config/suppress-browser-warnings.js
+deleted file mode 100644
+index e3328867a16e2a..00000000000000
+--- a/test/unit/config/suppress-browser-warnings.js
++++ /dev/null
+@@ -1,34 +0,0 @@
+-/**
+- * Suppress specific browser warnings for unit tests
+- *
+- * This file mocks the @wordpress/warning module to suppress specific
+- * warnings that are expected or not relevant in the test environment,
+- * while allowing other warnings to pass through normally.
+- *
+- * Note: This mock can be removed once the apiVersion:3 becomes the default.
+- */
+-
+-jest.mock( '@wordpress/warning', () => {
+-	const mockOriginalWarning =
+-		jest.requireActual( '@wordpress/warning' ).default;
+-
+-	return {
+-		__esModule: true,
+-		default: jest.fn( ( message ) => {
+-			const suppressedWarningRegexes = [
+-				/The block ".*" is registered with API version 2 or lower/, // apiVersion warnings
+-			];
+-			if ( typeof message === 'string' ) {
+-				const shouldSuppress = suppressedWarningRegexes.some(
+-					( regex ) => regex.test( message )
+-				);
+-				if ( shouldSuppress ) {
+-					return;
+-				}
+-			}
+-			if ( typeof mockOriginalWarning === 'function' ) {
+-				mockOriginalWarning( message );
+-			}
+-		} ),
+-	};
+-} );
+diff --git a/test/unit/jest.config.js b/test/unit/jest.config.js
+index 154e5880b1efbc..23a594e52f1d0e 100644
+--- a/test/unit/jest.config.js
++++ b/test/unit/jest.config.js
+@@ -22,7 +22,6 @@ module.exports = {
+ 	setupFiles: [
+ 		'<rootDir>/test/unit/config/global-mocks.js',
+ 		'<rootDir>/test/unit/config/gutenberg-env.js',
+-		'<rootDir>/test/unit/config/suppress-browser-warnings.js',
+ 	],
+ 	setupFilesAfterEnv: [
+ 		'<rootDir>/test/unit/config/testing-library.js',

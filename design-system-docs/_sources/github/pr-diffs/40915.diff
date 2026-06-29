@@ -1,0 +1,378 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b822b0701808e6..19243e2a14a5ed 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ 
+ -   `DateTimePicker`: Convert to TypeScript ([#40775](https://github.com/WordPress/gutenberg/pull/40775)).
+ -   `DateTimePicker`: Convert unit tests to TypeScript ([#40957](https://github.com/WordPress/gutenberg/pull/40957)).
++-   `CheckboxControl`: Convert to TypeScript ([#40915](https://github.com/WordPress/gutenberg/pull/40915)).
+ 
+ ## 19.10.0 (2022-05-04)
+ 
+@@ -28,15 +29,15 @@
+ -   `UnitControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40627](https://github.com/WordPress/gutenberg/pull/40627)).
+ -   `SelectControl`: Improved TypeScript support ([#40737](https://github.com/WordPress/gutenberg/pull/40737)).
+ -   `ToggleControlGroup`: Switch to internal `Icon` component for dashicon support ([40717](https://github.com/WordPress/gutenberg/pull/40717)).
+--    Improve `ToolsPanel` accessibility. ([#40716](https://github.com/WordPress/gutenberg/pull/40716))
++-   Improve `ToolsPanel` accessibility. ([#40716](https://github.com/WordPress/gutenberg/pull/40716))
+ 
+ ### Bug Fix
+ 
+--    The `Button` component now displays the label as the tooltip for icon only buttons. ([#40716](https://github.com/WordPress/gutenberg/pull/40716))
+--    Use fake timers and fix usage of async methods from `@testing-library/user-event`. ([#40790](https://github.com/WordPress/gutenberg/pull/40790))
+--    UnitControl: avoid calling onChange callback twice when unit changes. ([#40796](https://github.com/WordPress/gutenberg/pull/40796))
+--    `UnitControl`: show unit label when units prop has only one unit. ([#40784](https://github.com/WordPress/gutenberg/pull/40784))
+--    `AnglePickerControl`: Fix closing of gradient popover when the angle control is clicked. ([#40735](https://github.com/WordPress/gutenberg/pull/40735))
++-   The `Button` component now displays the label as the tooltip for icon only buttons. ([#40716](https://github.com/WordPress/gutenberg/pull/40716))
++-   Use fake timers and fix usage of async methods from `@testing-library/user-event`. ([#40790](https://github.com/WordPress/gutenberg/pull/40790))
++-   UnitControl: avoid calling onChange callback twice when unit changes. ([#40796](https://github.com/WordPress/gutenberg/pull/40796))
++-   `UnitControl`: show unit label when units prop has only one unit. ([#40784](https://github.com/WordPress/gutenberg/pull/40784))
++-   `AnglePickerControl`: Fix closing of gradient popover when the angle control is clicked. ([#40735](https://github.com/WordPress/gutenberg/pull/40735))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/checkbox-control/README.md b/packages/components/src/checkbox-control/README.md
+index 0aa98eae854c70..4bc19ed9bfe5f0 100644
+--- a/packages/components/src/checkbox-control/README.md
++++ b/packages/components/src/checkbox-control/README.md
+@@ -77,37 +77,39 @@ const MyCheckboxControl = () => {
+ The set of props accepted by the component will be specified below.
+ Props not included in this set will be applied to the input element.
+ 
+-#### label
++#### `label`: `string`
+ 
+ A label for the input field, that appears at the side of the checkbox.
+ The prop will be rendered as content a label element.
+ If no prop is passed an empty label is rendered.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-#### help
++#### `help`: `string|WPElement`
+ 
+ If this property is added, a help text will be generated using help property as the content.
+ 
+--   Type: `String|WPElement`
+ -   Required: No
+ 
+-#### checked
++#### `checked`: `boolean`
+ 
+ If checked is true the checkbox will be checked. If checked is false the checkbox will be unchecked.
+ If no value is passed the checkbox will be unchecked.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-#### onChange
++#### `onChange`: `function`
+ 
+ A function that receives the checked state (boolean) as input.
+ 
+--   Type: `function`
+ -   Required: Yes
+ 
++#### `indeterminate`: `boolean`
++
++If indeterminate is true the state of the checkbox will be indeterminate.
++
++-   Required: No
++
+ ## Related components
+ 
+ -   To select one option from a set, and you want to show all the available options at once, use the `RadioControl` component.
+diff --git a/packages/components/src/checkbox-control/index.js b/packages/components/src/checkbox-control/index.tsx
+similarity index 61%
+rename from packages/components/src/checkbox-control/index.js
+rename to packages/components/src/checkbox-control/index.tsx
+index d5c3506a06d5c8..3b4e6eb2dc5e55 100644
+--- a/packages/components/src/checkbox-control/index.js
++++ b/packages/components/src/checkbox-control/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
++import type { ChangeEvent } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -15,17 +16,48 @@ import { Icon, check, reset } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import BaseControl from '../base-control';
++import type { CheckboxControlProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
++
++/**
++ * Checkboxes allow the user to select one or more items from a set.
++ *
++ * ```jsx
++ * import { CheckboxControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyCheckboxControl = () => {
++ *   const [ isChecked, setChecked ] = useState( true );
++ *   return (
++ *     <CheckboxControl
++ *       label="Is author"
++ *       help="Is the user a author or not?"
++ *       checked={ isChecked }
++ *       onChange={ setChecked }
++ *     />
++ *   );
++ * };
++ * ```
++ */
++export function CheckboxControl(
++	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
++	// ref forwarding to CheckboxControl.
++	props: Omit<
++		WordPressComponentProps< CheckboxControlProps, 'input', false >,
++		'ref'
++	>
++) {
++	const {
++		label,
++		className,
++		heading,
++		checked,
++		indeterminate,
++		help,
++		onChange,
++		...additionalProps
++	} = props;
+ 
+-export default function CheckboxControl( {
+-	label,
+-	className,
+-	heading,
+-	checked,
+-	indeterminate,
+-	help,
+-	onChange,
+-	...props
+-} ) {
+ 	if ( heading ) {
+ 		deprecated( '`heading` prop in `CheckboxControl`', {
+ 			alternative: 'a separate element to implement a heading',
+@@ -38,9 +70,9 @@ export default function CheckboxControl( {
+ 		false
+ 	);
+ 
+-	// Run the following callback everytime the `ref` (and the additional
++	// Run the following callback every time the `ref` (and the additional
+ 	// dependencies) change.
+-	const ref = useRefEffect(
++	const ref = useRefEffect< HTMLInputElement >(
+ 		( node ) => {
+ 			if ( ! node ) {
+ 				return;
+@@ -56,7 +88,8 @@ export default function CheckboxControl( {
+ 	);
+ 	const instanceId = useInstanceId( CheckboxControl );
+ 	const id = `inspector-checkbox-control-${ instanceId }`;
+-	const onChangeValue = ( event ) => onChange( event.target.checked );
++	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
++		onChange( event.target.checked );
+ 
+ 	return (
+ 		<BaseControl
+@@ -75,7 +108,7 @@ export default function CheckboxControl( {
+ 					onChange={ onChangeValue }
+ 					checked={ checked }
+ 					aria-describedby={ !! help ? id + '__help' : undefined }
+-					{ ...props }
++					{ ...additionalProps }
+ 				/>
+ 				{ showIndeterminateIcon ? (
+ 					<Icon
+@@ -101,3 +134,5 @@ export default function CheckboxControl( {
+ 		</BaseControl>
+ 	);
+ }
++
++export default CheckboxControl;
+diff --git a/packages/components/src/checkbox-control/stories/index.js b/packages/components/src/checkbox-control/stories/index.tsx
+similarity index 50%
+rename from packages/components/src/checkbox-control/stories/index.js
+rename to packages/components/src/checkbox-control/stories/index.tsx
+index f70ac4323abfc2..6a43713a0161c2 100644
+--- a/packages/components/src/checkbox-control/stories/index.js
++++ b/packages/components/src/checkbox-control/stories/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { text } from '@storybook/addon-knobs';
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -11,42 +11,60 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import CheckboxControl from '../';
++import CheckboxControl from '..';
+ 
+-export default {
+-	title: 'Components/CheckboxControl',
++const meta: ComponentMeta< typeof CheckboxControl > = {
+ 	component: CheckboxControl,
++	title: 'Components/CheckboxControl',
++	argTypes: {
++		onChange: {
++			action: 'onChange',
++		},
++		checked: {
++			control: { type: null },
++		},
++		help: { control: { type: 'text' } },
++	},
+ 	parameters: {
+-		knobs: { disable: false },
++		controls: {
++			expanded: true,
++			exclude: [ 'heading' ],
++		},
++		docs: { source: { state: 'open' } },
+ 	},
+ };
++export default meta;
+ 
+-const CheckboxControlWithState = ( { checked, ...props } ) => {
+-	const [ isChecked, setChecked ] = useState( checked );
++const DefaultTemplate: ComponentStory< typeof CheckboxControl > = ( {
++	onChange,
++	...args
++} ) => {
++	const [ isChecked, setChecked ] = useState( true );
+ 
+ 	return (
+ 		<CheckboxControl
+-			{ ...props }
++			{ ...args }
+ 			checked={ isChecked }
+-			onChange={ setChecked }
++			onChange={ ( v ) => {
++				setChecked( v );
++				onChange( v );
++			} }
+ 		/>
+ 	);
+ };
+ 
+-export const _default = () => {
+-	const label = text( 'Label', 'Is author' );
+-
+-	return <CheckboxControlWithState label={ label } checked />;
++export const Default: ComponentStory<
++	typeof CheckboxControl
++> = DefaultTemplate.bind( {} );
++Default.args = {
++	label: 'Is author',
++	help: 'Is the user an author or not?',
+ };
+ 
+-export const all = () => {
+-	const label = text( 'Label', 'Is author' );
+-	const help = text( 'Help', 'Is the user an author or not?' );
+-
+-	return <CheckboxControlWithState label={ label } help={ help } checked />;
+-};
+-
+-export const Indeterminate = () => {
++export const Indeterminate: ComponentStory< typeof CheckboxControl > = ( {
++	onChange,
++	...args
++} ) => {
+ 	const [ fruits, setFruits ] = useState( { apple: false, orange: false } );
+ 
+ 	const isAllChecked = Object.values( fruits ).every( Boolean );
+@@ -56,15 +74,16 @@ export const Indeterminate = () => {
+ 	return (
+ 		<>
+ 			<CheckboxControl
+-				label="Select All"
++				{ ...args }
+ 				checked={ isAllChecked }
+ 				indeterminate={ isIndeterminate }
+-				onChange={ ( newValue ) =>
++				onChange={ ( v ) => {
+ 					setFruits( {
+-						apple: newValue,
+-						orange: newValue,
+-					} )
+-				}
++						apple: v,
++						orange: v,
++					} );
++					onChange( v );
++				} }
+ 			/>
+ 			<CheckboxControl
+ 				label="Apple"
+@@ -89,3 +108,6 @@ export const Indeterminate = () => {
+ 		</>
+ 	);
+ };
++Indeterminate.args = {
++	label: 'Select all',
++};
+diff --git a/packages/components/src/checkbox-control/types.ts b/packages/components/src/checkbox-control/types.ts
+new file mode 100644
+index 00000000000000..29461471202920
+--- /dev/null
++++ b/packages/components/src/checkbox-control/types.ts
+@@ -0,0 +1,36 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { BaseControlProps } from '../base-control/types';
++
++export type CheckboxControlProps = Pick< BaseControlProps, 'help' > & {
++	/**
++	 * A function that receives the checked state (boolean) as input.
++	 */
++	onChange: ( value: boolean ) => void;
++	/**
++	 * A label for the input field, that appears at the side of the checkbox.
++	 * The prop will be rendered as content a label element. If no prop is
++	 * passed an empty label is rendered.
++	 */
++	label?: string;
++	/**
++	 * If checked is true the checkbox will be checked. If checked is false the
++	 * checkbox will be unchecked. If no value is passed the checkbox will be
++	 * unchecked.
++	 */
++	checked?: boolean;
++	/**
++	 * If indeterminate is true the state of the checkbox will be indeterminate.
++	 */
++	indeterminate?: boolean;
++	/**
++	 * @deprecated
++	 */
++	heading?: ReactNode;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index dbc64e1aac7b06..eea391d1200dcf 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -39,6 +39,7 @@
+ 		"src/button/**/*",
+ 		"src/button-group/**/*",
+ 		"src/card/**/*",
++		"src/checkbox-control/**/*",
+ 		"src/circular-option-picker/**/*",
+ 		"src/color-indicator/**/*",
+ 		"src/color-palette/**/*",

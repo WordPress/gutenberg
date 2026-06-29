@@ -1,0 +1,1979 @@
+diff --git a/packages/dataviews/README.md b/packages/dataviews/README.md
+index 9e9b7b1e4010e4..32989c08daecb9 100644
+--- a/packages/dataviews/README.md
++++ b/packages/dataviews/README.md
+@@ -1202,7 +1202,7 @@ Example:
+ 	id: 'title',
+ 	type: 'text',
+ 	header: (
+-		<Stack direction="row" gap="2xs" justify="start">
++		<Stack direction="row" gap="xs" justify="start">
+ 			<Icon icon={ icon } />
+ 			<span>Title</span>
+ 		</Stack>
+diff --git a/packages/dataviews/src/components/dataform-controls/date.tsx b/packages/dataviews/src/components/dataform-controls/date.tsx
+index 3e6460c6699157..299fe860cf804e 100644
+--- a/packages/dataviews/src/components/dataform-controls/date.tsx
++++ b/packages/dataviews/src/components/dataform-controls/date.tsx
+@@ -386,11 +386,11 @@ function CalendarDateControl< Item >( {
+ 				label={ displayLabel }
+ 				hideLabelFromVision={ hideLabelFromVision }
+ 			>
+-				<Stack direction="column" gap="md">
++				<Stack direction="column" gap="lg">
+ 					{ /* Preset buttons */ }
+ 					<Stack
+ 						direction="row"
+-						gap="xs"
++						gap="sm"
+ 						wrap="wrap"
+ 						justify="flex-start"
+ 					>
+@@ -594,11 +594,11 @@ function CalendarDateRangeControl< Item >( {
+ 				label={ displayLabel }
+ 				hideLabelFromVision={ hideLabelFromVision }
+ 			>
+-				<Stack direction="column" gap="md">
++				<Stack direction="column" gap="lg">
+ 					{ /* Preset buttons */ }
+ 					<Stack
+ 						direction="row"
+-						gap="xs"
++						gap="sm"
+ 						wrap="wrap"
+ 						justify="flex-start"
+ 					>
+@@ -634,7 +634,7 @@ function CalendarDateRangeControl< Item >( {
+ 					{ /* Manual date range inputs */ }
+ 					<Stack
+ 						direction="row"
+-						gap="xs"
++						gap="sm"
+ 						justify="space-between"
+ 						className="dataviews-controls__date-range-inputs"
+ 					>
+diff --git a/packages/dataviews/src/components/dataform-controls/datetime.tsx b/packages/dataviews/src/components/dataform-controls/datetime.tsx
+index 28adaf75f6e3eb..141c27deec931e 100644
+--- a/packages/dataviews/src/components/dataform-controls/datetime.tsx
++++ b/packages/dataviews/src/components/dataform-controls/datetime.tsx
+@@ -167,7 +167,7 @@ function CalendarDateTimeControl< Item >( {
+ 			help={ description }
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 		>
+-			<Stack direction="column" gap="md">
++			<Stack direction="column" gap="lg">
+ 				{ /* Calendar widget */ }
+ 				<DateCalendar
+ 					style={ { width: '100%' } }
+diff --git a/packages/dataviews/src/components/dataform-controls/utils/relative-date-control.tsx b/packages/dataviews/src/components/dataform-controls/utils/relative-date-control.tsx
+index b6ccac9ef45a47..64ee4c59a0450b 100644
+--- a/packages/dataviews/src/components/dataform-controls/utils/relative-date-control.tsx
++++ b/packages/dataviews/src/components/dataform-controls/utils/relative-date-control.tsx
+@@ -92,7 +92,7 @@ export default function RelativeDateControl< Item >( {
+ 			label={ label }
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 		>
+-			<Stack direction="row" gap="xs">
++			<Stack direction="row" gap="sm">
+ 				<NumberControl
+ 					__next40pxDefaultSize
+ 					className="dataviews-controls__relative-date-number"
+diff --git a/packages/dataviews/src/components/dataform-layouts/data-form-layout.tsx b/packages/dataviews/src/components/dataform-layouts/data-form-layout.tsx
+index c8caa7259c7fd1..ccff55100b2c00 100644
+--- a/packages/dataviews/src/components/dataform-layouts/data-form-layout.tsx
++++ b/packages/dataviews/src/components/dataform-layouts/data-form-layout.tsx
+@@ -17,7 +17,7 @@ import { getFormFieldLayout } from './index';
+ import DataFormContext from '../dataform-context';
+ 
+ const DEFAULT_WRAPPER = ( { children }: { children: React.ReactNode } ) => (
+-	<Stack direction="column" className="dataforms-layouts__wrapper" gap="md">
++	<Stack direction="column" className="dataforms-layouts__wrapper" gap="lg">
+ 		{ children }
+ 	</Stack>
+ );
+diff --git a/packages/dataviews/src/components/dataform-layouts/details/index.tsx b/packages/dataviews/src/components/dataform-layouts/details/index.tsx
+index b444c1e824a7cb..721f0df14ac4ab 100644
+--- a/packages/dataviews/src/components/dataform-layouts/details/index.tsx
++++ b/packages/dataviews/src/components/dataform-layouts/details/index.tsx
+@@ -109,7 +109,7 @@ export default function FormDetailsField< Item >( {
+ 				<Stack
+ 					direction="row"
+ 					align="center"
+-					gap="sm"
++					gap="md"
+ 					className="dataforms-layouts-details__summary-content"
+ 				>
+ 					{ summaryContent }
+diff --git a/packages/dataviews/src/components/dataform-layouts/index.tsx b/packages/dataviews/src/components/dataform-layouts/index.tsx
+index 5aaa43899227b5..f4d1c5bf0890fe 100644
+--- a/packages/dataviews/src/components/dataform-layouts/index.tsx
++++ b/packages/dataviews/src/components/dataform-layouts/index.tsx
+@@ -21,7 +21,7 @@ const FORM_FIELD_LAYOUTS = [
+ 			<Stack
+ 				direction="column"
+ 				className="dataforms-layouts__wrapper"
+-				gap="md"
++				gap="lg"
+ 			>
+ 				{ children }
+ 			</Stack>
+@@ -34,7 +34,7 @@ const FORM_FIELD_LAYOUTS = [
+ 			<Stack
+ 				direction="column"
+ 				className="dataforms-layouts__wrapper"
+-				gap="xs"
++				gap="sm"
+ 			>
+ 				{ children }
+ 			</Stack>
+@@ -47,7 +47,7 @@ const FORM_FIELD_LAYOUTS = [
+ 			<Stack
+ 				direction="column"
+ 				className="dataforms-layouts__wrapper"
+-				gap="lg"
++				gap="xl"
+ 			>
+ 				{ children }
+ 			</Stack>
+@@ -66,12 +66,12 @@ const FORM_FIELD_LAYOUTS = [
+ 			<Stack
+ 				direction="column"
+ 				className="dataforms-layouts__wrapper"
+-				gap="md"
++				gap="lg"
+ 			>
+ 				<div className="dataforms-layouts-row__field">
+ 					<Stack
+ 						direction="row"
+-						gap="md"
++						gap="lg"
+ 						align={ ( layout as NormalizedRowLayout ).alignment }
+ 					>
+ 						{ children }
+diff --git a/packages/dataviews/src/components/dataform-layouts/panel/dropdown.tsx b/packages/dataviews/src/components/dataform-layouts/panel/dropdown.tsx
+index 89a8b16b71702a..659b048036f95b 100644
+--- a/packages/dataviews/src/components/dataform-layouts/panel/dropdown.tsx
++++ b/packages/dataviews/src/components/dataform-layouts/panel/dropdown.tsx
+@@ -39,9 +39,9 @@ function DropdownHeader( {
+ 		<Stack
+ 			direction="column"
+ 			className="dataforms-layouts-panel__dropdown-header"
+-			gap="md"
++			gap="lg"
+ 		>
+-			<Stack direction="row" gap="xs" align="center">
++			<Stack direction="row" gap="sm" align="center">
+ 				{ title && (
+ 					<Heading level={ 2 } size={ 13 }>
+ 						{ title }
+diff --git a/packages/dataviews/src/components/dataform-layouts/panel/index.tsx b/packages/dataviews/src/components/dataform-layouts/panel/index.tsx
+index c6e88bafc6af05..d6ddfd92aa9e60 100644
+--- a/packages/dataviews/src/components/dataform-layouts/panel/index.tsx
++++ b/packages/dataviews/src/components/dataform-layouts/panel/index.tsx
+@@ -172,7 +172,7 @@ export default function FormPanelField< Item >( {
+ 		<Tooltip text={ errorMessage } placement="top">
+ 			<Stack
+ 				direction="row"
+-				gap="xs"
++				gap="sm"
+ 				className="dataforms-layouts-panel__field-label-error-content"
+ 				justify="flex-start"
+ 			>
+@@ -234,7 +234,7 @@ export default function FormPanelField< Item >( {
+ 		return (
+ 			<Stack
+ 				direction="row"
+-				gap="xs"
++				gap="sm"
+ 				className="dataforms-layouts-panel__field dataforms-layouts-panel__field--label-position-none"
+ 			>
+ 				{ showError && (
+@@ -257,7 +257,7 @@ export default function FormPanelField< Item >( {
+ 	return (
+ 		<Stack
+ 			direction="row"
+-			gap="xs"
++			gap="sm"
+ 			ref={ setPopoverAnchor }
+ 			className="dataforms-layouts-panel__field"
+ 		>
+diff --git a/packages/dataviews/src/components/dataform-layouts/panel/modal.tsx b/packages/dataviews/src/components/dataform-layouts/panel/modal.tsx
+index 4ce1a2b1ba6b64..6d061a12ca6752 100644
+--- a/packages/dataviews/src/components/dataform-layouts/panel/modal.tsx
++++ b/packages/dataviews/src/components/dataform-layouts/panel/modal.tsx
+@@ -132,7 +132,7 @@ function ModalContent< Item >( {
+ 			<Stack
+ 				direction="row"
+ 				className="dataforms-layouts-panel__modal-footer"
+-				gap="sm"
++				gap="md"
+ 			>
+ 				<Spacer style={ { flex: 1 } } />
+ 				<Button
+diff --git a/packages/dataviews/src/components/dataform-layouts/regular/index.tsx b/packages/dataviews/src/components/dataform-layouts/regular/index.tsx
+index 5d4b0ed58adfb2..433e5522296398 100644
+--- a/packages/dataviews/src/components/dataform-layouts/regular/index.tsx
++++ b/packages/dataviews/src/components/dataform-layouts/regular/index.tsx
+@@ -30,7 +30,7 @@ function Header( { title }: { title: string } ) {
+ 		<Stack
+ 			direction="column"
+ 			className="dataforms-layouts-regular__header"
+-			gap="md"
++			gap="lg"
+ 		>
+ 			<Stack direction="row" align="center">
+ 				<Heading level={ 2 } size={ 13 }>
+@@ -89,7 +89,7 @@ export default function FormRegularField< Item >( {
+ 			<Stack
+ 				direction="row"
+ 				className="dataforms-layouts-regular__field"
+-				gap="xs"
++				gap="sm"
+ 			>
+ 				<div
+ 					className={ clsx(
+diff --git a/packages/dataviews/src/components/dataform-layouts/row/index.tsx b/packages/dataviews/src/components/dataform-layouts/row/index.tsx
+index 13ae1137b41b23..49299862a35bfb 100644
+--- a/packages/dataviews/src/components/dataform-layouts/row/index.tsx
++++ b/packages/dataviews/src/components/dataform-layouts/row/index.tsx
+@@ -22,7 +22,7 @@ function Header( { title }: { title: string } ) {
+ 		<Stack
+ 			direction="column"
+ 			className="dataforms-layouts-row__header"
+-			gap="md"
++			gap="lg"
+ 		>
+ 			<Stack direction="row" align="center">
+ 				<Heading level={ 2 } size={ 13 }>
+@@ -57,7 +57,7 @@ export default function FormRowField< Item >( {
+ 				{ ! hideLabelFromVision && field.label && (
+ 					<Header title={ field.label } />
+ 				) }
+-				<Stack direction="row" align={ layout.alignment } gap="md">
++				<Stack direction="row" align={ layout.alignment } gap="lg">
+ 					<DataFormLayout
+ 						data={ data }
+ 						form={ form }
+diff --git a/packages/dataviews/src/components/dataviews-bulk-actions/index.tsx b/packages/dataviews/src/components/dataviews-bulk-actions/index.tsx
+index 231e50a9f96abb..370635fb3ac25d 100644
+--- a/packages/dataviews/src/components/dataviews-bulk-actions/index.tsx
++++ b/packages/dataviews/src/components/dataviews-bulk-actions/index.tsx
+@@ -261,7 +261,7 @@ function renderFooterContent< Item >(
+ 		<Stack
+ 			direction="row"
+ 			className="dataviews-bulk-actions-footer__container"
+-			gap="sm"
++			gap="md"
+ 			align="center"
+ 		>
+ 			<BulkSelectionCheckbox
+@@ -277,7 +277,7 @@ function renderFooterContent< Item >(
+ 			<Stack
+ 				direction="row"
+ 				className="dataviews-bulk-actions-footer__action-buttons"
+-				gap="2xs"
++				gap="xs"
+ 			>
+ 				{ actionsToShow.map( ( action ) => {
+ 					return (
+diff --git a/packages/dataviews/src/components/dataviews-filters/filter.tsx b/packages/dataviews/src/components/dataviews-filters/filter.tsx
+index bc5396a06e740c..0b1dc129e4f6d7 100644
+--- a/packages/dataviews/src/components/dataviews-filters/filter.tsx
++++ b/packages/dataviews/src/components/dataviews-filters/filter.tsx
+@@ -94,7 +94,7 @@ function OperatorSelector( {
+ 		operatorOptions.length > 1 && (
+ 			<Stack
+ 				direction="row"
+-				gap="xs"
++				gap="sm"
+ 				justify="flex-start"
+ 				className="dataviews-filters__summary-operators-container"
+ 				align="center"
+diff --git a/packages/dataviews/src/components/dataviews-filters/filters.tsx b/packages/dataviews/src/components/dataviews-filters/filters.tsx
+index 4526070e8d529d..7ad6fa170278e3 100644
+--- a/packages/dataviews/src/components/dataviews-filters/filters.tsx
++++ b/packages/dataviews/src/components/dataviews-filters/filters.tsx
+@@ -62,7 +62,7 @@ function Filters( { className }: { className?: string } ) {
+ 		<Stack
+ 			direction="row"
+ 			justify="flex-start"
+-			gap="xs"
++			gap="sm"
+ 			style={ { width: 'fit-content' } }
+ 			wrap="wrap"
+ 			className={ className }
+diff --git a/packages/dataviews/src/components/dataviews-footer/index.tsx b/packages/dataviews/src/components/dataviews-footer/index.tsx
+index 3cdc6e04053c1f..5a84ea7b05a779 100644
+--- a/packages/dataviews/src/components/dataviews-footer/index.tsx
++++ b/packages/dataviews/src/components/dataviews-footer/index.tsx
+@@ -42,7 +42,7 @@ export default function DataViewsFooter() {
+ 				justify="end"
+ 				align="center"
+ 				className="dataviews-footer"
+-				gap="xs"
++				gap="sm"
+ 			>
+ 				{ hasBulkActions && <BulkActionsFooter /> }
+ 				<DataViewsPagination />
+diff --git a/packages/dataviews/src/components/dataviews-layouts/activity/activity-item.tsx b/packages/dataviews/src/components/dataviews-layouts/activity/activity-item.tsx
+index 725eeb5cbd888a..62dcb981075641 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/activity/activity-item.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/activity/activity-item.tsx
+@@ -100,9 +100,9 @@ function ActivityItem< Item >(
+ 	const verticalGap = useMemo( () => {
+ 		switch ( density ) {
+ 			case 'comfortable':
+-				return 'sm';
++				return 'md';
+ 			default:
+-				return 'xs';
++				return 'sm';
+ 		}
+ 	}, [ density ] );
+ 
+@@ -121,10 +121,10 @@ function ActivityItem< Item >(
+ 				density === 'comfortable' && 'is-comfortable'
+ 			) }
+ 		>
+-			<Stack direction="row" gap="md" justify="start" align="flex-start">
++			<Stack direction="row" gap="lg" justify="start" align="flex-start">
+ 				<Stack
+ 					direction="column"
+-					gap="2xs"
++					gap="xs"
+ 					align="center"
+ 					className="dataviews-view-activity__item-type"
+ 				>
+diff --git a/packages/dataviews/src/components/dataviews-layouts/activity/index.tsx b/packages/dataviews/src/components/dataviews-layouts/activity/index.tsx
+index 910a413b8a3435..d731a89f33fdd1 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/activity/index.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/activity/index.tsx
+@@ -60,7 +60,7 @@ export default function ViewActivity< Item >(
+ 	// Render grouped activity
+ 	if ( hasData && groupField && dataByGroup ) {
+ 		return (
+-			<Stack direction="column" gap="xs" className={ wrapperClassName }>
++			<Stack direction="column" gap="sm" className={ wrapperClassName }>
+ 				{ groupedEntries.map(
+ 					( [ groupName, groupData ]: [ string, Item[] ] ) => (
+ 						<ActivityGroup< Item >
+diff --git a/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx b/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx
+index 043589967f45db..8db4171e2c1cff 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx
+@@ -189,7 +189,7 @@ const GridItem = forwardRef( function GridItem< Item >(
+ 			{ showTitle && (
+ 				<Stack
+ 					direction="row"
+-					gap="xs"
++					gap="sm"
+ 					className="dataviews-view-grid__title-actions"
+ 				>
+ 					<ItemClickWrapper
+@@ -211,7 +211,7 @@ const GridItem = forwardRef( function GridItem< Item >(
+ 					) }
+ 				</Stack>
+ 			) }
+-			<Stack direction="column" gap="2xs">
++			<Stack direction="column" gap="xs">
+ 				{ showDescription && descriptionField?.render && (
+ 					<descriptionField.render
+ 						item={ item }
+@@ -222,7 +222,7 @@ const GridItem = forwardRef( function GridItem< Item >(
+ 					<Stack
+ 						direction="row"
+ 						className="dataviews-view-grid__badge-fields"
+-						gap="xs"
++						gap="sm"
+ 						wrap="wrap"
+ 						align="top"
+ 						justify="flex-start"
+@@ -246,7 +246,7 @@ const GridItem = forwardRef( function GridItem< Item >(
+ 					<Stack
+ 						direction="column"
+ 						className="dataviews-view-grid__fields"
+-						gap="2xs"
++						gap="xs"
+ 					>
+ 						{ regularFields.map( ( field ) => {
+ 							return (
+diff --git a/packages/dataviews/src/components/dataviews-layouts/grid/index.tsx b/packages/dataviews/src/components/dataviews-layouts/grid/index.tsx
+index 54a806c3d9ccc6..f1818fd2fb1bfc 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/grid/index.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/grid/index.tsx
+@@ -56,13 +56,13 @@ function ViewGrid< Item >( {
+ 			{
+ 				// Render multiple groups.
+ 				hasData && groupField && dataByGroup && (
+-					<Stack direction="column" gap="md">
++					<Stack direction="column" gap="lg">
+ 						{ Array.from( dataByGroup.entries() ).map(
+ 							( [ groupName, groupItems ] ) => (
+ 								<Stack
+ 									direction="column"
+ 									key={ groupName }
+-									gap="xs"
++									gap="sm"
+ 								>
+ 									<h3 className="dataviews-view-grid__group-header">
+ 										{ view.groupBy?.showLabel === false
+diff --git a/packages/dataviews/src/components/dataviews-layouts/list/index.tsx b/packages/dataviews/src/components/dataviews-layouts/list/index.tsx
+index e36489b9d8c725..75555fb26ea946 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/list/index.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/list/index.tsx
+@@ -219,7 +219,7 @@ function ListItem< Item >( {
+ 	const usedActions = eligibleActions?.length > 0 && (
+ 		<Stack
+ 			direction="row"
+-			gap="sm"
++			gap="md"
+ 			className="dataviews-view-list__item-actions"
+ 		>
+ 			{ primaryAction && (
+@@ -312,7 +312,7 @@ function ListItem< Item >( {
+ 				</div>
+ 				<Stack
+ 					direction="row"
+-					gap="sm"
++					gap="md"
+ 					justify="start"
+ 					align="flex-start"
+ 					style={ { flex: 1 } }
+@@ -320,7 +320,7 @@ function ListItem< Item >( {
+ 					{ renderedMediaField }
+ 					<Stack
+ 						direction="column"
+-						gap="2xs"
++						gap="xs"
+ 						className="dataviews-view-list__field-wrapper"
+ 					>
+ 						<Stack direction="row" align="center">
+@@ -551,7 +551,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
+ 			>
+ 				<Stack
+ 					direction="column"
+-					gap="md"
++					gap="lg"
+ 					className={ clsx( 'dataviews-view-list', className ) }
+ 				>
+ 					{ Array.from( dataByGroup.entries() ).map(
+@@ -559,7 +559,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
+ 							<Stack
+ 								direction="column"
+ 								key={ groupName }
+-								gap="xs"
++								gap="sm"
+ 							>
+ 								<h3 className="dataviews-view-list__group-header">
+ 									{ view.groupBy?.showLabel === false
+diff --git a/packages/dataviews/src/components/dataviews-layouts/picker-grid/index.tsx b/packages/dataviews/src/components/dataviews-layouts/picker-grid/index.tsx
+index 8b91b471330878..7673bda832a102 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/picker-grid/index.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/picker-grid/index.tsx
+@@ -145,7 +145,7 @@ function GridItem< Item >( {
+ 					</div>
+ 				</Stack>
+ 			) }
+-			<Stack direction="column" gap="2xs">
++			<Stack direction="column" gap="xs">
+ 				{ showDescription && descriptionField?.render && (
+ 					<descriptionField.render
+ 						item={ item }
+@@ -156,7 +156,7 @@ function GridItem< Item >( {
+ 					<Stack
+ 						direction="row"
+ 						className="dataviews-view-picker-grid__badge-fields"
+-						gap="xs"
++						gap="sm"
+ 						wrap="wrap"
+ 						align="top"
+ 						justify="flex-start"
+@@ -180,7 +180,7 @@ function GridItem< Item >( {
+ 					<Stack
+ 						direction="column"
+ 						className="dataviews-view-picker-grid__fields"
+-						gap="2xs"
++						gap="xs"
+ 					>
+ 						{ regularFields.map( ( field ) => {
+ 							return (
+@@ -236,7 +236,7 @@ function GridGroup< Item >( {
+ 		<Stack
+ 			direction="column"
+ 			key={ groupName }
+-			gap="xs"
++			gap="sm"
+ 			role="group"
+ 			aria-labelledby={ headerId }
+ 		>
+@@ -342,7 +342,7 @@ function ViewPickerGrid< Item >( {
+ 						render={ ( { children, ...props } ) => (
+ 							<Stack
+ 								direction="column"
+-								gap="md"
++								gap="lg"
+ 								children={ children }
+ 								{ ...props }
+ 							/>
+diff --git a/packages/dataviews/src/components/dataviews-layouts/table/column-primary.tsx b/packages/dataviews/src/components/dataviews-layouts/table/column-primary.tsx
+index 70cd08272fa6bd..a203d84c6529c1 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/table/column-primary.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/table/column-primary.tsx
+@@ -38,7 +38,7 @@ function ColumnPrimary< Item >( {
+ 	isItemClickable: ( item: Item ) => boolean;
+ } ) {
+ 	return (
+-		<Stack direction="row" gap="sm" align="flex-start" justify="flex-start">
++		<Stack direction="row" gap="md" align="flex-start" justify="flex-start">
+ 			{ mediaField && (
+ 				<ItemClickWrapper
+ 					item={ item }
+diff --git a/packages/dataviews/src/components/dataviews-pagination/index.tsx b/packages/dataviews/src/components/dataviews-pagination/index.tsx
+index 2d4e0ad40d6b8f..40dac64e6af750 100644
+--- a/packages/dataviews/src/components/dataviews-pagination/index.tsx
++++ b/packages/dataviews/src/components/dataviews-pagination/index.tsx
+@@ -51,13 +51,13 @@ export function DataViewsPagination() {
+ 				className="dataviews-pagination"
+ 				justify="end"
+ 				align="center"
+-				gap="lg"
++				gap="xl"
+ 			>
+ 				<Stack
+ 					direction="row"
+ 					justify="flex-start"
+ 					align="center"
+-					gap="2xs"
++					gap="xs"
+ 					className="dataviews-pagination__page-select"
+ 				>
+ 					{ createInterpolateElement(
+@@ -90,7 +90,7 @@ export function DataViewsPagination() {
+ 						}
+ 					) }
+ 				</Stack>
+-				<Stack direction="row" gap="2xs" align="center">
++				<Stack direction="row" gap="xs" align="center">
+ 					<Button
+ 						onClick={ () =>
+ 							onChangeView( {
+diff --git a/packages/dataviews/src/components/dataviews-picker-footer/index.tsx b/packages/dataviews/src/components/dataviews-picker-footer/index.tsx
+index 0e6a09f7264350..ef80ad5457e33d 100644
+--- a/packages/dataviews/src/components/dataviews-picker-footer/index.tsx
++++ b/packages/dataviews/src/components/dataviews-picker-footer/index.tsx
+@@ -88,7 +88,7 @@ function ActionButtons< Item >( {
+ 	);
+ 
+ 	return (
+-		<Stack direction="row" gap="2xs">
++		<Stack direction="row" gap="xs">
+ 			{ actions.map( ( action ) => {
+ 				// Only support actions with callbacks for DataViewsPicker.
+ 				// This is because many use cases of the picker will be already within modals.
+@@ -158,12 +158,12 @@ export function DataViewsPickerFooter() {
+ 			justify="space-between"
+ 			align="center"
+ 			className="dataviews-footer"
+-			gap="xs"
++			gap="sm"
+ 		>
+ 			<Stack
+ 				direction="row"
+ 				className="dataviews-picker-footer__bulk-selection"
+-				gap="sm"
++				gap="md"
+ 				align="center"
+ 			>
+ 				{ isMultiselect && (
+diff --git a/packages/dataviews/src/components/dataviews-view-config/index.tsx b/packages/dataviews/src/components/dataviews-view-config/index.tsx
+index c74d872c123fa5..dbb503b432f590 100644
+--- a/packages/dataviews/src/components/dataviews-view-config/index.tsx
++++ b/packages/dataviews/src/components/dataviews-view-config/index.tsx
+@@ -321,12 +321,12 @@ export function DataviewsViewConfigDropdown() {
+ 					<Stack
+ 						direction="column"
+ 						className="dataviews-view-config"
+-						gap="lg"
++						gap="xl"
+ 					>
+ 						<SettingsSection title={ __( 'Appearance' ) }>
+ 							<Stack
+ 								direction="row"
+-								gap="xs"
++								gap="sm"
+ 								className="is-divided-in-two"
+ 							>
+ 								<SortFieldControl />
+diff --git a/packages/dataviews/src/components/dataviews-view-config/properties-section.tsx b/packages/dataviews/src/components/dataviews-view-config/properties-section.tsx
+index 75374da86a58e1..cb66be75813f01 100644
+--- a/packages/dataviews/src/components/dataviews-view-config/properties-section.tsx
++++ b/packages/dataviews/src/components/dataviews-view-config/properties-section.tsx
+@@ -30,7 +30,7 @@ function FieldItem( {
+ } ) {
+ 	return (
+ 		<Item onClick={ field.enableHiding ? onToggleVisibility : undefined }>
+-			<Stack direction="row" gap="xs" justify="flex-start" align="center">
++			<Stack direction="row" gap="sm" justify="flex-start" align="center">
+ 				<div style={ { height: 24, width: 24 } }>
+ 					{ isVisible && <Icon icon={ check } /> }
+ 				</div>
+diff --git a/packages/dataviews/src/dataform/stories/content.story.tsx b/packages/dataviews/src/dataform/stories/content.story.tsx
+index 7440f35dbaa4ae..53ca37a304a2b5 100644
+--- a/packages/dataviews/src/dataform/stories/content.story.tsx
++++ b/packages/dataviews/src/dataform/stories/content.story.tsx
+@@ -68,7 +68,7 @@ export const Labels: Story = {
+ 		);
+ 
+ 		return (
+-			<Stack direction="column" gap="md">
++			<Stack direction="column" gap="lg">
+ 				<DataForm< SampleData >
+ 					data={ data }
+ 					fields={ fields }
+@@ -135,7 +135,7 @@ export const HelpText: Story = {
+ 		);
+ 
+ 		return (
+-			<Stack direction="column" gap="md">
++			<Stack direction="column" gap="lg">
+ 				<DataForm< HelpTextData >
+ 					data={ data }
+ 					fields={ fields }
+@@ -240,7 +240,7 @@ export const ValidationMessages: Story = {
+ 
+ 		return (
+ 			<div ref={ containerRef }>
+-				<Stack direction="column" gap="lg">
++				<Stack direction="column" gap="xl">
+ 					<DataForm< ValidationMessagesData >
+ 						data={ data }
+ 						fields={ fields }
+@@ -314,7 +314,7 @@ export const HighLevelHelpText: Story = {
+ 		);
+ 
+ 		return (
+-			<Stack direction="column" gap="md">
++			<Stack direction="column" gap="lg">
+ 				<DataForm< HighLevelHelpTextData >
+ 					data={ data }
+ 					fields={ fields }
+@@ -375,7 +375,7 @@ export const Placeholders: Story = {
+ 		);
+ 
+ 		return (
+-			<Stack direction="column" gap="md">
++			<Stack direction="column" gap="lg">
+ 				<DataForm< PlaceholdersData >
+ 					data={ data }
+ 					fields={ fields }
+diff --git a/packages/dataviews/src/dataform/stories/validation.tsx b/packages/dataviews/src/dataform/stories/validation.tsx
+index 95725a30af4914..17875984930022 100644
+--- a/packages/dataviews/src/dataform/stories/validation.tsx
++++ b/packages/dataviews/src/dataform/stories/validation.tsx
+@@ -1018,7 +1018,7 @@ const ValidationComponent = ( {
+ 
+ 	return (
+ 		<form>
+-			<Stack direction="column" align="start" gap="xl">
++			<Stack direction="column" align="start" gap="3xl">
+ 				<DataForm< ValidatedItem >
+ 					data={ post }
+ 					fields={ _fields }
+diff --git a/packages/dataviews/src/dataviews-picker/index.tsx b/packages/dataviews/src/dataviews-picker/index.tsx
+index 20c21a0f799ef8..ad50beca5af0e1 100644
+--- a/packages/dataviews/src/dataviews-picker/index.tsx
++++ b/packages/dataviews/src/dataviews-picker/index.tsx
+@@ -86,18 +86,18 @@ function DefaultUI( {
+ 				align="top"
+ 				justify="space-between"
+ 				className="dataviews__view-actions"
+-				gap="2xs"
++				gap="xs"
+ 			>
+ 				<Stack
+ 					direction="row"
+-					gap="xs"
++					gap="sm"
+ 					justify="start"
+ 					className="dataviews__search"
+ 				>
+ 					{ search && <DataViewsSearch label={ searchLabel } /> }
+ 					<FiltersToggle />
+ 				</Stack>
+-				<Stack direction="row" gap="2xs" style={ { flexShrink: 0 } }>
++				<Stack direction="row" gap="xs" style={ { flexShrink: 0 } }>
+ 					<DataViewsViewConfig />
+ 				</Stack>
+ 			</Stack>
+diff --git a/packages/dataviews/src/dataviews-picker/stories/fixtures.tsx b/packages/dataviews/src/dataviews-picker/stories/fixtures.tsx
+index 34f6f4e83281b4..35a2fd28d5a904 100644
+--- a/packages/dataviews/src/dataviews-picker/stories/fixtures.tsx
++++ b/packages/dataviews/src/dataviews-picker/stories/fixtures.tsx
+@@ -320,7 +320,7 @@ export const fields: Field< SpaceObject >[] = [
+ 		id: 'image',
+ 		type: 'media',
+ 		header: (
+-			<Stack direction="row" gap="2xs" justify="start" align="center">
++			<Stack direction="row" gap="xs" justify="start" align="center">
+ 				<Icon icon={ image } />
+ 				<span style={ { minWidth: 0 } }>Image</span>
+ 			</Stack>
+@@ -426,7 +426,7 @@ export const fields: Field< SpaceObject >[] = [
+ 		label: 'Categories',
+ 		id: 'categories',
+ 		header: (
+-			<Stack direction="row" gap="2xs" justify="start" align="center">
++			<Stack direction="row" gap="xs" justify="start" align="center">
+ 				<Icon icon={ category } />
+ 				<span style={ { minWidth: 0 } }>Categories</span>
+ 			</Stack>
+diff --git a/packages/dataviews/src/dataviews-picker/stories/index.story.tsx b/packages/dataviews/src/dataviews-picker/stories/index.story.tsx
+index 3bf7d5bb9bdb16..1b65e5df5b5f4c 100644
+--- a/packages/dataviews/src/dataviews-picker/stories/index.story.tsx
++++ b/packages/dataviews/src/dataviews-picker/stories/index.story.tsx
+@@ -238,7 +238,7 @@ export const WithModal = ( {
+ 
+ 	return (
+ 		<>
+-			<Stack direction="row" justify="left" gap="xs">
++			<Stack direction="row" justify="left" gap="sm">
+ 				<Button
+ 					variant="primary"
+ 					onClick={ () => setIsModalOpen( true ) }
+diff --git a/packages/dataviews/src/dataviews/index.tsx b/packages/dataviews/src/dataviews/index.tsx
+index a7fa05cb7faad9..62d611c2fdae49 100644
+--- a/packages/dataviews/src/dataviews/index.tsx
++++ b/packages/dataviews/src/dataviews/index.tsx
+@@ -95,18 +95,18 @@ function DefaultUI( {
+ 				align="top"
+ 				justify="space-between"
+ 				className="dataviews__view-actions"
+-				gap="2xs"
++				gap="xs"
+ 			>
+ 				<Stack
+ 					direction="row"
+ 					justify="start"
+-					gap="xs"
++					gap="sm"
+ 					className="dataviews__search"
+ 				>
+ 					{ search && <DataViewsSearch label={ searchLabel } /> }
+ 					<FiltersToggle />
+ 				</Stack>
+-				<Stack direction="row" gap="2xs" style={ { flexShrink: 0 } }>
++				<Stack direction="row" gap="xs" style={ { flexShrink: 0 } }>
+ 					<DataViewsViewConfig />
+ 					{ header }
+ 				</Stack>
+diff --git a/packages/dataviews/src/dataviews/stories/empty.tsx b/packages/dataviews/src/dataviews/stories/empty.tsx
+index 6ba5d89cc5c9ed..ac9945284ad638 100644
+--- a/packages/dataviews/src/dataviews/stories/empty.tsx
++++ b/packages/dataviews/src/dataviews/stories/empty.tsx
+@@ -39,7 +39,7 @@ const PlanetIllustration = () => (
+ 	</svg>
+ );
+ const CustomEmptyComponent = () => (
+-	<Stack direction="column" align="center" justify="center" gap="sm">
++	<Stack direction="column" align="center" justify="center" gap="md">
+ 		<PlanetIllustration />
+ 		<Text>No celestial bodies found</Text>
+ 	</Stack>
+diff --git a/packages/dataviews/src/dataviews/stories/fixtures.tsx b/packages/dataviews/src/dataviews/stories/fixtures.tsx
+index 4ed77eabcdd0b9..53ce738e002c8c 100644
+--- a/packages/dataviews/src/dataviews/stories/fixtures.tsx
++++ b/packages/dataviews/src/dataviews/stories/fixtures.tsx
+@@ -333,9 +333,9 @@ export const actions: Action< SpaceObject >[] = [
+ 					? `Are you sure you want to delete ${ items.length } items?`
+ 					: `Are you sure you want to delete "${ items[ 0 ].name.title }"?`;
+ 			return (
+-				<Stack direction="column" gap="lg">
++				<Stack direction="column" gap="xl">
+ 					<Text>{ label }</Text>
+-					<Stack direction="row" gap="xs" justify="right">
++					<Stack direction="row" gap="sm" justify="right">
+ 						<Button
+ 							__next40pxDefaultSize
+ 							variant="tertiary"
+@@ -371,7 +371,7 @@ export const fields: Field< SpaceObject >[] = [
+ 		id: 'image',
+ 		type: 'media',
+ 		header: (
+-			<Stack direction="row" gap="2xs" justify="start" align="center">
++			<Stack direction="row" gap="xs" justify="start" align="center">
+ 				<Icon icon={ image } />
+ 				<span style={ { minWidth: 0 } }>Image</span>
+ 			</Stack>
+@@ -477,7 +477,7 @@ export const fields: Field< SpaceObject >[] = [
+ 		label: 'Categories',
+ 		id: 'categories',
+ 		header: (
+-			<Stack direction="row" gap="2xs" justify="start" align="center">
++			<Stack direction="row" gap="xs" justify="start" align="center">
+ 				<Icon icon={ category } />
+ 				<span style={ { minWidth: 0 } }>Categories</span>
+ 			</Stack>
+diff --git a/packages/dataviews/src/dataviews/stories/free-composition.tsx b/packages/dataviews/src/dataviews/stories/free-composition.tsx
+index c2cc2297854897..5bd8f82fb7e96e 100644
+--- a/packages/dataviews/src/dataviews/stories/free-composition.tsx
++++ b/packages/dataviews/src/dataviews/stories/free-composition.tsx
+@@ -37,14 +37,14 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
+ 				{ __( 'Solar System numbers' ) }
+ 			</Heading>
+ 			<div className="free-composition-header">
+-				<Stack direction="column" gap="md">
+-					<Stack direction="row" justify="start" gap="xs">
++				<Stack direction="column" gap="lg">
++					<Stack direction="row" justify="start" gap="sm">
+ 						<DataViews.Search label={ __( 'Search content' ) } />
+ 						<DataViews.FiltersToggle />
+ 						<Stack
+ 							direction="row"
+ 							justify="end"
+-							gap="xs"
++							gap="sm"
+ 							style={ { flex: 1 } }
+ 						>
+ 							<DataViews.ViewConfig />
+@@ -54,7 +54,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
+ 					<DataViews.FiltersToggled />
+ 					<Card variant="secondary">
+ 						<CardBody>
+-							<Stack direction="column" gap="xs">
++							<Stack direction="column" gap="sm">
+ 								<Text size={ 18 } as="p">
+ 									{ createInterpolateElement(
+ 										_n(
+@@ -95,7 +95,7 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
+ 								direction="row"
+ 								justify="space-between"
+ 								align="center"
+-								gap="xs"
++								gap="sm"
+ 							>
+ 								<DataViews.BulkActionToolbar />
+ 								<DataViews.Pagination />
+@@ -173,7 +173,7 @@ export const FreeCompositionComponent = () => {
+ 				empty={
+ 					<Stack
+ 						direction="column"
+-						gap="xs"
++						gap="sm"
+ 						justify="space-around"
+ 						align="center"
+ 						className="free-composition-dataviews-empty"
+diff --git a/packages/dataviews/src/dataviews/stories/layout-activity.tsx b/packages/dataviews/src/dataviews/stories/layout-activity.tsx
+index 5018f46c8bc138..d821b56c1e5c05 100644
+--- a/packages/dataviews/src/dataviews/stories/layout-activity.tsx
++++ b/packages/dataviews/src/dataviews/stories/layout-activity.tsx
+@@ -484,7 +484,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
+ 		label: 'Categories',
+ 		id: 'categories',
+ 		header: (
+-			<Stack direction="row" gap="2xs" justify="start" align="center">
++			<Stack direction="row" gap="sm" justify="start" align="center">
+ 				<Icon icon={ category } />
+ 				<span style={ { minWidth: 0 } }>Categories</span>
+ 			</Stack>
+@@ -554,9 +554,9 @@ export const orderEventActions: Action< OrderEvent >[] = [
+ 				closeModal?.();
+ 			};
+ 			return (
+-				<Stack direction="column" gap="lg">
++				<Stack direction="column" gap="xl">
+ 					<Text>{ label }</Text>
+-					<Stack direction="row" gap="xs" justify="right">
++					<Stack direction="row" gap="sm" justify="right">
+ 						<Button
+ 							__next40pxDefaultSize
+ 							variant="tertiary"
+diff --git a/packages/dataviews/src/field-types/stories/index.story.tsx b/packages/dataviews/src/field-types/stories/index.story.tsx
+index 7d31fa9e5f1178..3cbc7bce1cb1b8 100644
+--- a/packages/dataviews/src/field-types/stories/index.story.tsx
++++ b/packages/dataviews/src/field-types/stories/index.story.tsx
+@@ -619,7 +619,7 @@ const FieldTypeStory = ( {
+ 		null;
+ 
+ 	return (
+-		<Stack direction="row" gap="xs" align="stretch">
++		<Stack direction="row" gap="sm" align="stretch">
+ 			<div style={ { flex: 2 } }>
+ 				<DataViews
+ 					getItemId={ ( item ) => item.id.toString() }
+@@ -649,7 +649,7 @@ const FieldTypeStory = ( {
+ 				/>
+ 			</div>
+ 			{ selectedItem ? (
+-				<Stack direction="column" gap="xs" align="top">
++				<Stack direction="column" gap="sm" align="top">
+ 					<DataForm
+ 						data={ selectedItem }
+ 						form={ form }
+@@ -673,7 +673,7 @@ const FieldTypeStory = ( {
+ 			) : (
+ 				<Stack
+ 					direction="column"
+-					gap="xs"
++					gap="sm"
+ 					align="center"
+ 					justify="center"
+ 				>
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index d7ab9e27c52fad..e49ab29fe993d0 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -2,6 +2,24 @@
+ 
+ ## Unreleased
+ 
++### Breaking changes
++
++-   Renamed padding tokens to remove the `surface` segment and updated the scale from `2xs`–`lg` to `xs`–`3xl`. To preserve the same values:
++		- `--wpds-dimension-padding-surface-2xs`: use `--wpds-dimension-padding-xs` instead.
++		- `--wpds-dimension-padding-surface-xs`: use `--wpds-dimension-padding-sm` instead.
++		- `--wpds-dimension-padding-surface-sm`: use `--wpds-dimension-padding-lg` instead.
++		- `--wpds-dimension-padding-surface-md`: use `--wpds-dimension-padding-2xl` instead.
++		- `--wpds-dimension-padding-surface-lg`: use `--wpds-dimension-padding-3xl` instead.
++
++-   Updated gap token scale from `2xs`–`xl` to `xs`–`3xl`. To preserve the same values:
++		- `--wpds-dimension-gap-2xs`: use `--wpds-dimension-gap-xs` instead.
++		- `--wpds-dimension-gap-xs`: use `--wpds-dimension-gap-sm` instead.
++		- `--wpds-dimension-gap-sm`: use `--wpds-dimension-gap-md` instead.
++		- `--wpds-dimension-gap-md`: use `--wpds-dimension-gap-lg` instead.
++		- `--wpds-dimension-gap-lg`: use `--wpds-dimension-gap-xl` instead.
++		- `--wpds-dimension-gap-xl`: use `--wpds-dimension-gap-2xl` instead.
++		- `--wpds-dimension-gap-2xl`: use `--wpds-dimension-gap-3xl` instead.
++
+ ## 0.6.0 (2026-01-29)
+ 
+ ## 0.5.0 (2026-01-16)
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index e855ffe53d9c48..c6e8de9f8314c0 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -26,7 +26,7 @@ This separation allows the design system to maintain consistency while providing
+ 
+ Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
+ 
+-Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-bg-interactive-brand-strong` or `--wpds-dimension-padding-surface-md` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
++Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-bg-interactive-brand-strong` or `--wpds-dimension-padding-2xl` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
+ 
+ #### Structure
+ 
+@@ -89,7 +89,7 @@ Semantic tokens follow a consistent naming pattern:
+ 
+ | Value                               | Description          |
+ | ----------------------------------- | -------------------- |
+-| `2xs`, `xs`, `sm`, `md`, `lg`, `xl` | Size scale modifiers |
++| `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` | Size scale modifiers |
+ 
+ #### Color Token Modifiers
+ 
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index a256281ad1be83..e79930de867f59 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -116,20 +116,26 @@ Do not edit directly.
+ 
+ ### Dimension
+ 
+-| Variable name                          | Description                         |
+-| -------------------------------------- | ----------------------------------- |
+-| `--wpds-dimension-base`                | Base dimension unit                 |
+-| `--wpds-dimension-padding-surface-2xs` | 2x extra small spacing for surfaces |
+-| `--wpds-dimension-padding-surface-xs`  | Extra small spacing for surfaces    |
+-| `--wpds-dimension-padding-surface-sm`  | Small spacing for surfaces          |
+-| `--wpds-dimension-padding-surface-md`  | Medium spacing for surfaces         |
+-| `--wpds-dimension-padding-surface-lg`  | Large spacing for surfaces          |
+-| `--wpds-dimension-gap-2xs`             | 2x extra small gap                  |
+-| `--wpds-dimension-gap-xs`              | Extra small gap                     |
+-| `--wpds-dimension-gap-sm`              | Small gap                           |
+-| `--wpds-dimension-gap-md`              | Medium gap                          |
+-| `--wpds-dimension-gap-lg`              | Large gap                           |
+-| `--wpds-dimension-gap-xl`              | Extra large gap                     |
++| Variable name                             | Description                                             |
++| ----------------------------------------- | ------------------------------------------------------- |
++| `--wpds-dimension-base`                   | Base dimension unit                                     |
++| `--wpds-dimension-padding-xs`             | Extra small padding                                     |
++| `--wpds-dimension-padding-sm`             | Small padding                                           |
++| `--wpds-dimension-padding-md`             | Medium padding                                          |
++| `--wpds-dimension-padding-lg`             | Large padding                                           |
++| `--wpds-dimension-padding-xl`             | Extra large padding                                     |
++| `--wpds-dimension-padding-2xl`            | 2x extra large padding                                  |
++| `--wpds-dimension-padding-3xl`            | 3x extra large padding                                  |
++| `--wpds-dimension-control-height-default` | Default control height for standard text-label buttons  |
++| `--wpds-dimension-control-height-compact` | Compact control height for toggle buttons, icon buttons |
++| `--wpds-dimension-control-height-small`   | Small control height for auxiliary icon buttons         |
++| `--wpds-dimension-gap-xs`                 | Extra small gap                                         |
++| `--wpds-dimension-gap-sm`                 | Small gap                                               |
++| `--wpds-dimension-gap-md`                 | Medium gap                                              |
++| `--wpds-dimension-gap-lg`                 | Large gap                                               |
++| `--wpds-dimension-gap-xl`                 | Extra large gap                                         |
++| `--wpds-dimension-gap-2xl`                | 2x extra large gap                                      |
++| `--wpds-dimension-gap-3xl`                | 3x extra large gap                                      |
+ 
+ ### Elevation
+ 
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index f420be9c7d910d..72fa85d177d82e 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -101,17 +101,23 @@
+ 	--wpds-color-stroke-surface-warning: #d0b381; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
+ 	--wpds-color-stroke-surface-warning-strong: #926300; /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
+ 	--wpds-dimension-base: 4px; /* Base dimension unit */
+-	--wpds-dimension-gap-2xs: 4px; /* 2x extra small gap */
+-	--wpds-dimension-gap-lg: 24px; /* Large gap */
+-	--wpds-dimension-gap-md: 16px; /* Medium gap */
+-	--wpds-dimension-gap-sm: 12px; /* Small gap */
+-	--wpds-dimension-gap-xl: 40px; /* Extra large gap */
+-	--wpds-dimension-gap-xs: 8px; /* Extra small gap */
+-	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
+-	--wpds-dimension-padding-surface-lg: 32px; /* Large spacing for surfaces */
+-	--wpds-dimension-padding-surface-md: 24px; /* Medium spacing for surfaces */
+-	--wpds-dimension-padding-surface-sm: 16px; /* Small spacing for surfaces */
+-	--wpds-dimension-padding-surface-xs: 8px; /* Extra small spacing for surfaces */
++	--wpds-dimension-control-height-compact: 32px; /* Compact control height for toggle buttons, icon buttons */
++	--wpds-dimension-control-height-default: 40px; /* Default control height for standard text-label buttons */
++	--wpds-dimension-control-height-small: 24px; /* Small control height for auxiliary icon buttons */
++	--wpds-dimension-gap-2xl: 32px; /* 2x extra large gap */
++	--wpds-dimension-gap-3xl: 40px; /* 3x extra large gap */
++	--wpds-dimension-gap-lg: 16px; /* Large gap */
++	--wpds-dimension-gap-md: 12px; /* Medium gap */
++	--wpds-dimension-gap-sm: 8px; /* Small gap */
++	--wpds-dimension-gap-xl: 24px; /* Extra large gap */
++	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
++	--wpds-dimension-padding-2xl: 24px; /* 2x extra large padding */
++	--wpds-dimension-padding-3xl: 32px; /* 3x extra large padding */
++	--wpds-dimension-padding-lg: 16px; /* Large padding */
++	--wpds-dimension-padding-md: 12px; /* Medium padding */
++	--wpds-dimension-padding-sm: 8px; /* Small padding */
++	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
++	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
+ 	--wpds-elevation-large: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
+ 		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005; /* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
+ 	--wpds-elevation-medium: 0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a,
+@@ -143,45 +149,63 @@
+ 
+ [data-wpds-theme-provider-id][data-wpds-density='default'] {
+ 	--wpds-dimension-base: 4px; /* Base dimension unit */
+-	--wpds-dimension-gap-2xs: 4px; /* 2x extra small gap */
+-	--wpds-dimension-gap-lg: 24px; /* Large gap */
+-	--wpds-dimension-gap-md: 16px; /* Medium gap */
+-	--wpds-dimension-gap-sm: 12px; /* Small gap */
+-	--wpds-dimension-gap-xl: 40px; /* Extra large gap */
+-	--wpds-dimension-gap-xs: 8px; /* Extra small gap */
+-	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
+-	--wpds-dimension-padding-surface-lg: 32px; /* Large spacing for surfaces */
+-	--wpds-dimension-padding-surface-md: 24px; /* Medium spacing for surfaces */
+-	--wpds-dimension-padding-surface-sm: 16px; /* Small spacing for surfaces */
+-	--wpds-dimension-padding-surface-xs: 8px; /* Extra small spacing for surfaces */
++	--wpds-dimension-control-height-compact: 32px; /* Compact control height for toggle buttons, icon buttons */
++	--wpds-dimension-control-height-default: 40px; /* Default control height for standard text-label buttons */
++	--wpds-dimension-control-height-small: 24px; /* Small control height for auxiliary icon buttons */
++	--wpds-dimension-gap-2xl: 32px; /* 2x extra large gap */
++	--wpds-dimension-gap-3xl: 40px; /* 3x extra large gap */
++	--wpds-dimension-gap-lg: 16px; /* Large gap */
++	--wpds-dimension-gap-md: 12px; /* Medium gap */
++	--wpds-dimension-gap-sm: 8px; /* Small gap */
++	--wpds-dimension-gap-xl: 24px; /* Extra large gap */
++	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
++	--wpds-dimension-padding-2xl: 24px; /* 2x extra large padding */
++	--wpds-dimension-padding-3xl: 32px; /* 3x extra large padding */
++	--wpds-dimension-padding-lg: 16px; /* Large padding */
++	--wpds-dimension-padding-md: 12px; /* Medium padding */
++	--wpds-dimension-padding-sm: 8px; /* Small padding */
++	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
++	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
+ }
+ 
+ [data-wpds-theme-provider-id][data-wpds-density='compact'] {
+-	--wpds-dimension-gap-2xs: 4px; /* 2x extra small gap */
+-	--wpds-dimension-gap-lg: 20px; /* Large gap */
+-	--wpds-dimension-gap-md: 12px; /* Medium gap */
+-	--wpds-dimension-gap-sm: 8px; /* Small gap */
+-	--wpds-dimension-gap-xl: 32px; /* Extra large gap */
++	--wpds-dimension-control-height-compact: 28px; /* Compact control height for toggle buttons, icon buttons */
++	--wpds-dimension-control-height-default: 36px; /* Default control height for standard text-label buttons */
++	--wpds-dimension-control-height-small: 20px; /* Small control height for auxiliary icon buttons */
++	--wpds-dimension-gap-2xl: 24px; /* 2x extra large gap */
++	--wpds-dimension-gap-3xl: 32px; /* 3x extra large gap */
++	--wpds-dimension-gap-lg: 12px; /* Large gap */
++	--wpds-dimension-gap-md: 8px; /* Medium gap */
++	--wpds-dimension-gap-sm: 4px; /* Small gap */
++	--wpds-dimension-gap-xl: 20px; /* Extra large gap */
+ 	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
+-	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
+-	--wpds-dimension-padding-surface-lg: 24px; /* Large spacing for surfaces */
+-	--wpds-dimension-padding-surface-md: 20px; /* Medium spacing for surfaces */
+-	--wpds-dimension-padding-surface-sm: 12px; /* Small spacing for surfaces */
+-	--wpds-dimension-padding-surface-xs: 4px; /* Extra small spacing for surfaces */
++	--wpds-dimension-padding-2xl: 20px; /* 2x extra large padding */
++	--wpds-dimension-padding-3xl: 24px; /* 3x extra large padding */
++	--wpds-dimension-padding-lg: 12px; /* Large padding */
++	--wpds-dimension-padding-md: 8px; /* Medium padding */
++	--wpds-dimension-padding-sm: 4px; /* Small padding */
++	--wpds-dimension-padding-xl: 16px; /* Extra large padding */
++	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
+ }
+ 
+ [data-wpds-theme-provider-id][data-wpds-density='comfortable'] {
+-	--wpds-dimension-gap-2xs: 8px; /* 2x extra small gap */
+-	--wpds-dimension-gap-lg: 32px; /* Large gap */
+-	--wpds-dimension-gap-md: 20px; /* Medium gap */
+-	--wpds-dimension-gap-sm: 16px; /* Small gap */
+-	--wpds-dimension-gap-xl: 48px; /* Extra large gap */
+-	--wpds-dimension-gap-xs: 12px; /* Extra small gap */
+-	--wpds-dimension-padding-surface-2xs: 8px; /* 2x extra small spacing for surfaces */
+-	--wpds-dimension-padding-surface-lg: 40px; /* Large spacing for surfaces */
+-	--wpds-dimension-padding-surface-md: 32px; /* Medium spacing for surfaces */
+-	--wpds-dimension-padding-surface-sm: 20px; /* Small spacing for surfaces */
+-	--wpds-dimension-padding-surface-xs: 12px; /* Extra small spacing for surfaces */
++	--wpds-dimension-control-height-compact: 36px; /* Compact control height for toggle buttons, icon buttons */
++	--wpds-dimension-control-height-default: 44px; /* Default control height for standard text-label buttons */
++	--wpds-dimension-control-height-small: 28px; /* Small control height for auxiliary icon buttons */
++	--wpds-dimension-gap-2xl: 40px; /* 2x extra large gap */
++	--wpds-dimension-gap-3xl: 48px; /* 3x extra large gap */
++	--wpds-dimension-gap-lg: 20px; /* Large gap */
++	--wpds-dimension-gap-md: 16px; /* Medium gap */
++	--wpds-dimension-gap-sm: 12px; /* Small gap */
++	--wpds-dimension-gap-xl: 32px; /* Extra large gap */
++	--wpds-dimension-gap-xs: 8px; /* Extra small gap */
++	--wpds-dimension-padding-2xl: 32px; /* 2x extra large padding */
++	--wpds-dimension-padding-3xl: 40px; /* 3x extra large padding */
++	--wpds-dimension-padding-lg: 20px; /* Large padding */
++	--wpds-dimension-padding-md: 16px; /* Medium padding */
++	--wpds-dimension-padding-sm: 12px; /* Small padding */
++	--wpds-dimension-padding-xl: 24px; /* Extra large padding */
++	--wpds-dimension-padding-xs: 8px; /* Extra small padding */
+ }
+ 
+ @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index 53afbadde48356..aa4c08c203a337 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -102,17 +102,23 @@ export default [
+ 	'--wpds-color-stroke-interactive-error-strong',
+ 	'--wpds-color-stroke-focus-brand',
+ 	'--wpds-dimension-base',
+-	'--wpds-dimension-padding-surface-2xs',
+-	'--wpds-dimension-padding-surface-xs',
+-	'--wpds-dimension-padding-surface-sm',
+-	'--wpds-dimension-padding-surface-md',
+-	'--wpds-dimension-padding-surface-lg',
+-	'--wpds-dimension-gap-2xs',
++	'--wpds-dimension-padding-xs',
++	'--wpds-dimension-padding-sm',
++	'--wpds-dimension-padding-md',
++	'--wpds-dimension-padding-lg',
++	'--wpds-dimension-padding-xl',
++	'--wpds-dimension-padding-2xl',
++	'--wpds-dimension-padding-3xl',
++	'--wpds-dimension-control-height-default',
++	'--wpds-dimension-control-height-compact',
++	'--wpds-dimension-control-height-small',
+ 	'--wpds-dimension-gap-xs',
+ 	'--wpds-dimension-gap-sm',
+ 	'--wpds-dimension-gap-md',
+ 	'--wpds-dimension-gap-lg',
+ 	'--wpds-dimension-gap-xl',
++	'--wpds-dimension-gap-2xl',
++	'--wpds-dimension-gap-3xl',
+ 	'--wpds-elevation-x-small',
+ 	'--wpds-elevation-small',
+ 	'--wpds-elevation-medium',
+diff --git a/packages/theme/src/prebuilt/ts/token-types.ts b/packages/theme/src/prebuilt/ts/token-types.ts
+index 44bff5be0caff6..f4dba86181cc43 100644
+--- a/packages/theme/src/prebuilt/ts/token-types.ts
++++ b/packages/theme/src/prebuilt/ts/token-types.ts
+@@ -6,12 +6,12 @@
+ /**
+  * Size scale for padding tokens.
+  */
+-export type PaddingSize = '2xs' | 'xs' | 'sm' | 'md' | 'lg';
++export type PaddingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+ 
+ /**
+  * Size scale for gap tokens.
+  */
+-export type GapSize = '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
++export type GapSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+ 
+ /**
+  * Size scale for border radius tokens.
+diff --git a/packages/theme/src/stories/index.story.tsx b/packages/theme/src/stories/index.story.tsx
+index ad7feef45e25f7..51299922a2da7f 100644
+--- a/packages/theme/src/stories/index.story.tsx
++++ b/packages/theme/src/stories/index.story.tsx
+@@ -202,7 +202,7 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
+ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
+ 	<div
+ 		style={ {
+-			padding: 'var(--wpds-dimension-padding-surface-sm)',
++			padding: 'var(--wpds-dimension-padding-lg)',
+ 			color: 'var(--wpds-color-fg-content-neutral)',
+ 			backgroundColor: 'var(--wpds-color-bg-surface-neutral)',
+ 			display: 'flex',
+@@ -217,7 +217,7 @@ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
+ 		<span
+ 			style={ {
+ 				display: 'inline-block',
+-				padding: 'var(--wpds-dimension-padding-surface-xs)',
++				padding: 'var(--wpds-dimension-padding-sm)',
+ 				borderRadius: '0.25rem',
+ 				backgroundColor:
+ 					'var(--wpds-color-bg-interactive-brand-strong)',
+@@ -230,7 +230,7 @@ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
+ 			style={ {
+ 				display: 'inline-block',
+ 				marginInlineStart: '0.25rem',
+-				padding: 'var(--wpds-dimension-padding-surface-xs)',
++				padding: 'var(--wpds-dimension-padding-sm)',
+ 				borderRadius: '0.25rem',
+ 				backgroundColor:
+ 					'var(--wpds-color-bg-interactive-neutral-weak-disabled)',
+@@ -411,7 +411,7 @@ export const AcrossIframes: StoryObj< typeof ThemeProvider > = {
+ 				<span
+ 					style={ {
+ 						display: 'inline-block',
+-						padding: 'var(--wpds-dimension-padding-surface-xs)',
++						padding: 'var(--wpds-dimension-padding-sm)',
+ 						borderRadius: '0.25rem',
+ 						backgroundColor:
+ 							'var(--wpds-color-bg-interactive-brand-strong)',
+diff --git a/packages/theme/src/stylelint-plugins/test/fixtures/no-unknown-ds-tokens-valid.css b/packages/theme/src/stylelint-plugins/test/fixtures/no-unknown-ds-tokens-valid.css
+index 9dbaac006a9fef..1f27715ba42e5f 100644
+--- a/packages/theme/src/stylelint-plugins/test/fixtures/no-unknown-ds-tokens-valid.css
++++ b/packages/theme/src/stylelint-plugins/test/fixtures/no-unknown-ds-tokens-valid.css
+@@ -3,7 +3,7 @@
+ 	background-color: var(--wpds-color-bg-surface-neutral);
+ 	color: var(--wpds-color-fg-content-neutral);
+ 	border-radius: var(--wpds-border-radius-sm);
+-	padding: var(--wpds-dimension-padding-surface-md);
++	padding: var(--wpds-dimension-padding-2xl);
+ }
+ 
+ /* Valid: Using tokens with fallbacks */
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index c620faa042d029..2cdc08a4525e50 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -104,7 +104,7 @@ export default defineConfig( {
+ 				{
+ 					name: 'PaddingSize',
+ 					description: 'Size scale for padding tokens.',
+-					patterns: [ /^wpds-dimension\.padding\.[^.]+\.([^.]+)$/ ],
++					patterns: [ /^wpds-dimension\.padding\.([^.]+)$/ ],
+ 				},
+ 				{
+ 					name: 'GapSize',
+diff --git a/packages/theme/tokens/dimension.json b/packages/theme/tokens/dimension.json
+index 22ebcf3e93e0c7..89bc1592216502 100644
+--- a/packages/theme/tokens/dimension.json
++++ b/packages/theme/tokens/dimension.json
+@@ -50,68 +50,120 @@
+ 			"$description": "Base dimension unit"
+ 		},
+ 		"padding": {
+-			"surface": {
+-				"2xs": {
+-					"$value": "{wpds-dimension.primitive.space.10}",
+-					"$description": "2x extra small spacing for surfaces",
+-					"$extensions": {
+-						"mode": {
+-							"compact": "{wpds-dimension.primitive.space.10}",
+-							"comfortable": "{wpds-dimension.primitive.space.20}"
+-						},
+-						"com.figma.scopes": [ "GAP" ]
+-					}
+-				},
+-				"xs": {
+-					"$value": "{wpds-dimension.primitive.space.20}",
+-					"$description": "Extra small spacing for surfaces",
+-					"$extensions": {
+-						"mode": {
+-							"compact": "{wpds-dimension.primitive.space.10}",
+-							"comfortable": "{wpds-dimension.primitive.space.30}"
+-						},
+-						"com.figma.scopes": [ "GAP" ]
+-					}
+-				},
+-				"sm": {
+-					"$value": "{wpds-dimension.primitive.space.40}",
+-					"$description": "Small spacing for surfaces",
+-					"$extensions": {
+-						"mode": {
+-							"compact": "{wpds-dimension.primitive.space.30}",
+-							"comfortable": "{wpds-dimension.primitive.space.50}"
+-						},
+-						"com.figma.scopes": [ "GAP" ]
++			"xs": {
++				"$value": "{wpds-dimension.primitive.space.10}",
++				"$description": "Extra small padding",
++				"$extensions": {
++					"mode": {
++						"compact": "{wpds-dimension.primitive.space.10}",
++						"comfortable": "{wpds-dimension.primitive.space.20}"
++					},
++					"com.figma.scopes": [ "GAP" ]
++				}
++			},
++			"sm": {
++				"$value": "{wpds-dimension.primitive.space.20}",
++				"$description": "Small padding",
++				"$extensions": {
++					"mode": {
++						"compact": "{wpds-dimension.primitive.space.10}",
++						"comfortable": "{wpds-dimension.primitive.space.30}"
++					},
++					"com.figma.scopes": [ "GAP" ]
++				}
++			},
++			"md": {
++				"$value": "{wpds-dimension.primitive.space.30}",
++				"$description": "Medium padding",
++				"$extensions": {
++					"mode": {
++						"compact": "{wpds-dimension.primitive.space.20}",
++						"comfortable": "{wpds-dimension.primitive.space.40}"
++					},
++					"com.figma.scopes": [ "GAP" ]
++				}
++			},
++			"lg": {
++				"$value": "{wpds-dimension.primitive.space.40}",
++				"$description": "Large padding",
++				"$extensions": {
++					"mode": {
++						"compact": "{wpds-dimension.primitive.space.30}",
++						"comfortable": "{wpds-dimension.primitive.space.50}"
++					},
++					"com.figma.scopes": [ "GAP" ]
++				}
++			},
++			"xl": {
++				"$value": "{wpds-dimension.primitive.space.50}",
++				"$description": "Extra large padding",
++				"$extensions": {
++					"mode": {
++						"compact": "{wpds-dimension.primitive.space.40}",
++						"comfortable": "{wpds-dimension.primitive.space.60}"
++					},
++					"com.figma.scopes": [ "GAP" ]
++				}
++			},
++			"2xl": {
++				"$value": "{wpds-dimension.primitive.space.60}",
++				"$description": "2x extra large padding",
++				"$extensions": {
++					"mode": {
++						"compact": "{wpds-dimension.primitive.space.50}",
++						"comfortable": "{wpds-dimension.primitive.space.70}"
++					},
++					"com.figma.scopes": [ "GAP" ]
++				}
++			},
++			"3xl": {
++				"$value": "{wpds-dimension.primitive.space.70}",
++				"$description": "3x extra large padding",
++				"$extensions": {
++					"mode": {
++						"compact": "{wpds-dimension.primitive.space.60}",
++						"comfortable": "{wpds-dimension.primitive.space.80}"
++					},
++					"com.figma.scopes": [ "GAP" ]
++				}
++			}
++		},
++		"control-height": {
++			"default": {
++				"$value": { "value": 40, "unit": "px" },
++				"$description": "Default control height for standard text-label buttons",
++				"$extensions": {
++					"mode": {
++						"compact": { "value": 36, "unit": "px" },
++						"comfortable": { "value": 44, "unit": "px" }
+ 					}
+-				},
+-				"md": {
+-					"$value": "{wpds-dimension.primitive.space.60}",
+-					"$description": "Medium spacing for surfaces",
+-					"$extensions": {
+-						"mode": {
+-							"compact": "{wpds-dimension.primitive.space.50}",
+-							"comfortable": "{wpds-dimension.primitive.space.70}"
+-						},
+-						"com.figma.scopes": [ "GAP" ]
++				}
++			},
++			"compact": {
++				"$value": { "value": 32, "unit": "px" },
++				"$description": "Compact control height for toggle buttons, icon buttons",
++				"$extensions": {
++					"mode": {
++						"compact": { "value": 28, "unit": "px" },
++						"comfortable": { "value": 36, "unit": "px" }
+ 					}
+-				},
+-				"lg": {
+-					"$value": "{wpds-dimension.primitive.space.70}",
+-					"$description": "Large spacing for surfaces",
+-					"$extensions": {
+-						"mode": {
+-							"compact": "{wpds-dimension.primitive.space.60}",
+-							"comfortable": "{wpds-dimension.primitive.space.80}"
+-						},
+-						"com.figma.scopes": [ "GAP" ]
++				}
++			},
++			"small": {
++				"$value": { "value": 24, "unit": "px" },
++				"$description": "Small control height for auxiliary icon buttons",
++				"$extensions": {
++					"mode": {
++						"compact": { "value": 20, "unit": "px" },
++						"comfortable": { "value": 28, "unit": "px" }
+ 					}
+ 				}
+ 			}
+ 		},
+ 		"gap": {
+-			"2xs": {
++			"xs": {
+ 				"$value": "{wpds-dimension.primitive.space.10}",
+-				"$description": "2x extra small gap",
++				"$description": "Extra small gap",
+ 				"$extensions": {
+ 					"mode": {
+ 						"compact": "{wpds-dimension.primitive.space.10}",
+@@ -120,9 +172,9 @@
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+-			"xs": {
++			"sm": {
+ 				"$value": "{wpds-dimension.primitive.space.20}",
+-				"$description": "Extra small gap",
++				"$description": "Small gap",
+ 				"$extensions": {
+ 					"mode": {
+ 						"compact": "{wpds-dimension.primitive.space.10}",
+@@ -131,9 +183,9 @@
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+-			"sm": {
++			"md": {
+ 				"$value": "{wpds-dimension.primitive.space.30}",
+-				"$description": "Small gap",
++				"$description": "Medium gap",
+ 				"$extensions": {
+ 					"mode": {
+ 						"compact": "{wpds-dimension.primitive.space.20}",
+@@ -142,9 +194,9 @@
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+-			"md": {
++			"lg": {
+ 				"$value": "{wpds-dimension.primitive.space.40}",
+-				"$description": "Medium gap",
++				"$description": "Large gap",
+ 				"$extensions": {
+ 					"mode": {
+ 						"compact": "{wpds-dimension.primitive.space.30}",
+@@ -153,9 +205,9 @@
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+-			"lg": {
++			"xl": {
+ 				"$value": "{wpds-dimension.primitive.space.60}",
+-				"$description": "Large gap",
++				"$description": "Extra large gap",
+ 				"$extensions": {
+ 					"mode": {
+ 						"compact": "{wpds-dimension.primitive.space.50}",
+@@ -164,9 +216,20 @@
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+-			"xl": {
++			"2xl": {
++				"$value": "{wpds-dimension.primitive.space.70}",
++				"$description": "2x extra large gap",
++				"$extensions": {
++					"mode": {
++						"compact": "{wpds-dimension.primitive.space.60}",
++						"comfortable": "{wpds-dimension.primitive.space.80}"
++					},
++					"com.figma.scopes": [ "GAP" ]
++				}
++			},
++			"3xl": {
+ 				"$value": "{wpds-dimension.primitive.space.80}",
+-				"$description": "Extra large gap",
++				"$description": "3x extra large gap",
+ 				"$extensions": {
+ 					"mode": {
+ 						"compact": "{wpds-dimension.primitive.space.70}",
+diff --git a/packages/theme/tokens/modes/dimension.comfortable.json b/packages/theme/tokens/modes/dimension.comfortable.json
+index 7bf25e48b0ee82..3f3ce6d0a5818e 100644
+--- a/packages/theme/tokens/modes/dimension.comfortable.json
++++ b/packages/theme/tokens/modes/dimension.comfortable.json
+@@ -1,51 +1,84 @@
+ {
+ 	"wpds-dimension": {
+ 		"padding": {
+-			"surface": {
+-				"2xs": {
+-					"$type": "dimension",
+-					"$value": "{wpds-dimension.primitive.space.20}"
+-				},
+-				"xs": {
+-					"$type": "dimension",
+-					"$value": "{wpds-dimension.primitive.space.30}"
+-				},
+-				"sm": {
+-					"$type": "dimension",
+-					"$value": "{wpds-dimension.primitive.space.50}"
+-				},
+-				"md": {
+-					"$type": "dimension",
+-					"$value": "{wpds-dimension.primitive.space.70}"
+-				},
+-				"lg": {
+-					"$type": "dimension",
+-					"$value": "{wpds-dimension.primitive.space.80}"
++			"xs": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.20}"
++			},
++			"sm": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.30}"
++			},
++			"md": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.40}"
++			},
++			"lg": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.50}"
++			},
++			"xl": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.60}"
++			},
++			"2xl": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.70}"
++			},
++			"3xl": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.80}"
++			}
++		},
++		"control-height": {
++			"default": {
++				"$type": "dimension",
++				"$value": {
++					"value": 44,
++					"unit": "px"
++				}
++			},
++			"compact": {
++				"$type": "dimension",
++				"$value": {
++					"value": 36,
++					"unit": "px"
++				}
++			},
++			"small": {
++				"$type": "dimension",
++				"$value": {
++					"value": 28,
++					"unit": "px"
+ 				}
+ 			}
+ 		},
+ 		"gap": {
+-			"2xs": {
++			"xs": {
+ 				"$type": "dimension",
+ 				"$value": "{wpds-dimension.primitive.space.20}"
+ 			},
+-			"xs": {
++			"sm": {
+ 				"$type": "dimension",
+ 				"$value": "{wpds-dimension.primitive.space.30}"
+ 			},
+-			"sm": {
++			"md": {
+ 				"$type": "dimension",
+ 				"$value": "{wpds-dimension.primitive.space.40}"
+ 			},
+-			"md": {
++			"lg": {
+ 				"$type": "dimension",
+ 				"$value": "{wpds-dimension.primitive.space.50}"
+ 			},
+-			"lg": {
++			"xl": {
+ 				"$type": "dimension",
+ 				"$value": "{wpds-dimension.primitive.space.70}"
+ 			},
+-			"xl": {
++			"2xl": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.80}"
++			},
++			"3xl": {
+ 				"$type": "dimension",
+ 				"$value": "{wpds-dimension.primitive.space.90}"
+ 			}
+diff --git a/packages/theme/tokens/modes/dimension.compact.json b/packages/theme/tokens/modes/dimension.compact.json
+index e46a61b8c43198..a39ec52d0c667a 100644
+--- a/packages/theme/tokens/modes/dimension.compact.json
++++ b/packages/theme/tokens/modes/dimension.compact.json
+@@ -1,51 +1,84 @@
+ {
+ 	"wpds-dimension": {
+ 		"padding": {
+-			"surface": {
+-				"2xs": {
+-					"$type": "dimension",
+-					"$value": "{wpds-dimension.primitive.space.10}"
+-				},
+-				"xs": {
+-					"$type": "dimension",
+-					"$value": "{wpds-dimension.primitive.space.10}"
+-				},
+-				"sm": {
+-					"$type": "dimension",
+-					"$value": "{wpds-dimension.primitive.space.30}"
+-				},
+-				"md": {
+-					"$type": "dimension",
+-					"$value": "{wpds-dimension.primitive.space.50}"
+-				},
+-				"lg": {
+-					"$type": "dimension",
+-					"$value": "{wpds-dimension.primitive.space.60}"
++			"xs": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.10}"
++			},
++			"sm": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.10}"
++			},
++			"md": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.20}"
++			},
++			"lg": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.30}"
++			},
++			"xl": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.40}"
++			},
++			"2xl": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.50}"
++			},
++			"3xl": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.60}"
++			}
++		},
++		"control-height": {
++			"default": {
++				"$type": "dimension",
++				"$value": {
++					"value": 36,
++					"unit": "px"
++				}
++			},
++			"compact": {
++				"$type": "dimension",
++				"$value": {
++					"value": 28,
++					"unit": "px"
++				}
++			},
++			"small": {
++				"$type": "dimension",
++				"$value": {
++					"value": 20,
++					"unit": "px"
+ 				}
+ 			}
+ 		},
+ 		"gap": {
+-			"2xs": {
++			"xs": {
+ 				"$type": "dimension",
+ 				"$value": "{wpds-dimension.primitive.space.10}"
+ 			},
+-			"xs": {
++			"sm": {
+ 				"$type": "dimension",
+ 				"$value": "{wpds-dimension.primitive.space.10}"
+ 			},
+-			"sm": {
++			"md": {
+ 				"$type": "dimension",
+ 				"$value": "{wpds-dimension.primitive.space.20}"
+ 			},
+-			"md": {
++			"lg": {
+ 				"$type": "dimension",
+ 				"$value": "{wpds-dimension.primitive.space.30}"
+ 			},
+-			"lg": {
++			"xl": {
+ 				"$type": "dimension",
+ 				"$value": "{wpds-dimension.primitive.space.50}"
+ 			},
+-			"xl": {
++			"2xl": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.60}"
++			},
++			"3xl": {
+ 				"$type": "dimension",
+ 				"$value": "{wpds-dimension.primitive.space.70}"
+ 			}
+diff --git a/packages/ui/src/badge/badge.tsx b/packages/ui/src/badge/badge.tsx
+index 5be5c5dacf0240..054f46066a9220 100644
+--- a/packages/ui/src/badge/badge.tsx
++++ b/packages/ui/src/badge/badge.tsx
+@@ -70,7 +70,7 @@ export const Badge = forwardRef< HTMLDivElement, BadgeProps >( function Badge(
+ 	return (
+ 		<Box
+ 			{ ...intentStyles }
+-			padding={ { inline: 'xs', block: '2xs' } }
++			padding={ { inline: 'sm', block: 'xs' } }
+ 			borderRadius="lg"
+ 			render={ render }
+ 			style={ {
+diff --git a/packages/ui/src/box/box.tsx b/packages/ui/src/box/box.tsx
+index aab1d1fecb78cb..180fb387645893 100644
+--- a/packages/ui/src/box/box.tsx
++++ b/packages/ui/src/box/box.tsx
+@@ -20,16 +20,11 @@ const capitalize = ( str: string ): string =>
+  * fallback).
+  *
+  * @param property The CSS property name.
+- * @param target   The design system token target.
+  * @param value    The size token name.
+  * @return A CSS value string with variable references.
+  */
+-const getSpacingValue = (
+-	property: string,
+-	target: string,
+-	value: string
+-): string =>
+-	`var(--wpds-dimension-${ property }-${ target }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
++const getSpacingValue = ( property: string, value: string ): string =>
++	`var(--wpds-dimension-${ property }-${ value }, var(--wpds-dimension-${ property }-${ value }))`;
+ 
+ /**
+  * Generates CSS styles for properties with optionally directional values,
+@@ -37,23 +32,20 @@ const getSpacingValue = (
+  * properties.
+  *
+  * @param property The CSS property name from BoxProps.
+- * @param target   The design system token target.
+  * @param value    The property value (single or object with directional keys).
+  * @return A CSSProperties object with the computed styles.
+  */
+ const getDimensionVariantStyles = < T extends keyof BoxProps >(
+ 	property: T,
+-	target: string,
+ 	value: NonNullable< BoxProps[ T ] >
+ ): React.CSSProperties =>
+ 	typeof value !== 'object'
+-		? { [ property ]: getSpacingValue( property, target, value ) }
++		? { [ property ]: getSpacingValue( property, value ) }
+ 		: Object.keys( value ).reduce(
+ 				( result, key ) => ( {
+ 					...result,
+ 					[ property + capitalize( key ) ]: getSpacingValue(
+ 						property,
+-						target,
+ 						value[ key ]
+ 					),
+ 				} ),
+@@ -89,10 +81,7 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
+ 	}
+ 
+ 	if ( padding ) {
+-		Object.assign(
+-			style,
+-			getDimensionVariantStyles( 'padding', target, padding )
+-		);
++		Object.assign( style, getDimensionVariantStyles( 'padding', padding ) );
+ 	}
+ 
+ 	if ( borderRadius ) {
+diff --git a/packages/ui/src/box/stories/index.story.tsx b/packages/ui/src/box/stories/index.story.tsx
+index b2c1cfa259f8a6..0f5614432d8a44 100644
+--- a/packages/ui/src/box/stories/index.story.tsx
++++ b/packages/ui/src/box/stories/index.story.tsx
+@@ -23,7 +23,15 @@ export const Default: Story = {
+ 	argTypes: {
+ 		padding: {
+ 			control: 'select',
+-			options: [ '2xs', 'xs', 'sm', 'md', 'lg' ] satisfies PaddingSize[],
++			options: [
++				'xs',
++				'sm',
++				'md',
++				'lg',
++				'xl',
++				'2xl',
++				'3xl',
++			] satisfies PaddingSize[],
+ 		},
+ 	},
+ };
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+index ed1aad330b5704..7ef9d5ca412800 100644
+--- a/packages/ui/src/button/style.module.css
++++ b/packages/ui/src/button/style.module.css
+@@ -9,16 +9,14 @@
+ 
+ 	.button {
+ 		/* Internal variables */
+-		--wp-ui-button-font-weight: 499;
+-
+ 		--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand-strong);
+ 		--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-strong-active);
+ 		--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
+ 		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand-strong);
+ 		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-strong-active);
+ 		--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
++		--wp-ui-button-min-height: var(--wpds-dimension-control-height-default);
+ 		--wp-ui-button-padding-inline: calc(3 * var(--wpds-dimension-base)); /* TODO: Create new interactive padding tokens */
+-		--wp-ui-button-height: 40px;
+ 		--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
+ 		--wp-ui-button-font-size: var(--wpds-font-size-md);
+ 
+@@ -34,7 +32,7 @@
+ 		align-items: center;
+ 		gap: calc(2 * var(--wpds-dimension-base)); /* TODO: Consider new interactive/control gap tokens */
+ 		aspect-ratio: var(--wp-ui-button-aspect-ratio);
+-		height: var(--wp-ui-button-height);
++		min-height: var(--wp-ui-button-min-height);
+ 		padding-inline: var(--wp-ui-button-padding-inline);
+ 		border-style: solid;
+ 		border-width: 1px;
+@@ -44,7 +42,7 @@
+ 		background-clip: padding-box;
+ 		font-family: var(--wpds-font-family-body);
+ 		font-size: var(--wp-ui-button-font-size);
+-		font-weight: var(--wp-ui-button-font-weight);
++		font-weight: var(--wpds-font-weight-medium);
+ 		line-height: var(--wpds-font-line-height-sm);
+ 		text-decoration: none;
+ 		color: var(--wp-ui-button-foreground-color);
+@@ -119,8 +117,8 @@
+ 	}
+ 
+ 	.is-small {
++		--wp-ui-button-min-height: var(--wpds-dimension-control-height-small);
+ 		--wp-ui-button-padding-inline: calc(2 * var(--wpds-dimension-base)); /* TODO: Create new interactive padding tokens */
+-		--wp-ui-button-height: 24px;
+ 	}
+ 
+ 	/* Variants (`tone` + `variant`) overrides compared to default styles */
+@@ -193,7 +191,7 @@
+ 	}
+ 
+ 	.is-compact {
+-		--wp-ui-button-height: 32px;
++		--wp-ui-button-min-height: var(--wpds-dimension-control-height-compact);
+ 	}
+ 
+ 	.is-loading {
+diff --git a/packages/ui/src/form/primitives/fieldset/style.module.css b/packages/ui/src/form/primitives/fieldset/style.module.css
+index 0d8f7511d4bda9..4eb611641f6551 100644
+--- a/packages/ui/src/form/primitives/fieldset/style.module.css
++++ b/packages/ui/src/form/primitives/fieldset/style.module.css
+@@ -4,7 +4,7 @@
+ 	.root {
+ 		display: flex;
+ 		flex-direction: column;
+-		gap: var(--wpds-dimension-gap-2xs);
++		gap: var(--wpds-dimension-gap-xs);
+ 		border: 0;
+ 		margin: 0;
+ 		padding: 0;
+diff --git a/packages/ui/src/tooltip/style.module.css b/packages/ui/src/tooltip/style.module.css
+index db295a88bc9b63..dc9ee334cb4533 100644
+--- a/packages/ui/src/tooltip/style.module.css
++++ b/packages/ui/src/tooltip/style.module.css
+@@ -8,8 +8,8 @@
+ 	.popup {
+ 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+ 		padding:
+-			var(--wpds-dimension-padding-surface-2xs)
+-			var(--wpds-dimension-padding-surface-xs);
++			var(--wpds-dimension-padding-xs)
++			var(--wpds-dimension-padding-sm);
+ 		border-radius: var(--wpds-border-radius-sm);
+ 		font-family: var(--wpds-font-family-body);
+ 		font-size: var(--wpds-font-size-sm);
+diff --git a/packages/ui/src/utils/css/item-popup.module.css b/packages/ui/src/utils/css/item-popup.module.css
+index b41a8c7e1cfe14..3402d88636d2f7 100644
+--- a/packages/ui/src/utils/css/item-popup.module.css
++++ b/packages/ui/src/utils/css/item-popup.module.css
+@@ -59,7 +59,7 @@
+ 		grid-template-columns: 24px 1fr;
+ 		align-items: center;
+ 		justify-content: flex-start;
+-		gap: var(--wpds-dimension-gap-2xs);
++		gap: var(--wpds-dimension-gap-xs);
+ 		min-height: var(--wp-ui-popup-item-height);
+ 		border-radius: var(--wpds-border-radius-sm);
+ 		user-select: none;
+diff --git a/packages/ui/src/utils/css/select-trigger.module.css b/packages/ui/src/utils/css/select-trigger.module.css
+index 15f59ce06de914..2ba460a6d4e8b3 100644
+--- a/packages/ui/src/utils/css/select-trigger.module.css
++++ b/packages/ui/src/utils/css/select-trigger.module.css
+@@ -11,7 +11,7 @@
+ 		display: flex;
+ 		justify-content: space-between;
+ 		align-items: center;
+-		gap: var(--wpds-dimension-gap-2xs);
++		gap: var(--wpds-dimension-gap-xs);
+ 		width: 100%;
+ 		padding-block: 4px;
+ 
+diff --git a/storybook/decorators/with-design-system-theme.tsx b/storybook/decorators/with-design-system-theme.tsx
+index acc07c01d47b74..36c7cf67aff045 100644
+--- a/storybook/decorators/with-design-system-theme.tsx
++++ b/storybook/decorators/with-design-system-theme.tsx
+@@ -51,7 +51,7 @@ export function WithDesignSystemTheme(
+ 								background:
+ 									'var(--wpds-color-bg-surface-neutral-strong)',
+ 								padding:
+-									'var(--wpds-dimension-padding-surface-sm) var(--wpds-dimension-padding-surface-sm) var(--wpds-dimension-padding-surface-xs)',
++									'var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-sm)',
+ 								outline:
+ 									'1px dashed var(--wpds-color-stroke-surface-neutral)',
+ 								outlineOffset: '2px',
+@@ -65,7 +65,7 @@ export function WithDesignSystemTheme(
+ 						style={ {
+ 							display: 'block',
+ 							opacity: 0.5,
+-							marginTop: 'var(--wpds-dimension-gap-sm)',
++							marginTop: 'var(--wpds-dimension-gap-md)',
+ 							fontSize: 'var(--wpds-font-size-xs)',
+ 							color: 'var(--wpds-color-fg-content-neutral-weak)',
+ 							textTransform: 'uppercase',

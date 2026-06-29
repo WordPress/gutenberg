@@ -1,0 +1,81 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b5d2b56c2d382a..02e1fde1b85cba 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -27,6 +27,7 @@
+ -   `Snackbar`: Shorten timeout duration ([#73814](https://github.com/WordPress/gutenberg/pull/73814)).
+ -   `ToolsPanel`: Remove line-height workaround for control labels ([#73892](https://github.com/WordPress/gutenberg/pull/73892)).
+ -   `Notice`: Add right margin to content only when dismissible ([#73905](https://github.com/WordPress/gutenberg/pull/73905)).
++-   `Popover`: Update animation, also affecting `Autocomplete`, `BorderControl`, `CircularOptionPicker`, `ColorPalette`, `Dropdown`, `DropdownMenu`, and `PaletteEdit` ([#74082](https://github.com/WordPress/gutenberg/pull/74082)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/popover/test/index.tsx b/packages/components/src/popover/test/index.tsx
+index eac0f942df2f6e..6f4b830ba2be05 100644
+--- a/packages/components/src/popover/test/index.tsx
++++ b/packages/components/src/popover/test/index.tsx
+@@ -528,18 +528,18 @@ describe( 'Popover', () => {
+ 		} );
+ 		describe( 'initial translation', () => {
+ 			it.each( [
+-				[ 'top', 'translateY', '2em' ],
+-				[ 'top-start', 'translateY', '2em' ],
+-				[ 'top-end', 'translateY', '2em' ],
+-				[ 'right', 'translateX', '-2em' ],
+-				[ 'right-start', 'translateX', '-2em' ],
+-				[ 'right-end', 'translateX', '-2em' ],
+-				[ 'bottom', 'translateY', '-2em' ],
+-				[ 'bottom-start', 'translateY', '-2em' ],
+-				[ 'bottom-end', 'translateY', '-2em' ],
+-				[ 'left', 'translateX', '2em' ],
+-				[ 'left-start', 'translateX', '2em' ],
+-				[ 'left-end', 'translateX', '2em' ],
++				[ 'top', 'translateY', '4px' ],
++				[ 'top-start', 'translateY', '4px' ],
++				[ 'top-end', 'translateY', '4px' ],
++				[ 'right', 'translateX', '-4px' ],
++				[ 'right-start', 'translateX', '-4px' ],
++				[ 'right-end', 'translateX', '-4px' ],
++				[ 'bottom', 'translateY', '-4px' ],
++				[ 'bottom-start', 'translateY', '-4px' ],
++				[ 'bottom-end', 'translateY', '-4px' ],
++				[ 'left', 'translateX', '4px' ],
++				[ 'left-start', 'translateX', '4px' ],
++				[ 'left-end', 'translateX', '4px' ],
+ 			] as PlacementToInitialTranslationTuple[] )(
+ 				'for the `%s` placement computes an initial `%s` of `%s',
+ 				(
+diff --git a/packages/components/src/popover/utils.ts b/packages/components/src/popover/utils.ts
+index 6b9a4fa3c36a9c..5b02cbe473e5bc 100644
+--- a/packages/components/src/popover/utils.ts
++++ b/packages/components/src/popover/utils.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { MotionProps } from 'framer-motion';
++import { cubicBezier, type MotionProps } from 'framer-motion';
+ import type { Placement, ReferenceType } from '@floating-ui/react-dom';
+ 
+ /**
+@@ -129,11 +129,16 @@ export const placementToMotionAnimationProps = (
+ 		style: PLACEMENT_TO_ANIMATION_ORIGIN[ placement ],
+ 		initial: {
+ 			opacity: 0,
+-			scale: 0,
+-			[ translateProp ]: `${ 2 * translateDirection }em`,
++			[ translateProp ]: `${ 4 * translateDirection }px`,
++		},
++		animate: { opacity: 1, [ translateProp ]: 0 },
++		transition: {
++			opacity: { duration: 0.08, ease: 'linear' },
++			[ translateProp ]: {
++				duration: 0.3,
++				ease: cubicBezier( 0, 0, 0, 1 ),
++			},
+ 		},
+-		animate: { opacity: 1, scale: 1, [ translateProp ]: 0 },
+-		transition: { duration: 0.1, ease: [ 0, 0, 0.2, 1 ] },
+ 	};
+ };
+ 

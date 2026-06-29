@@ -1,0 +1,30 @@
+diff --git a/packages/block-editor/src/components/block-inspector/style.scss b/packages/block-editor/src/components/block-inspector/style.scss
+index 08ca013629927e..18c39b31144bc6 100644
+--- a/packages/block-editor/src/components/block-inspector/style.scss
++++ b/packages/block-editor/src/components/block-inspector/style.scss
+@@ -27,6 +27,25 @@
+ 	}
+ }
+ 
++.show-icon-labels {
++	.block-editor-block-inspector {
++		.components-button.has-icon,
++		[class*="isIconStyles"] {
++			width: auto;
++
++			// Hide the button icons when labels are set to display...
++			svg {
++				display: none;
++			}
++			// ... and display labels.
++			&::after {
++				content: attr(aria-label);
++				font-size: $helptext-font-size;
++			}
++		}
++	}
++}
++
+ .block-editor-block-inspector__no-blocks,
+ .block-editor-block-inspector__no-block-tools {
+ 	display: block;

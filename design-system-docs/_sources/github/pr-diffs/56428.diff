@@ -1,0 +1,82 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eb6e595e304ecf..cd1705d6cafd7b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `Tabs`: Memoize and expose the component context ([#56224](https://github.com/WordPress/gutenberg/pull/56224)).
+ 
++### Internal
++
++-   `Slot`: add `style` prop to `bubblesVirtually` version ([#56428](https://github.com/WordPress/gutenberg/pull/56428))
++
+ ## 25.12.0 (2023-11-16)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/slot-fill/README.md b/packages/components/src/slot-fill/README.md
+index a04416bdee50d9..9059566deefdf4 100644
+--- a/packages/components/src/slot-fill/README.md
++++ b/packages/components/src/slot-fill/README.md
+@@ -68,7 +68,7 @@ Both `Slot` and `Fill` accept a `name` string prop, where a `Slot` with a given
+ -   By default, events will bubble to their parents on the DOM hierarchy (native event bubbling)
+ -   If `bubblesVirtually` is set to true, events will bubble to their virtual parent in the React elements hierarchy instead.
+ 
+-`Slot` with `bubblesVirtually` set to true also accept an optional `className` to add to the slot container.
++`Slot` with `bubblesVirtually` set to true also accept optional `className` and `style` props to add to the slot container.
+ 
+ `Slot` **without** `bubblesVirtually` accepts an optional `children` function prop, which takes `fills` as a param. It allows you to perform additional processing and wrap `fills` conditionally.
+ 
+diff --git a/packages/components/src/slot-fill/types.ts b/packages/components/src/slot-fill/types.ts
+index 763fa799c8d860..8abb9b941c527c 100644
+--- a/packages/components/src/slot-fill/types.ts
++++ b/packages/components/src/slot-fill/types.ts
+@@ -36,15 +36,21 @@ export type SlotComponentProps =
+ 
+ 			/**
+ 			 * A function that returns nodes to be rendered.
+-			 * Not supported when `bubblesVirtually` is true.
++			 * Supported only when `bubblesVirtually` is `false`.
+ 			 */
+ 			children?: never;
+ 
+ 			/**
+-			 * className.
+-			 * Not supported when `bubblesVirtually` is true.
++			 * Additional className for the `Slot` component.
++			 * Supported only when `bubblesVirtually` is `true`.
+ 			 */
+ 			className?: string;
++
++			/**
++			 * Additional styles for the `Slot` component.
++			 * Supported only when `bubblesVirtually` is `true`.
++			 */
++			style?: React.CSSProperties;
+ 	  } )
+ 	| ( SlotPropBase & {
+ 			/**
+@@ -56,15 +62,21 @@ export type SlotComponentProps =
+ 
+ 			/**
+ 			 * A function that returns nodes to be rendered.
+-			 * Not supported when `bubblesVirtually` is true.
++			 * Supported only when `bubblesVirtually` is `false`.
+ 			 */
+ 			children?: ( fills: ReactNode ) => ReactNode;
+ 
+ 			/**
+-			 * className.
+-			 * Not supported when `bubblesVirtually` is false.
++			 * Additional className for the `Slot` component.
++			 * Supported only when `bubblesVirtually` is `true`.
+ 			 */
+ 			className?: never;
++
++			/**
++			 * Additional styles for the `Slot` component.
++			 * Supported only when `bubblesVirtually` is `true`.
++			 */
++			style?: never;
+ 	  } );
+ 
+ export type FillComponentProps = {

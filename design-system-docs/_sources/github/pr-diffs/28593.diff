@@ -1,0 +1,843 @@
+diff --git a/packages/components/src/ui/elevation/README.md b/packages/components/src/ui/elevation/README.md
+new file mode 100644
+index 00000000000000..777cec0c654c9a
+--- /dev/null
++++ b/packages/components/src/ui/elevation/README.md
+@@ -0,0 +1,70 @@
++# Elevation
++
++`Elevation` is a core component that renders shadow, using the component system's shadow system.
++
++## Usage
++
++The shadow effect is generated using the `value` prop.
++
++```jsx live
++import {
++	__experimentalElevation as Elevation,
++	__experimetnalSurface as Surface,
++	__experimetnalText as Text,
++	__experimetnalView as View,
++} from '@wp-g2/components';
++
++function Example() {
++	return (
++		<Surface>
++			<Text>Elevation</Text>
++			<Elevation value={ 5 } />
++		</Surface>
++	);
++}
++```
++
++## Props
++
++##### active
++
++**Type**: `boolean`
++
++Renders the active (interaction) shadow value.
++
++##### borderRadius
++
++**Type**: `string`,`number`
++
++Renders the border-radius of the shadow.
++
++##### focus
++
++**Type**: `boolean`
++
++Renders the focus (interaction) shadow value.
++
++##### hover
++
++**Type**: `boolean`
++
++Renders the hover (interaction) shadow value.
++
++##### isInteractive
++
++**Type**: `boolean`
++
++Determines if hover, active, and focus shadow values should be automatically calculated and rendered.
++
++##### offset
++
++**Type**: `number`
++
++Dimensional offsets (margin) for the shadow.
++
++##### value
++
++**Type**: `number`
++
++Size of the shadow, based on the Style system's elevation system. The `value` determines the strength of the shadow, which sense of depth.
++In the example below, `isInteractive` is activated to give a better sense of depth.
+diff --git a/packages/components/src/ui/elevation/elevation-styles.js b/packages/components/src/ui/elevation/elevation-styles.js
+new file mode 100644
+index 00000000000000..398a015cc30901
+--- /dev/null
++++ b/packages/components/src/ui/elevation/elevation-styles.js
+@@ -0,0 +1,13 @@
++/**
++ * External dependencies
++ */
++import { css } from '@wp-g2/styles';
++
++export const Elevation = css`
++	background: transparent;
++	display: block;
++	margin: 0 !important;
++	pointer-events: none;
++	position: absolute;
++	will-change: box-shadow;
++`;
+diff --git a/packages/components/src/ui/elevation/elevation.js b/packages/components/src/ui/elevation/elevation.js
+new file mode 100644
+index 00000000000000..f09ce51d92689a
+--- /dev/null
++++ b/packages/components/src/ui/elevation/elevation.js
+@@ -0,0 +1,32 @@
++/**
++ * Internal dependencies
++ */
++import { useElevation } from './use-elevation';
++import { createComponent } from '../utils';
++
++/**
++ * `Elevation` is a core component that renders shadow, using the library's shadow system.
++ *
++ * The shadow effect is generated using the `value` prop.
++ *
++ * @example
++ * ```jsx
++ * function Example() {
++ *   return (
++ *     <View css={ [ ui.padding( 5 ) ] }>
++ *       <Surface css={ [ ui.padding( 5 ) ] }>
++ *         <Text>Into The Unknown</Text>
++ *         <Elevation value={ 5 } />
++ *       </Surface>
++ *     </View>
++ *   );
++ * }
++ * ```
++ */
++const Elevation = createComponent( {
++	as: 'div',
++	useHook: useElevation,
++	name: 'Elevation',
++} );
++
++export default Elevation;
+diff --git a/packages/components/src/ui/elevation/index.js b/packages/components/src/ui/elevation/index.js
+new file mode 100644
+index 00000000000000..bb457293a6fdee
+--- /dev/null
++++ b/packages/components/src/ui/elevation/index.js
+@@ -0,0 +1,2 @@
++export { default as Elevation } from './elevation';
++export * from './use-elevation';
+diff --git a/packages/components/src/ui/elevation/stories/index.js b/packages/components/src/ui/elevation/stories/index.js
+new file mode 100644
+index 00000000000000..45bca3ba26bceb
+--- /dev/null
++++ b/packages/components/src/ui/elevation/stories/index.js
+@@ -0,0 +1,114 @@
++/**
++ * External dependencies
++ */
++import { boolean, number } from '@storybook/addon-knobs';
++
++/**
++ * Internal dependencies
++ */
++import { Elevation } from '../index';
++import { Grid } from '../../grid';
++import { View } from '../../view';
++
++/**
++ * WordPress dependencies
++ */
++import { useCallback } from '@wordpress/element';
++
++export default {
++	component: Elevation,
++	title: 'G2 Components (Experimental)/Elevation',
++};
++
++export const _default = () => {
++	const value = number( 'value', 5 );
++	const borderRadius = number( 'borderRadius', 0 );
++	const hover = number( 'hover', undefined );
++	const active = number( 'active', undefined );
++	const isInteractive = boolean( 'isInteractive', true );
++
++	return (
++		<View
++			css={ {
++				padding: '10vh',
++				position: 'relative',
++				margin: '20vh auto 10vw',
++				maxWidth: 200,
++			} }
++		>
++			<Elevation
++				isInteractive={ isInteractive }
++				value={ value }
++				borderRadius={ borderRadius }
++				hover={ hover }
++				active={ active }
++			/>
++		</View>
++	);
++};
++
++export const Focus = () => {
++	const borderRadius = number( 'borderRadius', 0 );
++	const value = number( 'value', 5 );
++	const hover = number( 'hover', 5 );
++	const active = number( 'active', 1 );
++	const focus = number( 'focus', 10 );
++
++	const Card = useCallback(
++		( props ) => (
++			<View
++				{ ...props }
++				as="a"
++				href="#"
++				onClick={ ( e ) => e.preventDefault() }
++				css={ {
++					display: 'block',
++					width: 100,
++					height: 100,
++					borderRadius,
++					position: 'relative',
++					margin: '20vh auto 10vw',
++				} }
++			/>
++		),
++		[]
++	);
++
++	return (
++		<View
++			css={ {
++				padding: '10vh',
++			} }
++		>
++			<Grid columns={ 3 }>
++				<Card>
++					<Elevation
++						borderRadius={ borderRadius }
++						value={ value }
++						focus={ focus }
++						active={ active }
++						hover={ hover }
++					/>
++				</Card>
++				<Card>
++					<Elevation
++						borderRadius={ borderRadius }
++						value={ value }
++						focus={ focus }
++						active={ active }
++						hover={ hover }
++					/>
++				</Card>
++				<Card>
++					<Elevation
++						borderRadius={ borderRadius }
++						value={ value }
++						focus={ focus }
++						active={ active }
++						hover={ hover }
++					/>
++				</Card>
++			</Grid>
++		</View>
++	);
++};
+diff --git a/packages/components/src/ui/elevation/test/__snapshots__/index.js.snap b/packages/components/src/ui/elevation/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..09f50122f9bcca
+--- /dev/null
++++ b/packages/components/src/ui/elevation/test/__snapshots__/index.js.snap
+@@ -0,0 +1,341 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render active 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
++  opacity: 1;
++  opacity: var(--wp-g2-elevation-intensity);
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
++}
++
++*:active > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
++}
++
++<div
++  aria-hidden="true"
++  class="components-elevation wp-components-elevation emotion-0"
++  data-g2-c16t="true"
++  data-g2-component="Elevation"
++/>
++`;
++
++exports[`props should render correctly 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
++  opacity: 1;
++  opacity: var(--wp-g2-elevation-intensity);
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<div
++  aria-hidden="true"
++  class="components-elevation wp-components-elevation emotion-0"
++  data-g2-c16t="true"
++  data-g2-component="Elevation"
++/>
++`;
++
++exports[`props should render hover 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
++  opacity: 1;
++  opacity: var(--wp-g2-elevation-intensity);
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
++}
++
++<div
++  aria-hidden="true"
++  class="components-elevation wp-components-elevation emotion-0"
++  data-g2-c16t="true"
++  data-g2-component="Elevation"
++/>
++`;
++
++exports[`props should render isInteractive 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
++  opacity: 1;
++  opacity: var(--wp-g2-elevation-intensity);
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
++}
++
++*:active > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
++}
++
++<div
++  aria-hidden="true"
++  class="components-elevation wp-components-elevation emotion-0"
++  data-g2-c16t="true"
++  data-g2-component="Elevation"
++/>
++`;
++
++exports[`props should render offset 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: -2px;
++  box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
++  opacity: 1;
++  opacity: var(--wp-g2-elevation-intensity);
++  left: -2px;
++  right: -2px;
++  top: -2px;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
++}
++
++*:active > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
++}
++
++<div
++  aria-hidden="true"
++  class="components-elevation wp-components-elevation emotion-0"
++  data-g2-c16t="true"
++  data-g2-component="Elevation"
++/>
++`;
++
++exports[`props should render value 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
++  opacity: 1;
++  opacity: var(--wp-g2-elevation-intensity);
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<div
++  aria-hidden="true"
++  class="components-elevation wp-components-elevation emotion-0"
++  data-g2-c16t="true"
++  data-g2-component="Elevation"
++/>
++`;
+diff --git a/packages/components/src/ui/elevation/test/index.js b/packages/components/src/ui/elevation/test/index.js
+new file mode 100644
+index 00000000000000..48d5fe6f6151ad
+--- /dev/null
++++ b/packages/components/src/ui/elevation/test/index.js
+@@ -0,0 +1,51 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { Elevation } from '../index';
++
++describe( 'props', () => {
++	test( 'should render correctly', () => {
++		const { container } = render( <Elevation /> );
++
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render isInteractive', () => {
++		const { container } = render( <Elevation isInteractive /> );
++
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render value', () => {
++		const { container } = render( <Elevation value={ 7 } /> );
++
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render hover', () => {
++		const { container } = render( <Elevation hover={ 14 } value={ 7 } /> );
++
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render active', () => {
++		const { container } = render(
++			<Elevation active={ 5 } hover={ 14 } value={ 7 } />
++		);
++
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render offset', () => {
++		const { container } = render(
++			<Elevation active={ 5 } hover={ 14 } offset={ -2 } value={ 7 } />
++		);
++
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++} );
+diff --git a/packages/components/src/ui/elevation/types.ts b/packages/components/src/ui/elevation/types.ts
+new file mode 100644
+index 00000000000000..fd9cb7ad91139d
+--- /dev/null
++++ b/packages/components/src/ui/elevation/types.ts
+@@ -0,0 +1,51 @@
++import { CSSProperties } from 'react';
++
++export type Props = {
++	/**
++	 * Renders the active (interaction) shadow value.
++	 */
++	active?: number;
++	/**
++	 * Renders the border-radius of the shadow.
++	 */
++	borderRadius?: CSSProperties[ 'borderRadius' ];
++	/**
++	 * Renders the focus (interaction) shadow value.
++	 */
++	focus?: number;
++	/**
++	 * Renders the hover (interaction) shadow value.
++	 */
++	hover?: number;
++	/**
++	 * Determines if hover, active, and focus shadow values should be automatically calculated and rendered.
++	 */
++	isInteractive?: boolean;
++	/**
++	 * Dimensional offsets (margin) for the shadow.
++	 */
++	offset?: number;
++	/**
++	 * Size of the shadow, based on the Style system's elevation system. The `value` determines the strength of the shadow, which sense of depth.
++	 * In the example below, `isInteractive` is activated to give a better sense of depth.
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Elevation, Surface, Text, View } from `@wp-g2/components`
++	 * import { ui } from `@wp-g2/styles`
++	 *
++	 * function Example() {
++	 *   return (
++	 *     <View css={[ui.padding(5)]}>
++	 *       <Surface css={[ui.padding(5)]}>
++	 *         <Text>Into The Unknown</Text>
++	 *         <Elevation value={8} isInteractive />
++	 *       </Surface>
++	 *     </View>
++	 *   )
++	 * }
++	 * ```
++	 */
++	value?: number;
++	children?: never;
++};
+diff --git a/packages/components/src/ui/elevation/use-elevation.js b/packages/components/src/ui/elevation/use-elevation.js
+new file mode 100644
+index 00000000000000..b26b6259461506
+--- /dev/null
++++ b/packages/components/src/ui/elevation/use-elevation.js
+@@ -0,0 +1,106 @@
++/**
++ * External dependencies
++ */
++import { useContextSystem } from '@wp-g2/context';
++import { css, cx, getBoxShadow, ui } from '@wp-g2/styles';
++import { isNil } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from './elevation-styles';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
++ */
++export function useElevation( props ) {
++	const {
++		active,
++		borderRadius = 'inherit',
++		className,
++		focus,
++		hover,
++		isInteractive = false,
++		offset = 0,
++		value = 0,
++		...otherProps
++	} = useContextSystem( props, 'Elevation' );
++
++	const classes = useMemo( () => {
++		/** @type {number | undefined} */
++		let hoverValue = ! isNil( hover ) ? hover : value * 2;
++		/** @type {number | undefined} */
++		let activeValue = ! isNil( active ) ? active : value / 2;
++
++		if ( ! isInteractive ) {
++			hoverValue = ! isNil( hover ) ? hover : undefined;
++			activeValue = ! isNil( active ) ? active : undefined;
++		}
++
++		const transition = `box-shadow ${ ui.get(
++			'transitionDuration'
++		) } ${ ui.get( 'transitionTimingFunction' ) }`;
++
++		const sx = {};
++
++		sx.Base = css( {
++			borderRadius,
++			bottom: offset,
++			boxShadow: getBoxShadow( value ),
++			opacity: ui.get( 'elevationIntensity' ),
++			left: offset,
++			right: offset,
++			top: offset,
++			transition,
++		} );
++
++		if ( ! isNil( hoverValue ) ) {
++			sx.hover = css`
++				*:hover > & {
++					box-shadow: ${ getBoxShadow( hoverValue ) };
++				}
++			`;
++		}
++
++		if ( ! isNil( activeValue ) ) {
++			sx.active = css`
++				*:active > & {
++					box-shadow: ${ getBoxShadow( activeValue ) };
++				}
++			`;
++		}
++
++		if ( ! isNil( focus ) ) {
++			sx.focus = css`
++				*:focus > & {
++					box-shadow: ${ getBoxShadow( focus ) };
++				}
++			`;
++		}
++
++		return cx(
++			styles.Elevation,
++			sx.Base,
++			sx.hover && sx.hover,
++			sx.focus && sx.focus,
++			sx.active && sx.active,
++			className
++		);
++	}, [
++		active,
++		borderRadius,
++		className,
++		focus,
++		hover,
++		isInteractive,
++		offset,
++		value,
++	] );
++
++	return { ...otherProps, className: classes, 'aria-hidden': true };
++}
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index ba099d22a5dfa5..da9767cf37496b 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -1,3 +1,4 @@
++export * from './elevation';
+ export * from './flex';
+ export * from './grid';
+ export * from './h-stack';

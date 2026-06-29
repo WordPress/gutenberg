@@ -1,0 +1,317 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 5b063aa3fd9b37..928f152b0d79c9 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -4,6 +4,13 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+ .emotion-0 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
++  box-sizing: border-box;
++}
++
++.emotion-0 *,
++.emotion-0 *::before,
++.emotion-0 *::after {
++  box-sizing: inherit;
+ }
+ 
+ .components-panel__row .emotion-2 {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2fbc3447917a1e..4113751e024a26 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `BorderControl`: Ensure box-sizing is reset for the control ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
+ -   `InputControl`: Fix acceptance of falsy values in controlled updates ([#42484](https://github.com/WordPress/gutenberg/pull/42484/)).
+ -   `Tooltip (Experimental)`, `CustomSelectControl`, `TimePicker`: Add missing font-size styles which were necessary in non-WordPress contexts ([#42844](https://github.com/WordPress/gutenberg/pull/42844/)).
++-   `TextControl`, `TextareaControl`, `ToggleGroupControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
+ -   `Popover`: fix arrow placement and design ([#42874](https://github.com/WordPress/gutenberg/pull/42874/)).
+ 
+ ### Enhancements
+@@ -15,6 +16,7 @@
+ -   Add `box-sizing` reset style mixin to utils ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
+ -   `ResizableBox`: Make tooltip background match `Tooltip` component's ([#42800](https://github.com/WordPress/gutenberg/pull/42800)).
+ -   `UnitControl`: Update unit dropdown design for the large size variant ([#42000](https://github.com/WordPress/gutenberg/pull/42000)).
++-   `BaseControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/base-control/styles/base-control-styles.ts b/packages/components/src/base-control/styles/base-control-styles.ts
+index f05ac237aa36aa..7ffa0a05b20c0c 100644
+--- a/packages/components/src/base-control/styles/base-control-styles.ts
++++ b/packages/components/src/base-control/styles/base-control-styles.ts
+@@ -7,12 +7,14 @@ import { css } from '@emotion/react';
+ /**
+  * Internal dependencies
+  */
+-import { font, COLORS } from '../../utils';
++import { font, COLORS, boxSizingReset } from '../../utils';
+ import { space } from '../../ui/utils/space';
+ 
+ export const Wrapper = styled.div`
+ 	font-family: ${ font( 'default.fontFamily' ) };
+ 	font-size: ${ font( 'default.fontSize' ) };
++
++	${ boxSizingReset }
+ `;
+ 
+ const deprecatedMarginField = ( { __nextHasNoMarginBottom = false } ) => {
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js
+index 7e7dd9df46059d..10e265a2bb6de9 100644
+--- a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js
++++ b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js
+@@ -12,14 +12,12 @@ import { COLORS } from '../../utils';
+ 
+ export const MediaWrapper = styled.div`
+ 	background-color: transparent;
+-	box-sizing: border-box;
+ 	text-align: center;
+ 	width: 100%;
+ `;
+ 
+ export const MediaContainer = styled.div`
+ 	align-items: center;
+-	box-sizing: border-box;
+ 	box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.2 );
+ 	cursor: pointer;
+ 	display: inline-flex;
+@@ -44,7 +42,6 @@ export const MediaContainer = styled.div`
+ 
+ export const MediaPlaceholder = styled.div`
+ 	background: ${ COLORS.lightGray[ 300 ] };
+-	box-sizing: border-box;
+ 	height: 170px;
+ 	max-width: 280px;
+ 	min-width: 200px;
+@@ -61,7 +58,6 @@ export const ControlWrapper = styled( Flex )`
+ `;
+ 
+ export const GridView = styled.div`
+-	box-sizing: border-box;
+ 	left: 50%;
+ 	opacity: 0;
+ 	overflow: hidden;
+@@ -80,7 +76,6 @@ export const GridView = styled.div`
+ `;
+ 
+ export const GridLine = styled.div`
+-	box-sizing: border-box;
+ 	background: white;
+ 	box-shadow: 0 0 2px rgba( 0, 0, 0, 0.6 );
+ 	position: absolute;
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-style.js b/packages/components/src/focal-point-picker/styles/focal-point-style.js
+index 56d3175a75754f..80f724f64ece84 100644
+--- a/packages/components/src/focal-point-picker/styles/focal-point-style.js
++++ b/packages/components/src/focal-point-picker/styles/focal-point-style.js
+@@ -15,7 +15,6 @@ import { COLORS } from '../../utils';
+ 
+ export const FocalPointWrapper = styled.div`
+ 	background-color: transparent;
+-	box-sizing: border-box;
+ 	cursor: grab;
+ 	height: 30px;
+ 	margin: -15px 0 0 -15px;
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index aa316a4a97929c..7f85c04c675db2 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -28,7 +28,6 @@ const thumbSize = 12;
+ 
+ export const Root = styled.div`
+ 	-webkit-tap-highlight-color: transparent;
+-	box-sizing: border-box;
+ 	align-items: flex-start;
+ 	display: inline-flex;
+ 	justify-content: flex-start;
+@@ -45,7 +44,6 @@ const wrapperMargin = ( { marks }: WrapperProps ) =>
+ 	css( { marginBottom: marks ? 16 : undefined } );
+ 
+ export const Wrapper = styled.div< WrapperProps >`
+-	box-sizing: border-box;
+ 	color: ${ COLORS.blue.medium.focus };
+ 	display: block;
+ 	flex: 1;
+@@ -81,7 +79,6 @@ const railBackgroundColor = ( { disabled, railColor }: RailProps ) => {
+ 
+ export const Rail = styled.span`
+ 	background-color: ${ COLORS.lightGray[ 600 ] };
+-	box-sizing: border-box;
+ 	left: 0;
+ 	pointer-events: none;
+ 	right: 0;
+@@ -108,7 +105,6 @@ const trackBackgroundColor = ( { disabled, trackColor }: TrackProps ) => {
+ export const Track = styled.span`
+ 	background-color: currentColor;
+ 	border-radius: ${ railHeight }px;
+-	box-sizing: border-box;
+ 	height: ${ railHeight }px;
+ 	pointer-events: none;
+ 	display: block;
+@@ -120,7 +116,6 @@ export const Track = styled.span`
+ `;
+ 
+ export const MarksWrapper = styled.span`
+-	box-sizing: border-box;
+ 	display: block;
+ 	pointer-events: none;
+ 	position: relative;
+@@ -141,7 +136,6 @@ const markFill = ( { disabled, isFilled }: RangeMarkProps ) => {
+ };
+ 
+ export const Mark = styled.span`
+-	box-sizing: border-box;
+ 	height: ${ thumbSize }px;
+ 	left: 0;
+ 	position: absolute;
+@@ -158,7 +152,6 @@ const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
+ };
+ 
+ export const MarkLabel = styled.span`
+-	box-sizing: border-box;
+ 	color: ${ COLORS.lightGray[ 600 ] };
+ 	left: 0;
+ 	font-size: 11px;
+@@ -181,7 +174,6 @@ const thumbColor = ( { disabled }: ThumbProps ) =>
+ 
+ export const ThumbWrapper = styled.span`
+ 	align-items: center;
+-	box-sizing: border-box;
+ 	display: flex;
+ 	height: ${ thumbSize }px;
+ 	justify-content: center;
+@@ -223,7 +215,6 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
+ export const Thumb = styled.span< ThumbProps >`
+ 	align-items: center;
+ 	border-radius: 50%;
+-	box-sizing: border-box;
+ 	height: 100%;
+ 	outline: 0;
+ 	position: absolute;
+@@ -272,7 +263,6 @@ const tooltipPosition = ( { position }: TooltipProps ) => {
+ export const Tooltip = styled.span< TooltipProps >`
+ 	background: rgba( 0, 0, 0, 0.8 );
+ 	border-radius: 2px;
+-	box-sizing: border-box;
+ 	color: white;
+ 	display: inline-block;
+ 	font-size: 12px;
+@@ -298,7 +288,6 @@ export const Tooltip = styled.span< TooltipProps >`
+ // @todo: Refactor RangeControl with latest HStack configuration
+ // @wordpress/components/ui/hstack.
+ export const InputNumber = styled( NumberControl )`
+-	box-sizing: border-box;
+ 	display: inline-block;
+ 	font-size: 13px;
+ 	margin-top: 0;
+@@ -312,7 +301,6 @@ export const InputNumber = styled( NumberControl )`
+ `;
+ 
+ export const ActionRightWrapper = styled.span`
+-	box-sizing: border-box;
+ 	display: block;
+ 	margin-top: 0;
+ 
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index b1ea3215f87922..878863c7d73e02 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -140,7 +140,6 @@ export const Select = styled.select< SelectProps >`
+ export const DownArrowWrapper = styled.div`
+ 	align-items: center;
+ 	bottom: 0;
+-	box-sizing: border-box;
+ 	display: flex;
+ 	padding: 0 4px;
+ 	pointer-events: none;
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+index 64c1e6833c0c1e..08c39633a301a3 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+@@ -4,6 +4,13 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ .emotion-0 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
++  box-sizing: border-box;
++}
++
++.emotion-0 *,
++.emotion-0 *::before,
++.emotion-0 *::after {
++  box-sizing: inherit;
+ }
+ 
+ .emotion-2 {
+@@ -257,6 +264,13 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+ .emotion-0 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
++  box-sizing: border-box;
++}
++
++.emotion-0 *,
++.emotion-0 *::before,
++.emotion-0 *::after {
++  box-sizing: inherit;
+ }
+ 
+ .emotion-2 {
+diff --git a/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap b/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
+index 977bc195fea0a8..9b012529df837a 100644
+--- a/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
+@@ -4,6 +4,13 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+ .emotion-0 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
++  box-sizing: border-box;
++}
++
++.emotion-0 *,
++.emotion-0 *::before,
++.emotion-0 *::after {
++  box-sizing: inherit;
+ }
+ 
+ .emotion-2 {
+@@ -67,6 +74,13 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+ .emotion-0 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
++  box-sizing: border-box;
++}
++
++.emotion-0 *,
++.emotion-0 *::before,
++.emotion-0 *::after {
++  box-sizing: inherit;
+ }
+ 
+ .emotion-2 {
+@@ -116,6 +130,13 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+ .emotion-0 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
++  box-sizing: border-box;
++}
++
++.emotion-0 *,
++.emotion-0 *::before,
++.emotion-0 *::after {
++  box-sizing: inherit;
+ }
+ 
+ .emotion-2 {
+@@ -179,6 +200,13 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
+ .emotion-0 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
++  box-sizing: border-box;
++}
++
++.emotion-0 *,
++.emotion-0 *::before,
++.emotion-0 *::after {
++  box-sizing: inherit;
+ }
+ 
+ .emotion-2 {

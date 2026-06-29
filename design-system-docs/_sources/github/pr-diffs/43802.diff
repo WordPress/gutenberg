@@ -1,0 +1,222 @@
+diff --git a/packages/block-editor/src/components/border-radius-control/linked-button.js b/packages/block-editor/src/components/border-radius-control/linked-button.js
+index 58fec1012b0651..b4142d5286453e 100644
+--- a/packages/block-editor/src/components/border-radius-control/linked-button.js
++++ b/packages/block-editor/src/components/border-radius-control/linked-button.js
+@@ -6,20 +6,21 @@ import { link, linkOff } from '@wordpress/icons';
+ import { __ } from '@wordpress/i18n';
+ 
+ export default function LinkedButton( { isLinked, ...props } ) {
+-	const label = isLinked ? __( 'Unlink Radii' ) : __( 'Link Radii' );
++	const label = isLinked ? __( 'Unlink radii' ) : __( 'Link radii' );
+ 
++	// TODO: Remove span after merging https://github.com/WordPress/gutenberg/pull/44198
+ 	return (
+ 		<Tooltip text={ label }>
+-			<Button
+-				{ ...props }
+-				className="component-border-radius-control__linked-button"
+-				isPrimary={ isLinked }
+-				isSecondary={ ! isLinked }
+-				isSmall
+-				icon={ isLinked ? link : linkOff }
+-				iconSize={ 16 }
+-				aria-label={ label }
+-			/>
++			<span>
++				<Button
++					{ ...props }
++					className="component-border-radius-control__linked-button"
++					isSmall
++					icon={ isLinked ? link : linkOff }
++					iconSize={ 24 }
++					aria-label={ label }
++				/>
++			</span>
+ 		</Tooltip>
+ 	);
+ }
+diff --git a/packages/block-editor/src/components/spacing-sizes-control/linked-button.js b/packages/block-editor/src/components/spacing-sizes-control/linked-button.js
+index 3cdb6e6c1ed1cf..bacdc083e80d63 100644
+--- a/packages/block-editor/src/components/spacing-sizes-control/linked-button.js
++++ b/packages/block-editor/src/components/spacing-sizes-control/linked-button.js
+@@ -6,16 +6,15 @@ import { __ } from '@wordpress/i18n';
+ import { Button, Tooltip } from '@wordpress/components';
+ 
+ export default function LinkedButton( { isLinked, onClick } ) {
+-	const label = isLinked ? __( 'Unlink Sides' ) : __( 'Link Sides' );
++	const label = isLinked ? __( 'Unlink sides' ) : __( 'Link sides' );
+ 
+ 	return (
+ 		<Tooltip text={ label }>
+ 			<span className="component-spacing-sizes-control__linked-button">
+ 				<Button
+-					variant={ isLinked ? 'primary' : 'secondary' }
+ 					isSmall
+ 					icon={ isLinked ? link : linkOff }
+-					iconSize={ 16 }
++					iconSize={ 24 }
+ 					aria-label={ label }
+ 					onClick={ onClick }
+ 				/>
+diff --git a/packages/block-editor/src/components/spacing-sizes-control/style.scss b/packages/block-editor/src/components/spacing-sizes-control/style.scss
+index 2dafd813bb3d48..448a21cc0ac1ba 100644
+--- a/packages/block-editor/src/components/spacing-sizes-control/style.scss
++++ b/packages/block-editor/src/components/spacing-sizes-control/style.scss
+@@ -46,10 +46,13 @@
+ 		grid-column: 2 / 2;
+ 		grid-row: 1 / 1;
+ 		justify-self: end;
+-		margin-right: $grid-unit-05;
+ 		padding: 0;
+ 	}
+ 
++	.component-spacing-sizes-control__linked-button ~ .components-spacing-sizes-control__custom-toggle-all {
++		margin-right: $grid-unit-05;
++	}
++
+ 	.components-spacing-sizes-control__custom-toggle-single {
+ 		grid-column: 3 / 3;
+ 		justify-self: end;
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f9b4528ac8ebd0..edeb4c919a94ea 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   The `LinkedButton` to unlink sides in `BoxControl`, `BorderBoxControl` and `BorderRadiusControl` have changed from a rectangular primary button to an icon-only button, with a sentence case tooltip, and default-size icon for better legibility. The `Button` component has been fixed so when `isSmall` and `icon` props are set, and no text is present, the button shape is square rather than rectangular.
++
+ ### New Features
+ 
+ -   `Popover`: added new `anchor` prop, supposed to supersede all previous anchor-related props (`anchorRef`, `anchorRect`, `getAnchorRect`). These older anchor-related props are now marked as deprecated and are scheduled to be removed in WordPress 6.3 ([#43691](https://github.com/WordPress/gutenberg/pull/43691)).
+diff --git a/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx b/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
+index 362b99d11480ec..c4001369f8e015 100644
+--- a/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
+@@ -28,10 +28,9 @@ const BorderBoxControlLinkedButton = (
+ 			<View className={ className }>
+ 				<Button
+ 					{ ...buttonProps }
+-					variant={ isLinked ? 'primary' : 'secondary' }
+ 					isSmall
+ 					icon={ isLinked ? link : linkOff }
+-					iconSize={ 16 }
++					iconSize={ 24 }
+ 					aria-label={ label }
+ 					ref={ forwardedRef }
+ 				/>
+diff --git a/packages/components/src/border-box-control/styles.ts b/packages/components/src/border-box-control/styles.ts
+index 5c49c51ae6ca51..e5bb4ce638acd3 100644
+--- a/packages/components/src/border-box-control/styles.ts
++++ b/packages/components/src/border-box-control/styles.ts
+@@ -23,7 +23,8 @@ export const BorderBoxControlLinkedButton = (
+ ) => {
+ 	return css`
+ 		flex: 0;
+-		flex-basis: 36px;
++		flex-basis: 24px;
++		line-height: 0;
+ 		margin-top: ${ __next36pxDefaultSize ? '6px' : '3px' };
+ 	`;
+ };
+diff --git a/packages/components/src/box-control/linked-button.js b/packages/components/src/box-control/linked-button.js
+index 3a24a62f188be0..39de0e894783f2 100644
+--- a/packages/components/src/box-control/linked-button.js
++++ b/packages/components/src/box-control/linked-button.js
+@@ -11,18 +11,18 @@ import Button from '../button';
+ import Tooltip from '../tooltip';
+ 
+ export default function LinkedButton( { isLinked, ...props } ) {
+-	const label = isLinked ? __( 'Unlink Sides' ) : __( 'Link Sides' );
++	const label = isLinked ? __( 'Unlink sides' ) : __( 'Link sides' );
+ 
++	// TODO: Remove span after merging https://github.com/WordPress/gutenberg/pull/44198
+ 	return (
+ 		<Tooltip text={ label }>
+ 			<span>
+ 				<Button
+ 					{ ...props }
+ 					className="component-box-control__linked-button"
+-					variant={ isLinked ? 'primary' : 'secondary' }
+ 					isSmall
+ 					icon={ isLinked ? link : linkOff }
+-					iconSize={ 16 }
++					iconSize={ 24 }
+ 					aria-label={ label }
+ 				/>
+ 			</span>
+diff --git a/packages/components/src/box-control/test/index.js b/packages/components/src/box-control/test/index.js
+index 0bf4b746e4bc3d..d52b50924f46b3 100644
+--- a/packages/components/src/box-control/test/index.js
++++ b/packages/components/src/box-control/test/index.js
+@@ -162,7 +162,7 @@ describe( 'BoxControl', () => {
+ 		} );
+ 	} );
+ 
+-	describe( 'Unlinked Sides', () => {
++	describe( 'Unlinked sides', () => {
+ 		it( 'should update a single side value when unlinked', async () => {
+ 			let state = {};
+ 			const setState = ( newState ) => ( state = newState );
+@@ -174,7 +174,7 @@ describe( 'BoxControl', () => {
+ 				/>
+ 			);
+ 			const user = setupUser();
+-			const unlink = screen.getByLabelText( /Unlink Sides/ );
++			const unlink = screen.getByLabelText( /Unlink sides/ );
+ 
+ 			await user.click( unlink );
+ 
+@@ -207,7 +207,7 @@ describe( 'BoxControl', () => {
+ 				/>
+ 			);
+ 			const user = setupUser();
+-			const unlink = screen.getByLabelText( /Unlink Sides/ );
++			const unlink = screen.getByLabelText( /Unlink sides/ );
+ 
+ 			await user.click( unlink );
+ 
+@@ -240,7 +240,7 @@ describe( 'BoxControl', () => {
+ 			await user.selectOptions( allUnitSelect, [ 'em' ] );
+ 
+ 			// Unlink the controls.
+-			await user.click( screen.getByLabelText( /Unlink Sides/ ) );
++			await user.click( screen.getByLabelText( /Unlink sides/ ) );
+ 
+ 			// Confirm that each individual control has the selected unit
+ 			const unlinkedSelects = screen.getAllByDisplayValue( 'em' );
+@@ -257,7 +257,7 @@ describe( 'BoxControl', () => {
+ 			await user.selectOptions( allUnitSelect, [ 'vw' ] );
+ 
+ 			// Unlink the controls.
+-			await user.click( screen.getByLabelText( /Unlink Sides/ ) );
++			await user.click( screen.getByLabelText( /Unlink sides/ ) );
+ 
+ 			// Confirm that each individual control has the selected unit
+ 			const unlinkedSelects = screen.getAllByDisplayValue( 'vw' );
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 6a33b1cdd9019f..bb0bed82239d54 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -288,14 +288,15 @@
+ 	}
+ 
+ 	&.is-small {
+-		height: 24px;
++		height: $icon-size;
+ 		line-height: 22px;
+ 		padding: 0 8px;
+ 		font-size: 11px;
+ 
+ 		&.has-icon:not(.has-text) {
+-			padding: 0 8px;
+-			width: 24px;
++			padding: 0;
++			width: $icon-size;
++			min-width: $icon-size;
+ 		}
+ 	}
+ 

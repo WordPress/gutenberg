@@ -1,0 +1,26 @@
+diff --git a/packages/stylelint-config/test/utils/index.js b/packages/stylelint-config/test/utils/index.js
+index c24e04f0a67a45..eac8c554591a95 100644
+--- a/packages/stylelint-config/test/utils/index.js
++++ b/packages/stylelint-config/test/utils/index.js
+@@ -8,7 +8,7 @@ const util = require( 'node:util' ),
+ const execute = util.promisify( childProcess.exec );
+ 
+ const generateStylelintCommand = ( filename ) =>
+-	'npx stylelint ' +
++	'node_modules/.bin/stylelint ' +
+ 	path.resolve( __dirname, '../', filename ) +
+ 	' -c' +
+ 	path.resolve( __dirname, '../', './.stylelintrc.tests.json' ) +
+diff --git a/packages/theme/src/stylelint-plugins/test/utils/index.ts b/packages/theme/src/stylelint-plugins/test/utils/index.ts
+index c3bb246ec85d5a..dead57ce4417b2 100644
+--- a/packages/theme/src/stylelint-plugins/test/utils/index.ts
++++ b/packages/theme/src/stylelint-plugins/test/utils/index.ts
+@@ -8,7 +8,7 @@ const generateStylelintCommand = (
+ 	filename: string,
+ 	configFile: string
+ ): string =>
+-	'npx stylelint ' +
++	'node_modules/.bin/stylelint ' +
+ 	path.resolve( __dirname, '../', filename ) +
+ 	' -c ' +
+ 	path.resolve( __dirname, '../', configFile ) +

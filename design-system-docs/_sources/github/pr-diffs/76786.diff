@@ -1,0 +1,224 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 15de8b71034e04..372cbca960e0bc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ -   `FormToggle`: Update disabled styles [#77208](https://github.com/WordPress/gutenberg/pull/77208).
+ -   `RadioControl`: Add support for disabled radio group [#77127](https://github.com/WordPress/gutenberg/pull/77127).
++-   `AlignmentMatrixControl`, `Button`, `Calendar`, `CheckboxControl`, `CircularOptionPicker`, `ColorPalette`, `DropdownMenu`, `FormToggle`, `FormTokenField`, `RadioControl`, `Snackbar`, `TabPanel`, `ToggleControl`: Use `--wpds-cursor-control` for interactive cursor styling ([#76786](https://github.com/WordPress/gutenberg/pull/76786)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/alignment-matrix-control/style.module.scss b/packages/components/src/alignment-matrix-control/style.module.scss
+index e278280a519a89..faf7df349a9dc1 100644
+--- a/packages/components/src/alignment-matrix-control/style.module.scss
++++ b/packages/components/src/alignment-matrix-control/style.module.scss
+@@ -15,7 +15,7 @@
+ 	border-radius: $radius-medium;
+ 	outline: none;
+ 
+-	cursor: pointer;
++	cursor: var(--wpds-cursor-control);
+ }
+ 
+ .grid-row {
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 645e83de9c86b3..84c76c126c2904 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -18,7 +18,7 @@
+ 	font-weight: $font-weight-medium;
+ 	margin: 0;
+ 	border: 0;
+-	cursor: pointer;
++	cursor: var(--wpds-cursor-control);
+ 	appearance: none;
+ 	background: none;
+ 
+diff --git a/packages/components/src/calendar/style.scss b/packages/components/src/calendar/style.scss
+index 237869a07a182f..ef040de409d763 100644
+--- a/packages/components/src/calendar/style.scss
++++ b/packages/components/src/calendar/style.scss
+@@ -53,7 +53,7 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
+ 	background: none;
+ 	padding: 0;
+ 	margin: 0;
+-	cursor: pointer;
++	cursor: var(--wpds-cursor-control);
+ 	justify-content: center;
+ 	align-items: center;
+ 	display: flex;
+@@ -127,7 +127,7 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
+ 	background: none;
+ 	padding: 0;
+ 	margin: 0;
+-	cursor: pointer;
++	cursor: var(--wpds-cursor-control);
+ 	appearance: none;
+ 	display: inline-flex;
+ 	align-items: center;
+diff --git a/packages/components/src/checkbox-control/style.scss b/packages/components/src/checkbox-control/style.scss
+index b307e222bdda49..153bc81d095b33 100644
+--- a/packages/components/src/checkbox-control/style.scss
++++ b/packages/components/src/checkbox-control/style.scss
+@@ -19,7 +19,7 @@
+ 	line-height: var(--checkbox-input-size);
+ 
+ 	.components-checkbox-control:not(:has(:disabled)) & {
+-		cursor: pointer;
++		cursor: var(--wpds-cursor-control);
+ 	}
+ }
+ 
+@@ -54,7 +54,7 @@
+ 	}
+ 
+ 	&:not(:disabled) {
+-		cursor: pointer;
++		cursor: var(--wpds-cursor-control);
+ 	}
+ 
+ 	&:checked::before {
+@@ -78,7 +78,7 @@ svg.components-checkbox-control__indeterminate {
+ 	--checkmark-size: var(--checkbox-input-size);
+ 
+ 	fill: $white;
+-	cursor: pointer;
++	cursor: var(--wpds-cursor-control);
+ 	position: absolute;
+ 	left: 50%;
+ 	top: 50%;
+diff --git a/packages/components/src/circular-option-picker/style.scss b/packages/components/src/circular-option-picker/style.scss
+index d52619aa45e16b..894d7e27438a64 100644
+--- a/packages/components/src/circular-option-picker/style.scss
++++ b/packages/components/src/circular-option-picker/style.scss
+@@ -84,7 +84,7 @@ $color-palette-circle-spacing: 12px;
+ 		transition: 100ms box-shadow ease;
+ 	}
+ 
+-	cursor: pointer;
++	cursor: var(--wpds-cursor-control);
+ 
+ 	&:hover {
+ 		// Override default button hover style.
+diff --git a/packages/components/src/color-palette/style.scss b/packages/components/src/color-palette/style.scss
+index 19d0dfc9211ed0..38754945c1e0a5 100644
+--- a/packages/components/src/color-palette/style.scss
++++ b/packages/components/src/color-palette/style.scss
+@@ -16,7 +16,7 @@ $border-as-box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
+ 	height: $grid-unit-80;
+ 	width: 100%;
+ 	box-sizing: border-box;
+-	cursor: pointer;
++	cursor: var(--wpds-cursor-control);
+ 	// Show a thin outline in Windows high contrast mode.
+ 	outline: 1px solid transparent;
+ 	border-radius: $radius-medium $radius-medium 0 0;
+diff --git a/packages/components/src/dropdown-menu/style.scss b/packages/components/src/dropdown-menu/style.scss
+index 718f532770a7b2..ca50da9da947fe 100644
+--- a/packages/components/src/dropdown-menu/style.scss
++++ b/packages/components/src/dropdown-menu/style.scss
+@@ -16,7 +16,7 @@
+ 		width: 100%;
+ 		padding: 6px;
+ 		outline: none;
+-		cursor: pointer;
++		cursor: var(--wpds-cursor-control);
+ 		white-space: nowrap;
+ 		font-weight: $font-weight-regular;
+ 
+diff --git a/packages/components/src/form-toggle/style.scss b/packages/components/src/form-toggle/style.scss
+index 057eae87ad5676..7f8bcaf5993e14 100644
+--- a/packages/components/src/form-toggle/style.scss
++++ b/packages/components/src/form-toggle/style.scss
+@@ -165,6 +165,6 @@ $transition-duration: 0.2s;
+ 	}
+ 
+ 	&:not(:disabled, [aria-disabled="true"]) {
+-		cursor: pointer;
++		cursor: var(--wpds-cursor-control);
+ 	}
+ }
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index 5ef4b280096fce..a93bf012df9f9c 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -208,6 +208,6 @@
+ 	}
+ 
+ 	&:not(.is-empty) {
+-		cursor: pointer;
++		cursor: var(--wpds-cursor-control);
+ 	}
+ }
+diff --git a/packages/components/src/radio-control/style.scss b/packages/components/src/radio-control/style.scss
+index d34b71e1e9d82a..c0a7fef8804dec 100644
+--- a/packages/components/src/radio-control/style.scss
++++ b/packages/components/src/radio-control/style.scss
+@@ -37,7 +37,7 @@
+ 	appearance: none;
+ 
+ 	&:not(:disabled) {
+-		cursor: pointer;
++		cursor: var(--wpds-cursor-control);
+ 	}
+ 
+ 	&:focus {
+@@ -72,7 +72,7 @@
+ 	grid-row: 1;
+ 
+ 	.components-radio-control:not(:disabled) & {
+-		cursor: pointer;
++		cursor: var(--wpds-cursor-control);
+ 	}
+ 
+ 	line-height: $radio-input-size-sm;
+diff --git a/packages/components/src/snackbar/style.scss b/packages/components/src/snackbar/style.scss
+index 004857bc09c75f..554ea4b871a0b9 100644
+--- a/packages/components/src/snackbar/style.scss
++++ b/packages/components/src/snackbar/style.scss
+@@ -16,7 +16,7 @@
+ 	width: 100%;
+ 	max-width: var(--wpds-dimension-surface-width-lg);
+ 	box-sizing: border-box;
+-	cursor: pointer;
++	cursor: var(--wpds-cursor-control);
+ 
+ 	// Re-enable pointer events, which are disabled by the
+ 	// .components-snackbar-list styles.
+@@ -47,7 +47,7 @@
+ 
+ 	.components-snackbar__dismiss-button {
+ 		margin-left: $grid-unit-30;
+-		cursor: pointer;
++		cursor: var(--wpds-cursor-control);
+ 	}
+ }
+ 
+diff --git a/packages/components/src/tab-panel/style.scss b/packages/components/src/tab-panel/style.scss
+index 367b53065e1f53..93557a481d982d 100644
+--- a/packages/components/src/tab-panel/style.scss
++++ b/packages/components/src/tab-panel/style.scss
+@@ -18,7 +18,7 @@
+ 	background: transparent;
+ 	border: none;
+ 	box-shadow: none;
+-	cursor: pointer;
++	cursor: var(--wpds-cursor-control);
+ 	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+ 	margin-left: 0;
+ 	font-weight: $font-weight-regular;
+diff --git a/packages/components/src/toggle-control/style.scss b/packages/components/src/toggle-control/style.scss
+index f9c81973c92e51..d11515d2fc4832 100644
+--- a/packages/components/src/toggle-control/style.scss
++++ b/packages/components/src/toggle-control/style.scss
+@@ -5,7 +5,7 @@
+ 	line-height: form-toggle.$toggle-height;
+ 
+ 	&:not(.is-disabled) {
+-		cursor: pointer;
++		cursor: var(--wpds-cursor-control);
+ 	}
+ }
+ 

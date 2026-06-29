@@ -1,0 +1,253 @@
+diff --git a/packages/components/src/color-picker/README.md b/packages/components/src/color-picker/README.md
+index 1b065203196a7a..21aa7867acb7c5 100644
+--- a/packages/components/src/color-picker/README.md
++++ b/packages/components/src/color-picker/README.md
+@@ -41,6 +41,16 @@ Defaults to `false`. When `true` the color picker will display the alpha channel
+ - Required: No
+ - Default: `false`
+ 
++### `getAuxiliaryColorArtefactWrapper`: `(WordPressComponentProps< ColorPickerProps, 'div', false >) => ReactElement`
++
++Defaults to a function that returns `null`. When passed to the color picker, allows
++to replace the bottom part of the color picker editor with a custom React element. Useful
++for using the color picker in more tight spaces when the auxiliary part of the picker
++is not relevant or needs to be swapped with something more minimal.
++
++- Required: No
++- Default: `(props) => null`
++
+ ### `defaultValue`: `string | undefined`
+ 
+ An optional default value to use for the color picker.
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index 4f9f0c7da59e78..871f9c3a2a4a25 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -37,10 +37,16 @@ import { useControlledValue } from '../utils/hooks';
+ 
+ import type { ColorType } from './types';
+ 
++// eslint-disable-next-line no-restricted-imports
++import type { ReactElement } from 'react';
++
+ extend( [ namesPlugin ] );
+ 
+ export interface ColorPickerProps {
+ 	enableAlpha?: boolean;
++	getAuxiliaryColorArtefactWrapper?: (
++		props: WordPressComponentProps< ColorPickerProps, 'div', false >
++	) => ReactElement;
+ 	color?: string;
+ 	onChange?: ( color: string ) => void;
+ 	defaultValue?: string;
+@@ -63,6 +69,7 @@ const ColorPicker = (
+ 		onChange,
+ 		defaultValue = '#fff',
+ 		copyFormat,
++		getAuxiliaryColorArtefactWrapper = () => null,
+ 		...divProps
+ 	} = useContextSystem( props, 'ColorPicker' );
+ 
+@@ -91,6 +98,10 @@ const ColorPicker = (
+ 		copyFormat || 'hex'
+ 	);
+ 
++	const customAuxiliaryColorArtefactWrapper = getAuxiliaryColorArtefactWrapper(
++		props
++	);
++
+ 	return (
+ 		<ColorfulWrapper ref={ forwardedRef } { ...divProps }>
+ 			<Picker
+@@ -98,47 +109,51 @@ const ColorPicker = (
+ 				color={ safeColordColor }
+ 				enableAlpha={ enableAlpha }
+ 			/>
+-			<AuxiliaryColorArtefactWrapper>
+-				<HStack justify="space-between">
+-					{ showInputs ? (
+-						<SelectControl
+-							options={ options }
+-							value={ colorType }
+-							onChange={ ( nextColorType ) =>
+-								setColorType( nextColorType as ColorType )
++			{ customAuxiliaryColorArtefactWrapper ? (
++				customAuxiliaryColorArtefactWrapper
++			) : (
++				<AuxiliaryColorArtefactWrapper>
++					<HStack justify="space-between">
++						{ showInputs ? (
++							<SelectControl
++								options={ options }
++								value={ colorType }
++								onChange={ ( nextColorType ) =>
++									setColorType( nextColorType as ColorType )
++								}
++								label={ __( 'Color format' ) }
++								hideLabelFromVision
++							/>
++						) : (
++							<ColorDisplay
++								color={ safeColordColor }
++								colorType={ copyFormat || colorType }
++								enableAlpha={ enableAlpha }
++							/>
++						) }
++						<DetailsControlButton
++							isSmall
++							onClick={ () => setShowInputs( ! showInputs ) }
++							icon={ settings }
++							isPressed={ showInputs }
++							label={
++								showInputs
++									? __( 'Hide detailed inputs' )
++									: __( 'Show detailed inputs' )
+ 							}
+-							label={ __( 'Color format' ) }
+-							hideLabelFromVision
+ 						/>
+-					) : (
+-						<ColorDisplay
++					</HStack>
++					<Spacer margin={ 4 } />
++					{ showInputs && (
++						<ColorInput
++							colorType={ colorType }
+ 							color={ safeColordColor }
+-							colorType={ copyFormat || colorType }
++							onChange={ handleChange }
+ 							enableAlpha={ enableAlpha }
+ 						/>
+ 					) }
+-					<DetailsControlButton
+-						isSmall
+-						onClick={ () => setShowInputs( ! showInputs ) }
+-						icon={ settings }
+-						isPressed={ showInputs }
+-						label={
+-							showInputs
+-								? __( 'Hide detailed inputs' )
+-								: __( 'Show detailed inputs' )
+-						}
+-					/>
+-				</HStack>
+-				<Spacer margin={ 4 } />
+-				{ showInputs && (
+-					<ColorInput
+-						colorType={ colorType }
+-						color={ safeColordColor }
+-						onChange={ handleChange }
+-						enableAlpha={ enableAlpha }
+-					/>
+-				) }
+-			</AuxiliaryColorArtefactWrapper>
++				</AuxiliaryColorArtefactWrapper>
++			) }
+ 		</ColorfulWrapper>
+ 	);
+ };
+diff --git a/packages/components/src/custom-gradient-bar/control-points.js b/packages/components/src/custom-gradient-bar/control-points.js
+index 4abad2c38930e9..8d61df3b08f31b 100644
+--- a/packages/components/src/custom-gradient-bar/control-points.js
++++ b/packages/components/src/custom-gradient-bar/control-points.js
+@@ -109,6 +109,7 @@ function ControlPoints( {
+ 	onStartControlPointChange,
+ 	onStopControlPointChange,
+ 	__experimentalIsRenderedInSidebar,
++	colorPickerProps = {},
+ } ) {
+ 	const controlPointMoveState = useRef();
+ 
+@@ -252,6 +253,7 @@ function ControlPoints( {
+ 										)
+ 									);
+ 								} }
++								{ ...( colorPickerProps || {} ) }
+ 							/>
+ 							{ ! disableRemove && controlPoints.length > 2 && (
+ 								<Button
+@@ -287,6 +289,7 @@ function InsertPoint( {
+ 	disableAlpha,
+ 	__experimentalIsRenderedInSidebar,
+ 	gradientPickerDomRef,
++	colorPickerProps = {},
+ } ) {
+ 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
+ 	return (
+@@ -343,6 +346,7 @@ function InsertPoint( {
+ 							);
+ 						}
+ 					} }
++					{ ...( colorPickerProps || {} ) }
+ 				/>
+ 			) }
+ 		/>
+diff --git a/packages/components/src/custom-gradient-bar/index.js b/packages/components/src/custom-gradient-bar/index.js
+index 87b14cac434d67..185b6f1b6009e0 100644
+--- a/packages/components/src/custom-gradient-bar/index.js
++++ b/packages/components/src/custom-gradient-bar/index.js
+@@ -79,6 +79,8 @@ export default function CustomGradientBar( {
+ 	disableInserter = false,
+ 	disableAlpha = false,
+ 	__experimentalIsRenderedInSidebar,
++
++	controlPointsProps = {},
+ } ) {
+ 	const gradientPickerDomRef = useRef();
+ 
+@@ -153,6 +155,7 @@ export default function CustomGradientBar( {
+ 									type: 'CLOSE_INSERTER',
+ 								} );
+ 							} }
++							{ ...controlPointsProps }
+ 						/>
+ 					) }
+ 				<ControlPoints
+@@ -179,6 +182,7 @@ export default function CustomGradientBar( {
+ 							type: 'STOP_CONTROL_CHANGE',
+ 						} );
+ 					} }
++					{ ...controlPointsProps }
+ 				/>
+ 			</div>
+ 		</div>
+diff --git a/packages/components/src/custom-gradient-picker/index.js b/packages/components/src/custom-gradient-picker/index.js
+index c84a9222b62f3c..c88efe500ac076 100644
+--- a/packages/components/src/custom-gradient-picker/index.js
++++ b/packages/components/src/custom-gradient-picker/index.js
+@@ -108,6 +108,7 @@ export default function CustomGradientPicker( {
+ 	value,
+ 	onChange,
+ 	__experimentalIsRenderedInSidebar,
++	customGradientBarProps,
+ } ) {
+ 	const gradientAST = getGradientAstWithDefault( value );
+ 	// On radial gradients the bar should display a linear gradient.
+@@ -141,6 +142,7 @@ export default function CustomGradientPicker( {
+ 						)
+ 					);
+ 				} }
++				{ ...( customGradientBarProps || {} ) }
+ 			/>
+ 			<Flex
+ 				gap={ 3 }
+diff --git a/packages/components/src/gradient-picker/index.js b/packages/components/src/gradient-picker/index.js
+index 0793acf2c083c0..88e2ee7323ea42 100644
+--- a/packages/components/src/gradient-picker/index.js
++++ b/packages/components/src/gradient-picker/index.js
+@@ -104,6 +104,7 @@ export default function GradientPicker( {
+ 	onChange,
+ 	value,
+ 	clearable = true,
++	customGradientPickerProps = {},
+ 	disableCustomGradients = false,
+ 	__experimentalHasMultipleOrigins,
+ 	__experimentalIsRenderedInSidebar,
+@@ -142,6 +143,7 @@ export default function GradientPicker( {
+ 						}
+ 						value={ value }
+ 						onChange={ onChange }
++						{ ...( customGradientPickerProps || {} ) }
+ 					/>
+ 				)
+ 			}

@@ -1,0 +1,26 @@
+diff --git a/packages/fields/src/components/create-template-part-modal/style.scss b/packages/fields/src/components/create-template-part-modal/style.scss
+index ee21982bd3f7b5..2364160fc4718e 100644
+--- a/packages/fields/src/components/create-template-part-modal/style.scss
++++ b/packages/fields/src/components/create-template-part-modal/style.scss
+@@ -64,7 +64,7 @@
+ 	}
+ 
+ 	input[type="radio"]:not(:checked) ~ &::before {
+-		cursor: pointer;
++		cursor: var(--wpds-cursor-control);
+ 	}
+ 
+ 	input[type="radio"]:focus-visible ~ &::before {
+diff --git a/packages/fields/src/components/media-edit/style.scss b/packages/fields/src/components/media-edit/style.scss
+index 0a9c28032c0b1c..000a19184aac61 100644
+--- a/packages/fields/src/components/media-edit/style.scss
++++ b/packages/fields/src/components/media-edit/style.scss
+@@ -103,7 +103,7 @@ fieldset.fields__media-edit {
+ 		border-radius: $radius-small;
+ 		padding: $grid-unit-05 $grid-unit-10;
+ 		min-height: $grid-unit-50;
+-		cursor: pointer;
++		cursor: var(--wpds-cursor-control);
+ 		min-width: 0;
+ 
+ 		&:not(.has-attachment) {

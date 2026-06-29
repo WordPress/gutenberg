@@ -1,0 +1,290 @@
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/index.js b/packages/block-editor/src/components/block-list/use-block-props/index.js
+index 64a24796a4268c..5aaaf7f07b6f48 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/index.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/index.js
+@@ -175,7 +175,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
+ 		'data-block': clientId,
+ 		'data-type': name,
+ 		'data-title': blockTitle,
+-		inert: isSubtreeDisabled ? 'true' : undefined,
++		inert: isSubtreeDisabled ? true : undefined,
+ 		className: clsx(
+ 			'block-editor-block-list__block',
+ 			{
+diff --git a/packages/block-editor/src/components/inserter/media-tab/utils.js b/packages/block-editor/src/components/inserter/media-tab/utils.js
+index 0a835c065a3a1b..38e1ebbf428344 100644
+--- a/packages/block-editor/src/components/inserter/media-tab/utils.js
++++ b/packages/block-editor/src/components/inserter/media-tab/utils.js
+@@ -34,7 +34,7 @@ export function getBlockAndPreviewFromMedia( media, mediaType ) {
+ 			src={ media.previewUrl || mediaSrc }
+ 			alt={ alt }
+ 			controls={ mediaType === 'audio' ? true : undefined }
+-			inert="true"
++			inert
+ 			onError={ ( { currentTarget } ) => {
+ 				// Fall back to the media source if the preview cannot be loaded.
+ 				if ( currentTarget.src === media.previewUrl ) {
+diff --git a/packages/block-library/src/comments/edit/placeholder.js b/packages/block-library/src/comments/edit/placeholder.js
+index 2660381c2c8944..981be2df62fab3 100644
+--- a/packages/block-library/src/comments/edit/placeholder.js
++++ b/packages/block-library/src/comments/edit/placeholder.js
+@@ -24,7 +24,7 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
+ 	);
+ 
+ 	return (
+-		<div className="wp-block-comments__legacy-placeholder" inert="true">
++		<div className="wp-block-comments__legacy-placeholder" inert>
+ 			<h3>
+ 				{
+ 					/* translators: %s: Post title. */
+diff --git a/packages/boot/src/components/canvas/index.tsx b/packages/boot/src/components/canvas/index.tsx
+index 9787bddf3e1324..83cf9b05d8a314 100644
+--- a/packages/boot/src/components/canvas/index.tsx
++++ b/packages/boot/src/components/canvas/index.tsx
+@@ -68,8 +68,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
+ 		<div style={ { height: '100%', position: 'relative' } }>
+ 			<div
+ 				style={ { height: '100%' } }
+-				// @ts-expect-error inert not typed properly
+-				inert={ canvas.isPreview ? 'true' : undefined }
++				inert={ canvas.isPreview ? true : undefined }
+ 			>
+ 				<Editor
+ 					postType={ canvas.postType }
+diff --git a/packages/components/src/disabled/index.tsx b/packages/components/src/disabled/index.tsx
+index 2b7bb23e1baed2..68a93a06bc8ff7 100644
+--- a/packages/components/src/disabled/index.tsx
++++ b/packages/components/src/disabled/index.tsx
+@@ -70,8 +70,7 @@ function Disabled( {
+ 	return (
+ 		<Provider value={ isDisabled }>
+ 			<div
+-				// @ts-ignore Reason: inert is a recent HTML attribute
+-				inert={ isDisabled ? 'true' : undefined }
++				inert={ isDisabled ? true : undefined }
+ 				className={
+ 					isDisabled
+ 						? cx( disabledStyles, className, 'components-disabled' )
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 82ed5867fffabe..82273e0527c941 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -3,6 +3,7 @@
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
+ 		"types": [
++			"react/experimental",
+ 			"gutenberg-env",
+ 			"gutenberg-test-env",
+ 			"css-modules",
+diff --git a/packages/compose/src/hooks/use-disabled/index.ts b/packages/compose/src/hooks/use-disabled/index.ts
+index 64b56b1f9a8682..b40da7496fe68c 100644
+--- a/packages/compose/src/hooks/use-disabled/index.ts
++++ b/packages/compose/src/hooks/use-disabled/index.ts
+@@ -52,7 +52,7 @@ export default function useDisabled( {
+ 						return;
+ 					}
+ 					if ( ! child.getAttribute( 'inert' ) ) {
+-						child.setAttribute( 'inert', 'true' );
++						child.setAttribute( 'inert', '' );
+ 						updates.push( () => {
+ 							child.removeAttribute( 'inert' );
+ 						} );
+diff --git a/packages/compose/src/hooks/use-disabled/test/index.js b/packages/compose/src/hooks/use-disabled/test/index.js
+index d51b2d5bf2d6e6..df48d4c9ce53ac 100644
+--- a/packages/compose/src/hooks/use-disabled/test/index.js
++++ b/packages/compose/src/hooks/use-disabled/test/index.js
+@@ -37,9 +37,9 @@ describe( 'useDisabled', () => {
+ 		const link = screen.getByRole( 'link' );
+ 		const p = screen.getByRole( 'document' );
+ 
+-		expect( input ).toHaveAttribute( 'inert', 'true' );
+-		expect( link ).toHaveAttribute( 'inert', 'true' );
+-		expect( p ).toHaveAttribute( 'inert', 'true' );
++		expect( input ).toHaveAttribute( 'inert' );
++		expect( link ).toHaveAttribute( 'inert' );
++		expect( p ).toHaveAttribute( 'inert' );
+ 	} );
+ 
+ 	it( 'will disable an element rendered in an update to the component', async () => {
+@@ -52,7 +52,7 @@ describe( 'useDisabled', () => {
+ 
+ 		const button = screen.getByText( 'Button' );
+ 		await waitFor( () => {
+-			expect( button ).toHaveAttribute( 'inert', 'true' );
++			expect( button ).toHaveAttribute( 'inert' );
+ 		} );
+ 	} );
+ } );
+diff --git a/test/e2e/specs/editor/various/pattern-overrides.spec.js b/test/e2e/specs/editor/various/pattern-overrides.spec.js
+index 99324ee1c11653..8dd241af989bae 100644
+--- a/test/e2e/specs/editor/various/pattern-overrides.spec.js
++++ b/test/e2e/specs/editor/various/pattern-overrides.spec.js
+@@ -1,12 +1,12 @@
+ /**
+- * WordPress dependencies
++ * External dependencies
+  */
+-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
++const path = require( 'path' );
+ 
+ /**
+- * External dependencies
++ * WordPress dependencies
+  */
+-const path = require( 'path' );
++const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+ 
+ test.describe( 'Pattern Overrides', () => {
+ 	test.beforeAll( async ( { requestUtils } ) => {
+@@ -159,14 +159,8 @@ test.describe( 'Pattern Overrides', () => {
+ 			} );
+ 			// Ensure the first pattern is selected.
+ 			await patternBlocks.first().selectText();
+-			await expect( paragraphs.first() ).not.toHaveAttribute(
+-				'inert',
+-				'true'
+-			);
+-			await expect( paragraphs.last() ).toHaveAttribute(
+-				'inert',
+-				'true'
+-			);
++			await expect( paragraphs.first() ).not.toHaveAttribute( 'inert' );
++			await expect( paragraphs.last() ).toHaveAttribute( 'inert' );
+ 
+ 			await expect( paragraphs.first() ).toHaveText(
+ 				'This paragraph can be edited'
+@@ -473,21 +467,11 @@ test.describe( 'Pattern Overrides', () => {
+ 				// are inert due to the 'click-through' behavior, that requires the
+ 				// pattern block be selected first before its inner blocks are selectable.
+ 				await editor.selectBlocks( groupBlock );
+-				await expect( patternBlock ).not.toHaveAttribute(
+-					'inert',
+-					'true'
+-				);
+-				await expect( blockWithOverrides ).toHaveAttribute(
+-					'inert',
+-					'true'
+-				);
+-				await expect( blockWithBindings ).toHaveAttribute(
+-					'inert',
+-					'true'
+-				);
++				await expect( patternBlock ).not.toHaveAttribute( 'inert' );
++				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
++				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
+ 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
+-					'inert',
+-					'true'
++					'inert'
+ 				);
+ 			} );
+ 
+@@ -498,16 +482,13 @@ test.describe( 'Pattern Overrides', () => {
+ 				// of the pattern with bindings are editable, but unbound
+ 				// blocks are inert.
+ 				await expect( blockWithOverrides ).not.toHaveAttribute(
+-					'inert',
+-					'true'
++					'inert'
+ 				);
+ 				await expect( blockWithBindings ).not.toHaveAttribute(
+-					'inert',
+-					'true'
++					'inert'
+ 				);
+ 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
+-					'inert',
+-					'true'
++					'inert'
+ 				);
+ 			} );
+ 
+@@ -516,26 +497,16 @@ test.describe( 'Pattern Overrides', () => {
+ 
+ 				// In zoomed out only the pattern block is editable,
+ 				// as in this scenario it's a section.
+-				await expect( patternBlock ).not.toHaveAttribute(
+-					'inert',
+-					'true'
+-				);
++				await expect( patternBlock ).not.toHaveAttribute( 'inert' );
+ 
+ 				// Ensure the pattern block is selected before checking the child blocks
+ 				// to ensure the click-through behavior isn't interfering.
+ 				await editor.selectBlocks( patternBlock );
+ 
+-				await expect( blockWithOverrides ).toHaveAttribute(
+-					'inert',
+-					'true'
+-				);
+-				await expect( blockWithBindings ).toHaveAttribute(
+-					'inert',
+-					'true'
+-				);
++				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
++				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
+ 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
+-					'inert',
+-					'true'
++					'inert'
+ 				);
+ 			} );
+ 
+@@ -546,17 +517,10 @@ test.describe( 'Pattern Overrides', () => {
+ 
+ 			await test.step( 'Zoomed out - pattern nested in a section', async () => {
+ 				// None of the pattern is editable in zoomed out when nested in a section.
+-				await expect( blockWithOverrides ).toHaveAttribute(
+-					'inert',
+-					'true'
+-				);
+-				await expect( blockWithBindings ).toHaveAttribute(
+-					'inert',
+-					'true'
+-				);
++				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
++				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
+ 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
+-					'inert',
+-					'true'
++					'inert'
+ 				);
+ 			} );
+ 		} );
+@@ -622,11 +586,11 @@ test.describe( 'Pattern Overrides', () => {
+ 				name: 'Block: Paragraph',
+ 			} );
+ 			await expect( headingBlock ).toHaveText( 'Outer heading (edited)' );
+-			await expect( headingBlock ).not.toHaveAttribute( 'inert', 'true' );
++			await expect( headingBlock ).not.toHaveAttribute( 'inert' );
+ 			await expect( paragraphBlock ).toHaveText(
+ 				'Inner paragraph (edited)'
+ 			);
+-			await expect( paragraphBlock ).toHaveAttribute( 'inert', 'true' );
++			await expect( paragraphBlock ).toHaveAttribute( 'inert' );
+ 
+ 			// Edit the outer pattern.
+ 			await editor.selectBlocks(
+@@ -651,7 +615,7 @@ test.describe( 'Pattern Overrides', () => {
+ 					name: 'Block: Paragraph',
+ 				} ),
+ 				'The inner paragraph should be editable'
+-			).not.toHaveAttribute( 'inert', 'true' );
++			).not.toHaveAttribute( 'inert' );
+ 
+ 			// Visit the post on the frontend.
+ 			await page.goto( `/?p=${ postId }` );
+diff --git a/tsconfig.base.json b/tsconfig.base.json
+index e8ed12c96dfc88..f2c56d407003cb 100644
+--- a/tsconfig.base.json
++++ b/tsconfig.base.json
+@@ -31,7 +31,7 @@
+ 		"resolveJsonModule": true,
+ 
+ 		"typeRoots": [ "./typings", "./node_modules/@types" ],
+-		"types": [],
++		"types": [ "react/experimental" ],
+ 
+ 		"rootDir": "${configDir}/src",
+ 		"declarationDir": "${configDir}/build-types"

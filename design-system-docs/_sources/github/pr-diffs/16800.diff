@@ -1,0 +1,214 @@
+diff --git a/packages/components/src/color-picker/test/__snapshots__/index.js.snap b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+index 1cb694aa24f833..5d61a24e5ac9e6 100644
+--- a/packages/components/src/color-picker/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+@@ -148,6 +148,7 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
++          onMouseDown={[Function]}
+           onMouseEnter={[Function]}
+           onMouseLeave={[Function]}
+           type="button"
+@@ -321,6 +322,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] =
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
++          onMouseDown={[Function]}
+           onMouseEnter={[Function]}
+           onMouseLeave={[Function]}
+           type="button"
+@@ -494,6 +496,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
++          onMouseDown={[Function]}
+           onMouseEnter={[Function]}
+           onMouseLeave={[Function]}
+           type="button"
+@@ -667,6 +670,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
++          onMouseDown={[Function]}
+           onMouseEnter={[Function]}
+           onMouseLeave={[Function]}
+           type="button"
+@@ -840,6 +844,7 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
++          onMouseDown={[Function]}
+           onMouseEnter={[Function]}
+           onMouseLeave={[Function]}
+           type="button"
+@@ -1013,6 +1018,7 @@ exports[`ColorPicker should render color picker 1`] = `
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
++          onMouseDown={[Function]}
+           onMouseEnter={[Function]}
+           onMouseLeave={[Function]}
+           type="button"
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index f20bb647c3cb81..9c7d0acb800ad6 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -35,6 +35,22 @@ class Tooltip extends Component {
+ 			TOOLTIP_DELAY
+ 		);
+ 
++		/**
++		 * Prebound `isInMouseDown` handler, created as a constant reference to
++		 * assure ability to remove in component unmount.
++		 *
++		 * @type {Function}
++		 */
++		this.cancelIsMouseDown = this.createSetIsMouseDown( false );
++
++		/**
++		 * Whether a the mouse is currently pressed, used in determining whether
++		 * to handle a focus event as displaying the tooltip immediately.
++		 *
++		 * @type {boolean}
++		 */
++		this.isInMouseDown = false;
++
+ 		this.state = {
+ 			isOver: false,
+ 		};
+@@ -42,6 +58,8 @@ class Tooltip extends Component {
+ 
+ 	componentWillUnmount() {
+ 		this.delayedSetIsOver.cancel();
++
++		document.removeEventListener( 'mouseup', this.cancelIsMouseDown );
+ 	}
+ 
+ 	emitToChild( eventName, event ) {
+@@ -71,6 +89,13 @@ class Tooltip extends Component {
+ 				return;
+ 			}
+ 
++			// A focus event will occur as a result of a mouse click, but it
++			// should be disambiguated between interacting with the button and
++			// using an explicit focus shift as a cue to display the tooltip.
++			if ( 'focus' === event.type && this.isInMouseDown ) {
++				return;
++			}
++
+ 			// Needed in case unsetting is over while delayed set pending, i.e.
+ 			// quickly blur/mouseleave before delayedSetIsOver is called
+ 			this.delayedSetIsOver.cancel();
+@@ -88,6 +113,34 @@ class Tooltip extends Component {
+ 		};
+ 	}
+ 
++	/**
++	 * Creates an event callback to handle assignment of the `isInMouseDown`
++	 * instance property in response to a `mousedown` or `mouseup` event.
++	 *
++	 * @param {booelan} isMouseDown Whether handler is to be created for the
++	 *                              `mousedown` event, as opposed to `mouseup`.
++	 *
++	 * @return {Function} Event callback handler.
++	 */
++	createSetIsMouseDown( isMouseDown ) {
++		return ( event ) => {
++			// Preserve original child callback behavior
++			this.emitToChild( isMouseDown ? 'onMouseDown' : 'onMouseUp', event );
++
++			// On mouse down, the next `mouseup` should revert the value of the
++			// instance property and remove its own event handler. The bind is
++			// made on the document since the `mouseup` might not occur within
++			// the bounds of the element.
++			document[
++				isMouseDown ?
++					'addEventListener' :
++					'removeEventListener'
++			]( 'mouseup', this.cancelIsMouseDown );
++
++			this.isInMouseDown = isMouseDown;
++		};
++	}
++
+ 	render() {
+ 		const { children, position, text, shortcut } = this.props;
+ 		if ( Children.count( children ) !== 1 ) {
+@@ -107,6 +160,7 @@ class Tooltip extends Component {
+ 			onClick: this.createToggleIsOver( 'onClick' ),
+ 			onFocus: this.createToggleIsOver( 'onFocus' ),
+ 			onBlur: this.createToggleIsOver( 'onBlur' ),
++			onMouseDown: this.createSetIsMouseDown( true ),
+ 			children: concatChildren(
+ 				child.props.children,
+ 				isOver && (
+diff --git a/packages/components/src/tooltip/test/index.js b/packages/components/src/tooltip/test/index.js
+index bc98cdf1f024b0..7265a345d1a4ea 100644
+--- a/packages/components/src/tooltip/test/index.js
++++ b/packages/components/src/tooltip/test/index.js
+@@ -77,6 +77,44 @@ describe( 'Tooltip', () => {
+ 			expect( popover ).toHaveLength( 1 );
+ 		} );
+ 
++		it( 'should show not popover on focus as result of mousedown', () => {
++			const originalOnMouseDown = jest.fn();
++			const originalOnMouseUp = jest.fn();
++			const wrapper = mount(
++				<Tooltip text="Help text">
++					<button
++						onMouseDown={ originalOnMouseDown }
++						onMouseUp={ originalOnMouseUp }
++					>
++						Hover Me!
++					</button>
++				</Tooltip>
++			);
++
++			const button = wrapper.find( 'button' );
++
++			let event;
++
++			event = { type: 'mousedown' };
++			button.simulate( event.type, event );
++			expect( originalOnMouseDown ).toHaveBeenCalledWith( expect.objectContaining( {
++				type: event.type,
++			} ) );
++
++			event = { type: 'focus', currentTarget: {} };
++			button.simulate( event.type, event );
++
++			const popover = wrapper.find( 'Popover' );
++			expect( wrapper.state( 'isOver' ) ).toBe( false );
++			expect( popover ).toHaveLength( 0 );
++
++			event = new window.MouseEvent( 'mouseup' );
++			document.dispatchEvent( event );
++			expect( originalOnMouseUp ).toHaveBeenCalledWith( expect.objectContaining( {
++				type: event.type,
++			} ) );
++		} );
++
+ 		it( 'should show popover on delayed mouseenter', () => {
+ 			const originalMouseEnter = jest.fn();
+ 			const wrapper = TestUtils.renderIntoDocument(
+diff --git a/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap
+index cc17255097c02d..889803c75d9107 100644
+--- a/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap
+@@ -44,6 +44,7 @@ exports[`MoreMenu should match snapshot 1`] = `
+               onClick={[Function]}
+               onFocus={[Function]}
+               onKeyDown={[Function]}
++              onMouseDown={[Function]}
+               onMouseEnter={[Function]}
+               onMouseLeave={[Function]}
+             >
+@@ -56,6 +57,7 @@ exports[`MoreMenu should match snapshot 1`] = `
+                 onClick={[Function]}
+                 onFocus={[Function]}
+                 onKeyDown={[Function]}
++                onMouseDown={[Function]}
+                 onMouseEnter={[Function]}
+                 onMouseLeave={[Function]}
+                 type="button"

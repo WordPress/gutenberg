@@ -1,0 +1,930 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index d87e24a7d4ebbe..e709db6c0d156b 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -467,13 +467,13 @@ module.exports = {
+ 			extends: [ 'plugin:ssr-friendly/recommended' ],
+ 		},
+ 		{
+-			files: [ 'packages/components/src/**' ],
++			files: [ 'packages/components/src/**', 'packages/ui/src/**' ],
+ 			rules: {
+ 				'no-restricted-imports': [
+ 					'error',
+ 					// The `ariakit` and `framer-motion` APIs are meant to be consumed via
+-					// the `@wordpress/components` package, hence why importing those
+-					// dependencies should be allowed in the components package.
++					// the `@wordpress/components` and @wordpress/ui` packages, hence why
++					// importing those imports should be allowed only in those packages.
+ 					{
+ 						paths: restrictedImports.filter(
+ 							( { name } ) =>
+diff --git a/package-lock.json b/package-lock.json
+index 0399a3a01260c4..f90a09b4e2f360 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -55694,7 +55694,9 @@
+ 			"version": "0.4.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@ariakit/react": "^0.4.15",
+ 				"@base-ui/react": "^1.0.0",
++				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/i18n": "file:../i18n",
+ 				"@wordpress/icons": "file:../icons",
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 83ecb00c00d66f..54c6462ace7f00 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -13,3 +13,4 @@
+ -   Add `Field` primitives ([#74190](https://github.com/WordPress/gutenberg/pull/74190)).
+ -   Add `Fieldset` primitives ([#74296](https://github.com/WordPress/gutenberg/pull/74296)).
+ -   Add `Icon` component ([#74311](https://github.com/WordPress/gutenberg/pull/74311)).
++-   Add `Button` component ([#74415](https://github.com/WordPress/gutenberg/pull/74415)).
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index b88774193474e0..5e7d16ac178003 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -43,7 +43,9 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
++		"@ariakit/react": "^0.4.15",
+ 		"@base-ui/react": "^1.0.0",
++		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/icons": "file:../icons",
+diff --git a/packages/ui/src/badge/badge.tsx b/packages/ui/src/badge/badge.tsx
+index 4e79a86c091f3f..5be5c5dacf0240 100644
+--- a/packages/ui/src/badge/badge.tsx
++++ b/packages/ui/src/badge/badge.tsx
+@@ -1,11 +1,4 @@
+-/**
+- * WordPress dependencies
+- */
+ import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+ import { Box } from '../box';
+ import { type BoxProps } from '../box/types';
+ import { type BadgeProps } from './types';
+diff --git a/packages/ui/src/badge/stories/index.story.tsx b/packages/ui/src/badge/stories/index.story.tsx
+index ad79d7a5966c1a..80ed9d28ffb864 100644
+--- a/packages/ui/src/badge/stories/index.story.tsx
++++ b/packages/ui/src/badge/stories/index.story.tsx
+@@ -1,16 +1,5 @@
+-/**
+- * External dependencies
+- */
+ import type { Meta, StoryObj } from '@storybook/react-webpack5';
+-
+-/**
+- * WordPress dependencies
+- */
+ import { Fragment } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+ import { Badge } from '../index';
+ 
+ const meta: Meta< typeof Badge > = {
+diff --git a/packages/ui/src/badge/types.ts b/packages/ui/src/badge/types.ts
+index 298dd57a9a8205..c2209a63087acf 100644
+--- a/packages/ui/src/badge/types.ts
++++ b/packages/ui/src/badge/types.ts
+@@ -1,6 +1,3 @@
+-/**
+- * Internal dependencies
+- */
+ import { type ComponentProps } from '../utils/types';
+ 
+ export interface BadgeProps extends ComponentProps< 'span' > {
+diff --git a/packages/ui/src/button/button.tsx b/packages/ui/src/button/button.tsx
+new file mode 100644
+index 00000000000000..61cd897d54503b
+--- /dev/null
++++ b/packages/ui/src/button/button.tsx
+@@ -0,0 +1,57 @@
++import { Button as AriakitButton } from '@ariakit/react';
++import clsx from 'clsx';
++import { speak } from '@wordpress/a11y';
++import { forwardRef, useEffect } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
++import { type ButtonProps } from './types';
++import styles from './style.module.css';
++import resetStyles from '../utils/css/resets.module.css';
++import focusStyles from '../utils/css/focus.module.css';
++
++export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
++	function Button(
++		{
++			tone = 'brand',
++			variant = 'solid',
++			size = 'default',
++			className,
++			accessibleWhenDisabled = true,
++			disabled,
++			loading,
++			loadingAnnouncement = __( 'Loading' ),
++			children,
++			...props
++		},
++		ref
++	) {
++		const mergedClassName = clsx(
++			resetStyles[ 'box-sizing' ],
++			focusStyles[ 'outset-ring--focus-except-active' ],
++			variant !== 'unstyled' && styles.button,
++			styles[ `is-${ tone }` ],
++			styles[ `is-${ variant }` ],
++			styles[ `is-${ size }` ],
++			loading && styles[ 'is-loading' ],
++			className
++		);
++
++		// Announce loading state to assistive technology
++		useEffect( () => {
++			if ( loading && loadingAnnouncement ) {
++				speak( loadingAnnouncement );
++			}
++		}, [ loading, loadingAnnouncement ] );
++
++		return (
++			<AriakitButton
++				ref={ ref }
++				className={ mergedClassName }
++				accessibleWhenDisabled={ accessibleWhenDisabled }
++				disabled={ disabled ?? loading }
++				{ ...props }
++			>
++				{ children }
++			</AriakitButton>
++		);
++	}
++);
+diff --git a/packages/ui/src/button/icon.tsx b/packages/ui/src/button/icon.tsx
+new file mode 100644
+index 00000000000000..c6ae7ab9bdd469
+--- /dev/null
++++ b/packages/ui/src/button/icon.tsx
+@@ -0,0 +1,24 @@
++import { forwardRef } from '@wordpress/element';
++import { type IconProps } from '../icon/types';
++import { Icon } from '../icon';
++
++interface ButtonIconProps extends IconProps {
++	/**
++	 * The icon to display, from the `@wordpress/icons` package.
++	 */
++	icon: IconProps[ 'icon' ];
++}
++
++export const ButtonIcon = forwardRef< SVGSVGElement, ButtonIconProps >(
++	function ButtonIcon( { icon, ...props }, ref ) {
++		return (
++			<Icon
++				ref={ ref }
++				icon={ icon }
++				viewBox="4 4 16 16"
++				size={ 16 }
++				{ ...props }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/button/index.ts b/packages/ui/src/button/index.ts
+new file mode 100644
+index 00000000000000..991227d14cf0f1
+--- /dev/null
++++ b/packages/ui/src/button/index.ts
+@@ -0,0 +1,16 @@
++import { Button as ButtonButton } from './button';
++import { ButtonIcon } from './icon';
++
++/**
++ * A versatile button component with multiple variants, tones, and sizes.
++ * Built on design tokens for consistent theming and accessibility.
++ */
++export const Button = Object.assign( ButtonButton, {
++	/**
++	 * An icon component specifically designed to work well when rendered inside
++	 * a `Button` component.
++	 */
++	Icon: ButtonIcon,
++} ) as typeof ButtonButton & {
++	Icon: typeof ButtonIcon;
++};
+diff --git a/packages/ui/src/button/stories/index.story.tsx b/packages/ui/src/button/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..46f4d23ce2deca
+--- /dev/null
++++ b/packages/ui/src/button/stories/index.story.tsx
+@@ -0,0 +1,208 @@
++import { Fragment, useState } from '@wordpress/element';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
++import { cog } from '@wordpress/icons';
++import { Button } from '../index';
++
++const meta: Meta< typeof Button > = {
++	title: 'Design System/Components/Button',
++	component: Button,
++	argTypes: {
++		'aria-pressed': {
++			control: { type: 'boolean' },
++		},
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof Button >;
++
++export const Default: Story = {
++	args: {
++		children: 'Button',
++	},
++};
++
++export const Outline: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		variant: 'outline',
++	},
++};
++
++export const Minimal: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		variant: 'minimal',
++	},
++};
++
++export const Compact: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		size: 'compact',
++	},
++};
++
++export const Small: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		size: 'small',
++	},
++};
++
++export const Neutral: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		tone: 'neutral',
++	},
++};
++
++export const NeutralOutline: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		tone: 'neutral',
++		variant: 'outline',
++	},
++};
++
++export const Unstyled: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		variant: 'unstyled',
++	},
++};
++
++export const AllTonesAndVariants: Story = {
++	...Default,
++	render: ( args ) => (
++		<div
++			style={ {
++				display: 'grid',
++				gridTemplateColumns: 'max-content repeat(2, min-content)',
++				color: 'var(--wpds-color-fg-content-neutral)',
++			} }
++		>
++			<div></div>
++			<div style={ { textAlign: 'center' } }>Resting</div>
++			<div style={ { textAlign: 'center' } }>Disabled</div>
++			{ ( [ 'brand', 'neutral' ] as const ).map( ( tone ) => (
++				<Fragment key={ tone }>
++					{ (
++						[ 'solid', 'outline', 'minimal', 'unstyled' ] as const
++					 ).map( ( variant ) => (
++						<Fragment key={ variant }>
++							<div
++								style={ {
++									paddingInlineEnd: '1rem',
++									display: 'flex',
++									alignItems: 'center',
++								} }
++							>
++								{ variant }, { tone }
++							</div>
++							<div
++								style={ {
++									padding: '0.5rem 1rem',
++									display: 'flex',
++									alignItems: 'center',
++								} }
++							>
++								<Button
++									{ ...args }
++									tone={ tone }
++									variant={ variant }
++								/>
++							</div>
++							<div
++								style={ {
++									padding: '0.5rem 1rem',
++									display: 'flex',
++									alignItems: 'center',
++								} }
++							>
++								<Button
++									{ ...args }
++									tone={ tone }
++									variant={ variant }
++									// Disabling because this lint rule was meant for the
++									// `@wordpress/components` Button, but is being applied here.
++									// TODO: rework the lint rule so that it checks the package
++									// where the Button comes from.
++									// eslint-disable-next-line no-restricted-syntax
++									disabled
++								/>
++							</div>
++						</Fragment>
++					) ) }
++				</Fragment>
++			) ) }
++		</div>
++	),
++};
++
++export const LinkStyledAsButton: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		// Link content passed through `children`
++		// eslint-disable-next-line jsx-a11y/anchor-has-content
++		render: <a href="https://example.com" />,
++		children: 'Link',
++	},
++};
++
++export const WithIcon: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		children: (
++			<>
++				<Button.Icon icon={ cog } />
++				Button
++			</>
++		),
++	},
++};
++
++export const Loading: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		loading: true,
++		loadingAnnouncement: 'Saving data',
++	},
++};
++
++/**
++ * The pressed state is only available for buttons with `tone="neutral"` and
++ * `variant="minimal"`. This represents a toggle button that is currently in an
++ * active/pressed state.
++ */
++export const Pressed: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		tone: 'neutral',
++		variant: 'minimal',
++	},
++	render: ( args ) => {
++		const [ isPressed, setIsPressed ] = useState( true );
++
++		return (
++			<Button
++				{ ...args }
++				aria-pressed={ isPressed }
++				onClick={ () => setIsPressed( ! isPressed ) }
++			>
++				Button
++			</Button>
++		);
++	},
++};
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+new file mode 100644
+index 00000000000000..f2ee22e715d735
+--- /dev/null
++++ b/packages/ui/src/button/style.module.css
+@@ -0,0 +1,230 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.button,
++	.is-unstyled {
++		appearance: none;
++		padding: 0;
++	}
++
++	.button {
++		/* Internal variables */
++		--wp-ui-button-font-weight: 499;
++
++		--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand-strong);
++		--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-strong-active);
++		--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-brand-strong-disabled);
++		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand-strong);
++		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-strong-active);
++		--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-brand-strong-disabled);
++		--wp-ui-button-padding-inline: calc(3 * var(--wpds-dimension-base)); /* TODO: Create new interactive padding tokens */
++		--wp-ui-button-height: 40px;
++		--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
++		--wp-ui-button-font-size: var(--wpds-font-size-md);
++
++		/* by default, borders have the same color as the background */
++		--wp-ui-button-border-color: var(--wp-ui-button-background-color);
++		--wp-ui-button-border-color-active: var(--wp-ui-button-background-color-active);
++		--wp-ui-button-border-color-disabled: var(--wp-ui-button-background-color-disabled);
++
++		/* Styles */
++		position: relative;
++		display: inline-flex;
++		justify-content: center;
++		align-items: center;
++		gap: calc(2 * var(--wpds-dimension-base)); /* TODO: Consider new interactive/control gap tokens */
++		aspect-ratio: var(--wp-ui-button-aspect-ratio);
++		height: var(--wp-ui-button-height);
++		padding-inline: var(--wp-ui-button-padding-inline);
++		border-style: solid;
++		border-width: 1px;
++		border-color: var(--wp-ui-button-border-color);
++		border-radius: var(--wpds-border-radius-surface-sm);
++		background-color: var(--wp-ui-button-background-color);
++		background-clip: padding-box;
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wp-ui-button-font-size);
++		font-weight: var(--wp-ui-button-font-weight);
++		line-height: var(--wpds-font-line-height-sm);
++		text-decoration: none;
++		color: var(--wp-ui-button-foreground-color);
++
++		@media not ( prefers-reduced-motion ) {
++			transition: color 0.1s ease-out;
++
++			* {
++				transition: opacity 0.1s ease-out;
++			}
++		}
++
++		/* Use pointer cursor for buttons that are links */
++		&[href] {
++			cursor: pointer;
++		}
++
++		/* Make sure that links rendered as children of `Button` use button styles */
++		*[href] {
++			color: inherit;
++			text-decoration: inherit;
++		}
++
++		/* States */
++		&:not([aria-disabled="true"]):is(:hover, :active, :focus) {
++			/* hover/active/focus states apply when the button is not disabled. A non
++			disabled, loading button will have hover/active/focus styles */
++			--wp-ui-button-background-color: var(--wp-ui-button-background-color-active);
++			--wp-ui-button-foreground-color: var(--wp-ui-button-foreground-color-active);
++			--wp-ui-button-border-color: var(--wp-ui-button-border-color-active);
++		}
++
++		&[aria-disabled="true"]:not(.is-loading) {
++			/* A loading button, even when disabled, won't "look" disabled */
++			--wp-ui-button-background-color: var(--wp-ui-button-background-color-disabled);
++			--wp-ui-button-foreground-color: var(--wp-ui-button-foreground-color-disabled);
++			--wp-ui-button-border-color: var(--wp-ui-button-border-color-disabled);
++
++			@media ( forced-colors: active ) {
++				border-color: GrayText;
++				color: GrayText;
++			}
++		}
++
++		/* Loading spinner — not animated and hidden unless in loading state */
++		&::before {
++			content: "";
++			position: absolute;
++			top: 50%;
++			inset-inline-start: 50%;
++			transform: translate(-50%, -50%);
++
++			display: block;
++			box-sizing: border-box;
++			height: var(--wp-ui-button-font-size);
++			aspect-ratio: 1;
++
++			border: var(--wpds-border-width-interactive-focus) solid;
++			border-block-start-color: var(--wp-ui-button-foreground-color);
++			border-inline-end-color: var(--wp-ui-button-foreground-color);
++			border-block-end-color: transparent;
++			border-inline-start-color: transparent;
++			border-radius: 50%;
++
++			pointer-events: none;
++			opacity: 0;
++
++			@media not ( prefers-reduced-motion ) {
++				transition: opacity 0.1s ease-out;
++			}
++		}
++	}
++
++	.is-small {
++		--wp-ui-button-padding-inline: calc(2 * var(--wpds-dimension-base)); /* TODO: Create new interactive padding tokens */
++		--wp-ui-button-height: 24px;
++	}
++
++	/* Variants (`tone` + `variant`) overrides compared to default styles */
++
++	/* All outline buttons have a border */
++	.is-brand {
++		/* no need to redefine variables for .is-brand.is-solid as it's the default variant */
++
++		/* Outline and minimal buttons use the same foreground color */
++		&.is-outline,
++		&.is-minimal {
++			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand);
++			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-active);
++			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-brand-disabled);
++		}
++
++		&.is-outline {
++			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand);
++			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-active);
++			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-brand-disabled);
++			--wp-ui-button-border-color: var(--wpds-color-stroke-interactive-brand);
++			--wp-ui-button-border-color-active: var(--wpds-color-stroke-interactive-brand-active);
++		}
++
++		&.is-minimal {
++			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand-weak);
++			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-weak-active);
++			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-brand-weak-disabled);
++		}
++	}
++
++	.is-neutral {
++		&.is-solid {
++			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-strong);
++			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-strong-active);
++			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
++			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral-strong);
++			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-strong-active);
++			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
++		}
++
++		/* Outline and minimal buttons use the same foreground color */
++		&.is-outline,
++		&.is-minimal {
++			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral);
++			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-active);
++			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-disabled);
++		}
++
++		&.is-outline {
++			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral);
++			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-active);
++			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-disabled);
++			--wp-ui-button-border-color: var(--wpds-color-stroke-interactive-neutral);
++			--wp-ui-button-border-color-active: var(--wpds-color-stroke-interactive-neutral-active);
++		}
++
++		&.is-minimal {
++			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-weak);
++			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-weak-active);
++			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
++		}
++	}
++
++	.is-unstyled {
++		border: none;
++		background: none;
++	}
++
++	.is-compact {
++		--wp-ui-button-height: 32px;
++	}
++
++	.is-loading {
++		color: transparent;
++
++		* {
++			opacity: 0;
++		}
++
++		&::before {
++			transition-delay: 0.05s;
++			opacity: 1;
++
++			@media not ( prefers-reduced-motion ) {
++				animation: loading-animation 1s linear infinite;
++			}
++		}
++	}
++
++	[aria-pressed="true"].is-minimal.is-neutral {
++		--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-strong);
++		--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-strong);
++		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral-strong);
++		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-strong);
++	}
++}
++
++@keyframes loading-animation {
++	0% {
++		transform: translate(-50%, -50%) rotate(0deg);
++	}
++
++	100% {
++		transform: translate(-50%, -50%) rotate(360deg);
++	}
++}
+diff --git a/packages/ui/src/button/test/button.test.tsx b/packages/ui/src/button/test/button.test.tsx
+new file mode 100644
+index 00000000000000..8e93e485d03e28
+--- /dev/null
++++ b/packages/ui/src/button/test/button.test.tsx
+@@ -0,0 +1,101 @@
++import { createRef } from '@wordpress/element';
++import { screen, render } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { Button } from '../index';
++
++describe( 'Button', () => {
++	it( 'renders a button element by default', () => {
++		render( <Button>Click me</Button> );
++
++		expect(
++			screen.getByRole( 'button', { name: 'Click me' } )
++		).toBeVisible();
++	} );
++
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLButtonElement >();
++
++		render( <Button ref={ ref }>Click me</Button> );
++
++		expect( ref.current ).toBeInstanceOf( HTMLButtonElement );
++	} );
++
++	it( 'is accessible when disabled by default', async () => {
++		const user = userEvent.setup();
++
++		const onClickMock = jest.fn();
++		render(
++			// Disabling because this lint rule was meant for the
++			// `@wordpress/components` Button, but is being applied here.
++			// TODO: rework the lint rule so that it checks the package
++			// where the Button comes from.
++			// eslint-disable-next-line no-restricted-syntax
++			<Button disabled onClick={ onClickMock }>
++				Click me
++			</Button>
++		);
++		const button = screen.getByRole( 'button', { name: 'Click me' } );
++
++		expect( button ).toBeEnabled();
++		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
++
++		await user.keyboard( '{Tab}' );
++		expect( button ).toHaveFocus();
++
++		await user.keyboard( '{Enter}' );
++		expect( onClickMock ).not.toHaveBeenCalled();
++	} );
++
++	it( 'is disabled when loading', () => {
++		render( <Button loading>Click me</Button> );
++
++		const button = screen.getByRole( 'button', { name: 'Click me' } );
++
++		expect( button ).toBeEnabled();
++		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
++	} );
++
++	it( 'can be enabled explicitly when loading', () => {
++		render(
++			// Disabling because this lint rule was meant for the
++			// `@wordpress/components` Button, but is being applied here.
++			// TODO: rework the lint rule so that it checks the package
++			// where the Button comes from.
++			// TODO: Additional improvement in the original lint rule: only error if disabled=true?
++			// eslint-disable-next-line no-restricted-syntax
++			<Button loading disabled={ false }>
++				Click me
++			</Button>
++		);
++
++		const button = screen.getByRole( 'button', { name: 'Click me' } );
++
++		expect( button ).toBeEnabled();
++		expect( button ).not.toHaveAttribute( 'aria-disabled', 'true' );
++	} );
++
++	it( 'supports custom render prop while retaining the default accessible when disabled behavior', () => {
++		render(
++			// eslint-disable-next-line jsx-a11y/anchor-has-content, no-restricted-syntax
++			<Button render={ <a href="/" /> } disabled>
++				Click me
++			</Button>
++		);
++		const button = screen.getByRole( 'link', { name: 'Click me' } );
++
++		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
++	} );
++
++	it( 'merges custom className with built-in classes', () => {
++		const customClass = 'my-button';
++		render(
++			<Button render={ <button /> } className={ customClass }>
++				Click me
++			</Button>
++		);
++
++		expect(
++			screen.getByRole( 'button', { name: 'Click me' } )
++		).toHaveClass( customClass );
++	} );
++} );
+diff --git a/packages/ui/src/button/test/icon.test.tsx b/packages/ui/src/button/test/icon.test.tsx
+new file mode 100644
+index 00000000000000..97283b06fbe590
+--- /dev/null
++++ b/packages/ui/src/button/test/icon.test.tsx
+@@ -0,0 +1,13 @@
++import { createRef } from '@wordpress/element';
++import { render } from '@testing-library/react';
++import { ButtonIcon } from '../icon';
++
++describe( 'Button.Icon', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< SVGSVGElement >();
++
++		render( <ButtonIcon ref={ ref } icon={ <svg /> } /> );
++
++		expect( ref.current ).toBeInstanceOf( SVGSVGElement );
++	} );
++} );
+diff --git a/packages/ui/src/button/types.ts b/packages/ui/src/button/types.ts
+new file mode 100644
+index 00000000000000..da5fbda444970d
+--- /dev/null
++++ b/packages/ui/src/button/types.ts
+@@ -0,0 +1,67 @@
++import { type ReactNode, type HTMLAttributes } from 'react';
++import { type ButtonProps as AriakitButtonProps } from '@ariakit/react';
++import { type ComponentProps } from '../utils/types';
++
++export interface ButtonProps
++	extends Omit< ComponentProps< 'button' >, 'disabled' | 'aria-pressed' > {
++	/**
++	 * The variant of the button. Variants describe the visual style treatment
++	 * of the button.
++	 *
++	 * @default "solid"
++	 */
++	variant?: 'solid' | 'outline' | 'minimal' | 'unstyled';
++
++	/**
++	 * The tone of the button. Tone describes a semantic color intent.
++	 *
++	 * @default "brand"
++	 */
++	tone?: 'brand' | 'neutral';
++
++	/**
++	 * The size of the button.
++	 *
++	 * - `'default'`: For normal text-label buttons, unless it is a toggle button.
++	 * - `'compact'`: For toggle buttons, icon buttons, and buttons when used in context of either.
++	 * - `'small'`: For icon buttons associated with more advanced or auxiliary features.
++	 *
++	 * @default "default"
++	 */
++	size?: 'default' | 'compact' | 'small';
++
++	/**
++	 * Whether the button is disabled.
++	 */
++	disabled?: boolean;
++
++	/**
++	 * Whether the element should be focusable even when it is disabled.
++	 *
++	 * @default true
++	 */
++	accessibleWhenDisabled?: AriakitButtonProps[ 'accessibleWhenDisabled' ];
++
++	/**
++	 * Indicates the current "pressed" state of toggle buttons. This should only
++	 * be used with neutral minimal buttons.
++	 */
++	'aria-pressed'?: HTMLAttributes< HTMLButtonElement >[ 'aria-pressed' ];
++
++	/**
++	 * The content of the button.
++	 */
++	children?: ReactNode;
++
++	/**
++	 * Whether the button is in a loading state, such as when an action is being
++	 * performed.
++	 * @default false
++	 */
++	loading?: boolean;
++
++	/**
++	 * The text used for assistive technology to indicate the loading state.
++	 */
++	loadingAnnouncement?: string;
++}
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index f293d9295b81f0..7b0c9cd537d9cd 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -1,5 +1,6 @@
+ export * from './badge';
+ export * from './box';
++export * from './button';
+ export * from './form/primitives';
+ export * from './icon';
+ export * from './stack';
+diff --git a/packages/ui/src/utils/css/focus.module.css b/packages/ui/src/utils/css/focus.module.css
+new file mode 100644
+index 00000000000000..57e2b610e49e4c
+--- /dev/null
++++ b/packages/ui/src/utils/css/focus.module.css
+@@ -0,0 +1,31 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-utilities {
++	.outset-ring--focus,
++	.outset-ring--focus-except-active,
++	.outset-ring--focus-visible,
++	.outset-ring--focus-within,
++	.outset-ring--focus-within-except-active,
++	.outset-ring--focus-within-visible {
++		@media not ( prefers-reduced-motion ) {
++			transition: outline 0.1s ease-out;
++		}
++
++		/* Outline width must be kept at 0 even with a transparent color,
++		or else the outline will be visible in forced-colors mode. */
++		outline-width: 0;
++		outline-style: solid;
++		outline-color: transparent;
++		outline-offset: 1px;
++	}
++
++	.outset-ring--focus:focus,
++	.outset-ring--focus-except-active:focus:not(:active),
++	.outset-ring--focus-visible:focus-visible,
++	.outset-ring--focus-within:focus-within,
++	.outset-ring--focus-within-except-active:focus-within:not(:has(:active)),
++	.outset-ring--focus-within-visible:focus-within:has(:focus-visible) {
++		outline-width: var(--wpds-border-width-interactive-focus);
++		outline-color: var(--wpds-color-stroke-focus-brand);
++	}
++}
+diff --git a/packages/ui/tsconfig.json b/packages/ui/tsconfig.json
+index b3c84a8a816414..a63ca8f3e4c83a 100644
+--- a/packages/ui/tsconfig.json
++++ b/packages/ui/tsconfig.json
+@@ -5,6 +5,7 @@
+ 		"types": [ "node", "jest" ]
+ 	},
+ 	"references": [
++		{ "path": "../a11y" },
+ 		{ "path": "../element" },
+ 		{ "path": "../i18n" },
+ 		{ "path": "../icons" },

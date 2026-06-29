@@ -1,0 +1,541 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 732fa6aa322674..1e5bea6e67afa8 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   Add `Text` primitive with predefined typographic variants (`heading-2xl` through `heading-sm`, `body-xl` through `body-sm`) built on design tokens ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
+ -   Add `Card` and `CollapsibleCard` primitives ([#76252](https://github.com/WordPress/gutenberg/pull/76252)).
+ -   Add `Link` primitive ([#76013](https://github.com/WordPress/gutenberg/pull/76013)).
++-   Add `Collapsible` primitive ([#76280](https://github.com/WordPress/gutenberg/pull/76280)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/ui/src/collapsible-card/content.tsx b/packages/ui/src/collapsible-card/content.tsx
+index ce4a740e2dc728..0f57970b68b2e9 100644
+--- a/packages/ui/src/collapsible-card/content.tsx
++++ b/packages/ui/src/collapsible-card/content.tsx
+@@ -1,6 +1,6 @@
+-import { Collapsible } from '@base-ui/react/collapsible';
+ import { forwardRef } from '@wordpress/element';
+ import * as Card from '../card';
++import * as Collapsible from '../collapsible';
+ import type { ContentProps } from './types';
+ 
+ /**
+diff --git a/packages/ui/src/collapsible-card/header.tsx b/packages/ui/src/collapsible-card/header.tsx
+index a017bd29d8505f..cf4c880bb5aabe 100644
+--- a/packages/ui/src/collapsible-card/header.tsx
++++ b/packages/ui/src/collapsible-card/header.tsx
+@@ -1,10 +1,10 @@
+-import { Collapsible } from '@base-ui/react/collapsible';
+ import clsx from 'clsx';
+ import type { MouseEvent } from 'react';
+ import { forwardRef, useCallback, useRef } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import { chevronDown, chevronUp } from '@wordpress/icons';
+ import * as Card from '../card';
++import * as Collapsible from '../collapsible';
+ import { IconButton } from '../icon-button';
+ import styles from './style.module.css';
+ import type { HeaderProps } from './types';
+@@ -52,11 +52,21 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
+ 				<div className={ styles[ 'header-trigger-wrapper' ] }>
+ 					<Collapsible.Trigger
+ 						ref={ triggerRef }
+-						render={ ( props, state ) => (
++						render={ ( props ) => (
+ 							<IconButton
+ 								{ ...props }
+ 								label={ __( 'Expand or collapse card' ) }
+-								icon={ state.open ? chevronUp : chevronDown }
++								// The Collapsible wrapper's `render` prop
++								// uses a single-argument callback (via the
++								// ComponentProps utility), so Base UI's
++								// second `state` argument isn't available
++								// here. We derive the open state from
++								// `aria-expanded` instead of `state.open`.
++								icon={
++									props[ 'aria-expanded' ] === true
++										? chevronUp
++										: chevronDown
++								}
+ 								variant="minimal"
+ 								tone="neutral"
+ 								size="compact"
+diff --git a/packages/ui/src/collapsible-card/root.tsx b/packages/ui/src/collapsible-card/root.tsx
+index 230ec22c6ef50d..f4e2ae53cba63b 100644
+--- a/packages/ui/src/collapsible-card/root.tsx
++++ b/packages/ui/src/collapsible-card/root.tsx
+@@ -1,6 +1,6 @@
+-import { Collapsible } from '@base-ui/react/collapsible';
+ import { forwardRef } from '@wordpress/element';
+ import * as Card from '../card';
++import * as Collapsible from '../collapsible';
+ import type { RootProps } from './types';
+ 
+ /**
+diff --git a/packages/ui/src/collapsible/index.ts b/packages/ui/src/collapsible/index.ts
+new file mode 100644
+index 00000000000000..8a2edfa94ec95d
+--- /dev/null
++++ b/packages/ui/src/collapsible/index.ts
+@@ -0,0 +1,5 @@
++import { Panel } from './panel';
++import { Root } from './root';
++import { Trigger } from './trigger';
++
++export { Root, Trigger, Panel };
+diff --git a/packages/ui/src/collapsible/panel.tsx b/packages/ui/src/collapsible/panel.tsx
+new file mode 100644
+index 00000000000000..7348073857d0d5
+--- /dev/null
++++ b/packages/ui/src/collapsible/panel.tsx
+@@ -0,0 +1,16 @@
++import { Collapsible as _Collapsible } from '@base-ui/react/collapsible';
++import { forwardRef } from '@wordpress/element';
++import type { PanelProps } from './types';
++
++/**
++ * A panel with the collapsible contents. Hidden when collapsed, visible
++ * when expanded.
++ *
++ * `Collapsible` is a collection of React components that combine to render
++ * a collapsible panel controlled by a button.
++ */
++export const Panel = forwardRef< HTMLDivElement, PanelProps >(
++	function CollapsiblePanel( props, forwardedRef ) {
++		return <_Collapsible.Panel ref={ forwardedRef } { ...props } />;
++	}
++);
+diff --git a/packages/ui/src/collapsible/root.tsx b/packages/ui/src/collapsible/root.tsx
+new file mode 100644
+index 00000000000000..6be50799f69a6e
+--- /dev/null
++++ b/packages/ui/src/collapsible/root.tsx
+@@ -0,0 +1,15 @@
++import { Collapsible as _Collapsible } from '@base-ui/react/collapsible';
++import { forwardRef } from '@wordpress/element';
++import type { RootProps } from './types';
++
++/**
++ * Groups all parts of the collapsible.
++ *
++ * `Collapsible` is a collection of React components that combine to render
++ * a collapsible panel controlled by a button.
++ */
++export const Root = forwardRef< HTMLDivElement, RootProps >(
++	function CollapsibleRoot( props, forwardedRef ) {
++		return <_Collapsible.Root ref={ forwardedRef } { ...props } />;
++	}
++);
+diff --git a/packages/ui/src/collapsible/stories/index.story.tsx b/packages/ui/src/collapsible/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..10960afe6458e3
+--- /dev/null
++++ b/packages/ui/src/collapsible/stories/index.story.tsx
+@@ -0,0 +1,108 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { useState } from '@wordpress/element';
++import * as Collapsible from '../index';
++
++const meta: Meta< typeof Collapsible.Root > = {
++	title: 'Design System/Components/Collapsible',
++	component: Collapsible.Root,
++	subcomponents: {
++		'Collapsible.Trigger': Collapsible.Trigger,
++		'Collapsible.Panel': Collapsible.Panel,
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof Collapsible.Root >;
++
++export const Default: Story = {
++	args: {
++		children: (
++			<>
++				<Collapsible.Trigger>Toggle</Collapsible.Trigger>
++				<Collapsible.Panel>
++					<p>Collapsible content here.</p>
++				</Collapsible.Panel>
++			</>
++		),
++	},
++};
++
++export const DefaultOpen: Story = {
++	argTypes: { open: { control: false } },
++	args: {
++		defaultOpen: true,
++		children: (
++			<>
++				<Collapsible.Trigger>Toggle</Collapsible.Trigger>
++				<Collapsible.Panel>
++					<p>This panel is open by default.</p>
++				</Collapsible.Panel>
++			</>
++		),
++	},
++};
++
++export const Disabled: Story = {
++	args: {
++		disabled: true,
++		children: (
++			<>
++				<Collapsible.Trigger>Toggle (disabled)</Collapsible.Trigger>
++				<Collapsible.Panel>
++					<p>This content cannot be toggled.</p>
++				</Collapsible.Panel>
++			</>
++		),
++	},
++};
++
++/**
++ * When `hiddenUntilFound` is set on `Collapsible.Panel`, the collapsed content
++ * remains in the DOM using the `hidden="until-found"` HTML attribute instead of
++ * being removed entirely. This lets the browser's native page search (Ctrl/Cmd+F)
++ * find text inside collapsed panels and automatically expand them to reveal the
++ * match — improving discoverability without sacrificing the collapsed layout.
++ */
++export const HiddenUntilFound: Story = {
++	render: function HiddenUntilFound() {
++		return (
++			<div>
++				<p>
++					Use the browser&apos;s find-in-page (Ctrl/Cmd+F) to search
++					for &quot;hidden treasure&quot;. The collapsed panel will
++					automatically expand to reveal the match.
++				</p>
++				<Collapsible.Root>
++					<Collapsible.Trigger>Expand to reveal</Collapsible.Trigger>
++					<Collapsible.Panel hiddenUntilFound>
++						<p>
++							This is the hidden treasure that can be found via
++							the browser&apos;s built-in page search even while
++							the panel is collapsed.
++						</p>
++					</Collapsible.Panel>
++				</Collapsible.Root>
++			</div>
++		);
++	},
++};
++
++export const Controlled: Story = {
++	argTypes: {
++		open: { control: false },
++		defaultOpen: { control: false },
++	},
++	render: function Controlled() {
++		const [ open, setOpen ] = useState( false );
++		return (
++			<Collapsible.Root open={ open } onOpenChange={ setOpen }>
++				<Collapsible.Trigger>
++					{ open ? 'Close' : 'Open' }
++				</Collapsible.Trigger>
++				<Collapsible.Panel>
++					<p>Controlled collapsible panel.</p>
++				</Collapsible.Panel>
++			</Collapsible.Root>
++		);
++	},
++};
+diff --git a/packages/ui/src/collapsible/test/index.test.tsx b/packages/ui/src/collapsible/test/index.test.tsx
+new file mode 100644
+index 00000000000000..8df94f8ce7d1cf
+--- /dev/null
++++ b/packages/ui/src/collapsible/test/index.test.tsx
+@@ -0,0 +1,228 @@
++import { render, screen } from '@testing-library/react';
++import { userEvent } from '@testing-library/user-event';
++import { createRef, useState } from '@wordpress/element';
++import * as Collapsible from '../index';
++
++function UncontrolledCollapsible( {
++	defaultOpen,
++	disabled,
++}: {
++	defaultOpen?: boolean;
++	disabled?: boolean;
++} ) {
++	return (
++		<Collapsible.Root defaultOpen={ defaultOpen } disabled={ disabled }>
++			<Collapsible.Trigger>Toggle</Collapsible.Trigger>
++			<Collapsible.Panel>Panel content</Collapsible.Panel>
++		</Collapsible.Root>
++	);
++}
++
++function ControlledCollapsible( {
++	onOpenChange,
++}: {
++	onOpenChange?: ( open: boolean ) => void;
++} ) {
++	const [ open, setOpen ] = useState( false );
++	return (
++		<Collapsible.Root
++			open={ open }
++			onOpenChange={ ( nextOpen ) => {
++				setOpen( nextOpen );
++				onOpenChange?.( nextOpen );
++			} }
++		>
++			<Collapsible.Trigger>Toggle</Collapsible.Trigger>
++			<Collapsible.Panel>Controlled panel</Collapsible.Panel>
++		</Collapsible.Root>
++	);
++}
++
++describe( 'Collapsible', () => {
++	describe( 'ref forwarding', () => {
++		it( 'forwards ref on Root', () => {
++			const ref = createRef< HTMLDivElement >();
++			render(
++				<Collapsible.Root ref={ ref }>
++					<Collapsible.Trigger>Toggle</Collapsible.Trigger>
++					<Collapsible.Panel>Content</Collapsible.Panel>
++				</Collapsible.Root>
++			);
++			expect( ref.current ).toBeInstanceOf( HTMLDivElement );
++		} );
++
++		it( 'forwards ref on Trigger', () => {
++			const ref = createRef< HTMLButtonElement >();
++			render(
++				<Collapsible.Root>
++					<Collapsible.Trigger ref={ ref }>
++						Toggle
++					</Collapsible.Trigger>
++					<Collapsible.Panel>Content</Collapsible.Panel>
++				</Collapsible.Root>
++			);
++			expect( ref.current ).toBeInstanceOf( HTMLButtonElement );
++		} );
++
++		it( 'forwards ref on Panel', () => {
++			const ref = createRef< HTMLDivElement >();
++			render(
++				<Collapsible.Root defaultOpen>
++					<Collapsible.Trigger>Toggle</Collapsible.Trigger>
++					<Collapsible.Panel ref={ ref }>Content</Collapsible.Panel>
++				</Collapsible.Root>
++			);
++			expect( ref.current ).toBeInstanceOf( HTMLDivElement );
++		} );
++	} );
++
++	describe( 'uncontrolled', () => {
++		it( 'is collapsed by default', () => {
++			render( <UncontrolledCollapsible /> );
++			expect(
++				screen.queryByText( 'Panel content' )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'shows panel when defaultOpen is true', () => {
++			render( <UncontrolledCollapsible defaultOpen /> );
++			expect( screen.getByText( 'Panel content' ) ).toBeVisible();
++		} );
++
++		it( 'toggles panel on trigger click', async () => {
++			const user = userEvent.setup();
++			render( <UncontrolledCollapsible /> );
++
++			expect(
++				screen.queryByText( 'Panel content' )
++			).not.toBeInTheDocument();
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Toggle' } )
++			);
++			expect( screen.getByText( 'Panel content' ) ).toBeVisible();
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Toggle' } )
++			);
++			expect(
++				screen.queryByText( 'Panel content' )
++			).not.toBeInTheDocument();
++		} );
++	} );
++
++	describe( 'controlled', () => {
++		it( 'calls onOpenChange when toggled', async () => {
++			const onOpenChange = jest.fn();
++			const user = userEvent.setup();
++
++			render( <ControlledCollapsible onOpenChange={ onOpenChange } /> );
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Toggle' } )
++			);
++			expect( onOpenChange ).toHaveBeenCalledWith( true );
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Toggle' } )
++			);
++			expect( onOpenChange ).toHaveBeenCalledWith( false );
++		} );
++	} );
++
++	describe( 'disabled', () => {
++		it( 'does not toggle when disabled', async () => {
++			const user = userEvent.setup();
++			render( <UncontrolledCollapsible defaultOpen disabled /> );
++
++			expect( screen.getByText( 'Panel content' ) ).toBeVisible();
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Toggle' } )
++			);
++			expect( screen.getByText( 'Panel content' ) ).toBeVisible();
++		} );
++	} );
++
++	describe( 'render prop', () => {
++		it( 'supports render prop on Root', () => {
++			const ref = createRef< HTMLDivElement >();
++			render(
++				<Collapsible.Root ref={ ref } render={ <section /> }>
++					<Collapsible.Trigger>Toggle</Collapsible.Trigger>
++					<Collapsible.Panel>Content</Collapsible.Panel>
++				</Collapsible.Root>
++			);
++			expect( ref.current?.tagName ).toBe( 'SECTION' );
++		} );
++
++		it( 'supports render prop on Trigger', () => {
++			render(
++				<Collapsible.Root>
++					<Collapsible.Trigger
++						nativeButton={ false }
++						render={ <div /> }
++					>
++						Toggle
++					</Collapsible.Trigger>
++					<Collapsible.Panel>Content</Collapsible.Panel>
++				</Collapsible.Root>
++			);
++			const trigger = screen.getByRole( 'button', { name: 'Toggle' } );
++			expect( trigger.tagName ).toBe( 'DIV' );
++		} );
++
++		it( 'supports render prop on Panel', () => {
++			const ref = createRef< HTMLDivElement >();
++			render(
++				<Collapsible.Root defaultOpen>
++					<Collapsible.Trigger>Toggle</Collapsible.Trigger>
++					<Collapsible.Panel ref={ ref } render={ <section /> }>
++						Content
++					</Collapsible.Panel>
++				</Collapsible.Root>
++			);
++			expect( ref.current?.tagName ).toBe( 'SECTION' );
++		} );
++	} );
++
++	describe( 'custom className', () => {
++		it( 'applies className to Root', () => {
++			const ref = createRef< HTMLDivElement >();
++			render(
++				<Collapsible.Root ref={ ref } className="custom-root">
++					<Collapsible.Trigger>Toggle</Collapsible.Trigger>
++					<Collapsible.Panel>Content</Collapsible.Panel>
++				</Collapsible.Root>
++			);
++			expect( ref.current ).toHaveClass( 'custom-root' );
++		} );
++
++		it( 'applies className to Trigger', () => {
++			render(
++				<Collapsible.Root>
++					<Collapsible.Trigger className="custom-trigger">
++						Toggle
++					</Collapsible.Trigger>
++					<Collapsible.Panel>Content</Collapsible.Panel>
++				</Collapsible.Root>
++			);
++			expect(
++				screen.getByRole( 'button', { name: 'Toggle' } )
++			).toHaveClass( 'custom-trigger' );
++		} );
++
++		it( 'applies className to Panel', () => {
++			const ref = createRef< HTMLDivElement >();
++			render(
++				<Collapsible.Root defaultOpen>
++					<Collapsible.Trigger>Toggle</Collapsible.Trigger>
++					<Collapsible.Panel ref={ ref } className="custom-panel">
++						Content
++					</Collapsible.Panel>
++				</Collapsible.Root>
++			);
++			expect( ref.current ).toHaveClass( 'custom-panel' );
++		} );
++	} );
++} );
+diff --git a/packages/ui/src/collapsible/trigger.tsx b/packages/ui/src/collapsible/trigger.tsx
+new file mode 100644
+index 00000000000000..a789970b3ca51f
+--- /dev/null
++++ b/packages/ui/src/collapsible/trigger.tsx
+@@ -0,0 +1,15 @@
++import { Collapsible as _Collapsible } from '@base-ui/react/collapsible';
++import { forwardRef } from '@wordpress/element';
++import type { TriggerProps } from './types';
++
++/**
++ * A button that opens and closes the collapsible panel.
++ *
++ * `Collapsible` is a collection of React components that combine to render
++ * a collapsible panel controlled by a button.
++ */
++export const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
++	function CollapsibleTrigger( props, forwardedRef ) {
++		return <_Collapsible.Trigger ref={ forwardedRef } { ...props } />;
++	}
++);
+diff --git a/packages/ui/src/collapsible/types.ts b/packages/ui/src/collapsible/types.ts
+new file mode 100644
+index 00000000000000..05950bf3b4bc18
+--- /dev/null
++++ b/packages/ui/src/collapsible/types.ts
+@@ -0,0 +1,24 @@
++import type { ReactNode } from 'react';
++import type { Collapsible as _Collapsible } from '@base-ui/react/collapsible';
++import type { ComponentProps } from '../utils/types';
++
++export type RootProps = ComponentProps< typeof _Collapsible.Root > & {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++};
++
++export type TriggerProps = ComponentProps< typeof _Collapsible.Trigger > & {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++};
++
++export type PanelProps = ComponentProps< typeof _Collapsible.Panel > & {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++};
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 75765c8a38212f..6f9a138744e15d 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -1,6 +1,7 @@
+ export * from './badge';
+ export * from './button';
+ export * as Card from './card';
++export * as Collapsible from './collapsible';
+ export * as CollapsibleCard from './collapsible-card';
+ export * as Dialog from './dialog';
+ export * from './form/primitives';

@@ -1,0 +1,43 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 970341765bfe69..a19d012c9788fd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Experimental
+ 
+ -   `Tabs`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
++-   `Tabs`: render a `Button` component by default for consistent styling([#57121](https://github.com/WordPress/gutenberg/pull/57121)).
+ -   `Tabs`: make sure `Tab`s are associated to the right `TabPanel`s, regardless of the order they're rendered in ([#57033](https://github.com/WordPress/gutenberg/pull/57033)).
+ 
+ ### Bug Fix
+@@ -46,9 +47,6 @@
+ 
+ -   `Tabs`: implement new `tabId` prop ([#56883](https://github.com/WordPress/gutenberg/pull/56883)).
+ -   `CustomSelect`: add `WordPressComponentsProps` for more flexibility ([#56998](https://github.com/WordPress/gutenberg/pull/56998))
+-
+-### Experimental
+-
+ -   `Tabs`: improve focus handling in controlled mode ([#56658](https://github.com/WordPress/gutenberg/pull/56658)).
+ 
+ ### Documentation
+diff --git a/packages/components/src/tabs/tab.tsx b/packages/components/src/tabs/tab.tsx
+index e1aa85c636cdd1..df13582541cfe8 100644
+--- a/packages/components/src/tabs/tab.tsx
++++ b/packages/components/src/tabs/tab.tsx
+@@ -12,6 +12,7 @@ import warning from '@wordpress/warning';
+ import { useTabsContext } from './context';
+ import { Tab as StyledTab } from './styles';
+ import type { WordPressComponentProps } from '../context';
++import Button from '../button';
+ 
+ export const Tab = forwardRef<
+ 	HTMLButtonElement,
+@@ -30,7 +31,7 @@ export const Tab = forwardRef<
+ 			store={ store }
+ 			id={ instancedTabId }
+ 			disabled={ disabled }
+-			render={ render }
++			render={ render ?? <Button /> }
+ 			{ ...otherProps }
+ 		>
+ 			{ children }

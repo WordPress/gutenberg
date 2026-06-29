@@ -1,0 +1,194 @@
+diff --git a/packages/block-editor/src/components/grid/grid-item-movers.js b/packages/block-editor/src/components/grid/grid-item-movers.js
+index 4f1d3853568fda..ed8e35c201f7e0 100644
+--- a/packages/block-editor/src/components/grid/grid-item-movers.js
++++ b/packages/block-editor/src/components/grid/grid-item-movers.js
+@@ -46,7 +46,7 @@ export function GridItemMovers( {
+ 			<ToolbarButton
+ 				icon={ arrowUp }
+ 				label={ __( 'Move block up' ) }
+-				isDisabled={ rowStart <= 1 }
++				disabled={ rowStart <= 1 }
+ 				onClick={ () => {
+ 					onChange( {
+ 						rowStart: rowStart - 1,
+@@ -66,7 +66,7 @@ export function GridItemMovers( {
+ 			<ToolbarButton
+ 				icon={ arrowDown }
+ 				label={ __( 'Move block down' ) }
+-				isDisabled={ rowCount && rowEnd >= rowCount }
++				disabled={ rowCount && rowEnd >= rowCount }
+ 				onClick={ () => {
+ 					onChange( {
+ 						rowStart: rowStart + 1,
+@@ -86,7 +86,7 @@ export function GridItemMovers( {
+ 			<ToolbarButton
+ 				icon={ arrowLeft }
+ 				label={ __( 'Move block left' ) }
+-				isDisabled={ columnStart <= 1 }
++				disabled={ columnStart <= 1 }
+ 				onClick={ () => {
+ 					onChange( {
+ 						columnStart: columnStartNumber - 1,
+@@ -106,7 +106,7 @@ export function GridItemMovers( {
+ 			<ToolbarButton
+ 				icon={ arrowRight }
+ 				label={ __( 'Move block right' ) }
+-				isDisabled={ columnCount && columnEnd >= columnCount }
++				disabled={ columnCount && columnEnd >= columnCount }
+ 				onClick={ () => {
+ 					onChange( {
+ 						columnStart: columnStartNumber + 1,
+diff --git a/packages/block-library/src/list-item/edit.js b/packages/block-library/src/list-item/edit.js
+index 42a8bb5551319c..71be31c03c0f8f 100644
+--- a/packages/block-library/src/list-item/edit.js
++++ b/packages/block-library/src/list-item/edit.js
+@@ -61,7 +61,7 @@ export function IndentUI( { clientId } ) {
+ 				icon={ isRTL() ? formatIndentRTL : formatIndent }
+ 				title={ __( 'Indent' ) }
+ 				describedBy={ __( 'Indent list item' ) }
+-				isDisabled={ ! canIndent }
++				disabled={ ! canIndent }
+ 				onClick={ () => indentListItem() }
+ 			/>
+ 		</>
+diff --git a/packages/block-library/src/navigation-submenu/edit.js b/packages/block-library/src/navigation-submenu/edit.js
+index bbba77707e8159..4decc2e68ffbbb 100644
+--- a/packages/block-library/src/navigation-submenu/edit.js
++++ b/packages/block-library/src/navigation-submenu/edit.js
+@@ -387,7 +387,7 @@ export default function NavigationSubmenuEdit( {
+ 						title={ __( 'Convert to Link' ) }
+ 						onClick={ transformToLink }
+ 						className="wp-block-navigation__submenu__revert"
+-						isDisabled={ ! canConvertToLink }
++						disabled={ ! canConvertToLink }
+ 					/>
+ 				</ToolbarGroup>
+ 			</BlockControls>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2f8da9ba0ec0d5..a0d4bef9293116 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,10 @@
+ -   `UnitControl`: Fix an issue where keyboard shortcuts unintentionally shift focus on Windows OS. ([#62988](https://github.com/WordPress/gutenberg/pull/62988))
+ -   Fix inaccessibly disabled `Button`s ([#62306](https://github.com/WordPress/gutenberg/pull/62306)).
+ 
++### Enhancements
++
++-   `ToolbarButton`: Deprecate `isDisabled` prop and merge with `disabled` ([#63101](https://github.com/WordPress/gutenberg/pull/63101)).
++
+ ### Internal
+ 
+ -   `CustomSelectControlV2`: prevent keyboard event propagation in legacy wrapper. ([#62907](https://github.com/WordPress/gutenberg/pull/62907))
+diff --git a/packages/components/src/toolbar/toolbar-button/index.tsx b/packages/components/src/toolbar/toolbar-button/index.tsx
+index 05278bb37ba97c..48f385fa1abaff 100644
+--- a/packages/components/src/toolbar/toolbar-button/index.tsx
++++ b/packages/components/src/toolbar/toolbar-button/index.tsx
+@@ -19,19 +19,29 @@ import ToolbarButtonContainer from './toolbar-button-container';
+ import type { ToolbarButtonProps } from './types';
+ import type { WordPressComponentProps } from '../../context';
+ 
++function useDeprecatedProps( {
++	isDisabled,
++	...otherProps
++}: React.ComponentProps< typeof ToolbarButton > ) {
++	return {
++		disabled: isDisabled,
++		...otherProps,
++	};
++}
++
+ function UnforwardedToolbarButton(
+-	{
++	props: WordPressComponentProps< ToolbarButtonProps, typeof Button, false >,
++	ref: ForwardedRef< any >
++) {
++	const {
+ 		children,
+ 		className,
+ 		containerClassName,
+ 		extraProps,
+ 		isActive,
+-		isDisabled,
+ 		title,
+-		...props
+-	}: WordPressComponentProps< ToolbarButtonProps, typeof Button, false >,
+-	ref: ForwardedRef< any >
+-) {
++		...restProps
++	} = useDeprecatedProps( props );
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+ 
+ 	if ( ! accessibleToolbarState ) {
+@@ -39,10 +49,10 @@ function UnforwardedToolbarButton(
+ 			<ToolbarButtonContainer className={ containerClassName }>
+ 				<Button
+ 					ref={ ref }
+-					icon={ props.icon }
++					icon={ restProps.icon }
+ 					label={ title }
+-					shortcut={ props.shortcut }
+-					data-subscript={ props.subscript }
++					shortcut={ restProps.shortcut }
++					data-subscript={ restProps.subscript }
+ 					onClick={ (
+ 						event: ReactMouseEvent<
+ 							HTMLButtonElement & HTMLAnchorElement,
+@@ -50,9 +60,9 @@ function UnforwardedToolbarButton(
+ 						>
+ 					) => {
+ 						event.stopPropagation();
+-						// TODO: Possible bug; maybe use onClick instead of props.onClick.
+-						if ( props.onClick ) {
+-							props.onClick( event );
++						// TODO: Possible bug; maybe use onClick instead of restProps.onClick.
++						if ( restProps.onClick ) {
++							restProps.onClick( event );
+ 						}
+ 					} }
+ 					className={ clsx(
+@@ -61,10 +71,9 @@ function UnforwardedToolbarButton(
+ 					) }
+ 					isPressed={ isActive }
+ 					__experimentalIsFocusable
+-					disabled={ isDisabled }
+ 					data-toolbar-item
+ 					{ ...extraProps }
+-					{ ...props }
++					{ ...restProps }
+ 				>
+ 					{ children }
+ 				</Button>
+@@ -79,18 +88,13 @@ function UnforwardedToolbarButton(
+ 		<ToolbarItem
+ 			className={ clsx( 'components-toolbar-button', className ) }
+ 			{ ...extraProps }
+-			{ ...props }
++			{ ...restProps }
+ 			ref={ ref }
+ 		>
+ 			{ ( toolbarItemProps ) => (
+ 				<Button
+ 					label={ title }
+ 					isPressed={ isActive }
+-					// TODO: Should be focusable disabled, but adding `__experimentalIsFocusable` will trigger a
+-					// focus bug when ToolbarButton is disabled via the `disabled` prop.
+-					// Must address first: https://github.com/WordPress/gutenberg/issues/63070
+-					// eslint-disable-next-line no-restricted-syntax
+-					disabled={ isDisabled }
+ 					{ ...toolbarItemProps }
+ 				>
+ 					{ children }
+diff --git a/packages/components/src/toolbar/toolbar-button/types.ts b/packages/components/src/toolbar/toolbar-button/types.ts
+index da7038c213324a..bcd349c0d89363 100644
+--- a/packages/components/src/toolbar/toolbar-button/types.ts
++++ b/packages/components/src/toolbar/toolbar-button/types.ts
+@@ -22,6 +22,9 @@ export type ToolbarButtonProps = {
+ 	isActive?: boolean;
+ 	/**
+ 	 * Indicates if the button is disabled.
++	 *
++	 * @deprecated Use `disabled` instead.
++	 * @ignore
+ 	 */
+ 	isDisabled?: boolean;
+ 	/**

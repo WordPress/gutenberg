@@ -1,0 +1,126 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d10c1c63c95365..f36121a38e232c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `useAutocomplete`: Fix autocomple UI flicker when deleting trigger prefix ([#69562](https://github.com/WordPress/gutenberg/pull/69562)).
+ -   `FormTokenField`: Use `color-mix` for disabled option selection background ([#69621](https://github.com/WordPress/gutenberg/pull/69621)).
+ -   `CustomSelectControl`: Fix check icon color to adapt with dark theme ([#69626](https://github.com/WordPress/gutenberg/pull/69626)).
++-   `Autocomplete`: Extracts `getNodeText` function into a separate file and adds unit tests ([#69135](https://github.com/WordPress/gutenberg/pull/69135)).
+ 
+ ## 29.6.0 (2025-03-13)
+ 
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index 796cccd782d281..d13d1d9b6a391a 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -40,35 +40,7 @@ import type {
+ 	UseAutocompleteProps,
+ 	WPCompleter,
+ } from './types';
+-
+-const getNodeText = ( node: React.ReactNode ): string => {
+-	if ( node === null ) {
+-		return '';
+-	}
+-
+-	switch ( typeof node ) {
+-		case 'string':
+-		case 'number':
+-			return node.toString();
+-			break;
+-		case 'boolean':
+-			return '';
+-			break;
+-		case 'object': {
+-			if ( node instanceof Array ) {
+-				return node.map( getNodeText ).join( '' );
+-			}
+-			if ( 'props' in node ) {
+-				return getNodeText( node.props.children );
+-			}
+-			break;
+-		}
+-		default:
+-			return '';
+-	}
+-
+-	return '';
+-};
++import getNodeText from '../utils/get-node-text';
+ 
+ const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
+ 
+diff --git a/packages/components/src/utils/get-node-text.ts b/packages/components/src/utils/get-node-text.ts
+new file mode 100644
+index 00000000000000..eb3bc045c3a653
+--- /dev/null
++++ b/packages/components/src/utils/get-node-text.ts
+@@ -0,0 +1,24 @@
++const getNodeText = ( node: React.ReactNode ): string => {
++	if ( node === null ) {
++		return '';
++	}
++
++	switch ( typeof node ) {
++		case 'string':
++		case 'number':
++			return node.toString();
++		case 'object': {
++			if ( node instanceof Array ) {
++				return node.map( getNodeText ).join( '' );
++			}
++			if ( 'props' in node ) {
++				return getNodeText( node.props.children );
++			}
++			return '';
++		}
++		default:
++			return '';
++	}
++};
++
++export default getNodeText;
+diff --git a/packages/components/src/utils/test/get-node-text.js b/packages/components/src/utils/test/get-node-text.js
+new file mode 100644
+index 00000000000000..903b6158f74b27
+--- /dev/null
++++ b/packages/components/src/utils/test/get-node-text.js
+@@ -0,0 +1,37 @@
++/**
++ * Internal dependencies
++ */
++import getNodeText from '../get-node-text';
++
++describe( 'getNodeText', () => {
++	it( 'should return an empty string for null', () => {
++		expect( getNodeText( null ) ).toBe( '' );
++	} );
++
++	it( 'should return the string representation of a string node', () => {
++		expect( getNodeText( 'Hello' ) ).toBe( 'Hello' );
++	} );
++
++	it( 'should return the string representation of a number node', () => {
++		expect( getNodeText( 123 ) ).toBe( '123' );
++	} );
++
++	it( 'should return an empty string for a boolean node', () => {
++		expect( getNodeText( true ) ).toBe( '' );
++	} );
++
++	it( 'should concatenate text from an array of nodes', () => {
++		expect( getNodeText( [ 'Hello', ' ', 'World' ] ) ).toBe(
++			'Hello World'
++		);
++	} );
++
++	it( 'should return text from a React element with children', () => {
++		const element = (
++			<div>
++				Hello <span>World</span>
++			</div>
++		);
++		expect( getNodeText( element ) ).toBe( 'Hello World' );
++	} );
++} );

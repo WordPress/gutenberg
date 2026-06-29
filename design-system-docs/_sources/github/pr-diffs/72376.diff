@@ -1,0 +1,49 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1800868b114ef4..279e2df3443ed0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ ### Bug Fixes
+ 
+ -   `Button`: Ensure that icons don't shrink ([#72474](https://github.com/WordPress/gutenberg/pull/72474)).
++-   `Popover`: Fix `onDialogClose` logic to only close the popover if the blur event targets the specific popover instance ([#72376](https://github.com/WordPress/gutenberg/pull/72376)).
+ 
+ ## 30.6.0 (2025-10-17)
+ 
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index ac03ae882531d7..98018e308a4225 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -268,9 +268,30 @@ const UnforwardedPopover = (
+ 		onDialogClose = ( type: string | undefined, event: SyntheticEvent ) => {
+ 			// Ideally the popover should have just a single onClose prop and
+ 			// not three props that potentially do the same thing.
+-			if ( type === 'focus-outside' && onFocusOutside ) {
+-				onFocusOutside( event );
++			if ( type === 'focus-outside' ) {
++				// Check if this blur event is actually relevant to this popover
++				const blurTarget = event?.target as Element;
++				const referenceElement = refs.reference.current;
++				const floatingElement = refs.floating.current;
++
++				// Check if blur is from this popover's reference element or its floating content
++				const isBlurFromThisPopover =
++					( referenceElement &&
++						'contains' in referenceElement &&
++						referenceElement.contains( blurTarget ) ) ||
++					floatingElement?.contains( blurTarget );
++				// Only proceed if the blur is actually from this popover
++				if ( ! isBlurFromThisPopover ) {
++					return;
++				}
++				// Call onFocusOutside if defined or call onClose.
++				if ( onFocusOutside ) {
++					onFocusOutside( event );
++				} else if ( onClose ) {
++					onClose();
++				}
+ 			} else if ( onClose ) {
++				// onClose should be called for other event types if it exists.
+ 				onClose();
+ 			}
+ 		};

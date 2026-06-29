@@ -1,0 +1,2717 @@
+diff --git a/docs/tool/manifest.js b/docs/tool/manifest.js
+index e407c47e7284be..d3ed5d61dc0bb1 100644
+--- a/docs/tool/manifest.js
++++ b/docs/tool/manifest.js
+@@ -14,6 +14,7 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
+ 		'**/src/ui/**/README.md',
+ 		'packages/components/src/theme/README.md',
+ 		'packages/components/src/view/README.md',
++		'packages/components/src/dropdown-menu-v2/README.md',
+ 	],
+ } );
+ const packagePaths = glob( 'packages/*/package.json' )
+diff --git a/package-lock.json b/package-lock.json
+index 040fe3911f3772..041a64c8600e77 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -7125,6 +7125,67 @@
+ 				"@babel/runtime": "^7.13.10"
+ 			}
+ 		},
++		"@radix-ui/react-arrow": {
++			"version": "1.0.2",
++			"resolved": "https://registry.npmjs.org/@radix-ui/react-arrow/-/react-arrow-1.0.2.tgz",
++			"integrity": "sha512-fqYwhhI9IarZ0ll2cUSfKuXHlJK0qE4AfnRrPBbRwEH/4mGQn04/QFGomLi8TXWIdv9WJk//KgGm+aDxVIr1wA==",
++			"requires": {
++				"@babel/runtime": "^7.13.10",
++				"@radix-ui/react-primitive": "1.0.2"
++			},
++			"dependencies": {
++				"@radix-ui/react-primitive": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-primitive/-/react-primitive-1.0.2.tgz",
++					"integrity": "sha512-zY6G5Qq4R8diFPNwtyoLRZBxzu1Z+SXMlfYpChN7Dv8gvmx9X3qhDqiLWvKseKVJMuedFeU/Sa0Sy/Ia+t06Dw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-slot": "1.0.1"
++					}
++				},
++				"@radix-ui/react-slot": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.0.1.tgz",
++					"integrity": "sha512-avutXAFL1ehGvAXtPquu0YK5oz6ctS474iM3vNGQIkswrVhdrS52e3uoMQBzZhNRAIE0jBnUyXWNmSjGHhCFcw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-compose-refs": "1.0.0"
++					}
++				}
++			}
++		},
++		"@radix-ui/react-collection": {
++			"version": "1.0.2",
++			"resolved": "https://registry.npmjs.org/@radix-ui/react-collection/-/react-collection-1.0.2.tgz",
++			"integrity": "sha512-s8WdQQ6wNXpaxdZ308KSr8fEWGrg4un8i4r/w7fhiS4ElRNjk5rRcl0/C6TANG2LvLOGIxtzo/jAg6Qf73TEBw==",
++			"requires": {
++				"@babel/runtime": "^7.13.10",
++				"@radix-ui/react-compose-refs": "1.0.0",
++				"@radix-ui/react-context": "1.0.0",
++				"@radix-ui/react-primitive": "1.0.2",
++				"@radix-ui/react-slot": "1.0.1"
++			},
++			"dependencies": {
++				"@radix-ui/react-primitive": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-primitive/-/react-primitive-1.0.2.tgz",
++					"integrity": "sha512-zY6G5Qq4R8diFPNwtyoLRZBxzu1Z+SXMlfYpChN7Dv8gvmx9X3qhDqiLWvKseKVJMuedFeU/Sa0Sy/Ia+t06Dw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-slot": "1.0.1"
++					}
++				},
++				"@radix-ui/react-slot": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.0.1.tgz",
++					"integrity": "sha512-avutXAFL1ehGvAXtPquu0YK5oz6ctS474iM3vNGQIkswrVhdrS52e3uoMQBzZhNRAIE0jBnUyXWNmSjGHhCFcw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-compose-refs": "1.0.0"
++					}
++				}
++			}
++		},
+ 		"@radix-ui/react-compose-refs": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/@radix-ui/react-compose-refs/-/react-compose-refs-1.0.0.tgz",
+@@ -7163,6 +7224,14 @@
+ 				"react-remove-scroll": "2.5.4"
+ 			}
+ 		},
++		"@radix-ui/react-direction": {
++			"version": "1.0.0",
++			"resolved": "https://registry.npmjs.org/@radix-ui/react-direction/-/react-direction-1.0.0.tgz",
++			"integrity": "sha512-2HV05lGUgYcA6xgLQ4BKPDmtL+QbIZYH5fCOTAOOcJ5O0QbWS3i9lKaurLzliYUDhORI2Qr3pyjhJh44lKA3rQ==",
++			"requires": {
++				"@babel/runtime": "^7.13.10"
++			}
++		},
+ 		"@radix-ui/react-dismissable-layer": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/@radix-ui/react-dismissable-layer/-/react-dismissable-layer-1.0.0.tgz",
+@@ -7176,6 +7245,41 @@
+ 				"@radix-ui/react-use-escape-keydown": "1.0.0"
+ 			}
+ 		},
++		"@radix-ui/react-dropdown-menu": {
++			"version": "2.0.4",
++			"resolved": "https://registry.npmjs.org/@radix-ui/react-dropdown-menu/-/react-dropdown-menu-2.0.4.tgz",
++			"integrity": "sha512-y6AT9+MydyXcByivdK1+QpjWoKaC7MLjkS/cH1Q3keEyMvDkiY85m8o2Bi6+Z1PPUlCsMULopxagQOSfN0wahg==",
++			"requires": {
++				"@babel/runtime": "^7.13.10",
++				"@radix-ui/primitive": "1.0.0",
++				"@radix-ui/react-compose-refs": "1.0.0",
++				"@radix-ui/react-context": "1.0.0",
++				"@radix-ui/react-id": "1.0.0",
++				"@radix-ui/react-menu": "2.0.4",
++				"@radix-ui/react-primitive": "1.0.2",
++				"@radix-ui/react-use-controllable-state": "1.0.0"
++			},
++			"dependencies": {
++				"@radix-ui/react-primitive": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-primitive/-/react-primitive-1.0.2.tgz",
++					"integrity": "sha512-zY6G5Qq4R8diFPNwtyoLRZBxzu1Z+SXMlfYpChN7Dv8gvmx9X3qhDqiLWvKseKVJMuedFeU/Sa0Sy/Ia+t06Dw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-slot": "1.0.1"
++					}
++				},
++				"@radix-ui/react-slot": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.0.1.tgz",
++					"integrity": "sha512-avutXAFL1ehGvAXtPquu0YK5oz6ctS474iM3vNGQIkswrVhdrS52e3uoMQBzZhNRAIE0jBnUyXWNmSjGHhCFcw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-compose-refs": "1.0.0"
++					}
++				}
++			}
++		},
+ 		"@radix-ui/react-focus-guards": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/@radix-ui/react-focus-guards/-/react-focus-guards-1.0.0.tgz",
+@@ -7204,6 +7308,166 @@
+ 				"@radix-ui/react-use-layout-effect": "1.0.0"
+ 			}
+ 		},
++		"@radix-ui/react-menu": {
++			"version": "2.0.4",
++			"resolved": "https://registry.npmjs.org/@radix-ui/react-menu/-/react-menu-2.0.4.tgz",
++			"integrity": "sha512-mzKR47tZ1t193trEqlQoJvzY4u9vYfVH16ryBrVrCAGZzkgyWnMQYEZdUkM7y8ak9mrkKtJiqB47TlEnubeOFQ==",
++			"requires": {
++				"@babel/runtime": "^7.13.10",
++				"@radix-ui/primitive": "1.0.0",
++				"@radix-ui/react-collection": "1.0.2",
++				"@radix-ui/react-compose-refs": "1.0.0",
++				"@radix-ui/react-context": "1.0.0",
++				"@radix-ui/react-direction": "1.0.0",
++				"@radix-ui/react-dismissable-layer": "1.0.3",
++				"@radix-ui/react-focus-guards": "1.0.0",
++				"@radix-ui/react-focus-scope": "1.0.2",
++				"@radix-ui/react-id": "1.0.0",
++				"@radix-ui/react-popper": "1.1.1",
++				"@radix-ui/react-portal": "1.0.2",
++				"@radix-ui/react-presence": "1.0.0",
++				"@radix-ui/react-primitive": "1.0.2",
++				"@radix-ui/react-roving-focus": "1.0.3",
++				"@radix-ui/react-slot": "1.0.1",
++				"@radix-ui/react-use-callback-ref": "1.0.0",
++				"aria-hidden": "^1.1.1",
++				"react-remove-scroll": "2.5.5"
++			},
++			"dependencies": {
++				"@radix-ui/react-dismissable-layer": {
++					"version": "1.0.3",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-dismissable-layer/-/react-dismissable-layer-1.0.3.tgz",
++					"integrity": "sha512-nXZOvFjOuHS1ovumntGV7NNoLaEp9JEvTht3MBjP44NSW5hUKj/8OnfN3+8WmB+CEhN44XaGhpHoSsUIEl5P7Q==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/primitive": "1.0.0",
++						"@radix-ui/react-compose-refs": "1.0.0",
++						"@radix-ui/react-primitive": "1.0.2",
++						"@radix-ui/react-use-callback-ref": "1.0.0",
++						"@radix-ui/react-use-escape-keydown": "1.0.2"
++					}
++				},
++				"@radix-ui/react-focus-scope": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-focus-scope/-/react-focus-scope-1.0.2.tgz",
++					"integrity": "sha512-spwXlNTfeIprt+kaEWE/qYuYT3ZAqJiAGjN/JgdvgVDTu8yc+HuX+WOWXrKliKnLnwck0F6JDkqIERncnih+4A==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-compose-refs": "1.0.0",
++						"@radix-ui/react-primitive": "1.0.2",
++						"@radix-ui/react-use-callback-ref": "1.0.0"
++					}
++				},
++				"@radix-ui/react-portal": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-portal/-/react-portal-1.0.2.tgz",
++					"integrity": "sha512-swu32idoCW7KA2VEiUZGBSu9nB6qwGdV6k6HYhUoOo3M1FFpD+VgLzUqtt3mwL1ssz7r2x8MggpLSQach2Xy/Q==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-primitive": "1.0.2"
++					}
++				},
++				"@radix-ui/react-primitive": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-primitive/-/react-primitive-1.0.2.tgz",
++					"integrity": "sha512-zY6G5Qq4R8diFPNwtyoLRZBxzu1Z+SXMlfYpChN7Dv8gvmx9X3qhDqiLWvKseKVJMuedFeU/Sa0Sy/Ia+t06Dw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-slot": "1.0.1"
++					}
++				},
++				"@radix-ui/react-slot": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.0.1.tgz",
++					"integrity": "sha512-avutXAFL1ehGvAXtPquu0YK5oz6ctS474iM3vNGQIkswrVhdrS52e3uoMQBzZhNRAIE0jBnUyXWNmSjGHhCFcw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-compose-refs": "1.0.0"
++					}
++				},
++				"@radix-ui/react-use-escape-keydown": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-use-escape-keydown/-/react-use-escape-keydown-1.0.2.tgz",
++					"integrity": "sha512-DXGim3x74WgUv+iMNCF+cAo8xUHHeqvjx8zs7trKf+FkQKPQXLk2sX7Gx1ysH7Q76xCpZuxIJE7HLPxRE+Q+GA==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-use-callback-ref": "1.0.0"
++					}
++				},
++				"react-remove-scroll": {
++					"version": "2.5.5",
++					"resolved": "https://registry.npmjs.org/react-remove-scroll/-/react-remove-scroll-2.5.5.tgz",
++					"integrity": "sha512-ImKhrzJJsyXJfBZ4bzu8Bwpka14c/fQt0k+cyFp/PBhTfyDnU5hjOtM4AG/0AMyy8oKzOTR0lDgJIM7pYXI0kw==",
++					"requires": {
++						"react-remove-scroll-bar": "^2.3.3",
++						"react-style-singleton": "^2.2.1",
++						"tslib": "^2.1.0",
++						"use-callback-ref": "^1.3.0",
++						"use-sidecar": "^1.1.2"
++					}
++				}
++			}
++		},
++		"@radix-ui/react-popper": {
++			"version": "1.1.1",
++			"resolved": "https://registry.npmjs.org/@radix-ui/react-popper/-/react-popper-1.1.1.tgz",
++			"integrity": "sha512-keYDcdMPNMjSC8zTsZ8wezUMiWM9Yj14wtF3s0PTIs9srnEPC9Kt2Gny1T3T81mmSeyDjZxsD9N5WCwNNb712w==",
++			"requires": {
++				"@babel/runtime": "^7.13.10",
++				"@floating-ui/react-dom": "0.7.2",
++				"@radix-ui/react-arrow": "1.0.2",
++				"@radix-ui/react-compose-refs": "1.0.0",
++				"@radix-ui/react-context": "1.0.0",
++				"@radix-ui/react-primitive": "1.0.2",
++				"@radix-ui/react-use-callback-ref": "1.0.0",
++				"@radix-ui/react-use-layout-effect": "1.0.0",
++				"@radix-ui/react-use-rect": "1.0.0",
++				"@radix-ui/react-use-size": "1.0.0",
++				"@radix-ui/rect": "1.0.0"
++			},
++			"dependencies": {
++				"@floating-ui/core": {
++					"version": "0.7.3",
++					"resolved": "https://registry.npmjs.org/@floating-ui/core/-/core-0.7.3.tgz",
++					"integrity": "sha512-buc8BXHmG9l82+OQXOFU3Kr2XQx9ys01U/Q9HMIrZ300iLc8HLMgh7dcCqgYzAzf4BkoQvDcXf5Y+CuEZ5JBYg=="
++				},
++				"@floating-ui/dom": {
++					"version": "0.5.4",
++					"resolved": "https://registry.npmjs.org/@floating-ui/dom/-/dom-0.5.4.tgz",
++					"integrity": "sha512-419BMceRLq0RrmTSDxn8hf9R3VCJv2K9PUfugh5JyEFmdjzDo+e8U5EdR8nzKq8Yj1htzLm3b6eQEEam3/rrtg==",
++					"requires": {
++						"@floating-ui/core": "^0.7.3"
++					}
++				},
++				"@floating-ui/react-dom": {
++					"version": "0.7.2",
++					"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-0.7.2.tgz",
++					"integrity": "sha512-1T0sJcpHgX/u4I1OzIEhlcrvkUN8ln39nz7fMoE/2HDHrPiMFoOGR7++GYyfUmIQHkkrTinaeQsO3XWubjSvGg==",
++					"requires": {
++						"@floating-ui/dom": "^0.5.3",
++						"use-isomorphic-layout-effect": "^1.1.1"
++					}
++				},
++				"@radix-ui/react-primitive": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-primitive/-/react-primitive-1.0.2.tgz",
++					"integrity": "sha512-zY6G5Qq4R8diFPNwtyoLRZBxzu1Z+SXMlfYpChN7Dv8gvmx9X3qhDqiLWvKseKVJMuedFeU/Sa0Sy/Ia+t06Dw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-slot": "1.0.1"
++					}
++				},
++				"@radix-ui/react-slot": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.0.1.tgz",
++					"integrity": "sha512-avutXAFL1ehGvAXtPquu0YK5oz6ctS474iM3vNGQIkswrVhdrS52e3uoMQBzZhNRAIE0jBnUyXWNmSjGHhCFcw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-compose-refs": "1.0.0"
++					}
++				}
++			}
++		},
+ 		"@radix-ui/react-portal": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/@radix-ui/react-portal/-/react-portal-1.0.0.tgz",
+@@ -7232,6 +7496,43 @@
+ 				"@radix-ui/react-slot": "1.0.0"
+ 			}
+ 		},
++		"@radix-ui/react-roving-focus": {
++			"version": "1.0.3",
++			"resolved": "https://registry.npmjs.org/@radix-ui/react-roving-focus/-/react-roving-focus-1.0.3.tgz",
++			"integrity": "sha512-stjCkIoMe6h+1fWtXlA6cRfikdBzCLp3SnVk7c48cv/uy3DTGoXhN76YaOYUJuy3aEDvDIKwKR5KSmvrtPvQPQ==",
++			"requires": {
++				"@babel/runtime": "^7.13.10",
++				"@radix-ui/primitive": "1.0.0",
++				"@radix-ui/react-collection": "1.0.2",
++				"@radix-ui/react-compose-refs": "1.0.0",
++				"@radix-ui/react-context": "1.0.0",
++				"@radix-ui/react-direction": "1.0.0",
++				"@radix-ui/react-id": "1.0.0",
++				"@radix-ui/react-primitive": "1.0.2",
++				"@radix-ui/react-use-callback-ref": "1.0.0",
++				"@radix-ui/react-use-controllable-state": "1.0.0"
++			},
++			"dependencies": {
++				"@radix-ui/react-primitive": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-primitive/-/react-primitive-1.0.2.tgz",
++					"integrity": "sha512-zY6G5Qq4R8diFPNwtyoLRZBxzu1Z+SXMlfYpChN7Dv8gvmx9X3qhDqiLWvKseKVJMuedFeU/Sa0Sy/Ia+t06Dw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-slot": "1.0.1"
++					}
++				},
++				"@radix-ui/react-slot": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.0.1.tgz",
++					"integrity": "sha512-avutXAFL1ehGvAXtPquu0YK5oz6ctS474iM3vNGQIkswrVhdrS52e3uoMQBzZhNRAIE0jBnUyXWNmSjGHhCFcw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-compose-refs": "1.0.0"
++					}
++				}
++			}
++		},
+ 		"@radix-ui/react-slot": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.0.0.tgz",
+@@ -7275,6 +7576,32 @@
+ 				"@babel/runtime": "^7.13.10"
+ 			}
+ 		},
++		"@radix-ui/react-use-rect": {
++			"version": "1.0.0",
++			"resolved": "https://registry.npmjs.org/@radix-ui/react-use-rect/-/react-use-rect-1.0.0.tgz",
++			"integrity": "sha512-TB7pID8NRMEHxb/qQJpvSt3hQU4sqNPM1VCTjTRjEOa7cEop/QMuq8S6fb/5Tsz64kqSvB9WnwsDHtjnrM9qew==",
++			"requires": {
++				"@babel/runtime": "^7.13.10",
++				"@radix-ui/rect": "1.0.0"
++			}
++		},
++		"@radix-ui/react-use-size": {
++			"version": "1.0.0",
++			"resolved": "https://registry.npmjs.org/@radix-ui/react-use-size/-/react-use-size-1.0.0.tgz",
++			"integrity": "sha512-imZ3aYcoYCKhhgNpkNDh/aTiU05qw9hX+HHI1QDBTyIlcFjgeFlKKySNGMwTp7nYFLQg/j0VA2FmCY4WPDDHMg==",
++			"requires": {
++				"@babel/runtime": "^7.13.10",
++				"@radix-ui/react-use-layout-effect": "1.0.0"
++			}
++		},
++		"@radix-ui/rect": {
++			"version": "1.0.0",
++			"resolved": "https://registry.npmjs.org/@radix-ui/rect/-/rect-1.0.0.tgz",
++			"integrity": "sha512-d0O68AYy/9oeEy1DdC07bz1/ZXX+DqCskRd3i4JzLSTXwefzaepQrKjXC7aNM8lTHjFLDO0pDgaEiQ7jEk+HVg==",
++			"requires": {
++				"@babel/runtime": "^7.13.10"
++			}
++		},
+ 		"@react-native-clipboard/clipboard": {
+ 			"version": "1.9.0",
+ 			"resolved": "https://registry.npmjs.org/@react-native-clipboard/clipboard/-/clipboard-1.9.0.tgz",
+@@ -17003,6 +17330,7 @@
+ 				"@emotion/styled": "^11.6.0",
+ 				"@emotion/utils": "^1.0.0",
+ 				"@floating-ui/react-dom": "1.0.0",
++				"@radix-ui/react-dropdown-menu": "^2.0.4",
+ 				"@use-gesture/react": "^10.2.24",
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
+@@ -56292,6 +56620,11 @@
+ 				"tslib": "^2.0.0"
+ 			}
+ 		},
++		"use-isomorphic-layout-effect": {
++			"version": "1.1.2",
++			"resolved": "https://registry.npmjs.org/use-isomorphic-layout-effect/-/use-isomorphic-layout-effect-1.1.2.tgz",
++			"integrity": "sha512-49L8yCO3iGT/ZF9QttjwLF/ZD9Iwto5LnH5LmEdk/6cFmXddqi2ulF0edxTwjj+7mqvpVVGQWvbXZdn32wRSHA=="
++		},
+ 		"use-lilius": {
+ 			"version": "2.0.1",
+ 			"resolved": "https://registry.npmjs.org/use-lilius/-/use-lilius-2.0.1.tgz",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6c00d6e22027bc..257d0545f42236 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   `Modal`: Remove children container's unused class name ([#50655](https://github.com/WordPress/gutenberg/pull/50655)).
+ -   `DropdownMenu`: Convert to TypeScript ([#50187](https://github.com/WordPress/gutenberg/pull/50187)).
++-   Added experimental v2 of `DropdownMenu` ([#49473](https://github.com/WordPress/gutenberg/pull/49473)).
+ 
+ 
+ ## 24.0.0 (2023-05-10)
+diff --git a/packages/components/CONTRIBUTING.md b/packages/components/CONTRIBUTING.md
+index 8464a4a7327447..bf7569a19ddba0 100644
+--- a/packages/components/CONTRIBUTING.md
++++ b/packages/components/CONTRIBUTING.md
+@@ -20,6 +20,7 @@ For an example of a component that follows these requirements, take a look at [`
+ - [README example](#README-example)
+ - [Folder structure](#folder-structure)
+ - [TypeScript migration guide](#refactoring-a-component-to-typescript)
++- [Using Radix UI primitives](#using-radix-ui-primitives)
+ 
+ ## Introducing new components
+ 
+@@ -639,3 +640,12 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
+ 11. Convert unit tests.
+ 	1. Rename test file extensions from `.js` to `.tsx`.
+ 	2. Fix all TypeScript errors.
++
++## Using Radix UI primitives
++
++Useful links:
++
++- [online docs](https://www.radix-ui.com/docs/primitives/overview/introduction)
++- [repo](https://github.com/radix-ui/primitives) — useful for:
++    - inspecting source code
++    - running storybook examples (`yarn install && yarn dev`)
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 0077e73d3f1da3..0339100948a019 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -38,6 +38,7 @@
+ 		"@emotion/styled": "^11.6.0",
+ 		"@emotion/utils": "^1.0.0",
+ 		"@floating-ui/react-dom": "1.0.0",
++		"@radix-ui/react-dropdown-menu": "^2.0.4",
+ 		"@use-gesture/react": "^10.2.24",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+@@ -85,4 +86,4 @@
+ 	"publishConfig": {
+ 		"access": "public"
+ 	}
+-}
++}
+\ No newline at end of file
+diff --git a/packages/components/src/dropdown-menu-v2/README.md b/packages/components/src/dropdown-menu-v2/README.md
+new file mode 100644
+index 00000000000000..c3896f8ca11093
+--- /dev/null
++++ b/packages/components/src/dropdown-menu-v2/README.md
+@@ -0,0 +1,392 @@
++# `DropdownMenu` (v2)
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`DropdownMenu` displays a menu to the user (such as a set of actions or functions) triggered by a button.
++
++
++## Design guidelines
++
++### Usage
++
++#### When to use a DropdownMenu
++
++Use a DropdownMenu when you want users to:
++
++-   Choose an action or change a setting from a list, AND
++-   Only see the available choices contextually.
++
++`DropdownMenu` is a React component to render an expandable menu of buttons. It is similar in purpose to a `<select>` element, with the distinction that it does not maintain a value. Instead, each option behaves as an action button.
++
++If you need to display all the available options at all times, consider using a Toolbar instead. Use a `DropdownMenu` to display a list of actions after the user interacts with a button.
++
++**Do**
++Use a `DropdownMenu` to display a list of actions after the user interacts with an icon.
++
++**Don’t** use a `DropdownMenu` for important actions that should always be visible. Use a `Toolbar` instead.
++
++**Don’t**
++Don’t use a `DropdownMenu` for frequently used actions. Use a `Toolbar` instead.
++
++#### Behavior
++
++Generally, the parent button should indicate that interacting with it will show a `DropdownMenu`.
++
++The parent button should retain the same visual styling regardless of whether the `DropdownMenu` is displayed or not.
++
++#### Placement
++
++The `DropdownMenu` should typically appear directly below, or below and to the left of, the parent button. If there isn’t enough space below to display the full `DropdownMenu`, it can be displayed instead above the parent button.
++
++## Development guidelines
++
++This component is still highly experimental, and it's not normally accessible to consumers of the `@wordpress/components` package.
++
++The component exposes a set of components that are meant to be used in combination with each other in order to implement a `DropdownMenu` correctly.
++
++### `DropdownMenu`
++
++The root component, used to specify the menu's trigger and its contents.
++
++#### Props
++
++The component accepts the following props:
++
++##### `trigger`: `React.ReactNode`
++
++The trigger button
++
++- Required: yes
++
++##### `children`: `React.ReactNode`
++
++The contents of the dropdown
++
++- Required: yes
++
++##### `defaultOpen`: `boolean`
++
++The open state of the dropdown menu when it is initially rendered. Use when you do not need to control its open state.
++
++- Required: no
++
++##### `open`: `boolean`
++
++The controlled open state of the dropdown menu. Must be used in conjunction with `onOpenChange`
++
++- Required: no
++
++##### `onOpenChange`: `(open: boolean) => void`
++
++Event handler called when the open state of the dropdown menu changes.
++
++- Required: no
++
++##### `modal`: `boolean`
++
++The modality of the dropdown menu. When set to true, interaction with outside elements will be disabled and only menu content will be visible to screen readers.
++
++- Required: no
++- Default: `true`
++
++##### `side`: `"bottom" | "left" | "right" | "top"`
++
++The preferred side of the trigger to render against when open. Will be reversed when collisions occur and avoidCollisions is enabled.
++
++- Required: no
++- Default: `"bottom"`
++
++##### `sideOffset`: `number`
++
++The distance in pixels from the trigger.
++
++- Required: no
++- Default: `0`
++
++##### `align`: `"end" | "start" | "center"`
++
++The preferred alignment against the trigger. May change when collisions occur.
++
++- Required: no
++- Default: `"center"`
++
++##### `alignOffset`: `number`
++
++An offset in pixels from the "start" or "end" alignment options.
++
++- Required: no
++- Default: `0`
++
++### `DropdownMenuItem`
++
++Used to render a menu item.
++
++#### Props
++
++The component accepts the following props:
++
++##### `children`: `React.ReactNode`
++
++The contents of the item
++
++- Required: yes
++
++##### `disabled`: `boolean`
++
++- Required: no
++- Default: `false`
++
++##### `onSelect`: `(event: Event) => void`
++
++Event handler called when the user selects an item (via mouse or keyboard). Calling `event.preventDefault` in this handler will prevent the dropdown menu from closing when selecting that item.
++
++- Required: no
++
++##### `textValue`: `string`
++
++Optional text used for typeahead purposes. By default the typeahead behavior will use the `.textContent` of the item. Use this when the content is complex, or you have non-textual content inside.
++
++- Required: no
++
++##### `prefix`: `React.ReactNode`
++
++The contents of the item's prefix.
++
++- Required: no
++
++##### `suffix`: `React.ReactNode`
++
++The contents of the item's suffix.
++
++- Required: no
++
++### `DropdownSubMenu`
++
++Used to render a nested submenu.
++
++#### Props
++
++The component accepts the following props:
++##### `trigger`: `React.ReactNode`
++
++The contents rendered inside the trigger. The trigger should be an instance of the `DropdownSubMenuTrigger` component.
++
++- Required: yes
++
++##### `children`: `React.ReactNode`
++
++The contents of the dropdown
++
++- Required: yes
++
++##### `defaultOpen`: `boolean`
++
++The open state of the dropdown menu when it is initially rendered. Use when you do not need to control its open state.
++
++- Required: no
++
++##### `open`: `boolean`
++
++The controlled open state of the dropdown menu. Must be used in conjunction with `onOpenChange`
++
++- Required: no
++
++##### `onOpenChange`: `(open: boolean) => void`
++
++Event handler called when the open state of the dropdown menu changes.
++
++- Required: no
++
++##### `disabled`: `boolean`
++
++When `true`, prevents the user from interacting with the item.
++
++- Required: no
++
++##### `textValue`: `string`
++
++Optional text used for typeahead purposes for the trigger. By default the typeahead behavior will use the `.textContent` of the trigger. Use this when the content is complex, or you have non-textual content inside.
++
++- Required: no
++
++### `DropdownSubMenuTrigger`
++
++Used to render a submenu trigger.
++
++#### Props
++
++The component accepts the following props:
++
++##### `children`: `React.ReactNode`
++
++The contents of the item
++
++- Required: yes
++
++##### `prefix`: `React.ReactNode`
++
++The contents of the item's prefix.
++
++- Required: no
++
++##### `suffix`: `React.ReactNode`
++
++The contents of the item's suffix.
++
++- Default: a chevron icon
++- Required: The standard chevron icon for a submenu trigger
++
++### `DropdownMenuCheckboxItem`
++
++Used to render a checkbox item.
++
++#### Props
++
++The component accepts the following props:
++
++##### `children`: `React.ReactNode`
++
++The contents of the checkbox item
++
++- Required: yes
++
++##### `checked`: `boolean`
++
++The controlled checked state of the item. Must be used in conjunction with `onCheckedChange`.
++
++- Required: no
++- Default: `false`
++
++##### `onCheckedChange`: `(checked: boolean) => void)`
++
++Event handler called when the checked state changes.
++
++- Required: no
++
++##### `disabled`: `boolean`
++
++When `true`, prevents the user from interacting with the item.
++
++- Required: no
++
++##### `onSelect`: `(event: Event) => void`
++
++Event handler called when the user selects an item (via mouse or keyboard). Calling `event.preventDefault` in this handler will prevent the dropdown menu from closing when selecting that item.
++
++- Required: no
++
++##### `textValue`: `string`
++
++Optional text used for typeahead purposes. By default the typeahead behavior will use the `.textContent` of the item. Use this when the content is complex, or you have non-textual content inside.
++
++- Required: no
++
++##### `suffix`: `React.ReactNode`
++
++The contents of the checkbox item's suffix.
++
++- Required: no
++
++### `DropdownMenuRadioGroup`
++
++Used to render a radio group.
++
++#### Props
++
++The component accepts the following props:
++
++##### `children`: `React.ReactNode`
++
++The contents of the radio group
++
++- Required: yes
++
++##### `value`: `string`
++
++The value of the selected item in the group.
++
++- Required: no
++
++##### `onValueChange`: `(value: string) => void`
++
++Event handler called when the value changes.
++
++- Required: no
++
++### `DropdownMenuRadioItem`
++
++Used to render a radio item.
++
++#### Props
++
++The component accepts the following props:
++
++##### `children`: `React.ReactNode`
++
++The contents of the item.
++
++- Required: yes
++
++##### `value`: `string`
++
++The unique value of the item.
++
++- Required: yes
++
++##### `disabled`: `boolean`
++
++When `true`, prevents the user from interacting with the item.
++
++- Required: no
++
++##### `onSelect`: `(event: Event) => void`
++
++Event handler called when the user selects an item (via mouse or keyboard). Calling `event.preventDefault` in this handler will prevent the dropdown menu from closing when selecting that item.
++
++- Required: no
++
++##### `textValue`: `string`
++
++Optional text used for typeahead purposes. By default the typeahead behavior will use the `.textContent` of the item. Use this when the content is complex, or you have non-textual content inside.
++
++- Required: no
++
++##### `suffix`: `React.ReactNode
++
++The contents of the radio item's suffix.
++
++- Required: no
++
++### `DropdownMenuLabel`
++
++Used to render a group label.
++
++#### Props
++
++The component accepts the following props:
++
++##### `children`: `React.ReactNode`
++
++The contents of the group.
++
++- Required: yes
++
++### `DropdownMenuGroup`
++
++Used to group menu items.
++
++#### Props
++
++The component accepts the following props:
++
++##### `children`: `React.ReactNode`
++
++The contents of the group.
++
++- Required: yes
++
++### `DropdownMenuSeparatorProps`
++
++Used to render a visual separator.
+diff --git a/packages/components/src/dropdown-menu-v2/index.tsx b/packages/components/src/dropdown-menu-v2/index.tsx
+new file mode 100644
+index 00000000000000..7a0197f69fc3dd
+--- /dev/null
++++ b/packages/components/src/dropdown-menu-v2/index.tsx
+@@ -0,0 +1,241 @@
++/**
++ * External dependencies
++ */
++import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++import { isRTL } from '@wordpress/i18n';
++import { check, chevronRightSmall, lineSolid } from '@wordpress/icons';
++import { SVG, Circle } from '@wordpress/primitives';
++
++/**
++ * Internal dependencies
++ */
++import Icon from '../icon';
++import * as DropdownMenuStyled from './styles';
++import type {
++	DropdownMenuProps,
++	DropdownSubMenuProps,
++	DropdownMenuItemProps,
++	DropdownMenuLabelProps,
++	DropdownMenuGroupProps,
++	DropdownMenuCheckboxItemProps,
++	DropdownMenuRadioGroupProps,
++	DropdownMenuRadioItemProps,
++	DropdownMenuSeparatorProps,
++	DropdownSubMenuTriggerProps,
++} from './types';
++
++// Menu content's side padding + 4px
++const SUB_MENU_OFFSET_SIDE = 12;
++// Opposite amount of the top padding of the menu item
++const SUB_MENU_OFFSET_ALIGN = -8;
++
++/**
++ * `DropdownMenu` displays a menu to the user (such as a set of actions
++ * or functions) triggered by a button.
++ */
++export const DropdownMenu = ( {
++	// Root props
++	defaultOpen,
++	open,
++	onOpenChange,
++	modal = true,
++	// Content positioning props
++	side = 'bottom',
++	sideOffset = 0,
++	align = 'center',
++	alignOffset = 0,
++	// Render props
++	children,
++	trigger,
++}: DropdownMenuProps ) => {
++	return (
++		<DropdownMenuPrimitive.Root
++			defaultOpen={ defaultOpen }
++			open={ open }
++			onOpenChange={ onOpenChange }
++			modal={ modal }
++			dir={ isRTL() ? 'rtl' : 'ltr' }
++		>
++			<DropdownMenuPrimitive.Trigger asChild>
++				{ trigger }
++			</DropdownMenuPrimitive.Trigger>
++			<DropdownMenuPrimitive.Portal>
++				<DropdownMenuStyled.Content
++					side={ side }
++					align={ align }
++					sideOffset={ sideOffset }
++					alignOffset={ alignOffset }
++					loop={ true }
++				>
++					{ children }
++				</DropdownMenuStyled.Content>
++			</DropdownMenuPrimitive.Portal>
++		</DropdownMenuPrimitive.Root>
++	);
++};
++
++export const DropdownSubMenuTrigger = ( {
++	prefix,
++	suffix = (
++		<DropdownMenuStyled.SubmenuRtlChevronIcon
++			icon={ chevronRightSmall }
++			size={ 24 }
++		/>
++	),
++	children,
++}: DropdownSubMenuTriggerProps ) => {
++	return (
++		<>
++			{ prefix && (
++				<DropdownMenuStyled.ItemPrefixWrapper>
++					{ prefix }
++				</DropdownMenuStyled.ItemPrefixWrapper>
++			) }
++			{ children }
++			{ suffix && (
++				<DropdownMenuStyled.ItemSuffixWrapper>
++					{ suffix }
++				</DropdownMenuStyled.ItemSuffixWrapper>
++			) }
++		</>
++	);
++};
++
++export const DropdownSubMenu = ( {
++	// Sub props
++	defaultOpen,
++	open,
++	onOpenChange,
++	// Sub trigger props
++	disabled,
++	textValue,
++	// Render props
++	children,
++	trigger,
++}: DropdownSubMenuProps ) => {
++	return (
++		<DropdownMenuPrimitive.Sub
++			defaultOpen={ defaultOpen }
++			open={ open }
++			onOpenChange={ onOpenChange }
++		>
++			<DropdownMenuStyled.SubTrigger
++				disabled={ disabled }
++				textValue={ textValue }
++			>
++				{ trigger }
++			</DropdownMenuStyled.SubTrigger>
++			<DropdownMenuPrimitive.Portal>
++				<DropdownMenuStyled.SubContent
++					loop
++					sideOffset={ SUB_MENU_OFFSET_SIDE }
++					alignOffset={ SUB_MENU_OFFSET_ALIGN }
++				>
++					{ children }
++				</DropdownMenuStyled.SubContent>
++			</DropdownMenuPrimitive.Portal>
++		</DropdownMenuPrimitive.Sub>
++	);
++};
++
++export const DropdownMenuLabel = ( props: DropdownMenuLabelProps ) => (
++	<DropdownMenuStyled.Label { ...props } />
++);
++
++export const DropdownMenuGroup = ( props: DropdownMenuGroupProps ) => (
++	<DropdownMenuPrimitive.Group { ...props } />
++);
++
++export const DropdownMenuItem = forwardRef(
++	(
++		{ children, prefix, suffix, ...props }: DropdownMenuItemProps,
++		forwardedRef: React.ForwardedRef< any >
++	) => {
++		return (
++			<DropdownMenuStyled.Item { ...props } ref={ forwardedRef }>
++				{ prefix && (
++					<DropdownMenuStyled.ItemPrefixWrapper>
++						{ prefix }
++					</DropdownMenuStyled.ItemPrefixWrapper>
++				) }
++				{ children }
++				{ suffix && (
++					<DropdownMenuStyled.ItemSuffixWrapper>
++						{ suffix }
++					</DropdownMenuStyled.ItemSuffixWrapper>
++				) }
++			</DropdownMenuStyled.Item>
++		);
++	}
++);
++
++export const DropdownMenuCheckboxItem = ( {
++	children,
++	checked = false,
++	suffix,
++	...props
++}: DropdownMenuCheckboxItemProps ) => {
++	return (
++		<DropdownMenuStyled.CheckboxItem { ...props } checked={ checked }>
++			<DropdownMenuStyled.ItemPrefixWrapper>
++				<DropdownMenuStyled.ItemIndicator>
++					{ ( checked === 'indeterminate' || checked === true ) && (
++						<Icon
++							icon={
++								checked === 'indeterminate' ? lineSolid : check
++							}
++							size={ 24 }
++						/>
++					) }
++				</DropdownMenuStyled.ItemIndicator>
++			</DropdownMenuStyled.ItemPrefixWrapper>
++			{ children }
++			{ suffix && (
++				<DropdownMenuStyled.ItemSuffixWrapper>
++					{ suffix }
++				</DropdownMenuStyled.ItemSuffixWrapper>
++			) }
++		</DropdownMenuStyled.CheckboxItem>
++	);
++};
++
++export const DropdownMenuRadioGroup = (
++	props: DropdownMenuRadioGroupProps
++) => <DropdownMenuPrimitive.RadioGroup { ...props } />;
++
++const radioDot = (
++	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
++		<Circle cx={ 12 } cy={ 12 } r={ 3 } fill="currentColor"></Circle>
++	</SVG>
++);
++
++export const DropdownMenuRadioItem = ( {
++	children,
++	suffix,
++	...props
++}: DropdownMenuRadioItemProps ) => {
++	return (
++		<DropdownMenuStyled.RadioItem { ...props }>
++			<DropdownMenuStyled.ItemPrefixWrapper>
++				<DropdownMenuStyled.ItemIndicator>
++					<Icon icon={ radioDot } size={ 22 } />
++				</DropdownMenuStyled.ItemIndicator>
++			</DropdownMenuStyled.ItemPrefixWrapper>
++			{ children }
++			{ suffix && (
++				<DropdownMenuStyled.ItemSuffixWrapper>
++					{ suffix }
++				</DropdownMenuStyled.ItemSuffixWrapper>
++			) }
++		</DropdownMenuStyled.RadioItem>
++	);
++};
++
++export const DropdownMenuSeparator = ( props: DropdownMenuSeparatorProps ) => (
++	<DropdownMenuStyled.Separator { ...props } />
++);
+diff --git a/packages/components/src/dropdown-menu-v2/stories/index.tsx b/packages/components/src/dropdown-menu-v2/stories/index.tsx
+new file mode 100644
+index 00000000000000..1171273028f9e1
+--- /dev/null
++++ b/packages/components/src/dropdown-menu-v2/stories/index.tsx
+@@ -0,0 +1,193 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import {
++	DropdownMenu,
++	DropdownMenuItem,
++	DropdownSubMenu,
++	DropdownMenuSeparator,
++	DropdownMenuCheckboxItem,
++	DropdownMenuGroup,
++	DropdownMenuLabel,
++	DropdownMenuRadioGroup,
++	DropdownMenuRadioItem,
++	DropdownSubMenuTrigger,
++} from '..';
++import Button from '../../button';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++import { menu, wordpress } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import Icon from '../../icon';
++
++const meta: ComponentMeta< typeof DropdownMenu > = {
++	title: 'Components (Experimental)/DropdownMenu v2',
++	component: DropdownMenu,
++	subcomponents: {
++		DropdownMenuItem,
++		DropdownSubMenu,
++		DropdownSubMenuTrigger,
++		DropdownMenuSeparator,
++		DropdownMenuCheckboxItem,
++		DropdownMenuGroup,
++		DropdownMenuLabel,
++		DropdownMenuRadioGroup,
++		DropdownMenuRadioItem,
++	},
++	argTypes: {
++		children: { control: { type: null } },
++		trigger: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: { source: { state: 'open', excludeDecorators: true } },
++	},
++	decorators: [
++		// Layout wrapper
++		( Story ) => (
++			<div
++				style={ {
++					minHeight: '300px',
++				} }
++			>
++				<Story />
++			</div>
++		),
++	],
++};
++export default meta;
++
++const ItemHelpText = styled.span`
++	font-size: 10px;
++	color: #777;
++
++	/* "> * > &" syntax is to target only immediate parent menu item */
++	[data-highlighted] > * > &,
++	[data-state='open'] > * > &,
++	[data-disabled] > * & {
++		color: inherit;
++	}
++`;
++
++const CheckboxItemsGroup = () => {
++	const [ itemOneChecked, setItemOneChecked ] = useState( true );
++	const [ itemTwoChecked, setItemTwoChecked ] = useState( false );
++
++	return (
++		<DropdownMenuGroup>
++			<DropdownMenuLabel>Checkbox group label</DropdownMenuLabel>
++			<DropdownMenuCheckboxItem
++				checked={ itemOneChecked }
++				onCheckedChange={ setItemOneChecked }
++				suffix={ <span>⌘+B</span> }
++			>
++				Checkbox item one
++			</DropdownMenuCheckboxItem>
++
++			<DropdownMenuCheckboxItem
++				checked={ itemTwoChecked }
++				onCheckedChange={ setItemTwoChecked }
++			>
++				Checkbox item two
++			</DropdownMenuCheckboxItem>
++		</DropdownMenuGroup>
++	);
++};
++
++const RadioItemsGroup = () => {
++	const [ radioValue, setRadioValue ] = useState( 'radio-one' );
++
++	return (
++		<DropdownMenuRadioGroup
++			value={ radioValue }
++			onValueChange={ setRadioValue }
++		>
++			<DropdownMenuLabel>Radio group label</DropdownMenuLabel>
++			<DropdownMenuRadioItem value="radio-one">
++				Radio item one
++			</DropdownMenuRadioItem>
++			<DropdownMenuRadioItem value="radio-two">
++				Radio item two
++			</DropdownMenuRadioItem>
++		</DropdownMenuRadioGroup>
++	);
++};
++
++const Template: ComponentStory< typeof DropdownMenu > = ( props ) => (
++	<DropdownMenu { ...props } />
++);
++export const Default = Template.bind( {} );
++Default.args = {
++	trigger: <Button __next40pxDefaultSize label="Open menu" icon={ menu } />,
++	sideOffset: 12,
++	children: (
++		<>
++			<DropdownMenuGroup>
++				<DropdownMenuItem>Menu item</DropdownMenuItem>
++				<DropdownMenuItem
++					prefix={ <Icon icon={ wordpress } size={ 18 } /> }
++				>
++					Menu item with prefix
++				</DropdownMenuItem>
++				<DropdownMenuItem suffix={ <span>⌥⌘T</span> }>
++					Menu item with suffix
++				</DropdownMenuItem>
++				<DropdownMenuItem disabled>Disabled menu item</DropdownMenuItem>
++				<DropdownSubMenu
++					trigger={
++						<DropdownSubMenuTrigger>Submenu</DropdownSubMenuTrigger>
++					}
++				>
++					<DropdownMenuItem suffix={ <span>⌘+S</span> }>
++						Submenu item with suffix
++					</DropdownMenuItem>
++					<DropdownMenuItem>
++						<div
++							style={ {
++								display: 'inline-flex',
++								flexDirection: 'column',
++							} }
++						>
++							Submenu item
++							<ItemHelpText>
++								With additional custom text
++							</ItemHelpText>
++						</div>
++					</DropdownMenuItem>
++					<DropdownMenuSeparator />
++					<DropdownSubMenu
++						trigger={
++							<DropdownSubMenuTrigger>
++								Second level submenu
++							</DropdownSubMenuTrigger>
++						}
++					>
++						<DropdownMenuItem>Submenu item</DropdownMenuItem>
++						<DropdownMenuItem>Submenu item</DropdownMenuItem>
++					</DropdownSubMenu>
++				</DropdownSubMenu>
++			</DropdownMenuGroup>
++
++			<DropdownMenuSeparator />
++
++			<CheckboxItemsGroup />
++
++			<DropdownMenuSeparator />
++
++			<RadioItemsGroup />
++		</>
++	),
++};
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/dropdown-menu-v2/styles.ts
+new file mode 100644
+index 00000000000000..c8843d052ec724
+--- /dev/null
++++ b/packages/components/src/dropdown-menu-v2/styles.ts
+@@ -0,0 +1,263 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css, keyframes } from '@emotion/react';
++import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS, font, rtl } from '../utils';
++import { space } from '../ui/utils/space';
++import Icon from '../icon';
++
++const ANIMATION_PARAMS = {
++	SLIDE_AMOUNT: '2px',
++	DURATION: '400ms',
++	EASING: 'cubic-bezier( 0.16, 1, 0.3, 1 )',
++};
++
++const ITEM_PREFIX_WIDTH = space( 7 );
++const ITEM_PADDING_INLINE_START = space( 2 );
++const ITEM_PADDING_INLINE_END = space( 2.5 );
++
++const slideUpAndFade = keyframes( {
++	'0%': {
++		opacity: 0,
++		transform: `translateY(${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
++	},
++	'100%': { opacity: 1, transform: 'translateY(0)' },
++} );
++
++const slideRightAndFade = keyframes( {
++	'0%': {
++		opacity: 0,
++		transform: `translateX(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
++	},
++	'100%': { opacity: 1, transform: 'translateX(0)' },
++} );
++
++const slideDownAndFade = keyframes( {
++	'0%': {
++		opacity: 0,
++		transform: `translateY(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
++	},
++	'100%': { opacity: 1, transform: 'translateY(0)' },
++} );
++
++const slideLeftAndFade = keyframes( {
++	'0%': {
++		opacity: 0,
++		transform: `translateX(${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
++	},
++	'100%': { opacity: 1, transform: 'translateX(0)' },
++} );
++
++const baseContent = css`
++	min-width: 220px;
++	background-color: ${ COLORS.ui.background };
++	border-radius: 6px;
++	padding: ${ space( 2 ) };
++	box-shadow: 0.1px 4px 16.4px -0.5px rgba( 0, 0, 0, 0.1 ),
++		0px 5.5px 7.8px -0.3px rgba( 0, 0, 0, 0.1 ),
++		0px 2.7px 3.8px -0.2px rgba( 0, 0, 0, 0.1 ),
++		0px 0.7px 1px rgba( 0, 0, 0, 0.1 );
++	animation-duration: ${ ANIMATION_PARAMS.DURATION };
++	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
++	will-change: transform, opacity;
++
++	&[data-side='top'] {
++		animation-name: ${ slideDownAndFade };
++	}
++
++	&[data-side='right'] {
++		animation-name: ${ slideLeftAndFade };
++	}
++
++	&[data-side='bottom'] {
++		animation-name: ${ slideUpAndFade };
++	}
++
++	&[data-side='left'] {
++		animation-name: ${ slideRightAndFade };
++	}
++
++	@media ( prefers-reduced-motion ) {
++		animation-duration: 0s;
++	}
++`;
++
++const itemPrefix = css`
++	width: ${ ITEM_PREFIX_WIDTH };
++	display: inline-flex;
++	align-items: center;
++	justify-content: center;
++	/* Prefixes don't get affected by the item's inline start padding */
++	margin-inline-start: calc( -1 * ${ ITEM_PADDING_INLINE_START } );
++	/*
++		Negative margin allows the suffix to be as tall as the whole item
++		(incl. padding) before increasing the items' height. This can be useful,
++		e.g., when using icons that are bigger than 20x20 px
++	*/
++	margin-top: ${ space( -2 ) };
++	margin-bottom: ${ space( -2 ) };
++`;
++
++const itemSuffix = css`
++	width: max-content;
++	display: inline-flex;
++	align-items: center;
++	justify-content: center;
++	/* Push prefix to the inline-end of the item */
++	margin-inline-start: auto;
++	/* Minimum space between the item's content and suffix */
++	padding-inline-start: ${ space( 6 ) };
++	/*
++		Negative margin allows the suffix to be as tall as the whole item
++		(incl. padding) before increasing the items' height. This can be useful,
++		e.g., when using icons that are bigger than 20x20 px
++	*/
++	margin-top: ${ space( -2 ) };
++	margin-bottom: ${ space( -2 ) };
++
++	/*
++		Override color in normal conditions, but inherit the item's color
++	  for altered conditions.
++
++		TODO:
++		  - For now, used opacity like for disabled item, which makes it work
++			  regardless of the theme
++		  - how do we translate this for themes? Should we have a new variable
++		for "secondary" text?
++	*/
++	opacity: 0.6;
++
++	[data-highlighted] > &,
++	[data-state='open'] > &,
++	[data-disabled] > & {
++		opacity: 1;
++	}
++`;
++
++export const ItemPrefixWrapper = styled.span`
++	${ itemPrefix }
++`;
++
++export const ItemSuffixWrapper = styled.span`
++	${ itemSuffix }
++`;
++
++const baseItem = css`
++	all: unset;
++	font-size: ${ font( 'default.fontSize' ) };
++	font-family: inherit;
++	font-weight: normal;
++	line-height: 20px;
++	color: ${ COLORS.gray[ 900 ] };
++	border-radius: 3px;
++	display: flex;
++	align-items: center;
++	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
++		${ ITEM_PADDING_INLINE_START };
++	position: relative;
++	user-select: none;
++	outline: none;
++
++	&[data-disabled] {
++		/*
++			TODO:
++			  - we need a disabled color in the Theme variables
++			  - design specs use opacity instead of setting a new text color
++		*/
++		opacity: 0.5;
++		pointer-events: none;
++	}
++
++	&[data-highlighted] {
++		/*
++			TODO: reconcile with global focus styles
++			(incl high contrast mode fallbacks)
++		 */
++
++		background-color: ${ COLORS.ui.theme };
++		color: white;
++	}
++
++	svg {
++		fill: currentColor;
++	}
++
++	&:not( :has( ${ ItemPrefixWrapper } ) ) {
++		padding-inline-start: ${ ITEM_PREFIX_WIDTH };
++	}
++`;
++
++export const Content = styled( DropdownMenu.Content )`
++	${ baseContent }
++`;
++export const SubContent = styled( DropdownMenu.SubContent )`
++	${ baseContent }
++`;
++
++export const Item = styled( DropdownMenu.Item )`
++	${ baseItem }
++`;
++export const CheckboxItem = styled( DropdownMenu.CheckboxItem )`
++	${ baseItem }
++`;
++export const RadioItem = styled( DropdownMenu.RadioItem )`
++	${ baseItem }
++`;
++export const SubTrigger = styled( DropdownMenu.SubTrigger )`
++	&[data-state='open']:not( [data-highlighted] ) {
++		/* TODO: use variable */
++		background-color: rgba( 56, 88, 233, 0.04 );
++		color: ${ COLORS.ui.theme };
++	}
++
++	${ baseItem }
++`;
++
++export const Label = styled( DropdownMenu.Label )`
++	box-sizing: border-box;
++	display: flex;
++	align-items: center;
++	min-height: ${ space( 8 ) };
++
++	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
++		${ ITEM_PREFIX_WIDTH };
++	/* TODO: color doesn't match available UI variables */
++	color: ${ COLORS.gray[ 700 ] };
++
++	/* TODO: font size doesn't match available ones via "font" utils */
++	font-size: 11px;
++	line-height: 1.4;
++	font-weight: 500;
++	text-transform: uppercase;
++`;
++
++export const Separator = styled( DropdownMenu.Separator )`
++	height: 1px;
++	/* TODO: doesn't match border color from variables */
++	background-color: ${ COLORS.ui.borderDisabled };
++	/* Negative horizontal margin to make separator go from side to side */
++	margin: ${ space( 2 ) } 0;
++`;
++
++export const ItemIndicator = styled( DropdownMenu.ItemIndicator )`
++	display: inline-flex;
++	align-items: center;
++	justify-content: center;
++`;
++
++export const SubmenuRtlChevronIcon = styled( Icon )`
++	${ rtl(
++		{
++			transform: `scaleX(1) translateX(${ space( 2 ) })`,
++		},
++		{
++			transform: `scaleX(-1) translateX(${ space( 2 ) })`,
++		}
++	)() }
++`;
+diff --git a/packages/components/src/dropdown-menu-v2/test/index.tsx b/packages/components/src/dropdown-menu-v2/test/index.tsx
+new file mode 100644
+index 00000000000000..3138c74557ae1a
+--- /dev/null
++++ b/packages/components/src/dropdown-menu-v2/test/index.tsx
+@@ -0,0 +1,816 @@
++/**
++ * External dependencies
++ */
++import { render, screen, waitFor } from '@testing-library/react';
++import {
++	default as userEvent,
++	PointerEventsCheckLevel,
++} from '@testing-library/user-event';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import {
++	DropdownMenu,
++	DropdownMenuCheckboxItem,
++	DropdownMenuItem,
++	DropdownMenuLabel,
++	DropdownMenuRadioGroup,
++	DropdownMenuRadioItem,
++	DropdownMenuSeparator,
++	DropdownSubMenu,
++	DropdownSubMenuTrigger,
++} from '..';
++
++const delay = ( delayInMs: number ) => {
++	return new Promise( ( resolve ) => setTimeout( resolve, delayInMs ) );
++};
++
++describe( 'DropdownMenu', () => {
++	// See https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/
++	it( 'should follow the WAI-ARIA spec', async () => {
++		// Radio and Checkbox items'
++		const user = userEvent.setup();
++
++		render(
++			<DropdownMenu trigger={ <button>Open dropdown</button> }>
++				<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
++				<DropdownMenuSeparator />
++				<DropdownSubMenu
++					trigger={
++						<DropdownSubMenuTrigger>
++							Dropdown submenu
++						</DropdownSubMenuTrigger>
++					}
++				>
++					<DropdownMenuItem>Dropdown submenu item 1</DropdownMenuItem>
++					<DropdownMenuItem>Dropdown submenu item 2</DropdownMenuItem>
++				</DropdownSubMenu>
++			</DropdownMenu>
++		);
++
++		const toggleButton = screen.getByRole( 'button', {
++			name: 'Open dropdown',
++		} );
++
++		expect( toggleButton ).toHaveAttribute( 'aria-haspopup', 'menu' );
++		expect( toggleButton ).toHaveAttribute( 'aria-expanded', 'false' );
++
++		await user.click( toggleButton );
++
++		expect( toggleButton ).toHaveAttribute( 'aria-expanded', 'true' );
++
++		expect( screen.getByRole( 'menu' ) ).toHaveFocus();
++		expect( screen.getByRole( 'separator' ) ).toHaveAttribute(
++			'aria-orientation',
++			'horizontal'
++		);
++		expect( screen.getAllByRole( 'menuitem' ) ).toHaveLength( 2 );
++
++		const submenuTrigger = screen.getByRole( 'menuitem', {
++			name: 'Dropdown submenu',
++		} );
++		expect( submenuTrigger ).toHaveAttribute( 'aria-haspopup', 'menu' );
++		expect( submenuTrigger ).toHaveAttribute( 'aria-expanded', 'false' );
++
++		await user.hover( submenuTrigger );
++
++		// Wait for the open animation after hovering
++		await waitFor( () =>
++			expect( screen.getAllByRole( 'menu' ) ).toHaveLength( 2 )
++		);
++
++		expect( submenuTrigger ).toHaveAttribute( 'aria-expanded', 'true' );
++		expect( submenuTrigger ).toHaveAttribute(
++			'aria-controls',
++			screen.getAllByRole( 'menu' )[ 1 ].id
++		);
++	} );
++
++	describe( 'pointer and keyboard interactions', () => {
++		it( 'should open when clicking the trigger', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			const toggleButton = screen.getByRole( 'button', {
++				name: 'Open dropdown',
++			} );
++
++			// DropdownMenu closed, the content is not displayed
++			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
++			expect( screen.queryByRole( 'menuitem' ) ).not.toBeInTheDocument();
++
++			// Click to open the menu
++			await user.click( toggleButton );
++
++			// DropdownMenu open, the content is displayed
++			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
++			expect( screen.getByRole( 'menuitem' ) ).toBeInTheDocument();
++		} );
++
++		it( 'should open when pressing the arrow down key on the trigger', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			const toggleButton = screen.getByRole( 'button', {
++				name: 'Open dropdown',
++			} );
++
++			// Move focus on the toggle
++			await user.keyboard( '{Tab}' );
++
++			expect( toggleButton ).toHaveFocus();
++
++			// DropdownMenu closed, the content is not displayed
++			expect( screen.queryByRole( 'menuitem' ) ).not.toBeInTheDocument();
++
++			await user.keyboard( '{ArrowDown}' );
++
++			// DropdownMenu open, the content is displayed
++			expect( screen.getByRole( 'menuitem' ) ).toBeInTheDocument();
++		} );
++
++		it( 'should close when pressing the escape key', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<DropdownMenu
++					defaultOpen
++					trigger={ <button>Open dropdown</button> }
++				>
++					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			// The menu is focused automatically when `defaultOpen` is set.
++			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
++
++			// Pressing esc will close the menu and move focus to the toggle
++			await user.keyboard( '{Escape}' );
++
++			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
++			expect(
++				screen.getByRole( 'button', { name: 'Open dropdown' } )
++			).toHaveFocus();
++		} );
++
++		it( 'should close when clicking outside of the content', async () => {
++			const user = userEvent.setup( {
++				// Disabling this check otherwise testing-library would complain
++				// when clicking on document.body to close the dropdown menu.
++				pointerEventsCheck: PointerEventsCheckLevel.Never,
++			} );
++
++			render(
++				<DropdownMenu
++					defaultOpen
++					trigger={ <button>Open dropdown</button> }
++				>
++					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
++
++			// Click on the body (ie. outside of the dropdown menu)
++			await user.click( document.body );
++
++			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
++		} );
++
++		it( 'should close when clicking on a menu item', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<DropdownMenu
++					defaultOpen
++					trigger={ <button>Open dropdown</button> }
++				>
++					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
++
++			// Clicking a menu item will close the menu
++			await user.click( screen.getByRole( 'menuitem' ) );
++
++			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
++		} );
++
++		it( 'should not close when clicking on a disabled menu item', async () => {
++			const user = userEvent.setup( {
++				// Disabling this check otherwise testing-library would complain
++				// when clicking on a disabled element with pointer-events: none
++				pointerEventsCheck: PointerEventsCheckLevel.Never,
++			} );
++
++			render(
++				<DropdownMenu
++					defaultOpen
++					trigger={ <button>Open dropdown</button> }
++				>
++					<DropdownMenuItem disabled>
++						Dropdown menu item
++					</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
++
++			// Clicking a disabled menu item won't close the menu
++			await user.click( screen.getByRole( 'menuitem' ) );
++
++			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
++		} );
++
++		it( 'should reveal submenu content when hovering over the submenu trigger', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<DropdownMenu
++					defaultOpen
++					trigger={ <button>Open dropdown</button> }
++				>
++					<DropdownMenuItem>Dropdown menu item 1</DropdownMenuItem>
++					<DropdownMenuItem>Dropdown menu item 2</DropdownMenuItem>
++					<DropdownSubMenu
++						trigger={
++							<DropdownSubMenuTrigger>
++								Dropdown submenu
++							</DropdownSubMenuTrigger>
++						}
++					>
++						<DropdownMenuItem>
++							Dropdown submenu item 1
++						</DropdownMenuItem>
++						<DropdownMenuItem>
++							Dropdown submenu item 2
++						</DropdownMenuItem>
++					</DropdownSubMenu>
++					<DropdownMenuItem>Dropdown menu item 3</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			// Before hover, submenu items are not rendered
++			expect(
++				screen.queryByRole( 'menuitem', {
++					name: 'Dropdown submenu item 1',
++				} )
++			).not.toBeInTheDocument();
++
++			await user.hover(
++				screen.getByRole( 'menuitem', { name: 'Dropdown submenu' } )
++			);
++
++			// After hover, submenu items are rendered
++			// Reason for `findByRole`: due to the animation, we've got to wait
++			// a short amount of time for the submenu to appear
++			await screen.findByRole( 'menuitem', {
++				name: 'Dropdown submenu item 1',
++			} );
++		} );
++
++		it( 'should navigate menu items and subitems using the arrow, spacebar and enter keys', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<DropdownMenu
++					defaultOpen
++					trigger={ <button>Open dropdown</button> }
++				>
++					<DropdownMenuItem>Dropdown menu item 1</DropdownMenuItem>
++					<DropdownMenuItem>Dropdown menu item 2</DropdownMenuItem>
++					<DropdownSubMenu
++						trigger={
++							<DropdownSubMenuTrigger>
++								Dropdown submenu
++							</DropdownSubMenuTrigger>
++						}
++					>
++						<DropdownMenuItem>
++							Dropdown submenu item 1
++						</DropdownMenuItem>
++						<DropdownMenuItem>
++							Dropdown submenu item 2
++						</DropdownMenuItem>
++					</DropdownSubMenu>
++					<DropdownMenuItem>Dropdown menu item 3</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			// The menu is focused automatically when `defaultOpen` is set.
++			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
++
++			// Arrow up/down selects menu items
++			// The selection wraps around from last to first and viceversa
++			await user.keyboard( '{ArrowDown}' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 1' } )
++			).toHaveFocus();
++
++			await user.keyboard( '{ArrowDown}' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 2' } )
++			).toHaveFocus();
++
++			await user.keyboard( '{ArrowDown}' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Dropdown submenu' } )
++			).toHaveFocus();
++
++			await user.keyboard( '{ArrowDown}' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 3' } )
++			).toHaveFocus();
++
++			await user.keyboard( '{ArrowDown}' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 1' } )
++			).toHaveFocus();
++
++			await user.keyboard( '{ArrowUp}' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 3' } )
++			).toHaveFocus();
++
++			await user.keyboard( '{ArrowUp}' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Dropdown submenu' } )
++			).toHaveFocus();
++
++			// Arrow right/left can be used to enter/leave submenus
++			await user.keyboard( '{ArrowRight}' );
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown submenu item 1',
++				} )
++			).toHaveFocus();
++
++			await user.keyboard( '{ArrowDown}' );
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown submenu item 2',
++				} )
++			).toHaveFocus();
++
++			await user.keyboard( '{ArrowLeft}' );
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown submenu',
++				} )
++			).toHaveFocus();
++
++			// Spacebar or enter key can also be used to enter a submenu
++			await user.keyboard( '{Enter}' );
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown submenu item 1',
++				} )
++			).toHaveFocus();
++
++			await user.keyboard( '{ArrowLeft}' );
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown submenu',
++				} )
++			).toHaveFocus();
++
++			await user.keyboard( '{Spacebar}' );
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown submenu item 1',
++				} )
++			).toHaveFocus();
++
++			await user.keyboard( '{ArrowLeft}' );
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown submenu',
++				} )
++			).toHaveFocus();
++		} );
++
++		it( 'should check menu radio items', async () => {
++			const user = userEvent.setup();
++
++			const onRadioValueChangeSpy = jest.fn();
++
++			const ControlledRadioGroup = () => {
++				const [ radioValue, setRadioValue ] = useState< string >();
++				return (
++					<DropdownMenu trigger={ <button>Open dropdown</button> }>
++						<DropdownMenuRadioGroup
++							value={ radioValue }
++							onValueChange={ ( value ) => {
++								onRadioValueChangeSpy( value );
++								setRadioValue( value );
++							} }
++						>
++							<DropdownMenuLabel>
++								Radio group label
++							</DropdownMenuLabel>
++							<DropdownMenuRadioItem value="radio-one">
++								Radio item one
++							</DropdownMenuRadioItem>
++							<DropdownMenuRadioItem value="radio-two">
++								Radio item two
++							</DropdownMenuRadioItem>
++						</DropdownMenuRadioGroup>
++					</DropdownMenu>
++				);
++			};
++
++			render( <ControlledRadioGroup /> );
++
++			// Open dropdown
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open dropdown' } )
++			);
++
++			// No radios should be checked at this point
++			expect( screen.getAllByRole( 'menuitemradio' ) ).toHaveLength( 2 );
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
++			).not.toBeChecked();
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
++			).not.toBeChecked();
++
++			// Click first radio item, make sure that the callback fires
++			await user.click(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
++			);
++			expect( onRadioValueChangeSpy ).toHaveBeenCalledTimes( 1 );
++			expect( onRadioValueChangeSpy ).toHaveBeenLastCalledWith(
++				'radio-one'
++			);
++
++			// Open dropdown
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open dropdown' } )
++			);
++
++			// Make sure that first radio is checked
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
++			).toBeChecked();
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
++			).not.toBeChecked();
++
++			// Click second radio item, make sure that the callback fires
++			await user.click(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
++			);
++			expect( onRadioValueChangeSpy ).toHaveBeenCalledTimes( 2 );
++			expect( onRadioValueChangeSpy ).toHaveBeenLastCalledWith(
++				'radio-two'
++			);
++
++			// Open dropdown
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open dropdown' } )
++			);
++
++			// Make sure that second radio is selected
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
++			).not.toBeChecked();
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
++			).toBeChecked();
++		} );
++
++		it( 'should check menu checkbox items', async () => {
++			const user = userEvent.setup();
++
++			const onCheckboxValueChangeSpy = jest.fn();
++
++			const ControlledRadioGroup = () => {
++				const [ itemOneChecked, setItemOneChecked ] =
++					useState< boolean >();
++				const [ itemTwoChecked, setItemTwoChecked ] =
++					useState< boolean >();
++				return (
++					<DropdownMenu trigger={ <button>Open dropdown</button> }>
++						<DropdownMenuLabel>
++							Checkbox group label
++						</DropdownMenuLabel>
++						<DropdownMenuCheckboxItem
++							checked={ itemOneChecked }
++							onCheckedChange={ ( checked ) => {
++								setItemOneChecked( checked );
++								onCheckboxValueChangeSpy( 'item-one', checked );
++							} }
++						>
++							Checkbox item one
++						</DropdownMenuCheckboxItem>
++
++						<DropdownMenuCheckboxItem
++							checked={ itemTwoChecked }
++							onCheckedChange={ ( checked ) => {
++								setItemTwoChecked( checked );
++								onCheckboxValueChangeSpy( 'item-two', checked );
++							} }
++						>
++							Checkbox item two
++						</DropdownMenuCheckboxItem>
++					</DropdownMenu>
++				);
++			};
++
++			render( <ControlledRadioGroup /> );
++
++			// Open dropdown
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open dropdown' } )
++			);
++
++			// No checkboxes should be checked at this point
++			expect( screen.getAllByRole( 'menuitemcheckbox' ) ).toHaveLength(
++				2
++			);
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item one',
++				} )
++			).not.toBeChecked();
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			).not.toBeChecked();
++
++			// Click first checkbox item, make sure that the callback fires
++			await user.click(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item one',
++				} )
++			);
++			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 1 );
++			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
++				'item-one',
++				true
++			);
++
++			// Open dropdown
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open dropdown' } )
++			);
++
++			// Make sure that first checkbox is checked
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item one',
++				} )
++			).toBeChecked();
++
++			// Click second checkbox item, make sure that the callback fires
++			await user.click(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			);
++			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 2 );
++			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
++				'item-two',
++				true
++			);
++
++			// Open dropdown
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open dropdown' } )
++			);
++
++			// Make sure that second checkbox is selected
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			).toBeChecked();
++
++			// Click second checkbox item, make sure that the callback fires
++			await user.click(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			);
++			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 3 );
++			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
++				'item-two',
++				false
++			);
++
++			// Open dropdown
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open dropdown' } )
++			);
++
++			// Make sure that second checkbox is unselected
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			).not.toBeChecked();
++		} );
++	} );
++
++	describe( 'items prefix and suffix', () => {
++		it( 'should display a prefix on regular items', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuItem prefix={ <>Item prefix</> }>
++						Dropdown menu item
++					</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			// Click to open the menu
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Open dropdown',
++				} )
++			);
++
++			// The contents of the prefix are rendered before the item's children
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Item prefix Dropdown menu item',
++				} )
++			).toBeInTheDocument();
++		} );
++
++		it( 'should display a suffix on regular items', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuItem suffix={ <>Item suffix</> }>
++						Dropdown menu item
++					</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			// Click to open the menu
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Open dropdown',
++				} )
++			);
++
++			// The contents of the suffix are rendered after the item's children
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown menu item Item suffix',
++				} )
++			).toBeInTheDocument();
++		} );
++
++		it( 'should display a suffix on radio items', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuRadioGroup>
++						<DropdownMenuRadioItem
++							value="radio-one"
++							suffix="Radio suffix"
++						>
++							Radio item one
++						</DropdownMenuRadioItem>
++					</DropdownMenuRadioGroup>
++				</DropdownMenu>
++			);
++
++			// Click to open the menu
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Open dropdown',
++				} )
++			);
++
++			// The contents of the suffix are rendered after the item's children
++			expect(
++				screen.getByRole( 'menuitemradio', {
++					name: 'Radio item one Radio suffix',
++				} )
++			).toBeInTheDocument();
++		} );
++
++		it( 'should display a suffix on checkbox items', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuCheckboxItem suffix={ 'Checkbox suffix' }>
++						Checkbox item one
++					</DropdownMenuCheckboxItem>
++				</DropdownMenu>
++			);
++
++			// Click to open the menu
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Open dropdown',
++				} )
++			);
++
++			// The contents of the suffix are rendered after the item's children
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item one Checkbox suffix',
++				} )
++			).toBeInTheDocument();
++		} );
++	} );
++
++	describe( 'typeahead', () => {
++		it( 'should highlight matching item', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuItem>One</DropdownMenuItem>
++					<DropdownMenuItem>Two</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			// Click to open the menu
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Open dropdown',
++				} )
++			);
++			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
++
++			// Type "tw", it should match and focus the item with content "Two"
++			await user.keyboard( 'tw' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Two' } )
++			).toHaveFocus();
++
++			// Wait for the typeahead timer to reset and interpret
++			// the next keystrokes as a new search
++			await delay( 1000 );
++
++			// Type "on", it should match and focus the item with content "One"
++			await user.keyboard( 'on' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'One' } )
++			).toHaveFocus();
++		} );
++
++		it( 'should use the textValue prop if specificied', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuItem>One</DropdownMenuItem>
++					<DropdownMenuItem textValue="Four">Two</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			// Click to open the menu
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Open dropdown',
++				} )
++			);
++			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
++
++			// Type "tw", it should not match the item with content "Two" because it
++			// that item specifies the "textValue" prop. Therefore, the menu container
++			// retains focus.
++			await user.keyboard( 'tw' );
++			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
++
++			// Wait for the typeahead timer to reset and interpret
++			// the next keystrokes as a new search
++			await delay( 1000 );
++
++			// Type "fo", it should match and focus the item with textValue "Four"
++			await user.keyboard( 'fo' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Two' } )
++			).toHaveFocus();
++		} );
++	} );
++} );
+diff --git a/packages/components/src/dropdown-menu-v2/types.ts b/packages/components/src/dropdown-menu-v2/types.ts
+new file mode 100644
+index 00000000000000..1fb246fafd6537
+--- /dev/null
++++ b/packages/components/src/dropdown-menu-v2/types.ts
+@@ -0,0 +1,250 @@
++/**
++ * External dependencies
++ */
++import type * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
++
++export type DropdownMenuProps = {
++	/**
++	 * The open state of the dropdown menu when it is initially rendered. Use when
++	 * you do not need to control its open state.
++	 *
++	 */
++	defaultOpen?: DropdownMenuPrimitive.DropdownMenuProps[ 'defaultOpen' ];
++	/**
++	 * The controlled open state of the dropdown menu. Must be used in conjunction
++	 * with `onOpenChange`.
++	 */
++	open?: DropdownMenuPrimitive.DropdownMenuProps[ 'open' ];
++	/**
++	 * Event handler called when the open state of the dropdown menu changes.
++	 */
++	onOpenChange?: DropdownMenuPrimitive.DropdownMenuProps[ 'onOpenChange' ];
++	/**
++	 * The modality of the dropdown menu. When set to true, interaction with
++	 * outside elements will be disabled and only menu content will be visible to
++	 * screen readers.
++	 *
++	 * @default true
++	 */
++	modal?: DropdownMenuPrimitive.DropdownMenuProps[ 'modal' ];
++	/**
++	 * The preferred side of the trigger to render against when open.
++	 * Will be reversed when collisions occur and avoidCollisions is enabled.
++	 *
++	 * @default 'bottom'
++	 */
++	side?: DropdownMenuPrimitive.DropdownMenuContentProps[ 'side' ];
++	/**
++	 * The distance in pixels from the trigger.
++	 *
++	 * @default 0
++	 */
++	sideOffset?: DropdownMenuPrimitive.DropdownMenuContentProps[ 'sideOffset' ];
++	/**
++	 * The preferred alignment against the trigger.
++	 * May change when collisions occur.
++	 *
++	 * @default 'center'
++	 */
++	align?: DropdownMenuPrimitive.DropdownMenuContentProps[ 'align' ];
++	/**
++	 * An offset in pixels from the "start" or "end" alignment options.
++	 *
++	 * @default 0
++	 */
++	alignOffset?: DropdownMenuPrimitive.DropdownMenuContentProps[ 'alignOffset' ];
++	/**
++	 * The trigger button.
++	 */
++	trigger: React.ReactNode;
++	/**
++	 * The contents of the dropdown
++	 */
++	children: React.ReactNode;
++};
++
++export type DropdownSubMenuTriggerProps = {
++	/**
++	 * The contents of the item.
++	 */
++	children: React.ReactNode;
++	/**
++	 * The contents of the item's prefix.
++	 */
++	prefix?: React.ReactNode;
++	/**
++	 * The contents of the item's suffix.
++	 *
++	 * @default The standard chevron icon for a submenu trigger.
++	 */
++	suffix?: React.ReactNode;
++};
++
++export type DropdownSubMenuProps = {
++	/**
++	 * The open state of the submenu when it is initially rendered. Use when you
++	 * do not need to control its open state.
++	 */
++	defaultOpen?: DropdownMenuPrimitive.DropdownMenuSubProps[ 'defaultOpen' ];
++	/**
++	 * The controlled open state of the submenu. Must be used in conjunction with
++	 * `onOpenChange`.
++	 */
++	open?: DropdownMenuPrimitive.DropdownMenuSubProps[ 'open' ];
++	/**
++	 * Event handler called when the open state of the submenu changes.
++	 */
++	onOpenChange?: DropdownMenuPrimitive.DropdownMenuSubProps[ 'onOpenChange' ];
++	/**
++	 * When `true`, prevents the user from interacting with the item.
++	 */
++	disabled?: DropdownMenuPrimitive.DropdownMenuSubTriggerProps[ 'disabled' ];
++	/**
++	 * Optional text used for typeahead purposes for the trigger. By default the typeahead
++	 * behavior will use the `.textContent` of the trigger. Use this when the content
++	 * is complex, or you have non-textual content inside.
++	 */
++	textValue?: DropdownMenuPrimitive.DropdownMenuSubTriggerProps[ 'textValue' ];
++	/**
++	 * The contents rendered inside the trigger. The trigger should be
++	 * an instance of the `DropdownSubMenuTriggerProps` component.
++	 */
++	trigger: React.ReactNode;
++	/**
++	 * The contents of the dropdown sub menu
++	 */
++	children: React.ReactNode;
++};
++
++export type DropdownMenuItemProps = {
++	/**
++	 * When true, prevents the user from interacting with the item.
++	 *
++	 * @default false
++	 */
++	disabled?: DropdownMenuPrimitive.DropdownMenuItemProps[ 'disabled' ];
++	/**
++	 * Event handler called when the user selects an item (via mouse or keyboard).
++	 * Calling `event.preventDefault` in this handler will prevent the dropdown
++	 * menu from closing when selecting that item.
++	 */
++	onSelect?: DropdownMenuPrimitive.DropdownMenuItemProps[ 'onSelect' ];
++	/**
++	 * Optional text used for typeahead purposes. By default the typeahead
++	 * behavior will use the `.textContent` of the item. Use this when the content
++	 * is complex, or you have non-textual content inside.
++	 */
++	textValue?: DropdownMenuPrimitive.DropdownMenuItemProps[ 'textValue' ];
++	/**
++	 * The contents of the item
++	 */
++	children: React.ReactNode;
++	/**
++	 * The contents of the item's prefix
++	 */
++	prefix?: React.ReactNode;
++	/**
++	 * The contents of the item's suffix
++	 */
++	suffix?: React.ReactNode;
++};
++
++export type DropdownMenuCheckboxItemProps = {
++	/**
++	 * The controlled checked state of the item.
++	 * Must be used in conjunction with `onCheckedChange`.
++	 *
++	 * @default false
++	 */
++	checked?: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps[ 'checked' ];
++	/**
++	 * Event handler called when the checked state changes.
++	 */
++	onCheckedChange?: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps[ 'onCheckedChange' ];
++	/**
++	 * When `true`, prevents the user from interacting with the item.
++	 */
++	disabled?: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps[ 'disabled' ];
++	/**
++	 * Event handler called when the user selects an item (via mouse or keyboard).
++	 * Calling `event.preventDefault` in this handler will prevent the dropdown
++	 * 	menu from closing when selecting that item.
++	 */
++	onSelect?: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps[ 'onSelect' ];
++	/**
++	 * Optional text used for typeahead purposes. By default the typeahead
++	 * behavior will use the `.textContent` of the item. Use this when the content
++	 * is complex, or you have non-textual content inside.
++	 */
++	textValue?: DropdownMenuPrimitive.DropdownMenuCheckboxItemProps[ 'textValue' ];
++	/**
++	 * The contents of the checkbox item
++	 */
++	children: React.ReactNode;
++	/**
++	 * The contents of the checkbox item's suffix
++	 */
++	suffix?: React.ReactNode;
++};
++
++export type DropdownMenuRadioGroupProps = {
++	/**
++	 * The value of the selected item in the group.
++	 */
++	value?: DropdownMenuPrimitive.DropdownMenuRadioGroupProps[ 'value' ];
++	/**
++	 * Event handler called when the value changes.
++	 */
++	onValueChange?: DropdownMenuPrimitive.DropdownMenuRadioGroupProps[ 'onValueChange' ];
++	/**
++	 * The contents of the radio group
++	 */
++	children: React.ReactNode;
++};
++
++export type DropdownMenuRadioItemProps = {
++	/**
++	 * The unique value of the item.
++	 */
++	value: DropdownMenuPrimitive.DropdownMenuRadioItemProps[ 'value' ];
++	/**
++	 * When `true`, prevents the user from interacting with the item.
++	 */
++	disabled?: DropdownMenuPrimitive.DropdownMenuRadioItemProps[ 'disabled' ];
++	/**
++	 * Event handler called when the user selects an item (via mouse or keyboard).
++	 * Calling `event.preventDefault` in this handler will prevent the dropdown
++	 * menu from closing when selecting that item.
++	 */
++	onSelect?: DropdownMenuPrimitive.DropdownMenuRadioItemProps[ 'onSelect' ];
++	/**
++	 * Optional text used for typeahead purposes. By default the typeahead
++	 * behavior will use the `.textContent` of the item. Use this when the content
++	 * is complex, or you have non-textual content inside.
++	 */
++	textValue?: DropdownMenuPrimitive.DropdownMenuRadioItemProps[ 'textValue' ];
++	/**
++	 * The contents of the radio item
++	 */
++	children: React.ReactNode;
++	/**
++	 * The contents of the radio item's suffix
++	 */
++	suffix?: React.ReactNode;
++};
++
++export type DropdownMenuLabelProps = {
++	/**
++	 * The contents of the label
++	 */
++	children: React.ReactNode;
++};
++
++export type DropdownMenuGroupProps = {
++	/**
++	 * The contents of the group
++	 */
++	children: React.ReactNode;
++};
++
++export type DropdownMenuSeparatorProps = {};
+diff --git a/packages/components/src/dropdown-menu/stories/index.tsx b/packages/components/src/dropdown-menu/stories/index.tsx
+index 97a51371d1ab8f..8bc652269422e8 100644
+--- a/packages/components/src/dropdown-menu/stories/index.tsx
++++ b/packages/components/src/dropdown-menu/stories/index.tsx
+@@ -6,7 +6,8 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
+  * Internal dependencies
+  */
+ import DropdownMenu from '..';
+-import { MenuGroup, MenuItem } from '../..';
++import MenuItem from '../../menu-item';
++import MenuGroup from '../../menu-group';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/dropdown-menu/test/index.tsx b/packages/components/src/dropdown-menu/test/index.tsx
+index 118e991812367e..9bee9f26605085 100644
+--- a/packages/components/src/dropdown-menu/test/index.tsx
++++ b/packages/components/src/dropdown-menu/test/index.tsx
+@@ -13,7 +13,7 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import DropdownMenu from '..';
+-import { MenuItem } from '../..';
++import MenuItem from '../../menu-item';
+ 
+ describe( 'DropdownMenu', () => {
+ 	it( 'should not render when neither controls nor children are assigned', () => {
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index e114559e5088c2..3d94ac4a44ea2d 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -9,6 +9,18 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/pri
+ import { default as CustomSelectControl } from './custom-select-control';
+ import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
+ import { createPrivateSlotFill } from './slot-fill';
++import {
++	DropdownMenu as DropdownMenuV2,
++	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2,
++	DropdownMenuGroup as DropdownMenuGroupV2,
++	DropdownMenuItem as DropdownMenuItemV2,
++	DropdownMenuLabel as DropdownMenuLabelV2,
++	DropdownMenuRadioGroup as DropdownMenuRadioGroupV2,
++	DropdownMenuRadioItem as DropdownMenuRadioItemV2,
++	DropdownMenuSeparator as DropdownMenuSeparatorV2,
++	DropdownSubMenu as DropdownSubMenuV2,
++	DropdownSubMenuTrigger as DropdownSubMenuTriggerV2,
++} from './dropdown-menu-v2';
+ 
+ export const { lock, unlock } =
+ 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+@@ -21,4 +33,14 @@ lock( privateApis, {
+ 	CustomSelectControl,
+ 	__experimentalPopoverLegacyPositionToPlacement,
+ 	createPrivateSlotFill,
++	DropdownMenuV2,
++	DropdownMenuCheckboxItemV2,
++	DropdownMenuGroupV2,
++	DropdownMenuItemV2,
++	DropdownMenuLabelV2,
++	DropdownMenuRadioGroupV2,
++	DropdownMenuRadioItemV2,
++	DropdownMenuSeparatorV2,
++	DropdownSubMenuV2,
++	DropdownSubMenuTriggerV2,
+ } );

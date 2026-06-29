@@ -1,0 +1,22 @@
+diff --git a/packages/components/src/validated-form-controls/components/toggle-control.tsx b/packages/components/src/validated-form-controls/components/toggle-control.tsx
+index 332b64e1e3214b..38a3ef95ecdd95 100644
+--- a/packages/components/src/validated-form-controls/components/toggle-control.tsx
++++ b/packages/components/src/validated-form-controls/components/toggle-control.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { forwardRef, useRef, useEffect } from '@wordpress/element';
++import { forwardRef, useRef, useLayoutEffect } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+@@ -27,7 +27,7 @@ const UnforwardedValidatedToggleControl = (
+ 
+ 	// TODO: Upstream limitation - The `required` attribute is not passed down to the input,
+ 	// so we need to set it manually.
+-	useEffect( () => {
++	useLayoutEffect( () => {
+ 		if ( validityTargetRef.current ) {
+ 			validityTargetRef.current.required = required ?? false;
+ 		}

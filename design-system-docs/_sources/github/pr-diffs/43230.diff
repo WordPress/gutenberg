@@ -1,0 +1,186 @@
+diff --git a/packages/block-editor/src/components/date-format-picker/index.js b/packages/block-editor/src/components/date-format-picker/index.js
+index de95b9baafa884..7d5ae7f53e5e55 100644
+--- a/packages/block-editor/src/components/date-format-picker/index.js
++++ b/packages/block-editor/src/components/date-format-picker/index.js
+@@ -116,6 +116,7 @@ function NonDefaultControls( { format, onChange } ) {
+ 		<>
+ 			<BaseControl className="block-editor-date-format-picker__custom-format-select-control">
+ 				<CustomSelectControl
++					__nextUnconstrainedWidth
+ 					label={ __( 'Choose a format' ) }
+ 					options={ [ ...suggestedOptions, customOption ] }
+ 					value={
+diff --git a/packages/block-editor/src/components/date-format-picker/style.scss b/packages/block-editor/src/components/date-format-picker/style.scss
+index f4b149a7f1836b..48c44899358727 100644
+--- a/packages/block-editor/src/components/date-format-picker/style.scss
++++ b/packages/block-editor/src/components/date-format-picker/style.scss
+@@ -11,10 +11,6 @@
+ 	&.components-base-control {
+ 		margin-bottom: 0;
+ 	}
+-
+-	.components-custom-select-control__button {
+-		width: 100%;
+-	}
+ }
+ 
+ .block-editor-date-format-picker__custom-format-select-control__custom-option {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index af8f3c52a3fd6b..d66ab306537dc7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   `CustomSelectControl`: Deprecate constrained width style. Add a `__nextUnconstrainedWidth` prop to start opting into the unconstrained width that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43230](https://github.com/WordPress/gutenberg/pull/43230)).
++
+ ### Enhancements
+ 
+ -   `ComboboxControl`: Normalize hyphen-like characters to an ASCII hyphen ([#42942](https://github.com/WordPress/gutenberg/pull/42942)).
+diff --git a/packages/components/src/custom-select-control/README.md b/packages/components/src/custom-select-control/README.md
+index 9cf8943c332107..c54e5a5e934e00 100644
+--- a/packages/components/src/custom-select-control/README.md
++++ b/packages/components/src/custom-select-control/README.md
+@@ -50,6 +50,7 @@ function MyCustomSelectControl() {
+ 	const [ , setFontSize ] = useState();
+ 	return (
+ 		<CustomSelectControl
++			__nextUnconstrainedWidth
+ 			label="Font Size"
+ 			options={ options }
+ 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
+@@ -61,6 +62,7 @@ function MyControlledCustomSelectControl() {
+ 	const [ fontSize, setFontSize ] = useState( options[ 0 ] );
+ 	return (
+ 		<CustomSelectControl
++			__nextUnconstrainedWidth
+ 			label="Font Size"
+ 			options={ options }
+ 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
+@@ -121,6 +123,14 @@ Can be used to externally control the value of the control, like in the `MyContr
+ -   Type: `Object`
+ -   Required: No
+ 
++#### __nextUnconstrainedWidth
++
++Start opting into the unconstrained width style that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
+ ## Related components
+ 
+ -   Like this component, but implemented using a native `<select>` for when custom styling is not necessary, the `SelectControl` component.
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index 0a3fe89c0468bd..f5916849d77fe9 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -10,6 +10,7 @@ import classnames from 'classnames';
+ import { Icon, check } from '@wordpress/icons';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { useCallback, useState } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -95,6 +96,17 @@ export default function CustomSelectControl( {
+ 
+ 	const [ isFocused, setIsFocused ] = useState( false );
+ 
++	if ( ! __nextUnconstrainedWidth ) {
++		deprecated(
++			'Constrained width styles for wp.components.CustomSelectControl',
++			{
++				since: '6.1',
++				version: '6.4',
++				hint: 'Set the `__nextUnconstrainedWidth` prop to true to start opting into the new styles, which will become the default in a future version',
++			}
++		);
++	}
++
+ 	function getDescribedBy() {
+ 		if ( describedBy ) {
+ 			return describedBy;
+diff --git a/packages/components/src/custom-select-control/stories/index.js b/packages/components/src/custom-select-control/stories/index.js
+index f698306be4f8fe..585c3809237c0d 100644
+--- a/packages/components/src/custom-select-control/stories/index.js
++++ b/packages/components/src/custom-select-control/stories/index.js
+@@ -8,7 +8,6 @@ export default {
+ 	component: CustomSelectControl,
+ 	argTypes: {
+ 		__next36pxDefaultSize: { control: { type: 'boolean' } },
+-		__nextUnconstrainedWidth: { control: { type: 'boolean' } },
+ 		size: {
+ 			control: {
+ 				type: 'radio',
+@@ -20,6 +19,7 @@ export default {
+ 
+ export const Default = CustomSelectControl.bind( {} );
+ Default.args = {
++	__nextUnconstrainedWidth: true,
+ 	label: 'Label',
+ 	options: [
+ 		{
+diff --git a/packages/components/src/custom-select-control/test/index.js b/packages/components/src/custom-select-control/test/index.js
+index 42e551abf8c7d1..e5f7ef728ca0d8 100644
+--- a/packages/components/src/custom-select-control/test/index.js
++++ b/packages/components/src/custom-select-control/test/index.js
+@@ -32,7 +32,10 @@ describe( 'CustomSelectControl', () => {
+ 				role="none"
+ 				onKeyDown={ onKeyDown }
+ 			>
+-				<CustomSelectControl options={ options } />
++				<CustomSelectControl
++					options={ options }
++					__nextUnconstrainedWidth
++				/>
+ 			</div>
+ 		);
+ 		const toggleButton = screen.getByRole( 'button' );
+diff --git a/packages/components/src/font-size-picker/style.scss b/packages/components/src/font-size-picker/style.scss
+index 90d7658330d04f..85a2ee16c574fb 100644
+--- a/packages/components/src/font-size-picker/style.scss
++++ b/packages/components/src/font-size-picker/style.scss
+@@ -29,10 +29,6 @@
+ 		}
+ 	}
+ 
+-	.components-custom-select-control__button {
+-		width: 100%;
+-	}
+-
+ 	// Apply the same height as the isSmall Reset button.
+ 	.components-font-size-picker__number {
+ 		@include input-control;
+diff --git a/packages/edit-navigation/src/components/sidebar/style.scss b/packages/edit-navigation/src/components/sidebar/style.scss
+index 4cfe5e3c70bf6a..55ca7f363fa215 100644
+--- a/packages/edit-navigation/src/components/sidebar/style.scss
++++ b/packages/edit-navigation/src/components/sidebar/style.scss
+@@ -105,10 +105,7 @@
+ 	align-items: flex-end;
+ 	margin-bottom: $grid-unit-15;
+ 	margin-top: $grid-unit-15;
+-	.components-custom-select-control,
+-	.components-custom-select-control__button {
+-		width: 100%;
+-	}
++
+ 	button {
+ 		height: 100%;
+ 		margin-bottom: 8px;
+diff --git a/packages/edit-site/src/components/global-styles/typography-panel.js b/packages/edit-site/src/components/global-styles/typography-panel.js
+index 6c049d670aad6a..02453d5a8f3943 100644
+--- a/packages/edit-site/src/components/global-styles/typography-panel.js
++++ b/packages/edit-site/src/components/global-styles/typography-panel.js
+@@ -234,7 +234,6 @@ export default function TypographyPanel( { name, element } ) {
+ 					hasFontStyles={ hasFontStyles }
+ 					hasFontWeights={ hasFontWeights }
+ 					size="__unstable-large"
+-					__nextUnconstrainedWidth
+ 				/>
+ 			) }
+ 			{ hasLetterSpacingControl && (

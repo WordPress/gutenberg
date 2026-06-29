@@ -1,0 +1,151 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5f8a7d95afd863..1186ab12d967cb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fix
+ 
++-   Context System: Stop explicitly setting `undefined` to the `children` prop. This fixes a bug where `Icon` could not be correctly rendered via the `as` prop of a context-connected component ([#42686](https://github.com/WordPress/gutenberg/pull/42686)).
+ -   `Popover`, `Dropdown`: Fix width when `expandOnMobile` is enabled ([#42635](https://github.com/WordPress/gutenberg/pull/42635/)).
+ -   `CustomSelectControl`: Fix font size and hover/focus style inconsistencies with `SelectControl` ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
+ -   `AnglePickerControl`: Fix gap between elements in RTL mode ([#42534](https://github.com/WordPress/gutenberg/pull/42534)).
+diff --git a/packages/components/src/ui/context/test/context-system-provider.js b/packages/components/src/ui/context/test/context-system-provider.js
+index 777a3bdf2dba6c..e8c2b5c56286f9 100644
+--- a/packages/components/src/ui/context/test/context-system-provider.js
++++ b/packages/components/src/ui/context/test/context-system-provider.js
+@@ -1,9 +1,14 @@
+ /**
+  * External dependencies
+  */
+-import { render } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
+ import styled from '@emotion/styled';
+ 
++/**
++ * WordPress dependencies
++ */
++import { cloneElement } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+@@ -101,3 +106,98 @@ describe( 'props', () => {
+ 		expect( el.innerHTML ).not.toContain( 'WordPress.org' );
+ 	} );
+ } );
++
++describe( 'children', () => {
++	test( 'should pass through children', () => {
++		const Component = ( props, ref ) => (
++			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
++		);
++		const ConnectedComponent = contextConnect( Component, 'Component' );
++
++		render(
++			<ContextSystemProvider>
++				<ConnectedComponent>Pass through</ConnectedComponent>
++			</ContextSystemProvider>
++		);
++
++		expect( screen.getByText( 'Pass through' ) ).toBeInTheDocument();
++	} );
++
++	test( 'should not accept children via `context`', () => {
++		const Component = ( props, ref ) => (
++			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
++		);
++		const ConnectedComponent = contextConnect( Component, 'Component' );
++
++		render(
++			<ContextSystemProvider
++				context={ { Component: { children: 'Override' } } }
++			>
++				<ConnectedComponent />
++			</ContextSystemProvider>
++		);
++
++		expect( screen.queryByText( 'Override' ) ).not.toBeInTheDocument();
++	} );
++
++	// This matches the behavior for normal, non-context-connected components.
++	test( 'should not override inherent children', () => {
++		const Component = ( props, ref ) => (
++			<View { ...useContextSystem( props, 'Component' ) } ref={ ref }>
++				Inherent
++			</View>
++		);
++		const ConnectedComponent = contextConnect( Component, 'Component' );
++		const NormalComponent = ( props ) => <div { ...props }>Inherent</div>;
++
++		render(
++			<ContextSystemProvider>
++				<ConnectedComponent />
++				<ConnectedComponent>Explicit children</ConnectedComponent>
++				<NormalComponent />
++				<NormalComponent>Explicit children</NormalComponent>
++			</ContextSystemProvider>
++		);
++
++		expect( screen.getAllByText( 'Inherent' ) ).toHaveLength( 4 );
++	} );
++
++	describe( 'when connected component does a `cloneElement()`', () => {
++		// eslint-disable-next-line no-unused-vars
++		const ComponentThatClones = ( { content, ...props }, _ref ) =>
++			cloneElement(
++				content,
++				useContextSystem( props, 'ComponentThatClones' )
++			);
++		const ConnectedComponentThatClones = contextConnect(
++			ComponentThatClones,
++			'ComponentThatClones'
++		);
++
++		test( 'should not override cloned inherent children with implicit `undefined` children', () => {
++			render(
++				<ContextSystemProvider>
++					<ConnectedComponentThatClones
++						content={ <span>Inherent</span> }
++					/>
++				</ContextSystemProvider>
++			);
++			expect( screen.getByText( 'Inherent' ) ).toBeInTheDocument();
++		} );
++
++		test( 'should override cloned inherent children with explicit children', () => {
++			render(
++				<ContextSystemProvider>
++					<ConnectedComponentThatClones
++						content={ <span>Inherent</span> }
++					>
++						Explicit children
++					</ConnectedComponentThatClones>
++				</ContextSystemProvider>
++			);
++			expect(
++				screen.getByText( 'Explicit children' )
++			).toBeInTheDocument();
++		} );
++	} );
++} );
+diff --git a/packages/components/src/ui/context/use-context-system.js b/packages/components/src/ui/context/use-context-system.js
+index 134ef9046b849d..07297ddb30f7e9 100644
+--- a/packages/components/src/ui/context/use-context-system.js
++++ b/packages/components/src/ui/context/use-context-system.js
+@@ -71,8 +71,13 @@ export function useContextSystem( props, namespace ) {
+ 		finalComponentProps[ key ] = overrideProps[ key ];
+ 	}
+ 
+-	// @ts-ignore
+-	finalComponentProps.children = rendered;
++	// Setting an `undefined` explicitly can cause unintended overwrites
++	// when a `cloneElement()` is involved.
++	if ( rendered !== undefined ) {
++		// @ts-ignore
++		finalComponentProps.children = rendered;
++	}
++
+ 	finalComponentProps.className = classes;
+ 
+ 	return finalComponentProps;

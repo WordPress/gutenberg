@@ -1,0 +1,777 @@
+diff --git a/package-lock.json b/package-lock.json
+index 1fa02b13a4921d..d3500a5e00505d 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -12433,10 +12433,10 @@
+ 				"@wordpress/primitives": "file:packages/primitives",
+ 				"@wordpress/rich-text": "file:packages/rich-text",
+ 				"@wordpress/warning": "file:packages/warning",
+-				"@wp-g2/components": "^0.0.159",
+-				"@wp-g2/context": "^0.0.159",
+-				"@wp-g2/styles": "^0.0.159",
+-				"@wp-g2/utils": "^0.0.159",
++				"@wp-g2/components": "^0.0.160",
++				"@wp-g2/context": "^0.0.160",
++				"@wp-g2/styles": "^0.0.160",
++				"@wp-g2/utils": "^0.0.160",
+ 				"classnames": "^2.2.5",
+ 				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^6.0.15",
+@@ -12454,132 +12454,6 @@
+ 				"rememo": "^3.0.0",
+ 				"tinycolor2": "^1.4.2",
+ 				"uuid": "^8.3.0"
+-			},
+-			"dependencies": {
+-				"@emotion/is-prop-valid": {
+-					"version": "0.8.8",
+-					"resolved": "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz",
+-					"integrity": "sha512-u5WtneEAr5IDG2Wv65yhunPSMLIpuKsbuOktRojfrEiEvRyC85LgPMZI63cr7NUqT8ZIGdSVg8ZKGxIug4lXcA==",
+-					"requires": {
+-						"@emotion/memoize": "0.7.4"
+-					}
+-				},
+-				"@emotion/memoize": {
+-					"version": "0.7.4",
+-					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.4.tgz",
+-					"integrity": "sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw=="
+-				},
+-				"@wp-g2/components": {
+-					"version": "0.0.159",
+-					"resolved": "https://registry.npmjs.org/@wp-g2/components/-/components-0.0.159.tgz",
+-					"integrity": "sha512-FUuQpZxiq7ROfOrPcCcru3znc82r9VtVRSAACQpadRswIYr9aTaedWOCnaI0QU32rs51nh4bc2LwalZVtE7nkg==",
+-					"requires": {
+-						"@popperjs/core": "^2.5.4",
+-						"@wp-g2/context": "^0.0.159",
+-						"@wp-g2/styles": "^0.0.159",
+-						"@wp-g2/utils": "^0.0.159",
+-						"csstype": "^3.0.3",
+-						"downshift": "^6.0.15",
+-						"framer-motion": "^2.1.0",
+-						"highlight-words-core": "^1.2.2",
+-						"history": "^4.9.0",
+-						"lodash": "^4.17.19",
+-						"path-to-regexp": "^1.7.0",
+-						"react-colorful": "4.4.4",
+-						"react-textarea-autosize": "^8.2.0",
+-						"react-use-gesture": "^9.0.0",
+-						"reakit": "^1.3.4"
+-					}
+-				},
+-				"@wp-g2/context": {
+-					"version": "0.0.159",
+-					"resolved": "https://registry.npmjs.org/@wp-g2/context/-/context-0.0.159.tgz",
+-					"integrity": "sha512-FyWg2u2yjUfzoNv3W8L+JQKojYuYrauNU0SidqbGaPMrk5ftSkRHisCxiYQgfeBUSPVvEIVfIDacDfHZ6QjI8A==",
+-					"requires": {
+-						"@emotion/hash": "^0.8.0",
+-						"@wp-g2/styles": "^0.0.159",
+-						"@wp-g2/utils": "^0.0.159",
+-						"lodash": "^4.17.19"
+-					}
+-				},
+-				"@wp-g2/create-styles": {
+-					"version": "0.0.159",
+-					"resolved": "https://registry.npmjs.org/@wp-g2/create-styles/-/create-styles-0.0.159.tgz",
+-					"integrity": "sha512-cdoasY3TS2LoBHK/Erw57gcHAYex2csKULLoFcvlttMBMhsLT0tQWz6aJjJDFCW1QZAjjIuk+FXByOxyZwo2cg==",
+-					"requires": {
+-						"@emotion/core": "^10.1.1",
+-						"@emotion/hash": "^0.8.0",
+-						"@emotion/is-prop-valid": "^0.8.8",
+-						"@wp-g2/utils": "^0.0.159",
+-						"create-emotion": "^10.0.27",
+-						"emotion": "^10.0.27",
+-						"emotion-theming": "^10.0.27",
+-						"lodash": "^4.17.19",
+-						"mitt": "^2.1.0",
+-						"rtlcss": "^2.6.2",
+-						"styled-griddie": "^0.1.3"
+-					}
+-				},
+-				"@wp-g2/styles": {
+-					"version": "0.0.159",
+-					"resolved": "https://registry.npmjs.org/@wp-g2/styles/-/styles-0.0.159.tgz",
+-					"integrity": "sha512-ZjhAKuLwNa+l5fJgwGzu7UzsUGJcW9D1EdfORKbGBv7Jw4+6P5xk+qf4CNYN6u3EE3J5r//CTF16f6Pbj2pjKg==",
+-					"requires": {
+-						"@wp-g2/create-styles": "^0.0.159",
+-						"@wp-g2/utils": "^0.0.159"
+-					}
+-				},
+-				"@wp-g2/utils": {
+-					"version": "0.0.159",
+-					"resolved": "https://registry.npmjs.org/@wp-g2/utils/-/utils-0.0.159.tgz",
+-					"integrity": "sha512-0bkbB1o+4J3qShVl5STiWVN9xl2+/LtiEi/sC4yx/yeFXN31Cr/HKtGVIjil2aRkL8Dk7imbaSJoMIyH5LfvsA==",
+-					"requires": {
+-						"copy-to-clipboard": "^3.3.1",
+-						"create-emotion": "^10.0.27",
+-						"deepmerge": "^4.2.2",
+-						"fast-deep-equal": "^3.1.3",
+-						"hoist-non-react-statics": "^3.3.2",
+-						"json2mq": "^0.2.0",
+-						"lodash": "^4.17.19",
+-						"memize": "^1.1.0",
+-						"react-merge-refs": "^1.1.0",
+-						"react-resize-aware": "^3.1.0",
+-						"tinycolor2": "^1.4.2",
+-						"use-enhanced-state": "^0.0.13",
+-						"use-isomorphic-layout-effect": "^1.0.0"
+-					}
+-				},
+-				"csstype": {
+-					"version": "3.0.7",
+-					"resolved": "https://registry.npmjs.org/csstype/-/csstype-3.0.7.tgz",
+-					"integrity": "sha512-KxnUB0ZMlnUWCsx2Z8MUsr6qV6ja1w9ArPErJaJaF8a5SOWoHLIszeCTKGRGRgtLgYrs1E8CHkNSP1VZTTPc9g=="
+-				},
+-				"fast-deep-equal": {
+-					"version": "3.1.3",
+-					"resolved": "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz",
+-					"integrity": "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
+-				},
+-				"hoist-non-react-statics": {
+-					"version": "3.3.2",
+-					"resolved": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz",
+-					"integrity": "sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==",
+-					"requires": {
+-						"react-is": "^16.7.0"
+-					}
+-				},
+-				"isarray": {
+-					"version": "0.0.1",
+-					"resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz",
+-					"integrity": "sha1-ihis/Kmo9Bd+Cav8YDiTmwXR7t8="
+-				},
+-				"path-to-regexp": {
+-					"version": "1.8.0",
+-					"resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-1.8.0.tgz",
+-					"integrity": "sha512-n43JRhlUKUAlibEJhPeir1ncUID16QnEjNpwzNdO3Lm4ywrBpBZ5oLD0I6br9evr1Y9JTqwRtAh7JLoOzAQdVA==",
+-					"requires": {
+-						"isarray": "0.0.1"
+-					}
+-				}
+ 			}
+ 		},
+ 		"@wordpress/compose": {
+@@ -13530,6 +13404,136 @@
+ 				"lodash": "^4.17.19"
+ 			}
+ 		},
++		"@wp-g2/components": {
++			"version": "0.0.160",
++			"resolved": "https://registry.npmjs.org/@wp-g2/components/-/components-0.0.160.tgz",
++			"integrity": "sha512-44qUtiF5Nl/srD7Vzbpcd0im/EIej04fOdDfa0lfDxXJDNK3RRtSSEwCRhok/M5SKCmvYbZKRUx2K0ugXNqK0Q==",
++			"requires": {
++				"@popperjs/core": "^2.5.4",
++				"@wp-g2/context": "^0.0.160",
++				"@wp-g2/styles": "^0.0.160",
++				"@wp-g2/utils": "^0.0.160",
++				"csstype": "^3.0.3",
++				"downshift": "^6.0.15",
++				"framer-motion": "^2.1.0",
++				"highlight-words-core": "^1.2.2",
++				"history": "^4.9.0",
++				"lodash": "^4.17.19",
++				"path-to-regexp": "^1.7.0",
++				"react-colorful": "4.4.4",
++				"react-textarea-autosize": "^8.2.0",
++				"react-use-gesture": "^9.0.0",
++				"reakit": "^1.3.4"
++			},
++			"dependencies": {
++				"csstype": {
++					"version": "3.0.7",
++					"resolved": "https://registry.npmjs.org/csstype/-/csstype-3.0.7.tgz",
++					"integrity": "sha512-KxnUB0ZMlnUWCsx2Z8MUsr6qV6ja1w9ArPErJaJaF8a5SOWoHLIszeCTKGRGRgtLgYrs1E8CHkNSP1VZTTPc9g=="
++				},
++				"isarray": {
++					"version": "0.0.1",
++					"resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz",
++					"integrity": "sha1-ihis/Kmo9Bd+Cav8YDiTmwXR7t8="
++				},
++				"path-to-regexp": {
++					"version": "1.8.0",
++					"resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-1.8.0.tgz",
++					"integrity": "sha512-n43JRhlUKUAlibEJhPeir1ncUID16QnEjNpwzNdO3Lm4ywrBpBZ5oLD0I6br9evr1Y9JTqwRtAh7JLoOzAQdVA==",
++					"requires": {
++						"isarray": "0.0.1"
++					}
++				}
++			}
++		},
++		"@wp-g2/context": {
++			"version": "0.0.160",
++			"resolved": "https://registry.npmjs.org/@wp-g2/context/-/context-0.0.160.tgz",
++			"integrity": "sha512-50wSQCZkdZEexP88Ljutskn7/klT2Id1ks4GpzKDSBM8kadrfNdr2iabjgJdFLIH33S+r4dzEnzLs9SFtqUgwg==",
++			"requires": {
++				"@wp-g2/create-styles": "^0.0.160",
++				"@wp-g2/styles": "^0.0.160",
++				"@wp-g2/utils": "^0.0.160",
++				"lodash": "^4.17.19"
++			}
++		},
++		"@wp-g2/create-styles": {
++			"version": "0.0.160",
++			"resolved": "https://registry.npmjs.org/@wp-g2/create-styles/-/create-styles-0.0.160.tgz",
++			"integrity": "sha512-2/q8jcB9wIyfxkoCfNhz+9otRmAbDwfgk3nSEFhyz9ExR+OCqNUWqmITE3TZ4hYaSsV8E/gUUO4JjnPPy989bA==",
++			"requires": {
++				"@emotion/core": "^10.1.1",
++				"@emotion/hash": "^0.8.0",
++				"@emotion/is-prop-valid": "^0.8.8",
++				"@wp-g2/utils": "^0.0.160",
++				"create-emotion": "^10.0.27",
++				"emotion": "^10.0.27",
++				"emotion-theming": "^10.0.27",
++				"lodash": "^4.17.19",
++				"mitt": "^2.1.0",
++				"rtlcss": "^2.6.2",
++				"styled-griddie": "^0.1.3"
++			},
++			"dependencies": {
++				"@emotion/is-prop-valid": {
++					"version": "0.8.8",
++					"resolved": "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz",
++					"integrity": "sha512-u5WtneEAr5IDG2Wv65yhunPSMLIpuKsbuOktRojfrEiEvRyC85LgPMZI63cr7NUqT8ZIGdSVg8ZKGxIug4lXcA==",
++					"requires": {
++						"@emotion/memoize": "0.7.4"
++					}
++				},
++				"@emotion/memoize": {
++					"version": "0.7.4",
++					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.4.tgz",
++					"integrity": "sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw=="
++				}
++			}
++		},
++		"@wp-g2/styles": {
++			"version": "0.0.160",
++			"resolved": "https://registry.npmjs.org/@wp-g2/styles/-/styles-0.0.160.tgz",
++			"integrity": "sha512-o91jxb0ZwEDRJrtVVjnqn3qTAXjnxZ1fX5KF3Q7oz776lMZPHsyfC0hvqnOz0w7zqaZZpdWtVQRShgrYXN6JHw==",
++			"requires": {
++				"@wp-g2/create-styles": "^0.0.160",
++				"@wp-g2/utils": "^0.0.160"
++			}
++		},
++		"@wp-g2/utils": {
++			"version": "0.0.160",
++			"resolved": "https://registry.npmjs.org/@wp-g2/utils/-/utils-0.0.160.tgz",
++			"integrity": "sha512-4FhezjKyeYVb+3PZahW1kmqXpCvVvuJM97EcGqkKf+u4Qf66J3n1niHgfnRbn8aNydYK6EFze+6/UL48U35z1w==",
++			"requires": {
++				"copy-to-clipboard": "^3.3.1",
++				"create-emotion": "^10.0.27",
++				"deepmerge": "^4.2.2",
++				"fast-deep-equal": "^3.1.3",
++				"hoist-non-react-statics": "^3.3.2",
++				"json2mq": "^0.2.0",
++				"lodash": "^4.17.19",
++				"memize": "^1.1.0",
++				"react-merge-refs": "^1.1.0",
++				"react-resize-aware": "^3.1.0",
++				"tinycolor2": "^1.4.2",
++				"use-enhanced-state": "^0.0.13",
++				"use-isomorphic-layout-effect": "^1.0.0"
++			},
++			"dependencies": {
++				"fast-deep-equal": {
++					"version": "3.1.3",
++					"resolved": "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz",
++					"integrity": "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
++				},
++				"hoist-non-react-statics": {
++					"version": "3.3.2",
++					"resolved": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz",
++					"integrity": "sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==",
++					"requires": {
++						"react-is": "^16.7.0"
++					}
++				}
++			}
++		},
+ 		"@xtuc/ieee754": {
+ 			"version": "1.2.0",
+ 			"resolved": "https://registry.npmjs.org/@xtuc/ieee754/-/ieee754-1.2.0.tgz",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 6aa31b82b386c6..3e8ff18c56f0da 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -45,10 +45,10 @@
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/rich-text": "file:../rich-text",
+ 		"@wordpress/warning": "file:../warning",
+-		"@wp-g2/components": "^0.0.159",
+-		"@wp-g2/context": "^0.0.159",
+-		"@wp-g2/styles": "^0.0.159",
+-		"@wp-g2/utils": "^0.0.159",
++		"@wp-g2/components": "^0.0.160",
++		"@wp-g2/context": "^0.0.160",
++		"@wp-g2/styles": "^0.0.160",
++		"@wp-g2/utils": "^0.0.160",
+ 		"classnames": "^2.2.5",
+ 		"dom-scroll-into-view": "^1.2.1",
+ 		"downshift": "^6.0.15",
+diff --git a/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
+index 5424bcfd068637..8b76670df18854 100644
+--- a/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
+@@ -997,8 +997,8 @@ exports[`props should render mixed control types 1`] = `
+   color: var(--wp-g2-color-text);
+   line-height: 1.2;
+   line-height: var(--wp-g2-font-line-height-base);
+-  font-size: calc(1 * 13px);
+-  font-size: calc(1 * var(--wp-g2-font-size));
++  font-size: calc((13 / 13) * 13px);
++  font-size: calc((13 / 13) * var(--wp-g2-font-size));
+   font-weight: normal;
+   font-weight: var(--wp-g2-font-weight);
+   display: block;
+diff --git a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+index b29cd6d788b001..360b5d7f92c901 100644
+--- a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+@@ -33,8 +33,8 @@ exports[`props should render correctly 1`] = `
+   color: var(--wp-g2-color-text);
+   line-height: 1.2;
+   line-height: var(--wp-g2-font-line-height-base);
+-  font-size: calc(1 * 13px);
+-  font-size: calc(1 * var(--wp-g2-font-size));
++  font-size: calc((13 / 13) * 13px);
++  font-size: calc((13 / 13) * var(--wp-g2-font-size));
+   font-weight: normal;
+   font-weight: var(--wp-g2-font-weight);
+   display: inline-block;
+@@ -105,8 +105,8 @@ exports[`props should render no truncate 1`] = `
+   color: var(--wp-g2-color-text);
+   line-height: 1.2;
+   line-height: var(--wp-g2-font-line-height-base);
+-  font-size: calc(1 * 13px);
+-  font-size: calc(1 * var(--wp-g2-font-size));
++  font-size: calc((13 / 13) * 13px);
++  font-size: calc((13 / 13) * var(--wp-g2-font-size));
+   font-weight: normal;
+   font-weight: var(--wp-g2-font-weight);
+   display: inline-block;
+@@ -181,8 +181,8 @@ exports[`props should render size 1`] = `
+   color: var(--wp-g2-color-text);
+   line-height: 1.2;
+   line-height: var(--wp-g2-font-line-height-base);
+-  font-size: calc(1 * 13px);
+-  font-size: calc(1 * var(--wp-g2-font-size));
++  font-size: calc((13 / 13) * 13px);
++  font-size: calc((13 / 13) * var(--wp-g2-font-size));
+   font-weight: normal;
+   font-weight: var(--wp-g2-font-weight);
+   display: inline-block;
+diff --git a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+index 8005b5772213a1..288e655271f9b6 100644
+--- a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+@@ -55,8 +55,8 @@ exports[`props should render alignLabel 1`] = `
+   color: var(--wp-g2-color-text);
+   line-height: 1.2;
+   line-height: var(--wp-g2-font-line-height-base);
+-  font-size: calc(1 * 13px);
+-  font-size: calc(1 * var(--wp-g2-font-size));
++  font-size: calc((13 / 13) * 13px);
++  font-size: calc((13 / 13) * var(--wp-g2-font-size));
+   font-weight: normal;
+   font-weight: var(--wp-g2-font-weight);
+   text-align: right;
+@@ -165,8 +165,8 @@ exports[`props should render vertically 1`] = `
+   color: var(--wp-g2-color-text);
+   line-height: 1.2;
+   line-height: var(--wp-g2-font-line-height-base);
+-  font-size: calc(1 * 13px);
+-  font-size: calc(1 * var(--wp-g2-font-size));
++  font-size: calc((13 / 13) * 13px);
++  font-size: calc((13 / 13) * var(--wp-g2-font-size));
+   font-weight: normal;
+   font-weight: var(--wp-g2-font-weight);
+   text-align: left;
+diff --git a/packages/components/src/ui/heading/README.md b/packages/components/src/ui/heading/README.md
+new file mode 100644
+index 00000000000000..80f098ed93e71a
+--- /dev/null
++++ b/packages/components/src/ui/heading/README.md
+@@ -0,0 +1,24 @@
++# Heading
++
++`Heading` renders headings and titles using the library's typography system.
++
++## Usage
++
++```jsx
++import { Heading } from '@wordpress/components/ui';
++
++function Example() {
++	return <Heading>Code is Poetry</Heading>;
++}
++```
++
++## Props
++
++
++`Heading` uses `Text` underneath, so we have access to all of `Text`'s props except for `size` which is replaced by `level`. For a complete list of those props, check out [`Text`](../text/#props).
++
++##### level
++
++**Type**: `1 | 2 | 3 | 4 | 5 | 6`
++
++Passing any of the heading levels to `level` will both render the correct typographic text size as well as the semantic element corresponding to the level (`h1` for `1` for example).
+diff --git a/packages/components/src/ui/heading/component.ts b/packages/components/src/ui/heading/component.ts
+new file mode 100644
+index 00000000000000..c6705325cdcaea
+--- /dev/null
++++ b/packages/components/src/ui/heading/component.ts
+@@ -0,0 +1,25 @@
++/**
++ * Internal dependencies
++ */
++import { createComponent } from '../utils';
++import { useHeading } from './hook';
++
++/**
++ * `Heading` renders headings and titles using the library's typography system.
++ *
++ * @example
++ * ```jsx
++ * import { Heading } from `@wordpress/components/ui`
++ *
++ * function Example() {
++ *   return <Heading>Code is Poetry</Heading>;
++ * }
++ * ```
++ */
++const Heading = createComponent( {
++	as: 'h1',
++	useHook: useHeading,
++	name: 'Heading',
++} );
++
++export default Heading;
+diff --git a/packages/components/src/ui/heading/hook.ts b/packages/components/src/ui/heading/hook.ts
+new file mode 100644
+index 00000000000000..79d8977c4da1ba
+--- /dev/null
++++ b/packages/components/src/ui/heading/hook.ts
+@@ -0,0 +1,83 @@
++/**
++ * External dependencies
++ */
++import { useContextSystem } from '@wp-g2/context';
++import { getHeadingFontSize, ui } from '@wp-g2/styles';
++import type { ViewOwnProps } from '@wp-g2/create-styles';
++
++/**
++ * Internal dependencies
++ */
++import type { Props as TextProps } from '../text/types';
++import { useText } from '../text';
++
++export type HeadingSize =
++	| 1
++	| 2
++	| 3
++	| 4
++	| 5
++	| 6
++	| '1'
++	| '2'
++	| '3'
++	| '4'
++	| '5'
++	| '6';
++
++export interface HeadingProps extends Omit< TextProps, 'size' > {
++	/**
++	 * `Heading` will typically render the sizes `1`, `2`, `3`, `4`, `5`, or `6`, which map to `h1`-`h6`.
++	 *
++	 * @default 3
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Heading, View } from `@wp-g2/components`
++	 *
++	 * function Example() {
++	 *   return (
++	 *     <View>
++	 *       <Heading level="1">Code is Poetry</Heading>
++	 *       <Heading level="2">Code is Poetry</Heading>
++	 *       <Heading level="3">Code is Poetry</Heading>
++	 *       <Heading level="4">Code is Poetry</Heading>
++	 *       <Heading level="5">Code is Poetry</Heading>
++	 *       <Heading level="6">Code is Poetry</Heading>
++	 *     </View>
++	 *   );
++	 * }
++	 * ```
++	 */
++	level: HeadingSize;
++}
++
++export function useHeading( props: ViewOwnProps< HeadingProps, 'h1' > ) {
++	const { as: asProp, level = 2, ...otherProps } = useContextSystem(
++		props,
++		'Heading'
++	);
++
++	const as = asProp || `h${ level }`;
++
++	const a11yProps: {
++		role?: string;
++		'aria-level'?: string | number;
++	} = {};
++	if ( typeof as === 'string' && as[ 0 ] !== 'h' ) {
++		// if not a semantic `h` element, add a11y props:
++		a11yProps.role = 'heading';
++		a11yProps[ 'aria-level' ] = level;
++	}
++
++	const textProps = useText( {
++		color: ui.get( 'colorTextHeading' ),
++		size: getHeadingFontSize( level ),
++		isBlock: true,
++		// @ts-ignore We're passing a variable so `string` is safe
++		weight: ui.get( 'fontWeightHeading' ),
++		...otherProps,
++	} );
++
++	return { ...textProps, ...a11yProps, as };
++}
+diff --git a/packages/components/src/ui/heading/index.ts b/packages/components/src/ui/heading/index.ts
+new file mode 100644
+index 00000000000000..aec7615839ad93
+--- /dev/null
++++ b/packages/components/src/ui/heading/index.ts
+@@ -0,0 +1,3 @@
++export { default as Heading } from './component';
++export * from './component';
++export * from './hook';
+diff --git a/packages/components/src/ui/heading/stories/index.js b/packages/components/src/ui/heading/stories/index.js
+new file mode 100644
+index 00000000000000..9254152b628170
+--- /dev/null
++++ b/packages/components/src/ui/heading/stories/index.js
+@@ -0,0 +1,22 @@
++/**
++ * Internal dependencies
++ */
++import { Heading } from '../index';
++
++export default {
++	component: Heading,
++	title: 'G2 Components (Experimental)/Heading',
++};
++
++export const _default = () => {
++	return (
++		<>
++			<Heading level={ 1 }>Heading</Heading>
++			<Heading level={ 2 }>Heading</Heading>
++			<Heading level={ 3 }>Heading</Heading>
++			<Heading level={ 4 }>Heading</Heading>
++			<Heading level={ 5 }>Heading</Heading>
++			<Heading level={ 6 }>Heading</Heading>
++		</>
++	);
++};
+diff --git a/packages/components/src/ui/heading/test/__snapshots__/index.js.snap b/packages/components/src/ui/heading/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..a0505ff6fe8881
+--- /dev/null
++++ b/packages/components/src/ui/heading/test/__snapshots__/index.js.snap
+@@ -0,0 +1,87 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render correctly 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  color: #1e1e1e;
++  color: var(--wp-g2-color-text);
++  line-height: 1.2;
++  line-height: var(--wp-g2-font-line-height-base);
++  color: #050505;
++  color: var(--wp-g2-color-text-heading);
++  font-size: calc(1.95 * 13px);
++  font-size: var(--wp-g2-font-size-h-2);
++  font-weight: 600;
++  font-weight: var(--wp-g2-font-weight-heading);
++  display: block;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<h2
++  class="components-truncate wp-components-truncate components-text wp-components-text components-heading wp-components-heading ic-1ng8wck ic-7u3orf ic-1m45iq3 ic-192yz5d emotion-0"
++  data-g2-c16t="true"
++  data-g2-component="Heading"
++>
++  Code is Poetry
++</h2>
++`;
++
++exports[`props should render level as a number 1`] = `
++Snapshot Diff:
++- Received styles
+++ Base styles
++
++@@ -4,11 +4,11 @@
++      "-webkit-font-smoothing": "antialiased",
++      "box-sizing": "border-box",
++      "color": "var(--wp-g2-color-text-heading)",
++      "display": "block",
++      "font-family": "var(--wp-g2-font-family)",
++-     "font-size": "var(--wp-g2-font-size-h-4)",
+++     "font-size": "var(--wp-g2-font-size-h-2)",
++      "font-weight": "var(--wp-g2-font-weight-heading)",
++      "line-height": "var(--wp-g2-font-line-height-base)",
++      "margin": "0",
++    },
++  ]
++`;
++
++exports[`props should render level as a string 1`] = `
++Snapshot Diff:
++- Received styles
+++ Base styles
++
++@@ -4,11 +4,11 @@
++      "-webkit-font-smoothing": "antialiased",
++      "box-sizing": "border-box",
++      "color": "var(--wp-g2-color-text-heading)",
++      "display": "block",
++      "font-family": "var(--wp-g2-font-family)",
++-     "font-size": "var(--wp-g2-font-size-h-4)",
+++     "font-size": "var(--wp-g2-font-size-h-2)",
++      "font-weight": "var(--wp-g2-font-weight-heading)",
++      "line-height": "var(--wp-g2-font-line-height-base)",
++      "margin": "0",
++    },
++  ]
++`;
+diff --git a/packages/components/src/ui/heading/test/index.js b/packages/components/src/ui/heading/test/index.js
+new file mode 100644
+index 00000000000000..454a50a393c0e0
+--- /dev/null
++++ b/packages/components/src/ui/heading/test/index.js
+@@ -0,0 +1,67 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { Heading } from '../index';
++
++describe( 'props', () => {
++	let base;
++	beforeEach( () => {
++		base = render( <Heading>Code is Poetry</Heading> );
++	} );
++
++	test( 'should render correctly', () => {
++		expect( base.container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render level as a number', () => {
++		const { container } = render(
++			<Heading level={ 4 }>Code is Poetry</Heading>
++		);
++		expect( container.firstChild ).toMatchStyleDiffSnapshot(
++			base.container.firstChild
++		);
++	} );
++
++	test( 'should render level as a string', () => {
++		const { container } = render(
++			<Heading level="4">Code is Poetry</Heading>
++		);
++		expect( container.firstChild ).toMatchStyleDiffSnapshot(
++			base.container.firstChild
++		);
++	} );
++
++	test( 'should allow as prop', () => {
++		const { container } = render(
++			<Heading level="1" as="span">
++				Code is Poetry
++			</Heading>
++		);
++		expect( container.firstChild.tagName ).toBe( 'SPAN' );
++	} );
++
++	test( 'should render a11y props when not using a semantic element', () => {
++		const { container } = render(
++			<Heading level="3" as="div">
++				Code is Poetry
++			</Heading>
++		);
++		expect( container.firstChild.getAttribute( 'role' ) ).toBe( 'heading' );
++		expect( container.firstChild.getAttribute( 'aria-level' ) ).toBe( '3' );
++	} );
++
++	test( 'should not render a11y props when using a semantic element', () => {
++		const { container } = render(
++			<Heading level="1" as="h4">
++				Code is Poetry
++			</Heading>
++		);
++		expect( container.firstChild.getAttribute( 'role' ) ).toBeNull();
++		expect( container.firstChild.getAttribute( 'aria-level' ) ).toBeNull();
++	} );
++} );
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index 716f72a624dd4b..1276b0dfd896cf 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -7,6 +7,7 @@ export * from './flex';
+ export * from './form-group';
+ export * from './grid';
+ export * from './h-stack';
++export * from './heading';
+ export * from './shortcut';
+ export * from './spinner';
+ export * from './text';
+diff --git a/packages/components/src/ui/text/test/__snapshots__/text.js.snap b/packages/components/src/ui/text/test/__snapshots__/text.js.snap
+index 77f8835bbbbb6b..199b820be1f32c 100644
+--- a/packages/components/src/ui/text/test/__snapshots__/text.js.snap
++++ b/packages/components/src/ui/text/test/__snapshots__/text.js.snap
+@@ -16,8 +16,8 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] =
+   color: var(--wp-g2-color-text);
+   line-height: 1.2;
+   line-height: var(--wp-g2-font-line-height-base);
+-  font-size: calc(1 * 13px);
+-  font-size: calc(1 * var(--wp-g2-font-size));
++  font-size: calc((13 / 13) * 13px);
++  font-size: calc((13 / 13) * var(--wp-g2-font-size));
+   font-weight: normal;
+   font-weight: var(--wp-g2-font-weight);
+ }
+@@ -71,8 +71,8 @@ exports[`Text snapshot tests should render correctly 1`] = `
+   color: var(--wp-g2-color-text);
+   line-height: 1.2;
+   line-height: var(--wp-g2-font-line-height-base);
+-  font-size: calc(1 * 13px);
+-  font-size: calc(1 * var(--wp-g2-font-size));
++  font-size: calc((13 / 13) * 13px);
++  font-size: calc((13 / 13) * var(--wp-g2-font-size));
+   font-weight: normal;
+   font-weight: var(--wp-g2-font-weight);
+ }

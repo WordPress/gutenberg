@@ -1,0 +1,433 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e1c10790e1746a..0ad95dbde54099 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,7 +16,7 @@
+ 
+ ### Experimental
+ 
+--   `DropdownMenu` v2: Tweak styles ([#50967](https://github.com/WordPress/gutenberg/pull/50967)).
++-   `DropdownMenu` v2: Tweak styles ([#50967](https://github.com/WordPress/gutenberg/pull/50967), [#51097](https://github.com/WordPress/gutenberg/pull/51097)).
+ -   `DropdownMenu` v2: Render in the default `Popover.Slot` ([#51046](https://github.com/WordPress/gutenberg/pull/51046)).
+ 
+ ## 25.0.0 (2023-05-24)
+diff --git a/packages/components/src/dropdown-menu-v2/index.tsx b/packages/components/src/dropdown-menu-v2/index.tsx
+index b0617edd77f9f0..28d825b8934ecd 100644
+--- a/packages/components/src/dropdown-menu-v2/index.tsx
++++ b/packages/components/src/dropdown-menu-v2/index.tsx
+@@ -6,7 +6,12 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
+ /**
+  * WordPress dependencies
+  */
+-import { forwardRef, createContext, useContext } from '@wordpress/element';
++import {
++	forwardRef,
++	createContext,
++	useContext,
++	useMemo,
++} from '@wordpress/element';
+ import { isRTL } from '@wordpress/i18n';
+ import { check, chevronRightSmall, lineSolid } from '@wordpress/icons';
+ import { SVG, Circle } from '@wordpress/primitives';
+@@ -14,6 +19,7 @@ import { SVG, Circle } from '@wordpress/primitives';
+ /**
+  * Internal dependencies
+  */
++import { useContextSystem, contextConnectWithoutRef } from '../ui/context';
+ import { useSlot } from '../slot-fill';
+ import Icon from '../icon';
+ import { SLOT_NAME as POPOVER_DEFAULT_SLOT_NAME } from '../popover';
+@@ -29,42 +35,56 @@ import type {
+ 	DropdownMenuRadioItemProps,
+ 	DropdownMenuSeparatorProps,
+ 	DropdownSubMenuTriggerProps,
++	DropdownMenuContext,
++	DropdownMenuPrivateContext as DropdownMenuPrivateContextType,
+ } from './types';
+ 
+ // Menu content's side padding + 4px
+-const SUB_MENU_OFFSET_SIDE = 12;
++const SUB_MENU_OFFSET_SIDE = 16;
+ // Opposite amount of the top padding of the menu item
+ const SUB_MENU_OFFSET_ALIGN = -8;
+ 
+-const DropdownMenuPrivateContext = createContext< {
+-	portalContainer: HTMLElement | null;
+-} >( {
+-	portalContainer: null,
+-} );
++const DropdownMenuPrivateContext =
++	createContext< DropdownMenuPrivateContextType >( {
++		variant: undefined,
++		portalContainer: null,
++	} );
++
++const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
++	const {
++		// Root props
++		defaultOpen,
++		open,
++		onOpenChange,
++		modal = true,
++		// Content positioning props
++		side = 'bottom',
++		sideOffset = 0,
++		align = 'center',
++		alignOffset = 0,
++		// Render props
++		children,
++		trigger,
++
++		// From internal components context
++		variant,
++	} = useContextSystem<
++		// Adding `className` to the context type to avoid a TS error
++		DropdownMenuProps & DropdownMenuContext & { className?: string }
++	>( props, 'DropdownMenu' );
+ 
+-/**
+- * `DropdownMenu` displays a menu to the user (such as a set of actions
+- * or functions) triggered by a button.
+- */
+-export const DropdownMenu = ( {
+-	// Root props
+-	defaultOpen,
+-	open,
+-	onOpenChange,
+-	modal = true,
+-	// Content positioning props
+-	side = 'bottom',
+-	sideOffset = 0,
+-	align = 'center',
+-	alignOffset = 0,
+-	// Render props
+-	children,
+-	trigger,
+-}: DropdownMenuProps ) => {
+ 	// Render the portal in the default slot used by the legacy Popover component.
+ 	const slot = useSlot( POPOVER_DEFAULT_SLOT_NAME );
+ 	const portalContainer = slot.ref?.current;
+ 
++	const privateContextValue = useMemo(
++		() => ( {
++			variant,
++			portalContainer,
++		} ),
++		[ variant, portalContainer ]
++	);
++
+ 	return (
+ 		<DropdownMenuPrimitive.Root
+ 			defaultOpen={ defaultOpen }
+@@ -83,9 +103,10 @@ export const DropdownMenu = ( {
+ 					sideOffset={ sideOffset }
+ 					alignOffset={ alignOffset }
+ 					loop={ true }
++					variant={ variant }
+ 				>
+ 					<DropdownMenuPrivateContext.Provider
+-						value={ { portalContainer } }
++						value={ privateContextValue }
+ 					>
+ 						{ children }
+ 					</DropdownMenuPrivateContext.Provider>
+@@ -95,6 +116,15 @@ export const DropdownMenu = ( {
+ 	);
+ };
+ 
++/**
++ * `DropdownMenu` displays a menu to the user (such as a set of actions
++ * or functions) triggered by a button.
++ */
++export const DropdownMenu = contextConnectWithoutRef(
++	UnconnectedDropdownMenu,
++	'DropdownMenu'
++);
++
+ export const DropdownSubMenuTrigger = ( {
+ 	prefix,
+ 	suffix = (
+@@ -134,7 +164,9 @@ export const DropdownSubMenu = ( {
+ 	children,
+ 	trigger,
+ }: DropdownSubMenuProps ) => {
+-	const { portalContainer } = useContext( DropdownMenuPrivateContext );
++	const { variant, portalContainer } = useContext(
++		DropdownMenuPrivateContext
++	);
+ 
+ 	return (
+ 		<DropdownMenuPrimitive.Sub
+@@ -153,6 +185,7 @@ export const DropdownSubMenu = ( {
+ 					loop
+ 					sideOffset={ SUB_MENU_OFFSET_SIDE }
+ 					alignOffset={ SUB_MENU_OFFSET_ALIGN }
++					variant={ variant }
+ 				>
+ 					{ children }
+ 				</DropdownMenuStyled.SubContent>
+@@ -254,6 +287,7 @@ export const DropdownMenuRadioItem = ( {
+ 	);
+ };
+ 
+-export const DropdownMenuSeparator = ( props: DropdownMenuSeparatorProps ) => (
+-	<DropdownMenuStyled.Separator { ...props } />
+-);
++export const DropdownMenuSeparator = ( props: DropdownMenuSeparatorProps ) => {
++	const { variant } = useContext( DropdownMenuPrivateContext );
++	return <DropdownMenuStyled.Separator { ...props } variant={ variant } />;
++};
+diff --git a/packages/components/src/dropdown-menu-v2/stories/index.tsx b/packages/components/src/dropdown-menu-v2/stories/index.tsx
+index 4bee7c902063f4..8880acaf735096 100644
+--- a/packages/components/src/dropdown-menu-v2/stories/index.tsx
++++ b/packages/components/src/dropdown-menu-v2/stories/index.tsx
+@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+  */
++import { COLORS } from '../../utils';
+ import {
+ 	DropdownMenu,
+ 	DropdownMenuItem,
+@@ -33,6 +34,7 @@ import { menu, wordpress } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import Icon from '../../icon';
++import { ContextSystemProvider } from '../../ui/context';
+ 
+ const meta: ComponentMeta< typeof DropdownMenu > = {
+ 	title: 'Components (Experimental)/DropdownMenu v2',
+@@ -73,8 +75,8 @@ const meta: ComponentMeta< typeof DropdownMenu > = {
+ export default meta;
+ 
+ const ItemHelpText = styled.span`
+-	font-size: 10px;
+-	color: #777;
++	font-size: 12px;
++	color: ${ COLORS.gray[ '700' ] };
+ 
+ 	/* "> * > &" syntax is to target only immediate parent menu item */
+ 	[data-highlighted] > * > &,
+@@ -144,7 +146,7 @@ Default.args = {
+ 			<DropdownMenuGroup>
+ 				<DropdownMenuItem>Menu item</DropdownMenuItem>
+ 				<DropdownMenuItem
+-					prefix={ <Icon icon={ wordpress } size={ 18 } /> }
++					prefix={ <Icon icon={ wordpress } size={ 24 } /> }
+ 				>
+ 					Menu item with prefix
+ 				</DropdownMenuItem>
+@@ -197,3 +199,19 @@ Default.args = {
+ 		</>
+ 	),
+ };
++
++const toolbarVariantContextValue = {
++	DropdownMenu: {
++		variant: 'toolbar',
++	},
++};
++export const ToolbarVariant: ComponentStory< typeof DropdownMenu > = (
++	props
++) => (
++	<ContextSystemProvider value={ toolbarVariantContextValue }>
++		<DropdownMenu { ...props } />
++	</ContextSystemProvider>
++);
++ToolbarVariant.args = {
++	...Default.args,
++};
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/dropdown-menu-v2/styles.ts
+index 64f72fa7f7c6d6..d3ed206b5f7319 100644
+--- a/packages/components/src/dropdown-menu-v2/styles.ts
++++ b/packages/components/src/dropdown-menu-v2/styles.ts
+@@ -8,9 +8,10 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+ /**
+  * Internal dependencies
+  */
+-import { COLORS, font, rtl } from '../utils';
++import { COLORS, font, rtl, CONFIG } from '../utils';
+ import { space } from '../ui/utils/space';
+ import Icon from '../icon';
++import type { DropdownMenuContext } from './types';
+ 
+ const ANIMATION_PARAMS = {
+ 	SLIDE_AMOUNT: '2px',
+@@ -23,6 +24,12 @@ const ITEM_PREFIX_WIDTH = space( 7 );
+ const ITEM_PADDING_INLINE_START = space( 2 );
+ const ITEM_PADDING_INLINE_END = space( 2.5 );
+ 
++// TODO: should bring this into the config, and make themeable
++const DEFAULT_BORDER_COLOR = COLORS.ui.borderDisabled;
++const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
++const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.popoverShadow }`;
++const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
++
+ const slideUpAndFade = keyframes( {
+ 	'0%': {
+ 		opacity: 0,
+@@ -55,15 +62,14 @@ const slideLeftAndFade = keyframes( {
+ 	'100%': { opacity: 1, transform: 'translateX(0)' },
+ } );
+ 
+-const baseContent = css`
++const baseContent = ( variant: DropdownMenuContext[ 'variant' ] ) => css`
+ 	min-width: 220px;
+ 	background-color: ${ COLORS.ui.background };
+-	border-radius: 6px;
++	border-radius: ${ CONFIG.radiusBlockUi };
+ 	padding: ${ CONTENT_WRAPPER_PADDING };
+-	box-shadow: 0.1px 4px 16.4px -0.5px rgba( 0, 0, 0, 0.1 ),
+-		0px 5.5px 7.8px -0.3px rgba( 0, 0, 0, 0.1 ),
+-		0px 2.7px 3.8px -0.2px rgba( 0, 0, 0, 0.1 ),
+-		0px 0.7px 1px rgba( 0, 0, 0, 0.1 );
++	box-shadow: ${ variant === 'toolbar'
++		? TOOLBAR_VARIANT_BOX_SHADOW
++		: DEFAULT_BOX_SHADOW };
+ 	animation-duration: ${ ANIMATION_PARAMS.DURATION };
+ 	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
+ 	will-change: transform, opacity;
+@@ -156,7 +162,7 @@ const baseItem = css`
+ 	font-weight: normal;
+ 	line-height: 20px;
+ 	color: ${ COLORS.gray[ 900 ] };
+-	border-radius: 3px;
++	border-radius: ${ CONFIG.radiusBlockUi };
+ 	display: flex;
+ 	align-items: center;
+ 	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
+@@ -193,11 +199,15 @@ const baseItem = css`
+ 	}
+ `;
+ 
+-export const Content = styled( DropdownMenu.Content )`
+-	${ baseContent }
++export const Content = styled( DropdownMenu.Content )<
++	Pick< DropdownMenuContext, 'variant' >
++>`
++	${ ( props ) => baseContent( props.variant ) }
+ `;
+-export const SubContent = styled( DropdownMenu.SubContent )`
+-	${ baseContent }
++export const SubContent = styled( DropdownMenu.SubContent )<
++	Pick< DropdownMenuContext, 'variant' >
++>`
++	${ ( props ) => baseContent( props.variant ) }
+ `;
+ 
+ export const Item = styled( DropdownMenu.Item )`
+@@ -235,10 +245,15 @@ export const Label = styled( DropdownMenu.Label )`
+ 	text-transform: uppercase;
+ `;
+ 
+-export const Separator = styled( DropdownMenu.Separator )`
+-	height: 1px;
++export const Separator = styled( DropdownMenu.Separator )<
++	Pick< DropdownMenuContext, 'variant' >
++>`
++	height: ${ CONFIG.borderWidth };
+ 	/* TODO: doesn't match border color from variables */
+-	background-color: ${ COLORS.ui.borderDisabled };
++	background-color: ${ ( props ) =>
++		props.variant === 'toolbar'
++			? TOOLBAR_VARIANT_BORDER_COLOR
++			: DEFAULT_BORDER_COLOR };
+ 	/* Negative horizontal margin to make separator go from side to side */
+ 	margin: ${ space( 2 ) } calc( -1 * ${ CONTENT_WRAPPER_PADDING } );
+ `;
+diff --git a/packages/components/src/dropdown-menu-v2/types.ts b/packages/components/src/dropdown-menu-v2/types.ts
+index 1fb246fafd6537..4b2d5aad71120a 100644
+--- a/packages/components/src/dropdown-menu-v2/types.ts
++++ b/packages/components/src/dropdown-menu-v2/types.ts
+@@ -248,3 +248,18 @@ export type DropdownMenuGroupProps = {
+ };
+ 
+ export type DropdownMenuSeparatorProps = {};
++
++export type DropdownMenuContext = {
++	/**
++	 * This variant can be used to change the appearance of the component in
++	 * specific contexts, ie. when rendered inside the `Toolbar` component.
++	 */
++	variant?: 'toolbar';
++};
++
++export type DropdownMenuPrivateContext = Pick<
++	DropdownMenuContext,
++	'variant'
++> & {
++	portalContainer: HTMLElement | null;
++};
+diff --git a/packages/components/src/toolbar/toolbar/index.tsx b/packages/components/src/toolbar/toolbar/index.tsx
+index db5ced5a382a21..9c837a72aa0e83 100644
+--- a/packages/components/src/toolbar/toolbar/index.tsx
++++ b/packages/components/src/toolbar/toolbar/index.tsx
+@@ -16,7 +16,22 @@ import deprecated from '@wordpress/deprecated';
+ import ToolbarGroup from '../toolbar-group';
+ import ToolbarContainer from './toolbar-container';
+ import type { ToolbarProps } from './types';
+-import type { WordPressComponentProps } from '../../ui/context';
++import {
++	WordPressComponentProps,
++	ContextSystemProvider,
++} from '../../ui/context';
++
++// TODO:
++// - (optional) make the legacy `DropdownMenu` read the context variable
++// - swap the legacy `DropdownMenu` with the new version of the component
++//   once it's stable
++const CONTEXT_SYSTEM_VALUE = {
++	DropdownMenu: {
++		// Note: the legacy `DropdownMenu` component is not yet reactive to this
++		// context variant. See https://github.com/WordPress/gutenberg/pull/51097.
++		variant: 'toolbar',
++	},
++};
+ 
+ function UnforwardedToolbar(
+ 	{
+@@ -40,12 +55,14 @@ function UnforwardedToolbar(
+ 		className
+ 	);
+ 	return (
+-		<ToolbarContainer
+-			className={ finalClassName }
+-			label={ label }
+-			ref={ ref }
+-			{ ...props }
+-		/>
++		<ContextSystemProvider value={ CONTEXT_SYSTEM_VALUE }>
++			<ToolbarContainer
++				className={ finalClassName }
++				label={ label }
++				ref={ ref }
++				{ ...props }
++			/>
++		</ContextSystemProvider>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/ui/context/index.ts b/packages/components/src/ui/context/index.ts
+index 54694e47304ff2..266e2c3459a547 100644
+--- a/packages/components/src/ui/context/index.ts
++++ b/packages/components/src/ui/context/index.ts
+@@ -4,6 +4,7 @@ export {
+ } from './context-system-provider';
+ export {
+ 	contextConnect,
++	contextConnectWithoutRef,
+ 	hasConnectNamespace,
+ 	getConnectNamespace,
+ } from './context-connect';
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 40c15a22ec17e3..5587720573e95c 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -67,6 +67,7 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
+ 	cardPaddingSmall: `${ space( 4 ) }`,
+ 	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,
+ 	cardPaddingLarge: `${ space( 6 ) } ${ space( 8 ) }`,
++	popoverShadow: `0 0.7px 1px rgba(0, 0, 0, 0.1), 0 1.2px 1.7px -0.2px rgba(0, 0, 0, 0.1), 0 2.3px 3.3px -0.5px rgba(0, 0, 0, 0.1)`,
+ 	surfaceBackgroundColor: COLORS.white,
+ 	surfaceBackgroundSubtleColor: '#F3F3F3',
+ 	surfaceBackgroundTintColor: '#F5F5F5',

@@ -1,0 +1,148 @@
+diff --git a/packages/a11y/src/script/add-container.js b/packages/a11y/src/script/add-container.js
+index 48d625c05e384d..314c319f376014 100644
+--- a/packages/a11y/src/script/add-container.js
++++ b/packages/a11y/src/script/add-container.js
+@@ -20,7 +20,8 @@ export default function addContainer( ariaLive = 'polite' ) {
+ 			'overflow:hidden;' +
+ 			'clip-path:inset(50%);' +
+ 			'border:0;' +
+-			'word-wrap:normal !important;'
++			'word-wrap:normal !important;' +
++			'word-break:normal !important;'
+ 	);
+ 	container.setAttribute( 'aria-live', ariaLive );
+ 	container.setAttribute( 'aria-relevant', 'additions text' );
+diff --git a/packages/a11y/src/script/add-intro-text.ts b/packages/a11y/src/script/add-intro-text.ts
+index 7f91be36154a4f..ac335c33182ed9 100644
+--- a/packages/a11y/src/script/add-intro-text.ts
++++ b/packages/a11y/src/script/add-intro-text.ts
+@@ -28,7 +28,8 @@ export default function addIntroText() {
+ 			'overflow:hidden;' +
+ 			'clip-path:inset(50%);' +
+ 			'border:0;' +
+-			'word-wrap:normal !important;'
++			'word-wrap:normal !important;' +
++			'word-break:normal !important;'
+ 	);
+ 	introText.setAttribute( 'hidden', '' );
+ 
+diff --git a/packages/block-editor/src/components/responsive-block-control/style.scss b/packages/block-editor/src/components/responsive-block-control/style.scss
+index 84606af60d4958..dfdd70a6f7644a 100644
+--- a/packages/block-editor/src/components/responsive-block-control/style.scss
++++ b/packages/block-editor/src/components/responsive-block-control/style.scss
+@@ -11,6 +11,7 @@
+ 	position: absolute;
+ 	width: 1px;
+ 	word-wrap: normal !important;
++	word-break: normal !important;
+ }
+ 
+ .block-editor-responsive-block-control {
+diff --git a/packages/block-library/src/common.scss b/packages/block-library/src/common.scss
+index 49b57b17261753..8553d6b6f0b9a9 100644
+--- a/packages/block-library/src/common.scss
++++ b/packages/block-library/src/common.scss
+@@ -92,6 +92,7 @@
+ 	position: absolute;
+ 	width: 1px;
+ 	word-wrap: normal !important;
++	word-break: normal !important;
+ }
+ 
+ .screen-reader-text:focus {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0c2191b1a8d106..5d668582502c33 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fixes
+ 
+ -   Revert `word-break: break-word` addition ([#76230](https://github.com/WordPress/gutenberg/pull/76230)).
++-   `VisuallyHidden`: Add `word-break: normal` to prevent text wrapping issues in screen reader content ([#75539](https://github.com/WordPress/gutenberg/pull/75539)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/notice/test/__snapshots__/index.tsx.snap b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+index 03d1288dc2dbce..51d03be3e71c65 100644
+--- a/packages/components/src/notice/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+@@ -9,7 +9,7 @@ exports[`Notice should match snapshot 1`] = `
+       class="components-visually-hidden css-1ragr82-PolymorphicDiv emotion-0"
+       data-wp-c16t="true"
+       data-wp-component="VisuallyHidden"
+-      style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
++      style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
+     >
+       Notice
+     </div>
+diff --git a/packages/components/src/visually-hidden/styles.ts b/packages/components/src/visually-hidden/styles.ts
+index bf6b171dcf73dd..f8bbd89245b2dc 100644
+--- a/packages/components/src/visually-hidden/styles.ts
++++ b/packages/components/src/visually-hidden/styles.ts
+@@ -15,4 +15,5 @@ export const visuallyHidden: CSSProperties = {
+ 	position: 'absolute',
+ 	width: '1px',
+ 	wordWrap: 'normal',
++	wordBreak: 'normal',
+ };
+diff --git a/packages/components/src/visually-hidden/test/__snapshots__/index.tsx.snap b/packages/components/src/visually-hidden/test/__snapshots__/index.tsx.snap
+index 0b352f4227b8cc..5efd6b306c2347 100644
+--- a/packages/components/src/visually-hidden/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/visually-hidden/test/__snapshots__/index.tsx.snap
+@@ -5,7 +5,7 @@ exports[`VisuallyHidden should render correctly 1`] = `
+   class="components-visually-hidden css-1ragr82-PolymorphicDiv emotion-0"
+   data-wp-c16t="true"
+   data-wp-component="VisuallyHidden"
+-  style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
++  style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
+ >
+   This is hidden
+ </div>
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index 7e1252d01f4aae..49cd25aee42c4f 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -164,7 +164,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+                 class="components-visually-hidden emotion-6 emotion-7"
+                 data-wp-c16t="true"
+                 data-wp-component="VisuallyHidden"
+-                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
++                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
+               >
+                 (opens in a new tab)
+               </span>
+@@ -391,7 +391,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+                 class="components-visually-hidden emotion-6 emotion-7"
+                 data-wp-c16t="true"
+                 data-wp-component="VisuallyHidden"
+-                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
++                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
+               >
+                 (opens in a new tab)
+               </span>
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 4985efd85f422e..4d98003df99c58 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `VisuallyHidden`: Add `word-break: normal` to prevent text wrapping issues in screen reader content ([#75539](https://github.com/WordPress/gutenberg/pull/75539)).
++
+ ### New Features
+ 
+ -   Add `Card` and `CollapsibleCard` primitives ([#76252](https://github.com/WordPress/gutenberg/pull/76252)).
+diff --git a/packages/ui/src/visually-hidden/style.module.css b/packages/ui/src/visually-hidden/style.module.css
+index c0234f4ef411d2..bee6e1abeb9360 100644
+--- a/packages/ui/src/visually-hidden/style.module.css
++++ b/packages/ui/src/visually-hidden/style.module.css
+@@ -11,5 +11,6 @@
+ 		position: absolute;
+ 		width: 1px;
+ 		word-wrap: normal;
++		word-break: normal;
+ 	}
+ }

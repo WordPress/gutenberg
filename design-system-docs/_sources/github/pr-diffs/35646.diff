@@ -1,0 +1,419 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5a49f9e06b41a3..f7ff065954f5bd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,8 @@
+ ### Experimental
+ 
+ -   Reinstated the ability to pass additional props to the `ToolsPanel` ([36428](https://github.com/WordPress/gutenberg/pull/36428)).
++-   Added an `__unstable-large` size variant to `InputControl`, `SelectControl`, and `UnitControl` for selective migration to the larger 40px heights. ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
++-   Fixed inconsistent padding in `UnitControl` ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
+ 
+ ### Bug Fix
+ 
+@@ -29,7 +31,6 @@
+ -   Updated the `ToolsPanel` to use `Grid` internally to manage panel layout ([#35621](https://github.com/WordPress/gutenberg/pull/35621)).
+ -   Added experimental `__experimentalHasMultipleOrigins` prop to the `ColorPalette` and `GradientPicker` components ([#35970](https://github.com/WordPress/gutenberg/pull/35970)).
+ 
+-
+ ## 19.0.0 (2021-10-22)
+ 
+ ### New Features
+diff --git a/packages/components/src/angle-picker-control/index.js b/packages/components/src/angle-picker-control/index.js
+index 7d8aeb4b3e3821..ff0e60e37232be 100644
+--- a/packages/components/src/angle-picker-control/index.js
++++ b/packages/components/src/angle-picker-control/index.js
+@@ -42,12 +42,14 @@ export default function AnglePickerControl( {
+ 					max={ 360 }
+ 					min={ 0 }
+ 					onChange={ handleOnNumberChange }
++					size="__unstable-large"
+ 					step="1"
+ 					value={ value }
+ 					hideHTMLArrows
+ 					suffix={
+ 						<Spacer
+ 							as={ Text }
++							marginBottom={ 0 }
+ 							marginRight={ space( 3 ) }
+ 							style={ {
+ 								color: 'var( --wp-admin-theme-color )',
+diff --git a/packages/components/src/custom-gradient-picker/index.js b/packages/components/src/custom-gradient-picker/index.js
+index 251fc8ccec8166..4196578c6cb94d 100644
+--- a/packages/components/src/custom-gradient-picker/index.js
++++ b/packages/components/src/custom-gradient-picker/index.js
+@@ -98,6 +98,7 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
+ 			labelPosition="top"
+ 			onChange={ handleOnChange }
+ 			options={ GRADIENT_OPTIONS }
++			size="__unstable-large"
+ 			value={ hasGradient && type }
+ 		/>
+ 	);
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index 809a4f0ad29d73..4b4daff76ce309 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -111,10 +111,6 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ 
+ // All these styles should be made generic and changed on the inputs for all components.
+ .components-custom-gradient-picker {
+-	.components-select-control__input,
+-	.components-input-control__input {
+-		height: 40px !important;
+-	}
+ 	.components-input-control__label {
+ 		line-height: 1;
+ 		padding-bottom: $grid-unit-10 !important;
+diff --git a/packages/components/src/input-control/stories/index.js b/packages/components/src/input-control/stories/index.js
+index 2a0d088f700650..53743a59439426 100644
+--- a/packages/components/src/input-control/stories/index.js
++++ b/packages/components/src/input-control/stories/index.js
+@@ -44,6 +44,7 @@ function Example() {
+ 			{
+ 				default: 'default',
+ 				small: 'small',
++				'__unstable-large': '__unstable-large',
+ 			},
+ 			'default'
+ 		),
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index c6471fa96ead55..dac503b85fdc07 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -13,7 +13,7 @@ import type { WordPressComponentProps } from '../../ui/context';
+ import { Flex, FlexItem } from '../../flex';
+ import { Text } from '../../text';
+ import { COLORS, rtl } from '../../utils';
+-import type { LabelPosition } from '../types';
++import type { LabelPosition, Size } from '../types';
+ 
+ type ContainerProps = {
+ 	disabled?: boolean;
+@@ -105,8 +105,6 @@ export const Container = styled.div< ContainerProps >`
+ 	${ containerWidthStyles }
+ `;
+ 
+-type Size = 'default' | 'small';
+-
+ type InputProps = {
+ 	disabled?: boolean;
+ 	inputSize?: Size;
+@@ -126,6 +124,7 @@ const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
+ 	const sizes = {
+ 		default: '13px',
+ 		small: '11px',
++		'__unstable-large': '13px',
+ 	};
+ 
+ 	const fontSize = sizes[ size as Size ] || sizes.default;
+@@ -148,11 +147,22 @@ const sizeStyles = ( { inputSize: size }: InputProps ) => {
+ 			height: 30,
+ 			lineHeight: 1,
+ 			minHeight: 30,
++			paddingLeft: 8,
++			paddingRight: 8,
+ 		},
+ 		small: {
+ 			height: 24,
+ 			lineHeight: 1,
+ 			minHeight: 24,
++			paddingLeft: 8,
++			paddingRight: 8,
++		},
++		'__unstable-large': {
++			height: 40,
++			lineHeight: 1,
++			minHeight: 40,
++			paddingLeft: 16,
++			paddingRight: 16,
+ 		},
+ 	};
+ 
+@@ -205,8 +215,6 @@ export const Input = styled.input< InputProps >`
+ 		display: block;
+ 		margin: 0;
+ 		outline: none;
+-		padding-left: 8px;
+-		padding-right: 8px;
+ 		width: 100%;
+ 
+ 		${ dragStyles }
+@@ -315,6 +323,8 @@ export const Prefix = styled.span`
+ `;
+ 
+ export const Suffix = styled.span`
++	align-items: center;
++	align-self: stretch;
+ 	box-sizing: border-box;
+-	display: block;
++	display: flex;
+ `;
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index eebefd349c86b6..1e9477243474f9 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -23,12 +23,14 @@ export type DragDirection = 'n' | 's' | 'e' | 'w';
+ 
+ export type DragProps = Parameters< Parameters< typeof useDrag >[ 0 ] >[ 0 ];
+ 
++export type Size = 'default' | 'small' | '__unstable-large';
++
+ interface BaseProps {
+ 	__unstableInputWidth?: CSSProperties[ 'width' ];
+ 	hideLabelFromVision?: boolean;
+ 	isFocused: boolean;
+ 	labelPosition?: LabelPosition;
+-	size?: 'default' | 'small';
++	size?: Size;
+ }
+ 
+ export type InputChangeCallback<
+diff --git a/packages/components/src/select-control/stories/index.js b/packages/components/src/select-control/stories/index.js
+index bd3cca9e67320d..357c8c631d7d55 100644
+--- a/packages/components/src/select-control/stories/index.js
++++ b/packages/components/src/select-control/stories/index.js
+@@ -60,6 +60,7 @@ export const _default = () => {
+ 			{
+ 				default: 'default',
+ 				small: 'small',
++				'__unstable-large': '__unstable-large',
+ 			},
+ 			'default'
+ 		),
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index 63b242fd58cabb..c0646560984bd8 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -27,6 +27,7 @@ const fontSizeStyles = ( { selectSize }: SelectProps ) => {
+ 	const sizes = {
+ 		default: '13px',
+ 		small: '11px',
++		'__unstable-large': '13px',
+ 	};
+ 
+ 	const fontSize = sizes[ selectSize as Size ];
+@@ -55,6 +56,11 @@ const sizeStyles = ( { selectSize }: SelectProps ) => {
+ 			lineHeight: 1,
+ 			minHeight: 24,
+ 		},
++		'__unstable-large': {
++			height: 40,
++			lineHeight: 1,
++			minHeight: 40,
++		},
+ 	};
+ 
+ 	const style = sizes[ selectSize as Size ] || sizes.default;
+@@ -62,6 +68,24 @@ const sizeStyles = ( { selectSize }: SelectProps ) => {
+ 	return css( style );
+ };
+ 
++const sizePaddings = ( { selectSize = 'default' }: SelectProps ) => {
++	const sizes = {
++		default: {
++			paddingLeft: 8,
++			paddingRight: 24,
++		},
++		small: {
++			paddingLeft: 8,
++			paddingRight: 24,
++		},
++		'__unstable-large': {
++			paddingLeft: 16,
++			paddingRight: 32,
++		},
++	};
++	return rtl( sizes[ selectSize ] );
++};
++
+ // TODO: Resolve need to use &&& to increase specificity
+ // https://github.com/WordPress/gutenberg/issues/18483
+ 
+@@ -80,8 +104,7 @@ export const Select = styled.select< SelectProps >`
+ 		${ disabledStyles };
+ 		${ fontSizeStyles };
+ 		${ sizeStyles };
+-
+-		${ rtl( { paddingLeft: 8, paddingRight: 24 } ) }
++		${ sizePaddings };
+ 	}
+ `;
+ 
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+index e69c3c45a9eb2f..c4c38cdf428b4b 100644
+--- a/packages/components/src/select-control/types.ts
++++ b/packages/components/src/select-control/types.ts
+@@ -1 +1 @@
+-export type Size = 'default' | 'small';
++export type Size = 'default' | 'small' | '__unstable-large';
+diff --git a/packages/components/src/unit-control/stories/index.js b/packages/components/src/unit-control/stories/index.js
+index de4bdfc52a4fee..0109fa56451e55 100644
+--- a/packages/components/src/unit-control/stories/index.js
++++ b/packages/components/src/unit-control/stories/index.js
+@@ -45,6 +45,7 @@ function Example() {
+ 			{
+ 				default: 'default',
+ 				small: 'small',
++				'__unstable-large': '__unstable-large',
+ 			},
+ 			'default'
+ 		),
+@@ -67,6 +68,23 @@ export const _default = () => {
+ 	return <Example />;
+ };
+ 
++export const WithSingleUnit = ( props ) => {
++	const [ value, setValue ] = useState( '10px' );
++	return (
++		<ControlWrapperView>
++			<UnitControl
++				{ ...props }
++				value={ value }
++				onChange={ ( v ) => setValue( v ) }
++			/>
++		</ControlWrapperView>
++	);
++};
++WithSingleUnit.args = {
++	label: 'Value',
++	units: CSS_UNITS.slice( 0, 1 ),
++};
++
+ export function WithCustomUnits() {
+ 	const [ value, setValue ] = useState( '10km' );
+ 
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.ts b/packages/components/src/unit-control/styles/unit-control-styles.ts
+index 9d951f5481bbb3..7035df6f47d1b2 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.ts
++++ b/packages/components/src/unit-control/styles/unit-control-styles.ts
+@@ -18,6 +18,7 @@ type SelectProps = {
+ 
+ type InputProps = {
+ 	disableUnits?: boolean;
++	size: SelectSize;
+ };
+ 
+ export const Root = styled.div`
+@@ -25,11 +26,21 @@ export const Root = styled.div`
+ 	position: relative;
+ `;
+ 
+-const paddingStyles = ( { disableUnits }: InputProps ) => {
+-	const value = disableUnits ? 3 : 24;
++const paddingStyles = ( { disableUnits, size }: InputProps ) => {
++	const paddings = {
++		default: {
++			paddingRight: 8,
++		},
++		small: {
++			paddingRight: 8,
++		},
++		'__unstable-large': {
++			paddingRight: disableUnits ? 16 : 8,
++		},
++	};
+ 
+ 	return css`
+-		${ rtl( { paddingRight: value } )() };
++		${ rtl( paddings[ size ] )() };
+ 	`;
+ };
+ 
+@@ -62,49 +73,24 @@ export const ValueInput = styled( NumberControl )`
+ 	}
+ `;
+ 
+-const unitSizeStyles = ( { selectSize }: SelectProps ) => {
+-	const sizes = {
+-		default: {
+-			height: 28,
+-			lineHeight: '24px',
+-			minHeight: 28,
+-			top: 1,
+-		},
+-		small: {
+-			height: 22,
+-			lineHeight: '18px',
+-			minHeight: 22,
+-			top: 1,
+-		},
+-	};
+-
+-	return css( sizes[ selectSize ] );
+-};
+-
+-const baseUnitLabelStyles = ( props: SelectProps ) => {
+-	return css`
+-		appearance: none;
+-		background: transparent;
+-		border-radius: 2px;
+-		border: none;
+-		box-sizing: border-box;
+-		color: ${ COLORS.darkGray[ 500 ] };
+-		display: block;
+-		font-size: 8px;
+-		line-height: 1;
+-		letter-spacing: -0.5px;
+-		outline: none;
+-		padding: 2px 1px;
+-		position: absolute;
+-		text-align-last: center;
+-		text-transform: uppercase;
+-		width: 20px;
+-
+-		${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
+-		${ rtl( { right: 0 } )() }
+-		${ unitSizeStyles( props ) }
+-	`;
+-};
++const baseUnitLabelStyles = css`
++	appearance: none;
++	background: transparent;
++	border-radius: 2px;
++	border: none;
++	box-sizing: border-box;
++	color: ${ COLORS.darkGray[ 500 ] };
++	display: block;
++	font-size: 8px;
++	letter-spacing: -0.5px;
++	outline: none;
++	padding: 2px 1px;
++	text-align-last: center;
++	text-transform: uppercase;
++	width: 20px;
++
++	${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
++`;
+ 
+ export const UnitLabel = styled.div< SelectProps >`
+ 	&&& {
+@@ -119,6 +105,7 @@ export const UnitSelect = styled.select< SelectProps >`
+ 		${ baseUnitLabelStyles };
+ 		cursor: pointer;
+ 		border: 1px solid transparent;
++		height: 100%;
+ 
+ 		&:hover {
+ 			background-color: ${ COLORS.lightGray[ 300 ] };
+diff --git a/packages/components/src/unit-control/types.ts b/packages/components/src/unit-control/types.ts
+index dafce74b176b97..8e15ac6f85b84f 100644
+--- a/packages/components/src/unit-control/types.ts
++++ b/packages/components/src/unit-control/types.ts
+@@ -8,11 +8,14 @@ import type { SyntheticEvent } from 'react';
+  * Internal dependencies
+  */
+ import type { StateReducer } from '../input-control/reducer/state';
+-import type { InputChangeCallback } from '../input-control/types';
++import type {
++	InputChangeCallback,
++	Size as InputSize,
++} from '../input-control/types';
+ 
+ export type Value = number | string;
+ 
+-export type SelectSize = 'default' | 'small';
++export type SelectSize = InputSize;
+ 
+ export type WPUnitControlUnit = {
+ 	/**

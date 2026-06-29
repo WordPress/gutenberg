@@ -1,0 +1,14 @@
+diff --git a/packages/components/src/color-palette/index.native.js b/packages/components/src/color-palette/index.native.js
+index ca55e225d5e28b..10b0b0df94de61 100644
+--- a/packages/components/src/color-palette/index.native.js
++++ b/packages/components/src/color-palette/index.native.js
+@@ -92,6 +92,9 @@ function ColorPalette( {
+ 				scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
+ 			}
+ 		}
++		// Temporarily disabling exhuastive-deps until the component can be refactored and updated safely.
++		// Please see https://github.com/WordPress/gutenberg/pull/41253 for discussion and details.
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ currentSegment ] );
+ 
+ 	function isSelectedCustom() {

@@ -1,0 +1,166 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 48827c815c5854..f6accd4bd04426 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,10 @@
+ 
+ -   `Tabs`: Fallback to first enabled tab if no active tab id ([#60681](https://github.com/WordPress/gutenberg/pull/60681)).
+ 
++### Internal
++
++-   `CheckboxControl`: Streamline size styles ([#60475](https://github.com/WordPress/gutenberg/pull/60475)).
++
+ ## 27.3.0 (2024-04-03)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/checkbox-control/style.scss b/packages/components/src/checkbox-control/style.scss
+index 4121250a7308a2..1821d49b4fcf47 100644
+--- a/packages/components/src/checkbox-control/style.scss
++++ b/packages/components/src/checkbox-control/style.scss
+@@ -1,5 +1,11 @@
+-$checkbox-input-size: 20px;
+-$checkbox-input-size-sm: 24px; // Width & height for small viewports.
++.components-checkbox-control {
++	// Careful, these CSS vars have experimental overrides in Data Views (packages/dataviews/src/style.scss).
++	--checkbox-input-size: 24px; // Width & height for small viewports.
++
++	@include break-small() {
++		--checkbox-input-size: 20px;
++	}
++}
+ 
+ .components-checkbox-control__input[type="checkbox"] {
+ 	@include checkbox-control;
+@@ -14,13 +20,8 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
+ 	padding: 0 !important;
+ 	text-align: center;
+ 	vertical-align: top;
+-	width: $checkbox-input-size-sm;
+-	height: $checkbox-input-size-sm;
+-
+-	@include break-small() {
+-		height: $checkbox-input-size;
+-		width: $checkbox-input-size;
+-	}
++	width: var(--checkbox-input-size);
++	height: var(--checkbox-input-size);
+ 
+ 	appearance: none;
+ 	transition: 0.1s border-color ease-in-out;
+@@ -51,29 +52,26 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
+ 	display: inline-block;
+ 	margin-right: 12px;
+ 	vertical-align: middle;
+-	width: $checkbox-input-size-sm;
+-	height: $checkbox-input-size-sm;
+-
+-	@include break-small() {
+-		width: $checkbox-input-size;
+-		height: $checkbox-input-size;
+-	}
++	width: var(--checkbox-input-size);
++	aspect-ratio: 1;
+ }
+ 
+ svg.components-checkbox-control__checked,
+ svg.components-checkbox-control__indeterminate {
++	--checkmark-size: var(--checkbox-input-size);
++
+ 	fill: $white;
+ 	cursor: pointer;
+ 	position: absolute;
+-	left: 0;
+-	top: 0;
+-	width: $button-size-small;
+-	height: $button-size-small;
++	left: 50%;
++	top: 50%;
++	transform: translate(-50%, -50%);
++	width: var(--checkmark-size);
++	height: var(--checkmark-size);
++	user-select: none;
++	pointer-events: none;
+ 
+ 	@include break-small() {
+-		left: -2px;
+-		top: -2px;
++		--checkmark-size: calc(var(--checkbox-input-size) + 4px);
+ 	}
+-	user-select: none;
+-	pointer-events: none;
+ }
+diff --git a/packages/dataviews/src/style.scss b/packages/dataviews/src/style.scss
+index 1d6a6ec3b6c07b..681068dd5e9c64 100644
+--- a/packages/dataviews/src/style.scss
++++ b/packages/dataviews/src/style.scss
+@@ -92,10 +92,6 @@
+ 		&.dataviews-view-table__checkbox-column {
+ 			padding-right: 0;
+ 		}
+-
+-		.components-checkbox-control__input-container {
+-			margin: $grid-unit-05;
+-		}
+ 	}
+ 	tr {
+ 		border-bottom: 1px solid $gray-100;
+@@ -532,16 +528,25 @@
+ 	justify-content: center;
+ }
+ 
+-.dataviews-view-table-selection-checkbox label {
+-	position: absolute;
+-	width: 1px;
+-	height: 1px;
+-	padding: 0;
+-	margin: -1px;
+-	overflow: hidden;
+-	clip: rect(0, 0, 0, 0);
+-	white-space: nowrap;
+-	border: 0;
++.dataviews-view-table-selection-checkbox {
++	// Experimental override for CheckboxControl size (fragile)
++	--checkbox-input-size: 24px;
++	@include break-small() {
++		--checkbox-input-size: 16px;
++	}
++
++	line-height: 0;
++	label {
++		position: absolute;
++		width: 1px;
++		height: 1px;
++		padding: 0;
++		margin: -1px;
++		overflow: hidden;
++		clip: rect(0, 0, 0, 0);
++		white-space: nowrap;
++		border: 0;
++	}
+ }
+ 
+ .dataviews-filters__custom-menu-radio-item-prefix {
+diff --git a/packages/dataviews/src/view-table.js b/packages/dataviews/src/view-table.js
+index aa186bb8e85441..b217dfe7802bbc 100644
+--- a/packages/dataviews/src/view-table.js
++++ b/packages/dataviews/src/view-table.js
+@@ -298,8 +298,7 @@ function TableRow( {
+ 				<td
+ 					className="dataviews-view-table__checkbox-column"
+ 					style={ {
+-						width: 20,
+-						minWidth: 20,
++						width: '1%',
+ 					} }
+ 				>
+ 					<div className="dataviews-view-table__cell-content-wrapper">
+@@ -426,8 +425,7 @@ function ViewTable( {
+ 							<th
+ 								className="dataviews-view-table__checkbox-column"
+ 								style={ {
+-									width: 20,
+-									minWidth: 20,
++									width: '1%',
+ 								} }
+ 								data-field-id="selection"
+ 								scope="col"

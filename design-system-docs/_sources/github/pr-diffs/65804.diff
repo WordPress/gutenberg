@@ -1,0 +1,12 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2d859184ae381b..4289866ce8b46f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ ### Enhancements
+ 
++-   `Tabs`: handle horizontal overflow and large tab lists gracefully ([#64371](https://github.com/WordPress/gutenberg/pull/64371)).
+ -   `BorderControl`: promote to stable ([#65475](https://github.com/WordPress/gutenberg/pull/65475)).
+ -   `BorderBoxControl`: promote to stable ([#65586](https://github.com/WordPress/gutenberg/pull/65586)).
+ -   `MenuGroup`: Simplify the MenuGroup styles within dropdown menus. ([#65561](https://github.com/WordPress/gutenberg/pull/65561)).

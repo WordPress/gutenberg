@@ -1,0 +1,599 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8c676c3334465c..f3c851344b9769 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,11 +5,13 @@
+ ### Deprecations
+ 
+ -   Deprecate `replace` from the options accepted by `useNavigator().goTo()` ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
++-   Soft deprecate `size` prop on `AlignmentMatrixControl.Icon` ([#64827](https://github.com/WordPress/gutenberg/pull/64827)).
+ 
+ ### Enhancements
+ 
+ -   `ColorPicker`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+ -   `CustomSelectControl V2`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
++-   `AlignmentMatrixControl.Icon`: rewrite entirely using SVG markup ([#64827](https://github.com/WordPress/gutenberg/pull/64827)).
+ -   `DateTime`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+ -   `FormToggle`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+ -   `FormTokenField`: Remove unused border-radius ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+diff --git a/packages/components/src/alignment-matrix-control/cell.tsx b/packages/components/src/alignment-matrix-control/cell.tsx
+index 6e045c26694f4e..8a3d1735b5ecfa 100644
+--- a/packages/components/src/alignment-matrix-control/cell.tsx
++++ b/packages/components/src/alignment-matrix-control/cell.tsx
+@@ -9,23 +9,17 @@ import { VisuallyHidden } from '../visually-hidden';
+  * Internal dependencies
+  */
+ import { ALIGNMENT_LABEL } from './utils';
+-import {
+-	Cell as CellView,
+-	Point,
+-} from './styles/alignment-matrix-control-styles';
++import { Cell as CellView, Point } from './styles';
+ import type { AlignmentMatrixControlCellProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
+ export default function Cell( {
+ 	id,
+-	isActive = false,
+ 	value,
+ 	...props
+ }: WordPressComponentProps< AlignmentMatrixControlCellProps, 'span', false > ) {
+-	const tooltipText = ALIGNMENT_LABEL[ value ];
+-
+ 	return (
+-		<Tooltip text={ tooltipText }>
++		<Tooltip text={ ALIGNMENT_LABEL[ value ] }>
+ 			<Composite.Item
+ 				id={ id }
+ 				render={ <CellView { ...props } role="gridcell" /> }
+@@ -34,7 +28,7 @@ export default function Cell( {
+ 			otherwise it'll announce the content as "blank". So we use a visually
+ 			hidden element instead of aria-label. */ }
+ 				<VisuallyHidden>{ value }</VisuallyHidden>
+-				<Point isActive={ isActive } role="presentation" />
++				<Point role="presentation" />
+ 			</Composite.Item>
+ 		</Tooltip>
+ 	);
+diff --git a/packages/components/src/alignment-matrix-control/icon.tsx b/packages/components/src/alignment-matrix-control/icon.tsx
+index bacc9771cf3e44..24cf54c0214937 100644
+--- a/packages/components/src/alignment-matrix-control/icon.tsx
++++ b/packages/components/src/alignment-matrix-control/icon.tsx
+@@ -3,59 +3,77 @@
+  */
+ import clsx from 'clsx';
+ 
++/**
++ * WordPress dependencies
++ */
++import { Rect, SVG } from '@wordpress/primitives';
++
+ /**
+  * Internal dependencies
+  */
+ import { ALIGNMENTS, getAlignmentIndex } from './utils';
+-import {
+-	Root,
+-	Cell,
+-	Point,
+-} from './styles/alignment-matrix-control-icon-styles';
+ import type { AlignmentMatrixControlIconProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
+ const BASE_SIZE = 24;
++const GRID_CELL_SIZE = 7;
++const GRID_PADDING = ( BASE_SIZE - 3 * GRID_CELL_SIZE ) / 2;
++const DOT_SIZE = 2;
++const DOT_SIZE_SELECTED = 4;
+ 
+ function AlignmentMatrixControlIcon( {
+ 	className,
+ 	disablePointerEvents = true,
+-	size = BASE_SIZE,
++	size,
++	width,
++	height,
+ 	style = {},
+ 	value = 'center',
+ 	...props
+-}: WordPressComponentProps< AlignmentMatrixControlIconProps, 'div', false > ) {
+-	const alignIndex = getAlignmentIndex( value );
+-	const scale = ( size / BASE_SIZE ).toFixed( 2 );
+-
+-	const classes = clsx(
+-		'component-alignment-matrix-control-icon',
+-		className
+-	);
+-
+-	const styles = {
+-		...style,
+-		transform: `scale(${ scale })`,
+-	};
+-
++}: WordPressComponentProps< AlignmentMatrixControlIconProps, 'svg', false > ) {
+ 	return (
+-		<Root
+-			{ ...props }
+-			className={ classes }
+-			disablePointerEvents={ disablePointerEvents }
++		<SVG
++			xmlns="http://www.w3.org/2000/svg"
++			viewBox={ `0 0 ${ BASE_SIZE } ${ BASE_SIZE }` }
++			width={ size ?? width ?? BASE_SIZE }
++			height={ size ?? height ?? BASE_SIZE }
+ 			role="presentation"
+-			style={ styles }
++			className={ clsx(
++				'component-alignment-matrix-control-icon',
++				className
++			) }
++			style={ {
++				pointerEvents: disablePointerEvents ? 'none' : undefined,
++				...style,
++			} }
++			{ ...props }
+ 		>
+ 			{ ALIGNMENTS.map( ( align, index ) => {
+-				const isActive = alignIndex === index;
++				const dotSize =
++					getAlignmentIndex( value ) === index
++						? DOT_SIZE_SELECTED
++						: DOT_SIZE;
+ 
+ 				return (
+-					<Cell key={ align }>
+-						<Point isActive={ isActive } />
+-					</Cell>
++					<Rect
++						key={ align }
++						x={
++							GRID_PADDING +
++							( index % 3 ) * GRID_CELL_SIZE +
++							( GRID_CELL_SIZE - dotSize ) / 2
++						}
++						y={
++							GRID_PADDING +
++							Math.floor( index / 3 ) * GRID_CELL_SIZE +
++							( GRID_CELL_SIZE - dotSize ) / 2
++						}
++						width={ dotSize }
++						height={ dotSize }
++						fill="currentColor"
++					/>
+ 				);
+ 			} ) }
+-		</Root>
++		</SVG>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/alignment-matrix-control/index.tsx b/packages/components/src/alignment-matrix-control/index.tsx
+index 4f3e78ca921f01..a865cd4f57a98b 100644
+--- a/packages/components/src/alignment-matrix-control/index.tsx
++++ b/packages/components/src/alignment-matrix-control/index.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import clsx from 'clsx';
+-import { useStoreState } from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,7 +15,7 @@ import { useInstanceId } from '@wordpress/compose';
+ import Cell from './cell';
+ import { Composite } from '../composite';
+ import { useCompositeStore } from '../composite/store';
+-import { Root, Row } from './styles/alignment-matrix-control-styles';
++import { GridContainer, GridRow } from './styles';
+ import AlignmentMatrixControlIcon from './icon';
+ import { GRID, getItemId, getItemValue } from './utils';
+ import type { WordPressComponentProps } from '../context';
+@@ -70,15 +69,13 @@ export function AlignmentMatrixControl( {
+ 		rtl: isRTL(),
+ 	} );
+ 
+-	const activeId = useStoreState( compositeStore, 'activeId' );
+-
+ 	const classes = clsx( 'component-alignment-matrix-control', className );
+ 
+ 	return (
+ 		<Composite
+ 			store={ compositeStore }
+ 			render={
+-				<Root
++				<GridContainer
+ 					{ ...props }
+ 					aria-label={ label }
+ 					className={ classes }
+@@ -89,20 +86,14 @@ export function AlignmentMatrixControl( {
+ 			}
+ 		>
+ 			{ GRID.map( ( cells, index ) => (
+-				<Composite.Row render={ <Row role="row" /> } key={ index }>
+-					{ cells.map( ( cell ) => {
+-						const cellId = getItemId( baseId, cell );
+-						const isActive = cellId === activeId;
+-
+-						return (
+-							<Cell
+-								id={ cellId }
+-								isActive={ isActive }
+-								key={ cell }
+-								value={ cell }
+-							/>
+-						);
+-					} ) }
++				<Composite.Row render={ <GridRow role="row" /> } key={ index }>
++					{ cells.map( ( cell ) => (
++						<Cell
++							id={ getItemId( baseId, cell ) }
++							key={ cell }
++							value={ cell }
++						/>
++					) ) }
+ 				</Composite.Row>
+ 			) ) }
+ 		</Composite>
+diff --git a/packages/components/src/alignment-matrix-control/stories/index.story.tsx b/packages/components/src/alignment-matrix-control/stories/index.story.tsx
+index 03bec9d92a8b78..11de17153492d8 100644
+--- a/packages/components/src/alignment-matrix-control/stories/index.story.tsx
++++ b/packages/components/src/alignment-matrix-control/stories/index.story.tsx
+@@ -59,18 +59,9 @@ export const Default = Template.bind( {} );
+ export const IconSubcomponent = () => {
+ 	return (
+ 		<HStack justify="flex-start">
++			<Icon icon={ <AlignmentMatrixControl.Icon value="top left" /> } />
+ 			<Icon
+-				icon={
+-					<AlignmentMatrixControl.Icon size={ 24 } value="top left" />
+-				}
+-			/>
+-			<Icon
+-				icon={
+-					<AlignmentMatrixControl.Icon
+-						size={ 24 }
+-						value="center center"
+-					/>
+-				}
++				icon={ <AlignmentMatrixControl.Icon value="center center" /> }
+ 			/>
+ 		</HStack>
+ 	);
+diff --git a/packages/components/src/alignment-matrix-control/styles.ts b/packages/components/src/alignment-matrix-control/styles.ts
+new file mode 100644
+index 00000000000000..73a20c2a37564b
+--- /dev/null
++++ b/packages/components/src/alignment-matrix-control/styles.ts
+@@ -0,0 +1,113 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css } from '@emotion/react';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS, CONFIG } from '../utils';
++import type {
++	AlignmentMatrixControlProps,
++	AlignmentMatrixControlIconProps,
++} from './types';
++
++// Grid structure
++
++const rootBase = ( { size = 92 } ) => css`
++	direction: ltr;
++
++	display: grid;
++	grid-template-columns: repeat( 3, 1fr );
++	grid-template-rows: repeat( 3, 1fr );
++
++	box-sizing: border-box;
++	width: ${ size }px;
++	aspect-ratio: 1;
++
++	border-radius: ${ CONFIG.radiusMedium };
++	outline: none;
++`;
++
++export const GridContainer = styled.div< {
++	size?: AlignmentMatrixControlProps[ 'width' ];
++	disablePointerEvents?: AlignmentMatrixControlIconProps[ 'disablePointerEvents' ];
++} >`
++	${ rootBase }
++
++	border: 1px solid transparent;
++
++	${ ( props ) =>
++		props.disablePointerEvents
++			? css``
++			: css`
++					cursor: pointer;
++			  ` }
++`;
++
++export const GridRow = styled.div`
++	grid-column: 1 / -1;
++
++	box-sizing: border-box;
++	display: grid;
++	grid-template-columns: repeat( 3, 1fr );
++`;
++
++// Cell
++export const Cell = styled.span`
++	position: relative;
++
++	display: flex;
++	align-items: center;
++	justify-content: center;
++
++	box-sizing: border-box;
++	margin: 0;
++	padding: 0;
++
++	appearance: none;
++	border: none;
++	outline: none;
++`;
++
++const POINT_SIZE = 6;
++export const Point = styled.span`
++	display: block;
++	contain: strict;
++
++	box-sizing: border-box;
++	width: ${ POINT_SIZE }px;
++	aspect-ratio: 1;
++
++	margin: auto;
++
++	color: ${ COLORS.theme.gray[ 400 ] };
++
++	/* Use border instead of background color so that the point shows
++	in Windows High Contrast Mode */
++	border: ${ POINT_SIZE / 2 }px solid currentColor;
++
++	/* Highlight active item */
++	${ Cell }[data-active-item] & {
++		color: ${ COLORS.gray[ 900 ] };
++		transform: scale( calc( 5 / 3 ) );
++	}
++
++	/* Hover styles for non-active items */
++	${ Cell }:not([data-active-item]):hover & {
++		color: ${ COLORS.theme.accent };
++	}
++
++	/* Show an outline only when interacting with keyboard */
++	${ Cell }[data-focus-visible] & {
++		outline: 1px solid ${ COLORS.theme.accent };
++		outline-offset: 1px;
++	}
++
++	@media not ( prefers-reduced-motion ) {
++		transition-property: color, transform;
++		transition-duration: 120ms;
++		transition-timing-function: linear;
++	}
++`;
+diff --git a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.ts b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.ts
+deleted file mode 100644
+index a14894633e05d1..00000000000000
+--- a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.ts
++++ /dev/null
+@@ -1,77 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-import { css } from '@emotion/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import {
+-	rootBase,
+-	pointBase,
+-	Cell as CellBase,
+-} from './alignment-matrix-control-styles';
+-import type {
+-	AlignmentMatrixControlIconProps,
+-	AlignmentMatrixControlCellProps,
+-} from '../types';
+-
+-const rootSize = () => {
+-	const padding = 1.5;
+-	const size = 24;
+-
+-	return css( {
+-		gridTemplateRows: `repeat( 3, calc( ${ size - padding * 2 }px / 3))`,
+-		padding,
+-		maxHeight: size,
+-		maxWidth: size,
+-	} );
+-};
+-
+-const rootPointerEvents = ( {
+-	disablePointerEvents,
+-}: Pick< AlignmentMatrixControlIconProps, 'disablePointerEvents' > ) => {
+-	return css( {
+-		pointerEvents: disablePointerEvents ? 'none' : undefined,
+-	} );
+-};
+-
+-export const Wrapper = styled.div`
+-	box-sizing: border-box;
+-	padding: 2px;
+-`;
+-
+-export const Root = styled.div`
+-	transform-origin: top left;
+-	height: 100%;
+-	width: 100%;
+-
+-	${ rootBase };
+-	${ rootSize };
+-	${ rootPointerEvents };
+-`;
+-
+-const pointActive = ( {
+-	isActive,
+-}: Pick< AlignmentMatrixControlCellProps, 'isActive' > ) => {
+-	const boxShadow = isActive ? `0 0 0 1px currentColor` : null;
+-
+-	return css`
+-		box-shadow: ${ boxShadow };
+-		color: currentColor;
+-
+-		*:hover > & {
+-			color: currentColor;
+-		}
+-	`;
+-};
+-
+-export const Point = styled.span`
+-	height: 2px;
+-	width: 2px;
+-	${ pointBase };
+-	${ pointActive };
+-`;
+-
+-export const Cell = CellBase;
+diff --git a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.ts b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.ts
+deleted file mode 100644
+index efbd23ab2be0af..00000000000000
+--- a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.ts
++++ /dev/null
+@@ -1,102 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-import { css } from '@emotion/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { COLORS, CONFIG } from '../../utils';
+-import type {
+-	AlignmentMatrixControlProps,
+-	AlignmentMatrixControlCellProps,
+-} from '../types';
+-
+-export const rootBase = () => {
+-	return css`
+-		border-radius: ${ CONFIG.radiusMedium };
+-		box-sizing: border-box;
+-		direction: ltr;
+-		display: grid;
+-		grid-template-columns: repeat( 3, 1fr );
+-		outline: none;
+-	`;
+-};
+-
+-const rootSize = ( { size = 92 } ) => {
+-	return css`
+-		grid-template-rows: repeat( 3, calc( ${ size }px / 3 ) );
+-		width: ${ size }px;
+-	`;
+-};
+-
+-export const Root = styled.div< {
+-	size: AlignmentMatrixControlProps[ 'width' ];
+-} >`
+-	${ rootBase };
+-
+-	border: 1px solid transparent;
+-	cursor: pointer;
+-	grid-template-columns: auto;
+-
+-	${ rootSize };
+-`;
+-
+-export const Row = styled.div`
+-	box-sizing: border-box;
+-	display: grid;
+-	grid-template-columns: repeat( 3, 1fr );
+-`;
+-
+-const pointActive = ( {
+-	isActive,
+-}: Pick< AlignmentMatrixControlCellProps, 'isActive' > ) => {
+-	const boxShadow = isActive ? `0 0 0 2px ${ COLORS.gray[ 900 ] }` : null;
+-	const pointColor = isActive ? COLORS.gray[ 900 ] : COLORS.gray[ 400 ];
+-	const pointColorHover = isActive ? COLORS.gray[ 900 ] : COLORS.theme.accent;
+-
+-	return css`
+-		box-shadow: ${ boxShadow };
+-		color: ${ pointColor };
+-
+-		*:hover > & {
+-			color: ${ pointColorHover };
+-		}
+-	`;
+-};
+-
+-export const pointBase = (
+-	props: Pick< AlignmentMatrixControlCellProps, 'isActive' >
+-) => {
+-	return css`
+-		background: currentColor;
+-		box-sizing: border-box;
+-		display: grid;
+-		margin: auto;
+-		@media not ( prefers-reduced-motion ) {
+-			transition: all 120ms linear;
+-		}
+-
+-		${ pointActive( props ) }
+-	`;
+-};
+-
+-export const Point = styled.span`
+-	height: 6px;
+-	width: 6px;
+-	${ pointBase }
+-`;
+-
+-export const Cell = styled.span`
+-	appearance: none;
+-	border: none;
+-	box-sizing: border-box;
+-	margin: 0;
+-	display: flex;
+-	position: relative;
+-	outline: none;
+-	align-items: center;
+-	justify-content: center;
+-	padding: 0;
+-`;
+diff --git a/packages/components/src/alignment-matrix-control/types.ts b/packages/components/src/alignment-matrix-control/types.ts
+index 892781234e694c..0f97c2df3b02bb 100644
+--- a/packages/components/src/alignment-matrix-control/types.ts
++++ b/packages/components/src/alignment-matrix-control/types.ts
+@@ -44,11 +44,22 @@ export type AlignmentMatrixControlIconProps = Pick<
+ 	AlignmentMatrixControlProps,
+ 	'value'
+ > & {
++	/**
++	 * If `true`, disables pointer events on the icon.
++	 * @default true
++	 */
+ 	disablePointerEvents?: boolean;
++	/**
++	 * _Note: this prop is deprecated. Use the `size` prop on the parent `Icon`
++	 * component instead_
++	 *
++	 * The size of the icon.
++	 * @ignore
++	 * @default 24
++	 */
+ 	size?: number;
+ };
+ 
+ export type AlignmentMatrixControlCellProps = {
+-	isActive?: boolean;
+ 	value: NonNullable< AlignmentMatrixControlProps[ 'value' ] >;
+ };

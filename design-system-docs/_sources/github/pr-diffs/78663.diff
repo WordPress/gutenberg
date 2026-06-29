@@ -1,0 +1,63 @@
+diff --git a/package-lock.json b/package-lock.json
+index 57b8a3aa54b9e4..e23ff3822a4310 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -63940,7 +63940,6 @@
+ 			"dependencies": {
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/private-apis": "file:../private-apis",
+-				"@wordpress/style-runtime": "file:../style-runtime",
+ 				"colorjs.io": "^0.6.0",
+ 				"memize": "^2.1.0"
+ 			},
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index d4fbe60af40597..3cdb7f5f1b8835 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ ### Internal
+ 
+ -   Refactor color space registration to avoid module-level side effects ([#77653](https://github.com/WordPress/gutenberg/pull/77653)).
++-   Remove unused `@wordpress/style-runtime` dependency.
+ 
+ ## 0.13.0 (2026-05-14)
+ 
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index f2c10a6c98c246..6dd3c46014fc1a 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -82,7 +82,6 @@
+ 	"dependencies": {
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/private-apis": "file:../private-apis",
+-		"@wordpress/style-runtime": "file:../style-runtime",
+ 		"colorjs.io": "^0.6.0",
+ 		"memize": "^2.1.0"
+ 	},
+diff --git a/packages/theme/tsconfig.json b/packages/theme/tsconfig.json
+index b88eeb2f72c79f..fd9097cc282475 100644
+--- a/packages/theme/tsconfig.json
++++ b/packages/theme/tsconfig.json
+@@ -5,7 +5,6 @@
+ 	},
+ 	"files": [],
+ 	"references": [
+-		{ "path": "../style-runtime" },
+ 		{ "path": "./tsconfig.src.json" },
+ 		{ "path": "./tsconfig.bin.json" }
+ 	]
+diff --git a/packages/theme/tsconfig.src.json b/packages/theme/tsconfig.src.json
+index 3924b135a97250..5d5953b0e5a972 100644
+--- a/packages/theme/tsconfig.src.json
++++ b/packages/theme/tsconfig.src.json
+@@ -7,9 +7,5 @@
+ 	},
+ 	"exclude": [],
+ 	"files": [ "global.d.ts" ],
+-	"references": [
+-		{ "path": "../element" },
+-		{ "path": "../private-apis" },
+-		{ "path": "../style-runtime" }
+-	]
++	"references": [ { "path": "../element" }, { "path": "../private-apis" } ]
+ }

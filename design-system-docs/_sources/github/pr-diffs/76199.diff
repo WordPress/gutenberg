@@ -1,0 +1,110 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1a0411475357f4..b69a6673fec544 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   Revert `word-break: break-word` addition ([#76230](https://github.com/WordPress/gutenberg/pull/76230)).
+ 
++### Enhancements
++
++-   `DateCalendar`, `DateRangeCalendar`: Add `showOutsideDays` and `fixedWeeks` props and style outside-month days ([#76199](https://github.com/WordPress/gutenberg/pull/76199)).
++
+ ## 32.3.0 (2026-03-04)
+ 
+ ### Code Quality
+diff --git a/packages/components/src/calendar/stories/date-calendar.story.tsx b/packages/components/src/calendar/stories/date-calendar.story.tsx
+index a8a8fedbdcb358..74890108b0e3ec 100644
+--- a/packages/components/src/calendar/stories/date-calendar.story.tsx
++++ b/packages/components/src/calendar/stories/date-calendar.story.tsx
+@@ -159,6 +159,17 @@ export const WithSelectedDateAndMonth: Story = {
+ 	},
+ };
+ 
++/**
++ * Shows days from adjacent months in the grid. Outside days use a lighter style
++ * and are still interactive. Use `fixedWeeks` to keep the grid height constant.
++ */
++export const WithOutsideDays: Story = {
++	args: {
++		showOutsideDays: true,
++		fixedWeeks: true,
++	},
++};
++
+ /**
+  * When working with time zones, use the `TZDate` object exported by this package instead of the native `Date` object.
+  */
+diff --git a/packages/components/src/calendar/stories/date-range-calendar.story.tsx b/packages/components/src/calendar/stories/date-range-calendar.story.tsx
+index 80461711aecd66..e9bae8d5548326 100644
+--- a/packages/components/src/calendar/stories/date-range-calendar.story.tsx
++++ b/packages/components/src/calendar/stories/date-range-calendar.story.tsx
+@@ -162,6 +162,17 @@ export const WithSelectedRangeAndMonth: Story = {
+ 	},
+ };
+ 
++/**
++ * Shows days from adjacent months in the grid. Outside days use a lighter style
++ * and are still interactive. Use `fixedWeeks` to keep the grid height constant.
++ */
++export const WithOutsideDays: Story = {
++	args: {
++		showOutsideDays: true,
++		fixedWeeks: true,
++	},
++};
++
+ /**
+  * When working with time zones, use the `TZDate` object exported by this package instead of the native `Date` object.
+  */
+diff --git a/packages/components/src/calendar/style.scss b/packages/components/src/calendar/style.scss
+index 8daff854981b04..e4d46a4494dcdf 100644
+--- a/packages/components/src/calendar/style.scss
++++ b/packages/components/src/calendar/style.scss
+@@ -253,6 +253,11 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
+ 	}
+ }
+ 
++// Outside month days (visible when showOutsideDays is true): use a lighter text color.
++.components-calendar__day--outside {
++	color: $components-color-gray-600;
++}
++
+ // Hidden button (ie. outside current month but still rendered)
+ .components-calendar__day--hidden {
+ 	visibility: hidden;
+diff --git a/packages/components/src/calendar/types.ts b/packages/components/src/calendar/types.ts
+index d347b12800534c..36934922e90a40 100644
+--- a/packages/components/src/calendar/types.ts
++++ b/packages/components/src/calendar/types.ts
+@@ -187,6 +187,18 @@ export interface BaseProps
+ 	 * @default 1
+ 	 */
+ 	numberOfMonths?: number;
++	/**
++	 * When `true`, days from adjacent months are shown in the grid and receive
++	 * the `outside` modifier and the class.
++	 * @default false
++	 */
++	showOutsideDays?: boolean;
++	/**
++	 * When `true`, the calendar always shows a fixed number of weeks (e.g. 6)
++	 * so the grid height does not change between months.
++	 * @default false
++	 */
++	fixedWeeks?: boolean;
+ 	/**
+ 	 * The earliest month to start the month navigation.
+ 	 */
+diff --git a/packages/components/src/calendar/utils/constants.ts b/packages/components/src/calendar/utils/constants.ts
+index 10ab9149f6d632..9e32797cdf9969 100644
+--- a/packages/components/src/calendar/utils/constants.ts
++++ b/packages/components/src/calendar/utils/constants.ts
+@@ -7,6 +7,7 @@ const CLASSNAMES = {
+ 	root: 'components-calendar',
+ 	day: 'components-calendar__day',
+ 	day_button: 'components-calendar__day-button',
++	outside: 'components-calendar__day--outside',
+ 	caption_label: 'components-calendar__caption-label',
+ 	button_next: 'components-calendar__button-next',
+ 	button_previous: 'components-calendar__button-previous',

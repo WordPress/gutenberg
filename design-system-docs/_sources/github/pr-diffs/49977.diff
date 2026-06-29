@@ -1,0 +1,41 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d9751644b0a387..d267999e06af63 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,10 @@
+ -   `SlotFill`: Added util for creating private SlotFills and supporting Symbol keys ([#49819](https://github.com/WordPress/gutenberg/pull/49819)).
+ -   `IconType`: Export for external use ([#49649](https://github.com/WordPress/gutenberg/pull/49649)).
+ 
++### Bug Fix
++
++-   `CheckboxControl`: Add support custom IDs ([#49977](https://github.com/WordPress/gutenberg/pull/49977)).
++
+ ### Documentation
+ 
+ -   `Autocomplete`: Add heading and fix type for `onReplace` in README. ([#49798](https://github.com/WordPress/gutenberg/pull/49798)).
+diff --git a/packages/components/src/checkbox-control/index.tsx b/packages/components/src/checkbox-control/index.tsx
+index 0b6bd68d7ad88e..1b7cae04cd81f6 100644
+--- a/packages/components/src/checkbox-control/index.tsx
++++ b/packages/components/src/checkbox-control/index.tsx
+@@ -50,6 +50,7 @@ export function CheckboxControl(
+ 		checked,
+ 		indeterminate,
+ 		help,
++		id: idProp,
+ 		onChange,
+ 		...additionalProps
+ 	} = props;
+@@ -81,8 +82,11 @@ export function CheckboxControl(
+ 		},
+ 		[ checked, indeterminate ]
+ 	);
+-	const instanceId = useInstanceId( CheckboxControl );
+-	const id = `inspector-checkbox-control-${ instanceId }`;
++	const id = useInstanceId(
++		CheckboxControl,
++		'inspector-checkbox-control',
++		idProp
++	);
+ 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
+ 		onChange( event.target.checked );
+ 

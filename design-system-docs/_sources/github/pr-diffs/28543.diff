@@ -1,0 +1,705 @@
+diff --git a/packages/block-editor/src/components/block-settings/container.native.js b/packages/block-editor/src/components/block-settings/container.native.js
+index 4ceb4fab58778c..de2cc7f4edbac6 100644
+--- a/packages/block-editor/src/components/block-settings/container.native.js
++++ b/packages/block-editor/src/components/block-settings/container.native.js
+@@ -44,6 +44,12 @@ function BottomSheetSettings( {
+ 				>
+ 					<InspectorControls.Slot />
+ 				</BottomSheet.NavigationScreen>
++				<BottomSheet.NavigationScreen
++					name={ BottomSheet.SubSheet.screenName }
++				>
++					<BottomSheet.SubSheet.Slot />
++				</BottomSheet.NavigationScreen>
++
+ 				<BottomSheet.NavigationScreen
+ 					name={ blockSettingsScreens.color }
+ 				>
+diff --git a/packages/block-library/src/button/edit.native.js b/packages/block-library/src/button/edit.native.js
+index 877809af599efd..2a11a1948f9973 100644
+--- a/packages/block-library/src/button/edit.native.js
++++ b/packages/block-library/src/button/edit.native.js
+@@ -21,6 +21,7 @@ import {
+ 	ToolbarGroup,
+ 	ToolbarButton,
+ 	LinkSettingsNavigation,
++	BottomSheetSelectControl,
+ } from '@wordpress/components';
+ import { Component } from '@wordpress/element';
+ import { withSelect, withDispatch } from '@wordpress/data';
+@@ -39,6 +40,48 @@ const MIN_BORDER_RADIUS_VALUE = 0;
+ const MAX_BORDER_RADIUS_VALUE = 50;
+ const INITIAL_MAX_WIDTH = 108;
+ const MIN_WIDTH = 40;
++// Map of the percentage width to pixel subtraction that make the buttons fit nicely into columns.
++const MIN_WIDTH_MARGINS = {
++	100: 0,
++	75: styles.button75?.marginLeft,
++	50: styles.button50?.marginLeft,
++	25: styles.button25?.marginLeft,
++};
++
++function WidthPanel( { selectedWidth, setAttributes } ) {
++	function handleChange( newWidth ) {
++		// Check if we are toggling the width off
++		let width = selectedWidth === newWidth ? undefined : newWidth;
++		if ( newWidth === 'auto' ) {
++			width = undefined;
++		}
++		// Update attributes
++		setAttributes( { width } );
++	}
++
++	const options = [
++		{ value: 'auto', label: __( 'Auto' ) },
++		{ value: 25, label: '25%' },
++		{ value: 50, label: '50%' },
++		{ value: 75, label: '75%' },
++		{ value: 100, label: '100%' },
++	];
++
++	if ( ! selectedWidth ) {
++		selectedWidth = 'auto';
++	}
++
++	return (
++		<PanelBody title={ __( 'Width Settings' ) }>
++			<BottomSheetSelectControl
++				label={ __( 'Button width' ) }
++				value={ selectedWidth }
++				onChange={ handleChange }
++				options={ options }
++			/>
++		</PanelBody>
++	);
++}
+ 
+ class ButtonEdit extends Component {
+ 	constructor( props ) {
+@@ -52,6 +95,7 @@ class ButtonEdit extends Component {
+ 		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
+ 		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
+ 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
++		this.onPlaceholderTextWidth = this.onPlaceholderTextWidth.bind( this );
+ 		this.setRef = this.setRef.bind( this );
+ 		this.onRemove = this.onRemove.bind( this );
+ 		this.getPlaceholderWidth = this.getPlaceholderWidth.bind( this );
+@@ -108,7 +152,7 @@ class ButtonEdit extends Component {
+ 		}
+ 
+ 		if ( prevProps.parentWidth !== parentWidth ) {
+-			this.onSetMaxWidth();
++			this.onSetMaxWidth( null, true );
+ 		}
+ 
+ 		// Blur `RichText` on Android when link settings sheet or button settings sheet is opened,
+@@ -211,20 +255,19 @@ class ButtonEdit extends Component {
+ 		this.onSetMaxWidth( width );
+ 	}
+ 
+-	onSetMaxWidth( width ) {
++	onSetMaxWidth( width, isParentWidthDidChange = false ) {
+ 		const { maxWidth } = this.state;
+ 		const { parentWidth } = this.props;
+ 		const { marginRight: spacing } = styles.defaultButton;
+ 
+-		const isParentWidthChanged = maxWidth !== parentWidth;
++		const isParentWidthChanged = isParentWidthDidChange
++			? isParentWidthDidChange
++			: maxWidth !== parentWidth;
+ 		const isWidthChanged = maxWidth !== width;
+ 
+ 		if ( parentWidth && ! width && isParentWidthChanged ) {
+ 			this.setState( {
+-				maxWidth: Math.min(
+-					parentWidth,
+-					this.props.maxWidth - 2 * spacing
+-				),
++				maxWidth: parentWidth - spacing,
+ 			} );
+ 		} else if ( ! parentWidth && width && isWidthChanged ) {
+ 			this.setState( { maxWidth: width - spacing } );
+@@ -277,28 +320,28 @@ class ButtonEdit extends Component {
+ 	// Render `Text` with `placeholderText` styled as a placeholder
+ 	// to calculate its width which then is set as a `minWidth`
+ 	getPlaceholderWidth( placeholderText ) {
+-		const { maxWidth, placeholderTextWidth } = this.state;
+ 		return (
+ 			<Text
+ 				style={ styles.placeholder }
+-				onTextLayout={ ( { nativeEvent } ) => {
+-					const textWidth =
+-						nativeEvent.lines[ 0 ] && nativeEvent.lines[ 0 ].width;
+-					if ( textWidth && textWidth !== placeholderTextWidth ) {
+-						this.setState( {
+-							placeholderTextWidth: Math.min(
+-								textWidth,
+-								maxWidth
+-							),
+-						} );
+-					}
+-				} }
++				onTextLayout={ this.onPlaceholderTextWidth }
+ 			>
+ 				{ placeholderText }
+ 			</Text>
+ 		);
+ 	}
+ 
++	onPlaceholderTextWidth( { nativeEvent } ) {
++		const { maxWidth, placeholderTextWidth } = this.state;
++		const textWidth =
++			nativeEvent.lines[ 0 ] && nativeEvent.lines[ 0 ].width;
++
++		if ( textWidth && textWidth !== placeholderTextWidth ) {
++			this.setState( {
++				placeholderTextWidth: Math.min( textWidth, maxWidth ),
++			} );
++		}
++	}
++
+ 	render() {
+ 		const {
+ 			attributes,
+@@ -307,6 +350,7 @@ class ButtonEdit extends Component {
+ 			onReplace,
+ 			mergeBlocks,
+ 			parentWidth,
++			setAttributes,
+ 		} = this.props;
+ 		const {
+ 			placeholder,
+@@ -314,6 +358,7 @@ class ButtonEdit extends Component {
+ 			borderRadius,
+ 			url,
+ 			align = 'center',
++			width,
+ 		} = attributes;
+ 		const { maxWidth, isButtonFocused, placeholderTextWidth } = this.state;
+ 		const { paddingTop: spacing, borderWidth } = styles.defaultButton;
+@@ -333,10 +378,16 @@ class ButtonEdit extends Component {
+ 		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
+ 		// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
+ 		// different than empty string.
+-		const minWidth =
++		let minWidth =
+ 			isButtonFocused || ( ! isButtonFocused && text && text !== '' )
+ 				? MIN_WIDTH
+ 				: placeholderTextWidth;
++		if ( width ) {
++			// Set the width of the button.
++			minWidth = Math.floor(
++				maxWidth * ( width / 100 ) - MIN_WIDTH_MARGINS[ width ]
++			);
++		}
+ 		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
+ 		// a `placeholder` as an empty string when `RichText` is focused,
+ 		// because `AztecView` is calculating a `minWidth` based on placeholder text.
+@@ -383,8 +434,8 @@ class ButtonEdit extends Component {
+ 						}
+ 						identifier="text"
+ 						tagName="p"
+-						minWidth={ minWidth }
+-						maxWidth={ maxWidth }
++						minWidth={ minWidth } // The minimum Button size.
++						maxWidth={ maxWidth } // The width of the screen.
+ 						id={ clientId }
+ 						isSelected={ isButtonFocused }
+ 						withoutInteractiveFormatting
+@@ -426,6 +477,10 @@ class ButtonEdit extends Component {
+ 									onChange={ this.onChangeBorderRadius }
+ 								/>
+ 							</PanelBody>
++							<WidthPanel
++								selectedWidth={ width }
++								setAttributes={ setAttributes }
++							/>
+ 							<PanelBody title={ __( 'Link Settings' ) }>
+ 								{ this.getLinkSettings( true ) }
+ 							</PanelBody>
+@@ -443,18 +498,15 @@ export default compose( [
+ 	withColors( 'backgroundColor', { textColor: 'color' } ),
+ 	withSelect( ( select, { clientId, isSelected } ) => {
+ 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
+-		const { getBlockCount, getBlockRootClientId, getSettings } = select(
++		const { getBlockCount, getBlockRootClientId } = select(
+ 			blockEditorStore
+ 		);
+-		const { maxWidth } = getSettings();
+-
+ 		const parentId = getBlockRootClientId( clientId );
+ 		const numOfButtons = getBlockCount( parentId );
+ 
+ 		return {
+ 			editorSidebarOpened: isSelected && isEditorSidebarOpened(),
+ 			numOfButtons,
+-			maxWidth,
+ 		};
+ 	} ),
+ 	withDispatch( ( dispatch ) => {
+diff --git a/packages/block-library/src/button/editor.native.scss b/packages/block-library/src/button/editor.native.scss
+index 31ce81004e09aa..64d3a129e194fe 100644
+--- a/packages/block-library/src/button/editor.native.scss
++++ b/packages/block-library/src/button/editor.native.scss
+@@ -56,3 +56,15 @@ $block-spacing: 4px;
+ 	padding-left: 0;
+ 	padding-right: 0;
+ }
++
++.button75 {
++	margin: $solid-border-space - $block-selected-border-width;
++}
++
++.button50 {
++	margin: $solid-border-space * 2 - $block-selected-border-width * 2;
++}
++
++.button25 {
++	margin: $block-edge-to-content * 2 + $block-selected-border-width;
++}
+diff --git a/packages/block-library/src/buttons/edit.native.js b/packages/block-library/src/buttons/edit.native.js
+index 7589e3b6627c5d..484ea35ae150da 100644
+--- a/packages/block-library/src/buttons/edit.native.js
++++ b/packages/block-library/src/buttons/edit.native.js
+@@ -73,15 +73,12 @@ export default function ButtonsEdit( {
+ 	);
+ 
+ 	useEffect( () => {
+-		const margins = 2 * styles.parent.marginRight;
+ 		const { width } = sizes || {};
+ 		const { isFullWidth } = alignmentHelpers;
+ 
+ 		if ( width ) {
+-			const base = width - margins;
+ 			const isFullWidthBlock = isFullWidth( align );
+-
+-			setMaxWidth( isFullWidthBlock ? base - 2 * spacing : base );
++			setMaxWidth( isFullWidthBlock ? blockWidth : width );
+ 		}
+ 	}, [ sizes, align ] );
+ 
+@@ -149,7 +146,7 @@ export default function ButtonsEdit( {
+ 				horizontalAlignment={ contentJustification }
+ 				onDeleteBlock={ shouldDelete ? remove : undefined }
+ 				onAddBlock={ onAddNextButton }
+-				parentWidth={ maxWidth }
++				parentWidth={ maxWidth } // This value controls the width of that the buttons are able to expand to.
+ 				marginHorizontal={ spacing }
+ 				marginVertical={ spacing }
+ 				__experimentalLayout={ layoutProp }
+diff --git a/packages/components/src/index.native.js b/packages/components/src/index.native.js
+index 45c47fbb6764c5..6f9b4c2915e8f1 100644
+--- a/packages/components/src/index.native.js
++++ b/packages/components/src/index.native.js
+@@ -66,6 +66,7 @@ export {
+ 	BottomSheetProvider,
+ 	BottomSheetContext,
+ } from './mobile/bottom-sheet/bottom-sheet-context';
++export { default as BottomSheetSelectControl } from './mobile/bottom-sheet-select-control';
+ export { default as HTMLTextInput } from './mobile/html-text-input';
+ export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';
+ export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
+diff --git a/packages/components/src/mobile/bottom-sheet-select-control/README.md b/packages/components/src/mobile/bottom-sheet-select-control/README.md
+new file mode 100644
+index 00000000000000..4fc8a0be79b097
+--- /dev/null
++++ b/packages/components/src/mobile/bottom-sheet-select-control/README.md
+@@ -0,0 +1,90 @@
++# BottomSheetSelectControl
++
++`BottomSheetSelectControl` allows users to select an item from a single-option menu just like [`SelectControl`](/packages/components/src/select-control/readme.md), 
++However, instead of opening up the selection in a modal, the selection opens up in a BottomSheet.
++
++### Usage
++
++```jsx
++/**
++ * WordPress dependencies
++ */
++import { BottomSheetSelectControl } from '@wordpress/components';
++import { useState } from '@wordpress/compose';
++
++const options = [
++	{
++		key: 'small',
++		name: 'Small',
++		style: { fontSize: '50%' },
++	},
++	{
++		key: 'normal',
++		name: 'Normal',
++		style: { fontSize: '100%' },
++	},
++	{
++		key: 'large',
++		name: 'Large',
++		style: { fontSize: '200%' },
++	},
++	{
++		key: 'huge',
++		name: 'Huge',
++		style: { fontSize: '300%' },
++	},
++];
++
++function MyCustomSelectControl() {
++	const [ fontSize, setFontSize ] = useState();
++	return (
++		<BottomSheetSelectControl
++			label="Font Size"
++			options={ options }
++			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
++		/>
++	);
++}
++
++function MyControlledCustomSelectControl() {
++	const [ fontSize, setFontSize ] = useState( options[ 0 ] );
++	return (
++		<BottomSheetSelectControl
++			label="Font Size"
++			options={ options }
++			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
++			value={ options.find( ( option ) => option.key === fontSize.key ) }
++		/>
++	);
++}
++```
++
++### Props
++
++#### label
++
++The label for the control.
++
++-   Type: `String`
++-   Required: Yes
++
++#### options
++
++The options that can be chosen from.
++
++-   Type: `Array<{ key: String, name: String, ...rest }>`
++-   Required: Yes
++
++#### onChange
++
++Function called with the control's internal state changes. The `selectedItem` property contains the next selected item.
++
++-   Type: `Function`
++-   Required: No
++
++#### value
++
++Can be used to externally control the value of the control, like in the `MyControlledCustomSelectControl` example above.
++
++-   Type: `Object`
++-   Required: No
+diff --git a/packages/components/src/mobile/bottom-sheet-select-control/index.native.js b/packages/components/src/mobile/bottom-sheet-select-control/index.native.js
+new file mode 100644
+index 00000000000000..3df7f185c77103
+--- /dev/null
++++ b/packages/components/src/mobile/bottom-sheet-select-control/index.native.js
+@@ -0,0 +1,107 @@
++/**
++ * External dependencies
++ */
++import { View } from 'react-native';
++
++/**
++ * WordPress dependencies
++ */
++import { useNavigation } from '@react-navigation/native';
++import { useState } from '@wordpress/element';
++import { Icon, chevronRight, check } from '@wordpress/icons';
++import { __, sprintf } from '@wordpress/i18n';
++import { BottomSheet } from '@wordpress/components';
++/**
++ * Internal dependencies
++ */
++import styles from './style.scss';
++
++const BottomSheetSelectControl = ( {
++	label,
++	options: items,
++	onChange,
++	value: selectedValue,
++} ) => {
++	const [ showSubSheet, setShowSubSheet ] = useState( false );
++	const navigation = useNavigation();
++
++	const onChangeValue = ( value ) => {
++		return () => {
++			goBack();
++			onChange( value );
++		};
++	};
++
++	const selectedOption = items.find(
++		( option ) => option.value === selectedValue
++	);
++
++	const goBack = () => {
++		setShowSubSheet( false );
++		navigation.goBack();
++	};
++
++	const openSubSheet = () => {
++		navigation.navigate( BottomSheet.SubSheet.screenName );
++		setShowSubSheet( true );
++	};
++
++	return (
++		<BottomSheet.SubSheet
++			navigationButton={
++				<BottomSheet.Cell
++					label={ label }
++					separatorType="none"
++					value={ selectedOption.label }
++					onPress={ openSubSheet }
++					accessibilityRole={ 'button' }
++					accessibilityLabel={ selectedOption.label }
++					accessibilityHint={ sprintf(
++						// translators: %s: Select control button label e.g. "Button width"
++						__( 'Navigates to select %s' ),
++						selectedOption.label
++					) }
++				>
++					<Icon icon={ chevronRight }></Icon>
++				</BottomSheet.Cell>
++			}
++			showSheet={ showSubSheet }
++		>
++			<>
++				<BottomSheet.NavigationHeader
++					screen={ label }
++					leftButtonOnPress={ goBack }
++				/>
++				<View style={ styles.selectControl }>
++					{ items.map( ( item, index ) => (
++						<BottomSheet.Cell
++							customActionButton
++							separatorType="none"
++							label={ item.label }
++							onPress={ onChangeValue( item.value ) }
++							leftAlign={ true }
++							key={ index }
++							accessibilityRole={ 'button' }
++							accessibilityLabel={
++								item.value === selectedValue
++									? sprintf(
++											// translators: %s: Select control option value e.g: "Auto, 25%".
++											__( 'Selected: %s' ),
++											item.label
++									  )
++									: item.label
++							}
++							accessibilityHint={ __( 'Double tap to select' ) }
++						>
++							{ item.value === selectedValue && (
++								<Icon icon={ check }></Icon>
++							) }
++						</BottomSheet.Cell>
++					) ) }
++				</View>
++			</>
++		</BottomSheet.SubSheet>
++	);
++};
++
++export default BottomSheetSelectControl;
+diff --git a/packages/components/src/mobile/bottom-sheet-select-control/style.native.scss b/packages/components/src/mobile/bottom-sheet-select-control/style.native.scss
+new file mode 100644
+index 00000000000000..c6f9b0d71e16f2
+--- /dev/null
++++ b/packages/components/src/mobile/bottom-sheet-select-control/style.native.scss
+@@ -0,0 +1,3 @@
++.selectControl {
++	padding: 0 $block-edge-to-content;
++}
+diff --git a/packages/components/src/mobile/bottom-sheet/index.native.js b/packages/components/src/mobile/bottom-sheet/index.native.js
+index 63b7ea41f1436a..aa58172dfa84d7 100644
+--- a/packages/components/src/mobile/bottom-sheet/index.native.js
++++ b/packages/components/src/mobile/bottom-sheet/index.native.js
+@@ -39,6 +39,8 @@ import RadioCell from './radio-cell';
+ import NavigationScreen from './bottom-sheet-navigation/navigation-screen';
+ import NavigationContainer from './bottom-sheet-navigation/navigation-container';
+ import KeyboardAvoidingView from './keyboard-avoiding-view';
++import BottomSheetSubSheet from './sub-sheet';
++import NavigationHeader from './navigation-header';
+ import { BottomSheetProvider } from './bottom-sheet-context';
+ 
+ class BottomSheet extends Component {
+@@ -486,6 +488,8 @@ const ThemedBottomSheet = withPreferredColorScheme( BottomSheet );
+ ThemedBottomSheet.getWidth = getWidth;
+ ThemedBottomSheet.Button = Button;
+ ThemedBottomSheet.Cell = Cell;
++ThemedBottomSheet.SubSheet = BottomSheetSubSheet;
++ThemedBottomSheet.NavigationHeader = NavigationHeader;
+ ThemedBottomSheet.CyclePickerCell = CyclePickerCell;
+ ThemedBottomSheet.PickerCell = PickerCell;
+ ThemedBottomSheet.SwitchCell = SwitchCell;
+diff --git a/packages/components/src/mobile/bottom-sheet/sub-sheet/README.md b/packages/components/src/mobile/bottom-sheet/sub-sheet/README.md
+new file mode 100644
+index 00000000000000..15403280aca93d
+--- /dev/null
++++ b/packages/components/src/mobile/bottom-sheet/sub-sheet/README.md
+@@ -0,0 +1,91 @@
++# BottomSheetSubSheet
++
++BottomSheetSubSheet allows for adding controls inside the React Native bottom sheet settings. 
++
++### Usage
++
++```jsx
++/**
++ * External dependencies
++ */
++import { SafeAreaView, View } from 'react-native';
++import { useNavigation } from '@react-navigation/native';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++import { Icon, chevronRight } from '@wordpress/icons';
++import { BottomSheet } from '@wordpress/components';
++
++const ExampleControl = () => {
++	const [ showSubSheet, setShowSubSheet ] = useState( false );
++	const navigation = useNavigation();
++
++	const goBack = () => {
++		setShowSubSheet( false );
++		navigation.goBack();
++	};
++
++	const openSubSheet = () => {
++		navigation.navigate( BottomSheet.SubSheet.screenName );
++		setShowSubSheet( true );
++	};
++
++	return (
++		<BottomSheet.SubSheet
++			navigationButton={
++				<BottomSheet.Cell
++					label={ 'Howdy' }
++					separatorType="none"
++                    onPress={ openSubSheet }
++                    accessibilityRole={ 'button' }
++				    accessibilityLabel={ 'Howdy' }
++				    accessibilityHint={ 'Navigates to Howdy bottom sheet' }
++				>
++					<Icon icon={ chevronRight }></Icon>
++				</BottomSheet.Cell>
++			}
++			showSheet={ showSubSheet }
++		>
++			<>
++				<BottomSheet.NavigationHeader
++					screen={ 'Howdy' }
++					leftButtonOnPress={ goBack }
++				/>
++				<View paddingHorizontal={ 16 }>
++					<Text>{ 'World' }</Text>
++				</View>
++			</>
++		</BottomSheet.SubSheet>
++	);
++};
++
++export default ExampleControl;
++```
++
++### Props
++
++#### showSheet
++
++Controls the Sub Sheet content visibility.
++
++-   Type: `Boolean`
++-   Required: Yes
++
++#### navigationButton
++
++UI rendered to allow navigating to the Sub Sheet when tapped.
++
++-   Type: `ReactComponent`
++-   Required: Yes
++
++
++#### isFullScreen
++
++Toggles the Sub Sheet height filling the entire device height.
++
++-   Type: `Boolean`
++-   Required: Yes
++
++See `BottomSheetSelectControl` as an example.
+diff --git a/packages/components/src/mobile/bottom-sheet/sub-sheet/index.native.js b/packages/components/src/mobile/bottom-sheet/sub-sheet/index.native.js
+new file mode 100644
+index 00000000000000..f1e7cdfd1a1fc9
+--- /dev/null
++++ b/packages/components/src/mobile/bottom-sheet/sub-sheet/index.native.js
+@@ -0,0 +1,42 @@
++/**
++ * External dependencies
++ */
++import { SafeAreaView } from 'react-native';
++
++/**
++ * WordPress dependencies
++ */
++import { Children } from '@wordpress/element';
++import { createSlotFill, BottomSheetConsumer } from '@wordpress/components';
++
++const { Fill, Slot } = createSlotFill( 'BottomSheetSubSheet' );
++
++const BottomSheetSubSheet = ( {
++	children,
++	navigationButton,
++	showSheet,
++	isFullScreen,
++} ) => {
++	return (
++		<>
++			{ showSheet && (
++				<Fill>
++					<SafeAreaView>
++						<BottomSheetConsumer>
++							{ ( { setIsFullScreen } ) => {
++								setIsFullScreen( isFullScreen );
++								return children;
++							} }
++						</BottomSheetConsumer>
++					</SafeAreaView>
++				</Fill>
++			) }
++			{ Children.count( children ) > 0 && navigationButton }
++		</>
++	);
++};
++
++BottomSheetSubSheet.Slot = Slot;
++BottomSheetSubSheet.screenName = 'BottomSheetSubSheet';
++
++export default BottomSheetSubSheet;
+diff --git a/packages/components/src/mobile/utils/alignments.native.js b/packages/components/src/mobile/utils/alignments.native.js
+index 219bdefb8a721c..52d3ec9b43aa93 100644
+--- a/packages/components/src/mobile/utils/alignments.native.js
++++ b/packages/components/src/mobile/utils/alignments.native.js
+@@ -5,7 +5,13 @@ export const WIDE_ALIGNMENTS = {
+ 	},
+ 	// `innerContainers`: Group of blocks based on `InnerBlocks` component,
+ 	// used to nest other blocks inside
+-	innerContainers: [ 'core/group', 'core/columns', 'core/column' ],
++	innerContainers: [
++		'core/group',
++		'core/columns',
++		'core/column',
++		'core/buttons',
++		'core/button',
++	],
+ 	excludeBlocks: [ 'core/heading' ],
+ };
+ 

@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/icon-button/index.js b/packages/components/src/icon-button/index.js
+index 377feab7601cfc..6a78f4e6b6c8be 100644
+--- a/packages/components/src/icon-button/index.js
++++ b/packages/components/src/icon-button/index.js
+@@ -56,7 +56,7 @@ function IconButton( props, ref ) {
+ 			className={ classes }
+ 			ref={ ref }
+ 		>
+-			<Icon icon={ icon } ariaPressed={ ariaPressed } />
++			<Icon icon={ icon } aria-pressed={ ariaPressed } />
+ 			{ children }
+ 		</Button>
+ 	);

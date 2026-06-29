@@ -1,0 +1,1455 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 88376c838dda21..b28dff5a8988be 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -965,12 +965,6 @@
+ 		"markdown_source": "../packages/components/src/form-token-field/README.md",
+ 		"parent": "components"
+ 	},
+-	{
+-		"title": "Grid",
+-		"slug": "grid",
+-		"markdown_source": "../packages/components/src/grid/README.md",
+-		"parent": "components"
+-	},
+ 	{
+ 		"title": "Guide",
+ 		"slug": "guide",
+@@ -1073,12 +1067,6 @@
+ 		"markdown_source": "../packages/components/src/menu-items-choice/README.md",
+ 		"parent": "components"
+ 	},
+-	{
+-		"title": "BottomSheetNavigation",
+-		"slug": "bottom-sheet-navigation",
+-		"markdown_source": "../packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/README.md",
+-		"parent": "components"
+-	},
+ 	{
+ 		"title": "Modal",
+ 		"slug": "modal",
+@@ -1223,12 +1211,6 @@
+ 		"markdown_source": "../packages/components/src/text-highlight/README.md",
+ 		"parent": "components"
+ 	},
+-	{
+-		"title": "Next",
+-		"slug": "next",
+-		"markdown_source": "../packages/components/src/text/next/README.md",
+-		"parent": "components"
+-	},
+ 	{
+ 		"title": "Text",
+ 		"slug": "text",
+@@ -1289,24 +1271,12 @@
+ 		"markdown_source": "../packages/components/src/tree-select/README.md",
+ 		"parent": "components"
+ 	},
+-	{
+-		"title": "Truncate",
+-		"slug": "truncate",
+-		"markdown_source": "../packages/components/src/truncate/README.md",
+-		"parent": "components"
+-	},
+ 	{
+ 		"title": "UnitControl",
+ 		"slug": "unit-control",
+ 		"markdown_source": "../packages/components/src/unit-control/README.md",
+ 		"parent": "components"
+ 	},
+-	{
+-		"title": "View",
+-		"slug": "view",
+-		"markdown_source": "../packages/components/src/view/README.md",
+-		"parent": "components"
+-	},
+ 	{
+ 		"title": "VisuallyHidden",
+ 		"slug": "visually-hidden",
+diff --git a/docs/tool/manifest.js b/docs/tool/manifest.js
+index 44e7b2d5612176..42f9d3898dfb0f 100644
+--- a/docs/tool/manifest.js
++++ b/docs/tool/manifest.js
+@@ -7,8 +7,8 @@ const glob = require( 'glob' ).sync;
+ 
+ const baseRepoUrl = '..';
+ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
+-	// Don't expose documentation for mobile only components just yet.
+-	ignore: '**/mobile/*/README.md',
++	// Don't expose documentation for mobile only and G2 components just yet.
++	ignore: [ '**/src/mobile/**/README.md', '**/src/ui/**/README.md' ],
+ } );
+ const packagePaths = glob( 'packages/*/package.json' ).map(
+ 	( fileName ) => fileName.split( '/' )[ 1 ]
+diff --git a/packages/components/src/__next/context/index.js b/packages/components/src/__next/context/index.js
+deleted file mode 100644
+index da09738c58dd0b..00000000000000
+--- a/packages/components/src/__next/context/index.js
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export { ComponentSystemProvider as __unstableComponentSystemProvider } from './component-system-provider';
+-export { withNext as __unstableWithNext } from './with-next';
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 935923488fbc53..c726e1ed523c69 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -18,7 +18,7 @@ import Button from '../button';
+ import RangeControl from '../range-control';
+ import CustomSelectControl from '../custom-select-control';
+ import VisuallyHidden from '../visually-hidden';
+-import { withNextComponent } from './next/';
++import { withNextComponent } from './next';
+ 
+ const DEFAULT_FONT_SIZE = 'default';
+ const CUSTOM_FONT_SIZE = 'custom';
+diff --git a/packages/components/src/font-size-picker/next/index.js b/packages/components/src/font-size-picker/next.js
+similarity index 84%
+rename from packages/components/src/font-size-picker/next/index.js
+rename to packages/components/src/font-size-picker/next.js
+index d973f3218fb8e1..2d3815661ba116 100644
+--- a/packages/components/src/font-size-picker/next/index.js
++++ b/packages/components/src/font-size-picker/next.js
+@@ -1,8 +1,8 @@
+ /**
+  * Internal dependencies
+  */
+-import { __unstableWithNext as withNext } from '../../__next/context';
+-import FontSizeControl from './font-size-control';
++import { withNext } from '../ui/context';
++import { FontSizeControl } from '../ui/font-size-control';
+ 
+ const FontSizePicker =
+ 	process.env.COMPONENT_SYSTEM_PHASE === 1
+diff --git a/packages/components/src/grid/index.js b/packages/components/src/grid/index.js
+deleted file mode 100644
+index 4af7eb7b6eea62..00000000000000
+--- a/packages/components/src/grid/index.js
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export { default } from './grid';
+-export * from './use-grid';
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 84d87495b37c21..0c67e9330f035e 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -71,7 +71,6 @@ export { default as FormToggle } from './form-toggle';
+ export { default as FormTokenField } from './form-token-field';
+ export { default as __experimentalGradientPicker } from './gradient-picker';
+ export { default as __experimentalCustomGradientPicker } from './custom-gradient-picker';
+-export { default as __experimentalGrid } from './grid';
+ export { default as Guide } from './guide';
+ export { default as GuidePage } from './guide/page';
+ export { default as Icon } from './icon';
+@@ -130,9 +129,7 @@ export {
+ 	TreeGridItem as __experimentalTreeGridItem,
+ } from './tree-grid';
+ export { default as TreeSelect } from './tree-select';
+-export { default as __experimentalTruncate } from './truncate';
+ export { default as __experimentalUnitControl } from './unit-control';
+-export { default as __experimentalView } from './view';
+ export { default as VisuallyHidden } from './visually-hidden';
+ export { default as IsolatedEventContainer } from './isolated-event-container';
+ export {
+@@ -161,6 +158,6 @@ export { default as withSpokenMessages } from './higher-order/with-spoken-messag
+ 
+ // Component System
+ export {
+-	__unstableWithNext,
+-	__unstableComponentSystemProvider,
+-} from './__next/context';
++	withNext as __unstableWithNext,
++	ComponentSystemProvider as __unstableComponentSystemProvider,
++} from './ui/context';
+diff --git a/packages/components/src/text/next/index.js b/packages/components/src/text/next.js
+similarity index 80%
+rename from packages/components/src/text/next/index.js
+rename to packages/components/src/text/next.js
+index f91e9628109074..04936258945912 100644
+--- a/packages/components/src/text/next/index.js
++++ b/packages/components/src/text/next.js
+@@ -1,16 +1,16 @@
+ /**
+  * Internal dependencies
+  */
+-import { __unstableWithNext as withNext } from '../../__next/context';
+-import NextText from './text';
+-import { text } from '../styles/text-mixins';
++import { withNext } from '../ui/context';
++import { Text as NextText } from '../ui/text';
++import { text } from './styles/text-mixins';
+ 
+ const Text = process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextText : undefined;
+ 
+ /**
+  * @typedef AdaptedTextProps
+  * @property {keyof JSX.IntrinsicElements} as Styled components `as` prop.
+- * @property {import('../styles/text-mixins').TextVariant} variant The variant to render.
++ * @property {import('./styles/text-mixins').TextVariant} variant The variant to render.
+  * @property {import('react').ReactNode} children Children to render.
+  * @property {string} [className] Classname to render on the element.
+  */
+diff --git a/packages/components/src/truncate/index.js b/packages/components/src/truncate/index.js
+deleted file mode 100644
+index 37d691e9003a2a..00000000000000
+--- a/packages/components/src/truncate/index.js
++++ /dev/null
+@@ -1,3 +0,0 @@
+-export { default } from './truncate';
+-
+-export * from './use-truncate';
+diff --git a/packages/components/src/__next/context/component-system-provider.js b/packages/components/src/ui/context/component-system-provider.js
+similarity index 100%
+rename from packages/components/src/__next/context/component-system-provider.js
+rename to packages/components/src/ui/context/component-system-provider.js
+diff --git a/packages/components/src/ui/context/index.js b/packages/components/src/ui/context/index.js
+new file mode 100644
+index 00000000000000..ef7f9470413c01
+--- /dev/null
++++ b/packages/components/src/ui/context/index.js
+@@ -0,0 +1,2 @@
++export { ComponentSystemProvider } from './component-system-provider';
++export { withNext } from './with-next';
+diff --git a/packages/components/src/__next/context/with-next.js b/packages/components/src/ui/context/with-next.js
+similarity index 100%
+rename from packages/components/src/__next/context/with-next.js
+rename to packages/components/src/ui/context/with-next.js
+diff --git a/packages/components/src/font-size-picker/next/font-size-control.js b/packages/components/src/ui/font-size-control/font-size-control.js
+similarity index 84%
+rename from packages/components/src/font-size-picker/next/font-size-control.js
+rename to packages/components/src/ui/font-size-control/font-size-control.js
+index 08e002a0038af3..f53e0c10921ef6 100755
+--- a/packages/components/src/font-size-picker/next/font-size-control.js
++++ b/packages/components/src/ui/font-size-control/font-size-control.js
+@@ -1,20 +1,21 @@
+ /**
+- * WordPress dependencies
++ * External dependencies
+  */
+-import { __ } from '@wordpress/i18n';
++import { contextConnect } from '@wp-g2/context';
++import { VisuallyHidden, VStack } from '@wp-g2/components';
+ 
+ /**
+- * External dependencies
++ * WordPress dependencies
+  */
+-import { contextConnect } from '@wp-g2/context';
+-import { View, VisuallyHidden, VStack } from '@wp-g2/components';
++import { __ } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+  */
+-import FontSizeControlSelect from './font-size-control-select';
+-import FontSizeControlSlider from './font-size-control-slider';
+-import { useFontSizeControl } from './use-font-size-control';
++import FontSizeControlSelect from './select';
++import FontSizeControlSlider from './slider';
++import useFontSizeControl from './use-font-size-control';
++import { View } from '../view';
+ 
+ function FontSizeControl( props, forwardedRef ) {
+ 	const {
+diff --git a/packages/components/src/ui/font-size-control/index.js b/packages/components/src/ui/font-size-control/index.js
+new file mode 100644
+index 00000000000000..38f84af096d9b1
+--- /dev/null
++++ b/packages/components/src/ui/font-size-control/index.js
+@@ -0,0 +1,2 @@
++export { default as FontSizeControl } from './font-size-control';
++export { default as useFontSizeControl } from './use-font-size-control';
+diff --git a/packages/components/src/font-size-picker/next/font-size-control-select.js b/packages/components/src/ui/font-size-control/select.js
+similarity index 94%
+rename from packages/components/src/font-size-picker/next/font-size-control-select.js
+rename to packages/components/src/ui/font-size-control/select.js
+index e27789e1bfa872..9ed1999be28d37 100755
+--- a/packages/components/src/font-size-picker/next/font-size-control-select.js
++++ b/packages/components/src/ui/font-size-control/select.js
+@@ -1,26 +1,26 @@
+-/**
+- * WordPress dependencies
+- */
+-import { __ } from '@wordpress/i18n';
+-
+ /**
+  * External dependencies
+  */
+ import { noop } from 'lodash';
+ import { contextConnect, useContextSystem } from '@wp-g2/context';
+ import {
+-	Grid,
+ 	TextInput,
+ 	SelectDropdown,
+ 	FormGroup,
+ 	Button,
+-	View,
+ } from '@wp-g2/components';
+ 
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++
+ /**
+  * Internal dependencies
+  */
+-import { getSelectTemplateColumns } from './font-size-control-utils';
++import { getSelectTemplateColumns } from './utils';
++import { Grid } from '../grid';
++import { View } from '../view';
+ 
+ function renderItem( { name, style } ) {
+ 	return <span style={ style }>{ name }</span>;
+diff --git a/packages/components/src/font-size-picker/next/font-size-control-slider.js b/packages/components/src/ui/font-size-control/slider.js
+similarity index 83%
+rename from packages/components/src/font-size-picker/next/font-size-control-slider.js
+rename to packages/components/src/ui/font-size-control/slider.js
+index 7b3fa18cb66fca..82305c01e4430b 100755
+--- a/packages/components/src/font-size-picker/next/font-size-control-slider.js
++++ b/packages/components/src/ui/font-size-control/slider.js
+@@ -1,24 +1,19 @@
+ /**
+- * WordPress dependencies
++ * External dependencies
+  */
+-import { __ } from '@wordpress/i18n';
++import { noop } from 'lodash';
++import { ControlLabel, Slider, TextInput, VStack } from '@wp-g2/components';
+ 
+ /**
+- * External dependencies
++ * WordPress dependencies
+  */
+-import { noop } from 'lodash';
++import { __ } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+  */
+-import {
+-	ControlLabel,
+-	Grid,
+-	Slider,
+-	TextInput,
+-	VStack,
+-} from '@wp-g2/components';
+-import { getSliderTemplateColumns } from './font-size-control-utils';
++import { getSliderTemplateColumns } from './utils';
++import { Grid } from '../grid';
+ 
+ function FontSizeControlSlider( props ) {
+ 	const {
+diff --git a/packages/components/src/font-size-picker/next/font-size-control-styles.js b/packages/components/src/ui/font-size-control/styles.js
+similarity index 100%
+rename from packages/components/src/font-size-picker/next/font-size-control-styles.js
+rename to packages/components/src/ui/font-size-control/styles.js
+diff --git a/packages/components/src/font-size-picker/next/use-font-size-control.js b/packages/components/src/ui/font-size-control/use-font-size-control.js
+similarity index 94%
+rename from packages/components/src/font-size-picker/next/use-font-size-control.js
+rename to packages/components/src/ui/font-size-control/use-font-size-control.js
+index df38503ef5bf51..543542f4f1947b 100755
+--- a/packages/components/src/font-size-picker/next/use-font-size-control.js
++++ b/packages/components/src/ui/font-size-control/use-font-size-control.js
+@@ -13,7 +13,7 @@ import { useCallback, useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import * as styles from './font-size-control-styles';
++import * as styles from './styles';
+ import {
+ 	getInputValue,
+ 	getSelectOptions,
+@@ -21,9 +21,9 @@ import {
+ 	hasUnit,
+ 	isCustomSelectedItem,
+ 	isCustomValue,
+-} from './font-size-control-utils';
++} from './utils';
+ 
+-export function useFontSizeControl( props ) {
++export default function useFontSizeControl( props ) {
+ 	const {
+ 		disableCustomFontSizes,
+ 		fontSizes = [],
+diff --git a/packages/components/src/font-size-picker/next/font-size-control-utils.js b/packages/components/src/ui/font-size-control/utils.js
+similarity index 100%
+rename from packages/components/src/font-size-picker/next/font-size-control-utils.js
+rename to packages/components/src/ui/font-size-control/utils.js
+diff --git a/packages/components/src/grid/README.md b/packages/components/src/ui/grid/README.md
+similarity index 91%
+rename from packages/components/src/grid/README.md
+rename to packages/components/src/ui/grid/README.md
+index ab96e289b89268..1910863bb8e2fd 100644
+--- a/packages/components/src/grid/README.md
++++ b/packages/components/src/ui/grid/README.md
+@@ -1,14 +1,11 @@
+-# Grid
++# Grid (Experimental)
+ 
+ `Grid` is a primitive layout component that can arrange content in a grid configuration.
+ 
+ ## Usage
+ 
+ ```jsx
+-import {
+-	__experientalGrid as Grid,
+-	__experimentalView as View,
+-} from '@wordpress/components';
++import { Grid, View } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+diff --git a/packages/components/src/grid/grid.js b/packages/components/src/ui/grid/grid.js
+similarity index 75%
+rename from packages/components/src/grid/grid.js
+rename to packages/components/src/ui/grid/grid.js
+index 0a03b36391abaa..73d236b41e169c 100644
+--- a/packages/components/src/grid/grid.js
++++ b/packages/components/src/ui/grid/grid.js
+@@ -1,15 +1,15 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../utils/create-component';
+-import { useGrid } from './use-grid';
++import { createComponent } from '../utils';
++import useGrid from './use-grid';
+ 
+ /**
+  * `Grid` is a primitive layout component that can arrange content in a grid configuration.
+  *
+  * @example
+  * ```jsx
+- * import { __experimentalGrid as Grid } from `@wordpress/components`
++ * import { Grid } from `@wordpress/components/ui`
+  *
+  * function Example() {
+  *   return (
+diff --git a/packages/components/src/ui/grid/index.js b/packages/components/src/ui/grid/index.js
+new file mode 100644
+index 00000000000000..dac772156147ca
+--- /dev/null
++++ b/packages/components/src/ui/grid/index.js
+@@ -0,0 +1,2 @@
++export { default as Grid } from './grid';
++export { default as useGrid } from './use-grid';
+diff --git a/packages/components/src/grid/stories/index.js b/packages/components/src/ui/grid/stories/index.js
+similarity index 85%
+rename from packages/components/src/grid/stories/index.js
+rename to packages/components/src/ui/grid/stories/index.js
+index def0ec021d44ef..871b4b881f5fab 100644
+--- a/packages/components/src/grid/stories/index.js
++++ b/packages/components/src/ui/grid/stories/index.js
+@@ -6,12 +6,12 @@ import { number } from '@storybook/addon-knobs';
+ /**
+  * Internal dependencies
+  */
+-import View from '../../view';
+-import Grid from '../index';
++import { View } from '../../view';
++import Grid from '../grid';
+ 
+ export default {
+ 	component: Grid,
+-	title: 'Components/Grid',
++	title: 'G2 Components (Experimental)/Grid',
+ };
+ 
+ const Item = ( props ) => (
+diff --git a/packages/components/src/grid/test/index.js b/packages/components/src/ui/grid/test/grid.js
+similarity index 98%
+rename from packages/components/src/grid/test/index.js
+rename to packages/components/src/ui/grid/test/grid.js
+index db1e6d91a9d952..cefd3194cc6c5c 100644
+--- a/packages/components/src/grid/test/index.js
++++ b/packages/components/src/ui/grid/test/grid.js
+@@ -7,8 +7,8 @@ import { ui } from '@wp-g2/styles';
+ /**
+  * Internal dependencies
+  */
+-import View from '../../view';
+-import Grid from '../index';
++import { View } from '../../view';
++import Grid from '../grid';
+ 
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {
+diff --git a/packages/components/src/grid/types.ts b/packages/components/src/ui/grid/types.ts
+similarity index 96%
+rename from packages/components/src/grid/types.ts
+rename to packages/components/src/ui/grid/types.ts
+index a1eaa7a02ee59f..62aa5ed4a01c01 100644
+--- a/packages/components/src/grid/types.ts
++++ b/packages/components/src/ui/grid/types.ts
+@@ -1,5 +1,6 @@
+ import { CSSProperties } from 'react';
+-import { ResponsiveCSSValue } from '../utils/types';
++
++type ResponsiveCSSValue<T> = Array<T | undefined> | T;
+ 
+ type GridAlignment =
+ 	| 'bottom'
+diff --git a/packages/components/src/grid/use-grid.js b/packages/components/src/ui/grid/use-grid.js
+similarity index 95%
+rename from packages/components/src/grid/use-grid.js
+rename to packages/components/src/ui/grid/use-grid.js
+index d7d2ad2c1ae73d..df929e1ba4d36a 100644
+--- a/packages/components/src/grid/use-grid.js
++++ b/packages/components/src/ui/grid/use-grid.js
+@@ -12,12 +12,12 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { getAlignmentProps } from './grid-utils';
++import { getAlignmentProps } from './utils';
+ 
+ /**
+  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
+  */
+-export function useGrid( props ) {
++export default function useGrid( props ) {
+ 	const {
+ 		align,
+ 		alignment,
+diff --git a/packages/components/src/grid/grid-utils.js b/packages/components/src/ui/grid/utils.js
+similarity index 100%
+rename from packages/components/src/grid/grid-utils.js
+rename to packages/components/src/ui/grid/utils.js
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+new file mode 100644
+index 00000000000000..cddfa1a2e22a5e
+--- /dev/null
++++ b/packages/components/src/ui/index.js
+@@ -0,0 +1,4 @@
++export * from './grid';
++export * from './text';
++export * from './truncate';
++export * from './view';
+diff --git a/packages/components/src/text/next/README.md b/packages/components/src/ui/text/README.md
+similarity index 88%
+rename from packages/components/src/text/next/README.md
+rename to packages/components/src/ui/text/README.md
+index 52471f6de9549c..343bb389ed7c26 100644
+--- a/packages/components/src/text/next/README.md
++++ b/packages/components/src/ui/text/README.md
+@@ -1,4 +1,4 @@
+-# Text
++# Text (Experimental)
+ 
+ `Text` is a core component that renders text in the library, using the library's typography system.
+ 
+@@ -6,8 +6,8 @@
+ 
+ `Text` can be used to render any text-content, like an HTML `p` or `span`.
+ 
+-```jsx live
+-import { Text } from '@wp-g2/components';
++```jsx
++import { Text } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return <Text>Where the north wind meets the sea</Text>;
+@@ -22,8 +22,8 @@ function Example() {
+ 
+ Automatically calculate the appropriate line-height value for contents that render text and Control elements (e.g. `TextInput`).
+ 
+-```jsx live
+-import { Text, TextInput } from '@wp-g2/components';
++```jsx
++import { Text, TextInput } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+@@ -40,8 +40,8 @@ function Example() {
+ 
+ Adjusts the text alignment.
+ 
+-```jsx live
+-import { Text } from '@wp-g2/components';
++```jsx
++import { Text } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+@@ -105,12 +105,12 @@ Array of search words. String search terms are automatically cast to RegExps unl
+ 
+ Letters or words within `Text` can be highlighted using `highlightWords`.
+ 
+-```jsx live
+-import { Text } from '@wp-g2/components';
++```jsx
++import { Text } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+-		<Text highlightWords={['the']}>
++		<Text highlightWords={ [ 'the' ] }>
+ 			Where the north wind meets the sea, there's a river full of memory.
+ 			Sleep, my darling, safe and sound, for in this river all is found.
+ 			In her waters, deep and true, lay the answers and a path for you.
+@@ -156,15 +156,15 @@ Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis`
+ 
+ The `Text` color can be adapted to a background color for optimal readability. `optimizeReadabilityFor` can accept CSS variables, in addition to standard CSS color values (e.g. Hex, RGB, HSL, etc...).
+ 
+-```jsx live
+-import { Text, View } from '@wp-g2/components';
++```jsx
++import { Text, View } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	const backgroundColor = 'blue';
+ 
+ 	return (
+-		<View css={{ backgroundColor }}>
+-			<Text optimizeReadabilityFor={backgroundColor}>
++		<View css={ { backgroundColor } }>
++			<Text optimizeReadabilityFor={ backgroundColor }>
+ 				Where the north wind meets the sea, there's a river full of
+ 				memory.
+ 			</Text>
+@@ -179,8 +179,8 @@ function Example() {
+ 
+ Adjusts text size based on the typography system. `Text` can render a wide range of font sizes, which are automatically calculated and adapted to the typography system. The `size` value can be a system preset, a `number`, or a custom unit value (`string`) such as `30em`.
+ 
+-```jsx live
+-import { Text } from '@wp-g2/components';
++```jsx
++import { Text } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return <Text size="largeTitle">Where the north wind meets the sea...</Text>;
+@@ -193,8 +193,8 @@ function Example() {
+ 
+ Enables text truncation. When `truncate` is set,we are able to truncate the long text in a variety of ways.
+ 
+-```jsx live
+-import { Text } from '@wp-g2/components';
++```jsx
++import { Text } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+@@ -220,8 +220,8 @@ Uppercases the text content.
+ 
+ Adjusts style variation of the text.
+ 
+-```jsx live
+-import { Text } from '@wp-g2/components';
++```jsx
++import { Text } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return <Text variant="muted">Where the north wind meets the sea...</Text>;
+diff --git a/packages/components/src/ui/text/index.js b/packages/components/src/ui/text/index.js
+new file mode 100644
+index 00000000000000..a130a34ce986de
+--- /dev/null
++++ b/packages/components/src/ui/text/index.js
+@@ -0,0 +1,2 @@
++export { default as Text } from './text';
++export { default as useText } from './use-text';
+diff --git a/packages/components/src/text/next/stories/index.js b/packages/components/src/ui/text/stories/index.js
+similarity index 62%
+rename from packages/components/src/text/next/stories/index.js
+rename to packages/components/src/ui/text/stories/index.js
+index 66e02a6ebfba5e..014dcec8755908 100644
+--- a/packages/components/src/text/next/stories/index.js
++++ b/packages/components/src/ui/text/stories/index.js
+@@ -1,18 +1,11 @@
+-/**
+- * External dependencies
+- */
+-import { boolean } from '@storybook/addon-knobs';
+-
+ /**
+  * Internal dependencies
+  */
+ import Text from '../text';
+-import OldText from '../../index';
+-import { adapter } from '../index';
+ 
+ export default {
+ 	component: Text,
+-	title: 'Components/G2/Text',
++	title: 'G2 Components (Experimental)/Text',
+ };
+ 
+ export const _default = () => {
+@@ -58,44 +51,3 @@ export const highlight = () => {
+ 		</Text>
+ 	);
+ };
+-
+-const Adapted = ( { doAdapt, ...props } ) =>
+-	doAdapt ? <Text { ...adapter( props ) } /> : <OldText { ...props } />;
+-
+-export const adapted = () => {
+-	const doAdapt = boolean( 'Use adapted component', false );
+-	return (
+-		<>
+-			<Adapted variant="title.large" as="h1" doAdapt={ doAdapt }>
+-				Title Large
+-			</Adapted>
+-			<Adapted variant="title.medium" as="h2" doAdapt={ doAdapt }>
+-				Title Medium
+-			</Adapted>
+-			<Adapted variant="title.small" as="h3" doAdapt={ doAdapt }>
+-				Title Small
+-			</Adapted>
+-			<Adapted variant="subtitle" doAdapt={ doAdapt }>
+-				Subtitle
+-			</Adapted>
+-			<Adapted variant="subtitle.small" doAdapt={ doAdapt }>
+-				Subtitle Small
+-			</Adapted>
+-			<Adapted variant="body" doAdapt={ doAdapt }>
+-				Body
+-			</Adapted>
+-			<Adapted variant="body.small" doAdapt={ doAdapt }>
+-				Body Small
+-			</Adapted>
+-			<Adapted variant="button" doAdapt={ doAdapt }>
+-				Button
+-			</Adapted>
+-			<Adapted variant="caption" doAdapt={ doAdapt }>
+-				Caption
+-			</Adapted>
+-			<Adapted variant="label" doAdapt={ doAdapt }>
+-				Label
+-			</Adapted>
+-		</>
+-	);
+-};
+diff --git a/packages/components/src/text/next/text-styles.js b/packages/components/src/ui/text/styles.js
+similarity index 100%
+rename from packages/components/src/text/next/text-styles.js
+rename to packages/components/src/ui/text/styles.js
+diff --git a/packages/components/src/text/next/test/__snapshots__/index.js.snap b/packages/components/src/ui/text/test/__snapshots__/text.js.snap
+similarity index 100%
+rename from packages/components/src/text/next/test/__snapshots__/index.js.snap
+rename to packages/components/src/ui/text/test/__snapshots__/text.js.snap
+diff --git a/packages/components/src/text/next/test/index.js b/packages/components/src/ui/text/test/text.js
+similarity index 100%
+rename from packages/components/src/text/next/test/index.js
+rename to packages/components/src/ui/text/test/text.js
+diff --git a/packages/components/src/text/next/text.js b/packages/components/src/ui/text/text.js
+similarity index 58%
+rename from packages/components/src/text/next/text.js
+rename to packages/components/src/ui/text/text.js
+index b7a54f106cb9fb..ee37a2abd18ff6 100644
+--- a/packages/components/src/text/next/text.js
++++ b/packages/components/src/ui/text/text.js
+@@ -1,8 +1,8 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../../utils';
+-import { useText } from './use-text';
++import { createComponent } from '../utils';
++import useText from './use-text';
+ 
+ export default createComponent( {
+ 	as: 'span',
+diff --git a/packages/components/src/text/next/types.ts b/packages/components/src/ui/text/types.ts
+similarity index 91%
+rename from packages/components/src/text/next/types.ts
+rename to packages/components/src/ui/text/types.ts
+index bb1db45d443f9f..323bb1fee127c5 100644
+--- a/packages/components/src/text/next/types.ts
++++ b/packages/components/src/ui/text/types.ts
+@@ -1,4 +1,4 @@
+-import type { Props as TruncateProps } from '../../truncate/use-truncate';
++import type { Props as TruncateProps } from '../truncate/use-truncate';
+ import type { CSSProperties, ReactNode } from 'react';
+ 
+ type TextAdjustLineHeightForInnerControls =
+@@ -26,7 +26,7 @@ type Highlighted = {
+ 	 *
+ 	 * @example
+ 	 * ```jsx
+-	 * import { Text } from `@wp-g2/components`
++	 * import { Text } from `@wordpress/components/ui`
+ 	 *
+ 	 * function Example() {
+ 	 *   return (
+@@ -55,7 +55,7 @@ export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
+ 	 *
+ 	 * @example
+ 	 * ```jsx
+-	 * import { Text } from `@wp-g2/components`
++	 * import { Text } from `@wordpress/components/ui`
+ 	 *
+ 	 * function Example() {
+ 	 * 	return (
+@@ -72,7 +72,7 @@ export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
+ 	 *
+ 	 * @example
+ 	 * ```jsx
+-	 * import { Text, TextInput } from `@wp-g2/components`
++	 * import { Text, TextInput } from `@wordpress/components/ui`
+ 	 *
+ 	 * function Example() {
+ 	 * 	return (
+@@ -123,7 +123,7 @@ export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
+ 	 *
+ 	 * @example
+ 	 * ```jsx
+-	 * import { Text, View } from `@wp-g2/components`
++	 * import { Text, View } from `@wordpress/components/ui`
+ 	 *
+ 	 * function Example() {
+ 	 *   const backgroundColor = "blue"
+@@ -144,7 +144,7 @@ export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
+ 	 *
+ 	 * @example
+ 	 * ```jsx
+-	 * import { Text } from `@wp-g2/components`
++	 * import { Text } from `@wordpress/components/ui`
+ 	 *
+ 	 * function Example() {
+ 	 *   return <Text size="largeTitle">Where the north wind meets the sea...</Text>
+@@ -158,7 +158,7 @@ export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
+ 	 * @example
+ 	 *
+ 	 * ```jsx
+-	 * import { Text } from `@wp-g2/components`
++	 * import { Text } from `@wordpress/components/ui`
+ 	 *
+ 	 * function Example() {
+ 	 *   return (
+@@ -182,7 +182,7 @@ export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
+ 	 *
+ 	 * @example
+ 	 * ```jsx
+-	 * import { Text } from `@wp-g2/components`
++	 * import { Text } from `@wordpress/components/ui`
+ 	 *
+ 	 * function Example() {
+ 	 *   return <Text variant="muted">Where the north wind meets the sea...</Text>
+diff --git a/packages/components/src/text/next/use-text.js b/packages/components/src/ui/text/use-text.js
+similarity index 95%
+rename from packages/components/src/text/next/use-text.js
+rename to packages/components/src/ui/text/use-text.js
+index 1925e3fa20d67d..16e9e3083a6590 100644
+--- a/packages/components/src/text/next/use-text.js
++++ b/packages/components/src/ui/text/use-text.js
+@@ -13,15 +13,15 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useTruncate } from '../../truncate';
+-import { getOptimalTextShade } from '../../utils/colors';
+-import * as styles from './text-styles';
+-import { createHighlighterText } from './text-utils';
++import { useTruncate } from '../truncate';
++import { getOptimalTextShade } from '../utils';
++import * as styles from './styles';
++import { createHighlighterText } from './utils';
+ 
+ /**
+  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'span'>} props
+  */
+-export function useText( props ) {
++export default function useText( props ) {
+ 	const {
+ 		adjustLineHeightForInnerControls,
+ 		align,
+diff --git a/packages/components/src/text/next/text-utils.js b/packages/components/src/ui/text/utils.js
+similarity index 100%
+rename from packages/components/src/text/next/text-utils.js
+rename to packages/components/src/ui/text/utils.js
+diff --git a/packages/components/src/truncate/README.md b/packages/components/src/ui/truncate/README.md
+similarity index 90%
+rename from packages/components/src/truncate/README.md
+rename to packages/components/src/ui/truncate/README.md
+index 695fae86d35a27..7e2b439a48a713 100644
+--- a/packages/components/src/truncate/README.md
++++ b/packages/components/src/ui/truncate/README.md
+@@ -1,11 +1,11 @@
+-# Truncate
++# Truncate (Experimental)
+ 
+ `Truncate` is a typography primitive that trims text content. For almost all cases, it is recommended that `Text`, `Heading`, or `Subheading` is used to render text content. However, `Truncate` is available for custom implementations.
+ 
+ ## Usage
+ 
+-```jsx live
+-import { Truncate } from '@wp-g2/components';
++```jsx
++import { Truncate } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+@@ -50,12 +50,12 @@ Determines the max characters when `truncate` is set.
+ 
+ Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
+ 
+-```jsx live
+-import { Truncate } from '@wp-g2/components';
++```jsx
++import { Truncate } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+-		<Truncate numberOfLines={2}>
++		<Truncate numberOfLines={ 2 }>
+ 			Where the north wind meets the sea, there's a river full of memory.
+ 			Sleep, my darling, safe and sound, for in this river all is found.
+ 			In her waters, deep and true, lay the answers and a path for you.
+diff --git a/packages/components/src/ui/truncate/index.js b/packages/components/src/ui/truncate/index.js
+new file mode 100644
+index 00000000000000..c2471764d88128
+--- /dev/null
++++ b/packages/components/src/ui/truncate/index.js
+@@ -0,0 +1,2 @@
++export { default as Truncate } from './truncate';
++export { default as useTruncate } from './use-truncate';
+diff --git a/packages/components/src/truncate/stories/index.js b/packages/components/src/ui/truncate/stories/index.js
+similarity index 79%
+rename from packages/components/src/truncate/stories/index.js
+rename to packages/components/src/ui/truncate/stories/index.js
+index b0a5472f4d59f2..7af90b1b8a9e14 100644
+--- a/packages/components/src/truncate/stories/index.js
++++ b/packages/components/src/ui/truncate/stories/index.js
+@@ -1,16 +1,22 @@
++/**
++ * External dependencies
++ */
++import { number } from '@storybook/addon-knobs';
++
+ /**
+  * Internal dependencies
+  */
+-import Truncate from '../index';
++import Truncate from '../truncate';
+ 
+ export default {
+ 	component: Truncate,
+-	title: 'Components/Truncate',
++	title: 'G2 Components (Experimental)/Truncate',
+ };
+ 
+ export const _default = () => {
++	const numberOfLines = number( 'numberOfLines', 2 );
+ 	return (
+-		<Truncate numberOfLines={ 2 }>
++		<Truncate numberOfLines={ numberOfLines }>
+ 			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+ 			facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
+ 			Duis semper dui id augue malesuada, ut feugiat nisi aliquam.
+diff --git a/packages/components/src/truncate/truncate-styles.js b/packages/components/src/ui/truncate/styles.js
+similarity index 100%
+rename from packages/components/src/truncate/truncate-styles.js
+rename to packages/components/src/ui/truncate/styles.js
+diff --git a/packages/components/src/truncate/test/truncate.js b/packages/components/src/ui/truncate/test/truncate.js
+similarity index 97%
+rename from packages/components/src/truncate/test/truncate.js
+rename to packages/components/src/ui/truncate/test/truncate.js
+index 5ceb711a6afe42..01382e9eaac8c4 100644
+--- a/packages/components/src/truncate/test/truncate.js
++++ b/packages/components/src/ui/truncate/test/truncate.js
+@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import Truncate from '..';
++import Truncate from '../truncate';
+ 
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {
+diff --git a/packages/components/src/truncate/truncate.js b/packages/components/src/ui/truncate/truncate.js
+similarity index 78%
+rename from packages/components/src/truncate/truncate.js
+rename to packages/components/src/ui/truncate/truncate.js
+index c8facc65d25530..db89238fe32e54 100644
+--- a/packages/components/src/truncate/truncate.js
++++ b/packages/components/src/ui/truncate/truncate.js
+@@ -2,7 +2,7 @@
+  * Internal dependencies
+  */
+ import { createComponent } from '../utils';
+-import { useTruncate } from './use-truncate';
++import useTruncate from './use-truncate';
+ 
+ export default createComponent( {
+ 	as: 'span',
+diff --git a/packages/components/src/truncate/use-truncate.js b/packages/components/src/ui/truncate/use-truncate.js
+similarity index 89%
+rename from packages/components/src/truncate/use-truncate.js
+rename to packages/components/src/ui/truncate/use-truncate.js
+index 82a28d05835351..d79f8bf9f1587c 100644
+--- a/packages/components/src/truncate/use-truncate.js
++++ b/packages/components/src/ui/truncate/use-truncate.js
+@@ -12,12 +12,8 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import * as styles from './truncate-styles';
+-import {
+-	TRUNCATE_ELLIPSIS,
+-	TRUNCATE_TYPE,
+-	truncateContent,
+-} from './truncate-utils';
++import * as styles from './styles';
++import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
+ 
+ /**
+  * @typedef Props
+@@ -30,7 +26,7 @@ import {
+ /**
+  * @param {import('@wp-g2/create-styles').ViewOwnProps<Props, 'span'>} props
+  */
+-export function useTruncate( props ) {
++export default function useTruncate( props ) {
+ 	const {
+ 		className,
+ 		children,
+diff --git a/packages/components/src/truncate/truncate-utils.js b/packages/components/src/ui/truncate/utils.js
+similarity index 100%
+rename from packages/components/src/truncate/truncate-utils.js
+rename to packages/components/src/ui/truncate/utils.js
+diff --git a/packages/components/src/ui/utils/colors.js b/packages/components/src/ui/utils/colors.js
+new file mode 100644
+index 00000000000000..d9938f76e7cc3b
+--- /dev/null
++++ b/packages/components/src/ui/utils/colors.js
+@@ -0,0 +1,99 @@
++/**
++ * External dependencies
++ */
++import memoize from 'memize';
++import tinycolor from 'tinycolor2';
++
++/** @type {HTMLDivElement} */
++let colorComputationNode;
++
++/**
++ * @return {HTMLDivElement | undefined} The HTML element for color computation.
++ */
++function getColorComputationNode() {
++	if ( typeof document === 'undefined' ) return;
++
++	if ( ! colorComputationNode ) {
++		// Create a temporary element for style computation.
++		const el = document.createElement( 'div' );
++		el.setAttribute( 'data-g2-color-computation-node', '' );
++		// Inject for window computed style.
++		document.body.appendChild( el );
++		colorComputationNode = el;
++	}
++
++	return colorComputationNode;
++}
++
++/**
++ * @param {string | unknown} value
++ *
++ * @return {boolean} Whether the value is a valid color.
++ */
++function isColor( value ) {
++	if ( typeof value !== 'string' ) return false;
++	const test = tinycolor( value );
++
++	return test.isValid();
++}
++
++/**
++ * Retrieves the computed background color. This is useful for getting the
++ * value of a CSS variable color.
++ *
++ * @param {string | unknown} backgroundColor The background color to compute.
++ *
++ * @return {string} The computed background color.
++ */
++function _getComputedBackgroundColor( backgroundColor ) {
++	if ( typeof backgroundColor !== 'string' ) return '';
++
++	if ( isColor( backgroundColor ) ) return backgroundColor;
++
++	if ( ! backgroundColor.includes( 'var(' ) ) return '';
++	if ( typeof document === 'undefined' ) return '';
++
++	// Attempts to gracefully handle CSS variables color values.
++	const el = getColorComputationNode();
++	if ( ! el ) return '';
++
++	el.style.background = backgroundColor;
++	// Grab the style
++	const computedColor = window?.getComputedStyle( el ).background;
++	// Reset
++	el.style.background = '';
++
++	return computedColor || '';
++}
++
++const getComputedBackgroundColor = memoize( _getComputedBackgroundColor );
++
++/**
++ * Get the text shade optimized for readability, based on a background color.
++ *
++ * @param {string | unknown} backgroundColor  The background color.
++ *
++ * @return {string} The optimized text color (black or white).
++ */
++function getOptimalTextColor( backgroundColor ) {
++	const background = getComputedBackgroundColor( backgroundColor );
++	const isReadableWithBlackText = tinycolor.isReadable(
++		background,
++		'#000000'
++	);
++
++	return isReadableWithBlackText ? '#000000' : '#ffffff';
++}
++
++/**
++ * Get the text shade optimized for readability, based on a background color.
++ *
++ * @param {string | unknown} backgroundColor The background color.
++ *
++ * @return {string} The optimized text shade (dark or light).
++ */
++export function getOptimalTextShade( backgroundColor ) {
++	const result = getOptimalTextColor( backgroundColor );
++
++	return result === '#000000' ? 'dark' : 'light';
++}
+diff --git a/packages/components/src/utils/create-component.js b/packages/components/src/ui/utils/create-component.js
+similarity index 97%
+rename from packages/components/src/utils/create-component.js
+rename to packages/components/src/ui/utils/create-component.js
+index 6269c83967f704..9b3b435f23318a 100644
+--- a/packages/components/src/utils/create-component.js
++++ b/packages/components/src/ui/utils/create-component.js
+@@ -7,7 +7,7 @@ import { identity } from 'lodash';
+ /**
+  * Internal dependencies
+  */
+-import View from '../view';
++import { View } from '../view';
+ 
+ /* eslint-disable jsdoc/require-returns-description */
+ /**
+diff --git a/packages/components/src/ui/utils/index.js b/packages/components/src/ui/utils/index.js
+new file mode 100644
+index 00000000000000..26e05b9d84d7db
+--- /dev/null
++++ b/packages/components/src/ui/utils/index.js
+@@ -0,0 +1,2 @@
++export { getOptimalTextShade } from './colors';
++export { createComponent } from './create-component';
+diff --git a/packages/components/src/ui/utils/types.ts b/packages/components/src/ui/utils/types.ts
+new file mode 100644
+index 00000000000000..68f9c644fc64ab
+--- /dev/null
++++ b/packages/components/src/ui/utils/types.ts
+@@ -0,0 +1,9 @@
++import { As } from 'reakit-utils/types';
++import { ViewOwnProps } from '@wp-g2/create-styles';
++
++export type Options<T extends As, P extends ViewOwnProps<{}, T>> = {
++	as: T;
++	name: string;
++	useHook: (props: P) => any;
++	memo?: boolean;
++};
+diff --git a/packages/components/src/view/README.md b/packages/components/src/ui/view/README.md
+similarity index 76%
+rename from packages/components/src/view/README.md
+rename to packages/components/src/ui/view/README.md
+index ec265056ca4081..bc8fd691244a6b 100644
+--- a/packages/components/src/view/README.md
++++ b/packages/components/src/ui/view/README.md
+@@ -1,4 +1,4 @@
+-# View
++# View (Experimental)
+ 
+ `View` is a core component that renders everything in the library. It is the principle component in the entire library. Note that `View` is not exported from components, it's fully internal.
+ 
+@@ -6,8 +6,8 @@
+ 
+ ## Usage
+ 
+-```jsx live
+-import { Text, View } from '@wp-g2/components';
++```jsx
++import { Text, View } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+@@ -40,20 +40,20 @@ The Style system provides a bunch of style presets, which come from `@wp-g2/styl
+ 
+ Presets can style a `View` by passing an `Array` of them into the `css` prop.
+ 
+-```jsx live
+-import { Text, View } from '@wp-g2/components';
++```jsx
++import { Text, View } from '@wordpress/components/ui';
+ import { ui } from '@wp-g2/styles';
+ 
+ function Example() {
+ 	return (
+ 		<View
+-			css={[
+-				ui.padding(5),
++			css={ [
++				ui.padding( 5 ),
+ 				ui.background.blue,
+-				ui.hover(ui.background.red, ui.scale(1.02)),
+-				ui.active(ui.background.yellow, ui.scale(0.8)),
++				ui.hover( ui.background.red, ui.scale( 1.02 ) ),
++				ui.active( ui.background.yellow, ui.scale( 0.8 ) ),
+ 				ui.animation.bounce,
+-			]}
++			] }
+ 		>
+ 			<Text>Into The Unknown</Text>
+ 		</View>
+diff --git a/packages/components/src/ui/view/index.js b/packages/components/src/ui/view/index.js
+new file mode 100644
+index 00000000000000..64c032291ab979
+--- /dev/null
++++ b/packages/components/src/ui/view/index.js
+@@ -0,0 +1 @@
++export { default as View } from './view';
+diff --git a/packages/components/src/view/test/__snapshots__/view.js.snap b/packages/components/src/ui/view/test/__snapshots__/view.js.snap
+similarity index 100%
+rename from packages/components/src/view/test/__snapshots__/view.js.snap
+rename to packages/components/src/ui/view/test/__snapshots__/view.js.snap
+diff --git a/packages/components/src/view/test/view.js b/packages/components/src/ui/view/test/view.js
+similarity index 98%
+rename from packages/components/src/view/test/view.js
+rename to packages/components/src/ui/view/test/view.js
+index c3ab622390226d..6e3d1c44cbeb66 100644
+--- a/packages/components/src/view/test/view.js
++++ b/packages/components/src/ui/view/test/view.js
+@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import View from '../index';
++import View from '../view';
+ 
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {
+diff --git a/packages/components/src/view/view.js b/packages/components/src/ui/view/view.js
+similarity index 100%
+rename from packages/components/src/view/view.js
+rename to packages/components/src/ui/view/view.js
+diff --git a/packages/components/src/utils/colors.js b/packages/components/src/utils/colors.js
+index b7d6938c2e9a41..6815964f57a879 100644
+--- a/packages/components/src/utils/colors.js
++++ b/packages/components/src/utils/colors.js
+@@ -3,7 +3,6 @@
+  */
+ import { get } from 'lodash';
+ import tinycolor from 'tinycolor2';
+-import memoize from 'memize';
+ 
+ /**
+  * Internal dependencies
+@@ -40,146 +39,3 @@ export function color( value ) {
+ 	const fallbackColor = '#000';
+ 	return get( COLORS, value, fallbackColor );
+ }
+-
+-/** @type {HTMLDivElement} */
+-let __colorComputationNode;
+-
+-/**
+- * @return {HTMLDivElement | undefined} The HTML element for color computation.
+- */
+-function getColorComputationNode() {
+-	if ( typeof document === 'undefined' ) return;
+-
+-	if ( ! __colorComputationNode ) {
+-		// Create a temporary element for style computation.
+-		const el = document.createElement( 'div' );
+-		el.setAttribute( 'data-g2-color-computation-node', '' );
+-		// Inject for window computed style.
+-		document.body.appendChild( el );
+-		__colorComputationNode = el;
+-	}
+-
+-	return __colorComputationNode;
+-}
+-
+-/**
+- * @param {string | unknown} value
+- *
+- * @return {boolean} Whether the value is a valid color.
+- */
+-export function isColor( value ) {
+-	if ( typeof value !== 'string' ) return false;
+-	const test = tinycolor( value );
+-
+-	return test.isValid();
+-}
+-
+-/**
+- * Retrieves the computed background color. This is useful for getting the
+- * value of a CSS variable color.
+- *
+- * @param {string | unknown} backgroundColor The background color to compute.
+- *
+- * @return {string} The computed background color.
+- */
+-function __getComputedBackgroundColor( backgroundColor ) {
+-	if ( typeof backgroundColor !== 'string' ) return '';
+-
+-	if ( isColor( backgroundColor ) ) return backgroundColor;
+-
+-	if ( ! backgroundColor.includes( 'var(' ) ) return '';
+-	if ( typeof document === 'undefined' ) return '';
+-
+-	// Attempts to gracefully handle CSS variables color values.
+-	const el = getColorComputationNode();
+-	if ( ! el ) return '';
+-
+-	el.style.background = backgroundColor;
+-	// Grab the style
+-	const computedColor = window?.getComputedStyle( el ).background;
+-	// Reset
+-	el.style.background = '';
+-
+-	return computedColor || '';
+-}
+-
+-/**
+- * Retrieves the computed background color. This is useful for getting the
+- * value of a CSS variable color.
+- *
+- * @param {string | unknown} color The background color to compute.
+- *
+- * @return {string} The computed background color.
+- */
+-export const getComputedBackgroundColor = memoize(
+-	__getComputedBackgroundColor
+-);
+-
+-/**
+- * Retrieves the computed text color. This is useful for getting the
+- * value of a CSS variable color.
+- *
+- * @param {string | unknown} textColor
+- *
+- * @return {string} The computed text color.
+- */
+-function __getComputedColor( textColor ) {
+-	if ( typeof textColor !== 'string' ) return '';
+-
+-	if ( isColor( textColor ) ) return textColor;
+-
+-	if ( ! textColor.includes( 'var(' ) ) return '';
+-	if ( typeof document === 'undefined' ) return '';
+-
+-	// Attempts to gracefully handle CSS variables color values.
+-	const el = getColorComputationNode();
+-	if ( ! el ) return '';
+-
+-	el.style.color = textColor;
+-	// Grab the style
+-	const computedColor = window?.getComputedStyle( el ).color;
+-	// Reset
+-	el.style.color = '';
+-
+-	return computedColor || '';
+-}
+-
+-/**
+- * Retrieves the computed text color. This is useful for getting the
+- * value of a CSS variable color.
+- *
+- * @param {string | unknown} color
+- *
+- * @return {string} The computed text color.
+- */
+-export const getComputedColor = memoize( __getComputedColor );
+-
+-/**
+- * Get the text shade optimized for readability, based on a background color.
+- *
+- * @param {string | unknown} backgroundColor  The background color.
+- *
+- * @return {string} The optimized text color (black or white).
+- */
+-export function getOptimalTextColor( backgroundColor ) {
+-	const background = getComputedBackgroundColor( backgroundColor );
+-	const isReadableWithBlackText = tinycolor.isReadable(
+-		background,
+-		'#000000'
+-	);
+-
+-	return isReadableWithBlackText ? '#000000' : '#ffffff';
+-}
+-
+-/**
+- * Get the text shade optimized for readability, based on a background color.
+- *
+- * @param {string | unknown} backgroundColor The background color.
+- *
+- * @return {string} The optimized text shade (dark or light).
+- */
+-export function getOptimalTextShade( backgroundColor ) {
+-	const result = getOptimalTextColor( backgroundColor );
+-
+-	return result === '#000000' ? 'dark' : 'light';
+-}
+diff --git a/packages/components/src/utils/index.js b/packages/components/src/utils/index.js
+index da2f1a2dcdc722..94d8a67cc04607 100644
+--- a/packages/components/src/utils/index.js
++++ b/packages/components/src/utils/index.js
+@@ -1,3 +1,2 @@
+ export * from './hooks';
+ export * from './style-mixins';
+-export { createComponent } from './create-component';
+diff --git a/packages/components/src/utils/types.ts b/packages/components/src/utils/types.ts
+index f661f45a1d8024..85f4c0fe5623d7 100644
+--- a/packages/components/src/utils/types.ts
++++ b/packages/components/src/utils/types.ts
+@@ -1,15 +1,3 @@
+-import { As } from 'reakit-utils/types';
+-import { ViewOwnProps } from '@wp-g2/create-styles';
+-
+-export type Options<T extends As, P extends ViewOwnProps<{}, T>> = {
+-	as: T;
+-	name: string;
+-	useHook: (props: P) => any;
+-	memo?: boolean;
+-};
+-
+-export type ResponsiveCSSValue<T> = Array<T | undefined> | T;
+-
+ export type SizeRangeDefault =
+ 	| 'xLarge'
+ 	| 'large'
+diff --git a/packages/components/src/view/index.js b/packages/components/src/view/index.js
+deleted file mode 100644
+index 6dd227ec960634..00000000000000
+--- a/packages/components/src/view/index.js
++++ /dev/null
+@@ -1 +0,0 @@
+-export { default } from './view';
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 9965ad27817733..5d42b26b890f1d 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -16,9 +16,8 @@
+ 		"src/base-control/**/*",
+ 		"src/dashicon/**/*",
+ 		"src/tip/**/*",
+-		"src/truncate/**/*",
++		"src/ui/**/*",
+ 		"src/utils/**/*",
+-		"src/view/**/*",
+ 		"src/visually-hidden/**/*",
+ 		"src/text/**/*",
+ 		"src/grid/**/*",
+@@ -30,6 +29,7 @@
+ 		"src/**/*.native.js",
+ 		"src/**/react-native-*",
+ 		"src/**/stories",
+-		"src/**/test"
++		"src/**/test",
++		"src/ui/font-size-control"
+ 	]
+ }

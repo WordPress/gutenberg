@@ -1,0 +1,536 @@
+diff --git a/packages/block-editor/src/components/duotone-control/style.scss b/packages/block-editor/src/components/duotone-control/style.scss
+index e9fe9fb2de2bd2..d80f7c4628c35f 100644
+--- a/packages/block-editor/src/components/duotone-control/style.scss
++++ b/packages/block-editor/src/components/duotone-control/style.scss
+@@ -18,10 +18,6 @@ $swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover
+ 		padding: 0;
+ 	}
+ 
+-	.components-custom-gradient-picker__gradient-bar {
+-		margin: $grid-unit-20 0 $grid-unit-15;
+-	}
+-
+ 	.components-circular-option-picker__swatches {
+ 		display: grid;
+ 		grid-template-columns: repeat($swatch-columns, $swatch-size);
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d6398cfd61efc3..297fbb45e06ee6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ 
+ ### Enhancements
+ 
++-   `CustomGradientPicker`, `GradientPicker`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43387](https://github.com/WordPress/gutenberg/pull/43387)).
+ -   `ToggleGroupControl`: Improve TypeScript documentation ([#43265](https://github.com/WordPress/gutenberg/pull/43265)).
+ -   `ComboboxControl`: Normalize hyphen-like characters to an ASCII hyphen ([#42942](https://github.com/WordPress/gutenberg/pull/42942)).
+ -   `FormTokenField`: Refactor away from `_.difference()` ([#43224](https://github.com/WordPress/gutenberg/pull/43224/)).
+diff --git a/packages/components/src/custom-gradient-bar/constants.js b/packages/components/src/custom-gradient-picker/gradient-bar/constants.js
+similarity index 100%
+rename from packages/components/src/custom-gradient-bar/constants.js
+rename to packages/components/src/custom-gradient-picker/gradient-bar/constants.js
+diff --git a/packages/components/src/custom-gradient-bar/control-points.js b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.js
+similarity index 97%
+rename from packages/components/src/custom-gradient-bar/control-points.js
+rename to packages/components/src/custom-gradient-picker/gradient-bar/control-points.js
+index f617e067b19e0c..9f2e960563eced 100644
+--- a/packages/components/src/custom-gradient-bar/control-points.js
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.js
+@@ -16,11 +16,11 @@ import { LEFT, RIGHT } from '@wordpress/keycodes';
+ /**
+  * Internal dependencies
+  */
+-import Button from '../button';
+-import { HStack } from '../h-stack';
+-import { ColorPicker } from '../color-picker';
+-import { VisuallyHidden } from '../visually-hidden';
+-import { CustomColorPickerDropdown } from '../color-palette';
++import Button from '../../button';
++import { HStack } from '../../h-stack';
++import { ColorPicker } from '../../color-picker';
++import { VisuallyHidden } from '../../visually-hidden';
++import { CustomColorPickerDropdown } from '../../color-palette';
+ 
+ import {
+ 	addControlPoint,
+diff --git a/packages/components/src/custom-gradient-bar/index.js b/packages/components/src/custom-gradient-picker/gradient-bar/index.js
+similarity index 100%
+rename from packages/components/src/custom-gradient-bar/index.js
+rename to packages/components/src/custom-gradient-picker/gradient-bar/index.js
+diff --git a/packages/components/src/custom-gradient-bar/test/utils.js b/packages/components/src/custom-gradient-picker/gradient-bar/test/utils.js
+similarity index 100%
+rename from packages/components/src/custom-gradient-bar/test/utils.js
+rename to packages/components/src/custom-gradient-picker/gradient-bar/test/utils.js
+diff --git a/packages/components/src/custom-gradient-bar/utils.js b/packages/components/src/custom-gradient-picker/gradient-bar/utils.js
+similarity index 100%
+rename from packages/components/src/custom-gradient-bar/utils.js
+rename to packages/components/src/custom-gradient-picker/gradient-bar/utils.js
+diff --git a/packages/components/src/custom-gradient-picker/index.js b/packages/components/src/custom-gradient-picker/index.js
+index 055ad05fd7771e..8247f9f2202f54 100644
+--- a/packages/components/src/custom-gradient-picker/index.js
++++ b/packages/components/src/custom-gradient-picker/index.js
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -7,9 +12,10 @@ import { __ } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import AnglePickerControl from '../angle-picker-control';
+-import CustomGradientBar from '../custom-gradient-bar';
++import CustomGradientBar from './gradient-bar';
+ import { Flex } from '../flex';
+ import SelectControl from '../select-control';
++import { VStack } from '../v-stack';
+ import {
+ 	getGradientAstWithDefault,
+ 	getLinearGradientRepresentation,
+@@ -44,6 +50,7 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
+ 	};
+ 	return (
+ 		<AnglePickerControl
++			__nextHasNoMarginBottom
+ 			onChange={ onAngleChange }
+ 			labelPosition="top"
+ 			value={ hasGradient ? angle : '' }
+@@ -86,6 +93,7 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
+ 
+ 	return (
+ 		<SelectControl
++			__nextHasNoMarginBottom
+ 			className="components-custom-gradient-picker__type-picker"
+ 			label={ __( 'Type' ) }
+ 			labelPosition="top"
+@@ -98,6 +106,8 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
+ };
+ 
+ export default function CustomGradientPicker( {
++	/** Start opting into the new margin-free styles that will become the default in a future version. */
++	__nextHasNoMargin = false,
+ 	value,
+ 	onChange,
+ 	__experimentalIsRenderedInSidebar,
+@@ -116,7 +126,12 @@ export default function CustomGradientPicker( {
+ 	} ) );
+ 
+ 	return (
+-		<div className="components-custom-gradient-picker">
++		<VStack
++			spacing={ 5 }
++			className={ classnames( 'components-custom-gradient-picker', {
++				'is-next-has-no-margin': __nextHasNoMargin,
++			} ) }
++		>
+ 			<CustomGradientBar
+ 				__experimentalIsRenderedInSidebar={
+ 					__experimentalIsRenderedInSidebar
+@@ -156,6 +171,6 @@ export default function CustomGradientPicker( {
+ 					) }
+ 				</AccessoryWrapper>
+ 			</Flex>
+-		</div>
++		</VStack>
+ 	);
+ }
+diff --git a/packages/components/src/custom-gradient-picker/stories/index.js b/packages/components/src/custom-gradient-picker/stories/index.js
+index e34cc07531af02..d4be0eb6917c85 100644
+--- a/packages/components/src/custom-gradient-picker/stories/index.js
++++ b/packages/components/src/custom-gradient-picker/stories/index.js
+@@ -11,6 +11,9 @@ import CustomGradientPicker from '../';
+ export default {
+ 	title: 'Components/CustomGradientPicker',
+ 	component: CustomGradientPicker,
++	argTypes: {
++		__nextHasNoMargin: { control: { type: 'boolean' } },
++	},
+ };
+ 
+ const CustomGradientPickerWithState = ( props ) => {
+@@ -24,6 +27,4 @@ const CustomGradientPickerWithState = ( props ) => {
+ 	);
+ };
+ 
+-export const _default = () => {
+-	return <CustomGradientPickerWithState />;
+-};
++export const Default = CustomGradientPickerWithState.bind( {} );
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index 4fb7826f4602e8..c3c236f2367058 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -1,15 +1,20 @@
+ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 16px handles inside, that leaves 32px padding, half of which is 1å6.
+ 
++.components-custom-gradient-picker {
++	&:not(.is-next-has-no-margin) {
++		margin-top: $grid-unit-15;
++		margin-bottom: $grid-unit-30;
++	}
++}
++
+ .components-custom-gradient-picker__gradient-bar:not(.has-gradient) {
+ 	opacity: 0.4;
+ }
+ 
+ .components-custom-gradient-picker__gradient-bar {
+ 	border-radius: $radius-block-ui;
+-	margin-top: $grid-unit-15;
+ 	width: 100%;
+ 	height: $grid-unit-60;
+-	margin-bottom: $grid-unit-20+$grid-unit-05;
+ 
+ 	.components-custom-gradient-picker__markers-container {
+ 		position: relative;
+@@ -86,15 +91,6 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ 	height: 20px;
+ }
+ 
+-.components-custom-gradient-picker .components-custom-gradient-picker__ui-line {
+-	margin-bottom: $grid-unit-20;
+-
+-	.components-base-control.components-angle-picker,
+-	.components-base-control.components-custom-gradient-picker__type-picker {
+-		margin-bottom: 0;
+-	}
+-}
+-
+ .components-custom-gradient-picker .components-custom-gradient-picker__toolbar {
+ 	border: none;
+ 
+diff --git a/packages/components/src/duotone-picker/custom-duotone-bar.js b/packages/components/src/duotone-picker/custom-duotone-bar.js
+index 87a191cf4b7ae5..8aef83f8a4bfab 100644
+--- a/packages/components/src/duotone-picker/custom-duotone-bar.js
++++ b/packages/components/src/duotone-picker/custom-duotone-bar.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import CustomGradientBar from '../custom-gradient-bar';
++import CustomGradientBar from '../custom-gradient-picker/gradient-bar';
+ 
+ import {
+ 	getColorStopsFromColors,
+diff --git a/packages/components/src/duotone-picker/duotone-picker.js b/packages/components/src/duotone-picker/duotone-picker.js
+index 8f04db7ec60883..39e1733460f2ae 100644
+--- a/packages/components/src/duotone-picker/duotone-picker.js
++++ b/packages/components/src/duotone-picker/duotone-picker.js
+@@ -14,9 +14,11 @@ import { __, sprintf } from '@wordpress/i18n';
+  */
+ import ColorListPicker from '../color-list-picker';
+ import CircularOptionPicker from '../circular-option-picker';
++import { VStack } from '../v-stack';
+ 
+ import CustomDuotoneBar from './custom-duotone-bar';
+ import { getDefaultColors, getGradientFromCSSColors } from './utils';
++import { Spacer } from '../spacer';
+ 
+ function DuotonePicker( {
+ 	clearable = true,
+@@ -97,32 +99,38 @@ function DuotonePicker( {
+ 				)
+ 			}
+ 		>
+-			{ ! disableCustomColors && ! disableCustomDuotone && (
+-				<CustomDuotoneBar
+-					value={ isUnset ? undefined : value }
+-					onChange={ onChange }
+-				/>
+-			) }
+-			{ ! disableCustomDuotone && (
+-				<ColorListPicker
+-					labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
+-					colors={ colorPalette }
+-					value={ isUnset ? undefined : value }
+-					disableCustomColors={ disableCustomColors }
+-					enableAlpha
+-					onChange={ ( newColors ) => {
+-						if ( ! newColors[ 0 ] ) {
+-							newColors[ 0 ] = defaultDark;
+-						}
+-						if ( ! newColors[ 1 ] ) {
+-							newColors[ 1 ] = defaultLight;
+-						}
+-						const newValue =
+-							newColors.length >= 2 ? newColors : undefined;
+-						onChange( newValue );
+-					} }
+-				/>
+-			) }
++			<Spacer paddingTop={ 4 }>
++				<VStack spacing={ 3 }>
++					{ ! disableCustomColors && ! disableCustomDuotone && (
++						<CustomDuotoneBar
++							value={ isUnset ? undefined : value }
++							onChange={ onChange }
++						/>
++					) }
++					{ ! disableCustomDuotone && (
++						<ColorListPicker
++							labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
++							colors={ colorPalette }
++							value={ isUnset ? undefined : value }
++							disableCustomColors={ disableCustomColors }
++							enableAlpha
++							onChange={ ( newColors ) => {
++								if ( ! newColors[ 0 ] ) {
++									newColors[ 0 ] = defaultDark;
++								}
++								if ( ! newColors[ 1 ] ) {
++									newColors[ 1 ] = defaultLight;
++								}
++								const newValue =
++									newColors.length >= 2
++										? newColors
++										: undefined;
++								onChange( newValue );
++							} }
++						/>
++					) }
++				</VStack>
++			</Spacer>
+ 		</CircularOptionPicker>
+ 	);
+ }
+diff --git a/packages/components/src/duotone-picker/stories/duotone-picker.js b/packages/components/src/duotone-picker/stories/duotone-picker.js
+index 74607eaabbda4f..6186dd1b3ad37f 100644
+--- a/packages/components/src/duotone-picker/stories/duotone-picker.js
++++ b/packages/components/src/duotone-picker/stories/duotone-picker.js
+@@ -13,6 +13,8 @@ export default {
+ 	component: DuotonePicker,
+ 	argTypes: {
+ 		clearable: { control: { type: 'boolean' } },
++		disableCustomColors: { control: { type: 'boolean' } },
++		disableCustomDuotone: { control: { type: 'boolean' } },
+ 		onChange: { action: 'onChange' },
+ 		unsetable: { control: { type: 'boolean' } },
+ 	},
+diff --git a/packages/components/src/gradient-picker/index.js b/packages/components/src/gradient-picker/index.js
+index 7ad4251c4866e6..4f8cbe9fc7a303 100644
+--- a/packages/components/src/gradient-picker/index.js
++++ b/packages/components/src/gradient-picker/index.js
+@@ -16,6 +16,7 @@ import CircularOptionPicker from '../circular-option-picker';
+ import CustomGradientPicker from '../custom-gradient-picker';
+ import { VStack } from '../v-stack';
+ import { ColorHeading } from '../color-palette/styles';
++import { Spacer } from '../spacer';
+ 
+ function SingleOrigin( {
+ 	className,
+@@ -99,6 +100,8 @@ function MultipleOrigin( {
+ }
+ 
+ export default function GradientPicker( {
++	/** Start opting into the new margin-free styles that will become the default in a future version. */
++	__nextHasNoMargin = false,
+ 	className,
+ 	gradients,
+ 	onChange,
+@@ -117,6 +120,11 @@ export default function GradientPicker( {
+ 			? MultipleOrigin
+ 			: SingleOrigin;
+ 
++	// Can be removed when deprecation period is over
++	const deprecatedMarginSpacerProps = ! __nextHasNoMargin
++		? { marginTop: 3 }
++		: {};
++
+ 	return (
+ 		<Component
+ 			className={ className }
+@@ -137,13 +145,20 @@ export default function GradientPicker( {
+ 			}
+ 			content={
+ 				! disableCustomGradients && (
+-					<CustomGradientPicker
+-						__experimentalIsRenderedInSidebar={
+-							__experimentalIsRenderedInSidebar
+-						}
+-						value={ value }
+-						onChange={ onChange }
+-					/>
++					<Spacer
++						marginTop={ gradients?.length ? 3 : 0 }
++						marginBottom={ 0 }
++						{ ...deprecatedMarginSpacerProps }
++					>
++						<CustomGradientPicker
++							__nextHasNoMargin={ __nextHasNoMargin }
++							__experimentalIsRenderedInSidebar={
++								__experimentalIsRenderedInSidebar
++							}
++							value={ value }
++							onChange={ onChange }
++						/>
++					</Spacer>
+ 				)
+ 			}
+ 		/>
+diff --git a/packages/components/src/gradient-picker/stories/index.js b/packages/components/src/gradient-picker/stories/index.js
+index 9fa07be602afe1..1a3bd61357e27b 100644
+--- a/packages/components/src/gradient-picker/stories/index.js
++++ b/packages/components/src/gradient-picker/stories/index.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { text, boolean, object } from '@storybook/addon-knobs';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -16,94 +11,74 @@ import GradientPicker from '../';
+ export default {
+ 	title: 'Components/GradientPicker',
+ 	component: GradientPicker,
+-	parameters: {
+-		knobs: { disable: false },
++	argTypes: {
++		__nextHasNoMargin: { control: { type: 'boolean' } },
++		clearable: { control: { type: 'boolean' } },
++		disableCustomGradients: { control: { type: 'boolean' } },
++		onChange: { action: 'onChange' },
+ 	},
+ };
+ 
+-const GradientPickerWithState = ( props ) => {
++const GRADIENTS = [
++	{
++		name: 'Vivid cyan blue to vivid purple',
++		gradient:
++			'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
++		slug: 'vivid-cyan-blue-to-vivid-purple',
++	},
++	{
++		name: 'Light green cyan to vivid green cyan',
++		gradient:
++			'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)',
++		slug: 'light-green-cyan-to-vivid-green-cyan',
++	},
++	{
++		name: 'Luminous vivid amber to luminous vivid orange',
++		gradient:
++			'linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%)',
++		slug: 'luminous-vivid-amber-to-luminous-vivid-orange',
++	},
++	{
++		name: 'Luminous vivid orange to vivid red',
++		gradient:
++			'linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%)',
++		slug: 'luminous-vivid-orange-to-vivid-red',
++	},
++	{
++		name: 'Very light gray to cyan bluish gray',
++		gradient:
++			'linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%)',
++		slug: 'very-light-gray-to-cyan-bluish-gray',
++	},
++	{
++		name: 'Cool to warm spectrum',
++		gradient:
++			'linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)',
++		slug: 'cool-to-warm-spectrum',
++	},
++];
++
++const Template = ( { onChange, ...props } ) => {
+ 	const [ gradient, setGradient ] = useState();
+ 	return (
+ 		<GradientPicker
+ 			{ ...props }
+ 			value={ gradient }
+-			onChange={ setGradient }
++			onChange={ ( ...changeArgs ) => {
++				setGradient( ...changeArgs );
++				onChange?.( ...changeArgs );
++			} }
+ 		/>
+ 	);
+ };
+ 
+-export const _default = () => {
+-	const disableCustomGradients = boolean( 'Disable Custom Gradients', false );
+-	const clearable = boolean( 'Clearable', true );
+-	const className = text( 'Class Name', '' );
+-	const gradients = object( 'Gradients', [
+-		{
+-			name: 'Vivid cyan blue to vivid purple',
+-			gradient:
+-				'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)',
+-			slug: 'vivid-cyan-blue-to-vivid-purple',
+-		},
+-		{
+-			name: 'Light green cyan to vivid green cyan',
+-			gradient:
+-				'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)',
+-			slug: 'light-green-cyan-to-vivid-green-cyan',
+-		},
+-		{
+-			name: 'Luminous vivid amber to luminous vivid orange',
+-			gradient:
+-				'linear-gradient(135deg,rgba(252,185,0,1) 0%,rgba(255,105,0,1) 100%)',
+-			slug: 'luminous-vivid-amber-to-luminous-vivid-orange',
+-		},
+-		{
+-			name: 'Luminous vivid orange to vivid red',
+-			gradient:
+-				'linear-gradient(135deg,rgba(255,105,0,1) 0%,rgb(207,46,46) 100%)',
+-			slug: 'luminous-vivid-orange-to-vivid-red',
+-		},
+-		{
+-			name: 'Very light gray to cyan bluish gray',
+-			gradient:
+-				'linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%)',
+-			slug: 'very-light-gray-to-cyan-bluish-gray',
+-		},
+-		{
+-			name: 'Cool to warm spectrum',
+-			gradient:
+-				'linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)',
+-			slug: 'cool-to-warm-spectrum',
+-		},
+-	] );
+-
+-	return (
+-		<GradientPickerWithState
+-			disableCustomGradients={ disableCustomGradients }
+-			gradients={ gradients }
+-			clearable={ clearable }
+-			className={ className }
+-		/>
+-	);
++export const Default = Template.bind( {} );
++Default.args = {
++	gradients: GRADIENTS,
+ };
+ 
+-export const WithNoExistingGradients = () => {
+-	const disableCustomGradients = boolean( 'Disable Custom Gradients', false );
+-	const __experimentalHasMultipleOrigins = boolean(
+-		'Experimental Has Multiple Origins',
+-		true
+-	);
+-	const clearable = boolean( 'Clearable', true );
+-	const className = text( 'Class Name', '' );
+-	const gradients = object( 'Gradients', [] );
+-
+-	return (
+-		<GradientPickerWithState
+-			__experimentalHasMultipleOrigins={
+-				__experimentalHasMultipleOrigins
+-			}
+-			disableCustomGradients={ disableCustomGradients }
+-			gradients={ gradients }
+-			clearable={ clearable }
+-			className={ className }
+-		/>
+-	);
++export const WithNoExistingGradients = Template.bind( {} );
++WithNoExistingGradients.args = {
++	...Default.args,
++	gradients: [],
+ };

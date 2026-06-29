@@ -1,0 +1,25 @@
+diff --git a/packages/components/src/tab-panel/index.js b/packages/components/src/tab-panel/index.js
+index 2e94bd2b05e14d..5558272f2ffc4a 100644
+--- a/packages/components/src/tab-panel/index.js
++++ b/packages/components/src/tab-panel/index.js
+@@ -13,9 +13,10 @@ import { withInstanceId } from '@wordpress/compose';
+  * Internal dependencies
+  */
+ import { NavigableMenu } from '../navigable-container';
++import Button from '../button';
+ 
+ const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
+-	<button role="tab"
++	<Button role="tab"
+ 		tabIndex={ selected ? null : -1 }
+ 		aria-selected={ selected }
+ 		id={ tabId }
+@@ -23,7 +24,7 @@ const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
+ 		{ ...rest }
+ 	>
+ 		{ children }
+-	</button>
++	</Button>
+ );
+ 
+ class TabPanel extends Component {

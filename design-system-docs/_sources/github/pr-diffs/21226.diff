@@ -1,0 +1,124 @@
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+index 26b4a32c7c600c..6d4b046a6271cf 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+@@ -25,7 +25,6 @@ function useSlotRegistry() {
+ 
+ 	const unregisterSlot = useCallback( ( name, ref ) => {
+ 		setSlots( ( prevSlots ) => {
+-			// eslint-disable-next-line no-unused-vars
+ 			const { [ name ]: slot, ...nextSlots } = prevSlots;
+ 			// Make sure we're not unregistering a slot registered by another element
+ 			// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
+diff --git a/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap b/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
+index 79b43ad4c65c07..c8b4df5c0237de 100644
+--- a/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
++++ b/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
+@@ -26,6 +26,8 @@ Array [
+ ]
+ `;
+ 
++exports[`Slot bubblesVirtually false should unmount two slots with the same name 1`] = `"<div data-position=\\"first\\"></div><div data-position=\\"second\\"></div>"`;
++
+ exports[`Slot bubblesVirtually true should subsume another slot by the same name 1`] = `
+ Array [
+   <div
+@@ -54,6 +56,8 @@ Array [
+ ]
+ `;
+ 
++exports[`Slot bubblesVirtually true should unmount two slots with the same name 1`] = `"<div data-position=\\"first\\"></div><div data-position=\\"second\\"></div>"`;
++
+ exports[`Slot should re-render Slot when not bubbling virtually 1`] = `
+ Array [
+   <div>
+diff --git a/packages/components/src/slot-fill/test/slot.js b/packages/components/src/slot-fill/test/slot.js
+index db935e6bc2ed29..d168c41da47b43 100644
+--- a/packages/components/src/slot-fill/test/slot.js
++++ b/packages/components/src/slot-fill/test/slot.js
+@@ -3,6 +3,8 @@
+  */
+ import { isEmpty } from 'lodash';
+ import ReactTestRenderer from 'react-test-renderer';
++import { render, unmountComponentAtNode } from 'react-dom';
++import { act } from 'react-dom/test-utils';
+ 
+ /**
+  * Internal dependencies
+@@ -36,6 +38,20 @@ class Filler extends Component {
+ 	}
+ }
+ 
++let container = null;
++beforeEach( () => {
++	// setup a DOM element as a render target
++	container = document.createElement( 'div' );
++	document.body.appendChild( container );
++} );
++
++afterEach( () => {
++	// cleanup on exiting
++	unmountComponentAtNode( container );
++	container.remove();
++	container = null;
++} );
++
+ describe( 'Slot', () => {
+ 	it( 'should render empty Fills', () => {
+ 		const tree = ReactTestRenderer.create(
+@@ -260,6 +276,55 @@ describe( 'Slot', () => {
+ 
+ 				expect( testRenderer.toJSON() ).toMatchSnapshot();
+ 			} );
++
++			it( 'should unmount two slots with the same name', () => {
++				act( () => {
++					render(
++						<Provider>
++							<div data-position="first">
++								<Slot
++									name="egg"
++									bubblesVirtually={ bubblesVirtually }
++								/>
++							</div>
++							<div data-position="second">
++								<Slot
++									name="egg"
++									bubblesVirtually={ bubblesVirtually }
++								/>
++							</div>
++							<Fill name="egg">Content</Fill>
++						</Provider>,
++						container
++					);
++				} );
++				act( () => {
++					render(
++						<Provider>
++							<div data-position="first">
++								<Slot
++									name="egg"
++									bubblesVirtually={ bubblesVirtually }
++								/>
++							</div>
++							<div data-position="second" />
++							<Fill name="egg">Content</Fill>
++						</Provider>,
++						container
++					);
++				} );
++				act( () => {
++					render(
++						<Provider>
++							<div data-position="first" />
++							<div data-position="second" />
++							<Fill name="egg">Content</Fill>
++						</Provider>,
++						container
++					);
++				} );
++				expect( container.innerHTML ).toMatchSnapshot();
++			} );
+ 		}
+ 	);
+ } );

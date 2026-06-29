@@ -1,0 +1,27 @@
+diff --git a/packages/components/src/toolbar-group/toolbar-group-collapsed.js b/packages/components/src/toolbar-group/toolbar-group-collapsed.js
+index e78caa97113474..c671a4dd00f99f 100644
+--- a/packages/components/src/toolbar-group/toolbar-group-collapsed.js
++++ b/packages/components/src/toolbar-group/toolbar-group-collapsed.js
+@@ -20,7 +20,6 @@ function ToolbarGroupCollapsed( { controls = [], toggleProps, ...props } ) {
+ 			controls={ controls }
+ 			toggleProps={ {
+ 				...internalToggleProps,
+-				...toggleProps,
+ 				'data-toolbar-item': true,
+ 			} }
+ 			{ ...props }
+@@ -28,10 +27,12 @@ function ToolbarGroupCollapsed( { controls = [], toggleProps, ...props } ) {
+ 	);
+ 
+ 	if ( accessibleToolbarState ) {
+-		return <ToolbarItem>{ renderDropdownMenu }</ToolbarItem>;
++		return (
++			<ToolbarItem { ...toggleProps }>{ renderDropdownMenu }</ToolbarItem>
++		);
+ 	}
+ 
+-	return renderDropdownMenu();
++	return renderDropdownMenu( toggleProps );
+ }
+ 
+ export default ToolbarGroupCollapsed;

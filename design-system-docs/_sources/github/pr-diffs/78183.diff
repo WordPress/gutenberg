@@ -1,0 +1,765 @@
+diff --git a/.stylelintrc.js b/.stylelintrc.js
+index fc6f4c2f64f02a..09ffc0badc8a04 100644
+--- a/.stylelintrc.js
++++ b/.stylelintrc.js
+@@ -1,3 +1,6 @@
++// CSS Baseline 2024 stepped-value functions not yet recognized by Stylelint.
++const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
++
+ /** @type {import('stylelint').Config} */
+ module.exports = {
+ 	extends: '@wordpress/stylelint-config/scss-stylistic',
+@@ -68,16 +71,7 @@ module.exports = {
+ 			rules: {
+ 				'function-no-unknown': [
+ 					true,
+-					{
+-						ignoreFunctions: [
+-							// CSS stepped value math functions in Baseline 2024.
+-							// This rule exception can likely be removed when
+-							// updating to a more recent version of Stylelint.
+-							'round',
+-							'rem',
+-							'mod',
+-						],
+-					},
++					{ ignoreFunctions: CSS_BASELINE_2024_FUNCTIONS },
+ 				],
+ 				'declaration-property-max-values': {
+ 					// Prevents left/right values with shorthand property names (unclear for RTL)
+@@ -135,6 +129,23 @@ module.exports = {
+ 				],
+ 			},
+ 		},
++		{
++			// SCSS-only: use the Sass-aware `function-no-unknown` variant.
++			files: [ '**/*.module.scss', 'routes/**/*.scss' ],
++			rules: {
++				'function-no-unknown': null,
++				'scss/function-no-unknown': [
++					true,
++					{
++						ignoreFunctions: [
++							...CSS_BASELINE_2024_FUNCTIONS,
++							// Sass helpers from `@wordpress/base-styles`.
++							'z-index',
++						],
++					},
++				],
++			},
++		},
+ 	],
+ 	reportDescriptionlessDisables: true,
+ };
+diff --git a/package-lock.json b/package-lock.json
+index 5878c4c8cb60d3..154a657fa3c985 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -59726,6 +59726,7 @@
+ 				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/rich-text": "file:../rich-text",
+ 				"@wordpress/style-runtime": "file:../style-runtime",
++				"@wordpress/ui": "file:../ui",
+ 				"@wordpress/warning": "file:../warning",
+ 				"change-case": "^4.1.2",
+ 				"clsx": "^2.1.1",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2998bb71ddbdcb..d7c5460c88497d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `Draggable`: Render the drag clone inside the `@wordpress/ui` compat overlay slot so it shares stacking with `@wordpress/ui` overlays opened mid-drag. Auto-enabled in WordPress environments; other hosts can opt in via `useEnableWpCompatOverlaySlot()` ([#78183](https://github.com/WordPress/gutenberg/pull/78183)).
++
+ ## 33.1.0 (2026-05-14)
+ 
+ ### Enhancements
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 722fb737f69680..3d13e67664bebf 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -82,6 +82,7 @@
+ 		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/rich-text": "file:../rich-text",
+ 		"@wordpress/style-runtime": "file:../style-runtime",
++		"@wordpress/ui": "file:../ui",
+ 		"@wordpress/warning": "file:../warning",
+ 		"change-case": "^4.1.2",
+ 		"clsx": "^2.1.1",
+diff --git a/packages/components/src/draggable/index.tsx b/packages/components/src/draggable/index.tsx
+index b9dea8fed43061..c04594529ded3f 100644
+--- a/packages/components/src/draggable/index.tsx
++++ b/packages/components/src/draggable/index.tsx
+@@ -8,16 +8,30 @@ import type { DragEvent } from 'react';
+  */
+ import { throttle } from '@wordpress/compose';
+ import { useEffect, useRef } from '@wordpress/element';
++import { getWpCompatOverlaySlot } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+  */
+ import type { DraggableProps } from './types';
+-
+-const dragImageClass = 'components-draggable__invisible-drag-image';
+-const cloneWrapperClass = 'components-draggable__clone';
+-const clonePadding = 0;
++import styles from './style.module.scss';
++
++// The hardcoded legacy class names are preserved alongside the
++// CSS-module hashed ones for backwards compatibility. `filter(Boolean)`
++// keeps Jest's CSS-module mock (which returns `undefined`) from leaking
++// a literal "undefined" class.
++const dragImageClasses = [
++	styles[ 'invisible-drag-image' ],
++	'components-draggable__invisible-drag-image',
++].filter( Boolean );
++const cloneWrapperClasses = [
++	styles.clone,
++	'components-draggable__clone',
++].filter( Boolean );
++// Body-level signal shared with external code (e.g. block-editor keyboard
++// drag), so it stays as a plain global class rather than module-scoped.
+ const bodyClass = 'is-dragging-components-draggable';
++const clonePadding = 0;
+ 
+ /**
+  * `Draggable` is a Component that provides a way to set up a cross-browser
+@@ -99,6 +113,11 @@ export function Draggable( {
+ 	 */
+ 	function start( event: DragEvent ) {
+ 		const { ownerDocument } = event.target as HTMLElement;
++		// Only use the slot when it lives in the same document as the
++		// dragged element, so the clone's viewport-relative coordinates
++		// resolve in one coordinate space.
++		const slot = getWpCompatOverlaySlot();
++		const compatSlot = slot?.ownerDocument === ownerDocument ? slot : null;
+ 
+ 		event.dataTransfer.setData(
+ 			transferDataType,
+@@ -116,12 +135,14 @@ export function Draggable( {
+ 		// right after. event.dataTransfer.setDragImage is not supported yet in
+ 		// IE, we need to check for its existence first.
+ 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
+-			dragImage.classList.add( dragImageClass );
++			dragImage.classList.add( ...dragImageClasses );
++			// Stays at the document body — invisible, so the slot's stacking
++			// guarantees aren't needed here.
+ 			ownerDocument.body.appendChild( dragImage );
+ 			event.dataTransfer.setDragImage( dragImage, 0, 0 );
+ 		}
+ 
+-		cloneWrapper.classList.add( cloneWrapperClass );
++		cloneWrapper.classList.add( ...cloneWrapperClasses );
+ 
+ 		if ( cloneClassname ) {
+ 			cloneWrapper.classList.add( cloneClassname );
+@@ -141,8 +162,7 @@ export function Draggable( {
+ 			clonedDragComponent.innerHTML = dragComponentRef.current.innerHTML;
+ 			cloneWrapper.appendChild( clonedDragComponent );
+ 
+-			// Inject the cloneWrapper into the DOM.
+-			ownerDocument.body.appendChild( cloneWrapper );
++			( compatSlot ?? ownerDocument.body ).appendChild( cloneWrapper );
+ 		} else {
+ 			const element = ownerDocument.getElementById(
+ 				elementId
+@@ -173,8 +193,9 @@ export function Draggable( {
+ 
+ 			cloneWrapper.appendChild( clone );
+ 
+-			// Inject the cloneWrapper into the DOM.
+-			if ( appendToOwnerDocument ) {
++			if ( compatSlot ) {
++				compatSlot.appendChild( cloneWrapper );
++			} else if ( appendToOwnerDocument ) {
+ 				ownerDocument.body.appendChild( cloneWrapper );
+ 			} else {
+ 				elementWrapper?.appendChild( cloneWrapper );
+diff --git a/packages/components/src/draggable/stories/index.story.tsx b/packages/components/src/draggable/stories/index.story.tsx
+index f6b6b5cf7d46bd..3bf09ef7a037d7 100644
+--- a/packages/components/src/draggable/stories/index.story.tsx
++++ b/packages/components/src/draggable/stories/index.story.tsx
+@@ -32,7 +32,13 @@ const meta: Meta< typeof Draggable > = {
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
+-		docs: { source: { code: '' } },
++		docs: {
++			source: { code: '' },
++			// Render each story in its own iframe — Storybook's docs-page
++			// wrappers create transform-based containing blocks that break
++			// the drag clone's `position: fixed` resolution.
++			story: { inline: false, height: '250px' },
++		},
+ 		componentStatus: {
+ 			status: 'use-with-caution',
+ 			whereUsed: 'global',
+@@ -115,11 +121,10 @@ export const Default: StoryFn< typeof Draggable > = DefaultTemplate.bind( {} );
+ Default.args = {};
+ 
+ /**
+- * `appendToOwnerDocument` is used to append the element being dragged to the body of the owner document.
+- *
+- * This is useful when the element being dragged should not receive styles from its parent.
+- * For example, when the element's parent sets a `z-index` value that would cause the dragged
+- * element to be rendered behind other elements.
++ * `appendToOwnerDocument` appends the dragged element's clone to the owner
++ * document's body instead of the element's parent, which is useful when an
++ * ancestor's stacking context (e.g. its `z-index`) would otherwise place the
++ * clone behind other content.
+  */
+ export const AppendElementToOwnerDocument: StoryFn< typeof Draggable > =
+ 	DefaultTemplate.bind( {} );
+diff --git a/packages/components/src/draggable/style.module.scss b/packages/components/src/draggable/style.module.scss
+new file mode 100644
+index 00000000000000..5c1410770e0e8d
+--- /dev/null
++++ b/packages/components/src/draggable/style.module.scss
+@@ -0,0 +1,26 @@
++@use "@wordpress/base-styles/z-index" as *;
++
++.invisible-drag-image {
++	position: fixed;
++	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Offscreen drag-image stand-in; flipping with writing direction has no benefit. */
++	left: -1000px;
++	height: 50px;
++	width: 50px;
++}
++
++.clone {
++	position: fixed;
++	padding: 0; // Should match clonePadding variable.
++	background: transparent;
++	pointer-events: none;
++	// Stacking fallback for when the clone is not routed into the
++	// `@wordpress/ui` compat overlay slot.
++	z-index: z-index(".components-draggable__clone");
++}
++
++// Keep this selector global so external code that toggles the same
++// body class (e.g. block-editor keyboard drag) gets the same cursor.
++:global(body.is-dragging-components-draggable) {
++	cursor: move; /* Fallback for IE/Edge < 14 */
++	cursor: grabbing !important;
++}
+diff --git a/packages/components/src/draggable/style.scss b/packages/components/src/draggable/style.scss
+deleted file mode 100644
+index 07e1f36973ff2f..00000000000000
+--- a/packages/components/src/draggable/style.scss
++++ /dev/null
+@@ -1,21 +0,0 @@
+-@use "@wordpress/base-styles/z-index" as *;
+-
+-body.is-dragging-components-draggable {
+-	cursor: move;/* Fallback for IE/Edge < 14 */
+-	cursor: grabbing !important;
+-}
+-
+-.components-draggable__invisible-drag-image {
+-	position: fixed;
+-	left: -1000px;
+-	height: 50px;
+-	width: 50px;
+-}
+-
+-.components-draggable__clone {
+-	position: fixed;
+-	padding: 0; // Should match clonePadding variable.
+-	background: transparent;
+-	pointer-events: none;
+-	z-index: z-index(".components-draggable__clone");
+-}
+diff --git a/packages/components/src/draggable/types.ts b/packages/components/src/draggable/types.ts
+index 61dd345e74d2ca..e3081a21c0409d 100644
+--- a/packages/components/src/draggable/types.ts
++++ b/packages/components/src/draggable/types.ts
+@@ -21,6 +21,10 @@ export type DraggableProps = {
+ 	 * Whether to append the cloned element to the `ownerDocument` body.
+ 	 * By default, elements sourced by id are appended to the element's wrapper.
+ 	 *
++	 * Has no effect while the `@wordpress/ui` compat overlay slot is in use
++	 * in the same document (the clone is placed in the slot instead). Cross-
++	 * document drags fall back to this prop's regular semantics.
++	 *
+ 	 * @default false
+ 	 */
+ 	appendToOwnerDocument?: boolean;
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index d316d1716f2e90..6d85fd28f7ac60 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -12,7 +12,6 @@
+ @use "./combobox-control/style.scss" as *;
+ @use "./color-palette/style.scss" as *;
+ @use "./custom-gradient-picker/style.scss" as *;
+-@use "./draggable/style.scss" as *;
+ @use "./drop-zone/style.scss" as *;
+ @use "./dropdown/style.scss" as *;
+ @use "./dropdown-menu/style.scss" as *;
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index e86cbfa127ae2e..2b640ad8a293ba 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -28,6 +28,7 @@
+ 		{ "path": "../react-i18n" },
+ 		{ "path": "../rich-text" },
+ 		{ "path": "../style-runtime" },
++		{ "path": "../ui" },
+ 		{ "path": "../warning" }
+ 	],
+ 	"files": [ "global.d.ts", "storybook.d.ts" ],
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index d35c3aff000c9c..1be594d5650c74 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   Export `getWpCompatOverlaySlot()` so consumers can route their own portals into the compat overlay slot ([#78183](https://github.com/WordPress/gutenberg/pull/78183)).
++
+ ## 0.13.0 (2026-05-14)
+ 
+ ### Breaking Changes
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 7b7efd78856256..1333f3564d2b65 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -17,5 +17,6 @@ export * from './stack';
+ export * as Tabs from './tabs';
+ export * from './text';
+ export * as Tooltip from './tooltip';
++export { getWpCompatOverlaySlot } from './utils/wp-compat-overlay-slot';
+ export { useEnableWpCompatOverlaySlot } from './utils/use-enable-wp-compat-overlay-slot';
+ export * from './visually-hidden';
+diff --git a/packages/ui/src/popover/stories/index.story.tsx b/packages/ui/src/popover/stories/index.story.tsx
+index 1795ba74b7e90c..d10c3d47ba04b9 100644
+--- a/packages/ui/src/popover/stories/index.story.tsx
++++ b/packages/ui/src/popover/stories/index.story.tsx
+@@ -1,6 +1,5 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { useId, useRef, useState } from '@wordpress/element';
+-import { SlotFillProvider, Slot } from '@wordpress/components';
+ import { close, info } from '@wordpress/icons';
+ import * as Popover from '../';
+ import { VisuallyHidden } from '../../visually-hidden';
+@@ -697,102 +696,6 @@ export const CrossIframe: Story = {
+ 	},
+ };
+ 
+-/**
+- * Same cross-iframe scenario, but using `SlotFillProvider` and `Slot` from
+- * `@wordpress/components` as the render target.
+- *
+- * The `Slot` renders a `div` in the parent document, and its forwarded ref
+- * is passed to `Popover.Portal`'s `container` prop (via `Popover.Popup`'s
+- * `portal` prop) so the popup portals into the slot element. This mirrors the
+- * legacy Popover's `WithSlotOutsideIframe` pattern.
+- */
+-export const CrossIframeWithSlotFill: Story = {
+-	name: 'Cross-Iframe (SlotFill)',
+-	args: { defaultOpen: true },
+-	argTypes: { defaultOpen: { control: false } },
+-	render: function Render( { children: _children, ...args } ) {
+-		const slotRef = useRef< HTMLDivElement >( null );
+-		const [ iframeBoundary, setIframeBoundary ] =
+-			useState< HTMLIFrameElement | null >( null );
+-
+-		return (
+-			<SlotFillProvider>
+-				<Slot
+-					name="popover-container"
+-					bubblesVirtually
+-					ref={ slotRef }
+-				/>
+-				<GenericIframe
+-					ref={ setIframeBoundary }
+-					style={ {
+-						width: '100%',
+-						height: 400,
+-						border: 0,
+-						outline: '1px solid purple',
+-					} }
+-				>
+-					<div
+-						style={ {
+-							height: '200vh',
+-							paddingTop: '10vh',
+-						} }
+-					>
+-						<div
+-							style={ {
+-								maxWidth: 200,
+-								marginTop: 100,
+-								marginInline: 'auto',
+-							} }
+-						>
+-							<Popover.Root { ...args }>
+-								<Popover.Trigger
+-									style={ {
+-										padding: 8,
+-										background: 'salmon',
+-									} }
+-								>
+-									Popover&apos;s anchor (inside iframe)
+-								</Popover.Trigger>
+-								<Popover.Popup
+-									portal={
+-										<Popover.Portal
+-											container={
+-												slotRef as React.RefObject< HTMLElement >
+-											}
+-										/>
+-									}
+-									positioner={
+-										<Popover.Positioner
+-											collisionBoundary={
+-												iframeBoundary ?? undefined
+-											}
+-										/>
+-									}
+-								>
+-									<Popover.Arrow />
+-									<Popover.Title
+-										style={ {
+-											marginBottom:
+-												'var(--wpds-dimension-gap-xs)',
+-										} }
+-									>
+-										Cross-Iframe (SlotFill)
+-									</Popover.Title>
+-									<Popover.Description>
+-										This popup renders in the parent
+-										document via a `Slot` from
+-										`@wordpress/components`.
+-									</Popover.Description>
+-								</Popover.Popup>
+-							</Popover.Root>
+-						</div>
+-					</div>
+-				</GenericIframe>
+-			</SlotFillProvider>
+-		);
+-	},
+-};
+-
+ /**
+  * Popovers in Gutenberg are managed with explicit z-index values, which can
+  * create situations where a popover renders below another popover when you
+diff --git a/storybook/stories/playground/draggable-cross-document-fallback.story.jsx b/storybook/stories/playground/draggable-cross-document-fallback.story.jsx
+new file mode 100644
+index 00000000000000..3d294dcdae1c7a
+--- /dev/null
++++ b/storybook/stories/playground/draggable-cross-document-fallback.story.jsx
+@@ -0,0 +1,121 @@
++/**
++ * WordPress dependencies
++ */
++import {
++	Draggable,
++	__experimentalStyleProvider as StyleProvider,
++} from '@wordpress/components';
++import { createPortal, useEffect, useRef, useState } from '@wordpress/element';
++import { getWpCompatOverlaySlot } from '@wordpress/ui';
++
++/**
++ * Internal dependencies
++ */
++import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
++
++export default {
++	title: 'Playground/Debug fixtures/Draggable cross-document fallback',
++	component: Draggable,
++	decorators: [ WithWpCompatOverlaySlot ],
++};
++
++export const InsideIframeWithCompatSlot = () => {
++	const iframeRef = useRef( null );
++	const [ iframeDoc, setIframeDoc ] = useState( null );
++
++	const updateIframeDoc = () => {
++		setIframeDoc( iframeRef.current?.contentDocument ?? null );
++	};
++
++	useEffect( updateIframeDoc, [] );
++
++	return (
++		<div>
++			<p>
++				Drag the blue handle inside the iframe. The orange clone should
++				appear under the cursor. If it appears offset toward the
++				top-left of the Storybook canvas, the compat-slot cross-document
++				fallback has regressed.
++			</p>
++			<p>
++				<small>
++					Compat slot present in this document:{ ' ' }
++					<code>
++						{ String(
++							typeof window !== 'undefined' &&
++								getWpCompatOverlaySlot() !== undefined
++						) }
++					</code>
++				</small>
++			</p>
++			<iframe
++				ref={ iframeRef }
++				title="Draggable iframe coordinate test"
++				onLoad={ updateIframeDoc }
++				srcDoc='<!doctype html><html><head></head><body style="margin:0;"></body></html>'
++				style={ {
++					border: '2px dashed #757575',
++					height: 240,
++					marginBlockStart: 80,
++					marginInlineStart: 120,
++					width: 360,
++				} }
++			/>
++			{ iframeDoc?.body &&
++				createPortal(
++					<StyleProvider document={ iframeDoc }>
++						<div
++							style={ {
++								background: '#f6f7f7',
++								boxSizing: 'border-box',
++								fontFamily: 'sans-serif',
++								height: '240px',
++								padding: 32,
++							} }
++						>
++							<Draggable
++								elementId="iframe-draggable-source"
++								transferData={ {} }
++								__experimentalDragComponent={
++									<div
++										style={ {
++											background: '#f0b849',
++											borderRadius: 4,
++											color: '#1e1e1e',
++											fontWeight: 600,
++											padding: '8px 12px',
++										} }
++									>
++										Drag clone
++									</div>
++								}
++							>
++								{ ( { onDraggableStart, onDraggableEnd } ) => (
++									<div
++										draggable
++										onDragStart={ onDraggableStart }
++										onDragEnd={ onDraggableEnd }
++										style={ {
++											alignItems: 'center',
++											background: '#3858e9',
++											borderRadius: 4,
++											color: 'white',
++											cursor: 'grab',
++											display: 'inline-flex',
++											fontWeight: 600,
++											height: 56,
++											justifyContent: 'center',
++											padding: '0 16px',
++										} }
++									>
++										Drag from iframe
++									</div>
++								) }
++							</Draggable>
++						</div>
++					</StyleProvider>,
++					iframeDoc.body
++				) }
++		</div>
++	);
++};
+diff --git a/storybook/stories/playground/popover-with-slotfill.story.jsx b/storybook/stories/playground/popover-with-slotfill.story.jsx
+new file mode 100644
+index 00000000000000..63995d46c10800
+--- /dev/null
++++ b/storybook/stories/playground/popover-with-slotfill.story.jsx
+@@ -0,0 +1,111 @@
++/**
++ * WordPress dependencies
++ */
++import { createPortal, useState } from '@wordpress/element';
++import { SlotFillProvider, Slot } from '@wordpress/components';
++import { Popover } from '@wordpress/ui';
++
++export default {
++	title: 'Playground/Debug fixtures/Popover with SlotFill',
++	component: Popover.Root,
++};
++
++// Renders an iframe and portals `children` into its body once `load` fires.
++// Gating the portal on `load` avoids a Firefox-only React portal bug — see
++// https://github.com/facebook/react/issues/22847#issuecomment-991394558.
++function IframePortal( { children, iframeRef, ...iframeProps } ) {
++	const [ bodyNode, setBodyNode ] = useState( null );
++	return (
++		<iframe
++			title="Iframe"
++			{ ...iframeProps }
++			ref={ iframeRef }
++			srcDoc="<!doctype html><html><body></body></html>"
++			onLoad={ ( event ) => {
++				setBodyNode(
++					event.currentTarget.contentDocument?.body ?? null
++				);
++			} }
++		>
++			{ bodyNode && createPortal( children, bodyNode ) }
++		</iframe>
++	);
++}
++
++export const CrossIframeWithSlotFill = {
++	args: { defaultOpen: true },
++	argTypes: { defaultOpen: { control: false } },
++	render: function Render( { children: _children, ...args } ) {
++		const [ slotNode, setSlotNode ] = useState( null );
++		const [ iframeBoundary, setIframeBoundary ] = useState( null );
++
++		return (
++			<SlotFillProvider>
++				<Slot
++					name="popover-container"
++					bubblesVirtually
++					ref={ setSlotNode }
++				/>
++				<IframePortal
++					iframeRef={ setIframeBoundary }
++					style={ {
++						width: '100%',
++						height: 400,
++						border: 0,
++						outline: '1px solid purple',
++					} }
++				>
++					<div style={ { height: '200vh', paddingTop: '10vh' } }>
++						<div
++							style={ {
++								maxWidth: 200,
++								marginTop: 100,
++								marginInline: 'auto',
++							} }
++						>
++							<Popover.Root { ...args }>
++								<Popover.Trigger
++									style={ {
++										padding: 8,
++										background: 'salmon',
++									} }
++								>
++									Popover&apos;s anchor (inside iframe)
++								</Popover.Trigger>
++								<Popover.Popup
++									portal={
++										<Popover.Portal
++											container={ slotNode ?? undefined }
++										/>
++									}
++									positioner={
++										<Popover.Positioner
++											collisionBoundary={
++												iframeBoundary ?? undefined
++											}
++										/>
++									}
++								>
++									<Popover.Arrow />
++									<Popover.Title
++										style={ {
++											marginBottom:
++												'var(--wpds-dimension-gap-xs)',
++										} }
++									>
++										Cross-Iframe (SlotFill)
++									</Popover.Title>
++									<Popover.Description>
++										This popup renders in the parent
++										document via a `Slot` from
++										`@wordpress/components`.
++									</Popover.Description>
++								</Popover.Popup>
++							</Popover.Root>
++						</div>
++					</div>
++				</IframePortal>
++			</SlotFillProvider>
++		);
++	},
++};
+diff --git a/storybook/stories/playground/wp-compat-overlay-slot.story.jsx b/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
+index 5ed406df6487cb..89b4fe1a5b02f8 100644
+--- a/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
++++ b/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
+@@ -16,7 +16,7 @@ import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
+  * components-side overlay, via the `@wordpress/ui` compat overlay slot.
+  */
+ export default {
+-	title: 'Playground/WP Compat Overlay Slot',
++	title: 'Playground/Debug fixtures/WP Compat Overlay Slot',
+ 	decorators: [ WithWpCompatOverlaySlot ],
+ };
+ 
+diff --git a/test/e2e/specs/editor/various/draggable-blocks.spec.js b/test/e2e/specs/editor/various/draggable-blocks.spec.js
+index d1366a57729024..80f2e6c7ab3715 100644
+--- a/test/e2e/specs/editor/various/draggable-blocks.spec.js
++++ b/test/e2e/specs/editor/various/draggable-blocks.spec.js
+@@ -454,6 +454,48 @@ test.describe( 'Draggable block', () => {
+ 		}
+ 	} );
+ 
++	test( 'renders the drag chip inside the wp compat overlay slot', async ( {
++		editor,
++		page,
++	} ) => {
++		await page.keyboard.press( 'Enter' );
++		await page.keyboard.type( '1' );
++		await page.keyboard.press( 'Enter' );
++		await page.keyboard.type( '2' );
++
++		await editor.canvas
++			.locator( 'role=document[name="Block: Paragraph"i] >> text=2' )
++			.focus();
++		await editor.showBlockToolbar();
++
++		const dragHandle = page.locator(
++			'role=toolbar[name="Block tools"i] >> role=button[name="Drag"i][include-hidden]'
++		);
++		await dragHandle.hover();
++		await page.mouse.down();
++
++		const firstParagraph = editor.canvas.locator(
++			'role=document[name="Block: Paragraph"i] >> text=1'
++		);
++		const firstParagraphBound = await firstParagraph.boundingBox();
++		await dragTo( page, firstParagraphBound.x, firstParagraphBound.y );
++
++		const chip = page.locator(
++			'data-testid=block-draggable-chip >> visible=true'
++		);
++		await expect( chip ).toBeVisible();
++
++		// The chip should live inside the body-level
++		// `[data-wp-compat-overlay-slot]` — that's what keeps it above
++		// any `@wordpress/components` overlays opened mid-drag.
++		const chipIsInsideCompatSlot = await chip.evaluate(
++			( el ) => el.closest( '[data-wp-compat-overlay-slot]' ) !== null
++		);
++		expect( chipIsInsideCompatSlot ).toBe( true );
++
++		await page.mouse.up();
++	} );
++
+ 	test( 'can directly drag an image', async ( { page, editor } ) => {
+ 		await editor.insertBlock( { name: 'core/image' } );
+ 		await editor.insertBlock( {

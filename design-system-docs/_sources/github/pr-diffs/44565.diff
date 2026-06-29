@@ -1,0 +1,126 @@
+diff --git a/packages/components/src/border-box-control/test/utils.js b/packages/components/src/border-box-control/test/utils.js
+index f5c65ed6532831..42c23e98101745 100644
+--- a/packages/components/src/border-box-control/test/utils.js
++++ b/packages/components/src/border-box-control/test/utils.js
+@@ -244,6 +244,54 @@ describe( 'BorderBoxControl Utils', () => {
+ 
+ 			expect( getCommonBorder( sideBorders ) ).toEqual( commonBorder );
+ 		} );
++
++		it( 'should return most common unit selection if border widths are mixed', () => {
++			const sideBorders = {
++				top: { color: '#fff', style: 'solid', width: '10px' },
++				right: { color: '#000', style: 'solid', width: '1rem' },
++				bottom: { color: '#000', style: 'solid', width: '2em' },
++				left: { color: '#000', style: undefined, width: '2em' },
++			};
++			const commonBorder = {
++				color: undefined,
++				style: undefined,
++				width: 'em',
++			};
++
++			expect( getCommonBorder( sideBorders ) ).toEqual( commonBorder );
++		} );
++
++		it( 'should return first unit when multiple units are equal most common', () => {
++			const sideBorders = {
++				top: { color: '#fff', style: 'solid', width: '1rem' },
++				right: { color: '#000', style: 'solid', width: '0.75em' },
++				bottom: { color: '#000', style: 'solid', width: '1vw' },
++				left: { color: '#000', style: undefined, width: '2vh' },
++			};
++			const commonBorder = {
++				color: undefined,
++				style: undefined,
++				width: 'rem',
++			};
++
++			expect( getCommonBorder( sideBorders ) ).toEqual( commonBorder );
++		} );
++
++		it( 'should ignore undefined values in determining most common unit', () => {
++			const sideBorders = {
++				top: { color: '#fff', style: 'solid', width: undefined },
++				right: { color: '#000', style: 'solid', width: '5vw' },
++				bottom: { color: '#000', style: 'solid', width: undefined },
++				left: { color: '#000', style: undefined, width: '2vh' },
++			};
++			const commonBorder = {
++				color: undefined,
++				style: undefined,
++				width: 'vw',
++			};
++
++			expect( getCommonBorder( sideBorders ) ).toEqual( commonBorder );
++		} );
+ 	} );
+ 
+ 	describe( 'getShorthandBorderStyle', () => {
+diff --git a/packages/components/src/border-box-control/utils.ts b/packages/components/src/border-box-control/utils.ts
+index 6e8c6e35f12b7e..1e2529166974a6 100644
+--- a/packages/components/src/border-box-control/utils.ts
++++ b/packages/components/src/border-box-control/utils.ts
+@@ -6,6 +6,7 @@ import type { CSSProperties } from 'react';
+ /**
+  * Internal dependencies
+  */
++import { parseCSSUnitValue } from '../utils/unit-values';
+ import type { Border } from '../border-control/types';
+ import type { AnyBorder, Borders, BorderProp, BorderSide } from './types';
+ 
+@@ -123,7 +124,7 @@ export const getCommonBorder = ( borders?: Borders ) => {
+ 	return {
+ 		color: allColorsMatch ? colors[ 0 ] : undefined,
+ 		style: allStylesMatch ? styles[ 0 ] : undefined,
+-		width: allWidthsMatch ? widths[ 0 ] : undefined,
++		width: allWidthsMatch ? widths[ 0 ] : getMostCommonUnit( widths ),
+ 	};
+ };
+ 
+@@ -152,3 +153,45 @@ export const getShorthandBorderStyle = (
+ 
+ 	return [ width, borderStyle, color ].filter( Boolean ).join( ' ' );
+ };
++
++export const getMostCommonUnit = (
++	values: Array< string | number | undefined >
++): string | undefined => {
++	// Collect all the CSS units.
++	const units = values.map( ( value ) =>
++		value === undefined ? undefined : parseCSSUnitValue( `${ value }` )[ 1 ]
++	);
++
++	// Return the most common unit out of only the defined CSS units.
++	const filteredUnits = units.filter( ( value ) => value !== undefined );
++	return mode( filteredUnits as string[] );
++};
++
++/**
++ * Finds the mode value out of the array passed favouring the first value
++ * as a tiebreaker.
++ *
++ * @param  values Values to determine the mode from.
++ *
++ * @return The mode value.
++ */
++function mode( values: Array< string > ): string | undefined {
++	if ( values.length === 0 ) {
++		return undefined;
++	}
++
++	const map: { [ index: string ]: number } = {};
++	let maxCount = 0;
++	let currentMode;
++
++	values.forEach( ( value ) => {
++		map[ value ] = map[ value ] === undefined ? 1 : map[ value ] + 1;
++
++		if ( map[ value ] > maxCount ) {
++			currentMode = value;
++			maxCount = map[ value ];
++		}
++	} );
++
++	return currentMode;
++}

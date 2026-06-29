@@ -1,0 +1,134 @@
+diff --git a/packages/ui/src/box/box.tsx b/packages/ui/src/box/box.tsx
+index 10c8ea89255895..08c8aab3b55bfe 100644
+--- a/packages/ui/src/box/box.tsx
++++ b/packages/ui/src/box/box.tsx
+@@ -73,6 +73,7 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
+ 		borderRadius,
+ 		borderWidth,
+ 		borderColor,
++		elevation,
+ 		render = DEFAULT_RENDER,
+ 		...props
+ 	},
+@@ -108,6 +109,10 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
+ 		style.borderColor = `var(--wpds-color-stroke-${ target }-${ borderColor }, var(--wpds-color-stroke-surface-${ borderColor }))`;
+ 	}
+ 
++	if ( elevation ) {
++		style.boxShadow = `var(--wpds-elevation-${ elevation })`;
++	}
++
+ 	const element = useRender( {
+ 		render,
+ 		ref,
+diff --git a/packages/ui/src/box/stories/index.story.tsx b/packages/ui/src/box/stories/index.story.tsx
+index 63d4f626550eac..384250497c01c9 100644
+--- a/packages/ui/src/box/stories/index.story.tsx
++++ b/packages/ui/src/box/stories/index.story.tsx
+@@ -39,3 +39,42 @@ export const DirectionalPadding: Story = {
+ 		},
+ 	},
+ };
++
++export const WithElevation: Story = {
++	render: () => (
++		<div style={ { display: 'flex', gap: '24px', flexWrap: 'wrap' } }>
++			<Box
++				backgroundColor="neutral"
++				padding="md"
++				borderRadius="md"
++				elevation="x-small"
++			>
++				Elevation: x-small
++			</Box>
++			<Box
++				backgroundColor="neutral"
++				padding="md"
++				borderRadius="md"
++				elevation="small"
++			>
++				Elevation: small
++			</Box>
++			<Box
++				backgroundColor="neutral"
++				padding="md"
++				borderRadius="md"
++				elevation="medium"
++			>
++				Elevation: medium
++			</Box>
++			<Box
++				backgroundColor="neutral"
++				padding="md"
++				borderRadius="md"
++				elevation="large"
++			>
++				Elevation: large
++			</Box>
++		</div>
++	),
++};
+diff --git a/packages/ui/src/box/test/box.test.tsx b/packages/ui/src/box/test/box.test.tsx
+index a351f967c6edc3..659cd10095f39c 100644
+--- a/packages/ui/src/box/test/box.test.tsx
++++ b/packages/ui/src/box/test/box.test.tsx
+@@ -37,4 +37,34 @@ describe( 'Box', () => {
+ 			width: '10px',
+ 		} );
+ 	} );
++
++	it( 'applies elevation style', () => {
++		render( <Box elevation="small">Content</Box> );
++
++		const box = screen.getByText( 'Content' );
++
++		expect( box ).toHaveStyle( {
++			'box-shadow': 'var(--wpds-elevation-small)',
++		} );
++	} );
++
++	it( 'applies different elevation levels', () => {
++		const { rerender } = render( <Box elevation="x-small">Content</Box> );
++		let box = screen.getByText( 'Content' );
++		expect( box ).toHaveStyle( {
++			'box-shadow': 'var(--wpds-elevation-x-small)',
++		} );
++
++		rerender( <Box elevation="medium">Content</Box> );
++		box = screen.getByText( 'Content' );
++		expect( box ).toHaveStyle( {
++			'box-shadow': 'var(--wpds-elevation-medium)',
++		} );
++
++		rerender( <Box elevation="large">Content</Box> );
++		box = screen.getByText( 'Content' );
++		expect( box ).toHaveStyle( {
++			'box-shadow': 'var(--wpds-elevation-large)',
++		} );
++	} );
+ } );
+diff --git a/packages/ui/src/box/types.ts b/packages/ui/src/box/types.ts
+index 22bae4eb9e1094..527837e0eaa570 100644
+--- a/packages/ui/src/box/types.ts
++++ b/packages/ui/src/box/types.ts
+@@ -9,6 +9,8 @@ import {
+ } from '@wordpress/theme';
+ import { type ComponentProps } from '../utils/types';
+ 
++type ElevationSize = 'x-small' | 'small' | 'medium' | 'large';
++
+ type DimensionVariant< T > = {
+ 	block?: T;
+ 	blockStart?: T;
+@@ -54,6 +56,11 @@ export interface BoxProps extends ComponentProps< 'div' > {
+ 	 */
+ 	borderColor?: SurfaceStrokeColor;
+ 
++	/**
++	 * The elevation design token for box shadow.
++	 */
++	elevation?: ElevationSize;
++
+ 	/**
+ 	 * The content to be rendered inside the component.
+ 	 */

@@ -1,0 +1,91 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4c101980238fb1..26cc8e9ae4e07e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ 
+ -   `ToggleGroupControl`: Fix active background for empty string value ([#69969](https://github.com/WordPress/gutenberg/pull/69969)).
+ -   `ItemGroup`: Fix double border in `ItemGroup` when last item is focused ([#70021](https://github.com/WordPress/gutenberg/pull/70021)).
++-   `__experimentalUseCustomUnits `: Don't mutate 'ALL_CSS_UNITS' default value ([#70037](https://github.com/WordPress/gutenberg/pull/70037)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/unit-control/test/utils.ts b/packages/components/src/unit-control/test/utils.ts
+index c35167ae49243c..35ce01466e44ce 100644
+--- a/packages/components/src/unit-control/test/utils.ts
++++ b/packages/components/src/unit-control/test/utils.ts
+@@ -42,6 +42,42 @@ describe( 'UnitControl utils', () => {
+ 			] );
+ 		} );
+ 
++		it( 'should not mutate default units argument definiton', () => {
++			const unitsA = useCustomUnits( {
++				availableUnits: [ 'px', 'em', 'rem' ],
++				defaultValues: { px: 8, em: 0.5, rem: 0.5 },
++			} );
++
++			const unitsB = useCustomUnits( {
++				availableUnits: [ 'px', 'em', 'rem' ],
++				defaultValues: { px: 16, em: 1, rem: 1 },
++			} );
++
++			expect( unitsA ).not.toEqual( unitsB );
++		} );
++
++		it( 'should not mutate custon units argument definitons', () => {
++			const units = [
++				{ value: 'px', label: 'pixel' },
++				{ value: 'em', label: 'em' },
++				{ value: 'rem', label: 'rem' },
++			];
++
++			const unitsA = useCustomUnits( {
++				availableUnits: [ 'px', 'em', 'rem' ],
++				defaultValues: { px: 8, em: 0.5, rem: 0.5 },
++				units,
++			} );
++
++			const unitsB = useCustomUnits( {
++				availableUnits: [ 'px', 'em', 'rem' ],
++				defaultValues: { px: 16, em: 1, rem: 1 },
++				units,
++			} );
++
++			expect( unitsA ).not.toEqual( unitsB );
++		} );
++
+ 		it( 'should add default values to available units even if the default values are strings', () => {
+ 			// Although the public APIs of the component expect a `number` as the type of the
+ 			// default values, it's still good to test for strings (as it can happen in un-typed
+diff --git a/packages/components/src/unit-control/utils.ts b/packages/components/src/unit-control/utils.ts
+index c80b34ef3af7b0..f9b3d9b2731357 100644
+--- a/packages/components/src/unit-control/utils.ts
++++ b/packages/components/src/unit-control/utils.ts
+@@ -428,19 +428,16 @@ export const useCustomUnits = ( {
+ 		units
+ 	);
+ 
+-	if ( defaultValues ) {
+-		customUnitsToReturn.forEach( ( unit, i ) => {
+-			if ( defaultValues[ unit.value ] ) {
+-				const [ parsedDefaultValue ] = parseQuantityAndUnitFromRawValue(
+-					defaultValues[ unit.value ]
+-				);
+-
+-				customUnitsToReturn[ i ].default = parsedDefaultValue;
+-			}
+-		} );
++	if ( ! defaultValues ) {
++		return customUnitsToReturn;
+ 	}
+ 
+-	return customUnitsToReturn;
++	return customUnitsToReturn.map( ( unit ) => {
++		const [ defaultValue ] = defaultValues[ unit.value ]
++			? parseQuantityAndUnitFromRawValue( defaultValues[ unit.value ] )
++			: [];
++		return { ...unit, default: defaultValue };
++	} );
+ };
+ 
+ /**

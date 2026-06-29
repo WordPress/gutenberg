@@ -1,0 +1,33 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a9416b25c5ff05..21ece7c6aaed34 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `CustomSelectControl`: switch to ariakit-based implementation ([#63258](https://github.com/WordPress/gutenberg/pull/63258)).
+ -   `CustomSelectControlV2`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
+ -   `CustomSelectControlV2`: do not flip popover if legacy adapter. ([#63357](https://github.com/WordPress/gutenberg/pull/63357)).
++-   `DropdownMenuV2`: invert animation direction. ([#63443](https://github.com/WordPress/gutenberg/pull/63443)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/dropdown-menu-v2/styles.ts
+index 2165e3af41cb76..91a3aaeec1147e 100644
+--- a/packages/components/src/dropdown-menu-v2/styles.ts
++++ b/packages/components/src/dropdown-menu-v2/styles.ts
+@@ -107,13 +107,13 @@ export const DropdownMenu = styled( Ariakit.Menu )<
+ 	/* Default animation.*/
+ 	animation-name: ${ slideDownAndFade };
+ 
+-	&[data-side='right'] {
++	&[data-side='left'] {
+ 		animation-name: ${ slideLeftAndFade };
+ 	}
+-	&[data-side='bottom'] {
++	&[data-side='up'] {
+ 		animation-name: ${ slideUpAndFade };
+ 	}
+-	&[data-side='left'] {
++	&[data-side='right'] {
+ 		animation-name: ${ slideRightAndFade };
+ 	}
+ 	@media ( prefers-reduced-motion ) {

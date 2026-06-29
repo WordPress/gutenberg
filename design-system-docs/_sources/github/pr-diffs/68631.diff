@@ -1,0 +1,56 @@
+diff --git a/packages/block-editor/src/components/background-image-control/index.js b/packages/block-editor/src/components/background-image-control/index.js
+index 62bffb54218c58..20cdd4d02cb44a 100644
+--- a/packages/block-editor/src/components/background-image-control/index.js
++++ b/packages/block-editor/src/components/background-image-control/index.js
+@@ -17,7 +17,6 @@ import {
+ 	FocalPointPicker,
+ 	MenuItem,
+ 	VisuallyHidden,
+-	__experimentalItemGroup as ItemGroup,
+ 	__experimentalHStack as HStack,
+ 	__experimentalTruncate as Truncate,
+ 	Dropdown,
+@@ -119,13 +118,16 @@ function InspectorImagePreviewItem( {
+ 	className,
+ 	onToggleCallback = noop,
+ } ) {
++	const { isOpen, ...restToggleProps } = toggleProps;
++
+ 	useEffect( () => {
+-		if ( typeof toggleProps?.isOpen !== 'undefined' ) {
+-			onToggleCallback( toggleProps?.isOpen );
++		if ( typeof isOpen !== 'undefined' ) {
++			onToggleCallback( isOpen );
+ 		}
+-	}, [ toggleProps?.isOpen, onToggleCallback ] );
+-	return (
+-		<ItemGroup as={ as } className={ className } { ...toggleProps }>
++	}, [ isOpen, onToggleCallback ] );
++
++	const renderPreviewContent = () => {
++		return (
+ 			<HStack
+ 				justify="flex-start"
+ 				as="span"
+@@ -162,7 +164,20 @@ function InspectorImagePreviewItem( {
+ 					</VisuallyHidden>
+ 				</FlexItem>
+ 			</HStack>
+-		</ItemGroup>
++		);
++	};
++
++	return as === 'button' ? (
++		<Button
++			__next40pxDefaultSize
++			className={ className }
++			{ ...restToggleProps }
++			aria-expanded={ isOpen }
++		>
++			{ renderPreviewContent() }
++		</Button>
++	) : (
++		renderPreviewContent()
+ 	);
+ }
+ 

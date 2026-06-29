@@ -1,0 +1,77 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index f1680954b17f2a..6beaf2e881b997 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -95,6 +95,7 @@ module.exports = {
+ 							'stubTrue',
+ 							'sum',
+ 							'sumBy',
++							'take',
+ 						],
+ 						message:
+ 							'This Lodash method is not recommended. Please use native functionality instead. If using `memoize`, please use `memize` instead.',
+diff --git a/packages/block-editor/src/components/link-control/test/fixtures/index.js b/packages/block-editor/src/components/link-control/test/fixtures/index.js
+index 6983279b2a55eb..bd7994c558e98d 100644
+--- a/packages/block-editor/src/components/link-control/test/fixtures/index.js
++++ b/packages/block-editor/src/components/link-control/test/fixtures/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { uniqueId, take } from 'lodash';
++import { uniqueId } from 'lodash';
+ 
+ export const fauxEntitySuggestions = [
+ 	{
+@@ -41,7 +41,7 @@ export const fetchFauxEntitySuggestions = (
+ 	{ isInitialSuggestions } = {}
+ ) => {
+ 	const suggestions = isInitialSuggestions
+-		? take( fauxEntitySuggestions, 3 )
++		? fauxEntitySuggestions.slice( 0, 3 )
+ 		: fauxEntitySuggestions;
+ 	return Promise.resolve( suggestions );
+ };
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index b5845dcd17d694..d06e9f124e62b0 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -3,7 +3,6 @@
+  */
+ import {
+ 	last,
+-	take,
+ 	clone,
+ 	uniq,
+ 	map,
+@@ -498,7 +497,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 			_suggestions = startsWithMatch.concat( containsMatch );
+ 		}
+ 
+-		return take( _suggestions, _maxSuggestions );
++		return _suggestions.slice( 0, _maxSuggestions );
+ 	}
+ 
+ 	function getSelectedSuggestion() {
+diff --git a/packages/components/src/mobile/segmented-control/index.native.js b/packages/components/src/mobile/segmented-control/index.native.js
+index 2a3071d0963b74..a216f6ea23574a 100644
+--- a/packages/components/src/mobile/segmented-control/index.native.js
++++ b/packages/components/src/mobile/segmented-control/index.native.js
+@@ -9,7 +9,7 @@ import {
+ 	Animated,
+ 	Easing,
+ } from 'react-native';
+-import { take, values, map, reduce } from 'lodash';
++import { values, map, reduce } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+@@ -103,7 +103,7 @@ const SegmentedControls = ( {
+ 			? styles.containerIOS
+ 			: styles.container;
+ 		const widths = map( values( segmentsDimensions ), 'width' );
+-		const widthsDistance = take( widths, index );
++		const widthsDistance = widths.slice( 0, index );
+ 		const widthsDistanceSum = reduce(
+ 			widthsDistance,
+ 			( sum, n ) => sum + n

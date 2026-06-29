@@ -1,0 +1,135 @@
+diff --git a/package-lock.json b/package-lock.json
+index a4389bf1610718..d64c7fea35c225 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -16282,13 +16282,22 @@
+ 			}
+ 		},
+ 		"@types/react-dates": {
+-			"version": "17.1.10",
+-			"resolved": "https://registry.npmjs.org/@types/react-dates/-/react-dates-17.1.10.tgz",
+-			"integrity": "sha512-vMMO4bw88PJ5yLfeo1WR0peR7hkYIsso1wGLiO5Xkpcb/B86LK2P1l3YbNWXD1M7BqFekezkuWaO1qKGf8uX4Q==",
++			"version": "21.8.3",
++			"resolved": "https://registry.npmjs.org/@types/react-dates/-/react-dates-21.8.3.tgz",
++			"integrity": "sha512-MSG/A5UCXepPw5a9BtdOXfCCSMcQ5+oQIkm0K2u39sf4EJbsgngUg1zcoY3amxa6Hz0EWZkZOiExK/92J6hxUw==",
+ 			"dev": true,
+ 			"requires": {
+ 				"@types/react": "*",
+-				"moment": ">=2.17.1"
++				"@types/react-outside-click-handler": "*",
++				"moment": "^2.26.0"
++			},
++			"dependencies": {
++				"moment": {
++					"version": "2.29.3",
++					"resolved": "https://registry.npmjs.org/moment/-/moment-2.29.3.tgz",
++					"integrity": "sha512-c6YRvhEo//6T2Jz/vVtYzqBzwvPT95JBQ+smCytzf7c50oMZRsR/a4w88aD34I+/QVSfnoAnSBFPJHItlOMJVw==",
++					"dev": true
++				}
+ 			}
+ 		},
+ 		"@types/react-dom": {
+@@ -16299,6 +16308,15 @@
+ 				"@types/react": "*"
+ 			}
+ 		},
++		"@types/react-outside-click-handler": {
++			"version": "1.3.1",
++			"resolved": "https://registry.npmjs.org/@types/react-outside-click-handler/-/react-outside-click-handler-1.3.1.tgz",
++			"integrity": "sha512-0BNan5zIIDyO5k9LFSG+60ZxQ/0wf+LTF9BJx3oOUdOaJlZk6RCe52jRB75mlvLLJx2YLa61+NidOwBfptWMKw==",
++			"dev": true,
++			"requires": {
++				"@types/react": "*"
++			}
++		},
+ 		"@types/react-syntax-highlighter": {
+ 			"version": "11.0.5",
+ 			"resolved": "https://registry.npmjs.org/@types/react-syntax-highlighter/-/react-syntax-highlighter-11.0.5.tgz",
+@@ -17315,7 +17333,7 @@
+ 				"highlight-words-core": "^1.2.2",
+ 				"lodash": "^4.17.21",
+ 				"memize": "^1.1.0",
+-				"moment": "^2.22.1",
++				"moment": "^2.26.0",
+ 				"re-resizable": "^6.4.0",
+ 				"react-colorful": "^5.3.1",
+ 				"react-dates": "^21.8.0",
+@@ -17345,6 +17363,11 @@
+ 					"resolved": "https://registry.npmjs.org/csstype/-/csstype-3.0.10.tgz",
+ 					"integrity": "sha512-2u44ZG2OcNUO9HDp/Jl8C07x6pU/eTR3ncV91SiK3dhG9TWvRVsCoJw14Ckx5DgWkzGA3waZWO3d7pgqpUI/XA=="
+ 				},
++				"moment": {
++					"version": "2.29.3",
++					"resolved": "https://registry.npmjs.org/moment/-/moment-2.29.3.tgz",
++					"integrity": "sha512-c6YRvhEo//6T2Jz/vVtYzqBzwvPT95JBQ+smCytzf7c50oMZRsR/a4w88aD34I+/QVSfnoAnSBFPJHItlOMJVw=="
++				},
+ 				"react-dates": {
+ 					"version": "21.8.0",
+ 					"resolved": "https://registry.npmjs.org/react-dates/-/react-dates-21.8.0.tgz",
+diff --git a/package.json b/package.json
+index 1604b2a0001c2c..d361be7ec5f018 100755
+--- a/package.json
++++ b/package.json
+@@ -122,7 +122,7 @@
+ 		"@types/npm-package-arg": "6.1.1",
+ 		"@types/prettier": "2.4.4",
+ 		"@types/qs": "6.9.7",
+-		"@types/react-dates": "17.1.10",
++		"@types/react-dates": "21.8.3",
+ 		"@types/requestidlecallback": "0.3.4",
+ 		"@types/semver": "7.3.8",
+ 		"@types/sprintf-js": "1.1.2",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 32ad4578ebf71d..4b811128c1bdd6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `CheckboxControl`: Add unit tests ([#41165](https://github.com/WordPress/gutenberg/pull/41165)).
+ -   `BorderBoxControl`: fix some layout misalignments, especially for RTL users ([#41254](https://github.com/WordPress/gutenberg/pull/41254)).
+ -   `TimePicker`: Update unit tests to use `@testing-library/user-event` ([#41270](https://github.com/WordPress/gutenberg/pull/41270)).
++-   `DateTimePicker`: Update `moment` to 2.26.0 and update `react-date` typings ([#41266](https://github.com/WordPress/gutenberg/pull/41266)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 7501d7516c5ca3..8922d0d7294cc1 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -62,7 +62,7 @@
+ 		"highlight-words-core": "^1.2.2",
+ 		"lodash": "^4.17.21",
+ 		"memize": "^1.1.0",
+-		"moment": "^2.22.1",
++		"moment": "^2.26.0",
+ 		"re-resizable": "^6.4.0",
+ 		"react-colorful": "^5.3.1",
+ 		"react-dates": "^21.8.0",
+diff --git a/packages/components/src/date-time/date.tsx b/packages/components/src/date-time/date.tsx
+index 9399d6afbab4ad..4c3a1fe748d826 100644
+--- a/packages/components/src/date-time/date.tsx
++++ b/packages/components/src/date-time/date.tsx
+@@ -8,12 +8,7 @@ import { noop } from 'lodash';
+ 
+ // `react-dates` doesn't tree-shake correctly, so we import from the individual
+ // component here.
+-// @ts-expect-error TypeScript won't find any type declarations at
+-// `react-dates/lib/components/DayPickerSingleDateController` as they're located
+-// at `react-dates`.
+-import UntypedDayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
+-import type { DayPickerSingleDateController } from 'react-dates';
+-const TypedDayPickerSingleDateController = UntypedDayPickerSingleDateController as DayPickerSingleDateController;
++import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
+ 
+ /**
+  * WordPress dependencies
+@@ -176,8 +171,9 @@ export function DatePicker( {
+ 
+ 	return (
+ 		<div className="components-datetime__date" ref={ nodeRef }>
+-			<TypedDayPickerSingleDateController
++			<DayPickerSingleDateController
+ 				date={ momentDate }
++				initialVisibleMonth={ null }
+ 				daySize={ 30 }
+ 				focused
+ 				hideKeyboardShortcutsPanel

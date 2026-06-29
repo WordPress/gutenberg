@@ -1,0 +1,429 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 16b7a0e309124c..2cde2a6f17dc4f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `FormTokenField`: Convert to TypeScript and refactor to functional component ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
+ -   `RadioControl`: Convert to TypeScript ([#41568](https://github.com/WordPress/gutenberg/pull/41568)).
+ -   `Flex` updated to satisfy `react/exhuastive-deps` eslint rule ([#41507](https://github.com/WordPress/gutenberg/pull/41507)).
++-   `TreeSelect`: Convert to TypeScript ([#41536](https://github.com/WordPress/gutenberg/pull/41536)).
+ 
+ ## 19.12.0 (2022-06-01)
+ 
+diff --git a/packages/components/src/select-control/stories/index.tsx b/packages/components/src/select-control/stories/index.tsx
+index 167e35eda4745a..3f5498dfc634a9 100644
+--- a/packages/components/src/select-control/stories/index.tsx
++++ b/packages/components/src/select-control/stories/index.tsx
+@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import SelectControl from '..';
++import SelectControl from '../';
+ 
+ const meta: ComponentMeta< typeof SelectControl > = {
+ 	title: 'Components/SelectControl',
+diff --git a/packages/components/src/tree-select/README.md b/packages/components/src/tree-select/README.md
+index b706d4a2b1f5a9..3306dfb0b71316 100644
+--- a/packages/components/src/tree-select/README.md
++++ b/packages/components/src/tree-select/README.md
+@@ -80,12 +80,12 @@ A function that receives the id of the new node element that is being selected.
+ 
+ The id of the currently selected node.
+ 
+--   Type: `Object`
++-   Type: `string` | `string[]`
+ -   Required: No
+ 
+ ### tree
+ 
+ An array containing the tree objects with the possible nodes the user can select.
+ 
+--   Type: `String`
++-   Type: `Object[]`
+ -   Required: No
+diff --git a/packages/components/src/tree-select/index.js b/packages/components/src/tree-select/index.js
+deleted file mode 100644
+index ef33f42584e380..00000000000000
+--- a/packages/components/src/tree-select/index.js
++++ /dev/null
+@@ -1,48 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { unescape as unescapeString, repeat, flatMap, compact } from 'lodash';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useMemo } from '@wordpress/element';
+-/**
+- * Internal dependencies
+- */
+-import { SelectControl } from '../';
+-
+-function getSelectOptions( tree, level = 0 ) {
+-	return flatMap( tree, ( treeNode ) => [
+-		{
+-			value: treeNode.id,
+-			label:
+-				repeat( '\u00A0', level * 3 ) + unescapeString( treeNode.name ),
+-		},
+-		...getSelectOptions( treeNode.children || [], level + 1 ),
+-	] );
+-}
+-
+-export default function TreeSelect( {
+-	label,
+-	noOptionLabel,
+-	onChange,
+-	selectedId,
+-	tree,
+-	...props
+-} ) {
+-	const options = useMemo( () => {
+-		return compact( [
+-			noOptionLabel && { value: '', label: noOptionLabel },
+-			...getSelectOptions( tree ),
+-		] );
+-	}, [ noOptionLabel, tree ] );
+-
+-	return (
+-		<SelectControl
+-			{ ...{ label, options, onChange } }
+-			value={ selectedId }
+-			{ ...props }
+-		/>
+-	);
+-}
+diff --git a/packages/components/src/tree-select/index.tsx b/packages/components/src/tree-select/index.tsx
+new file mode 100644
+index 00000000000000..d91fa20b4bcfd1
+--- /dev/null
++++ b/packages/components/src/tree-select/index.tsx
+@@ -0,0 +1,99 @@
++/**
++ * External dependencies
++ */
++import { unescape as unescapeString, repeat, flatMap, compact } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import { SelectControl } from '../select-control';
++import type { TreeSelectProps, Tree, SelectOptions } from './types';
++
++function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
++	return flatMap( tree, ( treeNode ) => [
++		{
++			value: treeNode.id,
++			label:
++				repeat( '\u00A0', level * 3 ) + unescapeString( treeNode.name ),
++		},
++		...getSelectOptions( treeNode.children || [], level + 1 ),
++	] );
++}
++
++/**
++ * TreeSelect component is used to generate select input fields.
++ *
++ * @example
++ * ```jsx
++ * import { TreeSelect } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyTreeSelect = () => {
++ * 	const [ page, setPage ] = useState( 'p21' );
++ *
++ * 	return (
++ * 		<TreeSelect
++ * 			label="Parent page"
++ * 			noOptionLabel="No parent page"
++ * 			onChange={ ( newPage ) => setPage( newPage ) }
++ * 			selectedId={ page }
++ * 			tree={ [
++ * 				{
++ * 					name: 'Page 1',
++ * 					id: 'p1',
++ * 					children: [
++ * 						{ name: 'Descend 1 of page 1', id: 'p11' },
++ * 						{ name: 'Descend 2 of page 1', id: 'p12' },
++ * 					],
++ * 				},
++ * 				{
++ * 					name: 'Page 2',
++ * 					id: 'p2',
++ * 					children: [
++ * 						{
++ * 							name: 'Descend 1 of page 2',
++ * 							id: 'p21',
++ * 							children: [
++ * 								{
++ * 									name: 'Descend 1 of Descend 1 of page 2',
++ * 									id: 'p211',
++ * 								},
++ * 							],
++ * 						},
++ * 					],
++ * 				},
++ * 			] }
++ * 		/>
++ * 	);
++ * }
++ * ```
++ */
++export function TreeSelect( {
++	label,
++	noOptionLabel,
++	onChange,
++	selectedId,
++	tree = [],
++	...props
++}: TreeSelectProps ) {
++	const options = useMemo( () => {
++		return compact( [
++			noOptionLabel && { value: '', label: noOptionLabel },
++			...getSelectOptions( tree ),
++		] );
++	}, [ noOptionLabel, tree ] );
++
++	return (
++		<SelectControl
++			{ ...{ label, options, onChange } }
++			value={ selectedId }
++			{ ...props }
++		/>
++	);
++}
++
++export default TreeSelect;
+diff --git a/packages/components/src/tree-select/stories/index.js b/packages/components/src/tree-select/stories/index.js
+deleted file mode 100644
+index 84e4273df73b32..00000000000000
+--- a/packages/components/src/tree-select/stories/index.js
++++ /dev/null
+@@ -1,80 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, object, text } from '@storybook/addon-knobs';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import TreeSelect from '../';
+-
+-export default {
+-	title: 'Components/TreeSelect',
+-	component: TreeSelect,
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-const TreeSelectWithState = ( props ) => {
+-	const [ selection, setSelection ] = useState();
+-
+-	return (
+-		<TreeSelect
+-			{ ...props }
+-			onChange={ setSelection }
+-			selectedId={ selection }
+-		/>
+-	);
+-};
+-
+-export const _default = () => {
+-	const label = text( 'Label', 'Label Text' );
+-	const noOptionLabel = text( 'No Option Label', 'No parent page' );
+-	const hideLabelFromVision = boolean( 'Hide Label From Vision', false );
+-	const help = text(
+-		'Help Text',
+-		'Help text to explain the select control.'
+-	);
+-	const tree = object( 'Tree', [
+-		{
+-			name: 'Page 1',
+-			id: 'p1',
+-			children: [
+-				{ name: 'Descend 1 of page 1', id: 'p11' },
+-				{ name: 'Descend 2 of page 1', id: 'p12' },
+-			],
+-		},
+-		{
+-			name: 'Page 2',
+-			id: 'p2',
+-			children: [
+-				{
+-					name: 'Descend 1 of page 2',
+-					id: 'p21',
+-					children: [
+-						{
+-							name: 'Descend 1 of Descend 1 of page 2',
+-							id: 'p211',
+-						},
+-					],
+-				},
+-			],
+-		},
+-	] );
+-
+-	return (
+-		<TreeSelectWithState
+-			label={ label }
+-			noOptionLabel={ noOptionLabel }
+-			hideLabelFromVision={ hideLabelFromVision }
+-			help={ help }
+-			tree={ tree }
+-		/>
+-	);
+-};
+diff --git a/packages/components/src/tree-select/stories/index.tsx b/packages/components/src/tree-select/stories/index.tsx
+new file mode 100644
+index 00000000000000..13c5dd74f262a4
+--- /dev/null
++++ b/packages/components/src/tree-select/stories/index.tsx
+@@ -0,0 +1,81 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++import type { ComponentProps } from 'react';
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import TreeSelect from '../';
++
++const meta: ComponentMeta< typeof TreeSelect > = {
++	title: 'Components/TreeSelect',
++	component: TreeSelect,
++	argTypes: {
++		help: { control: { type: 'text' } },
++		label: { control: { type: 'text' } },
++		prefix: { control: { type: 'text' } },
++		suffix: { control: { type: 'text' } },
++		selectedId: { control: { type: null } },
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++
++export default meta;
++
++const TreeSelectWithState: ComponentStory< typeof TreeSelect > = ( props ) => {
++	const [ selection, setSelection ] = useState<
++		ComponentProps< typeof TreeSelect >[ 'selectedId' ]
++	>();
++
++	return (
++		<TreeSelect
++			{ ...props }
++			onChange={ setSelection }
++			selectedId={ selection }
++		/>
++	);
++};
++
++export const Default = TreeSelectWithState.bind( {} );
++Default.args = {
++	label: 'Label Text',
++	noOptionLabel: 'No parent page',
++	help: 'Help text to explain the select control.',
++	tree: [
++		{
++			name: 'Page 1',
++			id: 'p1',
++			children: [
++				{ name: 'Descend 1 of page 1', id: 'p11' },
++				{ name: 'Descend 2 of page 1', id: 'p12' },
++			],
++		},
++		{
++			name: 'Page 2',
++			id: 'p2',
++			children: [
++				{
++					name: 'Descend 1 of page 2',
++					id: 'p21',
++					children: [
++						{
++							name: 'Descend 1 of Descend 1 of page 2',
++							id: 'p211',
++						},
++					],
++				},
++			],
++		},
++	],
++};
+diff --git a/packages/components/src/tree-select/types.ts b/packages/components/src/tree-select/types.ts
+new file mode 100644
+index 00000000000000..aafc057be34205
+--- /dev/null
++++ b/packages/components/src/tree-select/types.ts
+@@ -0,0 +1,35 @@
++/**
++ * External dependencies
++ */
++import type { ComponentProps } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type SelectControl from '../select-control';
++import type { SelectControlProps } from '../select-control/types';
++
++export type SelectOptions = Required<
++	ComponentProps< typeof SelectControl >
++>[ 'options' ];
++
++export interface Tree {
++	id: string;
++	name: string;
++	children?: Tree[];
++}
++
++export interface TreeSelectProps extends Omit< SelectControlProps, 'value' > {
++	/**
++	 * If this property is added, an option will be added with this label to represent empty selection.
++	 */
++	noOptionLabel?: string;
++	/**
++	 * An array containing the tree objects with the possible nodes the user can select.
++	 */
++	tree?: Tree[];
++	/**
++	 * The id of the currently selected node.
++	 */
++	selectedId?: ComponentProps< typeof SelectControl >[ 'value' ];
++}
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index f45345b7c43421..4ed0fba2b54c98 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -90,6 +90,7 @@
+ 		"src/toggle-group-control/**/*",
+ 		"src/tools-panel/**/*",
+ 		"src/tooltip/**/*",
++		"src/tree-select/**/*",
+ 		"src/truncate/**/*",
+ 		"src/ui/**/*",
+ 		"src/unit-control/**/*",

@@ -1,0 +1,205 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a31dbf4011c25d..b37b7b876abe48 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,12 +4,16 @@
+ 
+ ### Bug Fixes
+ 
++<<<<<<< fix/rtc-inline-inserter
++-   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).
++=======
+ -   `ValidatedRangeControl`: Fix `aria-label` rendered as `[object Object]` when `required` or `markWhenOptional` is set ([#77042](https://github.com/WordPress/gutenberg/pull/77042)).
+ -   `Autocomplete`: Fix matching logic to prefer longest overlapping trigger ([#77018](https://github.com/WordPress/gutenberg/pull/77018)).
+ 
+ ### Internal
+ 
+ -   Autocomplete: Refactor `useAutocomplete` to use `useReducer` ([#77020](https://github.com/WordPress/gutenberg/pull/77020)).
++>>>>>>> trunk
+ 
+ ## 32.5.0 (2026-04-01)
+ 
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index 7991177363adb7..f12533284535e1 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -294,17 +294,41 @@ export function useAutocomplete( {
+ 	};
+ }
+ 
+-function useLastDifferentValue( value: UseAutocompleteProps[ 'record' ] ) {
+-	const history = useRef< Set< typeof value > >( new Set() );
++/**
++ * Checks whether two records represent the same user-visible state
++ * (same text content and cursor position).
++ */
++function recordValuesMatch(
++	a: UseAutocompleteProps[ 'record' ],
++	b: UseAutocompleteProps[ 'record' ]
++) {
++	return a.text === b.text && a.start === b.start && a.end === b.end;
++}
+ 
+-	history.current.add( value );
++/**
++ * Tracks the last record whose value differed from the current one.
++ * Used to determine whether the user has actually typed something
++ */
++export function useLastDifferentValue(
++	value: UseAutocompleteProps[ 'record' ]
++) {
++	const history = useRef< Array< typeof value > >( [] );
++
++	const lastEntry = history.current[ history.current.length - 1 ];
++
++	// Only add to history if the value is meaningfully different from
++	// the most recent entry (analogous to Set.add being a no-op for
++	// duplicate references in the original implementation).
++	if ( ! lastEntry || ! recordValuesMatch( value, lastEntry ) ) {
++		history.current.push( value );
++	}
+ 
+ 	// Keep the history size to 2.
+-	if ( history.current.size > 2 ) {
+-		history.current.delete( Array.from( history.current )[ 0 ] );
++	if ( history.current.length > 2 ) {
++		history.current.shift();
+ 	}
+ 
+-	return Array.from( history.current )[ 0 ];
++	return history.current[ 0 ];
+ }
+ 
+ export function useAutocompleteProps( options: UseAutocompleteProps ) {
+diff --git a/packages/components/src/autocomplete/test/index.tsx b/packages/components/src/autocomplete/test/index.tsx
+index 0df784f8367cdd..f77e685c6370ea 100644
+--- a/packages/components/src/autocomplete/test/index.tsx
++++ b/packages/components/src/autocomplete/test/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen } from '@testing-library/react';
++import { render, screen, renderHook } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+ /**
+@@ -13,9 +13,118 @@ import { useRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { getAutoCompleterUI } from '../autocompleter-ui';
++import { useLastDifferentValue } from '..';
+ 
+ type FruitOption = { visual: string; name: string; id: number };
+ 
++function makeRecord( text: string ) {
++	return {
++		text,
++		formats: [],
++		replacements: [],
++		start: text.length,
++		end: text.length,
++	};
++}
++
++describe( 'useLastDifferentValue', () => {
++	it( 'should return the current record on first render', () => {
++		const record = makeRecord( 'Hello' );
++		const { result } = renderHook(
++			( { value } ) => useLastDifferentValue( value ),
++			{ initialProps: { value: record } }
++		);
++
++		expect( result.current.text ).toBe( 'Hello' );
++	} );
++
++	it( 'should return the previous record when text changes', () => {
++		const record1 = makeRecord( 'Hello' );
++		const { result, rerender } = renderHook(
++			( { value } ) => useLastDifferentValue( value ),
++			{ initialProps: { value: record1 } }
++		);
++
++		const record2 = makeRecord( 'Hello/' );
++		rerender( { value: record2 } );
++
++		expect( result.current.text ).toBe( 'Hello' );
++	} );
++
++	it( 'should not update when re-rendered with a new reference but same text', () => {
++		const record1 = makeRecord( 'Hello' );
++		const { result, rerender } = renderHook(
++			( { value } ) => useLastDifferentValue( value ),
++			{ initialProps: { value: record1 } }
++		);
++
++		// User types "/"
++		const record2 = makeRecord( 'Hello/' );
++		rerender( { value: record2 } );
++		expect( result.current.text ).toBe( 'Hello' );
++
++		// RESET_BLOCKS creates a new record object with the same text.
++		const record3 = makeRecord( 'Hello/' );
++		rerender( { value: record3 } );
++		expect( result.current.text ).toBe( 'Hello' );
++	} );
++
++	it( 'should survive multiple same-text re-renders', () => {
++		const record1 = makeRecord( 'Hello' );
++		const { result, rerender } = renderHook(
++			( { value } ) => useLastDifferentValue( value ),
++			{ initialProps: { value: record1 } }
++		);
++
++		// User types "/"
++		const record2 = makeRecord( 'Hello/' );
++		rerender( { value: record2 } );
++
++		// Multiple syncs, each producing new references with the same text.
++		for ( let i = 0; i < 5; i++ ) {
++			rerender( { value: makeRecord( 'Hello/' ) } );
++		}
++
++		expect( result.current.text ).toBe( 'Hello' );
++	} );
++
++	it( 'should track consecutive text changes correctly', () => {
++		const { result, rerender } = renderHook(
++			( { value } ) => useLastDifferentValue( value ),
++			{ initialProps: { value: makeRecord( 'A' ) } }
++		);
++
++		rerender( { value: makeRecord( 'AB' ) } );
++		expect( result.current.text ).toBe( 'A' );
++
++		rerender( { value: makeRecord( 'ABC' ) } );
++		expect( result.current.text ).toBe( 'AB' );
++
++		rerender( { value: makeRecord( 'ABCD' ) } );
++		expect( result.current.text ).toBe( 'ABC' );
++	} );
++
++	it( 'should update when cursor position changes without text change', () => {
++		const { result, rerender } = renderHook(
++			( { value } ) => useLastDifferentValue( value ),
++			{ initialProps: { value: makeRecord( 'Hello' ) } }
++		);
++
++		// User types "/"
++		rerender( { value: makeRecord( 'Hello/' ) } );
++		expect( result.current.text ).toBe( 'Hello' );
++
++		// User moves cursor left (same text, different position).
++		rerender( {
++			value: { ...makeRecord( 'Hello/' ), start: 0, end: 0 },
++		} );
++
++		// The returned record should now match the current text,
++		// so that didUserInput evaluates to false.
++		expect( result.current.text ).toBe( 'Hello/' );
++	} );
++} );
++
+ describe( 'AutocompleterUI', () => {
+ 	describe( 'click outside behavior', () => {
+ 		it( 'should call reset function when a click on another element occurs', async () => {

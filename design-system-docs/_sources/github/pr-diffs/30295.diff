@@ -1,0 +1,1330 @@
+diff --git a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
+index f025cddb77907c..fbc18f3cb9fafb 100644
+--- a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
++++ b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import styled from '@emotion/styled';
++import { styled } from '@wp-g2/styles';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/box-control/stories/index.js b/packages/components/src/box-control/stories/index.js
+index 60205d435fb944..eeb610ad4ae363 100644
+--- a/packages/components/src/box-control/stories/index.js
++++ b/packages/components/src/box-control/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import styled from '@emotion/styled';
++import { styled } from '@wp-g2/styles';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/box-control/styles/box-control-styles.js b/packages/components/src/box-control/styles/box-control-styles.js
+index 78cf6ceb9a6968..b0fddd1faf3064 100644
+--- a/packages/components/src/box-control/styles/box-control-styles.js
++++ b/packages/components/src/box-control/styles/box-control-styles.js
+@@ -2,7 +2,8 @@
+  * External dependencies
+  */
+ import { css } from '@emotion/core';
+-import styled from '@emotion/styled';
++import { styled } from '@wp-g2/styles';
++
+ /**
+  * Internal dependencies
+  */
+diff --git a/packages/components/src/card/styles/card-styles.js b/packages/components/src/card/styles/card-styles.js
+index 27421a29631d44..3cf61c7e2253a4 100644
+--- a/packages/components/src/card/styles/card-styles.js
++++ b/packages/components/src/card/styles/card-styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import styled from '@emotion/styled';
++import { styled } from '@wp-g2/styles';
+ 
+ /**
+  * WordPress dependencies
+@@ -11,7 +11,7 @@ import { HorizontalRule } from '@wordpress/primitives';
+ /**
+  * Internal dependencies
+  */
+-import Flex from '../../flex';
++import { Flex } from '../../flex';
+ import { color, space } from '../../utils/style-mixins';
+ 
+ export const styleProps = {
+diff --git a/packages/components/src/flex/README.md b/packages/components/src/flex/README.md
+index 8084352d06a887..e970053ffcea16 100644
+--- a/packages/components/src/flex/README.md
++++ b/packages/components/src/flex/README.md
+@@ -1,98 +1,65 @@
+ # Flex
+ 
+-Flex is a layout-based component, which provides a convenient way to align user-interfaces.
++`Flex` is a primitive layout component that adaptively aligns child content horizontally or vertically. `Flex` powers components like `HStack` and `VStack`.
+ 
+ ## Usage
+ 
++`Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
++
+ ```jsx
+-import { Flex, FlexItem, FlexBlock } from '@wordpress/components';
+-import { Icon, wordpress } from '@wordpress/icons';
++import { Flex, FlexItem, FlexBlock, Text } from '@wordpress/components/ui';
+ 
+-const Example = () => {
++function Example() {
+ 	return (
+ 		<Flex>
+ 			<FlexItem>
+-				<Icon icon={ wordpress } />
++				<Text>Code</Text>
+ 			</FlexItem>
+ 			<FlexBlock>
+-				<h2>WordPress</h2>
++				<Text>Poetry</Text>
+ 			</FlexBlock>
+ 		</Flex>
+ 	);
+-};
++}
+ ```
+ 
+-The most common use-case for `<Flex />` would be to automatically align two (or more) child items of varying sizes. By default, `<Flex />` would vertically center align them, and evenly spread the inner content horizontally, starting at the edges.
+-
+-Child items can be added directly. However, it is recommended that they are wrapped with `<FlexItem />` (which helps normalize layout styles).
+-
+-![Flex aligning and distributing 2 items of varying heights](https://make.wordpress.org/design/files/2020/06/flex-2-items.png)
+-
+-Adding more than 2 child items will spread them across with even gaps in between each item.
+-
+-![Flex aligning 3 items](https://make.wordpress.org/design/files/2020/06/flex-3-items.png)
+-
+-### Items and Blocks
+-
+-`<Flex />` provides 2 sub-components:
+-
+--   `<FlexItem />`
+--   `<FlexBlock />`
+-
+-These components can be used in combination to achieve flexible adaptive layouts.
+-
+-`<FlexBlock />` components will grow their widths to take up the remaining space within the `<Flex />` wrapper.
+-
+-![Flex item with block](https://make.wordpress.org/design/files/2020/06/flex-item-block.png)
+-
+-`<Flex />` automatically provides "gap" spacing in-between all child items. This value can be adjusted using the `gap` component prop.
+-
+-`<FlexItem />` and `<FlexBlock />` can be used in combination.
+-
+-![Multiple Flex items with Flex block](https://make.wordpress.org/design/files/2020/06/flex-item-block-item.png)
++## Props
+ 
+-## Sub-Components
++##### align
+ 
+-This component provides a collection of sub-component that can be used to compose various interfaces.
++**Type**: `CSS['alignItems']`
+ 
+-### `FlexBlock`
++Aligns children using CSS Flexbox `align-items`. Vertically aligns content if the `direction` is `row`, or horizontally aligns content if the `direction` is `column`.
+ 
+-A layout component that expands to fit the remaining space of `Flex`.
++In the example below, `flex-start` will align the children content to the top.
+ 
+-### `FlexItem`
++##### direction
+ 
+-A layout component to contain items of a fixed width within `Flex`.
++**Type**: `FlexDirection`
+ 
+-## Props
++The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
+ 
+-### align
++##### expanded
+ 
+-Vertically aligns children components using the CSS [`align-items`](https://developer.mozilla.org/en-US/docs/Web/CSS/align-items) property.
++**Type**: `boolean`
+ 
+--   Type: `String`
+--   Required: No
+--   Default: `center`
++Expands to the maximum available width (if horizontal) or height (if vertical).
+ 
+-### gap
++##### gap
+ 
+-Determines the spacing in between children components. The `gap` value is a multiplier to the base value of `4`.
++**Type**: `number`
+ 
+--   Type: `Number`
+--   Required: No
+--   Default: `2`
++Spacing in between each child can be adjusted by using `gap`. The value of `gap` works as a multiplier to the library's grid system (base of `4px`).
+ 
+-### isReversed
++##### justify
+ 
+-Reverses the render order of children components.
++**Type**: `CSS['justifyContent']`
+ 
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
++Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
++In the example below, `flex-start` will align the children content to the left.
+ 
+-### justify
++##### wrap
+ 
+-Horizontally aligns children components using the CSS [`justify-content`](https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content) property.
++**Type**: `boolean`
+ 
+--   Type: `String`
+--   Required: No
+--   Default: `space-between`
++Determines if children should wrap.
+diff --git a/packages/components/src/flex/block.js b/packages/components/src/flex/block.js
+deleted file mode 100644
+index ffe3ad85030f51..00000000000000
+--- a/packages/components/src/flex/block.js
++++ /dev/null
+@@ -1,30 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Block } from './styles/flex-styles';
+-import { withNextFlexBlock } from './next';
+-
+-/**
+- * @typedef {import('react').HTMLProps<HTMLDivElement> & import('react').RefAttributes<HTMLDivElement>} Props
+- */
+-
+-/**
+- * @param {Props} props
+- * @param {import('react').Ref<HTMLDivElement>} ref
+- */
+-function FlexBlock( { className, ...props }, ref ) {
+-	const classes = classnames( 'components-flex__block', className );
+-
+-	return <Block { ...props } className={ classes } ref={ ref } />;
+-}
+-
+-export default withNextFlexBlock( forwardRef( FlexBlock ) );
+diff --git a/packages/components/src/ui/flex/flex-block.js b/packages/components/src/flex/flex-block.js
+similarity index 89%
+rename from packages/components/src/ui/flex/flex-block.js
+rename to packages/components/src/flex/flex-block.js
+index a3d87336ac964c..0d08af50545c4c 100644
+--- a/packages/components/src/ui/flex/flex-block.js
++++ b/packages/components/src/flex/flex-block.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../utils';
++import { createComponent } from '../ui/utils';
+ import { useFlexBlock } from './use-flex-block';
+ 
+ /**
+diff --git a/packages/components/src/ui/flex/flex-item.js b/packages/components/src/flex/flex-item.js
+similarity index 89%
+rename from packages/components/src/ui/flex/flex-item.js
+rename to packages/components/src/flex/flex-item.js
+index c65636fc74c7ab..53e80e0bb124dc 100644
+--- a/packages/components/src/ui/flex/flex-item.js
++++ b/packages/components/src/flex/flex-item.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../utils';
++import { createComponent } from '../ui/utils';
+ import { useFlexItem } from './use-flex-item';
+ 
+ /**
+diff --git a/packages/components/src/ui/flex/flex.js b/packages/components/src/flex/flex.js
+similarity index 94%
+rename from packages/components/src/ui/flex/flex.js
+rename to packages/components/src/flex/flex.js
+index 69dc4be48af498..9f4665acd21573 100644
+--- a/packages/components/src/ui/flex/flex.js
++++ b/packages/components/src/flex/flex.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../utils';
++import { createComponent } from '../ui/utils';
+ import { useFlex } from './use-flex';
+ 
+ /**
+diff --git a/packages/components/src/flex/index.js b/packages/components/src/flex/index.js
+index 4da5e5425baad6..fb2bdace6a1fa2 100644
+--- a/packages/components/src/flex/index.js
++++ b/packages/components/src/flex/index.js
+@@ -1,64 +1,7 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
++export { default as Flex } from './flex';
++export { default as FlexItem } from './flex-item';
++export { default as FlexBlock } from './flex-block';
+ 
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Flex as BaseFlex } from './styles/flex-styles';
+-import { withNextFlex } from './next';
+-
+-export { default as FlexBlock } from './block';
+-export { default as FlexItem } from './item';
+-
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * @typedef OwnProps
+- * @property {import('react').CSSProperties['alignItems'] | 'top' | 'bottom'} [align='center'] Sets align-items. Top and bottom are shorthand for flex-start and flex-end respectively.
+- * @property {number} [gap=2] Determines the spacing in between children components. The `gap` value is a multiplier to the base value of `4`.
+- * @property {import('react').CSSProperties['justifyContent'] | 'left' | 'right'} [justify='space-between']          * Sets jusifty-content. Left and right are shorthand for flex-start and flex-end respectively, not the actual CSS value.
+- * @property {boolean} [isReversed=false] Reversed the flex direction.
+- */
+-/* eslint-enable jsdoc/valid-types */
+-
+-/** @typedef {OwnProps & import('react').HTMLProps<HTMLDivElement> & import('react').RefAttributes<HTMLDivElement>} Props */
+-
+-/**
+- * @param {Props} props
+- * @param {import('react').Ref<HTMLDivElement>} ref
+- */
+-function FlexComponent(
+-	{
+-		align = 'center',
+-		className,
+-		gap = 2,
+-		justify = 'space-between',
+-		isReversed = false,
+-		...props
+-	},
+-	ref
+-) {
+-	const classes = classnames( 'components-flex', className );
+-
+-	return (
+-		<BaseFlex
+-			{ ...props }
+-			align={ align }
+-			className={ classes }
+-			ref={ ref }
+-			gap={ gap }
+-			justify={ justify }
+-			isReversed={ isReversed }
+-		/>
+-	);
+-}
+-
+-export const Flex = withNextFlex( forwardRef( FlexComponent ) );
+-
+-export default Flex;
++export * from './use-flex';
++export * from './use-flex-item';
++export * from './use-flex-block';
+diff --git a/packages/components/src/flex/item.js b/packages/components/src/flex/item.js
+deleted file mode 100644
+index 26ac665ae4ea91..00000000000000
+--- a/packages/components/src/flex/item.js
++++ /dev/null
+@@ -1,31 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Item } from './styles/flex-styles';
+-import { withNextFlexItem } from './next';
+-
+-/**
+- * @typedef {import('react').RefAttributes<HTMLDivElement> & import('react').HTMLProps<HTMLDivElement>} Props
+- */
+-
+-/**
+- * @param {Props} props
+- * @param {import('react').Ref<HTMLDivElement>} ref
+- */
+-function FlexItem( { className, ...props }, ref ) {
+-	const classes = classnames( 'components-flex__item', className );
+-
+-	return <Item { ...props } className={ classes } ref={ ref } />;
+-}
+-
+-export default withNextFlexItem( forwardRef( FlexItem ) );
+diff --git a/packages/components/src/flex/next.js b/packages/components/src/flex/next.js
+deleted file mode 100644
+index 541b01be1f41f6..00000000000000
+--- a/packages/components/src/flex/next.js
++++ /dev/null
+@@ -1,75 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { withNext } from '../ui/context';
+-import {
+-	Flex as NextFlex,
+-	FlexItem as NextFlexItem,
+-	FlexBlock as NextFlexBlock,
+-} from '../ui/flex';
+-
+-const Flex = process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextFlex : undefined;
+-const FlexBlock =
+-	process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextFlexBlock : undefined;
+-const FlexItem =
+-	process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextFlexItem : undefined;
+-
+-/**
+- * @param {import('./index').Props} props Current props.
+- * @return {import('../ui/flex/types').FlexProps} Next props.
+- */
+-const flexAdapter = ( { isReversed, ...restProps } ) => ( {
+-	// There's no equivalent for `direction` on the original component so we can just translate `isReversed` to it
+-	direction: isReversed ? 'row-reverse' : 'row',
+-	...restProps,
+-	// There's an HTML attribute named `wrap` that will exist in `restProps` so we need to set it to undefined so the default behavior of the next component takes over
+-	wrap: undefined,
+-} );
+-
+-/**
+- * @param {import('./item').Props} props Current props.
+- * @return {import('../ui/flex/types').FlexItemProps} Next props.
+- */
+-const flexItemAdapter = ( props ) => ( {
+-	...props,
+-	// ensure these are undefined so the default takes over
+-	isBlock: undefined,
+-	display: undefined,
+-} );
+-
+-/**
+- * @param {import('./block').Props} props Current props.
+- * @return {import('../ui/flex/types').FlexBlockProps} Next props.
+- */
+-const flexBlockAdapter = ( props ) => ( {
+-	...props,
+-	// ensure this is undefined so the default takes over
+-	display: undefined,
+-} );
+-
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * @param {import('react').ForwardRefExoticComponent<import('./index').Props>} Current
+- */
+-/* eslint-enable jsdoc/valid-types */
+-export function withNextFlex( Current ) {
+-	return withNext( Current, Flex, 'WPComponentsFlex', flexAdapter );
+-}
+-
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * @param {import('react').ForwardRefExoticComponent<import('./item').Props>} Current
+- */
+-/* eslint-enable jsdoc/valid-types */
+-export function withNextFlexItem( Current ) {
+-	return withNext( Current, FlexItem, 'WPComponentsFlex', flexItemAdapter );
+-}
+-
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * @param {import('react').ForwardRefExoticComponent<import('./block').Props>} Current
+- */
+-/* eslint-enable jsdoc/valid-types */
+-export function withNextFlexBlock( Current ) {
+-	return withNext( Current, FlexBlock, 'WPComponentsFlex', flexBlockAdapter );
+-}
+diff --git a/packages/components/src/flex/stories/index.js b/packages/components/src/flex/stories/index.js
+index 919eb29fd4267e..90058acdf89dba 100644
+--- a/packages/components/src/flex/stories/index.js
++++ b/packages/components/src/flex/stories/index.js
+@@ -1,241 +1,30 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, number, select } from '@storybook/addon-knobs';
+-import { random } from 'lodash';
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-import { arrowLeft } from '@wordpress/icons';
+-
+ /**
+  * Internal dependencies
+  */
+-import Button from '../../button';
+-import Flex from '../index';
+-import FlexBlock from '../block';
+-import FlexItem from '../item';
+-
+-import './style.css';
+-
+-export default { title: 'Components/Flex', component: Flex };
++import Flex from '../flex';
++import FlexItem from '../flex-item';
++import { View } from '../../ui/view';
+ 
+-const getStoryProps = () => {
+-	const showOutline = boolean( 'Example: Show Outline', true );
+-
+-	const align = select(
+-		'align',
+-		{
+-			top: 'top',
+-			center: 'center',
+-			bottom: 'bottom',
+-		},
+-		'center'
+-	);
+-
+-	const gap = number( 'gap', 1 );
+-
+-	const justify = select(
+-		'justify',
+-		{
+-			'space-between': 'space-between',
+-			left: 'left',
+-			center: 'center',
+-			right: 'right',
+-		},
+-		'space-between'
+-	);
+-
+-	return {
+-		showOutline,
+-		align,
+-		gap,
+-		justify,
+-	};
+-};
+-
+-const Box = ( props ) => {
+-	const { height, width, style: styleProps = {} } = props;
+-
+-	const style = {
+-		background: '#ddd',
+-		fontSize: 12,
+-		...styleProps,
+-		height: height || 40,
+-		width: width || '100%',
+-	};
+-
+-	return <div { ...props } style={ style } />;
+-};
+-
+-const EnhancedFlex = ( props ) => {
+-	const { showOutline, ...restProps } = props;
+-	const exampleClassName = showOutline ? 'example-only-show-outline' : '';
+-
+-	return <Flex { ...restProps } className={ exampleClassName } />;
++export default {
++	component: Flex,
++	title: 'G2 Components (Experimental)/Flex',
+ };
+ 
+ export const _default = () => {
+-	const showBlock = boolean( 'Example: Show Block', true );
+-	const differSize = boolean( 'Example: Differ Sizes', true );
+-	const props = getStoryProps();
+-
+-	const baseSize = 40;
+-
+ 	return (
+-		<EnhancedFlex { ...props }>
+-			<FlexItem>
+-				<Box
+-					width={ differSize ? 100 : baseSize }
+-					height={ differSize ? 100 : baseSize }
+-				>
+-					Item
+-				</Box>
+-			</FlexItem>
+-			{ showBlock && (
+-				<FlexBlock>
+-					<Box height={ differSize ? 300 : null }>Block</Box>
+-				</FlexBlock>
+-			) }
+-
+-			<FlexItem>
+-				<Box width={ 40 }>Item</Box>
+-			</FlexItem>
+-		</EnhancedFlex>
+-	);
+-};
+-
+-const ItemExample = () => {
+-	const props = getStoryProps();
+-
+-	const [ items, setItems ] = useState( [
+-		{
+-			width: 40,
+-			height: 40,
+-		},
+-	] );
+-
+-	const addItem = () => {
+-		setItems( [
+-			...items,
+-			{ width: random( 12, 150 ), height: random( 12, 150 ) },
+-		] );
+-	};
+-
+-	const removeItem = () => {
+-		const nextItems = items.filter( ( item, index ) => {
+-			return index !== items.length - 1;
+-		} );
+-		setItems( nextItems );
+-	};
+-
+-	return (
+-		<div>
+-			<Flex justify="left" gap="small">
+-				<FlexItem>
+-					<Button onClick={ addItem } isSecondary>
+-						Add Item
+-					</Button>
+-				</FlexItem>
+-				<FlexItem>
+-					<Button onClick={ removeItem } isSecondary>
+-						Remove Item
+-					</Button>
+-				</FlexItem>
++		<>
++			<Flex gap={ 3 }>
++				<View>Item</View>
++				<View>Item</View>
+ 			</Flex>
+-			<hr />
+-			<EnhancedFlex { ...props }>
+-				{ items.map( ( item, index ) => (
+-					<FlexItem key={ index }>
+-						<Box { ...item } />
+-					</FlexItem>
+-				) ) }
+-			</EnhancedFlex>
+-		</div>
+-	);
+-};
+-
+-export const flexItem = () => {
+-	return <ItemExample />;
+-};
+-
+-const BlockExample = () => {
+-	const props = getStoryProps();
+-
+-	const [ items, setItems ] = useState( [
+-		{
+-			height: 40,
+-		},
+-	] );
+-
+-	const addItem = () => {
+-		setItems( [ ...items, { height: random( 20, 150 ) } ] );
+-	};
+-
+-	const removeItem = () => {
+-		const nextItems = items.filter( ( item, index ) => {
+-			return index !== items.length - 1;
+-		} );
+-		setItems( nextItems );
+-	};
+-
+-	return (
+-		<div>
+-			<Flex justify="left" gap="small">
+-				<FlexItem>
+-					<Button onClick={ addItem } isSecondary>
+-						Add Block
+-					</Button>
+-				</FlexItem>
+-				<FlexItem>
+-					<Button onClick={ removeItem } isSecondary>
+-						Remove Blcok
+-					</Button>
++			<Flex direction={ [ 'column', 'row' ] } gap={ 3 }>
++				<View css={ { width: '180px' } }>Item</View>
++				<FlexItem isBlock>
++					<View>Item</View>
+ 				</FlexItem>
++				<View>Item</View>
++				<View>Item</View>
+ 			</Flex>
+-			<hr />
+-			<EnhancedFlex { ...props }>
+-				<FlexItem>
+-					<Box width={ 40 } height={ 40 } />
+-				</FlexItem>
+-				{ items.map( ( item, index ) => (
+-					<FlexBlock key={ index }>
+-						<Box { ...item } />
+-					</FlexBlock>
+-				) ) }
+-				<FlexItem>
+-					<Box width={ 40 } height={ 40 } />
+-				</FlexItem>
+-			</EnhancedFlex>
+-		</div>
+-	);
+-};
+-
+-export const flexBlock = () => {
+-	return <BlockExample />;
+-};
+-
+-export const exampleActions = () => {
+-	const props = getStoryProps();
+-
+-	return (
+-		<EnhancedFlex { ...props }>
+-			<FlexItem>
+-				<Button icon={ arrowLeft } isTertiary />
+-			</FlexItem>
+-			<FlexItem>
+-				<Flex justify="left" gap="small">
+-					<FlexItem>
+-						<Button isSecondary isPrimary>
+-							Add
+-						</Button>
+-					</FlexItem>
+-					<FlexItem>
+-						<Button isSecondary>Remove Item</Button>
+-					</FlexItem>
+-				</Flex>
+-			</FlexItem>
+-		</EnhancedFlex>
++		</>
+ 	);
+ };
+diff --git a/packages/components/src/flex/stories/style.css b/packages/components/src/flex/stories/style.css
+deleted file mode 100644
+index 06a05379c37354..00000000000000
+--- a/packages/components/src/flex/stories/style.css
++++ /dev/null
+@@ -1,7 +0,0 @@
+-.components-flex.example-only-show-outline {
+-	box-shadow: 0 0 0 1px pink;
+-}
+-
+-.components-flex.example-only-show-outline > * {
+-	box-shadow: 0 0 0 1px pink;
+-}
+diff --git a/packages/components/src/ui/flex/styles.js b/packages/components/src/flex/styles.js
+similarity index 100%
+rename from packages/components/src/ui/flex/styles.js
+rename to packages/components/src/flex/styles.js
+diff --git a/packages/components/src/flex/styles/flex-styles.js b/packages/components/src/flex/styles/flex-styles.js
+deleted file mode 100644
+index 1ff2fdeb89ba53..00000000000000
+--- a/packages/components/src/flex/styles/flex-styles.js
++++ /dev/null
+@@ -1,98 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/core';
+-import styled from '@emotion/styled';
+-
+-/**
+- * @param {import('..').OwnProps} props
+- */
+-const alignStyle = ( { align } ) => {
+-	if ( align === undefined ) return '';
+-
+-	const aligns = {
+-		top: 'flex-start',
+-		bottom: 'flex-end',
+-	};
+-
+-	const value = aligns[ /** @type {'top' | 'bottom'} */ ( align ) ] || align;
+-
+-	return css( {
+-		alignItems: value,
+-	} );
+-};
+-
+-/**
+- * @param {import('..').OwnProps} props
+- */
+-const justifyStyle = ( { justify, isReversed } ) => {
+-	const justifies = {
+-		left: 'flex-start',
+-		right: 'flex-end',
+-	};
+-	let value =
+-		justifies[ /** @type {'left' | 'right'} */ ( justify ) ] || justify;
+-
+-	if (
+-		isReversed &&
+-		justifies[ /** @type {'left' | 'right'} */ ( justify ) ]
+-	) {
+-		value = justify === 'left' ? justifies.right : justifies.left;
+-	}
+-
+-	return css( {
+-		justifyContent: value,
+-	} );
+-};
+-
+-/**
+- * @param {import('..').OwnProps} Props
+- */
+-const gapStyle = ( { gap, isReversed } ) => {
+-	const base = 4;
+-	const value = typeof gap === 'number' ? base * gap : base;
+-	const dir = isReversed ? 'left' : 'right';
+-	const margin = `margin-${ dir }`;
+-
+-	return css`
+-		> * {
+-			${ margin }: ${ value }px;
+-
+-			&:last-child {
+-				${ margin }: 0;
+-			}
+-		}
+-	`;
+-};
+-
+-/**
+- * @param {import('..').OwnProps} props
+- */
+-const reversedStyles = ( { isReversed } ) => {
+-	if ( ! isReversed ) return '';
+-
+-	return css`
+-		flex-direction: row-reverse;
+-	`;
+-};
+-
+-export const Flex = styled.div`
+-	box-sizing: border-box;
+-	display: flex;
+-	width: 100%;
+-
+-	${ alignStyle }
+-	${ justifyStyle }
+-	${ reversedStyles }
+-	${ gapStyle }
+-`;
+-
+-export const Item = styled.div`
+-	box-sizing: border-box;
+-	min-width: 0;
+-	max-width: 100%;
+-`;
+-
+-export const Block = styled( Item )`
+-	flex: 1;
+-`;
+diff --git a/packages/components/src/ui/flex/test/__snapshots__/index.js.snap b/packages/components/src/flex/test/__snapshots__/index.js.snap
+similarity index 100%
+rename from packages/components/src/ui/flex/test/__snapshots__/index.js.snap
+rename to packages/components/src/flex/test/__snapshots__/index.js.snap
+diff --git a/packages/components/src/ui/flex/test/index.js b/packages/components/src/flex/test/index.js
+similarity index 97%
+rename from packages/components/src/ui/flex/test/index.js
+rename to packages/components/src/flex/test/index.js
+index 8a17edc0a3bddb..d20b383cbb883c 100644
+--- a/packages/components/src/ui/flex/test/index.js
++++ b/packages/components/src/flex/test/index.js
+@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../../view';
++import { View } from '../../ui/view';
+ import Flex from '../flex';
+ import FlexItem from '../flex-item';
+ import FlexBlock from '../flex-block';
+diff --git a/packages/components/src/ui/flex/types.ts b/packages/components/src/flex/types.ts
+similarity index 93%
+rename from packages/components/src/ui/flex/types.ts
+rename to packages/components/src/flex/types.ts
+index 46087177102835..ec4783661870f2 100644
+--- a/packages/components/src/ui/flex/types.ts
++++ b/packages/components/src/flex/types.ts
+@@ -7,7 +7,7 @@ import type { CSSProperties } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { ResponsiveCSSValue } from '../utils/types';
++import type { ResponsiveCSSValue } from '../ui/utils/types';
+ 
+ export type FlexDirection = ResponsiveCSSValue<
+ 	CSSProperties[ 'flexDirection' ]
+@@ -61,6 +61,10 @@ export type FlexProps = {
+ 	 * @default false
+ 	 */
+ 	wrap?: boolean;
++	/**
++	 * @deprecated Use `direction` instead
++	 */
++	isReversed?: boolean;
+ };
+ 
+ export type FlexItemProps = {
+diff --git a/packages/components/src/ui/flex/use-flex-block.js b/packages/components/src/flex/use-flex-block.js
+similarity index 55%
+rename from packages/components/src/ui/flex/use-flex-block.js
+rename to packages/components/src/flex/use-flex-block.js
+index 8a6b7673c27071..c606f7795231a9 100644
+--- a/packages/components/src/ui/flex/use-flex-block.js
++++ b/packages/components/src/flex/use-flex-block.js
+@@ -1,6 +1,7 @@
+ /**
+  * External dependencies
+  */
++import { cx } from '@wp-g2/styles';
+ import { useContextSystem } from '@wp-g2/context';
+ 
+ /**
+@@ -12,8 +13,13 @@ import { useFlexItem } from './use-flex-item';
+  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexBlockProps, 'div'>} props
+  */
+ export function useFlexBlock( props ) {
+-	const otherProps = useContextSystem( props, 'FlexBlock' );
+-	const flexItemProps = useFlexItem( { isBlock: true, ...otherProps } );
++	const { className, ...otherProps } = useContextSystem( props, 'FlexBlock' );
++	const classes = cx( 'components-flex__block', className );
++	const flexItemProps = useFlexItem( {
++		isBlock: true,
++		className: classes,
++		...otherProps,
++	} );
+ 
+ 	return flexItemProps;
+ }
+diff --git a/packages/components/src/ui/flex/use-flex-item.js b/packages/components/src/flex/use-flex-item.js
+similarity index 82%
+rename from packages/components/src/ui/flex/use-flex-item.js
+rename to packages/components/src/flex/use-flex-item.js
+index c8d129cd0984ef..1b5561dbdc0833 100644
+--- a/packages/components/src/ui/flex/use-flex-item.js
++++ b/packages/components/src/flex/use-flex-item.js
+@@ -29,7 +29,8 @@ export function useFlexItem( props ) {
+ 		styles.Item,
+ 		sx.Base,
+ 		isBlock && styles.block,
+-		className
++		// If a className is passed in (i.e., by `useFlexBlock` use that to override the `flex__item` className)
++		className || 'components-flex__item'
+ 	);
+ 
+ 	return {
+diff --git a/packages/components/src/ui/flex/use-flex.js b/packages/components/src/flex/use-flex.js
+similarity index 75%
+rename from packages/components/src/ui/flex/use-flex.js
+rename to packages/components/src/flex/use-flex.js
+index c16687f37939ec..b2a642f718a64a 100644
+--- a/packages/components/src/ui/flex/use-flex.js
++++ b/packages/components/src/flex/use-flex.js
+@@ -8,16 +8,48 @@ import { css, cx, ui, useResponsiveValue } from '@wp-g2/styles';
+  * WordPress dependencies
+  */
+ import { useMemo } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+  */
+ import * as styles from './styles';
+ 
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexProps, 'div'>} props
++ */
++function getDirection( { isReversed, direction } ) {
++	if ( typeof isReversed !== 'undefined' ) {
++		deprecated( 'Flex isReversed', {
++			alternative: 'Flex direction="row-reverse"',
++			since: '10.4',
++		} );
++		if ( isReversed ) {
++			return 'row-reverse';
++		}
++
++		return 'row';
++	}
++
++	return direction;
++}
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexProps, 'div'>} props
++ * @return {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexProps, 'div'>} Cleaned props
++ */
++function useDeprecatedProps( props ) {
++	return {
++		...props,
++		direction: getDirection( props ),
++	};
++}
++
+ /**
+  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexProps, 'div'>} props
+  */
+ export function useFlex( props ) {
++	const cleanedProps = useDeprecatedProps( props );
+ 	const {
+ 		align = 'center',
+ 		className,
+@@ -27,7 +59,7 @@ export function useFlex( props ) {
+ 		justify = 'space-between',
+ 		wrap = false,
+ 		...otherProps
+-	} = useContextSystem( props, 'Flex' );
++	} = useContextSystem( cleanedProps, 'Flex' );
+ 
+ 	const directionAsArray = Array.isArray( directionProp )
+ 		? directionProp
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js
+index a672af57f338aa..03313a67933fc5 100644
+--- a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js
++++ b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js
+@@ -1,12 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import styled from '@emotion/styled';
++import { styled } from '@wp-g2/styles';
+ 
+ /**
+  * Internal dependencies
+  */
+-import Flex from '../../flex';
++import { Flex } from '../../flex';
+ import BaseUnitControl from '../../unit-control';
+ import { color } from '../../utils/style-mixins';
+ 
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 0c67e9330f035e..2ee7075d6a2ea4 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -60,9 +60,7 @@ export {
+ export { default as Dropdown } from './dropdown';
+ export { default as DropdownMenu } from './dropdown-menu';
+ export { default as ExternalLink } from './external-link';
+-export { default as Flex } from './flex';
+-export { default as FlexBlock } from './flex/block';
+-export { default as FlexItem } from './flex/item';
++export { Flex, FlexBlock, FlexItem } from './flex';
+ export { default as FocalPointPicker } from './focal-point-picker';
+ export { default as FocusableIframe } from './focusable-iframe';
+ export { default as FontSizePicker } from './font-size-picker';
+diff --git a/packages/components/src/input-control/styles/input-control-styles.js b/packages/components/src/input-control/styles/input-control-styles.js
+index 6ebb621c788cb7..f6aa0f0f939620 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.js
++++ b/packages/components/src/input-control/styles/input-control-styles.js
+@@ -2,12 +2,12 @@
+  * External dependencies
+  */
+ import { css } from '@emotion/core';
+-import styled from '@emotion/styled';
++import { styled } from '@wp-g2/styles';
+ 
+ /**
+  * Internal dependencies
+  */
+-import Flex, { FlexItem } from '../../flex';
++import { Flex, FlexItem } from '../../flex';
+ import Text from '../../text';
+ import { color, rtl } from '../../utils/style-mixins';
+ 
+diff --git a/packages/components/src/ui/base-button/component.js b/packages/components/src/ui/base-button/component.js
+index 1afc9abf25f82d..e3a8b1b8c3305c 100644
+--- a/packages/components/src/ui/base-button/component.js
++++ b/packages/components/src/ui/base-button/component.js
+@@ -16,7 +16,7 @@ import { Icon, chevronDown } from '@wordpress/icons';
+  */
+ import { useButtonGroupContext } from '../button-group';
+ import { Elevation } from '../elevation';
+-import { FlexItem } from '../flex';
++import { FlexItem } from '../../flex';
+ import { View } from '../view';
+ import * as styles from './styles';
+ import LoadingOverlay from './loading-overlay';
+diff --git a/packages/components/src/ui/base-button/hook.js b/packages/components/src/ui/base-button/hook.js
+index 13ea85904ca05e..949cd3243be7be 100644
+--- a/packages/components/src/ui/base-button/hook.js
++++ b/packages/components/src/ui/base-button/hook.js
+@@ -8,7 +8,7 @@ import { css, cx } from '@wp-g2/styles';
+  * Internal dependencies
+  */
+ import { useControlGroupContext } from '../control-group';
+-import { useFlex } from '../flex';
++import { useFlex } from '../../flex';
+ import * as styles from './styles';
+ 
+ /**
+diff --git a/packages/components/src/ui/base-button/loading-overlay.js b/packages/components/src/ui/base-button/loading-overlay.js
+index c014ca2621733b..919e679cc4d7f1 100644
+--- a/packages/components/src/ui/base-button/loading-overlay.js
++++ b/packages/components/src/ui/base-button/loading-overlay.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { Flex } from '../flex';
++import { Flex } from '../../flex';
+ import { Spinner } from '../spinner';
+ import * as styles from './styles';
+ 
+diff --git a/packages/components/src/ui/card/footer.js b/packages/components/src/ui/card/footer.js
+index 7ad190b11950bc..06beb19602d608 100644
+--- a/packages/components/src/ui/card/footer.js
++++ b/packages/components/src/ui/card/footer.js
+@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { Flex } from '../flex';
++import { Flex } from '../../flex';
+ import * as styles from './styles';
+ 
+ /**
+diff --git a/packages/components/src/ui/card/header.js b/packages/components/src/ui/card/header.js
+index f6c4f13a052eed..f44bdce4d7b540 100644
+--- a/packages/components/src/ui/card/header.js
++++ b/packages/components/src/ui/card/header.js
+@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { Flex } from '../flex';
++import { Flex } from '../../flex';
+ import * as styles from './styles';
+ 
+ /**
+diff --git a/packages/components/src/ui/control-group/component.js b/packages/components/src/ui/control-group/component.js
+index c35c687bc7926b..1274e71fdf2a4f 100644
+--- a/packages/components/src/ui/control-group/component.js
++++ b/packages/components/src/ui/control-group/component.js
+@@ -6,7 +6,7 @@ import { contextConnect } from '@wp-g2/context';
+ /**
+  * Internal dependencies
+  */
+-import { Flex } from '../flex';
++import { Flex } from '../../flex';
+ import { Grid } from '../grid';
+ import { useControlGroup } from './hook';
+ 
+diff --git a/packages/components/src/ui/control-group/types.ts b/packages/components/src/ui/control-group/types.ts
+index 83aa340a41baae..60e02f0186ed2f 100644
+--- a/packages/components/src/ui/control-group/types.ts
++++ b/packages/components/src/ui/control-group/types.ts
+@@ -7,7 +7,7 @@ import type { CSSProperties } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { FlexProps } from '../flex/types';
++import type { FlexProps } from '../../flex/types';
+ 
+ export type ControlGroupContext = {
+ 	isFirst?: boolean;
+diff --git a/packages/components/src/ui/flex/README.md b/packages/components/src/ui/flex/README.md
+deleted file mode 100644
+index e970053ffcea16..00000000000000
+--- a/packages/components/src/ui/flex/README.md
++++ /dev/null
+@@ -1,65 +0,0 @@
+-# Flex
+-
+-`Flex` is a primitive layout component that adaptively aligns child content horizontally or vertically. `Flex` powers components like `HStack` and `VStack`.
+-
+-## Usage
+-
+-`Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
+-
+-```jsx
+-import { Flex, FlexItem, FlexBlock, Text } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return (
+-		<Flex>
+-			<FlexItem>
+-				<Text>Code</Text>
+-			</FlexItem>
+-			<FlexBlock>
+-				<Text>Poetry</Text>
+-			</FlexBlock>
+-		</Flex>
+-	);
+-}
+-```
+-
+-## Props
+-
+-##### align
+-
+-**Type**: `CSS['alignItems']`
+-
+-Aligns children using CSS Flexbox `align-items`. Vertically aligns content if the `direction` is `row`, or horizontally aligns content if the `direction` is `column`.
+-
+-In the example below, `flex-start` will align the children content to the top.
+-
+-##### direction
+-
+-**Type**: `FlexDirection`
+-
+-The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
+-
+-##### expanded
+-
+-**Type**: `boolean`
+-
+-Expands to the maximum available width (if horizontal) or height (if vertical).
+-
+-##### gap
+-
+-**Type**: `number`
+-
+-Spacing in between each child can be adjusted by using `gap`. The value of `gap` works as a multiplier to the library's grid system (base of `4px`).
+-
+-##### justify
+-
+-**Type**: `CSS['justifyContent']`
+-
+-Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
+-In the example below, `flex-start` will align the children content to the left.
+-
+-##### wrap
+-
+-**Type**: `boolean`
+-
+-Determines if children should wrap.
+diff --git a/packages/components/src/ui/flex/index.js b/packages/components/src/ui/flex/index.js
+deleted file mode 100644
+index fb2bdace6a1fa2..00000000000000
+--- a/packages/components/src/ui/flex/index.js
++++ /dev/null
+@@ -1,7 +0,0 @@
+-export { default as Flex } from './flex';
+-export { default as FlexItem } from './flex-item';
+-export { default as FlexBlock } from './flex-block';
+-
+-export * from './use-flex';
+-export * from './use-flex-item';
+-export * from './use-flex-block';
+diff --git a/packages/components/src/ui/flex/stories/index.js b/packages/components/src/ui/flex/stories/index.js
+deleted file mode 100644
+index a1b27e8b8a2656..00000000000000
+--- a/packages/components/src/ui/flex/stories/index.js
++++ /dev/null
+@@ -1,30 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import Flex from '../flex';
+-import FlexItem from '../flex-item';
+-import { View } from '../../view';
+-
+-export default {
+-	component: Flex,
+-	title: 'G2 Components (Experimental)/Flex',
+-};
+-
+-export const _default = () => {
+-	return (
+-		<>
+-			<Flex gap={ 3 }>
+-				<View>Item</View>
+-				<View>Item</View>
+-			</Flex>
+-			<Flex direction={ [ 'column', 'row' ] } gap={ 3 }>
+-				<View css={ { width: '180px' } }>Item</View>
+-				<FlexItem isBlock>
+-					<View>Item</View>
+-				</FlexItem>
+-				<View>Item</View>
+-				<View>Item</View>
+-			</Flex>
+-		</>
+-	);
+-};
+diff --git a/packages/components/src/ui/h-stack/hook.js b/packages/components/src/ui/h-stack/hook.js
+index d553d4d69e0a3e..527dee46c056a7 100644
+--- a/packages/components/src/ui/h-stack/hook.js
++++ b/packages/components/src/ui/h-stack/hook.js
+@@ -8,7 +8,7 @@ import { getValidChildren } from '@wp-g2/utils';
+ /**
+  * Internal dependencies
+  */
+-import { FlexItem, useFlex } from '../flex';
++import { FlexItem, useFlex } from '../../flex';
+ import { getAlignmentProps } from './utils';
+ 
+ /**
+diff --git a/packages/components/src/ui/h-stack/types.ts b/packages/components/src/ui/h-stack/types.ts
+index 2dcdf4e83ff62b..163e7ec5f9255d 100644
+--- a/packages/components/src/ui/h-stack/types.ts
++++ b/packages/components/src/ui/h-stack/types.ts
+@@ -7,7 +7,7 @@ import type { CSSProperties } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { FlexProps } from '../flex/types';
++import type { FlexProps } from '../../flex/types';
+ 
+ export type HStackAlignment =
+ 	| 'bottom'
+diff --git a/packages/components/src/ui/h-stack/utils.js b/packages/components/src/ui/h-stack/utils.js
+index 288cdc79b7db96..780096da20b29c 100644
+--- a/packages/components/src/ui/h-stack/utils.js
++++ b/packages/components/src/ui/h-stack/utils.js
+@@ -36,7 +36,7 @@ const V_ALIGNMENTS = {
+ /* eslint-disable jsdoc/valid-types */
+ /**
+  * @param {import('./types').HStackAlignment | import('react').CSSProperties[ 'alignItems' ]} alignment Where to align.
+- * @param {import('../flex/types').FlexDirection} [direction='row'] Direction to align.
++ * @param {import('../../flex/types').FlexDirection} [direction='row'] Direction to align.
+  * @return {import('./types').AlignmentProps} Alignment props.
+  */
+ /* eslint-enable jsdoc/valid-types */
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index 1276b0dfd896cf..25e8490e2bb9c1 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -3,7 +3,6 @@ export * from './control-group';
+ export * from './control-label';
+ export * from './divider';
+ export * from './elevation';
+-export * from './flex';
+ export * from './form-group';
+ export * from './grid';
+ export * from './h-stack';

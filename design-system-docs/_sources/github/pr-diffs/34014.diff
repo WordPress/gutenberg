@@ -1,0 +1,419 @@
+diff --git a/packages/components/src/ui/color-picker/component.tsx b/packages/components/src/ui/color-picker/component.tsx
+index 15a034ed5c4449..5fa862a07ef9a7 100644
+--- a/packages/components/src/ui/color-picker/component.tsx
++++ b/packages/components/src/ui/color-picker/component.tsx
+@@ -32,7 +32,7 @@ import { useControlledValue } from '../../utils/hooks';
+ 
+ import type { ColorType } from './types';
+ 
+-interface ColorPickerProps {
++export interface ColorPickerProps {
+ 	enableAlpha?: boolean;
+ 	color?: ColorFormats.HSL | ColorFormats.HSLA;
+ 	onChange?: ( color: ColorFormats.HSL | ColorFormats.HSLA ) => void;
+@@ -62,6 +62,7 @@ const ColorPicker = (
+ 		onChange,
+ 		defaultValue,
+ 		copyFormat,
++		...divProps
+ 	} = useContextSystem( props, 'ColorPicker' );
+ 
+ 	const [ color, setColor ] = useControlledValue( {
+@@ -88,7 +89,7 @@ const ColorPicker = (
+ 	);
+ 
+ 	return (
+-		<ColorfulWrapper ref={ forwardedRef }>
++		<ColorfulWrapper ref={ forwardedRef } { ...divProps }>
+ 			<Picker
+ 				onChange={ handleChange }
+ 				color={ safeColor }
+diff --git a/packages/components/src/ui/color-picker/index.ts b/packages/components/src/ui/color-picker/index.ts
+index 24afc1ddb18cec..de5f98ce4ebc0a 100644
+--- a/packages/components/src/ui/color-picker/index.ts
++++ b/packages/components/src/ui/color-picker/index.ts
+@@ -1 +1 @@
+-export { default as ColorPicker } from './component';
++export { LegacyAdapter as ColorPicker } from './legacy-adapter';
+diff --git a/packages/components/src/ui/color-picker/legacy-adapter.tsx b/packages/components/src/ui/color-picker/legacy-adapter.tsx
+new file mode 100644
+index 00000000000000..ef119f263d92dc
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/legacy-adapter.tsx
+@@ -0,0 +1,11 @@
++/**
++ * Internal dependencies
++ */
++import ColorPicker from './component';
++import { useDeprecatedProps } from './use-deprecated-props';
++
++type LegacyAdapterProps = Parameters< typeof useDeprecatedProps >[ 0 ];
++
++export const LegacyAdapter = ( props: LegacyAdapterProps ) => {
++	return <ColorPicker { ...useDeprecatedProps( props ) } />;
++};
+diff --git a/packages/components/src/ui/color-picker/stories/index.js b/packages/components/src/ui/color-picker/stories/index.js
+index db25d392724a5d..558a4ce1d2612c 100644
+--- a/packages/components/src/ui/color-picker/stories/index.js
++++ b/packages/components/src/ui/color-picker/stories/index.js
+@@ -57,3 +57,23 @@ const Example = () => {
+ export const _default = () => {
+ 	return <Example />;
+ };
++
++const LegacyExample = () => {
++	const [ legacyColor, setLegacyColor ] = useState( '#fff' );
++	const legacyProps = {
++		color: legacyColor,
++		onChangeComplete: setLegacyColor,
++		disableAlpha: boolean( 'disableAlpha', true ),
++	};
++
++	return (
++		<Flex align="flex-start" justify="flex-start">
++			<ColorPicker { ...legacyProps } />
++			<pre style={ { width: '20em' } }>
++				{ JSON.stringify( legacyColor, undefined, 4 ) }
++			</pre>
++		</Flex>
++	);
++};
++
++export const legacy = () => <LegacyExample />;
+diff --git a/packages/components/src/ui/color-picker/test/index.js b/packages/components/src/ui/color-picker/test/index.js
+new file mode 100644
+index 00000000000000..503d5ffa66e8f4
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/test/index.js
+@@ -0,0 +1,168 @@
++/**
++ * External dependencies
++ */
++import { render, fireEvent } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { ColorPicker } from '..';
++
++/**
++ * Ordinarily we'd try to select the compnoent by role but the silder role appears
++ * on several elements and we'd end up encoding assumptions about order when
++ * trying to select the appropriate element. We might as well just use the classname
++ * on the container which will be more durable if, for example, the order changes.
++ *
++ * @param {HTMLElement} container
++ * @return {HTMLElement} The saturation element
++ */
++function getSaturation( container ) {
++	return container.querySelector(
++		'.react-colorful__saturation .react-colorful__interactive'
++	);
++}
++
++// Fix to pass `pageX` and `pageY`
++// See https://github.com/testing-library/react-testing-library/issues/268
++class FakeMouseEvent extends window.MouseEvent {
++	constructor( type, values = {} ) {
++		super( type, { buttons: 1, bubbles: true, ...values } );
++
++		Object.assign( this, {
++			pageX: values.pageX || 0,
++			pageY: values.pageY || 0,
++		} );
++	}
++}
++
++function moveReactColorfulSlider( sliderElement, from, to ) {
++	fireEvent( sliderElement, new FakeMouseEvent( 'mousedown', from ) );
++	fireEvent( sliderElement, new FakeMouseEvent( 'mousemove', to ) );
++}
++
++const sleep = ( ms ) => {
++	const promise = new Promise( ( resolve ) => setTimeout( resolve, ms ) );
++	jest.advanceTimersByTime( ms + 1 );
++	return promise;
++};
++
++const hslMatcher = expect.objectContaining( {
++	h: expect.any( Number ),
++	s: expect.any( Number ),
++	l: expect.any( Number ),
++} );
++
++const hslaMatcher = expect.objectContaining( {
++	h: expect.any( Number ),
++	s: expect.any( Number ),
++	l: expect.any( Number ),
++	a: expect.any( Number ),
++} );
++
++const legacyColorMatcher = {
++	color: expect.anything(),
++	hex: expect.any( String ),
++	hsl: hslaMatcher,
++	hsv: expect.objectContaining( {
++		h: expect.any( Number ),
++		s: expect.any( Number ),
++		v: expect.any( Number ),
++		a: expect.any( Number ),
++	} ),
++	rgb: expect.objectContaining( {
++		r: expect.any( Number ),
++		g: expect.any( Number ),
++		b: expect.any( Number ),
++		a: expect.any( Number ),
++	} ),
++	oldHue: expect.any( Number ),
++	source: 'hex',
++};
++
++describe( 'ColorPicker', () => {
++	describe( 'legacy props', () => {
++		it( 'should fire onChangeComplete with the legacy color format', async () => {
++			const onChangeComplete = jest.fn();
++			const color = '#fff';
++
++			const { container } = render(
++				<ColorPicker
++					onChangeComplete={ onChangeComplete }
++					color={ color }
++				/>
++			);
++
++			const saturation = getSaturation( container );
++			moveReactColorfulSlider(
++				saturation,
++				{ pageX: 0, pageY: 0 },
++				{ pageX: 10, pageY: 10 }
++			);
++
++			// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
++			await sleep( 1 );
++
++			expect( onChangeComplete ).toHaveBeenCalledWith(
++				legacyColorMatcher
++			);
++		} );
++	} );
++
++	it( 'should fire onChange with the HSLA value', async () => {
++		const onChange = jest.fn();
++		const color = {
++			h: 125,
++			s: 0.2,
++			l: 0.5,
++			a: 0.5,
++		};
++
++		const { container } = render(
++			<ColorPicker onChange={ onChange } color={ color } enableAlpha />
++		);
++
++		const saturation = getSaturation( container );
++		moveReactColorfulSlider(
++			saturation,
++			{ pageX: 0, pageY: 0 },
++			{ pageX: 10, pageY: 10 }
++		);
++
++		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
++		await sleep( 1 );
++
++		expect( onChange ).toHaveBeenCalledWith( hslaMatcher );
++	} );
++
++	it( 'should fire onChange with the HSL value', async () => {
++		const onChange = jest.fn();
++		const color = {
++			h: 125,
++			s: 0.2,
++			l: 0.5,
++			// add alpha to prove it's ignored
++			a: 0.5,
++		};
++
++		const { container } = render(
++			<ColorPicker
++				onChange={ onChange }
++				color={ color }
++				enableAlpha={ false }
++			/>
++		);
++
++		const saturation = getSaturation( container );
++		moveReactColorfulSlider(
++			saturation,
++			{ pageX: 0, pageY: 0 },
++			{ pageX: 10, pageY: 10 }
++		);
++
++		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
++		await sleep( 1 );
++
++		expect( onChange ).toHaveBeenCalledWith( hslMatcher );
++	} );
++} );
+diff --git a/packages/components/src/ui/color-picker/use-deprecated-props.ts b/packages/components/src/ui/color-picker/use-deprecated-props.ts
+new file mode 100644
+index 00000000000000..7fc952b8f99ab5
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/use-deprecated-props.ts
+@@ -0,0 +1,157 @@
++/**
++ * External dependencies
++ */
++import colorize, { ColorFormats } from 'tinycolor2';
++// eslint-disable-next-line no-restricted-imports
++import type { ComponentProps } from 'react';
++import memoize from 'memize';
++
++/**
++ * WordPress dependencies
++ */
++import { useCallback, useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type ColorPicker from './component';
++
++type ColorPickerProps = ComponentProps< typeof ColorPicker >;
++
++/**
++ * @deprecated
++ */
++type LegacyColor =
++	| string
++	| {
++			color: colorize.Instance;
++			hex: string;
++			hsl: ColorFormats.HSL | ColorFormats.HSLA;
++			hsv: ColorFormats.HSV | ColorFormats.HSVA;
++			rgb: ColorFormats.RGB | ColorFormats.RGBA;
++			/**
++			 * @deprecated
++			 */
++			oldHue: number;
++			/**
++			 * @deprecated
++			 */
++			source: 'hex';
++	  };
++
++/**
++ * @deprecated
++ */
++export interface LegacyProps {
++	color: LegacyColor;
++	/**
++	 * @deprecated
++	 */
++	onChangeComplete: ( colors: LegacyColor ) => void;
++	/**
++	 * @deprecated
++	 */
++	oldHue: string;
++	className: string;
++	/**
++	 * @deprecated
++	 */
++	disableAlpha: boolean;
++}
++
++function isLegacyProps( props: any ): props is LegacyProps {
++	return (
++		typeof props.onChangeComplete !== 'undefined' ||
++		typeof props.color === 'string' ||
++		typeof props.color?.hex === 'string'
++	);
++}
++
++function getColorFromLegacyProps(
++	props: LegacyProps
++): ColorFormats.HSL | ColorFormats.HSLA {
++	if ( typeof props.color === 'string' ) {
++		return colorize( props.color ).toHsl();
++	}
++
++	return props.color.hsl;
++}
++
++function toHsv(
++	color: colorize.Instance
++): ColorFormats.HSV | ColorFormats.HSVA {
++	const { h, s, v, a } = color.toHsv();
++
++	return {
++		h: Math.round( h ),
++		s: Math.round( s * 100 ),
++		v: Math.round( v * 100 ),
++		a,
++	};
++}
++
++const transformHslToLegacyColor = memoize(
++	( hsla: ColorFormats.HSL | ColorFormats.HSLA ): LegacyColor => {
++		const color = colorize( hsla );
++		const rawHex = color.toHex();
++		const rgb = color.toRgb();
++		const hsv = toHsv( color );
++		const hsl = hsla;
++
++		const isTransparent = rawHex === '000000' && rgb.a === 0;
++
++		const hex = isTransparent ? 'transparent' : `#${ rawHex }`;
++
++		return {
++			color,
++			hex,
++			rgb,
++			hsv,
++			hsl,
++			source: 'hex',
++			oldHue: hsl.h,
++		};
++	}
++);
++
++export function useDeprecatedProps(
++	props: LegacyProps | ColorPickerProps
++): ColorPickerProps {
++	const onChange = useCallback(
++		( hsla: ColorFormats.HSL | ColorFormats.HSLA ) => {
++			if ( isLegacyProps( props ) ) {
++				return props.onChangeComplete(
++					transformHslToLegacyColor( hsla )
++				);
++			}
++
++			return props.onChange?.( hsla );
++		},
++		[
++			( props as LegacyProps ).onChangeComplete,
++			( props as ColorPickerProps ).onChange,
++		]
++	);
++
++	const color = useMemo( () => {
++		return isLegacyProps( props )
++			? getColorFromLegacyProps( props )
++			: props.color;
++	}, [ props.color ] );
++
++	const enableAlpha = useMemo( () => {
++		return isLegacyProps( props )
++			? ! props.disableAlpha
++			: props.enableAlpha;
++	}, [
++		( props as LegacyProps ).disableAlpha,
++		( props as ColorPickerProps ).enableAlpha,
++	] );
++
++	return {
++		...( isLegacyProps( props ) ? {} : props ),
++		onChange,
++		color,
++		enableAlpha,
++	};
++}

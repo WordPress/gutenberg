@@ -1,0 +1,235 @@
+diff --git a/packages/components/src/divider/README.md b/packages/components/src/divider/README.md
+index 8b314be13b4d6a..53cd1541b98a8f 100644
+--- a/packages/components/src/divider/README.md
++++ b/packages/components/src/divider/README.md
+@@ -11,16 +11,15 @@ This feature is still experimental. “Experimental” means this is an early im
+ ```jsx
+ import {
+ 	__experimentalDivider as Divider,
+-	__experimentalText as Text,
+ } from `@wordpress/components`;
+ import { Stack } from '@wordpress/ui';
+ 
+ function Example() {
+ 	return (
+ 		<Stack direction="column" gap="lg">
+-			<Text>Some text here</Text>
++			<span>Some text here</span>
+ 			<Divider />
+-			<Text>Some more text here</Text>
++			<span>Some more text here</span>
+ 		</Stack>
+ 	);
+ }
+diff --git a/packages/components/src/h-stack/README.md b/packages/components/src/h-stack/README.md
+index 77e3c77b940f2a..5961c79694ef59 100644
+--- a/packages/components/src/h-stack/README.md
++++ b/packages/components/src/h-stack/README.md
+@@ -11,17 +11,14 @@ This feature is still experimental. “Experimental” means this is an early im
+ `HStack` can render anything inside.
+ 
+ ```jsx
+-import {
+-	__experimentalHStack as HStack,
+-	__experimentalText as Text,
+-} from '@wordpress/components';
++import { __experimentalHStack as HStack } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+ 		<HStack>
+-			<Text>Code</Text>
+-			<Text>is</Text>
+-			<Text>Poetry</Text>
++			<span>Code</span>
++			<span>is</span>
++			<span>Poetry</span>
+ 		</HStack>
+ 	);
+ }
+@@ -87,17 +84,16 @@ When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to t
+ import {
+ 	__experimentalHStack as HStack,
+ 	__experimentalSpacer as Spacer,
+-	__experimentalText as Text,
+ } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+ 		<HStack>
+-			<Text>Code</Text>
++			<span>Code</span>
+ 			<Spacer>
+-				<Text>is</Text>
++				<span>is</span>
+ 			</Spacer>
+-			<Text>Poetry</Text>
++			<span>Poetry</span>
+ 		</HStack>
+ 	);
+ }
+@@ -109,16 +105,15 @@ function Example() {
+ import {
+ 	__experimentalHStack as HStack,
+ 	__experimentalSpacer as Spacer,
+-	__experimentalText as Text,
+ } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+ 		<HStack>
+-			<Text>Code</Text>
++			<span>Code</span>
+ 			<Spacer />
+-			<Text>is</Text>
+-			<Text>Poetry</Text>
++			<span>is</span>
++			<span>Poetry</span>
+ 		</HStack>
+ 	);
+ }
+diff --git a/packages/components/src/heading/stories/index.story.tsx b/packages/components/src/heading/stories/index.story.tsx
+index bbac5776b54284..fc21947d8e0ceb 100644
+--- a/packages/components/src/heading/stories/index.story.tsx
++++ b/packages/components/src/heading/stories/index.story.tsx
+@@ -32,7 +32,7 @@ const meta: Meta< typeof Heading > = {
+ 		componentStatus: {
+ 			status: 'not-recommended',
+ 			whereUsed: 'global',
+-			notes: 'Values are not aligned with the current design system. Use [typography tokens](?path=/docs/tokens-typography--page) from `@wordpress/base-styles` instead.',
++			notes: 'Use `Text` from `@wordpress/ui` instead, with the `render` prop set to the heading level element and the variant set to the visual heading size (e.g. `<Text render={ <h1 /> } variant="heading-2xl">`).',
+ 		},
+ 	},
+ };
+diff --git a/packages/components/src/text/stories/index.story.tsx b/packages/components/src/text/stories/index.story.tsx
+index 2b5d36ebb4fa5e..67241ea56d035c 100644
+--- a/packages/components/src/text/stories/index.story.tsx
++++ b/packages/components/src/text/stories/index.story.tsx
+@@ -33,7 +33,7 @@ const meta: Meta< typeof Text > = {
+ 		componentStatus: {
+ 			status: 'not-recommended',
+ 			whereUsed: 'global',
+-			notes: 'Values are not aligned with the current design system. Use [typography tokens](?path=/docs/tokens-typography--page) from `@wordpress/base-styles` instead.',
++			notes: 'Use `Text` from `@wordpress/ui` instead.',
+ 		},
+ 	},
+ };
+diff --git a/packages/components/src/v-stack/README.md b/packages/components/src/v-stack/README.md
+index 2f447b18015e51..d70f6a2860d916 100644
+--- a/packages/components/src/v-stack/README.md
++++ b/packages/components/src/v-stack/README.md
+@@ -11,17 +11,14 @@ This feature is still experimental. “Experimental” means this is an early im
+ `VStack` can render anything inside.
+ 
+ ```jsx
+-import {
+-	__experimentalText as Text,
+-	__experimentalVStack as VStack,
+-} from '@wordpress/components';
++import { __experimentalVStack as VStack } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+ 		<VStack>
+-			<Text>Code</Text>
+-			<Text>is</Text>
+-			<Text>Poetry</Text>
++			<span>Code</span>
++			<span>is</span>
++			<span>Poetry</span>
+ 		</VStack>
+ 	);
+ }
+@@ -74,18 +71,17 @@ When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to t
+ ```jsx
+ import {
+ 	__experimentalSpacer as Spacer,
+-	__experimentalText as Text,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+ 		<VStack>
+-			<Text>Code</Text>
++			<span>Code</span>
+ 			<Spacer>
+-				<Text>is</Text>
++				<span>is</span>
+ 			</Spacer>
+-			<Text>Poetry</Text>
++			<span>Poetry</span>
+ 		</VStack>
+ 	);
+ }
+@@ -96,17 +92,16 @@ function Example() {
+ ```jsx
+ import {
+ 	__experimentalSpacer as Spacer,
+-	__experimentalText as Text,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+ 		<VStack>
+-			<Text>Code</Text>
++			<span>Code</span>
+ 			<Spacer />
+-			<Text>is</Text>
+-			<Text>Poetry</Text>
++			<span>is</span>
++			<span>Poetry</span>
+ 		</VStack>
+ 	);
+ }
+diff --git a/packages/components/src/view/README.md b/packages/components/src/view/README.md
+index c1e04ebd8cfff4..d480e01f30e297 100644
+--- a/packages/components/src/view/README.md
++++ b/packages/components/src/view/README.md
+@@ -11,15 +11,12 @@ This feature is still experimental. “Experimental” means this is an early im
+ ## Usage
+ 
+ ```jsx
+-import {
+-	__experimentalText as Text,
+-	__experimentalView as View,
+-} from '@wordpress/components';
++import { __experimentalView as View } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+ 		<View>
+-			<Text>Code is Poetry</Text>
++			<span>Code is Poetry</span>
+ 		</View>
+ 	);
+ }
+diff --git a/packages/eslint-plugin/rules/use-recommended-components.js b/packages/eslint-plugin/rules/use-recommended-components.js
+index d69c6c958d386a..e2ae74d1222253 100644
+--- a/packages/eslint-plugin/rules/use-recommended-components.js
++++ b/packages/eslint-plugin/rules/use-recommended-components.js
+@@ -8,7 +8,7 @@
+  */
+ const ALLOWLIST = {
+ 	'@wordpress/ui': {
+-		allowed: [ 'Badge', 'Stack' ],
++		allowed: [ 'Badge', 'Stack', 'Text' ],
+ 		message:
+ 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
+ 	},
+diff --git a/packages/ui/src/text/stories/index.story.tsx b/packages/ui/src/text/stories/index.story.tsx
+index 82a0cb9cfcdc5a..1c78ce513dc9ee 100644
+--- a/packages/ui/src/text/stories/index.story.tsx
++++ b/packages/ui/src/text/stories/index.story.tsx
+@@ -17,6 +17,10 @@ export const Default: Story = {
+ 	},
+ };
+ 
++/**
++ * Important: Setting the `variant` prop to a `heading` variant will not automatically render a heading element.
++ * Use the `render` prop to render a heading element with the appropriate level.
++ */
+ export const AllVariants: Story = {
+ 	render: () => (
+ 		<Stack

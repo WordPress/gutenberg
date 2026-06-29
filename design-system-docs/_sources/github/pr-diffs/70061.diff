@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b1544099686548..5998d7dc327e03 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `ToggleGroupControl`: Fix active background for empty string value ([#69969](https://github.com/WordPress/gutenberg/pull/69969)).
+ -   `ItemGroup`: Fix double border in `ItemGroup` when last item is focused ([#70021](https://github.com/WordPress/gutenberg/pull/70021)).
+ -   `__experimentalUseCustomUnits `: Don't mutate 'ALL_CSS_UNITS' default value ([#70037](https://github.com/WordPress/gutenberg/pull/70037)).
++-  `FocalPointPicker`: Fix SVG display when it doesn't provide a width attribute ([#70061](https://github.com/WordPress/gutenberg/pull/70061))..
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
+index fba3eda2fb0f29..01565313e06ebb 100644
+--- a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
++++ b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
+@@ -53,7 +53,7 @@ export const MediaContainer = styled.div`
+ 		max-width: 100%;
+ 		pointer-events: none;
+ 		user-select: none;
+-		width: auto;
++		width: 100%;
+ 	}
+ `;
+ 

@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/utils/input/base.js b/packages/components/src/utils/input/base.js
+index e657664493a965..073ee0431ebda9 100644
+--- a/packages/components/src/utils/input/base.js
++++ b/packages/components/src/utils/input/base.js
+@@ -14,7 +14,7 @@ export const inputStyleNeutral = css`
+ 	box-shadow: 0 0 0 transparent;
+ 	transition: box-shadow 0.1s linear;
+ 	border-radius: ${ CONFIG.radiusBlockUi };
+-	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border } };
++	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
+ 	${ reduceMotion( 'transition' ) }
+ `;
+ 

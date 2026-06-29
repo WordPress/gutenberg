@@ -1,0 +1,142 @@
+diff --git a/packages/ui/README.md b/packages/ui/README.md
+index 71e87a60980cd1..ef1a3ad5a59537 100644
+--- a/packages/ui/README.md
++++ b/packages/ui/README.md
+@@ -16,6 +16,24 @@ This is a companion to the `@wordpress/theme` package that provides:
+ -   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more
+ -   **Theme System**: A flexible theming provider for consistent theming across applications
+ 
++## Installation
++
++Install using NPM:
++
++```
++npm install @wordpress/ui
++```
++
++As an implementation of the design system and companion to the `@wordpress/theme` package, these components depend on CSS custom properties defined by the theme package. This is managed on your behalf in a WordPress admin page context, but you will need to install and include the base theme stylesheet yourself if you're using the components in an application outside WordPress:
++
++```
++npm install @wordpress/theme
++```
++
++```tsx
++import '@wordpress/theme/design-tokens.css';
++```
++
+ ## Usage
+ 
+ ### Basic Component Usage
+diff --git a/packages/ui/src/badge/stories/choosing-intent.mdx b/packages/ui/src/badge/stories/choosing-intent.mdx
+index 09b99ec0433750..18eea03cf7d5e0 100644
+--- a/packages/ui/src/badge/stories/choosing-intent.mdx
++++ b/packages/ui/src/badge/stories/choosing-intent.mdx
+@@ -1,5 +1,6 @@
+ import { Meta } from '@storybook/blocks';
+ import { Badge } from '../index';
++import '@wordpress/theme/design-tokens.css';
+ 
+ <Meta title="Design System/Components/Badge/Choosing intent" />
+ 
+@@ -109,4 +110,3 @@ Use the least attention‑grabbing intent that still:
+ -   Makes it clear what needs attention,
+ -   Marks what isn't final, or
+ -   Confirms a key success state in that context.
+-
+diff --git a/packages/ui/src/badge/stories/index.story.tsx b/packages/ui/src/badge/stories/index.story.tsx
+index 3107f91225570f..bfc1def8a558ef 100644
+--- a/packages/ui/src/badge/stories/index.story.tsx
++++ b/packages/ui/src/badge/stories/index.story.tsx
+@@ -7,7 +7,6 @@ import type { Meta, StoryObj } from '@storybook/react';
+  * WordPress dependencies
+  */
+ import { Fragment } from '@wordpress/element';
+-import '@wordpress/theme/design-tokens.css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/ui/src/box/stories/index.story.tsx b/packages/ui/src/box/stories/index.story.tsx
+index e4832d22b80a67..9a93fe126938e2 100644
+--- a/packages/ui/src/box/stories/index.story.tsx
++++ b/packages/ui/src/box/stories/index.story.tsx
+@@ -1,6 +1,5 @@
+ import { type Meta, type StoryObj } from '@storybook/react';
+ import { type PaddingSize } from '@wordpress/theme';
+-import '@wordpress/theme/design-tokens.css';
+ import { Box } from '../box';
+ 
+ const meta: Meta< typeof Box > = {
+diff --git a/packages/ui/src/stack/stories/index.story.tsx b/packages/ui/src/stack/stories/index.story.tsx
+index bd3213c3de76f5..bb7fcbc624e301 100644
+--- a/packages/ui/src/stack/stories/index.story.tsx
++++ b/packages/ui/src/stack/stories/index.story.tsx
+@@ -1,16 +1,4 @@
+-/**
+- * External dependencies
+- */
+ import type { Meta, StoryObj } from '@storybook/react';
+-
+-/**
+- * WordPress dependencies
+- */
+-import '@wordpress/theme/design-tokens.css';
+-
+-/**
+- * Internal dependencies
+- */
+ import { Stack } from '../index';
+ import { Box } from '../../box';
+ 
+diff --git a/storybook/package-styles/config.js b/storybook/package-styles/config.js
+index 285ae07bf1baf0..d15fde3dee45b6 100644
+--- a/storybook/package-styles/config.js
++++ b/storybook/package-styles/config.js
+@@ -17,6 +17,7 @@ import fieldsLtr from '../package-styles/fields-ltr.lazy.scss';
+ import fieldsRtl from '../package-styles/fields-rtl.lazy.scss';
+ import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss';
+ import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss';
++import ui from '../package-styles/ui.lazy.scss';
+ 
+ /**
+  * Stylesheets to lazy load when the story's context.componentId matches the
+@@ -67,6 +68,11 @@ const CONFIG = [
+ 		ltr: [ componentsLtr, dataviewsLtr, fieldsLtr, mediaFieldsLtr ],
+ 		rtl: [ componentsRtl, dataviewsRtl, fieldsRtl, mediaFieldsRtl ],
+ 	},
++	{
++		componentIdMatcher: /^design-system-components-/,
++		ltr: [ ui ],
++		rtl: [ ui ],
++	},
+ ];
+ 
+ export default CONFIG;
+diff --git a/storybook/package-styles/ui.lazy.scss b/storybook/package-styles/ui.lazy.scss
+new file mode 100644
+index 00000000000000..2877dcf23775bc
+--- /dev/null
++++ b/storybook/package-styles/ui.lazy.scss
+@@ -0,0 +1 @@
++@import "../../packages/theme/src/prebuilt/css/design-tokens.css";
+diff --git a/storybook/preview.jsx b/storybook/preview.jsx
+index 16420c5b6da275..03a818df214cc2 100644
+--- a/storybook/preview.jsx
++++ b/storybook/preview.jsx
+@@ -1,6 +1,3 @@
+-/**
+- * External dependencies
+- */
+ import {
+ 	Controls,
+ 	Description,
+@@ -9,10 +6,6 @@ import {
+ 	Subtitle,
+ 	Title,
+ } from '@storybook/blocks';
+-
+-/**
+- * Internal dependencies
+- */
+ import { WithGlobalCSS } from './decorators/with-global-css';
+ import { WithMarginChecker } from './decorators/with-margin-checker';
+ import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';

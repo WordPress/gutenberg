@@ -1,0 +1,257 @@
+diff --git a/packages/block-editor/src/components/border-radius-control/input-controls.js b/packages/block-editor/src/components/border-radius-control/input-controls.js
+index b33b79a482435f..c0c5c672d6364f 100644
+--- a/packages/block-editor/src/components/border-radius-control/input-controls.js
++++ b/packages/block-editor/src/components/border-radius-control/input-controls.js
+@@ -68,7 +68,7 @@ export default function BoxInputControls( {
+ 					: selectedUnits[ corner ] || selectedUnits.flat;
+ 
+ 				return (
+-					<Tooltip text={ label } position="top" key={ corner }>
++					<Tooltip text={ label } placement="top" key={ corner }>
+ 						<div className="components-border-radius-control__tooltip-wrapper">
+ 							<UnitControl
+ 								{ ...props }
+diff --git a/packages/block-editor/src/components/media-replace-flow/index.js b/packages/block-editor/src/components/media-replace-flow/index.js
+index 9010e0a1a90049..c331761af5852d 100644
+--- a/packages/block-editor/src/components/media-replace-flow/index.js
++++ b/packages/block-editor/src/components/media-replace-flow/index.js
+@@ -220,7 +220,7 @@ const MediaReplaceFlow = ( {
+ 								{ __( 'Current media URL:' ) }
+ 							</span>
+ 
+-							<Tooltip text={ mediaURL } position="bottom">
++							<Tooltip text={ mediaURL }>
+ 								<div>
+ 									<LinkControl
+ 										value={ { url: mediaURL } }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0aefc8941fe159..86f8a73b43d706 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,7 +11,6 @@
+ -   `Dropdown` and `DropdownMenu`: support controlled mode for the dropdown's open/closed state ([#54257](https://github.com/WordPress/gutenberg/pull/54257)).
+ -   `BorderControl`: Apply proper metrics and simpler text ([#53998](https://github.com/WordPress/gutenberg/pull/53998)).
+ -   `FormTokenField`: Update styling for consistency and increased visibility ([#54402](https://github.com/WordPress/gutenberg/pull/54402)).
+--   `Tooltip`: Add new `hideOnClick` prop ([#54406](https://github.com/WordPress/gutenberg/pull/54406)).
+ -   `CircularOptionPicker`: Add option to use previous non-listbox behaviour, for contexts where buttons are more appropriate than a list of options ([#54290](https://github.com/WordPress/gutenberg/pull/54290)).
+ -   `DuotonePicker/ColorListPicker`: Adds appropriate labels to 'Duotone Filter' color pickers ([#54468](https://github.com/WordPress/gutenberg/pull/54468)).
+ 
+@@ -42,6 +41,11 @@
+ 
+ -   `DropdownMenu` v2: Fix submenu chevron direction in RTL languages ([#54036](https://github.com/WordPress/gutenberg/pull/54036).
+ 
++### New Features
++
++-   `Tooltip`: Add new `hideOnClick` prop ([#54406](https://github.com/WordPress/gutenberg/pull/54406)).
++-   `Tooltip`: Add `placement` prop to replace deprecated `position`([#54264](https://github.com/WordPress/gutenberg/pull/54264)).
++
+ ## 25.7.0 (2023-08-31)
+ 
+ ### Breaking changes
+diff --git a/packages/components/src/box-control/unit-control.tsx b/packages/components/src/box-control/unit-control.tsx
+index ea724e9a82a19c..24d71cf0d6cd34 100644
+--- a/packages/components/src/box-control/unit-control.tsx
++++ b/packages/components/src/box-control/unit-control.tsx
+@@ -67,7 +67,7 @@ function Tooltip( {
+ 	 * https://github.com/WordPress/gutenberg/pull/24966#issuecomment-685875026
+ 	 */
+ 	return (
+-		<BaseTooltip text={ text } position="top">
++		<BaseTooltip text={ text } placement="top">
+ 			<div>{ children }</div>
+ 		</BaseTooltip>
+ 	);
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index cc91cf46425867..a199c1bb350cd7 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -24,6 +24,7 @@ import Tooltip from '../tooltip';
+ import Icon from '../icon';
+ import { VisuallyHidden } from '../visually-hidden';
+ import type { ButtonProps, DeprecatedButtonProps } from './types';
++import { positionToPlacement } from '../popover/utils';
+ 
+ const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
+ 
+@@ -225,6 +226,13 @@ export function UnforwardedButton(
+ 			</button>
+ 		);
+ 
++	// Convert legacy `position` values to be used with the new `placement` prop
++	let computedPlacement;
++	// if `tooltipPosition` is defined, compute value to `placement`
++	if ( tooltipPosition !== undefined ) {
++		computedPlacement = positionToPlacement( tooltipPosition );
++	}
++
+ 	if ( ! shouldShowTooltip ) {
+ 		return (
+ 			<>
+@@ -248,7 +256,7 @@ export function UnforwardedButton(
+ 						: label
+ 				}
+ 				shortcut={ shortcut }
+-				position={ tooltipPosition }
++				placement={ computedPlacement }
+ 			>
+ 				{ element }
+ 			</Tooltip>
+diff --git a/packages/components/src/date-time/time/timezone.tsx b/packages/components/src/date-time/time/timezone.tsx
+index f878deddaa782a..9fac1ec094ed89 100644
+--- a/packages/components/src/date-time/time/timezone.tsx
++++ b/packages/components/src/date-time/time/timezone.tsx
+@@ -38,7 +38,7 @@ const TimeZone = () => {
+ 			: `(${ zoneAbbr }) ${ timezone.string.replace( '_', ' ' ) }`;
+ 
+ 	return (
+-		<Tooltip position="top center" text={ timezoneDetail }>
++		<Tooltip placement="top" text={ timezoneDetail }>
+ 			<StyledComponent className="components-datetime__timezone">
+ 				{ zoneAbbr }
+ 			</StyledComponent>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index 572a4b70785eb7..3682aa3a5f1f6d 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -38,7 +38,7 @@ const LAYOUT_ID = 'toggle-group-backdrop-shared-layout-id';
+ const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
+ 	if ( showTooltip && text ) {
+ 		return (
+-			<Tooltip text={ text } position="top center">
++			<Tooltip text={ text } placement="top">
+ 				{ children }
+ 			</Tooltip>
+ 		);
+diff --git a/packages/components/src/tooltip/README.md b/packages/components/src/tooltip/README.md
+index 5b4caecf6d5c75..9b214e8fc6b00e 100644
+--- a/packages/components/src/tooltip/README.md
++++ b/packages/components/src/tooltip/README.md
+@@ -42,12 +42,21 @@ Option to hide the tooltip when the anchor is clicked.
+ -   Required: No
+ -   Default: `true`
+ 
++#### `placement`: `'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
++
++Used to specify the tooltip's placement with respect to its anchor.
++
++-   Required: No
++-   Default: `'bottom'`
++
+ #### `position`: `string`
+ 
+-The direction in which the tooltip should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
++_Note: use the `placement` prop instead when possible._
++
++Legacy way to specify the popover's position with respect to its anchor. Specify y- and x-axis as a space-separated string. Supports `'top'`, `'middle'`, `'bottom'` y axis, and `'left'`, `'center'`, `'right'` x axis.
+ 
+ -   Required: No
+--   Default: `"bottom"`
++-   Default: `'bottom'`
+ 
+ #### `shortcut`: `string` | `object`
+ 
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index f86bd5d2ade9c3..f31a2a4f264d90 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -8,6 +8,7 @@ import * as Ariakit from '@ariakit/react/tooltip';
+  */
+ import { useInstanceId } from '@wordpress/compose';
+ import { Children } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -26,7 +27,8 @@ function Tooltip( props: TooltipProps ) {
+ 		children,
+ 		delay = TOOLTIP_DELAY,
+ 		hideOnClick = true,
+-		position = 'bottom',
++		placement,
++		position,
+ 		shortcut,
+ 		text,
+ 	} = props;
+@@ -45,8 +47,24 @@ function Tooltip( props: TooltipProps ) {
+ 		}
+ 	}
+ 
++	// Compute tooltip's placement:
++	// - give priority to `placement` prop, if defined
++	// - otherwise, compute it from the legacy `position` prop (if defined)
++	// - finally, fallback to the default placement: 'bottom'
++	let computedPlacement;
++	if ( placement !== undefined ) {
++		computedPlacement = placement;
++	} else if ( position !== undefined ) {
++		computedPlacement = positionToPlacement( position );
++		deprecated( '`position` prop in wp.components.tooltip', {
++			since: '6.4',
++			alternative: '`placement` prop',
++		} );
++	}
++	computedPlacement = computedPlacement || 'bottom';
++
+ 	const tooltipStore = Ariakit.useTooltipStore( {
+-		placement: positionToPlacement( position ),
++		placement: computedPlacement,
+ 		timeout: delay,
+ 	} );
+ 
+diff --git a/packages/components/src/tooltip/types.ts b/packages/components/src/tooltip/types.ts
+index 1487a382ff1b8f..8708ae7005f5b3 100644
+--- a/packages/components/src/tooltip/types.ts
++++ b/packages/components/src/tooltip/types.ts
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { Placement } from '@floating-ui/react-dom';
++
+ /**
+  * Internal dependencies
+  */
+@@ -24,10 +29,20 @@ export type TooltipProps = {
+ 	 */
+ 	delay?: number;
+ 	/**
+-	 * The direction in which the tooltip should open relative to its parent node.
++	 * Where the tooltip should be positioned relative to its parent.
++	 *
++	 * @default bottom
++	 */
++	placement?: Placement;
++	/**
++	 * _Note: this prop is deprecated. Please use the `placement` prop instead._
++	 *
++	 * Legacy way of specifying the tooltip's position relative to its parent.
++	 *
+ 	 * Specify y- and x-axis as a space-separated string. Supports `"top"`,
+ 	 * `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+ 	 *
++	 * @deprecated
+ 	 * @default bottom
+ 	 */
+ 	position?: PopoverProps[ 'position' ];
+diff --git a/packages/edit-site/src/components/page-patterns/grid-item.js b/packages/edit-site/src/components/page-patterns/grid-item.js
+index 25aab2646cdfd0..0f6c5097590dbb 100644
+--- a/packages/edit-site/src/components/page-patterns/grid-item.js
++++ b/packages/edit-site/src/components/page-patterns/grid-item.js
+@@ -182,7 +182,7 @@ function GridItem( { categoryId, item, ...props } ) {
+ 				>
+ 					{ itemIcon && ! isNonUserPattern && (
+ 						<Tooltip
+-							position="top center"
++							placement="top"
+ 							text={ __(
+ 								'Editing this pattern will also update anywhere it is used'
+ 							) }
+@@ -211,7 +211,7 @@ function GridItem( { categoryId, item, ...props } ) {
+ 						) }
+ 						{ item.type === PATTERNS && (
+ 							<Tooltip
+-								position="top center"
++								placement="top"
+ 								text={ __( 'This pattern cannot be edited.' ) }
+ 							>
+ 								<Icon

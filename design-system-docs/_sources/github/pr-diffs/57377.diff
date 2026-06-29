@@ -1,0 +1,67 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2f2f1ded2782da..3493f7708e902a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ -   `Truncate`: improve handling of non-string `children` ([#57261](https://github.com/WordPress/gutenberg/pull/57261)).
+ -   `PaletteEdit`: Don't discard colors with default name and slug ([#54332](https://github.com/WordPress/gutenberg/pull/54332)).
+ -   `RadioControl`: Fully encapsulate styles ([#57347](https://github.com/WordPress/gutenberg/pull/57347)).
++-   `Snackbar`: Fix icon positioning ([#57377](https://github.com/WordPress/gutenberg/pull/57377)).
+ -   `GradientPicker`: Use slug while iterating over gradient entries to avoid React "duplicated key" warning ([#57361](https://github.com/WordPress/gutenberg/pull/57361)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/snackbar/stories/index.story.tsx b/packages/components/src/snackbar/stories/index.story.tsx
+index 953b33d273b3fc..c1f525b60b3919 100644
+--- a/packages/components/src/snackbar/stories/index.story.tsx
++++ b/packages/components/src/snackbar/stories/index.story.tsx
+@@ -3,9 +3,15 @@
+  */
+ import type { Meta, StoryFn } from '@storybook/react';
+ 
++/**
++ * WordPress dependencies
++ */
++import { wordpress } from '@wordpress/icons';
++
+ /**
+  * Internal dependencies
+  */
++import Icon from '../../icon';
+ import Snackbar from '..';
+ 
+ const meta: Meta< typeof Snackbar > = {
+@@ -63,11 +69,7 @@ WithActions.args = {
+ export const WithIcon: StoryFn< typeof Snackbar > = DefaultTemplate.bind( {} );
+ WithIcon.args = {
+ 	children: 'Add an icon to make your snackbar stand out',
+-	icon: (
+-		<span role="img" aria-label="Icon" style={ { fontSize: 21 } }>
+-			🌮
+-		</span>
+-	),
++	icon: <Icon style={ { fill: 'currentcolor' } } icon={ wordpress } />,
+ };
+ 
+ export const WithExplicitDismiss: StoryFn< typeof Snackbar > =
+diff --git a/packages/components/src/snackbar/style.scss b/packages/components/src/snackbar/style.scss
+index 3cae9c8ef65d49..0ba1774d67382f 100644
+--- a/packages/components/src/snackbar/style.scss
++++ b/packages/components/src/snackbar/style.scss
+@@ -29,13 +29,14 @@
+ 	}
+ 
+ 	.components-snackbar__content-with-icon {
+-		margin-left: $grid-unit-30;
++		position: relative;
++		padding-left: $icon-size;
+ 	}
+ 
+ 	.components-snackbar__icon {
+ 		position: absolute;
+-		top: 24px;
+-		left: 28px;
++		left: $grid-unit-10 * -1;
++		top: calc((#{$icon-size - ($default-font-size * $default-line-height)}) / -2);
+ 	}
+ 
+ 	.components-snackbar__dismiss-button {

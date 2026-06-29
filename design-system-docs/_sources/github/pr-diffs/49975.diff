@@ -1,0 +1,270 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 260c50887297d4..babf4e9c84f508 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ ### Enhancements
+ 
+ -   `Modal`: Add css class to children container ([#50099](https://github.com/WordPress/gutenberg/pull/50099)).
++-   `PaletteEdit`: Allow custom popover configuration ([#49975](https://github.com/WordPress/gutenberg/pull/49975)).
+ 
+ ## 23.9.0 (2023-04-26)
+ 
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index bd9818d5d8db2f..9061222567103a 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -1,12 +1,19 @@
+ /**
+  * External dependencies
+  */
++import classnames from 'classnames';
+ import { paramCase as kebabCase } from 'change-case';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
++import {
++	useState,
++	useRef,
++	useEffect,
++	useCallback,
++	useMemo,
++} from '@wordpress/element';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { lineSolid, moreVertical, plus } from '@wordpress/icons';
+ import {
+@@ -106,15 +113,26 @@ function ColorPickerPopover< T extends Color | Gradient >( {
+ 	isGradient,
+ 	element,
+ 	onChange,
++	popoverProps: receivedPopoverProps,
+ 	onClose = () => {},
+ }: ColorPickerPopoverProps< T > ) {
++	const popoverProps: ColorPickerPopoverProps< T >[ 'popoverProps' ] =
++		useMemo(
++			() => ( {
++				shift: true,
++				offset: 20,
++				placement: 'left-start',
++				...receivedPopoverProps,
++				className: classnames(
++					'components-palette-edit__popover',
++					receivedPopoverProps?.className
++				),
++			} ),
++			[ receivedPopoverProps ]
++		);
++
+ 	return (
+-		<Popover
+-			placement="left-start"
+-			offset={ 20 }
+-			className="components-palette-edit__popover"
+-			onClose={ onClose }
+-		>
++		<Popover { ...popoverProps } onClose={ onClose }>
+ 			{ ! isGradient && (
+ 				<ColorPicker
+ 					color={ element.color }
+@@ -154,17 +172,31 @@ function Option< T extends Color | Gradient >( {
+ 	onStartEditing,
+ 	onRemove,
+ 	onStopEditing,
++	popoverProps: receivedPopoverProps,
+ 	slugPrefix,
+ 	isGradient,
+ }: OptionProps< T > ) {
+ 	const focusOutsideProps = useFocusOutside( onStopEditing );
+ 	const value = isGradient ? element.gradient : element.color;
+ 
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
++	const popoverProps = useMemo(
++		() => ( {
++			...receivedPopoverProps,
++			// Use the custom palette color item as the popover anchor.
++			anchor: popoverAnchor,
++		} ),
++		[ popoverAnchor, receivedPopoverProps ]
++	);
++
+ 	return (
+ 		<PaletteItem
+ 			className={ isEditing ? 'is-selected' : undefined }
+ 			as="div"
+ 			onClick={ onStartEditing }
++			ref={ setPopoverAnchor }
+ 			{ ...( isEditing
+ 				? { ...focusOutsideProps }
+ 				: {
+@@ -218,6 +250,7 @@ function Option< T extends Color | Gradient >( {
+ 					isGradient={ isGradient }
+ 					onChange={ onChange }
+ 					element={ element }
++					popoverProps={ popoverProps }
+ 				/>
+ 			) }
+ 		</PaletteItem>
+@@ -244,6 +277,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
+ 	canOnlyChangeValues,
+ 	slugPrefix,
+ 	isGradient,
++	popoverProps,
+ }: PaletteEditListViewProps< T > ) {
+ 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
+ 	const elementsReference = useRef< typeof elements >();
+@@ -317,6 +351,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
+ 							}
+ 						} }
+ 						slugPrefix={ slugPrefix }
++						popoverProps={ popoverProps }
+ 					/>
+ 				) ) }
+ 			</ItemGroup>
+@@ -356,6 +391,7 @@ export function PaletteEdit( {
+ 	canOnlyChangeValues,
+ 	canReset,
+ 	slugPrefix = '',
++	popoverProps,
+ }: PaletteEditProps ) {
+ 	const isGradient = !! gradients;
+ 	const elements = isGradient ? gradients : colors;
+@@ -541,6 +577,7 @@ export function PaletteEdit( {
+ 							setEditingElement={ setEditingElement }
+ 							slugPrefix={ slugPrefix }
+ 							isGradient={ isGradient }
++							popoverProps={ popoverProps }
+ 						/>
+ 					) }
+ 					{ ! isEditing && editingElement !== null && (
+@@ -568,6 +605,7 @@ export function PaletteEdit( {
+ 								);
+ 							} }
+ 							element={ elements[ editingElement ?? -1 ] }
++							popoverProps={ popoverProps }
+ 						/>
+ 					) }
+ 					{ ! isEditing &&
+diff --git a/packages/components/src/palette-edit/stories/index.tsx b/packages/components/src/palette-edit/stories/index.tsx
+index 5fd0d45592a823..5739964fbb2764 100644
+--- a/packages/components/src/palette-edit/stories/index.tsx
++++ b/packages/components/src/palette-edit/stories/index.tsx
+@@ -59,6 +59,10 @@ Default.args = {
+ 	],
+ 	paletteLabel: 'Colors',
+ 	emptyMessage: 'Colors are empty',
++	popoverProps: {
++		placement: 'bottom-start',
++		offset: 8,
++	},
+ };
+ 
+ export const Gradients = Template.bind( {} );
+diff --git a/packages/components/src/palette-edit/types.ts b/packages/components/src/palette-edit/types.ts
+index 5513b945537784..1cc0611628c2f4 100644
+--- a/packages/components/src/palette-edit/types.ts
++++ b/packages/components/src/palette-edit/types.ts
+@@ -6,6 +6,7 @@ import type { Key, MouseEventHandler } from 'react';
+ /**
+  * Internal dependencies
+  */
++import type Popover from '../popover';
+ import type { HeadingSize } from '../heading/types';
+ 
+ export type Color = {
+@@ -58,6 +59,13 @@ export type BasePaletteEdit = {
+ 	 * @default ''
+ 	 */
+ 	slugPrefix?: string;
++	/**
++	 * Props to pass through to the underlying Popover component.
++	 */
++	popoverProps?: Omit<
++		React.ComponentPropsWithoutRef< typeof Popover >,
++		'children'
++	>;
+ };
+ 
+ type PaletteEditColors = {
+@@ -94,6 +102,7 @@ export type ColorPickerPopoverProps< T extends Color | Gradient > = {
+ 	onChange: ( newElement: T ) => void;
+ 	isGradient?: T extends Gradient ? true : false;
+ 	onClose?: () => void;
++	popoverProps?: PaletteEditProps[ 'popoverProps' ];
+ };
+ 
+ export type NameInputProps = {
+@@ -112,6 +121,7 @@ export type OptionProps< T extends Color | Gradient > = {
+ 	onRemove: MouseEventHandler< HTMLButtonElement >;
+ 	onStartEditing: () => void;
+ 	onStopEditing: () => void;
++	popoverProps?: PaletteEditProps[ 'popoverProps' ];
+ 	slugPrefix: string;
+ };
+ 
+@@ -121,6 +131,7 @@ export type PaletteEditListViewProps< T extends Color | Gradient > = {
+ 	isGradient: T extends Gradient ? true : false;
+ 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
+ 	editingElement?: EditingElement;
++	popoverProps?: PaletteEditProps[ 'popoverProps' ];
+ 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
+ 	slugPrefix: string;
+ };
+diff --git a/packages/edit-site/src/components/global-styles/color-palette-panel.js b/packages/edit-site/src/components/global-styles/color-palette-panel.js
+index 7bf422b878e01a..185a46fdba4761 100644
+--- a/packages/edit-site/src/components/global-styles/color-palette-panel.js
++++ b/packages/edit-site/src/components/global-styles/color-palette-panel.js
+@@ -1,6 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
++import { useViewportMatch } from '@wordpress/compose';
+ import {
+ 	__experimentalPaletteEdit as PaletteEdit,
+ 	__experimentalVStack as VStack,
+@@ -14,6 +15,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+ import { unlock } from '../../private-apis';
+ 
+ const { useGlobalSetting } = unlock( blockEditorPrivateApis );
++const mobilePopoverProps = { placement: 'bottom-start', offset: 8 };
+ 
+ export default function ColorPalettePanel( { name } ) {
+ 	const [ themeColors, setThemeColors ] = useGlobalSetting(
+@@ -43,6 +45,10 @@ export default function ColorPalettePanel( { name } ) {
+ 		'color.defaultPalette',
+ 		name
+ 	);
++
++	const isMobileViewport = useViewportMatch( 'small', '<' );
++	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
++
+ 	return (
+ 		<VStack
+ 			className="edit-site-global-styles-color-palette-panel"
+@@ -56,6 +62,7 @@ export default function ColorPalettePanel( { name } ) {
+ 					onChange={ setThemeColors }
+ 					paletteLabel={ __( 'Theme' ) }
+ 					paletteLabelHeadingLevel={ 3 }
++					popoverProps={ popoverProps }
+ 				/>
+ 			) }
+ 			{ !! defaultColors &&
+@@ -68,6 +75,7 @@ export default function ColorPalettePanel( { name } ) {
+ 						onChange={ setDefaultColors }
+ 						paletteLabel={ __( 'Default' ) }
+ 						paletteLabelHeadingLevel={ 3 }
++						popoverProps={ popoverProps }
+ 					/>
+ 				) }
+ 			<PaletteEdit
+@@ -79,6 +87,7 @@ export default function ColorPalettePanel( { name } ) {
+ 					'Custom colors are empty! Add some colors to create your own color palette.'
+ 				) }
+ 				slugPrefix="custom-"
++				popoverProps={ popoverProps }
+ 			/>
+ 		</VStack>
+ 	);

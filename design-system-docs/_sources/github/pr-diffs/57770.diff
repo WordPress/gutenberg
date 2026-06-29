@@ -1,0 +1,248 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a8dd57900cfae1..469d62b04b175b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ -   `DuotonePicker`: Remove top margin when no duotone options ([#57489](https://github.com/WordPress/gutenberg/pull/57489)).
+ -   `Snackbar`: Fix icon positioning ([#57377](https://github.com/WordPress/gutenberg/pull/57377)).
+ -   `GradientPicker`: Use slug while iterating over gradient entries to avoid React "duplicated key" warning ([#57361](https://github.com/WordPress/gutenberg/pull/57361)).
++-   `ToggleGroupControl`: Improve controlled value detection ([#57770](https://github.com/WordPress/gutenberg/pull/57770)).
+ -   `NavigatorProvider`: Exclude `size` value from `contain` CSS rule ([#57498](https://github.com/WordPress/gutenberg/pull/57498)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 990d8144ff33c8..bac30669f1851c 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -240,7 +240,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+         class="components-toggle-group-control emotion-8 emotion-9"
+         data-wp-c16t="true"
+         data-wp-component="ToggleGroupControl"
+-        id="toggle-group-control-as-radio-group-8"
++        id="toggle-group-control-as-radio-group-10"
+         role="radiogroup"
+       >
+         <div
+@@ -254,7 +254,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+             data-value="uppercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+-            id="toggle-group-control-as-radio-group-8-20"
++            id="toggle-group-control-as-radio-group-10-24"
+             role="radio"
+             type="button"
+             value="uppercase"
+@@ -292,7 +292,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+             data-value="lowercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+-            id="toggle-group-control-as-radio-group-8-21"
++            id="toggle-group-control-as-radio-group-10-25"
+             role="radio"
+             type="button"
+             value="lowercase"
+@@ -488,7 +488,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+         class="components-toggle-group-control emotion-8 emotion-9"
+         data-wp-c16t="true"
+         data-wp-component="ToggleGroupControl"
+-        id="toggle-group-control-as-radio-group-7"
++        id="toggle-group-control-as-radio-group-9"
+         role="radiogroup"
+       >
+         <div
+@@ -501,7 +501,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+             data-value="rigas"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+-            id="toggle-group-control-as-radio-group-7-18"
++            id="toggle-group-control-as-radio-group-9-22"
+             role="radio"
+             type="button"
+             value="rigas"
+@@ -523,7 +523,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+             data-value="jack"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+-            id="toggle-group-control-as-radio-group-7-19"
++            id="toggle-group-control-as-radio-group-9-23"
+             role="radio"
+             type="button"
+             value="jack"
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index 99a2dd8a00421c..a8835bc66c58d4 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -117,6 +117,22 @@ describe.each( [
+ 			expect( container ).toMatchSnapshot();
+ 		} );
+ 	} );
++	it( 'should render with the correct option initially selected when `value` is defined', () => {
++		render(
++			<Component value="jack" label="Test Toggle Group Control">
++				{ options }
++			</Component>
++		);
++		expect( screen.getByRole( 'radio', { name: 'R' } ) ).not.toBeChecked();
++		expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
++	} );
++	it( 'should render without a selected option when `value` is `undefined`', () => {
++		render(
++			<Component label="Test Toggle Group Control">{ options }</Component>
++		);
++		expect( screen.getByRole( 'radio', { name: 'R' } ) ).not.toBeChecked();
++		expect( screen.getByRole( 'radio', { name: 'J' } ) ).not.toBeChecked();
++	} );
+ 	it( 'should call onChange with proper value', async () => {
+ 		const mockOnChange = jest.fn();
+ 
+@@ -193,7 +209,7 @@ describe.each( [
+ 	} );
+ 
+ 	if ( mode === 'controlled' ) {
+-		it( 'should reset values correctly', async () => {
++		it( 'should reset values correctly when default value is undefined', async () => {
+ 			render(
+ 				<Component label="Test Toggle Group Control">
+ 					{ options }
+@@ -208,56 +224,77 @@ describe.each( [
+ 			expect( jackOption ).not.toBeChecked();
+ 			expect( rigasOption ).toBeChecked();
+ 
+-			await press.ArrowRight();
+-
+-			expect( rigasOption ).not.toBeChecked();
+-			expect( jackOption ).toBeChecked();
+-
+ 			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
+ 
+ 			expect( rigasOption ).not.toBeChecked();
+ 			expect( jackOption ).not.toBeChecked();
+ 		} );
+ 
+-		it( 'should update correctly when triggered by external updates', async () => {
++		it( 'should reset values correctly when default value is defined', async () => {
+ 			render(
+-				<Component
+-					value="rigas"
+-					label="Test Toggle Group Control"
+-					extraButtonOptions={ [
+-						{ name: 'Rigas', value: 'rigas' },
+-						{ name: 'Jack', value: 'jack' },
+-					] }
+-				>
++				<Component label="Test Toggle Group Control" value="rigas">
+ 					{ options }
+ 				</Component>
+ 			);
+ 
+-			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
+-			expect(
+-				screen.getByRole( 'radio', { name: 'J' } )
+-			).not.toBeChecked();
+-
+-			await click( screen.getByRole( 'button', { name: 'Jack' } ) );
+-			expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
+-			expect(
+-				screen.getByRole( 'radio', { name: 'R' } )
+-			).not.toBeChecked();
++			const rigasOption = screen.getByRole( 'radio', {
++				name: 'R',
++			} );
++			const jackOption = screen.getByRole( 'radio', {
++				name: 'J',
++			} );
+ 
+-			await click( screen.getByRole( 'button', { name: 'Rigas' } ) );
+-			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
+-			expect(
+-				screen.getByRole( 'radio', { name: 'J' } )
+-			).not.toBeChecked();
++			expect( rigasOption ).toBeChecked();
++			expect( jackOption ).not.toBeChecked();
+ 
+ 			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
+-			expect(
+-				screen.getByRole( 'radio', { name: 'R' } )
+-			).not.toBeChecked();
+-			expect(
+-				screen.getByRole( 'radio', { name: 'J' } )
+-			).not.toBeChecked();
++
++			expect( rigasOption ).not.toBeChecked();
++			expect( jackOption ).not.toBeChecked();
+ 		} );
++
++		describe.each( [
++			[ 'undefined', undefined ],
++			[ 'defined', 'rigas' ],
++		] )(
++			'should update correctly when triggered by external updates',
++			( defaultValueType, defaultValue ) => {
++				it( `when default value is ${ defaultValueType }`, async () => {
++					render(
++						<Component
++							value={ defaultValue }
++							label="Test Toggle Group Control"
++							extraButtonOptions={ [
++								{ name: 'Rigas', value: 'rigas' },
++								{ name: 'Jack', value: 'jack' },
++							] }
++						>
++							{ options }
++						</Component>
++					);
++
++					await click(
++						screen.getByRole( 'button', { name: 'Jack' } )
++					);
++					expect(
++						screen.getByRole( 'radio', { name: 'J' } )
++					).toBeChecked();
++					expect(
++						screen.getByRole( 'radio', { name: 'R' } )
++					).not.toBeChecked();
++
++					await click(
++						screen.getByRole( 'button', { name: 'Rigas' } )
++					);
++					expect(
++						screen.getByRole( 'radio', { name: 'R' } )
++					).toBeChecked();
++					expect(
++						screen.getByRole( 'radio', { name: 'J' } )
++					).not.toBeChecked();
++				} );
++			}
++		);
+ 	}
+ 
+ 	describe( 'isDeselectable', () => {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/utils.ts b/packages/components/src/toggle-group-control/toggle-group-control/utils.ts
+index 3f6d6e135a0df3..fe2b84c5b81231 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/utils.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/utils.ts
+@@ -21,16 +21,21 @@ type ValueProp = ToggleGroupControlProps[ 'value' ];
+ export function useComputeControlledOrUncontrolledValue(
+ 	valueProp: ValueProp
+ ): { value: ValueProp; defaultValue: ValueProp } {
++	const isInitialRender = useRef( true );
+ 	const prevValueProp = usePrevious( valueProp );
+ 	const prevIsControlled = useRef( false );
+ 
++	useEffect( () => {
++		if ( isInitialRender.current ) {
++			isInitialRender.current = false;
++		}
++	}, [] );
++
+ 	// Assume the component is being used in controlled mode on the first re-render
+ 	// that has a different `valueProp` from the previous render.
+ 	const isControlled =
+ 		prevIsControlled.current ||
+-		( prevValueProp !== undefined &&
+-			valueProp !== undefined &&
+-			prevValueProp !== valueProp );
++		( ! isInitialRender.current && prevValueProp !== valueProp );
+ 	useEffect( () => {
+ 		prevIsControlled.current = isControlled;
+ 	}, [ isControlled ] );

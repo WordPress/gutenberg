@@ -1,0 +1,458 @@
+diff --git a/packages/block-directory/src/components/downloadable-block-list-item/index.js b/packages/block-directory/src/components/downloadable-block-list-item/index.js
+index 9499643853c091..53ce10526a095c 100644
+--- a/packages/block-directory/src/components/downloadable-block-list-item/index.js
++++ b/packages/block-directory/src/components/downloadable-block-list-item/index.js
+@@ -12,7 +12,6 @@ import { createInterpolateElement } from '@wordpress/element';
+ import { decodeEntities } from '@wordpress/html-entities';
+ import { getBlockType } from '@wordpress/blocks';
+ import { useSelect } from '@wordpress/data';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { VisuallyHidden, Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/block-editor/src/components/block-patterns-list/index.js b/packages/block-editor/src/components/block-patterns-list/index.js
+index c1876ef50fbd04..72cc523307322c 100644
+--- a/packages/block-editor/src/components/block-patterns-list/index.js
++++ b/packages/block-editor/src/components/block-patterns-list/index.js
+@@ -12,7 +12,6 @@ import {
+ 	Composite,
+ 	__experimentalHStack as HStack,
+ } from '@wordpress/components';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { VisuallyHidden, Text, Tooltip } from '@wordpress/ui';
+ import { useInstanceId } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+diff --git a/packages/block-editor/src/components/global-styles/shadow-panel-components.js b/packages/block-editor/src/components/global-styles/shadow-panel-components.js
+index cbae99afb0df7f..b941911d4ab38b 100644
+--- a/packages/block-editor/src/components/global-styles/shadow-panel-components.js
++++ b/packages/block-editor/src/components/global-styles/shadow-panel-components.js
+@@ -20,7 +20,6 @@ import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
+  */
+ import clsx from 'clsx';
+ 
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/block-editor/src/components/inserter/media-tab/media-preview.js b/packages/block-editor/src/components/inserter/media-tab/media-preview.js
+index 97ebad06908ff2..6fc65a10b4b76a 100644
+--- a/packages/block-editor/src/components/inserter/media-tab/media-preview.js
++++ b/packages/block-editor/src/components/inserter/media-tab/media-preview.js
+@@ -27,7 +27,6 @@ import { store as noticesStore } from '@wordpress/notices';
+ import { isBlobURL } from '@wordpress/blob';
+ import { getFilename } from '@wordpress/url';
+ 
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/block-editor/src/components/inspector-controls-tabs/index.js b/packages/block-editor/src/components/inspector-controls-tabs/index.js
+index 6d4da3750dbcc1..a3d855d7db7253 100644
+--- a/packages/block-editor/src/components/inspector-controls-tabs/index.js
++++ b/packages/block-editor/src/components/inspector-controls-tabs/index.js
+@@ -9,7 +9,6 @@ import { useEffect, useState, useRef } from '@wordpress/element';
+ import { store as preferencesStore } from '@wordpress/preferences';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ 
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/block-editor/src/components/list-view/block-select-button.js b/packages/block-editor/src/components/list-view/block-select-button.js
+index 8d31d7888beaf7..ca913d9b21b2b2 100644
+--- a/packages/block-editor/src/components/list-view/block-select-button.js
++++ b/packages/block-editor/src/components/list-view/block-select-button.js
+@@ -22,7 +22,6 @@ import {
+ import { SPACE, ENTER } from '@wordpress/keycodes';
+ import { useSelect } from '@wordpress/data';
+ 
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/block-editor/src/components/preset-input-control/custom-value-controls.js b/packages/block-editor/src/components/preset-input-control/custom-value-controls.js
+index ffacf39e19e729..1960998524efb0 100644
+--- a/packages/block-editor/src/components/preset-input-control/custom-value-controls.js
++++ b/packages/block-editor/src/components/preset-input-control/custom-value-controls.js
+@@ -6,7 +6,6 @@ import {
+ 	__experimentalUnitControl as UnitControl,
+ } from '@wordpress/components';
+ 
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/boot/src/components/root/index.tsx b/packages/boot/src/components/root/index.tsx
+index e03ba5cd454726..541113fcc20899 100644
+--- a/packages/boot/src/components/root/index.tsx
++++ b/packages/boot/src/components/root/index.tsx
+@@ -19,7 +19,6 @@ import { menu } from '@wordpress/icons';
+ import { useState, useEffect, useMemo } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ import { privateApis as themePrivateApis } from '@wordpress/theme';
+ 
+diff --git a/packages/boot/src/components/save-button/index.tsx b/packages/boot/src/components/save-button/index.tsx
+index e6a2f2909baf30..09d0cdfb6e3c14 100644
+--- a/packages/boot/src/components/save-button/index.tsx
++++ b/packages/boot/src/components/save-button/index.tsx
+@@ -9,7 +9,6 @@ import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
+ import { check } from '@wordpress/icons';
+ import { EntitiesSavedStates } from '@wordpress/editor';
+ import { Button, Modal } from '@wordpress/components';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/boot/src/components/site-icon-link/index.tsx b/packages/boot/src/components/site-icon-link/index.tsx
+index cb1c88abbd603a..53b5314f469f01 100644
+--- a/packages/boot/src/components/site-icon-link/index.tsx
++++ b/packages/boot/src/components/site-icon-link/index.tsx
+@@ -2,7 +2,6 @@
+  * WordPress dependencies
+  */
+ import { Link, privateApis as routePrivateApis } from '@wordpress/route';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d995a8b3193eb0..2d2fa59bc2a8ff 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -59,6 +59,7 @@
+ 
+ ### Enhancements
+ 
++-   `Tooltip`: Mark as not recommended for use in a WordPress environment, in favour of `Tooltip` from `@wordpress/ui` ([#78693](https://github.com/WordPress/gutenberg/pull/78693)).
+ -   `Tabs`, `TabPanel`: Align selected tab colors and indicators with `@wordpress/ui` `Tabs` ([#78418](https://github.com/WordPress/gutenberg/pull/78418)).
+ -   `NoticeList`: Add vertical spacing between notices in a list.
+ -   `Draggable`: Render the drag clone inside the `@wordpress/ui` compat overlay slot so it shares stacking with `@wordpress/ui` overlays opened mid-drag. Auto-enabled in WordPress environments; other hosts can opt in via `useEnableWpCompatOverlaySlot()` ([#78183](https://github.com/WordPress/gutenberg/pull/78183), [#78354](https://github.com/WordPress/gutenberg/pull/78354)).
+diff --git a/packages/components/src/tooltip/stories/index.story.tsx b/packages/components/src/tooltip/stories/index.story.tsx
+index 265af6492e81d4..d6ffaaab7d8403 100644
+--- a/packages/components/src/tooltip/stories/index.story.tsx
++++ b/packages/components/src/tooltip/stories/index.story.tsx
+@@ -15,7 +15,6 @@ import Tooltip from '..';
+ import Button from '../../button';
+ 
+ const meta: Meta< typeof Tooltip > = {
+-	tags: [ 'manifest' ],
+ 	title: 'Components/Overlays/Tooltip',
+ 	id: 'components-tooltip',
+ 	component: Tooltip,
+@@ -38,8 +37,9 @@ const meta: Meta< typeof Tooltip > = {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 		componentStatus: {
+-			status: 'recommended',
++			status: 'not-recommended',
+ 			whereUsed: 'global',
++			notes: 'Use `Tooltip` from `@wordpress/ui` instead.',
+ 		},
+ 	},
+ };
+diff --git a/packages/dataviews/src/components/dataform-layouts/panel/summary-button.tsx b/packages/dataviews/src/components/dataform-layouts/panel/summary-button.tsx
+index 299fab25d69979..717df1e08f2a3c 100644
+--- a/packages/dataviews/src/components/dataform-layouts/panel/summary-button.tsx
++++ b/packages/dataviews/src/components/dataform-layouts/panel/summary-button.tsx
+@@ -10,7 +10,6 @@ import { Button, Icon as WCIcon } from '@wordpress/components';
+ import { sprintf, _x } from '@wordpress/i18n';
+ import { error as errorIcon, pencil } from '@wordpress/icons';
+ import { useInstanceId } from '@wordpress/compose';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ import { useRef } from '@wordpress/element';
+ 
+diff --git a/packages/dataviews/src/components/dataform-layouts/panel/utils/get-label-content.tsx b/packages/dataviews/src/components/dataform-layouts/panel/utils/get-label-content.tsx
+index f75333c252d7f4..f28d1704fe699b 100644
+--- a/packages/dataviews/src/components/dataform-layouts/panel/utils/get-label-content.tsx
++++ b/packages/dataviews/src/components/dataform-layouts/panel/utils/get-label-content.tsx
+@@ -3,7 +3,6 @@
+  */
+ import { Icon as WCIcon } from '@wordpress/components';
+ import { error as errorIcon } from '@wordpress/icons';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip, VisuallyHidden } from '@wordpress/ui';
+ 
+ function getLabelContent(
+diff --git a/packages/dataviews/src/components/dataviews-filters/filter.tsx b/packages/dataviews/src/components/dataviews-filters/filter.tsx
+index 5af95df8f97a50..98f56ff7c97283 100644
+--- a/packages/dataviews/src/components/dataviews-filters/filter.tsx
++++ b/packages/dataviews/src/components/dataviews-filters/filter.tsx
+@@ -16,7 +16,6 @@ import {
+ import { __, sprintf } from '@wordpress/i18n';
+ import { useMemo, useRef } from '@wordpress/element';
+ import { closeSmall } from '@wordpress/icons';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Stack, Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx b/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx
+index 5b0fbe7fbc4b0e..8d2ce464bd4a8e 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx
+@@ -13,7 +13,6 @@ import {
+ 	Composite,
+ 	privateApis as componentsPrivateApis,
+ } from '@wordpress/components';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Stack, Tooltip } from '@wordpress/ui';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { useInstanceId } from '@wordpress/compose';
+diff --git a/packages/edit-post/src/components/layout/index.js b/packages/edit-post/src/components/layout/index.js
+index f5b42332eb7bdd..063bccb511f2bc 100644
+--- a/packages/edit-post/src/components/layout/index.js
++++ b/packages/edit-post/src/components/layout/index.js
+@@ -49,7 +49,6 @@ import {
+ 	useRefEffect,
+ 	useViewportMatch,
+ } from '@wordpress/compose';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip, VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/edit-site/src/components/layout/index.js b/packages/edit-site/src/components/layout/index.js
+index 391308b566ec51..e3fb883b5395b0 100644
+--- a/packages/edit-site/src/components/layout/index.js
++++ b/packages/edit-site/src/components/layout/index.js
+@@ -32,7 +32,6 @@ import { PluginArea } from '@wordpress/plugins';
+ import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import { store as preferencesStore } from '@wordpress/preferences';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/edit-site/src/components/resizable-frame/index.js b/packages/edit-site/src/components/resizable-frame/index.js
+index 74b48e596a20dd..9466d35b2390c0 100644
+--- a/packages/edit-site/src/components/resizable-frame/index.js
++++ b/packages/edit-site/src/components/resizable-frame/index.js
+@@ -17,7 +17,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
+ import { useSelect } from '@wordpress/data';
+ import { store as coreStore } from '@wordpress/core-data';
+ import { addQueryArgs } from '@wordpress/url';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/editor/src/components/collab-sidebar/note-byline.js b/packages/editor/src/components/collab-sidebar/note-byline.js
+index 1aea6b688d5a47..7dc1ef8c37ebeb 100644
+--- a/packages/editor/src/components/collab-sidebar/note-byline.js
++++ b/packages/editor/src/components/collab-sidebar/note-byline.js
+@@ -1,7 +1,6 @@
+ /**
+  * WordPress dependencies
+  */
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Stack, Tooltip } from '@wordpress/ui';
+ import { __, _x } from '@wordpress/i18n';
+ import {
+diff --git a/packages/editor/src/components/collaborators-presence/avatar/component.tsx b/packages/editor/src/components/collaborators-presence/avatar/component.tsx
+index 0b305180928e23..541bb6b2b078b7 100644
+--- a/packages/editor/src/components/collaborators-presence/avatar/component.tsx
++++ b/packages/editor/src/components/collaborators-presence/avatar/component.tsx
+@@ -12,7 +12,6 @@ extend( [ a11yPlugin ] );
+  */
+ import { Icon as WCIcon } from '@wordpress/components';
+ import { useMemo } from '@wordpress/element';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/editor/src/components/collaborators-presence/avatar/test/index.tsx b/packages/editor/src/components/collaborators-presence/avatar/test/index.tsx
+index e25524fac35bbb..f4115ad12dd78f 100644
+--- a/packages/editor/src/components/collaborators-presence/avatar/test/index.tsx
++++ b/packages/editor/src/components/collaborators-presence/avatar/test/index.tsx
+@@ -7,7 +7,6 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * WordPress dependencies
+  */
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/editor/src/components/post-revisions-preview/diff-markers.js b/packages/editor/src/components/post-revisions-preview/diff-markers.js
+index e1d074f5fefc15..3b3cdcb86b61bb 100644
+--- a/packages/editor/src/components/post-revisions-preview/diff-markers.js
++++ b/packages/editor/src/components/post-revisions-preview/diff-markers.js
+@@ -15,7 +15,6 @@ import {
+ 	store as blockEditorStore,
+ } from '@wordpress/block-editor';
+ import { __ } from '@wordpress/i18n';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/editor/src/components/resizable-editor/resize-handle.js b/packages/editor/src/components/resizable-editor/resize-handle.js
+index 91ffa4f1854a55..bd3e94830ce9f9 100644
+--- a/packages/editor/src/components/resizable-editor/resize-handle.js
++++ b/packages/editor/src/components/resizable-editor/resize-handle.js
+@@ -4,7 +4,6 @@
+ import { __ } from '@wordpress/i18n';
+ import { LEFT, RIGHT } from '@wordpress/keycodes';
+ import { __unstableMotion as motion } from '@wordpress/components';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip, VisuallyHidden } from '@wordpress/ui';
+ 
+ const DELTA_DISTANCE = 20; // The distance to resize per keydown in pixels.
+diff --git a/packages/editor/src/components/template-actions-panel/block-theme-content.js b/packages/editor/src/components/template-actions-panel/block-theme-content.js
+index 8d3806528e737e..b27ed16f1862e7 100644
+--- a/packages/editor/src/components/template-actions-panel/block-theme-content.js
++++ b/packages/editor/src/components/template-actions-panel/block-theme-content.js
+@@ -20,7 +20,6 @@ import { decodeEntities } from '@wordpress/html-entities';
+ import { ENTER, SPACE } from '@wordpress/keycodes';
+ import { store as noticesStore } from '@wordpress/notices';
+ import { store as preferencesStore } from '@wordpress/preferences';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/eslint-plugin/rules/__tests__/use-recommended-components.js b/packages/eslint-plugin/rules/__tests__/use-recommended-components.js
+index eaa9f1e9f170ca..4e85685d62ad1d 100644
+--- a/packages/eslint-plugin/rules/__tests__/use-recommended-components.js
++++ b/packages/eslint-plugin/rules/__tests__/use-recommended-components.js
+@@ -24,7 +24,7 @@ ruleTester.run( 'use-recommended-components', rule, {
+ 		"import { Link } from '@wordpress/ui';",
+ 		"import { Stack } from '@wordpress/ui';",
+ 		"import { Text } from '@wordpress/ui';",
+-		"import { Badge, Icon, Link, Stack, Tabs, Text } from '@wordpress/ui';",
++		"import { Badge, Icon, Link, Stack, Tabs, Text, Tooltip } from '@wordpress/ui';",
+ 
+ 		// Unlocked private APIs are only checked for denied names.
+ 		"import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { SomethingElse } = unlock( privateApis );",
+@@ -114,6 +114,14 @@ ruleTester.run( 'use-recommended-components', rule, {
+ 				},
+ 			],
+ 		},
++		{
++			code: "import { Tooltip } from '@wordpress/components';",
++			errors: [
++				{
++					message: 'Use `Tooltip` from `@wordpress/ui` instead.',
++				},
++			],
++		},
+ 	],
+ } );
+ 
+diff --git a/packages/eslint-plugin/rules/use-recommended-components.js b/packages/eslint-plugin/rules/use-recommended-components.js
+index 3b31c42dca6d45..3ce2d70ca48284 100644
+--- a/packages/eslint-plugin/rules/use-recommended-components.js
++++ b/packages/eslint-plugin/rules/use-recommended-components.js
+@@ -26,6 +26,7 @@ const ALLOWLIST = {
+ 			'Stack',
+ 			'Tabs',
+ 			'Text',
++			'Tooltip',
+ 			'VisuallyHidden',
+ 		],
+ 		message:
+@@ -60,6 +61,7 @@ const DENYLIST = {
+ 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
+ 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
+ 		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
++		Tooltip: 'Use `Tooltip` from `@wordpress/ui` instead.',
+ 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
+ 	},
+ };
+diff --git a/packages/fields/src/components/media-edit/index.tsx b/packages/fields/src/components/media-edit/index.tsx
+index 801ab1e1f73b9d..22df1c56177664 100644
+--- a/packages/fields/src/components/media-edit/index.tsx
++++ b/packages/fields/src/components/media-edit/index.tsx
+@@ -40,7 +40,6 @@ import {
+ 	chevronLeft,
+ 	chevronRight,
+ } from '@wordpress/icons';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { VisuallyHidden, Tooltip } from '@wordpress/ui';
+ import {
+ 	MediaUpload,
+diff --git a/packages/fields/src/fields/pattern-title/view.tsx b/packages/fields/src/fields/pattern-title/view.tsx
+index 0a5d62d41d826e..fe71e7bef67fe1 100644
+--- a/packages/fields/src/fields/pattern-title/view.tsx
++++ b/packages/fields/src/fields/pattern-title/view.tsx
+@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
+ import { Icon, lockSmall } from '@wordpress/icons';
+ // @ts-ignore
+ import { privateApis as patternPrivateApis } from '@wordpress/patterns';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip, VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/global-styles-ui/src/variations/variation.tsx b/packages/global-styles-ui/src/variations/variation.tsx
+index cadfec3d4240ea..d311105f740600 100644
+--- a/packages/global-styles-ui/src/variations/variation.tsx
++++ b/packages/global-styles-ui/src/variations/variation.tsx
+@@ -10,7 +10,6 @@ import {
+ 	areGlobalStylesEqual,
+ 	mergeGlobalStyles,
+ } from '@wordpress/global-styles-engine';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/media-fields/src/filename/view.tsx b/packages/media-fields/src/filename/view.tsx
+index b601fdfd5432b2..cf984485eaf011 100644
+--- a/packages/media-fields/src/filename/view.tsx
++++ b/packages/media-fields/src/filename/view.tsx
+@@ -4,7 +4,6 @@
+ import { useMemo } from '@wordpress/element';
+ import { getFilename } from '@wordpress/url';
+ import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Tooltip } from '@wordpress/ui';
+ 
+ /**
+diff --git a/packages/ui/src/tooltip/stories/index.story.tsx b/packages/ui/src/tooltip/stories/index.story.tsx
+index c73ffa4dd8f4b1..b45eb69822ee52 100644
+--- a/packages/ui/src/tooltip/stories/index.story.tsx
++++ b/packages/ui/src/tooltip/stories/index.story.tsx
+@@ -6,6 +6,7 @@ import * as Tooltip from '../';
+ const meta: Meta< typeof Tooltip.Root > = {
+ 	title: 'Design System/Components/Tooltip',
+ 	component: Tooltip.Root,
++	tags: [ 'manifest' ],
+ 	subcomponents: {
+ 		'Tooltip.Provider': Tooltip.Provider,
+ 		'Tooltip.Trigger': Tooltip.Trigger,
+@@ -15,9 +16,8 @@ const meta: Meta< typeof Tooltip.Root > = {
+ 	},
+ 	parameters: {
+ 		componentStatus: {
+-			status: 'use-with-caution',
++			status: 'recommended',
+ 			whereUsed: 'global',
+-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+ 		},
+ 	},
+ };
+diff --git a/packages/ui/src/tooltip/stories/usage-guidelines.story.tsx b/packages/ui/src/tooltip/stories/usage-guidelines.story.tsx
+index 26fe3d45d33a44..222e29734ff3ba 100644
+--- a/packages/ui/src/tooltip/stories/usage-guidelines.story.tsx
++++ b/packages/ui/src/tooltip/stories/usage-guidelines.story.tsx
+@@ -15,11 +15,6 @@ const meta: Meta = {
+ 	title: 'Design System/Components/Tooltip/Usage Guidelines',
+ 	parameters: {
+ 		controls: { disable: true },
+-		componentStatus: {
+-			status: 'use-with-caution',
+-			whereUsed: 'global',
+-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+-		},
+ 	},
+ 	tags: [ '!dev' ],
+ };
+diff --git a/widgets/events/render.tsx b/widgets/events/render.tsx
+index b118d79ef2b628..b5bb249d399ea2 100644
+--- a/widgets/events/render.tsx
++++ b/widgets/events/render.tsx
+@@ -7,7 +7,6 @@ import { store as coreStore } from '@wordpress/core-data';
+ import { Spinner } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import { mapMarker } from '@wordpress/icons';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+ import { Icon, Link, Stack, Text, Tooltip } from '@wordpress/ui';
+ 
+ /**

@@ -1,0 +1,37 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6ac170d77ba647..3dbe915bc9a746 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `TextareaControl`: Add `min-height` to the textarea element ([#72867](https://github.com/WordPress/gutenberg/pull/72867)).
+ -   `Card`, `CardHeader`, `CardBody` and `CardFooter`: Add support for directional padding through object-based size prop, allowing independent control of padding for each side ([#72511](https://github.com/WordPress/gutenberg/pull/72511)).
+ -   `CustomSelectControl`: Fix the options with the same name are shown as the selected option ([#72189](https://github.com/WordPress/gutenberg/pull/72189)).
++-   `ToolsPanelItem`: Update the custom hook `useToolsPanelItem` for `hasValue` prop to always be Boolean ([#73074](https://github.com/WordPress/gutenberg/pull/73074))
+ 
+ ## 30.7.0 (2025-10-29)
+ 
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index e0a1f0139dcace..8cafc90840d500 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -54,7 +54,10 @@ export function useToolsPanelItem(
+ 
+ 	// hasValue is a new function on every render, so do not add it as a
+ 	// dependency to the useCallback hook! If needed, we should use a ref.
+-	const hasValueCallback = useCallback( hasValue, [ panelId ] );
++	const hasValueCallback = useCallback(
++		() => Boolean( hasValue() ),
++		[ panelId ]
++	);
+ 	// resetAllFilter is a new function on every render, so do not add it as a
+ 	// dependency to the useCallback hook! If needed, we should use a ref.
+ 	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
+@@ -122,7 +125,7 @@ export function useToolsPanelItem(
+ 	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
+ 	const isRegistered = menuItems?.[ menuGroup ]?.[ label ] !== undefined;
+ 
+-	const isValueSet = hasValue();
++	const isValueSet = Boolean( hasValue() );
+ 	// Notify the panel when an item's value has changed except for optional
+ 	// items without value because the item should not cause itself to hide.
+ 	useEffect( () => {

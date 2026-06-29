@@ -1,0 +1,24 @@
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index f2051a7d839e7e..36b001ae50cbe1 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -71,11 +71,17 @@ function computeAnchorRect(
+ 			return;
+ 		}
+ 
+-		if ( anchorRef instanceof window.Range ) {
++		// Duck-type to check if `anchorRef` is an instance of Range
++		// `anchorRef instanceof window.Range` checks will break across document boundaries
++		// such as in an iframe
++		if ( typeof anchorRef?.cloneRange === 'function' ) {
+ 			return getRectangleFromRange( anchorRef );
+ 		}
+ 
+-		if ( anchorRef instanceof window.Element ) {
++		// Duck-type to check if `anchorRef` is an instance of Element
++		// `anchorRef instanceof window.Element` checks will break across document boundaries
++		// such as in an iframe
++		if ( typeof anchorRef?.getBoundingClientRect === 'function' ) {
+ 			const rect = anchorRef.getBoundingClientRect();
+ 
+ 			if ( shouldAnchorIncludePadding ) {

@@ -1,0 +1,146 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 106863c020c5d9..ed4c83cdf14312 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,10 @@
+ -   `FormToggle`: fix sass deprecation warning ([#56672](https://github.com/WordPress/gutenberg/pull/56672)).
+ -   `QueryControls`: Add opt-in prop for 40px default size ([#56576](https://github.com/WordPress/gutenberg/pull/56576)).
+ 
++### Bug Fix
++
++-   `ToggleGroupControl`: react correctly to external controlled updates ([#56678](https://github.com/WordPress/gutenberg/pull/56678)).
++
+ ## 25.13.0 (2023-11-29)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index 78be0e89fc0bb3..b54b5764d4e0ff 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -25,8 +25,11 @@ import cleanupTooltip from '../../tooltip/test/utils';
+ const ControlledToggleGroupControl = ( {
+ 	value: valueProp,
+ 	onChange,
++	extraButtonOptions,
+ 	...props
+-}: ToggleGroupControlProps ) => {
++}: ToggleGroupControlProps & {
++	extraButtonOptions?: { name: string; value: string }[];
++} ) => {
+ 	const [ value, setValue ] = useState( valueProp );
+ 
+ 	return (
+@@ -40,6 +43,14 @@ const ControlledToggleGroupControl = ( {
+ 				value={ value }
+ 			/>
+ 			<Button onClick={ () => setValue( undefined ) }>Reset</Button>
++			{ extraButtonOptions?.map( ( obj ) => (
++				<Button
++					key={ obj.value }
++					onClick={ () => setValue( obj.value ) }
++				>
++					{ obj.name }
++				</Button>
++			) ) }
+ 		</>
+ 	);
+ };
+@@ -192,6 +203,48 @@ describe.each( [
+ 			expect( rigasOption ).not.toBeChecked();
+ 			expect( jackOption ).not.toBeChecked();
+ 		} );
++
++		it( 'should update correctly when triggered by external updates', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Component
++					value="rigas"
++					label="Test Toggle Group Control"
++					extraButtonOptions={ [
++						{ name: 'Rigas', value: 'rigas' },
++						{ name: 'Jack', value: 'jack' },
++					] }
++				>
++					{ options }
++				</Component>
++			);
++
++			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
++			expect(
++				screen.getByRole( 'radio', { name: 'J' } )
++			).not.toBeChecked();
++
++			await user.click( screen.getByRole( 'button', { name: 'Jack' } ) );
++			expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
++			expect(
++				screen.getByRole( 'radio', { name: 'R' } )
++			).not.toBeChecked();
++
++			await user.click( screen.getByRole( 'button', { name: 'Rigas' } ) );
++			expect( screen.getByRole( 'radio', { name: 'R' } ) ).toBeChecked();
++			expect(
++				screen.getByRole( 'radio', { name: 'J' } )
++			).not.toBeChecked();
++
++			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
++			expect(
++				screen.getByRole( 'radio', { name: 'R' } )
++			).not.toBeChecked();
++			expect(
++				screen.getByRole( 'radio', { name: 'J' } )
++			).not.toBeChecked();
++		} );
+ 	}
+ 
+ 	describe( 'isDeselectable', () => {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/utils.ts b/packages/components/src/toggle-group-control/toggle-group-control/utils.ts
+index 1a012e6efe00d2..3f6d6e135a0df3 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/utils.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/utils.ts
+@@ -21,30 +21,25 @@ type ValueProp = ToggleGroupControlProps[ 'value' ];
+ export function useComputeControlledOrUncontrolledValue(
+ 	valueProp: ValueProp
+ ): { value: ValueProp; defaultValue: ValueProp } {
+-	const hasEverBeenUsedInControlledMode = useRef( false );
+-	const previousValueProp = usePrevious( valueProp );
++	const prevValueProp = usePrevious( valueProp );
++	const prevIsControlled = useRef( false );
+ 
++	// Assume the component is being used in controlled mode on the first re-render
++	// that has a different `valueProp` from the previous render.
++	const isControlled =
++		prevIsControlled.current ||
++		( prevValueProp !== undefined &&
++			valueProp !== undefined &&
++			prevValueProp !== valueProp );
+ 	useEffect( () => {
+-		if ( ! hasEverBeenUsedInControlledMode.current ) {
+-			// Assume the component is being used in controlled mode if:
+-			// - the `value` prop is not `undefined`
+-			// - the `value` prop was not previously `undefined` and was given a new value
+-			hasEverBeenUsedInControlledMode.current =
+-				valueProp !== undefined &&
+-				previousValueProp !== undefined &&
+-				valueProp !== previousValueProp;
+-		}
+-	}, [ valueProp, previousValueProp ] );
++		prevIsControlled.current = isControlled;
++	}, [ isControlled ] );
+ 
+-	let value, defaultValue;
+-
+-	if ( hasEverBeenUsedInControlledMode.current ) {
++	if ( isControlled ) {
+ 		// When in controlled mode, use `''` instead of `undefined`
+-		value = valueProp ?? '';
+-	} else {
+-		// When in uncontrolled mode, the `value` should be intended as the initial value
+-		defaultValue = valueProp;
++		return { value: valueProp ?? '', defaultValue: undefined };
+ 	}
+ 
+-	return { value, defaultValue };
++	// When in uncontrolled mode, the `value` should be intended as the initial value
++	return { value: undefined, defaultValue: valueProp };
+ }

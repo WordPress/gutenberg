@@ -1,0 +1,87 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ee87809f1d1e68..517f5e3dd33409 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -24,6 +24,7 @@
+ -   `ComboboxControl`: Refactor away from `_.deburr()` ([#42169](https://github.com/WordPress/gutenberg/pull/42169/)).
+ -   `FormTokenField`: Refactor away from `_.identity()` ([#42215](https://github.com/WordPress/gutenberg/pull/42215/)).
+ -   `SelectControl`: Use roles and `@testing-library/user-event` in unit tests ([#42308](https://github.com/WordPress/gutenberg/pull/42308)).
++-   `DropdownMenu`: Refactor away from Lodash ([#42218](https://github.com/WordPress/gutenberg/pull/42218/)).
+ -   `ToolbarGroup`: Refactor away from `_.flatMap()` ([#42223](https://github.com/WordPress/gutenberg/pull/42223/)).
+ -   `TreeSelect`: Refactor away from `_.flatMap()` ([#42223](https://github.com/WordPress/gutenberg/pull/42223/)).
+ -   `Autocomplete`: Refactor away from `_.deburr()` ([#42266](https://github.com/WordPress/gutenberg/pull/42266/)).
+diff --git a/packages/components/src/dropdown-menu/index.js b/packages/components/src/dropdown-menu/index.js
+index eff41fee62cc29..9687ecce8ebc7b 100644
+--- a/packages/components/src/dropdown-menu/index.js
++++ b/packages/components/src/dropdown-menu/index.js
+@@ -3,7 +3,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { flatMap, isEmpty } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -59,13 +58,13 @@ function DropdownMenu( dropdownMenuProps ) {
+ 		noIcons,
+ 	} = dropdownMenuProps;
+ 
+-	if ( isEmpty( controls ) && ! isFunction( children ) ) {
++	if ( ! controls?.length && ! isFunction( children ) ) {
+ 		return null;
+ 	}
+ 
+ 	// Normalize controls to nested array of objects (sets of controls)
+ 	let controlSets;
+-	if ( ! isEmpty( controls ) ) {
++	if ( controls?.length ) {
+ 		controlSets = controls;
+ 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
+ 			controlSets = [ controlSets ];
+@@ -146,7 +145,7 @@ function DropdownMenu( dropdownMenuProps ) {
+ 				return (
+ 					<NavigableMenu { ...mergedMenuProps } role="menu">
+ 						{ isFunction( children ) ? children( props ) : null }
+-						{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
++						{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
+ 							controlSet.map( ( control, indexOfControl ) => (
+ 								<Button
+ 									key={ [
+diff --git a/packages/components/src/dropdown-menu/index.native.js b/packages/components/src/dropdown-menu/index.native.js
+index 848b51062f03ae..f75ac157616ade 100644
+--- a/packages/components/src/dropdown-menu/index.native.js
++++ b/packages/components/src/dropdown-menu/index.native.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { flatMap, isEmpty } from 'lodash';
+ import { Platform } from 'react-native';
+ /**
+  * WordPress dependencies
+@@ -53,13 +52,13 @@ function DropdownMenu( {
+ 	popoverProps,
+ 	toggleProps,
+ } ) {
+-	if ( isEmpty( controls ) && ! isFunction( children ) ) {
++	if ( ! controls?.length && ! isFunction( children ) ) {
+ 		return null;
+ 	}
+ 
+ 	// Normalize controls to nested array of objects (sets of controls)
+ 	let controlSets;
+-	if ( ! isEmpty( controls ) ) {
++	if ( controls?.length ) {
+ 		controlSets = controls;
+ 		if ( ! Array.isArray( controlSets[ 0 ] ) ) {
+ 			controlSets = [ controlSets ];
+@@ -131,8 +130,7 @@ function DropdownMenu( {
+ 							title={ label }
+ 							style={ { paddingLeft: 0, paddingRight: 0 } }
+ 						>
+-							{ flatMap(
+-								controlSets,
++							{ controlSets?.flatMap(
+ 								( controlSet, indexOfSet ) =>
+ 									controlSet.map(
+ 										( control, indexOfControl ) => (

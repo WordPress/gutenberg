@@ -1,0 +1,2657 @@
+diff --git a/packages/components/src/autocomplete/test/index.js b/packages/components/src/autocomplete/test/index.js
+index 0972f35c38b55f..26031a710422f1 100644
+--- a/packages/components/src/autocomplete/test/index.js
++++ b/packages/components/src/autocomplete/test/index.js
+@@ -14,14 +14,10 @@ import { useRef } from '@wordpress/element';
+  */
+ import { getAutoCompleterUI } from '../autocompleter-ui';
+ 
+-jest.useFakeTimers();
+-
+ describe( 'AutocompleterUI', () => {
+ 	describe( 'click outside behavior', () => {
+ 		it( 'should call reset function when a click on another element occurs', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const resetSpy = jest.fn();
+ 
+diff --git a/packages/components/src/box-control/test/index.js b/packages/components/src/box-control/test/index.js
+index 2d6a51bd8abf73..a15853443fe848 100644
+--- a/packages/components/src/box-control/test/index.js
++++ b/packages/components/src/box-control/test/index.js
+@@ -14,8 +14,6 @@ import { useState } from '@wordpress/element';
+  */
+ import BoxControl from '../';
+ 
+-jest.useFakeTimers();
+-
+ const Example = ( extraProps ) => {
+ 	const [ state, setState ] = useState();
+ 
+@@ -39,9 +37,7 @@ describe( 'BoxControl', () => {
+ 		} );
+ 
+ 		it( 'should update values when interacting with input', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <BoxControl /> );
+ 
+@@ -63,9 +59,7 @@ describe( 'BoxControl', () => {
+ 
+ 	describe( 'Reset', () => {
+ 		it( 'should reset values when clicking Reset', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <BoxControl /> );
+ 
+@@ -89,9 +83,7 @@ describe( 'BoxControl', () => {
+ 		} );
+ 
+ 		it( 'should reset values when clicking Reset, if controlled', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <Example /> );
+ 
+@@ -115,9 +107,7 @@ describe( 'BoxControl', () => {
+ 		} );
+ 
+ 		it( 'should reset values when clicking Reset, if controlled <-> uncontrolled state changes', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <Example /> );
+ 
+@@ -141,9 +131,7 @@ describe( 'BoxControl', () => {
+ 		} );
+ 
+ 		it( 'should persist cleared value when focus changes', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const spyChange = jest.fn();
+ 
+ 			render( <BoxControl onChange={ ( v ) => spyChange( v ) } /> );
+@@ -179,9 +167,7 @@ describe( 'BoxControl', () => {
+ 
+ 	describe( 'Unlinked sides', () => {
+ 		it( 'should update a single side value when unlinked', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <Example /> );
+ 
+@@ -216,9 +202,7 @@ describe( 'BoxControl', () => {
+ 		} );
+ 
+ 		it( 'should update a whole axis when value is changed when unlinked', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <Example splitOnAxis /> );
+ 
+@@ -251,9 +235,7 @@ describe( 'BoxControl', () => {
+ 
+ 	describe( 'Unit selections', () => {
+ 		it( 'should update unlinked controls unit selection based on all input control', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			// Render control.
+ 			render( <BoxControl /> );
+@@ -285,9 +267,7 @@ describe( 'BoxControl', () => {
+ 		} );
+ 
+ 		it( 'should use individual side attribute unit when available', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			// Render control.
+ 			const { rerender } = render( <BoxControl /> );
+@@ -337,9 +317,7 @@ describe( 'BoxControl', () => {
+ 
+ 	describe( 'onChange updates', () => {
+ 		it( 'should call onChange when values contain more than just CSS units', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const setState = jest.fn();
+ 
+ 			render( <BoxControl onChange={ setState } /> );
+@@ -361,9 +339,7 @@ describe( 'BoxControl', () => {
+ 		} );
+ 
+ 		it( 'should not pass invalid CSS unit only values to onChange', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const setState = jest.fn();
+ 
+ 			render( <BoxControl onChange={ setState } /> );
+diff --git a/packages/components/src/checkbox-control/test/index.tsx b/packages/components/src/checkbox-control/test/index.tsx
+index 5972adf6f695fa..061087fdc09012 100644
+--- a/packages/components/src/checkbox-control/test/index.tsx
++++ b/packages/components/src/checkbox-control/test/index.tsx
+@@ -15,8 +15,6 @@ import { useState } from '@wordpress/element';
+ import BaseCheckboxControl from '..';
+ import type { CheckboxControlProps } from '../types';
+ 
+-jest.useFakeTimers();
+-
+ const noop = () => {};
+ 
+ const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
+@@ -85,9 +83,7 @@ describe( 'CheckboxControl', () => {
+ 
+ 	describe( 'Value', () => {
+ 		it( 'should flip the checked property when clicked', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state = false;
+ 			const setState = jest.fn(
+diff --git a/packages/components/src/color-palette/test/index.tsx b/packages/components/src/color-palette/test/index.tsx
+index 136cecec02192a..46b5bc6ba22bdc 100644
+--- a/packages/components/src/color-palette/test/index.tsx
++++ b/packages/components/src/color-palette/test/index.tsx
+@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
+  */
+ import ColorPalette from '..';
+ 
+-jest.useFakeTimers();
+-
+ const EXAMPLE_COLORS = [
+ 	{ name: 'red', color: '#f00' },
+ 	{ name: 'green', color: '#0f0' },
+@@ -54,9 +52,7 @@ describe( 'ColorPalette', () => {
+ 	} );
+ 
+ 	it( 'should call onClick on an active button with undefined', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		const onChange = jest.fn();
+ 
+ 		render(
+@@ -76,9 +72,7 @@ describe( 'ColorPalette', () => {
+ 	} );
+ 
+ 	it( 'should call onClick on an inactive button', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		const onChange = jest.fn();
+ 
+ 		render(
+@@ -104,9 +98,7 @@ describe( 'ColorPalette', () => {
+ 	} );
+ 
+ 	it( 'should call onClick with undefined, when the clearButton onClick is triggered', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		const onChange = jest.fn();
+ 
+ 		render(
+@@ -139,9 +131,7 @@ describe( 'ColorPalette', () => {
+ 	} );
+ 
+ 	it( 'should render dropdown and its content', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		const onChange = jest.fn();
+ 
+ 		render(
+diff --git a/packages/components/src/color-picker/test/index.js b/packages/components/src/color-picker/test/index.js
+index caf17afd320ff9..a04a114e1276bf 100644
+--- a/packages/components/src/color-picker/test/index.js
++++ b/packages/components/src/color-picker/test/index.js
+@@ -1,15 +1,13 @@
+ /**
+  * External dependencies
+  */
+-import { render, fireEvent } from '@testing-library/react';
++import { render, fireEvent, waitFor } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { ColorPicker } from '..';
+ 
+-jest.useFakeTimers();
+-
+ /**
+  * Ordinarily we'd try to select the compnoent by role but the silder role appears
+  * on several elements and we'd end up encoding assumptions about order when
+@@ -43,12 +41,6 @@ function moveReactColorfulSlider( sliderElement, from, to ) {
+ 	fireEvent( sliderElement, new FakeMouseEvent( 'mousemove', to ) );
+ }
+ 
+-const sleep = ( ms ) => {
+-	const promise = new Promise( ( resolve ) => setTimeout( resolve, ms ) );
+-	jest.advanceTimersByTime( ms + 1 );
+-	return promise;
+-};
+-
+ const hslaMatcher = expect.objectContaining( {
+ 	h: expect.any( Number ),
+ 	s: expect.any( Number ),
+@@ -95,8 +87,9 @@ describe( 'ColorPicker', () => {
+ 				{ pageX: 10, pageY: 10 }
+ 			);
+ 
+-			// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
+-			await sleep( 1 );
++			await waitFor( () =>
++				expect( onChangeComplete ).toHaveBeenCalled()
++			);
+ 
+ 			expect( onChangeComplete ).toHaveBeenCalledWith(
+ 				legacyColorMatcher
+@@ -119,8 +112,7 @@ describe( 'ColorPicker', () => {
+ 			{ pageX: 10, pageY: 10 }
+ 		);
+ 
+-		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
+-		await sleep( 1 );
++		await waitFor( () => expect( onChange ).toHaveBeenCalled() );
+ 
+ 		expect( onChange ).toHaveBeenCalledWith(
+ 			expect.stringMatching( /^#([a-fA-F0-9]{8})$/ )
+@@ -152,8 +144,7 @@ describe( 'ColorPicker', () => {
+ 			{ pageX: 10, pageY: 10 }
+ 		);
+ 
+-		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
+-		await sleep( 1 );
++		await waitFor( () => expect( onChange ).toHaveBeenCalled() );
+ 
+ 		expect( onChange ).toHaveBeenCalledWith(
+ 			expect.stringMatching( /^#([a-fA-F0-9]{6})$/ )
+diff --git a/packages/components/src/combobox-control/test/index.js b/packages/components/src/combobox-control/test/index.js
+index 8c01eaa40464b3..0a017b35bd60f5 100644
+--- a/packages/components/src/combobox-control/test/index.js
++++ b/packages/components/src/combobox-control/test/index.js
+@@ -14,8 +14,6 @@ import { useState } from '@wordpress/element';
+  */
+ import ComboboxControl from '../';
+ 
+-jest.useFakeTimers();
+-
+ const timezones = [
+ 	{ label: 'Greenwich Mean Time', value: 'GMT' },
+ 	{ label: 'Universal Coordinated Time', value: 'UTC' },
+@@ -56,10 +54,7 @@ const getInput = ( name ) => screen.getByRole( 'combobox', { name } );
+ const getOption = ( name ) => screen.getByRole( 'option', { name } );
+ const getAllOptions = () => screen.getAllByRole( 'option' );
+ const getOptionSearchString = ( option ) => option.label.substring( 0, 11 );
+-const setupUser = () =>
+-	userEvent.setup( {
+-		advanceTimers: jest.advanceTimersByTime,
+-	} );
++const setupUser = () => userEvent.setup();
+ 
+ const ControlledComboboxControl = ( {
+ 	value: valueProp,
+diff --git a/packages/components/src/confirm-dialog/test/index.js b/packages/components/src/confirm-dialog/test/index.js
+index 487c025d2153d1..c9ea800cba3cb1 100644
+--- a/packages/components/src/confirm-dialog/test/index.js
++++ b/packages/components/src/confirm-dialog/test/index.js
+@@ -15,8 +15,6 @@ import userEvent from '@testing-library/user-event';
+  */
+ import { ConfirmDialog } from '..';
+ 
+-jest.useFakeTimers();
+-
+ const noop = () => {};
+ 
+ describe( 'Confirm', () => {
+@@ -82,9 +80,7 @@ describe( 'Confirm', () => {
+ 			} );
+ 
+ 			it( 'should not render if closed by clicking `OK`, and the `onConfirm` callback should be called', async () => {
+-				const user = userEvent.setup( {
+-					advanceTimers: jest.advanceTimersByTime,
+-				} );
++				const user = userEvent.setup();
+ 
+ 				const onConfirm = jest.fn().mockName( 'onConfirm()' );
+ 
+@@ -104,9 +100,7 @@ describe( 'Confirm', () => {
+ 			} );
+ 
+ 			it( 'should not render if closed by clicking `Cancel`, and the `onCancel` callback should be called', async () => {
+-				const user = userEvent.setup( {
+-					advanceTimers: jest.advanceTimersByTime,
+-				} );
++				const user = userEvent.setup();
+ 
+ 				const onCancel = jest.fn().mockName( 'onCancel()' );
+ 
+@@ -126,9 +120,7 @@ describe( 'Confirm', () => {
+ 			} );
+ 
+ 			it( 'should be dismissable even if an `onCancel` callback is not provided', async () => {
+-				const user = userEvent.setup( {
+-					advanceTimers: jest.advanceTimersByTime,
+-				} );
++				const user = userEvent.setup();
+ 
+ 				render(
+ 					<ConfirmDialog onConfirm={ noop }>
+@@ -166,9 +158,7 @@ describe( 'Confirm', () => {
+ 			} );
+ 
+ 			it( 'should not render if dialog is closed by pressing `Escape`, and the `onCancel` callback should be called', async () => {
+-				const user = userEvent.setup( {
+-					advanceTimers: jest.advanceTimersByTime,
+-				} );
++				const user = userEvent.setup();
+ 
+ 				const onCancel = jest.fn().mockName( 'onCancel()' );
+ 
+@@ -187,9 +177,7 @@ describe( 'Confirm', () => {
+ 			} );
+ 
+ 			it( 'should not render if dialog is closed by pressing `Enter`, and the `onConfirm` callback should be called', async () => {
+-				const user = userEvent.setup( {
+-					advanceTimers: jest.advanceTimersByTime,
+-				} );
++				const user = userEvent.setup();
+ 
+ 				const onConfirm = jest.fn().mockName( 'onConfirm()' );
+ 
+@@ -245,9 +233,7 @@ describe( 'Confirm', () => {
+ 		} );
+ 
+ 		it( 'should call the `onConfirm` callback if `OK`', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onConfirm = jest.fn().mockName( 'onConfirm()' );
+ 
+@@ -265,9 +251,7 @@ describe( 'Confirm', () => {
+ 		} );
+ 
+ 		it( 'should call the `onCancel` callback if `Cancel` is clicked', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onCancel = jest.fn().mockName( 'onCancel()' );
+ 
+@@ -313,9 +297,7 @@ describe( 'Confirm', () => {
+ 		} );
+ 
+ 		it( 'should call the `onCancel` callback if the `Escape` key is pressed', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onCancel = jest.fn().mockName( 'onCancel()' );
+ 
+@@ -331,9 +313,7 @@ describe( 'Confirm', () => {
+ 		} );
+ 
+ 		it( 'should call the `onConfirm` callback if the `Enter` key is pressed', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onConfirm = jest.fn().mockName( 'onConfirm()' );
+ 
+diff --git a/packages/components/src/date-time/date/test/index.tsx b/packages/components/src/date-time/date/test/index.tsx
+index 2a62fab3405030..fa502cbae29644 100644
+--- a/packages/components/src/date-time/date/test/index.tsx
++++ b/packages/components/src/date-time/date/test/index.tsx
+@@ -10,8 +10,6 @@ import userEvent from '@testing-library/user-event';
+  */
+ import DatePicker from '..';
+ 
+-jest.useFakeTimers();
+-
+ describe( 'DatePicker', () => {
+ 	it( 'should highlight the current date', () => {
+ 		render( <DatePicker currentDate="2022-05-02T11:00:00" /> );
+@@ -33,9 +31,7 @@ describe( 'DatePicker', () => {
+ 	} );
+ 
+ 	it( 'should call onChange when a day is selected', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onChange = jest.fn();
+ 
+@@ -54,9 +50,7 @@ describe( 'DatePicker', () => {
+ 	} );
+ 
+ 	it( 'should call onMonthPreviewed and onChange when a day in a different month is selected', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onMonthPreviewed = jest.fn();
+ 		const onChange = jest.fn();
+diff --git a/packages/components/src/date-time/time/test/index.tsx b/packages/components/src/date-time/time/test/index.tsx
+index bcffe041a100ba..a4f7df4db2acba 100644
+--- a/packages/components/src/date-time/time/test/index.tsx
++++ b/packages/components/src/date-time/time/test/index.tsx
+@@ -9,13 +9,9 @@ import userEvent from '@testing-library/user-event';
+  */
+ import TimePicker from '..';
+ 
+-jest.useFakeTimers();
+-
+ describe( 'TimePicker', () => {
+ 	it( 'should call onChange with updated date values', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onChangeSpy = jest.fn();
+ 
+@@ -69,9 +65,7 @@ describe( 'TimePicker', () => {
+ 	} );
+ 
+ 	it( 'should call onChange with an updated hour (12-hour clock)', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onChangeSpy = jest.fn();
+ 
+@@ -93,9 +87,7 @@ describe( 'TimePicker', () => {
+ 	} );
+ 
+ 	it( 'should call onChange with a bounded hour (12-hour clock) if the hour is out of bounds', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onChangeSpy = jest.fn();
+ 
+@@ -117,9 +109,7 @@ describe( 'TimePicker', () => {
+ 	} );
+ 
+ 	it( 'should call onChange with an updated hour (24-hour clock)', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onChangeSpy = jest.fn();
+ 
+@@ -141,9 +131,7 @@ describe( 'TimePicker', () => {
+ 	} );
+ 
+ 	it( 'should call onChange with a bounded minute if out of bounds', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onChangeSpy = jest.fn();
+ 
+@@ -165,9 +153,7 @@ describe( 'TimePicker', () => {
+ 	} );
+ 
+ 	it( 'should switch to PM correctly', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onChangeSpy = jest.fn();
+ 
+@@ -187,9 +173,7 @@ describe( 'TimePicker', () => {
+ 	} );
+ 
+ 	it( 'should switch to AM correctly', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onChangeSpy = jest.fn();
+ 
+@@ -209,9 +193,7 @@ describe( 'TimePicker', () => {
+ 	} );
+ 
+ 	it( 'should allow to set the time correctly when the PM period is selected', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onChangeSpy = jest.fn();
+ 
+@@ -244,9 +226,7 @@ describe( 'TimePicker', () => {
+ 	} );
+ 
+ 	it( 'should truncate at the minutes on change', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onChangeSpy = jest.fn();
+ 
+diff --git a/packages/components/src/dimension-control/test/index.test.js b/packages/components/src/dimension-control/test/index.test.js
+index 2864578e6ff833..247e15fbe1b521 100644
+--- a/packages/components/src/dimension-control/test/index.test.js
++++ b/packages/components/src/dimension-control/test/index.test.js
+@@ -14,8 +14,6 @@ import { plus } from '@wordpress/icons';
+  */
+ import { DimensionControl } from '../';
+ 
+-jest.useFakeTimers();
+-
+ describe( 'DimensionControl', () => {
+ 	const onChangeHandler = jest.fn();
+ 	const instanceId = 1;
+@@ -90,9 +88,7 @@ describe( 'DimensionControl', () => {
+ 
+ 	describe( 'callbacks', () => {
+ 		it( 'should call onChange handler with correct args on size change', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<DimensionControl
+@@ -114,9 +110,7 @@ describe( 'DimensionControl', () => {
+ 		} );
+ 
+ 		it( 'should call onChange handler with undefined value when no size is provided on change', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<DimensionControl
+diff --git a/packages/components/src/disabled/test/index.tsx b/packages/components/src/disabled/test/index.tsx
+index b4dadc21662a63..5ab8e6ebffd5ca 100644
+--- a/packages/components/src/disabled/test/index.tsx
++++ b/packages/components/src/disabled/test/index.tsx
+@@ -9,8 +9,6 @@ import { render, screen } from '@testing-library/react';
+ import Disabled from '../';
+ import userEvent from '@testing-library/user-event';
+ 
+-jest.useFakeTimers();
+-
+ describe( 'Disabled', () => {
+ 	const Form = () => (
+ 		<form title="form">
+@@ -75,9 +73,7 @@ describe( 'Disabled', () => {
+ 	} );
+ 
+ 	it( 'should preserve input values when toggling the isDisabled prop', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const MaybeDisable = ( { isDisabled = true } ) => (
+ 			<Disabled isDisabled={ isDisabled }>
+diff --git a/packages/components/src/dropdown-menu/test/index.js b/packages/components/src/dropdown-menu/test/index.js
+index 1fc52175862c0d..028ac9c2401daa 100644
+--- a/packages/components/src/dropdown-menu/test/index.js
++++ b/packages/components/src/dropdown-menu/test/index.js
+@@ -15,8 +15,6 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
+ import DropdownMenu from '../';
+ import { MenuItem } from '../../';
+ 
+-jest.useFakeTimers();
+-
+ describe( 'DropdownMenu', () => {
+ 	it( 'should not render when neither controls nor children are assigned', () => {
+ 		render( <DropdownMenu /> );
+@@ -33,9 +31,7 @@ describe( 'DropdownMenu', () => {
+ 	} );
+ 
+ 	it( 'should open menu when pressing arrow down on the toggle and the controls prop is used to define menu items', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const controls = [
+ 			{
+@@ -82,9 +78,7 @@ describe( 'DropdownMenu', () => {
+ 	} );
+ 
+ 	it( 'should open menu when pressing arrow down on the toggle and the children prop is used to define menu items', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		render(
+ 			<DropdownMenu
+diff --git a/packages/components/src/dropdown/test/index.tsx b/packages/components/src/dropdown/test/index.tsx
+index ecf32c4500e3e8..c737499c7fb28d 100644
+--- a/packages/components/src/dropdown/test/index.tsx
++++ b/packages/components/src/dropdown/test/index.tsx
+@@ -9,13 +9,9 @@ import userEvent from '@testing-library/user-event';
+  */
+ import Dropdown from '..';
+ 
+-jest.useFakeTimers();
+-
+ describe( 'Dropdown', () => {
+ 	it( 'should toggle the dropdown properly', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		const { unmount } = render(
+ 			<Dropdown
+ 				className="container"
+@@ -49,9 +45,7 @@ describe( 'Dropdown', () => {
+ 	} );
+ 
+ 	it( 'should close the dropdown when calling onClose', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		render(
+ 			<Dropdown
+ 				className="container"
+diff --git a/packages/components/src/external-link/test/index.tsx b/packages/components/src/external-link/test/index.tsx
+index c641c5d799a63b..810874577231d3 100644
+--- a/packages/components/src/external-link/test/index.tsx
++++ b/packages/components/src/external-link/test/index.tsx
+@@ -9,12 +9,7 @@ import userEvent from '@testing-library/user-event';
+  */
+ import { ExternalLink } from '..';
+ 
+-jest.useFakeTimers();
+-
+-const setupUser = () =>
+-	userEvent.setup( {
+-		advanceTimers: jest.advanceTimersByTime,
+-	} );
++const setupUser = () => userEvent.setup();
+ 
+ describe( 'ExternalLink', () => {
+ 	test( 'should call function passed in onClick handler when clicking the link', async () => {
+diff --git a/packages/components/src/focal-point-picker/test/index.js b/packages/components/src/focal-point-picker/test/index.js
+index 4e7645b01cbf68..af295150f6cb87 100644
+--- a/packages/components/src/focal-point-picker/test/index.js
++++ b/packages/components/src/focal-point-picker/test/index.js
+@@ -9,14 +9,10 @@ import userEvent from '@testing-library/user-event';
+  */
+ import Picker from '..';
+ 
+-jest.useFakeTimers();
+-
+ describe( 'FocalPointPicker', () => {
+ 	describe( 'focus and blur', () => {
+ 		it( 'clicking the draggable area should focus it', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const mockOnChange = jest.fn();
+ 
+@@ -89,9 +85,7 @@ describe( 'FocalPointPicker', () => {
+ 
+ 	describe( 'resolvePoint handling', () => {
+ 		it( 'should allow value altering', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const spyChange = jest.fn();
+ 			const spy = jest.fn();
+@@ -131,9 +125,7 @@ describe( 'FocalPointPicker', () => {
+ 			expect( xInput.value ).toBe( '93' );
+ 		} );
+ 		it( 'call onChange with the expected values', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const spyChange = jest.fn();
+ 			render(
+diff --git a/packages/components/src/font-size-picker/test/index.tsx b/packages/components/src/font-size-picker/test/index.tsx
+index c51416a18cbddd..58330083b41904 100644
+--- a/packages/components/src/font-size-picker/test/index.tsx
++++ b/packages/components/src/font-size-picker/test/index.tsx
+@@ -10,8 +10,6 @@ import userEvent from '@testing-library/user-event';
+ import FontSizePicker from '../';
+ import type { FontSize } from '../types';
+ 
+-jest.useFakeTimers();
+-
+ describe( 'FontSizePicker', () => {
+ 	test.each( [
+ 		// Use units when initial value uses units.
+@@ -21,9 +19,7 @@ describe( 'FontSizePicker', () => {
+ 	] )(
+ 		'should call onChange( $expectedValue ) after user types 80 when value is $value',
+ 		async ( { value, expectedValue } ) => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+ 			render(
+ 				<FontSizePicker
+@@ -48,9 +44,7 @@ describe( 'FontSizePicker', () => {
+ 	] )(
+ 		'should call onChange( $expectedValue ) after user types 80 when first font size is $firstFontSize',
+ 		async ( { firstFontSize, expectedValue } ) => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+ 			render(
+ 				<FontSizePicker
+@@ -104,9 +98,7 @@ describe( 'FontSizePicker', () => {
+ 		];
+ 
+ 		it( 'displays a select control', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			render(
+ 				<FontSizePicker
+ 					__nextHasNoMarginBottom
+@@ -162,9 +154,7 @@ describe( 'FontSizePicker', () => {
+ 		] )(
+ 			'calls onChange( $expectedArguments ) when $option is selected',
+ 			async ( { option, value, expectedArguments } ) => {
+-				const user = userEvent.setup( {
+-					advanceTimers: jest.advanceTimersByTime,
+-				} );
++				const user = userEvent.setup();
+ 				const onChange = jest.fn();
+ 				render(
+ 					<FontSizePicker
+@@ -224,9 +214,7 @@ describe( 'FontSizePicker', () => {
+ 		];
+ 
+ 		it( 'displays a select control', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			render(
+ 				<FontSizePicker
+ 					__nextHasNoMarginBottom
+@@ -323,9 +311,7 @@ describe( 'FontSizePicker', () => {
+ 		] )(
+ 			'calls onChange( $expectedValue ) when $option is selected',
+ 			async ( { option, value, expectedArguments } ) => {
+-				const user = userEvent.setup( {
+-					advanceTimers: jest.advanceTimersByTime,
+-				} );
++				const user = userEvent.setup();
+ 				const onChange = jest.fn();
+ 				render(
+ 					<FontSizePicker
+@@ -421,9 +407,7 @@ describe( 'FontSizePicker', () => {
+ 		);
+ 
+ 		it( 'calls onChange when a font size is selected', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+ 			render(
+ 				<FontSizePicker
+@@ -523,9 +507,7 @@ describe( 'FontSizePicker', () => {
+ 		] )(
+ 			'calls onChange( $expectedArguments ) when $radio is selected',
+ 			async ( { radio, expectedArguments } ) => {
+-				const user = userEvent.setup( {
+-					advanceTimers: jest.advanceTimersByTime,
+-				} );
++				const user = userEvent.setup();
+ 				const onChange = jest.fn();
+ 				render(
+ 					<FontSizePicker
+@@ -580,9 +562,7 @@ describe( 'FontSizePicker', () => {
+ 
+ 	function commonSelectTests( fontSizes: FontSize[] ) {
+ 		it( 'shows custom input when Custom is selected', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+ 			render(
+ 				<FontSizePicker
+@@ -615,9 +595,7 @@ describe( 'FontSizePicker', () => {
+ 		} );
+ 
+ 		it( 'allows custom values by default', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+ 			render(
+ 				<FontSizePicker
+@@ -648,9 +626,7 @@ describe( 'FontSizePicker', () => {
+ 		} );
+ 
+ 		it( 'does not display a slider by default', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			render(
+ 				<FontSizePicker
+ 					__nextHasNoMarginBottom
+@@ -666,9 +642,7 @@ describe( 'FontSizePicker', () => {
+ 		} );
+ 
+ 		it( 'allows a slider to be used when withSlider is set', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+ 			render(
+ 				<FontSizePicker
+@@ -690,9 +664,7 @@ describe( 'FontSizePicker', () => {
+ 		} );
+ 
+ 		it( 'allows reset by default', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+ 			render(
+ 				<FontSizePicker
+@@ -711,9 +683,7 @@ describe( 'FontSizePicker', () => {
+ 		} );
+ 
+ 		it( 'does not allow reset when withReset is false', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			render(
+ 				<FontSizePicker
+ 					__nextHasNoMarginBottom
+diff --git a/packages/components/src/form-file-upload/test/index.tsx b/packages/components/src/form-file-upload/test/index.tsx
+index a1492e7e988d3c..3035bcaa670647 100644
+--- a/packages/components/src/form-file-upload/test/index.tsx
++++ b/packages/components/src/form-file-upload/test/index.tsx
+@@ -14,8 +14,6 @@ import FormFileUpload from '..';
+  */
+ const { File } = window;
+ 
+-jest.useFakeTimers();
+-
+ // @testing-library/user-event considers changing <input type="file"> to a string as a change, but it do not occur on real browsers, so the comparisons will be against this result
+ const fakePath = expect.objectContaining( {
+ 	target: expect.objectContaining( {
+@@ -24,15 +22,6 @@ const fakePath = expect.objectContaining( {
+ } );
+ 
+ describe( 'FormFileUpload', () => {
+-	beforeEach( () => {
+-		jest.useFakeTimers();
+-	} );
+-
+-	afterEach( () => {
+-		jest.runOnlyPendingTimers();
+-		jest.useRealTimers();
+-	} );
+-
+ 	it( 'should show an Icon Button and a hidden input', () => {
+ 		render(
+ 			<FormFileUpload onChange={ () => {} }>
+@@ -47,9 +36,7 @@ describe( 'FormFileUpload', () => {
+ 	} );
+ 
+ 	it( 'should not fire a change event after selecting the same file', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onChange = jest.fn();
+ 
+@@ -74,9 +61,7 @@ describe( 'FormFileUpload', () => {
+ 	} );
+ 
+ 	it( 'should fire a change event after selecting the same file if the value was reset in between', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onChange = jest.fn();
+ 
+diff --git a/packages/components/src/form-toggle/test/index.tsx b/packages/components/src/form-toggle/test/index.tsx
+index 4ed799567b4075..b843ecc27c74b6 100644
+--- a/packages/components/src/form-toggle/test/index.tsx
++++ b/packages/components/src/form-toggle/test/index.tsx
+@@ -15,8 +15,6 @@ import { useState } from '@wordpress/element';
+ import FormToggle, { noop } from '..';
+ import type { FormToggleProps } from '../types';
+ 
+-jest.useFakeTimers();
+-
+ const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
+ 
+ const ControlledFormToggle = ( { onChange }: FormToggleProps ) => {
+@@ -81,9 +79,7 @@ describe( 'FormToggle', () => {
+ 
+ 	describe( 'Value', () => {
+ 		it( 'should flip the checked property when clicked', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChange = jest.fn();
+ 			render( <ControlledFormToggle onChange={ onChange } /> );
+diff --git a/packages/components/src/form-token-field/test/index.tsx b/packages/components/src/form-token-field/test/index.tsx
+index 020e4e650006b6..e5ea909681f5e3 100644
+--- a/packages/components/src/form-token-field/test/index.tsx
++++ b/packages/components/src/form-token-field/test/index.tsx
+@@ -21,8 +21,6 @@ import { useState } from '@wordpress/element';
+  */
+ import FormTokenField from '../';
+ 
+-jest.useFakeTimers();
+-
+ const FormTokenFieldWithState = ( {
+ 	onChange,
+ 	value,
+@@ -109,9 +107,7 @@ function unescapeAndFormatSpaces( str: string ) {
+ describe( 'FormTokenField', () => {
+ 	describe( 'basic usage', () => {
+ 		it( "should add tokens with the input's value when pressing the enter key", async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -136,9 +132,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( "should add a token with the input's value when pressing the comma key", async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -154,9 +148,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should add a token with the input value when pressing the space key and the `tokenizeOnSpace` prop is `true`', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -200,9 +192,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( "should not add a token with the input's value when pressing the tab key", async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -218,9 +208,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should remove the last token when pressing the backspace key', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -248,9 +236,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should remove a token when clicking the token\'s "remove" button', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -292,9 +278,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should remove a token when by focusing on the token\'s "remove" button and pressing space bar', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -329,9 +313,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should not add a new token if a token with the same value already exists', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -358,9 +340,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should not add a new token if the text input is blank', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -380,9 +360,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should allow moving the cursor through the tokens when pressing the arrow keys, and should remove the token in front of the cursor when pressing the delete key', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -509,9 +487,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should fire the `onFocus` callback when the input is focused', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onFocusSpy = jest.fn();
+ 
+@@ -533,9 +509,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( "should fire the `onInputChange` callback when the input's value changes", async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onInputChangeSpy = jest.fn();
+ 
+@@ -602,9 +576,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( "should use the value of the `placeholder` prop as the input's placeholder only when there are no tokens", async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -633,9 +605,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should handle accents and special characters in tokens and input value', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -680,9 +650,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should render suggestions when receiving focus if the `__experimentalExpandOnFocus` prop is set to `true`', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onFocusSpy = jest.fn();
+ 
+@@ -725,9 +693,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should not render suggestions if the text input is not matching any of the suggestions', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const suggestions = [ 'White', 'Pearl', 'Alabaster' ];
+ 
+@@ -742,9 +708,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should render the matching suggestions only if the text input has the minimum length', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const suggestions = [ 'Yellow', 'Canary', 'Gold', 'Blonde' ];
+ 
+@@ -769,9 +733,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should not render a matching suggestion if a token with the same value has already been added', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const suggestions = [ 'Green', 'Emerald', 'Seaweed' ];
+ 
+@@ -794,9 +756,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should allow the user to use the keyboard to navigate and select suggestions (which are marked with the `aria-selected` attribute)', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -875,9 +835,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should allow the user to use the mouse to navigate and select suggestions (which are marked with the `aria-selected` attribute)', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -947,9 +905,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should hide the suggestion list when the Escape key is pressed', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -982,9 +938,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'matches the search text with the suggestions in a case-insensitive way', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const suggestions = [ 'Cinnamon', 'Tawny', 'Mocha' ];
+ 
+@@ -1003,9 +957,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should show, at most, a number of suggestions equals to the value of the `maxSuggestions` prop', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const suggestions = [
+ 				'Ablaze',
+@@ -1053,9 +1005,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should match the search text against the unescaped values of suggestions with special characters (including spaces)', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<FormTokenFieldWithState
+@@ -1096,9 +1046,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should re-render if suggestions change', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const suggestions = [ 'Aluminum', 'Silver', 'Bronze' ];
+ 
+@@ -1119,9 +1067,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should automatically select the first matching suggestions when the `__experimentalAutoSelectFirstMatch` prop is set to `true`', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const suggestions = [ 'Walnut', 'Hazelnut', 'Pecan' ];
+ 
+@@ -1162,9 +1108,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should allow to render custom suggestion items via the `__experimentalRenderItem` prop', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const suggestions = [ 'Wood', 'Stone', 'Metal' ];
+ 
+@@ -1195,9 +1139,7 @@ describe( 'FormTokenField', () => {
+ 
+ 	describe( 'tokens as objects', () => {
+ 		it( 'should accept tokens in their object format', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -1237,9 +1179,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should trigger mouse callbacks if the `onMouseEnter` and/or the `onMouseLeave` properties are set on a token data object', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onMouseEnterSpy = jest.fn();
+ 			const onMouseLeaveSpy = jest.fn();
+@@ -1305,9 +1245,7 @@ describe( 'FormTokenField', () => {
+ 
+ 	describe( 'saveTransform', () => {
+ 		it( "by default, it should trim the input's value from extra white spaces before attempting to add it as a token", async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -1371,9 +1309,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( "should allow to modify the input's value when saving it as a token", async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -1436,9 +1372,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'is applied to the search value when matching it against the list of suggestions', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -1476,9 +1410,7 @@ describe( 'FormTokenField', () => {
+ 
+ 	describe( 'displayTransform', () => {
+ 		it( 'should allow to modify the text rendered in the browser for each token', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -1534,9 +1466,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( "is applied to each suggestions, but doesn't influence the matching against the search value", async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -1630,9 +1560,7 @@ describe( 'FormTokenField', () => {
+ 
+ 	describe( 'validation', () => {
+ 		it( 'should add a token only if it passes the validation set via `__experimentalValidateInput`', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 			const startsWithCapitalLetter = ( tokenText: string ) =>
+@@ -1677,9 +1605,7 @@ describe( 'FormTokenField', () => {
+ 
+ 	describe( 'maxLength', () => {
+ 		it( 'should not allow adding new tokens beyond the value defined by the `maxLength` prop', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -1747,9 +1673,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should not affect tokens that were added before the limit was imposed', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -1792,9 +1716,7 @@ describe( 'FormTokenField', () => {
+ 
+ 	describe( 'disabled', () => {
+ 		it( 'should not allow adding tokens when the `disabled` prop is `true`', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -1822,9 +1744,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should not allow removing tokens when the `disable` prop is `true`', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 
+@@ -1870,9 +1790,7 @@ describe( 'FormTokenField', () => {
+ 		};
+ 
+ 		it( 'should announce to assistive technology the addition of a new token', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <FormTokenFieldWithState /> );
+ 
+@@ -1888,9 +1806,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should announce to assistive technology the addition of a new token with a custom message', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <FormTokenFieldWithState messages={ customMessages } /> );
+ 
+@@ -1906,9 +1822,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should announce to assistive technology the removal of a token', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <FormTokenFieldWithState initialValue={ [ 'horse' ] } /> );
+ 
+@@ -1923,9 +1837,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should announce to assistive technology the removal of a token with a custom message', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<FormTokenFieldWithState
+@@ -1945,9 +1857,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should announce to assistive technology the failure of a potential token to pass validation', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<FormTokenFieldWithState
+@@ -1967,9 +1877,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should announce to assistive technology the failure of a potential token to pass validation with a custom message', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<FormTokenFieldWithState
+@@ -1990,9 +1898,7 @@ describe( 'FormTokenField', () => {
+ 		} );
+ 
+ 		it( 'should announce to assistive technology the result of the matching of the search text against the list of suggestions', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<FormTokenFieldWithState
+@@ -2054,9 +1960,7 @@ describe( 'FormTokenField', () => {
+ 	// but I wasn't sure if there was a better way.
+ 	describe( 'aria attributes', () => {
+ 		it( 'should add the correct aria attributes to the input as the user interacts with it', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const suggestions = [ 'Pine', 'Pistachio', 'Sage' ];
+ 
+diff --git a/packages/components/src/guide/test/index.js b/packages/components/src/guide/test/index.js
+index fcea9d15d31675..8372e46518257c 100644
+--- a/packages/components/src/guide/test/index.js
++++ b/packages/components/src/guide/test/index.js
+@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
+  */
+ import Guide from '../';
+ 
+-jest.useFakeTimers();
+-
+ describe( 'Guide', () => {
+ 	it( 'renders nothing when there are no pages', () => {
+ 		render( <Guide pages={ [] } /> );
+@@ -54,9 +52,7 @@ describe( 'Guide', () => {
+ 	} );
+ 
+ 	it( 'shows back button and shows finish button on the last page', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		render(
+ 			<Guide
+ 				pages={ [
+@@ -89,9 +85,7 @@ describe( 'Guide', () => {
+ 	} );
+ 
+ 	it( 'calls onFinish when the finish button is clicked', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		const onFinish = jest.fn();
+ 		render(
+ 			<Guide
+@@ -105,9 +99,7 @@ describe( 'Guide', () => {
+ 	} );
+ 
+ 	it( 'calls onFinish when the modal is closed', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		const onFinish = jest.fn();
+ 		render(
+ 			<Guide
+@@ -158,9 +150,7 @@ describe( 'Guide', () => {
+ 		} );
+ 
+ 		it( 'sets the current page when a button is clicked', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<Guide
+@@ -202,9 +192,7 @@ describe( 'Guide', () => {
+ 		} );
+ 
+ 		it( 'allows navigating through the pages with the left and right arrows', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<Guide
+diff --git a/packages/components/src/higher-order/with-focus-return/test/index.js b/packages/components/src/higher-order/with-focus-return/test/index.js
+index a8abaa56d69628..d9905840d731b2 100644
+--- a/packages/components/src/higher-order/with-focus-return/test/index.js
++++ b/packages/components/src/higher-order/with-focus-return/test/index.js
+@@ -14,8 +14,6 @@ import { Component } from '@wordpress/element';
+  */
+ import withFocusReturn from '../';
+ 
+-jest.useFakeTimers();
+-
+ class Test extends Component {
+ 	render() {
+ 		const { className, focusHistory } = this.props;
+@@ -86,9 +84,7 @@ describe( 'withFocusReturn()', () => {
+ 		} );
+ 
+ 		it( 'should switch focus back when unmounted while having focus', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const { unmount } = render( <Composite />, {
+ 				container: document.body.appendChild(
+diff --git a/packages/components/src/input-control/test/index.js b/packages/components/src/input-control/test/index.js
+index 82e936aa1b5e98..f93fe9f0915284 100644
+--- a/packages/components/src/input-control/test/index.js
++++ b/packages/components/src/input-control/test/index.js
+@@ -14,12 +14,7 @@ import { useState } from '@wordpress/element';
+  */
+ import BaseInputControl from '../';
+ 
+-jest.useFakeTimers();
+-
+-const setupUser = () =>
+-	userEvent.setup( {
+-		advanceTimers: jest.advanceTimersByTime,
+-	} );
++const setupUser = () => userEvent.setup();
+ 
+ const getInput = () => screen.getByTestId( 'input' );
+ 
+diff --git a/packages/components/src/isolated-event-container/test/index.js b/packages/components/src/isolated-event-container/test/index.js
+index 2f81f50e66c3b5..2f13cf06b6db66 100644
+--- a/packages/components/src/isolated-event-container/test/index.js
++++ b/packages/components/src/isolated-event-container/test/index.js
+@@ -9,13 +9,9 @@ import userEvent from '@testing-library/user-event';
+  */
+ import IsolatedEventContainer from '../';
+ 
+-jest.useFakeTimers();
+-
+ describe( 'IsolatedEventContainer', () => {
+ 	it( 'should pass props to container', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		const clickHandler = jest.fn();
+ 		render(
+ 			<IsolatedEventContainer
+@@ -47,9 +43,7 @@ describe( 'IsolatedEventContainer', () => {
+ 	} );
+ 
+ 	it( 'should stop event propagation only for mousedown, but not for keydown', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const mousedownHandler = jest.fn();
+ 		const keydownHandler = jest.fn();
+diff --git a/packages/components/src/navigable-container/test/navigable-menu.js b/packages/components/src/navigable-container/test/navigable-menu.js
+index 461c1efd454805..8152ca61ed73ce 100644
+--- a/packages/components/src/navigable-container/test/navigable-menu.js
++++ b/packages/components/src/navigable-container/test/navigable-menu.js
+@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
+  */
+ import { NavigableMenu } from '../menu';
+ 
+-jest.useFakeTimers();
+-
+ const NavigableMenuTestCase = ( props ) => (
+ 	<NavigableMenu { ...props }>
+ 		<button>Item 1</button>
+@@ -46,9 +44,7 @@ describe( 'NavigableMenu', () => {
+ 	} );
+ 
+ 	it( 'moves focus on its focusable children by using the up/down arrow keys', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onNavigateSpy = jest.fn();
+ 
+@@ -87,9 +83,7 @@ describe( 'NavigableMenu', () => {
+ 	} );
+ 
+ 	it( 'moves focus on its focusable children by using the left/right arrow keys when the `orientation`prop is set to `horizontal', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onNavigateSpy = jest.fn();
+ 
+@@ -133,9 +127,7 @@ describe( 'NavigableMenu', () => {
+ 	} );
+ 
+ 	it( 'should stop at the edges when the `cycle` prop is set to `false`', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onNavigateSpy = jest.fn();
+ 
+@@ -193,9 +185,7 @@ describe( 'NavigableMenu', () => {
+ 	} );
+ 
+ 	it( 'stops keydown event propagation when arrow keys are pressed, regardless of the `orientation` prop', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const externalWrapperOnKeyDownSpy = jest.fn();
+ 
+@@ -224,9 +214,7 @@ describe( 'NavigableMenu', () => {
+ 	} );
+ 
+ 	it( 'skips its internal logic when the tab key is pressed', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		render(
+ 			<>
+diff --git a/packages/components/src/navigable-container/test/tababble-container.js b/packages/components/src/navigable-container/test/tababble-container.js
+index 55db6aa24c7410..f514df39a50c86 100644
+--- a/packages/components/src/navigable-container/test/tababble-container.js
++++ b/packages/components/src/navigable-container/test/tababble-container.js
+@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
+  */
+ import { TabbableContainer } from '../tabbable';
+ 
+-jest.useFakeTimers();
+-
+ const TabbableContainerTestCase = ( props ) => (
+ 	<TabbableContainer { ...props }>
+ 		<button>Item 1</button>
+@@ -49,9 +47,7 @@ describe( 'TabbableContainer', () => {
+ 	} );
+ 
+ 	it( 'moves focus on its tabbable children by using the tab key', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onNavigateSpy = jest.fn();
+ 
+@@ -80,9 +76,7 @@ describe( 'TabbableContainer', () => {
+ 	} );
+ 
+ 	it( 'should stop at the edges when the `cycle` prop is set to `false`', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const onNavigateSpy = jest.fn();
+ 
+@@ -141,9 +135,7 @@ describe( 'TabbableContainer', () => {
+ 	} );
+ 
+ 	it( 'stops keydown event propagation when the tab key is pressed', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		const externalWrapperOnKeyDownSpy = jest.fn();
+ 
+diff --git a/packages/components/src/navigation/test/index.js b/packages/components/src/navigation/test/index.js
+index 1c26bb461930ca..7a8d7dec67c77f 100644
+--- a/packages/components/src/navigation/test/index.js
++++ b/packages/components/src/navigation/test/index.js
+@@ -16,8 +16,6 @@ import Navigation from '..';
+ import NavigationItem from '../item';
+ import NavigationMenu from '../menu';
+ 
+-jest.useFakeTimers();
+-
+ const TestNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
+ 	<Navigation activeItem={ activeItem }>
+ 		<NavigationMenu title={ rootTitle }>
+@@ -192,9 +190,7 @@ describe( 'Navigation', () => {
+ 	} );
+ 
+ 	it( 'should set an active category on click', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		render( <TestNavigation /> );
+ 
+@@ -236,9 +232,7 @@ describe( 'Navigation', () => {
+ 	} );
+ 
+ 	it( 'should navigate up a level when clicking the back button', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		render( <TestNavigation rootTitle="Home" /> );
+ 
+@@ -252,9 +246,7 @@ describe( 'Navigation', () => {
+ 	} );
+ 
+ 	it( 'should navigate correctly when controlled', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		render( <TestNavigationControlled /> );
+ 
+diff --git a/packages/components/src/navigator/test/index.tsx b/packages/components/src/navigator/test/index.tsx
+index 4a6b7d85e360ca..43b1a21f9b4de8 100644
+--- a/packages/components/src/navigator/test/index.tsx
++++ b/packages/components/src/navigator/test/index.tsx
+@@ -20,8 +20,6 @@ import {
+ 	NavigatorBackButton,
+ } from '..';
+ 
+-jest.useFakeTimers();
+-
+ jest.mock( 'framer-motion', () => {
+ 	const actual = jest.requireActual( 'framer-motion' );
+ 	return {
+@@ -304,9 +302,7 @@ describe( 'Navigator', () => {
+ 	it( 'should navigate across screens', async () => {
+ 		const spy = jest.fn();
+ 
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
+ 
+@@ -376,9 +372,7 @@ describe( 'Navigator', () => {
+ 	it( 'should not rended anything if the path does not match any available screen', async () => {
+ 		const spy = jest.fn();
+ 
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		render( <MyNavigation onNavigatorButtonClick={ spy } /> );
+ 
+@@ -402,9 +396,7 @@ describe( 'Navigator', () => {
+ 	} );
+ 
+ 	it( 'should escape the value of the `path` prop', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 
+ 		render( <MyNavigation /> );
+ 
+@@ -437,9 +429,7 @@ describe( 'Navigator', () => {
+ 
+ 	describe( 'focus management', () => {
+ 		it( 'should restore focus correctly', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <MyNavigation /> );
+ 
+@@ -469,9 +459,7 @@ describe( 'Navigator', () => {
+ 		} );
+ 
+ 		it( 'should keep focus on an active element inside navigator, while re-rendering', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <MyNavigation /> );
+ 
+@@ -489,9 +477,7 @@ describe( 'Navigator', () => {
+ 		} );
+ 
+ 		it( 'should keep focus on an active element outside navigator, while re-rendering', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <MyNavigation /> );
+ 
+diff --git a/packages/components/src/number-control/test/index.tsx b/packages/components/src/number-control/test/index.tsx
+index f4f5556982c953..ae92875708b568 100644
+--- a/packages/components/src/number-control/test/index.tsx
++++ b/packages/components/src/number-control/test/index.tsx
+@@ -15,8 +15,6 @@ import { useState } from '@wordpress/element';
+ import NumberControl from '..';
+ import type { NumberControlProps } from '../types';
+ 
+-jest.useFakeTimers();
+-
+ function StatefulNumberControl( props: NumberControlProps ) {
+ 	const [ value, setValue ] = useState( props.value );
+ 	const handleOnChange = ( v: string | undefined ) => setValue( v );
+@@ -45,9 +43,7 @@ describe( 'NumberControl', () => {
+ 
+ 	describe( 'onChange handling', () => {
+ 		it( 'should provide onChange callback with number value', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const spy = jest.fn();
+ 
+ 			render(
+@@ -62,9 +58,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should call onChange callback when value is clamped on blur', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const onChangeSpy = jest.fn();
+ 
+ 			render(
+@@ -107,9 +101,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should call onChange callback when value is not valid', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const onChangeSpy = jest.fn();
+ 
+ 			render(
+@@ -153,9 +145,7 @@ describe( 'NumberControl', () => {
+ 
+ 	describe( 'Validation', () => {
+ 		it( 'should clamp value within range on ENTER keypress', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
+ 
+@@ -173,9 +163,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should clamp value within range on blur', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
+ 
+@@ -194,9 +182,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should parse non-numeric values to a number on ENTER keypress when required', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <NumberControl value={ 5 } required /> );
+ 
+@@ -209,9 +195,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should parse non-numeric values to empty string on ENTER keypress when not required', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <NumberControl value={ 5 } required={ false } /> );
+ 
+@@ -230,9 +214,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should not enforce numerical value for empty string when required is omitted', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <NumberControl value={ 5 } /> );
+ 
+@@ -247,9 +229,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should enforce numerical value for empty string when required', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <NumberControl value={ 5 } required /> );
+ 
+@@ -263,9 +243,7 @@ describe( 'NumberControl', () => {
+ 
+ 	describe( 'Key UP interactions', () => {
+ 		it( 'should fire onKeyDown callback', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const spy = jest.fn();
+ 
+@@ -279,9 +257,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should increment by step on key UP press', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <StatefulNumberControl value={ 5 } /> );
+ 
+@@ -293,9 +269,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should increment from a negative value', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <StatefulNumberControl value={ -5 } /> );
+ 
+@@ -307,9 +281,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should increment while preserving the decimal value when `step` is “any”', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <StatefulNumberControl value={ 866.5309 } step="any" /> );
+ 
+@@ -321,9 +293,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should increment by shiftStep on key UP + shift press', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <StatefulNumberControl value={ 5 } shiftStep={ 10 } /> );
+ 
+@@ -335,9 +305,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should increment by shiftStep while preserving the decimal value when `step` is “any”', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <StatefulNumberControl value={ 857.5309 } step="any" /> );
+ 
+@@ -349,9 +317,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should increment by custom shiftStep on key UP + shift press', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
+ 
+@@ -363,9 +329,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should increment but be limited by max on shiftStep', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<StatefulNumberControl
+@@ -383,9 +347,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should not increment by shiftStep if disabled', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<StatefulNumberControl
+@@ -405,9 +367,7 @@ describe( 'NumberControl', () => {
+ 
+ 	describe( 'Key DOWN interactions', () => {
+ 		it( 'should fire onKeyDown callback', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const spy = jest.fn();
+ 
+ 			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
+@@ -420,9 +380,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should decrement by step on key DOWN press', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <StatefulNumberControl value={ 5 } /> );
+ 
+@@ -434,9 +392,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should decrement from a negative value', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <StatefulNumberControl value={ -5 } /> );
+ 
+@@ -448,9 +404,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should decrement while preserving the decimal value when `step` is “any”', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <StatefulNumberControl value={ 868.5309 } step="any" /> );
+ 
+@@ -462,9 +416,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should decrement by shiftStep on key DOWN + shift press', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <StatefulNumberControl value={ 5 } /> );
+ 
+@@ -476,9 +428,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should decrement by shiftStep while preserving the decimal value when `step` is “any”', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <StatefulNumberControl value={ 877.5309 } step="any" /> );
+ 
+@@ -490,9 +440,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should decrement by custom shiftStep on key DOWN + shift press', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
+ 
+@@ -504,9 +452,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should decrement but be limited by min on shiftStep', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<StatefulNumberControl
+@@ -524,9 +470,7 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should not decrement by shiftStep if disabled', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<StatefulNumberControl
+@@ -574,9 +518,7 @@ describe( 'NumberControl', () => {
+ 		] )(
+ 			'should spin %s to %s when props = %o',
+ 			async ( direction, expectedValue, props ) => {
+-				const user = userEvent.setup( {
+-					advanceTimers: jest.advanceTimersByTime,
+-				} );
++				const user = userEvent.setup();
+ 				const onChange = jest.fn();
+ 				render(
+ 					<NumberControl
+diff --git a/packages/components/src/panel/test/body.js b/packages/components/src/panel/test/body.js
+index bd8cc0d567d0f2..1f282256fb2616 100644
+--- a/packages/components/src/panel/test/body.js
++++ b/packages/components/src/panel/test/body.js
+@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
+  */
+ import { PanelBody } from '../body';
+ 
+-jest.useFakeTimers();
+-
+ describe( 'PanelBody', () => {
+ 	describe( 'basic rendering', () => {
+ 		it( 'should render an empty div with the matching className', () => {
+@@ -117,9 +115,7 @@ describe( 'PanelBody', () => {
+ 		} );
+ 
+ 		it( 'should toggle when clicking header', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<PanelBody title="Panel" initialOpen={ false }>
+@@ -146,9 +142,7 @@ describe( 'PanelBody', () => {
+ 		} );
+ 
+ 		it( 'should pass button props to panel title', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 			const mock = jest.fn();
+ 
+ 			render(
+diff --git a/packages/components/src/select-control/test/select-control.tsx b/packages/components/src/select-control/test/select-control.tsx
+index 11d9eedc60407f..e61fabf461b068 100644
+--- a/packages/components/src/select-control/test/select-control.tsx
++++ b/packages/components/src/select-control/test/select-control.tsx
+@@ -9,12 +9,7 @@ import userEvent from '@testing-library/user-event';
+  */
+ import SelectControl from '..';
+ 
+-jest.useFakeTimers();
+-
+-const setupUser = () =>
+-	userEvent.setup( {
+-		advanceTimers: jest.advanceTimersByTime,
+-	} );
++const setupUser = () => userEvent.setup();
+ 
+ describe( 'SelectControl', () => {
+ 	it( 'should not render when no options or children are provided', () => {
+diff --git a/packages/components/src/tab-panel/test/index.tsx b/packages/components/src/tab-panel/test/index.tsx
+index 3ae9122bd94af5..2d281c6853f82a 100644
+--- a/packages/components/src/tab-panel/test/index.tsx
++++ b/packages/components/src/tab-panel/test/index.tsx
+@@ -9,12 +9,7 @@ import userEvent from '@testing-library/user-event';
+  */
+ import TabPanel from '..';
+ 
+-jest.useFakeTimers();
+-
+-const setupUser = () =>
+-	userEvent.setup( {
+-		advanceTimers: jest.advanceTimersByTime,
+-	} );
++const setupUser = () => userEvent.setup();
+ 
+ const TABS = [
+ 	{
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index 511b362f1a2d59..b1e6c0c3938825 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -18,8 +18,6 @@ import {
+ 	ToggleGroupControlOptionIcon,
+ } from '../index';
+ 
+-jest.useFakeTimers();
+-
+ function getWrappingPopoverElement( element: HTMLElement ) {
+ 	return element.closest( '.components-popover' );
+ }
+@@ -81,9 +79,7 @@ describe( 'ToggleGroupControl', () => {
+ 		} );
+ 	} );
+ 	it( 'should call onChange with proper value', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		const mockOnChange = jest.fn();
+ 
+ 		render(
+@@ -102,9 +98,7 @@ describe( 'ToggleGroupControl', () => {
+ 	} );
+ 
+ 	it( 'should render tooltip where `showTooltip` === `true`', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		render(
+ 			<ToggleGroupControl label="Test Toggle Group Control">
+ 				{ optionsWithTooltip }
+@@ -131,9 +125,7 @@ describe( 'ToggleGroupControl', () => {
+ 	} );
+ 
+ 	it( 'should not render tooltip', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		render(
+ 			<ToggleGroupControl label="Test Toggle Group Control">
+ 				{ optionsWithTooltip }
+@@ -157,9 +149,7 @@ describe( 'ToggleGroupControl', () => {
+ 		describe( 'isDeselectable = false', () => {
+ 			it( 'should not be deselectable', async () => {
+ 				const mockOnChange = jest.fn();
+-				const user = userEvent.setup( {
+-					advanceTimers: jest.advanceTimersByTime,
+-				} );
++				const user = userEvent.setup();
+ 
+ 				render(
+ 					<ToggleGroupControl
+@@ -180,9 +170,7 @@ describe( 'ToggleGroupControl', () => {
+ 			} );
+ 
+ 			it( 'should not tab to next radio option', async () => {
+-				const user = userEvent.setup( {
+-					advanceTimers: jest.advanceTimersByTime,
+-				} );
++				const user = userEvent.setup();
+ 
+ 				render(
+ 					<ToggleGroupControl value="rigas" label="Test">
+@@ -205,9 +193,7 @@ describe( 'ToggleGroupControl', () => {
+ 		describe( 'isDeselectable = true', () => {
+ 			it( 'should be deselectable', async () => {
+ 				const mockOnChange = jest.fn();
+-				const user = userEvent.setup( {
+-					advanceTimers: jest.advanceTimersByTime,
+-				} );
++				const user = userEvent.setup();
+ 
+ 				render(
+ 					<ToggleGroupControl
+@@ -237,9 +223,7 @@ describe( 'ToggleGroupControl', () => {
+ 			} );
+ 
+ 			it( 'should tab to the next option button', async () => {
+-				const user = userEvent.setup( {
+-					advanceTimers: jest.advanceTimersByTime,
+-				} );
++				const user = userEvent.setup();
+ 
+ 				render(
+ 					<ToggleGroupControl
+diff --git a/packages/components/src/unit-control/test/index.tsx b/packages/components/src/unit-control/test/index.tsx
+index d0d232a54e6704..b4103ac4b2b8b7 100644
+--- a/packages/components/src/unit-control/test/index.tsx
++++ b/packages/components/src/unit-control/test/index.tsx
+@@ -16,8 +16,6 @@ import UnitControl from '..';
+ import { parseQuantityAndUnitFromRawValue } from '../utils';
+ import type { UnitControlOnChangeCallback } from '../types';
+ 
+-jest.useFakeTimers();
+-
+ const getInput = ( {
+ 	isInputTypeText = false,
+ }: {
+@@ -87,15 +85,6 @@ const ControlledSyncUnits = () => {
+ };
+ 
+ describe( 'UnitControl', () => {
+-	beforeEach( () => {
+-		jest.useFakeTimers();
+-	} );
+-
+-	afterEach( () => {
+-		jest.runOnlyPendingTimers();
+-		jest.useRealTimers();
+-	} );
+-
+ 	describe( 'Basic rendering', () => {
+ 		it( 'should render', () => {
+ 			render( <UnitControl /> );
+@@ -147,9 +136,7 @@ describe( 'UnitControl', () => {
+ 
+ 	describe( 'Value', () => {
+ 		it( 'should update value on change', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state = '50px';
+ 			const setState = jest.fn( ( value ) => ( state = value ) );
+@@ -169,9 +156,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should increment value on UP press', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state: string | undefined = '50px';
+ 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+@@ -186,9 +171,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should increment value on UP + SHIFT press, with step', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state: string | undefined = '50px';
+ 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+@@ -203,9 +186,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should decrement value on DOWN press', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state: string | number | undefined = 50;
+ 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+@@ -220,9 +201,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should decrement value on DOWN + SHIFT press, with step', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state: string | number | undefined = 50;
+ 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+@@ -237,9 +216,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should cancel change when ESCAPE key is pressed', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state: string | number | undefined = 50;
+ 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+@@ -268,9 +245,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should run onBlur callback when quantity input is blurred', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 			const onBlurSpy = jest.fn();
+@@ -303,9 +278,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should invoke onChange and onUnitChange callbacks when isPressEnterToChange is true and the component is blurred with an uncommitted value', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onUnitChangeSpy = jest.fn();
+ 			const onChangeSpy = jest.fn();
+@@ -348,9 +321,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should update value correctly when typed and blurred when a single unit is passed', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+ 			render(
+@@ -384,9 +355,7 @@ describe( 'UnitControl', () => {
+ 
+ 	describe( 'Unit', () => {
+ 		it( 'should update unit value on change', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state: string | undefined = '14rem';
+ 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+@@ -428,9 +397,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should reset value on unit change, if unit has default value', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state: string | number | undefined = 50;
+ 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+@@ -461,9 +428,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should not reset value on unit change, if disabled', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state: string | number | undefined = 50;
+ 			const setState: UnitControlOnChangeCallback = ( nextState ) =>
+@@ -494,9 +459,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should set correct unit if single units', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state: string | undefined = '50%';
+ 			const setState: UnitControlOnChangeCallback = ( value ) =>
+@@ -518,9 +481,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should update unit value when a new raw value is passed', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render( <ControlledSyncUnits /> );
+ 
+@@ -550,9 +511,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should maintain the chosen non-default unit when value is cleared', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const units = [
+ 				{ value: 'pt', label: 'pt' },
+@@ -571,9 +530,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should run onBlur callback when the unit select is blurred', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			const onUnitChangeSpy = jest.fn();
+ 			const onBlurSpy = jest.fn();
+@@ -604,9 +561,7 @@ describe( 'UnitControl', () => {
+ 
+ 	describe( 'Unit Parser', () => {
+ 		it( 'should parse unit from input', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state = '10px';
+ 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
+@@ -629,9 +584,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should parse PX unit from input', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state = '10px';
+ 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
+@@ -654,9 +607,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should parse EM unit from input', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state = '10px';
+ 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
+@@ -679,9 +630,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should parse % unit from input', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state = '10px';
+ 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );
+@@ -704,9 +653,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should parse REM unit from input', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			let state = '10px';
+ 			const setState = jest.fn( ( nextState ) => ( state = nextState ) );

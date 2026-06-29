@@ -1,0 +1,26 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9614494f0f0e07..d831f63b4e584e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `PaletteEdit`: Consider digits when generating kebab-cased slug ([#56713](https://github.com/WordPress/gutenberg/pull/56713)).
+ -   `Button`: Fix logic of `has-text` class addition ([#56949](https://github.com/WordPress/gutenberg/pull/56949)).
+ -   `FormTokenField`: Fix a regression where the suggestion list would re-open after clicking away from the input ([#57002](https://github.com/WordPress/gutenberg/pull/57002)).
++-   `Snackbar`: Remove erroneous `__unstableHTML` prop from TypeScript definitions ([#57218](https://github.com/WordPress/gutenberg/pull/57218)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/snackbar/types.ts b/packages/components/src/snackbar/types.ts
+index 71ded92e5b7d11..539c4c3ebdf65e 100644
+--- a/packages/components/src/snackbar/types.ts
++++ b/packages/components/src/snackbar/types.ts
+@@ -28,7 +28,8 @@ type SnackbarOnlyProps = {
+ 	listRef?: MutableRefObject< HTMLDivElement | null >;
+ };
+ 
+-export type SnackbarProps = NoticeProps & SnackbarOnlyProps;
++export type SnackbarProps = Omit< NoticeProps, '__unstableHTML' > &
++	SnackbarOnlyProps;
+ 
+ export type SnackbarListProps = {
+ 	notices: Array<

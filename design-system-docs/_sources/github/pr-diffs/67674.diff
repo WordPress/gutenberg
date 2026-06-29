@@ -1,0 +1,29 @@
+diff --git a/packages/components/src/popover/stories/index.story.tsx b/packages/components/src/popover/stories/index.story.tsx
+index cf1bd5135ad9fd..1e1d4225bd0233 100644
+--- a/packages/components/src/popover/stories/index.story.tsx
++++ b/packages/components/src/popover/stories/index.story.tsx
+@@ -58,7 +58,9 @@ const meta: Meta< typeof Popover > = {
+ export default meta;
+ 
+ const PopoverWithAnchor = ( args: PopoverProps ) => {
+-	const anchorRef = useRef( null );
++	const [ popoverAnchor, setPopoverAnchor ] = useState< Element | null >(
++		null
++	);
+ 
+ 	return (
+ 		<div
+@@ -71,11 +73,11 @@ const PopoverWithAnchor = ( args: PopoverProps ) => {
+ 		>
+ 			<p
+ 				style={ { padding: '8px', background: 'salmon' } }
+-				ref={ anchorRef }
++				ref={ setPopoverAnchor }
+ 			>
+ 				Popover&apos;s anchor
+ 			</p>
+-			<Popover { ...args } anchorRef={ anchorRef } />
++			<Popover { ...args } anchor={ popoverAnchor } />
+ 		</div>
+ 	);
+ };

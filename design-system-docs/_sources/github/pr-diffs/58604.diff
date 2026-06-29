@@ -1,0 +1,60 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8f0a224b7c7ec0..4b3aebbfd70c31 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `Placeholder`: Fix Placeholder component padding when body text font size is changed ([#58323](https://github.com/WordPress/gutenberg/pull/58323)).
+ -   `Placeholder`: Fix Global Styles typography settings bleeding into placeholder component ([#58303](https://github.com/WordPress/gutenberg/pull/58303)).
+ -   `PaletteEdit`: Fix palette item accessibility in details view ([#58214](https://github.com/WordPress/gutenberg/pull/58214)).
++-   `Snackbar`: Fix the auto-dismissal timers ([#58604](https://github.com/WordPress/gutenberg/pull/58604)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/snackbar/index.tsx b/packages/components/src/snackbar/index.tsx
+index 7460b481a7fed7..48eb8ed4873801 100644
+--- a/packages/components/src/snackbar/index.tsx
++++ b/packages/components/src/snackbar/index.tsx
+@@ -8,7 +8,13 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { speak } from '@wordpress/a11y';
+-import { useEffect, forwardRef, renderToString } from '@wordpress/element';
++import {
++	useEffect,
++	useLayoutEffect,
++	useRef,
++	forwardRef,
++	renderToString,
++} from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import warning from '@wordpress/warning';
+ 
+@@ -88,17 +94,24 @@ function UnforwardedSnackbar(
+ 
+ 	useSpokenMessage( spokenMessage, politeness );
+ 
+-	// Only set up the timeout dismiss if we're not explicitly dismissing.
++	// The `onDismiss/onRemove` can have unstable references,
++	// trigger side-effect cleanup, and reset timers.
++	const callbackRefs = useRef( { onDismiss, onRemove } );
++	useLayoutEffect( () => {
++		callbackRefs.current = { onDismiss, onRemove };
++	} );
++
+ 	useEffect( () => {
++		// Only set up the timeout dismiss if we're not explicitly dismissing.
+ 		const timeoutHandle = setTimeout( () => {
+ 			if ( ! explicitDismiss ) {
+-				onDismiss?.();
+-				onRemove?.();
++				callbackRefs.current.onDismiss?.();
++				callbackRefs.current.onRemove?.();
+ 			}
+ 		}, NOTICE_TIMEOUT );
+ 
+ 		return () => clearTimeout( timeoutHandle );
+-	}, [ onDismiss, onRemove, explicitDismiss ] );
++	}, [ explicitDismiss ] );
+ 
+ 	const classes = classnames( className, 'components-snackbar', {
+ 		'components-snackbar-explicit-dismiss': !! explicitDismiss,

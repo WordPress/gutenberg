@@ -1,0 +1,695 @@
+diff --git a/packages/block-editor/src/components/block-inspector/index.js b/packages/block-editor/src/components/block-inspector/index.js
+index 0f7fededfb6f9b..ae07e4d486bdc3 100644
+--- a/packages/block-editor/src/components/block-inspector/index.js
++++ b/packages/block-editor/src/components/block-inspector/index.js
+@@ -8,7 +8,7 @@ import {
+ } from '@wordpress/blocks';
+ import {
+ 	PanelBody,
+-	__experimentalSlotFillConsumer,
++	__experimentalUseSlot as useSlot,
+ } from '@wordpress/components';
+ import { withSelect } from '@wordpress/data';
+ 
+@@ -30,6 +30,9 @@ const BlockInspector = ( {
+ 	selectedBlockName,
+ 	showNoBlockSelectedMessage = true,
+ } ) => {
++	const slot = useSlot( InspectorAdvancedControls.slotName );
++	const hasFills = Boolean( slot.fills && slot.fills.length );
++
+ 	if ( count > 1 ) {
+ 		return <MultiSelectionInspector />;
+ 	}
+@@ -69,21 +72,15 @@ const BlockInspector = ( {
+ 			) }
+ 			<InspectorControls.Slot bubblesVirtually />
+ 			<div>
+-				<__experimentalSlotFillConsumer>
+-					{ ( { hasFills } ) =>
+-						hasFills( InspectorAdvancedControls.slotName ) && (
+-							<PanelBody
+-								className="block-editor-block-inspector__advanced"
+-								title={ __( 'Advanced' ) }
+-								initialOpen={ false }
+-							>
+-								<InspectorAdvancedControls.Slot
+-									bubblesVirtually
+-								/>
+-							</PanelBody>
+-						)
+-					}
+-				</__experimentalSlotFillConsumer>
++				{ hasFills && (
++					<PanelBody
++						className="block-editor-block-inspector__advanced"
++						title={ __( 'Advanced' ) }
++						initialOpen={ false }
++					>
++						<InspectorAdvancedControls.Slot bubblesVirtually />
++					</PanelBody>
++				) }
+ 			</div>
+ 			<SkipToSelectedBlock key="back" />
+ 		</div>
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 5a78b26d4733ed..e02dde7f7217df 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -98,7 +98,7 @@ export {
+ 	Slot,
+ 	Fill,
+ 	Provider as SlotFillProvider,
+-	Consumer as __experimentalSlotFillConsumer,
++	useSlot as __experimentalUseSlot,
+ } from './slot-fill';
+ 
+ // Higher-Order Components
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 943b1eb0d9b1fc..90d680820350d2 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -23,7 +23,7 @@ import PopoverDetectOutside from './detect-outside';
+ import Button from '../button';
+ import ScrollLock from '../scroll-lock';
+ import IsolatedEventContainer from '../isolated-event-container';
+-import { Slot, Fill, Consumer } from '../slot-fill';
++import { Slot, Fill, useSlot } from '../slot-fill';
+ import Animate from '../animate';
+ 
+ const FocusManaged = withConstrainedTabbing(
+@@ -261,6 +261,7 @@ const Popover = ( {
+ 	const contentRect = useRef();
+ 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+ 	const [ animateOrigin, setAnimateOrigin ] = useState();
++	const slot = useSlot( __unstableSlotName );
+ 	const isExpanded = expandOnMobile && isMobileViewport;
+ 
+ 	noArrow = isExpanded || noArrow;
+@@ -602,25 +603,15 @@ const Popover = ( {
+ 		content = <FocusManaged>{ content }</FocusManaged>;
+ 	}
+ 
+-	return (
+-		<Consumer>
+-			{ ( { getSlot } ) => {
+-				// In case there is no slot context in which to render,
+-				// default to an in-place rendering.
+-				if ( getSlot && getSlot( __unstableSlotName ) ) {
+-					content = (
+-						<Fill name={ __unstableSlotName }>{ content }</Fill>
+-					);
+-				}
++	if ( slot.ref ) {
++		content = <Fill name={ __unstableSlotName }>{ content }</Fill>;
++	}
+ 
+-				if ( anchorRef || anchorRect ) {
+-					return content;
+-				}
++	if ( anchorRef || anchorRect ) {
++		return content;
++	}
+ 
+-				return <span ref={ anchorRefFallback }>{ content }</span>;
+-			} }
+-		</Consumer>
+-	);
++	return <span ref={ anchorRefFallback }>{ content }</span>;
+ };
+ 
+ const PopoverContainer = Popover;
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/fill.js b/packages/components/src/slot-fill/bubbles-virtually/fill.js
+new file mode 100644
+index 00000000000000..2257e9a01b3499
+--- /dev/null
++++ b/packages/components/src/slot-fill/bubbles-virtually/fill.js
+@@ -0,0 +1,34 @@
++/**
++ * WordPress dependencies
++ */
++import { useRef, useEffect, createPortal } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import useSlot from './use-slot';
++
++export default function Fill( { name, children } ) {
++	const slot = useSlot( name );
++	const ref = useRef();
++
++	useEffect( () => {
++		// We register fills so we can keep track of their existance.
++		// Some Slot implementations need to know if there're already fills
++		// registered so they can choose to render themselves or not.
++		slot.registerFill( ref );
++		return () => {
++			slot.unregisterFill( ref );
++		};
++	}, [ slot.registerFill, slot.unregisterFill ] );
++
++	if ( ! slot.ref || ! slot.ref.current ) {
++		return null;
++	}
++
++	if ( typeof children === 'function' ) {
++		children = children( slot.fillProps );
++	}
++
++	return createPortal( children, slot.ref.current );
++}
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
+new file mode 100644
+index 00000000000000..cfee66bd11a9a3
+--- /dev/null
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
+@@ -0,0 +1,15 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext } from '@wordpress/element';
++
++const SlotFillContext = createContext( {
++	slots: {},
++	fills: {},
++	registerSlot: () => {},
++	unregisterSlot: () => {},
++	registerFill: () => {},
++	unregisterFill: () => {},
++} );
++
++export default SlotFillContext;
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+new file mode 100644
+index 00000000000000..d487d98fbfa9a1
+--- /dev/null
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+@@ -0,0 +1,92 @@
++/**
++ * WordPress dependencies
++ */
++import { useMemo, useCallback, useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import SlotFillContext from './slot-fill-context';
++
++function useSlotRegistry() {
++	const [ slots, setSlots ] = useState( {} );
++	const [ fills, setFills ] = useState( {} );
++
++	const registerSlot = useCallback( ( name, ref, fillProps ) => {
++		setSlots( ( prevSlots ) => ( {
++			...prevSlots,
++			[ name ]: {
++				...prevSlots[ name ],
++				ref: ref || prevSlots[ name ].ref,
++				fillProps: fillProps || prevSlots[ name ].fillProps || {},
++			},
++		} ) );
++	}, [] );
++
++	const unregisterSlot = useCallback( ( name, ref ) => {
++		setSlots( ( prevSlots ) => {
++			// eslint-disable-next-line no-unused-vars
++			const { [ name ]: slot, ...nextSlots } = prevSlots;
++			// Make sure we're not unregistering a slot registered by another element
++			// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
++			if ( slot.ref === ref ) {
++				return nextSlots;
++			}
++			return prevSlots;
++		} );
++	}, [] );
++
++	const registerFill = useCallback( ( name, ref ) => {
++		setFills( ( prevFills ) => ( {
++			...prevFills,
++			[ name ]: [ ...( prevFills[ name ] || [] ), ref ],
++		} ) );
++	}, [] );
++
++	const unregisterFill = useCallback( ( name, ref ) => {
++		setFills( ( prevFills ) => {
++			if ( prevFills[ name ] ) {
++				return {
++					...prevFills,
++					[ name ]: prevFills[ name ].filter(
++						( fillRef ) => fillRef !== ref
++					),
++				};
++			}
++			return prevFills;
++		} );
++	}, [] );
++
++	// Memoizing the return value so it can be directly passed to Provider value
++	const registry = useMemo(
++		() => ( {
++			slots,
++			fills,
++			registerSlot,
++			// Just for readability
++			updateSlot: registerSlot,
++			unregisterSlot,
++			registerFill,
++			unregisterFill,
++		} ),
++		[
++			slots,
++			fills,
++			registerSlot,
++			unregisterSlot,
++			registerFill,
++			unregisterFill,
++		]
++	);
++
++	return registry;
++}
++
++export default function SlotFillProvider( { children } ) {
++	const registry = useSlotRegistry();
++	return (
++		<SlotFillContext.Provider value={ registry }>
++			{ children }
++		</SlotFillContext.Provider>
++	);
++}
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot.js b/packages/components/src/slot-fill/bubbles-virtually/slot.js
+new file mode 100644
+index 00000000000000..d1347a92272426
+--- /dev/null
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot.js
+@@ -0,0 +1,48 @@
++/**
++ * WordPress dependencies
++ */
++import {
++	useEffect,
++	useRef,
++	useLayoutEffect,
++	useContext,
++} from '@wordpress/element';
++import isShallowEqual from '@wordpress/is-shallow-equal';
++
++/**
++ * Internal dependencies
++ */
++import SlotFillContext from './slot-fill-context';
++import useSlot from './use-slot';
++
++export default function Slot( {
++	name,
++	fillProps = {},
++	as: Component = 'div',
++	...props
++} ) {
++	const registry = useContext( SlotFillContext );
++	const ref = useRef();
++	const slot = useSlot( name );
++
++	useEffect( () => {
++		registry.registerSlot( name, ref, fillProps );
++		return () => {
++			registry.unregisterSlot( name, ref );
++		};
++		// We are not including fillProps in the deps because we don't want to
++		// unregister and register the slot whenever fillProps change, which would
++		// cause the fill to be re-mounted. We are only considering the initial value
++		// of fillProps.
++	}, [ registry.registerSlot, registry.unregisterSlot, name ] );
++
++	// fillProps may be an update that interact with the layout, so
++	// we useLayoutEffect
++	useLayoutEffect( () => {
++		if ( slot.fillProps && ! isShallowEqual( slot.fillProps, fillProps ) ) {
++			registry.updateSlot( name, ref, fillProps );
++		}
++	} );
++
++	return <Component ref={ ref } { ...props } />;
++}
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/use-slot.js b/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
+new file mode 100644
+index 00000000000000..8fdaeb58666521
+--- /dev/null
++++ b/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
+@@ -0,0 +1,54 @@
++/**
++ * WordPress dependencies
++ */
++import { useCallback, useContext, useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import SlotFillContext from './slot-fill-context';
++
++export default function useSlot( name ) {
++	const registry = useContext( SlotFillContext );
++
++	const slot = registry.slots[ name ] || {};
++	const slotFills = registry.fills[ name ];
++	const fills = useMemo( () => slotFills || [], [ slotFills ] );
++
++	const updateSlot = useCallback(
++		( slotRef, slotFillProps ) => {
++			registry.updateSlot( name, slotRef, slotFillProps );
++		},
++		[ name, registry.updateSlot ]
++	);
++
++	const unregisterSlot = useCallback(
++		( slotRef ) => {
++			registry.unregisterSlot( name, slotRef );
++		},
++		[ name, registry.unregisterSlot ]
++	);
++
++	const registerFill = useCallback(
++		( fillRef ) => {
++			registry.registerFill( name, fillRef );
++		},
++		[ name, registry.registerFill ]
++	);
++
++	const unregisterFill = useCallback(
++		( fillRef ) => {
++			registry.unregisterFill( name, fillRef );
++		},
++		[ name, registry.unregisterFill ]
++	);
++
++	return {
++		...slot,
++		updateSlot,
++		unregisterSlot,
++		fills,
++		registerFill,
++		unregisterFill,
++	};
++}
+diff --git a/packages/components/src/slot-fill/context.js b/packages/components/src/slot-fill/context.js
+index 5b6ec9527e15e6..e42ec9e79aa8fe 100644
+--- a/packages/components/src/slot-fill/context.js
++++ b/packages/components/src/slot-fill/context.js
+@@ -14,6 +14,11 @@ import {
+ 	useEffect,
+ } from '@wordpress/element';
+ 
++/**
++ * Internal dependencies
++ */
++import SlotFillBubblesVirtuallyProvider from './bubbles-virtually/slot-fill-provider';
++
+ const SlotFillContext = createContext( {
+ 	registerSlot: () => {},
+ 	unregisterSlot: () => {},
+@@ -140,7 +145,9 @@ class SlotFillProvider extends Component {
+ 	render() {
+ 		return (
+ 			<Provider value={ this.contextValue }>
+-				{ this.props.children }
++				<SlotFillBubblesVirtuallyProvider>
++					{ this.props.children }
++				</SlotFillBubblesVirtuallyProvider>
+ 			</Provider>
+ 		);
+ 	}
+diff --git a/packages/components/src/slot-fill/fill.js b/packages/components/src/slot-fill/fill.js
+index 3600e177e5434f..563e1a44db7064 100644
+--- a/packages/components/src/slot-fill/fill.js
++++ b/packages/components/src/slot-fill/fill.js
+@@ -34,7 +34,7 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
+ 
+ 	useLayoutEffect( () => {
+ 		ref.current.children = children;
+-		if ( slot && ! slot.props.bubblesVirtually ) {
++		if ( slot ) {
+ 			slot.forceUpdate();
+ 		}
+ 	}, [ children ] );
+@@ -49,7 +49,7 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
+ 		registerFill( name, ref.current );
+ 	}, [ name ] );
+ 
+-	if ( ! slot || ! slot.node || ! slot.props.bubblesVirtually ) {
++	if ( ! slot || ! slot.node ) {
+ 		return null;
+ 	}
+ 
+diff --git a/packages/components/src/slot-fill/index.js b/packages/components/src/slot-fill/index.js
+index 4155b083b0fdf4..f24ff8134dd15b 100644
+--- a/packages/components/src/slot-fill/index.js
++++ b/packages/components/src/slot-fill/index.js
+@@ -1,13 +1,31 @@
+ /**
+  * Internal dependencies
+  */
+-import Slot from './slot';
+-import Fill from './fill';
+-import Provider, { Consumer } from './context';
++import BaseSlot from './slot';
++import BaseFill from './fill';
++import Provider from './context';
++import BubblesVirtuallySlot from './bubbles-virtually/slot';
++import BubblesVirtuallyFill from './bubbles-virtually/fill';
++import useSlot from './bubbles-virtually/use-slot';
+ 
+-export { Slot };
+-export { Fill };
+-export { Provider, Consumer };
++export function Slot( { bubblesVirtually, ...props } ) {
++	if ( bubblesVirtually ) {
++		return <BubblesVirtuallySlot { ...props } />;
++	}
++	return <BaseSlot { ...props } />;
++}
++
++export function Fill( props ) {
++	// We're adding both Fills here so they can register themselves before
++	// their respective slot has been registered. Only the Fill that has a slot
++	// will render. The other one will return null.
++	return (
++		<>
++			<BaseFill { ...props } />
++			<BubblesVirtuallyFill { ...props } />
++		</>
++	);
++}
+ 
+ export function createSlotFill( name ) {
+ 	const FillComponent = ( props ) => <Fill name={ name } { ...props } />;
+@@ -21,3 +39,5 @@ export function createSlotFill( name ) {
+ 		Slot: SlotComponent,
+ 	};
+ }
++
++export { useSlot, Provider };
+diff --git a/packages/components/src/slot-fill/slot.js b/packages/components/src/slot-fill/slot.js
+index 7bb75172582a7f..87ac857fda5816 100644
+--- a/packages/components/src/slot-fill/slot.js
++++ b/packages/components/src/slot-fill/slot.js
+@@ -51,18 +51,7 @@ class SlotComponent extends Component {
+ 	}
+ 
+ 	render() {
+-		const {
+-			children,
+-			name,
+-			bubblesVirtually = false,
+-			fillProps = {},
+-			getFills,
+-			className,
+-		} = this.props;
+-
+-		if ( bubblesVirtually ) {
+-			return <div ref={ this.bindNode } className={ className } />;
+-		}
++		const { children, name, fillProps = {}, getFills } = this.props;
+ 
+ 		const fills = map( getFills( name, this ), ( fill ) => {
+ 			const fillKey = fill.occurrence;
+diff --git a/packages/components/src/slot-fill/stories/index.js b/packages/components/src/slot-fill/stories/index.js
+new file mode 100644
+index 00000000000000..48d07ef62b69c8
+--- /dev/null
++++ b/packages/components/src/slot-fill/stories/index.js
+@@ -0,0 +1,87 @@
++/**
++ * External dependencies
++ */
++import { text, number } from '@storybook/addon-knobs';
++
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { Slot, Fill, Provider } from '../';
++
++export default { title: 'Components/SlotFill', component: Slot };
++
++export const _default = () => {
++	return (
++		<Provider>
++			<h2>Profile</h2>
++			<p>
++				Name: <Slot bubblesVirtually as="span" name="name" />
++			</p>
++			<p>
++				Age: <Slot bubblesVirtually as="span" name="age" />
++			</p>
++			<Fill name="name">Grace</Fill>
++			<Fill name="age">33</Fill>
++		</Provider>
++	);
++};
++
++export const withFillProps = () => {
++	const name = text( 'name', 'Grace' );
++	const age = number( 'age', 33 );
++	return (
++		<Provider>
++			<h2>Profile</h2>
++			<p>
++				Name:{ ' ' }
++				<Slot
++					bubblesVirtually
++					as="span"
++					name="name"
++					fillProps={ { name } }
++				/>
++			</p>
++			<p>
++				Age:{ ' ' }
++				<Slot
++					bubblesVirtually
++					as="span"
++					name="age"
++					fillProps={ { age } }
++				/>
++			</p>
++			<Fill name="name">{ ( fillProps ) => fillProps.name }</Fill>
++			<Fill name="age">{ ( fillProps ) => fillProps.age }</Fill>
++		</Provider>
++	);
++};
++
++export const withContext = () => {
++	const Context = createContext();
++	const ContextFill = ( { name } ) => {
++		const value = useContext( Context );
++		return <Fill name={ name }>{ value }</Fill>;
++	};
++	return (
++		<Provider>
++			<h2>Profile</h2>
++			<p>
++				Name: <Slot bubblesVirtually as="span" name="name" />
++			</p>
++			<p>
++				Age: <Slot bubblesVirtually as="span" name="age" />
++			</p>
++			<Context.Provider value="Grace">
++				<ContextFill name="name" />
++			</Context.Provider>
++			<Context.Provider value={ 33 }>
++				<ContextFill name="age" />
++			</Context.Provider>
++		</Provider>
++	);
++};
+diff --git a/packages/components/src/slot-fill/test/slot.js b/packages/components/src/slot-fill/test/slot.js
+index 68fccc18926497..db935e6bc2ed29 100644
+--- a/packages/components/src/slot-fill/test/slot.js
++++ b/packages/components/src/slot-fill/test/slot.js
+@@ -7,9 +7,7 @@ import ReactTestRenderer from 'react-test-renderer';
+ /**
+  * Internal dependencies
+  */
+-import Slot from '../slot';
+-import Fill from '../fill';
+-import Provider from '../context';
++import { Slot, Fill, Provider } from '../';
+ 
+ /**
+  * WordPress dependencies
+@@ -261,10 +259,6 @@ describe( 'Slot', () => {
+ 				);
+ 
+ 				expect( testRenderer.toJSON() ).toMatchSnapshot();
+-
+-				expect( testRenderer.getInstance().slots ).toHaveProperty(
+-					'egg'
+-				);
+ 			} );
+ 		}
+ 	);
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index 58f8eeacc975bb..ef913e27fa7f4e 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -7887,6 +7887,56 @@ exports[`Storyshots Components/ScrollLock Default 1`] = `
+ </div>
+ `;
+ 
++exports[`Storyshots Components/SlotFill Default 1`] = `
++Array [
++  <h2>
++    Profile
++  </h2>,
++  <p>
++    Name: 
++    <span />
++  </p>,
++  <p>
++    Age: 
++    <span />
++  </p>,
++]
++`;
++
++exports[`Storyshots Components/SlotFill With Context 1`] = `
++Array [
++  <h2>
++    Profile
++  </h2>,
++  <p>
++    Name: 
++    <span />
++  </p>,
++  <p>
++    Age: 
++    <span />
++  </p>,
++]
++`;
++
++exports[`Storyshots Components/SlotFill With Fill Props 1`] = `
++Array [
++  <h2>
++    Profile
++  </h2>,
++  <p>
++    Name:
++     
++    <span />
++  </p>,
++  <p>
++    Age:
++     
++    <span />
++  </p>,
++]
++`;
++
+ exports[`Storyshots Components/Snackbar Default 1`] = `
+ <div
+   className="components-snackbar"

@@ -1,0 +1,4633 @@
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 01c11c9af0ce85..86f11e6f9e1d34 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -95,7 +95,7 @@ export default function FontSizePicker( {
+ 
+ 	const options = getSelectOptions( fontSizes, disableCustomFontSizes );
+ 
+-	const rangeControlNumberId = `components-range-control__number#${ instanceId }`;
++	const fontSizePickerNumberId = `components-font-size-picker__number#${ instanceId }`;
+ 	return (
+ 		<fieldset className="components-font-size-picker">
+ 			<legend className="screen-reader-text">
+@@ -116,13 +116,13 @@ export default function FontSizePicker( {
+ 					/>
+ 				) }
+ 				{ ! withSlider && ! disableCustomFontSizes && (
+-					<div className="components-range-control__number-container">
+-						<label htmlFor={ rangeControlNumberId }>
++					<div className="components-font-size-picker__number-container">
++						<label htmlFor={ fontSizePickerNumberId }>
+ 							{ __( 'Custom' ) }
+ 						</label>
+ 						<input
+-							id={ rangeControlNumberId }
+-							className="components-range-control__number"
++							id={ fontSizePickerNumberId }
++							className="components-font-size-picker__number"
+ 							type="number"
+ 							onChange={ onChangeValue }
+ 							aria-label={ __( 'Custom' ) }
+diff --git a/packages/components/src/font-size-picker/style.scss b/packages/components/src/font-size-picker/style.scss
+index 123713e6e83b1b..3b61451785631e 100644
+--- a/packages/components/src/font-size-picker/style.scss
++++ b/packages/components/src/font-size-picker/style.scss
+@@ -5,12 +5,15 @@
+ 	margin-bottom: $grid-size * 3;
+ 
+ 	// Apply the same height as the isSmall Reset button.
+-	.components-range-control__number {
++	.components-font-size-picker__number {
++		display: inline-block;
++		font-weight: 500;
+ 		height: 30px;
+ 		margin-bottom: 0;
+-		margin-top: 5px;
+ 		margin-left: 0;
+ 		margin-right: $grid-size;
++		margin-top: 5px;
++		width: 54px;
+ 
+ 		// Show the reset button as disabled until a value is entered.
+ 		&[value=""] + .components-button {
+diff --git a/packages/components/src/range-control/README.md b/packages/components/src/range-control/README.md
+index e88ec3b9d44103..ea1bd196d53eb0 100644
+--- a/packages/components/src/range-control/README.md
++++ b/packages/components/src/range-control/README.md
+@@ -152,6 +152,14 @@ If this property is true, a button to reset the the slider is rendered.
+ - Required: No
+ - Platform: Web | Mobile
+ 
++#### disabled
++
++Disables the `input`, preventing new values from being applied.
++
++- Type: `Boolean`
++- Required: No
++- Platform: Web
++
+ #### initialPosition
+ 
+ If no value exists this prop contains the slider starting position.
+@@ -160,13 +168,41 @@ If no value exists this prop contains the slider starting position.
+ - Required: No
+ - Platform: Web | Mobile
+ 
+-#### value
+ 
+-The current value of the range slider.
++#### marks
+ 
+-- Type: `Number`
+-- Required: Yes
+-- Platform: Web | Mobile
++Renders a visual representation of `step` ticks. Custom mark indicators can be provided by an `Array`.
++
++Example:
++
++```jsx
++const marks = [
++	{
++		value: 0,
++		label: '0',
++	},
++	{
++		value: 1,
++		label: '1',
++	},
++	{
++		value: 8,
++		label: '8',
++	},
++	{
++		value: 10,
++		label: '10',
++	},
++];
++
++const MyRangeControl() {
++	return (<RangeControl marks={ marks } min={ 0 } max={ 10 } step={ 1 } />)
++}
++```
++
++- Type: `Array|Boolean`
++- Required: No
++- Platform: Web
+ 
+ #### onChange
+ 
+@@ -193,6 +229,54 @@ The maximum value accepted. If higher values are inserted onChange will not be c
+ - Required: No
+ - Platform: Web | Mobile
+ 
++#### renderTooltipContent
++
++A way to customize the rendered UI of the value. Example:
++
++```jsx
++const customTooltipContent = value => `${value}%`
++
++const MyRangeControl() {
++	return (<RangeControl renderTooltipContent={ customTooltipContent } />)
++}
++```
++
++- Type: `Function`
++- Required: No
++- Platform: Web
++
++#### showTooltip
++
++Forcing the Tooltip UI to show or hide.
++
++- Type: `Boolean`
++- Required: No
++- Platform: Web
++
++#### step
++
++The stepping interval between `min` and `max` values. Step is used both for user interface and validation purposes.
++
++- Type: `Number`
++- Required: No
++- Platform: Web
++
++#### value
++
++The current value of the range slider.
++
++- Type: `Number`
++- Required: Yes
++- Platform: Web | Mobile
++
++#### withInputField
++
++Determines if the `input` number field will render next to the RangeControl.
++
++- Type: `Boolean`
++- Required: No
++- Platform: Web
++
+ #### icon
+ 
+ An icon to be shown above the slider next to it's container title.
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index 988a32a363f3c3..25502c117d73a4 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -1,124 +1,345 @@
+ /**
+  * External dependencies
+  */
+-import { isFinite } from 'lodash';
+ import classnames from 'classnames';
++import { clamp, noop } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { compose, withInstanceId, withState } from '@wordpress/compose';
++import {
++	useCallback,
++	useRef,
++	useEffect,
++	useState,
++	forwardRef,
++} from '@wordpress/element';
++import { compose, withInstanceId } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { BaseControl, Button, Dashicon } from '../';
+-
+-function RangeControl( {
+-	className,
+-	currentInput,
+-	label,
+-	value,
+-	instanceId,
+-	onChange,
+-	beforeIcon,
+-	afterIcon,
+-	help,
+-	allowReset,
+-	initialPosition,
+-	min,
+-	max,
+-	setState,
+-	...props
+-} ) {
+-	const id = `inspector-range-control-${ instanceId }`;
+-	const currentInputValue = currentInput === null ? value : currentInput;
+-	const resetValue = () => {
+-		resetCurrentInput();
+-		onChange();
+-	};
+-	const resetCurrentInput = () => {
+-		if ( currentInput !== null ) {
+-			setState( {
+-				currentInput: null,
+-			} );
+-		}
+-	};
++import BaseControl from '../base-control';
++import Button from '../button';
++import Dashicon from '../dashicon';
+ 
+-	const onChangeValue = ( event ) => {
+-		const newValue = event.target.value;
+-		// If the input value is invalid temporarily save it to the state,
+-		// without calling on change.
+-		if ( ! event.target.checkValidity() ) {
+-			setState( {
+-				currentInput: newValue,
+-			} );
+-			return;
+-		}
+-		// The input is valid, reset the local state property used to temporaly save the value,
+-		// and call onChange with the new value as a number.
+-		resetCurrentInput();
+-		onChange( newValue === '' ? undefined : parseFloat( newValue ) );
+-	};
++import { color } from '../utils/colors';
++import RangeRail from './rail';
++import SimpleTooltip from './tooltip';
++import {
++	ActionRightWrapper,
++	AfterIconWrapper,
++	BeforeIconWrapper,
++	InputRange,
++	InputNumber,
++	Root,
++	Track,
++	ThumbWrapper,
++	Thumb,
++	Wrapper,
++} from './styles/range-control-styles';
++import { useRtl } from '../utils/rtl';
++
++const BaseRangeControl = forwardRef(
++	(
++		{
++			afterIcon,
++			allowReset = false,
++			beforeIcon,
++			className,
++			color: colorProp = color( 'blue.wordpress.700' ),
++			disabled = false,
++			help,
++			instanceId,
++			initialPosition,
++			label,
++			marks = false,
++			max = 100,
++			min = 0,
++			onBlur = noop,
++			onChange = noop,
++			onFocus = noop,
++			onMouseEnter = noop,
++			onMouseLeave = noop,
++			renderTooltipContent = ( v ) => v,
++			showTooltip: showTooltipProp,
++			step = 1,
++			value: valueProp = 0,
++			withInputField = true,
++			...props
++		},
++		ref
++	) => {
++		const isRTL = useRtl();
++
++		const sliderValue = initialPosition || valueProp;
++		const [ value, setValue ] = useControlledRangeValue( {
++			min,
++			max,
++			value: sliderValue,
++		} );
++		const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
++		const [ isFocused, setIsFocused ] = useState( false );
++		const originalValueRef = useRef( value );
++
++		const inputRef = useRef();
++
++		const setRef = ( nodeRef ) => {
++			inputRef.current = nodeRef;
++
++			if ( ref ) {
++				ref( nodeRef );
++			}
++		};
++
++		const isThumbFocused = ! disabled && isFocused;
++		const fillValue = ( ( value - min ) / ( max - min ) ) * 100;
++		const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
++
++		const classes = classnames( 'components-range-control', className );
++
++		const wrapperClasses = classnames(
++			'components-range-control__wrapper',
++			!! marks && 'is-marked'
++		);
++
++		const id = `inspector-range-control-${ instanceId }`;
++
++		const describedBy = !! help ? `${ id }__help` : undefined;
++		const enableTooltip = showTooltipProp !== false;
++
++		const handleOnChange = ( event ) => {
++			if ( ! event.target.checkValidity() ) {
++				return;
++			}
++
++			const nextValue = parseFloat( event.target.value );
++
++			setValue( nextValue );
++			onChange( nextValue );
++		};
++
++		const handleOnReset = () => {
++			const nextValue = originalValueRef.current;
++
++			setValue( nextValue );
++			onChange( nextValue );
++		};
++
++		const handleShowTooltip = () => setShowTooltip( true );
++		const handleHideTooltip = () => setShowTooltip( false );
++
++		const handleOnBlur = ( event ) => {
++			onBlur( event );
++			setIsFocused( false );
++			handleHideTooltip();
++		};
++
++		const handleOnFocus = ( event ) => {
++			onFocus( event );
++			setIsFocused( true );
++			handleShowTooltip();
++		};
++
++		const hoverInteractions = useDebouncedHoverInteraction( {
++			onShow: handleShowTooltip,
++			onHide: handleHideTooltip,
++			onMouseEnter,
++			onMouseLeave,
++		} );
++
++		const offsetStyle = {
++			[ isRTL ? 'right' : 'left' ]: fillValueOffset,
++		};
+ 
+-	const initialFallbackValue = isFinite( initialPosition )
+-		? initialPosition
+-		: '';
+-
+-	const initialSliderValue = isFinite( currentInputValue )
+-		? currentInputValue
+-		: initialFallbackValue;
+-
+-	return (
+-		<BaseControl
+-			label={ label }
+-			id={ id }
+-			help={ help }
+-			className={ classnames( 'components-range-control', className ) }
+-		>
+-			{ beforeIcon && <Dashicon icon={ beforeIcon } /> }
+-			<input
+-				className="components-range-control__slider"
++		return (
++			<BaseControl
++				className={ classes }
++				label={ label }
+ 				id={ id }
+-				type="range"
+-				value={ initialSliderValue }
+-				onChange={ onChangeValue }
+-				aria-describedby={ !! help ? id + '__help' : undefined }
+-				min={ min }
+-				max={ max }
+-				{ ...props }
+-			/>
+-			{ afterIcon && <Dashicon icon={ afterIcon } /> }
+-			<input
+-				className="components-range-control__number"
+-				type="number"
+-				onChange={ onChangeValue }
+-				aria-label={ label }
+-				value={ currentInputValue }
+-				min={ min }
+-				max={ max }
+-				onBlur={ resetCurrentInput }
+-				{ ...props }
+-			/>
+-			{ allowReset && (
+-				<Button
+-					onClick={ resetValue }
+-					disabled={ value === undefined }
+-					isSmall
+-					isSecondary
+-					className="components-range-control__reset"
++				help={ help }
++			>
++				<Root
++					className="components-range-control__root"
++					isRTL={ isRTL }
+ 				>
+-					{ __( 'Reset' ) }
+-				</Button>
+-			) }
+-		</BaseControl>
++					{ beforeIcon && (
++						<BeforeIconWrapper>
++							<Dashicon icon={ beforeIcon } />
++						</BeforeIconWrapper>
++					) }
++					<Wrapper
++						className={ wrapperClasses }
++						color={ colorProp }
++						marks={ !! marks }
++					>
++						<InputRange
++							{ ...props }
++							{ ...hoverInteractions }
++							aria-describedby={ describedBy }
++							aria-label={ label }
++							aria-hidden={ false }
++							className="components-range-control__slider"
++							disabled={ disabled }
++							id={ id }
++							max={ max }
++							min={ min }
++							onBlur={ handleOnBlur }
++							onChange={ handleOnChange }
++							onFocus={ handleOnFocus }
++							ref={ setRef }
++							step={ step }
++							tabIndex={ 0 }
++							type="range"
++							value={ value }
++						/>
++						<RangeRail
++							aria-hidden={ true }
++							marks={ marks }
++							max={ max }
++							min={ min }
++							step={ step }
++							value={ value }
++						/>
++						<Track
++							aria-hidden={ true }
++							className="components-range-control__track"
++							style={ { width: fillValueOffset } }
++						/>
++						<ThumbWrapper style={ offsetStyle }>
++							<Thumb
++								aria-hidden={ true }
++								isFocused={ isThumbFocused }
++							/>
++						</ThumbWrapper>
++						{ enableTooltip && (
++							<SimpleTooltip
++								{ ...hoverInteractions }
++								className="components-range-control__tooltip"
++								inputRef={ inputRef }
++								renderTooltipContent={ renderTooltipContent }
++								show={ showTooltip || showTooltip }
++								style={ offsetStyle }
++								value={ value }
++							/>
++						) }
++					</Wrapper>
++					{ afterIcon && (
++						<AfterIconWrapper>
++							<Dashicon icon={ afterIcon } />
++						</AfterIconWrapper>
++					) }
++					{ withInputField && (
++						<InputNumber
++							aria-label={ label }
++							className="components-range-control__number"
++							inputMode="decimal"
++							max={ max }
++							min={ min }
++							onChange={ handleOnChange }
++							step={ step }
++							type="number"
++							value={ value }
++						/>
++					) }
++					{ allowReset && (
++						<ActionRightWrapper>
++							<Button
++								className="components-range-control__reset"
++								disabled={ value === undefined }
++								isSecondary
++								isSmall
++								onClick={ handleOnReset }
++							>
++								{ __( 'Reset' ) }
++							</Button>
++						</ActionRightWrapper>
++					) }
++				</Root>
++			</BaseControl>
++		);
++	}
++);
++
++/**
++ * A float supported clamp function for a specific value.
++ *
++ * @param {number} value The value to clamp
++ * @param {number} min The minimum value
++ * @param {number} max The maxinum value
++ * @return {number} A (float) number
++ */
++function floatClamp( value, min, max ) {
++	return parseFloat( clamp( value, min, max ) );
++}
++
++/**
++ * Hook to store a clamped value, derived from props.
++ */
++function useControlledRangeValue( { min, max, value: valueProp = 0 } ) {
++	const [ value, _setValue ] = useState( floatClamp( valueProp, min, max ) );
++	const valueRef = useRef( value );
++
++	const setValue = useCallback(
++		( nextValue ) => {
++			_setValue( floatClamp( nextValue, min, max ) );
++		},
++		[ _setValue, min, max ]
+ 	);
++
++	useEffect( () => {
++		if ( valueRef.current !== valueProp ) {
++			setValue( valueProp );
++			valueRef.current = valueProp;
++		}
++	}, [ valueRef, valueProp, setValue ] );
++
++	return [ value, setValue ];
++}
++
++/**
++ * Hook to encapsulate the debouncing "hover" to better handle the showing
++ * and hiding of the Tooltip.
++ */
++function useDebouncedHoverInteraction( {
++	onShow = noop,
++	onHide = noop,
++	onMouseEnter = noop,
++	onMouseLeave = noop,
++	timeout = 250,
++} ) {
++	const [ show, setShow ] = useState( false );
++	const timeoutRef = useRef();
++
++	const handleOnMouseEnter = useCallback( ( event ) => {
++		onMouseEnter( event );
++
++		if ( timeoutRef.current ) {
++			window.clearTimeout( timeoutRef.current );
++		}
++
++		if ( ! show ) {
++			setShow( true );
++			onShow();
++		}
++	}, [] );
++
++	const handleOnMouseLeave = useCallback( ( event ) => {
++		onMouseLeave( event );
++
++		timeoutRef.current = setTimeout( () => {
++			setShow( false );
++			onHide();
++		}, timeout );
++	}, [] );
++
++	return {
++		onMouseEnter: handleOnMouseEnter,
++		onMouseLeave: handleOnMouseLeave,
++	};
+ }
+ 
+-export default compose( [
+-	withInstanceId,
+-	withState( {
+-		currentInput: null,
+-	} ),
+-] )( RangeControl );
++export const RangeControlNext = compose( withInstanceId )( BaseRangeControl );
++
++export default RangeControlNext;
+diff --git a/packages/components/src/range-control/mark.js b/packages/components/src/range-control/mark.js
+new file mode 100644
+index 00000000000000..38794ca96793b4
+--- /dev/null
++++ b/packages/components/src/range-control/mark.js
+@@ -0,0 +1,49 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import { Mark, MarkLabel } from './styles/range-control-styles';
++
++export default function RangeMark( {
++	className,
++	isFilled = false,
++	label,
++	style = {},
++	...props
++} ) {
++	const classes = classnames(
++		'components-range-control__mark',
++		isFilled && 'is-filled',
++		className
++	);
++	const labelClasses = classnames(
++		'components-range-control__mark-label',
++		isFilled && 'is-filled'
++	);
++
++	return (
++		<>
++			<Mark
++				{ ...props }
++				aria-hidden="true"
++				className={ classes }
++				isFilled={ isFilled }
++				style={ style }
++			/>
++			{ label && (
++				<MarkLabel
++					aria-hidden="true"
++					className={ labelClasses }
++					isFilled={ isFilled }
++					style={ style }
++				>
++					{ label }
++				</MarkLabel>
++			) }
++		</>
++	);
++}
+diff --git a/packages/components/src/range-control/rail.js b/packages/components/src/range-control/rail.js
+new file mode 100644
+index 00000000000000..0eea30a0d8762b
+--- /dev/null
++++ b/packages/components/src/range-control/rail.js
+@@ -0,0 +1,86 @@
++/**
++ * External dependencies
++ */
++import { isUndefined } from 'lodash';
++/**
++ * Internal dependencies
++ */
++import RangeMark from './mark';
++import { MarksWrapper, Rail } from './styles/range-control-styles';
++
++export default function RangeRail( {
++	marks = false,
++	min = 0,
++	max = 100,
++	step = 1,
++	value = 0,
++	...restProps
++} ) {
++	return (
++		<>
++			<Rail { ...restProps } />
++			{ marks && (
++				<Marks
++					marks={ marks }
++					min={ min }
++					max={ max }
++					step={ step }
++					value={ value }
++				/>
++			) }
++		</>
++	);
++}
++
++function Marks( { marks = false, min = 0, max = 100, step = 1, value = 0 } ) {
++	const marksData = useMarks( { marks, min, max, step, value } );
++
++	return (
++		<MarksWrapper
++			aria-hidden="true"
++			className="components-range-control__marks"
++		>
++			{ marksData.map( ( mark ) => (
++				<RangeMark { ...mark } key={ mark.key } aria-hidden="true" />
++			) ) }
++		</MarksWrapper>
++	);
++}
++
++function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
++	const isRTL = document.documentElement.dir === 'rtl';
++
++	if ( ! marks ) {
++		return [];
++	}
++
++	const isCustomMarks = Array.isArray( marks );
++
++	const markCount = ( max - min ) / step;
++	const marksArray = isCustomMarks
++		? marks
++		: [ ...Array( markCount + 1 ) ].map( ( _, index ) => ( {
++				value: index,
++		  } ) );
++
++	const enhancedMarks = marksArray.map( ( mark, index ) => {
++		const markValue = ! isUndefined( mark.value ) ? mark.value : value;
++
++		const key = `mark-${ index }`;
++		const isFilled = markValue * step <= value;
++		const offset = `${ ( markValue / markCount ) * 100 }%`;
++
++		const offsetStyle = {
++			[ isRTL ? 'right' : 'left' ]: offset,
++		};
++
++		return {
++			...mark,
++			isFilled,
++			key,
++			style: offsetStyle,
++		};
++	} );
++
++	return enhancedMarks;
++}
+diff --git a/packages/components/src/range-control/stories/index.js b/packages/components/src/range-control/stories/index.js
+index 97abc17aa11f53..28170196098da4 100644
+--- a/packages/components/src/range-control/stories/index.js
++++ b/packages/components/src/range-control/stories/index.js
+@@ -1,17 +1,18 @@
+ /**
+  * External dependencies
+  */
+-import { number, text } from '@storybook/addon-knobs';
++import styled from '@emotion/styled';
++import { boolean, number, text } from '@storybook/addon-knobs';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { useState } from '@wordpress/element';
++import { useEffect, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+-import RangeControl from '../';
++import RangeControl from '../index';
+ 
+ export default { title: 'Components/RangeControl', component: RangeControl };
+ 
+@@ -22,10 +23,51 @@ const RangeControlWithState = ( props ) => {
+ 	return <RangeControl { ...props } value={ value } onChange={ setValue } />;
+ };
+ 
+-export const _default = () => {
+-	const label = text( 'Label', 'How many columns should this use?' );
++const DefaultExample = () => {
++	const [ isRtl, setIsRtl ] = useState( false );
++
++	const rtl = boolean( 'RTL', false );
++	const props = {
++		allowReset: boolean( 'allowReset', false ),
++		label: text( 'label', 'Range Label' ),
++		help: text( 'help', '' ),
++		min: number( 'min', 0 ),
++		max: number( 'max', 10 ),
++		step: number( 'step', 1 ),
++		marks: boolean( 'marks', false ),
++		showTooltip: boolean( 'showTooltip', false ),
++		beforeIcon: text( 'beforeIcon', '' ),
++		afterIcon: text( 'afterIcon', '' ),
++		withInputField: boolean( 'withInputField', true ),
++	};
++
++	useEffect( () => {
++		if ( rtl !== isRtl ) {
++			setIsRtl( rtl );
++		}
++	}, [ rtl, isRtl ] );
++
++	useEffect( () => {
++		if ( isRtl ) {
++			document.documentElement.setAttribute( 'dir', 'rtl' );
++		} else {
++			document.documentElement.setAttribute( 'dir', 'ltr' );
++		}
++
++		return () => {
++			document.documentElement.setAttribute( 'dir', 'ltr' );
++		};
++	}, [ isRtl ] );
+ 
+-	return <RangeControlWithState label={ label } />;
++	return (
++		<Wrapper>
++			<RangeControl { ...props } />
++		</Wrapper>
++	);
++};
++
++export const _default = () => {
++	return <DefaultExample />;
+ };
+ 
+ export const InitialValueZero = () => {
+@@ -79,3 +121,38 @@ export const withReset = () => {
+ 
+ 	return <RangeControlWithState label={ label } allowReset />;
+ };
++
++export const customMarks = () => {
++	const marks = [
++		{
++			value: 0,
++			label: '0',
++		},
++		{
++			value: 1,
++			label: '1',
++		},
++		{
++			value: 2,
++			label: '2',
++		},
++		{
++			value: 8,
++			label: '8',
++		},
++		{
++			value: 10,
++			label: '10',
++		},
++	];
++
++	return (
++		<Wrapper>
++			<RangeControl marks={ marks } min={ 0 } max={ 10 } step={ 1 } />
++		</Wrapper>
++	);
++};
++
++const Wrapper = styled.div`
++	padding: 60px 40px;
++`;
+diff --git a/packages/components/src/range-control/style.scss b/packages/components/src/range-control/style.scss
+deleted file mode 100644
+index b67e503592650e..00000000000000
+--- a/packages/components/src/range-control/style.scss
++++ /dev/null
+@@ -1,129 +0,0 @@
+-
+-.components-range-control {
+-	.components-base-control__field {
+-		display: flex;
+-		justify-content: center;
+-		flex-wrap: wrap;
+-		align-items: center;
+-	}
+-
+-	.dashicon {
+-		flex-shrink: 0;
+-		margin-right: 10px;
+-	}
+-
+-	.components-base-control__label {
+-		width: 100%;
+-	}
+-
+-	.components-range-control__slider {
+-		margin-left: 0;
+-		flex: 1;
+-	}
+-}
+-
+-.components-range-control__reset {
+-	margin-left: $grid-size;
+-}
+-
+-// creating mixin because we can't do multiline variables, and we can't comma-group the selectors for styling the range slider
+-@mixin range-thumb() {
+-	height: 18px;
+-	width: 18px;
+-	border-radius: 50%;
+-	cursor: pointer;
+-	background: $dark-gray-500;
+-	border: 4px solid transparent;
+-	background-clip: padding-box;
+-	box-sizing: border-box;
+-}
+-
+-@mixin range-track() {
+-	height: 3px;
+-	cursor: pointer;
+-	background: $light-gray-500;
+-	border-radius: 1.5px;
+-}
+-
+-.components-range-control__slider {
+-	width: 100%;
+-	margin-left: $grid-size;
+-	padding: 0;
+-	-webkit-appearance: none;
+-	background: transparent;
+-
+-	/**
+- 	 * Thumb
+- 	 */
+-
+-	// webkit
+-	&::-webkit-slider-thumb {
+-		-webkit-appearance: none;
+-		@include range-thumb();
+-		margin-top: -7px;	// necessary for chrome
+-	}
+-
+-	// moz
+-	&::-moz-range-thumb {
+-		@include range-thumb();
+-	}
+-
+-	// ie
+-	&::-ms-thumb {
+-		@include range-thumb();
+-		margin-top: 0;	// necessary because edge inherits from chrome
+-		height: 14px;
+-		width: 14px;
+-		border: 2px solid transparent;
+-	}
+-
+-	&:focus {
+-		outline: none;
+-	}
+-
+-	// webkit
+-	&:focus::-webkit-slider-thumb {
+-		@include button-style__focus-active;
+-	}
+-
+-	// moz
+-	&:focus::-moz-range-thumb {
+-		@include button-style__focus-active;
+-	}
+-
+-	// ie
+-	&:focus::-ms-thumb {
+-		@include button-style__focus-active;
+-	}
+-
+-	/**
+- 	 * Track
+- 	 */
+-
+-	// webkit
+-	&::-webkit-slider-runnable-track {
+-		@include range-track();
+-		margin-top: -4px;
+-	}
+-
+-	// moz
+-	&::-moz-range-track {
+-		@include range-track();
+-	}
+-
+-	// ie
+-	&::-ms-track {
+-		margin-top: -4px;
+-		background: transparent;
+-		border-color: transparent;
+-		color: transparent;
+-		@include range-track();
+-	}
+-}
+-
+-.components-range-control__number {
+-	display: inline-block;
+-	margin-left: $grid-size;
+-	font-weight: 500;
+-	width: 54px;
+-}
+diff --git a/packages/components/src/range-control/styles/range-control-styles.js b/packages/components/src/range-control/styles/range-control-styles.js
+new file mode 100644
+index 00000000000000..cdbf2af600b9db
+--- /dev/null
++++ b/packages/components/src/range-control/styles/range-control-styles.js
+@@ -0,0 +1,287 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/core';
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import { color, reduceMotion, rtl } from '../../utils/style-mixins';
++
++const rangeHeight = () => css( { height: 30, minHeight: 30 } );
++
++export const Root = styled.span`
++	-webkit-tap-highlight-color: transparent;
++	box-sizing: border-box;
++	cursor: pointer;
++	align-items: flex-start;
++	display: inline-flex;
++	justify-content: flex-start;
++	padding: 0;
++	position: relative;
++	touch-action: none;
++	width: 100%;
++`;
++
++const wrapperMargin = ( { marks } ) =>
++	css( { marginBottom: marks ? 16 : null } );
++
++export const Wrapper = styled.span`
++	box-sizing: border-box;
++	color: ${color( 'blue.medium.focus' )};
++	display: block;
++	padding-top: 15px;
++	position: relative;
++	width: 100%;
++
++	${rangeHeight};
++	${wrapperMargin};
++
++	${rtl( { marginLeft: 10 } )}
++`;
++
++export const BeforeIconWrapper = styled.span`
++	margin-top: 3px;
++
++	${rtl( { marginRight: 6 } )}
++`;
++
++export const AfterIconWrapper = styled.span`
++	margin-top: 3px;
++
++	${rtl( { marginLeft: 16 } )}
++`;
++
++export const Rail = styled.span`
++	background-color: ${color( 'lightGray.600' )};
++	box-sizing: border-box;
++	left: 0;
++	pointer-events: none;
++	right: 0;
++	display: block;
++	height: 3px;
++	position: absolute;
++	margin-top: 14px;
++	top: 0;
++`;
++
++export const Track = styled.span`
++	background-color: currentColor;
++	border-radius: 1px;
++	box-sizing: border-box;
++	height: 3px;
++	pointer-events: none;
++	display: block;
++	position: absolute;
++	margin-top: 14px;
++	top: 0;
++`;
++
++export const MarksWrapper = styled.span`
++	box-sizing: border-box;
++	display: block;
++	position: relative;
++	width: 100%;
++	user-select: none;
++`;
++
++const markFill = ( { isFilled } ) => {
++	return css( {
++		backgroundColor: isFilled ? 'currentColor' : color( 'lightGray.600' ),
++	} );
++};
++
++export const Mark = styled.span`
++	box-sizing: border-box;
++	height: 9px;
++	left: 0;
++	position: absolute;
++	top: -4px;
++	width: 1px;
++
++	${markFill};
++`;
++
++const markLabelFill = ( { isFilled } ) => {
++	return css( {
++		color: isFilled ? color( 'darkGray.300' ) : color( 'lightGray.600' ),
++	} );
++};
++
++export const MarkLabel = styled.span`
++	box-sizing: border-box;
++	color: ${color( 'lightGray.600' )};
++	left: 0;
++	font-size: 11px;
++	position: absolute;
++	top: 12px;
++	transform: translateX( -50% );
++	white-space: nowrap;
++
++	${markLabelFill};
++`;
++
++export const ThumbWrapper = styled.span`
++	align-items: center;
++	box-sizing: border-box;
++	display: flex;
++	height: 20px;
++	justify-content: center;
++	margin-top: 5px;
++	outline: 0;
++	pointer-events: none;
++	position: absolute;
++	top: 0;
++	user-select: none;
++	width: 20px;
++
++	${rtl( { marginLeft: -10 } )}
++`;
++
++const thumbFocus = ( { isFocused } ) => {
++	return css( {
++		borderColor: isFocused
++			? color( 'blue.medium.focus' )
++			: color( 'darkGray.200' ),
++		boxShadow: isFocused
++			? `
++				0 0 0 1px ${ color( 'blue.medium.focus' ) }
++			`
++			: `
++				0 0 0 rgba(0, 0, 0, 0)
++			`,
++	} );
++};
++
++export const Thumb = styled.span`
++	align-items: center;
++	background-color: white;
++	border-radius: 50%;
++	border: 1px solid ${color( 'darkGray.200' )};
++	box-sizing: border-box;
++	height: 100%;
++	outline: 0;
++	pointer-events: none;
++	position: absolute;
++	user-select: none;
++	width: 100%;
++
++	${thumbFocus};
++`;
++
++export const InputRange = styled.input`
++	box-sizing: border-box;
++	cursor: pointer;
++	display: block;
++	height: 100%;
++	left: 0;
++	margin: 0;
++	opacity: 0;
++	outline: none;
++	position: absolute;
++	right: 0;
++	top: 0;
++	width: 100%;
++`;
++
++const tooltipShow = ( { show } ) => {
++	return css( {
++		opacity: show ? 1 : 0,
++	} );
++};
++
++const tooltipPosition = ( { position } ) => {
++	const isTop = position === 'top';
++
++	if ( isTop ) {
++		return css`
++			margin-top: -4px;
++			top: -100%;
++
++			&::after {
++				border-bottom: none;
++				border-top-style: solid;
++				bottom: -6px;
++			}
++		`;
++	}
++
++	return css`
++		margin-bottom: -4px;
++		bottom: -100%;
++
++		&::after {
++			border-bottom-style: solid;
++			border-top: none;
++			top: -6px;
++		}
++	`;
++};
++
++export const Tooltip = styled.span`
++	background: ${color( 'darkGray.800' )};
++	border-radius: 3px;
++	box-sizing: border-box;
++	color: white;
++	display: inline-block;
++	font-size: 11px;
++	min-width: 32px;
++	opacity: 0;
++	padding: 8px;
++	position: absolute;
++	text-align: center;
++	transition: opacity 120ms ease;
++	user-select: none;
++
++	&::after {
++		border: 6px solid ${color( 'darkGray.800' )};
++		border-left-color: transparent;
++		border-right-color: transparent;
++		bottom: -6px;
++		box-sizing: border-box;
++		content: '';
++		height: 0;
++		left: 50%;
++		line-height: 0;
++		margin-left: -6px;
++		position: absolute;
++		width: 0;
++	}
++
++	${tooltipShow};
++	${tooltipPosition};
++	${reduceMotion( 'transition' )};
++	${rtl(
++		{ transform: 'translateX(-50%)' },
++		{ transform: 'translateX(50%)' }
++	)}
++`;
++
++export const InputNumber = styled.input`
++	box-sizing: border-box;
++	display: inline-block;
++	margin-top: 0;
++	min-width: 54px;
++	max-width: 120px;
++
++	input[type='number']& {
++		${rangeHeight};
++	}
++
++	${rtl( { marginLeft: 16 } )}
++`;
++
++export const ActionRightWrapper = styled.span`
++	box-sizing: border-box;
++	display: block;
++	margin-top: 0;
++
++	button,
++	button.is-small {
++		margin-left: 0;
++		${rangeHeight};
++	}
++
++	${rtl( { marginLeft: 8 } )}
++`;
+diff --git a/packages/components/src/range-control/tooltip.js b/packages/components/src/range-control/tooltip.js
+new file mode 100644
+index 00000000000000..ae9a7791c9e4a3
+--- /dev/null
++++ b/packages/components/src/range-control/tooltip.js
+@@ -0,0 +1,82 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { useCallback, useEffect, useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { Tooltip } from './styles/range-control-styles';
++
++const TOOLTIP_OFFSET_HEIGHT = 32;
++
++export default function SimpleTooltip( {
++	className,
++	inputRef,
++	position: positionProp = 'auto',
++	show = false,
++	style = {},
++	value = 0,
++	renderTooltipContent = ( v ) => v,
++	zIndex = 100,
++	...restProps
++} ) {
++	const position = useTooltipPosition( { inputRef, position: positionProp } );
++	const classes = classnames( 'components-simple-tooltip', className );
++	const styles = {
++		...style,
++		zIndex,
++	};
++
++	return (
++		<Tooltip
++			{ ...restProps }
++			aria-hidden={ show }
++			className={ classes }
++			position={ position }
++			show={ show }
++			role="tooltip"
++			style={ styles }
++		>
++			{ renderTooltipContent( value ) }
++		</Tooltip>
++	);
++}
++
++function useTooltipPosition( { inputRef, position: positionProp } ) {
++	const [ position, setPosition ] = useState( 'top' );
++
++	const calculatePosition = useCallback( () => {
++		if ( inputRef && inputRef.current ) {
++			let nextPosition = positionProp;
++
++			if ( positionProp === 'auto' ) {
++				const { top } = inputRef.current.getBoundingClientRect();
++				const isOffscreenTop = top - TOOLTIP_OFFSET_HEIGHT < 0;
++
++				nextPosition = isOffscreenTop ? 'bottom' : 'top';
++			}
++
++			setPosition( nextPosition );
++		}
++	}, [ positionProp ] );
++
++	useEffect( () => {
++		calculatePosition();
++	}, [ calculatePosition ] );
++
++	useEffect( () => {
++		window.addEventListener( 'resize', calculatePosition );
++
++		return () => {
++			window.removeEventListener( 'resize', calculatePosition );
++		};
++	} );
++
++	return position;
++}
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index a4728386ed030f..481d789d5bfc96 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -34,7 +34,6 @@
+ @import "./placeholder/style.scss";
+ @import "./popover/style.scss";
+ @import "./radio-control/style.scss";
+-@import "./range-control/style.scss";
+ @import "./resizable-box/style.scss";
+ @import "./responsive-wrapper/style.scss";
+ @import "./sandbox/style.scss";
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index 8dfca09543f5e9..537a8e7810300b 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -103,7 +103,7 @@ export const ALERT = {
+ 
+ export const COLORS = {
+ 	...BASE,
+-	darkGrey: DARK_GRAY,
++	darkGray: DARK_GRAY,
+ 	darkOpacity: DARK_OPACITY,
+ 	darkOpacityLight: DARK_OPACITY_LIGHT,
+ 	lightGray: LIGHT_GRAY,
+diff --git a/packages/components/src/utils/reduce-motion.js b/packages/components/src/utils/reduce-motion.js
+new file mode 100644
+index 00000000000000..b3651d494c66eb
+--- /dev/null
++++ b/packages/components/src/utils/reduce-motion.js
+@@ -0,0 +1,31 @@
++/**
++ * Allows users to opt-out of animations via OS-level preferences.
++ *
++ * @param {string} prop CSS Property name
++ * @return {string}
++ */
++export function reduceMotion( prop = 'transition' ) {
++	let style;
++
++	switch ( prop ) {
++		case 'transition':
++			style = 'transition-duration: 0ms;';
++			break;
++
++		case 'animation':
++			style = 'animation-duration: 1ms;';
++			break;
++
++		default:
++			style = `
++				animation-duration: 1ms;
++				transition-duration: 0ms;
++			`;
++	}
++
++	return `
++		@media ( prefers-reduced-motion: reduce ) {
++			${ style };
++		}
++	`;
++}
+diff --git a/packages/components/src/utils/rtl.js b/packages/components/src/utils/rtl.js
+new file mode 100644
+index 00000000000000..3fa6c3757737a9
+--- /dev/null
++++ b/packages/components/src/utils/rtl.js
+@@ -0,0 +1,58 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/core';
++
++function getRtl() {
++	return !! ( document && document.documentElement.dir === 'rtl' );
++}
++
++/**
++ * Simple hook to retrieve RTL direction value
++ */
++export function useRtl() {
++	return getRtl();
++}
++
++/**
++ * An incredibly basic ltr -> rtl converter for style properties
++ *
++ * @param {Object} ltrStyles
++ * @return {Object} Converted ltr -> rtl styles
++ */
++const convertLtrToRtl = ( ltrStyles = {} ) => {
++	const nextStyles = {};
++
++	for ( const key in ltrStyles ) {
++		const value = ltrStyles[ key ];
++		let nextKey = key;
++		if ( /left/gi.test( key ) ) {
++			nextKey = [ key.replace( 'left', 'right' ) ];
++		}
++		if ( /Left/gi.test( key ) ) {
++			nextKey = [ key.replace( 'Left', 'Right' ) ];
++		}
++		nextStyles[ nextKey ] = value;
++	}
++
++	return nextStyles;
++};
++
++/**
++ * An incredibly basic ltr -> rtl style converter for CSS objects.
++ *
++ * @param {Object} ltrStyles Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
++ * @param {null|Object} rtlStyles Rtl styles. Renders if provided.
++ * @return {Object} Rendered CSS styles for Emotion's renderer
++ */
++export function rtl( ltrStyles = {}, rtlStyles ) {
++	return () => {
++		const isRtl = getRtl();
++
++		if ( rtlStyles ) {
++			return isRtl ? css( rtlStyles ) : css( ltrStyles );
++		}
++
++		return isRtl ? css( convertLtrToRtl( ltrStyles ) ) : css( ltrStyles );
++	};
++}
+diff --git a/packages/components/src/utils/style-mixins.js b/packages/components/src/utils/style-mixins.js
+new file mode 100644
+index 00000000000000..26344df68a9d95
+--- /dev/null
++++ b/packages/components/src/utils/style-mixins.js
+@@ -0,0 +1,3 @@
++export { color, rgba } from './colors';
++export { reduceMotion } from './reduce-motion';
++export { rtl } from './rtl';
+diff --git a/packages/e2e-tests/specs/editor/various/font-size-picker.test.js b/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
+index d3ab21d68d0acf..5c47e626ba6ab6 100644
+--- a/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
++++ b/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
+@@ -33,7 +33,7 @@ describe( 'Font Size Picker', () => {
+ 		await page.keyboard.type( 'Paragraph to be made "small"' );
+ 
+ 		await page.click(
+-			'.components-font-size-picker__controls .components-range-control__number'
++			'.components-font-size-picker__controls .components-font-size-picker__number'
+ 		);
+ 		// This should be the "small" font-size of the editor defaults.
+ 		await page.keyboard.type( '13' );
+@@ -49,7 +49,7 @@ describe( 'Font Size Picker', () => {
+ 		await page.keyboard.type( 'Paragraph to be made "small"' );
+ 
+ 		await page.click(
+-			'.components-font-size-picker__controls .components-range-control__number'
++			'.components-font-size-picker__controls .components-font-size-picker__number'
+ 		);
+ 		await page.keyboard.type( '23' );
+ 
+@@ -96,7 +96,7 @@ describe( 'Font Size Picker', () => {
+ 
+ 		// Clear the custom font size input.
+ 		await page.click(
+-			'.components-font-size-picker__controls .components-range-control__number'
++			'.components-font-size-picker__controls .components-font-size-picker__number'
+ 		);
+ 		await pressKeyTimes( 'ArrowRight', 5 );
+ 		await pressKeyTimes( 'Backspace', 5 );
+@@ -112,14 +112,14 @@ describe( 'Font Size Picker', () => {
+ 		await page.keyboard.type( 'Paragraph to be made "small"' );
+ 
+ 		await page.click(
+-			'.components-font-size-picker__controls .components-range-control__number'
++			'.components-font-size-picker__controls .components-font-size-picker__number'
+ 		);
+ 		await page.keyboard.type( '23' );
+ 
+ 		await page.keyboard.press( 'Backspace' );
+ 
+ 		await page.click(
+-			'.components-font-size-picker__controls .components-range-control__number'
++			'.components-font-size-picker__controls .components-font-size-picker__number'
+ 		);
+ 		await page.keyboard.press( 'Backspace' );
+ 		await page.keyboard.press( 'Backspace' );
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index ed7268b34a7fc2..8b77814bcfb195 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -3126,17 +3126,17 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
+       />
+     </div>
+     <div
+-      className="components-range-control__number-container"
++      className="components-font-size-picker__number-container"
+     >
+       <label
+-        htmlFor="components-range-control__number#0"
++        htmlFor="components-font-size-picker__number#0"
+       >
+         Custom
+       </label>
+       <input
+         aria-label="Custom"
+-        className="components-range-control__number"
+-        id="components-range-control__number#0"
++        className="components-font-size-picker__number"
++        id="components-font-size-picker__number#0"
+         onChange={[Function]}
+         type="number"
+         value={16}
+@@ -3155,6 +3155,208 @@ exports[`Storyshots Components/FontSizePicker Default 1`] = `
+ `;
+ 
+ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
++.emotion-20 {
++  -webkit-tap-highlight-color: transparent;
++  box-sizing: border-box;
++  cursor: pointer;
++  -webkit-align-items: flex-start;
++  -webkit-box-align: flex-start;
++  -ms-flex-align: flex-start;
++  align-items: flex-start;
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-box-pack: start;
++  -webkit-justify-content: flex-start;
++  -ms-flex-pack: start;
++  justify-content: flex-start;
++  padding: 0;
++  position: relative;
++  touch-action: none;
++  width: 100%;
++}
++
++.emotion-0 {
++  margin-top: 3px;
++  margin-right: 6px;
++}
++
++.emotion-14 {
++  box-sizing: border-box;
++  color: #007cba;
++  display: block;
++  padding-top: 15px;
++  position: relative;
++  width: 100%;
++  height: 30px;
++  min-height: 30px;
++  margin-left: 10px;
++}
++
++.emotion-2 {
++  box-sizing: border-box;
++  cursor: pointer;
++  display: block;
++  height: 100%;
++  left: 0;
++  margin: 0;
++  opacity: 0;
++  outline: none;
++  position: absolute;
++  right: 0;
++  top: 0;
++  width: 100%;
++}
++
++.emotion-4 {
++  background-color: #d7dade;
++  box-sizing: border-box;
++  left: 0;
++  pointer-events: none;
++  right: 0;
++  display: block;
++  height: 3px;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-6 {
++  background-color: currentColor;
++  border-radius: 1px;
++  box-sizing: border-box;
++  height: 3px;
++  pointer-events: none;
++  display: block;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-10 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  height: 20px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++  margin-top: 5px;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  top: 0;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 20px;
++  margin-left: -10px;
++}
++
++.emotion-8 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  background-color: white;
++  border-radius: 50%;
++  border: 1px solid #7e8993;
++  box-sizing: border-box;
++  height: 100%;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 100%;
++  border-color: #7e8993;
++  box-shadow: 0 0 0 rgba(0,0,0,0);
++}
++
++.emotion-12 {
++  background: #23282d;
++  border-radius: 3px;
++  box-sizing: border-box;
++  color: white;
++  display: inline-block;
++  font-size: 11px;
++  min-width: 32px;
++  opacity: 0;
++  padding: 8px;
++  position: absolute;
++  text-align: center;
++  -webkit-transition: opacity 120ms ease;
++  transition: opacity 120ms ease;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  opacity: 0;
++  margin-top: -4px;
++  top: -100%;
++  -webkit-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++}
++
++.emotion-12::after {
++  border: 6px solid #23282d;
++  border-left-color: transparent;
++  border-right-color: transparent;
++  bottom: -6px;
++  box-sizing: border-box;
++  content: '';
++  height: 0;
++  left: 50%;
++  line-height: 0;
++  margin-left: -6px;
++  position: absolute;
++  width: 0;
++}
++
++.emotion-12::after {
++  border-bottom: none;
++  border-top-style: solid;
++  bottom: -6px;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-12 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-16 {
++  margin-top: 3px;
++  margin-left: 16px;
++}
++
++.emotion-18 {
++  box-sizing: border-box;
++  display: inline-block;
++  margin-top: 0;
++  min-width: 54px;
++  max-width: 120px;
++  margin-left: 16px;
++}
++
++input[type='number'].emotion-18 {
++  height: 30px;
++  min-height: 30px;
++}
++
+ <fieldset
+   className="components-font-size-picker"
+ >
+@@ -3234,53 +3436,121 @@ exports[`Storyshots Components/FontSizePicker With Slider 1`] = `
+       >
+         Custom Size
+       </label>
+-      <svg
+-        aria-hidden="true"
+-        className="dashicon dashicons-editor-textcolor"
+-        focusable="false"
+-        height={20}
+-        role="img"
+-        viewBox="0 0 20 20"
+-        width={20}
+-        xmlns="http://www.w3.org/2000/svg"
+-      >
+-        <path
+-          d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z"
+-        />
+-      </svg>
+-      <input
+-        className="components-range-control__slider"
+-        id="inspector-range-control-0"
+-        max={100}
+-        min={12}
+-        onChange={[Function]}
+-        type="range"
+-        value={16}
+-      />
+-      <svg
+-        aria-hidden="true"
+-        className="dashicon dashicons-editor-textcolor"
+-        focusable="false"
+-        height={20}
+-        role="img"
+-        viewBox="0 0 20 20"
+-        width={20}
+-        xmlns="http://www.w3.org/2000/svg"
++      <span
++        className="components-range-control__root emotion-20 emotion-21"
+       >
+-        <path
+-          d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z"
++        <span
++          className="emotion-0 emotion-1"
++        >
++          <svg
++            aria-hidden="true"
++            className="dashicon dashicons-editor-textcolor"
++            focusable="false"
++            height={20}
++            role="img"
++            viewBox="0 0 20 20"
++            width={20}
++            xmlns="http://www.w3.org/2000/svg"
++          >
++            <path
++              d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z"
++            />
++          </svg>
++        </span>
++        <span
++          className="components-range-control__wrapper emotion-14 emotion-15"
++          color="#00669b"
++        >
++          <input
++            aria-hidden={false}
++            aria-label="Custom Size"
++            className="components-range-control__slider emotion-2 emotion-3"
++            disabled={false}
++            id="inspector-range-control-0"
++            max={100}
++            min={12}
++            onBlur={[Function]}
++            onChange={[Function]}
++            onFocus={[Function]}
++            onMouseEnter={[Function]}
++            onMouseLeave={[Function]}
++            step={1}
++            tabIndex={0}
++            type="range"
++            value={16}
++          />
++          <span
++            aria-hidden={true}
++            className="emotion-4 emotion-5"
++          />
++          <span
++            aria-hidden={true}
++            className="components-range-control__track emotion-6 emotion-7"
++            style={
++              Object {
++                "width": "4.545454545454546%",
++              }
++            }
++          />
++          <span
++            className="emotion-10 emotion-11"
++            style={
++              Object {
++                "left": "4.545454545454546%",
++              }
++            }
++          >
++            <span
++              aria-hidden={true}
++              className="emotion-8 emotion-9"
++            />
++          </span>
++          <span
++            aria-hidden={false}
++            className="components-simple-tooltip components-range-control__tooltip emotion-12 emotion-13"
++            onMouseEnter={[Function]}
++            onMouseLeave={[Function]}
++            role="tooltip"
++            style={
++              Object {
++                "left": "4.545454545454546%",
++                "zIndex": 100,
++              }
++            }
++          >
++            16
++          </span>
++        </span>
++        <span
++          className="emotion-16 emotion-17"
++        >
++          <svg
++            aria-hidden="true"
++            className="dashicon dashicons-editor-textcolor"
++            focusable="false"
++            height={20}
++            role="img"
++            viewBox="0 0 20 20"
++            width={20}
++            xmlns="http://www.w3.org/2000/svg"
++          >
++            <path
++              d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z"
++            />
++          </svg>
++        </span>
++        <input
++          aria-label="Custom Size"
++          className="components-range-control__number emotion-18 emotion-153"
++          inputMode="decimal"
++          max={100}
++          min={12}
++          onChange={[Function]}
++          step={1}
++          type="number"
++          value={16}
+         />
+-      </svg>
+-      <input
+-        aria-label="Custom Size"
+-        className="components-range-control__number"
+-        max={100}
+-        min={12}
+-        onBlur={[Function]}
+-        onChange={[Function]}
+-        type="number"
+-        value={16}
+-      />
++      </span>
+     </div>
+   </div>
+ </fieldset>
+@@ -4454,75 +4724,1174 @@ exports[`Storyshots Components/RadioControl With Help 1`] = `
+ </div>
+ `;
+ 
+-exports[`Storyshots Components/RangeControl Default 1`] = `
+-<div
+-  className="components-base-control components-range-control"
+->
+-  <div
+-    className="components-base-control__field"
+-  >
+-    <label
+-      className="components-base-control__label"
+-      htmlFor="inspector-range-control-1"
+-    >
+-      How many columns should this use?
+-    </label>
+-    <input
+-      className="components-range-control__slider"
+-      id="inspector-range-control-1"
+-      onChange={[Function]}
+-      type="range"
+-      value={5}
+-    />
+-    <input
+-      aria-label="How many columns should this use?"
+-      className="components-range-control__number"
+-      onBlur={[Function]}
+-      onChange={[Function]}
+-      type="number"
+-      value={5}
+-    />
+-  </div>
+-</div>
+-`;
++exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
++.emotion-38 {
++  -webkit-tap-highlight-color: transparent;
++  box-sizing: border-box;
++  cursor: pointer;
++  -webkit-align-items: flex-start;
++  -webkit-box-align: flex-start;
++  -ms-flex-align: flex-start;
++  align-items: flex-start;
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-box-pack: start;
++  -webkit-justify-content: flex-start;
++  -ms-flex-pack: start;
++  justify-content: flex-start;
++  padding: 0;
++  position: relative;
++  touch-action: none;
++  width: 100%;
++}
++
++.emotion-0 {
++  box-sizing: border-box;
++  cursor: pointer;
++  display: block;
++  height: 100%;
++  left: 0;
++  margin: 0;
++  opacity: 0;
++  outline: none;
++  position: absolute;
++  right: 0;
++  top: 0;
++  width: 100%;
++}
++
++.emotion-2 {
++  background-color: #d7dade;
++  box-sizing: border-box;
++  left: 0;
++  pointer-events: none;
++  right: 0;
++  display: block;
++  height: 3px;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-26 {
++  background-color: currentColor;
++  border-radius: 1px;
++  box-sizing: border-box;
++  height: 3px;
++  pointer-events: none;
++  display: block;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-30 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  height: 20px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++  margin-top: 5px;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  top: 0;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 20px;
++  margin-left: -10px;
++}
++
++.emotion-28 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  background-color: white;
++  border-radius: 50%;
++  border: 1px solid #7e8993;
++  box-sizing: border-box;
++  height: 100%;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 100%;
++  border-color: #7e8993;
++  box-shadow: 0 0 0 rgba(0,0,0,0);
++}
++
++.emotion-32 {
++  background: #23282d;
++  border-radius: 3px;
++  box-sizing: border-box;
++  color: white;
++  display: inline-block;
++  font-size: 11px;
++  min-width: 32px;
++  opacity: 0;
++  padding: 8px;
++  position: absolute;
++  text-align: center;
++  -webkit-transition: opacity 120ms ease;
++  transition: opacity 120ms ease;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  opacity: 0;
++  margin-top: -4px;
++  top: -100%;
++  -webkit-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++}
++
++.emotion-32::after {
++  border: 6px solid #23282d;
++  border-left-color: transparent;
++  border-right-color: transparent;
++  bottom: -6px;
++  box-sizing: border-box;
++  content: '';
++  height: 0;
++  left: 50%;
++  line-height: 0;
++  margin-left: -6px;
++  position: absolute;
++  width: 0;
++}
++
++.emotion-32::after {
++  border-bottom: none;
++  border-top-style: solid;
++  bottom: -6px;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-32 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-36 {
++  box-sizing: border-box;
++  display: inline-block;
++  margin-top: 0;
++  min-width: 54px;
++  max-width: 120px;
++  margin-left: 16px;
++}
++
++input[type='number'].emotion-36 {
++  height: 30px;
++  min-height: 30px;
++}
++
++.emotion-40 {
++  padding: 60px 40px;
++}
++
++.emotion-34 {
++  box-sizing: border-box;
++  color: #007cba;
++  display: block;
++  padding-top: 15px;
++  position: relative;
++  width: 100%;
++  height: 30px;
++  min-height: 30px;
++  margin-bottom: 16px;
++  margin-left: 10px;
++}
++
++.emotion-24 {
++  box-sizing: border-box;
++  display: block;
++  position: relative;
++  width: 100%;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++}
++
++.emotion-4 {
++  box-sizing: border-box;
++  height: 9px;
++  left: 0;
++  position: absolute;
++  top: -4px;
++  width: 1px;
++  background-color: currentColor;
++}
++
++.emotion-6 {
++  box-sizing: border-box;
++  color: #d7dade;
++  left: 0;
++  font-size: 11px;
++  position: absolute;
++  top: 12px;
++  -webkit-transform: translateX( -50% );
++  -ms-transform: translateX( -50% );
++  transform: translateX( -50% );
++  white-space: nowrap;
++  color: #6c7781;
++}
++
++.emotion-8 {
++  box-sizing: border-box;
++  height: 9px;
++  left: 0;
++  position: absolute;
++  top: -4px;
++  width: 1px;
++  background-color: #d7dade;
++}
++
++.emotion-10 {
++  box-sizing: border-box;
++  color: #d7dade;
++  left: 0;
++  font-size: 11px;
++  position: absolute;
++  top: 12px;
++  -webkit-transform: translateX( -50% );
++  -ms-transform: translateX( -50% );
++  transform: translateX( -50% );
++  white-space: nowrap;
++  color: #d7dade;
++}
+ 
+-exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
+ <div
+-  className="components-base-control components-range-control"
++  className="emotion-40 emotion-41"
+ >
+   <div
+-    className="components-base-control__field"
++    className="components-base-control components-range-control"
+   >
+-    <label
+-      className="components-base-control__label"
+-      htmlFor="inspector-range-control-2"
++    <div
++      className="components-base-control__field"
+     >
+-      How many columns should this use?
+-    </label>
+-    <input
+-      className="components-range-control__slider"
+-      id="inspector-range-control-2"
+-      max={20}
+-      min={0}
+-      onChange={[Function]}
+-      type="range"
+-      value={0}
+-    />
+-    <input
+-      aria-label="How many columns should this use?"
+-      className="components-range-control__number"
+-      max={20}
+-      min={0}
+-      onBlur={[Function]}
+-      onChange={[Function]}
+-      type="number"
+-      value={null}
+-    />
++      <span
++        className="components-range-control__root emotion-38 emotion-39"
++      >
++        <span
++          className="components-range-control__wrapper is-marked emotion-34 emotion-35"
++          color="#00669b"
++        >
++          <input
++            aria-hidden={false}
++            className="components-range-control__slider emotion-0 emotion-1"
++            disabled={false}
++            id="inspector-range-control-8"
++            max={10}
++            min={0}
++            onBlur={[Function]}
++            onChange={[Function]}
++            onFocus={[Function]}
++            onMouseEnter={[Function]}
++            onMouseLeave={[Function]}
++            step={1}
++            tabIndex={0}
++            type="range"
++            value={0}
++          />
++          <span
++            aria-hidden={true}
++            className="emotion-2 emotion-3"
++          />
++          <span
++            aria-hidden="true"
++            className="components-range-control__marks emotion-24 emotion-25"
++          >
++            <span
++              aria-hidden="true"
++              className="components-range-control__mark is-filled emotion-4 emotion-5"
++              style={
++                Object {
++                  "left": "0%",
++                }
++              }
++              value={0}
++            />
++            <span
++              aria-hidden="true"
++              className="components-range-control__mark-label is-filled emotion-6 emotion-7"
++              style={
++                Object {
++                  "left": "0%",
++                }
++              }
++            >
++              0
++            </span>
++            <span
++              aria-hidden="true"
++              className="components-range-control__mark emotion-8 emotion-5"
++              style={
++                Object {
++                  "left": "10%",
++                }
++              }
++              value={1}
++            />
++            <span
++              aria-hidden="true"
++              className="components-range-control__mark-label emotion-10 emotion-7"
++              style={
++                Object {
++                  "left": "10%",
++                }
++              }
++            >
++              1
++            </span>
++            <span
++              aria-hidden="true"
++              className="components-range-control__mark emotion-8 emotion-5"
++              style={
++                Object {
++                  "left": "20%",
++                }
++              }
++              value={2}
++            />
++            <span
++              aria-hidden="true"
++              className="components-range-control__mark-label emotion-10 emotion-7"
++              style={
++                Object {
++                  "left": "20%",
++                }
++              }
++            >
++              2
++            </span>
++            <span
++              aria-hidden="true"
++              className="components-range-control__mark emotion-8 emotion-5"
++              style={
++                Object {
++                  "left": "80%",
++                }
++              }
++              value={8}
++            />
++            <span
++              aria-hidden="true"
++              className="components-range-control__mark-label emotion-10 emotion-7"
++              style={
++                Object {
++                  "left": "80%",
++                }
++              }
++            >
++              8
++            </span>
++            <span
++              aria-hidden="true"
++              className="components-range-control__mark emotion-8 emotion-5"
++              style={
++                Object {
++                  "left": "100%",
++                }
++              }
++              value={10}
++            />
++            <span
++              aria-hidden="true"
++              className="components-range-control__mark-label emotion-10 emotion-7"
++              style={
++                Object {
++                  "left": "100%",
++                }
++              }
++            >
++              10
++            </span>
++          </span>
++          <span
++            aria-hidden={true}
++            className="components-range-control__track emotion-26 emotion-27"
++            style={
++              Object {
++                "width": "0%",
++              }
++            }
++          />
++          <span
++            className="emotion-30 emotion-31"
++            style={
++              Object {
++                "left": "0%",
++              }
++            }
++          >
++            <span
++              aria-hidden={true}
++              className="emotion-28 emotion-29"
++            />
++          </span>
++          <span
++            aria-hidden={false}
++            className="components-simple-tooltip components-range-control__tooltip emotion-32 emotion-33"
++            onMouseEnter={[Function]}
++            onMouseLeave={[Function]}
++            role="tooltip"
++            style={
++              Object {
++                "left": "0%",
++                "zIndex": 100,
++              }
++            }
++          >
++            0
++          </span>
++        </span>
++        <input
++          className="components-range-control__number emotion-36 emotion-353"
++          inputMode="decimal"
++          max={10}
++          min={0}
++          onChange={[Function]}
++          step={1}
++          type="number"
++          value={0}
++        />
++      </span>
++    </div>
++  </div>
++</div>
++`;
++
++exports[`Storyshots Components/RangeControl Default 1`] = `
++.emotion-14 {
++  -webkit-tap-highlight-color: transparent;
++  box-sizing: border-box;
++  cursor: pointer;
++  -webkit-align-items: flex-start;
++  -webkit-box-align: flex-start;
++  -ms-flex-align: flex-start;
++  align-items: flex-start;
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-box-pack: start;
++  -webkit-justify-content: flex-start;
++  -ms-flex-pack: start;
++  justify-content: flex-start;
++  padding: 0;
++  position: relative;
++  touch-action: none;
++  width: 100%;
++}
++
++.emotion-10 {
++  box-sizing: border-box;
++  color: #007cba;
++  display: block;
++  padding-top: 15px;
++  position: relative;
++  width: 100%;
++  height: 30px;
++  min-height: 30px;
++  margin-left: 10px;
++}
++
++.emotion-0 {
++  box-sizing: border-box;
++  cursor: pointer;
++  display: block;
++  height: 100%;
++  left: 0;
++  margin: 0;
++  opacity: 0;
++  outline: none;
++  position: absolute;
++  right: 0;
++  top: 0;
++  width: 100%;
++}
++
++.emotion-2 {
++  background-color: #d7dade;
++  box-sizing: border-box;
++  left: 0;
++  pointer-events: none;
++  right: 0;
++  display: block;
++  height: 3px;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-4 {
++  background-color: currentColor;
++  border-radius: 1px;
++  box-sizing: border-box;
++  height: 3px;
++  pointer-events: none;
++  display: block;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-8 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  height: 20px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++  margin-top: 5px;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  top: 0;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 20px;
++  margin-left: -10px;
++}
++
++.emotion-6 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  background-color: white;
++  border-radius: 50%;
++  border: 1px solid #7e8993;
++  box-sizing: border-box;
++  height: 100%;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 100%;
++  border-color: #7e8993;
++  box-shadow: 0 0 0 rgba(0,0,0,0);
++}
++
++.emotion-12 {
++  box-sizing: border-box;
++  display: inline-block;
++  margin-top: 0;
++  min-width: 54px;
++  max-width: 120px;
++  margin-left: 16px;
++}
++
++input[type='number'].emotion-12 {
++  height: 30px;
++  min-height: 30px;
++}
++
++.emotion-16 {
++  padding: 60px 40px;
++}
++
++<div
++  className="emotion-16 emotion-17"
++>
++  <div
++    className="components-base-control components-range-control"
++  >
++    <div
++      className="components-base-control__field"
++    >
++      <label
++        className="components-base-control__label"
++        htmlFor="inspector-range-control-1"
++      >
++        Range Label
++      </label>
++      <span
++        className="components-range-control__root emotion-14 emotion-15"
++      >
++        
++        <span
++          className="components-range-control__wrapper emotion-10 emotion-11"
++          color="#00669b"
++        >
++          <input
++            aria-hidden={false}
++            aria-label="Range Label"
++            className="components-range-control__slider emotion-0 emotion-1"
++            disabled={false}
++            id="inspector-range-control-1"
++            max={10}
++            min={0}
++            onBlur={[Function]}
++            onChange={[Function]}
++            onFocus={[Function]}
++            onMouseEnter={[Function]}
++            onMouseLeave={[Function]}
++            step={1}
++            tabIndex={0}
++            type="range"
++            value={0}
++          />
++          <span
++            aria-hidden={true}
++            className="emotion-2 emotion-3"
++          />
++          <span
++            aria-hidden={true}
++            className="components-range-control__track emotion-4 emotion-5"
++            style={
++              Object {
++                "width": "0%",
++              }
++            }
++          />
++          <span
++            className="emotion-8 emotion-9"
++            style={
++              Object {
++                "left": "0%",
++              }
++            }
++          >
++            <span
++              aria-hidden={true}
++              className="emotion-6 emotion-7"
++            />
++          </span>
++        </span>
++        
++        <input
++          aria-label="Range Label"
++          className="components-range-control__number emotion-12 emotion-113"
++          inputMode="decimal"
++          max={10}
++          min={0}
++          onChange={[Function]}
++          step={1}
++          type="number"
++          value={0}
++        />
++      </span>
++    </div>
++  </div>
++</div>
++`;
++
++exports[`Storyshots Components/RangeControl Initial Value Zero 1`] = `
++.emotion-16 {
++  -webkit-tap-highlight-color: transparent;
++  box-sizing: border-box;
++  cursor: pointer;
++  -webkit-align-items: flex-start;
++  -webkit-box-align: flex-start;
++  -ms-flex-align: flex-start;
++  align-items: flex-start;
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-box-pack: start;
++  -webkit-justify-content: flex-start;
++  -ms-flex-pack: start;
++  justify-content: flex-start;
++  padding: 0;
++  position: relative;
++  touch-action: none;
++  width: 100%;
++}
++
++.emotion-12 {
++  box-sizing: border-box;
++  color: #007cba;
++  display: block;
++  padding-top: 15px;
++  position: relative;
++  width: 100%;
++  height: 30px;
++  min-height: 30px;
++  margin-left: 10px;
++}
++
++.emotion-0 {
++  box-sizing: border-box;
++  cursor: pointer;
++  display: block;
++  height: 100%;
++  left: 0;
++  margin: 0;
++  opacity: 0;
++  outline: none;
++  position: absolute;
++  right: 0;
++  top: 0;
++  width: 100%;
++}
++
++.emotion-2 {
++  background-color: #d7dade;
++  box-sizing: border-box;
++  left: 0;
++  pointer-events: none;
++  right: 0;
++  display: block;
++  height: 3px;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-4 {
++  background-color: currentColor;
++  border-radius: 1px;
++  box-sizing: border-box;
++  height: 3px;
++  pointer-events: none;
++  display: block;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-8 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  height: 20px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++  margin-top: 5px;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  top: 0;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 20px;
++  margin-left: -10px;
++}
++
++.emotion-6 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  background-color: white;
++  border-radius: 50%;
++  border: 1px solid #7e8993;
++  box-sizing: border-box;
++  height: 100%;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 100%;
++  border-color: #7e8993;
++  box-shadow: 0 0 0 rgba(0,0,0,0);
++}
++
++.emotion-10 {
++  background: #23282d;
++  border-radius: 3px;
++  box-sizing: border-box;
++  color: white;
++  display: inline-block;
++  font-size: 11px;
++  min-width: 32px;
++  opacity: 0;
++  padding: 8px;
++  position: absolute;
++  text-align: center;
++  -webkit-transition: opacity 120ms ease;
++  transition: opacity 120ms ease;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  opacity: 0;
++  margin-top: -4px;
++  top: -100%;
++  -webkit-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++}
++
++.emotion-10::after {
++  border: 6px solid #23282d;
++  border-left-color: transparent;
++  border-right-color: transparent;
++  bottom: -6px;
++  box-sizing: border-box;
++  content: '';
++  height: 0;
++  left: 50%;
++  line-height: 0;
++  margin-left: -6px;
++  position: absolute;
++  width: 0;
++}
++
++.emotion-10::after {
++  border-bottom: none;
++  border-top-style: solid;
++  bottom: -6px;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-10 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-14 {
++  box-sizing: border-box;
++  display: inline-block;
++  margin-top: 0;
++  min-width: 54px;
++  max-width: 120px;
++  margin-left: 16px;
++}
++
++input[type='number'].emotion-14 {
++  height: 30px;
++  min-height: 30px;
++}
++
++<div
++  className="components-base-control components-range-control"
++>
++  <div
++    className="components-base-control__field"
++  >
++    <label
++      className="components-base-control__label"
++      htmlFor="inspector-range-control-2"
++    >
++      How many columns should this use?
++    </label>
++    <span
++      className="components-range-control__root emotion-16 emotion-17"
++    >
++      <span
++        className="components-range-control__wrapper emotion-12 emotion-13"
++        color="#00669b"
++      >
++        <input
++          aria-hidden={false}
++          aria-label="How many columns should this use?"
++          className="components-range-control__slider emotion-0 emotion-1"
++          disabled={false}
++          id="inspector-range-control-2"
++          max={20}
++          min={0}
++          onBlur={[Function]}
++          onChange={[Function]}
++          onFocus={[Function]}
++          onMouseEnter={[Function]}
++          onMouseLeave={[Function]}
++          step={1}
++          tabIndex={0}
++          type="range"
++          value={0}
++        />
++        <span
++          aria-hidden={true}
++          className="emotion-2 emotion-3"
++        />
++        <span
++          aria-hidden={true}
++          className="components-range-control__track emotion-4 emotion-5"
++          style={
++            Object {
++              "width": "0%",
++            }
++          }
++        />
++        <span
++          className="emotion-8 emotion-9"
++          style={
++            Object {
++              "left": "0%",
++            }
++          }
++        >
++          <span
++            aria-hidden={true}
++            className="emotion-6 emotion-7"
++          />
++        </span>
++        <span
++          aria-hidden={false}
++          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
++          onMouseEnter={[Function]}
++          onMouseLeave={[Function]}
++          role="tooltip"
++          style={
++            Object {
++              "left": "0%",
++              "zIndex": 100,
++            }
++          }
++        >
++          0
++        </span>
++      </span>
++      <input
++        aria-label="How many columns should this use?"
++        className="components-range-control__number emotion-14 emotion-133"
++        inputMode="decimal"
++        max={20}
++        min={0}
++        onChange={[Function]}
++        step={1}
++        type="number"
++        value={0}
++      />
++    </span>
+   </div>
+ </div>
+ `;
+ 
+ exports[`Storyshots Components/RangeControl With Help 1`] = `
++.emotion-16 {
++  -webkit-tap-highlight-color: transparent;
++  box-sizing: border-box;
++  cursor: pointer;
++  -webkit-align-items: flex-start;
++  -webkit-box-align: flex-start;
++  -ms-flex-align: flex-start;
++  align-items: flex-start;
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-box-pack: start;
++  -webkit-justify-content: flex-start;
++  -ms-flex-pack: start;
++  justify-content: flex-start;
++  padding: 0;
++  position: relative;
++  touch-action: none;
++  width: 100%;
++}
++
++.emotion-12 {
++  box-sizing: border-box;
++  color: #007cba;
++  display: block;
++  padding-top: 15px;
++  position: relative;
++  width: 100%;
++  height: 30px;
++  min-height: 30px;
++  margin-left: 10px;
++}
++
++.emotion-0 {
++  box-sizing: border-box;
++  cursor: pointer;
++  display: block;
++  height: 100%;
++  left: 0;
++  margin: 0;
++  opacity: 0;
++  outline: none;
++  position: absolute;
++  right: 0;
++  top: 0;
++  width: 100%;
++}
++
++.emotion-2 {
++  background-color: #d7dade;
++  box-sizing: border-box;
++  left: 0;
++  pointer-events: none;
++  right: 0;
++  display: block;
++  height: 3px;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-4 {
++  background-color: currentColor;
++  border-radius: 1px;
++  box-sizing: border-box;
++  height: 3px;
++  pointer-events: none;
++  display: block;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-8 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  height: 20px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++  margin-top: 5px;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  top: 0;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 20px;
++  margin-left: -10px;
++}
++
++.emotion-6 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  background-color: white;
++  border-radius: 50%;
++  border: 1px solid #7e8993;
++  box-sizing: border-box;
++  height: 100%;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 100%;
++  border-color: #7e8993;
++  box-shadow: 0 0 0 rgba(0,0,0,0);
++}
++
++.emotion-10 {
++  background: #23282d;
++  border-radius: 3px;
++  box-sizing: border-box;
++  color: white;
++  display: inline-block;
++  font-size: 11px;
++  min-width: 32px;
++  opacity: 0;
++  padding: 8px;
++  position: absolute;
++  text-align: center;
++  -webkit-transition: opacity 120ms ease;
++  transition: opacity 120ms ease;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  opacity: 0;
++  margin-top: -4px;
++  top: -100%;
++  -webkit-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++}
++
++.emotion-10::after {
++  border: 6px solid #23282d;
++  border-left-color: transparent;
++  border-right-color: transparent;
++  bottom: -6px;
++  box-sizing: border-box;
++  content: '';
++  height: 0;
++  left: 50%;
++  line-height: 0;
++  margin-left: -6px;
++  position: absolute;
++  width: 0;
++}
++
++.emotion-10::after {
++  border-bottom: none;
++  border-top-style: solid;
++  bottom: -6px;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-10 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-14 {
++  box-sizing: border-box;
++  display: inline-block;
++  margin-top: 0;
++  min-width: 54px;
++  max-width: 120px;
++  margin-left: 16px;
++}
++
++input[type='number'].emotion-14 {
++  height: 30px;
++  min-height: 30px;
++}
++
+ <div
+   className="components-base-control components-range-control"
+ >
+@@ -4535,22 +5904,86 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
+     >
+       How many columns should this use?
+     </label>
+-    <input
+-      aria-describedby="inspector-range-control-3__help"
+-      className="components-range-control__slider"
+-      id="inspector-range-control-3"
+-      onChange={[Function]}
+-      type="range"
+-      value={5}
+-    />
+-    <input
+-      aria-label="How many columns should this use?"
+-      className="components-range-control__number"
+-      onBlur={[Function]}
+-      onChange={[Function]}
+-      type="number"
+-      value={5}
+-    />
++    <span
++      className="components-range-control__root emotion-16 emotion-17"
++    >
++      <span
++        className="components-range-control__wrapper emotion-12 emotion-13"
++        color="#00669b"
++      >
++        <input
++          aria-describedby="inspector-range-control-3__help"
++          aria-hidden={false}
++          aria-label="How many columns should this use?"
++          className="components-range-control__slider emotion-0 emotion-1"
++          disabled={false}
++          id="inspector-range-control-3"
++          max={100}
++          min={0}
++          onBlur={[Function]}
++          onChange={[Function]}
++          onFocus={[Function]}
++          onMouseEnter={[Function]}
++          onMouseLeave={[Function]}
++          step={1}
++          tabIndex={0}
++          type="range"
++          value={5}
++        />
++        <span
++          aria-hidden={true}
++          className="emotion-2 emotion-3"
++        />
++        <span
++          aria-hidden={true}
++          className="components-range-control__track emotion-4 emotion-5"
++          style={
++            Object {
++              "width": "5%",
++            }
++          }
++        />
++        <span
++          className="emotion-8 emotion-9"
++          style={
++            Object {
++              "left": "5%",
++            }
++          }
++        >
++          <span
++            aria-hidden={true}
++            className="emotion-6 emotion-7"
++          />
++        </span>
++        <span
++          aria-hidden={false}
++          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
++          onMouseEnter={[Function]}
++          onMouseLeave={[Function]}
++          role="tooltip"
++          style={
++            Object {
++              "left": "5%",
++              "zIndex": 100,
++            }
++          }
++        >
++          5
++        </span>
++      </span>
++      <input
++        aria-label="How many columns should this use?"
++        className="components-range-control__number emotion-14 emotion-133"
++        inputMode="decimal"
++        max={100}
++        min={0}
++        onChange={[Function]}
++        step={1}
++        type="number"
++        value={5}
++      />
++    </span>
+   </div>
+   <p
+     className="components-base-control__help"
+@@ -4562,6 +5995,203 @@ exports[`Storyshots Components/RangeControl With Help 1`] = `
+ `;
+ 
+ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
++.emotion-18 {
++  -webkit-tap-highlight-color: transparent;
++  box-sizing: border-box;
++  cursor: pointer;
++  -webkit-align-items: flex-start;
++  -webkit-box-align: flex-start;
++  -ms-flex-align: flex-start;
++  align-items: flex-start;
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-box-pack: start;
++  -webkit-justify-content: flex-start;
++  -ms-flex-pack: start;
++  justify-content: flex-start;
++  padding: 0;
++  position: relative;
++  touch-action: none;
++  width: 100%;
++}
++
++.emotion-12 {
++  box-sizing: border-box;
++  color: #007cba;
++  display: block;
++  padding-top: 15px;
++  position: relative;
++  width: 100%;
++  height: 30px;
++  min-height: 30px;
++  margin-left: 10px;
++}
++
++.emotion-0 {
++  box-sizing: border-box;
++  cursor: pointer;
++  display: block;
++  height: 100%;
++  left: 0;
++  margin: 0;
++  opacity: 0;
++  outline: none;
++  position: absolute;
++  right: 0;
++  top: 0;
++  width: 100%;
++}
++
++.emotion-2 {
++  background-color: #d7dade;
++  box-sizing: border-box;
++  left: 0;
++  pointer-events: none;
++  right: 0;
++  display: block;
++  height: 3px;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-4 {
++  background-color: currentColor;
++  border-radius: 1px;
++  box-sizing: border-box;
++  height: 3px;
++  pointer-events: none;
++  display: block;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-8 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  height: 20px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++  margin-top: 5px;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  top: 0;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 20px;
++  margin-left: -10px;
++}
++
++.emotion-6 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  background-color: white;
++  border-radius: 50%;
++  border: 1px solid #7e8993;
++  box-sizing: border-box;
++  height: 100%;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 100%;
++  border-color: #7e8993;
++  box-shadow: 0 0 0 rgba(0,0,0,0);
++}
++
++.emotion-10 {
++  background: #23282d;
++  border-radius: 3px;
++  box-sizing: border-box;
++  color: white;
++  display: inline-block;
++  font-size: 11px;
++  min-width: 32px;
++  opacity: 0;
++  padding: 8px;
++  position: absolute;
++  text-align: center;
++  -webkit-transition: opacity 120ms ease;
++  transition: opacity 120ms ease;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  opacity: 0;
++  margin-top: -4px;
++  top: -100%;
++  -webkit-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++}
++
++.emotion-10::after {
++  border: 6px solid #23282d;
++  border-left-color: transparent;
++  border-right-color: transparent;
++  bottom: -6px;
++  box-sizing: border-box;
++  content: '';
++  height: 0;
++  left: 50%;
++  line-height: 0;
++  margin-left: -6px;
++  position: absolute;
++  width: 0;
++}
++
++.emotion-10::after {
++  border-bottom: none;
++  border-top-style: solid;
++  bottom: -6px;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-10 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-14 {
++  margin-top: 3px;
++  margin-left: 16px;
++}
++
++.emotion-16 {
++  box-sizing: border-box;
++  display: inline-block;
++  margin-top: 0;
++  min-width: 54px;
++  max-width: 120px;
++  margin-left: 16px;
++}
++
++input[type='number'].emotion-16 {
++  height: 30px;
++  min-height: 30px;
++}
++
+ <div
+   className="components-base-control components-range-control"
+ >
+@@ -4574,40 +6204,305 @@ exports[`Storyshots Components/RangeControl With Icon After 1`] = `
+     >
+       How many columns should this use?
+     </label>
+-    <input
+-      className="components-range-control__slider"
+-      id="inspector-range-control-6"
+-      onChange={[Function]}
+-      type="range"
+-      value={5}
+-    />
+-    <svg
+-      aria-hidden="true"
+-      className="dashicon dashicons-wordpress"
+-      focusable="false"
+-      height={20}
+-      role="img"
+-      viewBox="0 0 20 20"
+-      width={20}
+-      xmlns="http://www.w3.org/2000/svg"
++    <span
++      className="components-range-control__root emotion-18 emotion-19"
+     >
+-      <path
+-        d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
++      <span
++        className="components-range-control__wrapper emotion-12 emotion-13"
++        color="#00669b"
++      >
++        <input
++          aria-hidden={false}
++          aria-label="How many columns should this use?"
++          className="components-range-control__slider emotion-0 emotion-1"
++          disabled={false}
++          id="inspector-range-control-6"
++          max={100}
++          min={0}
++          onBlur={[Function]}
++          onChange={[Function]}
++          onFocus={[Function]}
++          onMouseEnter={[Function]}
++          onMouseLeave={[Function]}
++          step={1}
++          tabIndex={0}
++          type="range"
++          value={5}
++        />
++        <span
++          aria-hidden={true}
++          className="emotion-2 emotion-3"
++        />
++        <span
++          aria-hidden={true}
++          className="components-range-control__track emotion-4 emotion-5"
++          style={
++            Object {
++              "width": "5%",
++            }
++          }
++        />
++        <span
++          className="emotion-8 emotion-9"
++          style={
++            Object {
++              "left": "5%",
++            }
++          }
++        >
++          <span
++            aria-hidden={true}
++            className="emotion-6 emotion-7"
++          />
++        </span>
++        <span
++          aria-hidden={false}
++          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
++          onMouseEnter={[Function]}
++          onMouseLeave={[Function]}
++          role="tooltip"
++          style={
++            Object {
++              "left": "5%",
++              "zIndex": 100,
++            }
++          }
++        >
++          5
++        </span>
++      </span>
++      <span
++        className="emotion-14 emotion-15"
++      >
++        <svg
++          aria-hidden="true"
++          className="dashicon dashicons-wordpress"
++          focusable="false"
++          height={20}
++          role="img"
++          viewBox="0 0 20 20"
++          width={20}
++          xmlns="http://www.w3.org/2000/svg"
++        >
++          <path
++            d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
++          />
++        </svg>
++      </span>
++      <input
++        aria-label="How many columns should this use?"
++        className="components-range-control__number emotion-16 emotion-133"
++        inputMode="decimal"
++        max={100}
++        min={0}
++        onChange={[Function]}
++        step={1}
++        type="number"
++        value={5}
+       />
+-    </svg>
+-    <input
+-      aria-label="How many columns should this use?"
+-      className="components-range-control__number"
+-      onBlur={[Function]}
+-      onChange={[Function]}
+-      type="number"
+-      value={5}
+-    />
++    </span>
+   </div>
+ </div>
+ `;
+ 
+ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
++.emotion-18 {
++  -webkit-tap-highlight-color: transparent;
++  box-sizing: border-box;
++  cursor: pointer;
++  -webkit-align-items: flex-start;
++  -webkit-box-align: flex-start;
++  -ms-flex-align: flex-start;
++  align-items: flex-start;
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-box-pack: start;
++  -webkit-justify-content: flex-start;
++  -ms-flex-pack: start;
++  justify-content: flex-start;
++  padding: 0;
++  position: relative;
++  touch-action: none;
++  width: 100%;
++}
++
++.emotion-0 {
++  margin-top: 3px;
++  margin-right: 6px;
++}
++
++.emotion-14 {
++  box-sizing: border-box;
++  color: #007cba;
++  display: block;
++  padding-top: 15px;
++  position: relative;
++  width: 100%;
++  height: 30px;
++  min-height: 30px;
++  margin-left: 10px;
++}
++
++.emotion-2 {
++  box-sizing: border-box;
++  cursor: pointer;
++  display: block;
++  height: 100%;
++  left: 0;
++  margin: 0;
++  opacity: 0;
++  outline: none;
++  position: absolute;
++  right: 0;
++  top: 0;
++  width: 100%;
++}
++
++.emotion-4 {
++  background-color: #d7dade;
++  box-sizing: border-box;
++  left: 0;
++  pointer-events: none;
++  right: 0;
++  display: block;
++  height: 3px;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-6 {
++  background-color: currentColor;
++  border-radius: 1px;
++  box-sizing: border-box;
++  height: 3px;
++  pointer-events: none;
++  display: block;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-10 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  height: 20px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++  margin-top: 5px;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  top: 0;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 20px;
++  margin-left: -10px;
++}
++
++.emotion-8 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  background-color: white;
++  border-radius: 50%;
++  border: 1px solid #7e8993;
++  box-sizing: border-box;
++  height: 100%;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 100%;
++  border-color: #7e8993;
++  box-shadow: 0 0 0 rgba(0,0,0,0);
++}
++
++.emotion-12 {
++  background: #23282d;
++  border-radius: 3px;
++  box-sizing: border-box;
++  color: white;
++  display: inline-block;
++  font-size: 11px;
++  min-width: 32px;
++  opacity: 0;
++  padding: 8px;
++  position: absolute;
++  text-align: center;
++  -webkit-transition: opacity 120ms ease;
++  transition: opacity 120ms ease;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  opacity: 0;
++  margin-top: -4px;
++  top: -100%;
++  -webkit-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++}
++
++.emotion-12::after {
++  border: 6px solid #23282d;
++  border-left-color: transparent;
++  border-right-color: transparent;
++  bottom: -6px;
++  box-sizing: border-box;
++  content: '';
++  height: 0;
++  left: 50%;
++  line-height: 0;
++  margin-left: -6px;
++  position: absolute;
++  width: 0;
++}
++
++.emotion-12::after {
++  border-bottom: none;
++  border-top-style: solid;
++  bottom: -6px;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-12 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-16 {
++  box-sizing: border-box;
++  display: inline-block;
++  margin-top: 0;
++  min-width: 54px;
++  max-width: 120px;
++  margin-left: 16px;
++}
++
++input[type='number'].emotion-16 {
++  height: 30px;
++  min-height: 30px;
++}
++
+ <div
+   className="components-base-control components-range-control"
+ >
+@@ -4620,40 +6515,300 @@ exports[`Storyshots Components/RangeControl With Icon Before 1`] = `
+     >
+       How many columns should this use?
+     </label>
+-    <svg
+-      aria-hidden="true"
+-      className="dashicon dashicons-wordpress"
+-      focusable="false"
+-      height={20}
+-      role="img"
+-      viewBox="0 0 20 20"
+-      width={20}
+-      xmlns="http://www.w3.org/2000/svg"
++    <span
++      className="components-range-control__root emotion-18 emotion-19"
+     >
+-      <path
+-        d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
++      <span
++        className="emotion-0 emotion-1"
++      >
++        <svg
++          aria-hidden="true"
++          className="dashicon dashicons-wordpress"
++          focusable="false"
++          height={20}
++          role="img"
++          viewBox="0 0 20 20"
++          width={20}
++          xmlns="http://www.w3.org/2000/svg"
++        >
++          <path
++            d="M20 10c0-5.52-4.48-10-10-10S0 4.48 0 10s4.48 10 10 10 10-4.48 10-10zM10 1.01c4.97 0 8.99 4.02 8.99 8.99s-4.02 8.99-8.99 8.99S1.01 14.97 1.01 10 5.03 1.01 10 1.01zM8.01 14.82L4.96 6.61c.49-.03 1.05-.08 1.05-.08.43-.05.38-1.01-.06-.99 0 0-1.29.1-2.13.1-.15 0-.33 0-.52-.01 1.44-2.17 3.9-3.6 6.7-3.6 2.09 0 3.99.79 5.41 2.09-.6-.08-1.45.35-1.45 1.42 0 .66.38 1.22.79 1.88.31.54.5 1.22.5 2.21 0 1.34-1.27 4.48-1.27 4.48l-2.71-7.5c.48-.03.75-.16.75-.16.43-.05.38-1.1-.05-1.08 0 0-1.3.11-2.14.11-.78 0-2.11-.11-2.11-.11-.43-.02-.48 1.06-.05 1.08l.84.08 1.12 3.04zm6.02 2.15L16.64 10s.67-1.69.39-3.81c.63 1.14.94 2.42.94 3.81 0 2.96-1.56 5.58-3.94 6.97zM2.68 6.77L6.5 17.25c-2.67-1.3-4.47-4.08-4.47-7.25 0-1.16.2-2.23.65-3.23zm7.45 4.53l2.29 6.25c-.75.27-1.57.42-2.42.42-.72 0-1.41-.11-2.06-.3z"
++          />
++        </svg>
++      </span>
++      <span
++        className="components-range-control__wrapper emotion-14 emotion-15"
++        color="#00669b"
++      >
++        <input
++          aria-hidden={false}
++          aria-label="How many columns should this use?"
++          className="components-range-control__slider emotion-2 emotion-3"
++          disabled={false}
++          id="inspector-range-control-5"
++          max={100}
++          min={0}
++          onBlur={[Function]}
++          onChange={[Function]}
++          onFocus={[Function]}
++          onMouseEnter={[Function]}
++          onMouseLeave={[Function]}
++          step={1}
++          tabIndex={0}
++          type="range"
++          value={5}
++        />
++        <span
++          aria-hidden={true}
++          className="emotion-4 emotion-5"
++        />
++        <span
++          aria-hidden={true}
++          className="components-range-control__track emotion-6 emotion-7"
++          style={
++            Object {
++              "width": "5%",
++            }
++          }
++        />
++        <span
++          className="emotion-10 emotion-11"
++          style={
++            Object {
++              "left": "5%",
++            }
++          }
++        >
++          <span
++            aria-hidden={true}
++            className="emotion-8 emotion-9"
++          />
++        </span>
++        <span
++          aria-hidden={false}
++          className="components-simple-tooltip components-range-control__tooltip emotion-12 emotion-13"
++          onMouseEnter={[Function]}
++          onMouseLeave={[Function]}
++          role="tooltip"
++          style={
++            Object {
++              "left": "5%",
++              "zIndex": 100,
++            }
++          }
++        >
++          5
++        </span>
++      </span>
++      <input
++        aria-label="How many columns should this use?"
++        className="components-range-control__number emotion-16 emotion-153"
++        inputMode="decimal"
++        max={100}
++        min={0}
++        onChange={[Function]}
++        step={1}
++        type="number"
++        value={5}
+       />
+-    </svg>
+-    <input
+-      className="components-range-control__slider"
+-      id="inspector-range-control-5"
+-      onChange={[Function]}
+-      type="range"
+-      value={5}
+-    />
+-    <input
+-      aria-label="How many columns should this use?"
+-      className="components-range-control__number"
+-      onBlur={[Function]}
+-      onChange={[Function]}
+-      type="number"
+-      value={5}
+-    />
++    </span>
+   </div>
+ </div>
+ `;
+ 
+ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`] = `
++.emotion-16 {
++  -webkit-tap-highlight-color: transparent;
++  box-sizing: border-box;
++  cursor: pointer;
++  -webkit-align-items: flex-start;
++  -webkit-box-align: flex-start;
++  -ms-flex-align: flex-start;
++  align-items: flex-start;
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-box-pack: start;
++  -webkit-justify-content: flex-start;
++  -ms-flex-pack: start;
++  justify-content: flex-start;
++  padding: 0;
++  position: relative;
++  touch-action: none;
++  width: 100%;
++}
++
++.emotion-12 {
++  box-sizing: border-box;
++  color: #007cba;
++  display: block;
++  padding-top: 15px;
++  position: relative;
++  width: 100%;
++  height: 30px;
++  min-height: 30px;
++  margin-left: 10px;
++}
++
++.emotion-0 {
++  box-sizing: border-box;
++  cursor: pointer;
++  display: block;
++  height: 100%;
++  left: 0;
++  margin: 0;
++  opacity: 0;
++  outline: none;
++  position: absolute;
++  right: 0;
++  top: 0;
++  width: 100%;
++}
++
++.emotion-2 {
++  background-color: #d7dade;
++  box-sizing: border-box;
++  left: 0;
++  pointer-events: none;
++  right: 0;
++  display: block;
++  height: 3px;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-4 {
++  background-color: currentColor;
++  border-radius: 1px;
++  box-sizing: border-box;
++  height: 3px;
++  pointer-events: none;
++  display: block;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-8 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  height: 20px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++  margin-top: 5px;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  top: 0;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 20px;
++  margin-left: -10px;
++}
++
++.emotion-6 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  background-color: white;
++  border-radius: 50%;
++  border: 1px solid #7e8993;
++  box-sizing: border-box;
++  height: 100%;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 100%;
++  border-color: #7e8993;
++  box-shadow: 0 0 0 rgba(0,0,0,0);
++}
++
++.emotion-10 {
++  background: #23282d;
++  border-radius: 3px;
++  box-sizing: border-box;
++  color: white;
++  display: inline-block;
++  font-size: 11px;
++  min-width: 32px;
++  opacity: 0;
++  padding: 8px;
++  position: absolute;
++  text-align: center;
++  -webkit-transition: opacity 120ms ease;
++  transition: opacity 120ms ease;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  opacity: 0;
++  margin-top: -4px;
++  top: -100%;
++  -webkit-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++}
++
++.emotion-10::after {
++  border: 6px solid #23282d;
++  border-left-color: transparent;
++  border-right-color: transparent;
++  bottom: -6px;
++  box-sizing: border-box;
++  content: '';
++  height: 0;
++  left: 50%;
++  line-height: 0;
++  margin-left: -6px;
++  position: absolute;
++  width: 0;
++}
++
++.emotion-10::after {
++  border-bottom: none;
++  border-top-style: solid;
++  bottom: -6px;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-10 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-14 {
++  box-sizing: border-box;
++  display: inline-block;
++  margin-top: 0;
++  min-width: 54px;
++  max-width: 120px;
++  margin-left: 16px;
++}
++
++input[type='number'].emotion-14 {
++  height: 30px;
++  min-height: 30px;
++}
++
+ <div
+   className="components-base-control components-range-control"
+ >
+@@ -4666,30 +6821,296 @@ exports[`Storyshots Components/RangeControl With Minimum And Maximum Limits 1`]
+     >
+       How many columns should this use?
+     </label>
+-    <input
+-      className="components-range-control__slider"
+-      id="inspector-range-control-4"
+-      max={10}
+-      min={2}
+-      onChange={[Function]}
+-      type="range"
+-      value={5}
+-    />
+-    <input
+-      aria-label="How many columns should this use?"
+-      className="components-range-control__number"
+-      max={10}
+-      min={2}
+-      onBlur={[Function]}
+-      onChange={[Function]}
+-      type="number"
+-      value={5}
+-    />
++    <span
++      className="components-range-control__root emotion-16 emotion-17"
++    >
++      <span
++        className="components-range-control__wrapper emotion-12 emotion-13"
++        color="#00669b"
++      >
++        <input
++          aria-hidden={false}
++          aria-label="How many columns should this use?"
++          className="components-range-control__slider emotion-0 emotion-1"
++          disabled={false}
++          id="inspector-range-control-4"
++          max={10}
++          min={2}
++          onBlur={[Function]}
++          onChange={[Function]}
++          onFocus={[Function]}
++          onMouseEnter={[Function]}
++          onMouseLeave={[Function]}
++          step={1}
++          tabIndex={0}
++          type="range"
++          value={5}
++        />
++        <span
++          aria-hidden={true}
++          className="emotion-2 emotion-3"
++        />
++        <span
++          aria-hidden={true}
++          className="components-range-control__track emotion-4 emotion-5"
++          style={
++            Object {
++              "width": "37.5%",
++            }
++          }
++        />
++        <span
++          className="emotion-8 emotion-9"
++          style={
++            Object {
++              "left": "37.5%",
++            }
++          }
++        >
++          <span
++            aria-hidden={true}
++            className="emotion-6 emotion-7"
++          />
++        </span>
++        <span
++          aria-hidden={false}
++          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
++          onMouseEnter={[Function]}
++          onMouseLeave={[Function]}
++          role="tooltip"
++          style={
++            Object {
++              "left": "37.5%",
++              "zIndex": 100,
++            }
++          }
++        >
++          5
++        </span>
++      </span>
++      <input
++        aria-label="How many columns should this use?"
++        className="components-range-control__number emotion-14 emotion-133"
++        inputMode="decimal"
++        max={10}
++        min={2}
++        onChange={[Function]}
++        step={1}
++        type="number"
++        value={5}
++      />
++    </span>
+   </div>
+ </div>
+ `;
+ 
+ exports[`Storyshots Components/RangeControl With Reset 1`] = `
++.emotion-18 {
++  -webkit-tap-highlight-color: transparent;
++  box-sizing: border-box;
++  cursor: pointer;
++  -webkit-align-items: flex-start;
++  -webkit-box-align: flex-start;
++  -ms-flex-align: flex-start;
++  align-items: flex-start;
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-box-pack: start;
++  -webkit-justify-content: flex-start;
++  -ms-flex-pack: start;
++  justify-content: flex-start;
++  padding: 0;
++  position: relative;
++  touch-action: none;
++  width: 100%;
++}
++
++.emotion-12 {
++  box-sizing: border-box;
++  color: #007cba;
++  display: block;
++  padding-top: 15px;
++  position: relative;
++  width: 100%;
++  height: 30px;
++  min-height: 30px;
++  margin-left: 10px;
++}
++
++.emotion-0 {
++  box-sizing: border-box;
++  cursor: pointer;
++  display: block;
++  height: 100%;
++  left: 0;
++  margin: 0;
++  opacity: 0;
++  outline: none;
++  position: absolute;
++  right: 0;
++  top: 0;
++  width: 100%;
++}
++
++.emotion-2 {
++  background-color: #d7dade;
++  box-sizing: border-box;
++  left: 0;
++  pointer-events: none;
++  right: 0;
++  display: block;
++  height: 3px;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-4 {
++  background-color: currentColor;
++  border-radius: 1px;
++  box-sizing: border-box;
++  height: 3px;
++  pointer-events: none;
++  display: block;
++  position: absolute;
++  margin-top: 14px;
++  top: 0;
++}
++
++.emotion-8 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  height: 20px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++  margin-top: 5px;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  top: 0;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 20px;
++  margin-left: -10px;
++}
++
++.emotion-6 {
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  background-color: white;
++  border-radius: 50%;
++  border: 1px solid #7e8993;
++  box-sizing: border-box;
++  height: 100%;
++  outline: 0;
++  pointer-events: none;
++  position: absolute;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  width: 100%;
++  border-color: #7e8993;
++  box-shadow: 0 0 0 rgba(0,0,0,0);
++}
++
++.emotion-10 {
++  background: #23282d;
++  border-radius: 3px;
++  box-sizing: border-box;
++  color: white;
++  display: inline-block;
++  font-size: 11px;
++  min-width: 32px;
++  opacity: 0;
++  padding: 8px;
++  position: absolute;
++  text-align: center;
++  -webkit-transition: opacity 120ms ease;
++  transition: opacity 120ms ease;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  opacity: 0;
++  margin-top: -4px;
++  top: -100%;
++  -webkit-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++}
++
++.emotion-10::after {
++  border: 6px solid #23282d;
++  border-left-color: transparent;
++  border-right-color: transparent;
++  bottom: -6px;
++  box-sizing: border-box;
++  content: '';
++  height: 0;
++  left: 50%;
++  line-height: 0;
++  margin-left: -6px;
++  position: absolute;
++  width: 0;
++}
++
++.emotion-10::after {
++  border-bottom: none;
++  border-top-style: solid;
++  bottom: -6px;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-10 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-14 {
++  box-sizing: border-box;
++  display: inline-block;
++  margin-top: 0;
++  min-width: 54px;
++  max-width: 120px;
++  margin-left: 16px;
++}
++
++input[type='number'].emotion-14 {
++  height: 30px;
++  min-height: 30px;
++}
++
++.emotion-16 {
++  box-sizing: border-box;
++  display: block;
++  margin-top: 0;
++  margin-left: 8px;
++}
++
++.emotion-16 button,
++.emotion-16 button.is-small {
++  margin-left: 0;
++  height: 30px;
++  min-height: 30px;
++}
++
+ <div
+   className="components-base-control components-range-control"
+ >
+@@ -4702,29 +7123,97 @@ exports[`Storyshots Components/RangeControl With Reset 1`] = `
+     >
+       How many columns should this use?
+     </label>
+-    <input
+-      className="components-range-control__slider"
+-      id="inspector-range-control-7"
+-      onChange={[Function]}
+-      type="range"
+-      value={5}
+-    />
+-    <input
+-      aria-label="How many columns should this use?"
+-      className="components-range-control__number"
+-      onBlur={[Function]}
+-      onChange={[Function]}
+-      type="number"
+-      value={5}
+-    />
+-    <button
+-      className="components-button components-range-control__reset is-secondary is-small"
+-      disabled={false}
+-      onClick={[Function]}
+-      type="button"
++    <span
++      className="components-range-control__root emotion-18 emotion-19"
+     >
+-      Reset
+-    </button>
++      <span
++        className="components-range-control__wrapper emotion-12 emotion-13"
++        color="#00669b"
++      >
++        <input
++          aria-hidden={false}
++          aria-label="How many columns should this use?"
++          className="components-range-control__slider emotion-0 emotion-1"
++          disabled={false}
++          id="inspector-range-control-7"
++          max={100}
++          min={0}
++          onBlur={[Function]}
++          onChange={[Function]}
++          onFocus={[Function]}
++          onMouseEnter={[Function]}
++          onMouseLeave={[Function]}
++          step={1}
++          tabIndex={0}
++          type="range"
++          value={5}
++        />
++        <span
++          aria-hidden={true}
++          className="emotion-2 emotion-3"
++        />
++        <span
++          aria-hidden={true}
++          className="components-range-control__track emotion-4 emotion-5"
++          style={
++            Object {
++              "width": "5%",
++            }
++          }
++        />
++        <span
++          className="emotion-8 emotion-9"
++          style={
++            Object {
++              "left": "5%",
++            }
++          }
++        >
++          <span
++            aria-hidden={true}
++            className="emotion-6 emotion-7"
++          />
++        </span>
++        <span
++          aria-hidden={false}
++          className="components-simple-tooltip components-range-control__tooltip emotion-10 emotion-11"
++          onMouseEnter={[Function]}
++          onMouseLeave={[Function]}
++          role="tooltip"
++          style={
++            Object {
++              "left": "5%",
++              "zIndex": 100,
++            }
++          }
++        >
++          5
++        </span>
++      </span>
++      <input
++        aria-label="How many columns should this use?"
++        className="components-range-control__number emotion-14 emotion-133"
++        inputMode="decimal"
++        max={100}
++        min={0}
++        onChange={[Function]}
++        step={1}
++        type="number"
++        value={5}
++      />
++      <span
++        className="emotion-16 emotion-134"
++      >
++        <button
++          className="components-button components-range-control__reset is-secondary is-small"
++          disabled={false}
++          onClick={[Function]}
++          type="button"
++        >
++          Reset
++        </button>
++      </span>
++    </span>
+   </div>
+ </div>
+ `;

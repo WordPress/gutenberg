@@ -1,0 +1,157 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d5b61610d7bb40..d2ffa69aba48be 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79112](https://github.com/WordPress/gutenberg/pull/79112)).
++-   `Button`, `DropdownMenu`, `FormToggle`, `Modal`, `Panel`, `RadioControl`, `Toolbar`: Migrate hardcoded border and stroke colors to WPDS tokens ([#79003](https://github.com/WordPress/gutenberg/pull/79003)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index 0109c0598e85b5..774934649af2fa 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -84,6 +84,7 @@ export const colorIndicatorBorder = ( border?: Border ) => {
+ 	const { color, style } = border || {};
+ 
+ 	const fallbackColor =
++		// TODO: should use the `--wpds-color-stroke-interactive-neutral` token when refactored to SCSS modules
+ 		!! style && style !== 'none' ? COLORS.gray[ 300 ] : undefined;
+ 
+ 	return css`
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 37ab30119552e0..b93b3689442124 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -153,7 +153,7 @@
+ 		&:disabled:not(:focus),
+ 		&[aria-disabled="true"]:not(:focus),
+ 		&[aria-disabled="true"]:hover:not(:focus) {
+-			box-shadow: inset 0 0 0 $border-width $gray-300;
++			box-shadow: inset 0 0 0 $border-width var(--wpds-color-stroke-interactive-neutral-disabled);
+ 		}
+ 
+ 		&:focus:not(:active) {
+diff --git a/packages/components/src/dropdown-menu/style.scss b/packages/components/src/dropdown-menu/style.scss
+index ca50da9da947fe..9450f9830c540c 100644
+--- a/packages/components/src/dropdown-menu/style.scss
++++ b/packages/components/src/dropdown-menu/style.scss
+@@ -30,7 +30,7 @@
+ 			display: block;
+ 			content: "";
+ 			box-sizing: content-box;
+-			background-color: $gray-300;
++			background-color: var(--wpds-color-stroke-surface-neutral);
+ 			position: absolute;
+ 			top: -3px;
+ 			left: 0;
+diff --git a/packages/components/src/form-toggle/style.scss b/packages/components/src/form-toggle/style.scss
+index 48a50e5c0dafc6..2ef2bd31fe226d 100644
+--- a/packages/components/src/form-toggle/style.scss
++++ b/packages/components/src/form-toggle/style.scss
+@@ -106,7 +106,7 @@ $transition-duration: 0.2s;
+ 	.components-disabled & {
+ 		.components-form-toggle__track {
+ 			background-color: $components-color-gray-100;
+-			border-color: $components-color-gray-300;
++			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+ 
+ 			@media ( forced-colors: active ) {
+ 				border-color: GrayText;
+diff --git a/packages/components/src/menu/styles.ts b/packages/components/src/menu/styles.ts
+index c98d0343e96618..b3f534e8ba3571 100644
+--- a/packages/components/src/menu/styles.ts
++++ b/packages/components/src/menu/styles.ts
+@@ -22,7 +22,9 @@ const ITEM_PADDING_INLINE = space( 3 );
+ // - border color and divider color are different from COLORS.theme variables
+ // - lighter text color is not defined in COLORS.theme, should it be?
+ // - lighter background color is not defined in COLORS.theme, should it be?
++// TODO: should use the `--wpds-color-stroke-surface-neutral` token when refactored to SCSS modules
+ const DEFAULT_BORDER_COLOR = COLORS.theme.gray[ 300 ];
++// TODO: should use the `--wpds-color-stroke-surface-neutral-weak` token when refactored to SCSS modules
+ const DIVIDER_COLOR = COLORS.theme.gray[ 200 ];
+ const LIGHTER_TEXT_COLOR = COLORS.theme.gray[ 700 ];
+ const LIGHT_BACKGROUND_COLOR = COLORS.theme.gray[ 100 ];
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index 52fd11f0e3e563..d9c2e9edf29d6f 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -217,7 +217,7 @@
+ 	}
+ 
+ 	.components-modal__content.has-scrolled-content:not(.hide-header) & {
+-		border-bottom-color: $gray-300;
++		border-bottom-color: var(--wpds-color-stroke-surface-neutral);
+ 	}
+ 
+ 	& + p {
+diff --git a/packages/components/src/panel/style.scss b/packages/components/src/panel/style.scss
+index 1cba950547e6f5..57b5a75e06c8c4 100644
+--- a/packages/components/src/panel/style.scss
++++ b/packages/components/src/panel/style.scss
+@@ -40,7 +40,7 @@
+ 	justify-content: space-between;
+ 	align-items: center;
+ 	padding: 0 $grid-unit-20;
+-	border-bottom: $border-width solid $gray-300;
++	border-bottom: $border-width solid var(--wpds-color-stroke-surface-neutral);
+ 
+ 	// This helps ensure the correct panel height, including the border, avoiding subpixel rounding issues.
+ 	box-sizing: content-box;
+diff --git a/packages/components/src/radio-control/style.scss b/packages/components/src/radio-control/style.scss
+index c0a7fef8804dec..c7cdfaf3f436d1 100644
+--- a/packages/components/src/radio-control/style.scss
++++ b/packages/components/src/radio-control/style.scss
+@@ -56,7 +56,7 @@
+ 
+ 	&:disabled {
+ 		background: $components-color-gray-100;
+-		border: 1px solid $components-color-gray-300;
++		border: 1px solid var(--wpds-color-stroke-interactive-neutral-disabled);
+ 		opacity: 1; // Override style from wp-admin forms.css.
+ 
+ 		&:checked::before {
+diff --git a/packages/components/src/spinner/styles.ts b/packages/components/src/spinner/styles.ts
+index e51fd29470541c..5219c1bc1dac8c 100644
+--- a/packages/components/src/spinner/styles.ts
++++ b/packages/components/src/spinner/styles.ts
+@@ -35,6 +35,7 @@ const commonPathProps = css`
+ 	stroke-width: 1.5px;
+ `;
+ 
++// TODO: should use the `--wpds-color-stroke-surface-neutral` token when refactored to SCSS modules
+ export const SpinnerTrack = styled.circle`
+ 	${ commonPathProps };
+ 	stroke: ${ COLORS.gray[ 300 ] };
+diff --git a/packages/components/src/toolbar/toolbar-group/style.scss b/packages/components/src/toolbar/toolbar-group/style.scss
+index 1a1862747a9549..ef32998abdaf15 100644
+--- a/packages/components/src/toolbar/toolbar-group/style.scss
++++ b/packages/components/src/toolbar/toolbar-group/style.scss
+@@ -75,7 +75,7 @@ div.components-toolbar {
+ 			display: inline-block;
+ 			content: "";
+ 			box-sizing: content-box;
+-			background-color: $gray-300;
++			background-color: var(--wpds-color-stroke-surface-neutral);
+ 			position: absolute;
+ 			top: 8px;
+ 			left: -3px;
+diff --git a/packages/components/src/tools-panel/styles.ts b/packages/components/src/tools-panel/styles.ts
+index 46b2763ccea878..db1713d7e94316 100644
+--- a/packages/components/src/tools-panel/styles.ts
++++ b/packages/components/src/tools-panel/styles.ts
+@@ -30,10 +30,10 @@ const toolsPanelGrid = {
+ 	},
+ };
+ 
++// TODO: should use the `--wpds-color-stroke-surface-neutral` token when refactored to SCSS modules
+ export const ToolsPanel = ( columns: number ) => css`
+ 	${ toolsPanelGrid.columns( columns ) }
+ 	${ toolsPanelGrid.spacing }
+-
+ 	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 300 ] };
+ 	margin-top: -1px;
+ 	padding: ${ space( 4 ) };

@@ -1,0 +1,428 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 1f2a0454abedc5..1882a1615fccf1 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `Tabs`: Add development-mode validation for Tab/Panel count matching ([#75170](https://github.com/WordPress/gutenberg/pull/75170)).
++
+ ## 0.9.0 (2026-03-18)
+ 
+ ### New Features
+diff --git a/packages/ui/src/tabs/context.tsx b/packages/ui/src/tabs/context.tsx
+new file mode 100644
+index 00000000000000..99b6e201b37ca6
+--- /dev/null
++++ b/packages/ui/src/tabs/context.tsx
+@@ -0,0 +1,170 @@
++import {
++	createContext,
++	useContext,
++	useCallback,
++	useMemo,
++	useRef,
++	useEffect,
++} from '@wordpress/element';
++
++type TabsValidationContextType = {
++	registerTab: () => () => void;
++	registerPanel: () => () => void;
++};
++
++/**
++ * Whether validation is enabled. This is a build-time constant that allows
++ * bundlers to tree-shake all validation code in production builds.
++ */
++const VALIDATION_ENABLED = process.env.NODE_ENV !== 'production';
++
++const TabsValidationContext = VALIDATION_ENABLED
++	? createContext< TabsValidationContextType | null >( null )
++	: ( null as unknown as React.Context< TabsValidationContextType | null > );
++
++function useRegisterTabDev() {
++	const context = useContext( TabsValidationContext );
++
++	useEffect( () => {
++		if ( context ) {
++			return context.registerTab();
++		}
++		return undefined;
++	}, [ context ] );
++}
++
++function useRegisterTabProd() {
++	// No-op in production.
++}
++
++/**
++ * Hook that registers a Tab for count validation in development mode.
++ */
++export const useRegisterTab = VALIDATION_ENABLED
++	? useRegisterTabDev
++	: useRegisterTabProd;
++
++function useRegisterPanelDev() {
++	const context = useContext( TabsValidationContext );
++
++	useEffect( () => {
++		if ( context ) {
++			return context.registerPanel();
++		}
++		return undefined;
++	}, [ context ] );
++}
++
++function useRegisterPanelProd() {
++	// No-op in production.
++}
++
++/**
++ * Hook that registers a Panel for count validation in development mode.
++ */
++export const useRegisterPanel = VALIDATION_ENABLED
++	? useRegisterPanelDev
++	: useRegisterPanelProd;
++
++/**
++ * Development-only provider that tracks the number of registered tabs and
++ * panels, and warns when the counts don't match.
++ */
++function TabsValidationProviderDev( {
++	children,
++}: {
++	children: React.ReactNode;
++} ) {
++	const tabCountRef = useRef( 0 );
++	const panelCountRef = useRef( 0 );
++	const validationScheduledRef = useRef< ReturnType<
++		typeof setTimeout
++	> | null >( null );
++
++	const scheduleValidation = useCallback( () => {
++		if ( validationScheduledRef.current ) {
++			clearTimeout( validationScheduledRef.current );
++		}
++
++		// Schedule validation for the next tick to allow all
++		// registrations/unregistrations to complete.
++		validationScheduledRef.current = setTimeout( () => {
++			const tabCount = tabCountRef.current;
++			const panelCount = panelCountRef.current;
++
++			if ( tabCount !== panelCount ) {
++				throw new Error(
++					`Tabs: Tab/Panel count mismatch (${ tabCount } Tabs, ${ panelCount } Panels). ` +
++						`Each Tab must be associated with exactly one Panel. ` +
++						`Mismatched or missing associations can break screen reader navigation ` +
++						`and violate WAI-ARIA Tabs pattern requirements.`
++				);
++			}
++
++			validationScheduledRef.current = null;
++		}, 0 );
++	}, [] );
++
++	const registerTab = useCallback( () => {
++		tabCountRef.current += 1;
++		scheduleValidation();
++
++		return () => {
++			tabCountRef.current -= 1;
++			scheduleValidation();
++		};
++	}, [ scheduleValidation ] );
++
++	const registerPanel = useCallback( () => {
++		panelCountRef.current += 1;
++		scheduleValidation();
++
++		return () => {
++			panelCountRef.current -= 1;
++			scheduleValidation();
++		};
++	}, [ scheduleValidation ] );
++
++	useEffect( () => {
++		return () => {
++			if ( validationScheduledRef.current ) {
++				clearTimeout( validationScheduledRef.current );
++			}
++		};
++	}, [] );
++
++	const contextValue = useMemo(
++		() => ( {
++			registerTab,
++			registerPanel,
++		} ),
++		[ registerTab, registerPanel ]
++	);
++
++	return (
++		<TabsValidationContext.Provider value={ contextValue }>
++			{ children }
++		</TabsValidationContext.Provider>
++	);
++}
++
++/**
++ * Production no-op provider that just renders children.
++ */
++function TabsValidationProviderProd( {
++	children,
++}: {
++	children: React.ReactNode;
++} ) {
++	return <>{ children }</>;
++}
++
++/**
++ * Provider component that validates the number of tabs matches the number
++ * of panels in development mode.
++ *
++ * In production, this component is a no-op and just renders children.
++ */
++export const TabsValidationProvider = VALIDATION_ENABLED
++	? TabsValidationProviderDev
++	: TabsValidationProviderProd;
+diff --git a/packages/ui/src/tabs/panel.tsx b/packages/ui/src/tabs/panel.tsx
+index 6ae551234172a1..2396e7586e292b 100644
+--- a/packages/ui/src/tabs/panel.tsx
++++ b/packages/ui/src/tabs/panel.tsx
+@@ -1,6 +1,7 @@
+ import { forwardRef } from '@wordpress/element';
+ import clsx from 'clsx';
+ import { Tabs as _Tabs } from '@base-ui/react/tabs';
++import { useRegisterPanel } from './context';
+ import styles from './style.module.css';
+ import type { TabPanelProps } from './types';
+ 
+@@ -12,6 +13,8 @@ import type { TabPanelProps } from './types';
+  */
+ export const Panel = forwardRef< HTMLDivElement, TabPanelProps >(
+ 	function TabPanel( { className, ...otherProps }, forwardedRef ) {
++		useRegisterPanel();
++
+ 		return (
+ 			<_Tabs.Panel
+ 				ref={ forwardedRef }
+diff --git a/packages/ui/src/tabs/root.tsx b/packages/ui/src/tabs/root.tsx
+index e7a825fdad0ff4..ddef00a3bd999a 100644
+--- a/packages/ui/src/tabs/root.tsx
++++ b/packages/ui/src/tabs/root.tsx
+@@ -1,5 +1,6 @@
+ import { forwardRef } from '@wordpress/element';
+ import { Tabs as _Tabs } from '@base-ui/react/tabs';
++import { TabsValidationProvider } from './context';
+ import type { TabRootProps } from './types';
+ 
+ /**
+@@ -10,6 +11,10 @@ import type { TabRootProps } from './types';
+  */
+ export const Root = forwardRef< HTMLDivElement, TabRootProps >(
+ 	function TabsRoot( { ...otherProps }, forwardedRef ) {
+-		return <_Tabs.Root ref={ forwardedRef } { ...otherProps } />;
++		return (
++			<TabsValidationProvider>
++				<_Tabs.Root ref={ forwardedRef } { ...otherProps } />
++			</TabsValidationProvider>
++		);
+ 	}
+ );
+diff --git a/packages/ui/src/tabs/tab.tsx b/packages/ui/src/tabs/tab.tsx
+index 949d893536c29f..d94fc3240c4dbc 100644
+--- a/packages/ui/src/tabs/tab.tsx
++++ b/packages/ui/src/tabs/tab.tsx
+@@ -3,6 +3,7 @@ import clsx from 'clsx';
+ import { Tabs as _Tabs } from '@base-ui/react/tabs';
+ import { chevronRight } from '@wordpress/icons';
+ import { Icon } from '../icon';
++import { useRegisterTab } from './context';
+ import styles from './style.module.css';
+ import type { TabProps } from './types';
+ 
+@@ -16,6 +17,8 @@ export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
+ 	{ className, children, ...otherProps },
+ 	forwardedRef
+ ) {
++	useRegisterTab();
++
+ 	return (
+ 		<_Tabs.Tab
+ 			ref={ forwardedRef }
+diff --git a/packages/ui/src/tabs/test/index.test.tsx b/packages/ui/src/tabs/test/index.test.tsx
+index 88c4bda488eebc..0281f3ac14b7eb 100644
+--- a/packages/ui/src/tabs/test/index.test.tsx
++++ b/packages/ui/src/tabs/test/index.test.tsx
+@@ -2256,5 +2256,167 @@ describe( 'Tabs', () => {
+ 			);
+ 		} );
+ 	} );
++
++	describe( 'Development mode validation', () => {
++		function collectUncaughtErrors() {
++			const errors: Error[] = [];
++			const handler = ( event: ErrorEvent ) => {
++				event.preventDefault();
++				errors.push( event.error );
++			};
++			window.addEventListener( 'error', handler );
++			return {
++				errors,
++				cleanup: () => window.removeEventListener( 'error', handler ),
++			};
++		}
++
++		it( 'should throw when there are more Tabs than Panels', async () => {
++			const { errors, cleanup } = collectUncaughtErrors();
++
++			render(
++				<Tabs.Root defaultValue="one">
++					<Tabs.List>
++						<Tabs.Tab value="one">One</Tabs.Tab>
++						<Tabs.Tab value="two">Two</Tabs.Tab>
++						<Tabs.Tab value="three">Three</Tabs.Tab>
++					</Tabs.List>
++					<Tabs.Panel value="one">First panel</Tabs.Panel>
++					<Tabs.Panel value="two">Second panel</Tabs.Panel>
++				</Tabs.Root>
++			);
++
++			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
++
++			await waitFor( () => {
++				expect( errors.length ).toBeGreaterThan( 0 );
++			} );
++
++			expect( errors[ 0 ].message ).toBe(
++				'Tabs: Tab/Panel count mismatch (3 Tabs, 2 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
++			);
++
++			cleanup();
++		} );
++
++		it( 'should throw when there are more Panels than Tabs', async () => {
++			const { errors, cleanup } = collectUncaughtErrors();
++
++			render(
++				<Tabs.Root defaultValue="one">
++					<Tabs.List>
++						<Tabs.Tab value="one">One</Tabs.Tab>
++						<Tabs.Tab value="two">Two</Tabs.Tab>
++					</Tabs.List>
++					<Tabs.Panel value="one">First panel</Tabs.Panel>
++					<Tabs.Panel value="two">Second panel</Tabs.Panel>
++					<Tabs.Panel value="three">Third panel</Tabs.Panel>
++				</Tabs.Root>
++			);
++
++			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
++
++			await waitFor( () => {
++				expect( errors.length ).toBeGreaterThan( 0 );
++			} );
++
++			expect( errors[ 0 ].message ).toBe(
++				'Tabs: Tab/Panel count mismatch (2 Tabs, 3 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
++			);
++
++			cleanup();
++		} );
++
++		it( 'should not throw when Tab and Panel counts match', async () => {
++			const { errors, cleanup } = collectUncaughtErrors();
++
++			render(
++				<Tabs.Root defaultValue="one">
++					<Tabs.List>
++						<Tabs.Tab value="one">One</Tabs.Tab>
++						<Tabs.Tab value="two">Two</Tabs.Tab>
++					</Tabs.List>
++					<Tabs.Panel value="one">First panel</Tabs.Panel>
++					<Tabs.Panel value="two">Second panel</Tabs.Panel>
++				</Tabs.Root>
++			);
++
++			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
++
++			// Wait a bit to ensure validation has run
++			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
++
++			expect( errors ).toHaveLength( 0 );
++
++			cleanup();
++		} );
++
++		it( 'should throw when tabs are used without any panels', async () => {
++			const { errors, cleanup } = collectUncaughtErrors();
++
++			render(
++				<Tabs.Root>
++					<Tabs.List>
++						<Tabs.Tab value="one">One</Tabs.Tab>
++						<Tabs.Tab value="two">Two</Tabs.Tab>
++					</Tabs.List>
++				</Tabs.Root>
++			);
++
++			await waitFor( () => {
++				expect( errors.length ).toBeGreaterThan( 0 );
++			} );
++
++			expect( errors[ 0 ].message ).toBe(
++				'Tabs: Tab/Panel count mismatch (2 Tabs, 0 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
++			);
++
++			cleanup();
++		} );
++
++		it( 'should detect count mismatch after dynamic changes', async () => {
++			const { errors, cleanup } = collectUncaughtErrors();
++
++			const { rerender } = render(
++				<Tabs.Root defaultValue="one">
++					<Tabs.List>
++						<Tabs.Tab value="one">One</Tabs.Tab>
++						<Tabs.Tab value="two">Two</Tabs.Tab>
++					</Tabs.List>
++					<Tabs.Panel value="one">First panel</Tabs.Panel>
++					<Tabs.Panel value="two">Second panel</Tabs.Panel>
++				</Tabs.Root>
++			);
++
++			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
++
++			// Wait for validation
++			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
++
++			// No errors since counts match
++			expect( errors ).toHaveLength( 0 );
++
++			// Remove a panel to create a mismatch
++			rerender(
++				<Tabs.Root defaultValue="one">
++					<Tabs.List>
++						<Tabs.Tab value="one">One</Tabs.Tab>
++						<Tabs.Tab value="two">Two</Tabs.Tab>
++					</Tabs.List>
++					<Tabs.Panel value="one">First panel</Tabs.Panel>
++				</Tabs.Root>
++			);
++
++			await waitFor( () => {
++				expect( errors.length ).toBeGreaterThan( 0 );
++			} );
++
++			expect( errors[ 0 ].message ).toBe(
++				'Tabs: Tab/Panel count mismatch (2 Tabs, 1 Panels). Each Tab must be associated with exactly one Panel. Mismatched or missing associations can break screen reader navigation and violate WAI-ARIA Tabs pattern requirements.'
++			);
++
++			cleanup();
++		} );
++	} );
+ } );
+ /* eslint-enable jest/no-conditional-expect */

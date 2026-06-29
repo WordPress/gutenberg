@@ -1,0 +1,576 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index e784c4c6e31e65..957f241dc8a539 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -10,6 +10,10 @@
+ 
+ -   `Card`: Set default foreground color on `Card.Root` so content and `currentColor` icons (for example the `CollapsibleCard` chevron) are themeable by default ([#77013](https://github.com/WordPress/gutenberg/pull/77013)).
+ 
++### Enhancements
++
++-   Add defensive styles against global WordPress stylesheets like common.css and forms.css ([#76783](https://github.com/WordPress/gutenberg/pull/76783)).
++
+ ## 0.10.0 (2026-04-01)
+ 
+ ### New Features
+diff --git a/packages/ui/CONTRIBUTING.md b/packages/ui/CONTRIBUTING.md
+index 7341343f1a407b..2d55509f7d1e08 100644
+--- a/packages/ui/CONTRIBUTING.md
++++ b/packages/ui/CONTRIBUTING.md
+@@ -132,3 +132,28 @@ If a higher layer sets `.special-button { --button-bg: red; }`, that override wi
+ ### Disabled State Styling
+ 
+ For components built on Base UI, use the `data-disabled` attribute when styling disabled states rather than targeting `disabled` or `aria-disabled` directly. Base UI applies `data-disabled` consistently regardless of whether the underlying implementation uses the native `disabled` attribute or `aria-disabled` (which depends on the `focusableWhenDisabled` prop). This keeps styles decoupled from the specific HTML attribute and avoids verbose selectors that would need to target both.
++
++### Global CSS defense (wp-admin)
++
++WordPress loads broad, **unlayered** global styles in the admin (`common.css`, `forms.css`) that target bare elements (`input`, `button`, `a`, `p`, headings, and so on). In the cascade, **unlayered rules always win over layered rules**, no matter how specific the layered selector is. That means normal `@wordpress/ui` styles, which live in `@layer wp-ui-*`, can be overridden by admin CSS and components may look wrong in wp-admin (borders, focus rings, typography, colors, and more).
++
++**What it is:** [`global-css-defense.module.css`](src/utils/css/global-css-defense.module.css) is a shared, **unlayered** stylesheet that defines small, class-scoped rules (for example `.input`, `.textarea`, `.button`, `.a`, `p.p`, `:is(h1,…,h6).heading`, `.div`). Those classes are applied on the actual DOM nodes that need protection. Because the declarations are unlayered and use classes, they compete with admin styles on similar footing and can win by specificity.
++
++**How it works (custom property bridge):** Each defended property is expressed with an internal custom property and a fallback, for example:
++
++```css
++.input {
++	font-size: var( --_gcd-input-font-size, inherit );
++}
++```
++
++-   The **fallback** encodes the default that `@wordpress/ui` wants when nothing else is set, so many components need no extra declarations.
++-   A component’s **layered** module can set `--_gcd-*` on a wrapper or the element itself. Custom property resolution is not blocked by cascade layers the same way longhand properties are, so the layered stylesheet can still supply the real token values while the unlayered rule applies them in a context where admin CSS would otherwise win.
++
++Use the `--_gcd-*` prefix only inside this package; treat these variables as implementation details, not public theming API.
++
++**When to use it:** Whenever you introduce or change a primitive that renders a native element commonly styled by wp-admin globals, wire in the matching defense class from `global-css-defense.module.css` (see existing usages in `Button`, `Input`, `Textarea`, `Link`, `Text`, field descriptions, and related form primitives). If admin styles affect a new element type, extend the defense module with a new class and the same bridge pattern rather than duplicating unlayered overrides inside individual components.
++
++**Testing:** In Storybook, enable **WordPress global CSS** from the toolbar and compare stories with that mode on and off; appearance should match aside from intentional differences.
++
++Long term, Core may reduce the need for this by [scoping](https://core.trac.wordpress.org/ticket/64939). Until then, this module is the supported way to keep components predictable inside wp-admin.
+diff --git a/packages/ui/src/button/button.tsx b/packages/ui/src/button/button.tsx
+index c5a53b20ab1ba5..112f1af5a77123 100644
+--- a/packages/ui/src/button/button.tsx
++++ b/packages/ui/src/button/button.tsx
+@@ -7,6 +7,7 @@ import { type ButtonProps } from './types';
+ import styles from './style.module.css';
+ import resetStyles from '../utils/css/resets.module.css';
+ import focusStyles from '../utils/css/focus.module.css';
++import defenseStyles from '../utils/css/global-css-defense.module.css';
+ 
+ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
+ 	function Button(
+@@ -25,6 +26,7 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
+ 		ref
+ 	) {
+ 		const mergedClassName = clsx(
++			defenseStyles.button,
+ 			resetStyles[ 'box-sizing' ],
+ 			focusStyles[ 'outset-ring--focus-except-active' ],
+ 			variant !== 'unstyled' && styles.button,
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+index 814692791e9241..c94818a13138fb 100644
+--- a/packages/ui/src/button/style.module.css
++++ b/packages/ui/src/button/style.module.css
+@@ -28,6 +28,10 @@
+ 		--wp-ui-button-border-color-active: var(--wp-ui-button-background-color-active);
+ 		--wp-ui-button-border-color-disabled: var(--wp-ui-button-background-color-disabled);
+ 
++		--_gcd-button-font-family: var(--wpds-font-family-body);
++		--_gcd-button-font-size: var(--wp-ui-button-font-size);
++		--_gcd-button-font-weight: var(--wp-ui-button-font-weight);
++
+ 		/* Styles */
+ 		position: relative;
+ 		display: inline-flex;
+diff --git a/packages/ui/src/form/primitives/field/description.tsx b/packages/ui/src/form/primitives/field/description.tsx
+index 9ecef06d862214..4c9609708d4bdb 100644
+--- a/packages/ui/src/form/primitives/field/description.tsx
++++ b/packages/ui/src/form/primitives/field/description.tsx
+@@ -1,6 +1,7 @@
+ import clsx from 'clsx';
+ import { Field as _Field } from '@base-ui/react/field';
+ import { forwardRef } from '@wordpress/element';
++import defenseStyles from '../../../utils/css/global-css-defense.module.css';
+ import fieldStyles from '../../../utils/css/field.module.css';
+ import type { FieldDescriptionProps } from './types';
+ 
+@@ -11,7 +12,11 @@ export const Description = forwardRef<
+ 	return (
+ 		<_Field.Description
+ 			ref={ ref }
+-			className={ clsx( fieldStyles.description, className ) }
++			className={ clsx(
++				defenseStyles.p,
++				fieldStyles.description,
++				className
++			) }
+ 			{ ...restProps }
+ 		/>
+ 	);
+diff --git a/packages/ui/src/form/primitives/fieldset/description.tsx b/packages/ui/src/form/primitives/fieldset/description.tsx
+index 0271366918b98a..a21ed50454e692 100644
+--- a/packages/ui/src/form/primitives/fieldset/description.tsx
++++ b/packages/ui/src/form/primitives/fieldset/description.tsx
+@@ -1,6 +1,7 @@
+ import clsx from 'clsx';
+ import { mergeProps, useRender } from '@base-ui/react';
+ import { forwardRef, useEffect, useId } from '@wordpress/element';
++import defenseStyles from '../../../utils/css/global-css-defense.module.css';
+ import fieldStyles from '../../../utils/css/field.module.css';
+ import { useFieldsetContext } from './context';
+ import type { FieldsetDescriptionProps } from './types';
+@@ -27,7 +28,14 @@ export const FieldsetDescription = forwardRef<
+ 		render,
+ 		ref,
+ 		props: mergeProps< 'p' >(
+-			{ className: clsx( fieldStyles.description, className ), id },
++			{
++				className: clsx(
++					defenseStyles.p,
++					fieldStyles.description,
++					className
++				),
++				id,
++			},
+ 			restProps
+ 		),
+ 	} );
+diff --git a/packages/ui/src/form/primitives/input-layout/input-layout.tsx b/packages/ui/src/form/primitives/input-layout/input-layout.tsx
+index c5b24faee7c704..11b327455b2a91 100644
+--- a/packages/ui/src/form/primitives/input-layout/input-layout.tsx
++++ b/packages/ui/src/form/primitives/input-layout/input-layout.tsx
+@@ -1,5 +1,6 @@
+ import clsx from 'clsx';
+ import { Children, forwardRef } from '@wordpress/element';
++import defenseStyles from '../../../utils/css/global-css-defense.module.css';
+ import resetStyles from '../../../utils/css/resets.module.css';
+ import styles from './style.module.css';
+ import type { InputLayoutProps } from './types';
+@@ -26,6 +27,7 @@ export const InputLayout = forwardRef< HTMLDivElement, InputLayoutProps >(
+ 			<div
+ 				ref={ ref }
+ 				className={ clsx(
++					defenseStyles.div,
+ 					resetStyles[ 'box-sizing' ],
+ 					styles[ 'input-layout' ],
+ 					styles[ `is-size-${ size }` ],
+diff --git a/packages/ui/src/form/primitives/input/input.tsx b/packages/ui/src/form/primitives/input/input.tsx
+index a1848acbc0fd59..e343676c10d95c 100644
+--- a/packages/ui/src/form/primitives/input/input.tsx
++++ b/packages/ui/src/form/primitives/input/input.tsx
+@@ -1,6 +1,7 @@
+ import { Input as _Input } from '@base-ui/react/input';
+ import clsx from 'clsx';
+ import { forwardRef } from '@wordpress/element';
++import defenseStyles from '../../../utils/css/global-css-defense.module.css';
+ import focusStyles from '../../../utils/css/focus.module.css';
+ import styles from './style.module.css';
+ import type { InputProps } from './types';
+@@ -22,7 +23,11 @@ export const Input = forwardRef< HTMLElement, InputProps >( function Input(
+ 			prefix={ prefix }
+ 			suffix={ suffix }
+ 		>
+-			<_Input ref={ ref } className={ styles.input } { ...restProps } />
++			<_Input
++				ref={ ref }
++				className={ clsx( defenseStyles.input, styles.input ) }
++				{ ...restProps }
++			/>
+ 		</InputLayout>
+ 	);
+ } );
+diff --git a/packages/ui/src/form/primitives/input/style.module.css b/packages/ui/src/form/primitives/input/style.module.css
+index 8bda471799ee72..95aff7f34ebab6 100644
+--- a/packages/ui/src/form/primitives/input/style.module.css
++++ b/packages/ui/src/form/primitives/input/style.module.css
+@@ -2,6 +2,10 @@
+ 
+ @layer wp-ui-components {
+ 	.input {
++		--_gcd-input-padding:
++			var(--wp-ui-input-padding-block, 0)
++			var(--wp-ui-input-layout-padding-inline, 0);
++
+ 		padding-block: var(--wp-ui-input-padding-block, 0);
+ 		padding-inline: var(--wp-ui-input-layout-padding-inline, 0);
+ 		width: 100%;
+diff --git a/packages/ui/src/form/primitives/textarea/textarea.tsx b/packages/ui/src/form/primitives/textarea/textarea.tsx
+index c2caf9dbd689ad..3fa4ac53f013a1 100644
+--- a/packages/ui/src/form/primitives/textarea/textarea.tsx
++++ b/packages/ui/src/form/primitives/textarea/textarea.tsx
+@@ -4,6 +4,7 @@ import { cloneElement, forwardRef } from '@wordpress/element';
+ import styles from './style.module.css';
+ import type { TextareaProps } from './types';
+ import { Input } from '../input';
++import defenseStyles from '../../../utils/css/global-css-defense.module.css';
+ 
+ const wrappedRender = (
+ 	render: NonNullable< TextareaProps[ 'render' ] >,
+@@ -39,7 +40,15 @@ export const Textarea = forwardRef< HTMLTextAreaElement, TextareaProps >(
+ 				style={ style }
+ 				render={ wrappedRender(
+ 					render || ( ( props ) => <textarea { ...props } /> ),
+-					{ className: styles.textarea, ref, rows, ...restProps }
++					{
++						className: clsx(
++							defenseStyles.textarea,
++							styles.textarea
++						),
++						ref,
++						rows,
++						...restProps,
++					}
+ 				) }
+ 				value={ value }
+ 				defaultValue={ defaultValue }
+diff --git a/packages/ui/src/link/link.tsx b/packages/ui/src/link/link.tsx
+index 658d89d3fd81f2..e5ee5a6b672eb1 100644
+--- a/packages/ui/src/link/link.tsx
++++ b/packages/ui/src/link/link.tsx
+@@ -6,6 +6,7 @@ import { type LinkProps } from './types';
+ import resetStyles from '../utils/css/resets.module.css';
+ import focusStyles from '../utils/css/focus.module.css';
+ import styles from './style.module.css';
++import defenseStyles from '../utils/css/global-css-defense.module.css';
+ 
+ /**
+  * A styled anchor element with support for semantic color tones and an
+@@ -39,6 +40,7 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
+ 		ref,
+ 		props: mergeProps< 'a' >( props, {
+ 			className: clsx(
++				defenseStyles.a,
+ 				resetStyles[ 'box-sizing' ],
+ 				focusStyles[ 'outset-ring--focus' ],
+ 				variant !== 'unstyled' && styles.link,
+diff --git a/packages/ui/src/link/style.module.css b/packages/ui/src/link/style.module.css
+index fa1f8f5a5cd2c9..1aa7a796a3e421 100644
+--- a/packages/ui/src/link/style.module.css
++++ b/packages/ui/src/link/style.module.css
+@@ -9,28 +9,38 @@
+ 	/* Brand tone */
+ 	.is-brand,
+ 	.is-brand:visited {
++		--_gcd-a-color: var(--wpds-color-fg-interactive-brand);
++
+ 		color: var(--wpds-color-fg-interactive-brand);
+ 	}
+ 
+ 	.is-brand:hover,
+ 	.is-brand:active {
++		--_gcd-a-color: var(--wpds-color-fg-interactive-brand-active);
++
+ 		color: var(--wpds-color-fg-interactive-brand-active);
+ 	}
+ 
+ 	/* Neutral tone */
+ 	.is-neutral,
+ 	.is-neutral:visited {
++		--_gcd-a-color: var(--wpds-color-fg-interactive-neutral);
++
+ 		color: var(--wpds-color-fg-interactive-neutral);
+ 		text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
+ 	}
+ 
+ 	.is-neutral:hover,
+ 	.is-neutral:active {
++		--_gcd-a-color: var(--wpds-color-fg-interactive-neutral-active);
++
+ 		color: var(--wpds-color-fg-interactive-neutral-active);
+ 	}
+ 
+ 	/* Unstyled variant */
+ 	.is-unstyled {
++		--_gcd-a-color: inherit;
++
+ 		color: inherit;
+ 		text-decoration: none;
+ 	}
+diff --git a/packages/ui/src/text/style.module.css b/packages/ui/src/text/style.module.css
+index 3357c26c2a1b3d..2ca0707c098678 100644
+--- a/packages/ui/src/text/style.module.css
++++ b/packages/ui/src/text/style.module.css
+@@ -6,6 +6,8 @@
+ 	}
+ 
+ 	.heading-2xl {
++		--_gcd-heading-font-size: var(--wpds-font-size-2xl);
++
+ 		font-family: var(--wpds-font-family-heading);
+ 		font-size: var(--wpds-font-size-2xl);
+ 		line-height: var(--wpds-font-line-height-2xl);
+@@ -13,6 +15,8 @@
+ 	}
+ 
+ 	.heading-xl {
++		--_gcd-heading-font-size: var(--wpds-font-size-xl);
++
+ 		font-family: var(--wpds-font-family-heading);
+ 		font-size: var(--wpds-font-size-xl);
+ 		line-height: var(--wpds-font-line-height-md);
+@@ -20,6 +24,8 @@
+ 	}
+ 
+ 	.heading-lg {
++		--_gcd-heading-font-size: var(--wpds-font-size-lg);
++
+ 		font-family: var(--wpds-font-family-heading);
+ 		font-size: var(--wpds-font-size-lg);
+ 		line-height: var(--wpds-font-line-height-sm);
+@@ -27,6 +33,8 @@
+ 	}
+ 
+ 	.heading-md {
++		--_gcd-heading-font-size: var(--wpds-font-size-md);
++
+ 		font-family: var(--wpds-font-family-heading);
+ 		font-size: var(--wpds-font-size-md);
+ 		line-height: var(--wpds-font-line-height-sm);
+@@ -34,6 +42,8 @@
+ 	}
+ 
+ 	.heading-sm {
++		--_gcd-heading-font-size: var(--wpds-font-size-xs);
++
+ 		font-family: var(--wpds-font-family-heading);
+ 		font-size: var(--wpds-font-size-xs);
+ 		line-height: var(--wpds-font-line-height-xs);
+@@ -42,6 +52,9 @@
+ 	}
+ 
+ 	.body-xl {
++		--_gcd-p-font-size: var(--wpds-font-size-xl);
++		--_gcd-p-line-height: var(--wpds-font-line-height-xl);
++
+ 		font-family: var(--wpds-font-family-body);
+ 		font-size: var(--wpds-font-size-xl);
+ 		line-height: var(--wpds-font-line-height-xl);
+@@ -49,6 +62,9 @@
+ 	}
+ 
+ 	.body-lg {
++		--_gcd-p-font-size: var(--wpds-font-size-lg);
++		--_gcd-p-line-height: var(--wpds-font-line-height-md);
++
+ 		font-family: var(--wpds-font-family-body);
+ 		font-size: var(--wpds-font-size-lg);
+ 		line-height: var(--wpds-font-line-height-md);
+@@ -56,6 +72,9 @@
+ 	}
+ 
+ 	.body-md {
++		--_gcd-p-font-size: var(--wpds-font-size-md);
++		--_gcd-p-line-height: var(--wpds-font-line-height-sm);
++
+ 		font-family: var(--wpds-font-family-body);
+ 		font-size: var(--wpds-font-size-md);
+ 		line-height: var(--wpds-font-line-height-sm);
+@@ -63,6 +82,9 @@
+ 	}
+ 
+ 	.body-sm {
++		--_gcd-p-font-size: var(--wpds-font-size-sm);
++		--_gcd-p-line-height: var(--wpds-font-line-height-xs);
++
+ 		font-family: var(--wpds-font-family-body);
+ 		font-size: var(--wpds-font-size-sm);
+ 		line-height: var(--wpds-font-line-height-xs);
+diff --git a/packages/ui/src/text/text.tsx b/packages/ui/src/text/text.tsx
+index 29ce1057676969..aaee306f38c037 100644
+--- a/packages/ui/src/text/text.tsx
++++ b/packages/ui/src/text/text.tsx
+@@ -3,6 +3,7 @@ import clsx from 'clsx';
+ import { forwardRef } from '@wordpress/element';
+ import { type TextProps } from './types';
+ import styles from './style.module.css';
++import defenseStyles from '../utils/css/global-css-defense.module.css';
+ 
+ /**
+  * A text component for rendering content with predefined typographic variants.
+@@ -17,7 +18,13 @@ export const Text = forwardRef< HTMLSpanElement, TextProps >( function Text(
+ 		defaultTagName: 'span',
+ 		ref,
+ 		props: mergeProps< 'span' >( props, {
+-			className: clsx( styles.text, styles[ variant ], className ),
++			className: clsx(
++				styles.text,
++				variant.startsWith( 'heading-' ) && defenseStyles.heading,
++				variant.startsWith( 'body-' ) && defenseStyles.p,
++				styles[ variant ],
++				className
++			),
+ 		} ),
+ 	} );
+ 
+diff --git a/packages/ui/src/utils/css/field.module.css b/packages/ui/src/utils/css/field.module.css
+index a9e566f8b24bd1..d6d9778e763863 100644
+--- a/packages/ui/src/utils/css/field.module.css
++++ b/packages/ui/src/utils/css/field.module.css
+@@ -18,7 +18,10 @@
+ 	}
+ 
+ 	.description {
+-		margin: 0;
++		--_gcd-p-font-size: var(--wpds-font-size-sm);
++		--_gcd-p-line-height: var(--wpds-font-line-height-xs);
++		--_gcd-p-margin: 0;
++
+ 		font-family: var(--wpds-font-family-body);
+ 		font-size: var(--wpds-font-size-sm);
+ 		line-height: var(--wpds-font-line-height-xs);
+diff --git a/packages/ui/src/utils/css/focus.module.css b/packages/ui/src/utils/css/focus.module.css
+index d11f440305dca8..b8834f98bbddba 100644
+--- a/packages/ui/src/utils/css/focus.module.css
++++ b/packages/ui/src/utils/css/focus.module.css
+@@ -9,14 +9,14 @@
+ 	.outset-ring--focus-within-visible,
+ 	.outset-ring--focus-parent-visible {
+ 		@media not ( prefers-reduced-motion ) {
++			--_gcd-a-transition: outline 0.1s ease-out;
++
+ 			transition: outline 0.1s ease-out;
+ 		}
+ 
+ 		/* Outline width must be kept at 0 even with a transparent color,
+ 		or else the outline will be visible in forced-colors mode. */
+-		outline-width: 0;
+-		outline-style: solid;
+-		outline-color: transparent;
++		outline: 0 solid transparent;
+ 		outline-offset: 1px;
+ 	}
+ 
+@@ -27,7 +27,9 @@
+ 	.outset-ring--focus-within-except-active:focus-within:not(:has(:active)),
+ 	.outset-ring--focus-within-visible:focus-within:has(:focus-visible),
+ 	:focus-visible .outset-ring--focus-parent-visible {
+-		outline-width: var(--wpds-border-width-focus);
+-		outline-color: var(--wpds-color-stroke-focus-brand);
++		--_gcd-a-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
++		--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
++
++		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+ 	}
+ }
+diff --git a/packages/ui/src/utils/css/global-css-defense.module.css b/packages/ui/src/utils/css/global-css-defense.module.css
+new file mode 100644
+index 00000000000000..e48fc411eac553
+--- /dev/null
++++ b/packages/ui/src/utils/css/global-css-defense.module.css
+@@ -0,0 +1,117 @@
++/*
++ * Unlayered defense against wp-admin global CSS (common.css, forms.css).
++ *
++ * CSS cascade layers always lose to unlayered styles, so @wordpress/ui's
++ * layered component styles get overridden by wp-admin's broad bare-element
++ * selectors. This file provides unlayered, class-scoped defenses that
++ * restore control to the component.
++ *
++ * Mechanism (custom property bridge):
++ *   .input { font-size: var(--_gcd-input-font-size, inherit); }
++ *
++ * - The class selector beats admin bare-element selectors in specificity.
++ * - Each property reads a custom property. The fallback values are what
++ *   makes sense for @wordpress/ui, to minimize the number of overrides
++ *   in each individual component stylesheet.
++ * - Component CSS modules only need to define the custom properties for
++ *   the specific properties they want to override.
++ * - Custom property definitions aren't suppressed by cascade layers, so the
++ *   layered value propagates through to the unlayered declaration.
++ *
++ * Usage: apply the element-specific class directly to each element that
++ * needs defense (e.g. defenseStyles.input on an <input>).
++ */
++
++/*
++ * ==========================================================================
++ * forms.css defense - https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-admin/css/forms.css
++ * ==========================================================================
++ */
++
++.button {
++	box-sizing: var(--_gcd-button-box-sizing, border-box);
++	font-family: var(--_gcd-button-font-family, inherit);
++	font-size: var(--_gcd-button-font-size, inherit);
++	font-weight: var(--_gcd-button-font-weight, inherit);
++}
++
++.input {
++	box-sizing: var(--_gcd-input-box-sizing, border-box);
++	font-family: var(--_gcd-input-font-family, inherit);
++	font-size: var(--_gcd-input-font-size, inherit);
++	font-weight: var(--_gcd-input-font-weight, inherit);
++	margin: var(--_gcd-input-margin, 0);
++
++	/* Also targets textarea elements, which the `Input` primitive can render as. We combine these textarea defenses
++	   into the input defenses to minimize the number of tokens, but they should be split if it ever becomes necessary. */
++	&:is(textarea, [type="text"], [type="password"], [type="color"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]) {
++		box-shadow: var(--_gcd-input-box-shadow, 0 0 0 transparent);
++		border-radius: var(--_gcd-input-border-radius, 0);
++		border: var(--_gcd-input-border, none);
++		background-color: var(--_gcd-input-background-color, transparent);
++		color: var(--_gcd-input-color, var(--wpds-color-fg-interactive-neutral));
++
++		&:focus {
++			border-color: var(--_gcd-input-border-color-focus, var(--wp-admin-theme-color));
++			box-shadow: var(--_gcd-input-box-shadow-focus, none);
++			outline: var(--_gcd-input-outline-focus, none);
++		}
++
++		&:disabled {
++			background: var(--_gcd-input-background-disabled, transparent);
++			border-color: var(--_gcd-input-border-color-disabled, transparent);
++			box-shadow: var(--_gcd-input-box-shadow-disabled, none);
++			color: var(--_gcd-input-color-disabled, var(--wpds-color-fg-interactive-neutral-disabled));
++		}
++
++		&::placeholder {
++			color: var(--_gcd-input-placeholder-color, var(--wpds-color-fg-interactive-neutral-disabled));
++		}
++	}
++
++	&:is(textarea, [type="text"], [type="password"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]) {
++		padding: var(--_gcd-input-padding, 0);
++		line-height: var(--_gcd-input-line-height, inherit);
++		min-height: var(--_gcd-input-min-height, auto);
++	}
++}
++
++.textarea {
++	box-sizing: var(--_gcd-textarea-box-sizing, border-box);
++	overflow: var(--_gcd-textarea-overflow, auto);
++	resize: var(--_gcd-textarea-resize, block);
++}
++
++/*
++ * ==========================================================================
++ * common.css defense - https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-admin/css/common.css
++ * ==========================================================================
++ */
++
++.div {
++	outline: var(--_gcd-div-outline, 0 solid transparent);
++}
++
++/* Narrowed down to p elements only, to support element multiplicity of Text component. */
++p.p {
++	font-size: var(--_gcd-p-font-size, 13px);
++	line-height: var(--_gcd-p-line-height, 1.5);
++	margin: var(--_gcd-p-margin, 0);
++}
++
++/* Narrowed down to h[1-6] elements only, to support element multiplicity of Text component. */
++:is(h1, h2, h3, h4, h5, h6).heading {
++	color: var(--_gcd-heading-color, var(--wpds-color-fg-content-neutral));
++	font-size: var(--_gcd-heading-font-size, inherit);
++	font-weight: var(--_gcd-heading-font-weight, var(--wpds-font-weight-medium));
++	margin: var(--_gcd-heading-margin, 0);
++}
++
++.a,
++.a:is(:hover, :focus, :active) {
++	outline: var(--_gcd-a-outline, 0 solid transparent);
++	color: var(--_gcd-a-color, inherit);
++	box-shadow: var(--_gcd-a-box-shadow, none);
++	border-radius: var(--_gcd-a-border-radius, 0);
++	transition: var(--_gcd-a-transition, none);
++}

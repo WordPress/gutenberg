@@ -1,0 +1,21 @@
+diff --git a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+index 3e3fc188a4ea8b..298e64b10f00bf 100644
+--- a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+@@ -98,16 +98,6 @@ exports[`props should render correctly 1`] = `
+   border-radius: 2px;
+ }
+ 
+-.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12 {
+-  background-color: #ffffff;
+-  background-color: var(--wp-g2-surface-color);
+-  color: #1e1e1e;
+-  color: var(--wp-g2-color-text);
+-  position: relative;
+-  --wp-g2-surface-background-size: 12px;
+-  --wp-g2-surface-background-size-dotted: 11px;
+-}
+-
+ <div
+   class="components-surface components-card emotion-11 emotion-1 emotion-2"
+   data-wp-c16t="true"

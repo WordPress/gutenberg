@@ -1,0 +1,175 @@
+diff --git a/packages/block-editor/src/components/block-alignment-matrix-control/index.js b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+index 68ce33b65f86ee..6cd5a2aac41e0c 100644
+--- a/packages/block-editor/src/components/block-alignment-matrix-control/index.js
++++ b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+@@ -54,7 +54,7 @@ function BlockAlignmentMatrixControl( props ) {
+ 
+ 	return (
+ 		<Dropdown
+-			popoverProps={ { placement: 'bottom-start' } }
++			popoverProps={ { placement: 'bottom-start', focusOnMount: false } }
+ 			renderToggle={ ( { onToggle, isOpen } ) => {
+ 				const openOnArrowDown = ( event ) => {
+ 					if ( ! isOpen && event.keyCode === DOWN ) {
+@@ -77,7 +77,12 @@ function BlockAlignmentMatrixControl( props ) {
+ 				);
+ 			} }
+ 			renderContent={ () => (
+-				<AlignmentMatrixControl onChange={ onChange } value={ value } />
++				<AlignmentMatrixControl
++					// eslint-disable-next-line jsx-a11y/no-autofocus -- To avoid race conditions with matrix initialization, let it focus itself rather than relying on dropdown focusOnMount.
++					autoFocus
++					onChange={ onChange }
++					value={ value }
++				/>
+ 			) }
+ 		/>
+ 	);
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 613b863374c021..9e755f54548ff2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Enhancements
+ 
++-   `AlignmentMatrixControl`: Add an `autoFocus` prop that focuses the active cell on mount, for use when the control is revealed in a popover or dialog ([#79354](https://github.com/WordPress/gutenberg/pull/79354)).
+ -   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79112](https://github.com/WordPress/gutenberg/pull/79112)).
+ -   `Button`, `DropdownMenu`, `FormToggle`, `Modal`, `Panel`, `RadioControl`, `Toolbar`: Migrate hardcoded border and stroke colors to WPDS tokens ([#79244](https://github.com/WordPress/gutenberg/pull/79244)).
+ 
+diff --git a/packages/components/src/alignment-matrix-control/README.md b/packages/components/src/alignment-matrix-control/README.md
+index 39a5b90af8841a..3bd9b104f68c4a 100644
+--- a/packages/components/src/alignment-matrix-control/README.md
++++ b/packages/components/src/alignment-matrix-control/README.md
+@@ -24,6 +24,23 @@ const Example = () => {
+ 
+ ## Props
+ 
++### `autoFocus`
++
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
++
++If `true`, focuses the currently active cell receives when mounted.
++
++Intended for cases where the control is revealed in a popover or dialog
++and focus should move to it. AlignmentMatrixControl's initialization is
++asynchronous, and all rendered cells are tabbable until initialization
++is complete. This create race conditions when competing with programmatic
++focus management initiated when popovers are opened, where that focus
++management itself may be asynchronous. To avoid such race conditions,
++disable the external focus management and use this prop instead to focus
++the active cell once initialization is complete.
++
+ ### `defaultValue`
+ 
+  - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
+diff --git a/packages/components/src/alignment-matrix-control/cell.tsx b/packages/components/src/alignment-matrix-control/cell.tsx
+index c9e0c489cffe5a..f0cbd4cc281b88 100644
+--- a/packages/components/src/alignment-matrix-control/cell.tsx
++++ b/packages/components/src/alignment-matrix-control/cell.tsx
+@@ -21,12 +21,15 @@ import styles from './style.module.scss';
+ export default function Cell( {
+ 	id,
+ 	value,
++	autoFocus,
+ 	...props
+ }: WordPressComponentProps< AlignmentMatrixControlCellProps, 'span', false > ) {
+ 	return (
+ 		<Tooltip text={ ALIGNMENT_LABEL[ value ] }>
+ 			<Composite.Item
+ 				id={ id }
++				// eslint-disable-next-line jsx-a11y/no-autofocus -- This is a pass-through, and the appropriateness of autoFocus should be determined by the consumer.
++				autoFocus={ autoFocus }
+ 				render={
+ 					<span
+ 						{ ...props }
+diff --git a/packages/components/src/alignment-matrix-control/index.tsx b/packages/components/src/alignment-matrix-control/index.tsx
+index 94a9c2024908f5..a6007b63ecddd4 100644
+--- a/packages/components/src/alignment-matrix-control/index.tsx
++++ b/packages/components/src/alignment-matrix-control/index.tsx
+@@ -29,6 +29,7 @@ function UnforwardedAlignmentMatrixControl( {
+ 	value,
+ 	onChange,
+ 	width = 92,
++	autoFocus = false,
+ 	...props
+ }: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
+ 	const baseId = useInstanceId(
+@@ -37,6 +38,10 @@ function UnforwardedAlignmentMatrixControl( {
+ 		id
+ 	);
+ 
++	const defaultActiveId = getItemId( baseId, defaultValue );
++	const activeId = getItemId( baseId, value );
++	const resolvedActiveId = activeId ?? defaultActiveId;
++
+ 	const setActiveId = useCallback<
+ 		NonNullable< React.ComponentProps< typeof Composite >[ 'setActiveId' ] >
+ 	>(
+@@ -57,8 +62,8 @@ function UnforwardedAlignmentMatrixControl( {
+ 
+ 	return (
+ 		<Composite
+-			defaultActiveId={ getItemId( baseId, defaultValue ) }
+-			activeId={ getItemId( baseId, value ) }
++			defaultActiveId={ defaultActiveId }
++			activeId={ activeId }
+ 			setActiveId={ setActiveId }
+ 			rtl={ isRTL() }
+ 			render={
+@@ -79,13 +84,20 @@ function UnforwardedAlignmentMatrixControl( {
+ 					}
+ 					key={ index }
+ 				>
+-					{ cells.map( ( cell ) => (
+-						<Cell
+-							id={ getItemId( baseId, cell ) }
+-							key={ cell }
+-							value={ cell }
+-						/>
+-					) ) }
++					{ cells.map( ( cell ) => {
++						const cellId = getItemId( baseId, cell );
++						return (
++							<Cell
++								id={ cellId }
++								key={ cell }
++								value={ cell }
++								// eslint-disable-next-line jsx-a11y/no-autofocus -- This is a pass-through, and the appropriateness of autoFocus should be determined by the consumer.
++								autoFocus={
++									autoFocus && cellId === resolvedActiveId
++								}
++							/>
++						);
++					} ) }
+ 				</Composite.Row>
+ 			) ) }
+ 		</Composite>
+diff --git a/packages/components/src/alignment-matrix-control/types.ts b/packages/components/src/alignment-matrix-control/types.ts
+index e93f412c1f4721..72d610d3b68aeb 100644
+--- a/packages/components/src/alignment-matrix-control/types.ts
++++ b/packages/components/src/alignment-matrix-control/types.ts
+@@ -38,6 +38,21 @@ export type AlignmentMatrixControlProps = {
+ 	 * @default 92
+ 	 */
+ 	width?: number;
++	/**
++	 * If `true`, focuses the currently active cell receives when mounted.
++	 *
++	 * Intended for cases where the control is revealed in a popover or dialog
++	 * and focus should move to it. AlignmentMatrixControl's initialization is
++	 * asynchronous, and all rendered cells are tabbable until initialization
++	 * is complete. This create race conditions when competing with programmatic
++	 * focus management initiated when popovers are opened, where that focus
++	 * management itself may be asynchronous. To avoid such race conditions,
++	 * disable the external focus management and use this prop instead to focus
++	 * the active cell once initialization is complete.
++	 *
++	 * @default false
++	 */
++	autoFocus?: boolean;
+ };
+ 
+ export type AlignmentMatrixControlIconProps = Pick<

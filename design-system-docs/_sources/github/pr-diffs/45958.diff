@@ -1,0 +1,24 @@
+diff --git a/packages/block-library/src/cover/edit/inspector-controls.js b/packages/block-library/src/cover/edit/inspector-controls.js
+index cfcf012badd62c..98747988c8f409 100644
+--- a/packages/block-library/src/cover/edit/inspector-controls.js
++++ b/packages/block-library/src/cover/edit/inspector-controls.js
+@@ -162,6 +162,7 @@ export default function CoverInspectorControls( {
+ 						) }
+ 						{ showFocalPointPicker && (
+ 							<FocalPointPicker
++								__nextHasNoMarginBottom
+ 								label={ __( 'Focal point picker' ) }
+ 								url={ url }
+ 								value={ focalPoint }
+diff --git a/packages/block-library/src/media-text/edit.js b/packages/block-library/src/media-text/edit.js
+index 5a88830d385d18..ccec1eb8710034 100644
+--- a/packages/block-library/src/media-text/edit.js
++++ b/packages/block-library/src/media-text/edit.js
+@@ -268,6 +268,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
+ 			) }
+ 			{ imageFill && mediaUrl && mediaType === 'image' && (
+ 				<FocalPointPicker
++					__nextHasNoMarginBottom
+ 					label={ __( 'Focal point picker' ) }
+ 					url={ mediaUrl }
+ 					value={ focalPoint }

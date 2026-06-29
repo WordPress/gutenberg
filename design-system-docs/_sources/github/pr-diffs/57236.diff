@@ -1,0 +1,39 @@
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md
+index a3a9a94807e93d..e673a1ed45bbf6 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md
+@@ -4,7 +4,7 @@
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-`ToggleGroupControlOptionBase` is a form component and is meant to be used as an internal, generic component for any children of [`ToggleGroupControl`](<(/packages/components/src/toggle-group-control/toggle-group-control/README.md)>).
++`ToggleGroupControlOptionBase` is a form component and is meant to be used as an internal, generic component for any children of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md).
+ 
+ ## Props
+ 
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+index d82700ae21b1f5..8b96470e21301e 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+@@ -4,7 +4,7 @@
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-`ToggleGroupControlOptionIcon` is a form component which is meant to be used as a child of [`ToggleGroupControl`] and displays an icon(<(/packages/components/src/toggle-group-control/toggle-group-control/README.md)>).
++`ToggleGroupControlOptionIcon` is a form component which is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md) and displays an icon.
+ 
+ ## Usage
+ 
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+index 2de2e665c3f5b2..7f9f4d32f29fc3 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+@@ -4,7 +4,7 @@
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-`ToggleGroupControlOption` is a form component and is meant to be used as a child of [`ToggleGroupControl`]((/packages/components/src/toggle-group-control/toggle-group-control/README.md)).
++`ToggleGroupControlOption` is a form component and is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md).
+ 
+ 
+ ## Usage

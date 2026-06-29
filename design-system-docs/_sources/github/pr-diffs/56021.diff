@@ -1,0 +1,101 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5e851ab2b63df0..edbd02867c0103 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `QueryControls`: Add opt-in prop for 40px default size ([#56576](https://github.com/WordPress/gutenberg/pull/56576)).
+ -   `CheckboxControl`: Add option to not render label ([#56158](https://github.com/WordPress/gutenberg/pull/56158)).
+ -   `PaletteEdit`: Gradient pickers to use same width as color pickers ([#56801](https://github.com/WordPress/gutenberg/pull/56801)).
++-   `FocalPointPicker`: Add opt-in prop for 40px default size ([#56021](https://github.com/WordPress/gutenberg/pull/56021)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/focal-point-picker/controls.tsx b/packages/components/src/focal-point-picker/controls.tsx
+index f204d5736779cb..40cf8d215704b5 100644
+--- a/packages/components/src/focal-point-picker/controls.tsx
++++ b/packages/components/src/focal-point-picker/controls.tsx
+@@ -23,6 +23,7 @@ const noop = () => {};
+ 
+ export default function FocalPointPickerControls( {
+ 	__nextHasNoMarginBottom,
++	__next40pxDefaultSize,
+ 	hasHelpText,
+ 	onChange = noop,
+ 	point = {
+@@ -51,8 +52,10 @@ export default function FocalPointPickerControls( {
+ 			className="focal-point-picker__controls"
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 			hasHelpText={ hasHelpText }
++			gap={ 4 }
+ 		>
+ 			<FocalPointUnitControl
++				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 				label={ __( 'Left' ) }
+ 				aria-label={ __( 'Focal point left position' ) }
+ 				value={ [ valueX, '%' ].join( '' ) }
+@@ -66,6 +69,7 @@ export default function FocalPointPickerControls( {
+ 				dragDirection="e"
+ 			/>
+ 			<FocalPointUnitControl
++				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 				label={ __( 'Top' ) }
+ 				aria-label={ __( 'Focal point top position' ) }
+ 				value={ [ valueY, '%' ].join( '' ) }
+diff --git a/packages/components/src/focal-point-picker/index.tsx b/packages/components/src/focal-point-picker/index.tsx
+index 65efdc322cf0c6..1b4c4d9dff9665 100644
+--- a/packages/components/src/focal-point-picker/index.tsx
++++ b/packages/components/src/focal-point-picker/index.tsx
+@@ -84,6 +84,7 @@ const GRID_OVERLAY_TIMEOUT = 600;
+  */
+ export function FocalPointPicker( {
+ 	__nextHasNoMarginBottom,
++	__next40pxDefaultSize = false,
+ 	autoPlay = true,
+ 	className,
+ 	help,
+@@ -273,6 +274,7 @@ export function FocalPointPicker( {
+ 			</MediaWrapper>
+ 			<Controls
+ 				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 				hasHelpText={ !! help }
+ 				point={ { x, y } }
+ 				onChange={ ( value ) => {
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
+index f405b02959f9d7..3df6d1bc6eafbe 100644
+--- a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
++++ b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
+@@ -53,7 +53,7 @@ export const MediaPlaceholder = styled.div`
+ `;
+ 
+ export const StyledUnitControl = styled( UnitControl )`
+-	width: 100px;
++	width: 100%;
+ `;
+ 
+ const deprecatedBottomMargin = ( {
+diff --git a/packages/components/src/focal-point-picker/types.ts b/packages/components/src/focal-point-picker/types.ts
+index 81b683b7ce16cb..bd66ae02451a95 100644
+--- a/packages/components/src/focal-point-picker/types.ts
++++ b/packages/components/src/focal-point-picker/types.ts
+@@ -26,6 +26,12 @@ export type FocalPointPickerProps = Pick<
+ 	 * @default false
+ 	 */
+ 	__nextHasNoMarginBottom?: boolean;
++	/**
++	 * Start opting into the larger default height that will become the default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next40pxDefaultSize?: boolean;
+ 	/**
+ 	 * Autoplays HTML5 video. This only applies to video sources (`url`).
+ 	 *
+@@ -62,6 +68,7 @@ export type FocalPointPickerProps = Pick<
+ 
+ export type FocalPointPickerControlsProps = {
+ 	__nextHasNoMarginBottom?: boolean;
++	__next40pxDefaultSize?: boolean;
+ 	/**
+ 	 * A bit of extra bottom margin will be added if a `help` text
+ 	 * needs to be rendered under it.

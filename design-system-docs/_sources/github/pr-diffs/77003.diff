@@ -1,0 +1,128 @@
+diff --git a/packages/block-editor/src/components/block-list/block-crash-warning.js b/packages/block-editor/src/components/block-list/block-crash-warning.js
+index 3a1b2100f55c3b..fa1a2487e826e9 100644
+--- a/packages/block-editor/src/components/block-list/block-crash-warning.js
++++ b/packages/block-editor/src/components/block-list/block-crash-warning.js
+@@ -14,4 +14,6 @@ const warning = (
+ 	</Warning>
+ );
+ 
+-export default () => warning;
++export default function BlockCrashWarning() {
++	return warning;
++}
+diff --git a/packages/block-editor/src/components/block-list/block-crash-warning.native.js b/packages/block-editor/src/components/block-list/block-crash-warning.native.js
+index 4736938b9d74f2..c575a58c9bb501 100644
+--- a/packages/block-editor/src/components/block-list/block-crash-warning.native.js
++++ b/packages/block-editor/src/components/block-list/block-crash-warning.native.js
+@@ -16,4 +16,6 @@ const warning = (
+ 	/>
+ );
+ 
+-export default () => warning;
++export default function BlockCrashWarning() {
++	return warning;
++}
+diff --git a/packages/components/src/higher-order/with-focus-outside/index.native.js b/packages/components/src/higher-order/with-focus-outside/index.native.js
+index e23ae14b0b52de..946606237d22b2 100644
+--- a/packages/components/src/higher-order/with-focus-outside/index.native.js
++++ b/packages/components/src/higher-order/with-focus-outside/index.native.js
+@@ -12,26 +12,27 @@ import {
+ } from '@wordpress/compose';
+ 
+ export default createHigherOrderComponent(
+-	( WrappedComponent ) => ( props ) => {
+-		const [ handleFocusOutside, setHandleFocusOutside ] = useState();
+-		const bindFocusOutsideHandler = useCallback(
+-			( node ) =>
+-				setHandleFocusOutside( () =>
+-					node?.handleFocusOutside
+-						? node.handleFocusOutside.bind( node )
+-						: undefined
+-				),
+-			[]
+-		);
++	( WrappedComponent ) =>
++		function WithFocusOutside( props ) {
++			const [ handleFocusOutside, setHandleFocusOutside ] = useState();
++			const bindFocusOutsideHandler = useCallback(
++				( node ) =>
++					setHandleFocusOutside( () =>
++						node?.handleFocusOutside
++							? node.handleFocusOutside.bind( node )
++							: undefined
++					),
++				[]
++			);
+ 
+-		return (
+-			<View { ...useFocusOutside( handleFocusOutside ) }>
+-				<WrappedComponent
+-					ref={ bindFocusOutsideHandler }
+-					{ ...props }
+-				/>
+-			</View>
+-		);
+-	},
++			return (
++				<View { ...useFocusOutside( handleFocusOutside ) }>
++					<WrappedComponent
++						ref={ bindFocusOutsideHandler }
++						{ ...props }
++					/>
++				</View>
++			);
++		},
+ 	'withFocusOutside'
+ );
+diff --git a/packages/components/src/toolbar/toolbar-button/toolbar-button-container.native.js b/packages/components/src/toolbar/toolbar-button/toolbar-button-container.native.js
+index 2141f79430b016..0ac1ae188285ab 100644
+--- a/packages/components/src/toolbar/toolbar-button/toolbar-button-container.native.js
++++ b/packages/components/src/toolbar/toolbar-button/toolbar-button-container.native.js
+@@ -3,4 +3,6 @@
+  */
+ import { View } from 'react-native';
+ 
+-export default ( props ) => <View>{ props.children }</View>;
++export default function ToolbarButtonContainer( props ) {
++	return <View>{ props.children }</View>;
++}
+diff --git a/packages/core-data/src/hooks/use-entity-record.ts b/packages/core-data/src/hooks/use-entity-record.ts
+index 2020a365d87bcc..87b201b3a2f0cc 100644
+--- a/packages/core-data/src/hooks/use-entity-record.ts
++++ b/packages/core-data/src/hooks/use-entity-record.ts
+@@ -222,7 +222,7 @@ export default function useEntityRecord< RecordType >(
+ 	};
+ }
+ 
+-export function __experimentalUseEntityRecord(
++function useDeprecatedEntityRecord(
+ 	kind: string,
+ 	name: string,
+ 	recordId: any,
+@@ -234,3 +234,5 @@ export function __experimentalUseEntityRecord(
+ 	} );
+ 	return useEntityRecord( kind, name, recordId, options );
+ }
++
++export { useDeprecatedEntityRecord as __experimentalUseEntityRecord };
+diff --git a/packages/core-data/src/hooks/use-resource-permissions.ts b/packages/core-data/src/hooks/use-resource-permissions.ts
+index 72163c1a55bde8..6e8c3e9cea8026 100644
+--- a/packages/core-data/src/hooks/use-resource-permissions.ts
++++ b/packages/core-data/src/hooks/use-resource-permissions.ts
+@@ -209,13 +209,12 @@ function useResourcePermissions< IdType = void >(
+ 
+ export default useResourcePermissions;
+ 
+-export function __experimentalUseResourcePermissions(
+-	resource: string,
+-	id?: unknown
+-) {
++function useDeprecatedResourcePermissions( resource: string, id?: unknown ) {
+ 	deprecated( `wp.data.__experimentalUseResourcePermissions`, {
+ 		alternative: 'wp.data.useResourcePermissions',
+ 		since: '6.1',
+ 	} );
+ 	return useResourcePermissions( resource, id );
+ }
++
++export { useDeprecatedResourcePermissions as __experimentalUseResourcePermissions };

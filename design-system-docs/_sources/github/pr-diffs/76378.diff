@@ -1,0 +1,184 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 7af6d21a72e450..02add77bbc758e 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -   `Notice`: Use `Text` component for `Title` and `Description` typography ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
+ -   `Card`, `CollapsibleCard`: update padding to match legacy `Card` component ([#76368](https://github.com/WordPress/gutenberg/pull/76368)).
+ -   `CollapsibleCard`: move trigger to the header ([#76265](https://github.com/WordPress/gutenberg/pull/76265)).
++-   `CollapsibleCard`: add animations ([#76378](https://github.com/WordPress/gutenberg/pull/76378)).
+ 
+ ## 0.8.0 (2026-03-04)
+ 
+diff --git a/packages/ui/src/card/style.module.css b/packages/ui/src/card/style.module.css
+index ac9f45ab9add08..61dce405820b4d 100644
+--- a/packages/ui/src/card/style.module.css
++++ b/packages/ui/src/card/style.module.css
+@@ -4,6 +4,7 @@
+ 	.root {
+ 		--wp-ui-card-padding: var(--wpds-dimension-padding-2xl);
+ 		--wp-ui-card-header-content-gap: var(--wpds-dimension-gap-xl);
++		--wp-ui-card-header-content-margin: calc(var(--wp-ui-card-header-content-gap) - var(--wp-ui-card-padding));
+ 
+ 		display: flex;
+ 		flex-direction: column;
+@@ -28,7 +29,7 @@
+ 	/* Custom vertical gap between header and content */
+ 	.header + .content {
+ 		padding-block-start: 0;
+-		margin-block-start: calc(var(--wp-ui-card-header-content-gap) - var(--wp-ui-card-padding));
++		margin-block-start: var(--wp-ui-card-header-content-margin);
+ 	}
+ 
+ 	.fullbleed {
+diff --git a/packages/ui/src/collapsible-card/content.tsx b/packages/ui/src/collapsible-card/content.tsx
+index 0f57970b68b2e9..cff163eeef6534 100644
+--- a/packages/ui/src/collapsible-card/content.tsx
++++ b/packages/ui/src/collapsible-card/content.tsx
+@@ -1,6 +1,8 @@
+ import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
+ import * as Card from '../card';
+ import * as Collapsible from '../collapsible';
++import styles from './style.module.css';
+ import type { ContentProps } from './types';
+ 
+ /**
+@@ -8,13 +10,23 @@ import type { ContentProps } from './types';
+  * visible when expanded.
+  */
+ export const Content = forwardRef< HTMLDivElement, ContentProps >(
+-	function CollapsibleCardContent( { render, ...restProps }, ref ) {
++	function CollapsibleCardContent(
++		{ className, render, children, ...restProps },
++		ref
++	) {
+ 		return (
+ 			<Collapsible.Panel
+ 				ref={ ref }
+-				render={ <Card.Content render={ render } /> }
++				className={ clsx( styles.content, className ) }
+ 				{ ...restProps }
+-			/>
++			>
++				<Card.Content
++					className={ styles[ 'content-inner' ] }
++					render={ render }
++				>
++					{ children }
++				</Card.Content>
++			</Collapsible.Panel>
+ 		);
+ 	}
+ );
+diff --git a/packages/ui/src/collapsible-card/stories/index.story.tsx b/packages/ui/src/collapsible-card/stories/index.story.tsx
+index 97b0b19b3f2507..a505bd3bf4a5ea 100644
+--- a/packages/ui/src/collapsible-card/stories/index.story.tsx
++++ b/packages/ui/src/collapsible-card/stories/index.story.tsx
+@@ -105,6 +105,57 @@ export const Disabled: Story = {
+ 	},
+ };
+ 
++/**
++ * Multiple collapsible cards stacked vertically, simulating a typical
++ * settings-panel or FAQ-style layout.
++ */
++export const Stacked: Story = {
++	parameters: { controls: { disable: true } },
++	render: () => (
++		<div
++			style={ {
++				display: 'flex',
++				flexDirection: 'column',
++				gap: 'var(--wpds-dimension-gap-lg)',
++			} }
++		>
++			{ [
++				'General',
++				'Advanced',
++				'Accessibility',
++				'Performance',
++				'Privacy',
++				'Notifications',
++			].map( ( title ) => (
++				<CollapsibleCard.Root key={ title }>
++					<CollapsibleCard.Header>
++						<Card.Title>{ title }</Card.Title>
++					</CollapsibleCard.Header>
++					<CollapsibleCard.Content>
++						<Text>
++							Configure all { title.toLowerCase() } settings for
++							your site. Changes here affect how your site behaves
++							across all pages and posts.
++						</Text>
++						<Text>
++							Review each option carefully before saving. Some
++							changes may require a page reload to take effect.
++							Hover over individual options for more details about
++							what they control.
++						</Text>
++						<Text>
++							If you&apos;re unsure about a setting, you can
++							always reset to defaults using the button at the
++							bottom of this section. Your previous configuration
++							will be saved as a backup.
++						</Text>
++					</CollapsibleCard.Content>
++				</CollapsibleCard.Root>
++			) ) }
++		</div>
++	),
++};
++
+ /**
+  * Visual comparison: a `CollapsibleCard` (open) next to a regular `Card`
+  * to verify identical spacing and layout.
+diff --git a/packages/ui/src/collapsible-card/style.module.css b/packages/ui/src/collapsible-card/style.module.css
+index 55b0744ebb6532..168490e44176bc 100644
+--- a/packages/ui/src/collapsible-card/style.module.css
++++ b/packages/ui/src/collapsible-card/style.module.css
+@@ -23,6 +23,10 @@
+ 
+ 		/* For an outline that looks like `IconButton`'s */
+ 		border-radius: var(--wpds-border-radius-sm);
++
++		@media not (prefers-reduced-motion) {
++			transition: rotate 0.15s ease-out;
++		}
+ 	}
+ 
+ 	.header[data-panel-open] .header-trigger {
+@@ -33,9 +37,33 @@
+ 	.header[data-disabled] .header-trigger {
+ 		color: var(--wpds-color-fg-interactive-neutral-disabled);
+ 	}
++
++	.content {
++		height: var(--collapsible-panel-height);
++		overflow: hidden;
++		margin-block-start: var(--wp-ui-card-header-content-margin);
++
++		&[hidden]:not([hidden="until-found"]) {
++			display: none;
++		}
++
++		&[data-starting-style],
++		&[data-ending-style] {
++			height: 0;
++		}
++
++		@media not (prefers-reduced-motion) {
++			transition: all 150ms ease-out;
++		}
++	}
++
+ }
+ 
+ @layer wp-ui-compositions {
++	.content-inner {
++		padding-block-start: 0;
++	}
++
+ 	.header {
+ 		display: flex;
+ 		flex-direction: row;

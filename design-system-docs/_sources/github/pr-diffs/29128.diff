@@ -1,0 +1,2065 @@
+diff --git a/packages/components/src/ui/README.md b/packages/components/src/ui/README.md
+new file mode 100644
+index 00000000000000..3b9dd5a3223e61
+--- /dev/null
++++ b/packages/components/src/ui/README.md
+@@ -0,0 +1,22 @@
++# (Next) Component System
++
++This directory contains the code for next Component System.
++
++More information can be found in the original Github issue:
++https://github.com/WordPress/gutenberg/issues/27484
++
++## Usage
++
++(This is still very much a work in progress)
++
++```jsx
++import { Text, View } from '@wordpress/components/ui';
++
++function Example() {
++	return (
++		<View>
++			<Text>Code is Poetry</Text>
++		</View>
++	);
++}
++```
+diff --git a/packages/components/src/ui/control-group/component.js b/packages/components/src/ui/control-group/component.js
+index f0a3c77c535487..c35c687bc7926b 100644
+--- a/packages/components/src/ui/control-group/component.js
++++ b/packages/components/src/ui/control-group/component.js
+@@ -57,7 +57,7 @@ function ControlGroup( props, forwardedRef ) {
+  *
+  * @example
+  * ```jsx
+- * import { Button, ControlGroup, Select, TextInput } from `@wordpress/components/ui`
++ * import { Button, ControlGroup, Select, TextInput } from `@wordpress/components/ui`;
+  *
+  * function Example() {
+  *   return (
+diff --git a/packages/components/src/ui/control-group/types.ts b/packages/components/src/ui/control-group/types.ts
+index f5503db2e2bd40..5b6d66e24a0b5b 100644
+--- a/packages/components/src/ui/control-group/types.ts
++++ b/packages/components/src/ui/control-group/types.ts
+@@ -14,21 +14,6 @@ export type ControlGroupContext = {
+ export type Props = Pick< FlexProps, 'direction' > & {
+ 	/**
+ 	 * Adjust the layout (width) of content using CSS grid (`grid-template-columns`).
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Button, ControlGroup, Select, TextInput } from `@wordpress/components/ui`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <ControlGroup templateColumns="auto 1fr auto">
+-	 *       <Select />
+-	 *       <TextInput placeholder="First name" />
+-	 *       <Button variant="primary" />
+-	 *     </ControlGroup>
+-	 *   );
+-	 * }
+-	 * ```
+ 	 */
+ 	templateColumns?: CSSProperties[ 'gridTemplateColumns' ];
+ };
+diff --git a/packages/components/src/ui/control-label/README.md b/packages/components/src/ui/control-label/README.md
+index 511b93fad37309..ee6dd9a31329d6 100644
+--- a/packages/components/src/ui/control-label/README.md
++++ b/packages/components/src/ui/control-label/README.md
+@@ -5,11 +5,7 @@
+ ## Usage
+ 
+ ```jsx
+-import {
+-	__experimentalControlLabel as ControlLabel,
+-	__experimentalFormGroup as FormGroup,
+-	__experimentalTextInput as TextInput,
+-} from '@wordpress/components';
++import { ControlLabel, FormGroup, TextInput } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+diff --git a/packages/components/src/ui/control-label/component.js b/packages/components/src/ui/control-label/component.js
+new file mode 100644
+index 00000000000000..1e2ff02029e44b
+--- /dev/null
++++ b/packages/components/src/ui/control-label/component.js
+@@ -0,0 +1,30 @@
++/**
++ * Internal dependencies
++ */
++import { createComponent } from '../utils';
++import { useControlLabel } from './hook';
++
++/**
++ * `ControlLabel` is a form component that works with `FormGroup` to provide a
++ * label for form elements (e.g. `Switch` or `TextInput`).
++ *
++ * ```jsx
++ * import { ControlLabel, FormGroup, TextInput } from '@wordpress/components/ui';
++ *
++ * function Example() {
++ * 	return (
++ * 		<FormGroup>
++ * 			<ControlLabel>First Name</ControlLabel>
++ * 			<TextInput />
++ * 		</FormGroup>
++ * 	);
++ * }
++ * ```
++ */
++const ControlLabel = createComponent( {
++	as: 'label',
++	useHook: useControlLabel,
++	name: 'ControlLabel',
++} );
++
++export default ControlLabel;
+diff --git a/packages/components/src/ui/control-label/control-label.js b/packages/components/src/ui/control-label/control-label.js
+deleted file mode 100644
+index b662bf2474f031..00000000000000
+--- a/packages/components/src/ui/control-label/control-label.js
++++ /dev/null
+@@ -1,13 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { createComponent } from '../utils';
+-import { useControlLabel } from './use-control-label';
+-
+-const ControlLabel = createComponent( {
+-	as: 'label',
+-	useHook: useControlLabel,
+-	name: 'ControlLabel',
+-} );
+-
+-export default ControlLabel;
+diff --git a/packages/components/src/ui/control-label/use-control-label.js b/packages/components/src/ui/control-label/hook.js
+similarity index 94%
+rename from packages/components/src/ui/control-label/use-control-label.js
+rename to packages/components/src/ui/control-label/hook.js
+index 6cceff5dd6a39c..626fec07274bc9 100644
+--- a/packages/components/src/ui/control-label/use-control-label.js
++++ b/packages/components/src/ui/control-label/hook.js
+@@ -9,7 +9,7 @@ import { cx } from '@wp-g2/styles';
+  */
+ import { useFormGroupContextId } from '../form-group';
+ import { useText } from '../text';
+-import * as styles from './control-label-styles';
++import * as styles from './styles';
+ 
+ /**
+  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'label'>} props
+diff --git a/packages/components/src/ui/control-label/index.js b/packages/components/src/ui/control-label/index.js
+index 560861f55fa85a..c73e0027014e24 100644
+--- a/packages/components/src/ui/control-label/index.js
++++ b/packages/components/src/ui/control-label/index.js
+@@ -1,2 +1,2 @@
+-export { default as ControlLabel } from './control-label';
+-export * from './use-control-label';
++export { default as ControlLabel } from './component';
++export * from './hook';
+diff --git a/packages/components/src/ui/control-label/control-label-styles.js b/packages/components/src/ui/control-label/styles.js
+similarity index 100%
+rename from packages/components/src/ui/control-label/control-label-styles.js
+rename to packages/components/src/ui/control-label/styles.js
+diff --git a/packages/components/src/ui/elevation/README.md b/packages/components/src/ui/elevation/README.md
+index 777cec0c654c9a..6c57b501daf18e 100644
+--- a/packages/components/src/ui/elevation/README.md
++++ b/packages/components/src/ui/elevation/README.md
+@@ -6,18 +6,13 @@
+ 
+ The shadow effect is generated using the `value` prop.
+ 
+-```jsx live
+-import {
+-	__experimentalElevation as Elevation,
+-	__experimetnalSurface as Surface,
+-	__experimetnalText as Text,
+-	__experimetnalView as View,
+-} from '@wp-g2/components';
++```jsx
++import { Elevation, Surface, Text, View } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+ 		<Surface>
+-			<Text>Elevation</Text>
++			<Text>Code is Poetry</Text>
+ 			<Elevation value={ 5 } />
+ 		</Surface>
+ 	);
+diff --git a/packages/components/src/ui/elevation/elevation.js b/packages/components/src/ui/elevation/component.js
+similarity index 60%
+rename from packages/components/src/ui/elevation/elevation.js
+rename to packages/components/src/ui/elevation/component.js
+index f09ce51d92689a..3d525c099ceeac 100644
+--- a/packages/components/src/ui/elevation/elevation.js
++++ b/packages/components/src/ui/elevation/component.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { useElevation } from './use-elevation';
++import { useElevation } from './hook';
+ import { createComponent } from '../utils';
+ 
+ /**
+@@ -11,15 +11,15 @@ import { createComponent } from '../utils';
+  *
+  * @example
+  * ```jsx
++ * import { Elevation, Surface, Text, View } from `@wordpress/components/ui`;
++ *
+  * function Example() {
+- *   return (
+- *     <View css={ [ ui.padding( 5 ) ] }>
+- *       <Surface css={ [ ui.padding( 5 ) ] }>
+- *         <Text>Into The Unknown</Text>
+- *         <Elevation value={ 5 } />
+- *       </Surface>
+- *     </View>
+- *   );
++ * 	return (
++ * 		<Surface>
++ * 			<Text>Code is Poetry</Text>
++ * 			<Elevation value={ 5 } />
++ * 		</Surface>
++ * 	);
+  * }
+  * ```
+  */
+diff --git a/packages/components/src/ui/elevation/use-elevation.js b/packages/components/src/ui/elevation/hook.js
+similarity index 97%
+rename from packages/components/src/ui/elevation/use-elevation.js
+rename to packages/components/src/ui/elevation/hook.js
+index b26b6259461506..9cf55c0b08d5f8 100644
+--- a/packages/components/src/ui/elevation/use-elevation.js
++++ b/packages/components/src/ui/elevation/hook.js
+@@ -13,7 +13,7 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import * as styles from './elevation-styles';
++import * as styles from './styles';
+ 
+ /**
+  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
+diff --git a/packages/components/src/ui/elevation/index.js b/packages/components/src/ui/elevation/index.js
+index bb457293a6fdee..dcf1b5cbf71e2b 100644
+--- a/packages/components/src/ui/elevation/index.js
++++ b/packages/components/src/ui/elevation/index.js
+@@ -1,2 +1,2 @@
+-export { default as Elevation } from './elevation';
+-export * from './use-elevation';
++export { default as Elevation } from './component';
++export * from './hook';
+diff --git a/packages/components/src/ui/elevation/elevation-styles.js b/packages/components/src/ui/elevation/styles.js
+similarity index 100%
+rename from packages/components/src/ui/elevation/elevation-styles.js
+rename to packages/components/src/ui/elevation/styles.js
+diff --git a/packages/components/src/ui/elevation/types.ts b/packages/components/src/ui/elevation/types.ts
+index fd9cb7ad91139d..c0463bd2c33895 100644
+--- a/packages/components/src/ui/elevation/types.ts
++++ b/packages/components/src/ui/elevation/types.ts
+@@ -28,23 +28,6 @@ export type Props = {
+ 	/**
+ 	 * Size of the shadow, based on the Style system's elevation system. The `value` determines the strength of the shadow, which sense of depth.
+ 	 * In the example below, `isInteractive` is activated to give a better sense of depth.
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Elevation, Surface, Text, View } from `@wp-g2/components`
+-	 * import { ui } from `@wp-g2/styles`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <View css={[ui.padding(5)]}>
+-	 *       <Surface css={[ui.padding(5)]}>
+-	 *         <Text>Into The Unknown</Text>
+-	 *         <Elevation value={8} isInteractive />
+-	 *       </Surface>
+-	 *     </View>
+-	 *   )
+-	 * }
+-	 * ```
+ 	 */
+ 	value?: number;
+ 	children?: never;
+diff --git a/packages/components/src/ui/flex/README.md b/packages/components/src/ui/flex/README.md
+index 5b40592e00301f..e970053ffcea16 100644
+--- a/packages/components/src/ui/flex/README.md
++++ b/packages/components/src/ui/flex/README.md
+@@ -6,21 +6,17 @@
+ 
+ `Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
+ 
+-```jsx live
+-import { Flex, FlexItem, FlexBlock, Text, View } from '@wordpress/components/ui';
++```jsx
++import { Flex, FlexItem, FlexBlock, Text } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+ 		<Flex>
+ 			<FlexItem>
+-				<View css={[ui.background.blue]}>
+-					<Text>Ana</Text>
+-				</View>
++				<Text>Code</Text>
+ 			</FlexItem>
+ 			<FlexBlock>
+-				<View css={[ui.background.blue]}>
+-					<Text>Elsa</Text>
+-				</View>
++				<Text>Poetry</Text>
+ 			</FlexBlock>
+ 		</Flex>
+ 	);
+@@ -43,72 +39,18 @@ In the example below, `flex-start` will align the children content to the top.
+ 
+ The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
+ 
+-```jsx live
+-import { Flex, Text, View } from '@wordpress/components/ui';
+-import { ui } from '@wp-g2/styles';
+-
+-function Example() {
+-	return (
+-		<Flex direction="column">
+-			<View css={[ui.background.blue]}>
+-				<Text>Ana</Text>
+-			</View>
+-			<View css={[ui.background.blue]}>
+-				<Text>Elsa</Text>
+-			</View>
+-		</Flex>
+-	);
+-}
+-```
+-
+ ##### expanded
+ 
+ **Type**: `boolean`
+ 
+ Expands to the maximum available width (if horizontal) or height (if vertical).
+ 
+-```jsx live
+-import { Flex, Text, View } from '@wordpress/components/ui';
+-import { ui } from '@wp-g2/styles';
+-
+-function Example() {
+-	return (
+-		<Flex direction="row" expanded>
+-			<View css={[ui.background.blue]}>
+-				<Text>Ana</Text>
+-			</View>
+-			<View css={[ui.background.blue]}>
+-				<Text>Elsa</Text>
+-			</View>
+-		</Flex>
+-	);
+-}
+-```
+-
+ ##### gap
+ 
+ **Type**: `number`
+ 
+ Spacing in between each child can be adjusted by using `gap`. The value of `gap` works as a multiplier to the library's grid system (base of `4px`).
+ 
+-```jsx live
+-import { Flex, Text, View } from '@wordpress/components/ui';
+-import { ui } from '@wp-g2/styles';
+-
+-function Example() {
+-	return (
+-		<Flex justify="flex-start" gap={8}>
+-			<View css={[ui.background.blue]}>
+-				<Text>Ana</Text>
+-			</View>
+-			<View css={[ui.background.blue]}>
+-				<Text>Elsa</Text>
+-			</View>
+-		</Flex>
+-	);
+-}
+-```
+-
+ ##### justify
+ 
+ **Type**: `CSS['justifyContent']`
+@@ -121,36 +63,3 @@ In the example below, `flex-start` will align the children content to the left.
+ **Type**: `boolean`
+ 
+ Determines if children should wrap.
+-
+-```jsx live
+-import { Flex, Text, View } from '@wordpress/components/ui';
+-import { ui } from '@wp-g2/styles';
+-
+-function Example() {
+-	return (
+-		<Flex justify="flex-start" wrap>
+-			<View css={[ui.background.blue, { width: 200 }]}>
+-				<Text>Ana</Text>
+-			</View>
+-			<View css={[ui.background.blue, { width: 200 }]}>
+-				<Text>Elsa</Text>
+-			</View>
+-			<View css={[ui.background.blue, { width: 200 }]}>
+-				<Text>Olaf</Text>
+-			</View>
+-			<View css={[ui.background.blue, { width: 200 }]}>
+-				<Text>Kristoff</Text>
+-			</View>
+-			<View css={[ui.background.blue, { width: 200 }]}>
+-				<Text>Queen Iduna</Text>
+-			</View>
+-			<View css={[ui.background.blue, { width: 200 }]}>
+-				<Text>King Agnarr</Text>
+-			</View>
+-			<View css={[ui.background.blue, { width: 200 }]}>
+-				<Text>Yelena</Text>
+-			</View>
+-		</Flex>
+-	);
+-}
+-```
+diff --git a/packages/components/src/ui/flex/flex.js b/packages/components/src/ui/flex/flex.js
+index c3980e340db610..69dc4be48af498 100644
+--- a/packages/components/src/ui/flex/flex.js
++++ b/packages/components/src/ui/flex/flex.js
+@@ -5,30 +5,27 @@ import { createComponent } from '../utils';
+ import { useFlex } from './use-flex';
+ 
+ /**
+- * `Flex` is a primitive layout component that adaptively aligns child content horizontally or vertically. `Flex` powers components like `HStack` and `VStack`.
++ * `Flex` is a primitive layout component that adaptively aligns child content
++ * horizontally or vertically. `Flex` powers components like `HStack` and
++ * `VStack`.
+  *
+  * `Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
+  *
+- *
+  * @example
+  * ```jsx
+- * import { Flex, FlexItem, FlexBlock, Text, View } from `@wordpress/components`
++ * import { Flex, FlexItem, FlexBlock, Text } from `@wordpress/components/ui`;
+  *
+  * function Example() {
+- *   return (
+- *     <Flex>
+- *       <FlexItem>
+- *         <View css={[ui.background.blue]}>
+- *           <Text>Ana</Text>
+- *         </View>
+- *       </FlexItem>
+- *       <FlexBlock>
+- *         <View css={[ui.background.blue]}>
+- *           <Text>Elsa</Text>
+- *         </View>
+- *       </FlexBlock>
+- *     </Flex>
+- *   );
++ * 	return (
++ * 		<Flex>
++ * 			<FlexItem>
++ * 				<Text>Code</Text>
++ * 			</FlexItem>
++ * 			<FlexBlock>
++ * 				<Text>Poetry</Text>
++ * 			</FlexBlock>
++ * 		</Flex>
++ * 	);
+  * }
+  * ```
+  */
+diff --git a/packages/components/src/ui/flex/types.ts b/packages/components/src/ui/flex/types.ts
+index de235693df3999..795366a9cc7fd9 100644
+--- a/packages/components/src/ui/flex/types.ts
++++ b/packages/components/src/ui/flex/types.ts
+@@ -12,25 +12,6 @@ export type FlexProps = {
+ 	 * In the example below, `flex-start` will align the children content to the top.
+ 	 *
+ 	 * @default 'center'
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Flex, Text, View } from `@wordpress/components/ui`
+-	 * import { ui } from `@wp-g2/styles`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <Flex align="flex-start">
+-	 *       <View css={[ui.background.blue, { height: 100 }]}>
+-	 *         <Text>Ana</Text>
+-	 *       </View>
+-	 *       <View css={[ui.background.blue]}>
+-	 *         <Text>Elsa</Text>
+-	 *       </View>
+-	 *     </Flex>
+-	 *   )
+-	 * }
+-	 * ```
+ 	 */
+ 	align?: CSSProperties[ 'alignItems' ];
+ 	/**
+@@ -41,75 +22,18 @@ export type FlexProps = {
+ 	 * The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
+ 	 *
+ 	 * @default 'row'
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Flex, Text, View } from `@wordpress/components/ui`
+-	 * import { ui } from `@wp-g2/styles`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <Flex direction="column">
+-	 *       <View css={[ui.background.blue]}>
+-	 *         <Text>Ana</Text>
+-	 *       </View>
+-	 *       <View css={[ui.background.blue]}>
+-	 *         <Text>Elsa</Text>
+-	 *       </View>
+-	 *     </Flex>
+-	 *   )
+-	 * }
+-	 * ```
+ 	 */
+ 	direction?: FlexDirection;
+ 	/**
+ 	 * Expands to the maximum available width (if horizontal) or height (if vertical).
+ 	 *
+ 	 * @default true
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Flex, Text, View } from `@wordpress/components/ui`
+-	 * import { ui } from `@wp-g2/styles`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <Flex direction="row" expanded>
+-	 *       <View css={[ui.background.blue]}>
+-	 *         <Text>Ana</Text>
+-	 *       </View>
+-	 *       <View css={[ui.background.blue]}>
+-	 *         <Text>Elsa</Text>
+-	 *       </View>
+-	 *     </Flex>
+-	 *   )
+-	 * }
+-	 * ```
+ 	 */
+ 	expanded?: boolean;
+ 	/**
+ 	 * Spacing in between each child can be adjusted by using `gap`. The value of `gap` works as a multiplier to the library's grid system (base of `4px`).
+ 	 *
+ 	 * @default 2
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Flex, Text, View } from `@wordpress/components/ui`
+-	 * import { ui } from `@wp-g2/styles`
+-	 *
+-	 * function Example() {
+-	 * 	return (
+-	 * 		<Flex justify="flex-start" gap={8}>
+-	 * 			<View css={[ui.background.blue]}>
+-	 * 				<Text>Ana</Text>
+-	 * 			</View>
+-	 * 			<View css={[ui.background.blue]}>
+-	 * 				<Text>Elsa</Text>
+-	 * 			</View>
+-	 * 		</Flex>
+-	 * 	)
+-	 * }
+-	 * ```
+ 	 */
+ 	gap?: import('react').ReactText;
+ 	/**
+@@ -117,25 +41,6 @@ export type FlexProps = {
+ 	 * In the example below, `flex-start` will align the children content to the left.
+ 	 *
+ 	 * @default 'space-between'
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Flex, Text, View } from `@wordpress/components/ui`
+-	 * import { ui } from `@wp-g2/styles`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <Flex justify="flex-start">
+-	 *       <View css={[ui.background.blue, { height: 100 }]}>
+-	 *         <Text>Ana</Text>
+-	 *       </View>
+-	 *       <View css={[ui.background.blue]}>
+-	 *         <Text>Elsa</Text>
+-	 *       </View>
+-	 *     </Flex>
+-	 *   )
+-	 * }
+-	 * ```
+ 	 */
+ 	justify?: CSSProperties[ 'justifyContent' ];
+ 	/**
+@@ -146,40 +51,6 @@ export type FlexProps = {
+ 	 * Determines if children should wrap.
+ 	 *
+ 	 * @default false
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Flex, Text, View } from `@wordpress/components/ui`
+-	 * import { ui } from `@wp-g2/styles`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <Flex justify="flex-start" wrap>
+-	 *       <View css={[ui.background.blue, { width: 200 }]}>
+-	 *         <Text>Ana</Text>
+-	 *       </View>
+-	 *       <View css={[ui.background.blue, { width: 200 }]}>
+-	 *         <Text>Elsa</Text>
+-	 *       </View>
+-	 *       <View css={[ui.background.blue, { width: 200 }]}>
+-	 *         <Text>Olaf</Text>
+-	 *       </View>
+-	 *       <View css={[ui.background.blue, { width: 200 }]}>
+-	 *         <Text>Kristoff</Text>
+-	 *       </View>
+-	 *       <View css={[ui.background.blue, { width: 200 }]}>
+-	 *         <Text>Queen Iduna</Text>
+-	 *       </View>
+-	 *       <View css={[ui.background.blue, { width: 200 }]}>
+-	 *         <Text>King Agnarr</Text>
+-	 *       </View>
+-	 *       <View css={[ui.background.blue, { width: 200 }]}>
+-	 *         <Text>Yelena</Text>
+-	 *       </View>
+-	 *     </Flex>
+-	 *   )
+-	 * }
+-	 * ```
+ 	 */
+ 	wrap?: boolean;
+ };
+diff --git a/packages/components/src/ui/font-size-control/README.md b/packages/components/src/ui/font-size-control/README.md
+new file mode 100644
+index 00000000000000..aff5e97a568d24
+--- /dev/null
++++ b/packages/components/src/ui/font-size-control/README.md
+@@ -0,0 +1,5 @@
++# FontSizeControl
++
++`FontSizeControl` is a tool that renders a UI that allows users to select a font size.
++
++For more information, see the [`FontSizePicker`](../../font-size-picker).
+diff --git a/packages/components/src/ui/form-group/README.md b/packages/components/src/ui/form-group/README.md
+index 305729f2fa57cc..69b65aabc638ca 100644
+--- a/packages/components/src/ui/form-group/README.md
++++ b/packages/components/src/ui/form-group/README.md
+@@ -5,10 +5,7 @@
+ ## Usage
+ 
+ ```jsx
+-import {
+-	__experimentalFormGroup as FormGroup,
+-	__experimentalTextInput as TextInput,
+-} from '@wordpress/components';
++import { FormGroup, TextInput } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+diff --git a/packages/components/src/ui/form-group/form-group.js b/packages/components/src/ui/form-group/form-group.js
+index 3486d14d9a438f..ea17672b64b768 100644
+--- a/packages/components/src/ui/form-group/form-group.js
++++ b/packages/components/src/ui/form-group/form-group.js
+@@ -42,17 +42,14 @@ function FormGroup( props, forwardedRef ) {
+  *
+  * @example
+  * ```jsx
+- * import {
+- * 	__experimentalFormGroup as FormGroup,
+- * 	__experimentalTextInput as TextInput
+- * } from `@wordpress/components`
++ * import { FormGroup, TextInput } from `@wordpress/components/ui`;
+  *
+  * function Example() {
+  * 	return (
+  * 		<FormGroup label="First name">
+  * 			<TextInput />
+  * 		</FormGroup>
+- * 	)
++ * 	);
+  * }
+  * ```
+  */
+diff --git a/packages/components/src/ui/grid/README.md b/packages/components/src/ui/grid/README.md
+index 1910863bb8e2fd..4678b902bfa784 100644
+--- a/packages/components/src/ui/grid/README.md
++++ b/packages/components/src/ui/grid/README.md
+@@ -10,9 +10,9 @@ import { Grid, View } from '@wordpress/components/ui';
+ function Example() {
+ 	return (
+ 		<Grid columns={ 3 }>
+-			<View>One</View>
+-			<View>Two</View>
+-			<View>Three</View>
++			<View>Code</View>
++			<View>is</View>
++			<View>Poetry</View>
+ 		</Grid>
+ 	);
+ }
+diff --git a/packages/components/src/ui/grid/component.js b/packages/components/src/ui/grid/component.js
+index 8739e734736c40..98b3cd7f09b601 100644
+--- a/packages/components/src/ui/grid/component.js
++++ b/packages/components/src/ui/grid/component.js
+@@ -9,22 +9,16 @@ import useGrid from './hook';
+  *
+  * @example
+  * ```jsx
+- * import { Grid } from `@wordpress/components/ui`
++ * import { Grid, View } from `@wordpress/components/ui`;
+  *
+  * function Example() {
+- *   return (
+- *     <Grid columns={3}>
+- *       <View>
+- *         One
+- *       </View>
+- *       <View>
+- *         Two
+- *       </View>
+- *       <View>
+- *         Three
+- *       </View>
+- *     </Grid>
+- *   );
++ * 	return (
++ * 		<Grid columns={ 3 }>
++ * 			<View>Code</View>
++ * 			<View>is</View>
++ * 			<View>Poetry</View>
++ * 		</Grid>
++ * 	);
+  * }
+  * ```
+  */
+diff --git a/packages/components/src/ui/h-stack/README.md b/packages/components/src/ui/h-stack/README.md
+index bf627f85c39937..2d3b03d1a868c9 100644
+--- a/packages/components/src/ui/h-stack/README.md
++++ b/packages/components/src/ui/h-stack/README.md
+@@ -6,18 +6,18 @@
+ 
+ `HStack` can render anything inside.
+ 
+-```jsx 
++```jsx
+ function Example() {
+ 	return (
+ 		<HStack>
+-			<View css={ [ ui.background.blue ] }>
+-				<Text>Ana</Text>
++			<View>
++				<Text>Code</Text>
+ 			</View>
+-			<View css={ [ ui.background.blue ] }>
+-				<Text>Elsa</Text>
++			<View>
++				<Text>is</Text>
+ 			</View>
+-			<View css={ [ ui.background.blue ] }>
+-				<Text>Olaf</Text>
++			<View>
++				<Text>Poetry</Text>
+ 			</View>
+ 		</HStack>
+ 	);
+@@ -80,21 +80,20 @@ Determines if children should wrap.
+ 
+ When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to take up the remaining space.
+ 
+-```jsx live
+-import { HStack, Spacer, Text, View } from '@wp-g2/components';
+-import { ui } from '@wp-g2/styles';
++```jsx
++import { HStack, Spacer, Text, View } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+ 		<HStack>
+-			<View css={[ui.background.blue]}>
+-				<Text>Ana</Text>
++			<View>
++				<Text>Code</Text>
+ 			</View>
+-			<Spacer css={[ui.background.blue]}>
+-				<Text>Elsa</Text>
++			<Spacer>
++				<Text>is</Text>
+ 			</Spacer>
+-			<View css={[ui.background.blue]}>
+-				<Text>Olaf</Text>
++			<View>
++				<Text>Poetry</Text>
+ 			</View>
+ 		</HStack>
+ 	);
+@@ -103,25 +102,23 @@ function Example() {
+ 
+ `Spacer` also be used in-between items to push them apart.
+ 
+-```jsx live
+-import { HStack, Spacer, Text, View } from '@wp-g2/components';
+-import { ui } from '@wp-g2/styles';
++```jsx
++import { HStack, Spacer, Text, View } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+ 		<HStack>
+-			<View css={[ui.background.blue]}>
+-				<Text>Ana</Text>
++			<View>
++				<Text>Code</Text>
+ 			</View>
+ 			<Spacer />
+-			<View css={[ui.background.blue]}>
+-				<Text>Elsa</Text>
++			<View>
++				<Text>is</Text>
+ 			</View>
+-			<View css={[ui.background.blue]}>
+-				<Text>Olaf</Text>
++			<View>
++				<Text>Poetry</Text>
+ 			</View>
+ 		</HStack>
+ 	);
+ }
+ ```
+-
+diff --git a/packages/components/src/ui/h-stack/component.js b/packages/components/src/ui/h-stack/component.js
+index 68a3343fa33d9f..99ad64f834e496 100644
+--- a/packages/components/src/ui/h-stack/component.js
++++ b/packages/components/src/ui/h-stack/component.js
+@@ -4,6 +4,32 @@
+ import { createComponent } from '../utils';
+ import { useHStack } from './hook';
+ 
++/**
++ *`HStack` (Horizontal Stack) arranges child elements in a horizontal line.
++ *
++ * `HStack` can render anything inside.
++ *
++ * @example
++ * ```jsx
++ * import { HStack, Text, View } from `@wp-g2/components/ui`;
++ *
++ * function Example() {
++ * 	return (
++ * 		<HStack>
++ * 			<View>
++ * 				<Text>Code</Text>
++ * 			</View>
++ * 			<View>
++ * 				<Text>is</Text>
++ * 			</View>
++ * 			<View>
++ * 				<Text>Poetry</Text>
++ * 			</View>
++ * 		</HStack>
++ * 	);
++ * }
++ * ```
++ */
+ export default createComponent( {
+ 	as: 'div',
+ 	useHook: useHStack,
+diff --git a/packages/components/src/ui/h-stack/types.ts b/packages/components/src/ui/h-stack/types.ts
+index a4d78f67dbec53..3dd0a921034148 100644
+--- a/packages/components/src/ui/h-stack/types.ts
++++ b/packages/components/src/ui/h-stack/types.ts
+@@ -38,28 +38,6 @@ export type Props = Omit< FlexProps, 'align' | 'gap' > & {
+ 	 * * `stretch`: Stretches content to the edges of the container.
+ 	 *
+ 	 * @default 'edge'
+-	 *
+-	 * @example
+-	 *```jsx
+-	 * import { HStack, Text, View } from `@wp-g2/components`
+-	 * import { ui } from `@wp-g2/styles`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <HStack alignment="center">
+-	 *       <View css={[ui.background.blue]}>
+-	 *         <Text>Ana</Text>
+-	 *       </View>
+-	 *       <View css={[ui.background.blue]}>
+-	 *         <Text>Elsa</Text>
+-	 *       </View>
+-	 *       <View css={[ui.background.blue]}>
+-	 *         <Text>Olaf</Text>
+-	 *       </View>
+-	 *     </HStack>
+-	 *   );
+-	 * }
+-	 *```
+ 	 */
+ 	alignment?: HStackAlignment | CSSProperties[ 'alignItems' ];
+ 	/**
+@@ -67,57 +45,6 @@ export type Props = Omit< FlexProps, 'align' | 'gap' > & {
+ 	 * The value of `spacing` works as a multiplier to the library's grid system (base of `4px`).
+ 	 *
+ 	 * @default 2
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { HStack, Text, View } from `@wp-g2/components`
+-	 * import { ui } from `@wp-g2/styles`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <HStack alignment="center" spacing={8}>
+-	 *       <View css={[ui.background.blue]}>
+-	 *         <Text>Ana</Text>
+-	 *       </View>
+-	 *       <View css={[ui.background.blue]}>
+-	 *         <Text>Elsa</Text>
+-	 *       </View>
+-	 *       <View css={[ui.background.blue]}>
+-	 *         <Text>Olaf</Text>
+-	 *       </View>
+-	 *     </HStack>
+-	 *   );
+-	 * }
+-	 *```
+ 	 */
+ 	spacing?: CSSProperties[ 'width' ];
+ };
+-
+-/**
+- * `HStack` (Horizontal Stack) arranges child elements in a horizontal line.
+- *
+- * @remarks
+- * `HStack` can render anything inside.
+- *
+- * @example
+- * ```jsx
+- * import { HStack, Text, View } from `@wp-g2/components`
+- * import { ui } from `@wp-g2/styles`
+- *
+- * function Example() {
+- *   return (
+- *     <HStack>
+- *       <View css={[ui.background.blue]}>
+- *         <Text>Ana</Text>
+- *       </View>
+- *       <View css={[ui.background.blue]}>
+- *         <Text>Elsa</Text>
+- *       </View>
+- *       <View css={[ui.background.blue]}>
+- *         <Text>Olaf</Text>
+- *       </View>
+- *     </HStack>
+- *   );
+- * }
+- * ```
+- */
+diff --git a/packages/components/src/ui/surface/component.js b/packages/components/src/ui/surface/component.js
+index a35f255f430bc3..988c18997838fe 100644
+--- a/packages/components/src/ui/surface/component.js
++++ b/packages/components/src/ui/surface/component.js
+@@ -4,6 +4,23 @@
+ import { createComponent } from '../utils';
+ import { useSurface } from './hook';
+ 
++/**
++ * `Surface` is a core component that renders a primary background color.
++ *
++ * In the example below, notice how the `Surface` renders in white (or dark gray if in dark mode).
++ *
++ * ```jsx
++ * import { Surface, Text } from `@wp-g2/components/ui`;
++ *
++ * function Example() {
++ * 	return (
++ * 		<Surface>
++ * 			<Text>Code is Poetry</Text>
++ * 		</Surface>
++ * 	);
++ * }
++ * ```
++ */
+ export default createComponent( {
+ 	as: 'div',
+ 	useHook: useSurface,
+diff --git a/packages/components/src/ui/surface/types.ts b/packages/components/src/ui/surface/types.ts
+index f49c3a7a384b47..128fb1a2858dbe 100644
+--- a/packages/components/src/ui/surface/types.ts
++++ b/packages/components/src/ui/surface/types.ts
+@@ -36,27 +36,6 @@ export type Props = {
+ 	 * * `primary`: Used for almost all cases.
+ 	 * * `secondary`: Used as a secondary background for inner `Surface` components.
+ 	 * * `tertiary`: Used as the app/site wide background. Visible in **dark mode** only. Use case is rare.
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Surface, Text, VStack } from `@wordpress/components/ui`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <VStack>
+-	 *       <Surface variant="primary">
+-	 *         <Text>Primary Surface</Text>
+-	 *       </Surface>
+-	 *       <Surface variant="secondary">
+-	 *         <Text>Secondary Surface</Text>
+-	 *       </Surface>
+-	 *       <Surface variant="tertiary">
+-	 *         <Text>Tertiary Surface</Text>
+-	 *       </Surface>
+-	 *     </VStack>
+-	 *   );
+-	 * }
+-	 * ```
+ 	 */
+ 	variant?: SurfaceVariant;
+ };
+diff --git a/packages/components/src/ui/text/README.md b/packages/components/src/ui/text/README.md
+index 343bb389ed7c26..d511731706b3ec 100644
+--- a/packages/components/src/ui/text/README.md
++++ b/packages/components/src/ui/text/README.md
+@@ -1,4 +1,4 @@
+-# Text (Experimental)
++# Text
+ 
+ `Text` is a core component that renders text in the library, using the library's typography system.
+ 
+@@ -10,7 +10,7 @@
+ import { Text } from '@wordpress/components/ui';
+ 
+ function Example() {
+-	return <Text>Where the north wind meets the sea</Text>;
++	return <Text>Code is Poetry</Text>;
+ }
+ ```
+ 
+@@ -28,7 +28,8 @@ import { Text, TextInput } from '@wordpress/components/ui';
+ function Example() {
+ 	return (
+ 		<Text adjustLineHeightForInnerControls>
+-			Where the north wind meets the <TextInput value="sea..." />
++			Lorem ipsum dolor sit amet, consectetur{ ' ' }
++			<TextInput value="adipiscing elit..." />
+ 		</Text>
+ 	);
+ }
+@@ -46,7 +47,7 @@ import { Text } from '@wordpress/components/ui';
+ function Example() {
+ 	return (
+ 		<Text align="center" isBlock>
+-			Where the north wind meets the sea...
++			Lorem ipsum dolor sit amet, consectetur adipiscing elit...
+ 		</Text>
+ 	);
+ }
+@@ -110,11 +111,12 @@ import { Text } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+-		<Text highlightWords={ [ 'the' ] }>
+-			Where the north wind meets the sea, there's a river full of memory.
+-			Sleep, my darling, safe and sound, for in this river all is found.
+-			In her waters, deep and true, lay the answers and a path for you.
+-			Dive down deep into her sound, but not too far or you'll be drowned
++		<Text highlightWords={ [ 'pi' ] }>
++			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ex
++			neque, vulputate a diam et, luctus convallis lacus. Vestibulum ac
++			mollis mi. Morbi id elementum massa. Suspendisse interdum auctor
++			ligula eget cursus. In fermentum ultricies mauris, pharetra
++			fermentum erat pellentesque id.
+ 		</Text>
+ 	);
+ }
+@@ -165,8 +167,7 @@ function Example() {
+ 	return (
+ 		<View css={ { backgroundColor } }>
+ 			<Text optimizeReadabilityFor={ backgroundColor }>
+-				Where the north wind meets the sea, there's a river full of
+-				memory.
++				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ 			</Text>
+ 		</View>
+ 	);
+@@ -183,7 +184,7 @@ Adjusts text size based on the typography system. `Text` can render a wide range
+ import { Text } from '@wordpress/components/ui';
+ 
+ function Example() {
+-	return <Text size="largeTitle">Where the north wind meets the sea...</Text>;
++	return <Text size="largeTitle">Code is Poetry</Text>;
+ }
+ ```
+ 
+@@ -199,10 +200,11 @@ import { Text } from '@wordpress/components/ui';
+ function Example() {
+ 	return (
+ 		<Text truncate>
+-			Where the north wind meets the sea, there's a river full of memory.
+-			Sleep, my darling, safe and sound, for in this river all is found.
+-			In her waters, deep and true, lay the answers and a path for you.
+-			Dive down deep into her sound, but not too far or you'll be drowned
++			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ex
++			neque, vulputate a diam et, luctus convallis lacus. Vestibulum ac
++			mollis mi. Morbi id elementum massa. Suspendisse interdum auctor
++			ligula eget cursus. In fermentum ultricies mauris, pharetra
++			fermentum erat pellentesque id.
+ 		</Text>
+ 	);
+ }
+@@ -224,7 +226,7 @@ Adjusts style variation of the text.
+ import { Text } from '@wordpress/components/ui';
+ 
+ function Example() {
+-	return <Text variant="muted">Where the north wind meets the sea...</Text>;
++	return <Text variant="muted">Code is Poetry</Text>;
+ }
+ ```
+ 
+diff --git a/packages/components/src/ui/text/component.js b/packages/components/src/ui/text/component.js
+index cf94e416e6814e..a659faa6b67fa8 100644
+--- a/packages/components/src/ui/text/component.js
++++ b/packages/components/src/ui/text/component.js
+@@ -4,6 +4,22 @@
+ import { createComponent } from '../utils';
+ import useText from './hook';
+ 
++/**
++ * `Text` is a core component that renders text in the library, using the
++ * library's typography system.
++ *
++ * `Text` can be used to render any text-content, like an HTML `p` or `span`.
++ *
++ * @example
++ *
++ * ```jsx
++ * import { Text } from `@wordpress/components/ui`;
++ *
++ * function Example() {
++ * 	return <Text>Code is Poetry</Text>;
++ * }
++ * ```
++ */
+ const Text = createComponent( {
+ 	as: 'span',
+ 	useHook: useText,
+diff --git a/packages/components/src/ui/text/test/__snapshots__/text.js.snap b/packages/components/src/ui/text/test/__snapshots__/text.js.snap
+index dd2f46c7d9c012..ea4c0e9d749109 100644
+--- a/packages/components/src/ui/text/test/__snapshots__/text.js.snap
++++ b/packages/components/src/ui/text/test/__snapshots__/text.js.snap
+@@ -50,7 +50,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] =
+     class=""
+     data-g2-component="Text"
+   >
+-    Some people are worth melting for.
++    Lorem ipsum.
+   </span>
+ </span>
+ `;
+@@ -94,6 +94,6 @@ exports[`Text snapshot tests should render correctly 1`] = `
+   data-g2-c16t="true"
+   data-g2-component="Text"
+ >
+-  Some people are worth melting for.
++  Lorem ipsum.
+ </span>
+ `;
+diff --git a/packages/components/src/ui/text/test/text.js b/packages/components/src/ui/text/test/text.js
+index 4bfaebb7afd00d..0c2cddae3ac644 100644
+--- a/packages/components/src/ui/text/test/text.js
++++ b/packages/components/src/ui/text/test/text.js
+@@ -12,18 +12,14 @@ import { Text } from '..';
+ describe( 'Text', () => {
+ 	describe( 'snapshot tests', () => {
+ 		test( 'should render correctly', () => {
+-			const { container } = render(
+-				<Text>Some people are worth melting for.</Text>
+-			);
++			const { container } = render( <Text>Lorem ipsum.</Text> );
+ 			expect( container.firstChild ).toMatchSnapshot();
+ 		} );
+ 	} );
+ 
+ 	test( 'should render optimizeReadabilityFor', () => {
+ 		const { container } = render(
+-			<Text optimizeReadabilityFor="blue">
+-				Some people are worth melting for.
+-			</Text>
++			<Text optimizeReadabilityFor="blue">Lorem ipsum.</Text>
+ 		);
+ 		expect( container.firstChild ).toHaveStyle( {
+ 			color: ui.get( 'white' ),
+@@ -31,27 +27,21 @@ describe( 'Text', () => {
+ 	} );
+ 
+ 	test( 'should render truncate', () => {
+-		const { container } = render(
+-			<Text truncate>Some people are worth melting for.</Text>
+-		);
++		const { container } = render( <Text truncate>Lorem ipsum.</Text> );
+ 		expect( container.firstChild ).toHaveStyle( {
+ 			textOverflow: 'ellipsis',
+ 		} );
+ 	} );
+ 
+ 	test( 'should render size', () => {
+-		const { container } = render(
+-			<Text size="title">Some people are worth melting for.</Text>
+-		);
++		const { container } = render( <Text size="title">Lorem ipsum.</Text> );
+ 		expect( container.firstChild ).toHaveStyle( {
+ 			fontSize: getFontSize( 'title' ),
+ 		} );
+ 	} );
+ 
+ 	test( 'should render custom size', () => {
+-		const { container } = render(
+-			<Text size={ 15 }>Some people are worth melting for.</Text>
+-		);
++		const { container } = render( <Text size={ 15 }>Lorem ipsum.</Text> );
+ 		expect( container.firstChild ).toHaveStyle( {
+ 			fontSize: getFontSize( 15 ),
+ 		} );
+@@ -59,7 +49,7 @@ describe( 'Text', () => {
+ 
+ 	test( 'should render variant', () => {
+ 		const { container } = render(
+-			<Text variant="muted">Some people are worth melting for.</Text>
++			<Text variant="muted">Lorem ipsum.</Text>
+ 		);
+ 		expect( container.firstChild ).toHaveStyle( {
+ 			color: ui.get( 'colorTextMuted' ),
+@@ -67,31 +57,27 @@ describe( 'Text', () => {
+ 	} );
+ 
+ 	test( 'should render as another element', () => {
+-		const { container } = render(
+-			<Text as="div">Some people are worth melting for.</Text>
+-		);
++		const { container } = render( <Text as="div">Lorem ipsum.</Text> );
+ 		expect( container.firstChild.nodeName ).toBe( 'DIV' );
+ 	} );
+ 
+ 	test( 'should render align', () => {
+ 		const { container } = render(
+-			<Text align="center">Some people are worth melting for.</Text>
++			<Text align="center">Lorem ipsum.</Text>
+ 		);
+ 		expect( container.firstChild ).toHaveStyle( { textAlign: 'center' } );
+ 	} );
+ 
+ 	test( 'should render color', () => {
+ 		const { container } = render(
+-			<Text color="orange">Some people are worth melting for.</Text>
++			<Text color="orange">Lorem ipsum.</Text>
+ 		);
+ 		expect( container.firstChild ).toHaveStyle( { color: 'orange' } );
+ 	} );
+ 
+ 	test( 'should render display', () => {
+ 		const { container } = render(
+-			<Text display="inline-flex">
+-				Some people are worth melting for.
+-			</Text>
++			<Text display="inline-flex">Lorem ipsum.</Text>
+ 		);
+ 		expect( container.firstChild ).toHaveStyle( {
+ 			display: 'inline-flex',
+@@ -100,22 +86,17 @@ describe( 'Text', () => {
+ 
+ 	test( 'should render highlighted words', async () => {
+ 		const wrapper = render(
+-			<Text highlightWords={ [ 'worth' ] }>
+-				Some people are worth melting for.
+-			</Text>
++			<Text highlightWords={ [ 'm' ] }>Lorem ipsum.</Text>
+ 		);
+-		// It should have three child nodes: (Some people are )(worth)( melting for.)
+-		expect( wrapper.container.firstChild.childNodes ).toHaveLength( 3 );
+-		const worth = await wrapper.findAllByText( 'worth' );
+-		expect( worth ).toHaveLength( 1 );
+-		expect( worth[ 0 ].dataset.g2Component ).toBe( 'TextHighlight' );
++		expect( wrapper.container.firstChild.childNodes ).toHaveLength( 5 );
++		const words = await wrapper.findAllByText( 'm' );
++		expect( words ).toHaveLength( 2 );
++		expect( words[ 0 ].dataset.g2Component ).toBe( 'TextHighlight' );
+ 	} );
+ 
+ 	test( 'should render highlighted words with undefined passed', () => {
+ 		const { container } = render(
+-			<Text highlightWords={ undefined }>
+-				Some people are worth melting for.
+-			</Text>
++			<Text highlightWords={ undefined }>Lorem ipsum.</Text>
+ 		);
+ 		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered
+ 		expect( container.firstChild.childNodes ).toHaveLength( 1 );
+@@ -123,8 +104,8 @@ describe( 'Text', () => {
+ 
+ 	test( 'should render highlighted words with highlightCaseSensitive', () => {
+ 		const { container } = render(
+-			<Text highlightCaseSensitive highlightWords={ [ 'WORTH' ] }>
+-				Some people are worth melting for.
++			<Text highlightCaseSensitive highlightWords={ [ 'IPSUM' ] }>
++				Lorem ipsum.
+ 			</Text>
+ 		);
+ 
+@@ -134,9 +115,7 @@ describe( 'Text', () => {
+ 	} );
+ 
+ 	test( 'should render isBlock', () => {
+-		const { container } = render(
+-			<Text isBlock>Some people are worth melting for.</Text>
+-		);
++		const { container } = render( <Text isBlock>Lorem ipsum.</Text> );
+ 		expect( container.firstChild ).toHaveStyle( {
+ 			display: 'block',
+ 		} );
+@@ -144,15 +123,13 @@ describe( 'Text', () => {
+ 
+ 	test( 'should render lineHeight', () => {
+ 		const { container } = render(
+-			<Text lineHeight={ 1.5 }>Some people are worth melting for.</Text>
++			<Text lineHeight={ 1.5 }>Lorem ipsum.</Text>
+ 		);
+ 		expect( container.firstChild ).toHaveStyle( { lineHeight: '1.5' } );
+ 	} );
+ 
+ 	test( 'should render upperCase', () => {
+-		const { container } = render(
+-			<Text upperCase>Some people are worth melting for.</Text>
+-		);
++		const { container } = render( <Text upperCase>Lorem ipsum.</Text> );
+ 		expect( container.firstChild ).toHaveStyle( {
+ 			textTransform: 'uppercase',
+ 		} );
+@@ -160,7 +137,7 @@ describe( 'Text', () => {
+ 
+ 	test( 'should render weight', () => {
+ 		const { container } = render(
+-			<Text weight={ 700 }>Some people are worth melting for.</Text>
++			<Text weight={ 700 }>Lorem ipsum.</Text>
+ 		);
+ 		expect( container.firstChild ).toHaveStyle( { fontWeight: '700' } );
+ 	} );
+diff --git a/packages/components/src/ui/text/types.ts b/packages/components/src/ui/text/types.ts
+index ffc51f5708cdc2..cc86887c78d587 100644
+--- a/packages/components/src/ui/text/types.ts
++++ b/packages/components/src/ui/text/types.ts
+@@ -23,36 +23,10 @@ type TextWeight = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
+ export interface Props extends TruncateProps {
+ 	/**
+ 	 * Adjusts the text alignment.
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Text } from `@wordpress/components/ui`
+-	 *
+-	 * function Example() {
+-	 * 	return (
+-	 * 		<Text align="center" isBlock>
+-	 * 			Where the north wind meets the sea...
+-	 * 		</Text>
+-	 * 	)
+-	 * }
+-	 *```
+ 	 */
+ 	align?: CSSProperties[ 'textAlign' ];
+ 	/**
+ 	 * Automatically calculate the appropriate line-height value for contents that render text and Control elements (e.g. `TextInput`).
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Text, TextInput } from `@wordpress/components/ui`
+-	 *
+-	 * function Example() {
+-	 * 	return (
+-	 * 		<Text adjustLineHeightForInnerControls>
+-	 * 			Where the north wind meets the <TextInput value="sea..." />
+-	 * 		</Text>
+-	 * 	)
+-	 * }
+-	 *```
+ 	 */
+ 	adjustLineHeightForInnerControls?: TextAdjustLineHeightForInnerControls;
+ 	/**
+@@ -91,57 +65,14 @@ export interface Props extends TruncateProps {
+ 	lineHeight?: CSSProperties[ 'lineHeight' ];
+ 	/**
+ 	 * The `Text` color can be adapted to a background color for optimal readability. `optimizeReadabilityFor` can accept CSS variables, in addition to standard CSS color values (e.g. Hex, RGB, HSL, etc...).
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Text, View } from `@wordpress/components/ui`
+-	 *
+-	 * function Example() {
+-	 *   const backgroundColor = "blue"
+-	 *
+-	 *   return (
+-	 *     <View css={{ backgroundColor }}>
+-	 *       <Text optimizeReadabilityFor={backgroundColor}>
+-	 *         Where the north wind meets the sea, there's a river full of memory.
+-	 *       </Text>
+-	 *     </View>
+-	 *   )
+-	 * }
+-	 * ```
+ 	 */
+ 	optimizeReadabilityFor?: CSSProperties[ 'color' ];
+ 	/**
+ 	 * Adjusts text size based on the typography system. `Text` can render a wide range of font sizes, which are automatically calculated and adapted to the typography system. The `size` value can be a system preset, a `number`, or a custom unit value (`string`) such as `30em`.
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Text } from `@wordpress/components/ui`
+-	 *
+-	 * function Example() {
+-	 *   return <Text size="largeTitle">Where the north wind meets the sea...</Text>
+-	 * }
+-	 * ```
+ 	 */
+ 	size?: CSSProperties[ 'fontSize' ] | TextSize;
+ 	/**
+ 	 * Enables text truncation. When `truncate` is set,we are able to truncate the long text in a variety of ways.
+-	 *
+-	 * @example
+-	 *
+-	 * ```jsx
+-	 * import { Text } from `@wordpress/components/ui`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <Text truncate>
+-	 *       Where the north wind meets the sea, there's a river full of memory. Sleep,
+-	 *       my darling, safe and sound, for in this river all is found. In her waters,
+-	 *       deep and true, lay the answers and a path for you. Dive down deep into her
+-	 *       sound, but not too far or you'll be drowned
+-	 *     </Text>
+-	 *   )
+-	 * }
+-	 * ```
+ 	 */
+ 	truncate?: boolean;
+ 	/**
+@@ -150,15 +81,6 @@ export interface Props extends TruncateProps {
+ 	upperCase?: boolean;
+ 	/**
+ 	 * Adjusts style variation of the text.
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Text } from `@wordpress/components/ui`
+-	 *
+-	 * function Example() {
+-	 *   return <Text variant="muted">Where the north wind meets the sea...</Text>
+-	 * }
+-	 * ```
+ 	 */
+ 	variant?: TextVariant;
+ 	/**
+@@ -171,22 +93,6 @@ export interface Props extends TruncateProps {
+ 	letterSpacing?: CSSProperties[ 'letterSpacing' ];
+ 	/**
+ 	 * Letters or words within `Text` can be highlighted using `highlightWords`.
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Text } from `@wordpress/components/ui`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <Text highlightWords={["the"]}>
+-	 *       Where the north wind meets the sea, there's a river full of memory. Sleep,
+-	 *       my darling, safe and sound, for in this river all is found. In her waters,
+-	 *       deep and true, lay the answers and a path for you. Dive down deep into her
+-	 *       sound, but not too far or you'll be drowned
+-	 *     </Text>
+-	 *   )
+-	 * }
+-	 * ```
+ 	 */
+ 	highlightWords?: string[];
+ }
+diff --git a/packages/components/src/ui/truncate/README.md b/packages/components/src/ui/truncate/README.md
+index 7e2b439a48a713..76c98c0a4166bf 100644
+--- a/packages/components/src/ui/truncate/README.md
++++ b/packages/components/src/ui/truncate/README.md
+@@ -10,10 +10,9 @@ import { Truncate } from '@wordpress/components/ui';
+ function Example() {
+ 	return (
+ 		<Truncate>
+-			Where the north wind meets the sea, there's a river full of memory.
+-			Sleep, my darling, safe and sound, for in this river all is found.
+-			In her waters, deep and true, lay the answers and a path for you.
+-			Dive down deep into her sound, but not too far or you'll be drowned
++			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ex
++			neque, vulputate a diam et, luctus convallis lacus. Vestibulum ac
++			mollis mi. Morbi id elementum massa.
+ 		</Truncate>
+ 	);
+ }
+diff --git a/packages/components/src/ui/truncate/component.js b/packages/components/src/ui/truncate/component.js
+index 98d667cfa38af0..d61585c7189980 100644
+--- a/packages/components/src/ui/truncate/component.js
++++ b/packages/components/src/ui/truncate/component.js
+@@ -5,21 +5,23 @@ import { createComponent } from '../utils';
+ import useTruncate from './hook';
+ 
+ /**
+- * `Truncate` is a typography primitive that trims text content. For almost all cases, it is recommended that `Text`, `Heading`, or `Subheading` is used to render text content. However, `Truncate` is available for custom implementations.
++ * `Truncate` is a typography primitive that trims text content.
++ * For almost all cases, it is recommended that `Text`, `Heading`, or
++ * `Subheading` is used to render text content. However,`Truncate` is
++ * available for custom implementations.
+  *
+  * @example
+  * ```jsx
+- * import { Truncate } from `@wp-g2/components`
++ * import { Truncate } from `@wordpress/components/ui`;
+  *
+  * function Example() {
+- *   return (
+- *     <Truncate>
+- *       Where the north wind meets the sea, there's a river full of memory. Sleep,
+- *       my darling, safe and sound, for in this river all is found. In her waters,
+- *       deep and true, lay the answers and a path for you. Dive down deep into her
+- *       sound, but not too far or you'll be drowned
+- *     </Truncate>
+- *   );
++ * 	return (
++ * 		<Truncate>
++ * 			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ex
++ * 			neque, vulputate a diam et, luctus convallis lacus. Vestibulum ac
++ * 			mollis mi. Morbi id elementum massa.
++ * 		</Truncate>
++ * 	);
+  * }
+  * ```
+  */
+diff --git a/packages/components/src/ui/truncate/test/truncate.js b/packages/components/src/ui/truncate/test/truncate.js
+index 2e3bab8d9b185b..82b5b95d6e3e67 100644
+--- a/packages/components/src/ui/truncate/test/truncate.js
++++ b/packages/components/src/ui/truncate/test/truncate.js
+@@ -10,38 +10,34 @@ import { Truncate } from '..';
+ 
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {
+-		const { container } = render(
+-			<Truncate>Some people are worth melting for.</Truncate>
+-		);
+-		expect( container.firstChild.textContent ).toEqual(
+-			'Some people are worth melting for.'
+-		);
++		const { container } = render( <Truncate>Lorem ipsum.</Truncate> );
++		expect( container.firstChild.textContent ).toEqual( 'Lorem ipsum.' );
+ 	} );
+ 
+ 	test( 'should render limit', () => {
+ 		const { container } = render(
+ 			<Truncate limit={ 1 } ellipsizeMode="tail">
+-				Some
++				Lorem ipsum.
+ 			</Truncate>
+ 		);
+-		expect( container.firstChild.textContent ).toEqual( 'S…' );
++		expect( container.firstChild.textContent ).toEqual( 'L…' );
+ 	} );
+ 
+ 	test( 'should render custom ellipsis', () => {
+ 		const { container } = render(
+ 			<Truncate ellipsis="!!!" limit={ 5 } ellipsizeMode="tail">
+-				Some people are worth melting for.
++				Lorem ipsum.
+ 			</Truncate>
+ 		);
+-		expect( container.firstChild.textContent ).toEqual( 'Some !!!' );
++		expect( container.firstChild.textContent ).toEqual( 'Lorem!!!' );
+ 	} );
+ 
+ 	test( 'should render custom ellipsizeMode', () => {
+ 		const { container } = render(
+ 			<Truncate ellipsis="!!!" ellipsizeMode="middle" limit={ 5 }>
+-				Some people are worth melting for.
++				Lorem ipsum.
+ 			</Truncate>
+ 		);
+-		expect( container.firstChild.textContent ).toEqual( 'So!!!r.' );
++		expect( container.firstChild.textContent ).toEqual( 'Lo!!!m.' );
+ 	} );
+ } );
+diff --git a/packages/components/src/ui/truncate/types.ts b/packages/components/src/ui/truncate/types.ts
+index 09533c0f2a855e..61ff73ad64c0de 100644
+--- a/packages/components/src/ui/truncate/types.ts
++++ b/packages/components/src/ui/truncate/types.ts
+@@ -16,22 +16,6 @@ export interface Props {
+ 	 * * `tail`: Trims content at the end. Requires a `limit`.
+ 	 *
+ 	 * @default 'auto'
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Truncate } from `@wp-g2/components`
+-	 *
+-	 * function Example() {
+-	 * 	return (
+-	 * 		<Truncate ellipsizeMode="middle" limit={40}>
+-	 * 			Where the north wind meets the sea, there's a river full of memory. Sleep,
+-	 * 			my darling, safe and sound, for in this river all is found. In her waters,
+-	 * 			deep and true, lay the answers and a path for you. Dive down deep into her
+-	 * 			sound, but not too far or you'll be drowned
+-	 * 		</Truncate>
+-	 * 	)
+-	 * }
+-	 * ```
+ 	 */
+ 	ellipsizeMode?: TruncateEllisizeMode;
+ 	/**
+@@ -42,22 +26,6 @@ export interface Props {
+ 	limit?: number;
+ 	/**
+ 	 * Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Truncate } from `@wp-g2/components`
+-	 *
+-	 * function Example() {
+-	 * 	return (
+-	 * 		<Truncate numberOfLines={2}>
+-	 * 			Where the north wind meets the sea, there's a river full of memory. Sleep,
+-	 * 			my darling, safe and sound, for in this river all is found. In her waters,
+-	 * 			deep and true, lay the answers and a path for you. Dive down deep into her
+-	 * 			sound, but not too far or you'll be drowned
+-	 * 		</Truncate>
+-	 * 	)
+-	 * }
+-	 * ```
+ 	 */
+ 	numberOfLines?: number;
+ }
+diff --git a/packages/components/src/ui/v-stack/README.md b/packages/components/src/ui/v-stack/README.md
+index 882465501ad9ef..2fa95655dfbaaa 100644
+--- a/packages/components/src/ui/v-stack/README.md
++++ b/packages/components/src/ui/v-stack/README.md
+@@ -6,21 +6,20 @@
+ 
+ `VStack` can render anything inside.
+ 
+-```jsx live
+-import { VStack, Text, View } from '@wp-g2/components';
+-import { ui } from '@wp-g2/styles';
++```jsx
++import { VStack, Text, View } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+-		<VStack css={[ui.frame.height(200)]}>
+-			<View css={[ui.background.blue]}>
+-				<Text>Ana</Text>
++		<VStack>
++			<View>
++				<Text>Code</Text>
+ 			</View>
+-			<View css={[ui.background.blue]}>
+-				<Text>Elsa</Text>
++			<View>
++				<Text>is</Text>
+ 			</View>
+-			<View css={[ui.background.blue]}>
+-				<Text>Olaf</Text>
++			<View>
++				<Text>Poetry</Text>
+ 			</View>
+ 		</VStack>
+ 	);
+@@ -86,15 +85,15 @@ When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to t
+ ```jsx
+ function Example() {
+ 	return (
+-		<VStack css={[ui.frame.height(200)]}>
+-			<View css={[ui.background.blue]}>
+-				<Text>Ana</Text>
++		<VStack>
++			<View>
++				<Text>Code</Text>
+ 			</View>
+-			<Spacer css={[ui.background.blue]}>
+-				<Text>Elsa</Text>
++			<Spacer>
++				<Text>is</Text>
+ 			</Spacer>
+-			<View css={[ui.background.blue]}>
+-				<Text>Olaf</Text>
++			<View>
++				<Text>Poetry</Text>
+ 			</View>
+ 		</VStack>
+ 	);
+@@ -103,19 +102,19 @@ function Example() {
+ 
+ `Spacer` can also be used in-between items to push them apart.
+ 
+-```jsx live
++```jsx
+ function Example() {
+ 	return (
+-		<VStack css={[ui.frame.height(200)]}>
+-			<View css={[ui.background.blue]}>
+-				<Text>Ana</Text>
++		<VStack>
++			<View>
++				<Text>Code</Text>
+ 			</View>
+ 			<Spacer />
+-			<View css={[ui.background.blue]}>
+-				<Text>Elsa</Text>
++			<View>
++				<Text>is</Text>
+ 			</View>
+-			<View css={[ui.background.blue]}>
+-				<Text>Olaf</Text>
++			<View>
++				<Text>Poetry</Text>
+ 			</View>
+ 		</VStack>
+ 	);
+diff --git a/packages/components/src/ui/v-stack/component.js b/packages/components/src/ui/v-stack/component.js
+index 0335eb37711d83..9531b82cc5271f 100644
+--- a/packages/components/src/ui/v-stack/component.js
++++ b/packages/components/src/ui/v-stack/component.js
+@@ -11,20 +11,22 @@ import { useVStack } from './hook';
+  *
+  * @example
+  * ```jsx
++ * import { VStack, Text, View } from `@wordpress/components/ui`;
++ *
+  * function Example() {
+- *   return (
+- *     <VStack css={ [ ui.frame.height( 200 ) ] }>
+- *       <View css={ [ ui.background.blue ] }>
+- *         <Text>Ana</Text>
+- *       </View>
+- *       <View css={ [ ui.background.blue ] }>
+- *         <Text>Elsa</Text>
+- *       </View>
+- *       <View css={ [ ui.background.blue ] }>
+- *         <Text>Olaf</Text>
+- *       </View>
+- *     </VStack>
+- *   );
++ * 	return (
++ * 		<VStack>
++ * 			<View>
++ * 				<Text>Code</Text>
++ * 			</View>
++ * 			<View>
++ * 				<Text>is</Text>
++ * 			</View>
++ * 			<View>
++ * 				<Text>Poetry</Text>
++ * 			</View>
++ * 		</VStack>
++ * 	);
+  * }
+  * ```
+  */
+diff --git a/packages/components/src/ui/v-stack/types.ts b/packages/components/src/ui/v-stack/types.ts
+index 36153e0a1ff2f7..053a3dcd543872 100644
+--- a/packages/components/src/ui/v-stack/types.ts
++++ b/packages/components/src/ui/v-stack/types.ts
+@@ -2,46 +2,6 @@ import { CSSProperties } from 'react';
+ import { HStackAlignment, Props as HStackProps } from '../h-stack/types';
+ 
+ export type Props = HStackProps & {
+-	/**
+-	 * @example
+-	 *```jsx
+-	 * function Example() {
+-	 *   return (
+-	 *     <VStack alignment="center">
+-	 *       <View css={ [ ui.background.blue ] }>
+-	 *         <Text>Ana</Text>
+-	 *       </View>
+-	 *       <View css={ [ ui.background.blue ] }>
+-	 *         <Text>Elsa</Text>
+-	 *       </View>
+-	 *       <View css={ [ ui.background.blue ] }>
+-	 *         <Text>Olaf</Text>
+-	 *       </View>
+-	 *     </VStack>
+-	 *   );
+-	 * }
+-	 *```
+-	 */
+ 	alignment?: HStackAlignment | CSSProperties[ 'alignItems' ];
+-	/**
+-	 * @example
+-	 * ```jsx
+-	 * function Example() {
+-	 *   return (
+-	 *     <VStack alignment="center" spacing={8}>
+-	 *       <View css={ [ ui.background.blue ] }>
+-	 *         <Text>Ana</Text>
+-	 *       </View>
+-	 *       <View css={ [ ui.background.blue ] }>
+-	 *         <Text>Elsa</Text>
+-	 *       </View>
+-	 *       <View css={ [ ui.background.blue ] }>
+-	 *         <Text>Olaf</Text>
+-	 *       </View>
+-	 *     </VStack>
+-	 *   );
+-	 * }
+-	 *```
+-	 */
+ 	spacing?: CSSProperties[ 'width' ];
+ };
+diff --git a/packages/components/src/ui/view/README.md b/packages/components/src/ui/view/README.md
+index bc8fd691244a6b..130578920bd75e 100644
+--- a/packages/components/src/ui/view/README.md
++++ b/packages/components/src/ui/view/README.md
+@@ -1,6 +1,6 @@
+ # View (Experimental)
+ 
+-`View` is a core component that renders everything in the library. It is the principle component in the entire library. Note that `View` is not exported from components, it's fully internal.
++`View` is a core component that renders everything in the library. It is the principle component in the entire library.
+ 
+ **Everything** is a `View`, and a `View` is **everything**.
+ 
+@@ -12,7 +12,7 @@ import { Text, View } from '@wordpress/components/ui';
+ function Example() {
+ 	return (
+ 		<View>
+-			<Text>Into The Unknown</Text>
++			<Text>Code is Poetry</Text>
+ 		</View>
+ 	);
+ }
+@@ -31,32 +31,3 @@ Render the component as another React Component or HTML Element.
+ **Type**: `InterpolatedCSS`
+ 
+ Render custom CSS using the style system.
+-
+-## Styling
+-
+-### Presets
+-
+-The Style system provides a bunch of style presets, which come from `@wp-g2/styles`. These presets are namespaced under `ui`.
+-
+-Presets can style a `View` by passing an `Array` of them into the `css` prop.
+-
+-```jsx
+-import { Text, View } from '@wordpress/components/ui';
+-import { ui } from '@wp-g2/styles';
+-
+-function Example() {
+-	return (
+-		<View
+-			css={ [
+-				ui.padding( 5 ),
+-				ui.background.blue,
+-				ui.hover( ui.background.red, ui.scale( 1.02 ) ),
+-				ui.active( ui.background.yellow, ui.scale( 0.8 ) ),
+-				ui.animation.bounce,
+-			] }
+-		>
+-			<Text>Into The Unknown</Text>
+-		</View>
+-	);
+-}
+-```
+diff --git a/packages/components/src/ui/view/component.js b/packages/components/src/ui/view/component.js
+new file mode 100644
+index 00000000000000..a7cce7d27c0b17
+--- /dev/null
++++ b/packages/components/src/ui/view/component.js
+@@ -0,0 +1,26 @@
++/**
++ * External dependencies
++ */
++import { BaseView } from '@wp-g2/styles';
++
++/**
++ * `View` is a core component that renders everything in the library.
++ * It is the principle component in the entire library.
++ *
++ * @example
++ * ```jsx
++ * import { View } from `@wordpress/components/ui`;
++ *
++ * function Example() {
++ * 	return (
++ * 		<View>
++ * 			 Code is Poetry
++ * 		</View>
++ * 	);
++ * }
++ * ```
++ */
++const View = BaseView;
++View.displayName = 'View';
++
++export default View;
+diff --git a/packages/components/src/ui/view/index.js b/packages/components/src/ui/view/index.js
+index 64c032291ab979..31d386aaa575f6 100644
+--- a/packages/components/src/ui/view/index.js
++++ b/packages/components/src/ui/view/index.js
+@@ -1 +1 @@
+-export { default as View } from './view';
++export { default as View } from './component';
+diff --git a/packages/components/src/ui/view/test/__snapshots__/view.js.snap b/packages/components/src/ui/view/test/__snapshots__/index.js.snap
+similarity index 94%
+rename from packages/components/src/ui/view/test/__snapshots__/view.js.snap
+rename to packages/components/src/ui/view/test/__snapshots__/index.js.snap
+index 273ac93c27caa0..d834cab1418023 100644
+--- a/packages/components/src/ui/view/test/__snapshots__/view.js.snap
++++ b/packages/components/src/ui/view/test/__snapshots__/index.js.snap
+@@ -29,9 +29,7 @@ exports[`props should render as another element 1`] = `
+ <p
+   class="emotion-0"
+ >
+-  <span>
+-    Some people are worth melting for.
+-  </span>
++  <span />
+ </p>
+ `;
+ 
+@@ -64,9 +62,7 @@ exports[`props should render correctly 1`] = `
+ <div
+   class="emotion-0"
+ >
+-  <span>
+-    Some people are worth melting for.
+-  </span>
++  <span />
+ </div>
+ `;
+ 
+@@ -101,9 +97,7 @@ exports[`props should render with custom styles (Array) 1`] = `
+ <p
+   class="emotion-0"
+ >
+-  <span>
+-    Some people are worth melting for.
+-  </span>
++  <span />
+ </p>
+ `;
+ 
+@@ -137,9 +131,7 @@ exports[`props should render with custom styles (object) 1`] = `
+ <p
+   class="emotion-0"
+ >
+-  <span>
+-    Some people are worth melting for.
+-  </span>
++  <span />
+ </p>
+ `;
+ 
+@@ -173,8 +165,6 @@ exports[`props should render with custom styles (string) 1`] = `
+ <p
+   class="emotion-0"
+ >
+-  <span>
+-    Some people are worth melting for.
+-  </span>
++  <span />
+ </p>
+ `;
+diff --git a/packages/components/src/ui/view/test/view.js b/packages/components/src/ui/view/test/index.js
+similarity index 81%
+rename from packages/components/src/ui/view/test/view.js
+rename to packages/components/src/ui/view/test/index.js
+index 6e3d1c44cbeb66..d55dcb45dec01c 100644
+--- a/packages/components/src/ui/view/test/view.js
++++ b/packages/components/src/ui/view/test/index.js
+@@ -6,13 +6,13 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import View from '../view';
++import { View } from '../index';
+ 
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {
+ 		const { container } = render(
+ 			<View>
+-				<span>Some people are worth melting for.</span>
++				<span />
+ 			</View>
+ 		);
+ 		expect( container.firstChild ).toMatchSnapshot();
+@@ -21,7 +21,7 @@ describe( 'props', () => {
+ 	test( 'should render as another element', () => {
+ 		const { container } = render(
+ 			<View as="p">
+-				<span>Some people are worth melting for.</span>
++				<span />
+ 			</View>
+ 		);
+ 		expect( container.firstChild ).toMatchSnapshot();
+@@ -35,7 +35,7 @@ describe( 'props', () => {
+ 					background: pink;
+ 				` }
+ 			>
+-				<span>Some people are worth melting for.</span>
++				<span />
+ 			</View>
+ 		);
+ 		expect( container.firstChild ).toMatchSnapshot();
+@@ -49,7 +49,7 @@ describe( 'props', () => {
+ 					background: 'pink',
+ 				} }
+ 			>
+-				<span>Some people are worth melting for.</span>
++				<span />
+ 			</View>
+ 		);
+ 		expect( container.firstChild ).toMatchSnapshot();
+@@ -66,7 +66,7 @@ describe( 'props', () => {
+ 					`font-weight: bold;`,
+ 				] }
+ 			>
+-				<span>Some people are worth melting for.</span>
++				<span />
+ 			</View>
+ 		);
+ 		expect( container.firstChild ).toMatchSnapshot();
+diff --git a/packages/components/src/ui/view/view.js b/packages/components/src/ui/view/view.js
+deleted file mode 100644
+index 968b0ad42c225d..00000000000000
+--- a/packages/components/src/ui/view/view.js
++++ /dev/null
+@@ -1,9 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { BaseView } from '@wp-g2/styles';
+-
+-const View = BaseView;
+-View.displayName = 'View';
+-
+-export default View;

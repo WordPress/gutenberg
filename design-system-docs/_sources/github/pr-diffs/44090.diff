@@ -1,0 +1,40 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fbeaa1bb6267b4..acc9dbdcf33012 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `NavigationMenu` updated to ignore `react/exhaustive-deps` eslint rule ([#44090](https://github.com/WordPress/gutenberg/pull/44090)).
++
+ ## 21.0.0 (2022-09-13)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/navigation/menu/menu-title-search.js b/packages/components/src/navigation/menu/menu-title-search.js
+index 8271cdf8b8f083..cba2ddf2ffe308 100644
+--- a/packages/components/src/navigation/menu/menu-title-search.js
++++ b/packages/components/src/navigation/menu/menu-title-search.js
+@@ -52,6 +52,8 @@ function MenuTitleSearch( {
+ 			count
+ 		);
+ 		debouncedSpeak( resultsFoundMessage );
++		// Ignore exhaustive-deps rule for now. See https://github.com/WordPress/gutenberg/pull/44090
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ items, search ] );
+ 
+ 	const onClose = () => {
+diff --git a/packages/components/src/navigation/menu/use-navigation-tree-menu.js b/packages/components/src/navigation/menu/use-navigation-tree-menu.js
+index 3642043532de9e..f50f25370f9380 100644
+--- a/packages/components/src/navigation/menu/use-navigation-tree-menu.js
++++ b/packages/components/src/navigation/menu/use-navigation-tree-menu.js
+@@ -21,5 +21,7 @@ export const useNavigationTreeMenu = ( props ) => {
+ 		return () => {
+ 			removeMenu( key );
+ 		};
++		// Ignore exhaustive-deps rule for now. See https://github.com/WordPress/gutenberg/pull/44090
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ };

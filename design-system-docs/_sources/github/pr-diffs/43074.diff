@@ -1,0 +1,269 @@
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 18f5a4e9093cd2..678cc83b8a6e18 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -63,15 +63,9 @@ function FontSizePicker(
+ 			getFontSizeOptions(
+ 				shouldUseSelectControl,
+ 				fontSizes,
+-				disableCustomFontSizes,
+-				fontSizesContainComplexValues
++				disableCustomFontSizes
+ 			),
+-		[
+-			shouldUseSelectControl,
+-			fontSizes,
+-			disableCustomFontSizes,
+-			fontSizesContainComplexValues,
+-		]
++		[ shouldUseSelectControl, fontSizes, disableCustomFontSizes ]
+ 	);
+ 	const selectedOption = getSelectedOption( fontSizes, value );
+ 	const isCustomValue = selectedOption.slug === CUSTOM_FONT_SIZE;
+@@ -94,6 +88,7 @@ function FontSizePicker(
+ 				`(${ selectedOption?.size })`
+ 			);
+ 		}
++
+ 		// Calculate the `hint` for toggle group control.
+ 		let hint = selectedOption.name;
+ 		if (
+diff --git a/packages/components/src/font-size-picker/test/index.js b/packages/components/src/font-size-picker/test/index.js
+index e714f317769552..d227f0e9df64f9 100644
+--- a/packages/components/src/font-size-picker/test/index.js
++++ b/packages/components/src/font-size-picker/test/index.js
+@@ -193,7 +193,7 @@ describe( 'FontSizePicker', () => {
+ 			expect( element ).toHaveLength( fontSizes.length + 2 );
+ 		} );
+ 		describe( 'segmented control', () => {
+-			it( 'should use numeric labels for simple css values', () => {
++			it( 'should use t-shirt labels for simple css values', () => {
+ 				const fontSizes = [ ...options ];
+ 				render(
+ 					<FontSizePicker
+@@ -203,9 +203,9 @@ describe( 'FontSizePicker', () => {
+ 				);
+ 				const element = screen.getByLabelText( 'Large' );
+ 				expect( element ).toBeInTheDocument();
+-				expect( element.children[ 0 ].textContent ).toBe( '1.7' );
++				expect( element.children[ 0 ].textContent ).toBe( 'L' );
+ 			} );
+-			it( 'should use incremental sequence of numbers as labels if we have complex css', () => {
++			it( 'should use incremental sequence of t-shirt sizes as labels if we have complex css', () => {
+ 				const fontSizes = [
+ 					...options,
+ 					{
+@@ -220,9 +220,16 @@ describe( 'FontSizePicker', () => {
+ 						value={ fontSizes[ 0 ].size }
+ 					/>
+ 				);
+-				const element = screen.getByLabelText( 'Large' );
+-				expect( element ).toBeInTheDocument();
+-				expect( element.children[ 0 ].textContent ).toBe( '3' );
++				const largeElement = screen.getByLabelText( 'Large' );
++				expect( largeElement ).toBeInTheDocument();
++				expect( largeElement ).toHaveTextContent( 'L' );
++
++				const extraLargeElement =
++					screen.getByLabelText( 'Extra Large' );
++				expect( extraLargeElement ).toBeInTheDocument();
++				expect( extraLargeElement.children[ 0 ].textContent ).toBe(
++					'XL'
++				);
+ 			} );
+ 		} );
+ 	} );
+diff --git a/packages/components/src/font-size-picker/test/util.js b/packages/components/src/font-size-picker/test/utils.js
+similarity index 65%
+rename from packages/components/src/font-size-picker/test/util.js
+rename to packages/components/src/font-size-picker/test/utils.js
+index 4a4a498c50e549..caeb43203c13d0 100644
+--- a/packages/components/src/font-size-picker/test/util.js
++++ b/packages/components/src/font-size-picker/test/utils.js
+@@ -1,7 +1,11 @@
+ /**
+  * Internal dependencies
+  */
+-import { isSimpleCssValue, splitValueAndUnitFromSize } from '../utils';
++import {
++	isSimpleCssValue,
++	splitValueAndUnitFromSize,
++	getToggleGroupOptions,
++} from '../utils';
+ 
+ const simpleCSSCases = [
+ 	// Test integers and non-integers.
+@@ -72,3 +76,75 @@ describe( 'splitValueAndUnitFromSize', () => {
+ 		}
+ 	);
+ } );
++
++describe( 'getToggleGroupOptions', () => {
++	test( 'should assign t-shirt sizes by default up until the aliases length', () => {
++		const optionsArray = [
++			{
++				slug: '1',
++				size: '1',
++				name: '1',
++			},
++			{
++				slug: '2',
++				size: '2',
++				name: '2',
++			},
++			{
++				slug: '3',
++				size: '3',
++				name: '3',
++			},
++			{
++				slug: '4',
++				size: '4',
++				name: '4',
++			},
++			{
++				slug: '5',
++				size: '5',
++				name: '5',
++			},
++		];
++		expect(
++			getToggleGroupOptions( optionsArray, [
++				'S',
++				'M',
++				'L',
++				'XL',
++				'XXL',
++			] )
++		).toEqual( [
++			{
++				key: '1',
++				value: '1',
++				label: 'S',
++				name: '1',
++			},
++			{
++				key: '2',
++				value: '2',
++				label: 'M',
++				name: '2',
++			},
++			{
++				key: '3',
++				value: '3',
++				label: 'L',
++				name: '3',
++			},
++			{
++				key: '4',
++				value: '4',
++				label: 'XL',
++				name: '4',
++			},
++			{
++				key: '5',
++				value: '5',
++				label: 'XXL',
++				name: '5',
++			},
++		] );
++	} );
++} );
+diff --git a/packages/components/src/font-size-picker/utils.js b/packages/components/src/font-size-picker/utils.js
+index cc5be4f91821e9..e2fec78f313357 100644
+--- a/packages/components/src/font-size-picker/utils.js
++++ b/packages/components/src/font-size-picker/utils.js
+@@ -15,13 +15,22 @@ const CUSTOM_FONT_SIZE_OPTION = {
+ };
+ 
+ /**
+- * In case we have at most five font sizes, where at least one the them
+- * contain a complex css value(clamp, var, etc..) show a incremental sequence
+- * of numbers as a label of the font size. We do this because complex css values
+- * cannot be caluclated properly and the incremental sequence of numbers as labels
+- * can help the user better mentally map the different available font sizes.
++ * In case we have at most five font sizes, show a `T-shirt size`
++ * alias as a label of the font size. The label assumes that the font sizes
++ * are ordered accordingly - from smallest to largest.
+  */
+-const FONT_SIZES_ALIASES = [ '1', '2', '3', '4', '5' ];
++const FONT_SIZES_ALIASES = [
++	/* translators: S stands for 'small' and is a size label. */
++	__( 'S' ),
++	/* translators: M stands for 'medium' and is a size label. */
++	__( 'M' ),
++	/* translators: L stands for 'large' and is a size label. */
++	__( 'L' ),
++	/* translators: XL stands for 'extra large' and is a size label. */
++	__( 'XL' ),
++	/* translators: XXL stands for 'extra extra large' and is a size label. */
++	__( 'XXL' ),
++];
+ 
+ /**
+  * Helper util to split a font size to its numeric value
+@@ -56,24 +65,22 @@ export function isSimpleCssValue( value ) {
+  * Return font size options in the proper format depending
+  * on the currently used control (select, toggle group).
+  *
+- * @param {boolean}  useSelectControl               Whether to use a select control.
+- * @param {Object[]} optionsArray                   Array of available font sizes objects.
+- * @param {*}        disableCustomFontSizes         Flag that indicates if custom font sizes are disabled.
+- * @param {boolean}  optionsContainComplexCssValues Whether font sizes contain at least one complex css value(clamp, var, etc..).
+- * @return {Object[]|null} Array of font sizes in proper format for the used control.
++ * @param {boolean}  useSelectControl       Whether to use a select control.
++ * @param {Object[]} optionsArray           Array of available font sizes objects.
++ * @param {boolean}  disableCustomFontSizes Flag that indicates if custom font sizes are disabled.
++ * @return {Object[]|null}                  Array of font sizes in proper format for the used control.
+  */
+ export function getFontSizeOptions(
+ 	useSelectControl,
+ 	optionsArray,
+-	disableCustomFontSizes,
+-	optionsContainComplexCssValues
++	disableCustomFontSizes
+ ) {
+ 	if ( disableCustomFontSizes && ! optionsArray.length ) {
+ 		return null;
+ 	}
+ 	return useSelectControl
+ 		? getSelectOptions( optionsArray, disableCustomFontSizes )
+-		: getToggleGroupOptions( optionsArray, optionsContainComplexCssValues );
++		: getToggleGroupOptions( optionsArray );
+ }
+ 
+ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+@@ -91,16 +98,24 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+ 	} ) );
+ }
+ 
+-function getToggleGroupOptions( optionsArray, optionsContainComplexCssValues ) {
++/**
++ * Build options for the toggle group options.
++ *
++ * @param {Array}    optionsArray An array of font size options.
++ * @param {string[]} labelAliases An array of alternative labels.
++ * @return {Array}   Remapped optionsArray.
++ */
++export function getToggleGroupOptions(
++	optionsArray,
++	labelAliases = FONT_SIZES_ALIASES
++) {
+ 	return optionsArray.map( ( { slug, size, name }, index ) => {
+-		let label = optionsContainComplexCssValues
+-			? FONT_SIZES_ALIASES[ index ]
+-			: size;
+-		if ( ! optionsContainComplexCssValues && typeof size === 'string' ) {
+-			const [ numericValue ] = splitValueAndUnitFromSize( size );
+-			label = numericValue;
+-		}
+-		return { key: slug, value: size, label, name };
++		return {
++			key: slug,
++			value: size,
++			label: labelAliases[ index ],
++			name,
++		};
+ 	} );
+ }
+ 

@@ -1,0 +1,43 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f89d5472d75762..2566d6c4dc2c78 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,8 +5,10 @@
+ ### Enhancements
+ 
+ -   `TreeGrid`: Modify keyboard navigation code to use a data-expanded attribute if aria-expanded is to be controlled outside of the TreeGrid component ([#48461](https://github.com/WordPress/gutenberg/pull/48461)).
++-   `Modal`: Equalize internal spacing ([#49890](https://github.com/WordPress/gutenberg/pull/49890)).
+ -   `Modal`: Increased border radius ([#49870](https://github.com/WordPress/gutenberg/pull/49870)).
+ 
++
+ ### Documentation
+ 
+ -   `Autocomplete`: Add heading and fix type for `onReplace` in README. ([#49798](https://github.com/WordPress/gutenberg/pull/49798)).
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index 25b4ee2d1bacf8..7ffa719c605585 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -64,12 +64,12 @@
+ .components-modal__header {
+ 	box-sizing: border-box;
+ 	border-bottom: $border-width solid transparent;
+-	padding: 0 $grid-unit-40;
++	padding: $grid-unit-30 $grid-unit-40 $grid-unit-15;
+ 	display: flex;
+ 	flex-direction: row;
+ 	justify-content: space-between;
+ 	align-items: center;
+-	height: $header-height + $grid-unit-20;
++	height: $header-height + $grid-unit-15;
+ 	width: 100%;
+ 	z-index: z-index(".components-modal__header");
+ 	position: absolute;
+@@ -121,7 +121,7 @@
+ // Modal contents.
+ .components-modal__content {
+ 	flex: 1;
+-	margin-top: $header-height + $grid-unit-20;
++	margin-top: $header-height + $grid-unit-15;
+ 	padding: 0 $grid-unit-40 $grid-unit-40;
+ 	overflow: auto;
+ 

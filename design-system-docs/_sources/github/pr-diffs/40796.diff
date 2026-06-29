@@ -1,0 +1,42 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9c58e2f84faddb..5011f643491944 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ 
+ -    The `Button` component now displays the label as the tooltip for icon only buttons. ([#40716](https://github.com/WordPress/gutenberg/pull/40716))
+ -    Use fake timers and fix usage of async methods from `@testing-library/user-event`. ([#40790](https://github.com/WordPress/gutenberg/pull/40790))
++-    UnitControl: avoid calling onChange callback twice when unit changes. ([#40796](https://github.com/WordPress/gutenberg/pull/40796))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index e97bc6ff955f6a..3296438b04b8c4 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -178,10 +178,7 @@ function UnforwardedUnitControl(
+ 				: undefined;
+ 			const changeProps = { event, data };
+ 
+-			onChangeProp?.(
+-				`${ validParsedQuantity ?? '' }${ validParsedUnit }`,
+-				changeProps
+-			);
++			// The `onChange` callback already gets called, no need to call it explicitely.
+ 			onUnitChange?.( validParsedUnit, changeProps );
+ 
+ 			setUnit( validParsedUnit );
+diff --git a/packages/components/src/unit-control/test/index.tsx b/packages/components/src/unit-control/test/index.tsx
+index 7677622f277c3c..c57af0e75a7379 100644
+--- a/packages/components/src/unit-control/test/index.tsx
++++ b/packages/components/src/unit-control/test/index.tsx
+@@ -310,8 +310,7 @@ describe( 'UnitControl', () => {
+ 			// Clicking document.body to trigger a blur event on the input.
+ 			await user.click( document.body );
+ 
+-			// TODO: investigate why `onChange` gets called twice instead of once
+-			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
++			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+ 			expect( onChangeSpy ).toHaveBeenLastCalledWith( '41vh' );
+ 
+ 			expect( onUnitChangeSpy ).toHaveBeenCalledTimes( 1 );

@@ -1,0 +1,34 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 45b98850e80f69..ed6af6c7baba4f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
+ -   `ColorPicker`: Fix issue where clearing the hex input entirely doesn't reset the selected color to black ([#77912](https://github.com/WordPress/gutenberg/pull/77912)).
++-   `ExternalLink`: Fix focus outline rendered in wp-admin ([#77935](https://github.com/WordPress/gutenberg/pull/77935)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/external-link/style.scss b/packages/components/src/external-link/style.scss
+index b8b7cbe8e46ecd..eefa429d411f63 100644
+--- a/packages/components/src/external-link/style.scss
++++ b/packages/components/src/external-link/style.scss
+@@ -24,6 +24,9 @@
+ 		outline:
+ 			var(--wpds-border-width-focus) solid
+ 			var(--wpds-color-stroke-focus-brand);
++		// Override style from wp-admin common.css.
++		box-shadow: none;
++		border-radius: 0;
+ 	}
+ }
+ 
+@@ -34,6 +37,7 @@
+ }
+ 
+ .components-external-link__icon {
++	line-height: 1;
+ 	display: inline-block;
+ 	margin-inline-start: var(--wpds-dimension-padding-xs);
+ 	font-weight: var(--wpds-typography-font-weight-regular);

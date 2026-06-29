@@ -1,0 +1,371 @@
+diff --git a/package-lock.json b/package-lock.json
+index bc25e83151fe9b..9b2592f77c29b3 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -4007,13 +4007,10 @@
+ 			}
+ 		},
+ 		"node_modules/@babel/runtime": {
+-			"version": "7.25.7",
+-			"resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.25.7.tgz",
+-			"integrity": "sha512-FjoyLe754PMiYsFaN5C94ttGiOmBNYTf6pLr4xXHAT5uctHb092PBszndLDR5XA/jghQvn4n7JMHl7dmTgbm9w==",
++			"version": "7.28.4",
++			"resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.28.4.tgz",
++			"integrity": "sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==",
+ 			"license": "MIT",
+-			"dependencies": {
+-				"regenerator-runtime": "^0.14.0"
+-			},
+ 			"engines": {
+ 				"node": ">=6.9.0"
+ 			}
+@@ -4036,11 +4033,6 @@
+ 			"resolved": "https://registry.npmjs.org/regenerator-runtime/-/regenerator-runtime-0.14.1.tgz",
+ 			"integrity": "sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw=="
+ 		},
+-		"node_modules/@babel/runtime/node_modules/regenerator-runtime": {
+-			"version": "0.14.1",
+-			"resolved": "https://registry.npmjs.org/regenerator-runtime/-/regenerator-runtime-0.14.1.tgz",
+-			"integrity": "sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw=="
+-		},
+ 		"node_modules/@babel/template": {
+ 			"version": "7.25.9",
+ 			"resolved": "https://registry.npmjs.org/@babel/template/-/template-7.25.9.tgz",
+@@ -4094,6 +4086,73 @@
+ 				"node": ">=6.9.0"
+ 			}
+ 		},
++		"node_modules/@base-ui/react": {
++			"version": "1.0.0",
++			"resolved": "https://registry.npmjs.org/@base-ui/react/-/react-1.0.0.tgz",
++			"integrity": "sha512-4USBWz++DUSLTuIYpbYkSgy1F9ZmNG9S/lXvlUN6qMK0P0RlW+6eQmDUB4DgZ7HVvtXl4pvi4z5J2fv6Z3+9hg==",
++			"license": "MIT",
++			"dependencies": {
++				"@babel/runtime": "^7.28.4",
++				"@base-ui/utils": "0.2.3",
++				"@floating-ui/react-dom": "^2.1.6",
++				"@floating-ui/utils": "^0.2.10",
++				"reselect": "^5.1.1",
++				"tabbable": "^6.3.0",
++				"use-sync-external-store": "^1.6.0"
++			},
++			"engines": {
++				"node": ">=14.0.0"
++			},
++			"funding": {
++				"type": "opencollective",
++				"url": "https://opencollective.com/mui-org"
++			},
++			"peerDependencies": {
++				"@types/react": "^17 || ^18 || ^19",
++				"react": "^17 || ^18 || ^19",
++				"react-dom": "^17 || ^18 || ^19"
++			},
++			"peerDependenciesMeta": {
++				"@types/react": {
++					"optional": true
++				}
++			}
++		},
++		"node_modules/@base-ui/react/node_modules/@floating-ui/react-dom": {
++			"version": "2.1.6",
++			"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.1.6.tgz",
++			"integrity": "sha512-4JX6rEatQEvlmgU80wZyq9RT96HZJa88q8hp0pBd+LrczeDI4o6uA2M+uvxngVHo4Ihr8uibXxH6+70zhAFrVw==",
++			"license": "MIT",
++			"dependencies": {
++				"@floating-ui/dom": "^1.7.4"
++			},
++			"peerDependencies": {
++				"react": ">=16.8.0",
++				"react-dom": ">=16.8.0"
++			}
++		},
++		"node_modules/@base-ui/utils": {
++			"version": "0.2.3",
++			"resolved": "https://registry.npmjs.org/@base-ui/utils/-/utils-0.2.3.tgz",
++			"integrity": "sha512-/CguQ2PDaOzeVOkllQR8nocJ0FFIDqsWIcURsVmm53QGo8NhFNpePjNlyPIB41luxfOqnG7PU0xicMEw3ls7XQ==",
++			"license": "MIT",
++			"dependencies": {
++				"@babel/runtime": "^7.28.4",
++				"@floating-ui/utils": "^0.2.10",
++				"reselect": "^5.1.1",
++				"use-sync-external-store": "^1.6.0"
++			},
++			"peerDependencies": {
++				"@types/react": "^17 || ^18 || ^19",
++				"react": "^17 || ^18 || ^19",
++				"react-dom": "^17 || ^18 || ^19"
++			},
++			"peerDependenciesMeta": {
++				"@types/react": {
++					"optional": true
++				}
++			}
++		},
+ 		"node_modules/@bcoe/v8-coverage": {
+ 			"version": "0.2.3",
+ 			"resolved": "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz",
+@@ -5245,21 +5304,21 @@
+ 			}
+ 		},
+ 		"node_modules/@floating-ui/core": {
+-			"version": "1.7.2",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/core/-/core-1.7.2.tgz",
+-			"integrity": "sha512-wNB5ooIKHQc+Kui96jE/n69rHFWAVoxn5CAzL1Xdd8FG03cgY3MLO+GF9U3W737fYDSgPWA6MReKhBQBop6Pcw==",
++			"version": "1.7.3",
++			"resolved": "https://registry.npmjs.org/@floating-ui/core/-/core-1.7.3.tgz",
++			"integrity": "sha512-sGnvb5dmrJaKEZ+LDIpguvdX3bDlEllmv4/ClQ9awcmCZrlx5jQyyMWFM5kBI+EyNOCDDiKk8il0zeuX3Zlg/w==",
+ 			"license": "MIT",
+ 			"dependencies": {
+ 				"@floating-ui/utils": "^0.2.10"
+ 			}
+ 		},
+ 		"node_modules/@floating-ui/dom": {
+-			"version": "1.7.2",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/dom/-/dom-1.7.2.tgz",
+-			"integrity": "sha512-7cfaOQuCS27HD7DX+6ib2OrnW+b4ZBwDNnCcT0uTyidcmyWb03FnQqJybDBoCnpdxwBSfA94UAYlRCt7mV+TbA==",
++			"version": "1.7.4",
++			"resolved": "https://registry.npmjs.org/@floating-ui/dom/-/dom-1.7.4.tgz",
++			"integrity": "sha512-OOchDgh4F2CchOX94cRVqhvy7b3AFb+/rQXyswmzmGakRfkMgoWVjfnLWkRirfLEfuD4ysVW16eXzwt3jHIzKA==",
+ 			"license": "MIT",
+ 			"dependencies": {
+-				"@floating-ui/core": "^1.7.2",
++				"@floating-ui/core": "^1.7.3",
+ 				"@floating-ui/utils": "^0.2.10"
+ 			}
+ 		},
+@@ -43981,6 +44040,12 @@
+ 			"resolved": "https://registry.npmjs.org/requires-port/-/requires-port-1.0.0.tgz",
+ 			"integrity": "sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ=="
+ 		},
++		"node_modules/reselect": {
++			"version": "5.1.1",
++			"resolved": "https://registry.npmjs.org/reselect/-/reselect-5.1.1.tgz",
++			"integrity": "sha512-K/BG6eIky/SBpzfHZv/dd+9JBFiS4SWV7FIujVyJRux6e45+73RaUHXLmIR1f7WOMaQ0U1km6qwklRQxpJJY0w==",
++			"license": "MIT"
++		},
+ 		"node_modules/resize-observer-polyfill": {
+ 			"version": "1.5.1",
+ 			"resolved": "https://registry.npmjs.org/resize-observer-polyfill/-/resize-observer-polyfill-1.5.1.tgz",
+@@ -47829,6 +47894,12 @@
+ 				"url": "https://opencollective.com/unts"
+ 			}
+ 		},
++		"node_modules/tabbable": {
++			"version": "6.3.0",
++			"resolved": "https://registry.npmjs.org/tabbable/-/tabbable-6.3.0.tgz",
++			"integrity": "sha512-EIHvdY5bPLuWForiR/AN2Bxngzpuwn1is4asboytXtpTgsArc+WmSJKVLlhdh71u7jFcryDqB2A8lQvj78MkyQ==",
++			"license": "MIT"
++		},
+ 		"node_modules/table": {
+ 			"version": "6.8.2",
+ 			"resolved": "https://registry.npmjs.org/table/-/table-6.8.2.tgz",
+@@ -56119,6 +56190,7 @@
+ 			"version": "0.3.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@base-ui/react": "^1.0.0",
+ 				"@wordpress/element": "file:../element",
+ 				"clsx": "^2.1.1"
+ 			},
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 1923e779bfbaa8..db3b650f1e42c9 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -4,8 +4,9 @@
+ 
+ ### Breaking Changes
+ 
+--   Remove numeric multiplier option for spacing tokens from `Stack` and `Box` components. ([#73852](https://github.com/WordPress/gutenberg/pull/73852), [#74008](https://github.com/WordPress/gutenberg/pull/74008))
++-   Remove numeric multiplier option for spacing tokens from `Stack` and `Box` components ([#73852](https://github.com/WordPress/gutenberg/pull/73852), [#74008](https://github.com/WordPress/gutenberg/pull/74008)).
+ 
+ ### New Features
+ 
+--   Add `Stack` component. ([#73928](https://github.com/WordPress/gutenberg/pull/73928))
++-   Add `Stack` component ([#73928](https://github.com/WordPress/gutenberg/pull/73928)).
++-   Add `VisuallyHidden` component ([#74189](https://github.com/WordPress/gutenberg/pull/74189)).
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 6eac838d30f809..f0be6636430a18 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -44,6 +44,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
++		"@base-ui/react": "^1.0.0",
+ 		"@wordpress/element": "file:../element",
+ 		"clsx": "^2.1.1"
+ 	},
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 75b81cf5cbc964..2f06a9456b4aa0 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -1,3 +1,4 @@
+ export * from './box';
+ export * from './badge';
+ export * from './stack';
++export * from './visually-hidden';
+diff --git a/packages/ui/src/visually-hidden/index.ts b/packages/ui/src/visually-hidden/index.ts
+new file mode 100644
+index 00000000000000..998d12822f2644
+--- /dev/null
++++ b/packages/ui/src/visually-hidden/index.ts
+@@ -0,0 +1 @@
++export { VisuallyHidden } from './visually-hidden';
+diff --git a/packages/ui/src/visually-hidden/stories/index.story.tsx b/packages/ui/src/visually-hidden/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..c40b363d30fb17
+--- /dev/null
++++ b/packages/ui/src/visually-hidden/stories/index.story.tsx
+@@ -0,0 +1,22 @@
++import type { Meta, StoryObj } from '@storybook/react';
++import { VisuallyHidden } from '../';
++
++const meta: Meta< typeof VisuallyHidden > = {
++	title: 'Design System/Components/VisuallyHidden',
++	component: VisuallyHidden,
++};
++export default meta;
++
++type Story = StoryObj< typeof VisuallyHidden >;
++
++export const Default: Story = {
++	render: () => (
++		<>
++			<VisuallyHidden>This should not show.</VisuallyHidden>
++			<div>
++				This text will <VisuallyHidden>but not inline </VisuallyHidden>
++				always show.
++			</div>
++		</>
++	),
++};
+diff --git a/packages/ui/src/visually-hidden/style.module.css b/packages/ui/src/visually-hidden/style.module.css
+new file mode 100644
+index 00000000000000..c0234f4ef411d2
+--- /dev/null
++++ b/packages/ui/src/visually-hidden/style.module.css
+@@ -0,0 +1,15 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.visually-hidden {
++		border: 0;
++		clip-path: inset(50%);
++		height: 1px;
++		margin: -1px;
++		overflow: hidden;
++		padding: 0;
++		position: absolute;
++		width: 1px;
++		word-wrap: normal;
++	}
++}
+diff --git a/packages/ui/src/visually-hidden/test/visually-hidden.test.tsx b/packages/ui/src/visually-hidden/test/visually-hidden.test.tsx
+new file mode 100644
+index 00000000000000..4dd0bc5e8735eb
+--- /dev/null
++++ b/packages/ui/src/visually-hidden/test/visually-hidden.test.tsx
+@@ -0,0 +1,59 @@
++import { render, screen } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import { VisuallyHidden } from '../index';
++
++describe( 'VisuallyHidden', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLDivElement >();
++
++		render( <VisuallyHidden ref={ ref }>Content</VisuallyHidden> );
++
++		expect( ref.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++
++	it( 'should forward props to the rendered element', () => {
++		render(
++			<VisuallyHidden data-testid="visually-hidden">
++				Content
++			</VisuallyHidden>
++		);
++
++		expect( screen.getByTestId( 'visually-hidden' ) ).toBeInTheDocument();
++	} );
++
++	it( 'should forward the class name to the rendered element', () => {
++		render(
++			<VisuallyHidden
++				data-testid="visually-hidden"
++				className="test-class"
++			>
++				Content
++			</VisuallyHidden>
++		);
++
++		expect( screen.getByTestId( 'visually-hidden' ) ).toHaveClass(
++			'test-class'
++		);
++	} );
++
++	it( 'should support the render prop', () => {
++		render(
++			<>
++				<VisuallyHidden
++					render={
++						// eslint-disable-next-line jsx-a11y/label-has-associated-control
++						<label htmlFor="input-id" />
++					}
++				>
++					My label
++				</VisuallyHidden>
++				{ /* eslint-disable-next-line no-restricted-syntax */ }
++				<input id="input-id" />
++			</>
++		);
++
++		expect(
++			screen.getByRole( 'textbox', { name: 'My label' } )
++		).toBeVisible();
++	} );
++} );
+diff --git a/packages/ui/src/visually-hidden/types.ts b/packages/ui/src/visually-hidden/types.ts
+new file mode 100644
+index 00000000000000..0d964ce46d9e47
+--- /dev/null
++++ b/packages/ui/src/visually-hidden/types.ts
+@@ -0,0 +1,8 @@
++import type { ComponentProps } from '../utils/types';
++
++export interface VisuallyHiddenProps extends ComponentProps< 'div' > {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: React.ReactNode;
++}
+diff --git a/packages/ui/src/visually-hidden/visually-hidden.tsx b/packages/ui/src/visually-hidden/visually-hidden.tsx
+new file mode 100644
+index 00000000000000..49996d07e0d8bc
+--- /dev/null
++++ b/packages/ui/src/visually-hidden/visually-hidden.tsx
+@@ -0,0 +1,23 @@
++import { mergeProps, useRender } from '@base-ui/react';
++import { forwardRef } from '@wordpress/element';
++import type { VisuallyHiddenProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * Visually hides content while keeping it accessible to screen readers.
++ * Useful when providing context that's only meaningful to assistive technology.
++ */
++export const VisuallyHidden = forwardRef< HTMLDivElement, VisuallyHiddenProps >(
++	function VisuallyHidden( { render, ...restProps }, ref ) {
++		const element = useRender( {
++			render,
++			ref,
++			props: mergeProps< 'div' >(
++				{ className: styles[ 'visually-hidden' ] },
++				restProps
++			),
++		} );
++
++		return element;
++	}
++);

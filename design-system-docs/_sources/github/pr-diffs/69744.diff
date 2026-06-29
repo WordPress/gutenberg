@@ -1,0 +1,28 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2e516deaf10d89..1a64b44c6a95b6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `Button`: Fix tertiary variant displaying incorrect text color in pressed and hover states ([#68542](https://github.com/WordPress/gutenberg/pull/68542)).
++
+ ### Enhancement
+ 
+ -   `QueryControls`: Add menu_order sorting option if supported by the post type. ([#68781](https://github.com/WordPress/gutenberg/pull/68781)).
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index e7cc40d205e2e3..10e363b79f1fd7 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -167,7 +167,7 @@
+ 		color: $components-color-accent;
+ 		background: transparent;
+ 
+-		&:hover:not(:disabled, [aria-disabled="true"]) {
++		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
+ 			background: color-mix(in srgb, $components-color-accent 4%, transparent);
+ 			color: $components-color-accent-darker-20;
+ 		}

@@ -1,0 +1,38 @@
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index 5c6725a51b435d..462e615db9e806 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -152,19 +152,23 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 	const inputContainer = useRef< HTMLInputElement >( null );
+ 
+ 	const matchingSuggestions = useMemo( () => {
+-		const startsWithMatch: ComboboxControlOption[] = [];
+-		const containsMatch: ComboboxControlOption[] = [];
++		const startsWithMatch = new Set< ComboboxControlOption >();
++		const containsMatch = new Set< ComboboxControlOption >();
+ 		const match = normalizeTextString( inputValue );
+ 		options.forEach( ( option ) => {
+-			const index = normalizeTextString( option.label ).indexOf( match );
+-			if ( index === 0 ) {
+-				startsWithMatch.push( option );
+-			} else if ( index > 0 ) {
+-				containsMatch.push( option );
+-			}
++			const searchFrom = [ option.label, option.value ];
++			searchFrom.forEach( ( searchField ) => {
++				const matchIndex =
++					normalizeTextString( searchField ).indexOf( match );
++				if ( matchIndex === 0 ) {
++					startsWithMatch.add( option );
++				} else if ( matchIndex > 0 ) {
++					containsMatch.add( option );
++				}
++			} );
+ 		} );
+-
+-		return startsWithMatch.concat( containsMatch );
++		// return the content of set as array
++		return [ ...startsWithMatch, ...containsMatch ];
+ 	}, [ inputValue, options ] );
+ 
+ 	const onSuggestionSelected = (

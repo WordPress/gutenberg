@@ -1,0 +1,3809 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 7b084a048df5fe..e5b03d93af7a4d 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -827,6 +827,12 @@
+ 		"markdown_source": "../packages/components/src/drop-zone/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "DropdownMenuV2Ariakit",
++		"slug": "dropdown-menu-v2-ariakit",
++		"markdown_source": "../packages/components/src/dropdown-menu-v2-ariakit/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "DropdownMenu",
+ 		"slug": "dropdown-menu",
+diff --git a/package-lock.json b/package-lock.json
+index 7603e03b936bff..4408c101e25e3a 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -361,6 +361,27 @@
+ 				"react-dom": "^17.0.0 || ^18.0.0"
+ 			}
+ 		},
++		"node_modules/@ariakit/test": {
++			"version": "0.3.0",
++			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.3.0.tgz",
++			"integrity": "sha512-fngAzkzCl9zM4O/tzVaUf7ixWUAk779hjTegr/zcegoxaMS5SmaLhNQ7RU0AGx06LrhJse6GYGy8ZtK58HP/EQ==",
++			"dependencies": {
++				"@ariakit/core": "0.3.3",
++				"@testing-library/dom": "^8.0.0 || ^9.0.0"
++			},
++			"peerDependencies": {
++				"@testing-library/react": "^12.0.0 || ^13.0.0 || ^14.0.0",
++				"react": "^17.0.0 || ^18.0.0"
++			},
++			"peerDependenciesMeta": {
++				"@testing-library/react": {
++					"optional": true
++				},
++				"react": {
++					"optional": true
++				}
++			}
++		},
+ 		"node_modules/@aw-web-design/x-default-browser": {
+ 			"version": "1.4.126",
+ 			"resolved": "https://registry.npmjs.org/@aw-web-design/x-default-browser/-/x-default-browser-1.4.126.tgz",
+@@ -13922,7 +13943,6 @@
+ 			"version": "9.3.1",
+ 			"resolved": "https://registry.npmjs.org/@testing-library/dom/-/dom-9.3.1.tgz",
+ 			"integrity": "sha512-0DGPd9AR3+iDTjGoMpxIkAsUihHZ3Ai6CneU6bRRrffXMgzCdlNk43jTrD2/5LT6CBb3MWTP8v510JzYtahD2w==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"@babel/code-frame": "^7.10.4",
+ 				"@babel/runtime": "^7.12.5",
+@@ -13941,7 +13961,6 @@
+ 			"version": "5.2.0",
+ 			"resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-5.2.0.tgz",
+ 			"integrity": "sha512-Cxwpt2SfTzTtXcfOlzGEee8O+c+MmUgGrNiBcXnuWxuFJHe6a5Hz7qwhwe5OgaSYI0IJvkLqWX1ASG+cJOkEiA==",
+-			"dev": true,
+ 			"engines": {
+ 				"node": ">=10"
+ 			},
+@@ -13953,7 +13972,6 @@
+ 			"version": "5.1.3",
+ 			"resolved": "https://registry.npmjs.org/aria-query/-/aria-query-5.1.3.tgz",
+ 			"integrity": "sha512-R5iJ5lkuHybztUfuOAznmboyjWq8O6sqNqtK7CLOqdydi54VNbORp49mb14KbWgG1QD3JFO9hJdZ+y4KutfdOQ==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"deep-equal": "^2.0.5"
+ 			}
+@@ -13962,7 +13980,6 @@
+ 			"version": "2.2.2",
+ 			"resolved": "https://registry.npmjs.org/deep-equal/-/deep-equal-2.2.2.tgz",
+ 			"integrity": "sha512-xjVyBf0w5vH0I42jdAZzOKVldmPgSulmiyPRywoyq7HXC9qdgo17kxJE+rdnif5Tz6+pIrpJI8dCpMNLIGkUiA==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"array-buffer-byte-length": "^1.0.0",
+ 				"call-bind": "^1.0.2",
+@@ -13990,14 +14007,12 @@
+ 		"node_modules/@testing-library/dom/node_modules/isarray": {
+ 			"version": "2.0.5",
+ 			"resolved": "https://registry.npmjs.org/isarray/-/isarray-2.0.5.tgz",
+-			"integrity": "sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==",
+-			"dev": true
++			"integrity": "sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw=="
+ 		},
+ 		"node_modules/@testing-library/dom/node_modules/pretty-format": {
+ 			"version": "27.5.1",
+ 			"resolved": "https://registry.npmjs.org/pretty-format/-/pretty-format-27.5.1.tgz",
+ 			"integrity": "sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"ansi-regex": "^5.0.1",
+ 				"ansi-styles": "^5.0.0",
+@@ -14010,8 +14025,7 @@
+ 		"node_modules/@testing-library/dom/node_modules/react-is": {
+ 			"version": "17.0.2",
+ 			"resolved": "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz",
+-			"integrity": "sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==",
+-			"dev": true
++			"integrity": "sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w=="
+ 		},
+ 		"node_modules/@testing-library/jest-dom": {
+ 			"version": "5.16.5",
+@@ -14193,8 +14207,7 @@
+ 		"node_modules/@types/aria-query": {
+ 			"version": "5.0.1",
+ 			"resolved": "https://registry.npmjs.org/@types/aria-query/-/aria-query-5.0.1.tgz",
+-			"integrity": "sha512-XTIieEY+gvJ39ChLcB4If5zHtPxt3Syj5rgZR+e1ctpmK8NjPf0zFqsz4JpLJT0xla9GFDKjy8Cpu331nrmE1Q==",
+-			"dev": true
++			"integrity": "sha512-XTIieEY+gvJ39ChLcB4If5zHtPxt3Syj5rgZR+e1ctpmK8NjPf0zFqsz4JpLJT0xla9GFDKjy8Cpu331nrmE1Q=="
+ 		},
+ 		"node_modules/@types/babel__core": {
+ 			"version": "7.20.0",
+@@ -23128,7 +23141,6 @@
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/array-buffer-byte-length/-/array-buffer-byte-length-1.0.0.tgz",
+ 			"integrity": "sha512-LPuwb2P+NrQw3XhxGc36+XSvuBPopovXYTR9Ew++Du9Yb/bx5AzBfrIsBoj0EZUifjQU+sHL21sseZ3jerWO/A==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"call-bind": "^1.0.2",
+ 				"is-array-buffer": "^3.0.1"
+@@ -23464,7 +23476,6 @@
+ 			"version": "1.0.5",
+ 			"resolved": "https://registry.npmjs.org/available-typed-arrays/-/available-typed-arrays-1.0.5.tgz",
+ 			"integrity": "sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==",
+-			"dev": true,
+ 			"engines": {
+ 				"node": ">= 0.4"
+ 			},
+@@ -24869,7 +24880,6 @@
+ 			"version": "1.0.2",
+ 			"resolved": "https://registry.npmjs.org/call-bind/-/call-bind-1.0.2.tgz",
+ 			"integrity": "sha512-7O+FbCihrB5WGbFYesctwmTKae6rOiIzmz1icreWJ+0aA7LJfuqhEso2T9ncpcFtzMQtzXf2QGGueWJGTYsqrA==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"function-bind": "^1.1.1",
+ 				"get-intrinsic": "^1.0.2"
+@@ -28285,7 +28295,6 @@
+ 			"version": "1.2.0",
+ 			"resolved": "https://registry.npmjs.org/define-properties/-/define-properties-1.2.0.tgz",
+ 			"integrity": "sha512-xvqAVKGfT1+UAvPwKTVw/njhdQ8ZhXK4lI0bCIuCMrp2up9nPnaDftrLtmpTazqd1o+UY4zgzU+avtMbDP+ldA==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"has-property-descriptors": "^1.0.0",
+ 				"object-keys": "^1.1.1"
+@@ -28856,8 +28865,7 @@
+ 		"node_modules/dom-accessibility-api": {
+ 			"version": "0.5.14",
+ 			"resolved": "https://registry.npmjs.org/dom-accessibility-api/-/dom-accessibility-api-0.5.14.tgz",
+-			"integrity": "sha512-NMt+m9zFMPZe0JcY9gN224Qvk6qLIdqex29clBvc/y75ZBX9YA9wNK3frsYvu2DI1xcCIwxwnX+TlsJ2DSOADg==",
+-			"dev": true
++			"integrity": "sha512-NMt+m9zFMPZe0JcY9gN224Qvk6qLIdqex29clBvc/y75ZBX9YA9wNK3frsYvu2DI1xcCIwxwnX+TlsJ2DSOADg=="
+ 		},
+ 		"node_modules/dom-converter": {
+ 			"version": "0.2.0",
+@@ -29357,7 +29365,6 @@
+ 			"version": "1.1.3",
+ 			"resolved": "https://registry.npmjs.org/es-get-iterator/-/es-get-iterator-1.1.3.tgz",
+ 			"integrity": "sha512-sPZmqHBe6JIiTfN5q2pEi//TwxmAFHwj/XEuYjTuse78i8KxaqMTTzxPoFKuzRpDpTJ+0NAbpfenkmH2rePtuw==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"call-bind": "^1.0.2",
+ 				"get-intrinsic": "^1.1.3",
+@@ -29376,8 +29383,7 @@
+ 		"node_modules/es-get-iterator/node_modules/isarray": {
+ 			"version": "2.0.5",
+ 			"resolved": "https://registry.npmjs.org/isarray/-/isarray-2.0.5.tgz",
+-			"integrity": "sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==",
+-			"dev": true
++			"integrity": "sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw=="
+ 		},
+ 		"node_modules/es-module-lexer": {
+ 			"version": "1.3.1",
+@@ -31723,7 +31729,6 @@
+ 			"version": "0.3.3",
+ 			"resolved": "https://registry.npmjs.org/for-each/-/for-each-0.3.3.tgz",
+ 			"integrity": "sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"is-callable": "^1.1.3"
+ 			}
+@@ -32003,7 +32008,6 @@
+ 			"version": "1.2.3",
+ 			"resolved": "https://registry.npmjs.org/functions-have-names/-/functions-have-names-1.2.3.tgz",
+ 			"integrity": "sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==",
+-			"dev": true,
+ 			"funding": {
+ 				"url": "https://github.com/sponsors/ljharb"
+ 			}
+@@ -32081,7 +32085,6 @@
+ 			"version": "1.2.1",
+ 			"resolved": "https://registry.npmjs.org/get-intrinsic/-/get-intrinsic-1.2.1.tgz",
+ 			"integrity": "sha512-2DcsyfABl+gVHEfCOaTrWgyt+tb6MSEGmKq+kI5HwLbIYgjgmMcV8KQ41uaKz1xxUcn9tJtgFbQUEVcEbd0FYw==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"function-bind": "^1.1.1",
+ 				"has": "^1.0.3",
+@@ -32574,7 +32577,6 @@
+ 			"version": "1.0.1",
+ 			"resolved": "https://registry.npmjs.org/gopd/-/gopd-1.0.1.tgz",
+ 			"integrity": "sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"get-intrinsic": "^1.1.3"
+ 			},
+@@ -32769,7 +32771,6 @@
+ 			"version": "1.0.2",
+ 			"resolved": "https://registry.npmjs.org/has-bigints/-/has-bigints-1.0.2.tgz",
+ 			"integrity": "sha512-tSvCKtBr9lkF0Ex0aQiP9N+OpV4zi2r/Nee5VkRDbaqv35RLYMzbwQfFSZZH0kR+Rd6302UJZ2p/bJCEoR3VoQ==",
+-			"dev": true,
+ 			"funding": {
+ 				"url": "https://github.com/sponsors/ljharb"
+ 			}
+@@ -32786,7 +32787,6 @@
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/has-property-descriptors/-/has-property-descriptors-1.0.0.tgz",
+ 			"integrity": "sha512-62DVLZGoiEBDHQyqG4w9xCuZ7eJEwNmJRWw2VY84Oedb7WFcA27fiEVe8oUQx9hAUJ4ekurquucTGwsyO1XGdQ==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"get-intrinsic": "^1.1.1"
+ 			},
+@@ -32798,7 +32798,6 @@
+ 			"version": "1.0.1",
+ 			"resolved": "https://registry.npmjs.org/has-proto/-/has-proto-1.0.1.tgz",
+ 			"integrity": "sha512-7qE+iP+O+bgF9clE5+UoBFzE65mlBiVj3tKCrlNQ0Ogwm0BjpT/gK4SlLYDMybDh5I3TCTKnPPa0oMG7JDYrhg==",
+-			"dev": true,
+ 			"engines": {
+ 				"node": ">= 0.4"
+ 			},
+@@ -32810,7 +32809,6 @@
+ 			"version": "1.0.3",
+ 			"resolved": "https://registry.npmjs.org/has-symbols/-/has-symbols-1.0.3.tgz",
+ 			"integrity": "sha512-l3LCuF6MgDNwTDKkdYGEihYjt5pRPbEg46rtlmnSPlUbgmB8LOIrKJbYYFBSbnPaJexMKtiPO8hmeRjRz2Td+A==",
+-			"dev": true,
+ 			"engines": {
+ 				"node": ">= 0.4"
+ 			},
+@@ -32822,7 +32820,6 @@
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/has-tostringtag/-/has-tostringtag-1.0.0.tgz",
+ 			"integrity": "sha512-kFjcSNhnlGV1kyoGk7OXKSawH5JOb/LzUc5w9B02hOTO0dfFRjbHQKvg1d6cf3HbeUmtU9VbbV3qzZ2Teh97WQ==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"has-symbols": "^1.0.2"
+ 			},
+@@ -33995,7 +33992,6 @@
+ 			"version": "1.0.5",
+ 			"resolved": "https://registry.npmjs.org/internal-slot/-/internal-slot-1.0.5.tgz",
+ 			"integrity": "sha512-Y+R5hJrzs52QCG2laLn4udYVnxsfny9CpOhNhUvk/SSSVyF6T27FzRbF0sroPidSu3X8oEAkOn2K804mjpt6UQ==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"get-intrinsic": "^1.2.0",
+ 				"has": "^1.0.3",
+@@ -34125,7 +34121,6 @@
+ 			"version": "1.1.1",
+ 			"resolved": "https://registry.npmjs.org/is-arguments/-/is-arguments-1.1.1.tgz",
+ 			"integrity": "sha512-8Q7EARjzEnKpt/PCD7e1cgUS0a6X8u5tdSiMqXhojOdoV9TsMsiO+9VLC5vAmO8N7/GmXn7yjR8qnA6bVAEzfA==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"call-bind": "^1.0.2",
+ 				"has-tostringtag": "^1.0.0"
+@@ -34141,7 +34136,6 @@
+ 			"version": "3.0.2",
+ 			"resolved": "https://registry.npmjs.org/is-array-buffer/-/is-array-buffer-3.0.2.tgz",
+ 			"integrity": "sha512-y+FyyR/w8vfIRq4eQcM1EYgSTnmHXPqaF+IgzgraytCFq5Xh8lllDVmAZolPJiZttZLeFSINPYMaEJ7/vWUa1w==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"call-bind": "^1.0.2",
+ 				"get-intrinsic": "^1.2.0",
+@@ -34160,7 +34154,6 @@
+ 			"version": "1.0.4",
+ 			"resolved": "https://registry.npmjs.org/is-bigint/-/is-bigint-1.0.4.tgz",
+ 			"integrity": "sha512-zB9CruMamjym81i2JZ3UMn54PKGsQzsJeo6xvN3HJJ4CAsQNB6iRutp2To77OfCNuoxspsIhzaPoO1zyCEhFOg==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"has-bigints": "^1.0.1"
+ 			},
+@@ -34184,7 +34177,6 @@
+ 			"version": "1.1.2",
+ 			"resolved": "https://registry.npmjs.org/is-boolean-object/-/is-boolean-object-1.1.2.tgz",
+ 			"integrity": "sha512-gDYaKHJmnj4aWxyj6YHyXVpdQawtVLHU5cb+eztPGczf6cjuTdwve5ZIEfgXqH4e57An1D1AKf8CZ3kYrQRqYA==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"call-bind": "^1.0.2",
+ 				"has-tostringtag": "^1.0.0"
+@@ -34220,7 +34212,6 @@
+ 			"version": "1.2.7",
+ 			"resolved": "https://registry.npmjs.org/is-callable/-/is-callable-1.2.7.tgz",
+ 			"integrity": "sha512-1BC0BVFhS/p0qtw6enp8e+8OD0UrK0oFLztSjNzhcKA3WDuJxxAPXzPuPtKkjEY9UUoEWlX/8fgKeu2S8i9JTA==",
+-			"dev": true,
+ 			"engines": {
+ 				"node": ">= 0.4"
+ 			},
+@@ -34283,7 +34274,6 @@
+ 			"version": "1.0.5",
+ 			"resolved": "https://registry.npmjs.org/is-date-object/-/is-date-object-1.0.5.tgz",
+ 			"integrity": "sha512-9YQaSxsAiSwcvS33MBk3wTCVnWK+HhF8VZR2jRxehM16QcVOdHqPn4VPHmRK4lSr38n9JriurInLcP90xsYNfQ==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"has-tostringtag": "^1.0.0"
+ 			},
+@@ -34477,7 +34467,6 @@
+ 			"version": "2.0.2",
+ 			"resolved": "https://registry.npmjs.org/is-map/-/is-map-2.0.2.tgz",
+ 			"integrity": "sha512-cOZFQQozTha1f4MxLFzlgKYPTyj26picdZTx82hbc/Xf4K/tZOOXSCkMvU4pKioRXGDLJRn0GM7Upe7kR721yg==",
+-			"dev": true,
+ 			"funding": {
+ 				"url": "https://github.com/sponsors/ljharb"
+ 			}
+@@ -34525,7 +34514,6 @@
+ 			"version": "1.0.7",
+ 			"resolved": "https://registry.npmjs.org/is-number-object/-/is-number-object-1.0.7.tgz",
+ 			"integrity": "sha512-k1U0IRzLMo7ZlYIfzRu23Oh6MiIFasgpb9X76eqfFZAqwH44UI4KTBvBYIZ1dSL9ZzChTB9ShHfLkR4pdW5krQ==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"has-tostringtag": "^1.0.0"
+ 			},
+@@ -34636,7 +34624,6 @@
+ 			"version": "1.1.4",
+ 			"resolved": "https://registry.npmjs.org/is-regex/-/is-regex-1.1.4.tgz",
+ 			"integrity": "sha512-kvRdxDsxZjhzUX07ZnLydzS1TU/TJlTUHHY4YLL87e37oUA49DfkLqgy+VjFocowy29cKvcSiu+kIv728jTTVg==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"call-bind": "^1.0.2",
+ 				"has-tostringtag": "^1.0.0"
+@@ -34661,7 +34648,6 @@
+ 			"version": "2.0.2",
+ 			"resolved": "https://registry.npmjs.org/is-set/-/is-set-2.0.2.tgz",
+ 			"integrity": "sha512-+2cnTEZeY5z/iXGbLhPrOAaK/Mau5k5eXq9j14CpRTftq0pAJu2MwVRSZhyZWBzx3o6X795Lz6Bpb6R0GKf37g==",
+-			"dev": true,
+ 			"funding": {
+ 				"url": "https://github.com/sponsors/ljharb"
+ 			}
+@@ -34670,7 +34656,6 @@
+ 			"version": "1.0.2",
+ 			"resolved": "https://registry.npmjs.org/is-shared-array-buffer/-/is-shared-array-buffer-1.0.2.tgz",
+ 			"integrity": "sha512-sqN2UDu1/0y6uvXyStCOzyhAjCSlHceFoMKJW8W9EU9cvic/QdsZ0kEU93HEy3IUEFZIiH/3w+AH/UQbPHNdhA==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"call-bind": "^1.0.2"
+ 			},
+@@ -34699,7 +34684,6 @@
+ 			"version": "1.0.7",
+ 			"resolved": "https://registry.npmjs.org/is-string/-/is-string-1.0.7.tgz",
+ 			"integrity": "sha512-tE2UXzivje6ofPW7l23cjDOMa09gb7xlAqG6jG5ej6uPV32TlWP3NKPigtaGeHNu9fohccRYvIiZMfOOnOYUtg==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"has-tostringtag": "^1.0.0"
+ 			},
+@@ -34714,7 +34698,6 @@
+ 			"version": "1.0.4",
+ 			"resolved": "https://registry.npmjs.org/is-symbol/-/is-symbol-1.0.4.tgz",
+ 			"integrity": "sha512-C/CPBqKWnvdcxqIARxyOh4v1UUEOCHpgDa0WYgpKDFMszcrPcffg5uhwSgPCLD2WWxmq6isisz87tzT01tuGhg==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"has-symbols": "^1.0.2"
+ 			},
+@@ -34741,7 +34724,6 @@
+ 			"version": "1.1.12",
+ 			"resolved": "https://registry.npmjs.org/is-typed-array/-/is-typed-array-1.1.12.tgz",
+ 			"integrity": "sha512-Z14TF2JNG8Lss5/HMqt0//T9JeHXttXy5pH/DBU4vi98ozO2btxzq9MwYDZYnKwU8nRsz/+GVFVRDq3DkVuSPg==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"which-typed-array": "^1.1.11"
+ 			},
+@@ -34773,7 +34755,6 @@
+ 			"version": "2.0.1",
+ 			"resolved": "https://registry.npmjs.org/is-weakmap/-/is-weakmap-2.0.1.tgz",
+ 			"integrity": "sha512-NSBR4kH5oVj1Uwvv970ruUkCV7O1mzgVFO4/rev2cLRda9Tm9HrL70ZPut4rOHgY0FNrUu9BCbXA2sdQ+x0chA==",
+-			"dev": true,
+ 			"funding": {
+ 				"url": "https://github.com/sponsors/ljharb"
+ 			}
+@@ -34794,7 +34775,6 @@
+ 			"version": "2.0.2",
+ 			"resolved": "https://registry.npmjs.org/is-weakset/-/is-weakset-2.0.2.tgz",
+ 			"integrity": "sha512-t2yVvttHkQktwnNNmBQ98AhENLdPUTDTE21uPqAQ0ARwQfGeQKRVS0NNurH7bTf7RrvcVn1OOge45CnBeHCSmg==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"call-bind": "^1.0.2",
+ 				"get-intrinsic": "^1.1.1"
+@@ -39365,7 +39345,6 @@
+ 			"version": "1.5.0",
+ 			"resolved": "https://registry.npmjs.org/lz-string/-/lz-string-1.5.0.tgz",
+ 			"integrity": "sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==",
+-			"dev": true,
+ 			"bin": {
+ 				"lz-string": "bin/bin.js"
+ 			}
+@@ -44135,7 +44114,6 @@
+ 			"version": "1.12.3",
+ 			"resolved": "https://registry.npmjs.org/object-inspect/-/object-inspect-1.12.3.tgz",
+ 			"integrity": "sha512-geUvdk7c+eizMNUDkRpW1wJwgfOiOeHbxBR/hLXK1aT6zmVSO0jsQcs7fj6MGw89jC/cjGfLcNOrtMYtGqm81g==",
+-			"dev": true,
+ 			"funding": {
+ 				"url": "https://github.com/sponsors/ljharb"
+ 			}
+@@ -44144,7 +44122,6 @@
+ 			"version": "1.1.5",
+ 			"resolved": "https://registry.npmjs.org/object-is/-/object-is-1.1.5.tgz",
+ 			"integrity": "sha512-3cyDsyHgtmi7I7DfSSI2LDp6SK2lwvtbg0p0R1e0RvTqF5ceGx+K2dfSjm1bKDMVCFEDAQvy+o8c6a7VujOddw==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"call-bind": "^1.0.2",
+ 				"define-properties": "^1.1.3"
+@@ -44160,7 +44137,6 @@
+ 			"version": "1.1.1",
+ 			"resolved": "https://registry.npmjs.org/object-keys/-/object-keys-1.1.1.tgz",
+ 			"integrity": "sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA==",
+-			"dev": true,
+ 			"engines": {
+ 				"node": ">= 0.4"
+ 			}
+@@ -44180,7 +44156,6 @@
+ 			"version": "4.1.4",
+ 			"resolved": "https://registry.npmjs.org/object.assign/-/object.assign-4.1.4.tgz",
+ 			"integrity": "sha512-1mxKf0e58bvyjSCtKYY4sRe9itRk3PJpquJOjeIkz885CczcI4IvJJDLPS72oowuSh+pBxUFROpX+TU++hxhZQ==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"call-bind": "^1.0.2",
+ 				"define-properties": "^1.1.4",
+@@ -48746,7 +48721,6 @@
+ 			"version": "1.5.0",
+ 			"resolved": "https://registry.npmjs.org/regexp.prototype.flags/-/regexp.prototype.flags-1.5.0.tgz",
+ 			"integrity": "sha512-0SutC3pNudRKgquxGoRGIz946MZVHqbNfPjBdxeOhBrdgDKlRoXmYLQN9xRbrR09ZXWeGAdPuif7egofn6v5LA==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"call-bind": "^1.0.2",
+ 				"define-properties": "^1.2.0",
+@@ -50446,7 +50420,6 @@
+ 			"version": "1.0.4",
+ 			"resolved": "https://registry.npmjs.org/side-channel/-/side-channel-1.0.4.tgz",
+ 			"integrity": "sha512-q5XPytqFEIKHkGdiMIrY10mvLRvnQh42/+GoBlFW3b2LXLE2xxJpZFdm94we0BaoV3RwJyGqg5wS7epxTv0Zvw==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"call-bind": "^1.0.0",
+ 				"get-intrinsic": "^1.0.2",
+@@ -51252,7 +51225,6 @@
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/stop-iteration-iterator/-/stop-iteration-iterator-1.0.0.tgz",
+ 			"integrity": "sha512-iCGQj+0l0HOdZ2AEeBADlsRC+vsnDsZsbdSiH1yNSjcfKM7fdpCMfqAL/dwF5BLiw/XhRft/Wax6zQbhq2BcjQ==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"internal-slot": "^1.0.4"
+ 			},
+@@ -55236,7 +55208,6 @@
+ 			"version": "1.0.2",
+ 			"resolved": "https://registry.npmjs.org/which-boxed-primitive/-/which-boxed-primitive-1.0.2.tgz",
+ 			"integrity": "sha512-bwZdv0AKLpplFY2KZRX6TvyuN7ojjr7lwkg6ml0roIy9YeuSr7JS372qlNW18UQYzgYK9ziGcerWqZOmEn9VNg==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"is-bigint": "^1.0.1",
+ 				"is-boolean-object": "^1.1.0",
+@@ -55252,7 +55223,6 @@
+ 			"version": "1.0.1",
+ 			"resolved": "https://registry.npmjs.org/which-collection/-/which-collection-1.0.1.tgz",
+ 			"integrity": "sha512-W8xeTUwaln8i3K/cY1nGXzdnVZlidBcagyNFtBdD5kxnb4TvGKR7FfSIS3mYpwWS1QUCutfKz8IY8RjftB0+1A==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"is-map": "^2.0.1",
+ 				"is-set": "^2.0.1",
+@@ -55272,7 +55242,6 @@
+ 			"version": "1.1.11",
+ 			"resolved": "https://registry.npmjs.org/which-typed-array/-/which-typed-array-1.1.11.tgz",
+ 			"integrity": "sha512-qe9UWWpkeG5yzZ0tNYxDmd7vo58HDBc39mZ0xWWpolAGADdFOzkfamWLDxkOWcvHQKVmdTyQdLD4NOfjLWTKew==",
+-			"dev": true,
+ 			"dependencies": {
+ 				"available-typed-arrays": "^1.0.5",
+ 				"call-bind": "^1.0.2",
+@@ -56310,6 +56279,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@ariakit/react": "^0.3.5",
++				"@ariakit/test": "^0.3.0",
+ 				"@babel/runtime": "^7.16.0",
+ 				"@emotion/cache": "^11.7.1",
+ 				"@emotion/css": "^11.7.1",
+@@ -58293,6 +58263,15 @@
+ 				"use-sync-external-store": "^1.2.0"
+ 			}
+ 		},
++		"@ariakit/test": {
++			"version": "0.3.0",
++			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.3.0.tgz",
++			"integrity": "sha512-fngAzkzCl9zM4O/tzVaUf7ixWUAk779hjTegr/zcegoxaMS5SmaLhNQ7RU0AGx06LrhJse6GYGy8ZtK58HP/EQ==",
++			"requires": {
++				"@ariakit/core": "0.3.3",
++				"@testing-library/dom": "^8.0.0 || ^9.0.0"
++			}
++		},
+ 		"@aw-web-design/x-default-browser": {
+ 			"version": "1.4.126",
+ 			"resolved": "https://registry.npmjs.org/@aw-web-design/x-default-browser/-/x-default-browser-1.4.126.tgz",
+@@ -67936,7 +67915,6 @@
+ 			"version": "9.3.1",
+ 			"resolved": "https://registry.npmjs.org/@testing-library/dom/-/dom-9.3.1.tgz",
+ 			"integrity": "sha512-0DGPd9AR3+iDTjGoMpxIkAsUihHZ3Ai6CneU6bRRrffXMgzCdlNk43jTrD2/5LT6CBb3MWTP8v510JzYtahD2w==",
+-			"dev": true,
+ 			"requires": {
+ 				"@babel/code-frame": "^7.10.4",
+ 				"@babel/runtime": "^7.12.5",
+@@ -67951,14 +67929,12 @@
+ 				"ansi-styles": {
+ 					"version": "5.2.0",
+ 					"resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-5.2.0.tgz",
+-					"integrity": "sha512-Cxwpt2SfTzTtXcfOlzGEee8O+c+MmUgGrNiBcXnuWxuFJHe6a5Hz7qwhwe5OgaSYI0IJvkLqWX1ASG+cJOkEiA==",
+-					"dev": true
++					"integrity": "sha512-Cxwpt2SfTzTtXcfOlzGEee8O+c+MmUgGrNiBcXnuWxuFJHe6a5Hz7qwhwe5OgaSYI0IJvkLqWX1ASG+cJOkEiA=="
+ 				},
+ 				"aria-query": {
+ 					"version": "5.1.3",
+ 					"resolved": "https://registry.npmjs.org/aria-query/-/aria-query-5.1.3.tgz",
+ 					"integrity": "sha512-R5iJ5lkuHybztUfuOAznmboyjWq8O6sqNqtK7CLOqdydi54VNbORp49mb14KbWgG1QD3JFO9hJdZ+y4KutfdOQ==",
+-					"dev": true,
+ 					"requires": {
+ 						"deep-equal": "^2.0.5"
+ 					}
+@@ -67967,7 +67943,6 @@
+ 					"version": "2.2.2",
+ 					"resolved": "https://registry.npmjs.org/deep-equal/-/deep-equal-2.2.2.tgz",
+ 					"integrity": "sha512-xjVyBf0w5vH0I42jdAZzOKVldmPgSulmiyPRywoyq7HXC9qdgo17kxJE+rdnif5Tz6+pIrpJI8dCpMNLIGkUiA==",
+-					"dev": true,
+ 					"requires": {
+ 						"array-buffer-byte-length": "^1.0.0",
+ 						"call-bind": "^1.0.2",
+@@ -67992,14 +67967,12 @@
+ 				"isarray": {
+ 					"version": "2.0.5",
+ 					"resolved": "https://registry.npmjs.org/isarray/-/isarray-2.0.5.tgz",
+-					"integrity": "sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==",
+-					"dev": true
++					"integrity": "sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw=="
+ 				},
+ 				"pretty-format": {
+ 					"version": "27.5.1",
+ 					"resolved": "https://registry.npmjs.org/pretty-format/-/pretty-format-27.5.1.tgz",
+ 					"integrity": "sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==",
+-					"dev": true,
+ 					"requires": {
+ 						"ansi-regex": "^5.0.1",
+ 						"ansi-styles": "^5.0.0",
+@@ -68009,8 +67982,7 @@
+ 				"react-is": {
+ 					"version": "17.0.2",
+ 					"resolved": "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz",
+-					"integrity": "sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==",
+-					"dev": true
++					"integrity": "sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w=="
+ 				}
+ 			}
+ 		},
+@@ -68144,8 +68116,7 @@
+ 		"@types/aria-query": {
+ 			"version": "5.0.1",
+ 			"resolved": "https://registry.npmjs.org/@types/aria-query/-/aria-query-5.0.1.tgz",
+-			"integrity": "sha512-XTIieEY+gvJ39ChLcB4If5zHtPxt3Syj5rgZR+e1ctpmK8NjPf0zFqsz4JpLJT0xla9GFDKjy8Cpu331nrmE1Q==",
+-			"dev": true
++			"integrity": "sha512-XTIieEY+gvJ39ChLcB4If5zHtPxt3Syj5rgZR+e1ctpmK8NjPf0zFqsz4JpLJT0xla9GFDKjy8Cpu331nrmE1Q=="
+ 		},
+ 		"@types/babel__core": {
+ 			"version": "7.20.0",
+@@ -69686,6 +69657,7 @@
+ 			"version": "file:packages/components",
+ 			"requires": {
+ 				"@ariakit/react": "^0.3.5",
++				"@ariakit/test": "^0.3.0",
+ 				"@babel/runtime": "^7.16.0",
+ 				"@emotion/cache": "^11.7.1",
+ 				"@emotion/css": "^11.7.1",
+@@ -77933,7 +77905,6 @@
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/array-buffer-byte-length/-/array-buffer-byte-length-1.0.0.tgz",
+ 			"integrity": "sha512-LPuwb2P+NrQw3XhxGc36+XSvuBPopovXYTR9Ew++Du9Yb/bx5AzBfrIsBoj0EZUifjQU+sHL21sseZ3jerWO/A==",
+-			"dev": true,
+ 			"requires": {
+ 				"call-bind": "^1.0.2",
+ 				"is-array-buffer": "^3.0.1"
+@@ -78195,8 +78166,7 @@
+ 		"available-typed-arrays": {
+ 			"version": "1.0.5",
+ 			"resolved": "https://registry.npmjs.org/available-typed-arrays/-/available-typed-arrays-1.0.5.tgz",
+-			"integrity": "sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==",
+-			"dev": true
++			"integrity": "sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw=="
+ 		},
+ 		"aws-sign2": {
+ 			"version": "0.7.0",
+@@ -79305,7 +79275,6 @@
+ 			"version": "1.0.2",
+ 			"resolved": "https://registry.npmjs.org/call-bind/-/call-bind-1.0.2.tgz",
+ 			"integrity": "sha512-7O+FbCihrB5WGbFYesctwmTKae6rOiIzmz1icreWJ+0aA7LJfuqhEso2T9ncpcFtzMQtzXf2QGGueWJGTYsqrA==",
+-			"dev": true,
+ 			"requires": {
+ 				"function-bind": "^1.1.1",
+ 				"get-intrinsic": "^1.0.2"
+@@ -81885,7 +81854,6 @@
+ 			"version": "1.2.0",
+ 			"resolved": "https://registry.npmjs.org/define-properties/-/define-properties-1.2.0.tgz",
+ 			"integrity": "sha512-xvqAVKGfT1+UAvPwKTVw/njhdQ8ZhXK4lI0bCIuCMrp2up9nPnaDftrLtmpTazqd1o+UY4zgzU+avtMbDP+ldA==",
+-			"dev": true,
+ 			"requires": {
+ 				"has-property-descriptors": "^1.0.0",
+ 				"object-keys": "^1.1.1"
+@@ -82324,8 +82292,7 @@
+ 		"dom-accessibility-api": {
+ 			"version": "0.5.14",
+ 			"resolved": "https://registry.npmjs.org/dom-accessibility-api/-/dom-accessibility-api-0.5.14.tgz",
+-			"integrity": "sha512-NMt+m9zFMPZe0JcY9gN224Qvk6qLIdqex29clBvc/y75ZBX9YA9wNK3frsYvu2DI1xcCIwxwnX+TlsJ2DSOADg==",
+-			"dev": true
++			"integrity": "sha512-NMt+m9zFMPZe0JcY9gN224Qvk6qLIdqex29clBvc/y75ZBX9YA9wNK3frsYvu2DI1xcCIwxwnX+TlsJ2DSOADg=="
+ 		},
+ 		"dom-converter": {
+ 			"version": "0.2.0",
+@@ -82749,7 +82716,6 @@
+ 			"version": "1.1.3",
+ 			"resolved": "https://registry.npmjs.org/es-get-iterator/-/es-get-iterator-1.1.3.tgz",
+ 			"integrity": "sha512-sPZmqHBe6JIiTfN5q2pEi//TwxmAFHwj/XEuYjTuse78i8KxaqMTTzxPoFKuzRpDpTJ+0NAbpfenkmH2rePtuw==",
+-			"dev": true,
+ 			"requires": {
+ 				"call-bind": "^1.0.2",
+ 				"get-intrinsic": "^1.1.3",
+@@ -82765,8 +82731,7 @@
+ 				"isarray": {
+ 					"version": "2.0.5",
+ 					"resolved": "https://registry.npmjs.org/isarray/-/isarray-2.0.5.tgz",
+-					"integrity": "sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==",
+-					"dev": true
++					"integrity": "sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw=="
+ 				}
+ 			}
+ 		},
+@@ -84570,7 +84535,6 @@
+ 			"version": "0.3.3",
+ 			"resolved": "https://registry.npmjs.org/for-each/-/for-each-0.3.3.tgz",
+ 			"integrity": "sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==",
+-			"dev": true,
+ 			"requires": {
+ 				"is-callable": "^1.1.3"
+ 			}
+@@ -84780,8 +84744,7 @@
+ 		"functions-have-names": {
+ 			"version": "1.2.3",
+ 			"resolved": "https://registry.npmjs.org/functions-have-names/-/functions-have-names-1.2.3.tgz",
+-			"integrity": "sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==",
+-			"dev": true
++			"integrity": "sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ=="
+ 		},
+ 		"gauge": {
+ 			"version": "4.0.4",
+@@ -84843,7 +84806,6 @@
+ 			"version": "1.2.1",
+ 			"resolved": "https://registry.npmjs.org/get-intrinsic/-/get-intrinsic-1.2.1.tgz",
+ 			"integrity": "sha512-2DcsyfABl+gVHEfCOaTrWgyt+tb6MSEGmKq+kI5HwLbIYgjgmMcV8KQ41uaKz1xxUcn9tJtgFbQUEVcEbd0FYw==",
+-			"dev": true,
+ 			"requires": {
+ 				"function-bind": "^1.1.1",
+ 				"has": "^1.0.3",
+@@ -85229,7 +85191,6 @@
+ 			"version": "1.0.1",
+ 			"resolved": "https://registry.npmjs.org/gopd/-/gopd-1.0.1.tgz",
+ 			"integrity": "sha512-d65bNlIadxvpb/A2abVdlqKqV563juRnZ1Wtk6s1sIR8uNsXR70xqIzVqxVf1eTqDunwT2MkczEeaezCKTZhwA==",
+-			"dev": true,
+ 			"requires": {
+ 				"get-intrinsic": "^1.1.3"
+ 			}
+@@ -85383,8 +85344,7 @@
+ 		"has-bigints": {
+ 			"version": "1.0.2",
+ 			"resolved": "https://registry.npmjs.org/has-bigints/-/has-bigints-1.0.2.tgz",
+-			"integrity": "sha512-tSvCKtBr9lkF0Ex0aQiP9N+OpV4zi2r/Nee5VkRDbaqv35RLYMzbwQfFSZZH0kR+Rd6302UJZ2p/bJCEoR3VoQ==",
+-			"dev": true
++			"integrity": "sha512-tSvCKtBr9lkF0Ex0aQiP9N+OpV4zi2r/Nee5VkRDbaqv35RLYMzbwQfFSZZH0kR+Rd6302UJZ2p/bJCEoR3VoQ=="
+ 		},
+ 		"has-flag": {
+ 			"version": "3.0.0",
+@@ -85395,7 +85355,6 @@
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/has-property-descriptors/-/has-property-descriptors-1.0.0.tgz",
+ 			"integrity": "sha512-62DVLZGoiEBDHQyqG4w9xCuZ7eJEwNmJRWw2VY84Oedb7WFcA27fiEVe8oUQx9hAUJ4ekurquucTGwsyO1XGdQ==",
+-			"dev": true,
+ 			"requires": {
+ 				"get-intrinsic": "^1.1.1"
+ 			}
+@@ -85403,20 +85362,17 @@
+ 		"has-proto": {
+ 			"version": "1.0.1",
+ 			"resolved": "https://registry.npmjs.org/has-proto/-/has-proto-1.0.1.tgz",
+-			"integrity": "sha512-7qE+iP+O+bgF9clE5+UoBFzE65mlBiVj3tKCrlNQ0Ogwm0BjpT/gK4SlLYDMybDh5I3TCTKnPPa0oMG7JDYrhg==",
+-			"dev": true
++			"integrity": "sha512-7qE+iP+O+bgF9clE5+UoBFzE65mlBiVj3tKCrlNQ0Ogwm0BjpT/gK4SlLYDMybDh5I3TCTKnPPa0oMG7JDYrhg=="
+ 		},
+ 		"has-symbols": {
+ 			"version": "1.0.3",
+ 			"resolved": "https://registry.npmjs.org/has-symbols/-/has-symbols-1.0.3.tgz",
+-			"integrity": "sha512-l3LCuF6MgDNwTDKkdYGEihYjt5pRPbEg46rtlmnSPlUbgmB8LOIrKJbYYFBSbnPaJexMKtiPO8hmeRjRz2Td+A==",
+-			"dev": true
++			"integrity": "sha512-l3LCuF6MgDNwTDKkdYGEihYjt5pRPbEg46rtlmnSPlUbgmB8LOIrKJbYYFBSbnPaJexMKtiPO8hmeRjRz2Td+A=="
+ 		},
+ 		"has-tostringtag": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/has-tostringtag/-/has-tostringtag-1.0.0.tgz",
+ 			"integrity": "sha512-kFjcSNhnlGV1kyoGk7OXKSawH5JOb/LzUc5w9B02hOTO0dfFRjbHQKvg1d6cf3HbeUmtU9VbbV3qzZ2Teh97WQ==",
+-			"dev": true,
+ 			"requires": {
+ 				"has-symbols": "^1.0.2"
+ 			}
+@@ -86298,7 +86254,6 @@
+ 			"version": "1.0.5",
+ 			"resolved": "https://registry.npmjs.org/internal-slot/-/internal-slot-1.0.5.tgz",
+ 			"integrity": "sha512-Y+R5hJrzs52QCG2laLn4udYVnxsfny9CpOhNhUvk/SSSVyF6T27FzRbF0sroPidSu3X8oEAkOn2K804mjpt6UQ==",
+-			"dev": true,
+ 			"requires": {
+ 				"get-intrinsic": "^1.2.0",
+ 				"has": "^1.0.3",
+@@ -86401,7 +86356,6 @@
+ 			"version": "1.1.1",
+ 			"resolved": "https://registry.npmjs.org/is-arguments/-/is-arguments-1.1.1.tgz",
+ 			"integrity": "sha512-8Q7EARjzEnKpt/PCD7e1cgUS0a6X8u5tdSiMqXhojOdoV9TsMsiO+9VLC5vAmO8N7/GmXn7yjR8qnA6bVAEzfA==",
+-			"dev": true,
+ 			"requires": {
+ 				"call-bind": "^1.0.2",
+ 				"has-tostringtag": "^1.0.0"
+@@ -86411,7 +86365,6 @@
+ 			"version": "3.0.2",
+ 			"resolved": "https://registry.npmjs.org/is-array-buffer/-/is-array-buffer-3.0.2.tgz",
+ 			"integrity": "sha512-y+FyyR/w8vfIRq4eQcM1EYgSTnmHXPqaF+IgzgraytCFq5Xh8lllDVmAZolPJiZttZLeFSINPYMaEJ7/vWUa1w==",
+-			"dev": true,
+ 			"requires": {
+ 				"call-bind": "^1.0.2",
+ 				"get-intrinsic": "^1.2.0",
+@@ -86427,7 +86380,6 @@
+ 			"version": "1.0.4",
+ 			"resolved": "https://registry.npmjs.org/is-bigint/-/is-bigint-1.0.4.tgz",
+ 			"integrity": "sha512-zB9CruMamjym81i2JZ3UMn54PKGsQzsJeo6xvN3HJJ4CAsQNB6iRutp2To77OfCNuoxspsIhzaPoO1zyCEhFOg==",
+-			"dev": true,
+ 			"requires": {
+ 				"has-bigints": "^1.0.1"
+ 			}
+@@ -86445,7 +86397,6 @@
+ 			"version": "1.1.2",
+ 			"resolved": "https://registry.npmjs.org/is-boolean-object/-/is-boolean-object-1.1.2.tgz",
+ 			"integrity": "sha512-gDYaKHJmnj4aWxyj6YHyXVpdQawtVLHU5cb+eztPGczf6cjuTdwve5ZIEfgXqH4e57An1D1AKf8CZ3kYrQRqYA==",
+-			"dev": true,
+ 			"requires": {
+ 				"call-bind": "^1.0.2",
+ 				"has-tostringtag": "^1.0.0"
+@@ -86468,8 +86419,7 @@
+ 		"is-callable": {
+ 			"version": "1.2.7",
+ 			"resolved": "https://registry.npmjs.org/is-callable/-/is-callable-1.2.7.tgz",
+-			"integrity": "sha512-1BC0BVFhS/p0qtw6enp8e+8OD0UrK0oFLztSjNzhcKA3WDuJxxAPXzPuPtKkjEY9UUoEWlX/8fgKeu2S8i9JTA==",
+-			"dev": true
++			"integrity": "sha512-1BC0BVFhS/p0qtw6enp8e+8OD0UrK0oFLztSjNzhcKA3WDuJxxAPXzPuPtKkjEY9UUoEWlX/8fgKeu2S8i9JTA=="
+ 		},
+ 		"is-ci": {
+ 			"version": "2.0.0",
+@@ -86518,7 +86468,6 @@
+ 			"version": "1.0.5",
+ 			"resolved": "https://registry.npmjs.org/is-date-object/-/is-date-object-1.0.5.tgz",
+ 			"integrity": "sha512-9YQaSxsAiSwcvS33MBk3wTCVnWK+HhF8VZR2jRxehM16QcVOdHqPn4VPHmRK4lSr38n9JriurInLcP90xsYNfQ==",
+-			"dev": true,
+ 			"requires": {
+ 				"has-tostringtag": "^1.0.0"
+ 			}
+@@ -86646,8 +86595,7 @@
+ 		"is-map": {
+ 			"version": "2.0.2",
+ 			"resolved": "https://registry.npmjs.org/is-map/-/is-map-2.0.2.tgz",
+-			"integrity": "sha512-cOZFQQozTha1f4MxLFzlgKYPTyj26picdZTx82hbc/Xf4K/tZOOXSCkMvU4pKioRXGDLJRn0GM7Upe7kR721yg==",
+-			"dev": true
++			"integrity": "sha512-cOZFQQozTha1f4MxLFzlgKYPTyj26picdZTx82hbc/Xf4K/tZOOXSCkMvU4pKioRXGDLJRn0GM7Upe7kR721yg=="
+ 		},
+ 		"is-nan": {
+ 			"version": "1.3.2",
+@@ -86687,7 +86635,6 @@
+ 			"version": "1.0.7",
+ 			"resolved": "https://registry.npmjs.org/is-number-object/-/is-number-object-1.0.7.tgz",
+ 			"integrity": "sha512-k1U0IRzLMo7ZlYIfzRu23Oh6MiIFasgpb9X76eqfFZAqwH44UI4KTBvBYIZ1dSL9ZzChTB9ShHfLkR4pdW5krQ==",
+-			"dev": true,
+ 			"requires": {
+ 				"has-tostringtag": "^1.0.0"
+ 			}
+@@ -86757,7 +86704,6 @@
+ 			"version": "1.1.4",
+ 			"resolved": "https://registry.npmjs.org/is-regex/-/is-regex-1.1.4.tgz",
+ 			"integrity": "sha512-kvRdxDsxZjhzUX07ZnLydzS1TU/TJlTUHHY4YLL87e37oUA49DfkLqgy+VjFocowy29cKvcSiu+kIv728jTTVg==",
+-			"dev": true,
+ 			"requires": {
+ 				"call-bind": "^1.0.2",
+ 				"has-tostringtag": "^1.0.0"
+@@ -86772,14 +86718,12 @@
+ 		"is-set": {
+ 			"version": "2.0.2",
+ 			"resolved": "https://registry.npmjs.org/is-set/-/is-set-2.0.2.tgz",
+-			"integrity": "sha512-+2cnTEZeY5z/iXGbLhPrOAaK/Mau5k5eXq9j14CpRTftq0pAJu2MwVRSZhyZWBzx3o6X795Lz6Bpb6R0GKf37g==",
+-			"dev": true
++			"integrity": "sha512-+2cnTEZeY5z/iXGbLhPrOAaK/Mau5k5eXq9j14CpRTftq0pAJu2MwVRSZhyZWBzx3o6X795Lz6Bpb6R0GKf37g=="
+ 		},
+ 		"is-shared-array-buffer": {
+ 			"version": "1.0.2",
+ 			"resolved": "https://registry.npmjs.org/is-shared-array-buffer/-/is-shared-array-buffer-1.0.2.tgz",
+ 			"integrity": "sha512-sqN2UDu1/0y6uvXyStCOzyhAjCSlHceFoMKJW8W9EU9cvic/QdsZ0kEU93HEy3IUEFZIiH/3w+AH/UQbPHNdhA==",
+-			"dev": true,
+ 			"requires": {
+ 				"call-bind": "^1.0.2"
+ 			}
+@@ -86802,7 +86746,6 @@
+ 			"version": "1.0.7",
+ 			"resolved": "https://registry.npmjs.org/is-string/-/is-string-1.0.7.tgz",
+ 			"integrity": "sha512-tE2UXzivje6ofPW7l23cjDOMa09gb7xlAqG6jG5ej6uPV32TlWP3NKPigtaGeHNu9fohccRYvIiZMfOOnOYUtg==",
+-			"dev": true,
+ 			"requires": {
+ 				"has-tostringtag": "^1.0.0"
+ 			}
+@@ -86811,7 +86754,6 @@
+ 			"version": "1.0.4",
+ 			"resolved": "https://registry.npmjs.org/is-symbol/-/is-symbol-1.0.4.tgz",
+ 			"integrity": "sha512-C/CPBqKWnvdcxqIARxyOh4v1UUEOCHpgDa0WYgpKDFMszcrPcffg5uhwSgPCLD2WWxmq6isisz87tzT01tuGhg==",
+-			"dev": true,
+ 			"requires": {
+ 				"has-symbols": "^1.0.2"
+ 			}
+@@ -86829,7 +86771,6 @@
+ 			"version": "1.1.12",
+ 			"resolved": "https://registry.npmjs.org/is-typed-array/-/is-typed-array-1.1.12.tgz",
+ 			"integrity": "sha512-Z14TF2JNG8Lss5/HMqt0//T9JeHXttXy5pH/DBU4vi98ozO2btxzq9MwYDZYnKwU8nRsz/+GVFVRDq3DkVuSPg==",
+-			"dev": true,
+ 			"requires": {
+ 				"which-typed-array": "^1.1.11"
+ 			}
+@@ -86848,8 +86789,7 @@
+ 		"is-weakmap": {
+ 			"version": "2.0.1",
+ 			"resolved": "https://registry.npmjs.org/is-weakmap/-/is-weakmap-2.0.1.tgz",
+-			"integrity": "sha512-NSBR4kH5oVj1Uwvv970ruUkCV7O1mzgVFO4/rev2cLRda9Tm9HrL70ZPut4rOHgY0FNrUu9BCbXA2sdQ+x0chA==",
+-			"dev": true
++			"integrity": "sha512-NSBR4kH5oVj1Uwvv970ruUkCV7O1mzgVFO4/rev2cLRda9Tm9HrL70ZPut4rOHgY0FNrUu9BCbXA2sdQ+x0chA=="
+ 		},
+ 		"is-weakref": {
+ 			"version": "1.0.2",
+@@ -86864,7 +86804,6 @@
+ 			"version": "2.0.2",
+ 			"resolved": "https://registry.npmjs.org/is-weakset/-/is-weakset-2.0.2.tgz",
+ 			"integrity": "sha512-t2yVvttHkQktwnNNmBQ98AhENLdPUTDTE21uPqAQ0ARwQfGeQKRVS0NNurH7bTf7RrvcVn1OOge45CnBeHCSmg==",
+-			"dev": true,
+ 			"requires": {
+ 				"call-bind": "^1.0.2",
+ 				"get-intrinsic": "^1.1.1"
+@@ -90360,8 +90299,7 @@
+ 		"lz-string": {
+ 			"version": "1.5.0",
+ 			"resolved": "https://registry.npmjs.org/lz-string/-/lz-string-1.5.0.tgz",
+-			"integrity": "sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==",
+-			"dev": true
++			"integrity": "sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ=="
+ 		},
+ 		"macos-release": {
+ 			"version": "2.2.0",
+@@ -94097,14 +94035,12 @@
+ 		"object-inspect": {
+ 			"version": "1.12.3",
+ 			"resolved": "https://registry.npmjs.org/object-inspect/-/object-inspect-1.12.3.tgz",
+-			"integrity": "sha512-geUvdk7c+eizMNUDkRpW1wJwgfOiOeHbxBR/hLXK1aT6zmVSO0jsQcs7fj6MGw89jC/cjGfLcNOrtMYtGqm81g==",
+-			"dev": true
++			"integrity": "sha512-geUvdk7c+eizMNUDkRpW1wJwgfOiOeHbxBR/hLXK1aT6zmVSO0jsQcs7fj6MGw89jC/cjGfLcNOrtMYtGqm81g=="
+ 		},
+ 		"object-is": {
+ 			"version": "1.1.5",
+ 			"resolved": "https://registry.npmjs.org/object-is/-/object-is-1.1.5.tgz",
+ 			"integrity": "sha512-3cyDsyHgtmi7I7DfSSI2LDp6SK2lwvtbg0p0R1e0RvTqF5ceGx+K2dfSjm1bKDMVCFEDAQvy+o8c6a7VujOddw==",
+-			"dev": true,
+ 			"requires": {
+ 				"call-bind": "^1.0.2",
+ 				"define-properties": "^1.1.3"
+@@ -94113,8 +94049,7 @@
+ 		"object-keys": {
+ 			"version": "1.1.1",
+ 			"resolved": "https://registry.npmjs.org/object-keys/-/object-keys-1.1.1.tgz",
+-			"integrity": "sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA==",
+-			"dev": true
++			"integrity": "sha512-NuAESUOUMrlIXOfHKzD6bpPu3tYt3xvjNdRIQ+FeT0lNb4K8WR70CaDxhuNguS2XG+GjkyMwOzsN5ZktImfhLA=="
+ 		},
+ 		"object-visit": {
+ 			"version": "1.0.1",
+@@ -94128,7 +94063,6 @@
+ 			"version": "4.1.4",
+ 			"resolved": "https://registry.npmjs.org/object.assign/-/object.assign-4.1.4.tgz",
+ 			"integrity": "sha512-1mxKf0e58bvyjSCtKYY4sRe9itRk3PJpquJOjeIkz885CczcI4IvJJDLPS72oowuSh+pBxUFROpX+TU++hxhZQ==",
+-			"dev": true,
+ 			"requires": {
+ 				"call-bind": "^1.0.2",
+ 				"define-properties": "^1.1.4",
+@@ -97539,7 +97473,6 @@
+ 			"version": "1.5.0",
+ 			"resolved": "https://registry.npmjs.org/regexp.prototype.flags/-/regexp.prototype.flags-1.5.0.tgz",
+ 			"integrity": "sha512-0SutC3pNudRKgquxGoRGIz946MZVHqbNfPjBdxeOhBrdgDKlRoXmYLQN9xRbrR09ZXWeGAdPuif7egofn6v5LA==",
+-			"dev": true,
+ 			"requires": {
+ 				"call-bind": "^1.0.2",
+ 				"define-properties": "^1.2.0",
+@@ -98860,7 +98793,6 @@
+ 			"version": "1.0.4",
+ 			"resolved": "https://registry.npmjs.org/side-channel/-/side-channel-1.0.4.tgz",
+ 			"integrity": "sha512-q5XPytqFEIKHkGdiMIrY10mvLRvnQh42/+GoBlFW3b2LXLE2xxJpZFdm94we0BaoV3RwJyGqg5wS7epxTv0Zvw==",
+-			"dev": true,
+ 			"requires": {
+ 				"call-bind": "^1.0.0",
+ 				"get-intrinsic": "^1.0.2",
+@@ -99502,7 +99434,6 @@
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/stop-iteration-iterator/-/stop-iteration-iterator-1.0.0.tgz",
+ 			"integrity": "sha512-iCGQj+0l0HOdZ2AEeBADlsRC+vsnDsZsbdSiH1yNSjcfKM7fdpCMfqAL/dwF5BLiw/XhRft/Wax6zQbhq2BcjQ==",
+-			"dev": true,
+ 			"requires": {
+ 				"internal-slot": "^1.0.4"
+ 			}
+@@ -102509,7 +102440,6 @@
+ 			"version": "1.0.2",
+ 			"resolved": "https://registry.npmjs.org/which-boxed-primitive/-/which-boxed-primitive-1.0.2.tgz",
+ 			"integrity": "sha512-bwZdv0AKLpplFY2KZRX6TvyuN7ojjr7lwkg6ml0roIy9YeuSr7JS372qlNW18UQYzgYK9ziGcerWqZOmEn9VNg==",
+-			"dev": true,
+ 			"requires": {
+ 				"is-bigint": "^1.0.1",
+ 				"is-boolean-object": "^1.1.0",
+@@ -102522,7 +102452,6 @@
+ 			"version": "1.0.1",
+ 			"resolved": "https://registry.npmjs.org/which-collection/-/which-collection-1.0.1.tgz",
+ 			"integrity": "sha512-W8xeTUwaln8i3K/cY1nGXzdnVZlidBcagyNFtBdD5kxnb4TvGKR7FfSIS3mYpwWS1QUCutfKz8IY8RjftB0+1A==",
+-			"dev": true,
+ 			"requires": {
+ 				"is-map": "^2.0.1",
+ 				"is-set": "^2.0.1",
+@@ -102539,7 +102468,6 @@
+ 			"version": "1.1.11",
+ 			"resolved": "https://registry.npmjs.org/which-typed-array/-/which-typed-array-1.1.11.tgz",
+ 			"integrity": "sha512-qe9UWWpkeG5yzZ0tNYxDmd7vo58HDBc39mZ0xWWpolAGADdFOzkfamWLDxkOWcvHQKVmdTyQdLD4NOfjLWTKew==",
+-			"dev": true,
+ 			"requires": {
+ 				"available-typed-arrays": "^1.0.5",
+ 				"call-bind": "^1.0.2",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f8db1ef6d263a5..7fbe8b4bb91bb9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `Autocomplete`: Add `aria-live` announcements for Mac and IOS Voiceover to fix lack of support for `aria-owns` ([#54902](https://github.com/WordPress/gutenberg/pull/54902)).
+ 
++### Internal
++
++-   Introduce experimental new version of `DropdownMenu` based on `ariakit` ([#54939](https://github.com/WordPress/gutenberg/pull/54939))
++
+ ## 25.10.0 (2023-10-18)
+ 
+ ### Enhancements
+diff --git a/packages/components/package.json b/packages/components/package.json
+index c25356b70cadbc..a8346b054a6e01 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -31,6 +31,7 @@
+ 	"types": "build-types",
+ 	"dependencies": {
+ 		"@ariakit/react": "^0.3.5",
++		"@ariakit/test": "^0.3.0",
+ 		"@babel/runtime": "^7.16.0",
+ 		"@emotion/cache": "^11.7.1",
+ 		"@emotion/css": "^11.7.1",
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/README.md b/packages/components/src/dropdown-menu-v2-ariakit/README.md
+new file mode 100644
+index 00000000000000..89fccb54e7d011
+--- /dev/null
++++ b/packages/components/src/dropdown-menu-v2-ariakit/README.md
+@@ -0,0 +1,324 @@
++# `DropdownMenu` (v2)
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`DropdownMenu` displays a menu to the user (such as a set of actions or functions) triggered by a button.
++
++
++## Design guidelines
++
++### Usage
++
++#### When to use a DropdownMenu
++
++Use a DropdownMenu when you want users to:
++
++-   Choose an action or change a setting from a list, AND
++-   Only see the available choices contextually.
++
++`DropdownMenu` is a React component to render an expandable menu of buttons. It is similar in purpose to a `<select>` element, with the distinction that it does not maintain a value. Instead, each option behaves as an action button.
++
++If you need to display all the available options at all times, consider using a Toolbar instead. Use a `DropdownMenu` to display a list of actions after the user interacts with a button.
++
++**Do**
++Use a `DropdownMenu` to display a list of actions after the user interacts with an icon.
++
++**Don’t** use a `DropdownMenu` for important actions that should always be visible. Use a `Toolbar` instead.
++
++**Don’t**
++Don’t use a `DropdownMenu` for frequently used actions. Use a `Toolbar` instead.
++
++#### Behavior
++
++Generally, the parent button should indicate that interacting with it will show a `DropdownMenu`.
++
++The parent button should retain the same visual styling regardless of whether the `DropdownMenu` is displayed or not.
++
++#### Placement
++
++The `DropdownMenu` should typically appear directly below, or below and to the left of, the parent button. If there isn’t enough space below to display the full `DropdownMenu`, it can be displayed instead above the parent button.
++
++## Development guidelines
++
++This component is still highly experimental, and it's not normally accessible to consumers of the `@wordpress/components` package.
++
++The component exposes a set of components that are meant to be used in combination with each other in order to implement a `DropdownMenu` correctly.
++
++### `DropdownMenu`
++
++The root component, used to specify the menu's trigger and its contents.
++
++#### Props
++
++The component accepts the following props:
++
++##### `trigger`: `React.ReactNode`
++
++The trigger button
++
++- Required: yes
++
++##### `children`: `React.ReactNode`
++
++The contents of the dropdown
++
++- Required: yes
++
++##### `defaultOpen`: `boolean`
++
++The open state of the dropdown menu when it is initially rendered. Use when not wanting to control its open state.
++
++- Required: no
++- Default: `false`
++
++##### `open`: `boolean`
++
++The controlled open state of the dropdown menu. Must be used in conjunction with `onOpenChange`.
++
++- Required: no
++
++##### `onOpenChange`: `(open: boolean) => void`
++
++Event handler called when the open state of the dropdown menu changes.
++
++- Required: no
++
++##### `modal`: `boolean`
++
++The modality of the dropdown menu. When set to true, interaction with outside elements will be disabled and only menu content will be visible to screen readers.
++
++- Required: no
++- Default: `true`
++
++##### `placement`: ``'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
++
++The placement of the dropdown menu popover.
++
++- Required: no
++- Default: `'bottom-start'` for root-level menus, `'right-start'` for nested menus
++
++##### `gutter`: `number`
++
++The distance in pixels from the trigger.
++
++- Required: no
++- Default: `8` for root-level menus, `16` for nested menus
++
++##### `shift`: `number`
++
++The skidding of the popover along the anchor element. Can be set to negative values to make the popover shift to the opposite side.
++
++- Required: no
++- Default: `0` for root-level menus, `-8` for nested menus
++
++##### `hideOnEscape`: `boolean | ( ( event: KeyboardEvent | React.KeyboardEvent< Element > ) => boolean )`
++
++Determines whether the menu popover will be hidden when the user presses the Escape key.
++
++- Required: no
++- Default: `true`
++
++### `DropdownMenuItem`
++
++Used to render a menu item.
++
++#### Props
++
++The component accepts the following props:
++
++##### `children`: `React.ReactNode`
++
++The contents of the item
++
++- Required: yes
++
++##### `prefix`: `React.ReactNode`
++
++The contents of the item's prefix.
++
++- Required: no
++
++##### `suffix`: `React.ReactNode`
++
++The contents of the item's suffix.
++
++- Required: no
++
++##### `hideOnClick`: `boolean`
++
++Whether to hide the dropdown menu when the menu item is clicked.
++
++- Required: no
++- Default: `true`
++
++##### `disabled`: `boolean`
++
++Determines if the element is disabled.
++
++- Required: no
++- Default: `false`
++
++### `DropdownMenuCheckboxItem`
++
++Used to render a checkbox item.
++
++#### Props
++
++The component accepts the following props:
++
++##### `children`: `React.ReactNode`
++
++The contents of the item
++
++- Required: yes
++
++##### `suffix`: `React.ReactNode`
++
++The contents of the item's suffix.
++
++- Required: no
++
++##### `hideOnClick`: `boolean`
++
++Whether to hide the dropdown menu when the menu item is clicked.
++
++- Required: no
++- Default: `false`
++
++##### `disabled`: `boolean`
++
++Determines if the element is disabled.
++
++- Required: no
++- Default: `false`
++
++##### `name`: `string`
++
++The checkbox item's name.
++
++- Required: yes
++
++##### `value`: `string`
++
++The checkbox item's value, useful when using multiple checkbox items
++ associated to the same `name`.
++
++- Required: no
++
++##### `checked`: `boolean`
++
++The checkbox item's value, useful when using multiple checkbox items
++ associated to the same `name`.
++
++- Required: no
++
++##### `defaultChecked`: `boolean`
++
++The checked state of the checkbox menu item when it is initially rendered. Use when not wanting to control its checked state.
++
++- Required: no
++
++##### `onChange`: `( event: React.ChangeEvent< HTMLInputElement > ) => void;`
++
++Event handler called when the checked state of the checkbox menu item changes.
++
++- Required: no
++
++### `DropdownMenuRadioItem`
++
++Used to render a radio item.
++
++#### Props
++
++The component accepts the following props:
++
++##### `children`: `React.ReactNode`
++
++The contents of the item
++
++- Required: yes
++
++##### `suffix`: `React.ReactNode`
++
++The contents of the item's suffix.
++
++- Required: no
++
++##### `hideOnClick`: `boolean`
++
++Whether to hide the dropdown menu when the menu item is clicked.
++
++- Required: no
++- Default: `false`
++
++##### `disabled`: `boolean`
++
++Determines if the element is disabled.
++
++- Required: no
++- Default: `false`
++
++##### `name`: `string`
++
++The radio item's name.
++
++- Required: yes
++
++##### `value`: `string | number`
++
++The radio item's value.
++
++- Required: yes
++
++##### `checked`: `boolean`
++
++The checkbox item's value, useful when using multiple checkbox items
++ associated to the same `name`.
++
++- Required: no
++
++##### `defaultChecked`: `boolean`
++
++The checked state of the radio menu item when it is initially rendered. Use when not wanting to control its checked state.
++
++- Required: no
++
++##### `onChange`: `( event: React.ChangeEvent< HTMLInputElement > ) => void;`
++
++Event handler called when the checked radio menu item changes.
++
++- Required: no
++
++### `DropdownMenuGroup`
++
++Used to group menu items.
++
++#### Props
++
++The component accepts the following props:
++
++##### `children`: `React.ReactNode`
++
++The contents of the group.
++
++- Required: yes
++
++### `DropdownMenuGroupLabel`
++
++Used to render a group label.
++
++#### Props
++
++The component accepts the following props:
++
++##### `children`: `React.ReactNode`
++
++The contents of the group.
++
++- Required: yes
++
++### `DropdownMenuSeparatorProps`
++
++Used to render a visual separator.
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/index.tsx b/packages/components/src/dropdown-menu-v2-ariakit/index.tsx
+new file mode 100644
+index 00000000000000..5d0cd6142b4bea
+--- /dev/null
++++ b/packages/components/src/dropdown-menu-v2-ariakit/index.tsx
+@@ -0,0 +1,318 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import * as Ariakit from '@ariakit/react';
++
++/**
++ * WordPress dependencies
++ */
++import {
++	forwardRef,
++	createContext,
++	useContext,
++	useMemo,
++	cloneElement,
++	isValidElement,
++} from '@wordpress/element';
++import { isRTL } from '@wordpress/i18n';
++import { check, chevronRightSmall } from '@wordpress/icons';
++import { SVG, Circle } from '@wordpress/primitives';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem, contextConnect } from '../context';
++import type { WordPressComponentProps } from '../context';
++import Icon from '../icon';
++import type {
++	DropdownMenuContext as DropdownMenuContextType,
++	DropdownMenuProps,
++	DropdownMenuGroupProps,
++	DropdownMenuGroupLabelProps,
++	DropdownMenuItemProps,
++	DropdownMenuCheckboxItemProps,
++	DropdownMenuRadioItemProps,
++	DropdownMenuSeparatorProps,
++} from './types';
++import * as Styled from './styles';
++
++export const DropdownMenuContext = createContext<
++	DropdownMenuContextType | undefined
++>( undefined );
++
++export const DropdownMenuItem = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< DropdownMenuItemProps, 'div', false >
++>( function DropdownMenuItem(
++	{ prefix, suffix, children, hideOnClick = true, ...props },
++	ref
++) {
++	const dropdownMenuContext = useContext( DropdownMenuContext );
++
++	return (
++		<Styled.DropdownMenuItem
++			ref={ ref }
++			{ ...props }
++			hideOnClick={ hideOnClick }
++			store={ dropdownMenuContext?.store }
++		>
++			{ prefix && (
++				<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
++			) }
++			{ children }
++			{ suffix && (
++				<Styled.ItemSuffixWrapper>{ suffix }</Styled.ItemSuffixWrapper>
++			) }
++		</Styled.DropdownMenuItem>
++	);
++} );
++
++export const DropdownMenuCheckboxItem = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< DropdownMenuCheckboxItemProps, 'div', false >
++>( function DropdownMenuCheckboxItem(
++	{ suffix, children, hideOnClick = false, ...props },
++	ref
++) {
++	const dropdownMenuContext = useContext( DropdownMenuContext );
++
++	return (
++		<Styled.DropdownMenuCheckboxItem
++			ref={ ref }
++			{ ...props }
++			hideOnClick={ hideOnClick }
++			store={ dropdownMenuContext?.store }
++		>
++			<Ariakit.MenuItemCheck
++				store={ dropdownMenuContext?.store }
++				render={ <Styled.ItemPrefixWrapper /> }
++			>
++				<Icon icon={ check } size={ 24 } />
++			</Ariakit.MenuItemCheck>
++
++			{ children }
++			{ suffix && (
++				<Styled.ItemSuffixWrapper>{ suffix }</Styled.ItemSuffixWrapper>
++			) }
++		</Styled.DropdownMenuCheckboxItem>
++	);
++} );
++
++export const DropdownMenuRadioItem = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< DropdownMenuRadioItemProps, 'div', false >
++>( function DropdownMenuRadioItem(
++	{ suffix, children, hideOnClick = false, ...props },
++	ref
++) {
++	const dropdownMenuContext = useContext( DropdownMenuContext );
++
++	return (
++		<Styled.DropdownMenuRadioItem
++			ref={ ref }
++			{ ...props }
++			hideOnClick={ hideOnClick }
++			store={ dropdownMenuContext?.store }
++		>
++			<Ariakit.MenuItemCheck
++				store={ dropdownMenuContext?.store }
++				render={ <Styled.ItemPrefixWrapper /> }
++			>
++				<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
++					<Circle
++						cx={ 12 }
++						cy={ 12 }
++						r={ 3 }
++						fill="currentColor"
++					></Circle>
++				</SVG>
++			</Ariakit.MenuItemCheck>
++			{ children }
++			{ suffix }
++		</Styled.DropdownMenuRadioItem>
++	);
++} );
++
++export const DropdownMenuGroup = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< DropdownMenuGroupProps, 'div', false >
++>( function DropdownMenuGroup( props, ref ) {
++	const dropdownMenuContext = useContext( DropdownMenuContext );
++	return (
++		<Styled.DropdownMenuGroup
++			ref={ ref }
++			{ ...props }
++			store={ dropdownMenuContext?.store }
++		/>
++	);
++} );
++
++export const DropdownMenuGroupLabel = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< DropdownMenuGroupLabelProps, 'div', false >
++>( function DropdownMenuGroupLabel( props, ref ) {
++	const dropdownMenuContext = useContext( DropdownMenuContext );
++	return (
++		<Styled.DropdownMenuGroupLabel
++			ref={ ref }
++			{ ...props }
++			store={ dropdownMenuContext?.store }
++		/>
++	);
++} );
++
++const UnconnectedDropdownMenu = (
++	props: WordPressComponentProps< DropdownMenuProps, 'div', false >,
++	ref: React.ForwardedRef< HTMLDivElement >
++) => {
++	const {
++		// Store props
++		open,
++		defaultOpen = false,
++		onOpenChange,
++		placement,
++
++		// Menu trigger props
++		trigger,
++
++		// Menu props
++		gutter,
++		children,
++		shift,
++		modal = true,
++		hideOnEscape = true,
++
++		// From internal components context
++		variant,
++
++		// Rest
++		...otherProps
++	} = useContextSystem<
++		typeof props & Pick< DropdownMenuContextType, 'variant' >
++	>( props, 'DropdownMenu' );
++
++	const parentContext = useContext( DropdownMenuContext );
++
++	const computedDirection = isRTL() ? 'rtl' : 'ltr';
++
++	// If an explicit value for the `placement` prop is not passed,
++	// apply a default placement of `bottom-start` for the root dropdown,
++	// and of `right-start` for nested dropdowns.
++	let computedPlacement =
++		props.placement ??
++		( parentContext?.store ? 'right-start' : 'bottom-start' );
++	// Swap left/right in case of RTL direction
++	if ( computedDirection === 'rtl' ) {
++		if ( /right/.test( computedPlacement ) ) {
++			computedPlacement = computedPlacement.replace(
++				'right',
++				'left'
++			) as typeof computedPlacement;
++		} else if ( /left/.test( computedPlacement ) ) {
++			computedPlacement = computedPlacement.replace(
++				'left',
++				'right'
++			) as typeof computedPlacement;
++		}
++	}
++
++	const dropdownMenuStore = Ariakit.useMenuStore( {
++		parent: parentContext?.store,
++		open,
++		defaultOpen,
++		placement: computedPlacement,
++		focusLoop: true,
++		setOpen( willBeOpen ) {
++			onOpenChange?.( willBeOpen );
++		},
++		rtl: computedDirection === 'rtl',
++	} );
++
++	const contextValue = useMemo(
++		() => ( { store: dropdownMenuStore, variant } ),
++		[ dropdownMenuStore, variant ]
++	);
++
++	// Extract the side from the applied placement — useful for animations.
++	const appliedPlacementSide = dropdownMenuStore
++		.useState( 'placement' )
++		.split( '-' )[ 0 ];
++
++	if (
++		dropdownMenuStore.parent &&
++		! ( isValidElement( trigger ) && DropdownMenuItem === trigger.type )
++	) {
++		// eslint-disable-next-line no-console
++		console.warn(
++			'For nested DropdownMenus, the `trigger` should always be a `DropdownMenuItem`.'
++		);
++	}
++
++	return (
++		<>
++			{ /* Menu trigger */ }
++			<Ariakit.MenuButton
++				ref={ ref }
++				store={ dropdownMenuStore }
++				render={
++					dropdownMenuStore.parent
++						? cloneElement( trigger, {
++								// Add submenu arrow, unless a `suffix` is explicitly specified
++								suffix: trigger.props.suffix ?? (
++									<Styled.SubmenuChevronIcon
++										aria-hidden="true"
++										icon={ chevronRightSmall }
++										size={ 24 }
++									/>
++								),
++						  } )
++						: trigger
++				}
++			/>
++
++			{ /* Menu popover */ }
++			<Styled.DropdownMenu
++				{ ...otherProps }
++				modal={ modal }
++				store={ dropdownMenuStore }
++				gutter={ gutter ?? ( dropdownMenuStore.parent ? 16 : 8 ) }
++				shift={ shift ?? ( dropdownMenuStore.parent ? -8 : 0 ) }
++				hideOnHoverOutside={ false }
++				data-side={ appliedPlacementSide }
++				variant={ variant }
++				wrapperProps={ {
++					dir: computedDirection,
++					style: {
++						direction: computedDirection,
++					},
++				} }
++				hideOnEscape={ hideOnEscape }
++				unmountOnHide
++			>
++				<DropdownMenuContext.Provider value={ contextValue }>
++					{ children }
++				</DropdownMenuContext.Provider>
++			</Styled.DropdownMenu>
++		</>
++	);
++};
++export const DropdownMenu = contextConnect(
++	UnconnectedDropdownMenu,
++	'DropdownMenu'
++);
++
++export const DropdownMenuSeparator = forwardRef<
++	HTMLHRElement,
++	WordPressComponentProps< DropdownMenuSeparatorProps, 'hr', false >
++>( function DropdownMenuSeparator( props, ref ) {
++	const dropdownMenuContext = useContext( DropdownMenuContext );
++	return (
++		<Styled.DropdownMenuSeparator
++			ref={ ref }
++			{ ...props }
++			store={ dropdownMenuContext?.store }
++			variant={ dropdownMenuContext?.variant }
++		/>
++	);
++} );
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/stories/index.story.tsx b/packages/components/src/dropdown-menu-v2-ariakit/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..901a1c32ec4743
+--- /dev/null
++++ b/packages/components/src/dropdown-menu-v2-ariakit/stories/index.story.tsx
+@@ -0,0 +1,506 @@
++/**
++ * External dependencies
++ */
++import type { Meta, StoryFn } from '@storybook/react';
++import styled from '@emotion/styled';
++import { css } from '@emotion/react';
++
++/**
++ * WordPress dependencies
++ */
++import { wordpress } from '@wordpress/icons';
++import { useState, useMemo, useContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS, useCx } from '../../utils';
++import {
++	DropdownMenu,
++	DropdownMenuItem,
++	DropdownMenuCheckboxItem,
++	DropdownMenuGroup,
++	DropdownMenuGroupLabel,
++	DropdownMenuSeparator,
++	DropdownMenuContext,
++	DropdownMenuRadioItem,
++} from '..';
++import Icon from '../../icon';
++import Button from '../../button';
++import Modal from '../../modal';
++import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
++import { ContextSystemProvider } from '../../context';
++
++const meta: Meta< typeof DropdownMenu > = {
++	title: 'Components (Experimental)/DropdownMenu v2 ariakit',
++	component: DropdownMenu,
++	subcomponents: {
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		DropdownMenuItem,
++	},
++	argTypes: {
++		children: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: {
++			canvas: { sourceState: 'shown' },
++			source: { excludeDecorators: true },
++		},
++	},
++	decorators: [
++		// Layout wrapper
++		( Story ) => (
++			<div
++				style={ {
++					minHeight: '300px',
++				} }
++			>
++				<Story />
++			</div>
++		),
++	],
++};
++export default meta;
++
++const ItemHelpText = styled.span`
++	font-size: 12px;
++	color: ${ COLORS.gray[ '700' ] };
++
++	/* when the immediate parent item is hovered / focused */
++	[data-active-item] > * > &,
++	/* when the parent item is a submenu trigger and the submenu is open */
++	[aria-expanded='true'] > &,
++	/* when the parent item is disabled */
++	[aria-disabled='true'] > & {
++		color: inherit;
++	}
++`;
++
++export const Default: StoryFn< typeof DropdownMenu > = ( props ) => (
++	<DropdownMenu { ...props }>
++		<DropdownMenuItem>Default item</DropdownMenuItem>
++		<DropdownMenuItem hideOnClick={ false }>
++			<div
++				style={ {
++					display: 'inline-flex',
++					flexDirection: 'column',
++				} }
++			>
++				Other item
++				<ItemHelpText>
++					Won&apos;t close the menu when clicked
++				</ItemHelpText>
++			</div>
++		</DropdownMenuItem>
++		<DropdownMenuItem disabled>Disabled item</DropdownMenuItem>
++		<DropdownMenuSeparator />
++		<DropdownMenuGroup>
++			<DropdownMenuGroupLabel>Prefix and suffix</DropdownMenuGroupLabel>
++			<DropdownMenuItem
++				prefix={ <Icon icon={ wordpress } size={ 24 } /> }
++			>
++				With prefix
++			</DropdownMenuItem>
++			<DropdownMenuItem suffix={ <span>⌘S</span> }>
++				With suffix
++			</DropdownMenuItem>
++			<DropdownMenuItem
++				disabled
++				prefix={ <Icon icon={ wordpress } size={ 24 } /> }
++				suffix={ <span>⌥⌘T</span> }
++			>
++				Disabled with prefix and suffix
++			</DropdownMenuItem>
++		</DropdownMenuGroup>
++	</DropdownMenu>
++);
++Default.args = {
++	trigger: (
++		<Button __next40pxDefaultSize variant="secondary">
++			Open menu
++		</Button>
++	),
++};
++
++export const WithSubmenu: StoryFn< typeof DropdownMenu > = ( props ) => (
++	<DropdownMenu { ...props }>
++		<DropdownMenuItem>Level 1 item</DropdownMenuItem>
++		<DropdownMenu
++			trigger={ <DropdownMenuItem>Submenu trigger</DropdownMenuItem> }
++		>
++			<DropdownMenuItem>Level 2 item</DropdownMenuItem>
++			<DropdownMenuItem>Level 2 item</DropdownMenuItem>
++			<DropdownMenu
++				trigger={ <DropdownMenuItem>Submenu trigger</DropdownMenuItem> }
++			>
++				<DropdownMenuItem>Level 3 item</DropdownMenuItem>
++				<DropdownMenuItem>Level 3 item</DropdownMenuItem>
++			</DropdownMenu>
++		</DropdownMenu>
++	</DropdownMenu>
++);
++WithSubmenu.args = {
++	...Default.args,
++};
++
++export const WithCheckboxes: StoryFn< typeof DropdownMenu > = ( props ) => {
++	const [ isAChecked, setAChecked ] = useState( false );
++	const [ isBChecked, setBChecked ] = useState( true );
++	const [ multipleCheckboxesValue, setMultipleCheckboxesValue ] = useState<
++		string[]
++	>( [ 'b' ] );
++
++	const onMultipleCheckboxesCheckedChange: React.ComponentProps<
++		typeof DropdownMenuCheckboxItem
++	>[ 'onChange' ] = ( e ) => {
++		setMultipleCheckboxesValue( ( prevValues ) => {
++			if ( prevValues.includes( e.target.value ) ) {
++				return prevValues.filter( ( val ) => val !== e.target.value );
++			}
++			return [ ...prevValues, e.target.value ];
++		} );
++	};
++
++	return (
++		<DropdownMenu { ...props }>
++			<DropdownMenuGroup>
++				<DropdownMenuGroupLabel>
++					Individual, uncontrolled checkboxes
++				</DropdownMenuGroupLabel>
++				<DropdownMenuCheckboxItem
++					name="checkbox-individual-uncontrolled-a"
++					value="a"
++				>
++					Checkbox item A (initially unchecked)
++				</DropdownMenuCheckboxItem>
++				<DropdownMenuCheckboxItem
++					name="checkbox-individual-uncontrolled-b"
++					value="b"
++					defaultChecked
++				>
++					Checkbox item B (initially checked)
++				</DropdownMenuCheckboxItem>
++			</DropdownMenuGroup>
++			<DropdownMenuSeparator />
++			<DropdownMenuGroup>
++				<DropdownMenuGroupLabel>
++					Individual, controlled checkboxes
++				</DropdownMenuGroupLabel>
++				<DropdownMenuCheckboxItem
++					name="checkbox-individual-controlled-a"
++					value="a"
++					checked={ isAChecked }
++					onChange={ ( e ) => setAChecked( e.target.checked ) }
++				>
++					Checkbox item A
++				</DropdownMenuCheckboxItem>
++				<DropdownMenuCheckboxItem
++					name="checkbox-individual-controlled-b"
++					value="b"
++					checked={ isBChecked }
++					onChange={ ( e ) => setBChecked( e.target.checked ) }
++				>
++					Checkbox item B (initially checked)
++				</DropdownMenuCheckboxItem>
++			</DropdownMenuGroup>
++			<DropdownMenuSeparator />
++			<DropdownMenuGroup>
++				<DropdownMenuGroupLabel>
++					Multiple, uncontrolled checkboxes
++				</DropdownMenuGroupLabel>
++				<DropdownMenuCheckboxItem
++					name="checkbox-multiple-uncontrolled"
++					value="a"
++				>
++					Checkbox item A (initially unchecked)
++				</DropdownMenuCheckboxItem>
++				<DropdownMenuCheckboxItem
++					name="checkbox-multiple-uncontrolled"
++					value="b"
++					defaultChecked
++				>
++					Checkbox item B (initially checked)
++				</DropdownMenuCheckboxItem>
++			</DropdownMenuGroup>
++			<DropdownMenuSeparator />
++			<DropdownMenuGroup>
++				<DropdownMenuGroupLabel>
++					Multiple, controlled checkboxes
++				</DropdownMenuGroupLabel>
++				<DropdownMenuCheckboxItem
++					name="checkbox-multiple-controlled"
++					value="a"
++					checked={ multipleCheckboxesValue.includes( 'a' ) }
++					onChange={ onMultipleCheckboxesCheckedChange }
++				>
++					Checkbox item A (initially unchecked)
++				</DropdownMenuCheckboxItem>
++				<DropdownMenuCheckboxItem
++					name="checkbox-multiple-controlled"
++					value="b"
++					checked={ multipleCheckboxesValue.includes( 'b' ) }
++					onChange={ onMultipleCheckboxesCheckedChange }
++				>
++					Checkbox item B (initially checked)
++				</DropdownMenuCheckboxItem>
++			</DropdownMenuGroup>
++		</DropdownMenu>
++	);
++};
++WithCheckboxes.args = {
++	...Default.args,
++};
++
++export const WithRadios: StoryFn< typeof DropdownMenu > = ( props ) => {
++	const [ radioValue, setRadioValue ] = useState( 'two' );
++	const onRadioChange: React.ComponentProps<
++		typeof DropdownMenuRadioItem
++	>[ 'onChange' ] = ( e ) => setRadioValue( e.target.value );
++
++	return (
++		<DropdownMenu { ...props }>
++			<DropdownMenuGroup>
++				<DropdownMenuGroupLabel>
++					Uncontrolled radios
++				</DropdownMenuGroupLabel>
++				<DropdownMenuRadioItem name="radio-uncontrolled" value="one">
++					Radio item 1
++				</DropdownMenuRadioItem>
++				<DropdownMenuRadioItem
++					name="radio-uncontrolled"
++					value="two"
++					defaultChecked
++				>
++					Radio item 2 (initially checked)
++				</DropdownMenuRadioItem>
++			</DropdownMenuGroup>
++			<DropdownMenuSeparator />
++			<DropdownMenuGroup>
++				<DropdownMenuGroupLabel>
++					Controlled radios
++				</DropdownMenuGroupLabel>
++				<DropdownMenuRadioItem
++					name="radio-controlled"
++					value="one"
++					checked={ radioValue === 'one' }
++					onChange={ onRadioChange }
++				>
++					Radio item 1
++				</DropdownMenuRadioItem>
++				<DropdownMenuRadioItem
++					name="radio-controlled"
++					value="two"
++					checked={ radioValue === 'two' }
++					onChange={ onRadioChange }
++				>
++					Radio item 2 (initially checked)
++				</DropdownMenuRadioItem>
++			</DropdownMenuGroup>
++		</DropdownMenu>
++	);
++};
++WithRadios.args = {
++	...Default.args,
++};
++
++const modalOnTopOfDropdown = css`
++	&& {
++		z-index: 1000000;
++	}
++`;
++
++// For more examples with `Modal`, check https://ariakit.org/examples/menu-wordpress-modal
++export const WithModals: StoryFn< typeof DropdownMenu > = ( props ) => {
++	const [ isOuterModalOpen, setOuterModalOpen ] = useState( false );
++	const [ isInnerModalOpen, setInnerModalOpen ] = useState( false );
++
++	const cx = useCx();
++	const modalOverlayClassName = cx( modalOnTopOfDropdown );
++
++	return (
++		<>
++			<DropdownMenu { ...props }>
++				<DropdownMenuItem
++					onClick={ () => setOuterModalOpen( true ) }
++					hideOnClick={ false }
++				>
++					Open outer modal
++				</DropdownMenuItem>
++				<DropdownMenuItem
++					onClick={ () => setInnerModalOpen( true ) }
++					hideOnClick={ false }
++				>
++					Open inner modal
++				</DropdownMenuItem>
++				{ isInnerModalOpen && (
++					<Modal
++						onRequestClose={ () => setInnerModalOpen( false ) }
++						overlayClassName={ modalOverlayClassName }
++					>
++						Modal&apos;s contents
++						<button onClick={ () => setInnerModalOpen( false ) }>
++							Close
++						</button>
++					</Modal>
++				) }
++			</DropdownMenu>
++			{ isOuterModalOpen && (
++				<Modal
++					onRequestClose={ () => setOuterModalOpen( false ) }
++					overlayClassName={ modalOverlayClassName }
++				>
++					Modal&apos;s contents
++					<button onClick={ () => setOuterModalOpen( false ) }>
++						Close
++					</button>
++				</Modal>
++			) }
++		</>
++	);
++};
++WithModals.args = {
++	...Default.args,
++};
++
++const ExampleSlotFill = createSlotFill( 'Example' );
++
++const Slot = () => {
++	const dropdownMenuContext = useContext( DropdownMenuContext );
++
++	// Forwarding the content of the slot so that it can be used by the fill
++	const fillProps = useMemo(
++		() => ( {
++			forwardedContext: [
++				[
++					DropdownMenuContext.Provider,
++					{ value: dropdownMenuContext },
++				],
++			],
++		} ),
++		[ dropdownMenuContext ]
++	);
++
++	return <ExampleSlotFill.Slot fillProps={ fillProps } bubblesVirtually />;
++};
++
++type ForwardedContextTuple< P = {} > = [
++	React.ComponentType< React.PropsWithChildren< P > >,
++	P,
++];
++
++const Fill = ( { children }: { children: React.ReactNode } ) => {
++	const innerMarkup = <>{ children }</>;
++
++	return (
++		<ExampleSlotFill.Fill>
++			{ ( fillProps: { forwardedContext?: ForwardedContextTuple[] } ) => {
++				const { forwardedContext = [] } = fillProps;
++
++				return forwardedContext.reduce(
++					( inner: JSX.Element, [ Provider, props ] ) => (
++						<Provider { ...props }>{ inner }</Provider>
++					),
++					innerMarkup
++				);
++			} }
++		</ExampleSlotFill.Fill>
++	);
++};
++
++export const WithSlotFill: StoryFn< typeof DropdownMenu > = ( props ) => {
++	return (
++		<SlotFillProvider>
++			<DropdownMenu { ...props }>
++				<DropdownMenuItem>Item</DropdownMenuItem>
++				<Slot />
++			</DropdownMenu>
++
++			<Fill>
++				<DropdownMenuItem>Item from fill</DropdownMenuItem>
++				<DropdownMenu
++					trigger={
++						<DropdownMenuItem>Submenu from fill</DropdownMenuItem>
++					}
++				>
++					<DropdownMenuItem>Submenu item from fill</DropdownMenuItem>
++				</DropdownMenu>
++			</Fill>
++		</SlotFillProvider>
++	);
++};
++WithSlotFill.args = {
++	...Default.args,
++};
++
++const toolbarVariantContextValue = {
++	DropdownMenu: {
++		variant: 'toolbar',
++	},
++};
++export const ToolbarVariant: StoryFn< typeof DropdownMenu > = ( props ) => (
++	<ContextSystemProvider value={ toolbarVariantContextValue }>
++		<DropdownMenu { ...props }>
++			<DropdownMenuItem>Level 1 item</DropdownMenuItem>
++			<DropdownMenuItem>Level 1 item</DropdownMenuItem>
++			<DropdownMenuSeparator />
++			<DropdownMenu
++				trigger={ <DropdownMenuItem>Submenu trigger</DropdownMenuItem> }
++			>
++				<DropdownMenuItem>Level 2 item</DropdownMenuItem>
++			</DropdownMenu>
++		</DropdownMenu>
++	</ContextSystemProvider>
++);
++ToolbarVariant.args = {
++	...Default.args,
++};
++
++export const InsideModal: StoryFn< typeof DropdownMenu > = ( props ) => {
++	const [ isModalOpen, setModalOpen ] = useState( false );
++	return (
++		<>
++			<Button
++				onClick={ () => setModalOpen( true ) }
++				__next40pxDefaultSize
++				variant="secondary"
++			>
++				Open modal
++			</Button>
++			{ isModalOpen && (
++				<Modal onRequestClose={ () => setModalOpen( false ) }>
++					<DropdownMenu { ...props }>
++						<DropdownMenuItem>Level 1 item</DropdownMenuItem>
++						<DropdownMenuItem>Level 1 item</DropdownMenuItem>
++						<DropdownMenuSeparator />
++						<DropdownMenu
++							trigger={
++								<DropdownMenuItem>
++									Submenu trigger
++								</DropdownMenuItem>
++							}
++						>
++							<DropdownMenuItem>Level 2 item</DropdownMenuItem>
++						</DropdownMenu>
++					</DropdownMenu>
++					<Button onClick={ () => setModalOpen( false ) }>
++						Close modal
++					</Button>
++				</Modal>
++			) }
++		</>
++	);
++};
++InsideModal.args = {
++	...Default.args,
++	hideOnEscape: ( e ) => {
++		e.stopPropagation();
++		return true;
++	},
++};
++InsideModal.parameters = {
++	docs: {
++		source: { type: 'code' },
++	},
++};
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/styles.ts b/packages/components/src/dropdown-menu-v2-ariakit/styles.ts
+new file mode 100644
+index 00000000000000..0858bba4289efd
+--- /dev/null
++++ b/packages/components/src/dropdown-menu-v2-ariakit/styles.ts
+@@ -0,0 +1,297 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import * as Ariakit from '@ariakit/react';
++import { css, keyframes } from '@emotion/react';
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS, font, rtl, CONFIG } from '../utils';
++import { space } from '../utils/space';
++import Icon from '../icon';
++import type { DropdownMenuContext } from './types';
++
++const ANIMATION_PARAMS = {
++	SLIDE_AMOUNT: '2px',
++	DURATION: '400ms',
++	EASING: 'cubic-bezier( 0.16, 1, 0.3, 1 )',
++};
++
++const CONTENT_WRAPPER_PADDING = space( 2 );
++const ITEM_PREFIX_WIDTH = space( 7 );
++const ITEM_PADDING_INLINE_START = space( 2 );
++const ITEM_PADDING_INLINE_END = space( 2.5 );
++
++// TODO: should bring this into the config, and make themeable
++const DEFAULT_BORDER_COLOR = COLORS.ui.borderDisabled;
++const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
++const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.popoverShadow }`;
++const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
++
++const slideUpAndFade = keyframes( {
++	'0%': {
++		opacity: 0,
++		transform: `translateY(${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
++	},
++	'100%': { opacity: 1, transform: 'translateY(0)' },
++} );
++
++const slideRightAndFade = keyframes( {
++	'0%': {
++		opacity: 0,
++		transform: `translateX(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
++	},
++	'100%': { opacity: 1, transform: 'translateX(0)' },
++} );
++
++const slideDownAndFade = keyframes( {
++	'0%': {
++		opacity: 0,
++		transform: `translateY(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
++	},
++	'100%': { opacity: 1, transform: 'translateY(0)' },
++} );
++
++const slideLeftAndFade = keyframes( {
++	'0%': {
++		opacity: 0,
++		transform: `translateX(${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
++	},
++	'100%': { opacity: 1, transform: 'translateX(0)' },
++} );
++
++export const DropdownMenu = styled( Ariakit.Menu )<
++	Pick< DropdownMenuContext, 'variant' >
++>`
++	position: relative;
++	/* Same as popover component */
++	/* TODO: is there a way to read the sass variable? */
++	z-index: 1000000;
++
++	min-width: 220px;
++	max-height: var( --popover-available-height );
++	padding: ${ CONTENT_WRAPPER_PADDING };
++
++	background-color: ${ COLORS.ui.background };
++	border-radius: ${ CONFIG.radiusBlockUi };
++	${ ( props ) => css`
++		box-shadow: ${ props.variant === 'toolbar'
++			? TOOLBAR_VARIANT_BOX_SHADOW
++			: DEFAULT_BOX_SHADOW };
++	` }
++
++	overscroll-behavior: contain;
++	overflow: auto;
++
++	/* Only visible in Windows High Contrast mode */
++	outline: 2px solid transparent !important;
++
++	/* Animation */
++	animation-duration: ${ ANIMATION_PARAMS.DURATION };
++	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
++	will-change: transform, opacity;
++	/* Default animation.*/
++	animation-name: ${ slideDownAndFade };
++
++	&[data-side='right'] {
++		animation-name: ${ slideLeftAndFade };
++	}
++	&[data-side='bottom'] {
++		animation-name: ${ slideUpAndFade };
++	}
++	&[data-side='left'] {
++		animation-name: ${ slideRightAndFade };
++	}
++	@media ( prefers-reduced-motion ) {
++		animation-duration: 0s;
++	}
++`;
++
++const itemPrefix = css`
++	/* !important is to override some inline styles set by Ariakit */
++	width: ${ ITEM_PREFIX_WIDTH } !important;
++	/* !important is to override some inline styles set by Ariakit */
++	height: auto !important;
++	display: inline-flex;
++	align-items: center;
++	justify-content: center;
++	/* Prefixes don't get affected by the item's inline start padding */
++	margin-inline-start: calc( -1 * ${ ITEM_PADDING_INLINE_START } );
++	/*
++		Negative margin allows the suffix to be as tall as the whole item
++		(incl. padding) before increasing the items' height. This can be useful,
++		e.g., when using icons that are bigger than 20x20 px
++	*/
++	margin-top: ${ space( -2 ) };
++	margin-bottom: ${ space( -2 ) };
++`;
++
++const itemSuffix = css`
++	width: max-content;
++	display: inline-flex;
++	align-items: center;
++	justify-content: center;
++	/* Push prefix to the inline-end of the item */
++	margin-inline-start: auto;
++	/* Minimum space between the item's content and suffix */
++	padding-inline-start: ${ space( 6 ) };
++	/*
++		Negative margin allows the suffix to be as tall as the whole item
++		(incl. padding) before increasing the items' height. This can be useful,
++		e.g., when using icons that are bigger than 20x20 px
++	*/
++	margin-top: ${ space( -2 ) };
++	margin-bottom: ${ space( -2 ) };
++
++	/*
++		Override color in normal conditions, but inherit the item's color
++	  for altered conditions.
++
++		TODO:
++		  - For now, used opacity like for disabled item, which makes it work
++			  regardless of the theme
++		  - how do we translate this for themes? Should we have a new variable
++		for "secondary" text?
++	*/
++	opacity: 0.6;
++
++	/* when the parent item is hovered / focused */
++	[data-active-item] > &,
++	/* when the parent item is a submenu trigger and the submenu is open */
++	[aria-expanded='true'] > &,
++	/* when the parent item is disabled */
++	[aria-disabled='true'] > & {
++		opacity: 1;
++	}
++`;
++
++export const ItemPrefixWrapper = styled.span`
++	${ itemPrefix }
++`;
++
++export const ItemSuffixWrapper = styled.span`
++	${ itemSuffix }
++`;
++
++const baseItem = css`
++	all: unset;
++	font-size: ${ font( 'default.fontSize' ) };
++	font-family: inherit;
++	font-weight: normal;
++	line-height: 20px;
++	color: ${ COLORS.gray[ 900 ] };
++	border-radius: ${ CONFIG.radiusBlockUi };
++	display: flex;
++	align-items: center;
++	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
++		${ ITEM_PADDING_INLINE_START };
++	position: relative;
++	user-select: none;
++	outline: none;
++
++	&[aria-disabled='true'] {
++		/*
++		TODO:
++			- we need a disabled color in the Theme variables
++			- design specs use opacity instead of setting a new text color
++	*/
++		opacity: 0.5;
++		pointer-events: none;
++	}
++
++	/* Hover */
++	&[data-active-item] {
++		/* TODO: reconcile with global focus styles */
++		background-color: ${ COLORS.gray[ '100' ] };
++	}
++
++	/* Keyboard focus (focus-visible) */
++	&[data-focus-visible] {
++		box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++
++		/* Only visible in Windows High Contrast mode */
++		outline: 2px solid transparent;
++	}
++
++	/* Active (ie. pressed, mouse down) */
++	&:active,
++	&[data-active] {
++		/* TODO: should there be a visual active state? */
++	}
++
++	/* When the item is the trigger of an open submenu */
++	${ DropdownMenu }:not(:focus) &:not(:focus)[aria-expanded="true"] {
++		/* TODO: should we style submenu triggers any different? */
++	}
++
++	svg {
++		fill: currentColor;
++	}
++
++	&:not( :has( ${ ItemPrefixWrapper } ) ) {
++		padding-inline-start: ${ ITEM_PREFIX_WIDTH };
++	}
++`;
++
++export const DropdownMenuItem = styled( Ariakit.MenuItem )`
++	${ baseItem }
++`;
++
++export const DropdownMenuCheckboxItem = styled( Ariakit.MenuItemCheckbox )`
++	${ baseItem }
++`;
++
++export const DropdownMenuRadioItem = styled( Ariakit.MenuItemRadio )`
++	${ baseItem }
++`;
++
++export const DropdownMenuGroup = styled( Ariakit.MenuGroup )``;
++
++export const DropdownMenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
++	box-sizing: border-box;
++	display: flex;
++	align-items: center;
++	min-height: ${ space( 8 ) };
++
++	padding: ${ space( 2 ) } ${ ITEM_PADDING_INLINE_END } ${ space( 2 ) }
++		${ ITEM_PREFIX_WIDTH };
++	/* TODO: color doesn't match available UI variables */
++	color: ${ COLORS.gray[ 700 ] };
++
++	/* TODO: font size doesn't match available ones via "font" utils */
++	font-size: 11px;
++	line-height: 1.4;
++	font-weight: 500;
++	text-transform: uppercase;
++`;
++
++export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator )<
++	Pick< DropdownMenuContext, 'variant' >
++>`
++	border: none;
++	height: ${ CONFIG.borderWidth };
++	/* TODO: doesn't match border color from variables */
++	background-color: ${ ( props ) =>
++		props.variant === 'toolbar'
++			? TOOLBAR_VARIANT_BORDER_COLOR
++			: DEFAULT_BORDER_COLOR };
++	/* Negative horizontal margin to make separator go from side to side */
++	margin: ${ space( 2 ) } calc( -1 * ${ CONTENT_WRAPPER_PADDING } );
++
++	/* Only visible in Windows High Contrast mode */
++	outline: 2px solid transparent;
++`;
++
++export const SubmenuChevronIcon = styled( Icon )`
++	${ rtl(
++		{
++			transform: `scaleX(1) translateX(${ space( 2 ) })`,
++		},
++		{
++			transform: `scaleX(-1) translateX(${ space( 2 ) })`,
++		}
++	) }
++`;
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/test/index.tsx b/packages/components/src/dropdown-menu-v2-ariakit/test/index.tsx
+new file mode 100644
+index 00000000000000..3976159a82e68d
+--- /dev/null
++++ b/packages/components/src/dropdown-menu-v2-ariakit/test/index.tsx
+@@ -0,0 +1,1139 @@
++/**
++ * External dependencies
++ */
++import { render, screen, waitFor } from '@testing-library/react';
++import { press, click, hover, type } from '@ariakit/test';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import {
++	DropdownMenu,
++	DropdownMenuCheckboxItem,
++	DropdownMenuItem,
++	DropdownMenuGroupLabel,
++	DropdownMenuRadioItem,
++	DropdownMenuSeparator,
++	DropdownMenuGroup,
++} from '..';
++
++const delay = ( delayInMs: number ) => {
++	return new Promise( ( resolve ) => setTimeout( resolve, delayInMs ) );
++};
++
++describe( 'DropdownMenu', () => {
++	// See https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/
++	it( 'should follow the WAI-ARIA spec', async () => {
++		render(
++			<DropdownMenu trigger={ <button>Open dropdown</button> }>
++				<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
++				<DropdownMenuSeparator />
++				<DropdownMenu
++					trigger={
++						<DropdownMenuItem>Dropdown submenu</DropdownMenuItem>
++					}
++				>
++					<DropdownMenuItem>Dropdown submenu item 1</DropdownMenuItem>
++					<DropdownMenuItem>Dropdown submenu item 2</DropdownMenuItem>
++				</DropdownMenu>
++			</DropdownMenu>
++		);
++
++		const toggleButton = screen.getByRole( 'button', {
++			name: 'Open dropdown',
++		} );
++
++		expect( toggleButton ).toHaveAttribute( 'aria-haspopup', 'menu' );
++		expect( toggleButton ).toHaveAttribute( 'aria-expanded', 'false' );
++
++		await click( toggleButton );
++
++		expect( toggleButton ).toHaveAttribute( 'aria-expanded', 'true' );
++
++		expect(
++			screen.getByRole( 'menu', { name: toggleButton.textContent ?? '' } )
++		).toHaveFocus();
++		expect( screen.getByRole( 'separator' ) ).toHaveAttribute(
++			'aria-orientation',
++			'horizontal'
++		);
++		expect( screen.getAllByRole( 'menuitem' ) ).toHaveLength( 2 );
++
++		const submenuTrigger = screen.getByRole( 'menuitem', {
++			name: 'Dropdown submenu',
++		} );
++		expect( submenuTrigger ).toHaveAttribute( 'aria-haspopup', 'menu' );
++		expect( submenuTrigger ).toHaveAttribute( 'aria-expanded', 'false' );
++
++		await hover( submenuTrigger );
++
++		// Wait for the open animation after hovering
++		await waitFor( () =>
++			expect(
++				screen.getByRole( 'menu', {
++					name: submenuTrigger.textContent ?? '',
++				} )
++			).toBeVisible()
++		);
++
++		expect( submenuTrigger ).toHaveAttribute( 'aria-expanded', 'true' );
++		expect( submenuTrigger ).toHaveAttribute(
++			'aria-controls',
++			screen.getAllByRole( 'menu' )[ 1 ].id
++		);
++	} );
++
++	describe( 'pointer and keyboard interactions', () => {
++		it( 'should open and focus the menu when clicking the trigger', async () => {
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			const toggleButton = screen.getByRole( 'button', {
++				name: 'Open dropdown',
++			} );
++
++			// DropdownMenu closed
++			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
++
++			// Click to open the menu
++			await click( toggleButton );
++
++			// DropdownMenu open, focus is on the menu wrapper
++			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
++		} );
++
++		it( 'should open and focus the first item when pressing the arrow down key on the trigger', async () => {
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuItem disabled>First item</DropdownMenuItem>
++					<DropdownMenuItem>Second item</DropdownMenuItem>
++					<DropdownMenuItem>Third item</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			const toggleButton = screen.getByRole( 'button', {
++				name: 'Open dropdown',
++			} );
++
++			// Move focus on the toggle
++			await press.Tab();
++
++			expect( toggleButton ).toHaveFocus();
++
++			// DropdownMenu closed
++			expect( screen.queryByRole( 'menuitem' ) ).not.toBeInTheDocument();
++
++			await press.ArrowDown();
++
++			// DropdownMenu open, focus is on the first focusable item
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Second item' } )
++			).toHaveFocus();
++		} );
++
++		it( 'should open and focus the first item when pressing the space key on the trigger', async () => {
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuItem disabled>First item</DropdownMenuItem>
++					<DropdownMenuItem>Second item</DropdownMenuItem>
++					<DropdownMenuItem>Third item</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			const toggleButton = screen.getByRole( 'button', {
++				name: 'Open dropdown',
++			} );
++
++			// Move focus on the toggle
++			await press.Tab();
++
++			expect( toggleButton ).toHaveFocus();
++
++			// DropdownMenu closed
++			expect( screen.queryByRole( 'menuitem' ) ).not.toBeInTheDocument();
++
++			await press.Space();
++
++			// DropdownMenu open, focus is on the first focusable item
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Second item' } )
++			).toHaveFocus();
++		} );
++
++		it( 'should close when pressing the escape key', async () => {
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			const trigger = screen.getByRole( 'button', {
++				name: 'Open dropdown',
++			} );
++
++			await click( trigger );
++
++			// Focuses menu on mouse click, focuses first item on keyboard press
++			// Can be changed with a custom useEffect
++			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
++
++			// Pressing esc will close the menu and move focus to the toggle
++			await press.Escape();
++
++			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
++
++			await waitFor( () =>
++				expect(
++					screen.getByRole( 'button', { name: 'Open dropdown' } )
++				).toHaveFocus()
++			);
++		} );
++
++		it( 'should not close when pressing the escape key if the `hideOnEscape` prop is set to `false`', async () => {
++			render(
++				<DropdownMenu
++					trigger={ <button>Open dropdown</button> }
++					hideOnEscape={ false }
++				>
++					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			const trigger = screen.getByRole( 'button', {
++				name: 'Open dropdown',
++			} );
++
++			await click( trigger );
++
++			// Focuses menu on mouse click, focuses first item on keyboard press
++			// Can be changed with a custom useEffect
++			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
++
++			// Pressing esc will close the menu and move focus to the toggle
++			await press.Escape();
++
++			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
++		} );
++
++		it( 'should close when clicking outside of the content', async () => {
++			render(
++				<DropdownMenu
++					defaultOpen
++					trigger={ <button>Open dropdown</button> }
++				>
++					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
++
++			// Click on the body (ie. outside of the dropdown menu)
++			await click( document.body );
++
++			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
++		} );
++
++		it( 'should close when clicking on a menu item', async () => {
++			render(
++				<DropdownMenu
++					defaultOpen
++					trigger={ <button>Open dropdown</button> }
++				>
++					<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
++
++			// Clicking a menu item will close the menu
++			await click( screen.getByRole( 'menuitem' ) );
++
++			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
++		} );
++
++		it( 'should not close when clicking on a menu item when the `hideOnClick` prop is set to `false`', async () => {
++			render(
++				<DropdownMenu
++					defaultOpen
++					trigger={ <button>Open dropdown</button> }
++				>
++					<DropdownMenuItem hideOnClick={ false }>
++						Dropdown menu item
++					</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			expect( screen.getByRole( 'menu' ) ).toBeVisible();
++
++			// Clicking a menu item will close the menu
++			await click( screen.getByRole( 'menuitem' ) );
++
++			expect( screen.getByRole( 'menu' ) ).toBeVisible();
++		} );
++
++		it( 'should not close when clicking on a disabled menu item', async () => {
++			render(
++				<DropdownMenu
++					defaultOpen
++					trigger={ <button>Open dropdown</button> }
++				>
++					<DropdownMenuItem disabled>
++						Dropdown menu item
++					</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
++
++			// Clicking a disabled menu item won't close the menu
++			await click( screen.getByRole( 'menuitem' ) );
++
++			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
++		} );
++
++		it( 'should reveal submenu content when hovering over the submenu trigger', async () => {
++			render(
++				<DropdownMenu
++					defaultOpen
++					trigger={ <button>Open dropdown</button> }
++				>
++					<DropdownMenuItem>Dropdown menu item 1</DropdownMenuItem>
++					<DropdownMenuItem>Dropdown menu item 2</DropdownMenuItem>
++					<DropdownMenu
++						trigger={
++							<DropdownMenuItem>
++								Dropdown submenu
++							</DropdownMenuItem>
++						}
++					>
++						<DropdownMenuItem>
++							Dropdown submenu item 1
++						</DropdownMenuItem>
++						<DropdownMenuItem>
++							Dropdown submenu item 2
++						</DropdownMenuItem>
++					</DropdownMenu>
++					<DropdownMenuItem>Dropdown menu item 3</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			// Before hover, submenu items are not rendered
++			expect(
++				screen.queryByRole( 'menuitem', {
++					name: 'Dropdown submenu item 1',
++				} )
++			).not.toBeInTheDocument();
++
++			await hover(
++				screen.getByRole( 'menuitem', { name: 'Dropdown submenu' } )
++			);
++
++			// After hover, submenu items are rendered
++			// Reason for `findByRole`: due to the animation, we've got to wait
++			// a short amount of time for the submenu to appear
++			await screen.findByRole( 'menuitem', {
++				name: 'Dropdown submenu item 1',
++			} );
++		} );
++
++		it( 'should navigate menu items and subitems using the arrow, spacebar and enter keys', async () => {
++			render(
++				<DropdownMenu
++					defaultOpen
++					trigger={ <button>Open dropdown</button> }
++				>
++					<DropdownMenuItem>Dropdown menu item 1</DropdownMenuItem>
++					<DropdownMenuItem>Dropdown menu item 2</DropdownMenuItem>
++					<DropdownMenu
++						trigger={
++							<DropdownMenuItem>
++								Dropdown submenu
++							</DropdownMenuItem>
++						}
++					>
++						<DropdownMenuItem>
++							Dropdown submenu item 1
++						</DropdownMenuItem>
++						<DropdownMenuItem>
++							Dropdown submenu item 2
++						</DropdownMenuItem>
++					</DropdownMenu>
++					<DropdownMenuItem>Dropdown menu item 3</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			// The menu is focused automatically when `defaultOpen` is set.
++			await waitFor( () =>
++				expect( screen.getByRole( 'menu' ) ).toHaveFocus()
++			);
++
++			// Arrow up/down selects menu items
++			// The selection wraps around from last to first and viceversa
++			await press.ArrowDown();
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 1' } )
++			).toHaveFocus();
++
++			await press.ArrowDown();
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 2' } )
++			).toHaveFocus();
++
++			await press.ArrowDown();
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Dropdown submenu' } )
++			).toHaveFocus();
++
++			await press.ArrowDown();
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 3' } )
++			).toHaveFocus();
++
++			await press.ArrowDown();
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 1' } )
++			).toHaveFocus();
++
++			await press.ArrowUp();
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 3' } )
++			).toHaveFocus();
++
++			await press.ArrowUp();
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Dropdown submenu' } )
++			).toHaveFocus();
++
++			// Arrow right/left can be used to enter/leave submenus
++			await press.ArrowRight();
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown submenu item 1',
++				} )
++			).toHaveFocus();
++
++			await press.ArrowDown();
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown submenu item 2',
++				} )
++			).toHaveFocus();
++
++			await press.ArrowLeft();
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown submenu',
++				} )
++			).toHaveFocus();
++
++			// Spacebar or enter key can also be used to enter a submenu
++			await press.Enter();
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown submenu item 1',
++				} )
++			).toHaveFocus();
++
++			await press.ArrowLeft();
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown submenu',
++				} )
++			).toHaveFocus();
++
++			await press.Space();
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown submenu item 1',
++				} )
++			).toHaveFocus();
++
++			await press.ArrowLeft();
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown submenu',
++				} )
++			).toHaveFocus();
++		} );
++
++		it( 'should check radio items and keep the menu open when clicking (controlled)', async () => {
++			const onRadioValueChangeSpy = jest.fn();
++
++			const ControlledRadioGroup = () => {
++				const [ radioValue, setRadioValue ] = useState( 'two' );
++				const onRadioChange: React.ComponentProps<
++					typeof DropdownMenuRadioItem
++				>[ 'onChange' ] = ( e ) => {
++					onRadioValueChangeSpy( e.target.value );
++					setRadioValue( e.target.value );
++				};
++				return (
++					<DropdownMenu trigger={ <button>Open dropdown</button> }>
++						<DropdownMenuGroup>
++							<DropdownMenuGroupLabel>
++								Radio group label
++							</DropdownMenuGroupLabel>
++							<DropdownMenuRadioItem
++								name="radio-test"
++								value="radio-one"
++								checked={ radioValue === 'radio-one' }
++								onChange={ onRadioChange }
++							>
++								Radio item one
++							</DropdownMenuRadioItem>
++							<DropdownMenuRadioItem
++								name="radio-test"
++								value="radio-two"
++								checked={ radioValue === 'radio-two' }
++								onChange={ onRadioChange }
++							>
++								Radio item two
++							</DropdownMenuRadioItem>
++						</DropdownMenuGroup>
++					</DropdownMenu>
++				);
++			};
++
++			render( <ControlledRadioGroup /> );
++
++			// Open dropdown
++			await click(
++				screen.getByRole( 'button', { name: 'Open dropdown' } )
++			);
++
++			// No radios should be checked at this point
++			expect( screen.getAllByRole( 'menuitemradio' ) ).toHaveLength( 2 );
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
++			).not.toBeChecked();
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
++			).not.toBeChecked();
++
++			// Click first radio item, make sure that the callback fires
++			await click(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
++			);
++			expect( onRadioValueChangeSpy ).toHaveBeenCalledTimes( 1 );
++			expect( onRadioValueChangeSpy ).toHaveBeenLastCalledWith(
++				'radio-one'
++			);
++
++			// Make sure that first radio is checked
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
++			).toBeChecked();
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
++			).not.toBeChecked();
++
++			// Click second radio item, make sure that the callback fires
++			await click(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
++			);
++			expect( onRadioValueChangeSpy ).toHaveBeenCalledTimes( 2 );
++			expect( onRadioValueChangeSpy ).toHaveBeenLastCalledWith(
++				'radio-two'
++			);
++
++			// Make sure that second radio is selected
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
++			).not.toBeChecked();
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
++			).toBeChecked();
++		} );
++
++		it( 'should check radio items and keep the menu open when clicking (uncontrolled)', async () => {
++			const onRadioValueChangeSpy = jest.fn();
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuGroup>
++						<DropdownMenuGroupLabel>
++							Radio group label
++						</DropdownMenuGroupLabel>
++						<DropdownMenuRadioItem
++							name="radio-test"
++							value="radio-one"
++							onChange={ ( e ) =>
++								onRadioValueChangeSpy( e.target.value )
++							}
++						>
++							Radio item one
++						</DropdownMenuRadioItem>
++						<DropdownMenuRadioItem
++							name="radio-test"
++							value="radio-two"
++							defaultChecked
++							onChange={ ( e ) =>
++								onRadioValueChangeSpy( e.target.value )
++							}
++						>
++							Radio item two
++						</DropdownMenuRadioItem>
++					</DropdownMenuGroup>
++				</DropdownMenu>
++			);
++
++			// Open dropdown
++			await click(
++				screen.getByRole( 'button', { name: 'Open dropdown' } )
++			);
++
++			// Radio item two should be checked (`defaultChecked` prop)
++			expect( screen.getAllByRole( 'menuitemradio' ) ).toHaveLength( 2 );
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
++			).not.toBeChecked();
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
++			).toBeChecked();
++
++			// Click first radio item, make sure that the callback fires
++			await click(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
++			);
++			expect( onRadioValueChangeSpy ).toHaveBeenCalledTimes( 1 );
++			expect( onRadioValueChangeSpy ).toHaveBeenLastCalledWith(
++				'radio-one'
++			);
++
++			// Make sure that first radio is checked
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
++			).toBeChecked();
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
++			).not.toBeChecked();
++
++			// Click second radio item, make sure that the callback fires
++			await click(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
++			);
++			expect( onRadioValueChangeSpy ).toHaveBeenCalledTimes( 2 );
++			expect( onRadioValueChangeSpy ).toHaveBeenLastCalledWith(
++				'radio-two'
++			);
++
++			// Make sure that second radio is selected
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item one' } )
++			).not.toBeChecked();
++			expect(
++				screen.getByRole( 'menuitemradio', { name: 'Radio item two' } )
++			).toBeChecked();
++		} );
++
++		it( 'should check checkbox items and keep the menu open when clicking (controlled)', async () => {
++			const onCheckboxValueChangeSpy = jest.fn();
++
++			const ControlledRadioGroup = () => {
++				const [ itemOneChecked, setItemOneChecked ] =
++					useState< boolean >();
++				const [ itemTwoChecked, setItemTwoChecked ] =
++					useState< boolean >();
++
++				return (
++					<DropdownMenu trigger={ <button>Open dropdown</button> }>
++						<DropdownMenuCheckboxItem
++							name="item-one"
++							value="item-one-value"
++							checked={ itemOneChecked }
++							onChange={ ( e ) => {
++								onCheckboxValueChangeSpy(
++									e.target.name,
++									e.target.value,
++									e.target.checked
++								);
++								setItemOneChecked( e.target.checked );
++							} }
++						>
++							Checkbox item one
++						</DropdownMenuCheckboxItem>
++
++						<DropdownMenuCheckboxItem
++							name="item-two"
++							value="item-two-value"
++							checked={ itemTwoChecked }
++							onChange={ ( e ) => {
++								onCheckboxValueChangeSpy(
++									e.target.name,
++									e.target.value,
++									e.target.checked
++								);
++								setItemTwoChecked( e.target.checked );
++							} }
++						>
++							Checkbox item two
++						</DropdownMenuCheckboxItem>
++					</DropdownMenu>
++				);
++			};
++
++			render( <ControlledRadioGroup /> );
++
++			// Open dropdown
++			await click(
++				screen.getByRole( 'button', { name: 'Open dropdown' } )
++			);
++
++			// No checkboxes should be checked at this point
++			expect( screen.getAllByRole( 'menuitemcheckbox' ) ).toHaveLength(
++				2
++			);
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item one',
++				} )
++			).not.toBeChecked();
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			).not.toBeChecked();
++
++			// Click first checkbox item, make sure that the callback fires
++			await click(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item one',
++				} )
++			);
++			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 1 );
++			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
++				'item-one',
++				'item-one-value',
++				true
++			);
++
++			// Make sure that first checkbox is checked
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item one',
++				} )
++			).toBeChecked();
++
++			// Click second checkbox item, make sure that the callback fires
++			await click(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			);
++			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 2 );
++			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
++				'item-two',
++				'item-two-value',
++				true
++			);
++
++			// Make sure that second checkbox is selected
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			).toBeChecked();
++
++			// Click second checkbox item, make sure that the callback fires
++			await click(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			);
++			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 3 );
++			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
++				'item-two',
++				'item-two-value',
++				false
++			);
++
++			// Make sure that second checkbox is unselected
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			).not.toBeChecked();
++		} );
++
++		it( 'should check checkbox items and keep the menu open when clicking (uncontrolled)', async () => {
++			const onCheckboxValueChangeSpy = jest.fn();
++
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuCheckboxItem
++						name="item-one"
++						value="item-one-value"
++						onChange={ ( e ) => {
++							onCheckboxValueChangeSpy(
++								e.target.name,
++								e.target.value,
++								e.target.checked
++							);
++						} }
++					>
++						Checkbox item one
++					</DropdownMenuCheckboxItem>
++
++					<DropdownMenuCheckboxItem
++						name="item-two"
++						value="item-two-value"
++						defaultChecked
++						onChange={ ( e ) => {
++							onCheckboxValueChangeSpy(
++								e.target.name,
++								e.target.value,
++								e.target.checked
++							);
++						} }
++					>
++						Checkbox item two
++					</DropdownMenuCheckboxItem>
++				</DropdownMenu>
++			);
++
++			// Open dropdown
++			await click(
++				screen.getByRole( 'button', { name: 'Open dropdown' } )
++			);
++
++			// Checkbox item two should be checked (`defaultChecked`)
++			expect( screen.getAllByRole( 'menuitemcheckbox' ) ).toHaveLength(
++				2
++			);
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item one',
++				} )
++			).not.toBeChecked();
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			).toBeChecked();
++
++			// Click first checkbox item, make sure that the callback fires
++			await click(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item one',
++				} )
++			);
++			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 1 );
++			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
++				'item-one',
++				'item-one-value',
++				true
++			);
++
++			// Make sure that first checkbox is checked
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item one',
++				} )
++			).toBeChecked();
++
++			// Click second checkbox item, make sure that the callback fires
++			await click(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			);
++			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 2 );
++			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
++				'item-two',
++				'item-two-value',
++				false
++			);
++
++			// Make sure that second checkbox is unchecked
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			).not.toBeChecked();
++
++			// Click second checkbox item, make sure that the callback fires
++			await click(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			);
++			expect( onCheckboxValueChangeSpy ).toHaveBeenCalledTimes( 3 );
++			expect( onCheckboxValueChangeSpy ).toHaveBeenLastCalledWith(
++				'item-two',
++				'item-two-value',
++				true
++			);
++
++			// Make sure that second checkbox is unselected
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item two',
++				} )
++			).toBeChecked();
++		} );
++	} );
++
++	describe( 'modality', () => {
++		it( 'should be modal by default', async () => {
++			render(
++				<>
++					<DropdownMenu trigger={ <button>Open dropdown</button> }>
++						<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
++					</DropdownMenu>
++					<button>Button outside of dropdown</button>
++				</>
++			);
++
++			// Click to open the menu
++			await click(
++				screen.getByRole( 'button', {
++					name: 'Open dropdown',
++				} )
++			);
++
++			// DropdownMenu open, focus is on the menu wrapper
++			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
++
++			expect(
++				screen.queryByRole( 'button', {
++					name: 'Button outside of dropdown',
++				} )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'should not be modal when the `modal` prop is set to `false`', async () => {
++			render(
++				<>
++					<DropdownMenu
++						trigger={ <button>Open dropdown</button> }
++						modal={ false }
++					>
++						<DropdownMenuItem>Dropdown menu item</DropdownMenuItem>
++					</DropdownMenu>
++					<button>Button outside of dropdown</button>
++				</>
++			);
++
++			// Click to open the menu
++			await click(
++				screen.getByRole( 'button', {
++					name: 'Open dropdown',
++				} )
++			);
++
++			// DropdownMenu open, focus is on the menu wrapper
++			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
++
++			// DropdownMenu is not modal, therefore the outer button is part of the
++			// accessibility tree and can be found.
++			const outerButton = screen.getByRole( 'button', {
++				name: 'Button outside of dropdown',
++			} );
++
++			// The outer button can be focused by pressing tab. Doing so will cause
++			// the DropdownMenu to close.
++			await press.Tab();
++			expect( outerButton ).toBeInTheDocument();
++			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
++		} );
++	} );
++
++	describe( 'items prefix and suffix', () => {
++		it( 'should display a prefix on regular items', async () => {
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuItem prefix={ <>Item prefix</> }>
++						Dropdown menu item
++					</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			// Click to open the menu
++			await click(
++				screen.getByRole( 'button', {
++					name: 'Open dropdown',
++				} )
++			);
++
++			// The contents of the prefix are rendered before the item's children
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Item prefix Dropdown menu item',
++				} )
++			).toBeInTheDocument();
++		} );
++
++		it( 'should display a suffix on regular items', async () => {
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuItem suffix={ <>Item suffix</> }>
++						Dropdown menu item
++					</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			// Click to open the menu
++			await click(
++				screen.getByRole( 'button', {
++					name: 'Open dropdown',
++				} )
++			);
++
++			// The contents of the suffix are rendered after the item's children
++			expect(
++				screen.getByRole( 'menuitem', {
++					name: 'Dropdown menu item Item suffix',
++				} )
++			).toBeInTheDocument();
++		} );
++
++		it( 'should display a suffix on radio items', async () => {
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuRadioItem
++						name="radio-test"
++						value="radio-one"
++						suffix="Radio suffix"
++					>
++						Radio item one
++					</DropdownMenuRadioItem>
++				</DropdownMenu>
++			);
++
++			// Click to open the menu
++			await click(
++				screen.getByRole( 'button', {
++					name: 'Open dropdown',
++				} )
++			);
++
++			// The contents of the suffix are rendered after the item's children
++			expect(
++				screen.getByRole( 'menuitemradio', {
++					name: 'Radio item oneRadio suffix',
++				} )
++			).toBeInTheDocument();
++		} );
++
++		it( 'should display a suffix on checkbox items', async () => {
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuCheckboxItem
++						name="checkbox-test"
++						value="checkbox-one"
++						suffix="Checkbox suffix"
++					>
++						Checkbox item one
++					</DropdownMenuCheckboxItem>
++				</DropdownMenu>
++			);
++
++			// Click to open the menu
++			await click(
++				screen.getByRole( 'button', {
++					name: 'Open dropdown',
++				} )
++			);
++
++			// The contents of the suffix are rendered after the item's children
++			expect(
++				screen.getByRole( 'menuitemcheckbox', {
++					name: 'Checkbox item one Checkbox suffix',
++				} )
++			).toBeInTheDocument();
++		} );
++	} );
++
++	describe( 'typeahead', () => {
++		it( 'should highlight matching item', async () => {
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuItem>One</DropdownMenuItem>
++					<DropdownMenuItem>Two</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			// Click to open the menu
++			await click(
++				screen.getByRole( 'button', {
++					name: 'Open dropdown',
++				} )
++			);
++			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
++
++			// Type "tw", it should match and focus the item with content "Two"
++			await type( 'tw' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Two' } )
++			).toHaveFocus();
++
++			// Wait for the typeahead timer to reset and interpret
++			// the next keystrokes as a new search
++			await delay( 500 );
++
++			// Type "on", it should match and focus the item with content "One"
++			await type( 'on' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'One' } )
++			).toHaveFocus();
++		} );
++
++		it( 'should keep previous focus when no matches are found', async () => {
++			render(
++				<DropdownMenu trigger={ <button>Open dropdown</button> }>
++					<DropdownMenuItem>One</DropdownMenuItem>
++					<DropdownMenuItem>Two</DropdownMenuItem>
++				</DropdownMenu>
++			);
++
++			// Click to open the menu
++			await click(
++				screen.getByRole( 'button', {
++					name: 'Open dropdown',
++				} )
++			);
++			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
++
++			// Type a string that doesn't match any items. Focus shouldn't move.
++			await type( 'abc' );
++			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
++
++			// Wait for the typeahead timer to reset and interpret
++			// the next keystrokes as a new search
++			await delay( 500 );
++
++			// Type "on", it should match and focus the item with content "One"
++			await type( 'on' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'One' } )
++			).toHaveFocus();
++
++			// Wait for the typeahead timer to reset and interpret
++			// the next keystrokes as a new search
++			await delay( 500 );
++
++			// Type a string that doesn't match any items. Focus shouldn't move.
++			await type( 'abc' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'One' } )
++			).toHaveFocus();
++
++			// Wait for the typeahead timer to reset and interpret
++			// the next keystrokes as a new search
++			await delay( 500 );
++
++			// Type "tw", it should match and focus the item with content "Two"
++			await type( 'tw' );
++			expect(
++				screen.getByRole( 'menuitem', { name: 'Two' } )
++			).toHaveFocus();
++		} );
++	} );
++} );
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/types.ts b/packages/components/src/dropdown-menu-v2-ariakit/types.ts
+new file mode 100644
+index 00000000000000..198b112faa3120
+--- /dev/null
++++ b/packages/components/src/dropdown-menu-v2-ariakit/types.ts
+@@ -0,0 +1,186 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type * as Ariakit from '@ariakit/react';
++import type { Placement } from '@floating-ui/react-dom';
++
++export interface DropdownMenuContext {
++	/**
++	 * The ariakit store shared across all DropdownMenu subcomponents.
++	 */
++	store: Ariakit.MenuStore;
++	/**
++	 * The variant used by the underlying menu popover.
++	 */
++	variant?: 'toolbar';
++}
++
++export interface DropdownMenuProps {
++	/**
++	 * The trigger button.
++	 */
++	trigger: React.ReactElement;
++	/**
++	 * The contents of the dropdown.
++	 */
++	children?: React.ReactNode;
++	/**
++	 * The open state of the dropdown menu when it is initially rendered. Use when
++	 * not wanting to control its open state.
++	 *
++	 * @default false
++	 */
++	defaultOpen?: boolean;
++	/**
++	 * The controlled open state of the dropdown menu. Must be used in conjunction
++	 * with `onOpenChange`.
++	 */
++	open?: boolean;
++	/**
++	 * Event handler called when the open state of the dropdown menu changes.
++	 */
++	onOpenChange?: ( open: boolean ) => void;
++	/**
++	 * The modality of the dropdown menu. When set to true, interaction with
++	 * outside elements will be disabled and only menu content will be visible to
++	 * screen readers.
++	 *
++	 * @default true
++	 */
++	modal?: boolean;
++	/**
++	 * The placement of the dropdown menu popover.
++	 *
++	 * @default 'bottom-start' for root-level menus, 'right-start' for nested menus
++	 */
++	placement?: Placement;
++	/**
++	 * The distance between the popover and the anchor element.
++	 *
++	 * @default 8 for root-level menus, 16 for nested menus
++	 */
++	gutter?: number;
++	/**
++	 * The skidding of the popover along the anchor element. Can be set to
++	 * negative values to make the popover shift to the opposite side.
++	 *
++	 * @default 0 for root-level menus, -8 for nested menus
++	 */
++	shift?: number;
++	/**
++	 * Determines whether the menu popover will be hidden when the user presses
++	 * the Escape key.
++	 *
++	 * @default true
++	 */
++	hideOnEscape?:
++		| boolean
++		| ( (
++				event: KeyboardEvent | React.KeyboardEvent< Element >
++		  ) => boolean );
++}
++
++export interface DropdownMenuGroupProps {
++	/**
++	 * The contents of the dropdown menu group.
++	 */
++	children: React.ReactNode;
++}
++
++export interface DropdownMenuGroupLabelProps {
++	/**
++	 * The contents of the dropdown menu group label.
++	 */
++	children: React.ReactNode;
++}
++
++export interface DropdownMenuItemProps {
++	/**
++	 * The contents of the menu item.
++	 */
++	children: React.ReactNode;
++	/**
++	 * The contents of the menu item's prefix.
++	 */
++	prefix?: React.ReactNode;
++	/**
++	 * The contents of the menu item's suffix.
++	 */
++	suffix?: React.ReactNode;
++	/**
++	 * Whether to hide the parent menu when the item is clicked.
++	 *
++	 * @default true
++	 */
++	hideOnClick?: boolean;
++	/**
++	 * Determines if the element is disabled.
++	 */
++	disabled?: boolean;
++}
++
++export interface DropdownMenuCheckboxItemProps
++	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
++	/**
++	 * Whether to hide the dropdown menu when the item is clicked.
++	 *
++	 * @default false
++	 */
++	hideOnClick?: boolean;
++	/**
++	 * The checkbox menu item's name.
++	 */
++	name: string;
++	/**
++	 * The checkbox item's value, useful when using multiple checkbox menu items
++	 * associated to the same `name`.
++	 */
++	value?: string;
++	/**
++	 * The controlled checked state of the checkbox menu item.
++	 */
++	checked?: boolean;
++	/**
++	 * The checked state of the checkbox menu item when it is initially rendered.
++	 * Use when not wanting to control its checked state.
++	 */
++	defaultChecked?: boolean;
++	/**
++	 * Event handler called when the checked state of the checkbox menu item changes.
++	 */
++	onChange?: ( event: React.ChangeEvent< HTMLInputElement > ) => void;
++}
++
++export interface DropdownMenuRadioItemProps
++	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
++	/**
++	 * Whether to hide the dropdown menu when the item is clicked.
++	 *
++	 * @default false
++	 */
++	hideOnClick?: boolean;
++	/**
++	 * The radio item's name.
++	 */
++	name: string;
++	/**
++	 * The radio item's value.
++	 */
++	value: string | number;
++	/**
++	 * The controlled checked state of the radio menu item.
++	 */
++	checked?: boolean;
++	/**
++	 * The checked state of the radio menu item when it is initially rendered.
++	 * Use when not wanting to control its checked state.
++	 */
++	defaultChecked?: boolean;
++	/**
++	 * Event handler called when the checked radio menu item changes.
++	 */
++	onChange?: ( event: React.ChangeEvent< HTMLInputElement > ) => void;
++}
++
++export interface DropdownMenuSeparatorProps {}
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 0d2e8af112e177..e39ccbdacc2f54 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -29,6 +29,15 @@ import {
+ 	DropdownSubMenu as DropdownSubMenuV2,
+ 	DropdownSubMenuTrigger as DropdownSubMenuTriggerV2,
+ } from './dropdown-menu-v2';
++import {
++	DropdownMenu as DropdownMenuV2Ariakit,
++	DropdownMenuGroup as DropdownMenuGroupV2Ariakit,
++	DropdownMenuGroupLabel as DropdownMenuGroupLabelV2Ariakit,
++	DropdownMenuItem as DropdownMenuItemV2Ariakit,
++	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2Ariakit,
++	DropdownMenuRadioItem as DropdownMenuRadioItemV2Ariakit,
++	DropdownMenuSeparator as DropdownMenuSeparatorV2Ariakit,
++} from './dropdown-menu-v2-ariakit';
+ import { ComponentsContext } from './context/context-system-provider';
+ import Theme from './theme';
+ import Tabs from './tabs';
+@@ -63,4 +72,11 @@ lock( privateApis, {
+ 	ProgressBar,
+ 	Tabs,
+ 	Theme,
++	DropdownMenuV2Ariakit,
++	DropdownMenuGroupV2Ariakit,
++	DropdownMenuGroupLabelV2Ariakit,
++	DropdownMenuItemV2Ariakit,
++	DropdownMenuCheckboxItemV2Ariakit,
++	DropdownMenuRadioItemV2Ariakit,
++	DropdownMenuSeparatorV2Ariakit,
+ } );

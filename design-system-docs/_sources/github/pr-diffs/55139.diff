@@ -1,0 +1,251 @@
+diff --git a/packages/block-editor/src/components/block-tools/block-contextual-toolbar.js b/packages/block-editor/src/components/block-tools/block-contextual-toolbar.js
+index 439c3d33a30369..fcec9d56b24a8a 100644
+--- a/packages/block-editor/src/components/block-tools/block-contextual-toolbar.js
++++ b/packages/block-editor/src/components/block-tools/block-contextual-toolbar.js
+@@ -188,6 +188,7 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
+ 			className={ classes }
+ 			/* translators: accessibility text for the block toolbar */
+ 			aria-label={ __( 'Block tools' ) }
++			variant={ isFixed ? 'unstyled' : undefined }
+ 			{ ...props }
+ 		>
+ 			{ ! isCollapsed && <BlockToolbar hideDragHandle={ isFixed } /> }
+diff --git a/packages/block-editor/src/components/block-tools/style.scss b/packages/block-editor/src/components/block-tools/style.scss
+index 796c513d6d7c2c..2cb2edaf1a9c7f 100644
+--- a/packages/block-editor/src/components/block-tools/style.scss
++++ b/packages/block-editor/src/components/block-tools/style.scss
+@@ -109,7 +109,6 @@
+ 			overflow-y: hidden;
+ 		}
+ 
+-		border: none;
+ 		border-bottom: $border-width solid $gray-200;
+ 		border-radius: 0;
+ 
+diff --git a/packages/block-editor/src/components/tool-selector/index.js b/packages/block-editor/src/components/tool-selector/index.js
+index a0df14f1a19d9d..1e93a18cf6bb9e 100644
+--- a/packages/block-editor/src/components/tool-selector/index.js
++++ b/packages/block-editor/src/components/tool-selector/index.js
+@@ -51,7 +51,7 @@ function ToolSelector( props, ref ) {
+ 					label={ __( 'Tools' ) }
+ 				/>
+ 			) }
+-			popoverProps={ { placement: 'bottom-start', variant: undefined } }
++			popoverProps={ { placement: 'bottom-start' } }
+ 			renderContent={ () => (
+ 				<>
+ 					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index addb5a4d9ec327..d1d87acebaa373 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,10 @@
+ 
+ -   `ConfirmDialog`: Migrate to TypeScript. ([#54954](https://github.com/WordPress/gutenberg/pull/54954)).
+ 
++### New Features
++
++-   `Toolbar`: add new `variant` prop for 'unstyled' option ([#55139](https://github.com/WordPress/gutenberg/pull/55139)).
++
+ ## 25.9.0 (2023-10-05)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/toolbar/stories/index.story.tsx b/packages/components/src/toolbar/stories/index.story.tsx
+index 2eecf54a4a4939..e4fb3b07e1c904 100644
+--- a/packages/components/src/toolbar/stories/index.story.tsx
++++ b/packages/components/src/toolbar/stories/index.story.tsx
+@@ -52,6 +52,10 @@ const meta: Meta< typeof Toolbar > = {
+ 	},
+ 	argTypes: {
+ 		children: { control: { type: null } },
++		variant: {
++			options: [ undefined, 'unstyled' ],
++			control: { type: 'radio' },
++		},
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
+@@ -181,3 +185,14 @@ WithoutGroup.args = {
+ 		</>
+ 	),
+ };
++
++/**
++ * Set the variant to `unstyled` to remove default border styles.
++ * Otherwise, leave it as `undefined` for default styles.
++ */
++
++export const Unstyled = Template.bind( {} );
++Unstyled.args = {
++	...Default.args,
++	variant: 'unstyled',
++};
+diff --git a/packages/components/src/toolbar/test/index.tsx b/packages/components/src/toolbar/test/index.tsx
+index c9e58edc8a80e8..74c58804fc0991 100644
+--- a/packages/components/src/toolbar/test/index.tsx
++++ b/packages/components/src/toolbar/test/index.tsx
+@@ -25,5 +25,13 @@ describe( 'Toolbar', () => {
+ 				screen.getByLabelText( 'control2', { selector: 'button' } )
+ 			).toBeInTheDocument();
+ 		} );
++
++		it( 'should apply the unstyled variant correctly via the `variant` prop', () => {
++			render( <Toolbar label="blocks" variant="unstyled" /> );
++
++			expect( screen.getByRole( 'toolbar' ) ).toHaveClass(
++				'is-unstyled'
++			);
++		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/toolbar/toolbar/README.md b/packages/components/src/toolbar/toolbar/README.md
+index 6692d3f63f34e5..ee89127ded74f0 100644
+--- a/packages/components/src/toolbar/toolbar/README.md
++++ b/packages/components/src/toolbar/toolbar/README.md
+@@ -71,6 +71,15 @@ An accessible label for the toolbar.
+ 
+ -   Required: Yes
+ 
++#### `variant`: `'unstyled' | undefined`
++
++Specifies the toolbar's style.
++
++Leave undefined for the default style. Or `'unstyled'` which removes the border from the toolbar, but keeps the default popover style.
++
++-   Required: No
++-   Default: `undefined`
++
+ ## Related components
+ 
+ -   Toolbar may contain [ToolbarGroup](/packages/components/src/toolbar-group/README.md), [ToolbarButton](/packages/components/src/toolbar-button/README.md) and [ToolbarItem](/packages/components/src/toolbar-Item/README.md) as children.
+diff --git a/packages/components/src/toolbar/toolbar/index.tsx b/packages/components/src/toolbar/toolbar/index.tsx
+index b6e83dcf6da2a6..47c49b270afef2 100644
+--- a/packages/components/src/toolbar/toolbar/index.tsx
++++ b/packages/components/src/toolbar/toolbar/index.tsx
+@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
+ /**
+  * WordPress dependencies
+  */
+-import { forwardRef } from '@wordpress/element';
++import { forwardRef, useMemo } from '@wordpress/element';
+ import deprecated from '@wordpress/deprecated';
+ 
+ /**
+@@ -19,23 +19,30 @@ import type { ToolbarProps } from './types';
+ import type { WordPressComponentProps } from '../../context';
+ import { ContextSystemProvider } from '../../context';
+ 
+-const CONTEXT_SYSTEM_VALUE = {
+-	DropdownMenu: {
+-		variant: 'toolbar',
+-	},
+-	Dropdown: {
+-		variant: 'toolbar',
+-	},
+-};
+-
+ function UnforwardedToolbar(
+ 	{
+ 		className,
+ 		label,
++		variant,
+ 		...props
+ 	}: WordPressComponentProps< ToolbarProps, 'div', false >,
+ 	ref: ForwardedRef< any >
+ ) {
++	const isVariantDefined = variant !== undefined;
++	const contextSystemValue = useMemo( () => {
++		if ( isVariantDefined ) {
++			return {};
++		}
++		return {
++			DropdownMenu: {
++				variant: 'toolbar',
++			},
++			Dropdown: {
++				variant: 'toolbar',
++			},
++		};
++	}, [ isVariantDefined ] );
++
+ 	if ( ! label ) {
+ 		deprecated( 'Using Toolbar without label prop', {
+ 			since: '5.6',
+@@ -55,10 +62,12 @@ function UnforwardedToolbar(
+ 	// `ToolbarGroup` already uses components-toolbar for compatibility reasons.
+ 	const finalClassName = classnames(
+ 		'components-accessible-toolbar',
+-		className
++		className,
++		variant && `is-${ variant }`
+ 	);
++
+ 	return (
+-		<ContextSystemProvider value={ CONTEXT_SYSTEM_VALUE }>
++		<ContextSystemProvider value={ contextSystemValue }>
+ 			<ToolbarContainer
+ 				className={ finalClassName }
+ 				label={ label }
+diff --git a/packages/components/src/toolbar/toolbar/style.scss b/packages/components/src/toolbar/toolbar/style.scss
+index 53b6d8a65286b7..fa581c13cc6467 100644
+--- a/packages/components/src/toolbar/toolbar/style.scss
++++ b/packages/components/src/toolbar/toolbar/style.scss
+@@ -7,6 +7,15 @@
+ 	& > .components-toolbar-group:last-child {
+ 		border-right: none;
+ 	}
++
++	&.is-unstyled {
++		border: none;
++
++		& > .components-toolbar-group {
++			border-right: none;
++		}
++
++	}
+ }
+ 
+ .components-accessible-toolbar,
+diff --git a/packages/components/src/toolbar/toolbar/types.ts b/packages/components/src/toolbar/toolbar/types.ts
+index f6a6b9667ab4b4..681f1ab2d1af2d 100644
+--- a/packages/components/src/toolbar/toolbar/types.ts
++++ b/packages/components/src/toolbar/toolbar/types.ts
+@@ -12,4 +12,14 @@ export type ToolbarProps = {
+ 	 * An accessible label for the toolbar.
+ 	 */
+ 	label: string;
++	/**
++	 * Specifies the toolbar's style.
++	 *
++	 * Leave undefined for the default style. Or `'unstyled'` which
++	 * removes the border from the toolbar, but keeps the default
++	 * popover style.
++	 *
++	 * @default undefined
++	 */
++	variant?: 'unstyled' | undefined;
+ };
+diff --git a/packages/edit-post/src/components/header/header-toolbar/index.js b/packages/edit-post/src/components/header/header-toolbar/index.js
+index e814f7a49072ff..b86e66af7a849e 100644
+--- a/packages/edit-post/src/components/header/header-toolbar/index.js
++++ b/packages/edit-post/src/components/header/header-toolbar/index.js
+@@ -136,6 +136,7 @@ function HeaderToolbar( { setListViewToggleElement } ) {
+ 			className="edit-post-header-toolbar"
+ 			aria-label={ toolbarAriaLabel }
+ 			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
++			variant="unstyled"
+ 		>
+ 			<div className="edit-post-header-toolbar__left">
+ 				<ToolbarItem
+diff --git a/packages/edit-post/src/components/header/header-toolbar/style.scss b/packages/edit-post/src/components/header/header-toolbar/style.scss
+index 4a53be477e0258..960199a1564516 100644
+--- a/packages/edit-post/src/components/header/header-toolbar/style.scss
++++ b/packages/edit-post/src/components/header/header-toolbar/style.scss
+@@ -1,7 +1,6 @@
+ .edit-post-header-toolbar {
+ 	display: inline-flex;
+ 	align-items: center;
+-	border: none;
+ 
+ 	// Hide all action buttons except the inserter on mobile.
+ 	.edit-post-header-toolbar__left > .components-button {

@@ -1,0 +1,16 @@
+diff --git a/packages/components/src/dropdown-menu/style.scss b/packages/components/src/dropdown-menu/style.scss
+index 261662ab7256dc..e75fd4da078d37 100644
+--- a/packages/components/src/dropdown-menu/style.scss
++++ b/packages/components/src/dropdown-menu/style.scss
+@@ -34,6 +34,11 @@
+ 			height: 1px;
+ 		}
+ 
++		> svg {
++			width: $button-size-small;
++			height: $button-size-small;
++		}
++
+ 		&.is-active {
+ 			svg,
+ 			.dashicon {

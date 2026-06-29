@@ -1,0 +1,52 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6cdde409cbd176..ae191499aec769 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -3,7 +3,7 @@
+ ## Unreleased
+ 
+ ### Bug Fix
+-
++-   `InputControl`: Fix sample code on InputControl docs [#59517](https://github.com/WordPress/gutenberg/pull/59517)
+ -   `Tooltip`: Explicitly set system font to avoid CSS bleed ([#59307](https://github.com/WordPress/gutenberg/pull/59307)).
+ -   `HStack`, `VStack`: Stop passing invalid props to underlying element ([#59416](https://github.com/WordPress/gutenberg/pull/59416)).
+ -   `Button`: Fix focus outline in disabled primary variant ([#59391](https://github.com/WordPress/gutenberg/pull/59391)).
+diff --git a/packages/components/src/input-control/README.md b/packages/components/src/input-control/README.md
+index 1cde49917823ff..7af244f823516d 100644
+--- a/packages/components/src/input-control/README.md
++++ b/packages/components/src/input-control/README.md
+@@ -10,7 +10,7 @@ InputControl components let users enter and edit text. This is an experimental c
+ 
+ ```js
+ import { __experimentalInputControl as InputControl } from '@wordpress/components';
+-import { useState } from '@wordpress/compose';
++import { useState } from 'react';
+ 
+ const Example = () => {
+ 	const [ value, setValue ] = useState( '' );
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index 10297cce6fd098..be05b6d0d49b8b 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -126,7 +126,7 @@ export function UnforwardedInputControl(
+  *
+  * ```jsx
+  * import { __experimentalInputControl as InputControl } from '@wordpress/components';
+- * import { useState } from '@wordpress/compose';
++ * import { useState } from 'react';
+  *
+  * const Example = () => {
+  *   const [ value, setValue ] = useState( '' );
+diff --git a/packages/components/src/mobile/bottom-sheet-select-control/README.md b/packages/components/src/mobile/bottom-sheet-select-control/README.md
+index ed940baa53409f..7d45b7abcabba1 100644
+--- a/packages/components/src/mobile/bottom-sheet-select-control/README.md
++++ b/packages/components/src/mobile/bottom-sheet-select-control/README.md
+@@ -10,7 +10,7 @@ However, instead of opening up the selection in a modal, the selection opens up
+  * WordPress dependencies
+  */
+ import { BottomSheetSelectControl } from '@wordpress/components';
+-import { useState } from '@wordpress/compose';
++import { useState } from 'react';
+ 
+ const options = [
+ 	{

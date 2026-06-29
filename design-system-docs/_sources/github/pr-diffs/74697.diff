@@ -1,0 +1,501 @@
+diff --git a/package-lock.json b/package-lock.json
+index c46fa94bb7de3e..5cf383657d01ca 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -60688,16 +60688,6 @@
+ 				"npm": ">=8.19.2"
+ 			}
+ 		},
+-		"packages/react-native-editor/node_modules/@babel/helper-plugin-utils": {
+-			"version": "7.27.1",
+-			"resolved": "https://registry.npmjs.org/@babel/helper-plugin-utils/-/helper-plugin-utils-7.27.1.tgz",
+-			"integrity": "sha512-1gn1Up5YXka3YYAHGKpbideQ5Yjf1tDa9qYcgysz+cNCXukyLl6DjPXhD3VRwSb8c0J9tA4b2+rHEZtc6R0tlw==",
+-			"dev": true,
+-			"license": "MIT",
+-			"engines": {
+-				"node": ">=6.9.0"
+-			}
+-		},
+ 		"packages/react-native-editor/node_modules/@babel/plugin-transform-arrow-functions": {
+ 			"version": "7.27.1",
+ 			"resolved": "https://registry.npmjs.org/@babel/plugin-transform-arrow-functions/-/plugin-transform-arrow-functions-7.27.1.tgz",
+@@ -61394,6 +61384,7 @@
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/i18n": "file:../i18n",
+ 				"@wordpress/icons": "file:../icons",
++				"@wordpress/keycodes": "file:../keycodes",
+ 				"@wordpress/primitives": "file:../primitives",
+ 				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/theme": "file:../theme",
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 050e0079611dd3..ca22786a95ccd5 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -48,6 +48,7 @@
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/icons": "file:../icons",
++		"@wordpress/keycodes": "file:../keycodes",
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/theme": "file:../theme",
+diff --git a/packages/ui/src/button/stories/index.story.tsx b/packages/ui/src/button/stories/index.story.tsx
+index b2e40a50371548..d0b1fa535fd658 100644
+--- a/packages/ui/src/button/stories/index.story.tsx
++++ b/packages/ui/src/button/stories/index.story.tsx
+@@ -1,4 +1,4 @@
+-import { Fragment, useState } from '@wordpress/element';
++import { Fragment } from '@wordpress/element';
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { cog } from '@wordpress/icons';
+ import { Button } from '../index';
+@@ -166,8 +166,7 @@ export const Loading: Story = {
+ 
+ /**
+  * The pressed state is only available for buttons with `tone="neutral"` and
+- * `variant="minimal"`. This represents a toggle button that is currently in an
+- * active/pressed state.
++ * `variant="minimal"` and can be toggled via the `aria-pressed` HTML attribute.
+  */
+ export const Pressed: Story = {
+ 	...Default,
+@@ -175,18 +174,6 @@ export const Pressed: Story = {
+ 		...Default.args,
+ 		tone: 'neutral',
+ 		variant: 'minimal',
+-	},
+-	render: ( args ) => {
+-		const [ isPressed, setIsPressed ] = useState( true );
+-
+-		return (
+-			<Button
+-				{ ...args }
+-				aria-pressed={ isPressed }
+-				onClick={ () => setIsPressed( ! isPressed ) }
+-			>
+-				Button
+-			</Button>
+-		);
++		'aria-pressed': true,
+ 	},
+ };
+diff --git a/packages/ui/src/icon-button/icon-button.tsx b/packages/ui/src/icon-button/icon-button.tsx
+new file mode 100644
+index 00000000000000..2979fad9394c0e
+--- /dev/null
++++ b/packages/ui/src/icon-button/icon-button.tsx
+@@ -0,0 +1,64 @@
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { Button } from '../button';
++import { Icon } from '../icon';
++import * as Tooltip from '../tooltip';
++import styles from './style.module.css';
++import { type IconButtonProps } from './types';
++
++/**
++ * An icon-only button with automatic tooltip and optimized styling.
++ * Inherits all Button props while providing icon-specific enhancements.
++ */
++export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
++	function IconButton(
++		{
++			label,
++			className,
++			// Prevent accidental forwarding of `children`
++			children: _children,
++			icon,
++			size,
++			shortcut,
++			...restProps
++		}: IconButtonProps & { children?: unknown },
++		ref
++	) {
++		const classes = clsx( styles[ 'icon-button' ], className );
++
++		return (
++			<Tooltip.Provider delay={ 0 }>
++				<Tooltip.Root>
++					<Tooltip.Trigger
++						ref={ ref }
++						render={
++							<Button
++								{ ...restProps }
++								size={ size }
++								aria-label={ label }
++								aria-keyshortcuts={ shortcut?.ariaKeyShortcut }
++							/>
++						}
++						className={ classes }
++					>
++						<Icon
++							icon={ icon }
++							size={ size === 'small' ? 22 : 24 }
++						/>
++					</Tooltip.Trigger>
++					<Tooltip.Popup>
++						{ label }
++						{ shortcut && (
++							<>
++								{ ' ' }
++								<span aria-hidden="true">
++									{ shortcut.displayShortcut }
++								</span>
++							</>
++						) }
++					</Tooltip.Popup>
++				</Tooltip.Root>
++			</Tooltip.Provider>
++		);
++	}
++);
+diff --git a/packages/ui/src/icon-button/index.ts b/packages/ui/src/icon-button/index.ts
+new file mode 100644
+index 00000000000000..13aaf00af7a63b
+--- /dev/null
++++ b/packages/ui/src/icon-button/index.ts
+@@ -0,0 +1 @@
++export { IconButton } from './icon-button';
+diff --git a/packages/ui/src/icon-button/stories/index.story.tsx b/packages/ui/src/icon-button/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..6e3d52bd7cb27a
+--- /dev/null
++++ b/packages/ui/src/icon-button/stories/index.story.tsx
+@@ -0,0 +1,128 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import {
++	cog,
++	copy,
++	download,
++	pencil,
++	plus,
++	trash,
++	upload,
++	wordpress,
++} from '@wordpress/icons';
++import { displayShortcut, ariaKeyShortcut } from '@wordpress/keycodes';
++import { IconButton } from '../index';
++
++const meta: Meta< typeof IconButton > = {
++	title: 'Design System/Components/IconButton',
++	component: IconButton,
++	argTypes: {
++		'aria-pressed': {
++			control: { type: 'boolean' },
++		},
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof IconButton >;
++
++export const Default: Story = {
++	args: {
++		icon: cog,
++		label: 'Settings',
++	},
++};
++
++export const Outline: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		variant: 'outline',
++	},
++};
++
++export const Minimal: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		variant: 'minimal',
++	},
++};
++
++export const Neutral: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		tone: 'neutral',
++		label: 'Settings',
++	},
++};
++
++export const NeutralOutline: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		tone: 'neutral',
++		variant: 'outline',
++		label: 'Settings',
++	},
++};
++
++export const Disabled: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		disabled: true,
++		label: 'Settings',
++	},
++};
++
++export const WithDifferentIcons: Story = {
++	...Default,
++	render: ( args ) => (
++		<div
++			style={ {
++				display: 'flex',
++				gap: '1rem',
++				alignItems: 'center',
++				flexWrap: 'wrap',
++			} }
++		>
++			<IconButton { ...args } icon={ wordpress } label="WordPress" />
++			<IconButton { ...args } icon={ plus } label="Add" />
++			<IconButton { ...args } icon={ pencil } label="Edit" />
++			<IconButton { ...args } icon={ trash } label="Delete" />
++			<IconButton { ...args } icon={ download } label="Download" />
++			<IconButton { ...args } icon={ upload } label="Upload" />
++		</div>
++	),
++};
++
++/**
++ * The pressed state is only available for buttons with `tone="neutral"` and
++ * `variant="minimal"` and can be toggled via the `aria-pressed` HTML attribute.
++ */
++export const Pressed: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		tone: 'neutral',
++		variant: 'minimal',
++		label: 'Toggle Settings',
++		'aria-pressed': true,
++	},
++};
++
++const EXAMPLE_SHORTCUT_OBJECT = {
++	displayShortcut: displayShortcut.primary( 'c' ),
++	ariaKeyShortcut: ariaKeyShortcut.primary( 'c' ),
++};
++
++export const WithShortcut: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		icon: copy,
++		label: 'Copy',
++		shortcut: EXAMPLE_SHORTCUT_OBJECT,
++	},
++};
+diff --git a/packages/ui/src/icon-button/style.module.css b/packages/ui/src/icon-button/style.module.css
+new file mode 100644
+index 00000000000000..26258177253f97
+--- /dev/null
++++ b/packages/ui/src/icon-button/style.module.css
+@@ -0,0 +1,8 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-compositions {
++	.icon-button {
++		--wp-ui-button-aspect-ratio: 1;
++		--wp-ui-button-padding-inline: 0;
++	}
++}
+diff --git a/packages/ui/src/icon-button/test/index.test.tsx b/packages/ui/src/icon-button/test/index.test.tsx
+new file mode 100644
+index 00000000000000..021ff6738e5213
+--- /dev/null
++++ b/packages/ui/src/icon-button/test/index.test.tsx
+@@ -0,0 +1,86 @@
++import { render, waitFor, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { createRef } from '@wordpress/element';
++import { IconButton } from '../index';
++
++describe( 'IconButton', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLButtonElement >();
++
++		render( <IconButton ref={ ref } label="Click me" icon={ <svg /> } /> );
++
++		expect( ref.current ).toBeInstanceOf( HTMLButtonElement );
++	} );
++
++	it( 'respects custom render prop as handled by Button', () => {
++		render(
++			<IconButton
++				label="Click me"
++				icon={ <svg /> }
++				variant="outline"
++				disabled
++				focusableWhenDisabled
++				render={ <button data-testid="button" /> }
++			/>
++		);
++
++		// Should render as a button from `render` prop...
++		const button = screen.getByRole( 'button', { name: 'Click me' } );
++		expect( button ).toHaveAttribute( 'data-testid', 'button' );
++
++		// ...and still inherit the behavior of Button
++		expect( button ).toBeEnabled();
++		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
++	} );
++
++	describe( 'shortcut', () => {
++		it( 'sets aria-keyshortcuts attribute on the button', () => {
++			const { rerender } = render(
++				<IconButton
++					label="Save"
++					icon={ <svg /> }
++					shortcut={ {
++						displayShortcut: '⌘S',
++						ariaKeyShortcut: 'Meta+S',
++					} }
++				/>
++			);
++
++			const button = screen.getByRole( 'button', { name: 'Save' } );
++			expect( button ).toHaveAttribute( 'aria-keyshortcuts', 'Meta+S' );
++
++			// The aria-keyshortcuts attribute is removed when there is no
++			// `shortcut` prop.
++			rerender( <IconButton label="Save" icon={ <svg /> } /> );
++			expect( button ).not.toHaveAttribute( 'aria-keyshortcuts' );
++		} );
++
++		it( 'displays the shortcut in the tooltip but hides it from assistive technology', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<IconButton
++					label="Save"
++					icon={ <svg /> }
++					shortcut={ {
++						displayShortcut: '⌘S',
++						ariaKeyShortcut: 'Meta+S',
++					} }
++				/>
++			);
++
++			const button = screen.getByRole( 'button', { name: 'Save' } );
++			await user.hover( button );
++
++			await waitFor( () => {
++				const shortcutElement = screen.getByText( '⌘S' );
++				expect( shortcutElement ).toBeVisible();
++			} );
++
++			expect( screen.getByText( '⌘S' ) ).toHaveAttribute(
++				'aria-hidden',
++				'true'
++			);
++		} );
++	} );
++} );
+diff --git a/packages/ui/src/icon-button/types.ts b/packages/ui/src/icon-button/types.ts
+new file mode 100644
+index 00000000000000..9506310fa460fb
+--- /dev/null
++++ b/packages/ui/src/icon-button/types.ts
+@@ -0,0 +1,38 @@
++import { type ButtonProps } from '../button/types';
++import { type IconProps } from '../icon/types';
++
++export type IconButtonProps = Omit< ButtonProps, 'children' > & {
++	/**
++	 * A label describing the button's action, shown as a tooltip and to
++	 * assistive technology.
++	 */
++	label: string;
++
++	/**
++	 * The icon to display in the button.
++	 */
++	icon: IconProps[ 'icon' ];
++
++	/**
++	 * The keyboard shortcut associated with this button. When provided, the
++	 * shortcut is displayed in the tooltip and announced to assistive technology.
++	 *
++	 * **Note**: This prop is for display and accessibility purposes only — the
++	 * consumer is responsible for implementing the actual keyboard event handler.
++	 */
++	shortcut?: {
++		/**
++		 * The human-readable representation of the shortcut, displayed in the
++		 * tooltip. Use platform-appropriate symbols (e.g., "⌘S" on macOS,
++		 * "Ctrl+S" on Windows).
++		 */
++		displayShortcut: string;
++		/**
++		 * The shortcut in a format compatible with the
++		 * [aria-keyshortcuts](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts)
++		 * attribute. Use "+" to separate keys and standard key names
++		 * (e.g., "Meta+S", "Control+Shift+P").
++		 */
++		ariaKeyShortcut: string;
++	};
++};
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 38754353aebda1..dc886022898c19 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -3,6 +3,7 @@ export * from './box';
+ export * from './button';
+ export * from './form/primitives';
+ export * from './icon';
++export * from './icon-button';
+ export * from './stack';
+ export * as Tooltip from './tooltip';
+ export * from './visually-hidden';
+diff --git a/packages/ui/src/utils/types.ts b/packages/ui/src/utils/types.ts
+index 8eb9d7d26989c7..e8e9ab1f3286b9 100644
+--- a/packages/ui/src/utils/types.ts
++++ b/packages/ui/src/utils/types.ts
+@@ -1,16 +1,15 @@
+-import {
+-	type ElementType,
+-	type ComponentPropsWithoutRef,
+-	type HTMLAttributes,
+-	type Ref,
++import type {
++	ElementType,
++	ComponentPropsWithoutRef,
++	HTMLAttributes,
++	ReactElement,
++	Ref,
+ } from 'react';
+ 
+ type HTMLAttributesWithRef< T extends ElementType = any > =
+ 	HTMLAttributes< T > & { ref?: Ref< T > | undefined };
+ 
+-type ComponentRenderFn< Props > = (
+-	props: Props
+-) => React.ReactElement< unknown >;
++type ComponentRenderFn< Props > = ( props: Props ) => ReactElement< unknown >;
+ 
+ export type ComponentProps< E extends ElementType > = Omit<
+ 	ComponentPropsWithoutRef< E >,
+@@ -27,5 +26,5 @@ export type ComponentProps< E extends ElementType > = Omit<
+ 	 */
+ 	render?:
+ 		| ComponentRenderFn< HTMLAttributesWithRef >
+-		| React.ReactElement< Record< string, unknown > >;
++		| ReactElement< Record< string, unknown > >;
+ };
+diff --git a/packages/ui/tsconfig.json b/packages/ui/tsconfig.json
+index 0a2f1de667d363..e081a8873e6099 100644
+--- a/packages/ui/tsconfig.json
++++ b/packages/ui/tsconfig.json
+@@ -9,6 +9,7 @@
+ 		{ "path": "../element" },
+ 		{ "path": "../i18n" },
+ 		{ "path": "../icons" },
++		{ "path": "../keycodes" },
+ 		{ "path": "../primitives" },
+ 		{ "path": "../private-apis" },
+ 		{ "path": "../theme" }

@@ -1,0 +1,129 @@
+diff --git a/packages/block-library/src/freeform/modal.js b/packages/block-library/src/freeform/modal.js
+index aad79473b172b2..4ed4ef4d3a07ca 100644
+--- a/packages/block-library/src/freeform/modal.js
++++ b/packages/block-library/src/freeform/modal.js
+@@ -25,8 +25,7 @@ function ModalAuxiliaryActions( { onClick, isModalFullScreen } ) {
+ 
+ 	return (
+ 		<Button
+-			// TODO: Switch to `true` (40px size) if possible
+-			__next40pxDefaultSize={ false }
++			size="small"
+ 			onClick={ onClick }
+ 			icon={ fullscreen }
+ 			isPressed={ isModalFullScreen }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0293522cf9263e..8c656f4adb48bb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,10 @@
+ 
+ -   `Composite`: add stable version of the component ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
+ 
++### Enhancements
++
++-   `Modal`: Decrease close button size and remove horizontal offset ([#65131](https://github.com/WordPress/gutenberg/pull/65131)).
++
+ ### Internal
+ 
+ -   `Composite`: Remove from private APIs ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index e1f103b98c2735..7d988a0e7240b3 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -37,6 +37,7 @@ import Button from '../button';
+ import StyleProvider from '../style-provider';
+ import type { ModalProps } from './types';
+ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
++import { Spacer } from '../spacer';
+ 
+ // Used to track and dismiss the prior modal when another opens unless nested.
+ type Dismissers = Set<
+@@ -323,13 +324,21 @@ function UnforwardedModal(
+ 								</div>
+ 								{ headerActions }
+ 								{ isDismissible && (
+-									<Button
+-										onClick={ onRequestClose }
+-										icon={ close }
+-										label={
+-											closeButtonLabel || __( 'Close' )
+-										}
+-									/>
++									<>
++										<Spacer
++											marginBottom={ 0 }
++											marginLeft={ 3 }
++										/>
++										<Button
++											size="small"
++											onClick={ onRequestClose }
++											icon={ close }
++											label={
++												closeButtonLabel ||
++												__( 'Close' )
++											}
++										/>
++									</>
+ 								) }
+ 							</div>
+ 						) }
+diff --git a/packages/components/src/modal/stories/index.story.tsx b/packages/components/src/modal/stories/index.story.tsx
+index 60a53947116fac..f180de0dc06a46 100644
+--- a/packages/components/src/modal/stories/index.story.tsx
++++ b/packages/components/src/modal/stories/index.story.tsx
+@@ -7,7 +7,7 @@ import type { StoryFn, Meta } from '@storybook/react';
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
+-import { starEmpty, starFilled } from '@wordpress/icons';
++import { fullscreen } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+@@ -103,22 +103,16 @@ WithsizeSmall.args = {
+ };
+ WithsizeSmall.storyName = 'With size: small';
+ 
+-const LikeButton = () => {
+-	const [ isLiked, setIsLiked ] = useState( false );
+-	return (
+-		<Button
+-			icon={ isLiked ? starFilled : starEmpty }
+-			label="Like"
+-			onClick={ () => setIsLiked( ! isLiked ) }
+-		/>
+-	);
+-};
+-
++/**
++ * The `headerActions` prop can be used to add auxiliary actions to the header, for example a fullscreen mode toggle.
++ */
+ export const WithHeaderActions: StoryFn< typeof Modal > = Template.bind( {} );
+ WithHeaderActions.args = {
+ 	...Default.args,
+-	headerActions: <LikeButton />,
+-	isDismissible: false,
++	headerActions: (
++		<Button icon={ fullscreen } label="Fullscreen mode" size="small" />
++	),
++	children: <div style={ { height: '200px' } } />,
+ };
+ WithHeaderActions.parameters = {
+ 	...Default.parameters,
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index 47d5df116d8865..8c7c8416f0190b 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -116,11 +116,6 @@
+ 		margin: 0;
+ 	}
+ 
+-	.components-button {
+-		position: relative;
+-		left: $grid-unit-10;
+-	}
+-
+ 	.components-modal__content.has-scrolled-content:not(.hide-header) & {
+ 		border-bottom-color: $gray-300;
+ 	}

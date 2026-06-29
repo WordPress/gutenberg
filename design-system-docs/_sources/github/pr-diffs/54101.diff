@@ -1,0 +1,48 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 75b1b8077f1fbb..450d6126dc306b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -   `Composite`: Convert to TypeScript ([#54028](https://github.com/WordPress/gutenberg/pull/54028)).
+ -   `BorderControl`: Refactor unit tests to use `userEvent` ([#54155](https://github.com/WordPress/gutenberg/pull/54155))
+ -   `FocusableIframe`: Convert to TypeScript ([#53979](https://github.com/WordPress/gutenberg/pull/53979)).
++-   `Popover`: Remove unused `overlay` type from `positionToPlacement` utility function ([#54101](https://github.com/WordPress/gutenberg/pull/54101)).
+ 
+ ## 25.7.0 (2023-08-31)
+ 
+diff --git a/packages/components/src/popover/utils.ts b/packages/components/src/popover/utils.ts
+index 5833a65816c6d1..e03ef036803309 100644
+--- a/packages/components/src/popover/utils.ts
++++ b/packages/components/src/popover/utils.ts
+@@ -3,7 +3,11 @@
+  */
+ // eslint-disable-next-line no-restricted-imports
+ import type { MotionProps } from 'framer-motion';
+-import type { ReferenceType, VirtualElement } from '@floating-ui/react-dom';
++import type {
++	Placement,
++	ReferenceType,
++	VirtualElement,
++} from '@floating-ui/react-dom';
+ 
+ /**
+  * Internal dependencies
+@@ -16,7 +20,7 @@ import type {
+ 
+ const POSITION_TO_PLACEMENT: Record<
+ 	NonNullable< PopoverProps[ 'position' ] >,
+-	NonNullable< PopoverProps[ 'placement' ] >
++	Placement
+ > = {
+ 	bottom: 'bottom',
+ 	top: 'top',
+@@ -79,8 +83,7 @@ const POSITION_TO_PLACEMENT: Record<
+  */
+ export const positionToPlacement = (
+ 	position: NonNullable< PopoverProps[ 'position' ] >
+-): NonNullable< PopoverProps[ 'placement' ] > =>
+-	POSITION_TO_PLACEMENT[ position ] ?? 'bottom';
++) => POSITION_TO_PLACEMENT[ position ] ?? 'bottom';
+ 
+ /**
+  * @typedef AnimationOrigin

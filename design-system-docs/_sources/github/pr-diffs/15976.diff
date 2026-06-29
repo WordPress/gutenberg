@@ -1,0 +1,52 @@
+diff --git a/packages/block-library/src/tag-cloud/edit.js b/packages/block-library/src/tag-cloud/edit.js
+index ae653ffbfa9e98..3540fffe53498f 100644
+--- a/packages/block-library/src/tag-cloud/edit.js
++++ b/packages/block-library/src/tag-cloud/edit.js
+@@ -34,6 +34,7 @@ class TagCloudEdit extends Component {
+ 		const selectOption = {
+ 			label: __( '- Select -' ),
+ 			value: '',
++			disabled: true,
+ 		};
+ 		const taxonomyOptions = map( taxonomies, ( taxonomy ) => {
+ 			return {
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index 30fcb148ba8cc6..a43ffe4934811d 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -107,6 +107,7 @@ Render a user interface to select multiple users from a list.
+             value={ this.state.users } // e.g: value = [ 'a', 'c' ]
+             onChange={ ( users ) => { this.setState( { users } ) } }
+             options={ [
++                { value: null, label: 'Select a User', disabled: true },
+                 { value: 'a', label: 'User A' },
+                 { value: 'b', label: 'User B' },
+                 { value: 'c', label: 'User c' },
+@@ -115,7 +116,6 @@ Render a user interface to select multiple users from a list.
+ 
+ ### Props
+ 
+-
+ - The set of props accepted by the component will be specified below.
+ - Props not included in this set will be applied to the select element.
+ - One important prop to refer is `value`. If `multiple` is `true`, `value` should be an array with the values of the selected options.
+@@ -144,6 +144,7 @@ If this property is added, multiple values can be selected. The value passed sho
+ An array of objects containing the following properties:
+ - `label`: (string) The label to be shown to the user.
+ - `value`: (Object) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
++- `disabled`: (boolean) Whether or not the option should have the disabled attribute.
+ - Type: `Array`
+ - Required: No
+ 
+diff --git a/packages/components/src/select-control/index.js b/packages/components/src/select-control/index.js
+index 3d1755060e1130..cfb06c314f758e 100644
+--- a/packages/components/src/select-control/index.js
++++ b/packages/components/src/select-control/index.js
+@@ -51,6 +51,7 @@ function SelectControl( {
+ 					<option
+ 						key={ `${ option.label }-${ option.value }-${ index }` }
+ 						value={ option.value }
++						disabled={ option.disabled }
+ 					>
+ 						{ option.label }
+ 					</option>

@@ -1,0 +1,112 @@
+diff --git a/packages/components/src/button/test/index.tsx b/packages/components/src/button/test/index.tsx
+index 8161e68c4e21b6..664c755ac44043 100644
+--- a/packages/components/src/button/test/index.tsx
++++ b/packages/components/src/button/test/index.tsx
+@@ -6,19 +6,26 @@ import { render, screen } from '@testing-library/react';
+ /**
+  * WordPress dependencies
+  */
+-import { createRef } from '@wordpress/element';
++import { createRef, forwardRef } from '@wordpress/element';
+ import { plusCircle } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+  */
+-import Button from '..';
++import _Button from '..';
+ import Tooltip from '../../tooltip';
+ import cleanupTooltip from '../../tooltip/test/utils';
+ import { press } from '@ariakit/test';
+ 
+ jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
+ 
++const Button = forwardRef(
++	(
++		props: React.ComponentProps< typeof _Button >,
++		ref: React.ForwardedRef< unknown >
++	) => <_Button __next40pxDefaultSize { ...props } ref={ ref } />
++);
++
+ describe( 'Button', () => {
+ 	describe( 'basic rendering', () => {
+ 		it( 'should render a button element with only one class', () => {
+diff --git a/packages/components/src/navigator/test/index.tsx b/packages/components/src/navigator/test/index.tsx
+index cab6e9a4cdadff..07b118eaaef70d 100644
+--- a/packages/components/src/navigator/test/index.tsx
++++ b/packages/components/src/navigator/test/index.tsx
+@@ -75,6 +75,7 @@ function CustomNavigatorButton( {
+ } ) {
+ 	return (
+ 		<Navigator.Button
++			__next40pxDefaultSize
+ 			onClick={ () => {
+ 				// Used to spy on the values passed to `navigator.goTo`.
+ 				onClick?.( { type: 'goTo', path } );
+@@ -95,6 +96,7 @@ function CustomNavigatorGoToBackButton( {
+ 	const { goTo } = useNavigator();
+ 	return (
+ 		<Button
++			__next40pxDefaultSize
+ 			onClick={ () => {
+ 				goTo( path, { isBack: true } );
+ 				// Used to spy on the values passed to `navigator.goTo`.
+@@ -115,6 +117,7 @@ function CustomNavigatorGoToSkipFocusButton( {
+ 	const { goTo } = useNavigator();
+ 	return (
+ 		<Button
++			__next40pxDefaultSize
+ 			onClick={ () => {
+ 				goTo( path, { skipFocus: true } );
+ 				// Used to spy on the values passed to `navigator.goTo`.
+@@ -136,6 +139,7 @@ function CustomNavigatorBackButton( {
+ } ) {
+ 	return (
+ 		<Navigator.BackButton
++			__next40pxDefaultSize
+ 			onClick={ () => {
+ 				// Used to spy on the values passed to `navigator.goBack`.
+ 				onClick?.( { type: 'goBack' } );
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 91e9f291ddf018..18837ae79a325a 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -357,7 +357,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+     </div>
+   </div>
+   <button
+-    class="components-button"
++    class="components-button is-next-40px-default-size"
+     type="button"
+   >
+     Reset
+@@ -626,7 +626,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+     </div>
+   </div>
+   <button
+-    class="components-button"
++    class="components-button is-next-40px-default-size"
+     type="button"
+   >
+     Reset
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index 44cfda69c423cf..28928a9735a378 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -57,9 +57,15 @@ const ControlledToggleGroupControl = ( {
+ 				} }
+ 				value={ value }
+ 			/>
+-			<Button onClick={ () => setValue( undefined ) }>Reset</Button>
++			<Button
++				onClick={ () => setValue( undefined ) }
++				__next40pxDefaultSize
++			>
++				Reset
++			</Button>
+ 			{ extraButtonOptions?.map( ( obj ) => (
+ 				<Button
++					__next40pxDefaultSize
+ 					key={ obj.value }
+ 					onClick={ () => setValue( obj.value ) }
+ 				>

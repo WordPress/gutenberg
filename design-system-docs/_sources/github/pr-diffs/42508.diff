@@ -1,0 +1,345 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index a5c1d80254f7c7..6d91043574dd91 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -106,6 +106,7 @@ module.exports = {
+ 							'isNumber',
+ 							'isObject',
+ 							'isObjectLike',
++							'isPlainObject',
+ 							'isString',
+ 							'isUndefined',
+ 							'keyBy',
+diff --git a/package-lock.json b/package-lock.json
+index 8b37b070930571..2a6eda78081483 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -16653,6 +16653,7 @@
+ 				"@wordpress/shortcode": "file:packages/shortcode",
+ 				"colord": "^2.7.0",
+ 				"hpq": "^1.3.0",
++				"is-plain-obj": "^4.1.0",
+ 				"lodash": "^4.17.21",
+ 				"memize": "^1.1.0",
+ 				"rememo": "^4.0.0",
+@@ -16889,6 +16890,7 @@
+ 				"@wordpress/priority-queue": "file:packages/priority-queue",
+ 				"@wordpress/redux-routine": "file:packages/redux-routine",
+ 				"equivalent-key-map": "^0.2.2",
++				"is-plain-obj": "^4.1.0",
+ 				"is-promise": "^4.0.0",
+ 				"lodash": "^4.17.21",
+ 				"redux": "^4.1.2",
+@@ -17180,6 +17182,7 @@
+ 				"@types/react": "^17.0.37",
+ 				"@types/react-dom": "^17.0.11",
+ 				"@wordpress/escape-html": "file:packages/escape-html",
++				"is-plain-obj": "^4.1.0",
+ 				"lodash": "^4.17.21",
+ 				"react": "^17.0.2",
+ 				"react-dom": "^17.0.2"
+@@ -17745,6 +17748,7 @@
+ 			"version": "file:packages/redux-routine",
+ 			"requires": {
+ 				"@babel/runtime": "^7.16.0",
++				"is-plain-obj": "^4.1.0",
+ 				"is-promise": "^4.0.0",
+ 				"lodash": "^4.17.21",
+ 				"rungen": "^0.3.2"
+@@ -38668,10 +38672,9 @@
+ 			}
+ 		},
+ 		"is-plain-obj": {
+-			"version": "1.1.0",
+-			"resolved": "https://registry.npmjs.org/is-plain-obj/-/is-plain-obj-1.1.0.tgz",
+-			"integrity": "sha1-caUMhCnfync8kqOQpKA7OfzVHT4=",
+-			"dev": true
++			"version": "4.1.0",
++			"resolved": "https://registry.npmjs.org/is-plain-obj/-/is-plain-obj-4.1.0.tgz",
++			"integrity": "sha512-+Pgi+vMuUNkJyExiMBt5IlFoMyKnr5zhJ4Uspz58WOhBF5QoIZkFyNHIbBAtHwzVAgk5RtndVNsDRN61/mmDqg=="
+ 		},
+ 		"is-plain-object": {
+ 			"version": "2.0.4",
+@@ -44360,6 +44363,14 @@
+ 						"arrify": "^1.0.1",
+ 						"is-plain-obj": "^1.1.0",
+ 						"kind-of": "^6.0.3"
++					},
++					"dependencies": {
++						"is-plain-obj": {
++							"version": "1.1.0",
++							"resolved": "https://registry.npmjs.org/is-plain-obj/-/is-plain-obj-1.1.0.tgz",
++							"integrity": "sha512-yvkRyxmFKEOQ4pNXCmJG5AEQNlXJS5LaONXo5/cLdTZdWvsZ1ioJEonLGAosKlMWE8lwUy/bJzMjcw8az73+Fg==",
++							"dev": true
++						}
+ 					}
+ 				},
+ 				"normalize-package-data": {
+@@ -45703,6 +45714,14 @@
+ 			"requires": {
+ 				"arrify": "^1.0.1",
+ 				"is-plain-obj": "^1.1.0"
++			},
++			"dependencies": {
++				"is-plain-obj": {
++					"version": "1.1.0",
++					"resolved": "https://registry.npmjs.org/is-plain-obj/-/is-plain-obj-1.1.0.tgz",
++					"integrity": "sha512-yvkRyxmFKEOQ4pNXCmJG5AEQNlXJS5LaONXo5/cLdTZdWvsZ1ioJEonLGAosKlMWE8lwUy/bJzMjcw8az73+Fg==",
++					"dev": true
++				}
+ 			}
+ 		},
+ 		"minipass": {
+@@ -54034,6 +54053,14 @@
+ 			"dev": true,
+ 			"requires": {
+ 				"is-plain-obj": "^1.0.0"
++			},
++			"dependencies": {
++				"is-plain-obj": {
++					"version": "1.1.0",
++					"resolved": "https://registry.npmjs.org/is-plain-obj/-/is-plain-obj-1.1.0.tgz",
++					"integrity": "sha512-yvkRyxmFKEOQ4pNXCmJG5AEQNlXJS5LaONXo5/cLdTZdWvsZ1ioJEonLGAosKlMWE8lwUy/bJzMjcw8az73+Fg==",
++					"dev": true
++				}
+ 			}
+ 		},
+ 		"source-list-map": {
+@@ -55846,6 +55873,14 @@
+ 						"arrify": "^1.0.1",
+ 						"is-plain-obj": "^1.1.0",
+ 						"kind-of": "^6.0.3"
++					},
++					"dependencies": {
++						"is-plain-obj": {
++							"version": "1.1.0",
++							"resolved": "https://registry.npmjs.org/is-plain-obj/-/is-plain-obj-1.1.0.tgz",
++							"integrity": "sha512-yvkRyxmFKEOQ4pNXCmJG5AEQNlXJS5LaONXo5/cLdTZdWvsZ1ioJEonLGAosKlMWE8lwUy/bJzMjcw8az73+Fg==",
++							"dev": true
++						}
+ 					}
+ 				},
+ 				"ms": {
+@@ -57591,6 +57626,14 @@
+ 				"trough": "^1.0.0",
+ 				"vfile": "^3.0.0",
+ 				"x-is-string": "^0.1.0"
++			},
++			"dependencies": {
++				"is-plain-obj": {
++					"version": "1.1.0",
++					"resolved": "https://registry.npmjs.org/is-plain-obj/-/is-plain-obj-1.1.0.tgz",
++					"integrity": "sha512-yvkRyxmFKEOQ4pNXCmJG5AEQNlXJS5LaONXo5/cLdTZdWvsZ1ioJEonLGAosKlMWE8lwUy/bJzMjcw8az73+Fg==",
++					"dev": true
++				}
+ 			}
+ 		},
+ 		"union-value": {
+diff --git a/packages/blocks/package.json b/packages/blocks/package.json
+index 7cbb0e9673bfaf..b756451e81990c 100644
+--- a/packages/blocks/package.json
++++ b/packages/blocks/package.json
+@@ -43,6 +43,7 @@
+ 		"@wordpress/shortcode": "file:../shortcode",
+ 		"colord": "^2.7.0",
+ 		"hpq": "^1.3.0",
++		"is-plain-obj": "^4.1.0",
+ 		"lodash": "^4.17.21",
+ 		"memize": "^1.1.0",
+ 		"rememo": "^4.0.0",
+diff --git a/packages/blocks/src/store/actions.js b/packages/blocks/src/store/actions.js
+index 141fd9e79d4310..0ef38acfc2e0c5 100644
+--- a/packages/blocks/src/store/actions.js
++++ b/packages/blocks/src/store/actions.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { castArray, isPlainObject, omit, pick, some } from 'lodash';
++import isPlainObject from 'is-plain-obj';
++import { castArray, omit, pick, some } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/text/hook.js b/packages/components/src/text/hook.js
+index c914293c70e5e4..7a83bc9c336999 100644
+--- a/packages/components/src/text/hook.js
++++ b/packages/components/src/text/hook.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { css } from '@emotion/react';
+-import { isPlainObject } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -167,8 +166,11 @@ export default function useText( props ) {
+ 	 */
+ 	if ( ! truncate && Array.isArray( children ) ) {
+ 		content = Children.map( children, ( child ) => {
+-			// @ts-ignore
+-			if ( ! isPlainObject( child ) || ! ( 'props' in child ) ) {
++			if (
++				typeof child !== 'object' ||
++				child === null ||
++				! ( 'props' in child )
++			) {
+ 				return child;
+ 			}
+ 
+diff --git a/packages/data/package.json b/packages/data/package.json
+index 7f50bbd8383b00..5aeadf1ed6bf66 100644
+--- a/packages/data/package.json
++++ b/packages/data/package.json
+@@ -35,6 +35,7 @@
+ 		"@wordpress/priority-queue": "file:../priority-queue",
+ 		"@wordpress/redux-routine": "file:../redux-routine",
+ 		"equivalent-key-map": "^0.2.2",
++		"is-plain-obj": "^4.1.0",
+ 		"is-promise": "^4.0.0",
+ 		"lodash": "^4.17.21",
+ 		"redux": "^4.1.2",
+diff --git a/packages/data/src/plugins/persistence/index.js b/packages/data/src/plugins/persistence/index.js
+index 3029b459b3ad91..a9eb1d21bd1e9e 100644
+--- a/packages/data/src/plugins/persistence/index.js
++++ b/packages/data/src/plugins/persistence/index.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { merge, isPlainObject } from 'lodash';
++import isPlainObject from 'is-plain-obj';
++import { merge } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/element/package.json b/packages/element/package.json
+index 769dfcfa44c7ac..051b396793abbe 100644
+--- a/packages/element/package.json
++++ b/packages/element/package.json
+@@ -32,6 +32,7 @@
+ 		"@types/react": "^17.0.37",
+ 		"@types/react-dom": "^17.0.11",
+ 		"@wordpress/escape-html": "file:../escape-html",
++		"is-plain-obj": "^4.1.0",
+ 		"lodash": "^4.17.21",
+ 		"react": "^17.0.2",
+ 		"react-dom": "^17.0.2"
+diff --git a/packages/element/src/serialize.js b/packages/element/src/serialize.js
+index 9e14a089f8eb4c..dd3d26b6c4b8f9 100644
+--- a/packages/element/src/serialize.js
++++ b/packages/element/src/serialize.js
+@@ -28,7 +28,8 @@
+ /**
+  * External dependencies
+  */
+-import { kebabCase, isPlainObject } from 'lodash';
++import isPlainObject from 'is-plain-obj';
++import { kebabCase } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/npm-package-json-lint-config/test/index.test.js b/packages/npm-package-json-lint-config/test/index.test.js
+index 16dd989d61fd36..15733d7d0198c7 100644
+--- a/packages/npm-package-json-lint-config/test/index.test.js
++++ b/packages/npm-package-json-lint-config/test/index.test.js
+@@ -1,17 +1,13 @@
++/**
++ * External dependencies
++ */
++import isPlainObject from 'is-plain-obj';
++
+ /**
+  * Internal dependencies
+  */
+ import config from '../';
+ 
+-const isPlainObject = ( obj ) => {
+-	return (
+-		typeof obj === 'object' &&
+-		obj !== null &&
+-		obj.constructor === Object &&
+-		Object.prototype.toString.call( obj ) === '[object Object]'
+-	);
+-};
+-
+ describe( 'npm-package-json-lint config tests', () => {
+ 	it( 'should be an object', () => {
+ 		expect( isPlainObject( config ) ).toBeTruthy();
+diff --git a/packages/prettier-config/test/index.js b/packages/prettier-config/test/index.js
+index 991ed5d3bbe5e4..13b136107db884 100644
+--- a/packages/prettier-config/test/index.js
++++ b/packages/prettier-config/test/index.js
+@@ -1,17 +1,13 @@
++/**
++ * External dependencies
++ */
++import isPlainObject from 'is-plain-obj';
++
+ /**
+  * Internal dependencies
+  */
+ import config from '../lib/';
+ 
+-const isPlainObject = ( obj ) => {
+-	return (
+-		typeof obj === 'object' &&
+-		obj !== null &&
+-		obj.constructor === Object &&
+-		Object.prototype.toString.call( obj ) === '[object Object]'
+-	);
+-};
+-
+ describe( 'prettier config tests', () => {
+ 	it( 'should be an object', () => {
+ 		expect( isPlainObject( config ) ).toBeTruthy();
+diff --git a/packages/redux-routine/package.json b/packages/redux-routine/package.json
+index f99a2f87d8b753..321d66b563649e 100644
+--- a/packages/redux-routine/package.json
++++ b/packages/redux-routine/package.json
+@@ -30,6 +30,7 @@
+ 	"sideEffects": false,
+ 	"dependencies": {
+ 		"@babel/runtime": "^7.16.0",
++		"is-plain-obj": "^4.1.0",
+ 		"is-promise": "^4.0.0",
+ 		"lodash": "^4.17.21",
+ 		"rungen": "^0.3.2"
+diff --git a/packages/redux-routine/src/is-action.js b/packages/redux-routine/src/is-action.js
+index bcabab4e07a88b..cdd59c8cd63d25 100644
+--- a/packages/redux-routine/src/is-action.js
++++ b/packages/redux-routine/src/is-action.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isPlainObject } from 'lodash';
++import isPlainObject from 'is-plain-obj';
+ 
+ /* eslint-disable jsdoc/valid-types */
+ /**
+diff --git a/test/native/jest.config.js b/test/native/jest.config.js
+index a6ccf676882fb2..0a7bf84287f421 100644
+--- a/test/native/jest.config.js
++++ b/test/native/jest.config.js
+@@ -65,7 +65,7 @@ module.exports = {
+ 		// See: https://github.com/wordpress-mobile/gutenberg-mobile/pull/257#discussion_r234978268
+ 		// There is no overloading in jest so we need to rewrite the config from react-native-jest-preset:
+ 		// https://github.com/facebook/react-native/blob/HEAD/jest-preset.json#L20
+-		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|@react-native|react-clone-referenced-element|@react-navigation))',
++		'node_modules/(?!(simple-html-tokenizer|is-plain-obj|(jest-)?react-native|@react-native|react-clone-referenced-element|@react-navigation))',
+ 	],
+ 	snapshotSerializers: [ '@emotion/jest/serializer' ],
+ 	reporters: [ 'default', 'jest-junit' ],
+diff --git a/test/unit/jest.config.js b/test/unit/jest.config.js
+index c430aae0ed244c..2294974ffea32a 100644
+--- a/test/unit/jest.config.js
++++ b/test/unit/jest.config.js
+@@ -36,6 +36,7 @@ module.exports = {
+ 	transform: {
+ 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
+ 	},
++	transformIgnorePatterns: [ 'node_modules/(?!(is-plain-obj))' ],
+ 	snapshotSerializers: [
+ 		'enzyme-to-json/serializer',
+ 		'@emotion/jest/serializer',

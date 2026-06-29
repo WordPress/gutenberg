@@ -1,0 +1,84 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7ac88b7cab5124..2206e37b3e9534 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ ### Internal
+ 
+ -   `NavigationMenu` updated to ignore `react/exhaustive-deps` eslint rule ([#44090](https://github.com/WordPress/gutenberg/pull/44090)).
++-   `UnitControl` updated to pass the `react/exhaustive-deps` eslint rule ([#44161](https://github.com/WordPress/gutenberg/pull/44161)).
+ 
+ ## 21.0.0 (2022-09-13)
+ 
+diff --git a/packages/components/src/unit-control/index.native.js b/packages/components/src/unit-control/index.native.js
+index d6f63f0a98447c..a4c0b913f53432 100644
+--- a/packages/components/src/unit-control/index.native.js
++++ b/packages/components/src/unit-control/index.native.js
+@@ -47,6 +47,10 @@ function UnitControl( {
+ 		if ( pickerRef?.current ) {
+ 			pickerRef.current.presentPicker();
+ 		}
++		// Disable reason: this should be fixed by the native team.
++		// It would be great if this could be done in the context of
++		// https://github.com/WordPress/gutenberg/pull/39218
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ pickerRef?.current ] );
+ 
+ 	const currentInputValue = currentInput === null ? value : currentInput;
+@@ -102,6 +106,10 @@ function UnitControl( {
+ 			anchorNodeRef?.current
+ 				? findNodeHandle( anchorNodeRef?.current )
+ 				: undefined,
++		// Disable reason: this should be fixed by the native team.
++		// It would be great if this could be done in the context of
++		// https://github.com/WordPress/gutenberg/pull/39218
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 		[ anchorNodeRef?.current ]
+ 	);
+ 
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 5a3d0967d9b022..a3416d3005e27f 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -100,7 +100,7 @@ function UnforwardedUnitControl(
+ 		if ( parsedUnit !== undefined ) {
+ 			setUnit( parsedUnit );
+ 		}
+-	}, [ parsedUnit ] );
++	}, [ parsedUnit, setUnit ] );
+ 
+ 	// Stores parsed value for hand-off in state reducer.
+ 	const refParsedQuantity = useRef< number | undefined >( undefined );
+diff --git a/packages/components/src/utils/hooks/use-controlled-state.js b/packages/components/src/utils/hooks/use-controlled-state.js
+index 18a8174e68bb52..6075ad73d463ed 100644
+--- a/packages/components/src/utils/hooks/use-controlled-state.js
++++ b/packages/components/src/utils/hooks/use-controlled-state.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useEffect, useState } from '@wordpress/element';
++import { useEffect, useState, useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -70,11 +70,14 @@ function useControlledState( currentState, options = defaultOptions ) {
+ 
+ 	/* eslint-disable jsdoc/no-undefined-types */
+ 	/** @type {(nextState: T) => void} */
+-	const setState = ( nextState ) => {
+-		if ( ! hasCurrentState ) {
+-			setInternalState( nextState );
+-		}
+-	};
++	const setState = useCallback(
++		( nextState ) => {
++			if ( ! hasCurrentState ) {
++				setInternalState( nextState );
++			}
++		},
++		[ hasCurrentState ]
++	);
+ 	/* eslint-enable jsdoc/no-undefined-types */
+ 
+ 	return [ state, setState ];

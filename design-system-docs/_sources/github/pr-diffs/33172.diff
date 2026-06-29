@@ -1,0 +1,259 @@
+diff --git a/package-lock.json b/package-lock.json
+index ca2d654ff162ae..95e38971c05a1b 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -13932,6 +13932,7 @@
+ 				"@emotion/css": "^11.1.3",
+ 				"@emotion/react": "^11.1.5",
+ 				"@emotion/styled": "^11.3.0",
++				"@emotion/utils": "1.0.0",
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
+ 				"@wordpress/date": "file:packages/date",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index d96ff912be264d..603a19b922bfb5 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -34,6 +34,7 @@
+ 		"@emotion/css": "^11.1.3",
+ 		"@emotion/react": "^11.1.5",
+ 		"@emotion/styled": "^11.3.0",
++		"@emotion/utils": "1.0.0",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/date": "file:../date",
+diff --git a/packages/components/src/utils/hooks/index.js b/packages/components/src/utils/hooks/index.js
+index 187718e5e70a9a..bc7c1f9fb4b21b 100644
+--- a/packages/components/src/utils/hooks/index.js
++++ b/packages/components/src/utils/hooks/index.js
+@@ -2,3 +2,4 @@ export { default as useControlledState } from './use-controlled-state';
+ export { default as useJumpStep } from './use-jump-step';
+ export { default as useUpdateEffect } from './use-update-effect';
+ export { useControlledValue } from './use-controlled-value';
++export { useCx } from './use-cx';
+diff --git a/packages/components/src/utils/hooks/stories/use-cx.js b/packages/components/src/utils/hooks/stories/use-cx.js
+new file mode 100644
+index 00000000000000..96532565b03899
+--- /dev/null
++++ b/packages/components/src/utils/hooks/stories/use-cx.js
+@@ -0,0 +1,79 @@
++/**
++ * Internal dependencies
++ */
++import { useCx } from '..';
++import StyleProvider from '../../../style-provider';
++
++/**
++ * WordPress dependencies
++ */
++import { useState, createPortal } from '@wordpress/element';
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++
++export default {
++	title: 'Components (Experimental)/useCx',
++};
++
++const IFrame = ( { children } ) => {
++	const [ iframeDocument, setIframeDocument ] = useState();
++
++	const handleRef = ( node ) => {
++		if ( ! node ) {
++			return null;
++		}
++
++		function setIfReady() {
++			const { contentDocument } = node;
++			const { readyState } = contentDocument;
++
++			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
++				return false;
++			}
++
++			setIframeDocument( contentDocument );
++		}
++
++		if ( setIfReady() ) {
++			return;
++		}
++
++		node.addEventListener( 'load', () => {
++			// iframe isn't immediately ready in Firefox
++			setIfReady();
++		} );
++	};
++
++	return (
++		<iframe ref={ handleRef } title="use-cx-test-frame">
++			{ iframeDocument &&
++				createPortal(
++					<StyleProvider document={ iframeDocument }>
++						{ children }
++					</StyleProvider>,
++					iframeDocument.body
++				) }
++		</iframe>
++	);
++};
++
++const Example = ( { args, children } ) => {
++	const cx = useCx();
++	const classes = cx( ...args );
++	return <span className={ classes }>{ children }</span>;
++};
++
++export const _default = () => {
++	const redText = css`
++		color: red;
++	`;
++	return (
++		<IFrame>
++			<Example args={ [ redText ] }>
++				This text is inside an iframe and is red!
++			</Example>
++		</IFrame>
++	);
++};
+diff --git a/packages/components/src/utils/hooks/test/use-cx.js b/packages/components/src/utils/hooks/test/use-cx.js
+new file mode 100644
+index 00000000000000..181e0beeca2a41
+--- /dev/null
++++ b/packages/components/src/utils/hooks/test/use-cx.js
+@@ -0,0 +1,64 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import { cx as innerCx } from '@emotion/css';
++import { insertStyles } from '@emotion/utils';
++import { render } from '@testing-library/react';
++import { css, CacheProvider } from '@emotion/react';
++import createCache from '@emotion/cache';
++
++/**
++ * Internal dependencies
++ */
++import { useCx } from '..';
++
++jest.mock( '@emotion/css', () => ( {
++	cx: jest.fn(),
++} ) );
++
++jest.mock( '@emotion/utils', () => ( {
++	insertStyles: jest.fn(),
++} ) );
++
++function Example( { args } ) {
++	const cx = useCx();
++
++	return <div className={ cx( ...args ) } />;
++}
++
++describe( 'useCx', () => {
++	it( 'should call cx with the built style name and pass serialized styles to insertStyles', () => {
++		const serializedStyle = css`
++			color: red;
++		`;
++		const className = 'component-example';
++		const object = {
++			'component-example-focused': true,
++		};
++
++		const key = 'test-cache-key';
++
++		const container = document.createElement( 'head' );
++
++		const cache = createCache( { container, key } );
++
++		render(
++			<CacheProvider value={ cache }>
++				<Example args={ [ className, serializedStyle, object ] } />
++			</CacheProvider>
++		);
++
++		expect( innerCx ).toHaveBeenCalledWith(
++			className,
++			`${ key }-${ serializedStyle.name }`,
++			object
++		);
++
++		expect( insertStyles ).toHaveBeenCalledWith(
++			cache,
++			serializedStyle,
++			false
++		);
++	} );
++} );
+diff --git a/packages/components/src/utils/hooks/use-cx.ts b/packages/components/src/utils/hooks/use-cx.ts
+new file mode 100644
+index 00000000000000..0642745c743c6c
+--- /dev/null
++++ b/packages/components/src/utils/hooks/use-cx.ts
+@@ -0,0 +1,65 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Context } from 'react';
++import { CacheProvider, EmotionCache } from '@emotion/react';
++import type { SerializedStyles } from '@emotion/serialize';
++import { insertStyles } from '@emotion/utils';
++// eslint-disable-next-line no-restricted-imports
++import { cx as innerCx, ClassNamesArg } from '@emotion/css';
++
++/**
++ * WordPress dependencies
++ */
++import { useContext, useCallback } from '@wordpress/element';
++
++// @ts-ignore Private property
++const EmotionCacheContext: Context< EmotionCache > = CacheProvider._context;
++
++const useEmotionCacheContext = () => useContext( EmotionCacheContext );
++
++const isSerializedStyles = ( o: any ): o is SerializedStyles =>
++	[ 'name', 'styles' ].every( ( p ) => typeof o[ p ] !== 'undefined' );
++
++/**
++ * Retrieve a `cx` function that knows how to handle `SerializedStyles`
++ * returned by the `@emotion/react` `css` function in addition to what
++ * `cx` normally knows how to handle. It also hooks into the Emotion
++ * Cache, allowing `css` calls to work inside iframes.
++ *
++ * @example
++ * import { css } from '@emotion/react';
++ *
++ * const styles = css`
++ * 	color: red
++ * `;
++ *
++ * function RedText( { className, ...props } ) {
++ * 	const cx = useCx();
++ *
++ * 	const classes = cx(styles, className);
++ *
++ * 	return <span className={classes} {...props} />;
++ * }
++ */
++export const useCx = () => {
++	const cache = useEmotionCacheContext();
++
++	const cx = useCallback(
++		( ...classNames: ( ClassNamesArg | SerializedStyles )[] ) => {
++			return innerCx(
++				...classNames.map( ( arg ) => {
++					if ( isSerializedStyles( arg ) ) {
++						insertStyles( cache, arg, false );
++						return `${ cache.key }-${ arg.name }`;
++					}
++					return arg;
++				} )
++			);
++		},
++		[ cache ]
++	);
++
++	return cx;
++};

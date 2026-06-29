@@ -1,0 +1,1968 @@
+diff --git a/packages/block-editor/README.md b/packages/block-editor/README.md
+index e948b3f192b993..c4b06eef5ee154 100644
+--- a/packages/block-editor/README.md
++++ b/packages/block-editor/README.md
+@@ -287,7 +287,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `JSX.Element`: Block title.
++-   `React.JSX.Element`: Block title.
+ 
+ ### BlockToolbar
+ 
+@@ -838,11 +838,11 @@ _Parameters_
+ -   _props_ `Object`:
+ -   _props.uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
+ -   _props.blockName_ `string`: Optional block name.
+--   _props.children_ `JSX.Element`: React children.
++-   _props.children_ `React.JSX.Element`: React children.
+ 
+ _Returns_
+ 
+--   `JSX.Element`: A React element.
++-   `React.JSX.Element`: A React element.
+ 
+ ### RichText
+ 
+diff --git a/packages/block-editor/src/components/autocomplete/index.js b/packages/block-editor/src/components/autocomplete/index.js
+index 91cc3aa4e7cf03..578f7d6b50b211 100644
+--- a/packages/block-editor/src/components/autocomplete/index.js
++++ b/packages/block-editor/src/components/autocomplete/index.js
+@@ -66,7 +66,7 @@ export function useBlockEditorAutocompleteProps( props ) {
+  * Wrap the default Autocomplete component with one that supports a filter hook
+  * for customizing its list of autocompleters.
+  *
+- * @type {import('react').FC}
++ * @type {React.FC}
+  */
+ function BlockEditorAutocomplete( props ) {
+ 	return <Autocomplete { ...props } completers={ useCompleters( props ) } />;
+diff --git a/packages/block-editor/src/components/block-context/index.js b/packages/block-editor/src/components/block-context/index.js
+index 329aa3f843bfcf..f3a6eb85e87c16 100644
+--- a/packages/block-editor/src/components/block-context/index.js
++++ b/packages/block-editor/src/components/block-context/index.js
+@@ -3,7 +3,7 @@
+  */
+ import { createContext, useContext, useMemo } from '@wordpress/element';
+ 
+-/** @typedef {import('react').ReactNode} ReactNode */
++/** @typedef {React.ReactNode} ReactNode */
+ 
+ /**
+  * @typedef BlockContextProviderProps
+@@ -13,7 +13,7 @@ import { createContext, useContext, useMemo } from '@wordpress/element';
+  * @property {ReactNode}        children Component children.
+  */
+ 
+-/** @type {import('react').Context<Record<string,*>>} */
++/** @type {React.Context<Record<string,*>>} */
+ const Context = createContext( {} );
+ Context.displayName = 'BlockContext';
+ 
+diff --git a/packages/block-editor/src/components/block-draggable/draggable-chip.native.js b/packages/block-editor/src/components/block-draggable/draggable-chip.native.js
+index 597279fc03d24e..56d28c06cf382b 100644
+--- a/packages/block-editor/src/components/block-draggable/draggable-chip.native.js
++++ b/packages/block-editor/src/components/block-draggable/draggable-chip.native.js
+@@ -32,7 +32,7 @@ const shadowStyle = {
+  *
+  * @param {Object} props        Component props.
+  * @param {Object} [props.icon] Block icon.
+- * @return {JSX.Element} Chip component.
++ * @return {React.JSX.Element} Chip component.
+  */
+ export default function BlockDraggableChip( { icon } ) {
+ 	const containerStyle = usePreferredColorSchemeStyle(
+diff --git a/packages/block-editor/src/components/block-draggable/dropping-insertion-point.native.js b/packages/block-editor/src/components/block-draggable/dropping-insertion-point.native.js
+index 4ffbdbd1b8ac3f..b15565e72107b7 100644
+--- a/packages/block-editor/src/components/block-draggable/dropping-insertion-point.native.js
++++ b/packages/block-editor/src/components/block-draggable/dropping-insertion-point.native.js
+@@ -37,7 +37,7 @@ import styles from './dropping-insertion-point.scss';
+  * @param {import('react-native-reanimated').SharedValue} props.isDragging       Whether or not dragging has started.
+  * @param {import('react-native-reanimated').SharedValue} props.targetBlockIndex Current block target index.
+  *
+- * @return {JSX.Element} The component to be rendered.
++ * @return {React.JSX.Element} The component to be rendered.
+  */
+ export default function DroppingInsertionPoint( {
+ 	scroll,
+diff --git a/packages/block-editor/src/components/block-draggable/index.native.js b/packages/block-editor/src/components/block-draggable/index.native.js
+index 6128bf0cb179a2..9edd5ab1957704 100644
+--- a/packages/block-editor/src/components/block-draggable/index.native.js
++++ b/packages/block-editor/src/components/block-draggable/index.native.js
+@@ -60,9 +60,9 @@ const DEFAULT_IOS_LONG_PRESS_MIN_DURATION =
+  * that should be attached to the list that renders the blocks.
+  *
+  *
+- * @param {Object}      props          Component props.
+- * @param {JSX.Element} props.children Children to be rendered.
+- * @param {boolean}     props.isRTL    Check if current locale is RTL.
++ * @param {Object}            props          Component props.
++ * @param {React.JSX.Element} props.children Children to be rendered.
++ * @param {boolean}           props.isRTL    Check if current locale is RTL.
+  *
+  * @return {Function} Render function that passes `onScroll` event handler.
+  */
+@@ -342,12 +342,12 @@ function useIsEditingText() {
+  * This component serves for animating the block when it is being dragged.
+  * Hence, it should be wrapped around the rendering of a block.
+  *
+- * @param {Object}      props                    Component props.
+- * @param {JSX.Element} props.children           Children to be rendered.
+- * @param {string}      props.clientId           Client id of the block.
+- * @param {string}      [props.draggingClientId] Client id to use for dragging. If not defined, the value from `clientId` will be used.
+- * @param {boolean}     [props.enabled]          Enables the draggable trigger.
+- * @param {string}      [props.testID]           Id used for querying the long-press gesture handler in tests.
++ * @param {Object}            props                    Component props.
++ * @param {React.JSX.Element} props.children           Children to be rendered.
++ * @param {string}            props.clientId           Client id of the block.
++ * @param {string}            [props.draggingClientId] Client id to use for dragging. If not defined, the value from `clientId` will be used.
++ * @param {boolean}           [props.enabled]          Enables the draggable trigger.
++ * @param {string}            [props.testID]           Id used for querying the long-press gesture handler in tests.
+  *
+  * @return {Function} Render function which includes the parameter `isDraggable` to determine if the block can be dragged.
+  */
+diff --git a/packages/block-editor/src/components/block-heading-level-dropdown/heading-level-icon.js b/packages/block-editor/src/components/block-heading-level-dropdown/heading-level-icon.js
+index 397b1a27e65253..86deee1202fb41 100644
+--- a/packages/block-editor/src/components/block-heading-level-dropdown/heading-level-icon.js
++++ b/packages/block-editor/src/components/block-heading-level-dropdown/heading-level-icon.js
+@@ -12,7 +12,7 @@ import {
+ } from '@wordpress/icons';
+ import { Icon } from '@wordpress/components';
+ 
+-/** @typedef {import('react').ComponentType} ComponentType */
++/** @typedef {React.ComponentType} ComponentType */
+ 
+ /**
+  * HeadingLevelIcon props.
+diff --git a/packages/block-editor/src/components/block-heading-level-dropdown/index.js b/packages/block-editor/src/components/block-heading-level-dropdown/index.js
+index 6b9bad09978a50..3e4d92a181781a 100644
+--- a/packages/block-editor/src/components/block-heading-level-dropdown/index.js
++++ b/packages/block-editor/src/components/block-heading-level-dropdown/index.js
+@@ -15,7 +15,7 @@ const POPOVER_PROPS = {
+ 	className: 'block-library-heading-level-dropdown',
+ };
+ 
+-/** @typedef {import('react').ComponentType} ComponentType */
++/** @typedef {React.ComponentType} ComponentType */
+ 
+ /**
+  * HeadingLevelDropdown props.
+diff --git a/packages/block-editor/src/components/block-heading-level-dropdown/index.native.js b/packages/block-editor/src/components/block-heading-level-dropdown/index.native.js
+index d1a87fe542d41f..66c9152139f0d7 100644
+--- a/packages/block-editor/src/components/block-heading-level-dropdown/index.native.js
++++ b/packages/block-editor/src/components/block-heading-level-dropdown/index.native.js
+@@ -11,7 +11,7 @@ import HeadingLevelIcon from './heading-level-icon';
+ 
+ const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
+ 
+-/** @typedef {import('react').ComponentType} ComponentType */
++/** @typedef {React.ComponentType} ComponentType */
+ 
+ /**
+  * HeadingLevelDropdown props.
+diff --git a/packages/block-editor/src/components/block-selection-clearer/index.js b/packages/block-editor/src/components/block-selection-clearer/index.js
+index b22fc7ab708101..f1c292ee237024 100644
+--- a/packages/block-editor/src/components/block-selection-clearer/index.js
++++ b/packages/block-editor/src/components/block-selection-clearer/index.js
+@@ -14,7 +14,7 @@ import { store as blockEditorStore } from '../../store';
+  * selection. Selection will only be cleared if the element is clicked directly,
+  * not if a child element is clicked.
+  *
+- * @return {import('react').RefCallback} Ref callback.
++ * @return {React.RefCallback} Ref callback.
+  */
+ export function useBlockSelectionClearer() {
+ 	const { getSettings, hasSelectedBlock, hasMultiSelection } =
+diff --git a/packages/block-editor/src/components/block-title/index.js b/packages/block-editor/src/components/block-title/index.js
+index 4075171c87e476..b057d92f24d1cf 100644
+--- a/packages/block-editor/src/components/block-title/index.js
++++ b/packages/block-editor/src/components/block-title/index.js
+@@ -19,7 +19,7 @@ import useBlockDisplayTitle from './use-block-display-title';
+  * @param {number|undefined} props.maximumLength The maximum length that the block title string may be before truncated.
+  * @param {string|undefined} props.context       The context to pass to `getBlockLabel`.
+  *
+- * @return {JSX.Element} Block title.
++ * @return {React.JSX.Element} Block title.
+  */
+ export default function BlockTitle( { clientId, maximumLength, context } ) {
+ 	return useBlockDisplayTitle( { clientId, maximumLength, context } );
+diff --git a/packages/block-editor/src/components/block-toolbar/pattern-overrides-dropdown.js b/packages/block-editor/src/components/block-toolbar/pattern-overrides-dropdown.js
+index 5ae7bc5dafe4e2..1a019cc8298be6 100644
+--- a/packages/block-editor/src/components/block-toolbar/pattern-overrides-dropdown.js
++++ b/packages/block-editor/src/components/block-toolbar/pattern-overrides-dropdown.js
+@@ -22,7 +22,7 @@ import { store as blockEditorStore } from '../../store';
+  * @param {Object} props            Component props.
+  * @param {Array}  props.clientIds  The client IDs of selected blocks.
+  * @param {string} props.blockTitle The display title of the block.
+- * @return {JSX.Element} The popover content.
++ * @return {React.JSX.Element} The popover content.
+  */
+ function PatternOverridesPopoverContent( { clientIds, blockTitle } ) {
+ 	const blockMetaName = useSelect(
+@@ -54,12 +54,12 @@ function PatternOverridesPopoverContent( { clientIds, blockTitle } ) {
+ /**
+  * Renders a toolbar button that displays information about pattern overrides in a popover.
+  *
+- * @param {Object}      props            Component props.
+- * @param {JSX.Element} props.icon       The icon element to display.
+- * @param {Array}       props.clientIds  The client IDs of selected blocks.
+- * @param {string}      props.blockTitle The display title of the block.
+- * @param {string}      props.label      The label for the button.
+- * @return {JSX.Element} The pattern overrides button component.
++ * @param {Object}            props            Component props.
++ * @param {React.JSX.Element} props.icon       The icon element to display.
++ * @param {Array}             props.clientIds  The client IDs of selected blocks.
++ * @param {string}            props.blockTitle The display title of the block.
++ * @param {string}            props.label      The label for the button.
++ * @return {React.JSX.Element} The pattern overrides button component.
+  */
+ export default function PatternOverridesDropdown( {
+ 	icon,
+diff --git a/packages/block-editor/src/components/block-visibility/modal.js b/packages/block-editor/src/components/block-visibility/modal.js
+index 6c625f425e8b3d..ba01e254e8927e 100644
+--- a/packages/block-editor/src/components/block-visibility/modal.js
++++ b/packages/block-editor/src/components/block-visibility/modal.js
+@@ -58,7 +58,7 @@ const EMPTY_BLOCKS = [];
+  * @param {Object}   props           Component props.
+  * @param {Array}    props.clientIds The client IDs of the blocks to hide.
+  * @param {Function} props.onClose   Callback function invoked when the modal is closed.
+- * @return {JSX.Element} The modal component.
++ * @return {React.JSX.Element} The modal component.
+  */
+ export default function BlockVisibilityModal( { clientIds, onClose } ) {
+ 	const { createSuccessNotice } = useDispatch( noticesStore );
+diff --git a/packages/block-editor/src/components/dimensions-tool/scale-tool.js b/packages/block-editor/src/components/dimensions-tool/scale-tool.js
+index 05a7d2f4d251a7..e212d84d4c06f6 100644
+--- a/packages/block-editor/src/components/dimensions-tool/scale-tool.js
++++ b/packages/block-editor/src/components/dimensions-tool/scale-tool.js
+@@ -76,7 +76,7 @@ const DEFAULT_SCALE_OPTIONS = [
+  *
+  * @param {ScaleToolProps} props
+  *
+- * @return {import('react').ReactElement} The scale tool.
++ * @return {React.ReactElement} The scale tool.
+  */
+ export default function ScaleTool( {
+ 	panelId,
+diff --git a/packages/block-editor/src/components/dimensions-tool/width-height-tool.js b/packages/block-editor/src/components/dimensions-tool/width-height-tool.js
+index 77fc822c10eed8..79c9b58242f783 100644
+--- a/packages/block-editor/src/components/dimensions-tool/width-height-tool.js
++++ b/packages/block-editor/src/components/dimensions-tool/width-height-tool.js
+@@ -37,7 +37,7 @@ import { __ } from '@wordpress/i18n';
+  *
+  * @param {WidthHeightToolProps} props The component props.
+  *
+- * @return {import('react').ReactElement} The width and height tool.
++ * @return {React.ReactElement} The width and height tool.
+  */
+ export default function WidthHeightTool( {
+ 	panelId,
+diff --git a/packages/block-editor/src/components/iframe/index.js b/packages/block-editor/src/components/iframe/index.js
+index 3c72e2b01ec23b..719ecc2f68556f 100644
+--- a/packages/block-editor/src/components/iframe/index.js
++++ b/packages/block-editor/src/components/iframe/index.js
+@@ -122,7 +122,7 @@ function Iframe( {
+ 		};
+ 	}, [] );
+ 	const { styles = '', scripts = '' } = resolvedAssets;
+-	/** @type {[Document, import('react').Dispatch<Document>]} */
++	/** @type {[Document, React.Dispatch<Document>]} */
+ 	const [ iframeDocument, setIframeDocument ] = useState();
+ 	const [ bodyClasses, setBodyClasses ] = useState( [] );
+ 	const [ before, writingFlowRef, after ] = useWritingFlow();
+diff --git a/packages/block-editor/src/components/iframe/use-scale-canvas.js b/packages/block-editor/src/components/iframe/use-scale-canvas.js
+index ea43b80ee3d127..b26408ec443898 100644
+--- a/packages/block-editor/src/components/iframe/use-scale-canvas.js
++++ b/packages/block-editor/src/components/iframe/use-scale-canvas.js
+@@ -196,7 +196,7 @@ export function useScaleCanvas( {
+ 
+ 	/**
+ 	 * The starting transition state for the zoom out animation.
+-	 * @type {import('react').RefObject<TransitionState>}
++	 * @type {React.RefObject<TransitionState>}
+ 	 */
+ 	const transitionFromRef = useRef( {
+ 		scaleValue,
+@@ -208,7 +208,7 @@ export function useScaleCanvas( {
+ 
+ 	/**
+ 	 * The ending transition state for the zoom out animation.
+-	 * @type {import('react').RefObject<TransitionState>}
++	 * @type {React.RefObject<TransitionState>}
+ 	 */
+ 	const transitionToRef = useRef( {
+ 		scaleValue,
+diff --git a/packages/block-editor/src/components/inserter/media-tab/utils.js b/packages/block-editor/src/components/inserter/media-tab/utils.js
+index 0a835c065a3a1b..7a2c1fb28e2dbd 100644
+--- a/packages/block-editor/src/components/inserter/media-tab/utils.js
++++ b/packages/block-editor/src/components/inserter/media-tab/utils.js
+@@ -12,7 +12,7 @@ const mediaTypeTag = { image: 'img', video: 'video', audio: 'audio' };
+  *
+  * @param {InserterMediaItem}         media     The media object to create the block from.
+  * @param {('image'|'audio'|'video')} mediaType The media type to create the block for.
+- * @return {[WPBlock, JSX.Element]} An array containing the block and the preview element.
++ * @return {[WPBlock, React.JSX.Element]} An array containing the block and the preview element.
+  */
+ export function getBlockAndPreviewFromMedia( media, mediaType ) {
+ 	// Add the common attributes between the different media types.
+diff --git a/packages/block-editor/src/components/list-view/aria-referenced-text.js b/packages/block-editor/src/components/list-view/aria-referenced-text.js
+index b5d7a73e8bcf52..02e20a90260cf3 100644
+--- a/packages/block-editor/src/components/list-view/aria-referenced-text.js
++++ b/packages/block-editor/src/components/list-view/aria-referenced-text.js
+@@ -7,8 +7,8 @@ import { useRef, useEffect } from '@wordpress/element';
+  * A component specifically designed to be used as an element referenced
+  * by ARIA attributes such as `aria-labelledby` or `aria-describedby`.
+  *
+- * @param {Object}                    props          Props.
+- * @param {import('react').ReactNode} props.children
++ * @param {Object}          props          Props.
++ * @param {React.ReactNode} props.children
+  */
+ export default function AriaReferencedText( { children, ...props } ) {
+ 	const ref = useRef();
+diff --git a/packages/block-editor/src/components/list-view/index.js b/packages/block-editor/src/components/list-view/index.js
+index 097133eb80d288..f93a5d09785050 100644
+--- a/packages/block-editor/src/components/list-view/index.js
++++ b/packages/block-editor/src/components/list-view/index.js
+@@ -65,8 +65,8 @@ const expanded = ( state, action ) => {
+ 
+ export const BLOCK_LIST_ITEM_HEIGHT = 32;
+ 
+-/** @typedef {import('react').ComponentType} ComponentType */
+-/** @typedef {import('react').Ref<HTMLElement>} Ref */
++/** @typedef {React.ComponentType} ComponentType */
++/** @typedef {React.Ref<HTMLElement>} Ref */
+ 
+ /**
+  * Show a hierarchical list of blocks.
+diff --git a/packages/block-editor/src/components/recursion-provider/index.js b/packages/block-editor/src/components/recursion-provider/index.js
+index e3ca1416e6b935..7a846c262d0f45 100644
+--- a/packages/block-editor/src/components/recursion-provider/index.js
++++ b/packages/block-editor/src/components/recursion-provider/index.js
+@@ -40,12 +40,12 @@ function addToBlockType( renderedBlocks, blockName, uniqueId ) {
+  * Wrap block content with this provider and provide the same `uniqueId` prop as used
+  * with `useHasRecursion`.
+  *
+- * @param {Object}      props
+- * @param {*}           props.uniqueId  Any value that acts as a unique identifier for a block instance.
+- * @param {string}      props.blockName Optional block name.
+- * @param {JSX.Element} props.children  React children.
++ * @param {Object}            props
++ * @param {*}                 props.uniqueId  Any value that acts as a unique identifier for a block instance.
++ * @param {string}            props.blockName Optional block name.
++ * @param {React.JSX.Element} props.children  React children.
+  *
+- * @return {JSX.Element} A React element.
++ * @return {React.JSX.Element} A React element.
+  */
+ export function RecursionProvider( { children, uniqueId, blockName = '' } ) {
+ 	const previouslyRenderedBlocks = useContext( RenderedRefsContext );
+diff --git a/packages/block-editor/src/components/url-input/button.js b/packages/block-editor/src/components/url-input/button.js
+index 098b1ce8685e1b..d512de4e0648d6 100644
+--- a/packages/block-editor/src/components/url-input/button.js
++++ b/packages/block-editor/src/components/url-input/button.js
+@@ -20,7 +20,7 @@ import URLInput from './';
+  * @param {Object}   props          Component properties.
+  * @param {string}   props.url      The current URL value.
+  * @param {Function} props.onChange Callback function to handle URL changes.
+- * @return {JSX.Element} The URL input button component.
++ * @return {React.JSX.Element} The URL input button component.
+  */
+ function URLInputButton( { url, onChange } ) {
+ 	const [ expanded, toggleExpanded ] = useReducer(
+diff --git a/packages/block-editor/src/components/use-on-block-drop/index.js b/packages/block-editor/src/components/use-on-block-drop/index.js
+index 75b9a44e166f5c..c7778ff44dc053 100644
+--- a/packages/block-editor/src/components/use-on-block-drop/index.js
++++ b/packages/block-editor/src/components/use-on-block-drop/index.js
+@@ -18,7 +18,7 @@ import { getFilesFromDataTransfer } from '@wordpress/dom';
+  */
+ import { store as blockEditorStore } from '../../store';
+ 
+-/** @typedef {import('react').SyntheticEvent} SyntheticEvent */
++/** @typedef {React.SyntheticEvent} SyntheticEvent */
+ /** @typedef {import('./types').WPDropOperation} WPDropOperation */
+ 
+ /**
+diff --git a/packages/block-editor/src/hooks/block-style-variation.js b/packages/block-editor/src/hooks/block-style-variation.js
+index 273bbe4c841b4b..82233dfe2c1633 100644
+--- a/packages/block-editor/src/hooks/block-style-variation.js
++++ b/packages/block-editor/src/hooks/block-style-variation.js
+@@ -71,7 +71,7 @@ function OverrideStyles( { override } ) {
+  *
+  * @param {Object} props        Props.
+  * @param {Object} props.config A global styles object, containing settings and styles.
+- * @return {JSX.Element|undefined} An array of new block variation overrides.
++ * @return {React.JSX.Element}  An array of new block variation overrides.
+  */
+ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
+ 	const { getBlockStyles, overrides } = useSelect(
+@@ -164,7 +164,7 @@ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
+ 	}, [ config, overrides, getBlockStyles, getBlockName ] );
+ 
+ 	if ( ! overridesWithConfig || ! overridesWithConfig.length ) {
+-		return;
++		return null;
+ 	}
+ 
+ 	return (
+diff --git a/packages/block-editor/src/hooks/fit-text.js b/packages/block-editor/src/hooks/fit-text.js
+index 353ad2fe954be4..91089eaaef2fc9 100644
+--- a/packages/block-editor/src/hooks/fit-text.js
++++ b/packages/block-editor/src/hooks/fit-text.js
+@@ -232,14 +232,14 @@ function useFitText( { fitText, name, clientId } ) {
+ /**
+  * Fit text control component for the typography panel.
+  *
+- * @param {Object}      props               Component props.
+- * @param {string}      props.clientId      Block client ID.
+- * @param {Function}    props.setAttributes Function to set block attributes.
+- * @param {string}      props.name          Block name.
+- * @param {boolean}     props.fitText       Whether fit text is enabled.
+- * @param {string}      props.fontSize      Font size slug.
+- * @param {Object}      props.style         Block style object.
+- * @param {JSX.Element} props.warning       Warning component to display.
++ * @param {Object}            props               Component props.
++ * @param {string}            props.clientId      Block client ID.
++ * @param {Function}          props.setAttributes Function to set block attributes.
++ * @param {string}            props.name          Block name.
++ * @param {boolean}           props.fitText       Whether fit text is enabled.
++ * @param {string}            props.fontSize      Font size slug.
++ * @param {Object}            props.style         Block style object.
++ * @param {React.JSX.Element} props.warning       Warning component to display.
+  */
+ export function FitTextControl( {
+ 	clientId,
+diff --git a/packages/block-library/src/comment-author-name/edit.js b/packages/block-library/src/comment-author-name/edit.js
+index 50e5811eb4f6f3..1f68e95f42d194 100644
+--- a/packages/block-library/src/comment-author-name/edit.js
++++ b/packages/block-library/src/comment-author-name/edit.js
+@@ -28,7 +28,7 @@ import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+  * @param {Object} props.context               Inherited context.
+  * @param {string} props.context.commentId     The comment ID.
+  *
+- * @return {JSX.Element} React element.
++ * @return {React.JSX.Element} React element.
+  */
+ export default function Edit( props ) {
+ 	const {
+diff --git a/packages/block-library/src/comment-date/edit.js b/packages/block-library/src/comment-date/edit.js
+index a7bcb8d9788bb4..019c46fcf4fd92 100644
+--- a/packages/block-library/src/comment-date/edit.js
++++ b/packages/block-library/src/comment-date/edit.js
+@@ -35,7 +35,7 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+  * @param {Object} props.context           Inherited context.
+  * @param {string} props.context.commentId The comment ID.
+  *
+- * @return {JSX.Element} React element.
++ * @return {React.JSX.Element} React element.
+  */
+ export default function Edit( {
+ 	attributes: { format, isLink },
+diff --git a/packages/block-library/src/embed/wp-embed-preview.js b/packages/block-library/src/embed/wp-embed-preview.js
+index ad68bc3f7aadd6..1897d273005c53 100644
+--- a/packages/block-library/src/embed/wp-embed-preview.js
++++ b/packages/block-library/src/embed/wp-embed-preview.js
+@@ -4,7 +4,7 @@
+ import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
+ import { useRef, useEffect, useMemo } from '@wordpress/element';
+ 
+-/** @typedef {import('react').SyntheticEvent} SyntheticEvent */
++/** @typedef {React.SyntheticEvent} SyntheticEvent */
+ 
+ const attributeMap = {
+ 	class: 'className',
+diff --git a/packages/block-library/src/group/edit.js b/packages/block-library/src/group/edit.js
+index 4a2437806f6f9d..625b5686af75ca 100644
+--- a/packages/block-library/src/group/edit.js
++++ b/packages/block-library/src/group/edit.js
+@@ -30,7 +30,7 @@ const { HTMLElementControl } = unlock( blockEditorPrivateApis );
+  * @param {Function} props.onSelectTagName onChange function for the SelectControl.
+  * @param {string}   props.clientId        The client ID of the current block.
+  *
+- * @return {JSX.Element}                The control group.
++ * @return {React.JSX.Element}                The control group.
+  */
+ function GroupEditControls( { tagName, onSelectTagName, clientId } ) {
+ 	return (
+diff --git a/packages/block-library/src/group/placeholder.js b/packages/block-library/src/group/placeholder.js
+index c7c4c6956e7d6a..395db0cb953647 100644
+--- a/packages/block-library/src/group/placeholder.js
++++ b/packages/block-library/src/group/placeholder.js
+@@ -13,7 +13,7 @@ import { useState, useEffect } from '@wordpress/element';
+  *
+  * @param {string} name The block variation name.
+  *
+- * @return {JSX.Element} The SVG element.
++ * @return {React.JSX.Element} The SVG element.
+  */
+ const getGroupPlaceholderIcons = ( name = 'group' ) => {
+ 	const icons = {
+@@ -129,7 +129,7 @@ export function useShouldShowPlaceHolder( {
+  * @param {string}   props.name     The block's name.
+  * @param {Function} props.onSelect Function to set block's attributes.
+  *
+- * @return {JSX.Element}                The placeholder.
++ * @return {React.JSX.Element}                The placeholder.
+  */
+ function GroupPlaceHolder( { name, onSelect } ) {
+ 	const variations = useSelect(
+diff --git a/packages/block-library/src/navigation/edit/deleted-overlay-warning.js b/packages/block-library/src/navigation/edit/deleted-overlay-warning.js
+index 57b293ae08d7ec..10b254e4a905c9 100644
+--- a/packages/block-library/src/navigation/edit/deleted-overlay-warning.js
++++ b/packages/block-library/src/navigation/edit/deleted-overlay-warning.js
+@@ -12,7 +12,7 @@ import { createInterpolateElement } from '@wordpress/element';
+  * @param {Function} props.onClear    Callback to clear the overlay selection.
+  * @param {Function} props.onCreate   Callback to create a new overlay.
+  * @param {boolean}  props.isCreating Whether a new overlay is being created.
+- * @return {JSX.Element} The deleted overlay warning component.
++ * @return {React.JSX.Element} The deleted overlay warning component.
+  */
+ function DeletedOverlayWarning( { onClear, onCreate, isCreating = false } ) {
+ 	const message = createInterpolateElement(
+diff --git a/packages/block-library/src/navigation/edit/index.js b/packages/block-library/src/navigation/edit/index.js
+index fe74a4eee37780..f76c0c425584b7 100644
+--- a/packages/block-library/src/navigation/edit/index.js
++++ b/packages/block-library/src/navigation/edit/index.js
+@@ -92,7 +92,7 @@ import { getSubmenuVisibility } from '../utils/get-submenu-visibility';
+  *
+  * @param {Object} props          Component props.
+  * @param {string} props.clientId Block client ID.
+- * @return {JSX.Element|null} The Add page button component or null if not applicable.
++ * @return {React.JSX.Element} The Add page button component or null if not applicable.
+  */
+ function NavigationAddPageButton( { clientId } ) {
+ 	const { insertBlock } = useDispatch( blockEditorStore );
+diff --git a/packages/block-library/src/navigation/edit/overlay-menu-preview-button.js b/packages/block-library/src/navigation/edit/overlay-menu-preview-button.js
+index 2207d30d73a738..eaed10db9b61d2 100644
+--- a/packages/block-library/src/navigation/edit/overlay-menu-preview-button.js
++++ b/packages/block-library/src/navigation/edit/overlay-menu-preview-button.js
+@@ -24,7 +24,7 @@ import OverlayMenuPreviewControls from './overlay-menu-preview-controls';
+  * @param {string}   props.overlayMenuPreviewClasses CSS classes for overlay menu preview button.
+  * @param {string}   props.overlayMenuPreviewId      ID for overlay menu preview.
+  * @param {string}   props.containerStyle            Optional style for the preview container.
+- * @return {JSX.Element|null}                       The overlay menu preview button or null if not responsive.
++ * @return {React.JSX.Element}                       The overlay menu preview button or null if not responsive.
+  */
+ export default function OverlayMenuPreviewButton( {
+ 	isResponsive,
+diff --git a/packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js b/packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js
+index 069f74edc90f4e..b8c21da39c822d 100644
+--- a/packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js
++++ b/packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js
+@@ -22,7 +22,7 @@ import OverlayMenuIcon from './overlay-menu-icon';
+  * @param {boolean}  props.hasIcon       Whether the overlay menu has an icon.
+  * @param {string}   props.icon          Icon type for overlay menu.
+  * @param {Function} props.setAttributes Function to update block attributes.
+- * @return {JSX.Element}                The overlay menu preview controls.
++ * @return {React.JSX.Element}                The overlay menu preview controls.
+  */
+ export default function OverlayMenuPreviewControls( {
+ 	hasIcon,
+diff --git a/packages/block-library/src/navigation/edit/overlay-panel.js b/packages/block-library/src/navigation/edit/overlay-panel.js
+index d0a1eeaedf5d5a..1aec45c03861ad 100644
+--- a/packages/block-library/src/navigation/edit/overlay-panel.js
++++ b/packages/block-library/src/navigation/edit/overlay-panel.js
+@@ -33,7 +33,7 @@ import OverlayPreview from './overlay-preview';
+  * @param {boolean}  props.isResponsive              Whether overlay menu is responsive.
+  * @param {string}   props.currentTheme              Current theme stylesheet name.
+  * @param {boolean}  props.hasOverlays               Whether any overlay template parts exist.
+- * @return {JSX.Element|null}                       The overlay panel component or null if overlay is disabled.
++ * @return {React.JSX.Element}                       The overlay panel component or null if overlay is disabled.
+  */
+ export default function OverlayPanel( {
+ 	overlayMenu,
+diff --git a/packages/block-library/src/navigation/edit/overlay-preview.js b/packages/block-library/src/navigation/edit/overlay-preview.js
+index e4040e48bba254..035e8755f7ec0b 100644
+--- a/packages/block-library/src/navigation/edit/overlay-preview.js
++++ b/packages/block-library/src/navigation/edit/overlay-preview.js
+@@ -20,7 +20,7 @@ import { createTemplatePartId } from '../../template-part/edit/utils/create-temp
+  * @param {Object} props              Component props.
+  * @param {string} props.overlay      The overlay template part slug.
+  * @param {string} props.currentTheme The current theme stylesheet name.
+- * @return {JSX.Element|null} The overlay preview component or null if no overlay is selected.
++ * @return {React.JSX.Element} The overlay preview component or null if no overlay is selected.
+  */
+ export default function OverlayPreview( { overlay, currentTheme } ) {
+ 	const templatePartId = useMemo( () => {
+diff --git a/packages/block-library/src/navigation/edit/overlay-template-part-selector.js b/packages/block-library/src/navigation/edit/overlay-template-part-selector.js
+index 1cea74095116b2..4d859661d91a59 100644
+--- a/packages/block-library/src/navigation/edit/overlay-template-part-selector.js
++++ b/packages/block-library/src/navigation/edit/overlay-template-part-selector.js
+@@ -35,7 +35,7 @@ import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
+  * @param {Function} props.onNavigateToEntityRecord Function to navigate to template part editor.
+  * @param {boolean}  props.isCreatingOverlay        Whether an overlay is being created (lifted state).
+  * @param {Function} props.setIsCreatingOverlay     Function to set creating overlay state (lifted state).
+- * @return {JSX.Element} The overlay template part selector component.
++ * @return {React.JSX.Element} The overlay template part selector component.
+  */
+ export default function OverlayTemplatePartSelector( {
+ 	overlay,
+diff --git a/packages/block-library/src/navigation/edit/overlay-visibility-control.js b/packages/block-library/src/navigation/edit/overlay-visibility-control.js
+index 1567ce0219af34..e17bf7c55ef730 100644
+--- a/packages/block-library/src/navigation/edit/overlay-visibility-control.js
++++ b/packages/block-library/src/navigation/edit/overlay-visibility-control.js
+@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
+  * @param {Object}   props               Component props.
+  * @param {string}   props.overlayMenu   Overlay menu setting ('never', 'mobile', 'always').
+  * @param {Function} props.setAttributes Function to update block attributes.
+- * @return {JSX.Element}                 The overlay visibility control.
++ * @return {React.JSX.Element}                 The overlay visibility control.
+  */
+ export default function OverlayVisibilityControl( {
+ 	overlayMenu,
+diff --git a/packages/block-library/src/post-content/edit.js b/packages/block-library/src/post-content/edit.js
+index 9f5b2a924fcc8d..491bf374ba27da 100644
+--- a/packages/block-library/src/post-content/edit.js
++++ b/packages/block-library/src/post-content/edit.js
+@@ -183,7 +183,7 @@ function RecursionError() {
+  * @param {Function} props.onSelectTagName onChange function for the SelectControl.
+  * @param {string}   props.clientId        The client ID of the current block.
+  *
+- * @return {JSX.Element}                The control group.
++ * @return {React.JSX.Element}                The control group.
+  */
+ function PostContentEditControls( { tagName, onSelectTagName, clientId } ) {
+ 	return (
+diff --git a/packages/block-library/src/query/edit/inspector-controls/taxonomy-controls.js b/packages/block-library/src/query/edit/inspector-controls/taxonomy-controls.js
+index 328a04fb6867b7..525ff067053921 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/taxonomy-controls.js
++++ b/packages/block-library/src/query/edit/inspector-controls/taxonomy-controls.js
+@@ -129,7 +129,7 @@ export function TaxonomyControls( { onChange, query } ) {
+  * @param {number[]} props.oppositeTermIds An array with the opposite control's term ids (to exclude from suggestions).
+  * @param {Function} props.onChange        Callback `onChange` function.
+  * @param {string}   props.label           Label of the control.
+- * @return {JSX.Element} The rendered component.
++ * @return {React.JSX.Element} The rendered component.
+  */
+ function TaxonomyItem( {
+ 	taxonomy,
+diff --git a/packages/block-library/src/tab/add-tab-toolbar-control.js b/packages/block-library/src/tab/add-tab-toolbar-control.js
+index 6374c805a7d4d6..17960109f471ab 100644
+--- a/packages/block-library/src/tab/add-tab-toolbar-control.js
++++ b/packages/block-library/src/tab/add-tab-toolbar-control.js
+@@ -16,7 +16,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
+  *
+  * @param {Object} props
+  * @param {string} props.tabsClientId The client ID of the parent tabs block.
+- * @return {JSX.Element} The toolbar control element.
++ * @return {React.JSX.Element} The toolbar control element.
+  */
+ export default function AddTabToolbarControl( { tabsClientId } ) {
+ 	const { insertBlock } = useDispatch( blockEditorStore );
+diff --git a/packages/block-library/src/tab/remove-tab-toolbar-control.js b/packages/block-library/src/tab/remove-tab-toolbar-control.js
+index 879f9273fa4a54..5d7457c694ea3b 100644
+--- a/packages/block-library/src/tab/remove-tab-toolbar-control.js
++++ b/packages/block-library/src/tab/remove-tab-toolbar-control.js
+@@ -15,7 +15,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
+  *
+  * @param {Object} props
+  * @param {string} props.tabsClientId The client ID of the parent tabs block.
+- * @return {JSX.Element} The toolbar control element.
++ * @return {React.JSX.Element} The toolbar control element.
+  */
+ export default function RemoveTabToolbarControl( { tabsClientId } ) {
+ 	const {
+diff --git a/packages/block-library/src/utils/html-renderer.js b/packages/block-library/src/utils/html-renderer.js
+index e617fec6cb291b..dec0020749a0e6 100644
+--- a/packages/block-library/src/utils/html-renderer.js
++++ b/packages/block-library/src/utils/html-renderer.js
+@@ -16,7 +16,7 @@ import { safeHTML } from '@wordpress/dom';
+  * @param {Object} props.wrapperProps - The props to merge with the root element.
+  *                                    className and style are merged with the parsed HTML attributes.
+  * @param {string} props.html         - The HTML content to render.
+- * @return {JSX.Element} The rendered React elements.
++ * @return {React.JSX.Element} The rendered React elements.
+  */
+ const HtmlRenderer = ( { wrapperProps = {}, html = '' } ) => {
+ 	const options = {
+diff --git a/packages/commands/src/components/command-menu.js b/packages/commands/src/components/command-menu.js
+index b07fa6188ba75e..7b66315b57831f 100644
+--- a/packages/commands/src/components/command-menu.js
++++ b/packages/commands/src/components/command-menu.js
+@@ -236,7 +236,7 @@ export function CommandMenu() {
+ 
+ 	useShortcut(
+ 		'core/commands',
+-		/** @type {import('react').KeyboardEventHandler} */
++		/** @type {React.KeyboardEventHandler} */
+ 		withIgnoreIMEEvents( ( event ) => {
+ 			// Bails to avoid obscuring the effect of the preceding handler(s).
+ 			if ( event.defaultPrevented ) {
+diff --git a/packages/commands/src/store/actions.js b/packages/commands/src/store/actions.js
+index c69463c4093faa..bdb7ddaa101edd 100644
+--- a/packages/commands/src/store/actions.js
++++ b/packages/commands/src/store/actions.js
+@@ -5,14 +5,14 @@
+  *
+  * @typedef {Object} WPCommandConfig
+  *
+- * @property {string}      name        Command name.
+- * @property {string}      label       Command label.
+- * @property {string=}     searchLabel Command search label.
+- * @property {string=}     context     Command context.
+- * @property {JSX.Element} icon        Command icon.
+- * @property {Function}    callback    Command callback.
+- * @property {boolean}     disabled    Whether to disable the command.
+- * @property {string[]=}   keywords    Command keywords for search matching.
++ * @property {string}            name        Command name.
++ * @property {string}            label       Command label.
++ * @property {string=}           searchLabel Command search label.
++ * @property {string=}           context     Command context.
++ * @property {React.JSX.Element} icon        Command icon.
++ * @property {Function}          callback    Command callback.
++ * @property {boolean}           disabled    Whether to disable the command.
++ * @property {string[]=}         keywords    Command keywords for search matching.
+  */
+ 
+ /**
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7fb454e250df42..398b69e96ea3c5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,6 +22,7 @@
+ -   `Disabled`, `Modal`, `Popover`, `Tooltip`: Move context code to separate files to help docgen prop extraction ([#75316](https://github.com/WordPress/gutenberg/pull/75316)).
+ -   Update Emotion dependencies to ensure compatibility with React 19 ([#75324](https://github.com/WordPress/gutenberg/pull/75324)).
+ -   Update Testing Library packages used in unit tests ([#75340](https://github.com/WordPress/gutenberg/pull/75340)).
++-   Clean up type declarations using the `React` namespace ([#75499](https://github.com/WordPress/gutenberg/pull/75499)).
+ 
+ ## 32.1.0 (2026-01-29)
+ 
+diff --git a/packages/components/src/context/context-system-provider.js b/packages/components/src/context/context-system-provider.js
+index bfea45192f19c7..a64e78d5228c10 100644
+--- a/packages/components/src/context/context-system-provider.js
++++ b/packages/components/src/context/context-system-provider.js
+@@ -89,10 +89,10 @@ function useContextSystemBridge( { value } ) {
+  * ```
+  *
+  * @template {Record<string, any>} T
+- * @param {Object}                    options
+- * @param {import('react').ReactNode} options.children Children to render.
+- * @param {T}                         options.value    Props to render into connected components.
+- * @return {JSX.Element} A Provider wrapped component.
++ * @param {Object}          options
++ * @param {React.ReactNode} options.children Children to render.
++ * @param {T}               options.value    Props to render into connected components.
++ * @return {React.JSX.Element} A Provider wrapped component.
+  */
+ const BaseContextSystemProvider = ( { children, value } ) => {
+ 	const contextValue = useContextSystemBridge( { value } );
+diff --git a/packages/components/src/draggable/index.native.js b/packages/components/src/draggable/index.native.js
+index 87e68ad651cb06..ec1c6bb702ea85 100644
+--- a/packages/components/src/draggable/index.native.js
++++ b/packages/components/src/draggable/index.native.js
+@@ -29,14 +29,14 @@ const { Provider } = Context;
+ /**
+  * Draggable component.
+  *
+- * @param {Object}      props               Component props.
+- * @param {JSX.Element} props.children      Children to be rendered.
+- * @param {Function}    [props.onDragEnd]   Callback when dragging ends.
+- * @param {Function}    [props.onDragOver]  Callback when dragging happens over an element.
+- * @param {Function}    [props.onDragStart] Callback when dragging starts.
+- * @param {string}      [props.testID]      Id used for querying the pan gesture in tests.
++ * @param {Object}            props               Component props.
++ * @param {React.JSX.Element} props.children      Children to be rendered.
++ * @param {Function}          [props.onDragEnd]   Callback when dragging ends.
++ * @param {Function}          [props.onDragOver]  Callback when dragging happens over an element.
++ * @param {Function}          [props.onDragStart] Callback when dragging starts.
++ * @param {string}            [props.testID]      Id used for querying the pan gesture in tests.
+  *
+- * @return {JSX.Element} The component to be rendered.
++ * @return {React.JSX.Element} The component to be rendered.
+  */
+ const Draggable = ( {
+ 	children,
+@@ -167,17 +167,17 @@ const Draggable = ( {
+  *
+  * This component acts as the trigger for the dragging functionality.
+  *
+- * @param {Object}      props                  Component props.
+- * @param {JSX.Element} props.children         Children to be rendered.
+- * @param {*}           props.id               Identifier passed within the event callbacks.
+- * @param {boolean}     [props.enabled]        Enables the long-press gesture.
+- * @param {number}      [props.maxDistance]    Maximum distance, that defines how far the finger is allowed to travel during a long press gesture.
+- * @param {number}      [props.minDuration]    Minimum time, that a finger must remain pressed on the corresponding view.
+- * @param {Function}    [props.onLongPress]    Callback when long-press gesture is triggered over an element.
+- * @param {Function}    [props.onLongPressEnd] Callback when long-press gesture ends.
+- * @param {string}      [props.testID]         Id used for querying the long-press gesture handler in tests.
++ * @param {Object}            props                  Component props.
++ * @param {React.JSX.Element} props.children         Children to be rendered.
++ * @param {*}                 props.id               Identifier passed within the event callbacks.
++ * @param {boolean}           [props.enabled]        Enables the long-press gesture.
++ * @param {number}            [props.maxDistance]    Maximum distance, that defines how far the finger is allowed to travel during a long press gesture.
++ * @param {number}            [props.minDuration]    Minimum time, that a finger must remain pressed on the corresponding view.
++ * @param {Function}          [props.onLongPress]    Callback when long-press gesture is triggered over an element.
++ * @param {Function}          [props.onLongPressEnd] Callback when long-press gesture ends.
++ * @param {string}            [props.testID]         Id used for querying the long-press gesture handler in tests.
+  *
+- * @return {JSX.Element} The component to be rendered.
++ * @return {React.JSX.Element} The component to be rendered.
+  */
+ const DraggableTrigger = ( {
+ 	children,
+diff --git a/packages/components/src/heading/hook.ts b/packages/components/src/heading/hook.ts
+index 132595d69c4f76..311f2397615900 100644
+--- a/packages/components/src/heading/hook.ts
++++ b/packages/components/src/heading/hook.ts
+@@ -16,7 +16,7 @@ export function useHeading(
+ 		level = 2,
+ 		color = COLORS.theme.foreground,
+ 		isBlock = true,
+-		weight = CONFIG.fontWeightHeading as import('react').CSSProperties[ 'fontWeight' ],
++		weight = CONFIG.fontWeightHeading as React.CSSProperties[ 'fontWeight' ],
+ 		...otherProps
+ 	} = useContextSystem( props, 'Heading' );
+ 
+diff --git a/packages/components/src/higher-order/with-spoken-messages/index.tsx b/packages/components/src/higher-order/with-spoken-messages/index.tsx
+index 1d07fc68d5d25d..929296a5a5911b 100644
+--- a/packages/components/src/higher-order/with-spoken-messages/index.tsx
++++ b/packages/components/src/higher-order/with-spoken-messages/index.tsx
+@@ -4,16 +4,14 @@
+ import { createHigherOrderComponent, useDebounce } from '@wordpress/compose';
+ import { speak } from '@wordpress/a11y';
+ 
+-/** @typedef {import('react').ComponentType} ComponentType */
+-
+ /**
+  * A Higher Order Component used to provide speak and debounced speak functions.
+  *
+  * @see https://developer.wordpress.org/block-editor/packages/packages-a11y/#speak
+  *
+- * @param {ComponentType} Component The component to be wrapped.
++ * @param {React.ComponentType} Component The component to be wrapped.
+  *
+- * @return {ComponentType} The wrapped component.
++ * @return {React.ComponentType} The wrapped component.
+  */
+ export default createHigherOrderComponent(
+ 	( Component ) =>
+diff --git a/packages/components/src/text/utils.ts b/packages/components/src/text/utils.ts
+index 1c081ce85869d2..bf44e54f821776 100644
+--- a/packages/components/src/text/utils.ts
++++ b/packages/components/src/text/utils.ts
+@@ -17,37 +17,37 @@ import { createElement } from '@wordpress/element';
+ 
+ /**
+  * @typedef Options
+- * @property {string}                                                     [activeClassName='']      Classname for active highlighted areas.
+- * @property {number}                                                     [activeIndex=-1]          The index of the active highlighted area.
+- * @property {import('react').AllHTMLAttributes<HTMLDivElement>['style']} [activeStyle]             Styles to apply to the active highlighted area.
+- * @property {boolean}                                                    [autoEscape]              Whether to automatically escape text.
+- * @property {boolean}                                                    [caseSensitive=false]     Whether to highlight in a case-sensitive manner.
+- * @property {string}                                                     children                  Children to highlight.
+- * @property {import('highlight-words-core').FindAllArgs['findChunks']}   [findChunks]              Custom `findChunks` function to pass to `highlight-words-core`.
+- * @property {string | Record<string, unknown>}                           [highlightClassName='']   Classname to apply to highlighted text or a Record of classnames to apply to given text (which should be the key).
+- * @property {import('react').AllHTMLAttributes<HTMLDivElement>['style']} [highlightStyle={}]       Styles to apply to highlighted text.
+- * @property {keyof JSX.IntrinsicElements}                                [highlightTag='mark']     Tag to use for the highlighted text.
+- * @property {import('highlight-words-core').FindAllArgs['sanitize']}     [sanitize]                Custom `sanitize` function to pass to `highlight-words-core`.
+- * @property {string[]}                                                   [searchWords=[]]          Words to search for and highlight.
+- * @property {string}                                                     [unhighlightClassName=''] Classname to apply to unhighlighted text.
+- * @property {import('react').AllHTMLAttributes<HTMLDivElement>['style']} [unhighlightStyle]        Style to apply to unhighlighted text.
++ * @property {string}                            [activeClassName='']      Classname for active highlighted areas.
++ * @property {number}                            [activeIndex=-1]          The index of the active highlighted area.
++ * @property {React.CSSProperties}               [activeStyle]             Styles to apply to the active highlighted area.
++ * @property {boolean}                           [autoEscape]              Whether to automatically escape text.
++ * @property {boolean}                           [caseSensitive=false]     Whether to highlight in a case-sensitive manner.
++ * @property {string}                            children                  Children to highlight.
++ * @property {FindAllArgs['findChunks']}         [findChunks]              Custom `findChunks` function to pass to `highlight-words-core`.
++ * @property {string | Record<string, unknown>}  [highlightClassName='']   Classname to apply to highlighted text or a Record of classnames to apply to given text (which should be the key).
++ * @property {React.CSSProperties}               [highlightStyle={}]       Styles to apply to highlighted text.
++ * @property {keyof React.JSX.IntrinsicElements} [highlightTag='mark']     Tag to use for the highlighted text.
++ * @property {FindAllArgs['sanitize']}           [sanitize]                Custom `sanitize` function to pass to `highlight-words-core`.
++ * @property {string[]}                          [searchWords=[]]          Words to search for and highlight.
++ * @property {string}                            [unhighlightClassName=''] Classname to apply to unhighlighted text.
++ * @property {React.CSSProperties}               [unhighlightStyle]        Style to apply to unhighlighted text.
+  */
+ 
+ interface Options {
+ 	activeClassName?: string;
+ 	activeIndex?: number;
+-	activeStyle?: React.AllHTMLAttributes< HTMLDivElement >[ 'style' ];
++	activeStyle?: React.CSSProperties;
+ 	autoEscape?: boolean;
+ 	caseSensitive?: boolean;
+ 	children: string;
+ 	findChunks?: FindAllArgs[ 'findChunks' ];
+ 	highlightClassName?: string | Record< string, unknown >;
+-	highlightStyle?: React.AllHTMLAttributes< HTMLDivElement >[ 'style' ];
+-	highlightTag?: keyof JSX.IntrinsicElements;
++	highlightStyle?: React.CSSProperties;
++	highlightTag?: keyof React.JSX.IntrinsicElements;
+ 	sanitize?: FindAllArgs[ 'sanitize' ];
+ 	searchWords?: string[];
+ 	unhighlightClassName?: string;
+-	unhighlightStyle?: React.AllHTMLAttributes< HTMLDivElement >[ 'style' ];
++	unhighlightStyle?: React.CSSProperties;
+ }
+ 
+ /**
+diff --git a/packages/components/src/utils/hooks/use-update-effect.js b/packages/components/src/utils/hooks/use-update-effect.js
+index e371647f033de6..da278744d8c992 100644
+--- a/packages/components/src/utils/hooks/use-update-effect.js
++++ b/packages/components/src/utils/hooks/use-update-effect.js
+@@ -8,8 +8,8 @@ import { useRef, useEffect } from '@wordpress/element';
+  * Source:
+  * https://github.com/ariakit/ariakit/blob/main/packages/ariakit-react-core/src/utils/hooks.ts
+  *
+- * @param {import('react').EffectCallback} effect
+- * @param {import('react').DependencyList} deps
++ * @param {React.EffectCallback} effect
++ * @param {React.DependencyList} deps
+  */
+ function useUpdateEffect( effect, deps ) {
+ 	const mountedRef = useRef( false );
+diff --git a/packages/components/src/utils/rtl.js b/packages/components/src/utils/rtl.js
+index 457317ee68de70..caced3555801fa 100644
+--- a/packages/components/src/utils/rtl.js
++++ b/packages/components/src/utils/rtl.js
+@@ -51,9 +51,9 @@ function getConvertedKey( key ) {
+ /**
+  * An incredibly basic ltr -> rtl converter for style properties
+  *
+- * @param {import('react').CSSProperties} ltrStyles
++ * @param {React.CSSProperties} ltrStyles
+  *
+- * @return {import('react').CSSProperties} Converted ltr -> rtl styles
++ * @return {React.CSSProperties} Converted ltr -> rtl styles
+  */
+ export const convertLTRToRTL = ( ltrStyles = {} ) => {
+ 	return Object.fromEntries(
+@@ -67,8 +67,8 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
+ /**
+  * A higher-order function that create an incredibly basic ltr -> rtl style converter for CSS objects.
+  *
+- * @param {import('react').CSSProperties} ltrStyles   Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
+- * @param {import('react').CSSProperties} [rtlStyles] Rtl styles. Renders if provided.
++ * @param {React.CSSProperties} ltrStyles   Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
++ * @param {React.CSSProperties} [rtlStyles] Rtl styles. Renders if provided.
+  *
+  * @return {() => import('@emotion/react').SerializedStyles} A function to output CSS styles for Emotion's renderer
+  */
+diff --git a/packages/components/src/utils/use-responsive-value.ts b/packages/components/src/utils/use-responsive-value.ts
+index be986cb4fe3c02..df653297a4ba8e 100644
+--- a/packages/components/src/utils/use-responsive-value.ts
++++ b/packages/components/src/utils/use-responsive-value.ts
+@@ -66,9 +66,5 @@ export function useResponsiveValue< T >(
+ 
+ 	const array = values || [];
+ 
+-	/* eslint-disable jsdoc/no-undefined-types */
+-	return /** @type {T[]} */ array[
+-		/* eslint-enable jsdoc/no-undefined-types */
+-		index >= array.length ? array.length - 1 : index
+-	];
++	return array[ index >= array.length ? array.length - 1 : index ];
+ }
+diff --git a/packages/compose/README.md b/packages/compose/README.md
+index 06db532f4e914e..b4b1481968b79f 100644
+--- a/packages/compose/README.md
++++ b/packages/compose/README.md
+@@ -210,7 +210,7 @@ const ConstrainedTabbingExample = () => {
+ 
+ _Returns_
+ 
+--   `import('react').RefCallback<Element>`: Element Ref.
++-   `React.RefCallback<Element>`: Element Ref.
+ 
+ ### useCopyOnClick
+ 
+@@ -220,7 +220,7 @@ Copies the text to the clipboard when the element is clicked.
+ 
+ _Parameters_
+ 
+--   _ref_ `import('react').RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
++-   _ref_ `React.RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
+ -   _text_ `string|Function`: The text to copy.
+ -   _timeout_ `[number]`: Optional timeout to reset the returned state. 4 seconds by default.
+ 
+@@ -239,7 +239,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `import('react').Ref<TElementType>`: A ref to assign to the target element.
++-   `React.Ref<TElementType>`: A ref to assign to the target element.
+ 
+ ### useDebounce
+ 
+@@ -303,7 +303,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `import('react').RefCallback<HTMLElement>`: Element Ref.
++-   `React.RefCallback<HTMLElement>`: Element Ref.
+ 
+ ### useEvent
+ 
+@@ -362,7 +362,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `import('react').RefCallback<HTMLElement>`: Ref callback.
++-   `React.RefCallback<HTMLElement>`: Ref callback.
+ 
+ ### useFocusReturn
+ 
+@@ -390,7 +390,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `import('react').RefCallback<HTMLElement>`: Element Ref.
++-   `React.RefCallback<HTMLElement>`: Element Ref.
+ 
+ ### useInstanceId
+ 
+@@ -421,7 +421,7 @@ _Related_
+ _Parameters_
+ 
+ -   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
+--   _callback_ `(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
++-   _callback_ `(e: Mousetrap.ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
+ -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
+ 
+ ### useMediaQuery
+@@ -471,7 +471,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `import('react').RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
++-   `React.RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
+ 
+ ### useObservableValue
+ 
+diff --git a/packages/compose/src/hooks/use-constrained-tabbing/index.js b/packages/compose/src/hooks/use-constrained-tabbing/index.js
+index b9aca94222db6a..6ea6a810a91ec7 100644
+--- a/packages/compose/src/hooks/use-constrained-tabbing/index.js
++++ b/packages/compose/src/hooks/use-constrained-tabbing/index.js
+@@ -12,7 +12,7 @@ import useRefEffect from '../use-ref-effect';
+  * In Dialogs/modals, the tabbing must be constrained to the content of
+  * the wrapper element. This hook adds the behavior to the returned ref.
+  *
+- * @return {import('react').RefCallback<Element>} Element Ref.
++ * @return {React.RefCallback<Element>} Element Ref.
+  *
+  * @example
+  * ```js
+diff --git a/packages/compose/src/hooks/use-copy-on-click/index.js b/packages/compose/src/hooks/use-copy-on-click/index.js
+index 3f9410e1d617af..69597470343617 100644
+--- a/packages/compose/src/hooks/use-copy-on-click/index.js
++++ b/packages/compose/src/hooks/use-copy-on-click/index.js
+@@ -14,10 +14,10 @@ import deprecated from '@wordpress/deprecated';
+  *
+  * @deprecated
+  *
+- * @param {import('react').RefObject<string | Element | NodeListOf<Element>>} ref       Reference with the element.
+- * @param {string|Function}                                                   text      The text to copy.
+- * @param {number}                                                            [timeout] Optional timeout to reset the returned
+- *                                                                                      state. 4 seconds by default.
++ * @param {React.RefObject<string | Element | NodeListOf<Element>>} ref       Reference with the element.
++ * @param {string|Function}                                         text      The text to copy.
++ * @param {number}                                                  [timeout] Optional timeout to reset the returned
++ *                                                                            state. 4 seconds by default.
+  *
+  * @return {boolean} Whether or not the text has been copied. Resets after the
+  *                   timeout.
+@@ -28,7 +28,7 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
+ 		alternative: 'wp.compose.useCopyToClipboard',
+ 	} );
+ 
+-	/** @type {import('react').MutableRefObject<Clipboard | undefined>} */
++	/** @type {React.MutableRefObject<Clipboard | undefined>} */
+ 	const clipboardRef = useRef();
+ 	const [ hasCopied, setHasCopied ] = useState( false );
+ 
+diff --git a/packages/compose/src/hooks/use-copy-to-clipboard/index.js b/packages/compose/src/hooks/use-copy-to-clipboard/index.js
+index fbd7b77fecc4ce..c2f380d4103943 100644
+--- a/packages/compose/src/hooks/use-copy-to-clipboard/index.js
++++ b/packages/compose/src/hooks/use-copy-to-clipboard/index.js
+@@ -16,7 +16,7 @@ import useRefEffect from '../use-ref-effect';
+ /**
+  * @template T
+  * @param {T} value
+- * @return {import('react').RefObject<T>} The updated ref
++ * @return {React.RefObject<T>} The updated ref
+  */
+ function useUpdatedRef( value ) {
+ 	const ref = useRef( value );
+@@ -34,7 +34,7 @@ function useUpdatedRef( value ) {
+  *                                            already available and expensive to compute.
+  * @param {Function}                onSuccess Called when to text is copied.
+  *
+- * @return {import('react').Ref<TElementType>} A ref to assign to the target element.
++ * @return {React.Ref<TElementType>} A ref to assign to the target element.
+  */
+ export default function useCopyToClipboard( text, onSuccess ) {
+ 	// Store the dependencies as refs and continuously update them so they're
+diff --git a/packages/compose/src/hooks/use-disabled/index.ts b/packages/compose/src/hooks/use-disabled/index.ts
+index 64b56b1f9a8682..e45d3b55e95e4d 100644
+--- a/packages/compose/src/hooks/use-disabled/index.ts
++++ b/packages/compose/src/hooks/use-disabled/index.ts
+@@ -13,7 +13,7 @@ import useRefEffect from '../use-ref-effect';
+  *
+  * @param {Object}   config            Configuration object.
+  * @param {boolean=} config.isDisabled Whether the element should be disabled.
+- * @return {import('react').RefCallback<HTMLElement>} Element Ref.
++ * @return {React.RefCallback<HTMLElement>} Element Ref.
+  *
+  * @example
+  * ```js
+diff --git a/packages/compose/src/hooks/use-dragging/index.js b/packages/compose/src/hooks/use-dragging/index.js
+index 1ef0b6fee1adc7..6c6cd0724649f3 100644
+--- a/packages/compose/src/hooks/use-dragging/index.js
++++ b/packages/compose/src/hooks/use-dragging/index.js
+@@ -11,10 +11,10 @@ import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
+ // Event handlers that are triggered from `document` listeners accept a MouseEvent,
+ // while those triggered from React listeners accept a React.MouseEvent.
+ /**
+- * @param {Object}                                  props
+- * @param {(e: import('react').MouseEvent) => void} props.onDragStart
+- * @param {(e: MouseEvent) => void}                 props.onDragMove
+- * @param {(e?: MouseEvent) => void}                props.onDragEnd
++ * @param {Object}                        props
++ * @param {(e: React.MouseEvent) => void} props.onDragStart
++ * @param {(e: MouseEvent) => void}       props.onDragMove
++ * @param {(e?: MouseEvent) => void}      props.onDragEnd
+  */
+ export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
+ 	const [ isDragging, setIsDragging ] = useState( false );
+@@ -46,7 +46,7 @@ export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
+ 		document.removeEventListener( 'mouseup', endDrag );
+ 		setIsDragging( false );
+ 	}, [] );
+-	/** @type {(e: import('react').MouseEvent) => void} */
++	/** @type {(e: React.MouseEvent) => void} */
+ 	const startDrag = useCallback( ( event ) => {
+ 		if ( eventsRef.current.onDragStart ) {
+ 			eventsRef.current.onDragStart( event );
+diff --git a/packages/compose/src/hooks/use-drop-zone/index.js b/packages/compose/src/hooks/use-drop-zone/index.js
+index 1bf1b822228273..8fa7799361e329 100644
+--- a/packages/compose/src/hooks/use-drop-zone/index.js
++++ b/packages/compose/src/hooks/use-drop-zone/index.js
+@@ -17,7 +17,7 @@ import useEvent from '../use-event';
+  * @param {(e: MouseEvent) => void} [props.onDragEnd]       Called when dragging has ended.
+  * @param {(e: DragEvent) => void}  [props.onDrop]          Called when dropping in the zone.
+  *
+- * @return {import('react').RefCallback<HTMLElement>} Ref callback to be passed to the drop zone element.
++ * @return {React.RefCallback<HTMLElement>} Ref callback to be passed to the drop zone element.
+  */
+ export default function useDropZone( {
+ 	dropZoneElement,
+diff --git a/packages/compose/src/hooks/use-fixed-window-list/index.js b/packages/compose/src/hooks/use-fixed-window-list/index.js
+index 8f285a3c260884..145aeda7b548e8 100644
+--- a/packages/compose/src/hooks/use-fixed-window-list/index.js
++++ b/packages/compose/src/hooks/use-fixed-window-list/index.js
+@@ -32,10 +32,10 @@ const DEFAULT_INIT_WINDOW_SIZE = 30;
+ 
+ /**
+  *
+- * @param {import('react').RefObject<HTMLElement>} elementRef Used to find the closest scroll container that contains element.
+- * @param { number }                               itemHeight Fixed item height in pixels
+- * @param { number }                               totalItems Total items in list
+- * @param { WPFixedWindowListOptions }             [options]  Options object
++ * @param {React.RefObject<HTMLElement>} elementRef Used to find the closest scroll container that contains element.
++ * @param { number }                     itemHeight Fixed item height in pixels
++ * @param { number }                     totalItems Total items in list
++ * @param { WPFixedWindowListOptions }   [options]  Options object
+  * @return {[ WPFixedWindowList, setFixedListWindow:(nextWindow:WPFixedWindowList)=>void]} Array with the fixed window list and setter
+  */
+ export default function useFixedWindowList(
+diff --git a/packages/compose/src/hooks/use-focus-on-mount/index.js b/packages/compose/src/hooks/use-focus-on-mount/index.js
+index 91760a927c5a94..669a9a076b1a9b 100644
+--- a/packages/compose/src/hooks/use-focus-on-mount/index.js
++++ b/packages/compose/src/hooks/use-focus-on-mount/index.js
+@@ -13,7 +13,7 @@ import useRefEffect from '../use-ref-effect';
+  * Hook used to focus the first tabbable element on mount.
+  *
+  * @param {boolean | 'firstElement' | 'firstInputElement'} focusOnMount Focus on mount mode.
+- * @return {import('react').RefCallback<HTMLElement>} Ref callback.
++ * @return {React.RefCallback<HTMLElement>} Ref callback.
+  *
+  * @example
+  * ```js
+@@ -48,7 +48,7 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
+ 		} );
+ 	};
+ 
+-	/** @type {import('react').MutableRefObject<ReturnType<setTimeout> | undefined>} */
++	/** @type {React.MutableRefObject<ReturnType<setTimeout> | undefined>} */
+ 	const timerIdRef = useRef();
+ 
+ 	useEffect( () => {
+diff --git a/packages/compose/src/hooks/use-focus-outside/index.native.js b/packages/compose/src/hooks/use-focus-outside/index.native.js
+index fe233ffcd2b116..b6a3f12475f948 100644
+--- a/packages/compose/src/hooks/use-focus-outside/index.native.js
++++ b/packages/compose/src/hooks/use-focus-outside/index.native.js
+@@ -41,7 +41,7 @@ function isFocusNormalizedButton( eventTarget ) {
+ }
+ 
+ /**
+- * @typedef {import('react').SyntheticEvent} SyntheticEvent
++ * @typedef {React.SyntheticEvent} SyntheticEvent
+  */
+ 
+ /**
+@@ -55,7 +55,7 @@ function isFocusNormalizedButton( eventTarget ) {
+  */
+ 
+ /**
+- * @typedef {import('react').MutableRefObject<FocusOutsideReactElement | undefined>} FocusOutsideRef
++ * @typedef {React.MutableRefObject<FocusOutsideReactElement | undefined>} FocusOutsideRef
+  */
+ 
+ /**
+@@ -88,7 +88,7 @@ export default function useFocusOutside( onFocusOutside ) {
+ 	const preventBlurCheck = useRef( false );
+ 
+ 	/**
+-	 * @type {import('react').MutableRefObject<number | undefined>}
++	 * @type {React.MutableRefObject<number | undefined>}
+ 	 */
+ 	const blurCheckTimeoutId = useRef();
+ 
+diff --git a/packages/compose/src/hooks/use-focus-return/index.js b/packages/compose/src/hooks/use-focus-return/index.js
+index 36dc7560669652..14f11d77906cb0 100644
+--- a/packages/compose/src/hooks/use-focus-return/index.js
++++ b/packages/compose/src/hooks/use-focus-return/index.js
+@@ -11,7 +11,7 @@ let origin = null;
+  * previously as is expected for roles like menus or dialogs.
+  *
+  * @param {() => void} [onFocusReturn] Overrides the default return behavior.
+- * @return {import('react').RefCallback<HTMLElement>} Element Ref.
++ * @return {React.RefCallback<HTMLElement>} Element Ref.
+  *
+  * @example
+  * ```js
+@@ -29,9 +29,9 @@ let origin = null;
+  * ```
+  */
+ function useFocusReturn( onFocusReturn ) {
+-	/** @type {import('react').MutableRefObject<null | HTMLElement>} */
++	/** @type {React.MutableRefObject<null | HTMLElement>} */
+ 	const ref = useRef( null );
+-	/** @type {import('react').MutableRefObject<null | Element>} */
++	/** @type {React.MutableRefObject<null | Element>} */
+ 	const focusedBeforeMount = useRef( null );
+ 	const onFocusReturnRef = useRef( onFocusReturn );
+ 	useEffect( () => {
+diff --git a/packages/compose/src/hooks/use-keyboard-shortcut/index.js b/packages/compose/src/hooks/use-keyboard-shortcut/index.js
+index bf4e007eb9ab42..2659a0335a8de8 100644
+--- a/packages/compose/src/hooks/use-keyboard-shortcut/index.js
++++ b/packages/compose/src/hooks/use-keyboard-shortcut/index.js
+@@ -15,10 +15,10 @@ import { isAppleOS } from '@wordpress/keycodes';
+  *
+  * @typedef {Object} WPKeyboardShortcutConfig
+  *
+- * @property {boolean}                                [bindGlobal] Handle keyboard events anywhere including inside textarea/input fields.
+- * @property {string}                                 [eventName]  Event name used to trigger the handler, defaults to keydown.
+- * @property {boolean}                                [isDisabled] Disables the keyboard handler if the value is true.
+- * @property {import('react').RefObject<HTMLElement>} [target]     React reference to the DOM element used to catch the keyboard event.
++ * @property {boolean}                      [bindGlobal] Handle keyboard events anywhere including inside textarea/input fields.
++ * @property {string}                       [eventName]  Event name used to trigger the handler, defaults to keydown.
++ * @property {boolean}                      [isDisabled] Disables the keyboard handler if the value is true.
++ * @property {React.RefObject<HTMLElement>} [target]     React reference to the DOM element used to catch the keyboard event.
+  */
+ 
+ /**
+@@ -26,9 +26,9 @@ import { isAppleOS } from '@wordpress/keycodes';
+  *
+  * @see https://craig.is/killing/mice#api.bind for information about the `callback` parameter.
+  *
+- * @param {string[]|string}                                                       shortcuts Keyboard Shortcuts.
+- * @param {(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void} callback  Shortcut callback.
+- * @param {WPKeyboardShortcutConfig}                                              options   Shortcut options.
++ * @param {string[]|string}                                             shortcuts Keyboard Shortcuts.
++ * @param {(e: Mousetrap.ExtendedKeyboardEvent, combo: string) => void} callback  Shortcut callback.
++ * @param {WPKeyboardShortcutConfig}                                    options   Shortcut options.
+  */
+ function useKeyboardShortcut(
+ 	shortcuts,
+diff --git a/packages/compose/src/hooks/use-merge-refs/index.js b/packages/compose/src/hooks/use-merge-refs/index.js
+index 59242b54e71242..337df89f345463 100644
+--- a/packages/compose/src/hooks/use-merge-refs/index.js
++++ b/packages/compose/src/hooks/use-merge-refs/index.js
+@@ -5,20 +5,19 @@ import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
+ 
+ /**
+  * @template T
+- * @typedef {T extends import('react').Ref<infer R> ? R : never} TypeFromRef
++ * @typedef {T extends React.Ref<infer R> ? R : never} TypeFromRef
+  */
+ 
+ /**
+  * @template T
+- * @param {import('react').Ref<T>} ref
+- * @param {T}                      value
++ * @param {React.Ref<T>} ref
++ * @param {T}            value
+  */
+ function assignRef( ref, value ) {
+ 	if ( typeof ref === 'function' ) {
+ 		ref( value );
+ 	} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
+-		/** @type {import('react').MutableRefObject<T>} */ ( ref ).current =
+-			value;
++		/** @type {React.MutableRefObject<T>} */ ( ref ).current = value;
+ 	}
+ }
+ 
+@@ -60,16 +59,16 @@ function assignRef( ref, value ) {
+  * return <div ref={ mergedRefs } />;
+  * ```
+  *
+- * @template {import('react').Ref<any>} TRef
++ * @template {React.Ref<any>} TRef
+  * @param {Array<TRef>} refs The refs to be merged.
+  *
+- * @return {import('react').RefCallback<TypeFromRef<TRef>>} The merged ref callback.
++ * @return {React.RefCallback<TypeFromRef<TRef>>} The merged ref callback.
+  */
+ export default function useMergeRefs( refs ) {
+ 	const element = useRef();
+ 	const isAttachedRef = useRef( false );
+ 	const didElementChangeRef = useRef( false );
+-	/** @type {import('react').MutableRefObject<TRef[]>} */
++	/** @type {React.MutableRefObject<TRef[]>} */
+ 	const previousRefsRef = useRef( [] );
+ 	const currentRefsRef = useRef( refs );
+ 
+diff --git a/packages/data/src/components/with-dispatch/index.js b/packages/data/src/components/with-dispatch/index.js
+index cc67c8d9806375..f008367534e315 100644
+--- a/packages/data/src/components/with-dispatch/index.js
++++ b/packages/data/src/components/with-dispatch/index.js
+@@ -8,7 +8,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
+  */
+ import { useDispatchWithMap } from '../use-dispatch';
+ 
+-/** @typedef {import('react').ComponentType} ComponentType */
++/** @typedef {React.ComponentType} ComponentType */
+ 
+ /**
+  * Higher-order component used to add dispatch props using registered action
+diff --git a/packages/data/src/components/with-select/index.js b/packages/data/src/components/with-select/index.js
+index 12a56b70da2b65..6e56e42742c1cc 100644
+--- a/packages/data/src/components/with-select/index.js
++++ b/packages/data/src/components/with-select/index.js
+@@ -8,7 +8,7 @@ import { createHigherOrderComponent, pure } from '@wordpress/compose';
+  */
+ import useSelect from '../use-select';
+ 
+-/** @typedef {import('react').ComponentType} ComponentType */
++/** @typedef {React.ComponentType} ComponentType */
+ 
+ /**
+  * Higher-order component used to inject state-derived props using registered
+diff --git a/packages/edit-site/src/components/page-templates/hooks.js b/packages/edit-site/src/components/page-templates/hooks.js
+index fa84728795bc0d..ec4d8827463768 100644
+--- a/packages/edit-site/src/components/page-templates/hooks.js
++++ b/packages/edit-site/src/components/page-templates/hooks.js
+@@ -22,14 +22,14 @@ import { TEMPLATE_ORIGINS } from '../../utils/constants';
+  *
+  * @typedef AddedByData
+  * @type {Object}
+- * @property {AddedByType}  type         The type of the data.
+- * @property {JSX.Element}  icon         The icon to display.
+- * @property {string}       [imageUrl]   The optional image URL to display.
+- * @property {string}       [text]       The text to display.
+- * @property {boolean}      isCustomized Whether the template has been customized.
++ * @property {AddedByType}       type         The type of the data.
++ * @property {React.JSX.Element} icon         The icon to display.
++ * @property {string}            [imageUrl]   The optional image URL to display.
++ * @property {string}            [text]       The text to display.
++ * @property {boolean}           isCustomized Whether the template has been customized.
+  *
+- * @param    {TemplateType} postType     The template post type.
+- * @param    {number}       postId       The template post id.
++ * @param    {TemplateType}      postType     The template post type.
++ * @param    {number}            postId       The template post id.
+  * @return {AddedByData} The added by object or null.
+  */
+ export function useAddedBy( postType, postId ) {
+diff --git a/packages/editor/README.md b/packages/editor/README.md
+index b13e1e0bbb3006..78101e70370620 100644
+--- a/packages/editor/README.md
++++ b/packages/editor/README.md
+@@ -1267,7 +1267,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `import('react').ComponentType`: The component.
++-   `React.ComponentType`: The component.
+ 
+ ### PostSchedule
+ 
+diff --git a/packages/editor/src/components/autocompleters/user.js b/packages/editor/src/components/autocompleters/user.js
+index 7381c1a9ce6ea4..5b5dd2e49fb7e2 100644
+--- a/packages/editor/src/components/autocompleters/user.js
++++ b/packages/editor/src/components/autocompleters/user.js
+@@ -9,7 +9,7 @@ import { store as coreStore } from '@wordpress/core-data';
+  * Renders a user label for the autocompleter.
+  *
+  * @param {Object} user User object.
+- * @return {JSX.Element} User label component.
++ * @return {React.JSX.Element} User label component.
+  */
+ export function getUserLabel( user ) {
+ 	const avatar =
+diff --git a/packages/editor/src/components/editor-history/redo.js b/packages/editor/src/components/editor-history/redo.js
+index b2b20555f30544..d5807eb38c9477 100644
+--- a/packages/editor/src/components/editor-history/redo.js
++++ b/packages/editor/src/components/editor-history/redo.js
+@@ -42,7 +42,7 @@ function EditorHistoryRedo( props, ref ) {
+ 	);
+ }
+ 
+-/** @typedef {import('react').Ref<HTMLElement>} Ref */
++/** @typedef {React.Ref<HTMLElement>} Ref */
+ 
+ /**
+  * Renders the redo button for the editor history.
+diff --git a/packages/editor/src/components/editor-history/undo.js b/packages/editor/src/components/editor-history/undo.js
+index fe8cce72c4197e..21ebdb75aa8833 100644
+--- a/packages/editor/src/components/editor-history/undo.js
++++ b/packages/editor/src/components/editor-history/undo.js
+@@ -38,7 +38,7 @@ function EditorHistoryUndo( props, ref ) {
+ 	);
+ }
+ 
+-/** @typedef {import('react').Ref<HTMLElement>} Ref */
++/** @typedef {React.Ref<HTMLElement>} Ref */
+ 
+ /**
+  * Renders the undo button for the editor history.
+diff --git a/packages/editor/src/components/global-styles/menu.js b/packages/editor/src/components/global-styles/menu.js
+index ab12d08980f605..63ca584bbc999d 100644
+--- a/packages/editor/src/components/global-styles/menu.js
++++ b/packages/editor/src/components/global-styles/menu.js
+@@ -19,7 +19,7 @@ import { useGlobalStyles } from './hooks';
+  * @param {Object}   props                  Component props.
+  * @param {boolean}  props.hideWelcomeGuide Whether to hide the Welcome Guide option.
+  * @param {Function} props.onChangePath     Callback for navigation to different paths (e.g., '/css').
+- * @return {JSX.Element} The Global Styles Action Menu component.
++ * @return {React.JSX.Element} The Global Styles Action Menu component.
+  */
+ export function GlobalStylesActionMenu( {
+ 	hideWelcomeGuide = false,
+diff --git a/packages/editor/src/components/header/header-skeleton.js b/packages/editor/src/components/header/header-skeleton.js
+index 8ca721d1f1a994..46394473cc3b42 100644
+--- a/packages/editor/src/components/header/header-skeleton.js
++++ b/packages/editor/src/components/header/header-skeleton.js
+@@ -32,12 +32,12 @@ const backButtonVariations = {
+ /**
+  * Header skeleton component providing the common layout structure.
+  *
+- * @param {Object}      props           Component props.
+- * @param {string}      props.className Additional class name.
+- * @param {JSX.Element} props.toolbar   Content for the left toolbar area.
+- * @param {JSX.Element} props.center    Content for the center area.
+- * @param {JSX.Element} props.settings  Content for the right settings area.
+- * @return {JSX.Element} The header skeleton component.
++ * @param {Object}            props           Component props.
++ * @param {string}            props.className Additional class name.
++ * @param {React.JSX.Element} props.toolbar   Content for the left toolbar area.
++ * @param {React.JSX.Element} props.center    Content for the center area.
++ * @param {React.JSX.Element} props.settings  Content for the right settings area.
++ * @return {React.JSX.Element} The header skeleton component.
+  */
+ export default function HeaderSkeleton( {
+ 	className,
+diff --git a/packages/editor/src/components/post-revisions-preview/diff-markers.js b/packages/editor/src/components/post-revisions-preview/diff-markers.js
+index 6a099125c73fd0..35999d30bc5823 100644
+--- a/packages/editor/src/components/post-revisions-preview/diff-markers.js
++++ b/packages/editor/src/components/post-revisions-preview/diff-markers.js
+@@ -73,7 +73,7 @@ function calculatePosition( el ) {
+  * @param {string}   props.clientId  The block client ID.
+  * @param {string}   props.status    The diff status (added/removed/modified).
+  * @param {Function} props.subscribe Function to subscribe to position updates.
+- * @return {JSX.Element|null} The diff marker button or null if position not calculated.
++ * @return {React.JSX.Element} The diff marker button or null if position not calculated.
+  */
+ function DiffMarkerButton( { clientId, status, subscribe } ) {
+ 	const blockRef = useRef();
+diff --git a/packages/editor/src/components/post-revisions-preview/revisions-canvas.js b/packages/editor/src/components/post-revisions-preview/revisions-canvas.js
+index d2383e561333c5..15db6f69561ac4 100644
+--- a/packages/editor/src/components/post-revisions-preview/revisions-canvas.js
++++ b/packages/editor/src/components/post-revisions-preview/revisions-canvas.js
+@@ -153,7 +153,7 @@ function CanvasContent( { showDiff } ) {
+  *
+  * @param {Object}  props          Component props.
+  * @param {boolean} props.showDiff Whether to show diff highlighting.
+- * @return {JSX.Element} The revisions canvas component.
++ * @return {React.JSX.Element} The revisions canvas component.
+  */
+ export default function RevisionsCanvas( { showDiff } ) {
+ 	useEffect( () => {
+diff --git a/packages/editor/src/components/post-revisions-preview/revisions-header.js b/packages/editor/src/components/post-revisions-preview/revisions-header.js
+index 0136d0f1aaeae0..4ebead8e78df27 100644
+--- a/packages/editor/src/components/post-revisions-preview/revisions-header.js
++++ b/packages/editor/src/components/post-revisions-preview/revisions-header.js
+@@ -31,7 +31,7 @@ import { unlock } from '../../lock-unlock';
+  * @param {Object}   props              Component props.
+  * @param {boolean}  props.showDiff     Whether diff highlighting is enabled.
+  * @param {Function} props.onToggleDiff Callback to toggle diff highlighting.
+- * @return {JSX.Element} The revisions header component.
++ * @return {React.JSX.Element} The revisions header component.
+  */
+ function RevisionsHeader( { showDiff, onToggleDiff } ) {
+ 	const isWideViewport = useViewportMatch( 'large' );
+diff --git a/packages/editor/src/components/post-revisions-preview/revisions-slider.js b/packages/editor/src/components/post-revisions-preview/revisions-slider.js
+index 7963e5b2da9462..6f81797880ad35 100644
+--- a/packages/editor/src/components/post-revisions-preview/revisions-slider.js
++++ b/packages/editor/src/components/post-revisions-preview/revisions-slider.js
+@@ -17,7 +17,7 @@ import { unlock } from '../../lock-unlock';
+ /**
+  * Slider component for navigating revisions.
+  *
+- * @return {JSX.Element} The revisions slider component.
++ * @return {React.JSX.Element} The revisions slider component.
+  */
+ function RevisionsSlider() {
+ 	const { revisions, isLoading, currentRevisionId } = useSelect(
+diff --git a/packages/editor/src/components/post-saved-state/index.js b/packages/editor/src/components/post-saved-state/index.js
+index 9232c684253f4d..ac7aac35a8bd81 100644
+--- a/packages/editor/src/components/post-saved-state/index.js
++++ b/packages/editor/src/components/post-saved-state/index.js
+@@ -32,7 +32,7 @@ import { ATTACHMENT_POST_TYPE } from '../../store/constants';
+  * @param {Object}   props              Component props.
+  * @param {?boolean} props.forceIsDirty Whether to force the post to be marked
+  *                                      as dirty.
+- * @return {import('react').ComponentType} The component.
++ * @return {React.ComponentType} The component.
+  */
+ export default function PostSavedState( { forceIsDirty } ) {
+ 	const [ forceSavedMessage, setForceSavedMessage ] = useState( false );
+diff --git a/packages/editor/src/components/styles-canvas/index.js b/packages/editor/src/components/styles-canvas/index.js
+index 3b850805908388..ee83ec4eb74bfb 100644
+--- a/packages/editor/src/components/styles-canvas/index.js
++++ b/packages/editor/src/components/styles-canvas/index.js
+@@ -38,7 +38,7 @@ export function getStylesCanvasTitle( path, showStylebook ) {
+  * Styles canvas component - orchestrates rendering of style book and revisions.
+  * Determines what content to show based on global styles navigation state.
+  *
+- * @return {JSX.Element|null} The styles canvas or null if nothing to render.
++ * @return {React.JSX.Element} The styles canvas or null if nothing to render.
+  */
+ export default function StylesCanvas() {
+ 	const { stylesPath, showStylebook, showListViewByDefault } = useSelect(
+diff --git a/packages/editor/src/components/styles-canvas/revisions.js b/packages/editor/src/components/styles-canvas/revisions.js
+index 8ccd6c62ba1ff3..81b96acde229af 100644
+--- a/packages/editor/src/components/styles-canvas/revisions.js
++++ b/packages/editor/src/components/styles-canvas/revisions.js
+@@ -35,10 +35,10 @@ function isObjectEmpty( object ) {
+  * Coordinates with ScreenRevisions through the path parameter to display
+  * the currently selected revision.
+  *
+- * @param {Object}                       props      Component props.
+- * @param {string}                       props.path Current path in global styles.
+- * @param {import('react').ForwardedRef} ref        Ref to the Revisions component.
+- * @return {JSX.Element|null} The Revisions component or null if loading.
++ * @param {Object}             props      Component props.
++ * @param {string}             props.path Current path in global styles.
++ * @param {React.ForwardedRef} ref        Ref to the Revisions component.
++ * @return {React.JSX.Element} The Revisions component or null if loading.
+  */
+ function StylesCanvasRevisions( { path }, ref ) {
+ 	const blocks = useSelect( ( select ) => {
+diff --git a/packages/editor/src/components/styles-canvas/style-book.js b/packages/editor/src/components/styles-canvas/style-book.js
+index e99e48967b2369..e83872afadb5d2 100644
+--- a/packages/editor/src/components/styles-canvas/style-book.js
++++ b/packages/editor/src/components/styles-canvas/style-book.js
+@@ -13,11 +13,11 @@ import { STYLE_BOOK_COLOR_GROUPS } from '../style-book/constants';
+  * Style Book content component for global styles.
+  * Provides the business logic for StyleBook behavior in the global styles context.
+  *
+- * @param {Object}                       props              Component props.
+- * @param {string}                       props.path         Current path in global styles.
+- * @param {Function}                     props.onPathChange Callback when the path changes.
+- * @param {import('react').ForwardedRef} ref                Ref to the Style Book component.
+- * @return {JSX.Element} The Style Book component.
++ * @param {Object}             props              Component props.
++ * @param {string}             props.path         Current path in global styles.
++ * @param {Function}           props.onPathChange Callback when the path changes.
++ * @param {React.ForwardedRef} ref                Ref to the Style Book component.
++ * @return {React.JSX.Element} The Style Book component.
+  */
+ function StylesCanvasStyleBook( { path, onPathChange }, ref ) {
+ 	return (
+diff --git a/packages/editor/src/components/visual-editor/edit-template-blocks-notification.js b/packages/editor/src/components/visual-editor/edit-template-blocks-notification.js
+index 9ecb4e414a836d..f8b3e56bbd0a92 100644
+--- a/packages/editor/src/components/visual-editor/edit-template-blocks-notification.js
++++ b/packages/editor/src/components/visual-editor/edit-template-blocks-notification.js
+@@ -22,9 +22,9 @@ import { store as editorStore } from '../../store';
+  *   is focusing on editing page content and double clicks on a disabled
+  *   template block.
+  *
+- * @param {Object}                                 props
+- * @param {import('react').RefObject<HTMLElement>} props.contentRef Ref to the block
+- *                                                                  editor iframe canvas.
++ * @param {Object}                       props
++ * @param {React.RefObject<HTMLElement>} props.contentRef Ref to the block
++ *                                                        editor iframe canvas.
+  */
+ export default function EditTemplateBlocksNotification( { contentRef } ) {
+ 	const { onNavigateToEntityRecord, templateId } = useSelect( ( select ) => {
+diff --git a/packages/editor/src/hooks/navigation-link-view-button.js b/packages/editor/src/hooks/navigation-link-view-button.js
+index d1bf2f4e81726b..444012b3390d1f 100644
+--- a/packages/editor/src/hooks/navigation-link-view-button.js
++++ b/packages/editor/src/hooks/navigation-link-view-button.js
+@@ -21,7 +21,7 @@ const SUPPORTED_BLOCKS = [ 'core/navigation-link', 'core/navigation-submenu' ];
+  *
+  * @param {Object} props            Component props.
+  * @param {Object} props.attributes Block attributes.
+- * @return {JSX.Element|null} The View button component or null if not applicable.
++ * @return {React.JSX.Element} The View button component or null if not applicable.
+  */
+ function NavigationViewButton( { attributes } ) {
+ 	const { kind, id, type } = attributes;
+diff --git a/packages/editor/src/hooks/template-part-navigation-edit-button.js b/packages/editor/src/hooks/template-part-navigation-edit-button.js
+index 790eb8fbaa487f..33ac3ac4480ddb 100644
+--- a/packages/editor/src/hooks/template-part-navigation-edit-button.js
++++ b/packages/editor/src/hooks/template-part-navigation-edit-button.js
+@@ -26,7 +26,7 @@ const BLOCK_INSPECTOR_AREA = 'edit-post/block';
+  *
+  * @param {Object} props          Component props.
+  * @param {string} props.clientId The template part block client ID.
+- * @return {JSX.Element|null} The Edit navigation button component or null if not applicable.
++ * @return {React.JSX.Element} The Edit navigation button component or null if not applicable.
+  */
+ function TemplatePartNavigationEditButton( { clientId } ) {
+ 	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );
+diff --git a/packages/element/README.md b/packages/element/README.md
+index e7701fb0420b09..fe7dcee920d993 100755
+--- a/packages/element/README.md
++++ b/packages/element/README.md
+@@ -126,7 +126,7 @@ _Related_
+ 
+ _Parameters_
+ 
+--   _child_ `import('react').ReactElement`: Any renderable child, such as an element, string, or fragment.
++-   _child_ `React.ReactElement`: Any renderable child, such as an element, string, or fragment.
+ -   _container_ `HTMLElement`: DOM node into which element should be rendered.
+ 
+ ### createRef
+@@ -155,7 +155,7 @@ Finds the dom node of a React component.
+ 
+ _Parameters_
+ 
+--   _component_ `import('react').ComponentType`: Component's instance.
++-   _component_ `React.ComponentType`: Component's instance.
+ 
+ ### flushSync
+ 
+diff --git a/packages/element/src/react-platform.ts b/packages/element/src/react-platform.ts
+index 862b02706876d2..7adfc6c33095ec 100644
+--- a/packages/element/src/react-platform.ts
++++ b/packages/element/src/react-platform.ts
+@@ -16,16 +16,16 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
+  *
+  * @see https://github.com/facebook/react/issues/10309#issuecomment-318433235
+  *
+- * @param {import('react').ReactElement} child     Any renderable child, such as an element,
+- *                                                 string, or fragment.
+- * @param {HTMLElement}                  container DOM node into which element should be rendered.
++ * @param {React.ReactElement} child     Any renderable child, such as an element,
++ *                                       string, or fragment.
++ * @param {HTMLElement}        container DOM node into which element should be rendered.
+  */
+ export { createPortal };
+ 
+ /**
+  * Finds the dom node of a React component.
+  *
+- * @param {import('react').ComponentType} component Component's instance.
++ * @param {React.ComponentType} component Component's instance.
+  */
+ export { findDOMNode };
+ 
+diff --git a/packages/element/src/serialize.ts b/packages/element/src/serialize.ts
+index c4807c0c00f220..8d7a97e68b1ea7 100644
+--- a/packages/element/src/serialize.ts
++++ b/packages/element/src/serialize.ts
+@@ -46,7 +46,7 @@ import {
+ import { createContext, Fragment, StrictMode, forwardRef } from './react';
+ import RawHTML from './raw-html';
+ 
+-/** @typedef {import('react').ReactElement} ReactElement */
++/** @typedef {React.ReactElement} ReactElement */
+ 
+ const Context = createContext( undefined );
+ Context.displayName = 'ElementContext';
+diff --git a/packages/eslint-plugin/configs/jsdoc.js b/packages/eslint-plugin/configs/jsdoc.js
+index c56cc9ab645493..6fe737e2a1fd03 100644
+--- a/packages/eslint-plugin/configs/jsdoc.js
++++ b/packages/eslint-plugin/configs/jsdoc.js
+@@ -101,7 +101,7 @@ module.exports = {
+ 					...temporaryWordPressInternalTypes,
+ 					...temporaryExternalTypes,
+ 					'void',
+-					'JSX',
++					'React',
+ 				],
+ 			},
+ 		],
+diff --git a/packages/fields/README.md b/packages/fields/README.md
+index fa190b8f47aa3c..e557e7cb3eca6d 100644
+--- a/packages/fields/README.md
++++ b/packages/fields/README.md
+@@ -106,7 +106,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `JSX.Element`: The media edit control component.
++-   `React.JSX.Element`: The media edit control component.
+ 
+ ### MediaEditProps
+ 
+diff --git a/packages/fields/src/components/media-edit/index.tsx b/packages/fields/src/components/media-edit/index.tsx
+index e73e8788df4397..8077e1211d519f 100644
+--- a/packages/fields/src/components/media-edit/index.tsx
++++ b/packages/fields/src/components/media-edit/index.tsx
+@@ -572,7 +572,7 @@ function CompactMediaEditAttachments( {
+  * @param {boolean}              [props.hideLabelFromVision] - Whether the label should be hidden from vision.
+  * @param {boolean}              [props.isExpanded]          - Whether to render in an expanded form. Default `false`.
+  *
+- * @return {JSX.Element} The media edit control component.
++ * @return {React.JSX.Element} The media edit control component.
+  *
+  * @example
+  * ```tsx
+diff --git a/packages/format-library/src/link/utils.js b/packages/format-library/src/link/utils.js
+index 73f312bf76a856..dd322e2686c305 100644
+--- a/packages/format-library/src/link/utils.js
++++ b/packages/format-library/src/link/utils.js
+@@ -133,10 +133,10 @@ export function createLinkFormat( {
+ 	return format;
+ }
+ 
+-/* eslint-disable jsdoc/no-undefined-types */
+ /**
+- * Get the start and end boundaries of a given format from a rich text value.
++ * @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue
+  *
++ * Get the start and end boundaries of a given format from a rich text value.
+  *
+  * @param {RichTextValue} value      the rich text value to interrogate.
+  * @param {string}        format     the identifier for the target format (e.g. `core/link`, `core/bold`).
+@@ -144,7 +144,6 @@ export function createLinkFormat( {
+  * @param {number?}       endIndex   optional endIndex to seek from.
+  * @return {Object}	object containing start and end values for the given format.
+  */
+-/* eslint-enable jsdoc/no-undefined-types */
+ export function getFormatBoundary(
+ 	value,
+ 	format,
+diff --git a/packages/interface/src/components/complementary-area-toggle/index.js b/packages/interface/src/components/complementary-area-toggle/index.js
+index 9c629a9bff2765..9187fb9cfb3b0d 100644
+--- a/packages/interface/src/components/complementary-area-toggle/index.js
++++ b/packages/interface/src/components/complementary-area-toggle/index.js
+@@ -14,7 +14,7 @@ import { store as interfaceStore } from '../../store';
+  * Whether the role supports checked state.
+  *
+  * @see https://www.w3.org/TR/wai-aria-1.1/#aria-checked
+- * @param {import('react').AriaRole} role Role.
++ * @param {React.AriaRole} role Role.
+  * @return {boolean} Whether the role supports checked state.
+  */
+ function roleSupportsCheckedState( role ) {
+diff --git a/packages/patterns/src/components/pattern-convert-button.js b/packages/patterns/src/components/pattern-convert-button.js
+index d650e31994d8e9..866772c7217b50 100644
+--- a/packages/patterns/src/components/pattern-convert-button.js
++++ b/packages/patterns/src/components/pattern-convert-button.js
+@@ -31,7 +31,7 @@ import { PATTERN_SYNC_TYPES } from '../constants';
+  * @param {string[]} props.clientIds              Client ids of selected blocks.
+  * @param {string}   props.rootClientId           ID of the currently selected top-level block.
+  * @param {()=>void} props.closeBlockSettingsMenu Callback to close the block settings menu dropdown.
+- * @return {import('react').ComponentType} The menu control or null.
++ * @return {React.ComponentType} The menu control or null.
+  */
+ export default function PatternConvertButton( {
+ 	clientIds,
+diff --git a/packages/primitives/src/svg/index.js b/packages/primitives/src/svg/index.js
+index 4da6685d3d6f1e..023e9104d951ab 100644
+--- a/packages/primitives/src/svg/index.js
++++ b/packages/primitives/src/svg/index.js
+@@ -8,87 +8,87 @@ import clsx from 'clsx';
+  */
+ import { createElement, forwardRef } from '@wordpress/element';
+ 
+-/** @typedef {{isPressed?: boolean} & import('react').ComponentPropsWithoutRef<'svg'>} SVGProps */
++/** @typedef {{isPressed?: boolean} & React.ComponentPropsWithoutRef<'svg'>} SVGProps */
+ 
+ /**
+- * @param {import('react').ComponentPropsWithoutRef<'circle'>} props
++ * @param {React.ComponentPropsWithoutRef<'circle'>} props
+  *
+- * @return {JSX.Element} Circle component
++ * @return {React.JSX.Element} Circle component
+  */
+ export const Circle = ( props ) => createElement( 'circle', props );
+ 
+ /**
+- * @param {import('react').ComponentPropsWithoutRef<'g'>} props
++ * @param {React.ComponentPropsWithoutRef<'g'>} props
+  *
+- * @return {JSX.Element} G component
++ * @return {React.JSX.Element} G component
+  */
+ export const G = ( props ) => createElement( 'g', props );
+ 
+ /**
+- * @param {import('react').ComponentPropsWithoutRef<'line'>} props
++ * @param {React.ComponentPropsWithoutRef<'line'>} props
+  *
+- * @return {JSX.Element} Path component
++ * @return {React.JSX.Element} Path component
+  */
+ export const Line = ( props ) => createElement( 'line', props );
+ 
+ /**
+- * @param {import('react').ComponentPropsWithoutRef<'path'>} props
++ * @param {React.ComponentPropsWithoutRef<'path'>} props
+  *
+- * @return {JSX.Element} Path component
++ * @return {React.JSX.Element} Path component
+  */
+ export const Path = ( props ) => createElement( 'path', props );
+ 
+ /**
+- * @param {import('react').ComponentPropsWithoutRef<'polygon'>} props
++ * @param {React.ComponentPropsWithoutRef<'polygon'>} props
+  *
+- * @return {JSX.Element} Polygon component
++ * @return {React.JSX.Element} Polygon component
+  */
+ export const Polygon = ( props ) => createElement( 'polygon', props );
+ 
+ /**
+- * @param {import('react').ComponentPropsWithoutRef<'rect'>} props
++ * @param {React.ComponentPropsWithoutRef<'rect'>} props
+  *
+- * @return {JSX.Element} Rect component
++ * @return {React.JSX.Element} Rect component
+  */
+ export const Rect = ( props ) => createElement( 'rect', props );
+ 
+ /**
+- * @param {import('react').ComponentPropsWithoutRef<'defs'>} props
++ * @param {React.ComponentPropsWithoutRef<'defs'>} props
+  *
+- * @return {JSX.Element} Defs component
++ * @return {React.JSX.Element} Defs component
+  */
+ export const Defs = ( props ) => createElement( 'defs', props );
+ 
+ /**
+- * @param {import('react').ComponentPropsWithoutRef<'radialGradient'>} props
++ * @param {React.ComponentPropsWithoutRef<'radialGradient'>} props
+  *
+- * @return {JSX.Element} RadialGradient component
++ * @return {React.JSX.Element} RadialGradient component
+  */
+ export const RadialGradient = ( props ) =>
+ 	createElement( 'radialGradient', props );
+ 
+ /**
+- * @param {import('react').ComponentPropsWithoutRef<'linearGradient'>} props
++ * @param {React.ComponentPropsWithoutRef<'linearGradient'>} props
+  *
+- * @return {JSX.Element} LinearGradient component
++ * @return {React.JSX.Element} LinearGradient component
+  */
+ export const LinearGradient = ( props ) =>
+ 	createElement( 'linearGradient', props );
+ 
+ /**
+- * @param {import('react').ComponentPropsWithoutRef<'stop'>} props
++ * @param {React.ComponentPropsWithoutRef<'stop'>} props
+  *
+- * @return {JSX.Element} Stop component
++ * @return {React.JSX.Element} Stop component
+  */
+ export const Stop = ( props ) => createElement( 'stop', props );
+ 
+ export const SVG = forwardRef(
+ 	/**
+-	 * @param {SVGProps}                                    props isPressed indicates whether the SVG should appear as pressed.
+-	 *                                                            Other props will be passed through to svg component.
+-	 * @param {import('react').ForwardedRef<SVGSVGElement>} ref   The forwarded ref to the SVG element.
++	 * @param {SVGProps}                          props isPressed indicates whether the SVG should appear as pressed.
++	 *                                                  Other props will be passed through to svg component.
++	 * @param {React.ForwardedRef<SVGSVGElement>} ref   The forwarded ref to the SVG element.
+ 	 *
+-	 * @return {JSX.Element} Stop component
++	 * @return {React.JSX.Element} Stop component
+ 	 */
+ 	( { className, isPressed, ...props }, ref ) => {
+ 		const appliedProps = {
+diff --git a/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js b/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
+index eda2378ede8438..b85cc95a851713 100644
+--- a/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
++++ b/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
+@@ -31,7 +31,7 @@ import { store } from '../../store';
+  * @param {string[]} props.clientIds    Client ids of selected blocks.
+  * @param {string}   props.rootClientId ID of the currently selected top-level block.
+  * @param {()=>void} props.onClose      Callback to close the menu.
+- * @return {import('react').ComponentType} The menu control or null.
++ * @return {React.ComponentType} The menu control or null.
+  */
+ export default function ReusableBlockConvertButton( {
+ 	clientIds,
+diff --git a/packages/server-side-render/README.md b/packages/server-side-render/README.md
+index fa5065fe263926..4df7faaee452fe 100644
+--- a/packages/server-side-render/README.md
++++ b/packages/server-side-render/README.md
+@@ -76,7 +76,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `JSX.Element`: The rendered server-side content.
++-   `React.JSX.Element`: The rendered server-side content.
+ 
+ ### useServerSideRender
+ 
+diff --git a/packages/server-side-render/src/server-side-render.js b/packages/server-side-render/src/server-side-render.js
+index 811b0f1c1b0b10..8100574bc31136 100644
+--- a/packages/server-side-render/src/server-side-render.js
++++ b/packages/server-side-render/src/server-side-render.js
+@@ -146,7 +146,7 @@ export function ServerSideRender( props ) {
+  * @param {Function} [props.ErrorResponsePlaceholder]         Component rendered when the API response is an error.
+  * @param {Function} [props.LoadingResponsePlaceholder]       Component rendered while the API request is loading.
+  *
+- * @return {JSX.Element} The rendered server-side content.
++ * @return {React.JSX.Element} The rendered server-side content.
+  */
+ export function ServerSideRenderWithPostId( {
+ 	urlQueryArgs = EMPTY_OBJECT,
+diff --git a/packages/workflow/src/components/workflow-menu.js b/packages/workflow/src/components/workflow-menu.js
+index 699769614a7e9c..49c5979f40e293 100644
+--- a/packages/workflow/src/components/workflow-menu.js
++++ b/packages/workflow/src/components/workflow-menu.js
+@@ -110,7 +110,7 @@ export function WorkflowMenu() {
+ 
+ 	useShortcut(
+ 		'core/workflows',
+-		/** @type {import('react').KeyboardEventHandler} */
++		/** @type {React.KeyboardEventHandler} */
+ 		withIgnoreIMEEvents( ( event ) => {
+ 			// Bails to avoid obscuring the effect of the preceding handler(s).
+ 			if ( event.defaultPrevented ) {
+diff --git a/test/native/integration-test-helpers/initialize-editor.js b/test/native/integration-test-helpers/initialize-editor.js
+index ffaea764a90ec7..3be4b48cdbc6ad 100644
+--- a/test/native/integration-test-helpers/initialize-editor.js
++++ b/test/native/integration-test-helpers/initialize-editor.js
+@@ -22,11 +22,11 @@ import { getGlobalStyles } from './get-global-styles';
+ /**
+  * Initialize an editor for test assertions.
+  *
+- * @param {Object}                    props                  Properties passed to the editor component.
+- * @param {string}                    props.initialHtml      String of block editor HTML to parse and render.
+- * @param {string}                    props.withGlobalStyles Boolean to pass global styles data to the editor.
+- * @param {Object}                    [options]              Configuration options for the editor.
+- * @param {import('react').ReactNode} [options.component]    A specific editor component to render.
++ * @param {Object}          props                  Properties passed to the editor component.
++ * @param {string}          props.initialHtml      String of block editor HTML to parse and render.
++ * @param {string}          props.withGlobalStyles Boolean to pass global styles data to the editor.
++ * @param {Object}          [options]              Configuration options for the editor.
++ * @param {React.ReactNode} [options.component]    A specific editor component to render.
+  * @return {import('@testing-library/react-native').RenderAPI} A Testing Library screen.
+  */
+ export async function initializeEditor( props, { component } = {} ) {

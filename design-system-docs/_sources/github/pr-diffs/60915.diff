@@ -1,0 +1,96 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index be8d36763e41d7..a8ca30bd206270 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Deprecation
+ 
+ -   `Navigation`: Soft deprecate component ([#59182](https://github.com/WordPress/gutenberg/pull/59182)).
++-   `BorderBoxControl`: Remove "experimental" designation ([#60915](https://github.com/WordPress/gutenberg/pull/60915)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/border-box-control/border-box-control/README.md b/packages/components/src/border-box-control/border-box-control/README.md
+index 20352e03c8243d..7671292d835cd3 100644
+--- a/packages/components/src/border-box-control/border-box-control/README.md
++++ b/packages/components/src/border-box-control/border-box-control/README.md
+@@ -1,10 +1,5 @@
+ # BorderBoxControl
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-<br />
+-
+ This component provides users with the ability to configure a single "flat"
+ border or separate borders per side.
+ 
+@@ -28,7 +23,7 @@ show "Mixed" placeholder text.
+ 
+ ```jsx
+ import { useState } from 'react';
+-import { __experimentalBorderBoxControl as BorderBoxControl } from '@wordpress/components';
++import { BorderBoxControl } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ 
+ const colors = [
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index 26967ad7f63ddb..f1a55f88c03b75 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -162,7 +162,7 @@ const UnconnectedBorderBoxControl = (
+  * view's width input would show "Mixed" placeholder text.
+  *
+  * ```jsx
+- * import { __experimentalBorderBoxControl as BorderBoxControl } from '@wordpress/components';
++ * import { BorderBoxControl } from '@wordpress/components';
+  * import { __ } from '@wordpress/i18n';
+  *
+  * const colors = [
+diff --git a/packages/components/src/border-box-control/stories/index.story.tsx b/packages/components/src/border-box-control/stories/index.story.tsx
+index 5b5d7f311208c0..7ac8cbbea8c159 100644
+--- a/packages/components/src/border-box-control/stories/index.story.tsx
++++ b/packages/components/src/border-box-control/stories/index.story.tsx
+@@ -16,7 +16,7 @@ import Button from '../../button';
+ import { BorderBoxControl } from '../';
+ 
+ const meta: Meta< typeof BorderBoxControl > = {
+-	title: 'Components (Experimental)/BorderBoxControl',
++	title: 'Components/BorderBoxControl',
+ 	component: BorderBoxControl,
+ 	argTypes: {
+ 		onChange: { action: 'onChange' },
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..667250f1da1c6c 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -29,10 +29,14 @@ export {
+ } from './autocomplete';
+ export { default as BaseControl, useBaseControlProps } from './base-control';
+ export {
++	/**
++	 * @deprecated Import `BorderBoxControl` instead.
++	 */
+ 	BorderBoxControl as __experimentalBorderBoxControl,
+ 	hasSplitBorders as __experimentalHasSplitBorders,
+ 	isDefinedBorder as __experimentalIsDefinedBorder,
+ 	isEmptyBorder as __experimentalIsEmptyBorder,
++	BorderBoxControl,
+ } from './border-box-control';
+ export { BorderControl as __experimentalBorderControl } from './border-control';
+ export {
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..db35908b5c9879 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'borderboxcontrol',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

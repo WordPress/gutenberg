@@ -1,0 +1,60 @@
+diff --git a/storybook/main.js b/storybook/main.js
+index 66e951b26b1de6..f111e9f5d8cd38 100644
+--- a/storybook/main.js
++++ b/storybook/main.js
+@@ -41,6 +41,7 @@ module.exports = {
+ 		disableTelemetry: true,
+ 	},
+ 	stories,
++	staticDirs: [ './static' ],
+ 	addons: [
+ 		{
+ 			name: '@storybook/addon-docs',
+diff --git a/storybook/static/wp-logo@2x.png b/storybook/static/wp-logo@2x.png
+new file mode 100644
+index 00000000000000..a95cd961902b01
+Binary files /dev/null and b/storybook/static/wp-logo@2x.png differ
+diff --git a/storybook/theme.js b/storybook/theme.js
+index c13de5b53d4f53..9e340119eb48f8 100644
+--- a/storybook/theme.js
++++ b/storybook/theme.js
+@@ -6,6 +6,37 @@ import { create } from '@storybook/theming/create';
+ export default create( {
+ 	base: 'light',
+ 	brandTitle: 'WordPress Components',
+-	brandImage:
+-		'https://s.w.org/style/images/about/WordPress-logotype-wmark.png',
++	brandImage: './wp-logo@2x.png',
++
++	// Typography
++	fontBase:
++		'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif',
++	fontCode: 'monospace',
++
++	//
++	colorPrimary: '#3858E9',
++	colorSecondary: '#3858E9',
++
++	// UI
++	appBg: '#ffffff',
++	appContentBg: '#ffffff',
++	appPreviewBg: '#ffffff',
++	appBorderColor: '#DCDCDE',
++	appBorderRadius: 4,
++
++	// Text colors
++	textColor: '#10162F',
++	textInverseColor: '#ffffff',
++
++	// Toolbar default and active colors
++	barTextColor: '#9E9E9E',
++	barSelectedColor: '#3858E9',
++	barHoverColor: '#3858E9',
++	barBg: '#ffffff',
++
++	// Form colors
++	inputBg: '#ffffff',
++	inputBorder: '#10162F',
++	inputTextColor: '#10162F',
++	inputBorderRadius: 2,
+ } );

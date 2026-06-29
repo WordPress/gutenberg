@@ -1,0 +1,659 @@
+diff --git a/package-lock.json b/package-lock.json
+index 2f4240b00ac51a..54b21d38f45d83 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -39,6 +39,7 @@
+ 				"@storybook/addon-actions": "8.4.7",
+ 				"@storybook/addon-controls": "8.4.7",
+ 				"@storybook/addon-docs": "8.4.7",
++				"@storybook/addon-interactions": "8.4.7",
+ 				"@storybook/addon-toolbars": "8.4.7",
+ 				"@storybook/addon-viewport": "8.4.7",
+ 				"@storybook/addon-webpack5-compiler-babel": "3.0.3",
+@@ -100,7 +101,7 @@
+ 				"eslint-plugin-prettier": "5.0.0",
+ 				"eslint-plugin-react-compiler": "19.0.0-beta-0dec889-20241115",
+ 				"eslint-plugin-ssr-friendly": "1.0.6",
+-				"eslint-plugin-storybook": "0.6.13",
++				"eslint-plugin-storybook": "0.9.0",
+ 				"eslint-plugin-testing-library": "6.0.2",
+ 				"execa": "4.0.2",
+ 				"fast-glob": "3.2.7",
+@@ -5034,15 +5035,19 @@
+ 			}
+ 		},
+ 		"node_modules/@eslint-community/eslint-utils": {
+-			"version": "4.4.0",
+-			"resolved": "https://registry.npmjs.org/@eslint-community/eslint-utils/-/eslint-utils-4.4.0.tgz",
+-			"integrity": "sha512-1/sA4dwrzBAyeUoQ6oxahHKmrZvsnLCg4RfxW3ZFGGmQkSNQPFNLV9CUEFQP1x9EYXHTo5p6xdhZM1Ne9p/AfA==",
++			"version": "4.7.0",
++			"resolved": "https://registry.npmjs.org/@eslint-community/eslint-utils/-/eslint-utils-4.7.0.tgz",
++			"integrity": "sha512-dyybb3AcajC7uha6CvhdVRJqaKyn7w2YKqKyAN37NKYgZT36w+iRb0Dymmc5qEJ549c/S31cMMSFd75bteCpCw==",
++			"license": "MIT",
+ 			"dependencies": {
+-				"eslint-visitor-keys": "^3.3.0"
++				"eslint-visitor-keys": "^3.4.3"
+ 			},
+ 			"engines": {
+ 				"node": "^12.22.0 || ^14.17.0 || >=16.0.0"
+ 			},
++			"funding": {
++				"url": "https://opencollective.com/eslint"
++			},
+ 			"peerDependencies": {
+ 				"eslint": "^6.0.0 || ^7.0.0 || >=8.0.0"
+ 			}
+@@ -11724,6 +11729,27 @@
+ 				"storybook": "^8.4.7"
+ 			}
+ 		},
++		"node_modules/@storybook/addon-interactions": {
++			"version": "8.4.7",
++			"resolved": "https://registry.npmjs.org/@storybook/addon-interactions/-/addon-interactions-8.4.7.tgz",
++			"integrity": "sha512-fnufT3ym8ht3HHUIRVXAH47iOJW/QOb0VSM+j269gDuvyDcY03D1civCu1v+eZLGaXPKJ8vtjr0L8zKQ/4P0JQ==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"@storybook/global": "^5.0.0",
++				"@storybook/instrumenter": "8.4.7",
++				"@storybook/test": "8.4.7",
++				"polished": "^4.2.2",
++				"ts-dedent": "^2.2.0"
++			},
++			"funding": {
++				"type": "opencollective",
++				"url": "https://opencollective.com/storybook"
++			},
++			"peerDependencies": {
++				"storybook": "^8.4.7"
++			}
++		},
+ 		"node_modules/@storybook/addon-toolbars": {
+ 			"version": "8.4.7",
+ 			"resolved": "https://registry.npmjs.org/@storybook/addon-toolbars/-/addon-toolbars-8.4.7.tgz",
+@@ -23940,18 +23966,19 @@
+ 			}
+ 		},
+ 		"node_modules/eslint-plugin-storybook": {
+-			"version": "0.6.13",
+-			"resolved": "https://registry.npmjs.org/eslint-plugin-storybook/-/eslint-plugin-storybook-0.6.13.tgz",
+-			"integrity": "sha512-smd+CS0WH1jBqUEJ3znGS7DU4ayBE9z6lkQAK2yrSUv1+rq8BT/tiI5C/rKE7rmiqiAfojtNYZRhzo5HrulccQ==",
++			"version": "0.9.0",
++			"resolved": "https://registry.npmjs.org/eslint-plugin-storybook/-/eslint-plugin-storybook-0.9.0.tgz",
++			"integrity": "sha512-qOT/2vQBo0VqrG/BhZv8IdSsKQiyzJw+2Wqq+WFCiblI/PfxLSrGkF/buiXF+HumwfsCyBdaC94UhqhmYFmAvA==",
+ 			"dev": true,
++			"license": "MIT",
+ 			"dependencies": {
+ 				"@storybook/csf": "^0.0.1",
+-				"@typescript-eslint/utils": "^5.45.0",
+-				"requireindex": "^1.1.0",
++				"@typescript-eslint/utils": "^5.62.0",
++				"requireindex": "^1.2.0",
+ 				"ts-dedent": "^2.2.0"
+ 			},
+ 			"engines": {
+-				"node": "12.x || 14.x || >= 16"
++				"node": ">= 18"
+ 			},
+ 			"peerDependencies": {
+ 				"eslint": ">=6"
+@@ -23962,6 +23989,7 @@
+ 			"resolved": "https://registry.npmjs.org/@storybook/csf/-/csf-0.0.1.tgz",
+ 			"integrity": "sha512-USTLkZze5gkel8MYCujSRBVIrUQ3YPBrLOx7GNk/0wttvVtlzWXAq9eLbQ4p/NicGxP+3T7KPEMVV//g+yubpw==",
+ 			"dev": true,
++			"license": "MIT",
+ 			"dependencies": {
+ 				"lodash": "^4.17.15"
+ 			}
+diff --git a/package.json b/package.json
+index 9b2bc94bc2da66..d5c3a6a65ae367 100644
+--- a/package.json
++++ b/package.json
+@@ -48,6 +48,7 @@
+ 		"@storybook/addon-actions": "8.4.7",
+ 		"@storybook/addon-controls": "8.4.7",
+ 		"@storybook/addon-docs": "8.4.7",
++		"@storybook/addon-interactions": "8.4.7",
+ 		"@storybook/addon-toolbars": "8.4.7",
+ 		"@storybook/addon-viewport": "8.4.7",
+ 		"@storybook/addon-webpack5-compiler-babel": "3.0.3",
+@@ -109,7 +110,7 @@
+ 		"eslint-plugin-prettier": "5.0.0",
+ 		"eslint-plugin-react-compiler": "19.0.0-beta-0dec889-20241115",
+ 		"eslint-plugin-ssr-friendly": "1.0.6",
+-		"eslint-plugin-storybook": "0.6.13",
++		"eslint-plugin-storybook": "0.9.0",
+ 		"eslint-plugin-testing-library": "6.0.2",
+ 		"execa": "4.0.2",
+ 		"fast-glob": "3.2.7",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 49abeb6edb37e7..b2061f71bf9580 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ ### Internal
+ 
+ -   Validated form controls: Add support for async validation. This is a breaking API change that splits the `customValidator` prop into an `onValidate` callback and a `customValidity` object. ([#71184](https://github.com/WordPress/gutenberg/pull/71184)).
++-   Validated form controls: Fix bug where "validating" state was not shown when transitioning from error state ([#71260](https://github.com/WordPress/gutenberg/pull/71260)).
+ -   `DateCalendar`, `DateRangeCalendar`: use `px` instead of `rem` units. ([#71248](https://github.com/WordPress/gutenberg/pull/71248)).
+ 
+ ## 30.1.0 (2025-08-07)
+diff --git a/packages/components/src/validated-form-controls/components/stories/overview.story.tsx b/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
+index 6f5e9ac174167c..2267a383961ea5 100644
+--- a/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
+@@ -1,12 +1,14 @@
+ /**
+- * WordPress dependencies
++ * External dependencies
+  */
+-import { useRef, useCallback, useState } from '@wordpress/element';
++import type { Meta, StoryObj } from '@storybook/react';
++import { expect, userEvent, waitFor, within } from '@storybook/test';
+ 
+ /**
+- * External dependencies
++ * WordPress dependencies
+  */
+-import type { Meta, StoryObj } from '@storybook/react';
++import { useRef, useCallback, useState } from '@wordpress/element';
++import { debounce } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -14,7 +16,6 @@ import type { Meta, StoryObj } from '@storybook/react';
+ import { ValidatedInputControl } from '..';
+ import { formDecorator } from './story-utils';
+ import type { ControlWithError } from '../../control-with-error';
+-import { debounce } from '@wordpress/compose';
+ 
+ const meta: Meta< typeof ControlWithError > = {
+ 	title: 'Components/Selection & Input/Validated Form Controls/Overview',
+@@ -166,24 +167,19 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
+ 				} );
+ 
+ 				clearTimeout( timeoutRef.current );
+-				timeoutRef.current = setTimeout(
+-					() => {
+-						if ( v?.toString().toLowerCase() === 'error' ) {
+-							setCustomValidity( {
+-								type: 'invalid',
+-								message: 'The word "error" is not allowed.',
+-							} );
+-						} else {
+-							setCustomValidity( {
+-								type: 'valid',
+-								message: 'Validated',
+-							} );
+-						}
+-					},
+-					// Mimics a random server response time.
+-					// eslint-disable-next-line no-restricted-syntax
+-					Math.random() < 0.5 ? 1500 : 300
+-				);
++				timeoutRef.current = setTimeout( () => {
++					if ( v?.toString().toLowerCase() === 'error' ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message: 'The word "error" is not allowed.',
++						} );
++					} else {
++						setCustomValidity( {
++							type: 'valid',
++							message: 'Validated',
++						} );
++					}
++				}, 1500 );
+ 			}, 500 ),
+ 			[]
+ 		);
+@@ -200,9 +196,95 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
+ 			/>
+ 		);
+ 	},
++	args: {
++		label: 'Text',
++		help: 'The word "error" will trigger an error asynchronously.',
++		required: true,
++	},
+ };
+-AsyncValidation.args = {
+-	label: 'Text',
+-	help: 'The word "error" will trigger an error asynchronously.',
+-	required: true,
++
++// Not exported - Only for testing purposes.
++// eslint-disable-next-line @typescript-eslint/no-unused-vars
++const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
++	...AsyncValidation,
++	play: async ( { canvasElement } ) => {
++		const canvas = within( canvasElement );
++		await userEvent.click( canvas.getByRole( 'textbox' ) );
++		await userEvent.type( canvas.getByRole( 'textbox' ), 'valid text', {
++			delay: 10,
++		} );
++		await userEvent.tab();
++
++		await waitFor(
++			() => {
++				expect( canvas.getByText( 'Validated' ) ).toBeVisible();
++			},
++			{ timeout: 2500 }
++		);
++
++		await new Promise( ( resolve ) => setTimeout( resolve, 500 ) );
++		await userEvent.clear( canvas.getByRole( 'textbox' ) );
++
++		// Should show validating state when transitioning from valid to invalid.
++		await waitFor(
++			() => {
++				expect( canvas.getByText( 'Validating...' ) ).toBeVisible();
++			},
++			{ timeout: 2500 }
++		);
++
++		await waitFor(
++			() => {
++				expect(
++					canvas.getByText( 'Please fill out this field.' )
++				).toBeVisible();
++			},
++			{ timeout: 2500 }
++		);
++
++		// Should not show validating state if there were no changes
++		// after a valid/invalid state was already shown.
++		await new Promise( ( resolve ) => setTimeout( resolve, 1500 ) );
++		await expect(
++			canvas.queryByText( 'Validating...' )
++		).not.toBeInTheDocument();
++
++		await userEvent.type( canvas.getByRole( 'textbox' ), 'e', {
++			delay: 10,
++		} );
++
++		// Should not show valid state if server has not yet responded.
++		await expect(
++			canvas.queryByText( 'Validated' )
++		).not.toBeInTheDocument();
++
++		// Should show validating state when transitioning from invalid to valid.
++		await waitFor(
++			() => {
++				expect( canvas.getByText( 'Validating...' ) ).toBeVisible();
++			},
++			{ timeout: 2500 }
++		);
++
++		await waitFor(
++			() => {
++				expect( canvas.getByText( 'Validated' ) ).toBeVisible();
++			},
++			{ timeout: 2500 }
++		);
++
++		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
++		await userEvent.type( canvas.getByRole( 'textbox' ), 'rror', {
++			delay: 10,
++		} );
++
++		await waitFor(
++			() => {
++				expect(
++					canvas.getByText( 'The word "error" is not allowed.' )
++				).toBeVisible();
++			},
++			{ timeout: 2500 }
++		);
++	},
+ };
+diff --git a/packages/components/src/validated-form-controls/control-with-error.tsx b/packages/components/src/validated-form-controls/control-with-error.tsx
+index aa6027a74c9edc..76cd207f0b19b2 100644
+--- a/packages/components/src/validated-form-controls/control-with-error.tsx
++++ b/packages/components/src/validated-form-controls/control-with-error.tsx
+@@ -1,11 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
++import { usePrevious } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+-
+-/**
+- * External dependencies
+- */
+ import {
+ 	cloneElement,
+ 	forwardRef,
+@@ -98,6 +95,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		| undefined
+ 	>();
+ 	const [ isTouched, setIsTouched ] = useState( false );
++	const previousCustomValidityType = usePrevious( customValidity?.type );
+ 
+ 	// Ensure that error messages are visible after user attemps to submit a form
+ 	// with multiple invalid fields.
+@@ -116,7 +114,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		};
+ 	} );
+ 
+-	useEffect( () => {
++	useEffect( (): ReturnType< React.EffectCallback > => {
+ 		if ( ! isTouched ) {
+ 			return;
+ 		}
+@@ -134,6 +132,9 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 			case 'validating': {
+ 				// Wait before showing a validating state.
+ 				const timer = setTimeout( () => {
++					validityTarget?.setCustomValidity( '' );
++					setErrorMessage( undefined );
++
+ 					setStatusMessage( {
+ 						type: 'validating',
+ 						message: customValidity.message,
+@@ -143,6 +144,12 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 				return () => clearTimeout( timer );
+ 			}
+ 			case 'valid': {
++				// Ensures that we wait for any async responses before showing
++				// a synchronously valid state.
++				if ( previousCustomValidityType === 'valid' ) {
++					break;
++				}
++
+ 				validityTarget?.setCustomValidity( '' );
+ 				setErrorMessage( validityTarget?.validationMessage );
+ 
+@@ -150,7 +157,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 					type: 'valid',
+ 					message: customValidity.message,
+ 				} );
+-				return;
++				break;
+ 			}
+ 			case 'invalid': {
+ 				validityTarget?.setCustomValidity(
+@@ -159,7 +166,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 				setErrorMessage( validityTarget?.validationMessage );
+ 
+ 				setStatusMessage( undefined );
+-				return undefined;
++				break;
+ 			}
+ 		}
+ 	}, [
+@@ -167,9 +174,14 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		customValidity?.type,
+ 		customValidity?.message,
+ 		getValidityTarget,
++		previousCustomValidityType,
+ 	] );
+ 
+ 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
++		if ( isTouched ) {
++			return;
++		}
++
+ 		// Only consider "blurred from the component" if focus has fully left the wrapping div.
+ 		// This prevents unnecessary blurs from components with multiple focusable elements.
+ 		if (
+@@ -177,17 +189,6 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 			! event.currentTarget.contains( event.relatedTarget )
+ 		) {
+ 			setIsTouched( true );
+-
+-			const validityTarget = getValidityTarget();
+-
+-			// Prevents a double flash of the native error tooltip when the control is already showing one.
+-			if ( ! validityTarget?.validity.valid ) {
+-				if ( ! errorMessage ) {
+-					setErrorMessage( validityTarget?.validationMessage );
+-				}
+-				return;
+-			}
+-
+ 			onValidate?.();
+ 		}
+ 	};
+diff --git a/packages/components/src/validated-form-controls/test/control-with-error.tsx b/packages/components/src/validated-form-controls/test/control-with-error.tsx
+new file mode 100644
+index 00000000000000..8d04834c00f51a
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/test/control-with-error.tsx
+@@ -0,0 +1,224 @@
++/**
++ * External dependencies
++ */
++import { render, screen, waitFor, act } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * WordPress dependencies
++ */
++import { useState, useCallback } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { ValidatedInputControl } from '../components';
++
++describe( 'ControlWithError', () => {
++	describe( 'Async Validation', () => {
++		beforeEach( () => {
++			jest.useFakeTimers();
++		} );
++
++		afterEach( () => {
++			jest.useRealTimers();
++		} );
++
++		const AsyncValidatedInputControl = ( {
++			serverDelayMs,
++			...restProps
++		}: {
++			serverDelayMs: number;
++		} & React.ComponentProps< typeof ValidatedInputControl > ) => {
++			const [ text, setText ] = useState( '' );
++			const [ customValidity, setCustomValidity ] =
++				useState<
++					React.ComponentProps<
++						typeof ValidatedInputControl
++					>[ 'customValidity' ]
++				>( undefined );
++
++			const onValidate = useCallback(
++				( value?: string ) => {
++					setCustomValidity( {
++						type: 'validating',
++						message: 'Validating...',
++					} );
++
++					// Simulate delayed server response
++					setTimeout( () => {
++						if ( value?.toLowerCase() === 'error' ) {
++							setCustomValidity( {
++								type: 'invalid',
++								message: 'The word "error" is not allowed.',
++							} );
++						} else {
++							setCustomValidity( {
++								type: 'valid',
++								message: 'Validated',
++							} );
++						}
++					}, serverDelayMs );
++				},
++				[ serverDelayMs ]
++			);
++
++			return (
++				<ValidatedInputControl
++					label="Text"
++					value={ text }
++					onChange={ ( newValue ) => {
++						setText( newValue ?? '' );
++					} }
++					onValidate={ onValidate }
++					customValidity={ customValidity }
++					{ ...restProps }
++				/>
++			);
++		};
++
++		it( 'should not show "validating" state if it takes less than 1000ms', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++			render( <AsyncValidatedInputControl serverDelayMs={ 500 } /> );
++
++			const input = screen.getByRole( 'textbox' );
++
++			await user.type( input, 'valid text' );
++
++			// Blur to trigger validation
++			await user.tab();
++
++			// Fast-forward to right before the server response
++			act( () => jest.advanceTimersByTime( 499 ) );
++
++			// The validating state should not be shown
++			await waitFor( () => {
++				expect(
++					screen.queryByText( 'Validating...' )
++				).not.toBeInTheDocument();
++			} );
++
++			// Fast-forward past the server delay to show validation result
++			act( () => jest.advanceTimersByTime( 1 ) );
++
++			await waitFor( () => {
++				expect( screen.getByText( 'Validated' ) ).toBeVisible();
++			} );
++		} );
++
++		it( 'should show "validating" state if it takes more than 1000ms', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++			render( <AsyncValidatedInputControl serverDelayMs={ 1200 } /> );
++
++			const input = screen.getByRole( 'textbox' );
++
++			await user.type( input, 'valid text' );
++
++			// Blur to trigger validation
++			await user.tab();
++
++			// Initially, no validating message should be shown (before 1s delay)
++			expect(
++				screen.queryByText( 'Validating...' )
++			).not.toBeInTheDocument();
++
++			// Fast-forward past the 1s delay to show validating state
++			act( () => jest.advanceTimersByTime( 1000 ) );
++
++			await waitFor( () => {
++				expect( screen.getByText( 'Validating...' ) ).toBeVisible();
++			} );
++
++			// Fast-forward past the server delay to show validation result
++			act( () => jest.advanceTimersByTime( 200 ) );
++
++			await waitFor( () => {
++				expect( screen.getByText( 'Validated' ) ).toBeVisible();
++			} );
++
++			// Test error case
++			await user.clear( input );
++			await user.type( input, 'error' );
++
++			// Blur to trigger validation
++			await user.tab();
++
++			act( () => jest.advanceTimersByTime( 1000 ) );
++
++			await waitFor( () => {
++				expect( screen.getByText( 'Validating...' ) ).toBeVisible();
++			} );
++
++			act( () => jest.advanceTimersByTime( 200 ) );
++
++			await waitFor( () => {
++				expect(
++					screen.getByText( 'The word "error" is not allowed.' )
++				).toBeVisible();
++			} );
++
++			// Test editing after error
++			await user.type( input, '{backspace}' );
++
++			act( () => jest.advanceTimersByTime( 1000 ) );
++
++			await waitFor( () => {
++				expect( screen.getByText( 'Validating...' ) ).toBeVisible();
++			} );
++
++			act( () => jest.advanceTimersByTime( 200 ) );
++
++			await waitFor( () => {
++				expect( screen.getByText( 'Validated' ) ).toBeVisible();
++			} );
++		} );
++
++		it( 'should not show a "valid" state until the server response is received, even if locally valid', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++			render(
++				<AsyncValidatedInputControl serverDelayMs={ 1200 } required />
++			);
++
++			const input = screen.getByRole( 'textbox' );
++
++			await user.type( input, 'valid text' );
++
++			await user.tab();
++			act( () => jest.advanceTimersByTime( 1200 ) );
++
++			await waitFor( () => {
++				expect( screen.getByText( 'Validated' ) ).toBeVisible();
++			} );
++
++			await user.clear( input );
++
++			act( () => jest.advanceTimersByTime( 1000 ) );
++
++			await waitFor( () => {
++				expect(
++					screen.getByText( 'Constraints not satisfied' )
++				).toBeVisible();
++			} );
++
++			await user.type( input, 'error' );
++
++			act( () => jest.advanceTimersByTime( 200 ) );
++
++			expect( screen.queryByText( 'Validated' ) ).not.toBeInTheDocument();
++
++			act( () => jest.advanceTimersByTime( 1000 ) );
++
++			await waitFor( () => {
++				expect(
++					screen.getByText( 'The word "error" is not allowed.' )
++				).toBeVisible();
++			} );
++		} );
++	} );
++} );
+diff --git a/storybook/main.js b/storybook/main.js
+index 29f24c223ccdfe..7e9ddb7342d2cf 100644
+--- a/storybook/main.js
++++ b/storybook/main.js
+@@ -54,6 +54,7 @@ module.exports = {
+ 		'@storybook/addon-a11y',
+ 		'@storybook/addon-toolbars',
+ 		'@storybook/addon-actions',
++		'@storybook/addon-interactions',
+ 		'@storybook/addon-webpack5-compiler-babel',
+ 		'storybook-source-link',
+ 		'@geometricpanda/storybook-addon-badges',

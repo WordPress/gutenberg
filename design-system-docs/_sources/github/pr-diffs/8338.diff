@@ -1,0 +1,2015 @@
+diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+index 69c7174fea19fd..45c340220472f6 100644
+--- a/CONTRIBUTING.md
++++ b/CONTRIBUTING.md
+@@ -154,6 +154,10 @@ Documentation is automatically synced from master to the [Gutenberg Documentatio
+ 
+ To add a new documentation page, you'll have to create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder and add an item to the [manifest file](https://github.com/WordPress/gutenberg/blob/master/docs/manifest.json).
+ 
++### `@wordpress/component`
++
++If you're contributing to the documentation of any component from the `@wordpress/component` package, take a look at its [guidelines for contributing](./packages/components/CONTRIBUTING.md). 
++
+ ## Reporting Security Issues
+ 
+ Please see [SECURITY.md](./SECURITY.md).
+diff --git a/packages/components/CONTRIBUTING.md b/packages/components/CONTRIBUTING.md
+new file mode 100644
+index 00000000000000..cebec43084b1ee
+--- /dev/null
++++ b/packages/components/CONTRIBUTING.md
+@@ -0,0 +1,15 @@
++# Contributing
++
++Thank you for taking the time to contribute.
++
++The following is a set of guidelines for contributing to the `@wordpress/components` package to be considered in addition to the general ones described in our [Contributing Policy](../../CONTRIBUTING.md).
++
++## Examples
++
++Each component needs to include an example in its README.md file to demonstrate the usage of the component.
++
++These examples can be consumed automatically from other projects in order to visualize them in their documentation. To ensure these examples are extractable, compilable and renderable, they should be structured in the following way:
++
++* It has to be included in a `jsx` code block.
++* It has to work out-of-the-box. No additional code should be needed to have working the example.
++* It has to define a React component called `My<ComponentName>` which renders the example (i.e.: `MyButton`). Examples for the Higher Order Components should define a `MyComponent<ComponentName>` component (i.e.: `MyComponentWithNotices`). 
+diff --git a/packages/components/src/autocomplete/README.md b/packages/components/src/autocomplete/README.md
+index fe7a467dfd30ba..1a14bf63237245 100644
+--- a/packages/components/src/autocomplete/README.md
++++ b/packages/components/src/autocomplete/README.md
+@@ -111,7 +111,7 @@ The following is a contrived completer for fresh fruit.
+ ```jsx
+ import { Autocomplete } from '@wordpress/components';
+ 
+-function FreshFruitAutocomplete() {
++const MyAutocomplete = () => {
+ 	const autocompleters = [
+ 		{
+ 			name: 'fruit',
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index 1dd091908176d1..b79ee413e21905 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -9,19 +9,17 @@ Render a BaseControl for a textarea input:
+ ```jsx
+ import { BaseControl } from '@wordpress/components';
+ 
+-function MyBaseControl() {
+-	return (
+-		<BaseControl
++const MyBaseControl = () => (
++	<BaseControl
++		id="textarea-1"
++		label="Text"
++		help="Enter some text"
++	>
++		<textarea
+ 			id="textarea-1"
+-			label="Text"
+-			help="Enter some text"
+-		>
+-			<textarea
+-				id="textarea-1"
+-			/>
+-		</BaseControl>
+-    );
+-}
++		/>
++	</BaseControl>
++);
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/button-group/README.md b/packages/components/src/button-group/README.md
+index 34a8965687cd65..2cdf23d037aba3 100644
+--- a/packages/components/src/button-group/README.md
++++ b/packages/components/src/button-group/README.md
+@@ -5,12 +5,10 @@
+ ```jsx
+ import { Button, ButtonGroup } from '@wordpress/components';
+ 
+-function MyButtonGroup() {
+-	return (
+-		<ButtonGroup>
+-			<Button isPrimary>Button 1</Button>
+-			<Button isPrimary>Button 2</Button>
+-		</ButtonGroup>
+-	);
+-}
++const MyButtonGroup = () => (
++	<ButtonGroup>
++		<Button isPrimary>Button 1</Button>
++		<Button isPrimary>Button 2</Button>
++	</ButtonGroup>
++);
+ ```
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index d88151ad2b8400..cd68b438d3eeee 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -11,13 +11,11 @@ Renders a button with default style.
+ ```jsx
+ import { Button } from "@wordpress/components";
+ 
+-function MyButton() {
+-	return (
+-		<Button isDefault>
+-			Click me!
+-		</Button>
+-	);
+-}
++const MyButton = () => (
++	<Button isDefault>
++		Click me!
++	</Button>
++);
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/checkbox-control/README.md b/packages/components/src/checkbox-control/README.md
+index 6b0aa412fd7620..2538fda6b3dd05 100644
+--- a/packages/components/src/checkbox-control/README.md
++++ b/packages/components/src/checkbox-control/README.md
+@@ -10,7 +10,7 @@ Render an is author checkbox:
+ import { CheckboxControl } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-withState( {
++const MyCheckboxControl = withState( {
+ 	isChecked: true,
+ } )( ( { isChecked, setState } ) => ( 
+ 	<CheckboxControl
+@@ -20,7 +20,7 @@ withState( {
+ 		checked={ isChecked }
+ 		onChange={ ( isChecked ) => { setState( { isChecked } ) } }
+ 	/>
+-) )
++) );
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/clipboard-button/README.md b/packages/components/src/clipboard-button/README.md
+index 838602f0d5a760..cde05359aa64e5 100644
+--- a/packages/components/src/clipboard-button/README.md
++++ b/packages/components/src/clipboard-button/README.md
+@@ -6,7 +6,7 @@
+ import { ClipboardButton } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-withState( {
++const MyClipboardButton = withState( {
+ 	hasCopied: false,
+ } )( ( { hasCopied, setState } ) => ( 
+ 	<ClipboardButton
+diff --git a/packages/components/src/color-indicator/README.md b/packages/components/src/color-indicator/README.md
+index 48fd911eba53fb..185e4961af7116 100644
+--- a/packages/components/src/color-indicator/README.md
++++ b/packages/components/src/color-indicator/README.md
+@@ -5,9 +5,7 @@
+ ```jsx
+ import { ColorIndicator } from '@wordpress/components';
+ 
+-function MyColorIndicator() {
+-	return (
+-		<ColorIndicator colorValue="#f00" />
+-	);
+-}
++const MyColorIndicator = () => (
++	<ColorIndicator colorValue="#f00" />
++);
+ ```
+diff --git a/packages/components/src/color-palette/README.md b/packages/components/src/color-palette/README.md
+index 9676785fe3697e..f7f4adc51fce21 100644
+--- a/packages/components/src/color-palette/README.md
++++ b/packages/components/src/color-palette/README.md
+@@ -5,7 +5,7 @@
+ import { ColorPalette } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-withState( {
++const MyColorPalette = withState( {
+ 	color: '#f00',
+ } )( ( { color, setState } ) => { 
+ 	const colors = [ 
+@@ -18,8 +18,8 @@ withState( {
+ 		<ColorPalette 
+ 			colors={ colors } 
+ 			value={ color }
+-			onChange={ color => setState( { color } ) } 
++			onChange={ ( color ) => setState( { color } ) } 
+ 		/>
+ 	) 
+-} )
++} );
+ ```
+diff --git a/packages/components/src/dashicon/README.md b/packages/components/src/dashicon/README.md
+index 3e74a1de14dfc2..793c5d01d38e78 100644
+--- a/packages/components/src/dashicon/README.md
++++ b/packages/components/src/dashicon/README.md
+@@ -5,13 +5,11 @@
+ ```jsx
+ import { Dashicon } from '@wordpress/components';
+ 
+-function MyDashicons() {
+-	return (
+-		<div>
+-			<Dashicon icon="admin-home" />
+-			<Dashicon icon="products" />
+-			<Dashicon icon="wordpress" />
+-		</div>
+-	);
+-}
++const MyDashicon = () => (
++	<div>
++		<Dashicon icon="admin-home" />
++		<Dashicon icon="products" />
++		<Dashicon icon="wordpress" />
++	</div>
++);
+ ```
+diff --git a/packages/components/src/date-time/README.md b/packages/components/src/date-time/README.md
+index 3ca5a9dc290210..9193617331d90c 100644
+--- a/packages/components/src/date-time/README.md
++++ b/packages/components/src/date-time/README.md
+@@ -9,8 +9,12 @@ Render a DateTimePicker.
+ ```jsx
+ import { DateTimePicker } from '@wordpress/components';
+ import { getSettings } from '@wordpress/date';
++import { withState } from '@wordpress/compose';
+ 
+-function selectTime( date, onUpdateDate ) {
++
++const MyDateTimePicker = withState( {
++	date: new Date(),
++} )( ( { date, setState } ) => {
+ 	const settings = getSettings();
+ 
+ 	// To know if the current timezone is a 12 hour time with look for "a" in the time format.
+@@ -25,12 +29,12 @@ function selectTime( date, onUpdateDate ) {
+ 	return (
+ 		<DateTimePicker
+ 		    currentDate={ date }
+-		    onChange={ onUpdateDate }
++		    onChange={ ( date ) => setState( { date } ) }
+ 		    locale={ settings.l10n.locale }
+ 		    is12Hour={ is12HourTime }
+ 		    />
+ 	);
+-}
++} );
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/disabled/README.md b/packages/components/src/disabled/README.md
+index c006ee57a2e1ac..3b823b120be1a1 100644
+--- a/packages/components/src/disabled/README.md
++++ b/packages/components/src/disabled/README.md
+@@ -10,7 +10,7 @@ Assuming you have a form component, you can disable all form inputs by wrapping
+ import { Button, Disabled, TextControl } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-withState( {
++const MyDisabled = withState( {
+ 	isDisabled: true,
+ } )( ( { isDisabled, setState } ) => { 
+ 	let input = <TextControl label="Input" onChange={ () => {} } />;
+@@ -30,7 +30,7 @@ withState( {
+ 			</Button>
+ 		</div>
+ 	);
+-} )
++} );
+ ```
+ 
+ A component can detect if it has been wrapped in a `<Disabled>` by accessing its [context](https://reactjs.org/docs/context.html) using `Disabled.Consumer`.
+diff --git a/packages/components/src/draggable/README.md b/packages/components/src/draggable/README.md
+index 7ba24bdb53cc60..ea069429b7716f 100644
+--- a/packages/components/src/draggable/README.md
++++ b/packages/components/src/draggable/README.md
+@@ -41,20 +41,18 @@ The function called when dragging ends.
+ ```jsx
+ import { Dashicon, Draggable, Panel, PanelBody } from '@wordpress/components';
+ 
+-function DraggablePanel() {
+-	return (
+-		<div id="draggable-panel">
+-			<Panel header="Draggable panel" >
+-				<PanelBody>
+-					<Draggable
+-						elementId="draggable-panel"
+-						transferData={ { } }
+-					>
+-						<Dashicon icon="move" />
+-					</Draggable>
+-				</PanelBody>
+-			</Panel>
+-		</div>
+-	);
+-}
++const MyDraggable = () => (
++	<div id="draggable-panel">
++		<Panel header="Draggable panel" >
++			<PanelBody>
++				<Draggable
++					elementId="draggable-panel"
++					transferData={ { } }
++				>
++					<Dashicon icon="move" />
++				</Draggable>
++			</PanelBody>
++		</Panel>
++	</div>
++);
+ ```
+diff --git a/packages/components/src/drop-zone/README.md b/packages/components/src/drop-zone/README.md
+index bd895447c8afb2..55206559ca2673 100644
+--- a/packages/components/src/drop-zone/README.md
++++ b/packages/components/src/drop-zone/README.md
+@@ -8,7 +8,7 @@
+ import { DropZoneProvider, DropZone } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-withState( {
++const MyDropZone = withState( {
+ 	hasDropped: false,
+ } )( ( { hasDropped, setState } ) => (
+ 	<DropZoneProvider>
+diff --git a/packages/components/src/dropdown-menu/README.md b/packages/components/src/dropdown-menu/README.md
+index e999f76b7d29bc..59aadcc36d6ece 100644
+--- a/packages/components/src/dropdown-menu/README.md
++++ b/packages/components/src/dropdown-menu/README.md
+@@ -9,36 +9,34 @@ Render a Dropdown Menu with a set of controls:
+ ```jsx
+ import { DropdownMenu } from '@wordpress/components';
+ 
+-function DirectionMenu() {
+-	return (
+-		<DropdownMenu
+-			icon="move"
+-			label="Select a direction"
+-			controls={ [
+-				{
+-					title: 'Up',
+-					icon: 'arrow-up-alt',
+-					onClick: () => console.log( 'up' )
+-				},
+-				{
+-					title: 'Right',
+-					icon: 'arrow-right-alt',
+-					onClick: () => console.log( 'right' )
+-				},
+-				{
+-					title: 'Down',
+-					icon: 'arrow-down-alt',
+-					onClick: () => console.log( 'down' )
+-				},
+-				{
+-					title: 'Left',
+-					icon: 'arrow-left-alt',
+-					onClick: () => console.log( 'left' )
+-				},
+-			] }
+-		/>
+-	);
+-}
++const MyDropdownMenu = () => (
++	<DropdownMenu
++		icon="move"
++		label="Select a direction"
++		controls={ [
++			{
++				title: 'Up',
++				icon: 'arrow-up-alt',
++				onClick: () => console.log( 'up' )
++			},
++			{
++				title: 'Right',
++				icon: 'arrow-right-alt',
++				onClick: () => console.log( 'right' )
++			},
++			{
++				title: 'Down',
++				icon: 'arrow-down-alt',
++				onClick: () => console.log( 'down' )
++			},
++			{
++				title: 'Left',
++				icon: 'arrow-left-alt',
++				onClick: () => console.log( 'left' )
++			},
++		] }
++	/>
++);
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/dropdown/README.md b/packages/components/src/dropdown/README.md
+index 51d4b0d911ab52..3d4c46bc8f396a 100644
+--- a/packages/components/src/dropdown/README.md
++++ b/packages/components/src/dropdown/README.md
+@@ -10,25 +10,23 @@ and uses render props to render the button and the content.
+ ```jsx
+ import { Button, Dropdown } from '@wordpress/components';
+ 
+-function MyDropdownMenu() {
+-	return (
+-		<Dropdown
+-			className="my-container-class-name"
+-			contentClassName="my-popover-content-classname"
+-			position="bottom right"
+-			renderToggle={ ( { isOpen, onToggle } ) => (
+-				<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
+-					Toggle Popover!
+-				</Button>
+-			) }
+-			renderContent={ () => (
+-				<div>
+-					This is the content of the popover.
+-				</div>
+-			) }
+-		/>
+-	);
+-}
++const MyDropdown = () => (
++	<Dropdown
++		className="my-container-class-name"
++		contentClassName="my-popover-content-classname"
++		position="bottom right"
++		renderToggle={ ( { isOpen, onToggle } ) => (
++			<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
++				Toggle Popover!
++			</Button>
++		) }
++		renderContent={ () => (
++			<div>
++				This is the content of the popover.
++			</div>
++		) }
++	/>
++);
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/external-link/README.md b/packages/components/src/external-link/README.md
+index 436632bc9a5a5d..73fe8b5c3fbdd0 100644
+--- a/packages/components/src/external-link/README.md
++++ b/packages/components/src/external-link/README.md
+@@ -5,9 +5,7 @@
+ ```jsx
+ import { ExternalLink } from '@wordpress/components';
+ 
+-function MyExternalLink() {
+-	return (
+-		<ExternalLink href="https://wordpress.org">WordPress.org</ExternalLink>
+-	);
+-}
++const MyExternalLink = () => (
++	<ExternalLink href="https://wordpress.org">WordPress.org</ExternalLink>
++);
+ ```
+diff --git a/packages/components/src/focusable-iframe/README.md b/packages/components/src/focusable-iframe/README.md
+index b612d9bac63437..cbf1571ce53d5f 100644
+--- a/packages/components/src/focusable-iframe/README.md
++++ b/packages/components/src/focusable-iframe/README.md
+@@ -9,14 +9,12 @@ Use as you would a standard `iframe`. You may pass `onFocus` directly as the cal
+ ```jsx
+ import { FocusableIframe } from '@wordpress/components';
+ 
+-function MyIframe() {
+-	return (
+-		<FocusableIframe
+-			src="/"
+-			onFocus={ () => console.log( 'iframe is focused' ) }
+-		/>
+-	);
+-}
++const MyFocusableIframe = () => (
++	<FocusableIframe
++		src="/"
++		onFocus={ () => console.log( 'iframe is focused' ) }
++	/>
++);
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index 8e29b77479c13c..8d64411a04eed1 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -10,7 +10,7 @@ The component renders a series of buttons that allow the user to select predefin
+ import { FontSizePicker } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-withState( {
++const MyFontSizePicker = withState( {
+ 	fontSize: 16,
+ } )( ( { fontSize, setState } ) => { 
+ 	const fontSizes = [
+diff --git a/packages/components/src/form-file-upload/README.md b/packages/components/src/form-file-upload/README.md
+index 65743f587ff0ce..987468b83d297c 100644
+--- a/packages/components/src/form-file-upload/README.md
++++ b/packages/components/src/form-file-upload/README.md
+@@ -5,14 +5,12 @@
+ ```jsx
+ import { FormFileUpload } from '@wordpress/components';
+ 
+-function MyFormFileUpload() {
+-	return (
+-		<FormFileUpload
+-			accept="image/*"
+-			onChange={ () => console.log('new image') }
+-		>
+-			Upload
+-		</FormFileUpload>
+-	);
+-}
++const MyFormFileUpload = () => (
++	<FormFileUpload
++		accept="image/*"
++		onChange={ () => console.log('new image') }
++	>
++		Upload
++	</FormFileUpload>
++);
+ ```
+diff --git a/packages/components/src/form-toggle/README.md b/packages/components/src/form-toggle/README.md
+index a2309723fc9144..9aeac6cd509cf6 100644
+--- a/packages/components/src/form-toggle/README.md
++++ b/packages/components/src/form-toggle/README.md
+@@ -6,12 +6,12 @@
+ import { FormToggle } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-withState( {
++const MyFormToggle = withState( {
+ 	checked: true,
+ } )( ( { checked, setState } ) => (
+ 	<FormToggle 
+ 		checked={ checked }
+ 		onChange={ () => setState( state => ( { checked: ! state.checked } ) ) } 
+ 	/>
+-) )
++) );
+ ```
+diff --git a/packages/components/src/form-token-field/README.md b/packages/components/src/form-token-field/README.md
+index 0ff943424840ef..8d4a984ea11dd3 100644
+--- a/packages/components/src/form-token-field/README.md
++++ b/packages/components/src/form-token-field/README.md
+@@ -57,7 +57,7 @@ The `value` property is handled in a manner similar to controlled form component
+ import { FormTokenField } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-withState( {
++const MyFormTokenField = withState( {
+ 	tokens: [],
+ 	suggestions: [ 'Africa', 'America', 'Antarctica', 'Asia', 'Europe', 'Oceania' ],
+ } )( ( { tokens, suggestions, setState } ) => ( 
+@@ -67,5 +67,5 @@ withState( {
+ 		onChange={ tokens => setState( { tokens } ) }
+ 		placeholder="Type a continent"
+ 	/>
+-) )
++) );
+ ```
+diff --git a/packages/components/src/higher-order/navigate-regions/README.md b/packages/components/src/higher-order/navigate-regions/README.md
+index 22805f838fb122..e741403379deb5 100644
+--- a/packages/components/src/higher-order/navigate-regions/README.md
++++ b/packages/components/src/higher-order/navigate-regions/README.md
+@@ -5,15 +5,15 @@
+ ## Example:
+ 
+ ```jsx
+-function MyLayout() {
+-	return (
++import { navigateRegions } from '@wordpress/components';
++
++const MyComponentWithNavigateRegions = navigateRegions( 
++	() => (
+ 		<div>
+ 			<div role="region" tabIndex="-1" aria-label="Header">Header</div>
+ 			<div role="region" tabIndex="-1" aria-label="Content">Content</div>
+ 			<div role="region" tabIndex="-1" aria-label="Sidebar">Sidebar</div>
+ 		</div>
+-	);
+-}
+-
+-export default navigateRegions( MyLayout );
++	)
++);
+ ```
+diff --git a/packages/components/src/higher-order/with-api-data/README.md b/packages/components/src/higher-order/with-api-data/README.md
+index 6cdb5fd6b94a7a..98c5761fc2cf56 100644
+--- a/packages/components/src/higher-order/with-api-data/README.md
++++ b/packages/components/src/higher-order/with-api-data/README.md
+@@ -14,17 +14,52 @@ Out of the box, it includes:
+ Consider a post component which displays a placeholder message while it loads, and the post's title once it becomes available:
+ 
+ ```jsx
+-function MyPost( { post } ) {
+-	if ( post.isLoading || 'undefined' === typeof post.data ) {
+-		return <div>Loading...</div>;
+-	}
++import { withAPIData } from '@wordpress/components';
++import PropTypes from 'prop-types';
+ 
+-	return <div>{ post.data.title.rendered }</div>;
++class Context extends React.Component {
++	getChildContext() {
++		return { 
++			getAPISchema: () => ( {
++				routes: {
++					'http://demo.wp-api.org/wp-json/wp/v2/posts/(?P<id>[\\d]+)': {
++						methods: [ 'GET' ],
++					},
++				},
++			} ) ,
++			getAPIPostTypeRestBaseMapping: () => {},
++			getAPITaxonomyRestBaseMapping: () => {},
++		};
++	}
++	
++	render() {
++		return this.props.children;
++	}
+ }
+ 
+-export default withAPIData( ( props, { type } ) => ( {
+-	post: `/wp/v2/${ type( 'post' ) }/${ props.postId }`
+-} ) )( MyPost );
++Context.childContextTypes = {
++	getAPISchema: PropTypes.func,
++	getAPIPostTypeRestBaseMapping: PropTypes.func,
++	getAPITaxonomyRestBaseMapping: PropTypes.func,
++};
++
++const MyPost = withAPIData( ( props, { type } ) => ( {
++	post: `http://demo.wp-api.org/wp-json/wp/v2/posts/${ props.postId }`
++} ) )( 
++	( { post } ) => {
++		if ( post.isLoading || 'undefined' === typeof post.data ) {
++			return <div>Loading...</div>;
++		}
++	
++		return <div>{ post.data.title.rendered }</div>;
++	}
++);
++
++const MyComponentWithAPIData = () => (
++	<Context>
++		<MyPost postId={ 1 } />
++	</Context>
++);
+ ```
+ 
+ ## Usage
+diff --git a/packages/components/src/higher-order/with-constrained-tabbing/README.md b/packages/components/src/higher-order/with-constrained-tabbing/README.md
+index 3e29122b8faf25..143d3e857ddf74 100644
+--- a/packages/components/src/higher-order/with-constrained-tabbing/README.md
++++ b/packages/components/src/higher-order/with-constrained-tabbing/README.md
+@@ -5,3 +5,37 @@
+ ## Usage
+ 
+ Wrap your original component with `withConstrainedTabbing`.
++
++```jsx
++import { withConstrainedTabbing, TextControl, Button } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const ConstrainedTabbing = withConstrainedTabbing( ( { children } ) => children );
++
++const MyComponentWithConstrainedTabbing = withState( {
++	isConstrainedTabbing: false,
++} )( ( { isConstrainedTabbing, setState } ) => { 
++	let form = (
++		<form>
++			<TextControl label="Input 1" onChange={ () => {} } />
++			<TextControl label="Input 2" onChange={ () => {} } />
++		</form>
++	);
++	if ( isConstrainedTabbing ) {
++		form = <ConstrainedTabbing>{ form }</ConstrainedTabbing>;
++	}
++	
++	const toggleConstrain = () => {
++		setState( ( state ) => ( { isConstrainedTabbing: ! state.isConstrainedTabbing } ) );
++	};
++	
++	return (
++		<div>
++			{ form }
++			<Button isDefault onClick={ toggleConstrain }>
++				{ isConstrainedTabbing ? 'Disable' : 'Enable' } constrain tabbing
++			</Button>
++		</div>
++	);
++} );
++```
+diff --git a/packages/components/src/higher-order/with-context/README.md b/packages/components/src/higher-order/with-context/README.md
+index a3743872b58707..3819e86c922c77 100644
+--- a/packages/components/src/higher-order/with-context/README.md
++++ b/packages/components/src/higher-order/with-context/README.md
+@@ -7,15 +7,38 @@
+ Wrap your original component with `withContext`, defining a key of context to receive and an optional mapping function.
+ 
+ ```jsx
+-function OriginalComponent( { favoriteColor } ) {
+-	return <div>Your favorite color is: { favoriteColor }</div>;
++import PropTypes from 'prop-types';
++import { withContext } from '@wordpress/components';
++
++class Settings extends React.Component {
++	getChildContext() {
++		return { 
++			settings: {
++				favoriteColor: 'purple', 
++			},
++		};
++	}
++	
++	render() {
++		return this.props.children;
++	}
+ }
+ 
+-const EnhancedComponent = withContext( 'settings' )( ( settings ) => {
+-	return {
+-		favoriteColor: settings.favoriteColor
+-	};
+-} )( OriginalComponent );
++Settings.childContextTypes = {
++	settings: PropTypes.object,
++};
++
++const EnhancedComponent = withContext( 'settings' )(
++	( settings ) => ( { favoriteColor: settings.favoriteColor } )
++)(
++	( { favoriteColor } ) => <div>Your favorite color is: { favoriteColor }</div>
++);
++
++const MyComponentWithContext = () => (
++	<Settings>
++		<EnhancedComponent />
++	</Settings>
++);
+ ```
+ 
+ The above example assumes that an ancestor component provides a `settings` context containing a key `favoriteColor`. When the enhanced component is rendered, the favorite color setting will be injected as a prop.
+diff --git a/packages/components/src/higher-order/with-fallback-styles/README.md b/packages/components/src/higher-order/with-fallback-styles/README.md
+new file mode 100644
+index 00000000000000..49ed7678613bce
+--- /dev/null
++++ b/packages/components/src/higher-order/with-fallback-styles/README.md
+@@ -0,0 +1,25 @@
++# withFallbackStyles
++
++## Usage
++
++```jsx
++import { withFallbackStyles, Button } from '@wordpress/components';
++
++const { getComputedStyle } = window;
++
++const MyComponentWithFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
++	const buttonNode = node.querySelector( 'button' );
++	return {
++		fallbackBackgroundColor: getComputedStyle( buttonNode ).backgroundColor,
++		fallbackTextColor: getComputedStyle( buttonNode ).color,
++	};
++} )(
++	( { fallbackTextColor, fallbackBackgroundColor } ) => (
++		<div>
++			<Button isPrimary>My button</Button>
++			<div>Text color: { fallbackTextColor }</div>
++			<div>Background color: { fallbackBackgroundColor }</div>
++		</div>
++	)
++);
++```
+diff --git a/packages/components/src/higher-order/with-filters/README.md b/packages/components/src/higher-order/with-filters/README.md
+index 5fc12a0ca0246b..244b226445c16d 100644
+--- a/packages/components/src/higher-order/with-filters/README.md
++++ b/packages/components/src/higher-order/with-filters/README.md
+@@ -1,5 +1,4 @@
+-withFilters
+-==============
++# withFilters
+ 
+ `withFilters` is a part of [Native Gutenberg Extensibility](https://github.com/WordPress/gutenberg/issues/3330). It is also a React [higher-order component](https://facebook.github.io/react/docs/higher-order-components.html).
+ 
+@@ -8,20 +7,25 @@ Wrapping a component with `withFilters` provides a filtering capability controll
+ ## Usage
+ 
+ ```jsx
+-/**
+- * WordPress dependencies
+- */
+ import { withFilters } from '@wordpress/components';
++import { addFilter } from '@wordpress/hooks';
+ 
+-function MyCustomElement() {
+-	return (
++const ComposedComponent = () => <div>Composed component</div>;
++
++addFilter(
++	'MyHookName',
++	'example/filtered-component',
++	( FilteredComponent ) => () => (
+ 		<div>
+-			content
++			<FilteredComponent />
++			<ComposedComponent />
+ 		</div>
+-	);
+-}
++	)
++);
+ 
+-export default withFilters( 'MyCustomElement' )( MyCustomElement );
++const MyComponentWithFilters = withFilters( 'MyHookName' )( 
++	() => <div>My component</div> 
++);
+ ```
+ 
+ `withFilters` expects a string argument which provides a hook name. It returns a function which can then be used in composing your component. The hook name allows plugin developers to customize or completely override the component passed to this higher-order component using `wp.hooks.addFilter` method.
+diff --git a/packages/components/src/higher-order/with-focus-outside/README.md b/packages/components/src/higher-order/with-focus-outside/README.md
+index 83cda23cb2bf60..1a8615c6b7a347 100644
+--- a/packages/components/src/higher-order/with-focus-outside/README.md
++++ b/packages/components/src/higher-order/with-focus-outside/README.md
+@@ -9,17 +9,19 @@ Wrap your original component with `withFocusOutside`, defining a `handleFocusOut
+ __Note:__ `withFocusOutside` must only be used to wrap the `Component` class.
+ 
+ ```jsx
+-const EnhancedComponent = withFocusOutside(
+-	class extends Component {
++import { withFocusOutside, TextControl } from '@wordpress/components';
++
++const MyComponentWithFocusOutside = withFocusOutside(
++	class extends React.Component {
+ 		handleFocusOutside() {
+-			this.props.onFocusOutside();
++			console.log( 'Focus outside' );
+ 		}
+ 
+ 		render() {
+ 			return (
+ 				<div>
+-					<input />
+-					<input />
++					<TextControl onChange={ ( ) => { } }/>
++					<TextControl onChange={ ( ) => { } }/>
+ 				</div>
+ 			);
+ 		}
+diff --git a/packages/components/src/higher-order/with-focus-return/README.md b/packages/components/src/higher-order/with-focus-return/README.md
+new file mode 100644
+index 00000000000000..c583cded6332ca
+--- /dev/null
++++ b/packages/components/src/higher-order/with-focus-return/README.md
+@@ -0,0 +1,41 @@
++# withFocusReturn
++
++## Usage
++
++```jsx
++import { withFocusReturn, TextControl, Button } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const EnhancedComponent = withFocusReturn(
++	() => (
++		<div>
++			Focus will return to the previous input when this component is unmounted
++			<TextControl
++				autoFocus={ true }
++				onChange={ () => {} }
++			/>
++		</div>
++	)
++);
++
++const MyComponentWithFocusReturn = withState( {
++	text: '',
++} )( ( { text, setState } ) => {
++	const unmount = () => {
++		document.activeElement.blur();
++		setState( { text: '' } );
++	}
++
++	return (
++		<div>
++			<TextControl
++				placeholder="Type something"
++				value={ text }
++				onChange={ ( text ) => setState( { text } ) }
++			/>
++			{ text && <EnhancedComponent /> }
++			{ text && <Button isDefault onClick={ unmount }>Unmount</Button> }
++		</div>
++	);
++} ); 
++```
+diff --git a/packages/components/src/higher-order/with-notices/README.md b/packages/components/src/higher-order/with-notices/README.md
+new file mode 100644
+index 00000000000000..9ca098a2bffe40
+--- /dev/null
++++ b/packages/components/src/higher-order/with-notices/README.md
+@@ -0,0 +1,19 @@
++# withNotices
++
++## Usage
++
++```jsx
++import { withNotices, Button } from '@wordpress/components';
++
++const MyComponentWithNotices = withNotices(
++	( { noticeOperations, noticeUI } ) => {
++		const addError = () => noticeOperations.createErrorNotice( 'Error message' );
++		return (
++			<div>
++				{ noticeUI }
++				<Button isDefault onClick={ addError }>Add error</Button>
++			</div>
++		)
++	}
++);
++```
+diff --git a/packages/components/src/higher-order/with-spoken-messages/README.md b/packages/components/src/higher-order/with-spoken-messages/README.md
+new file mode 100644
+index 00000000000000..1cb09651b7919d
+--- /dev/null
++++ b/packages/components/src/higher-order/with-spoken-messages/README.md
+@@ -0,0 +1,14 @@
++# withSpokenMessages
++
++## Usage
++
++```jsx
++import { withSpokenMessages, Button } from '@wordpress/components';
++
++const MyComponentWithSpokenMessages = withSpokenMessages( ( { speak, debouncedSpeak } ) => (
++	<div>
++		<Button isDefault onClick={ speak( 'Spoken message' ) }>Speak</Button>
++		<Button isDefault onClick={ debouncedSpeak( 'Delayed message' ) }>Debounced Speak</Button>
++	</div>
++) );
++```
+diff --git a/packages/components/src/icon-button/README.md b/packages/components/src/icon-button/README.md
+index 6c19a4c0462279..2d47a5bf3a2039 100644
+--- a/packages/components/src/icon-button/README.md
++++ b/packages/components/src/icon-button/README.md
+@@ -5,12 +5,10 @@
+ ```jsx
+ import { IconButton } from '@wordpress/components';
+ 
+-function MyIconButton() {
+-	return (
+-		<IconButton
+-			icon="ellipsis"
+-			label="More"
+-		/>
+-	);
+-}
++const MyIconButton = () => (
++	<IconButton
++		icon="ellipsis"
++		label="More"
++	/>
++);
+ ```
+diff --git a/packages/components/src/keyboard-shortcuts/README.md b/packages/components/src/keyboard-shortcuts/README.md
+index 63987b05b479f9..4e1bb1a9dd73f3 100644
+--- a/packages/components/src/keyboard-shortcuts/README.md
++++ b/packages/components/src/keyboard-shortcuts/README.md
+@@ -14,7 +14,7 @@ Render `<KeyboardShortcuts />` with a `shortcuts` prop object:
+ import { KeyboardShortcuts } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-withState( {
++const MyKeyboardShortcuts = withState( {
+ 	isAllSelected: false,
+ } )( ( { isAllSelected, setState } ) => { 
+ 	const selectAll = () => {
+diff --git a/packages/components/src/menu-group/README.md b/packages/components/src/menu-group/README.md
+index 6aa7280202c28f..b40a902b013701 100644
+--- a/packages/components/src/menu-group/README.md
++++ b/packages/components/src/menu-group/README.md
+@@ -5,12 +5,10 @@
+ ```jsx
+ import { MenuGroup, MenuItem } from '@wordpress/components';
+ 
+-function MyMenuGroup() {
+-	return (
+-		<MenuGroup label="Settings">
+-			<MenuItem>Setting 1</MenuItem>
+-			<MenuItem>Setting 2</MenuItem>
+-		</MenuGroup>
+-	);
+-}
++const MyMenuGroup = () => (
++	<MenuGroup label="Settings">
++		<MenuItem>Setting 1</MenuItem>
++		<MenuItem>Setting 2</MenuItem>
++	</MenuGroup>
++);
+ ```
+diff --git a/packages/components/src/menu-item/README.md b/packages/components/src/menu-item/README.md
+index 03e7bfaabad579..c454f7ff933a61 100644
+--- a/packages/components/src/menu-item/README.md
++++ b/packages/components/src/menu-item/README.md
+@@ -6,7 +6,7 @@
+ import { MenuItem } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-withState( {
++const MyMenuItem = withState( {
+ 	isActive: true,
+ } )( ( { isActive, setState } ) => (
+ 	<MenuItem
+diff --git a/packages/components/src/menu-items-choice/README.md b/packages/components/src/menu-items-choice/README.md
+index 28b2914b5a297c..be4388376ebf3c 100644
+--- a/packages/components/src/menu-items-choice/README.md
++++ b/packages/components/src/menu-items-choice/README.md
+@@ -6,7 +6,7 @@
+ import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-withState( {
++const MyMenuItemsChoice = withState( {
+ 	mode: 'visual',
+ 	choices: [
+ 		{
+@@ -26,5 +26,5 @@ withState( {
+ 			onSelect={ mode => setState( { mode } ) }
+ 		/>
+ 	</MenuGroup>
+-) )
++) );
+ ```
+diff --git a/packages/components/src/modal/README.md b/packages/components/src/modal/README.md
+index 8c416614d65079..09de5d1bef6627 100644
+--- a/packages/components/src/modal/README.md
++++ b/packages/components/src/modal/README.md
+@@ -1,5 +1,4 @@
+-Modal
+-=======
++# Modal
+ 
+ The modal is used to create an accessible modal over an application.
+ 
+@@ -7,67 +6,28 @@ The modal is used to create an accessible modal over an application.
+ 
+ ## Usage
+ 
+-Render a screen overlay with a modal on top.
+-```jsx
+-	<Modal
+-		title="My Modal"
+-		onRequestClose={ closeFunction }
+-		aria={ {
+-		    describedby: "modal-description",
+-		} }
+-	>
+-		<p id="modal-description">This modal is meant to be awesome!</p>
+-	</Modal>
+-```
++The following example shows you how to properly implement a modal. For the modal to properly work it's important you implement the close logic for the modal properly.
+ 
+-## Implement close logic
+-
+-For the modal to properly work it's important you implement the close logic for the modal properly. The following example shows you how to properly implement a modal.
+-
+-```js
+-const { Component, Fragment } = wp.element;
+-const { Modal } = wp.components;
+-
+-class MyModalWrapper extends Component {
+-	constructor() {
+-		super( ...arguments );
+-		this.state = {
+-			isOpen: true,
+-		}
+-
+-		this.openModal = this.openModal.bind( this );
+-		this.closeModal = this.closeModal.bind( this );
+-	}
+-	
+-	openModal() {
+-		if ( ! this.state.isOpen ) {
+-			this.setState( { isOpen: true } );
+-		}
+-	}
+-
+-	closeModal() {
+-		if ( this.state.isOpen ) {
+-			this.setState( { isOpen: false } );
+-		}
+-	}
+-
+-	render() {
+-		return (
+-			<Fragment>
+-				<button onClick={ this.openModal }>Open Modal</button>
+-				{ this.state.isOpen ?
+-					<Modal
+-						title="This is my modal"
+-						onRequestClose={ this.closeModal }>
+-						<button onClick={ this.closeModal }>
+-						    My custom close button
+-						</button>
+-					</Modal> 
+-					: null }
+-			</Fragment>
+-		);
+-	}
+-}
++```jsx
++import { Button, Modal } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const MyModal = withState( {
++	isOpen: false,
++} )( ( { isOpen, setState } ) => (
++	<div>
++		<Button isDefault onClick={ () => setState( { isOpen: true } ) }>Open Modal</Button>
++		{ isOpen ?
++			<Modal
++				title="This is my modal"
++				onRequestClose={ () => setState( { isOpen: false } ) }>
++				<Button isDefault onClick={ () => setState( { isOpen: false } ) }>
++					My custom close button
++				</Button>
++			</Modal> 
++			: null }
++	</div>
++) );
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/navigable-container/README.md b/packages/components/src/navigable-container/README.md
+index bb30c24234ac77..630c9be46f053d 100644
+--- a/packages/components/src/navigable-container/README.md
++++ b/packages/components/src/navigable-container/README.md
+@@ -1,5 +1,4 @@
+-NavigableContainers
+-=============
++# NavigableContainers
+ 
+ `NavigableContainer` is a React component to render a container navigable using the keyboard. Only things that are focusable can be navigated to. It will currently always be a `div`.
+ 
+@@ -38,29 +37,8 @@ The orientation of the menu. It could be "vertical", "horizontal" or "both"
+ 
+ ### NavigableMenu
+ 
+-
+ A NavigableMenu allows movement up and down (or left and right) the component via the arrow keys. The `tab` key is not handled. The `orientation` prop is used to determine whether the arrow keys used are vertical, horizontal or both.
+ 
+-### Usage
+-
+-```jsx
+-import { NavigableMenu, Button } from '@wordpress/components';
+-
+-function onNavigate( index, target ) {
+-	// ....
+-}
+-
+-function MyMenu() {
+-	return (
+-		<NavigableMenu onNavigate={ onNavigate }>
+-			<Button>My Button 1</Button>
+-			<Button>My Button 2</Button>
+-			<Button>My Button 3</Button>
+-		</NavigableMenu>
+-	);
+-}
+-```
+-
+ ### TabbableContainer
+ 
+ A `TabbableContainer` will only be navigated using the `tab` key. Every intended tabstop must have a tabIndex `0`.
+@@ -68,20 +46,28 @@ A `TabbableContainer` will only be navigated using the `tab` key. Every intended
+ ### Usage
+ 
+ ```jsx
+-import { TabbableContainer, Button } from '@wordpress/components';
++import { NavigableMenu, TabbableContainer, Button } from '@wordpress/components';
+ 
+ function onNavigate( index, target ) {
+-	// ....
++	console.log( `Navigates to ${ index }`, target );
+ }
+ 
+-function MyContainer() {
+-	return (
++const MyNavigableContainer = () => (
++	<div>
++		<span>Navigable Menu:</span>
++		<NavigableMenu onNavigate={ onNavigate } orientation="horizontal">
++			<Button isDefault>Item 1</Button>
++			<Button isDefault>Item 2</Button>
++			<Button isDefault>Item 3</Button>
++		</NavigableMenu>
++		
++		<span>Tabbable Container:</span>
+ 		<TabbableContainer onNavigate={ onNavigate }>
+-			<div tabIndex="0">Section 1</div>
+-			<div tabIndex="0">Section 2</div>
+-			<div tabIndex="0">Section 3</div>
+-			<div tabIndex="0">Section 4</div>
++			<Button isDefault tabIndex="0">Section 1</Button>
++			<Button isDefault tabIndex="0">Section 2</Button>
++			<Button isDefault tabIndex="0">Section 3</Button>
++			<Button isDefault tabIndex="0">Section 4</Button>
+ 		</TabbableContainer>
+-	);
+-}
++	</div>
++);
+ ```
+diff --git a/packages/components/src/notice/README.md b/packages/components/src/notice/README.md
+index 0d0a38518d001b..c703639a0aa1a6 100644
+--- a/packages/components/src/notice/README.md
++++ b/packages/components/src/notice/README.md
+@@ -1,5 +1,4 @@
+-Notice
+-======
++# Notice
+ 
+ This component is used to display notices in editor.
+ 
+@@ -8,17 +7,21 @@ This component is used to display notices in editor.
+ To display a plain notice, pass `Notice` a string:
+ 
+ ```jsx
+-<Notice status="error">
+-    An unknown error occurred.
+-</Notice>
++const MyNotice = () => (
++	<Notice status="error">
++		An unknown error occurred.
++	</Notice>
++);
+ ```
+ 
+ For more complex markup, you can pass any JSX element:
+ 
+ ```jsx
+-<Notice status="error">
+-    <p>An error occurred: <code>{ errorDetails }</code>.</p>
+-</Notice>
++const MyNotice = () => (
++	<Notice status="error">
++		<p>An error occurred: <code>{ errorDetails }</code>.</p>
++	</Notice>
++);
+ ```
+ 
+ ### Props
+diff --git a/packages/components/src/panel/README.md b/packages/components/src/panel/README.md
+new file mode 100644
+index 00000000000000..9012d96650b4fb
+--- /dev/null
++++ b/packages/components/src/panel/README.md
+@@ -0,0 +1,13 @@
++# Panel
++
++## Usage
++
++```jsx
++import { Panel, PanelBody } from '@wordpress/components';
++ 
++const MyPanel = () => (
++	<Panel header="My Panel">
++		<PanelBody>Panel body</PanelBody>
++	</Panel>
++);
++```
+diff --git a/packages/components/src/placeholder/README.md b/packages/components/src/placeholder/README.md
+new file mode 100644
+index 00000000000000..5d4c64a7f64f19
+--- /dev/null
++++ b/packages/components/src/placeholder/README.md
+@@ -0,0 +1,13 @@
++# Placeholder
++
++## Usage
++```jsx
++import { Placeholder } from '@wordpress/components';
++
++const MyPlaceholder = () => (
++	<Placeholder
++		icon="wordpress-alt"
++		label="Placeholder"
++	/>
++);
++```
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index 18a01ad0f203d6..f071dbcad2a645 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -8,23 +8,26 @@ Popover is a React component to render a floating content modal. It is similar i
+ Render a Popover within the parent to which it should anchor:
+ 
+ ```jsx
+-import { Popover } from '@wordpress/components';
+-
+-function ToggleButton( { isVisible, toggleVisible } ) {
++import { Button, Popover } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const MyPopover = withState( {
++	isVisible: false,
++} )( ( { isVisible, setState } ) => {
++	const toggleVisible = () => {
++		setState( ( state ) => ( { isVisible: ! state.isVisible } ) );
++	};
+ 	return (
+-		<button onClick={ toggleVisible }>
++		<Button isDefault onClick={ toggleVisible }>
+ 			Toggle Popover!
+ 			{ isVisible && (
+-				<Popover
+-					onClose={ toggleVisible }
+-					onClick={ ( event ) => event.stopPropagation() }
+-				>
++				<Popover>
+ 					Popover is toggled!
+ 				</Popover>
+ 			) }
+-		</button>
++		</Button>
+ 	);
+-}
++} );
+ ```
+ 
+ If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
+diff --git a/packages/components/src/query-controls/README.md b/packages/components/src/query-controls/README.md
+new file mode 100644
+index 00000000000000..83dd4092e18b6d
+--- /dev/null
++++ b/packages/components/src/query-controls/README.md
+@@ -0,0 +1,42 @@
++# QueryControls
++
++## Usage
++
++```jsx
++import { QueryControls } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const MyQueryControls = withState( {
++	orderBy: 'title',
++	order: 'asc',
++	category: 1,
++	categories: [ 
++		{
++			id: 1,
++			name: 'Category 1',
++			parent: 0,
++		},
++		{
++			id: 2,
++			name: 'Category 1b',
++			parent: 1,
++		},
++		{
++			id: 3,
++			name: 'Category 2',
++			parent: 0,
++		},
++	],
++	numberOfItems: 10,
++} )( ( { orderBy, order, category, categories, numberOfItems, setState } ) => (
++	<QueryControls
++		{ ...{ orderBy, order, numberOfItems } }
++		onOrderByChange={ ( orderBy ) => setState( { orderBy } ) }
++		onOrderChange={ ( order ) => setState( { order } ) }
++		categoriesList={ categories }
++		selectedCategoryId={ category }
++		onCategoryChange={ ( category ) => setState( { category } ) }
++		onNumberOfItemsChange={ ( numberOfItems ) => setState( { numberOfItems } ) }
++	/>
++) );
++```
+diff --git a/packages/components/src/radio-control/README.md b/packages/components/src/radio-control/README.md
+index fe73ea15c69750..88f5379749059a 100644
+--- a/packages/components/src/radio-control/README.md
++++ b/packages/components/src/radio-control/README.md
+@@ -1,5 +1,4 @@
+-RadioControl
+-=======
++# RadioControl
+ 
+ RadioControl component is used to generate radio input fields.
+ 
+@@ -8,16 +7,23 @@ RadioControl component is used to generate radio input fields.
+ 
+ Render a user interface to select the user type using radio inputs.
+ ```jsx
+-    <RadioControl
+-        label="User type"
+-        help="The type of the current user"
+-        selected={ value }
+-        options={ [
+-            { label: 'Author', value: 'a' },
+-            { label: 'Editor', value: 'e' },
+-        ] }
+-        onChange={ onChange }
+-    />
++import { RadioControl } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const MyRadioControl = withState( {
++	option: 'a',
++} )( ( { option, setState } ) => ( 
++	<RadioControl
++		label="User type"
++		help="The type of the current user"
++		selected={ option }
++		options={ [
++			{ label: 'Author', value: 'a' },
++			{ label: 'Editor', value: 'e' },
++		] }
++		onChange={ ( option ) => { setState( { option } ) } }
++	/>
++) );
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/range-control/README.md b/packages/components/src/range-control/README.md
+index 98f52096d9e259..eabc808b2552e6 100644
+--- a/packages/components/src/range-control/README.md
++++ b/packages/components/src/range-control/README.md
+@@ -1,5 +1,4 @@
+-RangeControl
+-=======
++# RangeControl
+ 
+ RangeControl component is used to create range slider to input numerical values.
+ 
+@@ -8,13 +7,20 @@ RangeControl component is used to create range slider to input numerical values.
+ 
+ Render a user interface to select the number of columns between 2 and 10.
+ ```jsx
++import { RadioControl } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const MyRangeControl = withState( {
++	columns: 2,
++} )( ( { columns, setState } ) => ( 
+     <RangeControl
+         label="Columns"
+         value={ columns }
+-        onChange={ onChange }
++        onChange={ ( columns ) => setState( { columns } ) }
+         min={ 2 }
+         max={ 10 }
+     />
++) );
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/responsive-wrapper/README.md b/packages/components/src/responsive-wrapper/README.md
+new file mode 100644
+index 00000000000000..ce325e732ce0ec
+--- /dev/null
++++ b/packages/components/src/responsive-wrapper/README.md
+@@ -0,0 +1,16 @@
++# ResponsiveWrapper
++
++## Usage
++
++```jsx
++import { ResponsiveWrapper } from '@wordpress/components';
++
++const MyResponsiveWrapper = () => (
++	<ResponsiveWrapper
++		naturalWidth={ 2000 }
++		naturalHeight={ 680 }
++	>
++		<img src="https://s.w.org/style/images/about/WordPress-logotype-standard.png" alt="WordPress" />
++	</ResponsiveWrapper>
++);
++```
+diff --git a/packages/components/src/sandbox/README.md b/packages/components/src/sandbox/README.md
+index adf7a75e795f1f..7b1b5cafdb1b90 100644
+--- a/packages/components/src/sandbox/README.md
++++ b/packages/components/src/sandbox/README.md
+@@ -1,14 +1,17 @@
+-This component provides an isolated environment for arbitrary HTML via iframes. 
++# Sandbox
+ 
+-#### To test
++This component provides an isolated environment for arbitrary HTML via iframes.
+ 
+-Embed the following:
++## Usage
+ 
+-- Short tweet: https://twitter.com/notnownikki/status/876229494465581056
+-- Long tweet with media: https://twitter.com/PattyJenks/status/874034832430424065
+-- Video: https://www.youtube.com/watch?v=PfKUdmTq2MI
+-- Photo: https://cloudup.com/cQFlxqtY4ob
+-- Long tumblr post: http://doctorwho.tumblr.com/post/162052108791
+-- Create a custom html block with the following content: <img src="https://cldup.com/G3fFjtKEKe-3000x3000.jpeg">
++```jsx
++import { SandBox } from '@wordpress/components';
+ 
+-This tests that HTML is written into the sandbox correctly in all cases, and that sites that do responsive resizes (e.g. tumblr) don't mess up when put into a small iframe that is also trying to resize.
++const MySandBox = () => (
++	<SandBox
++		html="<p>Content</p>"
++		title="Sandbox"
++		type="embed"
++	/>
++);
++```
+diff --git a/packages/components/src/scroll-lock/README.md b/packages/components/src/scroll-lock/README.md
+index d74373e9d2e928..d2ff62e4b96cb3 100644
+--- a/packages/components/src/scroll-lock/README.md
++++ b/packages/components/src/scroll-lock/README.md
+@@ -1,5 +1,4 @@
+-ScrollLock
+-==========
++# ScrollLock
+ 
+ ScrollLock is a content-free React component for declaratively preventing scroll bleed from modal UI to the page body. This component applies a `lockscroll` class to the `document.documentElement` and `document.scrollingElement` elements to stop the body from scrolling. When it is present, the lock is applied.
+ 
+@@ -9,13 +8,22 @@ Declare scroll locking as part of modal UI.
+ 
+ ```jsx
+ import { ScrollLock } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
+ 
+-function Sidebar( { isMobile } ) {
++const MyScrollLock = withState( {
++	isScrollLocked: false,
++} )( ( { isScrollLocked, setState } ) => {
++	const toggleLock = () => {
++		setState( ( state ) => ( { isScrollLocked: ! state.isScrollLocked } ) );
++	};
+ 	return (
+ 		<div>
+-			Sidebar Content!
+-			{ isMobile && <ScrollLock /> }
++			<Button isDefault onClick={ toggleLock }>
++				Toggle scroll lock
++			</Button>
++			{ isScrollLocked && <ScrollLock /> }
++			<p>Scroll locked: <strong>{ isScrollLocked ? 'Yes' : 'No' }</strong></p>
+ 		</div>
+ 	);
+-}
++} );
+ ```
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index 09ec4a041c0bf5..83f958c9684d9f 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -1,5 +1,4 @@
+-SelectControl
+-=======
++# SelectControl
+ 
+ SelectControl component is used to generate select input fields.
+ 
+@@ -8,15 +7,23 @@ SelectControl component is used to generate select input fields.
+ 
+ Render a user interface to select the size of an image.
+ ```jsx
++import { SelectControl } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const MySelectControl = withState( {
++	size: '50%',
++} )( ( { size, setState } ) => ( 
+ 	<SelectControl
+-		label={ __( 'Size' ) }
++		label="Size"
+ 		value={ size }
+-		options={ map( availableSizes, ( size, name ) => ( {
+-			value: size,
+-			label: startCase( name ),
+-		} ) ) }
+-		onChange={ onChange }
++		options={ [
++			{ label: 'Big', value: '100%' },
++			{ label: 'Medium', value: '50%' },
++			{ label: 'Small', value: '25%' },
++		] }
++		onChange={ ( size ) => { setState( { size } ) } }
+ 	/>
++) );
+ ```
+ 
+ Render a user interface to select multiple users from a list.
+diff --git a/packages/components/src/server-side-render/README.md b/packages/components/src/server-side-render/README.md
+index 470dbfee11f992..a8cbf404e2307e 100644
+--- a/packages/components/src/server-side-render/README.md
++++ b/packages/components/src/server-side-render/README.md
+@@ -1,5 +1,4 @@
+-ServerSideRender
+-=======
++# ServerSideRender
+ 
+ ServerSideRender is a component used for server-side rendering a preview of dynamic blocks to display in the editor. Server-side rendering in a block's `edit` function should be limited to blocks that are heavily dependent on existing PHP rendering logic that is heavily intertwined with data, particularly when there are no endpoints available.
+ 
+@@ -14,10 +13,17 @@ New blocks should be built in conjunction with any necessary REST API endpoints,
+ Render core/archives preview.
+ 
+ ```jsx
++import { ServerSideRender } from '@wordpress/components';
++
++const MyServerSideRender = () => (
+ 	<ServerSideRender
+ 		block="core/archives"
+-		attributes={ this.props.attributes }
++		attributes={ {
++			showPostCounts: true,
++			displayAsDropdown: false, 
++		} }
+ 	/>
++);
+ ```
+ 
+ ## Output
+diff --git a/packages/components/src/slot-fill/README.md b/packages/components/src/slot-fill/README.md
+index 31aac57f17a39e..23bbd7b77f9411 100644
+--- a/packages/components/src/slot-fill/README.md
++++ b/packages/components/src/slot-fill/README.md
+@@ -1,5 +1,4 @@
+-Slot Fill
+-=========
++# Slot Fill
+ 
+ Slot and Fill are a pair of components which enable developers to render elsewhere in a React element tree, a pattern often referred to as "portal" rendering. It is a pattern for component extensibility, where a single Slot may be occupied by an indeterminate number of Fills elsewhere in the application.
+ 
+@@ -9,39 +8,39 @@ Slot Fill is heavily inspired by the [`react-slot-fill` library](https://github.
+ 
+ At the root of your application, you must render a `SlotFillProvider` which coordinates Slot and Fill rendering.
+ 
+-```jsx
+-import { SlotFillProvider } from '@wordpress/components';
+-import { render } from '@wordpress/element';
+-import App from './app';
+-
+-render(
+-	<SlotFillProvider>
+-		<App />
+-	</SlotFillProvider>,
+-	document.getElementById( 'app' )
+-);
+-```
++Then, render a Slot component anywhere in your application, giving it a name.
+ 
+-Then, render a Slot component anywhere in your application, giving it a name:
++Any Fill will automatically occupy this Slot space, even if rendered elsewhere in the application.
+ 
+-```jsx
+-const Toolbar = () => (
+-	<div className="toolbar">
+-		<Slot name="Toolbar" />
+-	</div>
+-);
++You can either use the Fill component directly, or a wrapper component type as in the below example to abstract the slot name from consumer awareness.
+ 
+-Toolbar.Item = ( { children } ) => (
+-	<Fill name="Toolbar">
+-		{ children }
+-	</Fill>
+-);
++```jsx
++import { SlotFillProvider, Slot, Fill, Panel, PanelBody } from '@wordpress/components';
++
++const MySlotFillProvider = () => {
++	const MyPanelSlot = () => (
++		<Panel header="Panel with slot">
++			<PanelBody>
++				<Slot name="MyPanelSlot"/>
++			</PanelBody>
++		</Panel>
++	);
++	
++	MyPanelSlot.Content = () => (
++		<Fill name="MyPanelSlot">
++			Panel body
++		</Fill>
++	);
++
++	return (
++		<SlotFillProvider>
++			<MyPanelSlot />
++			<MyPanelSlot.Content />
++		</SlotFillProvider>
++	);
++};
+ ```
+ 
+-Any Fill will automatically occupy this Slot space, even if rendered elsewhere in the application.
+-
+-You can either use the Fill component directly, or a wrapper component type as in the above example to abstract the slot name from consumer awareness.
+-
+ There is also `createSlotFill` helper method which was created to simplify the process of matching the corresponding `Slot` and `Fill` components:
+ 
+ ```jsx
+diff --git a/packages/components/src/spinner/README.md b/packages/components/src/spinner/README.md
+new file mode 100644
+index 00000000000000..b4978f5f4607c2
+--- /dev/null
++++ b/packages/components/src/spinner/README.md
+@@ -0,0 +1,11 @@
++# Spinner
++
++## Usage
++
++```jsx
++import { Spinner } from '@wordpress/components';
++
++const MySpinner = () => (
++	<Spinner />
++);
++```
+diff --git a/packages/components/src/tab-panel/README.md b/packages/components/src/tab-panel/README.md
+index e9c54681e2e6da..dd96512c5f0435 100644
+--- a/packages/components/src/tab-panel/README.md
++++ b/packages/components/src/tab-panel/README.md
+@@ -1,5 +1,4 @@
+-TabPanel
+-=======
++# TabPanel
+ 
+ TabPanel is a React component to render an ARIA-compliant TabPanel. It has two sections: a list of tabs, and the view to show when tabs are chosen. When the list of tabs gets focused, the active tab gets focus (the first tab if there isn't one already). Use the arrow keys to navigate between tabs AND select the newly focused tab at the same time.
+ 
+@@ -10,38 +9,33 @@ TabPanel is a Function-as-Children component. The function takes `tabName` as an
+ Renders a TabPanel with each tab representing a paragraph with its title.
+ 
+ ```jsx
+-
+ import { TabPanel } from '@wordpress/components';
+ 
+ const onSelect = ( tabName ) => {
+ 	console.log( 'Selecting tab', tabName );
+ };
+ 
+-function MyTabPanel() {
+-	return (
+-		<TabPanel className="my-tab-panel"
+-			activeClass="active-tab"
+-			onSelect={ onSelect }
+-			tabs={ [
+-				{
+-					name: 'tab1',
+-					title: 'Tab 1',
+-					className: 'tab-one',
+-				},
+-				{
+-					name: 'tab2',
+-					title: 'Tab 2',
+-					className: 'tab-two',
+-				},
+-			] }>
++const MyTabPanel = () => (
++	<TabPanel className="my-tab-panel"
++		activeClass="active-tab"
++		onSelect={ onSelect }
++		tabs={ [
++			{
++				name: 'tab1',
++				title: 'Tab 1',
++				className: 'tab-one',
++			},
+ 			{
+-				( tabName ) => {
+-					return <p>${ tabName }</p>;
+-				}
+-			}
+-		</TabPanel>
+-	)
+-}
++				name: 'tab2',
++				title: 'Tab 2',
++				className: 'tab-two',
++			},
++		] }>
++		{
++			( tabName ) => <p>{ tabName }</p>
++		}
++	</TabPanel>
++);
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/text-control/README.md b/packages/components/src/text-control/README.md
+index 449c132c36f976..a66e6daadbd5b3 100644
+--- a/packages/components/src/text-control/README.md
++++ b/packages/components/src/text-control/README.md
+@@ -1,5 +1,4 @@
+-TextControl
+-=======
++# TextControl
+ 
+ TextControl is normally used to generate text input fields. But can be used to generate other input types.
+ 
+@@ -7,12 +6,20 @@ TextControl is normally used to generate text input fields. But can be used to g
+ ## Usage
+ 
+ Render a user interface to input the name of an additional css class.
++
+ ```jsx
++import { TextControl } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const MyTextControl = withState( {
++	className: '',
++} )( ( { className, setState } ) => ( 
+ 	<TextControl
+-		label={ __( 'Additional CSS Class' ) }
++		label="Additional CSS Class"
+ 		value={ className }
+-		onChange={ onChange }
++		onChange={ ( className ) => setState( { className } ) }
+ 	/>
++) );
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/textarea-control/README.md b/packages/components/src/textarea-control/README.md
+index 850593166b334d..c43458971a4740 100644
+--- a/packages/components/src/textarea-control/README.md
++++ b/packages/components/src/textarea-control/README.md
+@@ -1,19 +1,24 @@
+-TextareaControl
+-=======
++# TextareaControl
+ 
+ TextareaControl is used to generate textarea input fields.
+ 
+ 
+ ## Usage
+ 
+-Render a user interface to input the name of an additional CSS class.
+ ```jsx
+-    <TextareaControl
+-        label="Text"
+-        value={ value }
+-        help="Enter some text"
+-        onChange={ onChange }
+-    />
++import { TextareaControl } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const MyTextareaControl = withState( {
++	text: '',
++} )( ( { text, setState } ) => ( 
++	<TextareaControl
++		label="Text"
++		help="Enter some text"
++		value={ text }
++		onChange={ ( text ) => setState( { text } ) }
++	/>
++) );
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/toggle-control/README.md b/packages/components/src/toggle-control/README.md
+index 96caf8a17d1ca3..c41bb464a44f3c 100644
+--- a/packages/components/src/toggle-control/README.md
++++ b/packages/components/src/toggle-control/README.md
+@@ -1,5 +1,4 @@
+-ToggleControl
+-=======
++# ToggleControl
+ 
+ ToggleControl is used to generate a toggle user interface.
+ 
+@@ -8,12 +7,19 @@ ToggleControl is used to generate a toggle user interface.
+ 
+ Render a user interface to change fixed background setting.
+ ```jsx
++import { ToggleControl } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const MyToggleControl = withState( {
++	hasFixedBackground: false,
++} )( ( { hasFixedBackground, setState } ) => ( 
+ 	<ToggleControl
+-		label={ __( 'Fixed Background' ) }
+-		checked={ !! hasParallax }
+-		help={ ( checked ) => checked ? __( 'Has fixed background.' ) : __( 'No fixed background.' ) } 
+-		onChange={ toggleParallax }
++		label="Fixed Background"
++		help={ hasFixedBackground ? 'Has fixed background.' : 'No fixed background.' } 
++		checked={ hasFixedBackground }
++		onChange={ () => setState( ( state ) => ( { hasFixedBackground: ! state.hasFixedBackground } ) ) }
+ 	/>
++) );
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/toolbar/README.md b/packages/components/src/toolbar/README.md
+new file mode 100644
+index 00000000000000..968d8909fa6bc5
+--- /dev/null
++++ b/packages/components/src/toolbar/README.md
+@@ -0,0 +1,25 @@
++# Toolbar
++
++## Usage
++
++```jsx
++import { Toolbar } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const MyToolbar = withState( {
++	activeControl: 'up',
++} )( ( { activeControl, setState } ) => { 
++	function createThumbsControl( thumbs ) {
++		return {
++			icon: `thumbs-${ thumbs }`,
++			title: `Thumbs ${ thumbs }`,
++			isActive: activeControl === thumbs,
++			onClick: () => setState( { activeControl: thumbs } ),
++		};
++	}
++	
++	return (
++		<Toolbar controls={ [ 'up', 'down' ].map( createThumbsControl ) } />
++	);
++} );
++```
+diff --git a/packages/components/src/tooltip/README.md b/packages/components/src/tooltip/README.md
+index c7bd8537b79916..bf155161fd0d63 100644
+--- a/packages/components/src/tooltip/README.md
++++ b/packages/components/src/tooltip/README.md
+@@ -1,5 +1,4 @@
+-Tooltip
+-=======
++# Tooltip
+ 
+ Tooltip is a React component to render floating help text relative to a node when it receives focus or when the user places the mouse cursor atop it. If the tooltip exceeds the bounds of the page in the direction it opens, its position will be flipped automatically.
+ 
+@@ -10,17 +9,15 @@ Accessibility note: the tooltip text is hidden from screen readers and assistive
+ Render a Tooltip, passing as a child the element to which it should anchor:
+ 
+ ```jsx
+-import { Tooltip } from '@wordpress/components';
+-
+-function HelpfulButton() {
+-	return (
+-		<Tooltip text="More information">
+-			<button>
+-				Hover for more information
+-			</button>
+-		</Tooltip>
+-	);
+-}
++import { Tooltip, Button } from '@wordpress/components';
++
++const MyTooltip = () => (
++	<Tooltip text="More information">
++		<Button isDefault>
++			Hover for more information
++		</Button>
++	</Tooltip>
++);
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/tree-select/README.md b/packages/components/src/tree-select/README.md
+index 0d16032c6992dd..3924a239d3b933 100644
+--- a/packages/components/src/tree-select/README.md
++++ b/packages/components/src/tree-select/README.md
+@@ -1,5 +1,4 @@
+-TreeSelect
+-=======
++# TreeSelect
+ 
+ TreeSelect component is used to generate select input fields.
+ 
+@@ -8,11 +7,17 @@ TreeSelect component is used to generate select input fields.
+ 
+ Render a user interface to select the parent page in a hierarchy of pages:
+ ```jsx
++import { TreeSelect } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const MyTreeSelect = withState( {
++	page: 'p21',
++} )( ( { page, setState } ) => (
+ 	<TreeSelect
+ 		label="Parent page"
+ 		noOptionLabel="No parent page"
+-		onChange={ onChange }
+-		selectedId="p211"
++		onChange={ ( page ) => setState( { page } ) }
++		selectedId={ page }
+ 		tree={ [
+ 			{
+ 				name: 'Page 1',
+@@ -40,6 +45,7 @@ Render a user interface to select the parent page in a hierarchy of pages:
+ 			},
+ 		] }
+ 	/>
++) );
+ ```
+ 
+ ## Props

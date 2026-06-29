@@ -1,0 +1,92 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 129fcfbccf3a31..49147469393e94 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `Grid`: Remove "experimental" designation ([#61018](https://github.com/WordPress/gutenberg/pull/61018)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/grid/README.md b/packages/components/src/grid/README.md
+index 15cd959e135bee..89b162b7618922 100644
+--- a/packages/components/src/grid/README.md
++++ b/packages/components/src/grid/README.md
+@@ -1,16 +1,12 @@
+ # Grid
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `Grid` is a primitive layout component that can arrange content in a grid configuration.
+ 
+ ## Usage
+ 
+ ```jsx
+ import {
+-	__experimentalGrid as Grid,
++	Grid,
+ 	__experimentalText as Text,
+ } from '@wordpress/components';
+ 
+diff --git a/packages/components/src/grid/component.tsx b/packages/components/src/grid/component.tsx
+index f18909c8e1c9ae..e86211cb4f898a 100644
+--- a/packages/components/src/grid/component.tsx
++++ b/packages/components/src/grid/component.tsx
+@@ -26,7 +26,7 @@ function UnconnectedGrid(
+  *
+  * ```jsx
+  * import {
+- * 	__experimentalGrid as Grid,
++ * 	Grid,
+  * 	__experimentalText as Text
+  * } from `@wordpress/components`;
+  *
+diff --git a/packages/components/src/grid/stories/index.story.tsx b/packages/components/src/grid/stories/index.story.tsx
+index 171b324e033c04..f4355657a5d81a 100644
+--- a/packages/components/src/grid/stories/index.story.tsx
++++ b/packages/components/src/grid/stories/index.story.tsx
+@@ -11,7 +11,7 @@ import { Grid } from '..';
+ 
+ const meta: Meta< typeof Grid > = {
+ 	component: Grid,
+-	title: 'Components (Experimental)/Grid',
++	title: 'Components/Grid',
+ 	argTypes: {
+ 		as: { control: { type: 'text' } },
+ 		align: { control: { type: 'text' } },
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..1c57d9681d4616 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -88,7 +88,13 @@ export { default as FormToggle } from './form-toggle';
+ export { default as FormTokenField } from './form-token-field';
+ export { default as GradientPicker } from './gradient-picker';
+ export { default as CustomGradientPicker } from './custom-gradient-picker';
+-export { Grid as __experimentalGrid } from './grid';
++export {
++	/**
++	 * @deprecated Import `Grid` instead.
++	 */
++	Grid as __experimentalGrid,
++	Grid,
++} from './grid';
+ export { default as Guide } from './guide';
+ export { default as GuidePage } from './guide/page';
+ export { Heading as __experimentalHeading } from './heading';
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..526ba73a3fb250 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,6 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation', 'grid' ];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

@@ -1,0 +1,454 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f01fea4e35e500..8455c0be46601f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ 
+ -   Reexport all of the `build-types` folder from the `components` package entry point ([#72809](https://github.com/WordPress/gutenberg/pull/72809)).
+ -   `TextareaControl`: Add `min-height` to the textarea element ([#72867](https://github.com/WordPress/gutenberg/pull/72867)).
++-   `Card`, `CardHeader`, `CardBody` and `CardFooter`: Add support for directional padding through object-based size prop, allowing independent control of padding for each side ([#72511](https://github.com/WordPress/gutenberg/pull/72511)).
+ 
+ ## 30.7.0 (2025-10-29)
+ 
+diff --git a/packages/components/src/card/card-body/README.md b/packages/components/src/card/card-body/README.md
+index 451b4dc8526cf7..e38fa6bdc5de36 100644
+--- a/packages/components/src/card/card-body/README.md
++++ b/packages/components/src/card/card-body/README.md
+@@ -32,10 +32,21 @@ Renders with a light gray background color.
+ -   Required: No
+ -   Default: `false`
+ 
+-### `size`: `string`
++### `size`: `string | object`
+ 
+-Determines the amount of padding within the component.
++Determines the amount of padding within the component. Can be specified either as a single size token or as an object.
+ 
+ - Required: No
+ - Default: `medium`
+-- Allowed values: `xSmall`, `small`, `medium`, `large`
++- Allowed values:
++-   Single size token: `none`, `xSmall`, `small`, `medium`, `large`
++-   Object:
++
++    ```ts
++    {
++      blockStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++      blockEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++      inlineStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++      inlineEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++    }
++    ```
+diff --git a/packages/components/src/card/card-body/hook.ts b/packages/components/src/card/card-body/hook.ts
+index d4cefb9ed9e670..e957f417dd20ed 100644
+--- a/packages/components/src/card/card-body/hook.ts
++++ b/packages/components/src/card/card-body/hook.ts
+@@ -11,6 +11,7 @@ import { useContextSystem } from '../../context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { BodyProps } from '../types';
++import { getPaddingBySize } from '../get-padding-by-size';
+ 
+ export function useCardBody(
+ 	props: WordPressComponentProps< BodyProps, 'div' >
+@@ -30,7 +31,7 @@ export function useCardBody(
+ 			cx(
+ 				styles.Body,
+ 				styles.borderRadius,
+-				styles.cardPaddings[ size ],
++				getPaddingBySize( size ),
+ 				isShady && styles.shady,
+ 				// This classname is added for legacy compatibility reasons.
+ 				'components-card__body',
+diff --git a/packages/components/src/card/card-footer/README.md b/packages/components/src/card/card-footer/README.md
+index e7f15d846b4fbd..f5781e6f05bdf4 100644
+--- a/packages/components/src/card/card-footer/README.md
++++ b/packages/components/src/card/card-footer/README.md
+@@ -65,10 +65,21 @@ Renders with a light gray background color.
+ 
+ See the documentation for the `justify` prop for the [`Flex` component](/packages/components/src/flex/flex/README.md#justify)
+ 
+-### `size`: `string`
++### `size`: `string | object`
+ 
+-Determines the amount of padding within the component.
++Determines the amount of padding within the component. Can be specified either as a single size token or as an object.
+ 
+ - Required: No
+ - Default: `medium`
+-- Allowed values: `xSmall`, `small`, `medium`, `large`
++- Allowed values:
++-   Single size token: `none`, `xSmall`, `small`, `medium`, `large`
++-   Object:
++
++    ```ts
++    {
++      blockStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++      blockEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++      inlineStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++      inlineEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++    }
++    ```
+diff --git a/packages/components/src/card/card-footer/hook.ts b/packages/components/src/card/card-footer/hook.ts
+index 844417848b8aee..037b74d833cd21 100644
+--- a/packages/components/src/card/card-footer/hook.ts
++++ b/packages/components/src/card/card-footer/hook.ts
+@@ -11,6 +11,7 @@ import { useContextSystem } from '../../context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { FooterProps } from '../types';
++import { getPaddingBySize } from '../get-padding-by-size';
+ 
+ export function useCardFooter(
+ 	props: WordPressComponentProps< FooterProps, 'div' >
+@@ -32,7 +33,7 @@ export function useCardFooter(
+ 				styles.Footer,
+ 				styles.borderRadius,
+ 				styles.borderColor,
+-				styles.cardPaddings[ size ],
++				getPaddingBySize( size ),
+ 				isBorderless && styles.borderless,
+ 				isShady && styles.shady,
+ 				// This classname is added for legacy compatibility reasons.
+diff --git a/packages/components/src/card/card-header/README.md b/packages/components/src/card/card-header/README.md
+index 87f2f6178a9c82..c5538c0acb94b7 100644
+--- a/packages/components/src/card/card-header/README.md
++++ b/packages/components/src/card/card-header/README.md
+@@ -33,10 +33,21 @@ Renders with a light gray background color.
+ -   Required: No
+ -   Default: `false`
+ 
+-### `size`: `string`
++### `size`: `string | object`
+ 
+-Determines the amount of padding within the component.
++Determines the amount of padding within the component. Can be specified either as a single size token or as an object.
+ 
+ - Required: No
+ - Default: `medium`
+-- Allowed values: `xSmall`, `small`, `medium`, `large`
++- Allowed values:
++-   Single size token: `none`, `xSmall`, `small`, `medium`, `large`
++-   Object:
++
++    ```ts
++    {
++      blockStart: 'none' |  'xSmall' | 'small' | 'medium' | 'large';
++      blockEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++      inlineStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++      inlineEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++    }
++    ```
+diff --git a/packages/components/src/card/card-header/hook.ts b/packages/components/src/card/card-header/hook.ts
+index b45d75ff5467d0..e8b112ca35055d 100644
+--- a/packages/components/src/card/card-header/hook.ts
++++ b/packages/components/src/card/card-header/hook.ts
+@@ -11,6 +11,7 @@ import { useContextSystem } from '../../context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { HeaderProps } from '../types';
++import { getPaddingBySize } from '../get-padding-by-size';
+ 
+ export function useCardHeader(
+ 	props: WordPressComponentProps< HeaderProps, 'div' >
+@@ -31,7 +32,7 @@ export function useCardHeader(
+ 				styles.Header,
+ 				styles.borderRadius,
+ 				styles.borderColor,
+-				styles.cardPaddings[ size ],
++				getPaddingBySize( size ),
+ 				isBorderless && styles.borderless,
+ 				isShady && styles.shady,
+ 				// This classname is added for legacy compatibility reasons.
+diff --git a/packages/components/src/card/card/README.md b/packages/components/src/card/card/README.md
+index 33b71cb74faa83..f656c837614ca5 100644
+--- a/packages/components/src/card/card/README.md
++++ b/packages/components/src/card/card/README.md
+@@ -56,13 +56,24 @@ Renders with rounded corners.
+ - Required: No
+ - Default: `true`
+ 
+-### `size`: `string`
++### `size`: `string | object`
+ 
+-Determines the amount of padding within the component.
++Determines the amount of padding within the component. Can be specified either as a single size token or as an object.
+ 
+ - Required: No
+ - Default: `medium`
+-- Allowed values: `xSmall`, `small`, `medium`, `large`
++- Allowed values:
++   	- Single size token: `none`, `xSmall`, `small`, `medium`, `large`
++   	- Object:
++
++    ```ts
++    {
++      blockStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++      blockEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++      inlineStart: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++      inlineEnd: 'none' | 'xSmall' | 'small' | 'medium' | 'large';
++    }
++    ```
+ 
+ ### Inherited props
+ 
+@@ -104,6 +115,40 @@ const Example = () => (
+ );
+ ```
+ 
++### Logical Padding Properties
++
++The `size` prop supports logical properties that adapt to different writing directions:
++
++- `blockStart` - Maps to `top` in horizontal writing modes
++- `blockEnd` - Maps to `bottom` in horizontal writing modes
++- `inlineStart` - Maps to `left` in horizontal left-to-right writing modes
++- `inlineEnd` - Maps to `right` in horizontal left-to-right writing modes
++
++```jsx
++import { Card, CardBody } from '@wordpress/components';
++
++const Example = () => (
++	<Card
++		size={ {
++			blockStart: 'large',
++			blockEnd: 'small',
++			inlineStart: 'medium',
++			inlineEnd: 'medium',
++		} }
++	>
++		<CardBody
++			size={ {
++				blockStart: 'small',
++				inlineStart: 'large',
++				inlineEnd: 'large',
++			} }
++		>
++			Content with logical padding properties
++		</CardBody>
++	</Card>
++);
++```
++
+ ### Context
+ 
+ `<Card />`'s sub-components are connected to `<Card />` using [Context](https://react.dev/learn/passing-data-deeply-with-context). Certain props like `size` and `isBorderless` are passed through to some of the sub-components.
+diff --git a/packages/components/src/card/get-padding-by-size.ts b/packages/components/src/card/get-padding-by-size.ts
+new file mode 100644
+index 00000000000000..d048c7c7957d69
+--- /dev/null
++++ b/packages/components/src/card/get-padding-by-size.ts
+@@ -0,0 +1,70 @@
++/**
++ * External dependencies
++ */
++import { css, type SerializedStyles } from '@emotion/react';
++
++/**
++ * Internal dependencies
++ */
++import type { Props, SizeToken } from './types';
++import { space } from '../utils/space';
++
++const xSmallCardPadding = css`
++	padding: ${ space( 2 ) };
++`;
++
++export const cardPaddings = {
++	none: css`
++		padding: 0;
++	`,
++	large: css`
++		padding: ${ space( 6 ) } ${ space( 8 ) };
++	`,
++	medium: css`
++		padding: ${ space( 4 ) } ${ space( 6 ) };
++	`,
++	small: css`
++		padding: ${ space( 4 ) };
++	`,
++	xSmall: xSmallCardPadding,
++	// The `extraSmall` size is not officially documented, but the following styles
++	// are kept for legacy reasons to support older values of the `size` prop.
++	extraSmall: xSmallCardPadding,
++};
++
++const getSinglePaddingValue = ( size: SizeToken ): string | undefined => {
++	switch ( size ) {
++		case 'xSmall':
++			return space( 2 );
++		case 'small':
++			return space( 4 );
++		case 'medium':
++			return space( 6 );
++		case 'large':
++			return space( 8 );
++		case 'none':
++			return '0';
++		default:
++			return space( 6 );
++	}
++};
++
++export const getPaddingBySize = ( size: Props[ 'size' ] ): SerializedStyles => {
++	// Handle string-based sizes (both standard and deprecated)
++	if ( typeof size === 'string' ) {
++		return cardPaddings[ size as SizeToken ];
++	}
++
++	if ( size ) {
++		const { blockStart, blockEnd, inlineStart, inlineEnd } = size;
++		return css`
++			padding-block-start: ${ getSinglePaddingValue( blockStart ) };
++			padding-block-end: ${ getSinglePaddingValue( blockEnd ) };
++			padding-inline-start: ${ getSinglePaddingValue( inlineStart ) };
++			padding-inline-end: ${ getSinglePaddingValue( inlineEnd ) };
++		`;
++	}
++
++	// Default to medium if no size is provided
++	return cardPaddings.medium;
++};
+diff --git a/packages/components/src/card/stories/index.story.tsx b/packages/components/src/card/stories/index.story.tsx
+index 22fb749461785f..b54883f361ecab 100644
+--- a/packages/components/src/card/stories/index.story.tsx
++++ b/packages/components/src/card/stories/index.story.tsx
+@@ -91,3 +91,62 @@ export const FullBleedContent: StoryObj< typeof Card > = {
+ 		),
+ 	},
+ };
++
++/**
++ * The Card component supports three approaches to padding:
++ * 1. Default padding (medium) - no size prop needed
++ * 2. Token-based padding - using size tokens: xSmall, small, medium, large
++ * 3. Logical padding - customize each direction using logical properties
++ *
++ * Each component (Card, CardHeader, CardBody) can have its own padding configuration.
++ */
++export const PaddingVariations: StoryObj< typeof Card > = {
++	render: () => (
++		<div
++			style={ { display: 'flex', flexDirection: 'column', gap: '32px' } }
++		>
++			{ /* 1. Default Padding */ }
++			<div>
++				<Card>
++					<CardHeader>
++						<Text>Header with default padding</Text>
++					</CardHeader>
++					<CardBody>
++						<Text>Body with default padding (medium)</Text>
++					</CardBody>
++				</Card>
++			</div>
++
++			<div>
++				<Card>
++					<CardHeader
++						size={ {
++							blockStart: 'large',
++							blockEnd: 'small',
++							inlineStart: 'xSmall',
++							inlineEnd: 'large',
++						} }
++					>
++						<Text>
++							Header with logical padding (large blockStart, small
++							blockEnd, xSmall inlineStart, large inlineEnd)
++						</Text>
++					</CardHeader>
++					<CardBody
++						size={ {
++							blockStart: 'medium',
++							blockEnd: 'xSmall',
++							inlineStart: 'large',
++							inlineEnd: 'xSmall',
++						} }
++					>
++						<Text>
++							Body with logical padding (medium blockStart, xSmall
++							blockEnd, large inlineStart, xSmall inlineEnd)
++						</Text>
++					</CardBody>
++				</Card>
++			</div>
++		</div>
++	),
++};
+diff --git a/packages/components/src/card/styles.ts b/packages/components/src/card/styles.ts
+index df0fe4eb7ed720..80ba26cd0f55fb 100644
+--- a/packages/components/src/card/styles.ts
++++ b/packages/components/src/card/styles.ts
+@@ -94,26 +94,6 @@ export const rounded = css`
+ 	border-radius: ${ adjustedBorderRadius };
+ `;
+ 
+-const xSmallCardPadding = css`
+-	padding: ${ CONFIG.cardPaddingXSmall };
+-`;
+-
+-export const cardPaddings = {
+-	large: css`
+-		padding: ${ CONFIG.cardPaddingLarge };
+-	`,
+-	medium: css`
+-		padding: ${ CONFIG.cardPaddingMedium };
+-	`,
+-	small: css`
+-		padding: ${ CONFIG.cardPaddingSmall };
+-	`,
+-	xSmall: xSmallCardPadding,
+-	// The `extraSmall` size is not officially documented, but the following styles
+-	// are kept for legacy reasons to support older values of the `size` prop.
+-	extraSmall: xSmallCardPadding,
+-};
+-
+ export const shady = css`
+ 	background-color: ${ COLORS.ui.backgroundDisabled };
+ `;
+diff --git a/packages/components/src/card/types.ts b/packages/components/src/card/types.ts
+index 9aa0ac1e3fa6ab..534a597b00aeff 100644
+--- a/packages/components/src/card/types.ts
++++ b/packages/components/src/card/types.ts
+@@ -5,8 +5,16 @@ import type { SurfaceProps } from '../surface/types';
+ import type { FlexProps } from '../flex/types';
+ 
+ type DeprecatedSizeOptions = 'extraSmall';
+-export type SizeOptions = 'xSmall' | 'small' | 'medium' | 'large';
++export type SizeToken = 'xSmall' | 'small' | 'medium' | 'large' | 'none';
+ 
++export type SizeOptions =
++	| SizeToken
++	| {
++			blockStart: SizeToken;
++			blockEnd: SizeToken;
++			inlineStart: SizeToken;
++			inlineEnd: SizeToken;
++	  };
+ type SizeableProps = {
+ 	/**
+ 	 * Determines the amount of padding within the component.
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 5b0562a895c2c7..567c72c38a5bed 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -1,7 +1,6 @@
+ /**
+  * Internal dependencies
+  */
+-import { space } from './space';
+ import { COLORS } from './colors-values';
+ 
+ const CONTROL_HEIGHT = '36px';
+@@ -54,10 +53,6 @@ export default Object.assign( {}, CONTROL_PROPS, {
+ 	fontWeightMedium: '499', // ensures fallback to 400 (instead of 600)
+ 	fontWeightHeading: '600',
+ 	gridBase: '4px',
+-	cardPaddingXSmall: `${ space( 2 ) }`,
+-	cardPaddingSmall: `${ space( 4 ) }`,
+-	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,
+-	cardPaddingLarge: `${ space( 6 ) } ${ space( 8 ) }`,
+ 	elevationXSmall: `0 1px 1px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02), 0 3px 3px rgba(0, 0, 0, 0.02), 0 4px 4px rgba(0, 0, 0, 0.01)`,
+ 	elevationSmall: `0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 3px rgba(0, 0, 0, 0.04), 0 6px 6px rgba(0, 0, 0, 0.03), 0 8px 8px rgba(0, 0, 0, 0.02)`,
+ 	elevationMedium: `0 2px 3px rgba(0, 0, 0, 0.05), 0 4px 5px rgba(0, 0, 0, 0.04), 0 12px 12px rgba(0, 0, 0, 0.03), 0 16px 16px rgba(0, 0, 0, 0.02)`,

@@ -1,0 +1,612 @@
+[
+	{
+		"number": 78365,
+		"url": "https://github.com/WordPress/gutenberg/pull/78365",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77842,
+		"url": "https://github.com/WordPress/gutenberg/pull/77842",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 78300,
+		"url": "https://github.com/WordPress/gutenberg/pull/78300",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77982,
+		"url": "https://github.com/WordPress/gutenberg/pull/77982",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 78354,
+		"url": "https://github.com/WordPress/gutenberg/pull/78354",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77648,
+		"url": "https://github.com/WordPress/gutenberg/pull/77648",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77599,
+		"url": "https://github.com/WordPress/gutenberg/pull/77599",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77450,
+		"url": "https://github.com/WordPress/gutenberg/pull/77450",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77642,
+		"url": "https://github.com/WordPress/gutenberg/pull/77642",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77423,
+		"url": "https://github.com/WordPress/gutenberg/pull/77423",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77185,
+		"url": "https://github.com/WordPress/gutenberg/pull/77185",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77191,
+		"url": "https://github.com/WordPress/gutenberg/pull/77191",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77193,
+		"url": "https://github.com/WordPress/gutenberg/pull/77193",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77187,
+		"url": "https://github.com/WordPress/gutenberg/pull/77187",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77182,
+		"url": "https://github.com/WordPress/gutenberg/pull/77182",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77181,
+		"url": "https://github.com/WordPress/gutenberg/pull/77181",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77184,
+		"url": "https://github.com/WordPress/gutenberg/pull/77184",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77194,
+		"url": "https://github.com/WordPress/gutenberg/pull/77194",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77190,
+		"url": "https://github.com/WordPress/gutenberg/pull/77190",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77140,
+		"url": "https://github.com/WordPress/gutenberg/pull/77140",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77171,
+		"url": "https://github.com/WordPress/gutenberg/pull/77171",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77158,
+		"url": "https://github.com/WordPress/gutenberg/pull/77158",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77138,
+		"url": "https://github.com/WordPress/gutenberg/pull/77138",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77373,
+		"url": "https://github.com/WordPress/gutenberg/pull/77373",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77163,
+		"url": "https://github.com/WordPress/gutenberg/pull/77163",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77183,
+		"url": "https://github.com/WordPress/gutenberg/pull/77183",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77160,
+		"url": "https://github.com/WordPress/gutenberg/pull/77160",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77148,
+		"url": "https://github.com/WordPress/gutenberg/pull/77148",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77159,
+		"url": "https://github.com/WordPress/gutenberg/pull/77159",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77132,
+		"url": "https://github.com/WordPress/gutenberg/pull/77132",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77143,
+		"url": "https://github.com/WordPress/gutenberg/pull/77143",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77152,
+		"url": "https://github.com/WordPress/gutenberg/pull/77152",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77335,
+		"url": "https://github.com/WordPress/gutenberg/pull/77335",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77137,
+		"url": "https://github.com/WordPress/gutenberg/pull/77137",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77165,
+		"url": "https://github.com/WordPress/gutenberg/pull/77165",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77129,
+		"url": "https://github.com/WordPress/gutenberg/pull/77129",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77161,
+		"url": "https://github.com/WordPress/gutenberg/pull/77161",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77177,
+		"url": "https://github.com/WordPress/gutenberg/pull/77177",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77202,
+		"url": "https://github.com/WordPress/gutenberg/pull/77202",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77127,
+		"url": "https://github.com/WordPress/gutenberg/pull/77127",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77112,
+		"url": "https://github.com/WordPress/gutenberg/pull/77112",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77107,
+		"url": "https://github.com/WordPress/gutenberg/pull/77107",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77073,
+		"url": "https://github.com/WordPress/gutenberg/pull/77073",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77042,
+		"url": "https://github.com/WordPress/gutenberg/pull/77042",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77105,
+		"url": "https://github.com/WordPress/gutenberg/pull/77105",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77048,
+		"url": "https://github.com/WordPress/gutenberg/pull/77048",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76931,
+		"url": "https://github.com/WordPress/gutenberg/pull/76931",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77062,
+		"url": "https://github.com/WordPress/gutenberg/pull/77062",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77010,
+		"url": "https://github.com/WordPress/gutenberg/pull/77010",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77020,
+		"url": "https://github.com/WordPress/gutenberg/pull/77020",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77018,
+		"url": "https://github.com/WordPress/gutenberg/pull/77018",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77013,
+		"url": "https://github.com/WordPress/gutenberg/pull/77013",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77051,
+		"url": "https://github.com/WordPress/gutenberg/pull/77051",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77031,
+		"url": "https://github.com/WordPress/gutenberg/pull/77031",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77052,
+		"url": "https://github.com/WordPress/gutenberg/pull/77052",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76970,
+		"url": "https://github.com/WordPress/gutenberg/pull/76970",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76937,
+		"url": "https://github.com/WordPress/gutenberg/pull/76937",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76912,
+		"url": "https://github.com/WordPress/gutenberg/pull/76912",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76869,
+		"url": "https://github.com/WordPress/gutenberg/pull/76869",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 77041,
+		"url": "https://github.com/WordPress/gutenberg/pull/77041",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76910,
+		"url": "https://github.com/WordPress/gutenberg/pull/76910",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76403,
+		"url": "https://github.com/WordPress/gutenberg/pull/76403",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76400,
+		"url": "https://github.com/WordPress/gutenberg/pull/76400",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76410,
+		"url": "https://github.com/WordPress/gutenberg/pull/76410",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76399,
+		"url": "https://github.com/WordPress/gutenberg/pull/76399",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76378,
+		"url": "https://github.com/WordPress/gutenberg/pull/76378",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76365,
+		"url": "https://github.com/WordPress/gutenberg/pull/76365",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76356,
+		"url": "https://github.com/WordPress/gutenberg/pull/76356",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76368,
+		"url": "https://github.com/WordPress/gutenberg/pull/76368",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76340,
+		"url": "https://github.com/WordPress/gutenberg/pull/76340",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76281,
+		"url": "https://github.com/WordPress/gutenberg/pull/76281",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76329,
+		"url": "https://github.com/WordPress/gutenberg/pull/76329",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76362,
+		"url": "https://github.com/WordPress/gutenberg/pull/76362",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76280,
+		"url": "https://github.com/WordPress/gutenberg/pull/76280",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76265,
+		"url": "https://github.com/WordPress/gutenberg/pull/76265",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76254,
+		"url": "https://github.com/WordPress/gutenberg/pull/76254",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76249,
+		"url": "https://github.com/WordPress/gutenberg/pull/76249",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76230,
+		"url": "https://github.com/WordPress/gutenberg/pull/76230",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76252,
+		"url": "https://github.com/WordPress/gutenberg/pull/76252",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76071,
+		"url": "https://github.com/WordPress/gutenberg/pull/76071",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76084,
+		"url": "https://github.com/WordPress/gutenberg/pull/76084",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76052,
+		"url": "https://github.com/WordPress/gutenberg/pull/76052",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76199,
+		"url": "https://github.com/WordPress/gutenberg/pull/76199",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76097,
+		"url": "https://github.com/WordPress/gutenberg/pull/76097",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76218,
+		"url": "https://github.com/WordPress/gutenberg/pull/76218",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76131,
+		"url": "https://github.com/WordPress/gutenberg/pull/76131",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76222,
+		"url": "https://github.com/WordPress/gutenberg/pull/76222",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76041,
+		"url": "https://github.com/WordPress/gutenberg/pull/76041",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76047,
+		"url": "https://github.com/WordPress/gutenberg/pull/76047",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76202,
+		"url": "https://github.com/WordPress/gutenberg/pull/76202",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76027,
+		"url": "https://github.com/WordPress/gutenberg/pull/76027",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 76021,
+		"url": "https://github.com/WordPress/gutenberg/pull/76021",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 75165,
+		"url": "https://github.com/WordPress/gutenberg/pull/75165",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 75157,
+		"url": "https://github.com/WordPress/gutenberg/pull/75157",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 75098,
+		"url": "https://github.com/WordPress/gutenberg/pull/75098",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 75103,
+		"url": "https://github.com/WordPress/gutenberg/pull/75103",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 75138,
+		"url": "https://github.com/WordPress/gutenberg/pull/75138",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 75101,
+		"url": "https://github.com/WordPress/gutenberg/pull/75101",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 75133,
+		"url": "https://github.com/WordPress/gutenberg/pull/75133",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 75089,
+		"url": "https://github.com/WordPress/gutenberg/pull/75089",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 75031,
+		"url": "https://github.com/WordPress/gutenberg/pull/75031",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 75095,
+		"url": "https://github.com/WordPress/gutenberg/pull/75095",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74956,
+		"url": "https://github.com/WordPress/gutenberg/pull/74956",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74977,
+		"url": "https://github.com/WordPress/gutenberg/pull/74977",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 75054,
+		"url": "https://github.com/WordPress/gutenberg/pull/75054",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74986,
+		"url": "https://github.com/WordPress/gutenberg/pull/74986",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74980,
+		"url": "https://github.com/WordPress/gutenberg/pull/74980",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 75096,
+		"url": "https://github.com/WordPress/gutenberg/pull/75096",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74952,
+		"url": "https://github.com/WordPress/gutenberg/pull/74952",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74930,
+		"url": "https://github.com/WordPress/gutenberg/pull/74930",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74899,
+		"url": "https://github.com/WordPress/gutenberg/pull/74899",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74548,
+		"url": "https://github.com/WordPress/gutenberg/pull/74548",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74505,
+		"url": "https://github.com/WordPress/gutenberg/pull/74505",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74536,
+		"url": "https://github.com/WordPress/gutenberg/pull/74536",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74513,
+		"url": "https://github.com/WordPress/gutenberg/pull/74513",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74530,
+		"url": "https://github.com/WordPress/gutenberg/pull/74530",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74480,
+		"url": "https://github.com/WordPress/gutenberg/pull/74480",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74416,
+		"url": "https://github.com/WordPress/gutenberg/pull/74416",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74415,
+		"url": "https://github.com/WordPress/gutenberg/pull/74415",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74463,
+		"url": "https://github.com/WordPress/gutenberg/pull/74463",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74470,
+		"url": "https://github.com/WordPress/gutenberg/pull/74470",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	},
+	{
+		"number": 74441,
+		"url": "https://github.com/WordPress/gutenberg/pull/74441",
+		"error": "HTTP 429: <!DOCTYPE html>\n<html>\n  <head>\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\">\n    <meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; base-uri 'self'; connect-src 'self'; form-action 'self'; img-src 'self' data:; script-src 'self'; style-src 'unsafe-inli"
+	}
+]

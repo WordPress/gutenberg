@@ -1,0 +1,246 @@
+diff --git a/packages/block-editor/src/components/global-styles/border-panel.js b/packages/block-editor/src/components/global-styles/border-panel.js
+index cc7a464f8634a9..aea8e67f5b5944 100644
+--- a/packages/block-editor/src/components/global-styles/border-panel.js
++++ b/packages/block-editor/src/components/global-styles/border-panel.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import {
+-	__experimentalBorderBoxControl as BorderBoxControl,
++	BorderBoxControl,
+ 	__experimentalHasSplitBorders as hasSplitBorders,
+ 	__experimentalIsDefinedBorder as isDefinedBorder,
+ 	__experimentalToolsPanel as ToolsPanel,
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 71aa08d6934034..cd7ea8007746b7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,8 +7,13 @@
+ -   `ToolsPanel`: atomic one-step state update when (un)registering panels ([#65564](https://github.com/WordPress/gutenberg/pull/65564)).
+ -   `Navigator`: fix `isInitial` logic ([#65527](https://github.com/WordPress/gutenberg/pull/65527)).
+ 
++### Deprecations
++
++-   `__experimentalBorderBoxControl` can now be imported as a stable `BorderBoxControl` ([#65586](https://github.com/WordPress/gutenberg/pull/65586)).
++
+ ### Enhancements
+ 
++-   `BorderBoxControl`: promote to stable ([#65586](https://github.com/WordPress/gutenberg/pull/65586)).
+ -   `MenuGroup`: Simplify the MenuGroup styles within dropdown menus. ([#65561](https://github.com/WordPress/gutenberg/pull/65561)).
+ 
+ ## 28.8.0 (2024-09-19)
+diff --git a/packages/components/src/border-box-control/border-box-control/README.md b/packages/components/src/border-box-control/border-box-control/README.md
+index 5ec2263bf16741..e67a1386103c1a 100644
+--- a/packages/components/src/border-box-control/border-box-control/README.md
++++ b/packages/components/src/border-box-control/border-box-control/README.md
+@@ -1,12 +1,7 @@
+ # BorderBoxControl
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-<br />
+-
+-This component provides users with the ability to configure a single "flat"
+-border or separate borders per side.
++An input control for the color, style, and width of the border of a box. The
++border can be customized as a whole, or individually for each side of the box.
+ 
+ ## Development guidelines
+ 
+@@ -28,7 +23,7 @@ show "Mixed" placeholder text.
+ 
+ ```jsx
+ import { useState } from 'react';
+-import { __experimentalBorderBoxControl as BorderBoxControl } from '@wordpress/components';
++import { BorderBoxControl } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ 
+ const colors = [
+@@ -76,35 +71,35 @@ colors are organized by multiple origins.
+ 
+ Each color may be an object containing a `name` and `color` value.
+ 
+-- Required: No
+-- Default: `[]`
++-   Required: No
++-   Default: `[]`
+ 
+ ### `disableCustomColors`: `boolean`
+ 
+ This toggles the ability to choose custom colors.
+ 
+-- Required: No
++-   Required: No
+ 
+ ### `enableAlpha`: `boolean`
+ 
+ This controls whether the alpha channel will be offered when selecting
+ custom colors.
+ 
+-- Required: No
+-- Default: `false`
++-   Required: No
++-   Default: `false`
+ 
+ ### `enableStyle`: `boolean`
+ 
+ This controls whether to support border style selections.
+ 
+-- Required: No
+-- Default: `true`
++-   Required: No
++-   Default: `true`
+ 
+ ### `hideLabelFromVision`: `boolean`
+ 
+ Provides control over whether the label will only be visible to screen readers.
+ 
+-- Required: No
++-   Required: No
+ 
+ ### `label`: `string`
+ 
+@@ -113,7 +108,7 @@ If provided, a label will be generated using this as the content.
+ _Whether it is visible only to screen readers is controlled via
+ `hideLabelFromVision`._
+ 
+-- Required: No
++-   Required: No
+ 
+ ### `onChange`: `( value?: Object ) => void`
+ 
+@@ -123,7 +118,7 @@ borders, or `undefined`.
+ 
+ _Note: The will be `undefined` if a user clears all borders._
+ 
+-- Required: Yes
++-   Required: Yes
+ 
+ ### `popoverPlacement`: `string`
+ 
+@@ -133,21 +128,21 @@ By default, popovers are displayed relative to the button that initiated the pop
+ 
+ The available base placements are 'top', 'right', 'bottom', 'left'. Each of these base placements has an alignment in the form -start and -end. For example, 'right-start', or 'bottom-end'. These allow you to align the tooltip to the edges of the button, rather than centering it.
+ 
+-- Required: No
++-   Required: No
+ 
+ ### `popoverOffset`: `number`
+ 
+ The space between the popover and the control wrapper.
+ 
+-- Required: No
++-   Required: No
+ 
+ ### `size`: `string`
+ 
+ Size of the control.
+ 
+-- Required: No
+-- Default: `default`
+-- Allowed values: `default`, `__unstable-large`
++-   Required: No
++-   Default: `default`
++-   Allowed values: `default`, `__unstable-large`
+ 
+ ### `value`: `Object`
+ 
+@@ -158,6 +153,7 @@ properties or a "split" border which defines the previous properties but for
+ each side; `top`, `right`, `bottom`, and `left`.
+ 
+ Examples:
++
+ ```js
+ const flatBorder = { color: '#72aee6', style: 'solid', width: '1px' };
+ const splitBorders = {
+@@ -168,11 +164,11 @@ const splitBorders = {
+ };
+ ```
+ 
+-- Required: No
++-   Required: No
+ 
+ ### `__next40pxDefaultSize`: `boolean`
+ 
+ Start opting into the larger default height that will become the default size in a future version.
+ 
+-- Required: No
+-- Default: `false`
++-   Required: No
++-   Default: `false`
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index 26967ad7f63ddb..1dd3437aa50de4 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -147,22 +147,11 @@ const UnconnectedBorderBoxControl = (
+ };
+ 
+ /**
+- * The `BorderBoxControl` effectively has two view states. The first, a "linked"
+- * view, allows configuration of a flat border via a single `BorderControl`.
+- * The second, a "split" view, contains a `BorderControl` for each side
+- * as well as a visualizer for the currently selected borders. Each view also
+- * contains a button to toggle between the two.
+- *
+- * When switching from the "split" view to "linked", if the individual side
+- * borders are not consistent, the "linked" view will display any border
+- * properties selections that are consistent while showing a mixed state for
+- * those that aren't. For example, if all borders had the same color and style
+- * but different widths, then the border dropdown in the "linked" view's
+- * `BorderControl` would show that consistent color and style but the "linked"
+- * view's width input would show "Mixed" placeholder text.
++ * An input control for the color, style, and width of the border of a box. The
++ * border can be customized as a whole, or individually for each side of the box.
+  *
+  * ```jsx
+- * import { __experimentalBorderBoxControl as BorderBoxControl } from '@wordpress/components';
++ * import { BorderBoxControl } from '@wordpress/components';
+  * import { __ } from '@wordpress/i18n';
+  *
+  * const colors = [
+diff --git a/packages/components/src/border-box-control/stories/index.story.tsx b/packages/components/src/border-box-control/stories/index.story.tsx
+index 5b5d7f311208c0..5341dacab646eb 100644
+--- a/packages/components/src/border-box-control/stories/index.story.tsx
++++ b/packages/components/src/border-box-control/stories/index.story.tsx
+@@ -16,7 +16,7 @@ import Button from '../../button';
+ import { BorderBoxControl } from '../';
+ 
+ const meta: Meta< typeof BorderBoxControl > = {
+-	title: 'Components (Experimental)/BorderBoxControl',
++	title: 'Components/BorderBoxControl',
+ 	component: BorderBoxControl,
+ 	argTypes: {
+ 		onChange: { action: 'onChange' },
+@@ -83,4 +83,5 @@ export const Default = Template.bind( {} );
+ Default.args = {
+ 	colors,
+ 	label: 'Borders',
++	enableStyle: true,
+ };
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a59d258012807d..200225148a0a49 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -33,7 +33,9 @@ export {
+ } from './autocomplete';
+ export { default as BaseControl, useBaseControlProps } from './base-control';
+ export {
++	/** @deprecated Import `BorderBoxControl` instead. */
+ 	BorderBoxControl as __experimentalBorderBoxControl,
++	BorderBoxControl,
+ 	hasSplitBorders as __experimentalHasSplitBorders,
+ 	isDefinedBorder as __experimentalIsDefinedBorder,
+ 	isEmptyBorder as __experimentalIsEmptyBorder,
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 7293248ae3e472..f3eaef13509218 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -2,6 +2,7 @@
+ 	( function redirectIfStoryMoved() {
+ 		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
+ 			'alignmentmatrixcontrol',
++			'borderboxcontrol',
+ 			'boxcontrol',
+ 			'customselectcontrol-v2',
+ 			'dimensioncontrol',

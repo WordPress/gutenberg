@@ -1,0 +1,36 @@
+diff --git a/packages/dataviews/src/dataform/stories/field-optionality.mdx b/packages/dataviews/src/dataform/stories/field-optionality.mdx
+new file mode 100644
+index 00000000000000..c00354a44dd3ad
+--- /dev/null
++++ b/packages/dataviews/src/dataform/stories/field-optionality.mdx
+@@ -0,0 +1,18 @@
++import { Meta } from '@storybook/addon-docs/blocks';
++
++<Meta title="DataViews/DataForm/Field Optionality Guidelines" />
++
++# Field Optionality Guidelines
++
++When designing forms with DataForm, it's important to clearly communicate which fields are required and which are optional. This guide explains best practices for marking field optionality to create clear, scannable forms.
++
++## Main Rule: Mark the Minority
++
++For mixed forms (where some fields are required and some are optional), mark the minority to reduce visual noise:
++
++-   If **most fields are optional** → mark only the required fields
++-   If **most fields are required** → mark only the optional fields
++
++## Uniform Forms: Use Card Description
++
++When all fields are either required or optional it can be helpful to state this somewhere above the form. This provides a cleaner, more scannable interface.
+diff --git a/storybook/main.ts b/storybook/main.ts
+index 8513f8e159e783..c77dd84048f040 100644
+--- a/storybook/main.ts
++++ b/storybook/main.ts
+@@ -17,6 +17,7 @@ const stories = [
+ 	'../packages/components/src/**/stories/*.mdx',
+ 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
+ 	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
++	'../packages/dataviews/src/**/stories/*.mdx',
+ 	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
+ 	'../packages/image-cropper/src/**/stories/*.story.@(js|tsx|mdx)',
+ 	'../packages/media-fields/src/**/stories/*.story.@(js|tsx|mdx)',

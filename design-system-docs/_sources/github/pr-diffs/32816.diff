@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/higher-order/navigate-regions/index.js b/packages/components/src/higher-order/navigate-regions/index.js
+index 93ec95af801e0e..db9fc877e9467e 100644
+--- a/packages/components/src/higher-order/navigate-regions/index.js
++++ b/packages/components/src/higher-order/navigate-regions/index.js
+@@ -53,7 +53,7 @@ export function useNavigateRegions( ref, shortcuts = defaultShortcuts ) {
+ 		ref.current.addEventListener( 'click', onClick );
+ 
+ 		return () => {
+-			ref.current.removeEventListener( 'click', onClick );
++			ref.current?.removeEventListener( 'click', onClick );
+ 		};
+ 	}, [ setIsFocusingRegions ] );
+ 

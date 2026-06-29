@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index 8a403d75192064..2083089038597a 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -44,7 +44,7 @@ function SinglePalette( {
+ 	actions,
+ }: SinglePaletteProps ) {
+ 	const colorOptions = useMemo( () => {
+-		return colors.map( ( { color, name }, index ) => {
++		return colors?.map( ( { color, name }, index ) => {
+ 			const colordColor = colord( color );
+ 			const isSelected = value === color;
+ 

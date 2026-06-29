@@ -1,0 +1,187 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 08082f99a00b92..0c1d2adb34489b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,12 +17,13 @@
+ -   `Tabs`: Memoize and expose the component context ([#56224](https://github.com/WordPress/gutenberg/pull/56224)).
+ -   `DropdownMenuV2`: Design tweaks ([#56041](https://github.com/WordPress/gutenberg/pull/56041))
+ 
+-### Internal
++### Documentation
+ 
+--   `Slot`: add `style` prop to `bubblesVirtually` version ([#56428](https://github.com/WordPress/gutenberg/pull/56428))
++-  `Text` and `Heading`: improve docs around default values and truncation logic ([#56518](https://github.com/WordPress/gutenberg/pull/56518))
+ 
+ ### Internal
+ 
++-   `Slot`: add `style` prop to `bubblesVirtually` version ([#56428](https://github.com/WordPress/gutenberg/pull/56428))
+ -   Introduce experimental new version of `CustomSelectControl` based on `ariakit` ([#55790](https://github.com/WordPress/gutenberg/pull/55790))
+ 
+ ## 25.12.0 (2023-11-16)
+diff --git a/packages/components/src/heading/README.md b/packages/components/src/heading/README.md
+index 2989f4b25fbf46..5f7f41c0664698 100644
+--- a/packages/components/src/heading/README.md
++++ b/packages/components/src/heading/README.md
+@@ -18,7 +18,12 @@ function Example() {
+ 
+ ## Props
+ 
+-`Heading` uses `Text` underneath, so we have access to all of `Text`'s props except for `size` which is replaced by `level`. For a complete list of those props, check out [`Text`](/packages/components/src/text/README.md#props).
++`Heading` uses `Text` underneath, so we have access to all of `Text`'s props except for:
++
++- `size` which is replaced by `level`;
++- `isBlock`'s default value, which is `true` for the `Heading` component.
++
++For a complete list of those props, check out [`Text`](/packages/components/src/text/README.md#props).
+ 
+ ##### `level`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
+ 
+diff --git a/packages/components/src/heading/hook.ts b/packages/components/src/heading/hook.ts
+index e493343967cba8..d242afe1fdb2f5 100644
+--- a/packages/components/src/heading/hook.ts
++++ b/packages/components/src/heading/hook.ts
+@@ -14,6 +14,9 @@ export function useHeading(
+ 	const {
+ 		as: asProp,
+ 		level = 2,
++		color = COLORS.gray[ 900 ],
++		isBlock = true,
++		weight = CONFIG.fontWeightHeading as import('react').CSSProperties[ 'fontWeight' ],
+ 		...otherProps
+ 	} = useContextSystem( props, 'Heading' );
+ 
+@@ -31,10 +34,10 @@ export function useHeading(
+ 	}
+ 
+ 	const textProps = useText( {
+-		color: COLORS.gray[ 900 ],
++		color,
++		isBlock,
++		weight,
+ 		size: getHeadingFontSize( level ),
+-		isBlock: true,
+-		weight: CONFIG.fontWeightHeading as import('react').CSSProperties[ 'fontWeight' ],
+ 		...otherProps,
+ 	} );
+ 
+diff --git a/packages/components/src/heading/types.ts b/packages/components/src/heading/types.ts
+index a7cac0d5b1f16b..4767c0407d5a03 100644
+--- a/packages/components/src/heading/types.ts
++++ b/packages/components/src/heading/types.ts
+@@ -17,7 +17,10 @@ export type HeadingSize =
+ 	| '5'
+ 	| '6';
+ 
+-export type HeadingProps = Omit< TextProps, 'size' > & {
++export type HeadingProps = Omit<
++	TextProps,
++	'size' | 'isBlock' | 'color' | 'weight'
++> & {
+ 	/**
+ 	 * Passing any of the heading levels to `level` will both render the correct
+ 	 * typographic text size as well as the semantic element corresponding to
+@@ -26,4 +29,23 @@ export type HeadingProps = Omit< TextProps, 'size' > & {
+ 	 * @default 2
+ 	 */
+ 	level?: HeadingSize;
++	/**
++	 * Sets `Heading` to have `display: block`. Note: text truncation only works
++	 * when `isBlock` is `false`.
++	 *
++	 * @default true
++	 */
++	isBlock?: TextProps[ 'isBlock' ];
++	/**
++	 * Adjusts the text color.
++	 *
++	 * @default '#1e1e1e'
++	 */
++	color?: TextProps[ 'color' ];
++	/**
++	 * Adjusts font-weight of the text.
++	 *
++	 * @default '600'
++	 */
++	weight?: TextProps[ 'weight' ];
+ };
+diff --git a/packages/components/src/text/README.md b/packages/components/src/text/README.md
+index 6b1fc156158407..46bd6a5f10de77 100644
+--- a/packages/components/src/text/README.md
++++ b/packages/components/src/text/README.md
+@@ -132,6 +132,8 @@ function Example() {
+ 
+ Sets `Text` to have `display: block`.
+ 
++Note: text truncation only works when `isBlock` is `false`.
++
+ ### isDestructive
+ 
+ **Type**: `boolean`
+@@ -196,7 +198,9 @@ function Example() {
+ 
+ **Type**: `boolean`
+ 
+-Enables text truncation. When `truncate` is set,we are able to truncate the long text in a variety of ways.
++Enables text truncation. When `truncate` is set, we are able to truncate the long text in a variety of ways.
++
++Note: text truncation won't work if the `isBlock` property is set to `true`
+ 
+ ```jsx
+ import { __experimentalText as Text } from '@wordpress/components';
+diff --git a/packages/components/src/text/types.ts b/packages/components/src/text/types.ts
+index e4702c1f3257dd..0b373adf49a729 100644
+--- a/packages/components/src/text/types.ts
++++ b/packages/components/src/text/types.ts
+@@ -46,10 +46,14 @@ export interface Props extends TruncateProps {
+ 	isDestructive?: boolean;
+ 	/**
+ 	 * Escape characters in `highlightWords` which are meaningful in regular expressions.
++	 *
++	 * @default false
+ 	 */
+ 	highlightEscape?: boolean;
+ 	/**
+ 	 * Determines if `highlightWords` should be case sensitive.
++	 *
++	 * @default false
+ 	 */
+ 	highlightCaseSensitive?: boolean;
+ 	/**
+@@ -57,7 +61,10 @@ export interface Props extends TruncateProps {
+ 	 */
+ 	highlightSanitize?: FindAllArgs[ 'sanitize' ];
+ 	/**
+-	 * Sets `Text` to have `display: block`.
++	 * Sets `Text` to have `display: block`. Note: text truncation only works
++	 * when `isBlock` is `false`.
++	 *
++	 * @default false
+ 	 */
+ 	isBlock?: boolean;
+ 	/**
+@@ -73,11 +80,15 @@ export interface Props extends TruncateProps {
+ 	 */
+ 	size?: CSSProperties[ 'fontSize' ] | TextSize;
+ 	/**
+-	 * Enables text truncation. When `truncate` is set,we are able to truncate the long text in a variety of ways.
++	 * Enables text truncation. When `truncate` is set, we are able to truncate the long text in a variety of ways. Note: text truncation won't work if the `isBlock` property is set to `true`
++	 *
++	 * @default false
+ 	 */
+ 	truncate?: boolean;
+ 	/**
+ 	 * Uppercases the text content.
++	 *
++	 * @default false
+ 	 */
+ 	upperCase?: boolean;
+ 	/**
+@@ -86,6 +97,8 @@ export interface Props extends TruncateProps {
+ 	variant?: TextVariant;
+ 	/**
+ 	 * Adjusts font-weight of the text.
++	 *
++	 * @default 'normal'
+ 	 */
+ 	weight?: CSSProperties[ 'fontWeight' ] | TextWeight;
+ 	/**

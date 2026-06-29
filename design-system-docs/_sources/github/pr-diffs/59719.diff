@@ -1,0 +1,73 @@
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 90f4ab92e3f704..7b5815f9ca872c 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -321,6 +321,7 @@ export const BackdropUI = styled.div< BackdropProps >`
+ export const Prefix = styled.span`
+ 	box-sizing: border-box;
+ 	display: block;
++	${ fontSizeStyles }
+ `;
+ 
+ export const Suffix = styled.span`
+@@ -328,4 +329,5 @@ export const Suffix = styled.span`
+ 	align-self: stretch;
+ 	box-sizing: border-box;
+ 	display: flex;
++	${ fontSizeStyles }
+ `;
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 3a550be7daa333..4d3ddc402f5722 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -14,11 +14,13 @@ import { useState, forwardRef } from '@wordpress/element';
+  */
+ import BaseControl from '../base-control';
+ import InputBase from '../input-control/input-base';
++import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
+ import { Select } from './styles/select-control-styles';
+ import type { WordPressComponentProps } from '../context';
+ import type { SelectControlProps } from './types';
+ import SelectControlChevronDown from './chevron-down';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
++import InputControlSuffixWrapper from '../input-control/input-suffix-wrapper';
+ 
+ const noop = () => {};
+ 
+@@ -104,9 +106,20 @@ function UnforwardedSelectControl(
+ 				label={ label }
+ 				size={ size }
+ 				suffix={
+-					suffix || ( ! multiple && <SelectControlChevronDown /> )
++					( suffix && (
++						<InputControlSuffixWrapper>
++							{ suffix }
++						</InputControlSuffixWrapper>
++					) ) ||
++					( ! multiple && <SelectControlChevronDown /> )
++				}
++				prefix={
++					prefix && (
++						<InputControlPrefixWrapper>
++							{ prefix }
++						</InputControlPrefixWrapper>
++					)
+ 				}
+-				prefix={ prefix }
+ 				labelPosition={ labelPosition }
+ 				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 			>
+diff --git a/packages/components/src/select-control/style.scss b/packages/components/src/select-control/style.scss
+index 1558314af554f8..c01cc1051fcb3b 100644
+--- a/packages/components/src/select-control/style.scss
++++ b/packages/components/src/select-control/style.scss
+@@ -2,9 +2,3 @@
+ 	outline: 0;
+ 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
+ }
+-
+-@media (max-width: #{ ($break-medium) }) {
+-	.components-base-control .components-base-control__field .components-select-control__input {
+-		font-size: 16px;
+-	}
+-}

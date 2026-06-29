@@ -1,0 +1,19 @@
+diff --git a/README.md b/README.md
+index bda7b2a78ff539..df14d6e815069d 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,5 @@
++<!-- CI validation: temporary edit to verify the doc-only skip behavior in PR #77533. Do not merge. -->
++
+ # Gutenberg
+ 
+ [![End-to-End Tests](https://github.com/WordPress/gutenberg/workflows/End-to-End%20Tests/badge.svg)](https://github.com/WordPress/gutenberg/actions?query=workflow%3A%22End-to-End+Tests%22+branch%3Atrunk)
+diff --git a/packages/components/src/card/stories/index.story.tsx b/packages/components/src/card/stories/index.story.tsx
+index 8e7de3fb3ff80b..3e5d5cf3e6bce9 100644
+--- a/packages/components/src/card/stories/index.story.tsx
++++ b/packages/components/src/card/stories/index.story.tsx
+@@ -1,3 +1,4 @@
++// CI validation: temporary edit to verify the stories-only skip behavior in PR #77533. Do not merge.
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import {
+ 	Card,

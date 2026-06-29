@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 388aef8d5a3df5..83d74153ccb1cc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `Modal`: Remove children container's unused class name ([#50655](https://github.com/WordPress/gutenberg/pull/50655)).
+ -   `DropdownMenu`: Convert to TypeScript ([#50187](https://github.com/WordPress/gutenberg/pull/50187)).
+ -   Added experimental v2 of `DropdownMenu` ([#49473](https://github.com/WordPress/gutenberg/pull/49473)).
++-   `ColorPicker`: its private `SelectControl` component no longer hides BackdropUI, thus making its focus state visible for keyboard users ([#50703](https://github.com/WordPress/gutenberg/pull/50703)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index bf25707ba9c936..1592f6a201656a 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -30,7 +30,7 @@ export const SelectControl = styled( InnerSelectControl )`
+ 	margin-left: ${ space( -2 ) };
+ 	width: 5em;
+ 	${ BackdropUI } {
+-		display: none;
++		display: block;
+ 	}
+ `;
+ 

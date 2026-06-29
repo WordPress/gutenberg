@@ -1,0 +1,25 @@
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index 23ee902df5ffc3..90b4f3d95c6c8d 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -163,7 +163,10 @@ const BorderControlDropdown = (
+ 		...otherProps
+ 	} = useBorderControlDropdown( props );
+ 
+-	const { color, style } = border || {};
++	const { color, style, width } = border || {};
++	const indicatorColor =
++		color ?? ( width ? 'var(--wp--preset--color--contrast)' : undefined );
++
+ 	const colorObject = getColorObject( color, colors );
+ 
+ 	const toggleAriaLabel = getToggleAriaLabel(
+@@ -193,7 +196,7 @@ const BorderControlDropdown = (
+ 			<span className={ indicatorWrapperClassName }>
+ 				<ColorIndicator
+ 					className={ indicatorClassName }
+-					colorValue={ color }
++					colorValue={ indicatorColor }
+ 				/>
+ 			</span>
+ 		</Button>

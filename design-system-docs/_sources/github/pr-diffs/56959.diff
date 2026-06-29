@@ -1,0 +1,529 @@
+diff --git a/packages/edit-site/src/components/sidebar-edit-mode/index.js b/packages/edit-site/src/components/sidebar-edit-mode/index.js
+index aaeb2fd875df5c..bd9c43cc456f73 100644
+--- a/packages/edit-site/src/components/sidebar-edit-mode/index.js
++++ b/packages/edit-site/src/components/sidebar-edit-mode/index.js
+@@ -1,10 +1,13 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill } from '@wordpress/components';
++import {
++	createSlotFill,
++	privateApis as componentsPrivateApis,
++} from '@wordpress/components';
+ import { isRTL, __ } from '@wordpress/i18n';
+ import { drawerLeft, drawerRight } from '@wordpress/icons';
+-import { useEffect } from '@wordpress/element';
++import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { store as interfaceStore } from '@wordpress/interface';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+@@ -22,12 +25,89 @@ import TemplatePanel from './template-panel';
+ import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
+ import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
+ import { store as editSiteStore } from '../../store';
++import { unlock } from '../../lock-unlock';
++
++const { Tabs } = unlock( componentsPrivateApis );
+ 
+ const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
+ 	'EditSiteSidebarInspector'
+ );
+ export const SidebarInspectorFill = InspectorFill;
+ 
++const FillContents = ( {
++	sidebarName,
++	isEditingPage,
++	supportsGlobalStyles,
++} ) => {
++	const tabListRef = useRef( null );
++	// Because `DefaultSidebar` renders a `ComplementaryArea`, we
++	// need to forward the `Tabs` context so it can be passed through the
++	// underlying slot/fill.
++	const tabsContextValue = useContext( Tabs.Context );
++
++	// This effect addresses a race condition caused by tabbing from the last
++	// block in the editor into the settings sidebar. Without this effect, the
++	// selected tab and browser focus can become separated in an unexpected way.
++	// (e.g the "block" tab is focused, but the "post" tab is selected).
++	useEffect( () => {
++		const tabsElements = Array.from(
++			tabListRef.current?.querySelectorAll( '[role="tab"]' ) || []
++		);
++		const selectedTabElement = tabsElements.find(
++			// We are purposefully using a custom `data-tab-id` attribute here
++			// because we don't want rely on any assumptions about `Tabs`
++			// component internals.
++			( element ) => element.getAttribute( 'data-tab-id' ) === sidebarName
++		);
++		const activeElement = selectedTabElement?.ownerDocument.activeElement;
++		const tabsHasFocus = tabsElements.some( ( element ) => {
++			return activeElement && activeElement.id === element.id;
++		} );
++		if (
++			tabsHasFocus &&
++			selectedTabElement &&
++			selectedTabElement.id !== activeElement?.id
++		) {
++			selectedTabElement?.focus();
++		}
++	}, [ sidebarName ] );
++
++	return (
++		<>
++			<DefaultSidebar
++				identifier={ sidebarName }
++				title={ __( 'Settings' ) }
++				icon={ isRTL() ? drawerLeft : drawerRight }
++				closeLabel={ __( 'Close Settings' ) }
++				header={
++					<Tabs.Context.Provider value={ tabsContextValue }>
++						<SettingsHeader ref={ tabListRef } />
++					</Tabs.Context.Provider>
++				}
++				headerClassName="edit-site-sidebar-edit-mode__panel-tabs"
++				// This classname is added so we can apply a corrective negative
++				// margin to the panel.
++				// see https://github.com/WordPress/gutenberg/pull/55360#pullrequestreview-1737671049
++				className="edit-site-sidebar__panel"
++			>
++				<Tabs.Context.Provider value={ tabsContextValue }>
++					<Tabs.TabPanel
++						tabId={ SIDEBAR_TEMPLATE }
++						focusable={ false }
++					>
++						{ isEditingPage ? <PagePanels /> : <TemplatePanel /> }
++						<PluginTemplateSettingPanel.Slot />
++					</Tabs.TabPanel>
++					<Tabs.TabPanel tabId={ SIDEBAR_BLOCK } focusable={ false }>
++						<InspectorSlot bubblesVirtually />
++					</Tabs.TabPanel>
++				</Tabs.Context.Provider>
++			</DefaultSidebar>
++			{ supportsGlobalStyles && <GlobalStylesSidebar /> }
++		</>
++	);
++};
++
+ export function SidebarComplementaryAreaFills() {
+ 	const {
+ 		sidebar,
+@@ -35,13 +115,17 @@ export function SidebarComplementaryAreaFills() {
+ 		hasBlockSelection,
+ 		supportsGlobalStyles,
+ 		isEditingPage,
++		isEditorOpen,
+ 	} = useSelect( ( select ) => {
+ 		const _sidebar =
+ 			select( interfaceStore ).getActiveComplementaryArea( STORE_NAME );
++
+ 		const _isEditorSidebarOpened = [
+ 			SIDEBAR_BLOCK,
+ 			SIDEBAR_TEMPLATE,
+ 		].includes( _sidebar );
++		const { getCanvasMode } = unlock( select( editSiteStore ) );
++
+ 		return {
+ 			sidebar: _sidebar,
+ 			isEditorSidebarOpened: _isEditorSidebarOpened,
+@@ -50,6 +134,7 @@ export function SidebarComplementaryAreaFills() {
+ 			supportsGlobalStyles:
+ 				select( coreStore ).getCurrentTheme()?.is_block_theme,
+ 			isEditingPage: select( editSiteStore ).isPage(),
++			isEditorOpen: getCanvasMode() === 'edit',
+ 		};
+ 	}, [] );
+ 	const { enableComplementaryArea } = useDispatch( interfaceStore );
+@@ -79,27 +164,37 @@ export function SidebarComplementaryAreaFills() {
+ 		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
+ 	}
+ 
++	// `newSelectedTabId` could technically be falsey if no tab is selected (i.e.
++	// the initial render) or when we don't want a tab displayed (i.e. the
++	// sidebar is closed). These cases should both be covered by the `!!` check
++	// below, so we shouldn't need any additional falsey handling.
++	const onTabSelect = useCallback(
++		( newSelectedTabId ) => {
++			if ( !! newSelectedTabId ) {
++				enableComplementaryArea( STORE_NAME, newSelectedTabId );
++			}
++		},
++		[ enableComplementaryArea ]
++	);
++
+ 	return (
+-		<>
+-			<DefaultSidebar
+-				identifier={ sidebarName }
+-				title={ __( 'Settings' ) }
+-				icon={ isRTL() ? drawerLeft : drawerRight }
+-				closeLabel={ __( 'Close Settings' ) }
+-				header={ <SettingsHeader sidebarName={ sidebarName } /> }
+-				headerClassName="edit-site-sidebar-edit-mode__panel-tabs"
+-			>
+-				{ sidebarName === SIDEBAR_TEMPLATE && (
+-					<>
+-						{ isEditingPage ? <PagePanels /> : <TemplatePanel /> }
+-						<PluginTemplateSettingPanel.Slot />
+-					</>
+-				) }
+-				{ sidebarName === SIDEBAR_BLOCK && (
+-					<InspectorSlot bubblesVirtually />
+-				) }
+-			</DefaultSidebar>
+-			{ supportsGlobalStyles && <GlobalStylesSidebar /> }
+-		</>
++		<Tabs
++			// Due to how this component is controlled (via a value from the
++			// edit-site store), when the sidebar closes the currently selected
++			// tab can't be found. This causes the component to continuously reset
++			// the selection to `null` in an infinite loop. Proactively setting
++			// the selected tab to `null` avoids that.
++			selectedTabId={
++				isEditorOpen && isEditorSidebarOpened ? sidebarName : null
++			}
++			onSelect={ onTabSelect }
++			selectOnMove={ false }
++		>
++			<FillContents
++				sidebarName={ sidebarName }
++				isEditingPage={ isEditingPage }
++				supportsGlobalStyles={ supportsGlobalStyles }
++			/>
++		</Tabs>
+ 	);
+ }
+diff --git a/packages/edit-site/src/components/sidebar-edit-mode/settings-header/index.js b/packages/edit-site/src/components/sidebar-edit-mode/settings-header/index.js
+index b3bbf0dd035788..152b4191f9b0d5 100644
+--- a/packages/edit-site/src/components/sidebar-edit-mode/settings-header/index.js
++++ b/packages/edit-site/src/components/sidebar-edit-mode/settings-header/index.js
+@@ -1,82 +1,44 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+ /**
+  * WordPress dependencies
+  */
+-import { Button } from '@wordpress/components';
+-import { __, sprintf } from '@wordpress/i18n';
+-import { useSelect, useDispatch } from '@wordpress/data';
+-import { store as interfaceStore } from '@wordpress/interface';
++import { privateApis as componentsPrivateApis } from '@wordpress/components';
++import { __ } from '@wordpress/i18n';
++import { useSelect } from '@wordpress/data';
+ import { store as editorStore } from '@wordpress/editor';
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { STORE_NAME } from '../../../store/constants';
+ import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from '../constants';
++import { unlock } from '../../../lock-unlock';
+ 
+-const SettingsHeader = ( { sidebarName } ) => {
++const { Tabs } = unlock( componentsPrivateApis );
++
++const SettingsHeader = ( _, ref ) => {
+ 	const postTypeLabel = useSelect(
+ 		( select ) => select( editorStore ).getPostTypeLabel(),
+ 		[]
+ 	);
+ 
+-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+-	const openTemplateSettings = () =>
+-		enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
+-	const openBlockSettings = () =>
+-		enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+-
+-	const documentAriaLabel =
+-		sidebarName === SIDEBAR_TEMPLATE
+-			? // translators: ARIA label for the Template sidebar tab, selected.
+-			  sprintf( __( '%s (selected)' ), postTypeLabel )
+-			: postTypeLabel;
+-
+-	/* Use a list so screen readers will announce how many tabs there are. */
+ 	return (
+-		<ul>
+-			<li>
+-				<Button
+-					onClick={ openTemplateSettings }
+-					className={ classnames(
+-						'edit-site-sidebar-edit-mode__panel-tab',
+-						{
+-							'is-active': sidebarName === SIDEBAR_TEMPLATE,
+-						}
+-					) }
+-					aria-label={ documentAriaLabel }
+-					data-label={ postTypeLabel }
+-				>
+-					{ postTypeLabel }
+-				</Button>
+-			</li>
+-			<li>
+-				<Button
+-					onClick={ openBlockSettings }
+-					className={ classnames(
+-						'edit-site-sidebar-edit-mode__panel-tab',
+-						{
+-							'is-active': sidebarName === SIDEBAR_BLOCK,
+-						}
+-					) }
+-					aria-label={
+-						sidebarName === SIDEBAR_BLOCK
+-							? // translators: ARIA label for the Block Settings Sidebar tab, selected.
+-							  __( 'Block (selected)' )
+-							: // translators: ARIA label for the Block Settings Sidebar tab, not selected.
+-							  __( 'Block' )
+-					}
+-					data-label={ __( 'Block' ) }
+-				>
+-					{ __( 'Block' ) }
+-				</Button>
+-			</li>
+-		</ul>
++		<Tabs.TabList ref={ ref }>
++			<Tabs.Tab
++				tabId={ SIDEBAR_TEMPLATE }
++				// Used for focus management in the SettingsSidebar component.
++				data-tab-id={ SIDEBAR_TEMPLATE }
++			>
++				{ postTypeLabel }
++			</Tabs.Tab>
++			<Tabs.Tab
++				tabId={ SIDEBAR_BLOCK }
++				// Used for focus management in the SettingsSidebar component.
++				data-tab-id={ SIDEBAR_BLOCK }
++			>
++				{ __( 'Block' ) }
++			</Tabs.Tab>
++		</Tabs.TabList>
+ 	);
+ };
+ 
+-export default SettingsHeader;
++export default forwardRef( SettingsHeader );
+diff --git a/packages/edit-site/src/components/sidebar-edit-mode/settings-header/style.scss b/packages/edit-site/src/components/sidebar-edit-mode/settings-header/style.scss
+index 01f074c73fca7a..d74432451e1d4c 100644
+--- a/packages/edit-site/src/components/sidebar-edit-mode/settings-header/style.scss
++++ b/packages/edit-site/src/components/sidebar-edit-mode/settings-header/style.scss
+@@ -1,20 +1,8 @@
+ .components-panel__header.edit-site-sidebar-edit-mode__panel-tabs {
+-	justify-content: flex-start;
+ 	padding-left: 0;
+ 	padding-right: $grid-unit-20;
+-	border-top: 0;
+-	margin-top: 0;
+-
+-	ul {
+-		display: flex;
+-	}
+-	li {
+-		margin: 0;
+-	}
+ 
+ 	.components-button.has-icon {
+-		display: none;
+-		margin: 0 0 0 auto;
+ 		padding: 0;
+ 		min-width: $icon-size;
+ 		height: $icon-size;
+@@ -24,78 +12,3 @@
+ 		}
+ 	}
+ }
+-
+-// This tab style CSS is duplicated verbatim in
+-// /packages/components/src/tab-panel/style.scss
+-.components-button.edit-site-sidebar-edit-mode__panel-tab {
+-	position: relative;
+-	border-radius: 0;
+-	height: $grid-unit-60;
+-	background: transparent;
+-	border: none;
+-	box-shadow: none;
+-	cursor: pointer;
+-	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+-	margin-left: 0;
+-	font-weight: 500;
+-
+-	&:focus:not(:disabled) {
+-		position: relative;
+-		box-shadow: none;
+-		outline: none;
+-	}
+-
+-	// Tab indicator
+-	&::after {
+-		content: "";
+-		position: absolute;
+-		right: 0;
+-		bottom: 0;
+-		left: 0;
+-		pointer-events: none;
+-
+-		// Draw the indicator.
+-		background: var(--wp-admin-theme-color);
+-		height: calc(0 * var(--wp-admin-border-width-focus));
+-		border-radius: 0;
+-
+-		// Animation
+-		transition: all 0.1s linear;
+-		@include reduce-motion("transition");
+-	}
+-
+-	// Active.
+-	&.is-active::after {
+-		height: calc(1 * var(--wp-admin-border-width-focus));
+-
+-		// Windows high contrast mode.
+-		outline: 2px solid transparent;
+-		outline-offset: -1px;
+-	}
+-
+-	// Focus.
+-	&::before {
+-		content: "";
+-		position: absolute;
+-		top: $grid-unit-15;
+-		right: $grid-unit-15;
+-		bottom: $grid-unit-15;
+-		left: $grid-unit-15;
+-		pointer-events: none;
+-
+-		// Draw the indicator.
+-		box-shadow: 0 0 0 0 transparent;
+-		border-radius: $radius-block-ui;
+-
+-		// Animation
+-		transition: all 0.1s linear;
+-		@include reduce-motion("transition");
+-	}
+-
+-	&:focus-visible::before {
+-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+-
+-		// Windows high contrast mode.
+-		outline: 2px solid transparent;
+-	}
+-}
+diff --git a/packages/edit-site/src/components/sidebar-edit-mode/style.scss b/packages/edit-site/src/components/sidebar-edit-mode/style.scss
+index eeb5dc2d170cd2..fbc4954821e367 100644
+--- a/packages/edit-site/src/components/sidebar-edit-mode/style.scss
++++ b/packages/edit-site/src/components/sidebar-edit-mode/style.scss
+@@ -99,3 +99,7 @@
+ 		}
+ 	}
+ }
++
++.edit-site-sidebar__panel {
++	margin-top: -1px;
++}
+diff --git a/test/e2e/specs/site-editor/settings-sidebar.spec.js b/test/e2e/specs/site-editor/settings-sidebar.spec.js
+index f063603deacca2..63c37d7ee9ec0c 100644
+--- a/test/e2e/specs/site-editor/settings-sidebar.spec.js
++++ b/test/e2e/specs/site-editor/settings-sidebar.spec.js
+@@ -38,8 +38,8 @@ test.describe( 'Settings sidebar', () => {
+ 			await expect(
+ 				page
+ 					.getByRole( 'region', { name: 'Editor settings' } )
+-					.getByRole( 'button', { name: 'Template (selected)' } )
+-			).toHaveClass( /is-active/ );
++					.getByRole( 'tab', { selected: true } )
++			).toHaveText( 'Template' );
+ 		} );
+ 
+ 		test( `should show the currently selected template's title and description`, async ( {
+@@ -90,8 +90,8 @@ test.describe( 'Settings sidebar', () => {
+ 			await expect(
+ 				page
+ 					.getByRole( 'region', { name: 'Editor settings' } )
+-					.getByRole( 'button', { name: 'Block (selected)' } )
+-			).toHaveClass( /is-active/ );
++					.getByRole( 'tab', { selected: true } )
++			).toHaveText( 'Block' );
+ 		} );
+ 	} );
+ 
+@@ -105,16 +105,17 @@ test.describe( 'Settings sidebar', () => {
+ 			await expect(
+ 				page
+ 					.getByRole( 'region', { name: 'Editor settings' } )
+-					.getByRole( 'button', { name: 'Template (selected)' } )
+-			).toHaveClass( /is-active/ );
++					.getByRole( 'tab', { selected: true } )
++			).toHaveText( 'Template' );
+ 
+ 			// By inserting the block is also selected.
+ 			await editor.insertBlock( { name: 'core/heading' } );
++
+ 			await expect(
+ 				page
+ 					.getByRole( 'region', { name: 'Editor settings' } )
+-					.getByRole( 'button', { name: 'Block (selected)' } )
+-			).toHaveClass( /is-active/ );
++					.getByRole( 'tab', { selected: true } )
++			).toHaveText( 'Block' );
+ 		} );
+ 
+ 		test( 'should switch to Template tab when a block was selected and we select the Template', async ( {
+@@ -129,8 +130,8 @@ test.describe( 'Settings sidebar', () => {
+ 			await expect(
+ 				page
+ 					.getByRole( 'region', { name: 'Editor settings' } )
+-					.getByRole( 'button', { name: 'Block (selected)' } )
+-			).toHaveClass( /is-active/ );
++					.getByRole( 'tab', { selected: true } )
++			).toHaveText( 'Block' );
+ 
+ 			await page.evaluate( () => {
+ 				window.wp.data
+@@ -141,8 +142,8 @@ test.describe( 'Settings sidebar', () => {
+ 			await expect(
+ 				page
+ 					.getByRole( 'region', { name: 'Editor settings' } )
+-					.getByRole( 'button', { name: 'Template (selected)' } )
+-			).toHaveClass( /is-active/ );
++					.getByRole( 'tab', { selected: true } )
++			).toHaveText( 'Template' );
+ 		} );
+ 	} );
+ } );
+diff --git a/test/e2e/specs/site-editor/template-revert.spec.js b/test/e2e/specs/site-editor/template-revert.spec.js
+index c281b71d16a183..4cc18448608015 100644
+--- a/test/e2e/specs/site-editor/template-revert.spec.js
++++ b/test/e2e/specs/site-editor/template-revert.spec.js
+@@ -294,12 +294,12 @@ class TemplateRevertUtils {
+ 		await this.editor.openDocumentSettingsSidebar();
+ 		const isTemplateTabVisible = await this.page
+ 			.locator(
+-				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
++				'role=region[name="Editor settings"i] >> role=tab[name="Template"i]'
+ 			)
+ 			.isVisible();
+ 		if ( isTemplateTabVisible ) {
+ 			await this.page.click(
+-				'role=region[name="Editor settings"i] >> role=button[name="Template"i]'
++				'role=region[name="Editor settings"i] >> role=tab[name="Template"i]'
+ 			);
+ 		}
+ 		await this.page.click(
+diff --git a/test/e2e/specs/site-editor/writing-flow.spec.js b/test/e2e/specs/site-editor/writing-flow.spec.js
+index 8ee6ce0e565572..75f8766891156b 100644
+--- a/test/e2e/specs/site-editor/writing-flow.spec.js
++++ b/test/e2e/specs/site-editor/writing-flow.spec.js
+@@ -65,9 +65,9 @@ test.describe( 'Site editor writing flow', () => {
+ 
+ 		// Tab to the inspector, tabbing three times to go past the two resize handles.
+ 		await pageUtils.pressKeys( 'Tab', { times: 3 } );
+-		const inspectorTemplateTab = page.locator(
+-			'role=region[name="Editor settings"i] >> role=button[name="Template part"i]'
++		const inspectorBlockTab = page.locator(
++			'role=region[name="Editor settings"i] >> role=tab[name="Block"i]'
+ 		);
+-		await expect( inspectorTemplateTab ).toBeFocused();
++		await expect( inspectorBlockTab ).toBeFocused();
+ 	} );
+ } );

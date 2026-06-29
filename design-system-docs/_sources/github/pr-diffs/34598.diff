@@ -1,0 +1,435 @@
+diff --git a/packages/components/src/range-control/styles/range-control-styles.js b/packages/components/src/range-control/styles/range-control-styles.js
+index 8ec40ad9b82e02..2b7b6ec86da9f1 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.js
++++ b/packages/components/src/range-control/styles/range-control-styles.js
+@@ -12,8 +12,11 @@ import NumberControl from '../../number-control';
+ import { COLORS, reduceMotion, rtl } from '../../utils';
+ import { space } from '../../ui/utils/space';
+ 
+-const rangeHeight = () => css( { height: 30, minHeight: 30 } );
+-const thumbSize = 12;
++const rangeHeightValue = 30;
++const railHeight = 4;
++const rangeHeight = () =>
++	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
++const thumbSize = 9;
+ 
+ export const Root = styled.div`
+ 	-webkit-tap-highlight-color: transparent;
+@@ -38,7 +41,6 @@ export const Wrapper = styled.div`
+ 	color: ${ COLORS.blue.medium.focus };
+ 	display: block;
+ 	flex: 1;
+-	padding-top: 18px;
+ 	position: relative;
+ 	width: 100%;
+ 
+@@ -48,13 +50,13 @@ export const Wrapper = styled.div`
+ `;
+ 
+ export const BeforeIconWrapper = styled.span`
+-	margin-top: 3px;
++	margin-top: ${ railHeight }px;
+ 
+ 	${ rtl( { marginRight: 6 } ) }
+ `;
+ 
+ export const AfterIconWrapper = styled.span`
+-	margin-top: 3px;
++	margin-top: ${ railHeight }px;
+ 
+ 	${ rtl( { marginLeft: 16 } ) }
+ `;
+@@ -78,11 +80,11 @@ export const Rail = styled.span`
+ 	pointer-events: none;
+ 	right: 0;
+ 	display: block;
+-	height: 3px;
++	height: ${ railHeight }px;
+ 	position: absolute;
+-	margin-top: 14px;
++	margin-top: ${ ( rangeHeightValue - railHeight ) / 2 }px;
+ 	top: 0;
+-	border-radius: 9999px;
++	border-radius: ${ railHeight }px;
+ 
+ 	${ railBackgroundColor };
+ `;
+@@ -101,13 +103,13 @@ const trackBackgroundColor = ( { disabled, trackColor } ) => {
+ 
+ export const Track = styled.span`
+ 	background-color: currentColor;
+-	border-radius: 9999px;
++	border-radius: ${ railHeight }px;
+ 	box-sizing: border-box;
+-	height: 3px;
++	height: ${ railHeight }px;
+ 	pointer-events: none;
+ 	display: block;
+ 	position: absolute;
+-	margin-top: 14px;
++	margin-top: ${ ( rangeHeightValue - railHeight ) / 2 }px;
+ 	top: 0;
+ 
+ 	${ trackBackgroundColor };
+@@ -136,7 +138,7 @@ const markFill = ( { disabled, isFilled } ) => {
+ 
+ export const Mark = styled.span`
+ 	box-sizing: border-box;
+-	height: 9px;
++	height: ${ thumbSize }px;
+ 	left: 0;
+ 	position: absolute;
+ 	top: -4px;
+@@ -179,7 +181,7 @@ export const ThumbWrapper = styled.span`
+ 	display: flex;
+ 	height: ${ thumbSize }px;
+ 	justify-content: center;
+-	margin-top: 9px;
++	margin-top: ${ ( rangeHeightValue - thumbSize ) / 2 }px;
+ 	outline: 0;
+ 	pointer-events: none;
+ 	position: absolute;
+@@ -261,7 +263,7 @@ const tooltipPosition = ( { position } ) => {
+ };
+ 
+ export const Tooltip = styled.span`
+-	background: ${ COLORS.ui.border };
++	background: rgba( 0, 0, 0, 0.8 );
+ 	border-radius: 2px;
+ 	box-sizing: border-box;
+ 	color: white;
+diff --git a/packages/components/src/ui/color-picker/color-display.tsx b/packages/components/src/ui/color-picker/color-display.tsx
+index 3a3d5097a8db31..16a83aa1941d62 100644
+--- a/packages/components/src/ui/color-picker/color-display.tsx
++++ b/packages/components/src/ui/color-picker/color-display.tsx
+@@ -164,7 +164,12 @@ export const ColorDisplay = ( {
+ 				</Text>
+ 			}
+ 		>
+-			<Flex justify="flex-start" gap={ space( 1 ) } ref={ copyRef }>
++			<Flex
++				justify="flex-start"
++				gap={ space( 1 ) }
++				ref={ copyRef }
++				style={ { height: 30 } }
++			>
+ 				<Component { ...props } />
+ 			</Flex>
+ 		</Tooltip>
+diff --git a/packages/components/src/ui/color-picker/component.tsx b/packages/components/src/ui/color-picker/component.tsx
+index 977826c6ccf958..984ef6d30b39fb 100644
+--- a/packages/components/src/ui/color-picker/component.tsx
++++ b/packages/components/src/ui/color-picker/component.tsx
+@@ -9,7 +9,7 @@ import type { ColorFormats } from 'tinycolor2';
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
+-import { moreVertical } from '@wordpress/icons';
++import { settings } from '@wordpress/icons';
+ import { useDebounce } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+ 
+@@ -22,9 +22,13 @@ import {
+ 	WordPressComponentProps,
+ } from '../context';
+ import { HStack } from '../../h-stack';
+-import Button from '../../button';
+ import { Spacer } from '../../spacer';
+-import { ColorfulWrapper, SelectControl } from './styles';
++import {
++	ColorfulWrapper,
++	SelectControl,
++	AuxiliaryColorArtefactWrapper,
++	DetailsControlButton,
++} from './styles';
+ import { ColorDisplay } from './color-display';
+ import { ColorInput } from './color-input';
+ import { Picker } from './picker';
+@@ -95,44 +99,47 @@ const ColorPicker = (
+ 				color={ safeColor }
+ 				enableAlpha={ enableAlpha }
+ 			/>
+-			<HStack justify="space-between">
+-				{ showInputs ? (
+-					<SelectControl
+-						options={ options }
+-						value={ colorType }
+-						onChange={ ( nextColorType ) =>
+-							setColorType( nextColorType as ColorType )
++			<AuxiliaryColorArtefactWrapper>
++				<HStack justify="space-between">
++					{ showInputs ? (
++						<SelectControl
++							options={ options }
++							value={ colorType }
++							onChange={ ( nextColorType ) =>
++								setColorType( nextColorType as ColorType )
++							}
++							label={ __( 'Color format' ) }
++							hideLabelFromVision
++						/>
++					) : (
++						<ColorDisplay
++							color={ safeColor }
++							colorType={ copyFormat || colorType }
++							enableAlpha={ enableAlpha }
++						/>
++					) }
++					<DetailsControlButton
++						isSmall
++						onClick={ () => setShowInputs( ! showInputs ) }
++						icon={ settings }
++						isPressed={ showInputs }
++						label={
++							showInputs
++								? __( 'Hide detailed inputs' )
++								: __( 'Show detailed inputs' )
+ 						}
+-						label={ __( 'Color format' ) }
+-						hideLabelFromVision
+ 					/>
+-				) : (
+-					<ColorDisplay
++				</HStack>
++				<Spacer margin={ 4 } />
++				{ showInputs && (
++					<ColorInput
++						colorType={ colorType }
+ 						color={ safeColor }
+-						colorType={ copyFormat || colorType }
++						onChange={ handleChange }
+ 						enableAlpha={ enableAlpha }
+ 					/>
+ 				) }
+-				<Button
+-					onClick={ () => setShowInputs( ! showInputs ) }
+-					icon={ moreVertical }
+-					isPressed={ showInputs }
+-					label={
+-						showInputs
+-							? __( 'Hide detailed inputs' )
+-							: __( 'Show detailed inputs' )
+-					}
+-				/>
+-			</HStack>
+-			<Spacer />
+-			{ showInputs && (
+-				<ColorInput
+-					colorType={ colorType }
+-					color={ safeColor }
+-					onChange={ handleChange }
+-					enableAlpha={ enableAlpha }
+-				/>
+-			) }
++			</AuxiliaryColorArtefactWrapper>
+ 		</ColorfulWrapper>
+ 	);
+ };
+diff --git a/packages/components/src/ui/color-picker/hex-input.tsx b/packages/components/src/ui/color-picker/hex-input.tsx
+index 7a58cbdbd1f200..8891decf133d90 100644
+--- a/packages/components/src/ui/color-picker/hex-input.tsx
++++ b/packages/components/src/ui/color-picker/hex-input.tsx
+@@ -13,8 +13,8 @@ import { __ } from '@wordpress/i18n';
+  */
+ import { Text } from '../../text';
+ import { Spacer } from '../../spacer';
+-import InputControl from '../../input-control';
+ import { space } from '../utils/space';
++import { ColorHexInputControl } from './styles';
+ 
+ interface HexInputProps {
+ 	color: ColorFormats.HSLA;
+@@ -35,10 +35,14 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+ 		: colorized.toHexString();
+ 
+ 	return (
+-		<InputControl
+-			__unstableInputWidth="8em"
++		<ColorHexInputControl
+ 			prefix={
+-				<Spacer as={ Text } marginLeft={ space( 2 ) } color="blue">
++				<Spacer
++					as={ Text }
++					marginLeft={ space( 3.5 ) }
++					color="blue"
++					lineHeight={ 1 }
++				>
+ 					#
+ 				</Spacer>
+ 			}
+diff --git a/packages/components/src/ui/color-picker/input-with-slider.tsx b/packages/components/src/ui/color-picker/input-with-slider.tsx
+index 0a1b8d50e63005..cbccd3d6cf76c5 100644
+--- a/packages/components/src/ui/color-picker/input-with-slider.tsx
++++ b/packages/components/src/ui/color-picker/input-with-slider.tsx
+@@ -1,12 +1,11 @@
+ /**
+  * Internal dependencies
+  */
+-import NumberControl from '../../number-control';
+ import { HStack } from '../../h-stack';
+ import { Text } from '../../text';
+ import { Spacer } from '../../spacer';
+ import { space } from '../utils/space';
+-import { RangeControl } from './styles';
++import { RangeControl, NumberControlWrapper } from './styles';
+ 
+ interface InputWithSliderProps {
+ 	min: number;
+@@ -26,9 +25,8 @@ export const InputWithSlider = ( {
+ 	value,
+ }: InputWithSliderProps ) => {
+ 	return (
+-		<Spacer as={ HStack }>
+-			<NumberControl
+-				__unstableInputWidth="5em"
++		<Spacer as={ HStack } spacing={ 4 }>
++			<NumberControlWrapper
+ 				min={ min }
+ 				max={ max }
+ 				label={ label }
+@@ -36,7 +34,12 @@ export const InputWithSlider = ( {
+ 				value={ value }
+ 				onChange={ onChange }
+ 				prefix={
+-					<Spacer as={ Text } paddingLeft={ space( 1 ) } color="blue">
++					<Spacer
++						as={ Text }
++						paddingLeft={ space( 3.5 ) }
++						color="blue"
++						lineHeight={ 1 }
++					>
+ 						{ abbreviation }
+ 					</Spacer>
+ 				}
+diff --git a/packages/components/src/ui/color-picker/stories/index.js b/packages/components/src/ui/color-picker/stories/index.js
+index 558a4ce1d2612c..44c0ccba2b7347 100644
+--- a/packages/components/src/ui/color-picker/stories/index.js
++++ b/packages/components/src/ui/color-picker/stories/index.js
+@@ -48,7 +48,9 @@ const Example = () => {
+ 			marginTop={ space( 10 ) }
+ 		>
+ 			<ColorPicker { ...props } color={ color } onChange={ setColor } />
+-			<div>{ colorize( color ).toHslString() }</div>
++			<div style={ { width: 200, textAlign: 'center' } }>
++				{ colorize( color ).toHslString() }
++			</div>
+ 			<ColorPicker { ...props } color={ color } onChange={ setColor } />
+ 		</Flex>
+ 	);
+diff --git a/packages/components/src/ui/color-picker/styles.ts b/packages/components/src/ui/color-picker/styles.ts
+index afd79c2cf999bd..8f3c66495a4935 100644
+--- a/packages/components/src/ui/color-picker/styles.ts
++++ b/packages/components/src/ui/color-picker/styles.ts
+@@ -6,13 +6,32 @@ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+  */
++import NumberControl from '../../number-control';
+ import InnerSelectControl from '../../select-control';
+ import InnerRangeControl from '../../range-control';
+ import { StyledField } from '../../base-control/styles/base-control-styles';
+ import { space } from '../utils/space';
++import Button from '../../button';
++import {
++	BackdropUI,
++	Container as InputControlContainer,
++	Input,
++} from '../../input-control/styles/input-control-styles';
++import InputControl from '../../input-control';
++import CONFIG from '../../utils/config-values';
++
++export const NumberControlWrapper = styled( NumberControl )`
++	${ InputControlContainer } {
++		width: ${ space( 24 ) };
++	}
++`;
+ 
+ export const SelectControl = styled( InnerSelectControl )`
++	margin-left: ${ space( -2 ) };
+ 	width: 5em;
++	${ BackdropUI } {
++		display: none;
++	}
+ `;
+ 
+ export const RangeControl = styled( InnerRangeControl )`
+@@ -23,6 +42,25 @@ export const RangeControl = styled( InnerRangeControl )`
+ 	}
+ `;
+ 
++// All inputs should be the same height so this should be changed at the component level.
++// That involves changing heights of multiple input types probably buttons too etc.
++// So until that is done we are already using the new height on the color picker so it matches the mockups.
++const inputHeightStyle = `
++&&& ${ Input } {
++	height: 40px;
++}`;
++
++// Make the Hue circle picker not go out of the bar
++const interactiveHueStyles = `
++.react-colorful__interactive {
++	width: calc( 100% - ${ space( 2 ) } );
++	margin-left: ${ space( 1 ) };
++}`;
++
++export const AuxiliaryColorArtefactWrapper = styled.div`
++	padding: ${ space( 2 ) } ${ space( 4 ) };
++`;
++
+ export const ColorfulWrapper = styled.div`
+ 	width: 216px;
+ 
+@@ -53,9 +91,26 @@ export const ColorfulWrapper = styled.div`
+ 	.react-colorful__pointer {
+ 		height: 16px;
+ 		width: 16px;
++		border: ${ CONFIG.borderWidthFocus } solid rgba( 255, 255, 255, 0 );
++		box-shadow: inset 0px 0px 0px ${ CONFIG.borderWidthFocus } #ffffff;
+ 	}
+ 
++	${ interactiveHueStyles }
++
+ 	${ StyledField } {
+ 		margin-bottom: 0;
+ 	}
++
++	${ inputHeightStyle }
++`;
++
++export const DetailsControlButton = styled( Button )`
++	&&&& {
++		min-width: ${ space( 6 ) };
++		padding: 0;
++	}
++`;
++
++export const ColorHexInputControl = styled( InputControl )`
++	width: 8em;
+ `;
+diff --git a/packages/components/src/ui/tooltip/styles.js b/packages/components/src/ui/tooltip/styles.js
+index f9c23215659441..c1d535bb782927 100644
+--- a/packages/components/src/ui/tooltip/styles.js
++++ b/packages/components/src/ui/tooltip/styles.js
+@@ -28,7 +28,7 @@ export const TooltipContent = css`
+ 
+ export const TooltipPopoverView = styled.div`
+ 	background: rgba( 0, 0, 0, 0.8 );
+-	border-radius: 6px;
++	border-radius: 2px;
+ 	box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.04 );
+ 	color: ${ COLORS.white };
+ 	padding: 4px 8px;
+diff --git a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+index 0a0a7f694de74f..7e9248a65c04d4 100644
+--- a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+@@ -17,7 +17,7 @@ exports[`props should render correctly 1`] = `
+ 
+ .emotion-2 {
+   background: rgba( 0, 0, 0, 0.8 );
+-  border-radius: 6px;
++  border-radius: 2px;
+   box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.04 );
+   color: #fff;
+   padding: 4px 8px;

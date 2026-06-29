@@ -1,0 +1,248 @@
+diff --git a/packages/block-editor/src/components/global-styles/dimensions-panel.js b/packages/block-editor/src/components/global-styles/dimensions-panel.js
+index ce508a5ebc89e5..4c52de6a3d7d11 100644
+--- a/packages/block-editor/src/components/global-styles/dimensions-panel.js
++++ b/packages/block-editor/src/components/global-styles/dimensions-panel.js
+@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
+ import {
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+-	__experimentalBoxControl as BoxControl,
++	BoxControl,
+ 	__experimentalUnitControl as UnitControl,
+ 	__experimentalUseCustomUnits as useCustomUnits,
+ 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4dd18914a7acb5..c4b2b6917862c0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ ### Deprecations
+ 
+ -   Deprecate `__unstableComposite`, `__unstableCompositeGroup`, `__unstableCompositeItem` and `__unstableUseCompositeState`. Consumers of the package should use the stable `Composite` component instead ([#63572](https://github.com/WordPress/gutenberg/pull/63572)).
++-   `__experimentalBoxControl` can now be imported as a stable `BoxControl` ([#65469](https://github.com/WordPress/gutenberg/pull/65469)).
+ 
+ ### New Features
+ 
+@@ -32,6 +33,7 @@
+ -   `Tooltip`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+ -   `Modal`: add exit animation for internally triggered events ([#65203](https://github.com/WordPress/gutenberg/pull/65203)).
+ -   `Card`: Adopt radius scale ([#65053](https://github.com/WordPress/gutenberg/pull/65053)).
++-   `BoxControl`: promote to stable ([#65469](https://github.com/WordPress/gutenberg/pull/65469)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/box-control/README.md b/packages/components/src/box-control/README.md
+index b03b03a85466ae..77176b49eeb6d8 100644
+--- a/packages/components/src/box-control/README.md
++++ b/packages/components/src/box-control/README.md
+@@ -1,18 +1,14 @@
+ # BoxControl
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-BoxControl components let users set values for Top, Right, Bottom, and Left. This can be used as an input control for values like `padding` or `margin`.
++A control that lets users set values for top, right, bottom, and left. Can be used as an input control for values like `padding` or `margin`.
+ 
+ ## Usage
+ 
+ ```jsx
+ import { useState } from 'react';
+-import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
++import { BoxControl } from '@wordpress/components';
+ 
+-const Example = () => {
++function Example() {
+ 	const [ values, setValues ] = useState( {
+ 		top: '50px',
+ 		left: '10%',
+@@ -26,23 +22,24 @@ const Example = () => {
+ 			onChange={ ( nextValues ) => setValues( nextValues ) }
+ 		/>
+ 	);
+-};
++}
+ ```
+ 
+ ## Props
++
+ ### `allowReset`: `boolean`
+ 
+ If this property is true, a button to reset the box control is rendered.
+ 
+-- Required: No
+-- Default: `true`
++-   Required: No
++-   Default: `true`
+ 
+ ### `splitOnAxis`: `boolean`
+ 
+ If this property is true, when the box control is unlinked, vertical and horizontal controls can be used instead of updating individual sides.
+ 
+-- Required: No
+-- Default: `false`
++-   Required: No
++-   Default: `false`
+ 
+ ### `inputProps`: `object`
+ 
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index 9c3452d4ccb806..41e95aa88bea37 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -47,14 +47,14 @@ function useUniqueId( idProp?: string ) {
+ }
+ 
+ /**
+- * BoxControl components let users set values for Top, Right, Bottom, and Left.
+- * This can be used as an input control for values like `padding` or `margin`.
++ * A control that lets users set values for top, right, bottom, and left. Can be
++ * used as an input control for values like `padding` or `margin`.
+  *
+  * ```jsx
+- * import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
++ * import { BoxControl } from '@wordpress/components';
+  * import { useState } from '@wordpress/element';
+  *
+- * const Example = () => {
++ * function Example() {
+  * 	const [ values, setValues ] = useState( {
+  * 		top: '50px',
+  * 		left: '10%',
+diff --git a/packages/components/src/box-control/stories/index.story.tsx b/packages/components/src/box-control/stories/index.story.tsx
+index 1b6604048f6d52..783f9d047b1bb0 100644
+--- a/packages/components/src/box-control/stories/index.story.tsx
++++ b/packages/components/src/box-control/stories/index.story.tsx
+@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
+ import BoxControl from '../';
+ 
+ const meta: Meta< typeof BoxControl > = {
+-	title: 'Components (Experimental)/BoxControl',
++	title: 'Components/BoxControl',
+ 	component: BoxControl,
+ 	argTypes: {
+ 		values: { control: { type: null } },
+diff --git a/packages/components/src/box-control/types.ts b/packages/components/src/box-control/types.ts
+index eeb72df14bb9c1..5f4071aeed88a7 100644
+--- a/packages/components/src/box-control/types.ts
++++ b/packages/components/src/box-control/types.ts
+@@ -37,13 +37,13 @@ export type BoxControlProps = Pick<
+ 	/**
+ 	 * Props for the internal `UnitControl` components.
+ 	 *
+-	 * @default `{ min: 0 }`
++	 * @default { min: 0 }
+ 	 */
+ 	inputProps?: UnitControlPassthroughProps;
+ 	/**
+ 	 * Heading label for the control.
+ 	 *
+-	 * @default `__( 'Box Control' )`
++	 * @default __( 'Box Control' )
+ 	 */
+ 	label?: string;
+ 	/**
+@@ -53,7 +53,7 @@ export type BoxControlProps = Pick<
+ 	/**
+ 	 * The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
+ 	 *
+-	 * @default `{ top: undefined, right: undefined, bottom: undefined, left: undefined }`
++	 * @default { top: undefined, right: undefined, bottom: undefined, left: undefined }
+ 	 */
+ 	resetValues?: BoxControlValue;
+ 	/**
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index 32195ebc444ce6..a59d258012807d 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -40,7 +40,9 @@ export {
+ } from './border-box-control';
+ export { BorderControl as __experimentalBorderControl } from './border-control';
+ export {
++	/** @deprecated Import `BoxControl` instead. */
+ 	default as __experimentalBoxControl,
++	default as BoxControl,
+ 	applyValueToSides as __experimentalApplyValueToSides,
+ } from './box-control';
+ export { default as Button } from './button';
+diff --git a/packages/components/src/tools-panel/tools-panel/README.md b/packages/components/src/tools-panel/tools-panel/README.md
+index df41b623eefb6c..1daa7537335e1c 100644
+--- a/packages/components/src/tools-panel/tools-panel/README.md
++++ b/packages/components/src/tools-panel/tools-panel/README.md
+@@ -60,7 +60,7 @@ import styled from '@emotion/styled';
+  * WordPress dependencies
+  */
+ import {
+-	__experimentalBoxControl as BoxControl,
++	BoxControl,
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ 	__experimentalUnitControl as UnitControl,
+@@ -91,8 +91,8 @@ export function DimensionPanel() {
+ 	return (
+ 		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
+ 			<PanelDescription>
+-				Select dimensions or spacing related settings from the
+-				menu for additional controls.
++				Select dimensions or spacing related settings from the menu for
++				additional controls.
+ 			</PanelDescription>
+ 			<SingleColumnItem
+ 				hasValue={ () => !! height }
+@@ -154,8 +154,8 @@ export function DimensionPanel() {
+ Flags that the items in this ToolsPanel will be contained within an inner
+ wrapper element allowing the panel to lay them out accordingly.
+ 
+-- Required: No
+-- Default: `false`
++-   Required: No
++-   Default: `false`
+ 
+ ### `dropdownMenuProps`: `{}`
+ 
+@@ -176,7 +176,7 @@ The heading level of the panel's header.
+ Text to be displayed within the panel's header and as the `aria-label` for the
+ panel's dropdown menu.
+ 
+-- Required: Yes
++-   Required: Yes
+ 
+ ### `panelId`: `string | null`
+ 
+@@ -185,13 +185,13 @@ to restrict panel items. When a `panelId` is set, items can only register
+ themselves if the `panelId` is explicitly `null` or the item's `panelId` matches
+ exactly.
+ 
+-- Required: No
++-   Required: No
+ 
+ ### `resetAll`: `( filters?: ResetAllFilter[] ) => void`
+ 
+ A function to call when the `Reset all` menu option is selected. As an argument, it receives an array containing the `resetAllFilter` callbacks of all the valid registered `ToolsPanelItems`.
+ 
+-- Required: Yes
++-   Required: Yes
+ 
+ ### `shouldRenderPlaceholderItems`: `boolean`
+ 
+@@ -201,5 +201,5 @@ placeholder content (instead of `null`) when they are toggled off and hidden.
+ Note that placeholder items won't apply the `className` that would be
+ normally applied to a visible `ToolsPanelItem` via the `className` prop.
+ 
+-- Required: No
+-- Default: `false`
++-   Required: No
++-   Default: `false`
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index ebf2d6891ba0bb..7293248ae3e472 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -2,6 +2,7 @@
+ 	( function redirectIfStoryMoved() {
+ 		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
+ 			'alignmentmatrixcontrol',
++			'boxcontrol',
+ 			'customselectcontrol-v2',
+ 			'dimensioncontrol',
+ 			'navigation',

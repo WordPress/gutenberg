@@ -1,0 +1,209 @@
+diff --git a/packages/block-library/src/file/edit.js b/packages/block-library/src/file/edit.js
+index c2364b581133e7..6f5ae1023513ba 100644
+--- a/packages/block-library/src/file/edit.js
++++ b/packages/block-library/src/file/edit.js
+@@ -8,7 +8,7 @@ import classnames from 'classnames';
+  */
+ import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+ import {
+-	__unstableGetAnimateClassName as getAnimateClassName,
++	getAnimateClassName,
+ 	withNotices,
+ 	ToolbarGroup,
+ 	ToolbarButton,
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1748317bc6bbf6..5f25d8f3d0cdc2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,14 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++- Add `getAnimateClassName` animation className helper [#27390](https://github.com/WordPress/gutenberg/pull/27390).
++
++### Deprecations
++
++- `Animate` component has been deprecated in favor of `getAnimateClassName` [#27390](https://github.com/WordPress/gutenberg/pull/27390)
++
+ ## 12.0.0 (2020-12-17)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/animate/index.js b/packages/components/src/animate/index.js
+index 95fba645fd1782..fc8c26eaa3cb26 100644
+--- a/packages/components/src/animate/index.js
++++ b/packages/components/src/animate/index.js
+@@ -3,6 +3,11 @@
+  */
+ import classnames from 'classnames';
+ 
++/**
++ * WordPress dependencies
++ */
++import deprecated from '@wordpress/deprecated';
++
+ /**
+  * @typedef {'top' | 'top left' | 'top right' | 'middle' | 'middle left' | 'middle right' | 'bottom' | 'bottom left' | 'bottom right'} AppearOrigin
+  * @typedef {'left' | 'right'} SlideInOrigin
+@@ -50,8 +55,13 @@ export function getAnimateClassName( options ) {
+ 	}
+ }
+ 
+-// @ts-ignore Reason: Planned for deprecation
++// @ts-ignore Reason: Deprecated
+ export default function Animate( { type, options = {}, children } ) {
++	deprecated( 'Animate component', {
++		version: '9.8',
++		alternative: 'getAnimateClassName',
++		hint: '`<AnimatedComponent className={ getAnimateClassName() } />`',
++	} );
+ 	return children( {
+ 		className: getAnimateClassName( { type, ...options } ),
+ 	} );
+diff --git a/packages/components/src/animate/stories/index.js b/packages/components/src/animate/stories/index.js
+index 0f0e83b8cbcec8..4b68693c846dca 100644
+--- a/packages/components/src/animate/stories/index.js
++++ b/packages/components/src/animate/stories/index.js
+@@ -1,53 +1,63 @@
++/**
++ * External dependencies
++ */
++import { button, radios } from '@storybook/addon-knobs';
++import { useMemo, useState } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import Animate from '../';
++import { getAnimateClassName } from '../';
+ import Notice from '../../notice';
+ 
+-export default { title: 'Components/Animate', component: Animate };
+-
+-export const _default = () => (
+-	<Animate>
+-		{ ( { className } ) => (
+-			<Notice className={ className } status="success">
+-				<p>{ `No default animation. Use one of type = "appear", "slide-in", or "loading".` }</p>
+-			</Notice>
+-		) }
+-	</Animate>
+-);
+-
+-// Unexported helper for different origins.
+-const Appear = ( { origin } ) => (
+-	<Animate type="appear" options={ { origin } }>
+-		{ ( { className } ) => (
+-			<Notice className={ className } status="success">
+-				<p>Appear animation. Origin: { origin }.</p>
+-			</Notice>
+-		) }
+-	</Animate>
+-);
+-
+-export const appearTopLeft = () => <Appear origin="top left" />;
+-export const appearTopRight = () => <Appear origin="top right" />;
+-export const appearBottomLeft = () => <Appear origin="bottom left" />;
+-export const appearBottomRight = () => <Appear origin="bottom right" />;
++export default { title: 'Components/getAnimateClassName' };
+ 
+-export const loading = () => (
+-	<Animate type="loading">
+-		{ ( { className } ) => (
+-			<Notice className={ className } status="success">
+-				<p>Loading animation.</p>
+-			</Notice>
+-		) }
+-	</Animate>
+-);
++export const _default = () => {
++	const typeToOrigin = useMemo(
++		() => ( {
++			appear: [
++				[
++					'top',
++					'top left',
++					'top right',
++					'middle',
++					'middle left',
++					'middle right',
++					'bottom',
++					'bottom left',
++					'bottom right',
++				],
++				'top left',
++			],
++			'slide-in': [ [ 'left', 'right' ], 'left' ],
++			loading: [ [], undefined ],
++		} ),
++		[]
++	);
++	const [ keySuffix, setKeySuffix ] = useState( Number.MIN_SAFE_INTEGER );
++	button( 'Replay animation', () => setKeySuffix( ( prevK ) => prevK + 1 ) );
++	const type = radios(
++		'Type',
++		[ 'appear', 'slide-in', 'loading' ],
++		'appear'
++	);
++	const origin = radios( 'Origin', ...typeToOrigin[ type ] );
++	const key = `${ type }${ origin }${ keySuffix }`;
+ 
+-export const slideIn = () => (
+-	<Animate type="slide-in">
+-		{ ( { className } ) => (
+-			<Notice className={ className } status="success">
+-				<p>Slide-in animation.</p>
+-			</Notice>
+-		) }
+-	</Animate>
+-);
++	return (
++		<Notice
++			className={ getAnimateClassName( { type, origin } ) }
++			status="success"
++			key={ key }
++		>
++			<p>
++				<code>{ type }</code> animation.
++			</p>
++			{ origin && (
++				<p>
++					Origin: <code>{ origin }</code>.
++				</p>
++			) }
++		</Notice>
++	);
++};
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index aaf2620e259237..e75f43d7dee360 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -12,10 +12,7 @@ export {
+ 
+ // Components
+ export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
+-export {
+-	default as Animate,
+-	getAnimateClassName as __unstableGetAnimateClassName,
+-} from './animate';
++export { default as Animate, getAnimateClassName } from './animate';
+ export { default as AnglePickerControl } from './angle-picker-control';
+ export { default as Autocomplete } from './autocomplete';
+ export { default as BaseControl } from './base-control';
+diff --git a/packages/editor/src/components/post-saved-state/index.js b/packages/editor/src/components/post-saved-state/index.js
+index 1103b0f7468785..6777473a21b3d0 100644
+--- a/packages/editor/src/components/post-saved-state/index.js
++++ b/packages/editor/src/components/post-saved-state/index.js
+@@ -6,10 +6,7 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	__unstableGetAnimateClassName as getAnimateClassName,
+-	Button,
+-} from '@wordpress/components';
++import { Button, getAnimateClassName } from '@wordpress/components';
+ import { usePrevious, useViewportMatch } from '@wordpress/compose';
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import { useEffect, useState } from '@wordpress/element';

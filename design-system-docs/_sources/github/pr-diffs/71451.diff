@@ -1,0 +1,35 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 68abe0ee169c94..2bcea4183d5482 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,9 +12,9 @@
+ ### Internal
+ 
+ -   Upgrade `framer-motion` package to version `^11.15.0` ([#71442](https://github.com/WordPress/gutenberg/pull/71442)).
++-   Expose `ValidatedInputControl` via privateAPIs ([#71451](https://github.com/WordPress/gutenberg/pull/71451)).
+ -   Display names for Context providers [#71208](https://github.com/WordPress/gutenberg/pull/71208).
+ 
+-
+ ## 30.2.0 (2025-08-20)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index da0e12d4441eb6..92b1ef6fcf34fa 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -13,6 +13,7 @@ import Badge from './badge';
+ 
+ import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
+ import {
++	ValidatedInputControl,
+ 	ValidatedNumberControl,
+ 	ValidatedTextControl,
+ 	ValidatedToggleControl,
+@@ -32,6 +33,7 @@ lock( privateApis, {
+ 	DateCalendar,
+ 	DateRangeCalendar,
+ 	TZDate,
++	ValidatedInputControl,
+ 	ValidatedNumberControl,
+ 	ValidatedTextControl,
+ 	ValidatedToggleControl,

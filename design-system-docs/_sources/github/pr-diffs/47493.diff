@@ -1,0 +1,474 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12c454459a1984..de726e6106e9bc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `Guide`: Convert to TypeScript ([#47493](https://github.com/WordPress/gutenberg/pull/47493)).
++
+ ## 23.5.0 (2023-03-01)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/guide/README.md b/packages/components/src/guide/README.md
+index 061332234cdbc2..01b11823380059 100644
+--- a/packages/components/src/guide/README.md
++++ b/packages/components/src/guide/README.md
+@@ -37,20 +37,6 @@ function MyTutorial() {
+ 
+ The component accepts the following props:
+ 
+-### onFinish
+-
+-A function which is called when the guide is finished. The guide is finished when the modal is closed or when the user clicks _Finish_ on the last page of the guide.
+-
+--   Type: `function`
+--   Required: Yes
+-
+-### pages
+-
+-A list of objects describing each page in the guide. Each object **must** contain a `'content'` property and may optionally contain a `'image'` property.
+-
+--   Type: `array`
+--   Required: Yes
+-
+ ### className
+ 
+ A custom class to add to the modal.
+@@ -62,7 +48,7 @@ A custom class to add to the modal.
+ 
+ This property is used as the modal's accessibility label. It is required for accessibility reasons.
+ 
+--   Type: `String`
++-   Type: `string`
+ -   Required: Yes
+ 
+ ### finishButtonText
+@@ -71,3 +57,19 @@ Use this to customize the label of the _Finish_ button shown at the end of the g
+ 
+ -   Type: `string`
+ -   Required: No
++-	Default: `'Finish'`
++
++### onFinish
++
++A function which is called when the guide is finished. The guide is finished when the modal is closed or when the user clicks _Finish_ on the last page of the guide.
++
++-   Type: `( event?: KeyboardEvent< HTMLDivElement > | SyntheticEvent ) => void`
++-   Required: Yes
++
++### pages
++
++A list of objects describing each page in the guide. Each object **must** contain a `'content'` property and may optionally contain a `'image'` property.
++
++-   Type: `{ content: ReactNode; image?: ReactNode; }[]`
++-   Required: No
++-   Default: `[]`
+diff --git a/packages/components/src/guide/icons.js b/packages/components/src/guide/icons.tsx
+similarity index 76%
+rename from packages/components/src/guide/icons.js
+rename to packages/components/src/guide/icons.tsx
+index 1f9713d6fdd8c5..1c47180ae0b11a 100644
+--- a/packages/components/src/guide/icons.js
++++ b/packages/components/src/guide/icons.tsx
+@@ -3,7 +3,7 @@
+  */
+ import { SVG, Circle } from '@wordpress/primitives';
+ 
+-export const PageControlIcon = ( { isSelected } ) => (
++export const PageControlIcon = ( { isSelected }: { isSelected: boolean } ) => (
+ 	<SVG width="8" height="8" fill="none" xmlns="http://www.w3.org/2000/svg">
+ 		<Circle
+ 			cx="4"
+diff --git a/packages/components/src/guide/index.js b/packages/components/src/guide/index.tsx
+similarity index 69%
+rename from packages/components/src/guide/index.js
+rename to packages/components/src/guide/index.tsx
+index 4669f13471801b..38f8d07d8c0efc 100644
+--- a/packages/components/src/guide/index.js
++++ b/packages/components/src/guide/index.tsx
+@@ -17,16 +17,49 @@ import { focus } from '@wordpress/dom';
+ import Modal from '../modal';
+ import Button from '../button';
+ import PageControl from './page-control';
++import type { GuideProps } from './types';
+ 
+-export default function Guide( {
++/**
++ * `Guide` is a React component that renders a _user guide_ in a modal. The guide consists of several pages which the user can step through one by one. The guide is finished when the modal is closed or when the user clicks _Finish_ on the last page of the guide.
++ *
++ * ```jsx
++ * function MyTutorial() {
++ * 	const [ isOpen, setIsOpen ] = useState( true );
++ *
++ * 	if ( ! isOpen ) {
++ * 		return null;
++ * 	}
++ *
++ * 	return (
++ * 		<Guide
++ * 			onFinish={ () => setIsOpen( false ) }
++ * 			pages={ [
++ * 				{
++ * 					content: <p>Welcome to the ACME Store!</p>,
++ * 				},
++ * 				{
++ * 					image: <img src="https://acmestore.com/add-to-cart.png" />,
++ * 					content: (
++ * 						<p>
++ * 							Click <i>Add to Cart</i> to buy a product.
++ * 						</p>
++ * 					),
++ * 				},
++ * 			] }
++ * 		/>
++ * 	);
++ * }
++ * ```
++ */
++function Guide( {
+ 	children,
+ 	className,
+ 	contentLabel,
+-	finishButtonText,
++	finishButtonText = __( 'Finish' ),
+ 	onFinish,
+ 	pages = [],
+-} ) {
+-	const guideContainer = useRef();
++}: GuideProps ) {
++	const guideContainer = useRef< HTMLDivElement >( null );
+ 	const [ currentPage, setCurrentPage ] = useState( 0 );
+ 
+ 	useEffect( () => {
+@@ -42,12 +75,17 @@ export default function Guide( {
+ 		// Each time we change the current page, start from the first element of the page.
+ 		// This also solves any focus loss that can happen.
+ 		if ( guideContainer.current ) {
+-			focus.tabbable.find( guideContainer.current )?.[ 0 ]?.focus();
++			(
++				focus.tabbable.find( guideContainer.current ) as HTMLElement[]
++			 )[ 0 ]?.focus();
+ 		}
+ 	}, [ currentPage ] );
+ 
+ 	if ( Children.count( children ) ) {
+-		pages = Children.map( children, ( child ) => ( { content: child } ) );
++		pages =
++			Children.map( children, ( child ) => ( {
++				content: child,
++			} ) ) ?? [];
+ 	}
+ 
+ 	const canGoBack = currentPage > 0;
+@@ -124,7 +162,7 @@ export default function Guide( {
+ 							className="components-guide__finish-button"
+ 							onClick={ onFinish }
+ 						>
+-							{ finishButtonText || __( 'Finish' ) }
++							{ finishButtonText }
+ 						</Button>
+ 					) }
+ 				</div>
+@@ -132,3 +170,5 @@ export default function Guide( {
+ 		</Modal>
+ 	);
+ }
++
++export default Guide;
+diff --git a/packages/components/src/guide/page-control.js b/packages/components/src/guide/page-control.tsx
+similarity index 93%
+rename from packages/components/src/guide/page-control.js
+rename to packages/components/src/guide/page-control.tsx
+index 41547c18326dfd..6e5951923ab387 100644
+--- a/packages/components/src/guide/page-control.js
++++ b/packages/components/src/guide/page-control.tsx
+@@ -8,12 +8,13 @@ import { __, sprintf } from '@wordpress/i18n';
+  */
+ import Button from '../button';
+ import { PageControlIcon } from './icons';
++import type { PageControlProps } from './types';
+ 
+ export default function PageControl( {
+ 	currentPage,
+ 	numberOfPages,
+ 	setCurrentPage,
+-} ) {
++}: PageControlProps ) {
+ 	return (
+ 		<ul
+ 			className="components-guide__page-control"
+diff --git a/packages/components/src/guide/page.js b/packages/components/src/guide/page.tsx
+similarity index 61%
+rename from packages/components/src/guide/page.js
+rename to packages/components/src/guide/page.tsx
+index 2b8cec1af5492c..dcad2780203c8a 100644
+--- a/packages/components/src/guide/page.js
++++ b/packages/components/src/guide/page.tsx
+@@ -4,7 +4,14 @@
+ import { useEffect } from '@wordpress/element';
+ import deprecated from '@wordpress/deprecated';
+ 
+-export default function GuidePage( props ) {
++/**
++ * Internal dependencies
++ */
++import type { WordPressComponentProps } from '../ui/context';
++
++export default function GuidePage(
++	props: WordPressComponentProps< {}, 'div', false >
++) {
+ 	useEffect( () => {
+ 		deprecated( '<GuidePage>', {
+ 			since: '5.5',
+diff --git a/packages/components/src/guide/stories/index.js b/packages/components/src/guide/stories/index.tsx
+similarity index 72%
+rename from packages/components/src/guide/stories/index.js
+rename to packages/components/src/guide/stories/index.tsx
+index 253f1252e14cbc..d07fa02100e626 100644
+--- a/packages/components/src/guide/stories/index.js
++++ b/packages/components/src/guide/stories/index.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -7,9 +12,9 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Button from '../../button';
+-import Guide from '../';
++import Guide from '..';
+ 
+-export default {
++const meta: ComponentMeta< typeof Guide > = {
+ 	title: 'Components/Guide',
+ 	component: Guide,
+ 	argTypes: {
+@@ -18,8 +23,9 @@ export default {
+ 		onFinish: { action: 'onFinish' },
+ 	},
+ };
++export default meta;
+ 
+-const Template = ( { onFinish, ...props } ) => {
++const Template: ComponentStory< typeof Guide > = ( { onFinish, ...props } ) => {
+ 	const [ isOpen, setOpen ] = useState( false );
+ 
+ 	const openGuide = () => setOpen( true );
+@@ -34,8 +40,8 @@ const Template = ( { onFinish, ...props } ) => {
+ 				<Guide
+ 					{ ...props }
+ 					onFinish={ ( ...finishArgs ) => {
+-						closeGuide( ...finishArgs );
+-						onFinish( ...finishArgs );
++						closeGuide();
++						onFinish?.( ...finishArgs );
+ 					} }
+ 				/>
+ 			) }
+diff --git a/packages/components/src/guide/test/index.js b/packages/components/src/guide/test/index.tsx
+similarity index 92%
+rename from packages/components/src/guide/test/index.js
+rename to packages/components/src/guide/test/index.tsx
+index 8372e46518257c..eff2886cb038b9 100644
+--- a/packages/components/src/guide/test/index.js
++++ b/packages/components/src/guide/test/index.tsx
+@@ -7,17 +7,23 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * Internal dependencies
+  */
+-import Guide from '../';
++import Guide from '..';
++
++const defaultProps = {
++	onFinish: () => {},
++	contentLabel: 'Arbitrary Content Label',
++};
+ 
+ describe( 'Guide', () => {
+ 	it( 'renders nothing when there are no pages', () => {
+-		render( <Guide pages={ [] } /> );
++		render( <Guide { ...defaultProps } pages={ [] } /> );
+ 		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+ 	} );
+ 
+ 	it( 'renders one page at a time', () => {
+ 		render(
+ 			<Guide
++				{ ...defaultProps }
+ 				pages={ [
+ 					{ content: <p>Page 1</p> },
+ 					{ content: <p>Page 2</p> },
+@@ -33,6 +39,7 @@ describe( 'Guide', () => {
+ 	it( 'hides back button and shows forward button on the first page', () => {
+ 		render(
+ 			<Guide
++				{ ...defaultProps }
+ 				pages={ [
+ 					{ content: <p>Page 1</p> },
+ 					{ content: <p>Page 2</p> },
+@@ -55,6 +62,7 @@ describe( 'Guide', () => {
+ 		const user = userEvent.setup();
+ 		render(
+ 			<Guide
++				{ ...defaultProps }
+ 				pages={ [
+ 					{ content: <p>Page 1</p> },
+ 					{ content: <p>Page 2</p> },
+@@ -78,7 +86,12 @@ describe( 'Guide', () => {
+ 	} );
+ 
+ 	it( "doesn't display the page control if there is only one page", () => {
+-		render( <Guide pages={ [ { content: <p>Page 1</p> } ] } /> );
++		render(
++			<Guide
++				{ ...defaultProps }
++				pages={ [ { content: <p>Page 1</p> } ] }
++			/>
++		);
+ 		expect(
+ 			screen.queryByRole( 'list', { name: 'Guide controls' } )
+ 		).not.toBeInTheDocument();
+@@ -89,6 +102,7 @@ describe( 'Guide', () => {
+ 		const onFinish = jest.fn();
+ 		render(
+ 			<Guide
++				{ ...defaultProps }
+ 				onFinish={ onFinish }
+ 				pages={ [ { content: <p>Page 1</p> } ] }
+ 			/>
+@@ -103,6 +117,7 @@ describe( 'Guide', () => {
+ 		const onFinish = jest.fn();
+ 		render(
+ 			<Guide
++				{ ...defaultProps }
+ 				onFinish={ onFinish }
+ 				pages={ [ { content: <p>Page 1</p> } ] }
+ 			/>
+@@ -115,7 +130,7 @@ describe( 'Guide', () => {
+ 
+ 	describe( 'page navigation', () => {
+ 		it( 'renders an empty list when there are no pages', () => {
+-			render( <Guide pages={ [] } /> );
++			render( <Guide { ...defaultProps } pages={ [] } /> );
+ 			expect(
+ 				screen.queryByRole( 'list', {
+ 					name: 'Guide controls',
+@@ -131,6 +146,7 @@ describe( 'Guide', () => {
+ 		it( 'renders a button for each page', () => {
+ 			render(
+ 				<Guide
++					{ ...defaultProps }
+ 					pages={ [
+ 						{ content: <p>Page 1</p> },
+ 						{ content: <p>Page 2</p> },
+@@ -154,6 +170,7 @@ describe( 'Guide', () => {
+ 
+ 			render(
+ 				<Guide
++					{ ...defaultProps }
+ 					pages={ [
+ 						{ content: <p>Page 1</p> },
+ 						{ content: <p>Page 2</p> },
+@@ -196,6 +213,7 @@ describe( 'Guide', () => {
+ 
+ 			render(
+ 				<Guide
++					{ ...defaultProps }
+ 					pages={ [
+ 						{ content: <p>Page 1</p> },
+ 						{ content: <p>Page 2</p> },
+diff --git a/packages/components/src/guide/types.ts b/packages/components/src/guide/types.ts
+new file mode 100644
+index 00000000000000..62c1816a5c6720
+--- /dev/null
++++ b/packages/components/src/guide/types.ts
+@@ -0,0 +1,68 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { ModalProps } from '../modal/types';
++
++export type Page = {
++	/**
++	 * Content of the page.
++	 */
++	content: ReactNode;
++	/**
++	 * Image displayed above the page content.
++	 */
++	image?: ReactNode;
++};
++
++export type GuideProps = {
++	/**
++	 * Deprecated. Use `pages` prop instead.
++	 *
++	 * @deprecated since 5.5
++	 */
++	children?: ReactNode;
++	/**
++	 * A custom class to add to the modal.
++	 */
++	className?: string;
++	/**
++	 * Used as the modal's accessibility label.
++	 */
++	contentLabel: ModalProps[ 'contentLabel' ];
++	/**
++	 * Use this to customize the label of the _Finish_ button shown at the end of the guide.
++	 *
++	 * @default 'Finish'
++	 */
++	finishButtonText?: string;
++	/**
++	 * A function which is called when the guide is finished.
++	 */
++	onFinish: ModalProps[ 'onRequestClose' ];
++	/**
++	 * A list of objects describing each page in the guide. Each object **must** contain a `'content'` property and may optionally contain a `'image'` property.
++	 *
++	 * @default []
++	 */
++	pages?: Page[];
++};
++
++export type PageControlProps = {
++	/**
++	 * Current page index.
++	 */
++	currentPage: number;
++	/**
++	 * Total number of pages.
++	 */
++	numberOfPages: number;
++	/**
++	 * Called when user clicks on a `PageControlIcon` button.
++	 */
++	setCurrentPage: ( page: number ) => void;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 860b6f3ca36cc1..005ddd0b4c568e 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -49,7 +49,6 @@
+ 		"src/dimension-control",
+ 		"src/duotone-picker",
+ 		"src/gradient-picker",
+-		"src/guide",
+ 		"src/higher-order/navigate-regions",
+ 		"src/higher-order/with-fallback-styles",
+ 		"src/higher-order/with-filters",

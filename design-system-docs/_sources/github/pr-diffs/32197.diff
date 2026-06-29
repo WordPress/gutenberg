@@ -1,0 +1,1311 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index ede0e009f199fe..f1d91901cfdac5 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -875,6 +875,12 @@
+ 		"markdown_source": "../packages/components/src/flex/flex/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "Flyout",
++		"slug": "flyout",
++		"markdown_source": "../packages/components/src/flyout/flyout/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "FocalPointPicker",
+ 		"slug": "focal-point-picker",
+diff --git a/packages/components/src/flyout/context.js b/packages/components/src/flyout/context.js
+new file mode 100644
+index 00000000000000..f1678c99e3efd5
+--- /dev/null
++++ b/packages/components/src/flyout/context.js
+@@ -0,0 +1,10 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++/**
++ * @type {import('react').Context<import('./types').Context>}
++ */
++export const FlyoutContext = createContext( {} );
++export const useFlyoutContext = () => useContext( FlyoutContext );
+diff --git a/packages/components/src/flyout/flyout-content/component.js b/packages/components/src/flyout/flyout-content/component.js
+new file mode 100644
+index 00000000000000..aa12340a678049
+--- /dev/null
++++ b/packages/components/src/flyout/flyout-content/component.js
+@@ -0,0 +1,53 @@
++/**
++ * Internal dependencies
++ */
++import { useFlyoutContext } from '../context';
++import { FlyoutContentView, CardView } from '../styles';
++import { contextConnect, useContextSystem } from '../../ui/context';
++
++/**
++ *
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').ContentProps, 'div', false>} props
++ * @param {import('react').Ref<any>}                                                                     forwardedRef
++ */
++function FlyoutContent( props, forwardedRef ) {
++	const {
++		children,
++		elevation,
++		maxWidth,
++		style = {},
++		...otherProps
++	} = useContextSystem( props, 'FlyoutContent' );
++
++	const { label, flyoutState } = useFlyoutContext();
++
++	if ( ! flyoutState ) {
++		throw new Error(
++			'`FlyoutContent` must only be used inside a `Flyout`.'
++		);
++	}
++
++	const showContent = flyoutState.visible || flyoutState.animating;
++
++	return (
++		<FlyoutContentView
++			aria-label={ label }
++			// maxWidth is applied via inline styles in order to avoid the `React does
++			// not recognize the maxWidth prop on a DOM element` error that comes from
++			// passing `maxWidth` as a prop to `FlyoutContentView`
++			style={ { maxWidth, ...style } }
++			{ ...otherProps }
++			{ ...flyoutState }
++		>
++			{ showContent && (
++				<CardView elevation={ elevation } ref={ forwardedRef }>
++					{ children }
++				</CardView>
++			) }
++		</FlyoutContentView>
++	);
++}
++
++const ConnectedFlyoutContent = contextConnect( FlyoutContent, 'FlyoutContent' );
++
++export default ConnectedFlyoutContent;
+diff --git a/packages/components/src/flyout/flyout-content/index.js b/packages/components/src/flyout/flyout-content/index.js
+new file mode 100644
+index 00000000000000..b404d7fd44a81a
+--- /dev/null
++++ b/packages/components/src/flyout/flyout-content/index.js
+@@ -0,0 +1 @@
++export { default } from './component';
+diff --git a/packages/components/src/flyout/flyout/README.md b/packages/components/src/flyout/flyout/README.md
+new file mode 100644
+index 00000000000000..7c2937af607c1a
+--- /dev/null
++++ b/packages/components/src/flyout/flyout/README.md
+@@ -0,0 +1,98 @@
++# Flyout
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`Flyout` is a component to render a floating content modal. It is similar in purpose to a tooltip, but renders content of any sort, not only simple text.
++
++## Usage
++
++```jsx
++import { Button, __experimentalFlyout as Flyout, __experimentalText as } from '@wordpress/components';
++
++function Example() {
++	return (
++		<Flyout trigger={ <Button>Show/Hide content</Button> }>
++			<Text>Code is Poetry</Text>
++		</Flyout>
++	);
++}
++```
++
++## Props
++
++### `state`: `PopoverStateReturn`
++
++- Required: No
++
++### `label`: `string`
++
++- Required: No
++
++### `animated`: `boolean`
++
++Determines if `Flyout` has animations.
++
++- Required: No
++- Default: `true`
++
++### `animationDuration`: `boolean`
++
++The duration of `Flyout` animations.
++
++- Required: No
++- Default: `160`
++
++### `baseId`: `string`
++
++ID that will serve as a base for all the items IDs. See https://reakit.io/docs/popover/#usepopoverstate
++
++- Required: No
++- Default: `160`
++
++### `elevation`: `number`
++
++Size of the elevation shadow. For more information, check out [`Card`](/packages/components/src/card/card/README.md#props).
++
++- Required: No
++- Default: `5`
++
++### `maxWidth`: `CSSProperties[ 'maxWidth' ]`
++
++Max-width for the `Flyout` element.
++
++- Required: No
++- Default: `360`
++
++### `onVisibleChange`: `( ...args: any ) => void`
++
++Callback for when the `visible` state changes.
++
++- Required: No
++
++### `trigger`: `FunctionComponentElement< any >`
++
++Element that triggers the `visible` state of `Flyout` when clicked.
++
++```jsx
++<Flyout trigger={<Button>Greet</Button>}>
++	<Text>Hi! I'm Olaf!</Text>
++</Flyout>
++```
++
++- Required: Yes
++
++### `visible`: `boolean`
++
++Whether `Flyout` is visible. See [the `Reakit` docs](https://reakit.io/docs/popover/#usepopoverstate) for more information.
++
++- Required: No
++- Default: `false`
++
++### `placement`: `PopperPlacement`
++
++Position of the popover element. See [the `popper` docs](https://popper.js.org/docs/v1/#popperplacements--codeenumcode) for more information.
++
++- Required: No
++- Default: `auto`
+diff --git a/packages/components/src/flyout/flyout/component.js b/packages/components/src/flyout/flyout/component.js
+new file mode 100644
+index 00000000000000..e1d8de13888566
+--- /dev/null
++++ b/packages/components/src/flyout/flyout/component.js
+@@ -0,0 +1,111 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import { PopoverDisclosure, Portal } from 'reakit';
++
++/**
++ * WordPress dependencies
++ */
++import { useCallback, useMemo, cloneElement } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { contextConnect } from '../../ui/context';
++import { FlyoutContext } from '../context';
++import { useFlyoutResizeUpdater } from '../utils';
++import FlyoutContent from '../flyout-content';
++import { useUpdateEffect } from '../../utils/hooks';
++import { useFlyout } from './hook';
++
++/**
++ *
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div', false>} props
++ * @param {import('react').Ref<any>}                                                                     forwardedRef
++ */
++function Flyout( props, forwardedRef ) {
++	const {
++		children,
++		elevation,
++		label,
++		maxWidth,
++		onVisibleChange,
++		trigger,
++		flyoutState,
++		...otherProps
++	} = useFlyout( props );
++
++	const resizeListener = useFlyoutResizeUpdater( {
++		onResize: flyoutState.unstable_update,
++	} );
++
++	const uniqueId = `flyout-${ flyoutState.baseId }`;
++	const labelId = label || uniqueId;
++
++	const contextProps = useMemo(
++		() => ( {
++			label: labelId,
++			flyoutState,
++		} ),
++		[ labelId, flyoutState ]
++	);
++
++	const triggerContent = useCallback(
++		( triggerProps ) => {
++			return cloneElement( trigger, triggerProps );
++		},
++		[ trigger ]
++	);
++
++	useUpdateEffect( () => {
++		onVisibleChange?.( flyoutState.visible );
++	}, [ flyoutState.visible ] );
++
++	return (
++		<FlyoutContext.Provider value={ contextProps }>
++			{ trigger && (
++				<PopoverDisclosure
++					{ ...flyoutState }
++					ref={ trigger.ref }
++					{ ...trigger.props }
++				>
++					{ triggerContent }
++				</PopoverDisclosure>
++			) }
++			<Portal>
++				<FlyoutContent
++					ref={ forwardedRef }
++					{ ...otherProps }
++					elevation={ elevation }
++					maxWidth={ maxWidth }
++				>
++					{ resizeListener }
++					{ children }
++				</FlyoutContent>
++			</Portal>
++		</FlyoutContext.Provider>
++	);
++}
++
++/**
++ * `Flyout` is a component to render a floating content modal.
++ * It is similar in purpose to a tooltip, but renders content of any sort,
++ * not only simple text.
++ *
++ * @example
++ * ```jsx
++ * import { Button, __experimentalFlyout as Flyout, __experimentalText as } from '@wordpress/components';
++ *
++ * function Example() {
++ * 	return (
++ * 		<Flyout trigger={ <Button>Show/Hide content</Button> }>
++ *			<Text>Code is Poetry</Text>
++ * 		</Flyout>
++ * 	);
++ * }
++ * ```
++ */
++const ConnectedFlyout = contextConnect( Flyout, 'Flyout' );
++
++export default ConnectedFlyout;
+diff --git a/packages/components/src/flyout/flyout/hook.js b/packages/components/src/flyout/flyout/hook.js
+new file mode 100644
+index 00000000000000..4cdb0299019758
+--- /dev/null
++++ b/packages/components/src/flyout/flyout/hook.js
+@@ -0,0 +1,45 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import { usePopoverState } from 'reakit';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem } from '../../ui/context';
++
++/**
++ * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div', false>} props
++ */
++export function useFlyout( props ) {
++	const {
++		animated = true,
++		animationDuration = 160,
++		baseId,
++		elevation = 5,
++		id,
++		maxWidth = 360,
++		placement,
++		state,
++		visible,
++		...otherProps
++	} = useContextSystem( props, 'Flyout' );
++
++	const _flyoutState = usePopoverState( {
++		animated: animated ? animationDuration : undefined,
++		baseId: baseId || id,
++		placement,
++		visible,
++		...otherProps,
++	} );
++
++	const flyoutState = state || _flyoutState;
++
++	return {
++		...otherProps,
++		elevation,
++		maxWidth,
++		flyoutState,
++	};
++}
+diff --git a/packages/components/src/flyout/flyout/index.js b/packages/components/src/flyout/flyout/index.js
+new file mode 100644
+index 00000000000000..ef5d7d27828f85
+--- /dev/null
++++ b/packages/components/src/flyout/flyout/index.js
+@@ -0,0 +1,2 @@
++export { default } from './component';
++export { useFlyout } from './hook';
+diff --git a/packages/components/src/flyout/index.js b/packages/components/src/flyout/index.js
+new file mode 100644
+index 00000000000000..28e34de445ba03
+--- /dev/null
++++ b/packages/components/src/flyout/index.js
+@@ -0,0 +1 @@
++export { default as Flyout } from './flyout';
+diff --git a/packages/components/src/ui/popover/stories/index.js b/packages/components/src/flyout/stories/index.js
+similarity index 53%
+rename from packages/components/src/ui/popover/stories/index.js
+rename to packages/components/src/flyout/stories/index.js
+index d42bbae04e0316..df8f41b8f279ea 100644
+--- a/packages/components/src/ui/popover/stories/index.js
++++ b/packages/components/src/flyout/stories/index.js
+@@ -1,24 +1,24 @@
+ /**
+  * Internal dependencies
+  */
+-import { CardBody, CardHeader } from '../../../card';
+-import Button from '../../../button';
+-import { Popover } from '..';
++import { CardBody, CardHeader } from '../../card';
++import Button from '../../button';
++import { Flyout } from '..';
+ 
+ export default {
+-	component: Popover,
+-	title: 'G2 Components (Experimental)/Popover',
++	component: Flyout,
++	title: 'Components (Experimental)/Flyout',
+ };
+ 
+ export const _default = () => {
+ 	return (
+-		<Popover
++		<Flyout
+ 			trigger={ <Button>Click</Button> }
+ 			visible
+ 			placement="bottom-start"
+ 		>
+ 			<CardHeader>Go</CardHeader>
+ 			<CardBody>Stuff</CardBody>
+-		</Popover>
++		</Flyout>
+ 	);
+ };
+diff --git a/packages/components/src/ui/popover/styles.js b/packages/components/src/flyout/styles.ts
+similarity index 50%
+rename from packages/components/src/ui/popover/styles.js
+rename to packages/components/src/flyout/styles.ts
+index b3bb67def80ab9..b18cf6524d83f9 100644
+--- a/packages/components/src/ui/popover/styles.js
++++ b/packages/components/src/flyout/styles.ts
+@@ -1,20 +1,19 @@
+ /**
+  * External dependencies
+  */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++import styled from '@emotion/styled';
+ // eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
++import { Popover as ReakitPopover } from 'reakit';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { CardBody } from '../../card';
+-import * as ZIndex from '../../utils/z-index';
+-import CONFIG from '../../utils/config-values';
++import { Card, CardBody } from '../card';
++import * as ZIndex from '../utils/z-index';
++import CONFIG from '../utils/config-values';
+ 
+-export const PopoverContent = css`
+-	z-index: ${ ZIndex.Popover };
++export const FlyoutContentView = styled( ReakitPopover )`
++	z-index: ${ ZIndex.Flyout };
+ 	box-sizing: border-box;
+ 	opacity: 0;
+ 	outline: none;
+@@ -33,7 +32,7 @@ export const PopoverContent = css`
+ 	}
+ `;
+ 
+-export const cardStyle = css`
++export const CardView = styled( Card )`
+ 	${ CardBody.selector } {
+ 		max-height: 80vh;
+ 	}
+diff --git a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+similarity index 76%
+rename from packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+rename to packages/components/src/flyout/test/__snapshots__/index.js.snap
+index 2a58dfaa6aea1d..9f2bbea548705c 100644
+--- a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
++++ b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-0 {
++.emotion-1 {
+   background-color: #fff;
+   color: #000;
+   position: relative;
+@@ -10,15 +10,15 @@ exports[`props should render correctly 1`] = `
+   border-radius: 2px;
+ }
+ 
+-.emotion-0 .components-card-body {
++.emotion-2 .components-card-body {
+   max-height: 80vh;
+ }
+ 
+-.emotion-3 {
++.emotion-4 {
+   height: 100%;
+ }
+ 
+-.emotion-6 {
++.emotion-7 {
+   height: 100%;
+   overflow-x: hidden;
+   overflow-y: auto;
+@@ -28,21 +28,21 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ @media only screen and ( min-device-width: 40em ) {
+-  .emotion-6::-webkit-scrollbar {
++  .emotion-7::-webkit-scrollbar {
+     height: 12px;
+     width: 12px;
+   }
+ 
+-  .emotion-6::-webkit-scrollbar-track {
++  .emotion-7::-webkit-scrollbar-track {
+     background-color: transparent;
+   }
+ 
+-  .emotion-6::-webkit-scrollbar-track {
++  .emotion-7::-webkit-scrollbar-track {
+     background: rgba(0, 0, 0, 0.04);
+     border-radius: 8px;
+   }
+ 
+-  .emotion-6::-webkit-scrollbar-thumb {
++  .emotion-7::-webkit-scrollbar-thumb {
+     -webkit-background-clip: padding-box;
+     background-clip: padding-box;
+     background-color: rgba(0, 0, 0, 0.2);
+@@ -50,22 +50,22 @@ exports[`props should render correctly 1`] = `
+     border-radius: 7px;
+   }
+ 
+-  .emotion-6:hover::-webkit-scrollbar-thumb {
++  .emotion-7:hover::-webkit-scrollbar-thumb {
+     background-color: rgba(0, 0, 0, 0.5);
+   }
+ }
+ 
+-.emotion-6:first-of-type {
++.emotion-7:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-6:last-of-type {
++.emotion-7:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-9 {
++.emotion-10 {
+   background: transparent;
+   display: block;
+   margin: 0!important;
+@@ -84,7 +84,7 @@ exports[`props should render correctly 1`] = `
+   border-radius: 2px;
+ }
+ 
+-.emotion-12 {
++.emotion-13 {
+   background: transparent;
+   display: block;
+   margin: 0!important;
+@@ -104,12 +104,12 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-surface components-card components-card emotion-0 emotion-1 emotion-2"
++  class="components-surface components-card components-card emotion-0 emotion-1 emotion-2 emotion-3"
+   data-wp-c16t="true"
+   data-wp-component="Card"
+ >
+   <div
+-    class="emotion-3 emotion-1 emotion-2"
++    class="emotion-4 emotion-5 emotion-3"
+   >
+     <iframe
+       aria-hidden="true"
+@@ -119,7 +119,7 @@ exports[`props should render correctly 1`] = `
+       tabindex="-1"
+     />
+     <div
+-      class="components-scrollable components-card__body components-card-body emotion-6 emotion-1 emotion-2"
++      class="components-scrollable components-card__body components-card-body emotion-7 emotion-5 emotion-3"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -128,13 +128,13 @@ exports[`props should render correctly 1`] = `
+   </div>
+   <div
+     aria-hidden="true"
+-    class="components-elevation emotion-9 emotion-1 emotion-2"
++    class="components-elevation emotion-10 emotion-5 emotion-3"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+   <div
+     aria-hidden="true"
+-    class="components-elevation emotion-12 emotion-1 emotion-2"
++    class="components-elevation emotion-13 emotion-5 emotion-3"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+@@ -149,15 +149,15 @@ Snapshot Diff:
+ @@ -1,12 +1,12 @@
+   <div
+ -   aria-label="show"
+-+   aria-label="popover-base-popover"
+-    class="components-popover-content components-popover css-mlsx58-PopoverContent-classes css-1mm2cvy-View em57xhy0"
+++   aria-label="flyout-base-flyout"
++    class="components-flyout-content components-flyout css-1b8wigk-FlyoutContentView e1vtu5161"
+     data-dialog="true"
+     data-wp-c16t="true"
+-    data-wp-component="Popover"
+--   id="labelled-popover"
+-+   id="base-popover"
++    data-wp-component="Flyout"
++-   id="labelled-flyout"
+++   id="base-flyout"
+     role="dialog"
+-    style="position: fixed; left: 100%; top: 100%;"
++    style="position: fixed; left: 100%; top: 100%; max-width: 360px;"
+     tabindex="-1"
+   >
+     <div
+@@ -170,16 +170,16 @@ Snapshot Diff:
+ 
+ @@ -1,12 +1,12 @@
+   <div
+--   aria-label="popover-contentless-popover"
+-+   aria-label="popover-base-popover"
+-    class="components-popover-content components-popover css-mlsx58-PopoverContent-classes css-1mm2cvy-View em57xhy0"
++-   aria-label="flyout-contentless-flyout"
+++   aria-label="flyout-base-flyout"
++    class="components-flyout-content components-flyout css-1b8wigk-FlyoutContentView e1vtu5161"
+     data-dialog="true"
+     data-wp-c16t="true"
+-    data-wp-component="Popover"
+--   id="contentless-popover"
+-+   id="base-popover"
++    data-wp-component="Flyout"
++-   id="contentless-flyout"
+++   id="base-flyout"
+     role="dialog"
+-    style="position: fixed; left: 100%; top: 100%;"
++    style="position: fixed; left: 100%; top: 100%; max-width: 360px;"
+     tabindex="-1"
+   >
+     <div
+diff --git a/packages/components/src/flyout/test/index.js b/packages/components/src/flyout/test/index.js
+new file mode 100644
+index 00000000000000..276bb589a60ae1
+--- /dev/null
++++ b/packages/components/src/flyout/test/index.js
+@@ -0,0 +1,103 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../../button';
++import { CardBody } from '../../card';
++import { Flyout } from '..';
++
++describe( 'props', () => {
++	const baseFlyoutId = 'base-flyout';
++	beforeEach( () => {
++		render(
++			<Flyout
++				baseId={ baseFlyoutId }
++				trigger={ <Button>WordPress.org</Button> }
++				visible
++			>
++				<CardBody>Code is Poetry</CardBody>
++			</Flyout>
++		);
++	} );
++
++	test( 'should render correctly', () => {
++		const dialog = screen.getByRole( 'dialog' );
++		expect( dialog.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render invisible', () => {
++		const invisibleFlyoutTriggerContent =
++			'WordPress.org - invisible flyout';
++		render(
++			<Flyout
++				baseId="flyout"
++				trigger={ <Button>{ invisibleFlyoutTriggerContent }</Button> }
++				visible={ false }
++			>
++				<CardBody>Code is Poetry</CardBody>
++			</Flyout>
++		);
++
++		const flyouts = screen.getAllByRole( 'dialog' );
++		const trigger = screen.getByText( invisibleFlyoutTriggerContent );
++		// assert only the base flyout rendered
++		expect( flyouts ).toHaveLength( 1 );
++		expect( flyouts[ 0 ].id ).toBe( baseFlyoutId );
++		expect( trigger ).not.toBeUndefined();
++	} );
++
++	test( 'should render without trigger', () => {
++		const triggerlessFlyoutId = 'triggerless-flyout';
++		render(
++			<Flyout baseId={ triggerlessFlyoutId } visible>
++				<CardBody>Code is Poetry</CardBody>
++			</Flyout>
++		);
++		const flyouts = screen.getAllByRole( 'dialog' );
++		const triggerlessFlyout = flyouts.find(
++			( p ) => p.id === triggerlessFlyoutId
++		);
++		expect( triggerlessFlyout ).not.toBeUndefined();
++	} );
++
++	test( 'should render without content', () => {
++		const contentlessFlyoutId = 'contentless-flyout';
++		render(
++			<Flyout
++				baseId={ contentlessFlyoutId }
++				trigger={ <Button>WordPress.org</Button> }
++				visible
++			/>
++		);
++		const flyouts = screen.getAllByRole( 'dialog' );
++		const contentlessFlyout = flyouts.find(
++			( p ) => p.id === contentlessFlyoutId
++		);
++		const baseFlyout = flyouts.find( ( p ) => p.id === baseFlyoutId );
++		expect( contentlessFlyout ).toMatchDiffSnapshot( baseFlyout );
++	} );
++
++	test( 'should render label', () => {
++		const labelledFlyoutId = 'labelled-flyout';
++		render(
++			<Flyout
++				baseId={ labelledFlyoutId }
++				label="show"
++				trigger={ <Button>WordPress.org</Button> }
++				visible
++			>
++				<CardBody>Code is Poetry</CardBody>
++			</Flyout>
++		);
++		const flyouts = screen.getAllByRole( 'dialog' );
++		const labelledFlyout = flyouts.find(
++			( p ) => p.id === labelledFlyoutId
++		);
++		const baseFlyout = flyouts.find( ( p ) => p.id === baseFlyoutId );
++		expect( labelledFlyout ).toMatchDiffSnapshot( baseFlyout );
++	} );
++} );
+diff --git a/packages/components/src/ui/popover/types.ts b/packages/components/src/flyout/types.ts
+similarity index 71%
+rename from packages/components/src/ui/popover/types.ts
+rename to packages/components/src/flyout/types.ts
+index 45e111bd342554..cf9c8bf1549082 100644
+--- a/packages/components/src/ui/popover/types.ts
++++ b/packages/components/src/flyout/types.ts
+@@ -11,8 +11,8 @@ import type { CSSProperties, FunctionComponentElement } from 'react';
+  */
+ import type { PopperProps } from '../utils/types';
+ 
+-export type PopoverContext = {
+-	popover?: PopoverStateReturn;
++export type Context = {
++	flyoutState?: PopoverStateReturn;
+ 	label?: string;
+ };
+ 
+@@ -20,11 +20,13 @@ export type Props = PopperProps & {
+ 	state?: PopoverStateReturn;
+ 	label?: string;
+ 	/**
+-	 * Determines if `Popover` has animations.
++	 * Determines if `Flyout` has animations.
++	 *
++	 * @default true
+ 	 */
+ 	animated?: boolean;
+ 	/**
+-	 * The duration of `Popover` animations.
++	 * The duration of `Flyout` animations.
+ 	 *
+ 	 * @default 160
+ 	 */
+@@ -36,13 +38,15 @@ export type Props = PopperProps & {
+ 	 */
+ 	baseId?: string;
+ 	/**
+-	 * Renders `Elevation` styles for the `Popover`.
++	 * Renders `Elevation` styles for the `Flyout`.
+ 	 *
+ 	 * @default 5
+ 	 */
+ 	elevation?: number;
+ 	/**
+-	 * Max-width for the `Popover` element.
++	 * Max-width for the `Flyout` element.
++	 *
++	 * @default 360
+ 	 */
+ 	maxWidth?: CSSProperties[ 'maxWidth' ];
+ 	/**
+@@ -50,18 +54,18 @@ export type Props = PopperProps & {
+ 	 */
+ 	onVisibleChange?: ( ...args: any ) => void;
+ 	/**
+-	 * Element that triggers the `visible` state of `Popover` when clicked.
++	 * Element that triggers the `visible` state of `Flyout` when clicked.
+ 	 *
+ 	 * @example
+ 	 * ```jsx
+-	 * <Popover trigger={<Button>Greet</Button>}>
++	 * <Flyout trigger={<Button>Greet</Button>}>
+ 	 *  <Text>Hi! I'm Olaf!</Text>
+-	 * </Popover>
++	 * </Flyout>
+ 	 * ```
+ 	 */
+ 	trigger: FunctionComponentElement< any >;
+ 	/**
+-	 * Whether `Popover` is visible.
++	 * Whether `Flyout` is visible.
+ 	 *
+ 	 * @default false
+ 	 *
+@@ -75,7 +79,7 @@ export type Props = PopperProps & {
+ };
+ 
+ export type ContentProps = {
+-	elevation?: number;
+-	maxWidth?: CSSProperties[ 'maxWidth' ];
++	elevation: number;
++	maxWidth: CSSProperties[ 'maxWidth' ];
+ 	children: React.ReactNode;
+ };
+diff --git a/packages/components/src/ui/popover/utils.js b/packages/components/src/flyout/utils.js
+similarity index 71%
+rename from packages/components/src/ui/popover/utils.js
+rename to packages/components/src/flyout/utils.js
+index 142a38e4bee5e1..25a3f1c07fc791 100644
+--- a/packages/components/src/ui/popover/utils.js
++++ b/packages/components/src/flyout/utils.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { noop } from 'lodash';
+ import useResizeAware from 'react-resize-aware';
+ 
+ /**
+@@ -9,11 +8,15 @@ import useResizeAware from 'react-resize-aware';
+  */
+ import { useIsomorphicLayoutEffect } from '@wordpress/compose';
+ 
+-export function usePopoverResizeUpdater( { onResize = noop } ) {
++/**
++ *
++ * @param { { onResize?: () => any } } onResize
++ */
++export function useFlyoutResizeUpdater( { onResize } ) {
+ 	const [ resizeListener, sizes ] = useResizeAware();
+ 
+ 	useIsomorphicLayoutEffect( () => {
+-		onResize();
++		onResize?.();
+ 	}, [ sizes.width, sizes.height ] );
+ 
+ 	return resizeListener;
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 6a6097486e6307..18cca75a71cb21 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -62,6 +62,7 @@ export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
+ export { Elevation as __experimentalElevation } from './elevation';
+ export { default as ExternalLink } from './external-link';
+ export { Flex, FlexBlock, FlexItem } from './flex';
++export { Flyout as __experimentalFlyout } from './flyout';
+ export { default as FocalPointPicker } from './focal-point-picker';
+ export { default as FocusableIframe } from './focusable-iframe';
+ export { default as FontSizePicker } from './font-size-picker';
+diff --git a/packages/components/src/ui/item-group/stories/index.js b/packages/components/src/ui/item-group/stories/index.js
+index db38f7489f7d5e..620cd1179be539 100644
+--- a/packages/components/src/ui/item-group/stories/index.js
++++ b/packages/components/src/ui/item-group/stories/index.js
+@@ -4,7 +4,7 @@
+  * Internal dependencies
+  */
+ import { ItemGroup, Item } from '..';
+-import { Popover } from '../../popover';
++import { Flyout } from '../../../flyout';
+ import Button from '../../../button';
+ 
+ export default {
+@@ -30,7 +30,7 @@ export const _default = () => (
+ );
+ 
+ export const dropdown = () => (
+-	<Popover
++	<Flyout
+ 		css={ { width: '350px' } }
+ 		trigger={ <Button>Open Popover</Button> }
+ 	>
+@@ -48,6 +48,6 @@ export const dropdown = () => (
+ 				Code is Poetry — Click me!
+ 			</Item>
+ 		</ItemGroup>
+-	</Popover>
++	</Flyout>
+ );
+ /* eslint-enable no-alert */
+diff --git a/packages/components/src/ui/popover/README.md b/packages/components/src/ui/popover/README.md
+deleted file mode 100644
+index 028d093818749d..00000000000000
+--- a/packages/components/src/ui/popover/README.md
++++ /dev/null
+@@ -1,23 +0,0 @@
+-# Popover
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-`Popover` is a component to render a floating content modal. It is similar in purpose to a tooltip, but renders content of any sort, not only simple text.
+-
+-## Usage
+-
+-```jsx
+-import { Button, Popover, View, Text } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return (
+-		<Popover trigger={ <Button>Popover</Button> }>
+-			<View>
+-				<Text>Code is Poetry</Text>
+-			</View>
+-		</Popover>
+-	);
+-}
+-```
+diff --git a/packages/components/src/ui/popover/component.js b/packages/components/src/ui/popover/component.js
+deleted file mode 100644
+index 83c01e42bdcead..00000000000000
+--- a/packages/components/src/ui/popover/component.js
++++ /dev/null
+@@ -1,125 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-// eslint-disable-next-line no-restricted-imports
+-import { PopoverDisclosure, usePopoverState, Portal } from 'reakit';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useCallback, useMemo, cloneElement } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { contextConnect, useContextSystem } from '../context';
+-import { PopoverContext } from './context';
+-import { usePopoverResizeUpdater } from './utils';
+-import PopoverContent from './content';
+-import { useUpdateEffect } from '../../utils/hooks';
+-
+-/**
+- *
+- * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                                       forwardedRef
+- */
+-function Popover( props, forwardedRef ) {
+-	const {
+-		animated = true,
+-		animationDuration = 160,
+-		baseId,
+-		children,
+-		elevation = 5,
+-		id,
+-		label,
+-		maxWidth = 360,
+-		onVisibleChange = noop,
+-		placement,
+-		state,
+-		trigger,
+-		visible,
+-		...otherProps
+-	} = useContextSystem( props, 'Popover' );
+-
+-	const _popover = usePopoverState( {
+-		animated: animated ? animationDuration : undefined,
+-		baseId: baseId || id,
+-		placement,
+-		visible,
+-		...otherProps,
+-	} );
+-
+-	const popover = state || _popover;
+-
+-	const resizeListener = usePopoverResizeUpdater( {
+-		onResize: popover.unstable_update,
+-	} );
+-
+-	const uniqueId = `popover-${ popover.baseId }`;
+-	const labelId = label || uniqueId;
+-
+-	const contextProps = useMemo(
+-		() => ( {
+-			label: labelId,
+-			popover,
+-		} ),
+-		[ labelId, popover ]
+-	);
+-
+-	const triggerContent = useCallback(
+-		( triggerProps ) => {
+-			return cloneElement( trigger, triggerProps );
+-		},
+-		[ trigger ]
+-	);
+-
+-	useUpdateEffect( () => {
+-		onVisibleChange( popover.visible );
+-	}, [ popover.visible ] );
+-
+-	return (
+-		<PopoverContext.Provider value={ contextProps }>
+-			{ trigger && (
+-				<PopoverDisclosure
+-					{ ...popover }
+-					ref={ trigger.ref }
+-					{ ...trigger.props }
+-				>
+-					{ triggerContent }
+-				</PopoverDisclosure>
+-			) }
+-			<Portal>
+-				<PopoverContent
+-					ref={ forwardedRef }
+-					{ ...otherProps }
+-					elevation={ elevation }
+-					maxWidth={ maxWidth }
+-				>
+-					{ resizeListener }
+-					{ children }
+-				</PopoverContent>
+-			</Portal>
+-		</PopoverContext.Provider>
+-	);
+-}
+-
+-/**
+- * `Popover` is a component to render a floating content modal.
+- * It is similar in purpose to a tooltip, but renders content of any sort,
+- * not only simple text.
+- *
+- * @example
+- * ```jsx
+- * import { Button, Popover, Text } from `@wordpress/components/ui`;
+- *
+- * function Example() {
+- * 	return (
+- * 		<Popover trigger={ <Button>Popover</Button> }>
+- *			<Text>Code is Poetry</Text>
+- * 		</Popover>
+- * 	);
+- * }
+- * ```
+- */
+-export default contextConnect( Popover, 'Popover' );
+diff --git a/packages/components/src/ui/popover/content.js b/packages/components/src/ui/popover/content.js
+deleted file mode 100644
+index cdb29e8c5bd582..00000000000000
+--- a/packages/components/src/ui/popover/content.js
++++ /dev/null
+@@ -1,71 +0,0 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css, cx } from '@emotion/css';
+-// eslint-disable-next-line no-restricted-imports
+-import { Popover as ReakitPopover } from 'reakit';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Card } from '../../card';
+-import { View } from '../../view';
+-import { usePopoverContext } from './context';
+-import * as styles from './styles';
+-import { contextConnect, useContextSystem } from '../context';
+-
+-/**
+- *
+- * @param {import('../context').PolymorphicComponentProps<import('./types').ContentProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                              forwardedRef
+- */
+-function PopoverContent( props, forwardedRef ) {
+-	const {
+-		children,
+-		className,
+-		elevation = 5,
+-		maxWidth = 360,
+-		...otherProps
+-	} = useContextSystem( props, 'PopoverContent' );
+-
+-	const { label, popover } = usePopoverContext();
+-	const classes = cx( styles.PopoverContent, css( { maxWidth } ), className );
+-
+-	if ( ! popover ) {
+-		throw new Error(
+-			'`PopoverContent` must only be used inside a `Popover`.'
+-		);
+-	}
+-
+-	const showContent = popover.visible || popover.animating;
+-
+-	return (
+-		<ReakitPopover
+-			aria-label={ label }
+-			as={ View }
+-			className={ classes }
+-			{ ...otherProps }
+-			{ ...popover }
+-		>
+-			{ showContent && (
+-				<Card
+-					className={ styles.cardStyle }
+-					elevation={ elevation }
+-					ref={ forwardedRef }
+-				>
+-					{ children }
+-				</Card>
+-			) }
+-		</ReakitPopover>
+-	);
+-}
+-
+-const ConnectedPopoverContent = contextConnect(
+-	PopoverContent,
+-	'PopoverContent'
+-);
+-
+-export default ConnectedPopoverContent;
+diff --git a/packages/components/src/ui/popover/context.js b/packages/components/src/ui/popover/context.js
+deleted file mode 100644
+index 902903260a49ab..00000000000000
+--- a/packages/components/src/ui/popover/context.js
++++ /dev/null
+@@ -1,10 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext, useContext } from '@wordpress/element';
+-
+-/**
+- * @type {import('react').Context<import('./types').PopoverContext>}
+- */
+-export const PopoverContext = createContext( {} );
+-export const usePopoverContext = () => useContext( PopoverContext );
+diff --git a/packages/components/src/ui/popover/index.js b/packages/components/src/ui/popover/index.js
+deleted file mode 100644
+index fe984a96eb127e..00000000000000
+--- a/packages/components/src/ui/popover/index.js
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export { default as Popover } from './component';
+-export * from './context';
+diff --git a/packages/components/src/ui/popover/test/index.js b/packages/components/src/ui/popover/test/index.js
+deleted file mode 100644
+index 0daf3cb16437fa..00000000000000
+--- a/packages/components/src/ui/popover/test/index.js
++++ /dev/null
+@@ -1,103 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, screen } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import Button from '../../../button';
+-import { CardBody } from '../../../card';
+-import { Popover } from '../index';
+-
+-describe( 'props', () => {
+-	const basePopoverId = 'base-popover';
+-	beforeEach( () => {
+-		render(
+-			<Popover
+-				baseId={ basePopoverId }
+-				trigger={ <Button>WordPress.org</Button> }
+-				visible
+-			>
+-				<CardBody>Code is Poetry</CardBody>
+-			</Popover>
+-		);
+-	} );
+-
+-	test( 'should render correctly', () => {
+-		const dialog = screen.getByRole( 'dialog' );
+-		expect( dialog.firstChild ).toMatchSnapshot();
+-	} );
+-
+-	test( 'should render invisible', () => {
+-		const invisiblePopoverTriggerContent =
+-			'WordPress.org - invisible popover';
+-		render(
+-			<Popover
+-				baseId="popover"
+-				trigger={ <Button>{ invisiblePopoverTriggerContent }</Button> }
+-				visible={ false }
+-			>
+-				<CardBody>Code is Poetry</CardBody>
+-			</Popover>
+-		);
+-
+-		const popovers = screen.getAllByRole( 'dialog' );
+-		const trigger = screen.getByText( invisiblePopoverTriggerContent );
+-		// assert only the base popover rendered
+-		expect( popovers ).toHaveLength( 1 );
+-		expect( popovers[ 0 ].id ).toBe( basePopoverId );
+-		expect( trigger ).not.toBeUndefined();
+-	} );
+-
+-	test( 'should render without trigger', () => {
+-		const triggerlessPopoverId = 'triggerless-popover';
+-		render(
+-			<Popover baseId={ triggerlessPopoverId } visible>
+-				<CardBody>Code is Poetry</CardBody>
+-			</Popover>
+-		);
+-		const popovers = screen.getAllByRole( 'dialog' );
+-		const triggerlessPopover = popovers.find(
+-			( p ) => p.id === triggerlessPopoverId
+-		);
+-		expect( triggerlessPopover ).not.toBeUndefined();
+-	} );
+-
+-	test( 'should render without content', () => {
+-		const contentlessPopoverId = 'contentless-popover';
+-		render(
+-			<Popover
+-				baseId={ contentlessPopoverId }
+-				trigger={ <Button>WordPress.org</Button> }
+-				visible
+-			/>
+-		);
+-		const popovers = screen.getAllByRole( 'dialog' );
+-		const contentlessPopover = popovers.find(
+-			( p ) => p.id === contentlessPopoverId
+-		);
+-		const basePopover = popovers.find( ( p ) => p.id === basePopoverId );
+-		expect( contentlessPopover ).toMatchDiffSnapshot( basePopover );
+-	} );
+-
+-	test( 'should render label', () => {
+-		const labelledPopoverId = 'labelled-popover';
+-		render(
+-			<Popover
+-				baseId={ labelledPopoverId }
+-				label="show"
+-				trigger={ <Button>WordPress.org</Button> }
+-				visible
+-			>
+-				<CardBody>Code is Poetry</CardBody>
+-			</Popover>
+-		);
+-		const popovers = screen.getAllByRole( 'dialog' );
+-		const labelledPopover = popovers.find(
+-			( p ) => p.id === labelledPopoverId
+-		);
+-		const basePopover = popovers.find( ( p ) => p.id === basePopoverId );
+-		expect( labelledPopover ).toMatchDiffSnapshot( basePopover );
+-	} );
+-} );
+diff --git a/packages/components/src/utils/z-index.js b/packages/components/src/utils/z-index.js
+index fd7568a421a840..600f51c673aacf 100644
+--- a/packages/components/src/utils/z-index.js
++++ b/packages/components/src/utils/z-index.js
+@@ -1,2 +1,2 @@
+-export const Popover = 10000;
++export const Flyout = 10000;
+ export const Tooltip = 1000002;
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 4b831d54dbaa29..4589afd554f1a7 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -29,6 +29,7 @@
+ 		"src/draggable/**/*",
+ 		"src/elevation/**/*",
+ 		"src/flex/**/*",
++		"src/flyout/**/*",
+ 		"src/form-group/**/*",
+ 		"src/grid/**/*",
+ 		"src/h-stack/**/*",

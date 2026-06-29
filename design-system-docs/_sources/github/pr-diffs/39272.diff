@@ -1,0 +1,370 @@
+diff --git a/packages/block-editor/src/components/list-view/block-select-button.js b/packages/block-editor/src/components/list-view/block-select-button.js
+index 452f01d30b3bd4..ad6a05818afdaf 100644
+--- a/packages/block-editor/src/components/list-view/block-select-button.js
++++ b/packages/block-editor/src/components/list-view/block-select-button.js
+@@ -6,17 +6,14 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { Button, VisuallyHidden } from '@wordpress/components';
+-import { useInstanceId } from '@wordpress/compose';
++import { Button } from '@wordpress/components';
+ import { forwardRef } from '@wordpress/element';
+-import { __ } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+  */
+ import BlockIcon from '../block-icon';
+ import useBlockDisplayInformation from '../use-block-display-information';
+-import { getBlockPositionDescription } from './utils';
+ import BlockTitle from '../block-title';
+ import ListViewExpander from './expander';
+ import { SPACE, ENTER } from '@wordpress/keycodes';
+@@ -25,29 +22,17 @@ function ListViewBlockSelectButton(
+ 	{
+ 		className,
+ 		block: { clientId },
+-		isSelected,
+ 		onClick,
+ 		onToggleExpanded,
+-		position,
+-		siblingBlockCount,
+-		level,
+ 		tabIndex,
+ 		onFocus,
+ 		onDragStart,
+ 		onDragEnd,
+ 		draggable,
+-		isExpanded,
+ 	},
+ 	ref
+ ) {
+ 	const blockInformation = useBlockDisplayInformation( clientId );
+-	const instanceId = useInstanceId( ListViewBlockSelectButton );
+-	const descriptionId = `list-view-block-select-button__${ instanceId }`;
+-	const blockPositionDescription = getBlockPositionDescription(
+-		position,
+-		siblingBlockCount,
+-		level
+-	);
+ 
+ 	// The `href` attribute triggers the browser's native HTML drag operations.
+ 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
+@@ -73,7 +58,6 @@ function ListViewBlockSelectButton(
+ 				) }
+ 				onClick={ onClick }
+ 				onKeyDown={ onKeyDownHandler }
+-				aria-describedby={ descriptionId }
+ 				ref={ ref }
+ 				tabIndex={ tabIndex }
+ 				onFocus={ onFocus }
+@@ -81,7 +65,7 @@ function ListViewBlockSelectButton(
+ 				onDragEnd={ onDragEnd }
+ 				draggable={ draggable }
+ 				href={ `#block-${ clientId }` }
+-				aria-expanded={ isExpanded }
++				aria-hidden={ true }
+ 			>
+ 				<ListViewExpander onClick={ onToggleExpanded } />
+ 				<BlockIcon icon={ blockInformation?.icon } showColors />
+@@ -91,18 +75,7 @@ function ListViewBlockSelectButton(
+ 						{ blockInformation.anchor }
+ 					</span>
+ 				) }
+-				{ isSelected && (
+-					<VisuallyHidden>
+-						{ __( '(selected block)' ) }
+-					</VisuallyHidden>
+-				) }
+ 			</Button>
+-			<div
+-				className="block-editor-list-view-block-select-button__description"
+-				id={ descriptionId }
+-			>
+-				{ blockPositionDescription }
+-			</div>
+ 		</>
+ 	);
+ }
+diff --git a/packages/block-editor/src/components/list-view/block.js b/packages/block-editor/src/components/list-view/block.js
+index 0a432534c2550b..71a1c42638157d 100644
+--- a/packages/block-editor/src/components/list-view/block.js
++++ b/packages/block-editor/src/components/list-view/block.js
+@@ -10,6 +10,7 @@ import {
+ 	__experimentalTreeGridCell as TreeGridCell,
+ 	__experimentalTreeGridItem as TreeGridItem,
+ } from '@wordpress/components';
++import { useInstanceId } from '@wordpress/compose';
+ import { moreVertical } from '@wordpress/icons';
+ import {
+ 	useState,
+@@ -32,6 +33,7 @@ import {
+ import ListViewBlockContents from './block-contents';
+ import BlockSettingsDropdown from '../block-settings-menu/block-settings-dropdown';
+ import { useListViewContext } from './context';
++import { getBlockPositionDescription } from './utils';
+ import { store as blockEditorStore } from '../../store';
+ import useBlockDisplayInformation from '../use-block-display-information';
+ 
+@@ -49,6 +51,7 @@ function ListViewBlock( {
+ 	path,
+ 	isExpanded,
+ 	selectedClientIds,
++	preventAnnouncement,
+ } ) {
+ 	const cellRef = useRef( null );
+ 	const [ isHovered, setIsHovered ] = useState( false );
+@@ -56,6 +59,31 @@ function ListViewBlock( {
+ 
+ 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
+ 
++	const blockInformation = useBlockDisplayInformation( clientId );
++	const instanceId = useInstanceId( ListViewBlock );
++	const descriptionId = `list-view-block-select-button__${ instanceId }`;
++	const blockPositionDescription = getBlockPositionDescription(
++		position,
++		siblingBlockCount,
++		level
++	);
++
++	const blockAriaLabel = blockInformation
++		? sprintf(
++				// translators: %s: The title of the block. This string indicates a link to select the block.
++				__( '%s link' ),
++				blockInformation.title
++		  )
++		: __( 'Link' );
++
++	const settingsAriaLabel = blockInformation
++		? sprintf(
++				// translators: %s: The title of the block.
++				__( 'Options for %s block' ),
++				blockInformation.title
++		  )
++		: __( 'Options' );
++
+ 	const {
+ 		__experimentalFeatures: withExperimentalFeatures,
+ 		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
+@@ -155,15 +183,6 @@ function ListViewBlock( {
+ 		'has-single-cell': hideBlockActions,
+ 	} );
+ 
+-	const blockInformation = useBlockDisplayInformation( clientId );
+-	const settingsAriaLabel = blockInformation
+-		? sprintf(
+-				// translators: %s: The title of the block.
+-				__( 'Options for %s block' ),
+-				blockInformation.title
+-		  )
+-		: __( 'Options' );
+-
+ 	// Only include all selected blocks if the currently clicked on block
+ 	// is one of the selected blocks. This ensures that if a user attempts
+ 	// to alter a block that isn't part of the selection, they're still able
+@@ -186,11 +205,16 @@ function ListViewBlock( {
+ 			id={ `list-view-block-${ clientId }` }
+ 			data-block={ clientId }
+ 			isExpanded={ isExpanded }
++			aria-selected={ !! isSelected }
+ 		>
+ 			<TreeGridCell
+ 				className="block-editor-list-view-block__contents-cell"
+ 				colSpan={ colSpan }
+ 				ref={ cellRef }
++				aria-label={ blockAriaLabel }
++				aria-selected={ !! isSelected }
++				aria-expanded={ isExpanded }
++				aria-describedby={ descriptionId }
+ 			>
+ 				{ ( { ref, tabIndex, onFocus } ) => (
+ 					<div className="block-editor-list-view-block__contents-container">
+@@ -207,7 +231,14 @@ function ListViewBlock( {
+ 							onFocus={ onFocus }
+ 							isExpanded={ isExpanded }
+ 							selectedClientIds={ selectedClientIds }
++							preventAnnouncement={ preventAnnouncement }
+ 						/>
++						<div
++							className="block-editor-list-view-block-select-button__description"
++							id={ descriptionId }
++						>
++							{ blockPositionDescription }
++						</div>
+ 					</div>
+ 				) }
+ 			</TreeGridCell>
+@@ -244,7 +275,10 @@ function ListViewBlock( {
+ 			) }
+ 
+ 			{ showBlockActions && (
+-				<TreeGridCell className={ listViewBlockSettingsClassName }>
++				<TreeGridCell
++					className={ listViewBlockSettingsClassName }
++					aria-selected={ !! isSelected }
++				>
+ 					{ ( { ref, tabIndex, onFocus } ) => (
+ 						<BlockSettingsDropdown
+ 							clientIds={ dropdownClientIds }
+diff --git a/packages/block-editor/src/components/list-view/use-block-selection.js b/packages/block-editor/src/components/list-view/use-block-selection.js
+index b6ac6e1825d417..2edcd3ed8bad3d 100644
+--- a/packages/block-editor/src/components/list-view/use-block-selection.js
++++ b/packages/block-editor/src/components/list-view/use-block-selection.js
+@@ -10,7 +10,7 @@ import { speak } from '@wordpress/a11y';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import { useCallback } from '@wordpress/element';
+-import { UP, DOWN } from '@wordpress/keycodes';
++import { UP, DOWN, HOME, END } from '@wordpress/keycodes';
+ import { store as blocksStore } from '@wordpress/blocks';
+ 
+ /**
+@@ -49,7 +49,10 @@ export default function useBlockSelection() {
+ 
+ 			const isKeyPress =
+ 				event.type === 'keydown' &&
+-				( event.keyCode === UP || event.keyCode === DOWN );
++				( event.keyCode === UP ||
++					event.keyCode === DOWN ||
++					event.keyCode === HOME ||
++					event.keyCode === END );
+ 
+ 			// Handle clicking on a block when no blocks are selected, and return early.
+ 			if (
+@@ -114,6 +117,16 @@ export default function useBlockSelection() {
+ 			// the total number of blocks deselected is greater than one.
+ 			const updatedSelectedBlocks = getSelectedBlockClientIds();
+ 
++			// If the selection is greater than 1 and the Home or End keys
++			// were used to generate the selection, then skip announcing the
++			// deselected blocks.
++			if (
++				( event.keyCode === HOME || event.keyCode === END ) &&
++				updatedSelectedBlocks.length > 1
++			) {
++				return;
++			}
++
+ 			const selectionDiff = difference(
+ 				selectedBlocks,
+ 				updatedSelectedBlocks
+diff --git a/packages/e2e-tests/specs/editor/various/list-view.test.js b/packages/e2e-tests/specs/editor/various/list-view.test.js
+index 7ec97b9a142315..072f549214f49b 100644
+--- a/packages/e2e-tests/specs/editor/various/list-view.test.js
++++ b/packages/e2e-tests/specs/editor/various/list-view.test.js
+@@ -72,8 +72,8 @@ describe( 'List view', () => {
+ 		await pressKeyWithModifier( 'access', 'o' );
+ 
+ 		// The last inserted paragraph block should be selected in List View.
+-		await page.waitForXPath(
+-			'//a[contains(., "Paragraph(selected block)")]'
++		await page.waitForSelector(
++			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Paragraph"]'
+ 		);
+ 
+ 		// Go to the image block in list view.
+@@ -115,8 +115,8 @@ describe( 'List view', () => {
+ 		await openListView();
+ 
+ 		// The last inserted paragraph block should be selected in List View.
+-		await page.waitForXPath(
+-			'//a[contains(., "Paragraph(selected block)")]'
++		await page.waitForSelector(
++			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Paragraph"]'
+ 		);
+ 
+ 		// Paragraph options button.
+@@ -134,8 +134,8 @@ describe( 'List view', () => {
+ 		await paragraphRemoveButton.click();
+ 
+ 		// Heading block should be selected as previous block.
+-		await page.waitForXPath(
+-			'//a[contains(., "Heading(selected block)")]'
++		await page.waitForSelector(
++			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Heading"]'
+ 		);
+ 	} );
+ 
+@@ -150,8 +150,8 @@ describe( 'List view', () => {
+ 		await openListView();
+ 
+ 		// The last inserted paragraph block should be selected in List View.
+-		await page.waitForXPath(
+-			'//a[contains(., "Paragraph(selected block)")]'
++		await page.waitForSelector(
++			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Paragraph"]'
+ 		);
+ 
+ 		// Go to the image block in list view.
+@@ -159,7 +159,9 @@ describe( 'List view', () => {
+ 		await pressKeyTimes( 'Enter', 1 );
+ 
+ 		// Image block should have selected.
+-		await page.waitForXPath( '//a[contains(., "Image(selected block)")]' );
++		await page.waitForSelector(
++			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Image"]'
++		);
+ 
+ 		// Image options dropdown.
+ 		const imageOptionsButton = await page.waitForSelector(
+@@ -176,8 +178,8 @@ describe( 'List view', () => {
+ 		await imageRemoveButton.click();
+ 
+ 		// Heading block should be selected as next block.
+-		await page.waitForXPath(
+-			'//a[contains(., "Heading(selected block)")]'
++		await page.waitForSelector(
++			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Heading"]'
+ 		);
+ 	} );
+ 
+@@ -194,8 +196,8 @@ describe( 'List view', () => {
+ 		await openListView();
+ 
+ 		// The last inserted heading block should be selected in List View.
+-		const headingBlock = await page.waitForXPath(
+-			'//a[contains(., "Heading(selected block)")]'
++		const headingBlock = await page.waitForSelector(
++			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Heading"]'
+ 		);
+ 
+ 		await headingBlock.click();
+@@ -204,10 +206,12 @@ describe( 'List view', () => {
+ 		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+ 
+ 		// Both Image and Heading blocks should have selected.
+-		await page.waitForXPath(
+-			'//a[contains(., "Heading(selected block)")]'
++		await page.waitForSelector(
++			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Heading"]'
++		);
++		await page.waitForSelector(
++			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Image"]'
+ 		);
+-		await page.waitForXPath( '//a[contains(., "Image(selected block)")]' );
+ 
+ 		const imageOptionsButton = await page.waitForSelector(
+ 			'tr.block-editor-list-view-leaf:first-child button[aria-label="Options for Image block"]'
+@@ -224,8 +228,8 @@ describe( 'List view', () => {
+ 		await blocksRemoveButton.click();
+ 
+ 		// Newly created default paragraph block should be selected.
+-		await page.waitForXPath(
+-			'//a[contains(., "Paragraph(selected block)")]'
++		await page.waitForSelector(
++			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Paragraph"]'
+ 		);
+ 	} );
+ 
+@@ -289,7 +293,9 @@ describe( 'List view', () => {
+ 		await pressKeyWithModifier( 'access', 'o' );
+ 
+ 		// The last inserted group block should be selected in list view.
+-		await page.waitForXPath( '//a[contains(., "Group(selected block)")]' );
++		await page.waitForSelector(
++			'.block-editor-list-view-block__contents-cell[aria-selected="true"][aria-label^="Group"]'
++		);
+ 
+ 		// Press Home to go to the first inserted block (image).
+ 		await page.keyboard.press( 'Home' );

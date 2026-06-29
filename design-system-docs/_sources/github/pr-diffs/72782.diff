@@ -1,0 +1,714 @@
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index 0d83086ce52962..468b8cc3c38e89 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -9,6 +9,58 @@ A theming package that's part of the WordPress Design System. It has two parts:
+ 
+ In the **[Design Tokens Reference](docs/ds-tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
+ 
++### Color Tokens
++
++The design system defines color tokens using the following naming scheme:
++
++```
++--wpds-<element>-<tone>[-<emphasis>][-<state>]
++```
++
++**Element** specifies what the color is applied to.
++
++| Value                | Description                                                                                 |
++| -------------------- | ------------------------------------------------------------------------------------------- |
++| `bg-surface`         | Backgrounds of layout or container surfaces.                                                |
++| `bg-interactive`     | Backgrounds of interactive elements such as buttons, inputs, and toggles.                   |
++| `bg-track`           | Backgrounds of track components like scrollbars and slider tracks.                          |
++| `bg-thumb`           | Backgrounds of thumb components like scrollbar thumbs and slider thumbs.                    |
++| `fg-content`         | Foreground color for text and icons in static content.                                      |
++| `fg-interactive`     | Foreground color for text and icons in interactive elements such as links and buttons.      |
++| `stroke-surface`     | Decorative borders and dividers for non-interactive surfaces.                               |
++| `stroke-interactive` | Accessible borders for interactive controls.                                                |
++| `stroke-focus`       | Stroke color specifically for focus rings.                                                  |
++
++**Tone** defines the semantic intent of the color.
++
++| Value     | Description                                                                              |
++| --------- | ---------------------------------------------------------------------------------------- |
++| `neutral` | Neutrally toned UI elements.                                                             |
++| `brand`   | Brand-accented or primary action colors.                                                 |
++| `success` | Positive or completed states.                                                            |
++| `info`    | Informational or system-generated context.                                               |
++| `caution` | Heads-up or low-severity issues; “proceed carefully.”                                    |
++| `warning` | Higher-severity or time-sensitive issues that require user attention but are not errors. |
++| `error`   | Blocking issues, validation failures, or destructive actions.                            |
++
++> [!NOTE]
++> `caution` and `warning` represent two escalation levels of non-error severity.
++> Use **`caution`** for guidance or minor risks, and **`warning`** when the user must act to prevent an error.
++
++**Emphasis** adjusts color strength relative to the base tone, if specified. The default is a normal emphasis.
++
++| Value                | Description                                 |
++| -------------------- | ------------------------------------------- |
++| `strong`             | Higher contrast and/or elevated emphasis.   |
++| `weak`               | Subtle variant for secondary or muted elements. |
++
++**State** represents the interactive state of the element, if specified. The default is an idle state.
++
++| Value      | Description                              |
++| ---------- | ---------------------------------------- |
++| `active`   | Hovered, pressed, or selected state.     |
++| `disabled` | Unavailable or inoperable state.         |
++
+ ## Theme Provider
+ 
+ The `ThemeProvider` is a React component that should wrap your application to provide design tokens and theme context to the child UI components.
+diff --git a/packages/theme/docs/ds-tokens.md b/packages/theme/docs/ds-tokens.md
+index 94270bcf123787..56abd82f8af33a 100644
+--- a/packages/theme/docs/ds-tokens.md
++++ b/packages/theme/docs/ds-tokens.md
+@@ -31,6 +31,8 @@ Do not edit directly.
+ | `--wpds-color-bg-surface-info-weak`                   | Background color for surfaces with info tone and weak emphasis.                                                                             |
+ | `--wpds-color-bg-surface-warning`                     | Background color for surfaces with warning tone and normal emphasis.                                                                        |
+ | `--wpds-color-bg-surface-warning-weak`                | Background color for surfaces with warning tone and weak emphasis.                                                                          |
++| `--wpds-color-bg-surface-caution`                     | Background color for surfaces with caution tone and normal emphasis.                                                                        |
++| `--wpds-color-bg-surface-caution-weak`                | Background color for surfaces with caution tone and weak emphasis.                                                                          |
+ | `--wpds-color-bg-surface-error`                       | Background color for surfaces with error tone and normal emphasis.                                                                          |
+ | `--wpds-color-bg-surface-error-weak`                  | Background color for surfaces with error tone and weak emphasis.                                                                            |
+ | `--wpds-color-bg-interactive-neutral`                 | Background color for interactive elements with neutral tone and normal emphasis.                                                            |
+@@ -60,6 +62,16 @@ Do not edit directly.
+ | `--wpds-color-bg-thumb-brand-disabled`                | Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state.             |
+ | `--wpds-color-fg-content-neutral`                     | Foreground color for content like text with normal emphasis.                                                                                |
+ | `--wpds-color-fg-content-neutral-weak`                | Foreground color for content like text with weak emphasis.                                                                                  |
++| `--wpds-color-fg-content-success`                     | Foreground color for content like text with success tone and normal emphasis.                                                               |
++| `--wpds-color-fg-content-success-weak`                | Foreground color for content like text with success tone and weak emphasis.                                                                 |
++| `--wpds-color-fg-content-info`                        | Foreground color for content like text with info tone and normal emphasis.                                                                  |
++| `--wpds-color-fg-content-info-weak`                   | Foreground color for content like text with info tone and weak emphasis.                                                                    |
++| `--wpds-color-fg-content-warning`                     | Foreground color for content like text with warning tone and normal emphasis.                                                               |
++| `--wpds-color-fg-content-warning-weak`                | Foreground color for content like text with warning tone and weak emphasis.                                                                 |
++| `--wpds-color-fg-content-caution`                     | Foreground color for content like text with caution tone and normal emphasis.                                                               |
++| `--wpds-color-fg-content-caution-weak`                | Foreground color for content like text with caution tone and weak emphasis.                                                                 |
++| `--wpds-color-fg-content-error`                       | Foreground color for content like text with error tone and normal emphasis.                                                                 |
++| `--wpds-color-fg-content-error-weak`                  | Foreground color for content like text with error tone and weak emphasis.                                                                   |
+ | `--wpds-color-fg-interactive-neutral`                 | Foreground color for interactive elements with neutral tone and normal emphasis.                                                            |
+ | `--wpds-color-fg-interactive-neutral-active`          | Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active.                       |
+ | `--wpds-color-fg-interactive-neutral-disabled`        | Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state.                                   |
+@@ -281,3 +293,25 @@ Do not edit directly.
+ | `--wpds-color-private-bg-bg-fill-inverted1`      | N/A         |
+ | `--wpds-color-private-bg-fg-fill-inverted`       | N/A         |
+ | `--wpds-color-private-bg-surface1`               | N/A         |
++| `--wpds-color-private-caution-bg-fill1`          | N/A         |
++| `--wpds-color-private-caution-fg-fill`           | N/A         |
++| `--wpds-color-private-caution-bg-fill2`          | N/A         |
++| `--wpds-color-private-caution-surface2`          | N/A         |
++| `--wpds-color-private-caution-surface6`          | N/A         |
++| `--wpds-color-private-caution-surface5`          | N/A         |
++| `--wpds-color-private-caution-surface4`          | N/A         |
++| `--wpds-color-private-caution-surface3`          | N/A         |
++| `--wpds-color-private-caution-fg-surface4`       | N/A         |
++| `--wpds-color-private-caution-fg-surface3`       | N/A         |
++| `--wpds-color-private-caution-fg-surface2`       | N/A         |
++| `--wpds-color-private-caution-fg-surface1`       | N/A         |
++| `--wpds-color-private-caution-stroke3`           | N/A         |
++| `--wpds-color-private-caution-stroke4`           | N/A         |
++| `--wpds-color-private-caution-stroke2`           | N/A         |
++| `--wpds-color-private-caution-stroke1`           | N/A         |
++| `--wpds-color-private-caution-bg-fill-dark`      | N/A         |
++| `--wpds-color-private-caution-fg-fill-dark`      | N/A         |
++| `--wpds-color-private-caution-bg-fill-inverted2` | N/A         |
++| `--wpds-color-private-caution-bg-fill-inverted1` | N/A         |
++| `--wpds-color-private-caution-fg-fill-inverted`  | N/A         |
++| `--wpds-color-private-caution-surface1`          | N/A         |
+diff --git a/packages/theme/src/color-ramps/lib/constants.ts b/packages/theme/src/color-ramps/lib/constants.ts
+index 9d9903c0f3a31f..9066cdbcbf38a3 100644
+--- a/packages/theme/src/color-ramps/lib/constants.ts
++++ b/packages/theme/src/color-ramps/lib/constants.ts
+@@ -80,6 +80,7 @@ export const DEFAULT_SEED_COLORS = {
+ 	primary: '#3858e9',
+ 	info: '#0090ff',
+ 	success: '#4ab866',
++	caution: '#f0d149',
+ 	warning: '#f0b849',
+ 	error: '#cc1818',
+ };
+diff --git a/packages/theme/src/color-ramps/stories/index.story.tsx b/packages/theme/src/color-ramps/stories/index.story.tsx
+index 71b1e10e505a80..f6177429e7fedc 100644
+--- a/packages/theme/src/color-ramps/stories/index.story.tsx
++++ b/packages/theme/src/color-ramps/stories/index.story.tsx
+@@ -82,6 +82,13 @@ export const Default: StoryObj< typeof ColorGen > = {
+ 			},
+ 			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.warning, bgRamp ).ramp,
+ 		};
++		const cautionRampObj = {
++			seed: {
++				name: 'bgFill1' as const,
++				value: DEFAULT_SEED_COLORS.caution,
++			},
++			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.caution, bgRamp ).ramp,
++		};
+ 		const errorRampObj = {
+ 			seed: {
+ 				name: 'bgFill1' as const,
+@@ -109,6 +116,7 @@ export const Default: StoryObj< typeof ColorGen > = {
+ 						infoRampObj,
+ 						successRampObj,
+ 						warningRampObj,
++						cautionRampObj,
+ 						errorRampObj,
+ 					] }
+ 				/>
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index d1ca95bc588d7e..402fe8d78301b3 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -57,6 +57,12 @@
+ 	--wpds-color-bg-surface-brand: var(
+ 		--wpds-color-private-primary-surface1
+ 	); /* Background color for surfaces with brand tone and normal emphasis. */
++	--wpds-color-bg-surface-caution: var(
++		--wpds-color-private-caution-surface4
++	); /* Background color for surfaces with caution tone and normal emphasis. */
++	--wpds-color-bg-surface-caution-weak: var(
++		--wpds-color-private-caution-surface2
++	); /* Background color for surfaces with caution tone and weak emphasis. */
+ 	--wpds-color-bg-surface-error: var(
+ 		--wpds-color-private-error-surface4
+ 	); /* Background color for surfaces with error tone and normal emphasis. */
+@@ -111,12 +117,42 @@
+ 	--wpds-color-bg-track-neutral-weak: var(
+ 		--wpds-color-private-bg-stroke1
+ 	); /* Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track). */
++	--wpds-color-fg-content-caution: var(
++		--wpds-color-private-caution-fg-surface4
++	); /* Foreground color for content like text with caution tone and normal emphasis. */
++	--wpds-color-fg-content-caution-weak: var(
++		--wpds-color-private-caution-fg-surface3
++	); /* Foreground color for content like text with caution tone and weak emphasis. */
++	--wpds-color-fg-content-error: var(
++		--wpds-color-private-error-fg-surface4
++	); /* Foreground color for content like text with error tone and normal emphasis. */
++	--wpds-color-fg-content-error-weak: var(
++		--wpds-color-private-error-fg-surface3
++	); /* Foreground color for content like text with error tone and weak emphasis. */
++	--wpds-color-fg-content-info: var(
++		--wpds-color-private-info-fg-surface4
++	); /* Foreground color for content like text with info tone and normal emphasis. */
++	--wpds-color-fg-content-info-weak: var(
++		--wpds-color-private-info-fg-surface3
++	); /* Foreground color for content like text with info tone and weak emphasis. */
+ 	--wpds-color-fg-content-neutral: var(
+ 		--wpds-color-private-bg-fg-surface4
+ 	); /* Foreground color for content like text with normal emphasis. */
+ 	--wpds-color-fg-content-neutral-weak: var(
+ 		--wpds-color-private-bg-fg-surface3
+ 	); /* Foreground color for content like text with weak emphasis. */
++	--wpds-color-fg-content-success: var(
++		--wpds-color-private-success-fg-surface4
++	); /* Foreground color for content like text with success tone and normal emphasis. */
++	--wpds-color-fg-content-success-weak: var(
++		--wpds-color-private-success-fg-surface3
++	); /* Foreground color for content like text with success tone and weak emphasis. */
++	--wpds-color-fg-content-warning: var(
++		--wpds-color-private-warning-fg-surface4
++	); /* Foreground color for content like text with warning tone and normal emphasis. */
++	--wpds-color-fg-content-warning-weak: var(
++		--wpds-color-private-warning-fg-surface3
++	); /* Foreground color for content like text with warning tone and weak emphasis. */
+ 	--wpds-color-fg-interactive-brand: var(
+ 		--wpds-color-private-primary-fg-surface3
+ 	); /* Foreground color for interactive elements with brand tone and normal emphasis. */
+@@ -181,6 +217,28 @@
+ 	--wpds-color-private-bg-surface4: #eaeaea;
+ 	--wpds-color-private-bg-surface5: #dfdfdf;
+ 	--wpds-color-private-bg-surface6: #d0d0d0;
++	--wpds-color-private-caution-bg-fill-dark: #1f1e1b;
++	--wpds-color-private-caution-bg-fill-inverted1: #3d2e00;
++	--wpds-color-private-caution-bg-fill-inverted2: #1f1e1b;
++	--wpds-color-private-caution-bg-fill1: #f0d149;
++	--wpds-color-private-caution-bg-fill2: #dabb2b;
++	--wpds-color-private-caution-fg-fill: #1f1e1b;
++	--wpds-color-private-caution-fg-fill-dark: #f6f1da;
++	--wpds-color-private-caution-fg-fill-inverted: #f6f1da;
++	--wpds-color-private-caution-fg-surface1: #c6a800;
++	--wpds-color-private-caution-fg-surface2: #a58700;
++	--wpds-color-private-caution-fg-surface3: #866a00;
++	--wpds-color-private-caution-fg-surface4: #291d00;
++	--wpds-color-private-caution-stroke1: #b8ab76;
++	--wpds-color-private-caution-stroke2: #988d61;
++	--wpds-color-private-caution-stroke3: #866a00;
++	--wpds-color-private-caution-stroke4: #644e00;
++	--wpds-color-private-caution-surface1: #faf1cb;
++	--wpds-color-private-caution-surface2: #fdf9e7;
++	--wpds-color-private-caution-surface3: #ffffff;
++	--wpds-color-private-caution-surface4: #f8ebb6;
++	--wpds-color-private-caution-surface5: #f4df8c;
++	--wpds-color-private-caution-surface6: #e7d072;
+ 	--wpds-color-private-error-bg-fill-dark: #231c1b;
+ 	--wpds-color-private-error-bg-fill-inverted1: #6d0000;
+ 	--wpds-color-private-error-bg-fill-inverted2: #231c1b;
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.js b/packages/theme/src/prebuilt/js/design-tokens.js
+index 2233c2b52bc887..36b846676ef985 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.js
++++ b/packages/theme/src/prebuilt/js/design-tokens.js
+@@ -19,6 +19,8 @@ export default [
+ 	'--wpds-color-bg-surface-info-weak',
+ 	'--wpds-color-bg-surface-warning',
+ 	'--wpds-color-bg-surface-warning-weak',
++	'--wpds-color-bg-surface-caution',
++	'--wpds-color-bg-surface-caution-weak',
+ 	'--wpds-color-bg-surface-error',
+ 	'--wpds-color-bg-surface-error-weak',
+ 	'--wpds-color-bg-interactive-neutral',
+@@ -48,6 +50,16 @@ export default [
+ 	'--wpds-color-bg-thumb-brand-disabled',
+ 	'--wpds-color-fg-content-neutral',
+ 	'--wpds-color-fg-content-neutral-weak',
++	'--wpds-color-fg-content-success',
++	'--wpds-color-fg-content-success-weak',
++	'--wpds-color-fg-content-info',
++	'--wpds-color-fg-content-info-weak',
++	'--wpds-color-fg-content-warning',
++	'--wpds-color-fg-content-warning-weak',
++	'--wpds-color-fg-content-caution',
++	'--wpds-color-fg-content-caution-weak',
++	'--wpds-color-fg-content-error',
++	'--wpds-color-fg-content-error-weak',
+ 	'--wpds-color-fg-interactive-neutral',
+ 	'--wpds-color-fg-interactive-neutral-active',
+ 	'--wpds-color-fg-interactive-neutral-disabled',
+diff --git a/packages/theme/src/prebuilt/json/figma.json b/packages/theme/src/prebuilt/json/figma.json
+index 4b8d01f7edada8..ab123b9a4fab90 100644
+--- a/packages/theme/src/prebuilt/json/figma.json
++++ b/packages/theme/src/prebuilt/json/figma.json
+@@ -690,6 +690,116 @@
+ 			".": "#efefef"
+ 		}
+ 	},
++	"Color/_Primitives/Caution/bgFill1": {
++		"value": {
++			".": "#f0d149"
++		}
++	},
++	"Color/_Primitives/Caution/fgFill": {
++		"value": {
++			".": "#1f1e1b"
++		}
++	},
++	"Color/_Primitives/Caution/bgFill2": {
++		"value": {
++			".": "#dabb2b"
++		}
++	},
++	"Color/_Primitives/Caution/surface2": {
++		"value": {
++			".": "#fdf9e7"
++		}
++	},
++	"Color/_Primitives/Caution/surface6": {
++		"value": {
++			".": "#e7d072"
++		}
++	},
++	"Color/_Primitives/Caution/surface5": {
++		"value": {
++			".": "#f4df8c"
++		}
++	},
++	"Color/_Primitives/Caution/surface4": {
++		"value": {
++			".": "#f8ebb6"
++		}
++	},
++	"Color/_Primitives/Caution/surface3": {
++		"value": {
++			".": "#fff"
++		}
++	},
++	"Color/_Primitives/Caution/fgSurface4": {
++		"value": {
++			".": "#291d00"
++		}
++	},
++	"Color/_Primitives/Caution/fgSurface3": {
++		"value": {
++			".": "#866a00"
++		}
++	},
++	"Color/_Primitives/Caution/fgSurface2": {
++		"value": {
++			".": "#a58700"
++		}
++	},
++	"Color/_Primitives/Caution/fgSurface1": {
++		"value": {
++			".": "#c6a800"
++		}
++	},
++	"Color/_Primitives/Caution/stroke3": {
++		"value": {
++			".": "#866a00"
++		}
++	},
++	"Color/_Primitives/Caution/stroke4": {
++		"value": {
++			".": "#644e00"
++		}
++	},
++	"Color/_Primitives/Caution/stroke2": {
++		"value": {
++			".": "#988d61"
++		}
++	},
++	"Color/_Primitives/Caution/stroke1": {
++		"value": {
++			".": "#b8ab76"
++		}
++	},
++	"Color/_Primitives/Caution/bgFillDark": {
++		"value": {
++			".": "#1f1e1b"
++		}
++	},
++	"Color/_Primitives/Caution/fgFillDark": {
++		"value": {
++			".": "#f6f1da"
++		}
++	},
++	"Color/_Primitives/Caution/bgFillInverted2": {
++		"value": {
++			".": "#1f1e1b"
++		}
++	},
++	"Color/_Primitives/Caution/bgFillInverted1": {
++		"value": {
++			".": "#3d2e00"
++		}
++	},
++	"Color/_Primitives/Caution/fgFillInverted": {
++		"value": {
++			".": "#f6f1da"
++		}
++	},
++	"Color/_Primitives/Caution/surface1": {
++		"value": {
++			".": "#faf1cb"
++		}
++	},
+ 	"Color/Semantic/Background/Neutral/bgSur-neutral": {
+ 		"value": {
+ 			".": "{Color/_Primitives/Bg/surface2}"
+@@ -750,6 +860,18 @@
+ 		},
+ 		"description": "Background color for surfaces with warning tone and weak emphasis."
+ 	},
++	"Color/Semantic/Background/Caution/bgSur-caution": {
++		"value": {
++			".": "{Color/_Primitives/Caution/surface4}"
++		},
++		"description": "Background color for surfaces with caution tone and normal emphasis."
++	},
++	"Color/Semantic/Background/Caution/bgSur-caution-weak": {
++		"value": {
++			".": "{Color/_Primitives/Caution/surface2}"
++		},
++		"description": "Background color for surfaces with caution tone and weak emphasis."
++	},
+ 	"Color/Semantic/Background/Error/bgSur-error": {
+ 		"value": {
+ 			".": "{Color/_Primitives/Error/surface4}"
+@@ -924,6 +1046,66 @@
+ 		},
+ 		"description": "Foreground color for content like text with weak emphasis."
+ 	},
++	"Color/Semantic/Foreground/Success/fgCon-success": {
++		"value": {
++			".": "{Color/_Primitives/Success/fgSurface4}"
++		},
++		"description": "Foreground color for content like text with success tone and normal emphasis."
++	},
++	"Color/Semantic/Foreground/Success/fgCon-success-weak": {
++		"value": {
++			".": "{Color/_Primitives/Success/fgSurface3}"
++		},
++		"description": "Foreground color for content like text with success tone and weak emphasis."
++	},
++	"Color/Semantic/Foreground/Info/fgCon-info": {
++		"value": {
++			".": "{Color/_Primitives/Info/fgSurface4}"
++		},
++		"description": "Foreground color for content like text with info tone and normal emphasis."
++	},
++	"Color/Semantic/Foreground/Info/fgCon-info-weak": {
++		"value": {
++			".": "{Color/_Primitives/Info/fgSurface3}"
++		},
++		"description": "Foreground color for content like text with info tone and weak emphasis."
++	},
++	"Color/Semantic/Foreground/Warning/fgCon-warning": {
++		"value": {
++			".": "{Color/_Primitives/Warning/fgSurface4}"
++		},
++		"description": "Foreground color for content like text with warning tone and normal emphasis."
++	},
++	"Color/Semantic/Foreground/Warning/fgCon-warning-weak": {
++		"value": {
++			".": "{Color/_Primitives/Warning/fgSurface3}"
++		},
++		"description": "Foreground color for content like text with warning tone and weak emphasis."
++	},
++	"Color/Semantic/Foreground/Caution/fgCon-caution": {
++		"value": {
++			".": "{Color/_Primitives/Caution/fgSurface4}"
++		},
++		"description": "Foreground color for content like text with caution tone and normal emphasis."
++	},
++	"Color/Semantic/Foreground/Caution/fgCon-caution-weak": {
++		"value": {
++			".": "{Color/_Primitives/Caution/fgSurface3}"
++		},
++		"description": "Foreground color for content like text with caution tone and weak emphasis."
++	},
++	"Color/Semantic/Foreground/Error/fgCon-error": {
++		"value": {
++			".": "{Color/_Primitives/Error/fgSurface4}"
++		},
++		"description": "Foreground color for content like text with error tone and normal emphasis."
++	},
++	"Color/Semantic/Foreground/Error/fgCon-error-weak": {
++		"value": {
++			".": "{Color/_Primitives/Error/fgSurface3}"
++		},
++		"description": "Foreground color for content like text with error tone and weak emphasis."
++	},
+ 	"Color/Semantic/Foreground/Neutral/fgInt-neutral": {
+ 		"value": {
+ 			".": "{Color/_Primitives/Bg/fgSurface4}"
+diff --git a/packages/theme/src/prebuilt/ts/design-tokens.ts b/packages/theme/src/prebuilt/ts/design-tokens.ts
+index ab40c5a4041c42..ba5eb6def00f5a 100644
+--- a/packages/theme/src/prebuilt/ts/design-tokens.ts
++++ b/packages/theme/src/prebuilt/ts/design-tokens.ts
+@@ -50,6 +50,12 @@ export default {
+ 	'--wpds-color-bg-surface-warning-weak': {
+ 		'.': 'var(--wpds-color-private-warning-surface2)',
+ 	},
++	'--wpds-color-bg-surface-caution': {
++		'.': 'var(--wpds-color-private-caution-surface4)',
++	},
++	'--wpds-color-bg-surface-caution-weak': {
++		'.': 'var(--wpds-color-private-caution-surface2)',
++	},
+ 	'--wpds-color-bg-surface-error': {
+ 		'.': 'var(--wpds-color-private-error-surface4)',
+ 	},
+@@ -137,6 +143,36 @@ export default {
+ 	'--wpds-color-fg-content-neutral-weak': {
+ 		'.': 'var(--wpds-color-private-bg-fg-surface3)',
+ 	},
++	'--wpds-color-fg-content-success': {
++		'.': 'var(--wpds-color-private-success-fg-surface4)',
++	},
++	'--wpds-color-fg-content-success-weak': {
++		'.': 'var(--wpds-color-private-success-fg-surface3)',
++	},
++	'--wpds-color-fg-content-info': {
++		'.': 'var(--wpds-color-private-info-fg-surface4)',
++	},
++	'--wpds-color-fg-content-info-weak': {
++		'.': 'var(--wpds-color-private-info-fg-surface3)',
++	},
++	'--wpds-color-fg-content-warning': {
++		'.': 'var(--wpds-color-private-warning-fg-surface4)',
++	},
++	'--wpds-color-fg-content-warning-weak': {
++		'.': 'var(--wpds-color-private-warning-fg-surface3)',
++	},
++	'--wpds-color-fg-content-caution': {
++		'.': 'var(--wpds-color-private-caution-fg-surface4)',
++	},
++	'--wpds-color-fg-content-caution-weak': {
++		'.': 'var(--wpds-color-private-caution-fg-surface3)',
++	},
++	'--wpds-color-fg-content-error': {
++		'.': 'var(--wpds-color-private-error-fg-surface4)',
++	},
++	'--wpds-color-fg-content-error-weak': {
++		'.': 'var(--wpds-color-private-error-fg-surface3)',
++	},
+ 	'--wpds-color-fg-interactive-neutral': {
+ 		'.': 'var(--wpds-color-private-bg-fg-surface4)',
+ 	},
+diff --git a/packages/theme/tokens/color.json b/packages/theme/tokens/color.json
+index 97a2072a18aad2..720f4de91b4422 100644
+--- a/packages/theme/tokens/color.json
++++ b/packages/theme/tokens/color.json
+@@ -409,6 +409,74 @@
+ 				"surface1": {
+ 					"$value": "#efefef"
+ 				}
++			},
++			"caution": {
++				"bgFill1": {
++					"$value": "#f0d149"
++				},
++				"fgFill": {
++					"$value": "#1f1e1b"
++				},
++				"bgFill2": {
++					"$value": "#dabb2b"
++				},
++				"surface2": {
++					"$value": "#fdf9e7"
++				},
++				"surface6": {
++					"$value": "#e7d072"
++				},
++				"surface5": {
++					"$value": "#f4df8c"
++				},
++				"surface4": {
++					"$value": "#f8ebb6"
++				},
++				"surface3": {
++					"$value": "#fff"
++				},
++				"fgSurface4": {
++					"$value": "#291d00"
++				},
++				"fgSurface3": {
++					"$value": "#866a00"
++				},
++				"fgSurface2": {
++					"$value": "#a58700"
++				},
++				"fgSurface1": {
++					"$value": "#c6a800"
++				},
++				"stroke3": {
++					"$value": "#866a00"
++				},
++				"stroke4": {
++					"$value": "#644e00"
++				},
++				"stroke2": {
++					"$value": "#988d61"
++				},
++				"stroke1": {
++					"$value": "#b8ab76"
++				},
++				"bgFillDark": {
++					"$value": "#1f1e1b"
++				},
++				"fgFillDark": {
++					"$value": "#f6f1da"
++				},
++				"bgFillInverted2": {
++					"$value": "#1f1e1b"
++				},
++				"bgFillInverted1": {
++					"$value": "#3d2e00"
++				},
++				"fgFillInverted": {
++					"$value": "#f6f1da"
++				},
++				"surface1": {
++					"$value": "#faf1cb"
++				}
+ 			}
+ 		},
+ 		"semantic": {
+@@ -483,6 +551,20 @@
+ 						}
+ 					}
+ 				},
++				"caution": {
++					"normal": {
++						"resting": {
++							"$value": "{color.primitive.caution.surface4}",
++							"$description": "Background color for surfaces with caution tone and normal emphasis."
++						}
++					},
++					"weak": {
++						"resting": {
++							"$value": "{color.primitive.caution.surface2}",
++							"$description": "Background color for surfaces with caution tone and weak emphasis."
++						}
++					}
++				},
+ 				"error": {
+ 					"normal": {
+ 						"resting": {
+@@ -648,6 +730,76 @@
+ 							"$description": "Foreground color for content like text with weak emphasis."
+ 						}
+ 					}
++				},
++				"success": {
++					"normal": {
++						"resting": {
++							"$value": "{color.primitive.success.fgSurface4}",
++							"$description": "Foreground color for content like text with success tone and normal emphasis."
++						}
++					},
++					"weak": {
++						"resting": {
++							"$value": "{color.primitive.success.fgSurface3}",
++							"$description": "Foreground color for content like text with success tone and weak emphasis."
++						}
++					}
++				},
++				"info": {
++					"normal": {
++						"resting": {
++							"$value": "{color.primitive.info.fgSurface4}",
++							"$description": "Foreground color for content like text with info tone and normal emphasis."
++						}
++					},
++					"weak": {
++						"resting": {
++							"$value": "{color.primitive.info.fgSurface3}",
++							"$description": "Foreground color for content like text with info tone and weak emphasis."
++						}
++					}
++				},
++				"warning": {
++					"normal": {
++						"resting": {
++							"$value": "{color.primitive.warning.fgSurface4}",
++							"$description": "Foreground color for content like text with warning tone and normal emphasis."
++						}
++					},
++					"weak": {
++						"resting": {
++							"$value": "{color.primitive.warning.fgSurface3}",
++							"$description": "Foreground color for content like text with warning tone and weak emphasis."
++						}
++					}
++				},
++				"caution": {
++					"normal": {
++						"resting": {
++							"$value": "{color.primitive.caution.fgSurface4}",
++							"$description": "Foreground color for content like text with caution tone and normal emphasis."
++						}
++					},
++					"weak": {
++						"resting": {
++							"$value": "{color.primitive.caution.fgSurface3}",
++							"$description": "Foreground color for content like text with caution tone and weak emphasis."
++						}
++					}
++				},
++				"error": {
++					"normal": {
++						"resting": {
++							"$value": "{color.primitive.error.fgSurface4}",
++							"$description": "Foreground color for content like text with error tone and normal emphasis."
++						}
++					},
++					"weak": {
++						"resting": {
++							"$value": "{color.primitive.error.fgSurface3}",
++							"$description": "Foreground color for content like text with error tone and weak emphasis."
++						}
++					}
+ 				}
+ 			},
+ 			"fg-interactive": {

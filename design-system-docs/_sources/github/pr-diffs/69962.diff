@@ -1,0 +1,1451 @@
+diff --git a/package-lock.json b/package-lock.json
+index 1fb09dd57e009b..5153b548eafa4f 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -2387,22 +2387,6 @@
+ 				"@babel/core": "^7.0.0-0"
+ 			}
+ 		},
+-		"node_modules/@babel/plugin-proposal-private-methods": {
+-			"version": "7.18.6",
+-			"resolved": "https://registry.npmjs.org/@babel/plugin-proposal-private-methods/-/plugin-proposal-private-methods-7.18.6.tgz",
+-			"integrity": "sha512-nutsvktDItsNn4rpGItSNV2sz1XwS+nfU0Rg8aCx3W3NOKVzdMjJRu0O5OkgDp3ZGICSTbgRpxZoWsxoKRvbeA==",
+-			"deprecated": "This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-private-methods instead.",
+-			"dependencies": {
+-				"@babel/helper-create-class-features-plugin": "^7.18.6",
+-				"@babel/helper-plugin-utils": "^7.18.6"
+-			},
+-			"engines": {
+-				"node": ">=6.9.0"
+-			},
+-			"peerDependencies": {
+-				"@babel/core": "^7.0.0-0"
+-			}
+-		},
+ 		"node_modules/@babel/plugin-proposal-private-property-in-object": {
+ 			"version": "7.21.0-placeholder-for-preset-env.2",
+ 			"resolved": "https://registry.npmjs.org/@babel/plugin-proposal-private-property-in-object/-/plugin-proposal-private-property-in-object-7.21.0-placeholder-for-preset-env.2.tgz",
+@@ -31146,33 +31130,32 @@
+ 				}
+ 			}
+ 		},
+-		"node_modules/eslint-plugin-react-compiler": {
+-			"version": "19.1.0-rc.2",
+-			"resolved": "https://registry.npmjs.org/eslint-plugin-react-compiler/-/eslint-plugin-react-compiler-19.1.0-rc.2.tgz",
+-			"integrity": "sha512-oKalwDGcD+RX9mf3NEO4zOoUMeLvjSvcbbEOpquzmzqEEM2MQdp7/FY/Hx9NzmUwFzH1W9SKTz5fihfMldpEYw==",
++		"node_modules/eslint-plugin-react-hooks": {
++			"version": "7.1.1",
++			"resolved": "https://registry.npmjs.org/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-7.1.1.tgz",
++			"integrity": "sha512-f2I7Gw6JbvCexzIInuSbZpfdQ44D7iqdWX01FKLvrPgqxoE7oMj8clOfto8U6vYiz4yd5oKu39rRSVOe1zRu0g==",
+ 			"license": "MIT",
+ 			"dependencies": {
+ 				"@babel/core": "^7.24.4",
+ 				"@babel/parser": "^7.24.4",
+-				"@babel/plugin-proposal-private-methods": "^7.18.6",
+ 				"hermes-parser": "^0.25.1",
+-				"zod": "^3.22.4",
+-				"zod-validation-error": "^3.0.3"
++				"zod": "^3.25.0 || ^4.0.0",
++				"zod-validation-error": "^3.5.0 || ^4.0.0"
+ 			},
+ 			"engines": {
+-				"node": "^14.17.0 || ^16.0.0 || >= 18.0.0"
++				"node": ">=18"
+ 			},
+ 			"peerDependencies": {
+-				"eslint": ">=7"
++				"eslint": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0 || ^10.0.0"
+ 			}
+ 		},
+-		"node_modules/eslint-plugin-react-compiler/node_modules/hermes-estree": {
++		"node_modules/eslint-plugin-react-hooks/node_modules/hermes-estree": {
+ 			"version": "0.25.1",
+ 			"resolved": "https://registry.npmjs.org/hermes-estree/-/hermes-estree-0.25.1.tgz",
+ 			"integrity": "sha512-0wUoCcLp+5Ev5pDW2OriHC2MJCbwLwuRx+gAqMTOkGKJJiBCLjtrvy4PWUGn6MIVefecRpzoOZ/UV6iGdOr+Cw==",
+ 			"license": "MIT"
+ 		},
+-		"node_modules/eslint-plugin-react-compiler/node_modules/hermes-parser": {
++		"node_modules/eslint-plugin-react-hooks/node_modules/hermes-parser": {
+ 			"version": "0.25.1",
+ 			"resolved": "https://registry.npmjs.org/hermes-parser/-/hermes-parser-0.25.1.tgz",
+ 			"integrity": "sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA==",
+@@ -31181,6 +31164,27 @@
+ 				"hermes-estree": "0.25.1"
+ 			}
+ 		},
++		"node_modules/eslint-plugin-react-hooks/node_modules/zod": {
++			"version": "4.4.1",
++			"resolved": "https://registry.npmjs.org/zod/-/zod-4.4.1.tgz",
++			"integrity": "sha512-a6ENMBBGZBsnlSebQ/eKCguSBeGKSf4O7BPnqVPmYGtpBYI7VSqoVqw+QcB7kPRjbqPwhYTpFbVj/RqNz/CT0Q==",
++			"license": "MIT",
++			"funding": {
++				"url": "https://github.com/sponsors/colinhacks"
++			}
++		},
++		"node_modules/eslint-plugin-react-hooks/node_modules/zod-validation-error": {
++			"version": "4.0.2",
++			"resolved": "https://registry.npmjs.org/zod-validation-error/-/zod-validation-error-4.0.2.tgz",
++			"integrity": "sha512-Q6/nZLe6jxuU80qb/4uJ4t5v2VEZ44lzQjPDhYJNztRQ4wyWc6VF3D3Kb/fAuPetZQnhS3hnajCf9CsWesghLQ==",
++			"license": "MIT",
++			"engines": {
++				"node": ">=18.0.0"
++			},
++			"peerDependencies": {
++				"zod": "^3.25.0 || ^4.0.0"
++			}
++		},
+ 		"node_modules/eslint-plugin-storybook": {
+ 			"version": "10.2.19",
+ 			"resolved": "https://registry.npmjs.org/eslint-plugin-storybook/-/eslint-plugin-storybook-10.2.19.tgz",
+@@ -57676,17 +57680,6 @@
+ 				"url": "https://github.com/sponsors/colinhacks"
+ 			}
+ 		},
+-		"node_modules/zod-validation-error": {
+-			"version": "3.4.0",
+-			"resolved": "https://registry.npmjs.org/zod-validation-error/-/zod-validation-error-3.4.0.tgz",
+-			"integrity": "sha512-ZOPR9SVY6Pb2qqO5XHt+MkkTRxGXb4EVtnjc9JpXUOtUB1T9Ru7mZOT361AN3MsetVe7R0a1KZshJDZdgp9miQ==",
+-			"engines": {
+-				"node": ">=18.0.0"
+-			},
+-			"peerDependencies": {
+-				"zod": "^3.18.0"
+-			}
+-		},
+ 		"packages/a11y": {
+ 			"name": "@wordpress/a11y",
+ 			"version": "4.45.0",
+@@ -60153,7 +60146,7 @@
+ 				"eslint-plugin-playwright": "^2.1.0",
+ 				"eslint-plugin-prettier": "^5.0.0",
+ 				"eslint-plugin-react": "^7.37.0",
+-				"eslint-plugin-react-hooks": "^5.0.0",
++				"eslint-plugin-react-hooks": "7.1.1",
+ 				"globals": "^16.0.0",
+ 				"requireindex": "^1.2.0",
+ 				"typescript-eslint": "^8.0.0"
+@@ -60427,18 +60420,6 @@
+ 				"eslint": "^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9.7"
+ 			}
+ 		},
+-		"packages/eslint-plugin/node_modules/eslint-plugin-react-hooks": {
+-			"version": "5.2.0",
+-			"resolved": "https://registry.npmjs.org/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-5.2.0.tgz",
+-			"integrity": "sha512-+f15FfK64YQwZdJNELETdn5ibXEUQmW1DZL6KXhNnc2heoy/sg9VJJeT7n8TlMWouzWqSWavFkIhHyIbIAEapg==",
+-			"license": "MIT",
+-			"engines": {
+-				"node": ">=10"
+-			},
+-			"peerDependencies": {
+-				"eslint": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0"
+-			}
+-		},
+ 		"packages/eslint-plugin/node_modules/estraverse": {
+ 			"version": "5.3.0",
+ 			"resolved": "https://registry.npmjs.org/estraverse/-/estraverse-5.3.0.tgz",
+@@ -63838,7 +63819,7 @@
+ 				"eslint-plugin-jest": "28.11.0",
+ 				"eslint-plugin-jest-dom": "5.5.0",
+ 				"eslint-plugin-prettier": "5.5.5",
+-				"eslint-plugin-react-compiler": "^19.1.0-rc.2",
++				"eslint-plugin-react-hooks": "7.1.1",
+ 				"eslint-plugin-storybook": "10.2.19",
+ 				"eslint-plugin-testing-library": "7.16.0",
+ 				"glob": "7.1.2",
+diff --git a/packages/block-editor/src/components/block-controls/fill.js b/packages/block-editor/src/components/block-controls/fill.js
+index 3090cfe5e0c8cf..26bdb6988f1ab6 100644
+--- a/packages/block-editor/src/components/block-controls/fill.js
++++ b/packages/block-editor/src/components/block-controls/fill.js
+@@ -34,6 +34,7 @@ export default function BlockControlsFill( {
+ 
+ 	return (
+ 		<StyleProvider document={ document }>
++			{ /* eslint-disable-next-line react-hooks/static-components */ }
+ 			<Fill>
+ 				{ ( fillProps ) => {
+ 					// `fillProps.forwardedContext` is an array of context provider entries, provided by slot,
+diff --git a/packages/block-editor/src/components/block-variation-transforms/index.js b/packages/block-editor/src/components/block-variation-transforms/index.js
+index 460f004b3df787..6fedc5d177f11c 100644
+--- a/packages/block-editor/src/components/block-variation-transforms/index.js
++++ b/packages/block-editor/src/components/block-variation-transforms/index.js
+@@ -144,7 +144,7 @@ function VariationsToggleGroupControl( {
+ 	);
+ }
+ 
+-function __experimentalBlockVariationTransforms( { blockClientId } ) {
++function BlockVariationTransforms( { blockClientId } ) {
+ 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+ 	const {
+ 		activeBlockVariation,
+@@ -235,4 +235,4 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
+ 	);
+ }
+ 
+-export default __experimentalBlockVariationTransforms;
++export default BlockVariationTransforms;
+diff --git a/packages/block-editor/src/components/gradients/use-gradient.js b/packages/block-editor/src/components/gradients/use-gradient.js
+index 938a60143d7670..18a63a96e492ec 100644
+--- a/packages/block-editor/src/components/gradients/use-gradient.js
++++ b/packages/block-editor/src/components/gradients/use-gradient.js
+@@ -54,7 +54,7 @@ export function getGradientSlugByValue( gradients, value ) {
+ 	return gradient && gradient.slug;
+ }
+ 
+-export function __experimentalUseGradient( {
++function useGradient( {
+ 	gradientAttribute = 'gradient',
+ 	customGradientAttribute = 'customGradient',
+ } = {} ) {
+@@ -120,3 +120,5 @@ export function __experimentalUseGradient( {
+ 	}
+ 	return { gradientClass, gradientValue, setGradient };
+ }
++
++export { useGradient as __experimentalUseGradient };
+diff --git a/packages/block-editor/src/components/iframe/use-scale-canvas.js b/packages/block-editor/src/components/iframe/use-scale-canvas.js
+index b8db8ca86a786b..63b03e4892465f 100644
+--- a/packages/block-editor/src/components/iframe/use-scale-canvas.js
++++ b/packages/block-editor/src/components/iframe/use-scale-canvas.js
+@@ -286,10 +286,6 @@ export function useScaleCanvas( {
+ 
+ 		iframeDocument.documentElement.classList.remove( 'zoom-out-animation' );
+ 
+-		// Set the final scroll position that was just animated to.
+-		// Disable reason: Eslint isn't smart enough to know that this is a
+-		// DOM element. https://github.com/facebook/react/issues/31483
+-		// eslint-disable-next-line react-compiler/react-compiler
+ 		iframeDocument.documentElement.scrollTop =
+ 			transitionToRef.current.scrollTop;
+ 
+diff --git a/packages/block-editor/src/components/inserter/tips.js b/packages/block-editor/src/components/inserter/tips.js
+index 6024e32bef0ee3..614d2d5968dcb9 100644
+--- a/packages/block-editor/src/components/inserter/tips.js
++++ b/packages/block-editor/src/components/inserter/tips.js
+@@ -29,7 +29,7 @@ const globalTips = [
+ ];
+ 
+ function Tips() {
+-	const [ randomIndex ] = useState(
++	const [ randomIndex ] = useState( () =>
+ 		Math.floor( Math.random() * globalTips.length )
+ 	);
+ 
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/index.js b/packages/block-editor/src/components/rich-text/event-listeners/index.js
+index 3d9024b11127e3..4ec67d8f30af97 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/index.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/index.js
+@@ -36,7 +36,6 @@ const allEventListeners = [
+ export function useEventListeners( props ) {
+ 	const propsRef = useRef( props );
+ 	useInsertionEffect( () => {
+-		// eslint-disable-next-line react-compiler/react-compiler -- false positive, see https://github.com/facebook/react/issues/29196
+ 		propsRef.current = props;
+ 	} );
+ 	const refEffects = useMemo(
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 251c2e6dbaae80..5ce2d734dd6bc8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,10 @@
+ 
+ -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
+ 
++### Internal
++
++-   Update code to comply with `eslint-plugin-react-hooks` v7 ([#69962](https://github.com/WordPress/gutenberg/pull/69962)).
++
+ ## 33.0.0 (2026-04-29)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.tsx b/packages/components/src/autocomplete/autocompleter-ui.tsx
+index ae730b3164508a..b2e742ba00bf41 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.tsx
++++ b/packages/components/src/autocomplete/autocompleter-ui.tsx
+@@ -96,7 +96,6 @@ export function AutocompleterUI( {
+ 	// ensuring a fresh mount (and stable hook identity) when the completer changes.
+ 	const useItems =
+ 		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
+-	// eslint-disable-next-line react-compiler/react-compiler
+ 	const [ items ] = useItems( filterValue );
+ 	const popoverAnchor = useAnchor( {
+ 		editableContentElement: contentRef.current,
+diff --git a/packages/components/src/composite/legacy/test/index.tsx b/packages/components/src/composite/legacy/test/index.tsx
+index a118dbcfbadbb3..3a77b6398eb202 100644
+--- a/packages/components/src/composite/legacy/test/index.tsx
++++ b/packages/components/src/composite/legacy/test/index.tsx
+@@ -341,7 +341,7 @@ describe.each( [
+ ] )( '%s', ( _when, rtl ) => {
+ 	const { previous, next, first, last } = getKeys( rtl );
+ 
+-	async function useOneDimensionalTest( initialState?: InitialState ) {
++	async function renderOneDimensionalTest( initialState?: InitialState ) {
+ 		const Test = () => (
+ 			<OneDimensionalTest
+ 				state={ useCompositeState( { rtl, ...initialState } ) }
+@@ -351,7 +351,7 @@ describe.each( [
+ 		return getOneDimensionalItems();
+ 	}
+ 
+-	async function useTwoDimensionalTest( initialState?: InitialState ) {
++	async function renderTwoDimensionalTest( initialState?: InitialState ) {
+ 		const Test = () => (
+ 			<TwoDimensionalTest
+ 				state={ useCompositeState( { rtl, ...initialState } ) }
+@@ -361,7 +361,7 @@ describe.each( [
+ 		return getTwoDimensionalItems();
+ 	}
+ 
+-	async function useShiftTest( shift: boolean ) {
++	async function renderShiftTest( shift: boolean ) {
+ 		const Test = () => (
+ 			<ShiftTest state={ useCompositeState( { rtl, shift } ) } />
+ 		);
+@@ -371,7 +371,7 @@ describe.each( [
+ 
+ 	describe( 'In one dimension', () => {
+ 		test( 'All directions work with no orientation', async () => {
+-			const { item1, item2, item3 } = await useOneDimensionalTest();
++			const { item1, item2, item3 } = await renderOneDimensionalTest();
+ 
+ 			await press.Tab();
+ 			expect( item1 ).toHaveFocus();
+@@ -406,7 +406,7 @@ describe.each( [
+ 		} );
+ 
+ 		test( 'Only left/right work with horizontal orientation', async () => {
+-			const { item1, item2, item3 } = await useOneDimensionalTest( {
++			const { item1, item2, item3 } = await renderOneDimensionalTest( {
+ 				orientation: 'horizontal',
+ 			} );
+ 
+@@ -435,7 +435,7 @@ describe.each( [
+ 		} );
+ 
+ 		test( 'Only up/down work with vertical orientation', async () => {
+-			const { item1, item2, item3 } = await useOneDimensionalTest( {
++			const { item1, item2, item3 } = await renderOneDimensionalTest( {
+ 				orientation: 'vertical',
+ 			} );
+ 
+@@ -464,7 +464,7 @@ describe.each( [
+ 		} );
+ 
+ 		test( 'Focus wraps with loop enabled', async () => {
+-			const { item1, item2, item3 } = await useOneDimensionalTest( {
++			const { item1, item2, item3 } = await renderOneDimensionalTest( {
+ 				loop: true,
+ 			} );
+ 
+@@ -488,7 +488,7 @@ describe.each( [
+ 	describe( 'In two dimensions', () => {
+ 		test( 'All directions work as standard', async () => {
+ 			const { itemA1, itemA2, itemA3, itemB1, itemB2, itemC1, itemC3 } =
+-				await useTwoDimensionalTest();
++				await renderTwoDimensionalTest();
+ 
+ 			await press.Tab();
+ 			expect( itemA1 ).toHaveFocus();
+@@ -524,7 +524,7 @@ describe.each( [
+ 
+ 		test( 'Focus wraps around rows/columns with loop enabled', async () => {
+ 			const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
+-				await useTwoDimensionalTest( { loop: true } );
++				await renderTwoDimensionalTest( { loop: true } );
+ 
+ 			await press.Tab();
+ 			expect( itemA1 ).toHaveFocus();
+@@ -548,7 +548,7 @@ describe.each( [
+ 
+ 		test( 'Focus moves between rows/columns with wrap enabled', async () => {
+ 			const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
+-				await useTwoDimensionalTest( { wrap: true } );
++				await renderTwoDimensionalTest( { wrap: true } );
+ 
+ 			await press.Tab();
+ 			expect( itemA1 ).toHaveFocus();
+@@ -577,7 +577,7 @@ describe.each( [
+ 		} );
+ 
+ 		test( 'Focus wraps around start/end with loop and wrap enabled', async () => {
+-			const { itemA1, itemC3 } = await useTwoDimensionalTest( {
++			const { itemA1, itemC3 } = await renderTwoDimensionalTest( {
+ 				loop: true,
+ 				wrap: true,
+ 			} );
+@@ -596,7 +596,7 @@ describe.each( [
+ 
+ 		test( 'Focus shifts if vertical neighbour unavailable when shift enabled', async () => {
+ 			const { itemA1, itemB1, itemB2, itemC1 } =
+-				await useShiftTest( true );
++				await renderShiftTest( true );
+ 
+ 			await press.Tab();
+ 			expect( itemA1 ).toHaveFocus();
+@@ -617,7 +617,7 @@ describe.each( [
+ 		} );
+ 
+ 		test( 'Focus does not shift if vertical neighbour unavailable when shift not enabled', async () => {
+-			const { itemA1, itemB1, itemB2 } = await useShiftTest( false );
++			const { itemA1, itemB1, itemB2 } = await renderShiftTest( false );
+ 
+ 			await press.Tab();
+ 			expect( itemA1 ).toHaveFocus();
+diff --git a/packages/components/src/custom-gradient-picker/index.tsx b/packages/components/src/custom-gradient-picker/index.tsx
+index 2616d08f3adbfe..ceab70c0a82dc3 100644
+--- a/packages/components/src/custom-gradient-picker/index.tsx
++++ b/packages/components/src/custom-gradient-picker/index.tsx
+@@ -76,7 +76,6 @@ const GradientTypePicker = ( {
+ 	);
+ 
+ 	if ( type === 'linear-gradient' && gradientAST.orientation ) {
+-		// eslint-disable-next-line react-compiler/react-compiler -- false positive, see https://github.com/facebook/react/issues/29196
+ 		lastLinearOrientationAngle.current = Number(
+ 			gradientAST.orientation.value
+ 		);
+diff --git a/packages/components/src/higher-order/with-notices/test/index.tsx b/packages/components/src/higher-order/with-notices/test/index.tsx
+index 193e1f55ea4458..f7bacc20d7834a 100644
+--- a/packages/components/src/higher-order/with-notices/test/index.tsx
++++ b/packages/components/src/higher-order/with-notices/test/index.tsx
+@@ -14,10 +14,10 @@ import {
+  * WordPress dependencies
+  */
+ import {
++	createRef,
+ 	forwardRef,
+ 	useEffect,
+ 	useImperativeHandle,
+-	useRef,
+ } from '@wordpress/element';
+ 
+ /**
+@@ -91,15 +91,17 @@ describe( 'withNotices return type', () => {
+ } );
+ 
+ describe( 'withNotices operations', () => {
+-	let handle: React.RefObject< any >;
+-	const Handle = ( props: any ) => {
+-		handle = useRef( null );
+-		return <TestNoticeOperations { ...props } ref={ handle } />;
+-	};
++	function setup( props: any = {} ) {
++		const handle = createRef< any >();
++		const utils = render(
++			<TestNoticeOperations { ...props } ref={ handle } />
++		);
++		return { ...utils, handle };
++	}
+ 
+ 	it( 'should create notices with createNotice', () => {
+ 		const message = 'Aló!';
+-		const { container } = render( <Handle /> );
++		const { container, handle } = setup();
+ 		const { getByText } = within( container );
+ 		act( () => {
+ 			handle.current.createNotice( { content: message } );
+@@ -109,7 +111,7 @@ describe( 'withNotices operations', () => {
+ 
+ 	it( 'should create notices of error status with createErrorNotice', () => {
+ 		const message = 'can’t touch this';
+-		const { container } = render( <Handle /> );
++		const { container, handle } = setup();
+ 		const { getByText } = within( container );
+ 		act( () => {
+ 			handle.current.createErrorNotice( message );
+@@ -120,7 +122,7 @@ describe( 'withNotices operations', () => {
+ 
+ 	it( 'should remove a notice with removeNotice', async () => {
+ 		const notice = { id: 'so real', content: 'so why can’t I touch it?' };
+-		const { container } = render( <Handle /> );
++		const { container, handle } = setup();
+ 		const { getByText } = within( container );
+ 		act( () => {
+ 			handle.current.createNotice( notice );
+@@ -137,7 +139,7 @@ describe( 'withNotices operations', () => {
+ 	it( 'should remove all notices with removeAllNotices', async () => {
+ 		const messages = [ 'Aló!', 'hu dis?', 'Otis' ];
+ 		const notices = noticesFrom( messages );
+-		const { container } = render( <Handle notifications={ notices } /> );
++		const { container, handle } = setup( { notifications: notices } );
+ 		const { getByText } = within( container );
+ 		expect(
+ 			await waitForElementToBeRemoved( () => {
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 0e06f277421de3..9515bd96d7dcfb 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -121,7 +121,6 @@ function UnforwardedModal(
+ 	const onRequestCloseRef =
+ 		useRef< ModalProps[ 'onRequestClose' ] >( undefined );
+ 	useEffect( () => {
+-		// eslint-disable-next-line react-compiler/react-compiler -- false positive, see https://github.com/facebook/react/issues/29196
+ 		onRequestCloseRef.current = onRequestClose;
+ 	}, [ onRequestClose ] );
+ 
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index 01825ed8e64a05..0732f8015db562 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -299,7 +299,6 @@ function PaletteEditListView< T extends PaletteElement >( {
+ 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
+ 	const elementsReferenceRef = useRef< T[] >( undefined );
+ 	useEffect( () => {
+-		// eslint-disable-next-line react-compiler/react-compiler -- false positive, see https://github.com/facebook/react/issues/29196
+ 		elementsReferenceRef.current = elements;
+ 	}, [ elements ] );
+ 
+diff --git a/packages/compose/src/hooks/use-copy-to-clipboard/index.ts b/packages/compose/src/hooks/use-copy-to-clipboard/index.ts
+index b021a95e552ed6..4c10c5764455ea 100644
+--- a/packages/compose/src/hooks/use-copy-to-clipboard/index.ts
++++ b/packages/compose/src/hooks/use-copy-to-clipboard/index.ts
+@@ -71,7 +71,6 @@ export function clearSelection( trigger: Element ): void {
+ function useUpdatedRef< T >( value: T ): MutableRefObject< T > {
+ 	const ref = useRef< T >( value );
+ 	useLayoutEffect( () => {
+-		// eslint-disable-next-line react-compiler/react-compiler -- false positive, see https://github.com/facebook/react/issues/29196
+ 		ref.current = value;
+ 	}, [ value ] );
+ 	return ref;
+diff --git a/packages/data/src/components/use-select/index.ts b/packages/data/src/components/use-select/index.ts
+index d9a7a2993d1e7d..4b6fb984ad22a2 100644
+--- a/packages/data/src/components/use-select/index.ts
++++ b/packages/data/src/components/use-select/index.ts
+@@ -1,7 +1,7 @@
+ // useSelect is a low-level hook that intentionally breaks rules-of-hooks
+ // in its internal helpers (_useStaticSelect, _useMappingSelect) where
+ // hooks are called inside non-hook functions and conditionally dispatched.
+-/* eslint-disable react-hooks/rules-of-hooks, react-compiler/react-compiler */
++/* eslint-disable react-hooks/rules-of-hooks */
+ 
+ /**
+  * WordPress dependencies
+@@ -372,4 +372,4 @@ export function useSuspenseSelect< T extends MapSelect >(
+ ): ReturnType< T > {
+ 	return _useMappingSelect( true, mapSelect, deps ) as ReturnType< T >;
+ }
+-/* eslint-enable react-hooks/rules-of-hooks, react-compiler/react-compiler */
++/* eslint-enable react-hooks/rules-of-hooks */
+diff --git a/packages/eslint-plugin/package.json b/packages/eslint-plugin/package.json
+index 3f7b53611c9fa8..e794f07114af2e 100644
+--- a/packages/eslint-plugin/package.json
++++ b/packages/eslint-plugin/package.json
+@@ -57,7 +57,7 @@
+ 		"eslint-plugin-playwright": "^2.1.0",
+ 		"eslint-plugin-prettier": "^5.0.0",
+ 		"eslint-plugin-react": "^7.37.0",
+-		"eslint-plugin-react-hooks": "^5.0.0",
++		"eslint-plugin-react-hooks": "7.1.1",
+ 		"globals": "^16.0.0",
+ 		"requireindex": "^1.2.0",
+ 		"typescript-eslint": "^8.0.0"
+diff --git a/packages/global-styles-ui/src/font-library/font-collection.tsx b/packages/global-styles-ui/src/font-library/font-collection.tsx
+index 833f1ed801732c..321d496b986d19 100644
+--- a/packages/global-styles-ui/src/font-library/font-collection.tsx
++++ b/packages/global-styles-ui/src/font-library/font-collection.tsx
+@@ -257,26 +257,8 @@ function FontCollection( { slug }: { slug: string } ) {
+ 		return <GoogleFontsConfirmDialog />;
+ 	}
+ 
+-	const ActionsComponent = () => {
+-		if ( slug !== 'google-fonts' || renderConfirmDialog || selectedFont ) {
+-			return null;
+-		}
+-		return (
+-			<DropdownMenu
+-				icon={ moreVertical }
+-				label={ __( 'Actions' ) }
+-				popoverProps={ {
+-					position: 'bottom left',
+-				} }
+-				controls={ [
+-					{
+-						title: __( 'Revoke access to Google Fonts' ),
+-						onClick: revokeAccess,
+-					},
+-				] }
+-			/>
+-		);
+-	};
++	const showActions =
++		slug === 'google-fonts' && ! renderConfirmDialog && ! selectedFont;
+ 
+ 	return (
+ 		<div className="font-library__tabpanel-layout">
+@@ -301,7 +283,23 @@ function FontCollection( { slug }: { slug: string } ) {
+ 										{ selectedCollection.description }
+ 									</WCText>
+ 								</VStack>
+-								<ActionsComponent />
++								{ showActions && (
++									<DropdownMenu
++										icon={ moreVertical }
++										label={ __( 'Actions' ) }
++										popoverProps={ {
++											position: 'bottom left',
++										} }
++										controls={ [
++											{
++												title: __(
++													'Revoke access to Google Fonts'
++												),
++												onClick: revokeAccess,
++											},
++										] }
++									/>
++								) }
+ 							</HStack>
+ 							<Spacer margin={ 4 } />
+ 							<HStack spacing={ 4 } justify="space-between">
+diff --git a/packages/rich-text/src/hook/event-listeners/index.js b/packages/rich-text/src/hook/event-listeners/index.js
+index 3be0c0fcbaca1e..d4f760abdc735a 100644
+--- a/packages/rich-text/src/hook/event-listeners/index.js
++++ b/packages/rich-text/src/hook/event-listeners/index.js
+@@ -28,7 +28,6 @@ const allEventListeners = [
+ export function useEventListeners( props ) {
+ 	const propsRef = useRef( props );
+ 	useInsertionEffect( () => {
+-		// eslint-disable-next-line react-compiler/react-compiler -- false positive, see https://github.com/facebook/react/issues/29196
+ 		propsRef.current = props;
+ 	} );
+ 	const refEffects = useMemo(
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index f43fa2f6833294..3c6ecc58826a3c 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -7,7 +7,7 @@ import { fixupPluginRules } from '@eslint/compat';
+ import globals from 'globals';
+ import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
+ import storybookPlugin from 'eslint-plugin-storybook';
+-import reactCompilerPlugin from 'eslint-plugin-react-compiler';
++import reactHooksPlugin from 'eslint-plugin-react-hooks';
+ import rawJestDomPlugin from 'eslint-plugin-jest-dom';
+ import rawTestingLibraryPlugin from 'eslint-plugin-testing-library';
+ import jestPlugin from 'eslint-plugin-jest';
+@@ -220,6 +220,9 @@ export default dedupePlugins( [
+ 	// Storybook recommended (array of 3).
+ 	...storybookPlugin.configs[ 'flat/recommended' ],
+ 
++	// React Hooks recommended-latest (includes React Compiler rules).
++	reactHooksPlugin.configs.flat[ 'recommended-latest' ],
++
+ 	// Global settings applicable to all files.
+ 	{
+ 		languageOptions: {
+@@ -283,7 +286,7 @@ export default dedupePlugins( [
+ 					definedTags: [ 'jest-environment' ],
+ 				},
+ 			],
+-			'react-compiler/react-compiler': [
++			'react-hooks/config': [
+ 				'error',
+ 				{
+ 					environment: {
+@@ -294,7 +297,7 @@ export default dedupePlugins( [
+ 			],
+ 		},
+ 		plugins: {
+-			'react-compiler': reactCompilerPlugin,
++			'react-hooks': reactHooksPlugin,
+ 			'@typescript-eslint': tseslint.plugin,
+ 		},
+ 	},
+@@ -339,7 +342,19 @@ export default dedupePlugins( [
+ 			'import/no-unresolved': 'off',
+ 			'import/named': 'off',
+ 			'@wordpress/data-no-store-string-literals': 'off',
+-			'react-compiler/react-compiler': 'off',
++		},
++	},
++
++	// Override: React Native files — disable React Compiler rules until
++	// the native codebase's legacy patterns are migrated.
++	{
++		files: [
++			'**/*.@(android|ios|native).js',
++			'packages/react-native-*/**/*.js',
++		],
++		rules: {
++			'react-hooks/immutability': 'off',
++			'react-hooks/refs': 'off',
+ 		},
+ 	},
+ 
+@@ -556,6 +571,17 @@ export default dedupePlugins( [
+ 		},
+ 	},
+ 
++	// Override: Storybook story files — disable rules-of-hooks for the
++	// `render` method pattern (hooks in a lowercase function) and
++	// static-components for inline factories used in story setup.
++	{
++		files: [ '**/@(storybook|stories)/**/*.[tj]s?(x)' ],
++		rules: {
++			'react-hooks/rules-of-hooks': 'off',
++			'react-hooks/static-components': 'off',
++		},
++	},
++
+ 	// Override: Storybook + components — enforce JSX file extensions.
+ 	{
+ 		files: [
+@@ -775,11 +801,10 @@ export default dedupePlugins( [
+ 		},
+ 	},
+ 
+-	// Override: Interactivity packages — disable react-compiler, require react import.
++	// Override: Interactivity packages — require react import.
+ 	{
+ 		files: [ 'packages/interactivity*/src/**' ],
+ 		rules: {
+-			'react-compiler/react-compiler': 'off',
+ 			'react/react-in-jsx-scope': 'error',
+ 		},
+ 	},
+@@ -845,21 +870,9 @@ export default dedupePlugins( [
+ 		},
+ 	},
+ 
+-	// Override: Files with __unstable/__experimental prefixed functions that use hooks.
+-	// react-hooks v5 rejects hook calls in functions not matching useX or PascalCase naming.
+-	// These are known legacy patterns being phased out.
+-	{
+-		files: [
+-			'packages/block-editor/src/components/block-variation-transforms/index.js',
+-			'packages/block-editor/src/components/gradients/use-gradient.js',
+-		],
+-		rules: {
+-			'react-hooks/rules-of-hooks': 'off',
+-		},
+-	},
+-
+ 	// Override: Files with pre-existing exhaustive-deps warnings that cannot use
+-	// inline eslint-disable comments (react-compiler flags those as errors).
++	// inline eslint-disable comments because the React Compiler rules in
++	// `react-hooks` flag those as errors.
+ 	{
+ 		files: [
+ 			'packages/block-editor/src/components/inserter/media-tab/hooks.js',
+diff --git a/tools/eslint/package.json b/tools/eslint/package.json
+index 87cbbdc05a0176..ebf3e1fa666477 100644
+--- a/tools/eslint/package.json
++++ b/tools/eslint/package.json
+@@ -35,7 +35,7 @@
+ 		"eslint-plugin-jest": "28.11.0",
+ 		"eslint-plugin-jest-dom": "5.5.0",
+ 		"eslint-plugin-prettier": "5.5.5",
+-		"eslint-plugin-react-compiler": "^19.1.0-rc.2",
++		"eslint-plugin-react-hooks": "7.1.1",
+ 		"eslint-plugin-storybook": "10.2.19",
+ 		"eslint-plugin-testing-library": "7.16.0",
+ 		"glob": "7.1.2",
+diff --git a/tools/eslint/suppressions.json b/tools/eslint/suppressions.json
+index 024cd9198872d9..f0136c3a76911d 100644
+--- a/tools/eslint/suppressions.json
++++ b/tools/eslint/suppressions.json
+@@ -29,6 +29,21 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/block-editor/src/components/block-list/block.js": {
++		"react-hooks/immutability": {
++			"count": 2
++		}
++	},
++	"packages/block-editor/src/components/block-list/use-block-props/index.js": {
++		"react-hooks/immutability": {
++			"count": 2
++		}
++	},
++	"packages/block-editor/src/components/block-lock/toolbar.js": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
+ 	"packages/block-editor/src/components/block-manager/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -72,6 +87,24 @@
+ 	"packages/block-editor/src/components/block-toolbar/pattern-overrides-dropdown.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
++		},
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/block-editor/src/components/block-tools/block-toolbar-popover.js": {
++		"react-hooks/refs": {
++			"count": 4
++		}
++	},
++	"packages/block-editor/src/components/block-tools/empty-block-inserter.js": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
++	"packages/block-editor/src/components/block-visibility/viewport-toolbar.js": {
++		"react-hooks/refs": {
++			"count": 2
+ 		}
+ 	},
+ 	"packages/block-editor/src/components/block-visibility/viewport-visibility-info.js": {
+@@ -129,6 +162,14 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/block-editor/src/components/iframe/use-scale-canvas.js": {
++		"react-hooks/immutability": {
++			"count": 4
++		},
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
+ 	"packages/block-editor/src/components/image-size-control/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
+@@ -174,6 +215,16 @@
+ 			"count": 2
+ 		}
+ 	},
++	"packages/block-editor/src/components/link-control/use-create-page.js": {
++		"react-hooks/immutability": {
++			"count": 1
++		}
++	},
++	"packages/block-editor/src/components/link-picker/link-picker.js": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
+ 	"packages/block-editor/src/components/link-picker/link-preview.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
+@@ -184,6 +235,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/block-editor/src/components/list-view/branch.js": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
+ 	"packages/block-editor/src/components/list-view/drop-indicator.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -199,6 +255,21 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/block-editor/src/components/rich-text/index.js": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/block-editor/src/components/rich-text/input-event.js": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/block-editor/src/components/rich-text/shortcut.js": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
+ 	"packages/block-editor/src/components/spacing-sizes-control/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
+@@ -207,6 +278,9 @@
+ 	"packages/block-editor/src/components/url-popover/image-url-input-ui.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
++		},
++		"react-hooks/refs": {
++			"count": 1
+ 		}
+ 	},
+ 	"packages/block-editor/src/components/url-popover/link-viewer-url.js": {
+@@ -239,9 +313,17 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/block-library/src/breadcrumbs/edit.js": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
+ 	"packages/block-library/src/button/edit.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
++		},
++		"react-hooks/refs": {
++			"count": 1
+ 		}
+ 	},
+ 	"packages/block-library/src/columns/edit.js": {
+@@ -254,6 +336,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/block-library/src/cover/edit/index.js": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
+ 	"packages/block-library/src/cover/edit/inspector-controls.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -264,6 +351,21 @@
+ 			"count": 3
+ 		}
+ 	},
++	"packages/block-library/src/form-input/edit.js": {
++		"react-hooks/refs": {
++			"count": 3
++		}
++	},
++	"packages/block-library/src/gallery/edit.js": {
++		"react-hooks/immutability": {
++			"count": 1
++		}
++	},
++	"packages/block-library/src/group/edit.js": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
+ 	"packages/block-library/src/html/edit.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -279,6 +381,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/block-library/src/list-item/hooks/use-enter.js": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
+ 	"packages/block-library/src/math/edit.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -287,11 +394,22 @@
+ 	"packages/block-library/src/media-text/edit.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
++		},
++		"react-hooks/immutability": {
++			"count": 1
++		}
++	},
++	"packages/block-library/src/navigation-link/edit.js": {
++		"react-hooks/immutability": {
++			"count": 6
+ 		}
+ 	},
+ 	"packages/block-library/src/navigation-link/link-ui/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
++		},
++		"react-hooks/refs": {
++			"count": 4
+ 		}
+ 	},
+ 	"packages/block-library/src/navigation-link/link-ui/page-creator.js": {
+@@ -299,11 +417,21 @@
+ 			"count": 2
+ 		}
+ 	},
++	"packages/block-library/src/navigation/edit/index.js": {
++		"react-hooks/immutability": {
++			"count": 3
++		}
++	},
+ 	"packages/block-library/src/navigation/edit/navigation-list-view-header.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
+ 		}
+ 	},
++	"packages/block-library/src/navigation/edit/navigation-menu-selector.js": {
++		"react-hooks/immutability": {
++			"count": 1
++		}
++	},
+ 	"packages/block-library/src/navigation/edit/overlay-menu-preview-button.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -324,6 +452,16 @@
+ 			"count": 2
+ 		}
+ 	},
++	"packages/block-library/src/navigation/edit/unsaved-inner-blocks.js": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/block-library/src/paragraph/use-enter.js": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
+ 	"packages/block-library/src/post-author/edit.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
+@@ -394,6 +532,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/block-library/src/utils/waveform-player.js": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
+ 	"packages/block-library/src/video/tracks-editor.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
+@@ -427,6 +570,127 @@
+ 	"packages/commands/src/components/command-menu.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
++		},
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/components/src/autocomplete/autocompleter-ui.tsx": {
++		"react-hooks/refs": {
++			"count": 6
++		}
++	},
++	"packages/components/src/autocomplete/index.tsx": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
++	"packages/components/src/base-control/stories/index.story.tsx": {
++		"react-hooks/immutability": {
++			"count": 1
++		}
++	},
++	"packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/components/src/custom-gradient-picker/index.tsx": {
++		"react-hooks/immutability": {
++			"count": 1
++		}
++	},
++	"packages/components/src/draggable/index.tsx": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/components/src/form-file-upload/index.tsx": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/components/src/input-control/input-field.tsx": {
++		"react-hooks/immutability": {
++			"count": 2
++		}
++	},
++	"packages/components/src/navigation/index.tsx": {
++		"react-hooks/refs": {
++			"count": 3
++		}
++	},
++	"packages/components/src/number-control/index.tsx": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
++	"packages/components/src/panel/body.tsx": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/components/src/popover/index.tsx": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/components/src/range-control/index.tsx": {
++		"react-hooks/immutability": {
++			"count": 3
++		},
++		"react-hooks/refs": {
++			"count": 4
++		}
++	},
++	"packages/components/src/slot-fill/slot.tsx": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/components/src/toggle-group-control/toggle-group-control/utils.ts": {
++		"react-hooks/refs": {
++			"count": 11
++		}
++	},
++	"packages/components/src/toolbar/toolbar-item/index.tsx": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/components/src/tools-panel/tools-panel/hook.ts": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
++	"packages/components/src/tree-grid/cell.tsx": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/compose/src/hooks/use-dialog/index.ts": {
++		"react-hooks/immutability": {
++			"count": 1
++		}
++	},
++	"packages/compose/src/hooks/use-dragging/index.js": {
++		"react-hooks/immutability": {
++			"count": 1
++		}
++	},
++	"packages/compose/src/hooks/use-focus-return/index.js": {
++		"react-hooks/immutability": {
++			"count": 2
++		}
++	},
++	"packages/compose/src/hooks/use-merge-refs/index.ts": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/compose/src/hooks/use-previous/index.ts": {
++		"react-hooks/refs": {
++			"count": 1
+ 		}
+ 	},
+ 	"packages/connectors/src/connector-item.tsx": {
+@@ -439,6 +703,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/data/src/components/use-select/index.ts": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
+ 	"packages/dataviews/src/components/dataform-layouts/panel/dropdown.tsx": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -454,6 +723,21 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/dataviews/src/components/dataviews-bulk-actions/index.tsx": {
++		"react-hooks/refs": {
++			"count": 4
++		}
++	},
++	"packages/dataviews/src/components/dataviews-layouts/picker-table/index.tsx": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/dataviews/src/components/dataviews-layouts/table/index.tsx": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
+ 	"packages/dataviews/src/components/dataviews-view-config/index.tsx": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -479,16 +763,39 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/dataviews/src/hooks/use-data.ts": {
++		"react-hooks/refs": {
++			"count": 8
++		}
++	},
++	"packages/dataviews/src/hooks/use-infinite-scroll.ts": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
+ 	"packages/edit-post/src/components/init-pattern-modal/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
+ 		}
+ 	},
++	"packages/edit-post/src/components/layout/index.js": {
++		"react-hooks/immutability": {
++			"count": 2
++		},
++		"react-hooks/refs": {
++			"count": 3
++		}
++	},
+ 	"packages/edit-post/src/components/welcome-guide/default.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+ 		}
+ 	},
++	"packages/edit-site/src/components/add-new-pattern/index.js": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
+ 	"packages/edit-site/src/components/add-new-post/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
+@@ -524,6 +831,16 @@
+ 			"count": 2
+ 		}
+ 	},
++	"packages/edit-site/src/components/editor/use-resolve-edited-entity.js": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
++	"packages/edit-site/src/components/layout/index.js": {
++		"react-hooks/refs": {
++			"count": 3
++		}
++	},
+ 	"packages/edit-site/src/components/page-patterns/fields.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -544,6 +861,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/edit-site/src/components/resizable-frame/index.js": {
++		"react-hooks/refs": {
++			"count": 4
++		}
++	},
+ 	"packages/edit-site/src/components/save-hub/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -579,6 +901,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/edit-widgets/src/components/layout/index.js": {
++		"react-hooks/refs": {
++			"count": 3
++		}
++	},
+ 	"packages/edit-widgets/src/components/welcome-guide/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -587,6 +914,14 @@
+ 	"packages/editor/src/components/document-bar/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
++		},
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
++	"packages/editor/src/components/document-outline/index.js": {
++		"react-hooks/refs": {
++			"count": 1
+ 		}
+ 	},
+ 	"packages/editor/src/components/error-boundary/index.js": {
+@@ -764,6 +1099,11 @@
+ 			"count": 3
+ 		}
+ 	},
++	"packages/editor/src/components/visual-editor/index.js": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
+ 	"packages/fields/src/actions/delete-post.tsx": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 3
+@@ -807,6 +1147,14 @@
+ 	"packages/fields/src/components/media-edit/index.tsx": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 3
++		},
++		"react-hooks/refs": {
++			"count": 7
++		}
++	},
++	"packages/fields/src/components/media-edit/use-moving-animation.ts": {
++		"react-hooks/refs": {
++			"count": 3
+ 		}
+ 	},
+ 	"packages/fields/src/fields/author/author-view.tsx": {
+@@ -842,6 +1190,14 @@
+ 	"packages/fields/src/fields/slug/slug-edit.tsx": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
++		},
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
++	"packages/fields/src/fields/slug/slug-view.tsx": {
++		"react-hooks/refs": {
++			"count": 1
+ 		}
+ 	},
+ 	"packages/fields/src/fields/status/status-view.tsx": {
+@@ -857,11 +1213,17 @@
+ 	"packages/format-library/src/image/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 3
++		},
++		"react-hooks/refs": {
++			"count": 2
+ 		}
+ 	},
+ 	"packages/format-library/src/language/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
++		},
++		"react-hooks/refs": {
++			"count": 2
+ 		}
+ 	},
+ 	"packages/format-library/src/link/css-classes-setting.js": {
+@@ -869,9 +1231,22 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/format-library/src/link/inline.js": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
+ 	"packages/format-library/src/math/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
++		},
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
++	"packages/format-library/src/text-color/inline.js": {
++		"react-hooks/refs": {
++			"count": 2
+ 		}
+ 	},
+ 	"packages/global-styles-ui/src/color-palette-panel.tsx": {
+@@ -1064,16 +1439,46 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/grid/src/grid.tsx": {
++		"react-hooks/refs": {
++			"count": 13
++		}
++	},
++	"packages/grid/src/resize-handle.tsx": {
++		"react-hooks/immutability": {
++			"count": 1
++		}
++	},
+ 	"packages/image-cropper/src/stories/index.story.tsx": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 3
+ 		}
+ 	},
++	"packages/interactivity/src/hooks.tsx": {
++		"react-hooks/immutability": {
++			"count": 5
++		}
++	},
+ 	"packages/media-editor/src/components/media-form/index.tsx": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+ 		}
+ 	},
++	"packages/media-editor/src/image-editor/react/components/stencils/rectangle-stencil.tsx": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
++	"packages/media-editor/src/image-editor/react/hooks/use-cropper-state.ts": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
++	"packages/media-editor/src/image-editor/react/hooks/use-interaction.ts": {
++		"react-hooks/refs": {
++			"count": 5
++		}
++	},
+ 	"packages/media-fields/src/author/view.tsx": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -1084,6 +1489,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/media-utils/src/components/media-upload-modal/upload-status-popover.tsx": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
+ 	"packages/patterns/src/components/allow-overrides-modal.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 3
+@@ -1114,6 +1524,36 @@
+ 			"count": 2
+ 		}
+ 	},
++	"packages/rich-text/src/hook/index.js": {
++		"react-hooks/refs": {
++			"count": 12
++		}
++	},
++	"packages/server-side-render/src/server-side-render.js": {
++		"react-hooks/refs": {
++			"count": 3
++		}
++	},
++	"packages/theme/src/stories/index.story.tsx": {
++		"react-hooks/refs": {
++			"count": 5
++		}
++	},
++	"packages/ui/src/alert-dialog/root.tsx": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
++	"packages/ui/src/utils/test/use-deprioritized-initial-focus.test.tsx": {
++		"react-hooks/refs": {
++			"count": 2
++		}
++	},
++	"packages/ui/src/utils/use-schedule-validation.ts": {
++		"react-hooks/refs": {
++			"count": 1
++		}
++	},
+ 	"packages/workflow/src/components/workflow-menu.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -1162,6 +1602,9 @@
+ 	"routes/guidelines/components/guideline-actions-section.tsx": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 3
++		},
++		"react-hooks/refs": {
++			"count": 2
+ 		}
+ 	},
+ 	"routes/guidelines/components/revision-history.tsx": {

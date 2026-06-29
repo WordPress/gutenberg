@@ -1,0 +1,67 @@
+diff --git a/packages/components/src/color-picker/inputs.js b/packages/components/src/color-picker/inputs.js
+index 99da852a7e8cd9..aa8d9ff7900367 100644
+--- a/packages/components/src/color-picker/inputs.js
++++ b/packages/components/src/color-picker/inputs.js
+@@ -175,11 +175,12 @@ export class Inputs extends Component {
+ 				</div>
+ 			);
+ 		} else if ( this.state.view === 'rgb' ) {
++			const legend = disableAlpha
++				? __( 'Color value in RGB' )
++				: __( 'Color value in RGBA' );
+ 			return (
+ 				<fieldset>
+-					<VisuallyHidden as="legend">
+-						{ __( 'Color value in RGB' ) }
+-					</VisuallyHidden>
++					<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
+ 					<div className="components-color-picker__inputs-fields">
+ 						<Input
+ 							source={ this.state.view }
+@@ -228,11 +229,12 @@ export class Inputs extends Component {
+ 				</fieldset>
+ 			);
+ 		} else if ( this.state.view === 'hsl' ) {
++			const legend = disableAlpha
++				? __( 'Color value in HSL' )
++				: __( 'Color value in HSLA' );
+ 			return (
+ 				<fieldset>
+-					<VisuallyHidden as="legend">
+-						{ __( 'Color value in HSL' ) }
+-					</VisuallyHidden>
++					<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
+ 					<div className="components-color-picker__inputs-fields">
+ 						<Input
+ 							source={ this.state.view }
+diff --git a/packages/components/src/color-picker/style.scss b/packages/components/src/color-picker/style.scss
+index f985945ab2a3d4..a3addf76d2f42c 100644
+--- a/packages/components/src/color-picker/style.scss
++++ b/packages/components/src/color-picker/style.scss
+@@ -227,6 +227,7 @@
+ 	padding-top: 16px;
+ 	display: flex;
+ 	align-items: flex-end;
++	min-width: 255px;
+ 
+ 	fieldset {
+ 		flex: 1;
+@@ -236,7 +237,8 @@
+ 	}
+ 
+ 	.components-color-picker__inputs-fields .components-text-control__input[type="number"] {
+-		padding: 6px 8px;
++		padding: 6px 3px;
++		margin: 0;
+ 	}
+ }
+ 
+@@ -256,7 +258,7 @@
+ 	}
+ 
+ 	.components-base-control__field {
+-		margin: 0 4px;
++		margin: 0 2px;
+ 	}
+ }
+ 

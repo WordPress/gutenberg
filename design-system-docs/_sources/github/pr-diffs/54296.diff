@@ -1,0 +1,391 @@
+diff --git a/packages/block-editor/src/hooks/block-rename-ui.js b/packages/block-editor/src/hooks/block-rename-ui.js
+index 835a09556aed5e..ec13198f4dd701 100644
+--- a/packages/block-editor/src/hooks/block-rename-ui.js
++++ b/packages/block-editor/src/hooks/block-rename-ui.js
+@@ -69,6 +69,7 @@ function RenameModal( { blockName, originalBlockName, onClose, onSave } ) {
+ 			aria={ {
+ 				describedby: dialogDescription,
+ 			} }
++			focusOnMount="firstElement"
+ 		>
+ 			<p id={ dialogDescription }>
+ 				{ __( 'Enter a custom name for this block.' ) }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d0e758045f4817..89cd1e7f0212ba 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking changes
++
++-   Update `Modal` so that when passing `firstElement` as the `focusOnMount` prop it will optimize for focusing first element within the Modal's _contents_ as opposed to the entire component. ([#54296](https://github.com/WordPress/gutenberg/pull/54296)).
++
+ ### Enhancements
+ 
+ -   Making Circular Option Picker a `listbox`. Note that while this changes some public API, new props are optional, and currently have default values; this will change in another patch ([#52255](https://github.com/WordPress/gutenberg/pull/52255)).
+diff --git a/packages/components/src/modal/README.md b/packages/components/src/modal/README.md
+index 01cad7d6ff2e0f..944fc6c384db8e 100644
+--- a/packages/components/src/modal/README.md
++++ b/packages/components/src/modal/README.md
+@@ -189,7 +189,11 @@ Titles are required for accessibility reasons, see `aria.labelledby` and `title`
+ 
+ #### `focusOnMount`: `boolean | 'firstElement'`
+ 
+-If this property is true, it will focus the first tabbable element rendered in the modal.
++If this property is true, it will focus the first tabbable element rendered anywhere within the modal.
++
++If the value `firstElement` is used then the component will attempt to place focus
++within the Modal's **contents**, initially skipping focusable nodes within the Modal's header. This is useful
++for Modal's which contain immediately focusable elements such as form fields.
+ 
+ -   Required: No
+ -   Default: `true`
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index d21a3f9ae3535e..fafdb41ed49d91 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -39,6 +39,32 @@ import type { ModalProps } from './types';
+ // Used to count the number of open modals.
+ let openModalCount = 0;
+ 
++/**
++ * When `firstElement` is passed to `focusOnMount`, this function is optimized to
++ * avoid focusing on the `Close` button (or other "header" elements of the Modal
++ * and instead focus within the Modal's contents.
++ * However, if no tabbable elements are found within the Modal's contents, the
++ * first tabbable element (likely the `Close` button) will be focused instead.
++ * This ensures that at least one element is focused whilst still optimizing
++ * for the best a11y experience.
++ *
++ * See: https://github.com/WordPress/gutenberg/issues/54106.
++ * @param tabbables Element[] an array of tabbable elements.
++ * @return Element the first tabbable element in the Modal contents (or any tabbable element if none are found in content).
++ */
++function getFirstTabbableElement( tabbables: Element[] ) {
++	return (
++		// Attempt to locate tabbable outside of the header portion of the Modal.
++		tabbables.find(
++			( tabbable ) =>
++				tabbable.closest( `.${ MODAL_HEADER_CLASSNAME }` ) === null
++		) ??
++		// Fallback to the first tabbable element anywhere within the Modal.
++		// Likely the `Close` button.
++		tabbables[ 0 ]
++	);
++}
++
+ function UnforwardedModal(
+ 	props: ModalProps,
+ 	forwardedRef: ForwardedRef< HTMLDivElement >
+@@ -75,7 +101,13 @@ function UnforwardedModal(
+ 	const headingId = title
+ 		? `components-modal-header-${ instanceId }`
+ 		: aria.labelledby;
+-	const focusOnMountRef = useFocusOnMount( focusOnMount );
++
++	// If focusOnMount is `firstElement`, Modals should ignore the `Close` button which is the first focusable element.
++	// Remap `true` to select the next focusable element instead.
++	const focusOnMountRef = useFocusOnMount(
++		focusOnMount === 'firstElement' ? getFirstTabbableElement : focusOnMount
++	);
++
+ 	const constrainedTabbingRef = useConstrainedTabbing();
+ 	const focusReturnRef = useFocusReturn();
+ 	const focusOutsideProps = useFocusOutside( onRequestClose );
+diff --git a/packages/components/src/modal/stories/index.story.tsx b/packages/components/src/modal/stories/index.story.tsx
+index 8405a6eb0113e3..fe43db1ad691db 100644
+--- a/packages/components/src/modal/stories/index.story.tsx
++++ b/packages/components/src/modal/stories/index.story.tsx
+@@ -28,7 +28,8 @@ const meta: Meta< typeof Modal > = {
+ 			control: { type: null },
+ 		},
+ 		focusOnMount: {
+-			control: { type: 'boolean' },
++			options: [ true, false, 'firstElement' ],
++			control: { type: 'select' },
+ 		},
+ 		role: {
+ 			control: { type: 'text' },
+diff --git a/packages/components/src/modal/test/index.tsx b/packages/components/src/modal/test/index.tsx
+index c2ab277f721570..93027af900c1ae 100644
+--- a/packages/components/src/modal/test/index.tsx
++++ b/packages/components/src/modal/test/index.tsx
+@@ -129,4 +129,178 @@ describe( 'Modal', () => {
+ 			screen.getByText( 'A sweet button', { selector: 'button' } )
+ 		).toBeInTheDocument();
+ 	} );
++
++	describe( 'Focus handling', () => {
++		let originalGetClientRects: () => DOMRectList;
++
++		beforeEach( () => {
++			/**
++			 * The test environment does not have a layout engine, so we need to mock
++			 * the getClientRects method. This ensures that the focusable elements can be
++			 * found by the `focusOnMount` logic which depends on layout information
++			 * to determine if the element is visible or not.
++			 * See https://github.com/WordPress/gutenberg/blob/trunk/packages/dom/src/focusable.js#L55-L61.
++			 */
++			// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
++			window.HTMLElement.prototype.getClientRects = function () {
++				return [ 'trick-jsdom-into-having-size-for-element-rect' ];
++			};
++		} );
++
++		afterEach( () => {
++			// Restore original HTMLElement prototype.
++			// See beforeEach for details.
++			window.HTMLElement.prototype.getClientRects =
++				originalGetClientRects;
++		} );
++
++		it( 'should focus the first focusable element in the contents (if found) when `firstElement` passed as value for `focusOnMount` prop', async () => {
++			const user = userEvent.setup();
++
++			const FocusMountDemo = () => {
++				const [ isShown, setIsShown ] = useState( false );
++				return (
++					<>
++						<button onClick={ () => setIsShown( true ) }>📣</button>
++						{ isShown && (
++							<Modal
++								focusOnMount="firstElement"
++								onRequestClose={ () => setIsShown( false ) }
++							>
++								<p>Modal content</p>
++								<a
++									href="https://wordpress.org"
++									data-testid="first-focusable-element"
++								>
++									First Focusable Element
++								</a>
++
++								<a href="https://wordpress.org">
++									Another Focusable Element
++								</a>
++							</Modal>
++						) }
++					</>
++				);
++			};
++
++			render( <FocusMountDemo /> );
++
++			const opener = screen.getByRole( 'button' );
++
++			await user.click( opener );
++
++			expect(
++				screen.getByTestId( 'first-focusable-element' )
++			).toHaveFocus();
++		} );
++
++		it( 'should focus the first focusable element anywhere within the dialog when `firstElement` passed as value for `focusOnMount` prop but there is no focusable element in the Modal contents', async () => {
++			const user = userEvent.setup();
++
++			const FocusMountDemo = () => {
++				const [ isShown, setIsShown ] = useState( false );
++				return (
++					<>
++						<button onClick={ () => setIsShown( true ) }>📣</button>
++						{ isShown && (
++							<Modal
++								focusOnMount="firstElement"
++								onRequestClose={ () => setIsShown( false ) }
++							>
++								<p>Modal content with no focusable elements.</p>
++							</Modal>
++						) }
++					</>
++				);
++			};
++
++			render( <FocusMountDemo /> );
++
++			const opener = screen.getByRole( 'button' );
++
++			await user.click( opener );
++
++			// The close button is the first focusable element in the dialog.
++			expect(
++				screen.getByRole( 'button', {
++					name: 'Close',
++				} )
++			).toHaveFocus();
++		} );
++
++		it( 'should focus the Modal dialog when `true` passed as value for `focusOnMount` prop', async () => {
++			const user = userEvent.setup();
++			const FocusMountDemo = () => {
++				const [ isShown, setIsShown ] = useState( false );
++				return (
++					<>
++						<button onClick={ () => setIsShown( true ) }>📣</button>
++						{ isShown && (
++							<Modal
++								focusOnMount
++								onRequestClose={ () => setIsShown( false ) }
++							>
++								<p>Modal content</p>
++								<a
++									href="https://wordpress.org"
++									data-testid="first-focusable-element"
++								>
++									First Focusable Element
++								</a>
++
++								<a href="https://wordpress.org">
++									Another Focusable Element
++								</a>
++							</Modal>
++						) }
++					</>
++				);
++			};
++			render( <FocusMountDemo /> );
++
++			const opener = screen.getByRole( 'button' );
++
++			await user.click( opener );
++
++			expect( screen.getByRole( 'dialog' ) ).toHaveFocus();
++		} );
++
++		it( 'should not move focus when `false` passed as value for `focusOnMount` prop', async () => {
++			const user = userEvent.setup();
++			const FocusMountDemo = () => {
++				const [ isShown, setIsShown ] = useState( false );
++				return (
++					<>
++						<button onClick={ () => setIsShown( true ) }>📣</button>
++						{ isShown && (
++							<Modal
++								focusOnMount={ false }
++								onRequestClose={ () => setIsShown( false ) }
++							>
++								<p>Modal content</p>
++								<a
++									href="https://wordpress.org"
++									data-testid="first-focusable-element"
++								>
++									First Focusable Element
++								</a>
++
++								<a href="https://wordpress.org">
++									Another Focusable Element
++								</a>
++							</Modal>
++						) }
++					</>
++				);
++			};
++			render( <FocusMountDemo /> );
++
++			const opener = screen.getByRole( 'button' );
++
++			await user.click( opener );
++
++			expect( opener ).toHaveFocus();
++		} );
++	} );
+ } );
+diff --git a/packages/compose/CHANGELOG.md b/packages/compose/CHANGELOG.md
+index ab2f98424481d5..ce41a813f65ac2 100644
+--- a/packages/compose/CHANGELOG.md
++++ b/packages/compose/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   Update `useFocusOnMount` to allow passing a callback as the primary argument. This allows for consumers to optionally implement custom focus handling. ([#54296](https://github.com/WordPress/gutenberg/pull/54296)).
++
+ ## 6.18.0 (2023-08-31)
+ 
+ ## 6.17.0 (2023-08-16)
+diff --git a/packages/compose/README.md b/packages/compose/README.md
+index 62ebdef6d798ed..4d3c78baea41e5 100644
+--- a/packages/compose/README.md
++++ b/packages/compose/README.md
+@@ -315,7 +315,7 @@ const WithFocusOnMount = () => {
+ 
+ _Parameters_
+ 
+--   _focusOnMount_ `boolean | 'firstElement'`: Focus on mount mode.
++-   _focusOnMount_ `boolean | 'firstElement' | ((tabbables: Element[]) => Element | null | undefined)`: Focus on mount mode. May optionally be a callback that receives an array of tabbable elements and should return the element to focus.
+ 
+ _Returns_
+ 
+diff --git a/packages/compose/src/hooks/use-focus-on-mount/index.js b/packages/compose/src/hooks/use-focus-on-mount/index.js
+index c5176b17e9ceab..3829616562af0a 100644
+--- a/packages/compose/src/hooks/use-focus-on-mount/index.js
++++ b/packages/compose/src/hooks/use-focus-on-mount/index.js
+@@ -7,7 +7,7 @@ import { focus } from '@wordpress/dom';
+ /**
+  * Hook used to focus the first tabbable element on mount.
+  *
+- * @param {boolean | 'firstElement'} focusOnMount Focus on mount mode.
++ * @param {boolean | 'firstElement' | ((tabbables: Element[]) => Element | null | undefined) } focusOnMount Focus on mount mode. May optionally be a callback that receives an array of tabbable elements and should return the element to focus.
+  * @return {import('react').RefCallback<HTMLElement>} Ref callback.
+  *
+  * @example
+@@ -79,6 +79,25 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
+ 			return;
+ 		}
+ 
++		if ( typeof focusOnMountRef?.current === 'function' ) {
++			// Store a reference to the function to ensure that the
++			// focusOnMountRef will still hold a reference to a function
++			// when the timeout fires.
++			const focusOnMountFunc = focusOnMountRef.current;
++
++			timerId.current = setTimeout( () => {
++				const tabbables = focus.tabbable.find( node );
++
++				const elementToFocus = focusOnMountFunc( tabbables );
++
++				if ( elementToFocus ) {
++					setFocus( /** @type {HTMLElement} */ ( elementToFocus ) );
++				}
++			}, 0 );
++
++			return;
++		}
++
+ 		setFocus( node );
+ 	}, [] );
+ }
+diff --git a/test/e2e/specs/editor/various/block-renaming.spec.js b/test/e2e/specs/editor/various/block-renaming.spec.js
+index 8568258aaa4fda..c0f056e7b6e3d7 100644
+--- a/test/e2e/specs/editor/various/block-renaming.spec.js
++++ b/test/e2e/specs/editor/various/block-renaming.spec.js
+@@ -58,12 +58,14 @@ test.describe( 'Block Renaming', () => {
+ 				name: 'Rename',
+ 			} );
+ 
+-			// Check focus is transferred into modal.
+-			await expect( renameModal ).toBeFocused();
+-
+ 			// Check the Modal is perceivable.
+ 			await expect( renameModal ).toBeVisible();
+ 
++			const nameInput = renameModal.getByLabel( 'Block name' );
++
++			// Check focus is transferred into the input within the Modal.
++			await expect( nameInput ).toBeFocused();
++
+ 			const saveButton = renameModal.getByRole( 'button', {
+ 				name: 'Save',
+ 				type: 'submit',
+@@ -71,8 +73,6 @@ test.describe( 'Block Renaming', () => {
+ 
+ 			await expect( saveButton ).toBeDisabled();
+ 
+-			const nameInput = renameModal.getByLabel( 'Block name' );
+-
+ 			await expect( nameInput ).toHaveAttribute( 'placeholder', 'Group' );
+ 
+ 			await nameInput.fill( 'My new name' );

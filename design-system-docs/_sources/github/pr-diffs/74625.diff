@@ -1,0 +1,407 @@
+diff --git a/packages/private-apis/src/implementation.ts b/packages/private-apis/src/implementation.ts
+index cf6f3aa298853f..f3292cf2898499 100644
+--- a/packages/private-apis/src/implementation.ts
++++ b/packages/private-apis/src/implementation.ts
+@@ -36,6 +36,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
+ 	'@wordpress/routes',
+ 	'@wordpress/sync',
+ 	'@wordpress/theme',
++	'@wordpress/ui',
+ 	'@wordpress/dataviews',
+ 	'@wordpress/fields',
+ 	'@wordpress/lazy-editor',
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 7b0c9cd537d9cd..38754353aebda1 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -4,4 +4,5 @@ export * from './button';
+ export * from './form/primitives';
+ export * from './icon';
+ export * from './stack';
++export * as Tooltip from './tooltip';
+ export * from './visually-hidden';
+diff --git a/packages/ui/src/tooltip/index.ts b/packages/ui/src/tooltip/index.ts
+new file mode 100644
+index 00000000000000..26667374f3f863
+--- /dev/null
++++ b/packages/ui/src/tooltip/index.ts
+@@ -0,0 +1,6 @@
++import { Popup } from './popup';
++import { Trigger } from './trigger';
++import { Root } from './root';
++import { Provider } from './provider';
++
++export { Provider, Root, Trigger, Popup };
+diff --git a/packages/ui/src/tooltip/popup.tsx b/packages/ui/src/tooltip/popup.tsx
+new file mode 100644
+index 00000000000000..c93053645ea5f3
+--- /dev/null
++++ b/packages/ui/src/tooltip/popup.tsx
+@@ -0,0 +1,64 @@
++import clsx from 'clsx';
++import { Tooltip } from '@base-ui/react/tooltip';
++import { forwardRef } from '@wordpress/element';
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
++import type { PopupProps } from './types';
++import { unlock } from '../lock-unlock';
++import resetStyles from '../utils/css/resets.module.css';
++import styles from './style.module.css';
++
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
++const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
++	{
++		align = 'center',
++		side = 'bottom',
++		sideOffset = 4,
++		children,
++		className,
++		style,
++		...props
++	},
++	ref
++) {
++	return (
++		<Tooltip.Portal>
++			<Tooltip.Positioner
++				align={ align }
++				side={ side }
++				sideOffset={ sideOffset }
++				style={ style }
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					className,
++					styles.positioner
++				) }
++			>
++				{ /* This should ideally use whatever dark color makes sense,
++				and not be hardcoded to #1e1e1e. The solutions would be to:
++				  - review the design of the tooltip, in case we want to stop
++				    hardcoding it to a dark background
++				  - create new semantic tokens as needed (aliasing either the "inverted
++					  bg" or "perma-dark bg" private tokens) and have Tooltip.Popup use
++				    them;
++				  - remove the hardcoded `bg` setting from the `ThemeProvider` below
++					*/ }
++				<ThemeProvider color={ { bg: '#1e1e1e' } }>
++					<Tooltip.Popup
++						ref={ ref }
++						className={ styles.popup }
++						{ ...props }
++					>
++						{ children }
++					</Tooltip.Popup>
++				</ThemeProvider>
++			</Tooltip.Positioner>
++		</Tooltip.Portal>
++	);
++} );
++
++export { Popup };
+diff --git a/packages/ui/src/tooltip/provider.tsx b/packages/ui/src/tooltip/provider.tsx
+new file mode 100644
+index 00000000000000..736604655b1388
+--- /dev/null
++++ b/packages/ui/src/tooltip/provider.tsx
+@@ -0,0 +1,8 @@
++import { Tooltip } from '@base-ui/react/tooltip';
++import type { ProviderProps } from './types';
++
++function Provider( { children, ...props }: ProviderProps ) {
++	return <Tooltip.Provider { ...props }>{ children }</Tooltip.Provider>;
++}
++
++export { Provider };
+diff --git a/packages/ui/src/tooltip/root.tsx b/packages/ui/src/tooltip/root.tsx
+new file mode 100644
+index 00000000000000..ead8f13585f6f5
+--- /dev/null
++++ b/packages/ui/src/tooltip/root.tsx
+@@ -0,0 +1,8 @@
++import { Tooltip } from '@base-ui/react/tooltip';
++import type { RootProps } from './types';
++
++function Root( props: RootProps ) {
++	return <Tooltip.Root { ...props } />;
++}
++
++export { Root };
+diff --git a/packages/ui/src/tooltip/stories/index.story.tsx b/packages/ui/src/tooltip/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..48e20bf6e5d32d
+--- /dev/null
++++ b/packages/ui/src/tooltip/stories/index.story.tsx
+@@ -0,0 +1,97 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { Tooltip } from '../..';
++
++const meta: Meta< typeof Tooltip.Root > = {
++	title: 'Design System/Components/Tooltip',
++	component: Tooltip.Root,
++	subcomponents: {
++		Provider: Tooltip.Provider,
++		Trigger: Tooltip.Trigger,
++		Popup: Tooltip.Popup,
++	},
++};
++export default meta;
++
++export const Default: StoryObj< typeof Tooltip.Root > = {
++	args: {
++		children: (
++			<>
++				<Tooltip.Trigger>Hover me</Tooltip.Trigger>
++				<Tooltip.Popup>Tooltip text</Tooltip.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * The `disabled` prop prevents the tooltip from showing, and can be used to
++ * show the tooltip conditionally without rendering the underlying react
++ * component conditionally (which could cause reconciliation issues).
++ */
++export const Disabled: StoryObj< typeof Tooltip.Root > = {
++	...Default,
++	args: {
++		...Default.args,
++		disabled: true,
++	},
++};
++
++/**
++ * Use the `side` prop to control where the tooltip appears relative to the
++ * trigger element.
++ */
++export const Positioning: StoryObj< typeof Tooltip.Root > = {
++	render: () => (
++		<div
++			style={ {
++				display: 'flex',
++				gap: '2rem',
++				padding: '4rem',
++				justifyContent: 'center',
++			} }
++		>
++			<Tooltip.Root>
++				<Tooltip.Trigger>Top</Tooltip.Trigger>
++				<Tooltip.Popup side="top">Tooltip on top</Tooltip.Popup>
++			</Tooltip.Root>
++
++			<Tooltip.Root>
++				<Tooltip.Trigger>Right</Tooltip.Trigger>
++				<Tooltip.Popup side="right">Tooltip on right</Tooltip.Popup>
++			</Tooltip.Root>
++
++			<Tooltip.Root>
++				<Tooltip.Trigger>Bottom</Tooltip.Trigger>
++				<Tooltip.Popup side="bottom">Tooltip on bottom</Tooltip.Popup>
++			</Tooltip.Root>
++
++			<Tooltip.Root>
++				<Tooltip.Trigger>Left</Tooltip.Trigger>
++				<Tooltip.Popup side="left">Tooltip on left</Tooltip.Popup>
++			</Tooltip.Root>
++		</div>
++	),
++};
++
++/**
++ * Use `Tooltip.Provider` to control the delay before tooltips appear.
++ * This is useful when you have multiple tooltips and want them to share
++ * the same delay configuration.
++ */
++export const WithProvider: StoryObj< typeof Tooltip.Root > = {
++	render: () => (
++		<Tooltip.Provider delay={ 0 }>
++			<div style={ { display: 'flex', gap: '1rem' } }>
++				<Tooltip.Root>
++					<Tooltip.Trigger>First</Tooltip.Trigger>
++					<Tooltip.Popup>First tooltip</Tooltip.Popup>
++				</Tooltip.Root>
++
++				<Tooltip.Root>
++					<Tooltip.Trigger>Second</Tooltip.Trigger>
++					<Tooltip.Popup>Second tooltip</Tooltip.Popup>
++				</Tooltip.Root>
++			</div>
++		</Tooltip.Provider>
++	),
++};
+diff --git a/packages/ui/src/tooltip/style.module.css b/packages/ui/src/tooltip/style.module.css
+new file mode 100644
+index 00000000000000..385fd3f24586eb
+--- /dev/null
++++ b/packages/ui/src/tooltip/style.module.css
+@@ -0,0 +1,20 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.positioner {
++		z-index: var(--wp-ui-tooltip-z-index, initial);
++	}
++
++	.popup {
++		background-color: var(--wpds-color-bg-surface-neutral-strong);
++		padding:
++			var(--wpds-dimension-padding-surface-2xs)
++			var(--wpds-dimension-padding-surface-xs);
++		border-radius: var(--wpds-border-radius-surface-sm);
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wpds-font-size-sm);
++		line-height: 1.4; /* TODO: use DS token for line height */
++		color: var(--wpds-color-fg-content-neutral);
++		box-shadow: var(--wpds-elevation-small);
++	}
++}
+diff --git a/packages/ui/src/tooltip/test/index.test.tsx b/packages/ui/src/tooltip/test/index.test.tsx
+new file mode 100644
+index 00000000000000..1cd4cbfba56ad3
+--- /dev/null
++++ b/packages/ui/src/tooltip/test/index.test.tsx
+@@ -0,0 +1,87 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { createRef } from '@wordpress/element';
++import * as Tooltip from '../index';
++import type { ProviderProps } from '../types';
++
++// Test wrapper that sets delay={0} to avoid real-time delays in tests.
++function TestProvider( { children, ...props }: ProviderProps ) {
++	return (
++		<Tooltip.Provider delay={ 0 } { ...props }>
++			{ children }
++		</Tooltip.Provider>
++	);
++}
++
++describe( 'Tooltip', () => {
++	it( 'forwards ref', async () => {
++		const user = userEvent.setup();
++		const triggerRef = createRef< HTMLButtonElement >();
++		const popupRef = createRef< HTMLDivElement >();
++
++		render(
++			<TestProvider>
++				<Tooltip.Root>
++					<Tooltip.Trigger ref={ triggerRef }>
++						<span>Hover me</span>
++					</Tooltip.Trigger>
++					<Tooltip.Popup ref={ popupRef }>Tooltip text</Tooltip.Popup>
++				</Tooltip.Root>
++			</TestProvider>
++		);
++
++		// Test trigger ref before interaction
++		expect( triggerRef.current ).toBeInstanceOf( HTMLButtonElement );
++
++		// Hover over the trigger to open the tooltip
++		await user.hover( triggerRef.current! );
++
++		// Wait for the tooltip popup to appear
++		await waitFor( () => {
++			expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++		} );
++	} );
++
++	it( 'shows tooltip on hover', async () => {
++		const user = userEvent.setup();
++
++		render(
++			<TestProvider>
++				<Tooltip.Root>
++					<Tooltip.Trigger>Hover me</Tooltip.Trigger>
++					<Tooltip.Popup>Tooltip content</Tooltip.Popup>
++				</Tooltip.Root>
++			</TestProvider>
++		);
++
++		const trigger = screen.getByRole( 'button', { name: 'Hover me' } );
++		await user.hover( trigger );
++
++		// waitFor is used intentionally: even with delay={0}, the popup appearing
++		// is conceptually async (state change → render → portal mount). This also
++		// makes the test resilient to future internal changes in base-ui.
++		await waitFor( () => {
++			expect( screen.getByText( 'Tooltip content' ) ).toBeVisible();
++		} );
++	} );
++
++	it( 'does not show tooltip when disabled', async () => {
++		const user = userEvent.setup();
++
++		render(
++			<TestProvider>
++				<Tooltip.Root disabled>
++					<Tooltip.Trigger>Hover me</Tooltip.Trigger>
++					<Tooltip.Popup>Tooltip content</Tooltip.Popup>
++				</Tooltip.Root>
++			</TestProvider>
++		);
++
++		const trigger = screen.getByRole( 'button', { name: 'Hover me' } );
++		await user.hover( trigger );
++
++		expect(
++			screen.queryByText( 'Tooltip content' )
++		).not.toBeInTheDocument();
++	} );
++} );
+diff --git a/packages/ui/src/tooltip/trigger.tsx b/packages/ui/src/tooltip/trigger.tsx
+new file mode 100644
+index 00000000000000..2f5ff893e9c9e7
+--- /dev/null
++++ b/packages/ui/src/tooltip/trigger.tsx
+@@ -0,0 +1,15 @@
++import { Tooltip } from '@base-ui/react/tooltip';
++import { forwardRef } from '@wordpress/element';
++import type { TriggerProps } from './types';
++
++const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
++	function TooltipTrigger( { children, ...props }, ref ) {
++		return (
++			<Tooltip.Trigger ref={ ref } { ...props }>
++				{ children }
++			</Tooltip.Trigger>
++		);
++	}
++);
++
++export { Trigger };
+diff --git a/packages/ui/src/tooltip/types.ts b/packages/ui/src/tooltip/types.ts
+new file mode 100644
+index 00000000000000..e368e832075a6c
+--- /dev/null
++++ b/packages/ui/src/tooltip/types.ts
+@@ -0,0 +1,26 @@
++import type { ReactNode } from 'react';
++import type { Tooltip } from '@base-ui/react/tooltip';
++import type { ComponentProps } from '../utils/types';
++
++export type RootProps = Pick< Tooltip.Root.Props, 'disabled' | 'children' >;
++
++export type ProviderProps = Pick<
++	Tooltip.Provider.Props,
++	'delay' | 'children'
++>;
++
++export interface TriggerProps extends ComponentProps< 'button' > {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++}
++
++export interface PopupProps
++	extends ComponentProps< 'div' >,
++		Pick< Tooltip.Positioner.Props, 'align' | 'side' | 'sideOffset' > {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++}

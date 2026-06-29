@@ -1,0 +1,652 @@
+diff --git a/packages/components/src/alignment-matrix-control/test/index.tsx b/packages/components/src/alignment-matrix-control/test/index.tsx
+index 57c13f8c92eee0..a820b69b26c8ff 100644
+--- a/packages/components/src/alignment-matrix-control/test/index.tsx
++++ b/packages/components/src/alignment-matrix-control/test/index.tsx
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { render, screen, waitFor, within } from '@testing-library/react';
+-import { press, click, sleep } from '@ariakit/test';
++import { press, click } from '@ariakit/test';
+ 
+ /**
+  * Internal dependencies
+@@ -39,7 +39,6 @@ describe( 'AlignmentMatrixControl', () => {
+ 		it( 'should be centered by default', async () => {
+ 			await renderAndInitCompositeStore( <AlignmentMatrixControl /> );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 
+ 			expect( getCell( 'center center' ) ).toHaveFocus();
+@@ -110,7 +109,6 @@ describe( 'AlignmentMatrixControl', () => {
+ 						<AlignmentMatrixControl onChange={ spy } />
+ 					);
+ 
+-					await sleep();
+ 					await press.Tab();
+ 					await press[ keyRef ]();
+ 
+diff --git a/packages/components/src/circular-option-picker/test/index.tsx b/packages/components/src/circular-option-picker/test/index.tsx
+index 0b5ccbeecb57d8..a6e9f2c45a05ce 100644
+--- a/packages/components/src/circular-option-picker/test/index.tsx
++++ b/packages/components/src/circular-option-picker/test/index.tsx
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { render, screen } from '@testing-library/react';
+-import { press, sleep } from '@ariakit/test';
++import { press } from '@ariakit/test';
+ 
+ /**
+  * Internal dependencies
+@@ -70,7 +70,6 @@ describe( 'CircularOptionPicker', () => {
+ 				/>
+ 			);
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( getOption( 'Option One' ) ).toHaveFocus();
+ 			await press.ArrowRight();
+@@ -90,7 +89,6 @@ describe( 'CircularOptionPicker', () => {
+ 				/>
+ 			);
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( getOption( 'Option One' ) ).toHaveFocus();
+ 			await press.ArrowRight();
+@@ -110,7 +108,6 @@ describe( 'CircularOptionPicker', () => {
+ 				/>
+ 			);
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( getOption( 'Option One' ) ).toHaveFocus();
+ 			await press.ArrowRight();
+diff --git a/packages/components/src/composite/legacy/test/index.tsx b/packages/components/src/composite/legacy/test/index.tsx
+index 085ac572e3e8a1..07398e54b27ca3 100644
+--- a/packages/components/src/composite/legacy/test/index.tsx
++++ b/packages/components/src/composite/legacy/test/index.tsx
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { queryByAttribute, render, screen } from '@testing-library/react';
+-import { press, sleep, waitFor } from '@ariakit/test';
++import { press, waitFor } from '@ariakit/test';
+ 
+ /**
+  * Internal dependencies
+@@ -178,13 +178,10 @@ describe.each( [
+ 		);
+ 		renderAndValidate( <Test /> );
+ 
+-		await sleep();
+ 		await press.Tab();
+ 		expect( screen.getByText( 'Before' ) ).toHaveFocus();
+-		await sleep();
+ 		await press.Tab();
+ 		expect( screen.getByText( 'Item 1' ) ).toHaveFocus();
+-		await sleep();
+ 		await press.Tab();
+ 		expect( screen.getByText( 'After' ) ).toHaveFocus();
+ 		await press.ShiftTab();
+@@ -213,7 +210,6 @@ describe.each( [
+ 
+ 		expect( item2 ).toBeDisabled();
+ 
+-		await sleep();
+ 		await press.Tab();
+ 		expect( item1 ).toHaveFocus();
+ 		await press.ArrowDown();
+@@ -243,7 +239,6 @@ describe.each( [
+ 		expect( item2 ).toBeEnabled();
+ 		expect( item2 ).toHaveAttribute( 'aria-disabled', 'true' );
+ 
+-		await sleep();
+ 		await press.Tab();
+ 		expect( item1 ).toHaveFocus();
+ 		await press.ArrowDown();
+@@ -279,7 +274,6 @@ describe.each( [
+ 		renderAndValidate( <Test /> );
+ 		const { item2 } = getOneDimensionalItems();
+ 
+-		await sleep();
+ 		await press.Tab();
+ 		await waitFor( () => expect( item2 ).toHaveFocus() );
+ 	} );
+@@ -323,7 +317,6 @@ describe.each( [
+ 		test( 'All directions work with no orientation', async () => {
+ 			const { item1, item2, item3 } = useOneDimensionalTest();
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( item1 ).toHaveFocus();
+ 			await press.ArrowDown();
+@@ -361,7 +354,6 @@ describe.each( [
+ 				orientation: 'horizontal',
+ 			} );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( item1 ).toHaveFocus();
+ 			await press.ArrowDown();
+@@ -391,7 +383,6 @@ describe.each( [
+ 				orientation: 'vertical',
+ 			} );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( item1 ).toHaveFocus();
+ 			await press( next );
+@@ -421,7 +412,6 @@ describe.each( [
+ 				loop: true,
+ 			} );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( item1 ).toHaveFocus();
+ 			await press.ArrowDown();
+@@ -444,7 +434,6 @@ describe.each( [
+ 			const { itemA1, itemA2, itemA3, itemB1, itemB2, itemC1, itemC3 } =
+ 				useTwoDimensionalTest();
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( itemA1 ).toHaveFocus();
+ 			await press.ArrowUp();
+@@ -481,7 +470,6 @@ describe.each( [
+ 			const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
+ 				useTwoDimensionalTest( { loop: true } );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( itemA1 ).toHaveFocus();
+ 			await press( next );
+@@ -506,7 +494,6 @@ describe.each( [
+ 			const { itemA1, itemA2, itemA3, itemB1, itemC1, itemC3 } =
+ 				useTwoDimensionalTest( { wrap: true } );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( itemA1 ).toHaveFocus();
+ 			await press( next );
+@@ -539,7 +526,6 @@ describe.each( [
+ 				wrap: true,
+ 			} );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( itemA1 ).toHaveFocus();
+ 			await press( previous );
+@@ -555,7 +541,6 @@ describe.each( [
+ 		test( 'Focus shifts if vertical neighbour unavailable when shift enabled', async () => {
+ 			const { itemA1, itemB1, itemB2, itemC1 } = useShiftTest( true );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( itemA1 ).toHaveFocus();
+ 			await press.ArrowDown();
+@@ -577,7 +562,6 @@ describe.each( [
+ 		test( 'Focus does not shift if vertical neighbour unavailable when shift not enabled', async () => {
+ 			const { itemA1, itemB1, itemB2 } = useShiftTest( false );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( itemA1 ).toHaveFocus();
+ 			await press.ArrowDown();
+diff --git a/packages/components/src/custom-select-control-v2/test/index.tsx b/packages/components/src/custom-select-control-v2/test/index.tsx
+index e02eb0f774a401..060a367ba8597b 100644
+--- a/packages/components/src/custom-select-control-v2/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/test/index.tsx
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { screen } from '@testing-library/react';
+-import { click, press, sleep, type } from '@ariakit/test';
++import { click, press, type } from '@ariakit/test';
+ import { render } from '@ariakit/test/react';
+ 
+ /**
+@@ -101,7 +101,6 @@ describe.each( [
+ 			expanded: false,
+ 		} );
+ 
+-		await sleep();
+ 		await press.Tab();
+ 		await press.Enter();
+ 		expect(
+@@ -128,7 +127,6 @@ describe.each( [
+ 				expanded: false,
+ 			} );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( currentSelectedItem ).toHaveFocus();
+ 
+@@ -152,7 +150,6 @@ describe.each( [
+ 				expanded: false,
+ 			} );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			await press.Enter();
+ 			expect(
+@@ -173,7 +170,6 @@ describe.each( [
+ 				expanded: false,
+ 			} );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( currentSelectedItem ).toHaveFocus();
+ 			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+@@ -425,7 +421,6 @@ describe.each( [
+ 			expanded: false,
+ 		} );
+ 
+-		await sleep();
+ 		await press.Tab();
+ 		expect( currentSelectedItem ).toHaveFocus();
+ 		expect( currentSelectedItem ).toHaveTextContent( items[ 0 ].value );
+diff --git a/packages/components/src/custom-select-control/test/index.tsx b/packages/components/src/custom-select-control/test/index.tsx
+index fcab84773e5a0b..fdbe8d72a48dec 100644
+--- a/packages/components/src/custom-select-control/test/index.tsx
++++ b/packages/components/src/custom-select-control/test/index.tsx
+@@ -196,7 +196,6 @@ describe.each( [
+ 			expanded: false,
+ 		} );
+ 
+-		await sleep();
+ 		await press.Tab();
+ 		await press.Enter();
+ 		expect(
+@@ -388,7 +387,6 @@ describe.each( [
+ 
+ 		await render( <Component { ...props } onChange={ mockOnChange } /> );
+ 
+-		await sleep();
+ 		await press.Tab();
+ 		expect(
+ 			screen.getByRole( 'combobox', {
+@@ -494,7 +492,6 @@ describe.each( [
+ 				expanded: false,
+ 			} );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( currentSelectedItem ).toHaveFocus();
+ 
+@@ -520,7 +517,6 @@ describe.each( [
+ 				expanded: false,
+ 			} );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			await press.Enter();
+ 			expect(
+@@ -541,7 +537,6 @@ describe.each( [
+ 				expanded: false,
+ 			} );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( currentSelectedItem ).toHaveFocus();
+ 			expect( currentSelectedItem ).toHaveTextContent(
+@@ -571,7 +566,6 @@ describe.each( [
+ 				expanded: false,
+ 			} );
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect( currentSelectedItem ).toHaveFocus();
+ 			expect( currentSelectedItem ).toHaveTextContent(
+diff --git a/packages/components/src/dropdown-menu-v2/test/index.tsx b/packages/components/src/dropdown-menu-v2/test/index.tsx
+index 2829fbb8fefce0..5457f5e73e23c3 100644
+--- a/packages/components/src/dropdown-menu-v2/test/index.tsx
++++ b/packages/components/src/dropdown-menu-v2/test/index.tsx
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { render, screen, waitFor } from '@testing-library/react';
+-import { press, click, hover, sleep, type } from '@ariakit/test';
++import { press, click, hover, type } from '@ariakit/test';
+ 
+ /**
+  * WordPress dependencies
+@@ -128,7 +128,6 @@ describe( 'DropdownMenu', () => {
+ 			} );
+ 
+ 			// Move focus on the toggle
+-			await sleep();
+ 			await press.Tab();
+ 
+ 			expect( toggleButton ).toHaveFocus();
+@@ -159,7 +158,6 @@ describe( 'DropdownMenu', () => {
+ 			} );
+ 
+ 			// Move focus on the toggle
+-			await sleep();
+ 			await press.Tab();
+ 
+ 			expect( toggleButton ).toHaveFocus();
+@@ -915,7 +913,6 @@ describe( 'DropdownMenu', () => {
+ 
+ 			// The outer button can be focused by pressing tab. Doing so will cause
+ 			// the DropdownMenu to close.
+-			await sleep();
+ 			await press.Tab();
+ 			expect( outerButton ).toBeInTheDocument();
+ 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+diff --git a/packages/components/src/tab-panel/test/index.tsx b/packages/components/src/tab-panel/test/index.tsx
+index 65827040f1e34c..28dd1a81e9e84f 100644
+--- a/packages/components/src/tab-panel/test/index.tsx
++++ b/packages/components/src/tab-panel/test/index.tsx
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { render, screen, waitFor } from '@testing-library/react';
+-import { press, hover, click, sleep } from '@ariakit/test';
++import { press, hover, click } from '@ariakit/test';
+ 
+ /**
+  * WordPress dependencies
+@@ -155,7 +155,6 @@ describe.each( [
+ 			// Tab to focus the tablist. Make sure alpha is focused, and that the
+ 			// corresponding tooltip is shown.
+ 			expect( screen.queryByText( 'Alpha' ) ).not.toBeInTheDocument();
+-			await sleep();
+ 			await press.Tab();
+ 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+ 			expect( screen.getByText( 'Alpha' ) ).toBeInTheDocument();
+@@ -627,7 +626,6 @@ describe.each( [
+ 			// Tab to focus the tablist. Make sure alpha is focused.
+ 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+ 			expect( await getSelectedTab() ).not.toHaveFocus();
+-			await sleep();
+ 			await press.Tab();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 
+@@ -665,7 +663,6 @@ describe.each( [
+ 			// Tab to focus the tablist. Make sure Alpha is focused.
+ 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+ 			expect( await getSelectedTab() ).not.toHaveFocus();
+-			await sleep();
+ 			await press.Tab();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 
+@@ -703,7 +700,6 @@ describe.each( [
+ 			// Tab to focus the tablist. Make sure alpha is focused.
+ 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+ 			expect( await getSelectedTab() ).not.toHaveFocus();
+-			await sleep();
+ 			await press.Tab();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 
+@@ -799,7 +795,6 @@ describe.each( [
+ 			// Tab to focus the tablist. Make sure Alpha is focused.
+ 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+ 			expect( await getSelectedTab() ).not.toHaveFocus();
+-			await sleep();
+ 			await press.Tab();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+@@ -841,7 +836,6 @@ describe.each( [
+ 
+ 			// Tab should initially focus the first tab in the tablist, which
+ 			// is Alpha.
+-			await sleep();
+ 			await press.Tab();
+ 			expect(
+ 				await screen.findByRole( 'tab', { name: 'Alpha' } )
+@@ -849,7 +843,6 @@ describe.each( [
+ 
+ 			// Because all other tabs should have `tabindex=-1`, pressing Tab
+ 			// should NOT move the focus to the next tab, which is Beta.
+-			await sleep();
+ 			await press.Tab();
+ 			expect(
+ 				await screen.findByRole( 'tab', { name: 'Beta' } )
+diff --git a/packages/components/src/tabs/test/index.tsx b/packages/components/src/tabs/test/index.tsx
+index 382163f69e8e36..0563b0227d106e 100644
+--- a/packages/components/src/tabs/test/index.tsx
++++ b/packages/components/src/tabs/test/index.tsx
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { screen, waitFor } from '@testing-library/react';
+-import { press, click, sleep } from '@ariakit/test';
++import { press, click } from '@ariakit/test';
+ import { render } from '@ariakit/test/react';
+ 
+ /**
+@@ -195,14 +195,12 @@ describe( 'Tabs', () => {
+ 
+ 			// Tab should initially focus the first tab in the tablist, which
+ 			// is Alpha.
+-			await sleep();
+ 			await press.Tab();
+ 			expect(
+ 				await screen.findByRole( 'tab', { name: 'Alpha' } )
+ 			).toHaveFocus();
+ 
+ 			// By default the tabpanel should receive focus
+-			await sleep();
+ 			await press.Tab();
+ 			expect( selectedTabPanel ).toHaveFocus();
+ 		} );
+@@ -232,14 +230,12 @@ describe( 'Tabs', () => {
+ 
+ 			// Tab should initially focus the first tab in the tablist, which
+ 			// is Alpha.
+-			await sleep();
+ 			await press.Tab();
+ 			expect(
+ 				await screen.findByRole( 'tab', { name: 'Alpha' } )
+ 			).toHaveFocus();
+ 			// Because the alpha tabpanel is set to `focusable: false`, pressing
+ 			// the Tab key should focus the button, not the tabpanel
+-			await sleep();
+ 			await press.Tab();
+ 			expect( alphaButton ).toHaveFocus();
+ 		} );
+@@ -264,7 +260,6 @@ describe( 'Tabs', () => {
+ 				/>
+ 			);
+ 
+-			await sleep();
+ 			await press.Tab();
+ 			expect(
+ 				await screen.findByRole( 'tab', { name: 'Beta' } )
+@@ -348,7 +343,6 @@ describe( 'Tabs', () => {
+ 			// Tab to focus the tablist. Make sure alpha is focused.
+ 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+ 			expect( await getSelectedTab() ).not.toHaveFocus();
+-			await sleep();
+ 			await press.Tab();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 
+@@ -382,7 +376,6 @@ describe( 'Tabs', () => {
+ 			// Tab to focus the tablist. Make sure Alpha is focused.
+ 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+ 			expect( await getSelectedTab() ).not.toHaveFocus();
+-			await sleep();
+ 			await press.Tab();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 
+@@ -418,7 +411,6 @@ describe( 'Tabs', () => {
+ 			// Tab to focus the tablist. Make sure alpha is focused.
+ 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+ 			expect( await getSelectedTab() ).not.toHaveFocus();
+-			await sleep();
+ 			await press.Tab();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 
+@@ -518,7 +510,6 @@ describe( 'Tabs', () => {
+ 			// Tab to focus the tablist. Make sure Alpha is focused.
+ 			expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+ 			expect( await getSelectedTab() ).not.toHaveFocus();
+-			await sleep();
+ 			await press.Tab();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 			// Confirm onSelect has not been re-called
+@@ -561,7 +552,6 @@ describe( 'Tabs', () => {
+ 
+ 			// Tab should initially focus the first tab in the tablist, which
+ 			// is Alpha.
+-			await sleep();
+ 			await press.Tab();
+ 			expect(
+ 				await screen.findByRole( 'tab', { name: 'Alpha' } )
+@@ -570,7 +560,6 @@ describe( 'Tabs', () => {
+ 			// Because all other tabs should have `tabindex=-1`, pressing Tab
+ 			// should NOT move the focus to the next tab, which is Beta.
+ 			// Instead, focus should go to the currently selected tabpanel (alpha).
+-			await sleep();
+ 			await press.Tab();
+ 			expect(
+ 				await screen.findByRole( 'tabpanel', {
+@@ -881,7 +870,6 @@ describe( 'Tabs', () => {
+ 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+ 
+ 				// Move focus to the tablist, make sure alpha is focused.
+-				await sleep();
+ 				await press.Tab();
+ 				expect(
+ 					screen.getByRole( 'tab', { name: 'Alpha' } )
+@@ -1239,12 +1227,6 @@ describe( 'Tabs', () => {
+ 							/>
+ 						);
+ 
+-						// Due to the timing of the component re-rendering, we
+-						// need to force a delay to ensure the test doesn't run
+-						// the upcoming assertions too early.
+-						// see https://github.com/WordPress/gutenberg/pull/58629#issuecomment-1924875249
+-						await sleep();
+-
+ 						// Tab key should focus the currently selected tab, which is Beta.
+ 						await press.Tab();
+ 						await waitFor( async () =>
+@@ -1292,9 +1274,7 @@ describe( 'Tabs', () => {
+ 						);
+ 
+ 						// Tab key should focus the currently selected tab, which is Beta.
+-						await sleep();
+ 						await press.Tab();
+-						await sleep();
+ 						await press.Tab();
+ 						expect( await getSelectedTab() ).toHaveTextContent(
+ 							'Beta'
+@@ -1329,7 +1309,6 @@ describe( 'Tabs', () => {
+ 						).toHaveFocus();
+ 
+ 						// Press tab, move focus back to the tablist
+-						await sleep();
+ 						await press.Tab();
+ 
+ 						const betaTab = screen.getByRole( 'tab', {
+@@ -1353,7 +1332,6 @@ describe( 'Tabs', () => {
+ 					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
+ 				);
+ 
+-				await sleep();
+ 				await press.Tab();
+ 
+ 				// Tab key should focus the currently selected tab, which is Beta.
+@@ -1379,7 +1357,6 @@ describe( 'Tabs', () => {
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+ 
+ 				// Tab key should focus the currently selected tab, which is Beta.
+-				await sleep();
+ 				await press.Tab();
+ 				await waitFor( async () =>
+ 					expect(
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index 098407feef1493..661bbb9fc37bab 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -341,11 +341,9 @@ describe.each( [
+ 					name: 'R',
+ 				} );
+ 
+-				await sleep();
+ 				await press.Tab();
+ 				expect( rigas ).toHaveFocus();
+ 
+-				await sleep();
+ 				await press.Tab();
+ 
+ 				// When in controlled mode, there is an additional "Reset" button.
+@@ -372,7 +370,6 @@ describe.each( [
+ 					</Component>
+ 				);
+ 
+-				await sleep();
+ 				await press.Tab();
+ 
+ 				expect(
+@@ -448,7 +445,6 @@ describe.each( [
+ 					</Component>
+ 				);
+ 
+-				await sleep();
+ 				await press.Tab();
+ 				expect(
+ 					screen.getByRole( 'button', {
+@@ -457,7 +453,6 @@ describe.each( [
+ 					} )
+ 				).toHaveFocus();
+ 
+-				await sleep();
+ 				await press.Tab();
+ 				expect(
+ 					screen.getByRole( 'button', {
+@@ -490,7 +485,6 @@ describe.each( [
+ 					</Component>
+ 				);
+ 
+-				await sleep();
+ 				await press.Tab();
+ 
+ 				expect(
+diff --git a/packages/components/src/tooltip/test/index.tsx b/packages/components/src/tooltip/test/index.tsx
+index e406ff997c7295..67922ab1d5ac41 100644
+--- a/packages/components/src/tooltip/test/index.tsx
++++ b/packages/components/src/tooltip/test/index.tsx
+@@ -59,7 +59,6 @@ describe( 'Tooltip', () => {
+ 				screen.getByRole( 'button', { name: 'Second button' } )
+ 			).toBeVisible();
+ 
+-			await sleep();
+ 			await press.Tab();
+ 
+ 			expectTooltipToBeHidden();
+@@ -145,7 +144,6 @@ describe( 'Tooltip', () => {
+ 			);
+ 
+ 			// Focus the anchor, tooltip should show
+-			await sleep();
+ 			await press.Tab();
+ 			expect(
+ 				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
+@@ -153,7 +151,6 @@ describe( 'Tooltip', () => {
+ 			await waitExpectTooltipToShow();
+ 
+ 			// Focus the other button, tooltip should hide
+-			await sleep();
+ 			await press.Tab();
+ 			expect(
+ 				screen.getByRole( 'button', { name: 'Focus me' } )
+@@ -179,13 +176,11 @@ describe( 'Tooltip', () => {
+ 			expect( anchor ).toHaveAttribute( 'aria-disabled', 'true' );
+ 
+ 			// Focus anchor, tooltip should show
+-			await sleep();
+ 			await press.Tab();
+ 			expect( anchor ).toHaveFocus();
+ 			await waitExpectTooltipToShow();
+ 
+ 			// Focus another button, tooltip should hide
+-			await sleep();
+ 			await press.Tab();
+ 			expect(
+ 				screen.getByRole( 'button', {

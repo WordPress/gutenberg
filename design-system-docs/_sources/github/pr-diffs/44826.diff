@@ -1,0 +1,61 @@
+diff --git a/packages/components/src/tree-grid/test/__snapshots__/cell.js.snap b/packages/components/src/tree-grid/test/__snapshots__/cell.js.snap
+index 7817c3259bf5aa..2e6955e823dd73 100644
+--- a/packages/components/src/tree-grid/test/__snapshots__/cell.js.snap
++++ b/packages/components/src/tree-grid/test/__snapshots__/cell.js.snap
+@@ -5,7 +5,6 @@ exports[`TreeGridCell uses a child render function to render children 1`] = `
+   role="application"
+ >
+   <table
+-    onKeyDown={[Function]}
+     role="treegrid"
+   >
+     <tbody>
+@@ -14,8 +13,7 @@ exports[`TreeGridCell uses a child render function to render children 1`] = `
+           role="gridcell"
+         >
+           <button
+-            className="my-button"
+-            onFocus={[Function]}
++            class="my-button"
+           >
+             Click Me!
+           </button>
+diff --git a/packages/components/src/tree-grid/test/cell.js b/packages/components/src/tree-grid/test/cell.js
+index c98567fb77a518..4caf3857823699 100644
+--- a/packages/components/src/tree-grid/test/cell.js
++++ b/packages/components/src/tree-grid/test/cell.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import TestRenderer from 'react-test-renderer';
++import { render } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -21,7 +21,7 @@ const TestButton = forwardRef( ( { ...props }, ref ) => (
+ describe( 'TreeGridCell', () => {
+ 	it( 'requires TreeGrid to be declared as a parent component somewhere in the component hierarchy', () => {
+ 		expect( () =>
+-			TestRenderer.create(
++			render(
+ 				<TreeGridCell>
+ 					{ ( props ) => (
+ 						<TestButton className="my-button" { ...props }>
+@@ -35,7 +35,7 @@ describe( 'TreeGridCell', () => {
+ 	} );
+ 
+ 	it( 'uses a child render function to render children', () => {
+-		const renderer = TestRenderer.create(
++		const { container } = render(
+ 			<TreeGrid>
+ 				<tr>
+ 					<TreeGridCell>
+@@ -49,6 +49,6 @@ describe( 'TreeGridCell', () => {
+ 			</TreeGrid>
+ 		);
+ 
+-		expect( renderer.toJSON() ).toMatchSnapshot();
++		expect( container.firstChild ).toMatchSnapshot();
+ 	} );
+ } );

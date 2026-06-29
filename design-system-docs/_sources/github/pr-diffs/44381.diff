@@ -1,0 +1,36 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fe62222e11ecd7..d98fb1217ef924 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ 
+ -   `Mobile` updated to ignore `react/exhaustive-deps` eslint rule ([#44207](https://github.com/WordPress/gutenberg/pull/44207)).
+ -   `Popover`: refactor unit tests to TypeScript and modern RTL assertions ([#44373](https://github.com/WordPress/gutenberg/pull/44373)).
++-   `SearchControl`: updated to ignore `react/exhaustive-deps` eslint rule in native files([#44381](https://github.com/WordPress/gutenberg/pull/44381))
+ -   `ResizableBox` updated to pass the `react/exhaustive-deps` eslint rule ([#44370](https://github.com/WordPress/gutenberg/pull/44370)).
+ -   `Sandbox`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44378](https://github.com/WordPress/gutenberg/pull/44378))
+ -   `FontSizePicker`: Convert to TypeScript ([#44449](https://github.com/WordPress/gutenberg/pull/44449)).
+diff --git a/packages/components/src/search-control/index.native.js b/packages/components/src/search-control/index.native.js
+index 2bf19b8a42b54b..6f640f9960a3a4 100644
+--- a/packages/components/src/search-control/index.native.js
++++ b/packages/components/src/search-control/index.native.js
+@@ -115,6 +115,9 @@ function SearchControl( {
+ 		mergeFutureStyles( activeDarkStyles, [ isActive, isDark ] );
+ 
+ 		setCurrentStyles( futureStyles );
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ isActive, isDark ] );
+ 
+ 	useEffect( () => {
+@@ -130,6 +133,9 @@ function SearchControl( {
+ 			clearTimeout( onCancelTimer.current );
+ 			keyboardHideSubscription.remove();
+ 		};
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ 
+ 	const {

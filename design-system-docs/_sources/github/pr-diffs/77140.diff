@@ -1,0 +1,25 @@
+diff --git a/.stylelintrc.js b/.stylelintrc.js
+index 9f8b07e7c822dd..f1d91fb72379d6 100644
+--- a/.stylelintrc.js
++++ b/.stylelintrc.js
+@@ -55,7 +55,7 @@ module.exports = {
+ 	},
+ 	overrides: [
+ 		{
+-			files: [ '**/*.module.css' ],
++			files: [ '**/*.module.{css,scss}' ],
+ 			rules: {
+ 				'function-no-unknown': [
+ 					true,
+diff --git a/packages/components/src/angle-picker-control/style.module.scss b/packages/components/src/angle-picker-control/style.module.scss
+index 5cffe0a3ec6fb6..fb61ba0f187ce0 100644
+--- a/packages/components/src/angle-picker-control/style.module.scss
++++ b/packages/components/src/angle-picker-control/style.module.scss
+@@ -31,6 +31,7 @@
+ 	border-radius: $radius-round;
+ 	box-sizing: border-box;
+ 	display: block;
++	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Geometric centering */
+ 	left: 50%;
+ 	top: 4px;
+ 	transform: translateX(-50%);

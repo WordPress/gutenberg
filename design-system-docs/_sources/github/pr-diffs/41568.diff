@@ -1,0 +1,462 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a367b8f49d23e2..0898ecda762ac0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ ### Internal
+ 
+ -   `FormTokenField`: Convert to TypeScript and refactor to functional component ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
++-   `RadioControl`: Convert to TypeScript ([#41568](https://github.com/WordPress/gutenberg/pull/41568)).
+ 
+ ## 19.12.0 (2022-06-01)
+ 
+@@ -41,6 +42,7 @@
+ -   `Surface`: Convert to TypeScript ([#41212](https://github.com/WordPress/gutenberg/pull/41212)).
+ -   `Autocomplete` updated to satisfy `react/exhuastive-deps` eslint rule ([#41382](https://github.com/WordPress/gutenberg/pull/41382))
+ -   `DateDayPicker` updated to satisfy `react/exhuastive-deps` eslint rule ([#41470](https://github.com/WordPress/gutenberg/pull/41470)).
++
+ ### Experimental
+ 
+ -   `Spacer`: Add RTL support. ([#41172](https://github.com/WordPress/gutenberg/pull/41172))
+diff --git a/packages/components/src/radio-control/README.md b/packages/components/src/radio-control/README.md
+index 2624ee86d91941..28708f6dbb387f 100644
+--- a/packages/components/src/radio-control/README.md
++++ b/packages/components/src/radio-control/README.md
+@@ -75,57 +75,51 @@ const MyRadioControl = () => {
+ 			onChange={ ( value ) => setOption( value ) }
+ 		/>
+ 	);
+-}
++};
+ ```
+ 
+ ### Props
+ 
+ The component accepts the following props:
+ 
+-### hideLabelFromVision
++#### `help`: `string | WPElement`
+ 
+-If true, the label will only be visible to screen readers.
++If this property is added, a help text will be generated using help property as the content.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-#### label
++#### `hideLabelFromVision`: `boolean`
+ 
+-If this property is added, a label will be generated using label property as the content.
++If true, the label will only be visible to screen readers.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-#### help
++#### `label`: `string`
+ 
+-If this property is added, a help text will be generated using help property as the content.
++If this property is added, a label will be generated using label property as the content.
+ 
+--   Type: `String|WPElement`
+ -   Required: No
+ 
+-#### selected
++#### `onChange`: `( value: string ) => void`
+ 
+-The value property of the currently selected option.
++A function that receives the value of the new option that is being selected as input.
+ 
+--   Type: `Object`
+--   Required: No
++-   Required: Yes
+ 
+-#### options
++#### `options`: `{ label: string, value: string }[]`
+ 
+-An array of objects containing the following properties:
++An array of objects containing the value and label of the options.
+ 
+--   `label`: (string) The label to be shown to the user.
+--   `value`: (Object) The internal value compared against select and passed to onChange.
++-   `label`: `string` The label to be shown to the user.
++-   `value`: `string` The internal value compared against select and passed to onChange.
+ 
+-*   Type: `Array`
+ *   Required: No
+ 
+-#### onChange
++#### `selected`: `string`
+ 
+-A function that receives the value of the new option that is being selected as input.
++The value property of the currently selected option.
+ 
+--   Type: `function`
+--   Required: Yes
++-   Required: No
+ 
+ ## Related components
+ 
+diff --git a/packages/components/src/radio-control/index.js b/packages/components/src/radio-control/index.js
+deleted file mode 100644
+index 6ae64c20f047fa..00000000000000
+--- a/packages/components/src/radio-control/index.js
++++ /dev/null
+@@ -1,69 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { isEmpty } from 'lodash';
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useInstanceId } from '@wordpress/compose';
+-
+-/**
+- * Internal dependencies
+- */
+-import BaseControl from '../base-control';
+-
+-export default function RadioControl( {
+-	label,
+-	className,
+-	selected,
+-	help,
+-	onChange,
+-	hideLabelFromVision,
+-	options = [],
+-	...props
+-} ) {
+-	const instanceId = useInstanceId( RadioControl );
+-	const id = `inspector-radio-control-${ instanceId }`;
+-	const onChangeValue = ( event ) => onChange( event.target.value );
+-
+-	return (
+-		! isEmpty( options ) && (
+-			<BaseControl
+-				label={ label }
+-				id={ id }
+-				hideLabelFromVision={ hideLabelFromVision }
+-				help={ help }
+-				className={ classnames(
+-					className,
+-					'components-radio-control'
+-				) }
+-			>
+-				{ options.map( ( option, index ) => (
+-					<div
+-						key={ `${ id }-${ index }` }
+-						className="components-radio-control__option"
+-					>
+-						<input
+-							id={ `${ id }-${ index }` }
+-							className="components-radio-control__input"
+-							type="radio"
+-							name={ id }
+-							value={ option.value }
+-							onChange={ onChangeValue }
+-							checked={ option.value === selected }
+-							aria-describedby={
+-								!! help ? `${ id }__help` : undefined
+-							}
+-							{ ...props }
+-						/>
+-						<label htmlFor={ `${ id }-${ index }` }>
+-							{ option.label }
+-						</label>
+-					</div>
+-				) ) }
+-			</BaseControl>
+-		)
+-	);
+-}
+diff --git a/packages/components/src/radio-control/index.tsx b/packages/components/src/radio-control/index.tsx
+new file mode 100644
+index 00000000000000..5a4ffe874dacf2
+--- /dev/null
++++ b/packages/components/src/radio-control/index.tsx
+@@ -0,0 +1,107 @@
++/**
++ * External dependencies
++ */
++import { isEmpty } from 'lodash';
++import classnames from 'classnames';
++import type { ChangeEvent } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import BaseControl from '../base-control';
++import type { WordPressComponentProps } from '../ui/context';
++import type { RadioControlProps } from './types';
++
++/**
++ * Render a user interface to select the user type using radio inputs.
++ *
++ * ```jsx
++ * import { RadioControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyRadioControl = () => {
++ *   const [ option, setOption ] = useState( 'a' );
++ *
++ *   return (
++ *     <RadioControl
++ *       label="User type"
++ *       help="The type of the current user"
++ *       selected={ option }
++ *       options={ [
++ *         { label: 'Author', value: 'a' },
++ *         { label: 'Editor', value: 'e' },
++ *       ] }
++ *       onChange={ ( value ) => setOption( value ) }
++ *     />
++ *   );
++ * };
++ * ```
++ */
++export function RadioControl(
++	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
++	// ref forwarding to RadioControl.
++	props: Omit<
++		WordPressComponentProps< RadioControlProps, 'input', false >,
++		'ref'
++	>
++) {
++	const {
++		label,
++		className,
++		selected,
++		help,
++		onChange,
++		hideLabelFromVision,
++		options = [],
++		...additionalProps
++	} = props;
++	const instanceId = useInstanceId( RadioControl );
++	const id = `inspector-radio-control-${ instanceId }`;
++	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
++		onChange( event.target.value );
++
++	if ( isEmpty( options ) ) {
++		return null;
++	}
++
++	return (
++		<BaseControl
++			label={ label }
++			id={ id }
++			hideLabelFromVision={ hideLabelFromVision }
++			help={ help }
++			className={ classnames( className, 'components-radio-control' ) }
++		>
++			{ options.map( ( option, index ) => (
++				<div
++					key={ `${ id }-${ index }` }
++					className="components-radio-control__option"
++				>
++					<input
++						id={ `${ id }-${ index }` }
++						className="components-radio-control__input"
++						type="radio"
++						name={ id }
++						value={ option.value }
++						onChange={ onChangeValue }
++						checked={ option.value === selected }
++						aria-describedby={
++							!! help ? `${ id }__help` : undefined
++						}
++						{ ...additionalProps }
++					/>
++					<label htmlFor={ `${ id }-${ index }` }>
++						{ option.label }
++					</label>
++				</div>
++			) ) }
++		</BaseControl>
++	);
++}
++
++export default RadioControl;
+diff --git a/packages/components/src/radio-control/stories/index.js b/packages/components/src/radio-control/stories/index.js
+deleted file mode 100644
+index 6db176cb5d75c8..00000000000000
+--- a/packages/components/src/radio-control/stories/index.js
++++ /dev/null
+@@ -1,41 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import RadioControl from '../';
+-
+-export default { title: 'Components/RadioControl', component: RadioControl };
+-
+-const RadioControlWithState = ( props ) => {
+-	const [ option, setOption ] = useState( 'public' );
+-
+-	return (
+-		<RadioControl { ...props } selected={ option } onChange={ setOption } />
+-	);
+-};
+-
+-const options = [
+-	{ label: 'Public', value: 'public' },
+-	{ label: 'Private', value: 'private' },
+-	{ label: 'Password Protected', value: 'password' },
+-];
+-
+-export const _default = () => {
+-	return (
+-		<RadioControlWithState label="Post visibility" options={ options } />
+-	);
+-};
+-
+-export const withHelp = () => {
+-	return (
+-		<RadioControlWithState
+-			help="The visibility level for the current post"
+-			label="Post visibility"
+-			options={ options }
+-		/>
+-	);
+-};
+diff --git a/packages/components/src/radio-control/stories/index.tsx b/packages/components/src/radio-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..bf4bbcca24ea34
+--- /dev/null
++++ b/packages/components/src/radio-control/stories/index.tsx
+@@ -0,0 +1,72 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import RadioControl from '..';
++
++const meta: ComponentMeta< typeof RadioControl > = {
++	component: RadioControl,
++	title: 'Components/RadioControl',
++	argTypes: {
++		onChange: {
++			action: 'onChange',
++		},
++		selected: {
++			control: { type: null },
++		},
++		label: {
++			control: { type: 'text' },
++		},
++		help: {
++			control: { type: 'text' },
++		},
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof RadioControl > = ( {
++	onChange,
++	options,
++	...args
++} ) => {
++	const [ value, setValue ] = useState( options?.[ 0 ]?.value );
++
++	return (
++		<RadioControl
++			{ ...args }
++			selected={ value }
++			options={ options }
++			onChange={ ( v ) => {
++				setValue( v );
++				onChange( v );
++			} }
++		/>
++	);
++};
++
++export const Default: ComponentStory< typeof RadioControl > = Template.bind(
++	{}
++);
++Default.args = {
++	label: 'Post visibility',
++	options: [
++		{ label: 'Public', value: 'public' },
++		{ label: 'Private', value: 'private' },
++		{ label: 'Password Protected', value: 'password' },
++	],
++};
+diff --git a/packages/components/src/radio-control/types.ts b/packages/components/src/radio-control/types.ts
+new file mode 100644
+index 00000000000000..43c5e147f028d9
+--- /dev/null
++++ b/packages/components/src/radio-control/types.ts
+@@ -0,0 +1,32 @@
++/**
++ * Internal dependencies
++ */
++import type { BaseControlProps } from '../base-control/types';
++
++export type RadioControlProps = Pick<
++	BaseControlProps,
++	'label' | 'help' | 'hideLabelFromVision'
++> & {
++	/**
++	 * A function that receives the value of the new option that is being
++	 * selected as input.
++	 */
++	onChange: ( value: string ) => void;
++	/**
++	 * An array of objects containing the value and label of the options.
++	 */
++	options?: {
++		/**
++		 * The label to be shown to the user
++		 */
++		label: string;
++		/**
++		 * The internal value compared against select and passed to onChange
++		 */
++		value: string;
++	}[];
++	/**
++	 * The value property of the currently selected option.
++	 */
++	selected?: string;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index d83c5f2b24fba8..f45345b7c43421 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -71,6 +71,7 @@
+ 		"src/navigator/**/*",
+ 		"src/number-control/**/*",
+ 		"src/popover/**/*",
++		"src/radio-control/**/*",
+ 		"src/range-control/**/*",
+ 		"src/resizable-box/**/*",
+ 		"src/scroll-lock/**/*",

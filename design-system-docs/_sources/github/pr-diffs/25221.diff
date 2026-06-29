@@ -1,0 +1,88 @@
+diff --git a/docs/designers-developers/developers/filters/editor-filters.md b/docs/designers-developers/developers/filters/editor-filters.md
+index 6166b356c22f2d..af1861e8a5c83f 100644
+--- a/docs/designers-developers/developers/filters/editor-filters.md
++++ b/docs/designers-developers/developers/filters/editor-filters.md
+@@ -30,6 +30,24 @@ var customPreviewMessage = function() {
+ wp.hooks.addFilter( 'editor.PostPreview.interstitialMarkup', 'my-plugin/custom-preview-message', customPreviewMessage );
+ ```
+ 
++### `editor.PageAttributesParent.queryArgs`
++
++Filters the query arguments used to populate the page attributes parent page dropdown. For instance, this can be used to add draft posts to the dropdown list. Please note that the equivalent PHP filter hook `quick_edit_dropdown_pages_args` must be used to alter the quick edit parent page dropdown.
++
++_Example:_
++
++```js
++var pageAttributesParentQuery = function( args, post ) {
++	if ( post.type === 'page' ) {
++		args.status = 'publish,draft';
++	}
++
++	return args;
++};
++
++wp.hooks.addFilter( 'editor.PageAttributesParent.queryArgs', 'my-plugin/page-attributes-parent-query', pageAttributesParentQuery );
++```
++
+ ## Editor settings
+ 
+ ### `block_editor_settings`
+diff --git a/packages/editor/src/components/page-attributes/parent.js b/packages/editor/src/components/page-attributes/parent.js
+index b18cc4badf30a9..08483b6276de61 100644
+--- a/packages/editor/src/components/page-attributes/parent.js
++++ b/packages/editor/src/components/page-attributes/parent.js
+@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
+ import { ComboboxControl } from '@wordpress/components';
+ import { useState, useMemo } from '@wordpress/element';
+ import { useSelect, useDispatch } from '@wordpress/data';
++import { applyFilters } from '@wordpress/hooks';
+ 
+ /**
+  * Internal dependencies
+@@ -25,7 +26,9 @@ import { buildTermsTree } from '../../utils/terms';
+ 
+ function getTitle( post ) {
+ 	return post?.title?.rendered
+-		? post.title.rendered
++		? 'publish' === post.status
++			? post.title.rendered
++			: `${ post.title.rendered } (${ post.status })`
+ 		: `#${ post.id } (${ __( 'no title' ) })`;
+ }
+ 
+@@ -38,7 +41,7 @@ export function PageAttributesParent() {
+ 			const { getPostType, getEntityRecords, getEntityRecord } = select(
+ 				'core'
+ 			);
+-			const { getCurrentPostId, getEditedPostAttribute } = select(
++			const { getCurrentPost, getCurrentPostId, getEditedPostAttribute } = select(
+ 				'core/editor'
+ 			);
+ 			const postTypeSlug = getEditedPostAttribute( 'type' );
+@@ -46,14 +49,18 @@ export function PageAttributesParent() {
+ 			const pType = getPostType( postTypeSlug );
+ 			const postId = getCurrentPostId();
+ 			const isHierarchical = get( pType, [ 'hierarchical' ], false );
+-			const query = {
+-				per_page: 100,
+-				exclude: postId,
+-				parent_exclude: postId,
+-				orderby: 'menu_order',
+-				order: 'asc',
+-				_fields: 'id,title,parent',
+-			};
++			const query = applyFilters(
++				'editor.PageAttributesParent.queryArgs',
++				{
++					per_page: 100,
++					exclude: postId,
++					parent_exclude: postId,
++					orderby: 'menu_order',
++					order: 'asc',
++					_fields: 'id,title,parent,status',
++				},
++				getCurrentPost()
++			);
+ 
+ 			// Perform a search when the field is changed.
+ 			if ( isSearching ) {

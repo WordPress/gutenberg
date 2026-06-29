@@ -1,0 +1,208 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2566d6c4dc2c78..2743166026a3aa 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Enhancements
+ 
++-   `Draggable`: Add `appendToOwnerDocument` prop to allow elementId based elements to be attached to the ownerDocument body ([#49911](https://github.com/WordPress/gutenberg/pull/49911)).
+ -   `TreeGrid`: Modify keyboard navigation code to use a data-expanded attribute if aria-expanded is to be controlled outside of the TreeGrid component ([#48461](https://github.com/WordPress/gutenberg/pull/48461)).
+ -   `Modal`: Equalize internal spacing ([#49890](https://github.com/WordPress/gutenberg/pull/49890)).
+ -   `Modal`: Increased border radius ([#49870](https://github.com/WordPress/gutenberg/pull/49870)).
+diff --git a/packages/components/src/draggable/README.md b/packages/components/src/draggable/README.md
+index f83ab93dd3b3c1..58ffa2c6a6d0d1 100644
+--- a/packages/components/src/draggable/README.md
++++ b/packages/components/src/draggable/README.md
+@@ -8,9 +8,16 @@ Note that the drag handle needs to declare the `draggable="true"` property and b
+ 
+ The component accepts the following props:
+ 
++### `appendToOwnerDocument`: `boolean`
++
++Whether to append the cloned element to the `ownerDocument` body. By default, elements sourced by id are appended to the element's wrapper.
++
++-   Required: No
++-   Default: `false`
++
+ ### `elementId`: `string`
+ 
+-The HTML id of the element to clone on drag
++The HTML id of the element to clone on drag.
+ 
+ -   Required: Yes
+ 
+diff --git a/packages/components/src/draggable/index.tsx b/packages/components/src/draggable/index.tsx
+index 2b1244c9b1e66b..1f839332b66c0a 100644
+--- a/packages/components/src/draggable/index.tsx
++++ b/packages/components/src/draggable/index.tsx
+@@ -63,6 +63,7 @@ export function Draggable( {
+ 	onDragStart,
+ 	onDragOver,
+ 	onDragEnd,
++	appendToOwnerDocument = false,
+ 	cloneClassname,
+ 	elementId,
+ 	transferData,
+@@ -173,7 +174,11 @@ export function Draggable( {
+ 			cloneWrapper.appendChild( clone );
+ 
+ 			// Inject the cloneWrapper into the DOM.
+-			elementWrapper?.appendChild( cloneWrapper );
++			if ( appendToOwnerDocument ) {
++				ownerDocument.body.appendChild( cloneWrapper );
++			} else {
++				elementWrapper?.appendChild( cloneWrapper );
++			}
+ 		}
+ 
+ 		// Mark the current cursor coordinates.
+diff --git a/packages/components/src/draggable/stories/index.tsx b/packages/components/src/draggable/stories/index.tsx
+index 0fa16f063bb8fd..ad94802feb93a6 100644
+--- a/packages/components/src/draggable/stories/index.tsx
++++ b/packages/components/src/draggable/stories/index.tsx
+@@ -7,6 +7,7 @@ import type { DragEvent } from 'react';
+ /**
+  * WordPress dependencies
+  */
++import { useInstanceId } from '@wordpress/compose';
+ import { useState } from '@wordpress/element';
+ import { Icon, more } from '@wordpress/icons';
+ 
+@@ -32,46 +33,68 @@ export default meta;
+ 
+ const DefaultTemplate: ComponentStory< typeof Draggable > = ( args ) => {
+ 	const [ isDragging, setDragging ] = useState( false );
++	const instanceId = useInstanceId( DefaultTemplate );
+ 
+ 	// Allow for the use of ID in the example.
+ 	return (
+ 		<div>
+-			<p>Is Dragging? { isDragging ? 'Yes' : 'No!' }</p>
++			<p
++				style={ {
++					padding: '1em',
++					position: 'relative',
++					zIndex: 1000,
++					backgroundColor: 'whitesmoke',
++				} }
++			>
++				Is Dragging? { isDragging ? 'Yes' : 'No!' }
++			</p>
+ 			<div
+-				/* eslint-disable no-restricted-syntax, eslint-comments/disable-enable-pair */
+-				id="draggable-example-box"
+-				style={ { display: 'inline-flex' } }
++				style={ {
++					zIndex: 100,
++					position: 'relative',
++				} }
+ 			>
+-				<Draggable { ...args } elementId="draggable-example-box">
+-					{ ( { onDraggableStart, onDraggableEnd } ) => {
+-						const handleOnDragStart = ( event: DragEvent ) => {
+-							setDragging( true );
+-							onDraggableStart( event );
+-						};
+-						const handleOnDragEnd = ( event: DragEvent ) => {
+-							setDragging( false );
+-							onDraggableEnd( event );
+-						};
+-
+-						return (
+-							<div
+-								onDragStart={ handleOnDragStart }
+-								onDragEnd={ handleOnDragEnd }
+-								draggable
+-								style={ {
+-									alignItems: 'center',
+-									display: 'flex',
+-									justifyContent: 'center',
+-									width: 100,
+-									height: 100,
+-									background: '#ddd',
+-								} }
+-							>
+-								<Icon icon={ more } />
+-							</div>
+-						);
++				<div
++					id={ `draggable-example-box-${ instanceId }` }
++					style={ {
++						display: 'inline-flex',
++						position: 'relative',
+ 					} }
+-				</Draggable>
++				>
++					<Draggable
++						{ ...args }
++						elementId={ `draggable-example-box-${ instanceId }` }
++					>
++						{ ( { onDraggableStart, onDraggableEnd } ) => {
++							const handleOnDragStart = ( event: DragEvent ) => {
++								setDragging( true );
++								onDraggableStart( event );
++							};
++							const handleOnDragEnd = ( event: DragEvent ) => {
++								setDragging( false );
++								onDraggableEnd( event );
++							};
++
++							return (
++								<div
++									onDragStart={ handleOnDragStart }
++									onDragEnd={ handleOnDragEnd }
++									draggable
++									style={ {
++										alignItems: 'center',
++										display: 'flex',
++										justifyContent: 'center',
++										width: 100,
++										height: 100,
++										background: '#ddd',
++									} }
++								>
++									<Icon icon={ more } />
++								</div>
++							);
++						} }
++					</Draggable>
++				</div>
+ 			</div>
+ 		</div>
+ 	);
+@@ -81,3 +104,16 @@ export const Default: ComponentStory< typeof Draggable > = DefaultTemplate.bind(
+ 	{}
+ );
+ Default.args = {};
++
++/**
++ * `appendToOwnerDocument` is used to append the element being dragged to the body of the owner document.
++ *
++ * This is useful when the element being dragged should not receive styles from its parent.
++ * For example, when the element's parent sets a `z-index` value that would cause the dragged
++ * element to be rendered behind other elements.
++ */
++export const AppendElementToOwnerDocument: ComponentStory< typeof Draggable > =
++	DefaultTemplate.bind( {} );
++AppendElementToOwnerDocument.args = {
++	appendToOwnerDocument: true,
++};
+diff --git a/packages/components/src/draggable/types.ts b/packages/components/src/draggable/types.ts
+index 665378a71ea99b..5242ecf7d67eb6 100644
+--- a/packages/components/src/draggable/types.ts
++++ b/packages/components/src/draggable/types.ts
+@@ -17,6 +17,13 @@ export type DraggableProps = {
+ 		 */
+ 		onDraggableEnd: ( event: DragEvent ) => void;
+ 	} ) => JSX.Element | null;
++	/**
++	 * Whether to append the cloned element to the `ownerDocument` body.
++	 * By default, elements sourced by id are appended to the element's wrapper.
++	 *
++	 * @default false
++	 */
++	appendToOwnerDocument?: boolean;
+ 	/**
+ 	 * Classname for the cloned element.
+ 	 */

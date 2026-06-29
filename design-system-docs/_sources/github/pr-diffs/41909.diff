@@ -1,0 +1,104 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 611ac94827640b..304c73aec824ab 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -104,6 +104,7 @@ module.exports = {
+ 							'noop',
+ 							'nth',
+ 							'overEvery',
++							'partialRight',
+ 							'random',
+ 							'reverse',
+ 							'size',
+diff --git a/packages/components/src/dimension-control/README.md b/packages/components/src/dimension-control/README.md
+index 68f696470a7490..d310820a12f84d 100644
+--- a/packages/components/src/dimension-control/README.md
++++ b/packages/components/src/dimension-control/README.md
+@@ -11,12 +11,15 @@ This feature is still experimental. “Experimental” means this is an early im
+ In a block's `edit` implementation, render a `<DimensionControl />` component.
+ 
+ ```jsx
+-import { partialRight } from 'lodash';
+-
+ import { registerBlockType } from '@wordpress/blocks';
+ import { __ } from '@wordpress/i18n';
+ import { DimensionControl } from '@wordpress/components';
+ 
++const partialRight =
++	( fn, ...partialArgs ) =>
++	( ...args ) =>
++		fn( ...args, ...partialArgs );
++
+ registerBlockType( 'my-plugin/my-block', {
+ 	// ...
+ 
+diff --git a/packages/format-library/src/link/utils.js b/packages/format-library/src/link/utils.js
+index 204b69bbf07929..4c7a582a2e8f21 100644
+--- a/packages/format-library/src/link/utils.js
++++ b/packages/format-library/src/link/utils.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { startsWith, find, partialRight } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -47,7 +42,7 @@ export function isValidHref( href ) {
+ 		// Add some extra checks for http(s) URIs, since these are the most common use-case.
+ 		// This ensures URIs with an http protocol have exactly two forward slashes following the protocol.
+ 		if (
+-			startsWith( protocol, 'http' ) &&
++			protocol.startsWith( 'http' ) &&
+ 			! /^https?:\/\/[^\/\s]/i.test( trimmedHref )
+ 		) {
+ 			return false;
+@@ -75,7 +70,7 @@ export function isValidHref( href ) {
+ 	}
+ 
+ 	// Validate anchor links.
+-	if ( startsWith( trimmedHref, '#' ) && ! isValidFragment( trimmedHref ) ) {
++	if ( trimmedHref.startsWith( '#' ) && ! isValidFragment( trimmedHref ) ) {
+ 		return false;
+ 	}
+ 
+@@ -146,17 +141,17 @@ export function getFormatBoundary(
+ 	// Clone formats to avoid modifying source formats.
+ 	const newFormats = formats.slice();
+ 
+-	const formatAtStart = find( newFormats[ startIndex ], {
+-		type: format.type,
+-	} );
++	const formatAtStart = newFormats[ startIndex ]?.find(
++		( { type } ) => type === format.type
++	);
+ 
+-	const formatAtEnd = find( newFormats[ endIndex ], {
+-		type: format.type,
+-	} );
++	const formatAtEnd = newFormats[ endIndex ]?.find(
++		( { type } ) => type === format.type
++	);
+ 
+-	const formatAtEndMinusOne = find( newFormats[ endIndex - 1 ], {
+-		type: format.type,
+-	} );
++	const formatAtEndMinusOne = newFormats[ endIndex - 1 ]?.find(
++		( { type } ) => type === format.type
++	);
+ 
+ 	if ( !! formatAtStart ) {
+ 		// Set values to conform to "start"
+@@ -239,6 +234,11 @@ function walkToBoundary(
+ 	return index;
+ }
+ 
++const partialRight =
++	( fn, ...partialArgs ) =>
++	( ...args ) =>
++		fn( ...args, ...partialArgs );
++
+ const walkToStart = partialRight( walkToBoundary, 'backwards' );
+ 
+ const walkToEnd = partialRight( walkToBoundary, 'forwards' );

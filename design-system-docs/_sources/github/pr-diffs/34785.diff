@@ -1,0 +1,248 @@
+diff --git a/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js b/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js
+index 6fb98c963b501b..989c60b3ebd167 100644
+--- a/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js
++++ b/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js
+@@ -9,7 +9,7 @@ import { castArray, flow, noop } from 'lodash';
+ import { __ } from '@wordpress/i18n';
+ import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+ import { useSelect } from '@wordpress/data';
+-import { moreVertical } from '@wordpress/icons';
++import { moreVertical, insertAfter, insertBefore } from '@wordpress/icons';
+ 
+ import { Children, cloneElement, useCallback } from '@wordpress/element';
+ import { serialize } from '@wordpress/blocks';
+@@ -138,6 +138,8 @@ export function BlockSettingsDropdown( {
+ 								{ canInsertDefaultBlock && (
+ 									<>
+ 										<MenuItem
++											icon={ insertBefore }
++											iconPosition="left"
+ 											onClick={ flow(
+ 												onClose,
+ 												onInsertBefore
+@@ -147,6 +149,8 @@ export function BlockSettingsDropdown( {
+ 											{ __( 'Insert before' ) }
+ 										</MenuItem>
+ 										<MenuItem
++											icon={ insertAfter }
++											iconPosition="left"
+ 											onClick={ flow(
+ 												onClose,
+ 												onInsertAfter
+diff --git a/packages/block-editor/src/components/block-settings-menu/style.scss b/packages/block-editor/src/components/block-settings-menu/style.scss
+index bea2242fc59d4e..de3276975cb3df 100644
+--- a/packages/block-editor/src/components/block-settings-menu/style.scss
++++ b/packages/block-editor/src/components/block-settings-menu/style.scss
+@@ -1,3 +1,18 @@
+-.block-editor-block-settings-menu__popover .components-dropdown-menu__menu {
+-	padding: 0;
++.block-editor-block-settings-menu__popover {
++	.components-dropdown-menu__menu {
++		padding: 0;
++		.components-menu-item__button {
++			padding-left: $grid-unit-50;
++			/**
++			 * This is only applied to 'left' icons because 'right' icons
++			 * are rendered inside the `button`.
++			 */
++			&.has-icon {
++				padding-left: $grid-unit;
++			}
++			.components-menu-item__item {
++				min-width: 120px;
++			}
++		}
++	}
+ }
+diff --git a/packages/block-editor/src/components/convert-to-group-buttons/index.js b/packages/block-editor/src/components/convert-to-group-buttons/index.js
+index 6a1e0ff25d8ee2..3404a258522cc2 100644
+--- a/packages/block-editor/src/components/convert-to-group-buttons/index.js
++++ b/packages/block-editor/src/components/convert-to-group-buttons/index.js
+@@ -5,6 +5,7 @@ import { MenuItem } from '@wordpress/components';
+ import { _x } from '@wordpress/i18n';
+ import { switchToBlockType } from '@wordpress/blocks';
+ import { useDispatch } from '@wordpress/data';
++import { group, ungroup } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+@@ -48,6 +49,8 @@ function ConvertToGroupButton( {
+ 		<>
+ 			{ isGroupable && (
+ 				<MenuItem
++					icon={ group }
++					iconPosition="left"
+ 					onClick={ () => {
+ 						onConvertToGroup();
+ 						onClose();
+@@ -58,6 +61,8 @@ function ConvertToGroupButton( {
+ 			) }
+ 			{ isUngroupable && (
+ 				<MenuItem
++					icon={ ungroup }
++					iconPosition="left"
+ 					onClick={ () => {
+ 						onConvertFromGroup();
+ 						onClose();
+diff --git a/packages/components/src/menu-item/README.md b/packages/components/src/menu-item/README.md
+index 94087548619613..9df572b9fccabd 100644
+--- a/packages/components/src/menu-item/README.md
++++ b/packages/components/src/menu-item/README.md
+@@ -50,6 +50,14 @@ Refer to documentation for [`label`](#label).
+ 
+ Refer to documentation for [Button's `icon` prop](/packages/components/src/icon-button/README.md#icon).
+ 
++### `iconPosition`
++
++-   Type: `string`
++-   Required: No
++-   Default: `'right'`
++
++Determines where to display the provided `icon`.
++
+ ### `isSelected`
+ 
+ -   Type: `boolean`
+diff --git a/packages/components/src/menu-item/index.js b/packages/components/src/menu-item/index.js
+index 8bed60d84df8f7..23851b8fe0518e 100644
+--- a/packages/components/src/menu-item/index.js
++++ b/packages/components/src/menu-item/index.js
+@@ -19,15 +19,16 @@ import Icon from '../icon';
+ /**
+  * Renders a generic menu item for use inside the more menu.
+  *
+- * @param {Object}        props                   Component props.
+- * @param {WPElement}     props.children          Element to render as child of button.
+- * @param {string}        props.info              Text to use as description for button text.
+- * @param {string}        props.className         Class to set on the container.
+- * @param {WPIcon}        props.icon              Button's `icon` prop.
+- * @param {string|Object} props.shortcut          Shortcut's `shortcut` prop.
+- * @param {boolean}       props.isSelected        Whether or not the menu item is currently selected.
+- * @param {string}        [props.role="menuitem"] ARIA role of the menu item.
+- * @param {Object}        ref                     React Element ref.
++ * @param {Object}        props                        Component props.
++ * @param {WPElement}     props.children               Element to render as child of button.
++ * @param {string}        props.info                   Text to use as description for button text.
++ * @param {string}        props.className              Class to set on the container.
++ * @param {WPIcon}        props.icon                   Button's `icon` prop.
++ * @param {string}        [props.iconPosition="right"] Button's `icon` position (left|right).
++ * @param {string|Object} props.shortcut               Shortcut's `shortcut` prop.
++ * @param {boolean}       props.isSelected             Whether or not the menu item is currently selected.
++ * @param {string}        [props.role="menuitem"]      ARIA role of the menu item.
++ * @param {Object}        ref                          React Element ref.
+  *
+  * @return {WPComponent} The component to be rendered.
+  */
+@@ -37,6 +38,7 @@ export function MenuItem(
+ 		info,
+ 		className,
+ 		icon,
++		iconPosition = 'right',
+ 		shortcut,
+ 		isSelected,
+ 		role = 'menuitem',
+@@ -57,7 +59,9 @@ export function MenuItem(
+ 
+ 	if ( icon && ! isString( icon ) ) {
+ 		icon = cloneElement( icon, {
+-			className: 'components-menu-items__item-icon',
++			className: classnames( 'components-menu-items__item-icon', {
++				'has-icon-right': iconPosition === 'right',
++			} ),
+ 		} );
+ 	}
+ 
+@@ -71,6 +75,7 @@ export function MenuItem(
+ 					: undefined
+ 			}
+ 			role={ role }
++			icon={ iconPosition === 'left' ? icon : undefined }
+ 			className={ className }
+ 			{ ...props }
+ 		>
+@@ -79,7 +84,7 @@ export function MenuItem(
+ 				className="components-menu-item__shortcut"
+ 				shortcut={ shortcut }
+ 			/>
+-			{ icon && <Icon icon={ icon } /> }
++			{ icon && iconPosition === 'right' && <Icon icon={ icon } /> }
+ 		</Button>
+ 	);
+ }
+diff --git a/packages/components/src/menu-item/style.scss b/packages/components/src/menu-item/style.scss
+index 69e5c6f50fd7e4..5c88db241f4e01 100644
+--- a/packages/components/src/menu-item/style.scss
++++ b/packages/components/src/menu-item/style.scss
+@@ -12,13 +12,15 @@
+ 	}
+ 
+ 	.components-menu-items__item-icon {
+-		margin-right: -2px; // This optically balances the icon.
+-		margin-left: $grid-unit-30;
+ 		display: inline-block;
+ 		flex: 0 0 auto;
++		&.has-icon-right {
++			margin-right: -2px; // This optically balances the icon.
++			margin-left: $grid-unit-30;
++		}
+ 	}
+ 
+-	.components-menu-item__shortcut + .components-menu-items__item-icon {
++	.components-menu-item__shortcut + .components-menu-items__item-icon.has-icon-right {
+ 		margin-left: $grid-unit-10;
+ 	}
+ 
+diff --git a/packages/components/src/menu-item/test/__snapshots__/index.js.snap b/packages/components/src/menu-item/test/__snapshots__/index.js.snap
+index 2349726c1d07a5..a546e6078a79f4 100644
+--- a/packages/components/src/menu-item/test/__snapshots__/index.js.snap
++++ b/packages/components/src/menu-item/test/__snapshots__/index.js.snap
+@@ -19,7 +19,7 @@ exports[`MenuItem should match snapshot when all props provided 1`] = `
+   <Icon
+     icon={
+       <SVG
+-        className="components-menu-items__item-icon"
++        className="components-menu-items__item-icon has-icon-right"
+         viewBox="0 0 24 24"
+         xmlns="http://www.w3.org/2000/svg"
+       >
+@@ -79,7 +79,7 @@ exports[`MenuItem should match snapshot when isSelected and role are optionally
+   <Icon
+     icon={
+       <SVG
+-        className="components-menu-items__item-icon"
++        className="components-menu-items__item-icon has-icon-right"
+         viewBox="0 0 24 24"
+         xmlns="http://www.w3.org/2000/svg"
+       >
+diff --git a/packages/edit-post/src/components/block-settings-menu/plugin-block-settings-menu-item.js b/packages/edit-post/src/components/block-settings-menu/plugin-block-settings-menu-item.js
+index 77024f45a5c93d..096339323e7fcd 100644
+--- a/packages/edit-post/src/components/block-settings-menu/plugin-block-settings-menu-item.js
++++ b/packages/edit-post/src/components/block-settings-menu/plugin-block-settings-menu-item.js
+@@ -86,6 +86,7 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
+ const PluginBlockSettingsMenuItem = ( {
+ 	allowedBlocks,
+ 	icon,
++	iconPosition,
+ 	label,
+ 	onClick,
+ 	small,
+@@ -100,6 +101,7 @@ const PluginBlockSettingsMenuItem = ( {
+ 				<MenuItem
+ 					onClick={ compose( onClick, onClose ) }
+ 					icon={ icon }
++					iconPosition={ iconPosition }
+ 					label={ small ? label : undefined }
+ 					role={ role }
+ 				>
+diff --git a/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js b/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
+index ab7d8b12e44168..dabd27e95a23e6 100644
+--- a/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
++++ b/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
+@@ -114,6 +114,7 @@ export default function ReusableBlockConvertButton( {
+ 				<>
+ 					<MenuItem
+ 						icon={ reusableBlock }
++						iconPosition="left"
+ 						onClick={ () => {
+ 							setIsModalOpen( true );
+ 						} }

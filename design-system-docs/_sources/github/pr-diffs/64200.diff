@@ -1,0 +1,44 @@
+diff --git a/packages/components/src/dropdown-menu-v2/index.tsx b/packages/components/src/dropdown-menu-v2/index.tsx
+index c53286a7da128b..a2ac0c85461827 100644
+--- a/packages/components/src/dropdown-menu-v2/index.tsx
++++ b/packages/components/src/dropdown-menu-v2/index.tsx
+@@ -194,7 +194,8 @@ const UnconnectedDropdownMenu = (
+ 		gutter,
+ 		children,
+ 		shift,
+-		modal = true,
++		modal = false,
++		portal = true,
+ 
+ 		// From internal components context
+ 		variant,
+@@ -314,6 +315,7 @@ const UnconnectedDropdownMenu = (
+ 			<Styled.DropdownMenu
+ 				{ ...otherProps }
+ 				modal={ modal }
++				portal={ portal }
+ 				store={ dropdownMenuStore }
+ 				// Root menu has an 8px distance from its trigger,
+ 				// otherwise 0 (which causes the submenu to slightly overlap)
+diff --git a/packages/components/src/dropdown-menu-v2/types.ts b/packages/components/src/dropdown-menu-v2/types.ts
+index f49f026b787933..1febcfdc00f5d0 100644
+--- a/packages/components/src/dropdown-menu-v2/types.ts
++++ b/packages/components/src/dropdown-menu-v2/types.ts
+@@ -45,9 +45,16 @@ export interface DropdownMenuProps {
+ 	 * outside elements will be disabled and only menu content will be visible to
+ 	 * screen readers.
+ 	 *
+-	 * @default true
++	 * @default false
+ 	 */
+ 	modal?: boolean;
++	/**
++	 * Whether the element should be rendered as a React Portal.
++	 * When set to true will render the element at the end of the body element.
++	 *
++	 * @default true
++	 */
++	portal?: boolean;
+ 	/**
+ 	 * The placement of the dropdown menu popover.
+ 	 *

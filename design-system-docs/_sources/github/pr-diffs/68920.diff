@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 2dec0f65240f9b..a6d294bcb8a5c9 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -358,6 +358,7 @@ function UnforwardedModal(
+ 						) }
+ 
+ 						<div
++							className="components-modal__body"
+ 							ref={ useMergeRefs( [
+ 								childrenContainerRef,
+ 								focusOnMount === 'firstContentElement'

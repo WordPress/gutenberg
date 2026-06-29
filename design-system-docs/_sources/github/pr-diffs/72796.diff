@@ -1,0 +1,428 @@
+diff --git a/package-lock.json b/package-lock.json
+index cd3e77e13c5aa0..e049f18f1e2c82 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -54336,7 +54336,8 @@
+ 			"dependencies": {
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/private-apis": "file:../private-apis",
+-				"colorjs.io": "^0.5.2"
++				"colorjs.io": "^0.5.2",
++				"memize": "^2.1.0"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+diff --git a/packages/theme/bin/generate-primitive-tokens/index.ts b/packages/theme/bin/generate-primitive-tokens/index.ts
+index dd2ce18011ff74..26116cca93266b 100644
+--- a/packages/theme/bin/generate-primitive-tokens/index.ts
++++ b/packages/theme/bin/generate-primitive-tokens/index.ts
+@@ -58,15 +58,12 @@ function generatePrimitiveColorTokens() {
+ 		);
+ 
+ 		// Build the ramps
+-		const bgRamp = buildBgRamp( { seed: DEFAULT_SEED_COLORS.bg } );
++		const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.bg );
+ 		const accentRamps = [ ...Object.entries( DEFAULT_SEED_COLORS ) ]
+ 			.filter( ( [ scaleName ] ) => scaleName !== 'bg' )
+ 			.map( ( [ scaleName, seed ] ) => ( {
+ 				scaleName,
+-				ramp: buildAccentRamp( {
+-					seed,
+-					bgRamp,
+-				} ),
++				ramp: buildAccentRamp( seed, bgRamp ),
+ 			} ) );
+ 
+ 		// Convert the ramp values in a DTCG compatible format
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index 57c7298cfba3f5..45f0d59148067c 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -41,7 +41,8 @@
+ 	"dependencies": {
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/private-apis": "file:../private-apis",
+-		"colorjs.io": "^0.5.2"
++		"colorjs.io": "^0.5.2",
++		"memize": "^2.1.0"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0",
+diff --git a/packages/theme/src/color-ramps/index.ts b/packages/theme/src/color-ramps/index.ts
+index 9aa48c8be7ef00..3bf079bcf19252 100644
+--- a/packages/theme/src/color-ramps/index.ts
++++ b/packages/theme/src/color-ramps/index.ts
+@@ -20,22 +20,14 @@ export { DEFAULT_SEED_COLORS } from './lib/constants';
+ 
+ /**
+  * Creates a background ramp.
+- * @param params
+- * @param params.seed
+- * @param params.debug
++ * @param seed The seed color for the background ramp.
+  */
+-export function buildBgRamp( {
+-	seed,
+-	debug,
+-}: {
+-	seed: string;
+-	debug?: boolean;
+-} ): InternalRampResult {
++export function buildBgRamp( seed: string ) {
+ 	if ( typeof seed !== 'string' || seed.trim() === '' ) {
+ 		throw new Error( 'Seed color must be a non-empty string' );
+ 	}
+ 
+-	return buildRamp( seed, BG_RAMP_CONFIG, { debug } );
++	return buildRamp( seed, BG_RAMP_CONFIG );
+ }
+ 
+ const STEP_TO_PIN = 'surface2';
+@@ -61,29 +53,19 @@ function getBgRampInfo( ramp: InternalRampResult ): {
+ /**
+  * Creates an accent ramp (ie used by primary, success, info, warning and error
+  * ramps).
+- * @param params
+- * @param params.seed
+- * @param params.bgRamp
+- * @param params.debug
++ * @param seed   The seed color for the accent ramp.
++ * @param bgRamp The ramp of the background on which the accent is shown.
+  */
+-export function buildAccentRamp( {
+-	seed,
+-	bgRamp,
+-	debug,
+-}: {
+-	seed: string;
+-	bgRamp?: InternalRampResult;
+-	debug?: boolean;
+-} ): InternalRampResult {
++export function buildAccentRamp(
++	seed: string,
++	bgRamp?: InternalRampResult
++): InternalRampResult {
+ 	if ( typeof seed !== 'string' || seed.trim() === '' ) {
+ 		throw new Error( 'Seed color must be a non-empty string' );
+ 	}
+ 
+ 	const bgRampInfo = bgRamp ? getBgRampInfo( bgRamp ) : undefined;
+-	return buildRamp( seed, ACCENT_RAMP_CONFIG, {
+-		...bgRampInfo,
+-		debug,
+-	} );
++	return buildRamp( seed, ACCENT_RAMP_CONFIG, bgRampInfo );
+ }
+ 
+ /**
+diff --git a/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts b/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts
+index 2e8d9d668ccef6..7f345ac50f4930 100644
+--- a/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts
++++ b/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts
+@@ -28,7 +28,6 @@ import { type TaperChromaOptions, taperChroma } from './taper-chroma';
+  * @param direction
+  * @param options
+  * @param options.strict
+- * @param options.debug
+  * @param options.lightnessConstraint
+  * @param options.lightnessConstraint.type
+  * @param options.lightnessConstraint.value
+@@ -43,7 +42,6 @@ export function findColorMeetingRequirements(
+ 		lightnessConstraint,
+ 		taperChromaOptions,
+ 		strict = true,
+-		debug = false,
+ 	}: {
+ 		lightnessConstraint?: {
+ 			type: 'force' | 'onlyIfSucceeds';
+@@ -51,7 +49,6 @@ export function findColorMeetingRequirements(
+ 		};
+ 		taperChromaOptions?: TaperChromaOptions;
+ 		strict?: boolean;
+-		debug?: boolean;
+ 	} = {}
+ ): { color: Color; reached: boolean; achieved: number } {
+ 	// A target of 1 means same color.
+@@ -80,15 +77,6 @@ export function findColorMeetingRequirements(
+ 		);
+ 		const exactLContrast = getCachedContrast( reference, colorWithExactL );
+ 
+-		if ( debug ) {
+-			// eslint-disable-next-line no-console
+-			console.log(
+-				`Succeeded with ${ lightnessConstraint.type } lightness`,
+-				lightnessConstraint.value,
+-				colorWithExactL.oklch.l
+-			);
+-		}
+-
+ 		// If the L constraint is of "force" type, apply it even when it doesn't
+ 		// meet the contrast target.
+ 		if (
+@@ -125,13 +113,6 @@ export function findColorMeetingRequirements(
+ 			);
+ 		}
+ 
+-		if ( debug ) {
+-			// eslint-disable-next-line no-console
+-			console.log(
+-				'Did not succeeded because it reached the limit',
+-				mostContrastingL
+-			);
+-		}
+ 		return {
+ 			color: mostContrastingColor,
+ 			reached: false,
+diff --git a/packages/theme/src/color-ramps/lib/index.ts b/packages/theme/src/color-ramps/lib/index.ts
+index 8cdd183cb86ae0..cadd868dbf28ac 100644
+--- a/packages/theme/src/color-ramps/lib/index.ts
++++ b/packages/theme/src/color-ramps/lib/index.ts
+@@ -36,7 +36,6 @@ import { LIGHTNESS_EPSILON, MAX_BISECTION_ITERATIONS } from './constants';
+  * @param params.pinLightness          - Optional lightness override for a given step
+  * @param params.pinLightness.stepName
+  * @param params.pinLightness.value
+- * @param params.debug
+  * @return Object containing ramp results and satisfaction status
+  */
+ function calculateRamp( {
+@@ -46,7 +45,6 @@ function calculateRamp( {
+ 	mainDir,
+ 	oppDir,
+ 	pinLightness,
+-	debug = false,
+ }: {
+ 	seed: Color;
+ 	sortedSteps: ( keyof Ramp )[];
+@@ -57,7 +55,6 @@ function calculateRamp( {
+ 		stepName: keyof Ramp;
+ 		value: number;
+ 	};
+-	debug?: boolean;
+ } ) {
+ 	const rampResults = {} as Record<
+ 		keyof Ramp,
+@@ -163,7 +160,6 @@ function calculateRamp( {
+ 				strict: false,
+ 				lightnessConstraint,
+ 				taperChromaOptions,
+-				debug,
+ 			}
+ 		);
+ 
+@@ -213,7 +209,6 @@ export function buildRamp(
+ 	{
+ 		mainDirection,
+ 		pinLightness,
+-		debug = false,
+ 		rescaleToFitContrastTargets = true,
+ 	}: {
+ 		mainDirection?: RampDirection;
+@@ -222,7 +217,6 @@ export function buildRamp(
+ 			value: number;
+ 		};
+ 		rescaleToFitContrastTargets?: boolean;
+-		debug?: boolean;
+ 	} = {}
+ ): RampResult {
+ 	let seed: Color;
+@@ -263,27 +257,12 @@ export function buildRamp(
+ 		mainDir,
+ 		oppDir,
+ 		pinLightness,
+-		debug,
+ 	} );
+ 	const toReturn = {
+ 		ramp: rampResults,
+ 		direction: mainDir,
+ 	} as RampResult;
+ 
+-	if ( debug ) {
+-		// eslint-disable-next-line no-console
+-		console.log( `First run`, {
+-			SATISFIED_ALL_CONTRAST_REQUIREMENTS,
+-			UNSATISFIED_DIRECTION,
+-			seed: seed.toString(),
+-			sortedSteps,
+-			config,
+-			mainDir,
+-			oppDir,
+-			pinLightness,
+-		} );
+-	}
+-
+ 	if (
+ 		! SATISFIED_ALL_CONTRAST_REQUIREMENTS &&
+ 		rescaleToFitContrastTargets
+@@ -307,15 +286,6 @@ export function buildRamp(
+ 				} )
+ 			);
+ 
+-			if ( debug ) {
+-				// eslint-disable-next-line no-console
+-				console.log( `Iteration ${ i }`, {
+-					worseSeedL,
+-					newSeedL: ( worseSeedL + betterSeedL ) / 2,
+-					betterSeedL,
+-				} );
+-			}
+-
+ 			const iterationResults = calculateRamp( {
+ 				seed: newSeed,
+ 				sortedSteps,
+@@ -323,7 +293,6 @@ export function buildRamp(
+ 				mainDir,
+ 				oppDir,
+ 				pinLightness,
+-				debug,
+ 			} );
+ 
+ 			if ( iterationResults.SATISFIED_ALL_CONTRAST_REQUIREMENTS ) {
+@@ -339,20 +308,6 @@ export function buildRamp(
+ 				// We haven't moved far enough in mainDir, continue searching
+ 				worseSeedL = newSeed.oklch.l;
+ 			}
+-
+-			if ( debug ) {
+-				// eslint-disable-next-line no-console
+-				console.log( `Retry #${ i }`, {
+-					SATISFIED_ALL_CONTRAST_REQUIREMENTS,
+-					UNSATISFIED_DIRECTION,
+-					seed: newSeed.toString(),
+-					sortedSteps,
+-					config,
+-					mainDir,
+-					oppDir,
+-					pinLightness,
+-				} );
+-			}
+ 		}
+ 	}
+ 
+diff --git a/packages/theme/src/color-ramps/stories/index.story.tsx b/packages/theme/src/color-ramps/stories/index.story.tsx
+index d1d86a4f20403e..71b1e10e505a80 100644
+--- a/packages/theme/src/color-ramps/stories/index.story.tsx
++++ b/packages/theme/src/color-ramps/stories/index.story.tsx
+@@ -44,9 +44,7 @@ export const Default: StoryObj< typeof ColorGen > = {
+ 	render: ( args ) => {
+ 		const bgSeed = args.background ?? DEFAULT_SEED_COLORS.bg;
+ 		const primarySeed = args.primary ?? DEFAULT_SEED_COLORS.primary;
+-		const bgRamp = buildBgRamp( {
+-			seed: bgSeed,
+-		} );
++		const bgRamp = buildBgRamp( bgSeed );
+ 
+ 		const bgRampObj = {
+ 			seed: {
+@@ -61,47 +59,35 @@ export const Default: StoryObj< typeof ColorGen > = {
+ 				name: 'bgFill1' as const,
+ 				value: primarySeed,
+ 			},
+-			ramp: buildAccentRamp( { seed: primarySeed, bgRamp } ).ramp,
++			ramp: buildAccentRamp( primarySeed, bgRamp ).ramp,
+ 		};
+ 		const infoRampObj = {
+ 			seed: {
+ 				name: 'bgFill1' as const,
+ 				value: DEFAULT_SEED_COLORS.info,
+ 			},
+-			ramp: buildAccentRamp( {
+-				seed: DEFAULT_SEED_COLORS.info,
+-				bgRamp,
+-			} ).ramp,
++			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.info, bgRamp ).ramp,
+ 		};
+ 		const successRampObj = {
+ 			seed: {
+ 				name: 'bgFill1' as const,
+ 				value: DEFAULT_SEED_COLORS.success,
+ 			},
+-			ramp: buildAccentRamp( {
+-				seed: DEFAULT_SEED_COLORS.success,
+-				bgRamp,
+-			} ).ramp,
++			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.success, bgRamp ).ramp,
+ 		};
+ 		const warningRampObj = {
+ 			seed: {
+ 				name: 'bgFill1' as const,
+ 				value: DEFAULT_SEED_COLORS.warning,
+ 			},
+-			ramp: buildAccentRamp( {
+-				seed: DEFAULT_SEED_COLORS.warning,
+-				bgRamp,
+-			} ).ramp,
++			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.warning, bgRamp ).ramp,
+ 		};
+ 		const errorRampObj = {
+ 			seed: {
+ 				name: 'bgFill1' as const,
+ 				value: DEFAULT_SEED_COLORS.error,
+ 			},
+-			ramp: buildAccentRamp( {
+-				seed: DEFAULT_SEED_COLORS.error,
+-				bgRamp,
+-			} ).ramp,
++			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.error, bgRamp ).ramp,
+ 		};
+ 
+ 		const unmetTargets = checkAccessibleCombinations( {
+@@ -222,7 +208,7 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
+ 		];
+ 
+ 		const ramps = combinations.map( ( { background, primary } ) => {
+-			const bgRamp = buildBgRamp( { seed: background } );
++			const bgRamp = buildBgRamp( background );
+ 
+ 			const bgRampObj = {
+ 				seed: {
+@@ -237,7 +223,7 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
+ 					name: 'bgFill1' as const,
+ 					value: primary,
+ 				},
+-				ramp: buildAccentRamp( { seed: primary, bgRamp } ).ramp,
++				ramp: buildAccentRamp( primary, bgRamp ).ramp,
+ 			};
+ 
+ 			return [ bgRampObj, primaryRampObj ];
+diff --git a/packages/theme/src/use-theme-provider-styles.ts b/packages/theme/src/use-theme-provider-styles.ts
+index 12319dc7ef7254..c0d610f2272b1b 100644
+--- a/packages/theme/src/use-theme-provider-styles.ts
++++ b/packages/theme/src/use-theme-provider-styles.ts
+@@ -3,6 +3,7 @@
+  */
+ import type { CSSProperties } from 'react';
+ import Color from 'colorjs.io';
++import memoize from 'memize';
+ 
+ /**
+  * WordPress dependencies
+@@ -24,6 +25,9 @@ import type { ThemeProviderProps } from './types';
+ 
+ type Entry = [ string, string ];
+ 
++const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
++const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
++
+ const legacyWpComponentsOverridesCSS: Entry[] = [
+ 	[ '--wp-components-color-accent', 'var(--wp-admin-theme-color)' ],
+ 	[
+@@ -219,17 +223,14 @@ export function useThemeProviderStyles( {
+ 
+ 		// Generate ramps.
+ 		const computedColorRamps = new Map< string, RampResult >();
+-		const bgRamp = buildBgRamp( { seed: seeds.bg } );
++		const bgRamp = getCachedBgRamp( seeds.bg );
+ 		Object.entries( seeds ).forEach( ( [ rampName, seed ] ) => {
+ 			if ( rampName === 'bg' ) {
+ 				computedColorRamps.set( rampName, bgRamp );
+ 			} else {
+ 				computedColorRamps.set(
+ 					rampName,
+-					buildAccentRamp( {
+-						seed,
+-						bgRamp,
+-					} )
++					getCachedAccentRamp( seed, bgRamp )
+ 				);
+ 			}
+ 		} );

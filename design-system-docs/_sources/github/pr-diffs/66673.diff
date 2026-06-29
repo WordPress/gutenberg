@@ -1,0 +1,44 @@
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index d458771494a338..93cb0e6146a6bd 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -253,6 +253,11 @@ If provided with `showTooltip`, appends the Shortcut label to the tooltip conten
+ 
+ If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) component for the button.
+ 
++##### Usage Guidelines:
++
++1. Tooltips must be used only to visually expose the label of controls that don't show visible text.
++2. Tooltips usage must take into account the showIconLabels preference: when enabled and the control shows visible text, the tooltip must be disabled.
++
+ -   Required: No
+ 
+ #### `size`: `'default'` | `'compact'` | `'small'`
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md
+index e673a1ed45bbf6..13ab0c931d7d8c 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md
+@@ -24,4 +24,9 @@ The value of the `ToggleGroupControlOptionBase`.
+ 
+ Whether to show a tooltip when hovering over the option. The tooltip will only show if a label for it is provided using the `aria-label` prop.
+ 
++#### Usage Guidelines:
++
++1. Tooltips must be used only to visually expose the label of controls that don't show visible text.
++2. Tooltips usage must take into account the showIconLabels preference: when enabled and the control shows visible text, the tooltip must be disabled.
++
+ -   Required: No
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+index 2e7c55bd688361..7d8ee683b7689d 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+@@ -52,4 +52,9 @@ The value of the `ToggleGroupControlOption`.
+ 
+ Whether to show a tooltip when hovering over the option. The tooltip will attempt to use the `aria-label` prop text first, then the `label` prop text if no `aria-label` prop is found.
+ 
++#### Usage Guidelines:
++
++1. Tooltips must be used only to visually expose the label of controls that don't show visible text.
++2. Tooltips usage must take into account the showIconLabels preference: when enabled and the control shows visible text, the tooltip must be disabled.
++
+ -   Required: No

@@ -1,0 +1,372 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 46b1cb0790752d..aae796e69f5189 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `Divider`: Complete TypeScript migration ([#41991](https://github.com/WordPress/gutenberg/pull/41991)).
++
+ ## 19.15.0 (2022-07-13)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/divider/README.md b/packages/components/src/divider/README.md
+index 977f969d40ff51..c28b6b6b060a04 100644
+--- a/packages/components/src/divider/README.md
++++ b/packages/components/src/divider/README.md
+@@ -32,19 +32,26 @@ function Example() {
+ 
+ Adjusts all margins on the inline dimension.
+ 
+-- Required: No
++-   Required: No
++
++### `marginEnd`: `number`
++
++Adjusts the inline-end margin.
++
++-   Required: No
+ 
+ ### `marginStart`: `number`
+ 
+ Adjusts the inline-start margin.
+ 
+-- Required: No
++-   Required: No
+ 
+-### `marginEnd`: `number`
++### `orientation`: `horizontal | vertical`
+ 
+-Adjusts the inline-end margin.
++Divider's orientation. When using inside a flex container, you may need to make sure the divider is `stretch` aligned in order for it to be visible.
+ 
+-- Required: No
++-   Required: No
++-   Default: `horizontal`
+ 
+ ### Inherited props
+ 
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index b3bdc5e1c53373..ee03d9bd4dbb3e 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -14,10 +14,10 @@ import {
+ 	WordPressComponentProps,
+ } from '../ui/context';
+ import { DividerView } from './styles';
+-import type { Props } from './types';
++import type { DividerProps } from './types';
+ 
+ function UnconnectedDivider(
+-	props: WordPressComponentProps< Props, 'hr', false >,
++	props: WordPressComponentProps< DividerProps, 'hr', false >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const contextProps = useContextSystem( props, 'Divider' );
+@@ -34,7 +34,6 @@ function UnconnectedDivider(
+ /**
+  * `Divider` is a layout component that separates groups of related content.
+  *
+- * @example
+  * ```js
+  * import {
+  * 		__experimentalDivider as Divider,
+diff --git a/packages/components/src/divider/index.ts b/packages/components/src/divider/index.ts
+index f0aba16dd3b812..9f21cb2246230b 100644
+--- a/packages/components/src/divider/index.ts
++++ b/packages/components/src/divider/index.ts
+@@ -1,2 +1,2 @@
+ export { default as Divider } from './component';
+-export type { Props as DividerProps } from './types';
++export type { DividerProps } from './types';
+diff --git a/packages/components/src/divider/stories/index.tsx b/packages/components/src/divider/stories/index.tsx
+index 46f9b45837a0d2..312e5b8d7f6bea 100644
+--- a/packages/components/src/divider/stories/index.tsx
++++ b/packages/components/src/divider/stories/index.tsx
+@@ -15,13 +15,13 @@ const meta: ComponentMeta< typeof Divider > = {
+ 	title: 'Components (Experimental)/Divider',
+ 	argTypes: {
+ 		margin: {
+-			control: { type: 'number' },
++			control: { type: 'text' },
+ 		},
+ 		marginStart: {
+-			control: { type: 'number' },
++			control: { type: 'text' },
+ 		},
+ 		marginEnd: {
+-			control: { type: 'number' },
++			control: { type: 'text' },
+ 		},
+ 	},
+ 	parameters: {
+@@ -41,7 +41,7 @@ const Template: ComponentStory< typeof Divider > = ( args ) => (
+ 
+ export const Horizontal: ComponentStory< typeof Divider > = Template.bind( {} );
+ Horizontal.args = {
+-	margin: 2,
++	margin: '2',
+ };
+ 
+ export const Vertical: ComponentStory< typeof Divider > = Template.bind( {} );
+diff --git a/packages/components/src/divider/styles.ts b/packages/components/src/divider/styles.ts
+index 710e908c5b0ae9..ad13e357c53b08 100644
+--- a/packages/components/src/divider/styles.ts
++++ b/packages/components/src/divider/styles.ts
+@@ -9,10 +9,10 @@ import { css } from '@emotion/react';
+  */
+ import { space } from '../ui/utils/space';
+ import { rtl } from '../utils';
+-import type { Props } from './types';
++import type { DividerProps } from './types';
+ 
+ const MARGIN_DIRECTIONS: Record<
+-	NonNullable< Props[ 'orientation' ] >,
++	NonNullable< DividerProps[ 'orientation' ] >,
+ 	Record< 'start' | 'end', string >
+ > = {
+ 	vertical: {
+@@ -33,7 +33,7 @@ const renderMargin = ( {
+ 	margin,
+ 	marginStart,
+ 	marginEnd,
+-}: Props ) =>
++}: DividerProps ) =>
+ 	css(
+ 		rtl( {
+ 			[ MARGIN_DIRECTIONS[ orientation ].start ]: space(
+@@ -47,7 +47,7 @@ const renderMargin = ( {
+ 
+ const renderDisplay = ( {
+ 	'aria-orientation': orientation = 'horizontal',
+-}: Props ) => {
++}: DividerProps ) => {
+ 	return orientation === 'vertical'
+ 		? css( { display: 'inline' } )
+ 		: undefined;
+@@ -55,7 +55,7 @@ const renderDisplay = ( {
+ 
+ const renderBorder = ( {
+ 	'aria-orientation': orientation = 'horizontal',
+-}: Props ) => {
++}: DividerProps ) => {
+ 	return css( {
+ 		[ orientation === 'vertical' ? 'borderRight' : 'borderBottom' ]:
+ 			'1px solid currentColor',
+@@ -64,13 +64,13 @@ const renderBorder = ( {
+ 
+ const renderSize = ( {
+ 	'aria-orientation': orientation = 'horizontal',
+-}: Props ) =>
++}: DividerProps ) =>
+ 	css( {
+ 		height: orientation === 'vertical' ? 'auto' : 0,
+ 		width: orientation === 'vertical' ? 0 : 'auto',
+ 	} );
+ 
+-export const DividerView = styled.hr< Props >`
++export const DividerView = styled.hr< DividerProps >`
+ 	border: 0;
+ 	margin: 0;
+ 
+diff --git a/packages/components/src/divider/test/__snapshots__/index.js.snap b/packages/components/src/divider/test/__snapshots__/index.tsx.snap
+similarity index 87%
+rename from packages/components/src/divider/test/__snapshots__/index.js.snap
+rename to packages/components/src/divider/test/__snapshots__/index.tsx.snap
+index 5a330d602a5608..b450d6cb546d31 100644
+--- a/packages/components/src/divider/test/__snapshots__/index.js.snap
++++ b/packages/components/src/divider/test/__snapshots__/index.tsx.snap
+@@ -23,14 +23,14 @@ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
+-@@ -2,10 +2,8 @@
++@@ -2,8 +2,10 @@
+     Object {
+       "border": "0",
+       "border-bottom": "1px solid currentColor",
+       "height": "0",
+       "margin": "0",
+--     "margin-bottom": "calc(4px * 7)",
+--     "margin-top": "calc(4px * 7)",
+++     "margin-bottom": "calc(4px * 7)",
+++     "margin-top": "calc(4px * 7)",
+       "width": "auto",
+     },
+   ]
+@@ -41,13 +41,13 @@ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
+-@@ -2,9 +2,8 @@
++@@ -2,8 +2,9 @@
+     Object {
+       "border": "0",
+       "border-bottom": "1px solid currentColor",
+       "height": "0",
+       "margin": "0",
+--     "margin-bottom": "calc(4px * 5)",
+++     "margin-bottom": "calc(4px * 5)",
+       "width": "auto",
+     },
+   ]
+@@ -58,13 +58,13 @@ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
+-@@ -2,9 +2,8 @@
++@@ -2,8 +2,9 @@
+     Object {
+       "border": "0",
+       "border-bottom": "1px solid currentColor",
+       "height": "0",
+       "margin": "0",
+--     "margin-top": "calc(4px * 5)",
+++     "margin-top": "calc(4px * 5)",
+       "width": "auto",
+     },
+   ]
+diff --git a/packages/components/src/divider/test/index.js b/packages/components/src/divider/test/index.js
+deleted file mode 100644
+index 424fa33ce368b3..00000000000000
+--- a/packages/components/src/divider/test/index.js
++++ /dev/null
+@@ -1,41 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Divider } from '../index';
+-
+-describe( 'props', () => {
+-	let base;
+-	beforeEach( () => {
+-		base = render( <Divider /> );
+-	} );
+-
+-	test( 'should render correctly', () => {
+-		expect( base.container.firstChild ).toMatchSnapshot();
+-	} );
+-
+-	test( 'should render marginStart', () => {
+-		const { container } = render( <Divider marginStart={ 5 } /> );
+-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-			base.container.firstChild
+-		);
+-	} );
+-
+-	test( 'should render marginEnd', () => {
+-		const { container } = render( <Divider marginEnd={ 5 } /> );
+-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-			base.container.firstChild
+-		);
+-	} );
+-
+-	test( 'should render margin', () => {
+-		const { container } = render( <Divider margin={ 7 } /> );
+-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-			base.container.firstChild
+-		);
+-	} );
+-} );
+diff --git a/packages/components/src/divider/test/index.tsx b/packages/components/src/divider/test/index.tsx
+new file mode 100644
+index 00000000000000..f89e715c555f70
+--- /dev/null
++++ b/packages/components/src/divider/test/index.tsx
+@@ -0,0 +1,40 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { Divider } from '..';
++
++describe( 'props', () => {
++	beforeEach( () => {
++		render( <Divider /> );
++	} );
++
++	test( 'should render correctly', () => {
++		expect( screen.getByRole( 'separator' ) ).toMatchSnapshot();
++	} );
++
++	test( 'should render marginStart', () => {
++		render( <Divider marginStart={ 5 } /> );
++
++		const dividers = screen.getAllByRole( 'separator' );
++		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
++	} );
++
++	test( 'should render marginEnd', () => {
++		render( <Divider marginEnd={ 5 } /> );
++
++		const dividers = screen.getAllByRole( 'separator' );
++		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
++	} );
++
++	test( 'should render margin', () => {
++		render( <Divider margin={ 7 } /> );
++
++		const dividers = screen.getAllByRole( 'separator' );
++		expect( dividers[ 0 ] ).toMatchStyleDiffSnapshot( dividers[ 1 ] );
++	} );
++} );
+diff --git a/packages/components/src/divider/types.ts b/packages/components/src/divider/types.ts
+index d48f53795505be..61ab4296638b1b 100644
+--- a/packages/components/src/divider/types.ts
++++ b/packages/components/src/divider/types.ts
+@@ -9,31 +9,28 @@ import type { SeparatorProps } from 'reakit';
+  */
+ import type { SpaceInput } from '../ui/utils/space';
+ 
+-export interface OwnProps {
++export type DividerProps = Omit<
++	SeparatorProps,
++	'children' | 'unstable_system' | 'orientation'
++> & {
+ 	/**
+ 	 * Adjusts all margins on the inline dimension.
+ 	 */
+ 	margin?: SpaceInput;
+-	/**
+-	 * Adjusts the inline-start margin.
+-	 */
+-	marginStart?: SpaceInput;
+ 	/**
+ 	 * Adjusts the inline-end margin.
+ 	 */
+ 	marginEnd?: SpaceInput;
+ 	/**
+-	 * Divider's orientation. When using inside a flex container, you may need to make sure the divider is `stretch` aligned
+-	 * in order for it to be visible.
++	 * Adjusts the inline-start margin.
++	 */
++	marginStart?: SpaceInput;
++	/**
++	 * Divider's orientation. When using inside a flex container, you may need
++	 * to make sure the divider is `stretch` aligned in order for it to be
++	 * visible.
+ 	 *
+ 	 * @default 'horizontal'
+ 	 */
+ 	orientation?: SeparatorProps[ 'orientation' ];
+-}
+-
+-export interface Props
+-	extends Omit<
+-			SeparatorProps,
+-			'children' | 'unstable_system' | 'orientation'
+-		>,
+-		OwnProps {}
++};

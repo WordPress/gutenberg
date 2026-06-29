@@ -1,0 +1,585 @@
+diff --git a/packages/block-editor/src/components/autocomplete/index.js b/packages/block-editor/src/components/autocomplete/index.js
+index 5459128a8e475b..5ccad861250308 100644
+--- a/packages/block-editor/src/components/autocomplete/index.js
++++ b/packages/block-editor/src/components/autocomplete/index.js
+@@ -7,7 +7,7 @@ import { clone } from 'lodash';
+  * WordPress dependencies
+  */
+ import { applyFilters, hasFilter } from '@wordpress/hooks';
+-import { Autocomplete } from '@wordpress/components';
++import { __unstableUseAutocomplete as useAutocomplete } from '@wordpress/components';
+ import { useMemo } from '@wordpress/element';
+ import { getDefaultBlockName } from '@wordpress/blocks';
+ 
+@@ -25,13 +25,11 @@ import blockAutocompleter from '../../autocompleters/block';
+  */
+ const EMPTY_ARRAY = [];
+ 
+-/**
++/*
+  * Wrap the default Autocomplete component with one that supports a filter hook
+  * for customizing its list of autocompleters.
+- *
+- * @type {import('react').FC}
+  */
+-function BlockEditorAutocomplete( props ) {
++function useBlockEditorAutocomplete( props ) {
+ 	const { name } = useBlockEditContext();
+ 
+ 	let { completers = EMPTY_ARRAY } = props;
+@@ -61,10 +59,10 @@ function BlockEditorAutocomplete( props ) {
+ 		return filteredCompleters;
+ 	}, [ completers, name ] );
+ 
+-	return <Autocomplete { ...props } completers={ completers } />;
++	return useAutocomplete( { ...props, completers } );
+ }
+ 
+ /**
+  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/autocomplete/README.md
+  */
+-export default BlockEditorAutocomplete;
++export default useBlockEditorAutocomplete;
+diff --git a/packages/block-editor/src/components/rich-text/index.js b/packages/block-editor/src/components/rich-text/index.js
+index faf3f79140ab8e..ed4621d6c9dbc9 100644
+--- a/packages/block-editor/src/components/rich-text/index.js
++++ b/packages/block-editor/src/components/rich-text/index.js
+@@ -24,7 +24,7 @@ import {
+ } from '@wordpress/blocks';
+ import { useInstanceId } from '@wordpress/compose';
+ import {
+-	__experimentalRichText as RichText,
++	__experimentalUseRichTextProps as useRichTextProps,
+ 	__unstableCreateElement,
+ 	isEmpty,
+ 	__unstableIsEmptyLine as isEmptyLine,
+@@ -44,7 +44,7 @@ import { regexp } from '@wordpress/shortcode';
+ /**
+  * Internal dependencies
+  */
+-import Autocomplete from '../autocomplete';
++import useAutocomplete from '../autocomplete';
+ import { useBlockEditContext } from '../block-edit';
+ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
+ import { filePasteHandler } from './file-paste-handler';
+@@ -541,130 +541,109 @@ function RichTextWrapper(
+ 		[ onReplace, __unstableMarkAutomaticChange ]
+ 	);
+ 
++	const {
++		isSelected: nestedIsSelected,
++		value,
++		change,
++		focus,
++		children: richTextChildren,
++		...editableProps
++	} = useRichTextProps( props, {
++		clientId,
++		identifier,
++		ref,
++		value: adjustedValue,
++		onChange: adjustedOnChange,
++		selectionStart,
++		selectionEnd,
++		onSelectionChange,
++		placeholder,
++		allowedFormats: adjustedAllowedFormats,
++		withoutInteractiveFormatting,
++		onEnter,
++		onDelete,
++		onPaste,
++		__unstableIsSelected: isSelected,
++		__unstableInputRule: inputRule,
++		__unstableMultilineTag: multilineTag,
++		__unstableIsCaretWithinFormattedText: isCaretWithinFormattedText,
++		__unstableOnEnterFormattedText: enterFormattedText,
++		__unstableOnExitFormattedText: exitFormattedText,
++		__unstableOnCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
++		__unstableMarkAutomaticChange,
++		__unstableDidAutomaticChange: didAutomaticChange,
++		__unstableUndo: undo,
++		__unstableDisableFormats: disableFormats,
++		preserveWhiteSpace,
++		disabled,
++		unstableOnFocus,
++		__unstableAllowPrefixTransformations,
++		__unstableMultilineRootTag,
++		// Native props.
++		onCaretVerticalPositionChange,
++		blockIsSelected:
++			originalIsSelected !== undefined
++				? originalIsSelected
++				: blockIsSelected,
++		shouldBlurOnUnmount,
++		__unstableMobileNoFocusOnMount,
++		deleteEnter,
++		placeholderTextColor,
++		textAlign,
++		selectionColor,
++		tagsToEliminate,
++		rootTagsToEliminate,
++		disableEditingMenu,
++		fontSize,
++		fontFamily,
++		fontWeight,
++		fontStyle,
++		minWidth,
++		maxWidth,
++		onBlur,
++		setRef,
++		// Props to be set on the editable container are destructured on the
++		// element itself for web (see below), but passed through rich text
++		// for native.
++		id: props.id,
++		style: props.style,
++	} );
++
++	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
++		onReplace,
++		completers: autocompleters,
++		record: value,
++		onChange: change,
++	} );
++
++	const TagName = tagName || 'div';
+ 	const content = (
+-		<RichText
+-			clientId={ clientId }
+-			identifier={ identifier }
+-			ref={ ref }
+-			value={ adjustedValue }
+-			onChange={ adjustedOnChange }
+-			selectionStart={ selectionStart }
+-			selectionEnd={ selectionEnd }
+-			onSelectionChange={ onSelectionChange }
+-			tagName={ tagName }
+-			placeholder={ placeholder }
+-			allowedFormats={ adjustedAllowedFormats }
+-			withoutInteractiveFormatting={ withoutInteractiveFormatting }
+-			onEnter={ onEnter }
+-			onDelete={ onDelete }
+-			onPaste={ onPaste }
+-			__unstableIsSelected={ isSelected }
+-			__unstableInputRule={ inputRule }
+-			__unstableMultilineTag={ multilineTag }
+-			__unstableIsCaretWithinFormattedText={ isCaretWithinFormattedText }
+-			__unstableOnEnterFormattedText={ enterFormattedText }
+-			__unstableOnExitFormattedText={ exitFormattedText }
+-			__unstableOnCreateUndoLevel={ __unstableMarkLastChangeAsPersistent }
+-			__unstableMarkAutomaticChange={ __unstableMarkAutomaticChange }
+-			__unstableDidAutomaticChange={ didAutomaticChange }
+-			__unstableUndo={ undo }
+-			__unstableDisableFormats={ disableFormats }
+-			preserveWhiteSpace={ preserveWhiteSpace }
+-			disabled={ disabled }
+-			unstableOnFocus={ unstableOnFocus }
+-			__unstableAllowPrefixTransformations={
+-				__unstableAllowPrefixTransformations
+-			}
+-			__unstableMultilineRootTag={ __unstableMultilineRootTag }
+-			// Native props.
+-			onCaretVerticalPositionChange={ onCaretVerticalPositionChange }
+-			blockIsSelected={
+-				originalIsSelected !== undefined
+-					? originalIsSelected
+-					: blockIsSelected
+-			}
+-			shouldBlurOnUnmount={ shouldBlurOnUnmount }
+-			__unstableMobileNoFocusOnMount={ __unstableMobileNoFocusOnMount }
+-			deleteEnter={ deleteEnter }
+-			placeholderTextColor={ placeholderTextColor }
+-			textAlign={ textAlign }
+-			selectionColor={ selectionColor }
+-			tagsToEliminate={ tagsToEliminate }
+-			rootTagsToEliminate={ rootTagsToEliminate }
+-			disableEditingMenu={ disableEditingMenu }
+-			fontSize={ fontSize }
+-			fontFamily={ fontFamily }
+-			fontWeight={ fontWeight }
+-			fontStyle={ fontStyle }
+-			minWidth={ minWidth }
+-			maxWidth={ maxWidth }
+-			onBlur={ onBlur }
+-			setRef={ setRef }
+-			// Props to be set on the editable container are destructured on the
+-			// element itself for web (see below), but passed through rich text
+-			// for native.
+-			id={ props.id }
+-			style={ props.style }
+-		>
+-			{ ( {
+-				isSelected: nestedIsSelected,
+-				value,
+-				onChange,
+-				onFocus,
+-				editableProps,
+-				editableTagName: TagName,
+-			} ) => (
+-				<>
+-					{ children && children( { value, onChange, onFocus } ) }
+-					{ nestedIsSelected && hasFormats && (
+-						<FormatToolbarContainer
+-							inline={ inlineToolbar }
+-							anchorRef={ ref.current }
+-						/>
+-					) }
+-					{ nestedIsSelected && <RemoveBrowserShortcuts /> }
+-					<Autocomplete
+-						onReplace={ onReplace }
+-						completers={ autocompleters }
+-						record={ value }
+-						onChange={ onChange }
+-						isSelected={ nestedIsSelected }
+-					>
+-						{ ( { listBoxId, activeId, onKeyDown } ) => (
+-							<TagName
+-								{ ...editableProps }
+-								{ ...props }
+-								style={
+-									props.style
+-										? {
+-												...props.style,
+-												...editableProps.style,
+-										  }
+-										: editableProps.style
+-								}
+-								className={ classnames(
+-									classes,
+-									props.className,
+-									editableProps.className,
+-									{
+-										'keep-placeholder-on-focus': keepPlaceholderOnFocus,
+-									}
+-								) }
+-								aria-autocomplete={
+-									listBoxId ? 'list' : undefined
+-								}
+-								aria-owns={ listBoxId }
+-								aria-activedescendant={ activeId }
+-								onKeyDown={ ( event ) => {
+-									onKeyDown( event );
+-									editableProps.onKeyDown( event );
+-								} }
+-							/>
+-						) }
+-					</Autocomplete>
+-				</>
++		<>
++			{ children &&
++				children( { value, onChange: change, onFocus: focus } ) }
++			{ nestedIsSelected && hasFormats && (
++				<FormatToolbarContainer
++					inline={ inlineToolbar }
++					anchorRef={ ref.current }
++				/>
+ 			) }
+-		</RichText>
++			{ nestedIsSelected && <RemoveBrowserShortcuts /> }
++			{ popover }
++			{ richTextChildren }
++			<TagName
++				{ ...editableProps }
++				className={ classnames( editableProps.className, classes, {
++					'keep-placeholder-on-focus': keepPlaceholderOnFocus,
++				} ) }
++				aria-autocomplete={ listBoxId ? 'list' : undefined }
++				aria-owns={ listBoxId }
++				aria-activedescendant={ activeId }
++				onKeyDown={ ( event ) => {
++					onKeyDown( event );
++					editableProps.onKeyDown( event );
++				} }
++			/>
++		</>
+ 	);
+ 
+ 	if ( ! wrapperClassName ) {
+diff --git a/packages/components/src/autocomplete/index.js b/packages/components/src/autocomplete/index.js
+index c61ccc4f634bc4..0653308f6b1192 100644
+--- a/packages/components/src/autocomplete/index.js
++++ b/packages/components/src/autocomplete/index.js
+@@ -15,7 +15,8 @@ import {
+ } from '@wordpress/element';
+ import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+ import { __, _n, sprintf } from '@wordpress/i18n';
+-import { useInstanceId } from '@wordpress/compose';
++import { useInstanceId, useDebounce } from '@wordpress/compose';
++import { speak } from '@wordpress/a11y';
+ import {
+ 	create,
+ 	slice,
+@@ -29,7 +30,6 @@ import {
+  */
+ import Button from '../button';
+ import Popover from '../popover';
+-import withSpokenMessages from '../higher-order/with-spoken-messages';
+ 
+ /**
+  * A raw completer option.
+@@ -277,21 +277,14 @@ const getAutoCompleterUI = ( autocompleter ) => {
+ 	return AutocompleterUI;
+ };
+ 
+-function Autocomplete( {
+-	children,
+-	isSelected,
+-	record,
+-	onChange,
+-	onReplace,
+-	completers,
+-	debouncedSpeak,
+-} ) {
++export function useAutocomplete( { record, onChange, onReplace, completers } ) {
+ 	const instanceId = useInstanceId( Autocomplete );
+ 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
+ 	const [ filteredOptions, setFilteredOptions ] = useState( [] );
+ 	const [ filterValue, setFilterValue ] = useState( '' );
+ 	const [ autocompleter, setAutocompleter ] = useState( null );
+ 	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
++	const debouncedSpeak = useDebounce( speak );
+ 
+ 	function insertCompletion( replacement ) {
+ 		const end = record.start;
+@@ -484,27 +477,31 @@ function Autocomplete( {
+ 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
+ 		: null;
+ 
++	return {
++		isExpanded,
++		listBoxId,
++		activeId,
++		onKeyDown: handleKeyDown,
++		popover: AutocompleterUI && (
++			<AutocompleterUI
++				className={ className }
++				filterValue={ filterValue }
++				instanceId={ instanceId }
++				listBoxId={ listBoxId }
++				selectedIndex={ selectedIndex }
++				onChangeOptions={ onChangeOptions }
++				onSelect={ select }
++			/>
++		),
++	};
++}
++
++export default function Autocomplete( { children, isSelected, ...options } ) {
++	const { popover, ...props } = useAutocomplete( options );
+ 	return (
+ 		<>
+-			{ children( {
+-				isExpanded,
+-				listBoxId,
+-				activeId,
+-				onKeyDown: handleKeyDown,
+-			} ) }
+-			{ isSelected && AutocompleterUI && (
+-				<AutocompleterUI
+-					className={ className }
+-					filterValue={ filterValue }
+-					instanceId={ instanceId }
+-					listBoxId={ listBoxId }
+-					selectedIndex={ selectedIndex }
+-					onChangeOptions={ onChangeOptions }
+-					onSelect={ select }
+-				/>
+-			) }
++			{ children( props ) }
++			{ isSelected ? popover : null }
+ 		</>
+ 	);
+ }
+-
+-export default withSpokenMessages( Autocomplete );
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index a629eb4d8efc5d..4550d2c8cc83ac 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -14,7 +14,10 @@ export {
+ export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
+ export { default as Animate } from './animate';
+ export { default as AnglePickerControl } from './angle-picker-control';
+-export { default as Autocomplete } from './autocomplete';
++export {
++	default as Autocomplete,
++	useAutocomplete as __unstableUseAutocomplete,
++} from './autocomplete';
+ export { default as BaseControl } from './base-control';
+ export { default as __experimentalBoxControl } from './box-control';
+ export { default as Button } from './button';
+diff --git a/packages/rich-text/src/component/index.js b/packages/rich-text/src/component/index.js
+index 04fcb77f92b606..ed21aac840a6f1 100644
+--- a/packages/rich-text/src/component/index.js
++++ b/packages/rich-text/src/component/index.js
+@@ -7,7 +7,6 @@ import { find, isNil } from 'lodash';
+  * WordPress dependencies
+  */
+ import {
+-	forwardRef,
+ 	useEffect,
+ 	useRef,
+ 	useState,
+@@ -129,13 +128,38 @@ function fixPlaceholderSelection( defaultView ) {
+ 	selection.collapseToStart();
+ }
+ 
+-function RichText(
++function getRef( ref, callback ) {
++	return {
++		get current() {
++			return this._current;
++		},
++		set current( value ) {
++			this._current = value;
++
++			if ( typeof ref === 'function' ) {
++				ref( value );
++			} else if ( ref ) {
++				ref.current = value;
++			}
++
++			callback( value );
++
++			return value;
++		},
++	};
++}
++
++/*
++ * Renders a rich content input, providing users with the option to format the
++ * content.
++ */
++export default function useRichTextProps(
++	props,
+ 	{
+-		tagName: TagName = 'div',
++		ref,
+ 		value = '',
+ 		selectionStart,
+ 		selectionEnd,
+-		children,
+ 		allowedFormats,
+ 		withoutInteractiveFormatting,
+ 		placeholder,
+@@ -165,8 +189,7 @@ function RichText(
+ 		__unstableOnExitFormattedText: onExitFormattedText,
+ 		__unstableOnCreateUndoLevel: onCreateUndoLevel,
+ 		__unstableIsSelected: isSelected,
+-	},
+-	ref
++	}
+ ) {
+ 	const [ activeFormats = [], setActiveFormats ] = useState();
+ 	const {
+@@ -180,12 +203,6 @@ function RichText(
+ 		identifier,
+ 	} );
+ 
+-	// For backward compatibility, fall back to tagName if it's a string.
+-	// tagName can now be a component for light blocks.
+-	if ( ! multilineRootTag && typeof TagName === 'string' ) {
+-		multilineRootTag = TagName;
+-	}
+-
+ 	function getDoc() {
+ 		return ref.current.ownerDocument;
+ 	}
+@@ -1040,7 +1057,7 @@ function RichText(
+ 		if ( didMount.current ) {
+ 			applyFromProps();
+ 		}
+-	}, [ TagName, placeholder ] );
++	}, [ placeholder ] );
+ 
+ 	useEffect( () => {
+ 		if ( didMount.current && value !== _value.current ) {
+@@ -1094,14 +1111,22 @@ function RichText(
+ 		applyRecord( record.current );
+ 	}
+ 
+-	const editableProps = {
++	useBoundaryStyle( { ref, activeFormats } );
++	useInlineWarning( { ref } );
++
++	return {
++		isSelected,
++		value: record.current,
++		change: handleChange,
++		focus,
+ 		// Overridable props.
+ 		role: 'textbox',
+ 		'aria-multiline': true,
+ 		'aria-label': placeholder,
+-		ref,
+-		style: defaultStyle,
+-		className: 'rich-text',
++		...props,
++		ref: getRef( ref, ( newRef ) => newRef && applyFromProps() ),
++		style: props.style ? { ...props.style, ...defaultStyle } : defaultStyle,
++		className: 'rich-text ' + props.className,
+ 		onPaste: handlePaste,
+ 		onInput: handleInput,
+ 		onCompositionStart: handleCompositionStart,
+@@ -1121,41 +1146,15 @@ function RichText(
+ 		// Do not set the attribute if disabled.
+ 		contentEditable: disabled ? undefined : true,
+ 		suppressContentEditableWarning: ! disabled,
++		children: isSelected && (
++			<FormatEdit
++				allowedFormats={ allowedFormats }
++				withoutInteractiveFormatting={ withoutInteractiveFormatting }
++				value={ record.current }
++				onChange={ handleChange }
++				onFocus={ focus }
++				formatTypes={ formatTypes }
++			/>
++		),
+ 	};
+-
+-	useBoundaryStyle( { ref, activeFormats } );
+-	useInlineWarning( { ref } );
+-
+-	return (
+-		<>
+-			{ isSelected && (
+-				<FormatEdit
+-					allowedFormats={ allowedFormats }
+-					withoutInteractiveFormatting={
+-						withoutInteractiveFormatting
+-					}
+-					value={ record.current }
+-					onChange={ handleChange }
+-					onFocus={ focus }
+-					formatTypes={ formatTypes }
+-				/>
+-			) }
+-			{ children &&
+-				children( {
+-					isSelected,
+-					value: record.current,
+-					onChange: handleChange,
+-					onFocus: focus,
+-					editableProps,
+-					editableTagName: TagName,
+-				} ) }
+-			{ ! children && <TagName { ...editableProps } /> }
+-		</>
+-	);
+ }
+-
+-/**
+- * Renders a rich content input, providing users with the option to format the
+- * content.
+- */
+-export default forwardRef( RichText );
+diff --git a/packages/rich-text/src/index.js b/packages/rich-text/src/index.js
+index ac4cea67d4757c..a3a3bfa615c18c 100644
+--- a/packages/rich-text/src/index.js
++++ b/packages/rich-text/src/index.js
+@@ -36,5 +36,5 @@ export { outdentListItems as __unstableOutdentListItems } from './outdent-list-i
+ export { changeListType as __unstableChangeListType } from './change-list-type';
+ export { createElement as __unstableCreateElement } from './create-element';
+ 
+-export { default as __experimentalRichText } from './component';
++export { default as __experimentalUseRichTextProps } from './component';
+ export { default as __unstableFormatEdit } from './component/format-edit';

@@ -1,0 +1,6094 @@
+diff --git a/.eslintignore b/.eslintignore
+index aab87ed140ccd6..0b5d00e2930a98 100644
+--- a/.eslintignore
++++ b/.eslintignore
+@@ -4,6 +4,8 @@ build-module
+ node_modules
+ packages/block-serialization-spec-parser/parser.js
+ packages/e2e-tests/plugins
++component-docs/build
++component-docs/scripts
+ playground/dist
+ vendor
+ wordpress
+diff --git a/.gitignore b/.gitignore
+index 96f49190bf8b53..7a8d702c84f615 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -13,6 +13,7 @@ yarn.lock
+ /wordpress
+ 
+ playground/dist
++packages/components/website/build
+ .cache
+ 
+ # Report generated from jest-junit
+diff --git a/docs/manifest-devhub.json b/docs/manifest-devhub.json
+index 68958986ae8ea2..e2a6dfb7e2dc76 100644
+--- a/docs/manifest-devhub.json
++++ b/docs/manifest-devhub.json
+@@ -1127,6 +1127,12 @@
+ 		"markdown_source": "../packages/browserslist-config/README.md",
+ 		"parent": "packages"
+ 	},
++	{
++		"title": "@wordpress/components-website",
++		"slug": "packages-components-website",
++		"markdown_source": "../packages/components-website/README.md",
++		"parent": "packages"
++	},
+ 	{
+ 		"title": "@wordpress/components",
+ 		"slug": "packages-components",
+diff --git a/package-lock.json b/package-lock.json
+index d7586bbb615730..c6b386ea2be85e 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -4104,6 +4104,34 @@
+ 			"requires": {
+ 				"@parcel/utils": "^1.11.0",
+ 				"chokidar": "^2.0.3"
++			},
++			"dependencies": {
++				"chokidar": {
++					"version": "2.1.8",
++					"resolved": "https://registry.npmjs.org/chokidar/-/chokidar-2.1.8.tgz",
++					"integrity": "sha512-ZmZUazfOzf0Nve7duiCKD23PFSCs4JPoYyccjUFF3aQkQadqBhfzhjkwBH2mNOG9cTBwhamM37EIsIkZw3nRgg==",
++					"dev": true,
++					"requires": {
++						"anymatch": "^2.0.0",
++						"async-each": "^1.0.1",
++						"braces": "^2.3.2",
++						"fsevents": "^1.2.7",
++						"glob-parent": "^3.1.0",
++						"inherits": "^2.0.3",
++						"is-binary-path": "^1.0.0",
++						"is-glob": "^4.0.0",
++						"normalize-path": "^3.0.0",
++						"path-is-absolute": "^1.0.0",
++						"readdirp": "^2.2.1",
++						"upath": "^1.1.1"
++					}
++				},
++				"normalize-path": {
++					"version": "3.0.0",
++					"resolved": "https://registry.npmjs.org/normalize-path/-/normalize-path-3.0.0.tgz",
++					"integrity": "sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==",
++					"dev": true
++				}
+ 			}
+ 		},
+ 		"@parcel/workers": {
+@@ -6107,9 +6135,9 @@
+ 			}
+ 		},
+ 		"async-each": {
+-			"version": "1.0.1",
+-			"resolved": "https://registry.npmjs.org/async-each/-/async-each-1.0.1.tgz",
+-			"integrity": "sha1-GdOGodntxufByF04iu28xW0zYC0=",
++			"version": "1.0.3",
++			"resolved": "https://registry.npmjs.org/async-each/-/async-each-1.0.3.tgz",
++			"integrity": "sha512-z/WhQ5FPySLdvREByI2vZiTWwCnF0moMJ1hK9YQwDTHKh6I7/uSckMetoRGb5UBZPC1z0jlw+n/XCgjeH7y1AQ==",
+ 			"dev": true
+ 		},
+ 		"async-foreach": {
+@@ -6894,9 +6922,9 @@
+ 			}
+ 		},
+ 		"binary-extensions": {
+-			"version": "1.13.0",
+-			"resolved": "https://registry.npmjs.org/binary-extensions/-/binary-extensions-1.13.0.tgz",
+-			"integrity": "sha512-EgmjVLMn22z7eGGv3kcnHwSnJXmFHjISTY9E/S5lIcTD3Oxw05QTcBLNkJFzcb3cNueUdF/IN4U+d78V0zO8Hw==",
++			"version": "1.13.1",
++			"resolved": "https://registry.npmjs.org/binary-extensions/-/binary-extensions-1.13.1.tgz",
++			"integrity": "sha512-Un7MIEDdUC5gNpcGDV97op1Ywk748MpHcFTHoYs6qnj1Z3j7I53VG3nwZhKzoBZmbdRNnb6WRdFlwl7tSDuZGw==",
+ 			"dev": true
+ 		},
+ 		"bindings": {
+@@ -6939,27 +6967,27 @@
+ 			}
+ 		},
+ 		"body-parser": {
+-			"version": "1.18.2",
+-			"resolved": "https://registry.npmjs.org/body-parser/-/body-parser-1.18.2.tgz",
+-			"integrity": "sha1-h2eKGdhLR9hZuDGZvVm84iKxBFQ=",
++			"version": "1.19.0",
++			"resolved": "https://registry.npmjs.org/body-parser/-/body-parser-1.19.0.tgz",
++			"integrity": "sha512-dhEPs72UPbDnAQJ9ZKMNTP6ptJaionhP5cBb541nXPlW60Jepo9RV/a4fX4XWW9CuFNK22krhrj1+rgzifNCsw==",
+ 			"dev": true,
+ 			"requires": {
+-				"bytes": "3.0.0",
++				"bytes": "3.1.0",
+ 				"content-type": "~1.0.4",
+ 				"debug": "2.6.9",
+-				"depd": "~1.1.1",
+-				"http-errors": "~1.6.2",
+-				"iconv-lite": "0.4.19",
++				"depd": "~1.1.2",
++				"http-errors": "1.7.2",
++				"iconv-lite": "0.4.24",
+ 				"on-finished": "~2.3.0",
+-				"qs": "6.5.1",
+-				"raw-body": "2.3.2",
+-				"type-is": "~1.6.15"
++				"qs": "6.7.0",
++				"raw-body": "2.4.0",
++				"type-is": "~1.6.17"
+ 			},
+ 			"dependencies": {
+ 				"bytes": {
+-					"version": "3.0.0",
+-					"resolved": "https://registry.npmjs.org/bytes/-/bytes-3.0.0.tgz",
+-					"integrity": "sha1-0ygVQE1olpn4Wk6k+odV3ROpYEg=",
++					"version": "3.1.0",
++					"resolved": "https://registry.npmjs.org/bytes/-/bytes-3.1.0.tgz",
++					"integrity": "sha512-zauLjrfCG+xvoyaqLoV8bLVXXNGC4JqlxFCutSDWA6fJrTo2ZuvLYTqZ7aHBLZSMOopbzwv8f+wZcVzfVTI2Dg==",
+ 					"dev": true
+ 				},
+ 				"debug": {
+@@ -6971,54 +6999,56 @@
+ 						"ms": "2.0.0"
+ 					}
+ 				},
++				"http-errors": {
++					"version": "1.7.2",
++					"resolved": "https://registry.npmjs.org/http-errors/-/http-errors-1.7.2.tgz",
++					"integrity": "sha512-uUQBt3H/cSIVfch6i1EuPNy/YsRSOUBXTVfZ+yR7Zjez3qjBz6i9+i4zjNaoqcoFVI4lQJ5plg63TvGfRSDCRg==",
++					"dev": true,
++					"requires": {
++						"depd": "~1.1.2",
++						"inherits": "2.0.3",
++						"setprototypeof": "1.1.1",
++						"statuses": ">= 1.5.0 < 2",
++						"toidentifier": "1.0.0"
++					}
++				},
+ 				"iconv-lite": {
+-					"version": "0.4.19",
+-					"resolved": "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.19.tgz",
+-					"integrity": "sha512-oTZqweIP51xaGPI4uPa56/Pri/480R+mo7SeU+YETByQNhDG55ycFyNLIgta9vXhILrxXDmF7ZGhqZIcuN0gJQ==",
+-					"dev": true
++					"version": "0.4.24",
++					"resolved": "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.24.tgz",
++					"integrity": "sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==",
++					"dev": true,
++					"requires": {
++						"safer-buffer": ">= 2.1.2 < 3"
++					}
+ 				},
+ 				"qs": {
+-					"version": "6.5.1",
+-					"resolved": "https://registry.npmjs.org/qs/-/qs-6.5.1.tgz",
+-					"integrity": "sha512-eRzhrN1WSINYCDCbrz796z37LOe3m5tmW7RQf6oBntukAG1nmovJvhnwHHRMAfeoItc1m2Hk02WER2aQ/iqs+A==",
++					"version": "6.7.0",
++					"resolved": "https://registry.npmjs.org/qs/-/qs-6.7.0.tgz",
++					"integrity": "sha512-VCdBRNFTX1fyE7Nb6FYoURo/SPe62QCaAyzJvUjwRaIsc+NePBEniHlvxFmmX56+HZphIGtV0XeCirBtpDrTyQ==",
+ 					"dev": true
+ 				},
+ 				"raw-body": {
+-					"version": "2.3.2",
+-					"resolved": "https://registry.npmjs.org/raw-body/-/raw-body-2.3.2.tgz",
+-					"integrity": "sha1-vNYMd9Prk83gBQKVw/N5OJvIj4k=",
++					"version": "2.4.0",
++					"resolved": "https://registry.npmjs.org/raw-body/-/raw-body-2.4.0.tgz",
++					"integrity": "sha512-4Oz8DUIwdvoa5qMJelxipzi/iJIi40O5cGV1wNYp5hvZP8ZN0T+jiNkL0QepXs+EsQ9XJ8ipEDoiH70ySUJP3Q==",
+ 					"dev": true,
+ 					"requires": {
+-						"bytes": "3.0.0",
+-						"http-errors": "1.6.2",
+-						"iconv-lite": "0.4.19",
++						"bytes": "3.1.0",
++						"http-errors": "1.7.2",
++						"iconv-lite": "0.4.24",
+ 						"unpipe": "1.0.0"
+-					},
+-					"dependencies": {
+-						"depd": {
+-							"version": "1.1.1",
+-							"resolved": "https://registry.npmjs.org/depd/-/depd-1.1.1.tgz",
+-							"integrity": "sha1-V4O04cRZ8G+lyif5kfPQbnoxA1k=",
+-							"dev": true
+-						},
+-						"http-errors": {
+-							"version": "1.6.2",
+-							"resolved": "https://registry.npmjs.org/http-errors/-/http-errors-1.6.2.tgz",
+-							"integrity": "sha1-CgAsyFcHGSp+eUbO7cERVfYOxzY=",
+-							"dev": true,
+-							"requires": {
+-								"depd": "1.1.1",
+-								"inherits": "2.0.3",
+-								"setprototypeof": "1.0.3",
+-								"statuses": ">= 1.3.1 < 2"
+-							}
+-						}
+ 					}
+ 				},
+ 				"setprototypeof": {
+-					"version": "1.0.3",
+-					"resolved": "https://registry.npmjs.org/setprototypeof/-/setprototypeof-1.0.3.tgz",
+-					"integrity": "sha1-ZlZ+NwQ+608E2RvWWMDL77VbjgQ=",
++					"version": "1.1.1",
++					"resolved": "https://registry.npmjs.org/setprototypeof/-/setprototypeof-1.1.1.tgz",
++					"integrity": "sha512-JvdAWfbXeIGaZ9cILp38HntZSFSo3mWg6xGcJJsd+d4aRMOqauag1C63dJfDw7OaMYwEbHMOxEZ1lqVRYP2OAw==",
++					"dev": true
++				},
++				"statuses": {
++					"version": "1.5.0",
++					"resolved": "https://registry.npmjs.org/statuses/-/statuses-1.5.0.tgz",
++					"integrity": "sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=",
+ 					"dev": true
+ 				}
+ 			}
+@@ -7573,627 +7603,130 @@
+ 		"cheerio": {
+ 			"version": "1.0.0-rc.2",
+ 			"resolved": "https://registry.npmjs.org/cheerio/-/cheerio-1.0.0-rc.2.tgz",
+-			"integrity": "sha1-S59TqBsn5NXawxwP/Qz6A8xoMNs=",
+-			"dev": true,
+-			"requires": {
+-				"css-select": "~1.2.0",
+-				"dom-serializer": "~0.1.0",
+-				"entities": "~1.1.1",
+-				"htmlparser2": "^3.9.1",
+-				"lodash": "^4.15.0",
+-				"parse5": "^3.0.1"
+-			}
+-		},
+-		"chokidar": {
+-			"version": "2.1.1",
+-			"resolved": "https://registry.npmjs.org/chokidar/-/chokidar-2.1.1.tgz",
+-			"integrity": "sha512-gfw3p2oQV2wEt+8VuMlNsPjCxDxvvgnm/kz+uATu805mWVF8IJN7uz9DN7iBz+RMJISmiVbCOBFs9qBGMjtPfQ==",
+-			"dev": true,
+-			"requires": {
+-				"anymatch": "^2.0.0",
+-				"async-each": "^1.0.1",
+-				"braces": "^2.3.2",
+-				"fsevents": "^1.2.7",
+-				"glob-parent": "^3.1.0",
+-				"inherits": "^2.0.3",
+-				"is-binary-path": "^1.0.0",
+-				"is-glob": "^4.0.0",
+-				"normalize-path": "^3.0.0",
+-				"path-is-absolute": "^1.0.0",
+-				"readdirp": "^2.2.1",
+-				"upath": "^1.1.0"
+-			},
+-			"dependencies": {
+-				"fsevents": {
+-					"version": "1.2.7",
+-					"resolved": "https://registry.npmjs.org/fsevents/-/fsevents-1.2.7.tgz",
+-					"integrity": "sha512-Pxm6sI2MeBD7RdD12RYsqaP0nMiwx8eZBXCa6z2L+mRHm2DYrOYwihmhjpkdjUHwQhslWQjRpEgNq4XvBmaAuw==",
+-					"dev": true,
+-					"optional": true,
+-					"requires": {
+-						"nan": "^2.9.2",
+-						"node-pre-gyp": "^0.10.0"
+-					},
+-					"dependencies": {
+-						"abbrev": {
+-							"version": "1.1.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"ansi-regex": {
+-							"version": "2.1.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"aproba": {
+-							"version": "1.2.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"are-we-there-yet": {
+-							"version": "1.1.5",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"delegates": "^1.0.0",
+-								"readable-stream": "^2.0.6"
+-							}
+-						},
+-						"balanced-match": {
+-							"version": "1.0.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"brace-expansion": {
+-							"version": "1.1.11",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"balanced-match": "^1.0.0",
+-								"concat-map": "0.0.1"
+-							}
+-						},
+-						"chownr": {
+-							"version": "1.1.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"code-point-at": {
+-							"version": "1.1.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"concat-map": {
+-							"version": "0.0.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"console-control-strings": {
+-							"version": "1.1.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"core-util-is": {
+-							"version": "1.0.2",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"debug": {
+-							"version": "2.6.9",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"ms": "2.0.0"
+-							}
+-						},
+-						"deep-extend": {
+-							"version": "0.6.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"delegates": {
+-							"version": "1.0.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"detect-libc": {
+-							"version": "1.0.3",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"fs-minipass": {
+-							"version": "1.2.5",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"minipass": "^2.2.1"
+-							}
+-						},
+-						"fs.realpath": {
+-							"version": "1.0.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"gauge": {
+-							"version": "2.7.4",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"aproba": "^1.0.3",
+-								"console-control-strings": "^1.0.0",
+-								"has-unicode": "^2.0.0",
+-								"object-assign": "^4.1.0",
+-								"signal-exit": "^3.0.0",
+-								"string-width": "^1.0.1",
+-								"strip-ansi": "^3.0.1",
+-								"wide-align": "^1.1.0"
+-							}
+-						},
+-						"glob": {
+-							"version": "7.1.3",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"fs.realpath": "^1.0.0",
+-								"inflight": "^1.0.4",
+-								"inherits": "2",
+-								"minimatch": "^3.0.4",
+-								"once": "^1.3.0",
+-								"path-is-absolute": "^1.0.0"
+-							}
+-						},
+-						"has-unicode": {
+-							"version": "2.0.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"iconv-lite": {
+-							"version": "0.4.24",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"safer-buffer": ">= 2.1.2 < 3"
+-							}
+-						},
+-						"ignore-walk": {
+-							"version": "3.0.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"minimatch": "^3.0.4"
+-							}
+-						},
+-						"inflight": {
+-							"version": "1.0.6",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"once": "^1.3.0",
+-								"wrappy": "1"
+-							}
+-						},
+-						"inherits": {
+-							"version": "2.0.3",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"ini": {
+-							"version": "1.3.5",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"is-fullwidth-code-point": {
+-							"version": "1.0.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"number-is-nan": "^1.0.0"
+-							}
+-						},
+-						"isarray": {
+-							"version": "1.0.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"minimatch": {
+-							"version": "3.0.4",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"brace-expansion": "^1.1.7"
+-							}
+-						},
+-						"minimist": {
+-							"version": "0.0.8",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"minipass": {
+-							"version": "2.3.5",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"safe-buffer": "^5.1.2",
+-								"yallist": "^3.0.0"
+-							}
+-						},
+-						"minizlib": {
+-							"version": "1.2.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"minipass": "^2.2.1"
+-							}
+-						},
+-						"mkdirp": {
+-							"version": "0.5.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"minimist": "0.0.8"
+-							}
+-						},
+-						"ms": {
+-							"version": "2.0.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"needle": {
+-							"version": "2.2.4",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"debug": "^2.1.2",
+-								"iconv-lite": "^0.4.4",
+-								"sax": "^1.2.4"
+-							}
+-						},
+-						"node-pre-gyp": {
+-							"version": "0.10.3",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"detect-libc": "^1.0.2",
+-								"mkdirp": "^0.5.1",
+-								"needle": "^2.2.1",
+-								"nopt": "^4.0.1",
+-								"npm-packlist": "^1.1.6",
+-								"npmlog": "^4.0.2",
+-								"rc": "^1.2.7",
+-								"rimraf": "^2.6.1",
+-								"semver": "^5.3.0",
+-								"tar": "^4"
+-							}
+-						},
+-						"nopt": {
+-							"version": "4.0.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"abbrev": "1",
+-								"osenv": "^0.1.4"
+-							}
+-						},
+-						"npm-bundled": {
+-							"version": "1.0.5",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"npm-packlist": {
+-							"version": "1.2.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"ignore-walk": "^3.0.1",
+-								"npm-bundled": "^1.0.1"
+-							}
+-						},
+-						"npmlog": {
+-							"version": "4.1.2",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"are-we-there-yet": "~1.1.2",
+-								"console-control-strings": "~1.1.0",
+-								"gauge": "~2.7.3",
+-								"set-blocking": "~2.0.0"
+-							}
+-						},
+-						"number-is-nan": {
+-							"version": "1.0.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"object-assign": {
+-							"version": "4.1.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"once": {
+-							"version": "1.4.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"wrappy": "1"
+-							}
+-						},
+-						"os-homedir": {
+-							"version": "1.0.2",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"os-tmpdir": {
+-							"version": "1.0.2",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"osenv": {
+-							"version": "0.1.5",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"os-homedir": "^1.0.0",
+-								"os-tmpdir": "^1.0.0"
+-							}
+-						},
+-						"path-is-absolute": {
+-							"version": "1.0.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"process-nextick-args": {
+-							"version": "2.0.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"rc": {
+-							"version": "1.2.8",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"deep-extend": "^0.6.0",
+-								"ini": "~1.3.0",
+-								"minimist": "^1.2.0",
+-								"strip-json-comments": "~2.0.1"
+-							},
+-							"dependencies": {
+-								"minimist": {
+-									"version": "1.2.0",
+-									"resolved": false,
+-									"integrity": "sha1-o1AIsg9BOD7sH7kU9M1d95omQoQ=",
+-									"dev": true,
+-									"optional": true
+-								}
+-							}
+-						},
+-						"readable-stream": {
+-							"version": "2.3.6",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"core-util-is": "~1.0.0",
+-								"inherits": "~2.0.3",
+-								"isarray": "~1.0.0",
+-								"process-nextick-args": "~2.0.0",
+-								"safe-buffer": "~5.1.1",
+-								"string_decoder": "~1.1.1",
+-								"util-deprecate": "~1.0.1"
+-							}
+-						},
+-						"rimraf": {
+-							"version": "2.6.3",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"glob": "^7.1.3"
+-							}
+-						},
+-						"safe-buffer": {
+-							"version": "5.1.2",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"safer-buffer": {
+-							"version": "2.1.2",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"sax": {
+-							"version": "1.2.4",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"semver": {
+-							"version": "5.6.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"set-blocking": {
+-							"version": "2.0.0",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"signal-exit": {
+-							"version": "3.0.2",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"string-width": {
+-							"version": "1.0.2",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"code-point-at": "^1.0.0",
+-								"is-fullwidth-code-point": "^1.0.0",
+-								"strip-ansi": "^3.0.0"
+-							}
+-						},
+-						"string_decoder": {
+-							"version": "1.1.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"safe-buffer": "~5.1.0"
+-							}
+-						},
+-						"strip-ansi": {
+-							"version": "3.0.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"ansi-regex": "^2.0.0"
+-							}
+-						},
+-						"strip-json-comments": {
+-							"version": "2.0.1",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"tar": {
+-							"version": "4.4.8",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"chownr": "^1.1.1",
+-								"fs-minipass": "^1.2.5",
+-								"minipass": "^2.3.4",
+-								"minizlib": "^1.1.1",
+-								"mkdirp": "^0.5.0",
+-								"safe-buffer": "^5.1.2",
+-								"yallist": "^3.0.2"
+-							}
+-						},
+-						"util-deprecate": {
+-							"version": "1.0.2",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"wide-align": {
+-							"version": "1.1.3",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true,
+-							"requires": {
+-								"string-width": "^1.0.2 || 2"
+-							}
+-						},
+-						"wrappy": {
+-							"version": "1.0.2",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						},
+-						"yallist": {
+-							"version": "3.0.3",
+-							"bundled": true,
+-							"dev": true,
+-							"optional": true
+-						}
++			"integrity": "sha1-S59TqBsn5NXawxwP/Qz6A8xoMNs=",
++			"dev": true,
++			"requires": {
++				"css-select": "~1.2.0",
++				"dom-serializer": "~0.1.0",
++				"entities": "~1.1.1",
++				"htmlparser2": "^3.9.1",
++				"lodash": "^4.15.0",
++				"parse5": "^3.0.1"
++			}
++		},
++		"chokidar": {
++			"version": "3.0.2",
++			"resolved": "https://registry.npmjs.org/chokidar/-/chokidar-3.0.2.tgz",
++			"integrity": "sha512-c4PR2egjNjI1um6bamCQ6bUNPDiyofNQruHvKgHQ4gDUP/ITSVSzNsiI5OWtHOsX323i5ha/kk4YmOZ1Ktg7KA==",
++			"dev": true,
++			"requires": {
++				"anymatch": "^3.0.1",
++				"braces": "^3.0.2",
++				"fsevents": "^2.0.6",
++				"glob-parent": "^5.0.0",
++				"is-binary-path": "^2.1.0",
++				"is-glob": "^4.0.1",
++				"normalize-path": "^3.0.0",
++				"readdirp": "^3.1.1"
++			},
++			"dependencies": {
++				"anymatch": {
++					"version": "3.1.0",
++					"resolved": "https://registry.npmjs.org/anymatch/-/anymatch-3.1.0.tgz",
++					"integrity": "sha512-Ozz7l4ixzI7Oxj2+cw+p0tVUt27BpaJ+1+q1TCeANWxHpvyn2+Un+YamBdfKu0uh8xLodGhoa1v7595NhKDAuA==",
++					"dev": true,
++					"requires": {
++						"normalize-path": "^3.0.0",
++						"picomatch": "^2.0.4"
++					}
++				},
++				"binary-extensions": {
++					"version": "2.0.0",
++					"resolved": "https://registry.npmjs.org/binary-extensions/-/binary-extensions-2.0.0.tgz",
++					"integrity": "sha512-Phlt0plgpIIBOGTT/ehfFnbNlfsDEiqmzE2KRXoX1bLIlir4X/MR+zSyBEkL05ffWgnRSf/DXv+WrUAVr93/ow==",
++					"dev": true
++				},
++				"braces": {
++					"version": "3.0.2",
++					"resolved": "https://registry.npmjs.org/braces/-/braces-3.0.2.tgz",
++					"integrity": "sha512-b8um+L1RzM3WDSzvhm6gIz1yfTbBt6YTlcEKAvsmqCZZFw46z626lVj9j1yEPW33H5H+lBQpZMP1k8l+78Ha0A==",
++					"dev": true,
++					"requires": {
++						"fill-range": "^7.0.1"
++					}
++				},
++				"fill-range": {
++					"version": "7.0.1",
++					"resolved": "https://registry.npmjs.org/fill-range/-/fill-range-7.0.1.tgz",
++					"integrity": "sha512-qOo9F+dMUmC2Lcb4BbVvnKJxTPjCm+RRpe4gDuGrzkL7mEVl/djYSu2OdQ2Pa302N4oqkSg9ir6jaLWJ2USVpQ==",
++					"dev": true,
++					"requires": {
++						"to-regex-range": "^5.0.1"
+ 					}
+ 				},
++				"fsevents": {
++					"version": "2.0.7",
++					"resolved": "https://registry.npmjs.org/fsevents/-/fsevents-2.0.7.tgz",
++					"integrity": "sha512-a7YT0SV3RB+DjYcppwVDLtn13UQnmg0SWZS7ezZD0UjnLwXmy8Zm21GMVGLaFGimIqcvyMQaOJBrop8MyOp1kQ==",
++					"dev": true,
++					"optional": true
++				},
+ 				"glob-parent": {
+-					"version": "3.1.0",
+-					"resolved": "https://registry.npmjs.org/glob-parent/-/glob-parent-3.1.0.tgz",
+-					"integrity": "sha1-nmr2KZ2NO9K9QEMIMr0RPfkGxa4=",
++					"version": "5.1.0",
++					"resolved": "https://registry.npmjs.org/glob-parent/-/glob-parent-5.1.0.tgz",
++					"integrity": "sha512-qjtRgnIVmOfnKUE3NJAQEdk+lKrxfw8t5ke7SXtfMTHcjsBfOfWXCQfdb30zfDoZQ2IRSIiidmjtbHZPZ++Ihw==",
+ 					"dev": true,
+ 					"requires": {
+-						"is-glob": "^3.1.0",
+-						"path-dirname": "^1.0.0"
+-					},
+-					"dependencies": {
+-						"is-glob": {
+-							"version": "3.1.0",
+-							"resolved": "https://registry.npmjs.org/is-glob/-/is-glob-3.1.0.tgz",
+-							"integrity": "sha1-e6WuJCF4BKxwcHuWkiVnSGzD6Eo=",
+-							"dev": true,
+-							"requires": {
+-								"is-extglob": "^2.1.0"
+-							}
+-						}
++						"is-glob": "^4.0.1"
+ 					}
+ 				},
+-				"is-extglob": {
+-					"version": "2.1.1",
+-					"resolved": "https://registry.npmjs.org/is-extglob/-/is-extglob-2.1.1.tgz",
+-					"integrity": "sha1-qIwCU1eR8C7TfHahueqXc8gz+MI=",
+-					"dev": true
++				"is-binary-path": {
++					"version": "2.1.0",
++					"resolved": "https://registry.npmjs.org/is-binary-path/-/is-binary-path-2.1.0.tgz",
++					"integrity": "sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==",
++					"dev": true,
++					"requires": {
++						"binary-extensions": "^2.0.0"
++					}
+ 				},
+ 				"is-glob": {
+-					"version": "4.0.0",
+-					"resolved": "https://registry.npmjs.org/is-glob/-/is-glob-4.0.0.tgz",
+-					"integrity": "sha1-lSHHaEXMJhCoUgPd8ICpWML/q8A=",
++					"version": "4.0.1",
++					"resolved": "https://registry.npmjs.org/is-glob/-/is-glob-4.0.1.tgz",
++					"integrity": "sha512-5G0tKtBTFImOqDnLB2hG6Bp2qcKEFduo4tZu9MT/H6NQv/ghhy30o55ufafxJ/LdH79LLs2Kfrn85TLKyA7BUg==",
+ 					"dev": true,
+ 					"requires": {
+ 						"is-extglob": "^2.1.1"
+ 					}
+ 				},
++				"is-number": {
++					"version": "7.0.0",
++					"resolved": "https://registry.npmjs.org/is-number/-/is-number-7.0.0.tgz",
++					"integrity": "sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==",
++					"dev": true
++				},
+ 				"normalize-path": {
+ 					"version": "3.0.0",
+ 					"resolved": "https://registry.npmjs.org/normalize-path/-/normalize-path-3.0.0.tgz",
+ 					"integrity": "sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==",
+ 					"dev": true
++				},
++				"readdirp": {
++					"version": "3.1.2",
++					"resolved": "https://registry.npmjs.org/readdirp/-/readdirp-3.1.2.tgz",
++					"integrity": "sha512-8rhl0xs2cxfVsqzreYCvs8EwBfn/DhVdqtoLmw19uI3SC5avYX9teCurlErfpPXGmYtMHReGaP2RsLnFvz/lnw==",
++					"dev": true,
++					"requires": {
++						"picomatch": "^2.0.4"
++					}
++				},
++				"to-regex-range": {
++					"version": "5.0.1",
++					"resolved": "https://registry.npmjs.org/to-regex-range/-/to-regex-range-5.0.1.tgz",
++					"integrity": "sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==",
++					"dev": true,
++					"requires": {
++						"is-number": "^7.0.0"
++					}
+ 				}
+ 			}
+ 		},
+@@ -8849,10 +8382,13 @@
+ 			"dev": true
+ 		},
+ 		"content-disposition": {
+-			"version": "0.5.2",
+-			"resolved": "https://registry.npmjs.org/content-disposition/-/content-disposition-0.5.2.tgz",
+-			"integrity": "sha1-DPaLud318r55YcOoUXjLhdunjLQ=",
+-			"dev": true
++			"version": "0.5.3",
++			"resolved": "https://registry.npmjs.org/content-disposition/-/content-disposition-0.5.3.tgz",
++			"integrity": "sha512-ExO0774ikEObIAEV9kDo50o+79VCUdEB6n6lzKgGwupcVeRlhrj3qGAfwq8G6uBJjkqLrhT0qEYFcWng8z1z0g==",
++			"dev": true,
++			"requires": {
++				"safe-buffer": "5.1.2"
++			}
+ 		},
+ 		"content-type": {
+ 			"version": "1.0.4",
+@@ -9298,9 +8834,9 @@
+ 			"dev": true
+ 		},
+ 		"cookie": {
+-			"version": "0.3.1",
+-			"resolved": "https://registry.npmjs.org/cookie/-/cookie-0.3.1.tgz",
+-			"integrity": "sha1-5+Ch+e9DtMi6klxcWpboBtFoc7s=",
++			"version": "0.4.0",
++			"resolved": "https://registry.npmjs.org/cookie/-/cookie-0.4.0.tgz",
++			"integrity": "sha512-+Hp8fLp57wnUSt0tY0tHEXh4voZRDnoIrZPqlo3DPiI4y9lwg/jqx+1Om94/W6ZaPDOUbnjOt/99w66zk+l1Xg==",
+ 			"dev": true
+ 		},
+ 		"cookie-signature": {
+@@ -11854,43 +11390,53 @@
+ 			"dev": true
+ 		},
+ 		"express": {
+-			"version": "4.16.3",
+-			"resolved": "http://registry.npmjs.org/express/-/express-4.16.3.tgz",
+-			"integrity": "sha1-avilAjUNsyRuzEvs9rWjTSL37VM=",
++			"version": "4.17.1",
++			"resolved": "https://registry.npmjs.org/express/-/express-4.17.1.tgz",
++			"integrity": "sha512-mHJ9O79RqluphRrcw2X/GTh3k9tVv8YcoyY4Kkh4WDMUYKRZUq0h1o0w2rrrxBqM7VoeUVqgb27xlEMXTnYt4g==",
+ 			"dev": true,
+ 			"requires": {
+-				"accepts": "~1.3.5",
++				"accepts": "~1.3.7",
+ 				"array-flatten": "1.1.1",
+-				"body-parser": "1.18.2",
+-				"content-disposition": "0.5.2",
++				"body-parser": "1.19.0",
++				"content-disposition": "0.5.3",
+ 				"content-type": "~1.0.4",
+-				"cookie": "0.3.1",
++				"cookie": "0.4.0",
+ 				"cookie-signature": "1.0.6",
+ 				"debug": "2.6.9",
+ 				"depd": "~1.1.2",
+ 				"encodeurl": "~1.0.2",
+ 				"escape-html": "~1.0.3",
+ 				"etag": "~1.8.1",
+-				"finalhandler": "1.1.1",
++				"finalhandler": "~1.1.2",
+ 				"fresh": "0.5.2",
+ 				"merge-descriptors": "1.0.1",
+ 				"methods": "~1.1.2",
+ 				"on-finished": "~2.3.0",
+-				"parseurl": "~1.3.2",
++				"parseurl": "~1.3.3",
+ 				"path-to-regexp": "0.1.7",
+-				"proxy-addr": "~2.0.3",
+-				"qs": "6.5.1",
+-				"range-parser": "~1.2.0",
+-				"safe-buffer": "5.1.1",
+-				"send": "0.16.2",
+-				"serve-static": "1.13.2",
+-				"setprototypeof": "1.1.0",
+-				"statuses": "~1.4.0",
+-				"type-is": "~1.6.16",
++				"proxy-addr": "~2.0.5",
++				"qs": "6.7.0",
++				"range-parser": "~1.2.1",
++				"safe-buffer": "5.1.2",
++				"send": "0.17.1",
++				"serve-static": "1.14.1",
++				"setprototypeof": "1.1.1",
++				"statuses": "~1.5.0",
++				"type-is": "~1.6.18",
+ 				"utils-merge": "1.0.1",
+ 				"vary": "~1.1.2"
+ 			},
+ 			"dependencies": {
++				"accepts": {
++					"version": "1.3.7",
++					"resolved": "https://registry.npmjs.org/accepts/-/accepts-1.3.7.tgz",
++					"integrity": "sha512-Il80Qs2WjYlJIBNzNkK6KYqlVMTbZLXgHx2oT0pU/fjRHyEp+PEfEPY0R3WCwAGVOtauxh1hOxNgIf5bv7dQpA==",
++					"dev": true,
++					"requires": {
++						"mime-types": "~2.1.24",
++						"negotiator": "0.6.2"
++					}
++				},
+ 				"debug": {
+ 					"version": "2.6.9",
+ 					"resolved": "https://registry.npmjs.org/debug/-/debug-2.6.9.tgz",
+@@ -11900,16 +11446,121 @@
+ 						"ms": "2.0.0"
+ 					}
+ 				},
++				"http-errors": {
++					"version": "1.7.3",
++					"resolved": "https://registry.npmjs.org/http-errors/-/http-errors-1.7.3.tgz",
++					"integrity": "sha512-ZTTX0MWrsQ2ZAhA1cejAwDLycFsd7I7nVtnkT3Ol0aqodaKW+0CTZDQ1uBv5whptCnc8e8HeRRJxRs0kmm/Qfw==",
++					"dev": true,
++					"requires": {
++						"depd": "~1.1.2",
++						"inherits": "2.0.4",
++						"setprototypeof": "1.1.1",
++						"statuses": ">= 1.5.0 < 2",
++						"toidentifier": "1.0.0"
++					}
++				},
++				"inherits": {
++					"version": "2.0.4",
++					"resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz",
++					"integrity": "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==",
++					"dev": true
++				},
++				"mime": {
++					"version": "1.6.0",
++					"resolved": "https://registry.npmjs.org/mime/-/mime-1.6.0.tgz",
++					"integrity": "sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==",
++					"dev": true
++				},
++				"mime-db": {
++					"version": "1.40.0",
++					"resolved": "https://registry.npmjs.org/mime-db/-/mime-db-1.40.0.tgz",
++					"integrity": "sha512-jYdeOMPy9vnxEqFRRo6ZvTZ8d9oPb+k18PKoYNYUe2stVEBPPwsln/qWzdbmaIvnhZ9v2P+CuecK+fpUfsV2mA==",
++					"dev": true
++				},
++				"mime-types": {
++					"version": "2.1.24",
++					"resolved": "https://registry.npmjs.org/mime-types/-/mime-types-2.1.24.tgz",
++					"integrity": "sha512-WaFHS3MCl5fapm3oLxU4eYDw77IQM2ACcxQ9RIxfaC3ooc6PFuBMGZZsYpvoXS5D5QTWPieo1jjLdAm3TBP3cQ==",
++					"dev": true,
++					"requires": {
++						"mime-db": "1.40.0"
++					}
++				},
++				"negotiator": {
++					"version": "0.6.2",
++					"resolved": "https://registry.npmjs.org/negotiator/-/negotiator-0.6.2.tgz",
++					"integrity": "sha512-hZXc7K2e+PgeI1eDBe/10Ard4ekbfrrqG8Ep+8Jmf4JID2bNg7NvCPOZN+kfF574pFQI7mum2AUqDidoKqcTOw==",
++					"dev": true
++				},
++				"parseurl": {
++					"version": "1.3.3",
++					"resolved": "https://registry.npmjs.org/parseurl/-/parseurl-1.3.3.tgz",
++					"integrity": "sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==",
++					"dev": true
++				},
+ 				"qs": {
+-					"version": "6.5.1",
+-					"resolved": "https://registry.npmjs.org/qs/-/qs-6.5.1.tgz",
+-					"integrity": "sha512-eRzhrN1WSINYCDCbrz796z37LOe3m5tmW7RQf6oBntukAG1nmovJvhnwHHRMAfeoItc1m2Hk02WER2aQ/iqs+A==",
++					"version": "6.7.0",
++					"resolved": "https://registry.npmjs.org/qs/-/qs-6.7.0.tgz",
++					"integrity": "sha512-VCdBRNFTX1fyE7Nb6FYoURo/SPe62QCaAyzJvUjwRaIsc+NePBEniHlvxFmmX56+HZphIGtV0XeCirBtpDrTyQ==",
+ 					"dev": true
+ 				},
+-				"safe-buffer": {
+-					"version": "5.1.1",
+-					"resolved": "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.1.tgz",
+-					"integrity": "sha512-kKvNJn6Mm93gAczWVJg7wH+wGYWNrDHdWvpUmHyEsgCtIwwo3bqPtV4tR5tuPaUhTOo/kvhVwd8XwwOllGYkbg==",
++				"range-parser": {
++					"version": "1.2.1",
++					"resolved": "https://registry.npmjs.org/range-parser/-/range-parser-1.2.1.tgz",
++					"integrity": "sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==",
++					"dev": true
++				},
++				"send": {
++					"version": "0.17.1",
++					"resolved": "https://registry.npmjs.org/send/-/send-0.17.1.tgz",
++					"integrity": "sha512-BsVKsiGcQMFwT8UxypobUKyv7irCNRHk1T0G680vk88yf6LBByGcZJOTJCrTP2xVN6yI+XjPJcNuE3V4fT9sAg==",
++					"dev": true,
++					"requires": {
++						"debug": "2.6.9",
++						"depd": "~1.1.2",
++						"destroy": "~1.0.4",
++						"encodeurl": "~1.0.2",
++						"escape-html": "~1.0.3",
++						"etag": "~1.8.1",
++						"fresh": "0.5.2",
++						"http-errors": "~1.7.2",
++						"mime": "1.6.0",
++						"ms": "2.1.1",
++						"on-finished": "~2.3.0",
++						"range-parser": "~1.2.1",
++						"statuses": "~1.5.0"
++					},
++					"dependencies": {
++						"ms": {
++							"version": "2.1.1",
++							"resolved": "https://registry.npmjs.org/ms/-/ms-2.1.1.tgz",
++							"integrity": "sha512-tgp+dl5cGk28utYktBsrFqA7HKgrhgPsg6Z/EfhWI4gl1Hwq8B/GmY/0oXZ6nF8hDVesS/FpnYaD/kOWhYQvyg==",
++							"dev": true
++						}
++					}
++				},
++				"serve-static": {
++					"version": "1.14.1",
++					"resolved": "https://registry.npmjs.org/serve-static/-/serve-static-1.14.1.tgz",
++					"integrity": "sha512-JMrvUwE54emCYWlTI+hGrGv5I8dEwmco/00EvkzIIsR7MqrHonbD9pO2MOfFnpFntl7ecpZs+3mW+XbQZu9QCg==",
++					"dev": true,
++					"requires": {
++						"encodeurl": "~1.0.2",
++						"escape-html": "~1.0.3",
++						"parseurl": "~1.3.3",
++						"send": "0.17.1"
++					}
++				},
++				"setprototypeof": {
++					"version": "1.1.1",
++					"resolved": "https://registry.npmjs.org/setprototypeof/-/setprototypeof-1.1.1.tgz",
++					"integrity": "sha512-JvdAWfbXeIGaZ9cILp38HntZSFSo3mWg6xGcJJsd+d4aRMOqauag1C63dJfDw7OaMYwEbHMOxEZ1lqVRYP2OAw==",
++					"dev": true
++				},
++				"statuses": {
++					"version": "1.5.0",
++					"resolved": "https://registry.npmjs.org/statuses/-/statuses-1.5.0.tgz",
++					"integrity": "sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=",
+ 					"dev": true
+ 				}
+ 			}
+@@ -12296,17 +11947,17 @@
+ 			}
+ 		},
+ 		"finalhandler": {
+-			"version": "1.1.1",
+-			"resolved": "https://registry.npmjs.org/finalhandler/-/finalhandler-1.1.1.tgz",
+-			"integrity": "sha512-Y1GUDo39ez4aHAw7MysnUD5JzYX+WaIj8I57kO3aEPT1fFRL4sr7mjei97FgnwhAyyzRYmQZaTHb2+9uZ1dPtg==",
++			"version": "1.1.2",
++			"resolved": "https://registry.npmjs.org/finalhandler/-/finalhandler-1.1.2.tgz",
++			"integrity": "sha512-aAWcW57uxVNrQZqFXjITpW3sIUQmHGG3qSb9mUah9MgMC4NeWhNOlNjXEYq3HjRAvL6arUviZGGJsBg6z0zsWA==",
+ 			"dev": true,
+ 			"requires": {
+ 				"debug": "2.6.9",
+ 				"encodeurl": "~1.0.2",
+ 				"escape-html": "~1.0.3",
+ 				"on-finished": "~2.3.0",
+-				"parseurl": "~1.3.2",
+-				"statuses": "~1.4.0",
++				"parseurl": "~1.3.3",
++				"statuses": "~1.5.0",
+ 				"unpipe": "~1.0.0"
+ 			},
+ 			"dependencies": {
+@@ -12318,6 +11969,18 @@
+ 					"requires": {
+ 						"ms": "2.0.0"
+ 					}
++				},
++				"parseurl": {
++					"version": "1.3.3",
++					"resolved": "https://registry.npmjs.org/parseurl/-/parseurl-1.3.3.tgz",
++					"integrity": "sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==",
++					"dev": true
++				},
++				"statuses": {
++					"version": "1.5.0",
++					"resolved": "https://registry.npmjs.org/statuses/-/statuses-1.5.0.tgz",
++					"integrity": "sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=",
++					"dev": true
+ 				}
+ 			}
+ 		},
+@@ -13050,7 +12713,7 @@
+ 					"dependencies": {
+ 						"minimist": {
+ 							"version": "1.2.0",
+-							"resolved": false,
++							"resolved": "",
+ 							"integrity": "sha1-o1AIsg9BOD7sH7kU9M1d95omQoQ=",
+ 							"dev": true,
+ 							"optional": true
+@@ -14758,9 +14421,9 @@
+ 			"dev": true
+ 		},
+ 		"ipaddr.js": {
+-			"version": "1.8.0",
+-			"resolved": "https://registry.npmjs.org/ipaddr.js/-/ipaddr.js-1.8.0.tgz",
+-			"integrity": "sha1-6qM9bd16zo9/b+DJygRA5wZzix4=",
++			"version": "1.9.0",
++			"resolved": "https://registry.npmjs.org/ipaddr.js/-/ipaddr.js-1.9.0.tgz",
++			"integrity": "sha512-M4Sjn6N/+O6/IXSJseKqHoFc+5FdGJ22sXqnjTpdZweHK64MzEPAyQZyEU3R/KRv2GLoa7nNtg/C2Ev6m7z+eA==",
+ 			"dev": true
+ 		},
+ 		"irregular-plurals": {
+@@ -22343,13 +22006,13 @@
+ 			}
+ 		},
+ 		"proxy-addr": {
+-			"version": "2.0.4",
+-			"resolved": "https://registry.npmjs.org/proxy-addr/-/proxy-addr-2.0.4.tgz",
+-			"integrity": "sha512-5erio2h9jp5CHGwcybmxmVqHmnCBZeewlfJ0pex+UW7Qny7OOZXTtH56TGNyBizkgiOwhJtMKrVzDTeKcySZwA==",
++			"version": "2.0.5",
++			"resolved": "https://registry.npmjs.org/proxy-addr/-/proxy-addr-2.0.5.tgz",
++			"integrity": "sha512-t/7RxHXPH6cJtP0pRG6smSr9QJidhB+3kXu0KgXnbGYMgzEnUxRQ4/LDdfOwZEMyIh3/xHb8PX3t+lfL9z+YVQ==",
+ 			"dev": true,
+ 			"requires": {
+ 				"forwarded": "~0.1.2",
+-				"ipaddr.js": "1.8.0"
++				"ipaddr.js": "1.9.0"
+ 			}
+ 		},
+ 		"proxy-from-env": {
+@@ -26379,6 +26042,12 @@
+ 				"repeat-string": "^1.6.1"
+ 			}
+ 		},
++		"toidentifier": {
++			"version": "1.0.0",
++			"resolved": "https://registry.npmjs.org/toidentifier/-/toidentifier-1.0.0.tgz",
++			"integrity": "sha512-yaOH/Pk/VEhBWWTlhI+qXxDFXlejDGcQipMlyxda9nthulaxLZUNcUqFxokp0vcYnvteJln5FNQDRrxj3YcbVw==",
++			"dev": true
++		},
+ 		"touch": {
+ 			"version": "0.0.3",
+ 			"resolved": "https://registry.npmjs.org/touch/-/touch-0.0.3.tgz",
+@@ -26537,13 +26206,30 @@
+ 			"dev": true
+ 		},
+ 		"type-is": {
+-			"version": "1.6.16",
+-			"resolved": "https://registry.npmjs.org/type-is/-/type-is-1.6.16.tgz",
+-			"integrity": "sha512-HRkVv/5qY2G6I8iab9cI7v1bOIdhm94dVjQCPFElW9W+3GeDOSHmy2EBYe4VTApuzolPcmgFTN3ftVJRKR2J9Q==",
++			"version": "1.6.18",
++			"resolved": "https://registry.npmjs.org/type-is/-/type-is-1.6.18.tgz",
++			"integrity": "sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g==",
+ 			"dev": true,
+ 			"requires": {
+ 				"media-typer": "0.3.0",
+-				"mime-types": "~2.1.18"
++				"mime-types": "~2.1.24"
++			},
++			"dependencies": {
++				"mime-db": {
++					"version": "1.40.0",
++					"resolved": "https://registry.npmjs.org/mime-db/-/mime-db-1.40.0.tgz",
++					"integrity": "sha512-jYdeOMPy9vnxEqFRRo6ZvTZ8d9oPb+k18PKoYNYUe2stVEBPPwsln/qWzdbmaIvnhZ9v2P+CuecK+fpUfsV2mA==",
++					"dev": true
++				},
++				"mime-types": {
++					"version": "2.1.24",
++					"resolved": "https://registry.npmjs.org/mime-types/-/mime-types-2.1.24.tgz",
++					"integrity": "sha512-WaFHS3MCl5fapm3oLxU4eYDw77IQM2ACcxQ9RIxfaC3ooc6PFuBMGZZsYpvoXS5D5QTWPieo1jjLdAm3TBP3cQ==",
++					"dev": true,
++					"requires": {
++						"mime-db": "1.40.0"
++					}
++				}
+ 			}
+ 		},
+ 		"typedarray": {
+@@ -26933,9 +26619,9 @@
+ 			}
+ 		},
+ 		"upath": {
+-			"version": "1.1.0",
+-			"resolved": "https://registry.npmjs.org/upath/-/upath-1.1.0.tgz",
+-			"integrity": "sha512-bzpH/oBhoS/QI/YtbkqCg6VEiPYjSZtrHQM6/QnJS6OL9pKUFLqb3aFh4Scvwm45+7iAgiMkLhSbaZxUqmrprw==",
++			"version": "1.2.0",
++			"resolved": "https://registry.npmjs.org/upath/-/upath-1.2.0.tgz",
++			"integrity": "sha512-aZwGpamFO61g3OlfT7OQCHqhGnW43ieH9WZeP7QxN/G/jS4jfqUkZxoryvJgVPEcrl5NL/ggHsSmLMHuH64Lhg==",
+ 			"dev": true
+ 		},
+ 		"uri-js": {
+@@ -27347,6 +27033,34 @@
+ 				"chokidar": "^2.0.2",
+ 				"graceful-fs": "^4.1.2",
+ 				"neo-async": "^2.5.0"
++			},
++			"dependencies": {
++				"chokidar": {
++					"version": "2.1.8",
++					"resolved": "https://registry.npmjs.org/chokidar/-/chokidar-2.1.8.tgz",
++					"integrity": "sha512-ZmZUazfOzf0Nve7duiCKD23PFSCs4JPoYyccjUFF3aQkQadqBhfzhjkwBH2mNOG9cTBwhamM37EIsIkZw3nRgg==",
++					"dev": true,
++					"requires": {
++						"anymatch": "^2.0.0",
++						"async-each": "^1.0.1",
++						"braces": "^2.3.2",
++						"fsevents": "^1.2.7",
++						"glob-parent": "^3.1.0",
++						"inherits": "^2.0.3",
++						"is-binary-path": "^1.0.0",
++						"is-glob": "^4.0.0",
++						"normalize-path": "^3.0.0",
++						"path-is-absolute": "^1.0.0",
++						"readdirp": "^2.2.1",
++						"upath": "^1.1.1"
++					}
++				},
++				"normalize-path": {
++					"version": "3.0.0",
++					"resolved": "https://registry.npmjs.org/normalize-path/-/normalize-path-3.0.0.tgz",
++					"integrity": "sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==",
++					"dev": true
++				}
+ 			}
+ 		},
+ 		"wcwidth": {
+diff --git a/package.json b/package.json
+index addc608e1b57f0..ca441cd5587f5d 100644
+--- a/package.json
++++ b/package.json
+@@ -95,6 +95,7 @@
+ 		"benchmark": "2.1.4",
+ 		"browserslist": "4.6.2",
+ 		"chalk": "2.4.1",
++		"chokidar": "3.0.2",
+ 		"commander": "2.20.0",
+ 		"concurrently": "3.5.0",
+ 		"copy-webpack-plugin": "4.5.2",
+@@ -104,6 +105,7 @@
+ 		"enzyme": "3.9.0",
+ 		"eslint-plugin-eslint-comments": "3.1.2",
+ 		"eslint-plugin-import": "2.18.2",
++		"express": "4.17.1",
+ 		"fast-glob": "2.2.7",
+ 		"fbjs": "0.8.17",
+ 		"fs-extra": "8.0.1",
+@@ -187,6 +189,8 @@
+ 		"predev": "npm run check-engines",
+ 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
+ 		"dev:packages": "node ./bin/packages/watch.js",
++		"docs:component-start": "npm run start --prefix ./packages/components/website/",
++		"docs:component-build": "npm run build --prefix ./packages/components/website/",
+ 		"docs:build": "node ./docs/tool/index.js && node ./bin/update-readmes.js",
+ 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
+ 		"fixtures:server-registered": "wp-scripts env docker-run php ./bin/get-server-blocks.php > test/integration/full-content/server-registered.json",
+diff --git a/packages/components-website/.env b/packages/components-website/.env
+new file mode 100644
+index 00000000000000..6f809cc2540d7e
+--- /dev/null
++++ b/packages/components-website/.env
+@@ -0,0 +1 @@
++SKIP_PREFLIGHT_CHECK=true
+diff --git a/packages/components-website/.gitignore b/packages/components-website/.gitignore
+new file mode 100644
+index 00000000000000..844ee3b8676039
+--- /dev/null
++++ b/packages/components-website/.gitignore
+@@ -0,0 +1,27 @@
++# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
++
++# dependencies
++/node_modules
++/.pnp
++.pnp.js
++
++# testing
++/coverage
++
++# production
++/build
++public/_data
++
++# misc
++.DS_Store
++.env.local
++.env.development.local
++.env.test.local
++.env.production.local
++
++npm-debug.log*
++yarn-debug.log*
++yarn-error.log*
++
++package-lock.json
++component-docs/src/data/pkg.json
+diff --git a/packages/components-website/.npmrc b/packages/components-website/.npmrc
+new file mode 100644
+index 00000000000000..43c97e719a5a82
+--- /dev/null
++++ b/packages/components-website/.npmrc
+@@ -0,0 +1 @@
++package-lock=false
+diff --git a/packages/components-website/README.md b/packages/components-website/README.md
+new file mode 100644
+index 00000000000000..59155e422d3d66
+--- /dev/null
++++ b/packages/components-website/README.md
+@@ -0,0 +1,61 @@
++# WordPress Components: Doc Site
++
++> Documentation site with live examples, generated from README.md files
++
++## 🚨 Note: This project is very experimental and is a work in progress! 🚨
++
++How this project is generated, and components like the custom Gutenberg blocks, are forks from a work-in-progress doc site generation project by [@itsjonq](https://github.com/ItsJonQ). The plan is to abstract the tooling and components and make those publicly available as easy to use npm packages.
++
++## Getting Started
++
++Once you've cloned down `@wordpress/gutenberg` onto your machine, install the project's dependencies by running:
++
++```sh
++npm install --prefix ./component-docs
++```
++
++Once the dependencies are downloaded, you can start up the docs local dev environment by running:
++
++```sh
++npm run docs:component-start
++```
++
++The local dev environment will be viewable at [http://localhost:4700/](http://localhost:4700/).
++
++## How it Works
++
++### Generating Data
++
++A handful of scripts look for `README.md` files located in the `/packages/components/` directory. These files then run through a transformer to generate data that's consumable `.json` by the React app. These `.json` files are generated into the project's `/public` directory, allowing for the App to make serverless fetch requests for the `.json` files.
++
++The idea behind this approach was to open the possibility of saving/serving the data from a REST API endpoint (e.g. a WordPress instance) in the future, if required.
++
++During this process, additional data files are generated such as the `package.json` and Navigation data that the React app will use in it's UI. Since the React app will need immediate access to this data, the `.json` files are generated into a special `/component-docs/src/data/` directory.
++
++### Development
++
++This project uses [Create React App](https://github.com/facebook/create-react-app), which supports developer experience nicities like live reloading and linting.
++
++### Live Component Examples
++
++Live component examples can be rendered from the `README.md` files by wrapping examples with a special `wp:docs` tag:
++
++```
++<!-- wp:docs/sandbox { "name": "button" } -->
++...
++<!-- /wp:docs/sandbox -->
++```
++
++The React app uses custom Gutenberg blocks that transform that data. In the above example, the code snippet renders a live preview/editor, powered by [React Live](https://github.com/FormidableLabs/react-live).
++
++### Build (Deploy)
++
++This project can be built by running the following command:
++
++```sh
++npm run docs:component-build
++```
++
++Once completed, the built files can be found under `component-docs/build`.
++
++The built files is a static site (or web app). The directory can be deployed onto any server or service that can render HTML.
+diff --git a/packages/components-website/package.json b/packages/components-website/package.json
+new file mode 100644
+index 00000000000000..f55c16643c2f0a
+--- /dev/null
++++ b/packages/components-website/package.json
+@@ -0,0 +1,70 @@
++{
++	"name": "@wordpress/components-website",
++	"version": "0.1.0",
++	"description": "Documentation website for @wordpress/components",
++	"author": "The WordPress Contributors",
++	"license": "GPL-2.0-or-later",
++	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/components-website/README.md",
++	"repository": {
++		"type": "git",
++		"url": "https://github.com/WordPress/gutenberg.git"
++	},
++	"bugs": {
++		"url": "https://github.com/WordPress/gutenberg/issues"
++	},
++	"scripts": {
++		"prestart": "npm run build:docs",
++		"start": "concurrently 'npm run watch:docs' 'npm run start:server' 'npm run start:app'",
++		"start:app": "PORT=4700 react-scripts start",
++		"start:server": "node server.js",
++		"build": "npm run build:docs && npm run build:app",
++		"build:app": "react-scripts build",
++		"build:docs": "npm run clean:docs && npm run generate:data",
++		"clean:docs": "rm -rf public/_data",
++		"generate:docs": "node ./scripts/generate-docs.js",
++		"generate:pkg": "node ./scripts/generate-pkg.js",
++		"generate:nav": "node ./scripts/generate-nav.js",
++		"generate:data": "npm run generate:docs && npm run generate:nav && npm run generate:pkg",
++		"watch:docs": "node ./scripts/watch-transform-data.js"
++	},
++	"dependencies": {
++		"@automattic/color-studio": "2.1.0",
++		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
++		"@wordpress/blocks": "file:../blocks",
++		"@wordpress/components": "file:../components",
++		"@wordpress/compose": "file:../compose",
++		"@wordpress/date": "file:../date",
++		"@wordpress/element": "file:../element",
++		"@wordpress/i18n": "file:../i18n",
++		"axios": "0.19.0",
++		"classnames": "2.2.6",
++		"lodash": "4.17.11",
++		"marked": "0.7.0",
++		"prism-react-renderer": "0.1.7",
++		"remark": "11.0.1",
++		"remark-parse": "7.0.1",
++		"react": "^16.9.0",
++		"react-dom": "^16.9.0",
++		"react-helmet": "5.2.1",
++		"react-live": "2.1.2",
++		"react-router": "5.0.1",
++		"react-router-dom": "5.0.1",
++		"react-scripts": "3.0.1",
++		"scroll-into-view-if-needed": "2.2.20",
++		"styled-components": "4.3.2",
++		"unified": "8.3.2",
++		"unist-util-visit": "2.0.0"
++	},
++	"browserslist": {
++		"production": [
++			">0.2%",
++			"not dead",
++			"not op_mini all"
++		],
++		"development": [
++			"last 1 chrome version",
++			"last 1 firefox version",
++			"last 1 safari version"
++		]
++	}
++}
+diff --git a/packages/components-website/public/_redirects b/packages/components-website/public/_redirects
+new file mode 100644
+index 00000000000000..5d9eb958f3026d
+--- /dev/null
++++ b/packages/components-website/public/_redirects
+@@ -0,0 +1,2 @@
++# Redirect to index, for React single page applications
++/*   /index.html   200
+diff --git a/packages/components-website/public/favicon.ico b/packages/components-website/public/favicon.ico
+new file mode 100644
+index 00000000000000..6a224d097eaa76
+Binary files /dev/null and b/packages/components-website/public/favicon.ico differ
+diff --git a/packages/components-website/public/index.html b/packages/components-website/public/index.html
+new file mode 100644
+index 00000000000000..005ccfd38c4dd4
+--- /dev/null
++++ b/packages/components-website/public/index.html
+@@ -0,0 +1,38 @@
++<!DOCTYPE html>
++<html lang="en">
++    <head>
++        <meta charset="utf-8"/>
++        <link href="%PUBLIC_URL%/favicon.ico" rel="shortcut icon"/>
++        <meta content="width=device-width, initial-scale=1" name="viewport"/>
++        <meta content="#000000" name="theme-color"/>
++        <!--
++      manifest.json provides metadata used when your web app is installed on a
++      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
++    -->
++        <link href="%PUBLIC_URL%/manifest.json" rel="manifest"/>
++        <!--
++      Notice the use of %PUBLIC_URL% in the tags above.
++      It will be replaced with the URL of the `public` folder during the build.
++      Only files inside the `public` folder can be referenced from the HTML.
++
++      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
++      work correctly both with client-side routing and a non-root public URL.
++      Learn how to configure a non-root public URL by running `npm run build`.
++    -->
++        <title>WordPress Components</title>
++    </head>
++    <body>
++        <noscript>You need to enable JavaScript to run this app.</noscript>
++        <div id="root"></div>
++        <!--
++      This HTML file is a template.
++      If you open it directly in the browser, you will see an empty page.
++
++      You can add webfonts, meta tags, or analytics to this file.
++      The build step will place the bundled scripts into the <body> tag.
++
++      To begin the development, run `npm start` or `yarn start`.
++      To create a production bundle, use `npm run build` or `yarn build`.
++    -->
++    </body>
++</html>
+diff --git a/packages/components-website/public/manifest.json b/packages/components-website/public/manifest.json
+new file mode 100644
+index 00000000000000..1f2f141fafdeb1
+--- /dev/null
++++ b/packages/components-website/public/manifest.json
+@@ -0,0 +1,15 @@
++{
++  "short_name": "React App",
++  "name": "Create React App Sample",
++  "icons": [
++    {
++      "src": "favicon.ico",
++      "sizes": "64x64 32x32 24x24 16x16",
++      "type": "image/x-icon"
++    }
++  ],
++  "start_url": ".",
++  "display": "standalone",
++  "theme_color": "#000000",
++  "background_color": "#ffffff"
++}
+diff --git a/packages/components-website/scripts/generate-doc-data.js b/packages/components-website/scripts/generate-doc-data.js
+new file mode 100644
+index 00000000000000..d8a45a7624765c
+--- /dev/null
++++ b/packages/components-website/scripts/generate-doc-data.js
+@@ -0,0 +1,22 @@
++const fs = require( 'fs' );
++const mkdirp = require( 'mkdirp' );
++
++async function generateDocData( post ) {
++	return new Promise( ( resolve, reject ) => {
++		try {
++			const { dataFileDest, dataFilePath, title, content, slug, markdown } = post;
++			mkdirp.sync( dataFileDest );
++
++			const props = { title, content, slug, markdown };
++			const writeContent = JSON.stringify( props, null, 2 );
++
++			fs.writeFileSync( dataFilePath, writeContent );
++
++			resolve();
++		} catch ( err ) {
++			reject( err );
++		}
++	} );
++}
++
++exports.generateDocData = generateDocData;
+diff --git a/packages/components-website/scripts/generate-docs.js b/packages/components-website/scripts/generate-docs.js
+new file mode 100644
+index 00000000000000..b60656ae02a72b
+--- /dev/null
++++ b/packages/components-website/scripts/generate-docs.js
+@@ -0,0 +1,30 @@
++const { getPostData } = require( './get-post-data' );
++const { generateDocData } = require( './generate-doc-data' );
++
++async function generateDocs() {
++	// eslint-disable-next-line no-console
++	console.log( 'Creating data.json file from markdown content...\n' );
++	// eslint-disable-next-line no-console
++	console.log( 'Generating data from markdown files...' );
++
++	const files = await getPostData();
++
++	// eslint-disable-next-line no-console
++	console.log( '\nCreating data .json files...' );
++
++	const tasks = [];
++
++	files.forEach( ( post ) => {
++		const task = generateDocData( post );
++		tasks.push( task );
++	} );
++
++	await Promise.all( tasks );
++
++	// eslint-disable-next-line no-console
++	console.log( '\n\nuccessfully generated data files!' );
++}
++
++( async () => {
++	generateDocs();
++} )();
+diff --git a/packages/components-website/scripts/generate-nav.js b/packages/components-website/scripts/generate-nav.js
+new file mode 100644
+index 00000000000000..a0abefcf877ac1
+--- /dev/null
++++ b/packages/components-website/scripts/generate-nav.js
+@@ -0,0 +1,44 @@
++const fs = require( 'fs' );
++const path = require( 'path' );
++const mkdirp = require( 'mkdirp' );
++const { getPostData } = require( './get-post-data' );
++const { orderBy } = require( 'lodash' );
++
++const destDir = path.resolve( __dirname, '../src/data' );
++const fileDest = path.join( destDir, 'navigation.json' );
++
++async function generateNav() {
++	// eslint-disable-next-line no-console
++	console.log( 'Creating navigation file from markdown content...\n' );
++
++	mkdirp.sync( destDir );
++
++	// eslint-disable-next-line no-console
++	console.log( 'Generating data from markdown files...' );
++
++	const posts = await getPostData();
++	const data = posts.map( ( post ) => {
++		const { title, url, id } = post;
++		return {
++			title,
++			url,
++			id,
++		};
++	} );
++
++	const sortedData = orderBy( data, [ 'title' ], [ 'asc' ] );
++
++	// eslint-disable-next-line no-console
++	console.log( '\nCreating data navigation.json files...' );
++
++	const content = JSON.stringify( sortedData, null, 2 );
++
++	fs.writeFileSync( fileDest, content );
++
++	// eslint-disable-next-line no-console
++	console.log( '\n\nSuccessfully generated navigation file!' );
++}
++
++( async () => {
++	generateNav();
++} )();
+diff --git a/packages/components-website/scripts/generate-pkg.js b/packages/components-website/scripts/generate-pkg.js
+new file mode 100644
+index 00000000000000..28c90458cd4473
+--- /dev/null
++++ b/packages/components-website/scripts/generate-pkg.js
+@@ -0,0 +1,40 @@
++const fs = require( 'fs' );
++const path = require( 'path' );
++const mkdirp = require( 'mkdirp' );
++
++const localDocsDir = path.resolve( __dirname, '../../../components/' );
++const localPkg = path.join( localDocsDir, '/package.json' );
++const destDir = path.resolve( __dirname, '../src/data' );
++const destFile = path.join( destDir, 'pkg.json' );
++
++async function generatePkgData() {
++	const pkgFileData = fs.readFileSync( localPkg, 'utf-8' );
++	const {
++		name,
++		version,
++		description,
++		homepage,
++		repository,
++		bugs,
++		license,
++		author,
++	} = JSON.parse( pkgFileData );
++
++	const pkg = {
++		name,
++		version,
++		description,
++		homepage,
++		repository,
++		bugs,
++		license,
++		author,
++	};
++	const pkgFileContent = JSON.stringify( pkg, null, 2 );
++
++	mkdirp.sync( destDir );
++
++	fs.writeFileSync( destFile, pkgFileContent );
++}
++
++generatePkgData();
+diff --git a/packages/components-website/scripts/get-post-data.js b/packages/components-website/scripts/get-post-data.js
+new file mode 100644
+index 00000000000000..d52dead64a6934
+--- /dev/null
++++ b/packages/components-website/scripts/get-post-data.js
+@@ -0,0 +1,105 @@
++const fs = require( 'fs' );
++const path = require( 'path' );
++const glob = require( 'fast-glob' );
++const mkdirp = require( 'mkdirp' );
++const remark = require( 'remark' );
++const visit = require( 'unist-util-visit' );
++
++const localDocsDir = path.resolve( __dirname, '../../src' );
++const localDocs = path.join( localDocsDir, '/*/*.md' );
++const localIndexDocs = path.join( localDocsDir, '/*.md' );
++const dataDestDir = path.resolve( __dirname, '../public/_data' );
++
++function getDataFileDir( filePath ) {
++	const rootDest = path.resolve( __dirname, '../public/_data/components/' );
++	const fileDir = path.dirname( filePath ).replace( localDocsDir, '' );
++
++	return path.join( rootDest, fileDir );
++}
++
++async function getDataFromFile( filePath ) {
++	const markdown = fs.readFileSync( filePath, 'utf-8' );
++	const slug = path.basename( path.dirname( filePath ) );
++	const rawFileName = path.basename( filePath ).toLowerCase();
++	const fileName = rawFileName.replace( 'readme', 'index' );
++	const dataFileName = fileName.replace( '.md', '.json' );
++	const dataFileDest = getDataFileDir( filePath );
++	const dataFilePath = path.join( dataFileDest, dataFileName );
++
++	let url = path
++		.join( dataFileDest.replace( dataDestDir, '' ), dataFileName )
++		.replace( 'index.json', '' )
++		.replace( '.json', '' );
++
++	if ( ! url ) {
++		url = '/';
++	}
++
++	const id = path
++		.join( dataFileDest.replace( dataDestDir, '' ), dataFileName )
++		.replace( /\.| |\//g, '-' )
++		.replace( /^-|-json/g, '' );
++
++	const postContent = remark()
++		.use( () => {
++			return transformer;
++
++			function transformer( tree, file ) {
++				const remove = [];
++
++				visit( tree, [ 'heading' ], ( node ) => {
++					const { type, depth, children } = node;
++					if ( type === 'heading' && depth === 1 ) {
++						file.data.title = children[ 0 ].value;
++						remove.push( node );
++					}
++				} );
++
++				visit( tree, [ 'code' ], ( node ) => {
++					remove.push( node );
++				} );
++
++				visit( tree, ( node, index, parent ) => {
++					if ( parent && remove.indexOf( node ) !== -1 ) {
++						parent.children.splice( index, 1 );
++						return [ visit.SKIP, index ];
++					}
++				} );
++			}
++		} )
++		.processSync( markdown );
++
++	return {
++		title: postContent.data.title,
++		slug,
++		filePath,
++		dataFilePath,
++		dataFileDest,
++		markdown,
++		id,
++		objectID: id,
++		url,
++	};
++}
++
++async function getPostData( singleFile ) {
++	mkdirp.sync( dataDestDir );
++
++	const files = singleFile ? [ singleFile ] : glob.sync( [ localDocs, localIndexDocs ] );
++
++	try {
++		const data = files.reduce( async ( asyncCollection, filePath ) => {
++			const collection = await asyncCollection;
++			const post = await getDataFromFile( filePath );
++
++			return [ ...collection, post ];
++		}, [] );
++
++		return data;
++	} catch ( err ) {
++		return [];
++	}
++}
++
++exports.getPostData = getPostData;
++exports.dataDestDir = dataDestDir;
+diff --git a/packages/components-website/scripts/watch-transform-data.js b/packages/components-website/scripts/watch-transform-data.js
+new file mode 100644
+index 00000000000000..46ee879123a572
+--- /dev/null
++++ b/packages/components-website/scripts/watch-transform-data.js
+@@ -0,0 +1,46 @@
++const path = require( 'path' );
++const chokidar = require( 'chokidar' );
++const { generateDocData } = require( './generate-doc-data' );
++const { getPostData } = require( './get-post-data' );
++
++const src = path.resolve( __dirname, '../../components/src/**/*.md' );
++
++const watcher = chokidar.watch( src );
++let __state = { isReady: false };
++
++function getState( key ) {
++	if ( ! key ) {
++		return __state;
++	}
++	return __state[ key ];
++}
++function setState( nextState = {} ) {
++	__state = { ...__state, ...nextState };
++}
++
++function handleOnReady() {
++	setState( { isReady: true } );
++	// eslint-disable-next-line no-console
++	console.log( '@wordpress/components docs data transformer ready.' );
++}
++
++async function handleOnChange( file ) {
++	if ( ! getState( 'isReady' ) ) {
++		return;
++	}
++	const basefile = path.basename( path.dirname( file ) );
++	const [ data ] = await getPostData( file );
++
++	try {
++		await generateDocData( data );
++		// eslint-disable-next-line no-console
++		console.log( `Generated @wordpress/components/${ basefile } data` );
++	} catch ( err ) {
++		// eslint-disable-next-line no-console
++		console.log( err );
++	}
++}
++
++watcher.on( 'ready', handleOnReady );
++watcher.on( 'add', handleOnChange );
++watcher.on( 'change', handleOnChange );
+diff --git a/packages/components-website/server.js b/packages/components-website/server.js
+new file mode 100644
+index 00000000000000..0db138bb8c5932
+--- /dev/null
++++ b/packages/components-website/server.js
+@@ -0,0 +1,29 @@
++const fs = require( 'fs' );
++const path = require( 'path' );
++const express = require( 'express' );
++const app = express();
++const port = 8700;
++
++const docsDir = path.resolve( __dirname, './public/_data' );
++
++app.get( '/_data/*', ( req, res ) => {
++	const { originalUrl } = req;
++	const filePath = originalUrl.replace( /\/_data\//g, '' );
++	const docFile = path.join( docsDir, filePath );
++
++	if ( ! fs.existsSync( docFile ) ) {
++		return res.send( {
++			message: `Could not find ${ filePath }`,
++			status: 401,
++		} );
++	}
++
++	const fileData = fs.readFileSync( docFile, 'utf-8' );
++
++	return res.send( fileData );
++} );
++
++app.listen( port, () => {
++	// eslint-disable-next-line no-console
++	console.log( 'Started serving local data files' );
++} );
+diff --git a/packages/components-website/src/app.js b/packages/components-website/src/app.js
+new file mode 100644
+index 00000000000000..ee1833e0b48b59
+--- /dev/null
++++ b/packages/components-website/src/app.js
+@@ -0,0 +1,34 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
++/**
++ * Internal dependencies
++ */
++import HeaderNavigation from './components/header-navigation';
++import Layout from './components/layout';
++
++import HomePage from './pages/home';
++import ComponentsPage from './pages/components';
++
++function App() {
++	return (
++		<Router>
++			<Switch>
++				<Redirect exact from="/components" to="/components/animate/" />
++				<>
++					<HeaderNavigation />
++					<Layout>
++						<Layout.Main>
++							<Route path="/" exact component={ HomePage } />
++							<Route path="/components" component={ ComponentsPage } />
++						</Layout.Main>
++					</Layout>
++				</>
++			</Switch>
++		</Router>
++	);
++}
++
++export default App;
+diff --git a/packages/components-website/src/blocks/example.js b/packages/components-website/src/blocks/example.js
+new file mode 100644
+index 00000000000000..66ddf5cd2c29b7
+--- /dev/null
++++ b/packages/components-website/src/blocks/example.js
+@@ -0,0 +1,39 @@
++/**
++ * WordPress dependencies
++ */
++import { registerBlockType } from '@wordpress/blocks';
++
++/**
++ * External dependencies
++ */
++import React from 'react';
++
++/**
++ * Internal dependencies
++ */
++import Card from '../components/card';
++import CodeExample from '../components/code-example';
++
++registerBlockType( 'docs/example', {
++	title: 'Example: Live',
++	category: 'layout',
++	attributes: {
++		code: {
++			type: 'string',
++			source: 'text',
++			selector: 'code',
++		},
++	},
++	edit() {},
++	save( props ) {
++		const {
++			attributes: { code },
++		} = props;
++
++		return (
++			<Card>
++				<CodeExample code={ code } />
++			</Card>
++		);
++	},
++} );
+diff --git a/packages/components-website/src/blocks/index.js b/packages/components-website/src/blocks/index.js
+new file mode 100644
+index 00000000000000..f5ccc54672ba27
+--- /dev/null
++++ b/packages/components-website/src/blocks/index.js
+@@ -0,0 +1,5 @@
++/**
++ * Internal dependencies
++ */
++import './example';
++import './sandbox';
+diff --git a/packages/components-website/src/blocks/sandbox.js b/packages/components-website/src/blocks/sandbox.js
+new file mode 100644
+index 00000000000000..8fb7ebba17e826
+--- /dev/null
++++ b/packages/components-website/src/blocks/sandbox.js
+@@ -0,0 +1,59 @@
++/**
++ * WordPress dependencies
++ */
++import { registerBlockType } from '@wordpress/blocks';
++
++/**
++ * External dependencies
++ */
++import React from 'react';
++
++/**
++ * Internal dependencies
++ */
++import Card from '../components/card';
++import CodeExample from '../components/code-example';
++
++function transformCode( code ) {
++	if ( ! code ) {
++		return '';
++	}
++
++	const match = code.replace(
++		/import(?:["'\s]*([\w*{}\n, ]+)from\s*)?["'\s]*([@\w/_-]+)["'\s].*/gm,
++		''
++	);
++
++	return `() => {${ match }; return <Example />}`;
++}
++
++registerBlockType( 'docs/sandbox', {
++	title: 'Sandbox',
++	category: 'layout',
++	attributes: {
++		code: {
++			type: 'string',
++			source: 'text',
++			selector: 'code',
++		},
++		name: {
++			type: 'string',
++		},
++	},
++	save( props ) {
++		const {
++			attributes: { code, name },
++		} = props;
++
++		return (
++			<Card>
++				<CodeExample
++					name={ name }
++					code={ code }
++					enableCodeSandbox
++					transformCode={ transformCode }
++				/>
++			</Card>
++		);
++	},
++} );
+diff --git a/packages/components-website/src/components/card.js b/packages/components-website/src/components/card.js
+new file mode 100644
+index 00000000000000..836a12946e54bd
+--- /dev/null
++++ b/packages/components-website/src/components/card.js
+@@ -0,0 +1,23 @@
++/**
++ * External dependencies
++ */
++import styled from 'styled-components';
++
++const Card = styled.div`
++	margin: 2em 0 3em;
++	border: 1px solid #ddd;
++	border-radius: 4px;
++
++	& > * {
++		&:first-of-type {
++			border-top-left-radius: 4px;
++			border-top-right-radius: 4px;
++		}
++		&:last-of-type {
++			border-bottom-left-radius: 4px;
++			border-bottom-right-radius: 4px;
++		}
++	}
++`;
++
++export default Card;
+diff --git a/packages/components-website/src/components/code-example.js b/packages/components-website/src/components/code-example.js
+new file mode 100644
+index 00000000000000..47c041ce4359ed
+--- /dev/null
++++ b/packages/components-website/src/components/code-example.js
+@@ -0,0 +1,153 @@
++/**
++ * WordPress dependencies
++ */
++import * as WPComponents from '@wordpress/components';
++import * as WPCompose from '@wordpress/compose';
++import * as WPDate from '@wordpress/date';
++import * as WPI18n from '@wordpress/i18n';
++
++/**
++ * External dependencies
++ */
++import React, { useState, useEffect } from 'react';
++import { LiveProvider, LiveEditor, LiveError, LivePreview, withLive } from 'react-live';
++import styled from 'styled-components';
++
++/**
++ * Internal dependencies
++ */
++import CodeSandboxButton from './codesandbox-button';
++import theme from '../utils/editor-theme';
++
++const { Button, ClipboardButton } = WPComponents;
++
++const ConnctedCodeSandboxButton = withLive( CodeSandboxButton );
++
++function CodeExample( props ) {
++	const { code, enableCodeSandbox, name, transformCode } = props;
++	const initialCode = code.replace( / {4}/g, '  ' );
++
++	const [ exampleCode, setExampleCode ] = useState( initialCode );
++	const [ copyText, setCopyText ] = useState( 'Copy' );
++
++	let copyTimeout;
++	const scope = { ...WPComponents, ...WPCompose, ...WPDate, ...WPI18n };
++	const isModified = initialCode !== exampleCode;
++
++	useEffect( () => {
++		return () => {
++			clearTimeout( copyTimeout );
++		};
++	}, [ copyTimeout ] );
++
++	function handleReset() {
++		setExampleCode( initialCode );
++	}
++
++	function handleOnCopy() {
++		setCopyText( 'Copied!' );
++		copyTimeout = setTimeout( () => {
++			setCopyText( 'Copy' );
++		}, 1500 );
++	}
++
++	return (
++		<LiveProvider
++			code={ exampleCode }
++			scope={ scope }
++			theme={ theme }
++			transformCode={ transformCode }
++		>
++			<PreviewUI>
++				<LivePreview />
++			</PreviewUI>
++			<EditorUI style={ { paddingTop: enableCodeSandbox ? '35px' : 0 } }>
++				<EditorActionsUI enableCodeSandbox={ enableCodeSandbox }>
++					{ enableCodeSandbox && (
++						<EditorActionLeftUI>
++							<ConnctedCodeSandboxButton name={ name } />
++						</EditorActionLeftUI>
++					) }
++
++					{ isModified && (
++						<Button isDefault isSmall onClick={ handleReset }>
++							Reset
++						</Button>
++					) }
++					<ClipboardButton isDefault isSmall text={ exampleCode } onCopy={ handleOnCopy }>
++						{ copyText }
++					</ClipboardButton>
++				</EditorActionsUI>
++				<LiveEditor onValueChange={ setExampleCode } />
++			</EditorUI>
++			<div className="handbook-card__errors">
++				<LiveError />
++			</div>
++		</LiveProvider>
++	);
++}
++
++CodeExample.defaultProps = {
++	code: '',
++	enableCodeSandbox: false,
++	transformCode: ( code ) => code,
++};
++
++const PreviewUI = styled.div`
++	padding: 30px 20px;
++`;
++
++const EditorUI = styled.div`
++	background: ${ theme.plain.backgroundColor };
++	border-top: 1px solid #ddd;
++	border-bottom-left-radius: 4px;
++	border-bottom-right-radius: 4px;
++	font-size: 14px;
++	position: relative;
++
++	& > * {
++		border-bottom-left-radius: 4px;
++		border-bottom-right-radius: 4px;
++	}
++
++	& > pre {
++		display: block;
++		margin: 0;
++		padding: 10px;
++	}
++
++	textarea {
++		&:focus {
++			outline: none;
++		}
++	}
++`;
++
++const EditorActionsUI = styled.div`
++	position: absolute;
++	z-index: 2;
++	top: 4px;
++	right: 4px;
++	display: flex;
++	align-items: center;
++
++	> * {
++		margin-left: 4px;
++	}
++
++	${ ( { enableCodeSandbox } ) =>
++		enableCodeSandbox &&
++		`
++	left: 4px;
++	border-bottom: 1px solid rgba(0, 0, 0, 0.05);
++	padding-bottom: 4px;
++	border-radius: 0;
++	` }
++`;
++
++const EditorActionLeftUI = styled.div`
++	margin-left: 0;
++	margin-right: auto;
++`;
++
++export default React.memo( CodeExample );
+diff --git a/packages/components-website/src/components/codesandbox-button.js b/packages/components-website/src/components/codesandbox-button.js
+new file mode 100644
+index 00000000000000..2b9ddc5d85a5d2
+--- /dev/null
++++ b/packages/components-website/src/components/codesandbox-button.js
+@@ -0,0 +1,98 @@
++/**
++ * WordPress dependencies
++ */
++import { Button } from '@wordpress/components';
++
++/**
++ * External dependencies
++ */
++import React from 'react';
++import axios from 'axios';
++
++export default function CodeSandboxButton( props ) {
++	const {
++		live: { code },
++		name,
++	} = props;
++
++	const handleOnClick = () => createRequest( { code, name } );
++
++	return (
++		<Button isDefault isSmall onClick={ handleOnClick }>
++			Edit in Sandbox
++		</Button>
++	);
++}
++
++CodeSandboxButton.defaultProps = {
++	live: {},
++};
++
++const indexCode = `import React from 'react';
++import ReactDOM from 'react-dom';
++import Example from './example'
++import "@wordpress/components/build-style/style.css";
++
++ReactDOM.render(
++  <Example />,
++  document.getElementById('root')
++);`;
++const html = '<div id="root"></div>';
++
++function createExampleCode( code ) {
++	return `
++import React from 'react';
++${ code };
++
++export default Example;
++`.trim();
++}
++
++function createParameters( { code, name } ) {
++	const packageName = name ?
++		`wordpress-components-${ name }-example` :
++		'wordpress-components-example';
++	const parameters = {
++		files: {
++			'package.json': {
++				content: {
++					name: packageName,
++					dependencies: {
++						react: 'latest',
++						'react-dom': 'latest',
++						'@wordpress/components': 'latest',
++						'@wordpress/compose': 'latest',
++						'@wordpress/date': 'latest',
++						'@wordpress/element': 'latest',
++						'@wordpress/i18n': 'latest',
++					},
++				},
++			},
++			'index.js': {
++				content: indexCode,
++			},
++			'example.js': {
++				content: createExampleCode( code ),
++			},
++			'index.html': {
++				content: html,
++			},
++		},
++	};
++
++	return parameters;
++}
++
++async function createRequest( code ) {
++	const request = await axios.post(
++		'https://codesandbox.io/api/v1/sandboxes/define?json=1',
++		createParameters( code )
++	);
++
++	if ( request.data ) {
++		window.open(
++			`https://codesandbox.io/s/${ request.data.sandbox_id }?module=example.js`,
++			'_blank'
++		);
++	}
++}
+diff --git a/packages/components-website/src/components/codesandbox-button/codesandbox-button.utils.js b/packages/components-website/src/components/codesandbox-button/codesandbox-button.utils.js
+new file mode 100644
+index 00000000000000..b6189d7e06d216
+--- /dev/null
++++ b/packages/components-website/src/components/codesandbox-button/codesandbox-button.utils.js
+@@ -0,0 +1,70 @@
++/**
++ * External dependencies
++ */
++import axios from 'axios';
++
++const indexCode = `import React from 'react';
++import ReactDOM from 'react-dom';
++import Example from './example'
++import "@wordpress/components/build-style/style.css";
++
++ReactDOM.render(
++  <Example />,
++  document.getElementById('root')
++);`;
++const html = '<div id="root"></div>';
++
++function createExampleCode( code ) {
++	return `
++import React from 'react';
++${ code };
++
++export default Example;
++`.trim();
++}
++
++function createParameters( { code, name } ) {
++	const packageName = name ?
++		`wordpress-components-${ name }-example` :
++		'wordpress-components-example';
++	const parameters = {
++		files: {
++			'package.json': {
++				content: {
++					name: packageName,
++					dependencies: {
++						react: 'latest',
++						'react-dom': 'latest',
++						'@wordpress/components': 'latest',
++						'@wordpress/compose': 'latest',
++					},
++				},
++			},
++			'index.js': {
++				content: indexCode,
++			},
++			'example.js': {
++				content: createExampleCode( code ),
++			},
++			'index.html': {
++				content: html,
++			},
++		},
++	};
++
++	return parameters;
++}
++
++export async function createRequest( code ) {
++	const request = await axios.post(
++		'https://codesandbox.io/api/v1/sandboxes/define?json=1',
++		createParameters( code )
++	);
++
++	if ( request.data ) {
++		window.open(
++			`https://codesandbox.io/s/${ request.data.sandbox_id }?module=example.js`,
++			'_blank'
++		);
++	}
++}
+diff --git a/packages/components-website/src/components/codesandbox-button/index.js b/packages/components-website/src/components/codesandbox-button/index.js
+new file mode 100644
+index 00000000000000..f84e229d63ea34
+--- /dev/null
++++ b/packages/components-website/src/components/codesandbox-button/index.js
+@@ -0,0 +1,33 @@
++/**
++ * WordPress dependencies
++ */
++import { Button } from '@wordpress/components';
++
++/**
++ * External dependencies
++ */
++import React from 'react';
++
++/**
++ * Internal dependencies
++ */
++import { createRequest } from './codesandbox-button.utils';
++
++export default function CodeSandboxButton( props ) {
++	const {
++		live: { code },
++		name,
++	} = props;
++
++	const handleOnClick = () => createRequest( { code, name } );
++
++	return (
++		<Button isDefault isSmall onClick={ handleOnClick }>
++			Edit in Sandbox
++		</Button>
++	);
++}
++
++CodeSandboxButton.defaultProps = {
++	live: {},
++};
+diff --git a/packages/components-website/src/components/document.js b/packages/components-website/src/components/document.js
+new file mode 100644
+index 00000000000000..d22bdf52cfb2b9
+--- /dev/null
++++ b/packages/components-website/src/components/document.js
+@@ -0,0 +1,30 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++
++/**
++ * Internal dependencies
++ */
++import Layout from './layout';
++import Markdown from './markdown';
++import Page from './page';
++
++export default function Document( props ) {
++	const { isLoaded, markdown, headerSlot, footerSlot } = props;
++
++	return (
++		<Layout.Content>
++			<Page isLoaded={ isLoaded }>
++				{ headerSlot }
++				<Markdown markdown={ markdown } />
++				{ footerSlot }
++			</Page>
++		</Layout.Content>
++	);
++}
++
++Document.defaultProps = {
++	headerSlot: null,
++	footerSlot: null,
++};
+diff --git a/packages/components-website/src/components/fade-in.js b/packages/components-website/src/components/fade-in.js
+new file mode 100644
+index 00000000000000..e32411d419468a
+--- /dev/null
++++ b/packages/components-website/src/components/fade-in.js
+@@ -0,0 +1,41 @@
++/**
++ * External dependencies
++ */
++import React, { useState, useEffect } from 'react';
++import { isUndefined } from 'lodash';
++/**
++ * External dependencies
++ */
++import styled from 'styled-components';
++
++export default function Fade( props ) {
++	const { children, isLoaded } = props;
++	const [ isReady, setReady ] = useState( isLoaded );
++
++	useEffect( () => {
++		window.requestAnimationFrame( () => {
++			setReady( true );
++		} );
++		return () => {
++			setReady( false );
++		};
++	}, [ setReady ] );
++
++	const shouldFadeIn = isUndefined( isLoaded ) ? isReady : isLoaded;
++	const className = shouldFadeIn ? 'is-ready' : '';
++
++	return <FadeUI className={ className }>{ children }</FadeUI>;
++}
++
++const FadeUI = styled.div`
++	opacity: 0;
++	transition-delay: 0ms;
++	transition-duration: 0ms;
++	transition-property: opacity;
++	transition-timing-function: linear;
++
++	&.is-ready {
++		opacity: 1;
++		transition-duration: 200ms;
++	}
++`;
+diff --git a/packages/components-website/src/components/field-group.js b/packages/components-website/src/components/field-group.js
+new file mode 100644
+index 00000000000000..102b9a7ed0a98e
+--- /dev/null
++++ b/packages/components-website/src/components/field-group.js
+@@ -0,0 +1,14 @@
++/**
++ * External dependencies
++ */
++import styled from 'styled-components';
++
++const FieldGroup = styled.div`
++	margin-bottom: 15px;
++
++	&:last-of-type {
++		margin-bottom: 0;
++	}
++`;
++
++export default FieldGroup;
+diff --git a/packages/components-website/src/components/flexy.js b/packages/components-website/src/components/flexy.js
+new file mode 100644
+index 00000000000000..02a3e4bfafe731
+--- /dev/null
++++ b/packages/components-website/src/components/flexy.js
+@@ -0,0 +1,49 @@
++/**
++ * External dependencies
++ */
++import styled from 'styled-components';
++
++const alignProps = {
++	top: 'flex-start',
++	center: 'center',
++	middle: 'center',
++	bottom: 'flex-end',
++};
++
++const Flexy = styled.div`
++	display: flex;
++	justify-content: space-between;
++	width: 100%;
++
++	${ ( { align } ) => `
++		align-items: ${ alignProps[ align ] };
++	` }
++
++	& > * {
++		margin-right: 8px;
++
++		&:last-child {
++			margin-right: 0;
++		}
++	}
++`;
++
++Flexy.defaultProps = {
++	align: 'center',
++};
++
++const Item = styled.div`
++	min-width: 0;
++	min-height: 0;
++`;
++
++const Block = styled.div`
++	min-width: 0;
++	min-height: 0;
++	flex: 1;
++`;
++
++Flexy.Item = Item;
++Flexy.Block = Block;
++
++export default Flexy;
+diff --git a/packages/components-website/src/components/header-navigation/github-link.js b/packages/components-website/src/components/header-navigation/github-link.js
+new file mode 100644
+index 00000000000000..311624eb017247
+--- /dev/null
++++ b/packages/components-website/src/components/header-navigation/github-link.js
+@@ -0,0 +1,51 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++import styled from 'styled-components';
++
++/**
++ * WordPress dependencies
++ */
++import { SVG, Path } from '@wordpress/components';
++
++export default function GithubLink() {
++	return (
++		<a
++			href="https://github.com/WordPress/gutenberg/tree/master/packages/components"
++			target="_blank"
++			rel="noreferrer noopener"
++		>
++			<IconUI>
++				<GithubIcon />
++			</IconUI>{ ' ' }
++			<LabelUI>Github</LabelUI>
++		</a>
++	);
++}
++
++function GithubIcon() {
++	return (
++		<SVG role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
++			<title>GitHub icon</title>
++			<Path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
++		</SVG>
++	);
++}
++
++const IconUI = styled.span`
++	display: inline-block;
++	margin-right: 4px;
++	vertical-align: middle;
++
++	svg {
++		display: block;
++		width: 20px;
++	}
++`;
++
++const LabelUI = styled.span`
++	display: inline-block;
++	position: relative;
++	top: 2px;
++`;
+diff --git a/packages/components-website/src/components/header-navigation/index.js b/packages/components-website/src/components/header-navigation/index.js
+new file mode 100644
+index 00000000000000..bdcfce0295a53e
+--- /dev/null
++++ b/packages/components-website/src/components/header-navigation/index.js
+@@ -0,0 +1,47 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++import styled from 'styled-components';
++
++/**
++ * Internal dependencies
++ */
++import Flexy from '../flexy';
++import Menu from './menu';
++import Logo from './logo';
++import { getColor } from '../../utils/color';
++
++export default function HeaderNavigation() {
++	return (
++		<HeaderUI>
++			<Flexy>
++				<Flexy.Item>
++					<Logo />
++				</Flexy.Item>
++				<Flexy.Block>
++					<Menu />
++				</Flexy.Block>
++			</Flexy>
++		</HeaderUI>
++	);
++}
++
++export const HeaderUI = styled.div`
++	align-items: center;
++	background: ${ getColor( 'White' ) };
++	border-bottom: 1px solid ${ getColor( 'Gray 5' ) };
++	box-shadow: 0px 4px 10px rgba( 0, 0, 0, 0.05 );
++	display: flex;
++	height: var( --navHeight );
++	left: 0;
++	padding: 5px 10px;
++	position: fixed;
++	top: 0;
++	width: 100%;
++	z-index: 100;
++
++	a {
++		text-decoration: none;
++	}
++`;
+diff --git a/packages/components-website/src/components/header-navigation/logo.js b/packages/components-website/src/components/header-navigation/logo.js
+new file mode 100644
+index 00000000000000..0ea2a269f516ae
+--- /dev/null
++++ b/packages/components-website/src/components/header-navigation/logo.js
+@@ -0,0 +1,75 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++import { Link } from 'react-router-dom';
++import styled from 'styled-components';
++
++/**
++ * Internal dependencies
++ */
++import { getColor } from '../../utils/color';
++
++/**
++ * WordPress dependencies
++ */
++import { SVG, Path } from '@wordpress/components';
++
++export default function Logo() {
++	return (
++		<LogoUI>
++			<Link to="/">
++				<h1>
++					<IconUI>
++						<WordPressIcon />
++					</IconUI>
++					<LabelUI>Components</LabelUI>
++				</h1>
++			</Link>
++		</LogoUI>
++	);
++}
++
++function WordPressIcon() {
++	return (
++		<SVG role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
++			<title>WordPress icon</title>
++			<Path d="M21.469 6.825c.84 1.537 1.318 3.3 1.318 5.175 0 3.979-2.156 7.456-5.363 9.325l3.295-9.527c.615-1.54.82-2.771.82-3.864 0-.405-.026-.78-.07-1.11m-7.981.105c.647-.03 1.232-.105 1.232-.105.582-.075.514-.93-.067-.899 0 0-1.755.135-2.88.135-1.064 0-2.85-.15-2.85-.15-.585-.03-.661.855-.075.885 0 0 .54.061 1.125.09l1.68 4.605-2.37 7.08L5.354 6.9c.649-.03 1.234-.1 1.234-.1.585-.075.516-.93-.065-.896 0 0-1.746.138-2.874.138-.2 0-.438-.008-.69-.015C4.911 3.15 8.235 1.215 12 1.215c2.809 0 5.365 1.072 7.286 2.833-.046-.003-.091-.009-.141-.009-1.06 0-1.812.923-1.812 1.914 0 .89.513 1.643 1.06 2.531.411.72.89 1.643.89 2.977 0 .915-.354 1.994-.821 3.479l-1.075 3.585-3.9-11.61.001.014zM12 22.784c-1.059 0-2.081-.153-3.048-.437l3.237-9.406 3.315 9.087c.024.053.05.101.078.149-1.12.393-2.325.609-3.582.609M1.211 12c0-1.564.336-3.05.935-4.39L7.29 21.709C3.694 19.96 1.212 16.271 1.211 12M12 0C5.385 0 0 5.385 0 12s5.385 12 12 12 12-5.385 12-12S18.615 0 12 0" />
++		</SVG>
++	);
++}
++
++export const LogoUI = styled.div`
++	margin-right: 40px;
++
++	a {
++		display: block;
++		padding: 10px 15px;
++	}
++
++	h1 {
++		color: ${ getColor( 'Black' ) };
++		font-size: 18px;
++		font-weight: bold;
++		margin: 0;
++	}
++`;
++
++const IconUI = styled.span`
++	display: inline-block;
++	margin-right: 8px;
++	position: relative;
++	top: -3px;
++	vertical-align: middle;
++
++	svg {
++		display: block;
++		width: 20px;
++	}
++`;
++
++const LabelUI = styled.span`
++	display: inline-block;
++	position: relative;
++	top: 0px;
++`;
+diff --git a/packages/components-website/src/components/header-navigation/menu.js b/packages/components-website/src/components/header-navigation/menu.js
+new file mode 100644
+index 00000000000000..a7b4ed693ce511
+--- /dev/null
++++ b/packages/components-website/src/components/header-navigation/menu.js
+@@ -0,0 +1,63 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++import { NavLink } from 'react-router-dom';
++import styled from 'styled-components';
++
++/**
++ * Internal dependencies
++ */
++import GithubLink from './github-link';
++import Version from './version';
++import { getColor } from '../../utils/color';
++
++export default function Menu() {
++	return (
++		<NavUI>
++			<NavListUI>
++				<li>
++					<NavLink to="/components/">Documentation</NavLink>
++				</li>
++			</NavListUI>
++			<NavListUI>
++				<li>
++					<Version />
++				</li>
++				<li>
++					<GithubLink />
++				</li>
++			</NavListUI>
++		</NavUI>
++	);
++}
++
++const NavUI = styled.nav`
++	display: flex;
++	align-items: center;
++	justify-content: space-between;
++	width: 100%;
++
++	a {
++		color: ${ getColor( 'Gray 30' ) };
++		display: block;
++		padding: 15px 15px;
++
++		&:hover,
++		&.active {
++			color: ${ getColor( 'Black' ) };
++		}
++
++		&.active {
++			font-weight: bold;
++		}
++	}
++`;
++
++const NavListUI = styled.ul`
++	align-items: center;
++	display: flex;
++	list-style: none;
++	padding: 0;
++	margin: 0;
++`;
+diff --git a/packages/components-website/src/components/header-navigation/version.js b/packages/components-website/src/components/header-navigation/version.js
+new file mode 100644
+index 00000000000000..fffa70acb2b30a
+--- /dev/null
++++ b/packages/components-website/src/components/header-navigation/version.js
+@@ -0,0 +1,24 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++import styled from 'styled-components';
++
++/**
++ * Internal dependencies
++ */
++import pkg from '../../data/pkg.json';
++import { getColor } from '../../utils/color';
++
++export default function Version() {
++	const { version } = pkg;
++	return <BadgeUI>v{ version }</BadgeUI>;
++}
++
++const BadgeUI = styled.div`
++	border-radius: 4px;
++	background: ${ getColor( 'Gray 5' ) };
++	color: ${ getColor( 'Gray 80' ) };
++	font-size: 0.8rem;
++	padding: 2px 8px;
++`;
+diff --git a/packages/components-website/src/components/label.js b/packages/components-website/src/components/label.js
+new file mode 100644
+index 00000000000000..ac531ff22f1942
+--- /dev/null
++++ b/packages/components-website/src/components/label.js
+@@ -0,0 +1,21 @@
++/**
++ * External dependencies
++ */
++import styled from 'styled-components';
++
++/**
++ * Internal dependencies
++ */
++import { getColor } from '../utils/color';
++
++const Label = styled.div`
++	color: ${ getColor( 'Gray 40' ) };
++	font-size: 0.8rem;
++	margin-bottom: 5px;
++
++	&:last-child {
++		margin-bottom: 0;
++	}
++`;
++
++export default Label;
+diff --git a/packages/components-website/src/components/layout.js b/packages/components-website/src/components/layout.js
+new file mode 100644
+index 00000000000000..2d874bfba74863
+--- /dev/null
++++ b/packages/components-website/src/components/layout.js
+@@ -0,0 +1,39 @@
++/**
++ * External dependencies
++ */
++import styled from 'styled-components';
++
++const Main = styled.div`
++	margin-top: var( --navHeight );
++`;
++
++const Layout = styled.div``;
++
++const Container = styled.div`
++	max-width: 960px;
++	margin: 0 auto;
++	width: 100%;
++`;
++
++const Content = styled.div`
++	padding: 40px 20px 20vh;
++	margin: auto;
++	max-width: 800px;
++
++	${ ( { isWide } ) =>
++		isWide &&
++		`
++	max-width: 1020px;
++	` }
++`;
++
++const BodyWithSidebar = styled.div`
++	margin-left: 280px;
++`;
++
++Layout.Main = Main;
++Layout.Container = Container;
++Layout.Content = Content;
++Layout.BodyWithSidebar = BodyWithSidebar;
++
++export default Layout;
+diff --git a/packages/components-website/src/components/markdown.js b/packages/components-website/src/components/markdown.js
+new file mode 100644
+index 00000000000000..28b62edd32f9f3
+--- /dev/null
++++ b/packages/components-website/src/components/markdown.js
+@@ -0,0 +1,76 @@
++/**
++ * WordPress dependencies
++ */
++import { parse } from '@wordpress/block-serialization-default-parser';
++import { getBlockAttributes, getBlockType, getSaveElement } from '@wordpress/blocks';
++import { Notice } from '@wordpress/components';
++
++/**
++ * External dependencies
++ */
++import React from 'react';
++import marked from 'marked';
++
++/**
++ * Internal dependencies
++ */
++import '../blocks';
++import Typography from './typography';
++import { toHash } from '../utils/strings';
++
++function mapBlocksWithKeys( blocks ) {
++	return blocks.map( ( block, index ) => {
++		const { innerHTML } = block;
++		const id = `${ toHash( innerHTML ) }-${ index }`;
++
++		return { ...block, id };
++	} );
++}
++
++function markdownToBlocks( markdown ) {
++	const blocks = parse( marked( markdown ) );
++	return mapBlocksWithKeys( blocks );
++}
++
++export default function Markdown( props ) {
++	const { markdown } = props;
++	if ( ! markdown ) {
++		return null;
++	}
++
++	const blocks = markdownToBlocks( markdown );
++
++	return (
++		<>
++			{ blocks.map( ( block ) => {
++				const { attrs, blockName, id, innerBlocks, innerHTML } = block;
++
++				if ( ! blockName ) {
++					return <Typography key={ id } dangerouslySetInnerHTML={ { __html: innerHTML } } />;
++				}
++				const blockType = getBlockType( blockName );
++
++				if ( ! blockType ) {
++					return (
++						<Typography key={ id }>
++							<Notice status="warning" isDismissible={ false }>
++								No block found matching name { blockName }.
++							</Notice>
++							<Typography dangerouslySetInnerHTML={ { __html: innerHTML } } />
++						</Typography>
++					);
++				}
++
++				return (
++					<Typography key={ id }>
++						{ getSaveElement(
++							blockName,
++							getBlockAttributes( blockType, innerHTML, attrs ),
++							innerBlocks
++						) }
++					</Typography>
++				);
++			} ) }
++		</>
++	);
++}
+diff --git a/packages/components-website/src/components/navigation.js b/packages/components-website/src/components/navigation.js
+new file mode 100644
+index 00000000000000..c5b94bd865a620
+--- /dev/null
++++ b/packages/components-website/src/components/navigation.js
+@@ -0,0 +1,77 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++import { NavLink } from 'react-router-dom';
++import styled from 'styled-components';
++/**
++ * Internal dependencies
++ */
++import { useScrollIntoView } from '../utils/hooks';
++import data from '../data/navigation.json';
++
++function MenuList( props ) {
++	const { items } = props;
++	useScrollIntoView( '.NavigationMenuList a.active' );
++
++	return (
++		<ul className="NavigationMenuList">
++			{ items.map( ( item ) => {
++				return (
++					<li key={ item.id }>
++						<NavLink to={ item.url }>{ item.title }</NavLink>
++					</li>
++				);
++			} ) }
++		</ul>
++	);
++}
++
++function Navigation() {
++	const navItems = data.filter(
++		( item ) => item.url !== '/components/' && item.url !== '/components/contributing'
++	);
++
++	return (
++		<NavigationWrapper>
++			<NavigationBody>
++				<h2>Components</h2>
++				<MenuList items={ navItems } />
++			</NavigationBody>
++		</NavigationWrapper>
++	);
++}
++
++const NavigationWrapper = styled.div`
++	a {
++		color: black;
++		display: block;
++		text-decoration: none;
++	}
++`;
++
++const NavigationBody = styled.div`
++	padding: 20px;
++
++	ul {
++		list-style: none;
++		margin: 0;
++		padding: 0;
++	}
++
++	a {
++		padding: 5px 0;
++		opacity: 0.6;
++
++		&:hover {
++			opacity: 1;
++		}
++
++		&.active {
++			font-weight: bold;
++			opacity: 1;
++		}
++	}
++`;
++
++export default Navigation;
+diff --git a/packages/components-website/src/components/page.js b/packages/components-website/src/components/page.js
+new file mode 100644
+index 00000000000000..ea93682fa28e7a
+--- /dev/null
++++ b/packages/components-website/src/components/page.js
+@@ -0,0 +1,28 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++import styled from 'styled-components';
++
++/**
++ * Internal dependencies
++ */
++import FadeIn from './fade-in';
++import { useRouter, useScrollToTop } from '../utils/hooks';
++
++export default function Page( props ) {
++	const { location } = useRouter();
++	const { children, isLoaded } = props;
++
++	useScrollToTop( location.pathname );
++
++	return (
++		<FadeIn isLoaded={ isLoaded }>
++			<PageUI>{ children }</PageUI>
++		</FadeIn>
++	);
++}
++
++const PageUI = styled.div`
++	position: relative;
++`;
+diff --git a/packages/components-website/src/components/seo.js b/packages/components-website/src/components/seo.js
+new file mode 100644
+index 00000000000000..2efb2be6719ad4
+--- /dev/null
++++ b/packages/components-website/src/components/seo.js
+@@ -0,0 +1,35 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++import { Helmet } from 'react-helmet';
++
++/**
++ * Internal dependencies
++ */
++import { useRouter } from '../utils/hooks';
++
++const TITLE = 'WordPress Components';
++
++function getPageTitle( path, title ) {
++	let nextTitle = TITLE;
++	if ( title && path !== '/' ) {
++		nextTitle = `${ title } | ${ TITLE }`;
++	}
++
++	return nextTitle;
++}
++
++export default function SEO( props ) {
++	const { location } = useRouter();
++	const { title, description } = props;
++	const pageTitle = getPageTitle( location.pathname, title );
++
++	return (
++		<Helmet>
++			<title>{ pageTitle }</title>
++			<meta name="description" content={ description } />
++			{ pageTitle && <meta property="og:title" content={ pageTitle } /> }
++		</Helmet>
++	);
++}
+diff --git a/packages/components-website/src/components/sidebar.js b/packages/components-website/src/components/sidebar.js
+new file mode 100644
+index 00000000000000..941a85458ec074
+--- /dev/null
++++ b/packages/components-website/src/components/sidebar.js
+@@ -0,0 +1,41 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++import styled from 'styled-components';
++
++export default function Sidebar( props ) {
++	const { children } = props;
++
++	return (
++		<SidebarUI>
++			<BodyWrapper>
++				<Body>{ children }</Body>
++			</BodyWrapper>
++		</SidebarUI>
++	);
++}
++
++const SidebarUI = styled.div`
++	border-right: 1px solid #eee;
++	bottom: 0;
++	left: 0;
++	margin-top: var( --navHeight );
++	width: 280px;
++	position: fixed;
++	top: 0;
++`;
++
++const BodyWrapper = styled.div`
++	position: relative;
++	display: flex;
++	flex-flow: column;
++	height: 100%;
++`;
++
++const Body = styled.div`
++	padding-bottom: 10vh;
++	height: 100%;
++	min-height: 0;
++	overflow-y: auto;
++`;
+diff --git a/packages/components-website/src/components/typography.js b/packages/components-website/src/components/typography.js
+new file mode 100644
+index 00000000000000..63134bcc5c0784
+--- /dev/null
++++ b/packages/components-website/src/components/typography.js
+@@ -0,0 +1,63 @@
++/**
++ * External dependencies
++ */
++import styled from 'styled-components';
++
++const Typography = styled.div`
++	color: #444;
++	line-height: 1.5;
++
++	& > {
++		h1,
++		h2,
++		h3,
++		h4,
++		h5,
++		h6 {
++			color: black;
++			line-height: 1.2;
++			margin-bottom: 0.75em;
++		}
++
++		h1 {
++			font-size: 3.5em;
++			font-weight: normal;
++			max-width: calc(100% - 30px);
++		}
++
++		h1 + p {
++			font-size: 1.3em;
++		}
++
++		h2 {
++			font-size: 2.25em;
++			font-weight: normal;
++		}
++
++		h3 {
++			font-size: 1.6em;
++		}
++
++		h2,
++		h3,
++		h4,
++		h5,
++		h6 {
++			margin-top: 2em;
++		}
++
++		h1 + h2 {
++			margin-top: 0;
++		}
++		h2 + h3,
++		h3 + h4 {
++			margin-top: 1.5em;
++		}
++
++		p {
++			margin: 0 0 1em;
++		}
++	}
++`;
++
++export default Typography;
+diff --git a/packages/components-website/src/data/navigation.json b/packages/components-website/src/data/navigation.json
+new file mode 100644
+index 00000000000000..4faca647057429
+--- /dev/null
++++ b/packages/components-website/src/data/navigation.json
+@@ -0,0 +1,292 @@
++[
++  {
++    "title": "Animate",
++    "url": "/components/animate/",
++    "id": "components-animate-index"
++  },
++  {
++    "title": "Autocomplete",
++    "url": "/components/autocomplete/",
++    "id": "components-autocomplete-index"
++  },
++  {
++    "title": "BaseControl",
++    "url": "/components/base-control/",
++    "id": "components-base-control-index"
++  },
++  {
++    "title": "Button",
++    "url": "/components/button/",
++    "id": "components-button-index"
++  },
++  {
++    "title": "ButtonGroup",
++    "url": "/components/button-group/",
++    "id": "components-button-group-index"
++  },
++  {
++    "title": "CheckboxControl",
++    "url": "/components/checkbox-control/",
++    "id": "components-checkbox-control-index"
++  },
++  {
++    "title": "ClipboardButton",
++    "url": "/components/clipboard-button/",
++    "id": "components-clipboard-button-index"
++  },
++  {
++    "title": "ColorIndicator",
++    "url": "/components/color-indicator/",
++    "id": "components-color-indicator-index"
++  },
++  {
++    "title": "ColorPalette",
++    "url": "/components/color-palette/",
++    "id": "components-color-palette-index"
++  },
++  {
++    "title": "ColorPicker",
++    "url": "/components/color-picker/",
++    "id": "components-color-picker-index"
++  },
++  {
++    "title": "Components",
++    "url": "/components/",
++    "id": "components-index"
++  },
++  {
++    "title": "Contributing components",
++    "url": "/components/contributing",
++    "id": "components-contributing"
++  },
++  {
++    "title": "Dashicon",
++    "url": "/components/dashicon/",
++    "id": "components-dashicon-index"
++  },
++  {
++    "title": "DateTimePicker",
++    "url": "/components/date-time/",
++    "id": "components-date-time-index"
++  },
++  {
++    "title": "Disabled",
++    "url": "/components/disabled/",
++    "id": "components-disabled-index"
++  },
++  {
++    "title": "Draggable",
++    "url": "/components/draggable/",
++    "id": "components-draggable-index"
++  },
++  {
++    "title": "DropZone",
++    "url": "/components/drop-zone/",
++    "id": "components-drop-zone-index"
++  },
++  {
++    "title": "Dropdown",
++    "url": "/components/dropdown/",
++    "id": "components-dropdown-index"
++  },
++  {
++    "title": "DropdownMenu",
++    "url": "/components/dropdown-menu/",
++    "id": "components-dropdown-menu-index"
++  },
++  {
++    "title": "ExternalLink",
++    "url": "/components/external-link/",
++    "id": "components-external-link-index"
++  },
++  {
++    "title": "Focal Point Picker",
++    "url": "/components/focal-point-picker/",
++    "id": "components-focal-point-picker-index"
++  },
++  {
++    "title": "Focusable Iframe",
++    "url": "/components/focusable-iframe/",
++    "id": "components-focusable-iframe-index"
++  },
++  {
++    "title": "FontSizePicker",
++    "url": "/components/font-size-picker/",
++    "id": "components-font-size-picker-index"
++  },
++  {
++    "title": "Form Token Field",
++    "url": "/components/form-token-field/",
++    "id": "components-form-token-field-index"
++  },
++  {
++    "title": "FormFileUpload",
++    "url": "/components/form-file-upload/",
++    "id": "components-form-file-upload-index"
++  },
++  {
++    "title": "FormToggle",
++    "url": "/components/form-toggle/",
++    "id": "components-form-toggle-index"
++  },
++  {
++    "title": "Higher Order Components",
++    "url": "/components/higher-order/",
++    "id": "components-higher-order-index"
++  },
++  {
++    "title": "Icon",
++    "url": "/components/icon/",
++    "id": "components-icon-index"
++  },
++  {
++    "title": "Isolated Event Container",
++    "url": "/components/isolated-event-container/",
++    "id": "components-isolated-event-container-index"
++  },
++  {
++    "title": "Keyboard Shortcuts",
++    "url": "/components/keyboard-shortcuts/",
++    "id": "components-keyboard-shortcuts-index"
++  },
++  {
++    "title": "MenuGroup",
++    "url": "/components/menu-group/",
++    "id": "components-menu-group-index"
++  },
++  {
++    "title": "MenuItem",
++    "url": "/components/menu-item/",
++    "id": "components-menu-item-index"
++  },
++  {
++    "title": "MenuItemsChoice",
++    "url": "/components/menu-items-choice/",
++    "id": "components-menu-items-choice-index"
++  },
++  {
++    "title": "Modal",
++    "url": "/components/modal/",
++    "id": "components-modal-index"
++  },
++  {
++    "title": "NavigableContainers",
++    "url": "/components/navigable-container/",
++    "id": "components-navigable-container-index"
++  },
++  {
++    "title": "Notice",
++    "url": "/components/notice/",
++    "id": "components-notice-index"
++  },
++  {
++    "title": "Panel",
++    "url": "/components/panel/",
++    "id": "components-panel-index"
++  },
++  {
++    "title": "Placeholder",
++    "url": "/components/placeholder/",
++    "id": "components-placeholder-index"
++  },
++  {
++    "title": "Popover",
++    "url": "/components/popover/",
++    "id": "components-popover-index"
++  },
++  {
++    "title": "QueryControls",
++    "url": "/components/query-controls/",
++    "id": "components-query-controls-index"
++  },
++  {
++    "title": "RadioControl",
++    "url": "/components/radio-control/",
++    "id": "components-radio-control-index"
++  },
++  {
++    "title": "RangeControl",
++    "url": "/components/range-control/",
++    "id": "components-range-control-index"
++  },
++  {
++    "title": "Related components",
++    "url": "/components/icon-button/",
++    "id": "components-icon-button-index"
++  },
++  {
++    "title": "ResizableBox",
++    "url": "/components/resizable-box/",
++    "id": "components-resizable-box-index"
++  },
++  {
++    "title": "ResponsiveWrapper",
++    "url": "/components/responsive-wrapper/",
++    "id": "components-responsive-wrapper-index"
++  },
++  {
++    "title": "Sandbox",
++    "url": "/components/sandbox/",
++    "id": "components-sandbox-index"
++  },
++  {
++    "title": "ScrollLock",
++    "url": "/components/scroll-lock/",
++    "id": "components-scroll-lock-index"
++  },
++  {
++    "title": "SelectControl",
++    "url": "/components/select-control/",
++    "id": "components-select-control-index"
++  },
++  {
++    "title": "Slot Fill",
++    "url": "/components/slot-fill/",
++    "id": "components-slot-fill-index"
++  },
++  {
++    "title": "Snackbar",
++    "url": "/components/snackbar/",
++    "id": "components-snackbar-index"
++  },
++  {
++    "title": "Spinner",
++    "url": "/components/spinner/",
++    "id": "components-spinner-index"
++  },
++  {
++    "title": "TabPanel",
++    "url": "/components/tab-panel/",
++    "id": "components-tab-panel-index"
++  },
++  {
++    "title": "TextControl",
++    "url": "/components/text-control/",
++    "id": "components-text-control-index"
++  },
++  {
++    "title": "TextareaControl",
++    "url": "/components/textarea-control/",
++    "id": "components-textarea-control-index"
++  },
++  {
++    "title": "ToggleControl",
++    "url": "/components/toggle-control/",
++    "id": "components-toggle-control-index"
++  },
++  {
++    "title": "Toolbar",
++    "url": "/components/toolbar/",
++    "id": "components-toolbar-index"
++  },
++  {
++    "title": "Tooltip",
++    "url": "/components/tooltip/",
++    "id": "components-tooltip-index"
++  },
++  {
++    "title": "TreeSelect",
++    "url": "/components/tree-select/",
++    "id": "components-tree-select-index"
++  }
++]
+\ No newline at end of file
+diff --git a/packages/components-website/src/data/pkg.json b/packages/components-website/src/data/pkg.json
+new file mode 100644
+index 00000000000000..eab96ddecce454
+--- /dev/null
++++ b/packages/components-website/src/data/pkg.json
+@@ -0,0 +1,16 @@
++{
++  "name": "@wordpress/components",
++  "version": "8.3.0",
++  "description": "UI components for WordPress.",
++  "homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/components/README.md",
++  "repository": {
++    "type": "git",
++    "url": "https://github.com/WordPress/gutenberg.git",
++    "directory": "packages/components"
++  },
++  "bugs": {
++    "url": "https://github.com/WordPress/gutenberg/issues"
++  },
++  "license": "GPL-2.0-or-later",
++  "author": "The WordPress Contributors"
++}
+\ No newline at end of file
+diff --git a/packages/components-website/src/index.js b/packages/components-website/src/index.js
+new file mode 100644
+index 00000000000000..fcd86c2eea4826
+--- /dev/null
++++ b/packages/components-website/src/index.js
+@@ -0,0 +1,21 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++import ReactDOM from 'react-dom';
++
++/**
++ * WordPress dependencies
++ */
++// eslint-disable-next-line no-restricted-syntax
++import '@wordpress/components/build-style/style.css';
++
++/**
++ * Internal dependencies
++ */
++import App from './app';
++import './styles/reset.css';
++import './styles/global.css';
++import './styles/variables.css';
++
++ReactDOM.render( <App />, document.getElementById( 'root' ) );
+diff --git a/packages/components-website/src/pages/components/header.js b/packages/components-website/src/pages/components/header.js
+new file mode 100644
+index 00000000000000..11ad181c4563e5
+--- /dev/null
++++ b/packages/components-website/src/pages/components/header.js
+@@ -0,0 +1,30 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++import styled from 'styled-components';
++
++/**
++ * WordPress dependencies
++ */
++import { Button } from '@wordpress/components';
++
++export default function Header( props ) {
++	const { slug } = props;
++	const githubUrl = `https://github.com/WordPress/gutenberg/tree/master/packages/components/src/${ slug }`;
++
++	return (
++		<HeaderUI>
++			<Button isDefault isSmall href={ githubUrl } target="_blank">
++				View on Github
++			</Button>
++		</HeaderUI>
++	);
++}
++
++const HeaderUI = styled.div`
++	padding: 15px 0;
++	position: absolute;
++	right: 0;
++	top: 0;
++`;
+diff --git a/packages/components-website/src/pages/components/index.js b/packages/components-website/src/pages/components/index.js
+new file mode 100644
+index 00000000000000..44343802d6e634
+--- /dev/null
++++ b/packages/components-website/src/pages/components/index.js
+@@ -0,0 +1,36 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++
++/**
++ * Internal dependencies
++ */
++import Document from '../../components/document';
++import FadeIn from '../../components/fade-in';
++import Layout from '../../components/layout';
++import Navigation from '../../components/navigation';
++import Sidebar from '../../components/sidebar';
++import SEO from '../../components/seo';
++import Header from './header';
++import { useData, useRouter, useScrollToTop } from '../../utils/hooks';
++
++export default function ComponentsPage() {
++	const { data, isLoaded } = useData();
++	const { markdown, title, slug } = data;
++	const { location } = useRouter();
++
++	useScrollToTop( location.pathname );
++
++	return (
++		<FadeIn>
++			<SEO title={ title } />
++			<Sidebar>
++				<Navigation />
++			</Sidebar>
++			<Layout.BodyWithSidebar>
++				<Document markdown={ markdown } isLoaded={ isLoaded } headerSlot={ <Header slug={ slug } /> } />
++			</Layout.BodyWithSidebar>
++		</FadeIn>
++	);
++}
+diff --git a/packages/components-website/src/pages/home.js b/packages/components-website/src/pages/home.js
+new file mode 100644
+index 00000000000000..618576cb06ad96
+--- /dev/null
++++ b/packages/components-website/src/pages/home.js
+@@ -0,0 +1,25 @@
++/**
++ * External dependencies
++ */
++import React from 'react';
++
++/**
++ * Internal dependencies
++ */
++import Document from '../components/document';
++import SEO from '../components/seo';
++import { useData } from '../utils/hooks';
++
++export default function HomePage() {
++	const {
++		data: { markdown },
++		isLoaded,
++	} = useData( '/components' );
++
++	return (
++		<>
++			<SEO />
++			<Document isLoaded={ isLoaded } markdown={ markdown } />
++		</>
++	);
++}
+diff --git a/packages/components-website/src/styles/global.css b/packages/components-website/src/styles/global.css
+new file mode 100644
+index 00000000000000..5b32cdfed2f314
+--- /dev/null
++++ b/packages/components-website/src/styles/global.css
+@@ -0,0 +1,105 @@
++*,
++*::before,
++*::after {
++	box-sizing: border-box;
++}
++
++* {
++	-webkit-overflow-scrolling: touch;
++}
++
++html {
++	-moz-osx-font-smoothing: grayscale;
++	-webkit-font-smoothing: antialiased;
++}
++
++body {
++	margin: 0;
++	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
++		'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
++	-webkit-font-smoothing: antialiased;
++	-moz-osx-font-smoothing: grayscale;
++}
++
++code {
++	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
++}
++
++a {
++	color: #2271b1;
++}
++a:hover {
++	color: #5198d9;
++}
++
++button,
++input {
++	margin: 0;
++}
++
++img {
++	max-width: 100%;
++	height: auto;
++}
++
++input,
++textarea {
++	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell,
++		Helvetica Neue, sans-serif;
++}
++
++pre {
++	white-space: pre-wrap;
++	word-wrap: break-word;
++	tab-size: 2;
++}
++
++pre code {
++	padding: 15px;
++	display: block;
++}
++
++code {
++	background: rgba( 0, 0, 0, 0.05 );
++	color: black;
++	font-size: 14px;
++	padding: 2px;
++	border-radius: 4px;
++}
++
++table th {
++	text-align: left;
++}
++table td {
++	padding: 4px 8px 4px 0;
++}
++
++.components-modal__frame .components-select-control__input:focus {
++	outline: rgba( 0, 103, 244, 0.247 ) auto 5px;
++}
++
++.components-modal__screen-overlay {
++	background: rgba( 255, 255, 255, 0.9 );
++}
++
++.JumpModal {
++	border: none;
++	box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.05 ), 0 2px 4px rgba( 0, 0, 0, 0.2 ),
++		0 10px 30px rgba( 0, 0, 0, 0.2 );
++}
++
++@media ( min-width: 600px ) {
++	.JumpModal {
++		border-radius: 8px;
++		top: 100px;
++		transform: translate( -50%, 0 );
++	}
++}
++
++.JumpModal .components-modal__header {
++	display: none;
++}
++
++.JumpModal .components-modal__content {
++	padding: 0;
++}
+diff --git a/packages/components-website/src/styles/reset.css b/packages/components-website/src/styles/reset.css
+new file mode 100644
+index 00000000000000..98efe035b24bbe
+--- /dev/null
++++ b/packages/components-website/src/styles/reset.css
+@@ -0,0 +1,19 @@
++.screen-reader-text {
++	border: 0;
++	clip: rect( 1px, 1px, 1px, 1px );
++	-webkit-clip-path: inset( 50% );
++	clip-path: inset( 50% );
++	height: 1px;
++	margin: -1px;
++	overflow: hidden;
++	padding: 0;
++	position: absolute;
++	width: 1px;
++	word-wrap: normal !important;
++}
++
++html,
++body {
++	margin: 0;
++	padding: 0;
++}
+diff --git a/packages/components-website/src/styles/variables.css b/packages/components-website/src/styles/variables.css
+new file mode 100644
+index 00000000000000..25378700c920c6
+--- /dev/null
++++ b/packages/components-website/src/styles/variables.css
+@@ -0,0 +1,4 @@
++:root {
++	--colorBrand: #2271b1;
++	--navHeight: 60px;
++}
+diff --git a/packages/components-website/src/utils/color.js b/packages/components-website/src/utils/color.js
+new file mode 100644
+index 00000000000000..7316fc6f09974d
+--- /dev/null
++++ b/packages/components-website/src/utils/color.js
+@@ -0,0 +1,16 @@
++/**
++ * External dependencies
++ */
++import PALETTE from '@automattic/color-studio';
++
++/**
++ * Retrieves a color value from the A8C color palette
++ * Data file:
++ * https://github.com/Automattic/color-studio/blob/master/dist/colors.json
++ *
++ * @param {string} colorValue The desired color value from the palette
++ * @return {string} The hex color value
++ */
++export function getColor( colorValue ) {
++	return PALETTE.colors[ colorValue ];
++}
+diff --git a/packages/components-website/src/utils/editor-theme.js b/packages/components-website/src/utils/editor-theme.js
+new file mode 100644
+index 00000000000000..c6269380b2f748
+--- /dev/null
++++ b/packages/components-website/src/utils/editor-theme.js
+@@ -0,0 +1,19 @@
++/**
++ * External dependencies
++ */
++import githubTheme from 'prism-react-renderer/themes/github';
++
++/**
++ * Internal dependencies
++ */
++import { getColor } from './color';
++
++const { plain, styles } = githubTheme;
++
++export default {
++	styles,
++	plain: {
++		...plain,
++		backgroundColor: getColor( 'White' ),
++	},
++};
+diff --git a/packages/components-website/src/utils/hooks.js b/packages/components-website/src/utils/hooks.js
+new file mode 100644
+index 00000000000000..7df9822195e0f0
+--- /dev/null
++++ b/packages/components-website/src/utils/hooks.js
+@@ -0,0 +1,72 @@
++/**
++ * External dependencies
++ */
++import { useContext, useEffect } from 'react';
++import { __RouterContext as RouterContext } from 'react-router-dom';
++import scrollIntoViewIfNeeded from 'scroll-into-view-if-needed';
++
++export { useData } from './use-data.hooks';
++
++export function useClearSelection() {
++	useEffect( () => {
++		const sel = window.getSelection ? window.getSelection() : document.selection;
++		if ( sel ) {
++			if ( sel.removeAllRanges ) {
++				sel.removeAllRanges();
++			} else if ( sel.empty ) {
++				sel.empty();
++			}
++		}
++	}, [] );
++}
++
++export function useClearTimeout( timeout ) {
++	useEffect( () => {
++		return () => {
++			window.clearTimeout( timeout );
++		};
++	}, [ timeout ] );
++}
++
++export function useFocusNodeById( id ) {
++	useEffect( () => {
++		if ( ! id ) {
++			return;
++		}
++		window.requestAnimationFrame( () => {
++			const node = document.getElementById( id );
++			if ( node ) {
++				node.focus();
++			}
++		} );
++	}, [ id ] );
++}
++
++export function useRouter() {
++	return useContext( RouterContext );
++}
++
++export function useScrollToTop( prop ) {
++	useClearSelection();
++	useEffect( () => {
++		window.scrollTo( 0, 0 );
++	}, [ prop ] );
++}
++
++export function useScrollIntoView( selector ) {
++	useEffect( () => {
++		const options = {
++			behavior: 'smooth',
++			scrollMode: 'if-needed',
++		};
++
++		let node = selector;
++		if ( typeof selector === 'string' ) {
++			node = document.querySelector( selector );
++		}
++
++		if ( node ) {
++			scrollIntoViewIfNeeded( node, options );
++		}
++	}, [ selector ] );
++}
+diff --git a/packages/components-website/src/utils/strings.js b/packages/components-website/src/utils/strings.js
+new file mode 100644
+index 00000000000000..25aa284d48891b
+--- /dev/null
++++ b/packages/components-website/src/utils/strings.js
+@@ -0,0 +1,18 @@
++/* eslint-disable no-bitwise */
++export function toHash( s ) {
++	let a = 1,
++		c = 0,
++		h,
++		o;
++	if ( s ) {
++		a = 0;
++		for ( h = s.length - 1; h >= 0; h-- ) {
++			o = s.charCodeAt( h );
++			a = ( ( a << 6 ) & 268435455 ) + o + ( o << 14 );
++			c = a & 266338304;
++			a = c !== 0 ? a ^ ( c >> 21 ) : a;
++		}
++	}
++	return String( a );
++}
++/* eslint-enable no-bitwise */
+diff --git a/packages/components-website/src/utils/use-data.hooks.js b/packages/components-website/src/utils/use-data.hooks.js
+new file mode 100644
+index 00000000000000..1f417388b4a7f9
+--- /dev/null
++++ b/packages/components-website/src/utils/use-data.hooks.js
+@@ -0,0 +1,57 @@
++/**
++ * External dependencies
++ */
++import { useEffect, useState } from 'react';
++import axios from 'axios';
++
++/**
++ * Internal dependencies
++ */
++import { useRouter } from './hooks';
++
++export function getEndpoint( params ) {
++	const { path } = params;
++	const endpoint = `/_data/${ path }/index.json`;
++
++	return endpoint;
++}
++
++export async function fetchAndLoadData( { path, setData, setLoaded } ) {
++	const url = getEndpoint( {
++		path,
++	} );
++
++	try {
++		const { data } = await axios.get( url );
++		if ( ! data ) {
++			return;
++		}
++
++		setData( data );
++		setLoaded( true );
++	} catch ( err ) {
++		// eslint-disable-next-line no-console
++		console.log( err );
++	}
++}
++
++export function useData( pathname ) {
++	const { location } = useRouter();
++	const path = pathname || location.pathname || '';
++
++	const [ data, setData ] = useState( {} );
++	const [ isLoaded, setLoaded ] = useState( false );
++
++	useEffect( () => {
++		fetchAndLoadData( { path, setLoaded, setData } );
++
++		return () => {
++			setLoaded( false );
++		};
++	}, [ path, setLoaded, setData ] );
++
++	return {
++		data,
++		isLoaded,
++	};
++}
+diff --git a/packages/components/src/README.md b/packages/components/src/README.md
+index d1a71f0f59a167..aa3fb83179ed6f 100644
+--- a/packages/components/src/README.md
++++ b/packages/components/src/README.md
+@@ -7,15 +7,19 @@ This directory includes a library of generic React components to be used for cre
+ 
+ Within Gutenberg, these components can be accessed by importing from the `components` root directory:
+ 
++<!-- wp:docs/sandbox { "name": "button"} -->
+ ```jsx
+ /**
+  * WordPress dependencies
+  */
+ import { Button } from '@wordpress/components';
+ 
+-const MyButton = () => {
+-	return <Button>Click Me!</Button>;
+-}
++const Example = () => (
++	<Button isDefault>
++		Click me!
++	</Button>
++)
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ Many components also include styles which will need to be output in order to appear correctly. Within WordPress, you can [add the `wp-components` stylesheet as a dependency of your plugin's stylesheet](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters). In other projects, you can link to the `build-style/style.css` file directly.
+diff --git a/packages/components/src/animate/README.md b/packages/components/src/animate/README.md
+index d334fec6c07415..5e07711d0176bc 100644
+--- a/packages/components/src/animate/README.md
++++ b/packages/components/src/animate/README.md
+@@ -1,13 +1,14 @@
+ # Animate
+ 
+-Simple interface to introduce animations to components. 
++Simple interface to introduce animations to components.
+ 
+ ## Usage
+ 
++<!-- wp:docs/sandbox { "name": "animate" } -->
+ ```jsx
+-import { Animate } from '@wordpress/components';
++import { Animate, Notice } from '@wordpress/components';
+ 
+-const MyAnimatedNotice = () => (
++const Example = () => (
+ 	<Animate todo="Add missing props">
+ 		{ ( { className } ) => (
+ 			<Notice className={ className } status="success">
+@@ -17,6 +18,7 @@ const MyAnimatedNotice = () => (
+ 	</Animate>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ## Props
+ 
+@@ -30,7 +32,7 @@ Name | Type | Default | Description
+ 
+ ### appear
+ 
+-This animation is meant for popover/modal content, such as menus appearing. It shows the height and width of the animated element scaling from 0 to full size, from its point of origin. 
++This animation is meant for popover/modal content, such as menus appearing. It shows the height and width of the animated element scaling from 0 to full size, from its point of origin.
+ 
+ #### Options
+ 
+diff --git a/packages/components/src/autocomplete/README.md b/packages/components/src/autocomplete/README.md
+index 745323b23771c8..829323e4a77af9 100644
+--- a/packages/components/src/autocomplete/README.md
++++ b/packages/components/src/autocomplete/README.md
+@@ -132,7 +132,7 @@ const MyAutocomplete = () => {
+ 			),
+ 		}
+ 	];
+-		
++
+ 	return (
+ 		<div>
+ 			<Autocomplete completers={ autocompleters }>
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index 7b20ced34734d9..df9f700ad9cd79 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -6,10 +6,12 @@ BaseControl component is used to generate labels and help text for components ha
+ ## Usage
+ 
+ Render a BaseControl for a textarea input:
++
++<!-- wp:docs/sandbox { "name": "base-control" } -->
+ ```jsx
+ import { BaseControl } from '@wordpress/components';
+ 
+-const MyBaseControl = () => (
++const Example = () => (
+ 	<BaseControl
+ 		id="textarea-1"
+ 		label="Text"
+@@ -21,6 +23,7 @@ const MyBaseControl = () => (
+ 	</BaseControl>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ## Props
+ 
+@@ -77,10 +80,12 @@ It should only be used in cases where the children being rendered inside BaseCon
+ 
+ 
+ ## Usage
++
++<!-- wp:docs/sandbox { "name": "base-control" } -->
+ ```jsx
+-import { BaseControl } from '@wordpress/components';
++import { BaseControl, Button } from '@wordpress/components';
+ 
+-const MyBaseControl = () => (
++const Example = () => (
+ 	<BaseControl
+ 		help="Pressing the Select an author buttom will open a modal that allows an advanced mechanism for author selection"
+ 	>
+@@ -93,6 +98,7 @@ const MyBaseControl = () => (
+ 	</BaseControl>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ### Props
+ 
+diff --git a/packages/components/src/button-group/README.md b/packages/components/src/button-group/README.md
+index 700260e593eb8f..6c75409ba85348 100644
+--- a/packages/components/src/button-group/README.md
++++ b/packages/components/src/button-group/README.md
+@@ -46,16 +46,18 @@ Button groups that cannot be selected can either be given a disabled state, or b
+ 
+ ### Usage
+ 
++<!-- wp:docs/sandbox { "name": "button-group" } -->
+ ```jsx
+ import { Button, ButtonGroup } from '@wordpress/components';
+ 
+-const MyButtonGroup = () => (
++const Example = () => (
+ 	<ButtonGroup>
+ 		<Button isPrimary>Button 1</Button>
+ 		<Button isPrimary>Button 2</Button>
+ 	</ButtonGroup>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ## Related components
+ 
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index 722740d443af54..c4fb1bb5085472 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -43,13 +43,27 @@ Button text should also be quickly scannable — avoid unnecessary words and art
+ 
+ Link buttons have low emphasis. They don’t stand out much on the page, so they’re used for less-important actions. What’s less important can vary based on context, but it’s usually a supplementary action to the main action we want someone to take. Link buttons are also useful when you don’t want to distract from the content.
+ 
+-![Link button](https://make.wordpress.org/design/files/2019/03/link-button.png)
++
++<!-- wp:docs/example -->
++```jsx
++<Button href="#">
++	Add new category
++</Button>
++```
++<!-- /wp:docs/example -->
+ 
+ #### Default button
+ 
+ Default buttons have medium emphasis. The button appearance helps differentiate them from the page background, so they’re useful when you want more emphasis than a link button offers.
+ 
+-![Default button](https://make.wordpress.org/design/files/2019/03/default-button.png)
++
++<!-- wp:docs/example -->
++```jsx
++<Button isDefault>
++	Preview
++</Button>
++```
++<!-- /wp:docs/example -->
+ 
+ #### Primary button
+ 
+@@ -57,7 +71,13 @@ Primary buttons have high emphasis. Their color fill and shadow means they pop o
+ 
+ Since a high-emphasis button commands the most attention, a layout should contain a single primary button. This makes it clear that other buttons have less importance and helps users understand when an action requires their attention.
+ 
+-![Primary button](https://make.wordpress.org/design/files/2019/03/primary-button.png)
++<!-- wp:docs/example -->
++```jsx
++<Button isPrimary>
++	Publish
++</Button>
++```
++<!-- /wp:docs/example -->
+ 
+ #### Text label
+ 
+@@ -108,15 +128,17 @@ Placement best practices:
+ 
+ Renders a button with default style.
+ 
++<!-- wp:docs/sandbox { "name": "button" } -->
+ ```jsx
+ import { Button } from "@wordpress/components";
+ 
+-const MyButton = () => (
++const Example = () => (
+ 	<Button isDefault>
+ 		Click me!
+ 	</Button>
+-);
++)
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ### Props
+ 
+diff --git a/packages/components/src/checkbox-control/README.md b/packages/components/src/checkbox-control/README.md
+index 43165e8ae1b59c..2453e343d006ca 100644
+--- a/packages/components/src/checkbox-control/README.md
++++ b/packages/components/src/checkbox-control/README.md
+@@ -54,11 +54,13 @@ If only a few child checkboxes are checked, the parent checkbox becomes a mixed
+ ### Usage
+ 
+ Render an is author checkbox:
++
++<!-- wp:docs/sandbox { "name": "checkbox-control" } -->
+ ```jsx
+ import { CheckboxControl } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyCheckboxControl = withState( {
++const Example = withState( {
+ 	isChecked: true,
+ } )( ( { isChecked, setState } ) => (
+ 	<CheckboxControl
+@@ -70,6 +72,7 @@ const MyCheckboxControl = withState( {
+ 	/>
+ ) );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ### Props
+ 
+diff --git a/packages/components/src/clipboard-button/README.md b/packages/components/src/clipboard-button/README.md
+index 164af3cef49277..63a0fbc646f9d0 100644
+--- a/packages/components/src/clipboard-button/README.md
++++ b/packages/components/src/clipboard-button/README.md
+@@ -7,13 +7,14 @@ With a clipboard button, users copy text (or other elements) with a single click
+ 
+ ## Usage
+ 
++<!-- wp:docs/sandbox { "name": "clipboard-button" } -->
+ ```jsx
+ import { ClipboardButton } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyClipboardButton = withState( {
++const Example = withState( {
+ 	hasCopied: false,
+-} )( ( { hasCopied, setState } ) => ( 
++} )( ( { hasCopied, setState } ) => (
+ 	<ClipboardButton
+ 		isPrimary
+ 		text="Text to be copied."
+@@ -24,3 +25,4 @@ const MyClipboardButton = withState( {
+ 	</ClipboardButton>
+ ) );
+ ```
++<!-- /wp:docs/sandbox -->
+\ No newline at end of file
+diff --git a/packages/components/src/color-indicator/README.md b/packages/components/src/color-indicator/README.md
+index 185e4961af7116..6dc6df713f75a3 100644
+--- a/packages/components/src/color-indicator/README.md
++++ b/packages/components/src/color-indicator/README.md
+@@ -2,10 +2,12 @@
+ 
+ ## Usage
+ 
++<!-- wp:docs/sandbox { "name": "color-indicator" } -->
+ ```jsx
+ import { ColorIndicator } from '@wordpress/components';
+ 
+-const MyColorIndicator = () => (
++const Example = () => (
+ 	<ColorIndicator colorValue="#f00" />
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+diff --git a/packages/components/src/color-palette/README.md b/packages/components/src/color-palette/README.md
+index 83fac83707aec6..43223ae2dac4eb 100644
+--- a/packages/components/src/color-palette/README.md
++++ b/packages/components/src/color-palette/README.md
+@@ -52,11 +52,13 @@ Whether the palette should have a clearing button or not.
+ 
+ 
+ ## Usage
++
++<!-- wp:docs/sandbox { "name": "color-palette" } -->
+ ```jsx
+ import { ColorPalette } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyColorPalette = withState( {
++const Example = withState( {
+ 	color: '#f00',
+ } )( ( { color, setState } ) => {
+ 	const colors = [
+@@ -74,3 +76,4 @@ const MyColorPalette = withState( {
+ 	)
+ } );
+ ```
++<!-- /wp:docs/sandbox -->
+\ No newline at end of file
+diff --git a/packages/components/src/color-picker/README.md b/packages/components/src/color-picker/README.md
+index d2b1307a00d7b6..13e9c150d950d4 100644
+--- a/packages/components/src/color-picker/README.md
++++ b/packages/components/src/color-picker/README.md
+@@ -5,11 +5,13 @@ Accessible color picker.
+ _Parts of the source code were derived and modified from [react-color](https://github.com/casesandberg/react-color/), released under the MIT license._
+ 
+ ## Usage
++
++<!-- wp:docs/sandbox { "name": "color-picker" } -->
+ ```jsx
+ import { ColorPicker } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyColorPicker = withState( {
++const Example = withState( {
+ 	color: '#f00',
+ } )( ( { color, setState } ) => {
+ 	return (
+@@ -21,3 +23,4 @@ const MyColorPicker = withState( {
+ 	);
+ } );
+ ```
++<!-- /wp:docs/sandbox -->
+\ No newline at end of file
+diff --git a/packages/components/src/dashicon/README.md b/packages/components/src/dashicon/README.md
+index 793c5d01d38e78..55f2c154a87759 100644
+--- a/packages/components/src/dashicon/README.md
++++ b/packages/components/src/dashicon/README.md
+@@ -2,10 +2,11 @@
+ 
+ ## Usage
+ 
++<!-- wp:docs/sandbox { "name": "dashicon" } -->
+ ```jsx
+ import { Dashicon } from '@wordpress/components';
+ 
+-const MyDashicon = () => (
++const Example = () => (
+ 	<div>
+ 		<Dashicon icon="admin-home" />
+ 		<Dashicon icon="products" />
+@@ -13,3 +14,4 @@ const MyDashicon = () => (
+ 	</div>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+diff --git a/packages/components/src/date-time/README.md b/packages/components/src/date-time/README.md
+index 3cd2392b09e2fc..a4d7ad93b69d29 100644
+--- a/packages/components/src/date-time/README.md
++++ b/packages/components/src/date-time/README.md
+@@ -14,12 +14,13 @@ Date pickers should:
+ 
+ Render a DateTimePicker.
+ 
++<!-- wp:docs/sandbox { "name": "date-time-picker" } -->
+ ```jsx
+ import { DateTimePicker } from '@wordpress/components';
+ import { __experimentalGetSettings } from '@wordpress/date';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyDateTimePicker = withState( {
++const Example = withState( {
+ 	date: new Date(),
+ } )( ( { date, setState } ) => {
+ 	const settings = __experimentalGetSettings();
+@@ -42,6 +43,7 @@ const MyDateTimePicker = withState( {
+ 	);
+ } );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ## Props
+ 
+diff --git a/packages/components/src/disabled/README.md b/packages/components/src/disabled/README.md
+index 3b823b120be1a1..e515c9363fe8c4 100644
+--- a/packages/components/src/disabled/README.md
++++ b/packages/components/src/disabled/README.md
+@@ -6,22 +6,23 @@ Disabled is a component which disables descendant tabbable elements and prevents
+ 
+ Assuming you have a form component, you can disable all form inputs by wrapping the form with `<Disabled>`.
+ 
++<!-- wp:docs/sandbox { "name": "disabled" } -->
+ ```jsx
+ import { Button, Disabled, TextControl } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyDisabled = withState( {
++const Example = withState( {
+ 	isDisabled: true,
+-} )( ( { isDisabled, setState } ) => { 
++} )( ( { isDisabled, setState } ) => {
+ 	let input = <TextControl label="Input" onChange={ () => {} } />;
+ 	if ( isDisabled ) {
+ 		input = <Disabled>{ input }</Disabled>;
+ 	}
+-	
++
+ 	const toggleDisabled = () => {
+ 		setState( ( state ) => ( { isDisabled: ! state.isDisabled } ) );
+ 	};
+-	
++
+ 	return (
+ 		<div>
+ 			{ input }
+@@ -32,6 +33,7 @@ const MyDisabled = withState( {
+ 	);
+ } );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ A component can detect if it has been wrapped in a `<Disabled>` by accessing its [context](https://reactjs.org/docs/context.html) using `Disabled.Consumer`.
+ 
+diff --git a/packages/components/src/draggable/README.md b/packages/components/src/draggable/README.md
+index 34d4fbecea28f9..9badf82cfeec75 100644
+--- a/packages/components/src/draggable/README.md
++++ b/packages/components/src/draggable/README.md
+@@ -40,10 +40,11 @@ A function to be called when dragging ends.
+ 
+ ## Usage
+ 
++<!-- wp:docs/sandbox { "name": "draggable" } -->
+ ```jsx
+ import { Dashicon, Draggable, Panel, PanelBody } from '@wordpress/components';
+ 
+-const MyDraggable = () => (
++const Example = () => (
+ 	<div id="draggable-panel">
+ 		<Panel header="Draggable panel" >
+ 			<PanelBody>
+@@ -67,6 +68,7 @@ const MyDraggable = () => (
+ 	</div>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ In case you want to call your own `dragstart` / `dragend` event handlers as well, you can pass them to `Draggable` and it'll take care of calling them after their own:
+ 
+diff --git a/packages/components/src/drop-zone/README.md b/packages/components/src/drop-zone/README.md
+index 567862b4ed792b..9c7e3a629f33f5 100644
+--- a/packages/components/src/drop-zone/README.md
++++ b/packages/components/src/drop-zone/README.md
+@@ -14,10 +14,10 @@ const MyDropZone = withState( {
+ 	<DropZoneProvider>
+ 		<div>
+ 			{ hasDropped ? 'Dropped!' : 'Drop something here' }
+-			<DropZone 
++			<DropZone
+ 				onFilesDrop={ () => setState( { hasDropped: true } ) }
+ 				onHTMLDrop={ () => setState( { hasDropped: true } )  }
+-				onDrop={ () => setState( { hasDropped: true } ) } 
++				onDrop={ () => setState( { hasDropped: true } ) }
+ 			/>
+ 		</div>
+ 	</DropZoneProvider>
+diff --git a/packages/components/src/dropdown-menu/README.md b/packages/components/src/dropdown-menu/README.md
+index 3cab663adeb143..1d2c3f2edb404f 100644
+--- a/packages/components/src/dropdown-menu/README.md
++++ b/packages/components/src/dropdown-menu/README.md
+@@ -1,6 +1,6 @@
+ # DropdownMenu
+ 
+-The DropdownMenu displays a list of actions (each contained in a MenuItem, MenuItemsChoice, or MenuGroup) in a compact way. It appears in a Popover after the user has interacted with an element (a button or icon) or when they perform a specific action. 
++The DropdownMenu displays a list of actions (each contained in a MenuItem, MenuItemsChoice, or MenuGroup) in a compact way. It appears in a Popover after the user has interacted with an element (a button or icon) or when they perform a specific action.
+ 
+ ![An expanded DropdownMenu, containing a list of MenuItems.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenuExample.png)
+ 
+@@ -58,10 +58,11 @@ DropdownMenu is a React component to render an expandable menu of buttons. It is
+ 
+ Render a Dropdown Menu with a set of controls:
+ 
++<!-- wp:docs/sandbox { "name": "dropdown-menu" } -->
+ ```jsx
+ import { DropdownMenu } from '@wordpress/components';
+ 
+-const MyDropdownMenu = () => (
++const Example = () => (
+ 	<DropdownMenu
+ 		icon="move"
+ 		label="Select a direction"
+@@ -90,6 +91,7 @@ const MyDropdownMenu = () => (
+ 	/>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ Alternatively, specify a `children` function which returns elements valid for use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, or `MenuGroup`.
+ 
+diff --git a/packages/components/src/dropdown/README.md b/packages/components/src/dropdown/README.md
+index 31f5de665bea34..7f2bb091b3132b 100644
+--- a/packages/components/src/dropdown/README.md
++++ b/packages/components/src/dropdown/README.md
+@@ -6,11 +6,11 @@ and uses render props to render the button and the content.
+ 
+ ## Usage
+ 
+-
++<!-- wp:docs/sandbox { "name": "dropdown" } -->
+ ```jsx
+ import { Button, Dropdown } from '@wordpress/components';
+ 
+-const MyDropdown = () => (
++const Example = () => (
+ 	<Dropdown
+ 		className="my-container-class-name"
+ 		contentClassName="my-popover-content-classname"
+@@ -28,6 +28,7 @@ const MyDropdown = () => (
+ 	/>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ## Props
+ 
+@@ -90,21 +91,21 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to
+ 
+  - Type: `String`
+  - Required: No
+- 
++
+  ### focusOnMount
+- 
++
+  By default, the *first tabblable element* in the popover will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"`.
+- 
++
+  Set this prop to `false` to disable focus changing entirely. This should only be set when an appropriately accessible substitute behavior exists.
+- 
++
+  - Type: `String` or `Boolean`
+  - Required: No
+  - Default: `"firstElement"`
+ 
+  ### popoverProps
+- 
++
+ Properties of popoverProps object will be passed as props to the `Popover` component.
+-Use this o object to access properties/feature if the `Popover` component that are not already exposed in the `Dropdown`component, e.g.: the hability to have the popover without an arrow. 
+- 
++Use this o object to access properties/feature if the `Popover` component that are not already exposed in the `Dropdown`component, e.g.: the hability to have the popover without an arrow.
++
+  - Type: `Object`
+  - Required: No
+diff --git a/packages/components/src/external-link/README.md b/packages/components/src/external-link/README.md
+index 73fe8b5c3fbdd0..490362ab29ca13 100644
+--- a/packages/components/src/external-link/README.md
++++ b/packages/components/src/external-link/README.md
+@@ -2,10 +2,12 @@
+ 
+ ## Usage
+ 
++<!-- wp:docs/sandbox { "name": "external-link" } -->
+ ```jsx
+ import { ExternalLink } from '@wordpress/components';
+ 
+-const MyExternalLink = () => (
++const Example = () => (
+ 	<ExternalLink href="https://wordpress.org">WordPress.org</ExternalLink>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+\ No newline at end of file
+diff --git a/packages/components/src/focal-point-picker/README.md b/packages/components/src/focal-point-picker/README.md
+index 7afb26f2781522..1ea58698431972 100644
+--- a/packages/components/src/focal-point-picker/README.md
++++ b/packages/components/src/focal-point-picker/README.md
+@@ -7,30 +7,34 @@ Corresponding CSS: `background-position: 50% 10%;`
+ 
+ ## Usage
+ 
++<!-- wp:docs/sandbox { "name": "focal-point-picker" } -->
+ ```jsx
+ import { FocalPointPicker } from '@wordpress/components';
+ 
+-const MyFocalPointPicker = withState( {
++const Example = withState( {
+ 	focalPoint: {
+ 		x: 0.5,
+ 		y: 0.5
+ 	},
+-} )( ( { focalPoint, setState } ) => { 
+-	const url = '/path/to/image';
++} )( ( { focalPoint, setState } ) => {
++	const url = 'https://s1.wp.com/wp-content/themes/h4/landing/marketing/pages/create/blog/media/v1-headline-image-1-2x.jpg';
+ 	const dimensions = {
+ 		width: 400,
+ 		height: 100
+ 	};
+-	return ( 
+-		<FocalPointPicker 
++	return (
++		<FocalPointPicker
+ 			url={ url }
+ 			dimensions={ dimensions }
+ 			value={ focalPoint }
+-			onChange={ ( focalPoint ) => setState( { focalPoint } ) } 
++			onChange={ ( focalPoint ) => setState( { focalPoint } ) }
+ 		/>
+-	) 
++	)
+ } );
++```
++<!-- /wp:docs/sandbox -->
+ 
++```jsx
+ /* Example function to render the CSS styles based on Focal Point Picker value */
+ const renderImageContainerWithFocalPoint = ( url, focalPoint ) => {
+ 	const style = {
+@@ -65,4 +69,4 @@ const renderImageContainerWithFocalPoint = ( url, focalPoint ) => {
+ 
+ - Type: `Function`
+ - Required: Yes
+-- Description: Callback which is called when the focal point changes. 
++- Description: Callback which is called when the focal point changes.
+diff --git a/packages/components/src/focusable-iframe/README.md b/packages/components/src/focusable-iframe/README.md
+index 323298d3f6a638..25b4dd66f43b7b 100644
+--- a/packages/components/src/focusable-iframe/README.md
++++ b/packages/components/src/focusable-iframe/README.md
+@@ -6,16 +6,19 @@
+ 
+ Use as you would a standard `iframe`. You may pass `onFocus` directly as the callback to be invoked when the iframe receives focus, or on an ancestor component since the event will bubble.
+ 
++<!-- wp:docs/sandbox { "name": "focusable-frame" } -->
+ ```jsx
+ import { FocusableIframe } from '@wordpress/components';
+ 
+-const MyFocusableIframe = () => (
++const Example = () => (
+ 	<FocusableIframe
+-		src="/my-iframe-url"
++		src="/"
+ 		onFocus={ () => console.log( 'iframe is focused' ) }
+ 	/>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
++
+ 
+ ## Props
+ 
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index 6024e1403b09b5..fc9e306684d3b4 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -5,14 +5,13 @@ The component renders a series of buttons that allow the user to select predefin
+ 
+ ## Usage
+ 
+-
++<!-- wp:docs/sandbox { "name": "font-size-picker" } -->
+ ```jsx
+ import { FontSizePicker } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+ 
+-...
+-const MyFontSizePicker = withState( {
++const Example = withState( {
+ 	fontSize: 16,
+ } )( ( { fontSize, setState } ) => {
+ 	const fontSizes = [
+@@ -40,11 +39,8 @@ const MyFontSizePicker = withState( {
+ 		/>
+ 	);
+ } );
+-
+-...
+-
+-<MyFontSizePicker />
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ## Props
+ 
+diff --git a/packages/components/src/form-file-upload/README.md b/packages/components/src/form-file-upload/README.md
+index 969119eaa7552a..1ebc5c7074ed6a 100644
+--- a/packages/components/src/form-file-upload/README.md
++++ b/packages/components/src/form-file-upload/README.md
+@@ -2,10 +2,11 @@
+ 
+ ## Usage
+ 
++<!-- wp:docs/sandbox { "name": "form-file-upload" } -->
+ ```jsx
+ import { FormFileUpload } from '@wordpress/components';
+ 
+-const MyFormFileUpload = () => (
++const Example = () => (
+ 	<FormFileUpload
+ 		accept="image/*"
+ 		onChange={ () => console.log('new image') }
+@@ -14,6 +15,7 @@ const MyFormFileUpload = () => (
+ 	</FormFileUpload>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ## Props
+ 
+diff --git a/packages/components/src/form-toggle/README.md b/packages/components/src/form-toggle/README.md
+index f247a2a12d1a6c..945e3f92fd318a 100644
+--- a/packages/components/src/form-toggle/README.md
++++ b/packages/components/src/form-toggle/README.md
+@@ -53,19 +53,21 @@ When a user switches a toggle, its corresponding action takes effect immediately
+ 
+ ### Usage
+ 
++<!-- wp:docs/sandbox { "name": "form-toggle" } -->
+ ```jsx
+ import { FormToggle } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyFormToggle = withState( {
++const Example = withState( {
+ 	checked: true,
+ } )( ( { checked, setState } ) => (
+-	<FormToggle 
++	<FormToggle
+ 		checked={ checked }
+-		onChange={ () => setState( state => ( { checked: ! state.checked } ) ) } 
++		onChange={ () => setState( state => ( { checked: ! state.checked } ) ) }
+ 	/>
+ ) );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ### Props
+ 
+diff --git a/packages/components/src/form-token-field/README.md b/packages/components/src/form-token-field/README.md
+index 8d4a984ea11dd3..6c3dcfe64dfc09 100644
+--- a/packages/components/src/form-token-field/README.md
++++ b/packages/components/src/form-token-field/README.md
+@@ -53,19 +53,21 @@ The `value` property is handled in a manner similar to controlled form component
+ 
+ ## Usage
+ 
++<!-- wp:docs/sandbox { "name": "form-token-field" } -->
+ ```jsx
+ import { FormTokenField } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyFormTokenField = withState( {
++const Example = withState( {
+ 	tokens: [],
+ 	suggestions: [ 'Africa', 'America', 'Antarctica', 'Asia', 'Europe', 'Oceania' ],
+-} )( ( { tokens, suggestions, setState } ) => ( 
+-	<FormTokenField 
+-		value={ tokens } 
+-		suggestions={ suggestions } 
++} )( ( { tokens, suggestions, setState } ) => (
++	<FormTokenField
++		value={ tokens }
++		suggestions={ suggestions }
+ 		onChange={ tokens => setState( { tokens } ) }
+ 		placeholder="Type a continent"
+ 	/>
+ ) );
+ ```
++<!-- /wp:docs/sandbox -->
+\ No newline at end of file
+diff --git a/packages/components/src/icon-button/README.md b/packages/components/src/icon-button/README.md
+index 9637c3b046398a..7f87dbd3e21d72 100644
+--- a/packages/components/src/icon-button/README.md
++++ b/packages/components/src/icon-button/README.md
+@@ -7,7 +7,7 @@ Icon buttons tell users what actions they can take and give them a way to intera
+ 
+ ![IconButton component](https://wordpress.org/gutenberg/files/2018/12/s_1D98B71431B26D39301DAD9ADD4189EA9DDF0B98AC93C77E7DE58172FFC06323_1541793686578_IconButton.png)
+ 
+-![Toolbar component composed of attached IconButtons](https://wordpress.org/gutenberg/files/2018/12/s_1D98B71431B26D39301DAD9ADD4189EA9DDF0B98AC93C77E7DE58172FFC06323_1541793628237_Toolbar.png) 
++![Toolbar component composed of attached IconButtons](https://wordpress.org/gutenberg/files/2018/12/s_1D98B71431B26D39301DAD9ADD4189EA9DDF0B98AC93C77E7DE58172FFC06323_1541793628237_Toolbar.png)
+ 
+ ## Table of contents
+ 
+@@ -34,16 +34,18 @@ Icon buttons have low emphasis. They don’t stand out much on the page, so they
+ 
+ ##  Usage
+ 
++<!-- wp:docs/sandbox { "name": "icon-button" } -->
+ ```jsx
+ import { IconButton } from '@wordpress/components';
+ 
+-const MyIconButton = () => (
++const Example = () => (
+ 	<IconButton
+ 		icon="ellipsis"
+ 		label="More"
+ 	/>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ # Related components
+ 
+diff --git a/packages/components/src/isolated-event-container/README.md b/packages/components/src/isolated-event-container/README.md
+index 90ce7624f41679..240596d93a299a 100644
+--- a/packages/components/src/isolated-event-container/README.md
++++ b/packages/components/src/isolated-event-container/README.md
+@@ -14,10 +14,14 @@ The current isolated events are:
+ 
+ Creates a custom component that won't propagate `mousedown` events outside of the component.
+ 
++<!-- wp:docs/sandbox { "name": "isolated-event-container" } -->
++
+ ```jsx
+ import { IsolatedEventContainer } from '@wordpress/components';
+ 
+-const MyModal = () => {
++const Example = () => {
++	const clickHandler = (event) => console.log(event);
++
+ 	return (
+ 		<IsolatedEventContainer
+ 			className="component-some_component"
+@@ -28,6 +32,8 @@ const MyModal = () => {
+ 	);
+ };
+ ```
++<!-- /wp:docs/sandbox -->
++
+ 
+ ## Props
+ 
+diff --git a/packages/components/src/keyboard-shortcuts/README.md b/packages/components/src/keyboard-shortcuts/README.md
+index 7c1046087d9b38..f5fdfa47b2b1b1 100644
+--- a/packages/components/src/keyboard-shortcuts/README.md
++++ b/packages/components/src/keyboard-shortcuts/README.md
+@@ -10,17 +10,18 @@ It uses the [Mousetrap](https://craig.is/killing/mice) library to implement keyb
+ 
+ Render `<KeyboardShortcuts />` with a `shortcuts` prop object:
+ 
++<!-- wp:docs/sandbox { "name": "keyboard-shortcuts" } -->
+ ```jsx
+ import { KeyboardShortcuts } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyKeyboardShortcuts = withState( {
++const Example = withState( {
+ 	isAllSelected: false,
+-} )( ( { isAllSelected, setState } ) => { 
++} )( ( { isAllSelected, setState } ) => {
+ 	const selectAll = () => {
+ 		setState( { isAllSelected: true } )
+ 	};
+-	
++
+ 	return (
+ 		<div>
+ 			<KeyboardShortcuts shortcuts={ {
+@@ -28,9 +29,10 @@ const MyKeyboardShortcuts = withState( {
+ 			} } />
+ 			[cmd/ctrl + A] Combination pressed? { isAllSelected ? 'Yes' : 'No' }
+ 		</div>
+-	) 
++	)
+ } )
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ## Props
+ 
+diff --git a/packages/components/src/menu-group/README.md b/packages/components/src/menu-group/README.md
+index 837c6f28e0e97a..ce4af2f54f93a6 100644
+--- a/packages/components/src/menu-group/README.md
++++ b/packages/components/src/menu-group/README.md
+@@ -16,7 +16,7 @@
+ 
+ ### Usage
+ 
+-A `MenuGroup` should be used to indicate that two or more individual MenuItems are related. When other menu items exist above or below a `MenuGroup`, the group should have a divider line between it and the adjacent item. A `MenuGroup` can optionally include a label to describe its contents. 
++A `MenuGroup` should be used to indicate that two or more individual MenuItems are related. When other menu items exist above or below a `MenuGroup`, the group should have a divider line between it and the adjacent item. A `MenuGroup` can optionally include a label to describe its contents.
+ 
+ ![MenuGroup diagram with label and dividers](https://wordpress.org/gutenberg/files/2019/03/MenuGroup-Anatomy.png)
+ 
+@@ -27,16 +27,19 @@ A `MenuGroup` should be used to indicate that two or more individual MenuItems a
+ 
+ ### Usage
+ 
++<!-- wp:docs/sandbox { "name": "menu-grpoup" } -->
+ ```jsx
+ import { MenuGroup, MenuItem } from '@wordpress/components';
+ 
+-const MyMenuGroup = () => (
++const Example = () => (
+ 	<MenuGroup label="Settings">
+ 		<MenuItem>Setting 1</MenuItem>
+ 		<MenuItem>Setting 2</MenuItem>
+ 	</MenuGroup>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
++
+ 
+ ## Related Components
+ 
+diff --git a/packages/components/src/menu-item/README.md b/packages/components/src/menu-item/README.md
+index 1741f8102992f3..71e5f16c2b7d8d 100644
+--- a/packages/components/src/menu-item/README.md
++++ b/packages/components/src/menu-item/README.md
+@@ -4,11 +4,12 @@ MenuItem is a component which renders a button intended to be used in combinatio
+ 
+ ## Usage
+ 
++<!-- wp:docs/sandbox { "name": "menu-item" } -->
+ ```jsx
+ import { MenuItem } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyMenuItem = withState( {
++const Example = withState( {
+ 	isActive: true,
+ } )( ( { isActive, setState } ) => (
+ 	<MenuItem
+@@ -20,6 +21,7 @@ const MyMenuItem = withState( {
+ 	</MenuItem>
+ ) );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ## Props
+ 
+diff --git a/packages/components/src/menu-items-choice/README.md b/packages/components/src/menu-items-choice/README.md
+index bd294f35663894..6072b394bb4ada 100644
+--- a/packages/components/src/menu-items-choice/README.md
++++ b/packages/components/src/menu-items-choice/README.md
+@@ -17,7 +17,7 @@ A `MenuItemsChoice` should be housed within in its own distinct `MenuGroup`, so
+ 
+ ### Usage
+ 
+-`MenuItemsChoice` is used in a `DropdownMenu` to present users with a set of options. When one option in a `MenuItemsChoice` is selected, the others are automatically deselected. 
++`MenuItemsChoice` is used in a `DropdownMenu` to present users with a set of options. When one option in a `MenuItemsChoice` is selected, the others are automatically deselected.
+ 
+ ![MenuItemsChoice Diagram](https://wordpress.org/gutenberg/files/2019/03/MenuItemsChoice-Checkbox-Keyboard-Shortcut.png)
+ 
+@@ -31,7 +31,7 @@ Use `MenuItemsChoice` when you want users to:
+ - Select a single option from a set of choices in a menu.
+ - Expose all available options.
+ 
+-`MenuItemsChoice` should not be used to toggle individual features on and off. For that, consider using a `FeatureToggle`. 
++`MenuItemsChoice` should not be used to toggle individual features on and off. For that, consider using a `FeatureToggle`.
+ 
+ #### Defaults
+ 
+@@ -54,11 +54,12 @@ Designs with a `MenuItemsChoice` option selected by default make a strong sugges
+ 
+ ### Usage
+ 
++<!-- wp:docs/sandbox { "name": "menu-items-choice" } -->
+ ```jsx
+ import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyMenuItemsChoice = withState( {
++const Example = withState( {
+ 	mode: 'visual',
+ 	choices: [
+ 		{
+@@ -80,3 +81,4 @@ const MyMenuItemsChoice = withState( {
+ 	</MenuGroup>
+ ) );
+ ```
++<!-- /wp:docs/sandbox -->
+diff --git a/packages/components/src/modal/README.md b/packages/components/src/modal/README.md
+index 3c96c6a5f6592c..a7fdb989ecdb0f 100644
+--- a/packages/components/src/modal/README.md
++++ b/packages/components/src/modal/README.md
+@@ -118,11 +118,12 @@ The modal is used to create an accessible modal over an application.
+ 
+ The following example shows you how to properly implement a modal. For the modal to properly work it's important you implement the close logic for the modal properly.
+ 
++<!-- wp:docs/sandbox { "name": "modal" } -->
+ ```jsx
+ import { Button, Modal } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyModal = withState( {
++const Example = withState( {
+ 	isOpen: false,
+ } )( ( { isOpen, setState } ) => (
+ 	<div>
+@@ -139,6 +140,8 @@ const MyModal = withState( {
+ 	</div>
+ ) );
+ ```
++<!-- /wp:docs/sandbox -->
++
+ 
+ ### Props
+ 
+diff --git a/packages/components/src/navigable-container/README.md b/packages/components/src/navigable-container/README.md
+index 630c9be46f053d..a0693efa0558ab 100644
+--- a/packages/components/src/navigable-container/README.md
++++ b/packages/components/src/navigable-container/README.md
+@@ -45,6 +45,7 @@ A `TabbableContainer` will only be navigated using the `tab` key. Every intended
+ 
+ ### Usage
+ 
++<!-- wp:docs/sandbox { "name": "navigable-container" } -->
+ ```jsx
+ import { NavigableMenu, TabbableContainer, Button } from '@wordpress/components';
+ 
+@@ -52,7 +53,7 @@ function onNavigate( index, target ) {
+ 	console.log( `Navigates to ${ index }`, target );
+ }
+ 
+-const MyNavigableContainer = () => (
++const Example = () => (
+ 	<div>
+ 		<span>Navigable Menu:</span>
+ 		<NavigableMenu onNavigate={ onNavigate } orientation="horizontal">
+@@ -60,7 +61,7 @@ const MyNavigableContainer = () => (
+ 			<Button isDefault>Item 2</Button>
+ 			<Button isDefault>Item 3</Button>
+ 		</NavigableMenu>
+-		
++
+ 		<span>Tabbable Container:</span>
+ 		<TabbableContainer onNavigate={ onNavigate }>
+ 			<Button isDefault tabIndex="0">Section 1</Button>
+@@ -71,3 +72,4 @@ const MyNavigableContainer = () => (
+ 	</div>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+diff --git a/packages/components/src/notice/README.md b/packages/components/src/notice/README.md
+index 16de133c4346ae..1c3b840984656c 100644
+--- a/packages/components/src/notice/README.md
++++ b/packages/components/src/notice/README.md
+@@ -77,23 +77,31 @@ Don't apply any colors other than those for Warnings, Success, or Errors.
+ 
+ To display a plain notice, pass `Notice` a string:
+ 
++<!-- wp:docs/sandbox { "name": "notice" } -->
+ ```jsx
+-const MyNotice = () => (
++import { Notice } from "@wordpress/components";
++
++const Example = () => (
+ 	<Notice status="error">
+ 		An unknown error occurred.
+ 	</Notice>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ For more complex markup, you can pass any JSX element:
+ 
++<!-- wp:docs/sandbox { "name": "notice-component" } -->
+ ```jsx
+-const MyNotice = () => (
++import { Notice } from "@wordpress/components";
++
++const Example = () => (
+ 	<Notice status="error">
+-		<p>An error occurred: <code>{ errorDetails }</code>.</p>
++		<p>An error occurred: <code>Error</code>.</p>
+ 	</Notice>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ #### Props
+ 
+diff --git a/packages/components/src/panel/README.md b/packages/components/src/panel/README.md
+index c736ed88b9fa40..5153f83a75dbbf 100644
+--- a/packages/components/src/panel/README.md
++++ b/packages/components/src/panel/README.md
+@@ -57,10 +57,11 @@ The `Panel` creates a container with a header that can take collapsible `PanelBo
+ 
+ ### Usage
+ 
++<!-- wp:docs/sandbox { "name": "panel" } -->
+ ```jsx
+ import { Panel, PanelBody, PanelRow } from '@wordpress/components';
+- 
+-const MyPanel = () => (
++
++const Example = () => (
+ 	<Panel header="My Panel">
+ 		<PanelBody
+ 			title="My Block Settings"
+@@ -74,6 +75,7 @@ const MyPanel = () => (
+ 	</Panel>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ### Sub-Components
+ 
+@@ -98,7 +100,7 @@ Title of the `Panel`. Text will be rendered inside an `<h2>` tag.
+ ---
+ #### PanelBody
+ 
+-The `PanelBody` creates a collapsible container that can be toggled open or closed. 
++The `PanelBody` creates a collapsible container that can be toggled open or closed.
+ 
+ ##### Props
+ 
+diff --git a/packages/components/src/placeholder/README.md b/packages/components/src/placeholder/README.md
+index 2a12363e7fde01..dfb00cc3d877dc 100644
+--- a/packages/components/src/placeholder/README.md
++++ b/packages/components/src/placeholder/README.md
+@@ -1,16 +1,18 @@
+ # Placeholder
+ 
+ ## Usage
++<!-- wp:docs/sandbox { "name": "placeholder" } -->
+ ```jsx
+ import { Placeholder } from '@wordpress/components';
+ 
+-const MyPlaceholder = () => (
++const Example = () => (
+ 	<Placeholder
+ 		icon="wordpress-alt"
+ 		label="Placeholder"
+ 	/>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ### Props
+ 
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index c5877205969333..dccc12010e6a15 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -7,11 +7,12 @@ Popover is a React component to render a floating content modal. It is similar i
+ 
+ Render a Popover within the parent to which it should anchor:
+ 
++<!-- wp:docs/sandbox { "name": "popover" } -->
+ ```jsx
+ import { Button, Popover } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyPopover = withState( {
++const Example = withState( {
+ 	isVisible: false,
+ } )( ( { isVisible, setState } ) => {
+ 	const toggleVisible = () => {
+@@ -29,6 +30,7 @@ const MyPopover = withState( {
+ 	);
+ } );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
+ 
+diff --git a/packages/components/src/query-controls/README.md b/packages/components/src/query-controls/README.md
+index 83dd4092e18b6d..91dcfdf734a0be 100644
+--- a/packages/components/src/query-controls/README.md
++++ b/packages/components/src/query-controls/README.md
+@@ -2,15 +2,16 @@
+ 
+ ## Usage
+ 
++<!-- wp:docs/sandbox { "name": "query-controls" } -->
+ ```jsx
+ import { QueryControls } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyQueryControls = withState( {
++const Example = withState( {
+ 	orderBy: 'title',
+ 	order: 'asc',
+ 	category: 1,
+-	categories: [ 
++	categories: [
+ 		{
+ 			id: 1,
+ 			name: 'Category 1',
+@@ -40,3 +41,4 @@ const MyQueryControls = withState( {
+ 	/>
+ ) );
+ ```
++<!-- /wp:docs/sandbox -->
+diff --git a/packages/components/src/radio-control/README.md b/packages/components/src/radio-control/README.md
+index 2a55a81718fb15..a9f23d29cdb681 100644
+--- a/packages/components/src/radio-control/README.md
++++ b/packages/components/src/radio-control/README.md
+@@ -56,11 +56,12 @@ Designs with a radio button selected by default make a strong suggestion to the
+ 
+ Render a user interface to select the user type using radio inputs.
+ 
++<!-- wp:docs/sandbox { "name": "radio-control" } -->
+ ```jsx
+ import { RadioControl } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyRadioControl = withState( {
++const Example = withState( {
+ 	option: 'a',
+ } )( ( { option, setState } ) => (
+ 	<RadioControl
+@@ -75,6 +76,8 @@ const MyRadioControl = withState( {
+ 	/>
+ ) );
+ ```
++<!-- /wp:docs/sandbox -->
++
+ 
+ ### Props
+ 
+diff --git a/packages/components/src/range-control/README.md b/packages/components/src/range-control/README.md
+index b0511fdaec2d7d..d458d3ec80ab19 100644
+--- a/packages/components/src/range-control/README.md
++++ b/packages/components/src/range-control/README.md
+@@ -90,11 +90,12 @@ RangeControls should provide the full range of choices available for the user to
+ 
+ Render a RangeControl to make a selection from a range of incremental values.
+ 
++<!-- wp:docs/sandbox { "name": "range-control" } -->
+ ```jsx
+ import { RangeControl } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyRangeControl = withState( {
++const Example = withState( {
+         columns: 2,
+ } )( ( { columns, setState } ) => (
+     <RangeControl
+@@ -106,6 +107,7 @@ const MyRangeControl = withState( {
+     />
+ ) );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ### Props
+ 
+diff --git a/packages/components/src/resizable-box/README.md b/packages/components/src/resizable-box/README.md
+index 42302f93b08b06..a55eacd560fc75 100644
+--- a/packages/components/src/resizable-box/README.md
++++ b/packages/components/src/resizable-box/README.md
+@@ -8,10 +8,11 @@ Most options are passed directly through to [re-resizable](https://github.com/bo
+ 
+ The example below shows how you might use `ResizableBox` to set a width and height inside a block's `edit` component.
+ 
++<!-- wp:docs/sandbox { "name": "resizable-box" } -->
+ ```jsx
+ import { ResizableBox } from '@wordpress/components';
+ 
+-const Edit = ( props ) => {
++const Example = ( props ) => {
+ 	const {
+ 		attributes: {
+ 			height,
+@@ -52,4 +53,13 @@ const Edit = ( props ) => {
+ 		/>
+ 	);
+ }
++
++Example.defaultProps = {
++	attributes: {
++		height: 200,
++		width: 200,
++	}
++}
+ ```
++<!-- /wp:docs/sandbox -->
++
+diff --git a/packages/components/src/responsive-wrapper/README.md b/packages/components/src/responsive-wrapper/README.md
+index ce325e732ce0ec..d822d912a2a17d 100644
+--- a/packages/components/src/responsive-wrapper/README.md
++++ b/packages/components/src/responsive-wrapper/README.md
+@@ -2,10 +2,11 @@
+ 
+ ## Usage
+ 
++<!-- wp:docs/sandbox { "name": "responsive-wrapper" } -->
+ ```jsx
+ import { ResponsiveWrapper } from '@wordpress/components';
+ 
+-const MyResponsiveWrapper = () => (
++const Example = () => (
+ 	<ResponsiveWrapper
+ 		naturalWidth={ 2000 }
+ 		naturalHeight={ 680 }
+@@ -14,3 +15,4 @@ const MyResponsiveWrapper = () => (
+ 	</ResponsiveWrapper>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+diff --git a/packages/components/src/sandbox/README.md b/packages/components/src/sandbox/README.md
+index 7b1b5cafdb1b90..819db31860444e 100644
+--- a/packages/components/src/sandbox/README.md
++++ b/packages/components/src/sandbox/README.md
+@@ -4,10 +4,11 @@ This component provides an isolated environment for arbitrary HTML via iframes.
+ 
+ ## Usage
+ 
++<!-- wp:docs/sandbox { "name": "name" } -->
+ ```jsx
+ import { SandBox } from '@wordpress/components';
+ 
+-const MySandBox = () => (
++const Example = () => (
+ 	<SandBox
+ 		html="<p>Content</p>"
+ 		title="Sandbox"
+@@ -15,3 +16,4 @@ const MySandBox = () => (
+ 	/>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+diff --git a/packages/components/src/scroll-lock/README.md b/packages/components/src/scroll-lock/README.md
+index d2ff62e4b96cb3..abfde462af5fb3 100644
+--- a/packages/components/src/scroll-lock/README.md
++++ b/packages/components/src/scroll-lock/README.md
+@@ -6,11 +6,12 @@ ScrollLock is a content-free React component for declaratively preventing scroll
+ 
+ Declare scroll locking as part of modal UI.
+ 
++<!-- wp:docs/sandbox { "name": "name" } -->
+ ```jsx
+ import { ScrollLock } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyScrollLock = withState( {
++const Example = withState( {
+ 	isScrollLocked: false,
+ } )( ( { isScrollLocked, setState } ) => {
+ 	const toggleLock = () => {
+@@ -27,3 +28,4 @@ const MyScrollLock = withState( {
+ 	);
+ } );
+ ```
++<!-- /wp:docs/sandbox -->
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index 996756798b64b4..6d81ae55766efc 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -81,38 +81,54 @@ Use sentences in your menu.
+ 
+ Render a user interface to select the size of an image.
+ 
+-    import { SelectControl } from '@wordpress/components';
+-    import { withState } from '@wordpress/compose';
+-
+-    const MySelectControl = withState( {
+-        size: '50%',
+-    } )( ( { size, setState } ) => (
+-        <SelectControl
+-            label="Size"
+-            value={ size }
+-            options={ [
+-                { label: 'Big', value: '100%' },
+-                { label: 'Medium', value: '50%' },
+-                { label: 'Small', value: '25%' },
+-            ] }
+-            onChange={ ( size ) => { setState( { size } ) } }
+-        />
+-    ) );
++<!-- wp:docs/sandbox { "name": "select-control" } -->
++```jsx
++import { SelectControl } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const Example = withState( {
++	size: '50%',
++} )( ( { size, setState } ) => (
++	<SelectControl
++		label="Size"
++		value={ size }
++		options={ [
++			{ label: 'Big', value: '100%' },
++			{ label: 'Medium', value: '50%' },
++			{ label: 'Small', value: '25%' },
++		] }
++		onChange={ ( size ) => { setState( { size } ) } }
++	/>
++) );
++```
++<!-- /wp:docs/sandbox -->
++
+ 
+ Render a user interface to select multiple users from a list.
+ 
+-        <SelectControl
+-            multiple
+-            label={ __( 'Select some users:' ) }
+-            value={ this.state.users } // e.g: value = [ 'a', 'c' ]
+-            onChange={ ( users ) => { this.setState( { users } ) } }
+-            options={ [
+-                { value: null, label: 'Select a User', disabled: true },
+-                { value: 'a', label: 'User A' },
+-                { value: 'b', label: 'User B' },
+-                { value: 'c', label: 'User c' },
+-            ] }
+-        />
++<!-- wp:docs/sandbox { "name": "select-control-multiple" } -->
++```jsx
++import { SelectControl } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const Example = withState( {
++	users: [],
++} )( ( { users, setState } ) => (
++	<SelectControl
++		multiple
++		label="Select some users:"
++		value={ users } // e.g: value = [ 'a', 'c' ]
++		onChange={ ( users ) => { setState( { users } ) } }
++		options={ [
++			{ value: 'a', label: 'User A' },
++			{ value: 'b', label: 'User B' },
++			{ value: 'c', label: 'User c' },
++		] }
++	/>
++) );
++```
++<!-- /wp:docs/sandbox -->
++
+ 
+ ### Props
+ 
+diff --git a/packages/components/src/slot-fill/README.md b/packages/components/src/slot-fill/README.md
+index 20cd6d708bea6d..90d37930655791 100644
+--- a/packages/components/src/slot-fill/README.md
++++ b/packages/components/src/slot-fill/README.md
+@@ -14,10 +14,11 @@ Any Fill will automatically occupy this Slot space, even if rendered elsewhere i
+ 
+ You can either use the Fill component directly, or a wrapper component type as in the below example to abstract the slot name from consumer awareness.
+ 
++<!-- wp:docs/sandbox { "name": "slot-fill" } -->
+ ```jsx
+ import { SlotFillProvider, Slot, Fill, Panel, PanelBody } from '@wordpress/components';
+ 
+-const MySlotFillProvider = () => {
++const Example = () => {
+ 	const MyPanelSlot = () => (
+ 		<Panel header="Panel with slot">
+ 			<PanelBody>
+@@ -25,7 +26,7 @@ const MySlotFillProvider = () => {
+ 			</PanelBody>
+ 		</Panel>
+ 	);
+-	
++
+ 	MyPanelSlot.Content = () => (
+ 		<Fill name="MyPanelSlot">
+ 			Panel body
+@@ -40,6 +41,7 @@ const MySlotFillProvider = () => {
+ 	);
+ };
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ There is also `createSlotFill` helper method which was created to simplify the process of matching the corresponding `Slot` and `Fill` components:
+ 
+@@ -56,7 +58,7 @@ const Toolbar = () => (
+ 	<div className="toolbar">
+ 		<Slot />
+ 	</div>
+-); 
++);
+ ```
+ 
+ ## Props
+@@ -83,7 +85,7 @@ const Toolbar = ( { isMobile } ) => (
+ 				return isMobile && fills.length > 3 ?
+ 					<div className="toolbar__mobile-long">{ fills }</div> :
+ 					fills;
+-			} }	
++			} }
+ 		</Slot>
+ 	</div>
+ );
+diff --git a/packages/components/src/snackbar/README.md b/packages/components/src/snackbar/README.md
+index c25956fba04c81..1b65bdf9c35868 100644
+--- a/packages/components/src/snackbar/README.md
++++ b/packages/components/src/snackbar/README.md
+@@ -19,7 +19,9 @@ A Snackbar displays a succinct message that is cleared out after a small delay.
+ To display a plain snackbar, pass the message as a `children` prop:
+ 
+ ```jsx
+-const MySnackbarNotice = () => (
++import { Snackbar } from '@wordpress/components';
++
++const Example = () => (
+ 	<Snackbar>
+ 		Post published successfully.
+ 	</Snackbar>
+@@ -29,9 +31,11 @@ const MySnackbarNotice = () => (
+ For more complex markup, you can pass any JSX element:
+ 
+ ```jsx
+-const MySnackbarNotice = () => (
++import { Snackbar } from '@wordpress/components';
++
++const Example = () => (
+ 	<Snackbar>
+-		<p>An error occurred: <code>{ errorDetails }</code>.</p>
++		<p>An error occurred: <code>Error</code>.</p>
+ 	</Snackbar>
+ );
+ ```
+diff --git a/packages/components/src/spinner/README.md b/packages/components/src/spinner/README.md
+index 38d3c8ec1f39f4..6736e72fb8cc55 100644
+--- a/packages/components/src/spinner/README.md
++++ b/packages/components/src/spinner/README.md
+@@ -12,10 +12,12 @@ The spinner component should:
+ 
+ ## Usage
+ 
++<!-- wp:docs/sandbox { "name": "spinner" } -->
+ ```jsx
+ import { Spinner } from '@wordpress/components';
+ 
+-const MySpinner = () => (
++const Example = () => (
+ 	<Spinner />
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+diff --git a/packages/components/src/tab-panel/README.md b/packages/components/src/tab-panel/README.md
+index def626516b3a39..85afaba4419f8e 100644
+--- a/packages/components/src/tab-panel/README.md
++++ b/packages/components/src/tab-panel/README.md
+@@ -1,8 +1,8 @@
+ # TabPanel
+ 
+-TabPanel is a React component to render an ARIA-compliant TabPanel. 
++TabPanel is a React component to render an ARIA-compliant TabPanel.
+ 
+-TabPanels organize content across different screens, data sets, and interactions. It has two sections: a list of tabs, and the view to show when tabs are chosen. 
++TabPanels organize content across different screens, data sets, and interactions. It has two sections: a list of tabs, and the view to show when tabs are chosen.
+ 
+ ![The “Document” tab selected in the sidebar TabPanel.](https://wordpress.org/gutenberg/files/2019/01/s_E36D9C9B8FFA15A1A8CE224E422535A12B016F88884089575F9998E52016A49F_1541785098230_TabPanel.png)
+ 
+@@ -18,7 +18,7 @@ TabPanels organize content across different screens, data sets, and interactions
+ TabPanels organize and allow navigation between groups of content that are related and at the same level of hierarchy.
+ 
+ #### Tabs in a set
+-As a set, all tabs are unified by a shared topic. For clarity, each tab should contain content that is distinct from all the other tabs in a set. 
++As a set, all tabs are unified by a shared topic. For clarity, each tab should contain content that is distinct from all the other tabs in a set.
+ 
+ ### Anatomy
+ 
+@@ -54,6 +54,7 @@ Place tabs above content. Tabs control the UI region displayed below them.
+ 
+ ### Usage
+ 
++<!-- wp:docs/sandbox { "name": "tab-panel" } -->
+ ```jsx
+ import { TabPanel } from '@wordpress/components';
+ 
+@@ -61,7 +62,7 @@ const onSelect = ( tabName ) => {
+ 	console.log( 'Selecting tab', tabName );
+ };
+ 
+-const MyTabPanel = () => (
++const Example = () => (
+ 	<TabPanel className="my-tab-panel"
+ 		activeClass="active-tab"
+ 		onSelect={ onSelect }
+@@ -83,6 +84,7 @@ const MyTabPanel = () => (
+ 	</TabPanel>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ### Props
+ 
+diff --git a/packages/components/src/text-control/README.md b/packages/components/src/text-control/README.md
+index 91bd724923456e..0709e413765cb9 100644
+--- a/packages/components/src/text-control/README.md
++++ b/packages/components/src/text-control/README.md
+@@ -35,19 +35,19 @@ TextControls should:
+ 3. Input text
+ 
+ #### Label text
+-Label text is used to inform users as to what information is requested for a text field. Every text field should have a label. Label text should be above the input field, and always visible. 
++Label text is used to inform users as to what information is requested for a text field. Every text field should have a label. Label text should be above the input field, and always visible.
+ 
+ #### Containers
+ Containers improve the discoverability of text fields by creating contrast between the text field and surrounding content.
+ 
+ ![A TextControl with a stroke around the container to clearly indicate the input area](https://make.wordpress.org/design/files/2019/03/TextControl-Do.png)
+ 
+-**Do** 
++**Do**
+ A stroke around the container clearly indicates that users can input information.
+ 
+ ![A TextControl without a clear visual marker to indicate the input area](https://make.wordpress.org/design/files/2019/03/TextControl-Dont.png)
+ 
+-**Don’t** 
++**Don’t**
+ Don’t use unclear visual markers to indicate a text field.
+ 
+ ## Development guidelines
+@@ -56,18 +56,22 @@ Don’t use unclear visual markers to indicate a text field.
+ 
+ Render a user interface to input the name of an additional css class.
+ 
+-    import { TextControl } from '@wordpress/components';
+-    import { withState } from '@wordpress/compose';
+-    
+-    const MyTextControl = withState( {
+-        className: '',
+-    } )( ( { className, setState } ) => ( 
+-        <TextControl
+-            label="Additional CSS Class"
+-            value={ className }
+-            onChange={ ( className ) => setState( { className } ) }
+-        />
+-    ) );
++<!-- wp:docs/sandbox { "name": "text-control" } -->
++```jsx
++import { TextControl } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const Example = withState( {
++	className: '',
++} )( ( { className, setState } ) => (
++	<TextControl
++		label="Additional CSS Class"
++		value={ className }
++		onChange={ ( className ) => setState( { className } ) }
++	/>
++) );
++```
++<!-- /wp:docs/sandbox -->
+ 
+ ### Props
+ 
+diff --git a/packages/components/src/textarea-control/README.md b/packages/components/src/textarea-control/README.md
+index 2adfffdaf7584f..65c6accfae4d0d 100644
+--- a/packages/components/src/textarea-control/README.md
++++ b/packages/components/src/textarea-control/README.md
+@@ -76,19 +76,23 @@ When text input isn’t accepted, an error message can display instructions on h
+ 
+ ### Usage
+ 
+-    import { TextareaControl } from '@wordpress/components';
+-    import { withState } from '@wordpress/compose';
+-
+-    const MyTextareaControl = withState( {
+-        text: '',
+-    } )( ( { text, setState } ) => (
+-        <TextareaControl
+-            label="Text"
+-            help="Enter some text"
+-            value={ text }
+-            onChange={ ( text ) => setState( { text } ) }
+-        />
+-    ) );
++<!-- wp:docs/sandbox { "name": "textarea-control" } -->
++```jsx
++import { TextareaControl } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const Example = withState( {
++	text: '',
++} )( ( { text, setState } ) => (
++	<TextareaControl
++		label="Text"
++		help="Enter some text"
++		value={ text }
++		onChange={ ( text ) => setState( { text } ) }
++	/>
++) );
++```
++<!-- /wp:docs/sandbox -->
+ 
+ 
+ ### Props
+diff --git a/packages/components/src/toggle-control/README.md b/packages/components/src/toggle-control/README.md
+index fcc85df0af8b87..0723b9d88bce4a 100644
+--- a/packages/components/src/toggle-control/README.md
++++ b/packages/components/src/toggle-control/README.md
+@@ -6,11 +6,13 @@ ToggleControl is used to generate a toggle user interface.
+ ## Usage
+ 
+ Render a user interface to change fixed background setting.
++
++<!-- wp:docs/sandbox { "name": "toggle-control" } -->
+ ```jsx
+ import { ToggleControl } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyToggleControl = withState( {
++const Example = withState( {
+ 	hasFixedBackground: false,
+ } )( ( { hasFixedBackground, setState } ) => (
+ 	<ToggleControl
+@@ -21,6 +23,7 @@ const MyToggleControl = withState( {
+ 	/>
+ ) );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ## Props
+ 
+diff --git a/packages/components/src/toolbar/README.md b/packages/components/src/toolbar/README.md
+index 7458cb2e00936e..84349210823b0f 100644
+--- a/packages/components/src/toolbar/README.md
++++ b/packages/components/src/toolbar/README.md
+@@ -41,13 +41,14 @@ Toolbars that cannot be selected can either be given a disabled state, or be hid
+ 
+ ### Usage
+ 
++<!-- wp:docs/sandbox { "name": "toolbar" } -->
+ ```jsx
+ import { Toolbar } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyToolbar = withState( {
++const Example = withState( {
+ 	activeControl: 'up',
+-} )( ( { activeControl, setState } ) => { 
++} )( ( { activeControl, setState } ) => {
+ 	function createThumbsControl( thumbs ) {
+ 		return {
+ 			icon: `thumbs-${ thumbs }`,
+@@ -56,9 +57,10 @@ const MyToolbar = withState( {
+ 			onClick: () => setState( { activeControl: thumbs } ),
+ 		};
+ 	}
+-	
++
+ 	return (
+ 		<Toolbar controls={ [ 'up', 'down' ].map( createThumbsControl ) } />
+ 	);
+ } );
+ ```
++<!-- /wp:docs/sandbox -->
+diff --git a/packages/components/src/tooltip/README.md b/packages/components/src/tooltip/README.md
+index f3f702a6b486d0..d3969083c42138 100644
+--- a/packages/components/src/tooltip/README.md
++++ b/packages/components/src/tooltip/README.md
+@@ -8,10 +8,11 @@ Accessibility note: the tooltip text is hidden from screen readers and assistive
+ 
+ Render a Tooltip, passing as a child the element to which it should anchor:
+ 
++<!-- wp:docs/sandbox { "name": "tooltip" } -->
+ ```jsx
+ import { Tooltip, Button } from '@wordpress/components';
+ 
+-const MyTooltip = () => (
++const Example = () => (
+ 	<Tooltip text="More information">
+ 		<Button isDefault>
+ 			Hover for more information
+@@ -19,6 +20,7 @@ const MyTooltip = () => (
+ 	</Tooltip>
+ );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ## Props
+ 
+diff --git a/packages/components/src/tree-select/README.md b/packages/components/src/tree-select/README.md
+index 3924a239d3b933..19de9cb817d1ad 100644
+--- a/packages/components/src/tree-select/README.md
++++ b/packages/components/src/tree-select/README.md
+@@ -6,11 +6,13 @@ TreeSelect component is used to generate select input fields.
+ ## Usage
+ 
+ Render a user interface to select the parent page in a hierarchy of pages:
++
++<!-- wp:docs/sandbox { "name": "tree-select" } -->
+ ```jsx
+ import { TreeSelect } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+-const MyTreeSelect = withState( {
++const Example = withState( {
+ 	page: 'p21',
+ } )( ( { page, setState } ) => (
+ 	<TreeSelect
+@@ -47,6 +49,7 @@ const MyTreeSelect = withState( {
+ 	/>
+ ) );
+ ```
++<!-- /wp:docs/sandbox -->
+ 
+ ## Props
+ 

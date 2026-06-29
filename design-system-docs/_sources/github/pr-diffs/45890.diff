@@ -1,0 +1,50 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2e47db6c778689..a7710774c237cc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
++-   `ToggleGroupControl`: remove `isBlock` override in default Storybook args ([#45890](https://github.com/WordPress/gutenberg/pull/45890)).
+ 
+ ## 22.1.0 (2022-11-16)
+ 
+diff --git a/packages/components/src/toggle-group-control/stories/index.tsx b/packages/components/src/toggle-group-control/stories/index.tsx
+index 99784817643dca..6ed32a92e145e4 100644
+--- a/packages/components/src/toggle-group-control/stories/index.tsx
++++ b/packages/components/src/toggle-group-control/stories/index.tsx
+@@ -81,7 +81,6 @@ Default.args = {
+ 		{ value: 'right', label: 'Right' },
+ 		{ value: 'justify', label: 'Justify' },
+ 	].map( mapPropsToOptionComponent ),
+-	isBlock: true,
+ 	label: 'Label',
+ };
+ 
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/README.md b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+index 1f5fe74bc1a9af..9d7fb3974ea307 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+@@ -20,7 +20,7 @@ import {
+ 
+ function Example() {
+ 	return (
+-		<ToggleGroupControl label="my label" value="vertical" isBlock>
++		<ToggleGroupControl label="my label" value="vertical">
+ 			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
+ 			<ToggleGroupControlOption value="vertical" label="Vertical" />
+ 		</ToggleGroupControl>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index ebd4893e37fb2f..cb5971365e2510 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -107,7 +107,7 @@ function UnconnectedToggleGroupControl(
+  *
+  * function Example() {
+  *   return (
+- *     <ToggleGroupControl label="my label" value="vertical" isBlock>
++ *     <ToggleGroupControl label="my label" value="vertical">
+  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
+  *       <ToggleGroupControlOption value="vertical" label="Vertical" />
+  *     </ToggleGroupControl>

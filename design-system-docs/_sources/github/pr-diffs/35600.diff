@@ -1,0 +1,689 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 02ac6098ef9679..79fbecb7dad914 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1247,10 +1247,16 @@
+ 		"markdown_source": "../packages/components/src/toggle-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "ToggleGroupControlOption",
++		"slug": "toggle-group-control-option",
++		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control-option/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "ToggleGroupControl",
+ 		"slug": "toggle-group-control",
+-		"markdown_source": "../packages/components/src/toggle-group-control/README.md",
++		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control/README.md",
+ 		"parent": "components"
+ 	},
+ 	{
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b70adc0eff1390..148b4c06b6b675 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ ### Experimental
+ 
+ -   Removed the `fieldset` wrapper from the `FontAppearanceControl` component ([35461](https://github.com/WordPress/gutenberg/pull/35461)).
++-   Refactored the `ToggleGroupControl` component's structure and embedded `ToggleGroupControlButton` directly into `ToggleGroupControlOption` ([#35600](https://github.com/WordPress/gutenberg/pull/35600)).
+ 
+ ## 18.0.0 (2021-10-12)
+ 
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-context.ts b/packages/components/src/toggle-group-control/context.ts
+similarity index 100%
+rename from packages/components/src/toggle-group-control/toggle-group-control-context.ts
+rename to packages/components/src/toggle-group-control/context.ts
+diff --git a/packages/components/src/toggle-group-control/index.ts b/packages/components/src/toggle-group-control/index.ts
+index 2d29a52b0ae7e9..5b84f88a7ee0cc 100644
+--- a/packages/components/src/toggle-group-control/index.ts
++++ b/packages/components/src/toggle-group-control/index.ts
+@@ -1,2 +1,2 @@
+-export { default as ToggleGroupControl } from './component';
+-export { default as ToggleGroupControlOption } from './toggle-group-control-option';
++export { ToggleGroupControl } from './toggle-group-control';
++export { ToggleGroupControlOption } from './toggle-group-control-option';
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-button.tsx b/packages/components/src/toggle-group-control/toggle-group-control-button.tsx
+deleted file mode 100644
+index 13e9ec1309581b..00000000000000
+--- a/packages/components/src/toggle-group-control/toggle-group-control-button.tsx
++++ /dev/null
+@@ -1,57 +0,0 @@
+-/**
+- * External dependencies
+- */
+-// eslint-disable-next-line no-restricted-imports
+-import { Radio } from 'reakit';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { memo } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import * as styles from './styles';
+-import type { ToggleGroupControlButtonProps } from './types';
+-import { useCx } from '../utils/hooks';
+-
+-const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
+-
+-function ToggleGroupControlButton( {
+-	className,
+-	forwardedRef,
+-	isBlock = false,
+-	label,
+-	value,
+-	...props
+-}: ToggleGroupControlButtonProps ) {
+-	const isActive = props.state === value;
+-	const cx = useCx();
+-	const labelViewClasses = cx( isBlock && styles.labelBlock );
+-	const classes = cx(
+-		styles.buttonView,
+-		className,
+-		isActive && styles.buttonActive
+-	);
+-	return (
+-		<LabelView className={ labelViewClasses } data-active={ isActive }>
+-			<Radio
+-				{ ...props }
+-				as="button"
+-				aria-label={ props[ 'aria-label' ] ?? label }
+-				className={ classes }
+-				data-value={ value }
+-				ref={ forwardedRef }
+-				value={ value }
+-			>
+-				<ButtonContentView>{ label }</ButtonContentView>
+-				<LabelPlaceholderView aria-hidden>
+-					{ label }
+-				</LabelPlaceholderView>
+-			</Radio>
+-		</LabelView>
+-	);
+-}
+-
+-export default memo( ToggleGroupControlButton );
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option.tsx
+deleted file mode 100644
+index c38d1ffb93cf74..00000000000000
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option.tsx
++++ /dev/null
+@@ -1,45 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { __ } from '@wordpress/i18n';
+-import { useInstanceId } from '@wordpress/compose';
+-
+-/**
+- * Internal dependencies
+- */
+-import {
+-	contextConnect,
+-	useContextSystem,
+-	WordPressComponentProps,
+-} from '../ui/context';
+-import ToggleGroupControlButton from './toggle-group-control-button';
+-import type { ToggleGroupControlOptionProps } from './types';
+-import { useToggleGroupControlContext } from './toggle-group-control-context';
+-
+-function ToggleGroupControlOption(
+-	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'input' >,
+-	forwardedRef: import('react').Ref< any >
+-) {
+-	const toggleGroupControlContext = useToggleGroupControlContext();
+-	const id = useInstanceId(
+-		ToggleGroupControlOption,
+-		toggleGroupControlContext.baseId || 'toggle-group-control-option'
+-	);
+-	const buttonProps = useContextSystem(
+-		{ ...props, id },
+-		'ToggleGroupControlOption'
+-	);
+-	return (
+-		<ToggleGroupControlButton
+-			forwardedRef={ forwardedRef }
+-			{ ...{
+-				...toggleGroupControlContext,
+-				...buttonProps,
+-			} }
+-		/>
+-	);
+-}
+-export default contextConnect(
+-	ToggleGroupControlOption,
+-	'ToggleGroupControlOption'
+-);
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+new file mode 100644
+index 00000000000000..f509189d7171bc
+--- /dev/null
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+@@ -0,0 +1,40 @@
++# `ToggleGroupControlOption`
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`ToggleGroupControlOption` is a form component and is meant to be used as a child of [`ToggleGroupControl`]((/packages/components/src/toggle-group-control/toggle-group-control/README.md)).
++
++
++## Usage
++
++```js
++import {
++	__experimentalToggleGroupControl as ToggleGroupControl,
++	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
++} from '@wordpress/components';
++
++function Example() {
++	return (
++		<ToggleGroupControl label="my label" value="vertical" isBlock>
++			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
++			<ToggleGroupControlOption value="vertical" label="Vertical" />
++		</ToggleGroupControl>
++	);
++}
++```
++
++## Props
++
++### `label`: `string`
++
++Label for the option. If needed, the `aria-label` prop can be used in addition to specify a different label for assistive technologies.
++
++- Required: Yes
++
++### `value`: `string | number`
++
++The value of the `ToggleGroupControlOption`.
++
++- Required: Yes
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+new file mode 100644
+index 00000000000000..9591f07ada3b7e
+--- /dev/null
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+@@ -0,0 +1,104 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++// eslint-disable-next-line no-restricted-imports
++import { Radio } from 'reakit';
++
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++import { useInstanceId } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import {
++	contextConnect,
++	useContextSystem,
++	WordPressComponentProps,
++} from '../../ui/context';
++import type { ToggleGroupControlOptionProps } from '../types';
++import { useToggleGroupControlContext } from '../context';
++import * as styles from './styles';
++import { useCx } from '../../utils/hooks';
++
++const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
++
++function ToggleGroupControlOption(
++	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'button' >,
++	forwardedRef: Ref< any >
++) {
++	const toggleGroupControlContext = useToggleGroupControlContext();
++	const id = useInstanceId(
++		ToggleGroupControlOption,
++		toggleGroupControlContext.baseId || 'toggle-group-control-option'
++	) as string;
++	const buttonProps = useContextSystem(
++		{ ...props, id },
++		'ToggleGroupControlOption'
++	);
++
++	const { className, isBlock = false, label, value, ...radioProps } = {
++		...toggleGroupControlContext,
++		...buttonProps,
++	};
++
++	const isActive = radioProps.state === value;
++	const cx = useCx();
++	const labelViewClasses = cx( isBlock && styles.labelBlock );
++	const classes = cx(
++		styles.buttonView,
++		className,
++		isActive && styles.buttonActive
++	);
++
++	return (
++		<LabelView className={ labelViewClasses } data-active={ isActive }>
++			<Radio
++				{ ...radioProps }
++				as="button"
++				aria-label={ radioProps[ 'aria-label' ] ?? label }
++				className={ classes }
++				data-value={ value }
++				ref={ forwardedRef }
++				value={ value }
++			>
++				<ButtonContentView>{ label }</ButtonContentView>
++				<LabelPlaceholderView aria-hidden>
++					{ label }
++				</LabelPlaceholderView>
++			</Radio>
++		</LabelView>
++	);
++}
++
++/**
++ * `ToggleGroupControlOption` is a form component and is meant to be used as a
++ * child of `ToggleGroupControl`.
++ *
++ * @example
++ * ```jsx
++ * import {
++ *   __experimentalToggleGroupControl as ToggleGroupControl,
++ *   __experimentalToggleGroupControlOption as ToggleGroupControlOption,
++ * } from '@wordpress/components';
++ *
++ * function Example() {
++ *   return (
++ *     <ToggleGroupControl label="my label" value="vertical" isBlock>
++ *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
++ *       <ToggleGroupControlOption value="vertical" label="Vertical" />
++ *     </ToggleGroupControl>
++ *   );
++ * }
++ * ```
++ */
++const ConnectedToggleGroupControlOption = contextConnect(
++	ToggleGroupControlOption,
++	'ToggleGroupControlOption'
++);
++
++export default ConnectedToggleGroupControlOption;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/index.ts b/packages/components/src/toggle-group-control/toggle-group-control-option/index.ts
+new file mode 100644
+index 00000000000000..79d06d8b340bda
+--- /dev/null
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/index.ts
+@@ -0,0 +1 @@
++export { default as ToggleGroupControlOption } from './component';
+diff --git a/packages/components/src/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option/styles.ts
+similarity index 58%
+rename from packages/components/src/toggle-group-control/styles.ts
+rename to packages/components/src/toggle-group-control/toggle-group-control-option/styles.ts
+index 7f6756bd7417ff..bbaeed0992b70d 100644
+--- a/packages/components/src/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/styles.ts
+@@ -7,49 +7,7 @@ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+  */
+-import { CONFIG, COLORS, reduceMotion } from '../utils';
+-
+-export const ToggleGroupControl = css`
+-	background: ${ COLORS.ui.background };
+-	border: 1px solid;
+-	border-color: ${ COLORS.ui.border };
+-	border-radius: ${ CONFIG.controlBorderRadius };
+-	display: inline-flex;
+-	min-height: ${ CONFIG.controlHeight };
+-	min-width: 0;
+-	padding: 2px;
+-	position: relative;
+-	transition: transform ${ CONFIG.transitionDurationFastest } linear;
+-	${ reduceMotion( 'transition' ) }
+-	&:hover {
+-		border-color: ${ COLORS.ui.borderHover };
+-	}
+-
+-	&:focus-within {
+-		border-color: ${ COLORS.ui.borderFocus };
+-		box-shadow: ${ CONFIG.controlBoxShadowFocus };
+-		outline: none;
+-		z-index: 1;
+-	}
+-`;
+-
+-export const block = css`
+-	display: flex;
+-	width: 100%;
+-`;
+-
+-export const BackdropView = styled.div`
+-	background: ${ COLORS.gray[ 900 ] };
+-	border-radius: ${ CONFIG.controlBorderRadius };
+-	box-shadow: ${ CONFIG.toggleGroupControlBackdropBoxShadow };
+-	left: 0;
+-	position: absolute;
+-	top: 2px;
+-	bottom: 2px;
+-	transition: transform ${ CONFIG.transitionDurationFast } ease;
+-	${ reduceMotion( 'transition' ) }
+-	z-index: 1;
+-`;
++import { CONFIG, COLORS, reduceMotion } from '../../utils';
+ 
+ export const LabelView = styled.div`
+ 	display: inline-flex;
+diff --git a/packages/components/src/toggle-group-control/README.md b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+similarity index 66%
+rename from packages/components/src/toggle-group-control/README.md
+rename to packages/components/src/toggle-group-control/toggle-group-control/README.md
+index b50d4bd103d973..cf15d479235247 100644
+--- a/packages/components/src/toggle-group-control/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+@@ -1,12 +1,12 @@
+-# ToggleGroupControl
++# `ToggleGroupControl`
+ 
+ <div class="callout callout-alert">
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-`ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use `ToggleGroupControlOption` component.
++`ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use [`ToggleGroupControlOption`](/packages/components/src/toggle-group-control/toggle-group-control-option/README.md) component.
+ 
+-Only use this control when you know for sure the labels of items inside won't wrap. For items with longer labels, you can consider a `SelectControl` or a `CustomSelectControl` component instead.
++Only use this control when you know for sure the labels of items inside won't wrap. For items with longer labels, you can consider a [`SelectControl`](/packages/components/src/select-control/README.md) or a [`CustomSelectControl`](/packages/components/src/custom-select-control/README.md) component instead.
+ 
+ ## Usage
+ 
+@@ -28,69 +28,49 @@ function Example() {
+ 
+ ## Props
+ 
+-### `label`
++### `help`: `ReactNode`
+ 
+--   Type: `string`
+-
+-Label for the form element.
+-
+-### `hideLabelFromVision`
++If this property is added, a help text will be generated using help property as the content.
+ 
+--   Type: `boolean`
+ -   Required: No
+--   Default: `false`
+ 
+-If true, the label will only be visible to screen readers.
++### `hideLabelFromVision`: `boolean`
+ 
+-### `isAdaptiveWidth`
++If true, the label will only be visible to screen readers.
+ 
+--   Type: `boolean`
+ -   Required: No
+ -   Default: `false`
+ 
+-Determines if segments should be rendered with equal widths.
++### `isAdaptiveWidth`: `boolean`
+ 
+-### `isBlock`
++Determines if segments should be rendered with equal widths.
+ 
+--   Type: `boolean`
+ -   Required: No
+ -   Default: `false`
+ 
+-Renders `ToggleGroupControl` as a (CSS) block element.
++### `isBlock`: `boolean`
+ 
+-### `onChange`
++Renders `ToggleGroupControl` as a (CSS) block element.
+ 
+--   Type: `boolean`
+ -   Required: No
+ -   Default: `false`
+ 
+-Callback when a segment is selected.
++### `label`: `string`
+ 
+-### `value`
++Label for the form element.
+ 
+--   Type: `string | number`
++-   Required: Yes
+ 
+-The value of the `ToggleGroupControl`.
++### `onChange`: `( value?: string | number ) => void`
+ 
+-### `help`
++Callback when a segment is selected.
+ 
+--   Type: `ReactNode`
+ -   Required: No
++-   Default: `() => {}`
+ 
+-If this property is added, a help text will be generated using help property as the content.
+-
+-## ToggleGroupControlOption
+-
+-### Props
+ 
+-#### `label`
++### `value`: `string | number`
+ 
+--   Type: `string`
+-
+-Label for the option. If needed, the `aria-label` prop can be used in addition to specify a different label for assistive technologies.
+-
+-#### `value`
+-
+--   Type: `string | number`
++The value of the `ToggleGroupControl`.
+ 
+-The value of the `ToggleGroupControlOption`.
++-   Required: No
+diff --git a/packages/components/src/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+similarity index 62%
+rename from packages/components/src/toggle-group-control/component.tsx
+rename to packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 07d635bbba0605..e2fe005c6e672d 100644
+--- a/packages/components/src/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -2,6 +2,8 @@
+  * External dependencies
+  */
+ // eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++// eslint-disable-next-line no-restricted-imports
+ import { RadioGroup, useRadioState } from 'reakit';
+ import useResizeAware from 'react-resize-aware';
+ 
+@@ -19,20 +21,20 @@ import {
+ 	contextConnect,
+ 	useContextSystem,
+ 	WordPressComponentProps,
+-} from '../ui/context';
+-import { useUpdateEffect, useCx } from '../utils/hooks';
+-import { View } from '../view';
+-import BaseControl from '../base-control';
++} from '../../ui/context';
++import { useUpdateEffect, useCx } from '../../utils/hooks';
++import { View } from '../../view';
++import BaseControl from '../../base-control';
+ import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
+-import type { ToggleGroupControlProps } from './types';
+-import ToggleGroupControlContext from './toggle-group-control-context';
++import type { ToggleGroupControlProps } from '../types';
++import ToggleGroupControlContext from '../context';
+ import * as styles from './styles';
+ 
+ const noop = () => {};
+ 
+ function ToggleGroupControl(
+ 	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
+-	forwardedRef: import('react').Ref< any >
++	forwardedRef: Ref< any >
+ ) {
+ 	const {
+ 		className,
+@@ -114,4 +116,35 @@ function ToggleGroupControl(
+ 	);
+ }
+ 
+-export default contextConnect( ToggleGroupControl, 'ToggleGroupControl' );
++/**
++ * `ToggleGroupControl` is a form component that lets users choose options
++ * represented in horizontal segments. To render options for this control use
++ * `ToggleGroupControlOption` component.
++ *
++ * Only use this control when you know for sure the labels of items inside won't
++ * wrap. For items with longer labels, you can consider a `SelectControl` or a
++ * `CustomSelectControl` component instead.
++ *
++ * @example
++ * ```jsx
++ * import {
++ *   __experimentalToggleGroupControl as ToggleGroupControl,
++ *   __experimentalToggleGroupControlOption as ToggleGroupControlOption,
++ * } from '@wordpress/components';
++ *
++ * function Example() {
++ *   return (
++ *     <ToggleGroupControl label="my label" value="vertical" isBlock>
++ *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
++ *       <ToggleGroupControlOption value="vertical" label="Vertical" />
++ *     </ToggleGroupControl>
++ *   );
++ * }
++ * ```
++ */
++const ConnectedToggleGroupControl = contextConnect(
++	ToggleGroupControl,
++	'ToggleGroupControl'
++);
++
++export default ConnectedToggleGroupControl;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/index.ts b/packages/components/src/toggle-group-control/toggle-group-control/index.ts
+new file mode 100644
+index 00000000000000..64756c7127b4c1
+--- /dev/null
++++ b/packages/components/src/toggle-group-control/toggle-group-control/index.ts
+@@ -0,0 +1 @@
++export { default as ToggleGroupControl } from './component';
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+new file mode 100644
+index 00000000000000..0bc2039d507729
+--- /dev/null
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -0,0 +1,52 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import { CONFIG, COLORS, reduceMotion } from '../../utils';
++
++export const ToggleGroupControl = css`
++	background: ${ COLORS.ui.background };
++	border: 1px solid;
++	border-color: ${ COLORS.ui.border };
++	border-radius: ${ CONFIG.controlBorderRadius };
++	display: inline-flex;
++	min-height: ${ CONFIG.controlHeight };
++	min-width: 0;
++	padding: 2px;
++	position: relative;
++	transition: transform ${ CONFIG.transitionDurationFastest } linear;
++	${ reduceMotion( 'transition' ) }
++	&:hover {
++		border-color: ${ COLORS.ui.borderHover };
++	}
++
++	&:focus-within {
++		border-color: ${ COLORS.ui.borderFocus };
++		box-shadow: ${ CONFIG.controlBoxShadowFocus };
++		outline: none;
++		z-index: 1;
++	}
++`;
++
++export const block = css`
++	display: flex;
++	width: 100%;
++`;
++
++export const BackdropView = styled.div`
++	background: ${ COLORS.gray[ 900 ] };
++	border-radius: ${ CONFIG.controlBorderRadius };
++	box-shadow: ${ CONFIG.toggleGroupControlBackdropBoxShadow };
++	left: 0;
++	position: absolute;
++	top: 2px;
++	bottom: 2px;
++	transition: transform ${ CONFIG.transitionDurationFast } ease;
++	${ reduceMotion( 'transition' ) }
++	z-index: 1;
++`;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx b/packages/components/src/toggle-group-control/toggle-group-control/toggle-group-control-backdrop.tsx
+similarity index 96%
+rename from packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx
+rename to packages/components/src/toggle-group-control/toggle-group-control/toggle-group-control-backdrop.tsx
+index bc72c589054e19..33dc5cb654cccd 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/toggle-group-control-backdrop.tsx
+@@ -6,7 +6,7 @@ import { useState, useEffect, memo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { ToggleGroupControlBackdropProps } from './types';
++import type { ToggleGroupControlBackdropProps } from '../types';
+ import { BackdropView } from './styles';
+ 
+ function ToggleGroupControlBackdrop( {
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 838562af6904e1..2773a00550cc30 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ // eslint-disable-next-line no-restricted-imports
+-import type { MutableRefObject, Ref, ReactNode, ReactText } from 'react';
++import type { MutableRefObject, ReactNode, ReactText } from 'react';
+ // eslint-disable-next-line no-restricted-imports
+ import type { RadioStateReturn } from 'reakit';
+ 
+@@ -74,21 +74,6 @@ export type ToggleGroupControlContextProps = RadioStateReturn & {
+ 	isBlock?: boolean;
+ };
+ 
+-export type ToggleGroupControlButtonProps = {
+-	className?: string;
+-	forwardedRef?: Ref< any >;
+-	/**
+-	 * Renders `ToggleGroupControl` as a (CSS) block element.
+-	 *
+-	 * @default false
+-	 */
+-	isBlock?: boolean;
+-	label: string;
+-	'aria-label'?: string;
+-	value?: ReactText;
+-	state?: any;
+-};
+-
+ export type ToggleGroupControlBackdropProps = {
+ 	containerRef: MutableRefObject< HTMLElement | undefined >;
+ 	containerWidth?: number | null;

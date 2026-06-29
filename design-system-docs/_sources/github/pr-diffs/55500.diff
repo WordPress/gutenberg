@@ -1,0 +1,222 @@
+diff --git a/packages/components/src/custom-select/custom-select-item.tsx b/packages/components/src/custom-select/custom-select-item.tsx
+new file mode 100644
+index 00000000000000..1489da7541229c
+--- /dev/null
++++ b/packages/components/src/custom-select/custom-select-item.tsx
+@@ -0,0 +1,15 @@
++/**
++ * Internal dependencies
++ */
++import { CustomSelectItem as SelectItem } from './styles';
++import { type CustomSelectItemProps } from './types';
++
++function CustomSelectItem( { children, ...rest }: CustomSelectItemProps ) {
++	return (
++		<SelectItem className="select-item" { ...rest }>
++			{ children }
++		</SelectItem>
++	);
++}
++
++export default CustomSelectItem;
+diff --git a/packages/components/src/custom-select/index.tsx b/packages/components/src/custom-select/index.tsx
+new file mode 100644
+index 00000000000000..e4a482b41be259
+--- /dev/null
++++ b/packages/components/src/custom-select/index.tsx
+@@ -0,0 +1,39 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import * as Ariakit from '@ariakit/react';
++
++/**
++ * Internal dependencies
++ */
++import { type CustomSelectProps } from './types';
++import { CustomSelectButton, CustomSelectPopover } from './styles';
++import CustomSelectItem from './custom-select-item';
++
++function CustomSelect( {
++	children,
++	label,
++	onChange,
++	value,
++}: CustomSelectProps ) {
++	const store = Ariakit.useSelectStore( {
++		setValue: ( nextValue ) => {
++			onChange?.( nextValue );
++		},
++		value,
++	} );
++
++	return (
++		<>
++			<Ariakit.SelectLabel store={ store }>{ label }</Ariakit.SelectLabel>
++			<CustomSelectButton store={ store } />
++			<CustomSelectPopover sameWidth store={ store }>
++				{ children }
++			</CustomSelectPopover>
++		</>
++	);
++}
++
++CustomSelect.Item = CustomSelectItem;
++export default CustomSelect;
+diff --git a/packages/components/src/custom-select/stories/index.story.tsx b/packages/components/src/custom-select/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..4cc1839eab40dc
+--- /dev/null
++++ b/packages/components/src/custom-select/stories/index.story.tsx
+@@ -0,0 +1,62 @@
++//@ts-nocheck
++/**
++ * External dependencies
++ */
++import type { Meta, StoryFn } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import CustomSelect from '..';
++
++const meta: Meta< typeof CustomSelect > = {
++	title: 'Components/CustomSelect',
++	component: CustomSelect,
++	argTypes: {},
++	parameters: {
++		controls: { expanded: true },
++		docs: { canvas: { sourceState: 'shown' } },
++	},
++};
++export default meta;
++
++const Template: StoryFn< typeof CustomSelect > = ( props ) => (
++	<CustomSelect { ...props } />
++);
++
++export const Default: StoryFn< typeof CustomSelect > = Template.bind( {} );
++Default.args = {
++	label: 'Label',
++	children: (
++		<>
++			<CustomSelect.Item
++				style={ { fontSize: '50%' } }
++				key="small"
++				value="Small"
++			>
++				Small
++			</CustomSelect.Item>
++			<CustomSelect.Item
++				key="default"
++				style={ { fontSize: '100%' } }
++				value="Default"
++			>
++				Default
++			</CustomSelect.Item>
++			<CustomSelect.Item
++				key="large"
++				style={ { fontSize: '200%' } }
++				value="Large"
++			>
++				Large
++			</CustomSelect.Item>
++			<CustomSelect.Item
++				key="huge"
++				style={ { fontSize: '300%' } }
++				value="Huge"
++			>
++				Huge
++			</CustomSelect.Item>
++		</>
++	),
++};
+diff --git a/packages/components/src/custom-select/styles.ts b/packages/components/src/custom-select/styles.ts
+new file mode 100644
+index 00000000000000..97af9926fbce84
+--- /dev/null
++++ b/packages/components/src/custom-select/styles.ts
+@@ -0,0 +1,53 @@
++// TODO (TEMP STYLES)
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++// eslint-disable-next-line no-restricted-imports
++import * as Ariakit from '@ariakit/react';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS } from '../utils';
++import { space } from '../utils/space';
++
++export const CustomSelectButton = styled( Ariakit.Select )`
++	display: flex;
++	align-items: center;
++	justify-content: space-between;
++	gap: ${ space( 1 ) };
++	white-space: nowrap;
++	font-size: 1rem;
++	border-style: none;
++	border-radius: ${ space( 1 ) };
++	min-width: 250px;
++	height: auto;
++	margin-top: 1rem;
++	padding: ${ space( 4 ) };
++	background: ${ COLORS.white };
++	box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
++		${ COLORS.gray[ 400 ] };
++	&:hover {
++		background-color: ${ COLORS.gray[ 100 ] };
++	}
++`;
++
++export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
++	z-index: 50;
++	display: flex;
++	max-height: min( var( --popover-available-height, 300px ), 300px );
++	flex-direction: column;
++	border-radius: ${ space( 1 ) };
++	background: ${ COLORS.white };
++	box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
++		${ COLORS.gray[ 400 ] };
++`;
++export const CustomSelectItem = styled( Ariakit.SelectItem )`
++	cursor: pointer;
++	padding: ${ space( 2 ) };
++	&:hover {
++		background-color: ${ COLORS.theme.accent };
++		color: ${ COLORS.white };
++	}
++`;
+diff --git a/packages/components/src/custom-select/types.ts b/packages/components/src/custom-select/types.ts
+new file mode 100644
+index 00000000000000..5f96462a72581e
+--- /dev/null
++++ b/packages/components/src/custom-select/types.ts
+@@ -0,0 +1,23 @@
++// TODO
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type * as Ariakit from '@ariakit/react';
++
++export type CustomSelectContextProps =
++	| {
++			store: Ariakit.SelectStore;
++	  }
++	| undefined;
++
++export type CustomSelectProps = {
++	children: React.ReactNode;
++	label?: string;
++	onChange?: Function;
++	value?: string;
++};
++
++export type CustomSelectItemProps = {
++	children: React.ReactNode;
++};

@@ -1,0 +1,768 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 516fa70a321e9b..242218705b3cff 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -219,10 +219,11 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                           aria-label="Color: red"
+                           aria-selected="true"
+                           class="components-button components-circular-option-picker__option"
++                          data-active-item=""
++                          data-command=""
+                           id="components-circular-option-picker-0-0"
+                           role="option"
+                           style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
+-                          tabindex="0"
+                           type="button"
+                         />
+                         <svg
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 42ba2a8fc9c9d6..b7d33a0900b0e9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `InputControl`, `NumberControl`, `UnitControl`, `SelectControl`, `CustomSelectControl`, `TreeSelect`: Add opt-in prop for next 40px default size, superseding the `__next36pxDefaultSize` prop ([#53819](https://github.com/WordPress/gutenberg/pull/53819)).
+ -   `Modal`: add a new `size` prop to support preset widths, including a `fill` option to eventually replace the `isFullScreen` prop ([#54471](https://github.com/WordPress/gutenberg/pull/54471)).
+ -   Wrapped `TextareaControl` in a `forwardRef` call ([#54975](https://github.com/WordPress/gutenberg/pull/54975)).
++-   `Composite`/`AlignmentMatrixControl`/`CircularOptionPicker`: Starts the `Composite` migration from `reakit` to `ariakit` ([#54225](https://github.com/WordPress/gutenberg/pull/54225)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/alignment-matrix-control/cell.tsx b/packages/components/src/alignment-matrix-control/cell.tsx
+index 00daa6fb316954..162ca879f1a7e5 100644
+--- a/packages/components/src/alignment-matrix-control/cell.tsx
++++ b/packages/components/src/alignment-matrix-control/cell.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { CompositeItem } from '../composite';
++import { CompositeItem } from '../composite/v2';
+ import Tooltip from '../tooltip';
+ import { VisuallyHidden } from '../visually-hidden';
+ 
+@@ -17,6 +17,7 @@ import type { AlignmentMatrixControlCellProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
+ export default function Cell( {
++	id,
+ 	isActive = false,
+ 	value,
+ 	...props
+@@ -25,7 +26,10 @@ export default function Cell( {
+ 
+ 	return (
+ 		<Tooltip text={ tooltipText }>
+-			<CompositeItem as={ CellView } role="gridcell" { ...props }>
++			<CompositeItem
++				id={ id }
++				render={ <CellView { ...props } role="gridcell" /> }
++			>
+ 				{ /* VoiceOver needs a text content to be rendered within grid cell,
+ 			otherwise it'll announce the content as "blank". So we use a visually
+ 			hidden element instead of aria-label. */ }
+diff --git a/packages/components/src/alignment-matrix-control/index.tsx b/packages/components/src/alignment-matrix-control/index.tsx
+index 2d52bb0e248435..3de0e401187d53 100644
+--- a/packages/components/src/alignment-matrix-control/index.tsx
++++ b/packages/components/src/alignment-matrix-control/index.tsx
+@@ -8,32 +8,17 @@ import classnames from 'classnames';
+  */
+ import { __, isRTL } from '@wordpress/i18n';
+ import { useInstanceId } from '@wordpress/compose';
+-import { useState, useEffect } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Cell from './cell';
+-import { Composite, CompositeGroup, useCompositeState } from '../composite';
++import { Composite, CompositeRow, useCompositeStore } from '../composite/v2';
+ import { Root, Row } from './styles/alignment-matrix-control-styles';
+ import AlignmentMatrixControlIcon from './icon';
+-import { GRID, getItemId } from './utils';
++import { GRID, getItemId, getItemValue } from './utils';
+ import type { WordPressComponentProps } from '../context';
+-import type {
+-	AlignmentMatrixControlProps,
+-	AlignmentMatrixControlValue,
+-} from './types';
+-
+-const noop = () => {};
+-
+-function useBaseId( id?: string ) {
+-	const instanceId = useInstanceId(
+-		AlignmentMatrixControl,
+-		'alignment-matrix-control'
+-	);
+-
+-	return id || instanceId;
+-}
++import type { AlignmentMatrixControlProps } from './types';
+ 
+ /**
+  *
+@@ -61,31 +46,27 @@ export function AlignmentMatrixControl( {
+ 	label = __( 'Alignment Matrix Control' ),
+ 	defaultValue = 'center center',
+ 	value,
+-	onChange = noop,
++	onChange,
+ 	width = 92,
+ 	...props
+ }: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
+-	const [ immutableDefaultValue ] = useState( value ?? defaultValue );
+-	const baseId = useBaseId( id );
+-	const initialCurrentId = getItemId( baseId, immutableDefaultValue );
++	const baseId = useInstanceId(
++		AlignmentMatrixControl,
++		'alignment-matrix-control',
++		id
++	);
+ 
+-	const composite = useCompositeState( {
+-		baseId,
+-		currentId: initialCurrentId,
++	const compositeStore = useCompositeStore( {
++		defaultActiveId: getItemId( baseId, defaultValue ),
++		activeId: getItemId( baseId, value ),
++		setActiveId: ( nextActiveId ) => {
++			const nextValue = getItemValue( baseId, nextActiveId );
++			if ( nextValue ) onChange?.( nextValue );
++		},
+ 		rtl: isRTL(),
+ 	} );
+ 
+-	const handleOnChange = ( nextValue: AlignmentMatrixControlValue ) => {
+-		onChange( nextValue );
+-	};
+-
+-	const { setCurrentId } = composite;
+-
+-	useEffect( () => {
+-		if ( typeof value !== 'undefined' ) {
+-			setCurrentId( getItemId( baseId, value ) );
+-		}
+-	}, [ value, setCurrentId, baseId ] );
++	const activeId = compositeStore.useState( 'activeId' );
+ 
+ 	const classes = classnames(
+ 		'component-alignment-matrix-control',
+@@ -94,38 +75,34 @@ export function AlignmentMatrixControl( {
+ 
+ 	return (
+ 		<Composite
+-			{ ...props }
+-			{ ...composite }
+-			aria-label={ label }
+-			as={ Root }
+-			className={ classes }
+-			role="grid"
+-			size={ width }
++			store={ compositeStore }
++			render={
++				<Root
++					{ ...props }
++					aria-label={ label }
++					className={ classes }
++					id={ baseId }
++					role="grid"
++					size={ width }
++				/>
++			}
+ 		>
+ 			{ GRID.map( ( cells, index ) => (
+-				<CompositeGroup
+-					{ ...composite }
+-					as={ Row }
+-					role="row"
+-					key={ index }
+-				>
++				<CompositeRow render={ <Row role="row" /> } key={ index }>
+ 					{ cells.map( ( cell ) => {
+ 						const cellId = getItemId( baseId, cell );
+-						const isActive = composite.currentId === cellId;
++						const isActive = cellId === activeId;
+ 
+ 						return (
+ 							<Cell
+-								{ ...composite }
+ 								id={ cellId }
+ 								isActive={ isActive }
+ 								key={ cell }
+ 								value={ cell }
+-								onFocus={ () => handleOnChange( cell ) }
+-								tabIndex={ isActive ? 0 : -1 }
+ 							/>
+ 						);
+ 					} ) }
+-				</CompositeGroup>
++				</CompositeRow>
+ 			) ) }
+ 		</Composite>
+ 	);
+diff --git a/packages/components/src/alignment-matrix-control/stories/index.story.tsx b/packages/components/src/alignment-matrix-control/stories/index.story.tsx
+index 24b496d1f2432b..03bec9d92a8b78 100644
+--- a/packages/components/src/alignment-matrix-control/stories/index.story.tsx
++++ b/packages/components/src/alignment-matrix-control/stories/index.story.tsx
+@@ -6,7 +6,7 @@ import type { Meta, StoryFn } from '@storybook/react';
+ /**
+  * WordPress dependencies
+  */
+-import { useEffect, useState } from '@wordpress/element';
++import { useState } from '@wordpress/element';
+ import { Icon } from '@wordpress/icons';
+ 
+ /**
+@@ -24,10 +24,11 @@ const meta: Meta< typeof AlignmentMatrixControl > = {
+ 		'AlignmentMatrixControl.Icon': AlignmentMatrixControl.Icon,
+ 	},
+ 	argTypes: {
+-		onChange: { action: 'onChange', control: { type: null } },
++		onChange: { control: { type: null } },
+ 		value: { control: { type: null } },
+ 	},
+ 	parameters: {
++		actions: { argTypesRegex: '^on.*' },
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 	},
+@@ -42,11 +43,6 @@ const Template: StoryFn< typeof AlignmentMatrixControl > = ( {
+ 	const [ value, setValue ] =
+ 		useState< AlignmentMatrixControlProps[ 'value' ] >();
+ 
+-	// Convenience handler for Canvas view so changes are reflected
+-	useEffect( () => {
+-		setValue( defaultValue );
+-	}, [ defaultValue ] );
+-
+ 	return (
+ 		<AlignmentMatrixControl
+ 			{ ...props }
+diff --git a/packages/components/src/alignment-matrix-control/test/index.tsx b/packages/components/src/alignment-matrix-control/test/index.tsx
+index a99f6d70135c5f..6836bc7e45f95c 100644
+--- a/packages/components/src/alignment-matrix-control/test/index.tsx
++++ b/packages/components/src/alignment-matrix-control/test/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen, within } from '@testing-library/react';
++import { render, screen, waitFor, within } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+ /**
+@@ -17,34 +17,133 @@ const getCell = ( name: string ) => {
+ 	return within( getControl() ).getByRole( 'gridcell', { name } );
+ };
+ 
++const renderAndInitCompositeStore = async (
++	jsx: JSX.Element,
++	focusedCell = 'center center'
++) => {
++	const view = render( jsx );
++	await waitFor( () => {
++		expect( getCell( focusedCell ) ).toHaveAttribute( 'tabindex', '0' );
++	} );
++	return view;
++};
++
+ describe( 'AlignmentMatrixControl', () => {
+ 	describe( 'Basic rendering', () => {
+-		it( 'should render', () => {
+-			render( <AlignmentMatrixControl /> );
++		it( 'should render', async () => {
++			await renderAndInitCompositeStore( <AlignmentMatrixControl /> );
+ 
+ 			expect( getControl() ).toBeInTheDocument();
+ 		} );
++
++		it( 'should be centered by default', async () => {
++			const user = userEvent.setup();
++
++			await renderAndInitCompositeStore( <AlignmentMatrixControl /> );
++
++			await user.tab();
++
++			expect( getCell( 'center center' ) ).toHaveFocus();
++		} );
+ 	} );
+ 
+-	describe( 'Change value', () => {
+-		const alignments = [ 'center left', 'center center', 'bottom center' ];
+-		const user = userEvent.setup();
++	describe( 'Should change value', () => {
++		describe( 'with Mouse', () => {
++			describe( 'on cell click', () => {
++				it.each( [
++					'top left',
++					'top center',
++					'top right',
++					'center left',
++					'center right',
++					'bottom left',
++					'bottom center',
++					'bottom right',
++				] )( '%s', async ( alignment ) => {
++					const user = userEvent.setup();
++					const spy = jest.fn();
++
++					await renderAndInitCompositeStore(
++						<AlignmentMatrixControl
++							value="center"
++							onChange={ spy }
++						/>
++					);
++
++					const cell = getCell( alignment );
++
++					await user.click( cell );
+ 
+-		it.each( alignments )(
+-			'should change value on %s cell click',
+-			async ( alignment ) => {
+-				const spy = jest.fn();
++					expect( cell ).toHaveFocus();
++					expect( spy ).toHaveBeenCalledWith( alignment );
++				} );
+ 
+-				render(
+-					<AlignmentMatrixControl value="center" onChange={ spy } />
+-				);
++				it( 'unless already focused', async () => {
++					const user = userEvent.setup();
++					const spy = jest.fn();
+ 
+-				await user.click( getCell( alignment ) );
++					await renderAndInitCompositeStore(
++						<AlignmentMatrixControl
++							value="center"
++							onChange={ spy }
++						/>
++					);
+ 
+-				expect( getCell( alignment ) ).toHaveFocus();
++					const cell = getCell( 'center center' );
+ 
+-				expect( spy ).toHaveBeenCalledWith( alignment );
+-			}
+-		);
++					await user.click( cell );
++
++					expect( cell ).toHaveFocus();
++					expect( spy ).not.toHaveBeenCalled();
++				} );
++			} );
++		} );
++
++		describe( 'with Keyboard', () => {
++			describe( 'on arrow press', () => {
++				it.each( [
++					[ 'ArrowUp', 'top center' ],
++					[ 'ArrowLeft', 'center left' ],
++					[ 'ArrowDown', 'bottom center' ],
++					[ 'ArrowRight', 'center right' ],
++				] )( '%s', async ( keyRef, cellRef ) => {
++					const user = userEvent.setup();
++					const spy = jest.fn();
++
++					await renderAndInitCompositeStore(
++						<AlignmentMatrixControl onChange={ spy } />
++					);
++
++					await user.tab();
++					await user.keyboard( `[${ keyRef }]` );
++
++					expect( getCell( cellRef ) ).toHaveFocus();
++					expect( spy ).toHaveBeenCalledWith( cellRef );
++				} );
++			} );
++
++			describe( 'but not at at edge', () => {
++				it.each( [
++					[ 'ArrowUp', 'top left' ],
++					[ 'ArrowLeft', 'top left' ],
++					[ 'ArrowDown', 'bottom right' ],
++					[ 'ArrowRight', 'bottom right' ],
++				] )( '%s', async ( keyRef, cellRef ) => {
++					const user = userEvent.setup();
++					const spy = jest.fn();
++
++					await renderAndInitCompositeStore(
++						<AlignmentMatrixControl onChange={ spy } />
++					);
++
++					const cell = getCell( cellRef );
++					await user.click( cell );
++					await user.keyboard( `[${ keyRef }]` );
++
++					expect( cell ).toHaveFocus();
++					expect( spy ).toHaveBeenCalledWith( cellRef );
++				} );
++			} );
++		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/alignment-matrix-control/utils.tsx b/packages/components/src/alignment-matrix-control/utils.tsx
+index ba5e113c42fc7f..54455b61229b01 100644
+--- a/packages/components/src/alignment-matrix-control/utils.tsx
++++ b/packages/components/src/alignment-matrix-control/utils.tsx
+@@ -2,6 +2,7 @@
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
++
+ /**
+  * Internal dependencies
+  */
+@@ -31,16 +32,24 @@ export const ALIGNMENT_LABEL: Record< AlignmentMatrixControlValue, string > = {
+ export const ALIGNMENTS = GRID.flat();
+ 
+ /**
+- * Parses and transforms an incoming value to better match the alignment values
++ * Normalizes and transforms an incoming value to better match the alignment values
+  *
+  * @param value An alignment value to parse.
+  *
+  * @return The parsed value.
+  */
+-export function transformValue( value: AlignmentMatrixControlValue ) {
+-	const nextValue = value === 'center' ? 'center center' : value;
++function normalize( value?: string | null ) {
++	const normalized = value === 'center' ? 'center center' : value;
++
++	// Strictly speaking, this could be `string | null | undefined`,
++	// but will be validated shortly, so we're typecasting to an
++	// `AlignmentMatrixControlValue` to keep TypeScript happy.
++	const transformed = normalized?.replace(
++		'-',
++		' '
++	) as AlignmentMatrixControlValue;
+ 
+-	return nextValue.replace( '-', ' ' ) as AlignmentMatrixControlValue;
++	return ALIGNMENTS.includes( transformed ) ? transformed : undefined;
+ }
+ 
+ /**
+@@ -53,11 +62,25 @@ export function transformValue( value: AlignmentMatrixControlValue ) {
+  */
+ export function getItemId(
+ 	prefixId: string,
+-	value: AlignmentMatrixControlValue
++	value?: AlignmentMatrixControlValue
+ ) {
+-	const valueId = transformValue( value ).replace( ' ', '-' );
++	const normalized = normalize( value );
++	if ( ! normalized ) return;
++
++	const id = normalized.replace( ' ', '-' );
++	return `${ prefixId }-${ id }`;
++}
+ 
+-	return `${ prefixId }-${ valueId }`;
++/**
++ * Extracts an item value from its ID
++ *
++ * @param prefixId An ID prefix to remove
++ * @param id       An item ID
++ * @return         The item value
++ */
++export function getItemValue( prefixId: string, id?: string | null ) {
++	const value = id?.replace( prefixId + '-', '' );
++	return normalize( value );
+ }
+ 
+ /**
+@@ -70,8 +93,9 @@ export function getItemId(
+ export function getAlignmentIndex(
+ 	alignment: AlignmentMatrixControlValue = 'center'
+ ) {
+-	const item = transformValue( alignment );
+-	const index = ALIGNMENTS.indexOf( item );
++	const normalized = normalize( alignment );
++	if ( ! normalized ) return undefined;
+ 
++	const index = ALIGNMENTS.indexOf( normalized );
+ 	return index > -1 ? index : undefined;
+ }
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+index 2834228715115a..7dcfd635557550 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+@@ -8,7 +8,7 @@ import type { ForwardedRef } from 'react';
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { forwardRef, useContext, useEffect } from '@wordpress/element';
++import { forwardRef, useContext } from '@wordpress/element';
+ import { Icon, check } from '@wordpress/icons';
+ 
+ /**
+@@ -16,15 +16,9 @@ import { Icon, check } from '@wordpress/icons';
+  */
+ import { CircularOptionPickerContext } from './circular-option-picker-context';
+ import Button from '../button';
+-import { CompositeItem } from '../composite';
++import { CompositeItem } from '../composite/v2';
+ import Tooltip from '../tooltip';
+-import type {
+-	OptionProps,
+-	CircularOptionPickerCompositeState,
+-	CircularOptionPickerContextProps,
+-} from './types';
+-
+-const hasSelectedOption = new Map();
++import type { OptionProps, CircularOptionPickerCompositeStore } from './types';
+ 
+ function UnforwardedOptionAsButton(
+ 	props: {
+@@ -40,7 +34,7 @@ function UnforwardedOptionAsButton(
+ 			{ ...additionalProps }
+ 			aria-pressed={ isPressed }
+ 			ref={ forwardedRef }
+-		></Button>
++		/>
+ 	);
+ }
+ 
+@@ -51,38 +45,29 @@ function UnforwardedOptionAsOption(
+ 		id: string;
+ 		className?: string;
+ 		isSelected?: boolean;
+-		context: CircularOptionPickerContextProps;
++		compositeStore: CircularOptionPickerCompositeStore;
+ 	},
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+-	const { id, isSelected, context, ...additionalProps } = props;
+-	const { isComposite, ..._compositeState } = context;
+-	const compositeState =
+-		_compositeState as CircularOptionPickerCompositeState;
+-	const { baseId, currentId, setCurrentId } = compositeState;
++	const { id, isSelected, compositeStore, ...additionalProps } = props;
++	const activeId = compositeStore.useState( 'activeId' );
+ 
+-	useEffect( () => {
+-		// If we call `setCurrentId` here, it doesn't update for other
+-		// Option renders in the same pass. So we have to store our own
+-		// map to make sure that we only set the first selected option.
+-		// We still need to check `currentId` because the control will
+-		// update this as the user moves around, and that state should
+-		// be maintained as the group gains and loses focus.
+-		if ( isSelected && ! currentId && ! hasSelectedOption.get( baseId ) ) {
+-			hasSelectedOption.set( baseId, true );
+-			setCurrentId( id );
+-		}
+-	}, [ baseId, currentId, id, isSelected, setCurrentId ] );
++	if ( isSelected && ! activeId ) {
++		compositeStore.setActiveId( id );
++	}
+ 
+ 	return (
+ 		<CompositeItem
+-			{ ...additionalProps }
+-			{ ...compositeState }
+-			as={ Button }
++			render={
++				<Button
++					{ ...additionalProps }
++					role="option"
++					aria-selected={ !! isSelected }
++					ref={ forwardedRef }
++				/>
++			}
++			store={ compositeStore }
+ 			id={ id }
+-			role="option"
+-			aria-selected={ !! isSelected }
+-			ref={ forwardedRef }
+ 		/>
+ 	);
+ }
+@@ -96,8 +81,9 @@ export function Option( {
+ 	tooltipText,
+ 	...additionalProps
+ }: OptionProps ) {
+-	const compositeContext = useContext( CircularOptionPickerContext );
+-	const { isComposite, baseId } = compositeContext;
++	const { baseId, compositeStore } = useContext(
++		CircularOptionPickerContext
++	);
+ 	const id = useInstanceId(
+ 		Option,
+ 		baseId || 'components-circular-option-picker__option'
+@@ -109,10 +95,10 @@ export function Option( {
+ 		...additionalProps,
+ 	};
+ 
+-	const optionControl = isComposite ? (
++	const optionControl = compositeStore ? (
+ 		<OptionAsOption
+ 			{ ...commonProps }
+-			context={ compositeContext }
++			compositeStore={ compositeStore }
+ 			isSelected={ isSelected }
+ 		/>
+ 	) : (
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker.tsx b/packages/components/src/circular-option-picker/circular-option-picker.tsx
+index 08c5ad94a34cb7..047b0c569c7d3e 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker.tsx
+@@ -7,14 +7,13 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { useEffect } from '@wordpress/element';
+ import { isRTL } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { CircularOptionPickerContext } from './circular-option-picker-context';
+-import { Composite, useCompositeState } from '../composite';
++import { Composite, useCompositeStore } from '../composite/v2';
+ import type {
+ 	CircularOptionPickerProps,
+ 	ListboxCircularOptionPickerProps,
+@@ -85,30 +84,15 @@ function ListboxCircularOptionPicker(
+ 		children,
+ 		...additionalProps
+ 	} = props;
+-	const rtl = isRTL();
+ 
+-	const compositeState = useCompositeState( { baseId, loop, rtl } );
+-	const { setBaseId, setLoop, setRTL } = compositeState;
+-
+-	// These are necessary as `useCompositeState` is sealed after
+-	// the first render, so although unlikely to happen, if a state
+-	// property should change, we need to process it accordingly.
+-
+-	useEffect( () => {
+-		setBaseId( baseId );
+-	}, [ setBaseId, baseId ] );
+-
+-	useEffect( () => {
+-		setLoop( loop );
+-	}, [ setLoop, loop ] );
+-
+-	useEffect( () => {
+-		setRTL( rtl );
+-	}, [ setRTL, rtl ] );
++	const compositeStore = useCompositeStore( {
++		focusLoop: loop,
++		rtl: isRTL(),
++	} );
+ 
+ 	const compositeContext = {
+-		isComposite: true,
+-		...compositeState,
++		baseId,
++		compositeStore,
+ 	};
+ 
+ 	return (
+@@ -116,7 +100,8 @@ function ListboxCircularOptionPicker(
+ 			<CircularOptionPickerContext.Provider value={ compositeContext }>
+ 				<Composite
+ 					{ ...additionalProps }
+-					{ ...compositeState }
++					id={ baseId }
++					store={ compositeStore }
+ 					role={ 'listbox' }
+ 				>
+ 					{ options }
+@@ -134,10 +119,8 @@ function ButtonsCircularOptionPicker(
+ 	const { actions, options, children, baseId, ...additionalProps } = props;
+ 
+ 	return (
+-		<div { ...additionalProps }>
+-			<CircularOptionPickerContext.Provider
+-				value={ { isComposite: false, baseId } }
+-			>
++		<div { ...additionalProps } id={ baseId }>
++			<CircularOptionPickerContext.Provider value={ { baseId } }>
+ 				{ options }
+ 				{ children }
+ 				{ actions }
+diff --git a/packages/components/src/circular-option-picker/types.ts b/packages/components/src/circular-option-picker/types.ts
+index cd9d9dca6be8df..519d81d5905107 100644
+--- a/packages/components/src/circular-option-picker/types.ts
++++ b/packages/components/src/circular-option-picker/types.ts
+@@ -14,7 +14,7 @@ import type { Icon } from '@wordpress/icons';
+ import type { ButtonAsButtonProps } from '../button/types';
+ import type { DropdownProps } from '../dropdown/types';
+ import type { WordPressComponentProps } from '../context';
+-import type { CompositeState } from '../composite';
++import type { CompositeStore } from '../composite/v2';
+ 
+ type CommonCircularOptionPickerProps = {
+ 	/**
+@@ -123,7 +123,8 @@ export type OptionProps = Omit<
+ 	>;
+ };
+ 
+-export type CircularOptionPickerCompositeState = CompositeState;
+-export type CircularOptionPickerContextProps =
+-	| { isComposite?: false; baseId?: string }
+-	| ( { isComposite: true } & CircularOptionPickerCompositeState );
++export type CircularOptionPickerCompositeStore = CompositeStore;
++export type CircularOptionPickerContextProps = {
++	baseId?: string;
++	compositeStore?: CircularOptionPickerCompositeStore;
++};
+diff --git a/packages/components/src/composite/v2.ts b/packages/components/src/composite/v2.ts
+new file mode 100644
+index 00000000000000..d329fd3fd11dfb
+--- /dev/null
++++ b/packages/components/src/composite/v2.ts
+@@ -0,0 +1,22 @@
++/**
++ * Composite is a component that may contain navigable items represented by
++ * CompositeItem. It's inspired by the WAI-ARIA Composite Role and implements
++ * all the keyboard navigation mechanisms to ensure that there's only one
++ * tab stop for the whole Composite element. This means that it can behave as
++ * a roving tabindex or aria-activedescendant container.
++ *
++ * @see https://ariakit.org/components/composite
++ */
++
++/* eslint-disable-next-line no-restricted-imports */
++export {
++	Composite,
++	CompositeGroup,
++	CompositeGroupLabel,
++	CompositeItem,
++	CompositeRow,
++	useCompositeStore,
++} from '@ariakit/react';
++
++/* eslint-disable-next-line no-restricted-imports */
++export type { CompositeStore } from '@ariakit/react';
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 38707860e1ce91..fd61c2564e6b06 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -6,6 +6,13 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/pri
+ /**
+  * Internal dependencies
+  */
++import {
++	Composite as CompositeV2,
++	CompositeGroup as CompositeGroupV2,
++	CompositeItem as CompositeItemV2,
++	CompositeRow as CompositeRowV2,
++	useCompositeStore as useCompositeStoreV2,
++} from './composite/v2';
+ import { default as CustomSelectControl } from './custom-select-control';
+ import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
+ import { default as ProgressBar } from './progress-bar';
+@@ -33,6 +40,11 @@ export const { lock, unlock } =
+ 
+ export const privateApis = {};
+ lock( privateApis, {
++	CompositeV2,
++	CompositeGroupV2,
++	CompositeItemV2,
++	CompositeRowV2,
++	useCompositeStoreV2,
+ 	CustomSelectControl,
+ 	__experimentalPopoverLegacyPositionToPlacement,
+ 	createPrivateSlotFill,

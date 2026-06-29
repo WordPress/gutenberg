@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/snackbar/index.tsx b/packages/components/src/snackbar/index.tsx
+index 833d9dce8d30ff..83a052ae1b0a17 100644
+--- a/packages/components/src/snackbar/index.tsx
++++ b/packages/components/src/snackbar/index.tsx
+@@ -19,7 +19,7 @@ import Button from '../button';
+ import type { NoticeAction, SnackbarProps } from './types';
+ import type { WordPressComponentProps } from '../ui/context';
+ 
+-const NOTICE_TIMEOUT = 10000;
++const NOTICE_TIMEOUT = 6000;
+ 
+ /**
+  * Custom hook which announces the message with the given politeness, if a

@@ -1,0 +1,125 @@
+diff --git a/packages/components/src/tree-grid/test/__snapshots__/row.js.snap b/packages/components/src/tree-grid/test/__snapshots__/row.js.snap
+index f27fe4977c1234..a5cbe7d37aa303 100644
+--- a/packages/components/src/tree-grid/test/__snapshots__/row.js.snap
++++ b/packages/components/src/tree-grid/test/__snapshots__/row.js.snap
+@@ -2,31 +2,35 @@
+ 
+ exports[`TreeGridRow forwards other props to the rendered tr element 1`] = `
+ <table>
+-  <tr
+-    aria-level="1"
+-    aria-posinset="1"
+-    aria-setsize="1"
+-    className="my-row"
+-    role="row"
+-  >
+-    <td>
+-      Test
+-    </td>
+-  </tr>
++  <tbody>
++    <tr
++      aria-level="1"
++      aria-posinset="1"
++      aria-setsize="1"
++      class="my-row"
++      role="row"
++    >
++      <td>
++        Test
++      </td>
++    </tr>
++  </tbody>
+ </table>
+ `;
+ 
+ exports[`TreeGridRow renders a tr with support for level, positionInSet and setSize props 1`] = `
+ <table>
+-  <tr
+-    aria-level="1"
+-    aria-posinset="1"
+-    aria-setsize="1"
+-    role="row"
+-  >
+-    <td>
+-      Test
+-    </td>
+-  </tr>
++  <tbody>
++    <tr
++      aria-level="1"
++      aria-posinset="1"
++      aria-setsize="1"
++      role="row"
++    >
++      <td>
++        Test
++      </td>
++    </tr>
++  </tbody>
+ </table>
+ `;
+diff --git a/packages/components/src/tree-grid/test/row.js b/packages/components/src/tree-grid/test/row.js
+index 8d55c5cc9c9b19..afd867ca3bfc1f 100644
+--- a/packages/components/src/tree-grid/test/row.js
++++ b/packages/components/src/tree-grid/test/row.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import TestRenderer from 'react-test-renderer';
++import { render } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -10,31 +10,35 @@ import TreeGridRow from '../row';
+ 
+ describe( 'TreeGridRow', () => {
+ 	it( 'renders a tr with support for level, positionInSet and setSize props', () => {
+-		const renderer = TestRenderer.create(
++		const { container } = render(
+ 			<table>
+-				<TreeGridRow level="1" positionInSet="1" setSize="1">
+-					<td>Test</td>
+-				</TreeGridRow>
++				<tbody>
++					<TreeGridRow level="1" positionInSet="1" setSize="1">
++						<td>Test</td>
++					</TreeGridRow>
++				</tbody>
+ 			</table>
+ 		);
+ 
+-		expect( renderer.toJSON() ).toMatchSnapshot();
++		expect( container.firstChild ).toMatchSnapshot();
+ 	} );
+ 
+ 	it( 'forwards other props to the rendered tr element', () => {
+-		const renderer = TestRenderer.create(
++		const { container } = render(
+ 			<table>
+-				<TreeGridRow
+-					className="my-row"
+-					level="1"
+-					positionInSet="1"
+-					setSize="1"
+-				>
+-					<td>Test</td>
+-				</TreeGridRow>
++				<tbody>
++					<TreeGridRow
++						className="my-row"
++						level="1"
++						positionInSet="1"
++						setSize="1"
++					>
++						<td>Test</td>
++					</TreeGridRow>
++				</tbody>
+ 			</table>
+ 		);
+ 
+-		expect( renderer.toJSON() ).toMatchSnapshot();
++		expect( container.firstChild ).toMatchSnapshot();
+ 	} );
+ } );

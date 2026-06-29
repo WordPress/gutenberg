@@ -1,0 +1,38 @@
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index 09477a87e0509b..d9ebd10fab9ffc 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -27,19 +27,20 @@ function useObservableState( initialState, onStateChange ) {
+ 	];
+ }
+ 
+-export default function Dropdown( {
+-	renderContent,
+-	renderToggle,
+-	position = 'bottom right',
+-	className,
+-	contentClassName,
+-	expandOnMobile,
+-	headerTitle,
+-	focusOnMount,
+-	popoverProps,
+-	onClose,
+-	onToggle,
+-} ) {
++export default function Dropdown( props ) {
++	const {
++		renderContent,
++		renderToggle,
++		position = 'bottom right',
++		className,
++		contentClassName,
++		expandOnMobile,
++		headerTitle,
++		focusOnMount,
++		popoverProps,
++		onClose,
++		onToggle,
++	} = props;
+ 	const containerRef = useRef();
+ 	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
+ 

@@ -1,0 +1,1327 @@
+diff --git a/packages/block-editor/src/components/border-radius-control/index.js b/packages/block-editor/src/components/border-radius-control/index.js
+index ae501b60d68400..a83bfe5a37684c 100644
+--- a/packages/block-editor/src/components/border-radius-control/index.js
++++ b/packages/block-editor/src/components/border-radius-control/index.js
+@@ -3,7 +3,7 @@
+  */
+ import {
+ 	RangeControl,
+-	__experimentalParseUnit as parseUnit,
++	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+ 	__experimentalUseCustomUnits as useCustomUnits,
+ } from '@wordpress/components';
+ import { useState } from '@wordpress/element';
+@@ -58,7 +58,9 @@ export default function BorderRadiusControl( { onChange, values } ) {
+ 	const unitConfig = units && units.find( ( item ) => item.value === unit );
+ 	const step = unitConfig?.step || 1;
+ 
+-	const [ allValue ] = parseUnit( getAllValue( values ) );
++	const [ allValue ] = parseQuantityAndUnitFromRawValue(
++		getAllValue( values )
++	);
+ 
+ 	const toggleLinked = () => setIsLinked( ! isLinked );
+ 
+@@ -82,7 +84,7 @@ export default function BorderRadiusControl( { onChange, values } ) {
+ 						/>
+ 						<RangeControl
+ 							className="components-border-radius-control__range-control"
+-							value={ allValue }
++							value={ allValue ?? '' }
+ 							min={ MIN_BORDER_RADIUS_VALUE }
+ 							max={ MAX_BORDER_RADIUS_VALUES[ unit ] }
+ 							initialPosition={ 0 }
+diff --git a/packages/block-editor/src/components/border-radius-control/test/utils.js b/packages/block-editor/src/components/border-radius-control/test/utils.js
+index 50d932322a02f3..7b66deb5747425 100644
+--- a/packages/block-editor/src/components/border-radius-control/test/utils.js
++++ b/packages/block-editor/src/components/border-radius-control/test/utils.js
+@@ -91,14 +91,14 @@ describe( 'getAllValue', () => {
+ 	} );
+ 
+ 	describe( 'when provided object based values', () => {
+-		it( 'should return null if values are mixed', () => {
++		it( 'should return undefined if values are mixed', () => {
+ 			const values = {
+ 				bottomLeft: '2em',
+ 				bottomRight: '2em',
+ 				topLeft: '0',
+ 				topRight: '2px',
+ 			};
+-			expect( getAllValue( values ) ).toBe( null );
++			expect( getAllValue( values ) ).toBe( undefined );
+ 		} );
+ 
+ 		it( 'should return the common value + unit when all values are the same', () => {
+@@ -121,26 +121,26 @@ describe( 'getAllValue', () => {
+ 			expect( getAllValue( values ) ).toBe( '1em' );
+ 		} );
+ 
+-		it( 'should fall back to null when values are undefined', () => {
++		it( 'should fall back to undefined when values are undefined', () => {
+ 			const values = {
+ 				bottomLeft: undefined,
+ 				bottomRight: undefined,
+ 				topLeft: undefined,
+ 				topRight: undefined,
+ 			};
+-			expect( getAllValue( values ) ).toBe( null );
++			expect( getAllValue( values ) ).toBe( undefined );
+ 		} );
+ 	} );
+ 
+ 	describe( 'when provided invalid values', () => {
+-		it( 'should return px when passed an array', () => {
+-			expect( getAllValue( [] ) ).toBe( null );
++		it( 'should return undefined when passed an array', () => {
++			expect( getAllValue( [] ) ).toBe( undefined );
+ 		} );
+-		it( 'should return px when passed a boolean', () => {
+-			expect( getAllValue( false ) ).toBe( null );
++		it( 'should return undefined when passed a boolean', () => {
++			expect( getAllValue( false ) ).toBe( undefined );
+ 		} );
+-		it( 'should return px when passed undefined', () => {
+-			expect( getAllValue( false ) ).toBe( null );
++		it( 'should return undefined when passed undefined', () => {
++			expect( getAllValue( undefined ) ).toBe( undefined );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/block-editor/src/components/border-radius-control/utils.js b/packages/block-editor/src/components/border-radius-control/utils.js
+index 0f628d6dce068b..3ee1e7183fa4fc 100644
+--- a/packages/block-editor/src/components/border-radius-control/utils.js
++++ b/packages/block-editor/src/components/border-radius-control/utils.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { __experimentalParseUnit as parseUnit } from '@wordpress/components';
++import { __experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue } from '@wordpress/components';
+ 
+ /**
+  * Gets the (non-undefined) item with the highest occurrence within an array
+@@ -36,12 +36,12 @@ export function mode( inputArray ) {
+  */
+ export function getAllUnit( values = {} ) {
+ 	if ( typeof values === 'string' ) {
+-		const [ , unit ] = parseUnit( values );
++		const [ , unit ] = parseQuantityAndUnitFromRawValue( values );
+ 		return unit || 'px';
+ 	}
+ 
+ 	const allUnits = Object.values( values ).map( ( value ) => {
+-		const [ , unit ] = parseUnit( value );
++		const [ , unit ] = parseQuantityAndUnitFromRawValue( value );
+ 		return unit;
+ 	} );
+ 
+@@ -64,19 +64,21 @@ export function getAllValue( values = {} ) {
+ 		return values;
+ 	}
+ 
+-	const parsedValues = Object.values( values ).map( ( value ) =>
+-		parseUnit( value )
++	const parsedQuantitiesAndUnits = Object.values( values ).map( ( value ) =>
++		parseQuantityAndUnitFromRawValue( value )
+ 	);
+ 
+-	const allValues = parsedValues.map( ( value ) => value[ 0 ] );
+-	const allUnits = parsedValues.map( ( value ) => value[ 1 ] );
++	const allValues = parsedQuantitiesAndUnits.map(
++		( value ) => value[ 0 ] ?? ''
++	);
++	const allUnits = parsedQuantitiesAndUnits.map( ( value ) => value[ 1 ] );
+ 
+ 	const value = allValues.every( ( v ) => v === allValues[ 0 ] )
+ 		? allValues[ 0 ]
+ 		: '';
+ 	const unit = mode( allUnits );
+ 
+-	const allValue = value === 0 || value ? `${ value }${ unit }` : null;
++	const allValue = value === 0 || value ? `${ value }${ unit }` : undefined;
+ 
+ 	return allValue;
+ }
+diff --git a/packages/block-editor/src/components/letter-spacing-control/index.js b/packages/block-editor/src/components/letter-spacing-control/index.js
+index 197c2dd1bc8fbc..dac792b2eb3bd4 100644
+--- a/packages/block-editor/src/components/letter-spacing-control/index.js
++++ b/packages/block-editor/src/components/letter-spacing-control/index.js
+@@ -29,7 +29,7 @@ export default function LetterSpacingControl( {
+ } ) {
+ 	const units = useCustomUnits( {
+ 		availableUnits: useSetting( 'spacing.units' ) || [ 'px', 'em', 'rem' ],
+-		defaultValues: { px: '2', em: '.2', rem: '.2' },
++		defaultValues: { px: 2, em: 0.2, rem: 0.2 },
+ 	} );
+ 	return (
+ 		<UnitControl
+diff --git a/packages/block-editor/src/components/line-height-control/index.native.js b/packages/block-editor/src/components/line-height-control/index.native.js
+index 1a9ccb426e1177..c48ca0aa5a35f2 100644
+--- a/packages/block-editor/src/components/line-height-control/index.native.js
++++ b/packages/block-editor/src/components/line-height-control/index.native.js
+@@ -20,6 +20,8 @@ export default function LineHeightControl( { value: lineHeight, onChange } ) {
+ 			step={ STEP }
+ 			value={ value }
+ 			onChange={ onChange }
++			// TODO: should be updated to avoid using `false`, in order to
++			// align with the web version of `UnitControl`
+ 			units={ false }
+ 		/>
+ 	);
+diff --git a/packages/block-library/src/cover/controls.native.js b/packages/block-library/src/cover/controls.native.js
+index 5645d3f9323bbf..6b967548a23d45 100644
+--- a/packages/block-library/src/cover/controls.native.js
++++ b/packages/block-library/src/cover/controls.native.js
+@@ -76,7 +76,7 @@ function Controls( {
+ 			'vw',
+ 			'vh',
+ 		],
+-		defaultValues: { px: '430', em: '20', rem: '20', vw: '20', vh: '50' },
++		defaultValues: { px: 430, em: 20, rem: 20, vw: 20, vh: 50 },
+ 	} );
+ 
+ 	const onOpacityChange = useCallback( ( value ) => {
+diff --git a/packages/block-library/src/cover/edit.js b/packages/block-library/src/cover/edit.js
+index 9d24e4825657d2..7901f7755b548e 100644
+--- a/packages/block-library/src/cover/edit.js
++++ b/packages/block-library/src/cover/edit.js
+@@ -110,7 +110,7 @@ function CoverHeightInput( {
+ 			'vw',
+ 			'vh',
+ 		],
+-		defaultValues: { px: '430', em: '20', rem: '20', vw: '20', vh: '50' },
++		defaultValues: { px: 430, em: 20, rem: 20, vw: 20, vh: 50 },
+ 	} );
+ 
+ 	const handleOnChange = ( unprocessedValue ) => {
+diff --git a/packages/block-library/src/spacer/controls.js b/packages/block-library/src/spacer/controls.js
+index 116f0dc59fcbc2..8b6ec65898ee4f 100644
+--- a/packages/block-library/src/spacer/controls.js
++++ b/packages/block-library/src/spacer/controls.js
+@@ -37,7 +37,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
+ 			'vw',
+ 			'vh',
+ 		],
+-		defaultValues: { px: '100', em: '10', rem: '10', vw: '10', vh: '25' },
++		defaultValues: { px: 100, em: 10, rem: 10, vw: 10, vh: 25 },
+ 	} );
+ 
+ 	const handleOnChange = ( unprocessedValue ) => {
+diff --git a/packages/block-library/src/spacer/controls.native.js b/packages/block-library/src/spacer/controls.native.js
+index ecad9fab44860f..a75d31f3402458 100644
+--- a/packages/block-library/src/spacer/controls.native.js
++++ b/packages/block-library/src/spacer/controls.native.js
+@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
+  */
+ import styles from './style.scss';
+ 
+-const DEFAULT_VALUES = { px: '100', em: '10', rem: '10', vw: '10', vh: '25' };
++const DEFAULT_VALUES = { px: 100, em: 10, rem: 10, vw: 10, vh: 25 };
+ 
+ function Controls( { attributes, context, setAttributes } ) {
+ 	const { orientation } = context;
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 97f9b3ac505ad1..9406b0c277e3dd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -51,6 +51,7 @@
+ 
+ -   `Navigator`: rename `push`/`pop` to `goTo`/`goBack` ([#38582](https://github.com/WordPress/gutenberg/pull/38582))
+ -   `Navigator`: add `NavigatorButton` and `NavigatorBackButton` components ([#38634](https://github.com/WordPress/gutenberg/pull/38634))
++-   `UnitControl`: tidy up utilities and types. In particular, change the type of parsed quantities to `number` (previously it could have been a `string` too). ([#38987](https://github.com/WordPress/gutenberg/pull/38987]))
+ 
+ ## 19.3.0 (2022-01-27)
+ 
+diff --git a/packages/components/src/box-control/index.js b/packages/components/src/box-control/index.js
+index 5779b4a975b184..54377010e5df2f 100644
+--- a/packages/components/src/box-control/index.js
++++ b/packages/components/src/box-control/index.js
+@@ -27,7 +27,7 @@ import {
+ 	Header,
+ 	HeaderControlWrapper,
+ } from './styles/box-control-styles';
+-import { parseUnit } from '../unit-control/utils';
++import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
+ import {
+ 	DEFAULT_VALUES,
+ 	DEFAULT_VISUALIZER_VALUES,
+@@ -79,10 +79,10 @@ export default function BoxControl( {
+ 	// only values from being saved while maintaining preexisting unit selection
+ 	// behaviour. Filtering CSS only values prevents invalid style values.
+ 	const [ selectedUnits, setSelectedUnits ] = useState( {
+-		top: parseUnit( valuesProp?.top )[ 1 ],
+-		right: parseUnit( valuesProp?.right )[ 1 ],
+-		bottom: parseUnit( valuesProp?.bottom )[ 1 ],
+-		left: parseUnit( valuesProp?.left )[ 1 ],
++		top: parseQuantityAndUnitFromRawValue( valuesProp?.top )[ 1 ],
++		right: parseQuantityAndUnitFromRawValue( valuesProp?.right )[ 1 ],
++		bottom: parseQuantityAndUnitFromRawValue( valuesProp?.bottom )[ 1 ],
++		left: parseQuantityAndUnitFromRawValue( valuesProp?.left )[ 1 ],
+ 	} );
+ 
+ 	const id = useUniqueId( idProp );
+diff --git a/packages/components/src/box-control/utils.js b/packages/components/src/box-control/utils.js
+index 0e07098fbe2b72..9cadf7700484e3 100644
+--- a/packages/components/src/box-control/utils.js
++++ b/packages/components/src/box-control/utils.js
+@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import { parseUnit } from '../unit-control/utils';
++import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
+ 
+ export const LABELS = {
+ 	all: __( 'All' ),
+@@ -25,10 +25,10 @@ export const LABELS = {
+ };
+ 
+ export const DEFAULT_VALUES = {
+-	top: null,
+-	right: null,
+-	bottom: null,
+-	left: null,
++	top: undefined,
++	right: undefined,
++	bottom: undefined,
++	left: undefined,
+ };
+ 
+ export const DEFAULT_VISUALIZER_VALUES = {
+@@ -67,9 +67,13 @@ function mode( arr ) {
+  */
+ export function getAllValue( values = {}, availableSides = ALL_SIDES ) {
+ 	const sides = normalizeSides( availableSides );
+-	const parsedValues = sides.map( ( side ) => parseUnit( values[ side ] ) );
+-	const allValues = parsedValues.map( ( value ) => value[ 0 ] );
+-	const allUnits = parsedValues.map( ( value ) => value[ 1 ] );
++	const parsedQuantitiesAndUnits = sides.map( ( side ) =>
++		parseQuantityAndUnitFromRawValue( values[ side ] )
++	);
++	const allValues = parsedQuantitiesAndUnits.map(
++		( value ) => value[ 0 ] ?? ''
++	);
++	const allUnits = parsedQuantitiesAndUnits.map( ( value ) => value[ 1 ] );
+ 
+ 	const value = allValues.every( ( v ) => v === allValues[ 0 ] )
+ 		? allValues[ 0 ]
+@@ -85,7 +89,7 @@ export function getAllValue( values = {}, availableSides = ALL_SIDES ) {
+ 	 * isNumber() is more specific for these cases, rather than relying on a
+ 	 * simple truthy check.
+ 	 */
+-	const allValue = isNumber( value ) ? `${ value }${ unit }` : null;
++	const allValue = isNumber( value ) ? `${ value }${ unit }` : undefined;
+ 
+ 	return allValue;
+ }
+diff --git a/packages/components/src/focal-point-picker/index.native.js b/packages/components/src/focal-point-picker/index.native.js
+index 6e09dfd4cb9c2c..2b61f9f5300237 100644
+--- a/packages/components/src/focal-point-picker/index.native.js
++++ b/packages/components/src/focal-point-picker/index.native.js
+@@ -27,7 +27,7 @@ import { isVideoType } from './utils';
+ 
+ const MIN_POSITION_VALUE = 0;
+ const MAX_POSITION_VALUE = 100;
+-const FOCAL_POINT_UNITS = [ { default: '50', label: '%', value: '%' } ];
++const FOCAL_POINT_UNITS = [ { default: 50, label: '%', value: '%' } ];
+ 
+ function FocalPointPicker( props ) {
+ 	const { focalPoint, onChange, shouldEnableBottomSheetScroll, url } = props;
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index d7ecd0e72c5f3c..eb6c928f182d59 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -231,7 +231,7 @@ function FontSizePicker(
+ 											);
+ 										}
+ 									} }
+-									units={ hasUnits ? units : false }
++									units={ hasUnits ? units : [] }
+ 								/>
+ 							</FlexItem>
+ 							{ withReset && (
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 637737b81578a3..6331cd9b7d5d56 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -163,7 +163,7 @@ export { Truncate as __experimentalTruncate } from './truncate';
+ export {
+ 	default as __experimentalUnitControl,
+ 	useCustomUnits as __experimentalUseCustomUnits,
+-	parseUnit as __experimentalParseUnit,
++	parseQuantityAndUnitFromRawValue as __experimentalParseQuantityAndUnitFromRawValue,
+ } from './unit-control';
+ export { View as __experimentalView } from './view';
+ export { VisuallyHidden } from './visually-hidden';
+diff --git a/packages/components/src/unit-control/README.md b/packages/components/src/unit-control/README.md
+index 9f12b2c6df2e9e..f9aab741f18a97 100644
+--- a/packages/components/src/unit-control/README.md
++++ b/packages/components/src/unit-control/README.md
+@@ -96,7 +96,7 @@ Example:
+ 
+ -   Required: No
+ 
+-### `units`: `WPUnitControlUnitList`
++### `units`: `WPUnitControlUnit[]`
+ 
+ Collection of available units.
+ 
+diff --git a/packages/components/src/unit-control/index.native.js b/packages/components/src/unit-control/index.native.js
+index b45f1c84e06792..d6f63f0a98447c 100644
+--- a/packages/components/src/unit-control/index.native.js
++++ b/packages/components/src/unit-control/index.native.js
+@@ -16,7 +16,7 @@ import RangeCell from '../mobile/bottom-sheet/range-cell';
+ import StepperCell from '../mobile/bottom-sheet/stepper-cell';
+ import Picker from '../mobile/picker';
+ import styles from './style.scss';
+-import { CSS_UNITS, hasUnits, parseA11yLabelForUnit } from './utils';
++import { CSS_UNITS, hasUnits, getAccessibleLabelForUnit } from './utils';
+ 
+ /**
+  * WordPress dependencies
+@@ -116,6 +116,8 @@ function UnitControl( {
+ 	};
+ 
+ 	const renderUnitPicker = useCallback( () => {
++		// Keeping for legacy reasons, although `false` should not be a valid
++		// value for the `units` prop anymore.
+ 		if ( units === false ) {
+ 			return null;
+ 		}
+@@ -164,7 +166,7 @@ function UnitControl( {
+ 					shouldDisplayTextInput
+ 					decimalNum={ decimalNum }
+ 					openUnitPicker={ onPickerPresent }
+-					unitLabel={ parseA11yLabelForUnit( unit ) }
++					unitLabel={ getAccessibleLabelForUnit( unit ) }
+ 					{ ...props }
+ 				>
+ 					{ renderUnitPicker() }
+@@ -182,7 +184,7 @@ function UnitControl( {
+ 					separatorType={ separatorType }
+ 					decimalNum={ decimalNum }
+ 					openUnitPicker={ onPickerPresent }
+-					unitLabel={ parseA11yLabelForUnit( unit ) }
++					unitLabel={ getAccessibleLabelForUnit( unit ) }
+ 					{ ...props }
+ 				>
+ 					{ renderUnitPicker() }
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index abb116ccc329ac..a686efbb1a5f78 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -6,6 +6,7 @@ import type {
+ 	KeyboardEvent,
+ 	ForwardedRef,
+ 	SyntheticEvent,
++	ChangeEvent,
+ } from 'react';
+ import { noop, omit } from 'lodash';
+ import classnames from 'classnames';
+@@ -27,9 +28,9 @@ import { Root, ValueInput } from './styles/unit-control-styles';
+ import UnitSelectControl from './unit-select-control';
+ import {
+ 	CSS_UNITS,
+-	getParsedValue,
++	getParsedQuantityAndUnit,
+ 	getUnitsWithCurrentUnit,
+-	getValidParsedUnit,
++	getValidParsedQuantityAndUnit,
+ } from './utils';
+ import { useControlledState } from '../utils/hooks';
+ import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
+@@ -57,33 +58,46 @@ function UnitControl(
+ 	}: WordPressComponentProps< UnitControlProps, 'input', false >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
++	// The `value` prop, in theory, should not be `null`, but the following line
++	// ensures it fallback to `undefined` in case a consumer of `UnitControl`
++	// still passes `null` as a `value`.
++	const nonNullValueProp = valueProp ?? undefined;
+ 	const units = useMemo(
+-		() => getUnitsWithCurrentUnit( valueProp, unitProp, unitsProp ),
+-		[ valueProp, unitProp, unitsProp ]
++		() => getUnitsWithCurrentUnit( nonNullValueProp, unitProp, unitsProp ),
++		[ nonNullValueProp, unitProp, unitsProp ]
+ 	);
+-	const [ value, initialUnit ] = getParsedValue( valueProp, unitProp, units );
++	const [ parsedQuantity, parsedUnit ] = getParsedQuantityAndUnit(
++		nonNullValueProp,
++		unitProp,
++		units
++	);
++
+ 	const [ unit, setUnit ] = useControlledState< string | undefined >(
+ 		unitProp,
+ 		{
+-			initial: initialUnit,
++			initial: parsedUnit,
+ 			fallback: '',
+ 		}
+ 	);
+ 
+ 	useEffect( () => {
+-		setUnit( initialUnit );
+-	}, [ initialUnit ] );
++		setUnit( parsedUnit );
++	}, [ parsedUnit ] );
+ 
+ 	// Stores parsed value for hand-off in state reducer.
+-	const refParsedValue = useRef< string | null >( null );
++	const refParsedQuantity = useRef< number | undefined >( undefined );
+ 
+ 	const classes = classnames( 'components-unit-control', className );
+ 
+-	const handleOnChange: UnitControlOnChangeCallback = (
+-		next,
+-		changeProps
++	const handleOnQuantityChange = (
++		nextQuantityValue: number | string | undefined,
++		changeProps: { event: ChangeEvent< HTMLInputElement > }
+ 	) => {
+-		if ( next === '' ) {
++		if (
++			nextQuantityValue === '' ||
++			typeof nextQuantityValue === 'undefined' ||
++			nextQuantityValue === null
++		) {
+ 			onChange( '', changeProps );
+ 			return;
+ 		}
+@@ -92,53 +106,64 @@ function UnitControl(
+ 		 * Customizing the onChange callback.
+ 		 * This allows as to broadcast a combined value+unit to onChange.
+ 		 */
+-		next = getValidParsedUnit( next, units, value, unit ).join( '' );
++		const onChangeValue = getValidParsedQuantityAndUnit(
++			nextQuantityValue,
++			units,
++			parsedQuantity,
++			unit
++		).join( '' );
+ 
+-		onChange( next, changeProps );
++		onChange( onChangeValue, changeProps );
+ 	};
+ 
+ 	const handleOnUnitChange: UnitControlOnChangeCallback = (
+-		next,
++		nextUnitValue,
+ 		changeProps
+ 	) => {
+ 		const { data } = changeProps;
+ 
+-		let nextValue = `${ value }${ next }`;
++		let nextValue = `${ parsedQuantity ?? '' }${ nextUnitValue }`;
+ 
+ 		if ( isResetValueOnUnitChange && data?.default !== undefined ) {
+-			nextValue = `${ data.default }${ next }`;
++			nextValue = `${ data.default }${ nextUnitValue }`;
+ 		}
+ 
+ 		onChange( nextValue, changeProps );
+-		onUnitChange( next, changeProps );
++		onUnitChange( nextUnitValue, changeProps );
+ 
+-		setUnit( next );
++		setUnit( nextUnitValue );
+ 	};
+ 
+ 	const mayUpdateUnit = ( event: SyntheticEvent< HTMLInputElement > ) => {
+ 		if ( ! isNaN( Number( event.currentTarget.value ) ) ) {
+-			refParsedValue.current = null;
++			refParsedQuantity.current = undefined;
+ 			return;
+ 		}
+-		const [ parsedValue, parsedUnit ] = getValidParsedUnit(
++		const [
++			validParsedQuantity,
++			validParsedUnit,
++		] = getValidParsedQuantityAndUnit(
+ 			event.currentTarget.value,
+ 			units,
+-			value,
++			parsedQuantity,
+ 			unit
+ 		);
+ 
+-		refParsedValue.current = parsedValue.toString();
++		refParsedQuantity.current = validParsedQuantity;
+ 
+-		if ( isPressEnterToChange && parsedUnit !== unit ) {
++		if ( isPressEnterToChange && validParsedUnit !== unit ) {
+ 			const data = Array.isArray( units )
+-				? units.find( ( option ) => option.value === parsedUnit )
++				? units.find( ( option ) => option.value === validParsedUnit )
+ 				: undefined;
+ 			const changeProps = { event, data };
+ 
+-			onChange( `${ parsedValue }${ parsedUnit }`, changeProps );
+-			onUnitChange( parsedUnit, changeProps );
++			onChange(
++				`${ validParsedQuantity ?? '' }${ validParsedUnit }`,
++				changeProps
++			);
++			onUnitChange( validParsedUnit, changeProps );
+ 
+-			setUnit( parsedUnit );
++			setUnit( validParsedUnit );
+ 		}
+ 	};
+ 
+@@ -167,9 +192,9 @@ function UnitControl(
+ 		 * then use that result to update the state.
+ 		 */
+ 		if ( action.type === inputControlActionTypes.COMMIT ) {
+-			if ( refParsedValue.current !== null ) {
+-				state.value = refParsedValue.current;
+-				refParsedValue.current = null;
++			if ( refParsedQuantity.current !== undefined ) {
++				state.value = ( refParsedQuantity.current ?? '' ).toString();
++				refParsedQuantity.current = undefined;
+ 			}
+ 		}
+ 
+@@ -213,11 +238,11 @@ function UnitControl(
+ 				label={ label }
+ 				onBlur={ handleOnBlur }
+ 				onKeyDown={ handleOnKeyDown }
+-				onChange={ handleOnChange }
++				onChange={ handleOnQuantityChange }
+ 				ref={ forwardedRef }
+ 				size={ size }
+ 				suffix={ inputSuffix }
+-				value={ value }
++				value={ parsedQuantity ?? '' }
+ 				step={ step }
+ 				__unstableStateReducer={ composeStateReducers(
+ 					unitControlStateReducer,
+@@ -246,5 +271,5 @@ function UnitControl(
+  */
+ const ForwardedUnitControl = forwardRef( UnitControl );
+ 
+-export { parseUnit, useCustomUnits } from './utils';
++export { parseQuantityAndUnitFromRawValue, useCustomUnits } from './utils';
+ export default ForwardedUnitControl;
+diff --git a/packages/components/src/unit-control/test/index.js b/packages/components/src/unit-control/test/index.js
+index fef9814e6a2d5c..230f516e4ec5ae 100644
+--- a/packages/components/src/unit-control/test/index.js
++++ b/packages/components/src/unit-control/test/index.js
+@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import UnitControl from '../';
+-import { parseUnit } from '../utils';
++import { parseQuantityAndUnitFromRawValue } from '../utils';
+ 
+ const getComponent = () =>
+ 	document.body.querySelector( '.components-unit-control' );
+@@ -33,7 +33,9 @@ const ControlledSyncUnits = () => {
+ 	// Keep the unit sync'd between the two `UnitControl` instances.
+ 	const onUnitControlChange = ( fieldName, newValue ) => {
+ 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+-		const [ quantity, newUnit ] = parseUnit( newValue );
++		const [ quantity, newUnit ] = parseQuantityAndUnitFromRawValue(
++			newValue
++		);
+ 
+ 		if ( ! Number.isFinite( quantity ) ) {
+ 			return;
+@@ -42,7 +44,10 @@ const ControlledSyncUnits = () => {
+ 		const nextState = { ...state, [ fieldName ]: newValue };
+ 
+ 		Object.entries( state ).forEach( ( [ stateProp, stateValue ] ) => {
+-			const [ stateQuantity, stateUnit ] = parseUnit( stateValue );
++			const [
++				stateQuantity,
++				stateUnit,
++			] = parseQuantityAndUnitFromRawValue( stateValue );
+ 
+ 			if ( stateProp !== fieldName && stateUnit !== newUnit ) {
+ 				nextState[ stateProp ] = `${ stateQuantity }${ newUnit }`;
+@@ -88,7 +93,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should not render select, if units are disabled', () => {
+-			render( <UnitControl unit="em" units={ false } /> );
++			render( <UnitControl unit="em" units={ [] } /> );
+ 			const input = getInput();
+ 			const select = getSelect();
+ 
+diff --git a/packages/components/src/unit-control/test/utils.js b/packages/components/src/unit-control/test/utils.js
+index ae4b01048e5c40..b5fe385716dedf 100644
+--- a/packages/components/src/unit-control/test/utils.js
++++ b/packages/components/src/unit-control/test/utils.js
+@@ -4,7 +4,7 @@
+ import {
+ 	filterUnitsWithSettings,
+ 	useCustomUnits,
+-	getValidParsedUnit,
++	getValidParsedQuantityAndUnit,
+ 	getUnitsWithCurrentUnit,
+ } from '../utils';
+ 
+@@ -34,7 +34,27 @@ describe( 'UnitControl utils', () => {
+ 			] );
+ 		} );
+ 
+-		it( 'should return `false` where availableUnits match no preferred css units', () => {
++		it( 'should add default values to available units even if the default values are strings', () => {
++			// Although the public APIs of the component expect a `number` as the type of the
++			// default values, it's still good to test for strings (as it can happen in un-typed
++			// environments)
++			const cssUnits = [ { value: 'px' }, { value: '%' } ];
++			const units = useCustomUnits( {
++				availableUnits: [ '%', 'px' ],
++				defaultValues: {
++					'%': '14',
++					px: 'not a valid numeric quantity',
++				},
++				units: cssUnits,
++			} );
++
++			expect( units ).toEqual( [
++				{ value: 'px', default: undefined },
++				{ value: '%', default: 14 },
++			] );
++		} );
++
++		it( 'should return an empty array where availableUnits match no preferred css units', () => {
+ 			const cssUnits = [ { value: 'em' }, { value: 'vh' } ];
+ 			const units = useCustomUnits( {
+ 				availableUnits: [ '%', 'px' ],
+@@ -42,7 +62,7 @@ describe( 'UnitControl utils', () => {
+ 				units: cssUnits,
+ 			} );
+ 
+-			expect( units ).toBe( false );
++			expect( units ).toHaveLength( 0 );
+ 		} );
+ 	} );
+ 
+@@ -65,6 +85,8 @@ describe( 'UnitControl utils', () => {
+ 			).toEqual( [] );
+ 		} );
+ 
++		// Although the component's APIs and types don't allow for `false` as a value
++		// unit lists, it's good to keep this test around for backwards compat.
+ 		it( 'should return empty array where available units is set to false', () => {
+ 			const preferredUnits = [ '%', 'px' ];
+ 			const availableUnits = false;
+@@ -73,19 +95,31 @@ describe( 'UnitControl utils', () => {
+ 				filterUnitsWithSettings( preferredUnits, availableUnits )
+ 			).toEqual( [] );
+ 		} );
++
++		it( 'should return empty array where available units is set to an empty array', () => {
++			const preferredUnits = [ '%', 'px' ];
++			const availableUnits = [];
++
++			expect(
++				filterUnitsWithSettings( preferredUnits, availableUnits )
++			).toEqual( [] );
++		} );
+ 	} );
+ 
+-	describe( 'getValidParsedUnit', () => {
++	describe( 'getValidParsedQuantityAndUnit', () => {
+ 		it( 'should parse valid number and unit', () => {
+ 			const nextValue = '42px';
+ 
+-			expect( getValidParsedUnit( nextValue ) ).toEqual( [ 42, 'px' ] );
++			expect( getValidParsedQuantityAndUnit( nextValue ) ).toEqual( [
++				42,
++				'px',
++			] );
+ 		} );
+ 
+ 		it( 'should return next value only where no known unit parsed', () => {
+ 			const nextValue = '365zz';
+ 
+-			expect( getValidParsedUnit( nextValue ) ).toEqual( [
++			expect( getValidParsedQuantityAndUnit( nextValue ) ).toEqual( [
+ 				365,
+ 				undefined,
+ 			] );
+@@ -97,7 +131,11 @@ describe( 'UnitControl utils', () => {
+ 			const fallbackValue = 13;
+ 
+ 			expect(
+-				getValidParsedUnit( nextValue, preferredUnits, fallbackValue )
++				getValidParsedQuantityAndUnit(
++					nextValue,
++					preferredUnits,
++					fallbackValue
++				)
+ 			).toEqual( [ 13, 'em' ] );
+ 		} );
+ 
+@@ -106,7 +144,7 @@ describe( 'UnitControl utils', () => {
+ 			const fallbackUnit = '%';
+ 
+ 			expect(
+-				getValidParsedUnit(
++				getValidParsedQuantityAndUnit(
+ 					nextValue,
+ 					undefined,
+ 					undefined,
+@@ -119,10 +157,9 @@ describe( 'UnitControl utils', () => {
+ 			const nextValue = 101;
+ 			const preferredUnits = [ { value: 'px' } ];
+ 
+-			expect( getValidParsedUnit( nextValue, preferredUnits ) ).toEqual( [
+-				101,
+-				'px',
+-			] );
++			expect(
++				getValidParsedQuantityAndUnit( nextValue, preferredUnits )
++			).toEqual( [ 101, 'px' ] );
+ 		} );
+ 	} );
+ 
+@@ -139,7 +176,11 @@ describe( 'UnitControl utils', () => {
+ 		];
+ 
+ 		it( 'should return units list with valid current unit prepended', () => {
+-			const result = getUnitsWithCurrentUnit( '20%', null, limitedUnits );
++			const result = getUnitsWithCurrentUnit(
++				'20%',
++				undefined,
++				limitedUnits
++			);
+ 
+ 			expect( result ).toHaveLength( 3 );
+ 
+@@ -163,7 +204,7 @@ describe( 'UnitControl utils', () => {
+ 		it( 'should return units list without invalid current unit prepended', () => {
+ 			const result = getUnitsWithCurrentUnit(
+ 				'20null',
+-				null,
++				undefined,
+ 				limitedUnits
+ 			);
+ 
+@@ -174,7 +215,7 @@ describe( 'UnitControl utils', () => {
+ 		it( 'should return units list without an existing current unit prepended', () => {
+ 			const result = getUnitsWithCurrentUnit(
+ 				'20em',
+-				null,
++				undefined,
+ 				limitedUnits
+ 			);
+ 
+diff --git a/packages/components/src/unit-control/types.ts b/packages/components/src/unit-control/types.ts
+index 0cbebf4dd2ce03..83a381dc2b4cb2 100644
+--- a/packages/components/src/unit-control/types.ts
++++ b/packages/components/src/unit-control/types.ts
+@@ -12,8 +12,6 @@ import type {
+ 	Size as InputSize,
+ } from '../input-control/types';
+ 
+-export type Value = number | string;
+-
+ export type SelectSize = InputSize;
+ 
+ export type WPUnitControlUnit = {
+@@ -26,9 +24,9 @@ export type WPUnitControlUnit = {
+ 	 */
+ 	label: string;
+ 	/**
+-	 * Default value for the unit, used when switching units.
++	 * Default value (quantity) for the unit, used when switching units.
+ 	 */
+-	default?: Value;
++	default?: number;
+ 	/**
+ 	 * An accessible label used by screen readers.
+ 	 */
+@@ -39,8 +37,6 @@ export type WPUnitControlUnit = {
+ 	step?: number;
+ };
+ 
+-export type WPUnitControlUnitList = Array< WPUnitControlUnit > | false;
+-
+ export type UnitControlOnChangeCallback = InputChangeCallback<
+ 	SyntheticEvent< HTMLSelectElement | HTMLInputElement >,
+ 	{ data?: WPUnitControlUnit }
+@@ -74,9 +70,10 @@ export type UnitSelectControlProps = {
+ 	 *
+ 	 * @default CSS_UNITS
+ 	 */
+-	units?: WPUnitControlUnitList;
++	units?: WPUnitControlUnit[];
+ };
+ 
++// TODO: when available, should (partially) extend `NumberControl` props.
+ export type UnitControlProps = UnitSelectControlProps & {
+ 	__unstableStateReducer?: StateReducer;
+ 	__unstableInputWidth?: CSSProperties[ 'width' ];
+@@ -114,5 +111,5 @@ export type UnitControlProps = UnitSelectControlProps & {
+ 	 * Current value. If passed as a string, the current unit will be inferred from this value.
+ 	 * For example, a `value` of "50%" will set the current unit to `%`.
+ 	 */
+-	value: Value;
++	value?: string | number;
+ };
+diff --git a/packages/components/src/unit-control/unit-select-control.tsx b/packages/components/src/unit-control/unit-select-control.tsx
+index c1980b9c564602..775c032db8f632 100644
+--- a/packages/components/src/unit-control/unit-select-control.tsx
++++ b/packages/components/src/unit-control/unit-select-control.tsx
+@@ -22,7 +22,7 @@ export default function UnitSelectControl( {
+ 	units = CSS_UNITS,
+ 	...props
+ }: WordPressComponentProps< UnitSelectControlProps, 'select', false > ) {
+-	if ( ! units || ! hasUnits( units ) || units?.length === 1 ) {
++	if ( ! hasUnits( units ) || units?.length === 1 ) {
+ 		return (
+ 			<UnitLabel
+ 				className="components-unit-control__unit-label"
+diff --git a/packages/components/src/unit-control/utils.ts b/packages/components/src/unit-control/utils.ts
+index 5a03de790b08bf..87c0142ec9774c 100644
+--- a/packages/components/src/unit-control/utils.ts
++++ b/packages/components/src/unit-control/utils.ts
+@@ -7,7 +7,7 @@ import { Platform } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { Value, WPUnitControlUnit, WPUnitControlUnitList } from './types';
++import type { WPUnitControlUnit } from './types';
+ 
+ const isWeb = Platform.OS === 'web';
+ 
+@@ -15,105 +15,90 @@ const allUnits: Record< string, WPUnitControlUnit > = {
+ 	px: {
+ 		value: 'px',
+ 		label: isWeb ? 'px' : __( 'Pixels (px)' ),
+-		default: '',
+ 		a11yLabel: __( 'Pixels (px)' ),
+ 		step: 1,
+ 	},
+ 	'%': {
+ 		value: '%',
+ 		label: isWeb ? '%' : __( 'Percentage (%)' ),
+-		default: '',
+ 		a11yLabel: __( 'Percent (%)' ),
+ 		step: 0.1,
+ 	},
+ 	em: {
+ 		value: 'em',
+ 		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
+-		default: '',
+ 		a11yLabel: _x( 'ems', 'Relative to parent font size (em)' ),
+ 		step: 0.01,
+ 	},
+ 	rem: {
+ 		value: 'rem',
+ 		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
+-		default: '',
+ 		a11yLabel: _x( 'rems', 'Relative to root font size (rem)' ),
+ 		step: 0.01,
+ 	},
+ 	vw: {
+ 		value: 'vw',
+ 		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
+-		default: '',
+ 		a11yLabel: __( 'Viewport width (vw)' ),
+ 		step: 0.1,
+ 	},
+ 	vh: {
+ 		value: 'vh',
+ 		label: isWeb ? 'vh' : __( 'Viewport height (vh)' ),
+-		default: '',
+ 		a11yLabel: __( 'Viewport height (vh)' ),
+ 		step: 0.1,
+ 	},
+ 	vmin: {
+ 		value: 'vmin',
+ 		label: isWeb ? 'vmin' : __( 'Viewport smallest dimension (vmin)' ),
+-		default: '',
+ 		a11yLabel: __( 'Viewport smallest dimension (vmin)' ),
+ 		step: 0.1,
+ 	},
+ 	vmax: {
+ 		value: 'vmax',
+ 		label: isWeb ? 'vmax' : __( 'Viewport largest dimension (vmax)' ),
+-		default: '',
+ 		a11yLabel: __( 'Viewport largest dimension (vmax)' ),
+ 		step: 0.1,
+ 	},
+ 	ch: {
+ 		value: 'ch',
+ 		label: isWeb ? 'ch' : __( 'Width of the zero (0) character (ch)' ),
+-		default: '',
+ 		a11yLabel: __( 'Width of the zero (0) character (ch)' ),
+ 		step: 0.01,
+ 	},
+ 	ex: {
+ 		value: 'ex',
+ 		label: isWeb ? 'ex' : __( 'x-height of the font (ex)' ),
+-		default: '',
+ 		a11yLabel: __( 'x-height of the font (ex)' ),
+ 		step: 0.01,
+ 	},
+ 	cm: {
+ 		value: 'cm',
+ 		label: isWeb ? 'cm' : __( 'Centimeters (cm)' ),
+-		default: '',
+ 		a11yLabel: __( 'Centimeters (cm)' ),
+ 		step: 0.001,
+ 	},
+ 	mm: {
+ 		value: 'mm',
+ 		label: isWeb ? 'mm' : __( 'Millimeters (mm)' ),
+-		default: '',
+ 		a11yLabel: __( 'Millimeters (mm)' ),
+ 		step: 0.1,
+ 	},
+ 	in: {
+ 		value: 'in',
+ 		label: isWeb ? 'in' : __( 'Inches (in)' ),
+-		default: '',
+ 		a11yLabel: __( 'Inches (in)' ),
+ 		step: 0.001,
+ 	},
+ 	pc: {
+ 		value: 'pc',
+ 		label: isWeb ? 'pc' : __( 'Picas (pc)' ),
+-		default: '',
+ 		a11yLabel: __( 'Picas (pc)' ),
+ 		step: 1,
+ 	},
+ 	pt: {
+ 		value: 'pt',
+ 		label: isWeb ? 'pt' : __( 'Points (pt)' ),
+-		default: '',
+ 		a11yLabel: __( 'Points (pt)' ),
+ 		step: 1,
+ 	},
+@@ -145,130 +130,148 @@ export const DEFAULT_UNIT = allUnits.px;
+  * Moving forward, ideally the value should be a string that contains both
+  * the value and unit, example: '10px'
+  *
+- * @param  value Value
+- * @param  unit  Unit value
+- * @param  units Units to derive from.
+- * @return The extracted number and unit.
++ * @param  rawValue     The raw value as a string (may or may not contain the unit)
++ * @param  fallbackUnit The unit used as a fallback, if not unit is detected in the `value`
++ * @param  allowedUnits Units to derive from.
++ * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value
++ * could not be parsed to a number correctly. The unit can be `undefined` in case the unit parse
++ * from the raw value could not be matched against the list of allowed units.
+  */
+-export function getParsedValue(
+-	value: Value,
+-	unit?: string,
+-	units?: WPUnitControlUnitList
+-): [ Value, string | undefined ] {
+-	const initialValue = unit ? `${ value }${ unit }` : value;
++export function getParsedQuantityAndUnit(
++	rawValue?: string | number,
++	fallbackUnit?: string,
++	allowedUnits?: WPUnitControlUnit[]
++): [ number | undefined, string | undefined ] {
++	const initialValue = fallbackUnit
++		? `${ rawValue ?? '' }${ fallbackUnit }`
++		: rawValue;
+ 
+-	return parseUnit( initialValue, units );
++	return parseQuantityAndUnitFromRawValue( initialValue, allowedUnits );
+ }
+ 
+ /**
+  * Checks if units are defined.
+  *
+- * @param  units Units to check.
+- * @return Whether units are defined.
++ * @param  units List of units.
++ * @return Whether the list actually contains any units.
+  */
+-export function hasUnits( units: WPUnitControlUnitList ): boolean {
++export function hasUnits( units?: WPUnitControlUnit[] ): boolean {
++	// Although the `isArray` check shouldn't be necessary (given the signature of
++	// this typed function), it's better to stay on the side of caution, since
++	// this function may be called from un-typed environments.
+ 	return Array.isArray( units ) && !! units.length;
+ }
+ 
+ /**
+- * Parses a number and unit from a value.
++ * Parses a quantity and unit from a raw string value, given a list of allowed
++ * units and otherwise falling back to the default unit.
+  *
+- * @param  initialValue Value to parse
+- * @param  units        Units to derive from.
+- * @return The extracted number and unit.
++ * @param  rawValue     The raw value as a string (may or may not contain the unit)
++ * @param  allowedUnits Units to derive from.
++ * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value
++ * could not be parsed to a number correctly. The unit can be `undefined` in case the unit parsed
++ * from the raw value could not be matched against the list of allowed units.
+  */
+-export function parseUnit(
+-	initialValue: Value | undefined,
+-	units: WPUnitControlUnitList = ALL_CSS_UNITS
+-): [ Value, string | undefined ] {
+-	const value = String( initialValue ).trim();
++export function parseQuantityAndUnitFromRawValue(
++	rawValue?: string | number,
++	allowedUnits: WPUnitControlUnit[] = ALL_CSS_UNITS
++): [ number | undefined, string | undefined ] {
++	let trimmedValue;
++	let quantityToReturn;
+ 
+-	let num: Value = parseFloat( value );
+-	num = isNaN( num ) ? '' : num;
+-
+-	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ );
+-
+-	let unit: string | undefined =
+-		unitMatch?.[ 1 ] !== undefined ? unitMatch[ 1 ] : '';
+-	unit = unit.toLowerCase();
++	if ( typeof rawValue !== 'undefined' || rawValue === null ) {
++		trimmedValue = `${ rawValue }`.trim();
++		const parsedQuantity = parseFloat( trimmedValue );
++		quantityToReturn = ! isFinite( parsedQuantity )
++			? undefined
++			: parsedQuantity;
++	}
+ 
+-	if ( hasUnits( units ) && units !== false ) {
+-		const match = units.find( ( item ) => item.value === unit );
+-		unit = match?.value;
++	const unitMatch = trimmedValue?.match( /[\d.\-\+]*\s*(.*)/ );
++	const matchedUnit = unitMatch?.[ 1 ]?.toLowerCase();
++	let unitToReturn: string | undefined;
++	if ( hasUnits( allowedUnits ) ) {
++		const match = allowedUnits.find(
++			( item ) => item.value === matchedUnit
++		);
++		unitToReturn = match?.value;
+ 	} else {
+-		unit = DEFAULT_UNIT.value;
++		unitToReturn = DEFAULT_UNIT.value;
+ 	}
+ 
+-	return [ num, unit ];
++	return [ quantityToReturn, unitToReturn ];
+ }
+ 
+ /**
+- * Parses a number and unit from a value. Validates parsed value, using fallback
++ * Parses quantity and unit from a raw value. Validates parsed value, using fallback
+  * value if invalid.
+  *
+- * @param  next          The next value.
+- * @param  units         Units to derive from.
+- * @param  fallbackValue The fallback value.
+- * @param  fallbackUnit  The fallback value.
+- * @return The extracted value and unit.
++ * @param  rawValue         The next value.
++ * @param  allowedUnits     Units to derive from.
++ * @param  fallbackQuantity The fallback quantity, used in case it's not possible to parse a valid quantity from the raw value.
++ * @param  fallbackUnit     The fallback unit, used in case it's not possible to parse a valid unit from the raw value.
++ * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value
++ * could not be parsed to a number correctly, and the `fallbackQuantity` was also `undefined`. The
++ * unit can be `undefined` only if the unit parsed from the raw value could not be matched against
++ * the list of allowed units, the `fallbackQuantity` is also `undefined` and the list of
++ * `allowedUnits` is passed empty.
+  */
+-export function getValidParsedUnit(
+-	next: Value | undefined,
+-	units: WPUnitControlUnitList,
+-	fallbackValue: Value,
+-	fallbackUnit: string | undefined
+-): [ Value, string | undefined ] {
+-	const [ parsedValue, parsedUnit ] = parseUnit( next, units );
+-	let baseValue = parsedValue;
+-	let baseUnit: string | undefined;
++export function getValidParsedQuantityAndUnit(
++	rawValue: string | number,
++	allowedUnits: WPUnitControlUnit[],
++	fallbackQuantity?: number,
++	fallbackUnit?: string
++): [ number | undefined, string | undefined ] {
++	const [ parsedQuantity, parsedUnit ] = parseQuantityAndUnitFromRawValue(
++		rawValue,
++		allowedUnits
++	);
+ 
+-	// The parsed value from `parseUnit` should now be either a
+-	// real number or an empty string. If not, use the fallback value.
+-	if ( ! Number.isFinite( parsedValue ) || parsedValue === '' ) {
+-		baseValue = fallbackValue;
+-	}
++	// The parsed value from `parseQuantityAndUnitFromRawValue` should now be
++	// either a real number or undefined. If undefined, use the fallback value.
++	const quantityToReturn = parsedQuantity ?? fallbackQuantity;
+ 
+-	baseUnit = parsedUnit || fallbackUnit;
++	// If no unit is parsed from the raw value, or if the fallback unit is not
++	// defined, use the first value from the list of allowed units as fallback.
++	let unitToReturn = parsedUnit || fallbackUnit;
+ 
+-	/**
+-	 * If no unit is found, attempt to use the first value from the collection
+-	 * of units as a default fallback.
+-	 */
+-	if ( Array.isArray( units ) && hasUnits( units ) && ! baseUnit ) {
+-		baseUnit = units[ 0 ]?.value;
++	if ( ! unitToReturn && hasUnits( allowedUnits ) ) {
++		unitToReturn = allowedUnits[ 0 ].value;
+ 	}
+ 
+-	return [ baseValue, baseUnit ];
++	return [ quantityToReturn, unitToReturn ];
+ }
+ 
+ /**
+  * Takes a unit value and finds the matching accessibility label for the
+  * unit abbreviation.
+  *
+- * @param  unit Unit value (example: px)
++ * @param  unit Unit value (example: `px`)
+  * @return a11y label for the unit abbreviation
+  */
+-export function parseA11yLabelForUnit( unit: string ): string | undefined {
++export function getAccessibleLabelForUnit( unit: string ): string | undefined {
+ 	const match = ALL_CSS_UNITS.find( ( item ) => item.value === unit );
+ 	return match?.a11yLabel ? match?.a11yLabel : match?.value;
+ }
+ 
+ /**
+- * Filters available units based on values defined by the unit setting/property.
++ * Filters available units based on values defined a list of allowed unit values.
+  *
+- * @param  unitSetting Collection of preferred unit value strings.
+- * @param  units       Collection of available unit objects.
+- *
+- * @return Filtered units based on settings.
++ * @param  allowedUnitValues Collection of allowed unit value strings.
++ * @param  availableUnits    Collection of available unit objects.
++ * @return Filtered units.
+  */
+ export function filterUnitsWithSettings(
+-	unitSetting: Array< string > = [],
+-	units: WPUnitControlUnitList
+-): Array< WPUnitControlUnit > {
+-	return Array.isArray( units )
+-		? units.filter( ( unit ) => {
+-				return unitSetting.includes( unit.value );
+-		  } )
++	allowedUnitValues: string[] = [],
++	availableUnits: WPUnitControlUnit[]
++): WPUnitControlUnit[] {
++	// Although the `isArray` check shouldn't be necessary (given the signature of
++	// this typed function), it's better to stay on the side of caution, since
++	// this function may be called from un-typed environments.
++	return Array.isArray( availableUnits )
++		? availableUnits.filter( ( unit ) =>
++				allowedUnitValues.includes( unit.value )
++		  )
+ 		: [];
+ }
+ 
+@@ -280,34 +283,38 @@ export function filterUnitsWithSettings(
+  * @param  args                An object containing units, settingPath & defaultUnits.
+  * @param  args.units          Collection of all potentially available units.
+  * @param  args.availableUnits Collection of unit value strings for filtering available units.
+- * @param  args.defaultValues  Collection of default values for defined units. Example: { px: '350', em: '15' }.
++ * @param  args.defaultValues  Collection of default values for defined units. Example: `{ px: 350, em: 15 }`.
+  *
+- * @return Filtered units based on settings.
++ * @return Filtered list of units, with their default values updated following the `defaultValues`
++ * argument's property.
+  */
+ export const useCustomUnits = ( {
+-	units,
+-	availableUnits,
++	units = ALL_CSS_UNITS,
++	availableUnits = [],
+ 	defaultValues,
+ }: {
+-	units?: WPUnitControlUnitList;
+-	availableUnits?: Array< string >;
+-	defaultValues: Record< string, Value >;
+-} ): WPUnitControlUnitList => {
+-	units = units || ALL_CSS_UNITS;
+-	const usedUnits = filterUnitsWithSettings(
+-		! availableUnits ? [] : availableUnits,
++	units?: WPUnitControlUnit[];
++	availableUnits?: string[];
++	defaultValues: Record< string, number >;
++} ): WPUnitControlUnit[] => {
++	const customUnitsToReturn = filterUnitsWithSettings(
++		availableUnits,
+ 		units
+ 	);
+ 
+ 	if ( defaultValues ) {
+-		usedUnits.forEach( ( unit, i ) => {
++		customUnitsToReturn.forEach( ( unit, i ) => {
+ 			if ( defaultValues[ unit.value ] ) {
+-				usedUnits[ i ].default = defaultValues[ unit.value ];
++				const [ parsedDefaultValue ] = parseQuantityAndUnitFromRawValue(
++					defaultValues[ unit.value ]
++				);
++
++				customUnitsToReturn[ i ].default = parsedDefaultValue;
+ 			}
+ 		} );
+ 	}
+ 
+-	return usedUnits.length === 0 ? false : usedUnits;
++	return customUnitsToReturn;
+ };
+ 
+ /**
+@@ -318,36 +325,32 @@ export const useCustomUnits = ( {
+  * accurately displayed in the UI, even if the intention is to hide
+  * the availability of that unit.
+  *
+- * @param  currentValue Selected value to parse.
+- * @param  legacyUnit   Legacy unit value, if currentValue needs it appended.
+- * @param  units        List of available units.
++ * @param  rawValue   Selected value to parse.
++ * @param  legacyUnit Legacy unit value, if rawValue needs it appended.
++ * @param  units      List of available units.
+  *
+  * @return A collection of units containing the unit for the current value.
+  */
+ export function getUnitsWithCurrentUnit(
+-	currentValue: Value,
+-	legacyUnit: string | undefined,
+-	units: WPUnitControlUnitList = ALL_CSS_UNITS
+-): WPUnitControlUnitList {
+-	if ( ! Array.isArray( units ) ) {
+-		return units;
+-	}
+-
+-	const unitsWithCurrentUnit = [ ...units ];
+-	const [ , currentUnit ] = getParsedValue(
+-		currentValue,
++	rawValue?: string | number,
++	legacyUnit?: string,
++	units: WPUnitControlUnit[] = ALL_CSS_UNITS
++): WPUnitControlUnit[] {
++	const unitsToReturn = Array.isArray( units ) ? [ ...units ] : [];
++	const [ , currentUnit ] = getParsedQuantityAndUnit(
++		rawValue,
+ 		legacyUnit,
+ 		ALL_CSS_UNITS
+ 	);
+ 
+ 	if (
+ 		currentUnit &&
+-		! unitsWithCurrentUnit.some( ( unit ) => unit.value === currentUnit )
++		! unitsToReturn.some( ( unit ) => unit.value === currentUnit )
+ 	) {
+ 		if ( allUnits[ currentUnit ] ) {
+-			unitsWithCurrentUnit.unshift( allUnits[ currentUnit ] );
++			unitsToReturn.unshift( allUnits[ currentUnit ] );
+ 		}
+ 	}
+ 
+-	return unitsWithCurrentUnit;
++	return unitsToReturn;
+ }

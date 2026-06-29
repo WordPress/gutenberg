@@ -1,0 +1,93 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 927b1a12cee4c3..b23d024a724dd1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,8 @@
+ 
+ -   `DimensionControl`: Deprecate 36px default size ([#66705](https://github.com/WordPress/gutenberg/pull/66705)).
+ -   `TextControl`: Deprecate 36px default size ([#66745](https://github.com/WordPress/gutenberg/pull/66745).
++-   `FontSizePicker`: Deprecate 36px default size ([#66920](https://github.com/WordPress/gutenberg/pull/66920)).
++-   `ComboboxControl`: Deprecate 36px default size ([#66900](https://github.com/WordPress/gutenberg/pull/66900)).
+ 
+ ### Bug Fixes
+ 
+@@ -30,7 +32,6 @@
+ ### Deprecations
+ 
+ -   `Radio`: Deprecate 36px default size ([#66572](https://github.com/WordPress/gutenberg/pull/66572)).
+--   `ComboboxControl`: Deprecate 36px default size ([#66900](https://github.com/WordPress/gutenberg/pull/66900)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index 5d7fe2b39a7373..39d916c0c7b212 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -29,6 +29,7 @@ const MyFontSizePicker = () => {
+ 
+ 	return (
+ 		<FontSizePicker
++			__next40pxDefaultSize
+ 			fontSizes={ fontSizes }
+ 			value={ fontSize }
+ 			fallbackFontSize={ fallbackFontSize }
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index f93a09440a0688..d4e8ea29fc6c4f 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -35,6 +35,7 @@ import { Spacer } from '../spacer';
+ import FontSizePickerSelect from './font-size-picker-select';
+ import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
+ import { T_SHIRT_NAMES } from './constants';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
+ 
+@@ -123,6 +124,12 @@ const UnforwardedFontSizePicker = (
+ 		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
+ 	const isDisabled = value === undefined;
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'FontSizePicker',
++		__next40pxDefaultSize,
++		size,
++	} );
++
+ 	return (
+ 		<Container ref={ ref } className="components-font-size-picker">
+ 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
+diff --git a/packages/components/src/font-size-picker/stories/index.story.tsx b/packages/components/src/font-size-picker/stories/index.story.tsx
+index eec8f5173d9655..a0d83756ca1ec9 100644
+--- a/packages/components/src/font-size-picker/stories/index.story.tsx
++++ b/packages/components/src/font-size-picker/stories/index.story.tsx
+@@ -66,6 +66,7 @@ const TwoFontSizePickersWithState: StoryFn< typeof FontSizePicker > = ( {
+ export const Default: StoryFn< typeof FontSizePicker > =
+ 	FontSizePickerWithState.bind( {} );
+ Default.args = {
++	__next40pxDefaultSize: true,
+ 	disableCustomFontSizes: false,
+ 	fontSizes: [
+ 		{
+diff --git a/packages/components/src/font-size-picker/test/index.tsx b/packages/components/src/font-size-picker/test/index.tsx
+index e7205e57eefaa6..34e8ce17c67fa6 100644
+--- a/packages/components/src/font-size-picker/test/index.tsx
++++ b/packages/components/src/font-size-picker/test/index.tsx
+@@ -8,13 +8,17 @@ import { render } from '@ariakit/test/react';
+ /**
+  * Internal dependencies
+  */
+-import FontSizePicker from '../';
++import _FontSizePicker from '../';
+ import type { FontSize } from '../types';
+ /**
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
+ 
++const FontSizePicker = (
++	props: React.ComponentProps< typeof _FontSizePicker >
++) => <_FontSizePicker __next40pxDefaultSize { ...props } />;
++
+ const ControlledFontSizePicker = ( {
+ 	onChange,
+ 	...props

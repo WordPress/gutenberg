@@ -1,0 +1,376 @@
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+index 43f102e6ee0493..3a56435011a859 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+@@ -4,6 +4,11 @@
+ // eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ 
++/**
++ * WordPress dependencies
++ */
++import { useEffect } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+@@ -36,24 +41,30 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 			await Promise.resolve();
+ 			const state = store.getState();
+ 
++			const option = options.find( ( item ) => item.name === nextValue );
++
+ 			const changeObject = {
+ 				highlightedIndex: state.renderedItems.findIndex(
+ 					( item ) => item.value === nextValue
+ 				),
+ 				inputValue: '',
+ 				isOpen: state.open,
+-				selectedItem: {
+-					name: nextValue as string,
+-					key: nextValue as string,
+-				},
++				selectedItem: option!,
+ 				type: '',
+ 			};
+ 			onChange( changeObject );
+ 		},
+ 	} );
+ 
++	useEffect( () => {
++		if ( value ) {
++			store.setValue( value.name );
++		}
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++	}, [] );
++
+ 	const children = options.map(
+-		( { name, key, __experimentalHint, ...rest } ) => {
++		( { name, key, __experimentalHint, style, className } ) => {
+ 			const withHint = (
+ 				<Styled.WithHintWrapper>
+ 					<span>{ name }</span>
+@@ -68,7 +79,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 					key={ key }
+ 					value={ name }
+ 					children={ __experimentalHint ? withHint : name }
+-					{ ...rest }
++					style={ style }
++					className={ className }
+ 				/>
+ 			);
+ 		}
+@@ -121,4 +133,15 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 	);
+ }
+ 
+-export default CustomSelectControl;
++export function ClassicCustomSelectControlV2Adapter(
++	props: LegacyCustomSelectProps
++) {
++	return (
++		<CustomSelectControl
++			__experimentalShowSelectedHint={ false }
++			{ ...props }
++		/>
++	);
++}
++
++export default ClassicCustomSelectControlV2Adapter;
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+index 825a9b63464ca4..c0b96a27bd1c1d 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+@@ -14,7 +14,11 @@ import { useState } from '@wordpress/element';
+  */
+ import UncontrolledCustomSelectControl from '..';
+ 
+-const customClass = 'amber-skies';
++const className = 'amber-skies';
++const style = {
++	backgroundColor: 'rgb(127, 255, 212)',
++	rotate: '13deg',
++};
+ 
+ const legacyProps = {
+ 	label: 'label!',
+@@ -26,7 +30,7 @@ const legacyProps = {
+ 		{
+ 			key: 'flower2',
+ 			name: 'crimson clover',
+-			className: customClass,
++			className,
+ 		},
+ 		{
+ 			key: 'flower3',
+@@ -35,15 +39,20 @@ const legacyProps = {
+ 		{
+ 			key: 'color1',
+ 			name: 'amber',
+-			className: customClass,
++			className,
+ 		},
+ 		{
+ 			key: 'color2',
+ 			name: 'aquamarine',
+-			style: {
+-				backgroundColor: 'rgb(127, 255, 212)',
+-				rotate: '13deg',
+-			},
++			style,
++		},
++		{
++			key: 'aquarela-key',
++			name: 'aquarela',
++			className,
++			style,
++			customPropFoo: 'foo',
++			customPropBar: 30,
+ 		},
+ 	],
+ };
+@@ -53,7 +62,9 @@ const ControlledCustomSelectControl = ( {
+ 	onChange,
+ 	...restProps
+ }: React.ComponentProps< typeof UncontrolledCustomSelectControl > ) => {
++	const { value: overrideValue } = restProps;
+ 	const [ value, setValue ] = useState( options[ 0 ] );
++	const initialValue = overrideValue ?? value;
+ 	return (
+ 		<UncontrolledCustomSelectControl
+ 			{ ...restProps }
+@@ -63,7 +74,7 @@ const ControlledCustomSelectControl = ( {
+ 				setValue( args.selectedItem );
+ 			} }
+ 			value={ options.find(
+-				( option: any ) => option.key === value.key
++				( option: any ) => option.key === initialValue.key
+ 			) }
+ 		/>
+ 	);
+@@ -148,7 +159,7 @@ describe.each( [
+ 		// assert against filtered array
+ 		itemsWithClass.map( ( { name } ) =>
+ 			expect( screen.getByRole( 'option', { name } ) ).toHaveClass(
+-				customClass
++				className
+ 			)
+ 		);
+ 
+@@ -160,7 +171,7 @@ describe.each( [
+ 		// assert against filtered array
+ 		itemsWithoutClass.map( ( { name } ) =>
+ 			expect( screen.getByRole( 'option', { name } ) ).not.toHaveClass(
+-				customClass
++				className
+ 			)
+ 		);
+ 	} );
+@@ -286,7 +297,7 @@ describe.each( [
+ 			expect.objectContaining( {
+ 				inputValue: '',
+ 				isOpen: false,
+-				selectedItem: { key: 'violets', name: 'violets' },
++				selectedItem: { key: 'flower1', name: 'violets' },
+ 				type: '',
+ 			} )
+ 		);
+@@ -302,6 +313,7 @@ describe.each( [
+ 			expect.objectContaining( {
+ 				inputValue: '',
+ 				isOpen: false,
++
+ 				selectedItem: expect.objectContaining( {
+ 					name: 'aquamarine',
+ 				} ),
+@@ -328,7 +340,7 @@ describe.each( [
+ 		await type( 'p' );
+ 		await press.Enter();
+ 
+-		expect( mockOnChange ).toHaveReturnedWith( 'poppy' );
++		expect( mockOnChange ).toHaveReturnedWith( 'flower1' );
+ 	} );
+ 
+ 	describe( 'Keyboard behavior and accessibility', () => {
+@@ -457,4 +469,60 @@ describe.each( [
+ 			).toBeVisible();
+ 		} );
+ 	} );
++
++	// V1 styles items via a `style` or `className` metadata property in the option item object. Some consumers still expect it, e.g:
++	// - https://github.com/WordPress/gutenberg/blob/trunk/packages/block-editor/src/components/font-appearance-control/index.js#L216
++	// Besides that, the `option` prop is documented as havin the type:
++	// - `Array<{ key: String, name: String, style: ?{}, className: ?String, ...rest }>`
++	// Notice the `...test` there. We should keep supporting the arbitrary props like this.
++	it( 'Should return style and custom metadata as part of the selected option from onChange', async () => {
++		const mockOnChange = jest.fn();
++
++		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
++
++		await click(
++			screen.getByRole( 'combobox', {
++				expanded: false,
++			} )
++		);
++
++		const optionElement = screen.getByRole( 'option', {
++			name: 'aquarela',
++		} );
++
++		// Assert that the option element does not have the custom attributes
++		expect( optionElement ).not.toHaveAttribute( 'customPropFoo' );
++		expect( optionElement ).not.toHaveAttribute( 'customPropBar' );
++
++		await click( optionElement );
++
++		expect( mockOnChange ).toHaveBeenCalledWith(
++			expect.objectContaining( {
++				selectedItem: expect.objectContaining( {
++					className,
++					style,
++					customPropFoo: 'foo',
++					customPropBar: 30,
++				} ),
++			} )
++		);
++	} );
++
++	it( 'Should display the initial value passed as the selected value', async () => {
++		const initialSelectedItem = legacyProps.options[ 5 ];
++
++		const testProps = {
++			...legacyProps,
++			value: initialSelectedItem,
++		};
++
++		render( <Component { ...testProps } /> );
++
++		const currentSelectedItem = await screen.findByRole( 'combobox', {
++			expanded: false,
++		} );
++
++		// Verify the initial selected value
++		expect( currentSelectedItem ).toHaveTextContent( 'aquarela' );
++	} );
+ } );
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+index 5540a533c09d45..12b41ba54f4a20 100644
+--- a/packages/components/src/custom-select-control-v2/types.ts
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -79,6 +79,7 @@ type LegacyOption = {
+ 	style?: React.CSSProperties;
+ 	className?: string;
+ 	__experimentalHint?: string;
++	[ key: string ]: any;
+ };
+ 
+ /**
+diff --git a/packages/components/src/custom-select-control/test/index.js b/packages/components/src/custom-select-control/test/index.js
+index a9d5e7d9451ad5..659b301073418d 100644
+--- a/packages/components/src/custom-select-control/test/index.js
++++ b/packages/components/src/custom-select-control/test/index.js
+@@ -48,13 +48,23 @@ const props = {
+ 	],
+ };
+ 
+-const ControlledCustomSelectControl = ( { options, ...restProps } ) => {
++const ControlledCustomSelectControl = ( {
++	options,
++	onChange: onChangeMock,
++	...restProps
++} ) => {
+ 	const [ value, setValue ] = useState( options[ 0 ] );
++	const onChange = ( changeObject ) => {
++		if ( onChangeMock ) {
++			onChangeMock( changeObject );
++		}
++		setValue( changeObject.selectedItem );
++	};
+ 	return (
+ 		<UncontrolledCustomSelectControl
+ 			{ ...restProps }
+ 			options={ options }
+-			onChange={ ( { selectedItem } ) => setValue( selectedItem ) }
++			onChange={ onChange }
+ 			value={ options.find( ( option ) => option.key === value.key ) }
+ 		/>
+ 	);
+@@ -238,28 +248,56 @@ describe.each( [
+ 		).toHaveTextContent( 'Hint' );
+ 	} );
+ 
+-	it( 'shows selected hint in list of options when added, regardless of __experimentalShowSelectedHint prop', async () => {
++	it( 'Should accept and pass arbitrary properties to the selectedItem object in the onChange callback', async () => {
+ 		const user = userEvent.setup();
++		const onChangeMock = jest.fn();
+ 
+ 		render(
+ 			<Component
+ 				{ ...props }
+-				label="Custom select"
+ 				options={ [
++					...props.options,
+ 					{
+-						key: 'one',
+-						name: 'One',
+-						__experimentalHint: 'Hint',
++						key: 'custom',
++						name: 'Custom Option',
++						className: 'custom-class-name',
++						customProp1: 'value1',
++						customProp2: 42,
++						style: {
++							backgroundColor: 'rgb(127, 255, 212)',
++							rotate: '13deg',
++						},
+ 					},
+ 				] }
++				onChange={ onChangeMock }
+ 			/>
+ 		);
+ 
++		const currentSelectedItem = screen.getByRole( 'button', {
++			expanded: false,
++		} );
++
++		await user.click( currentSelectedItem );
+ 		await user.click(
+-			screen.getByRole( 'button', { name: 'Custom select' } )
++			screen.getByRole( 'option', { name: 'Custom Option' } )
+ 		);
+ 
+-		expect( screen.getByRole( 'option', { name: /hint/i } ) ).toBeVisible();
++		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
++		expect( onChangeMock ).toHaveBeenCalledWith(
++			expect.objectContaining( {
++				selectedItem: expect.objectContaining( {
++					key: 'custom',
++					name: 'Custom Option',
++					className: 'custom-class-name',
++					customProp1: 'value1',
++					customProp2: 42,
++					style: {
++						backgroundColor: 'rgb(127, 255, 212)',
++						rotate: '13deg',
++					},
++				} ),
++			} )
++		);
+ 	} );
+ 
+ 	describe( 'Keyboard behavior and accessibility', () => {
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index f3643a1499a02c..0dc58bcc65714c 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -63,7 +63,9 @@ export {
+ 	useCompositeState as __unstableUseCompositeState,
+ } from './composite';
+ export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
+-export { StableCustomSelectControl as CustomSelectControl } from './custom-select-control';
++//export { StableCustomSelectControl as CustomSelectControl } from './custom-select-control';
++export { ClassicCustomSelectControlV2Adapter as CustomSelectControl } from './custom-select-control-v2/legacy-component';
++export { default as CustomSelectControlV2 } from './custom-select-control-v2';
+ export { default as Dashicon } from './dashicon';
+ export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
+ export { default as __experimentalDimensionControl } from './dimension-control';

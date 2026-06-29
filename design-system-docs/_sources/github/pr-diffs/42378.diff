@@ -1,0 +1,434 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5845aba6df6a77..8231df57a93302 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   `BorderControl`: Improve labelling, tooltips and DOM structure ([#42348](https://github.com/WordPress/gutenberg/pull/42348/)).
+ -   `BaseControl`: Set zero padding on `StyledLabel` to ensure cross-browser styling ([#42348](https://github.com/WordPress/gutenberg/pull/42348/)).
++-   `InputControl`: Implement wrapper subcomponents for adding responsive padding to `prefix`/`suffix` ([#42378](https://github.com/WordPress/gutenberg/pull/42378)).
+ -   `SelectControl`: Add flag for larger default size ([#42456](https://github.com/WordPress/gutenberg/pull/42456/)).
+ -   `UnitControl`: Update unit select's focus styles to match input's ([#42383](https://github.com/WordPress/gutenberg/pull/42383)).
+ 
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 0c142746ab2af5..1c6f140ddce779 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -91,6 +91,8 @@ export {
+ 	Item as __experimentalItem,
+ } from './item-group';
+ export { default as __experimentalInputControl } from './input-control';
++export { default as __experimentalInputControlPrefixWrapper } from './input-control/input-prefix-wrapper';
++export { default as __experimentalInputControlSuffixWrapper } from './input-control/input-suffix-wrapper';
+ export { default as KeyboardShortcuts } from './keyboard-shortcuts';
+ export { default as MenuGroup } from './menu-group';
+ export { default as MenuItem } from './menu-item';
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index 73fb7dc4cab8f4..23fee2b813c6ac 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -30,6 +30,7 @@ function useUniqueId( idProp?: string ) {
+ 
+ export function UnforwardedInputControl(
+ 	{
++		__next36pxDefaultSize,
+ 		__unstableStateReducer: stateReducer = ( state ) => state,
+ 		__unstableInputWidth,
+ 		className,
+@@ -63,6 +64,7 @@ export function UnforwardedInputControl(
+ 
+ 	return (
+ 		<InputBase
++			__next36pxDefaultSize={ __next36pxDefaultSize }
+ 			__unstableInputWidth={ __unstableInputWidth }
+ 			className={ classes }
+ 			disabled={ disabled }
+@@ -79,6 +81,7 @@ export function UnforwardedInputControl(
+ 		>
+ 			<InputField
+ 				{ ...props }
++				__next36pxDefaultSize={ __next36pxDefaultSize }
+ 				className="components-input-control__input"
+ 				disabled={ disabled }
+ 				id={ id }
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index 9151ae14c78f8e..9333be8b837fa4 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { forwardRef } from '@wordpress/element';
++import { forwardRef, useMemo } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -20,8 +20,10 @@ import {
+ 	Prefix,
+ 	Suffix,
+ 	LabelWrapper,
++	getSizeConfig,
+ } from './styles/input-control-styles';
+ import type { InputBaseProps, LabelPosition } from './types';
++import { ContextSystemProvider } from '../ui/context';
+ 
+ function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( InputBase );
+@@ -52,6 +54,7 @@ function getUIFlexProps( labelPosition?: LabelPosition ) {
+ 
+ export function InputBase(
+ 	{
++		__next36pxDefaultSize,
+ 		__unstableInputWidth,
+ 		children,
+ 		className,
+@@ -71,6 +74,17 @@ export function InputBase(
+ 	const id = useUniqueId( idProp );
+ 	const hideLabel = hideLabelFromVision || ! label;
+ 
++	const { paddingLeft, paddingRight } = getSizeConfig( {
++		inputSize: size,
++		__next36pxDefaultSize,
++	} );
++	const prefixSuffixContextValue = useMemo( () => {
++		return {
++			InputControlPrefixWrapper: { paddingLeft },
++			InputControlSuffixWrapper: { paddingRight },
++		};
++	}, [ paddingLeft, paddingRight ] );
++
+ 	return (
+ 		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
+ 		<Root
+@@ -99,17 +113,19 @@ export function InputBase(
+ 				hideLabel={ hideLabel }
+ 				labelPosition={ labelPosition }
+ 			>
+-				{ prefix && (
+-					<Prefix className="components-input-control__prefix">
+-						{ prefix }
+-					</Prefix>
+-				) }
+-				{ children }
+-				{ suffix && (
+-					<Suffix className="components-input-control__suffix">
+-						{ suffix }
+-					</Suffix>
+-				) }
++				<ContextSystemProvider value={ prefixSuffixContextValue }>
++					{ prefix && (
++						<Prefix className="components-input-control__prefix">
++							{ prefix }
++						</Prefix>
++					) }
++					{ children }
++					{ suffix && (
++						<Suffix className="components-input-control__suffix">
++							{ suffix }
++						</Suffix>
++					) }
++				</ContextSystemProvider>
+ 				<Backdrop disabled={ disabled } isFocused={ isFocused } />
+ 			</Container>
+ 		</Root>
+diff --git a/packages/components/src/input-control/input-prefix-wrapper.tsx b/packages/components/src/input-control/input-prefix-wrapper.tsx
+new file mode 100644
+index 00000000000000..310d51886e93dd
+--- /dev/null
++++ b/packages/components/src/input-control/input-prefix-wrapper.tsx
+@@ -0,0 +1,48 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import { Spacer } from '../spacer';
++import {
++	WordPressComponentProps,
++	contextConnect,
++	useContextSystem,
++} from '../ui/context';
++import type { InputControlPrefixWrapperProps } from './types';
++
++function UnconnectedInputControlPrefixWrapper(
++	props: WordPressComponentProps< InputControlPrefixWrapperProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
++	const derivedProps = useContextSystem( props, 'InputControlPrefixWrapper' );
++
++	return (
++		<Spacer marginBottom={ 0 } { ...derivedProps } ref={ forwardedRef } />
++	);
++}
++
++/**
++ * A convenience wrapper for the `prefix` when you want to apply
++ * standard padding in accordance with the size variant.
++ *
++ * ```jsx
++ * import {
++ *   __experimentalInputControl as InputControl,
++ *   __experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
++ * } from '@wordpress/components';
++ *
++ * <InputControl
++ *   prefix={<InputControlPrefixWrapper>@</InputControlPrefixWrapper>}
++ * />
++ * ```
++ */
++export const InputControlPrefixWrapper = contextConnect(
++	UnconnectedInputControlPrefixWrapper,
++	'InputControlPrefixWrapper'
++);
++
++export default InputControlPrefixWrapper;
+diff --git a/packages/components/src/input-control/input-suffix-wrapper.tsx b/packages/components/src/input-control/input-suffix-wrapper.tsx
+new file mode 100644
+index 00000000000000..16e7848f9c12aa
+--- /dev/null
++++ b/packages/components/src/input-control/input-suffix-wrapper.tsx
+@@ -0,0 +1,48 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import { Spacer } from '../spacer';
++import {
++	WordPressComponentProps,
++	contextConnect,
++	useContextSystem,
++} from '../ui/context';
++import type { InputControlSuffixWrapperProps } from './types';
++
++function UnconnectedInputControlSuffixWrapper(
++	props: WordPressComponentProps< InputControlSuffixWrapperProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
++	const derivedProps = useContextSystem( props, 'InputControlSuffixWrapper' );
++
++	return (
++		<Spacer marginBottom={ 0 } { ...derivedProps } ref={ forwardedRef } />
++	);
++}
++
++/**
++ * A convenience wrapper for the `suffix` when you want to apply
++ * standard padding in accordance with the size variant.
++ *
++ * ```jsx
++ * import {
++ *   __experimentalInputControl as InputControl,
++ *   __experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
++ * } from '@wordpress/components';
++ *
++ * <InputControl
++ *   suffix={<InputControlSuffixWrapper>%</InputControlSuffixWrapper>}
++ * />
++ * ```
++ */
++export const InputControlSuffixWrapper = contextConnect(
++	UnconnectedInputControlSuffixWrapper,
++	'InputControlSuffixWrapper'
++);
++
++export default InputControlSuffixWrapper;
+diff --git a/packages/components/src/input-control/stories/index.tsx b/packages/components/src/input-control/stories/index.tsx
+index 2ae41172df0d2c..3199e42e630318 100644
+--- a/packages/components/src/input-control/stories/index.tsx
++++ b/packages/components/src/input-control/stories/index.tsx
+@@ -7,10 +7,13 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
+  * Internal dependencies
+  */
+ import InputControl from '..';
++import { InputControlPrefixWrapper } from '../input-prefix-wrapper';
++import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
+ 
+ const meta: ComponentMeta< typeof InputControl > = {
+ 	title: 'Components (Experimental)/InputControl',
+ 	component: InputControl,
++	subcomponents: { InputControlPrefixWrapper, InputControlSuffixWrapper },
+ 	argTypes: {
+ 		__unstableInputWidth: { control: { type: 'text' } },
+ 		__unstableStateReducer: { control: { type: null } },
+@@ -37,16 +40,26 @@ Default.args = {
+ 	placeholder: 'Placeholder',
+ };
+ 
++/**
++ * A `prefix` can be inserted before the input. By default, the prefix is aligned with the edge of the input border,
++ * with no padding. If you want to apply standard padding in accordance with the size variant, use the provided
++ * `<InputControlPrefixWrapper>` convenience wrapper.
++ */
+ export const WithPrefix = Template.bind( {} );
+ WithPrefix.args = {
+ 	...Default.args,
+-	prefix: <span style={ { marginInlineStart: 8 } }>@</span>,
++	prefix: <InputControlPrefixWrapper>@</InputControlPrefixWrapper>,
+ };
+ 
++/**
++ * A `suffix` can be inserted after the input. By default, the suffix is aligned with the edge of the input border,
++ * with no padding. If you want to apply standard padding in accordance with the size variant, use the provided
++ * `<InputControlSuffixWrapper>` convenience wrapper.
++ */
+ export const WithSuffix = Template.bind( {} );
+ WithSuffix.args = {
+ 	...Default.args,
+-	suffix: <button style={ { marginInlineEnd: 4 } }>Send</button>,
++	suffix: <InputControlSuffixWrapper>%</InputControlSuffixWrapper>,
+ };
+ 
+ export const WithSideLabel = Template.bind( {} );
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 943db6d0654246..a7fb7ecc7fa544 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -13,6 +13,7 @@ import { Flex, FlexItem } from '../../flex';
+ import { Text } from '../../text';
+ import { COLORS, rtl } from '../../utils';
+ import type { LabelPosition, Size } from '../types';
++import { space } from '../../ui/utils/space';
+ 
+ type ContainerProps = {
+ 	disabled?: boolean;
+@@ -143,7 +144,7 @@ const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
+ 	`;
+ };
+ 
+-const sizeStyles = ( {
++export const getSizeConfig = ( {
+ 	inputSize: size,
+ 	__next36pxDefaultSize,
+ }: InputProps ) => {
+@@ -153,22 +154,22 @@ const sizeStyles = ( {
+ 			height: 36,
+ 			lineHeight: 1,
+ 			minHeight: 36,
+-			paddingLeft: 16,
+-			paddingRight: 16,
++			paddingLeft: space( 4 ),
++			paddingRight: space( 4 ),
+ 		},
+ 		small: {
+ 			height: 24,
+ 			lineHeight: 1,
+ 			minHeight: 24,
+-			paddingLeft: 8,
+-			paddingRight: 8,
++			paddingLeft: space( 2 ),
++			paddingRight: space( 2 ),
+ 		},
+ 		'__unstable-large': {
+ 			height: 40,
+ 			lineHeight: 1,
+ 			minHeight: 40,
+-			paddingLeft: 16,
+-			paddingRight: 16,
++			paddingLeft: space( 4 ),
++			paddingRight: space( 4 ),
+ 		},
+ 	};
+ 
+@@ -177,14 +178,16 @@ const sizeStyles = ( {
+ 			height: 30,
+ 			lineHeight: 1,
+ 			minHeight: 30,
+-			paddingLeft: 8,
+-			paddingRight: 8,
++			paddingLeft: space( 2 ),
++			paddingRight: space( 2 ),
+ 		};
+ 	}
+ 
+-	const style = sizes[ size as Size ] || sizes.default;
++	return sizes[ size as Size ] || sizes.default;
++};
+ 
+-	return css( style );
++const sizeStyles = ( props: InputProps ) => {
++	return css( getSizeConfig( props ) );
+ };
+ 
+ const customPaddings = ( {
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index 341d5fe51e3997..509aae28648c84 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -125,10 +125,38 @@ export interface InputBaseProps extends BaseProps, FlexProps {
+ 	children: ReactNode;
+ 	/**
+ 	 * Renders an element on the left side of the input.
++	 *
++	 * By default, the prefix is aligned with the edge of the input border, with no padding.
++	 * If you want to apply standard padding in accordance with the size variant, wrap the element in
++	 * the provided `<InputControlPrefixWrapper>` component.
++	 *
++	 * @example
++	 * import {
++	 *   __experimentalInputControl as InputControl,
++	 *   __experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
++	 * } from '@wordpress/components';
++	 *
++	 * <InputControl
++	 *   prefix={<InputControlPrefixWrapper>@</InputControlPrefixWrapper>}
++	 * />
+ 	 */
+ 	prefix?: ReactNode;
+ 	/**
+ 	 * Renders an element on the right side of the input.
++	 *
++	 * By default, the suffix is aligned with the edge of the input border, with no padding.
++	 * If you want to apply standard padding in accordance with the size variant, wrap the element in
++	 * the provided `<InputControlSuffixWrapper>` component.
++	 *
++	 * @example
++	 * import {
++	 *   __experimentalInputControl as InputControl,
++	 *   __experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
++	 * } from '@wordpress/components';
++	 *
++	 * <InputControl
++	 *   suffix={<InputControlSuffixWrapper>%</InputControlSuffixWrapper>}
++	 * />
+ 	 */
+ 	suffix?: ReactNode;
+ 	/**
+@@ -175,3 +203,17 @@ export interface InputControlLabelProps {
+ 	labelPosition?: BaseProps[ 'labelPosition' ];
+ 	size?: BaseProps[ 'size' ];
+ }
++
++export type InputControlPrefixWrapperProps = {
++	/**
++	 * The prefix to be inserted.
++	 */
++	children: ReactNode;
++};
++
++export type InputControlSuffixWrapperProps = {
++	/**
++	 * The suffix to be inserted.
++	 */
++	children: ReactNode;
++};
+diff --git a/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap b/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
+index 3c061bdf53bfb4..e65364b96bf9bc 100644
+--- a/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
+@@ -22,7 +22,7 @@ Snapshot Diff:
+       >
+         <input
+           autocomplete="off"
+-          class="components-input-control__input css-1vhigq9-Input-dragStyles-fontSizeStyles-sizeStyles-customPaddings em5sgkm5"
++          class="components-input-control__input css-1hsyo1w-Input-dragStyles-fontSizeStyles-sizeStyles-customPaddings em5sgkm5"
+ -         id="inspector-input-control-1"
+ +         id="inspector-input-control-2"
+           inputmode="numeric"

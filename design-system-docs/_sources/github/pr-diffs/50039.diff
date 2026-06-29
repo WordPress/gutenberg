@@ -1,0 +1,52 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a86a1b6ef772e1..c02be2432dc224 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `parseStylesVariables()`: Refactor away from Lodash (mobile) ([#49794](https://github.com/WordPress/gutenberg/pull/49794)).
+ -   Remove Lodash dependency from components package ([#49794](https://github.com/WordPress/gutenberg/pull/49794)).
+ -   Tweak `WordPressComponent` type so `selector` property is optional ([#49960](https://github.com/WordPress/gutenberg/pull/49960)).
++-   Update `Modal` appearance on small screens ([#50039](https://github.com/WordPress/gutenberg/pull/50039)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index ae643e87034eb8..8f0cd5e3d56c0e 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -16,28 +16,28 @@
+ // The modal window element.
+ .components-modal__frame {
+ 	// Use the entire viewport on smaller screens.
+-	margin: 0;
++	margin: $grid-unit-50 0 0 0;
+ 	width: 100%;
+ 	background: $white;
+ 	box-shadow: $shadow-modal;
+-	border-radius: $grid-unit-10;
++	border-radius: $grid-unit-10 $grid-unit-10 0 0;
+ 	overflow: hidden;
+ 	// Have the content element fill the vertical space yet not overflow.
+ 	display: flex;
++	// Animate the modal frame/contents appearing on the page.
++	animation: components-modal__appear-animation 0.1s ease-out;
++	animation-fill-mode: forwards;
++	@include reduce-motion("animation");
+ 
+ 	// Show a centered modal on bigger screens.
+ 	@include break-small() {
++		border-radius: $grid-unit-10;
+ 		margin: auto;
+ 		width: auto;
+ 		min-width: $modal-min-width;
+ 		max-width: calc(100% - #{$grid-unit-20 * 2});
+ 		max-height: calc(100% - #{$header-height * 2});
+ 
+-		// Animate the modal frame/contents appearing on the page.
+-		animation: components-modal__appear-animation 0.1s ease-out;
+-		animation-fill-mode: forwards;
+-		@include reduce-motion("animation");
+-
+ 		&.is-full-screen {
+ 			@include break-small() {
+ 				width: calc(100% - #{ $grid-unit-20 * 2 });

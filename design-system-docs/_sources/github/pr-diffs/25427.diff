@@ -1,0 +1,127 @@
+diff --git a/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
+index 7dd76a3e3594c2..e0233344f6352d 100644
+--- a/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Basic rendering should render with required props 1`] = `"<fieldset class=\\"block-editor-responsive-block-control\\"><legend class=\\"block-editor-responsive-block-control__title\\">Padding</legend><div class=\\"block-editor-responsive-block-control__inner\\"><div class=\\"components-base-control components-toggle-control block-editor-responsive-block-control__toggle\\"><div class=\\"components-base-control__field\\"><span class=\\"components-form-toggle is-checked\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\" aria-describedby=\\"inspector-toggle-control-0__help\\" checked=\\"\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Use the same padding on all screensizes.</label></div><p id=\\"inspector-toggle-control-0__help\\" class=\\"components-base-control__help\\">Toggle between using the same value for all screen sizes or using a unique value per screen size.</p></div><div class=\\"block-editor-responsive-block-control__group\\"><div class=\\"components-base-control\\"><div class=\\"components-base-control__field\\"><div class=\\"components-flex components-select-control e1cr7zh10 css-4hkoc6-Flex-Root eboqfv50\\"><div class=\\"components-flex__item e1cr7zh14 css-d373l0-Item-LabelWrapper eboqfv51\\"><label for=\\"inspector-select-control-0\\" class=\\"components-input-control__label css-h505uc-Text-BaseLabel e1cr7zh13\\"><span aria-describedby=\\"rbc-desc-0\\">All</span><span class=\\"components-visually-hidden\\" id=\\"rbc-desc-0\\">Controls the padding property for All viewports.</span></label></div><div class=\\"components-input-control__container css-c1s9gk-Container e1cr7zh11\\"><select class=\\"components-select-control__input css-hwcz8s-Select e12x0a390\\" id=\\"inspector-select-control-0\\"><option value=\\"\\">Please select</option><option value=\\"small\\">Small</option><option value=\\"medium\\">Medium</option><option value=\\"large\\">Large</option></select><span class=\\"components-input-control__suffix css-1lym30p-Suffix e1cr7zh17\\"><div class=\\"css-s55r1c-DownArrowWrapper e12x0a391\\"><svg viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"18\\" height=\\"18\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z\\"></path></svg></div></span><div aria-hidden=\\"true\\" class=\\"components-input-control__backdrop css-2u723s-BackdropUI e1cr7zh15\\"></div></div></div></div></div><p id=\\"all\\">All is used here for testing purposes to ensure we have access to details about the device.</p></div></div></fieldset>"`;
++exports[`Basic rendering should render with required props 1`] = `"<fieldset class=\\"block-editor-responsive-block-control\\"><legend class=\\"block-editor-responsive-block-control__title\\">Padding</legend><div class=\\"block-editor-responsive-block-control__inner\\"><div class=\\"components-base-control components-toggle-control block-editor-responsive-block-control__toggle\\"><div class=\\"components-base-control__field\\"><span class=\\"components-form-toggle is-checked\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\" aria-describedby=\\"inspector-toggle-control-0__help\\" checked=\\"\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Use the same padding on all screensizes.</label></div><p id=\\"inspector-toggle-control-0__help\\" class=\\"components-base-control__help\\">Toggle between using the same value for all screen sizes or using a unique value per screen size.</p></div><div class=\\"block-editor-responsive-block-control__group\\"><div class=\\"components-base-control\\"><div class=\\"components-base-control__field\\"><div class=\\"components-flex components-select-control e1cr7zh10 css-195lg3g-Flex-Root eboqfv50\\"><div class=\\"components-flex__item e1cr7zh14 css-d373l0-Item-LabelWrapper eboqfv51\\"><label for=\\"inspector-select-control-0\\" class=\\"components-input-control__label css-h505uc-Text-BaseLabel e1cr7zh13\\"><span aria-describedby=\\"rbc-desc-0\\">All</span><span class=\\"components-visually-hidden\\" id=\\"rbc-desc-0\\">Controls the padding property for All viewports.</span></label></div><div class=\\"components-input-control__container css-c1s9gk-Container e1cr7zh11\\"><select class=\\"components-select-control__input css-hwcz8s-Select e12x0a390\\" id=\\"inspector-select-control-0\\"><option value=\\"\\">Please select</option><option value=\\"small\\">Small</option><option value=\\"medium\\">Medium</option><option value=\\"large\\">Large</option></select><span class=\\"components-input-control__suffix css-1lym30p-Suffix e1cr7zh17\\"><div class=\\"css-s55r1c-DownArrowWrapper e12x0a391\\"><svg viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"18\\" height=\\"18\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z\\"></path></svg></div></span><div aria-hidden=\\"true\\" class=\\"components-input-control__backdrop css-2u723s-BackdropUI e1cr7zh15\\"></div></div></div></div></div><p id=\\"all\\">All is used here for testing purposes to ensure we have access to details about the device.</p></div></div></fieldset>"`;
+diff --git a/packages/components/src/input-control/README.md b/packages/components/src/input-control/README.md
+index b24b21cc90a397..6af3626a09f1dd 100644
+--- a/packages/components/src/input-control/README.md
++++ b/packages/components/src/input-control/README.md
+@@ -52,6 +52,13 @@ If this property is added, a label will be generated using label property as the
+ -   Type: `String`
+ -   Required: No
+ 
++### labelPosition
++
++The position of the label (`top`, `side`, or `bottom`).
++
++-   Type: `String`
++-   Required: No
++
+ ### onChange
+ 
+ A function that receives the value of the input.
+diff --git a/packages/components/src/number-control/README.md b/packages/components/src/number-control/README.md
+index 1d225590bbadcf..36b21f63a40a83 100644
+--- a/packages/components/src/number-control/README.md
++++ b/packages/components/src/number-control/README.md
+@@ -63,6 +63,20 @@ If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment the v
+ -   Required: No
+ -   Default: `true`
+ 
++### label
++
++If this property is added, a label will be generated using label property as the content.
++
++-   Type: `String`
++-   Required: No
++
++### labelPosition
++
++The position of the label (`top`, `side`, or `bottom`).
++
++-   Type: `String`
++-   Required: No
++
+ ### shiftStep
+ 
+ Amount to increment by when the `SHIFT` key is held down. This shift value is a multiplier to the `step` value. For example, if the `step` value is `5`, and `shiftStep` is `10`, each jump would increment/decrement by `50`.
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index 83073594c1dced..db035549ce2fa7 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -131,6 +131,12 @@ If this property is added, a label will be generated using label property as the
+ - Type: `String`
+ - Required: No
+ 
++#### labelPosition
++
++The position of the label (`top`, `side`, or `bottom`).
++- Type: `String`
++- Required: No
++
+ #### hideLabelFromVision
+ 
+ If true, the label will only be visible to screen readers.
+diff --git a/packages/components/src/select-control/index.js b/packages/components/src/select-control/index.js
+index ee3b238d75e283..d6133929e00a58 100644
+--- a/packages/components/src/select-control/index.js
++++ b/packages/components/src/select-control/index.js
+@@ -40,7 +40,7 @@ function SelectControl(
+ 		options = [],
+ 		size = 'default',
+ 		value: valueProp,
+-		labelPosition,
++		labelPosition = 'top',
+ 		...props
+ 	},
+ 	ref
+diff --git a/packages/components/src/select-control/stories/index.js b/packages/components/src/select-control/stories/index.js
+index 80a71605df1c3a..83ce2e67923bf7 100644
+--- a/packages/components/src/select-control/stories/index.js
++++ b/packages/components/src/select-control/stories/index.js
+@@ -36,6 +36,15 @@ export const _default = () => {
+ 		help: text( 'help', 'Help text to explain the select control.' ),
+ 		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
+ 		label: text( 'label', 'Value' ),
++		labelPosition: select(
++			'labelPosition',
++			{
++				top: 'top',
++				side: 'side',
++				bottom: 'bottom',
++			},
++			'top'
++		),
+ 		multiple: boolean( 'multiple', false ),
+ 		options: object( 'Options', [
+ 			{ value: null, label: 'Select an Option', disabled: true },
+diff --git a/packages/components/src/unit-control/README.md b/packages/components/src/unit-control/README.md
+index b442a5ef25139f..b07685ba3d3842 100644
+--- a/packages/components/src/unit-control/README.md
++++ b/packages/components/src/unit-control/README.md
+@@ -33,6 +33,20 @@ Determines if the unit `<select>` is tabbable.
+ -   Required: No
+ -   Default: `true`
+ 
++### label
++
++If this property is added, a label will be generated using label property as the content.
++
++-   Type: `String`
++-   Required: No
++
++### labelPosition
++
++The position of the label (`top`, `side`, or `bottom`).
++
++-   Type: `String`
++-   Required: No
++
+ ### onChange
+ 
+ Callback when the `value` changes.

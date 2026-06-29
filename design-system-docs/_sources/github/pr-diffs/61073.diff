@@ -1,0 +1,127 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..2e74446d843de7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `VStack`: Remove "experimental" designation ([#61073](https://github.com/WordPress/gutenberg/pull/61073)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/divider/README.md b/packages/components/src/divider/README.md
+index c81026b7b55871..a4909e68305085 100644
+--- a/packages/components/src/divider/README.md
++++ b/packages/components/src/divider/README.md
+@@ -12,7 +12,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ import {
+ 	__experimentalDivider as Divider,
+ 	__experimentalText as Text,
+-	__experimentalVStack as VStack,
++	VStack,
+ } from `@wordpress/components`;
+ 
+ function Example() {
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 3870c2f12c4fc3..eccab3fb1002cb 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -35,7 +35,7 @@ function UnconnectedDivider(
+  * import {
+  * 		__experimentalDivider as Divider,
+  * 		__experimentalText as Text,
+- * 		__experimentalVStack as VStack,
++ * 		VStack,
+  * } from `@wordpress/components`;
+  *
+  * function Example() {
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..4193196e52166d 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -189,7 +189,13 @@ export {
+ } from './unit-control';
+ export { View as __experimentalView } from './view';
+ export { VisuallyHidden } from './visually-hidden';
+-export { VStack as __experimentalVStack } from './v-stack';
++export {
++	/**
++	 * @deprecated Import `VStack` instead.
++	 */
++	VStack as __experimentalVStack,
++	VStack,
++} from './v-stack';
+ export { default as IsolatedEventContainer } from './isolated-event-container';
+ export {
+ 	createSlotFill,
+diff --git a/packages/components/src/v-stack/README.md b/packages/components/src/v-stack/README.md
+index 2f447b18015e51..e68cd293a878c6 100644
+--- a/packages/components/src/v-stack/README.md
++++ b/packages/components/src/v-stack/README.md
+@@ -13,7 +13,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ ```jsx
+ import {
+ 	__experimentalText as Text,
+-	__experimentalVStack as VStack,
++	VStack,
+ } from '@wordpress/components';
+ 
+ function Example() {
+@@ -75,7 +75,7 @@ When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to t
+ import {
+ 	__experimentalSpacer as Spacer,
+ 	__experimentalText as Text,
+-	__experimentalVStack as VStack,
++	VStack,
+ } from '@wordpress/components';
+ 
+ function Example() {
+@@ -97,7 +97,7 @@ function Example() {
+ import {
+ 	__experimentalSpacer as Spacer,
+ 	__experimentalText as Text,
+-	__experimentalVStack as VStack,
++	VStack,
+ } from '@wordpress/components';
+ 
+ function Example() {
+diff --git a/packages/components/src/v-stack/component.tsx b/packages/components/src/v-stack/component.tsx
+index c3ae9fece97dc0..6cf71f65531917 100644
+--- a/packages/components/src/v-stack/component.tsx
++++ b/packages/components/src/v-stack/component.tsx
+@@ -30,7 +30,7 @@ function UnconnectedVStack(
+  * ```jsx
+  * import {
+  * 	__experimentalText as Text,
+- * 	__experimentalVStack as VStack,
++ * 	VStack,
+  * } from `@wordpress/components`;
+  *
+  * function Example() {
+diff --git a/packages/components/src/v-stack/stories/index.story.tsx b/packages/components/src/v-stack/stories/index.story.tsx
+index 781c1bce6676cc..64ed680a345c04 100644
+--- a/packages/components/src/v-stack/stories/index.story.tsx
++++ b/packages/components/src/v-stack/stories/index.story.tsx
+@@ -25,7 +25,7 @@ const ALIGNMENTS = {
+ 
+ const meta: Meta< typeof VStack > = {
+ 	component: VStack,
+-	title: 'Components (Experimental)/VStack',
++	title: 'Components/VStack',
+ 	argTypes: {
+ 		alignment: {
+ 			control: { type: 'select' },
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..c1151e77b0209b 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,6 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation', 'vstack' ];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

@@ -1,0 +1,33 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4466716bdc47c5..90df12abba3cf3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Bug Fix
+ 
+ -  `ResponsiveWrapper`: use `aspect-ratio` CSS prop, add support for `SVG` elements ([#48573](https://github.com/WordPress/gutenberg/pull/48573).
++-  `ResizeTooltip`: Use `default.fontFamily` on tooltip ([#48805](https://github.com/WordPress/gutenberg/pull/48805).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts
+index 72390f834f51c8..399fe92616d569 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts
++++ b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts
+@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import { Text } from '../../../text';
+-import { COLORS } from '../../../utils';
++import { font, COLORS } from '../../../utils';
+ 
+ export const Root = styled.div`
+ 	bottom: 0;
+@@ -33,6 +33,7 @@ export const Tooltip = styled.div`
+ 	background: ${ COLORS.gray[ 900 ] };
+ 	border-radius: 2px;
+ 	box-sizing: border-box;
++	font-family: ${ font( 'default.fontFamily' ) };
+ 	font-size: 12px;
+ 	color: ${ COLORS.ui.textDark };
+ 	padding: 4px 8px;

@@ -1,0 +1,112 @@
+diff --git a/packages/block-editor/src/components/block-list/style.scss b/packages/block-editor/src/components/block-list/style.scss
+index 2d90124cce0011..5d2ecb73485d91 100644
+--- a/packages/block-editor/src/components/block-list/style.scss
++++ b/packages/block-editor/src/components/block-list/style.scss
+@@ -482,6 +482,7 @@
+ /**
+  * Block Toolbar, top and contextual.
+  */
++
+ .block-editor-block-contextual-toolbar-wrapper {
+ 	padding-left: $block-toolbar-height; // Provide space for the mover control on full-wide items.
+ }
+diff --git a/packages/block-editor/src/components/block-mover/style.scss b/packages/block-editor/src/components/block-mover/style.scss
+index 83dcf5c459fe60..704e016f143282 100644
+--- a/packages/block-editor/src/components/block-mover/style.scss
++++ b/packages/block-editor/src/components/block-mover/style.scss
+@@ -12,7 +12,7 @@
+ }
+ 
+ // Show the mover in a single button under the contextual toolbar.
+-.block-editor-block-mover {
++.block-editor-block-toolbar .block-editor-block-mover {
+ 	.components-toolbar {
+ 		flex-direction: column;
+ 	}
+diff --git a/packages/block-editor/src/components/block-toolbar/style.scss b/packages/block-editor/src/components/block-toolbar/style.scss
+index d03ae73ec64351..d2a6452fb58d58 100644
+--- a/packages/block-editor/src/components/block-toolbar/style.scss
++++ b/packages/block-editor/src/components/block-toolbar/style.scss
+@@ -45,7 +45,7 @@
+ .block-editor-block-toolbar,
+ .block-editor-format-toolbar {
+ 	// Toolbar buttons.
+-	.components-button {
++	.components-toolbar .components-button {
+ 		position: relative;
+ 
+ 		// Give all buttons extra padding to fit text.
+diff --git a/packages/edit-post/src/components/sidebar/style.scss b/packages/edit-post/src/components/sidebar/style.scss
+index f960c6757c3033..b4e26e3c6d0ea9 100644
+--- a/packages/edit-post/src/components/sidebar/style.scss
++++ b/packages/edit-post/src/components/sidebar/style.scss
+@@ -65,15 +65,64 @@
+ 		margin: 1.5em 0;
+ 	}
+ 
+-	div.components-toolbar {
+-		box-shadow: none;
+-		margin-bottom: 1.5em;
+-		&:last-child {
+-			margin-bottom: 0;
++	// This section of code duplicates many of the styles of the block toolbar.
++	// It would be good to refactor the block toolbar/components-toolbar to
++	// include those styles so we don't have to duplicate these styles here.
++	.components-toolbar {
++		height: $block-toolbar-height;
++		background: none;
++		border-radius: $radius-block-ui;
++		border-color: $dark-gray-primary;
++
++		.components-button {
++			margin-top: -$border-width;
++			height: $block-toolbar-height;
++
++			svg {
++				position: relative;
++
++				// Center the icon inside.
++				margin-left: auto;
++				margin-right: auto;
++			}
++
++			&:focus {
++				box-shadow: none;
++			}
++		}
++
++		// Focus and toggle pseudo elements.
++		.components-button::before {
++			content: "";
++			position: absolute;
++			display: block;
++			border-radius: $radius-block-ui;
++			height: 32px;
++			min-width: 32px;
++
++			// Position the focus rectangle.
++			left: 2px;
++			right: 2px;
+ 		}
++
++		// Toggled style.
++		.components-button.is-pressed {
++			color: $white;
++
++			&::before {
++				background: $dark-gray-primary;
++			}
++		}
++
++		// Focus style.
++		.components-button:focus::before {
++			@include block-toolbar-button-style__focus();
++		}
++
+ 	}
+ 
+ 	p + div.components-toolbar {
++		display: inline-flex;
+ 		margin-top: -1em;
+ 	}
+ 

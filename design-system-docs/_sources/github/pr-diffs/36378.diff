@@ -1,0 +1,44 @@
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index bd9ee1fd49465c..a7e0b8b0cf7e21 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -5,6 +5,7 @@
+ import { Ref, useCallback } from 'react';
+ import { colord, extend, Colord } from 'colord';
+ import namesPlugin from 'colord/plugins/names';
++import { debounce } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -70,9 +71,9 @@ const ColorPicker = (
+ 	}, [ color, defaultValue ] );
+ 
+ 	const handleChange = useCallback(
+-		( nextValue: Colord ) => {
++		debounce( ( nextValue: Colord ) => {
+ 			onChange( nextValue.toHex() );
+-		},
++		}, 5 ),
+ 		[ onChange ]
+ 	);
+ 
+diff --git a/packages/components/src/color-picker/test/index.js b/packages/components/src/color-picker/test/index.js
+index 34a5198c236072..6eec201d712d9e 100644
+--- a/packages/components/src/color-picker/test/index.js
++++ b/packages/components/src/color-picker/test/index.js
+@@ -8,6 +8,15 @@ import { render, fireEvent } from '@testing-library/react';
+  */
+ import { ColorPicker } from '..';
+ 
++// Mock debounce to function ColorPicker.onChange properly
++jest.mock( 'lodash', () => ( {
++	...jest.requireActual( 'lodash' ),
++	debounce: ( fn ) => {
++		fn.cancel = jest.fn();
++		return fn;
++	},
++} ) );
++
+ /**
+  * Ordinarily we'd try to select the compnoent by role but the silder role appears
+  * on several elements and we'd end up encoding assumptions about order when

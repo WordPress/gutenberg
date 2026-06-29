@@ -1,0 +1,22 @@
+diff --git a/packages/components/src/placeholder/style.scss b/packages/components/src/placeholder/style.scss
+index eaa031c77f5d4e..beaac89a7c30c3 100644
+--- a/packages/components/src/placeholder/style.scss
++++ b/packages/components/src/placeholder/style.scss
+@@ -66,8 +66,7 @@
+ }
+ 
+ .components-placeholder__input {
+-	margin-top: 0;
+-	margin-right: 8px;
++	margin: 0 8px 0 0;
+ 	flex: 1 1 auto;
+ }
+ 
+@@ -85,6 +84,7 @@
+ 	margin-bottom: $grid-size; // If buttons wrap we need vertical space between.
+ 
+ 	&:last-child {
++		margin-bottom: 0;
+ 		margin-right: 0;
+ 	}
+ }

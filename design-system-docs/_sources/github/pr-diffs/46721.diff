@@ -1,0 +1,1315 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5190af098b75e4..3b4b42367466c6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ -   Removed deprecated `@storybook/addon-knobs` dependency from the package ([47152](https://github.com/WordPress/gutenberg/pull/47152)).
+ -   `ColorListPicker`: Convert to TypeScript ([#46358](https://github.com/WordPress/gutenberg/pull/46358)).
+ -   `Button`: Convert to TypeScript ([#46997](https://github.com/WordPress/gutenberg/pull/46997)).
++-   `QueryControls`: Convert to TypeScript ([#46721](https://github.com/WordPress/gutenberg/pull/46721)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/query-controls/README.md b/packages/components/src/query-controls/README.md
+index 9a0f5b08e0cef5..c34aae6f4217cd 100644
+--- a/packages/components/src/query-controls/README.md
++++ b/packages/components/src/query-controls/README.md
+@@ -28,10 +28,10 @@ const QUERY_DEFAULTS = {
+ 		},
+ 	],
+ 	maxItems: 20,
+-	minItems: 1,	
++	minItems: 1,
+ 	numberOfItems: 10,
+ 	order: 'asc',
+-	orderBy: 'title',	
++	orderBy: 'title',
+ };
+ 
+ const MyQueryControls = () => {
+@@ -66,24 +66,35 @@ The `QueryControls` component now supports multiple category selection, to repla
+ const QUERY_DEFAULTS = {
+ 	orderBy: 'title',
+ 	order: 'asc',
+-	selectedCategories: [ 1 ],
+-	categories: [
++	selectedCategories: [
+ 		{
+ 			id: 1,
+-			name: 'Category 1',
++			value: 'Category 1',
+ 			parent: 0,
+ 		},
+ 		{
++			id: 2,
++			value: 'Category 1b',
++			parent: 1,
++		},
++	],
++	categories: {
++		'Category 1': {
++			id: 1,
++			name: 'Category 1',
++			parent: 0,
++		},
++		'Category 1b': {
+ 			id: 2,
+ 			name: 'Category 1b',
+ 			parent: 1,
+ 		},
+-		{
++		'Category 2': {
+ 			id: 3,
+ 			name: 'Category 2',
+ 			parent: 0,
+ 		},
+-	],
++	},
+ 	numberOfItems: 10,
+ };
+ 
+@@ -111,132 +122,120 @@ const MyQueryControls = () => {
+ };
+ ```
+ 
+-The format of the categories list also needs to be updated to match what `FormTokenField` expects for making suggestions.
++The format of the categories list also needs to be updated to match the expected type for the category suggestions.
+ 
+ ### Props
+ 
+-#### authorList
++#### `authorList`: `Author[]`
+ 
+-An array of author IDs that is passed into an `AuthorSelect` sub-component.
++An array of the authors to select from.
+ 
+--   Type: `Array`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### selectedAuthorId
++#### `categoriesList`: `Category[]`
+ 
+-The selected author ID.
++An array of categories. When passed in conjunction with the `onCategoryChange` prop, it causes the component to render UI that allows selecting one category at a time.
+ 
+--   Type: `Number`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### categoriesList
++#### `categorySuggestions`: `Record< Category[ 'name' ], Category >`
+ 
+-An array of category IDs; renders a `CategorySelect` sub-component when passed in conjunction with `onCategoryChange`.
++An object of categories with the category name as the key. When passed in conjunction with the `onCategoryChange` prop, it causes the component to render UI that enables multiple selection.
+ 
+--   Type: `Array`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### categorySuggestions
++#### `maxItems`: `number`
+ 
+-An array of category names; renders a `FormTokenField` component when passed in conjunction with `onCategoryChange`.
++The maximum number of items.
+ 
+--   Type: `Array`
+ -   Required: No
++-   Default: 100
+ -   Platform: Web
+ 
+-#### maxItems
++#### `minItems`: `number`
++
++The minimum number of items.
+ 
+--   Type: `Number`
+ -   Required: No
+--   Default: 100
++-   Default: 1
+ -   Platform: Web
+ 
+-#### minItems
++#### `numberOfItems`: `number`
++
++The selected number of items to retrieve via the query.
+ 
+--   Type: `Number`
+ -   Required: No
+--   Default: 1
+ -   Platform: Web
+ 
+-#### numberOfItems
++#### `onAuthorChange`: `( newAuthor: string ) => void`
+ 
+-The selected number of items to retrieve via the query.
++A function that receives the new author value. If not specified, the author controls are not rendered.
+ 
+--   Type: `Number`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### onAuthorChange
++#### `onCategoryChange`: `CategorySelectProps[ 'onChange' ] | FormTokenFieldProps[ 'onChange' ]`
+ 
+-A function that receives the new author value. If this is not specified, the author controls are not included.
++A function that receives the new category value. If not specified, the category controls are not rendered.
+ 
+--   Type: `Function`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### onCategoryChange
++#### `onNumberOfItemsChange`: `( newNumber?: number ) => void`
+ 
+-A function that receives the new category value. If this is not specified, the category controls are not included.
++A function that receives the new number of items. If not specified, then the number of items range control is not rendered.
+ 
+--   Type: `Function`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### onNumberOfItemsChange
++#### `onOrderChange`: `( newOrder: 'asc' | 'desc' ) => void`
+ 
+-A function that receives the new number of items value. If this is not specified, then the number of items range control is not included.
++A function that receives the new order value. If this prop or the `onOrderByChange` prop are not specified, then the order controls are not rendered.
+ 
+--   Type: `Function`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### onOrderChange
++#### `onOrderByChange`: `( newOrderBy: 'date' | 'title' ) => void`
+ 
+-A function that receives the new order value. If this or onOrderByChange are not specified, then the order controls are not included.
++A function that receives the new orderby value. If this prop or the `onOrderChange` prop are not specified, then the order controls are not rendered.
+ 
+--   Type: `Function`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### onOrderByChange
++#### `order`: `'asc' | 'desc'`
+ 
+-A function that receives the new orderby value. If this or onOrderChange are not specified, then the order controls are not included.
++The order in which to retrieve posts.
+ 
+--   Type: `Function`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### order
++#### `orderBy`: `'date' | 'title'`
+ 
+-The order in which to retrieve posts. Can be 'asc' or 'desc'.
++The meta key by which to order posts.
+ 
+--   Type: `String`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### orderBy
++#### `selectedAuthorId`: `number`
+ 
+-The meta key by which to order posts. Can be 'date' or 'title'.
++The selected author ID.
+ 
+--   Type: `String`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### selectedCategories
++#### `selectedCategories`: `Category[]`
+ 
+-The selected categories for the `categorySuggestions`.
++The selected categories for the `categorySuggestions` prop.
+ 
+--   Type: `Array`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### selectedCategoryId
++#### `selectedCategoryId`: `number`
+ 
+-The selected category for the `categoriesList`.
++The selected category for the `categoriesList` prop.
+ 
+--   Type: `Number`
+ -   Required: No
+ -   Platform: Web
+diff --git a/packages/components/src/query-controls/author-select.js b/packages/components/src/query-controls/author-select.js
+deleted file mode 100644
+index 77901ce8703d19..00000000000000
+--- a/packages/components/src/query-controls/author-select.js
++++ /dev/null
+@@ -1,23 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { buildTermsTree } from './terms';
+-import TreeSelect from '../tree-select';
+-
+-export default function AuthorSelect( {
+-	label,
+-	noOptionLabel,
+-	authorList,
+-	selectedAuthorId,
+-	onChange,
+-} ) {
+-	if ( ! authorList ) return null;
+-	const termsTree = buildTermsTree( authorList );
+-	return (
+-		<TreeSelect
+-			{ ...{ label, noOptionLabel, onChange } }
+-			tree={ termsTree }
+-			selectedId={ selectedAuthorId }
+-		/>
+-	);
+-}
+diff --git a/packages/components/src/query-controls/author-select.tsx b/packages/components/src/query-controls/author-select.tsx
+new file mode 100644
+index 00000000000000..ebda05ffb9a365
+--- /dev/null
++++ b/packages/components/src/query-controls/author-select.tsx
+@@ -0,0 +1,37 @@
++/**
++ * Internal dependencies
++ */
++import { buildTermsTree } from './terms';
++import TreeSelect from '../tree-select';
++import type { TreeSelectProps } from '../tree-select/types';
++import type { AuthorSelectProps } from './types';
++
++export default function AuthorSelect( {
++	label,
++	noOptionLabel,
++	authorList,
++	selectedAuthorId,
++	onChange: onChangeProp,
++}: AuthorSelectProps ) {
++	if ( ! authorList ) return null;
++	const termsTree = buildTermsTree( authorList );
++	return (
++		<TreeSelect
++			{ ...{
++				label,
++				noOptionLabel,
++				// Since the `multiple` attribute is not passed to `TreeSelect`, it is
++				// safe to assume that the argument of `onChange` cannot be `string[]`.
++				// The correct solution would be to type `SelectControl` better, so that
++				// the type of `value` and `onChange` vary depending on `multiple`.
++				onChange: onChangeProp as TreeSelectProps[ 'onChange' ],
++			} }
++			tree={ termsTree }
++			selectedId={
++				selectedAuthorId !== undefined
++					? String( selectedAuthorId )
++					: undefined
++			}
++		/>
++	);
++}
+diff --git a/packages/components/src/query-controls/category-select.js b/packages/components/src/query-controls/category-select.js
+deleted file mode 100644
+index 5a401014676d3d..00000000000000
+--- a/packages/components/src/query-controls/category-select.js
++++ /dev/null
+@@ -1,31 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { buildTermsTree } from './terms';
+-import TreeSelect from '../tree-select';
+-/**
+- * WordPress dependencies
+- */
+-import { useMemo } from '@wordpress/element';
+-
+-export default function CategorySelect( {
+-	label,
+-	noOptionLabel,
+-	categoriesList,
+-	selectedCategoryId,
+-	onChange,
+-	...props
+-} ) {
+-	const termsTree = useMemo( () => {
+-		return buildTermsTree( categoriesList );
+-	}, [ categoriesList ] );
+-
+-	return (
+-		<TreeSelect
+-			{ ...{ label, noOptionLabel, onChange } }
+-			tree={ termsTree }
+-			selectedId={ selectedCategoryId }
+-			{ ...props }
+-		/>
+-	);
+-}
+diff --git a/packages/components/src/query-controls/category-select.tsx b/packages/components/src/query-controls/category-select.tsx
+new file mode 100644
+index 00000000000000..938dfe792de08f
+--- /dev/null
++++ b/packages/components/src/query-controls/category-select.tsx
+@@ -0,0 +1,46 @@
++/**
++ * Internal dependencies
++ */
++import { buildTermsTree } from './terms';
++import TreeSelect from '../tree-select';
++import type { TreeSelectProps } from '../tree-select/types';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++import type { CategorySelectProps } from './types';
++
++export default function CategorySelect( {
++	label,
++	noOptionLabel,
++	categoriesList,
++	selectedCategoryId,
++	onChange: onChangeProp,
++	...props
++}: CategorySelectProps ) {
++	const termsTree = useMemo( () => {
++		return buildTermsTree( categoriesList );
++	}, [ categoriesList ] );
++
++	return (
++		<TreeSelect
++			{ ...{
++				label,
++				noOptionLabel,
++				// Since the `multiple` attribute is not passed to `TreeSelect`, it is
++				// safe to assume that the argument of `onChange` cannot be `string[]`.
++				// The correct solution would be to type `SelectControl` better, so that
++				// the type of `value` and `onChange` vary depending on `multiple`.
++				onChange: onChangeProp as TreeSelectProps[ 'onChange' ],
++			} }
++			tree={ termsTree }
++			selectedId={
++				selectedCategoryId !== undefined
++					? String( selectedCategoryId )
++					: undefined
++			}
++			{ ...props }
++		/>
++	);
++}
+diff --git a/packages/components/src/query-controls/index.js b/packages/components/src/query-controls/index.js
+deleted file mode 100644
+index 79343c5954c94f..00000000000000
+--- a/packages/components/src/query-controls/index.js
++++ /dev/null
+@@ -1,122 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { __ } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import CategorySelect from './category-select';
+-import { RangeControl, SelectControl, FormTokenField } from '../';
+-import AuthorSelect from './author-select';
+-
+-const DEFAULT_MIN_ITEMS = 1;
+-const DEFAULT_MAX_ITEMS = 100;
+-const MAX_CATEGORIES_SUGGESTIONS = 20;
+-
+-export default function QueryControls( {
+-	authorList,
+-	selectedAuthorId,
+-	categoriesList,
+-	selectedCategoryId,
+-	categorySuggestions,
+-	selectedCategories,
+-	numberOfItems,
+-	order,
+-	orderBy,
+-	maxItems = DEFAULT_MAX_ITEMS,
+-	minItems = DEFAULT_MIN_ITEMS,
+-	onCategoryChange,
+-	onAuthorChange,
+-	onNumberOfItemsChange,
+-	onOrderChange,
+-	onOrderByChange,
+-} ) {
+-	return [
+-		onOrderChange && onOrderByChange && (
+-			<SelectControl
+-				__nextHasNoMarginBottom
+-				key="query-controls-order-select"
+-				label={ __( 'Order by' ) }
+-				value={ `${ orderBy }/${ order }` }
+-				options={ [
+-					{
+-						label: __( 'Newest to oldest' ),
+-						value: 'date/desc',
+-					},
+-					{
+-						label: __( 'Oldest to newest' ),
+-						value: 'date/asc',
+-					},
+-					{
+-						/* translators: label for ordering posts by title in ascending order */
+-						label: __( 'A → Z' ),
+-						value: 'title/asc',
+-					},
+-					{
+-						/* translators: label for ordering posts by title in descending order */
+-						label: __( 'Z → A' ),
+-						value: 'title/desc',
+-					},
+-				] }
+-				onChange={ ( value ) => {
+-					const [ newOrderBy, newOrder ] = value.split( '/' );
+-					if ( newOrder !== order ) {
+-						onOrderChange( newOrder );
+-					}
+-					if ( newOrderBy !== orderBy ) {
+-						onOrderByChange( newOrderBy );
+-					}
+-				} }
+-			/>
+-		),
+-		categoriesList && onCategoryChange && (
+-			<CategorySelect
+-				key="query-controls-category-select"
+-				categoriesList={ categoriesList }
+-				label={ __( 'Category' ) }
+-				noOptionLabel={ __( 'All' ) }
+-				selectedCategoryId={ selectedCategoryId }
+-				onChange={ onCategoryChange }
+-			/>
+-		),
+-		categorySuggestions && onCategoryChange && (
+-			<FormTokenField
+-				key="query-controls-categories-select"
+-				label={ __( 'Categories' ) }
+-				value={
+-					selectedCategories &&
+-					selectedCategories.map( ( item ) => ( {
+-						id: item.id,
+-						value: item.name || item.value,
+-					} ) )
+-				}
+-				suggestions={ Object.keys( categorySuggestions ) }
+-				onChange={ onCategoryChange }
+-				maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
+-			/>
+-		),
+-		onAuthorChange && (
+-			<AuthorSelect
+-				key="query-controls-author-select"
+-				authorList={ authorList }
+-				label={ __( 'Author' ) }
+-				noOptionLabel={ __( 'All' ) }
+-				selectedAuthorId={ selectedAuthorId }
+-				onChange={ onAuthorChange }
+-			/>
+-		),
+-		onNumberOfItemsChange && (
+-			<RangeControl
+-				__nextHasNoMarginBottom
+-				key="query-controls-range-control"
+-				label={ __( 'Number of items' ) }
+-				value={ numberOfItems }
+-				onChange={ onNumberOfItemsChange }
+-				min={ minItems }
+-				max={ maxItems }
+-				required
+-			/>
+-		),
+-	];
+-}
+diff --git a/packages/components/src/query-controls/index.tsx b/packages/components/src/query-controls/index.tsx
+new file mode 100644
+index 00000000000000..91769410b4fa92
+--- /dev/null
++++ b/packages/components/src/query-controls/index.tsx
+@@ -0,0 +1,192 @@
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import AuthorSelect from './author-select';
++import CategorySelect from './category-select';
++import FormTokenField from '../form-token-field';
++import RangeControl from '../range-control';
++import SelectControl from '../select-control';
++import type {
++	QueryControlsProps,
++	QueryControlsWithMultipleCategorySelectionProps,
++	QueryControlsWithSingleCategorySelectionProps,
++} from './types';
++
++const DEFAULT_MIN_ITEMS = 1;
++const DEFAULT_MAX_ITEMS = 100;
++const MAX_CATEGORIES_SUGGESTIONS = 20;
++
++function isSingleCategorySelection(
++	props: QueryControlsProps
++): props is QueryControlsWithSingleCategorySelectionProps {
++	return 'categoriesList' in props;
++}
++
++function isMultipleCategorySelection(
++	props: QueryControlsProps
++): props is QueryControlsWithMultipleCategorySelectionProps {
++	return 'categorySuggestions' in props;
++}
++
++/**
++ * Controls to query for posts.
++ *
++ * ```jsx
++ * const MyQueryControls = () => (
++ *   <QueryControls
++ *     { ...{ maxItems, minItems, numberOfItems, order, orderBy } }
++ *     onOrderByChange={ ( newOrderBy ) => {
++ *       updateQuery( { orderBy: newOrderBy } )
++ *     }
++ *     onOrderChange={ ( newOrder ) => {
++ *       updateQuery( { order: newOrder } )
++ *     }
++ *     categoriesList={ categories }
++ *     selectedCategoryId={ category }
++ *     onCategoryChange={ ( newCategory ) => {
++ *       updateQuery( { category: newCategory } )
++ *     }
++ *     onNumberOfItemsChange={ ( newNumberOfItems ) => {
++ *       updateQuery( { numberOfItems: newNumberOfItems } )
++ *     } }
++ *   />
++ * );
++ * ```
++ */
++export function QueryControls( {
++	authorList,
++	selectedAuthorId,
++	numberOfItems,
++	order,
++	orderBy,
++	maxItems = DEFAULT_MAX_ITEMS,
++	minItems = DEFAULT_MIN_ITEMS,
++	onAuthorChange,
++	onNumberOfItemsChange,
++	onOrderChange,
++	onOrderByChange,
++	// Props for single OR multiple category selection are not destructured here,
++	// but instead are destructured inline where necessary.
++	...props
++}: QueryControlsProps ) {
++	return (
++		<>
++			{ [
++				onOrderChange && onOrderByChange && (
++					<SelectControl
++						__nextHasNoMarginBottom
++						key="query-controls-order-select"
++						label={ __( 'Order by' ) }
++						value={ `${ orderBy }/${ order }` }
++						options={ [
++							{
++								label: __( 'Newest to oldest' ),
++								value: 'date/desc',
++							},
++							{
++								label: __( 'Oldest to newest' ),
++								value: 'date/asc',
++							},
++							{
++								/* translators: label for ordering posts by title in ascending order */
++								label: __( 'A → Z' ),
++								value: 'title/asc',
++							},
++							{
++								/* translators: label for ordering posts by title in descending order */
++								label: __( 'Z → A' ),
++								value: 'title/desc',
++							},
++						] }
++						onChange={ ( value ) => {
++							if ( typeof value !== 'string' ) {
++								return;
++							}
++
++							const [ newOrderBy, newOrder ] = value.split( '/' );
++							if ( newOrder !== order ) {
++								onOrderChange(
++									newOrder as NonNullable<
++										QueryControlsProps[ 'order' ]
++									>
++								);
++							}
++							if ( newOrderBy !== orderBy ) {
++								onOrderByChange(
++									newOrderBy as NonNullable<
++										QueryControlsProps[ 'orderBy' ]
++									>
++								);
++							}
++						} }
++					/>
++				),
++				isSingleCategorySelection( props ) &&
++					props.categoriesList &&
++					props.onCategoryChange && (
++						<CategorySelect
++							key="query-controls-category-select"
++							categoriesList={ props.categoriesList }
++							label={ __( 'Category' ) }
++							noOptionLabel={ __( 'All' ) }
++							selectedCategoryId={ props.selectedCategoryId }
++							onChange={ props.onCategoryChange }
++						/>
++					),
++				isMultipleCategorySelection( props ) &&
++					props.categorySuggestions &&
++					props.onCategoryChange && (
++						<FormTokenField
++							key="query-controls-categories-select"
++							label={ __( 'Categories' ) }
++							value={
++								props.selectedCategories &&
++								props.selectedCategories.map( ( item ) => ( {
++									id: item.id,
++									// Keeping the fallback to `item.value` for legacy reasons,
++									// even if items of `selectedCategories` should not have a
++									// `value` property.
++									// @ts-expect-error
++									value: item.name || item.value,
++								} ) )
++							}
++							suggestions={ Object.keys(
++								props.categorySuggestions
++							) }
++							onChange={ props.onCategoryChange }
++							maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
++						/>
++					),
++				onAuthorChange && (
++					<AuthorSelect
++						key="query-controls-author-select"
++						authorList={ authorList }
++						label={ __( 'Author' ) }
++						noOptionLabel={ __( 'All' ) }
++						selectedAuthorId={ selectedAuthorId }
++						onChange={ onAuthorChange }
++					/>
++				),
++				onNumberOfItemsChange && (
++					<RangeControl
++						__nextHasNoMarginBottom
++						key="query-controls-range-control"
++						label={ __( 'Number of items' ) }
++						value={ numberOfItems }
++						onChange={ onNumberOfItemsChange }
++						min={ minItems }
++						max={ maxItems }
++						required
++					/>
++				),
++			] }
++		</>
++	);
++}
++
++export default QueryControls;
+diff --git a/packages/components/src/query-controls/stories/index.tsx b/packages/components/src/query-controls/stories/index.tsx
+new file mode 100644
+index 00000000000000..d7fa5e50a4531a
+--- /dev/null
++++ b/packages/components/src/query-controls/stories/index.tsx
+@@ -0,0 +1,205 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import QueryControls from '..';
++import type {
++	Category,
++	QueryControlsWithSingleCategorySelectionProps,
++	QueryControlsWithMultipleCategorySelectionProps,
++} from '../types';
++
++const meta: ComponentMeta< typeof QueryControls > = {
++	title: 'Components/QueryControls',
++	component: QueryControls,
++	argTypes: {
++		numberOfItems: { control: { type: null } },
++		order: { control: { type: null } },
++		orderBy: { control: { type: null } },
++		selectedAuthorId: { control: { type: null } },
++		selectedCategories: { control: { type: null } },
++		selectedCategoryId: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++export const Default: ComponentStory< typeof QueryControls > = ( args ) => {
++	const {
++		onAuthorChange,
++		onCategoryChange,
++		onNumberOfItemsChange,
++		onOrderByChange,
++		onOrderChange,
++		...props
++	} = args as QueryControlsWithMultipleCategorySelectionProps;
++	const [ ownNumberOfItems, setOwnNumberOfItems ] = useState(
++		props.numberOfItems
++	);
++	const [ ownOrder, setOwnOrder ] = useState( props.order );
++	const [ ownOrderBy, setOwnOrderBy ] = useState( props.orderBy );
++	const [ ownSelectedAuthorId, setOwnSelectedAuthorId ] = useState(
++		props.selectedAuthorId
++	);
++	const [ ownSelectedCategories, setOwnSelectedCategories ] = useState(
++		props.selectedCategories
++	);
++
++	const handleCategoryChange: QueryControlsWithMultipleCategorySelectionProps[ 'onCategoryChange' ] =
++		( tokens ) => {
++			onCategoryChange?.( tokens );
++
++			const hasNoSuggestion = tokens.some(
++				( token ) =>
++					typeof token === 'string' &&
++					! props.categorySuggestions?.[ token ]
++			);
++			if ( hasNoSuggestion ) {
++				return;
++			}
++			const allCategories = tokens
++				.map( ( token ) => {
++					return typeof token === 'string'
++						? props.categorySuggestions?.[ token ]
++						: token;
++				} )
++				.filter( Boolean ) as Array< Required< Category > >;
++
++			setOwnSelectedCategories( allCategories );
++		};
++
++	return (
++		<QueryControls
++			{ ...props }
++			numberOfItems={ ownNumberOfItems }
++			onCategoryChange={ handleCategoryChange }
++			onOrderByChange={ ( newOrderBy ) => {
++				onOrderByChange?.( newOrderBy );
++				setOwnOrderBy( newOrderBy );
++			} }
++			onOrderChange={ ( newOrder ) => {
++				onOrderChange?.( newOrder );
++				setOwnOrder( newOrder );
++			} }
++			order={ ownOrder }
++			orderBy={ ownOrderBy }
++			onNumberOfItemsChange={ ( newNumber ) => {
++				onNumberOfItemsChange?.( newNumber );
++				setOwnNumberOfItems( newNumber );
++			} }
++			onAuthorChange={ ( newAuthor ) => {
++				onAuthorChange?.( newAuthor );
++				setOwnSelectedAuthorId( Number( newAuthor ) );
++			} }
++			selectedAuthorId={ ownSelectedAuthorId }
++			selectedCategories={ ownSelectedCategories }
++		/>
++	);
++};
++
++Default.args = {
++	authorList: [
++		{
++			id: 1,
++			name: 'admin',
++		},
++		{
++			id: 2,
++			name: 'editor',
++		},
++	],
++	categorySuggestions: {
++		TypeScript: {
++			id: 11,
++			name: 'TypeScript',
++			parent: 0,
++		},
++		JavaScript: {
++			id: 12,
++			name: 'JavaScript',
++			parent: 0,
++		},
++	},
++	selectedCategories: [
++		{
++			id: 11,
++			name: 'JavaScript',
++			parent: 0,
++		},
++	],
++	numberOfItems: 5,
++	order: 'desc',
++	orderBy: 'date',
++	selectedAuthorId: 1,
++};
++
++const SingleCategoryTemplate: ComponentStory< typeof QueryControls > = (
++	args
++) => {
++	const {
++		onAuthorChange,
++		onCategoryChange,
++		onNumberOfItemsChange,
++		onOrderByChange,
++		onOrderChange,
++		...props
++	} = args as QueryControlsWithSingleCategorySelectionProps;
++	const [ ownOrder, setOwnOrder ] = useState( props.order );
++	const [ ownOrderBy, setOwnOrderBy ] = useState( props.orderBy );
++	const [ ownSelectedCategoryId, setSelectedCategoryId ] = useState(
++		props.selectedCategoryId
++	);
++
++	const handleCategoryChange: QueryControlsWithSingleCategorySelectionProps[ 'onCategoryChange' ] =
++		( newCategory ) => {
++			onCategoryChange?.( newCategory );
++			setSelectedCategoryId( Number( newCategory ) );
++		};
++
++	return (
++		<QueryControls
++			{ ...props }
++			onCategoryChange={ handleCategoryChange }
++			onOrderByChange={ ( newOrderBy ) => {
++				setOwnOrderBy( newOrderBy );
++			} }
++			onOrderChange={ ( newOrder ) => {
++				onOrderChange?.( newOrder );
++				setOwnOrder( newOrder );
++			} }
++			order={ ownOrder }
++			orderBy={ ownOrderBy }
++			selectedCategoryId={ ownSelectedCategoryId }
++		/>
++	);
++};
++export const SelectSingleCategory: ComponentStory< typeof QueryControls > =
++	SingleCategoryTemplate.bind( {} );
++SelectSingleCategory.args = {
++	categoriesList: [
++		{
++			id: 11,
++			name: 'TypeScript',
++			parent: 0,
++		},
++		{
++			id: 12,
++			name: 'JavaScript',
++			parent: 0,
++		},
++	],
++	selectedCategoryId: 11,
++};
+diff --git a/packages/components/src/query-controls/terms.js b/packages/components/src/query-controls/terms.js
+deleted file mode 100644
+index 6405cf5d1ba5b0..00000000000000
+--- a/packages/components/src/query-controls/terms.js
++++ /dev/null
+@@ -1,40 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { groupBy } from 'lodash';
+-
+-/**
+- * Returns terms in a tree form.
+- *
+- * @param {Array} flatTerms Array of terms in flat format.
+- *
+- * @return {Array} Array of terms in tree format.
+- */
+-export function buildTermsTree( flatTerms ) {
+-	const flatTermsWithParentAndChildren = flatTerms.map( ( term ) => {
+-		return {
+-			children: [],
+-			parent: null,
+-			...term,
+-		};
+-	} );
+-
+-	const termsByParent = groupBy( flatTermsWithParentAndChildren, 'parent' );
+-	if ( termsByParent.null && termsByParent.null.length ) {
+-		return flatTermsWithParentAndChildren;
+-	}
+-	const fillWithChildren = ( terms ) => {
+-		return terms.map( ( term ) => {
+-			const children = termsByParent[ term.id ];
+-			return {
+-				...term,
+-				children:
+-					children && children.length
+-						? fillWithChildren( children )
+-						: [],
+-			};
+-		} );
+-	};
+-
+-	return fillWithChildren( termsByParent[ '0' ] || [] );
+-}
+diff --git a/packages/components/src/query-controls/terms.ts b/packages/components/src/query-controls/terms.ts
+new file mode 100644
+index 00000000000000..3802e05d84c7d6
+--- /dev/null
++++ b/packages/components/src/query-controls/terms.ts
+@@ -0,0 +1,57 @@
++/**
++ * External dependencies
++ */
++import { groupBy } from 'lodash';
++
++/**
++ * Internal dependencies
++ */
++import type {
++	Author,
++	Category,
++	TermWithParentAndChildren,
++	TermsByParent,
++} from './types';
++
++/**
++ * Returns terms in a tree form.
++ *
++ * @param  flatTerms Array of terms in flat format.
++ *
++ * @return Terms in tree format.
++ */
++export function buildTermsTree( flatTerms: readonly ( Author | Category )[] ) {
++	const flatTermsWithParentAndChildren: TermWithParentAndChildren[] =
++		flatTerms.map( ( term ) => {
++			return {
++				children: [],
++				parent: null,
++				...term,
++				id: String( term.id ),
++			};
++		} );
++
++	const termsByParent: TermsByParent = groupBy(
++		flatTermsWithParentAndChildren,
++		'parent'
++	);
++	if ( termsByParent.null && termsByParent.null.length ) {
++		return flatTermsWithParentAndChildren;
++	}
++	const fillWithChildren = (
++		terms: TermWithParentAndChildren[]
++	): TermWithParentAndChildren[] => {
++		return terms.map( ( term ) => {
++			const children = termsByParent[ term.id ];
++			return {
++				...term,
++				children:
++					children && children.length
++						? fillWithChildren( children )
++						: [],
++			};
++		} );
++	};
++
++	return fillWithChildren( termsByParent[ '0' ] || [] );
++}
+diff --git a/packages/components/src/query-controls/test/terms.js b/packages/components/src/query-controls/test/terms.ts
+similarity index 52%
+rename from packages/components/src/query-controls/test/terms.js
+rename to packages/components/src/query-controls/test/terms.ts
+index 68a1a7f10fb190..0dcaa62f1440a8 100644
+--- a/packages/components/src/query-controls/test/terms.js
++++ b/packages/components/src/query-controls/test/terms.ts
+@@ -6,38 +6,53 @@ import { buildTermsTree } from '../terms';
+ describe( 'buildTermsTree()', () => {
+ 	it( 'Should return same array as input with null parent and empty children added if parent is never specified.', () => {
+ 		const input = Object.freeze( [
+-			{ id: 2232, dummy: true },
+-			{ id: 2245, dummy: true },
++			{ id: 2232, name: 'foo', dummy: true },
++			{ id: 2245, name: 'baz', dummy: true },
+ 		] );
+ 		const output = Object.freeze( [
+-			{ id: 2232, parent: null, children: [], dummy: true },
+-			{ id: 2245, parent: null, children: [], dummy: true },
++			{
++				id: '2232',
++				name: 'foo',
++				parent: null,
++				children: [],
++				dummy: true,
++			},
++			{
++				id: '2245',
++				name: 'baz',
++				parent: null,
++				children: [],
++				dummy: true,
++			},
+ 		] );
+ 		const termsTreem = buildTermsTree( input );
+ 		expect( termsTreem ).toEqual( output );
+ 	} );
+ 	it( 'Should return same array as input with empty children added if all the elements are top level', () => {
+ 		const input = Object.freeze( [
+-			{ id: 2232, parent: 0, dummy: true },
+-			{ id: 2245, parent: 0, dummy: false },
++			{ id: 2232, name: 'foo', parent: 0, dummy: true },
++			{ id: 2245, name: 'baz', parent: 0, dummy: false },
+ 		] );
+ 		const output = [
+-			{ id: 2232, parent: 0, children: [], dummy: true },
+-			{ id: 2245, parent: 0, children: [], dummy: false },
++			{ id: '2232', name: 'foo', parent: 0, children: [], dummy: true },
++			{ id: '2245', name: 'baz', parent: 0, children: [], dummy: false },
+ 		];
+ 		const termsTreem = buildTermsTree( input );
+ 		expect( termsTreem ).toEqual( output );
+ 	} );
+ 	it( 'Should return element with its child if a child exists', () => {
+ 		const input = Object.freeze( [
+-			{ id: 2232, parent: 0 },
+-			{ id: 2245, parent: 2232 },
++			{ id: 2232, name: 'foo', parent: 0 },
++			{ id: 2245, name: 'baz', parent: 2232 },
+ 		] );
+ 		const output = [
+ 			{
+-				id: 2232,
++				id: '2232',
++				name: 'foo',
+ 				parent: 0,
+-				children: [ { id: 2245, parent: 2232, children: [] } ],
++				children: [
++					{ id: '2245', name: 'baz', parent: 2232, children: [] },
++				],
+ 			},
+ 		];
+ 		const termsTreem = buildTermsTree( input );
+@@ -45,21 +60,22 @@ describe( 'buildTermsTree()', () => {
+ 	} );
+ 	it( 'Should return elements with multiple children and elements with no children', () => {
+ 		const input = Object.freeze( [
+-			{ id: 2232, parent: 0 },
+-			{ id: 2245, parent: 2232 },
+-			{ id: 2249, parent: 0 },
+-			{ id: 2246, parent: 2232 },
++			{ id: 2232, name: 'a', parent: 0 },
++			{ id: 2245, name: 'b', parent: 2232 },
++			{ id: 2249, name: 'c', parent: 0 },
++			{ id: 2246, name: 'd', parent: 2232 },
+ 		] );
+ 		const output = [
+ 			{
+-				id: 2232,
++				id: '2232',
++				name: 'a',
+ 				parent: 0,
+ 				children: [
+-					{ id: 2245, parent: 2232, children: [] },
+-					{ id: 2246, parent: 2232, children: [] },
++					{ id: '2245', name: 'b', parent: 2232, children: [] },
++					{ id: '2246', name: 'd', parent: 2232, children: [] },
+ 				],
+ 			},
+-			{ id: 2249, parent: 0, children: [] },
++			{ id: '2249', name: 'c', parent: 0, children: [] },
+ 		];
+ 		const termsTreem = buildTermsTree( input );
+ 		expect( termsTreem ).toEqual( output );
+diff --git a/packages/components/src/query-controls/types.ts b/packages/components/src/query-controls/types.ts
+new file mode 100644
+index 00000000000000..63bbfeaa5a0aac
+--- /dev/null
++++ b/packages/components/src/query-controls/types.ts
+@@ -0,0 +1,146 @@
++/**
++ * Internal dependencies
++ */
++import type { FormTokenFieldProps } from '../form-token-field/types';
++import type { TreeSelectProps } from '../tree-select/types';
++
++export type Author = {
++	id: number;
++	name: string;
++};
++
++export type Category = {
++	id: number;
++	name: string;
++	parent: number;
++};
++
++export type TermWithParentAndChildren = {
++	id: string;
++	name: string;
++	parent: number | null;
++	children: TermWithParentAndChildren[];
++};
++
++export type TermsByParent = Record< string, TermWithParentAndChildren[] >;
++
++export type CategorySelectProps = Pick<
++	TreeSelectProps,
++	'label' | 'noOptionLabel'
++> & {
++	categoriesList: Category[];
++	onChange: ( newCategory: string ) => void;
++	selectedCategoryId?: Category[ 'id' ];
++};
++
++export type AuthorSelectProps = Pick<
++	TreeSelectProps,
++	'label' | 'noOptionLabel'
++> & {
++	authorList?: Author[];
++	onChange: ( newAuthor: string ) => void;
++	selectedAuthorId?: Author[ 'id' ];
++};
++
++type Order = 'asc' | 'desc';
++type OrderBy = 'date' | 'title';
++
++type BaseQueryControlsProps = {
++	/**
++	 * An array of the authors to select from.
++	 */
++	authorList?: AuthorSelectProps[ 'authorList' ];
++	/**
++	 * The maximum number of items.
++	 *
++	 * @default 100
++	 */
++	maxItems?: number;
++	/**
++	 * The minimum number of items.
++	 *
++	 * @default 1
++	 */
++	minItems?: number;
++	/**
++	 * The selected number of items to retrieve via the query.
++	 */
++	numberOfItems?: number;
++	/**
++	 * A function that receives the new author value.
++	 * If not specified, the author controls are not rendered.
++	 */
++	onAuthorChange?: AuthorSelectProps[ 'onChange' ];
++	/**
++	 * A function that receives the new number of items.
++	 * If not specified, then the number of items
++	 * range control is not rendered.
++	 */
++	onNumberOfItemsChange?: ( newNumber?: number ) => void;
++	/**
++	 * A function that receives the new order value.
++	 * If this prop or the `onOrderByChange` prop are not specified,
++	 * then the order controls are not rendered.
++	 */
++	onOrderChange?: ( newOrder: Order ) => void;
++	/**
++	 * A function that receives the new orderby value.
++	 * If this prop or the `onOrderChange` prop are not specified,
++	 * then the order controls are not rendered.
++	 */
++	onOrderByChange?: ( newOrderBy: OrderBy ) => void;
++	/**
++	 * The order in which to retrieve posts.
++	 */
++	order?: Order;
++	/**
++	 * The meta key by which to order posts.
++	 */
++	orderBy?: OrderBy;
++	/**
++	 * The selected author ID.
++	 */
++	selectedAuthorId?: AuthorSelectProps[ 'selectedAuthorId' ];
++};
++
++export type QueryControlsWithSingleCategorySelectionProps =
++	BaseQueryControlsProps & {
++		/**
++		 * An array of categories. When passed in conjunction with the
++		 * `onCategoryChange` prop, it causes the component to render UI that allows
++		 * selecting one category at a time.
++		 */
++		categoriesList?: CategorySelectProps[ 'categoriesList' ];
++		/**
++		 * The selected category for the `categoriesList` prop.
++		 */
++		selectedCategoryId?: CategorySelectProps[ 'selectedCategoryId' ];
++		/**
++		 * A function that receives the new category value.
++		 * If not specified, the category controls are not rendered.
++		 */
++		onCategoryChange?: CategorySelectProps[ 'onChange' ];
++	};
++
++export type QueryControlsWithMultipleCategorySelectionProps =
++	BaseQueryControlsProps & {
++		/**
++		 * An object of categories with the category name as the key. When passed in
++		 * conjunction with the `onCategoryChange` prop, it causes the component to
++		 * render UI that enables multiple selection.
++		 */
++		categorySuggestions?: Record< Category[ 'name' ], Category >;
++		/**
++		 * The selected categories for the `categorySuggestions` prop.
++		 */
++		selectedCategories?: Category[];
++		/**
++		 * A function that receives the new category value.
++		 * If not specified, the category controls are not rendered.
++		 */
++		onCategoryChange?: FormTokenFieldProps[ 'onChange' ];
++	};
++
++export type QueryControlsProps =
++	| QueryControlsWithSingleCategorySelectionProps
++	| QueryControlsWithMultipleCategorySelectionProps;
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 7570fa13a60ada..83d8d6251b94d6 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -60,7 +60,6 @@
+ 		"src/notice",
+ 		"src/palette-edit",
+ 		"src/panel",
+-		"src/query-controls",
+ 		"src/toolbar",
+ 		"src/tree-grid"
+ 	]

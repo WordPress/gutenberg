@@ -1,0 +1,51 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6c00d6e22027bc..41c67e3d50c6c9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,9 @@
+ -   `Modal`: Remove children container's unused class name ([#50655](https://github.com/WordPress/gutenberg/pull/50655)).
+ -   `DropdownMenu`: Convert to TypeScript ([#50187](https://github.com/WordPress/gutenberg/pull/50187)).
+ 
++### Bug Fix
++
++-   `InputControl`: Fix focus style to support Windows High Contrast mode ([#50772](https://github.com/WordPress/gutenberg/pull/50772)).
+ 
+ ## 24.0.0 (2023-05-10)
+ 
+@@ -21,7 +24,7 @@
+ ### Bug Fix
+ 
+ -   `NavigableContainer`: do not trap focus in `TabbableContainer` ([#49846](https://github.com/WordPress/gutenberg/pull/49846)).
+--   Update `<Button>` component to have a transparent background for its tertiary disabled state, to match its enabled state.  ([#50496](https://github.com/WordPress/gutenberg/pull/50496)).
++-   Update `<Button>` component to have a transparent background for its tertiary disabled state, to match its enabled state. ([#50496](https://github.com/WordPress/gutenberg/pull/50496)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 1be98530d1fa48..3548be6f7260c5 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -270,9 +270,14 @@ const backdropFocusedStyles = ( {
+ 	let borderColor = isFocused ? COLORS.ui.borderFocus : COLORS.ui.border;
+ 
+ 	let boxShadow;
++	let outline;
++	let outlineOffset;
+ 
+ 	if ( isFocused ) {
+ 		boxShadow = `0 0 0 1px ${ COLORS.ui.borderFocus } inset`;
++		// Windows High Contrast mode will show this outline, but not the box-shadow.
++		outline = `2px solid transparent`;
++		outlineOffset = `-2px`;
+ 	}
+ 
+ 	if ( disabled ) {
+@@ -284,6 +289,8 @@ const backdropFocusedStyles = ( {
+ 		borderColor,
+ 		borderStyle: 'solid',
+ 		borderWidth: 1,
++		outline,
++		outlineOffset,
+ 	} );
+ };
+ 

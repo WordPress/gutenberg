@@ -1,0 +1,455 @@
+diff --git a/package-lock.json b/package-lock.json
+index 0e27a7383cf08a..0c43b3c688bb18 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -3828,6 +3828,7 @@
+ 				"@babel/runtime": "^7.4.4",
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
++				"@wordpress/deprecated": "file:packages/deprecated",
+ 				"@wordpress/dom": "file:packages/dom",
+ 				"@wordpress/element": "file:packages/element",
+ 				"@wordpress/hooks": "file:packages/hooks",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a2ce1b818505e4..cccebe7571833d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,15 @@
+ 
+ - The `Button` component will no longer assign default styling (`is-default` class) when explicitly assigned as primary (the `isPrimary` prop). This should resolve potential conflicts affecting a combination of `isPrimary`, `isDefault`, and `isLarge` / `isSmall`, where the busy animation would appear with incorrect coloring.
+ 
++### Deprecations
++
++- The `Popover` component `onClickOutside` prop has been deprecated. Use `onFocusOutside` instead.
++
++### Internal
++
++- The `Dropdown` component has been refactored to focus changes using the `Popover` component's `onFocusOutside` prop.
++- The `MenuItem` component will now always use an `IconButton`. This prevents a focus loss when clicking a menu item.
++
+ ## 8.0.0 (2019-06-12)
+ 
+ ### New Feature
+diff --git a/packages/components/package.json b/packages/components/package.json
+index bcb29085eeb835..3a1381367b463a 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -24,6 +24,7 @@
+ 		"@babel/runtime": "^7.4.4",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
++		"@wordpress/deprecated": "file:../deprecated",
+ 		"@wordpress/dom": "file:../dom",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/hooks": "file:../hooks",
+diff --git a/packages/components/src/dropdown-menu/style.scss b/packages/components/src/dropdown-menu/style.scss
+index cbd41243062d3b..001d39ead784e8 100644
+--- a/packages/components/src/dropdown-menu/style.scss
++++ b/packages/components/src/dropdown-menu/style.scss
+@@ -99,7 +99,8 @@
+ 		border-bottom: $border-width solid $light-gray-500;
+ 	}
+ 
+-	.components-menu-item__button {
++	.components-menu-item__button,
++	.components-menu-item__button.components-icon-button {
+ 		padding-left: 2rem;
+ 
+ 		&.has-icon {
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index bff463f6655f9c..e198b239e32ca2 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -14,7 +14,7 @@ class Dropdown extends Component {
+ 
+ 		this.toggle = this.toggle.bind( this );
+ 		this.close = this.close.bind( this );
+-		this.closeIfClickOutside = this.closeIfClickOutside.bind( this );
++		this.closeIfFocusOutside = this.closeIfFocusOutside.bind( this );
+ 
+ 		this.containerRef = createRef();
+ 
+@@ -46,15 +46,13 @@ class Dropdown extends Component {
+ 	}
+ 
+ 	/**
+-	 * Closes the dropdown if a click occurs outside the dropdown wrapper. This
+-	 * is intentionally distinct from `onClose` in that a click outside the
+-	 * popover may occur in the toggling of the dropdown via its toggle button.
+-	 * The correct behavior is to keep the dropdown closed.
+-	 *
+-	 * @param {MouseEvent} event Click event triggering `onClickOutside`.
++	 * Closes the dropdown if a focus leaves the dropdown wrapper. This is
++	 * intentionally distinct from `onClose` since focus loss from the popover
++	 * is expected to occur when using the Dropdown's toggle button, in which
++	 * case the correct behavior is to keep the dropdown closed.
+ 	 */
+-	closeIfClickOutside( event ) {
+-		if ( ! this.containerRef.current.contains( event.target ) ) {
++	closeIfFocusOutside() {
++		if ( ! this.containerRef.current.contains( document.activeElement ) ) {
+ 			this.close();
+ 		}
+ 	}
+@@ -87,7 +85,7 @@ class Dropdown extends Component {
+ 						className={ contentClassName }
+ 						position={ position }
+ 						onClose={ this.close }
+-						onClickOutside={ this.closeIfClickOutside }
++						onFocusOutside={ this.closeIfFocusOutside }
+ 						expandOnMobile={ expandOnMobile }
+ 						headerTitle={ headerTitle }
+ 						focusOnMount={ focusOnMount }
+diff --git a/packages/components/src/menu-item/index.js b/packages/components/src/menu-item/index.js
+index de5429ddf525f8..b7cc7c8ca7a0bd 100644
+--- a/packages/components/src/menu-item/index.js
++++ b/packages/components/src/menu-item/index.js
+@@ -7,12 +7,11 @@ import { isString } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+-import { createElement, cloneElement } from '@wordpress/element';
++import { cloneElement } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+-import Button from '../button';
+ import Shortcut from '../shortcut';
+ import IconButton from '../icon-button';
+ 
+@@ -47,32 +46,26 @@ export function MenuItem( {
+ 		);
+ 	}
+ 
+-	let tagName = Button;
+-
+-	if ( icon ) {
+-		if ( ! isString( icon ) ) {
+-			icon = cloneElement( icon, {
+-				className: 'components-menu-items__item-icon',
+-				height: 20,
+-				width: 20,
+-			} );
+-		}
+-
+-		tagName = IconButton;
+-		props.icon = icon;
++	if ( icon && ! isString( icon ) ) {
++		icon = cloneElement( icon, {
++			className: 'components-menu-items__item-icon',
++			height: 20,
++			width: 20,
++		} );
+ 	}
+ 
+-	return createElement(
+-		tagName,
+-		{
++	return (
++		<IconButton
++			icon={ icon }
+ 			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
+-			'aria-checked': ( role === 'menuitemcheckbox' || role === 'menuitemradio' ) ? isSelected : undefined,
+-			role,
+-			className,
+-			...props,
+-		},
+-		children,
+-		<Shortcut className="components-menu-item__shortcut" shortcut={ shortcut } />
++			aria-checked={ ( role === 'menuitemcheckbox' || role === 'menuitemradio' ) ? isSelected : undefined }
++			role={ role }
++			className={ className }
++			{ ...props }
++		>
++			{ children }
++			<Shortcut className="components-menu-item__shortcut" shortcut={ shortcut } />
++		</IconButton>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/menu-item/test/__snapshots__/index.js.snap b/packages/components/src/menu-item/test/__snapshots__/index.js.snap
+index d029c29c0cb3aa..df61af88f86c88 100644
+--- a/packages/components/src/menu-item/test/__snapshots__/index.js.snap
++++ b/packages/components/src/menu-item/test/__snapshots__/index.js.snap
+@@ -17,7 +17,7 @@ exports[`MenuItem should match snapshot when all props provided 1`] = `
+ `;
+ 
+ exports[`MenuItem should match snapshot when info is provided 1`] = `
+-<ForwardRef(Button)
++<ForwardRef(IconButton)
+   className="components-menu-item__button"
+   role="menuitem"
+ >
+@@ -34,7 +34,7 @@ exports[`MenuItem should match snapshot when info is provided 1`] = `
+   <Shortcut
+     className="components-menu-item__shortcut"
+   />
+-</ForwardRef(Button)>
++</ForwardRef(IconButton)>
+ `;
+ 
+ exports[`MenuItem should match snapshot when isSelected and role are optionally provided 1`] = `
+@@ -53,7 +53,7 @@ exports[`MenuItem should match snapshot when isSelected and role are optionally
+ `;
+ 
+ exports[`MenuItem should match snapshot when only label provided 1`] = `
+-<ForwardRef(Button)
++<ForwardRef(IconButton)
+   className="components-menu-item__button"
+   role="menuitem"
+ >
+@@ -61,5 +61,5 @@ exports[`MenuItem should match snapshot when only label provided 1`] = `
+   <Shortcut
+     className="components-menu-item__shortcut"
+   />
+-</ForwardRef(Button)>
++</ForwardRef(IconButton)>
+ `;
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index 99097e08546b55..c5877205969333 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -93,9 +93,11 @@ A callback invoked when the popover should be closed.
+ - Type: `Function`
+ - Required: No
+ 
+-### onClickOutside
++### onFocusOutside
+ 
+-A callback invoked when the user clicks outside the opened popover, passing the click event. The popover should be closed in response to this interaction. Defaults to `onClose`.
++A callback invoked when the focus leaves the opened popover. This should only be provided in advanced use-cases when a Popover should close under specific circumstances; for example, if the new `document.activeElement` is content of or otherwise controlling Popover visibility.
++
++Defaults to `onClose` when not provided.
+ 
+ - Type: `Function`
+ - Required: No
+diff --git a/packages/components/src/popover/detect-outside.js b/packages/components/src/popover/detect-outside.js
+index a890eb664fcacc..92a3359d24055f 100644
+--- a/packages/components/src/popover/detect-outside.js
++++ b/packages/components/src/popover/detect-outside.js
+@@ -1,19 +1,16 @@
+ /**
+- * External dependencies
++ * WordPress dependencies
+  */
+-import clickOutside from 'react-click-outside';
++import { Component } from '@wordpress/element';
+ 
+ /**
+- * WordPress dependencies
++ * Internal dependencies
+  */
+-import { Component } from '@wordpress/element';
++import withFocusOutside from '../higher-order/with-focus-outside';
+ 
+ class PopoverDetectOutside extends Component {
+-	handleClickOutside( event ) {
+-		const { onClickOutside } = this.props;
+-		if ( onClickOutside ) {
+-			onClickOutside( event );
+-		}
++	handleFocusOutside( event ) {
++		this.props.onFocusOutside( event );
+ 	}
+ 
+ 	render() {
+@@ -21,4 +18,4 @@ class PopoverDetectOutside extends Component {
+ 	}
+ }
+ 
+-export default clickOutside( PopoverDetectOutside );
++export default withFocusOutside( PopoverDetectOutside );
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index c303b1c75acb07..1dad7be985dfb5 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -10,6 +10,7 @@ import { useRef, useState, useEffect } from '@wordpress/element';
+ import { focus } from '@wordpress/dom';
+ import { ESCAPE } from '@wordpress/keycodes';
+ import isShallowEqual from '@wordpress/is-shallow-equal';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -251,7 +252,6 @@ const Popover = ( {
+ 	onKeyDown,
+ 	children,
+ 	className,
+-	onClickOutside = onClose,
+ 	noArrow = false,
+ 	// Disable reason: We generate the `...contentProps` rest as remainder
+ 	// of props which aren't explicitly handled by this component.
+@@ -263,6 +263,8 @@ const Popover = ( {
+ 	getAnchorRect,
+ 	expandOnMobile,
+ 	animate = true,
++	onClickOutside,
++	onFocusOutside,
+ 	/* eslint-enable no-unused-vars */
+ 	...contentProps
+ } ) => {
+@@ -308,6 +310,45 @@ const Popover = ( {
+ 		}
+ 	};
+ 
++	/**
++	 * Shims an onFocusOutside callback to be compatible with a deprecated
++	 * onClickOutside prop function, if provided.
++	 *
++	 * @param {FocusEvent} event Focus event from onFocusOutside.
++	 */
++	function handleOnFocusOutside( event ) {
++		// Defer to given `onFocusOutside` if specified. Call `onClose` only if
++		// both `onFocusOutside` and `onClickOutside` are unspecified. Doing so
++		// assures backwards-compatibility for prior `onClickOutside` default.
++		if ( onFocusOutside ) {
++			onFocusOutside( event );
++			return;
++		} else if ( ! onClickOutside ) {
++			onClose();
++			return;
++		}
++
++		// Simulate MouseEvent using FocusEvent#relatedTarget as emulated click
++		// target. MouseEvent constructor is unsupported in Internet Explorer.
++		let clickEvent;
++		try {
++			clickEvent = new window.MouseEvent( 'click' );
++		} catch ( error ) {
++			clickEvent = document.createEvent( 'MouseEvent' );
++			clickEvent.initMouseEvent( 'click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null );
++		}
++
++		Object.defineProperty( clickEvent, 'target', {
++			get: () => event.relatedTarget,
++		} );
++
++		deprecated( 'Popover onClickOutside prop', {
++			alternative: 'onFocusOutside',
++		} );
++
++		onClickOutside( clickEvent );
++	}
++
+ 	// Compute the animation position
+ 	const yAxisMapping = {
+ 		top: 'bottom',
+@@ -339,7 +380,7 @@ const Popover = ( {
+ 
+ 	/* eslint-disable jsx-a11y/no-static-element-interactions */
+ 	let content = (
+-		<PopoverDetectOutside onClickOutside={ onClickOutside }>
++		<PopoverDetectOutside onFocusOutside={ handleOnFocusOutside }>
+ 			<Animate
+ 				type={ animate && isReadyToAnimate ? 'appear' : null }
+ 				options={ { origin: animateYAxis + ' ' + animateXAxis } }
+diff --git a/packages/components/src/popover/test/__snapshots__/index.js.snap b/packages/components/src/popover/test/__snapshots__/index.js.snap
+index 9813681b30734e..614f2dd55e5ee5 100644
+--- a/packages/components/src/popover/test/__snapshots__/index.js.snap
++++ b/packages/components/src/popover/test/__snapshots__/index.js.snap
+@@ -6,16 +6,18 @@ exports[`Popover should pass additional props to portaled element 1`] = `
+     tabindex="-1"
+   >
+     <div>
+-      <div
+-        class="components-popover is-bottom is-center components-animate__appear is-from-top"
+-        role="tooltip"
+-        style=""
+-      >
++      <div>
+         <div
+-          class="components-popover__content"
+-          tabindex="-1"
++          class="components-popover is-bottom is-center components-animate__appear is-from-top"
++          role="tooltip"
++          style=""
+         >
+-          Hello
++          <div
++            class="components-popover__content"
++            tabindex="-1"
++          >
++            Hello
++          </div>
+         </div>
+       </div>
+     </div>
+@@ -29,15 +31,17 @@ exports[`Popover should render content 1`] = `
+     tabindex="-1"
+   >
+     <div>
+-      <div
+-        class="components-popover is-bottom is-center components-animate__appear is-from-top"
+-        style=""
+-      >
++      <div>
+         <div
+-          class="components-popover__content"
+-          tabindex="-1"
++          class="components-popover is-bottom is-center components-animate__appear is-from-top"
++          style=""
+         >
+-          Hello
++          <div
++            class="components-popover__content"
++            tabindex="-1"
++          >
++            Hello
++          </div>
+         </div>
+       </div>
+     </div>
+diff --git a/packages/format-library/CHANGELOG.md b/packages/format-library/CHANGELOG.md
+index df1eeff7c6dbf6..ebe4074c8b5242 100644
+--- a/packages/format-library/CHANGELOG.md
++++ b/packages/format-library/CHANGELOG.md
+@@ -1,3 +1,9 @@
++## Unreleased
++
++### Internal
++
++- The inline link component has been refactored to focus changes using the `Popover` component's `onFocusOutside` prop.
++
+ ## 1.2.10 (2019-01-03)
+ 
+ ## 1.2.9 (2018-12-18)
+diff --git a/packages/format-library/src/link/inline.js b/packages/format-library/src/link/inline.js
+index 564ae795fd484b..48f116f9a69339 100644
+--- a/packages/format-library/src/link/inline.js
++++ b/packages/format-library/src/link/inline.js
+@@ -74,7 +74,7 @@ class InlineLinkUI extends Component {
+ 		this.onKeyDown = this.onKeyDown.bind( this );
+ 		this.onChangeInputValue = this.onChangeInputValue.bind( this );
+ 		this.setLinkTarget = this.setLinkTarget.bind( this );
+-		this.onClickOutside = this.onClickOutside.bind( this );
++		this.onFocusOutside = this.onFocusOutside.bind( this );
+ 		this.resetState = this.resetState.bind( this );
+ 		this.autocompleteRef = createRef();
+ 
+@@ -165,13 +165,13 @@ class InlineLinkUI extends Component {
+ 		}
+ 	}
+ 
+-	onClickOutside( event ) {
++	onFocusOutside() {
+ 		// The autocomplete suggestions list renders in a separate popover (in a portal),
+-		// so onClickOutside fails to detect that a click on a suggestion occurred in the
++		// so onFocusOutside fails to detect that a click on a suggestion occurred in the
+ 		// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
+ 		// return to avoid the popover being closed.
+ 		const autocompleteElement = this.autocompleteRef.current;
+-		if ( autocompleteElement && autocompleteElement.contains( event.target ) ) {
++		if ( autocompleteElement && autocompleteElement.contains( document.activeElement ) ) {
+ 			return;
+ 		}
+ 
+@@ -198,7 +198,7 @@ class InlineLinkUI extends Component {
+ 				value={ value }
+ 				isActive={ isActive }
+ 				addingLink={ addingLink }
+-				onClickOutside={ this.onClickOutside }
++				onFocusOutside={ this.onFocusOutside }
+ 				onClose={ this.resetState }
+ 				focusOnMount={ showInput ? 'firstElement' : false }
+ 				renderSettings={ () => (

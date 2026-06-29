@@ -1,0 +1,44 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5426a4d6d6dda0..2292380e12370a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,7 @@
+ -   `Higher Order` -- `with-focus-outside`: Convert to TypeScript ([#53980](https://github.com/WordPress/gutenberg/pull/53980)).
+ -   `IsolatedEventContainer`: Convert unit test to TypeScript ([#54316](https://github.com/WordPress/gutenberg/pull/54316)).
+ -   `Popover`: Remove `scroll` and `resize` listeners for iframe overflow parents and rely on recently added native Floating UI support ([#54286](https://github.com/WordPress/gutenberg/pull/54286)).
++-   `Button`: Update documentation to remove the button `focus` prop ([#54397](https://github.com/WordPress/gutenberg/pull/54397)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index 5430b869485ea0..fdd46b0255ccf2 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -145,12 +145,6 @@ Whether the button is disabled. If `true`, this will force a `button` element to
+ 
+ -   Required: No
+ 
+-#### `focus`: `boolean`
+-
+-Whether the button is focused.
+-
+--   Required: No
+-
+ #### `href`: `string`
+ 
+ If provided, renders `a` instead of `button`.
+diff --git a/packages/components/src/button/types.ts b/packages/components/src/button/types.ts
+index c55b74c0461573..13b3fa5e00207e 100644
+--- a/packages/components/src/button/types.ts
++++ b/packages/components/src/button/types.ts
+@@ -33,10 +33,6 @@ type BaseButtonProps = {
+ 	 * An accessible description for the button.
+ 	 */
+ 	describedBy?: string;
+-	/**
+-	 * Whether the button is focused.
+-	 */
+-	focus?: boolean;
+ 	/**
+ 	 * If provided, renders an Icon component inside the button.
+ 	 */

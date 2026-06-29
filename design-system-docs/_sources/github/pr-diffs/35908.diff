@@ -1,0 +1,31 @@
+diff --git a/packages/components/src/angle-picker-control/index.js b/packages/components/src/angle-picker-control/index.js
+index 842c6e6c6b9223..7d8aeb4b3e3821 100644
+--- a/packages/components/src/angle-picker-control/index.js
++++ b/packages/components/src/angle-picker-control/index.js
+@@ -49,7 +49,9 @@ export default function AnglePickerControl( {
+ 						<Spacer
+ 							as={ Text }
+ 							marginRight={ space( 3 ) }
+-							color="blue"
++							style={ {
++								color: 'var( --wp-admin-theme-color )',
++							} }
+ 						>
+ 							°
+ 						</Spacer>
+diff --git a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
+index 9c9e0f720a69d8..9bf45eaf92056e 100644
+--- a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
++++ b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
+@@ -36,9 +36,9 @@ export const CircleIndicatorWrapper = styled.div`
+ `;
+ 
+ export const CircleIndicator = styled.div`
+-	background: #3858e9;
++	background: ${ COLORS.admin.theme };
+ 	border-radius: 50%;
+-	border: ${ INNER_CIRCLE_SIZE }px solid #3858e9;
++	border: ${ INNER_CIRCLE_SIZE }px solid ${ COLORS.admin.theme };
+ 	bottom: 0;
+ 	box-sizing: border-box;
+ 	display: block;

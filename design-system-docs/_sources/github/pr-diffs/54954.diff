@@ -1,0 +1,352 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 14166f8827ec80..460ea9d8b7aa2e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `Modal`: fix closing when contained iframe is focused ([#51602](https://github.com/WordPress/gutenberg/pull/51602)).
+ 
++### Internal
++
++-   `ConfirmDialog`: Migrate to TypeScript. ([#54954](https://github.com/WordPress/gutenberg/pull/54954)).
++
+ ## 25.9.0 (2023-10-05)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/confirm-dialog/README.md b/packages/components/src/confirm-dialog/README.md
+index 86d38bccdec3c6..4b0f37f5d35b39 100644
+--- a/packages/components/src/confirm-dialog/README.md
++++ b/packages/components/src/confirm-dialog/README.md
+@@ -137,4 +137,4 @@ The optional custom text to display as the confirmation button's label
+ -   Required: No
+ -   Default: "Cancel"
+ 
+-The optional custom text to display as the cancelation button's label
++The optional custom text to display as the cancellation button's label
+diff --git a/packages/components/src/confirm-dialog/component.tsx b/packages/components/src/confirm-dialog/component.tsx
+index 4a8efd06e139c7..750e7030de13cd 100644
+--- a/packages/components/src/confirm-dialog/component.tsx
++++ b/packages/components/src/confirm-dialog/component.tsx
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import type { ForwardedRef, KeyboardEvent } from 'react';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -13,7 +8,7 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Modal from '../modal';
+-import type { OwnProps, DialogInputEvent } from './types';
++import type { ConfirmDialogProps, DialogInputEvent } from './types';
+ import type { WordPressComponentProps } from '../context';
+ import { useContextSystem, contextConnect } from '../context';
+ import { Flex } from '../flex';
+@@ -23,10 +18,10 @@ import { VStack } from '../v-stack';
+ import * as styles from './styles';
+ import { useCx } from '../utils/hooks/use-cx';
+ 
+-function ConfirmDialog(
+-	props: WordPressComponentProps< OwnProps, 'div', false >,
+-	forwardedRef: ForwardedRef< any >
+-) {
++const UnconnectedConfirmDialog = (
++	props: WordPressComponentProps< ConfirmDialogProps, 'div', false >,
++	forwardedRef: React.ForwardedRef< any >
++) => {
+ 	const {
+ 		isOpen: isOpenProp,
+ 		onConfirm,
+@@ -67,7 +62,7 @@ function ConfirmDialog(
+ 	);
+ 
+ 	const handleEnter = useCallback(
+-		( event: KeyboardEvent< HTMLDivElement > ) => {
++		( event: React.KeyboardEvent< HTMLDivElement > ) => {
+ 			// Avoid triggering the 'confirm' action when a button is focused,
+ 			// as this can cause a double submission.
+ 			const isConfirmOrCancelButton =
+@@ -120,6 +115,77 @@ function ConfirmDialog(
+ 			) }
+ 		</>
+ 	);
+-}
++};
+ 
+-export default contextConnect( ConfirmDialog, 'ConfirmDialog' );
++/**
++ * `ConfirmDialog` is built of top of [`Modal`](/packages/components/src/modal/README.md)
++ * and displays a confirmation dialog, with _confirm_ and _cancel_ buttons.
++ * The dialog is confirmed by clicking the _confirm_ button or by pressing the `Enter` key.
++ * It is cancelled (closed) by clicking the _cancel_ button, by pressing the `ESC` key, or by
++ * clicking outside the dialog focus (i.e, the overlay).
++ *
++ * `ConfirmDialog` has two main implicit modes: controlled and uncontrolled.
++ *
++ * UnControlled:
++ *
++ * Allows the component to be used standalone, just by declaring it as part of another React's component render method:
++ * -   It will be automatically open (displayed) upon mounting;
++ * -   It will be automatically closed when clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay);
++ * -   `onCancel` is not mandatory but can be passed. Even if passed, the dialog will still be able to close itself.
++ *
++ * Activating this mode is as simple as omitting the `isOpen` prop. The only mandatory prop, in this case, is the `onConfirm` callback. The message is passed as the `children`. You can pass any JSX you'd like, which allows to further format the message or include sub-component if you'd like:
++ *
++ * ```jsx
++ * import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
++ *
++ * function Example() {
++ * 	return (
++ * 		<ConfirmDialog onConfirm={ () => console.debug( ' Confirmed! ' ) }>
++ * 			Are you sure? <strong>This action cannot be undone!</strong>
++ * 		</ConfirmDialog>
++ * 	);
++ * }
++ * ```
++ *
++ *
++ * Controlled mode:
++ *  Let the parent component control when the dialog is open/closed. It's activated when a
++ * boolean value is passed to `isOpen`:
++ * -   It will not be automatically closed. You need to let it know when to open/close by updating the value of the `isOpen` prop;
++ * -   Both `onConfirm` and the `onCancel` callbacks are mandatory props in this mode;
++ * -   You'll want to update the state that controls `isOpen` by updating it from the `onCancel` and `onConfirm` callbacks.
++ *
++ *```jsx
++ * import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * function Example() {
++ * 	const [ isOpen, setIsOpen ] = useState( true );
++ *
++ * 	const handleConfirm = () => {
++ * 		console.debug( 'Confirmed!' );
++ * 		setIsOpen( false );
++ * 	};
++ *
++ * 	const handleCancel = () => {
++ * 		console.debug( 'Cancelled!' );
++ * 		setIsOpen( false );
++ * 	};
++ *
++ * 	return (
++ * 		<ConfirmDialog
++ * 			isOpen={ isOpen }
++ * 			onConfirm={ handleConfirm }
++ * 			onCancel={ handleCancel }
++ * 		>
++ * 			Are you sure? <strong>This action cannot be undone!</strong>
++ * 		</ConfirmDialog>
++ * 	);
++ * }
++ * ```
++ */
++export const ConfirmDialog = contextConnect(
++	UnconnectedConfirmDialog,
++	'ConfirmDialog'
++);
++export default ConfirmDialog;
+diff --git a/packages/components/src/confirm-dialog/stories/index.story.js b/packages/components/src/confirm-dialog/stories/index.story.tsx
+similarity index 75%
+rename from packages/components/src/confirm-dialog/stories/index.story.js
+rename to packages/components/src/confirm-dialog/stories/index.story.tsx
+index ea561ff297c436..85636c0ddc81ed 100644
+--- a/packages/components/src/confirm-dialog/stories/index.story.js
++++ b/packages/components/src/confirm-dialog/stories/index.story.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { Meta, StoryFn } from '@storybook/react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -7,47 +12,41 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Button from '../../button';
+-import { ConfirmDialog } from '..';
++import { ConfirmDialog } from '../component';
+ 
+-const meta = {
++const meta: Meta< typeof ConfirmDialog > = {
+ 	component: ConfirmDialog,
+ 	title: 'Components (Experimental)/ConfirmDialog',
+ 	argTypes: {
+-		children: {
+-			control: { type: 'text' },
+-		},
+-		confirmButtonText: {
+-			control: { type: 'text' },
+-		},
+-		cancelButtonText: {
+-			control: { type: 'text' },
+-		},
+ 		isOpen: {
+ 			control: { type: null },
+ 		},
+-		onConfirm: { action: 'onConfirm' },
+-		onCancel: { action: 'onCancel' },
+-	},
+-	args: {
+-		children: 'Would you like to privately publish the post now?',
+ 	},
+ 	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: {
++			expanded: true,
++		},
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 	},
+ };
+ 
+ export default meta;
+ 
+-const Template = ( { onConfirm, onCancel, ...args } ) => {
++const Template: StoryFn< typeof ConfirmDialog > = ( {
++	onConfirm,
++	onCancel,
++	...args
++} ) => {
+ 	const [ isOpen, setIsOpen ] = useState( false );
+ 
+-	const handleConfirm = ( ...confirmArgs ) => {
+-		onConfirm( ...confirmArgs );
++	const handleConfirm: typeof onConfirm = ( confirmArgs ) => {
++		onConfirm( confirmArgs );
+ 		setIsOpen( false );
+ 	};
+ 
+-	const handleCancel = ( ...cancelArgs ) => {
+-		onCancel( ...cancelArgs );
++	const handleCancel: typeof onCancel = ( cancelArgs ) => {
++		onCancel?.( cancelArgs );
+ 		setIsOpen( false );
+ 	};
+ 
+@@ -70,7 +69,7 @@ const Template = ( { onConfirm, onCancel, ...args } ) => {
+ };
+ 
+ // Simplest usage: just declare the component with the required `onConfirm` prop. Note: the `onCancel` prop is optional here, unless you'd like to render the component in Controlled mode (see below)
+-export const _default = Template.bind( {} );
++export const Default = Template.bind( {} );
+ const _defaultSnippet = `() => {
+   const [ isOpen, setIsOpen ] = useState( false );
+   const [ confirmVal, setConfirmVal ] = useState('');
+@@ -103,8 +102,10 @@ const _defaultSnippet = `() => {
+     </>
+   );
+ };`;
+-_default.args = {};
+-_default.parameters = {
++Default.args = {
++	children: 'Would you like to privately publish the post now?',
++};
++Default.parameters = {
+ 	docs: {
+ 		source: {
+ 			code: _defaultSnippet,
+@@ -117,6 +118,7 @@ _default.parameters = {
+ // To customize button text, pass the `cancelButtonText` and/or `confirmButtonText` props.
+ export const WithCustomButtonLabels = Template.bind( {} );
+ WithCustomButtonLabels.args = {
++	...Default.args,
+ 	cancelButtonText: 'No thanks',
+ 	confirmButtonText: 'Yes please!',
+ };
+diff --git a/packages/components/src/confirm-dialog/test/index.js b/packages/components/src/confirm-dialog/test/index.tsx
+similarity index 98%
+rename from packages/components/src/confirm-dialog/test/index.js
+rename to packages/components/src/confirm-dialog/test/index.tsx
+index adf19b292898f8..27e1af66ce7429 100644
+--- a/packages/components/src/confirm-dialog/test/index.js
++++ b/packages/components/src/confirm-dialog/test/index.tsx
+@@ -113,7 +113,7 @@ describe( 'Confirm', () => {
+ 				expect( onCancel ).toHaveBeenCalled();
+ 			} );
+ 
+-			it( 'should be dismissable even if an `onCancel` callback is not provided', async () => {
++			it( 'should be dismissible even if an `onCancel` callback is not provided', async () => {
+ 				const user = userEvent.setup();
+ 
+ 				render(
+@@ -144,7 +144,7 @@ describe( 'Confirm', () => {
+ 
+ 				// Disable reason: Semantic queries can’t reach the overlay.
+ 				// eslint-disable-next-line testing-library/no-node-access
+-				await user.click( confirmDialog.parentElement );
++				await user.click( confirmDialog.parentElement! );
+ 
+ 				expect( confirmDialog ).not.toBeInTheDocument();
+ 				expect( onCancel ).toHaveBeenCalled();
+@@ -325,7 +325,7 @@ describe( 'Confirm', () => {
+ 
+ 			// Disable reason: Semantic queries can’t reach the overlay.
+ 			// eslint-disable-next-line testing-library/no-node-access
+-			await user.click( confirmDialog.parentElement );
++			await user.click( confirmDialog.parentElement! );
+ 
+ 			expect( onCancel ).toHaveBeenCalled();
+ 		} );
+diff --git a/packages/components/src/confirm-dialog/types.ts b/packages/components/src/confirm-dialog/types.ts
+index 72fef59dc20094..b456b9bc4df196 100644
+--- a/packages/components/src/confirm-dialog/types.ts
++++ b/packages/components/src/confirm-dialog/types.ts
+@@ -13,21 +13,41 @@ export type DialogInputEvent =
+ 	| KeyboardEvent< HTMLDivElement >
+ 	| MouseEvent< HTMLButtonElement >;
+ 
+-type BaseProps = {
++export type ConfirmDialogProps = {
++	/**
++	 * The actual message for the dialog. It's passed as children and any valid `ReactNode` is accepted.
++	 */
+ 	children: ReactNode;
++	/**
++	 * The callback that's called when the user confirms.
++	 * A confirmation can happen when the `OK` button is clicked or when `Enter` is pressed.
++	 */
+ 	onConfirm: ( event: DialogInputEvent ) => void;
++	/**
++	 * The optional custom text to display as the confirmation button's label.
++	 */
+ 	confirmButtonText?: string;
++	/**
++	 * The optional custom text to display as the cancellation button's label.
++	 */
+ 	cancelButtonText?: string;
+-};
+-
+-type ControlledProps = BaseProps & {
+-	onCancel: ( event: DialogInputEvent ) => void;
+-	isOpen: boolean;
+-};
+-
+-type UncontrolledProps = BaseProps & {
++	/**
++	 * The callback that's called when the user cancels. A cancellation can happen
++	 * when the `Cancel` button is clicked, when the `ESC` key is pressed, or when
++	 * a click outside of the dialog focus is detected (i.e. in the overlay).
++	 *
++	 * It's not required if `isOpen` is not set (uncontrolled mode), as the component
++	 * will take care of closing itself, but you can still pass a callback if something
++	 * must be done upon cancelling (the component will still close itself in this case).
++	 *
++	 * If `isOpen` is set (controlled mode), then it's required, and you need to set
++	 * the state that defines `isOpen` to `false` as part of this callback if you want the
++	 * dialog to close when the user cancels.
++	 */
+ 	onCancel?: ( event: DialogInputEvent ) => void;
+-	isOpen?: never;
++	/**
++	 * Defines if the dialog is open (displayed) or closed (not rendered/displayed).
++	 * It also implicitly toggles the controlled mode if set or the uncontrolled mode if it's not set.
++	 */
++	isOpen?: boolean;
+ };
+-
+-export type OwnProps = ControlledProps | UncontrolledProps;

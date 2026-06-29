@@ -1,0 +1,18 @@
+diff --git a/packages/components/src/custom-select-control/index.tsx b/packages/components/src/custom-select-control/index.tsx
+index ecd9dc37a8f491..5ff1c9108fb7f1 100644
+--- a/packages/components/src/custom-select-control/index.tsx
++++ b/packages/components/src/custom-select-control/index.tsx
+@@ -145,11 +145,11 @@ function CustomSelectControl< T extends CustomSelectOption >(
+ 	const renderSelectedValueHint = () => {
+ 		const selectedOptionHint = options
+ 			?.map( applyOptionDeprecations )
+-			?.find( ( { name } ) => currentValue === name )?.hint;
++			?.find( ( { name } ) => value?.name === name )?.hint;
+ 
+ 		return (
+ 			<Styled.SelectedExperimentalHintWrapper>
+-				{ currentValue }
++				{ value?.name }
+ 				{ selectedOptionHint && (
+ 					<Styled.SelectedExperimentalHintItem
+ 						// Keeping the classname for legacy reasons

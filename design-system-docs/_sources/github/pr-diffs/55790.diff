@@ -1,0 +1,522 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index ba345e7716ee37..5906743512062c 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -785,6 +785,12 @@
+ 		"markdown_source": "../packages/components/src/confirm-dialog/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "CustomSelectControlV2",
++		"slug": "custom-select-control-v2",
++		"markdown_source": "../packages/components/src/custom-select-control-v2/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "CustomSelectControl",
+ 		"slug": "custom-select-control",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eb6e595e304ecf..135d8cb8c64ac9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `Tabs`: Memoize and expose the component context ([#56224](https://github.com/WordPress/gutenberg/pull/56224)).
+ 
++### Internal
++
++-   Introduce experimental new version of `CustomSelectControl` based on `ariakit` ([#55790](https://github.com/WordPress/gutenberg/pull/55790))
++
+ ## 25.12.0 (2023-11-16)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/custom-select-control-v2/README.md b/packages/components/src/custom-select-control-v2/README.md
+new file mode 100644
+index 00000000000000..3cd9c3f8534e76
+--- /dev/null
++++ b/packages/components/src/custom-select-control-v2/README.md
+@@ -0,0 +1,73 @@
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++### `CustomSelect`
++
++Used to render a customizable select control component.
++
++#### Props
++
++The component accepts the following props:
++
++##### `children`: `React.ReactNode`
++
++The child elements. This should be composed of CustomSelect.Item components.
++
++-   Required: yes
++
++##### `defaultValue`: `string`
++
++An optional default value for the control. If left `undefined`, the first non-disabled item will be used.
++
++-   Required: no
++
++##### `label`: `string`
++
++Label for the control.
++
++-   Required: yes
++
++##### `onChange`: `( newValue: string ) => void`
++
++A function that receives the new value of the input.
++
++-   Required: no
++
++##### `renderSelectedValue`: `( selectValue: string ) => React.ReactNode`
++
++Can be used to render select UI with custom styled values.
++
++-   Required: no
++
++##### `size`: `'default' | 'large'`
++
++The size of the control.
++
++-   Required: no
++
++##### `value`: `string`
++
++Can be used to externally control the value of the control.
++
++-   Required: no
++
++### `CustomSelectItem`
++
++Used to render a select item.
++
++#### Props
++
++The component accepts the following props:
++
++##### `value`: `string`
++
++The value of the select item. This will be used as the children if children are left `undefined`.
++
++-   Required: yes
++
++##### `children`: `React.ReactNode`
++
++The children to display for each select item. The `value` will be used if left `undefined`.
++
++-   Required: no
+diff --git a/packages/components/src/custom-select-control-v2/index.tsx b/packages/components/src/custom-select-control-v2/index.tsx
+new file mode 100644
+index 00000000000000..88231078fa8d56
+--- /dev/null
++++ b/packages/components/src/custom-select-control-v2/index.tsx
+@@ -0,0 +1,99 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import * as Ariakit from '@ariakit/react';
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++import { __, sprintf } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import * as Styled from './styles';
++import type {
++	CustomSelectProps,
++	CustomSelectItemProps,
++	CustomSelectContext as CustomSelectContextType,
++} from './types';
++
++export const CustomSelectContext =
++	createContext< CustomSelectContextType >( undefined );
++
++function defaultRenderSelectedValue( value: CustomSelectProps[ 'value' ] ) {
++	const isValueEmpty = Array.isArray( value )
++		? value.length === 0
++		: value === undefined || value === null;
++
++	if ( isValueEmpty ) {
++		return __( 'Select an item' );
++	}
++
++	if ( Array.isArray( value ) ) {
++		return value.length === 1
++			? value[ 0 ]
++			: // translators: %s: number of items selected (it will always be 2 or more items)
++			  sprintf( __( '%s items selected' ), value.length );
++	}
++
++	return value;
++}
++
++export function CustomSelect( props: CustomSelectProps ) {
++	const {
++		children,
++		defaultValue,
++		label,
++		onChange,
++		size = 'default',
++		value,
++		renderSelectedValue = defaultRenderSelectedValue,
++	} = props;
++
++	const store = Ariakit.useSelectStore( {
++		setValue: ( nextValue ) => onChange?.( nextValue ),
++		defaultValue,
++		value,
++	} );
++
++	const { value: currentValue } = store.useState();
++
++	return (
++		<>
++			<Styled.CustomSelectLabel store={ store }>
++				{ label }
++			</Styled.CustomSelectLabel>
++			<Styled.CustomSelectButton
++				size={ size }
++				hasCustomRenderProp={ !! renderSelectedValue }
++				store={ store }
++			>
++				{ renderSelectedValue( currentValue ) }
++				<Ariakit.SelectArrow />
++			</Styled.CustomSelectButton>
++			<Styled.CustomSelectPopover gutter={ 12 } store={ store } sameWidth>
++				<CustomSelectContext.Provider value={ { store } }>
++					{ children }
++				</CustomSelectContext.Provider>
++			</Styled.CustomSelectPopover>
++		</>
++	);
++}
++
++export function CustomSelectItem( {
++	children,
++	...props
++}: CustomSelectItemProps ) {
++	const customSelectContext = useContext( CustomSelectContext );
++	return (
++		<Styled.CustomSelectItem
++			store={ customSelectContext?.store }
++			{ ...props }
++		>
++			{ children ?? props.value }
++			<Ariakit.SelectItemCheck />
++		</Styled.CustomSelectItem>
++	);
++}
+diff --git a/packages/components/src/custom-select-control-v2/stories/index.story.tsx b/packages/components/src/custom-select-control-v2/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..2c7ae3507046bc
+--- /dev/null
++++ b/packages/components/src/custom-select-control-v2/stories/index.story.tsx
+@@ -0,0 +1,149 @@
++/**
++ * External dependencies
++ */
++import type { Meta, StoryFn } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { CustomSelect, CustomSelectItem } from '..';
++
++const meta: Meta< typeof CustomSelect > = {
++	title: 'Components (Experimental)/CustomSelectControl v2',
++	component: CustomSelect,
++	subcomponents: {
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		CustomSelectItem,
++	},
++	argTypes: {
++		children: { control: { type: null } },
++		renderSelectedValue: { control: { type: null } },
++		value: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: {
++			canvas: { sourceState: 'shown' },
++			source: { excludeDecorators: true },
++		},
++	},
++	decorators: [
++		( Story ) => (
++			<div
++				style={ {
++					minHeight: '150px',
++				} }
++			>
++				<Story />
++			</div>
++		),
++	],
++};
++export default meta;
++
++const Template: StoryFn< typeof CustomSelect > = ( props ) => {
++	return <CustomSelect { ...props } />;
++};
++
++const ControlledTemplate: StoryFn< typeof CustomSelect > = ( props ) => {
++	const [ value, setValue ] = useState< string | string[] >();
++	return (
++		<CustomSelect
++			{ ...props }
++			onChange={ ( nextValue ) => {
++				setValue( nextValue );
++				props.onChange?.( nextValue );
++			} }
++			value={ value }
++		/>
++	);
++};
++
++export const Default = Template.bind( {} );
++Default.args = {
++	label: 'Label',
++	children: (
++		<>
++			<CustomSelectItem value="Small">
++				<span style={ { fontSize: '75%' } }>Small</span>
++			</CustomSelectItem>
++			<CustomSelectItem value="Something bigger">
++				<span style={ { fontSize: '200%' } }>Something bigger</span>
++			</CustomSelectItem>
++		</>
++	),
++};
++
++/**
++ * Multiple selection can be enabled by using an array for the `value` and
++ * `defaultValue` props. The argument of the `onChange` function will also
++ * change accordingly.
++ */
++export const MultiSelect = Template.bind( {} );
++MultiSelect.args = {
++	defaultValue: [ 'lavender', 'tangerine' ],
++	label: 'Select Colors',
++	renderSelectedValue: ( currentValue: string | string[] ) => {
++		if ( ! Array.isArray( currentValue ) ) {
++			return currentValue;
++		}
++		if ( currentValue.length === 0 ) return 'No colors selected';
++		if ( currentValue.length === 1 ) return currentValue[ 0 ];
++		return `${ currentValue.length } colors selected`;
++	},
++	children: (
++		<>
++			{ [
++				'amber',
++				'aquamarine',
++				'flamingo pink',
++				'lavender',
++				'maroon',
++				'tangerine',
++			].map( ( item ) => (
++				<CustomSelectItem key={ item } value={ item }>
++					{ item }
++				</CustomSelectItem>
++			) ) }
++		</>
++	),
++};
++
++const renderControlledValue = ( gravatar: string | string[] ) => {
++	const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
++	return (
++		<div style={ { display: 'flex', alignItems: 'center' } }>
++			<img
++				style={ { maxHeight: '75px', marginRight: '10px' } }
++				key={ avatar }
++				src={ avatar }
++				alt=""
++				aria-hidden="true"
++			/>
++			<span>{ gravatar }</span>
++		</div>
++	);
++};
++
++export const Controlled = ControlledTemplate.bind( {} );
++Controlled.args = {
++	label: 'Default Gravatars',
++	renderSelectedValue: renderControlledValue,
++	children: (
++		<>
++			{ [ 'mystery-person', 'identicon', 'wavatar', 'retro' ].map(
++				( option ) => (
++					<CustomSelectItem key={ option } value={ option }>
++						{ renderControlledValue( option ) }
++					</CustomSelectItem>
++				)
++			) }
++		</>
++	),
++};
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+new file mode 100644
+index 00000000000000..c04f6ac32e5ffb
+--- /dev/null
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -0,0 +1,76 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++// eslint-disable-next-line no-restricted-imports
++import * as Ariakit from '@ariakit/react';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS } from '../utils';
++import { space } from '../utils/space';
++import type { CustomSelectProps } from './types';
++
++export const CustomSelectLabel = styled( Ariakit.SelectLabel )`
++	font-size: 11px;
++	font-weight: 500;
++	line-height: 1.4;
++	text-transform: uppercase;
++	margin-bottom: ${ space( 2 ) };
++`;
++
++const inputHeights = {
++	default: 40,
++	small: 24,
++};
++
++export const CustomSelectButton = styled( Ariakit.Select, {
++	// Do not forward `hasCustomRenderProp` to the underlying Ariakit.Select component
++	shouldForwardProp: ( prop ) => prop !== 'hasCustomRenderProp',
++} )( ( {
++	size,
++	hasCustomRenderProp,
++}: {
++	size: NonNullable< CustomSelectProps[ 'size' ] >;
++	hasCustomRenderProp: boolean;
++} ) => {
++	const isSmallSize = size === 'small' && ! hasCustomRenderProp;
++	const heightProperty = hasCustomRenderProp ? 'minHeight' : 'height';
++
++	return {
++		display: 'flex',
++		justifyContent: 'space-between',
++		alignItems: 'center',
++		backgroundColor: COLORS.white,
++		border: `1px solid ${ COLORS.gray[ 600 ] }`,
++		borderRadius: space( 0.5 ),
++		cursor: 'pointer',
++		width: '100%',
++		[ heightProperty ]: `${ inputHeights[ size ] }px`,
++		padding: isSmallSize ? space( 2 ) : space( 4 ),
++		fontSize: isSmallSize ? '11px' : '13px',
++		'&[data-focus-visible]': {
++			outlineStyle: 'solid',
++		},
++		'&[aria-expanded="true"]': {
++			outlineStyle: `1.5px solid ${ COLORS.theme.accent }`,
++		},
++	};
++} );
++
++export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
++	border-radius: ${ space( 0.5 ) };
++	background: ${ COLORS.white };
++	border: 1px solid ${ COLORS.gray[ 900 ] };
++`;
++
++export const CustomSelectItem = styled( Ariakit.SelectItem )`
++	display: flex;
++	align-items: center;
++	justify-content: space-between;
++	padding: ${ space( 2 ) };
++	&[data-active-item] {
++		background-color: ${ COLORS.gray[ 300 ] };
++	}
++`;
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+new file mode 100644
+index 00000000000000..2aecc1d4746f5c
+--- /dev/null
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -0,0 +1,63 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type * as Ariakit from '@ariakit/react';
++
++export type CustomSelectContext =
++	| {
++			/**
++			 * The store object returned by Ariakit's `useSelectStore` hook.
++			 */
++			store: Ariakit.SelectStore;
++	  }
++	| undefined;
++
++export type CustomSelectProps = {
++	/**
++	 * The child elements. This should be composed of CustomSelectItem components.
++	 */
++	children: React.ReactNode;
++	/**
++	 * An optional default value for the control. If left `undefined`, the first
++	 * non-disabled item will be used.
++	 */
++	defaultValue?: string | string[];
++	/**
++	 * Label for the control.
++	 */
++	label: string;
++	/**
++	 * A function that receives the new value of the input.
++	 */
++	onChange?: ( newValue: string | string[] ) => void;
++	/**
++	 * Can be used to render select UI with custom styled values.
++	 */
++	renderSelectedValue?: (
++		selectedValue: string | string[]
++	) => React.ReactNode;
++	/**
++	 * The size of the control.
++	 *
++	 * @default 'default'
++	 */
++	size?: 'default' | 'small';
++	/**
++	 * Can be used to externally control the value of the control.
++	 */
++	value?: string | string[];
++};
++
++export type CustomSelectItemProps = {
++	/**
++	 * The value of the select item. This will be used as the children if
++	 * children are left `undefined`.
++	 */
++	value: string;
++	/**
++	 * The children to display for each select item. The `value` will be
++	 * used if left `undefined`.
++	 */
++	children?: React.ReactNode;
++};

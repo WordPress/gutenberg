@@ -1,0 +1,339 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8ee3398e3d3e61..bdb1d8baa6da10 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,19 +6,22 @@
+ 
+ -   Replaced hardcoded blue in `ColorPicker` with UI theme color ([#36153](https://github.com/WordPress/gutenberg/pull/36153)).
+ 
++### Enhancements
++-   Added a `showTooltip` prop to `ToggleGroupControlOption` in order to display tooltip text (using `<Tooltip />`). ([#36726](https://github.com/WordPress/gutenberg/pull/36726)).
++
+ ### Experimental
+ 
+--   Reinstated the ability to pass additional props to the `ToolsPanel` ([36428](https://github.com/WordPress/gutenberg/pull/36428)).
++-   Reinstated the ability to pass additional props to the `ToolsPanel` ([#36428](https://github.com/WordPress/gutenberg/pull/36428)).
+ -   Added an `__unstable-large` size variant to `InputControl`, `SelectControl`, and `UnitControl` for selective migration to the larger 40px heights. ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
+ -   Fixed inconsistent padding in `UnitControl` ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
+ -   Added support for RTL behavior for the `ZStack`'s `offset` prop ([#36769](https://github.com/WordPress/gutenberg/pull/36769))
+--   Fixed race conditions causing conditionally displayed `ToolsPanelItem` components to be erroneously deregistered ([36588](https://github.com/WordPress/gutenberg/pull/36588)).
++-   Fixed race conditions causing conditionally displayed `ToolsPanelItem` components to be erroneously deregistered ([#36588](https://github.com/WordPress/gutenberg/pull/36588)).
+ -   Added `__experimentalHideHeader` prop to `Modal` component ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
+ -   Added experimental `ConfirmDialog` component ([#34153](https://github.com/WordPress/gutenberg/pull/34153)).
+ 
+ ### Bug Fix
+ 
+--   Fixed spacing between `BaseControl` fields and help text within the `ToolsPanel` ([36334](https://github.com/WordPress/gutenberg/pull/36334))
++-   Fixed spacing between `BaseControl` fields and help text within the `ToolsPanel` ([#36334](https://github.com/WordPress/gutenberg/pull/36334))
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 548eb2265f508f..ccb3e62fcab4b2 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -186,6 +186,7 @@ function FontSizePicker(
+ 								value={ option.value }
+ 								label={ option.label }
+ 								aria-label={ option.name }
++								showTooltip={ true }
+ 							/>
+ 						) ) }
+ 					</ToggleGroupControl>
+diff --git a/packages/components/src/toggle-group-control/stories/index.js b/packages/components/src/toggle-group-control/stories/index.js
+index b6b05de08bb475..bc8ee38a3b90c3 100644
+--- a/packages/components/src/toggle-group-control/stories/index.js
++++ b/packages/components/src/toggle-group-control/stories/index.js
+@@ -71,6 +71,11 @@ const _default = ( { options } ) => {
+ 				opt[ 'aria-label' ],
+ 				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
+ 			) }
++			showTooltip={ boolean(
++				`${ KNOBS_GROUPS.ToggleGroupControlOption }: showTooltip`,
++				opt.showTooltip,
++				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
++			) }
+ 		/>
+ 	) );
+ 
+@@ -101,6 +106,16 @@ Default.args = {
+ 	],
+ };
+ 
++export const WithTooltip = _default.bind( {} );
++WithTooltip.args = {
++	...Default.args,
++	options: [
++		{ value: 1, label: '1', showTooltip: true, 'aria-label': 'One' },
++		{ value: 2, label: '2', showTooltip: true, 'aria-label': 'Two' },
++		{ value: 3, label: '3', showTooltip: true, 'aria-label': 'Three' },
++	],
++};
++
+ export const WithAriaLabel = _default.bind( {} );
+ WithAriaLabel.args = {
+ 	...Default.args,
+diff --git a/packages/components/src/toggle-group-control/test/index.js b/packages/components/src/toggle-group-control/test/index.js
+index 00cac8be301215..2592b48c982aef 100644
+--- a/packages/components/src/toggle-group-control/test/index.js
++++ b/packages/components/src/toggle-group-control/test/index.js
+@@ -15,16 +15,35 @@ describe( 'ToggleGroupControl', () => {
+ 			<ToggleGroupControlOption value="jack" label="J" />
+ 		</>
+ 	);
++	const optionsWithTooltip = (
++		<>
++			<ToggleGroupControlOption
++				value="gnocchi"
++				label="Delicious Gnocchi"
++				aria-label="Click for Delicious Gnocchi"
++				showTooltip={ true }
++			/>
++			<ToggleGroupControlOption
++				value="caponata"
++				label="Sumptuous Caponata"
++				aria-label="Click for Sumptuous Caponata"
++			/>
++		</>
++	);
++
+ 	it( 'should render correctly', () => {
+ 		const { container } = render(
+ 			<ToggleGroupControl label="Test Toggle Group Control">
+ 				{ options }
+ 			</ToggleGroupControl>
+ 		);
++
+ 		expect( container.firstChild ).toMatchSnapshot();
+ 	} );
++
+ 	it( 'should call onChange with proper value', () => {
+ 		const mockOnChange = jest.fn();
++
+ 		render(
+ 			<ToggleGroupControl
+ 				value="jack"
+@@ -34,8 +53,46 @@ describe( 'ToggleGroupControl', () => {
+ 				{ options }
+ 			</ToggleGroupControl>
+ 		);
++
+ 		const firstRadio = screen.getByRole( 'radio', { name: 'R' } );
++
+ 		fireEvent.click( firstRadio );
++
+ 		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
+ 	} );
++	it( 'should render tooltip where `showTooltip` === `true`', () => {
++		render(
++			<ToggleGroupControl label="Test Toggle Group Control">
++				{ optionsWithTooltip }
++			</ToggleGroupControl>
++		);
++
++		const firstRadio = screen.getByLabelText(
++			'Click for Delicious Gnocchi'
++		);
++
++		fireEvent.focus( firstRadio );
++
++		expect(
++			screen.getByText( 'Click for Delicious Gnocchi' )
++		).toBeInTheDocument();
++	} );
++
++	it( 'should not render tooltip', () => {
++		render(
++			<ToggleGroupControl label="Test Toggle Group Control">
++				{ optionsWithTooltip }
++			</ToggleGroupControl>
++		);
++
++		const secondRadio = screen.getByLabelText(
++			'Click for Sumptuous Caponata'
++		);
++
++		fireEvent.focus( secondRadio );
++
++		expect(
++			screen.queryByText( 'Click for Sumptuous Caponata' )
++		).not.toBeInTheDocument();
++	} );
+ } );
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+index f509189d7171bc..3a4c0924902d7e 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+@@ -18,7 +18,7 @@ import {
+ function Example() {
+ 	return (
+ 		<ToggleGroupControl label="my label" value="vertical" isBlock>
+-			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
++			<ToggleGroupControlOption value="horizontal" label="Horizontal" showTooltip={ true } />
+ 			<ToggleGroupControlOption value="vertical" label="Vertical" />
+ 		</ToggleGroupControl>
+ 	);
+@@ -38,3 +38,10 @@ Label for the option. If needed, the `aria-label` prop can be used in addition t
+ The value of the `ToggleGroupControlOption`.
+ 
+ - Required: Yes
++
++### `showTooltip`: `boolean`
++
++Whether to show a tooltip when hovering over the option. The tooltip will attempt to use the `aria-label` prop text first, then the `label` prop text if no `aria-label` prop is found.
++
++- Required: No
++
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+index 9591f07ada3b7e..d42f7d8ab9c3c5 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+@@ -9,7 +9,6 @@ import { Radio } from 'reakit';
+ /**
+  * WordPress dependencies
+  */
+-import { __ } from '@wordpress/i18n';
+ import { useInstanceId } from '@wordpress/compose';
+ 
+ /**
+@@ -20,13 +19,25 @@ import {
+ 	useContextSystem,
+ 	WordPressComponentProps,
+ } from '../../ui/context';
+-import type { ToggleGroupControlOptionProps } from '../types';
++import type { ToggleGroupControlOptionProps, WithToolTipProps } from '../types';
+ import { useToggleGroupControlContext } from '../context';
+ import * as styles from './styles';
+ import { useCx } from '../../utils/hooks';
++import Tooltip from '../../tooltip';
+ 
+ const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
+ 
++const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
++	if ( showTooltip && text ) {
++		return (
++			<Tooltip text={ text } position="top center">
++				{ children }
++			</Tooltip>
++		);
++	}
++	return <>{ children }</>;
++};
++
+ function ToggleGroupControlOption(
+ 	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'button' >,
+ 	forwardedRef: Ref< any >
+@@ -41,7 +52,14 @@ function ToggleGroupControlOption(
+ 		'ToggleGroupControlOption'
+ 	);
+ 
+-	const { className, isBlock = false, label, value, ...radioProps } = {
++	const {
++		className,
++		isBlock = false,
++		label,
++		value,
++		showTooltip = false,
++		...radioProps
++	} = {
+ 		...toggleGroupControlContext,
+ 		...buttonProps,
+ 	};
+@@ -54,23 +72,28 @@ function ToggleGroupControlOption(
+ 		className,
+ 		isActive && styles.buttonActive
+ 	);
++	const optionLabel = !! radioProps[ 'aria-label' ]
++		? radioProps[ 'aria-label' ]
++		: label;
+ 
+ 	return (
+ 		<LabelView className={ labelViewClasses } data-active={ isActive }>
+-			<Radio
+-				{ ...radioProps }
+-				as="button"
+-				aria-label={ radioProps[ 'aria-label' ] ?? label }
+-				className={ classes }
+-				data-value={ value }
+-				ref={ forwardedRef }
+-				value={ value }
+-			>
+-				<ButtonContentView>{ label }</ButtonContentView>
+-				<LabelPlaceholderView aria-hidden>
+-					{ label }
+-				</LabelPlaceholderView>
+-			</Radio>
++			<WithToolTip showTooltip={ showTooltip } text={ optionLabel }>
++				<Radio
++					{ ...radioProps }
++					as="button"
++					aria-label={ optionLabel }
++					className={ classes }
++					data-value={ value }
++					ref={ forwardedRef }
++					value={ value }
++				>
++					<ButtonContentView>{ label }</ButtonContentView>
++					<LabelPlaceholderView aria-hidden>
++						{ label }
++					</LabelPlaceholderView>
++				</Radio>
++			</WithToolTip>
+ 		</LabelView>
+ 	);
+ }
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 2773a00550cc30..b14099c1ad35dd 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -18,6 +18,30 @@ export type ToggleGroupControlOptionProps = {
+ 	 * to specify a different label for assistive technologies.
+ 	 */
+ 	label: string;
++	/**
++	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
++	 * show the aria-label or the label prop text.
++	 *
++	 * @default false
++	 */
++	showTooltip?: boolean;
++};
++
++export type WithToolTipProps = {
++	/**
++	 * React children
++	 */
++	children: ReactNode;
++	/**
++	 * Label for the Tooltip component.
++	 */
++	text: string;
++	/**
++	 * Whether to wrap the control option in a Tooltip component.
++	 *
++	 * @default false
++	 */
++	showTooltip?: boolean;
+ };
+ 
+ export type ToggleGroupControlProps = Omit<
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index a5ecce608a1c62..c2a404035bc268 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -92,13 +92,8 @@ const emitToChild = ( children, eventName, event ) => {
+ 	}
+ };
+ 
+-function Tooltip( {
+-	children,
+-	position,
+-	text,
+-	shortcut,
+-	delay = TOOLTIP_DELAY,
+-} ) {
++function Tooltip( props ) {
++	const { children, position, text, shortcut, delay = TOOLTIP_DELAY } = props;
+ 	/**
+ 	 * Whether a mouse is currently pressed, used in determining whether
+ 	 * to handle a focus event as displaying the tooltip immediately.

@@ -1,0 +1,17 @@
+diff --git a/packages/components/README.md b/packages/components/README.md
+index 7fdba5511338f1..ebf8ef59094de6 100644
+--- a/packages/components/README.md
++++ b/packages/components/README.md
+@@ -29,6 +29,12 @@ Many components include CSS to add styles, which you will need to load in order
+ 
+ In non-WordPress projects, link to the `build-style/style.css` file directly, it is located at `node_modules/@wordpress/components/build-style/style.css`.
+ 
++> **Note:** If your project supports right-to-left (RTL) languages, you should include the appropriate stylesheet, either the standard or the RTL version, but not both. The RTL stylesheet is located at:
++>
++> ```text
++> node_modules/@wordpress/components/build-style/style-rtl.css
++> ```
++
+ ### Popovers
+ 
+ By default, the `Popover` component will render within an extra element appended to the body of the document.

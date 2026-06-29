@@ -1,0 +1,282 @@
+diff --git a/lib/compat/wordpress-6.5/script-loader.php b/lib/compat/wordpress-6.5/script-loader.php
+new file mode 100644
+index 00000000000000..98efbab397e663
+--- /dev/null
++++ b/lib/compat/wordpress-6.5/script-loader.php
+@@ -0,0 +1,101 @@
++<?php
++/**
++ * Updates the script-loader.php file
++ *
++ * @package gutenberg
++ */
++
++/**
++ * Updates the registered inline script `wp-date` required for moment.js localization.
++ * Changes to the inline script output should be synced with Core in the file
++ * src/wp-includes/script-loader.php in `wp_default_packages_inline_scripts()`.
++ *
++ * @since 6.5.0
++ *
++ * @global WP_Locale $wp_locale WordPress date and time locale object.
++ *
++ * @param WP_Scripts $scripts WP_Scripts object.
++ */
++function gutenberg_update_wp_date_timezone_settings( $scripts ) {
++	if ( $scripts->query( 'wp-date', 'registered' ) ) {
++		global $wp_locale;
++		// Calculate the timezone abbr (EDT, PST) if possible.
++		$timezone_string = get_option( 'timezone_string', 'UTC' );
++		$timezone_abbr   = '';
++
++		if ( ! empty( $timezone_string ) ) {
++			$timezone_date = new DateTime( 'now', new DateTimeZone( $timezone_string ) );
++			$timezone_abbr = $timezone_date->format( 'T' );
++		}
++
++		$gmt_offset = get_option( 'gmt_offset', 0 );
++
++		$scripts->registered['wp-date']->extra['after'] = array(
++			false,
++			sprintf(
++				'wp.date.setSettings( %s );',
++				wp_json_encode(
++					array(
++						'l10n'     => array(
++							'locale'        => get_user_locale(),
++							'months'        => array_values( $wp_locale->month ),
++							'monthsShort'   => array_values( $wp_locale->month_abbrev ),
++							'weekdays'      => array_values( $wp_locale->weekday ),
++							'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
++							'meridiem'      => (object) $wp_locale->meridiem,
++							'relative'      => array(
++								/* translators: %s: Duration. */
++								'future' => __( '%s from now', 'gutenberg' ),
++								/* translators: %s: Duration. */
++								'past'   => __( '%s ago', 'gutenberg' ),
++								/* translators: One second from or to a particular datetime, e.g., "a second ago" or "a second from now". */
++								's'      => __( 'a second', 'gutenberg' ),
++								/* translators: %s: Duration in seconds from or to a particular datetime, e.g., "4 seconds ago" or "4 seconds from now". */
++								'ss'     => __( '%d seconds', 'gutenberg' ),
++								/* translators: One minute from or to a particular datetime, e.g., "a minute ago" or "a minute from now". */
++								'm'      => __( 'a minute', 'gutenberg' ),
++								/* translators: %s: Duration in minutes from or to a particular datetime, e.g., "4 minutes ago" or "4 minutes from now". */
++								'mm'     => __( '%d minutes', 'gutenberg' ),
++								/* translators: %s: One hour from or to a particular datetime, e.g., "an hour ago" or "an hour from now". */
++								'h'      => __( 'an hour', 'gutenberg' ),
++								/* translators: %s: Duration in hours from or to a particular datetime, e.g., "4 hours ago" or "4 hours from now". */
++								'hh'     => __( '%d hours', 'gutenberg' ),
++								/* translators: %s: One day from or to a particular datetime, e.g., "a day ago" or "a day from now". */
++								'd'      => __( 'a day', 'gutenberg' ),
++								/* translators: %s: Duration in days from or to a particular datetime, e.g., "4 days ago" or "4 days from now". */
++								'dd'     => __( '%d days', 'gutenberg' ),
++								/* translators: %s: One month from or to a particular datetime, e.g., "a month ago" or "a month from now". */
++								'M'      => __( 'a month', 'gutenberg' ),
++								/* translators: %s: Duration in months from or to a particular datetime, e.g., "4 months ago" or "4 months from now". */
++								'MM'     => __( '%d months', 'gutenberg' ),
++								/* translators: %s: One year from or to a particular datetime, e.g., "a year ago" or "a year from now". */
++								'y'      => __( 'a year', 'gutenberg' ),
++								/* translators: %s: Duration in years from or to a particular datetime, e.g., "4 years ago" or "4 years from now". */
++								'yy'     => __( '%d years', 'gutenberg' ),
++							),
++							'startOfWeek'   => (int) get_option( 'start_of_week', 0 ),
++						),
++						'formats'  => array(
++							/* translators: Time format, see https://www.php.net/manual/datetime.format.php */
++							'time'                => get_option( 'time_format', __( 'g:i a', 'default' ) ),
++							/* translators: Date format, see https://www.php.net/manual/datetime.format.php */
++							'date'                => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
++							/* translators: Date/Time format, see https://www.php.net/manual/datetime.format.php */
++							'datetime'            => __( 'F j, Y g:i a', 'default' ),
++							/* translators: Abbreviated date/time format, see https://www.php.net/manual/datetime.format.php */
++							'datetimeAbbreviated' => __( 'M j, Y g:i a', 'default' ),
++						),
++						'timezone' => array(
++							'offset'          => (float) $gmt_offset,
++							'offsetFormatted' => str_replace( array( '.25', '.5', '.75' ), array( ':15', ':30', ':45' ), (string) $gmt_offset ),
++							'string'          => $timezone_string,
++							'abbr'            => $timezone_abbr,
++						),
++					)
++				)
++			),
++		);
++	}
++}
++
++add_action( 'wp_default_scripts', 'gutenberg_update_wp_date_timezone_settings' );
+diff --git a/lib/load.php b/lib/load.php
+index 6ded190b04e3fb..15debf61ba33b4 100644
+--- a/lib/load.php
++++ b/lib/load.php
+@@ -116,7 +116,7 @@ function gutenberg_is_experiment_enabled( $name ) {
+ require __DIR__ . '/compat/wordpress-6.5/block-bindings/block-bindings.php';
+ require __DIR__ . '/compat/wordpress-6.5/block-bindings/sources/post-meta.php';
+ require __DIR__ . '/compat/wordpress-6.5/block-bindings/sources/pattern.php';
+-
++require __DIR__ . '/compat/wordpress-6.5/script-loader.php';
+ 
+ // Experimental features.
+ require __DIR__ . '/experimental/block-editor-settings-mobile.php';
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a7c0ea58712ada..0c1b07f774a9e2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fix
+ 
++-   `DateTime`: Add a timezone offset value for display purposes. ([#56682](https://github.com/WordPress/gutenberg/pull/56682)).
+ -   `Placeholder`: Fix Placeholder component padding when body text font size is changed ([#58323](https://github.com/WordPress/gutenberg/pull/58323)).
+ -   `Placeholder`: Fix Global Styles typography settings bleeding into placeholder component ([#58303](https://github.com/WordPress/gutenberg/pull/58303)).
+ -   `PaletteEdit`: Fix palette item accessibility in details view ([#58214](https://github.com/WordPress/gutenberg/pull/58214)).
+diff --git a/packages/components/src/date-time/time/timezone.tsx b/packages/components/src/date-time/time/timezone.tsx
+index 9b08eac6307aa7..5c839e8df3af48 100644
+--- a/packages/components/src/date-time/time/timezone.tsx
++++ b/packages/components/src/date-time/time/timezone.tsx
+@@ -30,7 +30,7 @@ const TimeZone = () => {
+ 	const zoneAbbr =
+ 		'' !== timezone.abbr && isNaN( Number( timezone.abbr ) )
+ 			? timezone.abbr
+-			: `UTC${ offsetSymbol }${ timezone.offset }`;
++			: `UTC${ offsetSymbol }${ timezone.offsetFormatted }`;
+ 
+ 	// Replace underscore with space in strings like `America/Costa_Rica`.
+ 	const prettyTimezoneString = timezone.string.replace( '_', ' ' );
+diff --git a/packages/date/src/index.js b/packages/date/src/index.js
+index 3267f6cce92357..90f65f62628dc8 100644
+--- a/packages/date/src/index.js
++++ b/packages/date/src/index.js
+@@ -31,9 +31,10 @@ import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * @typedef TimezoneConfig
+- * @property {string} offset Offset setting.
+- * @property {string} string The timezone as a string (e.g., `'America/Los_Angeles'`).
+- * @property {string} abbr   Abbreviation for the timezone.
++ * @property {string} offset          Offset setting.
++ * @property {string} offsetFormatted Offset setting with decimals formatted to minutes.
++ * @property {string} string          The timezone as a string (e.g., `'America/Los_Angeles'`).
++ * @property {string} abbr            Abbreviation for the timezone.
+  */
+ 
+ /* eslint-disable jsdoc/valid-types */
+@@ -63,8 +64,8 @@ const WP_ZONE = 'WP';
+ // See: https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
+ const VALID_UTC_OFFSET = /^[+-][0-1][0-9](:?[0-9][0-9])?$/;
+ 
+-// Changes made here will likely need to be made in `lib/client-assets.php` as
+-// well because it uses the `setSettings()` function to change these settings.
++// Changes made here will likely need to be synced with Core in the file
++// src/wp-includes/script-loader.php in `wp_default_packages_inline_scripts()`.
+ /** @type {DateSettings} */
+ let settings = {
+ 	l10n: {
+@@ -132,7 +133,7 @@ let settings = {
+ 		datetime: 'F j, Y g: i a',
+ 		datetimeAbbreviated: 'M j, Y g: i a',
+ 	},
+-	timezone: { offset: '0', string: '', abbr: '' },
++	timezone: { offset: '0', offsetFormatted: '0', string: '', abbr: '' },
+ };
+ 
+ /**
+diff --git a/packages/editor/src/components/post-schedule/label.js b/packages/editor/src/components/post-schedule/label.js
+index e2b511ead762b1..223eaaca06343e 100644
+--- a/packages/editor/src/components/post-schedule/label.js
++++ b/packages/editor/src/components/post-schedule/label.js
+@@ -102,7 +102,7 @@ function getTimezoneAbbreviation() {
+ 	}
+ 
+ 	const symbol = timezone.offset < 0 ? '' : '+';
+-	return `UTC${ symbol }${ timezone.offset }`;
++	return `UTC${ symbol }${ timezone.offsetFormatted }`;
+ }
+ 
+ function isTimezoneSameAsSiteTimezone( date ) {
+diff --git a/packages/editor/src/components/post-schedule/test/label.js b/packages/editor/src/components/post-schedule/test/label.js
+index e4a4c0c4182101..adcda2a2365a26 100644
+--- a/packages/editor/src/components/post-schedule/test/label.js
++++ b/packages/editor/src/components/post-schedule/test/label.js
+@@ -23,9 +23,11 @@ describe( 'getFullPostScheduleLabel', () => {
+ 		} );
+ 
+ 		const label = getFullPostScheduleLabel( '2022-04-28T15:30:00' );
+-		expect( label ).toBe( 'April 28, 2022 3:30\xa0pm AEST' );
+ 
++		// Reset date settings before potential failure of the expectation.
+ 		setSettings( settings );
++
++		expect( label ).toBe( 'April 28, 2022 3:30\xa0pm AEST' );
+ 	} );
+ 
+ 	it( "should show site's timezone offset", () => {
+@@ -33,13 +35,15 @@ describe( 'getFullPostScheduleLabel', () => {
+ 
+ 		setSettings( {
+ 			...settings,
+-			timezone: { offset: 10 },
++			timezone: { offsetFormatted: 10 },
+ 		} );
+ 
+ 		const label = getFullPostScheduleLabel( '2022-04-28T15:30:00' );
+-		expect( label ).toBe( 'April 28, 2022 3:30\xa0pm UTC+10' );
+ 
++		// Reset date settings before potential failure of the expectation.
+ 		setSettings( settings );
++
++		expect( label ).toBe( 'April 28, 2022 3:30\xa0pm UTC+10' );
+ 	} );
+ } );
+ 
+@@ -80,9 +84,11 @@ describe( 'getPostScheduleLabel', () => {
+ 		);
+ 
+ 		const label = getPostScheduleLabel( '2022-04-28T15:30:00', { now } );
+-		expect( label ).toBe( 'Today at 3:30\xa0pm' );
+ 
++		// Reset date settings before potential failure of the expectation.
+ 		setSettings( settings );
++
++		expect( label ).toBe( 'Today at 3:30\xa0pm' );
+ 	} );
+ 
+ 	it( "should show tomorrow if date is same day as now + 1 day and user timezone equals site's timezone", () => {
+@@ -99,9 +105,11 @@ describe( 'getPostScheduleLabel', () => {
+ 		);
+ 
+ 		const label = getPostScheduleLabel( '2022-04-29T15:30:00', { now } );
+-		expect( label ).toBe( 'Tomorrow at 3:30\xa0pm' );
+ 
++		// Reset date settings before potential failure of the expectation.
+ 		setSettings( settings );
++
++		expect( label ).toBe( 'Tomorrow at 3:30\xa0pm' );
+ 	} );
+ 
+ 	it( "should hide year if date is same year as now and user timezone equals site's timezone", () => {
+@@ -118,9 +126,11 @@ describe( 'getPostScheduleLabel', () => {
+ 		);
+ 
+ 		const label = getPostScheduleLabel( '2022-12-25T15:30:00', { now } );
+-		expect( label ).toBe( 'December 25 3:30\xa0pm' );
+ 
++		// Reset date settings before potential failure of the expectation.
+ 		setSettings( settings );
++
++		expect( label ).toBe( 'December 25 3:30\xa0pm' );
+ 	} );
+ 
+ 	it( "should show year if date is not same year as now and user timezone equals site's timezone", () => {
+@@ -137,8 +147,10 @@ describe( 'getPostScheduleLabel', () => {
+ 		);
+ 
+ 		const label = getPostScheduleLabel( '2023-04-28T15:30:00', { now } );
+-		expect( label ).toBe( 'April 28, 2023 3:30\xa0pm' );
+ 
++		// Reset date settings before potential failure of the expectation.
+ 		setSettings( settings );
++
++		expect( label ).toBe( 'April 28, 2023 3:30\xa0pm' );
+ 	} );
+ } );

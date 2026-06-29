@@ -1,0 +1,43 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8345184770646c..d66929664dc1e4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `QueryControls`: Add menu_order sorting option if supported by the post type. ([#68781](https://github.com/WordPress/gutenberg/pull/68781)).
+ 
++### Internal
++
++-   `NumberControl`: Fixed className test to properly verify className application. ([#69540](https://github.com/WordPress/gutenberg/pull/69540)).
++
+ ### Bug Fixes
+ 
+ -   `Button`: Remove fixed width from small and compact buttons with icons ([#69378](https://github.com/WordPress/gutenberg/pull/69378)).
+diff --git a/packages/components/src/number-control/test/index.tsx b/packages/components/src/number-control/test/index.tsx
+index bf97b520673ea4..7b84b82aa0b178 100644
+--- a/packages/components/src/number-control/test/index.tsx
++++ b/packages/components/src/number-control/test/index.tsx
+@@ -40,8 +40,21 @@ describe( 'NumberControl', () => {
+ 		} );
+ 
+ 		it( 'should render custom className', () => {
+-			render( <NumberControl className="hello" /> );
+-			expect( screen.getByRole( 'spinbutton' ) ).toBeVisible();
++			const { container: withoutClassName } = render( <NumberControl /> );
++
++			const { container: withClassName } = render(
++				<NumberControl className="hello" />
++			);
++
++			expect(
++				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
++				withoutClassName.querySelector( '.components-number-control' )
++			).not.toHaveClass( 'hello' );
++
++			expect(
++				// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
++				withClassName.querySelector( '.components-number-control' )
++			).toHaveClass( 'hello' );
+ 		} );
+ 	} );
+ 

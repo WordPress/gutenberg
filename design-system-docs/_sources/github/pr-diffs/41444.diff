@@ -1,0 +1,2121 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 281068047017f4..370730aaba4652 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -27,6 +27,7 @@
+ -   `Autocomplete`: Refactor away from `_.deburr()` ([#42266](https://github.com/WordPress/gutenberg/pull/42266/)).
+ -   `MenuItem`: Refactor away from `_.isString()` ([#42268](https://github.com/WordPress/gutenberg/pull/42268/)).
+ -   `Shortcut`: Refactor away from `_.isString()` ([#42268](https://github.com/WordPress/gutenberg/pull/42268/)).
++-   `RangeControl`: Convert to TypeScript ([#40535](https://github.com/WordPress/gutenberg/pull/40535)).
+ 
+ ## 19.14.0 (2022-06-29)
+ 
+diff --git a/packages/components/src/border-control/border-control/hook.ts b/packages/components/src/border-control/border-control/hook.ts
+index 2b7b00854f0267..91f5702e7f1c9d 100644
+--- a/packages/components/src/border-control/border-control/hook.ts
++++ b/packages/components/src/border-control/border-control/hook.ts
+@@ -106,7 +106,7 @@ export function useBorderControl(
+ 	);
+ 
+ 	const onSliderChange = useCallback(
+-		( value: string ) => {
++		( value?: number ) => {
+ 			onWidthChange( `${ value }${ widthUnit }` );
+ 		},
+ 		[ onWidthChange, widthUnit ]
+diff --git a/packages/components/src/color-picker/input-with-slider.tsx b/packages/components/src/color-picker/input-with-slider.tsx
+index 8b7831f185f5f2..8b86f626fdc01c 100644
+--- a/packages/components/src/color-picker/input-with-slider.tsx
++++ b/packages/components/src/color-picker/input-with-slider.tsx
+@@ -52,6 +52,8 @@ export const InputWithSlider = ( {
+ 				min={ min }
+ 				max={ max }
+ 				value={ value }
++				// @ts-expect-error
++				// See: https://github.com/WordPress/gutenberg/pull/40535#issuecomment-1172418185
+ 				onChange={ onChange }
+ 				withInputField={ false }
+ 			/>
+diff --git a/packages/components/src/icon/index.tsx b/packages/components/src/icon/index.tsx
+index 99783a090f174c..94fe1d66c90a34 100644
+--- a/packages/components/src/icon/index.tsx
++++ b/packages/components/src/icon/index.tsx
+@@ -20,7 +20,7 @@ import { SVG } from '@wordpress/primitives';
+ import Dashicon from '../dashicon';
+ import type { IconKey as DashiconIconKey } from '../dashicon/types';
+ 
+-type IconType< P > = DashiconIconKey | ComponentType< P > | JSX.Element;
++export type IconType< P > = DashiconIconKey | ComponentType< P > | JSX.Element;
+ 
+ interface BaseProps< P > {
+ 	/**
+diff --git a/packages/components/src/range-control/README.md b/packages/components/src/range-control/README.md
+index a6389a9509d8d9..774ced541200ed 100644
+--- a/packages/components/src/range-control/README.md
++++ b/packages/components/src/range-control/README.md
+@@ -109,75 +109,100 @@ const MyRangeControl = () => {
+ };
+ ```
+ 
+-### Props
++## Props
+ 
+ The set of props accepted by the component will be specified below.
+ Props not included in this set will be applied to the input elements.
+ 
+-#### label
++### `afterIcon`: `string|Function|WPComponent|null`
+ 
+-If this property is added, a label will be generated using label property as the content.
++If this property is added, an [Icon component](/packages/components/src/icon/README.md) will be rendered after the slider with the icon equal to `afterIcon`.
++
++For more information on `IconType` see the [Icon component](/packages/components/src/icon/index.tsx#L23).
++
++-   Required: No
++-   Platform: Web
++
++### `allowReset`: `boolean`
++
++If this property is true, a button to reset the slider is rendered.
+ 
+--   Type: `String`
+ -   Required: No
++-   Default: `false`
+ -   Platform: Web | Mobile
+ 
+-#### help
++### `beforeIcon`: `string|Function|WPComponent|null`
+ 
+-If this property is added, a help text will be generated using help property as the content.
++If this property is added, an [Icon component](/packages/components/src/icon/README.md) will be rendered before the slider with the icon equal to `beforeIcon`.
++
++For more information on `IconType` see the [Icon component](/packages/components/src/icon/index.tsx#L23).
+ 
+--   Type: `String|WPElement`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### beforeIcon
++### `color`: `CSSProperties['color']`
+ 
+-If this property is added, a DashIcon component will be rendered before the slider with the icon equal to beforeIcon
++CSS color string for the `RangeControl` wrapper.
+ 
+--   Type: `String`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### afterIcon
++### `currentInput`: `number`
+ 
+-If this property is added, a DashIcon component will be rendered after the slider with the icon equal to afterIcon
++The current input to use as a fallback if `value` is currently `undefined`.
+ 
+--   Type: `String`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### allowReset
++### `disabled`: `boolean`
+ 
+-If this property is true, a button to reset the slider is rendered.
++Disables the `input`, preventing new values from being applied.
+ 
+--   Type: `Boolean`
+ -   Required: No
+--   Platform: Web | Mobile
++-   Platform: Web
+ 
+-#### disabled
+ 
+-Disables the `input`, preventing new values from being applied.
++### `help`: `string|WPElement`
++
++If this property is added, a help text will be generated using help property as the content.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### initialPosition
++### `hideLabelFromVision`: `boolean`
++
++Provides control over whether the label will only be visible to screen readers.
++
++- Required: No
++
++### `icon`: `string`
++
++An icon to be shown above the slider next to its container title.
++
++-   Required: No
++-   Platform: Mobile
++
++### `initialPosition`: `number`
+ 
+ If no value exists this prop contains the slider starting position.
+ 
+--   Type: `Number`
+ -   Required: No
+ -   Platform: Web | Mobile
+ 
+-#### isShiftStepEnabled
++### `isShiftStepEnabled`: `boolean`
+ 
+ Passed as a prop to the `NumberControl` component and is only applicable if `withInputField` is true. If true, while the number input has focus, pressing `UP` or `DOWN` along with the `SHIFT` key will change the value by the `shiftStep` value.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-#### marks
++### `label`: `string`
++
++If this property is added, a label will be generated using label property as the content.
++
++-   Required: No
++-   Platform: Web | Mobile
++
++### `marks`: `Array|boolean`
+ 
+ Renders a visual representation of `step` ticks. Custom mark indicators can be provided by an `Array`.
+ 
+@@ -204,49 +229,72 @@ const marks = [
+ ];
+ 
+ const MyRangeControl() {
+-	return (<RangeControl marks={ marks } min={ 0 } max={ 10 } step={ 1 } />)
++	return ( <RangeControl marks={ marks } min={ 0 } max={ 10 } step={ 1 } /> )
+ }
+ ```
+ 
+--   Type: `Array|Boolean`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### onChange
++### `onBlur`: `FocusEventHandler< HTMLInputElement >`
++
++Callback for when `RangeControl` input loses focus.
++
++-   Required: No
++-   Platform: Web
++
++### `onChange`: `( value?: number ) => void`
+ 
+ A function that receives the new value. The value will be less than `max` and more than `min` unless a reset (enabled by `allowReset`) has occurred. In which case the value will be either that of `resetFallbackValue` if it has been specified or otherwise `undefined`.
+ 
+--   Type: `function`
+--   Required: Yes
++-   Required: No
+ -   Platform: Web | Mobile
+ 
+-#### min
++### `onFocus`: `FocusEventHandler< HTMLInputElement >`
++
++Callback for when `RangeControl` input gains focus.
++
++-   Required: No
++-   Platform: Web
++
++### `onMouseLeave`: `MouseEventHandler< HTMLInputElement >`
++
++Callback for when mouse exits the `RangeControl`.
++
++-   Required: No
++-   Platform: Web
++
++### `onMouseMove`: `MouseEventHandler< HTMLInputElement >`
++
++Callback for when mouse moves within the `RangeControl`.
++
++-   Required: No
++-   Platform: Web
++
++### `min`: `number`
+ 
+ The minimum `value` allowed.
+ 
+--   Type: `Number`
+ -   Required: No
+ -   Default: 0
+ -   Platform: Web | Mobile
+ 
+-#### max
++### `max`: `number`
+ 
+ The maximum `value` allowed.
+ 
+--   Type: `Number`
+ -   Required: No
+ -   Default: 100
+ -   Platform: Web | Mobile
+ 
+-#### railColor
++### `railColor`: `CSSProperties[ 'color' ]`
+ 
+-Customizes the (background) color of the rail element.
++CSS color string to customize the rail element's background.
+ 
+--   Type: `String`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### renderTooltipContent
++### `renderTooltipContent`: ( value ) => value
+ 
+ A way to customize the rendered UI of the value. Example:
+ 
+@@ -258,89 +306,69 @@ const MyRangeControl() {
+ }
+ ```
+ 
+--   Type: `Function`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### resetFallbackValue
++### `resetFallbackValue`: `number`
+ 
+ The value to revert to if the Reset button is clicked (enabled by `allowReset`)
+ 
+--   Type: `Number`
+--   Required: No
+--   Platform: Web
+-
+-#### showTooltip
+-
+-Forcing the Tooltip UI to show or hide. This is overriden to `false` when `step` is set to the special string value `any`.
+-
+--   Type: `Boolean`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### step
++### `separatorType`: `'none' | 'fullWidth' | 'topFullWidth'`
+ 
+-The minimum amount by which `value` changes. It is also a factor in validation as `value` must be a multiple of `step` (offset by `min`) to be valid. Accepts the special string value `any` that voids the validation constraint and overrides both `withInputField` and `showTooltip` props to `false`.
++Define if separator line under/above control row should be disabled or full width. By default it is placed below excluding underline the control icon.
+ 
+--   Type: `Number | "any"`
+ -   Required: No
+--   Platform: Web
++-   Platform: Mobile
+ 
+-#### shiftStep
++### `shiftStep`: `number`
+ 
+ Passed as a prop to the `NumberControl` component and is only applicable if `withInputField` and `isShiftStepEnabled` are both true and while the number input has focus. Acts as a multiplier of `step`.
+ 
+--   Type: `Number`
+ -   Required: No
+ 
+-#### trackColor
++### `showTooltip`: `boolean`
+ 
+-Customizes the (background) color of the track element.
++Forcing the Tooltip UI to show or hide. This is overridden to `false` when `step` is set to the special string value `any`.
+ 
+--   Type: `String`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### value
++### `step`: `number | 'any'`
+ 
+-The current value of the range slider.
+-
+--   Type: `Number`
+--   Required: Yes
+--   Platform: Web | Mobile
++The minimum amount by which `value` changes. It is also a factor in validation as `value` must be a multiple of `step` (offset by `min`) to be valid. Accepts the special string value `any` that voids the validation constraint and overrides both `withInputField` and `showTooltip` props to `false`.
+ 
+-#### withInputField
++-   Required: No
++-   Platform: Web
++### `trackColor`: `CSSProperties[ 'color' ]`
+ 
+-Determines if the `input` number field will render next to the RangeControl. This is overriden to `false` when `step` is set to the special string value `any`.
++CSS color string to customize the track element's background.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ -   Platform: Web
+ 
+-#### icon
++### `type`: `string`
+ 
+-An icon to be shown above the slider next to it's container title.
++Define if the value selection should present a stepper control or a slider control in the bottom sheet on mobile. To use the stepper set the type value as `stepper`. Defaults to slider if no option is provided.
+ 
+--   Type: `String`
+ -   Required: No
+ -   Platform: Mobile
+ 
+-#### separatorType
++### `value`: `number`
+ 
+-Define if separator line under/above control row should be disabled or full width. By default it is placed below excluding underline the control icon.
++The current value of the range slider.
+ 
+--   Type: `String Enum`
+--   Values: `none` | `fullWidth` | `topFullWidth`
+ -   Required: No
+--   Platform: Mobile
++-   Platform: Web | Mobile
+ 
+-#### type
++### `withInputField`: `boolean`
+ 
+-Define if the value selection should present a stepper control or a slider control in the bottom sheet on mobile. To use the stepper set the type value as `stepper`. Defaults to slider if no option is provided.
++Determines if the `input` number field will render next to the RangeControl. This is overridden to `false` when `step` is set to the special string value `any`.
+ 
+--   Type: `String`
+ -   Required: No
+--   Platform: Mobile
++-   Platform: Web
+ 
+ ## Related components
+ 
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.tsx
+similarity index 74%
+rename from packages/components/src/range-control/index.js
+rename to packages/components/src/range-control/index.tsx
+index d0464fd8788669..3045b5c0283ddf 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.tsx
+@@ -1,15 +1,15 @@
+-// @ts-nocheck
+ /**
+  * External dependencies
+  */
+ import classnames from 'classnames';
++import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { __, isRTL } from '@wordpress/i18n';
+ import { useRef, useState, forwardRef } from '@wordpress/element';
+-import { useInstanceId } from '@wordpress/compose';
++import { useInstanceId, useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -35,71 +35,74 @@ import {
+ 	Wrapper,
+ } from './styles/range-control-styles';
+ 
++import type { RangeControlProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
++
+ const noop = () => {};
+ 
+-function RangeControl(
+-	{
++function UnforwardedRangeControl< IconProps = unknown >(
++	props: WordPressComponentProps<
++		RangeControlProps< IconProps >,
++		'input',
++		false
++	>,
++	forwardedRef: ForwardedRef< HTMLInputElement >
++) {
++	const {
+ 		afterIcon,
+ 		allowReset = false,
+ 		beforeIcon,
+ 		className,
+-		currentInput,
+ 		color: colorProp = COLORS.ui.theme,
++		currentInput,
+ 		disabled = false,
+ 		help,
++		hideLabelFromVision = false,
+ 		initialPosition,
+ 		isShiftStepEnabled = true,
+ 		label,
+-		hideLabelFromVision = false,
+ 		marks = false,
+ 		max = 100,
+ 		min = 0,
+ 		onBlur = noop,
+ 		onChange = noop,
+ 		onFocus = noop,
+-		onMouseMove = noop,
+ 		onMouseLeave = noop,
++		onMouseMove = noop,
+ 		railColor,
+-		resetFallbackValue,
+ 		renderTooltipContent = ( v ) => v,
+-		showTooltip: showTooltipProp,
++		resetFallbackValue,
+ 		shiftStep = 10,
++		showTooltip: showTooltipProp,
+ 		step = 1,
+ 		trackColor,
+ 		value: valueProp,
+ 		withInputField = true,
+-		...props
+-	},
+-	ref
+-) {
++		...otherProps
++	} = props;
++
+ 	const [ value, setValue ] = useControlledRangeValue( {
+ 		min,
+ 		max,
+-		value: valueProp,
++		value: valueProp ?? null,
+ 		initial: initialPosition,
+ 	} );
+ 	const isResetPendent = useRef( false );
+ 
++	let hasTooltip = showTooltipProp;
++	let hasInputField = withInputField;
++
+ 	if ( step === 'any' ) {
+ 		// The tooltip and number input field are hidden when the step is "any"
+ 		// because the decimals get too lengthy to fit well.
+-		showTooltipProp = false;
+-		withInputField = false;
++		hasTooltip = false;
++		hasInputField = false;
+ 	}
+ 
+-	const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
++	const [ showTooltip, setShowTooltip ] = useState( hasTooltip );
+ 	const [ isFocused, setIsFocused ] = useState( false );
+ 
+-	const inputRef = useRef();
+-
+-	const setRef = ( nodeRef ) => {
+-		inputRef.current = nodeRef;
+-
+-		if ( ref ) {
+-			ref( nodeRef );
+-		}
+-	};
+-
++	const inputRef = useRef< HTMLInputElement >();
+ 	const isCurrentlyFocused = inputRef.current?.matches( ':focus' );
+ 	const isThumbFocused = ! disabled && isFocused;
+ 
+@@ -107,11 +110,11 @@ function RangeControl(
+ 	const currentValue = value !== undefined ? value : currentInput;
+ 
+ 	const inputSliderValue = isValueReset ? '' : currentValue;
+-
+ 	const rangeFillValue = isValueReset ? ( max - min ) / 2 + min : value;
+ 
+-	const calculatedFillValue = ( ( value - min ) / ( max - min ) ) * 100;
+-	const fillValue = isValueReset ? 50 : calculatedFillValue;
++	const fillValue = isValueReset
++		? 50
++		: ( ( value - min ) / ( max - min ) ) * 100;
+ 	const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
+ 
+ 	const classes = classnames( 'components-range-control', className );
+@@ -121,27 +124,32 @@ function RangeControl(
+ 		!! marks && 'is-marked'
+ 	);
+ 
+-	const id = useInstanceId( RangeControl, 'inspector-range-control' );
++	const id = useInstanceId(
++		UnforwardedRangeControl,
++		'inspector-range-control'
++	);
+ 	const describedBy = !! help ? `${ id }__help` : undefined;
+-	const enableTooltip = showTooltipProp !== false && Number.isFinite( value );
++	const enableTooltip = hasTooltip !== false && Number.isFinite( value );
+ 
+-	const handleOnRangeChange = ( event ) => {
++	const handleOnRangeChange = ( event: ChangeEvent< HTMLInputElement > ) => {
+ 		const nextValue = parseFloat( event.target.value );
+ 		setValue( nextValue );
+ 		onChange( nextValue );
+ 	};
+ 
+-	const handleOnChange = ( nextValue ) => {
+-		nextValue = parseFloat( nextValue );
++	const handleOnChange = ( next: string ) => {
++		let nextValue = parseFloat( next );
+ 		setValue( nextValue );
++
+ 		/*
+ 		 * Calls onChange only when nextValue is numeric
+ 		 * otherwise may queue a reset for the blur event.
+ 		 */
+ 		if ( ! isNaN( nextValue ) ) {
+ 			if ( nextValue < min || nextValue > max ) {
+-				nextValue = floatClamp( nextValue, min, max );
++				nextValue = floatClamp( nextValue, min, max ) as number;
+ 			}
++
+ 			onChange( nextValue );
+ 			isResetPendent.current = false;
+ 		} else if ( allowReset ) {
+@@ -157,8 +165,8 @@ function RangeControl(
+ 	};
+ 
+ 	const handleOnReset = () => {
+-		let resetValue = parseFloat( resetFallbackValue );
+-		let onChangeResetValue = resetValue;
++		let resetValue: number | null = parseFloat( `${ resetFallbackValue }` );
++		let onChangeResetValue: number | undefined = resetValue;
+ 
+ 		if ( isNaN( resetValue ) ) {
+ 			resetValue = null;
+@@ -186,13 +194,13 @@ function RangeControl(
+ 	const handleShowTooltip = () => setShowTooltip( true );
+ 	const handleHideTooltip = () => setShowTooltip( false );
+ 
+-	const handleOnBlur = ( event ) => {
++	const handleOnBlur = ( event: FocusEvent< HTMLInputElement > ) => {
+ 		onBlur( event );
+ 		setIsFocused( false );
+ 		handleHideTooltip();
+ 	};
+ 
+-	const handleOnFocus = ( event ) => {
++	const handleOnFocus = ( event: FocusEvent< HTMLInputElement > ) => {
+ 		onFocus( event );
+ 		setIsFocused( true );
+ 		handleShowTooltip();
+@@ -207,7 +215,7 @@ function RangeControl(
+ 			className={ classes }
+ 			label={ label }
+ 			hideLabelFromVision={ hideLabelFromVision }
+-			id={ id }
++			id={ `${ id }` }
+ 			help={ help }
+ 		>
+ 			<Root className="components-range-control__root">
+@@ -222,11 +230,11 @@ function RangeControl(
+ 					marks={ !! marks }
+ 				>
+ 					<InputRange
+-						{ ...props }
++						{ ...otherProps }
+ 						className="components-range-control__slider"
+ 						describedBy={ describedBy }
+ 						disabled={ disabled }
+-						id={ id }
++						id={ `${ id }` }
+ 						label={ label }
+ 						max={ max }
+ 						min={ min }
+@@ -235,9 +243,9 @@ function RangeControl(
+ 						onFocus={ handleOnFocus }
+ 						onMouseMove={ onMouseMove }
+ 						onMouseLeave={ onMouseLeave }
+-						ref={ setRef }
++						ref={ useMergeRefs( [ inputRef, forwardedRef ] ) }
+ 						step={ step }
+-						value={ inputSliderValue }
++						value={ inputSliderValue ?? undefined }
+ 					/>
+ 					<RangeRail
+ 						aria-hidden={ true }
+@@ -280,7 +288,7 @@ function RangeControl(
+ 						<Icon icon={ afterIcon } />
+ 					</AfterIconWrapper>
+ 				) }
+-				{ withInputField && (
++				{ hasInputField && (
+ 					<InputNumber
+ 						aria-label={ label }
+ 						className="components-range-control__number"
+@@ -314,6 +322,28 @@ function RangeControl(
+ 	);
+ }
+ 
+-const ForwardedComponent = forwardRef( RangeControl );
++/**
++ * RangeControls are used to make selections from a range of incremental values.
++ *
++ * ```jsx
++ * import { RangeControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyRangeControl = () => {
++ *   const [ isChecked, setChecked ] = useState( true );
++ *   return (
++ *     <RangeControl
++ *       help="Please select how transparent you would like this."
++ *       initialPosition={50}
++ *       label="Opacity"
++ *       max={100}
++ *       min={0}
++ *       onChange={() => {}}
++ *     />
++ *   );
++ * };
++ * ```
++ */
++export const RangeControl = forwardRef( UnforwardedRangeControl );
+ 
+-export default ForwardedComponent;
++export default RangeControl;
+diff --git a/packages/components/src/range-control/input-range.js b/packages/components/src/range-control/input-range.tsx
+similarity index 76%
+rename from packages/components/src/range-control/input-range.js
+rename to packages/components/src/range-control/input-range.tsx
+index 9de136f2ca54b8..d7aaa028e6eb8f 100644
+--- a/packages/components/src/range-control/input-range.js
++++ b/packages/components/src/range-control/input-range.tsx
+@@ -1,4 +1,3 @@
+-// @ts-nocheck
+ /**
+  * WordPress dependencies
+  */
+@@ -10,10 +9,16 @@ import { forwardRef } from '@wordpress/element';
+ import { InputRange as BaseInputRange } from './styles/range-control-styles';
+ import { useDebouncedHoverInteraction } from './utils';
+ 
++import type { InputRangeProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
++
+ const noop = () => {};
+ 
+ function InputRange(
+-	{
++	props: WordPressComponentProps< InputRangeProps, 'input' >,
++	ref: React.ForwardedRef< HTMLInputElement >
++) {
++	const {
+ 		describedBy,
+ 		label,
+ 		onHideTooltip = noop,
+@@ -21,10 +26,9 @@ function InputRange(
+ 		onMouseMove = noop,
+ 		onShowTooltip = noop,
+ 		value,
+-		...props
+-	},
+-	ref
+-) {
++		...otherProps
++	} = props;
++
+ 	const hoverInteractions = useDebouncedHoverInteraction( {
+ 		onHide: onHideTooltip,
+ 		onMouseLeave,
+@@ -34,7 +38,7 @@ function InputRange(
+ 
+ 	return (
+ 		<BaseInputRange
+-			{ ...props }
++			{ ...otherProps }
+ 			{ ...hoverInteractions }
+ 			aria-describedby={ describedBy }
+ 			aria-label={ label }
+diff --git a/packages/components/src/range-control/mark.js b/packages/components/src/range-control/mark.tsx
+similarity index 68%
+rename from packages/components/src/range-control/mark.js
+rename to packages/components/src/range-control/mark.tsx
+index a6362b0ee903d6..892a3b3679df1e 100644
+--- a/packages/components/src/range-control/mark.js
++++ b/packages/components/src/range-control/mark.tsx
+@@ -1,4 +1,3 @@
+-// @ts-nocheck
+ /**
+  * External dependencies
+  */
+@@ -9,13 +8,20 @@ import classnames from 'classnames';
+  */
+ import { Mark, MarkLabel } from './styles/range-control-styles';
+ 
+-export default function RangeMark( {
+-	className,
+-	isFilled = false,
+-	label,
+-	style = {},
+-	...props
+-} ) {
++import type { RangeMarkProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
++
++export default function RangeMark(
++	props: WordPressComponentProps< RangeMarkProps, 'span' >
++) {
++	const {
++		className,
++		isFilled = false,
++		label,
++		style = {},
++		...otherProps
++	} = props;
++
+ 	const classes = classnames(
+ 		'components-range-control__mark',
+ 		isFilled && 'is-filled',
+@@ -29,7 +35,7 @@ export default function RangeMark( {
+ 	return (
+ 		<>
+ 			<Mark
+-				{ ...props }
++				{ ...otherProps }
+ 				aria-hidden="true"
+ 				className={ classes }
+ 				isFilled={ isFilled }
+diff --git a/packages/components/src/range-control/rail.js b/packages/components/src/range-control/rail.tsx
+similarity index 68%
+rename from packages/components/src/range-control/rail.js
+rename to packages/components/src/range-control/rail.tsx
+index 34caa88a736228..c284415630906c 100644
+--- a/packages/components/src/range-control/rail.js
++++ b/packages/components/src/range-control/rail.tsx
+@@ -1,4 +1,3 @@
+-// @ts-nocheck
+ /**
+  * WordPress dependencies
+  */
+@@ -10,15 +9,27 @@ import { isRTL } from '@wordpress/i18n';
+ import RangeMark from './mark';
+ import { MarksWrapper, Rail } from './styles/range-control-styles';
+ 
+-export default function RangeRail( {
+-	disabled = false,
+-	marks = false,
+-	min = 0,
+-	max = 100,
+-	step = 1,
+-	value = 0,
+-	...restProps
+-} ) {
++import type { WordPressComponentProps } from '../ui/context';
++import type {
++	MarksProps,
++	RangeMarkProps,
++	RailProps,
++	UseMarksArgs,
++} from './types';
++
++export default function RangeRail(
++	props: WordPressComponentProps< RailProps, 'span' >
++) {
++	const {
++		disabled = false,
++		marks = false,
++		min = 0,
++		max = 100,
++		step = 1,
++		value = 0,
++		...restProps
++	} = props;
++
+ 	return (
+ 		<>
+ 			<Rail disabled={ disabled } { ...restProps } />
+@@ -36,17 +47,17 @@ export default function RangeRail( {
+ 	);
+ }
+ 
+-function Marks( {
+-	disabled = false,
+-	marks = false,
+-	min = 0,
+-	max = 100,
+-	step = 1,
+-	value = 0,
+-} ) {
+-	if ( step === 'any' ) {
+-		step = 1;
+-	}
++function Marks( props: WordPressComponentProps< MarksProps, 'span' > ) {
++	const {
++		disabled = false,
++		marks = false,
++		min = 0,
++		max = 100,
++		step: stepProp = 1,
++		value = 0,
++	} = props;
++
++	const step = stepProp === 'any' ? 1 : stepProp;
+ 	const marksData = useMarks( { marks, min, max, step, value } );
+ 
+ 	return (
+@@ -66,7 +77,13 @@ function Marks( {
+ 	);
+ }
+ 
+-function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
++function useMarks( {
++	marks,
++	min = 0,
++	max = 100,
++	step = 1,
++	value = 0,
++}: UseMarksArgs ) {
+ 	if ( ! marks ) {
+ 		return [];
+ 	}
+@@ -78,7 +95,7 @@ function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
+ 		while ( count > marks.push( { value: step * marks.length + min } ) );
+ 	}
+ 
+-	const placedMarks = [];
++	const placedMarks: RangeMarkProps[] = [];
+ 	marks.forEach( ( mark, index ) => {
+ 		if ( mark.value < min || mark.value > max ) {
+ 			return;
+diff --git a/packages/components/src/range-control/stories/index.js b/packages/components/src/range-control/stories/index.js
+deleted file mode 100644
+index e57b421f90672c..00000000000000
+--- a/packages/components/src/range-control/stories/index.js
++++ /dev/null
+@@ -1,180 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-import { styles, wordpress } from '@wordpress/icons';
+-
+-/**
+- * Internal dependencies
+- */
+-import RangeControl from '../index';
+-
+-const ICONS = { styles, wordpress };
+-
+-export default {
+-	title: 'Components/RangeControl',
+-	component: RangeControl,
+-	argTypes: {
+-		afterIcon: {
+-			control: { type: 'select' },
+-			options: Object.keys( ICONS ),
+-			mapping: ICONS,
+-		},
+-		allowReset: { control: { type: 'boolean' } },
+-		beforeIcon: {
+-			control: { type: 'select' },
+-			options: Object.keys( ICONS ),
+-			mapping: ICONS,
+-		},
+-		color: { control: { type: 'color' } },
+-		disabled: { control: { type: 'boolean' } },
+-		help: { control: { type: 'text' } },
+-		initialPosition: { control: { type: 'number' } },
+-		marks: { control: { type: 'object' } },
+-		min: { control: { type: 'number' } },
+-		max: { control: { type: 'number' } },
+-		railColor: { control: { type: 'color' } },
+-		showTooltip: { control: { type: 'boolean' } },
+-		step: { control: { type: 'number' } },
+-		trackColor: { control: { type: 'color' } },
+-		withInputField: { control: { type: 'boolean' } },
+-	},
+-	parameters: {
+-		docs: { source: { state: 'open' } },
+-	},
+-};
+-
+-const RangeControlWithState = ( props ) => {
+-	const [ value, setValue ] = useState();
+-
+-	return <RangeControl { ...props } value={ value } onChange={ setValue } />;
+-};
+-
+-export const Default = RangeControlWithState.bind( {} );
+-Default.args = {
+-	label: 'Range label',
+-};
+-
+-/**
+- * The `initialPosition` prop sets the starting position of the slider when no `value` is provided.
+- */
+-export const InitialValueZero = RangeControlWithState.bind( {} );
+-InitialValueZero.args = {
+-	...Default.args,
+-	initialPosition: 0,
+-	max: 20,
+-};
+-
+-/**
+- * Setting the `step` prop to `"any"` will allow users to select non-integer values.
+- * This also overrides both `withInputField` and `showTooltip` props to `false`.
+- */
+-export const WithAnyStep = ( props ) => {
+-	const [ value, setValue ] = useState( 1.2345 );
+-
+-	return (
+-		<>
+-			<RangeControl value={ value } onChange={ setValue } { ...props } />
+-			<p>Current value: { value }</p>
+-		</>
+-	);
+-};
+-WithAnyStep.args = {
+-	label: 'Brightness',
+-	step: 'any',
+-};
+-
+-export const WithHelp = RangeControlWithState.bind( {} );
+-WithHelp.args = {
+-	...Default.args,
+-	label: 'How many columns should this use?',
+-	help: 'Please select the number of columns you would like this to contain.',
+-};
+-
+-/**
+- * Set `min` and `max` values to constrain the range of allowed values.
+- */
+-export const WithMinimumAndMaximumLimits = RangeControlWithState.bind( {} );
+-WithMinimumAndMaximumLimits.args = {
+-	...Default.args,
+-	min: 2,
+-	max: 10,
+-};
+-
+-export const WithIconBefore = RangeControlWithState.bind( {} );
+-WithIconBefore.args = {
+-	...Default.args,
+-	beforeIcon: wordpress,
+-};
+-
+-export const WithIconAfter = RangeControlWithState.bind( {} );
+-WithIconAfter.args = {
+-	...Default.args,
+-	afterIcon: wordpress,
+-};
+-
+-export const WithReset = RangeControlWithState.bind( {} );
+-WithReset.args = {
+-	...Default.args,
+-	allowReset: true,
+-};
+-
+-/**
+- * Use `marks` to render a visual representation of `step` ticks. Custom mark indicators can be provided by an `Array`.
+- */
+-export const WithMarks = ( props ) => {
+-	const marksBase = [
+-		{ value: 0, label: '0' },
+-		{ value: 1, label: '1' },
+-		{ value: 2, label: '2' },
+-		{ value: 8, label: '8' },
+-		{ value: 10, label: '10' },
+-	];
+-	const marksWithDecimal = [
+-		...marksBase,
+-		{ value: 3.5, label: '3.5' },
+-		{ value: 5.8, label: '5.8' },
+-	];
+-	const marksWithNegatives = [
+-		...marksBase,
+-		{ value: -1, label: '-1' },
+-		{ value: -2, label: '-2' },
+-		{ value: -4, label: '-4' },
+-		{ value: -8, label: '-8' },
+-	];
+-	const stepInteger = { min: 0, max: 10, step: 1 };
+-	const stepDecimal = { min: 0, max: 10, step: 0.1 };
+-	const minNegative = { min: -10, max: 10, step: 1 };
+-	const rangeNegative = { min: -10, max: -1, step: 1 };
+-
+-	const Range = ( localProps ) => {
+-		const label = Array.isArray( localProps.marks )
+-			? 'Custom'
+-			: 'Automatic';
+-		return <RangeControl { ...{ ...localProps, ...props, label } } />;
+-	};
+-
+-	return (
+-		<>
+-			<h2>Integer Step</h2>
+-			<Range marks { ...stepInteger } />
+-			<Range marks={ marksBase } { ...stepInteger } />
+-
+-			<h2>Decimal Step</h2>
+-			<Range marks { ...stepDecimal } />
+-			<Range marks={ marksWithDecimal } { ...stepDecimal } />
+-
+-			<h2>Negative Minimum</h2>
+-			<Range marks { ...minNegative } />
+-			<Range marks={ marksWithNegatives } { ...minNegative } />
+-
+-			<h2>Negative Range</h2>
+-			<Range marks { ...rangeNegative } />
+-			<Range marks={ marksWithNegatives } { ...rangeNegative } />
+-
+-			<h2>Any Step</h2>
+-			<Range marks { ...{ ...stepInteger, step: 'any' } } />
+-			<Range marks={ marksBase } { ...{ ...stepInteger, step: 'any' } } />
+-		</>
+-	);
+-};
+diff --git a/packages/components/src/range-control/stories/index.tsx b/packages/components/src/range-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..729b156e381649
+--- /dev/null
++++ b/packages/components/src/range-control/stories/index.tsx
+@@ -0,0 +1,244 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++import { starEmpty, starFilled, styles, wordpress } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import RangeControl from '..';
++
++const ICONS = { starEmpty, starFilled, styles, wordpress };
++
++const meta: ComponentMeta< typeof RangeControl > = {
++	component: RangeControl,
++	title: 'Components/RangeControl',
++	argTypes: {
++		afterIcon: {
++			control: { type: 'select' },
++			options: Object.keys( ICONS ),
++			mapping: ICONS,
++		},
++		beforeIcon: {
++			control: { type: 'select' },
++			options: Object.keys( ICONS ),
++			mapping: ICONS,
++		},
++		color: { control: { type: 'color' } },
++		help: { control: { type: 'text' } },
++		icon: { control: { type: null } },
++		marks: { control: { type: 'object' } },
++		onBlur: { control: { type: null } },
++		onChange: { action: 'onChange' },
++		onFocus: { control: { type: null } },
++		onMouseLeave: { control: { type: null } },
++		onMouseMove: { control: { type: null } },
++		railColor: { control: { type: 'color' } },
++		step: { control: { type: 'number' } },
++		trackColor: { control: { type: 'color' } },
++		type: { control: { type: 'check' }, options: [ 'stepper' ] },
++		value: { control: { type: null } },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof RangeControl > = ( {
++	onChange,
++	...args
++} ) => {
++	const [ value, setValue ] = useState< number >();
++
++	return (
++		<RangeControl
++			{ ...args }
++			value={ value }
++			onChange={ ( v ) => {
++				setValue( v );
++				onChange?.( v );
++			} }
++		/>
++	);
++};
++
++export const Default: ComponentStory< typeof RangeControl > = Template.bind(
++	{}
++);
++Default.args = {
++	help: 'Please select how transparent you would like this.',
++	initialPosition: 50,
++	label: 'Opacity',
++	max: 100,
++	min: 0,
++};
++
++/**
++ * Setting the `step` prop to `"any"` will allow users to select non-integer
++ * values. This also overrides both `withInputField` and `showTooltip` props to
++ * `false`.
++ */
++export const WithAnyStep: ComponentStory< typeof RangeControl > = ( {
++	onChange,
++	...args
++} ) => {
++	const [ value, setValue ] = useState< number >();
++
++	return (
++		<>
++			<RangeControl
++				{ ...args }
++				value={ value }
++				onChange={ ( v ) => {
++					setValue( v );
++					onChange?.( v );
++				} }
++			/>
++			<hr style={ { marginTop: '5em' } } />
++			<p>Current value: { value }</p>
++		</>
++	);
++};
++WithAnyStep.args = {
++	label: 'Brightness',
++	step: 'any',
++};
++
++const MarkTemplate: ComponentStory< typeof RangeControl > = ( {
++	label,
++	onChange,
++	...args
++} ) => {
++	const [ automaticValue, setAutomaticValue ] = useState< number >();
++	const [ customValue, setCustomValue ] = useState< number >();
++
++	return (
++		<>
++			<h2>{ label }</h2>
++			<RangeControl
++				{ ...args }
++				label="Automatic marks"
++				marks
++				onChange={ ( v ) => {
++					setAutomaticValue( v );
++					onChange?.( v );
++				} }
++				value={ automaticValue }
++			/>
++			<RangeControl
++				{ ...args }
++				label="Custom marks"
++				onChange={ ( v ) => {
++					setCustomValue( v );
++					onChange?.( v );
++				} }
++				value={ customValue }
++			/>
++		</>
++	);
++};
++
++const marksBase = [
++	{ value: 0, label: '0' },
++	{ value: 1, label: '1' },
++	{ value: 2, label: '2' },
++	{ value: 8, label: '8' },
++	{ value: 10, label: '10' },
++];
++
++const marksWithNegatives = [
++	...marksBase,
++	{ value: -1, label: '-1' },
++	{ value: -2, label: '-2' },
++	{ value: -4, label: '-4' },
++	{ value: -8, label: '-8' },
++];
++
++/**
++ * Use `marks` to render a visual representation of `step` ticks. Marks may be
++ * automatically generated or custom mark indicators can be provided by an
++ * `Array`.
++ */
++export const WithIntegerStepAndMarks: ComponentStory< typeof RangeControl > =
++	MarkTemplate.bind( {} );
++
++WithIntegerStepAndMarks.args = {
++	label: 'Integer Step',
++	marks: marksBase,
++	max: 10,
++	min: 0,
++	step: 1,
++};
++
++/**
++ * Decimal values may be used for `marks` rendered as a visual representation of
++ * `step` ticks. Marks may be automatically generated or custom mark indicators
++ * can be provided by an `Array`.
++ */
++export const WithDecimalStepAndMarks: ComponentStory< typeof RangeControl > =
++	MarkTemplate.bind( {} );
++
++WithDecimalStepAndMarks.args = {
++	marks: [
++		...marksBase,
++		{ value: 3.5, label: '3.5' },
++		{ value: 5.8, label: '5.8' },
++	],
++	max: 10,
++	min: 0,
++	step: 0.1,
++};
++
++/**
++ * A negative `min` value can be used to constrain `RangeControl` values. Mark
++ * indicators can represent negative values as well. Marks may be automatically
++ * generated or custom mark indicators can be provided by an `Array`.
++ */
++export const WithNegativeMinimumAndMarks: ComponentStory<
++	typeof RangeControl
++> = MarkTemplate.bind( {} );
++
++WithNegativeMinimumAndMarks.args = {
++	marks: marksWithNegatives,
++	max: 10,
++	min: -10,
++	step: 1,
++};
++
++/**
++ * The entire range of valid values for a `RangeControl` may be negative. Mark
++ * indicators can represent negative values as well. Marks may be automatically
++ * generated or custom mark indicators can be provided by an `Array`.
++ */
++export const WithNegativeRangeAndMarks: ComponentStory< typeof RangeControl > =
++	MarkTemplate.bind( {} );
++
++WithNegativeRangeAndMarks.args = {
++	marks: marksWithNegatives,
++	max: -1,
++	min: -10,
++	step: 1,
++};
++
++/**
++ * When a `RangeControl` has a `step` value of `any` a user may select
++ * non-integer values. This may still be used in conjunction with `marks`
++ * rendering a visual representation of `step` ticks.
++ */
++export const WithAnyStepAndMarks: ComponentStory< typeof RangeControl > =
++	MarkTemplate.bind( {} );
++
++WithAnyStepAndMarks.args = {
++	marks: marksBase,
++	max: 10,
++	min: 0,
++	step: 'any',
++};
+diff --git a/packages/components/src/range-control/styles/range-control-styles.js b/packages/components/src/range-control/styles/range-control-styles.ts
+similarity index 84%
+rename from packages/components/src/range-control/styles/range-control-styles.js
+rename to packages/components/src/range-control/styles/range-control-styles.ts
+index 204ddf7af78164..aa316a4a97929c 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.js
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -1,4 +1,3 @@
+-// @ts-nocheck
+ /**
+  * External dependencies
+  */
+@@ -12,6 +11,15 @@ import NumberControl from '../../number-control';
+ import { COLORS, reduceMotion, rtl } from '../../utils';
+ import { space } from '../../ui/utils/space';
+ 
++import type {
++	RangeMarkProps,
++	RailProps,
++	ThumbProps,
++	TooltipProps,
++	TrackProps,
++	WrapperProps,
++} from '../types';
++
+ const rangeHeightValue = 30;
+ const railHeight = 4;
+ const rangeHeight = () =>
+@@ -30,13 +38,13 @@ export const Root = styled.div`
+ 	width: 100%;
+ `;
+ 
+-const wrapperColor = ( { color: colorProp = COLORS.ui.borderFocus } ) => {
+-	return css( { color: colorProp } );
+-};
+-const wrapperMargin = ( { marks } ) =>
+-	css( { marginBottom: marks ? 16 : null } );
++const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>
++	css( { color } );
+ 
+-export const Wrapper = styled.div`
++const wrapperMargin = ( { marks }: WrapperProps ) =>
++	css( { marginBottom: marks ? 16 : undefined } );
++
++export const Wrapper = styled.div< WrapperProps >`
+ 	box-sizing: border-box;
+ 	color: ${ COLORS.blue.medium.focus };
+ 	display: block;
+@@ -61,16 +69,14 @@ export const AfterIconWrapper = styled.span`
+ 	${ rtl( { marginLeft: 6 } ) }
+ `;
+ 
+-const railBackgroundColor = ( { disabled, railColor } ) => {
+-	let background = railColor || null;
++const railBackgroundColor = ( { disabled, railColor }: RailProps ) => {
++	let background = railColor || '';
+ 
+ 	if ( disabled ) {
+ 		background = COLORS.lightGray[ 400 ];
+ 	}
+ 
+-	return css( {
+-		background,
+-	} );
++	return css( { background } );
+ };
+ 
+ export const Rail = styled.span`
+@@ -89,16 +95,14 @@ export const Rail = styled.span`
+ 	${ railBackgroundColor };
+ `;
+ 
+-const trackBackgroundColor = ( { disabled, trackColor } ) => {
++const trackBackgroundColor = ( { disabled, trackColor }: TrackProps ) => {
+ 	let background = trackColor || 'currentColor';
+ 
+ 	if ( disabled ) {
+ 		background = COLORS.lightGray[ 800 ];
+ 	}
+ 
+-	return css( {
+-		background,
+-	} );
++	return css( { background } );
+ };
+ 
+ export const Track = styled.span`
+@@ -124,7 +128,7 @@ export const MarksWrapper = styled.span`
+ 	user-select: none;
+ `;
+ 
+-const markFill = ( { disabled, isFilled } ) => {
++const markFill = ( { disabled, isFilled }: RangeMarkProps ) => {
+ 	let backgroundColor = isFilled ? 'currentColor' : COLORS.lightGray[ 600 ];
+ 
+ 	if ( disabled ) {
+@@ -147,7 +151,7 @@ export const Mark = styled.span`
+ 	${ markFill };
+ `;
+ 
+-const markLabelFill = ( { isFilled } ) => {
++const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
+ 	return css( {
+ 		color: isFilled ? COLORS.darkGray[ 300 ] : COLORS.lightGray[ 600 ],
+ 	} );
+@@ -166,7 +170,7 @@ export const MarkLabel = styled.span`
+ 	${ markLabelFill };
+ `;
+ 
+-const thumbColor = ( { disabled } ) =>
++const thumbColor = ( { disabled }: ThumbProps ) =>
+ 	disabled
+ 		? css`
+ 				background-color: ${ COLORS.lightGray[ 800 ] };
+@@ -198,7 +202,7 @@ export const ThumbWrapper = styled.span`
+ 	) };
+ `;
+ 
+-const thumbFocus = ( { isFocused } ) => {
++const thumbFocus = ( { isFocused }: ThumbProps ) => {
+ 	return isFocused
+ 		? css`
+ 				&::before {
+@@ -216,7 +220,7 @@ const thumbFocus = ( { isFocused } ) => {
+ 		: '';
+ };
+ 
+-export const Thumb = styled.span`
++export const Thumb = styled.span< ThumbProps >`
+ 	align-items: center;
+ 	border-radius: 50%;
+ 	box-sizing: border-box;
+@@ -245,13 +249,13 @@ export const InputRange = styled.input`
+ 	width: calc( 100% + ${ thumbSize }px );
+ `;
+ 
+-const tooltipShow = ( { show } ) => {
++const tooltipShow = ( { show }: TooltipProps ) => {
+ 	return css( {
+ 		opacity: show ? 1 : 0,
+ 	} );
+ };
+ 
+-const tooltipPosition = ( { position } ) => {
++const tooltipPosition = ( { position }: TooltipProps ) => {
+ 	const isBottom = position === 'bottom';
+ 
+ 	if ( isBottom ) {
+@@ -265,7 +269,7 @@ const tooltipPosition = ( { position } ) => {
+ 	`;
+ };
+ 
+-export const Tooltip = styled.span`
++export const Tooltip = styled.span< TooltipProps >`
+ 	background: rgba( 0, 0, 0, 0.8 );
+ 	border-radius: 2px;
+ 	box-sizing: border-box;
+diff --git a/packages/components/src/range-control/tooltip.js b/packages/components/src/range-control/tooltip.tsx
+similarity index 68%
+rename from packages/components/src/range-control/tooltip.js
+rename to packages/components/src/range-control/tooltip.tsx
+index 07c49e927094ae..81aeb5489976f3 100644
+--- a/packages/components/src/range-control/tooltip.js
++++ b/packages/components/src/range-control/tooltip.tsx
+@@ -1,4 +1,3 @@
+-// @ts-nocheck
+ /**
+  * External dependencies
+  */
+@@ -14,17 +13,23 @@ import { useCallback, useEffect, useState } from '@wordpress/element';
+  */
+ import { Tooltip } from './styles/range-control-styles';
+ 
+-export default function SimpleTooltip( {
+-	className,
+-	inputRef,
+-	tooltipPosition,
+-	show = false,
+-	style = {},
+-	value = 0,
+-	renderTooltipContent = ( v ) => v,
+-	zIndex = 100,
+-	...restProps
+-} ) {
++import type { TooltipProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
++
++export default function SimpleTooltip(
++	props: WordPressComponentProps< TooltipProps, 'span' >
++) {
++	const {
++		className,
++		inputRef,
++		tooltipPosition,
++		show = false,
++		style = {},
++		value = 0,
++		renderTooltipContent = ( v ) => v,
++		zIndex = 100,
++		...restProps
++	} = props;
+ 	const position = useTooltipPosition( { inputRef, tooltipPosition } );
+ 	const classes = classnames( 'components-simple-tooltip', className );
+ 	const styles = {
+@@ -47,8 +52,8 @@ export default function SimpleTooltip( {
+ 	);
+ }
+ 
+-function useTooltipPosition( { inputRef, tooltipPosition } ) {
+-	const [ position, setPosition ] = useState();
++function useTooltipPosition( { inputRef, tooltipPosition }: TooltipProps ) {
++	const [ position, setPosition ] = useState< string >();
+ 
+ 	const setTooltipPosition = useCallback( () => {
+ 		if ( inputRef && inputRef.current ) {
+diff --git a/packages/components/src/range-control/types.ts b/packages/components/src/range-control/types.ts
+new file mode 100644
+index 00000000000000..02a5a870317fe8
+--- /dev/null
++++ b/packages/components/src/range-control/types.ts
+@@ -0,0 +1,326 @@
++/**
++ * External dependencies
++ */
++import type {
++	CSSProperties,
++	FocusEventHandler,
++	MouseEventHandler,
++	MutableRefObject,
++} from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { BaseControlProps } from '../base-control/types';
++import type { IconType } from '../icon';
++
++export type NumericProps = {
++	/**
++	 * The minimum `value` allowed.
++	 *
++	 * @default 0
++	 */
++	min?: number;
++	/**
++	 * The maximum `value` allowed.
++	 *
++	 * @default 100
++	 */
++	max?: number;
++	/**
++	 * The current value of the range slider.
++	 */
++	value?: number;
++};
++
++export type RangeMark = { value: number; label?: string };
++// An expanded definition of this type is used in MarkProps to improve Storybook
++// generated docs.
++export type RangeMarks = boolean | RangeMark[];
++
++export type MarksProps = NumericProps & {
++	/**
++	 * Disables the `input`, preventing new values from being applied.
++	 *
++	 * @default false
++	 */
++	disabled?: boolean;
++	/**
++	 * Renders a visual representation of `step` ticks. Custom mark indicators
++	 * can be provided by an `Array`.
++	 *
++	 * @default false
++	 */
++	marks?: boolean | { value: number; label?: string }[];
++	/**
++	 * The minimum amount by which `value` changes. It is also a factor in
++	 * validation as `value` must be a multiple of `step` (offset by `min`) to
++	 * be valid. Accepts the special string value `any` that voids the
++	 * validation constraint and overrides both `withInputField` and
++	 * `showTooltip` props to `false`.
++	 *
++	 * @default 1
++	 */
++	step?: number | 'any';
++};
++
++export type RangeMarkProps = {
++	isFilled?: boolean;
++	label?: string;
++	disabled?: boolean;
++	key?: string;
++	style?: CSSProperties;
++};
++
++export type ControlledRangeValue = number | '' | null;
++
++export type RangeControlProps< IconProps = unknown > = Pick<
++	BaseControlProps,
++	'hideLabelFromVision' | 'help'
++> &
++	MarksProps & {
++		/**
++		 * If this property is added, an Icon component will be rendered
++		 * after the slider with the icon equal to afterIcon.
++		 *
++		 * For more information on `IconType` see the Icon component:
++		 * /packages/components/src/icon/index.tsx
++		 */
++		afterIcon?: IconType< IconProps >;
++		/**
++		 * If this property is true, a button to reset the the slider is
++		 * rendered.
++		 *
++		 * @default false
++		 */
++		allowReset?: boolean;
++		/**
++		 * If this property is added, an Icon component will be rendered
++		 * before the slider with the icon equal to beforeIcon.
++		 *
++		 * For more information on `IconType` see the Icon component:
++		 * /packages/components/src/icon/index.tsx
++		 */
++		beforeIcon?: IconType< IconProps >;
++		/**
++		 * CSS color string for the `RangeControl` wrapper.
++		 *
++		 * @default COLORS.ui.theme
++		 * @see /packages/components/src/utils/colors-values.js
++		 */
++		color?: CSSProperties[ 'color' ];
++		/**
++		 * The current input to use as a fallback if `value` is currently
++		 * `undefined`.
++		 */
++		currentInput?: number;
++		/**
++		 * An icon to be shown above the slider next to its container title.
++		 */
++		icon?: string;
++		/**
++		 * If no value exists this prop contains the slider starting position.
++		 */
++		initialPosition?: number;
++		/**
++		 * Passed as a prop to the `NumberControl` component and is only
++		 * applicable if `withInputField` is true. If true, while the number
++		 * input has focus, pressing `UP` or `DOWN` along with the `SHIFT` key
++		 * will change the value by the `shiftStep` value.
++		 *
++		 * @default true
++		 */
++		isShiftStepEnabled?: boolean;
++		/**
++		 * If this property is added, a label will be generated using label
++		 * property as the content.
++		 */
++		label?: string;
++		/**
++		 * Callback for when `RangeControl` input loses focus.
++		 *
++		 * @default () => void
++		 */
++		onBlur?: FocusEventHandler< HTMLInputElement >;
++		/**
++		 * A function that receives the new value. The value will be less than
++		 * `max` and more than `min` unless a reset (enabled by `allowReset`)
++		 * has occurred. In which case the value will be either that of
++		 * `resetFallbackValue` if it has been specified or otherwise
++		 * `undefined`.
++		 *
++		 * @default () => void
++		 */
++		onChange?: ( value?: number ) => void;
++		/**
++		 * Callback for when `RangeControl` input gains focus.
++		 *
++		 * @default () => void
++		 */
++		onFocus?: FocusEventHandler< HTMLInputElement >;
++		/**
++		 * Callback for when mouse exits the `RangeControl`.
++		 *
++		 * @default () => void
++		 */
++		onMouseLeave?: MouseEventHandler< HTMLInputElement >;
++		/**
++		 * Callback for when mouse moves within the `RangeControl`.
++		 *
++		 * @default () => void
++		 */
++		onMouseMove?: MouseEventHandler< HTMLInputElement >;
++		/**
++		 * CSS color string to customize the rail element's background.
++		 */
++		railColor?: CSSProperties[ 'color' ];
++		/**
++		 * A way to customize the rendered UI of the value.
++		 *
++		 * @default ( value ) => value
++		 */
++		renderTooltipContent?: (
++			value?: ControlledRangeValue
++		) => string | number | null | undefined;
++		/**
++		 * The value to revert to if the Reset button is clicked (enabled by
++		 * `allowReset`)
++		 */
++		resetFallbackValue?: number;
++		/**
++		 * Define if separator line under/above control row should be disabled
++		 * or full width. By default it is placed below excluding underline the
++		 * control icon.
++		 */
++		separatorType?: 'none' | 'fullWidth' | 'topFullWidth';
++		/**
++		 * Passed as a prop to the `NumberControl` component and is only
++		 * applicable if `withInputField` and `isShiftStepEnabled` are both true
++		 * and while the number input has focus. Acts as a multiplier of `step`.
++		 *
++		 * @default 10
++		 */
++		shiftStep?: number;
++		/**
++		 * Forcing the Tooltip UI to show or hide. This is overridden to `false`
++		 * when `step` is set to the special string value `any`.
++		 */
++		showTooltip?: boolean;
++		/**
++		 * CSS color string to customize the track element's background.
++		 */
++		trackColor?: CSSProperties[ 'color' ];
++		/**
++		 * Define if the value selection should present a stepper control or a
++		 * slider control in the bottom sheet on mobile. To use the stepper set
++		 * the type value as `stepper`. Defaults to slider if no option is
++		 * provided.
++		 */
++		type?: 'stepper';
++		/**
++		 * Determines if the `input` number field will render next to the
++		 * RangeControl. This is overridden to `false` when `step` is set to the
++		 * special string value `any`.
++		 *
++		 * @default true
++		 */
++		withInputField?: boolean;
++	};
++
++export type RailProps = MarksProps & {
++	railColor?: CSSProperties[ 'color' ];
++};
++
++export type InputRangeProps = {
++	describedBy?: string;
++	label?: string;
++	onHideTooltip?: () => void;
++	onMouseLeave?: MouseEventHandler< HTMLInputElement >;
++	onMouseMove?: MouseEventHandler< HTMLInputElement >;
++	onShowTooltip?: () => void;
++	value?: number | '';
++};
++
++export type WrapperProps = {
++	color?: CSSProperties[ 'color' ];
++	marks?: RangeMarks;
++};
++
++export type ThumbProps = {
++	isFocused?: boolean;
++	disabled?: boolean;
++};
++
++export type TooltipProps = {
++	show?: boolean;
++	position?: string;
++	inputRef?: MutableRefObject< HTMLElement | undefined >;
++	tooltipPosition?: string;
++	value?: ControlledRangeValue;
++	renderTooltipContent?: (
++		value?: ControlledRangeValue
++	) => string | number | null | undefined;
++	zIndex?: number;
++};
++
++export type TrackProps = {
++	disabled: boolean;
++	trackColor: CSSProperties[ 'color' ];
++};
++
++export type UseControlledRangeValueArgs = {
++	/**
++	 * The initial value.
++	 */
++	initial?: number;
++	/**
++	 * The maximum value.
++	 */
++	max: number;
++	/**
++	 * The minimum value.
++	 */
++	min: number;
++	/**
++	 * The current value.
++	 */
++	value: number | null;
++};
++
++export type UseDebouncedHoverInteractionArgs = {
++	/**
++	 *  A callback function invoked when the element is hidden.
++	 *
++	 * @default () => {}
++	 */
++	onHide?: () => void;
++	/**
++	 * A callback function invoked when the mouse is moved out of the element.
++	 *
++	 * @default () => {}
++	 */
++	onMouseLeave?: MouseEventHandler< HTMLInputElement >;
++	/**
++	 * A callback function invoked when the mouse is moved.
++	 *
++	 * @default () => {}
++	 */
++	onMouseMove?: MouseEventHandler< HTMLInputElement >;
++	/**
++	 * A callback function invoked when the element is shown.
++	 *
++	 * @default () => {}
++	 */
++	onShow?: () => void;
++	/**
++	 * Timeout before the element is shown or hidden.
++	 *
++	 * @default 300
++	 */
++	timeout?: number;
++};
++
++export type UseMarksArgs = NumericProps & {
++	marks: RangeMarks;
++	step: number;
++};
+diff --git a/packages/components/src/range-control/utils.js b/packages/components/src/range-control/utils.js
+deleted file mode 100644
+index d4bd5cdf0901a9..00000000000000
+--- a/packages/components/src/range-control/utils.js
++++ /dev/null
+@@ -1,131 +0,0 @@
+-// @ts-nocheck
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useControlledState } from '../utils/hooks';
+-import { clamp } from '../utils/math';
+-
+-const noop = () => {};
+-
+-/**
+- * A float supported clamp function for a specific value.
+- *
+- * @param {number|null} value The value to clamp.
+- * @param {number}      min   The minimum value.
+- * @param {number}      max   The maximum value.
+- *
+- * @return {number} A (float) number
+- */
+-export function floatClamp( value, min, max ) {
+-	if ( typeof value !== 'number' ) {
+-		return null;
+-	}
+-
+-	return parseFloat( clamp( value, min, max ) );
+-}
+-
+-/**
+- * Hook to store a clamped value, derived from props.
+- *
+- * @param {Object} settings         Hook settings.
+- * @param {number} settings.min     The minimum value.
+- * @param {number} settings.max     The maximum value.
+- * @param {number} settings.value   The current value.
+- * @param {any}    settings.initial The initial value.
+- *
+- * @return {[*, Function]} The controlled value and the value setter.
+- */
+-export function useControlledRangeValue( {
+-	min,
+-	max,
+-	value: valueProp,
+-	initial,
+-} ) {
+-	const [ state, setInternalState ] = useControlledState(
+-		floatClamp( valueProp, min, max ),
+-		{ initial, fallback: null }
+-	);
+-
+-	const setState = useCallback(
+-		( nextValue ) => {
+-			if ( nextValue === null ) {
+-				setInternalState( null );
+-			} else {
+-				setInternalState( floatClamp( nextValue, min, max ) );
+-			}
+-		},
+-		[ min, max ]
+-	);
+-
+-	return [ state, setState ];
+-}
+-
+-/**
+- * Hook to encapsulate the debouncing "hover" to better handle the showing
+- * and hiding of the Tooltip.
+- *
+- * @param {Object}   settings                     Hook settings.
+- * @param {Function} [settings.onShow=noop]       A callback function invoked when the element is shown.
+- * @param {Function} [settings.onHide=noop]       A callback function invoked when the element is hidden.
+- * @param {Function} [settings.onMouseMove=noop]  A callback function invoked when the mouse is moved.
+- * @param {Function} [settings.onMouseLeave=noop] A callback function invoked when the mouse is moved out of the element.
+- * @param {number}   [settings.timeout=300]       Timeout before the element is shown or hidden.
+- *
+- * @return {Object} Bound properties for use on a React.Node.
+- */
+-export function useDebouncedHoverInteraction( {
+-	onHide = noop,
+-	onMouseLeave = noop,
+-	onMouseMove = noop,
+-	onShow = noop,
+-	timeout = 300,
+-} ) {
+-	const [ show, setShow ] = useState( false );
+-	const timeoutRef = useRef();
+-
+-	const setDebouncedTimeout = useCallback(
+-		( callback ) => {
+-			window.clearTimeout( timeoutRef.current );
+-
+-			timeoutRef.current = setTimeout( callback, timeout );
+-		},
+-		[ timeout ]
+-	);
+-
+-	const handleOnMouseMove = useCallback( ( event ) => {
+-		onMouseMove( event );
+-
+-		setDebouncedTimeout( () => {
+-			if ( ! show ) {
+-				setShow( true );
+-				onShow();
+-			}
+-		} );
+-	}, [] );
+-
+-	const handleOnMouseLeave = useCallback( ( event ) => {
+-		onMouseLeave( event );
+-
+-		setDebouncedTimeout( () => {
+-			setShow( false );
+-			onHide();
+-		} );
+-	}, [] );
+-
+-	useEffect( () => {
+-		return () => {
+-			window.clearTimeout( timeoutRef.current );
+-		};
+-	} );
+-
+-	return {
+-		onMouseMove: handleOnMouseMove,
+-		onMouseLeave: handleOnMouseLeave,
+-	};
+-}
+diff --git a/packages/components/src/range-control/utils.ts b/packages/components/src/range-control/utils.ts
+new file mode 100644
+index 00000000000000..78657f9e32e7a0
+--- /dev/null
++++ b/packages/components/src/range-control/utils.ts
+@@ -0,0 +1,132 @@
++/**
++ * External dependencies
++ */
++import type { MouseEventHandler } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useControlledState } from '../utils/hooks';
++import { clamp } from '../utils/math';
++
++import type {
++	UseControlledRangeValueArgs,
++	UseDebouncedHoverInteractionArgs,
++} from './types';
++
++const noop = () => {};
++
++/**
++ * A float supported clamp function for a specific value.
++ *
++ * @param  value The value to clamp.
++ * @param  min   The minimum value.
++ * @param  max   The maximum value.
++ *
++ * @return A (float) number
++ */
++export function floatClamp( value: number | null, min: number, max: number ) {
++	if ( typeof value !== 'number' ) {
++		return null;
++	}
++
++	return parseFloat( `${ clamp( value, min, max ) }` );
++}
++
++/**
++ * Hook to store a clamped value, derived from props.
++ *
++ * @param  settings
++ * @return The controlled value and the value setter.
++ */
++export function useControlledRangeValue(
++	settings: UseControlledRangeValueArgs
++) {
++	const { min, max, value: valueProp, initial } = settings;
++	const [ state, setInternalState ] = useControlledState(
++		floatClamp( valueProp, min, max ),
++		{ initial, fallback: null }
++	);
++
++	const setState = useCallback(
++		( nextValue: number | null ) => {
++			if ( nextValue === null ) {
++				setInternalState( null );
++			} else {
++				setInternalState( floatClamp( nextValue, min, max ) );
++			}
++		},
++		[ min, max ]
++	);
++
++	// `state` can't be an empty string because we specified a fallback value of
++	// `null` in `useControlledState`
++	return [ state as Exclude< typeof state, '' >, setState ] as const;
++}
++
++/**
++ * Hook to encapsulate the debouncing "hover" to better handle the showing
++ * and hiding of the Tooltip.
++ *
++ * @param  settings
++ * @return Bound properties for use on a React.Node.
++ */
++export function useDebouncedHoverInteraction(
++	settings: UseDebouncedHoverInteractionArgs
++) {
++	const {
++		onHide = noop,
++		onMouseLeave = noop as MouseEventHandler,
++		onMouseMove = noop as MouseEventHandler,
++		onShow = noop,
++		timeout = 300,
++	} = settings;
++
++	const [ show, setShow ] = useState( false );
++	const timeoutRef = useRef< number | undefined >();
++
++	const setDebouncedTimeout = useCallback(
++		( callback ) => {
++			window.clearTimeout( timeoutRef.current );
++
++			timeoutRef.current = window.setTimeout( callback, timeout );
++		},
++		[ timeout ]
++	);
++
++	const handleOnMouseMove = useCallback( ( event ) => {
++		onMouseMove( event );
++
++		setDebouncedTimeout( () => {
++			if ( ! show ) {
++				setShow( true );
++				onShow();
++			}
++		} );
++	}, [] );
++
++	const handleOnMouseLeave = useCallback( ( event ) => {
++		onMouseLeave( event );
++
++		setDebouncedTimeout( () => {
++			setShow( false );
++			onHide();
++		} );
++	}, [] );
++
++	useEffect( () => {
++		return () => {
++			window.clearTimeout( timeoutRef.current );
++		};
++	} );
++
++	return {
++		onMouseMove: handleOnMouseMove,
++		onMouseLeave: handleOnMouseLeave,
++	};
++}

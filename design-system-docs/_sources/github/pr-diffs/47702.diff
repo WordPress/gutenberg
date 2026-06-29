@@ -1,0 +1,586 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index de726e6106e9bc..249ae1cfa617a8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,12 +5,13 @@
+ ### Internal
+ 
+ -   `Guide`: Convert to TypeScript ([#47493](https://github.com/WordPress/gutenberg/pull/47493)).
++-   `PanelBody`: Convert to TypeScript ([#47702](https://github.com/WordPress/gutenberg/pull/47702)).
+ 
+ ## 23.5.0 (2023-03-01)
+ 
+ ### Enhancements
+ 
+--  `ToolsPanel`: Separate reset all filter registration from items registration and support global resets ([#48123](https://github.com/WordPress/gutenberg/pull/48123#pullrequestreview-1308386926)).
++-   `ToolsPanel`: Separate reset all filter registration from items registration and support global resets ([#48123](https://github.com/WordPress/gutenberg/pull/48123#pullrequestreview-1308386926)).
+ 
+ ### Internal
+ 
+@@ -31,10 +32,10 @@
+ 
+ ### Enhancements
+ 
+--  `ColorPalette`, `GradientPicker`, `PaletteEdit`, `ToolsPanel`: add new props to set a custom heading level ([43848](https://github.com/WordPress/gutenberg/pull/43848) and [#47788](https://github.com/WordPress/gutenberg/pull/47788)).
++-   `ColorPalette`, `GradientPicker`, `PaletteEdit`, `ToolsPanel`: add new props to set a custom heading level ([43848](https://github.com/WordPress/gutenberg/pull/43848) and [#47788](https://github.com/WordPress/gutenberg/pull/47788)).
+ -   `ColorPalette`: ensure text label contrast checking works with CSS variables ([#47373](https://github.com/WordPress/gutenberg/pull/47373)).
+--  `Navigator`: Support dynamic paths with parameters ([#47827](https://github.com/WordPress/gutenberg/pull/47827)).
+--  `Navigator`: Support hierarchical paths navigation and add `NavigatorToParentButton` component ([#47883](https://github.com/WordPress/gutenberg/pull/47883)).
++-   `Navigator`: Support dynamic paths with parameters ([#47827](https://github.com/WordPress/gutenberg/pull/47827)).
++-   `Navigator`: Support hierarchical paths navigation and add `NavigatorToParentButton` component ([#47883](https://github.com/WordPress/gutenberg/pull/47883)).
+ 
+ ### Internal
+ 
+@@ -63,7 +64,7 @@
+ 
+ ### Enhancements
+ 
+--   `Dropdown`: deprecate `position`  prop, use `popoverProps` instead ([46865](https://github.com/WordPress/gutenberg/pull/46865)).
++-   `Dropdown`: deprecate `position` prop, use `popoverProps` instead ([46865](https://github.com/WordPress/gutenberg/pull/46865)).
+ -   `Button`: improve padding for buttons with icon and text. ([46764](https://github.com/WordPress/gutenberg/pull/46764)).
+ -   `ColorPalette`: Use computed color when css variable is passed to `ColorPicker` ([47181](https://github.com/WordPress/gutenberg/pull/47181)).
+ -   `Popover`: add `overlay` option to the `placement` prop ([47004](https://github.com/WordPress/gutenberg/pull/47004)).
+@@ -75,8 +76,7 @@
+ -   Removed deprecated `@storybook/addon-knobs` dependency from the package ([47152](https://github.com/WordPress/gutenberg/pull/47152)).
+ -   `ColorListPicker`: Convert to TypeScript ([#46358](https://github.com/WordPress/gutenberg/pull/46358)).
+ -   `KeyboardShortcuts`: Convert to TypeScript ([#47429](https://github.com/WordPress/gutenberg/pull/47429)).
+--   `ColorPalette`, `BorderControl`, `GradientPicker`: refine types and logic around single vs multiple palettes
+- ([#47384](https://github.com/WordPress/gutenberg/pull/47384)).
++-   `ColorPalette`, `BorderControl`, `GradientPicker`: refine types and logic around single vs multiple palettes ([#47384](https://github.com/WordPress/gutenberg/pull/47384)).
+ -   `Button`: Convert to TypeScript ([#46997](https://github.com/WordPress/gutenberg/pull/46997)).
+ -   `QueryControls`: Convert to TypeScript ([#46721](https://github.com/WordPress/gutenberg/pull/46721)).
+ -   `TreeGrid`: Convert to TypeScript ([#47516](https://github.com/WordPress/gutenberg/pull/47516)).
+@@ -91,6 +91,7 @@
+ ## 23.2.0 (2023-01-11)
+ 
+ ### Internal
++
+ -   `AlignmentMatrixControl`: Update center cell label to 'Center' instead of 'Center Center' ([#46852](https://github.com/WordPress/gutenberg/pull/46852)).
+ -   `Toolbar`: move all subcomponents under the same folder ([46951](https://github.com/WordPress/gutenberg/pull/46951)).
+ -   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
+diff --git a/packages/components/src/panel/README.md b/packages/components/src/panel/README.md
+index 04cf6d6eeeda1e..be4beca3e75278 100644
+--- a/packages/components/src/panel/README.md
++++ b/packages/components/src/panel/README.md
+@@ -77,20 +77,25 @@ const MyPanel = () => (
+ 
+ ##### Props
+ 
+-###### className
++###### `header`: `string`
+ 
+-The class that will be added with `components-panel`. If no `className` is passed only `components-panel__body` and `is-opened` is used.
++The text that will be rendered as the title of the panel. Text will be rendered inside an
++`<h2>` tag.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-###### header
++###### `className`: `string`
+ 
+-Title of the `Panel`. Text will be rendered inside an `<h2>` tag.
++The CSS class to apply to the wrapper element.
+ 
+--   Type: `String`
+ -   Required: No
+ 
++###### `children`: `React.ReactNode`
++
++The content to display within the panel row.
++
++-   Required: Yes
++
+ ---
+ 
+ #### PanelBody
+@@ -99,64 +104,67 @@ The `PanelBody` creates a collapsible container that can be toggled open or clos
+ 
+ ##### Props
+ 
+-###### title
++###### `title`: `string`
+ 
+-Title of the `PanelBody`. This shows even when it is closed.
++Title text. It shows even when the component is closed.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-###### opened
++###### `opened`: `boolean`
+ 
+-If opened is true then the `Panel` will remain open regardless of the `initialOpen` prop and the panel will be prevented from being closed.
++When set to `true`, the component will remain open regardless of the `initialOpen` prop and the
++panel will be prevented from being closed.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-###### className
++###### `className`: `string`
+ 
+-The class that will be added with `components-panel__body`, if the panel is currently open, the `is-opened` class will also be passed to the classes of the wrapper div. If no `className` is passed then only `components-panel__body` and `is-opened` is used.
++The CSS class to apply to the wrapper element.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-###### icon
++###### `icon`: `JSX.Element`
+ 
+-An icon to be shown next to the `PanelBody` title.
++An icon to be shown next to the title.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-###### onToggle
++###### `onToggle`: `( next: boolean ) => void;`
+ 
+-A function that is called when the user clicks on the `PanelBody` title after the open state is changed.
++A function that is called any time the component is toggled from its closed state to its
++opened state, or vice versa.
+ 
+--   Type: `function`
+ -   Required: No
++-   Default: `noop`
+ 
+-###### initialOpen
++###### `initialOpen`: `boolean`
+ 
+ Whether or not the panel will start open.
+ 
+--   Type: `Boolean`
+ -   Required: No
+--   Default: true
++-   Default: `true`
+ 
+-###### children
++###### `children`: `| React.ReactNode | ( ( props: { opened: boolean } ) => React.ReactNode )`
+ 
+-The rendered children. If the children is a `Function`, it will be called with an object with the `opened` property and return its value.
++The content to display in the `PanelBody`. If a function is provided for this prop, it will receive an object with the `opened` prop as an argument.
+ 
+--   Type: `React.ReactNode | Function`
+ -   Required: No
+ 
+-###### buttonProps
++###### `buttonProps`: `WordPressComponentProps<Omit< ButtonAsButtonProps, 'icon' >, 'button', false>`
+ 
+-Props that are passed to the `Button` component in the `PanelBodyTitle` within the panel body.
++Props that are passed to the `Button` component in title within the `PanelBody`.
+ 
+--   Type: `Object`
+ -   Required: No
+ -   Default: `{}`
+ 
++###### `scrollAfterOpen`: `boolean`
++
++Scrolls the content into view when visible. This improves the UX when multiple `PanelBody`
++components are stacked in a scrollable container.
++
++-   Required: No
++-   Default: `true`
++
+ ---
+ 
+ #### PanelRow
+@@ -165,11 +173,16 @@ Props that are passed to the `Button` component in the `PanelBodyTitle` within t
+ 
+ ##### Props
+ 
+-###### className
++###### `className`: `string`
+ 
+-The class that will be added with `components-panel__row`. to the classes of the wrapper div. If no `className` is passed only `components-panel__row` is used.
++The CSS class to apply to the wrapper element.
++
++-   Required: No
++
++###### `children`: `React.ReactNode`
++
++The content to display within the panel row.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+ ##### Ref
+@@ -186,11 +199,16 @@ PanelRow accepts a forwarded ref that will be added to the wrapper div. Usage:
+ 
+ ##### Props
+ 
+-###### label
++###### `label`: `string`
+ 
+ The text that will be rendered as the title of the `Panel`. Will be rendered in an `<h2>` tag.
+ 
+--   Type: `String`
++-   Required: No
++
++###### `children`: `React.ReactNode`
++
++The content to display within the panel row.
++
+ -   Required: No
+ 
+ ## Related components
+diff --git a/packages/components/src/panel/body.js b/packages/components/src/panel/body.tsx
+similarity index 73%
+rename from packages/components/src/panel/body.js
+rename to packages/components/src/panel/body.tsx
+index f47d0be42ad00f..f5ea844754cddd 100644
+--- a/packages/components/src/panel/body.js
++++ b/packages/components/src/panel/body.tsx
+@@ -13,14 +13,19 @@ import { chevronUp, chevronDown } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
++import type { PanelBodyProps, PanelBodyTitleProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
+ import Button from '../button';
+ import Icon from '../icon';
+ import { useControlledState, useUpdateEffect } from '../utils';
+ 
+ const noop = () => {};
+ 
+-export function PanelBody(
+-	{
++export function UnforwardedPanelBody(
++	props: PanelBodyProps,
++	ref: React.ForwardedRef< HTMLDivElement >
++) {
++	const {
+ 		buttonProps = {},
+ 		children,
+ 		className,
+@@ -30,19 +35,21 @@ export function PanelBody(
+ 		opened,
+ 		title,
+ 		scrollAfterOpen = true,
+-	},
+-	ref
+-) {
+-	const [ isOpened, setIsOpened ] = useControlledState( opened, {
+-		initial: initialOpen === undefined ? true : initialOpen,
+-	} );
+-	const nodeRef = useRef();
++	} = props;
++	const [ isOpened, setIsOpened ] = useControlledState< boolean | undefined >(
++		opened,
++		{
++			initial: initialOpen === undefined ? true : initialOpen,
++			fallback: false,
++		}
++	);
++	const nodeRef = useRef< HTMLElement >( null );
+ 
+ 	// Defaults to 'smooth' scrolling
+ 	// https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
+ 	const scrollBehavior = useReducedMotion() ? 'auto' : 'smooth';
+ 
+-	const handleOnToggle = ( event ) => {
++	const handleOnToggle = ( event: React.MouseEvent ) => {
+ 		event.preventDefault();
+ 		const next = ! isOpened;
+ 		setIsOpened( next );
+@@ -50,7 +57,7 @@ export function PanelBody(
+ 	};
+ 
+ 	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value.
+-	const scrollAfterOpenRef = useRef();
++	const scrollAfterOpenRef = useRef< boolean | undefined >();
+ 	scrollAfterOpenRef.current = scrollAfterOpen;
+ 	// Runs after initial render.
+ 	useUpdateEffect( () => {
+@@ -80,20 +87,28 @@ export function PanelBody(
+ 		<div className={ classes } ref={ useMergeRefs( [ nodeRef, ref ] ) }>
+ 			<PanelBodyTitle
+ 				icon={ icon }
+-				isOpened={ isOpened }
++				isOpened={ Boolean( isOpened ) }
+ 				onClick={ handleOnToggle }
+ 				title={ title }
+ 				{ ...buttonProps }
+ 			/>
+ 			{ typeof children === 'function'
+-				? children( { opened: isOpened } )
++				? children( { opened: Boolean( isOpened ) } )
+ 				: isOpened && children }
+ 		</div>
+ 	);
+ }
+ 
+ const PanelBodyTitle = forwardRef(
+-	( { isOpened, icon, title, ...props }, ref ) => {
++	(
++		{
++			isOpened,
++			icon,
++			title,
++			...props
++		}: WordPressComponentProps< PanelBodyTitleProps, 'button' >,
++		ref: React.ForwardedRef< any >
++	) => {
+ 		if ( ! title ) return null;
+ 
+ 		return (
+@@ -128,7 +143,6 @@ const PanelBodyTitle = forwardRef(
+ 	}
+ );
+ 
+-const ForwardedComponent = forwardRef( PanelBody );
+-ForwardedComponent.displayName = 'PanelBody';
++export const PanelBody = forwardRef( UnforwardedPanelBody );
+ 
+-export default ForwardedComponent;
++export default PanelBody;
+diff --git a/packages/components/src/panel/stories/index.js b/packages/components/src/panel/stories/index.tsx
+similarity index 76%
+rename from packages/components/src/panel/stories/index.js
+rename to packages/components/src/panel/stories/index.tsx
+index 29dab9b293bed3..b3c189d11cb888 100644
+--- a/packages/components/src/panel/stories/index.js
++++ b/packages/components/src/panel/stories/index.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
+ /**
+  * Internal dependencies
+  */
+@@ -11,7 +16,7 @@ import InputControl from '../../input-control';
+  */
+ import { wordpress } from '@wordpress/icons';
+ 
+-export default {
++const meta: ComponentMeta< typeof Panel > = {
+ 	title: 'Components/Panel',
+ 	component: Panel,
+ 	subcomponents: { PanelRow, PanelBody },
+@@ -23,10 +28,13 @@ export default {
+ 		docs: { source: { state: 'open' } },
+ 	},
+ };
++export default meta;
+ 
+-const Template = ( props ) => <Panel { ...props } />;
++const Template: ComponentStory< typeof Panel > = ( props ) => (
++	<Panel { ...props } />
++);
+ 
+-export const Default = Template.bind( {} );
++export const Default: ComponentStory< typeof Panel > = Template.bind( {} );
+ Default.args = {
+ 	header: 'My panel',
+ 	children: (
+@@ -61,7 +69,7 @@ Default.args = {
+  * `PanelRow` is a generic container for rows within a `PanelBody`.
+  * It is a flex container with a top margin for spacing.
+  */
+-export const _PanelRow = Template.bind( {} );
++export const _PanelRow: ComponentStory< typeof Panel > = Template.bind( {} );
+ _PanelRow.args = {
+ 	children: (
+ 		<PanelBody title="My Profile">
+@@ -78,7 +86,9 @@ _PanelRow.args = {
+ 	),
+ };
+ 
+-export const DisabledSection = Template.bind( {} );
++export const DisabledSection: ComponentStory< typeof Panel > = Template.bind(
++	{}
++);
+ DisabledSection.args = {
+ 	...Default.args,
+ 	children: (
+@@ -90,7 +100,7 @@ DisabledSection.args = {
+ 	),
+ };
+ 
+-export const WithIcon = Template.bind( {} );
++export const WithIcon: ComponentStory< typeof Panel > = Template.bind( {} );
+ WithIcon.args = {
+ 	...Default.args,
+ 	children: (
+diff --git a/packages/components/src/panel/test/__snapshots__/body.js.snap b/packages/components/src/panel/test/__snapshots__/body.tsx.snap
+similarity index 100%
+rename from packages/components/src/panel/test/__snapshots__/body.js.snap
+rename to packages/components/src/panel/test/__snapshots__/body.tsx.snap
+diff --git a/packages/components/src/panel/test/body.js b/packages/components/src/panel/test/body.tsx
+similarity index 83%
+rename from packages/components/src/panel/test/body.js
+rename to packages/components/src/panel/test/body.tsx
+index 1f282256fb2616..fb745f2c602db7 100644
+--- a/packages/components/src/panel/test/body.js
++++ b/packages/components/src/panel/test/body.tsx
+@@ -89,9 +89,7 @@ describe( 'PanelBody', () => {
+ 				</PanelBody>
+ 			);
+ 
+-			let panelContent = screen.getByTestId( 'inner-content' );
+-
+-			expect( panelContent ).toBeVisible();
++			expect( screen.getByTestId( 'inner-content' ) ).toBeVisible();
+ 
+ 			rerender(
+ 				<PanelBody opened={ false }>
+@@ -99,9 +97,9 @@ describe( 'PanelBody', () => {
+ 				</PanelBody>
+ 			);
+ 
+-			panelContent = screen.queryByTestId( 'inner-content' );
+-
+-			expect( panelContent ).not.toBeInTheDocument();
++			expect(
++				screen.queryByTestId( 'inner-content' )
++			).not.toBeInTheDocument();
+ 
+ 			rerender(
+ 				<PanelBody opened>
+@@ -109,9 +107,7 @@ describe( 'PanelBody', () => {
+ 				</PanelBody>
+ 			);
+ 
+-			panelContent = screen.getByTestId( 'inner-content' );
+-
+-			expect( panelContent ).toBeVisible();
++			expect( screen.getByTestId( 'inner-content' ) ).toBeVisible();
+ 		} );
+ 
+ 		it( 'should toggle when clicking header', async () => {
+@@ -123,22 +119,21 @@ describe( 'PanelBody', () => {
+ 				</PanelBody>
+ 			);
+ 
+-			let panelContent = screen.queryByTestId( 'inner-content' );
+ 			const panelToggle = screen.getByRole( 'button', { name: 'Panel' } );
+ 
+-			expect( panelContent ).not.toBeInTheDocument();
++			expect(
++				screen.queryByTestId( 'inner-content' )
++			).not.toBeInTheDocument();
+ 
+ 			await user.click( panelToggle );
+ 
+-			panelContent = screen.getByTestId( 'inner-content' );
+-
+-			expect( panelContent ).toBeVisible();
++			expect( screen.getByTestId( 'inner-content' ) ).toBeVisible();
+ 
+ 			await user.click( panelToggle );
+ 
+-			panelContent = screen.queryByTestId( 'inner-content' );
+-
+-			expect( panelContent ).not.toBeInTheDocument();
++			expect(
++				screen.queryByTestId( 'inner-content' )
++			).not.toBeInTheDocument();
+ 		} );
+ 
+ 		it( 'should pass button props to panel title', async () => {
+diff --git a/packages/components/src/panel/types.ts b/packages/components/src/panel/types.ts
+index fe41ad378d62bb..9059aad53fa0a1 100644
+--- a/packages/components/src/panel/types.ts
++++ b/packages/components/src/panel/types.ts
+@@ -1,3 +1,9 @@
++/**
++ * Internal dependencies
++ */
++import type { ButtonAsButtonProps } from '../button/types';
++import type { WordPressComponentProps } from '../ui/context';
++
+ export type PanelProps = {
+ 	/**
+ 	 * The text that will be rendered as the title of the panel.
+@@ -36,3 +42,75 @@ export type PanelRowProps = {
+ 	 */
+ 	children: React.ReactNode;
+ };
++
++export type PanelBodyProps = {
++	/**
++	 * Props that are passed to the `Button` component in title within the
++	 * `PanelBody`.
++	 *
++	 * @default {}
++	 */
++	buttonProps?: WordPressComponentProps<
++		Omit< ButtonAsButtonProps, 'icon' >,
++		'button',
++		false
++	>;
++	/**
++	 * The content to display in the `PanelBody`.If a function is provided for
++	 * this prop, it will receive an object with the `opened` prop as an argument.
++	 */
++	children?:
++		| React.ReactNode
++		| ( ( props: { opened: boolean } ) => React.ReactNode );
++
++	/**
++	 * The CSS class to apply to the wrapper element.
++	 */
++	className?: string;
++	/**
++	 * An icon to be shown next to the title.
++	 */
++	icon?: JSX.Element;
++	/**
++	 * Whether or not the panel will start open.
++	 */
++	initialOpen?: boolean;
++	/**
++	 * A function that is called any time the component is toggled from its closed
++	 * state to its opened state, or vice versa.
++	 *
++	 * @default noop
++	 */
++	onToggle?: ( next: boolean ) => void;
++	/**
++	 * When set to `true`, the component will remain open regardless of the
++	 * `initialOpen` prop and the panel will be prevented from being closed.
++	 */
++	opened?: boolean;
++	/**
++	 * Title text. It shows even when it is closed.
++	 */
++	title?: string;
++	/**
++	 * Scrolls the content into view when visible. This improves the UX when
++	 * multiple `PanelBody` components are stacked in a scrollable container.
++	 *
++	 * @default true
++	 */
++	scrollAfterOpen?: boolean;
++};
++
++export type PanelBodyTitleProps = Omit< ButtonAsButtonProps, 'icon' > & {
++	/**
++	 * An icon to be shown next to the title.
++	 */
++	icon?: JSX.Element;
++	/**
++	 * Whether or not the `PanelBody` is currently opened or not.
++	 */
++	isOpened?: boolean;
++	/**
++	 * The title text.
++	 */
++	title?: string;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 005ddd0b4c568e..b2ef337c4221e0 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -55,7 +55,6 @@
+ 		"src/higher-order/with-focus-return",
+ 		"src/higher-order/with-notices",
+ 		"src/navigation",
+-		"src/palette-edit",
+-		"src/panel/body.js"
++		"src/palette-edit"
+ 	]
+ }

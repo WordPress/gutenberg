@@ -1,0 +1,261 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 11650effa74028..398eb53faaa541 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `CustomSelectControlV2`: prevent keyboard event propagation in legacy wrapper. ([#62907](https://github.com/WordPress/gutenberg/pull/62907))
+ -   `CustomSelectControlV2`: fix item styles ([#62825](https://github.com/WordPress/gutenberg/pull/62825))
+ -   `CustomSelectControlV2`: add root element wrapper. ([#62803](https://github.com/WordPress/gutenberg/pull/62803))
++-   `CustomSelectControlV2`: tweak item inline padding based on size ([#62850](https://github.com/WordPress/gutenberg/pull/62850)).
+ -   `CustomSelectControlV2`: fix popover styles. ([#62821](https://github.com/WordPress/gutenberg/pull/62821))
+ -   `CustomSelectControlV2`: fix trigger text alignment in RTL languages ([#62869](https://github.com/WordPress/gutenberg/pull/62869)).
+ -   `CustomSelectControlV2`: allow wrapping item hint to new line ([#62848](https://github.com/WordPress/gutenberg/pull/62848)).
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index c03e047c882e45..027423319bece1 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -107,6 +107,8 @@ function _CustomSelect(
+ 			[ isLegacy ]
+ 		);
+ 
++	const contextValue = useMemo( () => ( { store, size } ), [ store, size ] );
++
+ 	return (
+ 		// Where should `restProps` be forwarded to?
+ 		<div className={ className }>
+@@ -134,7 +136,7 @@ function _CustomSelect(
+ 					slide={ false }
+ 					onKeyDown={ onSelectPopoverKeyDown }
+ 				>
+-					<CustomSelectContext.Provider value={ { store } }>
++					<CustomSelectContext.Provider value={ contextValue }>
+ 						{ children }
+ 					</CustomSelectContext.Provider>
+ 				</Styled.SelectPopover>
+diff --git a/packages/components/src/custom-select-control-v2/item.tsx b/packages/components/src/custom-select-control-v2/item.tsx
+index bd60f974cc43a6..ade187bb603e98 100644
+--- a/packages/components/src/custom-select-control-v2/item.tsx
++++ b/packages/components/src/custom-select-control-v2/item.tsx
+@@ -17,7 +17,11 @@ export function CustomSelectItem( {
+ }: WordPressComponentProps< CustomSelectItemProps, 'div', false > ) {
+ 	const customSelectContext = useContext( CustomSelectContext );
+ 	return (
+-		<Styled.SelectItem store={ customSelectContext?.store } { ...props }>
++		<Styled.SelectItem
++			store={ customSelectContext?.store }
++			size={ customSelectContext?.size ?? 'default' }
++			{ ...props }
++		>
+ 			{ children ?? props.value }
+ 			<Styled.SelectedItemCheck>
+ 				<Icon icon={ check } />
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index d432ac5e06ab62..59d22a45915500 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -13,7 +13,59 @@ import { space } from '../utils/space';
+ import { chevronIconSize } from '../select-control/styles/select-control-styles';
+ import type { CustomSelectButtonSize } from './types';
+ 
+-const ITEM_PADDING = space( 2 );
++const INLINE_PADDING = {
++	compact: 8, // space(2)
++	small: 8, // space(2)
++	default: 16, // space(4)
++};
++
++const getSelectSize = (
++	size: NonNullable< CustomSelectButtonSize[ 'size' ] >,
++	heightProperty: 'minHeight' | 'height'
++) => {
++	const sizes = {
++		compact: {
++			[ heightProperty ]: 32,
++			paddingInlineStart: INLINE_PADDING.compact,
++			paddingInlineEnd: INLINE_PADDING.compact + chevronIconSize,
++		},
++		default: {
++			[ heightProperty ]: 40,
++			paddingInlineStart: INLINE_PADDING.default,
++			paddingInlineEnd: INLINE_PADDING.default + chevronIconSize,
++		},
++		small: {
++			[ heightProperty ]: 24,
++			paddingInlineStart: INLINE_PADDING.small,
++			paddingInlineEnd: INLINE_PADDING.small + chevronIconSize,
++		},
++	};
++
++	return sizes[ size ] || sizes.default;
++};
++
++const getSelectItemSize = (
++	size: NonNullable< CustomSelectButtonSize[ 'size' ] >
++) => {
++	// Used to visually align the checkmark with the chevron
++	const checkmarkCorrection = 6;
++	const sizes = {
++		compact: {
++			paddingInlineStart: INLINE_PADDING.compact,
++			paddingInlineEnd: INLINE_PADDING.compact - checkmarkCorrection,
++		},
++		default: {
++			paddingInlineStart: INLINE_PADDING.default,
++			paddingInlineEnd: INLINE_PADDING.default - checkmarkCorrection,
++		},
++		small: {
++			paddingInlineStart: INLINE_PADDING.small,
++			paddingInlineEnd: INLINE_PADDING.small - checkmarkCorrection,
++		},
++	};
++
++	return sizes[ size ] || sizes.default;
++};
+ 
+ export const SelectLabel = styled( Ariakit.SelectLabel )`
+ 	font-size: 11px;
+@@ -26,38 +78,14 @@ export const SelectLabel = styled( Ariakit.SelectLabel )`
+ export const Select = styled( Ariakit.Select, {
+ 	// Do not forward `hasCustomRenderProp` to the underlying Ariakit.Select component
+ 	shouldForwardProp: ( prop ) => prop !== 'hasCustomRenderProp',
+-} )( ( {
+-	size,
+-	hasCustomRenderProp,
+-}: {
+-	size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
+-	hasCustomRenderProp: boolean;
+-} ) => {
+-	const heightProperty = hasCustomRenderProp ? 'minHeight' : 'height';
+-
+-	const getSize = () => {
+-		const sizes = {
+-			compact: {
+-				[ heightProperty ]: 32,
+-				paddingInlineStart: 8,
+-				paddingInlineEnd: 8 + chevronIconSize,
+-			},
+-			default: {
+-				[ heightProperty ]: 40,
+-				paddingInlineStart: 16,
+-				paddingInlineEnd: 16 + chevronIconSize,
+-			},
+-			small: {
+-				[ heightProperty ]: 24,
+-				paddingInlineStart: 8,
+-				paddingInlineEnd: 8 + chevronIconSize,
+-			},
+-		};
+-
+-		return sizes[ size ] || sizes.default;
+-	};
+-
+-	return css`
++} )(
++	( {
++		size,
++		hasCustomRenderProp,
++	}: {
++		size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
++		hasCustomRenderProp: boolean;
++	} ) => css`
+ 		display: block;
+ 		background-color: ${ COLORS.theme.background };
+ 		border: none;
+@@ -73,10 +101,10 @@ export const Select = styled( Ariakit.Select, {
+ 			outline: none; // handled by InputBase component
+ 		}
+ 
+-		${ getSize() }
++		${ getSelectSize( size, hasCustomRenderProp ? 'minHeight' : 'height' ) }
+ 		${ ! hasCustomRenderProp && truncateStyles }
+-	`;
+-} );
++	`
++);
+ 
+ export const SelectPopover = styled( Ariakit.SelectPopover )`
+ 	display: flex;
+@@ -101,31 +129,39 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
+ 	}
+ `;
+ 
+-export const SelectItem = styled( Ariakit.SelectItem )`
+-	cursor: default;
+-	display: flex;
+-	align-items: center;
+-	justify-content: space-between;
+-	padding: ${ ITEM_PADDING };
+-	font-size: ${ CONFIG.fontSize };
+-	// TODO: reassess line-height for non-legacy v2
+-	line-height: 28px;
+-	scroll-margin: ${ space( 1 ) };
+-	user-select: none;
+-
+-	&[aria-disabled='true'] {
+-		cursor: not-allowed;
+-	}
++export const SelectItem = styled( Ariakit.SelectItem )(
++	( {
++		size,
++	}: {
++		size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
++	} ) => css`
++		cursor: default;
++		display: flex;
++		align-items: center;
++		justify-content: space-between;
++		font-size: ${ CONFIG.fontSize };
++		// TODO: reassess line-height for non-legacy v2
++		line-height: 28px;
++		padding-block: ${ space( 2 ) };
++		scroll-margin: ${ space( 1 ) };
++		user-select: none;
+ 
+-	&[data-active-item] {
+-		background-color: ${ COLORS.theme.gray[ 300 ] };
+-	}
+-`;
++		&[aria-disabled='true'] {
++			cursor: not-allowed;
++		}
++
++		&[data-active-item] {
++			background-color: ${ COLORS.theme.gray[ 300 ] };
++		}
++
++		${ getSelectItemSize( size ) }
++	`
++);
+ 
+ export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
+ 	display: flex;
+ 	align-items: center;
+-	margin-inline-start: ${ ITEM_PADDING };
++	margin-inline-start: ${ space( 2 ) };
+ 	font-size: 24px; // Size of checkmark icon
+ `;
+ 
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+index c37db0690c5bc1..317c363ec3549a 100644
+--- a/packages/components/src/custom-select-control-v2/types.ts
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -12,8 +12,6 @@ export type CustomSelectStore = {
+ 	store: Ariakit.SelectStore;
+ };
+ 
+-export type CustomSelectContext = CustomSelectStore | undefined;
+-
+ type CustomSelectSize< Size = 'compact' | 'default' > = {
+ 	/**
+ 	 * The size of the control.
+@@ -27,6 +25,10 @@ export type CustomSelectButtonSize = CustomSelectSize<
+ 	'compact' | 'default' | 'small'
+ >;
+ 
++export type CustomSelectContext =
++	| ( CustomSelectStore & CustomSelectButtonSize )
++	| undefined;
++
+ export type CustomSelectButtonProps = {
+ 	/**
+ 	 * An optional default value for the control when used in uncontrolled mode.

@@ -1,0 +1,424 @@
+diff --git a/packages/block-library/src/query/edit/inspector-controls/author-control.js b/packages/block-library/src/query/edit/inspector-controls/author-control.js
+index 14a700e74c6236..105692fb821d3e 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/author-control.js
++++ b/packages/block-library/src/query/edit/inspector-controls/author-control.js
+@@ -75,7 +75,7 @@ function AuthorControl( { value, onChange } ) {
+ 			value={ sanitizedValue }
+ 			suggestions={ authorsInfo.names }
+ 			onChange={ onAuthorChange }
+-			__experimentalShowHowTo={ false }
++			help=""
+ 			__next40pxDefaultSize
+ 		/>
+ 	);
+diff --git a/packages/block-library/src/query/edit/inspector-controls/format-controls.js b/packages/block-library/src/query/edit/inspector-controls/format-controls.js
+index 3ea064c3ac9904..5e5250acfacce6 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/format-controls.js
++++ b/packages/block-library/src/query/edit/inspector-controls/format-controls.js
+@@ -81,7 +81,7 @@ export default function FormatControls( { onChange, query: { format } } ) {
+ 					format: formatNamesToValues( newValues, formats ),
+ 				} );
+ 			} }
+-			__experimentalShowHowTo={ false }
++			help=""
+ 			__experimentalExpandOnFocus
+ 			__next40pxDefaultSize
+ 		/>
+diff --git a/packages/block-library/src/query/edit/inspector-controls/parent-control.js b/packages/block-library/src/query/edit/inspector-controls/parent-control.js
+index 71d90e5b851e9a..eadb21890e08d8 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/parent-control.js
++++ b/packages/block-library/src/query/edit/inspector-controls/parent-control.js
+@@ -138,7 +138,7 @@ function ParentControl( { parents, postType, onChange } ) {
+ 			onInputChange={ debouncedSearch }
+ 			suggestions={ suggestions }
+ 			onChange={ onParentChange }
+-			__experimentalShowHowTo={ false }
++			help=""
+ 		/>
+ 	);
+ }
+diff --git a/packages/block-library/src/query/edit/inspector-controls/taxonomy-controls.js b/packages/block-library/src/query/edit/inspector-controls/taxonomy-controls.js
+index 525ff067053921..ae21830c6e2eba 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/taxonomy-controls.js
++++ b/packages/block-library/src/query/edit/inspector-controls/taxonomy-controls.js
+@@ -242,7 +242,7 @@ function TaxonomyItem( {
+ 				suggestions={ suggestions }
+ 				displayTransform={ decodeEntities }
+ 				onChange={ onTermsChange }
+-				__experimentalShowHowTo={ false }
++				help=""
+ 				__next40pxDefaultSize
+ 			/>
+ 		</div>
+diff --git a/packages/block-library/src/terms-query/edit/inspector-controls/include-control.js b/packages/block-library/src/terms-query/edit/inspector-controls/include-control.js
+index 98286b66f63724..8a1c7f50bd5d53 100644
+--- a/packages/block-library/src/terms-query/edit/inspector-controls/include-control.js
++++ b/packages/block-library/src/terms-query/edit/inspector-controls/include-control.js
+@@ -141,7 +141,7 @@ export default function IncludeControl( {
+ 			onInputChange={ debouncedSearch }
+ 			suggestions={ suggestions }
+ 			onChange={ onTermChange }
+-			__experimentalShowHowTo={ false }
++			help=""
+ 			{ ...props }
+ 		/>
+ 	);
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 124363642d126a..9e8a3309fc6e40 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,11 @@
+ 
+ -   `Menu`: Remove `cursor: not-allowed` and added pointer styles to menu ([#70412](https://github.com/WordPress/gutenberg/pull/70412))
+ -   `FormToggle`: Add stacking context isolation ([#77619](https://github.com/WordPress/gutenberg/pull/77619)).
++-   `FormTokenField`: Add `help` prop to render additional help text below the field, and deprecate the `__experimentalShowHowTo` prop in favor of it. The `help` prop now defaults to the previous how-to text; pass an empty string to hide it ([#77552](https://github.com/WordPress/gutenberg/pull/77552)).
++
++### Deprecations
++
++-   `FormTokenField`: Deprecate the `__experimentalShowHowTo` prop in favor of `help` prop. The `help` prop now defaults to the previous how-to text; pass an empty string to hide it ([#77552](https://github.com/WordPress/gutenberg/pull/77552)).
+ 
+ ### Breaking Changes
+ 
+diff --git a/packages/components/src/form-token-field/README.md b/packages/components/src/form-token-field/README.md
+index 566d0af95af55b..67f368b5a0c60d 100644
+--- a/packages/components/src/form-token-field/README.md
++++ b/packages/components/src/form-token-field/README.md
+@@ -51,6 +51,7 @@ The `value` property is handled in a manner similar to controlled form component
+ -   `maxLength` - If passed, `TokenField` will disable ability to add new tokens once number of tokens is greater than or equal to `maxLength`.
+ -   `disabled` - When true, tokens are not able to be added or removed.
+ -   `placeholder` - If passed, the `TokenField` input will show a placeholder string if no value tokens are present.
++-   `help` - Additional description for the control. Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the `FormTokenField` via `aria-describedby`. Defaults to a how-to message (e.g. _Separate with commas or the Enter key._); pass an empty string to hide it.
+ -   `messages` - Allows customizing the messages presented by screen readers in different occasions:
+     -   `added` - The user added a new token.
+     -   `removed` - The user removed an existing token.
+@@ -58,7 +59,7 @@ The `value` property is handled in a manner similar to controlled form component
+     -   `__experimentalInvalid` - The user tried to add a token that didn't pass the validation.
+ -   `__experimentalRenderItem` - Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
+ -   `__experimentalExpandOnFocus` - If true, the suggestions list will be always expanded when the input field has the focus.
+--   `__experimentalShowHowTo` - If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
++-   `__experimentalShowHowTo` - **Deprecated.** Use the `help` prop instead. The `help` prop now defaults to the previous how-to text; if you were passing `__experimentalShowHowTo={ false }` to hide it, pass an empty string to `help` instead.
+ -   `__experimentalValidateInput` - If passed, all introduced values will be validated before being added as tokens.
+ -   `__experimentalAutoSelectFirstMatch` - If true, the select the first matching suggestion when the user presses the Enter key (or space when tokenizeOnSpace is true).
+ -   `__next40pxDefaultSize` - Start opting into the larger default height that will become the default size in a future version.
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index cd1f46117e362b..25275cdc782dd6 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -2,7 +2,13 @@
+  * External dependencies
+  */
+ import clsx from 'clsx';
+-import type { KeyboardEvent, MouseEvent, TouchEvent, FocusEvent } from 'react';
++import type {
++	KeyboardEvent,
++	MouseEvent,
++	TouchEvent,
++	FocusEvent,
++	ReactNode,
++} from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -12,6 +18,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
+ import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
+ import { speak } from '@wordpress/a11y';
+ import { isShallowEqual } from '@wordpress/is-shallow-equal';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -70,10 +77,11 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		__experimentalRenderItem,
+ 		__experimentalExpandOnFocus = false,
+ 		__experimentalValidateInput = () => true,
+-		__experimentalShowHowTo = true,
++		__experimentalShowHowTo,
+ 		__next40pxDefaultSize = false,
+ 		__experimentalAutoSelectFirstMatch = false,
+ 		tokenizeOnBlur = false,
++		help,
+ 	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >( props );
+ 
+ 	maybeWarnDeprecated36pxSize( {
+@@ -82,6 +90,27 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		__next40pxDefaultSize,
+ 	} );
+ 
++	const defaultHelp = tokenizeOnSpace
++		? __( 'Separate with commas, spaces, or the Enter key.' )
++		: __( 'Separate with commas or the Enter key.' );
++
++	let computedHelp: ReactNode = help !== undefined ? help : defaultHelp;
++
++	if ( typeof __experimentalShowHowTo === 'boolean' ) {
++		deprecated(
++			'`__experimentalShowHowTo` prop in wp.components.FormTokenField',
++			{
++				since: '7.1',
++				alternative: '`help` prop',
++				hint: 'The `help` prop now defaults to the previous how-to text. Pass an empty string to hide it.',
++			}
++		);
++
++		if ( __experimentalShowHowTo === false && help === undefined ) {
++			computedHelp = '';
++		}
++	}
++
+ 	const instanceId = useInstanceId( FormTokenField );
+ 
+ 	// We reset to these initial values again in the onBlur
+@@ -655,6 +684,10 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 	}
+ 
+ 	function renderInput() {
++		const describedById = computedHelp
++			? `components-form-token-input-${ instanceId }__help`
++			: undefined;
++
+ 		const inputProps = {
+ 			instanceId,
+ 			autoCapitalize,
+@@ -665,6 +698,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 			onBlur,
+ 			isExpanded,
+ 			selectedSuggestionIndex,
++			'aria-describedby': describedById,
+ 		};
+ 
+ 		return (
+@@ -749,16 +783,12 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 					/>
+ 				) }
+ 			</div>
+-			{ __experimentalShowHowTo && (
++			{ computedHelp && (
+ 				<StyledHelp
+-					id={ `components-form-token-suggestions-howto-${ instanceId }` }
++					id={ `components-form-token-input-${ instanceId }__help` }
+ 					className="components-form-token-field__help"
+ 				>
+-					{ tokenizeOnSpace
+-						? __(
+-								'Separate with commas, spaces, or the Enter key.'
+-						  )
+-						: __( 'Separate with commas or the Enter key.' ) }
++					{ computedHelp }
+ 				</StyledHelp>
+ 			) }
+ 		</div>
+diff --git a/packages/components/src/form-token-field/stories/index.story.tsx b/packages/components/src/form-token-field/stories/index.story.tsx
+index 2b79675db7c6e9..d84a47674c8d3d 100644
+--- a/packages/components/src/form-token-field/stories/index.story.tsx
++++ b/packages/components/src/form-token-field/stories/index.story.tsx
+@@ -25,6 +25,7 @@ const meta: Meta< typeof FormTokenField > = {
+ 		__experimentalValidateInput: {
+ 			control: false,
+ 		},
++		help: { control: 'text' },
+ 	},
+ 	parameters: {
+ 		controls: {
+diff --git a/packages/components/src/form-token-field/test/index.tsx b/packages/components/src/form-token-field/test/index.tsx
+index 0c685e42ec6eb5..eb5e9189f007fd 100644
+--- a/packages/components/src/form-token-field/test/index.tsx
++++ b/packages/components/src/form-token-field/test/index.tsx
+@@ -17,6 +17,7 @@ import type { ComponentProps } from 'react';
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
++import { logged } from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -122,6 +123,14 @@ function unescapeAndFormatSpaces( str: string ) {
+ }
+ 
+ describe( 'FormTokenField', () => {
++	afterEach( () => {
++		// `@wordpress/deprecated` caches each warning message after the first
++		// log; reset it so multiple tests can assert the same deprecation.
++		for ( const key in logged ) {
++			delete logged[ key ];
++		}
++	} );
++
+ 	describe( 'basic usage', () => {
+ 		it( "should add tokens with the input's value when pressing the enter key", async () => {
+ 			const user = userEvent.setup();
+@@ -582,18 +591,17 @@ describe( 'FormTokenField', () => {
+ 			);
+ 		} );
+ 
+-		it( 'should show extra instructions when the `__experimentalShowHowTo` prop  is set to `true`', () => {
++		it( 'should show the default how-to text via the `help` prop by default', () => {
+ 			const instructionsTokenizeSpace =
+ 				'Separate with commas, spaces, or the Enter key.';
+ 			const instructionsDefault =
+ 				'Separate with commas or the Enter key.';
+ 
+-			// The __experimentalShowHowTo prop is `true` by default
+ 			const { rerender } = render( <FormTokenFieldWithState /> );
+ 
+ 			expect( screen.getByText( instructionsDefault ) ).toBeVisible();
+ 
+-			// The "show how to" text is used to aria-describedby the input
++			// The default how-to text is used to aria-describedby the input.
+ 			expect(
+ 				screen.getByRole( 'combobox' )
+ 			).toHaveAccessibleDescription( instructionsDefault );
+@@ -604,27 +612,79 @@ describe( 'FormTokenField', () => {
+ 				screen.getByText( instructionsTokenizeSpace )
+ 			).toBeVisible();
+ 
+-			// The "show how to" text is used to aria-describedby the input
+ 			expect(
+ 				screen.getByRole( 'combobox' )
+ 			).toHaveAccessibleDescription( instructionsTokenizeSpace );
++		} );
+ 
+-			rerender(
++		it( 'should allow hiding the help text by passing an empty string', () => {
++			render( <FormTokenFieldWithState help="" /> );
++
++			expect(
++				screen.queryByText( 'Separate with commas or the Enter key.' )
++			).not.toBeInTheDocument();
++			expect(
++				screen.getByRole( 'combobox' )
++			).not.toHaveAccessibleDescription();
++		} );
++
++		it( 'should associate the `help` text with the input accessibly', () => {
++			render( <FormTokenFieldWithState help="Help text" /> );
++			expect(
++				screen.getByRole( 'combobox' )
++			).toHaveAccessibleDescription( 'Help text' );
++			// The default how-to text should no longer be rendered.
++			expect(
++				screen.queryByText( 'Separate with commas or the Enter key.' )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'should warn and hide the default text when `__experimentalShowHowTo` is `false`', () => {
++			render(
++				<FormTokenFieldWithState __experimentalShowHowTo={ false } />
++			);
++
++			expect( console ).toHaveWarnedWith(
++				'`__experimentalShowHowTo` prop in wp.components.FormTokenField is deprecated since version 7.1. Please use `help` prop instead. Note: The `help` prop now defaults to the previous how-to text. Pass an empty string to hide it.'
++			);
++
++			expect(
++				screen.queryByText( 'Separate with commas or the Enter key.' )
++			).not.toBeInTheDocument();
++			expect(
++				screen.getByRole( 'combobox' )
++			).not.toHaveAccessibleDescription();
++		} );
++
++		it( 'should warn and prefer `help` over `__experimentalShowHowTo` when both are provided', () => {
++			const { rerender } = render(
+ 				<FormTokenFieldWithState
+-					tokenizeOnSpace
+ 					__experimentalShowHowTo={ false }
++					help="Help text"
+ 				/>
+ 			);
+ 
++			expect( console ).toHaveWarned();
+ 			expect(
+-				screen.queryByText( instructionsDefault )
+-			).not.toBeInTheDocument();
++				screen.getByRole( 'combobox' )
++			).toHaveAccessibleDescription( 'Help text' );
+ 			expect(
+-				screen.queryByText( instructionsTokenizeSpace )
++				screen.queryByText( 'Separate with commas or the Enter key.' )
+ 			).not.toBeInTheDocument();
++
++			rerender(
++				<FormTokenFieldWithState
++					__experimentalShowHowTo
++					help="Help text"
++				/>
++			);
++
+ 			expect(
+ 				screen.getByRole( 'combobox' )
+-			).not.toHaveAccessibleDescription();
++			).toHaveAccessibleDescription( 'Help text' );
++			expect(
++				screen.queryByText( 'Separate with commas or the Enter key.' )
++			).not.toBeInTheDocument();
+ 		} );
+ 
+ 		it( "should use the value of the `placeholder` prop as the input's placeholder only when there are no tokens", async () => {
+diff --git a/packages/components/src/form-token-field/token-input.tsx b/packages/components/src/form-token-field/token-input.tsx
+index 6a4b4565f829d0..9cfa70ca1b365f 100644
+--- a/packages/components/src/form-token-field/token-input.tsx
++++ b/packages/components/src/form-token-field/token-input.tsx
+@@ -87,12 +87,7 @@ export function UnForwardedTokenInput(
+ 					? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
+ 					: undefined
+ 			}
+-			aria-describedby={ [
+-				`components-form-token-suggestions-howto-${ instanceId }`,
+-				ariaDescribedBy,
+-			]
+-				.filter( Boolean )
+-				.join( ' ' ) }
++			aria-describedby={ ariaDescribedBy }
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/form-token-field/types.ts b/packages/components/src/form-token-field/types.ts
+index 8f2fda46c987b7..6f608b305d0955 100644
+--- a/packages/components/src/form-token-field/types.ts
++++ b/packages/components/src/form-token-field/types.ts
+@@ -147,9 +147,12 @@ export interface FormTokenFieldProps
+ 	 */
+ 	__experimentalValidateInput?: ( token: string ) => boolean;
+ 	/**
+-	 * If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
++	 * Use the `help` prop instead. The `help` prop now defaults to the previous
++	 * how-to text; if you were passing `__experimentalShowHowTo={ false }` to
++	 * hide it, pass an empty string to `help` instead.
+ 	 *
+-	 * @default true
++	 * @deprecated Use the `help` prop instead.
++	 * @ignore
+ 	 */
+ 	__experimentalShowHowTo?: boolean;
+ 	/**
+@@ -193,6 +196,17 @@ export interface FormTokenFieldProps
+ 	 * @default false
+ 	 */
+ 	tokenizeOnBlur?: boolean;
++	/**
++	 * Additional description for the control.
++	 *
++	 * Only use for meaningful description or instructions for the control. An
++	 * element containing the description will be programmatically associated to
++	 * the `FormTokenField` via `aria-describedby`.
++	 *
++	 * Defaults to a how-to message (e.g. _Separate with commas or the Enter key._);
++	 * pass an empty string to hide it.
++	 */
++	help?: ReactNode;
+ }
+ 
+ /**
+diff --git a/packages/dataviews/src/components/dataform-controls/array.tsx b/packages/dataviews/src/components/dataform-controls/array.tsx
+index 56381786b5d1fb..ac97a4aaf24abc 100644
+--- a/packages/dataviews/src/components/dataform-controls/array.tsx
++++ b/packages/dataviews/src/components/dataform-controls/array.tsx
+@@ -88,7 +88,7 @@ export default function ArrayControl< Item >( {
+ 				return true;
+ 			} }
+ 			__experimentalExpandOnFocus={ elements && elements.length > 0 }
+-			__experimentalShowHowTo={ ! field.isValid?.elements }
++			help={ field.isValid?.elements ? '' : undefined }
+ 			displayTransform={ ( token: any ) => {
+ 				// For existing tokens (element objects), display their label
+ 				if ( typeof token === 'object' && 'label' in token ) {

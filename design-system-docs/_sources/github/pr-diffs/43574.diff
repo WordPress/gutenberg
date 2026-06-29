@@ -1,0 +1,45 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 19182873e38282..411a326d4c5c7d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -   `ConfirmDialog`: Ensure onConfirm isn't called an extra time when submitting one of the buttons using the keyboard ([#51730](https://github.com/WordPress/gutenberg/pull/51730)).
+ -   `ZStack`: ZStack: fix component bounding box to match children ([#51836](https://github.com/WordPress/gutenberg/pull/51836)).
+ -   `Modal`: Add small top padding to the content so that avoid cutting off the visible outline when hovering items ([#51829](https://github.com/WordPress/gutenberg/pull/51829)).
++-   `DropdownMenu`: fix icon style when dashicon is used ([#43574](https://github.com/WordPress/gutenberg/pull/43574)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/dropdown-menu/style.scss b/packages/components/src/dropdown-menu/style.scss
+index 64303ea9049eb7..7d9e1b997f7804 100644
+--- a/packages/components/src/dropdown-menu/style.scss
++++ b/packages/components/src/dropdown-menu/style.scss
+@@ -30,19 +30,15 @@
+ 			height: 1px;
+ 		}
+ 
+-		&.is-active svg {
+-			// Block UI appearance.
+-			color: $white;
+-			background: $gray-900;
+-			box-shadow: 0 0 0 $border-width $gray-900;
+-			border-radius: $border-width;
+-		}
+-
+-		// Formatting buttons
+-		> svg {
+-			border-radius: $radius-block-ui;
+-			width: $button-size-small;
+-			height: $button-size-small;
++		&.is-active {
++			svg,
++			.dashicon {
++				// Block UI appearance.
++				color: $white;
++				background: $gray-900;
++				box-shadow: 0 0 0 $border-width $gray-900;
++				border-radius: $border-width;
++			}
+ 		}
+ 
+ 		// If menu items are icon-only, make them stretch only to the icon size.

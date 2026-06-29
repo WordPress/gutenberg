@@ -1,0 +1,407 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 52d33a582e8c6d..ecba87f220e048 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,10 @@
+ -   Delete the `composeStateReducers` utility function ([#39262](https://github.com/WordPress/gutenberg/pull/39262)).
+ -   `BoxControl`: stop using `UnitControl`'s deprecated `unit` prop ([#39511](https://github.com/WordPress/gutenberg/pull/39511)).
+ 
++### Bug Fix
++
++-   `NumberControl`: commit (and constrain) value on `blur` event ([#39186](https://github.com/WordPress/gutenberg/pull/39186)).
++
+ ## 19.6.0 (2022-03-11)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/input-control/input-field.tsx b/packages/components/src/input-control/input-field.tsx
+index 402f9196dccd16..999f1d3b2d6a98 100644
+--- a/packages/components/src/input-control/input-field.tsx
++++ b/packages/components/src/input-control/input-field.tsx
+@@ -67,7 +67,6 @@ function InputField(
+ 		pressEnter,
+ 		pressUp,
+ 		reset,
+-		update,
+ 	} = useInputControlStateReducer( stateReducer, {
+ 		isDragEnabled,
+ 		value: valueProp,
+@@ -91,10 +90,12 @@ function InputField(
+ 			return;
+ 		}
+ 		if ( ! isFocused && ! wasDirtyOnBlur.current ) {
+-			update( valueProp, _event as SyntheticEvent );
++			commit( valueProp, _event as SyntheticEvent );
+ 		} else if ( ! isDirty ) {
+ 			onChange( value, {
+-				event: _event as ChangeEvent< HTMLInputElement >,
++				event: _event as
++					| ChangeEvent< HTMLInputElement >
++					| PointerEvent< HTMLInputElement >,
+ 			} );
+ 			wasDirtyOnBlur.current = false;
+ 		}
+@@ -108,7 +109,7 @@ function InputField(
+ 		 * If isPressEnterToChange is set, this commits the value to
+ 		 * the onChange callback.
+ 		 */
+-		if ( isPressEnterToChange && isDirty ) {
++		if ( isDirty || ! event.target.validity.valid ) {
+ 			wasDirtyOnBlur.current = true;
+ 			handleOnCommit( event );
+ 		}
+@@ -168,7 +169,18 @@ function InputField(
+ 
+ 	const dragGestureProps = useDrag< PointerEvent< HTMLInputElement > >(
+ 		( dragProps ) => {
+-			const { distance, dragging, event } = dragProps;
++			const { distance, dragging, event, target } = dragProps;
++
++			// The `target` prop always references the `input` element while, by
++			// default, the `dragProps.event.target` property would reference the real
++			// event target (i.e. any DOM element that the pointer is hovering while
++			// dragging). Ensuring that the `target` is always the `input` element
++			// allows consumers of `InputControl` (or any higher-level control) to
++			// check the input's validity by accessing `event.target.validity.valid`.
++			dragProps.event = {
++				...dragProps.event,
++				target,
++			};
+ 
+ 			if ( ! distance ) return;
+ 			event.stopPropagation();
+diff --git a/packages/components/src/input-control/reducer/actions.ts b/packages/components/src/input-control/reducer/actions.ts
+index 687a4905d0bb8f..d66eb5778aad8c 100644
+--- a/packages/components/src/input-control/reducer/actions.ts
++++ b/packages/components/src/input-control/reducer/actions.ts
+@@ -18,7 +18,6 @@ export const PRESS_DOWN = 'PRESS_DOWN';
+ export const PRESS_ENTER = 'PRESS_ENTER';
+ export const PRESS_UP = 'PRESS_UP';
+ export const RESET = 'RESET';
+-export const UPDATE = 'UPDATE';
+ 
+ interface EventPayload {
+ 	event?: SyntheticEvent;
+@@ -42,14 +41,9 @@ export type DragStartAction = Action< typeof DRAG_START, DragProps >;
+ export type DragEndAction = Action< typeof DRAG_END, DragProps >;
+ export type DragAction = Action< typeof DRAG, DragProps >;
+ export type ResetAction = Action< typeof RESET, Partial< ValuePayload > >;
+-export type UpdateAction = Action< typeof UPDATE, ValuePayload >;
+ export type InvalidateAction = Action< typeof INVALIDATE, { error: unknown } >;
+ 
+-export type ChangeEventAction =
+-	| ChangeAction
+-	| ResetAction
+-	| CommitAction
+-	| UpdateAction;
++export type ChangeEventAction = ChangeAction | ResetAction | CommitAction;
+ 
+ export type DragEventAction = DragStartAction | DragEndAction | DragAction;
+ 
+diff --git a/packages/components/src/input-control/reducer/reducer.ts b/packages/components/src/input-control/reducer/reducer.ts
+index d94da7e1042426..de13dd9a8f9508 100644
+--- a/packages/components/src/input-control/reducer/reducer.ts
++++ b/packages/components/src/input-control/reducer/reducer.ts
+@@ -100,11 +100,6 @@ function inputControlStateReducer(
+ 				nextState.value = action.payload.value || state.initialValue;
+ 				break;
+ 
+-			case actions.UPDATE:
+-				nextState.value = action.payload.value;
+-				nextState.isDirty = false;
+-				break;
+-
+ 			/**
+ 			 * Validation
+ 			 */
+@@ -197,7 +192,6 @@ export function useInputControlStateReducer(
+ 		dispatch( { type: actions.INVALIDATE, payload: { error, event } } );
+ 	const reset = createChangeEvent( actions.RESET );
+ 	const commit = createChangeEvent( actions.COMMIT );
+-	const update = createChangeEvent( actions.UPDATE );
+ 
+ 	const dragStart = createDragEvent( actions.DRAG_START );
+ 	const drag = createDragEvent( actions.DRAG );
+@@ -220,6 +214,5 @@ export function useInputControlStateReducer(
+ 		pressUp,
+ 		reset,
+ 		state,
+-		update,
+ 	} as const;
+ }
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index c6867deba87178..0bc27aa56cc35d 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -6,6 +6,7 @@ import type {
+ 	ReactNode,
+ 	ChangeEvent,
+ 	SyntheticEvent,
++	PointerEvent,
+ } from 'react';
+ import type { useDrag } from '@use-gesture/react';
+ 
+@@ -33,7 +34,7 @@ interface BaseProps {
+ }
+ 
+ export type InputChangeCallback<
+-	E = ChangeEvent< HTMLInputElement >,
++	E = ChangeEvent< HTMLInputElement > | PointerEvent< HTMLInputElement >,
+ 	P = {}
+ > = ( nextValue: string | undefined, extra: { event: E } & P ) => void;
+ 
+diff --git a/packages/components/src/number-control/README.md b/packages/components/src/number-control/README.md
+index 2e57f69fbc36c4..21fae9ff888a2b 100644
+--- a/packages/components/src/number-control/README.md
++++ b/packages/components/src/number-control/README.md
+@@ -97,6 +97,20 @@ The minimum `value` allowed.
+ -   Required: No
+ -   Default: `-Infinity`
+ 
++### onChange
++
++Callback fired whenever the value of the input changes.
++
++The callback receives two arguments:
++
++1. `newValue`: the new value of the input
++2. `extra`: an object containing, under the `event` key, the original browser event.
++
++Note that the value received as the first argument of the callback is _not_ guaranteed to be a valid value (e.g. it could be outside of the range defined by the [`min`, `max`] props, or it could not match the `step`). In order to check the value's validity, check the `event.target?.validity.valid` property from the callback's second argument.
++
++-   Type: `(newValue, extra) => void`
++-   Required: No
++
+ ### required
+ 
+ If `true` enforces a valid number within the control's min/max range. If `false` allows an empty string as a valid value.
+diff --git a/packages/components/src/number-control/index.js b/packages/components/src/number-control/index.js
+index 4d840682ecf418..5e21b8ab970f56 100644
+--- a/packages/components/src/number-control/index.js
++++ b/packages/components/src/number-control/index.js
+@@ -148,7 +148,7 @@ export function NumberControl(
+ 		}
+ 
+ 		/**
+-		 * Handles commit (ENTER key press or on blur if isPressEnterToChange)
++		 * Handles commit (ENTER key press or blur)
+ 		 */
+ 		if (
+ 			type === inputControlActionTypes.PRESS_ENTER ||
+diff --git a/packages/components/src/number-control/stories/index.js b/packages/components/src/number-control/stories/index.js
+index 25106b0c364b83..9c8496cc908c2b 100644
+--- a/packages/components/src/number-control/stories/index.js
++++ b/packages/components/src/number-control/stories/index.js
+@@ -23,6 +23,7 @@ export default {
+ 
+ function Example() {
+ 	const [ value, setValue ] = useState( '0' );
++	const [ isValidValue, setIsValidValue ] = useState( true );
+ 
+ 	const props = {
+ 		disabled: boolean( 'disabled', false ),
+@@ -32,18 +33,24 @@ function Example() {
+ 		label: text( 'label', 'Number' ),
+ 		min: number( 'min', 0 ),
+ 		max: number( 'max', 100 ),
+-		placeholder: text( 'placeholder', 0 ),
++		placeholder: text( 'placeholder', '0' ),
+ 		required: boolean( 'required', false ),
+ 		shiftStep: number( 'shiftStep', 10 ),
+-		step: text( 'step', 1 ),
++		step: text( 'step', '1' ),
+ 	};
+ 
+ 	return (
+-		<NumberControl
+-			{ ...props }
+-			value={ value }
+-			onChange={ ( v ) => setValue( v ) }
+-		/>
++		<>
++			<NumberControl
++				{ ...props }
++				value={ value }
++				onChange={ ( v, extra ) => {
++					setValue( v );
++					setIsValidValue( extra.event.target.validity.valid );
++				} }
++			/>
++			<p>Is valid? { isValidValue ? 'Yes' : 'No' }</p>
++		</>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/number-control/test/index.js b/packages/components/src/number-control/test/index.js
+index db51a66681c670..7be791db232ec2 100644
+--- a/packages/components/src/number-control/test/index.js
++++ b/packages/components/src/number-control/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen, fireEvent } from '@testing-library/react';
++import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -63,6 +63,68 @@ describe( 'NumberControl', () => {
+ 
+ 			expect( spy ).toHaveBeenCalledWith( '10' );
+ 		} );
++
++		it( 'should call onChange callback when value is clamped on blur', async () => {
++			const spy = jest.fn();
++			render(
++				<NumberControl
++					value={ 5 }
++					min={ 4 }
++					max={ 10 }
++					onChange={ ( v ) => spy( v ) }
++				/>
++			);
++
++			const input = getInput();
++			input.focus();
++			fireEvent.change( input, { target: { value: 1 } } );
++
++			// Before blurring, the value is still un-clamped
++			expect( input.value ).toBe( '1' );
++
++			input.blur();
++
++			// After blur, value is clamped
++			expect( input.value ).toBe( '4' );
++
++			// After the blur, the `onChange` callback fires asynchronously.
++			await waitFor( () => {
++				expect( spy ).toHaveBeenCalledTimes( 2 );
++				expect( spy ).toHaveBeenNthCalledWith( 1, '1' );
++				expect( spy ).toHaveBeenNthCalledWith( 2, 4 );
++			} );
++		} );
++
++		it( 'should call onChange callback when value is not valid', () => {
++			const spy = jest.fn();
++			render(
++				<NumberControl
++					value={ 5 }
++					min={ 1 }
++					max={ 10 }
++					onChange={ ( v, extra ) =>
++						spy( v, extra.event.target.validity.valid )
++					}
++				/>
++			);
++
++			const input = getInput();
++			input.focus();
++			fireEvent.change( input, { target: { value: 14 } } );
++
++			expect( input.value ).toBe( '14' );
++
++			fireKeyDown( { keyCode: ENTER } );
++
++			expect( input.value ).toBe( '10' );
++
++			expect( spy ).toHaveBeenCalledTimes( 2 );
++
++			// First call: invalid, unclamped value
++			expect( spy ).toHaveBeenNthCalledWith( 1, '14', false );
++			// Second call: valid, clamped value
++			expect( spy ).toHaveBeenNthCalledWith( 2, 10, true );
++		} );
+ 	} );
+ 
+ 	describe( 'Validation', () => {
+@@ -82,6 +144,22 @@ describe( 'NumberControl', () => {
+ 			expect( input.value ).toBe( '0' );
+ 		} );
+ 
++		it( 'should clamp value within range on blur', () => {
++			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
++
++			const input = getInput();
++			input.focus();
++			fireEvent.change( input, { target: { value: 41 } } );
++
++			// Before blurring, the value is still un-clamped
++			expect( input.value ).toBe( '41' );
++
++			input.blur();
++
++			// After blur, value is clamped
++			expect( input.value ).toBe( '10' );
++		} );
++
+ 		it( 'should parse to number value on ENTER keypress when required', () => {
+ 			render( <NumberControl value={ 5 } required={ true } /> );
+ 
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index a477eacbcc8fcd..956cbdbd087e1c 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -7,6 +7,7 @@ import type {
+ 	ForwardedRef,
+ 	SyntheticEvent,
+ 	ChangeEvent,
++	PointerEvent,
+ } from 'react';
+ import { omit } from 'lodash';
+ import classnames from 'classnames';
+@@ -45,7 +46,7 @@ function UnforwardedUnitControl(
+ 		isResetValueOnUnitChange = false,
+ 		isUnitSelectTabbable = true,
+ 		label,
+-		onChange,
++		onChange: onChangeProp,
+ 		onUnitChange,
+ 		size = 'default',
+ 		style,
+@@ -89,14 +90,18 @@ function UnforwardedUnitControl(
+ 
+ 	const handleOnQuantityChange = (
+ 		nextQuantityValue: number | string | undefined,
+-		changeProps: { event: ChangeEvent< HTMLInputElement > }
++		changeProps: {
++			event:
++				| ChangeEvent< HTMLInputElement >
++				| PointerEvent< HTMLInputElement >;
++		}
+ 	) => {
+ 		if (
+ 			nextQuantityValue === '' ||
+ 			typeof nextQuantityValue === 'undefined' ||
+ 			nextQuantityValue === null
+ 		) {
+-			onChange?.( '', changeProps );
++			onChangeProp?.( '', changeProps );
+ 			return;
+ 		}
+ 
+@@ -111,7 +116,7 @@ function UnforwardedUnitControl(
+ 			unit
+ 		).join( '' );
+ 
+-		onChange?.( onChangeValue, changeProps );
++		onChangeProp?.( onChangeValue, changeProps );
+ 	};
+ 
+ 	const handleOnUnitChange: UnitControlOnChangeCallback = (
+@@ -126,7 +131,7 @@ function UnforwardedUnitControl(
+ 			nextValue = `${ data.default }${ nextUnitValue }`;
+ 		}
+ 
+-		onChange?.( nextValue, changeProps );
++		onChangeProp?.( nextValue, changeProps );
+ 		onUnitChange?.( nextUnitValue, changeProps );
+ 
+ 		setUnit( nextUnitValue );
+@@ -155,7 +160,7 @@ function UnforwardedUnitControl(
+ 				: undefined;
+ 			const changeProps = { event, data };
+ 
+-			onChange?.(
++			onChangeProp?.(
+ 				`${ validParsedQuantity ?? '' }${ validParsedUnit }`,
+ 				changeProps
+ 			);

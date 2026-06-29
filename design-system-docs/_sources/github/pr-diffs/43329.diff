@@ -1,0 +1,198 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f706499a277e73..fd602765a6f178 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   `Popover`: fix and improve opening animation ([#43186](https://github.com/WordPress/gutenberg/pull/43186)).
+ -   `Popover`: fix incorrect deps in hooks resulting in incorrect positioning after calling `update` ([#43267](https://github.com/WordPress/gutenberg/pull/43267/)).
+ -   `FontSizePicker`: Fix excessive margin between label and input ([#43304](https://github.com/WordPress/gutenberg/pull/43304)).
++-   `Popover`: make sure offset middleware always applies the latest frame offset values ([#43329](https://github.com/WordPress/gutenberg/pull/43329/)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 5e7ef6e948bcd5..c40804e1164e23 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -26,6 +26,7 @@ import {
+ 	createContext,
+ 	useContext,
+ 	useMemo,
++	useEffect,
+ } from '@wordpress/element';
+ import {
+ 	useViewportMatch,
+@@ -134,7 +135,7 @@ const Popover = (
+ 		isAlternate,
+ 		position,
+ 		placement: placementProp = 'bottom-start',
+-		offset,
++		offset: offsetProp = 0,
+ 		focusOnMount = 'firstElement',
+ 		anchorRef,
+ 		anchorRect,
+@@ -166,7 +167,7 @@ const Popover = (
+ 		? positionToPlacement( position )
+ 		: placementProp;
+ 
+-	const ownerDocument = useMemo( () => {
++	const referenceOwnerDocument = useMemo( () => {
+ 		let documentToReturn;
+ 
+ 		if ( anchorRef?.top ) {
+@@ -195,41 +196,43 @@ const Popover = (
+ 	 * Store the offset in a ref, due to constraints with floating-ui:
+ 	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
+ 	 */
+-	const frameOffset = useRef( getFrameOffset( ownerDocument ) );
++	const frameOffsetRef = useRef( getFrameOffset( referenceOwnerDocument ) );
++	/**
++	 * Store the offset prop in a ref, due to constraints with floating-ui:
++	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
++	 */
++	const offsetRef = useRef( offsetProp );
+ 
+ 	const middleware = [
+-		frameOffset.current || offset
+-			? offsetMiddleware( ( { placement: currentPlacement } ) => {
+-					if ( ! frameOffset.current ) {
+-						return offset;
+-					}
+-
+-					const isTopBottomPlacement =
+-						currentPlacement.includes( 'top' ) ||
+-						currentPlacement.includes( 'bottom' );
+-
+-					// The main axis should represent the gap between the
+-					// floating element and the reference element. The cross
+-					// axis is always perpendicular to the main axis.
+-					const mainAxis = isTopBottomPlacement ? 'y' : 'x';
+-					const crossAxis = mainAxis === 'x' ? 'y' : 'x';
+-
+-					// When the popover is before the reference, subtract the offset,
+-					// of the main axis else add it.
+-					const hasBeforePlacement =
+-						currentPlacement.includes( 'top' ) ||
+-						currentPlacement.includes( 'left' );
+-					const mainAxisModifier = hasBeforePlacement ? -1 : 1;
+-					const normalizedOffset = offset ? offset : 0;
+-
+-					return {
+-						mainAxis:
+-							normalizedOffset +
+-							frameOffset.current[ mainAxis ] * mainAxisModifier,
+-						crossAxis: frameOffset.current[ crossAxis ],
+-					};
+-			  } )
+-			: undefined,
++		offsetMiddleware( ( { placement: currentPlacement } ) => {
++			if ( ! frameOffsetRef.current ) {
++				return offsetRef.current;
++			}
++
++			const isTopBottomPlacement =
++				currentPlacement.includes( 'top' ) ||
++				currentPlacement.includes( 'bottom' );
++
++			// The main axis should represent the gap between the
++			// floating element and the reference element. The cross
++			// axis is always perpendicular to the main axis.
++			const mainAxis = isTopBottomPlacement ? 'y' : 'x';
++			const crossAxis = mainAxis === 'x' ? 'y' : 'x';
++
++			// When the popover is before the reference, subtract the offset,
++			// of the main axis else add it.
++			const hasBeforePlacement =
++				currentPlacement.includes( 'top' ) ||
++				currentPlacement.includes( 'left' );
++			const mainAxisModifier = hasBeforePlacement ? -1 : 1;
++
++			return {
++				mainAxis:
++					offsetRef.current +
++					frameOffsetRef.current[ mainAxis ] * mainAxisModifier,
++				crossAxis: frameOffsetRef.current[ crossAxis ],
++			};
++		} ),
+ 		__unstableForcePosition ? undefined : flip(),
+ 		__unstableForcePosition
+ 			? undefined
+@@ -293,6 +296,11 @@ const Popover = (
+ 		middlewareData: { arrow: arrowData = {} },
+ 	} = useFloating( { placement: normalizedPlacementFromProps, middleware } );
+ 
++	useEffect( () => {
++		offsetRef.current = offsetProp;
++		update();
++	}, [ offsetProp, update ] );
++
+ 	// Update the `reference`'s ref.
+ 	//
+ 	// In floating-ui's terms:
+@@ -390,19 +398,23 @@ const Popover = (
+ 	// we need to manually update the floating's position as the reference's owner
+ 	// document scrolls. Also update the frame offset if the view resizes.
+ 	useLayoutEffect( () => {
+-		if ( ownerDocument === document ) {
++		if ( referenceOwnerDocument === document ) {
++			frameOffsetRef.current = undefined;
+ 			return;
+ 		}
+ 
+-		const { defaultView } = ownerDocument;
++		const { defaultView } = referenceOwnerDocument;
+ 
+-		ownerDocument.addEventListener( 'scroll', update );
++		referenceOwnerDocument.addEventListener( 'scroll', update );
+ 
+ 		let updateFrameOffset;
+-		const hasFrameElement = !! ownerDocument?.defaultView?.frameElement;
++		const hasFrameElement =
++			!! referenceOwnerDocument?.defaultView?.frameElement;
+ 		if ( hasFrameElement ) {
+ 			updateFrameOffset = () => {
+-				frameOffset.current = getFrameOffset( ownerDocument );
++				frameOffsetRef.current = getFrameOffset(
++					referenceOwnerDocument
++				);
+ 				update();
+ 			};
+ 			updateFrameOffset();
+@@ -410,13 +422,13 @@ const Popover = (
+ 		}
+ 
+ 		return () => {
+-			ownerDocument.removeEventListener( 'scroll', update );
++			referenceOwnerDocument.removeEventListener( 'scroll', update );
+ 
+ 			if ( updateFrameOffset ) {
+ 				defaultView.removeEventListener( 'resize', updateFrameOffset );
+ 			}
+ 		};
+-	}, [ ownerDocument, update ] );
++	}, [ referenceOwnerDocument, update ] );
+ 
+ 	const mergedFloatingRef = useMergeRefs( [
+ 		floating,
+diff --git a/packages/components/src/popover/stories/index.js b/packages/components/src/popover/stories/index.js
+index 2a9879a9f43dcb..7e066d77c49cff 100644
+--- a/packages/components/src/popover/stories/index.js
++++ b/packages/components/src/popover/stories/index.js
+@@ -244,7 +244,7 @@ export const WithSlotOutsideIframe = ( args ) => {
+ 				<Iframe
+ 					style={ {
+ 						width: '100%',
+-						height: '100%',
++						height: '400px',
+ 					} }
+ 				>
+ 					<div
+@@ -258,7 +258,7 @@ export const WithSlotOutsideIframe = ( args ) => {
+ 								padding: '8px',
+ 								background: 'salmon',
+ 								maxWidth: '200px',
+-								marginTop: '30px',
++								marginTop: '100px',
+ 								marginLeft: 'auto',
+ 								marginRight: 'auto',
+ 							} }

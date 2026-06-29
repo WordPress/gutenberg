@@ -1,0 +1,814 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4771e00ab349e7..56acee814ccf75 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ 
+ -   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
+ -   `ToggleGroupControl`: Rename `__experimentalIsIconGroup` prop to `__experimentalIsBorderless` ([#43771](https://github.com/WordPress/gutenberg/pull/43771/)).
++-   `NumberControl`: Add TypeScript types ([#43791](https://github.com/WordPress/gutenberg/pull/43791/)).
+ -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
+ -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
+ -   `ToggleControl`: Convert to TypeScript and streamline CSS ([#43717](https://github.com/WordPress/gutenberg/pull/43717)). 
+diff --git a/packages/components/src/color-picker/input-with-slider.tsx b/packages/components/src/color-picker/input-with-slider.tsx
+index ca0376119f9463..fee14754f59440 100644
+--- a/packages/components/src/color-picker/input-with-slider.tsx
++++ b/packages/components/src/color-picker/input-with-slider.tsx
+@@ -33,6 +33,7 @@ export const InputWithSlider = ( {
+ 				label={ label }
+ 				hideLabelFromVision
+ 				value={ value }
++				// @ts-expect-error TODO: Resolve discrepancy in NumberControl
+ 				onChange={ onChange }
+ 				prefix={
+ 					<Spacer
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index 509aae28648c84..d179e9a7c26a6f 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -165,6 +165,9 @@ export interface InputBaseProps extends BaseProps, FlexProps {
+ 	 * @default false
+ 	 */
+ 	disabled?: boolean;
++	/**
++	 * The class name to be added to the wrapper element.
++	 */
+ 	className?: string;
+ 	id?: string;
+ 	/**
+diff --git a/packages/components/src/number-control/index.js b/packages/components/src/number-control/index.js
+deleted file mode 100644
+index 5e21b8ab970f56..00000000000000
+--- a/packages/components/src/number-control/index.js
++++ /dev/null
+@@ -1,192 +0,0 @@
+-// @ts-nocheck
+-/**
+- * External dependencies
+- */
+-import classNames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-import { isRTL } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Input } from './styles/number-control-styles';
+-import * as inputControlActionTypes from '../input-control/reducer/actions';
+-import { add, subtract, roundClamp } from '../utils/math';
+-import { isValueEmpty } from '../utils/values';
+-
+-export function NumberControl(
+-	{
+-		__unstableStateReducer: stateReducerProp,
+-		className,
+-		dragDirection = 'n',
+-		hideHTMLArrows = false,
+-		isDragEnabled = true,
+-		isShiftStepEnabled = true,
+-		label,
+-		max = Infinity,
+-		min = -Infinity,
+-		required = false,
+-		shiftStep = 10,
+-		step = 1,
+-		type: typeProp = 'number',
+-		value: valueProp,
+-		...props
+-	},
+-	ref
+-) {
+-	const isStepAny = step === 'any';
+-	const baseStep = isStepAny ? 1 : parseFloat( step );
+-	const baseValue = roundClamp( 0, min, max, baseStep );
+-	const constrainValue = ( value, stepOverride ) => {
+-		// When step is "any" clamp the value, otherwise round and clamp it.
+-		return isStepAny
+-			? Math.min( max, Math.max( min, value ) )
+-			: roundClamp( value, min, max, stepOverride ?? baseStep );
+-	};
+-
+-	const autoComplete = typeProp === 'number' ? 'off' : null;
+-	const classes = classNames( 'components-number-control', className );
+-
+-	/**
+-	 * "Middleware" function that intercepts updates from InputControl.
+-	 * This allows us to tap into actions to transform the (next) state for
+-	 * InputControl.
+-	 *
+-	 * @param {Object} state  State from InputControl
+-	 * @param {Object} action Action triggering state change
+-	 * @return {Object} The updated state to apply to InputControl
+-	 */
+-	const numberControlStateReducer = ( state, action ) => {
+-		const nextState = { ...state };
+-
+-		const { type, payload } = action;
+-		const event = payload?.event;
+-		const currentValue = nextState.value;
+-
+-		/**
+-		 * Handles custom UP and DOWN Keyboard events
+-		 */
+-		if (
+-			type === inputControlActionTypes.PRESS_UP ||
+-			type === inputControlActionTypes.PRESS_DOWN
+-		) {
+-			const enableShift = event.shiftKey && isShiftStepEnabled;
+-
+-			const incrementalValue = enableShift
+-				? parseFloat( shiftStep ) * baseStep
+-				: baseStep;
+-			let nextValue = isValueEmpty( currentValue )
+-				? baseValue
+-				: currentValue;
+-
+-			if ( event?.preventDefault ) {
+-				event.preventDefault();
+-			}
+-
+-			if ( type === inputControlActionTypes.PRESS_UP ) {
+-				nextValue = add( nextValue, incrementalValue );
+-			}
+-
+-			if ( type === inputControlActionTypes.PRESS_DOWN ) {
+-				nextValue = subtract( nextValue, incrementalValue );
+-			}
+-
+-			nextState.value = constrainValue(
+-				nextValue,
+-				enableShift ? incrementalValue : null
+-			);
+-		}
+-
+-		/**
+-		 * Handles drag to update events
+-		 */
+-		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
+-			const [ x, y ] = payload.delta;
+-			const enableShift = payload.shiftKey && isShiftStepEnabled;
+-			const modifier = enableShift
+-				? parseFloat( shiftStep ) * baseStep
+-				: baseStep;
+-
+-			let directionModifier;
+-			let delta;
+-
+-			switch ( dragDirection ) {
+-				case 'n':
+-					delta = y;
+-					directionModifier = -1;
+-					break;
+-
+-				case 'e':
+-					delta = x;
+-					directionModifier = isRTL() ? -1 : 1;
+-					break;
+-
+-				case 's':
+-					delta = y;
+-					directionModifier = 1;
+-					break;
+-
+-				case 'w':
+-					delta = x;
+-					directionModifier = isRTL() ? 1 : -1;
+-					break;
+-			}
+-
+-			if ( delta !== 0 ) {
+-				delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
+-				const distance = delta * modifier * directionModifier;
+-
+-				nextState.value = constrainValue(
+-					add( currentValue, distance ),
+-					enableShift ? modifier : null
+-				);
+-			}
+-		}
+-
+-		/**
+-		 * Handles commit (ENTER key press or blur)
+-		 */
+-		if (
+-			type === inputControlActionTypes.PRESS_ENTER ||
+-			type === inputControlActionTypes.COMMIT
+-		) {
+-			const applyEmptyValue = required === false && currentValue === '';
+-
+-			nextState.value = applyEmptyValue
+-				? currentValue
+-				: constrainValue( currentValue );
+-		}
+-
+-		return nextState;
+-	};
+-
+-	return (
+-		<Input
+-			autoComplete={ autoComplete }
+-			inputMode="numeric"
+-			{ ...props }
+-			className={ classes }
+-			dragDirection={ dragDirection }
+-			hideHTMLArrows={ hideHTMLArrows }
+-			isDragEnabled={ isDragEnabled }
+-			label={ label }
+-			max={ max }
+-			min={ min }
+-			ref={ ref }
+-			required={ required }
+-			step={ step }
+-			type={ typeProp }
+-			value={ valueProp }
+-			__unstableStateReducer={ ( state, action ) => {
+-				const baseState = numberControlStateReducer( state, action );
+-				return stateReducerProp?.( baseState, action ) ?? baseState;
+-			} }
+-		/>
+-	);
+-}
+-
+-export default forwardRef( NumberControl );
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+new file mode 100644
+index 00000000000000..082418bb571d12
+--- /dev/null
++++ b/packages/components/src/number-control/index.tsx
+@@ -0,0 +1,209 @@
++/**
++ * External dependencies
++ */
++import classNames from 'classnames';
++import type { ForwardedRef } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++import { isRTL } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import { Input } from './styles/number-control-styles';
++import * as inputControlActionTypes from '../input-control/reducer/actions';
++import { add, subtract, roundClamp } from '../utils/math';
++import { ensureNumber, isValueEmpty } from '../utils/values';
++import type { WordPressComponentProps } from '../ui/context/wordpress-component';
++import type { NumberControlProps } from './types';
++
++function UnforwardedNumberControl(
++	{
++		__unstableStateReducer: stateReducerProp,
++		className,
++		dragDirection = 'n',
++		hideHTMLArrows = false,
++		isDragEnabled = true,
++		isShiftStepEnabled = true,
++		label,
++		max = Infinity,
++		min = -Infinity,
++		required = false,
++		shiftStep = 10,
++		step = 1,
++		type: typeProp = 'number',
++		value: valueProp,
++		...props
++	}: WordPressComponentProps< NumberControlProps, 'input', false >,
++	ref: ForwardedRef< any >
++) {
++	const isStepAny = step === 'any';
++	const baseStep = isStepAny ? 1 : ensureNumber( step );
++	const baseValue = roundClamp( 0, min, max, baseStep );
++	const constrainValue = ( value: number, stepOverride?: number ) => {
++		// When step is "any" clamp the value, otherwise round and clamp it.
++		return isStepAny
++			? Math.min( max, Math.max( min, value ) )
++			: roundClamp( value, min, max, stepOverride ?? baseStep );
++	};
++
++	const autoComplete = typeProp === 'number' ? 'off' : undefined;
++	const classes = classNames( 'components-number-control', className );
++
++	/**
++	 * "Middleware" function that intercepts updates from InputControl.
++	 * This allows us to tap into actions to transform the (next) state for
++	 * InputControl.
++	 *
++	 * @return The updated state to apply to InputControl
++	 */
++	const numberControlStateReducer: NumberControlProps[ '__unstableStateReducer' ] =
++		( state, action ) => {
++			const nextState = { ...state };
++
++			const { type, payload } = action;
++			const event = payload.event;
++			const currentValue = nextState.value;
++
++			/**
++			 * Handles custom UP and DOWN Keyboard events
++			 */
++			if (
++				type === inputControlActionTypes.PRESS_UP ||
++				type === inputControlActionTypes.PRESS_DOWN
++			) {
++				const enableShift =
++					( event as KeyboardEvent | undefined )?.shiftKey &&
++					isShiftStepEnabled;
++
++				const incrementalValue = enableShift
++					? ensureNumber( shiftStep ) * baseStep
++					: baseStep;
++				let nextValue = isValueEmpty( currentValue )
++					? baseValue
++					: currentValue;
++
++				if ( event?.preventDefault ) {
++					event.preventDefault();
++				}
++
++				if ( type === inputControlActionTypes.PRESS_UP ) {
++					// @ts-expect-error TODO: isValueEmpty() needs to be typed properly
++					nextValue = add( nextValue, incrementalValue );
++				}
++
++				if ( type === inputControlActionTypes.PRESS_DOWN ) {
++					// @ts-expect-error TODO: isValueEmpty() needs to be typed properly
++					nextValue = subtract( nextValue, incrementalValue );
++				}
++
++				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
++				nextState.value = constrainValue(
++					// @ts-expect-error TODO: isValueEmpty() needs to be typed properly
++					nextValue,
++					enableShift ? incrementalValue : undefined
++				);
++			}
++
++			/**
++			 * Handles drag to update events
++			 */
++			if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
++				// @ts-expect-error TODO: See if reducer actions can be typed better
++				const [ x, y ] = payload.delta;
++				// @ts-expect-error TODO: See if reducer actions can be typed better
++				const enableShift = payload.shiftKey && isShiftStepEnabled;
++				const modifier = enableShift
++					? ensureNumber( shiftStep ) * baseStep
++					: baseStep;
++
++				let directionModifier;
++				let delta;
++
++				switch ( dragDirection ) {
++					case 'n':
++						delta = y;
++						directionModifier = -1;
++						break;
++
++					case 'e':
++						delta = x;
++						directionModifier = isRTL() ? -1 : 1;
++						break;
++
++					case 's':
++						delta = y;
++						directionModifier = 1;
++						break;
++
++					case 'w':
++						delta = x;
++						directionModifier = isRTL() ? 1 : -1;
++						break;
++				}
++
++				if ( delta !== 0 ) {
++					delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
++					const distance = delta * modifier * directionModifier;
++
++					// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
++					nextState.value = constrainValue(
++						// @ts-expect-error TODO: isValueEmpty() needs to be typed properly
++						add( currentValue, distance ),
++						enableShift ? modifier : undefined
++					);
++				}
++			}
++
++			/**
++			 * Handles commit (ENTER key press or blur)
++			 */
++			if (
++				type === inputControlActionTypes.PRESS_ENTER ||
++				type === inputControlActionTypes.COMMIT
++			) {
++				const applyEmptyValue =
++					required === false && currentValue === '';
++
++				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
++				nextState.value = applyEmptyValue
++					? currentValue
++					: // @ts-expect-error TODO: isValueEmpty() needs to be typed properly
++					  constrainValue( currentValue );
++			}
++
++			return nextState;
++		};
++
++	return (
++		<Input
++			autoComplete={ autoComplete }
++			inputMode="numeric"
++			{ ...props }
++			className={ classes }
++			dragDirection={ dragDirection }
++			hideHTMLArrows={ hideHTMLArrows }
++			isDragEnabled={ isDragEnabled }
++			label={ label }
++			max={ max }
++			min={ min }
++			ref={ ref }
++			required={ required }
++			step={ step }
++			type={ typeProp }
++			// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
++			value={ valueProp }
++			__unstableStateReducer={ ( state, action ) => {
++				const baseState = numberControlStateReducer( state, action );
++				return stateReducerProp?.( baseState, action ) ?? baseState;
++			} }
++		/>
++	);
++}
++
++export const NumberControl = forwardRef( UnforwardedNumberControl );
++
++export default NumberControl;
+diff --git a/packages/components/src/number-control/stories/index.js b/packages/components/src/number-control/stories/index.js
+index ab8a86281ebb5e..4daff7e34b2baa 100644
+--- a/packages/components/src/number-control/stories/index.js
++++ b/packages/components/src/number-control/stories/index.js
+@@ -12,13 +12,12 @@ export default {
+ 	title: 'Components (Experimental)/NumberControl',
+ 	component: NumberControl,
+ 	argTypes: {
+-		size: {
+-			control: {
+-				type: 'select',
+-				options: [ 'default', 'small', '__unstable-large' ],
+-			},
+-		},
+ 		onChange: { action: 'onChange' },
++		prefix: { control: { type: 'text' } },
++		step: { control: { type: 'text' } },
++		suffix: { control: { type: 'text' } },
++		type: { control: { type: 'text' } },
++		value: { control: null },
+ 	},
+ };
+ 
+@@ -44,16 +43,5 @@ function Template( { onChange, ...props } ) {
+ 
+ export const Default = Template.bind( {} );
+ Default.args = {
+-	disabled: false,
+-	hideLabelFromVision: false,
+-	isPressEnterToChange: false,
+-	isShiftStepEnabled: true,
+-	label: 'Number',
+-	min: 0,
+-	max: 100,
+-	placeholder: '0',
+-	required: false,
+-	shiftStep: 10,
+-	size: 'default',
+-	step: '1',
++	label: 'Value',
+ };
+diff --git a/packages/components/src/number-control/types.ts b/packages/components/src/number-control/types.ts
+new file mode 100644
+index 00000000000000..8b271538c1e196
+--- /dev/null
++++ b/packages/components/src/number-control/types.ts
+@@ -0,0 +1,75 @@
++/**
++ * Internal dependencies
++ */
++import type { InputControlProps } from '../input-control/types';
++
++export type NumberControlProps = Omit<
++	InputControlProps,
++	'isDragEnabled' | 'min' | 'max' | 'required' | 'step' | 'type' | 'value'
++> & {
++	/**
++	 * If true, the default `input` HTML arrows will be hidden.
++	 *
++	 * @default false
++	 */
++	hideHTMLArrows?: boolean;
++	/**
++	 * If true, enables mouse drag gestures.
++	 *
++	 * @default true
++	 */
++	isDragEnabled?: InputControlProps[ 'isDragEnabled' ];
++	/**
++	 * If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment the
++	 * value by the `shiftStep` value.
++	 *
++	 * @default true
++	 */
++	isShiftStepEnabled?: boolean;
++	/**
++	 * The maximum `value` allowed.
++	 *
++	 * @default Infinity
++	 */
++	max?: number;
++	/**
++	 * The minimum `value` allowed.
++	 *
++	 * @default -Infinity
++	 */
++	min?: number;
++	/**
++	 * If `true` enforces a valid number within the control's min/max range.
++	 * If `false` allows an empty string as a valid value.
++	 *
++	 * @default false
++	 */
++	required?: InputControlProps[ 'required' ];
++	/**
++	 * Amount to increment by when the `SHIFT` key is held down. This shift value is
++	 * a multiplier to the `step` value. For example, if the `step` value is `5`,
++	 * and `shiftStep` is `10`, each jump would increment/decrement by `50`.
++	 *
++	 * @default 10
++	 */
++	shiftStep?: number;
++	/**
++	 * Amount by which the `value` is changed when incrementing/decrementing.
++	 * It is also a factor in validation as `value` must be a multiple of `step`
++	 * (offset by `min`, if specified) to be valid. Accepts the special string value `any`
++	 * that voids the validation constraint and causes stepping actions to increment/decrement by `1`.
++	 *
++	 * @default 1
++	 */
++	step?: InputControlProps[ 'step' ];
++	/**
++	 * The `type` attribute of the `input` element.
++	 *
++	 * @default 'number'
++	 */
++	type?: InputControlProps[ 'type' ];
++	/**
++	 * The value of the input.
++	 */
++	value?: number | string;
++};
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index de3c60d9246273..cec69ac1dfa697 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -138,7 +138,9 @@ function UnforwardedRangeControl< IconProps = unknown >(
+ 		onChange( nextValue );
+ 	};
+ 
+-	const handleOnChange = ( next: string ) => {
++	const handleOnChange = ( next?: string ) => {
++		// @ts-expect-error TODO: Investigate if it's problematic for setValue() to
++		// potentially receive a NaN when next is undefined.
+ 		let nextValue = parseFloat( next );
+ 		setValue( nextValue );
+ 
+@@ -304,6 +306,7 @@ function UnforwardedRangeControl< IconProps = unknown >(
+ 						onChange={ handleOnChange }
+ 						shiftStep={ shiftStep }
+ 						step={ step }
++						// @ts-expect-error TODO: Investigate if the `null` value is necessary
+ 						value={ inputSliderValue }
+ 					/>
+ 				) }
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 6f9725950ff00a..73d2c692f0a29a 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -46,6 +46,7 @@ function UnforwardedUnitControl(
+ 	const {
+ 		__unstableStateReducer: stateReducerProp,
+ 		autoComplete = 'off',
++		// @ts-expect-error Ensure that children is omitted from restProps
+ 		children,
+ 		className,
+ 		disabled = false,
+@@ -259,7 +260,6 @@ function UnforwardedUnitControl(
+ 	return (
+ 		<Root className="components-unit-control-wrapper" style={ style }>
+ 			<ValueInput
+-				aria-label={ label }
+ 				type={ isPressEnterToChange ? 'text' : 'number' }
+ 				{ ...props }
+ 				autoComplete={ autoComplete }
+diff --git a/packages/components/src/unit-control/stories/index.tsx b/packages/components/src/unit-control/stories/index.tsx
+index 98bfc649c90543..6fe4b49a5687db 100644
+--- a/packages/components/src/unit-control/stories/index.tsx
++++ b/packages/components/src/unit-control/stories/index.tsx
+@@ -18,24 +18,15 @@ const meta: ComponentMeta< typeof UnitControl > = {
+ 	component: UnitControl,
+ 	title: 'Components (Experimental)/UnitControl',
+ 	argTypes: {
+-		__unstableInputWidth: {
+-			control: { type: 'text' },
+-		},
+-		__unstableStateReducer: {
+-			control: { type: null },
+-		},
+-		onChange: {
+-			action: 'onChange',
+-			control: { type: null },
+-		},
+-		onUnitChange: {
+-			control: { type: null },
+-		},
+-		value: {
+-			control: { type: null },
+-		},
++		__unstableInputWidth: { control: { type: 'text' } },
++		__unstableStateReducer: { control: { type: null } },
++		onChange: { control: { type: null } },
++		onUnitChange: { control: { type: null } },
++		prefix: { control: { type: 'text' } },
++		value: { control: { type: null } },
+ 	},
+ 	parameters: {
++		actions: { argTypesRegex: '^on.*' },
+ 		controls: {
+ 			expanded: true,
+ 		},
+diff --git a/packages/components/src/unit-control/types.ts b/packages/components/src/unit-control/types.ts
+index c88ec3ba91a117..edbd5ac8f4cd6b 100644
+--- a/packages/components/src/unit-control/types.ts
++++ b/packages/components/src/unit-control/types.ts
+@@ -1,22 +1,17 @@
+ /**
+  * External dependencies
+  */
+-import type {
+-	CSSProperties,
+-	FocusEventHandler,
+-	ReactNode,
+-	SyntheticEvent,
+-} from 'react';
++import type { FocusEventHandler, SyntheticEvent } from 'react';
+ 
+ /**
+  * Internal dependencies
+  */
+-import type { StateReducer } from '../input-control/reducer/state';
+ import type {
+ 	InputChangeCallback,
+ 	InputControlProps,
+ 	Size as InputSize,
+ } from '../input-control/types';
++import type { NumberControlProps } from '../number-control/types';
+ 
+ export type SelectSize = InputSize;
+ 
+@@ -71,31 +66,14 @@ export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
+ 	units?: WPUnitControlUnit[];
+ };
+ 
+-// TODO: when available, should (partially) extend `NumberControl` props.
+ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
+-	Pick<
+-		InputControlProps,
+-		'hideLabelFromVision' | 'prefix' | '__next36pxDefaultSize'
+-	> & {
+-		__unstableStateReducer?: StateReducer;
+-		__unstableInputWidth?: CSSProperties[ 'width' ];
+-		/**
+-		 * The children elements.
+-		 */
+-		children?: ReactNode;
++	Omit< NumberControlProps, 'hideHTMLArrows' | 'suffix' | 'type' > & {
+ 		/**
+ 		 * If `true`, the unit `<select>` is hidden.
+ 		 *
+ 		 * @default false
+ 		 */
+ 		disableUnits?: boolean;
+-		/**
+-		 * If `true`, the `ENTER` key press is required in order to trigger an `onChange`.
+-		 * If enabled, a change is also triggered when tabbing away (`onBlur`).
+-		 *
+-		 * @default false
+-		 */
+-		isPressEnterToChange?: boolean;
+ 		/**
+ 		 * If `true`, and the selected unit provides a `default` value, this value is set
+ 		 * when changing units.
+@@ -103,10 +81,6 @@ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
+ 		 * @default false
+ 		 */
+ 		isResetValueOnUnitChange?: boolean;
+-		/**
+-		 * If this property is added, a label will be generated using label property as the content.
+-		 */
+-		label?: string;
+ 		/**
+ 		 * Callback when the `unit` changes.
+ 		 */
+@@ -122,21 +96,6 @@ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
+ 		 * For example, a `value` of "50%" will set the current unit to `%`.
+ 		 */
+ 		value?: string | number;
+-		/**
+-		 * If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment
+-		 * the value by the `shiftStep` value.
+-		 *
+-		 * @default true
+-		 */
+-		isShiftStepEnabled?: boolean;
+-		/**
+-		 * Amount to increment by when the `SHIFT` key is held down. This shift value
+-		 * is a multiplier to the `step` value. For example, if the `step` value is `5`,
+-		 * and `shiftStep` is `10`, each jump would increment/decrement by `50`.
+-		 *
+-		 * @default 10
+-		 */
+-		shiftStep?: number;
+ 		/**
+ 		 * Callback when either the quantity or the unit inputs lose focus.
+ 		 */
+diff --git a/packages/components/src/utils/values.js b/packages/components/src/utils/values.js
+index 35d40cbdeddd63..8a124b70325de7 100644
+--- a/packages/components/src/utils/values.js
++++ b/packages/components/src/utils/values.js
+@@ -99,3 +99,47 @@ export function isValueNumeric( value, locale = window.navigator.language ) {
+ 			: value;
+ 	return ! isNaN( parseFloat( valueToCheck ) ) && isFinite( valueToCheck );
+ }
++
++/**
++ * Converts a string to a number.
++ *
++ * @param {string} value
++ * @return {number} String as a number.
++ */
++export const stringToNumber = ( value ) => {
++	return parseFloat( value );
++};
++
++/**
++ * Converts a number to a string.
++ *
++ * @param {number} value
++ * @return {string} Number as a string.
++ */
++export const numberToString = ( value ) => {
++	return `${ value }`;
++};
++
++/**
++ * Regardless of the input being a string or a number, returns a number.
++ *
++ * Returns `undefined` in case the string is `undefined` or not a valid numeric value.
++ *
++ * @param {string | number} value
++ * @return {number} The parsed number.
++ */
++export const ensureNumber = ( value ) => {
++	return typeof value === 'string' ? stringToNumber( value ) : value;
++};
++
++/**
++ * Regardless of the input being a string or a number, returns a number.
++ *
++ * Returns `undefined` in case the string is `undefined` or not a valid numeric value.
++ *
++ * @param {string | number} value
++ * @return {string} The converted string, or `undefined` in case the input is `undefined` or `NaN`.
++ */
++export const ensureString = ( value ) => {
++	return typeof value === 'string' ? value : numberToString( value );
++};
+diff --git a/packages/e2e-tests/specs/editor/various/font-size-picker.test.js b/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
+index f308a56e0e7a3a..a4927878208cab 100644
+--- a/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
++++ b/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
+@@ -37,9 +37,7 @@ const toggleCustomInput = async ( showCustomInput ) => {
+ };
+ 
+ const clickCustomInput = async () => {
+-	const customInput = await page.waitForXPath(
+-		"//input[@aria-label='Custom']"
+-	);
++	const customInput = await page.waitForXPath( "//input[@type='number']" );
+ 	return customInput.click();
+ };
+ 

@@ -1,0 +1,41 @@
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 42ba2d78db57a8..eeca7982ddfe5a 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -153,9 +153,9 @@ function UnforwardedModal(
+ 	// onRequestClose for any prior and/or nested modals as applicable.
+ 	useEffect( () => {
+ 		dismissers.push( refOnRequestClose );
+-		const [ first, second ] = dismissers;
+-		if ( second ) {
+-			first?.current?.();
++		const [ prior ] = dismissers;
++		if ( prior && prior !== refOnRequestClose ) {
++			prior.current?.();
+ 		}
+ 
+ 		const nested = nestedDismissers.current;
+diff --git a/packages/editor/src/components/commands/index.js b/packages/editor/src/components/commands/index.js
+index b1471e25583415..460a595234e59b 100644
+--- a/packages/editor/src/components/commands/index.js
++++ b/packages/editor/src/components/commands/index.js
+@@ -89,8 +89,7 @@ function useEditorCommandLoader() {
+ 		name: 'core/open-shortcut-help',
+ 		label: __( 'Keyboard shortcuts' ),
+ 		icon: keyboard,
+-		callback: ( { close } ) => {
+-			close();
++		callback: () => {
+ 			openModal( 'editor/keyboard-shortcut-help' );
+ 		},
+ 	} );
+@@ -109,8 +108,7 @@ function useEditorCommandLoader() {
+ 	commands.push( {
+ 		name: 'core/open-preferences',
+ 		label: __( 'Editor preferences' ),
+-		callback: ( { close } ) => {
+-			close();
++		callback: () => {
+ 			openModal( 'editor/preferences' );
+ 		},
+ 	} );

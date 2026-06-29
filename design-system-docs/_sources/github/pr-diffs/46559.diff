@@ -1,0 +1,128 @@
+diff --git a/packages/block-library/src/cover/edit/inspector-controls.js b/packages/block-library/src/cover/edit/inspector-controls.js
+index d3f65672e09328..6160f5d7828d6a 100644
+--- a/packages/block-library/src/cover/edit/inspector-controls.js
++++ b/packages/block-library/src/cover/edit/inspector-controls.js
+@@ -180,6 +180,7 @@ export default function CoverInspectorControls( {
+ 							isImageBackground &&
+ 							isImgElement && (
+ 								<TextareaControl
++									__nextHasNoMarginBottom
+ 									label={ __(
+ 										'Alt text (alternative text)'
+ 									) }
+diff --git a/packages/block-library/src/image/image.js b/packages/block-library/src/image/image.js
+index 5eb511b455864d..15f152a1ff7a45 100644
+--- a/packages/block-library/src/image/image.js
++++ b/packages/block-library/src/image/image.js
+@@ -413,6 +413,7 @@ export default function Image( {
+ 				<PanelBody title={ __( 'Settings' ) }>
+ 					{ ! multiImageSelection && (
+ 						<TextareaControl
++							__nextHasNoMarginBottom
+ 							label={ __( 'Alt text (alternative text)' ) }
+ 							value={ alt }
+ 							onChange={ updateAlt }
+diff --git a/packages/block-library/src/media-text/edit.js b/packages/block-library/src/media-text/edit.js
+index 83b7074e3d1550..e4f005f7986aec 100644
+--- a/packages/block-library/src/media-text/edit.js
++++ b/packages/block-library/src/media-text/edit.js
+@@ -281,6 +281,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
+ 			) }
+ 			{ mediaType === 'image' && (
+ 				<TextareaControl
++					__nextHasNoMarginBottom
+ 					label={ __( 'Alt text (alternative text)' ) }
+ 					value={ mediaAlt }
+ 					onChange={ onMediaAltChange }
+diff --git a/packages/block-library/src/navigation-link/edit.js b/packages/block-library/src/navigation-link/edit.js
+index 7e58527d947f5c..1f1fd9ac61fcf0 100644
+--- a/packages/block-library/src/navigation-link/edit.js
++++ b/packages/block-library/src/navigation-link/edit.js
+@@ -495,6 +495,7 @@ export default function NavigationLinkEdit( {
+ 						autoComplete="off"
+ 					/>
+ 					<TextareaControl
++						__nextHasNoMarginBottom
+ 						value={ description || '' }
+ 						onChange={ ( descriptionValue ) => {
+ 							setAttributes( { description: descriptionValue } );
+diff --git a/packages/block-library/src/navigation-submenu/edit.js b/packages/block-library/src/navigation-submenu/edit.js
+index 47a222bd57bb66..a6029e98661ddc 100644
+--- a/packages/block-library/src/navigation-submenu/edit.js
++++ b/packages/block-library/src/navigation-submenu/edit.js
+@@ -481,6 +481,7 @@ export default function NavigationSubmenuEdit( {
+ 						autoComplete="off"
+ 					/>
+ 					<TextareaControl
++						__nextHasNoMarginBottom
+ 						value={ description || '' }
+ 						onChange={ ( descriptionValue ) => {
+ 							setAttributes( {
+diff --git a/packages/components/src/disabled/stories/index.tsx b/packages/components/src/disabled/stories/index.tsx
+index 06246adde633f1..81f2bf4c079233 100644
+--- a/packages/components/src/disabled/stories/index.tsx
++++ b/packages/components/src/disabled/stories/index.tsx
+@@ -15,6 +15,7 @@ import Disabled from '../';
+ import SelectControl from '../../select-control/';
+ import TextControl from '../../text-control/';
+ import TextareaControl from '../../textarea-control/';
++import { VStack } from '../../v-stack/';
+ 
+ const meta: ComponentMeta< typeof Disabled > = {
+ 	title: 'Components/Disabled',
+@@ -37,18 +38,21 @@ const Form = () => {
+ 	const [ textControlValue, setTextControlValue ] = useState( '' );
+ 	const [ textAreaValue, setTextAreaValue ] = useState( '' );
+ 	return (
+-		<div>
++		<VStack>
+ 			<TextControl
++				__nextHasNoMarginBottom
+ 				label="Text Control"
+ 				value={ textControlValue }
+ 				onChange={ setTextControlValue }
+ 			/>
+ 			<TextareaControl
++				__nextHasNoMarginBottom
+ 				label="TextArea Control"
+ 				value={ textAreaValue }
+ 				onChange={ setTextAreaValue }
+ 			/>
+ 			<SelectControl
++				__nextHasNoMarginBottom
+ 				label="Select Control"
+ 				onChange={ () => {} }
+ 				options={ [
+@@ -58,7 +62,7 @@ const Form = () => {
+ 					{ value: 'c', label: 'Option C' },
+ 				] }
+ 			/>
+-		</div>
++		</VStack>
+ 	);
+ };
+ 
+diff --git a/packages/edit-site/src/components/global-styles/custom-css.js b/packages/edit-site/src/components/global-styles/custom-css.js
+index 6c7d3de1cf06e5..61aad940cd372f 100644
+--- a/packages/edit-site/src/components/global-styles/custom-css.js
++++ b/packages/edit-site/src/components/global-styles/custom-css.js
+@@ -42,6 +42,7 @@ function CustomCSSControl() {
+ 	return (
+ 		<>
+ 			<TextareaControl
++				__nextHasNoMarginBottom
+ 				value={
+ 					customCSS?.replace( ignoreThemeCustomCSS, '' ) ||
+ 					themeCustomCSS
+diff --git a/packages/editor/src/components/post-excerpt/index.js b/packages/editor/src/components/post-excerpt/index.js
+index fcba84ec03754a..dc0220f861abff 100644
+--- a/packages/editor/src/components/post-excerpt/index.js
++++ b/packages/editor/src/components/post-excerpt/index.js
+@@ -15,6 +15,7 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
+ 	return (
+ 		<div className="editor-post-excerpt">
+ 			<TextareaControl
++				__nextHasNoMarginBottom
+ 				label={ __( 'Write an excerpt (optional)' ) }
+ 				className="editor-post-excerpt__textarea"
+ 				onChange={ ( value ) => onUpdateExcerpt( value ) }

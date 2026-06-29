@@ -1,0 +1,428 @@
+diff --git a/storybook/stories/foundations/design-language/radius.mdx b/storybook/stories/foundations/design-language/radius.mdx
+new file mode 100644
+index 00000000000000..9117bf940d45a2
+--- /dev/null
++++ b/storybook/stories/foundations/design-language/radius.mdx
+@@ -0,0 +1,55 @@
++import { Meta, Typeset } from '@storybook/addon-docs/blocks';
++import radius from './static/radius.svg';
++import radiusDo from './static/radius-do.svg';
++import radiusDont from './static/radius-dont.svg';
++
++<Meta title="Foundations/Design Language/Radius" name="page" />
++
++# Radius
++
++<img src={ radius } alt="Radius" width="100%" />
++
++The radius scale is designed to provide a consistent, elegant appearance across nested elements. The defined values help maintain visual harmony between smaller primitives and larger containers, ensuring a cohesive user experience.
++
++## Scale
++
++The scale includes the following steps:
++
++-   `radius-x-small`: Applied to the smallest elements, such as buttons inside inputs or similar small primitives. This ensures subtle rounding without distracting from the core design.
++-   `radius-small`: The most commonly used radius value, applied to many primitives like buttons, inputs, and other standalone controls. It provides a moderate rounding that feels balanced and polished.
++-   `radius-medium`: Used for medium-sized containers like dropdown menus, popovers, and other mid-level components. This value is slightly more pronounced, giving these elements a soft but noticeable edge.
++-   `radius-large`: Reserved for larger containers such as cards and modals. The larger radius ensures that these elements have a smooth, elegant appearance that enhances their prominence on the page.
++-   `radius-full`: Applies a `border-radius` of `9999px`, this value creates a highly rounded appearance, often used on pill-shaped buttons or other components where extreme rounding is desired but full circularity is not necessary.
++-   `radius-round`: This value applies a `border-radius` of `100%`, making elements fully circular. It's typically used for circular avatars or buttons where complete rounding is required.
++
++These steps are defined as tokens. To view the values and understand how to use them please view the [Tokens section](?path=/docs/tokens-radius--page).
++
++## Usage Guidelines
++
++-   Consistency: To maintain visual cohesion, adhere to the radius scale when styling elements. Avoid custom radius values unless there is a specific need.
++-   Nested Elements: When combining elements of different sizes (e.g., buttons within inputs or cards within modals), ensure that smaller nested elements use the appropriate radius value for their size.
++-   Accessibility: Larger radius values can create a more approachable and friendly appearance, especially for larger components like cards and modals that demand more attention from users.
++
++<table>
++  <tr>
++    <th width="50%">✅ Do</th>
++    <th width="50%">🚫 Don't</th>
++  </tr>
++  <tr>
++    <td width="50%" valign="top">
++      <img src={ radiusDo } alt="Radius do" width="100%" />
++
++      - Scale application of radius with element or container size.
++
++      - Use `radius-round` for circles and `radius-full` for pills.
++    </td>
++    <td width="50%" valign="top">
++      <img src={ radiusDont } alt="Radius don't" width="100%" />
++
++        -   Don't nest larger radii inside smaller radii.
++
++        -   Don't apply the same
++    radius value to container and immediate descendent.
++    </td>
++  </tr>
++</table>
+diff --git a/storybook/stories/foundations/design-language/static/radius-do.svg b/storybook/stories/foundations/design-language/static/radius-do.svg
+new file mode 100644
+index 00000000000000..baec81e98456a4
+--- /dev/null
++++ b/storybook/stories/foundations/design-language/static/radius-do.svg
+@@ -0,0 +1,58 @@
++<svg xmlns="http://www.w3.org/2000/svg" width="821" height="400" fill="none">
++	<g clip-path="url(#a)">
++		<rect width="821" height="400" fill="#3858E9" rx="8"/>
++		<rect width="835" height="662" x="-211" y="60" fill="#607AEE" rx="48"/>
++		<rect width="834" height="661" x="-210.5" y="60.5" stroke="#fff" stroke-opacity=".2" rx="47.5"/>
++		<rect width="111" height="40" x="-34" y="107" fill="#7D92F1" rx="20"/>
++		<rect width="110" height="39" x="-33.5" y="107.5" stroke="#fff" stroke-opacity=".2" rx="19.5"/>
++		<rect width="111" height="40" x="93" y="107" fill="#7D92F1" rx="20"/>
++		<rect width="110" height="39" x="93.5" y="107.5" stroke="#fff" stroke-opacity=".2" rx="19.5"/>
++		<rect width="111" height="40" x="220" y="107" fill="#7D92F1" rx="20"/>
++		<rect width="110" height="39" x="220.5" y="107.5" stroke="#fff" stroke-opacity=".2" rx="19.5"/>
++		<rect width="40" height="40" x="537" y="107" fill="#7D92F1" rx="12"/>
++		<rect width="39" height="39" x="537.5" y="107.5" stroke="#fff" stroke-opacity=".2" rx="11.5"/>
++		<g filter="url(#b)">
++			<rect width="335" height="502" x="242" y="163" fill="#93A4F4" rx="24"/>
++			<rect width="334" height="501" x="242.5" y="163.5" stroke="#fff" stroke-opacity=".2" rx="23.5"/>
++		</g>
++		<rect width="287" height="62" x="266" y="187" fill="#ADBBFB" rx="12"/>
++		<rect width="286" height="61" x="266.5" y="187.5" stroke="#fff" stroke-opacity=".2" rx="11.5"/>
++		<rect width="40" height="40" x="266" y="281" fill="#ADBBFB" rx="20"/>
++		<rect width="39" height="39" x="266.5" y="281.5" stroke="#fff" stroke-opacity=".2" rx="19.5"/>
++		<rect width="40" height="40" x="266" y="337" fill="#ADBBFB" rx="20"/>
++		<rect width="39" height="39" x="266.5" y="337.5" stroke="#fff" stroke-opacity=".2" rx="19.5"/>
++		<rect width="40" height="40" x="266" y="393" fill="#ADBBFB" rx="20"/>
++		<rect width="39" height="39" x="266.5" y="393.5" stroke="#fff" stroke-opacity=".2" rx="19.5"/>
++		<rect width="40" height="40" x="502" y="198" fill="#CCD4FF" rx="6"/>
++		<rect width="39" height="39" x="502.5" y="198.5" stroke="#fff" stroke-opacity=".2" rx="5.5"/>
++	</g>
++	<defs>
++		<clipPath id="a">
++			<rect width="821" height="400" fill="#fff" rx="8"/>
++		</clipPath>
++		<filter id="b" width="533" height="867" x="143" y="144" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
++			<feFlood flood-opacity="0" result="BackgroundImageFix"/>
++			<feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
++			<feOffset dy="15"/>
++			<feGaussianBlur stdDeviation="17"/>
++			<feColorMatrix values="0 0 0 0 0.0117647 0 0 0 0 0.0627451 0 0 0 0 0.329412 0 0 0 0.1 0"/>
++			<feBlend in2="BackgroundImageFix" result="effect1_dropShadow_15778_6552"/>
++			<feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
++			<feOffset dy="62"/>
++			<feGaussianBlur stdDeviation="31"/>
++			<feColorMatrix values="0 0 0 0 0.0117647 0 0 0 0 0.0627451 0 0 0 0 0.329412 0 0 0 0.09 0"/>
++			<feBlend in2="effect1_dropShadow_15778_6552" result="effect2_dropShadow_15778_6552"/>
++			<feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
++			<feOffset dy="139"/>
++			<feGaussianBlur stdDeviation="41.5"/>
++			<feColorMatrix values="0 0 0 0 0.0117647 0 0 0 0 0.0627451 0 0 0 0 0.329412 0 0 0 0.05 0"/>
++			<feBlend in2="effect2_dropShadow_15778_6552" result="effect3_dropShadow_15778_6552"/>
++			<feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
++			<feOffset dy="247"/>
++			<feGaussianBlur stdDeviation="49.5"/>
++			<feColorMatrix values="0 0 0 0 0.0117647 0 0 0 0 0.0627451 0 0 0 0 0.329412 0 0 0 0.01 0"/>
++			<feBlend in2="effect3_dropShadow_15778_6552" result="effect4_dropShadow_15778_6552"/>
++			<feBlend in="SourceGraphic" in2="effect4_dropShadow_15778_6552" result="shape"/>
++		</filter>
++	</defs>
++</svg>
+diff --git a/storybook/stories/foundations/design-language/static/radius-dont.svg b/storybook/stories/foundations/design-language/static/radius-dont.svg
+new file mode 100644
+index 00000000000000..b4426b2fdd9199
+--- /dev/null
++++ b/storybook/stories/foundations/design-language/static/radius-dont.svg
+@@ -0,0 +1,58 @@
++<svg xmlns="http://www.w3.org/2000/svg" width="821" height="400" fill="none">
++	<g clip-path="url(#a)">
++		<rect width="821" height="400" fill="#3858E9" rx="8"/>
++		<rect width="835" height="662" x="-211" y="60" fill="#607AEE" rx="6"/>
++		<rect width="834" height="661" x="-210.5" y="60.5" stroke="#fff" stroke-opacity=".2" rx="5.5"/>
++		<rect width="111" height="40" x="-34" y="107" fill="#7D92F1" rx="12"/>
++		<rect width="110" height="39" x="-33.5" y="107.5" stroke="#fff" stroke-opacity=".2" rx="11.5"/>
++		<rect width="111" height="40" x="93" y="107" fill="#7D92F1" rx="12"/>
++		<rect width="110" height="39" x="93.5" y="107.5" stroke="#fff" stroke-opacity=".2" rx="11.5"/>
++		<rect width="111" height="40" x="220" y="107" fill="#7D92F1" rx="12"/>
++		<rect width="110" height="39" x="220.5" y="107.5" stroke="#fff" stroke-opacity=".2" rx="11.5"/>
++		<rect width="40" height="40" x="537" y="107" fill="#7D92F1" rx="12"/>
++		<rect width="39" height="39" x="537.5" y="107.5" stroke="#fff" stroke-opacity=".2" rx="11.5"/>
++		<g filter="url(#b)">
++			<rect width="335" height="502" x="242" y="163" fill="#93A4F4" rx="6"/>
++			<rect width="334" height="501" x="242.5" y="163.5" stroke="#fff" stroke-opacity=".2" rx="5.5"/>
++		</g>
++		<rect width="40" height="40" x="266" y="281" fill="#ADBBFB" rx="16"/>
++		<rect width="39" height="39" x="266.5" y="281.5" stroke="#fff" stroke-opacity=".2" rx="15.5"/>
++		<rect width="40" height="40" x="266" y="337" fill="#ADBBFB" rx="16"/>
++		<rect width="39" height="39" x="266.5" y="337.5" stroke="#fff" stroke-opacity=".2" rx="15.5"/>
++		<rect width="40" height="40" x="266" y="393" fill="#ADBBFB" rx="16"/>
++		<rect width="39" height="39" x="266.5" y="393.5" stroke="#fff" stroke-opacity=".2" rx="15.5"/>
++		<rect width="287" height="62" x="266" y="187" fill="#ADBBFB" rx="6"/>
++		<rect width="286" height="61" x="266.5" y="187.5" stroke="#fff" stroke-opacity=".2" rx="5.5"/>
++		<rect width="40" height="40" x="502" y="198" fill="#CCD4FF" rx="9"/>
++		<rect width="39" height="39" x="502.5" y="198.5" stroke="#fff" stroke-opacity=".2" rx="8.5"/>
++	</g>
++	<defs>
++		<clipPath id="a">
++			<rect width="821" height="400" fill="#fff" rx="8"/>
++		</clipPath>
++		<filter id="b" width="533" height="867" x="143" y="144" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
++			<feFlood flood-opacity="0" result="BackgroundImageFix"/>
++			<feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
++			<feOffset dy="15"/>
++			<feGaussianBlur stdDeviation="17"/>
++			<feColorMatrix values="0 0 0 0 0.0117647 0 0 0 0 0.0627451 0 0 0 0 0.329412 0 0 0 0.1 0"/>
++			<feBlend in2="BackgroundImageFix" result="effect1_dropShadow_15779_6567"/>
++			<feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
++			<feOffset dy="62"/>
++			<feGaussianBlur stdDeviation="31"/>
++			<feColorMatrix values="0 0 0 0 0.0117647 0 0 0 0 0.0627451 0 0 0 0 0.329412 0 0 0 0.09 0"/>
++			<feBlend in2="effect1_dropShadow_15779_6567" result="effect2_dropShadow_15779_6567"/>
++			<feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
++			<feOffset dy="139"/>
++			<feGaussianBlur stdDeviation="41.5"/>
++			<feColorMatrix values="0 0 0 0 0.0117647 0 0 0 0 0.0627451 0 0 0 0 0.329412 0 0 0 0.05 0"/>
++			<feBlend in2="effect2_dropShadow_15779_6567" result="effect3_dropShadow_15779_6567"/>
++			<feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
++			<feOffset dy="247"/>
++			<feGaussianBlur stdDeviation="49.5"/>
++			<feColorMatrix values="0 0 0 0 0.0117647 0 0 0 0 0.0627451 0 0 0 0 0.329412 0 0 0 0.01 0"/>
++			<feBlend in2="effect3_dropShadow_15779_6567" result="effect4_dropShadow_15779_6567"/>
++			<feBlend in="SourceGraphic" in2="effect4_dropShadow_15779_6567" result="shape"/>
++		</filter>
++	</defs>
++</svg>
+diff --git a/storybook/stories/foundations/design-language/static/radius.svg b/storybook/stories/foundations/design-language/static/radius.svg
+new file mode 100644
+index 00000000000000..a5d81ef7ca0535
+--- /dev/null
++++ b/storybook/stories/foundations/design-language/static/radius.svg
+@@ -0,0 +1,62 @@
++<svg xmlns="http://www.w3.org/2000/svg" width="1091" height="395" fill="none">
++	<g clip-path="url(#a)">
++		<rect width="1091" height="395" fill="#3858E9" rx="8"/>
++		<g filter="url(#b)">
++			<path fill="url(#c)" fill-opacity=".8" d="M73.06 344.57c-31.45-117.36 38.2-238 155.56-269.44L1091.2-156l166.69 622.08L182.8 754.14 73.07 344.57Z"/>
++		</g>
++		<g filter="url(#d)">
++			<path fill="url(#e)" fill-opacity=".8" d="M130.76 328.07c-22.73-84.82 27.6-172 112.43-194.73l863.53-231.38 145.37 542.51L234.97 717.02 130.76 328.07Z"/>
++		</g>
++		<g filter="url(#f)">
++			<path fill="url(#g)" fill-opacity=".8" d="M188.71 312.55c-14.15-52.82 17.2-107.1 70-121.25l863.55-231.4 127.94 477.48-959.16 257-102.32-381.84Z"/>
++		</g>
++		<g filter="url(#h)">
++			<path fill="url(#i)" fill-opacity=".8" d="M246.93 297.98A40 40 0 0 1 275.2 249l862.57-231.12 103.79 387.33-901.2 241.48-93.44-348.7Z"/>
++		</g>
++	</g>
++	<defs>
++		<linearGradient id="c" x1="553.66" x2="720.34" y1="-11.97" y2="610.11" gradientUnits="userSpaceOnUse">
++			<stop stop-color="#fff" stop-opacity=".25"/>
++			<stop offset="1" stop-color="#fff" stop-opacity=".1"/>
++		</linearGradient>
++		<linearGradient id="e" x1="598.16" x2="743.53" y1="38.22" y2="580.74" gradientUnits="userSpaceOnUse">
++			<stop stop-color="#fff" stop-opacity=".25"/>
++			<stop offset="1" stop-color="#fff" stop-opacity=".1"/>
++		</linearGradient>
++		<linearGradient id="g" x1="642.67" x2="770.61" y1="88.42" y2="565.89" gradientUnits="userSpaceOnUse">
++			<stop stop-color="#fff" stop-opacity=".25"/>
++			<stop offset="1" stop-color="#fff" stop-opacity=".1"/>
++		</linearGradient>
++		<linearGradient id="i" x1="687.18" x2="790.97" y1="138.61" y2="525.94" gradientUnits="userSpaceOnUse">
++			<stop stop-color="#fff" stop-opacity=".25"/>
++			<stop offset="1" stop-color="#fff" stop-opacity=".1"/>
++		</linearGradient>
++		<filter id="b" width="1208.37" height="926.14" x="57.51" y="-164" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
++			<feFlood flood-opacity="0" result="BackgroundImageFix"/>
++			<feGaussianBlur in="BackgroundImageFix" stdDeviation="4"/>
++			<feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_15773_6502"/>
++			<feBlend in="SourceGraphic" in2="effect1_backgroundBlur_15773_6502" result="shape"/>
++		</filter>
++		<filter id="d" width="1142.79" height="831.06" x="117.3" y="-106.05" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
++			<feFlood flood-opacity="0" result="BackgroundImageFix"/>
++			<feGaussianBlur in="BackgroundImageFix" stdDeviation="4"/>
++			<feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_15773_6502"/>
++			<feBlend in="SourceGraphic" in2="effect1_backgroundBlur_15773_6502" result="shape"/>
++		</filter>
++		<filter id="f" width="1080.88" height="750.49" x="177.31" y="-48.09" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
++			<feFlood flood-opacity="0" result="BackgroundImageFix"/>
++			<feGaussianBlur in="BackgroundImageFix" stdDeviation="4"/>
++			<feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_15773_6502"/>
++			<feBlend in="SourceGraphic" in2="effect1_backgroundBlur_15773_6502" result="shape"/>
++		</filter>
++		<filter id="h" width="1012.02" height="644.81" x="237.55" y="9.87" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
++			<feFlood flood-opacity="0" result="BackgroundImageFix"/>
++			<feGaussianBlur in="BackgroundImageFix" stdDeviation="4"/>
++			<feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_15773_6502"/>
++			<feBlend in="SourceGraphic" in2="effect1_backgroundBlur_15773_6502" result="shape"/>
++		</filter>
++		<clipPath id="a">
++			<rect width="1091" height="395" fill="#fff" rx="8"/>
++		</clipPath>
++	</defs>
++</svg>
+diff --git a/storybook/stories/tokens/components.tsx b/storybook/stories/tokens/components.tsx
+index 05c2b4bde85a21..1144bc10d625d3 100644
+--- a/storybook/stories/tokens/components.tsx
++++ b/storybook/stories/tokens/components.tsx
+@@ -4,9 +4,9 @@
+ // eslint-disable-next-line @typescript-eslint/no-restricted-imports
+ import React from 'react';
+ 
+-export const ElevationTable = ( { tokens } ) => {
++export const TokensTable = ( { tokenCategory, tokens, applyTokenStyle } ) => {
+ 	return (
+-		<table>
++		<table style={ { width: '100%' } }>
+ 			<thead>
+ 				<tr>
+ 					<th>Token</th>
+@@ -36,12 +36,12 @@ export const ElevationTable = ( { tokens } ) => {
+ 						</td>
+ 						<td style={ { padding: '24px' } }>
+ 							<div
+-								aria-label={ `An square showing an example of the '${ name }' elevation styles` }
++								aria-label={ `A shape showing an example of the '${ name }' ${ tokenCategory } token` }
+ 								style={ {
+ 									width: '100px',
+ 									height: '100px',
+-									boxShadow: valueCode,
+ 									background: 'white',
++									...applyTokenStyle( valueCode ),
+ 								} }
+ 							></div>
+ 						</td>
+diff --git a/storybook/stories/tokens/elevation.mdx b/storybook/stories/tokens/elevation.mdx
+index 5bd7dbf79a2622..5afb7e75266c4a 100644
+--- a/storybook/stories/tokens/elevation.mdx
++++ b/storybook/stories/tokens/elevation.mdx
+@@ -1,5 +1,5 @@
+ import { Meta } from '@storybook/addon-docs/blocks';
+-import { ElevationTable } from './components.tsx';
++import { TokensTable } from './components.tsx';
+ 
+ <Meta title="Tokens/Elevation" name="page" />
+ 
+@@ -11,7 +11,8 @@ This document outlines the various tokens relating to [elevation](?path=/docs/fo
+ 
+ Tokens can be used in different ways, but regardless of which method is used, each one is meant to be used as the value of the CSS `box-shadow` property, and references the following values:
+ 
+-<ElevationTable
++<TokensTable
++	tokenCategory="elevation"
+ 	tokens={ [
+ 		{
+ 			name: 'Extra small',
+@@ -42,6 +43,7 @@ Tokens can be used in different ways, but regardless of which method is used, ea
+ 				'0 5px 15px rgba(0, 0, 0, 0.08), 0 15px 27px rgba(0, 0, 0, 0.07), 0 30px 36px rgba(0, 0, 0, 0.04), 0 50px 43px rgba(0, 0, 0, 0.02)',
+ 		},
+ 	] }
++	applyTokenStyle={ ( valueCode ) => ( { boxShadow: valueCode } ) }
+ />
+ 
+ ## CSS tokens
+diff --git a/storybook/stories/tokens/radius.mdx b/storybook/stories/tokens/radius.mdx
+new file mode 100644
+index 00000000000000..49eeb4a3c312b9
+--- /dev/null
++++ b/storybook/stories/tokens/radius.mdx
+@@ -0,0 +1,105 @@
++import { Meta } from '@storybook/blocks';
++import { TokensTable } from './components.tsx';
++
++<Meta title="Tokens/Radius" name="page" />
++
++# Radius
++
++This document outlines the various tokens relating to radius in the WordPress design system.
++
++## Values
++
++Tokens can be used in different ways, but regardless of which method is used, each one is meant to be used as the value of the CSS `border-radius` property, and references the following values:
++
++<TokensTable
++	tokenCategory="radius"
++	tokens={ [
++		{
++			name: 'Extra small',
++			valueShow: '1px',
++			valueCode: '1px',
++		},
++		{
++			name: 'Small',
++			valueShow: '2px',
++			valueCode: '2px',
++		},
++		{
++			name: 'Medium',
++			valueShow: '4px',
++			valueCode: '4px',
++		},
++		{
++			name: 'Large',
++			valueShow: '8px',
++			valueCode: '8px',
++		},
++		{
++			name: 'Full',
++			valueShow: '9999px',
++			valueCode: '9999px',
++		},
++		{
++			name: 'Round',
++			valueShow: '100%',
++			valueCode: '100%',
++		},
++	] }
++	applyTokenStyle={ ( valueCode ) => ( {
++		borderRadius: valueCode,
++		border: '1px solid #1e1e1e',
++	} ) }
++/>
++
++## CSS tokens
++
++Radius tokens are defined as SASS variables:
++
++-   `$radius-x-small`
++-   `$radius-small`
++-   `$radius-medium`
++-   `$radius-large`
++-   `$radius-full`
++-   `$radius-round`
++
++They can be used like so:
++
++```css
++.radius-extra-small {
++	border-radius: $radius-x-small;
++}
++.radius-small {
++	border-radius: $radius-small;
++}
++.radius-medium {
++	border-radius: $radius-medium;
++}
++.radius-large {
++	border-radius: $radius-large;
++}
++.radius-full {
++	border-radius: $radius-full;
++}
++.radius-round {
++	border-radius: $radius-round;
++}
++```
++
++## JS tokens
++
++When working in the `@wordpress/components` package, the radius tokens can also be consumed as JavaScript variables via the `CONFIG` object found in the `packages/components/src/utils/index.js` file:
++
++-   `CONFIG.radiusXSmall`
++-   `CONFIG.radiusSmall`
++-   `CONFIG.radiusMedium`
++-   `CONFIG.radiusLarge`
++-   `CONFIG.radiusFull`
++-   `CONFIG.radiusRound`
++
++```js
++// Note: the `CONFIG` object is only available within the `@wordpress/components` package.
++import { CONFIG } from '../utils';
++
++// Later in the code:
++border-radius: ${ CONFIG.radiusXSmall };
++```

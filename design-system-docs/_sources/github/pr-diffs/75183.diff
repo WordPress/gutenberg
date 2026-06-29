@@ -1,0 +1,1142 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index bf7b8567508cd6..b9f5be24393d2b 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### New Features
+ 
++-   Add `Dialog` primitive ([#75183](https://github.com/WordPress/gutenberg/pull/75183)).
+ -   Add `Tabs` primitive ([#74652](https://github.com/WordPress/gutenberg/pull/74652)).
+ -   Add `Textarea` primitive ([#74707](https://github.com/WordPress/gutenberg/pull/74707)).
+ 
+diff --git a/packages/ui/src/dialog/action.tsx b/packages/ui/src/dialog/action.tsx
+new file mode 100644
+index 00000000000000..f3ee2698f8e2b2
+--- /dev/null
++++ b/packages/ui/src/dialog/action.tsx
+@@ -0,0 +1,22 @@
++import { Dialog as _Dialog } from '@base-ui/react/dialog';
++import { forwardRef } from '@wordpress/element';
++import { Button } from '../button';
++import type { ActionProps } from './types';
++
++/**
++ * Renders a button that closes the dialog when clicked.
++ * Accepts all Button component props for styling.
++ */
++const Action = forwardRef< HTMLButtonElement, ActionProps >(
++	function DialogAction( { render, ...props }, ref ) {
++		return (
++			<_Dialog.Close
++				ref={ ref }
++				render={ <Button render={ render } /> }
++				{ ...props }
++			/>
++		);
++	}
++);
++
++export { Action };
+diff --git a/packages/ui/src/dialog/close-icon.tsx b/packages/ui/src/dialog/close-icon.tsx
+new file mode 100644
+index 00000000000000..b70b1f0b114227
+--- /dev/null
++++ b/packages/ui/src/dialog/close-icon.tsx
+@@ -0,0 +1,32 @@
++import { Dialog as _Dialog } from '@base-ui/react/dialog';
++import { forwardRef } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
++import { close } from '@wordpress/icons';
++import { IconButton } from '../icon-button';
++import type { CloseIconProps } from './types';
++
++/**
++ * Renders an icon button that closes the dialog when clicked.
++ * Provides a default close icon and accessible label.
++ */
++const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
++	function DialogCloseIcon( { icon, label, ...props }, ref ) {
++		return (
++			<_Dialog.Close
++				ref={ ref }
++				render={
++					<IconButton
++						variant="minimal"
++						size="compact"
++						tone="neutral"
++						{ ...props }
++						icon={ icon ?? close }
++						label={ label ?? __( 'Close' ) }
++					/>
++				}
++			/>
++		);
++	}
++);
++
++export { CloseIcon };
+diff --git a/packages/ui/src/dialog/context.tsx b/packages/ui/src/dialog/context.tsx
+new file mode 100644
+index 00000000000000..a3cedaed8da461
+--- /dev/null
++++ b/packages/ui/src/dialog/context.tsx
+@@ -0,0 +1,113 @@
++import {
++	createContext,
++	useCallback,
++	useContext,
++	useEffect,
++	useMemo,
++	useRef,
++} from '@wordpress/element';
++
++/**
++ * Whether validation is enabled. This is a build-time constant that allows
++ * bundlers to tree-shake all validation code in production builds.
++ */
++const VALIDATION_ENABLED = process.env.NODE_ENV !== 'production';
++
++type DialogValidationContextType = {
++	registerTitle: ( element: HTMLElement | null ) => void;
++};
++
++// Context is only created in development mode.
++const DialogValidationContext = VALIDATION_ENABLED
++	? createContext< DialogValidationContextType | null >( null )
++	: ( null as unknown as React.Context< DialogValidationContextType | null > );
++
++/**
++ * Development-only hook to access the dialog validation context.
++ */
++function useDialogValidationContextDev() {
++	return useContext( DialogValidationContext );
++}
++
++/**
++ * Production no-op hook.
++ */
++function useDialogValidationContextProd() {
++	return null;
++}
++
++/**
++ * Hook to access the dialog validation context.
++ * Returns null in production or if not within a Dialog.Popup.
++ */
++export const useDialogValidationContext = VALIDATION_ENABLED
++	? useDialogValidationContextDev
++	: useDialogValidationContextProd;
++
++/**
++ * Development-only provider that tracks whether Dialog.Title is rendered.
++ */
++function DialogValidationProviderDev( {
++	children,
++}: {
++	children: React.ReactNode;
++} ) {
++	const titleElementRef = useRef< HTMLElement | null >( null );
++
++	const registerTitle = useCallback( ( element: HTMLElement | null ) => {
++		titleElementRef.current = element;
++	}, [] );
++
++	const contextValue = useMemo(
++		() => ( { registerTitle } ),
++		[ registerTitle ]
++	);
++
++	// Validate that Dialog.Title is rendered with non-empty text content
++	useEffect( () => {
++		// useLayoutEffect in Title runs before this useEffect,
++		// so titleElementRef should already be set if Title is present
++		const titleElement = titleElementRef.current;
++
++		if ( ! titleElement ) {
++			throw new Error(
++				'Dialog: Missing <Dialog.Title>. ' +
++					'For accessibility, every dialog requires a title. ' +
++					'If needed, the title can be visually hidden but must not be omitted.'
++			);
++		}
++
++		const textContent = titleElement.textContent?.trim();
++		if ( ! textContent ) {
++			throw new Error(
++				'Dialog: <Dialog.Title> cannot be empty. ' +
++					'Provide meaningful text content for the dialog title.'
++			);
++		}
++	}, [] );
++
++	return (
++		<DialogValidationContext.Provider value={ contextValue }>
++			{ children }
++		</DialogValidationContext.Provider>
++	);
++}
++
++/**
++ * Production no-op provider that just renders children.
++ */
++function DialogValidationProviderProd( {
++	children,
++}: {
++	children: React.ReactNode;
++} ) {
++	return <>{ children }</>;
++}
++
++/**
++ * Provider component that validates Dialog.Title presence in development mode.
++ * In production, this component is a no-op and just renders children.
++ */
++export const DialogValidationProvider = VALIDATION_ENABLED
++	? DialogValidationProviderDev
++	: DialogValidationProviderProd;
+diff --git a/packages/ui/src/dialog/footer.tsx b/packages/ui/src/dialog/footer.tsx
+new file mode 100644
+index 00000000000000..98064c61a9af6b
+--- /dev/null
++++ b/packages/ui/src/dialog/footer.tsx
+@@ -0,0 +1,26 @@
++import { mergeProps, useRender } from '@base-ui/react';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import styles from './style.module.css';
++import type { FooterProps } from './types';
++
++/**
++ * Renders the footer section of the dialog, typically containing
++ * action buttons.
++ */
++const Footer = forwardRef< HTMLDivElement, FooterProps >( function DialogFooter(
++	{ className, render, ...props },
++	ref
++) {
++	const element = useRender( {
++		render,
++		ref,
++		props: mergeProps< 'div' >( props, {
++			className: clsx( styles.footer, className ),
++		} ),
++	} );
++
++	return element;
++} );
++
++export { Footer };
+diff --git a/packages/ui/src/dialog/header.tsx b/packages/ui/src/dialog/header.tsx
+new file mode 100644
+index 00000000000000..2e1b665fa33659
+--- /dev/null
++++ b/packages/ui/src/dialog/header.tsx
+@@ -0,0 +1,26 @@
++import { mergeProps, useRender } from '@base-ui/react';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import styles from './style.module.css';
++import type { HeaderProps } from './types';
++
++/**
++ * Renders the header section of the dialog, typically containing
++ * the heading and close button.
++ */
++const Header = forwardRef< HTMLDivElement, HeaderProps >( function DialogHeader(
++	{ className, render, ...props },
++	ref
++) {
++	const element = useRender( {
++		render,
++		ref,
++		props: mergeProps< 'div' >( props, {
++			className: clsx( styles.header, className ),
++		} ),
++	} );
++
++	return element;
++} );
++
++export { Header };
+diff --git a/packages/ui/src/dialog/index.ts b/packages/ui/src/dialog/index.ts
+new file mode 100644
+index 00000000000000..22f7bae4e66e9b
+--- /dev/null
++++ b/packages/ui/src/dialog/index.ts
+@@ -0,0 +1,10 @@
++import { Action } from './action';
++import { CloseIcon } from './close-icon';
++import { Footer } from './footer';
++import { Header } from './header';
++import { Popup } from './popup';
++import { Root } from './root';
++import { Title } from './title';
++import { Trigger } from './trigger';
++
++export { Action, CloseIcon, Footer, Header, Popup, Root, Title, Trigger };
+diff --git a/packages/ui/src/dialog/popup.tsx b/packages/ui/src/dialog/popup.tsx
+new file mode 100644
+index 00000000000000..f657aba3bb0b77
+--- /dev/null
++++ b/packages/ui/src/dialog/popup.tsx
+@@ -0,0 +1,46 @@
++import { Dialog as _Dialog } from '@base-ui/react/dialog';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
++import { unlock } from '../lock-unlock';
++import { DialogValidationProvider } from './context';
++import styles from './style.module.css';
++import type { PopupProps } from './types';
++
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
++/**
++ * Renders the dialog popup element that contains the dialog content.
++ * Uses a portal to render outside the DOM hierarchy.
++ */
++const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
++	{ className, size = 'medium', children, ...props },
++	ref
++) {
++	return (
++		<_Dialog.Portal>
++			<_Dialog.Backdrop className={ styles.backdrop } />
++			<ThemeProvider>
++				<_Dialog.Popup
++					ref={ ref }
++					className={ clsx(
++						styles.popup,
++						className,
++						styles[ `is-${ size }` ]
++					) }
++					{ ...props }
++				>
++					<DialogValidationProvider>
++						{ children }
++					</DialogValidationProvider>
++				</_Dialog.Popup>
++			</ThemeProvider>
++		</_Dialog.Portal>
++	);
++} );
++
++export { Popup };
+diff --git a/packages/ui/src/dialog/root.tsx b/packages/ui/src/dialog/root.tsx
+new file mode 100644
+index 00000000000000..bd5acb96390902
+--- /dev/null
++++ b/packages/ui/src/dialog/root.tsx
+@@ -0,0 +1,14 @@
++import { Dialog as _Dialog } from '@base-ui/react/dialog';
++import type { RootProps } from './types';
++
++/**
++ * Groups the dialog trigger and popup.
++ *
++ * `Dialog` is a collection of React components that combine to render
++ * an ARIA-compliant dialog pattern.
++ */
++function Root( props: RootProps ) {
++	return <_Dialog.Root { ...props } />;
++}
++
++export { Root };
+diff --git a/packages/ui/src/dialog/stories/index.story.tsx b/packages/ui/src/dialog/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..f2af5aa127d359
+--- /dev/null
++++ b/packages/ui/src/dialog/stories/index.story.tsx
+@@ -0,0 +1,177 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { useId, useState } from '@wordpress/element';
++import type { ComponentProps } from 'react';
++import * as Dialog from '../index';
++
++const meta: Meta< typeof Dialog.Root > = {
++	title: 'Design System/Components/Dialog',
++	component: Dialog.Root,
++	subcomponents: {
++		'Dialog.Trigger': Dialog.Trigger,
++		'Dialog.Popup': Dialog.Popup,
++		'Dialog.Header': Dialog.Header,
++		'Dialog.Title': Dialog.Title,
++		'Dialog.CloseIcon': Dialog.CloseIcon,
++		'Dialog.Action': Dialog.Action,
++		'Dialog.Footer': Dialog.Footer,
++	},
++	argTypes: {
++		modal: {
++			control: 'inline-radio',
++			options: [ true, false, 'trap-focus' ],
++			table: {
++				defaultValue: { summary: 'true' },
++				type: {
++					summary: 'boolean | "trap-focus"',
++				},
++			},
++		},
++	},
++	parameters: {
++		docs: {
++			description: {
++				component: `
++Dialog is a popup that opens on top of the entire page. Every dialog must include a \`Dialog.Title\` component for accessibility — it serves as both the visible heading and the accessible label for the dialog.
++
++When using the Dialog component, make sure to always include a visible close button, either \`Dialog.CloseIcon\` or a clear dismissing action button. If your dialog has a "Cancel" button in the footer, the close icon may be redundant and create confusion about what clicking "X" means.
++
++Use \`Dialog.CloseIcon\` for informational dialogs where dismissing is safe and expected. For dialogs requiring explicit user choice (especially destructive actions), omit the close icon and rely on footer action buttons like "Cancel" and "Confirm" instead.
++				`,
++			},
++		},
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof Dialog.Root >;
++
++/**
++ * An informational dialog with a close icon, where there is no ambiguity on
++ * what happens when clicking the close icon.
++ */
++export const _Default: Story = {
++	args: {
++		children: (
++			<>
++				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++				<Dialog.Popup>
++					<Dialog.Header>
++						<Dialog.Title>Welcome</Dialog.Title>
++						<Dialog.CloseIcon />
++					</Dialog.Header>
++					<p>
++						This dialog demonstrates best practices for
++						informational dialogs. It includes a close icon because
++						dismissing it is safe and expected.
++					</p>
++					<Dialog.Footer>
++						<Dialog.Action>Got it</Dialog.Action>
++					</Dialog.Footer>
++				</Dialog.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * A confirmation dialog that intentionally omits the close icon. The user
++ * must explicitly choose "Cancel" or "Confirm" to make their intent clear,
++ * since it is not obvious what would happen when clicking a close icon.
++ */
++export const ConfirmDialog: Story = {
++	args: {
++		children: (
++			<>
++				<Dialog.Trigger>Confirm Action</Dialog.Trigger>
++				<Dialog.Popup>
++					<Dialog.Header>
++						<Dialog.Title>Confirm Action</Dialog.Title>
++					</Dialog.Header>
++					<p>
++						Are you sure you want to proceed? This action cannot be
++						undone.
++					</p>
++					<Dialog.Footer>
++						<Dialog.Action variant="outline">Cancel</Dialog.Action>
++						<Dialog.Action>Confirm</Dialog.Action>
++					</Dialog.Footer>
++				</Dialog.Popup>
++			</>
++		),
++	},
++};
++
++const ALL_SIZES = [ 'small', 'medium', 'large', 'stretch', 'full' ] as const;
++
++function SizeSelector( {
++	value,
++	onChange,
++}: {
++	value: ComponentProps< typeof Dialog.Popup >[ 'size' ];
++	onChange: ( size: ComponentProps< typeof Dialog.Popup >[ 'size' ] ) => void;
++} ) {
++	const selectId = useId();
++	return (
++		<div style={ { display: 'flex', gap: 8, alignItems: 'center' } }>
++			<label htmlFor={ selectId }>Dialog size preset</label>
++			<select
++				id={ selectId }
++				value={ value }
++				onChange={ ( e ) =>
++					onChange(
++						e.target.value as ComponentProps<
++							typeof Dialog.Popup
++						>[ 'size' ]
++					)
++				}
++			>
++				{ ALL_SIZES.map( ( s ) => (
++					<option key={ s } value={ s }>
++						{ s }
++						{ s === 'medium' ? ' (default)' : '' }
++					</option>
++				) ) }
++			</select>
++		</div>
++	);
++}
++
++function SizePlaygroundContent() {
++	const [ size, setSize ] =
++		useState< ComponentProps< typeof Dialog.Popup >[ 'size' ] >( 'medium' );
++	return (
++		<>
++			<div
++				style={ {
++					display: 'flex',
++					flexDirection: 'column',
++					gap: 16,
++					alignItems: 'start',
++				} }
++			>
++				<SizeSelector value={ size } onChange={ setSize } />
++				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++			</div>
++			<Dialog.Popup size={ size }>
++				<Dialog.Header>
++					<Dialog.Title>Size Playground</Dialog.Title>
++					<Dialog.CloseIcon />
++				</Dialog.Header>
++				<SizeSelector value={ size } onChange={ setSize } />
++				<p>
++					Use the dropdown above (or outside the dialog) to change the
++					popup size. Both controls stay in sync.
++				</p>
++				<Dialog.Footer>
++					<Dialog.Action>Got it</Dialog.Action>
++				</Dialog.Footer>
++			</Dialog.Popup>
++		</>
++	);
++}
++
++export const AllSizes: Story = {
++	args: {
++		children: <SizePlaygroundContent />,
++	},
++};
+diff --git a/packages/ui/src/dialog/style.module.css b/packages/ui/src/dialog/style.module.css
+new file mode 100644
+index 00000000000000..759da730c20e16
+--- /dev/null
++++ b/packages/ui/src/dialog/style.module.css
+@@ -0,0 +1,114 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.backdrop {
++		position: fixed;
++		inset: 0;
++		background-color: rgba(0, 0, 0, 0.35);
++
++		&[data-starting-style],
++		&[data-ending-style] {
++			opacity: 0;
++		}
++
++		&[data-open] {
++			opacity: 1;
++		}
++
++		@media not (prefers-reduced-motion) {
++			transition: opacity 0.2s ease-out;
++		}
++	}
++
++	.popup {
++		position: fixed;
++		top: 50%;
++		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical centering technique used with transform: translate(-50%, -50%) */
++		left: 50%;
++		transform: translate(-50%, -50%);
++		box-sizing: border-box;
++		min-width: 320px;
++		width: calc(100vw - 2 * var(--wpds-dimension-padding-2xl));
++		max-height: calc(100vh - 2 * var(--wpds-dimension-padding-2xl));
++		padding: var(--wpds-dimension-padding-2xl);
++		background-color: var(--wpds-color-bg-surface-neutral-strong);
++		border-radius: var(--wpds-border-radius-lg);
++		box-shadow: var(--wpds-elevation-lg);
++		overflow: auto;
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wpds-font-size-md);
++		line-height: var(--wpds-font-line-height-md);
++		color: var(--wpds-color-fg-content-neutral);
++
++		&[data-starting-style],
++		&[data-ending-style] {
++			opacity: 0;
++			transform: translate(-50%, -50%) scale(0.9);
++		}
++
++		@media not (prefers-reduced-motion) {
++			transition:
++				opacity 0.2s cubic-bezier(1, 0, 0.2, 1),
++				transform 0.2s cubic-bezier(1, 0, 0.2, 1);
++
++			&[data-open] {
++				transition:
++					opacity 0.2s cubic-bezier(0.29, 0, 0, 1),
++					transform 0.2s cubic-bezier(0.29, 0, 0, 1);
++			}
++		}
++
++		@media (min-width: 480px) {
++			min-width: 384px;
++		}
++
++		&.is-small {
++			max-width: 384px;
++		}
++
++		&.is-medium {
++			max-width: 512px;
++		}
++
++		&.is-large {
++			max-width: 840px;
++		}
++
++		&.is-stretch {
++			/* The dialog stretches to fill available width. */
++			max-width: none;
++		}
++
++		&.is-full {
++			/*
++			 * Force full height (full width is already in default styles).
++			 * The max-{width,height} properties will make sure some padding is shown.
++			 */
++			height: 100vh;
++		}
++	}
++
++	.header {
++		display: flex;
++		justify-content: space-between;
++		align-items: center;
++		margin-bottom: var(--wpds-dimension-gap-lg);
++	}
++
++	.title {
++		margin: 0;
++		font-size: var(--wpds-font-size-xl);
++		font-weight: var(--wpds-font-weight-medium);
++		line-height: var(--wpds-font-line-height-xl);
++		color: var(--wpds-color-fg-content-neutral);
++	}
++
++	.footer {
++		display: flex;
++		justify-content: flex-end;
++		align-items: center;
++		gap: var(--wpds-dimension-gap-sm);
++		margin-top: var(--wpds-dimension-gap-lg);
++		padding-top: var(--wpds-dimension-padding-lg);
++	}
++}
+diff --git a/packages/ui/src/dialog/test/index.test.tsx b/packages/ui/src/dialog/test/index.test.tsx
+new file mode 100644
+index 00000000000000..efce84ee6de797
+--- /dev/null
++++ b/packages/ui/src/dialog/test/index.test.tsx
+@@ -0,0 +1,309 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { Component, createRef } from '@wordpress/element';
++import type { ReactNode } from 'react';
++import * as Dialog from '../index';
++
++class TestErrorBoundary extends Component<
++	{ children: ReactNode; onError: ( error: Error ) => void },
++	{ hasError: boolean }
++> {
++	constructor( props: {
++		children: ReactNode;
++		onError: ( error: Error ) => void;
++	} ) {
++		super( props );
++		this.state = { hasError: false };
++	}
++
++	static getDerivedStateFromError() {
++		return { hasError: true };
++	}
++
++	componentDidCatch( error: Error ) {
++		this.props.onError( error );
++	}
++
++	render() {
++		if ( this.state.hasError ) {
++			return null;
++		}
++
++		return this.props.children;
++	}
++}
++
++describe( 'Dialog', () => {
++	it( 'forwards ref', async () => {
++		const user = userEvent.setup();
++		const triggerRef = createRef< HTMLButtonElement >();
++		const popupRef = createRef< HTMLDivElement >();
++		const actionRef = createRef< HTMLButtonElement >();
++		const headerRef = createRef< HTMLDivElement >();
++		const titleRef = createRef< HTMLHeadingElement >();
++		const closeIconRef = createRef< HTMLButtonElement >();
++		const footerRef = createRef< HTMLDivElement >();
++
++		render(
++			<Dialog.Root>
++				<Dialog.Trigger ref={ triggerRef }>Open Dialog</Dialog.Trigger>
++				<Dialog.Popup ref={ popupRef }>
++					<Dialog.Header ref={ headerRef }>
++						<Dialog.Title ref={ titleRef }>
++							Test Dialog
++						</Dialog.Title>
++						<Dialog.CloseIcon ref={ closeIconRef } />
++					</Dialog.Header>
++					<Dialog.Footer ref={ footerRef }>
++						<Dialog.Action ref={ actionRef }>Close</Dialog.Action>
++					</Dialog.Footer>
++				</Dialog.Popup>
++			</Dialog.Root>
++		);
++
++		// Test trigger ref before interaction
++		expect( triggerRef.current ).toBeInstanceOf( HTMLButtonElement );
++
++		// Click trigger to open dialog
++		await user.click( triggerRef.current! );
++
++		// Wait for the dialog to appear
++		await waitFor( () => {
++			expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++		} );
++
++		// Now that the dialog is open, verify all inner refs
++		expect( headerRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( titleRef.current ).toBeInstanceOf( HTMLHeadingElement );
++		expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
++		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
++		expect( footerRef.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++
++	describe( 'Development mode validation', () => {
++		// Suppress React's error boundary logging for these tests.
++		let originalConsoleError: typeof console.error;
++
++		beforeEach( () => {
++			// eslint-disable-next-line no-console
++			originalConsoleError = console.error;
++			// eslint-disable-next-line no-console
++			console.error = jest.fn();
++		} );
++
++		afterEach( () => {
++			// eslint-disable-next-line no-console
++			console.error = originalConsoleError;
++		} );
++
++		it( 'should throw when Dialog.Title is missing', async () => {
++			const user = userEvent.setup();
++			const onError = jest.fn();
++
++			render(
++				<TestErrorBoundary onError={ onError }>
++					<Dialog.Root>
++						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++						<Dialog.Popup>
++							<Dialog.Header>
++								{ /* Missing Dialog.Title */ }
++							</Dialog.Header>
++							<p>Content without a title</p>
++							<Dialog.Footer>
++								<Dialog.Action>Close</Dialog.Action>
++							</Dialog.Footer>
++						</Dialog.Popup>
++					</Dialog.Root>
++				</TestErrorBoundary>
++			);
++
++			// Open the dialog - this will trigger the error in useEffect
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open Dialog' } )
++			);
++
++			await waitFor( () => {
++				expect( onError ).toHaveBeenCalled();
++			} );
++
++			expect( onError.mock.calls[ 0 ][ 0 ] ).toBeInstanceOf( Error );
++			expect( ( onError.mock.calls[ 0 ][ 0 ] as Error ).message ).toBe(
++				'Dialog: Missing <Dialog.Title>. ' +
++					'For accessibility, every dialog requires a title. ' +
++					'If needed, the title can be visually hidden but must not be omitted.'
++			);
++		} );
++
++		it( 'should not throw before opening the dialog', async () => {
++			const onError = jest.fn();
++
++			render(
++				<TestErrorBoundary onError={ onError }>
++					<Dialog.Root>
++						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++						<Dialog.Popup>
++							<Dialog.Header>
++								<Dialog.Title>My Title</Dialog.Title>
++							</Dialog.Header>
++							<p>Content with a title</p>
++							<Dialog.Footer>
++								<Dialog.Action>Close</Dialog.Action>
++							</Dialog.Footer>
++						</Dialog.Popup>
++					</Dialog.Root>
++				</TestErrorBoundary>
++			);
++
++			// Check that the dialog itself hasn't been rendered in the DOM.
++			await expect( screen.findByRole( 'dialog' ) ).rejects.toThrow();
++
++			expect( onError ).not.toHaveBeenCalled();
++		} );
++
++		it( 'should not throw when Dialog.Title is present', async () => {
++			const user = userEvent.setup();
++			const onError = jest.fn();
++
++			render(
++				<TestErrorBoundary onError={ onError }>
++					<Dialog.Root>
++						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++						<Dialog.Popup>
++							<Dialog.Header>
++								<Dialog.Title>My Title</Dialog.Title>
++							</Dialog.Header>
++							<p>Content with a title</p>
++							<Dialog.Footer>
++								<Dialog.Action>Close</Dialog.Action>
++							</Dialog.Footer>
++						</Dialog.Popup>
++					</Dialog.Root>
++				</TestErrorBoundary>
++			);
++
++			// Open the dialog - should not throw
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open Dialog' } )
++			);
++
++			// Wait for the dialog to appear and ensure validation does not trigger errors
++			await waitFor( () => {
++				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
++			} );
++			expect( onError ).not.toHaveBeenCalled();
++		} );
++
++		it( 'should throw when Dialog.Title is empty', async () => {
++			const user = userEvent.setup();
++			const onError = jest.fn();
++
++			render(
++				<TestErrorBoundary onError={ onError }>
++					<Dialog.Root>
++						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++						<Dialog.Popup>
++							<Dialog.Header>
++								{ /* @ts-expect-error this is just for test purposes */ }
++								<Dialog.Title>
++									{ /* Empty title */ }
++								</Dialog.Title>
++							</Dialog.Header>
++							<p>Content with empty title</p>
++							<Dialog.Footer>
++								<Dialog.Action>Close</Dialog.Action>
++							</Dialog.Footer>
++						</Dialog.Popup>
++					</Dialog.Root>
++				</TestErrorBoundary>
++			);
++
++			// Open the dialog - this will trigger the error
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open Dialog' } )
++			);
++
++			await waitFor( () => {
++				expect( onError ).toHaveBeenCalled();
++			} );
++
++			expect( onError.mock.calls[ 0 ][ 0 ] ).toBeInstanceOf( Error );
++			expect( ( onError.mock.calls[ 0 ][ 0 ] as Error ).message ).toBe(
++				'Dialog: <Dialog.Title> cannot be empty. ' +
++					'Provide meaningful text content for the dialog title.'
++			);
++		} );
++
++		it( 'should throw when Dialog.Title contains only whitespace', async () => {
++			const user = userEvent.setup();
++			const onError = jest.fn();
++
++			render(
++				<TestErrorBoundary onError={ onError }>
++					<Dialog.Root>
++						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++						<Dialog.Popup>
++							<Dialog.Header>
++								<Dialog.Title> </Dialog.Title>
++							</Dialog.Header>
++							<p>Content with whitespace-only title</p>
++							<Dialog.Footer>
++								<Dialog.Action>Close</Dialog.Action>
++							</Dialog.Footer>
++						</Dialog.Popup>
++					</Dialog.Root>
++				</TestErrorBoundary>
++			);
++
++			// Open the dialog - this will trigger the error
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open Dialog' } )
++			);
++
++			await waitFor( () => {
++				expect( onError ).toHaveBeenCalled();
++			} );
++
++			expect( onError.mock.calls[ 0 ][ 0 ] ).toBeInstanceOf( Error );
++			expect( ( onError.mock.calls[ 0 ][ 0 ] as Error ).message ).toBe(
++				'Dialog: <Dialog.Title> cannot be empty. ' +
++					'Provide meaningful text content for the dialog title.'
++			);
++		} );
++
++		it( 'should not throw when Dialog.Title contains mixed content with text', async () => {
++			const user = userEvent.setup();
++			const onError = jest.fn();
++
++			render(
++				<TestErrorBoundary onError={ onError }>
++					<Dialog.Root>
++						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++						<Dialog.Popup>
++							<Dialog.Header>
++								<Dialog.Title>
++									<span aria-hidden="true">🎉</span>
++									Settings
++								</Dialog.Title>
++							</Dialog.Header>
++							<p>Content with icon and text title</p>
++							<Dialog.Footer>
++								<Dialog.Action>Close</Dialog.Action>
++							</Dialog.Footer>
++						</Dialog.Popup>
++					</Dialog.Root>
++				</TestErrorBoundary>
++			);
++
++			// Open the dialog - should not throw
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open Dialog' } )
++			);
++
++			// Wait for the dialog to appear and ensure validation does not trigger errors
++			await waitFor( () => {
++				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
++			} );
++			expect( onError ).not.toHaveBeenCalled();
++		} );
++	} );
++} );
+diff --git a/packages/ui/src/dialog/title.tsx b/packages/ui/src/dialog/title.tsx
+new file mode 100644
+index 00000000000000..d5784b6f6da232
+--- /dev/null
++++ b/packages/ui/src/dialog/title.tsx
+@@ -0,0 +1,39 @@
++import { Dialog as _Dialog } from '@base-ui/react/dialog';
++import clsx from 'clsx';
++import { useMergeRefs } from '@wordpress/compose';
++import { forwardRef, useLayoutEffect, useRef } from '@wordpress/element';
++import { useDialogValidationContext } from './context';
++import styles from './style.module.css';
++import type { TitleProps } from './types';
++
++/**
++ * Renders the dialog title. This component is required for accessibility
++ * and serves as both the visible heading and the accessible label for
++ * the dialog.
++ *
++ * Base UI's Dialog.Title renders an `<h2>` by default. Use the `render` prop
++ * to customize the element if needed.
++ */
++const Title = forwardRef< HTMLHeadingElement, TitleProps >(
++	function DialogTitle( { className, render, ...props }, forwardedRef ) {
++		const validationContext = useDialogValidationContext();
++		const internalRef = useRef< HTMLHeadingElement >( null );
++		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
++
++		// Register this title with the parent Popup for validation (dev only)
++		useLayoutEffect( () => {
++			validationContext?.registerTitle( internalRef.current );
++		}, [ validationContext ] );
++
++		return (
++			<_Dialog.Title
++				ref={ mergedRef }
++				className={ clsx( styles.title, className ) }
++				render={ render }
++				{ ...props }
++			/>
++		);
++	}
++);
++
++export { Title };
+diff --git a/packages/ui/src/dialog/trigger.tsx b/packages/ui/src/dialog/trigger.tsx
+new file mode 100644
+index 00000000000000..30a266c78110d8
+--- /dev/null
++++ b/packages/ui/src/dialog/trigger.tsx
+@@ -0,0 +1,14 @@
++import { Dialog as _Dialog } from '@base-ui/react/dialog';
++import { forwardRef } from '@wordpress/element';
++import type { TriggerProps } from './types';
++
++/**
++ * Renders a button that opens the dialog popup when clicked.
++ */
++const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
++	function DialogTrigger( props, ref ) {
++		return <_Dialog.Trigger ref={ ref } { ...props } />;
++	}
++);
++
++export { Trigger };
+diff --git a/packages/ui/src/dialog/types.ts b/packages/ui/src/dialog/types.ts
+new file mode 100644
+index 00000000000000..7d5bb547794be2
+--- /dev/null
++++ b/packages/ui/src/dialog/types.ts
+@@ -0,0 +1,93 @@
++import type { Dialog as _Dialog } from '@base-ui/react/dialog';
++import type { ReactNode } from 'react';
++import type { Button } from '../button';
++import type { IconButton } from '../icon-button';
++import type { ComponentProps } from '../utils/types';
++
++export interface RootProps
++	extends Pick<
++		_Dialog.Root.Props,
++		'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
++	> {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++}
++
++export interface TriggerProps extends ComponentProps< 'button' > {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++}
++
++export interface PopupProps extends ComponentProps< 'div' > {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++
++	/**
++	 * Renders the dialog at a preset width (excluding additional padding from
++	 * the viewport edges).
++	 *
++	 * - `'small'` — max-width of 384px.
++	 * - `'medium'` — max-width of 512px.
++	 * - `'large'` — max-width of 840px.
++	 * - `'stretch'` — no max-width, stretches to fill available space.
++	 * - `'full'` — stretches to fill available width and height.
++	 *
++	 * @default 'medium'
++	 */
++	size?: 'small' | 'medium' | 'large' | 'stretch' | 'full';
++}
++
++export interface ActionProps extends ComponentProps< typeof Button > {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++}
++
++export interface FooterProps extends ComponentProps< 'div' > {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++}
++
++export interface HeaderProps extends ComponentProps< 'div' > {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++}
++
++export interface TitleProps extends ComponentProps< 'h2' > {
++	/**
++	 * The title content to be rendered. This serves as both the visible
++	 * heading and the accessible label for the dialog.
++	 */
++	children: ReactNode;
++}
++
++export interface CloseIconProps
++	extends Omit<
++		ComponentProps< typeof IconButton >,
++		'label' | 'icon' | 'loading' | 'loadingAnnouncement'
++	> {
++	/**
++	 * A label describing the button's action, shown as a tooltip and to
++	 * assistive technology.
++	 *
++	 * @default __( 'Close' )
++	 */
++	label?: ComponentProps< typeof IconButton >[ 'label' ];
++	/**
++	 * The icon to display in the button.
++	 *
++	 * @default the `close` icon from `@wordpress/icons`
++	 */
++	icon?: ComponentProps< typeof IconButton >[ 'icon' ];
++}
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index b303bd87834b9d..6a6f1e12018fae 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -1,5 +1,6 @@
+ export * from './badge';
+ export * from './button';
++export * as Dialog from './dialog';
+ export * from './form/primitives';
+ export * from './icon';
+ export * from './icon-button';

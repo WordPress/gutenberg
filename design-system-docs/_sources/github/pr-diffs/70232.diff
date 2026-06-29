@@ -1,0 +1,93 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fad0febeec6af5..d7d9777363f9e0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,10 @@
+ -   `ComboboxControl`: Handle Unicode characters when matching values ([#70180](https://github.com/WordPress/gutenberg/pull/70180)).
+ -   `Toolbar`: Adjust colors for dark mode support ([#69278](https://github.com/WordPress/gutenberg/pull/69278)).
+ 
++### Bug Fixes
++
++-   `FormTokenField`: Fix filtering with full-width string ([#70232](https://github.com/WordPress/gutenberg/pull/70232)).
++
+ ### Internal
+ 
+ -   Expose `normalizeTextString` method as private API ([#70178](https://github.com/WordPress/gutenberg/pull/70178)).
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 42a45063eeb80d..d36f5670c8e2dc 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -513,7 +513,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 				( suggestion ) => ! normalizedValue.includes( suggestion )
+ 			);
+ 		} else {
+-			match = match.toLocaleLowerCase();
++			match = match.normalize( 'NFKC' ).toLocaleLowerCase();
+ 
+ 			_suggestions.forEach( ( suggestion ) => {
+ 				const index = suggestion
+diff --git a/packages/components/src/form-token-field/suggestions-list.tsx b/packages/components/src/form-token-field/suggestions-list.tsx
+index 537e760c0e4351..889a2b69a91694 100644
+--- a/packages/components/src/form-token-field/suggestions-list.tsx
++++ b/packages/components/src/form-token-field/suggestions-list.tsx
+@@ -65,7 +65,9 @@ export function SuggestionsList<
+ 	};
+ 
+ 	const computeSuggestionMatch = ( suggestion: T ) => {
+-		const matchText = displayTransform( match ).toLocaleLowerCase();
++		const matchText = displayTransform( match )
++			.normalize( 'NFKC' )
++			.toLocaleLowerCase();
+ 		if ( matchText.length === 0 ) {
+ 			return null;
+ 		}
+diff --git a/packages/components/src/form-token-field/test/index.tsx b/packages/components/src/form-token-field/test/index.tsx
+index 60c17112717bd1..1d8bd2b2ea0246 100644
+--- a/packages/components/src/form-token-field/test/index.tsx
++++ b/packages/components/src/form-token-field/test/index.tsx
+@@ -1275,6 +1275,45 @@ describe( 'FormTokenField', () => {
+ 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+ 		} );
+ 
++		it( 'should match suggestions with half-width and full-width characters', async () => {
++			const user = userEvent.setup();
++
++			const suggestions = [
++				// Half-width characters
++				'WordPress',
++				'Gutenberg',
++				// Full-width characters
++				'ＷｏｒｄＰｒｅｓｓ',
++				'Ｇｕｔｅｎｂｅｒｇ',
++				// Mixed characters
++				'WordＰｒｅｓｓ',
++				'Guteｎｂｅｒｇ',
++			];
++
++			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
++
++			const input = screen.getByRole( 'combobox' );
++
++			// Search with half-width characters.
++			await user.type( input, 'rdp' );
++
++			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
++				'WordPress',
++				'ＷｏｒｄＰｒｅｓｓ',
++				'WordＰｒｅｓｓ',
++			] );
++
++			// Search with full-width characters.
++			await user.clear( input );
++			await user.type( input, 'ｔｅｎ' );
++
++			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
++				'Gutenberg',
++				'Ｇｕｔｅｎｂｅｒｇ',
++				'Guteｎｂｅｒｇ',
++			] );
++		} );
++
+ 		it( 'should re-render if suggestions change', async () => {
+ 			const user = userEvent.setup();
+ 

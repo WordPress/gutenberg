@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/text/README.md b/packages/components/src/text/README.md
+index 4a659b34fa4ccc..68113190e0a48e 100644
+--- a/packages/components/src/text/README.md
++++ b/packages/components/src/text/README.md
+@@ -5,7 +5,7 @@ A component for rendering text.
+ ## Usage
+ 
+ ```jsx
+-import { Text } from '@wordpress/components';
++import { __experimentalText as Text } from '@wordpress/components';
+ 
+ const HeroPanel = () => (
+ 	<>

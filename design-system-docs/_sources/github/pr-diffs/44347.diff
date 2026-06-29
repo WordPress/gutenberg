@@ -1,0 +1,60 @@
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index a12b58f8eaa516..b0e932ce73cbc5 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -247,11 +247,7 @@ function ComboboxControl( {
+ 								instanceId={ instanceId }
+ 								ref={ inputContainer }
+ 								value={ isExpanded ? inputValue : currentLabel }
+-								aria-label={
+-									currentLabel
+-										? `${ currentLabel }, ${ label }`
+-										: null
+-								}
++								inputHasFocus={ inputHasFocus }
+ 								onFocus={ onFocus }
+ 								onBlur={ onBlur }
+ 								isExpanded={ isExpanded }
+diff --git a/packages/components/src/form-token-field/token-input.tsx b/packages/components/src/form-token-field/token-input.tsx
+index 478cce3f3733cc..e449ea9045fb55 100644
+--- a/packages/components/src/form-token-field/token-input.tsx
++++ b/packages/components/src/form-token-field/token-input.tsx
+@@ -22,6 +22,7 @@ export function UnForwardedTokenInput(
+ 	const {
+ 		value,
+ 		isExpanded,
++		inputHasFocus,
+ 		instanceId,
+ 		selectedSuggestionIndex,
+ 		className,
+@@ -30,6 +31,9 @@ export function UnForwardedTokenInput(
+ 	} = props;
+ 
+ 	const size = value ? value.length + 1 : 0;
++	// Ensure this is set to true if inputHasFocus is not defined.
++	const checkInputHasFocus =
++		inputHasFocus !== undefined ? inputHasFocus : true;
+ 
+ 	const onChangeHandler = ( event: ChangeEvent< HTMLInputElement > ) => {
+ 		if ( onChange ) {
+@@ -62,7 +66,7 @@ export function UnForwardedTokenInput(
+ 					: undefined
+ 			}
+ 			aria-activedescendant={
+-				selectedSuggestionIndex !== -1
++				checkInputHasFocus && selectedSuggestionIndex !== -1
+ 					? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
+ 					: undefined
+ 			}
+diff --git a/packages/components/src/form-token-field/types.ts b/packages/components/src/form-token-field/types.ts
+index bdc67d725489b4..b3e401bf5c0435 100644
+--- a/packages/components/src/form-token-field/types.ts
++++ b/packages/components/src/form-token-field/types.ts
+@@ -199,6 +199,7 @@ export interface TokenProps extends TokenItem {
+ 
+ export interface TokenInputProps {
+ 	isExpanded: boolean;
++	inputHasFocus?: boolean;
+ 	instanceId: string | number;
+ 	selectedSuggestionIndex: number;
+ 	onChange?: ( { value }: { value: string } ) => void;

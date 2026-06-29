@@ -1,0 +1,3404 @@
+diff --git a/packages/block-editor/src/hooks/block-bindings.js b/packages/block-editor/src/hooks/block-bindings.js
+index 694c9c1c0bb3cc..615804a311c0fb 100644
+--- a/packages/block-editor/src/hooks/block-bindings.js
++++ b/packages/block-editor/src/hooks/block-bindings.js
+@@ -34,7 +34,7 @@ import { useBlockEditContext } from '../components/block-edit';
+ import { useBlockBindingsUtils } from '../utils/block-bindings';
+ import { store as blockEditorStore } from '../store';
+ 
+-const { DropdownMenuV2 } = unlock( componentsPrivateApis );
++const { Menu } = unlock( componentsPrivateApis );
+ 
+ const EMPTY_OBJECT = {};
+ 
+@@ -70,18 +70,18 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
+ 		<>
+ 			{ Object.entries( fieldsList ).map( ( [ name, fields ], i ) => (
+ 				<Fragment key={ name }>
+-					<DropdownMenuV2.Group>
++					<Menu.Group>
+ 						{ Object.keys( fieldsList ).length > 1 && (
+-							<DropdownMenuV2.GroupLabel>
++							<Menu.GroupLabel>
+ 								{ registeredSources[ name ].label }
+-							</DropdownMenuV2.GroupLabel>
++							</Menu.GroupLabel>
+ 						) }
+ 						{ Object.entries( fields )
+ 							.filter(
+ 								( [ , args ] ) => args?.type === attributeType
+ 							)
+ 							.map( ( [ key, args ] ) => (
+-								<DropdownMenuV2.RadioItem
++								<Menu.RadioItem
+ 									key={ key }
+ 									onChange={ () =>
+ 										updateBlockBindings( {
+@@ -95,17 +95,17 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
+ 									value={ key }
+ 									checked={ key === currentKey }
+ 								>
+-									<DropdownMenuV2.ItemLabel>
++									<Menu.ItemLabel>
+ 										{ args?.label }
+-									</DropdownMenuV2.ItemLabel>
+-									<DropdownMenuV2.ItemHelpText>
++									</Menu.ItemLabel>
++									<Menu.ItemHelpText>
+ 										{ args?.value }
+-									</DropdownMenuV2.ItemHelpText>
+-								</DropdownMenuV2.RadioItem>
++									</Menu.ItemHelpText>
++								</Menu.RadioItem>
+ 							) ) }
+-					</DropdownMenuV2.Group>
++					</Menu.Group>
+ 					{ i !== Object.keys( fieldsList ).length - 1 && (
+-						<DropdownMenuV2.Separator />
++						<Menu.Separator />
+ 					) }
+ 				</Fragment>
+ 			) ) }
+@@ -175,7 +175,7 @@ function EditableBlockBindingsPanelItems( {
+ 							} );
+ 						} }
+ 					>
+-						<DropdownMenuV2
++						<Menu
+ 							placement={
+ 								isMobile ? 'bottom-start' : 'left-start'
+ 							}
+@@ -195,7 +195,7 @@ function EditableBlockBindingsPanelItems( {
+ 								attribute={ attribute }
+ 								binding={ binding }
+ 							/>
+-						</DropdownMenuV2>
++						</Menu>
+ 					</ToolsPanelItem>
+ 				);
+ 			} ) }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a9f1286bdc4167..1b75c498c47425 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -25,6 +25,7 @@
+ -   `Tabs`: update indicator more reactively ([#66207](https://github.com/WordPress/gutenberg/pull/66207)).
+ -   `Tabs` and `TabPanel`: Fix arrow key navigation in RTL ([#66201](https://github.com/WordPress/gutenberg/pull/66201)).
+ -   `Tabs`: override tablist's tabindex only when necessary ([#66209](https://github.com/WordPress/gutenberg/pull/66209)).
++-   `DropdownMenuV2`: rename to `Menu` ([#66289](https://github.com/WordPress/gutenberg/pull/66289)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/menu/README.md b/packages/components/src/menu/README.md
+index 771b5b74b24bf7..6732610c0c6cae 100644
+--- a/packages/components/src/menu/README.md
++++ b/packages/components/src/menu/README.md
+@@ -1,51 +1,51 @@
+-# `DropdownMenuV2`
++# `Menu`
+ 
+ <div class="callout callout-alert">
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-`DropdownMenuV2` displays a menu to the user (such as a set of actions or functions) triggered by a button.
++`Menu` displays a menu to the user (such as a set of actions or functions). The menu is rendered in a popover (this pattern is also known as a "Dropdown menu"), which is triggered by a button.
+ 
+ ## Design guidelines
+ 
+ ### Usage
+ 
+-#### When to use a DropdownMenu
++#### When to use a `Menu`
+ 
+-Use a DropdownMenu when you want users to:
++Use a `Menu` when you want users to:
+ 
+ -   Choose an action or change a setting from a list, AND
+ -   Only see the available choices contextually.
+ 
+-`DropdownMenu` is a React component to render an expandable menu of buttons. It is similar in purpose to a `<select>` element, with the distinction that it does not maintain a value. Instead, each option behaves as an action button.
++`Menu` is a React component to render an expandable menu of buttons. It is similar in purpose to a `<select>` element, with the distinction that it does not maintain a value. Instead, each option behaves as an action button.
+ 
+-If you need to display all the available options at all times, consider using a Toolbar instead. Use a `DropdownMenu` to display a list of actions after the user interacts with a button.
++If you need to display all the available options at all times, consider using a Toolbar instead. Use a `Menu` to display a list of actions after the user interacts with a button.
+ 
+ **Do**
+-Use a `DropdownMenu` to display a list of actions after the user interacts with an icon.
++Use a `Menu` to display a list of actions after the user interacts with an icon.
+ 
+-**Don’t** use a `DropdownMenu` for important actions that should always be visible. Use a `Toolbar` instead.
++**Don’t** use a `Menu` for important actions that should always be visible. Use a `Toolbar` instead.
+ 
+ **Don’t**
+-Don’t use a `DropdownMenu` for frequently used actions. Use a `Toolbar` instead.
++Don’t use a `Menu` for frequently used actions. Use a `Toolbar` instead.
+ 
+ #### Behavior
+ 
+-Generally, the parent button should indicate that interacting with it will show a `DropdownMenu`.
++Generally, the parent button should indicate that interacting with it will show a `Menu`.
+ 
+-The parent button should retain the same visual styling regardless of whether the `DropdownMenu` is displayed or not.
++The parent button should retain the same visual styling regardless of whether the `Menu` is displayed or not.
+ 
+ #### Placement
+ 
+-The `DropdownMenu` should typically appear directly below, or below and to the left of, the parent button. If there isn’t enough space below to display the full `DropdownMenu`, it can be displayed instead above the parent button.
++The `Menu` should typically appear directly below, or below and to the left of, the parent button. If there isn’t enough space below to display the full `Menu`, it can be displayed instead above the parent button.
+ 
+ ## Development guidelines
+ 
+ This component is still highly experimental, and it's not normally accessible to consumers of the `@wordpress/components` package.
+ 
+-The component exposes a set of components that are meant to be used in combination with each other in order to implement a `DropdownMenu` correctly.
++The component exposes a set of components that are meant to be used in combination with each other in order to implement a `Menu` correctly.
+ 
+-### `DropdownMenuV2`
++### `Menu`
+ 
+ The root component, used to specify the menu's trigger and its contents.
+ 
+@@ -55,45 +55,45 @@ The component accepts the following props:
+ 
+ ##### `trigger`: `React.ReactNode`
+ 
+-The trigger button
++The button triggering the menu popover.
+ 
+ -   Required: yes
+ 
+ ##### `children`: `React.ReactNode`
+ 
+-The contents of the dropdown
++The contents of the menu (ie. one or more menu items).
+ 
+ -   Required: yes
+ 
+ ##### `defaultOpen`: `boolean`
+ 
+-The open state of the dropdown menu when it is initially rendered. Use when not wanting to control its open state.
++The open state of the menu popover when it is initially rendered. Use when not wanting to control its open state.
+ 
+ -   Required: no
+ -   Default: `false`
+ 
+ ##### `open`: `boolean`
+ 
+-The controlled open state of the dropdown menu. Must be used in conjunction with `onOpenChange`.
++The controlled open state of the menu popover. Must be used in conjunction with `onOpenChange`.
+ 
+ -   Required: no
+ 
+ ##### `onOpenChange`: `(open: boolean) => void`
+ 
+-Event handler called when the open state of the dropdown menu changes.
++Event handler called when the open state of the menu popover changes.
+ 
+ -   Required: no
+ 
+ ##### `modal`: `boolean`
+ 
+-The modality of the dropdown menu. When set to true, interaction with outside elements will be disabled and only menu content will be visible to screen readers.
++The modality of the menu popover. When set to true, interaction with outside elements will be disabled and only menu content will be visible to screen readers.
+ 
+ -   Required: no
+ -   Default: `true`
+ 
+ ##### `placement`: ``'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
+ 
+-The placement of the dropdown menu popover.
++The placement of the menu popover.
+ 
+ -   Required: no
+ -   Default: `'bottom-start'` for root-level menus, `'right-start'` for nested menus
+@@ -112,7 +112,7 @@ The skidding of the popover along the anchor element. Can be set to negative val
+ -   Required: no
+ -   Default: `0` for root-level menus, `-8` for nested menus
+ 
+-### `DropdownMenuV2.Item`
++### `Menu.Item`
+ 
+ Used to render a menu item.
+ 
+@@ -140,7 +140,7 @@ The contents of the item's suffix.
+ 
+ ##### `hideOnClick`: `boolean`
+ 
+-Whether to hide the dropdown menu when the menu item is clicked.
++Whether to hide the menu popover when the menu item is clicked.
+ 
+ -   Required: no
+ -   Default: `true`
+@@ -152,7 +152,7 @@ Determines if the element is disabled.
+ -   Required: no
+ -   Default: `false`
+ 
+-### `DropdownMenuV2.CheckboxItem`
++### `Menu.CheckboxItem`
+ 
+ Used to render a checkbox item.
+ 
+@@ -174,7 +174,7 @@ The contents of the item's suffix.
+ 
+ ##### `hideOnClick`: `boolean`
+ 
+-Whether to hide the dropdown menu when the menu item is clicked.
++Whether to hide the menu popover when the menu item is clicked.
+ 
+ -   Required: no
+ -   Default: `false`
+@@ -218,7 +218,7 @@ Event handler called when the checked state of the checkbox menu item changes.
+ 
+ -   Required: no
+ 
+-### `DropdownMenuV2.RadioItem`
++### `Menu.RadioItem`
+ 
+ Used to render a radio item.
+ 
+@@ -240,7 +240,7 @@ The contents of the item's suffix.
+ 
+ ##### `hideOnClick`: `boolean`
+ 
+-Whether to hide the dropdown menu when the menu item is clicked.
++Whether to hide the menu popover when the menu item is clicked.
+ 
+ -   Required: no
+ -   Default: `false`
+@@ -283,7 +283,7 @@ Event handler called when the checked radio menu item changes.
+ 
+ -   Required: no
+ 
+-### `DropdownMenuV2.ItemLabel`
++### `Menu.ItemLabel`
+ 
+ Used to render the menu item's label.
+ 
+@@ -297,7 +297,7 @@ The label contents.
+ 
+ -   Required: yes
+ 
+-### `DropdownMenuV2.ItemHelpText`
++### `Menu.ItemHelpText`
+ 
+ Used to render the menu item's help text.
+ 
+@@ -311,7 +311,7 @@ The help text contents.
+ 
+ -   Required: yes
+ 
+-### `DropdownMenuV2.Group`
++### `Menu.Group`
+ 
+ Used to group menu items.
+ 
+@@ -321,11 +321,11 @@ The component accepts the following props:
+ 
+ ##### `children`: `React.ReactNode`
+ 
+-The contents of the group.
++The contents of the menu group (ie. an optional menu group label and one or more menu items).
+ 
+ -   Required: yes
+ 
+-### `DropdownMenuV2.GroupLabel`
++### `Menu.GroupLabel`
+ 
+ Used to render a group label. The label text should be kept as short as possible.
+ 
+@@ -335,10 +335,10 @@ The component accepts the following props:
+ 
+ ##### `children`: `React.ReactNode`
+ 
+-The contents of the group label.
++The contents of the menu group label.
+ 
+ -   Required: yes
+ 
+-### `DropdownMenuV2.Separator`
++### `Menu.Separator`
+ 
+ Used to render a visual separator.
+diff --git a/packages/components/src/menu/checkbox-item.tsx b/packages/components/src/menu/checkbox-item.tsx
+index bcbc920cbb7205..b9a9b8105e517e 100644
+--- a/packages/components/src/menu/checkbox-item.tsx
++++ b/packages/components/src/menu/checkbox-item.tsx
+@@ -13,33 +13,33 @@ import { Icon, check } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import { DropdownMenuContext } from './context';
+-import type { DropdownMenuCheckboxItemProps } from './types';
++import { MenuContext } from './context';
++import type { MenuCheckboxItemProps } from './types';
+ import * as Styled from './styles';
+ import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
+ 
+-export const DropdownMenuCheckboxItem = forwardRef<
++export const MenuCheckboxItem = forwardRef<
+ 	HTMLDivElement,
+-	WordPressComponentProps< DropdownMenuCheckboxItemProps, 'div', false >
+->( function DropdownMenuCheckboxItem(
++	WordPressComponentProps< MenuCheckboxItemProps, 'div', false >
++>( function MenuCheckboxItem(
+ 	{ suffix, children, onBlur, hideOnClick = false, ...props },
+ 	ref
+ ) {
+ 	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
+ 	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
+-	const dropdownMenuContext = useContext( DropdownMenuContext );
++	const menuContext = useContext( MenuContext );
+ 
+ 	return (
+-		<Styled.DropdownMenuCheckboxItem
++		<Styled.MenuCheckboxItem
+ 			ref={ ref }
+ 			{ ...props }
+ 			{ ...focusVisibleFixProps }
+ 			accessibleWhenDisabled
+ 			hideOnClick={ hideOnClick }
+-			store={ dropdownMenuContext?.store }
++			store={ menuContext?.store }
+ 		>
+ 			<Ariakit.MenuItemCheck
+-				store={ dropdownMenuContext?.store }
++				store={ menuContext?.store }
+ 				render={ <Styled.ItemPrefixWrapper /> }
+ 				// Override some ariakit inline styles
+ 				style={ { width: 'auto', height: 'auto' } }
+@@ -47,17 +47,17 @@ export const DropdownMenuCheckboxItem = forwardRef<
+ 				<Icon icon={ check } size={ 24 } />
+ 			</Ariakit.MenuItemCheck>
+ 
+-			<Styled.DropdownMenuItemContentWrapper>
+-				<Styled.DropdownMenuItemChildrenWrapper>
++			<Styled.MenuItemContentWrapper>
++				<Styled.MenuItemChildrenWrapper>
+ 					{ children }
+-				</Styled.DropdownMenuItemChildrenWrapper>
++				</Styled.MenuItemChildrenWrapper>
+ 
+ 				{ suffix && (
+ 					<Styled.ItemSuffixWrapper>
+ 						{ suffix }
+ 					</Styled.ItemSuffixWrapper>
+ 				) }
+-			</Styled.DropdownMenuItemContentWrapper>
+-		</Styled.DropdownMenuCheckboxItem>
++			</Styled.MenuItemContentWrapper>
++		</Styled.MenuCheckboxItem>
+ 	);
+ } );
+diff --git a/packages/components/src/menu/context.tsx b/packages/components/src/menu/context.tsx
+index b285843327267f..1205015c57cbee 100644
+--- a/packages/components/src/menu/context.tsx
++++ b/packages/components/src/menu/context.tsx
+@@ -6,8 +6,8 @@ import { createContext } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { DropdownMenuContext as DropdownMenuContextType } from './types';
++import type { MenuContext as MenuContextType } from './types';
+ 
+-export const DropdownMenuContext = createContext<
+-	DropdownMenuContextType | undefined
+->( undefined );
++export const MenuContext = createContext< MenuContextType | undefined >(
++	undefined
++);
+diff --git a/packages/components/src/menu/group-label.tsx b/packages/components/src/menu/group-label.tsx
+index 7d838ef9fa620a..71c5c7de69941e 100644
+--- a/packages/components/src/menu/group-label.tsx
++++ b/packages/components/src/menu/group-label.tsx
+@@ -7,18 +7,18 @@ import { forwardRef, useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import { DropdownMenuContext } from './context';
++import { MenuContext } from './context';
+ import { Text } from '../text';
+-import type { DropdownMenuGroupLabelProps } from './types';
++import type { MenuGroupLabelProps } from './types';
+ import * as Styled from './styles';
+ 
+-export const DropdownMenuGroupLabel = forwardRef<
++export const MenuGroupLabel = forwardRef<
+ 	HTMLDivElement,
+-	WordPressComponentProps< DropdownMenuGroupLabelProps, 'div', false >
+->( function DropdownMenuGroup( props, ref ) {
+-	const dropdownMenuContext = useContext( DropdownMenuContext );
++	WordPressComponentProps< MenuGroupLabelProps, 'div', false >
++>( function MenuGroup( props, ref ) {
++	const menuContext = useContext( MenuContext );
+ 	return (
+-		<Styled.DropdownMenuGroupLabel
++		<Styled.MenuGroupLabel
+ 			ref={ ref }
+ 			render={
+ 				// @ts-expect-error The `children` prop is passed
+@@ -31,7 +31,7 @@ export const DropdownMenuGroupLabel = forwardRef<
+ 				/>
+ 			}
+ 			{ ...props }
+-			store={ dropdownMenuContext?.store }
++			store={ menuContext?.store }
+ 		/>
+ 	);
+ } );
+diff --git a/packages/components/src/menu/group.tsx b/packages/components/src/menu/group.tsx
+index f2bf79015bc691..f9a4138fe43580 100644
+--- a/packages/components/src/menu/group.tsx
++++ b/packages/components/src/menu/group.tsx
+@@ -7,20 +7,20 @@ import { forwardRef, useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import { DropdownMenuContext } from './context';
+-import type { DropdownMenuGroupProps } from './types';
++import { MenuContext } from './context';
++import type { MenuGroupProps } from './types';
+ import * as Styled from './styles';
+ 
+-export const DropdownMenuGroup = forwardRef<
++export const MenuGroup = forwardRef<
+ 	HTMLDivElement,
+-	WordPressComponentProps< DropdownMenuGroupProps, 'div', false >
+->( function DropdownMenuGroup( props, ref ) {
+-	const dropdownMenuContext = useContext( DropdownMenuContext );
++	WordPressComponentProps< MenuGroupProps, 'div', false >
++>( function MenuGroup( props, ref ) {
++	const menuContext = useContext( MenuContext );
+ 	return (
+-		<Styled.DropdownMenuGroup
++		<Styled.MenuGroup
+ 			ref={ ref }
+ 			{ ...props }
+-			store={ dropdownMenuContext?.store }
++			store={ menuContext?.store }
+ 		/>
+ 	);
+ } );
+diff --git a/packages/components/src/menu/index.tsx b/packages/components/src/menu/index.tsx
+index 50c4f3069d51b5..6f6e89b0a1c72b 100644
+--- a/packages/components/src/menu/index.tsx
++++ b/packages/components/src/menu/index.tsx
+@@ -22,23 +22,20 @@ import { chevronRightSmall } from '@wordpress/icons';
+  */
+ import { useContextSystem, contextConnect } from '../context';
+ import type { WordPressComponentProps } from '../context';
+-import type {
+-	DropdownMenuContext as DropdownMenuContextType,
+-	DropdownMenuProps,
+-} from './types';
++import type { MenuContext as MenuContextType, MenuProps } from './types';
+ import * as Styled from './styles';
+-import { DropdownMenuContext } from './context';
+-import { DropdownMenuItem } from './item';
+-import { DropdownMenuCheckboxItem } from './checkbox-item';
+-import { DropdownMenuRadioItem } from './radio-item';
+-import { DropdownMenuGroup } from './group';
+-import { DropdownMenuGroupLabel } from './group-label';
+-import { DropdownMenuSeparator } from './separator';
+-import { DropdownMenuItemLabel } from './item-label';
+-import { DropdownMenuItemHelpText } from './item-help-text';
+-
+-const UnconnectedDropdownMenu = (
+-	props: WordPressComponentProps< DropdownMenuProps, 'div', false >,
++import { MenuContext } from './context';
++import { MenuItem } from './item';
++import { MenuCheckboxItem } from './checkbox-item';
++import { MenuRadioItem } from './radio-item';
++import { MenuGroup } from './group';
++import { MenuGroupLabel } from './group-label';
++import { MenuSeparator } from './separator';
++import { MenuItemLabel } from './item-label';
++import { MenuItemHelpText } from './item-help-text';
++
++const UnconnectedMenu = (
++	props: WordPressComponentProps< MenuProps, 'div', false >,
+ 	ref: React.ForwardedRef< HTMLDivElement >
+ ) => {
+ 	const {
+@@ -62,17 +59,18 @@ const UnconnectedDropdownMenu = (
+ 
+ 		// Rest
+ 		...otherProps
+-	} = useContextSystem<
+-		typeof props & Pick< DropdownMenuContextType, 'variant' >
+-	>( props, 'DropdownMenu' );
++	} = useContextSystem< typeof props & Pick< MenuContextType, 'variant' > >(
++		props,
++		'Menu'
++	);
+ 
+-	const parentContext = useContext( DropdownMenuContext );
++	const parentContext = useContext( MenuContext );
+ 
+ 	const computedDirection = isRTL() ? 'rtl' : 'ltr';
+ 
+ 	// If an explicit value for the `placement` prop is not passed,
+-	// apply a default placement of `bottom-start` for the root dropdown,
+-	// and of `right-start` for nested dropdowns.
++	// apply a default placement of `bottom-start` for the root menu popover,
++	// and of `right-start` for nested menu popovers.
+ 	let computedPlacement =
+ 		props.placement ??
+ 		( parentContext?.store ? 'right-start' : 'bottom-start' );
+@@ -91,7 +89,7 @@ const UnconnectedDropdownMenu = (
+ 		}
+ 	}
+ 
+-	const dropdownMenuStore = Ariakit.useMenuStore( {
++	const menuStore = Ariakit.useMenuStore( {
+ 		parent: parentContext?.store,
+ 		open,
+ 		defaultOpen,
+@@ -104,25 +102,25 @@ const UnconnectedDropdownMenu = (
+ 	} );
+ 
+ 	const contextValue = useMemo(
+-		() => ( { store: dropdownMenuStore, variant } ),
+-		[ dropdownMenuStore, variant ]
++		() => ( { store: menuStore, variant } ),
++		[ menuStore, variant ]
+ 	);
+ 
+ 	// Extract the side from the applied placement — useful for animations.
+ 	// Using `currentPlacement` instead of `placement` to make sure that we
+ 	// use the final computed placement (including "flips" etc).
+ 	const appliedPlacementSide = useStoreState(
+-		dropdownMenuStore,
++		menuStore,
+ 		'currentPlacement'
+ 	).split( '-' )[ 0 ];
+ 
+ 	if (
+-		dropdownMenuStore.parent &&
+-		! ( isValidElement( trigger ) && DropdownMenuItem === trigger.type )
++		menuStore.parent &&
++		! ( isValidElement( trigger ) && MenuItem === trigger.type )
+ 	) {
+ 		// eslint-disable-next-line no-console
+ 		console.warn(
+-			'For nested DropdownMenus, the `trigger` should always be a `DropdownMenuItem`.'
++			'For nested Menus, the `trigger` should always be a `MenuItem`.'
+ 		);
+ 	}
+ 
+@@ -153,9 +151,9 @@ const UnconnectedDropdownMenu = (
+ 			{ /* Menu trigger */ }
+ 			<Ariakit.MenuButton
+ 				ref={ ref }
+-				store={ dropdownMenuStore }
++				store={ menuStore }
+ 				render={
+-					dropdownMenuStore.parent
++					menuStore.parent
+ 						? cloneElement( trigger, {
+ 								// Add submenu arrow, unless a `suffix` is explicitly specified
+ 								suffix: (
+@@ -178,13 +176,13 @@ const UnconnectedDropdownMenu = (
+ 			<Ariakit.Menu
+ 				{ ...otherProps }
+ 				modal={ modal }
+-				store={ dropdownMenuStore }
++				store={ menuStore }
+ 				// Root menu has an 8px distance from its trigger,
+ 				// otherwise 0 (which causes the submenu to slightly overlap)
+-				gutter={ gutter ?? ( dropdownMenuStore.parent ? 0 : 8 ) }
++				gutter={ gutter ?? ( menuStore.parent ? 0 : 8 ) }
+ 				// Align nested menu by the same (but opposite) amount
+ 				// as the menu container's padding.
+-				shift={ shift ?? ( dropdownMenuStore.parent ? -4 : 0 ) }
++				shift={ shift ?? ( menuStore.parent ? -4 : 0 ) }
+ 				hideOnHoverOutside={ false }
+ 				data-side={ appliedPlacementSide }
+ 				wrapperProps={ wrapperProps }
+@@ -200,45 +198,42 @@ const UnconnectedDropdownMenu = (
+ 					</Styled.MenuPopoverOuterWrapper>
+ 				) }
+ 			>
+-				<DropdownMenuContext.Provider value={ contextValue }>
++				<MenuContext.Provider value={ contextValue }>
+ 					{ children }
+-				</DropdownMenuContext.Provider>
++				</MenuContext.Provider>
+ 			</Ariakit.Menu>
+ 		</>
+ 	);
+ };
+ 
+-export const DropdownMenuV2 = Object.assign(
+-	contextConnect( UnconnectedDropdownMenu, 'DropdownMenu' ),
+-	{
+-		Context: Object.assign( DropdownMenuContext, {
+-			displayName: 'DropdownMenuV2.Context',
+-		} ),
+-		Item: Object.assign( DropdownMenuItem, {
+-			displayName: 'DropdownMenuV2.Item',
+-		} ),
+-		RadioItem: Object.assign( DropdownMenuRadioItem, {
+-			displayName: 'DropdownMenuV2.RadioItem',
+-		} ),
+-		CheckboxItem: Object.assign( DropdownMenuCheckboxItem, {
+-			displayName: 'DropdownMenuV2.CheckboxItem',
+-		} ),
+-		Group: Object.assign( DropdownMenuGroup, {
+-			displayName: 'DropdownMenuV2.Group',
+-		} ),
+-		GroupLabel: Object.assign( DropdownMenuGroupLabel, {
+-			displayName: 'DropdownMenuV2.GroupLabel',
+-		} ),
+-		Separator: Object.assign( DropdownMenuSeparator, {
+-			displayName: 'DropdownMenuV2.Separator',
+-		} ),
+-		ItemLabel: Object.assign( DropdownMenuItemLabel, {
+-			displayName: 'DropdownMenuV2.ItemLabel',
+-		} ),
+-		ItemHelpText: Object.assign( DropdownMenuItemHelpText, {
+-			displayName: 'DropdownMenuV2.ItemHelpText',
+-		} ),
+-	}
+-);
+-
+-export default DropdownMenuV2;
++export const Menu = Object.assign( contextConnect( UnconnectedMenu, 'Menu' ), {
++	Context: Object.assign( MenuContext, {
++		displayName: 'Menu.Context',
++	} ),
++	Item: Object.assign( MenuItem, {
++		displayName: 'Menu.Item',
++	} ),
++	RadioItem: Object.assign( MenuRadioItem, {
++		displayName: 'Menu.RadioItem',
++	} ),
++	CheckboxItem: Object.assign( MenuCheckboxItem, {
++		displayName: 'Menu.CheckboxItem',
++	} ),
++	Group: Object.assign( MenuGroup, {
++		displayName: 'Menu.Group',
++	} ),
++	GroupLabel: Object.assign( MenuGroupLabel, {
++		displayName: 'Menu.GroupLabel',
++	} ),
++	Separator: Object.assign( MenuSeparator, {
++		displayName: 'Menu.Separator',
++	} ),
++	ItemLabel: Object.assign( MenuItemLabel, {
++		displayName: 'Menu.ItemLabel',
++	} ),
++	ItemHelpText: Object.assign( MenuItemHelpText, {
++		displayName: 'Menu.ItemHelpText',
++	} ),
++} );
++
++export default Menu;
+diff --git a/packages/components/src/menu/item-help-text.tsx b/packages/components/src/menu/item-help-text.tsx
+index 0408d20dfbd40d..0ccc8f7461a8ff 100644
+--- a/packages/components/src/menu/item-help-text.tsx
++++ b/packages/components/src/menu/item-help-text.tsx
+@@ -9,15 +9,11 @@ import { forwardRef } from '@wordpress/element';
+ import type { WordPressComponentProps } from '../context';
+ import * as Styled from './styles';
+ 
+-export const DropdownMenuItemHelpText = forwardRef<
++export const MenuItemHelpText = forwardRef<
+ 	HTMLSpanElement,
+ 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
+->( function DropdownMenuItemHelpText( props, ref ) {
++>( function MenuItemHelpText( props, ref ) {
+ 	return (
+-		<Styled.DropdownMenuItemHelpText
+-			numberOfLines={ 2 }
+-			ref={ ref }
+-			{ ...props }
+-		/>
++		<Styled.MenuItemHelpText numberOfLines={ 2 } ref={ ref } { ...props } />
+ 	);
+ } );
+diff --git a/packages/components/src/menu/item-label.tsx b/packages/components/src/menu/item-label.tsx
+index a1f9391af2f92d..458f69558eafbc 100644
+--- a/packages/components/src/menu/item-label.tsx
++++ b/packages/components/src/menu/item-label.tsx
+@@ -9,15 +9,11 @@ import { forwardRef } from '@wordpress/element';
+ import type { WordPressComponentProps } from '../context';
+ import * as Styled from './styles';
+ 
+-export const DropdownMenuItemLabel = forwardRef<
++export const MenuItemLabel = forwardRef<
+ 	HTMLSpanElement,
+ 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
+->( function DropdownMenuItemLabel( props, ref ) {
++>( function MenuItemLabel( props, ref ) {
+ 	return (
+-		<Styled.DropdownMenuItemLabel
+-			numberOfLines={ 1 }
+-			ref={ ref }
+-			{ ...props }
+-		/>
++		<Styled.MenuItemLabel numberOfLines={ 1 } ref={ ref } { ...props } />
+ 	);
+ } );
+diff --git a/packages/components/src/menu/item.tsx b/packages/components/src/menu/item.tsx
+index 2680603db22aa7..f8ae670846f55f 100644
+--- a/packages/components/src/menu/item.tsx
++++ b/packages/components/src/menu/item.tsx
+@@ -7,44 +7,44 @@ import { forwardRef, useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import type { DropdownMenuItemProps } from './types';
++import type { MenuItemProps } from './types';
+ import * as Styled from './styles';
+-import { DropdownMenuContext } from './context';
++import { MenuContext } from './context';
+ import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
+ 
+-export const DropdownMenuItem = forwardRef<
++export const MenuItem = forwardRef<
+ 	HTMLDivElement,
+-	WordPressComponentProps< DropdownMenuItemProps, 'div', false >
+->( function DropdownMenuItem(
++	WordPressComponentProps< MenuItemProps, 'div', false >
++>( function MenuItem(
+ 	{ prefix, suffix, children, onBlur, hideOnClick = true, ...props },
+ 	ref
+ ) {
+ 	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
+ 	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
+-	const dropdownMenuContext = useContext( DropdownMenuContext );
++	const menuContext = useContext( MenuContext );
+ 
+ 	return (
+-		<Styled.DropdownMenuItem
++		<Styled.MenuItem
+ 			ref={ ref }
+ 			{ ...props }
+ 			{ ...focusVisibleFixProps }
+ 			accessibleWhenDisabled
+ 			hideOnClick={ hideOnClick }
+-			store={ dropdownMenuContext?.store }
++			store={ menuContext?.store }
+ 		>
+ 			<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
+ 
+-			<Styled.DropdownMenuItemContentWrapper>
+-				<Styled.DropdownMenuItemChildrenWrapper>
++			<Styled.MenuItemContentWrapper>
++				<Styled.MenuItemChildrenWrapper>
+ 					{ children }
+-				</Styled.DropdownMenuItemChildrenWrapper>
++				</Styled.MenuItemChildrenWrapper>
+ 
+ 				{ suffix && (
+ 					<Styled.ItemSuffixWrapper>
+ 						{ suffix }
+ 					</Styled.ItemSuffixWrapper>
+ 				) }
+-			</Styled.DropdownMenuItemContentWrapper>
+-		</Styled.DropdownMenuItem>
++			</Styled.MenuItemContentWrapper>
++		</Styled.MenuItem>
+ 	);
+ } );
+diff --git a/packages/components/src/menu/radio-item.tsx b/packages/components/src/menu/radio-item.tsx
+index 547d8f257cdf4b..3848d2062c0c25 100644
+--- a/packages/components/src/menu/radio-item.tsx
++++ b/packages/components/src/menu/radio-item.tsx
+@@ -13,8 +13,8 @@ import { Icon } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import { DropdownMenuContext } from './context';
+-import type { DropdownMenuRadioItemProps } from './types';
++import { MenuContext } from './context';
++import type { MenuRadioItemProps } from './types';
+ import * as Styled from './styles';
+ import { SVG, Circle } from '@wordpress/primitives';
+ import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
+@@ -25,28 +25,28 @@ const radioCheck = (
+ 	</SVG>
+ );
+ 
+-export const DropdownMenuRadioItem = forwardRef<
++export const MenuRadioItem = forwardRef<
+ 	HTMLDivElement,
+-	WordPressComponentProps< DropdownMenuRadioItemProps, 'div', false >
+->( function DropdownMenuRadioItem(
++	WordPressComponentProps< MenuRadioItemProps, 'div', false >
++>( function MenuRadioItem(
+ 	{ suffix, children, onBlur, hideOnClick = false, ...props },
+ 	ref
+ ) {
+ 	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
+ 	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
+-	const dropdownMenuContext = useContext( DropdownMenuContext );
++	const menuContext = useContext( MenuContext );
+ 
+ 	return (
+-		<Styled.DropdownMenuRadioItem
++		<Styled.MenuRadioItem
+ 			ref={ ref }
+ 			{ ...props }
+ 			{ ...focusVisibleFixProps }
+ 			accessibleWhenDisabled
+ 			hideOnClick={ hideOnClick }
+-			store={ dropdownMenuContext?.store }
++			store={ menuContext?.store }
+ 		>
+ 			<Ariakit.MenuItemCheck
+-				store={ dropdownMenuContext?.store }
++				store={ menuContext?.store }
+ 				render={ <Styled.ItemPrefixWrapper /> }
+ 				// Override some ariakit inline styles
+ 				style={ { width: 'auto', height: 'auto' } }
+@@ -54,17 +54,17 @@ export const DropdownMenuRadioItem = forwardRef<
+ 				<Icon icon={ radioCheck } size={ 24 } />
+ 			</Ariakit.MenuItemCheck>
+ 
+-			<Styled.DropdownMenuItemContentWrapper>
+-				<Styled.DropdownMenuItemChildrenWrapper>
++			<Styled.MenuItemContentWrapper>
++				<Styled.MenuItemChildrenWrapper>
+ 					{ children }
+-				</Styled.DropdownMenuItemChildrenWrapper>
++				</Styled.MenuItemChildrenWrapper>
+ 
+ 				{ suffix && (
+ 					<Styled.ItemSuffixWrapper>
+ 						{ suffix }
+ 					</Styled.ItemSuffixWrapper>
+ 				) }
+-			</Styled.DropdownMenuItemContentWrapper>
+-		</Styled.DropdownMenuRadioItem>
++			</Styled.MenuItemContentWrapper>
++		</Styled.MenuRadioItem>
+ 	);
+ } );
+diff --git a/packages/components/src/menu/separator.tsx b/packages/components/src/menu/separator.tsx
+index bc5aff7ae26118..5d0110016d9c4a 100644
+--- a/packages/components/src/menu/separator.tsx
++++ b/packages/components/src/menu/separator.tsx
+@@ -7,21 +7,21 @@ import { forwardRef, useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import { DropdownMenuContext } from './context';
+-import type { DropdownMenuSeparatorProps } from './types';
++import { MenuContext } from './context';
++import type { MenuSeparatorProps } from './types';
+ import * as Styled from './styles';
+ 
+-export const DropdownMenuSeparator = forwardRef<
++export const MenuSeparator = forwardRef<
+ 	HTMLHRElement,
+-	WordPressComponentProps< DropdownMenuSeparatorProps, 'hr', false >
+->( function DropdownMenuSeparator( props, ref ) {
+-	const dropdownMenuContext = useContext( DropdownMenuContext );
++	WordPressComponentProps< MenuSeparatorProps, 'hr', false >
++>( function MenuSeparator( props, ref ) {
++	const menuContext = useContext( MenuContext );
+ 	return (
+-		<Styled.DropdownMenuSeparator
++		<Styled.MenuSeparator
+ 			ref={ ref }
+ 			{ ...props }
+-			store={ dropdownMenuContext?.store }
+-			variant={ dropdownMenuContext?.variant }
++			store={ menuContext?.store }
++			variant={ menuContext?.variant }
+ 		/>
+ 	);
+ } );
+diff --git a/packages/components/src/menu/stories/index.story.tsx b/packages/components/src/menu/stories/index.story.tsx
+index 90d15ca2ea6c18..ecb4cc3c7593f8 100644
+--- a/packages/components/src/menu/stories/index.story.tsx
++++ b/packages/components/src/menu/stories/index.story.tsx
+@@ -14,35 +14,35 @@ import { useState, useMemo, useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { useCx } from '../../utils';
+-import DropdownMenuV2 from '..';
++import { Menu } from '..';
+ import Icon from '../../icon';
+ import Button from '../../button';
+ import Modal from '../../modal';
+ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+ import { ContextSystemProvider } from '../../context';
+ 
+-const meta: Meta< typeof DropdownMenuV2 > = {
+-	title: 'Components (Experimental)/DropdownMenu V2',
+-	component: DropdownMenuV2,
++const meta: Meta< typeof Menu > = {
++	title: 'Components (Experimental)/Menu',
++	component: Menu,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		Item: DropdownMenuV2.Item,
++		Item: Menu.Item,
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		CheckboxItem: DropdownMenuV2.CheckboxItem,
++		CheckboxItem: Menu.CheckboxItem,
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		Group: DropdownMenuV2.Group,
++		Group: Menu.Group,
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		GroupLabel: DropdownMenuV2.GroupLabel,
++		GroupLabel: Menu.GroupLabel,
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		Separator: DropdownMenuV2.Separator,
++		Separator: Menu.Separator,
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		Context: DropdownMenuV2.Context,
++		Context: Menu.Context,
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		RadioItem: DropdownMenuV2.RadioItem,
++		RadioItem: Menu.RadioItem,
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		ItemLabel: DropdownMenuV2.ItemLabel,
++		ItemLabel: Menu.ItemLabel,
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		ItemHelpText: DropdownMenuV2.ItemHelpText,
++		ItemHelpText: Menu.ItemHelpText,
+ 	},
+ 	argTypes: {
+ 		children: { control: { type: null } },
+@@ -60,52 +60,46 @@ const meta: Meta< typeof DropdownMenuV2 > = {
+ };
+ export default meta;
+ 
+-export const Default: StoryFn< typeof DropdownMenuV2 > = ( props ) => (
+-	<DropdownMenuV2 { ...props }>
+-		<DropdownMenuV2.Item>
+-			<DropdownMenuV2.ItemLabel>Label</DropdownMenuV2.ItemLabel>
+-		</DropdownMenuV2.Item>
+-		<DropdownMenuV2.Item>
+-			<DropdownMenuV2.ItemLabel>Label</DropdownMenuV2.ItemLabel>
+-			<DropdownMenuV2.ItemHelpText>Help text</DropdownMenuV2.ItemHelpText>
+-		</DropdownMenuV2.Item>
+-		<DropdownMenuV2.Item>
+-			<DropdownMenuV2.ItemLabel>Label</DropdownMenuV2.ItemLabel>
+-			<DropdownMenuV2.ItemHelpText>
++export const Default: StoryFn< typeof Menu > = ( props ) => (
++	<Menu { ...props }>
++		<Menu.Item>
++			<Menu.ItemLabel>Label</Menu.ItemLabel>
++		</Menu.Item>
++		<Menu.Item>
++			<Menu.ItemLabel>Label</Menu.ItemLabel>
++			<Menu.ItemHelpText>Help text</Menu.ItemHelpText>
++		</Menu.Item>
++		<Menu.Item>
++			<Menu.ItemLabel>Label</Menu.ItemLabel>
++			<Menu.ItemHelpText>
+ 				The menu item help text is automatically truncated when there
+ 				are more than two lines of text
+-			</DropdownMenuV2.ItemHelpText>
+-		</DropdownMenuV2.Item>
+-		<DropdownMenuV2.Item hideOnClick={ false }>
+-			<DropdownMenuV2.ItemLabel>Label</DropdownMenuV2.ItemLabel>
+-			<DropdownMenuV2.ItemHelpText>
++			</Menu.ItemHelpText>
++		</Menu.Item>
++		<Menu.Item hideOnClick={ false }>
++			<Menu.ItemLabel>Label</Menu.ItemLabel>
++			<Menu.ItemHelpText>
+ 				This item doesn&apos;t close the menu on click
+-			</DropdownMenuV2.ItemHelpText>
+-		</DropdownMenuV2.Item>
+-		<DropdownMenuV2.Item disabled>Disabled item</DropdownMenuV2.Item>
+-		<DropdownMenuV2.Separator />
+-		<DropdownMenuV2.Group>
+-			<DropdownMenuV2.GroupLabel>Group label</DropdownMenuV2.GroupLabel>
+-			<DropdownMenuV2.Item
+-				prefix={ <Icon icon={ customLink } size={ 24 } /> }
+-			>
+-				<DropdownMenuV2.ItemLabel>With prefix</DropdownMenuV2.ItemLabel>
+-			</DropdownMenuV2.Item>
+-			<DropdownMenuV2.Item suffix="⌘S">With suffix</DropdownMenuV2.Item>
+-			<DropdownMenuV2.Item
++			</Menu.ItemHelpText>
++		</Menu.Item>
++		<Menu.Item disabled>Disabled item</Menu.Item>
++		<Menu.Separator />
++		<Menu.Group>
++			<Menu.GroupLabel>Group label</Menu.GroupLabel>
++			<Menu.Item prefix={ <Icon icon={ customLink } size={ 24 } /> }>
++				<Menu.ItemLabel>With prefix</Menu.ItemLabel>
++			</Menu.Item>
++			<Menu.Item suffix="⌘S">With suffix</Menu.Item>
++			<Menu.Item
+ 				disabled
+ 				prefix={ <Icon icon={ formatCapitalize } size={ 24 } /> }
+ 				suffix="⌥⌘T"
+ 			>
+-				<DropdownMenuV2.ItemLabel>
+-					Disabled with prefix and suffix
+-				</DropdownMenuV2.ItemLabel>
+-				<DropdownMenuV2.ItemHelpText>
+-					And help text
+-				</DropdownMenuV2.ItemHelpText>
+-			</DropdownMenuV2.Item>
+-		</DropdownMenuV2.Group>
+-	</DropdownMenuV2>
++				<Menu.ItemLabel>Disabled with prefix and suffix</Menu.ItemLabel>
++				<Menu.ItemHelpText>And help text</Menu.ItemHelpText>
++			</Menu.Item>
++		</Menu.Group>
++	</Menu>
+ );
+ Default.args = {
+ 	trigger: (
+@@ -115,56 +109,46 @@ Default.args = {
+ 	),
+ };
+ 
+-export const WithSubmenu: StoryFn< typeof DropdownMenuV2 > = ( props ) => (
+-	<DropdownMenuV2 { ...props }>
+-		<DropdownMenuV2.Item>Level 1 item</DropdownMenuV2.Item>
+-		<DropdownMenuV2
++export const WithSubmenu: StoryFn< typeof Menu > = ( props ) => (
++	<Menu { ...props }>
++		<Menu.Item>Level 1 item</Menu.Item>
++		<Menu
+ 			trigger={
+-				<DropdownMenuV2.Item suffix="Suffix">
+-					<DropdownMenuV2.ItemLabel>
++				<Menu.Item suffix="Suffix">
++					<Menu.ItemLabel>
+ 						Submenu trigger item with a long label
+-					</DropdownMenuV2.ItemLabel>
+-				</DropdownMenuV2.Item>
++					</Menu.ItemLabel>
++				</Menu.Item>
+ 			}
+ 		>
+-			<DropdownMenuV2.Item>
+-				<DropdownMenuV2.ItemLabel>
+-					Level 2 item
+-				</DropdownMenuV2.ItemLabel>
+-			</DropdownMenuV2.Item>
+-			<DropdownMenuV2.Item>
+-				<DropdownMenuV2.ItemLabel>
+-					Level 2 item
+-				</DropdownMenuV2.ItemLabel>
+-			</DropdownMenuV2.Item>
+-			<DropdownMenuV2
++			<Menu.Item>
++				<Menu.ItemLabel>Level 2 item</Menu.ItemLabel>
++			</Menu.Item>
++			<Menu.Item>
++				<Menu.ItemLabel>Level 2 item</Menu.ItemLabel>
++			</Menu.Item>
++			<Menu
+ 				trigger={
+-					<DropdownMenuV2.Item>
+-						<DropdownMenuV2.ItemLabel>
+-							Submenu trigger
+-						</DropdownMenuV2.ItemLabel>
+-					</DropdownMenuV2.Item>
++					<Menu.Item>
++						<Menu.ItemLabel>Submenu trigger</Menu.ItemLabel>
++					</Menu.Item>
+ 				}
+ 			>
+-				<DropdownMenuV2.Item>
+-					<DropdownMenuV2.ItemLabel>
+-						Level 3 item
+-					</DropdownMenuV2.ItemLabel>
+-				</DropdownMenuV2.Item>
+-				<DropdownMenuV2.Item>
+-					<DropdownMenuV2.ItemLabel>
+-						Level 3 item
+-					</DropdownMenuV2.ItemLabel>
+-				</DropdownMenuV2.Item>
+-			</DropdownMenuV2>
+-		</DropdownMenuV2>
+-	</DropdownMenuV2>
++				<Menu.Item>
++					<Menu.ItemLabel>Level 3 item</Menu.ItemLabel>
++				</Menu.Item>
++				<Menu.Item>
++					<Menu.ItemLabel>Level 3 item</Menu.ItemLabel>
++				</Menu.Item>
++			</Menu>
++		</Menu>
++	</Menu>
+ );
+ WithSubmenu.args = {
+ 	...Default.args,
+ };
+ 
+-export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
++export const WithCheckboxes: StoryFn< typeof Menu > = ( props ) => {
+ 	const [ isAChecked, setAChecked ] = useState( false );
+ 	const [ isBChecked, setBChecked ] = useState( true );
+ 	const [ multipleCheckboxesValue, setMultipleCheckboxesValue ] = useState<
+@@ -172,7 +156,7 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 	>( [ 'b' ] );
+ 
+ 	const onMultipleCheckboxesCheckedChange: React.ComponentProps<
+-		typeof DropdownMenuV2.CheckboxItem
++		typeof Menu.CheckboxItem
+ 	>[ 'onChange' ] = ( e ) => {
+ 		setMultipleCheckboxesValue( ( prevValues ) => {
+ 			if ( prevValues.includes( e.target.value ) ) {
+@@ -183,241 +167,183 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 	};
+ 
+ 	return (
+-		<DropdownMenuV2 { ...props }>
+-			<DropdownMenuV2.Group>
+-				<DropdownMenuV2.GroupLabel>
++		<Menu { ...props }>
++			<Menu.Group>
++				<Menu.GroupLabel>
+ 					Single selection, uncontrolled
+-				</DropdownMenuV2.GroupLabel>
+-				<DropdownMenuV2.CheckboxItem
++				</Menu.GroupLabel>
++				<Menu.CheckboxItem
+ 					name="checkbox-individual-uncontrolled-a"
+ 					value="a"
+ 					suffix="⌥⌘T"
+ 				>
+-					<DropdownMenuV2.ItemLabel>
+-						Checkbox item A
+-					</DropdownMenuV2.ItemLabel>
+-					<DropdownMenuV2.ItemHelpText>
+-						Initially unchecked
+-					</DropdownMenuV2.ItemHelpText>
+-				</DropdownMenuV2.CheckboxItem>
+-				<DropdownMenuV2.CheckboxItem
++					<Menu.ItemLabel>Checkbox item A</Menu.ItemLabel>
++					<Menu.ItemHelpText>Initially unchecked</Menu.ItemHelpText>
++				</Menu.CheckboxItem>
++				<Menu.CheckboxItem
+ 					name="checkbox-individual-uncontrolled-b"
+ 					value="b"
+ 					defaultChecked
+ 				>
+-					<DropdownMenuV2.ItemLabel>
+-						Checkbox item B
+-					</DropdownMenuV2.ItemLabel>
+-					<DropdownMenuV2.ItemHelpText>
+-						Initially checked
+-					</DropdownMenuV2.ItemHelpText>
+-				</DropdownMenuV2.CheckboxItem>
+-			</DropdownMenuV2.Group>
+-			<DropdownMenuV2.Separator />
+-			<DropdownMenuV2.Group>
+-				<DropdownMenuV2.GroupLabel>
+-					Single selection, controlled
+-				</DropdownMenuV2.GroupLabel>
+-				<DropdownMenuV2.CheckboxItem
++					<Menu.ItemLabel>Checkbox item B</Menu.ItemLabel>
++					<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
++				</Menu.CheckboxItem>
++			</Menu.Group>
++			<Menu.Separator />
++			<Menu.Group>
++				<Menu.GroupLabel>Single selection, controlled</Menu.GroupLabel>
++				<Menu.CheckboxItem
+ 					name="checkbox-individual-controlled-a"
+ 					value="a"
+ 					checked={ isAChecked }
+ 					onChange={ ( e ) => setAChecked( e.target.checked ) }
+ 				>
+-					<DropdownMenuV2.ItemLabel>
+-						Checkbox item A
+-					</DropdownMenuV2.ItemLabel>
+-					<DropdownMenuV2.ItemHelpText>
+-						Initially unchecked
+-					</DropdownMenuV2.ItemHelpText>
+-				</DropdownMenuV2.CheckboxItem>
+-				<DropdownMenuV2.CheckboxItem
++					<Menu.ItemLabel>Checkbox item A</Menu.ItemLabel>
++					<Menu.ItemHelpText>Initially unchecked</Menu.ItemHelpText>
++				</Menu.CheckboxItem>
++				<Menu.CheckboxItem
+ 					name="checkbox-individual-controlled-b"
+ 					value="b"
+ 					checked={ isBChecked }
+ 					onChange={ ( e ) => setBChecked( e.target.checked ) }
+ 				>
+-					<DropdownMenuV2.ItemLabel>
+-						Checkbox item B
+-					</DropdownMenuV2.ItemLabel>
+-					<DropdownMenuV2.ItemHelpText>
+-						Initially checked
+-					</DropdownMenuV2.ItemHelpText>
+-				</DropdownMenuV2.CheckboxItem>
+-			</DropdownMenuV2.Group>
+-			<DropdownMenuV2.Separator />
+-			<DropdownMenuV2.Group>
+-				<DropdownMenuV2.GroupLabel>
++					<Menu.ItemLabel>Checkbox item B</Menu.ItemLabel>
++					<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
++				</Menu.CheckboxItem>
++			</Menu.Group>
++			<Menu.Separator />
++			<Menu.Group>
++				<Menu.GroupLabel>
+ 					Multiple selection, uncontrolled
+-				</DropdownMenuV2.GroupLabel>
+-				<DropdownMenuV2.CheckboxItem
++				</Menu.GroupLabel>
++				<Menu.CheckboxItem
+ 					name="checkbox-multiple-uncontrolled"
+ 					value="a"
+ 				>
+-					<DropdownMenuV2.ItemLabel>
+-						Checkbox item A
+-					</DropdownMenuV2.ItemLabel>
+-					<DropdownMenuV2.ItemHelpText>
+-						Initially unchecked
+-					</DropdownMenuV2.ItemHelpText>
+-				</DropdownMenuV2.CheckboxItem>
+-				<DropdownMenuV2.CheckboxItem
++					<Menu.ItemLabel>Checkbox item A</Menu.ItemLabel>
++					<Menu.ItemHelpText>Initially unchecked</Menu.ItemHelpText>
++				</Menu.CheckboxItem>
++				<Menu.CheckboxItem
+ 					name="checkbox-multiple-uncontrolled"
+ 					value="b"
+ 					defaultChecked
+ 				>
+-					<DropdownMenuV2.ItemLabel>
+-						Checkbox item B
+-					</DropdownMenuV2.ItemLabel>
+-					<DropdownMenuV2.ItemHelpText>
+-						Initially checked
+-					</DropdownMenuV2.ItemHelpText>
+-				</DropdownMenuV2.CheckboxItem>
+-			</DropdownMenuV2.Group>
+-			<DropdownMenuV2.Separator />
+-			<DropdownMenuV2.Group>
+-				<DropdownMenuV2.GroupLabel>
++					<Menu.ItemLabel>Checkbox item B</Menu.ItemLabel>
++					<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
++				</Menu.CheckboxItem>
++			</Menu.Group>
++			<Menu.Separator />
++			<Menu.Group>
++				<Menu.GroupLabel>
+ 					Multiple selection, controlled
+-				</DropdownMenuV2.GroupLabel>
+-				<DropdownMenuV2.CheckboxItem
++				</Menu.GroupLabel>
++				<Menu.CheckboxItem
+ 					name="checkbox-multiple-controlled"
+ 					value="a"
+ 					checked={ multipleCheckboxesValue.includes( 'a' ) }
+ 					onChange={ onMultipleCheckboxesCheckedChange }
+ 				>
+-					<DropdownMenuV2.ItemLabel>
+-						Checkbox item A
+-					</DropdownMenuV2.ItemLabel>
+-					<DropdownMenuV2.ItemHelpText>
+-						Initially unchecked
+-					</DropdownMenuV2.ItemHelpText>
+-				</DropdownMenuV2.CheckboxItem>
+-				<DropdownMenuV2.CheckboxItem
++					<Menu.ItemLabel>Checkbox item A</Menu.ItemLabel>
++					<Menu.ItemHelpText>Initially unchecked</Menu.ItemHelpText>
++				</Menu.CheckboxItem>
++				<Menu.CheckboxItem
+ 					name="checkbox-multiple-controlled"
+ 					value="b"
+ 					checked={ multipleCheckboxesValue.includes( 'b' ) }
+ 					onChange={ onMultipleCheckboxesCheckedChange }
+ 				>
+-					<DropdownMenuV2.ItemLabel>
+-						Checkbox item B
+-					</DropdownMenuV2.ItemLabel>
+-					<DropdownMenuV2.ItemHelpText>
+-						Initially checked
+-					</DropdownMenuV2.ItemHelpText>
+-				</DropdownMenuV2.CheckboxItem>
+-			</DropdownMenuV2.Group>
+-		</DropdownMenuV2>
++					<Menu.ItemLabel>Checkbox item B</Menu.ItemLabel>
++					<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
++				</Menu.CheckboxItem>
++			</Menu.Group>
++		</Menu>
+ 	);
+ };
+ WithCheckboxes.args = {
+ 	...Default.args,
+ };
+ 
+-export const WithRadios: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
++export const WithRadios: StoryFn< typeof Menu > = ( props ) => {
+ 	const [ radioValue, setRadioValue ] = useState( 'two' );
+ 	const onRadioChange: React.ComponentProps<
+-		typeof DropdownMenuV2.RadioItem
++		typeof Menu.RadioItem
+ 	>[ 'onChange' ] = ( e ) => setRadioValue( e.target.value );
+ 
+ 	return (
+-		<DropdownMenuV2 { ...props }>
+-			<DropdownMenuV2.Group>
+-				<DropdownMenuV2.GroupLabel>
+-					Uncontrolled
+-				</DropdownMenuV2.GroupLabel>
+-				<DropdownMenuV2.RadioItem name="radio-uncontrolled" value="one">
+-					<DropdownMenuV2.ItemLabel>
+-						Radio item 1
+-					</DropdownMenuV2.ItemLabel>
+-					<DropdownMenuV2.ItemHelpText>
+-						Initially unchecked
+-					</DropdownMenuV2.ItemHelpText>
+-				</DropdownMenuV2.RadioItem>
+-				<DropdownMenuV2.RadioItem
++		<Menu { ...props }>
++			<Menu.Group>
++				<Menu.GroupLabel>Uncontrolled</Menu.GroupLabel>
++				<Menu.RadioItem name="radio-uncontrolled" value="one">
++					<Menu.ItemLabel>Radio item 1</Menu.ItemLabel>
++					<Menu.ItemHelpText>Initially unchecked</Menu.ItemHelpText>
++				</Menu.RadioItem>
++				<Menu.RadioItem
+ 					name="radio-uncontrolled"
+ 					value="two"
+ 					defaultChecked
+ 				>
+-					<DropdownMenuV2.ItemLabel>
+-						Radio item 2
+-					</DropdownMenuV2.ItemLabel>
+-					<DropdownMenuV2.ItemHelpText>
+-						Initially checked
+-					</DropdownMenuV2.ItemHelpText>
+-				</DropdownMenuV2.RadioItem>
+-			</DropdownMenuV2.Group>
+-			<DropdownMenuV2.Separator />
+-			<DropdownMenuV2.Group>
+-				<DropdownMenuV2.GroupLabel>
+-					Controlled
+-				</DropdownMenuV2.GroupLabel>
+-				<DropdownMenuV2.RadioItem
++					<Menu.ItemLabel>Radio item 2</Menu.ItemLabel>
++					<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
++				</Menu.RadioItem>
++			</Menu.Group>
++			<Menu.Separator />
++			<Menu.Group>
++				<Menu.GroupLabel>Controlled</Menu.GroupLabel>
++				<Menu.RadioItem
+ 					name="radio-controlled"
+ 					value="one"
+ 					checked={ radioValue === 'one' }
+ 					onChange={ onRadioChange }
+ 				>
+-					<DropdownMenuV2.ItemLabel>
+-						Radio item 1
+-					</DropdownMenuV2.ItemLabel>
+-					<DropdownMenuV2.ItemHelpText>
+-						Initially unchecked
+-					</DropdownMenuV2.ItemHelpText>
+-				</DropdownMenuV2.RadioItem>
+-				<DropdownMenuV2.RadioItem
++					<Menu.ItemLabel>Radio item 1</Menu.ItemLabel>
++					<Menu.ItemHelpText>Initially unchecked</Menu.ItemHelpText>
++				</Menu.RadioItem>
++				<Menu.RadioItem
+ 					name="radio-controlled"
+ 					value="two"
+ 					checked={ radioValue === 'two' }
+ 					onChange={ onRadioChange }
+ 				>
+-					<DropdownMenuV2.ItemLabel>
+-						Radio item 2
+-					</DropdownMenuV2.ItemLabel>
+-					<DropdownMenuV2.ItemHelpText>
+-						Initially checked
+-					</DropdownMenuV2.ItemHelpText>
+-				</DropdownMenuV2.RadioItem>
+-			</DropdownMenuV2.Group>
+-		</DropdownMenuV2>
++					<Menu.ItemLabel>Radio item 2</Menu.ItemLabel>
++					<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
++				</Menu.RadioItem>
++			</Menu.Group>
++		</Menu>
+ 	);
+ };
+ WithRadios.args = {
+ 	...Default.args,
+ };
+ 
+-const modalOnTopOfDropdown = css`
++const modalOnTopOfMenuPopover = css`
+ 	&& {
+ 		z-index: 1000000;
+ 	}
+ `;
+ 
+ // For more examples with `Modal`, check https://ariakit.org/examples/menu-wordpress-modal
+-export const WithModals: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
++export const WithModals: StoryFn< typeof Menu > = ( props ) => {
+ 	const [ isOuterModalOpen, setOuterModalOpen ] = useState( false );
+ 	const [ isInnerModalOpen, setInnerModalOpen ] = useState( false );
+ 
+ 	const cx = useCx();
+-	const modalOverlayClassName = cx( modalOnTopOfDropdown );
++	const modalOverlayClassName = cx( modalOnTopOfMenuPopover );
+ 
+ 	return (
+ 		<>
+-			<DropdownMenuV2 { ...props }>
+-				<DropdownMenuV2.Item
++			<Menu { ...props }>
++				<Menu.Item
+ 					onClick={ () => setOuterModalOpen( true ) }
+ 					hideOnClick={ false }
+ 				>
+-					<DropdownMenuV2.ItemLabel>
+-						Open outer modal
+-					</DropdownMenuV2.ItemLabel>
+-				</DropdownMenuV2.Item>
+-				<DropdownMenuV2.Item
++					<Menu.ItemLabel>Open outer modal</Menu.ItemLabel>
++				</Menu.Item>
++				<Menu.Item
+ 					onClick={ () => setInnerModalOpen( true ) }
+ 					hideOnClick={ false }
+ 				>
+-					<DropdownMenuV2.ItemLabel>
+-						Open inner modal
+-					</DropdownMenuV2.ItemLabel>
+-				</DropdownMenuV2.Item>
++					<Menu.ItemLabel>Open inner modal</Menu.ItemLabel>
++				</Menu.Item>
+ 				{ isInnerModalOpen && (
+ 					<Modal
+ 						onRequestClose={ () => setInnerModalOpen( false ) }
+@@ -429,7 +355,7 @@ export const WithModals: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 						</button>
+ 					</Modal>
+ 				) }
+-			</DropdownMenuV2>
++			</Menu>
+ 			{ isOuterModalOpen && (
+ 				<Modal
+ 					onRequestClose={ () => setOuterModalOpen( false ) }
+@@ -451,19 +377,16 @@ WithModals.args = {
+ const ExampleSlotFill = createSlotFill( 'Example' );
+ 
+ const Slot = () => {
+-	const dropdownMenuContext = useContext( DropdownMenuV2.Context );
++	const menuContext = useContext( Menu.Context );
+ 
+ 	// Forwarding the content of the slot so that it can be used by the fill
+ 	const fillProps = useMemo(
+ 		() => ( {
+ 			forwardedContext: [
+-				[
+-					DropdownMenuV2.Context.Provider,
+-					{ value: dropdownMenuContext },
+-				],
++				[ Menu.Context.Provider, { value: menuContext } ],
+ 			],
+ 		} ),
+-		[ dropdownMenuContext ]
++		[ menuContext ]
+ 	);
+ 
+ 	return (
+@@ -499,37 +422,31 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
+ 	);
+ };
+ 
+-export const WithSlotFill: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
++export const WithSlotFill: StoryFn< typeof Menu > = ( props ) => {
+ 	return (
+ 		<SlotFillProvider>
+-			<DropdownMenuV2 { ...props }>
+-				<DropdownMenuV2.Item>
+-					<DropdownMenuV2.ItemLabel>Item</DropdownMenuV2.ItemLabel>
+-				</DropdownMenuV2.Item>
++			<Menu { ...props }>
++				<Menu.Item>
++					<Menu.ItemLabel>Item</Menu.ItemLabel>
++				</Menu.Item>
+ 				<Slot />
+-			</DropdownMenuV2>
++			</Menu>
+ 
+ 			<Fill>
+-				<DropdownMenuV2.Item>
+-					<DropdownMenuV2.ItemLabel>
+-						Item from fill
+-					</DropdownMenuV2.ItemLabel>
+-				</DropdownMenuV2.Item>
+-				<DropdownMenuV2
++				<Menu.Item>
++					<Menu.ItemLabel>Item from fill</Menu.ItemLabel>
++				</Menu.Item>
++				<Menu
+ 					trigger={
+-						<DropdownMenuV2.Item>
+-							<DropdownMenuV2.ItemLabel>
+-								Submenu from fill
+-							</DropdownMenuV2.ItemLabel>
+-						</DropdownMenuV2.Item>
++						<Menu.Item>
++							<Menu.ItemLabel>Submenu from fill</Menu.ItemLabel>
++						</Menu.Item>
+ 					}
+ 				>
+-					<DropdownMenuV2.Item>
+-						<DropdownMenuV2.ItemLabel>
+-							Submenu item from fill
+-						</DropdownMenuV2.ItemLabel>
+-					</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++					<Menu.Item>
++						<Menu.ItemLabel>Submenu item from fill</Menu.ItemLabel>
++					</Menu.Item>
++				</Menu>
+ 			</Fill>
+ 		</SlotFillProvider>
+ 	);
+@@ -539,48 +456,40 @@ WithSlotFill.args = {
+ };
+ 
+ const toolbarVariantContextValue = {
+-	DropdownMenuV2: {
++	Menu: {
+ 		variant: 'toolbar',
+ 	},
+ };
+-export const ToolbarVariant: StoryFn< typeof DropdownMenuV2 > = ( props ) => (
++export const ToolbarVariant: StoryFn< typeof Menu > = ( props ) => (
+ 	// TODO: add toolbar
+ 	<ContextSystemProvider value={ toolbarVariantContextValue }>
+-		<DropdownMenuV2 { ...props }>
+-			<DropdownMenuV2.Item>
+-				<DropdownMenuV2.ItemLabel>
+-					Level 1 item
+-				</DropdownMenuV2.ItemLabel>
+-			</DropdownMenuV2.Item>
+-			<DropdownMenuV2.Item>
+-				<DropdownMenuV2.ItemLabel>
+-					Level 1 item
+-				</DropdownMenuV2.ItemLabel>
+-			</DropdownMenuV2.Item>
+-			<DropdownMenuV2.Separator />
+-			<DropdownMenuV2
++		<Menu { ...props }>
++			<Menu.Item>
++				<Menu.ItemLabel>Level 1 item</Menu.ItemLabel>
++			</Menu.Item>
++			<Menu.Item>
++				<Menu.ItemLabel>Level 1 item</Menu.ItemLabel>
++			</Menu.Item>
++			<Menu.Separator />
++			<Menu
+ 				trigger={
+-					<DropdownMenuV2.Item>
+-						<DropdownMenuV2.ItemLabel>
+-							Submenu trigger
+-						</DropdownMenuV2.ItemLabel>
+-					</DropdownMenuV2.Item>
++					<Menu.Item>
++						<Menu.ItemLabel>Submenu trigger</Menu.ItemLabel>
++					</Menu.Item>
+ 				}
+ 			>
+-				<DropdownMenuV2.Item>
+-					<DropdownMenuV2.ItemLabel>
+-						Level 2 item
+-					</DropdownMenuV2.ItemLabel>
+-				</DropdownMenuV2.Item>
+-			</DropdownMenuV2>
+-		</DropdownMenuV2>
++				<Menu.Item>
++					<Menu.ItemLabel>Level 2 item</Menu.ItemLabel>
++				</Menu.Item>
++			</Menu>
++		</Menu>
+ 	</ContextSystemProvider>
+ );
+ ToolbarVariant.args = {
+ 	...Default.args,
+ };
+ 
+-export const InsideModal: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
++export const InsideModal: StoryFn< typeof Menu > = ( props ) => {
+ 	const [ isModalOpen, setModalOpen ] = useState( false );
+ 	return (
+ 		<>
+@@ -593,34 +502,28 @@ export const InsideModal: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 			</Button>
+ 			{ isModalOpen && (
+ 				<Modal onRequestClose={ () => setModalOpen( false ) }>
+-					<DropdownMenuV2 { ...props }>
+-						<DropdownMenuV2.Item>
+-							<DropdownMenuV2.ItemLabel>
+-								Level 1 item
+-							</DropdownMenuV2.ItemLabel>
+-						</DropdownMenuV2.Item>
+-						<DropdownMenuV2.Item>
+-							<DropdownMenuV2.ItemLabel>
+-								Level 1 item
+-							</DropdownMenuV2.ItemLabel>
+-						</DropdownMenuV2.Item>
+-						<DropdownMenuV2.Separator />
+-						<DropdownMenuV2
++					<Menu { ...props }>
++						<Menu.Item>
++							<Menu.ItemLabel>Level 1 item</Menu.ItemLabel>
++						</Menu.Item>
++						<Menu.Item>
++							<Menu.ItemLabel>Level 1 item</Menu.ItemLabel>
++						</Menu.Item>
++						<Menu.Separator />
++						<Menu
+ 							trigger={
+-								<DropdownMenuV2.Item>
+-									<DropdownMenuV2.ItemLabel>
++								<Menu.Item>
++									<Menu.ItemLabel>
+ 										Submenu trigger
+-									</DropdownMenuV2.ItemLabel>
+-								</DropdownMenuV2.Item>
++									</Menu.ItemLabel>
++								</Menu.Item>
+ 							}
+ 						>
+-							<DropdownMenuV2.Item>
+-								<DropdownMenuV2.ItemLabel>
+-									Level 2 item
+-								</DropdownMenuV2.ItemLabel>
+-							</DropdownMenuV2.Item>
+-						</DropdownMenuV2>
+-					</DropdownMenuV2>
++							<Menu.Item>
++								<Menu.ItemLabel>Level 2 item</Menu.ItemLabel>
++							</Menu.Item>
++						</Menu>
++					</Menu>
+ 					<Button onClick={ () => setModalOpen( false ) }>
+ 						Close modal
+ 					</Button>
+diff --git a/packages/components/src/menu/styles.ts b/packages/components/src/menu/styles.ts
+index b25613e9feb52b..3312c8cb2de161 100644
+--- a/packages/components/src/menu/styles.ts
++++ b/packages/components/src/menu/styles.ts
+@@ -12,7 +12,7 @@ import { COLORS, font, rtl, CONFIG } from '../utils';
+ import { space } from '../utils/space';
+ import Icon from '../icon';
+ import { Truncate } from '../truncate';
+-import type { DropdownMenuContext } from './types';
++import type { MenuContext } from './types';
+ 
+ const ANIMATION_PARAMS = {
+ 	SCALE_AMOUNT_OUTER: 0.82,
+@@ -43,7 +43,7 @@ const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VAR
+ const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
+ 
+ export const MenuPopoverOuterWrapper = styled.div<
+-	Pick< DropdownMenuContext, 'variant' >
++	Pick< MenuContext, 'variant' >
+ >`
+ 	position: relative;
+ 
+@@ -229,15 +229,15 @@ const baseItem = css`
+ 	}
+ `;
+ 
+-export const DropdownMenuItem = styled( Ariakit.MenuItem )`
++export const MenuItem = styled( Ariakit.MenuItem )`
+ 	${ baseItem };
+ `;
+ 
+-export const DropdownMenuCheckboxItem = styled( Ariakit.MenuItemCheckbox )`
++export const MenuCheckboxItem = styled( Ariakit.MenuItemCheckbox )`
+ 	${ baseItem };
+ `;
+ 
+-export const DropdownMenuRadioItem = styled( Ariakit.MenuItemRadio )`
++export const MenuRadioItem = styled( Ariakit.MenuItemRadio )`
+ 	${ baseItem };
+ `;
+ 
+@@ -249,14 +249,14 @@ export const ItemPrefixWrapper = styled.span`
+ 	 * Even when the item is not checked, occupy the same screen space to avoid
+ 	 * the space collapside when no items are checked.
+ 	 */
+-	${ DropdownMenuCheckboxItem } > &,
+-	${ DropdownMenuRadioItem } > & {
++	${ MenuCheckboxItem } > &,
++	${ MenuRadioItem } > & {
+ 		/* Same width as the check icons */
+ 		min-width: ${ space( 6 ) };
+ 	}
+ 
+-	${ DropdownMenuCheckboxItem } > &,
+-	${ DropdownMenuRadioItem } > &,
++	${ MenuCheckboxItem } > &,
++	${ MenuRadioItem } > &,
+ 	&:not( :empty ) {
+ 		margin-inline-end: ${ space( 2 ) };
+ 	}
+@@ -278,7 +278,7 @@ export const ItemPrefixWrapper = styled.span`
+ 	}
+ `;
+ 
+-export const DropdownMenuItemContentWrapper = styled.div`
++export const MenuItemContentWrapper = styled.div`
+ 	/*
+ 	 * Always occupy the second column, since the first column
+ 	 * is taken by the prefix wrapper (when displayed).
+@@ -293,7 +293,7 @@ export const DropdownMenuItemContentWrapper = styled.div`
+ 	pointer-events: none;
+ `;
+ 
+-export const DropdownMenuItemChildrenWrapper = styled.div`
++export const MenuItemChildrenWrapper = styled.div`
+ 	flex: 1;
+ 
+ 	display: inline-flex;
+@@ -324,12 +324,12 @@ export const ItemSuffixWrapper = styled.span`
+ 	}
+ `;
+ 
+-export const DropdownMenuGroup = styled( Ariakit.MenuGroup )`
++export const MenuGroup = styled( Ariakit.MenuGroup )`
+ 	/* Ignore this element when calculating the layout. Useful for subgrid */
+ 	display: contents;
+ `;
+ 
+-export const DropdownMenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
++export const MenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
+ 	/* Occupy the width of all grid columns (ie. full width) */
+ 	grid-column: 1 / -1;
+ 
+@@ -338,8 +338,8 @@ export const DropdownMenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
+ 	padding-inline: ${ ITEM_PADDING_INLINE };
+ `;
+ 
+-export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator )<
+-	Pick< DropdownMenuContext, 'variant' >
++export const MenuSeparator = styled( Ariakit.MenuSeparator )<
++	Pick< MenuContext, 'variant' >
+ >`
+ 	/* Occupy the width of all grid columns (ie. full width) */
+ 	grid-column: 1 / -1;
+@@ -370,13 +370,13 @@ export const SubmenuChevronIcon = styled( Icon )`
+ 	) };
+ `;
+ 
+-export const DropdownMenuItemLabel = styled( Truncate )`
++export const MenuItemLabel = styled( Truncate )`
+ 	font-size: ${ font( 'default.fontSize' ) };
+ 	line-height: 20px;
+ 	color: inherit;
+ `;
+ 
+-export const DropdownMenuItemHelpText = styled( Truncate )`
++export const MenuItemHelpText = styled( Truncate )`
+ 	font-size: ${ font( 'helpText.fontSize' ) };
+ 	line-height: 16px;
+ 	color: ${ LIGHTER_TEXT_COLOR };
+diff --git a/packages/components/src/menu/test/index.tsx b/packages/components/src/menu/test/index.tsx
+index cb674f27edaacf..60276cdb2379a0 100644
+--- a/packages/components/src/menu/test/index.tsx
++++ b/packages/components/src/menu/test/index.tsx
+@@ -12,34 +12,24 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { DropdownMenuV2 } from '..';
++import { Menu } from '..';
+ 
+ const delay = ( delayInMs: number ) => {
+ 	return new Promise( ( resolve ) => setTimeout( resolve, delayInMs ) );
+ };
+ 
+-describe( 'DropdownMenu', () => {
++describe( 'Menu', () => {
+ 	// See https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/
+ 	it( 'should follow the WAI-ARIA spec', async () => {
+ 		render(
+-			<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-				<DropdownMenuV2.Item>Dropdown menu item</DropdownMenuV2.Item>
+-				<DropdownMenuV2.Separator />
+-				<DropdownMenuV2
+-					trigger={
+-						<DropdownMenuV2.Item>
+-							Dropdown submenu
+-						</DropdownMenuV2.Item>
+-					}
+-				>
+-					<DropdownMenuV2.Item>
+-						Dropdown submenu item 1
+-					</DropdownMenuV2.Item>
+-					<DropdownMenuV2.Item>
+-						Dropdown submenu item 2
+-					</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
+-			</DropdownMenuV2>
++			<Menu trigger={ <button>Open dropdown</button> }>
++				<Menu.Item>Menu item</Menu.Item>
++				<Menu.Separator />
++				<Menu trigger={ <Menu.Item>Submenu trigger item</Menu.Item> }>
++					<Menu.Item>Submenu item 1</Menu.Item>
++					<Menu.Item>Submenu item 2</Menu.Item>
++				</Menu>
++			</Menu>
+ 		);
+ 
+ 		const toggleButton = screen.getByRole( 'button', {
+@@ -68,7 +58,7 @@ describe( 'DropdownMenu', () => {
+ 		expect( screen.getAllByRole( 'menuitem' ) ).toHaveLength( 2 );
+ 
+ 		const submenuTrigger = screen.getByRole( 'menuitem', {
+-			name: 'Dropdown submenu',
++			name: 'Submenu trigger item',
+ 		} );
+ 		expect( submenuTrigger ).toHaveAttribute( 'aria-haspopup', 'menu' );
+ 		expect( submenuTrigger ).toHaveAttribute( 'aria-expanded', 'false' );
+@@ -94,36 +84,32 @@ describe( 'DropdownMenu', () => {
+ 	describe( 'pointer and keyboard interactions', () => {
+ 		it( 'should open and focus the menu when clicking the trigger', async () => {
+ 			render(
+-				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-					<DropdownMenuV2.Item>
+-						Dropdown menu item
+-					</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++				<Menu trigger={ <button>Open dropdown</button> }>
++					<Menu.Item>Menu item</Menu.Item>
++				</Menu>
+ 			);
+ 
+ 			const toggleButton = screen.getByRole( 'button', {
+ 				name: 'Open dropdown',
+ 			} );
+ 
+-			// DropdownMenu closed
++			// Menu closed
+ 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+ 
+ 			// Click to open the menu
+ 			await click( toggleButton );
+ 
+-			// DropdownMenu open, focus is on the menu wrapper
++			// Menu open, focus is on the menu wrapper
+ 			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
+ 		} );
+ 
+ 		it( 'should open and focus the first item when pressing the arrow down key on the trigger', async () => {
+ 			render(
+-				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-					<DropdownMenuV2.Item disabled>
+-						First item
+-					</DropdownMenuV2.Item>
+-					<DropdownMenuV2.Item>Second item</DropdownMenuV2.Item>
+-					<DropdownMenuV2.Item>Third item</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++				<Menu trigger={ <button>Open dropdown</button> }>
++					<Menu.Item disabled>First item</Menu.Item>
++					<Menu.Item>Second item</Menu.Item>
++					<Menu.Item>Third item</Menu.Item>
++				</Menu>
+ 			);
+ 
+ 			const toggleButton = screen.getByRole( 'button', {
+@@ -135,12 +121,12 @@ describe( 'DropdownMenu', () => {
+ 
+ 			expect( toggleButton ).toHaveFocus();
+ 
+-			// DropdownMenu closed
++			// Menu closed
+ 			expect( screen.queryByRole( 'menuitem' ) ).not.toBeInTheDocument();
+ 
+ 			await press.ArrowDown();
+ 
+-			// DropdownMenu open, focus is on the first focusable item
++			// Menu open, focus is on the first focusable item
+ 			// (disabled items are still focusable and accessible)
+ 			expect(
+ 				screen.getByRole( 'menuitem', { name: 'First item' } )
+@@ -149,13 +135,11 @@ describe( 'DropdownMenu', () => {
+ 
+ 		it( 'should open and focus the first item when pressing the space key on the trigger', async () => {
+ 			render(
+-				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-					<DropdownMenuV2.Item disabled>
+-						First item
+-					</DropdownMenuV2.Item>
+-					<DropdownMenuV2.Item>Second item</DropdownMenuV2.Item>
+-					<DropdownMenuV2.Item>Third item</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++				<Menu trigger={ <button>Open dropdown</button> }>
++					<Menu.Item disabled>First item</Menu.Item>
++					<Menu.Item>Second item</Menu.Item>
++					<Menu.Item>Third item</Menu.Item>
++				</Menu>
+ 			);
+ 
+ 			const toggleButton = screen.getByRole( 'button', {
+@@ -167,12 +151,12 @@ describe( 'DropdownMenu', () => {
+ 
+ 			expect( toggleButton ).toHaveFocus();
+ 
+-			// DropdownMenu closed
++			// Menu closed
+ 			expect( screen.queryByRole( 'menuitem' ) ).not.toBeInTheDocument();
+ 
+ 			await press.Space();
+ 
+-			// DropdownMenu open, focus is on the first focusable item
++			// Menu open, focus is on the first focusable item
+ 			// (disabled items are still focusable and accessible
+ 			expect(
+ 				screen.getByRole( 'menuitem', { name: 'First item' } )
+@@ -181,11 +165,9 @@ describe( 'DropdownMenu', () => {
+ 
+ 		it( 'should close when pressing the escape key', async () => {
+ 			render(
+-				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-					<DropdownMenuV2.Item>
+-						Dropdown menu item
+-					</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++				<Menu trigger={ <button>Open dropdown</button> }>
++					<Menu.Item>Menu item</Menu.Item>
++				</Menu>
+ 			);
+ 
+ 			const trigger = screen.getByRole( 'button', {
+@@ -212,14 +194,9 @@ describe( 'DropdownMenu', () => {
+ 
+ 		it( 'should close when clicking outside of the content', async () => {
+ 			render(
+-				<DropdownMenuV2
+-					defaultOpen
+-					trigger={ <button>Open dropdown</button> }
+-				>
+-					<DropdownMenuV2.Item>
+-						Dropdown menu item
+-					</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++				<Menu defaultOpen trigger={ <button>Open dropdown</button> }>
++					<Menu.Item>Menu item</Menu.Item>
++				</Menu>
+ 			);
+ 
+ 			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
+@@ -232,14 +209,9 @@ describe( 'DropdownMenu', () => {
+ 
+ 		it( 'should close when clicking on a menu item', async () => {
+ 			render(
+-				<DropdownMenuV2
+-					defaultOpen
+-					trigger={ <button>Open dropdown</button> }
+-				>
+-					<DropdownMenuV2.Item>
+-						Dropdown menu item
+-					</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++				<Menu defaultOpen trigger={ <button>Open dropdown</button> }>
++					<Menu.Item>Menu item</Menu.Item>
++				</Menu>
+ 			);
+ 
+ 			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
+@@ -252,14 +224,9 @@ describe( 'DropdownMenu', () => {
+ 
+ 		it( 'should not close when clicking on a menu item when the `hideOnClick` prop is set to `false`', async () => {
+ 			render(
+-				<DropdownMenuV2
+-					defaultOpen
+-					trigger={ <button>Open dropdown</button> }
+-				>
+-					<DropdownMenuV2.Item hideOnClick={ false }>
+-						Dropdown menu item
+-					</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++				<Menu defaultOpen trigger={ <button>Open dropdown</button> }>
++					<Menu.Item hideOnClick={ false }>Menu item</Menu.Item>
++				</Menu>
+ 			);
+ 
+ 			expect( screen.getByRole( 'menu' ) ).toBeVisible();
+@@ -272,14 +239,9 @@ describe( 'DropdownMenu', () => {
+ 
+ 		it( 'should not close when clicking on a disabled menu item', async () => {
+ 			render(
+-				<DropdownMenuV2
+-					defaultOpen
+-					trigger={ <button>Open dropdown</button> }
+-				>
+-					<DropdownMenuV2.Item disabled>
+-						Dropdown menu item
+-					</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++				<Menu defaultOpen trigger={ <button>Open dropdown</button> }>
++					<Menu.Item disabled>Menu item</Menu.Item>
++				</Menu>
+ 			);
+ 
+ 			expect( screen.getByRole( 'menu' ) ).toBeInTheDocument();
+@@ -292,85 +254,51 @@ describe( 'DropdownMenu', () => {
+ 
+ 		it( 'should reveal submenu content when hovering over the submenu trigger', async () => {
+ 			render(
+-				<DropdownMenuV2
+-					defaultOpen
+-					trigger={ <button>Open dropdown</button> }
+-				>
+-					<DropdownMenuV2.Item>
+-						Dropdown menu item 1
+-					</DropdownMenuV2.Item>
+-					<DropdownMenuV2.Item>
+-						Dropdown menu item 2
+-					</DropdownMenuV2.Item>
+-					<DropdownMenuV2
+-						trigger={
+-							<DropdownMenuV2.Item>
+-								Dropdown submenu
+-							</DropdownMenuV2.Item>
+-						}
++				<Menu defaultOpen trigger={ <button>Open dropdown</button> }>
++					<Menu.Item>Menu item 1</Menu.Item>
++					<Menu.Item>Menu item 2</Menu.Item>
++					<Menu
++						trigger={ <Menu.Item>Submenu trigger item</Menu.Item> }
+ 					>
+-						<DropdownMenuV2.Item>
+-							Dropdown submenu item 1
+-						</DropdownMenuV2.Item>
+-						<DropdownMenuV2.Item>
+-							Dropdown submenu item 2
+-						</DropdownMenuV2.Item>
+-					</DropdownMenuV2>
+-					<DropdownMenuV2.Item>
+-						Dropdown menu item 3
+-					</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++						<Menu.Item>Submenu item 1</Menu.Item>
++						<Menu.Item>Submenu item 2</Menu.Item>
++					</Menu>
++					<Menu.Item>Menu item 3</Menu.Item>
++				</Menu>
+ 			);
+ 
+ 			// Before hover, submenu items are not rendered
+ 			expect(
+ 				screen.queryByRole( 'menuitem', {
+-					name: 'Dropdown submenu item 1',
++					name: 'Submenu item 1',
+ 				} )
+ 			).not.toBeInTheDocument();
+ 
+ 			await hover(
+-				screen.getByRole( 'menuitem', { name: 'Dropdown submenu' } )
++				screen.getByRole( 'menuitem', { name: 'Submenu trigger item' } )
+ 			);
+ 
+ 			// After hover, submenu items are rendered
+ 			// Reason for `findByRole`: due to the animation, we've got to wait
+ 			// a short amount of time for the submenu to appear
+ 			await screen.findByRole( 'menuitem', {
+-				name: 'Dropdown submenu item 1',
++				name: 'Submenu item 1',
+ 			} );
+ 		} );
+ 
+ 		it( 'should navigate menu items and subitems using the arrow, spacebar and enter keys', async () => {
+ 			render(
+-				<DropdownMenuV2
+-					defaultOpen
+-					trigger={ <button>Open dropdown</button> }
+-				>
+-					<DropdownMenuV2.Item>
+-						Dropdown menu item 1
+-					</DropdownMenuV2.Item>
+-					<DropdownMenuV2.Item>
+-						Dropdown menu item 2
+-					</DropdownMenuV2.Item>
+-					<DropdownMenuV2
+-						trigger={
+-							<DropdownMenuV2.Item>
+-								Dropdown submenu
+-							</DropdownMenuV2.Item>
+-						}
++				<Menu defaultOpen trigger={ <button>Open dropdown</button> }>
++					<Menu.Item>Menu item 1</Menu.Item>
++					<Menu.Item>Menu item 2</Menu.Item>
++					<Menu
++						trigger={ <Menu.Item>Submenu trigger item</Menu.Item> }
+ 					>
+-						<DropdownMenuV2.Item>
+-							Dropdown submenu item 1
+-						</DropdownMenuV2.Item>
+-						<DropdownMenuV2.Item>
+-							Dropdown submenu item 2
+-						</DropdownMenuV2.Item>
+-					</DropdownMenuV2>
+-					<DropdownMenuV2.Item>
+-						Dropdown menu item 3
+-					</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++						<Menu.Item>Submenu item 1</Menu.Item>
++						<Menu.Item>Submenu item 2</Menu.Item>
++					</Menu>
++					<Menu.Item>Menu item 3</Menu.Item>
++				</Menu>
+ 			);
+ 
+ 			// The menu is focused automatically when `defaultOpen` is set.
+@@ -382,58 +310,58 @@ describe( 'DropdownMenu', () => {
+ 			// The selection wraps around from last to first and viceversa
+ 			await press.ArrowDown();
+ 			expect(
+-				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 1' } )
++				screen.getByRole( 'menuitem', { name: 'Menu item 1' } )
+ 			).toHaveFocus();
+ 
+ 			await press.ArrowDown();
+ 			expect(
+-				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 2' } )
++				screen.getByRole( 'menuitem', { name: 'Menu item 2' } )
+ 			).toHaveFocus();
+ 
+ 			await press.ArrowDown();
+ 			expect(
+-				screen.getByRole( 'menuitem', { name: 'Dropdown submenu' } )
++				screen.getByRole( 'menuitem', { name: 'Submenu trigger item' } )
+ 			).toHaveFocus();
+ 
+ 			await press.ArrowDown();
+ 			expect(
+-				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 3' } )
++				screen.getByRole( 'menuitem', { name: 'Menu item 3' } )
+ 			).toHaveFocus();
+ 
+ 			await press.ArrowDown();
+ 			expect(
+-				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 1' } )
++				screen.getByRole( 'menuitem', { name: 'Menu item 1' } )
+ 			).toHaveFocus();
+ 
+ 			await press.ArrowUp();
+ 			expect(
+-				screen.getByRole( 'menuitem', { name: 'Dropdown menu item 3' } )
++				screen.getByRole( 'menuitem', { name: 'Menu item 3' } )
+ 			).toHaveFocus();
+ 
+ 			await press.ArrowUp();
+ 			expect(
+-				screen.getByRole( 'menuitem', { name: 'Dropdown submenu' } )
++				screen.getByRole( 'menuitem', { name: 'Submenu trigger item' } )
+ 			).toHaveFocus();
+ 
+ 			// Arrow right/left can be used to enter/leave submenus
+ 			await press.ArrowRight();
+ 			expect(
+ 				screen.getByRole( 'menuitem', {
+-					name: 'Dropdown submenu item 1',
++					name: 'Submenu item 1',
+ 				} )
+ 			).toHaveFocus();
+ 
+ 			await press.ArrowDown();
+ 			expect(
+ 				screen.getByRole( 'menuitem', {
+-					name: 'Dropdown submenu item 2',
++					name: 'Submenu item 2',
+ 				} )
+ 			).toHaveFocus();
+ 
+ 			await press.ArrowLeft();
+ 			expect(
+ 				screen.getByRole( 'menuitem', {
+-					name: 'Dropdown submenu',
++					name: 'Submenu trigger item',
+ 				} )
+ 			).toHaveFocus();
+ 
+@@ -441,28 +369,28 @@ describe( 'DropdownMenu', () => {
+ 			await press.Enter();
+ 			expect(
+ 				screen.getByRole( 'menuitem', {
+-					name: 'Dropdown submenu item 1',
++					name: 'Submenu item 1',
+ 				} )
+ 			).toHaveFocus();
+ 
+ 			await press.ArrowLeft();
+ 			expect(
+ 				screen.getByRole( 'menuitem', {
+-					name: 'Dropdown submenu',
++					name: 'Submenu trigger item',
+ 				} )
+ 			).toHaveFocus();
+ 
+ 			await press.Space();
+ 			expect(
+ 				screen.getByRole( 'menuitem', {
+-					name: 'Dropdown submenu item 1',
++					name: 'Submenu item 1',
+ 				} )
+ 			).toHaveFocus();
+ 
+ 			await press.ArrowLeft();
+ 			expect(
+ 				screen.getByRole( 'menuitem', {
+-					name: 'Dropdown submenu',
++					name: 'Submenu trigger item',
+ 				} )
+ 			).toHaveFocus();
+ 		} );
+@@ -473,32 +401,32 @@ describe( 'DropdownMenu', () => {
+ 			const ControlledRadioGroup = () => {
+ 				const [ radioValue, setRadioValue ] = useState( 'two' );
+ 				const onRadioChange: React.ComponentProps<
+-					typeof DropdownMenuV2.RadioItem
++					typeof Menu.RadioItem
+ 				>[ 'onChange' ] = ( e ) => {
+ 					onRadioValueChangeSpy( e.target.value );
+ 					setRadioValue( e.target.value );
+ 				};
+ 				return (
+-					<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-						<DropdownMenuV2.Group>
+-							<DropdownMenuV2.RadioItem
++					<Menu trigger={ <button>Open dropdown</button> }>
++						<Menu.Group>
++							<Menu.RadioItem
+ 								name="radio-test"
+ 								value="radio-one"
+ 								checked={ radioValue === 'radio-one' }
+ 								onChange={ onRadioChange }
+ 							>
+ 								Radio item one
+-							</DropdownMenuV2.RadioItem>
+-							<DropdownMenuV2.RadioItem
++							</Menu.RadioItem>
++							<Menu.RadioItem
+ 								name="radio-test"
+ 								value="radio-two"
+ 								checked={ radioValue === 'radio-two' }
+ 								onChange={ onRadioChange }
+ 							>
+ 								Radio item two
+-							</DropdownMenuV2.RadioItem>
+-						</DropdownMenuV2.Group>
+-					</DropdownMenuV2>
++							</Menu.RadioItem>
++						</Menu.Group>
++					</Menu>
+ 				);
+ 			};
+ 
+@@ -556,9 +484,9 @@ describe( 'DropdownMenu', () => {
+ 		it( 'should check radio items and keep the menu open when clicking (uncontrolled)', async () => {
+ 			const onRadioValueChangeSpy = jest.fn();
+ 			render(
+-				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-					<DropdownMenuV2.Group>
+-						<DropdownMenuV2.RadioItem
++				<Menu trigger={ <button>Open dropdown</button> }>
++					<Menu.Group>
++						<Menu.RadioItem
+ 							name="radio-test"
+ 							value="radio-one"
+ 							onChange={ ( e ) =>
+@@ -566,8 +494,8 @@ describe( 'DropdownMenu', () => {
+ 							}
+ 						>
+ 							Radio item one
+-						</DropdownMenuV2.RadioItem>
+-						<DropdownMenuV2.RadioItem
++						</Menu.RadioItem>
++						<Menu.RadioItem
+ 							name="radio-test"
+ 							value="radio-two"
+ 							defaultChecked
+@@ -576,9 +504,9 @@ describe( 'DropdownMenu', () => {
+ 							}
+ 						>
+ 							Radio item two
+-						</DropdownMenuV2.RadioItem>
+-					</DropdownMenuV2.Group>
+-				</DropdownMenuV2>
++						</Menu.RadioItem>
++					</Menu.Group>
++				</Menu>
+ 			);
+ 
+ 			// Open dropdown
+@@ -640,8 +568,8 @@ describe( 'DropdownMenu', () => {
+ 					useState< boolean >();
+ 
+ 				return (
+-					<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-						<DropdownMenuV2.CheckboxItem
++					<Menu trigger={ <button>Open dropdown</button> }>
++						<Menu.CheckboxItem
+ 							name="item-one"
+ 							value="item-one-value"
+ 							checked={ itemOneChecked }
+@@ -655,9 +583,9 @@ describe( 'DropdownMenu', () => {
+ 							} }
+ 						>
+ 							Checkbox item one
+-						</DropdownMenuV2.CheckboxItem>
++						</Menu.CheckboxItem>
+ 
+-						<DropdownMenuV2.CheckboxItem
++						<Menu.CheckboxItem
+ 							name="item-two"
+ 							value="item-two-value"
+ 							checked={ itemTwoChecked }
+@@ -671,8 +599,8 @@ describe( 'DropdownMenu', () => {
+ 							} }
+ 						>
+ 							Checkbox item two
+-						</DropdownMenuV2.CheckboxItem>
+-					</DropdownMenuV2>
++						</Menu.CheckboxItem>
++					</Menu>
+ 				);
+ 			};
+ 
+@@ -763,8 +691,8 @@ describe( 'DropdownMenu', () => {
+ 			const onCheckboxValueChangeSpy = jest.fn();
+ 
+ 			render(
+-				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-					<DropdownMenuV2.CheckboxItem
++				<Menu trigger={ <button>Open dropdown</button> }>
++					<Menu.CheckboxItem
+ 						name="item-one"
+ 						value="item-one-value"
+ 						onChange={ ( e ) => {
+@@ -776,9 +704,9 @@ describe( 'DropdownMenu', () => {
+ 						} }
+ 					>
+ 						Checkbox item one
+-					</DropdownMenuV2.CheckboxItem>
++					</Menu.CheckboxItem>
+ 
+-					<DropdownMenuV2.CheckboxItem
++					<Menu.CheckboxItem
+ 						name="item-two"
+ 						value="item-two-value"
+ 						defaultChecked
+@@ -791,8 +719,8 @@ describe( 'DropdownMenu', () => {
+ 						} }
+ 					>
+ 						Checkbox item two
+-					</DropdownMenuV2.CheckboxItem>
+-				</DropdownMenuV2>
++					</Menu.CheckboxItem>
++				</Menu>
+ 			);
+ 
+ 			// Open dropdown
+@@ -881,11 +809,9 @@ describe( 'DropdownMenu', () => {
+ 		it( 'should be modal by default', async () => {
+ 			render(
+ 				<>
+-					<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-						<DropdownMenuV2.Item>
+-							Dropdown menu item
+-						</DropdownMenuV2.Item>
+-					</DropdownMenuV2>
++					<Menu trigger={ <button>Open dropdown</button> }>
++						<Menu.Item>Menu item</Menu.Item>
++					</Menu>
+ 					<button>Button outside of dropdown</button>
+ 				</>
+ 			);
+@@ -897,7 +823,7 @@ describe( 'DropdownMenu', () => {
+ 				} )
+ 			);
+ 
+-			// DropdownMenu open, focus is on the menu wrapper
++			// Menu open, focus is on the menu wrapper
+ 			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
+ 
+ 			expect(
+@@ -910,14 +836,12 @@ describe( 'DropdownMenu', () => {
+ 		it( 'should not be modal when the `modal` prop is set to `false`', async () => {
+ 			render(
+ 				<>
+-					<DropdownMenuV2
++					<Menu
+ 						trigger={ <button>Open dropdown</button> }
+ 						modal={ false }
+ 					>
+-						<DropdownMenuV2.Item>
+-							Dropdown menu item
+-						</DropdownMenuV2.Item>
+-					</DropdownMenuV2>
++						<Menu.Item>Menu item</Menu.Item>
++					</Menu>
+ 					<button>Button outside of dropdown</button>
+ 				</>
+ 			);
+@@ -929,17 +853,17 @@ describe( 'DropdownMenu', () => {
+ 				} )
+ 			);
+ 
+-			// DropdownMenu open, focus is on the menu wrapper
++			// Menu open, focus is on the menu wrapper
+ 			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
+ 
+-			// DropdownMenu is not modal, therefore the outer button is part of the
++			// Menu is not modal, therefore the outer button is part of the
+ 			// accessibility tree and can be found.
+ 			const outerButton = screen.getByRole( 'button', {
+ 				name: 'Button outside of dropdown',
+ 			} );
+ 
+ 			// The outer button can be focused by pressing tab. Doing so will cause
+-			// the DropdownMenu to close.
++			// the Menu to close.
+ 			await press.Tab();
+ 			expect( outerButton ).toBeInTheDocument();
+ 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+@@ -949,11 +873,9 @@ describe( 'DropdownMenu', () => {
+ 	describe( 'items prefix and suffix', () => {
+ 		it( 'should display a prefix on regular items', async () => {
+ 			render(
+-				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-					<DropdownMenuV2.Item prefix={ <>Item prefix</> }>
+-						Dropdown menu item
+-					</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++				<Menu trigger={ <button>Open dropdown</button> }>
++					<Menu.Item prefix={ <>Item prefix</> }>Menu item</Menu.Item>
++				</Menu>
+ 			);
+ 
+ 			// Click to open the menu
+@@ -966,18 +888,16 @@ describe( 'DropdownMenu', () => {
+ 			// The contents of the prefix are rendered before the item's children
+ 			expect(
+ 				screen.getByRole( 'menuitem', {
+-					name: 'Item prefix Dropdown menu item',
++					name: 'Item prefix Menu item',
+ 				} )
+ 			).toBeInTheDocument();
+ 		} );
+ 
+ 		it( 'should display a suffix on regular items', async () => {
+ 			render(
+-				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-					<DropdownMenuV2.Item suffix={ <>Item suffix</> }>
+-						Dropdown menu item
+-					</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++				<Menu trigger={ <button>Open dropdown</button> }>
++					<Menu.Item suffix={ <>Item suffix</> }>Menu item</Menu.Item>
++				</Menu>
+ 			);
+ 
+ 			// Click to open the menu
+@@ -990,22 +910,22 @@ describe( 'DropdownMenu', () => {
+ 			// The contents of the suffix are rendered after the item's children
+ 			expect(
+ 				screen.getByRole( 'menuitem', {
+-					name: 'Dropdown menu item Item suffix',
++					name: 'Menu item Item suffix',
+ 				} )
+ 			).toBeInTheDocument();
+ 		} );
+ 
+ 		it( 'should display a suffix on radio items', async () => {
+ 			render(
+-				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-					<DropdownMenuV2.RadioItem
++				<Menu trigger={ <button>Open dropdown</button> }>
++					<Menu.RadioItem
+ 						name="radio-test"
+ 						value="radio-one"
+ 						suffix="Radio suffix"
+ 					>
+ 						Radio item one
+-					</DropdownMenuV2.RadioItem>
+-				</DropdownMenuV2>
++					</Menu.RadioItem>
++				</Menu>
+ 			);
+ 
+ 			// Click to open the menu
+@@ -1025,15 +945,15 @@ describe( 'DropdownMenu', () => {
+ 
+ 		it( 'should display a suffix on checkbox items', async () => {
+ 			render(
+-				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-					<DropdownMenuV2.CheckboxItem
++				<Menu trigger={ <button>Open dropdown</button> }>
++					<Menu.CheckboxItem
+ 						name="checkbox-test"
+ 						value="checkbox-one"
+ 						suffix="Checkbox suffix"
+ 					>
+ 						Checkbox item one
+-					</DropdownMenuV2.CheckboxItem>
+-				</DropdownMenuV2>
++					</Menu.CheckboxItem>
++				</Menu>
+ 			);
+ 
+ 			// Click to open the menu
+@@ -1055,10 +975,10 @@ describe( 'DropdownMenu', () => {
+ 	describe( 'typeahead', () => {
+ 		it( 'should highlight matching item', async () => {
+ 			render(
+-				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-					<DropdownMenuV2.Item>One</DropdownMenuV2.Item>
+-					<DropdownMenuV2.Item>Two</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++				<Menu trigger={ <button>Open dropdown</button> }>
++					<Menu.Item>One</Menu.Item>
++					<Menu.Item>Two</Menu.Item>
++				</Menu>
+ 			);
+ 
+ 			// Click to open the menu
+@@ -1088,10 +1008,10 @@ describe( 'DropdownMenu', () => {
+ 
+ 		it( 'should keep previous focus when no matches are found', async () => {
+ 			render(
+-				<DropdownMenuV2 trigger={ <button>Open dropdown</button> }>
+-					<DropdownMenuV2.Item>One</DropdownMenuV2.Item>
+-					<DropdownMenuV2.Item>Two</DropdownMenuV2.Item>
+-				</DropdownMenuV2>
++				<Menu trigger={ <button>Open dropdown</button> }>
++					<Menu.Item>One</Menu.Item>
++					<Menu.Item>Two</Menu.Item>
++				</Menu>
+ 			);
+ 
+ 			// Click to open the menu
+diff --git a/packages/components/src/menu/types.ts b/packages/components/src/menu/types.ts
+index 795cd9ac76ff58..7b58cef241743e 100644
+--- a/packages/components/src/menu/types.ts
++++ b/packages/components/src/menu/types.ts
+@@ -4,9 +4,9 @@
+ import type * as Ariakit from '@ariakit/react';
+ import type { Placement } from '@floating-ui/react-dom';
+ 
+-export interface DropdownMenuContext {
++export interface MenuContext {
+ 	/**
+-	 * The ariakit store shared across all DropdownMenu subcomponents.
++	 * The ariakit store shared across all Menu subcomponents.
+ 	 */
+ 	store: Ariakit.MenuStore;
+ 	/**
+@@ -15,33 +15,33 @@ export interface DropdownMenuContext {
+ 	variant?: 'toolbar';
+ }
+ 
+-export interface DropdownMenuProps {
++export interface MenuProps {
+ 	/**
+-	 * The trigger button.
++	 * The button triggering the menu popover.
+ 	 */
+ 	trigger: React.ReactElement;
+ 	/**
+-	 * The contents of the dropdown.
++	 * The contents of the menu (ie. one or more menu items).
+ 	 */
+ 	children?: React.ReactNode;
+ 	/**
+-	 * The open state of the dropdown menu when it is initially rendered. Use when
++	 * The open state of the menu popover when it is initially rendered. Use when
+ 	 * not wanting to control its open state.
+ 	 *
+ 	 * @default false
+ 	 */
+ 	defaultOpen?: boolean;
+ 	/**
+-	 * The controlled open state of the dropdown menu. Must be used in conjunction
++	 * The controlled open state of the menu popover. Must be used in conjunction
+ 	 * with `onOpenChange`.
+ 	 */
+ 	open?: boolean;
+ 	/**
+-	 * Event handler called when the open state of the dropdown menu changes.
++	 * Event handler called when the open state of the menu popover changes.
+ 	 */
+ 	onOpenChange?: ( open: boolean ) => void;
+ 	/**
+-	 * The modality of the dropdown menu. When set to true, interaction with
++	 * The modality of the menu popover. When set to true, interaction with
+ 	 * outside elements will be disabled and only menu content will be visible to
+ 	 * screen readers.
+ 	 *
+@@ -49,7 +49,7 @@ export interface DropdownMenuProps {
+ 	 */
+ 	modal?: boolean;
+ 	/**
+-	 * The placement of the dropdown menu popover.
++	 * The placement of the menu popover.
+ 	 *
+ 	 * @default 'bottom-start' for root-level menus, 'right-start' for nested menus
+ 	 */
+@@ -80,21 +80,22 @@ export interface DropdownMenuProps {
+ 		  ) => boolean );
+ }
+ 
+-export interface DropdownMenuGroupProps {
++export interface MenuGroupProps {
+ 	/**
+-	 * The contents of the dropdown menu group.
++	 * The contents of the menu group (ie. an optional menu group label and one
++	 * or more menu items).
+ 	 */
+ 	children: React.ReactNode;
+ }
+ 
+-export interface DropdownMenuGroupLabelProps {
++export interface MenuGroupLabelProps {
+ 	/**
+-	 * The contents of the dropdown menu group.
++	 * The contents of the menu group label.
+ 	 */
+ 	children: React.ReactNode;
+ }
+ 
+-export interface DropdownMenuItemProps {
++export interface MenuItemProps {
+ 	/**
+ 	 * The contents of the menu item.
+ 	 */
+@@ -108,7 +109,7 @@ export interface DropdownMenuItemProps {
+ 	 */
+ 	suffix?: React.ReactNode;
+ 	/**
+-	 * Whether to hide the parent menu when the item is clicked.
++	 * Whether to hide the menu popover when the menu item is clicked.
+ 	 *
+ 	 * @default true
+ 	 */
+@@ -119,10 +120,10 @@ export interface DropdownMenuItemProps {
+ 	disabled?: boolean;
+ }
+ 
+-export interface DropdownMenuCheckboxItemProps
+-	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
++export interface MenuCheckboxItemProps
++	extends Omit< MenuItemProps, 'prefix' | 'hideOnClick' > {
+ 	/**
+-	 * Whether to hide the dropdown menu when the item is clicked.
++	 * Whether to hide the menu popover when the menu item is clicked.
+ 	 *
+ 	 * @default false
+ 	 */
+@@ -151,10 +152,10 @@ export interface DropdownMenuCheckboxItemProps
+ 	onChange?: ( event: React.ChangeEvent< HTMLInputElement > ) => void;
+ }
+ 
+-export interface DropdownMenuRadioItemProps
+-	extends Omit< DropdownMenuItemProps, 'prefix' | 'hideOnClick' > {
++export interface MenuRadioItemProps
++	extends Omit< MenuItemProps, 'prefix' | 'hideOnClick' > {
+ 	/**
+-	 * Whether to hide the dropdown menu when the item is clicked.
++	 * Whether to hide the menu popover when the menu item is clicked.
+ 	 *
+ 	 * @default false
+ 	 */
+@@ -182,4 +183,4 @@ export interface DropdownMenuRadioItemProps
+ 	onChange?: ( event: React.ChangeEvent< HTMLInputElement > ) => void;
+ }
+ 
+-export interface DropdownMenuSeparatorProps {}
++export interface MenuSeparatorProps {}
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 6d28765c2f685e..bea16b719a463d 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -3,7 +3,7 @@
+  */
+ import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
+ import { createPrivateSlotFill } from './slot-fill';
+-import { DropdownMenuV2 } from './menu';
++import { Menu } from './menu';
+ import { ComponentsContext } from './context/context-system-provider';
+ import Theme from './theme';
+ import { Tabs } from './tabs';
+@@ -17,6 +17,6 @@ lock( privateApis, {
+ 	ComponentsContext,
+ 	Tabs,
+ 	Theme,
+-	DropdownMenuV2,
++	Menu,
+ 	kebabCase,
+ } );
+diff --git a/packages/components/src/toolbar/toolbar/index.tsx b/packages/components/src/toolbar/toolbar/index.tsx
+index ba2e8062aed85d..6b7f4843560fe7 100644
+--- a/packages/components/src/toolbar/toolbar/index.tsx
++++ b/packages/components/src/toolbar/toolbar/index.tsx
+@@ -40,6 +40,9 @@ function UnforwardedToolbar(
+ 			Dropdown: {
+ 				variant: 'toolbar',
+ 			},
++			Menu: {
++				variant: 'toolbar',
++			},
+ 		};
+ 	}, [ isVariantDefined ] );
+ 
+diff --git a/packages/dataviews/src/components/dataviews-filters/add-filter.tsx b/packages/dataviews/src/components/dataviews-filters/add-filter.tsx
+index c8b6b5fda38fcc..94aebb71ea5874 100644
+--- a/packages/dataviews/src/components/dataviews-filters/add-filter.tsx
++++ b/packages/dataviews/src/components/dataviews-filters/add-filter.tsx
+@@ -19,7 +19,7 @@ import { forwardRef } from '@wordpress/element';
+ import { unlock } from '../../lock-unlock';
+ import type { NormalizedFilter, View } from '../../types';
+ 
+-const { DropdownMenuV2 } = unlock( componentsPrivateApis );
++const { Menu } = unlock( componentsPrivateApis );
+ 
+ interface AddFilterProps {
+ 	filters: NormalizedFilter[];
+@@ -28,7 +28,7 @@ interface AddFilterProps {
+ 	setOpenedFilter: ( filter: string | null ) => void;
+ }
+ 
+-export function AddFilterDropdownMenu( {
++export function AddFilterMenu( {
+ 	filters,
+ 	view,
+ 	onChangeView,
+@@ -39,10 +39,10 @@ export function AddFilterDropdownMenu( {
+ } ) {
+ 	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
+ 	return (
+-		<DropdownMenuV2 trigger={ trigger }>
++		<Menu trigger={ trigger }>
+ 			{ inactiveFilters.map( ( filter ) => {
+ 				return (
+-					<DropdownMenuV2.Item
++					<Menu.Item
+ 						key={ filter.field }
+ 						onClick={ () => {
+ 							setOpenedFilter( filter.field );
+@@ -60,13 +60,11 @@ export function AddFilterDropdownMenu( {
+ 							} );
+ 						} }
+ 					>
+-						<DropdownMenuV2.ItemLabel>
+-							{ filter.name }
+-						</DropdownMenuV2.ItemLabel>
+-					</DropdownMenuV2.Item>
++						<Menu.ItemLabel>{ filter.name }</Menu.ItemLabel>
++					</Menu.Item>
+ 				);
+ 			} ) }
+-		</DropdownMenuV2>
++		</Menu>
+ 	);
+ }
+ 
+@@ -79,7 +77,7 @@ function AddFilter(
+ 	}
+ 	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
+ 	return (
+-		<AddFilterDropdownMenu
++		<AddFilterMenu
+ 			trigger={
+ 				<Button
+ 					accessibleWhenDisabled
+diff --git a/packages/dataviews/src/components/dataviews-filters/index.tsx b/packages/dataviews/src/components/dataviews-filters/index.tsx
+index 96e7f5b5d7b9d9..fd0c8e8c800163 100644
+--- a/packages/dataviews/src/components/dataviews-filters/index.tsx
++++ b/packages/dataviews/src/components/dataviews-filters/index.tsx
+@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import FilterSummary from './filter-summary';
+-import { default as AddFilter, AddFilterDropdownMenu } from './add-filter';
++import { default as AddFilter, AddFilterMenu } from './add-filter';
+ import ResetFilters from './reset-filters';
+ import DataViewsContext from '../dataviews-context';
+ import { sanitizeOperators } from '../../utils';
+@@ -100,7 +100,7 @@ export function FilterVisibilityToggle( {
+ 	}
+ 	if ( ! hasVisibleFilters ) {
+ 		return (
+-			<AddFilterDropdownMenu
++			<AddFilterMenu
+ 				filters={ filters }
+ 				view={ view }
+ 				onChangeView={ onChangeViewWithFilterVisibility }
+diff --git a/packages/dataviews/src/components/dataviews-item-actions/index.tsx b/packages/dataviews/src/components/dataviews-item-actions/index.tsx
+index e33cb0fe56d0ed..20e58a2c6bb1fb 100644
+--- a/packages/dataviews/src/components/dataviews-item-actions/index.tsx
++++ b/packages/dataviews/src/components/dataviews-item-actions/index.tsx
+@@ -23,7 +23,7 @@ import { useRegistry } from '@wordpress/data';
+ import { unlock } from '../../lock-unlock';
+ import type { Action, ActionModal as ActionModalType } from '../../types';
+ 
+-const { DropdownMenuV2, kebabCase } = unlock( componentsPrivateApis );
++const { Menu, kebabCase } = unlock( componentsPrivateApis );
+ 
+ export interface ActionTriggerProps< Item > {
+ 	action: Action< Item >;
+@@ -43,7 +43,7 @@ interface ActionWithModalProps< Item > extends ActionModalProps< Item > {
+ 	isBusy?: boolean;
+ }
+ 
+-interface ActionsDropdownMenuGroupProps< Item > {
++interface ActionsMenuGroupProps< Item > {
+ 	actions: Action< Item >[];
+ 	item: Item;
+ }
+@@ -77,7 +77,7 @@ function ButtonTrigger< Item >( {
+ 	);
+ }
+ 
+-function DropdownMenuItemTrigger< Item >( {
++function MenuItemTrigger< Item >( {
+ 	action,
+ 	onClick,
+ 	items,
+@@ -85,12 +85,12 @@ function DropdownMenuItemTrigger< Item >( {
+ 	const label =
+ 		typeof action.label === 'string' ? action.label : action.label( items );
+ 	return (
+-		<DropdownMenuV2.Item
++		<Menu.Item
+ 			onClick={ onClick }
+ 			hideOnClick={ ! ( 'RenderModal' in action ) }
+ 		>
+-			<DropdownMenuV2.ItemLabel>{ label }</DropdownMenuV2.ItemLabel>
+-		</DropdownMenuV2.Item>
++			<Menu.ItemLabel>{ label }</Menu.ItemLabel>
++		</Menu.Item>
+ 	);
+ }
+ 
+@@ -146,13 +146,13 @@ export function ActionWithModal< Item >( {
+ 	);
+ }
+ 
+-export function ActionsDropdownMenuGroup< Item >( {
++export function ActionsMenuGroup< Item >( {
+ 	actions,
+ 	item,
+-}: ActionsDropdownMenuGroupProps< Item > ) {
++}: ActionsMenuGroupProps< Item > ) {
+ 	const registry = useRegistry();
+ 	return (
+-		<DropdownMenuV2.Group>
++		<Menu.Group>
+ 			{ actions.map( ( action ) => {
+ 				if ( 'RenderModal' in action ) {
+ 					return (
+@@ -160,12 +160,12 @@ export function ActionsDropdownMenuGroup< Item >( {
+ 							key={ action.id }
+ 							action={ action }
+ 							items={ [ item ] }
+-							ActionTrigger={ DropdownMenuItemTrigger }
++							ActionTrigger={ MenuItemTrigger }
+ 						/>
+ 					);
+ 				}
+ 				return (
+-					<DropdownMenuItemTrigger
++					<MenuItemTrigger
+ 						key={ action.id }
+ 						action={ action }
+ 						onClick={ () => {
+@@ -175,7 +175,7 @@ export function ActionsDropdownMenuGroup< Item >( {
+ 					/>
+ 				);
+ 			} ) }
+-		</DropdownMenuV2.Group>
++		</Menu.Group>
+ 	);
+ }
+ 
+@@ -245,7 +245,7 @@ function CompactItemActions< Item >( {
+ 	actions,
+ }: CompactItemActionsProps< Item > ) {
+ 	return (
+-		<DropdownMenuV2
++		<Menu
+ 			trigger={
+ 				<Button
+ 					size="compact"
+@@ -258,7 +258,7 @@ function CompactItemActions< Item >( {
+ 			}
+ 			placement="bottom-end"
+ 		>
+-			<ActionsDropdownMenuGroup actions={ actions } item={ item } />
+-		</DropdownMenuV2>
++			<ActionsMenuGroup actions={ actions } item={ item } />
++		</Menu>
+ 	);
+ }
+diff --git a/packages/dataviews/src/components/dataviews-view-config/index.tsx b/packages/dataviews/src/components/dataviews-view-config/index.tsx
+index 9824f9c8e8c6f6..c8b26c51275891 100644
+--- a/packages/dataviews/src/components/dataviews-view-config/index.tsx
++++ b/packages/dataviews/src/components/dataviews-view-config/index.tsx
+@@ -51,7 +51,7 @@ import DataViewsContext from '../dataviews-context';
+ import { unlock } from '../../lock-unlock';
+ import DensityPicker from '../../dataviews-layouts/grid/density-picker';
+ 
+-const { DropdownMenuV2 } = unlock( componentsPrivateApis );
++const { Menu } = unlock( componentsPrivateApis );
+ 
+ interface ViewTypeMenuProps {
+ 	defaultLayouts?: SupportedLayouts;
+@@ -69,7 +69,7 @@ function ViewTypeMenu( {
+ 	}
+ 	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
+ 	return (
+-		<DropdownMenuV2
++		<Menu
+ 			trigger={
+ 				<Button
+ 					size="compact"
+@@ -84,7 +84,7 @@ function ViewTypeMenu( {
+ 					return null;
+ 				}
+ 				return (
+-					<DropdownMenuV2.RadioItem
++					<Menu.RadioItem
+ 						key={ layout }
+ 						value={ layout }
+ 						name="view-actions-available-view"
+@@ -104,13 +104,11 @@ function ViewTypeMenu( {
+ 							warning( 'Invalid dataview' );
+ 						} }
+ 					>
+-						<DropdownMenuV2.ItemLabel>
+-							{ config.label }
+-						</DropdownMenuV2.ItemLabel>
+-					</DropdownMenuV2.RadioItem>
++						<Menu.ItemLabel>{ config.label }</Menu.ItemLabel>
++					</Menu.RadioItem>
+ 				);
+ 			} ) }
+-		</DropdownMenuV2>
++		</Menu>
+ 	);
+ }
+ 
+diff --git a/packages/dataviews/src/dataviews-layouts/list/index.tsx b/packages/dataviews/src/dataviews-layouts/list/index.tsx
+index e737b18f5b02a9..82f9b5ea4d4fc5 100644
+--- a/packages/dataviews/src/dataviews-layouts/list/index.tsx
++++ b/packages/dataviews/src/dataviews-layouts/list/index.tsx
+@@ -32,7 +32,7 @@ import { useRegistry } from '@wordpress/data';
+  */
+ import { unlock } from '../../lock-unlock';
+ import {
+-	ActionsDropdownMenuGroup,
++	ActionsMenuGroup,
+ 	ActionModal,
+ } from '../../components/dataviews-item-actions';
+ import type { Action, NormalizedField, ViewListProps } from '../../types';
+@@ -49,7 +49,7 @@ interface ListViewItemProps< Item > {
+ 	onDropdownTriggerKeyDown: React.KeyboardEventHandler< HTMLButtonElement >;
+ }
+ 
+-const { DropdownMenuV2: DropdownMenu } = unlock( componentsPrivateApis );
++const { Menu } = unlock( componentsPrivateApis );
+ 
+ function generateItemWrapperCompositeId( idPrefix: string ) {
+ 	return `${ idPrefix }-item-wrapper`;
+@@ -195,7 +195,7 @@ function ListItem< Item >( {
+ 				/>
+ 			) }
+ 			<div role="gridcell">
+-				<DropdownMenu
++				<Menu
+ 					trigger={
+ 						<Composite.Item
+ 							id={ generateDropdownTriggerCompositeId(
+@@ -215,11 +215,11 @@ function ListItem< Item >( {
+ 					}
+ 					placement="bottom-end"
+ 				>
+-					<ActionsDropdownMenuGroup
++					<ActionsMenuGroup
+ 						actions={ eligibleActions }
+ 						item={ item }
+ 					/>
+-				</DropdownMenu>
++				</Menu>
+ 			</div>
+ 		</HStack>
+ 	);
+diff --git a/packages/dataviews/src/dataviews-layouts/table/column-header-menu.tsx b/packages/dataviews/src/dataviews-layouts/table/column-header-menu.tsx
+index aff211fb613dcf..7071e54620f369 100644
+--- a/packages/dataviews/src/dataviews-layouts/table/column-header-menu.tsx
++++ b/packages/dataviews/src/dataviews-layouts/table/column-header-menu.tsx
+@@ -29,7 +29,7 @@ import type {
+ } from '../../types';
+ import { getVisibleFieldIds } from '../index';
+ 
+-const { DropdownMenuV2 } = unlock( componentsPrivateApis );
++const { Menu } = unlock( componentsPrivateApis );
+ 
+ interface HeaderMenuProps< Item > {
+ 	fieldId: string;
+@@ -40,12 +40,12 @@ interface HeaderMenuProps< Item > {
+ 	setOpenedFilter: ( fieldId: string ) => void;
+ }
+ 
+-function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
++function WithMenuSeparators( { children }: { children: ReactNode } ) {
+ 	return Children.toArray( children )
+ 		.filter( Boolean )
+ 		.map( ( child, i ) => (
+ 			<Fragment key={ i }>
+-				{ i > 0 && <DropdownMenuV2.Separator /> }
++				{ i > 0 && <Menu.Separator /> }
+ 				{ child }
+ 			</Fragment>
+ 		) );
+@@ -101,7 +101,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
+ 	}
+ 
+ 	return (
+-		<DropdownMenuV2
++		<Menu
+ 			align="start"
+ 			trigger={
+ 				<Button
+@@ -120,9 +120,9 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
+ 			}
+ 			style={ { minWidth: '240px' } }
+ 		>
+-			<WithDropDownMenuSeparators>
++			<WithMenuSeparators>
+ 				{ isSortable && (
+-					<DropdownMenuV2.Group>
++					<Menu.Group>
+ 						{ SORTING_DIRECTIONS.map(
+ 							( direction: SortDirection ) => {
+ 								const isChecked =
+@@ -133,7 +133,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
+ 								const value = `${ fieldId }-${ direction }`;
+ 
+ 								return (
+-									<DropdownMenuV2.RadioItem
++									<Menu.RadioItem
+ 										key={ value }
+ 										// All sorting radio items share the same name, so that
+ 										// selecting a sorting option automatically deselects the
+@@ -153,18 +153,18 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
+ 											} );
+ 										} }
+ 									>
+-										<DropdownMenuV2.ItemLabel>
++										<Menu.ItemLabel>
+ 											{ sortLabels[ direction ] }
+-										</DropdownMenuV2.ItemLabel>
+-									</DropdownMenuV2.RadioItem>
++										</Menu.ItemLabel>
++									</Menu.RadioItem>
+ 								);
+ 							}
+ 						) }
+-					</DropdownMenuV2.Group>
++					</Menu.Group>
+ 				) }
+ 				{ canAddFilter && (
+-					<DropdownMenuV2.Group>
+-						<DropdownMenuV2.Item
++					<Menu.Group>
++						<Menu.Item
+ 							prefix={ <Icon icon={ funnel } /> }
+ 							onClick={ () => {
+ 								setOpenedFilter( fieldId );
+@@ -182,14 +182,14 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
+ 								} );
+ 							} }
+ 						>
+-							<DropdownMenuV2.ItemLabel>
++							<Menu.ItemLabel>
+ 								{ __( 'Add filter' ) }
+-							</DropdownMenuV2.ItemLabel>
+-						</DropdownMenuV2.Item>
+-					</DropdownMenuV2.Group>
++							</Menu.ItemLabel>
++						</Menu.Item>
++					</Menu.Group>
+ 				) }
+-				<DropdownMenuV2.Group>
+-					<DropdownMenuV2.Item
++				<Menu.Group>
++					<Menu.Item
+ 						prefix={ <Icon icon={ arrowLeft } /> }
+ 						disabled={ index < 1 }
+ 						onClick={ () => {
+@@ -207,11 +207,9 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
+ 							} );
+ 						} }
+ 					>
+-						<DropdownMenuV2.ItemLabel>
+-							{ __( 'Move left' ) }
+-						</DropdownMenuV2.ItemLabel>
+-					</DropdownMenuV2.Item>
+-					<DropdownMenuV2.Item
++						<Menu.ItemLabel>{ __( 'Move left' ) }</Menu.ItemLabel>
++					</Menu.Item>
++					<Menu.Item
+ 						prefix={ <Icon icon={ arrowRight } /> }
+ 						disabled={ index >= visibleFieldIds.length - 1 }
+ 						onClick={ () => {
+@@ -227,12 +225,10 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
+ 							} );
+ 						} }
+ 					>
+-						<DropdownMenuV2.ItemLabel>
+-							{ __( 'Move right' ) }
+-						</DropdownMenuV2.ItemLabel>
+-					</DropdownMenuV2.Item>
++						<Menu.ItemLabel>{ __( 'Move right' ) }</Menu.ItemLabel>
++					</Menu.Item>
+ 					{ isHidable && field && (
+-						<DropdownMenuV2.Item
++						<Menu.Item
+ 							prefix={ <Icon icon={ unseen } /> }
+ 							onClick={ () => {
+ 								onHide( field );
+@@ -244,14 +240,14 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
+ 								} );
+ 							} }
+ 						>
+-							<DropdownMenuV2.ItemLabel>
++							<Menu.ItemLabel>
+ 								{ __( 'Hide column' ) }
+-							</DropdownMenuV2.ItemLabel>
+-						</DropdownMenuV2.Item>
++							</Menu.ItemLabel>
++						</Menu.Item>
+ 					) }
+-				</DropdownMenuV2.Group>
+-			</WithDropDownMenuSeparators>
+-		</DropdownMenuV2>
++				</Menu.Group>
++			</WithMenuSeparators>
++		</Menu>
+ 	);
+ } );
+ 
+diff --git a/packages/edit-site/src/components/global-styles/font-sizes/font-size.js b/packages/edit-site/src/components/global-styles/font-sizes/font-size.js
+index 43418f9caf5eb6..25dcc69185cae6 100644
+--- a/packages/edit-site/src/components/global-styles/font-sizes/font-size.js
++++ b/packages/edit-site/src/components/global-styles/font-sizes/font-size.js
+@@ -27,7 +27,7 @@ import ConfirmDeleteFontSizeDialog from './confirm-delete-font-size-dialog';
+ import RenameFontSizeDialog from './rename-font-size-dialog';
+ import SizeControl from '../size-control';
+ 
+-const { DropdownMenuV2 } = unlock( componentsPrivateApis );
++const { Menu } = unlock( componentsPrivateApis );
+ const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+ 
+ function FontSize() {
+@@ -166,7 +166,7 @@ function FontSize() {
+ 								marginBottom={ 0 }
+ 								paddingX={ 4 }
+ 							>
+-								<DropdownMenuV2
++								<Menu
+ 									trigger={
+ 										<Button
+ 											size="small"
+@@ -175,21 +175,17 @@ function FontSize() {
+ 										/>
+ 									}
+ 								>
+-									<DropdownMenuV2.Item
+-										onClick={ toggleRenameDialog }
+-									>
+-										<DropdownMenuV2.ItemLabel>
++									<Menu.Item onClick={ toggleRenameDialog }>
++										<Menu.ItemLabel>
+ 											{ __( 'Rename' ) }
+-										</DropdownMenuV2.ItemLabel>
+-									</DropdownMenuV2.Item>
+-									<DropdownMenuV2.Item
+-										onClick={ toggleDeleteConfirm }
+-									>
+-										<DropdownMenuV2.ItemLabel>
++										</Menu.ItemLabel>
++									</Menu.Item>
++									<Menu.Item onClick={ toggleDeleteConfirm }>
++										<Menu.ItemLabel>
+ 											{ __( 'Delete' ) }
+-										</DropdownMenuV2.ItemLabel>
+-									</DropdownMenuV2.Item>
+-								</DropdownMenuV2>
++										</Menu.ItemLabel>
++									</Menu.Item>
++								</Menu>
+ 							</Spacer>
+ 						</FlexItem>
+ 					) }
+diff --git a/packages/edit-site/src/components/global-styles/font-sizes/font-sizes.js b/packages/edit-site/src/components/global-styles/font-sizes/font-sizes.js
+index e09dda1a82fe81..4bda7a7b3266b5 100644
+--- a/packages/edit-site/src/components/global-styles/font-sizes/font-sizes.js
++++ b/packages/edit-site/src/components/global-styles/font-sizes/font-sizes.js
+@@ -27,7 +27,7 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { unlock } from '../../../lock-unlock';
+-const { DropdownMenuV2 } = unlock( componentsPrivateApis );
++const { Menu } = unlock( componentsPrivateApis );
+ const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+ import Subtitle from '../subtitle';
+ import { NavigationButtonAsItem } from '../navigation-button';
+@@ -81,7 +81,7 @@ function FontSizeGroup( {
+ 							/>
+ 						) }
+ 						{ !! handleResetFontSizes && (
+-							<DropdownMenuV2
++							<Menu
+ 								trigger={
+ 									<Button
+ 										size="small"
+@@ -92,16 +92,14 @@ function FontSizeGroup( {
+ 									/>
+ 								}
+ 							>
+-								<DropdownMenuV2.Item
+-									onClick={ toggleResetDialog }
+-								>
+-									<DropdownMenuV2.ItemLabel>
++								<Menu.Item onClick={ toggleResetDialog }>
++									<Menu.ItemLabel>
+ 										{ origin === 'custom'
+ 											? __( 'Remove font size presets' )
+ 											: __( 'Reset font size presets' ) }
+-									</DropdownMenuV2.ItemLabel>
+-								</DropdownMenuV2.Item>
+-							</DropdownMenuV2>
++									</Menu.ItemLabel>
++								</Menu.Item>
++							</Menu>
+ 						) }
+ 					</FlexItem>
+ 				</HStack>
+diff --git a/packages/edit-site/src/components/global-styles/shadows-edit-panel.js b/packages/edit-site/src/components/global-styles/shadows-edit-panel.js
+index 7321e927fbbae3..127480ee5af497 100644
+--- a/packages/edit-site/src/components/global-styles/shadows-edit-panel.js
++++ b/packages/edit-site/src/components/global-styles/shadows-edit-panel.js
+@@ -51,7 +51,7 @@ import {
+ } from './shadow-utils';
+ 
+ const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+-const { DropdownMenuV2 } = unlock( componentsPrivateApis );
++const { Menu } = unlock( componentsPrivateApis );
+ 
+ const customShadowMenuItems = [
+ 	{
+@@ -163,7 +163,7 @@ export default function ShadowsEditPanel() {
+ 				<ScreenHeader title={ selectedShadow.name } />
+ 				<FlexItem>
+ 					<Spacer marginTop={ 2 } marginBottom={ 0 } paddingX={ 4 }>
+-						<DropdownMenuV2
++						<Menu
+ 							trigger={
+ 								<Button
+ 									size="small"
+@@ -176,7 +176,7 @@ export default function ShadowsEditPanel() {
+ 								? customShadowMenuItems
+ 								: presetShadowMenuItems
+ 							).map( ( item ) => (
+-								<DropdownMenuV2.Item
++								<Menu.Item
+ 									key={ item.action }
+ 									onClick={ () => onMenuClick( item.action ) }
+ 									disabled={
+@@ -185,12 +185,12 @@ export default function ShadowsEditPanel() {
+ 											baseSelectedShadow.shadow
+ 									}
+ 								>
+-									<DropdownMenuV2.ItemLabel>
++									<Menu.ItemLabel>
+ 										{ item.label }
+-									</DropdownMenuV2.ItemLabel>
+-								</DropdownMenuV2.Item>
++									</Menu.ItemLabel>
++								</Menu.Item>
+ 							) ) }
+-						</DropdownMenuV2>
++						</Menu>
+ 					</Spacer>
+ 				</FlexItem>
+ 			</HStack>
+diff --git a/packages/editor/src/components/post-actions/index.js b/packages/editor/src/components/post-actions/index.js
+index 8a3850e8f547c1..9f39b1f3305aeb 100644
+--- a/packages/editor/src/components/post-actions/index.js
++++ b/packages/editor/src/components/post-actions/index.js
+@@ -18,7 +18,7 @@ import { store as coreStore } from '@wordpress/core-data';
+ import { unlock } from '../../lock-unlock';
+ import { usePostActions } from './actions';
+ 
+-const { DropdownMenuV2, kebabCase } = unlock( componentsPrivateApis );
++const { Menu, kebabCase } = unlock( componentsPrivateApis );
+ 
+ export default function PostActions( { postType, postId, onActionPerformed } ) {
+ 	const [ isActionsMenuOpen, setIsActionsMenuOpen ] = useState( false );
+@@ -54,7 +54,7 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
+ 	}, [ allActions, itemWithPermissions ] );
+ 
+ 	return (
+-		<DropdownMenuV2
++		<Menu
+ 			open={ isActionsMenuOpen }
+ 			trigger={
+ 				<Button
+@@ -79,7 +79,7 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
+ 					setIsActionsMenuOpen( false );
+ 				} }
+ 			/>
+-		</DropdownMenuV2>
++		</Menu>
+ 	);
+ }
+ 
+@@ -93,12 +93,9 @@ function DropdownMenuItemTrigger( { action, onClick, items } ) {
+ 	const label =
+ 		typeof action.label === 'string' ? action.label : action.label( items );
+ 	return (
+-		<DropdownMenuV2.Item
+-			onClick={ onClick }
+-			hideOnClick={ ! action.RenderModal }
+-		>
+-			<DropdownMenuV2.ItemLabel>{ label }</DropdownMenuV2.ItemLabel>
+-		</DropdownMenuV2.Item>
++		<Menu.Item onClick={ onClick } hideOnClick={ ! action.RenderModal }>
++			<Menu.ItemLabel>{ label }</Menu.ItemLabel>
++		</Menu.Item>
+ 	);
+ }
+ 
+@@ -145,7 +142,7 @@ function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
+ // With an added onClose prop.
+ function ActionsDropdownMenuGroup( { actions, item, onClose } ) {
+ 	return (
+-		<DropdownMenuV2.Group>
++		<Menu.Group>
+ 			{ actions.map( ( action ) => {
+ 				if ( action.RenderModal ) {
+ 					return (
+@@ -167,6 +164,6 @@ function ActionsDropdownMenuGroup( { actions, item, onClose } ) {
+ 					/>
+ 				);
+ 			} ) }
+-		</DropdownMenuV2.Group>
++		</Menu.Group>
+ 	);
+ }

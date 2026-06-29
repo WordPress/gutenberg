@@ -1,0 +1,133 @@
+diff --git a/packages/commands/src/components/command-menu.js b/packages/commands/src/components/command-menu.js
+index fd68761ebd3373..8d0ef64b80eee2 100644
+--- a/packages/commands/src/components/command-menu.js
++++ b/packages/commands/src/components/command-menu.js
+@@ -271,7 +271,10 @@ export function CommandMenu() {
+ 			<div className="commands-command-menu__container">
+ 				<Command label={ inputLabel } onKeyDown={ onKeyDown }>
+ 					<div className="commands-command-menu__header">
+-						<Icon icon={ inputIcon } />
++						<Icon
++							className="commands-command-menu__header-search-icon"
++							icon={ inputIcon }
++						/>
+ 						<CommandInput
+ 							search={ search }
+ 							setSearch={ setSearch }
+diff --git a/packages/commands/src/components/style.scss b/packages/commands/src/components/style.scss
+index bcf3d17d7baa6c..e5e8a53ace69ea 100644
+--- a/packages/commands/src/components/style.scss
++++ b/packages/commands/src/components/style.scss
+@@ -42,6 +42,12 @@
+ 	}
+ }
+ 
++.commands-command-menu__header-search-icon {
++	&:dir(ltr) {
++		transform: scaleX(-1);
++	}
++}
++
+ .commands-command-menu__container {
+ 	// the style here is a hack to force safari to repaint to avoid a style glitch
+ 	will-change: transform;
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4cb009ba686992..55ff44d607445e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `SearchControl`: Move search icon to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
++-   `SearchControl`: Flip search icon depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/search-control/index.tsx b/packages/components/src/search-control/index.tsx
+index 3fac6cf0646e6f..2f371c8457ab7f 100644
+--- a/packages/components/src/search-control/index.tsx
++++ b/packages/components/src/search-control/index.tsx
+@@ -9,7 +9,7 @@ import type { ForwardedRef } from 'react';
+  */
+ import { useInstanceId, useMergeRefs } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+-import { Icon, search, closeSmall } from '@wordpress/icons';
++import { search, closeSmall } from '@wordpress/icons';
+ import { forwardRef, useMemo, useRef } from '@wordpress/element';
+ import deprecated from '@wordpress/deprecated';
+ 
+@@ -22,7 +22,7 @@ import { InputControlSuffixWrapper } from '../input-control/input-suffix-wrapper
+ import type { WordPressComponentProps } from '../context/wordpress-component';
+ import type { SearchControlProps, SuffixItemProps } from './types';
+ import { ContextSystemProvider } from '../context';
+-import { StyledInputControl } from './styles';
++import { StyledInputControl, StyledIcon } from './styles';
+ 
+ function SuffixItem( {
+ 	searchRef,
+@@ -120,7 +120,7 @@ function UnforwardedSearchControl(
+ 				value={ value ?? '' }
+ 				prefix={
+ 					<InputControlPrefixWrapper variant="icon">
+-						<Icon icon={ search } fill="currentColor" />
++						<StyledIcon icon={ search } fill="currentColor" />
+ 					</InputControlPrefixWrapper>
+ 				}
+ 				suffix={
+diff --git a/packages/components/src/search-control/styles.ts b/packages/components/src/search-control/styles.ts
+index 83c09a06c696c5..8b89813ff990eb 100644
+--- a/packages/components/src/search-control/styles.ts
++++ b/packages/components/src/search-control/styles.ts
+@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import InputControl from '../input-control';
++import Icon from '../icon';
+ import { COLORS } from '../utils';
+ 
+ export const StyledInputControl = styled( InputControl )`
+@@ -23,3 +24,9 @@ export const StyledInputControl = styled( InputControl )`
+ 		--wp-components-color-background: ${ COLORS.theme.gray[ 100 ] };
+ 	}
+ `;
++
++export const StyledIcon = styled( Icon )`
++	&:dir( ltr ) {
++		transform: scaleX( -1 );
++	}
++`;
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 3b339428b62299..939ce57b5dc9f3 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ - Dataviews: Make header table view select all checkbox always visible. ([#72050](https://github.com/WordPress/gutenberg/pull/72050))
+ - Move search icon in search fields to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
++- Flip search icons depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
+ - DataViews: Improve renderItemLink event propagation handling. ([#72081](https://github.com/WordPress/gutenberg/pull/72081)).
+ 
+ ### Breaking changes
+diff --git a/packages/dataviews/src/components/dataviews-filters/style.scss b/packages/dataviews/src/components/dataviews-filters/style.scss
+index 121e416ec7965e..36726e1fec101a 100644
+--- a/packages/dataviews/src/components/dataviews-filters/style.scss
++++ b/packages/dataviews/src/components/dataviews-filters/style.scss
+@@ -355,12 +355,16 @@
+ 	.dataviews-filters__search-widget-filter-combobox__icon {
+ 		position: absolute;
+ 		inset-inline-start: $grid-unit-15;
+-		top: 50%;
+-		transform: translateY(-50%);
++		top: 0;
++		bottom: 0;
+ 		display: flex;
+ 		align-items: center;
+ 		justify-content: center;
+ 		width: $icon-size;
++
++		&:dir(ltr) {
++			transform: scaleX(-1);
++		}
+ 	}
+ }
+ 

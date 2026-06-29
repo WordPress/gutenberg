@@ -1,0 +1,223 @@
+diff --git a/package-lock.json b/package-lock.json
+index 05f29e14727edf..97e6296fc83db9 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -57669,7 +57669,6 @@
+ 			"version": "1.12.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/i18n": "file:../i18n",
+diff --git a/packages/admin-ui/CHANGELOG.md b/packages/admin-ui/CHANGELOG.md
+index 239b894c79f831..ad4af9f74f618f 100644
+--- a/packages/admin-ui/CHANGELOG.md
++++ b/packages/admin-ui/CHANGELOG.md
+@@ -20,6 +20,10 @@
+ 
+ -   Increase page header vertical padding. [#77152](https://github.com/WordPress/gutenberg/pull/77152)
+ 
++### Internal
++
++-   `Breadcrumbs`: Migrate from `@wordpress/components` to `Link`, `Stack`, and `Text` from `@wordpress/ui`. [#77012](https://github.com/WordPress/gutenberg/pull/77012)
++
+ ## 1.11.0 (2026-04-01)
+ 
+ ### Bug Fixes
+diff --git a/packages/admin-ui/package.json b/packages/admin-ui/package.json
+index 2c500f44a88400..31c39435566d7a 100644
+--- a/packages/admin-ui/package.json
++++ b/packages/admin-ui/package.json
+@@ -45,7 +45,6 @@
+ 		"src/**/*.module.css"
+ 	],
+ 	"dependencies": {
+-		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/i18n": "file:../i18n",
+diff --git a/packages/admin-ui/src/breadcrumbs/index.tsx b/packages/admin-ui/src/breadcrumbs/index.tsx
+index e657c5cdaa18dc..4c2eb41c3d1362 100644
+--- a/packages/admin-ui/src/breadcrumbs/index.tsx
++++ b/packages/admin-ui/src/breadcrumbs/index.tsx
+@@ -1,12 +1,9 @@
+ /**
+  * WordPress dependencies
+  */
+-import { Link } from '@wordpress/route';
++import { Link as RouterLink } from '@wordpress/route';
+ import { __ } from '@wordpress/i18n';
+-import {
+-	__experimentalHeading as Heading,
+-	__experimentalHStack as HStack,
+-} from '@wordpress/components';
++import { Link, Stack, Text } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+@@ -55,28 +52,58 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
+ 
+ 	return (
+ 		<nav aria-label={ __( 'Breadcrumbs' ) }>
+-			<HStack
+-				as="ul"
++			<Stack
++				render={ <ul /> }
++				direction="row"
++				align="center"
+ 				className={ styles.list }
+-				spacing={ 0 }
+-				justify="flex-start"
+-				alignment="center"
+ 			>
+ 				{ precedingItems.map( ( item, index ) => (
+ 					<li key={ index }>
+-						<Link to={ item.to }>{ item.label }</Link>
++						<Text
++							variant="body-lg"
++							render={
++								<Link
++									tone="neutral"
++									render={ <RouterLink to={ item.to } /> }
++								/>
++							}
++						>
++							{ item.label }
++						</Text>
++						<Text
++							variant="body-lg"
++							aria-hidden="true"
++							className={ styles.separator }
++						>
++							/
++						</Text>
+ 					</li>
+ 				) ) }
+ 				<li>
+ 					{ lastItem.to ? (
+-						<Link to={ lastItem.to }>{ lastItem.label }</Link>
++						<Text
++							variant="body-lg"
++							render={
++								<Link
++									tone="neutral"
++									render={ <RouterLink to={ lastItem.to } /> }
++								/>
++							}
++						>
++							{ lastItem.label }
++						</Text>
+ 					) : (
+-						<Heading level={ 1 } truncate>
++						<Text
++							variant="heading-lg"
++							render={ <h1 /> }
++							className={ styles.current }
++						>
+ 							{ lastItem.label }
+-						</Heading>
++						</Text>
+ 					) }
+ 				</li>
+-			</HStack>
++			</Stack>
+ 		</nav>
+ 	);
+ };
+diff --git a/packages/admin-ui/src/breadcrumbs/style.module.css b/packages/admin-ui/src/breadcrumbs/style.module.css
+index deebbc8c4c9f5d..1c90137a1eb2c8 100644
+--- a/packages/admin-ui/src/breadcrumbs/style.module.css
++++ b/packages/admin-ui/src/breadcrumbs/style.module.css
+@@ -1,23 +1,33 @@
+ .list {
+-	/* @TODO: use Text component from UI when available. */
+-	font-family: var(--wpds-typography-font-family-heading);
+-	font-size: var(--wpds-typography-font-size-lg);
+-	font-weight: var(--wpds-typography-font-weight-medium);
+-	line-height: var(--wpds-typography-line-height-lg);
+ 	list-style: none;
+ 	padding: 0;
+ 	margin: 0;
+-	/* gap prop don't seem to be working properly. */
+-	gap: 0;
+-	min-height: 32px;
++	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
++	min-height: calc(var(--wpds-dimension-base) * 8);
++}
++
++/*
++ * Preceding items keep their intrinsic width; only the last (current) item
++ * is allowed to shrink so that the truncation styles on `.current` engage.
++ */
++.list > li {
++	flex-shrink: 0;
++}
+ 
+-	li:not(:last-child)::after {
+-		content: "/";
+-		margin: 0 var(--wpds-dimension-gap-sm);
+-	}
++.list > li:last-child {
++	flex-shrink: 1;
++	min-width: 0;
++}
++
++/* @TODO: Remove truncation styles once `Text` supports truncation natively. */
++.current {
++	overflow: hidden;
++	text-overflow: ellipsis;
++	white-space: nowrap;
++}
+ 
+-	h1 {
+-		font-size: inherit;
+-		line-height: inherit;
+-	}
++.separator {
++	color: var(--wpds-color-stroke-surface-neutral);
++	margin: 0 var(--wpds-dimension-gap-sm);
++	user-select: none;
+ }
+diff --git a/packages/eslint-plugin/rules/__tests__/use-recommended-components.js b/packages/eslint-plugin/rules/__tests__/use-recommended-components.js
+index 7137614d8c5eba..961ff2158b1553 100644
+--- a/packages/eslint-plugin/rules/__tests__/use-recommended-components.js
++++ b/packages/eslint-plugin/rules/__tests__/use-recommended-components.js
+@@ -27,8 +27,10 @@ ruleTester.run( 'use-recommended-components', rule, {
+ 
+ 		// Allowed @wordpress/ui components.
+ 		"import { Badge } from '@wordpress/ui';",
++		"import { Link } from '@wordpress/ui';",
+ 		"import { Stack } from '@wordpress/ui';",
+-		"import { Badge, Stack } from '@wordpress/ui';",
++		"import { Text } from '@wordpress/ui';",
++		"import { Badge, Link, Stack, Text } from '@wordpress/ui';",
+ 	],
+ 
+ 	invalid: [
+diff --git a/packages/eslint-plugin/rules/use-recommended-components.js b/packages/eslint-plugin/rules/use-recommended-components.js
+index 63c77b78847614..d58b2197bda541 100644
+--- a/packages/eslint-plugin/rules/use-recommended-components.js
++++ b/packages/eslint-plugin/rules/use-recommended-components.js
+@@ -13,6 +13,7 @@ const ALLOWLIST = {
+ 			'Card',
+ 			'Collapsible',
+ 			'CollapsibleCard',
++			'Link',
+ 			'Stack',
+ 			'Text',
+ 			'VisuallyHidden',
+diff --git a/tools/eslint/suppressions.json b/tools/eslint/suppressions.json
+index 3d674488b4eb99..ab55aa0fc94882 100644
+--- a/tools/eslint/suppressions.json
++++ b/tools/eslint/suppressions.json
+@@ -1,9 +1,4 @@
+ {
+-	"packages/admin-ui/src/breadcrumbs/index.tsx": {
+-		"@wordpress/use-recommended-components": {
+-			"count": 2
+-		}
+-	},
+ 	"packages/block-editor/src/components/background-image-control/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2

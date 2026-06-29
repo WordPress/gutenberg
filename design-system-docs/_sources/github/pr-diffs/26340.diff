@@ -1,0 +1,4107 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 789949e13e9c09..0c35876f4139b6 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -1,24 +1,307 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`ColorPaletteControl matches the snapshot 1`] = `
+-.emotion-2 {
++.emotion-8 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+ }
+ 
+-.emotion-0 {
++.emotion-6 {
+   margin-bottom: 8px;
+ }
+ 
+-.components-panel__row .emotion-0 {
++.components-panel__row .emotion-6 {
+   margin-bottom: inherit;
+ }
+ 
++.emotion-0 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  color: #fff;
++  background: #1e1e1e;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-0 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-0[aria-expanded='true'],
++.emotion-0:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-0[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-0:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-0:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-0:disabled,
++.emotion-0[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-0 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-0 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-0:focus:not(:disabled ) {
++  box-shadow: inset 0 0 0 1px #fff,0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 2px solid transparent;
++}
++
++.emotion-0:hover:not(:disabled ) {
++  color: #fff;
++  background: #1e1e1e;
++}
++
++.emotion-0[aria-expanded='true'],
++.emotion-0:hover {
++  color: #fff;
++}
++
++.emotion-2 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  margin: 0;
++  padding: 0;
++  box-shadow: none;
++  border: 0;
++  border-radius: 0;
++  background: none;
++  outline: none;
++  text-align: left;
++  color: #0073aa;
++  -webkit-text-decoration: underline;
++  text-decoration: underline;
++  -webkit-transition-property: border,background,color;
++  transition-property: border,background,color;
++  -webkit-transition-duration: 0.05s;
++  transition-duration: 0.05s;
++  -webkit-transition-timing-function: ease-in-out;
++  transition-timing-function: ease-in-out;
++  height: auto;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-2 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-2[aria-expanded='true'],
++.emotion-2:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-2[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-2:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-2:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-2:disabled,
++.emotion-2[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-2 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-2 .components-visually-hidden {
++  height: auto;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-2 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-2:hover:not(:disabled ),
++.emotion-2:active:not(:disabled ) {
++  color: #00a0d2;
++  box-shadow: none;
++}
++
++.emotion-2:focus {
++  color: #124964;
++  box-shadow: 0 0 0 1px #5b9dd9,0 0 1.5px 1px rgba( 30,140,190,0.8 );
++}
++
++.emotion-4 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  height: 24px;
++  line-height: 22px;
++  padding: 0 8px;
++  font-size: 11px;
++  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++  white-space: nowrap;
++  color: var( --wp-admin-theme-color );
++  background: transparent;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-4 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-4[aria-expanded='true'],
++.emotion-4:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-4[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-4:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-4:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-4:disabled,
++.emotion-4[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-4 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-4 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-4:active:not(:disabled ) {
++  background: #e0e0e0;
++  color: var( --wp-admin-theme-color-darker-10 );
++  box-shadow: none;
++}
++
++.emotion-4:hover:not(:disabled ) {
++  color: var( --wp-admin-theme-color-darker-10 );
++  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color-darker-10 );
++}
++
++.emotion-4:disabled,
++.emotion-4[aria-disabled='true'],
++.emotion-4[aria-disabled='true']:hover {
++  color: #828282;
++  background: #eaeaea;
++  -webkit-transform: none;
++  -ms-transform: none;
++  transform: none;
++  opacity: 1;
++  box-shadow: none;
++}
++
+ <div
+-  className="components-base-control block-editor-color-gradient-control emotion-2 emotion-3"
++  className="components-base-control block-editor-color-gradient-control emotion-8 emotion-9"
+ >
+   <div
+-    className="components-base-control__field emotion-0 emotion-1"
++    className="components-base-control__field emotion-6 emotion-7"
+   >
+     <fieldset>
+       <legend>
+@@ -53,7 +336,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+             <button
+               aria-label="Color: red"
+               aria-pressed={true}
+-              className="components-button components-circular-option-picker__option is-pressed"
++              className="components-button components-circular-option-picker__option is-pressed emotion-0 emotion-1"
+               onBlur={[Function]}
+               onClick={[Function]}
+               onFocus={[Function]}
+@@ -94,7 +377,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+               aria-expanded={false}
+               aria-haspopup="true"
+               aria-label="Custom color picker"
+-              className="components-button is-link"
++              className="components-button is-link emotion-2 emotion-3"
+               onClick={[Function]}
+               type="button"
+             >
+@@ -102,7 +385,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+             </button>
+           </div>
+           <button
+-            className="components-button components-circular-option-picker__clear is-secondary is-small"
++            className="components-button components-circular-option-picker__clear is-secondary is-small emotion-4 emotion-5"
+             onClick={[Function]}
+             type="button"
+           >
+diff --git a/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
+index abb82e4ce4c1a5..b0f7ec4c4b84f7 100644
+--- a/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Basic rendering should render 1`] = `"<div tabindex=\\"-1\\" class=\\"block-editor-link-control\\"><div class=\\"block-editor-link-control__search-input-wrapper\\"><form><div class=\\"components-base-control block-editor-url-input block-editor-link-control__search-input css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><input required=\\"\\" class=\\"block-editor-url-input__input\\" type=\\"text\\" placeholder=\\"Search or type url\\" role=\\"combobox\\" aria-label=\\"URL\\" aria-expanded=\\"false\\" aria-autocomplete=\\"list\\" aria-owns=\\"block-editor-url-input-suggestions-0\\" value=\\"\\"></div></div><div class=\\"block-editor-link-control__search-actions\\"><button type=\\"submit\\" class=\\"components-button block-editor-link-control__search-submit has-icon\\" aria-label=\\"Submit\\"><svg width=\\"24\\" height=\\"24\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"-2 -2 24 24\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M16 4h2v9H7v3l-5-4 5-4v3h9V4z\\"></path></svg></button></div></form></div><fieldset class=\\"block-editor-link-control__settings\\"><legend class=\\"components-visually-hidden\\">Currently selected link settings</legend><div class=\\"components-base-control components-toggle-control block-editor-link-control__setting css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><span class=\\"components-form-toggle\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Open in new tab</label></div></div></fieldset></div>"`;
++exports[`Basic rendering should render 1`] = `"<div tabindex=\\"-1\\" class=\\"block-editor-link-control\\"><div class=\\"block-editor-link-control__search-input-wrapper\\"><form><div class=\\"components-base-control block-editor-url-input block-editor-link-control__search-input css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><input required=\\"\\" class=\\"block-editor-url-input__input\\" type=\\"text\\" placeholder=\\"Search or type url\\" role=\\"combobox\\" aria-label=\\"URL\\" aria-expanded=\\"false\\" aria-autocomplete=\\"list\\" aria-owns=\\"block-editor-url-input-suggestions-0\\" value=\\"\\"></div></div><div class=\\"block-editor-link-control__search-actions\\"><button type=\\"submit\\" class=\\"components-button block-editor-link-control__search-submit has-icon css-13svitq-BaseButton-icon e919hb30\\" aria-label=\\"Submit\\"><svg width=\\"24\\" height=\\"24\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"-2 -2 24 24\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M16 4h2v9H7v3l-5-4 5-4v3h9V4z\\"></path></svg></button></div></form></div><fieldset class=\\"block-editor-link-control__settings\\"><legend class=\\"components-visually-hidden\\">Currently selected link settings</legend><div class=\\"components-base-control components-toggle-control block-editor-link-control__setting css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><span class=\\"components-form-toggle\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Open in new tab</label></div></div></fieldset></div>"`;
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.js
+index a5b3f8eb8bd2e2..a38e01aab5c639 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.js
+@@ -15,9 +15,35 @@ import { forwardRef } from '@wordpress/element';
+  */
+ import Tooltip from '../tooltip';
+ import Icon from '../icon';
++import * as styledButtons from './styles';
+ 
+ const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
+ 
++const getStyledButton = ( props ) => {
++	if ( props.isPrimary ) {
++		return styledButtons.PrimaryButton;
++	}
++
++	if ( props.isSecondary ) {
++		return styledButtons.SecondaryButton;
++	}
++
++	if ( props.isTertiary ) {
++		return styledButtons.TertiaryButton;
++	}
++
++	if ( props.isLink ) {
++		return styledButtons.LinkButton;
++	}
++
++	// check pure destructive last to allow for destructive links
++	if ( props.isDestructive ) {
++		return styledButtons.DestructiveButton;
++	}
++
++	return styledButtons.BaseButton;
++};
++
+ export function Button( props, ref ) {
+ 	const {
+ 		href,
+@@ -50,6 +76,9 @@ export function Button( props, ref ) {
+ 		} );
+ 	}
+ 
++	const hasIcon = !! icon;
++	const hasText = !! icon && !! children;
++
+ 	const classes = classnames( 'components-button', className, {
+ 		'is-secondary': isDefault || isSecondary,
+ 		'is-primary': isPrimary,
+@@ -59,14 +88,15 @@ export function Button( props, ref ) {
+ 		'is-busy': isBusy,
+ 		'is-link': isLink,
+ 		'is-destructive': isDestructive,
+-		'has-text': !! icon && !! children,
+-		'has-icon': !! icon,
++		'has-text': hasText,
++		'has-icon': hasIcon,
+ 	} );
+ 
+ 	const trulyDisabled = disabled && ! isFocusable;
+-	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
++	const StyledButton = getStyledButton( props );
++	const tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
+ 	const tagProps =
+-		Tag === 'a'
++		tag === 'a'
+ 			? { href, target }
+ 			: {
+ 					type: 'button',
+@@ -103,16 +133,23 @@ export function Button( props, ref ) {
+ 				false !== showTooltip ) );
+ 
+ 	const element = (
+-		<Tag
++		<StyledButton
++			as={ tag }
+ 			{ ...tagProps }
+ 			{ ...additionalProps }
+ 			className={ classes }
+ 			aria-label={ additionalProps[ 'aria-label' ] || label }
+ 			ref={ ref }
++			isDestructive={ isDestructive }
++			isSmall={ isSmall }
++			isBusy={ isBusy }
++			isPressed={ isPressed }
++			hasText={ hasText }
++			hasIcon={ hasIcon }
+ 		>
+ 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
+ 			{ children }
+-		</Tag>
++		</StyledButton>
+ 	);
+ 
+ 	if ( ! shouldShowTooltip ) {
+diff --git a/packages/components/src/button/stories/index.js b/packages/components/src/button/stories/index.js
+index c5cc02b7922d42..e211b3df453937 100644
+--- a/packages/components/src/button/stories/index.js
++++ b/packages/components/src/button/stories/index.js
+@@ -29,20 +29,35 @@ export const _default = () => {
+ 
+ export const primary = () => {
+ 	const label = text( 'Label', 'Primary Button' );
++	const disabled = boolean( 'Disabled', false );
+ 
+-	return <Button isPrimary>{ label }</Button>;
++	return (
++		<Button isPrimary disabled={ disabled }>
++			{ label }
++		</Button>
++	);
+ };
+ 
+ export const secondary = () => {
+ 	const label = text( 'Label', 'Secondary Button' );
++	const disabled = boolean( 'Disabled', false );
+ 
+-	return <Button isSecondary>{ label }</Button>;
++	return (
++		<Button isSecondary disabled={ disabled }>
++			{ label }
++		</Button>
++	);
+ };
+ 
+ export const tertiary = () => {
+ 	const label = text( 'Label', 'Tertiary Button' );
++	const disabled = boolean( 'Disabled', false );
+ 
+-	return <Button isTertiary>{ label }</Button>;
++	return (
++		<Button isTertiary disabled={ disabled }>
++			{ label }
++		</Button>
++	);
+ };
+ 
+ export const isDestructive = () => {
+diff --git a/packages/components/src/button/stories/style.css b/packages/components/src/button/stories/style.css
+index 239018d6a298a4..5118cc91153b54 100644
+--- a/packages/components/src/button/stories/style.css
++++ b/packages/components/src/button/stories/style.css
+@@ -2,7 +2,7 @@
+ 	display: flex;
+ }
+ 
+-.story-buttons-container > * {
++.story-buttons-container > .components-button {
+ 	margin-right: 10px;
+ 	margin-bottom: 10px;
+ }
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+deleted file mode 100644
+index 2c90e5ab1e1a16..00000000000000
+--- a/packages/components/src/button/style.scss
++++ /dev/null
+@@ -1,331 +0,0 @@
+-.components-button {
+-	display: inline-flex;
+-	text-decoration: none;
+-	font-size: $default-font-size;
+-	margin: 0;
+-	border: 0;
+-	cursor: pointer;
+-	-webkit-appearance: none;
+-	background: none;
+-	transition: box-shadow 0.1s linear;
+-	@include reduce-motion("transition");
+-	height: $button-size;
+-	align-items: center;
+-	box-sizing: border-box;
+-	padding: 6px 12px;
+-	border-radius: $radius-block-ui;
+-	color: $gray-900;
+-
+-	&[aria-expanded="true"],
+-	&:hover {
+-		color: var(--wp-admin-theme-color);
+-	}
+-
+-	// Unset some hovers, instead of adding :not specificity.
+-	&[aria-disabled="true"]:hover {
+-		color: initial;
+-	}
+-
+-	// Focus.
+-	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
+-	&:focus:not(:disabled) {
+-		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+-
+-		// Windows High Contrast mode will show this outline, but not the box-shadow.
+-		outline: 1px solid transparent;
+-	}
+-
+-	/**
+-	 * Primary button style.
+-	 */
+-
+-	&.is-primary {
+-		white-space: nowrap;
+-		background: var(--wp-admin-theme-color);
+-		color: $white;
+-		text-decoration: none;
+-		text-shadow: none;
+-
+-		&:hover:not(:disabled) {
+-			background: var(--wp-admin-theme-color-darker-10);
+-			color: $white;
+-		}
+-
+-		&:active:not(:disabled) {
+-			background: var(--wp-admin-theme-color-darker-20);
+-			border-color: var(--wp-admin-theme-color-darker-20);
+-			color: $white;
+-		}
+-
+-		&:focus:not(:disabled) {
+-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+-
+-			// Windows High Contrast mode will show this outline, but not the box-shadow.
+-			outline: 1px solid transparent;
+-		}
+-
+-		&:disabled,
+-		&:disabled:active:enabled,
+-		&[aria-disabled="true"],
+-		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
+-		&[aria-disabled="true"]:active:enabled {
+-			color: rgba($white, 0.4);
+-			background: var(--wp-admin-theme-color);
+-			border-color: var(--wp-admin-theme-color);
+-			opacity: 1;
+-
+-			&:focus:enabled {
+-				box-shadow:
+-					0 0 0 $border-width $white,
+-					0 0 0 3px var(--wp-admin-theme-color);
+-			}
+-		}
+-
+-		&.is-busy,
+-		&.is-busy:disabled,
+-		&.is-busy[aria-disabled="true"] {
+-			color: $white;
+-			background-size: 100px 100%;
+-			// Disable reason: This function call looks nicer when each argument is on its own line.
+-			/* stylelint-disable */
+-			background-image: linear-gradient(
+-				-45deg,
+-				var(--wp-admin-theme-color) 28%,
+-				var(--wp-admin-theme-color-darker-20) 28%,
+-				var(--wp-admin-theme-color-darker-20) 72%,
+-				var(--wp-admin-theme-color)  72%
+-			);
+-			/* stylelint-enable */
+-			border-color: var(--wp-admin-theme-color);
+-		}
+-	}
+-
+-	/**
+-	 * Secondary and tertiary buttons.
+-	 */
+-
+-	&.is-secondary,
+-	&.is-tertiary {
+-		&:active:not(:disabled) {
+-			background: $gray-300;
+-			color: var(--wp-admin-theme-color-darker-10);
+-			box-shadow: none;
+-		}
+-
+-		&:hover:not(:disabled) {
+-			color: var(--wp-admin-theme-color-darker-10);
+-			box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color-darker-10);
+-		}
+-
+-		&:disabled,
+-		&[aria-disabled="true"],
+-		&[aria-disabled="true"]:hover {
+-			color: lighten($gray-700, 5%);
+-			background: lighten($gray-300, 5%);
+-			transform: none;
+-			opacity: 1;
+-			box-shadow: none;
+-		}
+-	}
+-
+-	/**
+-	 * Secondary button style.
+-	 */
+-
+-	&.is-secondary {
+-		box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
+-		outline: 1px solid transparent; // Shown in high contrast mode.
+-		white-space: nowrap;
+-		color: var(--wp-admin-theme-color);
+-		background: transparent;
+-	}
+-
+-	/**
+-	 * Tertiary buttons.
+-	 */
+-
+-	&.is-tertiary {
+-		white-space: nowrap;
+-		color: var(--wp-admin-theme-color);
+-		background: transparent;
+-		padding: 6px; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
+-
+-		.dashicon {
+-			display: inline-block;
+-			flex: 0 0 auto;
+-		}
+-
+-		// Windows High Contrast mode.
+-		outline: 1px dotted transparent;
+-	}
+-
+-	/**
+-	 * Destructive buttons.
+-	 */
+-
+-	&.is-destructive {
+-		color: $alert-red;
+-		box-shadow: inset 0 0 0 $border-width $alert-red;
+-
+-		&:hover:not(:disabled) {
+-			color: darken($alert-red, 20%);
+-			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
+-		}
+-
+-		&:focus:not(:disabled) {
+-			color: var(--wp-admin-theme-color);
+-		}
+-
+-		&:active:not(:disabled) {
+-			background: $gray-400;
+-		}
+-	}
+-
+-	/**
+-	 * Link buttons.
+-	 */
+-
+-	&.is-link {
+-		margin: 0;
+-		padding: 0;
+-		box-shadow: none;
+-		border: 0;
+-		border-radius: 0;
+-		background: none;
+-		outline: none;
+-		text-align: left;
+-		/* Mimics the default link style in common.css */
+-		color: #0073aa;
+-		text-decoration: underline;
+-		transition-property: border, background, color;
+-		transition-duration: 0.05s;
+-		transition-timing-function: ease-in-out;
+-		@include reduce-motion("transition");
+-		height: auto;
+-
+-		&:hover:not(:disabled),
+-		&:active:not(:disabled) {
+-			color: #00a0d2;
+-			box-shadow: none;
+-		}
+-
+-		&:focus {
+-			color: #124964;
+-			box-shadow:
+-				0 0 0 $border-width #5b9dd9,
+-				0 0 $border-width-focus $border-width rgba(30, 140, 190, 0.8);
+-		}
+-
+-		// Link buttons that are red to indicate destructive behavior.
+-		&.is-destructive {
+-			color: $alert-red;
+-
+-			&:active:not(:disabled),
+-			&:hover:not(:disabled) {
+-				color: darken($alert-red, 20%);
+-				background: none;
+-			}
+-
+-			&:focus:not(:disabled) {
+-				color: var(--wp-admin-theme-color);
+-			}
+-		}
+-	}
+-
+-	&:not([aria-disabled="true"]):active {
+-		color: inherit;
+-	}
+-
+-	&:disabled,
+-	&[aria-disabled="true"] {
+-		cursor: default;
+-		opacity: 0.3;
+-	}
+-
+-	&.is-busy,
+-	&.is-secondary.is-busy,
+-	&.is-secondary.is-busy:disabled,
+-	&.is-secondary.is-busy[aria-disabled="true"] {
+-		animation: components-button__busy-animation 2500ms infinite linear;
+-		opacity: 1;
+-		background-size: 100px 100%;
+-		// Disable reason: This function call looks nicer when each argument is on its own line.
+-		/* stylelint-disable */
+-		background-image: linear-gradient(
+-			-45deg,
+-			darken($white, 2%) 28%,
+-			darken($white, 12%) 28%,
+-			darken($white, 12%) 72%,
+-			darken($white, 2%) 72%
+-		);
+-		/* stylelint-enable */
+-	}
+-
+-	&.is-small {
+-		height: 24px;
+-		line-height: 22px;
+-		padding: 0 8px;
+-		font-size: 11px;
+-
+-		&.has-icon:not(.has-text) {
+-			padding: 0 8px;
+-			width: 24px;
+-		}
+-	}
+-
+-	&.has-icon {
+-		padding: 6px; // Works for 24px icons. Smaller icons are vertically centered by flex alignments.
+-
+-		// Icon buttons are square.
+-		min-width: $button-size;
+-		justify-content: center;
+-
+-		.dashicon {
+-			display: inline-block;
+-			flex: 0 0 auto;
+-		}
+-
+-		&.has-text {
+-			justify-content: left;
+-		}
+-
+-		&.has-text svg {
+-			margin-right: 8px;
+-		}
+-	}
+-
+-	// Toggled style.
+-	&.is-pressed {
+-		color: $white;
+-		background: $gray-900;
+-
+-		&:focus:not(:disabled) {
+-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+-
+-			// Windows High Contrast mode will show this outline, but not the box-shadow.
+-			outline: 2px solid transparent;
+-		}
+-
+-		&:hover:not(:disabled) {
+-			color: $white;
+-			background: $gray-900;
+-		}
+-	}
+-
+-	svg {
+-		fill: currentColor;
+-		outline: none;
+-	}
+-
+-	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.
+-	// See https://core.trac.wordpress.org/ticket/42006 and https://github.com/h5bp/html5-boilerplate/issues/1985
+-	.components-visually-hidden {
+-		height: auto;
+-	}
+-}
+-
+-@keyframes components-button__busy-animation {
+-	0% {
+-		background-position: 200px 0;
+-	}
+-}
+diff --git a/packages/components/src/button/styles/base-styles.js b/packages/components/src/button/styles/base-styles.js
+new file mode 100644
+index 00000000000000..d8363795aec880
+--- /dev/null
++++ b/packages/components/src/button/styles/base-styles.js
+@@ -0,0 +1,186 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css } from '@emotion/core';
++
++/**
++ * Internal dependencies
++ */
++import { font, config, color, reduceMotion, lighten, rtl } from '../../utils';
++
++const small = css`
++	height: 24px;
++	line-height: 22px;
++	padding: 0 8px;
++	font-size: 11px;
++`;
++
++const smallOnlyIcon = css`
++	${ small }
++
++	padding: 0 8px;
++	width: 24px;
++`;
++
++const appearSmall = ( { hasIcon, isSmall, hasText } ) => {
++	if ( isSmall ) {
++		if ( hasIcon && ! hasText ) {
++			return smallOnlyIcon;
++		}
++
++		return small;
++	}
++
++	return '';
++};
++
++export const icon = css`
++	padding: 6px; // Works for 24px icons. Smaller icons are vertically centered by flex alignments.
++
++	// Icon buttons are square.
++	min-width: ${ config( 'buttonSize' ) };
++	justify-content: center;
++
++	.dashicon {
++		display: inline-block;
++		flex: 0 0 auto;
++	}
++`;
++
++export const iconWithText = css`
++	${ icon }
++
++	${ rtl( { justifyContent: 'left' }, { justifyContent: 'right' } )() }
++
++	svg {
++		margin-right: 8px;
++	}
++`;
++
++const appearIcon = ( { hasIcon, hasText } ) => {
++	if ( hasIcon ) {
++		if ( hasText ) {
++			return iconWithText;
++		}
++
++		return icon;
++	}
++
++	return '';
++};
++
++const pressed = css`
++	color: ${ color( 'white' ) };
++	background: ${ color( 'gray.900' ) };
++
++	&:focus:not( :disabled ) {
++		box-shadow: inset 0 0 0 1px ${ color( 'white' ) },
++			0 0 0 ${ config( 'borderWidthFocus' ) }
++				var( --wp-admin-theme-color );
++
++		// Windows High Contrast mode will show this outline, but not the box-shadow.
++		outline: 2px solid transparent;
++	}
++
++	&:hover:not( :disabled ) {
++		color: ${ color( 'white' ) };
++		background: ${ color( 'gray.900' ) };
++	}
++
++	&[aria-expanded='true'],
++	&:hover {
++		color: ${ color( 'white' ) };
++	}
++`;
++
++const appearPressed = ( props ) => ( props.isPressed ? pressed : '' );
++
++export const BaseButton = styled.button`
++	display: inline-flex;
++	text-decoration: none;
++	font-size: ${ font( 'default.fontSize' ) };
++	margin: 0;
++	border: 0;
++	cursor: pointer;
++	-webkit-appearance: none;
++	background: none;
++	transition: box-shadow 0.1s linear;
++	${ reduceMotion( 'transition' ) }
++	height: ${ config( 'buttonSize' ) };
++	align-items: center;
++	box-sizing: border-box;
++	padding: 6px 12px;
++	border-radius: ${ config( 'radiusBlockUi' ) };
++	color: ${ color( 'gray.900' ) };
++
++	&[aria-expanded='true'],
++	&:hover {
++		color: var( --wp-admin-theme-color );
++	}
++
++	// Unset some hovers, instead of adding :not specificity.
++	&[aria-disabled='true']:hover {
++		color: initial;
++	}
++
++	// Focus.
++	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
++	&:focus:not( :disabled ) {
++		box-shadow: 0 0 0 ${ config(
++			'borderWidthFocus'
++		) } var( --wp-admin-theme-color );
++
++		// Windows High Contrast mode will show this outline, but not the box-shadow.
++		outline: 1px solid transparent;
++	}
++
++	&:not([aria-disabled="true"]):active {
++		color: inherit;
++	}
++
++	&:disabled,
++	&[aria-disabled="true"] {
++		cursor: default;
++		opacity: 0.3;
++	}
++
++	svg {
++		fill: currentColor;
++		outline: none;
++	}
++
++	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.
++	// See https://core.trac.wordpress.org/ticket/42006 and https://github.com/h5bp/html5-boilerplate/issues/1985
++	.components-visually-hidden {
++		height: auto;
++	}
++
++	${ appearSmall }
++	${ appearIcon }
++	${ appearPressed }
++`;
++
++export const SecondaryAndTertiaryBase = styled( BaseButton )`
++	&:active:not( :disabled ) {
++		background: ${ color( 'gray.200' ) };
++		color: var( --wp-admin-theme-color-darker-10 );
++		box-shadow: none;
++	}
++
++	&:hover:not( :disabled ) {
++		color: var( --wp-admin-theme-color-darker-10 );
++		box-shadow: inset 0 0 0 ${ config( 'borderWidth' ) }
++			var( --wp-admin-theme-color-darker-10 );
++	}
++
++	&:disabled,
++	&[aria-disabled='true'],
++	&[aria-disabled='true']:hover {
++		color: ${ lighten( color( 'gray.700' ), 5 ) };
++		background: ${ lighten( color( 'gray.300' ), 5 ) };
++		transform: none;
++		opacity: 1;
++		box-shadow: none;
++	}
++`;
+diff --git a/packages/components/src/button/styles/busy-styles.js b/packages/components/src/button/styles/busy-styles.js
+new file mode 100644
+index 00000000000000..16bafd6d7ebe9f
+--- /dev/null
++++ b/packages/components/src/button/styles/busy-styles.js
+@@ -0,0 +1,30 @@
++/**
++ * External dependencies
++ */
++import { css, keyframes } from '@emotion/core';
++
++/**
++ * Internal dependencies
++ */
++import { color, darken } from '../../utils';
++
++const busyAnimation = keyframes`
++	0% {
++		background-position: 200px 0;
++	}
++`;
++
++const busy = css`
++	animation: ${ busyAnimation } 2500ms infinite linear;
++	opacity: 1;
++	background-size: 100px 100%;
++	background-image: linear-gradient(
++		-45deg,
++		${ darken( color( 'white' ), 2 ) } 28%,
++		${ darken( color( 'white' ), 12 ) } 28%,
++		${ darken( color( 'white' ), 12 ) } 72%,
++		${ darken( color( 'white' ), 2 ) } 72%
++	);
++`;
++
++export const appearBusy = ( props ) => ( props.isBusy ? busy : '' );
+diff --git a/packages/components/src/button/styles/destructive-button-styles.js b/packages/components/src/button/styles/destructive-button-styles.js
+new file mode 100644
+index 00000000000000..4fa33e40aeeab8
+--- /dev/null
++++ b/packages/components/src/button/styles/destructive-button-styles.js
+@@ -0,0 +1,33 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import { BaseButton } from './base-styles';
++import { appearBusy } from './busy-styles';
++import { color, config, darken } from '../../utils';
++
++export const DestructiveButton = styled( BaseButton )`
++	color: ${ color( 'alert.red' ) };
++	box-shadow: inset 0 0 0 ${ config( 'borderWidth' ) }
++		${ color( 'alert.red' ) };
++
++	&:hover:not( :disabled ) {
++		color: ${ darken( color( 'alert.red' ), 20 ) };
++		box-shadow: inset 0 0 0 ${ config( 'borderWidth' ) }
++			${ darken( color( 'alert.red' ), 20 ) };
++	}
++
++	&:focus:not( :disabled ) {
++		color: var( --wp-admin-theme-color );
++	}
++
++	&:active:not( :disabled ) {
++		background: ${ color( 'gray.400' ) };
++	}
++
++	${ appearBusy }
++`;
+diff --git a/packages/components/src/button/styles/index.js b/packages/components/src/button/styles/index.js
+new file mode 100644
+index 00000000000000..6c37e3d06fd298
+--- /dev/null
++++ b/packages/components/src/button/styles/index.js
+@@ -0,0 +1,6 @@
++export * from './primary-button-styles';
++export * from './secondary-button-styles';
++export * from './tertiary-button-styles';
++export * from './destructive-button-styles';
++export * from './link-button-styles';
++export * from './base-styles';
+diff --git a/packages/components/src/button/styles/link-button-styles.js b/packages/components/src/button/styles/link-button-styles.js
+new file mode 100644
+index 00000000000000..1797729a6656ef
+--- /dev/null
++++ b/packages/components/src/button/styles/link-button-styles.js
+@@ -0,0 +1,61 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css } from '@emotion/core';
++
++/**
++ * Internal dependencies
++ */
++import { BaseButton } from './base-styles';
++import { appearBusy } from './busy-styles';
++import { reduceMotion, config, color, darken, rtl } from '../../utils';
++
++export const LinkButton = styled( BaseButton )`
++	margin: 0;
++	padding: 0;
++	box-shadow: none;
++	border: 0;
++	border-radius: 0;
++	background: none;
++	outline: none;
++	${ rtl( { textAlign: 'left' }, { textAlign: 'right' } ) }
++	/* Mimics the default link style in common.css */
++	color: #0073aa;
++	text-decoration: underline;
++	transition-property: border, background, color;
++	transition-duration: 0.05s;
++	transition-timing-function: ease-in-out;
++	${ reduceMotion( 'transition' ) }
++	height: auto;
++
++	&:hover:not( :disabled ),
++	&:active:not( :disabled ) {
++		color: #00a0d2;
++		box-shadow: none;
++	}
++
++	&:focus {
++		color: #124964;
++		box-shadow: 0 0 0 ${ config( 'borderWidth' ) } #5b9dd9,
++			0 0 ${ config( 'borderWidthFocus' ) } ${ config( 'borderWidth' ) }
++				rgba( 30, 140, 190, 0.8 );
++	}
++
++	${ ( props ) => ( props.isDestructive ? destructive : '' ) }
++	${ appearBusy }
++`;
++
++const destructive = css`
++	color: ${ color( 'alert.red' ) };
++
++	&:active:not( :disabled ),
++	&:hover:not( :disabled ) {
++		color: ${ darken( color( 'alert.red' ), 20 ) };
++		background: none;
++	}
++
++	&:focus:not( :disabled ) {
++		color: var( --wp-admin-theme-color );
++	}
++`;
+diff --git a/packages/components/src/button/styles/primary-button-styles.js b/packages/components/src/button/styles/primary-button-styles.js
+new file mode 100644
+index 00000000000000..0977295a67cc49
+--- /dev/null
++++ b/packages/components/src/button/styles/primary-button-styles.js
+@@ -0,0 +1,70 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css } from '@emotion/core';
++
++/**
++ * Internal dependencies
++ */
++import { BaseButton } from './base-styles';
++import { color, config, rgba } from '../../utils';
++
++export const PrimaryButton = styled( BaseButton )`
++	white-space: nowrap;
++	background: var( --wp-admin-theme-color );
++	color: ${ color( 'white' ) };
++	text-decoration: none;
++	text-shadow: none;
++
++	&:hover:not( :disabled ) {
++		background: var( --wp-admin-theme-color-darker-10 );
++		color: ${ color( 'white' ) };
++	}
++
++	&:active:not( :disabled ) {
++		background: var( --wp-admin-theme-color-darker-20 );
++		border-color: var( --wp-admin-theme-color-darker-20 );
++		color: ${ color( 'white' ) };
++	}
++
++	&:focus:not( :disabled ) {
++		box-shadow: inset 0 0 0 1px ${ color( 'white' ) },
++			0 0 0 ${ config( 'borderWidthFocus' ) }
++				var( --wp-admin-theme-color );
++
++		// Windows High Contrast mode will show this outline, but not the box-shadow.
++		outline: 1px solid transparent;
++	}
++
++	&:disabled,
++    &:disabled:active:enabled,
++    &[aria-disabled="true"],
++    &[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
++    &[aria-disabled="true"]:active:enabled {
++		color: ${ rgba( color( 'white' ), 0.4 ) };
++		background: var( --wp-admin-theme-color );
++		border-color: var( --wp-admin-theme-color );
++		opacity: 1;
++
++		&:focus:enabled {
++			box-shadow: 0 0 0 ${ config( 'borderWidth' ) } ${ color( 'white' ) },
++				0 0 0 3px var( --wp-admin-theme-color );
++		}
++	}
++
++	${ ( props ) => ( props.isBusy ? busy : '' ) }
++`;
++
++const busy = css`
++	color: ${ color( 'white' ) };
++	background-size: 100px 100%;
++	background-image: linear-gradient(
++		-45deg,
++		var( --wp-admin-theme-color ) 28%,
++		var( --wp-admin-theme-color-darker-20 ) 28%,
++		var( --wp-admin-theme-color-darker-20 ) 72%,
++		var( --wp-admin-theme-color ) 72%
++	);
++	border-color: var( --wp-admin-theme-color );
++`;
+diff --git a/packages/components/src/button/styles/secondary-button-styles.js b/packages/components/src/button/styles/secondary-button-styles.js
+new file mode 100644
+index 00000000000000..8632afc9f81fcf
+--- /dev/null
++++ b/packages/components/src/button/styles/secondary-button-styles.js
+@@ -0,0 +1,22 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import { config } from '../../utils';
++import { appearBusy } from './busy-styles';
++import { SecondaryAndTertiaryBase } from './base-styles';
++
++export const SecondaryButton = styled( SecondaryAndTertiaryBase )`
++	box-shadow: inset 0 0 0 ${ config( 'borderWidth' ) }
++		var( --wp-admin-theme-color );
++	outline: 1px solid transparent; // Shown in high contrast mode.
++	white-space: nowrap;
++	color: var( --wp-admin-theme-color );
++	background: transparent;
++
++	${ appearBusy }
++`;
+diff --git a/packages/components/src/button/styles/tertiary-button-styles.js b/packages/components/src/button/styles/tertiary-button-styles.js
+new file mode 100644
+index 00000000000000..27232c6cca2237
+--- /dev/null
++++ b/packages/components/src/button/styles/tertiary-button-styles.js
+@@ -0,0 +1,24 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import { SecondaryAndTertiaryBase } from './base-styles';
++import { appearBusy } from './busy-styles';
++
++export const TertiaryButton = styled( SecondaryAndTertiaryBase )`
++	white-space: nowrap;
++	color: var( --wp-admin-theme-color );
++	background: transparent;
++	padding: 6px; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
++
++	.dashicon {
++		display: inline-block;
++		flex: 0 0 auto;
++	}
++
++	${ appearBusy }
++`;
+diff --git a/packages/components/src/button/test/index.js b/packages/components/src/button/test/index.js
+index 49de9ef1d59ad2..317d46f78bccfc 100644
+--- a/packages/components/src/button/test/index.js
++++ b/packages/components/src/button/test/index.js
+@@ -26,7 +26,7 @@ describe( 'Button', () => {
+ 			expect( button.prop( 'disabled' ) ).toBeUndefined();
+ 			expect( button.prop( 'aria-disabled' ) ).toBeUndefined();
+ 			expect( button.prop( 'type' ) ).toBe( 'button' );
+-			expect( button.type() ).toBe( 'button' );
++			expect( button.prop( 'as' ) ).toBe( 'button' );
+ 		} );
+ 
+ 		it( 'should render a button element with is-primary class', () => {
+@@ -108,7 +108,7 @@ describe( 'Button', () => {
+ 			);
+ 			expect( iconButton.name() ).toBe( 'Tooltip' );
+ 			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
+-			expect( iconButton.find( 'button' ).prop( 'aria-label' ) ).toBe(
++			expect( iconButton.find( 'BaseButton' ).prop( 'aria-label' ) ).toBe(
+ 				'WordPress'
+ 			);
+ 		} );
+@@ -126,7 +126,7 @@ describe( 'Button', () => {
+ 					showTooltip={ false }
+ 				/>
+ 			);
+-			expect( iconButton.name() ).toBe( 'button' );
++			expect( iconButton.name() ).toBe( 'BaseButton' );
+ 			expect( iconButton.prop( 'aria-label' ) ).toBe( 'WordPress' );
+ 		} );
+ 
+@@ -144,7 +144,7 @@ describe( 'Button', () => {
+ 					Children
+ 				</Button>
+ 			);
+-			expect( iconButton.name() ).toBe( 'button' );
++			expect( iconButton.name() ).toBe( 'BaseButton' );
+ 		} );
+ 
+ 		it( 'should force showing the tooltip even if icon and children defined', () => {
+@@ -161,7 +161,7 @@ describe( 'Button', () => {
+ 		it( 'should render a link instead of a button with href prop', () => {
+ 			const button = shallow( <Button href="https://wordpress.org/" /> );
+ 
+-			expect( button.type() ).toBe( 'a' );
++			expect( button.prop( 'as' ) ).toBe( 'a' );
+ 			expect( button.prop( 'href' ) ).toBe( 'https://wordpress.org/' );
+ 		} );
+ 
+@@ -178,7 +178,7 @@ describe( 'Button', () => {
+ 				<Button href="https://wordpress.org/" disabled />
+ 			);
+ 
+-			expect( button.type() ).toBe( 'button' );
++			expect( button.prop( 'as' ) ).toBe( 'button' );
+ 		} );
+ 	} );
+ 
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.js.snap b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+index 93e90b9b95908f..5fda23d8988c9d 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+@@ -87,19 +87,124 @@ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`]
+ `;
+ 
+ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] = `
+-<button
++<LinkButton
+   aria-expanded={true}
+   aria-haspopup="true"
+   aria-label="Custom color picker"
++  as="button"
+   className="components-button is-link"
++  hasIcon={false}
++  hasText={false}
+   onClick={[MockFunction]}
+   type="button"
+ >
+   Custom color
+-</button>
++</LinkButton>
+ `;
+ 
+ exports[`ColorPalette Dropdown should render it correctly 1`] = `
++.emotion-0 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  margin: 0;
++  padding: 0;
++  box-shadow: none;
++  border: 0;
++  border-radius: 0;
++  background: none;
++  outline: none;
++  text-align: left;
++  color: #0073aa;
++  -webkit-text-decoration: underline;
++  text-decoration: underline;
++  -webkit-transition-property: border,background,color;
++  transition-property: border,background,color;
++  -webkit-transition-duration: 0.05s;
++  transition-duration: 0.05s;
++  -webkit-transition-timing-function: ease-in-out;
++  transition-timing-function: ease-in-out;
++  height: auto;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-0 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-0[aria-expanded='true'],
++.emotion-0:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-0[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-0:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-0:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-0:disabled,
++.emotion-0[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-0 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-0 .components-visually-hidden {
++  height: auto;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-0 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-0:hover:not(:disabled ),
++.emotion-0:active:not(:disabled ) {
++  color: #00a0d2;
++  box-shadow: none;
++}
++
++.emotion-0:focus {
++  color: #124964;
++  box-shadow: 0 0 0 1px #5b9dd9,0 0 1.5px 1px rgba( 30,140,190,0.8 );
++}
++
+ <Dropdown
+   className="components-circular-option-picker__dropdown-link-action"
+   contentClassName="components-color-palette__picker"
+@@ -116,16 +221,28 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+       isLink={true}
+       onClick={[Function]}
+     >
+-      <button
++      <LinkButton
+         aria-expanded={false}
+         aria-haspopup="true"
+         aria-label="Custom color picker"
++        as="button"
+         className="components-button is-link"
++        hasIcon={false}
++        hasText={false}
+         onClick={[Function]}
+         type="button"
+       >
+-        Custom color
+-      </button>
++        <button
++          aria-expanded={false}
++          aria-haspopup="true"
++          aria-label="Custom color picker"
++          className="components-button is-link emotion-0 emotion-1"
++          onClick={[Function]}
++          type="button"
++        >
++          Custom color
++        </button>
++      </LinkButton>
+     </ForwardRef(Button)>
+   </div>
+ </Dropdown>
+@@ -193,6 +310,355 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
+ `;
+ 
+ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
++.emotion-0 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  color: #fff;
++  background: #1e1e1e;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-0 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-0[aria-expanded='true'],
++.emotion-0:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-0[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-0:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-0:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-0:disabled,
++.emotion-0[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-0 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-0 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-0:focus:not(:disabled ) {
++  box-shadow: inset 0 0 0 1px #fff,0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 2px solid transparent;
++}
++
++.emotion-0:hover:not(:disabled ) {
++  color: #fff;
++  background: #1e1e1e;
++}
++
++.emotion-0[aria-expanded='true'],
++.emotion-0:hover {
++  color: #fff;
++}
++
++.emotion-2 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-2 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-2[aria-expanded='true'],
++.emotion-2:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-2[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-2:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-2:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-2:disabled,
++.emotion-2[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-2 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-2 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-6 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  margin: 0;
++  padding: 0;
++  box-shadow: none;
++  border: 0;
++  border-radius: 0;
++  background: none;
++  outline: none;
++  text-align: left;
++  color: #0073aa;
++  -webkit-text-decoration: underline;
++  text-decoration: underline;
++  -webkit-transition-property: border,background,color;
++  transition-property: border,background,color;
++  -webkit-transition-duration: 0.05s;
++  transition-duration: 0.05s;
++  -webkit-transition-timing-function: ease-in-out;
++  transition-timing-function: ease-in-out;
++  height: auto;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-6 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-6[aria-expanded='true'],
++.emotion-6:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-6[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-6:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-6:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-6:disabled,
++.emotion-6[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-6 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-6 .components-visually-hidden {
++  height: auto;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-6 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-6:hover:not(:disabled ),
++.emotion-6:active:not(:disabled ) {
++  color: #00a0d2;
++  box-shadow: none;
++}
++
++.emotion-6:focus {
++  color: #124964;
++  box-shadow: 0 0 0 1px #5b9dd9,0 0 1.5px 1px rgba( 30,140,190,0.8 );
++}
++
++.emotion-8 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  height: 24px;
++  line-height: 22px;
++  padding: 0 8px;
++  font-size: 11px;
++  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++  white-space: nowrap;
++  color: var( --wp-admin-theme-color );
++  background: transparent;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-8 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-8[aria-expanded='true'],
++.emotion-8:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-8[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-8:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-8:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-8:disabled,
++.emotion-8[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-8 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-8 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-8:active:not(:disabled ) {
++  background: #e0e0e0;
++  color: var( --wp-admin-theme-color-darker-10 );
++  box-shadow: none;
++}
++
++.emotion-8:hover:not(:disabled ) {
++  color: var( --wp-admin-theme-color-darker-10 );
++  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color-darker-10 );
++}
++
++.emotion-8:disabled,
++.emotion-8[aria-disabled='true'],
++.emotion-8[aria-disabled='true']:hover {
++  color: #828282;
++  background: #eaeaea;
++  -webkit-transform: none;
++  -ms-transform: none;
++  transform: none;
++  opacity: 1;
++  box-shadow: none;
++}
++
+ <ColorPalette
+   colors={
+     Array [
+@@ -332,10 +798,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                   }
+                 }
+               >
+-                <button
++                <BaseButton
+                   aria-label="Color: red"
+                   aria-pressed={true}
++                  as="button"
+                   className="components-button components-circular-option-picker__option is-pressed"
++                  hasIcon={false}
++                  hasText={false}
++                  isPressed={true}
+                   onBlur={[Function]}
+                   onClick={[Function]}
+                   onFocus={[Function]}
+@@ -349,7 +819,26 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                     }
+                   }
+                   type="button"
+-                />
++                >
++                  <button
++                    aria-label="Color: red"
++                    aria-pressed={true}
++                    className="components-button components-circular-option-picker__option is-pressed emotion-0 emotion-1"
++                    onBlur={[Function]}
++                    onClick={[Function]}
++                    onFocus={[Function]}
++                    onMouseDown={[Function]}
++                    onMouseEnter={[Function]}
++                    onMouseLeave={[Function]}
++                    style={
++                      Object {
++                        "backgroundColor": "#f00",
++                        "color": "#f00",
++                      }
++                    }
++                    type="button"
++                  />
++                </BaseButton>
+               </ForwardRef(Button)>
+             </Tooltip>
+             <Icon
+@@ -431,10 +920,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                   }
+                 }
+               >
+-                <button
++                <BaseButton
+                   aria-label="Color: white"
+                   aria-pressed={false}
++                  as="button"
+                   className="components-button components-circular-option-picker__option"
++                  hasIcon={false}
++                  hasText={false}
++                  isPressed={false}
+                   onBlur={[Function]}
+                   onClick={[Function]}
+                   onFocus={[Function]}
+@@ -448,7 +941,26 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                     }
+                   }
+                   type="button"
+-                />
++                >
++                  <button
++                    aria-label="Color: white"
++                    aria-pressed={false}
++                    className="components-button components-circular-option-picker__option emotion-2 emotion-1"
++                    onBlur={[Function]}
++                    onClick={[Function]}
++                    onFocus={[Function]}
++                    onMouseDown={[Function]}
++                    onMouseEnter={[Function]}
++                    onMouseLeave={[Function]}
++                    style={
++                      Object {
++                        "backgroundColor": "#fff",
++                        "color": "#fff",
++                      }
++                    }
++                    type="button"
++                  />
++                </BaseButton>
+               </ForwardRef(Button)>
+             </Tooltip>
+           </div>
+@@ -490,10 +1002,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                   }
+                 }
+               >
+-                <button
++                <BaseButton
+                   aria-label="Color: blue"
+                   aria-pressed={false}
++                  as="button"
+                   className="components-button components-circular-option-picker__option"
++                  hasIcon={false}
++                  hasText={false}
++                  isPressed={false}
+                   onBlur={[Function]}
+                   onClick={[Function]}
+                   onFocus={[Function]}
+@@ -507,7 +1023,26 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                     }
+                   }
+                   type="button"
+-                />
++                >
++                  <button
++                    aria-label="Color: blue"
++                    aria-pressed={false}
++                    className="components-button components-circular-option-picker__option emotion-2 emotion-1"
++                    onBlur={[Function]}
++                    onClick={[Function]}
++                    onFocus={[Function]}
++                    onMouseDown={[Function]}
++                    onMouseEnter={[Function]}
++                    onMouseLeave={[Function]}
++                    style={
++                      Object {
++                        "backgroundColor": "#00f",
++                        "color": "#00f",
++                      }
++                    }
++                    type="button"
++                  />
++                </BaseButton>
+               </ForwardRef(Button)>
+             </Tooltip>
+           </div>
+@@ -546,16 +1081,28 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                 isLink={true}
+                 onClick={[Function]}
+               >
+-                <button
++                <LinkButton
+                   aria-expanded={false}
+                   aria-haspopup="true"
+                   aria-label="Custom color picker"
++                  as="button"
+                   className="components-button is-link"
++                  hasIcon={false}
++                  hasText={false}
+                   onClick={[Function]}
+                   type="button"
+                 >
+-                  Custom color
+-                </button>
++                  <button
++                    aria-expanded={false}
++                    aria-haspopup="true"
++                    aria-label="Custom color picker"
++                    className="components-button is-link emotion-6 emotion-7"
++                    onClick={[Function]}
++                    type="button"
++                  >
++                    Custom color
++                  </button>
++                </LinkButton>
+               </ForwardRef(Button)>
+             </div>
+           </Dropdown>
+@@ -569,13 +1116,23 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+             isSmall={true}
+             onClick={[Function]}
+           >
+-            <button
++            <SecondaryButton
++              as="button"
+               className="components-button components-circular-option-picker__clear is-secondary is-small"
++              hasIcon={false}
++              hasText={false}
++              isSmall={true}
+               onClick={[Function]}
+               type="button"
+             >
+-              Clear
+-            </button>
++              <button
++                className="components-button components-circular-option-picker__clear is-secondary is-small emotion-8 emotion-9"
++                onClick={[Function]}
++                type="button"
++              >
++                Clear
++              </button>
++            </SecondaryButton>
+           </ForwardRef(Button)>
+         </ButtonAction>
+       </div>
+diff --git a/packages/components/src/color-picker/test/__snapshots__/index.js.snap b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+index 4fdc373fe966bd..e77e10275c5ae8 100644
+--- a/packages/components/src/color-picker/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+@@ -1,24 +1,169 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`ColorPicker should commit changes to all views on blur 1`] = `
+-.emotion-4 {
++.emotion-0 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-0 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-0[aria-expanded='true'],
++.emotion-0:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-0[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-0:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-0:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-0:disabled,
++.emotion-0[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-0 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-0 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-6 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+ }
+ 
+-.emotion-2 {
++.emotion-4 {
+   margin-bottom: 8px;
+ }
+ 
+-.components-panel__row .emotion-2 {
++.components-panel__row .emotion-4 {
+   margin-bottom: inherit;
+ }
+ 
+-.emotion-0 {
++.emotion-2 {
+   display: inline-block;
+   margin-bottom: 8px;
+ }
+ 
++.emotion-8 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  padding: 6px;
++  min-width: 36px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-8 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-8[aria-expanded='true'],
++.emotion-8:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-8[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-8:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-8:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-8:disabled,
++.emotion-8[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-8 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-8 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-8 .dashicon {
++  display: inline-block;
++  -webkit-flex: 0 0 auto;
++  -ms-flex: 0 0 auto;
++  flex: 0 0 auto;
++}
++
+ <div
+   className="components-color-picker is-alpha-disabled"
+ >
+@@ -47,7 +192,7 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
+         <button
+           aria-describedby="color-picker-saturation-2"
+           aria-label="Choose a shade"
+-          className="components-button components-color-picker__saturation-pointer"
++          className="components-button components-color-picker__saturation-pointer emotion-0 emotion-1"
+           onKeyDown={[Function]}
+           style={
+             Object {
+@@ -135,13 +280,13 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
+         className="components-color-picker__inputs-fields"
+       >
+         <div
+-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
++          className="components-base-control components-color-picker__inputs-field emotion-6 emotion-7"
+         >
+           <div
+-            className="components-base-control__field emotion-2 emotion-3"
++            className="components-base-control__field emotion-4 emotion-5"
+           >
+             <label
+-              className="components-base-control__label emotion-0 emotion-1"
++              className="components-base-control__label emotion-2 emotion-3"
+               htmlFor="inspector-text-control-2"
+             >
+               Color value in hexadecimal
+@@ -163,7 +308,7 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
+       >
+         <button
+           aria-label="Change color format"
+-          className="components-button components-color-picker__inputs-toggle has-icon"
++          className="components-button components-color-picker__inputs-toggle has-icon emotion-8 emotion-1"
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
+@@ -193,24 +338,169 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
+ `;
+ 
+ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = `
+-.emotion-4 {
++.emotion-0 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-0 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-0[aria-expanded='true'],
++.emotion-0:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-0[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-0:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-0:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-0:disabled,
++.emotion-0[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-0 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-0 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-6 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+ }
+ 
+-.emotion-2 {
++.emotion-4 {
+   margin-bottom: 8px;
+ }
+ 
+-.components-panel__row .emotion-2 {
++.components-panel__row .emotion-4 {
+   margin-bottom: inherit;
+ }
+ 
+-.emotion-0 {
++.emotion-2 {
+   display: inline-block;
+   margin-bottom: 8px;
+ }
+ 
++.emotion-8 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  padding: 6px;
++  min-width: 36px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-8 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-8[aria-expanded='true'],
++.emotion-8:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-8[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-8:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-8:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-8:disabled,
++.emotion-8[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-8 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-8 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-8 .dashicon {
++  display: inline-block;
++  -webkit-flex: 0 0 auto;
++  -ms-flex: 0 0 auto;
++  flex: 0 0 auto;
++}
++
+ <div
+   className="components-color-picker is-alpha-disabled"
+ >
+@@ -239,7 +529,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] =
+         <button
+           aria-describedby="color-picker-saturation-4"
+           aria-label="Choose a shade"
+-          className="components-button components-color-picker__saturation-pointer"
++          className="components-button components-color-picker__saturation-pointer emotion-0 emotion-1"
+           onKeyDown={[Function]}
+           style={
+             Object {
+@@ -327,13 +617,13 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] =
+         className="components-color-picker__inputs-fields"
+       >
+         <div
+-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
++          className="components-base-control components-color-picker__inputs-field emotion-6 emotion-7"
+         >
+           <div
+-            className="components-base-control__field emotion-2 emotion-3"
++            className="components-base-control__field emotion-4 emotion-5"
+           >
+             <label
+-              className="components-base-control__label emotion-0 emotion-1"
++              className="components-base-control__label emotion-2 emotion-3"
+               htmlFor="inspector-text-control-4"
+             >
+               Color value in hexadecimal
+@@ -355,7 +645,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] =
+       >
+         <button
+           aria-label="Change color format"
+-          className="components-button components-color-picker__inputs-toggle has-icon"
++          className="components-button components-color-picker__inputs-toggle has-icon emotion-8 emotion-1"
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
+@@ -385,24 +675,169 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] =
+ `;
+ 
+ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] = `
+-.emotion-4 {
++.emotion-0 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-0 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-0[aria-expanded='true'],
++.emotion-0:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-0[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-0:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-0:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-0:disabled,
++.emotion-0[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-0 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-0 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-6 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+ }
+ 
+-.emotion-2 {
++.emotion-4 {
+   margin-bottom: 8px;
+ }
+ 
+-.components-panel__row .emotion-2 {
++.components-panel__row .emotion-4 {
+   margin-bottom: inherit;
+ }
+ 
+-.emotion-0 {
++.emotion-2 {
+   display: inline-block;
+   margin-bottom: 8px;
+ }
+ 
++.emotion-8 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  padding: 6px;
++  min-width: 36px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-8 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-8[aria-expanded='true'],
++.emotion-8:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-8[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-8:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-8:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-8:disabled,
++.emotion-8[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-8 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-8 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-8 .dashicon {
++  display: inline-block;
++  -webkit-flex: 0 0 auto;
++  -ms-flex: 0 0 auto;
++  flex: 0 0 auto;
++}
++
+ <div
+   className="components-color-picker is-alpha-disabled"
+ >
+@@ -431,7 +866,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
+         <button
+           aria-describedby="color-picker-saturation-5"
+           aria-label="Choose a shade"
+-          className="components-button components-color-picker__saturation-pointer"
++          className="components-button components-color-picker__saturation-pointer emotion-0 emotion-1"
+           onKeyDown={[Function]}
+           style={
+             Object {
+@@ -519,13 +954,13 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
+         className="components-color-picker__inputs-fields"
+       >
+         <div
+-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
++          className="components-base-control components-color-picker__inputs-field emotion-6 emotion-7"
+         >
+           <div
+-            className="components-base-control__field emotion-2 emotion-3"
++            className="components-base-control__field emotion-4 emotion-5"
+           >
+             <label
+-              className="components-base-control__label emotion-0 emotion-1"
++              className="components-base-control__label emotion-2 emotion-3"
+               htmlFor="inspector-text-control-5"
+             >
+               Color value in hexadecimal
+@@ -547,7 +982,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
+       >
+         <button
+           aria-label="Change color format"
+-          className="components-button components-color-picker__inputs-toggle has-icon"
++          className="components-button components-color-picker__inputs-toggle has-icon emotion-8 emotion-1"
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
+@@ -577,24 +1012,169 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
+ `;
+ 
+ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
+-.emotion-4 {
++.emotion-0 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-0 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-0[aria-expanded='true'],
++.emotion-0:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-0[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-0:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-0:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-0:disabled,
++.emotion-0[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-0 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-0 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-6 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+ }
+ 
+-.emotion-2 {
++.emotion-4 {
+   margin-bottom: 8px;
+ }
+ 
+-.components-panel__row .emotion-2 {
++.components-panel__row .emotion-4 {
+   margin-bottom: inherit;
+ }
+ 
+-.emotion-0 {
++.emotion-2 {
+   display: inline-block;
+   margin-bottom: 8px;
+ }
+ 
++.emotion-8 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  padding: 6px;
++  min-width: 36px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-8 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-8[aria-expanded='true'],
++.emotion-8:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-8[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-8:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-8:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-8:disabled,
++.emotion-8[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-8 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-8 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-8 .dashicon {
++  display: inline-block;
++  -webkit-flex: 0 0 auto;
++  -ms-flex: 0 0 auto;
++  flex: 0 0 auto;
++}
++
+ <div
+   className="components-color-picker is-alpha-disabled"
+ >
+@@ -623,7 +1203,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
+         <button
+           aria-describedby="color-picker-saturation-3"
+           aria-label="Choose a shade"
+-          className="components-button components-color-picker__saturation-pointer"
++          className="components-button components-color-picker__saturation-pointer emotion-0 emotion-1"
+           onKeyDown={[Function]}
+           style={
+             Object {
+@@ -711,13 +1291,13 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
+         className="components-color-picker__inputs-fields"
+       >
+         <div
+-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
++          className="components-base-control components-color-picker__inputs-field emotion-6 emotion-7"
+         >
+           <div
+-            className="components-base-control__field emotion-2 emotion-3"
++            className="components-base-control__field emotion-4 emotion-5"
+           >
+             <label
+-              className="components-base-control__label emotion-0 emotion-1"
++              className="components-base-control__label emotion-2 emotion-3"
+               htmlFor="inspector-text-control-3"
+             >
+               Color value in hexadecimal
+@@ -739,7 +1319,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
+       >
+         <button
+           aria-label="Change color format"
+-          className="components-button components-color-picker__inputs-toggle has-icon"
++          className="components-button components-color-picker__inputs-toggle has-icon emotion-8 emotion-1"
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
+@@ -769,24 +1349,169 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
+ `;
+ 
+ exports[`ColorPicker should only update input view for draft changes 1`] = `
+-.emotion-4 {
++.emotion-0 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-0 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-0[aria-expanded='true'],
++.emotion-0:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-0[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-0:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-0:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-0:disabled,
++.emotion-0[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-0 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-0 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-6 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+ }
+ 
+-.emotion-2 {
++.emotion-4 {
+   margin-bottom: 8px;
+ }
+ 
+-.components-panel__row .emotion-2 {
++.components-panel__row .emotion-4 {
+   margin-bottom: inherit;
+ }
+ 
+-.emotion-0 {
++.emotion-2 {
+   display: inline-block;
+   margin-bottom: 8px;
+ }
+ 
++.emotion-8 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  padding: 6px;
++  min-width: 36px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-8 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-8[aria-expanded='true'],
++.emotion-8:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-8[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-8:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-8:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-8:disabled,
++.emotion-8[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-8 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-8 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-8 .dashicon {
++  display: inline-block;
++  -webkit-flex: 0 0 auto;
++  -ms-flex: 0 0 auto;
++  flex: 0 0 auto;
++}
++
+ <div
+   className="components-color-picker is-alpha-disabled"
+ >
+@@ -815,7 +1540,7 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
+         <button
+           aria-describedby="color-picker-saturation-1"
+           aria-label="Choose a shade"
+-          className="components-button components-color-picker__saturation-pointer"
++          className="components-button components-color-picker__saturation-pointer emotion-0 emotion-1"
+           onKeyDown={[Function]}
+           style={
+             Object {
+@@ -903,13 +1628,13 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
+         className="components-color-picker__inputs-fields"
+       >
+         <div
+-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
++          className="components-base-control components-color-picker__inputs-field emotion-6 emotion-7"
+         >
+           <div
+-            className="components-base-control__field emotion-2 emotion-3"
++            className="components-base-control__field emotion-4 emotion-5"
+           >
+             <label
+-              className="components-base-control__label emotion-0 emotion-1"
++              className="components-base-control__label emotion-2 emotion-3"
+               htmlFor="inspector-text-control-1"
+             >
+               Color value in hexadecimal
+@@ -931,7 +1656,7 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
+       >
+         <button
+           aria-label="Change color format"
+-          className="components-button components-color-picker__inputs-toggle has-icon"
++          className="components-button components-color-picker__inputs-toggle has-icon emotion-8 emotion-1"
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
+@@ -961,24 +1686,169 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
+ `;
+ 
+ exports[`ColorPicker should render color picker 1`] = `
+-.emotion-4 {
++.emotion-0 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-0 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-0[aria-expanded='true'],
++.emotion-0:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-0[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-0:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-0:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-0:disabled,
++.emotion-0[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-0 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-0 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-6 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+ }
+ 
+-.emotion-2 {
++.emotion-4 {
+   margin-bottom: 8px;
+ }
+ 
+-.components-panel__row .emotion-2 {
++.components-panel__row .emotion-4 {
+   margin-bottom: inherit;
+ }
+ 
+-.emotion-0 {
++.emotion-2 {
+   display: inline-block;
+   margin-bottom: 8px;
+ }
+ 
++.emotion-8 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  padding: 6px;
++  min-width: 36px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-8 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-8[aria-expanded='true'],
++.emotion-8:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-8[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-8:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-8:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-8:disabled,
++.emotion-8[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-8 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-8 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-8 .dashicon {
++  display: inline-block;
++  -webkit-flex: 0 0 auto;
++  -ms-flex: 0 0 auto;
++  flex: 0 0 auto;
++}
++
+ <div
+   className="components-color-picker is-alpha-disabled"
+ >
+@@ -1007,7 +1877,7 @@ exports[`ColorPicker should render color picker 1`] = `
+         <button
+           aria-describedby="color-picker-saturation-0"
+           aria-label="Choose a shade"
+-          className="components-button components-color-picker__saturation-pointer"
++          className="components-button components-color-picker__saturation-pointer emotion-0 emotion-1"
+           onKeyDown={[Function]}
+           style={
+             Object {
+@@ -1095,13 +1965,13 @@ exports[`ColorPicker should render color picker 1`] = `
+         className="components-color-picker__inputs-fields"
+       >
+         <div
+-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
++          className="components-base-control components-color-picker__inputs-field emotion-6 emotion-7"
+         >
+           <div
+-            className="components-base-control__field emotion-2 emotion-3"
++            className="components-base-control__field emotion-4 emotion-5"
+           >
+             <label
+-              className="components-base-control__label emotion-0 emotion-1"
++              className="components-base-control__label emotion-2 emotion-3"
+               htmlFor="inspector-text-control-0"
+             >
+               Color value in hexadecimal
+@@ -1123,7 +1993,7 @@ exports[`ColorPicker should render color picker 1`] = `
+       >
+         <button
+           aria-label="Change color format"
+-          className="components-button components-color-picker__inputs-toggle has-icon"
++          className="components-button components-color-picker__inputs-toggle has-icon emotion-8 emotion-1"
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 00270b85823a61..842ee790613f78 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -1,3 +1,9 @@
++/**
++ * Internal dependencies
++ */
++// Resolves Emotion (CSS-in-JS) style rendering.
++import './utils/resolve-style-rendering';
++
+ // Primitives
+ export {
+ 	SVG,
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 8df959bfb4a428..7a607f49f335c5 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -1,7 +1,6 @@
+ @import "./animate/style.scss";
+ @import "./autocomplete/style.scss";
+ @import "./button-group/style.scss";
+-@import "./button/style.scss";
+ @import "./checkbox-control/style.scss";
+ @import "./circular-option-picker/style.scss";
+ @import "./color-edit/style.scss";
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index b9e2313c6bbb44..ec9ee73667a31a 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -31,7 +31,8 @@ export const G2 = {
+ 		700: '#757575', // Meets 4.6:1 text contrast against white.
+ 		600: '#949494', // Meets 3:1 UI or large text contrast against white.
+ 		400: '#ccc',
+-		200: '#ddd', // Used for most borders.
++		300: '#ddd', // Used for most borders.
++		200: '#e0e0e0',
+ 		100: '#f0f0f0',
+ 	},
+ 	darkGray: {
+@@ -156,7 +157,7 @@ export const UI = {
+ 	border: G2.gray[ 700 ],
+ 	borderFocus: ADMIN.themeDark10,
+ 	borderDisabled: G2.gray[ 400 ],
+-	borderLight: G2.gray[ 200 ],
++	borderLight: G2.gray[ 300 ],
+ 	label: DARK_GRAY[ 500 ],
+ 	textDisabled: DARK_GRAY[ 150 ],
+ 	textDark: BASE.white,
+@@ -169,6 +170,7 @@ export const COLORS = {
+ 	darkOpacity: DARK_OPACITY,
+ 	darkOpacityLight: DARK_OPACITY_LIGHT,
+ 	mediumGray: G2.mediumGray,
++	gray: G2.gray,
+ 	lightGray: merge( {}, LIGHT_GRAY, G2.lightGray ),
+ 	lightGrayLight: LIGHT_OPACITY_LIGHT,
+ 	blue: merge( {}, BLUE, G2.blue ),
+diff --git a/packages/components/src/utils/colors.js b/packages/components/src/utils/colors.js
+index 43518ce29de140..1ddea4c543586c 100644
+--- a/packages/components/src/utils/colors.js
++++ b/packages/components/src/utils/colors.js
+@@ -12,7 +12,7 @@ import { COLORS } from './colors-values';
+ /**
+  * Generating a CSS complient rgba() color value.
+  *
+- * @param {string} hexValue The hex value to convert to rgba().
++ * @param {import('tinycolor2').ColorInput} hexValue The hex value to convert to rgba().
+  * @param {number} alpha The alpha value for opacity.
+  * @return {string} The converted rgba() color value.
+  *
+@@ -25,6 +25,28 @@ export function rgba( hexValue = '', alpha = 1 ) {
+ 	return `rgba(${ r }, ${ g }, ${ b }, ${ alpha })`;
+ }
+ 
++/**
++ * @see https://sass-lang.com/documentation/modules/color#lighten
++ * @see https://github.com/bgrins/TinyColor#lighten
++ * @param {import('tinycolor2').ColorInput} value The value to lighten.
++ * @param {number} by A number between 0 and 100 inclusive.
++ * @return {string} The lightened color.
++ */
++export function lighten( value = '', by = 0 ) {
++	return tinycolor( value ).lighten( by ).toString();
++}
++
++/**
++ * @see https://sass-lang.com/documentation/modules/color#darken
++ * @see https://github.com/bgrins/TinyColor#darken
++ * @param {import('tinycolor2').ColorInput} value The value to darken.
++ * @param {number} by A number between 0 and 100 inclusive.
++ * @return {string} The darkened color.
++ */
++export function darken( value = '', by = 0 ) {
++	return tinycolor( value ).darken( by ).toString();
++}
++
+ /**
+  * Retrieves a color from the color palette.
+  *
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 8cdad985401542..e10b77e829860d 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -3,4 +3,5 @@ export default {
+ 	borderWidth: '1px',
+ 	borderWidthFocus: '1.5px',
+ 	borderWidthTab: '4px',
++	buttonSize: '36px',
+ };
+diff --git a/packages/components/src/utils/resolve-style-rendering.js b/packages/components/src/utils/resolve-style-rendering.js
+new file mode 100644
+index 00000000000000..e44f3716f6c1a3
+--- /dev/null
++++ b/packages/components/src/utils/resolve-style-rendering.js
+@@ -0,0 +1,172 @@
++const EMOTION_TAG_SELECTOR = 'style[data-emotion="css"]';
++const INSERTION_ANCHOR_ID = 'resolve-style-rendering-node';
++
++let __didInvokeResolver__ = false;
++/*
++ * A cache that tracks tags that have been resolved. This prevents
++ * the MutationObserver from adjusting the tag HTML Element again.
++ */
++const __resolvedCache__ = new WeakSet();
++
++function getHeadNode() {
++	return document.getElementsByTagName( 'head' )[ 0 ];
++}
++
++/**
++ * Retrieves the "insertion" anchor point for Emotion style tags to
++ * re-order to when resolving styles.
++ *
++ * @return {HTMLStyleElement} The insertion style HTML node.
++ */
++function getInsertionAnchorNode() {
++	let node = document.getElementById( INSERTION_ANCHOR_ID );
++	if ( node ) return node;
++
++	const headNode = getHeadNode();
++
++	/*
++	 * Injecting the insertion HTML element to act as the "anchor" point
++	 * for Emotion tags to insert to.
++	 */
++	node = document.createElement( 'style' );
++	node.id = INSERTION_ANCHOR_ID;
++
++	headNode.prepend( node );
++
++	return node;
++}
++
++/**
++ * Checks if an HTML element is an Emotion style tag.
++ *
++ * @param {HTMLElement} node The HTMLElement to check.
++ * @return {boolean} If the node is an Emotion style tag.
++ */
++function isEmotionStyleTag( node ) {
++	return (
++		node &&
++		node.tagName === 'STYLE' &&
++		node.getAttribute( 'data-emotion' ) === 'css'
++	);
++}
++
++/**
++ * Retrieves all rendered Emotion style tags.
++ *
++ * @return {Array<HTMLStyleElement>} A collection of Emotion style tags.
++ */
++function getEmotionStyleTags() {
++	/*
++	 * Note: querySelectorAll with HTML attribute does not work with IE11.
++	 */
++	return Array.from( document.querySelectorAll( EMOTION_TAG_SELECTOR ) );
++}
++
++/**
++ * Reorders an Emotion style tag to the top of the document.head.
++ *
++ * This adjusts the cascading rendering order of the document.styleSheet,
++ * allowing for non-Emotion style rules to be cascade afterwards.
++ *
++ * @param {HTMLStyleElement} node The Emotion style tag.
++ */
++function reorderEmotionStyleTag( node ) {
++	if ( ! node ) return;
++	// Ensure that reordering only happens for unresolved tags.
++	if ( __resolvedCache__.has( node ) ) return;
++
++	const headNode = getHeadNode();
++	const insertionNode = getInsertionAnchorNode();
++
++	headNode.insertBefore( node, insertionNode );
++
++	// Marking it as "resolved", so it does not get moved again.
++	__resolvedCache__.add( node );
++}
++
++/**
++ * Creates an observer that resolves newly injected Emotion style tags.
++ * This observer will resolve the style rendering for these Emotion tags
++ * by shifting their position to the top of the document.head.
++ *
++ * @return {MutationObserver} The MutationObserver instance.
++ */
++function createEmotionStyleTagObserver() {
++	if ( ! window ) {
++		/* Escape in case of SSR or other non-browser env */
++		return;
++	}
++	const { MutationObserver } = window;
++
++	const headNode = getHeadNode();
++	const config = { attributes: true, childList: true, subtree: true };
++
++	const handleOnMutation = ( mutationsList ) => {
++		for ( const mutation of mutationsList ) {
++			if ( mutation.type === 'childList' ) {
++				/*
++				 * Only resolve when Emotion style tags are initially added.
++				 */
++				const [ targetNode ] = mutation.addedNodes;
++
++				if ( isEmotionStyleTag( targetNode ) ) {
++					reorderEmotionStyleTag( targetNode );
++				}
++			}
++		}
++	};
++
++	const observer = new MutationObserver( handleOnMutation );
++	observer.observe( headNode, config );
++
++	return observer;
++}
++
++/**
++ * Resolves styles generated by Emotion.
++ *
++ * This is achieved by ensuring that Emotion generated style rules are rendered
++ * before other styles (such as link imported stylesheets). This technique
++ * resolves specificity issues related to style rules from Emotion vs
++ * non-Emotion sources accidentally overriding, especially as it relates
++ * to ordering.
++ *
++ * This resolver helps smooth things out as we continue our efforts to
++ * refactor and migrate styles over to CSS-in-JS generated styles.
++ *
++ * This can be removed once the styles are stable.
++ */
++function resolveEmotionStyleTagRendering() {
++	if ( ! window ) {
++		/* Escape in case of SSR or other non-browser env */
++		return;
++	}
++	if ( __didInvokeResolver__ ) return;
++
++	try {
++		/*
++		 * Shifting the order of Emotion rendered style tags to the top of
++		 * the document.head. This resolves specificity conflicts between
++		 * CSS-in-JS styles and stylesheet rendered styles.
++		 */
++		const styleTags = getEmotionStyleTags();
++		styleTags.forEach( reorderEmotionStyleTag );
++
++		/**
++		 * Observe and resolve addition Emotion rendered style tags.
++		 *
++		 * This observer continues to function throughout the entire
++		 * browsing session.
++		 */
++		createEmotionStyleTagObserver();
++	} catch ( err ) {}
++
++	// Ensure this resolver is only invoked once.
++	__didInvokeResolver__ = true;
++}
++
++/*
++ * This function is invoked immediately to resolve any Emotion rendered styles
++ * within the context of WordPress/Gutenberg.
++ */
++resolveEmotionStyleTagRendering();
+diff --git a/packages/components/src/utils/style-mixins.js b/packages/components/src/utils/style-mixins.js
+index 74c9074a6c826f..19d7163d363a1c 100644
+--- a/packages/components/src/utils/style-mixins.js
++++ b/packages/components/src/utils/style-mixins.js
+@@ -1,4 +1,4 @@
+-export { color, rgba } from './colors';
++export { color, rgba, lighten, darken } from './colors';
+ export { reduceMotion } from './reduce-motion';
+ export { rtl, getRTL, useRTL } from './rtl';
+ export { space } from './space';
+diff --git a/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap
+index 7dfc1004081211..f8359ce333ebc3 100644
+--- a/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap
+@@ -1,6 +1,85 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`MoreMenu should match snapshot 1`] = `
++.emotion-0 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  padding: 6px;
++  min-width: 36px;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-0 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-0[aria-expanded='true'],
++.emotion-0:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-0[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-0:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-0:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-0:disabled,
++.emotion-0[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-0 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-0 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-0 .dashicon {
++  display: inline-block;
++  -webkit-flex: 0 0 auto;
++  -ms-flex: 0 0 auto;
++  flex: 0 0 auto;
++}
++
+ <MoreMenu>
+   <DropdownMenu
+     className="edit-post-more-menu"
+@@ -67,11 +146,14 @@ exports[`MoreMenu should match snapshot 1`] = `
+             position="bottom"
+             text="Options"
+           >
+-            <button
++            <BaseButton
+               aria-expanded={false}
+               aria-haspopup="true"
+               aria-label="Options"
++              as="button"
+               className="components-button components-dropdown-menu__toggle has-icon"
++              hasIcon={true}
++              hasText={false}
+               onBlur={[Function]}
+               onClick={[Function]}
+               onFocus={[Function]}
+@@ -81,45 +163,60 @@ exports[`MoreMenu should match snapshot 1`] = `
+               onMouseLeave={[Function]}
+               type="button"
+             >
+-              <Icon
+-                icon={
+-                  <SVG
+-                    viewBox="0 0 24 24"
+-                    xmlns="http://www.w3.org/2000/svg"
+-                  >
+-                    <Path
+-                      d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
+-                    />
+-                  </SVG>
+-                }
+-                key="0,0"
++              <button
++                aria-expanded={false}
++                aria-haspopup="true"
++                aria-label="Options"
++                className="components-button components-dropdown-menu__toggle has-icon emotion-0 emotion-1"
++                onBlur={[Function]}
++                onClick={[Function]}
++                onFocus={[Function]}
++                onKeyDown={[Function]}
++                onMouseDown={[Function]}
++                onMouseEnter={[Function]}
++                onMouseLeave={[Function]}
++                type="button"
+               >
+-                <SVG
+-                  height={24}
+-                  viewBox="0 0 24 24"
+-                  width={24}
+-                  xmlns="http://www.w3.org/2000/svg"
++                <Icon
++                  icon={
++                    <SVG
++                      viewBox="0 0 24 24"
++                      xmlns="http://www.w3.org/2000/svg"
++                    >
++                      <Path
++                        d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
++                      />
++                    </SVG>
++                  }
++                  key="0,0"
+                 >
+-                  <svg
+-                    aria-hidden={true}
+-                    focusable={false}
++                  <SVG
+                     height={24}
+-                    role="img"
+                     viewBox="0 0 24 24"
+                     width={24}
+                     xmlns="http://www.w3.org/2000/svg"
+                   >
+-                    <Path
+-                      d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
++                    <svg
++                      aria-hidden={true}
++                      focusable={false}
++                      height={24}
++                      role="img"
++                      viewBox="0 0 24 24"
++                      width={24}
++                      xmlns="http://www.w3.org/2000/svg"
+                     >
+-                      <path
++                      <Path
+                         d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
+-                      />
+-                    </Path>
+-                  </svg>
+-                </SVG>
+-              </Icon>
+-            </button>
++                      >
++                        <path
++                          d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
++                        />
++                      </Path>
++                    </svg>
++                  </SVG>
++                </Icon>
++              </button>
++            </BaseButton>
+           </Tooltip>
+         </ForwardRef(Button)>
+       </div>
+diff --git a/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap b/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
+index 73f69e0b93df00..39aaf4838679fb 100644
+--- a/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
+@@ -14,6 +14,100 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+   margin-bottom: inherit;
+ }
+ 
++.emotion-4 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++  white-space: nowrap;
++  color: var( --wp-admin-theme-color );
++  background: transparent;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-4 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-4[aria-expanded='true'],
++.emotion-4:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-4[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-4:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-4:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-4:disabled,
++.emotion-4[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-4 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-4 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-4:active:not(:disabled ) {
++  background: #e0e0e0;
++  color: var( --wp-admin-theme-color-darker-10 );
++  box-shadow: none;
++}
++
++.emotion-4:hover:not(:disabled ) {
++  color: var( --wp-admin-theme-color-darker-10 );
++  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color-darker-10 );
++}
++
++.emotion-4:disabled,
++.emotion-4[aria-disabled='true'],
++.emotion-4[aria-disabled='true']:hover {
++  color: #828282;
++  background: #eaeaea;
++  -webkit-transform: none;
++  -ms-transform: none;
++  transform: none;
++  opacity: 1;
++  box-shadow: none;
++}
++
+ <div
+   className="edit-post-preferences-modal__option"
+ >
+@@ -61,7 +155,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+     A page reload is required for this change. Make sure your content is saved before reloading.
+   </p>
+   <button
+-    className="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
++    className="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary emotion-4 emotion-5"
+     disabled={false}
+     onClick={[Function]}
+     type="button"
+@@ -143,6 +237,100 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+   margin-bottom: inherit;
+ }
+ 
++.emotion-4 {
++  display: -webkit-inline-box;
++  display: -webkit-inline-flex;
++  display: -ms-inline-flexbox;
++  display: inline-flex;
++  -webkit-text-decoration: none;
++  text-decoration: none;
++  font-size: 13px;
++  margin: 0;
++  border: 0;
++  cursor: pointer;
++  -webkit-appearance: none;
++  background: none;
++  -webkit-transition: box-shadow 0.1s linear;
++  transition: box-shadow 0.1s linear;
++  height: 36px;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  box-sizing: border-box;
++  padding: 6px 12px;
++  border-radius: 2px;
++  color: #1e1e1e;
++  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++  white-space: nowrap;
++  color: var( --wp-admin-theme-color );
++  background: transparent;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-4 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-4[aria-expanded='true'],
++.emotion-4:hover {
++  color: var( --wp-admin-theme-color );
++}
++
++.emotion-4[aria-disabled='true']:hover {
++  color: initial;
++}
++
++.emotion-4:focus:not(:disabled ) {
++  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
++  outline: 1px solid transparent;
++}
++
++.emotion-4:not([aria-disabled="true"]):active {
++  color: inherit;
++}
++
++.emotion-4:disabled,
++.emotion-4[aria-disabled="true"] {
++  cursor: default;
++  opacity: 0.3;
++}
++
++.emotion-4 svg {
++  fill: currentColor;
++  outline: none;
++}
++
++.emotion-4 .components-visually-hidden {
++  height: auto;
++}
++
++.emotion-4:active:not(:disabled ) {
++  background: #e0e0e0;
++  color: var( --wp-admin-theme-color-darker-10 );
++  box-shadow: none;
++}
++
++.emotion-4:hover:not(:disabled ) {
++  color: var( --wp-admin-theme-color-darker-10 );
++  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color-darker-10 );
++}
++
++.emotion-4:disabled,
++.emotion-4[aria-disabled='true'],
++.emotion-4[aria-disabled='true']:hover {
++  color: #828282;
++  background: #eaeaea;
++  -webkit-transform: none;
++  -ms-transform: none;
++  transform: none;
++  opacity: 1;
++  box-shadow: none;
++}
++
+ <div
+   className="edit-post-preferences-modal__option"
+ >
+@@ -176,7 +364,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+     A page reload is required for this change. Make sure your content is saved before reloading.
+   </p>
+   <button
+-    className="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
++    className="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary emotion-4 emotion-5"
+     disabled={false}
+     onClick={[Function]}
+     type="button"
+diff --git a/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
+index a6062e7af7b6ba..0464f55418391b 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`PluginPostPublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-post-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" aria-expanded=\\"true\\" class=\\"components-button components-panel__body-toggle\\"><span aria-hidden=\\"true\\"><svg width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" class=\\"components-panel__arrow\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z\\"></path></svg></span>My panel title</button></h2>My panel content</div>"`;
++exports[`PluginPostPublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-post-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" aria-expanded=\\"true\\" class=\\"components-button components-panel__body-toggle css-19pw1wt-BaseButton e919hb30\\"><span aria-hidden=\\"true\\"><svg width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" class=\\"components-panel__arrow\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z\\"></path></svg></span>My panel title</button></h2>My panel content</div>"`;
+diff --git a/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
+index b14bc1c0458d22..4f381c8d941d12 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/__snapshots__/index.js.snap
+@@ -1,4 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`PluginPrePublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-pre-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" aria-expanded=\\"true\\" class=\\"components-button components-panel__body-toggle\\"><span aria-hidden=\\"true\\"><svg width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" class=\\"components-panel__arrow\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z\\"></path></svg></span>My panel title</button></h2>My panel content</div>"`;
+-q
++exports[`PluginPrePublishPanel renders fill properly 1`] = `"<div class=\\"components-panel__body my-plugin-pre-publish-panel is-opened\\"><h2 class=\\"components-panel__body-title\\"><button type=\\"button\\" aria-expanded=\\"true\\" class=\\"components-button components-panel__body-toggle css-19pw1wt-BaseButton e919hb30\\"><span aria-hidden=\\"true\\"><svg width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" class=\\"components-panel__arrow\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z\\"></path></svg></span>My panel title</button></h2>My panel content</div>"`;
+diff --git a/packages/editor/src/components/post-featured-image/style.scss b/packages/editor/src/components/post-featured-image/style.scss
+index 965780179e6ef9..09599eab273ed9 100644
+--- a/packages/editor/src/components/post-featured-image/style.scss
++++ b/packages/editor/src/components/post-featured-image/style.scss
+@@ -28,7 +28,7 @@
+ 	}
+ }
+ 
+-.editor-post-featured-image__toggle,
++.editor-post-featured-image__toggle.components-button,
+ .editor-post-featured-image__preview {
+ 	display: block;
+ 	width: 100%;
+@@ -46,7 +46,7 @@
+ 	box-shadow: 0 0 0 4px var(--wp-admin-theme-color);
+ }
+ 
+-.editor-post-featured-image__toggle {
++.editor-post-featured-image__toggle.components-button {
+ 	border-radius: $radius-block-ui;
+ 	background-color: $gray-100;
+ 	min-height: 90px;

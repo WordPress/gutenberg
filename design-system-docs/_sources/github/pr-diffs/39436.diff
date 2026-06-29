@@ -1,0 +1,187 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 1c42e00ba5881f..938608a89b1883 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -26,7 +26,7 @@ const majorMinorRegExp =
+  */
+ const developmentFiles = [
+ 	'**/benchmark/**/*.js',
+-	'**/@(__mocks__|__tests__|test)/**/*.js',
++	'**/@(__mocks__|__tests__|test)/**/*.{js,ts,tsx}',
+ 	'**/@(storybook|stories)/**/*.js',
+ 	'packages/babel-preset-default/bin/**/*.js',
+ ];
+diff --git a/packages/components/src/text/test/__snapshots__/index.js.snap b/packages/components/src/text/test/__snapshots__/index.tsx.snap
+similarity index 75%
+rename from packages/components/src/text/test/__snapshots__/index.js.snap
+rename to packages/components/src/text/test/__snapshots__/index.tsx.snap
+index 054a5522837431..2d962f51c74f65 100644
+--- a/packages/components/src/text/test/__snapshots__/index.js.snap
++++ b/packages/components/src/text/test/__snapshots__/index.tsx.snap
+@@ -1,5 +1,21 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
++exports[`Text should render align 1`] = `
++Snapshot Diff:
++- Received styles
+++ Base styles
++
++@@ -3,7 +3,8 @@
++      "color": "#1e1e1e",
++      "font-size": "calc((13 / 13) * 13px)",
++      "font-weight": "normal",
++      "line-height": "1.2",
++      "margin": "0",
+++     "text-align": "center",
++    },
++  ]
++`;
++
+ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = `
+ .emotion-0 {
+   color: #1e1e1e;
+diff --git a/packages/components/src/text/test/index.js b/packages/components/src/text/test/index.tsx
+similarity index 88%
+rename from packages/components/src/text/test/index.js
+rename to packages/components/src/text/test/index.tsx
+index ca51ddad141876..c5dc40f0ae8958 100644
+--- a/packages/components/src/text/test/index.js
++++ b/packages/components/src/text/test/index.tsx
+@@ -59,14 +59,20 @@ describe( 'Text', () => {
+ 
+ 	test( 'should render as another element', () => {
+ 		const { container } = render( <Text as="div">Lorem ipsum.</Text> );
+-		expect( container.firstChild.nodeName ).toBe( 'DIV' );
++		expect( container.firstChild?.nodeName ).toBe( 'DIV' );
+ 	} );
+ 
+ 	test( 'should render align', () => {
+-		const { container } = render(
++		const { container: centerAlignedContainer } = render(
+ 			<Text align="center">Lorem ipsum.</Text>
+ 		);
+-		expect( container.firstChild ).toHaveStyle( { textAlign: 'center' } );
++		const { container: defaultAlignedContainer } = render(
++			<Text>Lorem ipsum.</Text>
++		);
++
++		expect(
++			defaultAlignedContainer.children[ 0 ]
++		).toMatchStyleDiffSnapshot( centerAlignedContainer.children[ 0 ] );
+ 	} );
+ 
+ 	test( 'should render color', () => {
+@@ -89,7 +95,7 @@ describe( 'Text', () => {
+ 		const wrapper = render(
+ 			<Text highlightWords={ [ 'm' ] }>Lorem ipsum.</Text>
+ 		);
+-		expect( wrapper.container.firstChild.childNodes ).toHaveLength( 5 );
++		expect( wrapper.container.firstChild?.childNodes ).toHaveLength( 5 );
+ 		const words = await wrapper.findAllByText( 'm' );
+ 		expect( words ).toHaveLength( 2 );
+ 		words.forEach( ( word ) => expect( word.tagName ).toEqual( 'MARK' ) );
+@@ -100,7 +106,7 @@ describe( 'Text', () => {
+ 			<Text highlightWords={ undefined }>Lorem ipsum.</Text>
+ 		);
+ 		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered.
+-		expect( container.firstChild.childNodes ).toHaveLength( 1 );
++		expect( container.firstChild?.childNodes ).toHaveLength( 1 );
+ 	} );
+ 
+ 	test( 'should render highlighted words with highlightCaseSensitive', () => {
+@@ -112,7 +118,7 @@ describe( 'Text', () => {
+ 
+ 		expect( container.firstChild ).toMatchSnapshot();
+ 		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered.
+-		expect( container.firstChild.childNodes ).toHaveLength( 1 );
++		expect( container.firstChild?.childNodes ).toHaveLength( 1 );
+ 	} );
+ 
+ 	test( 'should render isBlock', () => {
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 53f2fde0352449..8f8b6c412715d0 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -3,7 +3,13 @@
+ 	"compilerOptions": {
+ 		"rootDir": "src",
+ 		"declarationDir": "build-types",
+-		"types": [ "gutenberg-env" ],
++		"types": [
++			"gutenberg-env",
++			"gutenberg-test-env",
++			"jest",
++			"@testing-library/jest-dom",
++			"snapshot-diff",
++		],
+ 		// Some errors in Reakit types with TypeScript 4.3
+ 		// Remove the following line when they've been addressed.
+ 		"skipLibCheck": true,
+@@ -90,7 +96,7 @@
+ 		"src/**/*.native.js",
+ 		"src/**/react-native-*",
+ 		"src/**/stories/**.js", // only exclude js files, tsx files should be checked
+-		"src/**/test",
++		"src/**/test/**.js", // only exclude js files, ts{x} files should be checked
+ 		"src/ui/__storybook-utils",
+ 		"src/ui/font-size-control"
+ 	]
+diff --git a/test/unit/config/matchers/to-match-style-diff-snapshot.js b/test/unit/config/matchers/to-match-style-diff-snapshot.js
+index 7c810aad1736ff..c0f31d6be62a2c 100644
+--- a/test/unit/config/matchers/to-match-style-diff-snapshot.js
++++ b/test/unit/config/matchers/to-match-style-diff-snapshot.js
+@@ -8,7 +8,7 @@ const getStyleSheets = () =>
+ 
+ /**
+  *
+- * @param {Element}            element
++ * @param {Element | null}     element
+  * @param {HTMLStyleElement[]} styleSheets
+  */
+ const getStyleRulesForElement = ( element, styleSheets ) => {
+@@ -17,7 +17,7 @@ const getStyleRulesForElement = ( element, styleSheets ) => {
+ 
+ 		try {
+ 			Array.from( styleSheet.sheet.cssRules ).forEach( ( rule ) => {
+-				if ( element.matches( rule.selectorText ) ) {
++				if ( element?.matches( rule.selectorText ) ) {
+ 					found.push( rule.style );
+ 				}
+ 			} );
+@@ -58,9 +58,9 @@ const cleanStyleRule = ( rule ) => {
+ };
+ 
+ /**
+- * @param {Element} received
+- * @param {Element} expected
+- * @param {string}  testName
++ * @param {Element | null} received
++ * @param {Element | null} expected
++ * @param {string}         testName
+  */
+ function toMatchStyleDiffSnapshot( received, expected, testName ) {
+ 	const styleSheets = getStyleSheets();
+diff --git a/typings/gutenberg-test-env/index.d.ts b/typings/gutenberg-test-env/index.d.ts
+new file mode 100644
+index 00000000000000..ea575406ca1f67
+--- /dev/null
++++ b/typings/gutenberg-test-env/index.d.ts
+@@ -0,0 +1,18 @@
++declare namespace jest {
++	interface Matchers< R > {
++		/**
++		 * Similar to the [`toMatchDiffSnapshot` matcher], this custom matcher
++		 * allows to snapshot only the difference between the _styles_ associated
++		 * with different states of a component.
++		 *
++		 * @see [to-match-style-diff-snapshot.js]
++		 * @see [Testing Overview docs]
++		 * @cite https://github.com/testing-library/react-testing-library/issues/36#issuecomment-440442300
++		 *
++		 * [`toMatchDiffSnapshot` matcher]: https://github.com/jest-community/snapshot-diff
++		 * [to-match-style-diff-snapshot.js]: https://github.com/WordPress/gutenberg/blob/trunk/test/unit/config/matchers/to-match-style-diff-snapshot.js
++		 * [Testing Overview docs]: https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/testing-overview.md#best-practices
++		 */
++		toMatchStyleDiffSnapshot( expected: Element | null ): R;
++	}
++}

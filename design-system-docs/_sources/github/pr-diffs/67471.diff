@@ -1,0 +1,136 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c9295e7ef861e0..4830debcbcfba2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -21,6 +21,7 @@
+ -   Upgraded `@ariakit/react` (v0.4.13) and `@ariakit/test` (v0.4.5) ([#65907](https://github.com/WordPress/gutenberg/pull/65907)).
+ -   Upgraded `@ariakit/react` (v0.4.15) and `@ariakit/test` (v0.4.7) ([#67404](https://github.com/WordPress/gutenberg/pull/67404)).
+ -   Exported the `WPCompleter` type as it was being used in block-editor/autocompleters ([#67410](https://github.com/WordPress/gutenberg/pull/67410)).
++-   `SlotFill`: remove manual rerenders from the portal `Fill` component ([#67471](https://github.com/WordPress/gutenberg/pull/67471)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/fill.tsx b/packages/components/src/slot-fill/bubbles-virtually/fill.tsx
+index d5287adfab4178..ef7bc94ff540bd 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/fill.tsx
++++ b/packages/components/src/slot-fill/bubbles-virtually/fill.tsx
+@@ -4,7 +4,6 @@
+ import { useObservableValue } from '@wordpress/compose';
+ import {
+ 	useContext,
+-	useReducer,
+ 	useRef,
+ 	useEffect,
+ 	createPortal,
+@@ -20,18 +19,15 @@ import type { FillComponentProps } from '../types';
+ export default function Fill( { name, children }: FillComponentProps ) {
+ 	const registry = useContext( SlotFillContext );
+ 	const slot = useObservableValue( registry.slots, name );
+-	const [ , rerender ] = useReducer( () => [], [] );
+-	const ref = useRef( { rerender } );
++	const instanceRef = useRef( {} );
+ 
++	// We register fills so we can keep track of their existence.
++	// Slots can use the `useSlotFills` hook to know if there're already fills
++	// registered so they can choose to render themselves or not.
+ 	useEffect( () => {
+-		// We register fills so we can keep track of their existence.
+-		// Some Slot implementations need to know if there're already fills
+-		// registered so they can choose to render themselves or not.
+-		const refValue = ref.current;
+-		registry.registerFill( name, refValue );
+-		return () => {
+-			registry.unregisterFill( name, refValue );
+-		};
++		const instance = instanceRef.current;
++		registry.registerFill( name, instance );
++		return () => registry.unregisterFill( name, instance );
+ 	}, [ registry, name ] );
+ 
+ 	if ( ! slot || ! slot.ref.current ) {
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx
+index 1dc5ef35ceccfe..cf692700eef79c 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx
+@@ -23,13 +23,7 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
+ 		ref,
+ 		fillProps
+ 	) => {
+-		const slot = slots.get( name );
+-
+-		slots.set( name, {
+-			...slot,
+-			ref: ref || slot?.ref,
+-			fillProps: fillProps || slot?.fillProps || {},
+-		} );
++		slots.set( name, { ref, fillProps } );
+ 	};
+ 
+ 	const unregisterSlot: SlotFillBubblesVirtuallyContext[ 'unregisterSlot' ] =
+@@ -66,12 +60,7 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
+ 			return;
+ 		}
+ 
+-		slot.fillProps = fillProps;
+-		const slotFills = fills.get( name );
+-		if ( slotFills ) {
+-			// Force update fills.
+-			slotFills.forEach( ( fill ) => fill.rerender() );
+-		}
++		slots.set( name, { ref, fillProps } );
+ 	};
+ 
+ 	const registerFill: SlotFillBubblesVirtuallyContext[ 'registerFill' ] = (
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot.tsx b/packages/components/src/slot-fill/bubbles-virtually/slot.tsx
+index b8ead7fc7ea8ba..e65c055c410a6b 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot.tsx
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot.tsx
+@@ -39,8 +39,7 @@ function Slot(
+ 		...restProps
+ 	} = props;
+ 
+-	const { registerSlot, unregisterSlot, ...registry } =
+-		useContext( SlotFillContext );
++	const registry = useContext( SlotFillContext );
+ 
+ 	const ref = useRef< HTMLElement >( null );
+ 
+@@ -54,11 +53,9 @@ function Slot(
+ 	}, [ fillProps ] );
+ 
+ 	useLayoutEffect( () => {
+-		registerSlot( name, ref, fillPropsRef.current );
+-		return () => {
+-			unregisterSlot( name, ref );
+-		};
+-	}, [ registerSlot, unregisterSlot, name ] );
++		registry.registerSlot( name, ref, fillPropsRef.current );
++		return () => registry.unregisterSlot( name, ref );
++	}, [ registry, name ] );
+ 
+ 	useLayoutEffect( () => {
+ 		registry.updateSlot( name, ref, fillPropsRef.current );
+diff --git a/packages/components/src/slot-fill/types.ts b/packages/components/src/slot-fill/types.ts
+index 15f082cf3f7552..6668057323edd9 100644
+--- a/packages/components/src/slot-fill/types.ts
++++ b/packages/components/src/slot-fill/types.ts
+@@ -110,15 +110,16 @@ export type SlotFillProviderProps = {
+ 
+ export type SlotRef = RefObject< HTMLElement >;
+ export type Rerenderable = { rerender: () => void };
++export type FillInstance = {};
+ 
+ export type SlotFillBubblesVirtuallyContext = {
+ 	slots: ObservableMap< SlotKey, { ref: SlotRef; fillProps: FillProps } >;
+-	fills: ObservableMap< SlotKey, Rerenderable[] >;
++	fills: ObservableMap< SlotKey, FillInstance[] >;
+ 	registerSlot: ( name: SlotKey, ref: SlotRef, fillProps: FillProps ) => void;
+ 	unregisterSlot: ( name: SlotKey, ref: SlotRef ) => void;
+ 	updateSlot: ( name: SlotKey, ref: SlotRef, fillProps: FillProps ) => void;
+-	registerFill: ( name: SlotKey, ref: Rerenderable ) => void;
+-	unregisterFill: ( name: SlotKey, ref: Rerenderable ) => void;
++	registerFill: ( name: SlotKey, instance: FillInstance ) => void;
++	unregisterFill: ( name: SlotKey, instance: FillInstance ) => void;
+ 
+ 	/**
+ 	 * This helps the provider know if it's using the default context value or not.

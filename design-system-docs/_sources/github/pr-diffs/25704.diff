@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/unit-control/index.js b/packages/components/src/unit-control/index.js
+index 435bc5cca466e1..9bf870e4dd855c 100644
+--- a/packages/components/src/unit-control/index.js
++++ b/packages/components/src/unit-control/index.js
+@@ -30,7 +30,7 @@ function UnitControl(
+ 		disableUnits = false,
+ 		isPressEnterToChange = false,
+ 		isResetValueOnUnitChange = false,
+-		isUnitSelectTabbable = false,
++		isUnitSelectTabbable = true,
+ 		label,
+ 		onChange = noop,
+ 		onUnitChange = noop,

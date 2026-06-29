@@ -1,0 +1,296 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f6a68604d7c185..9491c5e5e6a0f4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -41,6 +41,7 @@
+ -   `Notice`: Fix notice component spacing issue when actions are present. ([#69430](https://github.com/WordPress/gutenberg/pull/69430))
+ -   `DatePicker`: Fix missing scheduled events and current date indicators. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
+ -   `DatePicker`: Fix handling of `currentDate` when passed values as Date or timestamp. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
++-   `Popover`: Fix nested popover detection to properly trigger `onFocusOutside` when focus moves from a nested popover to an external element ([#74154](https://github.com/WordPress/gutenberg/pull/74154)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 98018e308a4225..a785844f135395 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -29,6 +29,7 @@ import {
+ 	useState,
+ 	useCallback,
+ 	createPortal,
++	useId,
+ } from '@wordpress/element';
+ import {
+ 	useReducedMotion,
+@@ -104,6 +105,65 @@ const ArrowTriangle = () => (
+ const slotNameContext = createContext< string | undefined >( undefined );
+ slotNameContext.displayName = '__unstableSlotNameContext';
+ 
++/**
++ * Data attribute used to mark popover floating elements with their unique ID.
++ *
++ * @type {string}
++ */
++const POPOVER_ID_ATTR = 'data-popover-id';
++
++/**
++ * Data attribute used to mark popover floating elements with their parent's ID.
++ *
++ * @type {string}
++ */
++const PARENT_POPOVER_ID_ATTR = 'data-parent-popover-id';
++
++/*
++ * Context to track the parent popover's info for nested popover detection.
++ *
++ * @type {object}
++ * @property {string} id - The unique ID of the parent popover.
++ * @property {Element|null} floatingElement - The floating element of the parent popover.
++ */
++type ParentPopoverInfo = {
++	id: string;
++	floatingElement: Element | null;
++};
++
++const parentPopoverContext = createContext< ParentPopoverInfo | null >( null );
++parentPopoverContext.displayName = '__unstableParentPopoverContext';
++
++// Check if the blur target is inside a nested popover that is a descendant of
++// the given popover ID. This traverses the parent-popover chain via data attributes.
++const isBlurTargetInNestedPopover = (
++	blurTarget: Element,
++	popoverId: string
++): boolean => {
++	const closestPopover = blurTarget.closest( `[${ POPOVER_ID_ATTR }]` );
++	if ( ! closestPopover ) {
++		return false;
++	}
++
++	let current: Element | null = closestPopover;
++	const visited = new Set< string >();
++
++	while ( current ) {
++		const parentId = current.getAttribute( PARENT_POPOVER_ID_ATTR );
++		if ( parentId === popoverId ) {
++			return true;
++		}
++		if ( ! parentId || visited.has( parentId ) ) {
++			break;
++		}
++		visited.add( parentId );
++		current = document.querySelector(
++			`[${ POPOVER_ID_ATTR }="${ parentId }"]`
++		);
++	}
++	return false;
++};
++
+ const fallbackContainerClassname = 'components-popover__fallback-container';
+ const getPopoverFallbackContainer = () => {
+ 	let container = document.body.querySelector(
+@@ -262,6 +322,12 @@ const UnforwardedPopover = (
+ 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
+ 	const slot = useSlot( slotName );
+ 
++	// Generate a unique ID for this popover (used for nested popover detection).
++	const popoverId = useId();
++
++	// Get the parent popover's info from context (for nested popover detection).
++	const parentPopoverInfo = useContext( parentPopoverContext );
++
+ 	let onDialogClose;
+ 
+ 	if ( onClose || onFocusOutside ) {
+@@ -275,12 +341,24 @@ const UnforwardedPopover = (
+ 				const floatingElement = refs.floating.current;
+ 
+ 				// Check if blur is from this popover's reference element or its floating content
+-				const isBlurFromThisPopover =
++				const isBlurFromDirectContent =
+ 					( referenceElement &&
+ 						'contains' in referenceElement &&
+ 						referenceElement.contains( blurTarget ) ) ||
+ 					floatingElement?.contains( blurTarget );
+-				// Only proceed if the blur is actually from this popover
++
++				// Also check if blur is from a nested popover (rendered in a portal)
++				// This handles the case where nested popovers are siblings in the DOM
++				// but logically children of this popover.
++				const isBlurFromNestedPopover = isBlurTargetInNestedPopover(
++					blurTarget,
++					popoverId
++				);
++
++				const isBlurFromThisPopover =
++					isBlurFromDirectContent || isBlurFromNestedPopover;
++
++				// Only proceed if the blur is actually from this popover or its nested popovers
+ 				if ( ! isBlurFromThisPopover ) {
+ 					return;
+ 				}
+@@ -427,6 +505,37 @@ const UnforwardedPopover = (
+ 	const isPositioned =
+ 		( ! shouldAnimate || animationFinished ) && x !== null && y !== null;
+ 
++	// Compute the parent popover ID to set as a data attribute.
++	// This is determined based on whether the reference element is inside
++	// the parent popover's floating element.
++	const parentId = useMemo( () => {
++		if ( ! parentPopoverInfo?.floatingElement ) {
++			return undefined;
++		}
++		const referenceElement = refs.reference.current;
++		if (
++			referenceElement &&
++			'nodeType' in referenceElement &&
++			parentPopoverInfo.floatingElement.contains(
++				referenceElement as Node
++			)
++		) {
++			return parentPopoverInfo.id;
++		}
++		return undefined;
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++	}, [ parentPopoverInfo, refs.reference.current ] );
++
++	// Context value for nested popovers
++	const popoverContextValue = useMemo< ParentPopoverInfo >(
++		() => ( {
++			id: popoverId,
++			floatingElement: refs.floating.current,
++		} ),
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++		[ popoverId, refs.floating.current ]
++	);
++
+ 	let content = (
+ 		<motion.div
+ 			className={ clsx( className, {
+@@ -444,6 +553,8 @@ const UnforwardedPopover = (
+ 			ref={ mergedFloatingRef }
+ 			{ ...dialogProps }
+ 			tabIndex={ -1 }
++			{ ...{ [ POPOVER_ID_ATTR ]: popoverId } }
++			{ ...( parentId && { [ PARENT_POPOVER_ID_ATTR ]: parentId } ) }
+ 		>
+ 			{ /* Prevents scroll on the document */ }
+ 			{ isExpanded && <ScrollLock /> }
+@@ -461,7 +572,11 @@ const UnforwardedPopover = (
+ 					/>
+ 				</div>
+ 			) }
+-			<div className="components-popover__content">{ children }</div>
++			<div className="components-popover__content">
++				<parentPopoverContext.Provider value={ popoverContextValue }>
++					{ children }
++				</parentPopoverContext.Provider>
++			</div>
+ 			{ hasArrow && (
+ 				<div
+ 					ref={ arrowCallbackRef }
+diff --git a/packages/components/src/popover/test/index.tsx b/packages/components/src/popover/test/index.tsx
+index 6f4b830ba2be05..dee85b0742e376 100644
+--- a/packages/components/src/popover/test/index.tsx
++++ b/packages/components/src/popover/test/index.tsx
+@@ -578,4 +578,89 @@ describe( 'Popover', () => {
+ 			}
+ 		);
+ 	} );
++
++	describe( 'closing all nested popovers', () => {
++		// Test component that simulates the nested popover scenario:
++		// A parent popover (like ColorGradient dropdown) containing a trigger
++		// that opens a nested popover (like custom color picker dropdown)
++		function NestedPopoverTestComponent( {
++			onParentFocusOutside,
++			onNestedFocusOutside,
++		}: {
++			onParentFocusOutside: jest.Mock;
++			onNestedFocusOutside: jest.Mock;
++		} ) {
++			const [ isNestedOpen, setIsNestedOpen ] = useState( false );
++
++			return (
++				<>
++					<button data-testid="external-button">
++						External Button
++					</button>
++					<Popover
++						data-testid="parent-popover"
++						onFocusOutside={ onParentFocusOutside }
++						focusOnMount={ false }
++					>
++						<button
++							data-testid="parent-button"
++							onClick={ () => setIsNestedOpen( ! isNestedOpen ) }
++						>
++							Open Nested
++						</button>
++						{ isNestedOpen && (
++							<Popover
++								data-testid="nested-popover"
++								onFocusOutside={ onNestedFocusOutside }
++								focusOnMount={ false }
++							>
++								<button data-testid="nested-dummy-button">
++									Nested Dummy Button
++								</button>
++							</Popover>
++						) }
++					</Popover>
++				</>
++			);
++		}
++
++		it( 'should call parent onFocusOutside when focus moves from nested popover to external element', async () => {
++			const user = userEvent.setup();
++			const onParentFocusOutside = jest.fn();
++			const onNestedFocusOutside = jest.fn();
++
++			render(
++				<NestedPopoverTestComponent
++					onParentFocusOutside={ onParentFocusOutside }
++					onNestedFocusOutside={ onNestedFocusOutside }
++				/>
++			);
++
++			await waitFor( () => {
++				expect(
++					screen.getByTestId( 'parent-popover' )
++				).toBeInTheDocument();
++			} );
++
++			await user.click( screen.getByTestId( 'parent-button' ) );
++
++			await waitFor( () => {
++				expect(
++					screen.getByTestId( 'nested-popover' )
++				).toBeInTheDocument();
++			} );
++
++			await user.click( screen.getByTestId( 'nested-dummy-button' ) );
++
++			await user.click( screen.getByTestId( 'external-button' ) );
++
++			await waitFor( () => {
++				expect( onNestedFocusOutside ).toHaveBeenCalled();
++			} );
++
++			await waitFor( () => {
++				expect( onParentFocusOutside ).toHaveBeenCalled();
++			} );
++		} );
++	} );
+ } );
+diff --git a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+index a160b7f6555768..849a78908e56d4 100644
+--- a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
++++ b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+@@ -4,6 +4,7 @@ exports[`DotTip should render correctly 1`] = `
+ <div
+   aria-label="Editor tips"
+   class="components-popover nux-dot-tip is-positioned"
++  data-popover-id=":r0:"
+   data-wp-c16t="true"
+   data-wp-component="Popover"
+   role="dialog"

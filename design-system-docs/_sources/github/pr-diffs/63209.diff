@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0c1195083e30dd..f3c00a3770a880 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `useUpdateEffect`: Correctly track mounted state in strict mode. ([#62974](https://github.com/WordPress/gutenberg/pull/62974))
+ -   `UnitControl`: Fix an issue where keyboard shortcuts unintentionally shift focus on Windows OS. ([#62988](https://github.com/WordPress/gutenberg/pull/62988))
+ -   Fix inaccessibly disabled `Button`s ([#62306](https://github.com/WordPress/gutenberg/pull/62306)).
++-   `TimePicker`: Fix time zone overflow ([#63209](https://github.com/WordPress/gutenberg/pull/63209)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/date-time/time-input/index.tsx b/packages/components/src/date-time/time-input/index.tsx
+index 0dd62b2c9f70be..bfac1e2b604c23 100644
+--- a/packages/components/src/date-time/time-input/index.tsx
++++ b/packages/components/src/date-time/time-input/index.tsx
+@@ -103,7 +103,7 @@ export function TimeInput( {
+ 				</BaseControl.VisualLabel>
+ 			) }
+ 
+-			<HStack alignment="left">
++			<HStack alignment="left" expanded={ false }>
+ 				<TimeWrapper
+ 					className="components-datetime__time-field components-datetime__time-field-time" // Unused, for backwards compatibility.
+ 				>

@@ -1,0 +1,24 @@
+diff --git a/packages/components/src/focal-point-picker/index.tsx b/packages/components/src/focal-point-picker/index.tsx
+index 94aa23e1bd63e3..2f9e52f9268282 100644
+--- a/packages/components/src/focal-point-picker/index.tsx
++++ b/packages/components/src/focal-point-picker/index.tsx
+@@ -94,6 +94,7 @@ const GRID_OVERLAY_TIMEOUT = 600;
+ export function FocalPointPicker( {
+ 	// Prevent passing to internal component.
+ 	__nextHasNoMarginBottom: _,
++	__next40pxDefaultSize: _next40pxDefaultSize,
+ 	autoPlay = true,
+ 	className,
+ 	help,
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index b5aa7b9584d36e..22d6be9e027af5 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -172,6 +172,7 @@ const restrictedSyntax = [
+ 	...[
+ 		'BorderBoxControl',
+ 		'BoxControl',
++		'FocalPointPicker',
+ 		'FontSizePicker',
+ 		'QueryControls',
+ 		'TextControl',

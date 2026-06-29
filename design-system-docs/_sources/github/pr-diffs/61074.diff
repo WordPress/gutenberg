@@ -1,0 +1,83 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..352d779fa5b45e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `View`: Remove "experimental" designation ([#61074](https://github.com/WordPress/gutenberg/pull/61074)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..8844977b2a6903 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -187,7 +187,13 @@ export {
+ 	useCustomUnits as __experimentalUseCustomUnits,
+ 	parseQuantityAndUnitFromRawValue as __experimentalParseQuantityAndUnitFromRawValue,
+ } from './unit-control';
+-export { View as __experimentalView } from './view';
++export {
++	/**
++	 * @deprecated Import `View` instead.
++	 */
++	View as __experimentalView,
++	View,
++} from './view';
+ export { VisuallyHidden } from './visually-hidden';
+ export { VStack as __experimentalVStack } from './v-stack';
+ export { default as IsolatedEventContainer } from './isolated-event-container';
+diff --git a/packages/components/src/spacer/README.md b/packages/components/src/spacer/README.md
+index 16160d39b61fa0..6daca7f7cb3b35 100644
+--- a/packages/components/src/spacer/README.md
++++ b/packages/components/src/spacer/README.md
+@@ -14,7 +14,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ import {
+ 	__experimentalSpacer as Spacer,
+ 	__experimentalHeading as Heading,
+-	__experimentalView as View,
++	View,
+ } from '@wordpress/components';
+ 
+ function Example() {
+diff --git a/packages/components/src/view/README.md b/packages/components/src/view/README.md
+index c1e04ebd8cfff4..ce5b0746b82495 100644
+--- a/packages/components/src/view/README.md
++++ b/packages/components/src/view/README.md
+@@ -13,7 +13,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ ```jsx
+ import {
+ 	__experimentalText as Text,
+-	__experimentalView as View,
++	View,
+ } from '@wordpress/components';
+ 
+ function Example() {
+diff --git a/packages/components/src/view/stories/index.story.tsx b/packages/components/src/view/stories/index.story.tsx
+index 324825059deb20..233cee15f8ffcb 100644
+--- a/packages/components/src/view/stories/index.story.tsx
++++ b/packages/components/src/view/stories/index.story.tsx
+@@ -10,7 +10,7 @@ import { View } from '..';
+ 
+ const meta: Meta< typeof View > = {
+ 	component: View,
+-	title: 'Components (Experimental)/View',
++	title: 'Components/View',
+ 	argTypes: {
+ 		as: { control: { type: null } },
+ 		children: { control: { type: 'text' } },
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..1b2549f5cf1360 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,6 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation', 'view' ];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

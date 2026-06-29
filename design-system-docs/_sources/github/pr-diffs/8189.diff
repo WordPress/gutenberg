@@ -1,0 +1,532 @@
+diff --git a/docs/reference/deprecated.md b/docs/reference/deprecated.md
+index 156240b130fa2b..dd69d4a58dfe75 100644
+--- a/docs/reference/deprecated.md
++++ b/docs/reference/deprecated.md
+@@ -2,6 +2,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
+ 
+ ## 3.8.0
+ 
++ - `wp.components.withContext` has been removed. Please use `wp.element.createContext` instead. See: https://reactjs.org/docs/context.html.
+  - `wp.coreBlocks.registerCoreBlocks` has been removed. Please use `wp.blockLibrary.registerCoreBlocks` instead.
+ 
+ ## 3.7.0
+diff --git a/packages/blocks/src/block-content-provider/index.js b/packages/blocks/src/block-content-provider/index.js
+index 6829078682858f..f7c15d27e1e8ad 100644
+--- a/packages/blocks/src/block-content-provider/index.js
++++ b/packages/blocks/src/block-content-provider/index.js
+@@ -1,13 +1,16 @@
+ /**
+  * WordPress dependencies
+  */
+-import { Component, RawHTML } from '@wordpress/element';
++import { createHigherOrderComponent } from '@wordpress/compose';
++import { createContext, RawHTML } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { serialize } from '../api';
+ 
++const { Consumer, Provider } = createContext( () => {} );
++
+ /**
+  * An internal block component used in block content serialization to inject
+  * nested block content within the `save` implementation of the ancestor
+@@ -22,29 +25,42 @@ import { serialize } from '../api';
+  * 	{ blockSaveElement }
+  * </BlockContentProvider>
+  * ```
++ *
++ * @return {WPElement} Element with BlockContent injected via context.
+  */
+-class BlockContentProvider extends Component {
+-	getChildContext() {
+-		const { innerBlocks } = this.props;
+-
+-		return {
+-			BlockContent() {
+-				// Value is an array of blocks, so defer to block serializer
+-				const html = serialize( innerBlocks );
+-
+-				// Use special-cased raw HTML tag to avoid default escaping
+-				return <RawHTML>{ html }</RawHTML>;
+-			},
+-		};
+-	}
++const BlockContentProvider = ( { children, innerBlocks } ) => {
++	const BlockContent = () => {
++		// Value is an array of blocks, so defer to block serializer
++		const html = serialize( innerBlocks );
+ 
+-	render() {
+-		return this.props.children;
+-	}
+-}
++		// Use special-cased raw HTML tag to avoid default escaping
++		return <RawHTML>{ html }</RawHTML>;
++	};
+ 
+-BlockContentProvider.childContextTypes = {
+-	BlockContent: () => {},
++	return (
++		<Provider value={ BlockContent }>
++			{ children }
++		</Provider>
++	);
+ };
+ 
++/**
++ * A Higher Order Component used to inject BlockContent using context to the
++ * wrapped component.
++ *
++ * @return {Component} Enhanced component with injected BlockContent as prop.
++ */
++export const withBlockContentContext = createHigherOrderComponent( ( OriginalComponent ) => {
++	return ( props ) => (
++		<Consumer>
++			{ ( context ) => (
++				<OriginalComponent
++					{ ...props }
++					BlockContent={ context }
++				/>
++			) }
++		</Consumer>
++	);
++}, 'withBlockContentContext' );
++
+ export default BlockContentProvider;
+diff --git a/packages/blocks/src/index.js b/packages/blocks/src/index.js
+index 2fed22406b3e9c..bb7cde035780f3 100644
+--- a/packages/blocks/src/index.js
++++ b/packages/blocks/src/index.js
+@@ -9,3 +9,4 @@
+ // and then stored as objects in state, from which it is then rendered for editing.
+ import './store';
+ export * from './api';
++export { withBlockContentContext } from './block-content-provider';
+diff --git a/packages/components/src/higher-order/with-context/index.js b/packages/components/src/higher-order/with-context/index.js
+index c10b24001358fd..2efc7cf90db986 100644
+--- a/packages/components/src/higher-order/with-context/index.js
++++ b/packages/components/src/higher-order/with-context/index.js
+@@ -8,9 +8,17 @@ import { noop } from 'lodash';
+  */
+ import { Component } from '@wordpress/element';
+ import { createHigherOrderComponent } from '@wordpress/compose';
++import deprecated from '@wordpress/deprecated';
+ 
+ export default ( contextName ) => ( mapSettingsToProps ) => createHigherOrderComponent(
+ 	( OriginalComponent ) => {
++		deprecated( 'wp.components.withContext', {
++			version: '3.8',
++			alternative: 'wp.element.createContext',
++			plugin: 'Gutenberg',
++			hint: 'https://reactjs.org/docs/context.html',
++		} );
++
+ 		class WrappedComponent extends Component {
+ 			render() {
+ 				const extraProps = mapSettingsToProps ?
+diff --git a/packages/components/src/higher-order/with-context/test/index.js b/packages/components/src/higher-order/with-context/test/index.js
+index 855270b6b7baf7..b787c11dff989f 100644
+--- a/packages/components/src/higher-order/with-context/test/index.js
++++ b/packages/components/src/higher-order/with-context/test/index.js
+@@ -5,14 +5,17 @@ import renderer from 'react-test-renderer';
+ import PropTypes from 'prop-types';
+ 
+ /**
+- * Internal dependencies
++ * WordPress dependencies
+  */
+-import withContext from '../';
++import { Component } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+- * WordPress dependencies
++ * Internal dependencies
+  */
+-import { Component } from '@wordpress/element';
++import withContext from '../';
++
++jest.mock( '@wordpress/deprecated', () => jest.fn() );
+ 
+ class PassContext extends Component {
+ 	getChildContext() {
+@@ -39,6 +42,7 @@ describe( 'withContext', () => {
+ 		);
+ 
+ 		expect( wrapper.root.findByType( 'div' ).children[ 0 ] ).toBe( 'ok' );
++		expect( deprecated ).toHaveBeenCalled();
+ 	} );
+ 
+ 	it( 'should allow specifying a context getter mapping', () => {
+diff --git a/packages/editor/src/components/inner-blocks/index.js b/packages/editor/src/components/inner-blocks/index.js
+index ef0ff90942aef8..006787b8dec798 100644
+--- a/packages/editor/src/components/inner-blocks/index.js
++++ b/packages/editor/src/components/inner-blocks/index.js
+@@ -7,11 +7,10 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { withContext } from '@wordpress/components';
+ import { withViewportMatch } from '@wordpress/viewport';
+ import { Component } from '@wordpress/element';
+ import { withSelect, withDispatch } from '@wordpress/data';
+-import { synchronizeBlocksWithTemplate } from '@wordpress/blocks';
++import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
+ import isShallowEqual from '@wordpress/is-shallow-equal';
+ import { compose } from '@wordpress/compose';
+ 
+@@ -149,10 +148,8 @@ InnerBlocks = compose( [
+ 	} ),
+ ] )( InnerBlocks );
+ 
+-InnerBlocks.Content = ( { BlockContent } ) => {
+-	return <BlockContent />;
+-};
+-
+-InnerBlocks.Content = withContext( 'BlockContent' )()( InnerBlocks.Content );
++InnerBlocks.Content = withBlockContentContext(
++	( { BlockContent } ) => <BlockContent />
++);
+ 
+ export default InnerBlocks;
+diff --git a/packages/element/src/serialize.js b/packages/element/src/serialize.js
+index d05eb753e7f313..b245fab406e65b 100644
+--- a/packages/element/src/serialize.js
++++ b/packages/element/src/serialize.js
+@@ -41,7 +41,34 @@ import {
+ /**
+  * Internal dependencies
+  */
+-import { Fragment, RawHTML } from './';
++import {
++	Fragment,
++	StrictMode,
++} from './react';
++import RawHTML from './raw-html';
++
++/**
++ * Boolean reflecting whether the current environment supports Symbol.
++ *
++ * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol
++ *
++ * @type {boolean}
++ */
++const HAS_SYMBOL = typeof Symbol === 'function' && Symbol.for;
++
++/**
++ * Internal React symbol representing Provider type.
++ *
++ * @type {Symbol}
++ */
++const REACT_PROVIDER_TYPE = HAS_SYMBOL ? Symbol.for( 'react.provider' ) : 0xeacd;
++
++/**
++ * Internal React symbol representing context (Consumer) type.
++ *
++ * @type {Symbol}
++ */
++const REACT_CONTEXT_TYPE = HAS_SYMBOL ? Symbol.for( 'react.context' ) : 0xeace;
+ 
+ /**
+  * Valid attribute types.
+@@ -430,18 +457,19 @@ function getNormalStylePropertyValue( property, value ) {
+ /**
+  * Serializes a React element to string.
+  *
+- * @param {WPElement} element Element to serialize.
+- * @param {?Object}   context Context object.
++ * @param {WPElement} element       Element to serialize.
++ * @param {?Object}   context       Context object.
++ * @param {?Object}   legacyContext Legacy context object.
+  *
+  * @return {string} Serialized element.
+  */
+-export function renderElement( element, context = {} ) {
++export function renderElement( element, context, legacyContext = {} ) {
+ 	if ( null === element || undefined === element || false === element ) {
+ 		return '';
+ 	}
+ 
+ 	if ( Array.isArray( element ) ) {
+-		return renderChildren( element, context );
++		return renderChildren( element, context, legacyContext );
+ 	}
+ 
+ 	switch ( typeof element ) {
+@@ -452,11 +480,12 @@ export function renderElement( element, context = {} ) {
+ 			return element.toString();
+ 	}
+ 
+-	const { type: tagName, props } = element;
++	const { type, props } = element;
+ 
+-	switch ( tagName ) {
++	switch ( type ) {
++		case StrictMode:
+ 		case Fragment:
+-			return renderChildren( props.children, context );
++			return renderChildren( props.children, context, legacyContext );
+ 
+ 		case RawHTML:
+ 			const { children, ...wrapperProps } = props;
+@@ -467,20 +496,28 @@ export function renderElement( element, context = {} ) {
+ 					...wrapperProps,
+ 					dangerouslySetInnerHTML: { __html: children },
+ 				},
+-				context
++				context,
++				legacyContext
+ 			);
+ 	}
+ 
+-	switch ( typeof tagName ) {
++	switch ( typeof type ) {
+ 		case 'string':
+-			return renderNativeComponent( tagName, props, context );
++			return renderNativeComponent( type, props, context, legacyContext );
+ 
+ 		case 'function':
+-			if ( tagName.prototype && typeof tagName.prototype.render === 'function' ) {
+-				return renderComponent( tagName, props, context );
++			if ( type.prototype && typeof type.prototype.render === 'function' ) {
++				return renderComponent( type, props, context, legacyContext );
+ 			}
+ 
+-			return renderElement( tagName( props, context ), context );
++			return renderElement( type( props, legacyContext ), context, legacyContext );
++	}
++	switch ( type && type.$$typeof ) {
++		case REACT_PROVIDER_TYPE:
++			return renderChildren( props.children, props.value, legacyContext );
++
++		case REACT_CONTEXT_TYPE:
++			return renderElement( props.children( context || type._currentValue ), context, legacyContext );
+ 	}
+ 
+ 	return '';
+@@ -489,27 +526,28 @@ export function renderElement( element, context = {} ) {
+ /**
+  * Serializes a native component type to string.
+  *
+- * @param {?string} type    Native component type to serialize, or null if
+- *                          rendering as fragment of children content.
+- * @param {Object}  props   Props object.
+- * @param {?Object} context Context object.
++ * @param {?string} type          Native component type to serialize, or null if
++ *                                rendering as fragment of children content.
++ * @param {Object}  props         Props object.
++ * @param {?Object} context       Context object.
++ * @param {?Object} legacyContext Legacy context object.
+  *
+  * @return {string} Serialized element.
+  */
+-export function renderNativeComponent( type, props, context = {} ) {
++export function renderNativeComponent( type, props, context, legacyContext = {} ) {
+ 	let content = '';
+ 	if ( type === 'textarea' && props.hasOwnProperty( 'value' ) ) {
+ 		// Textarea children can be assigned as value prop. If it is, render in
+ 		// place of children. Ensure to omit so it is not assigned as attribute
+ 		// as well.
+-		content = renderChildren( props.value, context );
++		content = renderChildren( props.value, context, legacyContext );
+ 		props = omit( props, 'value' );
+ 	} else if ( props.dangerouslySetInnerHTML &&
+ 			typeof props.dangerouslySetInnerHTML.__html === 'string' ) {
+ 		// Dangerous content is left unescaped.
+ 		content = props.dangerouslySetInnerHTML.__html;
+ 	} else if ( typeof props.children !== 'undefined' ) {
+-		content = renderChildren( props.children, context );
++		content = renderChildren( props.children, context, legacyContext );
+ 	}
+ 
+ 	if ( ! type ) {
+@@ -528,20 +566,21 @@ export function renderNativeComponent( type, props, context = {} ) {
+ /**
+  * Serializes a non-native component type to string.
+  *
+- * @param {Function} Component Component type to serialize.
+- * @param {Object}   props     Props object.
+- * @param {?Object}  context   Context object.
++ * @param {Function} Component     Component type to serialize.
++ * @param {Object}   props         Props object.
++ * @param {?Object}  context       Context object.
++ * @param {?Object}  legacyContext Legacy context object.
+  *
+  * @return {string} Serialized element
+  */
+-export function renderComponent( Component, props, context = {} ) {
+-	const instance = new Component( props, context );
++export function renderComponent( Component, props, context, legacyContext = {} ) {
++	const instance = new Component( props, legacyContext );
+ 
+ 	if ( typeof instance.getChildContext === 'function' ) {
+-		Object.assign( context, instance.getChildContext() );
++		Object.assign( legacyContext, instance.getChildContext() );
+ 	}
+ 
+-	const html = renderElement( instance.render(), context );
++	const html = renderElement( instance.render(), context, legacyContext );
+ 
+ 	return html;
+ }
+@@ -549,12 +588,13 @@ export function renderComponent( Component, props, context = {} ) {
+ /**
+  * Serializes an array of children to string.
+  *
+- * @param {Array}   children Children to serialize.
+- * @param {?Object} context  Context object.
++ * @param {Array}   children      Children to serialize.
++ * @param {?Object} context       Context object.
++ * @param {?Object} legacyContext Legacy context object.
+  *
+  * @return {string} Serialized children.
+  */
+-function renderChildren( children, context = {} ) {
++function renderChildren( children, context, legacyContext = {} ) {
+ 	let result = '';
+ 
+ 	children = castArray( children );
+@@ -562,7 +602,7 @@ function renderChildren( children, context = {} ) {
+ 	for ( let i = 0; i < children.length; i++ ) {
+ 		const child = children[ i ];
+ 
+-		result += renderElement( child, context );
++		result += renderElement( child, context, legacyContext );
+ 	}
+ 
+ 	return result;
+diff --git a/packages/element/src/test/serialize.js b/packages/element/src/test/serialize.js
+index 44e83734eae8a8..d170789a6794c8 100644
+--- a/packages/element/src/test/serialize.js
++++ b/packages/element/src/test/serialize.js
+@@ -8,10 +8,12 @@ import { noop } from 'lodash';
+  */
+ import {
+ 	Component,
++	createContext,
+ 	createElement,
+ 	Fragment,
+-	RawHTML,
+-} from '../';
++	StrictMode,
++} from '../react';
++import RawHTML from '../raw-html';
+ import serialize, {
+ 	escapeAmpersand,
+ 	escapeQuotationMark,
+@@ -116,7 +118,7 @@ describe( 'serialize()', () => {
+ 		expect( result ).toBe( '<div ok="good"></div>' );
+ 	} );
+ 
+-	it( 'should render with context', () => {
++	it( 'should render with context (legacy)', () => {
+ 		class Provider extends Component {
+ 			getChildContext() {
+ 				return {
+@@ -298,12 +300,104 @@ describe( 'renderElement()', () => {
+ 		expect( result ).toBe( 'Hello' );
+ 	} );
+ 
++	it( 'renders StrictMode with undefined children', () => {
++		const result = renderElement( <StrictMode /> );
++
++		expect( result ).toBe( '' );
++	} );
++
++	it( 'renders StrictMode as its inner children', () => {
++		const result = renderElement( <StrictMode>Hello</StrictMode> );
++
++		expect( result ).toBe( 'Hello' );
++	} );
++
+ 	it( 'renders Fragment with undefined children', () => {
+ 		const result = renderElement( <Fragment /> );
+ 
+ 		expect( result ).toBe( '' );
+ 	} );
+ 
++	it( 'renders default value from Context API', () => {
++		const { Consumer } = createContext( {
++			value: 'default',
++		} );
++
++		const result = renderElement(
++			<Consumer>
++				{ ( context ) => context.value }
++			</Consumer>
++		);
++
++		expect( result ).toBe( 'default' );
++	} );
++
++	it( 'renders provided value through Context API', () => {
++		const { Consumer, Provider } = createContext( {
++			value: 'default',
++		} );
++
++		const result = renderElement(
++			<Provider value={ { value: 'provided' } }>
++				<Consumer>
++					{ ( context ) => context.value }
++				</Consumer>
++			</Provider>
++		);
++
++		expect( result ).toBe( 'provided' );
++	} );
++
++	it( 'renders proper value through Context API when multiple providers present', () => {
++		const { Consumer, Provider } = createContext( {
++			value: 'default',
++		} );
++
++		const result = renderElement(
++			<Fragment>
++				<Provider value={ { value: '1st provided' } }>
++					<Consumer>
++						{ ( context ) => context.value }
++					</Consumer>
++				</Provider>
++				{ '|' }
++				<Provider value={ { value: '2nd provided' } }>
++					<Consumer>
++						{ ( context ) => context.value }
++					</Consumer>
++				</Provider>
++				{ '|' }
++				<Consumer>
++					{ ( context ) => context.value }
++				</Consumer>
++			</Fragment>
++		);
++
++		expect( result ).toBe( '1st provided|2nd provided|default' );
++	} );
++
++	it( 'renders proper value through Context API when nested providers present', () => {
++		const { Consumer, Provider } = createContext( {
++			value: 'default',
++		} );
++
++		const result = renderElement(
++			<Provider value={ { value: 'outer provided' } }>
++				<Provider value={ { value: 'inner provided' } }>
++					<Consumer>
++						{ ( context ) => context.value }
++					</Consumer>
++				</Provider>
++				{ '|' }
++				<Consumer>
++					{ ( context ) => context.value }
++				</Consumer>
++			</Provider>
++		);
++
++		expect( result ).toBe( 'inner provided|outer provided' );
++	} );
++
+ 	it( 'renders RawHTML as its unescaped children', () => {
+ 		const result = renderElement( <RawHTML>{ '<img/>' }</RawHTML> );
+ 

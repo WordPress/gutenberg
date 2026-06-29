@@ -1,0 +1,64 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5c87043b8e31fe..85ab4f976c2b79 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ -   `ZStack`: ZStack: fix component bounding box to match children ([#51836](https://github.com/WordPress/gutenberg/pull/51836)).
+ -   `Modal`: Add small top padding to the content so that avoid cutting off the visible outline when hovering items ([#51829](https://github.com/WordPress/gutenberg/pull/51829)).
+ -   `DropdownMenu`: fix icon style when dashicon is used ([#43574](https://github.com/WordPress/gutenberg/pull/43574)).
++-   `UnitControl`: Fix crash when certain units are used ([#52211](https://github.com/WordPress/gutenberg/pull/52211)).
+ 
+ ## 25.2.0 (2023-06-23)
+ 
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 847056ae4da476..073801df17c156 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -24,6 +24,7 @@ import {
+ 	getValidParsedQuantityAndUnit,
+ } from './utils';
+ import { useControlledState } from '../utils/hooks';
++import { escapeRegExp } from '../utils/strings';
+ import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
+ 
+ function UnforwardedUnitControl(
+@@ -76,9 +77,9 @@ function UnforwardedUnitControl(
+ 		);
+ 		const [ { value: firstUnitValue = '' } = {}, ...rest ] = list;
+ 		const firstCharacters = rest.reduce( ( carry, { value } ) => {
+-			const first = value?.substring( 0, 1 ) || '';
++			const first = escapeRegExp( value?.substring( 0, 1 ) || '' );
+ 			return carry.includes( first ) ? carry : `${ carry }|${ first }`;
+-		}, firstUnitValue.substring( 0, 1 ) );
++		}, escapeRegExp( firstUnitValue.substring( 0, 1 ) ) );
+ 		return [ list, new RegExp( `^(?:${ firstCharacters })$`, 'i' ) ];
+ 	}, [ nonNullValueProp, unitProp, unitsProp ] );
+ 	const [ parsedQuantity, parsedUnit ] = getParsedQuantityAndUnit(
+diff --git a/packages/components/src/unit-control/test/index.tsx b/packages/components/src/unit-control/test/index.tsx
+index 9a2c719c46336d..777004a6e8ae27 100644
+--- a/packages/components/src/unit-control/test/index.tsx
++++ b/packages/components/src/unit-control/test/index.tsx
+@@ -373,18 +373,21 @@ describe( 'UnitControl', () => {
+ 			const units = [
+ 				{ value: 'pt', label: 'pt', default: 0 },
+ 				{ value: 'vmax', label: 'vmax', default: 10 },
++				// Proves that units with regex control characters don't error.
++				{ value: '+', label: '+', default: 10 },
+ 			];
+ 
+ 			render( <UnitControl units={ units } /> );
+ 
+ 			const options = getSelectOptions();
+ 
+-			expect( options.length ).toBe( 2 );
++			expect( options.length ).toBe( 3 );
+ 
+-			const [ pt, vmax ] = options;
++			const [ pt, vmax, plus ] = options;
+ 
+ 			expect( pt.value ).toBe( 'pt' );
+ 			expect( vmax.value ).toBe( 'vmax' );
++			expect( plus.value ).toBe( '+' );
+ 		} );
+ 
+ 		it( 'should reset value on unit change, if unit has default value', async () => {

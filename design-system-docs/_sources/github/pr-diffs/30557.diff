@@ -1,0 +1,103 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 876c46b448ce33..e659790312886a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fix
+ 
+ -   Add missing styles to the `BaseControl.VisualLabel` component. ([#37747](https://github.com/WordPress/gutenberg/pull/37747))
++-   Prevent keyDown events from propagating up in `CustomSelectControl` ([#30557](https://github.com/WordPress/gutenberg/pull/30557))
+ 
+ ## 19.2.0 (2022-01-04)
+ 
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index 90b5bbf2115e20..9c13cc6b0e6619 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -9,6 +9,8 @@ import classnames from 'classnames';
+  */
+ import { Icon, check, chevronDown } from '@wordpress/icons';
+ import { __, sprintf } from '@wordpress/i18n';
++import { useCallback } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+@@ -98,6 +100,15 @@ export default function CustomSelectControl( {
+ 		className: 'components-custom-select-control__menu',
+ 		'aria-hidden': ! isOpen,
+ 	} );
++
++	const onKeyDownHandler = useCallback(
++		( e ) => {
++			e.stopPropagation();
++			menuProps?.onKeyDown?.( e );
++		},
++		[ menuProps ]
++	);
++
+ 	// We need this here, because the null active descendant is not fully ARIA compliant.
+ 	if (
+ 		menuProps[ 'aria-activedescendant' ]?.startsWith( 'downshift-null' )
+@@ -141,7 +152,8 @@ export default function CustomSelectControl( {
+ 					className="components-custom-select-control__button-icon"
+ 				/>
+ 			</Button>
+-			<ul { ...menuProps }>
++			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
++			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
+ 				{ isOpen &&
+ 					items.map( ( item, index ) => (
+ 						// eslint-disable-next-line react/jsx-key
+diff --git a/packages/components/src/custom-select-control/test/index.js b/packages/components/src/custom-select-control/test/index.js
+new file mode 100644
+index 00000000000000..42e551abf8c7d1
+--- /dev/null
++++ b/packages/components/src/custom-select-control/test/index.js
+@@ -0,0 +1,46 @@
++/**
++ * External dependencies
++ */
++import { render, fireEvent, screen } from '@testing-library/react';
++
++/**
++ * WordPress dependencies
++ */
++import { CustomSelectControl } from '@wordpress/components';
++
++describe( 'CustomSelectControl', () => {
++	it( 'Captures the keypress event and does not let it propagate', () => {
++		const onKeyDown = jest.fn();
++		const options = [
++			{
++				key: 'one',
++				name: 'Option one',
++			},
++			{
++				key: 'two',
++				name: 'Option two',
++			},
++			{
++				key: 'three',
++				name: 'Option three',
++			},
++		];
++
++		render(
++			<div
++				// This role="none" is required to prevent an eslint warning about accessibility.
++				role="none"
++				onKeyDown={ onKeyDown }
++			>
++				<CustomSelectControl options={ options } />
++			</div>
++		);
++		const toggleButton = screen.getByRole( 'button' );
++		fireEvent.click( toggleButton );
++
++		const customSelect = screen.getByRole( 'listbox' );
++		fireEvent.keyDown( customSelect );
++
++		expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
++	} );
++} );

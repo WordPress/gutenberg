@@ -1,0 +1,180 @@
+diff --git a/packages/components/src/animate/stories/index.story.tsx b/packages/components/src/animate/stories/index.story.tsx
+index de28495a97fc57..c1798b503faa83 100644
+--- a/packages/components/src/animate/stories/index.story.tsx
++++ b/packages/components/src/animate/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import { Animate } from '..';
+ import Notice from '../../notice';
+ 
+ const meta: Meta< typeof Animate > = {
+-	title: 'Components/Animate',
++	title: 'Components/Utilities/Animate',
++	id: 'components-animate',
+ 	component: Animate,
+ 	parameters: {
+ 		controls: { expanded: true },
+diff --git a/packages/components/src/composite/stories/index.story.tsx b/packages/components/src/composite/stories/index.story.tsx
+index c5518375df8a6f..eefcd599134757 100644
+--- a/packages/components/src/composite/stories/index.story.tsx
++++ b/packages/components/src/composite/stories/index.story.tsx
+@@ -16,7 +16,8 @@ import { Composite } from '..';
+ import { Tooltip } from '../../tooltip';
+ 
+ const meta: Meta< typeof Composite > = {
+-	title: 'Components/Composite',
++	title: 'Components/Utilities/Composite',
++	id: 'components-composite',
+ 	component: Composite,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+diff --git a/packages/components/src/disabled/stories/index.story.tsx b/packages/components/src/disabled/stories/index.story.tsx
+index b5da6ccedddc07..59ff84dec43fca 100644
+--- a/packages/components/src/disabled/stories/index.story.tsx
++++ b/packages/components/src/disabled/stories/index.story.tsx
+@@ -18,7 +18,8 @@ import TextareaControl from '../../textarea-control/';
+ import { VStack } from '../../v-stack/';
+ 
+ const meta: Meta< typeof Disabled > = {
+-	title: 'Components/Disabled',
++	title: 'Components/Utilities/Disabled',
++	id: 'components-disabled',
+ 	component: Disabled,
+ 	argTypes: {
+ 		as: { control: { type: null } },
+diff --git a/packages/components/src/draggable/stories/index.story.tsx b/packages/components/src/draggable/stories/index.story.tsx
+index fc48618b1083a3..6ecb54a07a3fb2 100644
+--- a/packages/components/src/draggable/stories/index.story.tsx
++++ b/packages/components/src/draggable/stories/index.story.tsx
+@@ -18,7 +18,8 @@ import Draggable from '..';
+ 
+ const meta: Meta< typeof Draggable > = {
+ 	component: Draggable,
+-	title: 'Components/Draggable',
++	title: 'Components/Utilities/Draggable',
++	id: 'components-draggable',
+ 	argTypes: {
+ 		elementId: { control: { type: null } },
+ 		__experimentalDragComponent: { control: { type: null } },
+diff --git a/packages/components/src/keyboard-shortcuts/stories/index.story.tsx b/packages/components/src/keyboard-shortcuts/stories/index.story.tsx
+index 9e3a1e207451bb..0c8e0f451929a0 100644
+--- a/packages/components/src/keyboard-shortcuts/stories/index.story.tsx
++++ b/packages/components/src/keyboard-shortcuts/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import KeyboardShortcuts from '..';
+ 
+ const meta: Meta< typeof KeyboardShortcuts > = {
+ 	component: KeyboardShortcuts,
+-	title: 'Components/KeyboardShortcuts',
++	title: 'Components/Utilities/KeyboardShortcuts',
++	id: 'components-keyboardshortcuts',
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+diff --git a/packages/components/src/resizable-box/stories/index.story.tsx b/packages/components/src/resizable-box/stories/index.story.tsx
+index 81852f9cb4ea43..489a094c33f119 100644
+--- a/packages/components/src/resizable-box/stories/index.story.tsx
++++ b/packages/components/src/resizable-box/stories/index.story.tsx
+@@ -14,7 +14,8 @@ import ResizableBox from '..';
+ import { useState } from '@wordpress/element';
+ 
+ const meta: Meta< typeof ResizableBox > = {
+-	title: 'Components/ResizableBox',
++	title: 'Components/Utilities/ResizableBox',
++	id: 'components-resizablebox',
+ 	component: ResizableBox,
+ 	argTypes: {
+ 		children: { control: { type: null } },
+diff --git a/packages/components/src/sandbox/stories/index.story.tsx b/packages/components/src/sandbox/stories/index.story.tsx
+index efa8db621a4a63..0d083eac3e9026 100644
+--- a/packages/components/src/sandbox/stories/index.story.tsx
++++ b/packages/components/src/sandbox/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import SandBox from '..';
+ 
+ const meta: Meta< typeof SandBox > = {
+ 	component: SandBox,
+-	title: 'Components/SandBox',
++	title: 'Components/Utilities/SandBox',
++	id: 'components-sandbox',
+ 	argTypes: {
+ 		onFocus: { control: { type: null } },
+ 	},
+diff --git a/packages/components/src/scroll-lock/stories/index.story.tsx b/packages/components/src/scroll-lock/stories/index.story.tsx
+index 8518c0c520a486..b251018f00b38e 100644
+--- a/packages/components/src/scroll-lock/stories/index.story.tsx
++++ b/packages/components/src/scroll-lock/stories/index.story.tsx
+@@ -17,7 +17,8 @@ import ScrollLock from '..';
+ 
+ const meta: Meta< typeof ScrollLock > = {
+ 	component: ScrollLock,
+-	title: 'Components/ScrollLock',
++	title: 'Components/Utilities/ScrollLock',
++	id: 'components-scrolllock',
+ 	parameters: {
+ 		controls: { hideNoControlsWarning: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+diff --git a/packages/components/src/shortcut/stories/index.story.tsx b/packages/components/src/shortcut/stories/index.story.tsx
+index 27e96e3f6d1984..b0bd31ac51cf4b 100644
+--- a/packages/components/src/shortcut/stories/index.story.tsx
++++ b/packages/components/src/shortcut/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import Shortcut from '../';
+ 
+ const meta: Meta< typeof Shortcut > = {
+ 	component: Shortcut,
+-	title: 'Components/Shortcut',
++	title: 'Components/Utilities/Shortcut',
++	id: 'components-shortcut',
+ 	parameters: {
+ 		controls: {
+ 			expanded: true,
+diff --git a/packages/components/src/slot-fill/stories/index.story.tsx b/packages/components/src/slot-fill/stories/index.story.tsx
+index ee00a12d698954..bc6c4f57ad9ce1 100644
+--- a/packages/components/src/slot-fill/stories/index.story.tsx
++++ b/packages/components/src/slot-fill/stories/index.story.tsx
+@@ -15,7 +15,8 @@ import { Slot, Fill, Provider as SlotFillProvider } from '../';
+ 
+ const meta: Meta< typeof Slot > = {
+ 	component: Slot,
+-	title: 'Components/SlotFill',
++	title: 'Components/Utilities/SlotFill',
++	id: 'components-slotfill',
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { Fill, SlotFillProvider },
+ 	argTypes: {
+diff --git a/packages/components/src/theme/stories/index.story.tsx b/packages/components/src/theme/stories/index.story.tsx
+index d0af0a9b974fe3..67eec72533ff3f 100644
+--- a/packages/components/src/theme/stories/index.story.tsx
++++ b/packages/components/src/theme/stories/index.story.tsx
+@@ -13,7 +13,8 @@ import { HStack } from '../../h-stack';
+ 
+ const meta: Meta< typeof Theme > = {
+ 	component: Theme,
+-	title: 'Components/Theme',
++	title: 'Components/Utilities/Theme',
++	id: 'components-theme',
+ 	argTypes: {
+ 		accent: { control: { type: 'color' } },
+ 		background: { control: { type: 'color' } },
+diff --git a/packages/components/src/visually-hidden/stories/index.story.tsx b/packages/components/src/visually-hidden/stories/index.story.tsx
+index 149b2da6b5c891..8abe45a94aab4f 100644
+--- a/packages/components/src/visually-hidden/stories/index.story.tsx
++++ b/packages/components/src/visually-hidden/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import { VisuallyHidden } from '..';
+ 
+ const meta: Meta< typeof VisuallyHidden > = {
+ 	component: VisuallyHidden,
+-	title: 'Components/VisuallyHidden',
++	title: 'Components/Utilities/VisuallyHidden',
++	id: 'components-visuallyhidden',
+ 	argTypes: {
+ 		children: { control: { type: null } },
+ 		as: { control: { type: 'text' } },
+diff --git a/storybook/preview.js b/storybook/preview.js
+index 97be7205349100..21f2eab912059a 100644
+--- a/storybook/preview.js
++++ b/storybook/preview.js
+@@ -132,6 +132,7 @@ export const parameters = {
+ 					'Contributing Guidelines',
+ 					'Actions',
+ 					'Containers',
++					'Utilities',
+ 				],
+ 				'Components (Experimental)',
+ 				'Icons',

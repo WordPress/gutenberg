@@ -1,0 +1,185 @@
+diff --git a/packages/boot/src/style.scss b/packages/boot/src/style.scss
+index 652b5ddc5125c8..40ce1c8077ae58 100644
+--- a/packages/boot/src/style.scss
++++ b/packages/boot/src/style.scss
+@@ -1,4 +1,5 @@
+ @use "@wordpress/theme/src/prebuilt/css/design-tokens.css" as *;
++@use "@wordpress/theme/src/prebuilt/css/legacy-overrides.css" as *;
+ @use "@wordpress/base-styles/mixins" as *;
+ @use "@wordpress/base-styles/variables" as *;
+ @use "./experimental-admin-bar-in-editor.scss" as *;
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index d4fbe60af40597..18b8d085b315dd 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -11,6 +11,10 @@
+ -   Add ["Design System/Tokens/Introduction" page](https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs) to Storybook ([#78449](https://github.com/WordPress/gutenberg/pull/78449)).
+ -   Add "How to pick a token" and "Naming pattern" guidance to [the design system tokens reference documentation](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) ([#78438](https://github.com/WordPress/gutenberg/pull/78438)).
+ 
++### Enhancements
++
++-   `ThemeProvider`: Move the static `--wp-components-*` legacy overrides into a standalone `@wordpress/theme/legacy-overrides.css` stylesheet so they're emitted once at `:root` instead of being injected into every provider instance. The runtime `--wp-admin-theme-color*` overrides are now only emitted when `color.primary` is explicitly provided.
++
+ ### Internal
+ 
+ -   Refactor color space registration to avoid module-level side effects ([#77653](https://github.com/WordPress/gutenberg/pull/77653)).
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index f2c10a6c98c246..e62e97e8c3bfdb 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -38,6 +38,7 @@
+ 			"default": "./build/index.cjs"
+ 		},
+ 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
++		"./legacy-overrides.css": "./src/prebuilt/css/legacy-overrides.css",
+ 		"./design-tokens.js": {
+ 			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
+ 			"import": "./build-module/prebuilt/js/design-tokens.mjs",
+diff --git a/packages/theme/src/prebuilt/css/legacy-overrides.css b/packages/theme/src/prebuilt/css/legacy-overrides.css
+new file mode 100644
+index 00000000000000..827ebdcb7222a8
+--- /dev/null
++++ b/packages/theme/src/prebuilt/css/legacy-overrides.css
+@@ -0,0 +1,25 @@
++/*
++ * Legacy `--wp-components-*` overrides that map onto the design system.
++ *
++ * These entries only contain `var(...)` references that resolve against
++ * the design system tokens (`--wpds-*`) and the WP Core admin theme
++ * variables (`--wp-admin-theme-*`). Because they don't depend on any
++ * runtime input, they're emitted once at `:root` in a static stylesheet
++ * rather than being injected per `ThemeProvider` instance.
++ */
++:root {
++	--wp-components-color-accent: var(--wp-admin-theme-color);
++	--wp-components-color-accent-darker-10: var(--wp-admin-theme-color-darker-10);
++	--wp-components-color-accent-darker-20: var(--wp-admin-theme-color-darker-20);
++	--wp-components-color-accent-inverted: var(--wpds-color-fg-interactive-brand-strong);
++	--wp-components-color-background: var(--wpds-color-bg-surface-neutral-strong);
++	--wp-components-color-foreground: var(--wpds-color-fg-content-neutral);
++	--wp-components-color-foreground-inverted: var(--wpds-color-bg-surface-neutral);
++	--wp-components-color-gray-100: var(--wpds-color-bg-surface-neutral);
++	--wp-components-color-gray-200: var(--wpds-color-stroke-surface-neutral);
++	--wp-components-color-gray-300: var(--wpds-color-stroke-surface-neutral);
++	--wp-components-color-gray-400: var(--wpds-color-stroke-interactive-neutral);
++	--wp-components-color-gray-600: var(--wpds-color-stroke-interactive-neutral);
++	--wp-components-color-gray-700: var(--wpds-color-fg-content-neutral-weak);
++	--wp-components-color-gray-800: var(--wpds-color-fg-content-neutral);
++}
+diff --git a/packages/theme/src/use-theme-provider-styles.ts b/packages/theme/src/use-theme-provider-styles.ts
+index 223e6a8f6164ef..e3386c49f4e4a2 100644
+--- a/packages/theme/src/use-theme-provider-styles.ts
++++ b/packages/theme/src/use-theme-provider-styles.ts
+@@ -26,62 +26,6 @@ type Entry = [ string, string ];
+ const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
+ const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
+ 
+-const legacyWpComponentsOverridesCSS: Entry[] = [
+-	[ '--wp-components-color-accent', 'var(--wp-admin-theme-color)' ],
+-	[
+-		'--wp-components-color-accent-darker-10',
+-		'var(--wp-admin-theme-color-darker-10)',
+-	],
+-	[
+-		'--wp-components-color-accent-darker-20',
+-		'var(--wp-admin-theme-color-darker-20)',
+-	],
+-	[
+-		'--wp-components-color-accent-inverted',
+-		'var(--wpds-color-fg-interactive-brand-strong)',
+-	],
+-	[
+-		'--wp-components-color-background',
+-		'var(--wpds-color-bg-surface-neutral-strong)',
+-	],
+-	[
+-		'--wp-components-color-foreground',
+-		'var(--wpds-color-fg-content-neutral)',
+-	],
+-	[
+-		'--wp-components-color-foreground-inverted',
+-		'var(--wpds-color-bg-surface-neutral)',
+-	],
+-	[
+-		'--wp-components-color-gray-100',
+-		'var(--wpds-color-bg-surface-neutral)',
+-	],
+-	[
+-		'--wp-components-color-gray-200',
+-		'var(--wpds-color-stroke-surface-neutral)',
+-	],
+-	[
+-		'--wp-components-color-gray-300',
+-		'var(--wpds-color-stroke-surface-neutral)',
+-	],
+-	[
+-		'--wp-components-color-gray-400',
+-		'var(--wpds-color-stroke-interactive-neutral)',
+-	],
+-	[
+-		'--wp-components-color-gray-600',
+-		'var(--wpds-color-stroke-interactive-neutral)',
+-	],
+-	[
+-		'--wp-components-color-gray-700',
+-		'var(--wpds-color-fg-content-neutral-weak)',
+-	],
+-	[
+-		'--wp-components-color-gray-800',
+-		'var(--wpds-color-fg-content-neutral)',
+-	],
+-];
+-
+ function customRgbFormat( color: PlainColorObject ): string {
+ 	const rgb = to( color, sRGB );
+ 	return rgb.coords
+@@ -142,18 +86,25 @@ function colorTokensCSS(
+ 
+ function generateStyles( {
+ 	primary,
++	hasUserProvidedPrimary,
+ 	computedColorRamps,
+ }: {
+ 	primary: string;
++	hasUserProvidedPrimary: boolean;
+ 	computedColorRamps: Map< string, RampResult >;
+ } ): CSSProperties {
+ 	return Object.fromEntries(
+ 		[
+ 			// Semantic color tokens
+ 			colorTokensCSS( computedColorRamps ),
+-			// Legacy overrides
+-			legacyWpAdminThemeOverridesCSS( primary ),
+-			legacyWpComponentsOverridesCSS,
++			// Legacy `--wp-admin-theme-color*` overrides only need to be
++			// emitted when `color.primary` is explicitly provided by the
++			// consumer. WP Core already defines these custom properties at
++			// `:root`, so we'd otherwise be duplicating its defaults on
++			// every provider instance.
++			hasUserProvidedPrimary
++				? legacyWpAdminThemeOverridesCSS( primary )
++				: [],
+ 		].flat()
+ 	);
+ }
+@@ -190,6 +141,8 @@ export function useThemeProviderStyles( {
+ 		[ primary, bg, cursorControl ]
+ 	);
+ 
++	const hasUserProvidedPrimary = color.primary !== undefined;
++
+ 	const colorStyles = useMemo( () => {
+ 		// Determine which seeds are needed for generating ramps.
+ 		const seeds = {
+@@ -214,9 +167,10 @@ export function useThemeProviderStyles( {
+ 
+ 		return generateStyles( {
+ 			primary: seeds.primary,
++			hasUserProvidedPrimary,
+ 			computedColorRamps,
+ 		} );
+-	}, [ primary, bg ] );
++	}, [ primary, bg, hasUserProvidedPrimary ] );
+ 
+ 	const themeProviderStyles: CSSProperties = useMemo(
+ 		() => ( {

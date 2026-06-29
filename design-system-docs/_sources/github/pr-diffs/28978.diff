@@ -1,0 +1,439 @@
+diff --git a/packages/components/src/icon/next.js b/packages/components/src/icon/next.js
+new file mode 100644
+index 00000000000000..f3654ea8acdf7c
+--- /dev/null
++++ b/packages/components/src/icon/next.js
+@@ -0,0 +1,74 @@
++/**
++ * WordPress dependencies
++ */
++import {
++	cloneElement,
++	createElement,
++	Component,
++	isValidElement,
++} from '@wordpress/element';
++import { SVG } from '@wordpress/primitives';
++
++/**
++ * Internal dependencies
++ */
++import { withNext } from '../ui/context';
++import { Icon as NextIcon } from '../ui/icon';
++import Dashicon from '../dashicon';
++
++const Icon = process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextIcon : undefined;
++
++const getRenderedIcon = ( { icon = null, size, ...additionalProps } ) => {
++	if ( 'string' === typeof icon ) {
++		return <Dashicon icon={ icon } { ...additionalProps } />;
++	}
++
++	if ( icon && Dashicon === icon.type ) {
++		return cloneElement( icon, {
++			...additionalProps,
++		} );
++	}
++
++	// Icons should be 24x24 by default.
++	const iconSize = size || 24;
++	if ( 'function' === typeof icon ) {
++		if ( icon.prototype instanceof Component ) {
++			return createElement( icon, {
++				size: iconSize,
++				...additionalProps,
++			} );
++		}
++
++		return icon( { size: iconSize, ...additionalProps } );
++	}
++
++	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
++		const appliedProps = {
++			width: iconSize,
++			height: iconSize,
++			...icon.props,
++			...additionalProps,
++		};
++
++		return <SVG { ...appliedProps } />;
++	}
++
++	if ( isValidElement( icon ) ) {
++		return cloneElement( icon, {
++			size: iconSize,
++			...additionalProps,
++		} );
++	}
++
++	return icon;
++};
++
++const adapter = ( { icon, size, ...additionalProps } ) => ( {
++	...additionalProps,
++	size,
++	icon: getRenderedIcon( { icon, size, ...additionalProps } ),
++} );
++
++export function withNextComponent( Current ) {
++	return withNext( Current, Icon, 'WPComponentsIcon', adapter );
++}
+diff --git a/packages/components/src/ui/icon/component.js b/packages/components/src/ui/icon/component.js
+new file mode 100644
+index 00000000000000..e7da715f50ca2a
+--- /dev/null
++++ b/packages/components/src/ui/icon/component.js
+@@ -0,0 +1,89 @@
++/**
++ * External dependencies
++ */
++import { contextConnect, useContextSystem } from '@wp-g2/context';
++import { css, cx } from '@wp-g2/styles';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo, cloneElement } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { View } from '../view';
++import * as styles from './styles';
++
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @typedef Props
++ * @property {import('react').CSSProperties['fill']} [fill='currentColor'] Icon fill.
++ * @property {number} [height] Icon height.
++ * @property {import('react').ReactElement} icon Icon to render.
++ * @property {boolean} [inline] Whether the icon is inline with text.
++ * @property {number | string} [size=20] Icon size.
++ * @property {keyof styles} [variant] Variant to render.
++ * @property {number} [width] Icon width.
++ * @property {never} [children] Children are disallowed.
++ */
++/* eslint-enable jsdoc/valid-types */
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<Props, 'div'>} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function Icon( props, forwardedRef ) {
++	const {
++		className,
++		fill = 'currentColor', // https://github.com/ItsJonQ/g2/pull/133#discussion_r525538497
++		height,
++		icon,
++		inline,
++		size = 20,
++		variant,
++		width,
++		...otherProps
++	} = useContextSystem( props, 'Icon' );
++
++	const classes = useMemo( () => {
++		const sx = {};
++
++		// https://github.com/ItsJonQ/g2/issues/136
++		sx.fill = css( {
++			color: fill,
++			fill: 'currentColor',
++		} );
++
++		sx.size = css( {
++			height: height || size,
++			width: width || size,
++		} );
++
++		return cx(
++			styles.Wrapper,
++			sx.fill,
++			sx.size,
++			inline && styles.inline,
++			variant && styles[ variant ],
++			className
++		);
++	}, [ className, fill, height, inline, size, variant, width ] );
++
++	if ( ! icon ) return null;
++
++	const IconComponent = cloneElement( icon, {
++		height: size,
++		ref: forwardedRef,
++		size,
++		width: size,
++	} );
++
++	return (
++		<View { ...otherProps } className={ classes }>
++			{ IconComponent }
++		</View>
++	);
++}
++
++export default contextConnect( Icon, 'Icon' );
+diff --git a/packages/components/src/ui/icon/index.js b/packages/components/src/ui/icon/index.js
+new file mode 100644
+index 00000000000000..170be098097417
+--- /dev/null
++++ b/packages/components/src/ui/icon/index.js
+@@ -0,0 +1 @@
++export { default as Icon } from './component';
+diff --git a/packages/components/src/ui/icon/stories/index.js b/packages/components/src/ui/icon/stories/index.js
+new file mode 100644
+index 00000000000000..d77b93866f2f31
+--- /dev/null
++++ b/packages/components/src/ui/icon/stories/index.js
+@@ -0,0 +1,74 @@
++/**
++ * External dependencies
++ */
++import { omit, omitBy, map } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { SVG, Path } from '@wordpress/primitives';
++import * as icons from '@wordpress/icons';
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { Icon } from '..';
++
++export default {
++	component: Icon,
++	title: 'G2 Components (Experimental)/Icon',
++};
++
++export const _default = () => {
++	return (
++		<Icon
++			icon={
++				<SVG>
++					<Path d="M5 4v3h5.5v12h3V7H19V4z" />
++				</SVG>
++			}
++			size="50"
++		/>
++	);
++};
++
++const availableIcons = omit( icons, 'Icon' );
++
++const Library = () => {
++	const [ filter, setFilter ] = useState( '' );
++	const filteredIcons = omitBy( availableIcons, ( _icon, name ) => {
++		return name.indexOf( filter ) === -1;
++	} );
++	return (
++		<div style={ { padding: '20px' } }>
++			<label htmlFor="filter-icon" style={ { paddingRight: '10px' } }>
++				Filter Icons
++			</label>
++			<input
++				// eslint-disable-next-line no-restricted-syntax
++				id="filter-icons"
++				type="search"
++				value={ filter }
++				placeholder="Icon name"
++				onChange={ ( event ) => setFilter( event.target.value ) }
++			/>
++			{ map( filteredIcons, ( icon, name ) => {
++				return (
++					<div
++						key={ name }
++						style={ { display: 'flex', alignItems: 'center' } }
++					>
++						<strong style={ { width: '120px' } }>{ name }</strong>
++
++						<Icon icon={ icon } />
++						<Icon icon={ icon } size={ 36 } />
++						<Icon icon={ icon } size={ 48 } />
++					</div>
++				);
++			} ) }
++		</div>
++	);
++};
++
++export const library = () => <Library />;
+diff --git a/packages/components/src/ui/icon/styles.js b/packages/components/src/ui/icon/styles.js
+new file mode 100644
+index 00000000000000..531c5a65a3edb2
+--- /dev/null
++++ b/packages/components/src/ui/icon/styles.js
+@@ -0,0 +1,22 @@
++/**
++ * External dependencies
++ */
++import { css, ui } from '@wp-g2/styles';
++
++export const Wrapper = css`
++	display: block;
++	user-select: none;
++
++	svg {
++		display: block;
++	}
++`;
++
++export const inline = css`
++	display: inline-block;
++	vertical-align: middle;
++`;
++
++export const muted = css`
++	color: ${ ui.get( 'colorTextMuted' ) };
++`;
+diff --git a/packages/components/src/ui/icon/test/__snapshots__/component.js.snap b/packages/components/src/ui/icon/test/__snapshots__/component.js.snap
+new file mode 100644
+index 00000000000000..89e17dc9121b95
+--- /dev/null
++++ b/packages/components/src/ui/icon/test/__snapshots__/component.js.snap
+@@ -0,0 +1,96 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render correctly 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: block;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  color: currentColor;
++  fill: currentColor;
++  height: 20px;
++  width: 20px;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 svg {
++  display: block;
++}
++
++<div
++  class="components-icon wp-components-icon emotion-0"
++  data-g2-c16t="true"
++  data-g2-component="Icon"
++>
++  <svg />
++</div>
++`;
++
++exports[`props should render fill 1`] = `
++"Snapshot Diff:
++- First value
+++ Second value
++
++- Snapshot Diff:
++- - First value
++- + Second value
++-
++- @@ -7,11 +7,11 @@
++-   	\\"margin-top\\": \\"0px\\",
++-   	\\"margin-right\\": \\"0px\\",
++-   	\\"margin-bottom\\": \\"0px\\",
++-   	\\"margin-left\\": \\"0px\\",
++-   	\\"user-select\\": \\"none\\",
++- - 	\\"color\\": \\"red\\",
++- + 	\\"color\\": \\"currentColor\\",
++-   	\\"fill\\": \\"currentColor\\",
++-   	\\"height\\": \\"20px\\",
++-   	\\"width\\": \\"20px\\",
++-   	\\"visibility\\": \\"visible\\"
++-   }"
++`;
++
++exports[`props should render size 1`] = `
++"Snapshot Diff:
++- First value
+++ Second value
++
++- Snapshot Diff:
++- - First value
++- + Second value
++-
++- @@ -9,9 +9,9 @@
++-   	\\"margin-bottom\\": \\"0px\\",
++-   	\\"margin-left\\": \\"0px\\",
++-   	\\"user-select\\": \\"none\\",
++-   	\\"color\\": \\"currentColor\\",
++-   	\\"fill\\": \\"currentColor\\",
++- - 	\\"height\\": \\"31px\\",
++- - 	\\"width\\": \\"31px\\",
++- + 	\\"height\\": \\"20px\\",
++- + 	\\"width\\": \\"20px\\",
++-   	\\"visibility\\": \\"visible\\"
++-   }"
++`;
+diff --git a/packages/components/src/ui/icon/test/component.js b/packages/components/src/ui/icon/test/component.js
+new file mode 100644
+index 00000000000000..0d340249f0d4fd
+--- /dev/null
++++ b/packages/components/src/ui/icon/test/component.js
+@@ -0,0 +1,41 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { Icon } from '..';
++
++const MockIcon = () => <svg />;
++
++describe( 'props', () => {
++	let base;
++
++	beforeEach( () => {
++		( { container: base } = render( <Icon icon={ <MockIcon /> } /> ) );
++	} );
++
++	test( 'should render correctly', () => {
++		expect( base.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render fill', () => {
++		const { container } = render(
++			<Icon fill="red" icon={ <MockIcon /> } />
++		);
++		expect( container.firstChild ).toMatchStyleDiffSnapshot(
++			base.firstChild
++		);
++	} );
++
++	test( 'should render size', () => {
++		const { container } = render(
++			<Icon icon={ <MockIcon /> } size={ 31 } />
++		);
++		expect( container.firstChild ).toMatchStyleDiffSnapshot(
++			base.firstChild
++		);
++	} );
++} );

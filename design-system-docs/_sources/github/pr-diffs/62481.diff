@@ -1,0 +1,332 @@
+diff --git a/packages/block-library/src/post-date/edit.js b/packages/block-library/src/post-date/edit.js
+index e5d51b11722580..5057466c6af453 100644
+--- a/packages/block-library/src/post-date/edit.js
++++ b/packages/block-library/src/post-date/edit.js
+@@ -28,7 +28,7 @@ import {
+ 	ToggleControl,
+ 	PanelBody,
+ } from '@wordpress/components';
+-import { __, sprintf } from '@wordpress/i18n';
++import { __, _x, sprintf } from '@wordpress/i18n';
+ import { edit } from '@wordpress/icons';
+ import { DOWN } from '@wordpress/keycodes';
+ import { useSelect } from '@wordpress/data';
+@@ -128,6 +128,10 @@ export default function PostDateEdit( {
+ 											siteTimeFormat
+ 										) }
+ 										onClose={ onClose }
++										dateOrder={
++											/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
++											_x( 'dmy', 'date order' )
++										}
+ 									/>
+ 								) }
+ 								renderToggle={ ( { isOpen, onToggle } ) => {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0823731d455eaa..01218a30c36e04 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,12 @@
+ -   `Tooltip`: Add support for `className` prop ([#63157](https://github.com/WordPress/gutenberg/pull/63157)).
+ -   `Toolbar`: Add support for `vertical` orientation ([#60123](https://github.com/WordPress/gutenberg/pull/60123)).
+ -   `BaseControl`: forward ref on `VisualLabel` ([#63169](https://github.com/WordPress/gutenberg/pull/63169)).
++-   `ToolbarButton`: Deprecate `isDisabled` prop and merge with `disabled` ([#63101](https://github.com/WordPress/gutenberg/pull/63101)).
++-   `Button`: Stabilize `__experimentalIsFocusable` prop as `accessibleWhenDisabled` ([#62282](https://github.com/WordPress/gutenberg/pull/62282)).
++-   `ToolbarButton`: Always keep focusable when disabled ([#63102](https://github.com/WordPress/gutenberg/pull/63102)).
++-   `ProgressBar`: Fix indeterminate RTL support. ([#63129](https://github.com/WordPress/gutenberg/pull/63129)).
++-   `RangeControl`: Fix RTL support for custom marks ([#63198](https://github.com/WordPress/gutenberg/pull/63198)).
++-   `TimePicker`: Add `dateOrder` prop ([#62481](https://github.com/WordPress/gutenberg/pull/62481)).
+ 
+ ### Bug Fixes
+ 
+@@ -16,14 +22,6 @@
+ -   Fix inaccessibly disabled `Button`s ([#62306](https://github.com/WordPress/gutenberg/pull/62306)).
+ -   `TimePicker`: Fix time zone overflow ([#63209](https://github.com/WordPress/gutenberg/pull/63209)).
+ 
+-### Enhancements
+-
+--   `ToolbarButton`: Deprecate `isDisabled` prop and merge with `disabled` ([#63101](https://github.com/WordPress/gutenberg/pull/63101)).
+--   `Button`: Stabilize `__experimentalIsFocusable` prop as `accessibleWhenDisabled` ([#62282](https://github.com/WordPress/gutenberg/pull/62282)).
+--   `ToolbarButton`: Always keep focusable when disabled ([#63102](https://github.com/WordPress/gutenberg/pull/63102)).
+--   `ProgressBar`: Fix indeterminate RTL support. ([#63129](https://github.com/WordPress/gutenberg/pull/63129)).
+--   `RangeControl`: Fix RTL support for custom marks ([#63198](https://github.com/WordPress/gutenberg/pull/63198)).
+-
+ ### Internal
+ 
+ -   `Allow ariakit and framer motion imports in the components package. ([#63123](https://github.com/WordPress/gutenberg/pull/63123))
+diff --git a/packages/components/src/date-time/README.md b/packages/components/src/date-time/README.md
+index 3d6b0e7761d6a6..b57a3f859b0e11 100644
+--- a/packages/components/src/date-time/README.md
++++ b/packages/components/src/date-time/README.md
+@@ -56,6 +56,14 @@ Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is display
+ -   Required: No
+ -   Default: false
+ 
++### `dateOrder`: `'dmy' | 'mdy' | 'ymd'`
++
++The order of day, month, and year. This prop overrides the time format determined by `is12Hour` prop.
++
++-   Type: `string`
++-   Required: No
++-   Default: `'dmy'`
++
+ ### `isInvalidDate`: `( date: Date ) => boolean`
+ 
+ A callback function which receives a Date object representing a day as an argument, and should return a Boolean to signify if the day is valid or not.
+diff --git a/packages/components/src/date-time/date-time/index.tsx b/packages/components/src/date-time/date-time/index.tsx
+index bdb4738c4b12c0..82e34cff8e14e9 100644
+--- a/packages/components/src/date-time/date-time/index.tsx
++++ b/packages/components/src/date-time/date-time/index.tsx
+@@ -24,6 +24,7 @@ function UnforwardedDateTimePicker(
+ 	{
+ 		currentDate,
+ 		is12Hour,
++		dateOrder,
+ 		isInvalidDate,
+ 		onMonthPreviewed = noop,
+ 		onChange,
+@@ -39,6 +40,7 @@ function UnforwardedDateTimePicker(
+ 					currentTime={ currentDate }
+ 					onChange={ onChange }
+ 					is12Hour={ is12Hour }
++					dateOrder={ dateOrder }
+ 				/>
+ 				<DatePicker
+ 					currentDate={ currentDate }
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index f3039a2154d7eb..e2877a1ded5e1f 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -34,6 +34,8 @@ import {
+ import { TIMEZONELESS_FORMAT } from '../constants';
+ import { TimeInput } from '../time-input';
+ 
++const VALID_DATE_ORDERS = [ 'dmy', 'mdy', 'ymd' ];
++
+ /**
+  * TimePicker is a React component that renders a clock for time selection.
+  *
+@@ -58,6 +60,7 @@ export function TimePicker( {
+ 	is12Hour,
+ 	currentTime,
+ 	onChange,
++	dateOrder: dateOrderProp,
+ }: TimePickerProps ) {
+ 	const [ date, setDate ] = useState( () =>
+ 		// Truncate the date at the minutes, see: #15495.
+@@ -116,6 +119,7 @@ export function TimePicker( {
+ 
+ 	const dayField = (
+ 		<DayInput
++			key="day"
+ 			className="components-datetime__time-field components-datetime__time-field-day" // Unused, for backwards compatibility.
+ 			label={ __( 'Day' ) }
+ 			hideLabelFromVision
+@@ -134,7 +138,7 @@ export function TimePicker( {
+ 	);
+ 
+ 	const monthField = (
+-		<MonthSelectWrapper>
++		<MonthSelectWrapper key="month">
+ 			<SelectControl
+ 				className="components-datetime__time-field components-datetime__time-field-month" // Unused, for backwards compatibility.
+ 				label={ __( 'Month' ) }
+@@ -165,6 +169,46 @@ export function TimePicker( {
+ 		</MonthSelectWrapper>
+ 	);
+ 
++	const yearField = (
++		<YearInput
++			key="year"
++			className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
++			label={ __( 'Year' ) }
++			hideLabelFromVision
++			__next40pxDefaultSize
++			value={ year }
++			step={ 1 }
++			min={ 1 }
++			max={ 9999 }
++			required
++			spinControls="none"
++			isPressEnterToChange
++			isDragEnabled={ false }
++			isShiftStepEnabled={ false }
++			onChange={ buildNumberControlChangeCallback( 'year' ) }
++			__unstableStateReducer={ buildPadInputStateReducer( 4 ) }
++		/>
++	);
++
++	const defaultDateOrder = is12Hour ? 'mdy' : 'dmy';
++	const dateOrder =
++		dateOrderProp && VALID_DATE_ORDERS.includes( dateOrderProp )
++			? dateOrderProp
++			: defaultDateOrder;
++
++	const fields = dateOrder.split( '' ).map( ( field ) => {
++		switch ( field ) {
++			case 'd':
++				return dayField;
++			case 'm':
++				return monthField;
++			case 'y':
++				return yearField;
++			default:
++				return null;
++		}
++	} );
++
+ 	return (
+ 		<Wrapper
+ 			className="components-datetime__time" // Unused, for backwards compatibility.
+@@ -201,36 +245,7 @@ export function TimePicker( {
+ 				<HStack
+ 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
+ 				>
+-					{ is12Hour ? (
+-						<>
+-							{ monthField }
+-							{ dayField }
+-						</>
+-					) : (
+-						<>
+-							{ dayField }
+-							{ monthField }
+-						</>
+-					) }
+-					<YearInput
+-						className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
+-						label={ __( 'Year' ) }
+-						hideLabelFromVision
+-						__next40pxDefaultSize
+-						value={ year }
+-						step={ 1 }
+-						min={ 1 }
+-						max={ 9999 }
+-						required
+-						spinControls="none"
+-						isPressEnterToChange
+-						isDragEnabled={ false }
+-						isShiftStepEnabled={ false }
+-						onChange={ buildNumberControlChangeCallback( 'year' ) }
+-						__unstableStateReducer={ buildPadInputStateReducer(
+-							4
+-						) }
+-					/>
++					{ fields }
+ 				</HStack>
+ 			</Fieldset>
+ 		</Wrapper>
+diff --git a/packages/components/src/date-time/time/test/index.tsx b/packages/components/src/date-time/time/test/index.tsx
+index a4f7df4db2acba..0b91d95a5fc92d 100644
+--- a/packages/components/src/date-time/time/test/index.tsx
++++ b/packages/components/src/date-time/time/test/index.tsx
+@@ -333,6 +333,67 @@ describe( 'TimePicker', () => {
+ 		expect( monthInputIndex < dayInputIndex ).toBe( true );
+ 	} );
+ 
++	it( 'Should change layouts/orders when `dateOrder` prop is passed', () => {
++		const onChangeSpy = jest.fn();
++
++		render(
++			<form aria-label="form">
++				<TimePicker
++					currentTime="1986-10-18T11:00:00"
++					onChange={ onChangeSpy }
++					dateOrder="ymd"
++				/>
++			</form>
++		);
++
++		const form = screen.getByRole( 'form' ) as HTMLFormElement;
++
++		const yearInputIndex = Array.from( form.elements ).indexOf(
++			screen.getByLabelText( 'Year' )
++		);
++
++		const monthInputIndex = Array.from( form.elements ).indexOf(
++			screen.getByLabelText( 'Month' )
++		);
++		const dayInputIndex = Array.from( form.elements ).indexOf(
++			screen.getByLabelText( 'Day' )
++		);
++
++		expect( monthInputIndex > yearInputIndex ).toBe( true );
++		expect( dayInputIndex > monthInputIndex ).toBe( true );
++	} );
++
++	it( 'Should ignore `is12Hour` prop setting when `dateOrder` prop is explicitly passed', () => {
++		const onChangeSpy = jest.fn();
++
++		render(
++			<form aria-label="form">
++				<TimePicker
++					currentTime="1986-10-18T11:00:00"
++					onChange={ onChangeSpy }
++					dateOrder="ymd"
++					is12Hour
++				/>
++			</form>
++		);
++
++		const form = screen.getByRole( 'form' ) as HTMLFormElement;
++
++		const yearInputIndex = Array.from( form.elements ).indexOf(
++			screen.getByLabelText( 'Year' )
++		);
++
++		const monthInputIndex = Array.from( form.elements ).indexOf(
++			screen.getByLabelText( 'Month' )
++		);
++		const dayInputIndex = Array.from( form.elements ).indexOf(
++			screen.getByLabelText( 'Day' )
++		);
++
++		expect( monthInputIndex > yearInputIndex ).toBe( true );
++		expect( dayInputIndex > monthInputIndex ).toBe( true );
++	} );
++
+ 	it( 'Should set a time when passed a null currentTime', () => {
+ 		const onChangeSpy = jest.fn();
+ 
+diff --git a/packages/components/src/date-time/types.ts b/packages/components/src/date-time/types.ts
+index 3189eb453eb391..b3716d5c135c64 100644
+--- a/packages/components/src/date-time/types.ts
++++ b/packages/components/src/date-time/types.ts
+@@ -16,6 +16,14 @@ export type TimePickerProps = {
+ 	 */
+ 	is12Hour?: boolean;
+ 
++	/**
++	 * The order of day, month, and year. This prop overrides the time format
++	 * determined by `is12Hour` prop.
++	 *
++	 * @default 'dmy'
++	 */
++	dateOrder?: 'dmy' | 'mdy' | 'ymd';
++
+ 	/**
+ 	 * The function called when a new time has been selected. It is passed the
+ 	 * time as an argument.
+diff --git a/packages/editor/src/components/post-schedule/index.js b/packages/editor/src/components/post-schedule/index.js
+index 87a6e4649f9214..94387ed4267fa9 100644
+--- a/packages/editor/src/components/post-schedule/index.js
++++ b/packages/editor/src/components/post-schedule/index.js
+@@ -7,6 +7,7 @@ import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
+  * WordPress dependencies
+  */
+ import { getSettings } from '@wordpress/date';
++import { _x } from '@wordpress/i18n';
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+ import { useState, useMemo } from '@wordpress/element';
+@@ -98,6 +99,10 @@ export function PrivatePostSchedule( {
+ 			currentDate={ postDate }
+ 			onChange={ onUpdateDate }
+ 			is12Hour={ is12HourTime }
++			dateOrder={
++				/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
++				_x( 'dmy', 'date order' )
++			}
+ 			events={ events }
+ 			onMonthPreviewed={ ( date ) =>
+ 				setPreviewedMonth( parseISO( date ) )

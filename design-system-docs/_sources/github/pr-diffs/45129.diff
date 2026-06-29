@@ -1,0 +1,86 @@
+diff --git a/packages/components/src/tab-panel/index.js b/packages/components/src/tab-panel/index.js
+index c5423975e5ec16..35eaec60ba675a 100644
+--- a/packages/components/src/tab-panel/index.js
++++ b/packages/components/src/tab-panel/index.js
+@@ -7,8 +7,9 @@ import { partial, noop, find } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+-import { useState, useEffect } from '@wordpress/element';
++import { useState, useEffect, useRef } from '@wordpress/element';
+ import { useInstanceId } from '@wordpress/compose';
++import { DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+ 
+ /**
+  * Internal dependencies
+@@ -40,6 +41,7 @@ export default function TabPanel( {
+ } ) {
+ 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
+ 	const [ selected, setSelected ] = useState( null );
++	const [ direction, setDirection ] = useState( null );
+ 
+ 	const handleClick = ( tabKey ) => {
+ 		setSelected( tabKey );
+@@ -49,9 +51,30 @@ export default function TabPanel( {
+ 	const onNavigate = ( childIndex, child ) => {
+ 		child.click();
+ 	};
++	const onKeyDown = ( evt ) => {
++		const hKey = direction === 'rtl' ? LEFT : RIGHT;
++		const key = orientation === 'vertical' ? hKey : DOWN;
++
++		if ( evt.keyCode === key ) {
++			panelRef.current?.focus();
++		}
++	};
++
++	const tabRef = useRef();
++	const panelRef = useRef();
+ 	const selectedTab = find( tabs, { name: selected } );
+ 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
+ 
++	useEffect( () => {
++		if ( tabRef.current ) {
++			const dir = window.getComputedStyle( tabRef.current ).direction;
++
++			if ( dir ) {
++				setDirection( dir );
++			}
++		}
++	}, [ tabRef ] );
++
+ 	useEffect( () => {
+ 		const newSelectedTab = find( tabs, { name: selected } );
+ 		if ( ! newSelectedTab ) {
+@@ -68,6 +91,8 @@ export default function TabPanel( {
+ 				orientation={ orientation }
+ 				onNavigate={ onNavigate }
+ 				className="components-tab-panel__tabs"
++				onKeyDown={ onKeyDown }
++				ref={ tabRef }
+ 			>
+ 				{ tabs.map( ( tab ) => (
+ 					<TabButton
+@@ -95,6 +120,8 @@ export default function TabPanel( {
+ 					role="tabpanel"
+ 					id={ `${ selectedId }-view` }
+ 					className="components-tab-panel__tab-content"
++					tabIndex="-1"
++					ref={ panelRef }
+ 				>
+ 					{ children( selectedTab ) }
+ 				</div>
+diff --git a/packages/components/src/tab-panel/style.scss b/packages/components/src/tab-panel/style.scss
+index 40950b09ffdd6d..7852378107adab 100644
+--- a/packages/components/src/tab-panel/style.scss
++++ b/packages/components/src/tab-panel/style.scss
+@@ -62,3 +62,9 @@
+ 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
+ 	}
+ }
++
++.components-tab-panel__tab-content {
++	&:focus {
++		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
++	}
++}

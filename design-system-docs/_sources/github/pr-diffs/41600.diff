@@ -1,0 +1,29 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 297d2038ad866b..c4374f88e13049 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ -   `Flex` updated to satisfy `react/exhuastive-deps` eslint rule ([#41507](https://github.com/WordPress/gutenberg/pull/41507)).
+ -   `CustomGradientBar` updated to satisfy `react/exhuastive-deps` eslint rule ([#41463](https://github.com/WordPress/gutenberg/pull/41463))
+ -   `TreeSelect`: Convert to TypeScript ([#41536](https://github.com/WordPress/gutenberg/pull/41536)).
++-   `FontSizePicker`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41600](https://github.com/WordPress/gutenberg/pull/41600)).
+ 
+ ## 19.12.0 (2022-06-01)
+ 
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index eb6c928f182d59..816d94127853c1 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -103,9 +103,11 @@ function FontSizePicker(
+ 		return hint;
+ 	}, [
+ 		showCustomValueControl,
+-		selectedOption?.slug,
++		selectedOption?.name,
++		selectedOption?.size,
+ 		value,
+ 		isCustomValue,
++		shouldUseSelectControl,
+ 		fontSizesContainComplexValues,
+ 	] );
+ 

@@ -1,0 +1,44 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eb6e595e304ecf..efeefcf2410263 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -44,6 +44,7 @@
+ ### Bug Fix
+ 
+ -   `Autocomplete`: Add `aria-live` announcements for Mac and IOS Voiceover to fix lack of support for `aria-owns` ([#54902](https://github.com/WordPress/gutenberg/pull/54902)).
++-   Improve Button saving state accessibility. ([#55547](https://github.com/WordPress/gutenberg/pull/55547))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 03273056cfa179..48ea32bd1998e5 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -242,6 +242,11 @@
+ 	&.is-secondary.is-busy:disabled,
+ 	&.is-secondary.is-busy[aria-disabled="true"] {
+ 		animation: components-button__busy-animation 2500ms infinite linear;
++		// This should be refactored to use the reduce-motion("animation") mixin
++		// as soon as https://github.com/WordPress/gutenberg/issues/55566 is closed.
++		@media (prefers-reduced-motion: reduce) {
++			animation-duration: 0s;
++		}
+ 		opacity: 1;
+ 		background-size: 100px 100%;
+ 		// Disable reason: This function call looks nicer when each argument is on its own line.
+diff --git a/packages/edit-site/src/components/save-hub/style.scss b/packages/edit-site/src/components/save-hub/style.scss
+index e864444b2077b4..5cb7cca1f85018 100644
+--- a/packages/edit-site/src/components/save-hub/style.scss
++++ b/packages/edit-site/src/components/save-hub/style.scss
+@@ -18,4 +18,11 @@
+ 	&[aria-disabled="true"]:hover {
+ 		color: inherit;
+ 	}
++
++	&:not(.is-primary) {
++		&.is-busy,
++		&.is-busy[aria-disabled="true"]:hover {
++			color: $gray-900;
++		}
++	}
+ }

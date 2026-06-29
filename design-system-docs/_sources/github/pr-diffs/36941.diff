@@ -1,0 +1,167 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a5cb5bf1ec7781..a15f95fb47414c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,8 @@
+ 
+ ### Bug Fix
+ 
++-   Fixed error thrown in `ColorPicker` when used in controlled state in color gradients ([#36941](https://github.com/WordPress/gutenberg/pull/36941)).
++-   Updated readme to include default value introduced in fix for unexpected movements in the `ColorPicker` ([#35670](https://github.com/WordPress/gutenberg/pull/35670)).
+ -   Replaced hardcoded blue in `ColorPicker` with UI theme color ([#36153](https://github.com/WordPress/gutenberg/pull/36153)).
+ 
+ ### Experimental
+diff --git a/packages/components/src/color-picker/README.md b/packages/components/src/color-picker/README.md
+index efe8728d22bd69..1b065203196a7a 100644
+--- a/packages/components/src/color-picker/README.md
++++ b/packages/components/src/color-picker/README.md
+@@ -22,32 +22,34 @@ function Example() {
+ 
+ ## Props
+ 
+-### `color`
+-
+-**Type**: `string`
++### `color`: `string`
+ 
+ The current color value to display in the picker. Must be a hex or hex8 string.
+ 
+-### `onChange`
++- Required: No
+ 
+-**Type**: `(hex8Color: string) => void`
++### `onChange`: `(hex8Color: string) => void`
+ 
+ Fired when the color changes. Always passes a hex8 color string.
+ 
+-### `enableAlpha`
++- Required: No
+ 
+-**Type**: `boolean`
++### `enableAlpha`: `boolean`
+ 
+ Defaults to `false`. When `true` the color picker will display the alpha channel both in the bottom inputs as well as in the color picker itself.
+ 
+-### `defaultValue`
++- Required: No
++- Default: `false`
+ 
+-**Type**: `string | undefined`
++### `defaultValue`: `string | undefined`
+ 
+ An optional default value to use for the color picker.
+ 
+-### `copyFormat`
++- Required: No
++- Default: `'#fff'`
+ 
+-**Type**: `'hex' | 'hsl' | 'rgb' | undefined`
++### `copyFormat`: `'hex' | 'hsl' | 'rgb' | undefined`
+ 
+ The format to copy when clicking the displayed color format.
++
++- Required: No
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index bd9ee1fd49465c..4f9f0c7da59e78 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -11,6 +11,7 @@ import namesPlugin from 'colord/plugins/names';
+  */
+ import { useState, useMemo } from '@wordpress/element';
+ import { settings } from '@wordpress/icons';
++import { useDebounce } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+@@ -32,6 +33,7 @@ import {
+ import { ColorDisplay } from './color-display';
+ import { ColorInput } from './color-input';
+ import { Picker } from './picker';
++import { useControlledValue } from '../utils/hooks';
+ 
+ import type { ColorType } from './types';
+ 
+@@ -57,7 +59,7 @@ const ColorPicker = (
+ ) => {
+ 	const {
+ 		enableAlpha = false,
+-		color,
++		color: colorProp,
+ 		onChange,
+ 		defaultValue = '#fff',
+ 		copyFormat,
+@@ -65,15 +67,23 @@ const ColorPicker = (
+ 	} = useContextSystem( props, 'ColorPicker' );
+ 
+ 	// Use a safe default value for the color and remove the possibility of `undefined`.
++	const [ color, setColor ] = useControlledValue( {
++		onChange,
++		value: colorProp,
++		defaultValue,
++	} );
++
+ 	const safeColordColor = useMemo( () => {
+-		return color ? colord( color ) : colord( defaultValue );
+-	}, [ color, defaultValue ] );
++		return colord( color );
++	}, [ color ] );
++
++	const debouncedSetColor = useDebounce( setColor );
+ 
+ 	const handleChange = useCallback(
+ 		( nextValue: Colord ) => {
+-			onChange( nextValue.toHex() );
++			debouncedSetColor( nextValue.toHex() );
+ 		},
+-		[ onChange ]
++		[ debouncedSetColor ]
+ 	);
+ 
+ 	const [ showInputs, setShowInputs ] = useState< boolean >( false );
+diff --git a/packages/components/src/color-picker/test/index.js b/packages/components/src/color-picker/test/index.js
+index 34a5198c236072..19f8f2130f005e 100644
+--- a/packages/components/src/color-picker/test/index.js
++++ b/packages/components/src/color-picker/test/index.js
+@@ -41,6 +41,12 @@ function moveReactColorfulSlider( sliderElement, from, to ) {
+ 	fireEvent( sliderElement, new FakeMouseEvent( 'mousemove', to ) );
+ }
+ 
++const sleep = ( ms ) => {
++	const promise = new Promise( ( resolve ) => setTimeout( resolve, ms ) );
++	jest.advanceTimersByTime( ms + 1 );
++	return promise;
++};
++
+ const hslaMatcher = expect.objectContaining( {
+ 	h: expect.any( Number ),
+ 	s: expect.any( Number ),
+@@ -87,6 +93,9 @@ describe( 'ColorPicker', () => {
+ 				{ pageX: 10, pageY: 10 }
+ 			);
+ 
++			// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
++			await sleep( 1 );
++
+ 			expect( onChangeComplete ).toHaveBeenCalledWith(
+ 				legacyColorMatcher
+ 			);
+@@ -108,6 +117,9 @@ describe( 'ColorPicker', () => {
+ 			{ pageX: 10, pageY: 10 }
+ 		);
+ 
++		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
++		await sleep( 1 );
++
+ 		expect( onChange ).toHaveBeenCalledWith(
+ 			expect.stringMatching( /^#([a-fA-F0-9]{8})$/ )
+ 		);
+@@ -138,6 +150,9 @@ describe( 'ColorPicker', () => {
+ 			{ pageX: 10, pageY: 10 }
+ 		);
+ 
++		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
++		await sleep( 1 );
++
+ 		expect( onChange ).toHaveBeenCalledWith(
+ 			expect.stringMatching( /^#([a-fA-F0-9]{6})$/ )
+ 		);

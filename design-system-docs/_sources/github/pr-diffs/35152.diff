@@ -1,0 +1,308 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index df9fef03d219b7..c743ebb3dc8a5c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   Removed the deprecated `position` and `menuLabel` from the `DropdownMenu` component ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
+ -   Removed the deprecated `onClickOutside` prop from the `Popover` component ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
+ -   Changed `RangeControl` component to not apply `shiftStep` to inputs from its `<input type="range"/>` ([35020](https://github.com/WordPress/gutenberg/pull/35020)).
++-   Removed `isAction` prop from `Item`. The component will now rely on `onClick` to render as a `button` ([35152](https://github.com/WordPress/gutenberg/pull/35152)).
+ 
+ ### New Feature
+ 
+diff --git a/packages/components/src/item-group/item/README.md b/packages/components/src/item-group/item/README.md
+index dc5ac92fca4ba3..093d9fc192f6d7 100644
+--- a/packages/components/src/item-group/item/README.md
++++ b/packages/components/src/item-group/item/README.md
+@@ -29,12 +29,11 @@ function Example() {
+ 
+ ## Props
+ 
+-### `isAction`: `boolean`
++### `onClick`: `React.MouseEventHandler<HTMLDivElement>`
+ 
+-Renders the item as an interactive `button` element.
++Even handler for processing `click` events. When defined, the `Item` component will render as a `button` (unless differently specified via the `as` prop).
+ 
+ - Required: No
+-- Default: `false`
+ 
+ ### `size`: `'small' | 'medium' | 'large'`
+ 
+diff --git a/packages/components/src/item-group/item/hook.ts b/packages/components/src/item-group/item/hook.ts
+index 2ff7574751098e..d842a29b1eb036 100644
+--- a/packages/components/src/item-group/item/hook.ts
++++ b/packages/components/src/item-group/item/hook.ts
+@@ -4,6 +4,11 @@
+ // eslint-disable-next-line no-restricted-imports
+ import type { ElementType } from 'react';
+ 
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+@@ -15,9 +20,9 @@ import type { ItemProps } from '../types';
+ 
+ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
+ 	const {
+-		isAction = false,
+ 		as: asProp,
+ 		className,
++		onClick,
+ 		role = 'listitem',
+ 		size: sizeProp,
+ 		...otherProps
+@@ -27,16 +32,24 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
+ 
+ 	const size = sizeProp || contextSize;
+ 
+-	const as = ( asProp || isAction ? 'button' : 'div' ) as ElementType;
++	const as =
++		asProp ||
++		( ( typeof onClick !== 'undefined'
++			? 'button'
++			: 'div' ) as ElementType );
+ 
+ 	const cx = useCx();
+ 
+-	const classes = cx(
+-		isAction && styles.unstyledButton,
+-		styles.itemSizes[ size ] || styles.itemSizes.medium,
+-		styles.item,
+-		spacedAround && styles.spacedAround,
+-		className
++	const classes = useMemo(
++		() =>
++			cx(
++				as === 'button' && styles.unstyledButton,
++				styles.itemSizes[ size ] || styles.itemSizes.medium,
++				styles.item,
++				spacedAround && styles.spacedAround,
++				className
++			),
++		[ as, className, size, spacedAround ]
+ 	);
+ 
+ 	const wrapperClassName = cx( styles.itemWrapper );
+@@ -44,6 +57,7 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
+ 	return {
+ 		as,
+ 		className: classes,
++		onClick,
+ 		wrapperClassName,
+ 		role,
+ 		...otherProps,
+diff --git a/packages/components/src/item-group/stories/index.js b/packages/components/src/item-group/stories/index.js
+index 30fb1a02150aac..6c0ad5a671ffd7 100644
+--- a/packages/components/src/item-group/stories/index.js
++++ b/packages/components/src/item-group/stories/index.js
+@@ -56,7 +56,6 @@ export const _default = () => {
+ 			},
+ 			PROP_UNSET
+ 		),
+-		isAction: boolean( 'Item 1: isAction', true ),
+ 	};
+ 
+ 	// Do not pass the `size` prop when its value is `undefined`.
+@@ -68,16 +67,14 @@ export const _default = () => {
+ 
+ 	return (
+ 		<ItemGroup style={ { width: '350px' } } { ...itemGroupProps }>
+-			<Item { ...itemProps } onClick={ () => alert( 'WordPress.org' ) }>
++			<Item { ...itemProps }>Code is Poetry (no click handlers)</Item>
++			<Item onClick={ () => alert( 'WordPress.org' ) }>
+ 				Code is Poetry — Click me!
+ 			</Item>
+-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
++			<Item onClick={ () => alert( 'WordPress.org' ) }>
+ 				Code is Poetry — Click me!
+ 			</Item>
+-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
+-				Code is Poetry — Click me!
+-			</Item>
+-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
++			<Item onClick={ () => alert( 'WordPress.org' ) }>
+ 				Code is Poetry — Click me!
+ 			</Item>
+ 		</ItemGroup>
+@@ -90,16 +87,14 @@ export const dropdown = () => (
+ 		trigger={ <Button>Open Popover</Button> }
+ 	>
+ 		<ItemGroup style={ { padding: 4 } }>
+-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
+-				Code is Poetry — Click me!
+-			</Item>
+-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
++			<Item>Code is Poetry (no click handlers)</Item>
++			<Item onClick={ () => alert( 'WordPress.org' ) }>
+ 				Code is Poetry — Click me!
+ 			</Item>
+-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
++			<Item onClick={ () => alert( 'WordPress.org' ) }>
+ 				Code is Poetry — Click me!
+ 			</Item>
+-			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
++			<Item onClick={ () => alert( 'WordPress.org' ) }>
+ 				Code is Poetry — Click me!
+ 			</Item>
+ 		</ItemGroup>
+@@ -141,7 +136,7 @@ export const complexLayouts = () => {
+ 
+ 	return (
+ 		<ItemGroup isBordered isSeparated style={ { width: '250px' } }>
+-			<Item isAction onClick={ () => alert( 'Color palette' ) }>
++			<Item onClick={ () => alert( 'Color palette' ) }>
+ 				<HStack>
+ 					<FlexBlock>
+ 						<ZStack isLayered={ false } offset={ -8 }>
+@@ -156,7 +151,7 @@ export const complexLayouts = () => {
+ 				</HStack>
+ 			</Item>
+ 
+-			<Item isAction onClick={ () => alert( 'Single color setting' ) }>
++			<Item onClick={ () => alert( 'Single color setting' ) }>
+ 				<HStack justify="flex-start">
+ 					<FlexItem
+ 						as={ SimpleColorSwatch }
+@@ -169,10 +164,7 @@ export const complexLayouts = () => {
+ 				</HStack>
+ 			</Item>
+ 
+-			<Item
+-				isAction
+-				onClick={ () => alert( 'Single typography setting' ) }
+-			>
++			<Item onClick={ () => alert( 'Single typography setting' ) }>
+ 				<HStack justify="flex-start">
+ 					<FlexItem>
+ 						<Icon icon={ typography } size={ 24 } />
+diff --git a/packages/components/src/item-group/test/__snapshots__/index.js.snap b/packages/components/src/item-group/test/__snapshots__/index.js.snap
+index 4f96fd6f7e6504..4e5ee1d89f53de 100644
+--- a/packages/components/src/item-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/item-group/test/__snapshots__/index.js.snap
+@@ -33,28 +33,6 @@ Snapshot Diff:
+       </div>
+ `;
+ 
+-exports[`ItemGroup Item should render a button with the isAction prop is true 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-  <div
+-    class="css-dcjs67-itemWrapper"
+-    role="listitem"
+-  >
+--   <div
+--     class="components-item css-gqguxs-View-medium-itemWrapper em57xhy0"
+-+   <button
+-+     class="components-item css-1t39803-View-unstyledButton-medium-itemWrapper em57xhy0"
+-      data-wp-c16t="true"
+-      data-wp-component="Item"
+-    >
+-      Code is poetry
+--   </div>
+-+   </button>
+-  </div>
+-`;
+-
+ exports[`ItemGroup Item should use different amounts of padding depending on the value of the size prop 1`] = `
+ Snapshot Diff:
+ - First value
+diff --git a/packages/components/src/item-group/test/index.js b/packages/components/src/item-group/test/index.js
+index 3ae1eb78d4586c..739a02e74435bc 100644
+--- a/packages/components/src/item-group/test/index.js
++++ b/packages/components/src/item-group/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render } from '@testing-library/react';
++import { fireEvent, render, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -79,18 +79,36 @@ describe( 'ItemGroup', () => {
+ 	} );
+ 
+ 	describe( 'Item', () => {
+-		it( 'should render a button with the isAction prop is true', () => {
+-			// By default, `isAction` is `false`
+-			const { container: normalItem } = render(
+-				<Item>Code is poetry</Item>
+-			);
+-			const { container: actionItem } = render(
+-				<Item isAction={ true }>Code is poetry</Item>
++		it( 'should render as a `button` if the `onClick` handler is specified', () => {
++			const spy = jest.fn();
++			render( <Item onClick={ spy }>Code is poetry</Item> );
++
++			const button = screen.getByRole( 'button' );
++
++			expect( button ).toBeInTheDocument();
++
++			fireEvent.click( button );
++
++			expect( spy ).toHaveBeenCalled();
++		} );
++
++		it( 'should give priority to the `as` prop even if the `onClick` handler is specified', () => {
++			const spy = jest.fn();
++			const { rerender } = render(
++				<Item onClick={ spy }>Code is poetry</Item>
+ 			);
+ 
+-			expect( normalItem.firstChild ).toMatchDiffSnapshot(
+-				actionItem.firstChild
++			expect( screen.getByRole( 'button' ) ).toBeInTheDocument();
++			expect( screen.queryByRole( 'label' ) ).not.toBeInTheDocument();
++
++			rerender(
++				<Item as="a" href="#" onClick={ spy }>
++					Code is poetry
++				</Item>
+ 			);
++
++			expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
++			expect( screen.getByRole( 'link' ) ).toBeInTheDocument();
+ 		} );
+ 
+ 		it( 'should use different amounts of padding depending on the value of the size prop', () => {
+diff --git a/packages/components/src/item-group/types.ts b/packages/components/src/item-group/types.ts
+index ed07be8a133f17..39aad8c6902c72 100644
+--- a/packages/components/src/item-group/types.ts
++++ b/packages/components/src/item-group/types.ts
+@@ -32,12 +32,6 @@ export interface ItemGroupProps {
+ }
+ 
+ export interface ItemProps {
+-	/**
+-	 * Renders the item as an interactive `button` element.
+-	 *
+-	 * @default false
+-	 */
+-	isAction?: boolean;
+ 	/**
+ 	 * Determines the amount of padding within the component.
+ 	 *
+diff --git a/packages/edit-site/src/components/sidebar/global-styles-sidebar.js b/packages/edit-site/src/components/sidebar/global-styles-sidebar.js
+index 2d740ec9a8f3e2..5bd826922f1ced 100644
+--- a/packages/edit-site/src/components/sidebar/global-styles-sidebar.js
++++ b/packages/edit-site/src/components/sidebar/global-styles-sidebar.js
+@@ -206,11 +206,7 @@ function NavigationButton( {
+ } ) {
+ 	const navigator = useNavigator();
+ 	return (
+-		<Item
+-			isAction
+-			onClick={ () => navigator.push( path, { isBack } ) }
+-			{ ...props }
+-		>
++		<Item onClick={ () => navigator.push( path, { isBack } ) } { ...props }>
+ 			<HStack justify="flex-start">
+ 				{ icon && (
+ 					<FlexItem>

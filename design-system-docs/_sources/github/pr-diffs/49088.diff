@@ -1,0 +1,374 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 02b83fadfcfc20..51f1a54b440c83 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,6 +22,7 @@
+ -   `withFocusReturn` HOC: Convert to TypeScript ([#48748](https://github.com/WordPress/gutenberg/pull/48748)).
+ -   `navigateRegions` HOC: Convert to TypeScript ([#48632](https://github.com/WordPress/gutenberg/pull/48632)).
+ -   `withSpokenMessages`: HOC: Convert to TypeScript ([#48163](https://github.com/WordPress/gutenberg/pull/48163)).
++-   `withNotices`: HOC: Convert to TypeScript ([#49088](https://github.com/WordPress/gutenberg/pull/49088)).
+ -   `ToolbarButton`: Convert to TypeScript ([#47750](https://github.com/WordPress/gutenberg/pull/47750)).
+ -   `DimensionControl(Experimental)`: Convert to TypeScript ([#47351](https://github.com/WordPress/gutenberg/pull/47351)).
+ -   `PaletteEdit`: Convert to TypeScript ([#47764](https://github.com/WordPress/gutenberg/pull/47764)).
+diff --git a/packages/components/src/higher-order/with-notices/README.md b/packages/components/src/higher-order/with-notices/README.md
+index 84c484eba101b2..17e1b0e12113b9 100644
+--- a/packages/components/src/higher-order/with-notices/README.md
++++ b/packages/components/src/higher-order/with-notices/README.md
+@@ -2,7 +2,7 @@
+ 
+ `withNotices` is a React [higher-order component](https://facebook.github.io/react/docs/higher-order-components.html) used typically in adding the ability to post notice messages within the original component.
+ 
+-Wrapping the original component with `withNotices` encapsulates the component with the additional props `noticeOperations` and `noticeUI`.
++Wrapping the original component with `withNotices` encapsulates the component with the additional props `noticeOperations`, `noticeUI`, and `noticeList`.
+ 
+ **noticeOperations**
+ Contains a number of useful functions to add notices to your site.
+@@ -34,6 +34,9 @@ _Parameters_
+ <a  name="noticeUi"  href="#noticeUi">#</a>**noticeUi**
+ The rendered `NoticeList`.
+ 
++<a  name="noticeList"  href="#noticeList">#</a>**noticeList**
++The array of notice objects to be displayed.
++
+ ## Usage
+ 
+ ```jsx
+diff --git a/packages/components/src/higher-order/with-notices/index.js b/packages/components/src/higher-order/with-notices/index.js
+deleted file mode 100644
+index c4057e6b6fff3e..00000000000000
+--- a/packages/components/src/higher-order/with-notices/index.js
++++ /dev/null
+@@ -1,104 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { v4 as uuid } from 'uuid';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef, useState, useMemo } from '@wordpress/element';
+-import { createHigherOrderComponent } from '@wordpress/compose';
+-
+-/**
+- * Internal dependencies
+- */
+-import NoticeList from '../../notice/list';
+-
+-/**
+- * Override the default edit UI to include notices if supported.
+- *
+- * @param {WPComponent} OriginalComponent Original component.
+- *
+- * @return {WPComponent} Wrapped component.
+- */
+-export default createHigherOrderComponent( ( OriginalComponent ) => {
+-	function Component( props, ref ) {
+-		const [ noticeList, setNoticeList ] = useState( [] );
+-
+-		const noticeOperations = useMemo( () => {
+-			/**
+-			 * Function passed down as a prop that adds a new notice.
+-			 *
+-			 * @param {Object} notice Notice to add.
+-			 */
+-			const createNotice = ( notice ) => {
+-				const noticeToAdd = notice.id
+-					? notice
+-					: { ...notice, id: uuid() };
+-				setNoticeList( ( current ) => [ ...current, noticeToAdd ] );
+-			};
+-
+-			return {
+-				createNotice,
+-
+-				/**
+-				 * Function passed as a prop that adds a new error notice.
+-				 *
+-				 * @param {string} msg Error message of the notice.
+-				 */
+-				createErrorNotice: ( msg ) => {
+-					createNotice( {
+-						status: 'error',
+-						content: msg,
+-					} );
+-				},
+-
+-				/**
+-				 * Removes a notice by id.
+-				 *
+-				 * @param {string} id Id of the notice to remove.
+-				 */
+-				removeNotice: ( id ) => {
+-					setNoticeList( ( current ) =>
+-						current.filter( ( notice ) => notice.id !== id )
+-					);
+-				},
+-
+-				/**
+-				 * Removes all notices
+-				 */
+-				removeAllNotices: () => {
+-					setNoticeList( [] );
+-				},
+-			};
+-		}, [] );
+-
+-		const propsOut = {
+-			...props,
+-			noticeList,
+-			noticeOperations,
+-			noticeUI: noticeList.length > 0 && (
+-				<NoticeList
+-					className="components-with-notices-ui"
+-					notices={ noticeList }
+-					onRemove={ noticeOperations.removeNotice }
+-				/>
+-			),
+-		};
+-
+-		return isForwardRef ? (
+-			<OriginalComponent { ...propsOut } ref={ ref } />
+-		) : (
+-			<OriginalComponent { ...propsOut } />
+-		);
+-	}
+-
+-	let isForwardRef;
+-	const { render } = OriginalComponent;
+-	// Returns a forwardRef if OriginalComponent appears to be a forwardRef.
+-	if ( typeof render === 'function' ) {
+-		isForwardRef = true;
+-		return forwardRef( Component );
+-	}
+-	return Component;
+-} );
+diff --git a/packages/components/src/higher-order/with-notices/index.tsx b/packages/components/src/higher-order/with-notices/index.tsx
+new file mode 100644
+index 00000000000000..734fd8b2b1056c
+--- /dev/null
++++ b/packages/components/src/higher-order/with-notices/index.tsx
+@@ -0,0 +1,116 @@
++/**
++ * External dependencies
++ */
++import { v4 as uuid } from 'uuid';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef, useState, useMemo } from '@wordpress/element';
++import { createHigherOrderComponent } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import NoticeList from '../../notice/list';
++import type { WithNoticeProps } from './types';
++
++/**
++ * Override the default edit UI to include notices if supported.
++ *
++ * Wrapping the original component with `withNotices` encapsulates the component
++ * with the additional props `noticeOperations` and `noticeUI`.
++ *
++ * ```jsx
++ * import { withNotices, Button } from '@wordpress/components';
++ *
++ * const MyComponentWithNotices = withNotices(
++ * 	( { noticeOperations, noticeUI } ) => {
++ * 		const addError = () =>
++ * 			noticeOperations.createErrorNotice( 'Error message' );
++ * 		return (
++ * 			<div>
++ * 				{ noticeUI }
++ * 				<Button variant="secondary" onClick={ addError }>
++ * 					Add error
++ * 				</Button>
++ * 			</div>
++ * 		);
++ * 	}
++ * );
++ * ```
++ *
++ * @param OriginalComponent Original component.
++ *
++ * @return Wrapped component.
++ */
++export default createHigherOrderComponent( ( OriginalComponent ) => {
++	function Component(
++		props: { [ key: string ]: any },
++		ref: React.ForwardedRef< any >
++	) {
++		const [ noticeList, setNoticeList ] = useState<
++			WithNoticeProps[ 'noticeList' ]
++		>( [] );
++
++		const noticeOperations = useMemo<
++			WithNoticeProps[ 'noticeOperations' ]
++		>( () => {
++			const createNotice: WithNoticeProps[ 'noticeOperations' ][ 'createNotice' ] =
++				( notice ) => {
++					const noticeToAdd = notice.id
++						? notice
++						: { ...notice, id: uuid() };
++					setNoticeList( ( current ) => [ ...current, noticeToAdd ] );
++				};
++
++			return {
++				createNotice,
++				createErrorNotice: ( msg ) => {
++					// @ts-expect-error TODO: Missing `id`, potentially a bug
++					createNotice( {
++						status: 'error',
++						content: msg,
++					} );
++				},
++				removeNotice: ( id ) => {
++					setNoticeList( ( current ) =>
++						current.filter( ( notice ) => notice.id !== id )
++					);
++				},
++				removeAllNotices: () => {
++					setNoticeList( [] );
++				},
++			};
++		}, [] );
++
++		const propsOut = {
++			...props,
++			noticeList,
++			noticeOperations,
++			noticeUI: noticeList.length > 0 && (
++				<NoticeList
++					className="components-with-notices-ui"
++					notices={ noticeList }
++					onRemove={ noticeOperations.removeNotice }
++				/>
++			),
++		};
++
++		return isForwardRef ? (
++			<OriginalComponent { ...propsOut } ref={ ref } />
++		) : (
++			<OriginalComponent { ...propsOut } />
++		);
++	}
++
++	let isForwardRef: boolean;
++	// @ts-expect-error - `render` will only be present when OriginalComponent was wrapped with forwardRef().
++	const { render } = OriginalComponent;
++	// Returns a forwardRef if OriginalComponent appears to be a forwardRef.
++	if ( typeof render === 'function' ) {
++		isForwardRef = true;
++		return forwardRef( Component );
++	}
++	return Component;
++}, 'withNotices' );
+diff --git a/packages/components/src/higher-order/with-notices/test/index.js b/packages/components/src/higher-order/with-notices/test/index.tsx
+similarity index 91%
+rename from packages/components/src/higher-order/with-notices/test/index.js
+rename to packages/components/src/higher-order/with-notices/test/index.tsx
+index a403f3c3a80942..cbad7270414e3e 100644
+--- a/packages/components/src/higher-order/with-notices/test/index.js
++++ b/packages/components/src/higher-order/with-notices/test/index.tsx
+@@ -24,25 +24,30 @@ import {
+  * Internal dependencies
+  */
+ import withNotices from '..';
++import type { WithNoticeProps } from '../types';
+ 
+ // Implementation detail of Notice component used to query the dismissal button.
+ const stockDismissText = 'Dismiss this notice';
+ 
+-function noticesFrom( list ) {
++function noticesFrom( list: string[] ) {
+ 	return list.map( ( item ) => ( { id: item, content: item } ) );
+ }
+ 
+-function isComponentLike( object ) {
++function isComponentLike( object: any ) {
+ 	return typeof object === 'function';
+ }
+ 
+-function isForwardRefLike( { render: renderMethod } ) {
++function isForwardRefLike( { render: renderMethod }: any ) {
+ 	return typeof renderMethod === 'function';
+ }
+ 
+ const content = 'Base content';
+ 
+-const BaseComponent = ( { noticeOperations, noticeUI, notifications } ) => {
++const BaseComponent = ( {
++	noticeOperations,
++	noticeUI,
++	notifications,
++}: WithNoticeProps & { notifications: ReturnType< typeof noticesFrom > } ) => {
+ 	useEffect( () => {
+ 		if ( notifications ) {
+ 			notifications.forEach( ( item ) =>
+@@ -78,8 +83,8 @@ describe( 'withNotices return type', () => {
+ } );
+ 
+ describe( 'withNotices operations', () => {
+-	let handle;
+-	const Handle = ( props ) => {
++	let handle: React.MutableRefObject< any >;
++	const Handle = ( props: any ) => {
+ 		handle = useRef();
+ 		return <TestNoticeOperations { ...props } ref={ handle } />;
+ 	};
+diff --git a/packages/components/src/higher-order/with-notices/types.ts b/packages/components/src/higher-order/with-notices/types.ts
+new file mode 100644
+index 00000000000000..e914d21d82df7d
+--- /dev/null
++++ b/packages/components/src/higher-order/with-notices/types.ts
+@@ -0,0 +1,35 @@
++/**
++ * Internal dependencies
++ */
++import type { NoticeListProps } from '../../notice/types';
++
++export type WithNoticeProps = {
++	noticeList: NoticeListProps[ 'notices' ];
++	noticeOperations: {
++		/**
++		 * Function passed down as a prop that adds a new notice.
++		 *
++		 * @param notice Notice to add.
++		 */
++		createNotice: (
++			notice: NoticeListProps[ 'notices' ][ number ]
++		) => void;
++		/**
++		 * Function passed as a prop that adds a new error notice.
++		 *
++		 * @param msg Error message of the notice.
++		 */
++		createErrorNotice: ( msg: string ) => void;
++		/**
++		 * Removes a notice by id.
++		 *
++		 * @param id Id of the notice to remove.
++		 */
++		removeNotice: ( id: string ) => void;
++		/**
++		 * Removes all notices
++		 */
++		removeAllNotices: () => void;
++	};
++	noticeUI: false | JSX.Element;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index aa2434d026ca17..6aaadae65b49cc 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -45,7 +45,6 @@
+ 		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
+ 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
+ 		"src/index.js",
+-		"src/duotone-picker",
+-		"src/higher-order/with-notices"
++		"src/duotone-picker"
+ 	]
+ }

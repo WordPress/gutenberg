@@ -1,0 +1,107 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 37e8abb8a3efbd..b8326cf5d25212 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -83,6 +83,7 @@ module.exports = {
+ 							'defaultTo',
+ 							'differenceWith',
+ 							'dropRight',
++							'each',
+ 							'findIndex',
+ 							'isArray',
+ 							'isFinite',
+diff --git a/packages/block-library/src/image/utils.js b/packages/block-library/src/image/utils.js
+index 9ac6e7fc38cebd..7d9cc53f3d051a 100644
+--- a/packages/block-library/src/image/utils.js
++++ b/packages/block-library/src/image/utils.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEmpty, each, get } from 'lodash';
++import { isEmpty, get } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+@@ -13,7 +13,7 @@ export function removeNewTabRel( currentRel ) {
+ 
+ 	if ( currentRel !== undefined && ! isEmpty( newRel ) ) {
+ 		if ( ! isEmpty( newRel ) ) {
+-			each( NEW_TAB_REL, ( relVal ) => {
++			NEW_TAB_REL.forEach( ( relVal ) => {
+ 				const regExp = new RegExp( '\\b' + relVal + '\\b', 'gi' );
+ 				newRel = newRel.replace( regExp, '' );
+ 			} );
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 16b530957798f3..80d45b89a8fd3b 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -1,16 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import {
+-	last,
+-	clone,
+-	uniq,
+-	map,
+-	difference,
+-	each,
+-	identity,
+-	some,
+-} from 'lodash';
++import { last, clone, uniq, map, difference, identity, some } from 'lodash';
+ import classnames from 'classnames';
+ import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
+ 
+@@ -481,7 +472,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		} else {
+ 			match = match.toLocaleLowerCase();
+ 
+-			each( _suggestions, ( suggestion ) => {
++			_suggestions.forEach( ( suggestion ) => {
+ 				const index = suggestion.toLocaleLowerCase().indexOf( match );
+ 				if ( normalizedValue.indexOf( suggestion ) === -1 ) {
+ 					if ( index === 0 ) {
+diff --git a/packages/components/src/navigable-container/test/menu.js b/packages/components/src/navigable-container/test/menu.js
+index 98ef954b933827..bc6c5ff402e4b4 100644
+--- a/packages/components/src/navigable-container/test/menu.js
++++ b/packages/components/src/navigable-container/test/menu.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { fireEvent, render } from '@testing-library/react';
+-import { each } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,7 +15,7 @@ import { NavigableMenu } from '../menu';
+ 
+ function simulateVisible( container, selector ) {
+ 	const elements = container.querySelectorAll( selector );
+-	each( elements, ( elem ) => {
++	elements.forEach( ( elem ) => {
+ 		elem.getClientRects = () => [
+ 			'trick-jsdom-into-having-size-for-element-rect',
+ 		];
+diff --git a/packages/components/src/navigable-container/test/tabbable.js b/packages/components/src/navigable-container/test/tabbable.js
+index d25e6949d75940..e8b9a5b568cc6a 100644
+--- a/packages/components/src/navigable-container/test/tabbable.js
++++ b/packages/components/src/navigable-container/test/tabbable.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { fireEvent, render } from '@testing-library/react';
+-import { each } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,7 +15,7 @@ import { TabbableContainer } from '../tabbable';
+ 
+ function simulateVisible( container, selector ) {
+ 	const elements = container.querySelectorAll( selector );
+-	each( elements, ( elem ) => {
++	elements.forEach( ( elem ) => {
+ 		elem.getClientRects = () => [
+ 			'trick-jsdom-into-having-size-for-element-rect',
+ 		];

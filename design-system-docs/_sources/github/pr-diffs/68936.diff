@@ -1,0 +1,58 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5cdf14f89937f1..785ab59e397e34 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Documentation
++
++-   `FontSizePicker`: Fix Storybook units control type to use `inline-check` and improve documentation clarifying unitless mode in `README.md` ([#68936](https://github.com/WordPress/gutenberg/pull/68936)).
++
+ ### Bug Fixes
+ 
+ -   `TextControl`: Ensures email and url inputs have consistent LTR alignment in RTL languages ([#68561](https://github.com/WordPress/gutenberg/pull/68561)).
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index 39d916c0c7b212..8c5cd1444aa69c 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -99,6 +99,8 @@ Available units for custom font size selection.
+ 
+ The current font size value.
+ 
++**Note**: For the `units` property to work, the current font size value must be specified as strings with units (e.g., `'12px'` instead of `12`). When the font size is provided as a number, the component operates in "unitless mode" where the `units` property has no effect.
++
+ -   Required: No
+ 
+ ### `withReset`: `boolean`
+diff --git a/packages/components/src/font-size-picker/stories/index.story.tsx b/packages/components/src/font-size-picker/stories/index.story.tsx
+index f6502fcfd537c8..59af0f5cfe60dc 100644
+--- a/packages/components/src/font-size-picker/stories/index.story.tsx
++++ b/packages/components/src/font-size-picker/stories/index.story.tsx
+@@ -18,6 +18,10 @@ const meta: Meta< typeof FontSizePicker > = {
+ 	component: FontSizePicker,
+ 	argTypes: {
+ 		value: { control: false },
++		units: {
++			control: 'inline-check',
++			options: [ 'px', 'em', 'rem', 'vw', 'vh' ],
++		},
+ 	},
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
+diff --git a/packages/components/src/font-size-picker/types.ts b/packages/components/src/font-size-picker/types.ts
+index 2296e968567882..04964e05d45d55 100644
+--- a/packages/components/src/font-size-picker/types.ts
++++ b/packages/components/src/font-size-picker/types.ts
+@@ -34,6 +34,10 @@ export type FontSizePickerProps = {
+ 	units?: string[];
+ 	/**
+ 	 * The current font size value.
++	 *
++	 * Note: For the `units` property to work, the current font size value must be specified
++	 * as strings with units (e.g., '12px' instead of 12). When the font size is provided
++	 * as a number, the component operates in "unitless mode" where the `units` property has no effect.
+ 	 */
+ 	value?: number | string;
+ 	/**

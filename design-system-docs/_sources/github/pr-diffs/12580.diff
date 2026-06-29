@@ -1,0 +1,123 @@
+diff --git a/packages/components/src/slot-fill/context.js b/packages/components/src/slot-fill/context.js
+index df4476fea5b9ce..43a610d8afd2f1 100644
+--- a/packages/components/src/slot-fill/context.js
++++ b/packages/components/src/slot-fill/context.js
+@@ -58,8 +58,9 @@ class SlotFillProvider extends Component {
+ 	}
+ 
+ 	unregisterSlot( name ) {
+-		delete this.slots[ name ];
+ 		this.forceUpdateFills( name );
++		this.forceUpdateSlot( name );
++		delete this.slots[ name ];
+ 	}
+ 
+ 	unregisterFill( name, instance ) {
+diff --git a/packages/components/src/slot-fill/test/slot.js b/packages/components/src/slot-fill/test/slot.js
+index a12c9cd99c6cab..a747c60e6989ed 100644
+--- a/packages/components/src/slot-fill/test/slot.js
++++ b/packages/components/src/slot-fill/test/slot.js
+@@ -1,8 +1,9 @@
+ /**
+  * External dependencies
+  */
+-import { isEmpty } from 'lodash';
++import { isEmpty, noop } from 'lodash';
+ import ReactTestRenderer from 'react-test-renderer';
++import { shallow } from 'enzyme';
+ 
+ /**
+  * Internal dependencies
+@@ -209,4 +210,70 @@ describe( 'Slot', () => {
+ 
+ 		expect( testRenderer.toJSON() ).toMatchSnapshot();
+ 	} );
++
++	describe( 'Manage Slots', () => {
++		it( 'should return the named slot', () => {
++			const provider = shallow( <Provider></Provider> );
++			const instance = provider.instance();
++			const forceUpdate = jest.fn();
++			const slot = { name: 'slot', forceUpdate };
++
++			instance.registerSlot( 'test', slot );
++			expect( instance.getSlot( 'test' ) ).toBe( slot );
++			expect( forceUpdate ).toHaveBeenCalledTimes( 1 );
++		} );
++
++		it( 'should remove the named slot', () => {
++			const provider = shallow( <Provider></Provider> );
++			const instance = provider.instance();
++			const forceUpdate = jest.fn();
++			const slot = { name: 'slot', forceUpdate };
++
++			instance.registerSlot( 'test', slot );
++			instance.unregisterSlot( 'test' );
++
++			expect( instance.getSlot( 'test' ) ).toBe( undefined );
++			expect( forceUpdate ).toHaveBeenCalledTimes( 2 );
++		} );
++
++		it( 'should not allow multiple slots of same name', () => {
++			const provider = shallow( <Provider></Provider> );
++			const instance = provider.instance();
++			const slot1 = { name: 'slot1', forceUpdate: noop };
++			const slot2 = { name: 'slot2', forceUpdate: noop };
++
++			instance.registerSlot( 'test', slot1 );
++			instance.registerSlot( 'test', slot2 );
++
++			expect( instance.getSlot( 'test' ) ).toBe( slot1 );
++		} );
++
++		it( 'should allow multiple fills of same name', () => {
++			const provider = shallow( <Provider></Provider> );
++			const instance = provider.instance();
++			const fill1 = { name: 'fill1', forceUpdate: noop };
++			const fill2 = { name: 'fill2', forceUpdate: noop };
++
++			instance.registerFill( 'test', fill1 );
++			instance.registerFill( 'test', fill2 );
++
++			expect( instance.getFills( 'test' ) ).toEqual( [ fill1, fill2 ] );
++		} );
++
++		it( 'should force update of slot and fill when slot is removed', () => {
++			const provider = shallow( <Provider></Provider> );
++			const instance = provider.instance();
++			const forceUpdateFill = jest.fn();
++			const forceUpdateSlot = jest.fn();
++			const slot = { name: 'slot', forceUpdate: forceUpdateSlot };
++			const fill = { name: 'fill', forceUpdate: forceUpdateFill };
++
++			instance.registerSlot( 'test', slot );
++			instance.registerFill( 'test', fill );
++			instance.unregisterSlot( 'test' );
++
++			expect( forceUpdateFill ).toHaveBeenCalledTimes( 1 ); // Slot is unregistered
++			expect( forceUpdateSlot ).toHaveBeenCalledTimes( 3 ); // Slot is registered, fill is registered, slot is unregistered
++		} );
++	} );
+ } );
+diff --git a/packages/editor/src/components/block-actions/index.js b/packages/editor/src/components/block-actions/index.js
+index 590d932a626f9b..a2f1244e71390b 100644
+--- a/packages/editor/src/components/block-actions/index.js
++++ b/packages/editor/src/components/block-actions/index.js
+@@ -70,6 +70,7 @@ export default compose( [
+ 			multiSelect,
+ 			removeBlocks,
+ 			insertDefaultBlock,
++			clearSelectedBlock,
+ 		} = dispatch( 'core/editor' );
+ 
+ 		return {
+@@ -79,6 +80,9 @@ export default compose( [
+ 				}
+ 
+ 				const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
++
++				clearSelectedBlock();
++
+ 				insertBlocks(
+ 					clonedBlocks,
+ 					lastSelectedIndex + 1,

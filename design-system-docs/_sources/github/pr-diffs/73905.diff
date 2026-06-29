@@ -1,0 +1,52 @@
+diff --git a/packages/block-editor/src/hooks/color.scss b/packages/block-editor/src/hooks/color.scss
+index f3b6b014e7e93a..60d30a885d1f58 100644
+--- a/packages/block-editor/src/hooks/color.scss
++++ b/packages/block-editor/src/hooks/color.scss
+@@ -4,10 +4,6 @@
+ 	.block-editor-contrast-checker {
+ 		grid-column: span 2;
+ 		margin-top: $grid-unit-20;
+-
+-		.components-notice__content {
+-			margin-right: 0;
+-		}
+ 	}
+ 
+ 	/* Increased specificity required to remove the slot wrapper's row gap */
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9cf5d28f047568..6497da0479787a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ -   Validated form controls: Suppress native error popover ([#73471](https://github.com/WordPress/gutenberg/pull/73471)).
+ -   `Snackbar`: Shorten timeout duration ([#73814](https://github.com/WordPress/gutenberg/pull/73814)).
+ -   `ToolsPanel`: Remove line-height workaround for control labels ([#73892](https://github.com/WordPress/gutenberg/pull/73892)).
++-   `Notice`: Add right margin to content only when dismissible ([#73905](https://github.com/WordPress/gutenberg/pull/73905)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/notice/style.scss b/packages/components/src/notice/style.scss
+index 2f65012bd88f05..29b8eb460037fd 100644
+--- a/packages/components/src/notice/style.scss
++++ b/packages/components/src/notice/style.scss
+@@ -15,6 +15,10 @@
+ 
+ 	&.is-dismissible {
+ 		position: relative;
++
++		.components-notice__content {
++			margin-right: #{ $button-size-small + $border-width };
++		}
+ 	}
+ 
+ 	&.is-success {
+@@ -35,7 +39,8 @@
+ 
+ .components-notice__content {
+ 	flex-grow: 1;
+-	margin: $grid-unit-05 #{ $button-size-small + $border-width } $grid-unit-05 0;
++	margin-top: $grid-unit-05;
++	margin-bottom: $grid-unit-05;
+ }
+ 
+ .components-notice__actions {

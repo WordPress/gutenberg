@@ -1,0 +1,246 @@
+diff --git a/packages/block-editor/src/components/block-switcher/test/index.js b/packages/block-editor/src/components/block-switcher/test/index.js
+index 3cdb022dc361ff..ae073d74d07a66 100644
+--- a/packages/block-editor/src/components/block-switcher/test/index.js
++++ b/packages/block-editor/src/components/block-switcher/test/index.js
+@@ -8,7 +8,6 @@ import { shallow, mount } from 'enzyme';
+  */
+ import { useSelect } from '@wordpress/data';
+ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+-import { DOWN } from '@wordpress/keycodes';
+ import { Button } from '@wordpress/components';
+ import { copy } from '@wordpress/icons';
+ 
+@@ -180,7 +179,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
+ 			const onToggleStub = jest.fn();
+ 			const mockKeyDown = {
+ 				preventDefault: () => {},
+-				keyCode: DOWN,
++				code: 'ArrowDown',
+ 			};
+ 
+ 			afterEach( () => {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3aceea9955d780..160d26257a1748 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -62,6 +62,7 @@
+ -   `Tooltip`: Refactor away from `_.includes()` ([#43518](https://github.com/WordPress/gutenberg/pull/43518/)).
+ -   `TreeGrid`: Refactor away from `_.includes()` ([#43518](https://github.com/WordPress/gutenberg/pull/43518/)).
+ -   `FormTokenField`: use `KeyboardEvent.code`, refactor tests to modern RTL and `user-event` ([#43442](https://github.com/WordPress/gutenberg/pull/43442/)).
++-   `DropdownMenu`: use `KeyboardEvent.code`, refactor tests to model RTL and `user-event` ([#43439](https://github.com/WordPress/gutenberg/pull/43439/)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/dropdown-menu/index.js b/packages/components/src/dropdown-menu/index.js
+index 9687ecce8ebc7b..481d84a6589f48 100644
+--- a/packages/components/src/dropdown-menu/index.js
++++ b/packages/components/src/dropdown-menu/index.js
+@@ -7,7 +7,6 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { DOWN } from '@wordpress/keycodes';
+ import { menu } from '@wordpress/icons';
+ 
+ /**
+@@ -87,7 +86,7 @@ function DropdownMenu( dropdownMenuProps ) {
+ 						return;
+ 					}
+ 
+-					if ( ! isOpen && event.keyCode === DOWN ) {
++					if ( ! isOpen && event.code === 'ArrowDown' ) {
+ 						event.preventDefault();
+ 						onToggle();
+ 					}
+diff --git a/packages/components/src/dropdown-menu/index.native.js b/packages/components/src/dropdown-menu/index.native.js
+index f75ac157616ade..1f60e0f67cf088 100644
+--- a/packages/components/src/dropdown-menu/index.native.js
++++ b/packages/components/src/dropdown-menu/index.native.js
+@@ -6,7 +6,6 @@ import { Platform } from 'react-native';
+ /**
+  * WordPress dependencies
+  */
+-import { DOWN } from '@wordpress/keycodes';
+ import { BottomSheet, PanelBody } from '@wordpress/components';
+ import { withPreferredColorScheme } from '@wordpress/compose';
+ import { menu } from '@wordpress/icons';
+@@ -76,12 +75,6 @@ function DropdownMenu( {
+ 			className={ classnames( 'components-dropdown-menu', className ) }
+ 			popoverProps={ mergedPopoverProps }
+ 			renderToggle={ ( { isOpen, onToggle } ) => {
+-				const openOnArrowDown = ( event ) => {
+-					if ( ! isOpen && event.keyCode === DOWN ) {
+-						event.preventDefault();
+-						onToggle();
+-					}
+-				};
+ 				const mergedToggleProps = mergeProps(
+ 					{
+ 						className: classnames(
+@@ -104,12 +97,6 @@ function DropdownMenu( {
+ 								mergedToggleProps.onClick( event );
+ 							}
+ 						} }
+-						onKeyDown={ ( event ) => {
+-							openOnArrowDown( event );
+-							if ( mergedToggleProps.onKeyDown ) {
+-								mergedToggleProps.onKeyDown( event );
+-							}
+-						} }
+ 						aria-haspopup="true"
+ 						aria-expanded={ isOpen }
+ 						label={ label }
+diff --git a/packages/components/src/dropdown-menu/test/index.js b/packages/components/src/dropdown-menu/test/index.js
+index 3a26af1e60313a..2eab09f6c052df 100644
+--- a/packages/components/src/dropdown-menu/test/index.js
++++ b/packages/components/src/dropdown-menu/test/index.js
+@@ -1,12 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import { fireEvent, render } from '@testing-library/react';
++import { render, screen, waitFor, within } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { DOWN } from '@wordpress/keycodes';
+ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
+ 
+ /**
+@@ -15,19 +15,27 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
+ import DropdownMenu from '../';
+ import { MenuItem } from '../../';
+ 
+-function getMenuToggleButton( container ) {
+-	return container.querySelector( '.components-dropdown-menu__toggle' );
+-}
+-function getNavigableMenu( container ) {
+-	return container.querySelector( '.components-dropdown-menu__menu' );
+-}
+-
+ describe( 'DropdownMenu', () => {
+-	const children = ( { onClose } ) => <MenuItem onClick={ onClose } />;
++	it( 'should not render when neither controls nor children are assigned', () => {
++		render( <DropdownMenu /> );
++
++		// The button toggle should not even be rendered
++		expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
++	} );
++
++	it( 'should not render when controls are empty and children is not specified', () => {
++		render( <DropdownMenu controls={ [] } /> );
++
++		// The button toggle should not even be rendered
++		expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
++	} );
++
++	it( 'should open menu when pressing arrow down on the toggle and the controls prop is used to define menu items', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
+ 
+-	let controls;
+-	beforeEach( () => {
+-		controls = [
++		const controls = [
+ 			{
+ 				title: 'Up',
+ 				icon: arrowUp,
+@@ -49,62 +57,50 @@ describe( 'DropdownMenu', () => {
+ 				onClick: jest.fn(),
+ 			},
+ 		];
+-	} );
+ 
+-	describe( 'basic rendering', () => {
+-		it( 'should render a null element when neither controls nor children are assigned', () => {
+-			const { container } = render( <DropdownMenu /> );
++		render( <DropdownMenu controls={ controls } /> );
+ 
+-			expect( container.firstChild ).toBeNull();
+-		} );
++		// Move focus on the toggle button
++		await user.tab();
+ 
+-		it( 'should render a null element when controls are empty and children is not specified', () => {
+-			const { container } = render( <DropdownMenu controls={ [] } /> );
++		await user.keyboard( '[ArrowDown]' );
+ 
+-			expect( container.firstChild ).toBeNull();
++		let menu;
++		await waitFor( () => {
++			menu = screen.getByRole( 'menu' );
++			return expect( menu ).toBeVisible();
+ 		} );
+ 
+-		it( 'should open menu on arrow down (controls)', () => {
+-			const {
+-				container: { firstChild: dropdownMenuContainer },
+-			} = render( <DropdownMenu controls={ controls } /> );
+-
+-			const button = getMenuToggleButton( dropdownMenuContainer );
+-			button.focus();
+-			fireEvent.keyDown( button, {
+-				keyCode: DOWN,
+-				preventDefault: () => {},
+-			} );
+-			const menu = getNavigableMenu( dropdownMenuContainer );
+-			expect( menu ).toBeTruthy();
+-
+-			expect(
+-				dropdownMenuContainer.querySelectorAll(
+-					'.components-dropdown-menu__menu-item'
+-				)
+-			).toHaveLength( controls.length );
+-		} );
++		expect( within( menu ).getAllByRole( 'menuitem' ) ).toHaveLength(
++			controls.length
++		);
++	} );
+ 
+-		it( 'should open menu on arrow down (children)', () => {
+-			const {
+-				container: { firstChild: dropdownMenuContainer },
+-			} = render( <DropdownMenu children={ children } /> );
++	it( 'should open menu when pressing arrow down on the toggle and the children prop is used to define menu items', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
+ 
+-			const button = getMenuToggleButton( dropdownMenuContainer );
+-			button.focus();
+-			fireEvent.keyDown( button, {
+-				keyCode: DOWN,
+-				preventDefault: () => {},
+-			} );
++		render(
++			<DropdownMenu
++				children={ ( { onClose } ) => <MenuItem onClick={ onClose } /> }
++			/>
++		);
+ 
+-			expect( getNavigableMenu( dropdownMenuContainer ) ).toBeTruthy();
++		const button = screen.getByRole( 'button' );
++		button.focus();
+ 
+-			const menuItem = dropdownMenuContainer.querySelector(
+-				'.components-menu-item__button'
+-			);
+-			fireEvent.click( menuItem );
++		await user.keyboard( '[ArrowDown]' );
+ 
+-			expect( getNavigableMenu( dropdownMenuContainer ) ).toBeNull();
++		let menu;
++		await waitFor( () => {
++			menu = screen.getByRole( 'menu' );
++			return expect( menu ).toBeVisible();
+ 		} );
++
++		// Clicking the menu item will close the dropdown menu
++		await user.click( within( menu ).getByRole( 'menuitem' ) );
++
++		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+ 	} );
+ } );

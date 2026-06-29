@@ -1,0 +1,114 @@
+diff --git a/packages/components/src/checkbox-control/index.js b/packages/components/src/checkbox-control/index.js
+index e6abcb5fadbfc1..00179b844bccfc 100644
+--- a/packages/components/src/checkbox-control/index.js
++++ b/packages/components/src/checkbox-control/index.js
+@@ -8,6 +8,7 @@ import { Icon, check } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import BaseControl from '../base-control';
++import { StyledHelp } from '../base-control/styles/base-control-styles';
+ 
+ export default function CheckboxControl( {
+ 	label,
+@@ -15,6 +16,7 @@ export default function CheckboxControl( {
+ 	heading,
+ 	checked,
+ 	help,
++	helpPosition = 'left',
+ 	onChange,
+ 	...props
+ } ) {
+@@ -26,7 +28,7 @@ export default function CheckboxControl( {
+ 		<BaseControl
+ 			label={ heading }
+ 			id={ id }
+-			help={ help }
++			help={ helpPosition === 'left' ? help : '' }
+ 			className={ className }
+ 		>
+ 			<span className="components-checkbox-control__input-container">
+@@ -48,12 +50,22 @@ export default function CheckboxControl( {
+ 					/>
+ 				) : null }
+ 			</span>
+-			<label
+-				className="components-checkbox-control__label"
+-				htmlFor={ id }
+-			>
+-				{ label }
+-			</label>
++			<span className="components-checkbox-control__label-container">
++				<label
++					className="components-checkbox-control__label"
++					htmlFor={ id }
++				>
++					{ label }
++				</label>
++				{ helpPosition === 'center' && (
++					<StyledHelp
++						id={ id + '__help' }
++						className="components-base-control__help"
++					>
++						{ help }
++					</StyledHelp>
++				) }
++			</span>
+ 		</BaseControl>
+ 	);
+ }
+diff --git a/packages/components/src/checkbox-control/stories/index.js b/packages/components/src/checkbox-control/stories/index.js
+index b0819664eb8b03..0a4b9bbafedd80 100644
+--- a/packages/components/src/checkbox-control/stories/index.js
++++ b/packages/components/src/checkbox-control/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { text } from '@storybook/addon-knobs';
++import { select, text } from '@storybook/addon-knobs';
+ 
+ /**
+  * WordPress dependencies
+@@ -40,12 +40,21 @@ export const all = () => {
+ 	const heading = text( 'Heading', 'User' );
+ 	const label = text( 'Label', 'Is author' );
+ 	const help = text( 'Help', 'Is the user an author or not?' );
++	const helpPosition = select(
++		'align',
++		{
++			left: 'left',
++			center: 'center',
++		},
++		'center'
++	);
+ 
+ 	return (
+ 		<CheckboxControlWithState
+ 			heading={ heading }
+ 			label={ label }
+ 			help={ help }
++			helpPosition={ helpPosition }
+ 			checked
+ 		/>
+ 	);
+diff --git a/packages/components/src/checkbox-control/style.scss b/packages/components/src/checkbox-control/style.scss
+index 5b0996e0dad50a..47db7c470d967f 100644
+--- a/packages/components/src/checkbox-control/style.scss
++++ b/packages/components/src/checkbox-control/style.scss
+@@ -78,3 +78,16 @@ svg.components-checkbox-control__checked {
+ 	user-select: none;
+ 	pointer-events: none;
+ }
++
++.components-checkbox-control__label-container {
++	display: inline-block;
++}
++
++.components-checkbox-control__centered-help-text {
++	position: fixed;
++}
++
++.components-checkbox-control__label-container .components-base-control__help {
++	margin: 0;
++	position: fixed;
++}

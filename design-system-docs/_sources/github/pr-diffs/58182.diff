@@ -1,0 +1,23 @@
+diff --git a/packages/components/src/tooltip/test/index.tsx b/packages/components/src/tooltip/test/index.tsx
+index cbe09dc3214129..85e29f5f3809bc 100644
+--- a/packages/components/src/tooltip/test/index.tsx
++++ b/packages/components/src/tooltip/test/index.tsx
+@@ -487,5 +487,18 @@ describe( 'Tooltip', () => {
+ 				).not.toBeInTheDocument()
+ 			);
+ 		} );
++
++		it( 'should not leak Tooltip component classname to the anchor element', () => {
++			render(
++				<Tooltip>
++					<Tooltip>
++						<button>Anchor</button>
++					</Tooltip>
++				</Tooltip>
++			);
++			expect(
++				screen.getByRole( 'button', { name: 'Anchor' } )
++			).not.toHaveClass( 'components-tooltip' );
++		} );
+ 	} );
+ } );

@@ -1,0 +1,44 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 76d38fbc86a53b..7cf8f7f2ff828d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Textarea`: Fix disabled styles [#77129](https://github.com/WordPress/gutenberg/pull/77129).
+ -   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).
+ -   `ValidatedRangeControl`: Fix `aria-label` rendered as `[object Object]` when `required` or `markWhenOptional` is set ([#77042](https://github.com/WordPress/gutenberg/pull/77042)).
+ -   `Autocomplete`: Fix matching logic to prefer longest overlapping trigger ([#77018](https://github.com/WordPress/gutenberg/pull/77018)).
+diff --git a/packages/components/src/textarea-control/stories/index.story.tsx b/packages/components/src/textarea-control/stories/index.story.tsx
+index 517a0a704c8b2d..7945066bec2399 100644
+--- a/packages/components/src/textarea-control/stories/index.story.tsx
++++ b/packages/components/src/textarea-control/stories/index.story.tsx
+@@ -21,6 +21,9 @@ const meta: Meta< typeof TextareaControl > = {
+ 		onChange: { action: 'onChange' },
+ 		label: { control: { type: 'text' } },
+ 		help: { control: { type: 'text' } },
++		disabled: {
++			control: { type: 'boolean' },
++		},
+ 		value: { control: false },
+ 	},
+ 	parameters: {
+diff --git a/packages/components/src/textarea-control/styles/textarea-control-styles.ts b/packages/components/src/textarea-control/styles/textarea-control-styles.ts
+index 12de09063df047..7d6ba1671eaece 100644
+--- a/packages/components/src/textarea-control/styles/textarea-control-styles.ts
++++ b/packages/components/src/textarea-control/styles/textarea-control-styles.ts
+@@ -62,6 +62,13 @@ export const StyledTextarea = styled.textarea`
+ 		${ inputStyleFocus }
+ 	}
+ 
++	&:disabled {
++		background: ${ COLORS.ui.backgroundDisabled };
++		border-color: ${ COLORS.ui.borderDisabled };
++		color: ${ COLORS.ui.textDisabled };
++		opacity: 1;
++	}
++
+ 	// Use opacity to work in various editor styles.
+ 	&::-webkit-input-placeholder {
+ 		color: ${ COLORS.ui.darkGrayPlaceholder };

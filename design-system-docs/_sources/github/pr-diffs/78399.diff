@@ -1,0 +1,2095 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 3a09852dad5990..1d5d1651c8afcd 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ -   `Card`: `Card.FullBleed` now supports edge-bumping in additional positions ([#77856](https://github.com/WordPress/gutenberg/pull/77856)):
+     -   As the **first child of `Card.Header`**, it extends flush to the card's top and side edges — ideal for hero images. Inter-sibling spacing is consumer-managed: compose `Card.Header` with `Stack` via the `render` prop to add a gap between the hero and following siblings (e.g. `Card.Title`).
+     -   As the **sole child of `Card.Content`**, it extends flush to the card's side edges and additionally to the top edge when `Content` is the first card child, or the bottom edge when it is the last. This enables full-bleed content panels with or without a header above them.
++-   Add `Combobox` primitive ([#78399](https://github.com/WordPress/gutenberg/pull/78399)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/ui/src/form/primitives/combobox/chip-with-remove.tsx b/packages/ui/src/form/primitives/combobox/chip-with-remove.tsx
+new file mode 100644
+index 00000000000000..fb5f2fed2b6f08
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/chip-with-remove.tsx
+@@ -0,0 +1,50 @@
++import { Combobox as _Combobox } from '@base-ui/react/combobox';
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import { __ } from '@wordpress/i18n';
++import { closeSmall } from '@wordpress/icons';
++import { IconButton } from '../../../icon-button';
++import type { ComboboxChipWithRemoveProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * A utility component that combines a chip and a remove button,
++ * with standard styling.
++ */
++export const ChipWithRemove = forwardRef<
++	HTMLDivElement,
++	ComboboxChipWithRemoveProps
++>( function ChipWithRemove(
++	{ className, children, prefix, removeLabel = __( 'Remove' ), ...restProps },
++	ref
++) {
++	return (
++		<_Combobox.Chip
++			ref={ ref }
++			className={ clsx( styles.chip, className ) }
++			{ ...restProps }
++		>
++			{ prefix && (
++				<span className={ styles[ 'chip-prefix' ] }>{ prefix }</span>
++			) }
++			<span className={ styles[ 'chip-content' ] }>{ children }</span>
++
++			<_Combobox.ChipRemove
++				className={ styles[ 'chip-remove' ] }
++				render={ ( props, { disabled } ) => (
++					<IconButton
++						icon={ closeSmall }
++						label={ removeLabel }
++						size="small"
++						variant="minimal"
++						tone="neutral"
++						focusableWhenDisabled={ false }
++						disabled={ disabled }
++						aria-hidden={ disabled || undefined }
++						{ ...props }
++					/>
++				) }
++			/>
++		</_Combobox.Chip>
++	);
++} );
+diff --git a/packages/ui/src/form/primitives/combobox/chips.tsx b/packages/ui/src/form/primitives/combobox/chips.tsx
+new file mode 100644
+index 00000000000000..fe0b75c49f087d
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/chips.tsx
+@@ -0,0 +1,9 @@
++import { Combobox as _Combobox } from '@base-ui/react/combobox';
++import { forwardRef } from '@wordpress/element';
++import type { ComboboxChipsProps } from './types';
++
++export const Chips = forwardRef< HTMLDivElement, ComboboxChipsProps >(
++	function Chips( props, ref ) {
++		return <_Combobox.Chips ref={ ref } { ...props } />;
++	}
++);
+diff --git a/packages/ui/src/form/primitives/combobox/clear.tsx b/packages/ui/src/form/primitives/combobox/clear.tsx
+new file mode 100644
+index 00000000000000..5ae7cde96357ab
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/clear.tsx
+@@ -0,0 +1,34 @@
++import { Combobox as _Combobox } from '@base-ui/react/combobox';
++import { forwardRef } from '@wordpress/element';
++import { closeSmall } from '@wordpress/icons';
++import { __ } from '@wordpress/i18n';
++import { IconButton } from '../../../icon-button';
++import type { ComboboxClearProps } from './types';
++
++const DEFAULT_RENDER = (
++	{ 'aria-label': ariaLabel = __( 'Clear' ), ...props }: ComboboxClearProps,
++	{ disabled }: _Combobox.Clear.State
++) => (
++	<IconButton
++		icon={ closeSmall }
++		focusableWhenDisabled={ false }
++		disabled={ disabled }
++		aria-hidden={ disabled || undefined }
++		size="small"
++		variant="minimal"
++		tone="neutral"
++		label={ ariaLabel }
++		{ ...props }
++	/>
++);
++
++/**
++ * A button that clears the selected value(s).
++ */
++export const Clear = forwardRef< HTMLButtonElement, ComboboxClearProps >(
++	function Clear( { render = DEFAULT_RENDER, ...restProps }, ref ) {
++		return (
++			<_Combobox.Clear ref={ ref } render={ render } { ...restProps } />
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/combobox/collection.tsx b/packages/ui/src/form/primitives/combobox/collection.tsx
+new file mode 100644
+index 00000000000000..f94a9ab85189be
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/collection.tsx
+@@ -0,0 +1,13 @@
++import { Combobox as _Combobox } from '@base-ui/react/combobox';
++import type { ComboboxCollectionProps } from './types';
++
++export function Collection( {
++	children,
++	...restProps
++}: ComboboxCollectionProps ) {
++	return (
++		<_Combobox.Collection { ...restProps }>
++			{ children }
++		</_Combobox.Collection>
++	);
++}
+diff --git a/packages/ui/src/form/primitives/combobox/empty.tsx b/packages/ui/src/form/primitives/combobox/empty.tsx
+new file mode 100644
+index 00000000000000..0096920d2d156a
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/empty.tsx
+@@ -0,0 +1,17 @@
++import { Combobox as _Combobox } from '@base-ui/react/combobox';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import type { ComboboxEmptyProps } from './types';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++
++export const Empty = forwardRef< HTMLDivElement, ComboboxEmptyProps >(
++	function Empty( { className, ...restProps }, ref ) {
++		return (
++			<_Combobox.Empty
++				className={ clsx( itemPopupStyles.empty, className ) }
++				ref={ ref }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/combobox/index.ts b/packages/ui/src/form/primitives/combobox/index.ts
+new file mode 100644
+index 00000000000000..a4cc8e604589dc
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/index.ts
+@@ -0,0 +1,16 @@
++export { Chips } from './chips';
++export { ChipWithRemove } from './chip-with-remove';
++export { Clear } from './clear';
++export { Collection } from './collection';
++export { Empty } from './empty';
++export { Input } from './input';
++export { Item } from './item';
++export { List } from './list';
++export { ListBody } from './list-body';
++export { ListFooter } from './list-footer';
++export { Portal } from './portal';
++export { Positioner } from './positioner';
++export { Popup } from './popup';
++export { Root } from './root';
++export { Trigger } from './trigger';
++export { Value } from './value';
+diff --git a/packages/ui/src/form/primitives/combobox/input.tsx b/packages/ui/src/form/primitives/combobox/input.tsx
+new file mode 100644
+index 00000000000000..bb3048342bfe12
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/input.tsx
+@@ -0,0 +1,26 @@
++import { Combobox as _Combobox } from '@base-ui/react/combobox';
++import { forwardRef } from '@wordpress/element';
++import { search } from '@wordpress/icons';
++import { Icon } from '../../../icon';
++import { Input as InputPrimitive } from '../input';
++import { InputLayout } from '../input-layout';
++import type { ComboboxInputProps } from './types';
++
++const DEFAULT_RENDER = ( props: ComboboxInputProps ) => (
++	<InputPrimitive
++		prefix={
++			<InputLayout.Slot padding="minimal">
++				<Icon icon={ search } />
++			</InputLayout.Slot>
++		}
++		{ ...props }
++	/>
++);
++
++export const Input = forwardRef< HTMLInputElement, ComboboxInputProps >(
++	function Input( { render = DEFAULT_RENDER, ...restProps }, ref ) {
++		return (
++			<_Combobox.Input ref={ ref } render={ render } { ...restProps } />
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/combobox/item.tsx b/packages/ui/src/form/primitives/combobox/item.tsx
+new file mode 100644
+index 00000000000000..79111aff956f14
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/item.tsx
+@@ -0,0 +1,45 @@
++import { Combobox as _Combobox } from '@base-ui/react/combobox';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { check, plus } from '@wordpress/icons';
++import { Icon } from '../../../icon';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++import resetStyles from '../../../utils/css/resets.module.css';
++import type { ComboboxItemProps } from './types';
++
++export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
++	function Item(
++		{
++			className,
++			children,
++			size = 'default',
++			variant = 'default',
++			...restProps
++		},
++		ref
++	) {
++		return (
++			<_Combobox.Item
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					itemPopupStyles.item,
++					itemPopupStyles[ `is-size-${ size }` ],
++					className
++				) }
++				ref={ ref }
++				{ ...restProps }
++			>
++				<Icon
++					icon={ variant === 'creatable' ? plus : check }
++					className={ clsx(
++						itemPopupStyles[ 'item-icon' ],
++						variant !== 'creatable' &&
++							itemPopupStyles[ 'item-indicator-icon' ]
++					) }
++					size={ 24 }
++				/>
++				{ children }
++			</_Combobox.Item>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/combobox/list-body.tsx b/packages/ui/src/form/primitives/combobox/list-body.tsx
+new file mode 100644
+index 00000000000000..903f3bf4464213
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/list-body.tsx
+@@ -0,0 +1,23 @@
++import { forwardRef } from '@wordpress/element';
++import { mergeProps, useRender } from '@base-ui/react';
++import type { ComboboxListBodyProps } from './types';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++
++/**
++ * A layout container for the main scrolling area in the `List`, for holding `Item`s.
++ */
++export const ListBody = forwardRef< HTMLDivElement, ComboboxListBodyProps >(
++	function ListBody( { render, ...props }, ref ) {
++		const element = useRender( {
++			defaultTagName: 'div',
++			render,
++			ref,
++			props: mergeProps< 'div' >(
++				{ className: itemPopupStyles[ 'list-scrollable-container' ] },
++				props
++			),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/form/primitives/combobox/list-footer.tsx b/packages/ui/src/form/primitives/combobox/list-footer.tsx
+new file mode 100644
+index 00000000000000..f572b1f6916f6e
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/list-footer.tsx
+@@ -0,0 +1,24 @@
++import { forwardRef } from '@wordpress/element';
++import { mergeProps, useRender } from '@base-ui/react';
++import type { ComboboxListFooterProps } from './types';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++
++/**
++ * A layout container for the footer row in the `List`,
++ * for holding a single `Item` that triggers the creation of a new item.
++ */
++export const ListFooter = forwardRef< HTMLDivElement, ComboboxListFooterProps >(
++	function ListFooter( { render, ...props }, ref ) {
++		const element = useRender( {
++			defaultTagName: 'div',
++			render,
++			ref,
++			props: mergeProps< 'div' >(
++				{ className: itemPopupStyles[ 'list-footer' ] },
++				props
++			),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/form/primitives/combobox/list.tsx b/packages/ui/src/form/primitives/combobox/list.tsx
+new file mode 100644
+index 00000000000000..afbf930bff303b
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/list.tsx
+@@ -0,0 +1,17 @@
++import { Combobox as _Combobox } from '@base-ui/react/combobox';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import type { ComboboxListProps } from './types';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++
++export const List = forwardRef< HTMLDivElement, ComboboxListProps >(
++	function List( { className, ...restProps }, ref ) {
++		return (
++			<_Combobox.List
++				className={ clsx( itemPopupStyles.list, className ) }
++				ref={ ref }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/combobox/popup.tsx b/packages/ui/src/form/primitives/combobox/popup.tsx
+new file mode 100644
+index 00000000000000..6da83929dfde02
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/popup.tsx
+@@ -0,0 +1,38 @@
++import { Combobox as _Combobox } from '@base-ui/react/combobox';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
++import { unlock } from '../../../lock-unlock';
++import { Portal } from './portal';
++import { Positioner } from './positioner';
++import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++import type { ComboboxPopupProps } from './types';
++
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
++export const Popup = forwardRef< HTMLDivElement, ComboboxPopupProps >(
++	function Popup( { className, portal, positioner, ...restProps }, ref ) {
++		const popupContent = (
++			<ThemeProvider>
++				<_Combobox.Popup
++					ref={ ref }
++					className={ clsx( itemPopupStyles.popup, className ) }
++					{ ...restProps }
++				/>
++			</ThemeProvider>
++		);
++
++		const positionedPopup = renderSlotWithChildren(
++			positioner,
++			<Positioner />,
++			popupContent
++		);
++
++		return renderSlotWithChildren( portal, <Portal />, positionedPopup );
++	}
++);
+diff --git a/packages/ui/src/form/primitives/combobox/portal.tsx b/packages/ui/src/form/primitives/combobox/portal.tsx
+new file mode 100644
+index 00000000000000..374f6a24a558c2
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/portal.tsx
+@@ -0,0 +1,24 @@
++import { Combobox as _Combobox } from '@base-ui/react/combobox';
++import { forwardRef } from '@wordpress/element';
++import type { PortalProps } from './types';
++import { getWpCompatOverlaySlot } from '../../../utils/wp-compat-overlay-slot';
++
++/**
++ * Root element that portals `Combobox` popup content. Pass to
++ * `Combobox.Popup`'s `portal` prop. When `portal` is omitted,
++ * `Combobox.Popup` uses this component with default props.
++ * `container` defaults to the `@wordpress/ui` compat overlay slot.
++ */
++const Portal = forwardRef< HTMLDivElement, PortalProps >(
++	function ComboboxPortal( { container, ...restProps }, ref ) {
++		return (
++			<_Combobox.Portal
++				container={ container ?? getWpCompatOverlaySlot() }
++				{ ...restProps }
++				ref={ ref }
++			/>
++		);
++	}
++);
++
++export { Portal };
+diff --git a/packages/ui/src/form/primitives/combobox/positioner.tsx b/packages/ui/src/form/primitives/combobox/positioner.tsx
+new file mode 100644
+index 00000000000000..67f50f175029cc
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/positioner.tsx
+@@ -0,0 +1,29 @@
++import clsx from 'clsx';
++import { Combobox as _Combobox } from '@base-ui/react/combobox';
++import { forwardRef } from '@wordpress/element';
++import type { PositionerProps } from './types';
++import resetStyles from '../../../utils/css/resets.module.css';
++import styles from './style.module.css';
++import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
++
++/**
++ * Used to apply custom positioning to `Combobox`'s popup content.
++ */
++const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
++	function ComboboxPositioner( { className, ...props }, ref ) {
++		return (
++			<_Combobox.Positioner
++				{ ...ITEM_POPUP_POSITIONER_PROPS }
++				{ ...props }
++				ref={ ref }
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					styles.positioner,
++					className
++				) }
++			/>
++		);
++	}
++);
++
++export { Positioner };
+diff --git a/packages/ui/src/form/primitives/combobox/root.tsx b/packages/ui/src/form/primitives/combobox/root.tsx
+new file mode 100644
+index 00000000000000..7bbcf14d9062a5
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/root.tsx
+@@ -0,0 +1,14 @@
++import { Combobox as _Combobox } from '@base-ui/react/combobox';
++import type { ComboboxRootProps } from './types';
++
++/**
++ * Low-level primitive for a combobox that has an associated selection state.
++ *
++ * See `SearchableSelectControl` and `SearchableChipSelectControl` for standard
++ * implementations of a single and multiple selection combobox.
++ */
++export function Root< Value, Multiple extends boolean | undefined = false >(
++	props: ComboboxRootProps< Value, Multiple >
++) {
++	return <_Combobox.Root { ...props } />;
++}
+diff --git a/packages/ui/src/form/primitives/combobox/stories/fixtures.ts b/packages/ui/src/form/primitives/combobox/stories/fixtures.ts
+new file mode 100644
+index 00000000000000..e1fffaba9bc5a9
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/stories/fixtures.ts
+@@ -0,0 +1,57 @@
++export interface FixtureItem {
++	value: string;
++	label: string;
++}
++
++export const ITEMS: FixtureItem[] = [
++	{ value: 'apple', label: 'Apple' },
++	{ value: 'apricot', label: 'Apricot' },
++	{ value: 'banana', label: 'Banana' },
++	{ value: 'blackberry', label: 'Blackberry' },
++	{ value: 'blueberry', label: 'Blueberry' },
++	{ value: 'boysenberry', label: 'Boysenberry' },
++	{ value: 'breadfruit', label: 'Breadfruit' },
++	{ value: 'cantaloupe', label: 'Cantaloupe' },
++	{ value: 'cherry', label: 'Cherry' },
++	{ value: 'clementine', label: 'Clementine' },
++	{ value: 'coconut', label: 'Coconut' },
++	{ value: 'cranberry', label: 'Cranberry' },
++	{ value: 'dragonfruit', label: 'Dragonfruit' },
++	{ value: 'durian', label: 'Durian' },
++	{ value: 'elderberry', label: 'Elderberry' },
++	{ value: 'fig', label: 'Fig' },
++	{ value: 'gooseberry', label: 'Gooseberry' },
++	{ value: 'grape', label: 'Grape' },
++	{ value: 'grapefruit', label: 'Grapefruit' },
++	{ value: 'guava', label: 'Guava' },
++	{ value: 'honeydew', label: 'Honeydew' },
++	{ value: 'jackfruit', label: 'Jackfruit' },
++	{ value: 'kiwi', label: 'Kiwi' },
++	{ value: 'kumquat', label: 'Kumquat' },
++	{ value: 'lemon', label: 'Lemon' },
++	{ value: 'lime', label: 'Lime' },
++	{ value: 'longan', label: 'Longan' },
++	{ value: 'lychee', label: 'Lychee' },
++	{ value: 'mandarin', label: 'Mandarin' },
++	{ value: 'mango', label: 'Mango' },
++	{ value: 'mangosteen', label: 'Mangosteen' },
++	{ value: 'mulberry', label: 'Mulberry' },
++	{ value: 'nectarine', label: 'Nectarine' },
++	{ value: 'orange', label: 'Orange' },
++	{ value: 'papaya', label: 'Papaya' },
++	{ value: 'passionfruit', label: 'Passionfruit' },
++	{ value: 'peach', label: 'Peach' },
++	{ value: 'pear', label: 'Pear' },
++	{ value: 'persimmon', label: 'Persimmon' },
++	{ value: 'pineapple', label: 'Pineapple' },
++	{ value: 'plum', label: 'Plum' },
++	{ value: 'pomegranate', label: 'Pomegranate' },
++	{ value: 'quince', label: 'Quince' },
++	{ value: 'rambutan', label: 'Rambutan' },
++	{ value: 'raspberry', label: 'Raspberry' },
++	{ value: 'soursop', label: 'Soursop' },
++	{ value: 'starfruit', label: 'Starfruit' },
++	{ value: 'strawberry', label: 'Strawberry' },
++	{ value: 'tangerine', label: 'Tangerine' },
++	{ value: 'watermelon', label: 'Watermelon' },
++];
+diff --git a/packages/ui/src/form/primitives/combobox/stories/index.story.tsx b/packages/ui/src/form/primitives/combobox/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..fd40d1ddf1005f
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/stories/index.story.tsx
+@@ -0,0 +1,398 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { useEffect, useState } from '@wordpress/element';
++import * as Combobox from '../index';
++import { ITEMS, type FixtureItem } from './fixtures';
++
++const meta: Meta< typeof Combobox.Root > = {
++	title: 'Design System/Components/Form/Primitives/Combobox',
++	component: Combobox.Root,
++	subcomponents: {
++		'Combobox.Trigger': Combobox.Trigger,
++		'Combobox.Portal': Combobox.Portal,
++		'Combobox.Positioner': Combobox.Positioner,
++		'Combobox.Popup': Combobox.Popup,
++		'Combobox.Input': Combobox.Input,
++		'Combobox.List': Combobox.List,
++		'Combobox.ListBody': Combobox.ListBody,
++		'Combobox.ListFooter': Combobox.ListFooter,
++		'Combobox.Collection': Combobox.Collection,
++		'Combobox.Item': Combobox.Item,
++		'Combobox.Value': Combobox.Value,
++		'Combobox.Chips': Combobox.Chips,
++		'Combobox.ChipWithRemove': Combobox.ChipWithRemove,
++		'Combobox.Empty': Combobox.Empty,
++		'Combobox.Clear': Combobox.Clear,
++	},
++	parameters: {
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, overlays compatibility, and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
++		},
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof Combobox.Root >;
++
++const inputWrapperStyle = {
++	padding:
++		'var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-xs)',
++};
++
++export const Default: Story = {
++	args: {
++		items: ITEMS,
++		children: (
++			<>
++				<Combobox.Trigger />
++				<Combobox.Popup>
++					<div style={ inputWrapperStyle }>
++						<Combobox.Input placeholder="Search" />
++					</div>
++					<Combobox.Empty>No results found.</Combobox.Empty>
++					<Combobox.List>
++						<Combobox.ListBody>
++							<Combobox.Collection>
++								{ ( item: FixtureItem ) => (
++									<Combobox.Item
++										key={ item.value }
++										value={ item }
++									>
++										{ item.label }
++									</Combobox.Item>
++								) }
++							</Combobox.Collection>
++						</Combobox.ListBody>
++					</Combobox.List>
++				</Combobox.Popup>
++			</>
++		),
++	},
++};
++
++export const Compact: Story = {
++	args: {
++		defaultValue: ITEMS[ 0 ],
++		items: ITEMS,
++		children: (
++			<>
++				<Combobox.Trigger size="compact" />
++				<Combobox.Popup>
++					<div style={ inputWrapperStyle }>
++						<Combobox.Input placeholder="Search" />
++					</div>
++					<Combobox.Empty>No results found.</Combobox.Empty>
++					<Combobox.List>
++						<Combobox.ListBody>
++							<Combobox.Collection>
++								{ ( item: FixtureItem ) => (
++									<Combobox.Item
++										key={ item.value }
++										value={ item }
++										size="compact"
++									>
++										{ item.label }
++									</Combobox.Item>
++								) }
++							</Combobox.Collection>
++						</Combobox.ListBody>
++					</Combobox.List>
++				</Combobox.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * For certain multiple select use cases, it may be better to design a custom
++ * selection state UI, rather than using a chip-based selection state UI like `SearchableChipSelect`.
++ * In such cases, the selector UI can be detached and inlined into a modal dialog, for example.
++ *
++ * To do this, omit the `Popup` and enable the `inline` prop on the `Root`.
++ */
++export const DetachedInline: Story = {
++	args: {
++		items: ITEMS,
++		multiple: true,
++		inline: true,
++		children: (
++			<>
++				<Combobox.Input placeholder="Search" />
++				<div
++					style={ {
++						minHeight: '200px',
++						maxHeight: '200px',
++						marginTop: 8,
++						overflow: 'auto',
++					} }
++				>
++					<Combobox.Empty>No results found.</Combobox.Empty>
++					<Combobox.List>
++						<Combobox.Collection>
++							{ ( item: FixtureItem ) => (
++								<Combobox.Item
++									key={ item.value }
++									value={ item }
++								>
++									{ item.label }
++								</Combobox.Item>
++							) }
++						</Combobox.Collection>
++					</Combobox.List>
++				</div>
++			</>
++		),
++	},
++};
++
++export const Creatable: Story = {
++	render: function Template( args ) {
++		const [ inputValue, setInputValue ] = useState( '' );
++		const [ value, setValue ] = useState( ITEMS[ 0 ] );
++		const hasNoExactMatch =
++			inputValue.length > 0 &&
++			! ITEMS.some( ( item ) => item.label === inputValue.trim() );
++		const creatableItem = {
++			value: 'create',
++			label:
++				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
++		};
++
++		return (
++			<Combobox.Root
++				{ ...args }
++				inputValue={ inputValue }
++				onInputValueChange={ setInputValue }
++				value={ value }
++				onValueChange={ ( newValue, event ) => {
++					const typedValue = newValue as FixtureItem;
++					if ( typedValue.value === 'create' ) {
++						// eslint-disable-next-line no-alert
++						alert( 'Show dialog to create new item!' );
++					} else {
++						setValue( typedValue );
++					}
++					args.onValueChange?.( newValue, event );
++				} }
++				items={
++					! inputValue || hasNoExactMatch
++						? [ ...ITEMS, creatableItem ]
++						: ITEMS
++				}
++			>
++				<Combobox.Trigger />
++				<Combobox.Popup>
++					<div style={ inputWrapperStyle }>
++						<Combobox.Input placeholder="Search" />
++					</div>
++					<Combobox.Empty>No results found.</Combobox.Empty>
++					<Combobox.List>
++						<Combobox.ListBody>
++							<Combobox.Collection>
++								{ ( item: FixtureItem ) =>
++									item.value !== creatableItem.value && (
++										<Combobox.Item
++											key={ item.value }
++											value={ item }
++										>
++											{ item.label }
++										</Combobox.Item>
++									)
++								}
++							</Combobox.Collection>
++						</Combobox.ListBody>
++						<Combobox.ListFooter>
++							<Combobox.Item
++								variant="creatable"
++								value={ creatableItem }
++								key={ creatableItem.value }
++							>
++								{ creatableItem.label }
++							</Combobox.Item>
++						</Combobox.ListFooter>
++					</Combobox.List>
++				</Combobox.Popup>
++			</Combobox.Root>
++		);
++	},
++};
++
++export const AsyncItems: Story = {
++	render: function Template( args ) {
++		const LOADING_ITEM = {
++			value: 'loading',
++			label: 'Loading...',
++		};
++		const [ items, setItems ] = useState( [ LOADING_ITEM ] );
++		const [ value, setValue ] = useState< unknown >( LOADING_ITEM );
++
++		useEffect( () => {
++			const timeout = setTimeout( () => {
++				setItems( ITEMS );
++				setValue( ITEMS[ 0 ] );
++			}, 3000 );
++
++			return () => clearTimeout( timeout );
++		}, [] );
++
++		return (
++			<Combobox.Root
++				{ ...args }
++				items={ items }
++				value={ value }
++				onValueChange={ setValue }
++			>
++				<Combobox.Trigger />
++				<Combobox.Popup>
++					<div style={ inputWrapperStyle }>
++						<Combobox.Input placeholder="Search" />
++					</div>
++					<Combobox.Empty>No results found.</Combobox.Empty>
++					<Combobox.List>
++						<Combobox.ListBody>
++							<Combobox.Collection>
++								{ ( item: FixtureItem ) => (
++									<Combobox.Item
++										key={ item.value }
++										value={ item }
++										disabled={ item.value === 'loading' }
++									>
++										{ item.label }
++									</Combobox.Item>
++								) }
++							</Combobox.Collection>
++						</Combobox.ListBody>
++					</Combobox.List>
++				</Combobox.Popup>
++			</Combobox.Root>
++		);
++	},
++};
++
++/**
++ * For custom needs, a `Combobox.Trigger` can take a custom render function as its children,
++ * while `Combobox.Item` can take arbitrary content as children.
++ *
++ * In this example, some extra information is added to each list item as an ARIA description.
++ */
++export const WithCustomTriggerAndItem: Story = {
++	args: {
++		items: ITEMS,
++		defaultValue: ITEMS[ 0 ],
++		children: (
++			<>
++				<Combobox.Trigger>
++					{ ( item: FixtureItem ) => (
++						<span
++							style={ {
++								display: 'flex',
++								alignItems: 'center',
++								gap: 8,
++							} }
++						>
++							<img
++								src={ `https://gravatar.com/avatar/?d=initials&name=${ item.value }` }
++								alt=""
++								width="20"
++								style={ {
++									borderRadius: '50%',
++								} }
++							/>
++							{ item.label }
++						</span>
++					) }
++				</Combobox.Trigger>
++				<Combobox.Popup>
++					<div style={ inputWrapperStyle }>
++						<Combobox.Input placeholder="Search" />
++					</div>
++					<Combobox.List>
++						<Combobox.ListBody>
++							<Combobox.Collection>
++								{ ( item: FixtureItem ) => (
++									<Combobox.Item
++										key={ item.value }
++										value={ item }
++										aria-describedby={ `description-${ item.value }` }
++									>
++										<div
++											style={ {
++												display: 'flex',
++												alignItems: 'center',
++												justifyContent: 'space-between',
++												flexGrow: 1,
++											} }
++										>
++											<span>{ item.label }</span>
++											<span
++												id={ `description-${ item.value }` }
++												aria-hidden="true"
++											>
++												99 in stock
++											</span>
++										</div>
++									</Combobox.Item>
++								) }
++							</Combobox.Collection>
++						</Combobox.ListBody>
++					</Combobox.List>
++				</Combobox.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * Popovers in Gutenberg are managed with explicit z-index values, which can create
++ * situations where a popover renders below another popover, when you want it to be rendered above.
++ *
++ * The `--wp-ui-combobox-z-index` CSS variable controls the z-index of the
++ * `Combobox` positioner. Override it either:
++ *
++ * - **Globally**, by setting the variable on `:root` or `body` (raises every
++ *   `Combobox` popup in the page), or
++ * - **Per instance**, by passing a `Combobox.Positioner` with a `style` (or
++ *   `className`) to `Combobox.Popup`'s `positioner` prop.
++ *
++ * This story demonstrates the per-instance approach.
++ */
++export const WithCustomZIndex: Story = {
++	name: 'With Custom z-index',
++	args: {
++		defaultValue: ITEMS[ 0 ],
++		items: ITEMS,
++		children: (
++			<>
++				<Combobox.Trigger />
++				<Combobox.Popup
++					positioner={
++						<Combobox.Positioner
++							style={ {
++								'--wp-ui-combobox-z-index': '9999',
++							} }
++						/>
++					}
++				>
++					<div style={ inputWrapperStyle }>
++						<Combobox.Input placeholder="Search" />
++					</div>
++					<Combobox.List>
++						<Combobox.ListBody>
++							<Combobox.Collection>
++								{ ( item: FixtureItem ) => (
++									<Combobox.Item
++										key={ item.value }
++										value={ item }
++									>
++										{ item.label }
++									</Combobox.Item>
++								) }
++							</Combobox.Collection>
++						</Combobox.ListBody>
++					</Combobox.List>
++				</Combobox.Popup>
++			</>
++		),
++	},
++};
+diff --git a/packages/ui/src/form/primitives/combobox/style.module.css b/packages/ui/src/form/primitives/combobox/style.module.css
+new file mode 100644
+index 00000000000000..fc1cb702c2fb3d
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/style.module.css
+@@ -0,0 +1,70 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.positioner {
++		z-index: var(--wp-ui-combobox-z-index, initial);
++	}
++
++	.chip {
++		--wp-ui-combobox-chip-content-padding-inline-start: var(--wpds-dimension-padding-sm);
++
++		overflow: hidden;
++		display: flex;
++		align-items: center;
++		min-height: 24px;
++		border: 1px solid var(--wpds-color-stroke-interactive-neutral);
++		border-radius: 12px;
++		background-color: var(--wpds-color-bg-interactive-neutral-weak);
++		font-size: var(--wpds-typography-font-size-md);
++		color: var(--wpds-color-fg-interactive-neutral);
++		cursor: default;
++
++		&:not([data-disabled]):has(button:not(:disabled, [aria-disabled="true"]):hover),
++		&:not([data-disabled]):focus {
++			background-color: var(--wpds-color-bg-interactive-neutral-weak-active);
++			border-color: var(--wpds-color-stroke-interactive-neutral-active);
++			outline: none;
++			color: var(--wpds-color-fg-interactive-neutral-active);
++
++			@media ( forced-colors: active ) {
++				background-color: SelectedItem;
++			}
++		}
++
++		&[data-disabled] {
++			background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
++			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
++			color: var(--wpds-color-fg-interactive-neutral-disabled);
++
++			@media ( forced-colors: active ) {
++				border-color: GrayText;
++				color: GrayText;
++			}
++		}
++
++		&:has(.chip-prefix) {
++			--wp-ui-combobox-chip-content-padding-inline-start: var(--wpds-dimension-padding-xs);
++		}
++	}
++
++	.chip-prefix {
++		display: flex;
++		justify-content: center;
++		align-items: center;
++		margin-inline-start: 1px;
++		width: 20px;
++		height: 20px;
++		border-radius: 50%;
++		overflow: hidden;
++		flex-shrink: 0;
++	}
++
++	.chip-content {
++		padding-inline-start: var(--wp-ui-combobox-chip-content-padding-inline-start);
++		padding-block: var(--wpds-dimension-padding-xs);
++	}
++
++	.chip-remove {
++		border: none; /* suppress border when in forced-colors mode */
++	}
++}
+diff --git a/packages/ui/src/form/primitives/combobox/test/index.test.tsx b/packages/ui/src/form/primitives/combobox/test/index.test.tsx
+new file mode 100644
+index 00000000000000..b0c2d61bf03f26
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/test/index.test.tsx
+@@ -0,0 +1,551 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { createRef } from '@wordpress/element';
++import type { ReactNode } from 'react';
++import * as Combobox from '../index';
++import { useEnableWpCompatOverlaySlot } from '../../../../utils/use-enable-wp-compat-overlay-slot';
++
++const ITEMS = [
++	{ id: '1', value: 'Item 1' },
++	{ id: '2', value: 'Item 2' },
++	{ id: '3', value: 'Item 3' },
++];
++
++type Item = ( typeof ITEMS )[ number ];
++
++function renderDisabledMultiSelect() {
++	return render(
++		<Combobox.Root< Item, true >
++			items={ ITEMS }
++			multiple
++			disabled
++			defaultValue={ [ ITEMS[ 0 ] ] }
++		>
++			<Combobox.Chips>
++				<Combobox.Value>
++					{ ( value: Item[] ) => (
++						<>
++							{ value.map( ( item ) => (
++								<Combobox.ChipWithRemove key={ item.id }>
++									{ item.value }
++								</Combobox.ChipWithRemove>
++							) ) }
++							<Combobox.Clear />
++						</>
++					) }
++				</Combobox.Value>
++			</Combobox.Chips>
++			<Combobox.Popup>
++				<Combobox.List>
++					<Combobox.ListBody>
++						<Combobox.Collection>
++							{ ( item ) => (
++								<Combobox.Item key={ item.id } value={ item }>
++									{ item.value }
++								</Combobox.Item>
++							) }
++						</Combobox.Collection>
++					</Combobox.ListBody>
++				</Combobox.List>
++			</Combobox.Popup>
++		</Combobox.Root>
++	);
++}
++
++describe( 'Combobox', () => {
++	it( 'forwards ref', async () => {
++		const user = userEvent.setup();
++		const triggerRef = createRef< HTMLButtonElement >();
++		const popupRef = createRef< HTMLDivElement >();
++		const positionerRef = createRef< HTMLDivElement >();
++		const inputRef = createRef< HTMLInputElement >();
++		const listRef = createRef< HTMLDivElement >();
++		const listBodyRef = createRef< HTMLDivElement >();
++		const listFooterRef = createRef< HTMLDivElement >();
++		const itemRef = createRef< HTMLDivElement >();
++		const chipsRef = createRef< HTMLDivElement >();
++		const chipWithRemoveRef = createRef< HTMLDivElement >();
++		const clearRef = createRef< HTMLButtonElement >();
++		const emptyRef = createRef< HTMLDivElement >();
++
++		render(
++			<Combobox.Root items={ ITEMS } defaultValue={ ITEMS[ 0 ] }>
++				<Combobox.Trigger ref={ triggerRef } />
++				<Combobox.Popup
++					ref={ popupRef }
++					positioner={ <Combobox.Positioner ref={ positionerRef } /> }
++				>
++					<Combobox.Input ref={ inputRef } placeholder="Search" />
++					<Combobox.Value>
++						<Combobox.Chips ref={ chipsRef }>
++							<Combobox.ChipWithRemove
++								ref={ chipWithRemoveRef }
++							></Combobox.ChipWithRemove>
++							<Combobox.Clear ref={ clearRef } />
++						</Combobox.Chips>
++					</Combobox.Value>
++					<Combobox.Empty ref={ emptyRef }>
++						No results found.
++					</Combobox.Empty>
++					<Combobox.List ref={ listRef }>
++						<Combobox.ListBody ref={ listBodyRef }>
++							<Combobox.Collection>
++								{ ( item ) => (
++									<Combobox.Item
++										key={ item.id }
++										ref={
++											item.id === '1'
++												? itemRef
++												: undefined
++										}
++										value={ item }
++									>
++										{ item.value }
++									</Combobox.Item>
++								) }
++							</Combobox.Collection>
++						</Combobox.ListBody>
++						<Combobox.ListFooter ref={ listFooterRef } />
++					</Combobox.List>
++				</Combobox.Popup>
++			</Combobox.Root>
++		);
++
++		// Test trigger ref before interaction
++		expect( triggerRef.current ).toBeInstanceOf( HTMLButtonElement );
++
++		// Click on the trigger to open the combobox popup
++		await user.click( triggerRef.current! );
++
++		// Now test that the popup and its child component refs are also available
++		await waitFor( () => {
++			expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++		} );
++		expect( positionerRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( inputRef.current ).toBeInstanceOf( HTMLInputElement );
++		expect( listRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( listBodyRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( listFooterRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( chipsRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( chipWithRemoveRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
++		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++
++	it( 'uses a custom positioner', async () => {
++		const user = userEvent.setup();
++
++		render(
++			<Combobox.Root items={ ITEMS }>
++				<Combobox.Trigger />
++				<Combobox.Popup
++					positioner={
++						<Combobox.Positioner data-testid="custom-positioner" />
++					}
++				>
++					<Combobox.List>
++						<Combobox.ListBody>
++							<Combobox.Collection>
++								{ ( item ) => (
++									<Combobox.Item
++										key={ item.id }
++										value={ item }
++									>
++										{ item.value }
++									</Combobox.Item>
++								) }
++							</Combobox.Collection>
++						</Combobox.ListBody>
++					</Combobox.List>
++				</Combobox.Popup>
++			</Combobox.Root>
++		);
++
++		await user.click( screen.getByRole( 'combobox' ) );
++
++		const item = await screen.findByRole( 'option', {
++			name: 'Item 1',
++		} );
++		expect( screen.getByTestId( 'custom-positioner' ) ).toContainElement(
++			item
++		);
++	} );
++
++	it( 'uses a custom accessible label for chip remove buttons', () => {
++		render(
++			<Combobox.Root< Item, true >
++				items={ ITEMS }
++				multiple
++				defaultValue={ [ ITEMS[ 0 ] ] }
++			>
++				<Combobox.Chips>
++					<Combobox.Value>
++						{ ( value: Item[] ) => (
++							<>
++								{ value.map( ( item ) => (
++									<Combobox.ChipWithRemove
++										key={ item.id }
++										removeLabel={ `Remove ${ item.value }` }
++									>
++										{ item.value }
++									</Combobox.ChipWithRemove>
++								) ) }
++							</>
++						) }
++					</Combobox.Value>
++				</Combobox.Chips>
++			</Combobox.Root>
++		);
++
++		expect(
++			screen.getByRole( 'button', { name: 'Remove Item 1' } )
++		).toBeVisible();
++	} );
++
++	it( 'renders a default trigger placeholder when no value is selected', () => {
++		render(
++			<Combobox.Root items={ ITEMS }>
++				<Combobox.Trigger />
++			</Combobox.Root>
++		);
++
++		const trigger = screen.getByRole( 'combobox' );
++
++		expect( trigger ).toHaveTextContent( 'Select' );
++	} );
++
++	it( 'supports custom trigger placeholder text', () => {
++		render(
++			<Combobox.Root items={ ITEMS }>
++				<Combobox.Trigger placeholder="Choose an item" />
++			</Combobox.Root>
++		);
++
++		const trigger = screen.getByRole( 'combobox' );
++
++		expect( trigger ).toHaveTextContent( 'Choose an item' );
++	} );
++
++	// The actual bug is a CSS grid overlap: both Empty and List target
++	// `grid-area: main`, so Empty rendered later in DOM stacks on top and
++	// blocks clicks. JSDOM doesn't compute CSS layout, so this test only
++	// verifies the behavioral contract, not the CSS fix itself.
++	it( 'allows selecting items when Empty is rendered after List', async () => {
++		const user = userEvent.setup();
++		const onValueChange = jest.fn();
++
++		render(
++			<Combobox.Root
++				items={ ITEMS }
++				defaultValue={ ITEMS[ 0 ] }
++				onValueChange={ onValueChange }
++			>
++				<Combobox.Trigger />
++				<Combobox.Popup>
++					<Combobox.Input placeholder="Search" />
++					<Combobox.List>
++						<Combobox.ListBody>
++							<Combobox.Collection>
++								{ ( item ) => (
++									<Combobox.Item
++										key={ item.id }
++										value={ item }
++									>
++										{ item.value }
++									</Combobox.Item>
++								) }
++							</Combobox.Collection>
++						</Combobox.ListBody>
++					</Combobox.List>
++					<Combobox.Empty>No results found.</Combobox.Empty>
++				</Combobox.Popup>
++			</Combobox.Root>
++		);
++
++		await user.click( screen.getByRole( 'combobox' ) );
++		await waitFor( () => {
++			expect( screen.getByText( 'Item 2' ) ).toBeVisible();
++		} );
++		await user.click( screen.getByText( 'Item 2' ) );
++
++		expect( onValueChange ).toHaveBeenCalledWith(
++			ITEMS[ 1 ],
++			expect.anything()
++		);
++	} );
++
++	describe( 'portal', () => {
++		it( 'should render inside the portal container when a custom target is provided', async () => {
++			const user = userEvent.setup();
++			const containerRef = createRef< HTMLDivElement >();
++
++			render(
++				<div data-testid="wrapper">
++					<Combobox.Root items={ ITEMS }>
++						<Combobox.Trigger />
++						<div
++							ref={ containerRef }
++							data-testid="custom-container"
++						/>
++						<Combobox.Popup
++							portal={
++								<Combobox.Portal container={ containerRef } />
++							}
++						>
++							<Combobox.List>
++								<Combobox.ListBody>
++									<Combobox.Collection>
++										{ ( item ) => (
++											<Combobox.Item
++												key={ item.id }
++												value={ item }
++											>
++												{ item.value }
++											</Combobox.Item>
++										) }
++									</Combobox.Collection>
++								</Combobox.ListBody>
++							</Combobox.List>
++						</Combobox.Popup>
++					</Combobox.Root>
++				</div>
++			);
++
++			await user.click( screen.getByRole( 'combobox' ) );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++
++			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
++				item
++			);
++		} );
++
++		it( 'should render with a portal by default', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<div data-testid="wrapper">
++					<Combobox.Root items={ ITEMS }>
++						<Combobox.Trigger />
++						<Combobox.Popup>
++							<Combobox.List>
++								<Combobox.ListBody>
++									<Combobox.Collection>
++										{ ( item ) => (
++											<Combobox.Item
++												key={ item.id }
++												value={ item }
++											>
++												{ item.value }
++											</Combobox.Item>
++										) }
++									</Combobox.Collection>
++								</Combobox.ListBody>
++							</Combobox.List>
++						</Combobox.Popup>
++					</Combobox.Root>
++				</div>
++			);
++
++			await user.click( screen.getByRole( 'combobox' ) );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++
++			expect( screen.getByTestId( 'wrapper' ) ).not.toContainElement(
++				item
++			);
++		} );
++	} );
++
++	// Slot is identified by a data attribute, not a user-facing role/text.
++	/* eslint-disable testing-library/no-node-access */
++	describe( 'wp compat overlay slot', () => {
++		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
++
++		// Exercises the public opt-in path rather than poking the flag.
++		function WithSlotEnabled( { children }: { children: ReactNode } ) {
++			useEnableWpCompatOverlaySlot();
++			return <>{ children }</>;
++		}
++
++		afterEach( () => {
++			// The hook is one-way at runtime; reset explicitly between tests.
++			delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
++				.__wpUiCompatOverlaySlotEnabled;
++			document
++				.querySelectorAll( SLOT_SELECTOR )
++				.forEach( ( el ) => el.remove() );
++		} );
++
++		it( 'portals the popup into the slot when the consumer opts in', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<WithSlotEnabled>
++					<Combobox.Root items={ ITEMS }>
++						<Combobox.Trigger />
++						<Combobox.Popup>
++							<Combobox.List>
++								<Combobox.ListBody>
++									<Combobox.Collection>
++										{ ( item ) => (
++											<Combobox.Item
++												key={ item.id }
++												value={ item }
++											>
++												{ item.value }
++											</Combobox.Item>
++										) }
++									</Combobox.Collection>
++								</Combobox.ListBody>
++							</Combobox.List>
++						</Combobox.Popup>
++					</Combobox.Root>
++				</WithSlotEnabled>
++			);
++
++			await user.click( screen.getByRole( 'combobox' ) );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++
++			const slot = document.querySelector( SLOT_SELECTOR );
++			expect( slot ).not.toBeNull();
++			expect( slot ).toContainElement( item );
++		} );
++
++		it( 'does not create a slot when the consumer has not opted in (dormant default)', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Combobox.Root items={ ITEMS }>
++					<Combobox.Trigger />
++					<Combobox.Popup>
++						<Combobox.List>
++							<Combobox.ListBody>
++								<Combobox.Collection>
++									{ ( item ) => (
++										<Combobox.Item
++											key={ item.id }
++											value={ item }
++										>
++											{ item.value }
++										</Combobox.Item>
++									) }
++								</Combobox.Collection>
++							</Combobox.ListBody>
++						</Combobox.List>
++					</Combobox.Popup>
++				</Combobox.Root>
++			);
++
++			await user.click( screen.getByRole( 'combobox' ) );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++
++			expect( document.querySelector( SLOT_SELECTOR ) ).toBeNull();
++		} );
++
++		it( 'lets a caller-supplied portal container override the slot', async () => {
++			const user = userEvent.setup();
++			const containerRef = createRef< HTMLDivElement >();
++
++			render(
++				<WithSlotEnabled>
++					<Combobox.Root items={ ITEMS }>
++						<Combobox.Trigger />
++						<div
++							ref={ containerRef }
++							data-testid="custom-container"
++						/>
++						<Combobox.Popup
++							portal={
++								<Combobox.Portal container={ containerRef } />
++							}
++						>
++							<Combobox.List>
++								<Combobox.ListBody>
++									<Combobox.Collection>
++										{ ( item ) => (
++											<Combobox.Item
++												key={ item.id }
++												value={ item }
++											>
++												{ item.value }
++											</Combobox.Item>
++										) }
++									</Combobox.Collection>
++								</Combobox.ListBody>
++							</Combobox.List>
++						</Combobox.Popup>
++					</Combobox.Root>
++				</WithSlotEnabled>
++			);
++
++			await user.click( screen.getByRole( 'combobox' ) );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
++				item
++			);
++		} );
++	} );
++	/* eslint-enable testing-library/no-node-access */
++
++	describe( 'when disabled', () => {
++		it( 'hides the chip remove button from screen readers', () => {
++			renderDisabledMultiSelect();
++
++			expect(
++				screen.queryByRole( 'button', { name: 'Remove' } )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'hides the clear button from screen readers', () => {
++			renderDisabledMultiSelect();
++
++			expect(
++				screen.queryByRole( 'button', { name: 'Clear' } )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'does not show a tooltip when the chip remove button is hovered', async () => {
++			const user = userEvent.setup( { pointerEventsCheck: 0 } );
++			renderDisabledMultiSelect();
++
++			const removeButton = screen.getByLabelText( 'Remove', {
++				selector: 'button',
++			} );
++			await user.hover( removeButton );
++
++			expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
++		} );
++
++		it( 'does not show a tooltip when the clear button is hovered', async () => {
++			const user = userEvent.setup( { pointerEventsCheck: 0 } );
++			renderDisabledMultiSelect();
++
++			const clearButton = screen.getByLabelText( 'Clear', {
++				selector: 'button',
++			} );
++			await user.hover( clearButton );
++
++			expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
++		} );
++	} );
++} );
+diff --git a/packages/ui/src/form/primitives/combobox/trigger.tsx b/packages/ui/src/form/primitives/combobox/trigger.tsx
+new file mode 100644
+index 00000000000000..ad466b52fca965
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/trigger.tsx
+@@ -0,0 +1,57 @@
++import { Combobox as _Combobox } from '@base-ui/react/combobox';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
++import { chevronDown } from '@wordpress/icons';
++import { Icon } from '../../../icon';
++import focusStyles from '../../../utils/css/focus.module.css';
++import selectTriggerStyles from '../../../utils/css/select-trigger.module.css';
++import { InputLayout } from '../input-layout';
++import type { ComboboxTriggerProps } from './types';
++
++export const Trigger = forwardRef< HTMLButtonElement, ComboboxTriggerProps >(
++	function Trigger(
++		{
++			className,
++			children,
++			size = 'default',
++			placeholder = __( 'Select' ),
++			...restProps
++		},
++		ref
++	) {
++		return (
++			<InputLayout
++				className={ clsx(
++					focusStyles[ 'outset-ring--focus-within-except-active' ],
++					selectTriggerStyles[ 'trigger-wrapper' ],
++					className
++				) }
++				size={ size }
++			>
++				<_Combobox.Trigger
++					{ ...restProps }
++					className={ selectTriggerStyles.trigger }
++					data-can-disable-input-layout
++					ref={ ref }
++				>
++					{
++						// Combobox.Value does not currently render an element, so this
++						// wrapper lets it share the same trigger text styles as Select.
++						// See https://github.com/mui/base-ui/issues/4864
++					 }
++					<div className={ selectTriggerStyles[ 'trigger-value' ] }>
++						<_Combobox.Value placeholder={ placeholder }>
++							{ children }
++						</_Combobox.Value>
++					</div>
++					<Icon
++						className={ selectTriggerStyles[ 'trigger-caret' ] }
++						icon={ chevronDown }
++						size={ 18 }
++					/>
++				</_Combobox.Trigger>
++			</InputLayout>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/combobox/types.ts b/packages/ui/src/form/primitives/combobox/types.ts
+new file mode 100644
+index 00000000000000..ed770ec2463022
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/types.ts
+@@ -0,0 +1,124 @@
++import type { Combobox as _Combobox } from '@base-ui/react/combobox';
++import type { ReactElement } from 'react';
++
++import type { ComponentProps } from '../../../utils/types';
++import type { InputLayoutProps } from '../input-layout/types';
++
++type ComboboxSize = Exclude< InputLayoutProps[ 'size' ], 'small' >;
++
++export type ComboboxChipsProps = ComponentProps< typeof _Combobox.Chips > & {
++	children?: React.ReactNode;
++};
++
++export type ComboboxChipWithRemoveProps = Omit<
++	ComponentProps< typeof _Combobox.Chip >,
++	// Replace the native HTML `prefix` attribute.
++	'prefix'
++> & {
++	children?: React.ReactNode;
++	/**
++	 * Circular element to render before the chip content.
++	 */
++	prefix?: React.ReactNode;
++	/**
++	 * Accessible label for the remove button.
++	 *
++	 * @default __( 'Remove' )
++	 */
++	removeLabel?: string;
++};
++
++export type ComboboxClearProps = ComponentProps< typeof _Combobox.Clear > & {
++	children?: React.ReactNode;
++};
++
++export type ComboboxCollectionProps = _Combobox.Collection.Props;
++
++export type ComboboxEmptyProps = ComponentProps< typeof _Combobox.Empty > & {
++	children?: React.ReactNode;
++};
++
++export type ComboboxInputProps = Omit<
++	ComponentProps< typeof _Combobox.Input >,
++	'size'
++>;
++
++export type ComboboxItemProps = ComponentProps< typeof _Combobox.Item > & {
++	children?: React.ReactNode;
++	/**
++	 * The size of the item.
++	 *
++	 * @default 'default'
++	 */
++	size?: ComboboxSize;
++	/**
++	 * The variant of the item.
++	 *
++	 * - `'default'`: A standard item.
++	 * - `'creatable'`: An item that triggers the creation of a new item.
++	 *
++	 * @default 'default'
++	 */
++	variant?: 'default' | 'creatable';
++};
++
++export type ComboboxListProps = ComponentProps< typeof _Combobox.List > & {
++	children?: _Combobox.List.Props[ 'children' ];
++};
++
++export type ComboboxListBodyProps = ComponentProps< 'div' > & {
++	children?: React.ReactNode;
++};
++
++export type ComboboxListFooterProps = ComponentProps< 'div' > & {
++	children?: React.ReactNode;
++};
++
++export type PortalProps = ComponentProps< typeof _Combobox.Portal >;
++
++export type PositionerProps = ComponentProps< typeof _Combobox.Positioner >;
++
++export type ComboboxPopupProps = ComponentProps< typeof _Combobox.Popup > & {
++	children?: React.ReactNode;
++	/**
++	 * Optional portal element, typically `<Combobox.Portal />` with custom
++	 * `container`. When omitted, `Combobox.Popup` uses `Combobox.Portal` with
++	 * default props. Do not pass `children` on the portal element; they would be
++	 * ignored.
++	 */
++	portal?: ReactElement< Omit< PortalProps, 'children' > >;
++	/**
++	 * Optional positioner element, typically `<Combobox.Positioner />` with
++	 * custom positioning props (`side`, `align`, `sideOffset`, collision
++	 * settings, etc.). When omitted, `Combobox.Popup` uses
++	 * `Combobox.Positioner` with default props. Do not pass `children` on the
++	 * positioner element; they would be ignored.
++	 */
++	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
++};
++
++export type ComboboxRootProps<
++	Value,
++	Multiple extends boolean | undefined = false,
++> = _Combobox.Root.Props< Value, Multiple >;
++
++export type ComboboxTriggerProps = ComponentProps<
++	typeof _Combobox.Trigger
++> & {
++	children?: _Combobox.Value.Props[ 'children' ];
++	/**
++	 * Text to show when no value is selected.
++	 * This is overridden by `children` if specified, or by a null item's label in `items`.
++	 *
++	 * @default __( 'Select' )
++	 */
++	placeholder?: _Combobox.Value.Props[ 'placeholder' ];
++	/**
++	 * The size of the trigger.
++	 *
++	 * @default 'default'
++	 */
++	size?: ComboboxSize;
++};
++
++export type ComboboxValueProps = _Combobox.Value.Props;
+diff --git a/packages/ui/src/form/primitives/combobox/value.tsx b/packages/ui/src/form/primitives/combobox/value.tsx
+new file mode 100644
+index 00000000000000..5b9df17af2114f
+--- /dev/null
++++ b/packages/ui/src/form/primitives/combobox/value.tsx
+@@ -0,0 +1,6 @@
++import { Combobox as _Combobox } from '@base-ui/react/combobox';
++import type { ComboboxValueProps } from './types';
++
++export function Value( props: ComboboxValueProps ) {
++	return <_Combobox.Value { ...props } />;
++}
+diff --git a/packages/ui/src/form/primitives/constants.ts b/packages/ui/src/form/primitives/constants.ts
+index b35c8f9877000a..18bf509a05d119 100644
+--- a/packages/ui/src/form/primitives/constants.ts
++++ b/packages/ui/src/form/primitives/constants.ts
+@@ -1,10 +1,5 @@
+ /**
+- * Shared positioning defaults for item-list popups. Consumed as individual
+- * default values by `Select.Positioner` and `Autocomplete.Positioner`. Each
+- * key is validated by the consuming positioner's prop types at the use
+- * site, so a value here that does not satisfy either Base UI positioner's
+- * type will surface as a type error in `select/positioner.tsx` or
+- * `autocomplete/positioner.tsx`.
++ * Shared positioning defaults for item-list popups, e.g. Select or Combobox.
+  */
+ export const ITEM_POPUP_POSITIONER_PROPS = {
+ 	align: 'start',
+diff --git a/packages/ui/src/form/primitives/index.ts b/packages/ui/src/form/primitives/index.ts
+index b8cdf7d6eb8ed4..878c6a351d0e0c 100644
+--- a/packages/ui/src/form/primitives/index.ts
++++ b/packages/ui/src/form/primitives/index.ts
+@@ -1,4 +1,5 @@
+ export * as Autocomplete from './autocomplete';
++export * as Combobox from './combobox';
+ export * as Field from './field';
+ export * as Fieldset from './fieldset';
+ export { Input } from './input';
+diff --git a/packages/ui/src/form/primitives/input-layout/types.ts b/packages/ui/src/form/primitives/input-layout/types.ts
+index c7d3024b2df48f..7e5927a5c4e044 100644
+--- a/packages/ui/src/form/primitives/input-layout/types.ts
++++ b/packages/ui/src/form/primitives/input-layout/types.ts
+@@ -7,6 +7,8 @@ export interface InputLayoutProps
+ 	/**
+ 	 * The size of the field.
+ 	 *
++	 * The 'small' size is reserved for rare use cases. Most components should not support it.
++	 *
+ 	 * @default 'default'
+ 	 */
+ 	size?: 'default' | 'compact' | 'small';
+diff --git a/packages/ui/src/form/primitives/select/item.tsx b/packages/ui/src/form/primitives/select/item.tsx
+index 7772c471079026..392b8ad8ad78eb 100644
+--- a/packages/ui/src/form/primitives/select/item.tsx
++++ b/packages/ui/src/form/primitives/select/item.tsx
+@@ -27,6 +27,7 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
+ 				<Icon
+ 					icon={ check }
+ 					className={ clsx(
++						itemPopupStyles[ 'item-icon' ],
+ 						itemPopupStyles[ 'item-indicator-icon' ]
+ 					) }
+ 					size={ size === 'small' ? 20 : 24 }
+diff --git a/packages/ui/src/form/primitives/select/test/index.test.tsx b/packages/ui/src/form/primitives/select/test/index.test.tsx
+index 0ed0161ef330ec..c339a20014c5d4 100644
+--- a/packages/ui/src/form/primitives/select/test/index.test.tsx
++++ b/packages/ui/src/form/primitives/select/test/index.test.tsx
+@@ -1,4 +1,4 @@
+-import { render, screen, within } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ import { createRef } from '@wordpress/element';
+ import type { ReactNode } from 'react';
+@@ -80,10 +80,7 @@ describe( 'Select', () => {
+ 			</Select.Root>
+ 		);
+ 
+-		const placeholder = screen.getByText( 'Select' );
+-
+ 		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent( 'Select' );
+-		expect( placeholder ).toHaveAttribute( 'data-placeholder' );
+ 	} );
+ 
+ 	it( 'supports custom placeholder text', () => {
+@@ -96,30 +93,9 @@ describe( 'Select', () => {
+ 			</Select.Root>
+ 		);
+ 
+-		const placeholder = screen.getByText( 'Choose an item' );
+-
+ 		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent(
+ 			'Choose an item'
+ 		);
+-		expect( placeholder ).toHaveAttribute( 'data-placeholder' );
+-	} );
+-
+-	it( 'does not use placeholder styling when a value is selected', () => {
+-		render(
+-			<Select.Root defaultValue="Item 1">
+-				<Select.Trigger />
+-				<Select.Popup>
+-					<Select.Item value="Item 1" />
+-				</Select.Popup>
+-			</Select.Root>
+-		);
+-
+-		const trigger = screen.getByRole( 'combobox' );
+-
+-		expect( trigger ).toHaveTextContent( 'Item 1' );
+-		expect( within( trigger ).getByText( 'Item 1' ) ).not.toHaveAttribute(
+-			'data-placeholder'
+-		);
+ 	} );
+ 
+ 	it( 'forwards ref', async () => {
+diff --git a/packages/ui/src/utils/css/item-popup.module.css b/packages/ui/src/utils/css/item-popup.module.css
+index 7b966d45ab4e37..5f9a7e59aa6af4 100644
+--- a/packages/ui/src/utils/css/item-popup.module.css
++++ b/packages/ui/src/utils/css/item-popup.module.css
+@@ -4,7 +4,7 @@
+ 	.popup {
+ 		composes: dropdown-motion from "./dropdown-motion.module.css";
+ 
+-		--wp-ui-popup-padding: 4px;
++		--wp-ui-popup-padding: var(--wpds-dimension-padding-xs);
+ 
+ 		display: grid;
+ 		grid-template-rows: auto minmax(0, 1fr);
+@@ -49,11 +49,10 @@
+ 		}
+ 	}
+ 
+-	/* TODO: Use padding token */
+ 	.item {
+ 		--wp-ui-popup-item-height: 40px;
+-		--wp-ui-popup-item-padding-inline: 12px;
+-		--wp-ui-popup-item-padding-block: 4px;
++		--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-md);
++		--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
+ 
+ 		display: flex;
+ 		align-items: center;
+@@ -66,7 +65,7 @@
+ 		padding-block: var(--wp-ui-popup-item-padding-block);
+ 
+ 		/* Optically adjust the prefix icon to a more balanced position. */
+-		padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - 4px);
++		padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - var(--wpds-dimension-padding-xs));
+ 		padding-inline-end: var(--wp-ui-popup-item-padding-inline);
+ 
+ 		&:not([data-disabled]) {
+@@ -75,12 +74,12 @@
+ 
+ 		&.is-size-compact {
+ 			--wp-ui-popup-item-height: 32px;
+-			--wp-ui-popup-item-padding-inline: 8px;
++			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
+ 		}
+ 
+ 		&.is-size-small {
+ 			--wp-ui-popup-item-height: 24px;
+-			--wp-ui-popup-item-padding-inline: 8px;
++			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
+ 			--wp-ui-popup-item-padding-block: 2px;
+ 		}
+ 
+@@ -109,7 +108,7 @@
+ 		}
+ 	}
+ 
+-	.item-indicator-icon {
++	.item-icon {
+ 		flex-shrink: 0;
+ 	}
+ 
+@@ -117,7 +116,7 @@
+ 	on the .list beneath it (both share grid-area: main and overlap). */
+ 	.empty:not(:empty) {
+ 		--wp-ui-popup-empty-min-height: 40px;
+-		--wp-ui-popup-empty-padding-inline: 12px;
++		--wp-ui-popup-empty-padding-inline: var(--wpds-dimension-padding-md);
+ 
+ 		grid-area: main;
+ 		display: flex;
+diff --git a/packages/ui/src/utils/css/select-trigger.module.css b/packages/ui/src/utils/css/select-trigger.module.css
+index b0e3271deb2fdd..bb46e067c6d955 100644
+--- a/packages/ui/src/utils/css/select-trigger.module.css
++++ b/packages/ui/src/utils/css/select-trigger.module.css
+@@ -51,7 +51,8 @@
+ 		text-overflow: ellipsis;
+ 		white-space: nowrap;
+ 
+-		&[data-placeholder] {
++		/* Supports placeholder styling for both Select and Combobox triggers. */
++		.trigger[data-placeholder] & {
+ 			color: var(--wpds-color-fg-interactive-neutral-disabled);
+ 		}
+ 	}
+diff --git a/storybook/stories/playground/wp-compat-overlay-slot.story.jsx b/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
+index 9407afffb59340..ffe5df9321e3d6 100644
+--- a/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
++++ b/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
+@@ -1,16 +1,13 @@
+-/**
+- * WordPress dependencies
+- */
+ import { Modal, Popover, Button } from '@wordpress/components';
+ import { useState } from '@wordpress/element';
++import {
++	Autocomplete,
++	Combobox,
++	Select,
++	SelectControl,
++	Tooltip,
++} from '@wordpress/ui';
+ 
+-/**
+- * Internal dependencies
+- */
+-import * as Tooltip from '../../../packages/ui/src/tooltip';
+-import * as Select from '../../../packages/ui/src/form/primitives/select';
+-import { SelectControl } from '../../../packages/ui/src/form/select-control';
+-import * as Autocomplete from '../../../packages/ui/src/form/primitives/autocomplete';
+ import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
+ 
+ const selectItems = [
+@@ -25,10 +22,15 @@ const autocompleteItems = [
+ 	{ id: '3', value: 'Item 3' },
+ ];
+ 
++const inputWrapperStyle = {
++	padding:
++		'var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-xs)',
++};
++
+ // Cross-library stacking: `@wordpress/ui` overlays (`Tooltip`, `Select`,
+-// `SelectControl`, `Autocomplete`) inside a `@wordpress/components`
+-// Modal / Popover should sit above the components-side overlay via the
+-// compat overlay slot.
++// `Combobox`, `SelectControl`, `Autocomplete`) inside a
++// `@wordpress/components` Modal / Popover should sit above the
++// components-side overlay via the compat overlay slot.
+ export default {
+ 	title: 'Playground/Debug fixtures/WP Compat Overlay Slot',
+ 	decorators: [ WithWpCompatOverlaySlot ],
+@@ -83,6 +85,37 @@ export const InsideComponentsModal = {
+ 							</Select.Root>
+ 						</div>
+ 
++						<div style={ { marginTop: '1rem' } }>
++							<Combobox.Root
++								defaultValue={ selectItems[ 0 ] }
++								items={ selectItems }
++							>
++								<Combobox.Trigger aria-label="Combobox primitive" />
++								<Combobox.Popup>
++									<div style={ inputWrapperStyle }>
++										<Combobox.Input placeholder="Search" />
++									</div>
++									<Combobox.Empty>
++										No results found.
++									</Combobox.Empty>
++									<Combobox.List>
++										<Combobox.ListBody>
++											<Combobox.Collection>
++												{ ( item ) => (
++													<Combobox.Item
++														key={ item.value }
++														value={ item }
++													>
++														{ item.label }
++													</Combobox.Item>
++												) }
++											</Combobox.Collection>
++										</Combobox.ListBody>
++									</Combobox.List>
++								</Combobox.Popup>
++							</Combobox.Root>
++						</div>
++
+ 						<div style={ { marginTop: '1rem' } }>
+ 							<SelectControl
+ 								label="SelectControl"
+@@ -175,6 +208,37 @@ export const InsideComponentsPopover = {
+ 								</Select.Root>
+ 							</div>
+ 
++							<div style={ { marginTop: '1rem' } }>
++								<Combobox.Root
++									defaultValue={ selectItems[ 0 ] }
++									items={ selectItems }
++								>
++									<Combobox.Trigger aria-label="Combobox primitive" />
++									<Combobox.Popup>
++										<div style={ inputWrapperStyle }>
++											<Combobox.Input placeholder="Search" />
++										</div>
++										<Combobox.Empty>
++											No results found.
++										</Combobox.Empty>
++										<Combobox.List>
++											<Combobox.ListBody>
++												<Combobox.Collection>
++													{ ( item ) => (
++														<Combobox.Item
++															key={ item.value }
++															value={ item }
++														>
++															{ item.label }
++														</Combobox.Item>
++													) }
++												</Combobox.Collection>
++											</Combobox.ListBody>
++										</Combobox.List>
++									</Combobox.Popup>
++								</Combobox.Root>
++							</div>
++
+ 							<div style={ { marginTop: '1rem' } }>
+ 								<SelectControl
+ 									label="SelectControl"

@@ -1,0 +1,1946 @@
+diff --git a/packages/components/src/flex/block.js b/packages/components/src/flex/block.js
+index adcded360dbb30..ffe3ad85030f51 100644
+--- a/packages/components/src/flex/block.js
++++ b/packages/components/src/flex/block.js
+@@ -2,20 +2,29 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+ import { Block } from './styles/flex-styles';
++import { withNextFlexBlock } from './next';
+ 
+ /**
+- * WordPress dependencies
++ * @typedef {import('react').HTMLProps<HTMLDivElement> & import('react').RefAttributes<HTMLDivElement>} Props
+  */
+-import { forwardRef } from '@wordpress/element';
+ 
++/**
++ * @param {Props} props
++ * @param {import('react').Ref<HTMLDivElement>} ref
++ */
+ function FlexBlock( { className, ...props }, ref ) {
+ 	const classes = classnames( 'components-flex__block', className );
+ 
+ 	return <Block { ...props } className={ classes } ref={ ref } />;
+ }
+ 
+-export default forwardRef( FlexBlock );
++export default withNextFlexBlock( forwardRef( FlexBlock ) );
+diff --git a/packages/components/src/flex/index.js b/packages/components/src/flex/index.js
+index 98f188db0254dc..4da5e5425baad6 100644
+--- a/packages/components/src/flex/index.js
++++ b/packages/components/src/flex/index.js
+@@ -12,10 +12,27 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { Flex as BaseFlex } from './styles/flex-styles';
++import { withNextFlex } from './next';
+ 
+ export { default as FlexBlock } from './block';
+ export { default as FlexItem } from './item';
+ 
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @typedef OwnProps
++ * @property {import('react').CSSProperties['alignItems'] | 'top' | 'bottom'} [align='center'] Sets align-items. Top and bottom are shorthand for flex-start and flex-end respectively.
++ * @property {number} [gap=2] Determines the spacing in between children components. The `gap` value is a multiplier to the base value of `4`.
++ * @property {import('react').CSSProperties['justifyContent'] | 'left' | 'right'} [justify='space-between']          * Sets jusifty-content. Left and right are shorthand for flex-start and flex-end respectively, not the actual CSS value.
++ * @property {boolean} [isReversed=false] Reversed the flex direction.
++ */
++/* eslint-enable jsdoc/valid-types */
++
++/** @typedef {OwnProps & import('react').HTMLProps<HTMLDivElement> & import('react').RefAttributes<HTMLDivElement>} Props */
++
++/**
++ * @param {Props} props
++ * @param {import('react').Ref<HTMLDivElement>} ref
++ */
+ function FlexComponent(
+ 	{
+ 		align = 'center',
+@@ -42,6 +59,6 @@ function FlexComponent(
+ 	);
+ }
+ 
+-export const Flex = forwardRef( FlexComponent );
++export const Flex = withNextFlex( forwardRef( FlexComponent ) );
+ 
+ export default Flex;
+diff --git a/packages/components/src/flex/item.js b/packages/components/src/flex/item.js
+index 9112d010c1f0ca..26ac665ae4ea91 100644
+--- a/packages/components/src/flex/item.js
++++ b/packages/components/src/flex/item.js
+@@ -3,20 +3,29 @@
+  */
+ import classnames from 'classnames';
+ 
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+ import { Item } from './styles/flex-styles';
++import { withNextFlexItem } from './next';
+ 
+ /**
+- * WordPress dependencies
++ * @typedef {import('react').RefAttributes<HTMLDivElement> & import('react').HTMLProps<HTMLDivElement>} Props
+  */
+-import { forwardRef } from '@wordpress/element';
+ 
++/**
++ * @param {Props} props
++ * @param {import('react').Ref<HTMLDivElement>} ref
++ */
+ function FlexItem( { className, ...props }, ref ) {
+ 	const classes = classnames( 'components-flex__item', className );
+ 
+ 	return <Item { ...props } className={ classes } ref={ ref } />;
+ }
+ 
+-export default forwardRef( FlexItem );
++export default withNextFlexItem( forwardRef( FlexItem ) );
+diff --git a/packages/components/src/flex/next.js b/packages/components/src/flex/next.js
+new file mode 100644
+index 00000000000000..541b01be1f41f6
+--- /dev/null
++++ b/packages/components/src/flex/next.js
+@@ -0,0 +1,75 @@
++/**
++ * Internal dependencies
++ */
++import { withNext } from '../ui/context';
++import {
++	Flex as NextFlex,
++	FlexItem as NextFlexItem,
++	FlexBlock as NextFlexBlock,
++} from '../ui/flex';
++
++const Flex = process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextFlex : undefined;
++const FlexBlock =
++	process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextFlexBlock : undefined;
++const FlexItem =
++	process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextFlexItem : undefined;
++
++/**
++ * @param {import('./index').Props} props Current props.
++ * @return {import('../ui/flex/types').FlexProps} Next props.
++ */
++const flexAdapter = ( { isReversed, ...restProps } ) => ( {
++	// There's no equivalent for `direction` on the original component so we can just translate `isReversed` to it
++	direction: isReversed ? 'row-reverse' : 'row',
++	...restProps,
++	// There's an HTML attribute named `wrap` that will exist in `restProps` so we need to set it to undefined so the default behavior of the next component takes over
++	wrap: undefined,
++} );
++
++/**
++ * @param {import('./item').Props} props Current props.
++ * @return {import('../ui/flex/types').FlexItemProps} Next props.
++ */
++const flexItemAdapter = ( props ) => ( {
++	...props,
++	// ensure these are undefined so the default takes over
++	isBlock: undefined,
++	display: undefined,
++} );
++
++/**
++ * @param {import('./block').Props} props Current props.
++ * @return {import('../ui/flex/types').FlexBlockProps} Next props.
++ */
++const flexBlockAdapter = ( props ) => ( {
++	...props,
++	// ensure this is undefined so the default takes over
++	display: undefined,
++} );
++
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param {import('react').ForwardRefExoticComponent<import('./index').Props>} Current
++ */
++/* eslint-enable jsdoc/valid-types */
++export function withNextFlex( Current ) {
++	return withNext( Current, Flex, 'WPComponentsFlex', flexAdapter );
++}
++
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param {import('react').ForwardRefExoticComponent<import('./item').Props>} Current
++ */
++/* eslint-enable jsdoc/valid-types */
++export function withNextFlexItem( Current ) {
++	return withNext( Current, FlexItem, 'WPComponentsFlex', flexItemAdapter );
++}
++
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param {import('react').ForwardRefExoticComponent<import('./block').Props>} Current
++ */
++/* eslint-enable jsdoc/valid-types */
++export function withNextFlexBlock( Current ) {
++	return withNext( Current, FlexBlock, 'WPComponentsFlex', flexBlockAdapter );
++}
+diff --git a/packages/components/src/flex/styles/flex-styles.js b/packages/components/src/flex/styles/flex-styles.js
+index 89ba8383584f9d..1ff2fdeb89ba53 100644
+--- a/packages/components/src/flex/styles/flex-styles.js
++++ b/packages/components/src/flex/styles/flex-styles.js
+@@ -4,26 +4,39 @@
+ import { css } from '@emotion/core';
+ import styled from '@emotion/styled';
+ 
++/**
++ * @param {import('..').OwnProps} props
++ */
+ const alignStyle = ( { align } ) => {
++	if ( align === undefined ) return '';
++
+ 	const aligns = {
+ 		top: 'flex-start',
+ 		bottom: 'flex-end',
+ 	};
+-	const value = aligns[ align ] || align;
++
++	const value = aligns[ /** @type {'top' | 'bottom'} */ ( align ) ] || align;
+ 
+ 	return css( {
+ 		alignItems: value,
+ 	} );
+ };
+ 
++/**
++ * @param {import('..').OwnProps} props
++ */
+ const justifyStyle = ( { justify, isReversed } ) => {
+ 	const justifies = {
+ 		left: 'flex-start',
+ 		right: 'flex-end',
+ 	};
+-	let value = justifies[ justify ] || justify;
++	let value =
++		justifies[ /** @type {'left' | 'right'} */ ( justify ) ] || justify;
+ 
+-	if ( isReversed && justifies[ justify ] ) {
++	if (
++		isReversed &&
++		justifies[ /** @type {'left' | 'right'} */ ( justify ) ]
++	) {
+ 		value = justify === 'left' ? justifies.right : justifies.left;
+ 	}
+ 
+@@ -32,6 +45,9 @@ const justifyStyle = ( { justify, isReversed } ) => {
+ 	} );
+ };
+ 
++/**
++ * @param {import('..').OwnProps} Props
++ */
+ const gapStyle = ( { gap, isReversed } ) => {
+ 	const base = 4;
+ 	const value = typeof gap === 'number' ? base * gap : base;
+@@ -49,6 +65,9 @@ const gapStyle = ( { gap, isReversed } ) => {
+ 	`;
+ };
+ 
++/**
++ * @param {import('..').OwnProps} props
++ */
+ const reversedStyles = ( { isReversed } ) => {
+ 	if ( ! isReversed ) return '';
+ 
+@@ -64,8 +83,8 @@ export const Flex = styled.div`
+ 
+ 	${ alignStyle }
+ 	${ justifyStyle }
+-	${ gapStyle }
+ 	${ reversedStyles }
++	${ gapStyle }
+ `;
+ 
+ export const Item = styled.div`
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index c726e1ed523c69..764aece8cbef05 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -9,7 +9,7 @@ import { isNumber, isString } from 'lodash';
+ import { __ } from '@wordpress/i18n';
+ import { useInstanceId } from '@wordpress/compose';
+ import { textColor } from '@wordpress/icons';
+-import { useMemo } from '@wordpress/element';
++import { useMemo, forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -177,4 +177,4 @@ function FontSizePicker(
+ 	);
+ }
+ 
+-export default withNextComponent( FontSizePicker );
++export default withNextComponent( forwardRef( FontSizePicker ) );
+diff --git a/packages/components/src/input-control/input-base.js b/packages/components/src/input-control/input-base.js
+index 49ce733912b496..fd47c76473a60d 100644
+--- a/packages/components/src/input-control/input-base.js
++++ b/packages/components/src/input-control/input-base.js
+@@ -43,6 +43,7 @@ export function InputBase(
+ 	ref
+ ) {
+ 	const id = useUniqueId( idProp );
++	const hideLabel = hideLabelFromVision || ! label;
+ 
+ 	return (
+ 		<Root
+@@ -51,6 +52,7 @@ export function InputBase(
+ 			isFocused={ isFocused }
+ 			labelPosition={ labelPosition }
+ 			ref={ ref }
++			__unstableVersion="next"
+ 		>
+ 			<LabelWrapper>
+ 				<Label
+@@ -67,6 +69,7 @@ export function InputBase(
+ 				__unstableInputWidth={ __unstableInputWidth }
+ 				className="components-input-control__container"
+ 				disabled={ disabled }
++				hideLabel={ hideLabel }
+ 				isFocused={ isFocused }
+ 				labelPosition={ labelPosition }
+ 			>
+diff --git a/packages/components/src/input-control/styles/input-control-styles.js b/packages/components/src/input-control/styles/input-control-styles.js
+index 9db09301666f81..6ebb621c788cb7 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.js
++++ b/packages/components/src/input-control/styles/input-control-styles.js
+@@ -59,6 +59,11 @@ const containerDisabledStyles = ( { disabled } ) => {
+ 	return css( { backgroundColor } );
+ };
+ 
++// Normalizes the margins from the <Flex /> (components/ui/flex/) container.
++const containerMarginStyles = ( { hideLabel } ) => {
++	return hideLabel ? css( { margin: '0 !important' } ) : null;
++};
++
+ const containerWidthStyles = ( { __unstableInputWidth, labelPosition } ) => {
+ 	if ( ! __unstableInputWidth ) return css( { width: '100%' } );
+ 
+@@ -82,6 +87,7 @@ export const Container = styled.div`
+ 	position: relative;
+ 
+ 	${ containerDisabledStyles }
++	${ containerMarginStyles }
+ 	${ containerWidthStyles }
+ `;
+ 
+diff --git a/packages/components/src/text/index.js b/packages/components/src/text/index.js
+index fb815c5571d84b..e6eb39c0c6cb34 100644
+--- a/packages/components/src/text/index.js
++++ b/packages/components/src/text/index.js
+@@ -17,4 +17,5 @@ const Text = styled.p(
+ 	text
+ );
+ 
++// @ts-ignore Text _is_ forwarded ref but the styled component definition doesn't include $$typeof so we'll just ignore it here
+ export default withNextComponent( Text );
+diff --git a/packages/components/src/text/next.js b/packages/components/src/text/next.js
+index 04936258945912..a818f51cbe0cd0 100644
+--- a/packages/components/src/text/next.js
++++ b/packages/components/src/text/next.js
+@@ -29,7 +29,7 @@ export const adapter = ( { as, variant, ...restProps } ) => ( {
+ 
+ /* eslint-disable jsdoc/valid-types */
+ /**
+- * @param {import('react').ComponentType<AdaptedTextProps>} Current
++ * @param {import('react').ForwardRefExoticComponent<AdaptedTextProps>} Current
+  */
+ /* eslint-enable jsdoc/valid-types */
+ export function withNextComponent( Current ) {
+diff --git a/packages/components/src/ui/context/with-next.js b/packages/components/src/ui/context/with-next.js
+index a0b7770f582be0..88701c4480943e 100644
+--- a/packages/components/src/ui/context/with-next.js
++++ b/packages/components/src/ui/context/with-next.js
+@@ -6,13 +6,13 @@ import { contextConnect, useContextSystem } from '@wp-g2/context';
+ /**
+  * @template {{}} TCurrentProps
+  * @template {{}} TNextProps
+- * @param {import('react').ComponentType<TCurrentProps>} CurrentComponent
++ * @param {import('react').ForwardRefExoticComponent<TCurrentProps>} CurrentComponent
+  * @param {import('react').ComponentType<TNextProps>} NextComponent
+  * @param {string} namespace
+  * @param {(props: TCurrentProps) => TNextProps} adapter
+  */
+ export function withNext(
+-	CurrentComponent = () => null,
++	CurrentComponent,
+ 	NextComponent = () => null,
+ 	namespace = 'Component',
+ 	adapter = ( p ) => /** @type {any} */ ( p )
+diff --git a/packages/components/src/ui/flex/README.md b/packages/components/src/ui/flex/README.md
+new file mode 100644
+index 00000000000000..5b40592e00301f
+--- /dev/null
++++ b/packages/components/src/ui/flex/README.md
+@@ -0,0 +1,156 @@
++# Flex
++
++`Flex` is a primitive layout component that adaptively aligns child content horizontally or vertically. `Flex` powers components like `HStack` and `VStack`.
++
++## Usage
++
++`Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
++
++```jsx live
++import { Flex, FlexItem, FlexBlock, Text, View } from '@wordpress/components/ui';
++
++function Example() {
++	return (
++		<Flex>
++			<FlexItem>
++				<View css={[ui.background.blue]}>
++					<Text>Ana</Text>
++				</View>
++			</FlexItem>
++			<FlexBlock>
++				<View css={[ui.background.blue]}>
++					<Text>Elsa</Text>
++				</View>
++			</FlexBlock>
++		</Flex>
++	);
++}
++```
++
++## Props
++
++##### align
++
++**Type**: `CSS['alignItems']`
++
++Aligns children using CSS Flexbox `align-items`. Vertically aligns content if the `direction` is `row`, or horizontally aligns content if the `direction` is `column`.
++
++In the example below, `flex-start` will align the children content to the top.
++
++##### direction
++
++**Type**: `FlexDirection`
++
++The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
++
++```jsx live
++import { Flex, Text, View } from '@wordpress/components/ui';
++import { ui } from '@wp-g2/styles';
++
++function Example() {
++	return (
++		<Flex direction="column">
++			<View css={[ui.background.blue]}>
++				<Text>Ana</Text>
++			</View>
++			<View css={[ui.background.blue]}>
++				<Text>Elsa</Text>
++			</View>
++		</Flex>
++	);
++}
++```
++
++##### expanded
++
++**Type**: `boolean`
++
++Expands to the maximum available width (if horizontal) or height (if vertical).
++
++```jsx live
++import { Flex, Text, View } from '@wordpress/components/ui';
++import { ui } from '@wp-g2/styles';
++
++function Example() {
++	return (
++		<Flex direction="row" expanded>
++			<View css={[ui.background.blue]}>
++				<Text>Ana</Text>
++			</View>
++			<View css={[ui.background.blue]}>
++				<Text>Elsa</Text>
++			</View>
++		</Flex>
++	);
++}
++```
++
++##### gap
++
++**Type**: `number`
++
++Spacing in between each child can be adjusted by using `gap`. The value of `gap` works as a multiplier to the library's grid system (base of `4px`).
++
++```jsx live
++import { Flex, Text, View } from '@wordpress/components/ui';
++import { ui } from '@wp-g2/styles';
++
++function Example() {
++	return (
++		<Flex justify="flex-start" gap={8}>
++			<View css={[ui.background.blue]}>
++				<Text>Ana</Text>
++			</View>
++			<View css={[ui.background.blue]}>
++				<Text>Elsa</Text>
++			</View>
++		</Flex>
++	);
++}
++```
++
++##### justify
++
++**Type**: `CSS['justifyContent']`
++
++Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
++In the example below, `flex-start` will align the children content to the left.
++
++##### wrap
++
++**Type**: `boolean`
++
++Determines if children should wrap.
++
++```jsx live
++import { Flex, Text, View } from '@wordpress/components/ui';
++import { ui } from '@wp-g2/styles';
++
++function Example() {
++	return (
++		<Flex justify="flex-start" wrap>
++			<View css={[ui.background.blue, { width: 200 }]}>
++				<Text>Ana</Text>
++			</View>
++			<View css={[ui.background.blue, { width: 200 }]}>
++				<Text>Elsa</Text>
++			</View>
++			<View css={[ui.background.blue, { width: 200 }]}>
++				<Text>Olaf</Text>
++			</View>
++			<View css={[ui.background.blue, { width: 200 }]}>
++				<Text>Kristoff</Text>
++			</View>
++			<View css={[ui.background.blue, { width: 200 }]}>
++				<Text>Queen Iduna</Text>
++			</View>
++			<View css={[ui.background.blue, { width: 200 }]}>
++				<Text>King Agnarr</Text>
++			</View>
++			<View css={[ui.background.blue, { width: 200 }]}>
++				<Text>Yelena</Text>
++			</View>
++		</Flex>
++	);
++}
++```
+diff --git a/packages/components/src/ui/flex/flex-block.js b/packages/components/src/ui/flex/flex-block.js
+new file mode 100644
+index 00000000000000..a3d87336ac964c
+--- /dev/null
++++ b/packages/components/src/ui/flex/flex-block.js
+@@ -0,0 +1,23 @@
++/**
++ * Internal dependencies
++ */
++import { createComponent } from '../utils';
++import { useFlexBlock } from './use-flex-block';
++
++/**
++ * `FlexBlock` is a primitive layout component that adaptively resizes content within layout containers like `Flex`.
++ *
++ * @example
++ * ```jsx
++ * <Flex>
++ * 	<FlexBlock>...</FlexBlock>
++ * </Flex>
++ * ```
++ */
++const FlexBlock = createComponent( {
++	as: 'div',
++	useHook: useFlexBlock,
++	name: 'FlexBlock',
++} );
++
++export default FlexBlock;
+diff --git a/packages/components/src/ui/flex/flex-item.js b/packages/components/src/ui/flex/flex-item.js
+new file mode 100644
+index 00000000000000..c65636fc74c7ab
+--- /dev/null
++++ b/packages/components/src/ui/flex/flex-item.js
+@@ -0,0 +1,23 @@
++/**
++ * Internal dependencies
++ */
++import { createComponent } from '../utils';
++import { useFlexItem } from './use-flex-item';
++
++/**
++ * `FlexItem` is a primitive layout component that aligns content within layout containers like `Flex`.
++ *
++ * @example
++ * ```jsx
++ * <Flex>
++ * 	<FlexItem>...</FlexItem>
++ * </Flex>
++ * ```
++ */
++const FlexItem = createComponent( {
++	as: 'div',
++	useHook: useFlexItem,
++	name: 'FlexItem',
++} );
++
++export default FlexItem;
+diff --git a/packages/components/src/ui/flex/flex-styles.js b/packages/components/src/ui/flex/flex-styles.js
+new file mode 100644
+index 00000000000000..532b5e5ebfe5bc
+--- /dev/null
++++ b/packages/components/src/ui/flex/flex-styles.js
+@@ -0,0 +1,44 @@
++/**
++ * External dependencies
++ */
++import { css } from '@wp-g2/styles';
++
++export const Flex = css`
++	display: flex;
++`;
++
++export const Item = css`
++	display: block;
++	max-height: 100%;
++	max-width: 100%;
++	min-height: 0;
++	min-width: 0;
++`;
++
++export const block = css`
++	flex: 1;
++`;
++
++/**
++ * Workaround to optimize DOM rendering.
++ * We'll enhance alignment with naive parent flex assumptions.
++ *
++ * Trade-off:
++ * Far less DOM less. However, UI rendering is not as reliable.
++ */
++
++/**
++ * Improves stability of width/height rendering.
++ * https://github.com/ItsJonQ/g2/pull/149
++ */
++export const ItemsColumn = css`
++	> * {
++		min-height: 0;
++	}
++`;
++
++export const ItemsRow = css`
++	> * {
++		min-width: 0;
++	}
++`;
+diff --git a/packages/components/src/ui/flex/flex.js b/packages/components/src/ui/flex/flex.js
+new file mode 100644
+index 00000000000000..c3980e340db610
+--- /dev/null
++++ b/packages/components/src/ui/flex/flex.js
+@@ -0,0 +1,41 @@
++/**
++ * Internal dependencies
++ */
++import { createComponent } from '../utils';
++import { useFlex } from './use-flex';
++
++/**
++ * `Flex` is a primitive layout component that adaptively aligns child content horizontally or vertically. `Flex` powers components like `HStack` and `VStack`.
++ *
++ * `Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
++ *
++ *
++ * @example
++ * ```jsx
++ * import { Flex, FlexItem, FlexBlock, Text, View } from `@wordpress/components`
++ *
++ * function Example() {
++ *   return (
++ *     <Flex>
++ *       <FlexItem>
++ *         <View css={[ui.background.blue]}>
++ *           <Text>Ana</Text>
++ *         </View>
++ *       </FlexItem>
++ *       <FlexBlock>
++ *         <View css={[ui.background.blue]}>
++ *           <Text>Elsa</Text>
++ *         </View>
++ *       </FlexBlock>
++ *     </Flex>
++ *   );
++ * }
++ * ```
++ */
++const Flex = createComponent( {
++	as: 'div',
++	useHook: useFlex,
++	name: 'Flex',
++} );
++
++export default Flex;
+diff --git a/packages/components/src/ui/flex/index.js b/packages/components/src/ui/flex/index.js
+new file mode 100644
+index 00000000000000..fb2bdace6a1fa2
+--- /dev/null
++++ b/packages/components/src/ui/flex/index.js
+@@ -0,0 +1,7 @@
++export { default as Flex } from './flex';
++export { default as FlexItem } from './flex-item';
++export { default as FlexBlock } from './flex-block';
++
++export * from './use-flex';
++export * from './use-flex-item';
++export * from './use-flex-block';
+diff --git a/packages/components/src/ui/flex/stories/index.js b/packages/components/src/ui/flex/stories/index.js
+new file mode 100644
+index 00000000000000..a1b27e8b8a2656
+--- /dev/null
++++ b/packages/components/src/ui/flex/stories/index.js
+@@ -0,0 +1,30 @@
++/**
++ * Internal dependencies
++ */
++import Flex from '../flex';
++import FlexItem from '../flex-item';
++import { View } from '../../view';
++
++export default {
++	component: Flex,
++	title: 'G2 Components (Experimental)/Flex',
++};
++
++export const _default = () => {
++	return (
++		<>
++			<Flex gap={ 3 }>
++				<View>Item</View>
++				<View>Item</View>
++			</Flex>
++			<Flex direction={ [ 'column', 'row' ] } gap={ 3 }>
++				<View css={ { width: '180px' } }>Item</View>
++				<FlexItem isBlock>
++					<View>Item</View>
++				</FlexItem>
++				<View>Item</View>
++				<View>Item</View>
++			</Flex>
++		</>
++	);
++};
+diff --git a/packages/components/src/ui/flex/test/__snapshots__/index.js.snap b/packages/components/src/ui/flex/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..6674889debdd5e
+--- /dev/null
++++ b/packages/components/src/ui/flex/test/__snapshots__/index.js.snap
+@@ -0,0 +1,687 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render + wrap non Flex children 1`] = `
++.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  --wp-g2-flex-gap: calc(4px * 2);
++  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
++  --wp-g2-flex-item-margin-bottom: 0;
++  --wp-g2-flex-item-margin-right: calc(4px * 2);
++  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
++  --wp-g2-flex-item-margin-left: 0;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++  margin-left: calc(var(--wp-g2-grid-base) * 2);
++}
++
++.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 > * {
++  min-width: 0;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: block;
++  max-height: 100%;
++  max-width: 100%;
++  min-height: 0;
++  min-width: 0;
++  display: var(--wp-g2-flex-item-display);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: block;
++  max-height: 100%;
++  max-width: 100%;
++  min-height: 0;
++  min-width: 0;
++  display: var(--wp-g2-flex-item-display);
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<div
++  class="components-flex wp-components-flex emotion-3"
++  data-g2-c16t="true"
++  data-g2-component="Flex"
++>
++  <div
++    class="components-flex-item wp-components-flex-item emotion-0"
++    data-g2-c16t="true"
++    data-g2-component="FlexItem"
++  />
++  <div
++    class="emotion-1"
++  />
++  <div />
++  <div
++    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-2"
++    data-g2-c16t="true"
++    data-g2-component="FlexBlock"
++  />
++</div>
++`;
++
++exports[`props should render align 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: block;
++  max-height: 100%;
++  max-width: 100%;
++  min-height: 0;
++  min-width: 0;
++  display: var(--wp-g2-flex-item-display);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: block;
++  max-height: 100%;
++  max-width: 100%;
++  min-height: 0;
++  min-width: 0;
++  display: var(--wp-g2-flex-item-display);
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  --wp-g2-flex-gap: calc(4px * 2);
++  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
++  --wp-g2-flex-item-margin-bottom: 0;
++  --wp-g2-flex-item-margin-right: calc(4px * 2);
++  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
++  --wp-g2-flex-item-margin-left: 0;
++  -webkit-align-items: flex-start;
++  -webkit-box-align: flex-start;
++  -ms-flex-align: flex-start;
++  align-items: flex-start;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++  margin-left: calc(var(--wp-g2-grid-base) * 2);
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++  min-width: 0;
++}
++
++<div
++  class="components-flex wp-components-flex emotion-2"
++  data-g2-c16t="true"
++  data-g2-component="Flex"
++>
++  <div
++    class="components-flex-item wp-components-flex-item emotion-0"
++    data-g2-c16t="true"
++    data-g2-component="FlexItem"
++  />
++  <div
++    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-1"
++    data-g2-c16t="true"
++    data-g2-component="FlexBlock"
++  />
++</div>
++`;
++
++exports[`props should render correctly 1`] = `
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  --wp-g2-flex-gap: calc(4px * 2);
++  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
++  --wp-g2-flex-item-margin-bottom: 0;
++  --wp-g2-flex-item-margin-right: calc(4px * 2);
++  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
++  --wp-g2-flex-item-margin-left: 0;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++  margin-left: calc(var(--wp-g2-grid-base) * 2);
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++  min-width: 0;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: block;
++  max-height: 100%;
++  max-width: 100%;
++  min-height: 0;
++  min-width: 0;
++  display: var(--wp-g2-flex-item-display);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: block;
++  max-height: 100%;
++  max-width: 100%;
++  min-height: 0;
++  min-width: 0;
++  display: var(--wp-g2-flex-item-display);
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<div
++  class="components-flex wp-components-flex emotion-2"
++  data-g2-c16t="true"
++  data-g2-component="Flex"
++>
++  <div
++    class="components-flex-item wp-components-flex-item emotion-0"
++    data-g2-c16t="true"
++    data-g2-component="FlexItem"
++  />
++  <div
++    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-1"
++    data-g2-c16t="true"
++    data-g2-component="FlexBlock"
++  />
++</div>
++`;
++
++exports[`props should render justify 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: block;
++  max-height: 100%;
++  max-width: 100%;
++  min-height: 0;
++  min-width: 0;
++  display: var(--wp-g2-flex-item-display);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: block;
++  max-height: 100%;
++  max-width: 100%;
++  min-height: 0;
++  min-width: 0;
++  display: var(--wp-g2-flex-item-display);
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  --wp-g2-flex-gap: calc(4px * 2);
++  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
++  --wp-g2-flex-item-margin-bottom: 0;
++  --wp-g2-flex-item-margin-right: calc(4px * 2);
++  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
++  --wp-g2-flex-item-margin-left: 0;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: start;
++  -webkit-justify-content: flex-start;
++  -ms-flex-pack: start;
++  justify-content: flex-start;
++  width: 100%;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++  margin-left: calc(var(--wp-g2-grid-base) * 2);
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++  min-width: 0;
++}
++
++<div
++  class="components-flex wp-components-flex emotion-2"
++  data-g2-c16t="true"
++  data-g2-component="Flex"
++>
++  <div
++    class="components-flex-item wp-components-flex-item emotion-0"
++    data-g2-c16t="true"
++    data-g2-component="FlexItem"
++  />
++  <div
++    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-1"
++    data-g2-c16t="true"
++    data-g2-component="FlexBlock"
++  />
++</div>
++`;
++
++exports[`props should render spacing 1`] = `
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  --wp-g2-flex-gap: calc(4px * 2);
++  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
++  --wp-g2-flex-item-margin-bottom: 0;
++  --wp-g2-flex-item-margin-right: calc(4px * 2);
++  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
++  --wp-g2-flex-item-margin-left: 0;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++  margin-left: calc(var(--wp-g2-grid-base) * 2);
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++  min-width: 0;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<div
++  class="components-flex wp-components-flex emotion-2"
++  data-g2-c16t="true"
++  data-g2-component="Flex"
++  spacing="5"
++>
++  <div
++    class="emotion-0"
++  />
++  <div
++    class="emotion-0"
++  />
++</div>
++`;
+diff --git a/packages/components/src/ui/flex/test/index.js b/packages/components/src/ui/flex/test/index.js
+new file mode 100644
+index 00000000000000..cc5eb5fecc781a
+--- /dev/null
++++ b/packages/components/src/ui/flex/test/index.js
+@@ -0,0 +1,66 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { View } from '../../view';
++import Flex from '../flex';
++import FlexItem from '../flex-item';
++import FlexBlock from '../flex-block';
++
++describe( 'props', () => {
++	test( 'should render correctly', () => {
++		const { container } = render(
++			<Flex>
++				<FlexItem />
++				<FlexBlock />
++			</Flex>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render + wrap non Flex children', () => {
++		const { container } = render(
++			<Flex>
++				<FlexItem />
++				<View />
++				<div />
++				<FlexBlock />
++			</Flex>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render align', () => {
++		const { container } = render(
++			<Flex align="flex-start">
++				<FlexItem />
++				<FlexBlock />
++			</Flex>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render justify', () => {
++		const { container } = render(
++			<Flex justify="flex-start">
++				<FlexItem />
++				<FlexBlock />
++			</Flex>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render spacing', () => {
++		const { container } = render(
++			<Flex spacing={ 5 }>
++				<View />
++				<View />
++			</Flex>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++} );
+diff --git a/packages/components/src/ui/flex/types.ts b/packages/components/src/ui/flex/types.ts
+new file mode 100644
+index 00000000000000..3e3c84fa4fdf32
+--- /dev/null
++++ b/packages/components/src/ui/flex/types.ts
+@@ -0,0 +1,198 @@
++import { CSSProperties } from 'react';
++import { ResponsiveCSSValue } from '../utils/types';
++
++export type FlexDirection = ResponsiveCSSValue< CSSProperties[ 'flexDirection' ] >;
++
++export type FlexProps = {
++	/**
++	 * Aligns children using CSS Flexbox `align-items`. Vertically aligns content if the `direction` is `row`, or horizontally aligns content if the `direction` is `column`.
++	 *
++	 * In the example below, `flex-start` will align the children content to the top.
++	 *
++	 * @default 'center'
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Flex, Text, View } from `@wordpress/components/ui`
++	 * import { ui } from `@wp-g2/styles`
++	 *
++	 * function Example() {
++	 *   return (
++	 *     <Flex align="flex-start">
++	 *       <View css={[ui.background.blue, { height: 100 }]}>
++	 *         <Text>Ana</Text>
++	 *       </View>
++	 *       <View css={[ui.background.blue]}>
++	 *         <Text>Elsa</Text>
++	 *       </View>
++	 *     </Flex>
++	 *   )
++	 * }
++	 * ```
++	 */
++	align?: CSSProperties[ 'alignItems' ];
++	/**
++	 * @default false
++	 */
++	alignItems?: boolean;
++	/**
++	 * The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
++	 *
++	 * @default 'row'
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Flex, Text, View } from `@wordpress/components/ui`
++	 * import { ui } from `@wp-g2/styles`
++	 *
++	 * function Example() {
++	 *   return (
++	 *     <Flex direction="column">
++	 *       <View css={[ui.background.blue]}>
++	 *         <Text>Ana</Text>
++	 *       </View>
++	 *       <View css={[ui.background.blue]}>
++	 *         <Text>Elsa</Text>
++	 *       </View>
++	 *     </Flex>
++	 *   )
++	 * }
++	 * ```
++	 */
++	direction?: FlexDirection;
++	/**
++	 * Expands to the maximum available width (if horizontal) or height (if vertical).
++	 *
++	 * @default true
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Flex, Text, View } from `@wordpress/components/ui`
++	 * import { ui } from `@wp-g2/styles`
++	 *
++	 * function Example() {
++	 *   return (
++	 *     <Flex direction="row" expanded>
++	 *       <View css={[ui.background.blue]}>
++	 *         <Text>Ana</Text>
++	 *       </View>
++	 *       <View css={[ui.background.blue]}>
++	 *         <Text>Elsa</Text>
++	 *       </View>
++	 *     </Flex>
++	 *   )
++	 * }
++	 * ```
++	 */
++	expanded?: boolean;
++	/**
++	 * Spacing in between each child can be adjusted by using `gap`. The value of `gap` works as a multiplier to the library's grid system (base of `4px`).
++	 *
++	 * @default 2
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Flex, Text, View } from `@wordpress/components/ui`
++	 * import { ui } from `@wp-g2/styles`
++	 *
++	 * function Example() {
++	 * 	return (
++	 * 		<Flex justify="flex-start" gap={8}>
++	 * 			<View css={[ui.background.blue]}>
++	 * 				<Text>Ana</Text>
++	 * 			</View>
++	 * 			<View css={[ui.background.blue]}>
++	 * 				<Text>Elsa</Text>
++	 * 			</View>
++	 * 		</Flex>
++	 * 	)
++	 * }
++	 * ```
++	 */
++	gap?: number;
++	/**
++	 * Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
++	 * In the example below, `flex-start` will align the children content to the left.
++	 *
++	 * @default 'space-between'
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Flex, Text, View } from `@wordpress/components/ui`
++	 * import { ui } from `@wp-g2/styles`
++	 *
++	 * function Example() {
++	 *   return (
++	 *     <Flex justify="flex-start">
++	 *       <View css={[ui.background.blue, { height: 100 }]}>
++	 *         <Text>Ana</Text>
++	 *       </View>
++	 *       <View css={[ui.background.blue]}>
++	 *         <Text>Elsa</Text>
++	 *       </View>
++	 *     </Flex>
++	 *   )
++	 * }
++	 * ```
++	 */
++	justify?: CSSProperties[ 'justifyContent' ];
++	/**
++	 * @default false
++	 */
++	justifyContent?: boolean;
++	/**
++	 * Determines if children should wrap.
++	 *
++	 * @default false
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Flex, Text, View } from `@wordpress/components/ui`
++	 * import { ui } from `@wp-g2/styles`
++	 *
++	 * function Example() {
++	 *   return (
++	 *     <Flex justify="flex-start" wrap>
++	 *       <View css={[ui.background.blue, { width: 200 }]}>
++	 *         <Text>Ana</Text>
++	 *       </View>
++	 *       <View css={[ui.background.blue, { width: 200 }]}>
++	 *         <Text>Elsa</Text>
++	 *       </View>
++	 *       <View css={[ui.background.blue, { width: 200 }]}>
++	 *         <Text>Olaf</Text>
++	 *       </View>
++	 *       <View css={[ui.background.blue, { width: 200 }]}>
++	 *         <Text>Kristoff</Text>
++	 *       </View>
++	 *       <View css={[ui.background.blue, { width: 200 }]}>
++	 *         <Text>Queen Iduna</Text>
++	 *       </View>
++	 *       <View css={[ui.background.blue, { width: 200 }]}>
++	 *         <Text>King Agnarr</Text>
++	 *       </View>
++	 *       <View css={[ui.background.blue, { width: 200 }]}>
++	 *         <Text>Yelena</Text>
++	 *       </View>
++	 *     </Flex>
++	 *   )
++	 * }
++	 * ```
++	 */
++	wrap?: boolean;
++};
++
++export type FlexItemProps = {
++	/**
++	 * The (CSS) display of the `FlexItem`.
++	 */
++	display?: CSSProperties[ 'display' ];
++	/**
++	 * Determines if `FlexItem` should render as an adaptive full-width block.
++	 *
++	 * @default true
++	 */
++	isBlock?: boolean;
++};
++
++export type FlexBlockProps = Omit< FlexItemProps, 'isBlock' >;
+\ No newline at end of file
+diff --git a/packages/components/src/ui/flex/use-flex-block.js b/packages/components/src/ui/flex/use-flex-block.js
+new file mode 100644
+index 00000000000000..8a6b7673c27071
+--- /dev/null
++++ b/packages/components/src/ui/flex/use-flex-block.js
+@@ -0,0 +1,19 @@
++/**
++ * External dependencies
++ */
++import { useContextSystem } from '@wp-g2/context';
++
++/**
++ * Internal dependencies
++ */
++import { useFlexItem } from './use-flex-item';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexBlockProps, 'div'>} props
++ */
++export function useFlexBlock( props ) {
++	const otherProps = useContextSystem( props, 'FlexBlock' );
++	const flexItemProps = useFlexItem( { isBlock: true, ...otherProps } );
++
++	return flexItemProps;
++}
+diff --git a/packages/components/src/ui/flex/use-flex-item.js b/packages/components/src/ui/flex/use-flex-item.js
+new file mode 100644
+index 00000000000000..f36f74c7220d1f
+--- /dev/null
++++ b/packages/components/src/ui/flex/use-flex-item.js
+@@ -0,0 +1,39 @@
++/**
++ * External dependencies
++ */
++import { useContextSystem } from '@wp-g2/context';
++import { css, cx, ui } from '@wp-g2/styles';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from './flex-styles';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexItemProps, 'div'>} props
++ */
++export function useFlexItem( props ) {
++	const {
++		className,
++		display: displayProp,
++		isBlock = false,
++		...otherProps
++	} = useContextSystem( props, 'FlexItem' );
++	const sx = {};
++
++	sx.Base = css( {
++		display: displayProp || ui.get( 'FlexItemDisplay' ),
++	} );
++
++	const classes = cx(
++		styles.Item,
++		sx.Base,
++		isBlock && styles.block,
++		className
++	);
++
++	return {
++		...otherProps,
++		className: classes,
++	};
++}
+diff --git a/packages/components/src/ui/flex/use-flex.js b/packages/components/src/ui/flex/use-flex.js
+new file mode 100644
+index 00000000000000..87237dc0aaf9c3
+--- /dev/null
++++ b/packages/components/src/ui/flex/use-flex.js
+@@ -0,0 +1,117 @@
++/**
++ * External dependencies
++ */
++import { useContextSystem } from '@wp-g2/context';
++import { css, cx, ui, useResponsiveValue } from '@wp-g2/styles';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from './flex-styles';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexProps, 'div'>} props
++ */
++export function useFlex( props ) {
++	const {
++		align = 'center',
++		className,
++		direction: directionProp = 'row',
++		expanded = true,
++		gap = 2,
++		justify = 'space-between',
++		wrap = false,
++		...otherProps
++	} = useContextSystem( props, 'Flex' );
++
++	const directionAsArray = Array.isArray( directionProp )
++		? directionProp
++		: [ directionProp ];
++	const direction = useResponsiveValue( directionAsArray );
++
++	const isColumn =
++		typeof direction === 'string' && !! direction.includes( 'column' );
++	const isReverse =
++		typeof direction === 'string' && direction.includes( 'reverse' );
++
++	const classes = useMemo( () => {
++		const sx = {};
++
++		sx.Base = css( {
++			[ ui.createToken( 'FlexGap' ) ]: ui.space( gap ),
++			[ ui.createToken( 'FlexItemDisplay' ) ]: isColumn
++				? 'block'
++				: undefined,
++			[ ui.createToken( 'FlexItemMarginBottom' ) ]: isColumn
++				? ui.get( 'FlexGap' )
++				: 0,
++			[ ui.createToken( 'FlexItemMarginRight' ) ]:
++				! isColumn && ! isReverse ? ui.get( 'FlexGap' ) : 0,
++			[ ui.createToken( 'FlexItemMarginLeft' ) ]:
++				! isColumn && isReverse ? ui.get( 'FlexGap' ) : 0,
++			alignItems: isColumn ? 'normal' : align,
++			flexDirection: direction,
++			flexWrap: wrap ? 'wrap' : undefined,
++			justifyContent: justify,
++			height: isColumn && expanded ? '100%' : undefined,
++			width: ! isColumn && expanded ? '100%' : undefined,
++			marginBottom: wrap ? `calc(${ ui.space( gap ) } * -1)` : undefined,
++		} );
++
++		sx.Items = css( {
++			/**
++			 * Workaround to optimize DOM rendering.
++			 * We'll enhance alignment with naive parent flex assumptions.
++			 *
++			 * Trade-off:
++			 * Far less DOM less. However, UI rendering is not as reliable.
++			 */
++			'> * + *:not(marquee)': {
++				marginTop: isColumn ? ui.space( gap ) : undefined,
++				marginRight:
++					! isColumn && isReverse ? ui.space( gap ) : undefined,
++				marginLeft:
++					! isColumn && ! isReverse ? ui.space( gap ) : undefined,
++			},
++		} );
++
++		sx.WrapItems = css( {
++			'> *:not(marquee)': {
++				marginBottom: ui.space( gap ),
++				marginLeft:
++					! isColumn && isReverse ? ui.space( gap ) : undefined,
++				marginRight:
++					! isColumn && ! isReverse ? ui.space( gap ) : undefined,
++			},
++			'> *:last-child:not(marquee)': {
++				marginLeft: ! isColumn && isReverse ? 0 : undefined,
++				marginRight: ! isColumn && ! isReverse ? 0 : undefined,
++			},
++		} );
++
++		return cx(
++			styles.Flex,
++			sx.Base,
++			wrap ? sx.WrapItems : sx.Items,
++			isColumn ? styles.ItemsColumn : styles.ItemsRow,
++			className
++		);
++	}, [
++		align,
++		className,
++		direction,
++		expanded,
++		gap,
++		isColumn,
++		isReverse,
++		justify,
++		wrap,
++	] );
++
++	return { ...otherProps, className: classes };
++}
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index cddfa1a2e22a5e..bd1d80d9b124a8 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -1,3 +1,4 @@
++export * from './flex';
+ export * from './grid';
+ export * from './text';
+ export * from './truncate';
+diff --git a/packages/components/src/ui/utils/types.ts b/packages/components/src/ui/utils/types.ts
+index 68f9c644fc64ab..bb92504c5b33fc 100644
+--- a/packages/components/src/ui/utils/types.ts
++++ b/packages/components/src/ui/utils/types.ts
+@@ -7,3 +7,5 @@ export type Options<T extends As, P extends ViewOwnProps<{}, T>> = {
+ 	useHook: (props: P) => any;
+ 	memo?: boolean;
+ };
++
++export type ResponsiveCSSValue<T> = Array<T | undefined> | T;
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 5d42b26b890f1d..1bee38372d725a 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -15,6 +15,7 @@
+ 		"src/animate/**/*",
+ 		"src/base-control/**/*",
+ 		"src/dashicon/**/*",
++		"src/flex/**/*",
+ 		"src/tip/**/*",
+ 		"src/ui/**/*",
+ 		"src/utils/**/*",

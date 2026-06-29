@@ -1,0 +1,288 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3d54eee6ba3809..05d7bcf42e6d97 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,8 @@
+ -   `UnitControl`: Update unit select's focus styles to match input's ([#42383](https://github.com/WordPress/gutenberg/pull/42383)).
+ -   `CustomSelectControl`: Add size variants ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
+ -   `CustomSelectControl`: Add flag to opt in to unconstrained width ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
++-   `BorderControl`: Render dropdown as prefix within its `UnitControl` ([#42212](https://github.com/WordPress/gutenberg/pull/42212/))
++-   `UnitControl`: Update prop types to allow ReactNode as prefix ([#42212](https://github.com/WordPress/gutenberg/pull/42212/))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index e7cea20616d582..5e75dbb30f1067 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -43,6 +43,7 @@ const UnconnectedBorderControl = (
+ 		enableStyle = true,
+ 		hideLabelFromVision,
+ 		innerWrapperClassName,
++		inputWidth,
+ 		label,
+ 		onBorderChange,
+ 		onSliderChange,
+@@ -53,7 +54,6 @@ const UnconnectedBorderControl = (
+ 		showDropdownHeader,
+ 		sliderClassName,
+ 		value: border,
+-		widthControlClassName,
+ 		widthUnit,
+ 		widthValue,
+ 		withSlider,
+@@ -69,36 +69,36 @@ const UnconnectedBorderControl = (
+ 				label={ label }
+ 				hideLabelFromVision={ hideLabelFromVision }
+ 			/>
+-			<HStack spacing={ 3 }>
+-				<HStack className={ innerWrapperClassName } alignment="stretch">
+-					<BorderControlDropdown
+-						border={ border }
+-						colors={ colors }
+-						__unstablePopoverProps={ __unstablePopoverProps }
+-						disableCustomColors={ disableCustomColors }
+-						enableAlpha={ enableAlpha }
+-						enableStyle={ enableStyle }
+-						onChange={ onBorderChange }
+-						previousStyleSelection={ previousStyleSelection }
+-						showDropdownHeader={ showDropdownHeader }
+-						__experimentalHasMultipleOrigins={
+-							__experimentalHasMultipleOrigins
+-						}
+-						__experimentalIsRenderedInSidebar={
+-							__experimentalIsRenderedInSidebar
+-						}
+-						__next36pxDefaultSize={ __next36pxDefaultSize }
+-					/>
+-					<UnitControl
+-						label={ __( 'Border width' ) }
+-						hideLabelFromVision
+-						className={ widthControlClassName }
+-						min={ 0 }
+-						onChange={ onWidthChange }
+-						value={ border?.width || '' }
+-						placeholder={ placeholder }
+-					/>
+-				</HStack>
++			<HStack spacing={ 3 } className={ innerWrapperClassName }>
++				<UnitControl
++					prefix={
++						<BorderControlDropdown
++							border={ border }
++							colors={ colors }
++							__unstablePopoverProps={ __unstablePopoverProps }
++							disableCustomColors={ disableCustomColors }
++							enableAlpha={ enableAlpha }
++							enableStyle={ enableStyle }
++							onChange={ onBorderChange }
++							previousStyleSelection={ previousStyleSelection }
++							showDropdownHeader={ showDropdownHeader }
++							__experimentalHasMultipleOrigins={
++								__experimentalHasMultipleOrigins
++							}
++							__experimentalIsRenderedInSidebar={
++								__experimentalIsRenderedInSidebar
++							}
++							__next36pxDefaultSize={ __next36pxDefaultSize }
++						/>
++					}
++					label={ __( 'Border width' ) }
++					hideLabelFromVision
++					min={ 0 }
++					onChange={ onWidthChange }
++					value={ border?.width || '' }
++					placeholder={ placeholder }
++					__unstableInputWidth={ inputWidth }
++				/>
+ 				{ withSlider && (
+ 					<RangeControl
+ 						label={ __( 'Border width' ) }
+diff --git a/packages/components/src/border-control/border-control/hook.ts b/packages/components/src/border-control/border-control/hook.ts
+index 91f5702e7f1c9d..30215572bfb7fa 100644
+--- a/packages/components/src/border-control/border-control/hook.ts
++++ b/packages/components/src/border-control/border-control/hook.ts
+@@ -118,18 +118,13 @@ export function useBorderControl(
+ 		return cx( styles.borderControl, className );
+ 	}, [ className, cx ] );
+ 
++	const wrapperWidth = isCompact ? '90px' : width;
+ 	const innerWrapperClassName = useMemo( () => {
+-		const wrapperWidth = isCompact ? '90px' : width;
+-		const widthStyle =
+-			!! wrapperWidth && styles.wrapperWidth( wrapperWidth );
++		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
+ 		const heightStyle = styles.wrapperHeight( __next36pxDefaultSize );
+ 
+ 		return cx( styles.innerWrapper(), widthStyle, heightStyle );
+-	}, [ isCompact, width, cx, __next36pxDefaultSize ] );
+-
+-	const widthControlClassName = useMemo( () => {
+-		return cx( styles.borderWidthControl() );
+-	}, [ cx ] );
++	}, [ wrapperWidth, cx, __next36pxDefaultSize ] );
+ 
+ 	const sliderClassName = useMemo( () => {
+ 		return cx( styles.borderSlider() );
+@@ -139,13 +134,13 @@ export function useBorderControl(
+ 		...otherProps,
+ 		className: classes,
+ 		innerWrapperClassName,
++		inputWidth: wrapperWidth,
+ 		onBorderChange,
+ 		onSliderChange,
+ 		onWidthChange,
+ 		previousStyleSelection: styleSelection,
+ 		sliderClassName,
+ 		value: border,
+-		widthControlClassName,
+ 		widthUnit,
+ 		widthValue,
+ 		__next36pxDefaultSize,
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index 16ed5896315a07..ca07db87d0e120 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { css } from '@emotion/react';
+-import type { CSSProperties } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -13,7 +12,6 @@ import {
+ 	StyledField,
+ 	StyledLabel,
+ } from '../base-control/styles/base-control-styles';
+-import { BackdropUI } from '../input-control/styles/input-control-styles';
+ import {
+ 	Root as UnitControlWrapper,
+ 	UnitSelect,
+@@ -30,60 +28,32 @@ const focusBoxShadow = css`
+ `;
+ 
+ export const borderControl = css`
+-	position: relative;
+ 	border: 0;
+ 	padding: 0;
+ 	margin: 0;
+ `;
+ 
+ export const innerWrapper = () => css`
+-	flex: 1 0 40%;
+-
+-	/*
+-	 * Needs more thought. Aim is to prevent the border for BorderBoxControl
+-	 * showing through the control. Likely needs to take into account
+-	 * light/dark themes etc.
+-	 */
+-	background: #fff;
+-
+-	/*
+-	 * Forces the width control to fill available space given UnitControl
+-	 * passes its className directly through to the input.
+-	 */
+ 	${ UnitControlWrapper } {
+-		flex: 1;
+-		${ rtl( { marginLeft: -1 } )() }
++		flex: 1 1 40%;
+ 	}
+-
+ 	&& ${ UnitSelect } {
+-		/* Prevent default styles forcing heights larger than BorderControl */
++		/* Prevent unit select forcing min height larger than its UnitControl */
+ 		min-height: 0;
+-		${ rtl(
+-			{
+-				borderRadius: '0 1px 1px 0',
+-				marginRight: 0,
+-			},
+-			{
+-				borderRadius: '1px 0 0 1px',
+-				marginLeft: 0,
+-			}
+-		)() }
+-		transition: box-shadow 0.1s linear, border 0.1s linear;
+-
+-		&:focus {
+-			z-index: 1;
+-			${ focusBoxShadow }
+-			border: 1px solid ${ COLORS.ui.borderFocus };
+-		}
+ 	}
+ `;
+ 
+-export const wrapperWidth = ( width: CSSProperties[ 'width' ] ) => {
+-	return css`
+-		width: ${ width };
++/*
++ * This style is only applied to the UnitControl wrapper when the border width
++ * field should be a set width. Omitting this allows the UnitControl &
++ * RangeControl to share the available width in a 40/60 split respectively.
++ */
++export const wrapperWidth = css`
++	${ UnitControlWrapper } {
++		/* Force the UnitControl's set width. */
+ 		flex: 0 0 auto;
+-	`;
+-};
++	}
++`;
+ 
+ /*
+  * When default control height is 36px the following should be removed.
+@@ -101,7 +71,7 @@ export const borderControlDropdown = () => css`
+ 	&& > button {
+ 		/*
+ 		 * Override button component height and padding to fit within
+-		 * BorderControl
++		 * BorderControl regardless of size.
+ 		 */
+ 		height: 100%;
+ 		padding: ${ space( 0.75 ) };
+@@ -110,7 +80,6 @@ export const borderControlDropdown = () => css`
+ 			{ borderRadius: `0 2px 2px 0` }
+ 		)() }
+ 		border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
+-		position: relative;
+ 
+ 		&:focus,
+ 		&:hover:not( :disabled ) {
+@@ -209,23 +178,6 @@ export const resetButton = css`
+ 	}
+ `;
+ 
+-export const borderWidthControl = () => css`
+-	/* Target the InputControl's backdrop */
+-	&&& ${ BackdropUI } {
+-		${ rtl( {
+-			borderTopLeftRadius: 0,
+-			borderBottomLeftRadius: 0,
+-		} )() }
+-		transition: box-shadow 0.1s linear;
+-	}
+-
+-	/* Specificity required to overcome UnitControl padding */
+-	/* See packages/components/src/unit-control/styles/unit-control-styles.ts */
+-	&&& input {
+-		${ rtl( { paddingRight: 0 } )() }
+-	}
+-`;
+-
+ export const borderControlStylePicker = css`
+ 	${ StyledLabel } {
+ 		${ labelStyles }
+diff --git a/packages/components/src/unit-control/types.ts b/packages/components/src/unit-control/types.ts
+index c2b18361d82ba8..d967378f1432d5 100644
+--- a/packages/components/src/unit-control/types.ts
++++ b/packages/components/src/unit-control/types.ts
+@@ -76,7 +76,7 @@ export type UnitSelectControlProps = {
+ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
+ 	Pick<
+ 		InputControlProps,
+-		'hideLabelFromVision' | '__next36pxDefaultSize'
++		'hideLabelFromVision' | 'prefix' | '__next36pxDefaultSize'
+ 	> & {
+ 		__unstableStateReducer?: StateReducer;
+ 		__unstableInputWidth?: CSSProperties[ 'width' ];

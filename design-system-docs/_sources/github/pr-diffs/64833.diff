@@ -1,0 +1,224 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/control.js b/packages/block-editor/src/components/color-palette/test/control.js
+index 3a5dcc657a94c4..e1a5529544f791 100644
+--- a/packages/block-editor/src/components/color-palette/test/control.js
++++ b/packages/block-editor/src/components/color-palette/test/control.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render } from '@testing-library/react';
++import { render, waitFor, queryByAttribute } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -10,9 +10,22 @@ import ColorPaletteControl from '../control';
+ 
+ const noop = () => {};
+ 
++async function renderAndValidate( ...renderArgs ) {
++	const view = render( ...renderArgs );
++	await waitFor( () => {
++		const activeButton = queryByAttribute(
++			'data-active-item',
++			view.baseElement,
++			'true'
++		);
++		expect( activeButton ).not.toBeNull();
++	} );
++	return view;
++}
++
+ describe( 'ColorPaletteControl', () => {
+ 	it( 'matches the snapshot', async () => {
+-		const { container } = render(
++		const { container } = await renderAndValidate(
+ 			<ColorPaletteControl
+ 				label="Test Color"
+ 				value="#f00"
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 03520d901d85f6..3b8d45be5861bc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -57,6 +57,7 @@
+     -   `UnitControl`
+ -   `Modal`: Update animation effect ([#64580](https://github.com/WordPress/gutenberg/pull/64580)).
+ -   `AlignmentMatrixControl`: do not use composite store directly ([#64850](https://github.com/WordPress/gutenberg/pull/64850)).
++-   `CircularOptionPicker`: do not use composite store directly ([#64833](https://github.com/WordPress/gutenberg/pull/64833)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+index 1ab4fd0d017901..276ab7549781ed 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+@@ -2,14 +2,13 @@
+  * External dependencies
+  */
+ import clsx from 'clsx';
+-import { useStoreState } from '@ariakit/react';
+ import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { forwardRef, useContext } from '@wordpress/element';
++import { forwardRef, useContext, useEffect } from '@wordpress/element';
+ import { Icon, check } from '@wordpress/icons';
+ 
+ /**
+@@ -46,18 +45,21 @@ function UnforwardedOptionAsOption(
+ 		id: string;
+ 		className?: string;
+ 		isSelected?: boolean;
+-		compositeStore: NonNullable<
+-			React.ComponentProps< typeof Composite >[ 'store' ]
+-		>;
+ 	},
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+-	const { id, isSelected, compositeStore, ...additionalProps } = props;
+-	const activeId = useStoreState( compositeStore, 'activeId' );
++	const { id, isSelected, ...additionalProps } = props;
+ 
+-	if ( isSelected && ! activeId ) {
+-		compositeStore.setActiveId( id );
+-	}
++	const { setActiveId, activeId } = useContext( CircularOptionPickerContext );
++
++	useEffect( () => {
++		if ( isSelected && ! activeId ) {
++			// The setTimeout call is necessary to make sure that this update
++			// doesn't get overridden by `Composite`'s internal logic, which picks
++			// an initial active item if one is not specifically set.
++			window.setTimeout( () => setActiveId?.( id ), 0 );
++		}
++	}, [ isSelected, setActiveId, activeId, id ] );
+ 
+ 	return (
+ 		<Composite.Item
+@@ -83,9 +85,7 @@ export function Option( {
+ 	tooltipText,
+ 	...additionalProps
+ }: OptionProps ) {
+-	const { baseId, compositeStore } = useContext(
+-		CircularOptionPickerContext
+-	);
++	const { baseId, setActiveId } = useContext( CircularOptionPickerContext );
+ 	const id = useInstanceId(
+ 		Option,
+ 		baseId || 'components-circular-option-picker__option'
+@@ -97,12 +97,9 @@ export function Option( {
+ 		...additionalProps,
+ 	};
+ 
+-	const optionControl = compositeStore ? (
+-		<OptionAsOption
+-			{ ...commonProps }
+-			compositeStore={ compositeStore }
+-			isSelected={ isSelected }
+-		/>
++	const isListbox = setActiveId !== undefined;
++	const optionControl = isListbox ? (
++		<OptionAsOption { ...commonProps } isSelected={ isSelected } />
+ 	) : (
+ 		<OptionAsButton { ...commonProps } isPressed={ isSelected } />
+ 	);
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker.tsx b/packages/components/src/circular-option-picker/circular-option-picker.tsx
+index c878000aff84b8..adf2b386e5cbec 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker.tsx
+@@ -8,13 +8,13 @@ import clsx from 'clsx';
+  */
+ import { useInstanceId } from '@wordpress/compose';
+ import { isRTL } from '@wordpress/i18n';
++import { useMemo, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { CircularOptionPickerContext } from './circular-option-picker-context';
+ import { Composite } from '../composite';
+-import { useCompositeStore } from '../composite/store';
+ import type {
+ 	CircularOptionPickerProps,
+ 	ListboxCircularOptionPickerProps,
+@@ -86,24 +86,30 @@ function ListboxCircularOptionPicker(
+ 		...additionalProps
+ 	} = props;
+ 
+-	const compositeStore = useCompositeStore( {
+-		focusLoop: loop,
+-		rtl: isRTL(),
+-	} );
++	const [ activeId, setActiveId ] = useState< string | null | undefined >(
++		undefined
++	);
+ 
+-	const compositeContext = {
+-		baseId,
+-		compositeStore,
+-	};
++	const contextValue = useMemo(
++		() => ( {
++			baseId,
++			activeId,
++			setActiveId,
++		} ),
++		[ baseId, activeId, setActiveId ]
++	);
+ 
+ 	return (
+ 		<div className={ className }>
+-			<CircularOptionPickerContext.Provider value={ compositeContext }>
++			<CircularOptionPickerContext.Provider value={ contextValue }>
+ 				<Composite
+ 					{ ...additionalProps }
+ 					id={ baseId }
+-					store={ compositeStore }
++					focusLoop={ loop }
++					rtl={ isRTL() }
+ 					role="listbox"
++					activeId={ activeId }
++					setActiveId={ setActiveId }
+ 				>
+ 					{ options }
+ 				</Composite>
+@@ -119,9 +125,16 @@ function ButtonsCircularOptionPicker(
+ ) {
+ 	const { actions, options, children, baseId, ...additionalProps } = props;
+ 
++	const contextValue = useMemo(
++		() => ( {
++			baseId,
++		} ),
++		[ baseId ]
++	);
++
+ 	return (
+ 		<div { ...additionalProps } id={ baseId }>
+-			<CircularOptionPickerContext.Provider value={ { baseId } }>
++			<CircularOptionPickerContext.Provider value={ contextValue }>
+ 				{ options }
+ 				{ children }
+ 				{ actions }
+diff --git a/packages/components/src/circular-option-picker/types.ts b/packages/components/src/circular-option-picker/types.ts
+index e23ff4165f0580..411782aed575b1 100644
+--- a/packages/components/src/circular-option-picker/types.ts
++++ b/packages/components/src/circular-option-picker/types.ts
+@@ -14,7 +14,6 @@ import type { Icon } from '@wordpress/icons';
+ import type { ButtonAsButtonProps } from '../button/types';
+ import type { DropdownProps } from '../dropdown/types';
+ import type { WordPressComponentProps } from '../context';
+-import type { Composite } from '../composite';
+ 
+ type CommonCircularOptionPickerProps = {
+ 	/**
+@@ -125,5 +124,6 @@ export type OptionProps = Omit<
+ 
+ export type CircularOptionPickerContextProps = {
+ 	baseId?: string;
+-	compositeStore?: React.ComponentProps< typeof Composite >[ 'store' ];
++	activeId?: string | null | undefined;
++	setActiveId?: ( newId: string | null | undefined ) => void;
+ };

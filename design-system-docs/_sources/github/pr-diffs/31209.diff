@@ -1,0 +1,444 @@
+diff --git a/packages/components/src/ui/card/test/__snapshots__/index.js.snap b/packages/components/src/ui/card/test/__snapshots__/index.js.snap
+index 67e1c030f33b34..f050cf1213e1dc 100644
+--- a/packages/components/src/ui/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/card/test/__snapshots__/index.js.snap
+@@ -11,8 +11,8 @@ Snapshot Diff:
+         title="WordPress.org"
+       />
+       <div
+--       class="css-yyubco-InnerBody components-card-inner-body css-1mm2cvy-View egi4jkx0"
+-+       class="components-scrollable wp-components-scrollable components-card-body css-aej86y-Body-borderRadius ic-y3p1xi css-1jyvxqk css-1mm2cvy-View egi4jkx0"
++-       class="css-yc36db-InnerBody components-card-inner-body css-1mm2cvy-View egi4jkx0"
+++       class="components-scrollable wp-components-scrollable components-card-body css-3sz8a0-Body-borderRadius ic-y3p1xi css-1jyvxqk css-1mm2cvy-View egi4jkx0"
+ +       data-g2-c16t="true"
+ +       data-g2-component="Scrollable"
+         data-wp-c16t="true"
+@@ -22,7 +22,7 @@ Snapshot Diff:
+         Code is Poetry.
+       </div>
+       <div
+-        class="components-flex components-card-footer css-k894y4-Flex-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View egi4jkx0"
++        class="components-flex components-card-footer css-g6s6xo-Flex-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View egi4jkx0"
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+@@ -141,10 +141,10 @@ exports[`props should render correctly 1`] = `
+   border-bottom: 1px solid;
+   border-color: rgba(0,0,0,0.1);
+   min-height: 44px;
+-  padding-bottom: 8px;
+-  padding-left: 24px;
+-  padding-right: 24px;
+-  padding-top: 8px;
++  padding-bottom: calc(4px * 1);
++  padding-left: calc(4px * 3);
++  padding-right: calc(4px * 3);
++  padding-top: calc(4px * 1);
+ }
+ 
+ .emotion-0 > * + *:not(marquee) {
+@@ -168,7 +168,7 @@ exports[`props should render correctly 1`] = `
+ .emotion-3 {
+   height: auto;
+   max-height: 100%;
+-  padding: 24px,24px;
++  padding: calc(4px * 3) calc(4px * 3);
+ }
+ 
+ .emotion-3:first-of-type {
+@@ -200,10 +200,10 @@ exports[`props should render correctly 1`] = `
+   width: 100%;
+   border-color: rgba(0,0,0,0.1);
+   min-height: 44px;
+-  padding-bottom: 8px;
+-  padding-left: 24px;
+-  padding-right: 24px;
+-  padding-top: 8px;
++  padding-bottom: calc(4px * 1);
++  padding-left: calc(4px * 3);
++  padding-right: calc(4px * 3);
++  padding-top: calc(4px * 1);
+ }
+ 
+ .emotion-7 > * + *:not(marquee) {
+diff --git a/packages/components/src/ui/popover/component.js b/packages/components/src/ui/popover/component.js
+index 1b802b7c037d7b..bf69f4196dd4ed 100644
+--- a/packages/components/src/ui/popover/component.js
++++ b/packages/components/src/ui/popover/component.js
+@@ -1,10 +1,9 @@
+ /**
+  * External dependencies
+  */
+-import { contextConnect, useContextSystem } from '@wp-g2/context';
+-import { noop, useUpdateEffect } from '@wp-g2/utils';
++import { noop } from 'lodash';
+ // eslint-disable-next-line no-restricted-imports
+-import { PopoverDisclosure, usePopoverState } from 'reakit';
++import { PopoverDisclosure, usePopoverState, Portal } from 'reakit';
+ 
+ /**
+  * WordPress dependencies
+@@ -14,14 +13,15 @@ import { useCallback, useMemo, cloneElement } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { Portal } from '../portal';
++import { contextConnect, useContextSystem } from '../context';
+ import { PopoverContext } from './context';
+ import { usePopoverResizeUpdater } from './utils';
+ import PopoverContent from './content';
++import { useUpdateEffect } from '../../utils/hooks';
+ 
+ /**
+  *
+- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function Popover( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/popover/content.js b/packages/components/src/ui/popover/content.js
+index f05f66d7ddafdd..06713ecc01bb06 100644
+--- a/packages/components/src/ui/popover/content.js
++++ b/packages/components/src/ui/popover/content.js
+@@ -1,8 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { contextConnect, useContextSystem } from '@wp-g2/context';
+-import { css, cx } from '@wp-g2/styles';
++import { css, cx } from 'emotion';
+ // eslint-disable-next-line no-restricted-imports
+ import { Popover as ReakitPopover } from 'reakit';
+ 
+@@ -13,10 +12,11 @@ import { Card } from '../card';
+ import { View } from '../view';
+ import { usePopoverContext } from './context';
+ import * as styles from './styles';
++import { contextConnect, useContextSystem } from '../context';
+ 
+ /**
+  *
+- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').ContentProps, 'div'>} props
++ * @param {import('../context').ViewOwnProps<import('./types').ContentProps, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function PopoverContent( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/popover/stories/index.js b/packages/components/src/ui/popover/stories/index.js
+index 6151d21e3c0219..68a5dde9add305 100644
+--- a/packages/components/src/ui/popover/stories/index.js
++++ b/packages/components/src/ui/popover/stories/index.js
+@@ -1,10 +1,8 @@
+ /**
+  * Internal dependencies
+  */
+-/**
+- * External dependencies
+- */
+-import { Button, CardBody, CardHeader } from '@wp-g2/components';
++import { CardBody, CardHeader } from '../../card';
++import Button from '../../../button';
+ import { Popover } from '..';
+ 
+ export default {
+diff --git a/packages/components/src/ui/popover/styles.js b/packages/components/src/ui/popover/styles.js
+index 4eefa0fdb3efc3..8618e684056baf 100644
+--- a/packages/components/src/ui/popover/styles.js
++++ b/packages/components/src/ui/popover/styles.js
+@@ -1,20 +1,23 @@
+ /**
+  * External dependencies
+  */
+-import { css, ui } from '@wp-g2/styles';
++import { css } from 'emotion';
++
+ /**
+  * Internal dependencies
+  */
+ import { CardBody } from '../card';
++import * as ZIndex from '../../utils/z-index';
++import CONFIG from '../../utils/config-values';
+ 
+ export const PopoverContent = css`
+-	${ ui.zIndex( 'Popover', 10000 ) };
++	z-index: ${ ZIndex.Popover };
+ 	box-sizing: border-box;
+ 	opacity: 0;
+ 	outline: none;
+ 	position: relative;
+ 	transform-origin: center center;
+-	transition: opacity ${ ui.get( 'transitionDurationFastest' ) } linear;
++	transition: opacity ${ CONFIG.transitionDurationFastest } linear;
+ 	width: 100%;
+ 
+ 	&[data-enter] {
+diff --git a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+index 50afe6f2219237..ed81e30a217ff3 100644
+--- a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+@@ -11,10 +11,6 @@ exports[`props should render correctly 1`] = `
+   --wp-g2-surface-background-size-dotted: 11px;
+ }
+ 
+-.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17 .components-card-body {
+-  max-height: 80vh;
+-}
+-
+ .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+   height: 100%;
+   overflow-x: hidden;
+@@ -96,6 +92,10 @@ exports[`props should render correctly 1`] = `
+   border-radius: 2px;
+ }
+ 
++.emotion-16 .components-card-body {
++  max-height: 80vh;
++}
++
+ .emotion-8 {
+   border-radius: 2px;
+ }
+@@ -103,7 +103,7 @@ exports[`props should render correctly 1`] = `
+ .emotion-0 {
+   height: auto;
+   max-height: 100%;
+-  padding: 24px,24px;
++  padding: calc(4px * 3) calc(4px * 3);
+ }
+ 
+ .emotion-0:first-of-type {
+@@ -165,17 +165,17 @@ Snapshot Diff:
+   <div
+ -   aria-label="show"
+ +   aria-label="popover-base-popover"
+-    class="components-popover-content wp-components-popover-content components-popover wp-components-popover ic-fzg5i9 ic-1o22l1x css-xnf55w css-1mm2cvy-View egi4jkx0"
++    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View egi4jkx0"
+     data-dialog="true"
+-    data-g2-c16t="true"
+-    data-g2-component="Popover"
++    data-wp-c16t="true"
++    data-wp-component="Popover"
+ -   id="labelled-popover"
+ +   id="base-popover"
+     role="dialog"
+     tabindex="-1"
+   >
+     <div
+-      class="components-surface components-card css-1tf68oj-Card-rounded css-1wit8k9 css-1mm2cvy-View egi4jkx0"
++      class="components-surface components-card css-hy95ag-Card-rounded-cardStyle css-10jei3p css-1mm2cvy-View egi4jkx0"
+ `;
+ 
+ exports[`props should render without content 1`] = `
+@@ -187,17 +187,17 @@ Snapshot Diff:
+   <div
+ -   aria-label="popover-contentless-popover"
+ +   aria-label="popover-base-popover"
+-    class="components-popover-content wp-components-popover-content components-popover wp-components-popover ic-fzg5i9 ic-1o22l1x css-xnf55w css-1mm2cvy-View egi4jkx0"
++    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View egi4jkx0"
+     data-dialog="true"
+-    data-g2-c16t="true"
+-    data-g2-component="Popover"
++    data-wp-c16t="true"
++    data-wp-component="Popover"
+ -   id="contentless-popover"
+ +   id="base-popover"
+     role="dialog"
+     tabindex="-1"
+   >
+     <div
+-      class="components-surface components-card css-1tf68oj-Card-rounded css-1wit8k9 css-1mm2cvy-View egi4jkx0"
++      class="components-surface components-card css-hy95ag-Card-rounded-cardStyle css-10jei3p css-1mm2cvy-View egi4jkx0"
+ @@ -21,10 +21,19 @@
+           frameborder="0"
+           src="about:blank"
+@@ -205,7 +205,7 @@ Snapshot Diff:
+           tabindex="-1"
+         />
+ +       <div
+-+         class="components-scrollable wp-components-scrollable components-card-body css-aej86y-Body-borderRadius ic-y3p1xi css-1jyvxqk css-1mm2cvy-View egi4jkx0"
+++         class="components-scrollable wp-components-scrollable components-card-body css-3sz8a0-Body-borderRadius ic-y3p1xi css-1jyvxqk css-1mm2cvy-View egi4jkx0"
+ +         data-g2-c16t="true"
+ +         data-g2-component="Scrollable"
+ +         data-wp-c16t="true"
+diff --git a/packages/components/src/ui/popover/test/index.js b/packages/components/src/ui/popover/test/index.js
+index 0e1bcdcf2c8547..c2ffdece3be3ef 100644
+--- a/packages/components/src/ui/popover/test/index.js
++++ b/packages/components/src/ui/popover/test/index.js
+@@ -2,11 +2,11 @@
+  * External dependencies
+  */
+ import { render, screen } from '@testing-library/react';
+-import { Button } from '@wp-g2/components';
+ 
+ /**
+  * Internal dependencies
+  */
++import Button from '../../../button';
+ import { CardBody } from '../../card';
+ import { Popover } from '../index';
+ 
+diff --git a/packages/components/src/ui/portal/README.md b/packages/components/src/ui/portal/README.md
+deleted file mode 100644
+index 6c8a9ccc862d0d..00000000000000
+--- a/packages/components/src/ui/portal/README.md
++++ /dev/null
+@@ -1,17 +0,0 @@
+-# Portal
+-
+-`Portal` is a layout helper that renders components at the root `document.body` level, outside the DOM hierarchy of the parent component.
+-
+-## Usage
+-
+-```jsx
+-import { Portal, View } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return (
+-		<Portal>
+-			<View>Code Is Poetry</View>
+-		</Portal>
+-	);
+-}
+-```
+diff --git a/packages/components/src/ui/portal/component.js b/packages/components/src/ui/portal/component.js
+deleted file mode 100644
+index eba77ef14e6ad0..00000000000000
+--- a/packages/components/src/ui/portal/component.js
++++ /dev/null
+@@ -1,37 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { ThemeProvider } from '@wp-g2/styles';
+-// eslint-disable-next-line no-restricted-imports
+-import { Portal as BasePortal } from 'reakit';
+-
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * `Portal` is a layout helper that renders components at the root `document.body` level, outside the DOM hierarchy of the parent component.
+- *
+- * @example
+- * ```jsx
+- * import { Portal, View } from `@wordpress/components/ui`;
+- *
+- * function Example() {
+- * 	return (
+- * 		<Portal>
+- * 			<View>Code Is Poetry</View>
+- * 		</Portal>
+- * 	);
+- * }
+- * ```
+- *
+- * @param {{ children: import('react').ReactNode }} props
+- */
+-/* eslint-enable jsdoc/valid-types */
+-
+-function Portal( { children } ) {
+-	return (
+-		<BasePortal>
+-			<ThemeProvider>{ children }</ThemeProvider>
+-		</BasePortal>
+-	);
+-}
+-
+-export default Portal;
+diff --git a/packages/components/src/ui/portal/index.js b/packages/components/src/ui/portal/index.js
+deleted file mode 100644
+index bd8c804e8c9be8..00000000000000
+--- a/packages/components/src/ui/portal/index.js
++++ /dev/null
+@@ -1 +0,0 @@
+-export { default as Portal } from './component';
+diff --git a/packages/components/src/ui/portal/test/index.js b/packages/components/src/ui/portal/test/index.js
+deleted file mode 100644
+index 657853e1d25d75..00000000000000
+--- a/packages/components/src/ui/portal/test/index.js
++++ /dev/null
+@@ -1,33 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Portal } from '../index';
+-
+-describe( 'props', () => {
+-	test( 'should render correctly', () => {
+-		render(
+-			<>
+-				<div className="container">
+-					<Portal>
+-						<div className="element">
+-							Code is Poetry - WordPress.org
+-						</div>
+-					</Portal>
+-				</div>
+-			</>
+-		);
+-
+-		// This is because the `div.element` is portal'ed outside of the wrapping `.container`
+-		expect(
+-			document.querySelector( 'body .container .element' )
+-		).toBeFalsy();
+-
+-		// Instead, it is rendered at the `body` level.
+-		expect( document.querySelector( 'body .element' ) ).toBeTruthy();
+-	} );
+-} );
+diff --git a/packages/components/src/ui/utils/space.ts b/packages/components/src/ui/utils/space.ts
+index 9741ad2162b706..ccd7a2b81fd743 100644
+--- a/packages/components/src/ui/utils/space.ts
++++ b/packages/components/src/ui/utils/space.ts
+@@ -6,10 +6,11 @@ import type { ReactText } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import { CONFIG } from '../../utils';
++
++const GRID_BASE = '4px';
+ 
+ export function space( value: ReactText ): string {
+ 	return typeof value === 'number'
+-		? `calc(${ CONFIG.gridBase } * ${ value })`
++		? `calc(${ GRID_BASE } * ${ value })`
+ 		: value;
+ }
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 7c3a0cf7f05c79..291a55511307ba 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { space } from './space';
++import { space } from '../ui/utils/space';
+ 
+ const CONTROL_HEIGHT = '30px';
+ const CARD_PADDING_X = space( 3 );
+@@ -36,8 +36,14 @@ export default {
+ 	cardBorderRadius: '2px',
+ 	cardPaddingX: CARD_PADDING_X,
+ 	cardPaddingY: CARD_PADDING_Y,
+-	cardPadding: `${ CARD_PADDING_X }, ${ CARD_PADDING_Y }`,
++	cardPadding: `${ CARD_PADDING_X } ${ CARD_PADDING_Y }`,
+ 	cardHeaderFooterPaddingY: space( 1 ),
+ 	cardHeaderHeight: '44px',
+ 	surfaceBorderColor: 'rgba(0, 0, 0, 0.1)',
++	transitionDuration: '200ms',
++	transitionDurationFast: '160ms',
++	transitionDurationFaster: '120ms',
++	transitionDurationFastest: '100ms',
++	transitionTimingFunction: 'cubic-bezier(0.08, 0.52, 0.52, 1)',
++	transitionTimingFunctionControl: 'cubic-bezier(0.12, 0.8, 0.32, 1)',
+ };
+diff --git a/packages/components/src/utils/z-index.js b/packages/components/src/utils/z-index.js
+new file mode 100644
+index 00000000000000..6faeda93e84370
+--- /dev/null
++++ b/packages/components/src/utils/z-index.js
+@@ -0,0 +1 @@
++export const Popover = 10000;

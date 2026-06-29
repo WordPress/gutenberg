@@ -1,0 +1,48 @@
+diff --git a/packages/components/src/combobox-control/style.scss b/packages/components/src/combobox-control/style.scss
+index 1b5faf68b91cef..3cb0a8272e65c8 100644
+--- a/packages/components/src/combobox-control/style.scss
++++ b/packages/components/src/combobox-control/style.scss
+@@ -6,11 +6,18 @@ input.components-combobox-control__input[type="text"] {
+ 	width: 100%;
+ 	border: none;
+ 	box-shadow: none;
++	font-size: 16px;
+ 	padding: 2px;
+ 	margin: 0;
+ 	line-height: inherit;
+ 	min-height: auto;
+ 
++	// Resolves Zooming on iOS devices
++	// https://github.com/WordPress/gutenberg/issues/27405
++	@include break-small() {
++		font-size: 13px;
++	}
++
+ 	&:focus {
+ 		outline: none;
+ 		box-shadow: none;
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index af1437ad2290b7..1fcb039924219b 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -22,6 +22,7 @@
+ 	input[type="text"].components-form-token-field__input {
+ 		display: inline-block;
+ 		flex: 1;
++		font-size: 16px;
+ 		width: 100%;
+ 		max-width: 100%;
+ 		margin-left: 4px;
+@@ -33,6 +34,12 @@
+ 		color: $gray-900;
+ 		box-shadow: none;
+ 
++		// Resolves Zooming on iOS devices
++		// https://github.com/WordPress/gutenberg/issues/27405
++		@include break-small() {
++			font-size: 13px;
++		}
++
+ 		&:focus,
+ 		.components-form-token-field.is-active & {
+ 			outline: none;

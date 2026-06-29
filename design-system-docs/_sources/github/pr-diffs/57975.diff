@@ -1,0 +1,183 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 92ce15dc425f6d..8dda4d475e6b2b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   `PaletteEdit`: improve unit tests ([#57645](https://github.com/WordPress/gutenberg/pull/57645)).
+ -   `PaletteEdit` and `CircularOptionPicker`: improve unit tests ([#57809](https://github.com/WordPress/gutenberg/pull/57809)).
+ -   `Tooltip`: no-op when nested inside other `Tooltip` components ([#57202](https://github.com/WordPress/gutenberg/pull/57202)).
++-   `Tooltip` and `Button`: tidy up unit tests ([#57975](https://github.com/WordPress/gutenberg/pull/57975)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/button/test/index.tsx b/packages/components/src/button/test/index.tsx
+index fb6c6a72b9adcb..345ae3813fe067 100644
+--- a/packages/components/src/button/test/index.tsx
++++ b/packages/components/src/button/test/index.tsx
+@@ -112,6 +112,91 @@ describe( 'Button', () => {
+ 			);
+ 		} );
+ 
++		it( 'should render correctly as a tooltip anchor', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<>
++					<Tooltip text="Tooltip text">
++						<Button icon={ plusCircle } label="Tooltip anchor" />
++					</Tooltip>
++					<Button>Focus me</Button>
++				</>
++			);
++
++			const anchor = screen.getByRole( 'button', {
++				name: 'Tooltip anchor',
++			} );
++
++			await user.tab();
++
++			expect( anchor ).toHaveFocus();
++
++			const tooltip = await screen.findByRole( 'tooltip', {
++				name: 'Tooltip text',
++			} );
++
++			expect( tooltip ).toBeVisible();
++
++			await user.tab();
++
++			expect(
++				screen.getByRole( 'button', { name: 'Focus me' } )
++			).toHaveFocus();
++
++			expect(
++				screen.queryByRole( 'tooltip', {
++					name: 'Tooltip text',
++				} )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'should render correctly as a tooltip anchor, ignoring its internal tooltip in favour of the external tooltip', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<>
++					<Tooltip text="Tooltip text">
++						<Button icon={ plusCircle } label="Button label" />
++					</Tooltip>
++					<Button>Focus me</Button>
++				</>
++			);
++
++			const anchor = screen.getByRole( 'button', {
++				name: 'Button label',
++			} );
++
++			await user.tab();
++
++			expect( anchor ).toHaveFocus();
++
++			const tooltip = await screen.findByRole( 'tooltip', {
++				name: 'Tooltip text',
++			} );
++
++			expect( tooltip ).toBeVisible();
++			// Check that the tooltip that would be normally rendered internally by
++			// the `Button` component is ignored, because of an outer tooltip.
++			expect(
++				screen.queryByRole( 'tooltip', {
++					name: 'Button label',
++				} )
++			).not.toBeInTheDocument();
++
++			await user.tab();
++
++			expect(
++				screen.getByRole( 'button', { name: 'Focus me' } )
++			).toHaveFocus();
++
++			expect(
++				screen.queryByRole( 'tooltip', {
++					name: 'Tooltip text',
++				} )
++			).not.toBeInTheDocument();
++		} );
++
+ 		it( 'should add a disabled prop to the button', () => {
+ 			render( <Button disabled /> );
+ 
+diff --git a/packages/components/src/tooltip/test/index.tsx b/packages/components/src/tooltip/test/index.tsx
+index 40038bbc5e25ad..cbe09dc3214129 100644
+--- a/packages/components/src/tooltip/test/index.tsx
++++ b/packages/components/src/tooltip/test/index.tsx
+@@ -12,12 +12,11 @@ import { shortcutAriaLabel } from '@wordpress/keycodes';
+ /**
+  * Internal dependencies
+  */
+-import Button from '../../button';
+ import Modal from '../../modal';
+ import Tooltip, { TOOLTIP_DELAY } from '..';
+ 
+ const props = {
+-	children: <Button>Tooltip anchor</Button>,
++	children: <button>Tooltip anchor</button>,
+ 	text: 'tooltip text',
+ };
+ 
+@@ -56,8 +55,8 @@ describe( 'Tooltip', () => {
+ 			render(
+ 				// @ts-expect-error Tooltip cannot have more than one child element
+ 				<Tooltip { ...props }>
+-					<Button>First button</Button>
+-					<Button>Second button</Button>
++					<button>First button</button>
++					<button>Second button</button>
+ 				</Tooltip>
+ 			);
+ 
+@@ -153,9 +152,7 @@ describe( 'Tooltip', () => {
+ 			render(
+ 				<>
+ 					<Tooltip { ...props }>
+-						<Button disabled __experimentalIsFocusable>
+-							Tooltip anchor
+-						</Button>
++						<button aria-disabled="true">Tooltip anchor</button>
+ 					</Tooltip>
+ 					<button>Focus me</button>
+ 				</>
+@@ -207,9 +204,7 @@ describe( 'Tooltip', () => {
+ 			render(
+ 				<>
+ 					<Tooltip { ...props }>
+-						<Button disabled __experimentalIsFocusable>
+-							Tooltip anchor
+-						</Button>
++						<button aria-disabled="true">Tooltip anchor</button>
+ 					</Tooltip>
+ 					<button>Focus me</button>
+ 				</>
+@@ -321,12 +316,12 @@ describe( 'Tooltip', () => {
+ 
+ 			render(
+ 				<Tooltip { ...props }>
+-					<Button
++					<button
+ 						onMouseEnter={ onMouseEnterMock }
+ 						onMouseLeave={ onMouseLeaveMock }
+ 					>
+ 						Tooltip anchor
+-					</Button>
++					</button>
+ 				</Tooltip>
+ 			);
+ 
+@@ -454,7 +449,7 @@ describe( 'Tooltip', () => {
+ 				<Tooltip text="Outer tooltip">
+ 					<Tooltip text="Middle tooltip">
+ 						<Tooltip text="Inner tooltip">
+-							<Button>Tooltip anchor</Button>
++							<button>Tooltip anchor</button>
+ 						</Tooltip>
+ 					</Tooltip>
+ 				</Tooltip>

@@ -1,0 +1,778 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fe144c59ec1bb1..fc7bda7aabe57f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -29,6 +29,7 @@
+ -   `MenuGroup`: Convert to TypeScript ([#45617](https://github.com/WordPress/gutenberg/pull/45617)).
+ -   `useCx`: fix story to satisfy the `react-hooks/exhaustive-deps` eslint rule ([#45614](https://github.com/WordPress/gutenberg/pull/45614))
+ -   Activate the `react-hooks/exhuastive-deps` eslint rule for the Components package ([#41166](https://github.com/WordPress/gutenberg/pull/41166))
++-   `Snackbar`: Convert to TypeScript ([#45472](https://github.com/WordPress/gutenberg/pull/45472)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/snackbar/README.md b/packages/components/src/snackbar/README.md
+index e0fc4ea09b1a80..bbff9b9efabcb6 100644
+--- a/packages/components/src/snackbar/README.md
++++ b/packages/components/src/snackbar/README.md
+@@ -36,17 +36,72 @@ const MySnackbarNotice = () => (
+ );
+ ```
+ 
+-#### Props
++### Props
+ 
+ The following props are used to control the display of the component.
+ 
+--   `children`: (string) The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
+--   `spokenMessage`: (string) Used to provide a custom spoken message in place of the `children` default.
+--   `politeness`: (string) A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live). Defaults to `"polite"`. Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.
+-    -   A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
+-    -   A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
+--   `onRemove`: function called when dismissing the notice.
+--   `actions`: (array) an array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function.
++#### `actions`: `NoticeAction[]`
++
++An array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function.
++
++-   Required: No
++-   Default: `[]`
++
++#### `children`: `string`
++
++The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
++
++-   Required: Yes
++
++#### `explicitDismiss`: `boolean`
++
++Whether to require user action to dismiss the snackbar. By default, this is dismissed on a timeout, without user interaction.
++
++-   Required: No
++-   Default: `false`
++
++#### `icon`: `ReactNode`
++
++The icon to render in the snackbar.
++
++-   Required: No
++-   Default: `null`
++
++#### `listRef`: `MutableRefObject< HTMLDivElement | null >`
++
++A ref to the list that contains the snackbar.
++
++-   Required: No
++
++#### `onDismiss`: `() => void`
++
++A callback executed when the snackbar is dismissed. It is distinct from onRemove, which _looks_ like a callback but is actually the function to call to remove the snackbar from the UI.
++
++-   Required: No
++
++#### `onRemove`: `() => void`
++
++Function called when dismissing the notice.
++
++-   Required: No
++
++#### `politeness`: `'polite' | 'assertive'`
++
++A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live). Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.
++
++A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
++
++A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
++
++-   Required: No
++-   Default: `'polite'`
++
++#### `spokenMessage`: `string`
++
++Used to provide a custom spoken message.
++
++-   Required: No
++-   Default: `children`
+ 
+ ## Related components
+ 
+diff --git a/packages/components/src/snackbar/index.js b/packages/components/src/snackbar/index.tsx
+similarity index 68%
+rename from packages/components/src/snackbar/index.js
+rename to packages/components/src/snackbar/index.tsx
+index 6a67f055e9ed1f..833d9dce8d30ff 100644
+--- a/packages/components/src/snackbar/index.js
++++ b/packages/components/src/snackbar/index.tsx
+@@ -1,6 +1,7 @@
+ /**
+  * External dependencies
+  */
++import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
+ import classnames from 'classnames';
+ 
+ /**
+@@ -14,21 +15,23 @@ import warning from '@wordpress/warning';
+ /**
+  * Internal dependencies
+  */
+-import { Button } from '../';
++import Button from '../button';
++import type { NoticeAction, SnackbarProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+-const noop = () => {};
+ const NOTICE_TIMEOUT = 10000;
+ 
+-/** @typedef {import('@wordpress/element').WPElement} WPElement */
+-
+ /**
+  * Custom hook which announces the message with the given politeness, if a
+  * valid message is provided.
+  *
+- * @param {string|WPElement}     [message]  Message to announce.
+- * @param {'polite'|'assertive'} politeness Politeness to announce.
++ * @param  message    Message to announce.
++ * @param  politeness Politeness to announce.
+  */
+-function useSpokenMessage( message, politeness ) {
++function useSpokenMessage(
++	message: SnackbarProps[ 'spokenMessage' ],
++	politeness: NonNullable< SnackbarProps[ 'politeness' ] >
++) {
+ 	const spokenMessage =
+ 		typeof message === 'string' ? message : renderToString( message );
+ 
+@@ -39,42 +42,43 @@ function useSpokenMessage( message, politeness ) {
+ 	}, [ spokenMessage, politeness ] );
+ }
+ 
+-function Snackbar(
++function UnforwardedSnackbar(
+ 	{
+ 		className,
+ 		children,
+ 		spokenMessage = children,
+ 		politeness = 'polite',
+ 		actions = [],
+-		onRemove = noop,
++		onRemove,
+ 		icon = null,
+ 		explicitDismiss = false,
+ 		// onDismiss is a callback executed when the snackbar is dismissed.
+ 		// It is distinct from onRemove, which _looks_ like a callback but is
+ 		// actually the function to call to remove the snackbar from the UI.
+-		onDismiss = noop,
++		onDismiss,
+ 		listRef,
+-	},
+-	ref
++	}: WordPressComponentProps< SnackbarProps, 'div' >,
++	ref: ForwardedRef< any >
+ ) {
+-	onDismiss = onDismiss || noop;
+-
+-	function dismissMe( event ) {
++	function dismissMe( event: KeyboardEvent | MouseEvent ) {
+ 		if ( event && event.preventDefault ) {
+ 			event.preventDefault();
+ 		}
+ 
+ 		// Prevent focus loss by moving it to the list element.
+-		listRef.current.focus();
++		listRef?.current?.focus();
+ 
+-		onDismiss();
+-		onRemove();
++		onDismiss?.();
++		onRemove?.();
+ 	}
+ 
+-	function onActionClick( event, onClick ) {
++	function onActionClick(
++		event: MouseEvent,
++		onClick: NoticeAction[ 'onClick' ]
++	) {
+ 		event.stopPropagation();
+ 
+-		onRemove();
++		onRemove?.();
+ 
+ 		if ( onClick ) {
+ 			onClick( event );
+@@ -87,8 +91,8 @@ function Snackbar(
+ 	useEffect( () => {
+ 		const timeoutHandle = setTimeout( () => {
+ 			if ( ! explicitDismiss ) {
+-				onDismiss();
+-				onRemove();
++				onDismiss?.();
++				onRemove?.();
+ 			}
+ 		}, NOTICE_TIMEOUT );
+ 
+@@ -118,10 +122,10 @@ function Snackbar(
+ 		<div
+ 			ref={ ref }
+ 			className={ classes }
+-			onClick={ ! explicitDismiss ? dismissMe : noop }
+-			tabIndex="0"
++			onClick={ ! explicitDismiss ? dismissMe : undefined }
++			tabIndex={ 0 }
+ 			role={ ! explicitDismiss ? 'button' : '' }
+-			onKeyPress={ ! explicitDismiss ? dismissMe : noop }
++			onKeyPress={ ! explicitDismiss ? dismissMe : undefined }
+ 			aria-label={ ! explicitDismiss ? __( 'Dismiss this notice' ) : '' }
+ 		>
+ 			<div className={ snackbarContentClassnames }>
+@@ -135,7 +139,7 @@ function Snackbar(
+ 							key={ index }
+ 							href={ url }
+ 							variant="tertiary"
+-							onClick={ ( event ) =>
++							onClick={ ( event: MouseEvent ) =>
+ 								onActionClick( event, onClick )
+ 							}
+ 							className="components-snackbar__action"
+@@ -148,7 +152,7 @@ function Snackbar(
+ 					<span
+ 						role="button"
+ 						aria-label="Dismiss this notice"
+-						tabIndex="0"
++						tabIndex={ 0 }
+ 						className="components-snackbar__dismiss-button"
+ 						onClick={ dismissMe }
+ 						onKeyPress={ dismissMe }
+@@ -161,4 +165,18 @@ function Snackbar(
+ 	);
+ }
+ 
+-export default forwardRef( Snackbar );
++/**
++ * A Snackbar displays a succinct message that is cleared out after a small delay.
++ *
++ * It can also offer the user options, like viewing a published post.
++ * But these options should also be available elsewhere in the UI.
++ *
++ * ```jsx
++ * const MySnackbarNotice = () => (
++ *   <Snackbar>Post published successfully.</Snackbar>
++ * );
++ * ```
++ */
++export const Snackbar = forwardRef( UnforwardedSnackbar );
++
++export default Snackbar;
+diff --git a/packages/components/src/snackbar/list.js b/packages/components/src/snackbar/list.tsx
+similarity index 65%
+rename from packages/components/src/snackbar/list.js
+rename to packages/components/src/snackbar/list.tsx
+index 492c883f257049..093c0b3529612d 100644
+--- a/packages/components/src/snackbar/list.js
++++ b/packages/components/src/snackbar/list.tsx
+@@ -12,13 +12,14 @@ import { useRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import Snackbar from './';
++import Snackbar from '.';
+ import {
+ 	__unstableMotion as motion,
+ 	__unstableAnimatePresence as AnimatePresence,
+ } from '../animation';
++import type { Notice, SnackbarListProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+-const noop = () => {};
+ const SNACKBAR_VARIANTS = {
+ 	init: {
+ 		height: 0,
+@@ -39,28 +40,28 @@ const SNACKBAR_VARIANTS = {
+ 	},
+ };
+ 
+-const SNACKBAR_REDUCE_MOTION_VARIANTS = {
+-	init: false,
+-	open: false,
+-	exit: false,
+-};
+-
+ /**
+  * Renders a list of notices.
+  *
+- * @param {Object}   $0           Props passed to the component.
+- * @param {Array}    $0.notices   Array of notices to render.
+- * @param {Function} $0.onRemove  Function called when a notice should be removed / dismissed.
+- * @param {Object}   $0.className Name of the class used by the component.
+- * @param {Object}   $0.children  Array of children to be rendered inside the notice list.
+- *
+- * @return {Object} The rendered notices list.
++ * ```jsx
++ * const MySnackbarListNotice = () => (
++ *   <SnackbarList
++ *     notices={ notices }
++ *     onRemove={ removeNotice }
++ *   />
++ * );
++ * ```
+  */
+-function SnackbarList( { notices, className, children, onRemove = noop } ) {
+-	const listRef = useRef();
++export function SnackbarList( {
++	notices,
++	className,
++	children,
++	onRemove,
++}: WordPressComponentProps< SnackbarListProps, 'div' > ) {
++	const listRef = useRef< HTMLDivElement | null >( null );
+ 	const isReducedMotion = useReducedMotion();
+ 	className = classnames( 'components-snackbar-list', className );
+-	const removeNotice = ( notice ) => () => onRemove( notice.id );
++	const removeNotice = ( notice: Notice ) => () => onRemove?.( notice.id );
+ 	return (
+ 		<div className={ className } tabIndex={ -1 } ref={ listRef }>
+ 			{ children }
+@@ -76,9 +77,7 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
+ 							exit={ 'exit' }
+ 							key={ notice.id }
+ 							variants={
+-								isReducedMotion
+-									? SNACKBAR_REDUCE_MOTION_VARIANTS
+-									: SNACKBAR_VARIANTS
++								isReducedMotion ? undefined : SNACKBAR_VARIANTS
+ 							}
+ 						>
+ 							<div className="components-snackbar-list__notice-container">
+diff --git a/packages/components/src/snackbar/stories/index.js b/packages/components/src/snackbar/stories/index.js
+deleted file mode 100644
+index a4f4cc878a9585..00000000000000
+--- a/packages/components/src/snackbar/stories/index.js
++++ /dev/null
+@@ -1,89 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { text } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-import Snackbar from '../';
+-
+-export default {
+-	title: 'Components/Snackbar',
+-	component: Snackbar,
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-export const _default = () => {
+-	const content = text(
+-		'Content',
+-		'Use Snackbars to communicate low priority, non-interruptive messages to the user.'
+-	);
+-
+-	return <Snackbar>{ content }</Snackbar>;
+-};
+-
+-export const withActions = () => {
+-	const content = text(
+-		'Content',
+-		'Use Snackbars with an action link to an external page.'
+-	);
+-	const actions = [
+-		{
+-			label: text( 'Label', 'Open WP.org' ),
+-			url: text( 'URL', 'https://wordpress.org' ),
+-		},
+-	];
+-
+-	return <Snackbar actions={ actions }>{ content }</Snackbar>;
+-};
+-
+-export const withIcon = () => {
+-	const content = text(
+-		'Content',
+-		'Add an icon to make your snackbar stand out'
+-	);
+-	const icon = text( 'Icon (as unicode emoji)', '🌮' );
+-
+-	return (
+-		<Snackbar
+-			icon={
+-				<span role="img" aria-label="Icon" style={ { fontSize: 21 } }>
+-					{ icon }
+-				</span>
+-			}
+-		>
+-			{ content }
+-		</Snackbar>
+-	);
+-};
+-
+-export const withExplicitDismiss = () => {
+-	const content = text(
+-		'Content',
+-		'Add a cross to explicitly close the snackbar, and do not hide it automatically'
+-	);
+-
+-	return <Snackbar explicitDismiss={ true }>{ content }</Snackbar>;
+-};
+-
+-export const withActionAndExpicitDismiss = () => {
+-	const content = text(
+-		'Content',
+-		'Add an action and a cross to explicitly close the snackbar, and do not hide it automatically'
+-	);
+-	const actions = [
+-		{
+-			label: text( 'Label', 'Open WP.org' ),
+-			url: text( 'URL', 'https://wordpress.org' ),
+-		},
+-	];
+-
+-	return (
+-		<Snackbar actions={ actions } explicitDismiss={ true }>
+-			{ content }
+-		</Snackbar>
+-	);
+-};
+diff --git a/packages/components/src/snackbar/stories/index.tsx b/packages/components/src/snackbar/stories/index.tsx
+new file mode 100644
+index 00000000000000..0d226f321e72a0
+--- /dev/null
++++ b/packages/components/src/snackbar/stories/index.tsx
+@@ -0,0 +1,96 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import Snackbar from '..';
++
++const meta: ComponentMeta< typeof Snackbar > = {
++	title: 'Components/Snackbar',
++	component: Snackbar,
++	argTypes: {
++		as: { control: { type: null } },
++		onRemove: {
++			action: 'onRemove',
++			control: { type: null },
++		},
++		onDismiss: {
++			action: 'onDismiss',
++			control: { type: null },
++		},
++		listRef: {
++			control: { type: null },
++		},
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const DefaultTemplate: ComponentStory< typeof Snackbar > = ( {
++	children,
++	...props
++} ) => {
++	return <Snackbar { ...props }>{ children }</Snackbar>;
++};
++
++export const Default: ComponentStory< typeof Snackbar > = DefaultTemplate.bind(
++	{}
++);
++Default.args = {
++	children:
++		'Use Snackbars to communicate low priority, non-interruptive messages to the user.',
++};
++
++export const WithActions: ComponentStory< typeof Snackbar > =
++	DefaultTemplate.bind( {} );
++WithActions.args = {
++	actions: [
++		{
++			label: 'Open WP.org',
++			url: 'https://wordpress.org',
++		},
++	],
++	children: 'Use Snackbars with an action link to an external page.',
++};
++
++export const WithIcon: ComponentStory< typeof Snackbar > = DefaultTemplate.bind(
++	{}
++);
++WithIcon.args = {
++	children: 'Add an icon to make your snackbar stand out',
++	icon: (
++		<span role="img" aria-label="Icon" style={ { fontSize: 21 } }>
++			🌮
++		</span>
++	),
++};
++
++export const WithExplicitDismiss: ComponentStory< typeof Snackbar > =
++	DefaultTemplate.bind( {} );
++WithExplicitDismiss.args = {
++	children:
++		'Add a cross to explicitly close the snackbar, and do not hide it automatically',
++	explicitDismiss: true,
++};
++
++export const WithActionAndExplicitDismiss: ComponentStory< typeof Snackbar > =
++	DefaultTemplate.bind( {} );
++WithActionAndExplicitDismiss.args = {
++	actions: [
++		{
++			label: 'Open WP.org',
++			url: 'https://wordpress.org',
++		},
++	],
++	children:
++		'Add an action and a cross to explicitly close the snackbar, and do not hide it automatically',
++	explicitDismiss: true,
++};
+diff --git a/packages/components/src/snackbar/stories/list.tsx b/packages/components/src/snackbar/stories/list.tsx
+new file mode 100644
+index 00000000000000..a12b2c171ae7a5
+--- /dev/null
++++ b/packages/components/src/snackbar/stories/list.tsx
+@@ -0,0 +1,98 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import SnackbarList from '../list';
++
++const meta: ComponentMeta< typeof SnackbarList > = {
++	title: 'Components/SnackbarList',
++	component: SnackbarList,
++	argTypes: {
++		as: { control: { type: null } },
++		onRemove: {
++			action: 'onRemove',
++			control: { type: null },
++		},
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++export const Default: ComponentStory< typeof SnackbarList > = ( {
++	children,
++	notices: noticesProp,
++	...props
++} ) => {
++	const [ notices, setNotices ] = useState( noticesProp );
++
++	const onRemove = ( id: string ) => {
++		const matchIndex = notices.findIndex( ( n ) => n.id === id );
++		if ( matchIndex > -1 ) {
++			setNotices( [
++				...notices.slice( 0, matchIndex ),
++				...notices.slice( matchIndex + 1 ),
++			] );
++		}
++	};
++
++	return (
++		<SnackbarList { ...props } notices={ notices } onRemove={ onRemove }>
++			{ children }
++		</SnackbarList>
++	);
++};
++
++Default.args = {
++	children:
++		'Use SnackbarList to communicate multiple low priority, non-interruptive messages to the user.',
++	notices: [
++		{
++			id: 'SAVE_POST_NOTICE_ID_1',
++			spokenMessage: 'Post published.',
++			actions: [
++				{
++					label: 'View Post',
++					url: 'https://example.com/?p=522',
++				},
++			],
++			content: 'Post published.',
++			isDismissible: true,
++			explicitDismiss: false,
++		},
++		{
++			id: 'SAVE_POST_NOTICE_ID_2',
++			spokenMessage: 'Post updated',
++			actions: [
++				{
++					label: 'View Post',
++					url: 'https://example.com/?p=522',
++				},
++			],
++			content: 'Post updated.',
++			isDismissible: true,
++			explicitDismiss: false,
++		},
++		{
++			id: 'global1',
++			spokenMessage: 'All content copied.',
++			actions: [],
++			content: 'All content copied.',
++			isDismissible: true,
++			explicitDismiss: false,
++		},
++	],
++};
+diff --git a/packages/components/src/snackbar/types.ts b/packages/components/src/snackbar/types.ts
+new file mode 100644
+index 00000000000000..46c9a8e67e8cfb
+--- /dev/null
++++ b/packages/components/src/snackbar/types.ts
+@@ -0,0 +1,116 @@
++/**
++ * External dependencies
++ */
++import type { MutableRefObject, ReactNode, SyntheticEvent } from 'react';
++
++export type NoticeActionWithURL = {
++	label: string;
++	url: string;
++	onClick?: ( event: SyntheticEvent ) => void;
++};
++
++type NoticeActionWithOnClick = {
++	label: string;
++	url?: string;
++	onClick: ( event: SyntheticEvent ) => void;
++};
++
++// TODO: move this type to the Notice component once it gets typed.
++export type NoticeAction = NoticeActionWithURL | NoticeActionWithOnClick;
++
++export type Notice = {
++	id: string;
++	spokenMessage: string;
++	actions: NoticeAction[];
++	icon?: ReactNode;
++	onDismiss?: () => void;
++	content: string;
++	isDismissible: boolean;
++	explicitDismiss: boolean;
++};
++
++export type SnackbarProps = {
++	/**
++	 * The displayed message of a notice.
++	 *
++	 * Also used as the spoken message for assistive technology,
++	 * unless `spokenMessage` is provided as an alternative message.
++	 */
++	children: string;
++	/**
++	 * Used to provide a custom spoken message.
++	 *
++	 * @default children
++	 */
++	spokenMessage?: Notice[ 'spokenMessage' ];
++	/**
++	 * A politeness level for the notice's spoken message. Should be provided as
++	 * one of the valid options for an `aria-live` attribute value. Note that this
++	 * value should be considered a suggestion; assistive technologies may
++	 * override it based on internal heuristics.
++	 *
++	 * A value of `'assertive'` is to be used for important, and usually
++	 * time-sensitive, information. It will interrupt anything else the screen
++	 * reader is announcing in that moment.
++	 * A value of `'polite'` is to be used for advisory information. It should
++	 * not interrupt what the screen reader is announcing in that moment
++	 * (the "speech queue") or interrupt the current task.
++	 *
++	 * @see https://www.w3.org/TR/wai-aria-1.1/#aria-live
++	 *
++	 * @default 'polite'
++	 */
++	politeness?: 'polite' | 'assertive';
++	/**
++	 * An array of action objects.
++	 *
++	 * Each member object should contain
++	 * a `label` and either a `url` link string or `onClick` callback function.
++	 *
++	 * @default []
++	 */
++	actions?: Notice[ 'actions' ];
++	/**
++	 * Called to remove the snackbar from the UI.
++	 */
++	onRemove?: () => void;
++	/**
++	 * The icon to render in the snackbar.
++	 *
++	 * @default null
++	 */
++	icon?: Notice[ 'icon' ];
++	/**
++	 * Whether to require user action to dismiss the snackbar.
++	 * By default, this is dismissed on a timeout, without user interaction.
++	 *
++	 * @default false
++	 */
++	explicitDismiss?: Notice[ 'explicitDismiss' ];
++	/**
++	 * A callback executed when the snackbar is dismissed.
++	 *
++	 * It is distinct from onRemove, which _looks_ like a callback but is
++	 * actually the function to call to remove the snackbar from the UI.
++	 */
++	onDismiss?: Notice[ 'onDismiss' ];
++	/**
++	 * A ref to the list that contains the snackbar.
++	 */
++	listRef?: MutableRefObject< HTMLDivElement | null >;
++};
++
++export type SnackbarListProps = {
++	/**
++	 * Array of notices to render.
++	 */
++	notices: Notice[];
++	/**
++	 * Children to be rendered inside the notice list.
++	 */
++	children?: ReactNode;
++	/**
++	 * Function called when a notice should be removed / dismissed.
++	 */
++	onRemove?: ( id: Notice[ 'id' ] ) => void;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index c5d62d9423779c..107f0ffe586417 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -65,7 +65,6 @@
+ 		"src/query-controls",
+ 		"src/responsive-wrapper",
+ 		"src/sandbox",
+-		"src/snackbar",
+ 		"src/toolbar",
+ 		"src/toolbar-button",
+ 		"src/toolbar-context",

@@ -1,0 +1,323 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 398eb53faaa541..f46d856be0e9fc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ -   `CustomSelectControlV2`: fix trigger text alignment in RTL languages ([#62869](https://github.com/WordPress/gutenberg/pull/62869)).
+ -   `CustomSelectControlV2`: allow wrapping item hint to new line ([#62848](https://github.com/WordPress/gutenberg/pull/62848)).
+ -   `CustomSelectControlV2`: fix select popover content overflow. ([#62844](https://github.com/WordPress/gutenberg/pull/62844))
++-   `CustomSelectControlV2`: keep legacy arrow down behavior only for legacy wrapper. ([#62919](https://github.com/WordPress/gutenberg/pull/62919))
+ -   Extract `TimeInput` component from `TimePicker` ([#60613](https://github.com/WordPress/gutenberg/pull/60613)).
+ 
+ ## 28.2.0 (2024-06-26)
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index 027423319bece1..548153506b1424 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -1,3 +1,9 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type * as Ariakit from '@ariakit/react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -17,7 +23,6 @@ import type {
+ 	_CustomSelectInternalProps,
+ 	_CustomSelectProps,
+ } from './types';
+-import type { WordPressComponentProps } from '../context';
+ import InputBase from '../input-control/input-base';
+ import SelectControlChevronDown from '../select-control/chevron-down';
+ 
+@@ -51,11 +56,10 @@ const CustomSelectButton = ( {
+ 	store,
+ 	...restProps
+ }: Omit<
+-	WordPressComponentProps<
+-		CustomSelectButtonProps & CustomSelectButtonSize & CustomSelectStore,
+-		'button',
+-		false
+-	>,
++	React.ComponentProps< typeof Ariakit.Select > &
++		CustomSelectButtonProps &
++		CustomSelectButtonSize &
++		CustomSelectStore,
+ 	'onChange'
+ > ) => {
+ 	const { value: currentValue } = store.useState();
+@@ -71,9 +75,6 @@ const CustomSelectButton = ( {
+ 			size={ size }
+ 			hasCustomRenderProp={ !! renderSelectedValue }
+ 			store={ store }
+-			// to match legacy behavior where using arrow keys
+-			// move selection rather than open the popover
+-			showOnKeyDown={ false }
+ 		>
+ 			{ computedRenderSelectedValue( currentValue ) }
+ 		</Styled.Select>
+@@ -128,6 +129,8 @@ function _CustomSelect(
+ 					{ ...restProps }
+ 					size={ size }
+ 					store={ store }
++					// Match legacy behavior (move selection rather than open the popover)
++					showOnKeyDown={ ! isLegacy }
+ 				/>
+ 				<Styled.SelectPopover
+ 					gutter={ 12 }
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+index 532b14d7bda526..238b73ea96933c 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+@@ -204,14 +204,14 @@ describe.each( [
+ 		await press.Enter();
+ 		expect(
+ 			screen.getByRole( 'listbox', {
+-				name: 'label!',
++				name: legacyProps.label,
+ 			} )
+ 		).toBeVisible();
+ 
+ 		await press.Escape();
+ 		expect(
+ 			screen.queryByRole( 'listbox', {
+-				name: 'label!',
++				name: legacyProps.label,
+ 			} )
+ 		).not.toBeInTheDocument();
+ 
+@@ -472,7 +472,7 @@ describe.each( [
+ 			await click( currentSelectedItem );
+ 
+ 			const customSelect = screen.getByRole( 'listbox', {
+-				name: 'label!',
++				name: legacyProps.label,
+ 			} );
+ 			expect( customSelect ).toHaveFocus();
+ 			await press.Enter();
+@@ -494,7 +494,7 @@ describe.each( [
+ 			await press.Enter();
+ 			expect(
+ 				screen.getByRole( 'listbox', {
+-					name: 'label!',
++					name: legacyProps.label,
+ 				} )
+ 			).toHaveFocus();
+ 
+@@ -518,7 +518,7 @@ describe.each( [
+ 			await press.Enter();
+ 			expect(
+ 				screen.getByRole( 'listbox', {
+-					name: 'label!',
++					name: legacyProps.label,
+ 				} )
+ 			).toHaveFocus();
+ 
+@@ -546,7 +546,7 @@ describe.each( [
+ 
+ 			expect(
+ 				screen.queryByRole( 'listbox', {
+-					name: 'label!',
++					name: legacyProps.label,
+ 					hidden: true,
+ 				} )
+ 			).not.toBeInTheDocument();
+@@ -557,6 +557,33 @@ describe.each( [
+ 			expect( currentSelectedItem ).toHaveTextContent( 'amber' );
+ 		} );
+ 
++		it( 'Can change selection with a focused input and closed dropdown while pressing arrow keys', async () => {
++			render( <Component { ...legacyProps } /> );
++
++			const currentSelectedItem = screen.getByRole( 'combobox', {
++				expanded: false,
++			} );
++
++			await sleep();
++			await press.Tab();
++			expect( currentSelectedItem ).toHaveFocus();
++			expect( currentSelectedItem ).toHaveTextContent(
++				legacyProps.options[ 0 ].name
++			);
++
++			await press.ArrowDown();
++			await press.ArrowDown();
++			expect(
++				screen.queryByRole( 'listbox', {
++					name: legacyProps.label,
++				} )
++			).not.toBeInTheDocument();
++
++			expect( currentSelectedItem ).toHaveTextContent(
++				legacyProps.options[ 2 ].name
++			);
++		} );
++
+ 		it( 'Should have correct aria-selected value for selections', async () => {
+ 			render( <Component { ...legacyProps } /> );
+ 
+diff --git a/packages/components/src/custom-select-control-v2/test/index.tsx b/packages/components/src/custom-select-control-v2/test/index.tsx
+index 13421479c0dd55..c697539ab12085 100644
+--- a/packages/components/src/custom-select-control-v2/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/test/index.tsx
+@@ -105,14 +105,14 @@ describe.each( [
+ 		await press.Enter();
+ 		expect(
+ 			screen.getByRole( 'listbox', {
+-				name: 'label!',
++				name: defaultProps.label,
+ 			} )
+ 		).toBeVisible();
+ 
+ 		await press.Escape();
+ 		expect(
+ 			screen.queryByRole( 'listbox', {
+-				name: 'label!',
++				name: defaultProps.label,
+ 			} )
+ 		).not.toBeInTheDocument();
+ 
+@@ -134,7 +134,7 @@ describe.each( [
+ 			await press.Enter();
+ 			expect(
+ 				screen.getByRole( 'listbox', {
+-					name: 'label!',
++					name: defaultProps.label,
+ 				} )
+ 			).toHaveFocus();
+ 
+@@ -156,7 +156,7 @@ describe.each( [
+ 			await press.Enter();
+ 			expect(
+ 				screen.getByRole( 'listbox', {
+-					name: 'label!',
++					name: defaultProps.label,
+ 				} )
+ 			).toHaveFocus();
+ 
+@@ -182,7 +182,7 @@ describe.each( [
+ 
+ 			expect(
+ 				screen.queryByRole( 'listbox', {
+-					name: 'label!',
++					name: defaultProps.label,
+ 					hidden: true,
+ 				} )
+ 			).not.toBeInTheDocument();
+@@ -416,4 +416,24 @@ describe.each( [
+ 			screen.getByRole( 'option', { name: 'july-9' } )
+ 		).toBeVisible();
+ 	} );
++
++	it( 'Should open the select popover when focussing the trigger button and pressing arrow down', async () => {
++		render( <Component { ...defaultProps } /> );
++
++		const currentSelectedItem = screen.getByRole( 'combobox', {
++			expanded: false,
++		} );
++
++		await sleep();
++		await press.Tab();
++		expect( currentSelectedItem ).toHaveFocus();
++		expect( currentSelectedItem ).toHaveTextContent( items[ 0 ].value );
++
++		await press.ArrowDown();
++		expect(
++			screen.getByRole( 'listbox', {
++				name: defaultProps.label,
++			} )
++		).toBeVisible();
++	} );
+ } );
+diff --git a/packages/components/src/custom-select-control/test/index.js b/packages/components/src/custom-select-control/test/index.js
+index 4a19449ac80730..165973b09a809a 100644
+--- a/packages/components/src/custom-select-control/test/index.js
++++ b/packages/components/src/custom-select-control/test/index.js
+@@ -190,14 +190,14 @@ describe.each( [
+ 		await user.keyboard( '{enter}' );
+ 		expect(
+ 			screen.getByRole( 'listbox', {
+-				name: 'label!',
++				name: props.label,
+ 			} )
+ 		).toBeVisible();
+ 
+ 		await user.keyboard( '{escape}' );
+ 		expect(
+ 			screen.queryByRole( 'listbox', {
+-				name: 'label!',
++				name: props.label,
+ 			} )
+ 		).not.toBeInTheDocument();
+ 
+@@ -460,7 +460,7 @@ describe.each( [
+ 			await user.click( currentSelectedItem );
+ 
+ 			const customSelect = screen.getByRole( 'listbox', {
+-				name: 'label!',
++				name: props.label,
+ 			} );
+ 			await user.type( customSelect, '{enter}' );
+ 
+@@ -482,7 +482,7 @@ describe.each( [
+ 			await user.keyboard( '{enter}' );
+ 			expect(
+ 				screen.getByRole( 'listbox', {
+-					name: 'label!',
++					name: props.label,
+ 				} )
+ 			).toHaveFocus();
+ 
+@@ -507,7 +507,7 @@ describe.each( [
+ 			await user.keyboard( '{enter}' );
+ 			expect(
+ 				screen.getByRole( 'listbox', {
+-					name: 'label!',
++					name: props.label,
+ 				} )
+ 			).toHaveFocus();
+ 
+@@ -533,7 +533,7 @@ describe.each( [
+ 
+ 			expect(
+ 				screen.queryByRole( 'listbox', {
+-					name: 'label!',
++					name: props.label,
+ 					hidden: true,
+ 				} )
+ 			).not.toBeInTheDocument();
+@@ -542,6 +542,32 @@ describe.each( [
+ 			expect( currentSelectedItem ).toHaveTextContent( 'aquamarine' );
+ 		} );
+ 
++		it( 'Can change selection with a focused input and closed dropdown while pressing arrow keys', async () => {
++			const user = userEvent.setup();
++
++			render( <Component { ...props } /> );
++
++			const currentSelectedItem = screen.getByRole( 'button', {
++				expanded: false,
++			} );
++
++			await user.tab();
++			expect( currentSelectedItem ).toHaveFocus();
++			expect( currentSelectedItem ).toHaveTextContent(
++				props.options[ 0 ].name
++			);
++
++			await user.keyboard( '{arrowdown}' );
++			await user.keyboard( '{arrowdown}' );
++			expect(
++				screen.queryByRole( 'listbox', { name: props.label } )
++			).not.toBeInTheDocument();
++
++			expect( currentSelectedItem ).toHaveTextContent(
++				props.options[ 2 ].name
++			);
++		} );
++
+ 		it( 'Should have correct aria-selected value for selections', async () => {
+ 			const user = userEvent.setup();
+ 

@@ -1,0 +1,273 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5bb9a27bc6ab68..c2a7ad2a17a04d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -40,6 +40,7 @@
+ 
+ ### Enhancements
+ 
++-   `FontSizePicker`: Pass the preset object to the onChange callback to allow conversion from preset slugs to CSS vars ([#44967](https://github.com/WordPress/gutenberg/pull/44967)).
+ -   `FontSizePicker`: Improved slider design when `withSlider` is set ([#44598](https://github.com/WordPress/gutenberg/pull/44598)).
+ -   `ToggleControl`: Improved types for the `help` prop, covering the dynamic render function option, and enabled the dynamic `help` behavior only for a controlled component ([#45279](https://github.com/WordPress/gutenberg/pull/45279)).
+ -   `BorderControl` & `BorderBoxControl`: Replace `__next36pxDefaultSize` with "default" and "large" size variants ([#41860](https://github.com/WordPress/gutenberg/pull/41860)).
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index 7aa5d31b1e9e94..06a0b7fcf112f3 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -173,7 +173,13 @@ const UnforwardedFontSizePicker = (
+ 									onChange?.( undefined );
+ 								} else {
+ 									onChange?.(
+-										hasUnits ? newValue : Number( newValue )
++										hasUnits
++											? newValue
++											: Number( newValue ),
++										fontSizes.find(
++											( fontSize ) =>
++												fontSize.size === newValue
++										)
+ 									);
+ 								}
+ 							} }
+@@ -193,7 +199,11 @@ const UnforwardedFontSizePicker = (
+ 								onChange?.( undefined );
+ 							} else {
+ 								onChange?.(
+-									hasUnits ? newValue : Number( newValue )
++									hasUnits ? newValue : Number( newValue ),
++									fontSizes.find(
++										( fontSize ) =>
++											fontSize.size === newValue
++									)
+ 								);
+ 							}
+ 						} }
+diff --git a/packages/components/src/font-size-picker/test/index.tsx b/packages/components/src/font-size-picker/test/index.tsx
+index 74e0eef2f94dcd..3ac59bc2df1cb1 100644
+--- a/packages/components/src/font-size-picker/test/index.tsx
++++ b/packages/components/src/font-size-picker/test/index.tsx
+@@ -147,11 +147,19 @@ describe( 'FontSizePicker', () => {
+ 		);
+ 
+ 		test.each( [
+-			{ option: 'Default', value: '8px', expectedValue: undefined },
+-			{ option: 'Tiny 8', value: undefined, expectedValue: '8px' },
++			{
++				option: 'Default',
++				value: '8px',
++				expectedArguments: [ undefined ],
++			},
++			{
++				option: 'Tiny 8',
++				value: undefined,
++				expectedArguments: [ '8px', fontSizes[ 0 ] ],
++			},
+ 		] )(
+-			'calls onChange( $expectedValue ) when $option is selected',
+-			async ( { option, value, expectedValue } ) => {
++			'calls onChange( $expectedArguments ) when $option is selected',
++			async ( { option, value, expectedArguments } ) => {
+ 				const user = userEvent.setup( {
+ 					advanceTimers: jest.advanceTimersByTime,
+ 				} );
+@@ -171,7 +179,7 @@ describe( 'FontSizePicker', () => {
+ 					screen.getByRole( 'option', { name: option } )
+ 				);
+ 				expect( onChange ).toHaveBeenCalledTimes( 1 );
+-				expect( onChange ).toHaveBeenCalledWith( expectedValue );
++				expect( onChange ).toHaveBeenCalledWith( ...expectedArguments );
+ 			}
+ 		);
+ 
+@@ -282,18 +290,37 @@ describe( 'FontSizePicker', () => {
+ 		);
+ 
+ 		test.each( [
+-			{ option: 'Default', value: '8px', expectedValue: undefined },
+-			{ option: 'Tiny 8px', value: undefined, expectedValue: '8px' },
+-			{ option: 'Small 1em', value: '8px', expectedValue: '1em' },
+-			{ option: 'Medium 2rem', value: '8px', expectedValue: '2rem' },
++			{
++				option: 'Default',
++				value: '8px',
++				expectedArguments: [ undefined ],
++			},
++			{
++				option: 'Tiny 8px',
++				value: undefined,
++				expectedArguments: [ '8px', fontSizes[ 0 ] ],
++			},
++			{
++				option: 'Small 1em',
++				value: '8px',
++				expectedArguments: [ '1em', fontSizes[ 1 ] ],
++			},
++			{
++				option: 'Medium 2rem',
++				value: '8px',
++				expectedArguments: [ '2rem', fontSizes[ 2 ] ],
++			},
+ 			{
+ 				option: 'Large',
+ 				value: '8px',
+-				expectedValue: 'clamp(1.75rem, 3vw, 2.25rem)',
++				expectedArguments: [
++					'clamp(1.75rem, 3vw, 2.25rem)',
++					fontSizes[ 3 ],
++				],
+ 			},
+ 		] )(
+ 			'calls onChange( $expectedValue ) when $option is selected',
+-			async ( { option, value, expectedValue } ) => {
++			async ( { option, value, expectedArguments } ) => {
+ 				const user = userEvent.setup( {
+ 					advanceTimers: jest.advanceTimersByTime,
+ 				} );
+@@ -313,7 +340,7 @@ describe( 'FontSizePicker', () => {
+ 					screen.getByRole( 'option', { name: option } )
+ 				);
+ 				expect( onChange ).toHaveBeenCalledTimes( 1 );
+-				expect( onChange ).toHaveBeenCalledWith( expectedValue );
++				expect( onChange ).toHaveBeenCalledWith( ...expectedArguments );
+ 			}
+ 		);
+ 
+@@ -405,7 +432,7 @@ describe( 'FontSizePicker', () => {
+ 			);
+ 			await user.click( screen.getByRole( 'radio', { name: 'Medium' } ) );
+ 			expect( onChange ).toHaveBeenCalledTimes( 1 );
+-			expect( onChange ).toHaveBeenCalledWith( '16px' );
++			expect( onChange ).toHaveBeenCalledWith( '16px', fontSizes[ 1 ] );
+ 		} );
+ 
+ 		commonToggleGroupTests( fontSizes );
+@@ -481,16 +508,19 @@ describe( 'FontSizePicker', () => {
+ 		);
+ 
+ 		test.each( [
+-			{ radio: 'Small', expectedValue: '12px' },
+-			{ radio: 'Medium', expectedValue: '1em' },
+-			{ radio: 'Large', expectedValue: '2rem' },
++			{ radio: 'Small', expectedArguments: [ '12px', fontSizes[ 0 ] ] },
++			{ radio: 'Medium', expectedArguments: [ '1em', fontSizes[ 1 ] ] },
++			{ radio: 'Large', expectedArguments: [ '2rem', fontSizes[ 2 ] ] },
+ 			{
+ 				radio: 'Extra Large',
+-				expectedValue: 'clamp(1.75rem, 3vw, 2.25rem)',
++				expectedArguments: [
++					'clamp(1.75rem, 3vw, 2.25rem)',
++					fontSizes[ 3 ],
++				],
+ 			},
+ 		] )(
+-			'calls onChange( $expectedValue ) when $radio is selected',
+-			async ( { radio, expectedValue } ) => {
++			'calls onChange( $expectedArguments ) when $radio is selected',
++			async ( { radio, expectedArguments } ) => {
+ 				const user = userEvent.setup( {
+ 					advanceTimers: jest.advanceTimersByTime,
+ 				} );
+@@ -506,7 +536,7 @@ describe( 'FontSizePicker', () => {
+ 					screen.getByRole( 'radio', { name: radio } )
+ 				);
+ 				expect( onChange ).toHaveBeenCalledTimes( 1 );
+-				expect( onChange ).toHaveBeenCalledWith( expectedValue );
++				expect( onChange ).toHaveBeenCalledWith( ...expectedArguments );
+ 			}
+ 		);
+ 
+diff --git a/packages/components/src/font-size-picker/types.ts b/packages/components/src/font-size-picker/types.ts
+index c410ac172d63dc..24c66efe1bee28 100644
+--- a/packages/components/src/font-size-picker/types.ts
++++ b/packages/components/src/font-size-picker/types.ts
+@@ -22,7 +22,10 @@ export type FontSizePickerProps = {
+ 	 * attending to what reset means in that context, e.g., set the font size to
+ 	 * undefined or set the font size a starting value.
+ 	 */
+-	onChange?: ( value: number | string | undefined ) => void;
++	onChange?: (
++		value: number | string | undefined,
++		selectedItem?: FontSize
++	) => void;
+ 	/**
+ 	 * The current font size value.
+ 	 */
+diff --git a/packages/edit-site/src/components/global-styles/typography-panel.js b/packages/edit-site/src/components/global-styles/typography-panel.js
+index a1ef517560d42b..3e53486af2121c 100644
+--- a/packages/edit-site/src/components/global-styles/typography-panel.js
++++ b/packages/edit-site/src/components/global-styles/typography-panel.js
+@@ -19,7 +19,6 @@ import { __ } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import { getSupportedGlobalStylesPanels, useSetting, useStyle } from './hooks';
+-import { getTypographyFontSizeValue } from './typography-utils';
+ 
+ export function useHasTypographyPanel( name ) {
+ 	const hasFontFamily = useHasFontFamilyControl( name );
+@@ -110,6 +109,26 @@ function useStyleWithReset( path, blockName ) {
+ 	return [ style, setStyle, hasStyle, resetStyle ];
+ }
+ 
++function useFontSizeWithReset( path, blockName ) {
++	const [ fontSize, setStyleCallback ] = useStyle( path, blockName );
++	const [ userStyle ] = useStyle( path, blockName, 'user' );
++	const hasFontSize = () => !! userStyle;
++	const resetFontSize = () => setStyleCallback( undefined );
++	const setFontSize = ( newValue, metadata ) => {
++		if ( !! metadata?.slug ) {
++			newValue = `var:preset|font-size|${ metadata?.slug }`;
++		}
++		setStyleCallback( newValue );
++	};
++
++	return {
++		fontSize,
++		setFontSize,
++		hasFontSize,
++		resetFontSize,
++	};
++}
++
+ function useFontAppearance( prefix, name ) {
+ 	const [ fontStyle, setFontStyle ] = useStyle(
+ 		prefix + 'typography.fontStyle',
+@@ -152,19 +171,8 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
+ 	} else if ( element && element !== 'text' ) {
+ 		prefix = `elements.${ element }.`;
+ 	}
+-	const [ fluidTypography ] = useSetting( 'typography.fluid', name );
+ 	const [ fontSizes ] = useSetting( 'typography.fontSizes', name );
+ 
+-	// Convert static font size values to fluid font sizes if fluidTypography is activated.
+-	const fontSizesWithFluidValues = fontSizes.map( ( font ) => {
+-		if ( !! fluidTypography ) {
+-			font.size = getTypographyFontSizeValue( font, {
+-				fluid: fluidTypography,
+-			} );
+-		}
+-		return font;
+-	} );
+-
+ 	const disableCustomFontSizes = ! useSetting(
+ 		'typography.customFontSize',
+ 		name
+@@ -191,8 +199,8 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
+ 
+ 	const [ fontFamily, setFontFamily, hasFontFamily, resetFontFamily ] =
+ 		useStyleWithReset( prefix + 'typography.fontFamily', name );
+-	const [ fontSize, setFontSize, hasFontSize, resetFontSize ] =
+-		useStyleWithReset( prefix + 'typography.fontSize', name );
++	const { fontSize, setFontSize, hasFontSize, resetFontSize } =
++		useFontSizeWithReset( prefix + 'typography.fontSize', name );
+ 	const {
+ 		fontStyle,
+ 		setFontStyle,
+@@ -253,7 +261,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
+ 					<FontSizePicker
+ 						value={ fontSize }
+ 						onChange={ setFontSize }
+-						fontSizes={ fontSizesWithFluidValues }
++						fontSizes={ fontSizes }
+ 						disableCustomFontSizes={ disableCustomFontSizes }
+ 						withReset={ false }
+ 						withSlider

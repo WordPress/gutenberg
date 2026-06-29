@@ -1,0 +1,123 @@
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index 1ef761622524f5..13fecceae2e0e2 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -98,6 +98,7 @@ function UnforwardedRangeControl(
+ 		value: valueProp,
+ 		withInputField = true,
+ 		__shouldNotWarnDeprecated36pxSize,
++		size = 'default',
+ 		...otherProps
+ 	} = props;
+ 
+@@ -235,10 +236,20 @@ function UnforwardedRangeControl(
+ 	maybeWarnDeprecated36pxSize( {
+ 		componentName: 'RangeControl',
+ 		__next40pxDefaultSize,
+-		size: undefined,
++		size,
+ 		__shouldNotWarnDeprecated36pxSize,
+ 	} );
+ 
++	const translatedSize = ( () => {
++		if ( __next40pxDefaultSize && size === 'default' ) {
++			return 'default';
++		}
++		if ( ! __next40pxDefaultSize && size === 'default' ) {
++			return 'compact';
++		}
++		return size;
++	} )();
++
+ 	return (
+ 		<BaseControl
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+@@ -252,6 +263,7 @@ function UnforwardedRangeControl(
+ 			<Root
+ 				className="components-range-control__root"
+ 				__next40pxDefaultSize={ __next40pxDefaultSize }
++				size={ translatedSize }
+ 			>
+ 				{ beforeIcon && (
+ 					<BeforeIconWrapper>
+@@ -339,11 +351,7 @@ function UnforwardedRangeControl(
+ 						onBlur={ handleOnInputNumberBlur }
+ 						onChange={ handleOnChange }
+ 						shiftStep={ shiftStep }
+-						size={
+-							__next40pxDefaultSize
+-								? '__unstable-large'
+-								: 'default'
+-						}
++						size={ translatedSize }
+ 						__unstableInputWidth={
+ 							__next40pxDefaultSize ? space( 20 ) : space( 16 )
+ 						}
+diff --git a/packages/components/src/range-control/stories/index.story.tsx b/packages/components/src/range-control/stories/index.story.tsx
+index 5a4b2342a49ffb..b5c5485cb206be 100644
+--- a/packages/components/src/range-control/stories/index.story.tsx
++++ b/packages/components/src/range-control/stories/index.story.tsx
+@@ -41,6 +41,10 @@ const meta: Meta< typeof RangeControl > = {
+ 		onMouseLeave: { control: false },
+ 		onMouseMove: { control: false },
+ 		railColor: { control: { type: 'color' } },
++		size: {
++			control: { type: 'select' },
++			options: [ 'default', 'compact' ],
++		},
+ 		step: { control: { type: 'number' } },
+ 		trackColor: { control: { type: 'color' } },
+ 		type: { control: { type: 'check' }, options: [ 'stepper' ] },
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index c86c57800cac46..4a17fe09f39985 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -27,12 +27,21 @@ const rangeHeight = () =>
+ 	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
+ const thumbSize = 12;
+ 
++type SizeType = 'compact' | 'default';
++const getSizeHeight = ( size: SizeType ) => {
++	const sizes = {
++		compact: 32,
++		default: 40,
++	};
++	return sizes[ size ];
++};
++
+ const deprecatedHeight = ( {
+ 	__next40pxDefaultSize,
+ }: Pick< RangeControlProps, '__next40pxDefaultSize' > ) =>
+ 	! __next40pxDefaultSize && css( { minHeight: rangeHeightValue } );
+ 
+-type RootProps = Pick< RangeControlProps, '__next40pxDefaultSize' >;
++type RootProps = Pick< RangeControlProps, '__next40pxDefaultSize' | 'size' >;
+ export const Root = styled.div< RootProps >`
+ 	-webkit-tap-highlight-color: transparent;
+ 	align-items: center;
+@@ -42,7 +51,7 @@ export const Root = styled.div< RootProps >`
+ 	position: relative;
+ 	touch-action: none;
+ 	width: 100%;
+-	min-height: 40px;
++	min-height: ${ ( { size = 'default' } ) => getSizeHeight( size ) }px;
+ 	/* TODO: remove after removing the __next40pxDefaultSize prop */
+ 	${ deprecatedHeight };
+ `;
+diff --git a/packages/components/src/range-control/types.ts b/packages/components/src/range-control/types.ts
+index e4792296f83144..39a7a123020e7b 100644
+--- a/packages/components/src/range-control/types.ts
++++ b/packages/components/src/range-control/types.ts
+@@ -240,6 +240,12 @@ export type RangeControlProps = Pick<
+ 		 * @ignore
+ 		 */
+ 		__shouldNotWarnDeprecated36pxSize?: boolean;
++		/**
++		 * The size of the control.
++		 *
++		 * @default 'default'
++		 */
++		size?: 'default' | 'compact';
+ 	};
+ 
+ export type RailProps = MarksProps & {

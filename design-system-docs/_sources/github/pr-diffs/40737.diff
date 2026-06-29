@@ -1,0 +1,524 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eb7ab187b8eeaf..1abf30ff318a72 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `InputControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40622](https://github.com/WordPress/gutenberg/pull/40622)).
+ -   `UnitControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40627](https://github.com/WordPress/gutenberg/pull/40627)).
++-   `SelectControl`: Improved TypeScript support ([#40737](https://github.com/WordPress/gutenberg/pull/40737)).
+ -   `ToggleControlGroup`: Switch to internal `Icon` component for dashicon support ([40717](https://github.com/WordPress/gutenberg/pull/40717)).
+ 
+ ### Internal
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index f25202bad70eaa..8d4f0ad50e03d9 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+-<ForwardRef(SelectControl)
++<ForwardRef(UnforwardedSelectControl)
+   className="block-editor-dimension-control"
+   hideLabelFromVision={false}
+   label={
+@@ -34,7 +34,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+ `;
+ 
+ exports[`DimensionControl rendering renders with defaults 1`] = `
+-<ForwardRef(SelectControl)
++<ForwardRef(UnforwardedSelectControl)
+   className="block-editor-dimension-control"
+   hideLabelFromVision={false}
+   label={
+@@ -75,7 +75,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+ `;
+ 
+ exports[`DimensionControl rendering renders with icon and custom icon label 1`] = `
+-<ForwardRef(SelectControl)
++<ForwardRef(UnforwardedSelectControl)
+   className="block-editor-dimension-control"
+   hideLabelFromVision={false}
+   label={
+@@ -128,7 +128,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+ `;
+ 
+ exports[`DimensionControl rendering renders with icon and default icon label 1`] = `
+-<ForwardRef(SelectControl)
++<ForwardRef(UnforwardedSelectControl)
+   className="block-editor-dimension-control"
+   hideLabelFromVision={false}
+   label={
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index 9d059fc8cf5470..1f12c0594ee140 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -114,7 +114,7 @@ Render a user interface to select multiple users from a list.
+ 		this.setState( { users } );
+ 	} }
+ 	options={ [
+-		{ value: null, label: 'Select a User', disabled: true },
++		{ value: '', label: 'Select a User', disabled: true },
+ 		{ value: 'a', label: 'User A' },
+ 		{ value: 'b', label: 'User B' },
+ 		{ value: 'c', label: 'User c' },
+@@ -194,7 +194,7 @@ If this property is added, multiple values can be selected. The value passed sho
+ An array of objects containing the following properties:
+ 
+ -   `label`: (string) The label to be shown to the user.
+--   `value`: (Object) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
++-   `value`: (string) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
+ -   `disabled`: (boolean) Whether or not the option should have the disabled attribute.
+ -   Type: `Array`
+ -   Required: No
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 80dbd73e38ea25..95614becc2ac59 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -3,7 +3,7 @@
+  */
+ import { isEmpty, noop } from 'lodash';
+ import classNames from 'classnames';
+-import type { ChangeEvent, FocusEvent, ReactNode, ForwardedRef } from 'react';
++import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -17,10 +17,9 @@ import { Icon, chevronDown } from '@wordpress/icons';
+  */
+ import BaseControl from '../base-control';
+ import InputBase from '../input-control/input-base';
+-import type { InputBaseProps, LabelPosition } from '../input-control/types';
+ import { Select, DownArrowWrapper } from './styles/select-control-styles';
+-import type { Size } from './types';
+ import type { WordPressComponentProps } from '../ui/context';
++import type { SelectControlProps } from './types';
+ 
+ function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( SelectControl );
+@@ -29,30 +28,7 @@ function useUniqueId( idProp?: string ) {
+ 	return idProp || id;
+ }
+ 
+-export interface SelectControlProps
+-	extends Omit< InputBaseProps, 'children' | 'isFocused' > {
+-	help?: string;
+-	hideLabelFromVision?: boolean;
+-	multiple?: boolean;
+-	onBlur?: ( event: FocusEvent< HTMLSelectElement > ) => void;
+-	onFocus?: ( event: FocusEvent< HTMLSelectElement > ) => void;
+-	onChange?: (
+-		value: string | string[],
+-		extra?: { event?: ChangeEvent< HTMLSelectElement > }
+-	) => void;
+-	options?: {
+-		label: string;
+-		value: string;
+-		id?: string;
+-		disabled?: boolean;
+-	}[];
+-	size?: Size;
+-	value?: string | string[];
+-	labelPosition?: LabelPosition;
+-	children?: ReactNode;
+-}
+-
+-function SelectControl(
++function UnforwardedSelectControl(
+ 	{
+ 		className,
+ 		disabled = false,
+@@ -165,6 +141,31 @@ function SelectControl(
+ 	/* eslint-enable jsx-a11y/no-onchange */
+ }
+ 
+-const ForwardedComponent = forwardRef( SelectControl );
++/**
++ * `SelectControl` allows users to select from a single or multiple option menu.
++ * It functions as a wrapper around the browser's native `<select>` element.
++ *
++ * @example
++ * import { SelectControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MySelectControl = () => {
++ *   const [ size, setSize ] = useState( '50%' );
++ *
++ *   return (
++ *     <SelectControl
++ *       label="Size"
++ *       value={ size }
++ *       options={ [
++ *         { label: 'Big', value: '100%' },
++ *         { label: 'Medium', value: '50%' },
++ *         { label: 'Small', value: '25%' },
++ *       ] }
++ *       onChange={ setSize }
++ *     />
++ *   );
++ * };
++ */
++export const SelectControl = forwardRef( UnforwardedSelectControl );
+ 
+-export default ForwardedComponent;
++export default SelectControl;
+diff --git a/packages/components/src/select-control/stories/index.js b/packages/components/src/select-control/stories/index.js
+deleted file mode 100644
+index 5b21c55070feaf..00000000000000
+--- a/packages/components/src/select-control/stories/index.js
++++ /dev/null
+@@ -1,104 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, object, select, text } from '@storybook/addon-knobs';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import SelectControl from '..';
+-
+-export default {
+-	title: 'Components/SelectControl',
+-	component: SelectControl,
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-const SelectControlWithState = ( props ) => {
+-	const [ selection, setSelection ] = useState();
+-
+-	return (
+-		<SelectControl
+-			{ ...props }
+-			value={ selection }
+-			onChange={ setSelection }
+-		/>
+-	);
+-};
+-
+-export const _default = () => {
+-	const props = {
+-		disabled: boolean( 'disabled', false ),
+-		help: text( 'help', 'Help text to explain the select control.' ),
+-		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
+-		label: text( 'label', 'Value' ),
+-		labelPosition: select(
+-			'labelPosition',
+-			{
+-				top: 'top',
+-				side: 'side',
+-				bottom: 'bottom',
+-			},
+-			'top'
+-		),
+-		multiple: boolean( 'multiple', false ),
+-		options: object( 'Options', [
+-			{ value: null, label: 'Select an Option', disabled: true },
+-			{ value: 'a', label: 'Option A' },
+-			{ value: 'b', label: 'Option B' },
+-			{ value: 'c', label: 'Option C' },
+-		] ),
+-		size: select(
+-			'size',
+-			{
+-				default: 'default',
+-				small: 'small',
+-				'__unstable-large': '__unstable-large',
+-			},
+-			'default'
+-		),
+-	};
+-
+-	return <SelectControlWithState { ...props } />;
+-};
+-
+-export const withCustomChildren = () => {
+-	return (
+-		<SelectControlWithState label="Value">
+-			<option value="option-1">Option 1</option>
+-			<option value="option-2" disabled>
+-				Option 2 - Disabled
+-			</option>
+-			<option value="option-3">Option 3</option>
+-			<optgroup label="Option Group 1">
+-				<option value="option-group-1-option-1">
+-					Option Group 1 - Option 1
+-				</option>
+-				<option value="option-group-1-option-2" disabled>
+-					Option Group 1 - Option 2 - Disabled
+-				</option>
+-				<option value="option-group-1-option-3">
+-					Option Group 1 - Option 3
+-				</option>
+-			</optgroup>
+-			<optgroup label="Option Group 2">
+-				<option value="option-group-2-option-1">
+-					Option Group 2 - Option 1
+-				</option>
+-				<option value="option-group-2-option-2" disabled>
+-					Option Group 2 - Option 2 - Disabled
+-				</option>
+-				<option value="option-group-2-option-3">
+-					Option Group 2 - Option 3
+-				</option>
+-			</optgroup>
+-		</SelectControlWithState>
+-	);
+-};
+diff --git a/packages/components/src/select-control/stories/index.tsx b/packages/components/src/select-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..167e35eda4745a
+--- /dev/null
++++ b/packages/components/src/select-control/stories/index.tsx
+@@ -0,0 +1,90 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++import type { ComponentProps } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import SelectControl from '..';
++
++const meta: ComponentMeta< typeof SelectControl > = {
++	title: 'Components/SelectControl',
++	component: SelectControl,
++	argTypes: {
++		help: { control: { type: 'text' } },
++		label: { control: { type: 'text' } },
++		prefix: { control: { type: 'text' } },
++		suffix: { control: { type: 'text' } },
++		value: { control: { type: null } },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const SelectControlWithState: ComponentStory< typeof SelectControl > = (
++	args
++) => {
++	const [ selection, setSelection ] = useState<
++		ComponentProps< typeof SelectControl >[ 'value' ]
++	>();
++
++	return (
++		<SelectControl
++			{ ...args }
++			value={ selection }
++			onChange={ setSelection }
++		/>
++	);
++};
++
++export const Default = SelectControlWithState.bind( {} );
++Default.args = {
++	options: [
++		{ value: '', label: 'Select an Option', disabled: true },
++		{ value: 'a', label: 'Option A' },
++		{ value: 'b', label: 'Option B' },
++		{ value: 'c', label: 'Option C' },
++	],
++};
++
++export const WithLabelAndHelpText = SelectControlWithState.bind( {} );
++WithLabelAndHelpText.args = {
++	...Default.args,
++	help: 'Help text to explain the select control.',
++	label: 'Value',
++};
++
++/**
++ * As an alternative to the `options` prop, `optgroup`s and `options` can be
++ * passed in as `children` for more customizability.
++ */
++export const WithCustomChildren: ComponentStory< typeof SelectControl > = (
++	args
++) => {
++	return (
++		<SelectControlWithState { ...args }>
++			<option value="option-1">Option 1</option>
++			<option value="option-2" disabled>
++				Option 2 - Disabled
++			</option>
++			<optgroup label="Option Group 1">
++				<option value="option-group-1-option-1">
++					Option Group 1 - Option 1
++				</option>
++				<option value="option-group-1-option-2" disabled>
++					Option Group 1 - Option 2 - Disabled
++				</option>
++			</optgroup>
++		</SelectControlWithState>
++	);
++};
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index 1fabe500f917cd..eda0f5995146d2 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -8,11 +8,12 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import { COLORS, rtl } from '../../utils';
+-import type { Size } from '../types';
++import type { SelectControlProps } from '../types';
+ 
+-interface SelectProps {
+-	disabled?: boolean;
+-	selectSize?: Size;
++interface SelectProps extends Pick< SelectControlProps, 'disabled' > {
++	// Using `selectSize` instead of `size` to avoid a type conflict with the
++	// `size` HTML attribute of the `select` element.
++	selectSize?: SelectControlProps[ 'size' ];
+ }
+ 
+ const disabledStyles = ( { disabled }: SelectProps ) => {
+@@ -23,14 +24,14 @@ const disabledStyles = ( { disabled }: SelectProps ) => {
+ 	} );
+ };
+ 
+-const fontSizeStyles = ( { selectSize }: SelectProps ) => {
++const fontSizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
+ 	const sizes = {
+ 		default: '13px',
+ 		small: '11px',
+ 		'__unstable-large': '13px',
+ 	};
+ 
+-	const fontSize = sizes[ selectSize as Size ];
++	const fontSize = sizes[ selectSize ];
+ 	const fontSizeMobile = '16px';
+ 
+ 	if ( ! fontSize ) return '';
+@@ -44,7 +45,7 @@ const fontSizeStyles = ( { selectSize }: SelectProps ) => {
+ 	`;
+ };
+ 
+-const sizeStyles = ( { selectSize }: SelectProps ) => {
++const sizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
+ 	const sizes = {
+ 		default: {
+ 			height: 30,
+@@ -63,7 +64,7 @@ const sizeStyles = ( { selectSize }: SelectProps ) => {
+ 		},
+ 	};
+ 
+-	const style = sizes[ selectSize as Size ] || sizes.default;
++	const style = sizes[ selectSize ];
+ 
+ 	return css( style );
+ };
+diff --git a/packages/components/src/select-control/test/select-control.js b/packages/components/src/select-control/test/select-control.tsx
+similarity index 93%
+rename from packages/components/src/select-control/test/select-control.js
+rename to packages/components/src/select-control/test/select-control.tsx
+index f1883c150f111a..e1979ccbd709b4 100644
+--- a/packages/components/src/select-control/test/select-control.js
++++ b/packages/components/src/select-control/test/select-control.tsx
+@@ -32,7 +32,7 @@ describe( 'SelectControl', () => {
+ 
+ 		expect( screen.getByText( 'Option 1' ) ).toBeInTheDocument();
+ 
+-		const selectElement = screen.queryByLabelText( 'Select' );
++		const selectElement = screen.getByLabelText( 'Select' );
+ 
+ 		fireEvent.change( selectElement, {
+ 			target: { value: 'option-group-option-1' },
+@@ -68,7 +68,7 @@ describe( 'SelectControl', () => {
+ 
+ 		expect( screen.getByText( 'Option 1' ) ).toBeInTheDocument();
+ 
+-		const selectElement = screen.queryByLabelText( 'Select' );
++		const selectElement = screen.getByLabelText( 'Select' );
+ 
+ 		fireEvent.change( selectElement, {
+ 			target: { value: 'option-2' },
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+index c4c38cdf428b4b..81f62b55982a71 100644
+--- a/packages/components/src/select-control/types.ts
++++ b/packages/components/src/select-control/types.ts
+@@ -1 +1,66 @@
+-export type Size = 'default' | 'small' | '__unstable-large';
++/**
++ * External dependencies
++ */
++import type { ChangeEvent, FocusEvent, ReactNode } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { InputBaseProps } from '../input-control/types';
++import type { BaseControlProps } from '../base-control/types';
++
++export interface SelectControlProps
++	extends Pick<
++			InputBaseProps,
++			| 'disabled'
++			| 'hideLabelFromVision'
++			| 'label'
++			| 'labelPosition'
++			| 'prefix'
++			| 'size'
++			| 'suffix'
++		>,
++		Pick< BaseControlProps, 'help' > {
++	/**
++	 * If this property is added, multiple values can be selected. The value passed should be an array.
++	 *
++	 * @default false
++	 */
++	multiple?: boolean;
++	onBlur?: ( event: FocusEvent< HTMLSelectElement > ) => void;
++	onFocus?: ( event: FocusEvent< HTMLSelectElement > ) => void;
++	/**
++	 * A function that receives the value of the new option that is being selected as input.
++	 *
++	 * If `multiple` is `true`, the value received is an array of the selected value.
++	 * Otherwise, the value received is a single value with the new selected value.
++	 */
++	onChange?: (
++		value: string | string[],
++		extra?: { event?: ChangeEvent< HTMLSelectElement > }
++	) => void;
++	options?: {
++		/**
++		 * The label to be shown to the user.
++		 */
++		label: string;
++		/**
++		 * The internal value used to choose the selected value.
++		 * This is also the value passed to `onChange` when the option is selected.
++		 */
++		value: string;
++		id?: string;
++		/**
++		 * Whether or not the option should have the disabled attribute.
++		 *
++		 * @default false
++		 */
++		disabled?: boolean;
++	}[];
++	value?: string | string[];
++	/**
++	 * As an alternative to the `options` prop, `optgroup`s and `options` can be
++	 * passed in as `children` for more customizability.
++	 */
++	children?: ReactNode;
++}

@@ -1,0 +1,23 @@
+diff --git a/packages/components/src/external-link/stories/index.js b/packages/components/src/external-link/stories/index.js
+new file mode 100644
+index 00000000000000..9abfa1af04ba9c
+--- /dev/null
++++ b/packages/components/src/external-link/stories/index.js
+@@ -0,0 +1,17 @@
++/**
++ * External dependencies
++ */
++import { text } from '@storybook/addon-knobs';
++/**
++ * Internal dependencies
++ */
++import ExternalLink from '../';
++
++export default { title: 'ExternalLink', component: ExternalLink };
++
++export const _default = () => {
++	const title = text( 'children', 'WordPress' );
++	const href = text( 'href', 'https://wordpress.org' );
++
++	return <ExternalLink href={ href }>{ title }</ExternalLink>;
++};

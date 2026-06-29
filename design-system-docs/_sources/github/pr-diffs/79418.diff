@@ -1,0 +1,451 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8a90182dbea1e1..2b6e4d0c66f6a7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
+     -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
++    -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
+     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
+ 
+ ### Internal
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index 6fa3a061ab0361..9c8acced853a1d 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -74,7 +74,6 @@ const BorderBoxControlSplitControls = (
+ 			<BorderBoxControlVisualizer value={ value } />
+ 
+ 			<BorderControl
+-				size="__unstable-large"
+ 				className={ centeredClassName }
+ 				hideLabelFromVision
+ 				label={ __( 'Top border' ) }
+@@ -84,7 +83,6 @@ const BorderBoxControlSplitControls = (
+ 				{ ...sharedBorderControlProps }
+ 			/>
+ 			<BorderControl
+-				size="__unstable-large"
+ 				hideLabelFromVision
+ 				label={ __( 'Left border' ) }
+ 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
+@@ -93,7 +91,6 @@ const BorderBoxControlSplitControls = (
+ 				{ ...sharedBorderControlProps }
+ 			/>
+ 			<BorderControl
+-				size="__unstable-large"
+ 				className={ rightAlignedClassName }
+ 				hideLabelFromVision
+ 				label={ __( 'Right border' ) }
+@@ -103,7 +100,6 @@ const BorderBoxControlSplitControls = (
+ 				{ ...sharedBorderControlProps }
+ 			/>
+ 			<BorderControl
+-				size="__unstable-large"
+ 				className={ centeredClassName }
+ 				hideLabelFromVision
+ 				label={ __( 'Bottom border' ) }
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index 2eee26889d5bbf..27b7030fbf28d7 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -112,7 +112,6 @@ const UnconnectedBorderBoxControl = (
+ 						value={ linkedValue }
+ 						withSlider
+ 						width="116px"
+-						size="__unstable-large"
+ 						__experimentalIsRenderedInSidebar={
+ 							__experimentalIsRenderedInSidebar
+ 						}
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index 23ee902df5ffc3..1b47ff7897b834 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -158,7 +158,6 @@ const BorderControlDropdown = (
+ 		popoverContentClassName,
+ 		popoverControlsClassName,
+ 		resetButtonWrapperClassName,
+-		size,
+ 		__unstablePopoverProps,
+ 		...otherProps
+ 	} = useBorderControlDropdown( props );
+@@ -188,7 +187,7 @@ const BorderControlDropdown = (
+ 			tooltipPosition={ dropdownPosition }
+ 			label={ __( 'Border color and style picker' ) }
+ 			showTooltip
+-			__next40pxDefaultSize={ size === '__unstable-large' }
++			__next40pxDefaultSize
+ 		>
+ 			<span className={ indicatorWrapperClassName }>
+ 				<ColorIndicator
+diff --git a/packages/components/src/border-control/border-control-dropdown/hook.ts b/packages/components/src/border-control/border-control-dropdown/hook.ts
+index daba828fa64f2e..d5a7a886e475a2 100644
+--- a/packages/components/src/border-control/border-control-dropdown/hook.ts
++++ b/packages/components/src/border-control/border-control-dropdown/hook.ts
+@@ -25,7 +25,6 @@ export function useBorderControlDropdown(
+ 		enableStyle = true,
+ 		onChange,
+ 		previousStyleSelection,
+-		size = 'default',
+ 		__experimentalIsRenderedInSidebar = false,
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderControlDropdown' );
+@@ -65,8 +64,8 @@ export function useBorderControlDropdown(
+ 	}, [ cx ] );
+ 
+ 	const indicatorWrapperClassName = useMemo( () => {
+-		return cx( styles.colorIndicatorWrapper( border, size ) );
+-	}, [ border, cx, size ] );
++		return cx( styles.colorIndicatorWrapper( border ) );
++	}, [ border, cx ] );
+ 
+ 	const popoverControlsClassName = useMemo( () => {
+ 		return cx( styles.borderControlPopoverControls );
+@@ -95,7 +94,6 @@ export function useBorderControlDropdown(
+ 		popoverContentClassName,
+ 		popoverControlsClassName,
+ 		resetButtonWrapperClassName,
+-		size,
+ 		__experimentalIsRenderedInSidebar,
+ 	};
+ }
+diff --git a/packages/components/src/border-control/border-control/README.md b/packages/components/src/border-control/border-control/README.md
+index 0afda1ee31ae81..beee5ae651734b 100644
+--- a/packages/components/src/border-control/border-control/README.md
++++ b/packages/components/src/border-control/border-control/README.md
+@@ -30,7 +30,6 @@ const MyBorderControl = () => {
+ 
+ 	return (
+ 		<BorderControl
+-			__next40pxDefaultSize
+ 			colors={ colors }
+ 			label={ __( 'Border' ) }
+ 			onChange={ setBorder }
+@@ -126,13 +125,6 @@ new border value.
+ -   Required: No
+ -   Default: `true`
+ 
+-### `size`: `string`
+-
+-Size of the control.
+-
+--   Required: No
+--   Default: `default`
+--   Allowed values: `default`, `__unstable-large`
+ 
+ ### `value`: `Object`
+ 
+@@ -164,10 +156,3 @@ Flags whether this `BorderControl` should also render a `RangeControl` for
+ additional control over a border's width.
+ 
+ -   Required: No
+-
+-### `__next40pxDefaultSize`: `boolean`
+-
+-Start opting into the larger default height that will become the default size in a future version.
+-
+--   Required: No
+--   Default: `false`
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index a16907dfe5981f..790ce526756fda 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -39,7 +39,6 @@ const UnconnectedBorderControl = (
+ 	forwardedRef: React.ForwardedRef< any >
+ ) => {
+ 	const {
+-		__next40pxDefaultSize = false,
+ 		colors,
+ 		disableCustomColors,
+ 		disableUnits,
+@@ -57,7 +56,6 @@ const UnconnectedBorderControl = (
+ 		__unstablePopoverProps,
+ 		previousStyleSelection,
+ 		showDropdownHeader,
+-		size,
+ 		sliderClassName,
+ 		value: border,
+ 		widthUnit,
+@@ -75,8 +73,7 @@ const UnconnectedBorderControl = (
+ 			/>
+ 			<HStack spacing={ 4 } className={ innerWrapperClassName }>
+ 				<UnitControl
+-					__next40pxDefaultSize={ __next40pxDefaultSize }
+-					__shouldNotWarnDeprecated36pxSize
++					__next40pxDefaultSize
+ 					prefix={
+ 						<Spacer marginRight={ 1 } marginBottom={ 0 }>
+ 							<BorderControlDropdown
+@@ -96,7 +93,6 @@ const UnconnectedBorderControl = (
+ 								__experimentalIsRenderedInSidebar={
+ 									__experimentalIsRenderedInSidebar
+ 								}
+-								size={ size }
+ 							/>
+ 						</Spacer>
+ 					}
+@@ -108,7 +104,6 @@ const UnconnectedBorderControl = (
+ 					placeholder={ placeholder }
+ 					disableUnits={ disableUnits }
+ 					__unstableInputWidth={ inputWidth }
+-					size={ size }
+ 				/>
+ 				{ withSlider && (
+ 					<RangeControl
+@@ -122,8 +117,7 @@ const UnconnectedBorderControl = (
+ 						step={ [ 'px', '%' ].includes( widthUnit ) ? 1 : 0.1 }
+ 						value={ widthValue || undefined }
+ 						withInputField={ false }
+-						__next40pxDefaultSize={ __next40pxDefaultSize }
+-						__shouldNotWarnDeprecated36pxSize
++						__next40pxDefaultSize
+ 					/>
+ 				) }
+ 			</HStack>
+@@ -156,7 +150,6 @@ const UnconnectedBorderControl = (
+  *
+  * 	return (
+  * 		<BorderControl
+- * 			__next40pxDefaultSize
+  * 			colors={ colors }
+  * 			label={ __( 'Border' ) }
+  * 			onChange={ onChange }
+diff --git a/packages/components/src/border-control/border-control/hook.ts b/packages/components/src/border-control/border-control/hook.ts
+index 9b0f064c51921f..27be9cc12ba9be 100644
+--- a/packages/components/src/border-control/border-control/hook.ts
++++ b/packages/components/src/border-control/border-control/hook.ts
+@@ -12,7 +12,6 @@ import type { WordPressComponentProps } from '../../context';
+ import { useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { Border, BorderControlProps } from '../types';
+-import { maybeWarnDeprecated36pxSize } from '../../utils/deprecated-36px-size';
+ 
+ // If either width or color are defined, the border is considered valid
+ // and a border style can be set as well.
+@@ -33,25 +32,15 @@ export function useBorderControl(
+ 		enableAlpha = true,
+ 		enableStyle = true,
+ 		shouldSanitizeBorder = true,
+-		size = 'default',
+ 		value: border,
+ 		width,
+ 		__experimentalIsRenderedInSidebar = false,
+-		__next40pxDefaultSize,
+-		__shouldNotWarnDeprecated36pxSize,
++		// Deprecated props, no longer used.
++		size: _size,
++		__next40pxDefaultSize: _next40pxDefaultSize,
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderControl' );
+ 
+-	maybeWarnDeprecated36pxSize( {
+-		componentName: 'BorderControl',
+-		__next40pxDefaultSize,
+-		size,
+-		__shouldNotWarnDeprecated36pxSize,
+-	} );
+-
+-	const computedSize =
+-		size === 'default' && __next40pxDefaultSize ? '__unstable-large' : size;
+-
+ 	const [ widthValue, originalWidthUnit ] = parseQuantityAndUnitFromRawValue(
+ 		border?.width
+ 	);
+@@ -138,14 +127,14 @@ export function useBorderControl(
+ 	if ( isCompact ) {
+ 		// Widths below represent the minimum usable width for compact controls.
+ 		// Taller controls contain greater internal padding, thus greater width.
+-		wrapperWidth = size === '__unstable-large' ? '116px' : '90px';
++		wrapperWidth = '116px';
+ 	}
+ 	const innerWrapperClassName = useMemo( () => {
+ 		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
+-		const heightStyle = styles.wrapperHeight( computedSize );
++		const heightStyle = styles.wrapperHeight;
+ 
+ 		return cx( styles.innerWrapper(), widthStyle, heightStyle );
+-	}, [ wrapperWidth, cx, computedSize ] );
++	}, [ wrapperWidth, cx ] );
+ 
+ 	const sliderClassName = useMemo( () => {
+ 		return cx( styles.borderSlider() );
+@@ -168,8 +157,6 @@ export function useBorderControl(
+ 		value: border,
+ 		widthUnit,
+ 		widthValue,
+-		size: computedSize,
+ 		__experimentalIsRenderedInSidebar,
+-		__next40pxDefaultSize,
+ 	};
+ }
+diff --git a/packages/components/src/border-control/stories/index.story.tsx b/packages/components/src/border-control/stories/index.story.tsx
+index 195089d710cc3a..00d9a7924c9603 100644
+--- a/packages/components/src/border-control/stories/index.story.tsx
++++ b/packages/components/src/border-control/stories/index.story.tsx
+@@ -86,7 +86,6 @@ const Template: StoryFn< typeof BorderControl > = ( {
+ 
+ 	return (
+ 		<BorderControl
+-			__next40pxDefaultSize
+ 			onChange={ onChangeMerged }
+ 			value={ border }
+ 			{ ...props }
+@@ -98,7 +97,6 @@ export const Default = Template.bind( {} );
+ Default.args = {
+ 	colors,
+ 	label: 'Border',
+-	__next40pxDefaultSize: true,
+ 	enableAlpha: true,
+ 	enableStyle: true,
+ 	shouldSanitizeBorder: true,
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index 529a50f679b45d..9e514c9e890e84 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -49,11 +49,9 @@ export const wrapperWidth = css`
+ 	}
+ `;
+ 
+-export const wrapperHeight = ( size?: 'default' | '__unstable-large' ) => {
+-	return css`
+-		height: ${ size === '__unstable-large' ? '40px' : '30px' };
+-	`;
+-};
++export const wrapperHeight = css`
++	height: 40px;
++`;
+ 
+ export const borderControlDropdown = css`
+ 	background: #fff;
+@@ -93,19 +91,16 @@ export const colorIndicatorBorder = ( border?: Border ) => {
+ 	`;
+ };
+ 
+-export const colorIndicatorWrapper = (
+-	border?: Border,
+-	size?: 'default' | '__unstable-large'
+-) => {
++export const colorIndicatorWrapper = ( border?: Border ) => {
+ 	const { style } = border || {};
+ 
+ 	return css`
+ 		border-radius: ${ CONFIG.radiusFull };
+ 		border: 2px solid transparent;
+ 		${ style ? colorIndicatorBorder( border ) : undefined }
+-		width: ${ size === '__unstable-large' ? '24px' : '22px' };
+-		height: ${ size === '__unstable-large' ? '24px' : '22px' };
+-		padding: ${ size === '__unstable-large' ? '2px' : '1px' };
++		width: 24px;
++		height: 24px;
++		padding: 2px;
+ 
+ 		/*
+ 		 * ColorIndicator
+diff --git a/packages/components/src/border-control/test/index.js b/packages/components/src/border-control/test/index.js
+index dc697fffca19ca..5b58a32a0cae79 100644
+--- a/packages/components/src/border-control/test/index.js
++++ b/packages/components/src/border-control/test/index.js
+@@ -77,7 +77,7 @@ const getWidthInput = () => {
+ };
+ 
+ function TestBorderControl( restProps ) {
+-	return <BorderControl __next40pxDefaultSize { ...restProps } />;
++	return <BorderControl { ...restProps } />;
+ }
+ 
+ describe( 'BorderControl', () => {
+diff --git a/packages/components/src/border-control/types.ts b/packages/components/src/border-control/types.ts
+index ecd3f67c9be08d..574c714559db36 100644
+--- a/packages/components/src/border-control/types.ts
++++ b/packages/components/src/border-control/types.ts
+@@ -92,7 +92,8 @@ export type BorderControlProps = ColorProps &
+ 		/**
+ 		 * Size of the control.
+ 		 *
+-		 * @default 'default'
++		 * @deprecated This prop no longer has any effect.
++		 * @ignore
+ 		 */
+ 		size?: 'default' | '__unstable-large';
+ 		/**
+@@ -113,20 +114,14 @@ export type BorderControlProps = ColorProps &
+ 		/**
+ 		 * Start opting into the larger default height that will become the default size in a future version.
+ 		 *
+-		 * @default false
+-		 */
+-		__next40pxDefaultSize?: boolean;
+-		/**
+-		 * Do not throw a warning for the deprecated 36px default size.
+-		 * For internal components of other components that already throw the warning.
+-		 *
++		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+ 		 * @ignore
+ 		 */
+-		__shouldNotWarnDeprecated36pxSize?: boolean;
++		__next40pxDefaultSize?: boolean;
+ 	};
+ 
+ export type DropdownProps = ColorProps &
+-	Pick< BorderControlProps, 'enableStyle' | 'size' > & {
++	Pick< BorderControlProps, 'enableStyle' > & {
+ 		/**
+ 		 * An object representing a border or `undefined`. This component will
+ 		 * extract the border color and style selections from this object to use as
+diff --git a/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md b/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
+index 6927641716dcaf..279e1689b67a39 100644
+--- a/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
++++ b/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
+@@ -8,7 +8,6 @@ This is a temporary rule to help migrate components to the new default size. Onc
+ 
+ The following components are checked by this rule:
+ 
+--   BorderControl
+ -   Button
+ -   ComboboxControl
+ -   CustomSelectControl
+diff --git a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+index ff90dc5fd9fd09..93b8f9725a3f67 100644
+--- a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+@@ -110,7 +110,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
+ 		{
+ 			code: `
+ 				import {
+-					BorderControl,
+ 					ComboboxControl,
+ 					CustomSelectControl,
+ 					FontAppearanceControl,
+@@ -126,7 +125,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
+ 					UnitControl,
+ 				} from '@wordpress/components';
+ 				<>
+-					<BorderControl __next40pxDefaultSize />
+ 					<ComboboxControl __next40pxDefaultSize />
+ 					<CustomSelectControl __next40pxDefaultSize />
+ 					<FontAppearanceControl __next40pxDefaultSize />
+diff --git a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+index 67dfcbdf05bec7..ccda5a1395a147 100644
+--- a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+@@ -12,7 +12,6 @@ const { hasTruthyJsxAttribute } = require( '../utils' );
+  * These can be exempted if they have a non-default `size` prop.
+  */
+ const COMPONENTS_REQUIRING_40PX = new Set( [
+-	'BorderControl',
+ 	'Button',
+ 	'ClipboardButton',
+ 	'ComboboxControl',
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index b5aa7b9584d36e..14b2238e4abe96 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -171,6 +171,7 @@ const restrictedSyntax = [
+ 	},
+ 	...[
+ 		'BorderBoxControl',
++		'BorderControl',
+ 		'BoxControl',
+ 		'FontSizePicker',
+ 		'QueryControls',

@@ -1,0 +1,52 @@
+diff --git a/package-lock.json b/package-lock.json
+index 00d6305169b2df..bcf83300257837 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -1611,6 +1611,7 @@
+ 			"version": "10.0.27",
+ 			"resolved": "https://registry.npmjs.org/@emotion/native/-/native-10.0.27.tgz",
+ 			"integrity": "sha512-3qxR2XFizGfABKKbX9kAYc0PHhKuCEuyxshoq3TaMEbi9asWHdQVChg32ULpblm4XAf9oxaitAU7J9SfdwFxtw==",
++			"dev": true,
+ 			"requires": {
+ 				"@emotion/primitives-core": "10.0.27"
+ 			}
+@@ -1619,6 +1620,7 @@
+ 			"version": "10.0.27",
+ 			"resolved": "https://registry.npmjs.org/@emotion/primitives-core/-/primitives-core-10.0.27.tgz",
+ 			"integrity": "sha512-fRBEDNPSFFOrBJ0OcheuElayrNTNdLF9DzMxtL0sFgsCFvvadlzwJHhJMSwEJuxwARm9GhVLr1p8G8JGkK98lQ==",
++			"dev": true,
+ 			"requires": {
+ 				"css-to-react-native": "^2.2.1"
+ 			}
+@@ -13186,7 +13188,6 @@
+ 				"@emotion/cache": "^10.0.27",
+ 				"@emotion/core": "^10.1.1",
+ 				"@emotion/css": "^10.0.22",
+-				"@emotion/native": "^10.0.22",
+ 				"@emotion/styled": "^10.0.23",
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
+diff --git a/package.json b/package.json
+index 629e4822526db6..a3f1a9d769bbca 100644
+--- a/package.json
++++ b/package.json
+@@ -90,6 +90,7 @@
+ 		"@babel/plugin-syntax-jsx": "7.12.13",
+ 		"@babel/runtime-corejs3": "7.13.10",
+ 		"@babel/traverse": "7.13.0",
++		"@emotion/native": "10.0.27",
+ 		"@octokit/rest": "16.26.0",
+ 		"@octokit/webhooks": "7.1.0",
+ 		"@storybook/addon-a11y": "6.2.5",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index d5f1302929500c..900978d185f20f 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -33,7 +33,6 @@
+ 		"@emotion/cache": "^10.0.27",
+ 		"@emotion/core": "^10.1.1",
+ 		"@emotion/css": "^10.0.22",
+-		"@emotion/native": "^10.0.22",
+ 		"@emotion/styled": "^10.0.23",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",

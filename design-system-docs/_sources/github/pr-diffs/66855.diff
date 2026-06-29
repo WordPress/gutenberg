@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index abd32b37c4c650..2fddf51173e832 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Bug Fixes
+ 
+ -   `Popover`: Fix missing label of the headerTitle Close button ([#66813](https://github.com/WordPress/gutenberg/pull/66813)).
++-   `ToggleGroupControl`: Fix active background for `0` value ([#66855](https://github.com/WordPress/gutenberg/pull/66855)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 7f384f70ae1dc5..0c3cadf210d84a 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -52,7 +52,7 @@ function UnconnectedToggleGroupControl(
+ 	const [ controlElement, setControlElement ] = useState< HTMLElement >();
+ 	const refs = useMergeRefs( [ setControlElement, forwardedRef ] );
+ 	const selectedRect = useTrackElementOffsetRect(
+-		value ? selectedElement : undefined
++		value || value === 0 ? selectedElement : undefined
+ 	);
+ 	useAnimatedOffsetRect( controlElement, selectedRect, {
+ 		prefix: 'selected',

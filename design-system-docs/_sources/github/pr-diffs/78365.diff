@@ -1,0 +1,91 @@
+diff --git a/packages/components/src/icon/stories/index.story.tsx b/packages/components/src/icon/stories/index.story.tsx
+index 6c2e765271cb48..519794e669a53c 100644
+--- a/packages/components/src/icon/stories/index.story.tsx
++++ b/packages/components/src/icon/stories/index.story.tsx
+@@ -1,31 +1,19 @@
+-/**
+- * External dependencies
+- */
+ import type { Meta, StoryFn } from '@storybook/react-vite';
+-
+-/**
+- * WordPress dependencies
+- */
+ import { SVG, Path } from '@wordpress/primitives';
+ import { wordpress } from '@wordpress/icons';
+-
+-/**
+- * Internal dependencies
+- */
+ import Icon from '..';
+ import { VStack } from '../../v-stack';
+ 
+ const meta: Meta< typeof Icon > = {
+-	tags: [ 'manifest' ],
+ 	title: 'Components/Icon',
+ 	component: Icon,
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 		componentStatus: {
+-			status: 'recommended',
++			status: 'use-with-caution',
+ 			whereUsed: 'global',
+-			notes: 'Prefer this component over the `Icon` component from `@wordpress/icons`.',
++			notes: 'When rendering SVGs, use `Icon` from `@wordpress/ui` instead.',
+ 		},
+ 	},
+ };
+diff --git a/packages/eslint-plugin/rules/__tests__/use-recommended-components.js b/packages/eslint-plugin/rules/__tests__/use-recommended-components.js
+index 961ff2158b1553..b15ccd4ec7fecb 100644
+--- a/packages/eslint-plugin/rules/__tests__/use-recommended-components.js
++++ b/packages/eslint-plugin/rules/__tests__/use-recommended-components.js
+@@ -27,10 +27,11 @@ ruleTester.run( 'use-recommended-components', rule, {
+ 
+ 		// Allowed @wordpress/ui components.
+ 		"import { Badge } from '@wordpress/ui';",
++		"import { Icon } from '@wordpress/ui';",
+ 		"import { Link } from '@wordpress/ui';",
+ 		"import { Stack } from '@wordpress/ui';",
+ 		"import { Text } from '@wordpress/ui';",
+-		"import { Badge, Link, Stack, Text } from '@wordpress/ui';",
++		"import { Badge, Icon, Link, Stack, Text } from '@wordpress/ui';",
+ 	],
+ 
+ 	invalid: [
+diff --git a/packages/eslint-plugin/rules/use-recommended-components.js b/packages/eslint-plugin/rules/use-recommended-components.js
+index d03cabb3f6b571..6b452f21c8d86a 100644
+--- a/packages/eslint-plugin/rules/use-recommended-components.js
++++ b/packages/eslint-plugin/rules/use-recommended-components.js
+@@ -14,6 +14,7 @@ const ALLOWLIST = {
+ 			'Collapsible',
+ 			'CollapsibleCard',
+ 			'EmptyState',
++			'Icon',
+ 			'Link',
+ 			'Stack',
+ 			'Text',
+diff --git a/packages/ui/src/icon/stories/index.story.tsx b/packages/ui/src/icon/stories/index.story.tsx
+index e8164edd9fb4d3..e91387b257f8f2 100644
+--- a/packages/ui/src/icon/stories/index.story.tsx
++++ b/packages/ui/src/icon/stories/index.story.tsx
+@@ -5,6 +5,7 @@ import { Icon } from '../index';
+ const meta: Meta< typeof Icon > = {
+ 	title: 'Design System/Components/Icon',
+ 	component: Icon,
++	tags: [ 'manifest' ],
+ 	decorators: [
+ 		( Story ) => {
+ 			return (
+@@ -20,9 +21,9 @@ const meta: Meta< typeof Icon > = {
+ 	],
+ 	parameters: {
+ 		componentStatus: {
+-			status: 'use-with-caution',
++			status: 'recommended',
+ 			whereUsed: 'global',
+-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending a general readiness review. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
++			notes: 'Prefer this component over the `Icon` component from `@wordpress/components` or `@wordpress/icons`.',
+ 		},
+ 	},
+ };

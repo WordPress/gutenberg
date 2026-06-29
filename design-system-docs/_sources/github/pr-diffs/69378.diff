@@ -1,0 +1,35 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3084d806fb0dbf..8345184770646c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `QueryControls`: Add menu_order sorting option if supported by the post type. ([#68781](https://github.com/WordPress/gutenberg/pull/68781)).
+ 
++### Bug Fixes
++
++-   `Button`: Remove fixed width from small and compact buttons with icons ([#69378](https://github.com/WordPress/gutenberg/pull/69378)).
++
+ ## 29.5.0 (2025-02-28)
+ 
+ ### Documentation
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index e7cc40d205e2e3..6aaf2934ebca13 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -302,7 +302,6 @@
+ 
+ 		&.has-icon:not(.has-text) {
+ 			padding: 0;
+-			width: $button-size-compact;
+ 			min-width: $button-size-compact;
+ 		}
+ 	}
+@@ -315,7 +314,6 @@
+ 
+ 		&.has-icon:not(.has-text) {
+ 			padding: 0;
+-			width: $button-size-small;
+ 			min-width: $button-size-small;
+ 		}
+ 	}

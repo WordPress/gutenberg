@@ -1,0 +1,28 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 47fffbd4c99944..4c5317457be103 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `Button`: Fix tertiary variant displaying incorrect text color in pressed and hover states ([#68542](https://github.com/WordPress/gutenberg/pull/68542)).
++
+ ## 29.7.0 (2025-03-27)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 6aaf2934ebca13..4e7893c9771e8e 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -167,7 +167,7 @@
+ 		color: $components-color-accent;
+ 		background: transparent;
+ 
+-		&:hover:not(:disabled, [aria-disabled="true"]) {
++		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
+ 			background: color-mix(in srgb, $components-color-accent 4%, transparent);
+ 			color: $components-color-accent-darker-20;
+ 		}

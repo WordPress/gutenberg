@@ -1,0 +1,11 @@
+diff --git a/packages/components/src/base-control/style.scss b/packages/components/src/base-control/style.scss
+index b8509f77433971..f13ea63a90ec0d 100644
+--- a/packages/components/src/base-control/style.scss
++++ b/packages/components/src/base-control/style.scss
+@@ -22,5 +22,5 @@
+ }
+ 
+ .components-base-control + .components-base-control {
+-	margin-bottom: $grid-size-large;
++	margin-top: $grid-size-large;
+ }

@@ -1,0 +1,1501 @@
+diff --git a/packages/theme/bin/terrazzo-plugin-figma-ds-token-manager/index.ts b/packages/theme/bin/terrazzo-plugin-figma-ds-token-manager/index.ts
+deleted file mode 100644
+index 8e8e047250cf01..00000000000000
+--- a/packages/theme/bin/terrazzo-plugin-figma-ds-token-manager/index.ts
++++ /dev/null
+@@ -1,217 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { Plugin, TokenNormalized } from '@terrazzo/parser';
+-import { transformCSSValue } from '@terrazzo/token-tools/css';
+-import {
+-	parse,
+-	to,
+-	serialize,
+-	sRGB,
+-	type ColorConstructor,
+-} from 'colorjs.io/fn';
+-
+-/**
+- * Internal dependencies
+- */
+-import '../../src/color-ramps/lib/register-color-spaces';
+-import { FORMAT_JSON_ID } from './lib';
+-
+-function titleCase( str: string ) {
+-	return str[ 0 ].toUpperCase() + str.slice( 1 );
+-}
+-
+-function kebabToCamel( str: string ) {
+-	return str.replace( /-([a-z])/g, ( _, letter ) => letter.toUpperCase() );
+-}
+-
+-function transformTokenName( { id }: { id: string } ) {
+-	return (
+-		id
+-			// Capitalize first segment
+-			.replace( /^(\w+)\./g, ( _, g1 ) => `${ titleCase( g1 ) }/` )
+-			// Capitalize
+-			.replace( /primitive\./g, '_Primitives/' )
+-			.replace( /semantic\./g, 'Semantic/' )
+-			.replace(
+-				/(color\/_Primitives)\/(\w+)\.(.*)/gi,
+-				( _, prefix, tone, rampStep ) => {
+-					return `${ prefix }/${ titleCase( tone ) }/${ rampStep }`;
+-				}
+-			)
+-			// Color-specific transformation for semantic tokens:
+-			// - add extra folder (Background, Foreground, Stroke)
+-			// - swap "tone" folder order, capitalize
+-			// - limit bg-* to 6 characters
+-			// - keep last part of the token name with dots (eg no folders)
+-			.replace(
+-				/(color\/Semantic)\/([\w,\-]+)\.(\w+)\.(.*)/gi,
+-				( _, prefix, element, tone, emphasisAndState ) => {
+-					let extraFolder = '';
+-					let elementName = element;
+-					if ( /bg/.test( element ) ) {
+-						extraFolder = 'Background/';
+-						elementName = element.slice( 0, 6 );
+-					} else if ( /fg/.test( element ) ) {
+-						extraFolder = 'Foreground/';
+-						elementName = element.slice( 0, 6 );
+-					} else if ( /stroke/.test( element ) ) {
+-						extraFolder = 'Stroke/';
+-						elementName = element.slice( 0, 10 );
+-					}
+-					return `${ prefix }/${ extraFolder }${ titleCase(
+-						tone
+-					) }/${ kebabToCamel(
+-						elementName
+-					) }.${ tone }.${ emphasisAndState }`;
+-				}
+-			)
+-			// Remove default emphasis and state variants from variable name
+-			.replace( /normal\./g, '' )
+-			.replace( /resting/g, '' )
+-			// Remove double dots
+-			.replace( /\.{2,}/g, '.' )
+-			// Remove trailing dot
+-			.replace( /\.$/g, '' )
+-			// Replace remaining dots with dashes
+-			.replace( /\./g, '-' )
+-	);
+-}
+-
+-function transformColorToken(
+-	token: TokenNormalized,
+-	mode: string,
+-	tokens: Record< string, TokenNormalized >
+-) {
+-	if (
+-		token.mode[ mode ]?.aliasChain &&
+-		token.mode[ mode ].aliasChain.length > 0
+-	) {
+-		// Keep aliases
+-		return `{${ transformTokenName( {
+-			id: token.mode[ mode ].aliasChain[ 0 ],
+-		} ) }}`;
+-	}
+-	// Start by letting terrazzo do the heavy lifting.
+-	const baselineCSSValue = transformCSSValue( token, {
+-		mode,
+-		tokensSet: tokens,
+-		transformAlias: transformTokenName,
+-	} );
+-
+-	if ( baselineCSSValue === undefined ) {
+-		console.warn( 'Unexpected: could not tranform color token value' );
+-		return;
+-	}
+-
+-	let cssColorValue: string;
+-
+-	if ( typeof baselineCSSValue === 'object' ) {
+-		if ( 'srgb' in baselineCSSValue ) {
+-			// Pick SRGB gamut (safer compared to p3 or rec2020)
+-			cssColorValue = baselineCSSValue.srgb;
+-		} else {
+-			console.log( 'UNSUPPORTED USE CASE' );
+-			return;
+-		}
+-	} else {
+-		cssColorValue = baselineCSSValue;
+-	}
+-
+-	// Always convert to hex
+-	// (easier to convert to Figma RGB, and includes clamping)
+-	let convertedColor: ColorConstructor;
+-	try {
+-		convertedColor = parse( cssColorValue );
+-	} catch {
+-		console.warn( 'Unexpected: could not convert token value to Color' );
+-		return;
+-	}
+-
+-	return serialize( to( convertedColor, sRGB ), { format: 'hex' } );
+-}
+-
+-export default function pluginFigmaDsTokenManager( {
+-	filename = 'figma-ds-tokens.json',
+-} = {} ): Plugin {
+-	return {
+-		name: '@terrazzo/plugin-figma-ds-token-manager',
+-		async transform( { tokens, getTransforms, setTransform } ) {
+-			// skip work if another .json plugin has already run
+-			const jsonTokens = getTransforms( {
+-				format: FORMAT_JSON_ID,
+-				id: '*',
+-				mode: '.',
+-			} );
+-			if ( jsonTokens.length ) {
+-				return;
+-			}
+-
+-			for ( const [ id, token ] of Object.entries( tokens ) ) {
+-				for ( const mode of Object.keys( token.mode ) ) {
+-					const localID = transformTokenName( token );
+-
+-					let transformedValue;
+-
+-					if ( token.$type === 'color' ) {
+-						transformedValue = transformColorToken(
+-							token,
+-							mode,
+-							tokens
+-						);
+-					} else if (
+-						token.mode[ mode ]?.aliasChain &&
+-						token.mode[ mode ].aliasChain.length > 0
+-					) {
+-						// Keep aliases
+-						transformedValue = `{${ transformTokenName( {
+-							id: token.mode[ mode ].aliasChain[ 0 ],
+-						} ) }}`;
+-					} else {
+-						// Fallback to terrazzo
+-						transformedValue = transformCSSValue( token, {
+-							mode,
+-							tokensSet: tokens,
+-							transformAlias: transformTokenName,
+-						} );
+-					}
+-
+-					if ( transformedValue !== undefined ) {
+-						setTransform( id, {
+-							format: FORMAT_JSON_ID,
+-							localID,
+-							value: transformedValue,
+-							mode,
+-						} );
+-					}
+-				}
+-			}
+-		},
+-		async build( { getTransforms, outputFile } ) {
+-			const tokenVals: Record<
+-				string,
+-				{
+-					value: Record< string, string | Record< string, string > >;
+-					description?: string;
+-				}
+-			> = {};
+-
+-			for ( const token of getTransforms( {
+-				format: FORMAT_JSON_ID,
+-				id: '*',
+-			} ) ) {
+-				if ( ! token.localID ) {
+-					continue;
+-				}
+-
+-				tokenVals[ token.localID ] ??= { value: {}, description: '' };
+-
+-				tokenVals[ token.localID ].value[ token.mode ] = token.value;
+-				tokenVals[ token.localID ].description =
+-					token.token.$description;
+-			}
+-
+-			outputFile( filename, JSON.stringify( tokenVals, null, 2 ) );
+-		},
+-	};
+-}
+diff --git a/packages/theme/bin/terrazzo-plugin-figma-ds-token-manager/lib.ts b/packages/theme/bin/terrazzo-plugin-figma-ds-token-manager/lib.ts
+deleted file mode 100644
+index 95a893f289b3ea..00000000000000
+--- a/packages/theme/bin/terrazzo-plugin-figma-ds-token-manager/lib.ts
++++ /dev/null
+@@ -1 +0,0 @@
+-export const FORMAT_JSON_ID = 'json';
+diff --git a/packages/theme/bin/terrazzo-plugin-mode-overrides/index.ts b/packages/theme/bin/terrazzo-plugin-mode-overrides/index.ts
+new file mode 100644
+index 00000000000000..b0f3cc03ecb3ae
+--- /dev/null
++++ b/packages/theme/bin/terrazzo-plugin-mode-overrides/index.ts
+@@ -0,0 +1,203 @@
++/**
++ * External dependencies
++ */
++import { basename, join, dirname } from 'node:path';
++import { fileURLToPath } from 'node:url';
++import type { Plugin } from '@terrazzo/parser';
++
++type DTCGPrimitiveValue =
++	| string
++	| number
++	| boolean
++	| { value: number; unit: string }
++	| { r: number; g: number; b: number; a?: number };
++
++type DTCGValue = DTCGPrimitiveValue | Record< string, DTCGPrimitiveValue >;
++
++interface DTCGExtensions {
++	[ key: string ]: unknown;
++	mode?: Record< string, DTCGValue >;
++}
++
++/**
++ * @see https://tr.designtokens.org/format/
++ */
++interface DTCGToken {
++	$value: DTCGValue;
++	$type?: string;
++	$description?: string;
++	$extensions?: DTCGExtensions;
++}
++
++interface DTCGGroup {
++	$type?: string;
++	$description?: string;
++	$extensions?: DTCGExtensions;
++	[ key: string ]:
++		| DTCGToken
++		| DTCGGroup
++		| string
++		| DTCGExtensions
++		| undefined;
++}
++
++type DTCGDocument = Record< string, DTCGGroup >;
++
++interface ModeOverride {
++	path: string[];
++	$value: DTCGValue;
++	$type?: string;
++}
++
++/**
++ * Type guard to check if a value is a DTCG token (has $value).
++ *
++ * @param value - The value to check.
++ * @return True if the value is a DTCG token.
++ */
++function isDTCGToken( value: DTCGToken | DTCGGroup ): value is DTCGToken {
++	return '$value' in value;
++}
++
++/**
++ * Set a nested value in an object from a path array.
++ *
++ * @param object    - The object to modify.
++ * @param pathParts - The path at which to set the value.
++ * @param value     - The value to set.
++ */
++function setNestedValue(
++	object: Record< string, unknown >,
++	pathParts: string[],
++	value: any
++): void {
++	let current = object;
++
++	for ( let i = 0; i < pathParts.length - 1; i++ ) {
++		const key = pathParts[ i ];
++
++		if ( ! ( key in current ) ) {
++			current[ key ] = {};
++		}
++
++		current = current[ key ] as Record< string, unknown >;
++	}
++
++	current[ pathParts[ pathParts.length - 1 ] ] = value;
++}
++
++/**
++ * Recursively extracts mode overrides from a DTCG token tree.
++ *
++ * @param object      - The DTCG group to extract from.
++ * @param currentPath - The current path in the token tree.
++ * @param currentType - The $type inherited from parent groups.
++ * @return A map of mode names to their token overrides.
++ */
++function getModeOverrides(
++	object: DTCGGroup,
++	currentPath: string[] = [],
++	currentType?: string
++): Map< string, ModeOverride[] > {
++	const modeOverrides = new Map< string, ModeOverride[] >();
++
++	// Check if this group defines a $type that should be inherited by children
++	const groupType = object.$type ?? currentType;
++
++	for ( const [ key, value ] of Object.entries( object ) ) {
++		// Skip DTCG metadata keys
++		if ( key.startsWith( '$' ) ) {
++			continue;
++		}
++
++		const node = value as DTCGToken | DTCGGroup;
++
++		if ( isDTCGToken( node ) ) {
++			// Extract mode-specific values from extensions
++			const modes = node.$extensions?.mode;
++			if ( modes ) {
++				for ( const [ mode, modeValue ] of Object.entries( modes ) ) {
++					modeOverrides.set( mode, [
++						...( modeOverrides.get( mode ) ?? [] ),
++						{
++							path: [ ...currentPath, key ],
++							$value: modeValue,
++							$type: node.$type ?? groupType,
++						},
++					] );
++				}
++			}
++		} else {
++			// Recurse into nested groups, passing down the type
++			const nextPath = [ ...currentPath, key ];
++			const childOverrides = getModeOverrides(
++				node,
++				nextPath,
++				groupType
++			);
++
++			// Merge child results
++			for ( const [ mode, overrides ] of childOverrides ) {
++				modeOverrides.set( mode, [
++					...( modeOverrides.get( mode ) ?? [] ),
++					...overrides,
++				] );
++			}
++		}
++	}
++
++	return modeOverrides;
++}
++
++/**
++ * Terrazzo plugin that generates mode-specific DTCG override files.
++ *
++ * For each mode found in tokens (via $extensions.mode), generates a separate
++ * JSON file per source file containing tokens that have values for that mode.
++ *
++ * @return A Terrazzo plugin that generates mode-specific DTCG override files.
++ */
++export default function pluginModeOverrides(): Plugin {
++	return {
++		name: '@wordpress/terrazzo-plugin-mode-overrides',
++		async build( { outputFile, sources } ) {
++			for ( const { filename, src } of sources ) {
++				if ( ! filename ) {
++					continue;
++				}
++
++				// Parse the source JSON file
++				let document: DTCGDocument;
++				try {
++					document = JSON.parse( src ) as DTCGDocument;
++				} catch ( error ) {
++					throw new Error(
++						`Could not parse ${ filename }\n\n${ error }`
++					);
++				}
++
++				// Extract mode overrides from this file
++				const fileOverrides = getModeOverrides( document );
++
++				// Generate a DTCG file for each mode found in this source file
++				for ( const [ mode, overrides ] of fileOverrides ) {
++					const output: Record< string, unknown > = {};
++
++					for ( const override of overrides ) {
++						const { path, $value, $type } = override;
++						setNestedValue( output, path, { $type, $value } );
++					}
++
++					// Output as {basename}.{mode}.json (e.g., dimension.compact.json)
++					const filePath = fileURLToPath( filename );
++					const outFile = join(
++						dirname( filePath ),
++						'modes',
++						`${ basename( filePath, '.json' ) }.${ mode }.json`
++					);
++					outputFile( outFile, JSON.stringify( output, null, '\t' ) );
++				}
++			}
++		},
++	};
++}
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index 0bde419cd8d1d6..65a34bd1788877 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -62,6 +62,6 @@
+ 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
+ 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && cross-env NODE_OPTIONS=--import=esbuild-esm-loader/register tz build --config terrazzo.config.ts",
+ 		"build": "npm run build:tokens && npm run build:default-ramps",
+-		"postbuild": "prettier --write tokens/color.json src/prebuilt src/color-ramps/lib/default-ramps.ts docs"
++		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs"
+ 	}
+ }
+diff --git a/packages/theme/src/prebuilt/json/figma.json b/packages/theme/src/prebuilt/json/figma.json
+deleted file mode 100644
+index 0460fc1ddfa768..00000000000000
+--- a/packages/theme/src/prebuilt/json/figma.json
++++ /dev/null
+@@ -1,883 +0,0 @@
+-{
+-	"Border/radius-surface-xs": {
+-		"value": {
+-			".": "1px"
+-		},
+-		"description": "Extra small radius for surfaces"
+-	},
+-	"Border/radius-surface-sm": {
+-		"value": {
+-			".": "2px"
+-		},
+-		"description": "Small radius for surfaces"
+-	},
+-	"Border/radius-surface-md": {
+-		"value": {
+-			".": "4px"
+-		},
+-		"description": "Medium radius for surfaces"
+-	},
+-	"Border/radius-surface-lg": {
+-		"value": {
+-			".": "8px"
+-		},
+-		"description": "Large radius for surfaces"
+-	},
+-	"Border/width-surface-xs": {
+-		"value": {
+-			".": "1px"
+-		},
+-		"description": "Extra small width for surfaces"
+-	},
+-	"Border/width-surface-sm": {
+-		"value": {
+-			".": "2px"
+-		},
+-		"description": "Small width for surfaces"
+-	},
+-	"Border/width-surface-md": {
+-		"value": {
+-			".": "4px"
+-		},
+-		"description": "Medium width for surfaces"
+-	},
+-	"Border/width-surface-lg": {
+-		"value": {
+-			".": "8px"
+-		},
+-		"description": "Large width for surfaces"
+-	},
+-	"Border/width-interactive-focus": {
+-		"value": {
+-			".": "2px",
+-			"high-dpi": "1.5px"
+-		},
+-		"description": "Border width for focus ring"
+-	},
+-	"Color/Semantic/Background/Neutral/bgSur-neutral": {
+-		"value": {
+-			".": "#f8f8f8"
+-		},
+-		"description": "Background color for surfaces with normal emphasis."
+-	},
+-	"Color/Semantic/Background/Neutral/bgSur-neutral-strong": {
+-		"value": {
+-			".": "#fff"
+-		},
+-		"description": "Background color for surfaces with strong emphasis."
+-	},
+-	"Color/Semantic/Background/Neutral/bgSur-neutral-weak": {
+-		"value": {
+-			".": "#f0f0f0"
+-		},
+-		"description": "Background color for surfaces with weak emphasis."
+-	},
+-	"Color/Semantic/Background/Brand/bgSur-brand": {
+-		"value": {
+-			".": "#ecf0f9"
+-		},
+-		"description": "Background color for surfaces with brand tone and normal emphasis."
+-	},
+-	"Color/Semantic/Background/Success/bgSur-success": {
+-		"value": {
+-			".": "#c5f7cc"
+-		},
+-		"description": "Background color for surfaces with success tone and normal emphasis."
+-	},
+-	"Color/Semantic/Background/Success/bgSur-success-weak": {
+-		"value": {
+-			".": "#eaffed"
+-		},
+-		"description": "Background color for surfaces with success tone and weak emphasis."
+-	},
+-	"Color/Semantic/Background/Info/bgSur-info": {
+-		"value": {
+-			".": "#deebfa"
+-		},
+-		"description": "Background color for surfaces with info tone and normal emphasis."
+-	},
+-	"Color/Semantic/Background/Info/bgSur-info-weak": {
+-		"value": {
+-			".": "#f3f9ff"
+-		},
+-		"description": "Background color for surfaces with info tone and weak emphasis."
+-	},
+-	"Color/Semantic/Background/Warning/bgSur-warning": {
+-		"value": {
+-			".": "#fde6bd"
+-		},
+-		"description": "Background color for surfaces with warning tone and normal emphasis."
+-	},
+-	"Color/Semantic/Background/Warning/bgSur-warning-weak": {
+-		"value": {
+-			".": "#fff7e0"
+-		},
+-		"description": "Background color for surfaces with warning tone and weak emphasis."
+-	},
+-	"Color/Semantic/Background/Caution/bgSur-caution": {
+-		"value": {
+-			".": "#fee994"
+-		},
+-		"description": "Background color for surfaces with caution tone and normal emphasis."
+-	},
+-	"Color/Semantic/Background/Caution/bgSur-caution-weak": {
+-		"value": {
+-			".": "#fff9c9"
+-		},
+-		"description": "Background color for surfaces with caution tone and weak emphasis."
+-	},
+-	"Color/Semantic/Background/Error/bgSur-error": {
+-		"value": {
+-			".": "#f6e6e3"
+-		},
+-		"description": "Background color for surfaces with error tone and normal emphasis."
+-	},
+-	"Color/Semantic/Background/Error/bgSur-error-weak": {
+-		"value": {
+-			".": "#fff6f4"
+-		},
+-		"description": "Background color for surfaces with error tone and weak emphasis."
+-	},
+-	"Color/Semantic/Background/Neutral/bgInt-neutral": {
+-		"value": {
+-			".": "#0000"
+-		},
+-		"description": "Background color for interactive elements with neutral tone and normal emphasis."
+-	},
+-	"Color/Semantic/Background/Neutral/bgInt-neutral-active": {
+-		"value": {
+-			".": "#eaeaea"
+-		},
+-		"description": "Background color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Background/Neutral/bgInt-neutral-disabled": {
+-		"value": {
+-			".": "#e2e2e2"
+-		},
+-		"description": "Background color for interactive elements with neutral tone and normal emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Background/Neutral/bgInt-neutral-strong": {
+-		"value": {
+-			".": "#2d2d2d"
+-		},
+-		"description": "Background color for interactive elements with neutral tone and strong emphasis."
+-	},
+-	"Color/Semantic/Background/Neutral/bgInt-neutral-strong-active": {
+-		"value": {
+-			".": "#1e1e1e"
+-		},
+-		"description": "Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Background/Neutral/bgInt-neutral-strong-disabled": {
+-		"value": {
+-			".": "#d2d2d2"
+-		},
+-		"description": "Background color for interactive elements with neutral tone and strong emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Background/Neutral/bgInt-neutral-weak": {
+-		"value": {
+-			".": "#0000"
+-		},
+-		"description": "Background color for interactive elements with neutral tone and weak emphasis."
+-	},
+-	"Color/Semantic/Background/Neutral/bgInt-neutral-weak-active": {
+-		"value": {
+-			".": "#eaeaea"
+-		},
+-		"description": "Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Background/Neutral/bgInt-neutral-weak-disabled": {
+-		"value": {
+-			".": "#e2e2e2"
+-		},
+-		"description": "Background color for interactive elements with neutral tone and weak emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Background/Brand/bgInt-brand": {
+-		"value": {
+-			".": "#0000"
+-		},
+-		"description": "Background color for interactive elements with brand tone and normal emphasis."
+-	},
+-	"Color/Semantic/Background/Brand/bgInt-brand-active": {
+-		"value": {
+-			".": "#f6f8fd"
+-		},
+-		"description": "Background color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Background/Brand/bgInt-brand-disabled": {
+-		"value": {
+-			".": "#e2e2e2"
+-		},
+-		"description": "Background color for interactive elements with brand tone and normal emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Background/Brand/bgInt-brand-strong": {
+-		"value": {
+-			".": "#3858e9"
+-		},
+-		"description": "Background color for interactive elements with brand tone and strong emphasis."
+-	},
+-	"Color/Semantic/Background/Brand/bgInt-brand-strong-active": {
+-		"value": {
+-			".": "#2e49d9"
+-		},
+-		"description": "Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Background/Brand/bgInt-brand-strong-disabled": {
+-		"value": {
+-			".": "#d2d2d2"
+-		},
+-		"description": "Background color for interactive elements with brand tone and strong emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Background/Brand/bgInt-brand-weak": {
+-		"value": {
+-			".": "#0000"
+-		},
+-		"description": "Background color for interactive elements with brand tone and weak emphasis."
+-	},
+-	"Color/Semantic/Background/Brand/bgInt-brand-weak-active": {
+-		"value": {
+-			".": "#e6eaf4"
+-		},
+-		"description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Background/Brand/bgInt-brand-weak-disabled": {
+-		"value": {
+-			".": "#e2e2e2"
+-		},
+-		"description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Background/Error/bgInt-error": {
+-		"value": {
+-			".": "#0000"
+-		},
+-		"description": "Background color for interactive elements with error tone and normal emphasis."
+-	},
+-	"Color/Semantic/Background/Error/bgInt-error-active": {
+-		"value": {
+-			".": "#fff6f4"
+-		},
+-		"description": "Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Background/Error/bgInt-error-disabled": {
+-		"value": {
+-			".": "#e2e2e2"
+-		},
+-		"description": "Background color for interactive elements with error tone and normal emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Background/Error/bgInt-error-strong": {
+-		"value": {
+-			".": "#cc1818"
+-		},
+-		"description": "Background color for interactive elements with error tone and strong emphasis."
+-	},
+-	"Color/Semantic/Background/Error/bgInt-error-strong-active": {
+-		"value": {
+-			".": "#b90000"
+-		},
+-		"description": "Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Background/Error/bgInt-error-strong-disabled": {
+-		"value": {
+-			".": "#d2d2d2"
+-		},
+-		"description": "Background color for interactive elements with error tone and strong emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Background/Error/bgInt-error-weak": {
+-		"value": {
+-			".": "#0000"
+-		},
+-		"description": "Background color for interactive elements with error tone and weak emphasis."
+-	},
+-	"Color/Semantic/Background/Error/bgInt-error-weak-active": {
+-		"value": {
+-			".": "#f6e6e3"
+-		},
+-		"description": "Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Background/Error/bgInt-error-weak-disabled": {
+-		"value": {
+-			".": "#e2e2e2"
+-		},
+-		"description": "Background color for interactive elements with error tone and weak emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Background/Neutral/bgTra-neutral-weak": {
+-		"value": {
+-			".": "#e0e0e0"
+-		},
+-		"description": "Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track)."
+-	},
+-	"Color/Semantic/Background/Neutral/bgTra-neutral": {
+-		"value": {
+-			".": "#d8d8d8"
+-		},
+-		"description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track)."
+-	},
+-	"Color/Semantic/Background/Neutral/bgThu-neutral-weak": {
+-		"value": {
+-			".": "#8a8a8a"
+-		},
+-		"description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb)."
+-	},
+-	"Color/Semantic/Background/Neutral/bgThu-neutral-weak-active": {
+-		"value": {
+-			".": "#6c6c6c"
+-		},
+-		"description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Background/Brand/bgThu-brand": {
+-		"value": {
+-			".": "#3858e9"
+-		},
+-		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track)."
+-	},
+-	"Color/Semantic/Background/Brand/bgThu-brand-active": {
+-		"value": {
+-			".": "#3858e9"
+-		},
+-		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Background/Brand/bgThu-brand-disabled": {
+-		"value": {
+-			".": "#d8d8d8"
+-		},
+-		"description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
+-	},
+-	"Color/Semantic/Foreground/Neutral/fgCon-neutral": {
+-		"value": {
+-			".": "#1e1e1e"
+-		},
+-		"description": "Foreground color for content like text with normal emphasis."
+-	},
+-	"Color/Semantic/Foreground/Neutral/fgCon-neutral-weak": {
+-		"value": {
+-			".": "#6d6d6d"
+-		},
+-		"description": "Foreground color for content like text with weak emphasis."
+-	},
+-	"Color/Semantic/Foreground/Success/fgCon-success": {
+-		"value": {
+-			".": "#002900"
+-		},
+-		"description": "Foreground color for content like text with success tone and normal emphasis."
+-	},
+-	"Color/Semantic/Foreground/Success/fgCon-success-weak": {
+-		"value": {
+-			".": "#007f30"
+-		},
+-		"description": "Foreground color for content like text with success tone and weak emphasis."
+-	},
+-	"Color/Semantic/Foreground/Info/fgCon-info": {
+-		"value": {
+-			".": "#001b4f"
+-		},
+-		"description": "Foreground color for content like text with info tone and normal emphasis."
+-	},
+-	"Color/Semantic/Foreground/Info/fgCon-info-weak": {
+-		"value": {
+-			".": "#006bd7"
+-		},
+-		"description": "Foreground color for content like text with info tone and weak emphasis."
+-	},
+-	"Color/Semantic/Foreground/Warning/fgCon-warning": {
+-		"value": {
+-			".": "#2e1900"
+-		},
+-		"description": "Foreground color for content like text with warning tone and normal emphasis."
+-	},
+-	"Color/Semantic/Foreground/Warning/fgCon-warning-weak": {
+-		"value": {
+-			".": "#926300"
+-		},
+-		"description": "Foreground color for content like text with warning tone and weak emphasis."
+-	},
+-	"Color/Semantic/Foreground/Caution/fgCon-caution": {
+-		"value": {
+-			".": "#281d00"
+-		},
+-		"description": "Foreground color for content like text with caution tone and normal emphasis."
+-	},
+-	"Color/Semantic/Foreground/Caution/fgCon-caution-weak": {
+-		"value": {
+-			".": "#826a00"
+-		},
+-		"description": "Foreground color for content like text with caution tone and weak emphasis."
+-	},
+-	"Color/Semantic/Foreground/Error/fgCon-error": {
+-		"value": {
+-			".": "#470000"
+-		},
+-		"description": "Foreground color for content like text with error tone and normal emphasis."
+-	},
+-	"Color/Semantic/Foreground/Error/fgCon-error-weak": {
+-		"value": {
+-			".": "#cc1818"
+-		},
+-		"description": "Foreground color for content like text with error tone and weak emphasis."
+-	},
+-	"Color/Semantic/Foreground/Neutral/fgInt-neutral": {
+-		"value": {
+-			".": "#1e1e1e"
+-		},
+-		"description": "Foreground color for interactive elements with neutral tone and normal emphasis."
+-	},
+-	"Color/Semantic/Foreground/Neutral/fgInt-neutral-active": {
+-		"value": {
+-			".": "#1e1e1e"
+-		},
+-		"description": "Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Foreground/Neutral/fgInt-neutral-disabled": {
+-		"value": {
+-			".": "#8a8a8a"
+-		},
+-		"description": "Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Foreground/Neutral/fgInt-neutral-strong": {
+-		"value": {
+-			".": "#f0f0f0"
+-		},
+-		"description": "Foreground color for interactive elements with neutral tone and strong emphasis."
+-	},
+-	"Color/Semantic/Foreground/Neutral/fgInt-neutral-strong-active": {
+-		"value": {
+-			".": "#f0f0f0"
+-		},
+-		"description": "Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Foreground/Neutral/fgInt-neutral-strong-disabled": {
+-		"value": {
+-			".": "#6d6d6d"
+-		},
+-		"description": "Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Foreground/Neutral/fgInt-neutral-weak": {
+-		"value": {
+-			".": "#6d6d6d"
+-		},
+-		"description": "Foreground color for interactive elements with neutral tone and weak emphasis."
+-	},
+-	"Color/Semantic/Foreground/Neutral/fgInt-neutral-weak-disabled": {
+-		"value": {
+-			".": "#8a8a8a"
+-		},
+-		"description": "Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Foreground/Brand/fgInt-brand": {
+-		"value": {
+-			".": "#3858e9"
+-		},
+-		"description": "Foreground color for interactive elements with brand tone and normal emphasis."
+-	},
+-	"Color/Semantic/Foreground/Brand/fgInt-brand-active": {
+-		"value": {
+-			".": "#3858e9"
+-		},
+-		"description": "Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Foreground/Brand/fgInt-brand-disabled": {
+-		"value": {
+-			".": "#8a8a8a"
+-		},
+-		"description": "Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Foreground/Brand/fgInt-brand-strong": {
+-		"value": {
+-			".": "#eff0f2"
+-		},
+-		"description": "Foreground color for interactive elements with brand tone and strong emphasis."
+-	},
+-	"Color/Semantic/Foreground/Brand/fgInt-brand-strong-active": {
+-		"value": {
+-			".": "#eff0f2"
+-		},
+-		"description": "Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Foreground/Brand/fgInt-brand-strong-disabled": {
+-		"value": {
+-			".": "#6d6d6d"
+-		},
+-		"description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Foreground/Error/fgInt-error": {
+-		"value": {
+-			".": "#cc1818"
+-		},
+-		"description": "Foreground color for interactive elements with error tone and normal emphasis."
+-	},
+-	"Color/Semantic/Foreground/Error/fgInt-error-active": {
+-		"value": {
+-			".": "#cc1818"
+-		},
+-		"description": "Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Foreground/Error/fgInt-error-disabled": {
+-		"value": {
+-			".": "#8a8a8a"
+-		},
+-		"description": "Foreground color for interactive elements with error tone and normal emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Foreground/Error/fgInt-error-strong": {
+-		"value": {
+-			".": "#f2efef"
+-		},
+-		"description": "Foreground color for interactive elements with error tone and strong emphasis."
+-	},
+-	"Color/Semantic/Foreground/Error/fgInt-error-strong-active": {
+-		"value": {
+-			".": "#f2efef"
+-		},
+-		"description": "Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Foreground/Error/fgInt-error-strong-disabled": {
+-		"value": {
+-			".": "#6d6d6d"
+-		},
+-		"description": "Foreground color for interactive elements with error tone and strong emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Stroke/Neutral/strokeSur-neutral": {
+-		"value": {
+-			".": "#d8d8d8"
+-		},
+-		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis."
+-	},
+-	"Color/Semantic/Stroke/Neutral/strokeSur-neutral-weak": {
+-		"value": {
+-			".": "#e0e0e0"
+-		},
+-		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis."
+-	},
+-	"Color/Semantic/Stroke/Neutral/strokeSur-neutral-strong": {
+-		"value": {
+-			".": "#8a8a8a"
+-		},
+-		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
+-	},
+-	"Color/Semantic/Stroke/Brand/strokeSur-brand": {
+-		"value": {
+-			".": "#a3b1d4"
+-		},
+-		"description": "Decorative stroke color used to define brand-toned surface boundaries with normal emphasis."
+-	},
+-	"Color/Semantic/Stroke/Brand/strokeSur-brand-strong": {
+-		"value": {
+-			".": "#3858e9"
+-		},
+-		"description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
+-	},
+-	"Color/Semantic/Stroke/Success/strokeSur-success": {
+-		"value": {
+-			".": "#8ac894"
+-		},
+-		"description": "Decorative stroke color used to define success-toned surface boundaries with normal emphasis."
+-	},
+-	"Color/Semantic/Stroke/Success/strokeSur-success-strong": {
+-		"value": {
+-			".": "#007f30"
+-		},
+-		"description": "Decorative stroke color used to define success-toned surface boundaries with strong emphasis."
+-	},
+-	"Color/Semantic/Stroke/Info/strokeSur-info": {
+-		"value": {
+-			".": "#9fbcdc"
+-		},
+-		"description": "Decorative stroke color used to define info-toned surface boundaries with normal emphasis."
+-	},
+-	"Color/Semantic/Stroke/Info/strokeSur-info-strong": {
+-		"value": {
+-			".": "#006bd7"
+-		},
+-		"description": "Decorative stroke color used to define info-toned surface boundaries with strong emphasis."
+-	},
+-	"Color/Semantic/Stroke/Warning/strokeSur-warning": {
+-		"value": {
+-			".": "#d0b381"
+-		},
+-		"description": "Decorative stroke color used to define warning-toned surface boundaries with normal emphasis."
+-	},
+-	"Color/Semantic/Stroke/Warning/strokeSur-warning-strong": {
+-		"value": {
+-			".": "#926300"
+-		},
+-		"description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis."
+-	},
+-	"Color/Semantic/Stroke/Error/strokeSur-error": {
+-		"value": {
+-			".": "#daa39b"
+-		},
+-		"description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis."
+-	},
+-	"Color/Semantic/Stroke/Error/strokeSur-error-strong": {
+-		"value": {
+-			".": "#cc1818"
+-		},
+-		"description": "Decorative stroke color used to define error-toned surface boundaries with strong emphasis."
+-	},
+-	"Color/Semantic/Stroke/Neutral/strokeInt-neutral": {
+-		"value": {
+-			".": "#8a8a8a"
+-		},
+-		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis."
+-	},
+-	"Color/Semantic/Stroke/Neutral/strokeInt-neutral-active": {
+-		"value": {
+-			".": "#6c6c6c"
+-		},
+-		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Stroke/Neutral/strokeInt-neutral-disabled": {
+-		"value": {
+-			".": "#d8d8d8"
+-		},
+-		"description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state."
+-	},
+-	"Color/Semantic/Stroke/Neutral/strokeInt-neutral-strong": {
+-		"value": {
+-			".": "#6c6c6c"
+-		},
+-		"description": "Accessible stroke color used for interactive neutrally-toned elements with strong emphasis."
+-	},
+-	"Color/Semantic/Stroke/Brand/strokeInt-brand": {
+-		"value": {
+-			".": "#3858e9"
+-		},
+-		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis."
+-	},
+-	"Color/Semantic/Stroke/Brand/strokeInt-brand-active": {
+-		"value": {
+-			".": "#2337c8"
+-		},
+-		"description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Stroke/Error/strokeInt-error": {
+-		"value": {
+-			".": "#cc1818"
+-		},
+-		"description": "Accessible stroke color used for interactive error-toned elements with normal emphasis."
+-	},
+-	"Color/Semantic/Stroke/Error/strokeInt-error-active": {
+-		"value": {
+-			".": "#9d0000"
+-		},
+-		"description": "Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active."
+-	},
+-	"Color/Semantic/Stroke/Error/strokeInt-error-strong": {
+-		"value": {
+-			".": "#cc1818"
+-		},
+-		"description": "Accessible stroke color used for interactive error-toned elements with strong emphasis."
+-	},
+-	"Color/Semantic/Stroke/Brand/strokeFoc-brand": {
+-		"value": {
+-			".": "#3858e9"
+-		},
+-		"description": "Accessible stroke color applied to focus rings."
+-	},
+-	"Dimension/Semantic/base": {
+-		"value": {
+-			".": "4px"
+-		},
+-		"description": "Base dimension unit"
+-	},
+-	"Dimension/Semantic/padding-surface-2xs": {
+-		"value": {
+-			".": "4px",
+-			"compact": "4px",
+-			"comfortable": "8px"
+-		},
+-		"description": "2x extra small spacing for surfaces"
+-	},
+-	"Dimension/Semantic/padding-surface-xs": {
+-		"value": {
+-			".": "8px",
+-			"compact": "4px",
+-			"comfortable": "12px"
+-		},
+-		"description": "Extra small spacing for surfaces"
+-	},
+-	"Dimension/Semantic/padding-surface-sm": {
+-		"value": {
+-			".": "16px",
+-			"compact": "12px",
+-			"comfortable": "20px"
+-		},
+-		"description": "Small spacing for surfaces"
+-	},
+-	"Dimension/Semantic/padding-surface-md": {
+-		"value": {
+-			".": "24px",
+-			"compact": "20px",
+-			"comfortable": "32px"
+-		},
+-		"description": "Medium spacing for surfaces"
+-	},
+-	"Dimension/Semantic/padding-surface-lg": {
+-		"value": {
+-			".": "32px",
+-			"compact": "24px",
+-			"comfortable": "40px"
+-		},
+-		"description": "Large spacing for surfaces"
+-	},
+-	"Dimension/Semantic/gap-2xs": {
+-		"value": {
+-			".": "4px",
+-			"compact": "4px",
+-			"comfortable": "8px"
+-		},
+-		"description": "2x extra small gap"
+-	},
+-	"Dimension/Semantic/gap-xs": {
+-		"value": {
+-			".": "8px",
+-			"compact": "4px",
+-			"comfortable": "12px"
+-		},
+-		"description": "Extra small gap"
+-	},
+-	"Dimension/Semantic/gap-sm": {
+-		"value": {
+-			".": "12px",
+-			"compact": "8px",
+-			"comfortable": "16px"
+-		},
+-		"description": "Small gap"
+-	},
+-	"Dimension/Semantic/gap-md": {
+-		"value": {
+-			".": "16px",
+-			"compact": "12px",
+-			"comfortable": "20px"
+-		},
+-		"description": "Medium gap"
+-	},
+-	"Dimension/Semantic/gap-lg": {
+-		"value": {
+-			".": "24px",
+-			"compact": "20px",
+-			"comfortable": "32px"
+-		},
+-		"description": "Large gap"
+-	},
+-	"Dimension/Semantic/gap-xl": {
+-		"value": {
+-			".": "40px",
+-			"compact": "32px",
+-			"comfortable": "48px"
+-		},
+-		"description": "Extra large gap"
+-	},
+-	"Elevation/x-small": {
+-		"value": {
+-			".": "0 1px 1px 0 color(srgb 0 0 0 / 0.03), 0 1px 2px 0 color(srgb 0 0 0 / 0.02), 0 3px 3px 0 color(srgb 0 0 0 / 0.02), 0 4px 4px 0 color(srgb 0 0 0 / 0.01)"
+-		},
+-		"description": "For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame."
+-	},
+-	"Elevation/small": {
+-		"value": {
+-			".": "0 1px 2px 0 color(srgb 0 0 0 / 0.05), 0 2px 3px 0 color(srgb 0 0 0 / 0.04), 0 6px 6px 0 color(srgb 0 0 0 / 0.03), 0 8px 8px 0 color(srgb 0 0 0 / 0.02)"
+-		},
+-		"description": "For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar."
+-	},
+-	"Elevation/medium": {
+-		"value": {
+-			".": "0 2px 3px 0 color(srgb 0 0 0 / 0.05), 0 4px 5px 0 color(srgb 0 0 0 / 0.04), 0 12px 12px 0 color(srgb 0 0 0 / 0.03), 0 16px 16px 0 color(srgb 0 0 0 / 0.02)"
+-		},
+-		"description": "For components that offer additional actions. Example: Menus, Command Palette"
+-	},
+-	"Elevation/large": {
+-		"value": {
+-			".": "0 5px 15px 0 color(srgb 0 0 0 / 0.08), 0 15px 27px 0 color(srgb 0 0 0 / 0.07), 0 30px 36px 0 color(srgb 0 0 0 / 0.04), 0 50px 43px 0 color(srgb 0 0 0 / 0.02)"
+-		},
+-		"description": "For components that confirm decisions or handle necessary interruptions. Example: Modals."
+-	},
+-	"Font/family-heading": {
+-		"value": {
+-			".": "-apple-system, system-ui, \"Segoe UI\", \"Roboto\", \"Oxygen-Sans\", \"Ubuntu\", \"Cantarell\", \"Helvetica Neue\", sans-serif"
+-		},
+-		"description": "Headings font family"
+-	},
+-	"Font/family-body": {
+-		"value": {
+-			".": "-apple-system, system-ui, \"Segoe UI\", \"Roboto\", \"Oxygen-Sans\", \"Ubuntu\", \"Cantarell\", \"Helvetica Neue\", sans-serif"
+-		},
+-		"description": "Body font family"
+-	},
+-	"Font/family-mono": {
+-		"value": {
+-			".": "\"Menlo\", \"Consolas\", monaco, monospace"
+-		},
+-		"description": "Monospace font family"
+-	},
+-	"Font/size-x-small": {
+-		"value": {
+-			".": "11px"
+-		},
+-		"description": "Extra small font size"
+-	},
+-	"Font/size-small": {
+-		"value": {
+-			".": "12px"
+-		},
+-		"description": "Small font size"
+-	},
+-	"Font/size-medium": {
+-		"value": {
+-			".": "13px"
+-		},
+-		"description": "Medium font size"
+-	},
+-	"Font/size-large": {
+-		"value": {
+-			".": "15px"
+-		},
+-		"description": "Large font size"
+-	},
+-	"Font/size-x-large": {
+-		"value": {
+-			".": "20px"
+-		},
+-		"description": "Extra large font size"
+-	},
+-	"Font/size-2x-large": {
+-		"value": {
+-			".": "32px"
+-		},
+-		"description": "2X large font size"
+-	},
+-	"Font/lineHeight-x-small": {
+-		"value": {
+-			".": "16px"
+-		},
+-		"description": "Extra small line height"
+-	},
+-	"Font/lineHeight-small": {
+-		"value": {
+-			".": "20px"
+-		},
+-		"description": "Small line height"
+-	},
+-	"Font/lineHeight-medium": {
+-		"value": {
+-			".": "24px"
+-		},
+-		"description": "Medium line height"
+-	},
+-	"Font/lineHeight-large": {
+-		"value": {
+-			".": "28px"
+-		},
+-		"description": "Large line height"
+-	},
+-	"Font/lineHeight-x-large": {
+-		"value": {
+-			".": "32px"
+-		},
+-		"description": "Extra large line height"
+-	},
+-	"Font/lineHeight-2x-large": {
+-		"value": {
+-			".": "40px"
+-		},
+-		"description": "2X large line height"
+-	}
+-}
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index a84b835815f533..8ba95cdb1cc9ff 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -8,6 +8,7 @@ import { makeCSSVar } from '@terrazzo/token-tools/css';
+ /**
+  * Internal dependencies
+  */
++import pluginModeOverrides from './bin/terrazzo-plugin-mode-overrides/index';
+ import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
+ import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
+ import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index';
+@@ -74,6 +75,7 @@ export default defineConfig( {
+ 		pluginDsTokenDocs( {
+ 			filename: '../../docs/ds-tokens.md',
+ 		} ),
++		pluginModeOverrides(),
+ 	],
+ 
+ 	// Linter rules current error when multiple entry files are used
+diff --git a/packages/theme/tokens/modes/border.high-dpi.json b/packages/theme/tokens/modes/border.high-dpi.json
+new file mode 100644
+index 00000000000000..fafbac21ded55b
+--- /dev/null
++++ b/packages/theme/tokens/modes/border.high-dpi.json
+@@ -0,0 +1,15 @@
++{
++	"wpds-border": {
++		"width": {
++			"interactive": {
++				"focus": {
++					"$type": "dimension",
++					"$value": {
++						"value": 1.5,
++						"unit": "px"
++					}
++				}
++			}
++		}
++	}
++}
+diff --git a/packages/theme/tokens/modes/dimension.comfortable.json b/packages/theme/tokens/modes/dimension.comfortable.json
+new file mode 100644
+index 00000000000000..7bf25e48b0ee82
+--- /dev/null
++++ b/packages/theme/tokens/modes/dimension.comfortable.json
+@@ -0,0 +1,54 @@
++{
++	"wpds-dimension": {
++		"padding": {
++			"surface": {
++				"2xs": {
++					"$type": "dimension",
++					"$value": "{wpds-dimension.primitive.space.20}"
++				},
++				"xs": {
++					"$type": "dimension",
++					"$value": "{wpds-dimension.primitive.space.30}"
++				},
++				"sm": {
++					"$type": "dimension",
++					"$value": "{wpds-dimension.primitive.space.50}"
++				},
++				"md": {
++					"$type": "dimension",
++					"$value": "{wpds-dimension.primitive.space.70}"
++				},
++				"lg": {
++					"$type": "dimension",
++					"$value": "{wpds-dimension.primitive.space.80}"
++				}
++			}
++		},
++		"gap": {
++			"2xs": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.20}"
++			},
++			"xs": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.30}"
++			},
++			"sm": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.40}"
++			},
++			"md": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.50}"
++			},
++			"lg": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.70}"
++			},
++			"xl": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.90}"
++			}
++		}
++	}
++}
+diff --git a/packages/theme/tokens/modes/dimension.compact.json b/packages/theme/tokens/modes/dimension.compact.json
+new file mode 100644
+index 00000000000000..e46a61b8c43198
+--- /dev/null
++++ b/packages/theme/tokens/modes/dimension.compact.json
+@@ -0,0 +1,54 @@
++{
++	"wpds-dimension": {
++		"padding": {
++			"surface": {
++				"2xs": {
++					"$type": "dimension",
++					"$value": "{wpds-dimension.primitive.space.10}"
++				},
++				"xs": {
++					"$type": "dimension",
++					"$value": "{wpds-dimension.primitive.space.10}"
++				},
++				"sm": {
++					"$type": "dimension",
++					"$value": "{wpds-dimension.primitive.space.30}"
++				},
++				"md": {
++					"$type": "dimension",
++					"$value": "{wpds-dimension.primitive.space.50}"
++				},
++				"lg": {
++					"$type": "dimension",
++					"$value": "{wpds-dimension.primitive.space.60}"
++				}
++			}
++		},
++		"gap": {
++			"2xs": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.10}"
++			},
++			"xs": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.10}"
++			},
++			"sm": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.20}"
++			},
++			"md": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.30}"
++			},
++			"lg": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.50}"
++			},
++			"xl": {
++				"$type": "dimension",
++				"$value": "{wpds-dimension.primitive.space.70}"
++			}
++		}
++	}
++}

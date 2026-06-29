@@ -1,0 +1,444 @@
+diff --git a/packages/components/src/angle-picker/index.js b/packages/components/src/angle-picker/index.js
+new file mode 100644
+index 00000000000000..a46d11170328b9
+--- /dev/null
++++ b/packages/components/src/angle-picker/index.js
+@@ -0,0 +1,103 @@
++/**
++ * WordPress dependencies
++ */
++import { useRef } from '@wordpress/element';
++import { useInstanceId, __experimentalUseDragging as useDragging } from '@wordpress/compose';
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import BaseControl from '../base-control';
++
++function getAngle( centerX, centerY, pointX, pointY ) {
++	const y = pointY - centerY;
++	const x = pointX - centerX;
++
++	const angleInRadians = Math.atan2( y, x );
++	const angleInDeg = Math.round( angleInRadians * ( 180 / Math.PI ) ) + 90;
++	if ( angleInDeg < 0 ) {
++		return 360 + angleInDeg;
++	}
++	return angleInDeg;
++}
++
++const AngleCircle = ( { value, onChange, ...props } ) => {
++	const angleCircleRef = useRef();
++	const angleCircleCenter = useRef();
++
++	const setAngleCircleCenter = () => {
++		const rect = angleCircleRef.current.getBoundingClientRect();
++		angleCircleCenter.current = {
++			x: rect.x + ( rect.width / 2 ),
++			y: rect.y + ( rect.height / 2 ),
++		};
++	};
++
++	const changeAngleToPosition = ( event ) => {
++		const { x: centerX, y: centerY } = angleCircleCenter.current;
++		onChange( getAngle( centerX, centerY, event.clientX, event.clientY ) );
++	};
++
++	const { startDrag, isDragging } = useDragging( {
++		onDragStart: ( event ) => {
++			setAngleCircleCenter();
++			changeAngleToPosition( event );
++		},
++		onDragMove: changeAngleToPosition,
++		onDragEnd: changeAngleToPosition,
++	} );
++	return	(
++		/* eslint-disable jsx-a11y/no-static-element-interactions */
++		<div
++			ref={ angleCircleRef }
++			onMouseDown={ startDrag }
++			className="components-angle-picker__angle-circle"
++			style={ isDragging ? { cursor: 'grabbing' } : undefined }
++			{ ...props }
++		>
++			<div
++				style={ value ? { transform: `rotate(${ value }deg)` } : undefined }
++				className="components-angle-picker__angle-circle-indicator-wrapper"
++			>
++				<span className="components-angle-picker__angle-circle-indicator" />
++			</div>
++		</div>
++		/* eslint-enable jsx-a11y/no-static-element-interactions */
++	);
++};
++
++export default function AnglePicker( { value, onChange, label = __( 'Angle' ) } ) {
++	const instanceId = useInstanceId( AnglePicker );
++	const inputId = `components-angle-picker__input-${ instanceId }`;
++	return (
++		<BaseControl
++			label={ label }
++			id={ inputId }
++			className="components-angle-picker"
++		>
++			<AngleCircle
++				value={ value }
++				onChange={ onChange }
++				aria-hidden="true"
++			/>
++			<input
++				className="components-angle-picker__input-field"
++				type="number"
++				id={ inputId }
++				onChange={ ( event ) => {
++					const unprocessedValue = event.target.value;
++					const inputValue = unprocessedValue !== '' ?
++						parseInt( event.target.value, 10 ) :
++						0;
++					onChange( inputValue );
++				} }
++				value={ value }
++				min={ 0 }
++				max={ 360 }
++				step="1"
++			/>
++		</BaseControl>
++	);
++}
++
+diff --git a/packages/components/src/angle-picker/stories/index.js b/packages/components/src/angle-picker/stories/index.js
+new file mode 100644
+index 00000000000000..99fe93c00dd30f
+--- /dev/null
++++ b/packages/components/src/angle-picker/stories/index.js
+@@ -0,0 +1,23 @@
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import AnglePicker from '../';
++
++export default { title: 'Components|AnglePicker', component: AnglePicker };
++
++const AnglePickerWithState = () => {
++	const [ angle, setAngle ] = useState();
++	return (
++		<AnglePicker value={ angle } onChange={ setAngle } />
++	);
++};
++
++export const _default = () => {
++	return <AnglePickerWithState />;
++};
+diff --git a/packages/components/src/angle-picker/style.scss b/packages/components/src/angle-picker/style.scss
+new file mode 100644
+index 00000000000000..c1fdd0c53bc748
+--- /dev/null
++++ b/packages/components/src/angle-picker/style.scss
+@@ -0,0 +1,42 @@
++.components-angle-picker {
++	width: 50%;
++	&.components-base-control .components-base-control__label {
++		display: block;
++	}
++}
++
++.components-angle-picker__input-field {
++	width: calc(100% - #{$icon-button-size});
++	max-width: 100px;
++}
++
++.components-angle-picker__angle-circle {
++	width: $icon-button-size - ( 2 * $grid-size-small );
++	height: $icon-button-size - ( 2 * $grid-size-small );
++	border: 2px solid $dark-gray-500;
++	border-radius: 50%;
++	float: left;
++	margin-right: $grid-size-small;
++	cursor: grab;
++}
++
++.components-angle-picker__angle-circle-indicator-wrapper {
++	position: relative;
++	width: 100%;
++	height: 100%;
++}
++
++.components-angle-picker__angle-circle-indicator {
++	width: 1px;
++	height: 1px;
++	border-radius: 50%;
++	border: 3px solid $dark-gray-500;
++	display: block;
++	position: absolute;
++	top: -($icon-button-size - (2 * $grid-size-small)) / 2;
++	bottom: 0;
++	left: 0;
++	right: 0;
++	margin: auto;
++	background: $dark-gray-500;
++}
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 083d59c772850b..6f4ee09bb05835 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -3,6 +3,7 @@ export { SVG, Path, Circle, Polygon, Rect, G, HorizontalRule, BlockQuotation } f
+ 
+ // Components
+ export { default as Animate } from './animate';
++export { default as __experimentalAnglePicker } from './angle-picker';
+ export { default as Autocomplete } from './autocomplete';
+ export { default as BaseControl } from './base-control';
+ export { default as Button } from './button';
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index f99717ec65d84b..a4728386ed030f 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -1,4 +1,5 @@
+ @import "./animate/style.scss";
++@import "./angle-picker/style.scss";
+ @import "./autocomplete/style.scss";
+ @import "./base-control/style.scss";
+ @import "./button-group/style.scss";
+diff --git a/packages/compose/src/hooks/use-dragging/README.md b/packages/compose/src/hooks/use-dragging/README.md
+new file mode 100644
+index 00000000000000..5c76a370021a81
+--- /dev/null
++++ b/packages/compose/src/hooks/use-dragging/README.md
+@@ -0,0 +1,88 @@
++`useDragging`
++==============
++
++In some situations, we want to have simple drag & drop behaviors.
++Typically drag & drop behaviors follow a common pattern: We have an element that we want to drag or where we want dragging to start; the dragging starts when the `onMouseDown` event happens on the target element. When the dragging starts, global event listeners for mouse movement (`mousemove`) and the mouse up event (`mouseup`) are added. When the global mouse movement event triggers, the dragging behavior happens (e.g., a position is updated), when the mouse up event triggers, dragging stops, and both global event listeners are removed.
++`useDragging` makes the implementation of the described common pattern simpler because it handles the addition and removal of global events.
++
++## Input Object Properties
++
++### `onDragStart`
++
++- Type: `Function`
++
++The hook calls `onDragStart` when the dragging starts. The function receives as parameters the same parameters passed to `startDrag` whose documentation is available below.
++If `startDrag` is passed directly as an `onMouseDown` event handler, `onDragStart` will receive the `onMouseDown` event.
++
++### `onDragMove`
++
++- Type: `Function`
++
++The hook calls `onDragMove ` after the dragging starts and when a mouse movement happens.
++It receives the `mousemove` event.
++
++### `onDragEnd`
++
++- Type: `Function`
++
++The hook calls `onDragEnd` when the dragging ends. When dragging is explicitly stopped, the function receives as parameters, the same parameters passed to `endDrag` whose documentation is available below.
++When dragging stops because the user releases the mouse, the function receives the `mouseup` event.
++
++## Return Object Properties
++
++### `startDrag`
++
++- Type: `Function`
++
++A function that, when called, starts the dragging behavior. Parameters passed to this function will be passed to `onDragStart` when the dragging starts.
++It is possible to directly pass `startDrag` as the `onMouseDown` event handler of some element.
++
++### `endDrag`
++
++- Type: `Function`
++
++A function that, when called, stops the dragging behavior. Parameters passed to this function will be passed to `onDragEnd` when the dragging ends.
++In most cases, there is no need to call this function directly. Dragging behavior automatically stops when the mouse is released.
++
++### `isDragging`
++
++- Type: `Boolean`
++
++A boolean value, when true it means dragging is currently taking place; when false, it means dragging is not taking place.
++
++## Usage
++The following example allows us to drag & drop a red square around the entire viewport.
++
++```jsx
++/**
++ * WordPress dependencies
++ */
++import { useState, useCallback } from '@wordpress/element';
++import { __experimentalUseDragging as useDragging } from '@wordpress/compose';
++
++
++const UseDraggingExample = () => {
++	const [ position, setPosition ] = useState( null );
++	const changePosition = useCallback(
++		( event ) => {
++			setPosition( { x: event.clientX, y: event.clientY } );
++		}
++	);
++	const { startDrag } = useDragging( {
++		onDragMove: changePosition,
++	} );
++	return (
++		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
++		<div
++			onMouseDown={ startDrag }
++			style={ {
++				position: 'fixed',
++				width: 10,
++				height: 10,
++				backgroundColor: 'red',
++				...( position ? { top: position.y, left: position.x } : {} ),
++			} }
++		/>
++	);
++};
++```
+diff --git a/packages/compose/src/hooks/use-dragging/index.js b/packages/compose/src/hooks/use-dragging/index.js
+new file mode 100644
+index 00000000000000..411327e89c1cd3
+--- /dev/null
++++ b/packages/compose/src/hooks/use-dragging/index.js
+@@ -0,0 +1,74 @@
++/**
++ * WordPress dependencies
++ */
++import {
++	useCallback,
++	useEffect,
++	useLayoutEffect,
++	useRef,
++	useState,
++} from '@wordpress/element';
++
++const useIsomorphicLayoutEffect =
++	typeof window !== 'undefined' ? useLayoutEffect : useEffect;
++
++export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
++	const [ isDragging, setIsDragging ] = useState( false );
++
++	const eventsRef = useRef( {
++		onDragStart,
++		onDragMove,
++		onDragEnd,
++	} );
++	useIsomorphicLayoutEffect(
++		() => {
++			eventsRef.current.onDragStart = onDragStart;
++			eventsRef.current.onDragMove = onDragMove;
++			eventsRef.current.onDragEnd = onDragEnd;
++		},
++		[ onDragStart, onDragMove, onDragEnd ]
++	);
++
++	const onMouseMove = useCallback(
++		( ...args ) => ( eventsRef.current.onDragMove && eventsRef.current.onDragMove( ...args ) ),
++		[]
++	);
++	const endDrag = useCallback(
++		( ...args ) => {
++			if ( eventsRef.current.onDragEnd ) {
++				eventsRef.current.onDragEnd( ...args );
++			}
++			document.removeEventListener( 'mousemove', onMouseMove );
++			document.removeEventListener( 'mouseup', endDrag );
++			setIsDragging( false );
++		},
++		[]
++	);
++	const startDrag = useCallback(
++		( ...args ) => {
++			if ( eventsRef.current.onDragStart ) {
++				eventsRef.current.onDragStart( ...args );
++			}
++			document.addEventListener( 'mousemove', onMouseMove );
++			document.addEventListener( 'mouseup', endDrag );
++			setIsDragging( true );
++		},
++		[]
++	);
++
++	// Remove the global events when unmounting if needed.
++	useEffect( () => {
++		return () => {
++			if ( isDragging ) {
++				document.removeEventListener( 'mousemove', onMouseMove );
++				document.removeEventListener( 'mouseup', endDrag );
++			}
++		};
++	}, [ isDragging ] );
++
++	return {
++		startDrag,
++		endDrag,
++		isDragging,
++	};
++}
+diff --git a/packages/compose/src/index.js b/packages/compose/src/index.js
+index 5fce542d28e0e8..3a1aabde92cfef 100644
+--- a/packages/compose/src/index.js
++++ b/packages/compose/src/index.js
+@@ -13,6 +13,7 @@ export { default as withSafeTimeout } from './higher-order/with-safe-timeout';
+ export { default as withState } from './higher-order/with-state';
+ 
+ // Hooks
++export { default as __experimentalUseDragging } from './hooks/use-dragging';
+ export { default as useInstanceId } from './hooks/use-instance-id';
+ export { default as useKeyboardShortcut } from './hooks/use-keyboard-shortcut';
+ export { default as useMediaQuery } from './hooks/use-media-query';
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index b2f61d491bb3e8..4444eef5539679 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -5698,6 +5698,45 @@ Array [
+ ]
+ `;
+ 
++exports[`Storyshots Components|AnglePicker Default 1`] = `
++<div
++  className="components-base-control components-angle-picker"
++>
++  <div
++    className="components-base-control__field"
++  >
++    <label
++      className="components-base-control__label"
++      htmlFor="components-angle-picker__input-0"
++    >
++      Angle
++    </label>
++    <div
++      aria-hidden="true"
++      className="components-angle-picker__angle-circle"
++      onMouseDown={[Function]}
++    >
++      <div
++        className="components-angle-picker__angle-circle-indicator-wrapper"
++      >
++        <span
++          className="components-angle-picker__angle-circle-indicator"
++        />
++      </div>
++    </div>
++    <input
++      className="components-angle-picker__input-field"
++      id="components-angle-picker__input-0"
++      max={360}
++      min={0}
++      onChange={[Function]}
++      step="1"
++      type="number"
++    />
++  </div>
++</div>
++`;
++
+ exports[`Storyshots Icons/Icon Default 1`] = `
+ Array [
+   <div>

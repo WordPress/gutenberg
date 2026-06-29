@@ -1,0 +1,94 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2ed01a8f098e69..77836f18f10c1c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -23,6 +23,7 @@
+ -   `UnitControl`: Update unit dropdown design for the large size variant ([#42000](https://github.com/WordPress/gutenberg/pull/42000)).
+ -   `BaseControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
+ -   `BoxControl`: Export `applyValueToSides` util function. ([#42733](https://github.com/WordPress/gutenberg/pull/42733/)).
++-   `AnglePickerControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#43160](https://github.com/WordPress/gutenberg/pull/43160/)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/angle-picker-control/index.js b/packages/components/src/angle-picker-control/index.js
+index 1417bfd6a845c3..1cc3085cd7af56 100644
+--- a/packages/components/src/angle-picker-control/index.js
++++ b/packages/components/src/angle-picker-control/index.js
+@@ -20,6 +20,8 @@ import { Text } from '../text';
+ import { Spacer } from '../spacer';
+ 
+ export default function AnglePickerControl( {
++	/** Start opting into the new margin-free styles that will become the default in a future version. */
++	__nextHasNoMarginBottom = false,
+ 	className,
+ 	label = __( 'Angle' ),
+ 	onChange,
+@@ -34,7 +36,11 @@ export default function AnglePickerControl( {
+ 	const classes = classnames( 'components-angle-picker-control', className );
+ 
+ 	return (
+-		<Root className={ classes } gap={ 4 }>
++		<Root
++			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++			className={ classes }
++			gap={ 4 }
++		>
+ 			<FlexBlock>
+ 				<NumberControl
+ 					label={ label }
+diff --git a/packages/components/src/angle-picker-control/stories/index.js b/packages/components/src/angle-picker-control/stories/index.js
+index 5d88c9be90d59c..f2de7c4d77bc23 100644
+--- a/packages/components/src/angle-picker-control/stories/index.js
++++ b/packages/components/src/angle-picker-control/stories/index.js
+@@ -11,13 +11,16 @@ import AnglePickerControl from '../';
+ export default {
+ 	title: 'Components/AnglePickerControl',
+ 	component: AnglePickerControl,
++	argTypes: {
++		__nextHasNoMarginBottom: { control: { type: 'boolean' } },
++	},
+ };
+ 
+-const AnglePickerWithState = () => {
++const AnglePickerWithState = ( args ) => {
+ 	const [ angle, setAngle ] = useState();
+-	return <AnglePickerControl value={ angle } onChange={ setAngle } />;
++	return (
++		<AnglePickerControl { ...args } value={ angle } onChange={ setAngle } />
++	);
+ };
+ 
+-export const _default = () => {
+-	return <AnglePickerWithState />;
+-};
++export const Default = AnglePickerWithState.bind( {} );
+diff --git a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
+index 9bf45eaf92056e..7deb0c4645b474 100644
+--- a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
++++ b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
+@@ -1,6 +1,7 @@
+ /**
+  * External dependencies
+  */
++import { css } from '@emotion/react';
+ import styled from '@emotion/styled';
+ 
+ /**
+@@ -14,8 +15,16 @@ import CONFIG from '../../utils/config-values';
+ const CIRCLE_SIZE = 32;
+ const INNER_CIRCLE_SIZE = 3;
+ 
++const deprecatedBottomMargin = ( { __nextHasNoMarginBottom } ) => {
++	return ! __nextHasNoMarginBottom
++		? css`
++				margin-bottom: ${ space( 2 ) };
++		  `
++		: '';
++};
++
+ export const Root = styled( Flex )`
+-	margin-bottom: ${ space( 2 ) };
++	${ deprecatedBottomMargin }
+ `;
+ 
+ export const CircleRoot = styled.div`

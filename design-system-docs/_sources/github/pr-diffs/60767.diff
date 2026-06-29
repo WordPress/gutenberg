@@ -1,0 +1,32 @@
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index 368e78d799d72d..15eb4d6bd3b1d3 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -80,6 +80,13 @@ function goTo(
+ 		...restOptions
+ 	} = options;
+ 
++	const isNavigatingToSamePath =
++		locationHistory.length > 0 &&
++		locationHistory[ locationHistory.length - 1 ].path === path;
++	if ( isNavigatingToSamePath ) {
++		return locationHistory;
++	}
++
+ 	const isNavigatingToPreviousPath =
+ 		isBack &&
+ 		locationHistory.length > 1 &&
+@@ -157,13 +164,6 @@ function routerReducer(
+ 			locationHistory = goBack( state );
+ 			break;
+ 		case 'goto':
+-			if (
+-				locationHistory.length &&
+-				action.path ===
+-					locationHistory[ locationHistory.length - 1 ].path
+-			) {
+-				break;
+-			}
+ 			locationHistory = goTo( state, action.path, action.options );
+ 			break;
+ 		case 'gotoparent':

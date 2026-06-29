@@ -1,0 +1,89 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 791dfe7e8094b8..46b967c9067907 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   Revert `word-break: break-word` addition ([#76230](https://github.com/WordPress/gutenberg/pull/76230)).
++
+ ## 32.3.0 (2026-03-04)
+ 
+ ### Code Quality
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index ea0a718e4f3ae6..38e328eed82c04 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -13,7 +13,6 @@
+ .components-button {
+ 	display: inline-flex;
+ 	text-decoration: none;
+-	word-break: break-word;
+ 	font-family: inherit;
+ 	font-size: $default-font-size;
+ 	font-weight: $font-weight-medium;
+diff --git a/packages/editor/src/components/page-attributes/parent.js b/packages/editor/src/components/page-attributes/parent.js
+index 072cc9cd0e3de1..ba9ff799b4cf6c 100644
+--- a/packages/editor/src/components/page-attributes/parent.js
++++ b/packages/editor/src/components/page-attributes/parent.js
+@@ -226,6 +226,7 @@ function PostParentToggle( { isOpen, onClick } ) {
+ 	return (
+ 		<Button
+ 			size="compact"
++			className="editor-post-parent__panel-toggle"
+ 			variant="tertiary"
+ 			aria-expanded={ isOpen }
+ 			aria-label={
+diff --git a/packages/editor/src/components/post-url/panel.js b/packages/editor/src/components/post-url/panel.js
+index 8320751d71c32a..97eaa8ccb77f8d 100644
+--- a/packages/editor/src/components/post-url/panel.js
++++ b/packages/editor/src/components/post-url/panel.js
+@@ -90,6 +90,7 @@ function PostURLToggle( { isOpen, onClick } ) {
+ 	return (
+ 		<Button
+ 			size="compact"
++			className="editor-post-url__panel-toggle"
+ 			variant="tertiary"
+ 			aria-expanded={ isOpen }
+ 			aria-label={
+diff --git a/packages/editor/src/components/post-url/style.scss b/packages/editor/src/components/post-url/style.scss
+index 0be8efb9ca5412..2fc312cb8eb071 100644
+--- a/packages/editor/src/components/post-url/style.scss
++++ b/packages/editor/src/components/post-url/style.scss
+@@ -47,6 +47,11 @@
+ 	padding-inline-start: 0 !important;
+ }
+ 
++.editor-post-url__panel-toggle,
++.editor-post-parent__panel-toggle {
++	word-break: break-word;
++}
++
+ .editor-post-url__intro {
+ 	margin: 0;
+ }
+diff --git a/test/e2e/specs/editor/plugins/custom-post-types.spec.js b/test/e2e/specs/editor/plugins/custom-post-types.spec.js
+index 76a3ed9b6ae346..67372d46c61a70 100644
+--- a/test/e2e/specs/editor/plugins/custom-post-types.spec.js
++++ b/test/e2e/specs/editor/plugins/custom-post-types.spec.js
+@@ -36,7 +36,7 @@ test.describe( 'Test Custom Post Types', () => {
+ 			} )
+ 			.click();
+ 
+-		await page.getByRole( 'button', { name: /^Change parent:/ } ).click();
++		await page.locator( '.editor-post-parent__panel-toggle' ).click();
+ 
+ 		const parentPageLocator = page.getByRole( 'combobox', {
+ 			name: 'Parent',
+@@ -53,7 +53,7 @@ test.describe( 'Test Custom Post Types', () => {
+ 		await editor.publishPost();
+ 		await page.reload();
+ 
+-		await page.getByRole( 'button', { name: /^Change parent:/ } ).click();
++		await page.locator( '.editor-post-parent__panel-toggle' ).click();
+ 
+ 		// Confirm parent page selection matches after reloading.
+ 		await expect( parentPageLocator ).toHaveValue( parentPage );

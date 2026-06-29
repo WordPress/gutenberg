@@ -1,0 +1,921 @@
+diff --git a/package-lock.json b/package-lock.json
+index 0b5b92da05fa1d..fdfaf033b93653 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -49586,18 +49586,6 @@
+ 				"react": ">=16.8"
+ 			}
+ 		},
+-		"node_modules/use-lilius": {
+-			"version": "2.0.5",
+-			"resolved": "https://registry.npmjs.org/use-lilius/-/use-lilius-2.0.5.tgz",
+-			"integrity": "sha512-IbPjJe4T6B0zQV6ahftVtHvCAxi6RAuDpEcO8TmnHh4nBtx7JbGdpbgXWOUj/9YjrzEbdT/lW7JWcBVbX3MbrA==",
+-			"dependencies": {
+-				"date-fns": "^3.6.0"
+-			},
+-			"peerDependencies": {
+-				"react": "*",
+-				"react-dom": "*"
+-			}
+-		},
+ 		"node_modules/use-memo-one": {
+ 			"version": "1.1.1",
+ 			"resolved": "https://registry.npmjs.org/use-memo-one/-/use-memo-one-1.1.1.tgz",
+@@ -52936,7 +52924,6 @@
+ 				"re-resizable": "^6.4.0",
+ 				"react-colorful": "^5.3.1",
+ 				"remove-accents": "^0.5.0",
+-				"use-lilius": "^2.0.5",
+ 				"uuid": "^9.0.1"
+ 			},
+ 			"engines": {
+@@ -67803,7 +67790,6 @@
+ 				"re-resizable": "^6.4.0",
+ 				"react-colorful": "^5.3.1",
+ 				"remove-accents": "^0.5.0",
+-				"use-lilius": "^2.0.5",
+ 				"uuid": "^9.0.1"
+ 			},
+ 			"dependencies": {
+@@ -94041,14 +94027,6 @@
+ 			"resolved": "https://registry.npmjs.org/use-latest-callback/-/use-latest-callback-0.1.9.tgz",
+ 			"integrity": "sha512-CL/29uS74AwreI/f2oz2hLTW7ZqVeV5+gxFeGudzQrgkCytrHw33G4KbnQOrRlAEzzAFXi7dDLMC9zhWcVpzmw=="
+ 		},
+-		"use-lilius": {
+-			"version": "2.0.5",
+-			"resolved": "https://registry.npmjs.org/use-lilius/-/use-lilius-2.0.5.tgz",
+-			"integrity": "sha512-IbPjJe4T6B0zQV6ahftVtHvCAxi6RAuDpEcO8TmnHh4nBtx7JbGdpbgXWOUj/9YjrzEbdT/lW7JWcBVbX3MbrA==",
+-			"requires": {
+-				"date-fns": "^3.6.0"
+-			}
+-		},
+ 		"use-memo-one": {
+ 			"version": "1.1.1",
+ 			"resolved": "https://registry.npmjs.org/use-memo-one/-/use-memo-one-1.1.1.tgz",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 35549e8cb77998..0293522cf9263e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ ### Internal
+ 
+ -   `Composite`: Remove from private APIs ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
++-   use local copy of `use-lilius` instead of `npm` dependency ([#65097](https://github.com/WordPress/gutenberg/pull/65097)).
+ 
+ ## 28.7.0 (2024-09-05)
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 17209986c0f17c..8337d6dd8857f4 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -75,7 +75,6 @@
+ 		"re-resizable": "^6.4.0",
+ 		"react-colorful": "^5.3.1",
+ 		"remove-accents": "^0.5.0",
+-		"use-lilius": "^2.0.5",
+ 		"uuid": "^9.0.1"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index 75bfbb76ba2116..33fc736564d5e6 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { useLilius } from 'use-lilius';
+ import {
+ 	format,
+ 	isSameDay,
+@@ -29,6 +28,7 @@ import { useState, useRef, useEffect } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
++import { useLilius } from './use-lilius';
+ import type { DatePickerProps } from '../types';
+ import {
+ 	Wrapper,
+diff --git a/packages/components/src/date-time/date/test/use-lilius.ts b/packages/components/src/date-time/date/test/use-lilius.ts
+new file mode 100644
+index 00000000000000..31b81fa11bb74b
+--- /dev/null
++++ b/packages/components/src/date-time/date/test/use-lilius.ts
+@@ -0,0 +1,417 @@
++/**
++ * External dependencies
++ */
++import { act, renderHook } from '@testing-library/react';
++import { addYears, getYear, set, startOfToday, subYears } from 'date-fns';
++
++/**
++ * Internal dependencies
++ */
++import { Month, useLilius } from '../use-lilius';
++
++const getDate = ( {
++	year = 1999,
++	month = Month.NOVEMBER,
++	date = 24,
++	hours = 0,
++	minutes = 0,
++	seconds = 0,
++	milliseconds = 0,
++}: {
++	year?: number;
++	month?: number;
++	date?: number;
++	hours?: number;
++	minutes?: number;
++	seconds?: number;
++	milliseconds?: number;
++} = {} ) => {
++	return set( new Date(), {
++		year,
++		month,
++		date,
++		hours,
++		minutes,
++		seconds,
++		milliseconds,
++	} );
++};
++
++describe( 'helpers', () => {
++	describe( 'clearTime', () => {
++		it( 'returns a copy of the given date with the time set to 00:00:00:00', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const date = getDate( { hours: 7, minutes: 30 } );
++
++			expect( result.current.clearTime( date ) ).toStrictEqual(
++				set( date, {
++					hours: 0,
++					minutes: 0,
++					seconds: 0,
++					milliseconds: 0,
++				} )
++			);
++		} );
++	} );
++
++	describe( 'inRange', () => {
++		it( 'returns whether or not a date is between 2 other dates (inclusive)', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const date = getDate();
++			const min = subYears( date, 1 );
++			const max = addYears( date, 1 );
++
++			expect( result.current.inRange( date, min, max ) ).toBe( true );
++			expect(
++				result.current.inRange( addYears( date, 10 ), min, max )
++			).toBe( false );
++		} );
++	} );
++} );
++
++describe( 'viewing', () => {
++	describe( 'viewing', () => {
++		it( 'returns the date represented in the calendar matrix', () => {
++			const date = getDate();
++
++			const { result } = renderHook( () =>
++				useLilius( { viewing: date } )
++			);
++
++			expect( result.current.viewing ).toStrictEqual( date );
++		} );
++	} );
++
++	describe( 'setViewing', () => {
++		it( 'sets the date represented in the calendar matrix', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const date = getDate();
++
++			act( () => result.current.setViewing( date ) );
++			expect( result.current.viewing ).toStrictEqual( date );
++		} );
++	} );
++
++	describe( 'viewToday', () => {
++		it( 'sets the viewing date to today', () => {
++			const { result } = renderHook( () =>
++				useLilius( { viewing: getDate( { year: 1999 } ) } )
++			);
++
++			act( () => result.current.viewToday() );
++			expect( result.current.viewing ).toStrictEqual( startOfToday() );
++		} );
++	} );
++
++	describe( 'viewMonth', () => {
++		it( 'sets the viewing date to the given month', () => {
++			const date = getDate( { month: Month.JANUARY } );
++
++			const { result } = renderHook( () =>
++				useLilius( { viewing: date } )
++			);
++
++			act( () => result.current.viewMonth( Month.FEBRUARY ) );
++			expect( result.current.viewing ).toStrictEqual(
++				set( date, { month: Month.FEBRUARY } )
++			);
++		} );
++	} );
++
++	describe( 'viewPreviousMonth', () => {
++		it( 'sets the viewing date to the month before the current', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const date = getDate( { month: Month.OCTOBER } );
++
++			act( () => result.current.setViewing( date ) );
++			act( () => result.current.viewPreviousMonth() );
++			expect( result.current.viewing ).toStrictEqual(
++				set( date, { month: Month.SEPTEMBER } )
++			);
++		} );
++
++		it( 'wraps to december of the previous year if the current month is january', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const date = getDate( { month: Month.JANUARY } );
++
++			act( () => result.current.setViewing( date ) );
++			act( () => result.current.viewPreviousMonth() );
++			expect( result.current.viewing ).toStrictEqual(
++				set( date, {
++					month: Month.DECEMBER,
++					year: getYear( date ) - 1,
++				} )
++			);
++		} );
++	} );
++
++	describe( 'viewNextMonth', () => {
++		it( 'sets the viewing date to the month after the current', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const date = getDate( { month: Month.OCTOBER } );
++
++			act( () => result.current.setViewing( date ) );
++			act( () => result.current.viewNextMonth() );
++			expect( result.current.viewing ).toStrictEqual(
++				set( date, { month: Month.NOVEMBER } )
++			);
++		} );
++
++		it( 'wraps to january of the next year if the current month is december', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const date = getDate( { month: Month.DECEMBER } );
++
++			act( () => result.current.setViewing( date ) );
++			act( () => result.current.viewNextMonth() );
++			expect( result.current.viewing ).toStrictEqual(
++				set( date, { month: Month.JANUARY, year: getYear( date ) + 1 } )
++			);
++		} );
++	} );
++
++	describe( 'viewYear', () => {
++		it( 'sets the viewing date to the given year', () => {
++			const date = getDate( { year: 1999 } );
++
++			const { result } = renderHook( () =>
++				useLilius( { viewing: date } )
++			);
++
++			act( () => result.current.viewYear( 1997 ) );
++			expect( result.current.viewing ).toStrictEqual(
++				set( date, { year: 1997 } )
++			);
++		} );
++	} );
++
++	describe( 'viewPreviousYear', () => {
++		it( 'sets the viewing date to the year before the current', () => {
++			const date = getDate( { year: 1999 } );
++
++			const { result } = renderHook( () =>
++				useLilius( { viewing: date } )
++			);
++
++			act( () => result.current.viewPreviousYear() );
++			expect( result.current.viewing ).toStrictEqual(
++				set( date, { year: 1998 } )
++			);
++		} );
++	} );
++
++	describe( 'viewNextYear', () => {
++		it( 'sets the viewing date to the year after the current', () => {
++			const date = getDate( { year: 1999 } );
++
++			const { result } = renderHook( () =>
++				useLilius( { viewing: date } )
++			);
++
++			act( () => result.current.viewNextYear() );
++			expect( result.current.viewing ).toStrictEqual(
++				set( date, { year: 2000 } )
++			);
++		} );
++	} );
++} );
++
++describe( 'selected', () => {
++	describe( 'selected', () => {
++		it( 'returns the dates currently selected', () => {
++			const date = getDate();
++
++			const { result } = renderHook( () =>
++				useLilius( {
++					selected: [ date ],
++				} )
++			);
++
++			expect( result.current.selected ).toStrictEqual( [ date ] );
++		} );
++	} );
++
++	describe( 'clearSelected', () => {
++		it( 'resets the selected dates to []', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const date = getDate();
++
++			act( () =>
++				result.current.selectRange(
++					set( date, { date: 1 } ),
++					set( date, { date: 5 } )
++				)
++			);
++			expect( result.current.selected.length ).toBe( 5 );
++
++			act( () => result.current.clearSelected() );
++			expect( result.current.selected.length ).toBe( 0 );
++		} );
++	} );
++
++	describe( 'isSelected', () => {
++		it( 'returns whether or not a date has been selected', () => {
++			const date = getDate();
++
++			const { result } = renderHook( () =>
++				useLilius( {
++					selected: [ date ],
++				} )
++			);
++
++			expect( result.current.isSelected( date ) ).toBe( true );
++		} );
++	} );
++
++	describe( 'select', () => {
++		it( 'selects a date', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const date = getDate();
++
++			act( () => result.current.select( date ) );
++			expect( result.current.isSelected( date ) ).toBe( true );
++		} );
++
++		it( 'selects multiple dates', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const dateOne = getDate( { date: 1 } );
++			const dateTwo = getDate( { date: 2 } );
++
++			act( () => result.current.select( [ dateOne, dateTwo ] ) );
++			expect( result.current.isSelected( dateOne ) ).toBe( true );
++			expect( result.current.isSelected( dateTwo ) ).toBe( true );
++		} );
++	} );
++
++	describe( 'deselect', () => {
++		it( 'deselects a date', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const date = getDate();
++
++			act( () => result.current.select( date ) );
++			act( () => result.current.deselect( date ) );
++			expect( result.current.isSelected( date ) ).toBe( false );
++		} );
++
++		it( 'deselects multiple dates', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const dateOne = getDate( { date: 1 } );
++			const dateTwo = getDate( { date: 2 } );
++
++			act( () => result.current.select( [ dateOne, dateTwo ] ) );
++			act( () => result.current.deselect( [ dateOne, dateTwo ] ) );
++			expect( result.current.isSelected( dateOne ) ).toBe( false );
++			expect( result.current.isSelected( dateTwo ) ).toBe( false );
++		} );
++	} );
++
++	describe( 'toggle', () => {
++		it( 'toggles the selection of a date', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const date = getDate();
++
++			act( () => result.current.toggle( date ) );
++			expect( result.current.isSelected( date ) ).toBe( true );
++
++			act( () => result.current.toggle( date ) );
++			expect( result.current.isSelected( date ) ).toBe( false );
++		} );
++	} );
++
++	describe( 'selectRange', () => {
++		it( 'selects a range of dates (inclusive)', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const date = getDate();
++
++			const first = set( date, { date: 1 } );
++			const second = set( date, { date: 2 } );
++			const third = set( date, { date: 3 } );
++
++			act( () => result.current.selectRange( first, third ) );
++
++			expect( result.current.selected.length ).toBe( 3 );
++			expect( result.current.isSelected( first ) ).toBe( true );
++			expect( result.current.isSelected( second ) ).toBe( true );
++			expect( result.current.isSelected( third ) ).toBe( true );
++		} );
++	} );
++
++	describe( 'deselectRange', () => {
++		it( 'deselects a range of dates (inclusive)', () => {
++			const { result } = renderHook( () => useLilius() );
++
++			const date = getDate();
++
++			act( () =>
++				result.current.selectRange(
++					set( date, { date: 1 } ),
++					set( date, { date: 3 } )
++				)
++			);
++			act( () =>
++				result.current.deselectRange(
++					set( date, { date: 1 } ),
++					set( date, { date: 3 } )
++				)
++			);
++
++			expect( result.current.selected.length ).toBe( 0 );
++			expect(
++				result.current.isSelected( set( date, { date: 1 } ) )
++			).toBe( false );
++			expect(
++				result.current.isSelected( set( date, { date: 2 } ) )
++			).toBe( false );
++			expect(
++				result.current.isSelected( set( date, { date: 3 } ) )
++			).toBe( false );
++		} );
++	} );
++} );
++
++describe( 'calendar', () => {
++	it( 'returns a matrix of days based on the current viewing date', () => {
++		const { result } = renderHook( () =>
++			useLilius( { viewing: new Date( 1582, Month.OCTOBER, 1 ) } )
++		);
++
++		expect( result.current.calendar![ 0 ][ 0 ][ 0 ] ).toStrictEqual(
++			new Date( 1582, Month.SEPTEMBER, 26 )
++		);
++		expect( result.current.calendar![ 0 ][ 0 ][ 5 ] ).toStrictEqual(
++			new Date( 1582, Month.OCTOBER, 1 )
++		);
++		expect( result.current.calendar![ 0 ][ 5 ][ 6 ] ).toStrictEqual(
++			new Date( 1582, Month.NOVEMBER, 6 )
++		);
++	} );
++
++	it( 'supports returning multiple months', () => {
++		const { result } = renderHook( () =>
++			useLilius( {
++				viewing: new Date( 1582, Month.OCTOBER, 1 ),
++				numberOfMonths: 2,
++			} )
++		);
++
++		expect( result.current.calendar![ 0 ][ 0 ][ 0 ] ).toStrictEqual(
++			new Date( 1582, Month.SEPTEMBER, 26 )
++		);
++		expect( result.current.calendar![ 1 ][ 0 ][ 0 ] ).toStrictEqual(
++			new Date( 1582, Month.OCTOBER, 31 )
++		);
++	} );
++} );
+diff --git a/packages/components/src/date-time/date/use-lilius/index.ts b/packages/components/src/date-time/date/use-lilius/index.ts
+new file mode 100644
+index 00000000000000..2da204b3c76419
+--- /dev/null
++++ b/packages/components/src/date-time/date/use-lilius/index.ts
+@@ -0,0 +1,394 @@
++/**
++ * This source is a local copy of the use-lilius library, since the original
++ * library is not actively maintained.
++ * @see https://github.com/WordPress/gutenberg/discussions/64968
++ *
++ * use-lilius@2.0.5
++ * https://github.com/Avarios/use-lilius
++ *
++ * The MIT License (MIT)
++ *
++ * Copyright (c) 2021-Present Danny Tatom
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in all
++ * copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++ * SOFTWARE.
++ */
++
++/**
++ * External dependencies
++ */
++import {
++	addMonths,
++	addYears,
++	eachDayOfInterval,
++	eachMonthOfInterval,
++	eachWeekOfInterval,
++	endOfMonth,
++	endOfWeek,
++	isAfter,
++	isBefore,
++	isEqual,
++	set,
++	setMonth,
++	setYear,
++	startOfMonth,
++	startOfToday,
++	startOfWeek,
++	subMonths,
++	subYears,
++} from 'date-fns';
++
++/**
++ * WordPress dependencies
++ */
++import { useCallback, useMemo, useState } from '@wordpress/element';
++
++export enum Month {
++	JANUARY,
++	FEBRUARY,
++	MARCH,
++	APRIL,
++	MAY,
++	JUNE,
++	JULY,
++	AUGUST,
++	SEPTEMBER,
++	OCTOBER,
++	NOVEMBER,
++	DECEMBER,
++}
++
++export enum Day {
++	SUNDAY,
++	MONDAY,
++	TUESDAY,
++	WEDNESDAY,
++	THURSDAY,
++	FRIDAY,
++	SATURDAY,
++}
++
++export interface Options {
++	/**
++	 * What day a week starts on within the calendar matrix.
++	 *
++	 * @default Day.SUNDAY
++	 */
++	weekStartsOn?: Day;
++
++	/**
++	 * The initial viewing date.
++	 *
++	 * @default new Date()
++	 */
++	viewing?: Date;
++
++	/**
++	 * The initial date(s) selection.
++	 *
++	 * @default []
++	 */
++	selected?: Date[];
++
++	/**
++	 * The number of months in the calendar.
++	 *
++	 * @default 1
++	 */
++	numberOfMonths?: number;
++}
++
++export interface Returns {
++	/**
++	 * Returns a copy of the given date with the time set to 00:00:00:00.
++	 */
++	clearTime: ( date: Date ) => Date;
++
++	/**
++	 * Returns whether or not a date is between 2 other dates (inclusive).
++	 */
++	inRange: ( date: Date, min: Date, max: Date ) => boolean;
++
++	/**
++	 * The date represented in the calendar matrix. Note that
++	 * the month and year are the only parts used.
++	 */
++	viewing: Date;
++
++	/**
++	 * Set the date represented in the calendar matrix. Note that
++	 * the month and year are the only parts used.
++	 */
++	setViewing: React.Dispatch< React.SetStateAction< Date > >;
++
++	/**
++	 * Set the viewing date to today.
++	 */
++	viewToday: () => void;
++
++	/**
++	 * Set the viewing date to the given month.
++	 */
++	viewMonth: ( month: Month ) => void;
++
++	/**
++	 * Set the viewing date to the month before the current.
++	 */
++	viewPreviousMonth: () => void;
++
++	/**
++	 * Set the viewing date to the month after the current.
++	 */
++	viewNextMonth: () => void;
++
++	/**
++	 * Set the viewing date to the given year.
++	 */
++	viewYear: ( year: number ) => void;
++
++	/**
++	 * Set the viewing date to the year before the current.
++	 */
++	viewPreviousYear: () => void;
++
++	/**
++	 * Set the viewing date to the year after the current.
++	 */
++	viewNextYear: () => void;
++
++	/**
++	 * The dates currently selected.
++	 */
++	selected: Date[];
++
++	/**
++	 * Override the currently selected dates.
++	 */
++	setSelected: React.Dispatch< React.SetStateAction< Date[] > >;
++
++	/**
++	 * Reset the selected dates to [].
++	 */
++	clearSelected: () => void;
++
++	/**
++	 * Determine whether or not a date has been selected.
++	 */
++	isSelected: ( date: Date ) => boolean;
++
++	/**
++	 * Select one or more dates.
++	 */
++	select: ( date: Date | Date[], replaceExisting?: boolean ) => void;
++
++	/**
++	 * Deselect one or more dates.
++	 */
++	deselect: ( date: Date | Date[] ) => void;
++
++	/**
++	 * Toggle the selection of a date.
++	 */
++	toggle: ( date: Date, replaceExisting?: boolean ) => void;
++
++	/**
++	 * Select a range of dates (inclusive).
++	 */
++	selectRange: ( start: Date, end: Date, replaceExisting?: boolean ) => void;
++
++	/**
++	 * Deselect a range of dates (inclusive).
++	 */
++	deselectRange: ( start: Date, end: Date ) => void;
++
++	/**
++	 * A matrix of days based on the current viewing date.
++	 */
++	calendar: Date[][][];
++}
++
++const inRange = ( date: Date, min: Date, max: Date ) =>
++	( isEqual( date, min ) || isAfter( date, min ) ) &&
++	( isEqual( date, max ) || isBefore( date, max ) );
++
++const clearTime = ( date: Date ) =>
++	set( date, { hours: 0, minutes: 0, seconds: 0, milliseconds: 0 } );
++
++export const useLilius = ( {
++	weekStartsOn = Day.SUNDAY,
++	viewing: initialViewing = new Date(),
++	selected: initialSelected = [],
++	numberOfMonths = 1,
++}: Options = {} ): Returns => {
++	const [ viewing, setViewing ] = useState< Date >( initialViewing );
++
++	const viewToday = useCallback(
++		() => setViewing( startOfToday() ),
++		[ setViewing ]
++	);
++
++	const viewMonth = useCallback(
++		( month: Month ) => setViewing( ( v ) => setMonth( v, month ) ),
++		[]
++	);
++
++	const viewPreviousMonth = useCallback(
++		() => setViewing( ( v ) => subMonths( v, 1 ) ),
++		[]
++	);
++
++	const viewNextMonth = useCallback(
++		() => setViewing( ( v ) => addMonths( v, 1 ) ),
++		[]
++	);
++
++	const viewYear = useCallback(
++		( year: number ) => setViewing( ( v ) => setYear( v, year ) ),
++		[]
++	);
++
++	const viewPreviousYear = useCallback(
++		() => setViewing( ( v ) => subYears( v, 1 ) ),
++		[]
++	);
++
++	const viewNextYear = useCallback(
++		() => setViewing( ( v ) => addYears( v, 1 ) ),
++		[]
++	);
++
++	const [ selected, setSelected ] = useState< Date[] >(
++		initialSelected.map( clearTime )
++	);
++
++	const clearSelected = () => setSelected( [] );
++
++	const isSelected = useCallback(
++		( date: Date ) =>
++			selected.findIndex( ( s ) => isEqual( s, date ) ) > -1,
++		[ selected ]
++	);
++
++	const select = useCallback(
++		( date: Date | Date[], replaceExisting?: boolean ) => {
++			if ( replaceExisting ) {
++				setSelected( Array.isArray( date ) ? date : [ date ] );
++			} else {
++				setSelected( ( selectedItems ) =>
++					selectedItems.concat(
++						Array.isArray( date ) ? date : [ date ]
++					)
++				);
++			}
++		},
++		[]
++	);
++
++	const deselect = useCallback(
++		( date: Date | Date[] ) =>
++			setSelected( ( selectedItems ) =>
++				Array.isArray( date )
++					? selectedItems.filter(
++							( s ) =>
++								! date
++									.map( ( d ) => d.getTime() )
++									.includes( s.getTime() )
++					  )
++					: selectedItems.filter( ( s ) => ! isEqual( s, date ) )
++			),
++		[]
++	);
++
++	const toggle = useCallback(
++		( date: Date, replaceExisting?: boolean ) =>
++			isSelected( date )
++				? deselect( date )
++				: select( date, replaceExisting ),
++		[ deselect, isSelected, select ]
++	);
++
++	const selectRange = useCallback(
++		( start: Date, end: Date, replaceExisting?: boolean ) => {
++			if ( replaceExisting ) {
++				setSelected( eachDayOfInterval( { start, end } ) );
++			} else {
++				setSelected( ( selectedItems ) =>
++					selectedItems.concat( eachDayOfInterval( { start, end } ) )
++				);
++			}
++		},
++		[]
++	);
++
++	const deselectRange = useCallback( ( start: Date, end: Date ) => {
++		setSelected( ( selectedItems ) =>
++			selectedItems.filter(
++				( s ) =>
++					! eachDayOfInterval( { start, end } )
++						.map( ( d ) => d.getTime() )
++						.includes( s.getTime() )
++			)
++		);
++	}, [] );
++
++	const calendar = useMemo< Date[][][] >(
++		() =>
++			eachMonthOfInterval( {
++				start: startOfMonth( viewing ),
++				end: endOfMonth( addMonths( viewing, numberOfMonths - 1 ) ),
++			} ).map( ( month ) =>
++				eachWeekOfInterval(
++					{
++						start: startOfMonth( month ),
++						end: endOfMonth( month ),
++					},
++					{ weekStartsOn }
++				).map( ( week ) =>
++					eachDayOfInterval( {
++						start: startOfWeek( week, { weekStartsOn } ),
++						end: endOfWeek( week, { weekStartsOn } ),
++					} )
++				)
++			),
++		[ viewing, weekStartsOn, numberOfMonths ]
++	);
++
++	return {
++		clearTime,
++		inRange,
++		viewing,
++		setViewing,
++		viewToday,
++		viewMonth,
++		viewPreviousMonth,
++		viewNextMonth,
++		viewYear,
++		viewPreviousYear,
++		viewNextYear,
++		selected,
++		setSelected,
++		clearSelected,
++		isSelected,
++		select,
++		deselect,
++		toggle,
++		selectRange,
++		deselectRange,
++		calendar,
++	};
++};

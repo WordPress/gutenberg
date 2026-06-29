@@ -1,0 +1,859 @@
+diff --git a/package-lock.json b/package-lock.json
+index 500fa336362b9a..2895012d6b685c 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -50574,6 +50574,89 @@
+ 				}
+ 			}
+ 		},
++		"snapshot-diff": {
++			"version": "0.8.1",
++			"resolved": "https://registry.npmjs.org/snapshot-diff/-/snapshot-diff-0.8.1.tgz",
++			"integrity": "sha512-vPb0JHikbZM8kK4A/ktIEbM5FwHEgGQ330ARxgaccDcVgapY73sjKpK03uxJGHb0eDViFWTch0OY3ax52AIKGw==",
++			"dev": true,
++			"requires": {
++				"jest-diff": "^26.1.0",
++				"jest-snapshot": "^26.1.0",
++				"pretty-format": "^26.1.0"
++			},
++			"dependencies": {
++				"@jest/types": {
++					"version": "26.6.2",
++					"resolved": "https://registry.npmjs.org/@jest/types/-/types-26.6.2.tgz",
++					"integrity": "sha512-fC6QCp7Sc5sX6g8Tvbmj4XUTbyrik0akgRy03yjXbQaBWWNWGE7SGtJk98m0N8nzegD/7SggrUlivxo5ax4KWQ==",
++					"dev": true,
++					"requires": {
++						"@types/istanbul-lib-coverage": "^2.0.0",
++						"@types/istanbul-reports": "^3.0.0",
++						"@types/node": "*",
++						"@types/yargs": "^15.0.0",
++						"chalk": "^4.0.0"
++					}
++				},
++				"@types/istanbul-reports": {
++					"version": "3.0.0",
++					"resolved": "https://registry.npmjs.org/@types/istanbul-reports/-/istanbul-reports-3.0.0.tgz",
++					"integrity": "sha512-nwKNbvnwJ2/mndE9ItP/zc2TCzw6uuodnF4EHYWD+gCQDVBuRQL5UzbZD0/ezy1iKsFU2ZQiDqg4M9dN4+wZgA==",
++					"dev": true,
++					"requires": {
++						"@types/istanbul-lib-report": "*"
++					}
++				},
++				"ansi-regex": {
++					"version": "5.0.0",
++					"resolved": "https://registry.npmjs.org/ansi-regex/-/ansi-regex-5.0.0.tgz",
++					"integrity": "sha512-bY6fj56OUQ0hU1KjFNDQuJFezqKdrAyFdIevADiqrWHwSlbmBNMHp5ak2f40Pm8JTFyM2mqxkG6ngkHO11f/lg==",
++					"dev": true
++				},
++				"ansi-styles": {
++					"version": "4.3.0",
++					"resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-4.3.0.tgz",
++					"integrity": "sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==",
++					"dev": true,
++					"requires": {
++						"color-convert": "^2.0.1"
++					}
++				},
++				"color-convert": {
++					"version": "2.0.1",
++					"resolved": "https://registry.npmjs.org/color-convert/-/color-convert-2.0.1.tgz",
++					"integrity": "sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==",
++					"dev": true,
++					"requires": {
++						"color-name": "~1.1.4"
++					}
++				},
++				"color-name": {
++					"version": "1.1.4",
++					"resolved": "https://registry.npmjs.org/color-name/-/color-name-1.1.4.tgz",
++					"integrity": "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==",
++					"dev": true
++				},
++				"pretty-format": {
++					"version": "26.6.2",
++					"resolved": "https://registry.npmjs.org/pretty-format/-/pretty-format-26.6.2.tgz",
++					"integrity": "sha512-7AeGuCYNGmycyQbCqd/3PWH4eOoX/OiCa0uphp57NVTeAGdJGaAliecxwBDHYQCIvrW7aDBZCYeNTP/WX69mkg==",
++					"dev": true,
++					"requires": {
++						"@jest/types": "^26.6.2",
++						"ansi-regex": "^5.0.0",
++						"ansi-styles": "^4.0.0",
++						"react-is": "^17.0.1"
++					}
++				},
++				"react-is": {
++					"version": "17.0.1",
++					"resolved": "https://registry.npmjs.org/react-is/-/react-is-17.0.1.tgz",
++					"integrity": "sha512-NAnt2iGDXohE5LI7uBnLnqvLQMtzhkiAOLXTmv+qnF9Ky7xAPcX8Up/xWIhxvLVGJvuLiNc4xQLtuqDRzb4fSA==",
++					"dev": true
++				}
++			}
++		},
+ 		"socks": {
+ 			"version": "2.3.3",
+ 			"resolved": "https://registry.npmjs.org/socks/-/socks-2.3.3.tgz",
+diff --git a/package.json b/package.json
+index 6e8d5ba1d0e1f8..d115df348a5dbc 100644
+--- a/package.json
++++ b/package.json
+@@ -197,6 +197,7 @@
+ 		"sass-loader": "8.0.2",
+ 		"semver": "7.3.2",
+ 		"simple-git": "1.113.0",
++		"snapshot-diff": "0.8.1",
+ 		"source-map-loader": "0.2.4",
+ 		"sprintf-js": "1.1.1",
+ 		"style-loader": "1.0.0",
+diff --git a/packages/components/src/ui/flex/test/__snapshots__/index.js.snap b/packages/components/src/ui/flex/test/__snapshots__/index.js.snap
+index 6674889debdd5e..c780de737507fb 100644
+--- a/packages/components/src/ui/flex/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/flex/test/__snapshots__/index.js.snap
+@@ -1,312 +1,49 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render + wrap non Flex children 1`] = `
+-.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
+-  box-sizing: border-box;
+-  -moz-osx-font-smoothing: grayscale;
+-  -webkit-font-smoothing: antialiased;
+-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+-  font-family: var(--wp-g2-font-family);
+-  font-size: 13px;
+-  font-size: var(--wp-g2-font-size);
+-  font-weight: normal;
+-  font-weight: var(--wp-g2-font-weight);
+-  margin: 0;
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  --wp-g2-flex-gap: calc(4px * 2);
+-  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
+-  --wp-g2-flex-item-margin-bottom: 0;
+-  --wp-g2-flex-item-margin-right: calc(4px * 2);
+-  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
+-  --wp-g2-flex-item-margin-left: 0;
+-  -webkit-align-items: center;
+-  -webkit-box-align: center;
+-  -ms-flex-align: center;
+-  align-items: center;
+-  -webkit-flex-direction: row;
+-  -ms-flex-direction: row;
+-  flex-direction: row;
+-  -webkit-box-pack: justify;
+-  -webkit-justify-content: space-between;
+-  -ms-flex-pack: justify;
+-  justify-content: space-between;
+-  width: 100%;
+-}
+-
+-@media (prefers-reduced-motion) {
+-  .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
+-    -webkit-transition: none !important;
+-    transition: none !important;
+-  }
+-}
+-
+-[data-system-ui-reduced-motion-mode="true"] .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
+-  -webkit-transition: none !important;
+-  transition: none !important;
+-}
+-
+-.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 > * + *:not(marquee) {
+-  margin-left: calc(4px * 2);
+-  margin-left: calc(var(--wp-g2-grid-base) * 2);
+-}
+-
+-.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 > * {
+-  min-width: 0;
+-}
+-
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-  box-sizing: border-box;
+-  -moz-osx-font-smoothing: grayscale;
+-  -webkit-font-smoothing: antialiased;
+-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+-  font-family: var(--wp-g2-font-family);
+-  font-size: 13px;
+-  font-size: var(--wp-g2-font-size);
+-  font-weight: normal;
+-  font-weight: var(--wp-g2-font-weight);
+-  margin: 0;
+-  display: block;
+-  max-height: 100%;
+-  max-width: 100%;
+-  min-height: 0;
+-  min-width: 0;
+-  display: var(--wp-g2-flex-item-display);
+-}
+-
+-@media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-    -webkit-transition: none !important;
+-    transition: none !important;
+-  }
+-}
+-
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-  -webkit-transition: none !important;
+-  transition: none !important;
+-}
+-
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+-  box-sizing: border-box;
+-  -moz-osx-font-smoothing: grayscale;
+-  -webkit-font-smoothing: antialiased;
+-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+-  font-family: var(--wp-g2-font-family);
+-  font-size: 13px;
+-  font-size: var(--wp-g2-font-size);
+-  font-weight: normal;
+-  font-weight: var(--wp-g2-font-weight);
+-  margin: 0;
+-  display: block;
+-  max-height: 100%;
+-  max-width: 100%;
+-  min-height: 0;
+-  min-width: 0;
+-  display: var(--wp-g2-flex-item-display);
+-  -webkit-flex: 1;
+-  -ms-flex: 1;
+-  flex: 1;
+-}
+-
+-@media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+-    -webkit-transition: none !important;
+-    transition: none !important;
+-  }
+-}
+-
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+-  -webkit-transition: none !important;
+-  transition: none !important;
+-}
+-
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+-  box-sizing: border-box;
+-  -moz-osx-font-smoothing: grayscale;
+-  -webkit-font-smoothing: antialiased;
+-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+-  font-family: var(--wp-g2-font-family);
+-  font-size: 13px;
+-  font-size: var(--wp-g2-font-size);
+-  font-weight: normal;
+-  font-weight: var(--wp-g2-font-weight);
+-  margin: 0;
+-}
+-
+-@media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+-    -webkit-transition: none !important;
+-    transition: none !important;
+-  }
+-}
+-
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+-  -webkit-transition: none !important;
+-  transition: none !important;
+-}
+-
+-<div
+-  class="components-flex wp-components-flex emotion-3"
+-  data-g2-c16t="true"
+-  data-g2-component="Flex"
+->
+-  <div
+-    class="components-flex-item wp-components-flex-item emotion-0"
+-    data-g2-c16t="true"
+-    data-g2-component="FlexItem"
+-  />
+-  <div
+-    class="emotion-1"
+-  />
+-  <div />
+-  <div
+-    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-2"
+-    data-g2-c16t="true"
+-    data-g2-component="FlexBlock"
+-  />
+-</div>
+-`;
+-
+-exports[`props should render align 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-  box-sizing: border-box;
+-  -moz-osx-font-smoothing: grayscale;
+-  -webkit-font-smoothing: antialiased;
+-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+-  font-family: var(--wp-g2-font-family);
+-  font-size: 13px;
+-  font-size: var(--wp-g2-font-size);
+-  font-weight: normal;
+-  font-weight: var(--wp-g2-font-weight);
+-  margin: 0;
+-  display: block;
+-  max-height: 100%;
+-  max-width: 100%;
+-  min-height: 0;
+-  min-width: 0;
+-  display: var(--wp-g2-flex-item-display);
+-}
+-
+-@media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-    -webkit-transition: none !important;
+-    transition: none !important;
+-  }
+-}
+-
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-  -webkit-transition: none !important;
+-  transition: none !important;
+-}
+-
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+-  box-sizing: border-box;
+-  -moz-osx-font-smoothing: grayscale;
+-  -webkit-font-smoothing: antialiased;
+-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+-  font-family: var(--wp-g2-font-family);
+-  font-size: 13px;
+-  font-size: var(--wp-g2-font-size);
+-  font-weight: normal;
+-  font-weight: var(--wp-g2-font-weight);
+-  margin: 0;
+-  display: block;
+-  max-height: 100%;
+-  max-width: 100%;
+-  min-height: 0;
+-  min-width: 0;
+-  display: var(--wp-g2-flex-item-display);
+-  -webkit-flex: 1;
+-  -ms-flex: 1;
+-  flex: 1;
+-}
+-
+-@media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+-    -webkit-transition: none !important;
+-    transition: none !important;
+-  }
+-}
+-
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+-  -webkit-transition: none !important;
+-  transition: none !important;
+-}
+-
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+-  box-sizing: border-box;
+-  -moz-osx-font-smoothing: grayscale;
+-  -webkit-font-smoothing: antialiased;
+-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+-  font-family: var(--wp-g2-font-family);
+-  font-size: 13px;
+-  font-size: var(--wp-g2-font-size);
+-  font-weight: normal;
+-  font-weight: var(--wp-g2-font-weight);
+-  margin: 0;
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  --wp-g2-flex-gap: calc(4px * 2);
+-  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
+-  --wp-g2-flex-item-margin-bottom: 0;
+-  --wp-g2-flex-item-margin-right: calc(4px * 2);
+-  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
+-  --wp-g2-flex-item-margin-left: 0;
+-  -webkit-align-items: flex-start;
+-  -webkit-box-align: flex-start;
+-  -ms-flex-align: flex-start;
+-  align-items: flex-start;
+-  -webkit-flex-direction: row;
+-  -ms-flex-direction: row;
+-  flex-direction: row;
+-  -webkit-box-pack: justify;
+-  -webkit-justify-content: space-between;
+-  -ms-flex-pack: justify;
+-  justify-content: space-between;
+-  width: 100%;
+-}
+-
+-@media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+-    -webkit-transition: none !important;
+-    transition: none !important;
+-  }
+-}
+-
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+-  -webkit-transition: none !important;
+-  transition: none !important;
+-}
+-
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
+-  margin-left: calc(4px * 2);
+-  margin-left: calc(var(--wp-g2-grid-base) * 2);
+-}
+-
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
+-  min-width: 0;
+-}
++"Snapshot Diff:
++- First value
+++ Second value
++
++@@ -7,14 +7,10 @@
++      class=\\"components-flex-item wp-components-flex-item css-uyw6h0\\"
++      data-g2-c16t=\\"true\\"
++      data-g2-component=\\"FlexItem\\"
++    />
++    <div
++-     class=\\"css-1nqjm19\\"
++-   />
++-   <div />
++-   <div
++      class=\\"components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block css-2e3tg1\\"
++      data-g2-c16t=\\"true\\"
++      data-g2-component=\\"FlexBlock\\"
++    />
++  </div>"
++`;
+ 
+-<div
+-  class="components-flex wp-components-flex emotion-2"
+-  data-g2-c16t="true"
+-  data-g2-component="Flex"
+->
+-  <div
+-    class="components-flex-item wp-components-flex-item emotion-0"
+-    data-g2-c16t="true"
+-    data-g2-component="FlexItem"
+-  />
+-  <div
+-    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-1"
+-    data-g2-c16t="true"
+-    data-g2-component="FlexBlock"
+-  />
+-</div>
++exports[`props should render align 1`] = `
++"Snapshot Diff:
++- First value
+++ Second value
++
++- Snapshot Diff:
++- - First value
++- + Second value
++-
++- @@ -10,11 +10,11 @@
++-   	\\"margin-left\\": \\"0px\\",
++-   	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
++-   	\\"--wp-g2-flex-item-margin-bottom\\": \\"0\\",
++-   	\\"--wp-g2-flex-item-margin-right\\": \\"var(--wp-g2-flex-gap)\\",
++-   	\\"--wp-g2-flex-item-margin-left\\": \\"0\\",
++- - 	\\"align-items\\": \\"flex-start\\",
++- + 	\\"align-items\\": \\"center\\",
++-   	\\"flex-direction\\": \\"row\\",
++-   	\\"justify-content\\": \\"space-between\\",
++-   	\\"width\\": \\"100%\\",
++-   	\\"visibility\\": \\"visible\\"
++-   }"
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+@@ -450,238 +187,47 @@ exports[`props should render correctly 1`] = `
+ `;
+ 
+ exports[`props should render justify 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-  box-sizing: border-box;
+-  -moz-osx-font-smoothing: grayscale;
+-  -webkit-font-smoothing: antialiased;
+-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+-  font-family: var(--wp-g2-font-family);
+-  font-size: 13px;
+-  font-size: var(--wp-g2-font-size);
+-  font-weight: normal;
+-  font-weight: var(--wp-g2-font-weight);
+-  margin: 0;
+-  display: block;
+-  max-height: 100%;
+-  max-width: 100%;
+-  min-height: 0;
+-  min-width: 0;
+-  display: var(--wp-g2-flex-item-display);
+-}
+-
+-@media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-    -webkit-transition: none !important;
+-    transition: none !important;
+-  }
+-}
+-
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-  -webkit-transition: none !important;
+-  transition: none !important;
+-}
+-
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+-  box-sizing: border-box;
+-  -moz-osx-font-smoothing: grayscale;
+-  -webkit-font-smoothing: antialiased;
+-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+-  font-family: var(--wp-g2-font-family);
+-  font-size: 13px;
+-  font-size: var(--wp-g2-font-size);
+-  font-weight: normal;
+-  font-weight: var(--wp-g2-font-weight);
+-  margin: 0;
+-  display: block;
+-  max-height: 100%;
+-  max-width: 100%;
+-  min-height: 0;
+-  min-width: 0;
+-  display: var(--wp-g2-flex-item-display);
+-  -webkit-flex: 1;
+-  -ms-flex: 1;
+-  flex: 1;
+-}
+-
+-@media (prefers-reduced-motion) {
+-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+-    -webkit-transition: none !important;
+-    transition: none !important;
+-  }
+-}
+-
+-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+-  -webkit-transition: none !important;
+-  transition: none !important;
+-}
+-
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+-  box-sizing: border-box;
+-  -moz-osx-font-smoothing: grayscale;
+-  -webkit-font-smoothing: antialiased;
+-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+-  font-family: var(--wp-g2-font-family);
+-  font-size: 13px;
+-  font-size: var(--wp-g2-font-size);
+-  font-weight: normal;
+-  font-weight: var(--wp-g2-font-weight);
+-  margin: 0;
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  --wp-g2-flex-gap: calc(4px * 2);
+-  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
+-  --wp-g2-flex-item-margin-bottom: 0;
+-  --wp-g2-flex-item-margin-right: calc(4px * 2);
+-  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
+-  --wp-g2-flex-item-margin-left: 0;
+-  -webkit-align-items: center;
+-  -webkit-box-align: center;
+-  -ms-flex-align: center;
+-  align-items: center;
+-  -webkit-flex-direction: row;
+-  -ms-flex-direction: row;
+-  flex-direction: row;
+-  -webkit-box-pack: start;
+-  -webkit-justify-content: flex-start;
+-  -ms-flex-pack: start;
+-  justify-content: flex-start;
+-  width: 100%;
+-}
+-
+-@media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+-    -webkit-transition: none !important;
+-    transition: none !important;
+-  }
+-}
+-
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+-  -webkit-transition: none !important;
+-  transition: none !important;
+-}
+-
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
+-  margin-left: calc(4px * 2);
+-  margin-left: calc(var(--wp-g2-grid-base) * 2);
+-}
+-
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
+-  min-width: 0;
+-}
+-
+-<div
+-  class="components-flex wp-components-flex emotion-2"
+-  data-g2-c16t="true"
+-  data-g2-component="Flex"
+->
+-  <div
+-    class="components-flex-item wp-components-flex-item emotion-0"
+-    data-g2-c16t="true"
+-    data-g2-component="FlexItem"
+-  />
+-  <div
+-    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-1"
+-    data-g2-c16t="true"
+-    data-g2-component="FlexBlock"
+-  />
+-</div>
++"Snapshot Diff:
++- First value
+++ Second value
++
++- Snapshot Diff:
++- - First value
++- + Second value
++-
++- @@ -12,9 +12,9 @@
++-   	\\"--wp-g2-flex-item-margin-bottom\\": \\"0\\",
++-   	\\"--wp-g2-flex-item-margin-right\\": \\"var(--wp-g2-flex-gap)\\",
++-   	\\"--wp-g2-flex-item-margin-left\\": \\"0\\",
++-   	\\"align-items\\": \\"center\\",
++-   	\\"flex-direction\\": \\"row\\",
++- - 	\\"justify-content\\": \\"flex-start\\",
++- + 	\\"justify-content\\": \\"space-between\\",
++-   	\\"width\\": \\"100%\\",
++-   	\\"visibility\\": \\"visible\\"
++-   }"
+ `;
+ 
+ exports[`props should render spacing 1`] = `
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+-  box-sizing: border-box;
+-  -moz-osx-font-smoothing: grayscale;
+-  -webkit-font-smoothing: antialiased;
+-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+-  font-family: var(--wp-g2-font-family);
+-  font-size: 13px;
+-  font-size: var(--wp-g2-font-size);
+-  font-weight: normal;
+-  font-weight: var(--wp-g2-font-weight);
+-  margin: 0;
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  --wp-g2-flex-gap: calc(4px * 2);
+-  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
+-  --wp-g2-flex-item-margin-bottom: 0;
+-  --wp-g2-flex-item-margin-right: calc(4px * 2);
+-  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
+-  --wp-g2-flex-item-margin-left: 0;
+-  -webkit-align-items: center;
+-  -webkit-box-align: center;
+-  -ms-flex-align: center;
+-  align-items: center;
+-  -webkit-flex-direction: row;
+-  -ms-flex-direction: row;
+-  flex-direction: row;
+-  -webkit-box-pack: justify;
+-  -webkit-justify-content: space-between;
+-  -ms-flex-pack: justify;
+-  justify-content: space-between;
+-  width: 100%;
+-}
+-
+-@media (prefers-reduced-motion) {
+-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+-    -webkit-transition: none !important;
+-    transition: none !important;
+-  }
+-}
+-
+-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
+-  -webkit-transition: none !important;
+-  transition: none !important;
+-}
+-
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
+-  margin-left: calc(4px * 2);
+-  margin-left: calc(var(--wp-g2-grid-base) * 2);
+-}
+-
+-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
+-  min-width: 0;
+-}
+-
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-  box-sizing: border-box;
+-  -moz-osx-font-smoothing: grayscale;
+-  -webkit-font-smoothing: antialiased;
+-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+-  font-family: var(--wp-g2-font-family);
+-  font-size: 13px;
+-  font-size: var(--wp-g2-font-size);
+-  font-weight: normal;
+-  font-weight: var(--wp-g2-font-weight);
+-  margin: 0;
+-}
+-
+-@media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-    -webkit-transition: none !important;
+-    transition: none !important;
+-  }
+-}
+-
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-  -webkit-transition: none !important;
+-  transition: none !important;
+-}
+-
+-<div
+-  class="components-flex wp-components-flex emotion-2"
+-  data-g2-c16t="true"
+-  data-g2-component="Flex"
+-  spacing="5"
+->
+-  <div
+-    class="emotion-0"
+-  />
+-  <div
+-    class="emotion-0"
+-  />
+-</div>
++"Snapshot Diff:
++- First value
+++ Second value
++
++- Snapshot Diff:
++- - First value
++- + Second value
++-
++- @@ -6,11 +6,11 @@
++-   	\\"margin\\": \\"0px\\",
++-   	\\"margin-top\\": \\"0px\\",
++-   	\\"margin-right\\": \\"0px\\",
++-   	\\"margin-bottom\\": \\"0px\\",
++-   	\\"margin-left\\": \\"0px\\",
++- - 	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 5)\\",
++- + 	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
++-   	\\"--wp-g2-flex-item-margin-bottom\\": \\"0\\",
++-   	\\"--wp-g2-flex-item-margin-right\\": \\"var(--wp-g2-flex-gap)\\",
++-   	\\"--wp-g2-flex-item-margin-left\\": \\"0\\",
++-   	\\"align-items\\": \\"center\\",
++-   	\\"flex-direction\\": \\"row\\","
+ `;
+diff --git a/packages/components/src/ui/flex/test/index.js b/packages/components/src/ui/flex/test/index.js
+index cc5eb5fecc781a..8a17edc0a3bddb 100644
+--- a/packages/components/src/ui/flex/test/index.js
++++ b/packages/components/src/ui/flex/test/index.js
+@@ -12,14 +12,18 @@ import FlexItem from '../flex-item';
+ import FlexBlock from '../flex-block';
+ 
+ describe( 'props', () => {
+-	test( 'should render correctly', () => {
+-		const { container } = render(
++	let base;
++	beforeEach( () => {
++		base = render(
+ 			<Flex>
+ 				<FlexItem />
+ 				<FlexBlock />
+ 			</Flex>
+ 		);
+-		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render correctly', () => {
++		expect( base.container.firstChild ).toMatchSnapshot();
+ 	} );
+ 
+ 	test( 'should render + wrap non Flex children', () => {
+@@ -31,7 +35,10 @@ describe( 'props', () => {
+ 				<FlexBlock />
+ 			</Flex>
+ 		);
+-		expect( container.firstChild ).toMatchSnapshot();
++
++		expect( container.firstChild ).toMatchDiffSnapshot(
++			base.container.firstChild
++		);
+ 	} );
+ 
+ 	test( 'should render align', () => {
+@@ -41,7 +48,9 @@ describe( 'props', () => {
+ 				<FlexBlock />
+ 			</Flex>
+ 		);
+-		expect( container.firstChild ).toMatchSnapshot();
++		expect( container.firstChild ).toMatchStyleDiffSnapshot(
++			base.container.firstChild
++		);
+ 	} );
+ 
+ 	test( 'should render justify', () => {
+@@ -51,16 +60,20 @@ describe( 'props', () => {
+ 				<FlexBlock />
+ 			</Flex>
+ 		);
+-		expect( container.firstChild ).toMatchSnapshot();
++		expect( container.firstChild ).toMatchStyleDiffSnapshot(
++			base.container.firstChild
++		);
+ 	} );
+ 
+ 	test( 'should render spacing', () => {
+ 		const { container } = render(
+-			<Flex spacing={ 5 }>
++			<Flex gap={ 5 }>
+ 				<View />
+ 				<View />
+ 			</Flex>
+ 		);
+-		expect( container.firstChild ).toMatchSnapshot();
++		expect( container.firstChild ).toMatchStyleDiffSnapshot(
++			base.container.firstChild
++		);
+ 	} );
+ } );
+diff --git a/test/unit/config/matchers/to-match-style-diff-snapshot.js b/test/unit/config/matchers/to-match-style-diff-snapshot.js
+new file mode 100644
+index 00000000000000..4f3defc4d42950
+--- /dev/null
++++ b/test/unit/config/matchers/to-match-style-diff-snapshot.js
+@@ -0,0 +1,28 @@
++/**
++ * External dependencies
++ */
++const snapshotDiff = require( 'snapshot-diff' );
++
++const serialize = ( obj ) => JSON.stringify( obj, undefined, '\t' );
++
++/**
++ * @param {Element} received
++ * @param {Element} expected
++ * @param {string} testName
++ */
++function toMatchStyleDiffSnapshot( received, expected, testName ) {
++	const receivedStyles = serialize(
++		window.getComputedStyle( received )._values
++	);
++	const expectedStyles = serialize(
++		window.getComputedStyle( expected )._values
++	);
++	const difference = snapshotDiff( receivedStyles, expectedStyles );
++	return snapshotDiff.toMatchDiffSnapshot.call(
++		this,
++		difference,
++		testName || ''
++	);
++}
++
++expect.extend( { toMatchStyleDiffSnapshot } );
+diff --git a/test/unit/config/testing-library.js b/test/unit/config/testing-library.js
+index 50df4303ae3f05..dd8c725c6f4ae6 100644
+--- a/test/unit/config/testing-library.js
++++ b/test/unit/config/testing-library.js
+@@ -1 +1,3 @@
+ require( '@testing-library/jest-dom' );
++require( 'snapshot-diff/extend-expect' );
++require( './matchers/to-match-style-diff-snapshot' );

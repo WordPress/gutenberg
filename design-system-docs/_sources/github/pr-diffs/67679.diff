@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/disabled/stories/index.story.tsx b/packages/components/src/disabled/stories/index.story.tsx
+index 7a42da71f8efe9..f017305507814e 100644
+--- a/packages/components/src/disabled/stories/index.story.tsx
++++ b/packages/components/src/disabled/stories/index.story.tsx
+@@ -82,7 +82,7 @@ Default.args = {
+ export const ContentEditable: StoryFn< typeof Disabled > = ( args ) => {
+ 	return (
+ 		<Disabled { ...args }>
+-			<div contentEditable tabIndex={ 0 }>
++			<div contentEditable tabIndex={ 0 } suppressContentEditableWarning>
+ 				contentEditable
+ 			</div>
+ 		</Disabled>

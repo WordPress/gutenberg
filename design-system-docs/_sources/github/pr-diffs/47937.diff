@@ -1,0 +1,526 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 9d0954b6b4b441..4b4f6fbb73b9ef 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -713,6 +713,12 @@
+ 		"markdown_source": "../packages/components/src/checkbox-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "CircularOptionPicker",
++		"slug": "circular-option-picker",
++		"markdown_source": "../packages/components/src/circular-option-picker/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "ClipboardButton",
+ 		"slug": "clipboard-button",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 450c381a83c521..267c23bc8fcdf4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -  `ToolsPanel`: Separate reset all filter registration from items registration and support global resets ([#48123](https://github.com/WordPress/gutenberg/pull/48123#pullrequestreview-1308386926)).
+ 
++### Internal
++
++-   `CircularOptionPicker`: Convert to TypeScript ([#47937](https://github.com/WordPress/gutenberg/pull/47937)).
++
+ ## 23.4.0 (2023-02-15)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/circular-option-picker/README.md b/packages/components/src/circular-option-picker/README.md
+new file mode 100644
+index 00000000000000..122eca4fa56327
+--- /dev/null
++++ b/packages/components/src/circular-option-picker/README.md
+@@ -0,0 +1,141 @@
++# `CircularOptionPicker`
++
++<div class="callout callout-alert">
++This component is not exported, and therefore can only be used internally to the `@wordpress/components` package.
++</div>
++
++`CircularOptionPicker` is a component that displays a set of options as circular buttons.
++
++## Usage
++
++```jsx
++import { CircularOptionPicker } from '../circular-option-picker';
++import { useState } from '@wordpress/element';
++
++const Example = () => {
++	const [ currentColor, setCurrentColor ] = useState();
++	const colors = [
++		{ color: '#f00', name: 'Red' },
++		{ color: '#0f0', name: 'Green' },
++		{ color: '#00f', name: 'Blue' },
++	];
++	const colorOptions = (
++		<>
++			{ colors.map( ( { color, name }, index ) => {
++				return (
++					<CircularOptionPicker.Option
++						key={ `${ color }-${ index }` }
++						tooltipText={ name }
++						style={ { backgroundColor: color, color } }
++						isSelected={ index === currentColor }
++						onClick={ () => setCurrentColor( index ) }
++						aria-label={ name }
++					/>
++				);
++			} ) }
++		</>
++	);
++	return (
++		<CircularOptionPicker
++				options={ colorOptions }
++				actions={
++					<CircularOptionPicker.ButtonAction
++						onClick={ () => setCurrentColor( undefined ) }
++					>
++						{ 'Clear' }
++					</CircularOptionPicker.ButtonAction>
++				}
++			/>
++	);
++};
++```
++
++## Props
++
++### `className`: `string`
++
++A CSS class to apply to the wrapper element.
++
++- Required: No
++
++### `actions`: `ReactNode`
++
++The action(s) to be rendered after the options, such as a 'clear' button as seen in `ColorPalette`.
++
++Usually a `CircularOptionPicker.ButtonAction` or `CircularOptionPicker.DropdownLinkAction` component.
++
++- Required: No
++
++### `options`: `ReactNode`
++
++The options to be rendered, such as color swatches.
++
++Usually a `CircularOptionPicker.Option` component.
++
++- Required: No
++
++### `children`: `ReactNode`
++
++The child elements.
++
++- Required: No
++
++## Subcomponents
++
++### `CircularOptionPicker.ButtonAction`
++
++A `ButtonAction` is an action that is rendered as a button alongside the options themselves.
++
++A common use case is a 'clear' button to deselect the currently selected option.
++
++#### Props
++
++##### `className`: `string`
++
++A CSS class to apply to the underlying `Button` component.
++
++- Required: No
++
++##### `children`: `ReactNode`
++
++The button's children.
++
++- Required: No
++
++##### Inherited props
++
++`CircularOptionPicker.ButtonAction` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.
++
++### `CircularOptionPicker.DropdownLinkAction`
++
++`CircularOptionPicker.DropdownLinkAction` is an action that's hidden behind a dropdown toggle. The button is formatted as a link and rendered as an `anchor` element.
++
++#### Props
++
++##### `className`: `string`
++
++A CSS class to apply to the underlying `Dropdown` component.
++
++- Required: No
++
++##### `linkText`: `string`
++
++The text to be displayed on the button.
++
++- Required: Yes
++
++##### `dropdownProps`: `object`
++
++The props for the underlying `Dropdown` component.
++
++Inherits all of the [`Dropdown` props](/packages/components/src/dropdown/README.md#props), except for `className` and `renderToggle`.
++
++- Required: Yes
++
++##### `buttonProps`: `object`
++
++Props for the underlying `Button` component.
++
++Inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`, `target`, and `children`. 
++
++- Required: No
+diff --git a/packages/components/src/circular-option-picker/index.js b/packages/components/src/circular-option-picker/index.tsx
+similarity index 50%
+rename from packages/components/src/circular-option-picker/index.js
+rename to packages/components/src/circular-option-picker/index.tsx
+index f41813906fcaba..1736d2227ee770 100644
+--- a/packages/components/src/circular-option-picker/index.js
++++ b/packages/components/src/circular-option-picker/index.tsx
+@@ -1,4 +1,3 @@
+-// @ts-nocheck
+ /**
+  * External dependencies
+  */
+@@ -15,15 +14,21 @@ import { Icon, check } from '@wordpress/icons';
+ import Button from '../button';
+ import Dropdown from '../dropdown';
+ import Tooltip from '../tooltip';
++import type {
++	CircularOptionPickerProps,
++	DropdownLinkActionProps,
++	OptionProps,
++} from './types';
++import type { WordPressComponentProps } from '../ui/context';
++import type { ButtonAsButtonProps } from '../button/types';
+ 
+-function Option( props ) {
+-	const {
+-		className,
+-		isSelected,
+-		selectedIconProps,
+-		tooltipText,
+-		...additionalProps
+-	} = props;
++export function Option( {
++	className,
++	isSelected,
++	selectedIconProps,
++	tooltipText,
++	...additionalProps
++}: OptionProps ) {
+ 	const optionButton = (
+ 		<Button
+ 			isPressed={ isSelected }
+@@ -53,8 +58,12 @@ function Option( props ) {
+ 	);
+ }
+ 
+-function DropdownLinkAction( props ) {
+-	const { buttonProps, className, dropdownProps, linkText } = props;
++export function DropdownLinkAction( {
++	buttonProps,
++	className,
++	dropdownProps,
++	linkText,
++}: DropdownLinkActionProps ) {
+ 	return (
+ 		<Dropdown
+ 			className={ classnames(
+@@ -77,8 +86,11 @@ function DropdownLinkAction( props ) {
+ 	);
+ }
+ 
+-function ButtonAction( props ) {
+-	const { className, children, ...additionalProps } = props;
++export function ButtonAction( {
++	className,
++	children,
++	...additionalProps
++}: WordPressComponentProps< ButtonAsButtonProps, 'button', false > ) {
+ 	return (
+ 		<Button
+ 			className={ classnames(
+@@ -93,7 +105,53 @@ function ButtonAction( props ) {
+ 	);
+ }
+ 
+-export default function CircularOptionPicker( props ) {
++/**
++ *`CircularOptionPicker` is a component that displays a set of options as circular buttons.
++ *
++ * ```jsx
++ * import { CircularOptionPicker } from '../circular-option-picker';
++ * import { useState } from '@wordpress/element';
++ *
++ * const Example = () => {
++ * 	const [ currentColor, setCurrentColor ] = useState();
++ * 	const colors = [
++ * 		{ color: '#f00', name: 'Red' },
++ * 		{ color: '#0f0', name: 'Green' },
++ * 		{ color: '#00f', name: 'Blue' },
++ * 	];
++ * 	const colorOptions = (
++ * 		<>
++ * 			{ colors.map( ( { color, name }, index ) => {
++ * 				return (
++ * 					<CircularOptionPicker.Option
++ * 						key={ `${ color }-${ index }` }
++ * 						tooltipText={ name }
++ * 						style={ { backgroundColor: color, color } }
++ * 						isSelected={ index === currentColor }
++ * 						onClick={ () => setCurrentColor( index ) }
++ * 						aria-label={ name }
++ * 					/>
++ * 				);
++ * 			} ) }
++ * 		</>
++ * 	);
++ * 	return (
++ * 		<CircularOptionPicker
++ * 				options={ colorOptions }
++ * 				actions={
++ * 					<CircularOptionPicker.ButtonAction
++ * 						onClick={ () => setCurrentColor( undefined ) }
++ * 					>
++ * 						{ 'Clear' }
++ * 					</CircularOptionPicker.ButtonAction>
++ * 				}
++ * 			/>
++ * 	);
++ * };
++ * ```
++ */
++
++function CircularOptionPicker( props: CircularOptionPickerProps ) {
+ 	const { actions, className, options, children } = props;
+ 	return (
+ 		<div
+@@ -118,3 +176,5 @@ export default function CircularOptionPicker( props ) {
+ CircularOptionPicker.Option = Option;
+ CircularOptionPicker.ButtonAction = ButtonAction;
+ CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
++
++export default CircularOptionPicker;
+diff --git a/packages/components/src/circular-option-picker/stories/index.tsx b/packages/components/src/circular-option-picker/stories/index.tsx
+new file mode 100644
+index 00000000000000..a2e1bb5b0e482b
+--- /dev/null
++++ b/packages/components/src/circular-option-picker/stories/index.tsx
+@@ -0,0 +1,134 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++/**
++ * WordPress dependencies
++ */
++import { useState, createContext, useContext } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import {
++	default as CircularOptionPicker,
++	ButtonAction,
++	DropdownLinkAction,
++	Option,
++} from '..';
++
++const CircularOptionPickerStoryContext = createContext< {
++	currentColor?: string;
++	setCurrentColor?: ( v: string | undefined ) => void;
++} >( {} );
++
++const meta: ComponentMeta< typeof CircularOptionPicker > = {
++	title: 'Components/CircularOptionPicker',
++	component: CircularOptionPicker,
++	subcomponents: {
++		'CircularOptionPicker.Option': Option,
++		'CircularOptionPicker.ButtonAction': ButtonAction,
++		'CircularOptionPicker.DropdownLinkAction': DropdownLinkAction,
++	},
++	argTypes: {
++		actions: { control: { type: null } },
++		options: { control: { type: null } },
++		children: { control: { type: 'text' } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: { source: { state: 'open', excludeDecorators: true } },
++	},
++	decorators: [
++		// Share current color state between main component, `actions` and `options`
++		( Story ) => {
++			const [ currentColor, setCurrentColor ] = useState< string >();
++
++			return (
++				<CircularOptionPickerStoryContext.Provider
++					value={ {
++						currentColor,
++						setCurrentColor,
++					} }
++				>
++					<Story />
++				</CircularOptionPickerStoryContext.Provider>
++			);
++		},
++	],
++};
++export default meta;
++
++const colors = [
++	{ color: '#f00', name: 'Red' },
++	{ color: '#0f0', name: 'Green' },
++	{ color: '#0af', name: 'Blue' },
++];
++
++const DefaultOptions = () => {
++	const { currentColor, setCurrentColor } = useContext(
++		CircularOptionPickerStoryContext
++	);
++
++	return (
++		<>
++			{ colors.map( ( { color, name }, index ) => {
++				return (
++					<CircularOptionPicker.Option
++						key={ `${ color }-${ index }` }
++						tooltipText={ name }
++						style={ { backgroundColor: color, color } }
++						isSelected={ color === currentColor }
++						onClick={ () => {
++							setCurrentColor?.( color );
++						} }
++						aria-label={ name }
++					/>
++				);
++			} ) }
++		</>
++	);
++};
++
++const DefaultActions = () => {
++	const { setCurrentColor } = useContext( CircularOptionPickerStoryContext );
++
++	return (
++		<CircularOptionPicker.ButtonAction
++			onClick={ () => setCurrentColor?.( undefined ) }
++		>
++			{ 'Clear' }
++		</CircularOptionPicker.ButtonAction>
++	);
++};
++
++const Template: ComponentStory< typeof CircularOptionPicker > = ( props ) => (
++	<CircularOptionPicker { ...props } />
++);
++
++export const Default = Template.bind( {} );
++Default.args = { options: <DefaultOptions /> };
++
++export const WithButtonAction = Template.bind( {} );
++WithButtonAction.args = {
++	...Default.args,
++	actions: <DefaultActions />,
++};
++WithButtonAction.storyName = 'With ButtonAction';
++
++export const WithDropdownLinkAction = Template.bind( {} );
++WithDropdownLinkAction.args = {
++	...Default.args,
++	actions: (
++		<CircularOptionPicker.DropdownLinkAction
++			dropdownProps={ {
++				popoverProps: { position: 'top right' },
++				renderContent: () => (
++					<div>This is an example of a DropdownLinkAction.</div>
++				),
++			} }
++			linkText="Learn More"
++		></CircularOptionPicker.DropdownLinkAction>
++	),
++};
++WithDropdownLinkAction.storyName = 'With DropdownLinkAction';
+diff --git a/packages/components/src/circular-option-picker/types.ts b/packages/components/src/circular-option-picker/types.ts
+new file mode 100644
+index 00000000000000..c3791a42108cd5
+--- /dev/null
++++ b/packages/components/src/circular-option-picker/types.ts
+@@ -0,0 +1,69 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import type { Icon } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import type { ButtonAsButtonProps } from '../button/types';
++import type Dropdown from '../dropdown';
++import type { WordPressComponentProps } from '../ui/context';
++
++export type CircularOptionPickerProps = {
++	/**
++	 * A CSS class to apply to the wrapper element.
++	 */
++	className?: string;
++	/**
++	 * The action(s) to be rendered after the options,
++	 * such as a 'clear' button as seen in `ColorPalette`.
++	 * Usually a `CircularOptionPicker.ButtonAction` or
++	 * `CircularOptionPicker.DropdownLinkAction` component.
++	 */
++	actions?: ReactNode;
++	/**
++	 * The options to be rendered, such as color swatches.
++	 * Usually a `CircularOptionPicker.Option` component.
++	 */
++	options: ReactNode;
++	/**
++	 * The child elements.
++	 */
++	children?: ReactNode;
++};
++
++export type DropdownLinkActionProps = {
++	buttonProps?: Omit<
++		WordPressComponentProps< ButtonAsButtonProps, 'button', false >,
++		'children'
++	>;
++	linkText: string;
++	dropdownProps: Omit<
++		React.ComponentProps< typeof Dropdown >,
++		'className' | 'renderToggle'
++	>;
++	className?: string;
++};
++
++export type OptionProps = Omit<
++	WordPressComponentProps< ButtonAsButtonProps, 'button', false >,
++	'isPressed' | 'className'
++> & {
++	className?: string;
++	tooltipText?: string;
++	isSelected: boolean;
++	// `icon` is explicitly defined as 'check' by CircleOptionPicker.Option
++	// and is not intended to be overridden.
++	// `size` relies on the `Icon` component's default size of `24` to fit
++	// `CircularOptionPicker`'s design, and should not be explicitly set.
++	selectedIconProps?: Omit<
++		React.ComponentProps< typeof Icon >,
++		'icon' | 'size'
++	>;
++};

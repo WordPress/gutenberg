@@ -1,0 +1,1386 @@
+diff --git a/docs/getting-started/fundamentals/block-in-the-editor.md b/docs/getting-started/fundamentals/block-in-the-editor.md
+index 8cc5516af28c34..d1f2a25063e6c6 100644
+--- a/docs/getting-started/fundamentals/block-in-the-editor.md
++++ b/docs/getting-started/fundamentals/block-in-the-editor.md
+@@ -139,7 +139,6 @@ export default function Edit( { attributes, setAttributes } ) {
+ 				</div>
+ 			</InspectorControls>
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				value={ attributes.message }
+ 				onChange={ ( val ) => setAttributes( { message: val } ) }
+ 				style={ {
+diff --git a/docs/getting-started/tutorial.md b/docs/getting-started/tutorial.md
+index bbf22eb2bd9dc3..b5eea314a3f086 100644
+--- a/docs/getting-started/tutorial.md
++++ b/docs/getting-started/tutorial.md
+@@ -480,7 +480,6 @@ export default function Edit( { attributes, setAttributes } ) {
+ 			<InspectorControls>
+ 				<PanelBody title={ __( 'Settings', 'copyright-date-block' ) }>
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						label={ __(
+ 							'Starting year',
+ 							'copyright-date-block'
+@@ -541,7 +540,6 @@ export default function Edit( { attributes, setAttributes } ) {
+ 					/>
+ 					{ showStartingYear && (
+ 						<TextControl
+-							__next40pxDefaultSize
+ 							label={ __(
+ 								'Starting year',
+ 								'copyright-date-block'
+diff --git a/docs/how-to-guides/data-basics/3-building-an-edit-form.md b/docs/how-to-guides/data-basics/3-building-an-edit-form.md
+index 5729dc7155e49e..5f4e30357798d5 100644
+--- a/docs/how-to-guides/data-basics/3-building-an-edit-form.md
++++ b/docs/how-to-guides/data-basics/3-building-an-edit-form.md
+@@ -63,7 +63,6 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+ 	return (
+ 		<div className="my-gutenberg-form">
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				value=''
+ 				label='Page title:'
+ 			/>
+@@ -140,7 +139,6 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+ 	return (
+ 		<div className="my-gutenberg-form">
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label='Page title:'
+ 				value={ page.title.rendered }
+ 			/>
+@@ -166,7 +164,6 @@ function VanillaReactForm({ initialTitle }) {
+ 	const [title, setTitle] = useState( initialTitle );
+ 	return (
+ 		<TextControl
+-			__next40pxDefaultSize
+ 			value={ title }
+ 			onChange={ setTitle }
+ 		/>
+@@ -236,7 +233,6 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+ 	return (
+ 		<div className="my-gutenberg-form">
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label="Page title:"
+ 				value={ page.title }
+ 				onChange={ handleChange }
+@@ -505,7 +501,6 @@ function EditPageForm( { pageId, onCancel, onSaveFinished } ) {
+ 	return (
+ 		<div className="my-gutenberg-form">
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label="Page title:"
+ 				value={ page.title }
+ 				onChange={ handleChange }
+diff --git a/docs/how-to-guides/data-basics/4-building-a-create-page-form.md b/docs/how-to-guides/data-basics/4-building-a-create-page-form.md
+index 704bc6543b14dd..9011596e0feddd 100644
+--- a/docs/how-to-guides/data-basics/4-building-a-create-page-form.md
++++ b/docs/how-to-guides/data-basics/4-building-a-create-page-form.md
+@@ -87,7 +87,6 @@ function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCanc
+ 	return (
+ 		<div className="my-gutenberg-form">
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label="Page title:"
+ 				value={ title }
+ 				onChange={ onChangeTitle }
+@@ -347,7 +346,6 @@ function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCanc
+ 	return (
+ 		<div className="my-gutenberg-form">
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label="Page title:"
+ 				value={ title }
+ 				onChange={ onChangeTitle }
+diff --git a/docs/how-to-guides/metabox.md b/docs/how-to-guides/metabox.md
+index 16a0ab37fdbcb4..41b3a3c242dbcb 100644
+--- a/docs/how-to-guides/metabox.md
++++ b/docs/how-to-guides/metabox.md
+@@ -91,7 +91,6 @@ registerBlockType( 'myguten/meta-block', {
+ 		return (
+ 			<div { ...blockProps }>
+ 				<TextControl
+-					__next40pxDefaultSize				
+ 					label="Meta Block Field"
+ 					value={ metaFieldValue }
+ 					onChange={ updateMetaValue }
+diff --git a/docs/reference-guides/block-api/block-context.md b/docs/reference-guides/block-api/block-context.md
+index f4525b19016900..abb388bb264259 100644
+--- a/docs/reference-guides/block-api/block-context.md
++++ b/docs/reference-guides/block-api/block-context.md
+@@ -142,7 +142,6 @@ export default function Edit( props ) {
+ 	return (
+ 		<div>
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label={ __( 'Record ID' ) }
+ 				value={ recordId }
+ 				onChange={ ( val ) =>
+diff --git a/docs/reference-guides/block-api/block-edit-save.md b/docs/reference-guides/block-api/block-edit-save.md
+index 87b85a25623e63..1cac37301c8b30 100644
+--- a/docs/reference-guides/block-api/block-edit-save.md
++++ b/docs/reference-guides/block-api/block-edit-save.md
+@@ -253,7 +253,6 @@ edit: ( { attributes, setAttributes } ) => {
+ 	return (
+ 		<div { ...blockProps }>
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label='My Text Field'
+ 				value={ attributes.content }
+ 				onChange={ updateFieldValue }
+@@ -290,7 +289,6 @@ edit: ( { attributes, setAttributes } ) => {
+ 	return (
+ 		<div { ...blockProps }>
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label='Number Posts to Show'
+ 				value={ attributes.postsToShow }
+ 				onChange={ ( val ) => {
+diff --git a/docs/reference-guides/slotfills/plugin-sidebar-more-menu-item.md b/docs/reference-guides/slotfills/plugin-sidebar-more-menu-item.md
+index fa86fdf3676c45..4a4ff98697b5f3 100644
+--- a/docs/reference-guides/slotfills/plugin-sidebar-more-menu-item.md
++++ b/docs/reference-guides/slotfills/plugin-sidebar-more-menu-item.md
+@@ -45,7 +45,6 @@ const PluginSidebarMoreMenuItemTest = () => {
+ 						) }
+ 					</p>
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Text Control' ) }
+ 						value={ text }
+ 						onChange={ ( newText ) => setText( newText ) }
+diff --git a/docs/reference-guides/slotfills/plugin-sidebar.md b/docs/reference-guides/slotfills/plugin-sidebar.md
+index ba0812e5b5326e..9bf911b3bb13f2 100644
+--- a/docs/reference-guides/slotfills/plugin-sidebar.md
++++ b/docs/reference-guides/slotfills/plugin-sidebar.md
+@@ -38,7 +38,6 @@ const PluginSidebarExample = () => {
+ 					) }
+ 				</p>
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Text Control' ) }
+ 					value={ text }
+ 					onChange={ ( newText ) => setText( newText ) }
+diff --git a/packages/block-editor/src/components/block-rename/modal.js b/packages/block-editor/src/components/block-rename/modal.js
+index 9a2b153a823978..ae8ea350b30171 100644
+--- a/packages/block-editor/src/components/block-rename/modal.js
++++ b/packages/block-editor/src/components/block-rename/modal.js
+@@ -107,7 +107,6 @@ export default function BlockRenameModal( { clientId, onClose } ) {
+ 			>
+ 				<VStack spacing="3">
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						value={ editedBlockName ?? blockName }
+ 						label={ __( 'Name' ) }
+ 						help={
+diff --git a/packages/block-editor/src/components/date-format-picker/index.js b/packages/block-editor/src/components/date-format-picker/index.js
+index 76cefe7dbc5654..7e5e9594ec58f1 100644
+--- a/packages/block-editor/src/components/date-format-picker/index.js
++++ b/packages/block-editor/src/components/date-format-picker/index.js
+@@ -144,7 +144,6 @@ function NonDefaultControls( { format, onChange } ) {
+ 			/>
+ 			{ isCustom && (
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Custom format' ) }
+ 					hideLabelFromVision
+ 					help={ createInterpolateElement(
+diff --git a/packages/block-editor/src/components/inspector-controls/README.md b/packages/block-editor/src/components/inspector-controls/README.md
+index a615d5fa7319e8..cc68c7cae7c78e 100644
+--- a/packages/block-editor/src/components/inspector-controls/README.md
++++ b/packages/block-editor/src/components/inspector-controls/README.md
+@@ -114,7 +114,6 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
+ 						/>
+ 
+ 						<TextControl
+-							__next40pxDefaultSize
+ 							label="Text Field"
+ 							help="Additional help text"
+ 							value={ textField }
+@@ -204,7 +203,6 @@ function MyBlockEdit( { attributes, setAttributes } ) {
+ 			</InspectorControls>
+ 			<InspectorAdvancedControls>
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label="HTML anchor"
+ 					value={ attributes.anchor }
+ 					onChange={ ( nextValue ) => {
+diff --git a/packages/block-editor/src/components/link-control/index.js b/packages/block-editor/src/components/link-control/index.js
+index bffeb929c921e7..075036a47dec82 100644
+--- a/packages/block-editor/src/components/link-control/index.js
++++ b/packages/block-editor/src/components/link-control/index.js
+@@ -677,7 +677,6 @@ function LinkControl( {
+ 								value={ internalControlValue?.title }
+ 								onChange={ setInternalTextInputValue }
+ 								onKeyDown={ handleSubmitWithEnter }
+-								__next40pxDefaultSize
+ 							/>
+ 						) }
+ 						<LinkControlSearchInput
+diff --git a/packages/block-editor/src/components/url-popover/image-url-input-ui.js b/packages/block-editor/src/components/url-popover/image-url-input-ui.js
+index 3248c5c4e43acd..994168387096ba 100644
+--- a/packages/block-editor/src/components/url-popover/image-url-input-ui.js
++++ b/packages/block-editor/src/components/url-popover/image-url-input-ui.js
+@@ -233,7 +233,6 @@ const ImageURLInputUI = ( {
+ 				checked={ linkTarget === '_blank' }
+ 			/>
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label={ __( 'Link relation' ) }
+ 				value={ rel ?? '' }
+ 				onChange={ onSetLinkRel }
+@@ -249,7 +248,6 @@ const ImageURLInputUI = ( {
+ 				) }
+ 			/>
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label={ __( 'Link CSS class' ) }
+ 				value={ linkClass || '' }
+ 				onChange={ onSetLinkClass }
+diff --git a/packages/block-editor/src/hooks/anchor.js b/packages/block-editor/src/hooks/anchor.js
+index 8e2a31d2f4804a..a42abe958a2bf5 100644
+--- a/packages/block-editor/src/hooks/anchor.js
++++ b/packages/block-editor/src/hooks/anchor.js
+@@ -55,7 +55,6 @@ function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
+ 	return (
+ 		<InspectorControls group="advanced">
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				className="html-anchor-control"
+ 				label={ __( 'HTML anchor' ) }
+ 				help={
+diff --git a/packages/block-editor/src/hooks/custom-class-name.js b/packages/block-editor/src/hooks/custom-class-name.js
+index 89ce7b03483d83..8bcfada47ec0cf 100644
+--- a/packages/block-editor/src/hooks/custom-class-name.js
++++ b/packages/block-editor/src/hooks/custom-class-name.js
+@@ -47,7 +47,6 @@ function CustomClassNameControlsPure( { className, setAttributes } ) {
+ 	return (
+ 		<InspectorControls group="advanced">
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				autoComplete="off"
+ 				label={ __( 'Additional CSS class(es)' ) }
+ 				value={ className || '' }
+diff --git a/packages/block-library/src/breadcrumbs/edit.js b/packages/block-library/src/breadcrumbs/edit.js
+index ad3a155e193279..114dd262a6d0f3 100644
+--- a/packages/block-library/src/breadcrumbs/edit.js
++++ b/packages/block-library/src/breadcrumbs/edit.js
+@@ -264,7 +264,6 @@ export default function BreadcrumbEdit( {
+ 						}
+ 					>
+ 						<TextControl
+-							__next40pxDefaultSize
+ 							autoComplete="off"
+ 							label={ __( 'Separator' ) }
+ 							value={ separator }
+diff --git a/packages/block-library/src/button/edit.js b/packages/block-library/src/button/edit.js
+index f87e362dc619c3..0d8949e2eff051 100644
+--- a/packages/block-library/src/button/edit.js
++++ b/packages/block-library/src/button/edit.js
+@@ -449,7 +449,6 @@ function ButtonEdit( props ) {
+ 				/>
+ 				{ isLinkTag && (
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Link relation' ) }
+ 						help={ createInterpolateElement(
+ 							__(
+diff --git a/packages/block-library/src/cover/edit/embed-video-url-input.js b/packages/block-library/src/cover/edit/embed-video-url-input.js
+index adc13790f93d7e..a1799aa5607873 100644
+--- a/packages/block-library/src/cover/edit/embed-video-url-input.js
++++ b/packages/block-library/src/cover/edit/embed-video-url-input.js
+@@ -58,7 +58,6 @@ export default function EmbedVideoUrlInput( {
+ 				) }
+ 				<TextControl
+ 					type="url"
+-					__next40pxDefaultSize
+ 					label={ __( 'Video URL' ) }
+ 					value={ url }
+ 					onChange={ ( value ) => {
+diff --git a/packages/block-library/src/details/edit.js b/packages/block-library/src/details/edit.js
+index 095c4d4a0cbc39..c2e3a741a0903d 100644
+--- a/packages/block-library/src/details/edit.js
++++ b/packages/block-library/src/details/edit.js
+@@ -105,7 +105,6 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
+ 			</InspectorControls>
+ 			<InspectorControls group="advanced">
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Name attribute' ) }
+ 					value={ name || '' }
+ 					onChange={ ( newName ) =>
+diff --git a/packages/block-library/src/form-input/edit.js b/packages/block-library/src/form-input/edit.js
+index 78bc36ba10e99a..b4dbb382eda514 100644
+--- a/packages/block-library/src/form-input/edit.js
++++ b/packages/block-library/src/form-input/edit.js
+@@ -102,7 +102,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
+ 			) }
+ 			<InspectorControls group="advanced">
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					autoComplete="off"
+ 					label={ __( 'Name' ) }
+ 					value={ name }
+@@ -117,7 +116,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
+ 				/>
+ 				{ 'hidden' === type && (
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						autoComplete="off"
+ 						label={ __( 'Value' ) }
+ 						value={ value }
+diff --git a/packages/block-library/src/form/edit.js b/packages/block-library/src/form/edit.js
+index 4bb8c79a9801da..9492ff6c634ed3 100644
+--- a/packages/block-library/src/form/edit.js
++++ b/packages/block-library/src/form/edit.js
+@@ -150,7 +150,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
+ 							isShownByDefault
+ 						>
+ 							<TextControl
+-								__next40pxDefaultSize
+ 								autoComplete="off"
+ 								label={ __( 'Email for form submissions' ) }
+ 								value={ email || '' }
+@@ -189,7 +188,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
+ 						) }
+ 					/>
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						autoComplete="off"
+ 						label={ __( 'Form action' ) }
+ 						value={ action }
+diff --git a/packages/block-library/src/home-link/edit.js b/packages/block-library/src/home-link/edit.js
+index c8c0b5d097ed77..7c8d2e4b26ce49 100644
+--- a/packages/block-library/src/home-link/edit.js
++++ b/packages/block-library/src/home-link/edit.js
+@@ -108,7 +108,6 @@ export default function HomeEdit( { attributes, setAttributes, context } ) {
+ 						isShownByDefault
+ 					>
+ 						<TextControl
+-							__next40pxDefaultSize
+ 							label={ __( 'Text' ) }
+ 							value={ label ? stripHTML( label ) : '' }
+ 							onChange={ ( labelValue ) => {
+diff --git a/packages/block-library/src/icon/edit.js b/packages/block-library/src/icon/edit.js
+index aa7090447cd7de..7a986e32abb50e 100644
+--- a/packages/block-library/src/icon/edit.js
++++ b/packages/block-library/src/icon/edit.js
+@@ -169,7 +169,6 @@ export function Edit( { attributes, setAttributes } ) {
+ 								help={ __(
+ 									'Briefly describe the icon to help screen reader users. Leave blank for decorative icons.'
+ 								) }
+-								__next40pxDefaultSize
+ 							/>
+ 						) }
+ 					</DropdownMenu>
+@@ -207,7 +206,6 @@ export function Edit( { attributes, setAttributes } ) {
+ 							onChange={ ( value ) =>
+ 								setAttributes( { ariaLabel: value } )
+ 							}
+-							__next40pxDefaultSize
+ 						/>
+ 					</ToolsPanelItem>
+ 				</ToolsPanel>
+diff --git a/packages/block-library/src/image/image.js b/packages/block-library/src/image/image.js
+index 99abd84894e9fb..73f51000e8d79f 100644
+--- a/packages/block-library/src/image/image.js
++++ b/packages/block-library/src/image/image.js
+@@ -236,7 +236,6 @@ function ContentOnlyControls( {
+ 				>
+ 					<div className="wp-block-image__toolbar_content_textarea__container">
+ 						<TextControl
+-							__next40pxDefaultSize
+ 							className="wp-block-image__toolbar_content_textarea"
+ 							label={ __( 'Title attribute' ) }
+ 							value={ attributes.title || '' }
+@@ -1143,7 +1142,6 @@ export default function Image( {
+ 			) }
+ 			<InspectorControls group="advanced">
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Title attribute' ) }
+ 					value={ title || '' }
+ 					onChange={ onSetTitle }
+diff --git a/packages/block-library/src/list/ordered-list-settings.js b/packages/block-library/src/list/ordered-list-settings.js
+index 5780b36c74147c..f0b2413b9a73b5 100644
+--- a/packages/block-library/src/list/ordered-list-settings.js
++++ b/packages/block-library/src/list/ordered-list-settings.js
+@@ -86,7 +86,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
+ 					}
+ 				>
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Start value' ) }
+ 						type="number"
+ 						onChange={ ( value ) => {
+diff --git a/packages/block-library/src/navigation-link/link-ui/page-creator.js b/packages/block-library/src/navigation-link/link-ui/page-creator.js
+index 5ad7a1c0ab9049..096d732cf190d6 100644
+--- a/packages/block-library/src/navigation-link/link-ui/page-creator.js
++++ b/packages/block-library/src/navigation-link/link-ui/page-creator.js
+@@ -128,7 +128,6 @@ export function LinkUIPageCreator( {
+ 				<form onSubmit={ createPage }>
+ 					<VStack spacing={ 4 }>
+ 						<TextControl
+-							__next40pxDefaultSize
+ 							label={ __( 'Title' ) }
+ 							onChange={ setTitle }
+ 							placeholder={ __( 'No title' ) }
+diff --git a/packages/block-library/src/navigation-link/shared/controls.js b/packages/block-library/src/navigation-link/shared/controls.js
+index 2f77d2a63e5b76..c4e4f4788fdbe4 100644
+--- a/packages/block-library/src/navigation-link/shared/controls.js
++++ b/packages/block-library/src/navigation-link/shared/controls.js
+@@ -178,7 +178,6 @@ export function Controls( {
+ 				isShownByDefault
+ 			>
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Text' ) }
+ 					value={ label ? stripHTML( label ) : '' }
+ 					onChange={ ( labelValue ) => {
+@@ -292,7 +291,6 @@ export function Controls( {
+ 				isShownByDefault={ ! isContentOnly }
+ 			>
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Rel attribute' ) }
+ 					value={ rel || '' }
+ 					onChange={ ( relValue ) => {
+diff --git a/packages/block-library/src/navigation/edit/navigation-menu-name-control.js b/packages/block-library/src/navigation/edit/navigation-menu-name-control.js
+index 44740a0edf7459..fc32da79dc0912 100644
+--- a/packages/block-library/src/navigation/edit/navigation-menu-name-control.js
++++ b/packages/block-library/src/navigation/edit/navigation-menu-name-control.js
+@@ -14,7 +14,6 @@ export default function NavigationMenuNameControl() {
+ 
+ 	return (
+ 		<TextControl
+-			__next40pxDefaultSize
+ 			label={ __( 'Menu name' ) }
+ 			value={ title }
+ 			onChange={ updateTitle }
+diff --git a/packages/block-library/src/playlist-track/edit.js b/packages/block-library/src/playlist-track/edit.js
+index 7da2c6375323d8..6fde592458b619 100644
+--- a/packages/block-library/src/playlist-track/edit.js
++++ b/packages/block-library/src/playlist-track/edit.js
+@@ -161,7 +161,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
+ 			<InspectorControls>
+ 				<PanelBody title={ __( 'Settings' ) }>
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Artist' ) }
+ 						value={ artist ? stripHTML( artist ) : '' }
+ 						onChange={ ( artistValue ) => {
+@@ -169,7 +168,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
+ 						} }
+ 					/>
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Album' ) }
+ 						value={ album ? stripHTML( album ) : '' }
+ 						onChange={ ( albumValue ) => {
+@@ -177,7 +175,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
+ 						} }
+ 					/>
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Title' ) }
+ 						value={ title ? stripHTML( title ) : '' }
+ 						onChange={ ( titleValue ) => {
+diff --git a/packages/block-library/src/post-comment/edit.js b/packages/block-library/src/post-comment/edit.js
+index 5ffabb361d6aaf..1bf9b02343ce5f 100644
+--- a/packages/block-library/src/post-comment/edit.js
++++ b/packages/block-library/src/post-comment/edit.js
+@@ -34,7 +34,6 @@ export default function Edit( { attributes: { commentId }, setAttributes } ) {
+ 					) }
+ 				>
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						value={ commentId }
+ 						onChange={ ( val ) =>
+ 							setCommentIdInput( parseInt( val ) )
+diff --git a/packages/block-library/src/post-featured-image/edit.js b/packages/block-library/src/post-featured-image/edit.js
+index b90b499daf5a2e..e0579ff6f7b331 100644
+--- a/packages/block-library/src/post-featured-image/edit.js
++++ b/packages/block-library/src/post-featured-image/edit.js
+@@ -356,7 +356,6 @@ export default function PostFeaturedImageEdit( {
+ 								}
+ 							>
+ 								<TextControl
+-									__next40pxDefaultSize
+ 									label={ __( 'Link relation' ) }
+ 									help={ createInterpolateElement(
+ 										__(
+diff --git a/packages/block-library/src/post-terms/edit.js b/packages/block-library/src/post-terms/edit.js
+index b22a3f1aa75dbf..5069412c46526f 100644
+--- a/packages/block-library/src/post-terms/edit.js
++++ b/packages/block-library/src/post-terms/edit.js
+@@ -65,7 +65,6 @@ export default function PostTermsEdit( {
+ 		<>
+ 			<InspectorControls group="advanced">
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					autoComplete="off"
+ 					label={ __( 'Separator' ) }
+ 					value={ separator || '' }
+diff --git a/packages/block-library/src/post-title/edit.js b/packages/block-library/src/post-title/edit.js
+index c9514b2bbf84ef..527a69934bc72b 100644
+--- a/packages/block-library/src/post-title/edit.js
++++ b/packages/block-library/src/post-title/edit.js
+@@ -203,7 +203,6 @@ export default function PostTitleEdit( {
+ 										}
+ 									>
+ 										<TextControl
+-											__next40pxDefaultSize
+ 											label={ __( 'Link relation' ) }
+ 											help={ createInterpolateElement(
+ 												__(
+diff --git a/packages/block-library/src/query/edit/inspector-controls/index.js b/packages/block-library/src/query/edit/inspector-controls/index.js
+index 67a9bfb71a926d..5afb0a6544ea53 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/index.js
++++ b/packages/block-library/src/query/edit/inspector-controls/index.js
+@@ -432,7 +432,6 @@ export default function QueryInspectorControls( props ) {
+ 							} }
+ 						>
+ 							<TextControl
+-								__next40pxDefaultSize
+ 								label={ __( 'Keyword' ) }
+ 								value={ querySearch }
+ 								onChange={ ( newQuerySearch ) => {
+diff --git a/packages/block-library/src/rss/edit.js b/packages/block-library/src/rss/edit.js
+index af2ffb40c8be60..77a7331be961da 100644
+--- a/packages/block-library/src/rss/edit.js
++++ b/packages/block-library/src/rss/edit.js
+@@ -289,7 +289,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
+ 			</InspectorControls>
+ 			<InspectorControls group="advanced">
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Link relation' ) }
+ 					help={ createInterpolateElement(
+ 						__(
+diff --git a/packages/block-library/src/social-link/edit.js b/packages/block-library/src/social-link/edit.js
+index 995572e24c570d..b5e9eb472281dd 100644
+--- a/packages/block-library/src/social-link/edit.js
++++ b/packages/block-library/src/social-link/edit.js
+@@ -191,7 +191,6 @@ const SocialLinkEdit = ( {
+ 						) }
+ 						renderContent={ () => (
+ 							<TextControl
+-								__next40pxDefaultSize
+ 								className="wp-block-social-link__toolbar_content_text"
+ 								label={ __( 'Text' ) }
+ 								help={ __(
+@@ -224,7 +223,6 @@ const SocialLinkEdit = ( {
+ 						} }
+ 					>
+ 						<TextControl
+-							__next40pxDefaultSize
+ 							label={ __( 'Text' ) }
+ 							help={ __(
+ 								'The text is visible when enabled from the parent Social Icons block.'
+@@ -240,7 +238,6 @@ const SocialLinkEdit = ( {
+ 			</InspectorControls>
+ 			<InspectorControls group="advanced">
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Link relation' ) }
+ 					help={ createInterpolateElement(
+ 						__(
+diff --git a/packages/block-library/src/table/edit.js b/packages/block-library/src/table/edit.js
+index 2550790ef7680a..77976d3c7e87c4 100644
+--- a/packages/block-library/src/table/edit.js
++++ b/packages/block-library/src/table/edit.js
+@@ -563,7 +563,6 @@ function TableEdit( {
+ 						onSubmit={ onCreateTable }
+ 					>
+ 						<TextControl
+-							__next40pxDefaultSize
+ 							type="number"
+ 							label={ __( 'Column count' ) }
+ 							value={ initialColumnCount }
+@@ -572,7 +571,6 @@ function TableEdit( {
+ 							className="blocks-table__placeholder-input"
+ 						/>
+ 						<TextControl
+-							__next40pxDefaultSize
+ 							type="number"
+ 							label={ __( 'Row count' ) }
+ 							value={ initialRowCount }
+diff --git a/packages/block-library/src/template-part/edit/advanced-controls.js b/packages/block-library/src/template-part/edit/advanced-controls.js
+index 61d9955b4da574..ed1977f813bab3 100644
+--- a/packages/block-library/src/template-part/edit/advanced-controls.js
++++ b/packages/block-library/src/template-part/edit/advanced-controls.js
+@@ -57,7 +57,6 @@ export function TemplatePartAdvancedControls( {
+ 			{ isEntityAvailable && (
+ 				<>
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Title' ) }
+ 						value={ title }
+ 						onChange={ ( value ) => {
+diff --git a/packages/block-library/src/template-part/edit/title-modal.js b/packages/block-library/src/template-part/edit/title-modal.js
+index 3e12c284718f1c..f128c99a264539 100644
+--- a/packages/block-library/src/template-part/edit/title-modal.js
++++ b/packages/block-library/src/template-part/edit/title-modal.js
+@@ -39,7 +39,6 @@ export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
+ 						value={ title }
+ 						onChange={ setTitle }
+ 						placeholder={ __( 'Custom Template Part' ) }
+-						__next40pxDefaultSize
+ 					/>
+ 					<HStack justify="right">
+ 						<Button
+diff --git a/packages/block-library/src/video/tracks-editor.js b/packages/block-library/src/video/tracks-editor.js
+index 99ced6253a9537..3ae4c8194b15ca 100644
+--- a/packages/block-library/src/video/tracks-editor.js
++++ b/packages/block-library/src/video/tracks-editor.js
+@@ -120,7 +120,6 @@ function SingleTrackEditor( {
+ 			</span>
+ 			<Grid columns={ 2 } gap={ 4 }>
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					onChange={ ( newLabel ) =>
+ 						setTrackState( ( prevTrackState ) => ( {
+ 							...prevTrackState,
+@@ -132,7 +131,6 @@ function SingleTrackEditor( {
+ 					help={ __( 'Title of track' ) }
+ 				/>
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					onChange={ ( newSrcLang ) =>
+ 						setTrackState( ( prevTrackState ) => ( {
+ 							...prevTrackState,
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 613b863374c021..32a6696f130442 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   `TextControl`: The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79386](https://github.com/WordPress/gutenberg/pull/79386)).
++
+ ### Enhancements
+ 
+ -   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79112](https://github.com/WordPress/gutenberg/pull/79112)).
+diff --git a/packages/components/src/disabled/README.md b/packages/components/src/disabled/README.md
+index abb0cec528dda4..315460f8379e43 100644
+--- a/packages/components/src/disabled/README.md
++++ b/packages/components/src/disabled/README.md
+@@ -15,7 +15,6 @@ const MyDisabled = () => {
+ 
+ 	let input = (
+ 		<TextControl
+-			__next40pxDefaultSize
+ 			label="Input"
+ 			onChange={ () => {} }
+ 		/>
+diff --git a/packages/components/src/disabled/index.tsx b/packages/components/src/disabled/index.tsx
+index d66d5b2ef713e5..fa95e87667970d 100644
+--- a/packages/components/src/disabled/index.tsx
++++ b/packages/components/src/disabled/index.tsx
+@@ -25,7 +25,6 @@ const { Consumer, Provider } = Context;
+  *
+  *	let input = (
+  *		<TextControl
+- *			__next40pxDefaultSize
+  *			label="Input"
+  *			onChange={ () => {} }
+  *		/>
+diff --git a/packages/components/src/disabled/stories/index.story.tsx b/packages/components/src/disabled/stories/index.story.tsx
+index a61fc9dc365e09..69131697d7e6df 100644
+--- a/packages/components/src/disabled/stories/index.story.tsx
++++ b/packages/components/src/disabled/stories/index.story.tsx
+@@ -46,7 +46,6 @@ const Form = () => {
+ 	return (
+ 		<VStack>
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label="Text Control"
+ 				value={ textControlValue }
+ 				onChange={ setTextControlValue }
+diff --git a/packages/components/src/higher-order/with-constrained-tabbing/README.md b/packages/components/src/higher-order/with-constrained-tabbing/README.md
+index 2898800d41ec79..3e5b30a0cb57c7 100644
+--- a/packages/components/src/higher-order/with-constrained-tabbing/README.md
++++ b/packages/components/src/higher-order/with-constrained-tabbing/README.md
+@@ -23,12 +23,10 @@ const MyComponentWithConstrainedTabbing = () => {
+ 	let form = (
+ 		<form>
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label="Input 1"
+ 				onChange={ () => {} }
+ 			/>
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label="Input 2"
+ 				onChange={ () => {} }
+ 			/>
+diff --git a/packages/components/src/higher-order/with-focus-return/README.md b/packages/components/src/higher-order/with-focus-return/README.md
+index 6e13645349e722..03d474a6b008b4 100644
+--- a/packages/components/src/higher-order/with-focus-return/README.md
++++ b/packages/components/src/higher-order/with-focus-return/README.md
+@@ -14,7 +14,6 @@ const EnhancedComponent = withFocusReturn( () => (
+ 	<div>
+ 		Focus will return to the previous input when this component is unmounted
+ 		<TextControl
+-			__next40pxDefaultSize
+ 			autoFocus={ true }
+ 			onChange={ () => {} }
+ 		/>
+@@ -31,7 +30,6 @@ const MyComponentWithFocusReturn = () => {
+ 	return (
+ 		<div>
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				placeholder="Type something"
+ 				value={ text }
+ 				onChange={ ( value ) => setText( value ) }
+diff --git a/packages/components/src/placeholder/stories/index.story.tsx b/packages/components/src/placeholder/stories/index.story.tsx
+index 5d0cf0da7869ae..51876cdcd7d5d2 100644
+--- a/packages/components/src/placeholder/stories/index.story.tsx
++++ b/packages/components/src/placeholder/stories/index.story.tsx
+@@ -48,7 +48,6 @@ const Template: StoryFn< typeof Placeholder > = ( args ) => {
+ 		<Placeholder { ...args }>
+ 			<div>
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label="Sample Field"
+ 					placeholder="Enter something here"
+ 					value={ value }
+diff --git a/packages/components/src/text-control/README.md b/packages/components/src/text-control/README.md
+index 83b63cba95b464..2a95e4c46864b8 100644
+--- a/packages/components/src/text-control/README.md
++++ b/packages/components/src/text-control/README.md
+@@ -62,7 +62,6 @@ const MyTextControl = () => {
+ 
+ 	return (
+ 		<TextControl
+-			__next40pxDefaultSize
+ 			label="Additional CSS Class"
+ 			value={ className }
+ 			onChange={ ( value ) => setClassName( value ) }
+@@ -127,14 +126,6 @@ A function that receives the value of the input.
+ -   Type: `function`
+ -   Required: Yes
+ 
+-#### __next40pxDefaultSize
+-
+-Start opting into the larger default height that will become the default size in a future version.
+-
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
+-
+ ## Related components
+ 
+ -   To offer users more constrained options for input, use SelectControl, RadioControl, CheckboxControl, or RangeControl.
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+index 472da782a73f7d..bcb340aa9a8eed 100644
+--- a/packages/components/src/text-control/index.tsx
++++ b/packages/components/src/text-control/index.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import type { ChangeEvent, ForwardedRef } from 'react';
+-import clsx from 'clsx';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,16 +15,15 @@ import { forwardRef } from '@wordpress/element';
+ import BaseControl from '../base-control';
+ import type { WordPressComponentProps } from '../context';
+ import type { TextControlProps } from './types';
+-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ function UnforwardedTextControl(
+ 	props: WordPressComponentProps< TextControlProps, 'input', false >,
+ 	ref: ForwardedRef< HTMLInputElement >
+ ) {
+ 	const {
+-		// Prevent passing this to `input`.
++		// Prevent passing legacy props to `input`.
+ 		__nextHasNoMarginBottom: _,
+-		__next40pxDefaultSize = false,
++		__next40pxDefaultSize: __,
+ 		label,
+ 		hideLabelFromVision,
+ 		value,
+@@ -40,12 +38,6 @@ function UnforwardedTextControl(
+ 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
+ 		onChange( event.target.value );
+ 
+-	maybeWarnDeprecated36pxSize( {
+-		componentName: 'TextControl',
+-		size: undefined,
+-		__next40pxDefaultSize,
+-	} );
+-
+ 	return (
+ 		<BaseControl
+ 			label={ label }
+@@ -55,9 +47,7 @@ function UnforwardedTextControl(
+ 			className={ className }
+ 		>
+ 			<input
+-				className={ clsx( 'components-text-control__input', {
+-					'is-next-40px-default-size': __next40pxDefaultSize,
+-				} ) }
++				className="components-text-control__input"
+ 				type={ type }
+ 				id={ id }
+ 				value={ value }
+@@ -82,7 +72,6 @@ function UnforwardedTextControl(
+  *
+  *   return (
+  *     <TextControl
+- *       __next40pxDefaultSize
+  *       label="Additional CSS Class"
+  *       value={ className }
+  *       onChange={ ( value ) => setClassName( value ) }
+diff --git a/packages/components/src/text-control/stories/index.story.tsx b/packages/components/src/text-control/stories/index.story.tsx
+index b27aed98abdea0..7cd14dd1c24df0 100644
+--- a/packages/components/src/text-control/stories/index.story.tsx
++++ b/packages/components/src/text-control/stories/index.story.tsx
+@@ -46,7 +46,6 @@ const DefaultTemplate: StoryFn< typeof TextControl > = ( {
+ 
+ 	return (
+ 		<TextControl
+-			__next40pxDefaultSize
+ 			{ ...args }
+ 			value={ value }
+ 			onChange={ ( v ) => {
+@@ -61,7 +60,6 @@ export const Default: StoryFn< typeof TextControl > = DefaultTemplate.bind(
+ 	{}
+ );
+ Default.args = {
+-	__next40pxDefaultSize: true,
+ 	placeholder: 'Placeholder',
+ };
+ 
+diff --git a/packages/components/src/text-control/style.scss b/packages/components/src/text-control/style.scss
+index 7792f9c13dcafb..5127edc7e5077a 100644
+--- a/packages/components/src/text-control/style.scss
++++ b/packages/components/src/text-control/style.scss
+@@ -18,7 +18,7 @@
+ .components-text-control__input[type="month"],
+ .components-text-control__input[type="number"] {
+ 	width: 100%;
+-	height: $grid-unit-40;
++	height: $grid-unit-50;
+ 	// Override input style margin in WP forms.css.
+ 	margin: 0;
+ 	background: $components-color-background;
+@@ -26,19 +26,15 @@
+ 	@include input-control( $components-color-accent );
+ 	border-color: $components-color-border;
+ 
++	// Subtract 1px to account for the border, which isn't included on the element
++	// on newer components like InputControl, SelectControl, etc.
++	// These values should be shared with the `controlPaddingX` in ./utils/config-values.js
++	padding-left: $grid-unit-15;
++	padding-right: $grid-unit-15;
++
+ 	&::placeholder {
+ 		color: $components-color-dark-gray-placeholder;
+ 	}
+-
+-	&.is-next-40px-default-size {
+-		height: $grid-unit-50;
+-
+-		// Subtract 1px to account for the border, which isn't included on the element
+-		// on newer components like InputControl, SelectControl, etc.
+-		// These values should be shared with the `controlPaddingX` in ./utils/config-values.js
+-		padding-left: $grid-unit-15;
+-		padding-right: $grid-unit-15;
+-	}
+ }
+ 
+ .components-text-control__input[type="email"],
+diff --git a/packages/components/src/text-control/test/text-control.tsx b/packages/components/src/text-control/test/text-control.tsx
+index 8ac0034f0dba23..fc048b93992f08 100644
+--- a/packages/components/src/text-control/test/text-control.tsx
++++ b/packages/components/src/text-control/test/text-control.tsx
+@@ -6,11 +6,7 @@ import { render, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import _TextControl from '..';
+-
+-const TextControl = ( props: React.ComponentProps< typeof _TextControl > ) => {
+-	return <_TextControl { ...props } __next40pxDefaultSize />;
+-};
++import TextControl from '..';
+ 
+ const noop = () => {};
+ 
+diff --git a/packages/components/src/text-control/types.ts b/packages/components/src/text-control/types.ts
+index 09876b82f11fb8..f03a64641b6314 100644
+--- a/packages/components/src/text-control/types.ts
++++ b/packages/components/src/text-control/types.ts
+@@ -39,7 +39,8 @@ export type TextControlProps = Pick<
+ 	/**
+ 	 * Start opting into the larger default height that will become the default size in a future version.
+ 	 *
+-	 * @default false
++	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
++	 * @ignore
+ 	 */
+ 	__next40pxDefaultSize?: boolean;
+ };
+diff --git a/packages/components/src/validated-form-controls/components/text-control.tsx b/packages/components/src/validated-form-controls/components/text-control.tsx
+index 5e15d935303425..ca6d5b5a06ca2a 100644
+--- a/packages/components/src/validated-form-controls/components/text-control.tsx
++++ b/packages/components/src/validated-form-controls/components/text-control.tsx
+@@ -17,11 +17,7 @@ const UnforwardedValidatedTextControl = (
+ 		customValidity,
+ 		markWhenOptional,
+ 		...restProps
+-	}: Omit<
+-		React.ComponentProps< typeof TextControl >,
+-		'__next40pxDefaultSize'
+-	> &
+-		ValidatedControlProps,
++	}: React.ComponentProps< typeof TextControl > & ValidatedControlProps,
+ 	forwardedRef: React.ForwardedRef< HTMLInputElement >
+ ) => {
+ 	const validityTargetRef = useRef< HTMLInputElement >( null );
+@@ -34,11 +30,7 @@ const UnforwardedValidatedTextControl = (
+ 			customValidity={ customValidity }
+ 			getValidityTarget={ () => validityTargetRef.current }
+ 		>
+-			<TextControl
+-				__next40pxDefaultSize
+-				ref={ mergedRefs }
+-				{ ...restProps }
+-			/>
++			<TextControl ref={ mergedRefs } { ...restProps } />
+ 		</ControlWithError>
+ 	);
+ };
+diff --git a/packages/connectors/src/connector-item.tsx b/packages/connectors/src/connector-item.tsx
+index 35908bb32ea2f8..8be97371363c92 100644
+--- a/packages/connectors/src/connector-item.tsx
++++ b/packages/connectors/src/connector-item.tsx
+@@ -197,7 +197,6 @@ export function DefaultConnectorSettings( {
+ 			}
+ 		>
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label={ __( 'API Key' ) }
+ 				value={ apiKey }
+ 				onChange={ ( value ) => {
+diff --git a/packages/core-data/README.md b/packages/core-data/README.md
+index a7f26aef396228..3feb3f2f97b996 100644
+--- a/packages/core-data/README.md
++++ b/packages/core-data/README.md
+@@ -1134,7 +1134,6 @@ function PageRenameForm( { id } ) {
+ 	return (
+ 		<form onSubmit={ onRename }>
+ 			<TextControl
+-				__next40pxDefaultSize
+ 				label={ __( 'Name' ) }
+ 				value={ page.editedRecord.title }
+ 				onChange={ setTitle }
+diff --git a/packages/core-data/src/hooks/use-entity-record.ts b/packages/core-data/src/hooks/use-entity-record.ts
+index 7b6a7b625f1d66..cf01615a5becea 100644
+--- a/packages/core-data/src/hooks/use-entity-record.ts
++++ b/packages/core-data/src/hooks/use-entity-record.ts
+@@ -131,7 +131,6 @@ const EMPTY_OBJECT = {};
+  * 	return (
+  * 		<form onSubmit={ onRename }>
+  * 			<TextControl
+- *				__next40pxDefaultSize
+  * 				label={ __( 'Name' ) }
+  * 				value={ page.editedRecord.title }
+  * 				onChange={ setTitle }
+diff --git a/packages/e2e-tests/plugins/observe-typing/index.js b/packages/e2e-tests/plugins/observe-typing/index.js
+index fbfb6a5de757d9..817a4038554c4d 100644
+--- a/packages/e2e-tests/plugins/observe-typing/index.js
++++ b/packages/e2e-tests/plugins/observe-typing/index.js
+@@ -33,7 +33,6 @@
+ 								label: 'Dropdown field',
+ 								value,
+ 								onChange: setValue,
+-								__next40pxDefaultSize: true,
+ 							} ),
+ 					} )
+ 				),
+diff --git a/packages/edit-post/src/components/init-pattern-modal/index.js b/packages/edit-post/src/components/init-pattern-modal/index.js
+index 9fca2af18f900c..27da3587007619 100644
+--- a/packages/edit-post/src/components/init-pattern-modal/index.js
++++ b/packages/edit-post/src/components/init-pattern-modal/index.js
+@@ -51,7 +51,6 @@ export default function InitPatternModal() {
+ 						onChange={ setTitle }
+ 						placeholder={ __( 'My pattern' ) }
+ 						className="patterns-create-modal__name-input"
+-						__next40pxDefaultSize
+ 					/>
+ 					<ToggleControl
+ 						label={ _x( 'Synced', 'pattern (singular)' ) }
+diff --git a/packages/edit-site/src/components/add-new-post/index.js b/packages/edit-site/src/components/add-new-post/index.js
+index b686ab9f91783a..077f3543040d3b 100644
+--- a/packages/edit-site/src/components/add-new-post/index.js
++++ b/packages/edit-site/src/components/add-new-post/index.js
+@@ -98,7 +98,6 @@ export default function AddNewPostModal( { postType, onSave, onClose } ) {
+ 			<form onSubmit={ createPost }>
+ 				<VStack spacing={ 4 }>
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Title' ) }
+ 						onChange={ setTitle }
+ 						placeholder={ __( 'No title' ) }
+diff --git a/packages/edit-site/src/components/add-new-template-legacy/add-custom-generic-template-modal-content.js b/packages/edit-site/src/components/add-new-template-legacy/add-custom-generic-template-modal-content.js
+index 8dc41c20c38a35..fcfd260199c385 100644
+--- a/packages/edit-site/src/components/add-new-template-legacy/add-custom-generic-template-modal-content.js
++++ b/packages/edit-site/src/components/add-new-template-legacy/add-custom-generic-template-modal-content.js
+@@ -52,7 +52,6 @@ function AddCustomGenericTemplateModalContent( { createTemplate, onBack } ) {
+ 		<form onSubmit={ onCreateTemplate }>
+ 			<VStack spacing={ 6 }>
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Name' ) }
+ 					value={ title }
+ 					onChange={ setTitle }
+diff --git a/packages/edit-site/src/components/add-new-template/add-custom-generic-template-modal-content.js b/packages/edit-site/src/components/add-new-template/add-custom-generic-template-modal-content.js
+index 8dc41c20c38a35..fcfd260199c385 100644
+--- a/packages/edit-site/src/components/add-new-template/add-custom-generic-template-modal-content.js
++++ b/packages/edit-site/src/components/add-new-template/add-custom-generic-template-modal-content.js
+@@ -52,7 +52,6 @@ function AddCustomGenericTemplateModalContent( { createTemplate, onBack } ) {
+ 		<form onSubmit={ onCreateTemplate }>
+ 			<VStack spacing={ 6 }>
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Name' ) }
+ 					value={ title }
+ 					onChange={ setTitle }
+diff --git a/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/rename-modal.js b/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/rename-modal.js
+index 23d8570a8097c9..aa0c197eb87d44 100644
+--- a/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/rename-modal.js
++++ b/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/rename-modal.js
+@@ -31,7 +31,6 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
+ 			<form className="sidebar-navigation__rename-modal-form">
+ 				<VStack spacing="3">
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						value={ editedMenuTitle }
+ 						placeholder={ __( 'Navigation title' ) }
+ 						onChange={ setEditedMenuTitle }
+diff --git a/packages/editor/src/components/post-publish-panel/postpublish.js b/packages/editor/src/components/post-publish-panel/postpublish.js
+index 9ebdb895a8d5bf..3f6404d3127667 100644
+--- a/packages/editor/src/components/post-publish-panel/postpublish.js
++++ b/packages/editor/src/components/post-publish-panel/postpublish.js
+@@ -136,7 +136,6 @@ export default function PostPublishPanelPostpublish( {
+ 				</p>
+ 				<div className="post-publish-panel__postpublish-post-address-container">
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						className="post-publish-panel__postpublish-post-address"
+ 						readOnly
+ 						label={ sprintf(
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index 10609660170311..cc0e8950711cd7 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -134,7 +134,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+                   post address
+                 </label>
+                 <input
+-                  class="components-text-control__input is-next-40px-default-size"
++                  class="components-text-control__input"
+                   id="inspector-text-control-0"
+                   readonly=""
+                   type="text"
+@@ -362,7 +362,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+                   post address
+                 </label>
+                 <input
+-                  class="components-text-control__input is-next-40px-default-size"
++                  class="components-text-control__input"
+                   id="inspector-text-control-1"
+                   readonly=""
+                   type="text"
+diff --git a/packages/editor/src/components/post-status/index.js b/packages/editor/src/components/post-status/index.js
+index e984363e185a3e..8476b8de126b09 100644
+--- a/packages/editor/src/components/post-status/index.js
++++ b/packages/editor/src/components/post-status/index.js
+@@ -246,7 +246,6 @@ export default function PostStatus() {
+ 														) }
+ 														type="text"
+ 														id={ passwordInputId }
+-														__next40pxDefaultSize
+ 														maxLength={ 255 }
+ 													/>
+ 												</div>
+diff --git a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+index d4190c4496fd45..1f9ced1e265207 100644
+--- a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
++++ b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+@@ -462,7 +462,6 @@ export function HierarchicalTermSelector( { slug } ) {
+ 				<form onSubmit={ onAddTerm }>
+ 					<Flex direction="column" gap="4">
+ 						<TextControl
+-							__next40pxDefaultSize
+ 							className="editor-post-taxonomies__hierarchical-terms-input"
+ 							label={ newTermLabel }
+ 							value={ formName }
+diff --git a/packages/editor/src/components/post-template/create-new-template-modal.js b/packages/editor/src/components/post-template/create-new-template-modal.js
+index cfd8c966a9162f..ee843270d4f451 100644
+--- a/packages/editor/src/components/post-template/create-new-template-modal.js
++++ b/packages/editor/src/components/post-template/create-new-template-modal.js
+@@ -121,7 +121,6 @@ export default function CreateNewTemplateModal( { onClose } ) {
+ 			<form onSubmit={ submit }>
+ 				<VStack spacing="3">
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Name' ) }
+ 						value={ title }
+ 						onChange={ setTitle }
+diff --git a/packages/editor/src/components/post-visibility/index.js b/packages/editor/src/components/post-visibility/index.js
+index 9e21dc936e550d..1ff8b5c40e2f7e 100644
+--- a/packages/editor/src/components/post-visibility/index.js
++++ b/packages/editor/src/components/post-visibility/index.js
+@@ -82,7 +82,6 @@ export default function PostVisibility( { onClose } ) {
+ 						placeholder={ __( 'Use a secure password' ) }
+ 						type="text"
+ 						id={ `editor-post-visibility__password-input-${ instanceId }` }
+-						__next40pxDefaultSize
+ 						maxLength={ 255 }
+ 					/>
+ 				) }
+diff --git a/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md b/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
+index 4bfe8699477196..c0b71194969e41 100644
+--- a/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
++++ b/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
+@@ -25,7 +25,6 @@ The following components are checked by this rule:
+ -   NumberControl
+ -   RangeControl
+ -   SelectControl
+--   TextControl
+ -   ToggleGroupControl
+ -   UnitControl
+ 
+diff --git a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+index e46db526155864..9d9b59a287ab4e 100644
+--- a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+@@ -125,7 +125,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
+ 					NumberControl,
+ 					RangeControl,
+ 					SelectControl,
+-					TextControl,
+ 					ToggleGroupControl,
+ 					UnitControl,
+ 				} from '@wordpress/components';
+@@ -145,7 +144,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
+ 					<NumberControl __next40pxDefaultSize />
+ 					<RangeControl __next40pxDefaultSize />
+ 					<SelectControl __next40pxDefaultSize />
+-					<TextControl __next40pxDefaultSize />
+ 					<ToggleGroupControl __next40pxDefaultSize />
+ 					<UnitControl __next40pxDefaultSize />
+ 				</>
+@@ -208,13 +206,13 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
+ 		// Aliased import without __next40pxDefaultSize
+ 		{
+ 			code: `
+-				import { TextControl as MyTextControl } from '@wordpress/components';
+-				<MyTextControl />
++				import { InputControl as MyInputControl } from '@wordpress/components';
++				<MyInputControl />
+ 			`,
+ 			errors: [
+ 				{
+ 					messageId: 'missingProp',
+-					data: { component: 'TextControl' },
++					data: { component: 'InputControl' },
+ 				},
+ 			],
+ 		},
+diff --git a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+index 059df6548faf2e..e470eab17d3cbb 100644
+--- a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+@@ -31,7 +31,6 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
+ 	'Radio',
+ 	'RangeControl',
+ 	'SelectControl',
+-	'TextControl',
+ 	'TreeSelect',
+ 	'ToggleGroupControl',
+ 	'UnitControl',
+diff --git a/packages/fields/src/actions/rename-post.tsx b/packages/fields/src/actions/rename-post.tsx
+index c8f6d3c774ee20..1a9decc993c550 100644
+--- a/packages/fields/src/actions/rename-post.tsx
++++ b/packages/fields/src/actions/rename-post.tsx
+@@ -119,7 +119,6 @@ const renamePost: Action< PostWithPermissions > = {
+ 			<form onSubmit={ onRename }>
+ 				<VStack spacing="5">
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Name' ) }
+ 						value={ title }
+ 						onChange={ setTitle }
+diff --git a/packages/fields/src/components/create-template-part-modal/index.tsx b/packages/fields/src/components/create-template-part-modal/index.tsx
+index 2d3357db7e422b..1c92934f30673e 100644
+--- a/packages/fields/src/components/create-template-part-modal/index.tsx
++++ b/packages/fields/src/components/create-template-part-modal/index.tsx
+@@ -195,7 +195,6 @@ export function CreateTemplatePartModalContents( {
+ 		>
+ 			<VStack spacing="4">
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Name' ) }
+ 					value={ title }
+ 					onChange={ setTitle }
+diff --git a/packages/fields/src/fields/password/edit.tsx b/packages/fields/src/fields/password/edit.tsx
+index 420882e2490020..3d6bdddfa07a23 100644
+--- a/packages/fields/src/fields/password/edit.tsx
++++ b/packages/fields/src/fields/password/edit.tsx
+@@ -55,7 +55,6 @@ function PasswordEdit( {
+ 						value={ field.getValue( { item: data } ) || '' }
+ 						placeholder={ __( 'Use a secure password' ) }
+ 						type="text"
+-						__next40pxDefaultSize
+ 						maxLength={ 255 }
+ 					/>
+ 				</div>
+diff --git a/packages/format-library/src/language/index.js b/packages/format-library/src/language/index.js
+index c53ea1730eb868..a330f736210a82 100644
+--- a/packages/format-library/src/language/index.js
++++ b/packages/format-library/src/language/index.js
+@@ -102,7 +102,6 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
+ 				} }
+ 			>
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label={ title }
+ 					value={ lang }
+ 					onChange={ ( val ) => setLang( val ) }
+diff --git a/packages/format-library/src/math/index.js b/packages/format-library/src/math/index.js
+index d3500f0dedfec1..aeb7bdcd05543b 100644
+--- a/packages/format-library/src/math/index.js
++++ b/packages/format-library/src/math/index.js
+@@ -96,7 +96,6 @@ function InlineUI( {
+ 			<div style={ { minWidth: '300px', padding: '4px' } }>
+ 				<Stack direction="column" gap="xs">
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						hideLabelFromVision
+ 						label={ __( 'LaTeX math syntax' ) }
+ 						value={ latex }
+diff --git a/packages/patterns/src/components/allow-overrides-modal.js b/packages/patterns/src/components/allow-overrides-modal.js
+index f8b30ce5462b67..1e19cbb53cb8f8 100644
+--- a/packages/patterns/src/components/allow-overrides-modal.js
++++ b/packages/patterns/src/components/allow-overrides-modal.js
+@@ -61,7 +61,6 @@ export function AllowOverridesModal( {
+ 						) }
+ 					</Text>
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						value={ editedBlockName }
+ 						label={ __( 'Name' ) }
+ 						help={ __(
+diff --git a/packages/patterns/src/components/create-pattern-modal.js b/packages/patterns/src/components/create-pattern-modal.js
+index 73d6cdd070a6dc..987d33efcfdeae 100644
+--- a/packages/patterns/src/components/create-pattern-modal.js
++++ b/packages/patterns/src/components/create-pattern-modal.js
+@@ -121,7 +121,6 @@ export function CreatePatternModalContents( {
+ 					onChange={ setTitle }
+ 					placeholder={ __( 'My pattern' ) }
+ 					className="patterns-create-modal__name-input"
+-					__next40pxDefaultSize
+ 				/>
+ 				<CategorySelector
+ 					categoryTerms={ categoryTerms }
+diff --git a/packages/patterns/src/components/rename-pattern-category-modal.js b/packages/patterns/src/components/rename-pattern-category-modal.js
+index d0c3cfa34a7d63..925634f3c2e19e 100644
+--- a/packages/patterns/src/components/rename-pattern-category-modal.js
++++ b/packages/patterns/src/components/rename-pattern-category-modal.js
+@@ -132,7 +132,6 @@ export default function RenamePatternCategoryModal( {
+ 					<Stack direction="column" gap="sm">
+ 						<TextControl
+ 							ref={ textControlRef }
+-							__next40pxDefaultSize
+ 							label={ __( 'Name' ) }
+ 							value={ name }
+ 							onChange={ onChange }
+diff --git a/packages/patterns/src/components/rename-pattern-modal.js b/packages/patterns/src/components/rename-pattern-modal.js
+index 24e52b9da008d6..983132353b7797 100644
+--- a/packages/patterns/src/components/rename-pattern-modal.js
++++ b/packages/patterns/src/components/rename-pattern-modal.js
+@@ -93,7 +93,6 @@ export default function RenamePatternModal( {
+ 			<form onSubmit={ onRename }>
+ 				<Stack direction="column" gap="lg">
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Name' ) }
+ 						value={ name }
+ 						onChange={ setName }
+diff --git a/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js b/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
+index b85cc95a851713..d19848472cf75f 100644
+--- a/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
++++ b/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
+@@ -169,7 +169,6 @@ export default function ReusableBlockConvertButton( {
+ 					>
+ 						<VStack spacing="5">
+ 							<TextControl
+-								__next40pxDefaultSize
+ 								label={ __( 'Name' ) }
+ 								value={ title }
+ 								onChange={ setTitle }
+diff --git a/routes/guidelines/components/block-guideline-modal.tsx b/routes/guidelines/components/block-guideline-modal.tsx
+index ef0dbb2cdf09f0..7b599069620a90 100644
+--- a/routes/guidelines/components/block-guideline-modal.tsx
++++ b/routes/guidelines/components/block-guideline-modal.tsx
+@@ -140,7 +140,6 @@ export default function BlockGuidelineModal( {
+ 			<VStack spacing={ 4 }>
+ 				{ isEditing ? (
+ 					<TextControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Block' ) }
+ 						value={ selectedBlockLabel }
+ 						onChange={ () => {} }
+diff --git a/routes/navigation-list/add-navigation.tsx b/routes/navigation-list/add-navigation.tsx
+index 8e34295c161401..53a3a135d85d01 100644
+--- a/routes/navigation-list/add-navigation.tsx
++++ b/routes/navigation-list/add-navigation.tsx
+@@ -106,7 +106,6 @@ export const AddNavigationModal = ( {
+ 						label={ __( 'Name' ) }
+ 						placeholder={ __( 'Enter menu name' ) }
+ 						disabled={ isBusy }
+-						__next40pxDefaultSize
+ 					/>
+ 					<HStack justify="right" spacing={ 2 }>
+ 						<Button
+diff --git a/routes/template-list/add-new-template/add-custom-generic-template-modal-content.tsx b/routes/template-list/add-new-template/add-custom-generic-template-modal-content.tsx
+index 49a3b508a06e39..067756162485e8 100644
+--- a/routes/template-list/add-new-template/add-custom-generic-template-modal-content.tsx
++++ b/routes/template-list/add-new-template/add-custom-generic-template-modal-content.tsx
+@@ -63,7 +63,6 @@ function AddCustomGenericTemplateModalContent( {
+ 		<form onSubmit={ onCreateTemplate }>
+ 			<VStack spacing={ 6 }>
+ 				<TextControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Name' ) }
+ 					value={ title }
+ 					onChange={ setTitle }
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index 8694fab70d4fc1..30102223d34725 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -159,6 +159,12 @@ const restrictedSyntax = [
+ 		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
+ 		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
+ 	},
++	{
++		selector:
++			'JSXElement[openingElement.name.name="TextControl"] JSXAttribute[name.name="__next40pxDefaultSize"]',
++		message:
++			'The `__next40pxDefaultSize` prop is no longer needed on `TextControl`.',
++	},
+ 	{
+ 		selector:
+ 			'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',

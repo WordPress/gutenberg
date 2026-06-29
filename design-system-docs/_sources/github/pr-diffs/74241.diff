@@ -1,0 +1,775 @@
+diff --git a/packages/ui/src/form/primitives/index.ts b/packages/ui/src/form/primitives/index.ts
+new file mode 100644
+index 00000000000000..cf19813e8d1f26
+--- /dev/null
++++ b/packages/ui/src/form/primitives/index.ts
+@@ -0,0 +1 @@
++export * as Slider from './slider';
+diff --git a/packages/ui/src/form/primitives/slider/control.tsx b/packages/ui/src/form/primitives/slider/control.tsx
+new file mode 100644
+index 00000000000000..e4b02b9608df1a
+--- /dev/null
++++ b/packages/ui/src/form/primitives/slider/control.tsx
+@@ -0,0 +1,13 @@
++import { Slider as _Slider } from '@base-ui/react/slider';
++import { forwardRef } from '@wordpress/element';
++import type { SliderControlProps } from './types';
++
++/**
++ * The clickable, interactive part of the slider.
++ * Contains the track and thumb elements.
++ */
++export const Control = forwardRef< HTMLDivElement, SliderControlProps >(
++	function Control( props, ref ) {
++		return <_Slider.Control ref={ ref } { ...props } />;
++	}
++);
+diff --git a/packages/ui/src/form/primitives/slider/index.ts b/packages/ui/src/form/primitives/slider/index.ts
+new file mode 100644
+index 00000000000000..1cd7c3a4051e49
+--- /dev/null
++++ b/packages/ui/src/form/primitives/slider/index.ts
+@@ -0,0 +1,8 @@
++import { Root } from './root';
++import { Control } from './control';
++import { Track } from './track';
++import { Indicator } from './indicator';
++import { Thumb } from './thumb';
++import { Value } from './value';
++
++export { Root, Control, Track, Indicator, Thumb, Value };
+diff --git a/packages/ui/src/form/primitives/slider/indicator.tsx b/packages/ui/src/form/primitives/slider/indicator.tsx
+new file mode 100644
+index 00000000000000..e4910cb6663601
+--- /dev/null
++++ b/packages/ui/src/form/primitives/slider/indicator.tsx
+@@ -0,0 +1,21 @@
++import clsx from 'clsx';
++import { Slider as _Slider } from '@base-ui/react/slider';
++import { forwardRef } from '@wordpress/element';
++import sliderStyles from '../../../utils/css/slider.module.css';
++import type { SliderIndicatorProps } from './types';
++
++/**
++ * Visualizes the current value of the slider.
++ * Typically styled to show the filled portion of the track.
++ */
++export const Indicator = forwardRef< HTMLDivElement, SliderIndicatorProps >(
++	function Indicator( { className, ...restProps }, ref ) {
++		return (
++			<_Slider.Indicator
++				ref={ ref }
++				className={ clsx( sliderStyles.indicator, className ) }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/slider/root.tsx b/packages/ui/src/form/primitives/slider/root.tsx
+new file mode 100644
+index 00000000000000..02f4224c3066e2
+--- /dev/null
++++ b/packages/ui/src/form/primitives/slider/root.tsx
+@@ -0,0 +1,24 @@
++import clsx from 'clsx';
++import { Slider as _Slider } from '@base-ui/react/slider';
++import { forwardRef } from '@wordpress/element';
++import resetStyles from '../../../utils/css/resets.module.css';
++import type { SliderRootProps } from './types';
++
++/**
++ * A low-level slider component that provides a range input
++ * with accessible labeling support.
++ *
++ * The slider can be used standalone or prefer using a Field component
++ * for accessible label association.
++ */
++export const Root = forwardRef< HTMLDivElement, SliderRootProps >(
++	function Root( { className, ...restProps }, ref ) {
++		return (
++			<_Slider.Root
++				ref={ ref }
++				className={ clsx( resetStyles[ 'box-sizing' ], className ) }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/slider/stories/index.story.tsx b/packages/ui/src/form/primitives/slider/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..02bb2ac9297349
+--- /dev/null
++++ b/packages/ui/src/form/primitives/slider/stories/index.story.tsx
+@@ -0,0 +1,238 @@
++import type { Meta, StoryObj } from '@storybook/react';
++import { useState } from '@wordpress/element';
++import '@wordpress/theme/design-tokens.css';
++import * as Slider from '../index';
++import * as Field from '../../field';
++
++const meta: Meta< typeof Slider.Root > = {
++	title: 'Design System/Components/Form/Primitives/Slider',
++	component: Slider.Root,
++	subcomponents: {
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Control: Slider.Control,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Track: Slider.Track,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Indicator: Slider.Indicator,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Thumb: Slider.Thumb,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Value: Slider.Value,
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof Slider.Root >;
++
++/**
++ * A basic slider with a single thumb.
++ */
++export const Default: Story = {
++	args: {
++		defaultValue: 50,
++		min: 0,
++		max: 100,
++		step: 1,
++		children: (
++			<>
++				<Slider.Value />
++				<Slider.Control>
++					<Slider.Track>
++						<Slider.Indicator />
++						<Slider.Thumb />
++					</Slider.Track>
++				</Slider.Control>
++			</>
++		),
++	},
++};
++
++/**
++ * A controlled slider with external state management.
++ */
++export const Controlled: Story = {
++	render: () => {
++		const ControlledSlider = () => {
++			const [ value, setValue ] = useState< number >( 50 );
++
++			return (
++				<>
++					<Slider.Root
++						value={ value }
++						onValueChange={ ( newValue ) =>
++							setValue( newValue as number )
++						}
++					>
++						<Slider.Value />
++						<Slider.Control>
++							<Slider.Track>
++								<Slider.Indicator />
++								<Slider.Thumb />
++							</Slider.Track>
++						</Slider.Control>
++					</Slider.Root>
++					<div>
++						<button onClick={ () => setValue( 0 ) }>
++							Set to 0
++						</button>
++						<button onClick={ () => setValue( 50 ) }>
++							Set to 50
++						</button>
++						<button onClick={ () => setValue( 100 ) }>
++							Set to 100
++						</button>
++					</div>
++				</>
++			);
++		};
++
++		return <ControlledSlider />;
++	},
++};
++
++/**
++ * A range slider with two thumbs for selecting a range of values.
++ */
++export const RangeSlider: Story = {
++	args: {
++		defaultValue: [ 25, 75 ],
++		min: 0,
++		max: 100,
++		step: 1,
++		children: (
++			<>
++				<Slider.Value>
++					{ ( formattedValues: readonly string[] ) =>
++						formattedValues.join( ' – ' )
++					}
++				</Slider.Value>
++				<Slider.Control>
++					<Slider.Track>
++						<Slider.Indicator />
++						<Slider.Thumb index={ 0 } />
++						<Slider.Thumb index={ 1 } />
++					</Slider.Track>
++				</Slider.Control>
++			</>
++		),
++	},
++};
++
++/**
++ * A slider with custom step values.
++ */
++export const WithSteps: Story = {
++	args: {
++		defaultValue: 50,
++		min: 0,
++		max: 100,
++		step: 10,
++		largeStep: 25,
++		children: (
++			<>
++				<Slider.Value />
++				<Slider.Control>
++					<Slider.Track>
++						<Slider.Indicator />
++						<Slider.Thumb />
++					</Slider.Track>
++				</Slider.Control>
++			</>
++		),
++	},
++};
++
++/**
++ * A disabled slider.
++ */
++export const Disabled: Story = {
++	args: {
++		defaultValue: 50,
++		disabled: true,
++		children: (
++			<>
++				<Slider.Value />
++				<Slider.Control>
++					<Slider.Track>
++						<Slider.Indicator />
++						<Slider.Thumb />
++					</Slider.Track>
++				</Slider.Control>
++			</>
++		),
++	},
++};
++
++/**
++ * A vertical slider.
++ */
++export const Vertical: Story = {
++	args: {
++		defaultValue: 50,
++		orientation: 'vertical',
++		children: (
++			<>
++				<Slider.Value />
++				<Slider.Control>
++					<Slider.Track>
++						<Slider.Indicator />
++						<Slider.Thumb />
++					</Slider.Track>
++				</Slider.Control>
++			</>
++		),
++	},
++};
++
++/**
++ * A slider wrapped in a Field component for accessible labeling.
++ * This is the recommended pattern for form controls.
++ */
++export const WithField: Story = {
++	render: () => (
++		<Field.Root name="volume">
++			<Field.Label>Volume</Field.Label>
++			<Field.Control
++				render={
++					<Slider.Root defaultValue={ 50 }>
++						<Slider.Value />
++						<Slider.Control>
++							<Slider.Track>
++								<Slider.Indicator />
++								<Slider.Thumb />
++							</Slider.Track>
++						</Slider.Control>
++					</Slider.Root>
++				}
++			/>
++			<Field.Description>Adjust the volume level.</Field.Description>
++		</Field.Root>
++	),
++};
++
++/**
++ * A slider with custom value formatting using Intl.NumberFormat options.
++ */
++export const CustomFormat: Story = {
++	args: {
++		defaultValue: 50,
++		min: 0,
++		max: 100,
++		format: {
++			style: 'percent',
++			minimumFractionDigits: 0,
++			maximumFractionDigits: 0,
++		},
++		children: (
++			<>
++				<Slider.Value />
++				<Slider.Control>
++					<Slider.Track>
++						<Slider.Indicator />
++						<Slider.Thumb />
++					</Slider.Track>
++				</Slider.Control>
++			</>
++		),
++	},
++};
+diff --git a/packages/ui/src/form/primitives/slider/test/index.test.tsx b/packages/ui/src/form/primitives/slider/test/index.test.tsx
+new file mode 100644
+index 00000000000000..3b805e3353fb5b
+--- /dev/null
++++ b/packages/ui/src/form/primitives/slider/test/index.test.tsx
+@@ -0,0 +1,110 @@
++import { render, screen } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import * as Slider from '../index';
++
++describe( 'Slider', () => {
++	it( 'forwards ref', () => {
++		const rootRef = createRef< HTMLDivElement >();
++		const controlRef = createRef< HTMLDivElement >();
++		const trackRef = createRef< HTMLDivElement >();
++		const indicatorRef = createRef< HTMLDivElement >();
++		const thumbRef = createRef< HTMLDivElement >();
++		const valueRef = createRef< HTMLOutputElement >();
++
++		render(
++			<Slider.Root ref={ rootRef } defaultValue={ 50 }>
++				<Slider.Value ref={ valueRef } />
++				<Slider.Control ref={ controlRef }>
++					<Slider.Track ref={ trackRef }>
++						<Slider.Indicator ref={ indicatorRef } />
++						<Slider.Thumb ref={ thumbRef } />
++					</Slider.Track>
++				</Slider.Control>
++			</Slider.Root>
++		);
++
++		expect( rootRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( controlRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( trackRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( indicatorRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( thumbRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( valueRef.current ).toBeInstanceOf( HTMLOutputElement );
++	} );
++
++	it( 'renders with default value', () => {
++		render(
++			<Slider.Root defaultValue={ 50 }>
++				<Slider.Value data-testid="slider-value" />
++				<Slider.Control>
++					<Slider.Track>
++						<Slider.Indicator />
++						<Slider.Thumb />
++					</Slider.Track>
++				</Slider.Control>
++			</Slider.Root>
++		);
++
++		expect( screen.getByTestId( 'slider-value' ) ).toHaveTextContent(
++			'50'
++		);
++	} );
++
++	it( 'renders range slider with multiple thumbs', () => {
++		const rootRef = createRef< HTMLDivElement >();
++		const thumb1Ref = createRef< HTMLDivElement >();
++		const thumb2Ref = createRef< HTMLDivElement >();
++
++		render(
++			<Slider.Root ref={ rootRef } defaultValue={ [ 25, 75 ] }>
++				<Slider.Control>
++					<Slider.Track>
++						<Slider.Indicator />
++						<Slider.Thumb ref={ thumb1Ref } index={ 0 } />
++						<Slider.Thumb ref={ thumb2Ref } index={ 1 } />
++					</Slider.Track>
++				</Slider.Control>
++			</Slider.Root>
++		);
++
++		expect( rootRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( thumb1Ref.current ).toBeInstanceOf( HTMLDivElement );
++		expect( thumb2Ref.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++
++	it( 'renders with custom min and max', () => {
++		render(
++			<Slider.Root defaultValue={ 0 } min={ -100 } max={ 100 }>
++				<Slider.Value data-testid="slider-value" />
++				<Slider.Control>
++					<Slider.Track>
++						<Slider.Indicator />
++						<Slider.Thumb />
++					</Slider.Track>
++				</Slider.Control>
++			</Slider.Root>
++		);
++
++		expect( screen.getByTestId( 'slider-value' ) ).toHaveTextContent( '0' );
++	} );
++
++	it( 'applies custom className to root', () => {
++		render(
++			<Slider.Root
++				defaultValue={ 50 }
++				className="custom-slider"
++				data-testid="slider-root"
++			>
++				<Slider.Control>
++					<Slider.Track>
++						<Slider.Indicator />
++						<Slider.Thumb />
++					</Slider.Track>
++				</Slider.Control>
++			</Slider.Root>
++		);
++
++		expect( screen.getByTestId( 'slider-root' ) ).toHaveClass(
++			'custom-slider'
++		);
++	} );
++} );
+diff --git a/packages/ui/src/form/primitives/slider/thumb.tsx b/packages/ui/src/form/primitives/slider/thumb.tsx
+new file mode 100644
+index 00000000000000..b01caeb20c86bc
+--- /dev/null
++++ b/packages/ui/src/form/primitives/slider/thumb.tsx
+@@ -0,0 +1,21 @@
++import clsx from 'clsx';
++import { Slider as _Slider } from '@base-ui/react/slider';
++import { forwardRef } from '@wordpress/element';
++import sliderStyles from '../../../utils/css/slider.module.css';
++import type { SliderThumbProps } from './types';
++
++/**
++ * The draggable part of the slider at the tip of the indicator.
++ * Renders a div element with a nested hidden range input for accessibility.
++ */
++export const Thumb = forwardRef< HTMLDivElement, SliderThumbProps >(
++	function Thumb( { className, ...restProps }, ref ) {
++		return (
++			<_Slider.Thumb
++				ref={ ref }
++				className={ clsx( sliderStyles.thumb, className ) }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/slider/track.tsx b/packages/ui/src/form/primitives/slider/track.tsx
+new file mode 100644
+index 00000000000000..e03f7b3017b874
+--- /dev/null
++++ b/packages/ui/src/form/primitives/slider/track.tsx
+@@ -0,0 +1,20 @@
++import clsx from 'clsx';
++import { Slider as _Slider } from '@base-ui/react/slider';
++import { forwardRef } from '@wordpress/element';
++import sliderStyles from '../../../utils/css/slider.module.css';
++import type { SliderTrackProps } from './types';
++
++/**
++ * Contains the slider indicator and represents the entire range of the slider.
++ */
++export const Track = forwardRef< HTMLDivElement, SliderTrackProps >(
++	function Track( { className, ...restProps }, ref ) {
++		return (
++			<_Slider.Track
++				ref={ ref }
++				className={ clsx( sliderStyles.track, className ) }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/slider/types.ts b/packages/ui/src/form/primitives/slider/types.ts
+new file mode 100644
+index 00000000000000..10cd43e67aa237
+--- /dev/null
++++ b/packages/ui/src/form/primitives/slider/types.ts
+@@ -0,0 +1,137 @@
++import type { Slider } from '@base-ui/react/slider';
++import type { ComponentProps } from '../../../utils/types';
++
++export type SliderRootProps = ComponentProps< typeof Slider.Root > & {
++	children?: Slider.Root.Props[ 'children' ];
++	/**
++	 * The uncontrolled value of the slider when initially rendered.
++	 * Use when you do not need to control its value.
++	 */
++	defaultValue?: Slider.Root.Props[ 'defaultValue' ];
++	/**
++	 * The controlled value of the slider.
++	 * Must be used in conjunction with `onValueChange`.
++	 */
++	value?: Slider.Root.Props[ 'value' ];
++	/**
++	 * Callback function invoked when the slider value changes.
++	 * Use when you need to control the value.
++	 */
++	onValueChange?: Slider.Root.Props[ 'onValueChange' ];
++	/**
++	 * Callback function invoked when the slider value is committed
++	 * (e.g., when the thumb is released after dragging).
++	 */
++	onValueCommitted?: Slider.Root.Props[ 'onValueCommitted' ];
++	/**
++	 * The minimum value of the slider.
++	 *
++	 * @default 0
++	 */
++	min?: Slider.Root.Props[ 'min' ];
++	/**
++	 * The maximum value of the slider.
++	 *
++	 * @default 100
++	 */
++	max?: Slider.Root.Props[ 'max' ];
++	/**
++	 * The step increment of the slider.
++	 *
++	 * @default 1
++	 */
++	step?: Slider.Root.Props[ 'step' ];
++	/**
++	 * The large step increment of the slider when pressing Page Up/Down.
++	 *
++	 * @default 10
++	 */
++	largeStep?: Slider.Root.Props[ 'largeStep' ];
++	/**
++	 * The orientation of the slider.
++	 *
++	 * @default 'horizontal'
++	 */
++	orientation?: Slider.Root.Props[ 'orientation' ];
++	/**
++	 * The name of the slider for form submission.
++	 */
++	name?: Slider.Root.Props[ 'name' ];
++	/**
++	 * Controls how the thumb aligns with the track.
++	 *
++	 * - `'center'`: Thumb center aligns with the track edge at min/max values.
++	 * - `'edge'`: Thumb edge aligns with the track edge at min/max values.
++	 *
++	 * @default 'center'
++	 */
++	thumbAlignment?: Slider.Root.Props[ 'thumbAlignment' ];
++	/**
++	 * Controls how thumbs behave when they collide.
++	 *
++	 * - `'push'`: Thumbs push each other when they collide.
++	 * - `'swap'`: Thumbs swap positions when they collide.
++	 *
++	 * @default 'push'
++	 */
++	thumbCollisionBehavior?: Slider.Root.Props[ 'thumbCollisionBehavior' ];
++	/**
++	 * The minimum number of steps between values in a range slider.
++	 *
++	 * @default 0
++	 */
++	minStepsBetweenValues?: Slider.Root.Props[ 'minStepsBetweenValues' ];
++	/**
++	 * The locale for formatting the value.
++	 */
++	locale?: Slider.Root.Props[ 'locale' ];
++	/**
++	 * The format options for formatting the value.
++	 */
++	format?: Slider.Root.Props[ 'format' ];
++};
++
++export type SliderControlProps = ComponentProps< typeof Slider.Control > & {
++	children?: Slider.Control.Props[ 'children' ];
++};
++
++export type SliderTrackProps = ComponentProps< typeof Slider.Track > & {
++	children?: Slider.Track.Props[ 'children' ];
++};
++
++export type SliderIndicatorProps = ComponentProps< typeof Slider.Indicator > & {
++	children?: Slider.Indicator.Props[ 'children' ];
++};
++
++export type SliderThumbProps = ComponentProps< typeof Slider.Thumb > & {
++	children?: Slider.Thumb.Props[ 'children' ];
++	/**
++	 * The index of the thumb in a range slider.
++	 * Required for server-side rendering with multiple thumbs.
++	 */
++	index?: Slider.Thumb.Props[ 'index' ];
++	/**
++	 * A function that returns the accessible label for the thumb.
++	 */
++	getAriaLabel?: Slider.Thumb.Props[ 'getAriaLabel' ];
++	/**
++	 * A function that returns the accessible value text for the thumb.
++	 */
++	getAriaValueText?: Slider.Thumb.Props[ 'getAriaValueText' ];
++	/**
++	 * A ref to the hidden input element.
++	 */
++	inputRef?: Slider.Thumb.Props[ 'inputRef' ];
++	/**
++	 * Whether the thumb is disabled.
++	 */
++	disabled?: Slider.Thumb.Props[ 'disabled' ];
++};
++
++export type SliderValueProps = ComponentProps< typeof Slider.Value > & {
++	/**
++	 * A render function for custom value display.
++	 * Receives formatted values as strings and raw values as numbers.
++	 */
++	children?: Slider.Value.Props[ 'children' ];
++};
+diff --git a/packages/ui/src/form/primitives/slider/value.tsx b/packages/ui/src/form/primitives/slider/value.tsx
+new file mode 100644
+index 00000000000000..58acf1b515df5c
+--- /dev/null
++++ b/packages/ui/src/form/primitives/slider/value.tsx
+@@ -0,0 +1,21 @@
++import clsx from 'clsx';
++import { Slider as _Slider } from '@base-ui/react/slider';
++import { forwardRef } from '@wordpress/element';
++import sliderStyles from '../../../utils/css/slider.module.css';
++import type { SliderValueProps } from './types';
++
++/**
++ * Displays the current value of the slider as text.
++ * Renders an output element for accessibility.
++ */
++export const Value = forwardRef< HTMLOutputElement, SliderValueProps >(
++	function Value( { className, ...restProps }, ref ) {
++		return (
++			<_Slider.Value
++				ref={ ref }
++				className={ clsx( sliderStyles.value, className ) }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/utils/css/slider.module.css b/packages/ui/src/utils/css/slider.module.css
+new file mode 100644
+index 00000000000000..abd4dc3990b055
+--- /dev/null
++++ b/packages/ui/src/utils/css/slider.module.css
+@@ -0,0 +1,89 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.track {
++		position: relative;
++		display: block;
++		width: 100%;
++		height: 4px;
++		background-color: #ddd; /* COLORS.gray[300] */
++		border-radius: 9999px;
++		pointer-events: none;
++	}
++
++	.track[data-orientation='vertical'] {
++		width: 4px;
++		height: 150px;
++	}
++
++	.track[data-disabled] {
++		background-color: #ddd; /* COLORS.ui.backgroundDisabled */
++	}
++
++	.indicator {
++		position: absolute;
++		height: 4px;
++		background-color: var(--wp-admin-theme-color, #3858e9);
++		border-radius: 9999px;
++		pointer-events: none;
++	}
++
++	.indicator[data-orientation='vertical'] {
++		width: 4px;
++		height: auto;
++	}
++
++	.indicator[data-disabled] {
++		background-color: #949494; /* COLORS.gray[400] */
++	}
++
++	.thumb {
++		position: absolute;
++		width: 12px;
++		height: 12px;
++		background-color: var(--wp-admin-theme-color, #3858e9);
++		border-radius: 50%;
++		cursor: pointer;
++		outline: none;
++		pointer-events: auto;
++		box-shadow:
++			0 0 0 rgba(0, 0, 0, 0),
++			0 0 0 0.5px rgba(0, 0, 0, 0.1);
++	}
++
++	.thumb::before {
++		content: '';
++		position: absolute;
++		background-color: var(--wp-admin-theme-color, #3858e9);
++		opacity: 0;
++		border-radius: 50%;
++		height: 20px;
++		width: 20px;
++		top: -4px;
++		left: -4px;
++		transition: opacity 120ms ease;
++	}
++
++	.thumb:focus-visible::before,
++	.thumb[data-dragging]::before {
++		opacity: 0.4;
++	}
++
++	.thumb[data-disabled] {
++		cursor: not-allowed;
++		background-color: #949494; /* COLORS.gray[400] */
++	}
++
++	.thumb[data-disabled]::before {
++		display: none;
++	}
++
++	.value {
++		display: inline-block;
++		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
++			Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
++		font-size: 11px;
++		line-height: 1.4;
++		color: #1e1e1e;
++	}
++}

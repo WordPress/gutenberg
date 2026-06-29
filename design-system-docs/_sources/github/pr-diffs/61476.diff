@@ -1,0 +1,19 @@
+diff --git a/packages/base-styles/_mixins.scss b/packages/base-styles/_mixins.scss
+index a1de82c2081cc5..730fc6e9b4a8cb 100644
+--- a/packages/base-styles/_mixins.scss
++++ b/packages/base-styles/_mixins.scss
+@@ -317,10 +317,14 @@
+ 	border-radius: $radius-round;
+ 	width: $radio-input-size-sm;
+ 	height: $radio-input-size-sm;
++	min-width: $radio-input-size-sm;
++	max-width: $radio-input-size-sm;
+ 
+ 	@include break-small() {
+ 		height: $radio-input-size;
+ 		width: $radio-input-size;
++		min-width: $radio-input-size;
++		max-width: $radio-input-size;
+ 	}
+ 
+ 	&:checked::before {

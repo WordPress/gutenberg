@@ -1,0 +1,72 @@
+diff --git a/packages/base-styles/CHANGELOG.md b/packages/base-styles/CHANGELOG.md
+index 182721f7c9c13b..39f957feddf0a4 100644
+--- a/packages/base-styles/CHANGELOG.md
++++ b/packages/base-styles/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Breaking Changes
+ 
++-   Remove `.components-resizable-box__handle`, `.components-resizable-box__side-handle`, and `.components-resizable-box__corner-handle` from the `z-index()` helper ([#77620](https://github.com/WordPress/gutenberg/pull/77620)).
+ -   Remove `.components-form-toggle__input` from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619)).
+ -   Remove `.components-button {:focus or .is-primary}` from the `z-index()` helper ([#77621](https://github.com/WordPress/gutenberg/pull/77621)).
+ 
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index 9dc8b702838a78..011cf010eabf97 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -166,11 +166,6 @@ $z-layers: (
+ 	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
+ 	".components-tooltip": 1000002,
+ 
+-	// Make sure corner handles are above side handles for ResizableBox component
+-	".components-resizable-box__handle": 2,
+-	".components-resizable-box__side-handle": 2,
+-	".components-resizable-box__corner-handle": 2,
+-
+ 	// Make sure block manager sticky category titles appear above the options
+ 	".block-editor-block-manager__category-title": 1,
+ 	// And block manager sticky disabled block count is higher still
+diff --git a/packages/components/src/resizable-box/style.scss b/packages/components/src/resizable-box/style.scss
+index 8917c051074876..67e5a98f581cfd 100644
+--- a/packages/components/src/resizable-box/style.scss
++++ b/packages/components/src/resizable-box/style.scss
+@@ -1,7 +1,6 @@
+ @use "sass:math";
+ @use "@wordpress/base-styles/colors" as *;
+ @use "@wordpress/base-styles/variables" as *;
+-@use "@wordpress/base-styles/z-index" as *;
+ @use "../utils/theme-variables" as *;
+ 
+ $resize-handler-size: 15px;
+@@ -15,7 +14,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
+ 	height: $resize-handler-container-size;
+ 
+ 	// Elevate the resize handle above the focus style.
+-	z-index: z-index(".components-resizable-box__handle");
++	z-index: 2;
+ 
+ 	// Show the resize handle if set in props
+ 	.components-resizable-box__container.has-show-handle & {
+@@ -26,7 +25,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
+ 		position: relative;
+ 		width: 100%;
+ 		height: 100%;
+-		z-index: z-index(".components-resizable-box__handle");
++		z-index: 2;
+ 		outline: none;
+ 	}
+ }
+@@ -77,11 +76,11 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
+ 
+ // Show corner handles on top of side handles so they can be used
+ .components-resizable-box__side-handle {
+-	z-index: z-index(".components-resizable-box__side-handle");
++	z-index: 2;
+ }
+ 
+ .components-resizable-box__corner-handle {
+-	z-index: z-index(".components-resizable-box__corner-handle");
++	z-index: 2;
+ }
+ 
+ // Make horizontal side-handles full width

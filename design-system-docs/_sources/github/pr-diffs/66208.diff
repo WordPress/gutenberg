@@ -1,0 +1,54 @@
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index 926abc3e34b102..923c47726293ce 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -11,7 +11,7 @@ import { COLORS, CONFIG } from '../utils';
+ import { space } from '../utils/space';
+ import Icon from '../icon';
+ 
+-export const TabListWrapper = styled.div`
++export const StyledTabList = styled( Ariakit.TabList )`
+ 	display: flex;
+ 	align-items: stretch;
+ 	overflow-x: auto;
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index 512a3eb6724289..46cc0488bc67ae 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import * as Ariakit from '@ariakit/react';
+ import { useStoreState } from '@ariakit/react';
+ 
+ /**
+@@ -16,7 +15,7 @@ import { useMergeRefs } from '@wordpress/compose';
+  */
+ import type { TabListProps } from './types';
+ import { useTabsContext } from './context';
+-import { TabListWrapper } from './styles';
++import { StyledTabList } from './styles';
+ import type { WordPressComponentProps } from '../context';
+ import clsx from 'clsx';
+ import type { ElementOffsetRect } from '../utils/element-rect';
+@@ -109,10 +108,9 @@ export const TabList = forwardRef<
+ 	}
+ 
+ 	return (
+-		<Ariakit.TabList
++		<StyledTabList
+ 			ref={ refs }
+ 			store={ store }
+-			render={ <TabListWrapper /> }
+ 			onBlur={ onBlur }
+ 			tabIndex={ -1 }
+ 			data-select-on-move={ selectOnMove ? 'true' : 'false' }
+@@ -124,6 +122,6 @@ export const TabList = forwardRef<
+ 			) }
+ 		>
+ 			{ children }
+-		</Ariakit.TabList>
++		</StyledTabList>
+ 	);
+ } );

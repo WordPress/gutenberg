@@ -1,0 +1,10 @@
+diff --git a/packages/components/src/radio-control/README.md b/packages/components/src/radio-control/README.md
+index a1fd130d033a16..7acaca22cc07c6 100644
+--- a/packages/components/src/radio-control/README.md
++++ b/packages/components/src/radio-control/README.md
+@@ -119,4 +119,4 @@ The value property of the currently selected option.
+ 
+ -   To select one or more items from a set, use the `CheckboxControl` component.
+ -   To toggle a single setting on or off, use the `ToggleControl` component.
+--   To format as a button group, use the `RadioGroup` component.
++-   To format as a segmented button group, use the `ToggleGroupControl` component.

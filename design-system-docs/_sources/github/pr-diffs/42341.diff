@@ -1,0 +1,44 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 517f5e3dd33409..9bf6b3b4de816f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -31,6 +31,7 @@
+ -   `MenuItem`: Refactor away from `_.isString()` ([#42268](https://github.com/WordPress/gutenberg/pull/42268/)).
+ -   `Shortcut`: Refactor away from `_.isString()` ([#42268](https://github.com/WordPress/gutenberg/pull/42268/)).
+ -   `RangeControl`: Convert to TypeScript ([#40535](https://github.com/WordPress/gutenberg/pull/40535)).
++-   `ExternalLink`: Refactor away from Lodash ([#42341](https://github.com/WordPress/gutenberg/pull/42341/)).
+ 
+ ## 19.14.0 (2022-06-29)
+ 
+diff --git a/packages/components/src/external-link/index.tsx b/packages/components/src/external-link/index.tsx
+index 44d006a676e267..56e9a8494a184c 100644
+--- a/packages/components/src/external-link/index.tsx
++++ b/packages/components/src/external-link/index.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { compact, uniq } from 'lodash';
+ import type { ForwardedRef } from 'react';
+ 
+ /**
+@@ -28,9 +27,16 @@ function UnforwardedExternalLink(
+ 	ref: ForwardedRef< HTMLAnchorElement >
+ ) {
+ 	const { href, children, className, rel = '', ...additionalProps } = props;
+-	const optimizedRel = uniq(
+-		compact( [ ...rel.split( ' ' ), 'external', 'noreferrer', 'noopener' ] )
+-	).join( ' ' );
++	const optimizedRel = [
++		...new Set(
++			[
++				...rel.split( ' ' ),
++				'external',
++				'noreferrer',
++				'noopener',
++			].filter( Boolean )
++		),
++	].join( ' ' );
+ 	const classes = classnames( 'components-external-link', className );
+ 	return (
+ 		/* eslint-disable react/jsx-no-target-blank */

@@ -1,0 +1,65 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 68ce7e0320a3d1..edd0e49cea90d8 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `Link`: Fix text decoration on the `unstyled` variant when `openInNewTab` is enabled, and simplify new-tab icon markup ([#77420](https://github.com/WordPress/gutenberg/pull/77420)).
+ -   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: Fix broken focus-trap caused by ThemeProvider's `display: contents` and Base UI's `checkVisibility()` ([#77381](https://github.com/WordPress/gutenberg/pull/77381)).
+ -   `CollapsibleCard`: Fix missing keyboard focus ring on the header chevron icon when rendered inside wp-admin ([#77468](https://github.com/WordPress/gutenberg/pull/77468)).
++-   `Tabs`: Fix missing keyboard focus ring on the panel in Windows High Contrast mode when rendered inside wp-admin ([#77469](https://github.com/WordPress/gutenberg/pull/77469)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/ui/src/tabs/panel.tsx b/packages/ui/src/tabs/panel.tsx
+index 2396e7586e292b..f017ebd70f816c 100644
+--- a/packages/ui/src/tabs/panel.tsx
++++ b/packages/ui/src/tabs/panel.tsx
+@@ -2,7 +2,8 @@ import { forwardRef } from '@wordpress/element';
+ import clsx from 'clsx';
+ import { Tabs as _Tabs } from '@base-ui/react/tabs';
+ import { useRegisterPanel } from './context';
+-import styles from './style.module.css';
++import defenseStyles from '../utils/css/global-css-defense.module.css';
++import focusStyles from '../utils/css/focus.module.css';
+ import type { TabPanelProps } from './types';
+ 
+ /**
+@@ -18,7 +19,11 @@ export const Panel = forwardRef< HTMLDivElement, TabPanelProps >(
+ 		return (
+ 			<_Tabs.Panel
+ 				ref={ forwardedRef }
+-				className={ clsx( styles.tabpanel, className ) }
++				className={ clsx(
++					defenseStyles.div,
++					focusStyles[ 'outset-ring--focus-visible' ],
++					className
++				) }
+ 				{ ...otherProps }
+ 			/>
+ 		);
+diff --git a/packages/ui/src/tabs/style.module.css b/packages/ui/src/tabs/style.module.css
+index cbccb0042b1f44..245205570c8ce4 100644
+--- a/packages/ui/src/tabs/style.module.css
++++ b/packages/ui/src/tabs/style.module.css
+@@ -249,21 +249,4 @@
+ 			rotate: 180deg;
+ 		}
+ 	}
+-
+-	.tabpanel {
+-		&:focus {
+-			box-shadow: none;
+-			outline: none;
+-		}
+-
+-		&:focus-visible {
+-			box-shadow:
+-				0 0 0 var(--wpds-border-width-focus)
+-				var(--wpds-color-stroke-focus-brand);
+-
+-			/* Windows high contrast mode. */
+-			outline: 2px solid transparent;
+-			outline-offset: 0;
+-		}
+-	}
+ }

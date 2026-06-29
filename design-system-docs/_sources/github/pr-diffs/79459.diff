@@ -1,0 +1,13 @@
+diff --git a/packages/theme/src/use-theme-provider-styles.ts b/packages/theme/src/use-theme-provider-styles.ts
+index 249e765db83ca3..7e003139582420 100644
+--- a/packages/theme/src/use-theme-provider-styles.ts
++++ b/packages/theme/src/use-theme-provider-styles.ts
+@@ -23,6 +23,8 @@ import type { ThemeProviderProps } from './types';
+ 
+ type Entry = [ string, string ];
+ 
++// `getCachedAccentRamp` includes the `bgRamp` object reference in its cache key.
++// Without memoizing background ramps, accent ramp memoization would not work at all.
+ const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
+ const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
+ 

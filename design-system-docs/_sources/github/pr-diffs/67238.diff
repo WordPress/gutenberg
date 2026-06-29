@@ -1,0 +1,333 @@
+diff --git a/packages/block-editor/src/components/block-controls/slot.js b/packages/block-editor/src/components/block-controls/slot.js
+index ad800b49ab40db..9548b3e5cb0de8 100644
+--- a/packages/block-editor/src/components/block-controls/slot.js
++++ b/packages/block-editor/src/components/block-controls/slot.js
+@@ -31,9 +31,10 @@ export default function BlockControlsSlot( { group = 'default', ...props } ) {
+ 		[ toolbarState, contextState ]
+ 	);
+ 
+-	const Slot = groups[ group ]?.Slot;
+-	const fills = useSlotFills( Slot?.__unstableName );
+-	if ( ! Slot ) {
++	const slotFill = groups[ group ];
++	const fills = useSlotFills( slotFill.name );
++
++	if ( ! slotFill ) {
+ 		warning( `Unknown BlockControls group "${ group }" provided.` );
+ 		return null;
+ 	}
+@@ -42,6 +43,7 @@ export default function BlockControlsSlot( { group = 'default', ...props } ) {
+ 		return null;
+ 	}
+ 
++	const { Slot } = slotFill;
+ 	const slot = <Slot { ...props } bubblesVirtually fillProps={ fillProps } />;
+ 
+ 	if ( group === 'default' ) {
+diff --git a/packages/block-editor/src/components/block-info-slot-fill/index.js b/packages/block-editor/src/components/block-info-slot-fill/index.js
+index 8c9503313d754c..3592fc0424329b 100644
+--- a/packages/block-editor/src/components/block-info-slot-fill/index.js
++++ b/packages/block-editor/src/components/block-info-slot-fill/index.js
+@@ -1,19 +1,17 @@
+ /**
+  * WordPress dependencies
+  */
+-import { privateApis as componentsPrivateApis } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/components';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { unlock } from '../../lock-unlock';
+ import {
+ 	useBlockEditContext,
+ 	mayDisplayControlsKey,
+ } from '../block-edit/context';
+ 
+-const { createPrivateSlotFill } = unlock( componentsPrivateApis );
+-const { Fill, Slot } = createPrivateSlotFill( 'BlockInformation' );
++const { Fill, Slot } = createSlotFill( Symbol( 'BlockInformation' ) );
+ 
+ const BlockInfo = ( props ) => {
+ 	const context = useBlockEditContext();
+diff --git a/packages/block-editor/src/components/inspector-controls-tabs/position-controls-panel.js b/packages/block-editor/src/components/inspector-controls-tabs/position-controls-panel.js
+index 9a3670b5deb286..42a8597227dee9 100644
+--- a/packages/block-editor/src/components/inspector-controls-tabs/position-controls-panel.js
++++ b/packages/block-editor/src/components/inspector-controls-tabs/position-controls-panel.js
+@@ -53,9 +53,7 @@ const PositionControlsPanel = () => {
+ };
+ 
+ const PositionControls = () => {
+-	const fills = useSlotFills(
+-		InspectorControlsGroups.position.Slot.__unstableName
+-	);
++	const fills = useSlotFills( InspectorControlsGroups.position.name );
+ 	const hasFills = Boolean( fills && fills.length );
+ 
+ 	if ( ! hasFills ) {
+diff --git a/packages/block-editor/src/components/inspector-controls-tabs/use-inspector-controls-tabs.js b/packages/block-editor/src/components/inspector-controls-tabs/use-inspector-controls-tabs.js
+index 6a80d47f024816..c0655f4d85f3f4 100644
+--- a/packages/block-editor/src/components/inspector-controls-tabs/use-inspector-controls-tabs.js
++++ b/packages/block-editor/src/components/inspector-controls-tabs/use-inspector-controls-tabs.js
+@@ -46,18 +46,18 @@ export default function useInspectorControlsTabs( blockName ) {
+ 
+ 	// List View Tab: If there are any fills for the list group add that tab.
+ 	const listViewDisabled = useIsListViewTabDisabled( blockName );
+-	const listFills = useSlotFills( listGroup.Slot.__unstableName );
++	const listFills = useSlotFills( listGroup.name );
+ 	const hasListFills = ! listViewDisabled && !! listFills && listFills.length;
+ 
+ 	// Styles Tab: Add this tab if there are any fills for block supports
+ 	// e.g. border, color, spacing, typography, etc.
+ 	const styleFills = [
+-		...( useSlotFills( borderGroup.Slot.__unstableName ) || [] ),
+-		...( useSlotFills( colorGroup.Slot.__unstableName ) || [] ),
+-		...( useSlotFills( dimensionsGroup.Slot.__unstableName ) || [] ),
+-		...( useSlotFills( stylesGroup.Slot.__unstableName ) || [] ),
+-		...( useSlotFills( typographyGroup.Slot.__unstableName ) || [] ),
+-		...( useSlotFills( effectsGroup.Slot.__unstableName ) || [] ),
++		...( useSlotFills( borderGroup.name ) || [] ),
++		...( useSlotFills( colorGroup.name ) || [] ),
++		...( useSlotFills( dimensionsGroup.name ) || [] ),
++		...( useSlotFills( stylesGroup.name ) || [] ),
++		...( useSlotFills( typographyGroup.name ) || [] ),
++		...( useSlotFills( effectsGroup.name ) || [] ),
+ 	];
+ 	const hasStyleFills = styleFills.length;
+ 
+@@ -67,12 +67,12 @@ export default function useInspectorControlsTabs( blockName ) {
+ 	// the advanced controls slot as well to ensure they are rendered.
+ 	const advancedFills = [
+ 		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
+-		...( useSlotFills( bindingsGroup.Slot.__unstableName ) || [] ),
++		...( useSlotFills( bindingsGroup.name ) || [] ),
+ 	];
+ 
+ 	const settingsFills = [
+-		...( useSlotFills( defaultGroup.Slot.__unstableName ) || [] ),
+-		...( useSlotFills( positionGroup.Slot.__unstableName ) || [] ),
++		...( useSlotFills( defaultGroup.name ) || [] ),
++		...( useSlotFills( positionGroup.name ) || [] ),
+ 		...( hasListFills && hasStyleFills > 1 ? advancedFills : [] ),
+ 	];
+ 
+diff --git a/packages/block-editor/src/components/inspector-controls/slot.js b/packages/block-editor/src/components/inspector-controls/slot.js
+index cc32b1c88480ed..5c18dbd1f86bb8 100644
+--- a/packages/block-editor/src/components/inspector-controls/slot.js
++++ b/packages/block-editor/src/components/inspector-controls/slot.js
+@@ -34,14 +34,14 @@ export default function InspectorControlsSlot( {
+ 		);
+ 		group = __experimentalGroup;
+ 	}
+-	const Slot = groups[ group ]?.Slot;
+-	const fills = useSlotFills( Slot?.__unstableName );
++	const slotFill = groups[ group ];
++	const fills = useSlotFills( slotFill?.name );
+ 
+ 	const motionContextValue = useContext( MotionContext );
+ 
+ 	const computedFillProps = useMemo(
+ 		() => ( {
+-			...( fillProps ?? {} ),
++			...fillProps,
+ 			forwardedContext: [
+ 				...( fillProps?.forwardedContext ?? [] ),
+ 				[ MotionContext.Provider, { value: motionContextValue } ],
+@@ -50,7 +50,7 @@ export default function InspectorControlsSlot( {
+ 		[ motionContextValue, fillProps ]
+ 	);
+ 
+-	if ( ! Slot ) {
++	if ( ! slotFill ) {
+ 		warning( `Unknown InspectorControls group "${ group }" provided.` );
+ 		return null;
+ 	}
+@@ -59,6 +59,8 @@ export default function InspectorControlsSlot( {
+ 		return null;
+ 	}
+ 
++	const { Slot } = slotFill;
++
+ 	if ( label ) {
+ 		return (
+ 			<BlockSupportToolsPanel group={ group } label={ label }>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1d6ed8745cb5da..c91e56dfe43f1b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -31,6 +31,7 @@
+ ### Experimental
+ 
+ -   `SlotFill`: Remove registration API methods from return value of `__experimentalUseSlot` ([#67070](https://github.com/WordPress/gutenberg/pull/67070)).
++-   `SlotFill`: Remove the `createPrivateSlotFill` private API ([#67238](https://github.com/WordPress/gutenberg/pull/67238)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index bea16b719a463d..2ced100dc576be 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -2,7 +2,6 @@
+  * Internal dependencies
+  */
+ import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
+-import { createPrivateSlotFill } from './slot-fill';
+ import { Menu } from './menu';
+ import { ComponentsContext } from './context/context-system-provider';
+ import Theme from './theme';
+@@ -13,7 +12,6 @@ import { lock } from './lock-unlock';
+ export const privateApis = {};
+ lock( privateApis, {
+ 	__experimentalPopoverLegacyPositionToPlacement,
+-	createPrivateSlotFill,
+ 	ComponentsContext,
+ 	Tabs,
+ 	Theme,
+diff --git a/packages/components/src/slot-fill/README.md b/packages/components/src/slot-fill/README.md
+index 9059566deefdf4..3f14b9ccde9eeb 100644
+--- a/packages/components/src/slot-fill/README.md
++++ b/packages/components/src/slot-fill/README.md
+@@ -1,18 +1,18 @@
+-# Slot Fill
++# Slot/Fill
+ 
+-Slot and Fill are a pair of components which enable developers to render elsewhere in a React element tree, a pattern often referred to as "portal" rendering. It is a pattern for component extensibility, where a single Slot may be occupied by an indeterminate number of Fills elsewhere in the application.
++`Slot` and `Fill` are a pair of components which enable developers to render React UI elsewhere in a React element tree, a pattern often referred to as "portal" rendering. It is a pattern for component extensibility, where a single `Slot` may be occupied by multiple `Fill`s rendered in different parts of the application.
+ 
+-Slot Fill is heavily inspired by the [`react-slot-fill` library](https://github.com/camwest/react-slot-fill), but uses React's own portal rendering API.
++Slot/Fill was originally inspired by the [`react-slot-fill` library](https://github.com/camwest/react-slot-fill).
+ 
+ ## Usage
+ 
+-At the root of your application, you must render a `SlotFillProvider` which coordinates Slot and Fill rendering.
++At the root of your application, you must render a `SlotFillProvider` which coordinates `Slot` and `Fill` rendering.
+ 
+-Then, render a Slot component anywhere in your application, giving it a name.
++Then, render a `Slot` component anywhere in your application, giving it a `name`. The `name` is either a `string` or a symbol. Symbol names are useful for slots that are supposed to be private, accessible only to clients that have access to the symbol value.
+ 
+-Any Fill will automatically occupy this Slot space, even if rendered elsewhere in the application.
++Any `Fill` will render its UI in this `Slot` space, even if rendered elsewhere in the application.
+ 
+-You can either use the Fill component directly, or a wrapper component type as in the below example to abstract the slot name from consumer awareness.
++You can either use the `Fill` component directly, or create a wrapper component (as in the following example) to hide the slot name from the consumer.
+ 
+ ```jsx
+ import {
+@@ -43,7 +43,7 @@ const MySlotFillProvider = () => {
+ };
+ ```
+ 
+-There is also `createSlotFill` helper method which was created to simplify the process of matching the corresponding `Slot` and `Fill` components:
++There is also the `createSlotFill` helper method which was created to simplify the process of matching the corresponding `Slot` and `Fill` components:
+ 
+ ```jsx
+ const { Fill, Slot } = createSlotFill( 'Toolbar' );
+@@ -59,18 +59,27 @@ const Toolbar = () => (
+ 
+ ## Props
+ 
+-The `SlotFillProvider` component does not accept any props.
++The `SlotFillProvider` component does not accept any props (except `children`).
+ 
+ Both `Slot` and `Fill` accept a `name` string prop, where a `Slot` with a given `name` will render the `children` of any associated `Fill`s.
+ 
+-`Slot` accepts a `bubblesVirtually` prop which changes the event bubbling behaviour:
++`Slot` accepts a `bubblesVirtually` prop which changes the method how the `Fill` children are rendered. With `bubblesVirtually`, the `Fill` is rendered using a React portal. That affects the event bubbling and React context propagation behaviour:
+ 
+--   By default, events will bubble to their parents on the DOM hierarchy (native event bubbling)
+--   If `bubblesVirtually` is set to true, events will bubble to their virtual parent in the React elements hierarchy instead.
++### `bubblesVirtually=false`
+ 
+-`Slot` with `bubblesVirtually` set to true also accept optional `className` and `style` props to add to the slot container.
++-   events will bubble to their parents on the DOM hierarchy (native event bubbling)
++-   the React elements inside the `Fill` will be rendered with React context of the `Slot`
++-   renders the `Fill` elements directly, inside a `Fragment`, with no wrapper DOM element
+ 
+-`Slot` **without** `bubblesVirtually` accepts an optional `children` function prop, which takes `fills` as a param. It allows you to perform additional processing and wrap `fills` conditionally.
++### `bubblesVirtually=true`
++
++-   events will bubble to their virtual (React) parent in the React elements hierarchy
++-   the React elements inside the `Fill` will keep the React context of the `Fill` and its parents
++-   renders a wrapper DOM element inside which the `Fill` elements are rendered (used as an argument for React `createPortal`)
++
++`Slot` with `bubblesVirtually=true` renders a wrapper DOM element (a `div` by default) and accepts additional props that customize this element, like `className` or `style`. You can also replace the `div` with another element by passing an `as` prop.
++
++`Slot` **without** `bubblesVirtually` accepts an optional `children` prop, which is a function that receives `fills` array as a param. It allows you to perform additional processing: render a placeholder when there are no fills, or render a wrapper only when there are fills.
+ 
+ _Example_:
+ 
+@@ -90,7 +99,9 @@ const Toolbar = ( { isMobile } ) => (
+ );
+ ```
+ 
+-Props can also be passed from a `Slot` to a `Fill` by using the prop `fillProps` on the `Slot`:
++Additional information (props) can also be passed from a `Slot` to a `Fill` by a combination of:
++1. Adding a `fillProps` prop to the `Slot`.
++2. Passing a function as `children` to the `Fill`. This function will receive the `fillProps` as an argument.
+ 
+ ```jsx
+ const { Fill, Slot } = createSlotFill( 'Toolbar' );
+diff --git a/packages/components/src/slot-fill/index.tsx b/packages/components/src/slot-fill/index.tsx
+index 03ed33a67f13b6..caf97091b67ac8 100644
+--- a/packages/components/src/slot-fill/index.tsx
++++ b/packages/components/src/slot-fill/index.tsx
+@@ -84,17 +84,15 @@ export function createSlotFill( key: SlotKey ) {
+ 		props: DistributiveOmit< SlotComponentProps, 'name' >
+ 	) => <Slot name={ key } { ...props } />;
+ 	SlotComponent.displayName = `${ baseName }Slot`;
++	/**
++	 * @deprecated 6.8.0
++	 * Please use `slotFill.name` instead of `slotFill.Slot.__unstableName`.
++	 */
+ 	SlotComponent.__unstableName = key;
+ 
+ 	return {
++		name: key,
+ 		Fill: FillComponent,
+ 		Slot: SlotComponent,
+ 	};
+ }
+-
+-export const createPrivateSlotFill = ( name: string ) => {
+-	const privateKey = Symbol( name );
+-	const privateSlotFill = createSlotFill( privateKey );
+-
+-	return { privateKey, ...privateSlotFill };
+-};
+diff --git a/packages/edit-site/src/components/editor-canvas-container/index.js b/packages/edit-site/src/components/editor-canvas-container/index.js
+index ac1083e69abd7e..050d2e19585cc4 100644
+--- a/packages/edit-site/src/components/editor-canvas-container/index.js
++++ b/packages/edit-site/src/components/editor-canvas-container/index.js
+@@ -141,7 +141,7 @@ function EditorCanvasContainer( {
+ }
+ 
+ function useHasEditorCanvasContainer() {
+-	const fills = useSlotFills( EditorContentSlotFill.privateKey );
++	const fills = useSlotFills( EditorContentSlotFill.name );
+ 	return !! fills?.length;
+ }
+ 
+diff --git a/packages/editor/src/components/editor-interface/content-slot-fill.js b/packages/editor/src/components/editor-interface/content-slot-fill.js
+index 1aab394e87230f..ce1070b30da802 100644
+--- a/packages/editor/src/components/editor-interface/content-slot-fill.js
++++ b/packages/editor/src/components/editor-interface/content-slot-fill.js
+@@ -1,15 +1,10 @@
+ /**
+  * WordPress dependencies
+  */
+-import { privateApis as componentsPrivateApis } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/components';
+ 
+-/**
+- * Internal dependencies
+- */
+-import { unlock } from '../../lock-unlock';
+-
+-const { createPrivateSlotFill } = unlock( componentsPrivateApis );
+-const SLOT_FILL_NAME = 'EditCanvasContainerSlot';
+-const EditorContentSlotFill = createPrivateSlotFill( SLOT_FILL_NAME );
++const EditorContentSlotFill = createSlotFill(
++	Symbol( 'EditCanvasContainerSlot' )
++);
+ 
+ export default EditorContentSlotFill;

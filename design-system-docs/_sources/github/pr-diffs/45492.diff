@@ -1,0 +1,188 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 09572393d726d8..d82e26881534e5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,10 @@
+ 
+ -   `PaletteEditListView`: Update to ignore `exhaustive-deps` eslint rule ([#45467](https://github.com/WordPress/gutenberg/pull/45467)).
+ 
++### Experimental
++
++-   `ToggleGroupControl`: Only show enclosing border when `isBlock` and not `isDeselectable` ([#45492](https://github.com/WordPress/gutenberg/pull/45492)).
++
+ ## 22.0.0 (2022-11-02)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/toggle-group-control/stories/index.tsx b/packages/components/src/toggle-group-control/stories/index.tsx
+index 7a39597f192581..99784817643dca 100644
+--- a/packages/components/src/toggle-group-control/stories/index.tsx
++++ b/packages/components/src/toggle-group-control/stories/index.tsx
+@@ -81,6 +81,7 @@ Default.args = {
+ 		{ value: 'right', label: 'Right' },
+ 		{ value: 'justify', label: 'Justify' },
+ 	].map( mapPropsToOptionComponent ),
++	isBlock: true,
+ 	label: 'Label',
+ };
+ 
+@@ -121,6 +122,7 @@ WithIcons.args = {
+ 		{ value: 'uppercase', label: 'Uppercase', icon: formatUppercase },
+ 		{ value: 'lowercase', label: 'Lowercase', icon: formatLowercase },
+ 	].map( mapPropsToOptionIconComponent ),
++	isBlock: false,
+ };
+ 
+ /**
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 7cf90f8ff5144d..e8284a4fde11ef 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -41,6 +41,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ .emotion-8 {
+   background: #fff;
+   border: 1px solid transparent;
++  border-radius: 2px;
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+   display: -ms-inline-flexbox;
+@@ -51,8 +52,6 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+   -webkit-transition: -webkit-transform 100ms linear;
+   transition: transform 100ms linear;
+   min-height: 36px;
+-  border-color: #757575;
+-  border-radius: 2px;
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+@@ -377,6 +376,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+ .emotion-8 {
+   background: #fff;
+   border: 1px solid transparent;
++  border-radius: 2px;
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+   display: -ms-inline-flexbox;
+@@ -387,8 +387,6 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+   -webkit-transition: -webkit-transform 100ms linear;
+   transition: transform 100ms linear;
+   min-height: 36px;
+-  border-color: #757575;
+-  border-radius: 2px;
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/README.md b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+index cfbf6b12ed0b2d..1f5fe74bc1a9af 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+@@ -50,9 +50,16 @@ Determines if segments should be rendered with equal widths.
+ -   Required: No
+ -   Default: `false`
+ 
++### `isDeselectable`: `boolean`
++
++Whether an option can be deselected by clicking it again.
++
++-   Required: No
++-   Default: `false`
++
+ ### `isBlock`: `boolean`
+ 
+-Renders `ToggleGroupControl` as a (CSS) block element.
++Renders `ToggleGroupControl` as a (CSS) block element, spanning the entire width of the available space. This is the recommended style when the options are text-based and not icons.
+ 
+ -   Required: No
+ -   Default: `false`
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index a7630d23d37c22..ebd4893e37fb2f 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -50,7 +50,7 @@ function UnconnectedToggleGroupControl(
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+-				styles.ToggleGroupControl( { isDeselectable, size } ),
++				styles.ToggleGroupControl( { isBlock, isDeselectable, size } ),
+ 				isBlock && styles.block,
+ 				className
+ 			),
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+index 0c8da12bc10514..b48826e8ccbe84 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -11,14 +11,15 @@ import { CONFIG, COLORS, reduceMotion } from '../../utils';
+ import type { ToggleGroupControlProps } from '../types';
+ 
+ export const ToggleGroupControl = ( {
++	isBlock,
+ 	isDeselectable,
+ 	size,
+-}: {
+-	isDeselectable?: boolean;
++}: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
+ 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
+ } ) => css`
+ 	background: ${ COLORS.ui.background };
+ 	border: 1px solid transparent;
++	border-radius: ${ CONFIG.controlBorderRadius };
+ 	display: inline-flex;
+ 	min-width: 0;
+ 	padding: 2px;
+@@ -27,24 +28,29 @@ export const ToggleGroupControl = ( {
+ 	${ reduceMotion( 'transition' ) }
+ 
+ 	${ toggleGroupControlSize( size ) }
+-	${ ! isDeselectable && enclosingBorder }
++	${ ! isDeselectable && enclosingBorders( isBlock ) }
+ `;
+ 
+-const enclosingBorder = css`
+-	border-color: ${ COLORS.ui.border };
+-	border-radius: ${ CONFIG.controlBorderRadius };
++const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
++	const enclosingBorder = css`
++		border-color: ${ COLORS.ui.border };
++	`;
++
++	return css`
++		${ isBlock && enclosingBorder }
+ 
+-	&:hover {
+-		border-color: ${ COLORS.ui.borderHover };
+-	}
++		&:hover {
++			border-color: ${ COLORS.ui.borderHover };
++		}
+ 
+-	&:focus-within {
+-		border-color: ${ COLORS.ui.borderFocus };
+-		box-shadow: ${ CONFIG.controlBoxShadowFocus };
+-		outline: none;
+-		z-index: 1;
+-	}
+-`;
++		&:focus-within {
++			border-color: ${ COLORS.ui.borderFocus };
++			box-shadow: ${ CONFIG.controlBoxShadowFocus };
++			outline: none;
++			z-index: 1;
++		}
++	`;
++};
+ 
+ export const toggleGroupControlSize = (
+ 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 8b7345df853c70..4cc82bd3ac7b0c 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -92,7 +92,8 @@ export type ToggleGroupControlProps = Pick<
+ 	 */
+ 	isAdaptiveWidth?: boolean;
+ 	/**
+-	 * Renders `ToggleGroupControl` as a (CSS) block element.
++	 * Renders `ToggleGroupControl` as a (CSS) block element, spanning the entire width of
++	 * the available space. This is the recommended style when the options are text-based and not icons.
+ 	 *
+ 	 * @default false
+ 	 */

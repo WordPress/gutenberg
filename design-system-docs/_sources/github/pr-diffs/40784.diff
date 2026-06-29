@@ -1,0 +1,128 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 81ced7373fe2df..5c43f778a1d8ee 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -    The `Button` component now displays the label as the tooltip for icon only buttons. ([#40716](https://github.com/WordPress/gutenberg/pull/40716))
+ -    Use fake timers and fix usage of async methods from `@testing-library/user-event`. ([#40790](https://github.com/WordPress/gutenberg/pull/40790))
+ -    UnitControl: avoid calling onChange callback twice when unit changes. ([#40796](https://github.com/WordPress/gutenberg/pull/40796))
++-    `UnitControl`: show unit label when units prop has only one unit. ([#40784](https://github.com/WordPress/gutenberg/pull/40784))
+ -    `AnglePickerControl`: Fix closing of gradient popover when the angle control is clicked. ([#40735](https://github.com/WordPress/gutenberg/pull/40735))
+ 
+ ### Internal
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 3296438b04b8c4..440dc11b94e8b9 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -88,7 +88,7 @@ function UnforwardedUnitControl(
+ 	);
+ 
+ 	const [ unit, setUnit ] = useControlledState< string | undefined >(
+-		unitProp,
++		units.length === 1 ? units[ 0 ].value : unitProp,
+ 		{
+ 			initial: parsedUnit,
+ 			fallback: '',
+diff --git a/packages/components/src/unit-control/stories/index.tsx b/packages/components/src/unit-control/stories/index.tsx
+index 5fdace14370ea6..87dfd3a84c602d 100644
+--- a/packages/components/src/unit-control/stories/index.tsx
++++ b/packages/components/src/unit-control/stories/index.tsx
+@@ -109,40 +109,10 @@ TweakingTheNumberInput.args = {
+ /**
+  * When only one unit is available, the unit selection dropdown becomes static text.
+  */
+-export const WithSingleUnitControlled: ComponentStory<
++export const WithSingleUnit: ComponentStory<
+ 	typeof UnitControl
+-> = ( { onChange, ...args } ) => {
+-	// Starting value is `undefined`
+-	const [ value, setValue ] = useState< string | undefined >( undefined );
+-
+-	return (
+-		<div style={ { maxWidth: '100px' } }>
+-			<UnitControl
+-				{ ...args }
+-				value={ value }
+-				onChange={ ( v, extra ) => {
+-					setValue( v );
+-					onChange?.( v, extra );
+-				} }
+-			/>
+-		</div>
+-	);
+-};
+-WithSingleUnitControlled.args = {
+-	...Default.args,
+-	units: CSS_UNITS.slice( 0, 1 ),
+-};
+-
+-export const WithSingleUnitUncontrolled: ComponentStory<
+-	typeof UnitControl
+-> = ( args ) => {
+-	return (
+-		<div style={ { maxWidth: '100px' } }>
+-			<UnitControl { ...args } />
+-		</div>
+-	);
+-};
+-WithSingleUnitUncontrolled.args = {
++> = DefaultTemplate.bind( {} );
++WithSingleUnit.args = {
+ 	...Default.args,
+ 	units: CSS_UNITS.slice( 0, 1 ),
+ };
+diff --git a/packages/components/src/unit-control/test/index.tsx b/packages/components/src/unit-control/test/index.tsx
+index c57af0e75a7379..7c0f4ed99048d2 100644
+--- a/packages/components/src/unit-control/test/index.tsx
++++ b/packages/components/src/unit-control/test/index.tsx
+@@ -135,12 +135,7 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should render label if single units', () => {
+-			render(
+-				<UnitControl
+-					units={ [ { value: '%', label: '%' } ] }
+-					value="30%"
+-				/>
+-			);
++			render( <UnitControl units={ [ { value: '%', label: '%' } ] } /> );
+ 
+ 			const select = screen.queryByRole( 'combobox' );
+ 			const label = screen.getByText( '%' );
+@@ -319,6 +314,36 @@ describe( 'UnitControl', () => {
+ 				expect.anything()
+ 			);
+ 		} );
++
++		it( 'should update value correctly when typed and blurred when a single unit is passed', async () => {
++			const onChangeSpy = jest.fn();
++			render(
++				<>
++					<button>Click me</button>
++					<UnitControl
++						units={ [ { value: '%', label: '%' } ] }
++						onChange={ onChangeSpy }
++					/>
++				</>
++			);
++
++			const input = getInput();
++			await user.type( input, '62' );
++
++			expect( onChangeSpy ).toHaveBeenLastCalledWith(
++				'62%',
++				expect.anything()
++			);
++
++			// Start counting again calls to `onChangeSpy`.
++			onChangeSpy.mockClear();
++
++			// Clicking on the button should cause the `onBlur` callback to fire.
++			const button = screen.getByRole( 'button' );
++			await user.click( button );
++
++			expect( onChangeSpy ).not.toHaveBeenCalled();
++		} );
+ 	} );
+ 
+ 	describe( 'Unit', () => {

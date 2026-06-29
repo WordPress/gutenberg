@@ -1,0 +1,692 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 83166b09bad500..1ac67cd6d62a4e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Animate`: Convert to TypeScript ([#49243](https://github.com/WordPress/gutenberg/pull/49243)).
+ -   `CustomGradientPicker`: Convert to TypeScript ([#48929](https://github.com/WordPress/gutenberg/pull/48929)).
++-   `ColorPicker`: Convert to TypeScript ([#49214](https://github.com/WordPress/gutenberg/pull/49214)).
+ -   `GradientPicker`: Convert to TypeScript ([#48316](https://github.com/WordPress/gutenberg/pull/48316)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/color-picker/README.md b/packages/components/src/color-picker/README.md
+index 05ebf9a1abfac6..91656ca32851a9 100644
+--- a/packages/components/src/color-picker/README.md
++++ b/packages/components/src/color-picker/README.md
+@@ -31,13 +31,13 @@ The current color value to display in the picker. Must be a hex or hex8 string.
+ 
+ ### `onChange`: `(hex8Color: string) => void`
+ 
+-Fired when the color changes. Always passes a hex8 color string.
++Fired when the color changes. Always passes a hex or hex8 color string.
+ 
+ - Required: No
+ 
+ ### `enableAlpha`: `boolean`
+ 
+-Defaults to `false`. When `true` the color picker will display the alpha channel both in the bottom inputs as well as in the color picker itself.
++When `true` the color picker will display the alpha channel both in the bottom inputs as well as in the color picker itself.
+ 
+ - Required: No
+ - Default: `false`
+diff --git a/packages/components/src/color-picker/color-input.tsx b/packages/components/src/color-picker/color-input.tsx
+index c57077bb3e5fe6..486e1ea319c917 100644
+--- a/packages/components/src/color-picker/color-input.tsx
++++ b/packages/components/src/color-picker/color-input.tsx
+@@ -1,21 +1,10 @@
+-/**
+- * External dependencies
+- */
+-import type { Colord } from 'colord';
+-
+ /**
+  * Internal dependencies
+  */
+ import { RgbInput } from './rgb-input';
+ import { HslInput } from './hsl-input';
+ import { HexInput } from './hex-input';
+-
+-interface ColorInputProps {
+-	colorType: 'hsl' | 'hex' | 'rgb';
+-	color: Colord;
+-	onChange: ( nextColor: Colord ) => void;
+-	enableAlpha: boolean;
+-}
++import type { ColorInputProps } from './types';
+ 
+ export const ColorInput = ( {
+ 	colorType,
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index bb5caedb8082a0..852e0756b3cf16 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -15,11 +15,7 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import {
+-	useContextSystem,
+-	contextConnect,
+-	WordPressComponentProps,
+-} from '../ui/context';
++import { useContextSystem, contextConnect } from '../ui/context';
+ import {
+ 	ColorfulWrapper,
+ 	SelectControl,
+@@ -32,26 +28,18 @@ import { ColorInput } from './color-input';
+ import { Picker } from './picker';
+ import { useControlledValue } from '../utils/hooks';
+ 
+-import type { ColorType } from './types';
++import type { ColorPickerProps, ColorType } from './types';
+ 
+ extend( [ namesPlugin ] );
+ 
+-export interface ColorPickerProps {
+-	enableAlpha?: boolean;
+-	color?: string;
+-	onChange?: ( color: string ) => void;
+-	defaultValue?: string;
+-	copyFormat?: ColorType;
+-}
+-
+ const options = [
+ 	{ label: 'RGB', value: 'rgb' as const },
+ 	{ label: 'HSL', value: 'hsl' as const },
+ 	{ label: 'Hex', value: 'hex' as const },
+ ];
+ 
+-const ColorPicker = (
+-	props: WordPressComponentProps< ColorPickerProps, 'div', false >,
++const UnconnectedColorPicker = (
++	props: ColorPickerProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) => {
+ 	const {
+@@ -124,6 +112,9 @@ const ColorPicker = (
+ 	);
+ };
+ 
+-const ConnectedColorPicker = contextConnect( ColorPicker, 'ColorPicker' );
++export const ColorPicker = contextConnect(
++	UnconnectedColorPicker,
++	'ColorPicker'
++);
+ 
+-export default ConnectedColorPicker;
++export default ColorPicker;
+diff --git a/packages/components/src/color-picker/hex-input.tsx b/packages/components/src/color-picker/hex-input.tsx
+index b7c7032b284511..8107144aeea8b8 100644
+--- a/packages/components/src/color-picker/hex-input.tsx
++++ b/packages/components/src/color-picker/hex-input.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { colord, Colord } from 'colord';
++import { colord } from 'colord';
+ 
+ /**
+  * WordPress dependencies
+@@ -17,12 +17,7 @@ import { Spacer } from '../spacer';
+ import { space } from '../ui/utils/space';
+ import { COLORS } from '../utils/colors-values';
+ import type { StateReducer } from '../input-control/reducer/state';
+-
+-interface HexInputProps {
+-	color: Colord;
+-	onChange: ( nextColor: Colord ) => void;
+-	enableAlpha: boolean;
+-}
++import type { HexInputProps } from './types';
+ 
+ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+ 	const handleChange = ( nextValue: string | undefined ) => {
+diff --git a/packages/components/src/color-picker/hsl-input.tsx b/packages/components/src/color-picker/hsl-input.tsx
+index c9766244665fb1..3331a97b3d4de6 100644
+--- a/packages/components/src/color-picker/hsl-input.tsx
++++ b/packages/components/src/color-picker/hsl-input.tsx
+@@ -1,18 +1,13 @@
+ /**
+  * External dependencies
+  */
+-import { colord, Colord } from 'colord';
++import { colord } from 'colord';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { InputWithSlider } from './input-with-slider';
+-
+-interface HslInputProps {
+-	color: Colord;
+-	onChange: ( nextColor: Colord ) => void;
+-	enableAlpha: boolean;
+-}
++import type { HslInputProps } from './types';
+ 
+ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
+ 	const { h, s, l, a } = color.toHsl();
+diff --git a/packages/components/src/color-picker/input-with-slider.tsx b/packages/components/src/color-picker/input-with-slider.tsx
+index f28c7307c07727..5f249b03475f6f 100644
+--- a/packages/components/src/color-picker/input-with-slider.tsx
++++ b/packages/components/src/color-picker/input-with-slider.tsx
+@@ -7,15 +7,7 @@ import { Spacer } from '../spacer';
+ import { space } from '../ui/utils/space';
+ import { RangeControl, NumberControlWrapper } from './styles';
+ import { COLORS } from '../utils/colors-values';
+-
+-interface InputWithSliderProps {
+-	min: number;
+-	max: number;
+-	value: number;
+-	label: string;
+-	abbreviation: string;
+-	onChange: ( value: number ) => void;
+-}
++import type { InputWithSliderProps } from './types';
+ 
+ export const InputWithSlider = ( {
+ 	min,
+diff --git a/packages/components/src/color-picker/legacy-adapter.tsx b/packages/components/src/color-picker/legacy-adapter.tsx
+index ef119f263d92dc..4da460bc12bb78 100644
+--- a/packages/components/src/color-picker/legacy-adapter.tsx
++++ b/packages/components/src/color-picker/legacy-adapter.tsx
+@@ -2,10 +2,9 @@
+  * Internal dependencies
+  */
+ import ColorPicker from './component';
++import type { LegacyAdapterProps } from './types';
+ import { useDeprecatedProps } from './use-deprecated-props';
+ 
+-type LegacyAdapterProps = Parameters< typeof useDeprecatedProps >[ 0 ];
+-
+ export const LegacyAdapter = ( props: LegacyAdapterProps ) => {
+ 	return <ColorPicker { ...useDeprecatedProps( props ) } />;
+ };
+diff --git a/packages/components/src/color-picker/picker.tsx b/packages/components/src/color-picker/picker.tsx
+index f48050a468d9e0..f2d7a84a485565 100644
+--- a/packages/components/src/color-picker/picker.tsx
++++ b/packages/components/src/color-picker/picker.tsx
+@@ -2,17 +2,16 @@
+  * External dependencies
+  */
+ import { RgbStringColorPicker, RgbaStringColorPicker } from 'react-colorful';
+-import { colord, Colord } from 'colord';
++import { colord } from 'colord';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { useMemo } from '@wordpress/element';
+-interface PickerProps {
+-	color: Colord;
+-	enableAlpha: boolean;
+-	onChange: ( nextColor: Colord ) => void;
+-}
++/**
++ * Internal dependencies
++ */
++import type { PickerProps } from './types';
+ 
+ export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
+ 	const Component = enableAlpha
+diff --git a/packages/components/src/color-picker/rgb-input.tsx b/packages/components/src/color-picker/rgb-input.tsx
+index e2c51a32fd0635..21872db8472072 100644
+--- a/packages/components/src/color-picker/rgb-input.tsx
++++ b/packages/components/src/color-picker/rgb-input.tsx
+@@ -1,18 +1,13 @@
+ /**
+  * External dependencies
+  */
+-import { colord, Colord } from 'colord';
++import { colord } from 'colord';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { InputWithSlider } from './input-with-slider';
+-
+-interface RgbInputProps {
+-	color: Colord;
+-	onChange: ( nextColor: Colord ) => void;
+-	enableAlpha: boolean;
+-}
++import type { RgbInputProps } from './types';
+ 
+ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
+ 	const { r, g, b, a } = color.toRgb();
+diff --git a/packages/components/src/color-picker/stories/index.js b/packages/components/src/color-picker/stories/index.js
+deleted file mode 100644
+index b3dfb21fb1c489..00000000000000
+--- a/packages/components/src/color-picker/stories/index.js
++++ /dev/null
+@@ -1,41 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { ColorPicker } from '..';
+-
+-export default {
+-	component: ColorPicker,
+-	title: 'Components/ColorPicker',
+-	argTypes: {
+-		color: { control: { type: null } },
+-		copyFormat: {
+-			control: { type: 'select' },
+-			options: [ 'rgb', 'hsl', 'hex', undefined ],
+-		},
+-		// We can't use a `on*` regex because this component will switch to
+-		// legacy mode when an onChangeComplete prop is passed.
+-		onChange: { action: 'onChange' },
+-	},
+-};
+-
+-const Template = ( { onChange, ...props } ) => {
+-	const [ color, setColor ] = useState();
+-
+-	return (
+-		<ColorPicker
+-			{ ...props }
+-			color={ color }
+-			onChange={ ( ...changeArgs ) => {
+-				onChange( ...changeArgs );
+-				setColor( ...changeArgs );
+-			} }
+-		/>
+-	);
+-};
+-
+-export const Default = Template.bind( {} );
+diff --git a/packages/components/src/color-picker/stories/index.tsx b/packages/components/src/color-picker/stories/index.tsx
+new file mode 100644
+index 00000000000000..419c7195714b69
+--- /dev/null
++++ b/packages/components/src/color-picker/stories/index.tsx
+@@ -0,0 +1,51 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { ColorPicker } from '../component';
++
++const meta: ComponentMeta< typeof ColorPicker > = {
++	component: ColorPicker,
++	title: 'Components/ColorPicker',
++	argTypes: {
++		as: { control: { type: null } },
++		color: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof ColorPicker > = ( {
++	onChange,
++	...props
++} ) => {
++	const [ color, setColor ] = useState< string | undefined >();
++
++	return (
++		<ColorPicker
++			{ ...props }
++			color={ color }
++			onChange={ ( ...changeArgs ) => {
++				onChange?.( ...changeArgs );
++				setColor( ...changeArgs );
++			} }
++		/>
++	);
++};
++
++export const Default = Template.bind( {} );
+diff --git a/packages/components/src/color-picker/test/index.js b/packages/components/src/color-picker/test/index.tsx
+similarity index 76%
+rename from packages/components/src/color-picker/test/index.js
+rename to packages/components/src/color-picker/test/index.tsx
+index a04a114e1276bf..f531455f734e7e 100644
+--- a/packages/components/src/color-picker/test/index.js
++++ b/packages/components/src/color-picker/test/index.tsx
+@@ -9,34 +9,37 @@ import { render, fireEvent, waitFor } from '@testing-library/react';
+ import { ColorPicker } from '..';
+ 
+ /**
+- * Ordinarily we'd try to select the compnoent by role but the silder role appears
++ * Ordinarily we'd try to select the component by role but the slider role appears
+  * on several elements and we'd end up encoding assumptions about order when
+- * trying to select the appropriate element. We might as well just use the classname
++ * trying to select the appropriate element. We might as well just use the class name
+  * on the container which will be more durable if, for example, the order changes.
+- *
+- * @param {HTMLElement} container
+- * @return {HTMLElement} The saturation element
+  */
+-function getSaturation( container ) {
++function getSaturation( container: HTMLElement ) {
+ 	return container.querySelector(
+ 		'.react-colorful__saturation .react-colorful__interactive'
+ 	);
+ }
+ 
++type PageXPageY = { pageX: number; pageY: number };
++
+ // Fix to pass `pageX` and `pageY`
+ // See https://github.com/testing-library/react-testing-library/issues/268
+-class FakeMouseEvent extends window.MouseEvent {
+-	constructor( type, values = {} ) {
++class FakeMouseEvent extends MouseEvent {
++	constructor( type: MouseEvent[ 'type' ], values?: PageXPageY ) {
+ 		super( type, { buttons: 1, bubbles: true, ...values } );
+ 
+ 		Object.assign( this, {
+-			pageX: values.pageX || 0,
+-			pageY: values.pageY || 0,
++			pageX: values?.pageX ?? 0,
++			pageY: values?.pageY ?? 0,
+ 		} );
+ 	}
+ }
+ 
+-function moveReactColorfulSlider( sliderElement, from, to ) {
++function moveReactColorfulSlider(
++	sliderElement: Element,
++	from: PageXPageY,
++	to: PageXPageY
++) {
+ 	fireEvent( sliderElement, new FakeMouseEvent( 'mousedown', from ) );
+ 	fireEvent( sliderElement, new FakeMouseEvent( 'mousemove', to ) );
+ }
+@@ -81,6 +84,13 @@ describe( 'ColorPicker', () => {
+ 			);
+ 
+ 			const saturation = getSaturation( container );
++
++			if ( saturation === null ) {
++				throw new Error( 'The saturation slider could not be found' );
++			}
++
++			expect( saturation ).toBeInTheDocument();
++
+ 			moveReactColorfulSlider(
+ 				saturation,
+ 				{ pageX: 0, pageY: 0 },
+@@ -106,6 +116,13 @@ describe( 'ColorPicker', () => {
+ 		);
+ 
+ 		const saturation = getSaturation( container );
++
++		if ( saturation === null ) {
++			throw new Error( 'The saturation slider could not be found' );
++		}
++
++		expect( saturation ).toBeInTheDocument();
++
+ 		moveReactColorfulSlider(
+ 			saturation,
+ 			{ pageX: 0, pageY: 0 },
+@@ -121,13 +138,7 @@ describe( 'ColorPicker', () => {
+ 
+ 	it( 'should fire onChange with the HSL value', async () => {
+ 		const onChange = jest.fn();
+-		const color = {
+-			h: 125,
+-			s: 0.2,
+-			l: 0.5,
+-			// Add alpha to prove it's ignored.
+-			a: 0.5,
+-		};
++		const color = 'hsla(125, 20%, 50%, 0.5)';
+ 
+ 		const { container } = render(
+ 			<ColorPicker
+@@ -138,6 +149,13 @@ describe( 'ColorPicker', () => {
+ 		);
+ 
+ 		const saturation = getSaturation( container );
++
++		if ( saturation === null ) {
++			throw new Error( 'The saturation slider could not be found' );
++		}
++
++		expect( saturation ).toBeInTheDocument();
++
+ 		moveReactColorfulSlider(
+ 			saturation,
+ 			{ pageX: 0, pageY: 0 },
+diff --git a/packages/components/src/color-picker/types.ts b/packages/components/src/color-picker/types.ts
+index b2f9d2bc3739f4..83f1f1621a76ba 100644
+--- a/packages/components/src/color-picker/types.ts
++++ b/packages/components/src/color-picker/types.ts
+@@ -1,10 +1,137 @@
+ /**
+  * External dependencies
+  */
+-import type { Colord } from 'colord';
++import type {
++	Colord,
++	HslColor,
++	HsvaColor,
++	HsvColor,
++	RgbaColor,
++	RgbColor,
++} from 'colord';
++import type { HslaColor } from 'react-colorful';
++/**
++ * Internal dependencies
++ */
++import type { WordPressComponentProps } from '../ui/context';
++import type { useDeprecatedProps } from './use-deprecated-props';
+ 
+ export type ColorType = 'rgb' | 'hsl' | 'hex';
+ export type ColorCopyButtonProps = {
+ 	color: Colord;
+ 	colorType: ColorType;
+ };
++
++export type LegacyAdapterProps = Parameters< typeof useDeprecatedProps >[ 0 ];
++
++export type ColorPickerProps = WordPressComponentProps<
++	{
++		/**
++		 * When `true` the color picker will display the alpha channel both in
++		 * the bottom inputs as well as in the color picker itself.
++		 *
++		 * @default false
++		 */
++		enableAlpha?: boolean;
++		/**
++		 * The current color value to display in the picker.
++		 * Must be a hex or hex8 string.
++		 */
++		color?: string;
++		/**
++		 * Fired when the color changes. Always passes a hex or hex8 color string.
++		 */
++		onChange?: ( color: string ) => void;
++		/**
++		 * An optional default value to use for the color picker.
++		 */
++		defaultValue?: string;
++		/**
++		 * The format to copy when clicking the displayed color format.
++		 */
++		copyFormat?: ColorType;
++	},
++	'div',
++	false
++>;
++
++export interface PickerProps {
++	color: Colord;
++	enableAlpha: boolean;
++	onChange: ( nextColor: Colord ) => void;
++}
++
++export interface ColorInputProps {
++	colorType: 'hsl' | 'hex' | 'rgb';
++	color: Colord;
++	onChange: ( nextColor: Colord ) => void;
++	enableAlpha: boolean;
++}
++
++export interface InputWithSliderProps {
++	min: number;
++	max: number;
++	value: number;
++	label: string;
++	abbreviation: string;
++	onChange: ( value: number ) => void;
++}
++
++export interface HexInputProps {
++	color: Colord;
++	onChange: ( nextColor: Colord ) => void;
++	enableAlpha: boolean;
++}
++
++export interface HslInputProps {
++	color: Colord;
++	onChange: ( nextColor: Colord ) => void;
++	enableAlpha: boolean;
++}
++
++export interface RgbInputProps {
++	color: Colord;
++	onChange: ( nextColor: Colord ) => void;
++	enableAlpha: boolean;
++}
++
++/**
++ * @deprecated
++ */
++export type LegacyColor =
++	| string
++	| {
++			hex: string;
++			hsl: HslColor | HslaColor;
++			hsv: HsvColor | HsvaColor;
++			rgb: RgbColor | RgbaColor;
++			/**
++			 * @deprecated
++			 */
++			oldHue: number;
++			/**
++			 * @deprecated
++			 */
++			source: 'hex';
++	  };
++
++/**
++ * @deprecated
++ */
++export interface LegacyProps {
++	color?: LegacyColor;
++	/**
++	 * @deprecated
++	 */
++	onChangeComplete: ( colors: LegacyColor ) => void;
++	/**
++	 * @deprecated
++	 */
++	oldHue: string;
++	className: string;
++	/**
++	 * @deprecated
++	 */
++	disableAlpha: boolean;
++	onChange?: never;
++}
+diff --git a/packages/components/src/color-picker/use-deprecated-props.ts b/packages/components/src/color-picker/use-deprecated-props.ts
+index a2cae51d202f19..cc835d68fd10ba 100644
+--- a/packages/components/src/color-picker/use-deprecated-props.ts
++++ b/packages/components/src/color-picker/use-deprecated-props.ts
+@@ -1,16 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import {
+-	colord,
+-	HslColor,
+-	HslaColor,
+-	HsvColor,
+-	HsvaColor,
+-	RgbColor,
+-	RgbaColor,
+-} from 'colord';
+-import type { ComponentProps } from 'react';
++import { colord } from 'colord';
+ import memoize from 'memize';
+ 
+ /**
+@@ -21,49 +12,7 @@ import { useCallback } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type ColorPicker from './component';
+-
+-type ColorPickerProps = ComponentProps< typeof ColorPicker >;
+-
+-/**
+- * @deprecated
+- */
+-type LegacyColor =
+-	| string
+-	| {
+-			hex: string;
+-			hsl: HslColor | HslaColor;
+-			hsv: HsvColor | HsvaColor;
+-			rgb: RgbColor | RgbaColor;
+-			/**
+-			 * @deprecated
+-			 */
+-			oldHue: number;
+-			/**
+-			 * @deprecated
+-			 */
+-			source: 'hex';
+-	  };
+-
+-/**
+- * @deprecated
+- */
+-export interface LegacyProps {
+-	color?: LegacyColor;
+-	/**
+-	 * @deprecated
+-	 */
+-	onChangeComplete: ( colors: LegacyColor ) => void;
+-	/**
+-	 * @deprecated
+-	 */
+-	oldHue: string;
+-	className: string;
+-	/**
+-	 * @deprecated
+-	 */
+-	disableAlpha: boolean;
+-}
++import type { ColorPickerProps, LegacyColor, LegacyProps } from './types';
+ 
+ function isLegacyProps( props: any ): props is LegacyProps {
+ 	return (

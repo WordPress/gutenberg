@@ -1,0 +1,378 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 654c6037674e94..980f192e0767a9 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -677,6 +677,12 @@
+ 		"markdown_source": "../packages/components/src/animate/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "AspectRatio",
++		"slug": "aspect-ratio",
++		"markdown_source": "../packages/components/src/aspect-ratio/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "Autocomplete",
+ 		"slug": "autocomplete",
+diff --git a/packages/components/src/aspect-ratio/README.md b/packages/components/src/aspect-ratio/README.md
+new file mode 100644
+index 00000000000000..f7d38d90009a75
+--- /dev/null
++++ b/packages/components/src/aspect-ratio/README.md
+@@ -0,0 +1,44 @@
++# AspectRatio
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`AspectRatio` renders content with a given width:height ratio. A common example would be the **HD** `16:9` ratio. Typically, media-based content (such as images or video) would benefit from an `AspectRatio` controlled container. Another common use-case for `AspectRatio` would be to render `iframe` content with a specific responsive width:height ratio.
++
++<div class="callout callout-alert">
++Noting that this component accepts only one `ReactElement` child.
++</div>
++
++## Usage
++
++```js
++import { __experimentalAspectRatio as AspectRatio } from '@wordpress/components';
++
++function Example() {
++	return (
++		<AspectRatio ratio={ 16 / 9 }>
++			<img
++				src="https://cldup.com/cXyG__fTLN.jpg"
++				alt="Snowy Mountains"
++				style={ { objectFit: 'cover' } }
++			/>
++		</AspectRatio>
++	);
++}
++```
++
++## Props
++
++### `ratio`: `CSSProperties[ 'aspectRatio' ]`
++
++-   Required: No
++-   Default: `1`
++
++The width:height ratio to render.
++
++### `width`: `CSSProperties[ 'width' ]`
++
++-   Required: No
++
++A custom width.
+diff --git a/packages/components/src/aspect-ratio/component.tsx b/packages/components/src/aspect-ratio/component.tsx
+new file mode 100644
+index 00000000000000..b4d3bf1c00a938
+--- /dev/null
++++ b/packages/components/src/aspect-ratio/component.tsx
+@@ -0,0 +1,68 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++
++/**
++ * WordPress dependencies
++ */
++import { Children, cloneElement, isValidElement } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import {
++	contextConnect,
++	useContextSystem,
++	PolymorphicComponentProps,
++} from '../ui/context';
++import type { AspectRatioProps } from './types';
++import * as styles from './styles';
++import { useCx } from '../utils/hooks';
++
++const { AspectRatioView } = styles;
++
++function AspectRatio(
++	props: PolymorphicComponentProps< AspectRatioProps, 'div' >,
++	forwardedRef: import('react').Ref< any >
++) {
++	const {
++		children,
++		className,
++		ratio = 'auto',
++		width,
++		...otherProps
++	} = useContextSystem( props, 'AspectRatio' );
++	const cx = useCx();
++	const child = Children.only( children );
++	const clonedChild =
++		isValidElement( child ) &&
++		cloneElement( child, {
++			...child.props,
++			className: cx(
++				styles.content,
++				/**
++				 * We need to use string interpolation here, as this value
++				 * is passed through emotion serialization and `aspectRatio`
++				 * is not considered a unitless value. This results in adding
++				 * a `px` suffix, making the value invalid.
++				 *
++				 * @see https://github.com/emotion-js/emotion/blob/main/packages/unitless/src/index.js
++				 */
++				css( { aspectRatio: `${ ratio }` } ),
++				child.props.className
++			),
++		} );
++	const classes = cx( css( { maxWidth: width } ), className );
++	return (
++		<AspectRatioView
++			{ ...otherProps }
++			className={ classes }
++			ref={ forwardedRef }
++		>
++			{ clonedChild }
++		</AspectRatioView>
++	);
++}
++
++export default contextConnect( AspectRatio, 'AspectRatio' );
+diff --git a/packages/components/src/aspect-ratio/index.ts b/packages/components/src/aspect-ratio/index.ts
+new file mode 100644
+index 00000000000000..1331a421d3f053
+--- /dev/null
++++ b/packages/components/src/aspect-ratio/index.ts
+@@ -0,0 +1 @@
++export { default as AspectRatio } from './component';
+diff --git a/packages/components/src/aspect-ratio/stories/index.js b/packages/components/src/aspect-ratio/stories/index.js
+new file mode 100644
+index 00000000000000..3535a4abcc9c5f
+--- /dev/null
++++ b/packages/components/src/aspect-ratio/stories/index.js
+@@ -0,0 +1,33 @@
++/**
++ * External dependencies
++ */
++import { select } from '@storybook/addon-knobs';
++
++/**
++ * Internal dependencies
++ */
++import { AspectRatio } from '../index';
++
++export default {
++	component: AspectRatio,
++	title: 'Components (Experimental)/AspectRatio',
++};
++
++export const _default = () => {
++	const props = {
++		ratio: select(
++			'ratio',
++			{
++				'wide (16/9)': 16 / 9,
++				'standard (4/3)': 4 / 3,
++				'vertical (9/16)': 9 / 16,
++			},
++			16 / 9
++		),
++	};
++	return (
++		<AspectRatio width={ '400px' } { ...props }>
++			<img alt="random" src="https://cldup.com/cXyG__fTLN.jpg" />
++		</AspectRatio>
++	);
++};
+diff --git a/packages/components/src/aspect-ratio/styles.ts b/packages/components/src/aspect-ratio/styles.ts
+new file mode 100644
+index 00000000000000..6b8cce6acde746
+--- /dev/null
++++ b/packages/components/src/aspect-ratio/styles.ts
+@@ -0,0 +1,15 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++
++export const AspectRatioView = styled.div`
++	max-width: 100%;
++	position: relative;
++	width: 100%;
++`;
++
++export const content = css`
++	width: 100%;
++`;
+diff --git a/packages/components/src/aspect-ratio/test/__snapshots__/index.js.snap b/packages/components/src/aspect-ratio/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..1a3d8904efd3ae
+--- /dev/null
++++ b/packages/components/src/aspect-ratio/test/__snapshots__/index.js.snap
+@@ -0,0 +1,61 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should add different ratio when provided 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -3,8 +3,8 @@
++    data-wp-c16t="true"
++    data-wp-component="AspectRatio"
++  >
++    <img
++      alt="Snow"
++-     class="css-vl0irh-content css-3ecvn7-className"
+++     class="css-vl0irh-content css-1jydpxs-className"
++    />
++  </div>
++`;
++
++exports[`props should add different width when provided 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,7 +1,7 @@
++  <div
++-   class="components-aspect-ratio css-eji9eb-AspectRatioView-classes e8w5upx0"
+++   class="components-aspect-ratio css-y2g68t-AspectRatioView-classes e8w5upx0"
++    data-wp-c16t="true"
++    data-wp-component="AspectRatio"
++  >
++    <img
++      alt="Snow"
++`;
++
++exports[`props should render correctly 1`] = `
++.emotion-0 {
++  max-width: 100%;
++  position: relative;
++  width: 100%;
++}
++
++.emotion-2 {
++  width: 100%;
++}
++
++.emotion-3 {
++  aspect-ratio: auto;
++}
++
++<div
++  class="components-aspect-ratio emotion-0 emotion-1"
++  data-wp-c16t="true"
++  data-wp-component="AspectRatio"
++>
++  <img
++    alt="Snow"
++    class="emotion-2 emotion-3"
++  />
++</div>
++`;
+diff --git a/packages/components/src/aspect-ratio/test/index.js b/packages/components/src/aspect-ratio/test/index.js
+new file mode 100644
+index 00000000000000..5bf70a8dae723c
+--- /dev/null
++++ b/packages/components/src/aspect-ratio/test/index.js
+@@ -0,0 +1,52 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { AspectRatio } from '../index';
++
++describe( 'props', () => {
++	test( 'should render correctly', () => {
++		const { container } = render(
++			<AspectRatio>
++				<img alt="Snow" />
++			</AspectRatio>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should add different ratio when provided', () => {
++		const { container: withRatio } = render(
++			<AspectRatio ratio={ 21 / 9 }>
++				<img alt="Snow" />
++			</AspectRatio>
++		);
++		const { container: defaultRatio } = render(
++			<AspectRatio>
++				<img alt="Snow" />
++			</AspectRatio>
++		);
++		expect( withRatio.firstChild ).toMatchDiffSnapshot(
++			defaultRatio.firstChild
++		);
++	} );
++
++	test( 'should add different width when provided', () => {
++		const { container: withWidth } = render(
++			<AspectRatio ratio={ 21 / 9 } width={ '320px' }>
++				<img alt="Snow" />
++			</AspectRatio>
++		);
++		const { container: defaultWidth } = render(
++			<AspectRatio ratio={ 21 / 9 }>
++				<img alt="Snow" />
++			</AspectRatio>
++		);
++		expect( withWidth.firstChild ).toMatchDiffSnapshot(
++			defaultWidth.firstChild
++		);
++	} );
++} );
+diff --git a/packages/components/src/aspect-ratio/types.ts b/packages/components/src/aspect-ratio/types.ts
+new file mode 100644
+index 00000000000000..7b35aab3cf545b
+--- /dev/null
++++ b/packages/components/src/aspect-ratio/types.ts
+@@ -0,0 +1,27 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { CSSProperties, ReactNode } from 'react';
++
++export type AspectRatioProps = {
++	/**
++	 * The width:height ratio to render.
++	 *
++	 * @default 1
++	 *
++	 * @example
++	 * ```
++	 * <AspectRatio ratio={16/9} />
++	 * ```
++	 */
++	ratio?: CSSProperties[ 'aspectRatio' ];
++	/**
++	 * A custom width.
++	 */
++	width?: CSSProperties[ 'width' ];
++	/**
++	 * React children
++	 */
++	children: ReactNode;
++};
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 86d40d1db38fb9..b0d4add1427ebd 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -16,6 +16,7 @@ export {
+ 	default as Animate,
+ 	getAnimateClassName as __unstableGetAnimateClassName,
+ } from './animate';
++export { AspectRatio as __experimentalAspectRatio } from './aspect-ratio';
+ export { default as AnglePickerControl } from './angle-picker-control';
+ export {
+ 	default as Autocomplete,

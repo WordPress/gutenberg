@@ -1,0 +1,220 @@
+diff --git a/docs/reference/deprecated.md b/docs/reference/deprecated.md
+index 282d8c20940d70..e1a54e3498c1d6 100644
+--- a/docs/reference/deprecated.md
++++ b/docs/reference/deprecated.md
+@@ -1,5 +1,8 @@
+ Gutenberg's deprecation policy is intended to support backwards-compatibility for releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
+ 
++## 4.5.0
++- `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
++
+ ## 4.4.0
+ 
+ - `wp.date.getSettings` has been removed. Please use `wp.date.__experimentalGetSettings` instead.
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4e91e6f7869dab..6c70475da0384a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -1,8 +1,13 @@
+-## 5.1.0 (unreleased)
++## 5.1.0 (Unreleased)
+ 
+-### New Features
++### New Feature
+ 
+ - Adjust a11y roles for MenuItem component, so that aria-checked is used properly, related change in Editor/Components/BlockNavigationList ([#11431](https://github.com/WordPress/gutenberg/issues/11431)).
++- `Popover` components are now automatically refreshed every 0.5s in order to recalculate their size or position.
++
++### Deprecation
++
++- `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
+ 
+ ## 5.0.2 (2018-11-03)
+ 
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index 29b7700a0e636c..71042b40bd7efe 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -1,6 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
++import deprecated from '@wordpress/deprecated';
+ import { Component, createRef } from '@wordpress/element';
+ 
+ /**
+@@ -18,7 +19,6 @@ class Dropdown extends Component {
+ 		this.refresh = this.refresh.bind( this );
+ 
+ 		this.containerRef = createRef();
+-		this.popoverRef = createRef();
+ 
+ 		this.state = {
+ 			isOpen: false,
+@@ -45,11 +45,14 @@ class Dropdown extends Component {
+ 	 * When contents change height due to user interaction,
+ 	 * `refresh` can be called to re-render Popover with correct
+ 	 * attributes which allow scroll, if need be.
++	 * @deprecated
+ 	 */
+ 	refresh() {
+-		if ( this.popoverRef.current ) {
+-			this.popoverRef.current.refresh();
+-		}
++		deprecated( 'Dropdown.refresh()', {
++			plugin: 'Gutenberg',
++			version: '4.5',
++			hint: 'Popover is now automatically re-rendered without needing to execute "refresh"',
++		} );
+ 	}
+ 
+ 	toggle() {
+@@ -96,7 +99,6 @@ class Dropdown extends Component {
+ 				{ isOpen && (
+ 					<Popover
+ 						className={ contentClassName }
+-						ref={ this.popoverRef }
+ 						position={ position }
+ 						onClose={ this.close }
+ 						onClickOutside={ this.closeIfClickOutside }
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 7ce7163006a211..9ad4c6143e0508 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -39,8 +39,8 @@ class Popover extends Component {
+ 		this.getAnchorRect = this.getAnchorRect.bind( this );
+ 		this.updatePopoverSize = this.updatePopoverSize.bind( this );
+ 		this.computePopoverPosition = this.computePopoverPosition.bind( this );
+-		this.throttledComputePopoverPosition = this.throttledComputePopoverPosition.bind( this );
+ 		this.maybeClose = this.maybeClose.bind( this );
++		this.throttledRefresh = this.throttledRefresh.bind( this );
+ 
+ 		this.contentNode = createRef();
+ 		this.anchorNode = createRef();
+@@ -58,7 +58,7 @@ class Popover extends Component {
+ 	}
+ 
+ 	componentDidMount() {
+-		this.toggleWindowEvents( true );
++		this.toggleAutoRefresh( true );
+ 		this.refresh();
+ 
+ 		/*
+@@ -79,24 +79,38 @@ class Popover extends Component {
+ 	}
+ 
+ 	componentWillUnmount() {
+-		this.toggleWindowEvents( false );
+-
+ 		clearTimeout( this.focusTimeout );
++		this.toggleAutoRefresh( false );
+ 	}
+ 
+-	toggleWindowEvents( isListening ) {
+-		const handler = isListening ? 'addEventListener' : 'removeEventListener';
+-
++	toggleAutoRefresh( isActive ) {
+ 		window.cancelAnimationFrame( this.rafHandle );
+-		window[ handler ]( 'resize', this.throttledComputePopoverPosition );
+-		window[ handler ]( 'scroll', this.throttledComputePopoverPosition, true );
++
++		// Refresh the popover every time the window is resized or scrolled
++		const handler = isActive ? 'addEventListener' : 'removeEventListener';
++		window[ handler ]( 'resize', this.throttledRefresh );
++		window[ handler ]( 'scroll', this.throttledRefresh, true );
++
++		/*
++		 * There are sometimes we need to reposition or resize the popover that are not
++		 * handled by the resize/scroll window events (i.e. CSS changes in the layout
++		 * that changes the position of the anchor).
++		 *
++		 * For these situations, we refresh the popover every 0.5s
++		 */
++		if ( isActive ) {
++			this.autoRefresh = setInterval( this.throttledRefresh, 500 );
++		} else {
++			clearInterval( this.autoRefresh );
++		}
+ 	}
+ 
+-	throttledComputePopoverPosition( event ) {
+-		if ( event.type === 'scroll' && this.contentNode.current.contains( event.target ) ) {
++	throttledRefresh( event ) {
++		window.cancelAnimationFrame( this.rafHandle );
++		if ( event && event.type === 'scroll' && this.contentNode.current.contains( event.target ) ) {
+ 			return;
+ 		}
+-		this.rafHandle = window.requestAnimationFrame( () => this.computePopoverPosition() );
++		this.rafHandle = window.requestAnimationFrame( this.refresh );
+ 	}
+ 
+ 	/**
+@@ -161,16 +175,15 @@ class Popover extends Component {
+ 	}
+ 
+ 	updatePopoverSize() {
+-		const rect = this.contentNode.current.getBoundingClientRect();
++		const popoverSize = {
++			width: this.contentNode.current.scrollWidth,
++			height: this.contentNode.current.scrollHeight,
++		};
+ 		if (
+ 			! this.state.popoverSize ||
+-			rect.width !== this.state.popoverSize.width ||
+-			rect.height !== this.state.popoverSize.height
++			popoverSize.width !== this.state.popoverSize.width ||
++			popoverSize.height !== this.state.popoverSize.height
+ 		) {
+-			const popoverSize = {
+-				height: rect.height,
+-				width: rect.width,
+-			};
+ 			this.setState( { popoverSize } );
+ 			return popoverSize;
+ 		}
+diff --git a/packages/components/src/popover/test/index.js b/packages/components/src/popover/test/index.js
+index 742f096f3533a8..a66e68023f0ae0 100644
+--- a/packages/components/src/popover/test/index.js
++++ b/packages/components/src/popover/test/index.js
+@@ -15,7 +15,7 @@ describe( 'Popover', () => {
+ 		let wrapper;
+ 		beforeEach( () => {
+ 			jest.spyOn( Popover.prototype, 'computePopoverPosition' ).mockImplementation( noop );
+-			jest.spyOn( Popover.prototype, 'toggleWindowEvents' ).mockImplementation( noop );
++			jest.spyOn( Popover.prototype, 'toggleAutoRefresh' ).mockImplementation( noop );
+ 		} );
+ 
+ 		afterEach( () => {
+@@ -30,19 +30,19 @@ describe( 'Popover', () => {
+ 			}
+ 		} );
+ 
+-		it( 'should add window events', () => {
++		it( 'should turn on auto refresh', () => {
+ 			wrapper = TestUtils.renderIntoDocument( <Popover /> );
+-			expect( Popover.prototype.toggleWindowEvents ).toHaveBeenCalledWith( true );
++			expect( Popover.prototype.toggleAutoRefresh ).toHaveBeenCalledWith( true );
+ 			expect( Popover.prototype.computePopoverPosition ).toHaveBeenCalled();
+ 		} );
+ 
+-		it( 'should remove window events', () => {
++		it( 'should turn off auto refresh', () => {
+ 			wrapper = TestUtils.renderIntoDocument( <Popover /> );
+ 			/* eslint-disable react/no-find-dom-node */
+ 			ReactDOM.unmountComponentAtNode( ReactDOM.findDOMNode( wrapper ).parentNode );
+ 			/* eslint-enable react/no-find-dom-node */
+ 
+-			expect( Popover.prototype.toggleWindowEvents ).toHaveBeenCalledWith( false );
++			expect( Popover.prototype.toggleAutoRefresh ).toHaveBeenCalledWith( false );
+ 		} );
+ 
+ 		it( 'should set offset and forced positions on changed position', () => {
+@@ -52,7 +52,7 @@ describe( 'Popover', () => {
+ 
+ 			ReactDOM.render( <Popover position={ 'bottom right' } />, node );
+ 
+-			expect( Popover.prototype.toggleWindowEvents ).not.toHaveBeenCalled();
++			expect( Popover.prototype.toggleAutoRefresh ).not.toHaveBeenCalled();
+ 			expect( Popover.prototype.computePopoverPosition ).toHaveBeenCalled();
+ 		} );
+ 

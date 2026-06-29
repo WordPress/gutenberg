@@ -1,0 +1,184 @@
+diff --git a/packages/block-library/src/image/edit.js b/packages/block-library/src/image/edit.js
+index 10ea6dbb3a15c6..404606ce839d37 100644
+--- a/packages/block-library/src/image/edit.js
++++ b/packages/block-library/src/image/edit.js
+@@ -622,6 +622,7 @@ export class ImageEdit extends Component {
+ 											width,
+ 											height,
+ 										} }
++										showHandle={ isSelected }
+ 										minWidth={ minWidth }
+ 										maxWidth={ maxWidthBuffer }
+ 										minHeight={ minHeight }
+diff --git a/packages/block-library/src/image/editor.scss b/packages/block-library/src/image/editor.scss
+index 961941e5b6dfc0..e06a4a62eb2d46 100644
+--- a/packages/block-library/src/image/editor.scss
++++ b/packages/block-library/src/image/editor.scss
+@@ -24,19 +24,10 @@ figure.wp-block-image:not(.wp-block) {
+ }
+ 
+ // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
+-.wp-block-image .components-resizable-box__container {
+-	display: inline-block;
+-
+-	img {
+-		display: block;
+-		width: inherit;
+-		height: inherit;
+-	}
+-}
+-
+-// Ensure the resize handles are visible when the image is focused.
+-.wp-block-image.is-focused .components-resizable-box__handle {
++.wp-block-image .components-resizable-box__container img {
+ 	display: block;
++	width: inherit;
++	height: inherit;
+ }
+ 
+ .block-editor-block-list__block[data-type="core/image"] .block-editor-block-toolbar .block-editor-url-input__button-modal {
+diff --git a/packages/block-library/src/media-text/edit.js b/packages/block-library/src/media-text/edit.js
+index 86fd9c808596ce..8a5b6383fee8eb 100644
+--- a/packages/block-library/src/media-text/edit.js
++++ b/packages/block-library/src/media-text/edit.js
+@@ -146,7 +146,7 @@ class MediaTextEdit extends Component {
+ 	}
+ 
+ 	renderMediaArea() {
+-		const { attributes } = this.props;
++		const { attributes, isSelected } = this.props;
+ 		const {
+ 			mediaAlt,
+ 			mediaId,
+@@ -156,6 +156,7 @@ class MediaTextEdit extends Component {
+ 			mediaWidth,
+ 			imageFill,
+ 			focalPoint,
++			isStackedOnMobile,
+ 		} = attributes;
+ 		return (
+ 			<MediaContainer
+@@ -172,6 +173,8 @@ class MediaTextEdit extends Component {
+ 					mediaWidth,
+ 					imageFill,
+ 					focalPoint,
++					isSelected,
++					isStackedOnMobile,
+ 				} }
+ 			/>
+ 		);
+diff --git a/packages/block-library/src/media-text/editor.scss b/packages/block-library/src/media-text/editor.scss
+index 785966ae363d3d..2fd4f7c886fbef 100644
+--- a/packages/block-library/src/media-text/editor.scss
++++ b/packages/block-library/src/media-text/editor.scss
+@@ -59,24 +59,6 @@
+ 	max-width: unset;
+ }
+ 
+-.editor-media-container__resizer .components-resizable-box__handle {
+-	display: none;
+-}
+-
+-.wp-block-media-text.is-selected:not(.is-stacked-on-mobile) {
+-	.editor-media-container__resizer .components-resizable-box__handle {
+-		display: block;
+-	}
+-}
+-
+-@include break-small {
+-	.wp-block-media-text.is-selected.is-stacked-on-mobile {
+-		.editor-media-container__resizer .components-resizable-box__handle {
+-			display: block;
+-		}
+-	}
+-}
+-
+ @media (max-width: #{ ($break-small) }) {
+ 	.wp-block-media-text.is-stacked-on-mobile {
+ 		.block-editor-inner-blocks {
+diff --git a/packages/block-library/src/media-text/media-container.js b/packages/block-library/src/media-text/media-container.js
+index e6d339216b0e4c..0d29cd4b089f84 100644
+--- a/packages/block-library/src/media-text/media-container.js
++++ b/packages/block-library/src/media-text/media-container.js
+@@ -10,7 +10,7 @@ import {
+ } from '@wordpress/block-editor';
+ import { Component } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+-import { compose } from '@wordpress/compose';
++import { compose, useViewportMatch } from '@wordpress/compose';
+ import { withDispatch } from '@wordpress/data';
+ 
+ /**
+@@ -34,6 +34,15 @@ export function imageFillStyles( url, focalPoint ) {
+ 		: {};
+ }
+ 
++function ResizableBoxContainer( { isSelected, isStackedOnMobile, ...props } ) {
++	const isMobile = useViewportMatch( 'small', '<' );
++	return (
++		<ResizableBox
++			showHandle={ isSelected && ( ! isMobile || ! isStackedOnMobile ) }
++			{ ...props }
++		/>
++	);
++}
+ class MediaContainer extends Component {
+ 	constructor() {
+ 		super( ...arguments );
+@@ -121,6 +130,8 @@ class MediaContainer extends Component {
+ 			commitWidthChange,
+ 			onWidthChange,
+ 			toggleSelection,
++			isSelected,
++			isStackedOnMobile,
+ 		} = this.props;
+ 		if ( mediaType && mediaUrl ) {
+ 			const onResizeStart = () => {
+@@ -148,7 +159,7 @@ class MediaContainer extends Component {
+ 					break;
+ 			}
+ 			return (
+-				<ResizableBox
++				<ResizableBoxContainer
+ 					className="editor-media-container__resizer"
+ 					size={ { width: mediaWidth + '%' } }
+ 					minWidth="10%"
+@@ -158,9 +169,11 @@ class MediaContainer extends Component {
+ 					onResize={ onResize }
+ 					onResizeStop={ onResizeStop }
+ 					axis="x"
++					isSelected={ isSelected }
++					isStackedOnMobile={ isStackedOnMobile }
+ 				>
+ 					{ mediaElement }
+-				</ResizableBox>
++				</ResizableBoxContainer>
+ 			);
+ 		}
+ 		return this.renderPlaceholder();
+diff --git a/packages/components/src/resizable-box/index.js b/packages/components/src/resizable-box/index.js
+index 71db3d9cafc592..e9bc2a190f260e 100644
+--- a/packages/components/src/resizable-box/index.js
++++ b/packages/components/src/resizable-box/index.js
+@@ -4,7 +4,7 @@
+ import classnames from 'classnames';
+ import { Resizable } from 're-resizable';
+ 
+-function ResizableBox( { className, showHandle = false, ...props } ) {
++function ResizableBox( { className, showHandle = true, ...props } ) {
+ 	// Removes the inline styles in the drag handles.
+ 	const handleStylesOverrides = {
+ 		width: null,
+diff --git a/packages/components/src/resizable-box/index.native.js b/packages/components/src/resizable-box/index.native.js
+index 9de483e20c5096..ae9071cf84af18 100644
+--- a/packages/components/src/resizable-box/index.native.js
++++ b/packages/components/src/resizable-box/index.native.js
+@@ -12,7 +12,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
+ import styles from './style.scss';
+ 
+ function ResizableBox( props ) {
+-	const { size, showHandle, getStylesFromColorScheme } = props;
++	const { size, showHandle = true, getStylesFromColorScheme } = props;
+ 	const { height } = size;
+ 	const defaultStyle = getStylesFromColorScheme(
+ 		styles.staticSpacer,

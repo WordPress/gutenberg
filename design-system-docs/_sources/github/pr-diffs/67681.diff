@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/theme/stories/index.story.tsx b/packages/components/src/theme/stories/index.story.tsx
+index 67eec72533ff3f..8ef87cbe8ddb41 100644
+--- a/packages/components/src/theme/stories/index.story.tsx
++++ b/packages/components/src/theme/stories/index.story.tsx
+@@ -37,7 +37,7 @@ export const Default = Template.bind( {} );
+ Default.args = {};
+ 
+ export const Nested: StoryFn< typeof Theme > = ( args ) => (
+-	<Theme accent="tomato">
++	<Theme accent="crimson">
+ 		<Button variant="primary">Outer theme (hardcoded)</Button>
+ 
+ 		<Theme { ...args }>

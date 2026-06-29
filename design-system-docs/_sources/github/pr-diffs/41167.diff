@@ -1,0 +1,32 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e64c24c6b7bbc6..52277deca063e5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Internal
+ 
++-   `AlignmentMatrixControl` updated to satisfy `react/exhuastive-deps` eslint rule ([#41167](https://github.com/WordPress/gutenberg/pull/41167))
+ -   `CheckboxControl`: Add unit tests ([#41165](https://github.com/WordPress/gutenberg/pull/41165)).
+ 
+ ## 19.11.0 (2022-05-18)
+diff --git a/packages/components/src/alignment-matrix-control/index.js b/packages/components/src/alignment-matrix-control/index.js
+index d9665eb5d446dc..eac1fd2e77ab3a 100644
+--- a/packages/components/src/alignment-matrix-control/index.js
++++ b/packages/components/src/alignment-matrix-control/index.js
+@@ -53,11 +53,13 @@ export default function AlignmentMatrixControl( {
+ 		onChange( nextValue );
+ 	};
+ 
++	const { setCurrentId } = composite;
++
+ 	useEffect( () => {
+ 		if ( typeof value !== 'undefined' ) {
+-			composite.setCurrentId( getItemId( baseId, value ) );
++			setCurrentId( getItemId( baseId, value ) );
+ 		}
+-	}, [ value, composite.setCurrentId ] );
++	}, [ value, setCurrentId, baseId ] );
+ 
+ 	const classes = classnames(
+ 		'component-alignment-matrix-control',

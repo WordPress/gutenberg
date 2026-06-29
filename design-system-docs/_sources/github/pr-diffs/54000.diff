@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4017491e46de67..eb52028535f893 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ ### Bug Fix
+ 
+ -   `SandBox`: Fix the cleanup method in useEffect ([#53796](https://github.com/WordPress/gutenberg/pull/53796)).
++-   `PaletteEdit`: Fix the height of the `PaletteItems`. Don't rely on styles only present in the block editor ([#54000](https://github.com/WordPress/gutenberg/pull/54000)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/palette-edit/styles.js b/packages/components/src/palette-edit/styles.js
+index e04aa1840028ff..72e6bff97e4a29 100644
+--- a/packages/components/src/palette-edit/styles.js
++++ b/packages/components/src/palette-edit/styles.js
+@@ -42,7 +42,6 @@ export const NameInputControl = styled( InputControl )`
+ 
+ export const PaletteItem = styled( View )`
+ 	padding: 3px 0 3px ${ space( 3 ) };
+-	height: calc( 40px - ${ CONFIG.borderWidth } );
+ 	border: 1px solid ${ CONFIG.surfaceBorderColor };
+ 	border-bottom-color: transparent;
+ 	&:first-of-type {

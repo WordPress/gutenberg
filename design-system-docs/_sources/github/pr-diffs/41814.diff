@@ -1,0 +1,46 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 4b354fe2d986ff..a786e26c0d63d0 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -88,6 +88,7 @@ module.exports = {
+ 							'each',
+ 							'findIndex',
+ 							'flatten',
++							'flattenDeep',
+ 							'isArray',
+ 							'isFinite',
+ 							'isFunction',
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 60e7ef9033c2d7..7443f7f02e59a3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   `Spinner`: Convert to TypeScript and update storybook ([#41540](https://github.com/WordPress/gutenberg/pull/41540/)).
+ -   `InputControl`: Add tests and update to use `@testing-library/user-event` ([#41421](https://github.com/WordPress/gutenberg/pull/41421)).
++-   `AlignmentMatrixControl`: Refactor away from `_.flattenDeep()` in utils ([#41814](https://github.com/WordPress/gutenberg/pull/41814/)).
+ 
+ ## 19.13.0 (2022-06-15)
+ 
+diff --git a/packages/components/src/alignment-matrix-control/utils.js b/packages/components/src/alignment-matrix-control/utils.js
+index cbc86dd5a83431..4934e422d196cb 100644
+--- a/packages/components/src/alignment-matrix-control/utils.js
++++ b/packages/components/src/alignment-matrix-control/utils.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { flattenDeep } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -28,7 +23,7 @@ export const ALIGNMENT_LABEL = {
+ };
+ 
+ // Transforms GRID into a flat Array of values.
+-export const ALIGNMENTS = flattenDeep( GRID );
++export const ALIGNMENTS = GRID.flat();
+ 
+ /**
+  * Parses and transforms an incoming value to better match the alignment values

@@ -1,0 +1,508 @@
+diff --git a/packages/block-editor/src/components/colors-gradients/control.js b/packages/block-editor/src/components/colors-gradients/control.js
+index 5a1cda78f86683..946b5dd486b042 100644
+--- a/packages/block-editor/src/components/colors-gradients/control.js
++++ b/packages/block-editor/src/components/colors-gradients/control.js
+@@ -133,7 +133,7 @@ function ColorGradientControlInner( {
+ 					{ canChooseAColor && canChooseAGradient && (
+ 						<div>
+ 							<Tabs
+-								initialTabId={
++								defaultTabId={
+ 									gradientValue
+ 										? TAB_IDS.gradient
+ 										: !! canChooseAColor && TAB_IDS.color
+diff --git a/packages/block-editor/src/components/global-styles/color-panel.js b/packages/block-editor/src/components/global-styles/color-panel.js
+index c34335bc9dda50..13f61ec56a8520 100644
+--- a/packages/block-editor/src/components/global-styles/color-panel.js
++++ b/packages/block-editor/src/components/global-styles/color-panel.js
+@@ -259,7 +259,7 @@ function ColorPanelDropdown( {
+ 								/>
+ 							) }
+ 							{ tabs.length > 1 && (
+-								<Tabs initialTabId={ currentTab?.key }>
++								<Tabs defaultTabId={ currentTab?.key }>
+ 									<Tabs.TabList>
+ 										{ tabs.map( ( tab ) => (
+ 											<Tabs.Tab
+diff --git a/packages/block-editor/src/components/inspector-controls-tabs/index.js b/packages/block-editor/src/components/inspector-controls-tabs/index.js
+index 944ce6f3220937..76252bae975ae4 100644
+--- a/packages/block-editor/src/components/inspector-controls-tabs/index.js
++++ b/packages/block-editor/src/components/inspector-controls-tabs/index.js
+@@ -35,7 +35,7 @@ export default function InspectorControlsTabs( {
+ 
+ 	return (
+ 		<div className="block-editor-block-inspector__tabs">
+-			<Tabs initialTabId={ initialTabName } key={ clientId }>
++			<Tabs defaultTabId={ initialTabName } key={ clientId }>
+ 				<Tabs.TabList>
+ 					{ tabs.map( ( tab ) => (
+ 						<Tabs.Tab
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b5def99012dbe9..050856f51dcc66 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,10 @@
+ -   `FormTokenField`: Use `Element.scrollIntoView()` instead of `dom-scroll-into-view` ([#59085](https://github.com/WordPress/gutenberg/pull/59085)).
+ -   Removing `dom-scroll-into-view` as a dependency of the components package ([#59085](https://github.com/WordPress/gutenberg/pull/59085)).
+ 
++### Experimental
++
++-   `Tabs`: rename `initialTabId` prop to `defaultTabId` ([#59035](https://github.com/WordPress/gutenberg/pull/59035)).
++
+ ## 26.0.1 (2024-02-13)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/tabs/README.md b/packages/components/src/tabs/README.md
+index 732dec9dba7df0..6eaadc0ae0b19d 100644
+--- a/packages/components/src/tabs/README.md
++++ b/packages/components/src/tabs/README.md
+@@ -14,7 +14,7 @@ Tabs organizes content across different screens, data sets, and interactions. It
+ 
+ #### Uncontrolled Mode
+ 
+-Tabs can be used in an uncontrolled mode, where the component manages its own state. In this mode, the `initialTabId` prop can be used to set the initially selected tab. If this prop is not set, the first tab will be selected by default. In addition, in most cases where the currently active tab becomes disabled or otherwise unavailable, uncontrolled mode will automatically fall back to selecting the first available tab.
++Tabs can be used in an uncontrolled mode, where the component manages its own state. In this mode, the `defaultTabId` prop can be used to set the initially selected tab. If this prop is not set, the first tab will be selected by default. In addition, in most cases where the currently active tab becomes disabled or otherwise unavailable, uncontrolled mode will automatically fall back to selecting the first available tab.
+ 
+ ```jsx
+ import { Tabs } from '@wordpress/components';
+@@ -24,25 +24,25 @@ const onSelect = ( tabName ) => {
+ };
+ 
+ const MyUncontrolledTabs = () => (
+-		<Tabs onSelect={onSelect} initialTab="tab2">
+-			<Tabs.TabList >
+-				<Tabs.Tab id={ 'tab1' } title={ 'Tab 1' }>
++		<Tabs onSelect={ onSelect } defaultTabId="tab2">
++			<Tabs.TabList>
++				<Tabs.Tab tabId="tab1" title="Tab 1">
+ 					Tab 1
+ 				</Tabs.Tab>
+-				<Tabs.Tab id={ 'tab2' } title={ 'Tab 2' }>
++				<Tabs.Tab tabId="tab2" title="Tab 2">
+ 					Tab 2
+ 				</Tabs.Tab>
+-				<Tabs.Tab id={ 'tab3' } title={ 'Tab 3' }>
++				<Tabs.Tab tabId="tab3" title="Tab 3">
+ 					Tab 3
+ 				</Tabs.Tab>
+ 			</Tabs.TabList>
+-			<Tabs.TabPanel id={ 'tab1' }>
++			<Tabs.TabPanel tabId="tab1">
+ 				<p>Selected tab: Tab 1</p>
+ 			</Tabs.TabPanel>
+-			<Tabs.TabPanel id={ 'tab2' }>
++			<Tabs.TabPanel tabId="tab2">
+ 				<p>Selected tab: Tab 2</p>
+ 			</Tabs.TabPanel>
+-			<Tabs.TabPanel id={ 'tab3' }>
++			<Tabs.TabPanel tabId="tab3">
+ 				<p>Selected tab: Tab 3</p>
+ 			</Tabs.TabPanel>
+ 		</Tabs>
+@@ -51,7 +51,7 @@ const MyUncontrolledTabs = () => (
+ 
+ #### Controlled Mode
+ 
+-Tabs can also be used in a controlled mode, where the parent component specifies the `selectedTabId` and the `onSelect` props to control tab selection. In this mode, the `initialTabId` prop will be ignored if it is provided. If the `selectedTabId` is `null`, no tab is selected. In this mode, if the currently selected tab becomes disabled or otherwise unavailable, the component will _not_ fall back to another available tab, leaving the controlling component in charge of implementing the desired logic.
++Tabs can also be used in a controlled mode, where the parent component specifies the `selectedTabId` and the `onSelect` props to control tab selection. In this mode, the `defaultTabId` prop will be ignored if it is provided. If the `selectedTabId` is `null`, no tab is selected. In this mode, if the currently selected tab becomes disabled or otherwise unavailable, the component will _not_ fall back to another available tab, leaving the controlling component in charge of implementing the desired logic.
+ 
+ ```jsx
+ import { Tabs } from '@wordpress/components';
+@@ -71,24 +71,24 @@ const MyControlledTabs = () => (
+ 				onSelect( selectedId );
+ 			} }
+ 		>
+-			<Tabs.TabList >
+-				<Tabs.Tab id={ 'tab1' } title={ 'Tab 1' }>
++			<Tabs.TabList>
++				<Tabs.Tab tabId="tab1" title="Tab 1">
+ 					Tab 1
+ 				</Tabs.Tab>
+-				<Tabs.Tab id={ 'tab2' } title={ 'Tab 2' }>
++				<Tabs.Tab tabId="tab2" title="Tab 2">
+ 					Tab 2
+ 				</Tabs.Tab>
+-				<Tabs.Tab id={ 'tab3' } title={ 'Tab 3' }>
++				<Tabs.Tab tabId="tab3" title="Tab 3">
+ 					Tab 3
+ 				</Tabs.Tab>
+ 			</Tabs.TabList>
+-			<Tabs.TabPanel id={ 'tab1' }>
++			<Tabs.TabPanel tabId="tab1">
+ 				<p>Selected tab: Tab 1</p>
+ 			</Tabs.TabPanel>
+-			<Tabs.TabPanel id={ 'tab2' }>
++			<Tabs.TabPanel tabId="tab2">
+ 				<p>Selected tab: Tab 2</p>
+ 			</Tabs.TabPanel>
+-			<Tabs.TabPanel id={ 'tab3' }>
++			<Tabs.TabPanel tabId="tab3">
+ 				<p>Selected tab: Tab 3</p>
+ 			</Tabs.TabPanel>
+ 		</Tabs>
+@@ -120,7 +120,7 @@ When `true`, the tab will be selected when receiving focus (automatic tab activa
+ -   Required: No
+ -   Default: `true`
+ 
+-###### `initialTabId`: `string`
++###### `defaultTabId`: `string`
+ 
+ The id of the tab to be selected upon mounting of component. If this prop is not set, the first tab will be selected by default. The id provided will be internally prefixed with a unique instance ID to avoid collisions.
+ 
+diff --git a/packages/components/src/tabs/index.tsx b/packages/components/src/tabs/index.tsx
+index 685c5cb32bd05a..5ffa8e97a651b0 100644
+--- a/packages/components/src/tabs/index.tsx
++++ b/packages/components/src/tabs/index.tsx
+@@ -26,7 +26,7 @@ import { TabPanel } from './tabpanel';
+ 
+ function Tabs( {
+ 	selectOnMove = true,
+-	initialTabId,
++	defaultTabId,
+ 	orientation = 'horizontal',
+ 	onSelect,
+ 	children,
+@@ -36,7 +36,7 @@ function Tabs( {
+ 	const store = Ariakit.useTabStore( {
+ 		selectOnMove,
+ 		orientation,
+-		defaultSelectedId: initialTabId && `${ instanceId }-${ initialTabId }`,
++		defaultSelectedId: defaultTabId && `${ instanceId }-${ defaultTabId }`,
+ 		setSelectedId: ( selectedId ) => {
+ 			const strippedDownId =
+ 				typeof selectedId === 'string'
+@@ -66,7 +66,7 @@ function Tabs( {
+ 		return ! item.dimmed;
+ 	} );
+ 	const initialTab = items.find(
+-		( item ) => item.id === `${ instanceId }-${ initialTabId }`
++		( item ) => item.id === `${ instanceId }-${ defaultTabId }`
+ 	);
+ 
+ 	// Handle selecting the initial tab.
+@@ -78,8 +78,8 @@ function Tabs( {
+ 		// Wait for the denoted initial tab to be declared before making a
+ 		// selection. This ensures that if a tab is declared lazily it can
+ 		// still receive initial selection, as well as ensuring no tab is
+-		// selected if an invalid `initialTabId` is provided.
+-		if ( initialTabId && ! initialTab ) {
++		// selected if an invalid `defaultTabId` is provided.
++		if ( defaultTabId && ! initialTab ) {
+ 			return;
+ 		}
+ 
+@@ -101,7 +101,7 @@ function Tabs( {
+ 	}, [
+ 		firstEnabledTab,
+ 		initialTab,
+-		initialTabId,
++		defaultTabId,
+ 		isControlled,
+ 		items,
+ 		selectedId,
+@@ -122,7 +122,7 @@ function Tabs( {
+ 		}
+ 
+ 		// If the currently selected tab becomes disabled, fall back to the
+-		// `initialTabId` if possible. Otherwise select the first
++		// `defaultTabId` if possible. Otherwise select the first
+ 		// enabled tab (if there is one).
+ 		if ( initialTab && ! initialTab.dimmed ) {
+ 			setSelectedId( initialTab.id );
+diff --git a/packages/components/src/tabs/test/index.tsx b/packages/components/src/tabs/test/index.tsx
+index 96d17f59df99e8..39c860de62c144 100644
+--- a/packages/components/src/tabs/test/index.tsx
++++ b/packages/components/src/tabs/test/index.tsx
+@@ -598,7 +598,7 @@ describe( 'Tabs', () => {
+ 		} );
+ 	} );
+ 	describe( 'Uncontrolled mode', () => {
+-		describe( 'Without `initialTabId` prop', () => {
++		describe( 'Without `defaultTabId` prop', () => {
+ 			it( 'should render first tab', async () => {
+ 				render( <UncontrolledTabs tabs={ TABS } /> );
+ 
+@@ -655,20 +655,20 @@ describe( 'Tabs', () => {
+ 			} );
+ 		} );
+ 
+-		describe( 'With `initialTabId`', () => {
+-			it( 'should render the tab set by `initialTabId` prop', async () => {
++		describe( 'With `defaultTabId`', () => {
++			it( 'should render the tab set by `defaultTabId` prop', async () => {
+ 				render(
+-					<UncontrolledTabs tabs={ TABS } initialTabId="beta" />
++					<UncontrolledTabs tabs={ TABS } defaultTabId="beta" />
+ 				);
+ 
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+ 			} );
+ 
+-			it( 'should not select a tab when `initialTabId` does not match any known tab', () => {
++			it( 'should not select a tab when `defaultTabId` does not match any known tab', () => {
+ 				render(
+ 					<UncontrolledTabs
+ 						tabs={ TABS }
+-						initialTabId="does-not-exist"
++						defaultTabId="does-not-exist"
+ 					/>
+ 				);
+ 
+@@ -682,25 +682,25 @@ describe( 'Tabs', () => {
+ 					screen.queryByRole( 'tabpanel' )
+ 				).not.toBeInTheDocument();
+ 			} );
+-			it( 'should not change tabs when initialTabId is changed', async () => {
++			it( 'should not change tabs when defaultTabId is changed', async () => {
+ 				const { rerender } = render(
+-					<UncontrolledTabs tabs={ TABS } initialTabId="beta" />
++					<UncontrolledTabs tabs={ TABS } defaultTabId="beta" />
+ 				);
+ 
+ 				rerender(
+-					<UncontrolledTabs tabs={ TABS } initialTabId="alpha" />
++					<UncontrolledTabs tabs={ TABS } defaultTabId="alpha" />
+ 				);
+ 
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+ 			} );
+ 
+-			it( 'should fall back to the tab associated to `initialTabId` if the currently active tab is removed', async () => {
++			it( 'should fall back to the tab associated to `defaultTabId` if the currently active tab is removed', async () => {
+ 				const mockOnSelect = jest.fn();
+ 
+ 				const { rerender } = render(
+ 					<UncontrolledTabs
+ 						tabs={ TABS }
+-						initialTabId="gamma"
++						defaultTabId="gamma"
+ 						onSelect={ mockOnSelect }
+ 					/>
+ 				);
+@@ -714,7 +714,7 @@ describe( 'Tabs', () => {
+ 				rerender(
+ 					<UncontrolledTabs
+ 						tabs={ TABS.slice( 1 ) }
+-						initialTabId="gamma"
++						defaultTabId="gamma"
+ 						onSelect={ mockOnSelect }
+ 					/>
+ 				);
+@@ -722,13 +722,13 @@ describe( 'Tabs', () => {
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+ 			} );
+ 
+-			it( 'should fall back to the tab associated to `initialTabId` if the currently active tab becomes disabled', async () => {
++			it( 'should fall back to the tab associated to `defaultTabId` if the currently active tab becomes disabled', async () => {
+ 				const mockOnSelect = jest.fn();
+ 
+ 				const { rerender } = render(
+ 					<UncontrolledTabs
+ 						tabs={ TABS }
+-						initialTabId="gamma"
++						defaultTabId="gamma"
+ 						onSelect={ mockOnSelect }
+ 					/>
+ 				);
+@@ -754,7 +754,7 @@ describe( 'Tabs', () => {
+ 				rerender(
+ 					<UncontrolledTabs
+ 						tabs={ TABS_WITH_ALPHA_DISABLED }
+-						initialTabId="gamma"
++						defaultTabId="gamma"
+ 						onSelect={ mockOnSelect }
+ 					/>
+ 				);
+@@ -762,9 +762,9 @@ describe( 'Tabs', () => {
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+ 			} );
+ 
+-			it( 'should have no active tabs when the tab associated to `initialTabId` is removed while being the active tab', async () => {
++			it( 'should have no active tabs when the tab associated to `defaultTabId` is removed while being the active tab', async () => {
+ 				const { rerender } = render(
+-					<UncontrolledTabs tabs={ TABS } initialTabId="gamma" />
++					<UncontrolledTabs tabs={ TABS } defaultTabId="gamma" />
+ 				);
+ 
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+@@ -773,7 +773,7 @@ describe( 'Tabs', () => {
+ 				rerender(
+ 					<UncontrolledTabs
+ 						tabs={ TABS.slice( 0, 2 ) }
+-						initialTabId="gamma"
++						defaultTabId="gamma"
+ 					/>
+ 				);
+ 
+@@ -788,9 +788,9 @@ describe( 'Tabs', () => {
+ 				).not.toBeInTheDocument();
+ 			} );
+ 
+-			it( 'waits for the tab with the `initialTabId` to be present in the `tabs` array before selecting it', async () => {
++			it( 'waits for the tab with the `defaultTabId` to be present in the `tabs` array before selecting it', async () => {
+ 				const { rerender } = render(
+-					<UncontrolledTabs tabs={ TABS } initialTabId="delta" />
++					<UncontrolledTabs tabs={ TABS } defaultTabId="delta" />
+ 				);
+ 
+ 				// There should be no selected tab yet.
+@@ -801,7 +801,7 @@ describe( 'Tabs', () => {
+ 				rerender(
+ 					<UncontrolledTabs
+ 						tabs={ TABS_WITH_DELTA }
+-						initialTabId="delta"
++						defaultTabId="delta"
+ 					/>
+ 				);
+ 
+@@ -891,7 +891,7 @@ describe( 'Tabs', () => {
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+ 			} );
+ 
+-			it( 'should select first enabled tab when the tab associated to `initialTabId` is disabled', async () => {
++			it( 'should select first enabled tab when the tab associated to `defaultTabId` is disabled', async () => {
+ 				const TABS_ONLY_GAMMA_ENABLED = TABS.map( ( tabObj ) =>
+ 					tabObj.tabId !== 'gamma'
+ 						? {
+@@ -906,7 +906,7 @@ describe( 'Tabs', () => {
+ 				const { rerender } = render(
+ 					<UncontrolledTabs
+ 						tabs={ TABS_ONLY_GAMMA_ENABLED }
+-						initialTabId="beta"
++						defaultTabId="beta"
+ 					/>
+ 				);
+ 
+@@ -916,7 +916,7 @@ describe( 'Tabs', () => {
+ 
+ 				// Re-enable all tabs
+ 				rerender(
+-					<UncontrolledTabs tabs={ TABS } initialTabId="beta" />
++					<UncontrolledTabs tabs={ TABS } defaultTabId="beta" />
+ 				);
+ 
+ 				// Even if the initial tab becomes enabled again, the selected tab doesn't
+@@ -968,14 +968,14 @@ describe( 'Tabs', () => {
+ 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+ 			} );
+ 
+-			it( 'should select the first enabled tab when the tab associated to `initialTabId` becomes disabled while being the active tab', async () => {
++			it( 'should select the first enabled tab when the tab associated to `defaultTabId` becomes disabled while being the active tab', async () => {
+ 				const mockOnSelect = jest.fn();
+ 
+ 				const { rerender } = render(
+ 					<UncontrolledTabs
+ 						tabs={ TABS }
+ 						onSelect={ mockOnSelect }
+-						initialTabId="gamma"
++						defaultTabId="gamma"
+ 					/>
+ 				);
+ 
+@@ -998,7 +998,7 @@ describe( 'Tabs', () => {
+ 					<UncontrolledTabs
+ 						tabs={ TABS_WITH_GAMMA_DISABLED }
+ 						onSelect={ mockOnSelect }
+-						initialTabId="gamma"
++						defaultTabId="gamma"
+ 					/>
+ 				);
+ 
+@@ -1011,7 +1011,7 @@ describe( 'Tabs', () => {
+ 					<UncontrolledTabs
+ 						tabs={ TABS }
+ 						onSelect={ mockOnSelect }
+-						initialTabId="gamma"
++						defaultTabId="gamma"
+ 					/>
+ 				);
+ 
+@@ -1032,12 +1032,12 @@ describe( 'Tabs', () => {
+ 				await screen.findByRole( 'tabpanel', { name: 'Beta' } )
+ 			).toBeInTheDocument();
+ 		} );
+-		it( 'should render the specified `selectedTabId`, and ignore the `initialTabId` prop', async () => {
++		it( 'should render the specified `selectedTabId`, and ignore the `defaultTabId` prop', async () => {
+ 			render(
+ 				<ControlledTabs
+ 					tabs={ TABS }
+ 					selectedTabId="gamma"
+-					initialTabId="beta"
++					defaultTabId="beta"
+ 				/>
+ 			);
+ 
+diff --git a/packages/components/src/tabs/types.ts b/packages/components/src/tabs/types.ts
+index 389665b13357fe..1a9e6477385f67 100644
+--- a/packages/components/src/tabs/types.ts
++++ b/packages/components/src/tabs/types.ts
+@@ -43,7 +43,7 @@ export type TabsProps = {
+ 	 * Note: this prop will be overridden by the `selectedTabId` prop if it is
+ 	 * provided. (Controlled Mode)
+ 	 */
+-	initialTabId?: string;
++	defaultTabId?: string;
+ 	/**
+ 	 * The function called when a tab has been selected.
+ 	 * It is passed the id of the newly selected tab as an argument.
+diff --git a/packages/edit-site/src/components/global-styles/font-families.js b/packages/edit-site/src/components/global-styles/font-families.js
+index 5e66f705334c8e..55ca6d0b5222c9 100644
+--- a/packages/edit-site/src/components/global-styles/font-families.js
++++ b/packages/edit-site/src/components/global-styles/font-families.js
+@@ -33,7 +33,7 @@ function FontFamilies() {
+ 			{ !! modalTabOpen && (
+ 				<FontLibraryModal
+ 					onRequestClose={ () => toggleModal() }
+-					initialTabId={ modalTabOpen }
++					defaultTabId={ modalTabOpen }
+ 				/>
+ 			) }
+ 
+diff --git a/packages/edit-site/src/components/global-styles/font-library-modal/index.js b/packages/edit-site/src/components/global-styles/font-library-modal/index.js
+index 71966449eb616d..dc0fcd7ea373b0 100644
+--- a/packages/edit-site/src/components/global-styles/font-library-modal/index.js
++++ b/packages/edit-site/src/components/global-styles/font-library-modal/index.js
+@@ -41,7 +41,7 @@ const tabsFromCollections = ( collections ) =>
+ 
+ function FontLibraryModal( {
+ 	onRequestClose,
+-	initialTabId = 'installed-fonts',
++	defaultTabId = 'installed-fonts',
+ } ) {
+ 	const { collections, setNotice } = useContext( FontLibraryContext );
+ 
+@@ -63,7 +63,7 @@ function FontLibraryModal( {
+ 			className="font-library-modal"
+ 		>
+ 			<div className="font-library-modal__tabs">
+-				<Tabs initialTabId={ initialTabId } onSelect={ onSelect }>
++				<Tabs defaultTabId={ defaultTabId } onSelect={ onSelect }>
+ 					<Tabs.TabList>
+ 						{ tabs.map( ( { id, title } ) => (
+ 							<Tabs.Tab key={ id } tabId={ id }>
+diff --git a/packages/editor/src/components/list-view-sidebar/index.js b/packages/editor/src/components/list-view-sidebar/index.js
+index 9484ddcf3943dd..a08b9a73c3c982 100644
+--- a/packages/editor/src/components/list-view-sidebar/index.js
++++ b/packages/editor/src/components/list-view-sidebar/index.js
+@@ -127,7 +127,7 @@ export default function ListViewSidebar() {
+ 				// render where no tab is selected. This ensures that the
+ 				// tabpanel height is correct so the relevant scroll container
+ 				// can be rendered internally.
+-				initialTabId="list-view"
++				defaultTabId="list-view"
+ 			>
+ 				<div className="edit-post-editor__document-overview-panel__header">
+ 					<Button
+diff --git a/packages/preferences/src/components/preferences-modal-tabs/index.js b/packages/preferences/src/components/preferences-modal-tabs/index.js
+index 4797b50985f03a..f48d715dc1bf8a 100644
+--- a/packages/preferences/src/components/preferences-modal-tabs/index.js
++++ b/packages/preferences/src/components/preferences-modal-tabs/index.js
+@@ -66,7 +66,7 @@ export default function PreferencesModalTabs( { sections } ) {
+ 		modalContent = (
+ 			<div className="preferences__tabs">
+ 				<Tabs
+-					initialTabId={
++					defaultTabId={
+ 						activeMenu !== PREFERENCES_MENU ? activeMenu : undefined
+ 					}
+ 					onSelect={ setActiveMenu }

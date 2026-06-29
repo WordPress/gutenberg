@@ -1,0 +1,451 @@
+diff --git a/packages/block-editor/src/components/block-switcher/test/index.js b/packages/block-editor/src/components/block-switcher/test/index.js
+index 6fda7e21f2ff05..a17c3c689c437c 100644
+--- a/packages/block-editor/src/components/block-switcher/test/index.js
++++ b/packages/block-editor/src/components/block-switcher/test/index.js
+@@ -8,8 +8,6 @@ import { shallow, mount } from 'enzyme';
+  */
+ import { useSelect } from '@wordpress/data';
+ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+-import { DOWN } from '@wordpress/keycodes';
+-import { Button } from '@wordpress/components';
+ import { stack } from '@wordpress/icons';
+ 
+ /**
+@@ -155,7 +153,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
+ 		expect( wrapper ).toMatchSnapshot();
+ 	} );
+ 
+-	describe( 'Dropdown', () => {
++	describe( 'Dropdown .renderContent', () => {
+ 		beforeAll( () => {
+ 			useSelect.mockImplementation( () => ( {
+ 				possibleBlockTransformations: [
+@@ -168,66 +166,19 @@ describe( 'BlockSwitcherDropdownMenu', () => {
+ 				<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
+ 			).find( 'Dropdown' );
+ 
+-		test( 'should dropdown exist', () => {
+-			expect( getDropdown() ).toHaveLength( 1 );
+-		} );
+-
+-		describe( '.renderToggle', () => {
+-			const onToggleStub = jest.fn();
+-			const mockKeyDown = {
+-				preventDefault: () => {},
+-				stopPropagation: () => {},
+-				keyCode: DOWN,
+-			};
+-
+-			afterEach( () => {
+-				onToggleStub.mockReset();
+-			} );
+-
+-			test( 'should simulate a keydown event, which should call onToggle and open transform toggle.', () => {
+-				const toggleClosed = mount(
+-					getDropdown().props().renderToggle( {
+-						onToggle: onToggleStub,
+-						isOpen: false,
+-					} )
+-				);
+-				const iconButtonClosed = toggleClosed.find( Button );
+-
+-				iconButtonClosed.simulate( 'keydown', mockKeyDown );
+-
+-				expect( onToggleStub ).toHaveBeenCalledTimes( 1 );
+-			} );
+-
+-			test( 'should simulate a click event, which should call onToggle.', () => {
+-				const toggleOpen = mount(
+-					getDropdown().props().renderToggle( {
+-						onToggle: onToggleStub,
+-						isOpen: true,
+-					} )
+-				);
+-				const iconButtonOpen = toggleOpen.find( Button );
+-
+-				iconButtonOpen.simulate( 'keydown', mockKeyDown );
+-
+-				expect( onToggleStub ).toHaveBeenCalledTimes( 0 );
+-			} );
+-		} );
+-
+-		describe( '.renderContent', () => {
+-			test( 'should create the transform items for the chosen block. A heading block will have 3 items', () => {
+-				const onCloseStub = jest.fn();
+-				const content = shallow(
+-					<div>
+-						{ getDropdown()
+-							.props()
+-							.renderContent( { onClose: onCloseStub } ) }
+-					</div>
+-				);
+-				const blockList = content.find( 'BlockTransformationsMenu' );
+-				expect(
+-					blockList.prop( 'possibleBlockTransformations' )
+-				).toHaveLength( 1 );
+-			} );
++		test( 'should create the transform items for the chosen block. A heading block will have 1 item', () => {
++			const onCloseStub = jest.fn();
++			const content = shallow(
++				<div>
++					{ getDropdown()
++						.props()
++						.renderContent( { onClose: onCloseStub } ) }
++				</div>
++			);
++			const blockList = content.find( 'BlockTransformationsMenu' );
++			expect(
++				blockList.prop( 'possibleBlockTransformations' )
++			).toHaveLength( 1 );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/block-library/src/post-date/edit.js b/packages/block-library/src/post-date/edit.js
+index ee998f01188248..c46e1eca471182 100644
+--- a/packages/block-library/src/post-date/edit.js
++++ b/packages/block-library/src/post-date/edit.js
+@@ -7,7 +7,7 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { useEntityProp } from '@wordpress/core-data';
+-import { useState } from '@wordpress/element';
++import { useRef } from '@wordpress/element';
+ import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
+ import {
+ 	AlignmentToolbar,
+@@ -25,6 +25,7 @@ import {
+ 	CustomSelectControl,
+ } from '@wordpress/components';
+ import { __, sprintf } from '@wordpress/i18n';
++import { __experimentalUseToggler as useToggler } from '@wordpress/compose';
+ import { edit } from '@wordpress/icons';
+ 
+ export default function PostDateEdit( { attributes, context, setAttributes } ) {
+@@ -38,7 +39,12 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
+ 		'date',
+ 		postId
+ 	);
+-	const [ isPickerOpen, setIsPickerOpen ] = useState( false );
++	const timeRef = useRef();
++	const {
++		togglerHandlers,
++		isOn: isPickerOpen,
++		offUnlessToggler,
++	} = useToggler();
+ 	const settings = __experimentalGetSettings();
+ 	// To know if the current time format is a 12 hour time, look for "a".
+ 	// Also make sure this "a" is not escaped by a "/".
+@@ -50,6 +56,15 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
+ 			.reverse()
+ 			.join( '' ) // Reverse the string and test for "a" not followed by a slash.
+ 	);
++	const datePicker = (
++		<Popover onClose={ offUnlessToggler } anchorRef={ timeRef.current }>
++			<DateTimePicker
++				currentDate={ date }
++				onChange={ setDate }
++				is12Hour={ is12Hour }
++			/>
++		</Popover>
++	);
+ 	const formatOptions = Object.values( settings.formats ).map(
+ 		( formatOption ) => ( {
+ 			key: formatOption,
+@@ -64,17 +79,9 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
+ 	} );
+ 
+ 	let postDate = date ? (
+-		<time dateTime={ dateI18n( 'c', date ) }>
++		<time dateTime={ dateI18n( 'c', date ) } ref={ timeRef }>
+ 			{ dateI18n( resolvedFormat, date ) }
+-			{ isPickerOpen && (
+-				<Popover onClose={ setIsPickerOpen.bind( null, false ) }>
+-					<DateTimePicker
+-						currentDate={ date }
+-						onChange={ setDate }
+-						is12Hour={ is12Hour }
+-					/>
+-				</Popover>
+-			) }
++			{ isPickerOpen && datePicker }
+ 		</time>
+ 	) : (
+ 		__( 'No Date' )
+@@ -95,13 +102,10 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
+ 				{ date && (
+ 					<ToolbarGroup>
+ 						<ToolbarButton
++							aria-expanded={ isPickerOpen }
+ 							icon={ edit }
+ 							title={ __( 'Change Date' ) }
+-							onClick={ () =>
+-								setIsPickerOpen(
+-									( _isPickerOpen ) => ! _isPickerOpen
+-								)
+-							}
++							{ ...togglerHandlers }
+ 						/>
+ 					</ToolbarGroup>
+ 				) }
+diff --git a/packages/components/src/dropdown-menu/index.js b/packages/components/src/dropdown-menu/index.js
+index 45f4e67c613c6d..256d206b0ff040 100644
+--- a/packages/components/src/dropdown-menu/index.js
++++ b/packages/components/src/dropdown-menu/index.js
+@@ -92,7 +92,7 @@ function DropdownMenu( {
+ 		<Dropdown
+ 			className={ classnames( 'components-dropdown-menu', className ) }
+ 			popoverProps={ mergedPopoverProps }
+-			renderToggle={ ( { isOpen, onToggle } ) => {
++			renderToggle={ ( { isOpen, onToggle, togglerHandlers } ) => {
+ 				const openOnArrowDown = ( event ) => {
+ 					if ( disableOpenOnArrowDown ) {
+ 						return;
+@@ -115,22 +115,24 @@ function DropdownMenu( {
+ 					},
+ 					toggleProps
+ 				);
++				Object.keys( togglerHandlers ).forEach( ( key ) => {
++					if ( toggleProps?.key ) {
++						mergedToggleProps[ key ] = ( event ) => {
++							togglerHandlers[ key ]( event );
++							toggleProps[ key ]( event );
++						};
++					} else {
++						mergedToggleProps[ key ] = togglerHandlers[ key ];
++					}
++				} );
+ 
+ 				return (
+ 					<ButtonComponent
+ 						{ ...mergedToggleProps }
+ 						icon={ icon }
+-						onClick={ ( event ) => {
+-							onToggle( event );
+-							if ( mergedToggleProps.onClick ) {
+-								mergedToggleProps.onClick( event );
+-							}
+-						} }
+ 						onKeyDown={ ( event ) => {
+ 							openOnArrowDown( event );
+-							if ( mergedToggleProps.onKeyDown ) {
+-								mergedToggleProps.onKeyDown( event );
+-							}
++							mergedToggleProps.onKeyDown?.( event );
+ 						} }
+ 						aria-haspopup="true"
+ 						aria-expanded={ isOpen }
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index c5775fdaf09d97..419d89c4f5469e 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -6,26 +6,14 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { useRef, useEffect, useState } from '@wordpress/element';
++import { __experimentalUseToggler as useToggler } from '@wordpress/compose';
++import { useRef, useEffect } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Popover from '../popover';
+ 
+-function useObservableState( initialState, onStateChange ) {
+-	const [ state, setState ] = useState( initialState );
+-	return [
+-		state,
+-		( value ) => {
+-			setState( value );
+-			if ( onStateChange ) {
+-				onStateChange( value );
+-			}
+-		},
+-	];
+-}
+-
+ export default function Dropdown( {
+ 	renderContent,
+ 	renderToggle,
+@@ -40,7 +28,35 @@ export default function Dropdown( {
+ 	onToggle,
+ } ) {
+ 	const containerRef = useRef();
+-	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
++
++	const {
++		togglerHandlers: { onMouseDown: togglerMouseDown, ...togglerHandlers },
++		isOn: isOpen,
++		setIsOn,
++		offUnlessToggler,
++	} = useToggler();
++
++	const isUsingTogglerHook = useRef();
++	togglerHandlers.onMouseDown = () => {
++		// Notes the use of this codepath to obviate closeIfFocusOutside with
++		// offUnlessToggler from the Toggler hook.
++		if ( ! isUsingTogglerHook.current ) {
++			isUsingTogglerHook.current = true;
++		}
++		togglerMouseDown();
++	};
++
++	function setAndPropagateIsOpen( valueOrSetter ) {
++		let syncState;
++		if ( typeof valueOrSetter === 'function' ) {
++			setIsOn( ( current ) => ( syncState = valueOrSetter( current ) ) );
++		} else {
++			setIsOn( ( syncState = valueOrSetter ) );
++		}
++		// propagates updates synchronously
++		onToggle?.( syncState );
++		if ( ! syncState ) onClose?.( syncState );
++	}
+ 
+ 	useEffect(
+ 		() => () => {
+@@ -52,31 +68,25 @@ export default function Dropdown( {
+ 	);
+ 
+ 	function toggle() {
+-		setIsOpen( ! isOpen );
++		setAndPropagateIsOpen( ( current ) => ! current );
+ 	}
+ 
+ 	/**
+-	 * Closes the dropdown if a focus leaves the dropdown wrapper. This is
+-	 * intentionally distinct from `onClose` since focus loss from the popover
+-	 * is expected to occur when using the Dropdown's toggle button, in which
+-	 * case the correct behavior is to keep the dropdown closed. The same applies
+-	 * in case when focus is moved to the modal dialog.
++	 * Closes the dropdown if focus leaves the popover other than the case that
++	 * the toggle button was focused. This is a legacy codepath as it fails for
++	 * UAs that don't focus button elements when pressed. Can be removed after
++	 * all Dropdown implementors have been updated to use the `togglerHandlers`
++	 * passed to the renderToggle callback.
+ 	 */
+ 	function closeIfFocusOutside() {
+ 		const { ownerDocument } = containerRef.current;
+-		if (
+-			! containerRef.current.contains( ownerDocument.activeElement ) &&
+-			! ownerDocument.activeElement.closest( '[role="dialog"]' )
+-		) {
++		if ( ! containerRef.current.contains( ownerDocument.activeElement ) ) {
+ 			close();
+ 		}
+ 	}
+ 
+ 	function close() {
+-		if ( onClose ) {
+-			onClose();
+-		}
+-		setIsOpen( false );
++		setAndPropagateIsOpen( false );
+ 	}
+ 
+ 	const args = { isOpen, onToggle: toggle, onClose: close };
+@@ -86,12 +96,15 @@ export default function Dropdown( {
+ 			className={ classnames( 'components-dropdown', className ) }
+ 			ref={ containerRef }
+ 		>
+-			{ renderToggle( args ) }
++			{ renderToggle( { ...args, togglerHandlers } ) }
+ 			{ isOpen && (
+ 				<Popover
+ 					position={ position }
+-					onClose={ close }
+-					onFocusOutside={ closeIfFocusOutside }
++					onClose={
++						isUsingTogglerHook.current
++							? offUnlessToggler
++							: closeIfFocusOutside
++					}
+ 					expandOnMobile={ expandOnMobile }
+ 					headerTitle={ headerTitle }
+ 					focusOnMount={ focusOnMount }
+diff --git a/packages/compose/src/hooks/use-toggler/index.js b/packages/compose/src/hooks/use-toggler/index.js
+new file mode 100644
+index 00000000000000..98f524dabb0bcc
+--- /dev/null
++++ b/packages/compose/src/hooks/use-toggler/index.js
+@@ -0,0 +1,52 @@
++/**
++ * WordPress dependencies
++ */
++import { useCallback, useRef, useState } from '@wordpress/element';
++
++/**
++ * @typedef  {Object}    TogglerHookReturnValue
++ * @property {Object}    togglerHandlers   Event handlers for toggler element.
++ * @property {boolean}   isOn              State of toggler.
++ * @property {Function}  setIsOn           Sets toggler state
++ * @property {Function}  offUnlessToggler  Sets state, if toggler element is
++ *                                         not pressed, to false.
++ */
++
++/**
++ * Facilitates disclosure/toggle components. It returns state with a setter,
++ * event handlers for the toggle commponent and a function `offUnlessToggler`
++ * to be used by the disclosed component for auto-closing with deferral to the
++ * toggle component in case it was pressed.
++ *
++ * @return {TogglerHookReturnValue} State and handlers for content disclosures
++ */
++export default function useToggler() {
++	const [ isOn, setIsOn ] = useState( false );
++
++	const isTogglerPressed = useRef();
++	const togglerHandlers = useRef();
++	if ( ! togglerHandlers.current ) {
++		togglerHandlers.current = {
++			onMouseDown: () => ( isTogglerPressed.current = true ),
++			onMouseUp: () => ( isTogglerPressed.current = false ),
++			onClick: ( { currentTarget: { disabled, ariaDisabled } } ) => {
++				if ( disabled || ( ariaDisabled && ariaDisabled === 'true' ) ) {
++					return;
++				}
++				setIsOn( ( current ) => ! current );
++			},
++		};
++	}
++
++	const offUnlessToggler = useCallback(
++		() => ! isTogglerPressed.current && setIsOn( false ),
++		[]
++	);
++
++	return {
++		togglerHandlers: togglerHandlers.current,
++		isOn,
++		setIsOn,
++		offUnlessToggler,
++	};
++}
+diff --git a/packages/compose/src/index.js b/packages/compose/src/index.js
+index 5a42d7f19d8c16..d3d74a44545c94 100644
+--- a/packages/compose/src/index.js
++++ b/packages/compose/src/index.js
+@@ -35,3 +35,4 @@ export { default as useDebounce } from './hooks/use-debounce';
+ export { default as useThrottle } from './hooks/use-throttle';
+ export { default as useMergeRefs } from './hooks/use-merge-refs';
+ export { default as useRefEffect } from './hooks/use-ref-effect';
++export { default as __experimentalUseToggler } from './hooks/use-toggler';
+diff --git a/packages/edit-post/src/components/sidebar/post-visibility/index.js b/packages/edit-post/src/components/sidebar/post-visibility/index.js
+index 2eacd4d3042aab..d3b56d94b4fbd7 100644
+--- a/packages/edit-post/src/components/sidebar/post-visibility/index.js
++++ b/packages/edit-post/src/components/sidebar/post-visibility/index.js
+@@ -24,12 +24,12 @@ export function PostVisibility() {
+ 						<Dropdown
+ 							position="bottom left"
+ 							contentClassName="edit-post-post-visibility__dialog"
+-							renderToggle={ ( { isOpen, onToggle } ) => (
++							renderToggle={ ( { isOpen, togglerHandlers } ) => (
+ 								<Button
+ 									aria-expanded={ isOpen }
+ 									className="edit-post-post-visibility__toggle"
+-									onClick={ onToggle }
+ 									isTertiary
++									{ ...togglerHandlers }
+ 								>
+ 									<PostVisibilityLabel />
+ 								</Button>

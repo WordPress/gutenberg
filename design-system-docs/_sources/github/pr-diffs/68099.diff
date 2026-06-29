@@ -1,0 +1,128 @@
+diff --git a/bin/api-docs/gen-components-docs/index.mjs b/bin/api-docs/gen-components-docs/index.mjs
+index c7109dc4982c36..2d895db69827e1 100644
+--- a/bin/api-docs/gen-components-docs/index.mjs
++++ b/bin/api-docs/gen-components-docs/index.mjs
+@@ -116,6 +116,7 @@ await Promise.all(
+ 		const docs = generateMarkdownDocs( {
+ 			typeDocs,
+ 			subcomponentTypeDocs,
++			additionalProps: manifest.additionalProps,
+ 		} );
+ 		const outputFile = path.resolve(
+ 			path.dirname( manifestPath ),
+diff --git a/bin/api-docs/gen-components-docs/markdown/index.mjs b/bin/api-docs/gen-components-docs/markdown/index.mjs
+index 5978e7e80fe260..c4d712f1bdf10f 100644
+--- a/bin/api-docs/gen-components-docs/markdown/index.mjs
++++ b/bin/api-docs/gen-components-docs/markdown/index.mjs
+@@ -21,7 +21,11 @@ function normalizeTrailingNewline( str ) {
+ 	return str.replace( /\n*$/, '\n' );
+ }
+ 
+-export function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
++export function generateMarkdownDocs( {
++	typeDocs,
++	subcomponentTypeDocs,
++	additionalProps,
++} ) {
+ 	const mainDocsJson = [
+ 		{ h1: typeDocs.displayName },
+ 		'<!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->',
+@@ -29,7 +33,7 @@ export function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
+ 			p: `<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-${ typeDocs.displayName.toLowerCase() }--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>`,
+ 		},
+ 		normalizeTrailingNewline( typeDocs.description ),
+-		...generateMarkdownPropsJson( typeDocs.props ),
++		...generateMarkdownPropsJson( typeDocs.props, {}, additionalProps ),
+ 	];
+ 
+ 	const subcomponentDocsJson = subcomponentTypeDocs?.length
+diff --git a/bin/api-docs/gen-components-docs/markdown/props.mjs b/bin/api-docs/gen-components-docs/markdown/props.mjs
+index aaa73041217528..6a873e20f52b93 100644
+--- a/bin/api-docs/gen-components-docs/markdown/props.mjs
++++ b/bin/api-docs/gen-components-docs/markdown/props.mjs
+@@ -18,7 +18,11 @@ function renderPropType( type ) {
+ 	}
+ }
+ 
+-export function generateMarkdownPropsJson( props, { headingLevel = 2 } = {} ) {
++export function generateMarkdownPropsJson(
++	props,
++	{ headingLevel = 2 } = {},
++	additionalProps = false
++) {
+ 	const sortedKeys = Object.keys( props ).sort( ( [ a ], [ b ] ) =>
+ 		a.localeCompare( b )
+ 	);
+@@ -46,5 +50,12 @@ export function generateMarkdownPropsJson( props, { headingLevel = 2 } = {} ) {
+ 		} )
+ 		.filter( Boolean );
+ 
++	if ( additionalProps ) {
++		propsJson.push( [
++			{ [ `h${ headingLevel + 1 }` ]: `\`Additional props\`` },
++			`All other props will be passed directly to the underlying \`${ additionalProps }\` element.`,
++		] );
++	}
++
+ 	return [ { [ `h${ headingLevel }` ]: 'Props' }, ...propsJson ];
+ }
+diff --git a/packages/components/schemas/docs-manifest.json b/packages/components/schemas/docs-manifest.json
+index 7d1e40f4f696d7..976a36b6cc940d 100644
+--- a/packages/components/schemas/docs-manifest.json
++++ b/packages/components/schemas/docs-manifest.json
+@@ -32,6 +32,11 @@
+ 				},
+ 				"required": [ "displayName", "filePath" ]
+ 			}
++		},
++		"additionalProps": {
++			"type": "string",
++			"default": false,
++			"description": "The wrapper associated with the component which accepts additional props."
+ 		}
+ 	},
+ 	"required": [ "displayName", "filePath" ]
+diff --git a/packages/components/src/badge/README.md b/packages/components/src/badge/README.md
+index 0be531ca6f2df8..fa3350eb399f81 100644
+--- a/packages/components/src/badge/README.md
++++ b/packages/components/src/badge/README.md
+@@ -20,3 +20,7 @@ Badge variant.
+  - Type: `"default" | "info" | "success" | "warning" | "error"`
+  - Required: No
+  - Default: `default`
++
++### `Additional props`
++
++All other props will be passed directly to the underlying `span` element.
+\ No newline at end of file
+diff --git a/packages/components/src/badge/docs-manifest.json b/packages/components/src/badge/docs-manifest.json
+index 3b70c0ef228432..2747e2faf54f5b 100644
+--- a/packages/components/src/badge/docs-manifest.json
++++ b/packages/components/src/badge/docs-manifest.json
+@@ -1,5 +1,6 @@
+ {
+ 	"$schema": "../../schemas/docs-manifest.json",
+ 	"displayName": "Badge",
+-	"filePath": "./index.tsx"
++	"filePath": "./index.tsx",
++	"additionalProps": "span"
+ }
+diff --git a/packages/components/src/badge/stories/index.story.tsx b/packages/components/src/badge/stories/index.story.tsx
+index 7f827d3bfabf5a..7232dfc1d10239 100644
+--- a/packages/components/src/badge/stories/index.story.tsx
++++ b/packages/components/src/badge/stories/index.story.tsx
+@@ -13,6 +13,14 @@ const meta = {
+ 	title: 'Components/Containers/Badge',
+ 	id: 'components-badge',
+ 	tags: [ 'status-private' ],
++	argTypes: {
++		// @ts-expect-error
++		'': {
++			control: false,
++			table: { category: 'Other' },
++			description: 'This component also accepts props of `span`',
++		},
++	},
+ } satisfies Meta< typeof Badge >;
+ 
+ export default meta;

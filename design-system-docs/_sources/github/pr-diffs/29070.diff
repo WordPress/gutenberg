@@ -1,0 +1,14 @@
+diff --git a/packages/components/src/focal-point-picker/grid.js b/packages/components/src/focal-point-picker/grid.js
+index 52fbdc3f3bff3a..776419eaef5b3d 100644
+--- a/packages/components/src/focal-point-picker/grid.js
++++ b/packages/components/src/focal-point-picker/grid.js
+@@ -13,7 +13,8 @@ import {
+ } from './styles/focal-point-picker-style';
+ import { useUpdateEffect } from '../utils/hooks';
+ 
+-const { clearTimeout, setTimeout } = window;
++const { clearTimeout, setTimeout } =
++	typeof window !== 'undefined' ? window : {};
+ 
+ export default function FocalPointPickerGrid( {
+ 	bounds = {},

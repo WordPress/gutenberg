@@ -1,0 +1,54 @@
+diff --git a/packages/block-editor/src/components/block-draggable/style.scss b/packages/block-editor/src/components/block-draggable/style.scss
+index 349afa2c3563c0..f716f2d32a1d40 100644
+--- a/packages/block-editor/src/components/block-draggable/style.scss
++++ b/packages/block-editor/src/components/block-draggable/style.scss
+@@ -8,7 +8,7 @@
+ .block-editor-block-draggable-chip {
+ 	background-color: $gray-900;
+ 	border-radius: $radius-small;
+-	box-shadow: 0 6px 8px rgba($black, 0.3);
++	box-shadow: $elevation-small;
+ 	color: $white;
+ 	cursor: grabbing;
+ 	display: inline-flex;
+@@ -77,6 +77,6 @@
+ 	.block-editor-block-draggable-chip__disabled.block-editor-block-draggable-chip__disabled {
+ 		background-color: $gray-700;
+ 		opacity: 1;
+-		box-shadow: 0 4px 8px rgba($black, 0.2);
++		box-shadow: $elevation-small;
+ 	}
+ }
+diff --git a/packages/edit-site/src/components/layout/style.scss b/packages/edit-site/src/components/layout/style.scss
+index b2d929a7943dbf..27a3f7b99bf7e2 100644
+--- a/packages/edit-site/src/components/layout/style.scss
++++ b/packages/edit-site/src/components/layout/style.scss
+@@ -114,14 +114,18 @@
+ 		width: calc(100% - #{$canvas-padding});
+ 
+ 		.edit-site-resizable-frame__inner-content {
+-			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
+-			transition: border-radius 0.4s;
++			box-shadow: $elevation-x-small;
++			transition: border-radius, box-shadow 0.4s;
+ 			// This ensure the radius work properly.
+ 			overflow: hidden;
+ 
+ 			.edit-site-layout:not(.is-full-canvas) & {
+ 				border-radius: $radius-large;
+ 			}
++
++			&:hover {
++				box-shadow: $elevation-large;
++			}
+ 		}
+ 	}
+ 
+@@ -246,6 +250,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
+ 	flex-grow: 1;
+ 	margin: 0;
+ 	overflow: hidden;
++	box-shadow: $elevation-x-small;
+ 	@include break-medium() {
+ 		border-radius: 8px;
+ 		margin: $canvas-padding $canvas-padding $canvas-padding 0;

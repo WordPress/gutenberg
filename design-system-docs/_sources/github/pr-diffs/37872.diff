@@ -1,0 +1,72 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c03e959a54be86..2496d5c4cd01b2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   Add missing styles to the `BaseControl.VisualLabel` component. ([#37747](https://github.com/WordPress/gutenberg/pull/37747))
+ -   Prevent keyDown events from propagating up in `CustomSelectControl` ([#30557](https://github.com/WordPress/gutenberg/pull/30557))
++-   Mark `children` prop as optional in `SelectControl` ([#37872](https://github.com/WordPress/gutenberg/pull/37872))
+ 
+ ## 19.2.0 (2022-01-04)
+ 
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index 17d99165383d82..9d059fc8cf5470 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -201,9 +201,9 @@ An array of objects containing the following properties:
+ 
+ #### children
+ 
+-An alternative to the `options` prop.  
++An alternative to the `options` prop.
+ Use the `children` prop to have more control on the style of the items being rendered, like `optgroup`s or `options` and possibly avoid re-rendering due to the reference update on the `options` prop.
+-- Type: `Element`
++- Type: `ReactNode`
+ - Required: No
+ 
+ #### onChange
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 7ee32b6f55cb3a..ec2afed60d7123 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -3,7 +3,8 @@
+  */
+ import { isEmpty, noop } from 'lodash';
+ import classNames from 'classnames';
+-import type { ChangeEvent, FocusEvent, Ref } from 'react';
++// eslint-disable-next-line no-restricted-imports
++import type { ChangeEvent, FocusEvent, ReactNode, Ref } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -30,7 +31,7 @@ function useUniqueId( idProp?: string ) {
+ }
+ 
+ export interface SelectControlProps
+-	extends Omit< InputBaseProps, 'isFocused' > {
++	extends Omit< InputBaseProps, 'children' | 'isFocused' > {
+ 	help?: string;
+ 	hideLabelFromVision?: boolean;
+ 	multiple?: boolean;
+@@ -49,6 +50,7 @@ export interface SelectControlProps
+ 	size?: Size;
+ 	value?: string | string[];
+ 	labelPosition?: LabelPosition;
++	children?: ReactNode;
+ }
+ 
+ function SelectControl(
+diff --git a/packages/components/src/select-control/stories/index.js b/packages/components/src/select-control/stories/index.js
+index 4d616b2926184a..5b21c55070feaf 100644
+--- a/packages/components/src/select-control/stories/index.js
++++ b/packages/components/src/select-control/stories/index.js
+@@ -69,7 +69,7 @@ export const _default = () => {
+ 	return <SelectControlWithState { ...props } />;
+ };
+ 
+-export const withNativeChildren = () => {
++export const withCustomChildren = () => {
+ 	return (
+ 		<SelectControlWithState label="Value">
+ 			<option value="option-1">Option 1</option>

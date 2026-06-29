@@ -1,0 +1,184 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3586c90c1861a1..4dba94884c14d1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `Draggable`: Render the drag clone inside the `@wordpress/ui` compat overlay slot so it shares stacking with `@wordpress/ui` overlays opened mid-drag. Auto-enabled in WordPress environments; other hosts can opt in via `useEnableWpCompatOverlaySlot()` ([#78183](https://github.com/WordPress/gutenberg/pull/78183), [#78354](https://github.com/WordPress/gutenberg/pull/78354)).
+ 
++### Bug Fixes
++
++-   `Popover`: Don't close when focus moves into the `@wordpress/ui` compat overlay slot, or is restored to the popover from any portaled descendant. This unblocks nested overlays such as `@wordpress/ui` `Select`, which previously dismissed the host `Popover` on hover and on overlay dismissal ([#78407](https://github.com/WordPress/gutenberg/pull/78407)).
++
+ ## 33.1.0 (2026-05-14)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 3acc818ff35d08..6b0782963b9072 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -279,6 +279,28 @@ const UnforwardedPopover = (
+ 				) {
+ 					return;
+ 				}
++				// Treat focus moves involving portaled descendants as
++				// internal: either the next focus target is in the
++				// `@wordpress/ui` compat overlay slot, or focus is back
++				// inside this popover by the time we evaluate (e.g. when
++				// a portaled overlay is dismissed and synchronously
++				// restores focus to its trigger).
++				// See https://github.com/WordPress/gutenberg/issues/78406.
++				const relatedTarget =
++					'relatedTarget' in event ? event.relatedTarget : null;
++				if (
++					relatedTarget instanceof Element &&
++					relatedTarget.closest( '[data-wp-compat-overlay-slot]' )
++				) {
++					return;
++				}
++				if (
++					floatingElement &&
++					ownerDocument?.activeElement instanceof Element &&
++					floatingElement.contains( ownerDocument.activeElement )
++				) {
++					return;
++				}
+ 				// Call onFocusOutside if defined or call onClose.
+ 				if ( onFocusOutside ) {
+ 					onFocusOutside( event );
+diff --git a/packages/components/src/popover/test/index.tsx b/packages/components/src/popover/test/index.tsx
+index e369e35cee9eb0..f60099ebd1175b 100644
+--- a/packages/components/src/popover/test/index.tsx
++++ b/packages/components/src/popover/test/index.tsx
+@@ -1,7 +1,13 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen, waitFor, getByText } from '@testing-library/react';
++import {
++	act,
++	render,
++	screen,
++	waitFor,
++	getByText,
++} from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ import type { CSSProperties } from 'react';
+ 
+@@ -663,4 +669,116 @@ describe( 'Popover', () => {
+ 			} );
+ 		} );
+ 	} );
++
++	describe( 'wp compat overlay slot', () => {
++		function createOverlaySlot() {
++			const slot = document.createElement( 'div' );
++			slot.setAttribute( 'data-wp-compat-overlay-slot', '' );
++			const slotButton = document.createElement( 'button' );
++			slotButton.textContent = 'Slotted item';
++			slot.appendChild( slotButton );
++			document.body.appendChild( slot );
++			return { slot, slotButton };
++		}
++
++		it( 'should not call onFocusOutside when focus moves into the wp compat overlay slot', async () => {
++			const user = userEvent.setup();
++			const onFocusOutside = jest.fn();
++			const { slot, slotButton } = createOverlaySlot();
++
++			render(
++				<Popover onFocusOutside={ onFocusOutside }>
++					<button>Inside popover</button>
++				</Popover>
++			);
++
++			await user.click( screen.getByText( 'Inside popover' ) );
++			await user.click( slotButton );
++
++			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
++			expect( onFocusOutside ).not.toHaveBeenCalled();
++
++			document.body.removeChild( slot );
++		} );
++
++		it( 'should not call onFocusOutside when focus returns from the slot to a popover descendant', async () => {
++			const user = userEvent.setup();
++			const onFocusOutside = jest.fn();
++			const { slot, slotButton } = createOverlaySlot();
++
++			render(
++				<Popover onFocusOutside={ onFocusOutside }>
++					<button>Inside popover</button>
++				</Popover>
++			);
++
++			const insideButton = screen.getByText( 'Inside popover' );
++			await user.click( insideButton );
++			await user.click( slotButton );
++			insideButton.focus();
++
++			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
++			expect( onFocusOutside ).not.toHaveBeenCalled();
++
++			document.body.removeChild( slot );
++		} );
++
++		it( 'should not call onFocusOutside when focus is restored to a popover descendant by the time the blur check runs', async () => {
++			// Mimics the base-ui `Select` backdrop dismissal: focus drops
++			// to `body` (so the captured `relatedTarget` is `null`), then
++			// is synchronously restored to the popover before the blur
++			// check runs.
++			const onFocusOutside = jest.fn();
++			const { slot, slotButton } = createOverlaySlot();
++
++			render(
++				<Popover
++					data-testid="popover"
++					onFocusOutside={ onFocusOutside }
++				>
++					<button>Trigger</button>
++				</Popover>
++			);
++
++			const trigger = screen.getByText( 'Trigger' );
++			const floating = screen.getByTestId( 'popover' );
++
++			await act( async () => {
++				slotButton.focus();
++				floating.dispatchEvent(
++					new FocusEvent( 'blur', {
++						bubbles: true,
++						relatedTarget: null,
++					} )
++				);
++				trigger.focus();
++				await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
++			} );
++
++			expect( onFocusOutside ).not.toHaveBeenCalled();
++
++			document.body.removeChild( slot );
++		} );
++
++		it( 'should still call onFocusOutside when focus moves to a sibling outside the slot', async () => {
++			const user = userEvent.setup();
++			const onFocusOutside = jest.fn();
++
++			render(
++				<>
++					<Popover onFocusOutside={ onFocusOutside }>
++						<button>Inside popover</button>
++					</Popover>
++					<button>Outside</button>
++				</>
++			);
++
++			await user.click( screen.getByText( 'Inside popover' ) );
++			await user.click( screen.getByText( 'Outside' ) );
++
++			await waitFor( () => {
++				expect( onFocusOutside ).toHaveBeenCalledTimes( 1 );
++			} );
++		} );
++	} );
+ } );

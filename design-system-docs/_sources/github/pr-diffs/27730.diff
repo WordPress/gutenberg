@@ -1,0 +1,62 @@
+diff --git a/packages/components/src/date-time/datepicker.scss b/packages/components/src/date-time/datepicker.scss
+index 2dfc20f396cc9a..ed61a12d5edd32 100644
+--- a/packages/components/src/date-time/datepicker.scss
++++ b/packages/components/src/date-time/datepicker.scss
+@@ -432,7 +432,7 @@
+ }
+ .CalendarMonthGrid__horizontal {
+ 	position: absolute;
+-	left: 9px;
++	left: 0;
+ }
+ .CalendarMonthGrid__vertical {
+ 	margin: 0 auto;
+@@ -573,7 +573,7 @@
+ 	position: relative;
+ }
+ .DayPicker_weekHeaders__horizontal {
+-	margin-left: 9px;
++	margin-left: 13px;
+ }
+ .DayPicker_weekHeader {
+ 	color: #757575;
+@@ -581,6 +581,7 @@
+ 	top: 62px;
+ 	z-index: 2;
+ 	text-align: left;
++	padding: 0 !important;
+ }
+ .DayPicker_weekHeader__vertical {
+ 	left: 50%;
+@@ -605,6 +606,7 @@
+ .DayPicker_weekHeader_li {
+ 	display: inline-block;
+ 	text-align: center;
++	margin: 0 1px;
+ }
+ .DayPicker_transitionContainer {
+ 	position: relative;
+diff --git a/packages/components/src/date-time/style.scss b/packages/components/src/date-time/style.scss
+index 3a141074cd869a..7c56708e1fd32b 100644
+--- a/packages/components/src/date-time/style.scss
++++ b/packages/components/src/date-time/style.scss
+@@ -48,7 +48,9 @@
+ 
+ 	// Override external DatePicker styles.
+ 	.DayPickerNavigation_leftButton__horizontalDefault {
+-		left: 0;
++		/*!rtl:begin:ignore*/
++		left: 13px;
++		/*!rtl:end:ignore*/
+ 	}
+ 
+ 	.CalendarMonth_caption {
+@@ -98,7 +100,7 @@
+ 	.DayPicker_weekHeader {
+ 		top: 50px;
+ 		.DayPicker_weekHeader_ul {
+-			margin: 1px 0;
++			margin: 1px;
+ 			padding-left: 0;
+ 			padding-right: 0;
+ 		}

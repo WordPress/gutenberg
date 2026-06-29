@@ -1,0 +1,33 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ffea5a0aac616c..2fe344090bcdfc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Enhancements
+ 
++-   `UnitControl`: Update unit select styles ([#64712](https://github.com/WordPress/gutenberg/pull/64712)).
+ -   Decrease horizontal padding from 16px to 12px on the following components, when in the 40px default size ([#64708](https://github.com/WordPress/gutenberg/pull/64708)).
+     -   `AnglePickerControl`
+     -   `ColorPicker` (on the inputs)
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.ts b/packages/components/src/unit-control/styles/unit-control-styles.ts
+index 5f59771bd48a6a..8ec575c8499ec2 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.ts
++++ b/packages/components/src/unit-control/styles/unit-control-styles.ts
+@@ -64,6 +64,7 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
+ 			white-space: nowrap;
+ 			overflow: hidden;
+ 			text-overflow: ellipsis;
++			field-sizing: content;
+ 
+ 			&:not( :disabled ) {
+ 				color: ${ COLORS.theme.accent };
+@@ -114,7 +115,7 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
+ 			align-items: center;
+ 
+ 			&:where( :not( :disabled ) ):hover {
+-				box-shadow: inset 0 0 0
++				box-shadow: 0 0 0
+ 					${ CONFIG.borderWidth + ' ' + COLORS.ui.borderFocus };
+ 				outline: ${ CONFIG.borderWidth } solid transparent; // For High Contrast Mode
+ 			}

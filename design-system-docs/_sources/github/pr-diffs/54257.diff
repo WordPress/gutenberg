@@ -1,0 +1,348 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ca2d278909aa78..5539a28a09e013 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,16 +2,13 @@
+ 
+ ## Unreleased
+ 
+-### Breaking changes
+-
+--   Make the `Popover.Slot` optional and render popovers at the bottom of the document's body by default. ([#53889](https://github.com/WordPress/gutenberg/pull/53889), [#53982](https://github.com/WordPress/gutenberg/pull/53982)).
+-
+ ### Enhancements
+ 
+ -   Making Circular Option Picker a `listbox`. Note that while this changes some public API, new props are optional, and currently have default values; this will change in another patch ([#52255](https://github.com/WordPress/gutenberg/pull/52255)).
+ -   `ToggleGroupControl`: Rewrite backdrop animation using framer motion shared layout animations, add better support for controlled and uncontrolled modes ([#50278](https://github.com/WordPress/gutenberg/pull/50278)).
+ -   `Popover`: Add the `is-positioned` CSS class only after the popover has finished animating ([#54178](https://github.com/WordPress/gutenberg/pull/54178)).
+ -   `Tooltip`: Replace the existing tooltip to simplify the implementation and improve accessibility while maintaining the same behaviors and API ([#48440](https://github.com/WordPress/gutenberg/pull/48440)).
++-   `Dropdown` and `DropdownMenu`: support controlled mode for the dropdown's open/closed state ([#54257](https://github.com/WordPress/gutenberg/pull/54257)).
+ 
+ ### Bug Fix
+ 
+@@ -32,9 +29,12 @@
+ 
+ ## 25.7.0 (2023-08-31)
+ 
++### Breaking changes
++
++-   Make the `Popover.Slot` optional and render popovers at the bottom of the document's body by default. ([#53889](https://github.com/WordPress/gutenberg/pull/53889), [#53982](https://github.com/WordPress/gutenberg/pull/53982)).
++
+ ### Enhancements
+ 
+--   Make the `Popover.Slot` optional and render popovers at the bottom of the document's body by default. ([#53889](https://github.com/WordPress/gutenberg/pull/53889)).
+ -   `ProgressBar`: Add transition to determinate indicator ([#53877](https://github.com/WordPress/gutenberg/pull/53877)).
+ -   Prevent nested `SlotFillProvider` from rendering ([#53940](https://github.com/WordPress/gutenberg/pull/53940)).
+ 
+diff --git a/packages/components/src/dropdown-menu/README.md b/packages/components/src/dropdown-menu/README.md
+index e1e4c7bf031b0f..dcdb30997038eb 100644
+--- a/packages/components/src/dropdown-menu/README.md
++++ b/packages/components/src/dropdown-menu/README.md
+@@ -198,3 +198,21 @@ In some contexts, the arrow down key used to open the dropdown menu might need t
+ 
+ -   Required: No
+ -   Default: `false`
++
++### `defaultOpen`: `boolean`
++
++The open state of the dropdown menu when initially rendered. Use when you do not need to control its open state. It will be overridden by the `open` prop if it is specified on the component's first render.
++
++-   Required: No
++
++### `open`: `boolean`
++
++The controlled open state of the dropdown menu. Must be used in conjunction with `onToggle`.
++
++-   Required: No
++
++### `onToggle`: `( willOpen: boolean ) => void`
++
++A callback invoked when the state of the dropdown changes from open to closed and vice versa.
++
++-   Required: No
+diff --git a/packages/components/src/dropdown-menu/index.tsx b/packages/components/src/dropdown-menu/index.tsx
+index b5b7533e52bc40..b5ccd92d68b907 100644
+--- a/packages/components/src/dropdown-menu/index.tsx
++++ b/packages/components/src/dropdown-menu/index.tsx
+@@ -57,6 +57,10 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+ 		text,
+ 		noIcons,
+ 
++		open,
++		defaultOpen,
++		onToggle: onToggleProp,
++
+ 		// Context
+ 		variant,
+ 	} = useContextSystem< DropdownMenuProps & DropdownMenuInternalContext >(
+@@ -211,6 +215,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+ 					</NavigableMenu>
+ 				);
+ 			} }
++			open={ open }
++			defaultOpen={ defaultOpen }
++			onToggle={ onToggleProp }
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/dropdown-menu/stories/index.story.tsx b/packages/components/src/dropdown-menu/stories/index.story.tsx
+index 0490636cfa2067..d4b856380db92a 100644
+--- a/packages/components/src/dropdown-menu/stories/index.story.tsx
++++ b/packages/components/src/dropdown-menu/stories/index.story.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import type { Meta, StoryFn } from '@storybook/react';
++
+ /**
+  * Internal dependencies
+  */
+@@ -25,6 +26,7 @@ const meta: Meta< typeof DropdownMenu > = {
+ 	title: 'Components/DropdownMenu',
+ 	component: DropdownMenu,
+ 	parameters: {
++		actions: { argTypesRegex: '^on.*' },
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 	},
+@@ -34,6 +36,9 @@ const meta: Meta< typeof DropdownMenu > = {
+ 			mapping: { menu, chevronDown, more },
+ 			control: { type: 'select' },
+ 		},
++		open: { control: { type: null } },
++		defaultOpen: { control: { type: null } },
++		onToggle: { control: { type: null } },
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/dropdown-menu/types.ts b/packages/components/src/dropdown-menu/types.ts
+index 1063631c65113e..2e70557a7fe43e 100644
+--- a/packages/components/src/dropdown-menu/types.ts
++++ b/packages/components/src/dropdown-menu/types.ts
+@@ -140,6 +140,22 @@ export type DropdownMenuProps = {
+ 	 * A valid DropdownMenu must specify a `controls` or `children` prop, or both.
+ 	 */
+ 	controls?: DropdownOption[] | DropdownOption[][];
++	/**
++	 * The controlled open state of the dropdown menu.
++	 * Must be used in conjunction with `onToggle`.
++	 */
++	open?: boolean;
++	/**
++	 * The open state of the dropdown menu when initially rendered.
++	 * Use when you do not need to control its open state. It will be overridden
++	 * by the `open` prop if it is specified on the component's first render.
++	 */
++	defaultOpen?: boolean;
++	/**
++	 * A callback invoked when the state of the dropdown menu changes
++	 * from open to closed and vice versa.
++	 */
++	onToggle?: ( willOpen: boolean ) => void;
+ };
+ 
+ export type DropdownMenuInternalContext = {
+diff --git a/packages/components/src/dropdown/README.md b/packages/components/src/dropdown/README.md
+index 3dd321ed900128..5bb3ec2c3b6e0e 100644
+--- a/packages/components/src/dropdown/README.md
++++ b/packages/components/src/dropdown/README.md
+@@ -44,6 +44,12 @@ If you want to target the dropdown menu for styling purposes, you need to provid
+ 
+ -   Required: No
+ 
++### `defaultOpen`: `boolean`
++
++The open state of the dropdown when initially rendered. Use when you do not need to control its open state. It will be overridden by the `open` prop if it is specified on the component's first render.
++
++-   Required: No
++
+ ### `expandOnMobile`: `boolean`
+ 
+ Opt-in prop to show popovers fullscreen on mobile.
+@@ -74,11 +80,15 @@ A callback invoked when the popover should be closed.
+ 
+ -   Required: No
+ 
+-### `onToggle`: `( willOpen: boolean ) => void`
++### `open`: `boolean`
+ 
+-A callback invoked when the state of the popover changes from open to closed and vice versa.
++The controlled open state of the dropdown. Must be used in conjunction with `onToggle`.
++
++-   Required: No
++
++### `onToggle`: `( willOpen: boolean ) => void`
+ 
+-The callback receives a boolean as a parameter. If `true`, the popover will open. If `false`, the popover will close.
++A callback invoked when the state of the dropdown changes from open to closed and vice versa.
+ 
+ -   Required: No
+ 
+diff --git a/packages/components/src/dropdown/index.tsx b/packages/components/src/dropdown/index.tsx
+index 2060254fa73c11..0a870049a5b697 100644
+--- a/packages/components/src/dropdown/index.tsx
++++ b/packages/components/src/dropdown/index.tsx
+@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
+ /**
+  * WordPress dependencies
+  */
+-import { useEffect, useRef, useState } from '@wordpress/element';
++import { useRef, useState } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+ import deprecated from '@wordpress/deprecated';
+ 
+@@ -15,25 +15,10 @@ import deprecated from '@wordpress/deprecated';
+  * Internal dependencies
+  */
+ import { contextConnect, useContextSystem } from '../ui/context';
++import { useControlledValue } from '../utils/hooks';
+ import Popover from '../popover';
+ import type { DropdownProps, DropdownInternalContext } from './types';
+ 
+-function useObservableState(
+-	initialState: boolean,
+-	onStateChange?: ( newState: boolean ) => void
+-) {
+-	const [ state, setState ] = useState( initialState );
+-	return [
+-		state,
+-		( value: boolean ) => {
+-			setState( value );
+-			if ( onStateChange ) {
+-				onStateChange( value );
+-			}
+-		},
+-	] as const;
+-}
+-
+ const UnconnectedDropdown = (
+ 	props: DropdownProps,
+ 	forwardedRef: ForwardedRef< any >
+@@ -51,6 +36,9 @@ const UnconnectedDropdown = (
+ 		onToggle,
+ 		style,
+ 
++		open,
++		defaultOpen,
++
+ 		// Deprecated props
+ 		position,
+ 
+@@ -74,20 +62,12 @@ const UnconnectedDropdown = (
+ 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
+ 		useState< HTMLDivElement | null >( null );
+ 	const containerRef = useRef< HTMLDivElement >();
+-	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
+-
+-	useEffect(
+-		() => () => {
+-			if ( onToggle && isOpen ) {
+-				onToggle( false );
+-			}
+-		},
+-		[ onToggle, isOpen ]
+-	);
+ 
+-	function toggle() {
+-		setIsOpen( ! isOpen );
+-	}
++	const [ isOpen, setIsOpen ] = useControlledValue( {
++		defaultValue: defaultOpen,
++		value: open,
++		onChange: onToggle,
++	} );
+ 
+ 	/**
+ 	 * Closes the popover when focus leaves it unless the toggle was pressed or
+@@ -112,13 +92,15 @@ const UnconnectedDropdown = (
+ 	}
+ 
+ 	function close() {
+-		if ( onClose ) {
+-			onClose();
+-		}
++		onClose?.();
+ 		setIsOpen( false );
+ 	}
+ 
+-	const args = { isOpen, onToggle: toggle, onClose: close };
++	const args = {
++		isOpen: !! isOpen,
++		onToggle: () => setIsOpen( ! isOpen ),
++		onClose: close,
++	};
+ 	const popoverPropsHaveAnchor =
+ 		!! popoverProps?.anchor ||
+ 		// Note: `anchorRef`, `getAnchorRect` and `anchorRect` are deprecated and
+diff --git a/packages/components/src/dropdown/stories/index.story.tsx b/packages/components/src/dropdown/stories/index.story.tsx
+index 0b29da916b8d89..894f62ee47f8d7 100644
+--- a/packages/components/src/dropdown/stories/index.story.tsx
++++ b/packages/components/src/dropdown/stories/index.story.tsx
+@@ -25,8 +25,13 @@ const meta: Meta< typeof Dropdown > = {
+ 		position: { control: { type: null } },
+ 		renderContent: { control: { type: null } },
+ 		renderToggle: { control: { type: null } },
++		open: { control: { type: null } },
++		defaultOpen: { control: { type: null } },
++		onToggle: { control: { type: null } },
++		onClose: { control: { type: null } },
+ 	},
+ 	parameters: {
++		actions: { argTypesRegex: '^on.*' },
+ 		controls: {
+ 			expanded: true,
+ 		},
+@@ -34,13 +39,11 @@ const meta: Meta< typeof Dropdown > = {
+ };
+ export default meta;
+ 
+-const Template: StoryFn< typeof Dropdown > = ( args ) => {
+-	return (
+-		<div style={ { height: 150 } }>
+-			<Dropdown { ...args } />
+-		</div>
+-	);
+-};
++const Template: StoryFn< typeof Dropdown > = ( args ) => (
++	<div style={ { height: 150 } }>
++		<Dropdown { ...args } />
++	</div>
++);
+ 
+ export const Default = Template.bind( {} );
+ Default.args = {
+diff --git a/packages/components/src/dropdown/types.ts b/packages/components/src/dropdown/types.ts
+index c95953f37b1fb1..b185ec6fe14f71 100644
+--- a/packages/components/src/dropdown/types.ts
++++ b/packages/components/src/dropdown/types.ts
+@@ -62,11 +62,8 @@ export type DropdownProps = {
+ 	 */
+ 	onClose?: () => void;
+ 	/**
+-	 * A callback invoked when the state of the popover changes
++	 * A callback invoked when the state of the dropdown changes
+ 	 * from open to closed and vice versa.
+-	 * The callback receives a boolean as a parameter.
+-	 * If true, the popover will open.
+-	 * If false, the popover will close.
+ 	 */
+ 	onToggle?: ( willOpen: boolean ) => void;
+ 	/**
+@@ -111,6 +108,17 @@ export type DropdownProps = {
+ 	 * @deprecated
+ 	 */
+ 	position?: PopoverProps[ 'position' ];
++	/**
++	 * The controlled open state of the dropdown.
++	 * Must be used in conjunction with `onToggle`.
++	 */
++	open?: boolean;
++	/**
++	 * The open state of the dropdown when initially rendered.
++	 * Use when you do not need to control its open state. It will be overridden
++	 * by the `open` prop if it is specified on the component's first render.
++	 */
++	defaultOpen?: boolean;
+ };
+ 
+ export type DropdownInternalContext = {

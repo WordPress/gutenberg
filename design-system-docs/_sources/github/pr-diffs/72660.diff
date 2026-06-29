@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f820ea56c6ce54..62f8014b90cb07 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `Badge`: Add max-width for text truncation ([#72653](https://github.com/WordPress/gutenberg/pull/72653)).
++
+ ## 30.6.0 (2025-10-17)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/badge/styles.scss b/packages/components/src/badge/styles.scss
+index 05df1868d9da41..005358b3891517 100644
+--- a/packages/components/src/badge/styles.scss
++++ b/packages/components/src/badge/styles.scss
+@@ -18,6 +18,7 @@ $badge-colors: (
+ 	min-height: $grid-unit-30;
+ 	border-radius: $radius-small;
+ 	line-height: 0;
++	max-width: 100%;
+ 
+ 	// Prevents anchor text-decoration styles from being applied through a parent.
+ 	display: inline-block;

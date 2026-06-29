@@ -1,0 +1,90 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ac38491c12dc06..a4216b292e8847 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -27,6 +27,7 @@
+ -   `DatePicker`: Switch from `react-dates` to `use-lilius` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
+ -   `convertLTRToRTL()`: Refactor away from `_.mapKeys()` ([#43258](https://github.com/WordPress/gutenberg/pull/43258/)).
+ -   `withSpokenMessages`: Update to use `@testing-library/react` ([#43273](https://github.com/WordPress/gutenberg/pull/43273)).
++-   `MenuGroup`: Refactor unit tests to use `@testing-library/react` ([#43275](https://github.com/WordPress/gutenberg/pull/43275)).
+ -   `FormTokenField`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
+ -   `contextConnect`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
+ -   `ColorPalette`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
+diff --git a/packages/components/src/menu-group/test/__snapshots__/index.js.snap b/packages/components/src/menu-group/test/__snapshots__/index.js.snap
+deleted file mode 100644
+index 4a0c0e751a2667..00000000000000
+--- a/packages/components/src/menu-group/test/__snapshots__/index.js.snap
++++ /dev/null
+@@ -1,23 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`MenuGroup should match snapshot 1`] = `
+-<div
+-  className="components-menu-group"
+->
+-  <div
+-    aria-hidden="true"
+-    className="components-menu-group__label"
+-    id="components-menu-group-label-1"
+-  >
+-    My group
+-  </div>
+-  <div
+-    aria-labelledby="components-menu-group-label-1"
+-    role="group"
+-  >
+-    <p>
+-      My item
+-    </p>
+-  </div>
+-</div>
+-`;
+diff --git a/packages/components/src/menu-group/test/index.js b/packages/components/src/menu-group/test/index.js
+index 63551df4f982ec..5be68bee1dbcf2 100644
+--- a/packages/components/src/menu-group/test/index.js
++++ b/packages/components/src/menu-group/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { shallow } from 'enzyme';
++import { render, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -10,18 +10,29 @@ import { MenuGroup } from '../';
+ 
+ describe( 'MenuGroup', () => {
+ 	test( 'should render null when no children provided', () => {
+-		const wrapper = shallow( <MenuGroup /> );
++		render( <MenuGroup /> );
+ 
+-		expect( wrapper.html() ).toBe( null );
++		expect( screen.queryByRole( 'group' ) ).not.toBeInTheDocument();
+ 	} );
+ 
+-	test( 'should match snapshot', () => {
+-		const wrapper = shallow(
+-			<MenuGroup label="My group" instanceId="1">
++	test( 'should render children', () => {
++		render(
++			<MenuGroup>
+ 				<p>My item</p>
+ 			</MenuGroup>
+ 		);
+ 
+-		expect( wrapper ).toMatchSnapshot();
++		expect( screen.queryByRole( 'group' ) ).toBeVisible();
++		expect( screen.queryByText( 'My item' ) ).toBeVisible();
++	} );
++
++	test( 'should render with an accessible label', () => {
++		render( <MenuGroup label="My group">Example</MenuGroup> );
++
++		expect(
++			screen.queryByRole( 'group', {
++				name: 'My group',
++			} )
++		).toBeVisible();
+ 	} );
+ } );

@@ -1,0 +1,13 @@
+diff --git a/packages/block-editor/src/components/button-block-appender/index.js b/packages/block-editor/src/components/button-block-appender/index.js
+index a0c0c4ea0389d6..0af101b455930a 100644
+--- a/packages/block-editor/src/components/button-block-appender/index.js
++++ b/packages/block-editor/src/components/button-block-appender/index.js
+@@ -82,7 +82,7 @@ function ButtonBlockAppender(
+ 
+ 				if ( isToggleButton ) {
+ 					inserterButton = (
+-						<Tooltip text={ label }> { inserterButton } </Tooltip>
++						<Tooltip text={ label }>{ inserterButton }</Tooltip>
+ 					);
+ 				}
+ 				return inserterButton;

@@ -1,0 +1,1085 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index edd0e49cea90d8..c2ef0284a99b95 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: **`Popup` portal API** ([#77452](https://github.com/WordPress/gutenberg/pull/77452)). Add `Portal` subcomponents and an optional `portal` prop on `Popup` (when omitted, the default `Portal` is used). Remove `container` from every `Popup` and `portalClassName` from `Dialog.Popup` / `AlertDialog.Popup`; pass `portal={ <Matching.Portal … /> }` for `container`, `className`, `style`, and other portal options.
++
+ ### Documentation
+ 
+ -   Restructure setup docs into "Within standard WordPress editor screens" and "Elsewhere" for clarity ([#77338](https://github.com/WordPress/gutenberg/pull/77338)).
+diff --git a/packages/ui/src/alert-dialog/index.ts b/packages/ui/src/alert-dialog/index.ts
+index ec1477d0fd6c64..d244b44212ba1d 100644
+--- a/packages/ui/src/alert-dialog/index.ts
++++ b/packages/ui/src/alert-dialog/index.ts
+@@ -1,3 +1,4 @@
+ export { Root } from './root';
+ export { Trigger } from './trigger';
+ export { Popup } from './popup';
++export { Portal } from './portal';
+diff --git a/packages/ui/src/alert-dialog/popup.tsx b/packages/ui/src/alert-dialog/popup.tsx
+index 58af2412e54de1..cf58be1faeeab1 100644
+--- a/packages/ui/src/alert-dialog/popup.tsx
++++ b/packages/ui/src/alert-dialog/popup.tsx
+@@ -7,12 +7,14 @@ import {
+ 	privateApis as themePrivateApis,
+ } from '@wordpress/theme';
+ 
++import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+ import { Button } from '../button';
+ import dialogStyles from '../dialog/style.module.css';
+ import { unlock } from '../lock-unlock';
+ import { Stack } from '../stack';
+ import { Text } from '../text';
+ import { AlertDialogContext } from './context';
++import { Portal } from './portal';
+ import alertDialogStyles from './style.module.css';
+ import type { PopupProps } from './types';
+ 
+@@ -23,7 +25,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
+ 	function AlertDialogPopup(
+ 		{
+ 			className,
+-			container,
++			portal,
+ 			intent = 'default',
+ 			title,
+ 			description,
+@@ -44,8 +46,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
+ 
+ 		const buttonsDisabled = phase !== 'idle' || undefined;
+ 
+-		return (
+-			<_AlertDialog.Portal container={ container }>
++		const portalChildren = (
++			<>
+ 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
+ 				<ThemeProvider>
+ 					<_AlertDialog.Popup
+@@ -108,8 +110,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
+ 						</Stack>
+ 					</_AlertDialog.Popup>
+ 				</ThemeProvider>
+-			</_AlertDialog.Portal>
++			</>
+ 		);
++
++		return renderPortalWithChildren( portal, <Portal />, portalChildren );
+ 	}
+ );
+ 
+diff --git a/packages/ui/src/alert-dialog/portal.tsx b/packages/ui/src/alert-dialog/portal.tsx
+new file mode 100644
+index 00000000000000..09fc6af6ca433c
+--- /dev/null
++++ b/packages/ui/src/alert-dialog/portal.tsx
+@@ -0,0 +1,17 @@
++import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
++import { forwardRef } from '@wordpress/element';
++import type { PortalProps } from './types';
++
++/**
++ * Root element that portals `AlertDialog` overlay content. Pass to
++ * `AlertDialog.Popup`'s `portal` prop to customize the portal target and
++ * wrapper. When `portal` is omitted, `AlertDialog.Popup` uses this component
++ * with default props.
++ */
++const Portal = forwardRef< HTMLDivElement, PortalProps >(
++	function AlertDialogPortal( props, ref ) {
++		return <_AlertDialog.Portal ref={ ref } { ...props } />;
++	}
++);
++
++export { Portal };
+diff --git a/packages/ui/src/alert-dialog/test/index.test.tsx b/packages/ui/src/alert-dialog/test/index.test.tsx
+index 20846777fb4fb7..3c1944f4ec3c5a 100644
+--- a/packages/ui/src/alert-dialog/test/index.test.tsx
++++ b/packages/ui/src/alert-dialog/test/index.test.tsx
+@@ -1453,8 +1453,8 @@ describe( 'AlertDialog', () => {
+ 		} );
+ 	} );
+ 
+-	describe( 'container', () => {
+-		it( 'should render inside the container when provided', async () => {
++	describe( 'portal', () => {
++		it( 'should render inside the portal container when a custom target is provided', async () => {
+ 			const user = userEvent.setup();
+ 			const containerRef = createRef< HTMLDivElement >();
+ 
+@@ -1468,7 +1468,11 @@ describe( 'AlertDialog', () => {
+ 						/>
+ 						<AlertDialog.Popup
+ 							title="Confirm"
+-							container={ containerRef }
++							portal={
++								<AlertDialog.Portal
++									container={ containerRef }
++								/>
++							}
+ 						/>
+ 					</AlertDialog.Root>
+ 				</div>
+diff --git a/packages/ui/src/alert-dialog/types.ts b/packages/ui/src/alert-dialog/types.ts
+index 778009d12154ef..4a19994855774e 100644
+--- a/packages/ui/src/alert-dialog/types.ts
++++ b/packages/ui/src/alert-dialog/types.ts
+@@ -1,8 +1,12 @@
+ import type { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
+-import type { ReactNode } from 'react';
++import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
+ 
+ import type { ComponentProps } from '../utils/types';
+ 
++export type PortalProps = ComponentPropsWithoutRef<
++	typeof _AlertDialog.Portal
++>;
++
+ /**
+  * The return type of `onConfirm`. Return `void` (or nothing) to auto-close
+  * the dialog after the confirm handler completes. Return `{ close: false }`
+@@ -63,9 +67,15 @@ export interface PopupProps
+ 	extends ComponentProps< 'div' >,
+ 		Pick< _AlertDialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
+ 	/**
+-	 * A parent element to render the portal into.
++	 * Optional portal element, typically `<AlertDialog.Portal />` with
++	 * custom `container`, `className`, or `style`. Overlay content is
++	 * rendered as this portal's children (do not pass `children` on the portal
++	 * element; they would be ignored).
++	 *
++	 * When omitted, `AlertDialog.Popup` uses `AlertDialog.Portal` with default
++	 * props.
+ 	 */
+-	container?: _AlertDialog.Portal.Props[ 'container' ];
++	portal?: ReactElement< Omit< PortalProps, 'children' > >;
+ 
+ 	/**
+ 	 * The semantic intent of the dialog, which determines its styling.
+diff --git a/packages/ui/src/dialog/index.ts b/packages/ui/src/dialog/index.ts
+index 22f7bae4e66e9b..cd76ce7a5d4f0c 100644
+--- a/packages/ui/src/dialog/index.ts
++++ b/packages/ui/src/dialog/index.ts
+@@ -3,8 +3,19 @@ import { CloseIcon } from './close-icon';
+ import { Footer } from './footer';
+ import { Header } from './header';
+ import { Popup } from './popup';
++import { Portal } from './portal';
+ import { Root } from './root';
+ import { Title } from './title';
+ import { Trigger } from './trigger';
+ 
+-export { Action, CloseIcon, Footer, Header, Popup, Root, Title, Trigger };
++export {
++	Action,
++	CloseIcon,
++	Footer,
++	Header,
++	Popup,
++	Portal,
++	Root,
++	Title,
++	Trigger,
++};
+diff --git a/packages/ui/src/dialog/popup.tsx b/packages/ui/src/dialog/popup.tsx
+index 02954d7c8633d7..a1dc6e9c55716a 100644
+--- a/packages/ui/src/dialog/popup.tsx
++++ b/packages/ui/src/dialog/popup.tsx
+@@ -8,7 +8,9 @@ import {
+ } from '@wordpress/theme';
+ import { unlock } from '../lock-unlock';
+ import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
++import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+ import { DialogValidationProvider } from './context';
++import { Portal } from './portal';
+ import styles from './style.module.css';
+ import type { PopupProps } from './types';
+ 
+@@ -20,11 +22,14 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
+ /**
+  * Renders the dialog popup element that contains the dialog content.
+  * Uses a portal to render outside the DOM hierarchy.
++ *
++ * When `portal` is omitted, defaults to `Dialog.Portal`. Portal merging is
++ * handled by `renderPortalWithChildren` (shared with other overlay `Popup`s).
+  */
+ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
+ 	{
+ 		className,
+-		container,
++		portal,
+ 		size = 'medium',
+ 		initialFocus,
+ 		finalFocus,
+@@ -39,8 +44,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
+ 	} );
+ 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
+ 
+-	return (
+-		<_Dialog.Portal container={ container }>
++	const portalChildren = (
++		<>
+ 			<_Dialog.Backdrop className={ styles.backdrop } />
+ 			<ThemeProvider>
+ 				<_Dialog.Popup
+@@ -59,8 +64,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
+ 					</DialogValidationProvider>
+ 				</_Dialog.Popup>
+ 			</ThemeProvider>
+-		</_Dialog.Portal>
++		</>
+ 	);
++
++	return renderPortalWithChildren( portal, <Portal />, portalChildren );
+ } );
+ 
+ export { Popup };
+diff --git a/packages/ui/src/dialog/portal.tsx b/packages/ui/src/dialog/portal.tsx
+new file mode 100644
+index 00000000000000..bed507b68e01cb
+--- /dev/null
++++ b/packages/ui/src/dialog/portal.tsx
+@@ -0,0 +1,18 @@
++import { Dialog as _Dialog } from '@base-ui/react/dialog';
++import { forwardRef } from '@wordpress/element';
++import type { PortalProps } from './types';
++
++/**
++ * Root element that portals `Dialog` overlay content (`Backdrop`, inner
++ * `Popup`, etc.) outside the DOM hierarchy. Pass to `Dialog.Popup`'s
++ * `portal` prop to customize `container`, `className`, `style`, and other
++ * Base UI portal options. When `portal` is omitted, `Dialog.Popup` uses this
++ * component with default props.
++ */
++const Portal = forwardRef< HTMLDivElement, PortalProps >(
++	function DialogPortal( props, ref ) {
++		return <_Dialog.Portal ref={ ref } { ...props } />;
++	}
++);
++
++export { Portal };
+diff --git a/packages/ui/src/dialog/test/index.test.tsx b/packages/ui/src/dialog/test/index.test.tsx
+index 2890f19d8b794f..140d0effc0a8b4 100644
+--- a/packages/ui/src/dialog/test/index.test.tsx
++++ b/packages/ui/src/dialog/test/index.test.tsx
+@@ -502,8 +502,8 @@ describe( 'Dialog', () => {
+ 		} );
+ 	} );
+ 
+-	describe( 'container', () => {
+-		it( 'should render inside the container when provided', async () => {
++	describe( 'portal', () => {
++		it( 'should render inside the portal container when a custom target is provided', async () => {
+ 			const user = userEvent.setup();
+ 			const containerRef = createRef< HTMLDivElement >();
+ 
+@@ -515,7 +515,11 @@ describe( 'Dialog', () => {
+ 							ref={ containerRef }
+ 							data-testid="custom-container"
+ 						/>
+-						<Dialog.Popup container={ containerRef }>
++						<Dialog.Popup
++							portal={
++								<Dialog.Portal container={ containerRef } />
++							}
++						>
+ 							<Dialog.Header>
+ 								<Dialog.Title>Title</Dialog.Title>
+ 							</Dialog.Header>
+diff --git a/packages/ui/src/dialog/types.ts b/packages/ui/src/dialog/types.ts
+index 9788b3af810d00..affbb208ac67e5 100644
+--- a/packages/ui/src/dialog/types.ts
++++ b/packages/ui/src/dialog/types.ts
+@@ -1,9 +1,12 @@
+ import type { Dialog as _Dialog } from '@base-ui/react/dialog';
+-import type { ReactNode } from 'react';
++import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
++
+ import type { Button } from '../button';
+ import type { IconButton } from '../icon-button';
+ import type { ComponentProps } from '../utils/types';
+ 
++export type PortalProps = ComponentPropsWithoutRef< typeof _Dialog.Portal >;
++
+ export interface RootProps
+ 	extends Pick<
+ 		_Dialog.Root.Props,
+@@ -35,9 +38,14 @@ export interface PopupProps
+ 	children?: ReactNode;
+ 
+ 	/**
+-	 * A parent element to render the portal into.
++	 * Optional portal element, typically `<Dialog.Portal />` with custom
++	 * `container`, `className`, or `style`. The popup and backdrop are
++	 * rendered as this portal's children (do not pass `children` on the portal
++	 * element; they would be ignored).
++	 *
++	 * When omitted, `Dialog.Popup` uses `Dialog.Portal` with default props.
+ 	 */
+-	container?: _Dialog.Portal.Props[ 'container' ];
++	portal?: ReactElement< Omit< PortalProps, 'children' > >;
+ 
+ 	/**
+ 	 * Renders the dialog at a preset width (excluding additional padding from
+diff --git a/packages/ui/src/form/primitives/select/index.ts b/packages/ui/src/form/primitives/select/index.ts
+index 372c235a15734c..8c00e747fd16de 100644
+--- a/packages/ui/src/form/primitives/select/index.ts
++++ b/packages/ui/src/form/primitives/select/index.ts
+@@ -1,4 +1,5 @@
+ export { Item } from './item';
++export { Portal } from './portal';
+ export { Popup } from './popup';
+ export { Root } from './root';
+ export { Trigger } from './trigger';
+diff --git a/packages/ui/src/form/primitives/select/popup.tsx b/packages/ui/src/form/primitives/select/popup.tsx
+index 0d153d05cf3036..8bd56eca3b51b6 100644
+--- a/packages/ui/src/form/primitives/select/popup.tsx
++++ b/packages/ui/src/form/primitives/select/popup.tsx
+@@ -6,6 +6,8 @@ import {
+ 	privateApis as themePrivateApis,
+ } from '@wordpress/theme';
+ import { unlock } from '../../../lock-unlock';
++import { Portal } from './portal';
++import { renderPortalWithChildren } from '../../../utils/render-portal-with-children';
+ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+ import resetStyles from '../../../utils/css/resets.module.css';
+ import styles from './style.module.css';
+@@ -17,42 +19,42 @@ const ThemeProvider: typeof ThemeProviderType =
+ 
+ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
+ 	function Popup(
+-		{ className, container, children, style, ...restProps },
++		{ className, portal, children, style, ...restProps },
+ 		ref
+ 	) {
+-		return (
+-			<_Select.Portal container={ container }>
+-				<_Select.Positioner
+-					{ ...ITEM_POPUP_POSITIONER_PROPS }
+-					alignItemWithTrigger={ false }
+-					style={ style }
+-					className={ clsx(
+-						resetStyles[ 'box-sizing' ],
+-						styles.positioner,
+-						className
+-					) }
+-				>
+-					<ThemeProvider>
+-						<_Select.Popup
+-							ref={ ref }
+-							className={ itemPopupStyles.popup }
+-							{ ...restProps }
+-						>
+-							<_Select.List className={ itemPopupStyles.list }>
+-								<div
+-									className={
+-										itemPopupStyles[
+-											'list-scrollable-container'
+-										]
+-									}
+-								>
+-									{ children }
+-								</div>
+-							</_Select.List>
+-						</_Select.Popup>
+-					</ThemeProvider>
+-				</_Select.Positioner>
+-			</_Select.Portal>
++		const portalChildren = (
++			<_Select.Positioner
++				{ ...ITEM_POPUP_POSITIONER_PROPS }
++				alignItemWithTrigger={ false }
++				style={ style }
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					styles.positioner,
++					className
++				) }
++			>
++				<ThemeProvider>
++					<_Select.Popup
++						ref={ ref }
++						className={ itemPopupStyles.popup }
++						{ ...restProps }
++					>
++						<_Select.List className={ itemPopupStyles.list }>
++							<div
++								className={
++									itemPopupStyles[
++										'list-scrollable-container'
++									]
++								}
++							>
++								{ children }
++							</div>
++						</_Select.List>
++					</_Select.Popup>
++				</ThemeProvider>
++			</_Select.Positioner>
+ 		);
++
++		return renderPortalWithChildren( portal, <Portal />, portalChildren );
+ 	}
+ );
+diff --git a/packages/ui/src/form/primitives/select/portal.tsx b/packages/ui/src/form/primitives/select/portal.tsx
+new file mode 100644
+index 00000000000000..4dfa46a3fa9474
+--- /dev/null
++++ b/packages/ui/src/form/primitives/select/portal.tsx
+@@ -0,0 +1,16 @@
++import { Select as _Select } from '@base-ui/react/select';
++import { forwardRef } from '@wordpress/element';
++import type { PortalProps } from './types';
++
++/**
++ * Root element that portals `Select` listbox content. Pass to
++ * `Select.Popup`'s `portal` prop. When `portal` is omitted, `Select.Popup`
++ * uses this component with default props.
++ */
++const Portal = forwardRef< HTMLDivElement, PortalProps >(
++	function SelectPortal( props, ref ) {
++		return <_Select.Portal ref={ ref } { ...props } />;
++	}
++);
++
++export { Portal };
+diff --git a/packages/ui/src/form/primitives/select/test/index.test.tsx b/packages/ui/src/form/primitives/select/test/index.test.tsx
+index 89371c691e1eae..08330d6070aeda 100644
+--- a/packages/ui/src/form/primitives/select/test/index.test.tsx
++++ b/packages/ui/src/form/primitives/select/test/index.test.tsx
+@@ -31,8 +31,8 @@ describe( 'Select', () => {
+ 		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
+ 	} );
+ 
+-	describe( 'container', () => {
+-		it( 'should render inside the container when provided', async () => {
++	describe( 'portal', () => {
++		it( 'should render inside the portal container when a custom target is provided', async () => {
+ 			const user = userEvent.setup();
+ 			const containerRef = createRef< HTMLDivElement >();
+ 
+@@ -44,7 +44,11 @@ describe( 'Select', () => {
+ 							ref={ containerRef }
+ 							data-testid="custom-container"
+ 						/>
+-						<Select.Popup container={ containerRef }>
++						<Select.Popup
++							portal={
++								<Select.Portal container={ containerRef } />
++							}
++						>
+ 							<Select.Item value="Item 1" />
+ 						</Select.Popup>
+ 					</Select.Root>
+diff --git a/packages/ui/src/form/primitives/select/types.ts b/packages/ui/src/form/primitives/select/types.ts
+index 714b39a4363e72..abfc3ef63281b5 100644
+--- a/packages/ui/src/form/primitives/select/types.ts
++++ b/packages/ui/src/form/primitives/select/types.ts
+@@ -1,7 +1,11 @@
+ import type { Select as _Select } from '@base-ui/react/select';
++import type { ComponentPropsWithoutRef, ReactElement } from 'react';
++
+ import type { ComponentProps } from '../../../utils/types';
+ import type { InputLayoutProps } from '../input-layout/types';
+ 
++export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
++
+ // The second type parameter is the `multiple` flag (currently disabled).
+ export type SelectRootProps = Omit<
+ 	_Select.Root.Props< string, false >,
+@@ -34,9 +38,12 @@ export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
+ 	 */
+ 	children?: React.ReactNode;
+ 	/**
+-	 * A parent element to render the portal into.
++	 * Optional portal element, typically `<Select.Portal />` with custom
++	 * `container`. When omitted, `Select.Popup` uses `Select.Portal` with
++	 * default props. Do not pass `children` on the portal element; they would
++	 * be ignored.
+ 	 */
+-	container?: _Select.Portal.Props[ 'container' ];
++	portal?: ReactElement< Omit< PortalProps, 'children' > >;
+ };
+ 
+ export type SelectItemProps = Omit<
+diff --git a/packages/ui/src/popover/index.ts b/packages/ui/src/popover/index.ts
+index 472a9f1a681240..13cee0f8c41f86 100644
+--- a/packages/ui/src/popover/index.ts
++++ b/packages/ui/src/popover/index.ts
+@@ -2,8 +2,9 @@ import { Arrow } from './arrow';
+ import { Close } from './close';
+ import { Description } from './description';
+ import { Popup } from './popup';
++import { Portal } from './portal';
+ import { Root } from './root';
+ import { Title } from './title';
+ import { Trigger } from './trigger';
+ 
+-export { Arrow, Close, Description, Popup, Root, Title, Trigger };
++export { Arrow, Close, Description, Portal, Popup, Root, Title, Trigger };
+diff --git a/packages/ui/src/popover/popup.tsx b/packages/ui/src/popover/popup.tsx
+index 39abe6dbdf7f2a..97c393a8aa3dcd 100644
+--- a/packages/ui/src/popover/popup.tsx
++++ b/packages/ui/src/popover/popup.tsx
+@@ -9,7 +9,9 @@ import {
+ import { unlock } from '../lock-unlock';
+ import resetStyles from '../utils/css/resets.module.css';
+ import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
++import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+ import { PopoverValidationProvider } from './context';
++import { Portal } from './portal';
+ import styles from './style.module.css';
+ import type { PopupProps } from './types';
+ 
+@@ -22,8 +24,9 @@ const CLOSE_ATTR = 'data-wp-ui-popover-close';
+  * Renders the floating popup container for the popover content.
+  *
+  * Handles portal rendering, positioning relative to the anchor, collision
+- * avoidance, focus management, and optional backdrop. Supply a `container`
+- * element for cross-document scenarios such as iframes.
++ * avoidance, focus management, and optional backdrop. Use
++ * `portal={ <Popover.Portal container={ ... } /> }` for cross-document
++ * scenarios such as iframes.
+  */
+ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
+ 	{
+@@ -38,7 +41,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
+ 		collisionAvoidance,
+ 		collisionBoundary,
+ 		collisionPadding,
+-		container,
++		portal,
+ 		finalFocus,
+ 		initialFocus,
+ 		side = 'bottom',
+@@ -98,12 +101,14 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
+ 		</_Popover.Positioner>
+ 	);
+ 
+-	return (
+-		<_Popover.Portal container={ container }>
++	const portalChildren = (
++		<>
+ 			{ backdropElement }
+ 			{ positioner }
+-		</_Popover.Portal>
++		</>
+ 	);
++
++	return renderPortalWithChildren( portal, <Portal />, portalChildren );
+ } );
+ 
+ export { Popup };
+diff --git a/packages/ui/src/popover/portal.tsx b/packages/ui/src/popover/portal.tsx
+new file mode 100644
+index 00000000000000..a30e17600ddd07
+--- /dev/null
++++ b/packages/ui/src/popover/portal.tsx
+@@ -0,0 +1,17 @@
++import { Popover as _Popover } from '@base-ui/react/popover';
++import { forwardRef } from '@wordpress/element';
++import type { PortalProps } from './types';
++
++/**
++ * Root element that portals `Popover` floating content. Pass to
++ * `Popover.Popup`'s `portal` prop (for example `container` for
++ * cross-document rendering). When `portal` is omitted, `Popover.Popup` uses
++ * this component with default props.
++ */
++const Portal = forwardRef< HTMLDivElement, PortalProps >(
++	function PopoverPortal( props, ref ) {
++		return <_Popover.Portal ref={ ref } { ...props } />;
++	}
++);
++
++export { Portal };
+diff --git a/packages/ui/src/popover/root.tsx b/packages/ui/src/popover/root.tsx
+index 118bafca0d31da..564f59019a3a7d 100644
+--- a/packages/ui/src/popover/root.tsx
++++ b/packages/ui/src/popover/root.tsx
+@@ -12,8 +12,8 @@ import type { RootProps } from './types';
+  *
+  * - `Popover.Root` — provides open state and context to all sub-components.
+  * - `Popover.Trigger` — the button that toggles the popup.
+- * - `Popover.Popup` — the floating container (portal, positioning, collision
+- *   avoidance).
++ * - `Popover.Popup` — the floating container (positioning, collision
++ *   avoidance); portals by default or via `portal={ <Popover.Portal /> }`.
+  * - `Popover.Arrow` — an optional arrow pointing toward the anchor.
+  * - `Popover.Title` — **required** heading that labels the popover for
+  *   accessibility (can be visually hidden).
+diff --git a/packages/ui/src/popover/stories/index.story.tsx b/packages/ui/src/popover/stories/index.story.tsx
+index 3264ae6f1d22b9..553bc6821db9f6 100644
+--- a/packages/ui/src/popover/stories/index.story.tsx
++++ b/packages/ui/src/popover/stories/index.story.tsx
+@@ -13,6 +13,7 @@ const meta: Meta< typeof Popover.Root > = {
+ 	component: Popover.Root,
+ 	subcomponents: {
+ 		'Popover.Trigger': Popover.Trigger,
++		'Popover.Portal': Popover.Portal,
+ 		'Popover.Popup': Popover.Popup,
+ 		'Popover.Arrow': Popover.Arrow,
+ 		'Popover.Title': Popover.Title,
+@@ -443,10 +444,11 @@ export const OverlayPlacement: Story = {
+ };
+ 
+ /**
+- * To render the popup inline (without a portal), create a local ref to a
+- * `<span>` with `display: contents` and pass it as the `container` prop.
+- * The popup will render inside the span rather than being portaled to
+- * `document.body`, while retaining all positioning behavior.
++ * To keep the floating layer **in page flow** next to surrounding layout,
++ * create a local ref to a `<span>` with `display: contents` and pass
++ * `portal={ <Popover.Portal container={ ref } /> }`. The popup still uses a
++ * portal, but the portal **mounts** into that subtree instead of
++ * `document.body`, while retaining positioning behavior.
+  *
+  * **Note:** `backdrop` will not cover the full viewport in this mode.
+  */
+@@ -463,7 +465,11 @@ export const Inline: Story = {
+ 						ref={ inlineContainerRef }
+ 						style={ { display: 'contents' } }
+ 					/>
+-					<Popover.Popup container={ inlineContainerRef }>
++					<Popover.Popup
++						portal={
++							<Popover.Portal container={ inlineContainerRef } />
++						}
++					>
+ 						<Popover.Arrow />
+ 						<Popover.Title
+ 							style={ {
+@@ -473,8 +479,10 @@ export const Inline: Story = {
+ 							Inline Popover
+ 						</Popover.Title>
+ 						<Popover.Description>
+-							This popup is rendered in place — no portal is used.
+-							Inspect the DOM to see it lives inside its parent.
++							This example still uses `Popover.Portal`, but the
++							portal `container` is the in-tree span above, so the
++							portal node mounts inside the wrapper instead of
++							`document.body`.
+ 						</Popover.Description>
+ 					</Popover.Popup>
+ 				</Popover.Root>
+@@ -572,8 +580,8 @@ export const CollisionAvoidance: Story = {
+ 
+ /**
+  * When the popover's trigger lives inside an iframe but the popover should
+- * render in the parent document, pass a parent-document element to the
+- * `container` prop on `Popover.Popup`.
++ * render in the parent document, pass a parent-document element through
++ * `portal={ <Popover.Portal container={ ... } /> }` on `Popover.Popup`.
+  *
+  * This technique is used in Gutenberg where the block editor canvas is an
+  * iframe but toolbars and menus must appear outside it.
+@@ -624,8 +632,12 @@ export const CrossIframe: Story = {
+ 									Popover&apos;s anchor (inside iframe)
+ 								</Popover.Trigger>
+ 								<Popover.Popup
+-									container={
+-										portalContainerRef as React.RefObject< HTMLElement >
++									portal={
++										<Popover.Portal
++											container={
++												portalContainerRef as React.RefObject< HTMLElement >
++											}
++										/>
+ 									}
+ 									collisionBoundary={
+ 										iframeBoundary ?? undefined
+@@ -661,9 +673,9 @@ export const CrossIframe: Story = {
+  * `@wordpress/components` as the render target.
+  *
+  * The `Slot` renders a `div` in the parent document, and its forwarded ref
+- * is passed to `Popover.Popup`'s `container` prop so the popup portals into
+- * the slot element. This mirrors the legacy Popover's `WithSlotOutsideIframe`
+- * pattern.
++ * is passed to `Popover.Portal`'s `container` prop (via `Popover.Popup`'s
++ * `portal` prop) so the popup portals into the slot element. This mirrors the
++ * legacy Popover's `WithSlotOutsideIframe` pattern.
+  */
+ export const CrossIframeWithSlotFill: Story = {
+ 	name: 'Cross-Iframe (SlotFill)',
+@@ -713,8 +725,12 @@ export const CrossIframeWithSlotFill: Story = {
+ 									Popover&apos;s anchor (inside iframe)
+ 								</Popover.Trigger>
+ 								<Popover.Popup
+-									container={
+-										slotRef as React.RefObject< HTMLElement >
++									portal={
++										<Popover.Portal
++											container={
++												slotRef as React.RefObject< HTMLElement >
++											}
++										/>
+ 									}
+ 									collisionBoundary={
+ 										iframeBoundary ?? undefined
+diff --git a/packages/ui/src/popover/test/index.test.tsx b/packages/ui/src/popover/test/index.test.tsx
+index cc19eedbc9a7cf..d8044ed9b8daf1 100644
+--- a/packages/ui/src/popover/test/index.test.tsx
++++ b/packages/ui/src/popover/test/index.test.tsx
+@@ -434,7 +434,7 @@ describe( 'Popover', () => {
+ 		} );
+ 	} );
+ 
+-	describe( 'inline (via container)', () => {
++	describe( 'inline via portal (custom container)', () => {
+ 		function InlinePopover() {
+ 			const containerRef = createRef< HTMLSpanElement >();
+ 			return (
+@@ -445,7 +445,11 @@ describe( 'Popover', () => {
+ 							ref={ containerRef }
+ 							style={ { display: 'contents' } }
+ 						/>
+-						<Popover.Popup container={ containerRef }>
++						<Popover.Popup
++							portal={
++								<Popover.Portal container={ containerRef } />
++							}
++						>
+ 							<Popover.Title>Title</Popover.Title>
+ 							Inline content
+ 						</Popover.Popup>
+@@ -454,7 +458,7 @@ describe( 'Popover', () => {
+ 			);
+ 		}
+ 
+-		it( 'should render inside the container when a local ref is used', async () => {
++		it( 'should render inside the portal container when a local ref is used', async () => {
+ 			const user = userEvent.setup();
+ 
+ 			render( <InlinePopover /> );
+diff --git a/packages/ui/src/popover/types.ts b/packages/ui/src/popover/types.ts
+index 353bf278b6a349..914504fcbf4ea7 100644
+--- a/packages/ui/src/popover/types.ts
++++ b/packages/ui/src/popover/types.ts
+@@ -1,7 +1,10 @@
+-import type { ReactNode } from 'react';
++import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
+ import type { Popover as _Popover } from '@base-ui/react/popover';
++
+ import type { ComponentProps } from '../utils/types';
+ 
++export type PortalProps = ComponentPropsWithoutRef< typeof _Popover.Portal >;
++
+ export interface RootProps
+ 	extends Pick<
+ 		_Popover.Root.Props,
+@@ -64,12 +67,14 @@ export interface PopupProps
+ 	children?: ReactNode;
+ 
+ 	/**
+-	 * A parent element to render the portal into.
++	 * Optional portal element, typically `<Popover.Portal />` with custom
++	 * `container` for cross-document rendering. Floating content is rendered
++	 * as this portal's children (do not pass `children` on the portal element;
++	 * they would be ignored).
+ 	 *
+-	 * Useful for cross-document rendering, such as rendering a popover
+-	 * in a parent document when the trigger is inside an iframe.
++	 * When omitted, `Popover.Popup` uses `Popover.Portal` with default props.
+ 	 */
+-	container?: _Popover.Portal.Props[ 'container' ];
++	portal?: ReactElement< Omit< PortalProps, 'children' > >;
+ 
+ 	/**
+ 	 * The visual style variant of the popup.
+diff --git a/packages/ui/src/tooltip/index.ts b/packages/ui/src/tooltip/index.ts
+index 26667374f3f863..36f8e740e231ef 100644
+--- a/packages/ui/src/tooltip/index.ts
++++ b/packages/ui/src/tooltip/index.ts
+@@ -1,6 +1,7 @@
+ import { Popup } from './popup';
++import { Portal } from './portal';
+ import { Trigger } from './trigger';
+ import { Root } from './root';
+ import { Provider } from './provider';
+ 
+-export { Provider, Root, Trigger, Popup };
++export { Provider, Root, Trigger, Popup, Portal };
+diff --git a/packages/ui/src/tooltip/popup.tsx b/packages/ui/src/tooltip/popup.tsx
+index 6613b2d859112c..ddc31efba1a9b4 100644
+--- a/packages/ui/src/tooltip/popup.tsx
++++ b/packages/ui/src/tooltip/popup.tsx
+@@ -1,5 +1,5 @@
+ import clsx from 'clsx';
+-import { Tooltip } from '@base-ui/react/tooltip';
++import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
+ import { forwardRef } from '@wordpress/element';
+ import {
+ 	type ThemeProvider as ThemeProviderType,
+@@ -7,6 +7,8 @@ import {
+ } from '@wordpress/theme';
+ import type { PopupProps } from './types';
+ import { unlock } from '../lock-unlock';
++import { Portal } from './portal';
++import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+ import resetStyles from '../utils/css/resets.module.css';
+ import styles from './style.module.css';
+ 
+@@ -16,7 +18,7 @@ const ThemeProvider: typeof ThemeProviderType =
+ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
+ 	{
+ 		align = 'center',
+-		container,
++		portal,
+ 		side = 'top',
+ 		sideOffset = 4,
+ 		children,
+@@ -26,20 +28,19 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
+ 	},
+ 	ref
+ ) {
+-	return (
+-		<Tooltip.Portal container={ container }>
+-			<Tooltip.Positioner
+-				align={ align }
+-				side={ side }
+-				sideOffset={ sideOffset }
+-				style={ style }
+-				className={ clsx(
+-					resetStyles[ 'box-sizing' ],
+-					className,
+-					styles.positioner
+-				) }
+-			>
+-				{ /* This should ideally use whatever dark color makes sense,
++	const portalChildren = (
++		<_Tooltip.Positioner
++			align={ align }
++			side={ side }
++			sideOffset={ sideOffset }
++			style={ style }
++			className={ clsx(
++				resetStyles[ 'box-sizing' ],
++				className,
++				styles.positioner
++			) }
++		>
++			{ /* This should ideally use whatever dark color makes sense,
+ 				and not be hardcoded to #1e1e1e. The solutions would be to:
+ 				  - review the design of the tooltip, in case we want to stop
+ 				    hardcoding it to a dark background
+@@ -48,18 +49,19 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
+ 				    them;
+ 				  - remove the hardcoded `bg` setting from the `ThemeProvider` below
+ 					*/ }
+-				<ThemeProvider color={ { bg: '#1e1e1e' } }>
+-					<Tooltip.Popup
+-						ref={ ref }
+-						className={ styles.popup }
+-						{ ...props }
+-					>
+-						{ children }
+-					</Tooltip.Popup>
+-				</ThemeProvider>
+-			</Tooltip.Positioner>
+-		</Tooltip.Portal>
++			<ThemeProvider color={ { bg: '#1e1e1e' } }>
++				<_Tooltip.Popup
++					ref={ ref }
++					className={ styles.popup }
++					{ ...props }
++				>
++					{ children }
++				</_Tooltip.Popup>
++			</ThemeProvider>
++		</_Tooltip.Positioner>
+ 	);
++
++	return renderPortalWithChildren( portal, <Portal />, portalChildren );
+ } );
+ 
+ export { Popup };
+diff --git a/packages/ui/src/tooltip/portal.tsx b/packages/ui/src/tooltip/portal.tsx
+new file mode 100644
+index 00000000000000..f61091cc43abaa
+--- /dev/null
++++ b/packages/ui/src/tooltip/portal.tsx
+@@ -0,0 +1,16 @@
++import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
++import { forwardRef } from '@wordpress/element';
++import type { PortalProps } from './types';
++
++/**
++ * Root element that portals `Tooltip` floating content. Pass to
++ * `Tooltip.Popup`'s `portal` prop. When `portal` is omitted, `Tooltip.Popup`
++ * uses this component with default props.
++ */
++const Portal = forwardRef< HTMLDivElement, PortalProps >(
++	function TooltipPortal( props, ref ) {
++		return <_Tooltip.Portal ref={ ref } { ...props } />;
++	}
++);
++
++export { Portal };
+diff --git a/packages/ui/src/tooltip/provider.tsx b/packages/ui/src/tooltip/provider.tsx
+index 736604655b1388..1a4bfad5c89289 100644
+--- a/packages/ui/src/tooltip/provider.tsx
++++ b/packages/ui/src/tooltip/provider.tsx
+@@ -1,8 +1,8 @@
+-import { Tooltip } from '@base-ui/react/tooltip';
++import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
+ import type { ProviderProps } from './types';
+ 
+-function Provider( { children, ...props }: ProviderProps ) {
+-	return <Tooltip.Provider { ...props }>{ children }</Tooltip.Provider>;
++function Provider( { ...props }: ProviderProps ) {
++	return <_Tooltip.Provider { ...props } />;
+ }
+ 
+ export { Provider };
+diff --git a/packages/ui/src/tooltip/root.tsx b/packages/ui/src/tooltip/root.tsx
+index ee93b5318860a3..3de5b4c1723189 100644
+--- a/packages/ui/src/tooltip/root.tsx
++++ b/packages/ui/src/tooltip/root.tsx
+@@ -1,4 +1,4 @@
+-import { Tooltip } from '@base-ui/react/tooltip';
++import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
+ import type { RootProps } from './types';
+ 
+ /**
+@@ -15,7 +15,7 @@ import type { RootProps } from './types';
+  * @see {@link https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-iconbutton--docs IconButton}
+  */
+ function Root( props: RootProps ) {
+-	return <Tooltip.Root { ...props } />;
++	return <_Tooltip.Root { ...props } />;
+ }
+ 
+ export { Root };
+diff --git a/packages/ui/src/tooltip/test/index.test.tsx b/packages/ui/src/tooltip/test/index.test.tsx
+index 0f5ed252677ea0..f4b4e9f4381b7d 100644
+--- a/packages/ui/src/tooltip/test/index.test.tsx
++++ b/packages/ui/src/tooltip/test/index.test.tsx
+@@ -85,8 +85,8 @@ describe( 'Tooltip', () => {
+ 		).not.toBeInTheDocument();
+ 	} );
+ 
+-	describe( 'container', () => {
+-		it( 'should render inside the container when provided', async () => {
++	describe( 'portal', () => {
++		it( 'should render inside the portal container when a custom target is provided', async () => {
+ 			const user = userEvent.setup();
+ 			const containerRef = createRef< HTMLDivElement >();
+ 
+@@ -99,7 +99,13 @@ describe( 'Tooltip', () => {
+ 								ref={ containerRef }
+ 								data-testid="custom-container"
+ 							/>
+-							<Tooltip.Popup container={ containerRef }>
++							<Tooltip.Popup
++								portal={
++									<Tooltip.Portal
++										container={ containerRef }
++									/>
++								}
++							>
+ 								Tooltip content
+ 							</Tooltip.Popup>
+ 						</Tooltip.Root>
+diff --git a/packages/ui/src/tooltip/trigger.tsx b/packages/ui/src/tooltip/trigger.tsx
+index 2f5ff893e9c9e7..b3ac8b74c96f12 100644
+--- a/packages/ui/src/tooltip/trigger.tsx
++++ b/packages/ui/src/tooltip/trigger.tsx
+@@ -1,14 +1,10 @@
+-import { Tooltip } from '@base-ui/react/tooltip';
++import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
+ import { forwardRef } from '@wordpress/element';
+ import type { TriggerProps } from './types';
+ 
+ const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
+-	function TooltipTrigger( { children, ...props }, ref ) {
+-		return (
+-			<Tooltip.Trigger ref={ ref } { ...props }>
+-				{ children }
+-			</Tooltip.Trigger>
+-		);
++	function TooltipTrigger( props, ref ) {
++		return <_Tooltip.Trigger ref={ ref } { ...props } />;
+ 	}
+ );
+ 
+diff --git a/packages/ui/src/tooltip/types.ts b/packages/ui/src/tooltip/types.ts
+index c81c388af18aa4..e68a6a7a0aaf31 100644
+--- a/packages/ui/src/tooltip/types.ts
++++ b/packages/ui/src/tooltip/types.ts
+@@ -1,11 +1,14 @@
+-import type { ReactNode } from 'react';
+-import type { Tooltip } from '@base-ui/react/tooltip';
++import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
++import type { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
++
+ import type { ComponentProps } from '../utils/types';
+ 
+-export type RootProps = Pick< Tooltip.Root.Props, 'disabled' | 'children' >;
++export type PortalProps = ComponentPropsWithoutRef< typeof _Tooltip.Portal >;
++
++export type RootProps = Pick< _Tooltip.Root.Props, 'disabled' | 'children' >;
+ 
+ export type ProviderProps = Pick<
+-	Tooltip.Provider.Props,
++	_Tooltip.Provider.Props,
+ 	'delay' | 'children'
+ >;
+ 
+@@ -18,14 +21,17 @@ export interface TriggerProps extends ComponentProps< 'button' > {
+ 
+ export interface PopupProps
+ 	extends ComponentProps< 'div' >,
+-		Pick< Tooltip.Positioner.Props, 'align' | 'side' | 'sideOffset' > {
++		Pick< _Tooltip.Positioner.Props, 'align' | 'side' | 'sideOffset' > {
+ 	/**
+ 	 * The content to be rendered inside the component.
+ 	 */
+ 	children?: ReactNode;
+ 
+ 	/**
+-	 * A parent element to render the portal into.
++	 * Optional portal element, typically `<Tooltip.Portal />` with custom
++	 * `container`. When omitted, `Tooltip.Popup` uses `Tooltip.Portal` with
++	 * default props. Do not pass `children` on the portal element; they would
++	 * be ignored.
+ 	 */
+-	container?: Tooltip.Portal.Props[ 'container' ];
++	portal?: ReactElement< Omit< PortalProps, 'children' > >;
+ }
+diff --git a/packages/ui/src/utils/render-portal-with-children.ts b/packages/ui/src/utils/render-portal-with-children.ts
+new file mode 100644
+index 00000000000000..edc4d12863bdfc
+--- /dev/null
++++ b/packages/ui/src/utils/render-portal-with-children.ts
+@@ -0,0 +1,27 @@
++import { cloneElement } from '@wordpress/element';
++import type { ReactElement, ReactNode } from 'react';
++
++/**
++ * Renders overlay markup (`children`) through an optional `portal` element from
++ * `portal={ <Component.Portal … /> }`, or through the package default portal.
++ *
++ * Shared by overlay `Popup` components so portal merge behavior stays consistent.
++ *
++ * @param portal        Optional element from the `portal` prop (should have no
++ *                      `children`; callers type this via `Omit<PortalProps,'children'>`).
++ *                      When omitted, `defaultPortal` is used. Injected `children`
++ *                      replace any subtree on the portal element.
++ * @param defaultPortal Unpopulated default portal element (e.g. `<Dialog.Portal />`).
++ * @param children      Popup subtree (backdrop, positioner, etc.) to inject as the portal’s children.
++ */
++export function renderPortalWithChildren(
++	portal: ReactElement | undefined,
++	defaultPortal: ReactElement,
++	children: ReactNode
++): ReactElement {
++	const rootPortal = portal ?? defaultPortal;
++
++	return cloneElement( rootPortal, {
++		children,
++	} );
++}

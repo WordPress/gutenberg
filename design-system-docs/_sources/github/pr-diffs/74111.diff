@@ -1,0 +1,275 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b88a9dea4eb608..99ceab453c7b8e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -29,6 +29,7 @@
+ -   `ToolsPanel`: Remove line-height workaround for control labels ([#73892](https://github.com/WordPress/gutenberg/pull/73892)).
+ -   `Notice`: Add right margin to content only when dismissible ([#73905](https://github.com/WordPress/gutenberg/pull/73905)).
+ -   `Popover`: Update animation, also affecting `Autocomplete`, `BorderControl`, `CircularOptionPicker`, `ColorPalette`, `Dropdown`, `DropdownMenu`, and `PaletteEdit` ([#74082](https://github.com/WordPress/gutenberg/pull/74082)).
++-   `Menu`, `CustomSelectControl` (v1 & 2): Update animation ([#74111](https://github.com/WordPress/gutenberg/pull/74111)).
+ -   `Autocomplete`: Add offset to popover ([#74084](https://github.com/WordPress/gutenberg/pull/74084)).
+ -   `Button`: Hide focus style when `:active` ([#74106](https://github.com/WordPress/gutenberg/pull/74106)).
+ -   Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822)).
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index 9e5e40722c5b15..71da80f640a3ee 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -11,15 +11,9 @@ import { COLORS, CONFIG } from '../utils';
+ import { space } from '../utils/space';
+ import { chevronIconSize } from '../select-control/styles/select-control-styles';
+ import { fontSizeStyles } from '../input-control/styles/input-control-styles';
++import { DROPDOWN_MOTION_CSS } from '../utils/style-mixins';
+ import type { CustomSelectButtonSize } from './types';
+ 
+-// TODO: extract to common utils and apply to relevant components
+-const ANIMATION_PARAMS = {
+-	SLIDE_AMOUNT: '2px',
+-	DURATION: '400ms',
+-	EASING: 'cubic-bezier( 0.16, 1, 0.3, 1 )',
+-};
+-
+ const INLINE_PADDING = {
+ 	compact: CONFIG.controlPaddingXSmall,
+ 	small: CONFIG.controlPaddingXSmall,
+@@ -105,12 +99,14 @@ export const Select = styled( Ariakit.Select, {
+ 	`
+ );
+ 
+-const slideDownAndFade = keyframes( {
+-	'0%': {
+-		opacity: 0,
+-		transform: `translateY(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+-	},
+-	'100%': { opacity: 1, transform: 'translateY(0)' },
++const slideDown = keyframes( {
++	'0%': { transform: `translateY(-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE })` },
++	'100%': { transform: 'translateY(0)' },
++} );
++
++const fadeIn = keyframes( {
++	'0%': { opacity: 0 },
++	'100%': { opacity: 1 },
+ } );
+ 
+ export const SelectPopover = styled( Ariakit.SelectPopover )`
+@@ -135,9 +131,11 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
+ 	/* Animation */
+ 	&[data-open] {
+ 		@media not ( prefers-reduced-motion ) {
+-			animation-duration: ${ ANIMATION_PARAMS.DURATION };
+-			animation-timing-function: ${ ANIMATION_PARAMS.EASING };
+-			animation-name: ${ slideDownAndFade };
++			animation-name: ${ slideDown }, ${ fadeIn };
++			animation-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
++				${ DROPDOWN_MOTION_CSS.FADE_DURATION };
++			animation-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
++				${ DROPDOWN_MOTION_CSS.FADE_EASING };
+ 			will-change: transform, opacity;
+ 		}
+ 	}
+diff --git a/packages/components/src/menu/styles.ts b/packages/components/src/menu/styles.ts
+index 43190af7c1df07..acbc63c4095fbe 100644
+--- a/packages/components/src/menu/styles.ts
++++ b/packages/components/src/menu/styles.ts
+@@ -8,22 +8,12 @@ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+  */
+-import { COLORS, font, rtl, CONFIG } from '../utils';
++import { COLORS, font, rtl, CONFIG, DROPDOWN_MOTION_CSS } from '../utils';
+ import { space } from '../utils/space';
+ import Icon from '../icon';
+ import { Truncate } from '../truncate';
+ import type { ContextProps } from './types';
+ 
+-const ANIMATION_PARAMS = {
+-	SCALE_AMOUNT_OUTER: 0.82,
+-	SCALE_AMOUNT_CONTENT: 0.9,
+-	DURATION: {
+-		IN: '400ms',
+-		OUT: '200ms',
+-	},
+-	EASING: 'cubic-bezier(0.33, 0, 0, 1)',
+-};
+-
+ const CONTENT_WRAPPER_PADDING = space( 1 );
+ const ITEM_PADDING_BLOCK = space( 1 );
+ const ITEM_PADDING_INLINE = space( 3 );
+@@ -57,11 +47,13 @@ export const PopoverOuterWrapper = styled.div<
+ 
+ 	overflow: hidden;
+ 
+-	/* Open/close animation (outer wrapper) */
++	/* Open/close animation */
+ 	@media not ( prefers-reduced-motion ) {
+ 		transition-property: transform, opacity;
+-		transition-timing-function: ${ ANIMATION_PARAMS.EASING };
+-		transition-duration: ${ ANIMATION_PARAMS.DURATION.IN };
++		transition-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
++			${ DROPDOWN_MOTION_CSS.FADE_DURATION };
++		transition-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
++			${ DROPDOWN_MOTION_CSS.FADE_EASING };
+ 		will-change: transform, opacity;
+ 
+ 		/* Regardless of the side, fade in and out. */
+@@ -70,27 +62,26 @@ export const PopoverOuterWrapper = styled.div<
+ 			opacity: 1;
+ 		}
+ 
+-		&:has( [data-leave] ) {
+-			transition-duration: ${ ANIMATION_PARAMS.DURATION.OUT };
++		/* Slide in the direction the menu is opening. */
++		&:has( [data-side='bottom'] ) {
++			transform: translateY( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+ 		}
+-
+-		/* For menus opening on top and bottom side, animate the scale Y too. */
+-		&:has( [data-side='bottom'] ),
+ 		&:has( [data-side='top'] ) {
+-			transform: scaleY( ${ ANIMATION_PARAMS.SCALE_AMOUNT_OUTER } );
++			transform: translateY( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+ 		}
+-		&:has( [data-side='bottom'] ) {
+-			transform-origin: top;
++		&:has( [data-side='left'] ) {
++			transform: translateX( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+ 		}
+-		&:has( [data-side='top'] ) {
+-			transform-origin: bottom;
++		&:has( [data-side='right'] ) {
++			transform: translateX( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+ 		}
+ 		&:has( [data-enter][data-side='bottom'] ),
+-		&:has( [data-enter][data-side='top'] ),
+-		/* Do not animate the scaleY when closing the menu */
+-		&:has( [data-leave][data-side='bottom'] ),
+-		&:has( [data-leave][data-side='top'] ) {
+-			transform: scaleY( 1 );
++		&:has( [data-enter][data-side='top'] ) {
++			transform: translateY( 0 );
++		}
++		&:has( [data-enter][data-side='left'] ),
++		&:has( [data-enter][data-side='right'] ) {
++			transform: translateX( 0 );
+ 		}
+ 	}
+ `;
+@@ -117,35 +108,6 @@ export const PopoverInnerWrapper = styled.div`
+ 
+ 	/* Only visible in Windows High Contrast mode */
+ 	outline: 2px solid transparent !important;
+-
+-	/* Open/close animation (inner content wrapper) */
+-	@media not ( prefers-reduced-motion ) {
+-		transition: inherit;
+-		transform-origin: inherit;
+-
+-		/*
+-		 * For menus opening on top and bottom side, animate the scale Y too.
+-		 * The content scales at a different rate than the outer container:
+-		 * - first, counter the outer scale factor by doing "1 / scaleAmountOuter"
+-		 * - then, apply the content scale factor.
+-		 */
+-		&[data-side='bottom'],
+-		&[data-side='top'] {
+-			transform: scaleY(
+-				calc(
+-					1 / ${ ANIMATION_PARAMS.SCALE_AMOUNT_OUTER } *
+-						${ ANIMATION_PARAMS.SCALE_AMOUNT_CONTENT }
+-				)
+-			);
+-		}
+-		&[data-enter][data-side='bottom'],
+-		&[data-enter][data-side='top'],
+-		/* Do not animate the scaleY when closing the menu */
+-		&[data-leave][data-side='bottom'],
+-		&[data-leave][data-side='top'] {
+-			transform: scaleY( 1 );
+-		}
+-	}
+ `;
+ 
+ const baseItem = css`
+diff --git a/packages/components/src/popover/utils.ts b/packages/components/src/popover/utils.ts
+index 5b02cbe473e5bc..37f1f71dea7b9a 100644
+--- a/packages/components/src/popover/utils.ts
++++ b/packages/components/src/popover/utils.ts
+@@ -7,6 +7,7 @@ import type { Placement, ReferenceType } from '@floating-ui/react-dom';
+ /**
+  * Internal dependencies
+  */
++import { DROPDOWN_MOTION } from '../utils';
+ import type {
+ 	PopoverProps,
+ 	PopoverAnchorRefReference,
+@@ -129,14 +130,19 @@ export const placementToMotionAnimationProps = (
+ 		style: PLACEMENT_TO_ANIMATION_ORIGIN[ placement ],
+ 		initial: {
+ 			opacity: 0,
+-			[ translateProp ]: `${ 4 * translateDirection }px`,
++			[ translateProp ]: `${
++				DROPDOWN_MOTION.SLIDE_DISTANCE * translateDirection
++			}px`,
+ 		},
+ 		animate: { opacity: 1, [ translateProp ]: 0 },
+ 		transition: {
+-			opacity: { duration: 0.08, ease: 'linear' },
++			opacity: {
++				duration: DROPDOWN_MOTION.FADE_DURATION / 1000,
++				ease: DROPDOWN_MOTION.FADE_EASING.function,
++			},
+ 			[ translateProp ]: {
+-				duration: 0.3,
+-				ease: cubicBezier( 0, 0, 0, 1 ),
++				duration: DROPDOWN_MOTION.SLIDE_DURATION / 1000,
++				ease: cubicBezier( ...DROPDOWN_MOTION.SLIDE_EASING.args ),
+ 			},
+ 		},
+ 	};
+diff --git a/packages/components/src/utils/dropdown-motion.ts b/packages/components/src/utils/dropdown-motion.ts
+new file mode 100644
+index 00000000000000..f5576a8ff6e41f
+--- /dev/null
++++ b/packages/components/src/utils/dropdown-motion.ts
+@@ -0,0 +1,32 @@
++// Motion configuration for dropdown-like popovers.
++
++export const DROPDOWN_MOTION = Object.freeze( {
++	SLIDE_DISTANCE: 4,
++	SLIDE_DURATION: 200,
++	SLIDE_EASING: {
++		function: 'cubic-bezier',
++		args: [ 0, 0, 0, 1 ] as const,
++	},
++	FADE_DURATION: 80,
++	FADE_EASING: {
++		function: 'linear',
++	},
++} );
++
++const convertEasingToString = ( easing: {
++	function: string;
++	args?: readonly [ number, number, number, number ];
++} ) => {
++	if ( easing.args?.length ) {
++		return `${ easing.function }(${ easing.args.join( ',' ) })`;
++	}
++	return easing.function;
++};
++
++export const DROPDOWN_MOTION_CSS = Object.freeze( {
++	SLIDE_DISTANCE: `${ DROPDOWN_MOTION.SLIDE_DISTANCE }px`,
++	SLIDE_DURATION: `${ DROPDOWN_MOTION.SLIDE_DURATION }ms`,
++	SLIDE_EASING: convertEasingToString( DROPDOWN_MOTION.SLIDE_EASING ),
++	FADE_DURATION: `${ DROPDOWN_MOTION.FADE_DURATION }ms`,
++	FADE_EASING: convertEasingToString( DROPDOWN_MOTION.FADE_EASING ),
++} );
+diff --git a/packages/components/src/utils/style-mixins.js b/packages/components/src/utils/style-mixins.js
+index 46ee1183f59698..10b91237a784e2 100644
+--- a/packages/components/src/utils/style-mixins.js
++++ b/packages/components/src/utils/style-mixins.js
+@@ -6,3 +6,4 @@ export { breakpoint } from './breakpoint';
+ export { default as CONFIG } from './config-values';
+ export { COLORS } from './colors-values';
+ export { baseLabelTypography } from './base-label';
++export { DROPDOWN_MOTION, DROPDOWN_MOTION_CSS } from './dropdown-motion';

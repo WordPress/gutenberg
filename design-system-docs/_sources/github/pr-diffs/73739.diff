@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6cbb61df763f14..a7604c2040e47e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Modal`: Fix vertical scroll issue by reducing style specificity to allow overrides. ([#73739](https://github.com/WordPress/gutenberg/pull/73739))
+ -   `Notice`: Fix notice component spacing issue when actions are present. ([#69430](https://github.com/WordPress/gutenberg/pull/69430))
+ 
+ ## 30.9.0 (2025-11-26)
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index c67122090fcd6a..5f07342bfd8a0f 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -109,7 +109,7 @@
+ 
+ 	&.is-full-screen {
+ 		// When full screen, make sure the children container is full height.
+-		.components-modal__content {
++		:where(.components-modal__content) {
+ 			display: flex;
+ 			// If this container is scrollable, bottom padding won't apply so we use margin instead.
+ 			margin-bottom: $grid-unit-40;

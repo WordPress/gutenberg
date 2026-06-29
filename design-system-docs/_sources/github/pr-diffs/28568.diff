@@ -1,0 +1,2309 @@
+diff --git a/package-lock.json b/package-lock.json
+index 1bb24d74650fb1..8019b28aa9eeb7 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -11949,10 +11949,10 @@
+ 				"@wordpress/primitives": "file:packages/primitives",
+ 				"@wordpress/rich-text": "file:packages/rich-text",
+ 				"@wordpress/warning": "file:packages/warning",
+-				"@wp-g2/components": "^0.0.150",
+-				"@wp-g2/context": "^0.0.150",
+-				"@wp-g2/styles": "^0.0.150",
+-				"@wp-g2/utils": "^0.0.150",
++				"@wp-g2/components": "^0.0.152",
++				"@wp-g2/context": "^0.0.152",
++				"@wp-g2/styles": "^0.0.152",
++				"@wp-g2/utils": "^0.0.152",
+ 				"classnames": "^2.2.5",
+ 				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^6.0.15",
+@@ -11970,137 +11970,6 @@
+ 				"rememo": "^3.0.0",
+ 				"tinycolor2": "^1.4.2",
+ 				"uuid": "^8.3.0"
+-			},
+-			"dependencies": {
+-				"@emotion/is-prop-valid": {
+-					"version": "0.8.8",
+-					"resolved": "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz",
+-					"integrity": "sha512-u5WtneEAr5IDG2Wv65yhunPSMLIpuKsbuOktRojfrEiEvRyC85LgPMZI63cr7NUqT8ZIGdSVg8ZKGxIug4lXcA==",
+-					"requires": {
+-						"@emotion/memoize": "0.7.4"
+-					}
+-				},
+-				"@emotion/memoize": {
+-					"version": "0.7.4",
+-					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.4.tgz",
+-					"integrity": "sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw=="
+-				},
+-				"@wp-g2/components": {
+-					"version": "0.0.150",
+-					"resolved": "https://registry.npmjs.org/@wp-g2/components/-/components-0.0.150.tgz",
+-					"integrity": "sha512-wolFRz5X53jFTgnqLfZlJue7xs3ucGHksR9zBsONKXwolDvING0cJLn9U17vuU7dB7WFzf8lLxKxPvdFyYMcoQ==",
+-					"requires": {
+-						"@popperjs/core": "^2.5.4",
+-						"@wp-g2/context": "^0.0.150",
+-						"@wp-g2/styles": "^0.0.150",
+-						"@wp-g2/utils": "^0.0.150",
+-						"csstype": "^3.0.3",
+-						"downshift": "^6.0.15",
+-						"framer-motion": "^2.1.0",
+-						"highlight-words-core": "^1.2.2",
+-						"history": "^4.9.0",
+-						"lodash": "^4.17.19",
+-						"path-to-regexp": "^1.7.0",
+-						"react-colorful": "4.4.4",
+-						"react-textarea-autosize": "^8.2.0",
+-						"react-use-gesture": "^9.0.0",
+-						"reakit": "^1.3.4"
+-					}
+-				},
+-				"@wp-g2/context": {
+-					"version": "0.0.150",
+-					"resolved": "https://registry.npmjs.org/@wp-g2/context/-/context-0.0.150.tgz",
+-					"integrity": "sha512-VaC79oGUhJ/4THEW0XupIhunovV0u5IMLZfIrDAs5k0eqp45CO30zghMv2DQBQnuSzI1PH6DJCoHGkn4DTBDfw==",
+-					"requires": {
+-						"@wp-g2/styles": "^0.0.150",
+-						"@wp-g2/utils": "^0.0.150",
+-						"lodash": "^4.17.19"
+-					}
+-				},
+-				"@wp-g2/create-styles": {
+-					"version": "0.0.150",
+-					"resolved": "https://registry.npmjs.org/@wp-g2/create-styles/-/create-styles-0.0.150.tgz",
+-					"integrity": "sha512-Dl2k/s9qtcJ86v2eTGfX/NdS9mjnCk1zWj0fEbCxKxdDCBEoGmYeFsBq16+ZEEA0YgyTzq8QmYjLhhSNGHwptQ==",
+-					"requires": {
+-						"@emotion/core": "^10.1.1",
+-						"@emotion/is-prop-valid": "^0.8.8",
+-						"@wp-g2/utils": "^0.0.150",
+-						"create-emotion": "^10.0.27",
+-						"emotion": "^10.0.27",
+-						"emotion-theming": "^10.0.27",
+-						"lodash": "^4.17.19",
+-						"mitt": "^2.1.0",
+-						"rtlcss": "^2.6.2",
+-						"styled-griddie": "^0.1.3"
+-					}
+-				},
+-				"@wp-g2/styles": {
+-					"version": "0.0.150",
+-					"resolved": "https://registry.npmjs.org/@wp-g2/styles/-/styles-0.0.150.tgz",
+-					"integrity": "sha512-5CewOL0Ts5IdQIrW7d7Oa5joU1SWsVVBx9q+7rXfaXjFyeGliLrpRPchBk3OBPCQmw938kcexsa7eySlKFT67Q==",
+-					"requires": {
+-						"@wp-g2/create-styles": "^0.0.150",
+-						"@wp-g2/utils": "^0.0.150"
+-					}
+-				},
+-				"@wp-g2/utils": {
+-					"version": "0.0.150",
+-					"resolved": "https://registry.npmjs.org/@wp-g2/utils/-/utils-0.0.150.tgz",
+-					"integrity": "sha512-CXJEZvwZwlLJfvsfWyxzAxd8qCVzZp9kK7w+GJ883K6NythPymOVJwECUEv2PG3xTUo5qwX4mAwePhA8ZPTHfQ==",
+-					"requires": {
+-						"copy-to-clipboard": "^3.3.1",
+-						"create-emotion": "^10.0.27",
+-						"deepmerge": "^4.2.2",
+-						"fast-deep-equal": "^3.1.3",
+-						"hoist-non-react-statics": "^3.3.2",
+-						"json2mq": "^0.2.0",
+-						"lodash": "^4.17.19",
+-						"memize": "^1.1.0",
+-						"react-merge-refs": "^1.1.0",
+-						"react-resize-aware": "^3.1.0",
+-						"tinycolor2": "^1.4.2",
+-						"use-enhanced-state": "^0.0.13",
+-						"use-isomorphic-layout-effect": "^1.0.0"
+-					},
+-					"dependencies": {
+-						"react-merge-refs": {
+-							"version": "1.1.0",
+-							"resolved": "https://registry.npmjs.org/react-merge-refs/-/react-merge-refs-1.1.0.tgz",
+-							"integrity": "sha512-alTKsjEL0dKH/ru1Iyn7vliS2QRcBp9zZPGoWxUOvRGWPUYgjo+V01is7p04It6KhgrzhJGnIj9GgX8W4bZoCQ=="
+-						}
+-					}
+-				},
+-				"csstype": {
+-					"version": "3.0.6",
+-					"resolved": "https://registry.npmjs.org/csstype/-/csstype-3.0.6.tgz",
+-					"integrity": "sha512-+ZAmfyWMT7TiIlzdqJgjMb7S4f1beorDbWbsocyK4RaiqA5RTX3K14bnBWmmA9QEM0gRdsjyyrEmcyga8Zsxmw=="
+-				},
+-				"fast-deep-equal": {
+-					"version": "3.1.3",
+-					"resolved": "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz",
+-					"integrity": "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
+-				},
+-				"hoist-non-react-statics": {
+-					"version": "3.3.2",
+-					"resolved": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz",
+-					"integrity": "sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==",
+-					"requires": {
+-						"react-is": "^16.7.0"
+-					}
+-				},
+-				"isarray": {
+-					"version": "0.0.1",
+-					"resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz",
+-					"integrity": "sha1-ihis/Kmo9Bd+Cav8YDiTmwXR7t8="
+-				},
+-				"path-to-regexp": {
+-					"version": "1.8.0",
+-					"resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-1.8.0.tgz",
+-					"integrity": "sha512-n43JRhlUKUAlibEJhPeir1ncUID16QnEjNpwzNdO3Lm4ywrBpBZ5oLD0I6br9evr1Y9JTqwRtAh7JLoOzAQdVA==",
+-					"requires": {
+-						"isarray": "0.0.1"
+-					}
+-				}
+ 			}
+ 		},
+ 		"@wordpress/compose": {
+@@ -13006,6 +12875,134 @@
+ 				"lodash": "^4.17.19"
+ 			}
+ 		},
++		"@wp-g2/components": {
++			"version": "0.0.152",
++			"resolved": "https://registry.npmjs.org/@wp-g2/components/-/components-0.0.152.tgz",
++			"integrity": "sha512-FvnDvV8gXYTq6AixM330vyDHpLXzclby17dxYA2PKOSBI7Up03amVP0+0SO+w04cBYyomDcC3jI6WWKySbZ9xA==",
++			"requires": {
++				"@popperjs/core": "^2.5.4",
++				"@wp-g2/context": "^0.0.152",
++				"@wp-g2/styles": "^0.0.152",
++				"@wp-g2/utils": "^0.0.152",
++				"csstype": "^3.0.3",
++				"downshift": "^6.0.15",
++				"framer-motion": "^2.1.0",
++				"highlight-words-core": "^1.2.2",
++				"history": "^4.9.0",
++				"lodash": "^4.17.19",
++				"path-to-regexp": "^1.7.0",
++				"react-colorful": "4.4.4",
++				"react-textarea-autosize": "^8.2.0",
++				"react-use-gesture": "^9.0.0",
++				"reakit": "^1.3.4"
++			},
++			"dependencies": {
++				"csstype": {
++					"version": "3.0.6",
++					"resolved": "https://registry.npmjs.org/csstype/-/csstype-3.0.6.tgz",
++					"integrity": "sha512-+ZAmfyWMT7TiIlzdqJgjMb7S4f1beorDbWbsocyK4RaiqA5RTX3K14bnBWmmA9QEM0gRdsjyyrEmcyga8Zsxmw=="
++				},
++				"isarray": {
++					"version": "0.0.1",
++					"resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz",
++					"integrity": "sha1-ihis/Kmo9Bd+Cav8YDiTmwXR7t8="
++				},
++				"path-to-regexp": {
++					"version": "1.8.0",
++					"resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-1.8.0.tgz",
++					"integrity": "sha512-n43JRhlUKUAlibEJhPeir1ncUID16QnEjNpwzNdO3Lm4ywrBpBZ5oLD0I6br9evr1Y9JTqwRtAh7JLoOzAQdVA==",
++					"requires": {
++						"isarray": "0.0.1"
++					}
++				}
++			}
++		},
++		"@wp-g2/context": {
++			"version": "0.0.152",
++			"resolved": "https://registry.npmjs.org/@wp-g2/context/-/context-0.0.152.tgz",
++			"integrity": "sha512-f60nJLNSaPT+iE+6a9MOfF7GHfn6Kqp/Prl/WwsN9CjOvf6fxlOeezuzbSZKDKxp7CJM8iewhlP3mP5YF2h+ZA==",
++			"requires": {
++				"@wp-g2/styles": "^0.0.152",
++				"@wp-g2/utils": "^0.0.152",
++				"lodash": "^4.17.19"
++			}
++		},
++		"@wp-g2/create-styles": {
++			"version": "0.0.152",
++			"resolved": "https://registry.npmjs.org/@wp-g2/create-styles/-/create-styles-0.0.152.tgz",
++			"integrity": "sha512-ZSAgOJZB44IczlOYClR0LEuSgA+WD44O4ueN1cYscJV+he5A/t8EJESonxA2p8AZmAaVmIsU73qvEnXigWaMrw==",
++			"requires": {
++				"@emotion/core": "^10.1.1",
++				"@emotion/is-prop-valid": "^0.8.8",
++				"@wp-g2/utils": "^0.0.152",
++				"create-emotion": "^10.0.27",
++				"emotion": "^10.0.27",
++				"emotion-theming": "^10.0.27",
++				"lodash": "^4.17.19",
++				"mitt": "^2.1.0",
++				"rtlcss": "^2.6.2",
++				"styled-griddie": "^0.1.3"
++			},
++			"dependencies": {
++				"@emotion/is-prop-valid": {
++					"version": "0.8.8",
++					"resolved": "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz",
++					"integrity": "sha512-u5WtneEAr5IDG2Wv65yhunPSMLIpuKsbuOktRojfrEiEvRyC85LgPMZI63cr7NUqT8ZIGdSVg8ZKGxIug4lXcA==",
++					"requires": {
++						"@emotion/memoize": "0.7.4"
++					}
++				},
++				"@emotion/memoize": {
++					"version": "0.7.4",
++					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.4.tgz",
++					"integrity": "sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw=="
++				}
++			}
++		},
++		"@wp-g2/styles": {
++			"version": "0.0.152",
++			"resolved": "https://registry.npmjs.org/@wp-g2/styles/-/styles-0.0.152.tgz",
++			"integrity": "sha512-25vfi6f9+qURgA8OVofMrbhq5J/dy518LHGatpLxs8YNlWVB/Ygw+E+L6bTgD/22L1Vuh+izAn6v3WYxnmE3Rw==",
++			"requires": {
++				"@wp-g2/create-styles": "^0.0.152",
++				"@wp-g2/utils": "^0.0.152"
++			}
++		},
++		"@wp-g2/utils": {
++			"version": "0.0.152",
++			"resolved": "https://registry.npmjs.org/@wp-g2/utils/-/utils-0.0.152.tgz",
++			"integrity": "sha512-7ZvS6aeIpdQ+C1vD7aMAh0lyoGGdF1HZrikkmWymjUfiD9RJGZ/+8Kr3ztrCwGEvyNDeyvBPbDa6GdS+QImIDg==",
++			"requires": {
++				"copy-to-clipboard": "^3.3.1",
++				"create-emotion": "^10.0.27",
++				"deepmerge": "^4.2.2",
++				"fast-deep-equal": "^3.1.3",
++				"hoist-non-react-statics": "^3.3.2",
++				"json2mq": "^0.2.0",
++				"lodash": "^4.17.19",
++				"memize": "^1.1.0",
++				"react-merge-refs": "^1.1.0",
++				"react-resize-aware": "^3.1.0",
++				"tinycolor2": "^1.4.2",
++				"use-enhanced-state": "^0.0.13",
++				"use-isomorphic-layout-effect": "^1.0.0"
++			},
++			"dependencies": {
++				"fast-deep-equal": {
++					"version": "3.1.3",
++					"resolved": "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz",
++					"integrity": "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
++				},
++				"hoist-non-react-statics": {
++					"version": "3.3.2",
++					"resolved": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz",
++					"integrity": "sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==",
++					"requires": {
++						"react-is": "^16.7.0"
++					}
++				}
++			}
++		},
+ 		"@xtuc/ieee754": {
+ 			"version": "1.2.0",
+ 			"resolved": "https://registry.npmjs.org/@xtuc/ieee754/-/ieee754-1.2.0.tgz",
+@@ -47143,6 +47140,11 @@
+ 			"integrity": "sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==",
+ 			"dev": true
+ 		},
++		"react-merge-refs": {
++			"version": "1.1.0",
++			"resolved": "https://registry.npmjs.org/react-merge-refs/-/react-merge-refs-1.1.0.tgz",
++			"integrity": "sha512-alTKsjEL0dKH/ru1Iyn7vliS2QRcBp9zZPGoWxUOvRGWPUYgjo+V01is7p04It6KhgrzhJGnIj9GgX8W4bZoCQ=="
++		},
+ 		"react-moment-proptypes": {
+ 			"version": "1.7.0",
+ 			"resolved": "https://registry.npmjs.org/react-moment-proptypes/-/react-moment-proptypes-1.7.0.tgz",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 25c868d8c702eb..57c055ce7150ea 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -45,10 +45,10 @@
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/rich-text": "file:../rich-text",
+ 		"@wordpress/warning": "file:../warning",
+-		"@wp-g2/components": "^0.0.150",
+-		"@wp-g2/context": "^0.0.150",
+-		"@wp-g2/styles": "^0.0.150",
+-		"@wp-g2/utils": "^0.0.150",
++		"@wp-g2/components": "^0.0.152",
++		"@wp-g2/context": "^0.0.152",
++		"@wp-g2/styles": "^0.0.152",
++		"@wp-g2/utils": "^0.0.152",
+ 		"classnames": "^2.2.5",
+ 		"dom-scroll-into-view": "^1.2.1",
+ 		"downshift": "^6.0.15",
+@@ -70,4 +70,4 @@
+ 	"publishConfig": {
+ 		"access": "public"
+ 	}
+-}
++}
+\ No newline at end of file
+diff --git a/packages/components/src/ui/control-label/README.md b/packages/components/src/ui/control-label/README.md
+new file mode 100644
+index 00000000000000..511b93fad37309
+--- /dev/null
++++ b/packages/components/src/ui/control-label/README.md
+@@ -0,0 +1,22 @@
++# ControlLabel
++
++`ControlLabel` is a form component that works with `FormGroup` to provide a label for form elements (e.g. `Switch` or `TextInput`).
++
++## Usage
++
++```jsx
++import {
++	__experimentalControlLabel as ControlLabel,
++	__experimentalFormGroup as FormGroup,
++	__experimentalTextInput as TextInput,
++} from '@wordpress/components';
++
++function Example() {
++	return (
++		<FormGroup>
++			<ControlLabel>First Name</ControlLabel>
++			<TextInput />
++		</FormGroup>
++	);
++}
++```
+diff --git a/packages/components/src/ui/control-label/control-label-styles.js b/packages/components/src/ui/control-label/control-label-styles.js
+new file mode 100644
+index 00000000000000..a3291e1d431933
+--- /dev/null
++++ b/packages/components/src/ui/control-label/control-label-styles.js
+@@ -0,0 +1,61 @@
++/**
++ * External dependencies
++ */
++import { css, getHighDpi, ui } from '@wp-g2/styles';
++
++const lineHeight = `calc(${ ui.get( 'fontSize' ) } * 1.2)`;
++
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param {Parameters<typeof ui.get>[0]} size The padding size.
++ */
++/* eslint-enable jsdoc/valid-types */
++function getPadding( size ) {
++	return `calc((${ ui.get( size ) } - ${ lineHeight }) / 2)`;
++}
++
++const highDpiAdjust = getHighDpi`
++	> * {
++		position: relative;
++		top: 0.5px;
++	}
++`;
++
++export const ControlLabel = css`
++	display: inline-block;
++	line-height: ${ lineHeight };
++	margin: 0;
++	max-width: 100%;
++	padding-bottom: ${ getPadding( 'controlHeight' ) };
++	padding-top: ${ getPadding( 'controlHeight' ) };
++
++	&:active {
++		user-select: none;
++	}
++
++	${ highDpiAdjust };
++`;
++
++export const large = css`
++	padding-bottom: ${ getPadding( 'controlHeightLarge' ) };
++	padding-top: ${ getPadding( 'controlHeightLarge' ) };
++`;
++
++export const medium = css`
++	padding-bottom: ${ getPadding( 'controlHeight' ) };
++	padding-top: ${ getPadding( 'controlHeight' ) };
++`;
++
++export const small = css`
++	padding-bottom: ${ getPadding( 'controlHeightSmall' ) };
++	padding-top: ${ getPadding( 'controlHeightSmall' ) };
++`;
++
++export const inline = css`
++	display: inline-block;
++	vertical-align: middle;
++`;
++
++export const block = css`
++	display: block;
++`;
+diff --git a/packages/components/src/ui/control-label/control-label.js b/packages/components/src/ui/control-label/control-label.js
+new file mode 100644
+index 00000000000000..b662bf2474f031
+--- /dev/null
++++ b/packages/components/src/ui/control-label/control-label.js
+@@ -0,0 +1,13 @@
++/**
++ * Internal dependencies
++ */
++import { createComponent } from '../utils';
++import { useControlLabel } from './use-control-label';
++
++const ControlLabel = createComponent( {
++	as: 'label',
++	useHook: useControlLabel,
++	name: 'ControlLabel',
++} );
++
++export default ControlLabel;
+diff --git a/packages/components/src/ui/control-label/index.js b/packages/components/src/ui/control-label/index.js
+new file mode 100644
+index 00000000000000..560861f55fa85a
+--- /dev/null
++++ b/packages/components/src/ui/control-label/index.js
+@@ -0,0 +1,2 @@
++export { default as ControlLabel } from './control-label';
++export * from './use-control-label';
+diff --git a/packages/components/src/ui/control-label/stories/index.js b/packages/components/src/ui/control-label/stories/index.js
+new file mode 100644
+index 00000000000000..e64e5f3908f675
+--- /dev/null
++++ b/packages/components/src/ui/control-label/stories/index.js
+@@ -0,0 +1,13 @@
++/**
++ * Internal dependencies
++ */
++import { ControlLabel } from '../index';
++
++export default {
++	component: ControlLabel,
++	title: 'Components/ControlLabel',
++};
++
++export const _default = () => {
++	return <ControlLabel>Label</ControlLabel>;
++};
+diff --git a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..fbf8bf1335e1a1
+--- /dev/null
++++ b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+@@ -0,0 +1,225 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render correctly 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: inline-block;
++  line-height: calc(13px * 1.2);
++  line-height: calc(var(--wp-g2-font-size) * 1.2);
++  margin: 0;
++  max-width: 100%;
++  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-top: calc((30px - calc(13px * 1.2)) / 2);
++  padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-top: calc((30px - calc(13px * 1.2)) / 2);
++  padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  display: block;
++  overflow: hidden;
++  text-overflow: ellipsis;
++  white-space: nowrap;
++  color: #1e1e1e;
++  color: var(--wp-g2-color-text);
++  line-height: 1.2;
++  line-height: var(--wp-g2-font-line-height-base);
++  font-size: calc(1 * 13px);
++  font-size: calc(1 * var(--wp-g2-font-size));
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  display: inline-block;
++  vertical-align: middle;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:active {
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++}
++
++@media (-webkit-min-device-pixel-ratio:1.25), (min-resolution:120dpi) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * {
++    position: relative;
++    top: 0.5px;
++  }
++}
++
++<label
++  class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label emotion-0"
++  data-g2-c16t="true"
++  data-g2-component="ControlLabel"
++>
++  Label
++</label>
++`;
++
++exports[`props should render no truncate 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: inline-block;
++  line-height: calc(13px * 1.2);
++  line-height: calc(var(--wp-g2-font-size) * 1.2);
++  margin: 0;
++  max-width: 100%;
++  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-top: calc((30px - calc(13px * 1.2)) / 2);
++  padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-top: calc((30px - calc(13px * 1.2)) / 2);
++  padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  color: #1e1e1e;
++  color: var(--wp-g2-color-text);
++  line-height: 1.2;
++  line-height: var(--wp-g2-font-line-height-base);
++  font-size: calc(1 * 13px);
++  font-size: calc(1 * var(--wp-g2-font-size));
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  display: inline-block;
++  vertical-align: middle;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:active {
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++}
++
++@media (-webkit-min-device-pixel-ratio:1.25), (min-resolution:120dpi) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * {
++    position: relative;
++    top: 0.5px;
++  }
++}
++
++<label
++  class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label emotion-0"
++  data-g2-c16t="true"
++  data-g2-component="ControlLabel"
++>
++  Label
++</label>
++`;
++
++exports[`props should render size 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: inline-block;
++  line-height: calc(13px * 1.2);
++  line-height: calc(var(--wp-g2-font-size) * 1.2);
++  margin: 0;
++  max-width: 100%;
++  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-top: calc((30px - calc(13px * 1.2)) / 2);
++  padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-bottom: calc((calc(30px * 0.8) - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((var(--wp-g2-control-height-small) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-top: calc((calc(30px * 0.8) - calc(13px * 1.2)) / 2);
++  padding-top: calc((var(--wp-g2-control-height-small) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  display: block;
++  overflow: hidden;
++  text-overflow: ellipsis;
++  white-space: nowrap;
++  color: #1e1e1e;
++  color: var(--wp-g2-color-text);
++  line-height: 1.2;
++  line-height: var(--wp-g2-font-line-height-base);
++  font-size: calc(1 * 13px);
++  font-size: calc(1 * var(--wp-g2-font-size));
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  display: inline-block;
++  vertical-align: middle;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:active {
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++}
++
++@media (-webkit-min-device-pixel-ratio:1.25), (min-resolution:120dpi) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * {
++    position: relative;
++    top: 0.5px;
++  }
++}
++
++<label
++  class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label emotion-0"
++  data-g2-c16t="true"
++  data-g2-component="ControlLabel"
++>
++  Label
++</label>
++`;
+diff --git a/packages/components/src/ui/control-label/test/index.js b/packages/components/src/ui/control-label/test/index.js
+new file mode 100644
+index 00000000000000..e5b46f73bb043e
+--- /dev/null
++++ b/packages/components/src/ui/control-label/test/index.js
+@@ -0,0 +1,41 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { ControlLabel } from '../index';
++
++describe( 'props', () => {
++	test( 'should render correctly', () => {
++		const { container } = render( <ControlLabel>Label</ControlLabel> );
++
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render htmlFor', () => {
++		const { container } = render(
++			<ControlLabel htmlFor="Field">Label</ControlLabel>
++		);
++
++		expect( container.firstChild ).toHaveAttribute( 'for', 'Field' );
++	} );
++
++	test( 'should render size', () => {
++		const { container } = render(
++			<ControlLabel size="small">Label</ControlLabel>
++		);
++
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render no truncate', () => {
++		const { container } = render(
++			<ControlLabel truncate={ false }>Label</ControlLabel>
++		);
++
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++} );
+diff --git a/packages/components/src/ui/control-label/types.ts b/packages/components/src/ui/control-label/types.ts
+new file mode 100644
+index 00000000000000..f81fc3ca237c5f
+--- /dev/null
++++ b/packages/components/src/ui/control-label/types.ts
+@@ -0,0 +1,9 @@
++/**
++ * Internal dependencies
++ */
++import { Props as TextProps } from '../text/types';
++
++export type Props = TextProps & {
++	isBlock?: boolean;
++	size?: 'large' | 'medium' | 'small';
++};
+diff --git a/packages/components/src/ui/control-label/use-control-label.js b/packages/components/src/ui/control-label/use-control-label.js
+new file mode 100644
+index 00000000000000..6cceff5dd6a39c
+--- /dev/null
++++ b/packages/components/src/ui/control-label/use-control-label.js
+@@ -0,0 +1,45 @@
++/**
++ * External dependencies
++ */
++import { useContextSystem } from '@wp-g2/context';
++import { cx } from '@wp-g2/styles';
++
++/**
++ * Internal dependencies
++ */
++import { useFormGroupContextId } from '../form-group';
++import { useText } from '../text';
++import * as styles from './control-label-styles';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'label'>} props
++ */
++export function useControlLabel( props ) {
++	const {
++		htmlFor: htmlForProp,
++		isBlock = false,
++		size = 'medium',
++		truncate = true,
++		...otherProps
++	} = useContextSystem( props, 'ControlLabel' );
++
++	const { className, ...textProps } = useText( {
++		...otherProps,
++		isBlock,
++		truncate,
++	} );
++
++	const htmlFor = useFormGroupContextId( htmlForProp );
++	const classes = cx(
++		styles.ControlLabel,
++		styles[ size ],
++		className,
++		isBlock ? styles.block : styles.inline
++	);
++
++	return {
++		...textProps,
++		className: classes,
++		htmlFor,
++	};
++}
+diff --git a/packages/components/src/ui/flex/test/__snapshots__/index.js.snap b/packages/components/src/ui/flex/test/__snapshots__/index.js.snap
+index c780de737507fb..05292d490ae34e 100644
+--- a/packages/components/src/ui/flex/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/flex/test/__snapshots__/index.js.snap
+@@ -31,12 +31,12 @@ exports[`props should render align 1`] = `
+ - - First value
+ - + Second value
+ -
+-- @@ -10,11 +10,11 @@
++- @@ -7,11 +7,11 @@
++-   	\\"margin-top\\": \\"0px\\",
++-   	\\"margin-right\\": \\"0px\\",
++-   	\\"margin-bottom\\": \\"0px\\",
+ -   	\\"margin-left\\": \\"0px\\",
+ -   	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
+--   	\\"--wp-g2-flex-item-margin-bottom\\": \\"0\\",
+--   	\\"--wp-g2-flex-item-margin-right\\": \\"var(--wp-g2-flex-gap)\\",
+--   	\\"--wp-g2-flex-item-margin-left\\": \\"0\\",
+ - - 	\\"align-items\\": \\"flex-start\\",
+ - + 	\\"align-items\\": \\"center\\",
+ -   	\\"flex-direction\\": \\"row\\",
+@@ -64,10 +64,6 @@ exports[`props should render correctly 1`] = `
+   display: flex;
+   --wp-g2-flex-gap: calc(4px * 2);
+   --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
+-  --wp-g2-flex-item-margin-bottom: 0;
+-  --wp-g2-flex-item-margin-right: calc(4px * 2);
+-  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
+-  --wp-g2-flex-item-margin-left: 0;
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -195,10 +191,10 @@ exports[`props should render justify 1`] = `
+ - - First value
+ - + Second value
+ -
+-- @@ -12,9 +12,9 @@
+--   	\\"--wp-g2-flex-item-margin-bottom\\": \\"0\\",
+--   	\\"--wp-g2-flex-item-margin-right\\": \\"var(--wp-g2-flex-gap)\\",
+--   	\\"--wp-g2-flex-item-margin-left\\": \\"0\\",
++- @@ -9,9 +9,9 @@
++-   	\\"margin-bottom\\": \\"0px\\",
++-   	\\"margin-left\\": \\"0px\\",
++-   	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
+ -   	\\"align-items\\": \\"center\\",
+ -   	\\"flex-direction\\": \\"row\\",
+ - - 	\\"justify-content\\": \\"flex-start\\",
+@@ -225,9 +221,9 @@ exports[`props should render spacing 1`] = `
+ -   	\\"margin-left\\": \\"0px\\",
+ - - 	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 5)\\",
+ - + 	\\"--wp-g2-flex-gap\\": \\"calc(var(--wp-g2-grid-base) * 2)\\",
+--   	\\"--wp-g2-flex-item-margin-bottom\\": \\"0\\",
+--   	\\"--wp-g2-flex-item-margin-right\\": \\"var(--wp-g2-flex-gap)\\",
+--   	\\"--wp-g2-flex-item-margin-left\\": \\"0\\",
+ -   	\\"align-items\\": \\"center\\",
+--   	\\"flex-direction\\": \\"row\\","
++-   	\\"flex-direction\\": \\"row\\",
++-   	\\"justify-content\\": \\"space-between\\",
++-   	\\"width\\": \\"100%\\",
++-   	\\"visibility\\": \\"visible\\""
+ `;
+diff --git a/packages/components/src/ui/flex/use-flex-item.js b/packages/components/src/ui/flex/use-flex-item.js
+index f36f74c7220d1f..854a08c6d93304 100644
+--- a/packages/components/src/ui/flex/use-flex-item.js
++++ b/packages/components/src/ui/flex/use-flex-item.js
+@@ -22,7 +22,7 @@ export function useFlexItem( props ) {
+ 	const sx = {};
+ 
+ 	sx.Base = css( {
+-		display: displayProp || ui.get( 'FlexItemDisplay' ),
++		display: displayProp || ui.get( 'flexItemDisplay' ),
+ 	} );
+ 
+ 	const classes = cx(
+diff --git a/packages/components/src/ui/flex/use-flex.js b/packages/components/src/ui/flex/use-flex.js
+index 87237dc0aaf9c3..4d990b4f853b12 100644
+--- a/packages/components/src/ui/flex/use-flex.js
++++ b/packages/components/src/ui/flex/use-flex.js
+@@ -43,17 +43,10 @@ export function useFlex( props ) {
+ 		const sx = {};
+ 
+ 		sx.Base = css( {
+-			[ ui.createToken( 'FlexGap' ) ]: ui.space( gap ),
+-			[ ui.createToken( 'FlexItemDisplay' ) ]: isColumn
++			[ ui.createToken( 'flexGap' ) ]: ui.space( gap ),
++			[ ui.createToken( 'flexItemDisplay' ) ]: isColumn
+ 				? 'block'
+ 				: undefined,
+-			[ ui.createToken( 'FlexItemMarginBottom' ) ]: isColumn
+-				? ui.get( 'FlexGap' )
+-				: 0,
+-			[ ui.createToken( 'FlexItemMarginRight' ) ]:
+-				! isColumn && ! isReverse ? ui.get( 'FlexGap' ) : 0,
+-			[ ui.createToken( 'FlexItemMarginLeft' ) ]:
+-				! isColumn && isReverse ? ui.get( 'FlexGap' ) : 0,
+ 			alignItems: isColumn ? 'normal' : align,
+ 			flexDirection: direction,
+ 			flexWrap: wrap ? 'wrap' : undefined,
+diff --git a/packages/components/src/ui/form-group/README.md b/packages/components/src/ui/form-group/README.md
+new file mode 100644
+index 00000000000000..305729f2fa57cc
+--- /dev/null
++++ b/packages/components/src/ui/form-group/README.md
+@@ -0,0 +1,112 @@
++# FormGroup
++
++`FormGroup` is a form component that groups a label with a form element (e.g. `Switch` or `TextInput`).
++
++## Usage
++
++```jsx
++import {
++	__experimentalFormGroup as FormGroup,
++	__experimentalTextInput as TextInput,
++} from '@wordpress/components';
++
++function Example() {
++	return (
++		<FormGroup label="First name">
++			<TextInput />
++		</FormGroup>
++	);
++}
++```
++
++## Props
++
++##### align
++
++**Type**: `CSS['alignItems']`
++
++Adjusts the block alignment of children.
++
++##### alignLabel
++
++**Type**: `Pick<TextProps, "align">`
++
++Aligns the label within `FormGroup`.
++
++##### alignment
++
++**Type**: `string`
++
++Adjusts the horizontal and vertical alignment of children.
++
++##### columns
++
++**Type**: `number`,`(number`,`null)[]`
++
++Adjusts the number of columns of the `Grid`.
++
++##### gap
++
++**Type**: `number`
++
++Gap between each child.
++
++##### help
++
++**Type**: `React.ReactElement`
++
++Displays help content.
++
++##### horizontal
++
++**Type**: `boolean`
++
++Displays the label and form field horizontally.
++
++##### isInline
++
++**Type**: `boolean`
++
++Changes the CSS display from `grid` to `inline-grid`.
++
++##### justify
++
++**Type**: `CSS['justifyContent']`
++
++Adjusts the inline alignment of children.
++
++##### label
++
++**Type**: `string`
++
++Label of the form field.
++
++##### labelHidden
++
++**Type**: `boolean`
++
++Visually hides the label.
++
++##### rows
++
++**Type**: `number`,`(number`,`null)[]`
++
++Adjusts the number of rows of the `Grid`.
++
++##### templateColumns
++
++**Type**: `CSS['gridTemplateColumns']`
++
++Adjusts the CSS grid `template-columns`.
++
++##### templateRows
++
++**Type**: `CSS['gridTemplateRows']`
++
++Adjusts the CSS grid `template-rows`.
++
++##### truncate
++
++**Type**: `boolean`
++
++Truncates the label text content.
+diff --git a/packages/components/src/ui/form-group/form-group-content.js b/packages/components/src/ui/form-group/form-group-content.js
+new file mode 100644
+index 00000000000000..b62a1767b45e01
+--- /dev/null
++++ b/packages/components/src/ui/form-group/form-group-content.js
+@@ -0,0 +1,68 @@
++/**
++ * External dependencies
++ */
++import { ui } from '@wp-g2/styles';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo, memo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { VStack } from '../v-stack';
++import { FormGroupContext } from './form-group-context';
++import FormGroupHelp from './form-group-help';
++import FormGroupLabel from './form-group-label';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FormGroupContentProps, 'label'>} props
++ */
++function FormGroupContent( {
++	alignLabel,
++	children,
++	help,
++	horizontal = false,
++	id,
++	label,
++	labelHidden,
++	spacing = 2,
++	truncate,
++	...props
++} ) {
++	const contextProps = useMemo( () => ( { id, horizontal } ), [
++		id,
++		horizontal,
++	] );
++
++	const content = help ? (
++		<VStack
++			expanded={ false }
++			{ ...ui.$( 'FormGroupContentContainer' ) }
++			spacing={ spacing }
++		>
++			{ children }
++			<FormGroupHelp>{ help }</FormGroupHelp>
++		</VStack>
++	) : (
++		children
++	);
++
++	return (
++		<FormGroupContext.Provider value={ contextProps }>
++			<FormGroupLabel
++				align={ alignLabel }
++				id={ id }
++				labelHidden={ labelHidden }
++				truncate={ truncate }
++				{ ...props }
++			>
++				{ label }
++			</FormGroupLabel>
++			{ content }
++		</FormGroupContext.Provider>
++	);
++}
++
++export default memo( FormGroupContent );
+diff --git a/packages/components/src/ui/form-group/form-group-context.js b/packages/components/src/ui/form-group/form-group-context.js
+new file mode 100644
+index 00000000000000..e98f93de5095ac
+--- /dev/null
++++ b/packages/components/src/ui/form-group/form-group-context.js
+@@ -0,0 +1,31 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++/**
++ * @typedef {{ id?: import('react').ReactText, horizontal: boolean }} FormGroupContext
++ */
++
++/**
++ * @type {FormGroupContext}
++ */
++const initialContext = {
++	id: undefined,
++	horizontal: true,
++};
++
++/**
++ * @type {import('react').Context<FormGroupContext>}
++ */
++export const FormGroupContext = createContext( initialContext );
++export const useFormGroupContext = () => useContext( FormGroupContext );
++
++/**
++ * @param {string | undefined} id The preferred id for the form group element.
++ * @return {import('react').ReactText | undefined} The form group context id.
++ */
++export const useFormGroupContextId = ( id ) => {
++	const contextId = useFormGroupContext().id;
++	return id || contextId;
++};
+diff --git a/packages/components/src/ui/form-group/form-group-help.js b/packages/components/src/ui/form-group/form-group-help.js
+new file mode 100644
+index 00000000000000..ccf9d591def338
+--- /dev/null
++++ b/packages/components/src/ui/form-group/form-group-help.js
+@@ -0,0 +1,31 @@
++/**
++ * External dependencies
++ */
++import { ContextSystemProvider } from '@wp-g2/context';
++/**
++ * WordPress dependencies
++ */
++import { memo } from '@wordpress/element';
++
++const contextValue = { Text: { variant: 'muted' } };
++
++/**
++ * @typedef Props
++ * @property {import('react').ReactNode} [children] The content to display within `FormGroupHelp`.
++ */
++
++/**
++ *
++ * @param {Props} props
++ */
++function FormGroupHelp( { children } ) {
++	if ( ! children ) return null;
++
++	return (
++		<ContextSystemProvider value={ contextValue }>
++			{ children }
++		</ContextSystemProvider>
++	);
++}
++
++export default memo( FormGroupHelp );
+diff --git a/packages/components/src/ui/form-group/form-group-label.js b/packages/components/src/ui/form-group/form-group-label.js
+new file mode 100644
+index 00000000000000..389bef441133ef
+--- /dev/null
++++ b/packages/components/src/ui/form-group/form-group-label.js
+@@ -0,0 +1,30 @@
++/**
++ * WordPress dependencies
++ */
++import { memo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { ControlLabel } from '../control-label';
++import VisuallyHidden from '../../visually-hidden';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FormGroupLabelProps, 'label'>} props
++ * @return {JSX.Element | null} The form group's label.
++ */
++function FormGroupLabel( { children, id, labelHidden = false, ...props } ) {
++	if ( ! children ) return null;
++
++	if ( labelHidden ) {
++		return (
++			<VisuallyHidden as="label" htmlFor={ id }>
++				{ children }
++			</VisuallyHidden>
++		);
++	}
++
++	return <ControlLabel { ...props }>{ children }</ControlLabel>;
++}
++
++export default memo( FormGroupLabel );
+diff --git a/packages/components/src/ui/form-group/form-group-styles.js b/packages/components/src/ui/form-group/form-group-styles.js
+new file mode 100644
+index 00000000000000..a98f642ac8ca8e
+--- /dev/null
++++ b/packages/components/src/ui/form-group/form-group-styles.js
+@@ -0,0 +1,8 @@
++/**
++ * External dependencies
++ */
++import { css } from '@wp-g2/styles';
++
++export const FormGroup = css`
++	width: 100%;
++`;
+diff --git a/packages/components/src/ui/form-group/form-group.js b/packages/components/src/ui/form-group/form-group.js
+new file mode 100644
+index 00000000000000..3486d14d9a438f
+--- /dev/null
++++ b/packages/components/src/ui/form-group/form-group.js
+@@ -0,0 +1,61 @@
++/**
++ * External dependencies
++ */
++import { contextConnect } from '@wp-g2/context';
++
++/**
++ * Internal dependencies
++ */
++import { Grid } from '../grid';
++import { View } from '../view';
++import FormGroupContent from './form-group-content';
++import { useFormGroup } from './use-form-group';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FormGroupProps, 'div'>} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function FormGroup( props, forwardedRef ) {
++	const { contentProps, horizontal, ...otherProps } = useFormGroup( props );
++
++	if ( horizontal ) {
++		return (
++			<Grid
++				templateColumns="minmax(0, 1fr) 2fr"
++				{ ...otherProps }
++				ref={ forwardedRef }
++			>
++				<FormGroupContent { ...contentProps } />
++			</Grid>
++		);
++	}
++
++	return (
++		<View { ...otherProps } ref={ forwardedRef }>
++			<FormGroupContent { ...contentProps } />
++		</View>
++	);
++}
++
++/**
++ * `FormGroup` is a form component that groups a label with a form element (e.g. `Switch` or `TextInput`).
++ *
++ * @example
++ * ```jsx
++ * import {
++ * 	__experimentalFormGroup as FormGroup,
++ * 	__experimentalTextInput as TextInput
++ * } from `@wordpress/components`
++ *
++ * function Example() {
++ * 	return (
++ * 		<FormGroup label="First name">
++ * 			<TextInput />
++ * 		</FormGroup>
++ * 	)
++ * }
++ * ```
++ */
++const ConnectedFormGroup = contextConnect( FormGroup, 'FormGroup' );
++
++export default ConnectedFormGroup;
+diff --git a/packages/components/src/ui/form-group/index.js b/packages/components/src/ui/form-group/index.js
+new file mode 100644
+index 00000000000000..64c29381529b28
+--- /dev/null
++++ b/packages/components/src/ui/form-group/index.js
+@@ -0,0 +1,4 @@
++export { default as FormGroup } from './form-group';
++
++export * from './use-form-group';
++export * from './form-group-context';
+diff --git a/packages/components/src/ui/form-group/stories/index.js b/packages/components/src/ui/form-group/stories/index.js
+new file mode 100644
+index 00000000000000..29845d12ca527a
+--- /dev/null
++++ b/packages/components/src/ui/form-group/stories/index.js
+@@ -0,0 +1,48 @@
++/**
++ * External dependencies
++ */
++import { Text } from '@wp-g2/components';
++
++/**
++ * Internal dependencies
++ */
++import { FormGroup, useFormGroupContextId } from '../index';
++
++// @todo: Refactor this after adding next TextInput component.
++const TextInput = ( { id: idProp, ...props } ) => {
++	const id = useFormGroupContextId( idProp );
++	return (
++		<div>
++			<input type="text" id={ id } { ...props } />
++		</div>
++	);
++};
++
++export default {
++	component: FormGroup,
++	title: 'Components/FormGroup',
++};
++
++export const _default = () => {
++	return (
++		<FormGroup label="Form Group">
++			<TextInput />
++		</FormGroup>
++	);
++};
++
++export const _labelHidden = () => {
++	return (
++		<FormGroup label="Form Group" labelHidden>
++			<TextInput />
++		</FormGroup>
++	);
++};
++
++export const _help = () => {
++	return (
++		<FormGroup help={ <Text>Help Text</Text> } label="Form Group">
++			<TextInput />
++		</FormGroup>
++	);
++};
+diff --git a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..fa5403217e4c08
+--- /dev/null
++++ b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+@@ -0,0 +1,221 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render alignLabel 1`] = `
++.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  width: 100%;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: inline-block;
++  line-height: calc(13px * 1.2);
++  line-height: calc(var(--wp-g2-font-size) * 1.2);
++  margin: 0;
++  max-width: 100%;
++  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-top: calc((30px - calc(13px * 1.2)) / 2);
++  padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-top: calc((30px - calc(13px * 1.2)) / 2);
++  padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  color: #1e1e1e;
++  color: var(--wp-g2-color-text);
++  line-height: 1.2;
++  line-height: var(--wp-g2-font-line-height-base);
++  font-size: calc(1 * 13px);
++  font-size: calc(1 * var(--wp-g2-font-size));
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  text-align: right;
++  display: inline-block;
++  vertical-align: middle;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:active {
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++}
++
++@media (-webkit-min-device-pixel-ratio:1.25), (min-resolution:120dpi) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * {
++    position: relative;
++    top: 0.5px;
++  }
++}
++
++<div
++  class="components-form-group wp-components-form-group emotion-1"
++  data-g2-c16t="true"
++  data-g2-component="FormGroup"
++>
++  <label
++    class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label emotion-0"
++    data-g2-c16t="true"
++    data-g2-component="ControlLabel"
++    for="fname"
++  >
++    First name
++  </label>
++  <input
++    id="fname"
++    type="text"
++  />
++</div>
++`;
++
++exports[`props should render vertically 1`] = `
++.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  width: 100%;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: inline-block;
++  line-height: calc(13px * 1.2);
++  line-height: calc(var(--wp-g2-font-size) * 1.2);
++  margin: 0;
++  max-width: 100%;
++  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-top: calc((30px - calc(13px * 1.2)) / 2);
++  padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
++  padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  padding-top: calc((30px - calc(13px * 1.2)) / 2);
++  padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
++  color: #1e1e1e;
++  color: var(--wp-g2-color-text);
++  line-height: 1.2;
++  line-height: var(--wp-g2-font-line-height-base);
++  font-size: calc(1 * 13px);
++  font-size: calc(1 * var(--wp-g2-font-size));
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  text-align: left;
++  display: inline-block;
++  vertical-align: middle;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:active {
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++}
++
++@media (-webkit-min-device-pixel-ratio:1.25), (min-resolution:120dpi) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * {
++    position: relative;
++    top: 0.5px;
++  }
++}
++
++<div
++  class="components-form-group wp-components-form-group emotion-1"
++  data-g2-c16t="true"
++  data-g2-component="FormGroup"
++>
++  <label
++    class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label emotion-0"
++    data-g2-c16t="true"
++    data-g2-component="ControlLabel"
++    for="fname"
++  >
++    First name
++  </label>
++  <input
++    id="fname"
++    type="text"
++  />
++</div>
++`;
+diff --git a/packages/components/src/ui/form-group/test/index.js b/packages/components/src/ui/form-group/test/index.js
+new file mode 100644
+index 00000000000000..f221d7352c317e
+--- /dev/null
++++ b/packages/components/src/ui/form-group/test/index.js
+@@ -0,0 +1,83 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { ControlLabel } from '../../control-label';
++import { FormGroup, useFormGroupContextId } from '../index';
++
++// @todo: Refactor this after adding next TextInput component.
++const TextInput = ( { id: idProp, ...props } ) => {
++	const id = useFormGroupContextId( idProp );
++	return <input type="text" id={ id } { ...props } />;
++};
++
++// We're intentionally using a string literal for the ID to ensure
++// the htmlFor and id properties of the label and inputs are bound correctly.
++/* eslint-disable no-restricted-syntax */
++describe( 'props', () => {
++	test( 'should render correctly', () => {
++		const { container } = render(
++			<FormGroup id="fname" label="First name">
++				<TextInput />
++			</FormGroup>
++		);
++
++		const label = container.querySelector( 'label' );
++		expect( label ).toHaveAttribute( 'for', 'fname' );
++		expect( label ).toContainHTML( 'First name' );
++
++		const input = container.querySelector( 'input' );
++		expect( input ).toHaveAttribute( 'id', 'fname' );
++	} );
++
++	test( 'should render label without prop correctly', () => {
++		const { container } = render(
++			<FormGroup id="fname">
++				<ControlLabel htmlFor="fname">First name</ControlLabel>
++				<TextInput />
++			</FormGroup>
++		);
++
++		const label = container.querySelector( 'label' );
++		expect( label ).toHaveAttribute( 'for', 'fname' );
++		expect( label ).toContainHTML( 'First name' );
++	} );
++
++	test( 'should render labelHidden', () => {
++		const { container } = render(
++			<FormGroup labelHidden id="fname" label="First name">
++				<TextInput />
++			</FormGroup>
++		);
++
++		const label = container.querySelector( 'label' );
++		expect( label ).toContainHTML( 'First name' );
++		// @todo: Refactor this after adding next VisuallyHidden.
++		expect( label ).toHaveClass( 'components-visually-hidden' );
++	} );
++
++	test( 'should render alignLabel', () => {
++		const { container } = render(
++			<FormGroup alignLabel="right" id="fname" label="First name">
++				<TextInput />
++			</FormGroup>
++		);
++
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render vertically', () => {
++		const { container } = render(
++			<FormGroup horizontal={ false } id="fname" label="First name">
++				<TextInput />
++			</FormGroup>
++		);
++
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++} );
++/* eslint-enable no-restricted-syntax */
+diff --git a/packages/components/src/ui/form-group/types.ts b/packages/components/src/ui/form-group/types.ts
+new file mode 100644
+index 00000000000000..952443b6c1d2d1
+--- /dev/null
++++ b/packages/components/src/ui/form-group/types.ts
+@@ -0,0 +1,29 @@
++import { CSSProperties, ReactNode, ReactText } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import { Props as ControlLabelProps } from '../control-label/types'; 
++import { Props as GridProps } from '../grid/types';
++
++export type FormGroupLabelProps = ControlLabelProps & {
++	labelHidden?: boolean;
++	id?: ReactText;
++};
++
++export type FormGroupContentProps = FormGroupLabelProps & {
++	alignLabel?: CSSProperties[ 'textAlign' ];
++	help?: ReactNode;
++	horizontal?: boolean;
++	label?: ReactNode;
++	spacing?: CSSProperties[ 'width' ];
++	truncate?: boolean;
++};
++
++type Horizontal = GridProps & {
++	horizontal: true;
++};
++
++type Vertical = { horizontal: false; };
++
++export type FormGroupProps = FormGroupContentProps & (Horizontal | Vertical);
+diff --git a/packages/components/src/ui/form-group/use-form-group.js b/packages/components/src/ui/form-group/use-form-group.js
+new file mode 100644
+index 00000000000000..84944119bd0133
+--- /dev/null
++++ b/packages/components/src/ui/form-group/use-form-group.js
+@@ -0,0 +1,51 @@
++/**
++ * External dependencies
++ */
++import { useContextSystem } from '@wp-g2/context';
++import { cx } from '@wp-g2/styles';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from './form-group-styles';
++import { useInstanceId } from '../utils';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FormGroupProps, 'div'>} props
++ */
++export function useFormGroup( props ) {
++	const {
++		alignLabel = 'left',
++		children,
++		className,
++		help,
++		horizontal = false,
++		id: idProp,
++		label,
++		labelHidden = false,
++		truncate = false,
++		...otherProps
++	} = useContextSystem( props, 'FormGroup' );
++
++	const id = useInstanceId( useFormGroup, 'form-group', idProp );
++
++	const classes = cx( styles.FormGroup, className );
++
++	const contentProps = {
++		alignLabel,
++		children,
++		help,
++		id,
++		horizontal,
++		label,
++		labelHidden,
++		truncate,
++	};
++
++	return {
++		...otherProps,
++		className: classes,
++		contentProps,
++		horizontal,
++	};
++}
+diff --git a/packages/components/src/ui/h-stack/test/__snapshots__/index.js.snap b/packages/components/src/ui/h-stack/test/__snapshots__/index.js.snap
+index 2238493a1747f0..733cd7fb9d1372 100644
+--- a/packages/components/src/ui/h-stack/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/h-stack/test/__snapshots__/index.js.snap
+@@ -43,10 +43,6 @@ exports[`props should render alignment 1`] = `
+   display: flex;
+   --wp-g2-flex-gap: calc(4px * 2);
+   --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
+-  --wp-g2-flex-item-margin-bottom: 0;
+-  --wp-g2-flex-item-margin-right: calc(4px * 2);
+-  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
+-  --wp-g2-flex-item-margin-left: 0;
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -59,8 +55,6 @@ exports[`props should render alignment 1`] = `
+   -ms-flex-pack: center;
+   justify-content: center;
+   width: 100%;
+-  --wp-g2-h-stack-spacing: calc(4px * 2);
+-  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+ @media (prefers-reduced-motion) {
+@@ -116,10 +110,6 @@ exports[`props should render correctly 1`] = `
+   display: flex;
+   --wp-g2-flex-gap: calc(4px * 2);
+   --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
+-  --wp-g2-flex-item-margin-bottom: 0;
+-  --wp-g2-flex-item-margin-right: calc(4px * 2);
+-  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
+-  --wp-g2-flex-item-margin-left: 0;
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -132,8 +122,6 @@ exports[`props should render correctly 1`] = `
+   -ms-flex-pack: justify;
+   justify-content: space-between;
+   width: 100%;
+-  --wp-g2-h-stack-spacing: calc(4px * 2);
+-  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+ @media (prefers-reduced-motion) {
+@@ -239,10 +227,6 @@ exports[`props should render spacing 1`] = `
+   display: flex;
+   --wp-g2-flex-gap: calc(4px * 5);
+   --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 5);
+-  --wp-g2-flex-item-margin-bottom: 0;
+-  --wp-g2-flex-item-margin-right: calc(4px * 2);
+-  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
+-  --wp-g2-flex-item-margin-left: 0;
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -255,8 +239,6 @@ exports[`props should render spacing 1`] = `
+   -ms-flex-pack: justify;
+   justify-content: space-between;
+   width: 100%;
+-  --wp-g2-h-stack-spacing: calc(4px * 5);
+-  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 5);
+ }
+ 
+ @media (prefers-reduced-motion) {
+diff --git a/packages/components/src/ui/h-stack/use-h-stack.js b/packages/components/src/ui/h-stack/use-h-stack.js
+index 1d79efa22d89d4..7c50f6488fa802 100644
+--- a/packages/components/src/ui/h-stack/use-h-stack.js
++++ b/packages/components/src/ui/h-stack/use-h-stack.js
+@@ -2,14 +2,9 @@
+  * External dependencies
+  */
+ import { hasNamespace, useContextSystem } from '@wp-g2/context';
+-import { css, cx, ui } from '@wp-g2/styles';
++import { ui } from '@wp-g2/styles';
+ import { getValidChildren } from '@wp-g2/utils';
+ 
+-/**
+- * WordPress dependencies
+- */
+-import { useMemo } from '@wordpress/element';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -24,7 +19,6 @@ export function useHStack( props ) {
+ 	const {
+ 		alignment = 'edge',
+ 		children,
+-		className,
+ 		direction,
+ 		spacing = 2,
+ 		...otherProps
+@@ -54,17 +48,7 @@ export function useHStack( props ) {
+ 		}
+ 	);
+ 
+-	const classes = useMemo( () => {
+-		return cx(
+-			css( {
+-				[ ui.createToken( 'HStackSpacing' ) ]: ui.space( spacing ),
+-			} ),
+-			className
+-		);
+-	}, [ className, spacing ] );
+-
+ 	const propsForFlex = {
+-		className: classes,
+ 		children: clonedChildren,
+ 		direction,
+ 		justify: 'center',
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index da9767cf37496b..c336d36631dc97 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -1,5 +1,7 @@
++export * from './control-label';
+ export * from './elevation';
+ export * from './flex';
++export * from './form-group';
+ export * from './grid';
+ export * from './h-stack';
+ export * from './text';
+diff --git a/packages/components/src/ui/text/text.js b/packages/components/src/ui/text/text.js
+index ee37a2abd18ff6..3d8b2e1fa0c0c5 100644
+--- a/packages/components/src/ui/text/text.js
++++ b/packages/components/src/ui/text/text.js
+@@ -4,8 +4,10 @@
+ import { createComponent } from '../utils';
+ import useText from './use-text';
+ 
+-export default createComponent( {
++const Text = createComponent( {
+ 	as: 'span',
+ 	useHook: useText,
+ 	name: 'Text',
+ } );
++
++export default Text;
+diff --git a/packages/components/src/ui/text/types.ts b/packages/components/src/ui/text/types.ts
+index 323bb1fee127c5..faaef745db4f2e 100644
+--- a/packages/components/src/ui/text/types.ts
++++ b/packages/components/src/ui/text/types.ts
+@@ -1,5 +1,5 @@
+-import type { Props as TruncateProps } from '../truncate/use-truncate';
+-import type { CSSProperties, ReactNode } from 'react';
++import type { Props as TruncateProps } from '../truncate/types';
++import type { CSSProperties } from 'react';
+ 
+ type TextAdjustLineHeightForInnerControls =
+ 	| boolean
+@@ -20,36 +20,7 @@ type TextVariant = 'muted';
+ 
+ type TextWeight = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
+ 
+-type Highlighted = {
+-		/**
+-	 * Letters or words within `Text` can be highlighted using `highlightWords`.
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Text } from `@wordpress/components/ui`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <Text highlightWords={["the"]}>
+-	 *       Where the north wind meets the sea, there's a river full of memory. Sleep,
+-	 *       my darling, safe and sound, for in this river all is found. In her waters,
+-	 *       deep and true, lay the answers and a path for you. Dive down deep into her
+-	 *       sound, but not too far or you'll be drowned
+-	 *     </Text>
+-	 *   )
+-	 * }
+-	 * ```
+-	 */
+-	highlightWords?: string[];
+-	children: string;
+-}
+-
+-type Unhighlighted = {
+-	highlightWords?: undefined;
+-	children: ReactNode;
+-}
+-
+-export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
++export interface Props extends TruncateProps {
+ 	/**
+ 	 * Adjusts the text alignment.
+ 	 *
+@@ -198,4 +169,24 @@ export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
+ 	 * Adjusts letter-spacing of the text.
+ 	 */
+ 	letterSpacing?: CSSProperties[ 'letterSpacing' ];
++		/**
++	* Letters or words within `Text` can be highlighted using `highlightWords`.
++	*
++	* @example
++	* ```jsx
++	* import { Text } from `@wordpress/components/ui`
++	*
++	* function Example() {
++	*   return (
++	*     <Text highlightWords={["the"]}>
++	*       Where the north wind meets the sea, there's a river full of memory. Sleep,
++	*       my darling, safe and sound, for in this river all is found. In her waters,
++	*       deep and true, lay the answers and a path for you. Dive down deep into her
++	*       sound, but not too far or you'll be drowned
++	*     </Text>
++	*   )
++	* }
++	* ```
++	*/
++	highlightWords?: string[];
+ };
+diff --git a/packages/components/src/ui/text/use-text.js b/packages/components/src/ui/text/use-text.js
+index 16e9e3083a6590..f78eab0f818286 100644
+--- a/packages/components/src/ui/text/use-text.js
++++ b/packages/components/src/ui/text/use-text.js
+@@ -53,6 +53,12 @@ export default function useText( props ) {
+ 	const isCaption = size === 'caption';
+ 
+ 	if ( isHighlighter ) {
++		if ( typeof children !== 'string' ) {
++			throw new TypeError(
++				'`children` of `Text` must only be `string` types when `highlightWords` is defined'
++			);
++		}
++
+ 		content = createHighlighterText( {
+ 			autoEscape: highlightEscape,
+ 			// Disable reason: We need to disable this otherwise it erases the cast
+diff --git a/packages/components/src/ui/truncate/truncate.js b/packages/components/src/ui/truncate/truncate.js
+index db89238fe32e54..2f22b94525fd0e 100644
+--- a/packages/components/src/ui/truncate/truncate.js
++++ b/packages/components/src/ui/truncate/truncate.js
+@@ -4,8 +4,29 @@
+ import { createComponent } from '../utils';
+ import useTruncate from './use-truncate';
+ 
+-export default createComponent( {
++/**
++ * `Truncate` is a typography primitive that trims text content. For almost all cases, it is recommended that `Text`, `Heading`, or `Subheading` is used to render text content. However, `Truncate` is available for custom implementations.
++ *
++ * @example
++ * ```jsx
++ * import { Truncate } from `@wp-g2/components`
++ *
++ * function Example() {
++ *   return (
++ *     <Truncate>
++ *       Where the north wind meets the sea, there's a river full of memory. Sleep,
++ *       my darling, safe and sound, for in this river all is found. In her waters,
++ *       deep and true, lay the answers and a path for you. Dive down deep into her
++ *       sound, but not too far or you'll be drowned
++ *     </Truncate>
++ *   );
++ * }
++ * ```
++ */
++const Truncate = createComponent( {
+ 	as: 'span',
+ 	useHook: useTruncate,
+ 	name: 'Truncate',
+ } );
++
++export default Truncate;
+diff --git a/packages/components/src/ui/truncate/types.ts b/packages/components/src/ui/truncate/types.ts
+new file mode 100644
+index 00000000000000..09533c0f2a855e
+--- /dev/null
++++ b/packages/components/src/ui/truncate/types.ts
+@@ -0,0 +1,63 @@
++export type TruncateEllisizeMode = 'auto' | 'head' | 'tail' | 'middle' | 'none';
++
++export interface Props {
++	/**
++	 * The ellipsis string when `truncate` is set.
++	 *
++	 * @default '...'
++	 */
++	ellipsis?: string;
++	/**
++	 * Determines where to truncate.  For example, we can truncate text right in the middle. To do this, we need to set `ellipsizeMode` to `middle` and a text `limit`.
++	 *
++	 * * `auto`: Trims content at the end automatically without a `limit`.
++	 * * `head`: Trims content at the beginning. Requires a `limit`.
++	 * * `middle`: Trims content in the middle. Requires a `limit`.
++	 * * `tail`: Trims content at the end. Requires a `limit`.
++	 *
++	 * @default 'auto'
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Truncate } from `@wp-g2/components`
++	 *
++	 * function Example() {
++	 * 	return (
++	 * 		<Truncate ellipsizeMode="middle" limit={40}>
++	 * 			Where the north wind meets the sea, there's a river full of memory. Sleep,
++	 * 			my darling, safe and sound, for in this river all is found. In her waters,
++	 * 			deep and true, lay the answers and a path for you. Dive down deep into her
++	 * 			sound, but not too far or you'll be drowned
++	 * 		</Truncate>
++	 * 	)
++	 * }
++	 * ```
++	 */
++	ellipsizeMode?: TruncateEllisizeMode;
++	/**
++	 * Determines the max characters when `truncate` is set.
++	 *
++	 * @default 0
++	 */
++	limit?: number;
++	/**
++	 * Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Truncate } from `@wp-g2/components`
++	 *
++	 * function Example() {
++	 * 	return (
++	 * 		<Truncate numberOfLines={2}>
++	 * 			Where the north wind meets the sea, there's a river full of memory. Sleep,
++	 * 			my darling, safe and sound, for in this river all is found. In her waters,
++	 * 			deep and true, lay the answers and a path for you. Dive down deep into her
++	 * 			sound, but not too far or you'll be drowned
++	 * 		</Truncate>
++	 * 	)
++	 * }
++	 * ```
++	 */
++	numberOfLines?: number;
++}
+diff --git a/packages/components/src/ui/truncate/use-truncate.js b/packages/components/src/ui/truncate/use-truncate.js
+index d79f8bf9f1587c..75ef75f4b8edd5 100644
+--- a/packages/components/src/ui/truncate/use-truncate.js
++++ b/packages/components/src/ui/truncate/use-truncate.js
+@@ -16,15 +16,7 @@ import * as styles from './styles';
+ import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
+ 
+ /**
+- * @typedef Props
+- * @property {string} [ellipsis='...'] String to use to truncate the string with.
+- * @property {'auto' | 'head' | 'tail' | 'middle' | 'none'} [ellipsizeMode='auto'] Mode to follow.
+- * @property {number} [limit=0] Limit.
+- * @property {number} [numberOfLines=0] Number of lines.
+- */
+-
+-/**
+- * @param {import('@wp-g2/create-styles').ViewOwnProps<Props, 'span'>} props
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'span'>} props
+  */
+ export default function useTruncate( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/utils/index.js b/packages/components/src/ui/utils/index.js
+index 26e05b9d84d7db..95d94f78442c80 100644
+--- a/packages/components/src/ui/utils/index.js
++++ b/packages/components/src/ui/utils/index.js
+@@ -1,2 +1,3 @@
+ export { getOptimalTextShade } from './colors';
+ export { createComponent } from './create-component';
++export { useInstanceId } from './use-instance-id';
+diff --git a/packages/components/src/ui/utils/use-instance-id.js b/packages/components/src/ui/utils/use-instance-id.js
+new file mode 100644
+index 00000000000000..5520c9bbe127fd
+--- /dev/null
++++ b/packages/components/src/ui/utils/use-instance-id.js
+@@ -0,0 +1,42 @@
++/**
++ * Duplicated from @wordpress/compose to enable TypeScript support for ui/* files.
++ */
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * @type {WeakMap<any, number>}
++ */
++const instanceMap = new WeakMap();
++
++/**
++ * Creates a new id for a given object.
++ *
++ * @param {unknown} object Object reference to create an id for.
++ * @return {number} The instance id (index).
++ */
++function createId( object ) {
++	const instances = instanceMap.get( object ) || 0;
++	instanceMap.set( object, instances + 1 );
++	return instances;
++}
++
++/**
++ * Provides a unique instance ID.
++ *
++ * @param {Object} object Object reference to create an id for.
++ * @param {string} prefix Prefix for the unique id.
++ * @param {string | number} [preferredId=''] Default ID to use.
++ * @return {string | number} The unique instance id.
++ */
++export function useInstanceId( object, prefix, preferredId = '' ) {
++	return useMemo( () => {
++		if ( preferredId ) return preferredId;
++		const id = createId( object );
++
++		return prefix ? `${ prefix }-${ id }` : id;
++	}, [ object ] );
++}
+diff --git a/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap b/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap
+index ffa9e3846728df..53ec983c59ae61 100644
+--- a/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap
+@@ -44,10 +44,6 @@ exports[`props should render alignment 1`] = `
+   --wp-g2-flex-gap: calc(4px * 2);
+   --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
+   --wp-g2-flex-item-display: block;
+-  --wp-g2-flex-item-margin-bottom: calc(4px * 2);
+-  --wp-g2-flex-item-margin-bottom: var(--wp-g2-flex-gap);
+-  --wp-g2-flex-item-margin-right: 0;
+-  --wp-g2-flex-item-margin-left: 0;
+   -webkit-align-items: normal;
+   -webkit-box-align: normal;
+   -ms-flex-align: normal;
+@@ -59,8 +55,6 @@ exports[`props should render alignment 1`] = `
+   -webkit-justify-content: center;
+   -ms-flex-pack: center;
+   justify-content: center;
+-  --wp-g2-h-stack-spacing: calc(4px * 2);
+-  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+ @media (prefers-reduced-motion) {
+@@ -117,10 +111,6 @@ exports[`props should render correctly 1`] = `
+   --wp-g2-flex-gap: calc(4px * 2);
+   --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
+   --wp-g2-flex-item-display: block;
+-  --wp-g2-flex-item-margin-bottom: calc(4px * 2);
+-  --wp-g2-flex-item-margin-bottom: var(--wp-g2-flex-gap);
+-  --wp-g2-flex-item-margin-right: 0;
+-  --wp-g2-flex-item-margin-left: 0;
+   -webkit-align-items: normal;
+   -webkit-box-align: normal;
+   -ms-flex-align: normal;
+@@ -132,8 +122,6 @@ exports[`props should render correctly 1`] = `
+   -webkit-justify-content: space-between;
+   -ms-flex-pack: justify;
+   justify-content: space-between;
+-  --wp-g2-h-stack-spacing: calc(4px * 2);
+-  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 2);
+ }
+ 
+ @media (prefers-reduced-motion) {
+@@ -240,10 +228,6 @@ exports[`props should render spacing 1`] = `
+   --wp-g2-flex-gap: calc(4px * 5);
+   --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 5);
+   --wp-g2-flex-item-display: block;
+-  --wp-g2-flex-item-margin-bottom: calc(4px * 2);
+-  --wp-g2-flex-item-margin-bottom: var(--wp-g2-flex-gap);
+-  --wp-g2-flex-item-margin-right: 0;
+-  --wp-g2-flex-item-margin-left: 0;
+   -webkit-align-items: normal;
+   -webkit-box-align: normal;
+   -ms-flex-align: normal;
+@@ -255,8 +239,6 @@ exports[`props should render spacing 1`] = `
+   -webkit-justify-content: space-between;
+   -ms-flex-pack: justify;
+   justify-content: space-between;
+-  --wp-g2-h-stack-spacing: calc(4px * 5);
+-  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 5);
+ }
+ 
+ @media (prefers-reduced-motion) {
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 1bee38372d725a..f043f2c6891f73 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -16,6 +16,7 @@
+ 		"src/base-control/**/*",
+ 		"src/dashicon/**/*",
+ 		"src/flex/**/*",
++		"src/form-group/**/*",
+ 		"src/tip/**/*",
+ 		"src/ui/**/*",
+ 		"src/utils/**/*",
+diff --git a/packages/compose/README.md b/packages/compose/README.md
+index de6183d328ff86..0e831c454e2166 100644
+--- a/packages/compose/README.md
++++ b/packages/compose/README.md
+@@ -253,6 +253,11 @@ _Parameters_
+ 
+ -   _object_ `Object`: Object reference to create an id for.
+ -   _prefix_ `string`: Prefix for the unique id.
++-   _preferredId_ `string`: Default ID to use.
++
++_Returns_
++
++-   `(string|number)`: The unique instance id.
+ 
+ <a name="useIsomorphicLayoutEffect" href="#useIsomorphicLayoutEffect">#</a> **useIsomorphicLayoutEffect**
+ 
+diff --git a/packages/compose/src/hooks/use-instance-id/index.js b/packages/compose/src/hooks/use-instance-id/index.js
+index fd36653552162a..03ffc91871193c 100644
+--- a/packages/compose/src/hooks/use-instance-id/index.js
++++ b/packages/compose/src/hooks/use-instance-id/index.js
+@@ -3,12 +3,16 @@
+  */
+ import { useMemo } from '@wordpress/element';
+ 
++/**
++ * @type {WeakMap<any, number>}
++ */
+ const instanceMap = new WeakMap();
+ 
+ /**
+  * Creates a new id for a given object.
+  *
+- * @param {Object} object Object reference to create an id for.
++ * @param {unknown} object Object reference to create an id for.
++ * @return {number} The instance id (index).
+  */
+ function createId( object ) {
+ 	const instances = instanceMap.get( object ) || 0;
+@@ -21,10 +25,14 @@ function createId( object ) {
+  *
+  * @param {Object} object Object reference to create an id for.
+  * @param {string} prefix Prefix for the unique id.
++ * @param {string} preferredId Default ID to use.
++ * @return {string | number} The unique instance id.
+  */
+-export default function useInstanceId( object, prefix ) {
++export default function useInstanceId( object, prefix, preferredId = '' ) {
+ 	return useMemo( () => {
++		if ( preferredId ) return preferredId;
+ 		const id = createId( object );
++
+ 		return prefix ? `${ prefix }-${ id }` : id;
+ 	}, [ object ] );
+ }

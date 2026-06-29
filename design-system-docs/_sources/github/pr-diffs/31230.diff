@@ -1,0 +1,776 @@
+diff --git a/packages/components/src/ui/card/test/__snapshots__/index.js.snap b/packages/components/src/ui/card/test/__snapshots__/index.js.snap
+index 824b9f302fe136..190794eacaf0bd 100644
+--- a/packages/components/src/ui/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/card/test/__snapshots__/index.js.snap
+@@ -24,65 +24,12 @@ Snapshot Diff:
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-22.emotion-22.emotion-22.emotion-22.emotion-22.emotion-22.emotion-22 {
+-  background-color: #ffffff;
+-  background-color: var(--wp-g2-surface-color);
+-  color: #1e1e1e;
+-  color: var(--wp-g2-color-text);
+-  position: relative;
+-  --wp-g2-surface-background-size: 12px;
+-  --wp-g2-surface-background-size-dotted: 11px;
+-}
+-
+-.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12 {
+-  border-radius: inherit;
+-  bottom: 0;
+-  box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
+-  opacity: 1;
+-  opacity: var(--wp-g2-elevation-intensity);
+-  left: 0;
+-  right: 0;
+-  top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-}
+-
+-.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17 {
+-  border-radius: inherit;
+-  bottom: 0;
+-  box-shadow: 0 2px 4px 0 rgba(0 ,0,0,0.1);
+-  opacity: 1;
+-  opacity: var(--wp-g2-elevation-intensity);
+-  left: 0;
+-  right: 0;
+-  top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-}
+-
+-.emotion-11 {
+-  background: transparent;
+-  display: block;
+-  margin: 0 !important;
+-  pointer-events: none;
+-  position: absolute;
+-  will-change: box-shadow;
+-}
+-
+-.emotion-21 {
++.emotion-17 {
+   box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+   outline: none;
+   border-radius: 2px;
+ }
+ 
+-.emotion-13 {
+-  border-radius: 2px;
+-}
+-
+ .emotion-0 {
+   display: -webkit-box;
+   display: -webkit-flex;
+@@ -216,8 +163,56 @@ exports[`props should render correctly 1`] = `
+   border-bottom-right-radius: 2px;
+ }
+ 
++.emotion-11 {
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
++  opacity: 1;
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  border-radius: 2px;
++}
++
++.emotion-14 {
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 2px 4px 0 rgba(0 ,0,0,0.1);
++  opacity: 1;
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  border-radius: 2px;
++}
++
++.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18 {
++  background-color: #ffffff;
++  background-color: var(--wp-g2-surface-color);
++  color: #1e1e1e;
++  color: var(--wp-g2-color-text);
++  position: relative;
++  --wp-g2-surface-background-size: 12px;
++  --wp-g2-surface-background-size-dotted: 11px;
++}
++
+ <div
+-  class="components-surface components-card emotion-21 emotion-22 emotion-1 emotion-2"
++  class="components-surface components-card emotion-17 emotion-18 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Card"
+ >
+@@ -249,13 +244,13 @@ exports[`props should render correctly 1`] = `
+   </div>
+   <div
+     aria-hidden="true"
+-    class="emotion-11 emotion-12 components-elevation emotion-13 emotion-1 emotion-2"
++    class="components-elevation emotion-11 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+   <div
+     aria-hidden="true"
+-    class="emotion-11 emotion-17 components-elevation emotion-13 emotion-1 emotion-2"
++    class="components-elevation emotion-14 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+@@ -273,15 +268,15 @@ Snapshot Diff:
+     />
+     <div
+       aria-hidden="true"
+--     class="css-zsg5ag-Elevation css-1yc4u8p components-elevation css-icip60 css-1mm2cvy-View egi4jkx0"
+-+     class="css-zsg5ag-Elevation css-lxi9t4 components-elevation css-icip60 css-1mm2cvy-View egi4jkx0"
++-     class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View egi4jkx0"
+++     class="components-elevation css-xtff41-Elevation css-1mm2cvy-View egi4jkx0"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+     <div
+       aria-hidden="true"
+--     class="css-zsg5ag-Elevation css-akhjqa components-elevation css-icip60 css-1mm2cvy-View egi4jkx0"
+-+     class="css-zsg5ag-Elevation css-19rc1q1 components-elevation css-icip60 css-1mm2cvy-View egi4jkx0"
++-     class="components-elevation css-1ajhhcx-Elevation css-1mm2cvy-View egi4jkx0"
+++     class="components-elevation css-hdn3qt-Elevation css-1mm2cvy-View egi4jkx0"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+diff --git a/packages/components/src/ui/elevation/hook.js b/packages/components/src/ui/elevation/hook.js
+index d184be605e0451..04896987455740 100644
+--- a/packages/components/src/ui/elevation/hook.js
++++ b/packages/components/src/ui/elevation/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css, cx, getBoxShadow, ui } from '@wp-g2/styles';
++import { css, cx } from 'emotion';
+ import { isNil } from 'lodash';
+ 
+ /**
+@@ -14,6 +14,19 @@ import { useMemo } from '@wordpress/element';
+  */
+ import { useContextSystem } from '../context';
+ import * as styles from './styles';
++import CONFIG from '../../utils/config-values';
++
++/**
++ * @param {number} value
++ * @return {string} The box shadow value.
++ */
++export function getBoxShadow( value ) {
++	const boxShadowColor = `rgba(0 ,0, 0, ${ value / 20 })`;
++	const boxShadow = `0 ${ value }px ${ value * 2 }px 0
++	${ boxShadowColor }`;
++
++	return boxShadow;
++}
+ 
+ /**
+  * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
+@@ -42,9 +55,7 @@ export function useElevation( props ) {
+ 			activeValue = ! isNil( active ) ? active : undefined;
+ 		}
+ 
+-		const transition = `box-shadow ${ ui.get(
+-			'transitionDuration'
+-		) } ${ ui.get( 'transitionTimingFunction' ) }`;
++		const transition = `box-shadow ${ CONFIG.transitionDuration } ${ CONFIG.transitionTimingFunction }`;
+ 
+ 		const sx = {};
+ 
+@@ -52,7 +63,7 @@ export function useElevation( props ) {
+ 			borderRadius,
+ 			bottom: offset,
+ 			boxShadow: getBoxShadow( value ),
+-			opacity: ui.get( 'elevationIntensity' ),
++			opacity: CONFIG.elevationIntensity,
+ 			left: offset,
+ 			right: offset,
+ 			top: offset,
+diff --git a/packages/components/src/ui/elevation/stories/index.js b/packages/components/src/ui/elevation/stories/index.js
+index 687697b9ffe268..25b78c6c081889 100644
+--- a/packages/components/src/ui/elevation/stories/index.js
++++ b/packages/components/src/ui/elevation/stories/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { number } from '@storybook/addon-knobs';
+-import { Divider } from '@wp-g2/components';
+ 
+ /**
+  * Internal dependencies
+@@ -11,6 +10,7 @@ import { Elevation } from '../index';
+ import { Grid } from '../../grid';
+ import { View } from '../../view';
+ import { HStack } from '../../h-stack';
++import { Divider } from '../../divider';
+ import {
+ 	ExampleGrid,
+ 	ExampleGridItem,
+@@ -30,7 +30,7 @@ export default {
+ const ElevationWrapper = ( { children } ) => (
+ 	<HStack alignment="center">
+ 		<View
+-			css={ {
++			style={ {
+ 				position: 'relative',
+ 				width: 40,
+ 				height: 40,
+@@ -59,10 +59,10 @@ export const _default = () => {
+ 			{ elevations.map( ( elevation, index ) => {
+ 				return (
+ 					<ExampleGridItem key={ index }>
+-						<View css={ { padding: 20, paddingBottom: 40 } }>
++						<View style={ { padding: 20, paddingBottom: 40 } }>
+ 							<ElevationWrapper>
+ 								<Elevation
+-									css={ { background: 'white' } }
++									style={ { background: 'white' } }
+ 									value={ index }
+ 								/>
+ 							</ElevationWrapper>
+@@ -92,7 +92,7 @@ export const Focus = () => {
+ 				as="a"
+ 				href="#"
+ 				onClick={ ( e ) => e.preventDefault() }
+-				css={ {
++				style={ {
+ 					display: 'block',
+ 					width: 100,
+ 					height: 100,
+@@ -107,7 +107,7 @@ export const Focus = () => {
+ 
+ 	return (
+ 		<View
+-			css={ {
++			style={ {
+ 				padding: '10vh',
+ 			} }
+ 		>
+diff --git a/packages/components/src/ui/elevation/test/__snapshots__/index.js.snap b/packages/components/src/ui/elevation/test/__snapshots__/index.js.snap
+index 0d55926ed78e07..578762b861f263 100644
+--- a/packages/components/src/ui/elevation/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/elevation/test/__snapshots__/index.js.snap
+@@ -1,62 +1,41 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render active 1`] = `
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-0 {
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
+   border-radius: inherit;
+   bottom: 0;
+   box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
+   opacity: 1;
+-  opacity: var(--wp-g2-elevation-intensity);
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+ }
+ 
+-*:hover > .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++*:hover > .emotion-0 {
+   box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
+ }
+ 
+-*:active > .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++*:active > .emotion-0 {
+   box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
+ }
+ 
+-.emotion-0 {
+-  background: transparent;
+-  display: block;
+-  margin: 0 !important;
+-  pointer-events: none;
+-  position: absolute;
+-  will-change: box-shadow;
+-}
+-
+ <div
+   aria-hidden="true"
+-  class="emotion-0 components-elevation emotion-1 emotion-2 emotion-3"
++  class="components-elevation emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+-  border-radius: inherit;
+-  bottom: 0;
+-  box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
+-  opacity: 1;
+-  opacity: var(--wp-g2-elevation-intensity);
+-  left: 0;
+-  right: 0;
+-  top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-}
+-
+ .emotion-0 {
+   background: transparent;
+   display: block;
+@@ -64,151 +43,127 @@ exports[`props should render correctly 1`] = `
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
++  opacity: 1;
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+ }
+ 
+ <div
+   aria-hidden="true"
+-  class="emotion-0 emotion-1 components-elevation emotion-2 emotion-3"
++  class="components-elevation emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+ `;
+ 
+ exports[`props should render hover 1`] = `
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-0 {
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
+   border-radius: inherit;
+   bottom: 0;
+   box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
+   opacity: 1;
+-  opacity: var(--wp-g2-elevation-intensity);
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+ }
+ 
+-*:hover > .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++*:hover > .emotion-0 {
+   box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
+ }
+ 
+-.emotion-0 {
+-  background: transparent;
+-  display: block;
+-  margin: 0 !important;
+-  pointer-events: none;
+-  position: absolute;
+-  will-change: box-shadow;
+-}
+-
+ <div
+   aria-hidden="true"
+-  class="emotion-0 components-elevation emotion-1 emotion-2 emotion-3"
++  class="components-elevation emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+ `;
+ 
+ exports[`props should render isInteractive 1`] = `
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-0 {
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
+   border-radius: inherit;
+   bottom: 0;
+   box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
+   opacity: 1;
+-  opacity: var(--wp-g2-elevation-intensity);
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+ }
+ 
+-*:hover > .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++*:hover > .emotion-0 {
+   box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
+ }
+ 
+-*:active > .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++*:active > .emotion-0 {
+   box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
+ }
+ 
+-.emotion-0 {
+-  background: transparent;
+-  display: block;
+-  margin: 0 !important;
+-  pointer-events: none;
+-  position: absolute;
+-  will-change: box-shadow;
+-}
+-
+ <div
+   aria-hidden="true"
+-  class="emotion-0 components-elevation emotion-1 emotion-2 emotion-3"
++  class="components-elevation emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+ `;
+ 
+ exports[`props should render offset 1`] = `
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-0 {
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
+   border-radius: inherit;
+   bottom: -2px;
+   box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
+   opacity: 1;
+-  opacity: var(--wp-g2-elevation-intensity);
+   left: -2px;
+   right: -2px;
+   top: -2px;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+ }
+ 
+-*:hover > .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++*:hover > .emotion-0 {
+   box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
+ }
+ 
+-*:active > .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++*:active > .emotion-0 {
+   box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
+ }
+ 
+-.emotion-0 {
+-  background: transparent;
+-  display: block;
+-  margin: 0 !important;
+-  pointer-events: none;
+-  position: absolute;
+-  will-change: box-shadow;
+-}
+-
+ <div
+   aria-hidden="true"
+-  class="emotion-0 components-elevation emotion-1 emotion-2 emotion-3"
++  class="components-elevation emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+ `;
+ 
+ exports[`props should render value 1`] = `
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+-  border-radius: inherit;
+-  bottom: 0;
+-  box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
+-  opacity: 1;
+-  opacity: var(--wp-g2-elevation-intensity);
+-  left: 0;
+-  right: 0;
+-  top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-}
+-
+ .emotion-0 {
+   background: transparent;
+   display: block;
+@@ -216,11 +171,20 @@ exports[`props should render value 1`] = `
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
++  opacity: 1;
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+ }
+ 
+ <div
+   aria-hidden="true"
+-  class="emotion-0 emotion-1 components-elevation emotion-2 emotion-3"
++  class="components-elevation emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Elevation"
+ />
+diff --git a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+index 13ee6a46efc129..89d5bf7a0460a8 100644
+--- a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-16.emotion-16.emotion-16.emotion-16.emotion-16.emotion-16.emotion-16 {
++.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12 {
+   background-color: #ffffff;
+   background-color: var(--wp-g2-surface-color);
+   color: #1e1e1e;
+@@ -11,59 +11,16 @@ exports[`props should render correctly 1`] = `
+   --wp-g2-surface-background-size-dotted: 11px;
+ }
+ 
+-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
+-  border-radius: inherit;
+-  bottom: 0;
+-  box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
+-  opacity: 1;
+-  opacity: var(--wp-g2-elevation-intensity);
+-  left: 0;
+-  right: 0;
+-  top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-}
+-
+-.emotion-11.emotion-11.emotion-11.emotion-11.emotion-11.emotion-11.emotion-11 {
+-  border-radius: inherit;
+-  bottom: 0;
+-  box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
+-  opacity: 1;
+-  opacity: var(--wp-g2-elevation-intensity);
+-  left: 0;
+-  right: 0;
+-  top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+-}
+-
+-.emotion-5 {
+-  background: transparent;
+-  display: block;
+-  margin: 0 !important;
+-  pointer-events: none;
+-  position: absolute;
+-  will-change: box-shadow;
+-}
+-
+-.emotion-15 {
++.emotion-11 {
+   box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+   outline: none;
+   border-radius: 2px;
+ }
+ 
+-.emotion-15 .components-card-body {
++.emotion-11 .components-card-body {
+   max-height: 80vh;
+ }
+ 
+-.emotion-7 {
+-  border-radius: 2px;
+-}
+-
+ .emotion-0 {
+   height: 100%;
+   overflow-x: hidden;
+@@ -110,8 +67,46 @@ exports[`props should render correctly 1`] = `
+   border-bottom-right-radius: 2px;
+ }
+ 
++.emotion-5 {
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
++  opacity: 1;
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  border-radius: 2px;
++}
++
++.emotion-8 {
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
++  opacity: 1;
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  border-radius: 2px;
++}
++
+ <div
+-  class="components-surface components-card emotion-15 emotion-16 emotion-1 emotion-2"
++  class="components-surface components-card emotion-11 emotion-12 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Card"
+ >
+@@ -135,13 +130,13 @@ exports[`props should render correctly 1`] = `
+   </div>
+   <div
+     aria-hidden="true"
+-    class="emotion-5 emotion-6 components-elevation emotion-7 emotion-1 emotion-2"
++    class="components-elevation emotion-5 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+   <div
+     aria-hidden="true"
+-    class="emotion-5 emotion-11 components-elevation emotion-7 emotion-1 emotion-2"
++    class="components-elevation emotion-8 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+@@ -206,6 +201,6 @@ Snapshot Diff:
+       </div>
+       <div
+         aria-hidden="true"
+-        class="css-zsg5ag-Elevation css-1yc4u8p components-elevation css-icip60 css-1mm2cvy-View egi4jkx0"
++        class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View egi4jkx0"
+         data-wp-c16t="true"
+ `;
+diff --git a/packages/components/src/ui/utils/font-size.ts b/packages/components/src/ui/utils/font-size.ts
+index 3ddcd9623eb1bb..7a5e41ace540d0 100644
+--- a/packages/components/src/ui/utils/font-size.ts
++++ b/packages/components/src/ui/utils/font-size.ts
+@@ -7,7 +7,7 @@ import type { CSSProperties, ReactText } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import { config } from '../../utils';
++import CONFIG from '../../utils/config-values';
+ 
+ export type HeadingSize =
+ 	| 1
+@@ -57,7 +57,7 @@ export function getFontSize(
+ 	}
+ 
+ 	const ratio = `(${ size } / ${ BASE_FONT_SIZE })`;
+-	return `calc(${ ratio } * ${ config( 'fontSize' ) })`;
++	return `calc(${ ratio } * ${ CONFIG.fontSize })`;
+ }
+ 
+ export function getHeadingFontSize( size: ReactText = 3 ): string {
+@@ -66,5 +66,5 @@ export function getHeadingFontSize( size: ReactText = 3 ): string {
+ 	}
+ 
+ 	const headingSize = `fontSizeH${ size }` as `fontSizeH${ HeadingSize }`;
+-	return config( headingSize );
++	return CONFIG[ headingSize ];
+ }
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 4f1f73eda4fce2..d969e7d603820c 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -12,6 +12,7 @@ export default {
+ 	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
+ 	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',
+ 	colorScrollbarTrack: 'rgba(0, 0, 0, 0.04)',
++	elevationIntensity: 1,
+ 	radiusBlockUi: '2px',
+ 	borderWidth: '1px',
+ 	borderWidthFocus: '1.5px',
+diff --git a/packages/components/src/utils/config.js b/packages/components/src/utils/config.js
+index 8cac2b300a4a8b..129ec3a9c804c7 100644
+--- a/packages/components/src/utils/config.js
++++ b/packages/components/src/utils/config.js
+@@ -5,6 +5,6 @@ import CONFIG from './config-values';
+ 
+ /**
+  * @param {keyof CONFIG} name The variable name
+- * @return {string} The variable
++ * @return {string | number} The variable
+  */
+ export const config = ( name ) => CONFIG[ name ];

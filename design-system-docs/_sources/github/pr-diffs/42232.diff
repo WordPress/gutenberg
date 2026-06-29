@@ -1,0 +1,93 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bac27e61ad0e57..d73bbe6b79a85b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ -   `InputControl`: Implement wrapper subcomponents for adding responsive padding to `prefix`/`suffix` ([#42378](https://github.com/WordPress/gutenberg/pull/42378)).
+ -   `SelectControl`: Add flag for larger default size ([#42456](https://github.com/WordPress/gutenberg/pull/42456/)).
+ -   `UnitControl`: Update unit select's focus styles to match input's ([#42383](https://github.com/WordPress/gutenberg/pull/42383)).
++-   `ColorPalette`: Display checkered preview background when `value` is transparent ([#42232](https://github.com/WordPress/gutenberg/pull/42232)).
+ -   `CustomSelectControl`: Add size variants ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
+ -   `CustomSelectControl`: Add flag to opt in to unconstrained width ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
+ -   `Dropdown`: Implement wrapper subcomponent for adding different padding to the dropdown content ([#42595](https://github.com/WordPress/gutenberg/pull/42595/)).
+diff --git a/packages/components/src/color-palette/index.js b/packages/components/src/color-palette/index.js
+index 5ef690eb1e4fa8..024fabdb672028 100644
+--- a/packages/components/src/color-palette/index.js
++++ b/packages/components/src/color-palette/index.js
+@@ -162,6 +162,13 @@ export const extractColorNameFromCurrentValue = (
+ 	return __( 'Custom' );
+ };
+ 
++export const showTransparentBackground = ( currentValue ) => {
++	if ( typeof currentValue === 'undefined' ) {
++		return true;
++	}
++	return colord( currentValue ).alpha() === 0;
++};
++
+ export default function ColorPalette( {
+ 	clearable = true,
+ 	className,
+@@ -228,14 +235,18 @@ export default function ColorPalette( {
+ 							aria-haspopup="true"
+ 							onClick={ onToggle }
+ 							aria-label={ customColorAccessibleLabel }
+-							style={ {
+-								background: value,
+-								color:
+-									colordColor.contrast() >
+-									colordColor.contrast( '#000' )
+-										? '#fff'
+-										: '#000',
+-							} }
++							style={
++								showTransparentBackground( value )
++									? { color: '#000' }
++									: {
++											background: value,
++											color:
++												colordColor.contrast() >
++												colordColor.contrast( '#000' )
++													? '#fff'
++													: '#000',
++									  }
++							}
+ 						>
+ 							<FlexItem
+ 								isBlock
+diff --git a/packages/components/src/color-palette/test/utils.ts b/packages/components/src/color-palette/test/utils.ts
+index 32103883a11ea2..bbb0d82c6e91d7 100644
+--- a/packages/components/src/color-palette/test/utils.ts
++++ b/packages/components/src/color-palette/test/utils.ts
+@@ -1,7 +1,10 @@
+ /**
+  * Internal dependencies
+  */
+-import { extractColorNameFromCurrentValue } from '../';
++import {
++	extractColorNameFromCurrentValue,
++	showTransparentBackground,
++} from '../';
+ 
+ describe( 'ColorPalette: Utils', () => {
+ 	describe( 'extractColorNameFromCurrentValue', () => {
+@@ -21,4 +24,19 @@ describe( 'ColorPalette: Utils', () => {
+ 			expect( result ).toBe( 'Blue' );
+ 		} );
+ 	} );
++	describe( 'showTransparentBackground', () => {
++		test( 'should return true for undefined color values', () => {
++			expect( showTransparentBackground( undefined ) ).toBe( true );
++		} );
++		test( 'should return true for transparent colors', () => {
++			expect( showTransparentBackground( 'transparent' ) ).toBe( true );
++			expect( showTransparentBackground( '#75757500' ) ).toBe( true );
++		} );
++
++		test( 'should return false for non-transparent colors', () => {
++			expect( showTransparentBackground( '#FFF' ) ).toBe( false );
++			expect( showTransparentBackground( '#757575' ) ).toBe( false );
++			expect( showTransparentBackground( '#f5f5f524' ) ).toBe( false ); // 0.14 alpha.
++		} );
++	} );
+ } );

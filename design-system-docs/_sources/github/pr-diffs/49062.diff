@@ -1,0 +1,166 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0fce2b8b6557da..52fee76a975da5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `FontSizePicker`: Allow custom units for custom font size control ([#48468](https://github.com/WordPress/gutenberg/pull/48468)).
++-   `Navigator`: Disable initial screen animation ([#49062](https://github.com/WordPress/gutenberg/pull/49062)).
+ -   `FormTokenField`: Hide suggestions list on blur event if the input value is invalid ([#48785](https://github.com/WordPress/gutenberg/pull/48785)).
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 15cec834d8b8ad..2d4588d91b14d6 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -172,13 +172,19 @@ function UnconnectedNavigatorScreen(
+ 		},
+ 		x: 0,
+ 	};
+-	const initial = {
+-		opacity: 0,
+-		x:
+-			( isRTL() && location.isBack ) || ( ! isRTL() && ! location.isBack )
+-				? 50
+-				: -50,
+-	};
++	// Disable the initial animation if the screen is the very first screen to be
++	// rendered within the current `NavigatorProvider`.
++	const initial =
++		location.isInitial && ! location.isBack
++			? false
++			: {
++					opacity: 0,
++					x:
++						( isRTL() && location.isBack ) ||
++						( ! isRTL() && ! location.isBack )
++							? 50
++							: -50,
++			  };
+ 	const exit = {
+ 		delay: animationExitDelay,
+ 		opacity: 0,
+diff --git a/packages/components/src/navigator/test/index.tsx b/packages/components/src/navigator/test/index.tsx
+index 927f6f3abf0e04..a27be5475d8028 100644
+--- a/packages/components/src/navigator/test/index.tsx
++++ b/packages/components/src/navigator/test/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { ReactNode, ForwardedRef, ComponentPropsWithoutRef } from 'react';
++import type { ComponentPropsWithoutRef } from 'react';
+ import { render, screen } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+@@ -23,27 +23,6 @@ import {
+ 	useNavigator,
+ } from '..';
+ 
+-jest.mock( 'framer-motion', () => {
+-	const actual = jest.requireActual( 'framer-motion' );
+-	return {
+-		__esModule: true,
+-		...actual,
+-		AnimatePresence:
+-			( { children }: { children?: ReactNode } ) =>
+-			() =>
+-				<div>{ children }</div>,
+-		motion: {
+-			...actual.motion,
+-			div: require( 'react' ).forwardRef(
+-				(
+-					{ children }: { children?: ReactNode },
+-					ref: ForwardedRef< HTMLDivElement >
+-				) => <div ref={ ref }>{ children }</div>
+-			),
+-		},
+-	};
+-} );
+-
+ const INVALID_HTML_ATTRIBUTE = {
+ 	raw: ' "\'><=invalid_path',
+ 	escaped: " &quot;'&gt;<=invalid_path",
+@@ -738,4 +717,68 @@ describe( 'Navigator', () => {
+ 			expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
+ 		} );
+ 	} );
++
++	describe( 'animation', () => {
++		it( 'should not animate the initial screen', async () => {
++			const onHomeAnimationStartSpy = jest.fn();
++
++			render(
++				<NavigatorProvider initialPath="/">
++					<NavigatorScreen
++						path="/"
++						onAnimationStart={ onHomeAnimationStartSpy }
++					>
++						<CustomNavigatorButton path="/child">
++							To child
++						</CustomNavigatorButton>
++					</NavigatorScreen>
++				</NavigatorProvider>
++			);
++
++			expect( onHomeAnimationStartSpy ).not.toHaveBeenCalled();
++		} );
++
++		it( 'should animate all other screens (including the initial screen when navigating back)', async () => {
++			const user = userEvent.setup();
++
++			const onHomeAnimationStartSpy = jest.fn();
++			const onChildAnimationStartSpy = jest.fn();
++
++			render(
++				<NavigatorProvider initialPath="/">
++					<NavigatorScreen
++						path="/"
++						onAnimationStart={ onHomeAnimationStartSpy }
++					>
++						<CustomNavigatorButton path="/child">
++							To child
++						</CustomNavigatorButton>
++					</NavigatorScreen>
++					<NavigatorScreen
++						path="/child"
++						onAnimationStart={ onChildAnimationStartSpy }
++					>
++						<CustomNavigatorBackButton>
++							Back to home
++						</CustomNavigatorBackButton>
++					</NavigatorScreen>
++				</NavigatorProvider>
++			);
++
++			expect( onHomeAnimationStartSpy ).not.toHaveBeenCalled();
++			expect( onChildAnimationStartSpy ).not.toHaveBeenCalled();
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'To child' } )
++			);
++			expect( onChildAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
++			expect( onHomeAnimationStartSpy ).not.toHaveBeenCalled();
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Back to home' } )
++			);
++			expect( onChildAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
++			expect( onHomeAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
++		} );
++	} );
+ } );
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+index 67d5ee4e184366..c666ab81e0724f 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+@@ -733,7 +733,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+           class="emotion-2 components-navigator-screen"
+           data-wp-c16t="true"
+           data-wp-component="NavigatorScreen"
+-          style="opacity: 0; transform: translateX(50px) translateZ(0);"
++          style="opacity: 1; transform: none;"
+         >
+           <div
+             class="components-surface components-card emotion-3 emotion-1"

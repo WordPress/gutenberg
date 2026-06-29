@@ -1,0 +1,116 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 99110ba9f27c42..50b4898fd7e774 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -131,6 +131,7 @@ module.exports = {
+ 							'nth',
+ 							'once',
+ 							'overEvery',
++							'partial',
+ 							'partialRight',
+ 							'random',
+ 							'reject',
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 16dac405bb2be1..81f81afdac6780 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -37,6 +37,7 @@
+ -   `ComboboxControl`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41417](https://github.com/WordPress/gutenberg/pull/41417))
+ -   `FormTokenField`: Refactor away from Lodash ([#43744](https://github.com/WordPress/gutenberg/pull/43744/)).
+ -   `NavigatorButton`: updated to satisfy `react/exhaustive-deps` eslint rule ([#42051](https://github.com/WordPress/gutenberg/pull/42051))
++-   `TabPanel`: Refactor away from `_.partial()` ([#43895](https://github.com/WordPress/gutenberg/pull/43895/)).
+ 
+ ## 20.0.0 (2022-08-24)
+ 
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index 36450b0aba349a..b34ccff5f01c2b 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { partial, find } from 'lodash';
++import { find } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -127,7 +127,7 @@ export function TabPanel( {
+ 						aria-controls={ `${ instanceId }-${ tab.name }-view` }
+ 						selected={ tab.name === selected }
+ 						key={ tab.name }
+-						onClick={ partial( handleClick, tab.name ) }
++						onClick={ () => handleClick( tab.name ) }
+ 					>
+ 						{ tab.title }
+ 					</TabButton>
+diff --git a/packages/edit-post/src/components/block-manager/checklist.js b/packages/edit-post/src/components/block-manager/checklist.js
+index bdbc304e2d1bff..7aa1b025810d3b 100644
+--- a/packages/edit-post/src/components/block-manager/checklist.js
++++ b/packages/edit-post/src/components/block-manager/checklist.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { partial } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -25,7 +20,9 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
+ 							</>
+ 						}
+ 						checked={ value.includes( blockType.name ) }
+-						onChange={ partial( onItemChange, blockType.name ) }
++						onChange={ ( ...args ) =>
++							onItemChange( blockType.name, ...args )
++						}
+ 					/>
+ 				</li>
+ 			) ) }
+diff --git a/packages/edit-post/src/components/sidebar/featured-image/index.js b/packages/edit-post/src/components/sidebar/featured-image/index.js
+index 5a9db1e3839460..4463bf8e51404a 100644
+--- a/packages/edit-post/src/components/sidebar/featured-image/index.js
++++ b/packages/edit-post/src/components/sidebar/featured-image/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { get, partial } from 'lodash';
++import { get } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -66,7 +66,8 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
+ 	const { toggleEditorPanelOpened } = dispatch( editPostStore );
+ 
+ 	return {
+-		onTogglePanel: partial( toggleEditorPanelOpened, PANEL_NAME ),
++		onTogglePanel: ( ...args ) =>
++			toggleEditorPanelOpened( PANEL_NAME, ...args ),
+ 	};
+ } );
+ 
+diff --git a/packages/edit-post/src/components/sidebar/page-attributes/index.js b/packages/edit-post/src/components/sidebar/page-attributes/index.js
+index fd40612b56a730..84980e99aa3b99 100644
+--- a/packages/edit-post/src/components/sidebar/page-attributes/index.js
++++ b/packages/edit-post/src/components/sidebar/page-attributes/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { get, partial } from 'lodash';
++import { get } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -46,7 +46,8 @@ export function PageAttributes() {
+ 		return null;
+ 	}
+ 
+-	const onTogglePanel = partial( toggleEditorPanelOpened, PANEL_NAME );
++	const onTogglePanel = ( ...args ) =>
++		toggleEditorPanelOpened( PANEL_NAME, ...args );
+ 
+ 	return (
+ 		<PageAttributesCheck>

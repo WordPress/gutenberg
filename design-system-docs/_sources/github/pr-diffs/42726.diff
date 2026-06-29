@@ -1,0 +1,198 @@
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index 23fee2b813c6ac..e0ee04d06941da 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -15,7 +15,9 @@ import { useState, forwardRef } from '@wordpress/element';
+  */
+ import InputBase from './input-base';
+ import InputField from './input-field';
+-import type { InputControlProps } from './types';
++import Tooltip from '../tooltip';
++import { TooltipWrapper } from './styles/input-control-styles';
++import type { InputControlProps, WithTooltipProps } from './types';
+ import { space } from '../ui/utils/space';
+ import { useDraft } from './utils';
+ 
+@@ -28,6 +30,21 @@ function useUniqueId( idProp?: string ) {
+ 	return idProp || id;
+ }
+ 
++const WithTooltip = ( { showTooltip, text, children }: WithTooltipProps ) => {
++	if ( showTooltip && text ) {
++		// Children are wrapped in a simple `div` (`TooltipWrapper`) to prevent
++		// rendering issue with Tooltips.
++		// See: https://github.com/WordPress/gutenberg/pull/24966#issuecomment-685875026
++		return (
++			<Tooltip text={ text } position="top center">
++				<TooltipWrapper>{ children }</TooltipWrapper>
++			</Tooltip>
++		);
++	}
++
++	return <>{ children }</>;
++};
++
+ export function UnforwardedInputControl(
+ 	{
+ 		__next36pxDefaultSize,
+@@ -44,6 +61,8 @@ export function UnforwardedInputControl(
+ 		onValidate = noop,
+ 		onKeyDown = noop,
+ 		prefix,
++		showTooltip = false,
++		tooltipText: tooltipTextProp,
+ 		size = 'default',
+ 		suffix,
+ 		value,
+@@ -62,6 +81,10 @@ export function UnforwardedInputControl(
+ 		onChange,
+ 	} );
+ 
++	const tooltipText =
++		tooltipTextProp ||
++		( typeof label === 'string' ? ( label as string ) : undefined );
++
+ 	return (
+ 		<InputBase
+ 			__next36pxDefaultSize={ __next36pxDefaultSize }
+@@ -79,24 +102,26 @@ export function UnforwardedInputControl(
+ 			size={ size }
+ 			suffix={ suffix }
+ 		>
+-			<InputField
+-				{ ...props }
+-				__next36pxDefaultSize={ __next36pxDefaultSize }
+-				className="components-input-control__input"
+-				disabled={ disabled }
+-				id={ id }
+-				isFocused={ isFocused }
+-				isPressEnterToChange={ isPressEnterToChange }
+-				onKeyDown={ onKeyDown }
+-				onValidate={ onValidate }
+-				paddingInlineStart={ prefix ? space( 2 ) : undefined }
+-				paddingInlineEnd={ suffix ? space( 2 ) : undefined }
+-				ref={ ref }
+-				setIsFocused={ setIsFocused }
+-				size={ size }
+-				stateReducer={ stateReducer }
+-				{ ...draftHookProps }
+-			/>
++			<WithTooltip showTooltip={ showTooltip } text={ tooltipText }>
++				<InputField
++					{ ...props }
++					__next36pxDefaultSize={ __next36pxDefaultSize }
++					className="components-input-control__input"
++					disabled={ disabled }
++					id={ id }
++					isFocused={ isFocused }
++					isPressEnterToChange={ isPressEnterToChange }
++					onKeyDown={ onKeyDown }
++					onValidate={ onValidate }
++					paddingInlineStart={ prefix ? space( 2 ) : undefined }
++					paddingInlineEnd={ suffix ? space( 2 ) : undefined }
++					ref={ ref }
++					setIsFocused={ setIsFocused }
++					size={ size }
++					stateReducer={ stateReducer }
++					{ ...draftHookProps }
++				/>
++			</WithTooltip>
+ 		</InputBase>
+ 	);
+ }
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index 2b7d4123adcbba..63fcb3c20d328e 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -32,7 +32,7 @@ function useUniqueId( idProp?: string ) {
+ 	return idProp || id;
+ }
+ 
+-// Adapter to map props for the new ui/flex compopnent.
++// Adapter to map props for the new ui/flex component.
+ function getUIFlexProps( labelPosition?: LabelPosition ) {
+ 	const props: { direction?: string; gap?: number; justify?: string } = {};
+ 	switch ( labelPosition ) {
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index a7fb7ecc7fa544..06f29622902f39 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -105,6 +105,10 @@ export const Container = styled.div< ContainerProps >`
+ 	${ containerWidthStyles }
+ `;
+ 
++export const TooltipWrapper = styled.div`
++	width: 100%;
++`;
++
+ type InputProps = {
+ 	__next36pxDefaultSize?: boolean;
+ 	disabled?: boolean;
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index 509aae28648c84..9c10acebdeb0ca 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -67,6 +67,21 @@ export type InputChangeCallback<
+ 	P = {}
+ > = ( nextValue: string | undefined, extra: { event: E } & P ) => void;
+ 
++export type WithTooltipProps = {
++	/**
++	 * React children.
++	 */
++	children: ReactNode;
++	/**
++	 * Whether or not to wrap children in a tooltip.
++	 */
++	showTooltip?: boolean;
++	/**
++	 * Text to display within the tooltip.
++	 */
++	text?: string;
++};
++
+ export interface InputFieldProps extends BaseProps {
+ 	/**
+ 	 * Determines the drag axis.
+@@ -105,7 +120,18 @@ export interface InputFieldProps extends BaseProps {
+ 	paddingInlineStart?: CSSProperties[ 'paddingInlineStart' ];
+ 	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
+ 	setIsFocused: ( isFocused: boolean ) => void;
++	/**
++	 * Whether to wrap input field in a tooltip.
++	 *
++	 * @default false
++	 */
++	showTooltip?: boolean;
+ 	stateReducer?: StateReducer;
++	/**
++	 * Custom text to display when tooltips are enabled. If not provided enabled
++	 * tooltips will fallback to using the label value.
++	 */
++	tooltipText?: string;
+ 	/**
+ 	 * The current value of the input.
+ 	 */
+diff --git a/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap b/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
+index e65364b96bf9bc..cdfcb246721461 100644
+--- a/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
+@@ -10,15 +10,15 @@ Snapshot Diff:
+     class="components-unit-control-wrapper css-zi0c81-Root e1bagdl33"
+   >
+     <div
+--     class="components-flex components-input-control components-number-control components-unit-control e1bagdl32 ep48uk90 em5sgkm7 css-1njfmeu-View-Flex-sx-Base-sx-Items-ItemsColumn-Root-rootLabelPositionStyles-Input-ValueInput-arrowStyles em57xhy0"
+-+     class="components-flex components-input-control components-number-control components-unit-control hello e1bagdl32 ep48uk90 em5sgkm7 css-1njfmeu-View-Flex-sx-Base-sx-Items-ItemsColumn-Root-rootLabelPositionStyles-Input-ValueInput-arrowStyles em57xhy0"
++-     class="components-flex components-input-control components-number-control components-unit-control e1bagdl32 ep48uk90 em5sgkm8 css-1njfmeu-View-Flex-sx-Base-sx-Items-ItemsColumn-Root-rootLabelPositionStyles-Input-ValueInput-arrowStyles em57xhy0"
+++     class="components-flex components-input-control components-number-control components-unit-control hello e1bagdl32 ep48uk90 em5sgkm8 css-1njfmeu-View-Flex-sx-Base-sx-Items-ItemsColumn-Root-rootLabelPositionStyles-Input-ValueInput-arrowStyles em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="Flex"
+     >
+       <div
+         class="components-flex-item em5sgkm3 css-1fmchc6-View-Item-sx-Base-LabelWrapper em57xhy0"
+ @@ -15,11 +15,11 @@
+-        class="components-input-control__container css-1sy20aj-Container-containerDisabledStyles-containerMarginStyles-containerWidthStyles em5sgkm6"
++        class="components-input-control__container css-1sy20aj-Container-containerDisabledStyles-containerMarginStyles-containerWidthStyles em5sgkm7"
+       >
+         <input
+           autocomplete="off"

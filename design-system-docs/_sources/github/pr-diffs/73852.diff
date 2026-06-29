@@ -1,0 +1,148 @@
+diff --git a/packages/ui/src/stack/stack.tsx b/packages/ui/src/stack/stack.tsx
+index e56486c7d6ebbc..c83c3f03f34073 100644
+--- a/packages/ui/src/stack/stack.tsx
++++ b/packages/ui/src/stack/stack.tsx
+@@ -12,55 +12,21 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { renderElement } from '../utils/element';
+-import { type StackProps, type SizeToken } from './types';
++import { type StackProps } from './types';
+ import styles from './style.module.css';
+ 
+-/**
+- * Set of token names for gap spacing.
+- */
+-const TOKEN_NAMES = new Set< SizeToken >( [
+-	'2xs',
+-	'xs',
+-	'sm',
+-	'md',
+-	'lg',
+-	'xl',
+-] );
+-
+-/**
+- * Normalizes the gap value. When given a positive number, it will be converted
+- * to a CSS calculation. When given a string, it will be returned as is.
+- *
+- * @param gap The gap value to normalize.
+- *
+- * @return The normalized gap value.
+- */
+-export function getNormalizedGap(
+-	gap: number | SizeToken | React.CSSProperties[ 'gap' ]
+-): string {
+-	if ( typeof gap === 'number' ) {
+-		return `calc( ${ gap } * var( --wpds-dimension-base ) )`;
+-	}
+-
+-	if ( TOKEN_NAMES.has( gap as SizeToken ) ) {
+-		return `var(--wpds-dimension-gap-${ gap })`;
+-	}
+-
+-	return String( gap );
+-}
+-
+ /**
+  * A flexible layout component using CSS Flexbox for consistent spacing and alignment.
+  * Built on design tokens for predictable spacing values.
+  */
+ export const Stack = forwardRef< HTMLDivElement, StackProps >( function Stack(
+-	{ direction, gap = 0, align, justify, wrap, render, ...props },
++	{ direction, gap, align, justify, wrap, render, ...props },
+ 	ref
+ ) {
+ 	const className = clsx( props.className, styles.stack );
+ 
+ 	const style: React.CSSProperties = {
+-		gap: getNormalizedGap( gap ),
++		gap: gap && `var(--wpds-dimension-gap-${ gap })`,
+ 		alignItems: align,
+ 		justifyContent: justify,
+ 		flexDirection: direction,
+diff --git a/packages/ui/src/stack/stories/index.story.tsx b/packages/ui/src/stack/stories/index.story.tsx
+index 4eaeabd265a7f8..bd3213c3de76f5 100644
+--- a/packages/ui/src/stack/stories/index.story.tsx
++++ b/packages/ui/src/stack/stories/index.story.tsx
+@@ -48,18 +48,6 @@ export const Default: Story = {
+ 		),
+ 	},
+ 	argTypes: {
+-		gap: {
+-			control: {
+-				type: 'select',
+-			},
+-			options: [ 0, 1, 2, 3, 4, '2xs', 'xs', 'sm', 'md', 'lg', 'xl' ],
+-			table: {
+-				type: {
+-					summary:
+-						'number | "2xs" | "xs" | "sm" | "md" | "lg" | "xl"',
+-				},
+-			},
+-		},
+ 		align: {
+ 			options: [
+ 				'center',
+@@ -121,7 +109,7 @@ export const Nested: Story = {
+ 					<DemoBox />
+ 				</Stack>
+ 				<DemoBox variant="lg" />
+-				<Stack gap={ 0 } direction="column">
++				<Stack direction="column">
+ 					<DemoBox />
+ 					<DemoBox />
+ 				</Stack>
+diff --git a/packages/ui/src/stack/test/stack.test.tsx b/packages/ui/src/stack/test/stack.test.tsx
+index c1909a855d9e46..13e3bd1e7d74b3 100644
+--- a/packages/ui/src/stack/test/stack.test.tsx
++++ b/packages/ui/src/stack/test/stack.test.tsx
+@@ -11,27 +11,7 @@ import { createRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { Stack, getNormalizedGap } from '../stack';
+-
+-describe( 'getNormalizedGap', () => {
+-	it( 'should return the gap as a CSS calculation when the gap is a positive number', () => {
+-		const result = getNormalizedGap( 1 );
+-
+-		expect( result ).toBe( 'calc( 1 * var( --wpds-dimension-base ) )' );
+-	} );
+-
+-	it( 'should return the CSS variable reference to a token value', () => {
+-		const result = getNormalizedGap( 'md' );
+-
+-		expect( result ).toBe( 'var(--wpds-dimension-gap-md)' );
+-	} );
+-
+-	it( 'should return the gap as a literal value when the gap is a string', () => {
+-		const result = getNormalizedGap( '10px' );
+-
+-		expect( result ).toBe( '10px' );
+-	} );
+-} );
++import { Stack } from '../stack';
+ 
+ describe( 'Stack', () => {
+ 	it( 'forwards ref', () => {
+diff --git a/packages/ui/src/stack/types.ts b/packages/ui/src/stack/types.ts
+index 61f344be643061..f0d3b57ffa47b6 100644
+--- a/packages/ui/src/stack/types.ts
++++ b/packages/ui/src/stack/types.ts
+@@ -15,12 +15,11 @@ export interface StackProps extends ComponentProps< 'div' > {
+ 	>;
+ 
+ 	/**
+-	 * The amount of space between each child element. As a number, it is a
+-	 * multiple of the design system grid spacing.
++	 * The amount of space between each child element using design system tokens.
+ 	 *
+-	 * @default 'initial'
++	 * @default undefined
+ 	 */
+-	gap?: number | SizeToken | React.CSSProperties[ 'gap' ];
++	gap?: SizeToken;
+ 
+ 	/**
+ 	 * The alignment of the stack items along the cross axis.

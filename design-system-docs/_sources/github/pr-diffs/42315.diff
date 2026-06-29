@@ -1,0 +1,3042 @@
+diff --git a/packages/components/src/slider-control/index.ts b/packages/components/src/slider-control/index.ts
+new file mode 100644
+index 00000000000000..dd8874dc70a4f8
+--- /dev/null
++++ b/packages/components/src/slider-control/index.ts
+@@ -0,0 +1,2 @@
++export { default as SliderControl } from './slider-control/component';
++export { useSliderControl } from './slider-control/hook';
+diff --git a/packages/components/src/slider-control/mark/component.tsx b/packages/components/src/slider-control/mark/component.tsx
+new file mode 100644
+index 00000000000000..02f2a5dd2f385c
+--- /dev/null
++++ b/packages/components/src/slider-control/mark/component.tsx
+@@ -0,0 +1,48 @@
++/**
++ * Internal dependencies
++ */
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
++import { useMark } from './hook';
++import { View } from '../../view';
++
++import type { MarkProps } from '../types';
++
++const UnconnectedMark = (
++	props: WordPressComponentProps< MarkProps, 'span' >,
++	forwardedRef: React.ForwardedRef< any >
++) => {
++	const {
++		className,
++		isFilled = false,
++		label,
++		labelClassName,
++		style = {},
++		...otherProps
++	} = useMark( props );
++
++	return (
++		<>
++			<View
++				as="span"
++				{ ...otherProps }
++				aria-hidden="true"
++				className={ className }
++				style={ style }
++				ref={ forwardedRef }
++			/>
++			{ label && (
++				<View
++					as="span"
++					aria-hidden="true"
++					className={ labelClassName }
++					style={ style }
++				>
++					{ label }
++				</View>
++			) }
++		</>
++	);
++};
++
++export const Mark = contextConnect( UnconnectedMark, 'Mark' );
++export default Mark;
+diff --git a/packages/components/src/slider-control/mark/hook.ts b/packages/components/src/slider-control/mark/hook.ts
+new file mode 100644
+index 00000000000000..c6eed0dc620ce0
+--- /dev/null
++++ b/packages/components/src/slider-control/mark/hook.ts
+@@ -0,0 +1,38 @@
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from '../styles';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
++import { useCx } from '../../utils/hooks';
++
++import type { MarkProps } from '../types';
++
++export function useMark( props: WordPressComponentProps< MarkProps, 'span' > ) {
++	const { className, disabled, isFilled, ...otherProps } = useContextSystem(
++		props,
++		'Mark'
++	);
++
++	// Generate dynamic class names.
++	const cx = useCx();
++	const classes = useMemo( () => {
++		return cx( styles.mark( { isFilled, disabled } ), className );
++	}, [ className, cx, disabled, isFilled ] );
++
++	const labelClassName = useMemo( () => {
++		return cx( styles.markLabel( { isFilled } ) );
++	}, [ className, cx, isFilled ] );
++
++	return {
++		...otherProps,
++		className: classes,
++		disabled,
++		isFilled,
++		labelClassName,
++	};
++}
+diff --git a/packages/components/src/slider-control/marks/component.tsx b/packages/components/src/slider-control/marks/component.tsx
+new file mode 100644
+index 00000000000000..80d2f0ee8924a2
+--- /dev/null
++++ b/packages/components/src/slider-control/marks/component.tsx
+@@ -0,0 +1,36 @@
++/**
++ * Internal dependencies
++ */
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
++import { useMarks } from './hook';
++import { View } from '../../view';
++import { Mark } from '../mark/component';
++
++import type { MarksProps } from '../types';
++
++const UnconnectedMarks = (
++	props: WordPressComponentProps< MarksProps, 'input', false >,
++	forwardedRef: React.ForwardedRef< any >
++) => {
++	const { className, disabled = false, marksData } = useMarks( props );
++	return (
++		<View
++			as="span"
++			aria-hidden="true"
++			className={ className }
++			ref={ forwardedRef }
++		>
++			{ marksData.map( ( mark ) => (
++				<Mark
++					{ ...mark }
++					key={ mark.key }
++					aria-hidden="true"
++					disabled={ disabled }
++				/>
++			) ) }
++		</View>
++	);
++};
++
++export const Marks = contextConnect( UnconnectedMarks, 'Marks' );
++export default Marks;
+diff --git a/packages/components/src/slider-control/marks/hook.ts b/packages/components/src/slider-control/marks/hook.ts
+new file mode 100644
+index 00000000000000..9dea487b14a956
+--- /dev/null
++++ b/packages/components/src/slider-control/marks/hook.ts
+@@ -0,0 +1,43 @@
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from '../styles';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
++import { useCx } from '../../utils/hooks';
++import useMarksData from './use-marks-data';
++
++import type { MarksProps } from '../types';
++
++export function useMarks(
++	props: WordPressComponentProps< MarksProps, 'input', false >
++) {
++	const {
++		className,
++		marks = false,
++		min = 0,
++		max = 100,
++		step: stepProp = 1,
++		value = 0,
++		...otherProps
++	} = useContextSystem( props, 'Marks' );
++
++	const step = stepProp === 'any' ? 1 : stepProp;
++	const marksData = useMarksData( { marks, min, max, step, value } );
++
++	// Generate dynamic class names.
++	const cx = useCx();
++	const classes = useMemo( () => {
++		return cx( styles.marks, className );
++	}, [ className, cx ] );
++
++	return {
++		...otherProps,
++		className: classes,
++		marksData,
++	};
++}
+diff --git a/packages/components/src/slider-control/marks/use-marks-data.ts b/packages/components/src/slider-control/marks/use-marks-data.ts
+new file mode 100644
+index 00000000000000..cafd3e3affb66a
+--- /dev/null
++++ b/packages/components/src/slider-control/marks/use-marks-data.ts
+@@ -0,0 +1,53 @@
++/**
++ * WordPress dependencies
++ */
++import { isRTL } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import type { MarkProps, useMarksDataArgs } from '../types';
++
++const useMarksData = ( {
++	marks,
++	min = 0,
++	max = 100,
++	step = 1,
++	value = 0,
++}: useMarksDataArgs ) => {
++	if ( ! marks || step === 0 ) {
++		return [];
++	}
++
++	const range = max - min;
++	if ( ! Array.isArray( marks ) ) {
++		marks = [];
++		const count = 1 + Math.round( range / step );
++		while ( count > marks.push( { value: step * marks.length + min } ) );
++	}
++
++	const placedMarks: MarkProps[] = [];
++	marks.forEach( ( mark, index ) => {
++		if ( mark.value < min || mark.value > max ) {
++			return;
++		}
++		const key = `mark-${ index }`;
++		const isFilled = mark.value <= value;
++		const offset = `${ ( ( mark.value - min ) / range ) * 100 }%`;
++
++		const offsetStyle = {
++			[ isRTL() ? 'right' : 'left' ]: offset,
++		};
++
++		placedMarks.push( {
++			...mark,
++			isFilled,
++			key,
++			style: offsetStyle,
++		} );
++	} );
++
++	return placedMarks;
++};
++
++export default useMarksData;
+diff --git a/packages/components/src/slider-control/slider-control/component.tsx b/packages/components/src/slider-control/slider-control/component.tsx
+new file mode 100644
+index 00000000000000..df99f6255a49b5
+--- /dev/null
++++ b/packages/components/src/slider-control/slider-control/component.tsx
+@@ -0,0 +1,130 @@
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId, useMergeRefs } from '@wordpress/compose';
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import BaseControl from '../../base-control';
++import Marks from '../marks/component';
++import Slider from '../slider/component';
++import Tooltip from '../tooltip/component';
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
++import { useSliderControl } from './hook';
++import { VStack } from '../../v-stack';
++import { clamp } from '../../utils/math';
++
++import type { SliderControlProps } from '../types';
++
++const noop = () => {};
++
++const UnconnectedSliderControl = (
++	props: WordPressComponentProps< SliderControlProps, 'input', false >,
++	forwardedRef: React.ForwardedRef< any >
++) => {
++	const {
++		className,
++		disabled,
++		enableTooltip,
++		help,
++		hideLabelFromVision = false,
++		inputRef,
++		label,
++		marks = false,
++		max = 100,
++		min = 0,
++		onBlur = noop,
++		onChange = noop,
++		onFocus = noop,
++		onMouseLeave = noop,
++		onMouseMove = noop,
++		renderTooltipContent = ( v ) => v,
++		showTooltip,
++		step = 1,
++		value: valueProp,
++		wrapperClassName,
++		...otherProps
++	} = useSliderControl( props );
++
++	const id = useInstanceId( UnconnectedSliderControl, 'slider-control' );
++	const describedBy = !! help ? `${ id }__help` : undefined;
++
++	const value = valueProp;
++	const isValueReset = value === null;
++	const rangeFillValue = isValueReset ? ( max - min ) / 2 + min : value;
++	const fillValue = isValueReset
++		? 50
++		: ( ( value - min ) / ( max - min ) ) * 100;
++	const fillPercentage = clamp( fillValue, 0, 100 );
++
++	return (
++		<BaseControl
++			className={ className }
++			label={ label }
++			hideLabelFromVision={ hideLabelFromVision }
++			id={ `${ id }` }
++			help={ help }
++		>
++			<VStack className={ wrapperClassName }>
++				<Slider
++					aria-describedby={ describedBy }
++					className="components-range-control__slider"
++					disabled={ disabled }
++					id={ `${ id }` }
++					label={ label }
++					max={ max }
++					min={ min }
++					onBlur={ onBlur }
++					onChange={ onChange }
++					onFocus={ onFocus }
++					onMouseLeave={ onMouseLeave }
++					onMouseMove={ onMouseMove }
++					ref={ useMergeRefs( [ inputRef, forwardedRef ] ) }
++					step={ step }
++					value={ isValueReset ? undefined : value }
++					{ ...otherProps }
++				/>
++				<Marks
++					disabled={ disabled }
++					marks={ marks }
++					max={ max }
++					min={ min }
++					step={ step }
++					value={ rangeFillValue }
++				/>
++				{ enableTooltip && (
++					<Tooltip
++						inputRef={ inputRef }
++						renderTooltipContent={ renderTooltipContent }
++						show={ showTooltip }
++						fillPercentage={ fillPercentage }
++						value={ value }
++					/>
++				) }
++			</VStack>
++		</BaseControl>
++	);
++};
++
++/**
++ * `SliderControl` is a form component that lets users choose a value within a
++ * range.
++ *
++ * @example
++ * ```jsx
++ * import { SliderControl } from `@wordpress/components`
++ *
++ * function Example() {
++ *   return (
++ *     <SliderControl />
++ *   );
++ * }
++ * ```
++ */
++export const SliderControl = contextConnect(
++	UnconnectedSliderControl,
++	'SliderControl'
++);
++export default SliderControl;
+diff --git a/packages/components/src/slider-control/slider-control/hook.ts b/packages/components/src/slider-control/slider-control/hook.ts
+new file mode 100644
+index 00000000000000..6ce0b74123be56
+--- /dev/null
++++ b/packages/components/src/slider-control/slider-control/hook.ts
+@@ -0,0 +1,93 @@
++/**
++ * External dependencies
++ */
++import type { FocusEvent } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo, useRef, useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from '../styles';
++import { useControlledRangeValue } from '../utils';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
++import { useCx } from '../../utils/hooks';
++
++import type { SliderControlProps } from '../types';
++
++const noop = () => {};
++
++export function useSliderControl(
++	props: WordPressComponentProps< SliderControlProps, 'input', false >
++) {
++	const {
++		className,
++		initialPosition,
++		max = 100,
++		min = 0,
++		onBlur = noop,
++		onChange = noop,
++		onFocus = noop,
++		showTooltip: showTooltipProp,
++		step = 1,
++		value: valueProp,
++		...otherProps
++	} = useContextSystem( props, 'SliderControl' );
++
++	const [ value, setValue ] = useControlledRangeValue( {
++		min,
++		max,
++		value: valueProp ?? null,
++		initial: initialPosition,
++	} );
++
++	const hasTooltip = step === 'any' ? false : showTooltipProp;
++	const [ showTooltip, setShowTooltip ] = useState( hasTooltip );
++	const enableTooltip = hasTooltip !== false && Number.isFinite( value );
++
++	const inputRef = useRef< HTMLInputElement >();
++	const isCurrentlyFocused = inputRef.current?.matches( ':focus' );
++
++	const handleOnBlur = ( event: FocusEvent< HTMLInputElement > ) => {
++		onBlur( event );
++		setShowTooltip( false );
++	};
++
++	const handleOnFocus = ( event: FocusEvent< HTMLInputElement > ) => {
++		onFocus( event );
++		setShowTooltip( true );
++	};
++
++	const handleOnChange = ( next: number ) => {
++		setValue( next );
++		onChange( next );
++	};
++
++	// Generate dynamic class names.
++	const cx = useCx();
++	const classes = useMemo( () => {
++		return cx( styles.sliderControl, className );
++	}, [ className, cx ] );
++	const wrapperClassName = useMemo( () => {
++		return cx( styles.sliderWrapper, className );
++	}, [ cx ] );
++
++	return {
++		...otherProps,
++		className: classes,
++		enableTooltip,
++		inputRef,
++		max,
++		min,
++		onBlur: handleOnBlur,
++		onChange: handleOnChange,
++		onFocus: handleOnFocus,
++		showTooltip: isCurrentlyFocused || showTooltip,
++		step,
++		value,
++		wrapperClassName,
++	};
++}
+diff --git a/packages/components/src/slider-control/slider/component.tsx b/packages/components/src/slider-control/slider/component.tsx
+new file mode 100644
+index 00000000000000..823cd7151f0499
+--- /dev/null
++++ b/packages/components/src/slider-control/slider/component.tsx
+@@ -0,0 +1,18 @@
++/**
++ * Internal dependencies
++ */
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
++import { useSlider } from './hook';
++
++import type { SliderProps } from '../types';
++
++const UnconnectedSlider = (
++	props: WordPressComponentProps< SliderProps, 'input', false >,
++	forwardedRef: React.ForwardedRef< any >
++) => {
++	const inputProps = useSlider( props );
++	return <input { ...inputProps } ref={ forwardedRef } />;
++};
++
++export const Slider = contextConnect( UnconnectedSlider, 'Slider' );
++export default Slider;
+diff --git a/packages/components/src/slider-control/slider/hook.ts b/packages/components/src/slider-control/slider/hook.ts
+new file mode 100644
+index 00000000000000..f13acd176ae433
+--- /dev/null
++++ b/packages/components/src/slider-control/slider/hook.ts
+@@ -0,0 +1,132 @@
++/**
++ * WordPress dependencies
++ */
++import { useCallback, useMemo, useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from '../styles';
++import { COLORS, CONFIG } from '../../utils';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
++import { useControlledValue, useCx } from '../../utils/hooks';
++import { interpolate } from '../../utils/interpolate';
++import { isValueNumeric } from '../../utils/values';
++
++import type { SliderProps } from '../types';
++
++const noop = () => {};
++
++export function useSlider(
++	props: WordPressComponentProps< SliderProps, 'input', false >
++) {
++	const {
++		className,
++		defaultValue,
++		error,
++		errorColor = CONFIG.controlDestructiveBorderColor,
++		onBlur = noop,
++		onChange: onChangeProp = noop,
++		onFocus = noop,
++		isFocused: isFocusedProp = false,
++		max = 100,
++		min = 0,
++		size = 'default',
++		style,
++		thumbColor = COLORS.ui.theme,
++		trackColor = COLORS.ui.theme,
++		trackBackgroundColor = CONFIG.controlBackgroundDimColor,
++		value: valueProp,
++		...otherProps
++	} = useContextSystem( props, 'Slider' );
++
++	const numericMax = parseFloat( `${ max }` );
++	const numericMin = parseFloat( `${ min }` );
++	const fallbackDefaultValue = ( numericMax - numericMin ) / 2 + numericMin;
++
++	const [ value, onChange ] = useControlledValue( {
++		defaultValue: defaultValue || fallbackDefaultValue,
++		onChange: onChangeProp,
++		value: valueProp,
++	} );
++
++	const [ isFocused, setIsFocused ] = useState( isFocusedProp );
++
++	const handleOnBlur = useCallback(
++		( event ) => {
++			onBlur( event );
++			setIsFocused( false );
++		},
++		[ onBlur ]
++	);
++
++	const handleOnChange = useCallback(
++		( event ) => {
++			const nextValue = parseFloat( event.target.value );
++			if ( ! isValueNumeric( nextValue ) ) {
++				return;
++			}
++
++			onChange( nextValue );
++		},
++		[ onChange ]
++	);
++
++	const handleOnFocus = useCallback(
++		( event ) => {
++			onFocus( event );
++			setIsFocused( true );
++		},
++		[ onFocus ]
++	);
++
++	// Interpolate the current value between 0 and 100, so that it can be used
++	// to position the slider's thumb correctly.
++	const progressPercentage = interpolate(
++		value,
++		[ numericMin, numericMax ],
++		[ 0, 100 ]
++	);
++	const componentStyles = {
++		...style,
++		'--slider--progress': `${ progressPercentage }%`,
++	};
++
++	// Generate dynamic class names.
++	const cx = useCx();
++	const classes = useMemo( () => {
++		return cx(
++			styles.slider(
++				{ thumbColor, trackColor, trackBackgroundColor },
++				size
++			),
++			error && styles.error( { errorColor, trackBackgroundColor } ),
++			isFocused && styles.focused( thumbColor ),
++			error && isFocused && styles.focusedError( errorColor ),
++			className
++		);
++	}, [
++		className,
++		cx,
++		error,
++		errorColor,
++		isFocused,
++		size,
++		thumbColor,
++		trackColor,
++		trackBackgroundColor,
++	] );
++
++	return {
++		...otherProps,
++		className: classes,
++		max,
++		min,
++		onBlur: handleOnBlur,
++		onChange: handleOnChange,
++		onFocus: handleOnFocus,
++		style: componentStyles,
++		type: 'range',
++		value,
++	};
++}
+diff --git a/packages/components/src/slider-control/stories/index.tsx b/packages/components/src/slider-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..1178fec5c0f064
+--- /dev/null
++++ b/packages/components/src/slider-control/stories/index.tsx
+@@ -0,0 +1,233 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { SliderControl } from '../';
++
++const meta: ComponentMeta< typeof SliderControl > = {
++	title: 'Components (Experimental)/SliderControl',
++	component: SliderControl,
++	argTypes: {
++		errorColor: { control: { type: 'color' } },
++		onBlur: { control: { type: null } },
++		onChange: { control: { type: null } },
++		onFocus: { control: { type: null } },
++		onMouseLeave: { control: { type: null } },
++		onMouseMove: { control: { type: null } },
++		size: {
++			control: 'radio',
++			options: [ 'default', '__unstable-large' ],
++		},
++		step: { control: { type: 'number', min: 0.1, step: 0.1 } },
++		thumbColor: { control: { type: 'color' } },
++		trackBackgroundColor: { control: { type: 'color' } },
++		trackColor: { control: { type: 'color' } },
++		value: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof SliderControl > = ( {
++	onChange,
++	value: valueProp,
++	...args
++} ) => {
++	const [ value, setValue ] = useState< number | undefined >( valueProp );
++	const handleChange = ( newValue?: number ) => {
++		setValue( newValue );
++		onChange?.( newValue );
++	};
++
++	return (
++		<SliderControl { ...args } value={ value } onChange={ handleChange } />
++	);
++};
++
++export const Default: ComponentStory< typeof SliderControl > = Template.bind(
++	{}
++);
++Default.args = {
++	help: 'Please select how transparent you would like this.',
++	label: 'Opacity',
++	max: 100,
++	min: 0,
++	size: 'default',
++};
++
++/**
++ * Setting the `step` prop to `"any"` will allow users to select non-integer
++ * values. This also overrides the `showTooltip` props to `false`.
++ */
++export const WithAnyStep: ComponentStory< typeof SliderControl > = ( {
++	onChange,
++	...args
++} ) => {
++	const [ value, setValue ] = useState< number >();
++
++	return (
++		<>
++			<SliderControl
++				{ ...args }
++				value={ value }
++				onChange={ ( v ) => {
++					setValue( v );
++					onChange?.( v );
++				} }
++			/>
++			<hr style={ { marginTop: '5em' } } />
++			<p>Current value: { value }</p>
++		</>
++	);
++};
++
++WithAnyStep.parameters = { controls: { exclude: [ 'step' ] } };
++WithAnyStep.args = {
++	label: 'Brightness',
++	step: 'any',
++};
++
++const MarkTemplate: ComponentStory< typeof SliderControl > = ( {
++	label,
++	onChange,
++	...args
++} ) => {
++	const [ automaticValue, setAutomaticValue ] = useState< number >();
++	const [ customValue, setCustomValue ] = useState< number >();
++
++	return (
++		<>
++			<h2>{ label }</h2>
++			<SliderControl
++				{ ...args }
++				label="Automatic marks"
++				marks
++				onChange={ ( v ) => {
++					setAutomaticValue( v );
++					onChange?.( v );
++				} }
++				value={ automaticValue }
++			/>
++			<SliderControl
++				{ ...args }
++				label="Custom marks"
++				onChange={ ( v ) => {
++					setCustomValue( v );
++					onChange?.( v );
++				} }
++				value={ customValue }
++			/>
++		</>
++	);
++};
++
++const marksBase = [
++	{ value: 0, label: '0' },
++	{ value: 1, label: '1' },
++	{ value: 2, label: '2' },
++	{ value: 8, label: '8' },
++	{ value: 10, label: '10' },
++];
++
++const marksWithNegatives = [
++	...marksBase,
++	{ value: -1, label: '-1' },
++	{ value: -2, label: '-2' },
++	{ value: -4, label: '-4' },
++	{ value: -8, label: '-8' },
++];
++
++/**
++ * Use `marks` to render a visual representation of `step` ticks. Marks may be
++ * automatically generated or custom mark indicators can be provided by an
++ * `Array`.
++ */
++export const WithIntegerStepAndMarks: ComponentStory< typeof SliderControl > =
++	MarkTemplate.bind( {} );
++
++WithIntegerStepAndMarks.args = {
++	label: 'Integer Step',
++	marks: marksBase,
++	max: 10,
++	min: 0,
++	step: 1,
++};
++
++/**
++ * Decimal values may be used for `marks` rendered as a visual representation of
++ * `step` ticks. Marks may be automatically generated or custom mark indicators
++ * can be provided by an `Array`.
++ */
++export const WithDecimalStepAndMarks: ComponentStory< typeof SliderControl > =
++	MarkTemplate.bind( {} );
++
++WithDecimalStepAndMarks.args = {
++	marks: [
++		...marksBase,
++		{ value: 3.5, label: '3.5' },
++		{ value: 5.8, label: '5.8' },
++	],
++	max: 10,
++	min: 0,
++	step: 0.1,
++};
++
++/**
++ * A negative `min` value can be used to constrain `SliderControl` values. Mark
++ * indicators can represent negative values as well. Marks may be automatically
++ * generated or custom mark indicators can be provided by an `Array`.
++ */
++export const WithNegativeMinimumAndMarks: ComponentStory<
++	typeof SliderControl
++> = MarkTemplate.bind( {} );
++
++WithNegativeMinimumAndMarks.args = {
++	marks: marksWithNegatives,
++	max: 10,
++	min: -10,
++	step: 1,
++};
++
++/**
++ * The entire range of valid values for a `SliderControl` may be negative. Mark
++ * indicators can represent negative values as well. Marks may be automatically
++ * generated or custom mark indicators can be provided by an `Array`.
++ */
++export const WithNegativeRangeAndMarks: ComponentStory< typeof SliderControl > =
++	MarkTemplate.bind( {} );
++
++WithNegativeRangeAndMarks.args = {
++	marks: marksWithNegatives,
++	max: -1,
++	min: -10,
++	step: 1,
++};
++
++/**
++ * When a `SliderControl` has a `step` value of `any` a user may select
++ * non-integer values. This may still be used in conjunction with `marks`
++ * rendering a visual representation of `step` ticks.
++ */
++export const WithAnyStepAndMarks: ComponentStory< typeof SliderControl > =
++	MarkTemplate.bind( {} );
++
++WithAnyStepAndMarks.parameters = { controls: { exclude: [ 'step' ] } };
++WithAnyStepAndMarks.args = {
++	marks: marksBase,
++	max: 10,
++	min: 0,
++	step: 'any',
++};
+diff --git a/packages/components/src/slider-control/styles.ts b/packages/components/src/slider-control/styles.ts
+new file mode 100644
+index 00000000000000..41ebbd35448b5a
+--- /dev/null
++++ b/packages/components/src/slider-control/styles.ts
+@@ -0,0 +1,303 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++import type { CSSProperties } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS, CONFIG, reduceMotion, rtl } from '../utils';
++
++import type {
++	MarkProps,
++	SliderColors,
++	SliderSizes,
++	TooltipProps,
++} from './types';
++
++const getBoxShadowStyle = ( color: CSSProperties[ 'color' ] ) => {
++	return `
++		0 0 0 ${ CONFIG.controlPseudoBoxShadowFocusWidth } ${ CONFIG.surfaceBackgroundColor },
++		0 0 0 calc(${ CONFIG.controlPseudoBoxShadowFocusWidth } + 1px) ${ color }
++	`;
++};
++
++const getFocusBoxShadow = ( color: CSSProperties[ 'color' ] ) => {
++	const boxShadow = getBoxShadowStyle( color );
++	return css`
++		&::-webkit-slider-thumb {
++			box-shadow: ${ boxShadow };
++		}
++		&::-moz-range-thumb {
++			box-shadow: ${ boxShadow };
++		}
++	`;
++};
++
++const thumbStyles = ( thumbColor: CSSProperties[ 'color' ] ) => {
++	return css`
++		appearance: none;
++		background-color: ${ thumbColor };
++		border-radius: 50%;
++		border: 1px solid transparent;
++		box-shadow: none;
++		cursor: pointer;
++		height: 12px;
++		margin-top: -5px;
++		opacity: 1;
++		position: absolute;
++		transition: box-shadow ease ${ CONFIG.transitionDurationFast };
++		width: 12px;
++		${ rtl(
++			{
++				transform: 'translateX(-50%)',
++				left: `var( --slider--progress )`,
++			},
++			{
++				transform: 'translate(50%)',
++				right: `var( --slider--progress )`,
++			}
++		)() }
++	`;
++};
++
++const disabledThumbStyles = css`
++	background: ${ COLORS.ui.textDisabled };
++	border-color: ${ COLORS.ui.textDisabled };
++`;
++
++const trackStyles = ( { trackColor, trackBackgroundColor }: SliderColors ) => {
++	return css`
++		background: linear-gradient(
++			to right,
++			${ trackColor } var( --slider--progress ),
++			${ trackBackgroundColor } var( --slider--progress )
++		);
++		border-radius: 2px;
++		height: 2px;
++	`;
++};
++
++const sliderSizes = {
++	default: '36px',
++	'__unstable-large': '40px',
++};
++
++export const slider = ( colors: SliderColors, size: SliderSizes ) => {
++	return css`
++		appearance: none;
++		background-color: transparent;
++		border: 0;
++		border-radius: ${ CONFIG.controlBorderRadius };
++		cursor: pointer;
++		display: block;
++		height: ${ sliderSizes[ size ] };
++		max-width: 100%;
++		min-width: 0;
++		padding: 0;
++		margin: 0;
++		width: 100%;
++		z-index: 1; /* Ensures marks are beneath the thumb */
++
++		&:focus {
++			outline: none;
++		}
++
++		&::-moz-focus-outer {
++			border: 0;
++		}
++
++		&::-webkit-slider-runnable-track {
++			${ trackStyles( colors ) }
++
++			*:disabled& {
++				background: ${ CONFIG.controlBackgroundDimColor };
++			}
++		}
++		&::-moz-range-track {
++			${ trackStyles( colors ) }
++			will-change: transform;
++
++			*:disabled& {
++				background: ${ CONFIG.controlBackgroundDimColor };
++			}
++		}
++
++		/* Vendor prefixes don't work correctly when comma separated. */
++		&::-webkit-slider-thumb {
++			${ thumbStyles( colors.thumbColor ) }
++
++			*:disabled& {
++				${ disabledThumbStyles }
++			}
++		}
++		&::-moz-range-thumb {
++			${ thumbStyles( colors.thumbColor ) }
++			will-change: transform;
++
++			*:disabled& {
++				${ disabledThumbStyles }
++			}
++		}
++
++		&:focus {
++			${ getFocusBoxShadow( colors.thumbColor ) }
++		}
++	`;
++};
++
++export const focused = ( thumbColor: CSSProperties[ 'color' ] ) =>
++	getFocusBoxShadow( thumbColor );
++
++export const focusedError = ( errorColor: CSSProperties[ 'color' ] ) =>
++	getFocusBoxShadow( errorColor );
++
++export const error = ( { errorColor, trackBackgroundColor }: SliderColors ) => {
++	return css`
++		&::-webkit-slider-runnable-track {
++			background: linear-gradient(
++				to right,
++				${ errorColor } calc( var( --slider--progress ) ),
++				${ trackBackgroundColor } calc( var( --slider--progress ) )
++			);
++		}
++		&::-moz-range-track {
++			background: linear-gradient(
++				to right,
++				${ errorColor } calc( var( --slider--progress ) ),
++				${ trackBackgroundColor } calc( var( --slider--progress ) )
++			);
++		}
++
++		&::-webkit-slider-thumb {
++			background-color: ${ errorColor };
++			border: 1px solid ${ errorColor };
++		}
++		&::-moz-range-thumb {
++			background-color: ${ errorColor };
++			border: 1px solid ${ errorColor };
++		}
++
++		&:focus {
++			${ getFocusBoxShadow( errorColor ) };
++		}
++	`;
++};
++
++export const sliderControl = css``;
++export const sliderWrapper = css`
++	position: relative;
++`;
++
++export const marks = css`
++	box-sizing: border-box;
++	display: block;
++	pointer-events: none;
++	position: absolute;
++	width: 100%;
++	user-select: none;
++`;
++
++const markFill = ( { disabled, isFilled }: MarkProps ) => {
++	let backgroundColor = isFilled ? COLORS.ui.theme : COLORS.gray[ 300 ];
++
++	if ( disabled ) {
++		backgroundColor = COLORS.gray[ 400 ];
++	}
++
++	return css( { backgroundColor } );
++};
++
++export const mark = ( markProps: MarkProps ) => {
++	return css`
++		box-sizing: border-box;
++		height: 12px;
++		left: 0;
++		position: absolute;
++		top: -4px;
++		width: 1px;
++		${ markFill( markProps ) }
++	`;
++};
++
++const markLabelFill = ( { isFilled }: MarkProps ) => {
++	return css( {
++		color: isFilled ? COLORS.gray[ 700 ] : COLORS.gray[ 300 ],
++	} );
++};
++
++export const markLabel = ( markProps: MarkProps ) => {
++	return css`
++		box-sizing: border-box;
++		color: ${ COLORS.gray[ 300 ] };
++		left: 0;
++		font-size: 11px;
++		position: absolute;
++		top: 24px;
++		transform: translateX( -50% );
++		white-space: nowrap;
++		${ markLabelFill( markProps ) };
++	`;
++};
++
++const tooltipPosition = ( props: TooltipProps ) => {
++	const { position, fillPercentage } = props;
++
++	if ( position === 'bottom' ) {
++		return css`
++			bottom: -60%;
++			${ rtl(
++				{
++					transform: 'translateX(-50%)',
++					left: `${ fillPercentage }%`,
++				},
++				{
++					transform: 'translateX(50%)',
++					right: `${ fillPercentage }%`,
++				}
++			)() }
++		`;
++	}
++
++	return css`
++		top: -50%;
++		${ rtl(
++			{
++				transform: 'translate(-50%, -60%)',
++				left: `${ fillPercentage }%`,
++			},
++			{
++				transform: 'translate(50%, -60%)',
++				right: `${ fillPercentage }%`,
++			}
++		)() }
++	`;
++};
++
++export const tooltip = ( props: TooltipProps ) => {
++	const { show, zIndex } = props;
++
++	return css`
++		background: rgba( 0, 0, 0, 0.8 );
++		border-radius: 2px;
++		box-sizing: border-box;
++		color: white;
++		display: inline-block;
++		font-size: 12px;
++		min-width: 32px;
++		opacity: 0;
++		padding: 4px 8px;
++		pointer-events: none;
++		position: absolute;
++		text-align: center;
++		transition: opacity 120ms ease;
++		user-select: none;
++		line-height: 1.4;
++		opacity: ${ show ? 1 : 0 };
++		z-index: ${ zIndex };
++
++		${ tooltipPosition( props ) };
++		${ reduceMotion( 'transition' ) };
++	`;
++};
+diff --git a/packages/components/src/slider-control/test/__snapshots__/index.tsx.snap b/packages/components/src/slider-control/test/__snapshots__/index.tsx.snap
+new file mode 100644
+index 00000000000000..134454f9923e33
+--- /dev/null
++++ b/packages/components/src/slider-control/test/__snapshots__/index.tsx.snap
+@@ -0,0 +1,1100 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`SliderControl should render correctly 1`] = `
++.emotion-0 {
++  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
++  font-size: 13px;
++  box-sizing: border-box;
++}
++
++.emotion-0 *,
++.emotion-0 *::before,
++.emotion-0 *::after {
++  box-sizing: inherit;
++}
++
++.emotion-2 {
++  margin-bottom: calc(4px * 2);
++}
++
++.components-panel__row .emotion-2 {
++  margin-bottom: inherit;
++}
++
++.emotion-4 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: normal;
++  -webkit-box-align: normal;
++  -ms-flex-align: normal;
++  align-items: normal;
++  -webkit-flex-direction: column;
++  -ms-flex-direction: column;
++  flex-direction: column;
++  gap: calc(4px * 2);
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  justify-content: space-between;
++  position: relative;
++}
++
++.emotion-4>* {
++  min-height: 0;
++}
++
++.emotion-6 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: transparent;
++  border: 0;
++  border-radius: 2px;
++  cursor: pointer;
++  display: block;
++  height: 36px;
++  max-width: 100%;
++  min-width: 0;
++  padding: 0;
++  margin: 0;
++  width: 100%;
++  z-index: 1;
++}
++
++.emotion-6:focus {
++  outline: none;
++}
++
++.emotion-6::-moz-focus-outer {
++  border: 0;
++}
++
++.emotion-6::-webkit-slider-runnable-track {
++  background: linear-gradient(
++  			to right,
++  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
++  			#f0f0f0 var( --slider--progress )
++  		);
++  border-radius: 2px;
++  height: 2px;
++}
++
++*:disabled.emotion-6::-webkit-slider-runnable-track {
++  background: #f0f0f0;
++}
++
++.emotion-6::-moz-range-track {
++  background: linear-gradient(
++  			to right,
++  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
++  			#f0f0f0 var( --slider--progress )
++  		);
++  border-radius: 2px;
++  height: 2px;
++  will-change: transform;
++}
++
++*:disabled.emotion-6::-moz-range-track {
++  background: #f0f0f0;
++}
++
++.emotion-6::-webkit-slider-thumb {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: var( --wp-admin-theme-color, #007cba);
++  border-radius: 50%;
++  border: 1px solid transparent;
++  box-shadow: none;
++  cursor: pointer;
++  height: 12px;
++  margin-top: -5px;
++  opacity: 1;
++  position: absolute;
++  -webkit-transition: box-shadow ease 160ms;
++  transition: box-shadow ease 160ms;
++  width: 12px;
++  -webkit-transform: translateX(-50%);
++  -moz-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++  left: var( --slider--progress );
++}
++
++*:disabled.emotion-6::-webkit-slider-thumb {
++  background: #949494;
++  border-color: #949494;
++}
++
++.emotion-6::-moz-range-thumb {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: var( --wp-admin-theme-color, #007cba);
++  border-radius: 50%;
++  border: 1px solid transparent;
++  box-shadow: none;
++  cursor: pointer;
++  height: 12px;
++  margin-top: -5px;
++  opacity: 1;
++  position: absolute;
++  -webkit-transition: box-shadow ease 160ms;
++  transition: box-shadow ease 160ms;
++  width: 12px;
++  -webkit-transform: translateX(-50%);
++  -moz-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++  left: var( --slider--progress );
++  will-change: transform;
++}
++
++*:disabled.emotion-6::-moz-range-thumb {
++  background: #949494;
++  border-color: #949494;
++}
++
++.emotion-6:focus::-webkit-slider-thumb {
++  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
++}
++
++.emotion-6:focus::-moz-range-thumb {
++  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
++}
++
++.emotion-7 {
++  box-sizing: border-box;
++  display: block;
++  pointer-events: none;
++  position: absolute;
++  width: 100%;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++}
++
++<div
++  class="components-base-control components-slider-control emotion-0 emotion-1"
++>
++  <div
++    class="components-base-control__field emotion-2 emotion-3"
++  >
++    <div
++      class="components-flex components-h-stack components-v-stack components-slider-control emotion-4 emotion-5"
++      data-wp-c16t="true"
++      data-wp-component="VStack"
++    >
++      <input
++        class="emotion-6 components-slider components-range-control__slider"
++        data-wp-c16t="true"
++        data-wp-component="SliderControl"
++        id="slider"
++        max="100"
++        min="0"
++        step="1"
++        style="--slider--progress: 50%;"
++        type="range"
++        value="50"
++      />
++      <span
++        aria-hidden="true"
++        class="components-marks emotion-7 emotion-5"
++      />
++    </div>
++  </div>
++</div>
++`;
++
++exports[`SliderControl should render max 1`] = `
++.emotion-0 {
++  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
++  font-size: 13px;
++  box-sizing: border-box;
++}
++
++.emotion-0 *,
++.emotion-0 *::before,
++.emotion-0 *::after {
++  box-sizing: inherit;
++}
++
++.emotion-2 {
++  margin-bottom: calc(4px * 2);
++}
++
++.components-panel__row .emotion-2 {
++  margin-bottom: inherit;
++}
++
++.emotion-4 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: normal;
++  -webkit-box-align: normal;
++  -ms-flex-align: normal;
++  align-items: normal;
++  -webkit-flex-direction: column;
++  -ms-flex-direction: column;
++  flex-direction: column;
++  gap: calc(4px * 2);
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  justify-content: space-between;
++  position: relative;
++}
++
++.emotion-4>* {
++  min-height: 0;
++}
++
++.emotion-6 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: transparent;
++  border: 0;
++  border-radius: 2px;
++  cursor: pointer;
++  display: block;
++  height: 36px;
++  max-width: 100%;
++  min-width: 0;
++  padding: 0;
++  margin: 0;
++  width: 100%;
++  z-index: 1;
++}
++
++.emotion-6:focus {
++  outline: none;
++}
++
++.emotion-6::-moz-focus-outer {
++  border: 0;
++}
++
++.emotion-6::-webkit-slider-runnable-track {
++  background: linear-gradient(
++  			to right,
++  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
++  			#f0f0f0 var( --slider--progress )
++  		);
++  border-radius: 2px;
++  height: 2px;
++}
++
++*:disabled.emotion-6::-webkit-slider-runnable-track {
++  background: #f0f0f0;
++}
++
++.emotion-6::-moz-range-track {
++  background: linear-gradient(
++  			to right,
++  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
++  			#f0f0f0 var( --slider--progress )
++  		);
++  border-radius: 2px;
++  height: 2px;
++  will-change: transform;
++}
++
++*:disabled.emotion-6::-moz-range-track {
++  background: #f0f0f0;
++}
++
++.emotion-6::-webkit-slider-thumb {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: var( --wp-admin-theme-color, #007cba);
++  border-radius: 50%;
++  border: 1px solid transparent;
++  box-shadow: none;
++  cursor: pointer;
++  height: 12px;
++  margin-top: -5px;
++  opacity: 1;
++  position: absolute;
++  -webkit-transition: box-shadow ease 160ms;
++  transition: box-shadow ease 160ms;
++  width: 12px;
++  -webkit-transform: translateX(-50%);
++  -moz-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++  left: var( --slider--progress );
++}
++
++*:disabled.emotion-6::-webkit-slider-thumb {
++  background: #949494;
++  border-color: #949494;
++}
++
++.emotion-6::-moz-range-thumb {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: var( --wp-admin-theme-color, #007cba);
++  border-radius: 50%;
++  border: 1px solid transparent;
++  box-shadow: none;
++  cursor: pointer;
++  height: 12px;
++  margin-top: -5px;
++  opacity: 1;
++  position: absolute;
++  -webkit-transition: box-shadow ease 160ms;
++  transition: box-shadow ease 160ms;
++  width: 12px;
++  -webkit-transform: translateX(-50%);
++  -moz-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++  left: var( --slider--progress );
++  will-change: transform;
++}
++
++*:disabled.emotion-6::-moz-range-thumb {
++  background: #949494;
++  border-color: #949494;
++}
++
++.emotion-6:focus::-webkit-slider-thumb {
++  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
++}
++
++.emotion-6:focus::-moz-range-thumb {
++  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
++}
++
++.emotion-7 {
++  box-sizing: border-box;
++  display: block;
++  pointer-events: none;
++  position: absolute;
++  width: 100%;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++}
++
++<div
++  class="components-base-control components-slider-control emotion-0 emotion-1"
++>
++  <div
++    class="components-base-control__field emotion-2 emotion-3"
++  >
++    <div
++      class="components-flex components-h-stack components-v-stack components-slider-control emotion-4 emotion-5"
++      data-wp-c16t="true"
++      data-wp-component="VStack"
++    >
++      <input
++        class="emotion-6 components-slider components-range-control__slider"
++        data-wp-c16t="true"
++        data-wp-component="SliderControl"
++        id="slider"
++        max="50"
++        min="0"
++        step="1"
++        style="--slider--progress: 50%;"
++        type="range"
++        value="25"
++      />
++      <span
++        aria-hidden="true"
++        class="components-marks emotion-7 emotion-5"
++      />
++    </div>
++  </div>
++</div>
++`;
++
++exports[`SliderControl should render min 1`] = `
++.emotion-0 {
++  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
++  font-size: 13px;
++  box-sizing: border-box;
++}
++
++.emotion-0 *,
++.emotion-0 *::before,
++.emotion-0 *::after {
++  box-sizing: inherit;
++}
++
++.emotion-2 {
++  margin-bottom: calc(4px * 2);
++}
++
++.components-panel__row .emotion-2 {
++  margin-bottom: inherit;
++}
++
++.emotion-4 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: normal;
++  -webkit-box-align: normal;
++  -ms-flex-align: normal;
++  align-items: normal;
++  -webkit-flex-direction: column;
++  -ms-flex-direction: column;
++  flex-direction: column;
++  gap: calc(4px * 2);
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  justify-content: space-between;
++  position: relative;
++}
++
++.emotion-4>* {
++  min-height: 0;
++}
++
++.emotion-6 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: transparent;
++  border: 0;
++  border-radius: 2px;
++  cursor: pointer;
++  display: block;
++  height: 36px;
++  max-width: 100%;
++  min-width: 0;
++  padding: 0;
++  margin: 0;
++  width: 100%;
++  z-index: 1;
++}
++
++.emotion-6:focus {
++  outline: none;
++}
++
++.emotion-6::-moz-focus-outer {
++  border: 0;
++}
++
++.emotion-6::-webkit-slider-runnable-track {
++  background: linear-gradient(
++  			to right,
++  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
++  			#f0f0f0 var( --slider--progress )
++  		);
++  border-radius: 2px;
++  height: 2px;
++}
++
++*:disabled.emotion-6::-webkit-slider-runnable-track {
++  background: #f0f0f0;
++}
++
++.emotion-6::-moz-range-track {
++  background: linear-gradient(
++  			to right,
++  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
++  			#f0f0f0 var( --slider--progress )
++  		);
++  border-radius: 2px;
++  height: 2px;
++  will-change: transform;
++}
++
++*:disabled.emotion-6::-moz-range-track {
++  background: #f0f0f0;
++}
++
++.emotion-6::-webkit-slider-thumb {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: var( --wp-admin-theme-color, #007cba);
++  border-radius: 50%;
++  border: 1px solid transparent;
++  box-shadow: none;
++  cursor: pointer;
++  height: 12px;
++  margin-top: -5px;
++  opacity: 1;
++  position: absolute;
++  -webkit-transition: box-shadow ease 160ms;
++  transition: box-shadow ease 160ms;
++  width: 12px;
++  -webkit-transform: translateX(-50%);
++  -moz-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++  left: var( --slider--progress );
++}
++
++*:disabled.emotion-6::-webkit-slider-thumb {
++  background: #949494;
++  border-color: #949494;
++}
++
++.emotion-6::-moz-range-thumb {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: var( --wp-admin-theme-color, #007cba);
++  border-radius: 50%;
++  border: 1px solid transparent;
++  box-shadow: none;
++  cursor: pointer;
++  height: 12px;
++  margin-top: -5px;
++  opacity: 1;
++  position: absolute;
++  -webkit-transition: box-shadow ease 160ms;
++  transition: box-shadow ease 160ms;
++  width: 12px;
++  -webkit-transform: translateX(-50%);
++  -moz-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++  left: var( --slider--progress );
++  will-change: transform;
++}
++
++*:disabled.emotion-6::-moz-range-thumb {
++  background: #949494;
++  border-color: #949494;
++}
++
++.emotion-6:focus::-webkit-slider-thumb {
++  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
++}
++
++.emotion-6:focus::-moz-range-thumb {
++  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
++}
++
++.emotion-7 {
++  box-sizing: border-box;
++  display: block;
++  pointer-events: none;
++  position: absolute;
++  width: 100%;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++}
++
++<div
++  class="components-base-control components-slider-control emotion-0 emotion-1"
++>
++  <div
++    class="components-base-control__field emotion-2 emotion-3"
++  >
++    <div
++      class="components-flex components-h-stack components-v-stack components-slider-control emotion-4 emotion-5"
++      data-wp-c16t="true"
++      data-wp-component="VStack"
++    >
++      <input
++        class="emotion-6 components-slider components-range-control__slider"
++        data-wp-c16t="true"
++        data-wp-component="SliderControl"
++        id="slider"
++        max="100"
++        min="5"
++        step="1"
++        style="--slider--progress: 50%;"
++        type="range"
++        value="52.5"
++      />
++      <span
++        aria-hidden="true"
++        class="components-marks emotion-7 emotion-5"
++      />
++    </div>
++  </div>
++</div>
++`;
++
++exports[`SliderControl should render size 1`] = `
++.emotion-0 {
++  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
++  font-size: 13px;
++  box-sizing: border-box;
++}
++
++.emotion-0 *,
++.emotion-0 *::before,
++.emotion-0 *::after {
++  box-sizing: inherit;
++}
++
++.emotion-2 {
++  margin-bottom: calc(4px * 2);
++}
++
++.components-panel__row .emotion-2 {
++  margin-bottom: inherit;
++}
++
++.emotion-4 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: normal;
++  -webkit-box-align: normal;
++  -ms-flex-align: normal;
++  align-items: normal;
++  -webkit-flex-direction: column;
++  -ms-flex-direction: column;
++  flex-direction: column;
++  gap: calc(4px * 2);
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  justify-content: space-between;
++  position: relative;
++}
++
++.emotion-4>* {
++  min-height: 0;
++}
++
++.emotion-6 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: transparent;
++  border: 0;
++  border-radius: 2px;
++  cursor: pointer;
++  display: block;
++  height: 40px;
++  max-width: 100%;
++  min-width: 0;
++  padding: 0;
++  margin: 0;
++  width: 100%;
++  z-index: 1;
++}
++
++.emotion-6:focus {
++  outline: none;
++}
++
++.emotion-6::-moz-focus-outer {
++  border: 0;
++}
++
++.emotion-6::-webkit-slider-runnable-track {
++  background: linear-gradient(
++  			to right,
++  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
++  			#f0f0f0 var( --slider--progress )
++  		);
++  border-radius: 2px;
++  height: 2px;
++}
++
++*:disabled.emotion-6::-webkit-slider-runnable-track {
++  background: #f0f0f0;
++}
++
++.emotion-6::-moz-range-track {
++  background: linear-gradient(
++  			to right,
++  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
++  			#f0f0f0 var( --slider--progress )
++  		);
++  border-radius: 2px;
++  height: 2px;
++  will-change: transform;
++}
++
++*:disabled.emotion-6::-moz-range-track {
++  background: #f0f0f0;
++}
++
++.emotion-6::-webkit-slider-thumb {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: var( --wp-admin-theme-color, #007cba);
++  border-radius: 50%;
++  border: 1px solid transparent;
++  box-shadow: none;
++  cursor: pointer;
++  height: 12px;
++  margin-top: -5px;
++  opacity: 1;
++  position: absolute;
++  -webkit-transition: box-shadow ease 160ms;
++  transition: box-shadow ease 160ms;
++  width: 12px;
++  -webkit-transform: translateX(-50%);
++  -moz-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++  left: var( --slider--progress );
++}
++
++*:disabled.emotion-6::-webkit-slider-thumb {
++  background: #949494;
++  border-color: #949494;
++}
++
++.emotion-6::-moz-range-thumb {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: var( --wp-admin-theme-color, #007cba);
++  border-radius: 50%;
++  border: 1px solid transparent;
++  box-shadow: none;
++  cursor: pointer;
++  height: 12px;
++  margin-top: -5px;
++  opacity: 1;
++  position: absolute;
++  -webkit-transition: box-shadow ease 160ms;
++  transition: box-shadow ease 160ms;
++  width: 12px;
++  -webkit-transform: translateX(-50%);
++  -moz-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++  left: var( --slider--progress );
++  will-change: transform;
++}
++
++*:disabled.emotion-6::-moz-range-thumb {
++  background: #949494;
++  border-color: #949494;
++}
++
++.emotion-6:focus::-webkit-slider-thumb {
++  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
++}
++
++.emotion-6:focus::-moz-range-thumb {
++  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
++}
++
++.emotion-7 {
++  box-sizing: border-box;
++  display: block;
++  pointer-events: none;
++  position: absolute;
++  width: 100%;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++}
++
++<div
++  class="components-base-control components-slider-control emotion-0 emotion-1"
++>
++  <div
++    class="components-base-control__field emotion-2 emotion-3"
++  >
++    <div
++      class="components-flex components-h-stack components-v-stack components-slider-control emotion-4 emotion-5"
++      data-wp-c16t="true"
++      data-wp-component="VStack"
++    >
++      <input
++        class="emotion-6 components-slider components-range-control__slider"
++        data-wp-c16t="true"
++        data-wp-component="SliderControl"
++        id="slider"
++        max="100"
++        min="0"
++        step="1"
++        style="--slider--progress: 50%;"
++        type="range"
++        value="50"
++      />
++      <span
++        aria-hidden="true"
++        class="components-marks emotion-7 emotion-5"
++      />
++    </div>
++  </div>
++</div>
++`;
++
++exports[`SliderControl should render value 1`] = `
++.emotion-0 {
++  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
++  font-size: 13px;
++  box-sizing: border-box;
++}
++
++.emotion-0 *,
++.emotion-0 *::before,
++.emotion-0 *::after {
++  box-sizing: inherit;
++}
++
++.emotion-2 {
++  margin-bottom: calc(4px * 2);
++}
++
++.components-panel__row .emotion-2 {
++  margin-bottom: inherit;
++}
++
++.emotion-4 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: normal;
++  -webkit-box-align: normal;
++  -ms-flex-align: normal;
++  align-items: normal;
++  -webkit-flex-direction: column;
++  -ms-flex-direction: column;
++  flex-direction: column;
++  gap: calc(4px * 2);
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  justify-content: space-between;
++  position: relative;
++}
++
++.emotion-4>* {
++  min-height: 0;
++}
++
++.emotion-6 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: transparent;
++  border: 0;
++  border-radius: 2px;
++  cursor: pointer;
++  display: block;
++  height: 36px;
++  max-width: 100%;
++  min-width: 0;
++  padding: 0;
++  margin: 0;
++  width: 100%;
++  z-index: 1;
++}
++
++.emotion-6:focus {
++  outline: none;
++}
++
++.emotion-6::-moz-focus-outer {
++  border: 0;
++}
++
++.emotion-6::-webkit-slider-runnable-track {
++  background: linear-gradient(
++  			to right,
++  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
++  			#f0f0f0 var( --slider--progress )
++  		);
++  border-radius: 2px;
++  height: 2px;
++}
++
++*:disabled.emotion-6::-webkit-slider-runnable-track {
++  background: #f0f0f0;
++}
++
++.emotion-6::-moz-range-track {
++  background: linear-gradient(
++  			to right,
++  			var( --wp-admin-theme-color, #007cba) var( --slider--progress ),
++  			#f0f0f0 var( --slider--progress )
++  		);
++  border-radius: 2px;
++  height: 2px;
++  will-change: transform;
++}
++
++*:disabled.emotion-6::-moz-range-track {
++  background: #f0f0f0;
++}
++
++.emotion-6::-webkit-slider-thumb {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: var( --wp-admin-theme-color, #007cba);
++  border-radius: 50%;
++  border: 1px solid transparent;
++  box-shadow: none;
++  cursor: pointer;
++  height: 12px;
++  margin-top: -5px;
++  opacity: 1;
++  position: absolute;
++  -webkit-transition: box-shadow ease 160ms;
++  transition: box-shadow ease 160ms;
++  width: 12px;
++  -webkit-transform: translateX(-50%);
++  -moz-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++  left: var( --slider--progress );
++}
++
++*:disabled.emotion-6::-webkit-slider-thumb {
++  background: #949494;
++  border-color: #949494;
++}
++
++.emotion-6::-moz-range-thumb {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  -ms-appearance: none;
++  appearance: none;
++  background-color: var( --wp-admin-theme-color, #007cba);
++  border-radius: 50%;
++  border: 1px solid transparent;
++  box-shadow: none;
++  cursor: pointer;
++  height: 12px;
++  margin-top: -5px;
++  opacity: 1;
++  position: absolute;
++  -webkit-transition: box-shadow ease 160ms;
++  transition: box-shadow ease 160ms;
++  width: 12px;
++  -webkit-transform: translateX(-50%);
++  -moz-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++  left: var( --slider--progress );
++  will-change: transform;
++}
++
++*:disabled.emotion-6::-moz-range-thumb {
++  background: #949494;
++  border-color: #949494;
++}
++
++.emotion-6:focus::-webkit-slider-thumb {
++  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
++}
++
++.emotion-6:focus::-moz-range-thumb {
++  box-shadow: 0 0 0 2px #fff,0 0 0 calc(2px + 1px) var( --wp-admin-theme-color, #007cba);
++}
++
++.emotion-7 {
++  box-sizing: border-box;
++  display: block;
++  pointer-events: none;
++  position: absolute;
++  width: 100%;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++}
++
++.emotion-9 {
++  background: rgba( 0, 0, 0, 0.8 );
++  border-radius: 2px;
++  box-sizing: border-box;
++  color: white;
++  display: inline-block;
++  font-size: 12px;
++  min-width: 32px;
++  opacity: 0;
++  padding: 4px 8px;
++  pointer-events: none;
++  position: absolute;
++  text-align: center;
++  -webkit-transition: opacity 120ms ease;
++  transition: opacity 120ms ease;
++  -webkit-user-select: none;
++  -moz-user-select: none;
++  -ms-user-select: none;
++  user-select: none;
++  line-height: 1.4;
++  opacity: 0;
++  z-index: 100;
++  bottom: -60%;
++  -webkit-transform: translateX(-50%);
++  -moz-transform: translateX(-50%);
++  -ms-transform: translateX(-50%);
++  transform: translateX(-50%);
++  left: 40%;
++}
++
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-9 {
++    transition-duration: 0ms;
++  }
++}
++
++<div
++  class="components-base-control components-slider-control emotion-0 emotion-1"
++>
++  <div
++    class="components-base-control__field emotion-2 emotion-3"
++  >
++    <div
++      class="components-flex components-h-stack components-v-stack components-slider-control emotion-4 emotion-5"
++      data-wp-c16t="true"
++      data-wp-component="VStack"
++    >
++      <input
++        class="emotion-6 components-slider components-range-control__slider"
++        data-wp-c16t="true"
++        data-wp-component="SliderControl"
++        id="slider"
++        max="100"
++        min="0"
++        step="1"
++        style="--slider--progress: 40%;"
++        type="range"
++        value="40"
++      />
++      <span
++        aria-hidden="true"
++        class="components-marks emotion-7 emotion-5"
++      />
++      <span
++        aria-hidden="true"
++        class="components-tooltip emotion-9 emotion-5"
++        data-wp-c16t="true"
++        data-wp-component="Tooltip"
++      >
++        40
++      </span>
++    </div>
++  </div>
++</div>
++`;
+diff --git a/packages/components/src/slider-control/test/index.tsx b/packages/components/src/slider-control/test/index.tsx
+new file mode 100644
+index 00000000000000..55654ebc51eaa2
+--- /dev/null
++++ b/packages/components/src/slider-control/test/index.tsx
+@@ -0,0 +1,45 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { SliderControl } from '../index';
++
++const renderSliderControl = ( props = {} ) => {
++	// Disabled because of our rule restricting literal IDs, preferring
++	// `withInstanceId`. In this case, it's fine to use literal IDs.
++	// eslint-disable-next-line no-restricted-syntax
++	return render( <SliderControl id="slider" { ...props } /> );
++};
++
++describe( 'SliderControl', () => {
++	test( 'should render correctly', () => {
++		const { container } = renderSliderControl();
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render min', () => {
++		const { container } = renderSliderControl( { min: 5 } );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render max', () => {
++		const { container } = renderSliderControl( { max: 50 } );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render size', () => {
++		const { container } = renderSliderControl( {
++			size: '__unstable-large',
++		} );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render value', () => {
++		const { container } = renderSliderControl( { value: 40 } );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++} );
+diff --git a/packages/components/src/slider-control/tooltip/component.tsx b/packages/components/src/slider-control/tooltip/component.tsx
+new file mode 100644
+index 00000000000000..82a7f0b7d6d83a
+--- /dev/null
++++ b/packages/components/src/slider-control/tooltip/component.tsx
+@@ -0,0 +1,30 @@
++/**
++ * Internal dependencies
++ */
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
++import { useTooltip } from './hook';
++import { View } from '../../view';
++
++import type { TooltipProps } from '../types';
++
++const UnconnectedTooltip = (
++	props: WordPressComponentProps< TooltipProps, 'span' >,
++	forwardedRef: React.ForwardedRef< any >
++) => {
++	const { className, content, ...otherProps } = useTooltip( props );
++
++	return (
++		<View
++			as="span"
++			{ ...otherProps }
++			aria-hidden="true"
++			className={ className }
++			ref={ forwardedRef }
++		>
++			{ content }
++		</View>
++	);
++};
++
++export const Tooltip = contextConnect( UnconnectedTooltip, 'Tooltip' );
++export default Tooltip;
+diff --git a/packages/components/src/slider-control/tooltip/hook.ts b/packages/components/src/slider-control/tooltip/hook.ts
+new file mode 100644
+index 00000000000000..24d95c9cbbfb5e
+--- /dev/null
++++ b/packages/components/src/slider-control/tooltip/hook.ts
+@@ -0,0 +1,70 @@
++/**
++ * WordPress dependencies
++ */
++import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from '../styles';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
++import { useCx } from '../../utils/hooks';
++
++import type { TooltipProps } from '../types';
++
++function useTooltipPosition( { inputRef, tooltipPosition }: TooltipProps ) {
++	const [ position, setPosition ] = useState< string >();
++
++	const setTooltipPosition = useCallback( () => {
++		if ( inputRef && inputRef.current ) {
++			setPosition( tooltipPosition );
++		}
++	}, [ tooltipPosition, inputRef ] );
++
++	useEffect( () => {
++		setTooltipPosition();
++	}, [ setTooltipPosition ] );
++
++	useEffect( () => {
++		window.addEventListener( 'resize', setTooltipPosition );
++
++		return () => {
++			window.removeEventListener( 'resize', setTooltipPosition );
++		};
++	} );
++
++	return position;
++}
++
++export function useTooltip(
++	props: WordPressComponentProps< TooltipProps, 'span' >
++) {
++	const {
++		className,
++		inputRef,
++		renderTooltipContent = ( v: number | '' | null ) => v,
++		show = false,
++		fillPercentage = 50,
++		tooltipPosition = 'bottom',
++		value = 0,
++		zIndex = 100,
++		...otherProps
++	} = useContextSystem( props, 'Tooltip' );
++
++	const position = useTooltipPosition( { inputRef, tooltipPosition } );
++
++	// Generate dynamic class names.
++	const cx = useCx();
++	const classes = useMemo( () => {
++		const tooltipProps = { fillPercentage, position, show, zIndex };
++		return cx( styles.tooltip( tooltipProps ), className );
++	}, [ className, cx, fillPercentage, position, show, zIndex ] );
++
++	const content = renderTooltipContent( value );
++
++	return {
++		...otherProps,
++		className: classes,
++		content,
++	};
++}
+diff --git a/packages/components/src/slider-control/types.ts b/packages/components/src/slider-control/types.ts
+new file mode 100644
+index 00000000000000..0a48535cbab6c7
+--- /dev/null
++++ b/packages/components/src/slider-control/types.ts
+@@ -0,0 +1,260 @@
++/**
++ * External dependencies
++ */
++import type {
++	CSSProperties,
++	FocusEventHandler,
++	MouseEventHandler,
++	MutableRefObject,
++} from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { BaseControlProps } from '../base-control/types';
++
++export type SliderSizes = 'default' | '__unstable-large';
++export type SliderColors = {
++	/**
++	 * CSS color string to customize the Slider's error state.
++	 *
++	 * @default CONFIG.controlDestructiveBorderColor
++	 */
++	errorColor?: CSSProperties[ 'color' ];
++	/**
++	 * Allows customization of the thumb's color.
++	 *
++	 * @default COLORS.ui.theme
++	 */
++	thumbColor?: CSSProperties[ 'color' ];
++	/**
++	 * CSS color string to customize the track elements foreground color. This
++	 * is the portion of the Slider's track representing progress or the actual
++	 * value selected.
++	 *
++	 * @default COLORS.ui.theme
++	 */
++	trackColor?: CSSProperties[ 'color' ];
++	/**
++	 * CSS color string to customize the background for the track element.
++	 *
++	 * @default CONFIG.controlBackgroundDimColor
++	 */
++	trackBackgroundColor?: CSSProperties[ 'color' ];
++};
++
++export type SliderProps = SliderColors & {
++	/**
++	 * Default value for input.
++	 */
++	defaultValue?: number;
++	/**
++	 * Renders an error state.
++	 *
++	 * @default false
++	 */
++	error?: boolean;
++	/**
++	 * Renders focused styles.
++	 *
++	 * @default false
++	 */
++	isFocused?: boolean;
++	/**
++	 * Callback function when the `value` is committed.
++	 */
++	onChange?: ( value: number ) => void;
++	/**
++	 * Callback for when mouse exits the `RangeControl`.
++	 *
++	 * @default () => void
++	 */
++	onMouseLeave?: MouseEventHandler< HTMLInputElement >;
++	/**
++	 * Callback for when mouse moves within the `RangeControl`.
++	 *
++	 * @default () => void
++	 */
++	onMouseMove?: MouseEventHandler< HTMLInputElement >;
++	/**
++	 * Toggles which sized height the slider is rendered at.
++	 *
++	 * @default 'default'
++	 */
++	size?: SliderSizes;
++	/**
++	 * The Slider's current value.
++	 */
++	value?: number;
++};
++
++export type NumericProps = {
++	/**
++	 * The minimum `value` allowed.
++	 *
++	 * @default 0
++	 */
++	min?: number;
++	/**
++	 * The maximum `value` allowed.
++	 *
++	 * @default 100
++	 */
++	max?: number;
++	/**
++	 * The current value of the range slider.
++	 */
++	value?: number;
++};
++
++export type MarksProps = NumericProps & {
++	/**
++	 * Disables the `input`, preventing new values from being applied.
++	 *
++	 * @default false
++	 */
++	disabled?: boolean;
++	/**
++	 * Renders a visual representation of `step` ticks. Custom mark indicators
++	 * can be provided by an `Array`.
++	 *
++	 * @default false
++	 */
++	marks?: boolean | { value: number; label?: string }[];
++	/**
++	 * The minimum amount by which `value` changes. It is also a factor in
++	 * validation as `value` must be a multiple of `step` (offset by `min`) to
++	 * be valid. Accepts the special string value `any` that voids the
++	 * validation constraint and overrides the `showTooltip` prop to `false`.
++	 *
++	 * @default 1
++	 */
++	step?: number | 'any';
++};
++
++type RenderTooltipContent = (
++	value?: number | '' | null
++) => string | number | null | undefined;
++
++export type SliderControlProps = SliderProps &
++	MarksProps &
++	Pick< BaseControlProps, 'hideLabelFromVision' | 'help' > & {
++		/**
++		 * If no value exists this prop contains the slider starting position.
++		 */
++		initialPosition?: number;
++		/**
++		 * If this property is added, a label will be generated using label
++		 * property as the content.
++		 */
++		label?: string;
++		/**
++		 * Callback for when `RangeControl` input loses focus.
++		 *
++		 * @default () => void
++		 */
++		onBlur?: FocusEventHandler< HTMLInputElement >;
++		/**
++		 * A function that receives the new value. The value will be less than
++		 * `max` and more than `min` unless a reset (enabled by `allowReset`)
++		 * has occurred. In which case the value will be either that of
++		 * `resetFallbackValue` if it has been specified or otherwise
++		 * `undefined`.
++		 *
++		 * @default () => void
++		 */
++		onChange?: ( value?: number ) => void;
++		/**
++		 * Callback for when `RangeControl` input gains focus.
++		 *
++		 * @default () => void
++		 */
++		onFocus?: FocusEventHandler< HTMLInputElement >;
++		/**
++		 * A way to customize the rendered UI of the value.
++		 *
++		 * @default ( value ) => value
++		 */
++		renderTooltipContent?: RenderTooltipContent;
++		/**
++		 * Forcing the Tooltip UI to show or hide. This is overridden to `false`
++		 * when `step` is set to the special string value `any`.
++		 */
++		showTooltip?: boolean;
++	};
++
++export type TooltipProps = {
++	show?: boolean;
++	fillPercentage?: number;
++	position?: string;
++	inputRef?: MutableRefObject< HTMLElement | undefined >;
++	tooltipPosition?: string;
++	value?: number | '' | null;
++	renderTooltipContent?: RenderTooltipContent;
++	zIndex?: number;
++};
++
++export type MarkProps = {
++	isFilled?: boolean;
++	label?: string;
++	disabled?: boolean;
++	key?: string;
++	style?: CSSProperties;
++};
++
++export type useMarksDataArgs = NumericProps & {
++	marks: boolean | { value: number; label?: string }[];
++	step: number;
++};
++
++export type UseControlledRangeValueArgs = {
++	/**
++	 * The initial value.
++	 */
++	initial?: number;
++	/**
++	 * The maximum value.
++	 */
++	max: number;
++	/**
++	 * The minimum value.
++	 */
++	min: number;
++	/**
++	 * The current value.
++	 */
++	value: number | null;
++};
++
++export type UseDebouncedHoverInteractionArgs = {
++	/**
++	 *  A callback function invoked when the element is hidden.
++	 *
++	 * @default () => {}
++	 */
++	onHide?: () => void;
++	/**
++	 * A callback function invoked when the mouse is moved out of the element.
++	 *
++	 * @default () => {}
++	 */
++	onMouseLeave?: MouseEventHandler< HTMLInputElement >;
++	/**
++	 * A callback function invoked when the mouse is moved.
++	 *
++	 * @default () => {}
++	 */
++	onMouseMove?: MouseEventHandler< HTMLInputElement >;
++	/**
++	 * A callback function invoked when the element is shown.
++	 *
++	 * @default () => {}
++	 */
++	onShow?: () => void;
++	/**
++	 * Timeout before the element is shown or hidden.
++	 *
++	 * @default 300
++	 */
++	timeout?: number;
++};
+diff --git a/packages/components/src/slider-control/utils.ts b/packages/components/src/slider-control/utils.ts
+new file mode 100644
+index 00000000000000..dcc438a84cfab6
+--- /dev/null
++++ b/packages/components/src/slider-control/utils.ts
+@@ -0,0 +1,60 @@
++/**
++ * WordPress dependencies
++ */
++import { useCallback } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useControlledState } from '../utils/hooks';
++import { clamp } from '../utils/math';
++
++import type { UseControlledRangeValueArgs } from './types';
++
++/**
++ * A float supported clamp function for a specific value.
++ *
++ * @param  value The value to clamp.
++ * @param  min   The minimum value.
++ * @param  max   The maximum value.
++ *
++ * @return A (float) number
++ */
++export function floatClamp( value: number | null, min: number, max: number ) {
++	if ( typeof value !== 'number' ) {
++		return null;
++	}
++
++	return parseFloat( `${ clamp( value, min, max ) }` );
++}
++
++/**
++ * Hook to store a clamped value, derived from props.
++ *
++ * @param  settings
++ * @return The controlled value and the value setter.
++ */
++export function useControlledRangeValue(
++	settings: UseControlledRangeValueArgs
++) {
++	const { min, max, value: valueProp, initial } = settings;
++	const [ state, setInternalState ] = useControlledState(
++		floatClamp( valueProp, min, max ),
++		{ initial, fallback: null }
++	);
++
++	const setState = useCallback(
++		( nextValue: number | null ) => {
++			if ( nextValue === null ) {
++				setInternalState( null );
++			} else {
++				setInternalState( floatClamp( nextValue, min, max ) );
++			}
++		},
++		[ min, max ]
++	);
++
++	// `state` can't be an empty string because we specified a fallback value of
++	// `null` in `useControlledState`
++	return [ state as Exclude< typeof state, '' >, setState ] as const;
++}
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 05364a34a5eed1..9937fa69407802 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -14,11 +14,14 @@ const CONTROL_PROPS = {
+ 	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
+ 	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
+ 	controlBackgroundColor: COLORS.white,
++	controlBackgroundDimColor: COLORS.ui.backgroundDisabled,
+ 	controlBorderRadius: '2px',
+ 	controlBorderColor: COLORS.gray[ 700 ],
+ 	controlBoxShadow: 'transparent',
+ 	controlBorderColorHover: COLORS.gray[ 700 ],
+ 	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.ui.theme }`,
++	controlBoxShadowFocusSize: '0.5px',
++	controlPseudoBoxShadowFocusWidth: '2px',
+ 	controlDestructiveBorderColor: COLORS.alert.red,
+ 	controlHeight: CONTROL_HEIGHT,
+ 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
+diff --git a/packages/components/src/utils/interpolate.ts b/packages/components/src/utils/interpolate.ts
+new file mode 100644
+index 00000000000000..49189a73457243
+--- /dev/null
++++ b/packages/components/src/utils/interpolate.ts
+@@ -0,0 +1,105 @@
++/**
++ * Internal dependencies
++ */
++import { clamp } from './math';
++
++/**
++ * Interpolation from:
++ * https://github.com/react-spring/react-spring/blob/master/src/animated/createInterpolator.ts
++ */
++
++function findRange( input: number, inputRange: number[] ): number {
++	let i;
++	for ( i = 1; i < inputRange.length - 1; ++i ) {
++		if ( inputRange[ i ] >= input ) {
++			break;
++		}
++	}
++	return i - 1;
++}
++
++/**
++ * Base interpolate function.
++ *
++ * @param {number} [input=0]
++ * @param {number} [inputMin=0]
++ * @param {number} [inputMax=1]
++ * @param {number} [outputMin=0]
++ * @param {number} [outputMax=1]
++ *
++ * @return {number} The interpolated value.
++ */
++function baseInterpolate(
++	input: number = 0,
++	inputMin: number = 0,
++	inputMax: number = 1,
++	outputMin: number = 0,
++	outputMax: number = 1
++) {
++	let result = input;
++
++	if ( outputMin === outputMax ) return outputMin;
++	if ( inputMin === inputMax )
++		return input <= inputMin ? outputMin : outputMax;
++
++	// Input Range
++	if ( inputMin === -Infinity ) result = -result;
++	else if ( inputMax === Infinity ) result = result - inputMin;
++	else result = ( result - inputMin ) / ( inputMax - inputMin );
++
++	// Output Range
++	if ( outputMin === -Infinity ) result = -result;
++	else if ( outputMax === Infinity ) result = result + outputMin;
++	else result = result * ( outputMax - outputMin ) + outputMin;
++
++	let clampMin = outputMin;
++	let clampMax = outputMax;
++
++	if ( outputMax < outputMin ) {
++		clampMin = outputMax;
++		clampMax = outputMin;
++	}
++
++	return clamp( result, clampMin, clampMax );
++}
++
++/**
++ * Gets a value based on an input range and an output range.
++ * Can be used for a set of numbers.
++ *
++ * @param {number}           [input=0]
++ * @param {[number, number]} [inputRange=[0,1]]
++ * @param {[number, number]} [outputRange=[0,1]]
++ *
++ * @return {number} The interpolated value.
++ */
++export function interpolate(
++	input: number = 0,
++	inputRange: [ number, number ] = [ 0, 1 ],
++	outputRange: [ number, number ] = [ 0, 1 ]
++) {
++	const range = findRange( input, inputRange );
++	const outputRange1 = outputRange[ range ];
++	const outputRange2 = outputRange[ range + 1 ];
++
++	return baseInterpolate(
++		input,
++		inputRange[ range ],
++		inputRange[ range + 1 ],
++		outputRange1,
++		outputRange2
++	);
++}
++
++/**
++ * Gets a rounded value based on an input range and an output range.
++ *
++ * @param {Parameters<interpolate>} args
++ *
++ * @return {number} The rounded interpolated value.
++ */
++export function interpolateRounded(
++	...args: [ number, [ number, number ], [ number, number ] ]
++) {
++	return Math.round( interpolate( ...args ) );
++}
+diff --git a/packages/components/src/utils/test/interpolate.ts b/packages/components/src/utils/test/interpolate.ts
+new file mode 100644
+index 00000000000000..42623f6af2b2ae
+--- /dev/null
++++ b/packages/components/src/utils/test/interpolate.ts
+@@ -0,0 +1,104 @@
++/**
++ * Internal dependencies
++ */
++import { interpolate, interpolateRounded } from '../interpolate';
++
++describe( 'interpolate', () => {
++	it( 'should work with defaults', () => {
++		// Defaults to input: 0, inputRange: [ 0, 1 ], outputRange: [ 0, 1 ]
++		expect( interpolate( -1 ) ).toBe( 0 );
++		expect( interpolate() ).toBe( 0 );
++		expect( interpolate( 0.5 ) ).toBe( 0.5 );
++		expect( interpolate( 1 ) ).toBe( 1 );
++		expect( interpolate( 10 ) ).toBe( 1 );
++	} );
++
++	it( 'should handle single value output range', () => {
++		expect( interpolate( 0.5, [ 0, 1 ], [ 100, 100 ] ) ).toBe( 100 );
++	} );
++
++	it( 'should handle single value input range', () => {
++		const inputRange: [ number, number ] = [ 1, 1 ];
++		const outputRange: [ number, number ] = [ 100, 200 ];
++
++		expect( interpolate( 1, inputRange, outputRange ) ).toBe( 100 );
++		expect( interpolate( 5, inputRange, outputRange ) ).toBe( 200 );
++	} );
++
++	it( 'should correctly map values within input range', () => {
++		const inputRange: [ number, number ] = [ 0, 100 ];
++		const outputRange: [ number, number ] = [ 0, 1 ];
++
++		expect( interpolate( 0, inputRange, outputRange ) ).toBe( 0 );
++		expect( interpolate( 10, inputRange, outputRange ) ).toBe( 0.1 );
++		expect( interpolate( 50, inputRange, outputRange ) ).toBe( 0.5 );
++		expect( interpolate( 100, inputRange, outputRange ) ).toBe( 1 );
++	} );
++
++	it( 'should clamp values outside input range', () => {
++		const inputRange: [ number, number ] = [ 10, 50 ];
++		const outputRange: [ number, number ] = [ 0, 1 ];
++
++		expect( interpolate( -1, inputRange, outputRange ) ).toBe( 0 );
++		expect( interpolate( 0, inputRange, outputRange ) ).toBe( 0 );
++		expect( interpolate( 5, inputRange, outputRange ) ).toBe( 0 );
++		expect( interpolate( 51, inputRange, outputRange ) ).toBe( 1 );
++		expect( interpolate( 100, inputRange, outputRange ) ).toBe( 1 );
++	} );
++
++	it( 'should return original valid input if both ranges match', () => {
++		expect( interpolate( 1, [ 0, 100 ], [ 0, 100 ] ) ).toBe( 1 );
++		expect( interpolate( -10, [ -100, -1 ], [ -100, -1 ] ) ).toBe( -10 );
++	} );
++
++	it( 'should map negative ranges and values', () => {
++		expect( interpolate( -75, [ -100, -50 ], [ 0, 100 ] ) ).toBe( 50 );
++		expect( interpolate( -60, [ -100, -50 ], [ -50, -10 ] ) ).toBe( -18 );
++		expect( interpolate( 75, [ 0, 100 ], [ -100, -50 ] ) ).toBe( -62.5 );
++		expect( interpolate( 33, [ 0, 100 ], [ -100, -50 ] ) ).toBe( -83.5 );
++		expect( interpolate( 25, [ 0, 100 ], [ -100, 100 ] ) ).toBe( -50 );
++		expect( interpolate( 75, [ 0, 100 ], [ -100, 100 ] ) ).toBe( 50 );
++	} );
++
++	it( 'should handle input range with -Infinity minimum', () => {
++		const inputRange: [ number, number ] = [ -Infinity, 0 ];
++
++		expect( interpolate( -1000, inputRange, [ -Infinity, 1000 ] ) ).toBe(
++			-1000
++		);
++		expect(
++			interpolate( -Infinity, inputRange, [ -Infinity, 1000 ] )
++		).toBe( -Infinity );
++		expect( interpolate( 0, inputRange, [ 1, Infinity ] ) ).toBe( 1 );
++		expect( interpolate( -25, inputRange, [ 100, Infinity ] ) ).toBe( 125 );
++		expect( interpolate( -5, inputRange, [ 1000, 2000 ] ) ).toBe( 2000 );
++	} );
++
++	it( 'should handle input range with Infinity maximum', () => {
++		const inputRange: [ number, number ] = [ 0, Infinity ];
++
++		expect( interpolate( 1000, inputRange, [ -Infinity, 1000 ] ) ).toBe(
++			-1000
++		);
++		expect( interpolate( Infinity, inputRange, [ -Infinity, 1000 ] ) ).toBe(
++			-Infinity
++		);
++		expect( interpolate( 0, inputRange, [ 1, Infinity ] ) ).toBe( 1 );
++		expect( interpolate( 25, inputRange, [ 100, Infinity ] ) ).toBe( 125 );
++		expect( interpolate( 5, inputRange, [ 1000, 2000 ] ) ).toBe( 2000 );
++	} );
++
++	it( 'should handle reversed output range', () => {
++		expect( interpolate( 50, [ 0, 100 ], [ 60, 30 ] ) ).toBe( 45 );
++		expect( interpolate( 500, [ 0, 100 ], [ 60, 30 ] ) ).toBe( 30 );
++		expect( interpolate( -100, [ 0, 100 ], [ 60, 30 ] ) ).toBe( 60 );
++	} );
++} );
++
++describe( 'interpolateRounded', () => {
++	it( 'should round interpolated values', () => {
++		const rawValue = interpolate( 1, [ 0, 3 ], [ 0, 100 ] ); // 33.3333...
++		const value = Math.round( rawValue ); // 33
++		expect( interpolateRounded( 1, [ 0, 3 ], [ 0, 100 ] ) ).toBe( value );
++	} );
++} );

@@ -1,0 +1,1535 @@
+diff --git a/package-lock.json b/package-lock.json
+index cfa78b4f4fc03f..f84bf01bfd0af2 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -6182,9 +6182,9 @@
+ 			}
+ 		},
+ 		"@popperjs/core": {
+-			"version": "2.1.1",
+-			"resolved": "https://registry.npmjs.org/@popperjs/core/-/core-2.1.1.tgz",
+-			"integrity": "sha512-sLqWxCzC5/QHLhziXSCAksBxHfOnQlhPRVgPK0egEw+ktWvG75T2k+aYWVjVh9+WKeT3tlG3ZNbZQvZLmfuOIw=="
++			"version": "2.4.0",
++			"resolved": "https://registry.npmjs.org/@popperjs/core/-/core-2.4.0.tgz",
++			"integrity": "sha512-NMrDy6EWh9TPdSRiHmHH2ye1v5U0gBD7pRYwSwJvomx7Bm4GG04vu63dYiVzebLOx2obPpJugew06xVP0Nk7hA=="
+ 		},
+ 		"@reach/router": {
+ 			"version": "1.2.1",
+@@ -9954,7 +9954,7 @@
+ 				"re-resizable": "^6.0.0",
+ 				"react-dates": "^17.1.1",
+ 				"react-spring": "^8.0.20",
+-				"reakit": "^1.0.0-rc.0",
++				"reakit": "^1.0.0-rc.2",
+ 				"rememo": "^3.0.0",
+ 				"tinycolor2": "^1.4.1",
+ 				"uuid": "^7.0.2"
+@@ -13525,9 +13525,9 @@
+ 			}
+ 		},
+ 		"body-scroll-lock": {
+-			"version": "2.7.1",
+-			"resolved": "https://registry.npmjs.org/body-scroll-lock/-/body-scroll-lock-2.7.1.tgz",
+-			"integrity": "sha512-hS53SQ8RhM0e4DsQ3PKz6Gr2O7Kpdh59TWU98GHjaQznL7y4dFycEPk7pFQAikqBaUSCArkc5E3pe7CWIt2fZA=="
++			"version": "3.0.2",
++			"resolved": "https://registry.npmjs.org/body-scroll-lock/-/body-scroll-lock-3.0.2.tgz",
++			"integrity": "sha512-PtItUun94iIupKry8J/h6SfRCLWZnly77KbPsTSKALmxfR282L8R0Ujkv7bydSZvLxAJS4sBJ3y/E6X8gYkGrQ=="
+ 		},
+ 		"boolbase": {
+ 			"version": "1.0.0",
+@@ -37035,36 +37035,36 @@
+ 			}
+ 		},
+ 		"reakit": {
+-			"version": "1.0.0-rc.0",
+-			"resolved": "https://registry.npmjs.org/reakit/-/reakit-1.0.0-rc.0.tgz",
+-			"integrity": "sha512-jG9RfLE9DX3XP6xiUmindu8dJmd4rLs+ohQ2xppF9LVYQ/7Qa9B4kz8mNYbe42u8muE3nMM78T2RfXz+c/ZMsQ==",
++			"version": "1.0.0-rc.2",
++			"resolved": "https://registry.npmjs.org/reakit/-/reakit-1.0.0-rc.2.tgz",
++			"integrity": "sha512-+Snfc9Y/VMozEDXld3CJtvqgTyFCE67FXBmaDcvBuO3z2U/ZAHiAOBprF+ZN/QhsiVNMk1faj791vDBTokxS4w==",
+ 			"requires": {
+-				"@popperjs/core": "^2.1.0",
+-				"body-scroll-lock": "^2.6.4",
+-				"reakit-system": "^0.10.0",
+-				"reakit-utils": "^0.10.0",
+-				"reakit-warning": "^0.1.0"
++				"@popperjs/core": "^2.3.3",
++				"body-scroll-lock": "^3.0.1",
++				"reakit-system": "^0.12.0",
++				"reakit-utils": "^0.12.0",
++				"reakit-warning": "^0.3.0"
+ 			}
+ 		},
+ 		"reakit-system": {
+-			"version": "0.10.0",
+-			"resolved": "https://registry.npmjs.org/reakit-system/-/reakit-system-0.10.0.tgz",
+-			"integrity": "sha512-73ZI50NB2A6WAF3OsPJEEz73fax5cFiMoGMx3KxPT/AcS39rPqlBW6QkawtZC1HUebQXlsLxwZWicoFt8UubmQ==",
++			"version": "0.12.0",
++			"resolved": "https://registry.npmjs.org/reakit-system/-/reakit-system-0.12.0.tgz",
++			"integrity": "sha512-lqesr7jmOEDEqKtPhEilCJNfYiLCeXOeU2lpPLBzO+CB2lsfF+A/NtrSpb3kuLu2mfIUSTTBxgaKdOBbfANmWA==",
+ 			"requires": {
+-				"reakit-utils": "^0.10.0"
++				"reakit-utils": "^0.12.0"
+ 			}
+ 		},
+ 		"reakit-utils": {
+-			"version": "0.10.0",
+-			"resolved": "https://registry.npmjs.org/reakit-utils/-/reakit-utils-0.10.0.tgz",
+-			"integrity": "sha512-s1+nqLYrHo54U38iETdY86+VD+CZBTqF9rxMmphuft1Iz1i+L+OqOVJMq5sviBkTiEz8zRMhrNLcjBERFiPnkA=="
++			"version": "0.12.0",
++			"resolved": "https://registry.npmjs.org/reakit-utils/-/reakit-utils-0.12.0.tgz",
++			"integrity": "sha512-B0KUjRDu0GFDTi+FQApm4gynJGn18DuDdgCtcUytkN/AIJdKGaqHJ6FpeE1zMr1KAAUzZKrRqq/x93MrcQtvfQ=="
+ 		},
+ 		"reakit-warning": {
+-			"version": "0.1.0",
+-			"resolved": "https://registry.npmjs.org/reakit-warning/-/reakit-warning-0.1.0.tgz",
+-			"integrity": "sha512-nfujYGWoZ1lh6eAFTVQc2aNjrAEf30PHffJw8Q8tiJJY4Knoy7eLA4jQGHTl3gOjhA9+Yd8KSmiLoOPlr6A0kA==",
++			"version": "0.3.0",
++			"resolved": "https://registry.npmjs.org/reakit-warning/-/reakit-warning-0.3.0.tgz",
++			"integrity": "sha512-sJhgKQl6b4BZOo8jAXpneYFuAkx4wuftGl5KiIDAQZWg+e8YfB41QayjqM2eh0mQkG13hbc4pBOAyR5oFZxK0w==",
+ 			"requires": {
+-				"reakit-utils": "^0.10.0"
++				"reakit-utils": "^0.12.0"
+ 			}
+ 		},
+ 		"realpath-native": {
+diff --git a/packages/block-editor/src/components/alignment-toolbar/index.js b/packages/block-editor/src/components/alignment-toolbar/index.js
+index cd764f982b5d3c..4136f5f7a4c9e3 100644
+--- a/packages/block-editor/src/components/alignment-toolbar/index.js
++++ b/packages/block-editor/src/components/alignment-toolbar/index.js
+@@ -7,7 +7,7 @@ import { find } from 'lodash';
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { Toolbar } from '@wordpress/components';
++import { ToolbarGroup } from '@wordpress/components';
+ import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
+ 
+ const DEFAULT_ALIGNMENT_CONTROLS = [
+@@ -58,7 +58,7 @@ export function AlignmentToolbar( props ) {
+ 	}
+ 
+ 	return (
+-		<Toolbar
++		<ToolbarGroup
+ 			isCollapsed={ isCollapsed }
+ 			icon={ setIcon() }
+ 			label={ label }
+diff --git a/packages/block-editor/src/components/alignment-toolbar/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/alignment-toolbar/test/__snapshots__/index.js.snap
+index 4c5300651aef32..f995c767f95428 100644
+--- a/packages/block-editor/src/components/alignment-toolbar/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/alignment-toolbar/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`AlignmentToolbar should allow custom alignment controls to be specified 1`] = `
+-<Toolbar
++<ToolbarGroup
+   controls={
+     Array [
+       Object {
+@@ -58,7 +58,7 @@ exports[`AlignmentToolbar should allow custom alignment controls to be specified
+ `;
+ 
+ exports[`AlignmentToolbar should match snapshot 1`] = `
+-<Toolbar
++<ToolbarGroup
+   controls={
+     Array [
+       Object {
+diff --git a/packages/block-editor/src/components/block-alignment-toolbar/index.js b/packages/block-editor/src/components/block-alignment-toolbar/index.js
+index 84a7c6160d34d5..ed7fd8754fab04 100644
+--- a/packages/block-editor/src/components/block-alignment-toolbar/index.js
++++ b/packages/block-editor/src/components/block-alignment-toolbar/index.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { Toolbar } from '@wordpress/components';
++import { ToolbarGroup } from '@wordpress/components';
+ import { withSelect } from '@wordpress/data';
+ import { compose } from '@wordpress/compose';
+ import {
+@@ -67,7 +67,7 @@ export function BlockAlignmentToolbar( {
+ 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
+ 
+ 	return (
+-		<Toolbar
++		<ToolbarGroup
+ 			isCollapsed={ isCollapsed }
+ 			icon={
+ 				activeAlignmentControl
+diff --git a/packages/block-editor/src/components/block-alignment-toolbar/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/block-alignment-toolbar/test/__snapshots__/index.js.snap
+index 777dc35ad2910c..48c90acf606911 100644
+--- a/packages/block-editor/src/components/block-alignment-toolbar/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/block-alignment-toolbar/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`BlockAlignmentToolbar should match snapshot 1`] = `
+-<Toolbar
++<ToolbarGroup
+   controls={
+     Array [
+       Object {
+diff --git a/packages/block-editor/src/components/block-controls/index.js b/packages/block-editor/src/components/block-controls/index.js
+index 1d24a7e5cd3c45..f81c481c1bbba4 100644
+--- a/packages/block-editor/src/components/block-controls/index.js
++++ b/packages/block-editor/src/components/block-controls/index.js
+@@ -1,7 +1,17 @@
++/**
++ * External dependencies
++ */
++import { isEmpty } from 'lodash';
++
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill, Toolbar } from '@wordpress/components';
++import { useContext } from '@wordpress/element';
++import {
++	__experimentalToolbarContext as ToolbarContext,
++	createSlotFill,
++	ToolbarGroup,
++} from '@wordpress/components';
+ 
+ /**
+  * Internal dependencies
+@@ -10,15 +20,32 @@ import { ifBlockEditSelected } from '../block-edit/context';
+ 
+ const { Fill, Slot } = createSlotFill( 'BlockControls' );
+ 
+-const BlockControlsFill = ( { controls, children } ) => (
+-	<Fill>
+-		<Toolbar controls={ controls } />
+-		{ children }
+-	</Fill>
+-);
++function BlockControlsSlot( props ) {
++	const accessibleToolbarState = useContext( ToolbarContext );
++	return <Slot { ...props } fillProps={ accessibleToolbarState } />;
++}
++
++function BlockControlsFill( { controls, children } ) {
++	return (
++		<Fill>
++			{ ( fillProps ) => {
++				// Children passed to BlockControlsFill will not have access to any
++				// React Context whose Provider is part of the BlockControlsSlot tree.
++				// So we re-create the Provider in this subtree.
++				const value = ! isEmpty( fillProps ) ? fillProps : null;
++				return (
++					<ToolbarContext.Provider value={ value }>
++						<ToolbarGroup controls={ controls } />
++						{ children }
++					</ToolbarContext.Provider>
++				);
++			} }
++		</Fill>
++	);
++}
+ 
+ const BlockControls = ifBlockEditSelected( BlockControlsFill );
+ 
+-BlockControls.Slot = Slot;
++BlockControls.Slot = BlockControlsSlot;
+ 
+ export default BlockControls;
+diff --git a/packages/block-editor/src/components/block-format-controls/index.js b/packages/block-editor/src/components/block-format-controls/index.js
+index 2ab83843846ad4..89f2df3bee260f 100644
+--- a/packages/block-editor/src/components/block-format-controls/index.js
++++ b/packages/block-editor/src/components/block-format-controls/index.js
+@@ -1,7 +1,16 @@
++/**
++ * External dependencies
++ */
++import { isEmpty } from 'lodash';
++
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill } from '@wordpress/components';
++import { useContext } from '@wordpress/element';
++import {
++	__experimentalToolbarContext as ToolbarContext,
++	createSlotFill,
++} from '@wordpress/components';
+ 
+ /**
+  * Internal dependencies
+@@ -10,8 +19,28 @@ import { ifBlockEditSelected } from '../block-edit/context';
+ 
+ const { Fill, Slot } = createSlotFill( 'BlockFormatControls' );
+ 
+-const BlockFormatControls = ifBlockEditSelected( Fill );
++function BlockFormatControlsSlot( props ) {
++	const accessibleToolbarState = useContext( ToolbarContext );
++	return <Slot { ...props } fillProps={ accessibleToolbarState } />;
++}
++
++function BlockFormatControlsFill( props ) {
++	return (
++		<Fill>
++			{ ( fillProps ) => {
++				const value = ! isEmpty( fillProps ) ? fillProps : null;
++				return (
++					<ToolbarContext.Provider value={ value }>
++						{ props.children }
++					</ToolbarContext.Provider>
++				);
++			} }
++		</Fill>
++	);
++}
++
++const BlockFormatControls = ifBlockEditSelected( BlockFormatControlsFill );
+ 
+-BlockFormatControls.Slot = Slot;
++BlockFormatControls.Slot = BlockFormatControlsSlot;
+ 
+ export default BlockFormatControls;
+diff --git a/packages/block-editor/src/components/block-list/style.scss b/packages/block-editor/src/components/block-list/style.scss
+index 08ae6d8720902e..89ecdfe3549e42 100644
+--- a/packages/block-editor/src/components/block-list/style.scss
++++ b/packages/block-editor/src/components/block-list/style.scss
+@@ -484,6 +484,7 @@
+ 	border-radius: $radius-block-ui;
+ 	background-color: $white;
+ 
++	.block-editor-block-toolbar .components-toolbar-group,
+ 	.block-editor-block-toolbar .components-toolbar {
+ 		border-right-color: $dark-gray-primary;
+ 	}
+diff --git a/packages/block-editor/src/components/block-mover/button.js b/packages/block-editor/src/components/block-mover/button.js
+index 5015caf62d408c..1ad8c660d5dd11 100644
+--- a/packages/block-editor/src/components/block-mover/button.js
++++ b/packages/block-editor/src/components/block-mover/button.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { castArray, first, last, partial } from 'lodash';
++import { castArray, first, last } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -121,9 +121,14 @@ const BlockMoverButton = forwardRef(
+ 		);
+ 		const moverFunction =
+ 			direction === 'up' ? moveBlocksUp : moveBlocksDown;
+-		const onClick = isDisabled
+-			? null
+-			: partial( moverFunction, clientIds, rootClientId );
++
++		const onClick = ( event ) => {
++			moverFunction( clientIds, rootClientId );
++			if ( props.onClick ) {
++				props.onClick( event );
++			}
++		};
++
+ 		const descriptionId = `block-editor-block-mover-button__description-${ instanceId }`;
+ 
+ 		return (
+@@ -141,9 +146,9 @@ const BlockMoverButton = forwardRef(
+ 						isRTL
+ 					) }
+ 					aria-describedby={ descriptionId }
+-					onClick={ onClick }
+-					aria-disabled={ isDisabled }
+ 					{ ...props }
++					onClick={ isDisabled ? null : onClick }
++					aria-disabled={ isDisabled }
+ 				/>
+ 				<span
+ 					id={ descriptionId }
+diff --git a/packages/block-editor/src/components/block-mover/index.js b/packages/block-editor/src/components/block-mover/index.js
+index b7dff01d926593..61a579d01efea5 100644
+--- a/packages/block-editor/src/components/block-mover/index.js
++++ b/packages/block-editor/src/components/block-mover/index.js
+@@ -7,7 +7,10 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { ToolbarGroup } from '@wordpress/components';
++import {
++	ToolbarGroup,
++	__experimentalToolbarItem as ToolbarItem,
++} from '@wordpress/components';
+ import { getBlockType } from '@wordpress/blocks';
+ import { Component } from '@wordpress/element';
+ import { withSelect } from '@wordpress/data';
+@@ -73,16 +76,28 @@ export class BlockMover extends Component {
+ 						onDragEnd={ onDraggableEnd }
+ 					>
+ 						<ToolbarGroup>
+-							<BlockMoverUpButton
+-								clientIds={ clientIds }
++							<ToolbarItem
+ 								onFocus={ this.onFocus }
+ 								onBlur={ this.onBlur }
+-							/>
+-							<BlockMoverDownButton
+-								clientIds={ clientIds }
++							>
++								{ ( itemProps ) => (
++									<BlockMoverUpButton
++										clientIds={ clientIds }
++										{ ...itemProps }
++									/>
++								) }
++							</ToolbarItem>
++							<ToolbarItem
+ 								onFocus={ this.onFocus }
+ 								onBlur={ this.onBlur }
+-							/>
++							>
++								{ ( itemProps ) => (
++									<BlockMoverDownButton
++										clientIds={ clientIds }
++										{ ...itemProps }
++									/>
++								) }
++							</ToolbarItem>
+ 						</ToolbarGroup>
+ 					</div>
+ 				) }
+diff --git a/packages/block-editor/src/components/block-mover/style.scss b/packages/block-editor/src/components/block-mover/style.scss
+index 52cbcd2f0cf8fb..427e41189c8073 100644
+--- a/packages/block-editor/src/components/block-mover/style.scss
++++ b/packages/block-editor/src/components/block-mover/style.scss
+@@ -13,19 +13,32 @@
+ 
+ // Show the mover in a single button under the contextual toolbar.
+ .block-editor-block-mover {
++	.components-toolbar-group,
+ 	.components-toolbar {
+ 		flex-direction: column;
++		flex: 1;
+ 	}
+ 
++	&.is-horizontal .components-toolbar-group,
+ 	&.is-horizontal .components-toolbar {
+ 		flex-direction: row;
+ 	}
+ 
+ 	.block-editor-block-mover-button {
+ 		height: $block-toolbar-height/2;
++		width: $block-toolbar-height;
++		padding: 0 !important;
++
++		// Focus style.
++		// Overrides .components-toolbar-group styles
++		&::before {
++			left: $grid-unit-10 !important;
++			right: $grid-unit-10 !important;
++		}
+ 	}
+ 
+ 	// Position the icons correctly.
++	.components-toolbar-group .block-editor-block-mover-button.is-up-button,
+ 	.components-toolbar .block-editor-block-mover-button.is-up-button {
+ 		svg {
+ 			margin-bottom: -$grid-unit-10;
+@@ -38,6 +51,7 @@
+ 		}
+ 	}
+ 
++	.components-toolbar-group .block-editor-block-mover-button.is-down-button,
+ 	.components-toolbar .block-editor-block-mover-button.is-down-button {
+ 		svg {
+ 			margin-top: -$grid-unit-10;
+@@ -54,8 +68,9 @@
+ 	&.is-horizontal {
+ 		.block-editor-block-mover-button.has-icon {
+ 			height: $block-toolbar-height;
++			// Overrides .components-toolbar-group styles
+ 			width: $block-toolbar-height/2 !important;
+-			min-width: $grid-unit-30;
++			min-width: $grid-unit-30 !important;
+ 			padding-left: 0;
+ 			padding-right: 0;
+ 
+@@ -78,9 +93,10 @@
+ 			}
+ 
+ 			// Focus style.
++			// Overrides .components-toolbar-group styles
+ 			&::before {
+-				left: $grid-unit-10;
+-				right: 0;
++				left: $grid-unit-10 !important;
++				right: 0 !important;
+ 			}
+ 		}
+ 
+@@ -92,9 +108,10 @@
+ 			}
+ 
+ 			// Focus style.
++			// Overrides .components-toolbar-group styles
+ 			&::before {
+-				left: 0;
+-				right: $grid-unit-10;
++				left: 0 !important;
++				right: $grid-unit-10 !important;
+ 			}
+ 		}
+ 	}
+diff --git a/packages/block-editor/src/components/block-settings-menu/index.js b/packages/block-editor/src/components/block-settings-menu/index.js
+index e4c2c64682a32f..56d4c1f008b969 100644
+--- a/packages/block-editor/src/components/block-settings-menu/index.js
++++ b/packages/block-editor/src/components/block-settings-menu/index.js
+@@ -8,7 +8,8 @@ import { castArray, flow } from 'lodash';
+  */
+ import { __, _n } from '@wordpress/i18n';
+ import {
+-	Toolbar,
++	ToolbarGroup,
++	__experimentalToolbarItem as ToolbarItem,
+ 	DropdownMenu,
+ 	MenuGroup,
+ 	MenuItem,
+@@ -66,98 +67,115 @@ export function BlockSettingsMenu( { clientIds } ) {
+ 				onInsertBefore,
+ 				onRemove,
+ 			} ) => (
+-				<Toolbar>
+-					<DropdownMenu
+-						icon={ moreHorizontal }
+-						label={ __( 'More options' ) }
+-						className="block-editor-block-settings-menu"
+-						popoverProps={ POPOVER_PROPS }
+-						noIcons
+-					>
+-						{ ( { onClose } ) => (
+-							<>
+-								<MenuGroup>
+-									<__experimentalBlockSettingsMenuFirstItem.Slot
+-										fillProps={ { onClose } }
+-									/>
+-									{ count === 1 && (
+-										<BlockUnknownConvertButton
+-											clientId={ firstBlockClientId }
+-										/>
+-									) }
+-									{ count === 1 && (
+-										<BlockHTMLConvertButton
+-											clientId={ firstBlockClientId }
+-										/>
+-									) }
+-									{ canDuplicate && (
+-										<MenuItem
+-											onClick={ flow(
+-												onClose,
+-												onDuplicate
++				<ToolbarGroup>
++					<ToolbarItem>
++						{ ( toggleProps ) => (
++							<DropdownMenu
++								icon={ moreHorizontal }
++								label={ __( 'More options' ) }
++								className="block-editor-block-settings-menu"
++								popoverProps={ POPOVER_PROPS }
++								toggleProps={ toggleProps }
++								noIcons
++							>
++								{ ( { onClose } ) => (
++									<>
++										<MenuGroup>
++											<__experimentalBlockSettingsMenuFirstItem.Slot
++												fillProps={ { onClose } }
++											/>
++											{ count === 1 && (
++												<BlockUnknownConvertButton
++													clientId={
++														firstBlockClientId
++													}
++												/>
+ 											) }
+-											shortcut={ shortcuts.duplicate }
+-										>
+-											{ __( 'Duplicate' ) }
+-										</MenuItem>
+-									) }
+-									{ canInsertDefaultBlock && (
+-										<>
+-											<MenuItem
+-												onClick={ flow(
+-													onClose,
+-													onInsertBefore
+-												) }
+-												shortcut={
+-													shortcuts.insertBefore
+-												}
+-											>
+-												{ __( 'Insert Before' ) }
+-											</MenuItem>
+-											<MenuItem
+-												onClick={ flow(
+-													onClose,
+-													onInsertAfter
+-												) }
+-												shortcut={
+-													shortcuts.insertAfter
+-												}
+-											>
+-												{ __( 'Insert After' ) }
+-											</MenuItem>
+-										</>
+-									) }
+-									{ count === 1 && (
+-										<BlockModeToggle
+-											clientId={ firstBlockClientId }
+-											onToggle={ onClose }
+-										/>
+-									) }
+-								</MenuGroup>
+-								<BlockSettingsMenuControls.Slot
+-									fillProps={ { onClose } }
+-								/>
+-								<MenuGroup>
+-									{ ! isLocked && (
+-										<MenuItem
+-											onClick={ flow(
+-												onClose,
+-												onRemove
++											{ count === 1 && (
++												<BlockHTMLConvertButton
++													clientId={
++														firstBlockClientId
++													}
++												/>
++											) }
++											{ canDuplicate && (
++												<MenuItem
++													onClick={ flow(
++														onClose,
++														onDuplicate
++													) }
++													shortcut={
++														shortcuts.duplicate
++													}
++												>
++													{ __( 'Duplicate' ) }
++												</MenuItem>
+ 											) }
+-											shortcut={ shortcuts.remove }
+-										>
+-											{ _n(
+-												'Remove Block',
+-												'Remove Blocks',
+-												count
++											{ canInsertDefaultBlock && (
++												<>
++													<MenuItem
++														onClick={ flow(
++															onClose,
++															onInsertBefore
++														) }
++														shortcut={
++															shortcuts.insertBefore
++														}
++													>
++														{ __(
++															'Insert Before'
++														) }
++													</MenuItem>
++													<MenuItem
++														onClick={ flow(
++															onClose,
++															onInsertAfter
++														) }
++														shortcut={
++															shortcuts.insertAfter
++														}
++													>
++														{ __( 'Insert After' ) }
++													</MenuItem>
++												</>
++											) }
++											{ count === 1 && (
++												<BlockModeToggle
++													clientId={
++														firstBlockClientId
++													}
++													onToggle={ onClose }
++												/>
++											) }
++										</MenuGroup>
++										<BlockSettingsMenuControls.Slot
++											fillProps={ { onClose } }
++										/>
++										<MenuGroup>
++											{ ! isLocked && (
++												<MenuItem
++													onClick={ flow(
++														onClose,
++														onRemove
++													) }
++													shortcut={
++														shortcuts.remove
++													}
++												>
++													{ _n(
++														'Remove Block',
++														'Remove Blocks',
++														count
++													) }
++												</MenuItem>
+ 											) }
+-										</MenuItem>
+-									) }
+-								</MenuGroup>
+-							</>
++										</MenuGroup>
++									</>
++								) }
++							</DropdownMenu>
+ 						) }
+-					</DropdownMenu>
+-				</Toolbar>
++					</ToolbarItem>
++				</ToolbarGroup>
+ 			) }
+ 		</BlockActions>
+ 	);
+diff --git a/packages/block-editor/src/components/block-switcher/index.js b/packages/block-editor/src/components/block-switcher/index.js
+index eb2f7653af4f28..cc1c1b5d8d548c 100644
+--- a/packages/block-editor/src/components/block-switcher/index.js
++++ b/packages/block-editor/src/components/block-switcher/index.js
+@@ -7,7 +7,12 @@ import { castArray, filter, first, mapKeys, orderBy, uniq, map } from 'lodash';
+  * WordPress dependencies
+  */
+ import { __, _n, sprintf } from '@wordpress/i18n';
+-import { Dropdown, Button, Toolbar, MenuGroup } from '@wordpress/components';
++import {
++	Dropdown,
++	ToolbarButton,
++	ToolbarGroup,
++	MenuGroup,
++} from '@wordpress/components';
+ import {
+ 	getBlockType,
+ 	getPossibleBlockTransformations,
+@@ -91,14 +96,14 @@ export class BlockSwitcher extends Component {
+ 
+ 		if ( ! hasBlockStyles && ! possibleBlockTransformations.length ) {
+ 			return (
+-				<Toolbar>
+-					<Button
++				<ToolbarGroup>
++					<ToolbarButton
+ 						disabled
+ 						className="block-editor-block-switcher__no-switcher-icon"
+ 						label={ __( 'Block icon' ) }
+ 						icon={ <BlockIcon icon={ icon } showColors /> }
+ 					/>
+-				</Toolbar>
++				</ToolbarGroup>
+ 			);
+ 		}
+ 
+@@ -129,8 +134,8 @@ export class BlockSwitcher extends Component {
+ 							  );
+ 
+ 					return (
+-						<Toolbar>
+-							<Button
++						<ToolbarGroup>
++							<ToolbarButton
+ 								className="block-editor-block-switcher__toggle"
+ 								onClick={ onToggle }
+ 								aria-haspopup="true"
+@@ -140,7 +145,7 @@ export class BlockSwitcher extends Component {
+ 								showTooltip
+ 								icon={ <BlockIcon icon={ icon } showColors /> }
+ 							/>
+-						</Toolbar>
++						</ToolbarGroup>
+ 					);
+ 				} }
+ 				renderContent={ ( { onClose } ) => (
+diff --git a/packages/block-editor/src/components/block-switcher/style.scss b/packages/block-editor/src/components/block-switcher/style.scss
+index 17878a4db2963c..29bd8f1b3980f5 100644
+--- a/packages/block-editor/src/components/block-switcher/style.scss
++++ b/packages/block-editor/src/components/block-switcher/style.scss
+@@ -42,7 +42,8 @@
+ 
+ // Style this the same as the block buttons in the library.
+ // Needs specificiity to override the icon button.
+-.block-editor-block-toolbar .components-toolbar .components-button.block-editor-block-switcher__toggle.has-icon {
++.block-editor-block-toolbar .components-toolbar-group .components-button.block-editor-block-switcher__toggle.has-icon.has-icon,
++.block-editor-block-toolbar .components-toolbar .components-button.block-editor-block-switcher__toggle.has-icon.has-icon {
+ 	padding: 0;
+ 
+ 	.block-editor-block-icon {
+diff --git a/packages/block-editor/src/components/block-switcher/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/block-switcher/test/__snapshots__/index.js.snap
+index a7a9d6dd1bbed0..0c98e6d00431bd 100644
+--- a/packages/block-editor/src/components/block-switcher/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/block-switcher/test/__snapshots__/index.js.snap
+@@ -1,8 +1,8 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`BlockSwitcher should render disabled block switcher with multi block of different types when no transforms 1`] = `
+-<Toolbar>
+-  <ForwardRef(Button)
++<ToolbarGroup>
++  <ToolbarButton
+     className="block-editor-block-switcher__no-switcher-icon"
+     disabled={true}
+     icon={
+@@ -22,7 +22,7 @@ exports[`BlockSwitcher should render disabled block switcher with multi block of
+     }
+     label="Block icon"
+   />
+-</Toolbar>
++</ToolbarGroup>
+ `;
+ 
+ exports[`BlockSwitcher should render enabled block switcher with multi block when transforms exist 1`] = `
+diff --git a/packages/block-editor/src/components/block-switcher/test/index.js b/packages/block-editor/src/components/block-switcher/test/index.js
+index dea53770ca7d07..75755bcd561d4d 100644
+--- a/packages/block-editor/src/components/block-switcher/test/index.js
++++ b/packages/block-editor/src/components/block-switcher/test/index.js
+@@ -188,9 +188,7 @@ describe( 'BlockSwitcher', () => {
+ 							isOpen: false,
+ 						} )
+ 				);
+-				const iconButtonClosed = toggleClosed.find(
+-					'ForwardRef(Button)'
+-				);
++				const iconButtonClosed = toggleClosed.find( 'ToolbarButton' );
+ 
+ 				iconButtonClosed.simulate( 'keydown', mockKeyDown );
+ 
+@@ -206,7 +204,7 @@ describe( 'BlockSwitcher', () => {
+ 							isOpen: true,
+ 						} )
+ 				);
+-				const iconButtonOpen = toggleOpen.find( 'ForwardRef(Button)' );
++				const iconButtonOpen = toggleOpen.find( 'ToolbarButton' );
+ 
+ 				iconButtonOpen.simulate( 'keydown', mockKeyDown );
+ 
+diff --git a/packages/block-editor/src/components/block-toolbar/style.scss b/packages/block-editor/src/components/block-toolbar/style.scss
+index 6cc37f4d9309d4..e43f35d742491c 100644
+--- a/packages/block-editor/src/components/block-toolbar/style.scss
++++ b/packages/block-editor/src/components/block-toolbar/style.scss
+@@ -19,6 +19,7 @@
+ 	}
+ 
+ 	// Borders around toolbar segments.
++	.components-toolbar-group,
+ 	.components-toolbar {
+ 		background: none;
+ 		// IE11 has thick paddings without this.
+@@ -37,6 +38,7 @@
+ 	}
+ 
+ 	> :last-child,
++	> :last-child .components-toolbar-group,
+ 	> :last-child .components-toolbar {
+ 		border-right: none;
+ 	}
+diff --git a/packages/block-editor/src/components/block-toolbar/utils.js b/packages/block-editor/src/components/block-toolbar/utils.js
+index 2ee4a65b0d43f5..a33c6240b2f958 100644
+--- a/packages/block-editor/src/components/block-toolbar/utils.js
++++ b/packages/block-editor/src/components/block-toolbar/utils.js
+@@ -8,7 +8,12 @@ import { noop } from 'lodash';
+ import { useDispatch } from '@wordpress/data';
+ import { useState, useRef, useEffect, useCallback } from '@wordpress/element';
+ 
+-const { clearTimeout, requestAnimationFrame, setTimeout } = window;
++const {
++	clearTimeout,
++	requestAnimationFrame,
++	cancelAnimationFrame,
++	setTimeout,
++} = window;
+ const DEBOUNCE_TIMEOUT = 250;
+ 
+ /**
+@@ -153,6 +158,8 @@ export function useShowMoversGestures( {
+ 	};
+ }
+ 
++let requestAnimationFrameId;
++
+ /**
+  * Hook that toggles the highlight (outline) state of a block
+  *
+@@ -171,10 +178,16 @@ export function useToggleBlockHighlight( clientId ) {
+ 	);
+ 
+ 	useEffect( () => {
++		// On mount, we make sure to cancel any pending animation frame request
++		// that hasn't been completed yet. Components like NavigableToolbar may
++		// mount and unmount quickly.
++		if ( requestAnimationFrameId ) {
++			cancelAnimationFrame( requestAnimationFrameId );
++		}
+ 		return () => {
+ 			// Sequences state change to enable editor updates (e.g. cursor
+ 			// position) to render correctly.
+-			requestAnimationFrame( () => {
++			requestAnimationFrameId = requestAnimationFrame( () => {
+ 				updateBlockHighlight( false );
+ 			} );
+ 		};
+diff --git a/packages/block-editor/src/components/block-vertical-alignment-toolbar/index.js b/packages/block-editor/src/components/block-vertical-alignment-toolbar/index.js
+index ee48eae9ee5ede..e19de08f818292 100644
+--- a/packages/block-editor/src/components/block-vertical-alignment-toolbar/index.js
++++ b/packages/block-editor/src/components/block-vertical-alignment-toolbar/index.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { _x } from '@wordpress/i18n';
+-import { Toolbar } from '@wordpress/components';
++import { ToolbarGroup } from '@wordpress/components';
+ 
+ /**
+  * Internal dependencies
+@@ -48,7 +48,7 @@ export function BlockVerticalAlignmentToolbar( {
+ 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
+ 
+ 	return (
+-		<Toolbar
++		<ToolbarGroup
+ 			isCollapsed={ isCollapsed }
+ 			icon={
+ 				activeAlignment
+diff --git a/packages/block-editor/src/components/block-vertical-alignment-toolbar/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/block-vertical-alignment-toolbar/test/__snapshots__/index.js.snap
+index 33ff82d89aa0d5..1a01cf290f1c8b 100644
+--- a/packages/block-editor/src/components/block-vertical-alignment-toolbar/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/block-vertical-alignment-toolbar/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`BlockVerticalAlignmentToolbar should match snapshot 1`] = `
+-<Toolbar
++<ToolbarGroup
+   controls={
+     Array [
+       Object {
+diff --git a/packages/block-editor/src/components/navigable-toolbar/index.js b/packages/block-editor/src/components/navigable-toolbar/index.js
+index c79563c807a64e..fa63839248267e 100644
+--- a/packages/block-editor/src/components/navigable-toolbar/index.js
++++ b/packages/block-editor/src/components/navigable-toolbar/index.js
+@@ -1,28 +1,103 @@
+ /**
+  * WordPress dependencies
+  */
+-import { NavigableMenu } from '@wordpress/components';
+-import { useRef, useEffect, useCallback } from '@wordpress/element';
++import { NavigableMenu, Toolbar } from '@wordpress/components';
++import {
++	useState,
++	useRef,
++	useLayoutEffect,
++	useEffect,
++	useCallback,
++} from '@wordpress/element';
+ import { focus } from '@wordpress/dom';
+ import { useShortcut } from '@wordpress/keyboard-shortcuts';
+ 
+-function NavigableToolbar( { children, focusOnMount, ...props } ) {
+-	const wrapper = useRef();
+-	const focusToolbar = useCallback( () => {
+-		const tabbables = focus.tabbable.find( wrapper.current );
+-		if ( tabbables.length ) {
+-			tabbables[ 0 ].focus();
++function useUpdateLayoutEffect( effect, deps ) {
++	const mounted = useRef( false );
++	useLayoutEffect( () => {
++		if ( mounted.current ) {
++			return effect();
+ 		}
++		mounted.current = true;
++	}, deps );
++}
++
++function hasOnlyToolbarItem( elements ) {
++	const dataProp = 'experimentalToolbarItem';
++	return ! elements.some( ( element ) => ! ( dataProp in element.dataset ) );
++}
++
++function focusFirstTabbableIn( container ) {
++	const [ firstTabbable ] = focus.tabbable.find( container );
++	if ( firstTabbable ) {
++		firstTabbable.focus();
++	}
++}
++
++function useIsAccessibleToolbar( ref ) {
++	// By default, it's gonna render NavigableMenu. If all the tabbable elements
++	// inside the toolbar are ToolbarItem components (or derived components like
++	// ToolbarButton), then we can wrap them with the accessible Toolbar
++	// component.
++	const [ isAccessibleToolbar, setIsAccessibleToolbar ] = useState( false );
++
++	const determineIsAccessibleToolbar = useCallback( () => {
++		const tabbables = focus.tabbable.find( ref.current );
++		setIsAccessibleToolbar( hasOnlyToolbarItem( tabbables ) );
+ 	}, [] );
++
++	useLayoutEffect( determineIsAccessibleToolbar, [] );
++
++	useUpdateLayoutEffect( () => {
++		// Toolbar buttons may be rendered asynchronously, so we use
++		// MutationObserver to check if the toolbar subtree has been modified
++		const observer = new window.MutationObserver(
++			determineIsAccessibleToolbar
++		);
++		observer.observe( ref.current, { childList: true, subtree: true } );
++		return () => observer.disconnect();
++	}, [ isAccessibleToolbar ] );
++
++	return isAccessibleToolbar;
++}
++
++function useToolbarFocus( ref, focusOnMount, isAccessibleToolbar ) {
++	// Make sure we don't use modified versions of this prop
++	const [ initialFocusOnMount ] = useState( focusOnMount );
++
++	const focusToolbar = useCallback( () => {
++		focusFirstTabbableIn( ref.current );
++	}, [] );
++
+ 	useShortcut( 'core/block-editor/focus-toolbar', focusToolbar, {
+ 		bindGlobal: true,
+ 		eventName: 'keydown',
+ 	} );
++
+ 	useEffect( () => {
+-		if ( focusOnMount ) {
++		if ( initialFocusOnMount ) {
+ 			focusToolbar();
+ 		}
+-	}, [] );
++	}, [ isAccessibleToolbar, initialFocusOnMount, focusToolbar ] );
++}
++
++function NavigableToolbar( { children, focusOnMount, ...props } ) {
++	const wrapper = useRef();
++	const isAccessibleToolbar = useIsAccessibleToolbar( wrapper );
++
++	useToolbarFocus( wrapper, focusOnMount, isAccessibleToolbar );
++
++	if ( isAccessibleToolbar ) {
++		return (
++			<Toolbar
++				__experimentalAccessibilityLabel={ props[ 'aria-label' ] }
++				ref={ wrapper }
++				{ ...props }
++			>
++				{ children }
++			</Toolbar>
++		);
++	}
+ 
+ 	return (
+ 		<NavigableMenu
+diff --git a/packages/block-editor/src/components/rich-text/format-toolbar/index.js b/packages/block-editor/src/components/rich-text/format-toolbar/index.js
+index 3bbc0eadd680e3..e0c35b11cdae50 100644
+--- a/packages/block-editor/src/components/rich-text/format-toolbar/index.js
++++ b/packages/block-editor/src/components/rich-text/format-toolbar/index.js
+@@ -9,7 +9,12 @@ import { orderBy } from 'lodash';
+  */
+ 
+ import { __ } from '@wordpress/i18n';
+-import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
++import {
++	__experimentalToolbarItem as ToolbarItem,
++	ToolbarGroup,
++	DropdownMenu,
++	Slot,
++} from '@wordpress/components';
+ import { chevronDown } from '@wordpress/icons';
+ 
+ const POPOVER_PROPS = {
+@@ -20,7 +25,7 @@ const POPOVER_PROPS = {
+ const FormatToolbar = () => {
+ 	return (
+ 		<div className="block-editor-format-toolbar">
+-			<Toolbar>
++			<ToolbarGroup>
+ 				{ [ 'bold', 'italic', 'link', 'text-color' ].map(
+ 					( format ) => (
+ 						<Slot
+@@ -32,19 +37,28 @@ const FormatToolbar = () => {
+ 				<Slot name="RichText.ToolbarControls">
+ 					{ ( fills ) =>
+ 						fills.length !== 0 && (
+-							<DropdownMenu
+-								icon={ chevronDown }
+-								label={ __( 'More rich text controls' ) }
+-								controls={ orderBy(
+-									fills.map( ( [ { props } ] ) => props ),
+-									'title'
++							<ToolbarItem>
++								{ ( toggleProps ) => (
++									<DropdownMenu
++										icon={ chevronDown }
++										label={ __(
++											'More rich text controls'
++										) }
++										toggleProps={ toggleProps }
++										controls={ orderBy(
++											fills.map(
++												( [ { props } ] ) => props
++											),
++											'title'
++										) }
++										popoverProps={ POPOVER_PROPS }
++									/>
+ 								) }
+-								popoverProps={ POPOVER_PROPS }
+-							/>
++							</ToolbarItem>
+ 						)
+ 					}
+ 				</Slot>
+-			</Toolbar>
++			</ToolbarGroup>
+ 		</div>
+ 	);
+ };
+diff --git a/packages/block-editor/src/components/rich-text/style.scss b/packages/block-editor/src/components/rich-text/style.scss
+index cc5f2a1d379a3a..89433b13583e49 100644
+--- a/packages/block-editor/src/components/rich-text/style.scss
++++ b/packages/block-editor/src/components/rich-text/style.scss
+@@ -51,6 +51,7 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
+ 		background-color: $white;
+ 	}
+ 
++	.components-toolbar-group,
+ 	.components-toolbar {
+ 		// The popover already provides a border.
+ 		border: none;
+diff --git a/packages/block-editor/src/components/url-input/style.scss b/packages/block-editor/src/components/url-input/style.scss
+index 0237689edb4c4b..fc988577744123 100644
+--- a/packages/block-editor/src/components/url-input/style.scss
++++ b/packages/block-editor/src/components/url-input/style.scss
+@@ -101,6 +101,7 @@ $input-size: 300px;
+ }
+ 
+ // Toolbar button
++.components-toolbar-group > .block-editor-url-input__button,
+ .components-toolbar > .block-editor-url-input__button {
+ 	position: inherit; // Let the dialog position according to parent.
+ }
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 031e9784a9b7ca..641933d747b6c5 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -53,7 +53,7 @@
+ 		"re-resizable": "^6.0.0",
+ 		"react-dates": "^17.1.1",
+ 		"react-spring": "^8.0.20",
+-		"reakit": "^1.0.0-rc.0",
++		"reakit": "^1.0.0-rc.2",
+ 		"rememo": "^3.0.0",
+ 		"tinycolor2": "^1.4.1",
+ 		"uuid": "^7.0.2"
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index f5142afb2f86e0..ca4df08a9e4a3a 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -91,6 +91,7 @@ export { default as Tip } from './tip';
+ export { default as ToggleControl } from './toggle-control';
+ export { default as Toolbar } from './toolbar';
+ export { default as ToolbarButton } from './toolbar-button';
++export { default as __experimentalToolbarContext } from './toolbar-context';
+ export { default as ToolbarGroup } from './toolbar-group';
+ export { default as __experimentalToolbarItem } from './toolbar-item';
+ export { default as Tooltip } from './tooltip';
+diff --git a/packages/components/src/index.native.js b/packages/components/src/index.native.js
+index bec997cb2d9abd..d06f63519f7e6e 100644
+--- a/packages/components/src/index.native.js
++++ b/packages/components/src/index.native.js
+@@ -14,6 +14,7 @@ export { default as Dashicon } from './dashicon';
+ export { default as Dropdown } from './dropdown';
+ export { default as Toolbar } from './toolbar';
+ export { default as ToolbarButton } from './toolbar-button';
++export { default as __experimentalToolbarContext } from './toolbar-context';
+ export { default as ToolbarGroup } from './toolbar-group';
+ export { default as __experimentalToolbarItem } from './toolbar-item';
+ export { default as Icon } from './icon';
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+index 6d4b046a6271cf..c9bba8a6d7f64b 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+@@ -13,14 +13,17 @@ function useSlotRegistry() {
+ 	const [ fills, setFills ] = useState( {} );
+ 
+ 	const registerSlot = useCallback( ( name, ref, fillProps ) => {
+-		setSlots( ( prevSlots ) => ( {
+-			...prevSlots,
+-			[ name ]: {
+-				...prevSlots[ name ],
+-				ref: ref || prevSlots[ name ].ref,
+-				fillProps: fillProps || prevSlots[ name ].fillProps || {},
+-			},
+-		} ) );
++		setSlots( ( prevSlots ) => {
++			const currentSlot = prevSlots[ name ] || {};
++			return {
++				...prevSlots,
++				[ name ]: {
++					...currentSlot,
++					ref: ref || currentSlot.ref,
++					fillProps: fillProps || currentSlot.fillProps || {},
++				},
++			};
++		} );
+ 	}, [] );
+ 
+ 	const unregisterSlot = useCallback( ( name, ref ) => {
+diff --git a/packages/components/src/toolbar-button/index.js b/packages/components/src/toolbar-button/index.js
+index 347fd5fd0d7e60..7e84e89cc99315 100644
+--- a/packages/components/src/toolbar-button/index.js
++++ b/packages/components/src/toolbar-button/index.js
+@@ -21,6 +21,9 @@ function ToolbarButton( {
+ 	className,
+ 	extraProps,
+ 	children,
++	title,
++	isActive,
++	isDisabled,
+ 	...props
+ } ) {
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+@@ -32,7 +35,7 @@ function ToolbarButton( {
+ 			<ToolbarButtonContainer className={ containerClassName }>
+ 				<Button
+ 					icon={ props.icon }
+-					label={ props.title }
++					label={ title }
+ 					shortcut={ props.shortcut }
+ 					data-subscript={ props.subscript }
+ 					onClick={ ( event ) => {
+@@ -45,8 +48,9 @@ function ToolbarButton( {
+ 						'components-toolbar__control',
+ 						className
+ 					) }
+-					isPressed={ props.isActive }
+-					disabled={ props.isDisabled }
++					isPressed={ isActive }
++					disabled={ isDisabled }
++					data-experimental-toolbar-item
+ 					{ ...extraProps }
+ 				>
+ 					{ children }
+@@ -64,7 +68,14 @@ function ToolbarButton( {
+ 			{ ...props }
+ 		>
+ 			{ ( toolbarItemProps ) => (
+-				<Button { ...toolbarItemProps }>{ children }</Button>
++				<Button
++					label={ title }
++					isPressed={ isActive }
++					disabled={ isDisabled }
++					{ ...toolbarItemProps }
++				>
++					{ children }
++				</Button>
+ 			) }
+ 		</ToolbarItem>
+ 	);
+diff --git a/packages/components/src/toolbar-group/style.scss b/packages/components/src/toolbar-group/style.scss
+index a804663d4ef793..fa1f90b957d011 100644
+--- a/packages/components/src/toolbar-group/style.scss
++++ b/packages/components/src/toolbar-group/style.scss
+@@ -79,6 +79,7 @@ div.components-toolbar {
+ 
+ // First button in a group.
+ .components-accessible-toolbar .components-toolbar-group > .components-button:first-child.has-icon,
++.components-accessible-toolbar .components-toolbar-group > div:first-child > .components-button.has-icon,
+ .components-toolbar div:first-child .components-button.has-icon {
+ 	min-width: $block-toolbar-height - $grid-unit-15 / 2;
+ 	padding-left: $grid-unit-15 - $border-width;
+@@ -92,6 +93,7 @@ div.components-toolbar {
+ 
+ // Last button in a group.
+ .components-accessible-toolbar .components-toolbar-group > .components-button:last-child.has-icon,
++.components-accessible-toolbar .components-toolbar-group > div:last-child > .components-button.has-icon,
+ .components-toolbar div:last-child .components-button.has-icon {
+ 	min-width: $block-toolbar-height - $grid-unit-15 / 2;
+ 	padding-left: $grid-unit-15 / 2;
+@@ -104,7 +106,8 @@ div.components-toolbar {
+ }
+ 
+ // Single buttons should remain 48px.
+-.components-accessible-toolbar .components-toolbar-group > .components-button:first-child:last-child.has-icon,
++.components-accessible-toolbar .components-toolbar-group > .components-button:first-of-type:last-of-type.has-icon,
++.components-accessible-toolbar .components-toolbar-group > div:first-child:last-child > .components-button.has-icon,
+ .components-toolbar div:first-child:last-child > .components-button.has-icon {
+ 	min-width: $block-toolbar-height;
+ 	padding-left: $grid-unit-15;
+diff --git a/packages/components/src/toolbar-group/toolbar-group-collapsed.js b/packages/components/src/toolbar-group/toolbar-group-collapsed.js
+index fb9310bffdc9f6..1c020ad84d5c41 100644
+--- a/packages/components/src/toolbar-group/toolbar-group-collapsed.js
++++ b/packages/components/src/toolbar-group/toolbar-group-collapsed.js
+@@ -18,7 +18,10 @@ function ToolbarGroupCollapsed( { controls = [], ...props } ) {
+ 	const renderDropdownMenu = ( toggleProps ) => (
+ 		<DropdownMenu
+ 			controls={ controls }
+-			toggleProps={ toggleProps }
++			toggleProps={ {
++				...toggleProps,
++				'data-experimental-toolbar-item': true,
++			} }
+ 			{ ...props }
+ 		/>
+ 	);
+diff --git a/packages/components/src/toolbar-item/index.js b/packages/components/src/toolbar-item/index.js
+index b4de3013fd8db9..a475eb5e8e3c79 100644
+--- a/packages/components/src/toolbar-item/index.js
++++ b/packages/components/src/toolbar-item/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { useToolbarItem } from 'reakit/Toolbar';
++import { ToolbarItem as BaseToolbarItem } from 'reakit/Toolbar';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,11 +16,6 @@ import ToolbarContext from '../toolbar-context';
+ 
+ function ToolbarItem( { children, ...props }, ref ) {
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+-	// https://reakit.io/docs/composition/#props-hooks
+-	const itemProps = useToolbarItem( accessibleToolbarState, {
+-		...props,
+-		ref,
+-	} );
+ 
+ 	if ( typeof children !== 'function' ) {
+ 		warning(
+@@ -29,14 +24,21 @@ function ToolbarItem( { children, ...props }, ref ) {
+ 		return null;
+ 	}
+ 
++	const allProps = { ...props, ref, 'data-experimental-toolbar-item': true };
++
+ 	if ( ! accessibleToolbarState ) {
+-		warning(
+-			'`ToolbarItem` should be rendered within `<Toolbar __experimentalAccessibilityLabel="label">`'
+-		);
+-		return null;
++		return children( allProps );
+ 	}
+ 
+-	return children( itemProps );
++	return (
++		<BaseToolbarItem { ...accessibleToolbarState } { ...allProps }>
++			{ ( htmlProps ) =>
++				// Overwriting BaseToolbarItem's onMouseDown since it disables drag
++				// and drop
++				children( { ...htmlProps, onMouseDown: allProps.onMouseDown } )
++			}
++		</BaseToolbarItem>
++	);
+ }
+ 
+ export default forwardRef( ToolbarItem );
+diff --git a/packages/components/src/toolbar-item/index.native.js b/packages/components/src/toolbar-item/index.native.js
+deleted file mode 100644
+index 1d38d98ce9af1a..00000000000000
+--- a/packages/components/src/toolbar-item/index.native.js
++++ /dev/null
+@@ -1,18 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-import warning from '@wordpress/warning';
+-
+-function ToolbarItem( { children, ...props }, ref ) {
+-	if ( typeof children !== 'function' ) {
+-		warning(
+-			'`ToolbarItem` is a generic headless component that accepts only function children props'
+-		);
+-		return null;
+-	}
+-
+-	return children( { ...props, ref } );
+-}
+-
+-export default forwardRef( ToolbarItem );
+diff --git a/packages/components/src/toolbar/index.js b/packages/components/src/toolbar/index.js
+index 74fe904adf9952..228f73a7e5e453 100644
+--- a/packages/components/src/toolbar/index.js
++++ b/packages/components/src/toolbar/index.js
+@@ -3,6 +3,11 @@
+  */
+ import classnames from 'classnames';
+ 
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+@@ -16,8 +21,12 @@ import ToolbarContainer from './toolbar-container';
+  *
+  * @param {Object} props             Component props.
+  * @param {string} [props.className] Class to set on the container div.
++ * @param {Object} ref               React Element ref.
+  */
+-function Toolbar( { className, __experimentalAccessibilityLabel, ...props } ) {
++function Toolbar(
++	{ className, __experimentalAccessibilityLabel, ...props },
++	ref
++) {
+ 	if ( __experimentalAccessibilityLabel ) {
+ 		return (
+ 			<ToolbarContainer
+@@ -27,12 +36,16 @@ function Toolbar( { className, __experimentalAccessibilityLabel, ...props } ) {
+ 					className
+ 				) }
+ 				accessibilityLabel={ __experimentalAccessibilityLabel }
++				ref={ ref }
+ 				{ ...props }
+ 			/>
+ 		);
+ 	}
+-
++	// When the __experimentalAccessibilityLabel prop is not passed, Toolbar will
++	// fallback to ToolbarGroup. This should be deprecated as soon as the new API
++	// gets stable.
++	// See https://github.com/WordPress/gutenberg/pull/20008#issuecomment-624503410
+ 	return <ToolbarGroup { ...props } className={ className } />;
+ }
+ 
+-export default Toolbar;
++export default forwardRef( Toolbar );
+diff --git a/packages/components/src/toolbar/style.scss b/packages/components/src/toolbar/style.scss
+index fdbcccb3f20294..ae147df18885c4 100644
+--- a/packages/components/src/toolbar/style.scss
++++ b/packages/components/src/toolbar/style.scss
+@@ -4,7 +4,7 @@
+ 	border-radius: $radius-block-ui;
+ 	flex-shrink: 0;
+ 
+-	.components-toolbar-group:last-child {
++	& > .components-toolbar-group:last-child {
+ 		border-right: none;
+ 	}
+ }
+diff --git a/packages/e2e-tests/specs/editor/various/keyboard-navigable-blocks.test.js b/packages/e2e-tests/specs/editor/various/keyboard-navigable-blocks.test.js
+index 8f7d6818d380d3..3f590f4741f12b 100644
+--- a/packages/e2e-tests/specs/editor/various/keyboard-navigable-blocks.test.js
++++ b/packages/e2e-tests/specs/editor/various/keyboard-navigable-blocks.test.js
+@@ -29,7 +29,6 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
+ 	await page.keyboard.press( 'Tab' );
+ 	await expect( await getActiveLabel() ).toBe( 'Add block' );
+ 
+-	await tabThroughBlockMoverControl();
+ 	await tabThroughBlockToolbar();
+ 
+ 	await page.keyboard.press( 'Tab' );
+@@ -42,35 +41,36 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
+ 	await expect( await getActiveLabel() ).toBe( 'Open document settings' );
+ };
+ 
+-const tabThroughBlockMoverControl = async () => {
++const tabThroughBlockToolbar = async () => {
+ 	await page.keyboard.press( 'Tab' );
+ 	await expect( await getActiveLabel() ).toBe( 'Move up' );
+ 
+-	await page.keyboard.press( 'Tab' );
++	await page.keyboard.press( 'ArrowRight' );
+ 	await expect( await getActiveLabel() ).toBe( 'Move down' );
+-};
+ 
+-const tabThroughBlockToolbar = async () => {
+-	await page.keyboard.press( 'Tab' );
++	await page.keyboard.press( 'ArrowRight' );
+ 	await expect( await getActiveLabel() ).toBe( 'Change block type or style' );
+ 
+-	await page.keyboard.press( 'Tab' );
++	await page.keyboard.press( 'ArrowRight' );
+ 	await expect( await getActiveLabel() ).toBe( 'Change text alignment' );
+ 
+-	await page.keyboard.press( 'Tab' );
++	await page.keyboard.press( 'ArrowRight' );
+ 	await expect( await getActiveLabel() ).toBe( 'Bold' );
+ 
+-	await page.keyboard.press( 'Tab' );
++	await page.keyboard.press( 'ArrowRight' );
+ 	await expect( await getActiveLabel() ).toBe( 'Italic' );
+ 
+-	await page.keyboard.press( 'Tab' );
++	await page.keyboard.press( 'ArrowRight' );
+ 	await expect( await getActiveLabel() ).toBe( 'Link' );
+ 
+-	await page.keyboard.press( 'Tab' );
++	await page.keyboard.press( 'ArrowRight' );
+ 	await expect( await getActiveLabel() ).toBe( 'More rich text controls' );
+ 
+-	await page.keyboard.press( 'Tab' );
++	await page.keyboard.press( 'ArrowRight' );
+ 	await expect( await getActiveLabel() ).toBe( 'More options' );
++
++	await page.keyboard.press( 'ArrowRight' );
++	await expect( await getActiveLabel() ).toBe( 'Move up' );
+ };
+ 
+ describe( 'Order of block keyboard navigation', () => {
+@@ -197,6 +197,6 @@ describe( 'Order of block keyboard navigation', () => {
+ 		);
+ 
+ 		await pressKeyWithModifier( 'shift', 'Tab' );
+-		await expect( await getActiveLabel() ).toBe( 'More options' );
++		await expect( await getActiveLabel() ).toBe( 'Move up' );
+ 	} );
+ } );
+diff --git a/packages/edit-navigation/src/components/menu-editor/style.scss b/packages/edit-navigation/src/components/menu-editor/style.scss
+index aa7a3d98b33f55..8b76eeb8f1d6ed 100644
+--- a/packages/edit-navigation/src/components/menu-editor/style.scss
++++ b/packages/edit-navigation/src/components/menu-editor/style.scss
+@@ -19,6 +19,7 @@
+ 	border: 1px solid #e2e4e7;
+ 
+ 	// Borders around toolbar segments.
++	.components-toolbar-group,
+ 	.components-toolbar {
+ 		background: none;
+ 		// IE11 has thick paddings without this.
+diff --git a/packages/edit-post/src/components/header/header-toolbar/style.scss b/packages/edit-post/src/components/header/header-toolbar/style.scss
+index d399239b83b108..e2c9241c4dec33 100644
+--- a/packages/edit-post/src/components/header/header-toolbar/style.scss
++++ b/packages/edit-post/src/components/header/header-toolbar/style.scss
+@@ -39,6 +39,7 @@
+ 		display: none;
+ 	}
+ 
++	.block-editor-block-toolbar .components-toolbar-group,
+ 	.block-editor-block-toolbar .components-toolbar {
+ 		border-top: none;
+ 		border-bottom: none;
+@@ -72,6 +73,7 @@
+ 			border-left: $border-width solid $light-gray-500;
+ 		}
+ 
++		.block-editor-block-toolbar .components-toolbar-group,
+ 		.block-editor-block-toolbar .components-toolbar {
+ 			$top-toolbar-padding: ($header-height - $grid-unit-60) / 2;
+ 			height: $header-height;
+diff --git a/packages/interface/src/components/complementary-area/style.scss b/packages/interface/src/components/complementary-area/style.scss
+index 469e6605d13d5f..30ba90853102b8 100644
+--- a/packages/interface/src/components/complementary-area/style.scss
++++ b/packages/interface/src/components/complementary-area/style.scss
+@@ -65,6 +65,7 @@
+ 		margin: 1.5em 0;
+ 	}
+ 
++	div.components-toolbar-group,
+ 	div.components-toolbar {
+ 		box-shadow: none;
+ 		margin-bottom: 1.5em;

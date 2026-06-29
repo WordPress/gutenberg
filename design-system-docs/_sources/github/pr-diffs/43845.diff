@@ -1,0 +1,358 @@
+diff --git a/packages/block-editor/src/components/block-popover/index.js b/packages/block-editor/src/components/block-popover/index.js
+index 06b878e618be17..2a66623e2fbd6d 100644
+--- a/packages/block-editor/src/components/block-popover/index.js
++++ b/packages/block-editor/src/components/block-popover/index.js
+@@ -68,7 +68,7 @@ function BlockPopover(
+ 			__unstableSlotName={ __unstablePopoverSlot || null }
+ 			resize={ false }
+ 			flip={ false }
+-			__unstableShift
++			shift
+ 			{ ...props }
+ 			className={ classnames(
+ 				'block-editor-block-popover',
+diff --git a/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js b/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
+index 36a17506508a25..bea9487e48ca11 100644
+--- a/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
++++ b/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
+@@ -16,7 +16,7 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
+ // top of the viewport.
+ const DEFAULT_PROPS = {
+ 	flip: false,
+-	__unstableShift: true,
++	shift: true,
+ };
+ 
+ // When there isn't enough height between the top of the block and the editor
+@@ -26,7 +26,7 @@ const DEFAULT_PROPS = {
+ // otherwise the toolbar will be off-screen.
+ const RESTRICTED_HEIGHT_PROPS = {
+ 	flip: true,
+-	__unstableShift: false,
++	shift: false,
+ };
+ 
+ /**
+diff --git a/packages/block-editor/src/components/colors-gradients/dropdown.js b/packages/block-editor/src/components/colors-gradients/dropdown.js
+index 4de8891a97be9d..9c13efba03cdbb 100644
+--- a/packages/block-editor/src/components/colors-gradients/dropdown.js
++++ b/packages/block-editor/src/components/colors-gradients/dropdown.js
+@@ -120,7 +120,7 @@ export default function ColorGradientSettingsDropdown( {
+ 		popoverProps = {
+ 			placement: 'left-start',
+ 			offset: 36,
+-			__unstableShift: true,
++			shift: true,
+ 		};
+ 	}
+ 
+diff --git a/packages/block-editor/src/components/url-popover/index.js b/packages/block-editor/src/components/url-popover/index.js
+index de5760fea5694d..38d5e06015ec35 100644
+--- a/packages/block-editor/src/components/url-popover/index.js
++++ b/packages/block-editor/src/components/url-popover/index.js
+@@ -33,7 +33,7 @@ function URLPopover( {
+ 			className="block-editor-url-popover"
+ 			focusOnMount={ focusOnMount }
+ 			position={ position }
+-			__unstableShift
++			shift
+ 			{ ...popoverProps }
+ 		>
+ 			<div className="block-editor-url-popover__input-container">
+diff --git a/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap
+index f957ca01f41636..fe0b49ae57415d 100644
+--- a/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap
+@@ -2,10 +2,10 @@
+ 
+ exports[`URLPopover matches the snapshot in its default state 1`] = `
+ <ForwardRef(Popover)
+-  __unstableShift={true}
+   className="block-editor-url-popover"
+   focusOnMount="firstElement"
+   position="bottom center"
++  shift={true}
+ >
+   <div
+     className="block-editor-url-popover__input-container"
+@@ -39,10 +39,10 @@ exports[`URLPopover matches the snapshot in its default state 1`] = `
+ 
+ exports[`URLPopover matches the snapshot when the settings are toggled open 1`] = `
+ <ForwardRef(Popover)
+-  __unstableShift={true}
+   className="block-editor-url-popover"
+   focusOnMount="firstElement"
+   position="bottom center"
++  shift={true}
+ >
+   <div
+     className="block-editor-url-popover__input-container"
+@@ -83,10 +83,10 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`]
+ 
+ exports[`URLPopover matches the snapshot when there are no settings 1`] = `
+ <ForwardRef(Popover)
+-  __unstableShift={true}
+   className="block-editor-url-popover"
+   focusOnMount="firstElement"
+   position="bottom center"
++  shift={true}
+ >
+   <div
+     className="block-editor-url-popover__input-container"
+diff --git a/packages/block-library/src/button/edit.js b/packages/block-library/src/button/edit.js
+index 61e3bfa557e81a..97775bc0bcd10a 100644
+--- a/packages/block-library/src/button/edit.js
++++ b/packages/block-library/src/button/edit.js
+@@ -221,7 +221,7 @@ function ButtonEdit( props ) {
+ 					anchorRef={ ref?.current }
+ 					focusOnMount={ isEditingURL ? 'firstElement' : false }
+ 					__unstableSlotName={ '__unstable-block-tools-after' }
+-					__unstableShift
++					shift
+ 				>
+ 					<LinkControl
+ 						className="wp-block-navigation-link__inline-link-input"
+diff --git a/packages/block-library/src/navigation-link/edit.js b/packages/block-library/src/navigation-link/edit.js
+index 57cea79ac78efb..c208d83c1a45e5 100644
+--- a/packages/block-library/src/navigation-link/edit.js
++++ b/packages/block-library/src/navigation-link/edit.js
+@@ -845,7 +845,7 @@ export default function NavigationLinkEdit( {
+ 							position="bottom center"
+ 							onClose={ () => setIsLinkOpen( false ) }
+ 							anchorRef={ listItemRef.current }
+-							__unstableShift
++							shift
+ 						>
+ 							<LinkControl
+ 								hasTextControl
+diff --git a/packages/block-library/src/navigation-submenu/edit.js b/packages/block-library/src/navigation-submenu/edit.js
+index 12ee3d193f7496..99b5ccff153972 100644
+--- a/packages/block-library/src/navigation-submenu/edit.js
++++ b/packages/block-library/src/navigation-submenu/edit.js
+@@ -630,7 +630,7 @@ export default function NavigationSubmenuEdit( {
+ 							position="bottom center"
+ 							onClose={ () => setIsLinkOpen( false ) }
+ 							anchorRef={ listItemRef.current }
+-							__unstableShift
++							shift
+ 						>
+ 							<LinkControl
+ 								className="wp-block-navigation-link__inline-link-input"
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 47159ec62d079d..1e545e0d6c77fe 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,13 +9,14 @@
+ 
+ ### Enhancements
+ 
+--   `ToggleControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43717](https://github.com/WordPress/gutenberg/pull/43717)). 
++-   `ToggleControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43717](https://github.com/WordPress/gutenberg/pull/43717)).
+ -   `CheckboxControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43720](https://github.com/WordPress/gutenberg/pull/43720)).
+ -   `TextControl`, `TextareaControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43782](https://github.com/WordPress/gutenberg/pull/43782)).
+ -   `RangeControl`: Tweak dark gray marking color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
+ -   `UnitControl`: Tweak unit dropdown color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
+ -   `CardHeader`, `CardBody`, `CardFooter`: Tweak `isShady` background colors to be consistent with the grays in `@wordpress/base-styles` ([#43719](https://github.com/WordPress/gutenberg/pull/43719)).
+ -   `InputControl`, `SelectControl`: Tweak `disabled` colors to be consistent with the grays in `@wordpress/base-styles` ([#43719](https://github.com/WordPress/gutenberg/pull/43719)).
++-   `Popover`: stabilize `__unstableShift` to `shift` ([#43845](https://github.com/WordPress/gutenberg/pull/43845)).
+ 
+ ### Internal
+ 
+@@ -23,7 +24,7 @@
+ -   `ToggleGroupControl`: Rename `__experimentalIsIconGroup` prop to `__experimentalIsBorderless` ([#43771](https://github.com/WordPress/gutenberg/pull/43771/)).
+ -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
+ -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
+--   `ToggleControl`: Convert to TypeScript and streamline CSS ([#43717](https://github.com/WordPress/gutenberg/pull/43717)). 
++-   `ToggleControl`: Convert to TypeScript and streamline CSS ([#43717](https://github.com/WordPress/gutenberg/pull/43717)).
+ -   `Navigation`: use `code` instead of `keyCode` for keyboard events ([#43644](https://github.com/WordPress/gutenberg/pull/43644/)).
+ -   `ComboboxControl`: Add unit tests ([#42403](https://github.com/WordPress/gutenberg/pull/42403)).
+ -   `NavigableContainer`: use `code` instead of `keyCode` for keyboard events, rewrite tests using RTL and `user-event` ([#43606](https://github.com/WordPress/gutenberg/pull/43606/)).
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index d24c0bf2603f9d..777a36bb22a769 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -43,7 +43,7 @@ const BorderBoxControlSplitControls = (
+ 				placement: popoverPlacement,
+ 				offset: popoverOffset,
+ 				anchorRef: containerRef,
+-				__unstableShift: true,
++				shift: true,
+ 		  }
+ 		: undefined;
+ 
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index 877e5c4da0669d..a1e66d4c466874 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -69,7 +69,7 @@ const BorderBoxControl = (
+ 				placement: popoverPlacement,
+ 				offset: popoverOffset,
+ 				anchorRef: containerRef,
+-				__unstableShift: true,
++				shift: true,
+ 		  }
+ 		: undefined;
+ 
+diff --git a/packages/components/src/color-palette/index.js b/packages/components/src/color-palette/index.js
+index 29691a3c63ee94..baf88268507658 100644
+--- a/packages/components/src/color-palette/index.js
++++ b/packages/components/src/color-palette/index.js
+@@ -120,7 +120,7 @@ export function CustomColorPickerDropdown( {
+ } ) {
+ 	const popoverProps = useMemo(
+ 		() => ( {
+-			__unstableShift: true,
++			shift: true,
+ 			...( isRenderedInSidebar
+ 				? {
+ 						// When in the sidebar: open to the left (stacking),
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.js.snap b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+index 30084daf47d7d5..9b5f89011dac7a 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+@@ -366,9 +366,9 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+   contentClassName="components-color-palette__custom-color-dropdown-content"
+   popoverProps={
+     Object {
+-      "__unstableShift": true,
+       "offset": 8,
+       "placement": "bottom",
++      "shift": true,
+     }
+   }
+   renderContent={[Function]}
+@@ -744,9 +744,9 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+             contentClassName="components-color-palette__custom-color-dropdown-content"
+             popoverProps={
+               Object {
+-                "__unstableShift": true,
+                 "offset": 8,
+                 "placement": "bottom",
++                "shift": true,
+               }
+             }
+             renderContent={[Function]}
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index 6dfd1f6bdd7243..b200e213846fff 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -91,6 +91,14 @@ Adjusts the height of the `Popover` to prevent overflow.
+ -   Required: No
+ -   Default: `true`
+ 
++### shift
++
++Enables the `Popover` to shift in order to stay in view when meeting the viewport edges.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
+ ### offset
+ 
+ The distance (in pixels) between the anchor and popover.
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index eb3607e5b305c5..16d47aeddb6016 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -6,7 +6,7 @@ import classnames from 'classnames';
+ import {
+ 	useFloating,
+ 	flip as flipMiddleware,
+-	shift,
++	shift as shiftMiddleware,
+ 	autoUpdate,
+ 	arrow,
+ 	offset as offsetMiddleware,
+@@ -162,7 +162,8 @@ const Popover = (
+ 		__unstableSlotName = SLOT_NAME,
+ 		flip = true,
+ 		resize = true,
+-		__unstableShift = false,
++		shift = false,
++		__unstableShift,
+ 		__unstableForcePosition,
+ 		...contentProps
+ 	},
+@@ -188,6 +189,18 @@ const Popover = (
+ 		resize = ! __unstableForcePosition;
+ 	}
+ 
++	let shouldShift = shift;
++	if ( __unstableShift !== undefined ) {
++		deprecated( '`__unstableShift` prop in Popover component', {
++			since: '6.1',
++			version: '6.3',
++			alternative: '`shift` prop`',
++		} );
++
++		// Back-compat.
++		shouldShift = __unstableShift;
++	}
++
+ 	const arrowRef = useRef( null );
+ 
+ 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
+@@ -262,8 +275,8 @@ const Popover = (
+ 					},
+ 			  } )
+ 			: undefined,
+-		__unstableShift
+-			? shift( {
++		shouldShift
++			? shiftMiddleware( {
+ 					crossAxis: true,
+ 					limiter: limitShift(),
+ 					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
+diff --git a/packages/components/src/popover/stories/index.js b/packages/components/src/popover/stories/index.js
+index 68c0488e92ffc5..e4f9c90a9c2e44 100644
+--- a/packages/components/src/popover/stories/index.js
++++ b/packages/components/src/popover/stories/index.js
+@@ -75,7 +75,7 @@ export default {
+ 		__unstableSlotName: { control: { type: null } },
+ 		resize: { control: { type: 'boolean' } },
+ 		flip: { control: { type: 'boolean' } },
+-		__unstableShift: { control: { type: 'boolean' } },
++		shift: { control: { type: 'boolean' } },
+ 	},
+ };
+ 
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index bef68a9363a211..75508d7a78b784 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -79,7 +79,7 @@ const addPopoverToGrandchildren = ( {
+ 				animate={ false }
+ 				offset={ offset }
+ 				anchorRef={ anchorRef }
+-				__unstableShift
++				shift
+ 			>
+ 				{ text }
+ 				<Shortcut
+diff --git a/packages/format-library/src/link/inline.js b/packages/format-library/src/link/inline.js
+index b2998636010533..d648ce3a04e348 100644
+--- a/packages/format-library/src/link/inline.js
++++ b/packages/format-library/src/link/inline.js
+@@ -227,7 +227,7 @@ function InlineLinkUI( {
+ 			focusOnMount={ focusOnMount.current }
+ 			onClose={ stopAddingLink }
+ 			position="bottom center"
+-			__unstableShift
++			shift
+ 		>
+ 			<LinkControl
+ 				key={ forceRemountKey }
+diff --git a/packages/widgets/src/blocks/legacy-widget/edit/form.js b/packages/widgets/src/blocks/legacy-widget/edit/form.js
+index 0498587f2a3ccb..3d0a1026db7067 100644
+--- a/packages/widgets/src/blocks/legacy-widget/edit/form.js
++++ b/packages/widgets/src/blocks/legacy-widget/edit/form.js
+@@ -107,7 +107,7 @@ export default function Form( {
+ 					offset={ 32 }
+ 					resize={ false }
+ 					flip={ false }
+-					__unstableShift
++					shift
+ 				>
+ 					<div
+ 						ref={ ref }

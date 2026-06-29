@@ -1,0 +1,140 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ee0a64ca5ff3fb..88935b54d35e47 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `FontSizePicker`: Allow custom units for custom font size control ([#48468](https://github.com/WordPress/gutenberg/pull/48468)).
++-   `FormTokenField`: Hide suggestions list on blur event if the input value is invalid ([#48785](https://github.com/WordPress/gutenberg/pull/48785)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index a7c8e9d272f8e3..980376e905e782 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -153,7 +153,10 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 	}
+ 
+ 	function onBlur() {
+-		if ( inputHasValidValue() ) {
++		if (
++			inputHasValidValue() &&
++			__experimentalValidateInput( incompleteTokenValue )
++		) {
+ 			setIsActive( false );
+ 		} else {
+ 			// Reset to initial state
+diff --git a/packages/components/src/form-token-field/stories/index.tsx b/packages/components/src/form-token-field/stories/index.tsx
+index d4af7209132da2..f120c0dc52211e 100644
+--- a/packages/components/src/form-token-field/stories/index.tsx
++++ b/packages/components/src/form-token-field/stories/index.tsx
+@@ -123,3 +123,16 @@ WithCustomRenderItem.args = {
+ 		<div>{ `${ item } — a nice place to visit` }</div>
+ 	),
+ };
++
++/**
++ * Only values for which the `__experimentalValidateInput` function returns
++ * `true` will be tokenized. (This is still an experimental feature and is
++ * subject to change.)
++ */
++export const WithValidatedInput: ComponentStory< typeof FormTokenField > =
++	DefaultTemplate.bind( {} );
++WithValidatedInput.args = {
++	...Default.args,
++	__experimentalValidateInput: ( input: string ) =>
++		continents.includes( input ),
++};
+diff --git a/packages/components/src/form-token-field/test/index.tsx b/packages/components/src/form-token-field/test/index.tsx
+index 94761d420573b4..a10677f3c10aa1 100644
+--- a/packages/components/src/form-token-field/test/index.tsx
++++ b/packages/components/src/form-token-field/test/index.tsx
+@@ -950,6 +950,86 @@ describe( 'FormTokenField', () => {
+ 			expect( onChangeSpy ).not.toHaveBeenCalled();
+ 		} );
+ 
++		it( 'should hide the suggestion list on an empty input', async () => {
++			const user = userEvent.setup();
++
++			const suggestions = [ 'One', 'Two', 'Three' ];
++
++			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
++
++			const input = screen.getByRole( 'combobox' );
++
++			await user.type( input, 'on' );
++
++			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
++				'One',
++			] );
++
++			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
++
++			await user.clear( input );
++
++			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
++		} );
++
++		it( 'should hide the suggestion list on blur and invalid input', async () => {
++			const user = userEvent.setup();
++
++			const suggestions = [ 'One', 'Two', 'Three' ];
++
++			render(
++				<FormTokenFieldWithState
++					suggestions={ suggestions }
++					__experimentalValidateInput={ ( token ) =>
++						suggestions.includes( token )
++					}
++				/>
++			);
++
++			const input = screen.getByRole( 'combobox' );
++
++			await user.type( input, 'on' );
++
++			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
++				'One',
++			] );
++
++			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
++
++			await user.click( document.body );
++
++			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
++		} );
++
++		it( 'should not hide the suggestion list on blur and valid input', async () => {
++			const user = userEvent.setup();
++
++			const suggestions = [ 'One', 'Two', 'Three' ];
++
++			render(
++				<FormTokenFieldWithState
++					suggestions={ suggestions }
++					__experimentalValidateInput={ ( token ) =>
++						suggestions.includes( token )
++					}
++				/>
++			);
++
++			const input = screen.getByRole( 'combobox' );
++
++			await user.type( input, 'One' );
++
++			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
++				'One',
++			] );
++
++			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
++
++			await user.click( document.body );
++
++			expect( screen.getByRole( 'listbox' ) ).toBeVisible();
++		} );
++
+ 		it( 'matches the search text with the suggestions in a case-insensitive way', async () => {
+ 			const user = userEvent.setup();
+ 

@@ -1,0 +1,257 @@
+diff --git a/packages/components/src/navigator/context.ts b/packages/components/src/navigator/context.ts
+index 17b26fb9c14ad5..083b2082c49be2 100644
+--- a/packages/components/src/navigator/context.ts
++++ b/packages/components/src/navigator/context.ts
+@@ -8,5 +8,10 @@ import { createContext } from '@wordpress/element';
+  */
+ import type { NavigatorContext as NavigatorContextType } from './types';
+ 
+-const initialContextValue: NavigatorContextType = [ {}, () => {} ];
++const initialContextValue: NavigatorContextType = {
++	location: {},
++	setLocation: () => {},
++	isAnimating: false,
++	setIsAnimating: () => {},
++};
+ export const NavigatorContext = createContext( initialContextValue );
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index 5f8e82e6137213..e1e5b759ecef8a 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -3,11 +3,12 @@
+  */
+ // eslint-disable-next-line no-restricted-imports
+ import type { Ref } from 'react';
++import { css } from '@emotion/react';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { useState } from '@wordpress/element';
++import { useState, useMemo } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -17,26 +18,43 @@ import {
+ 	useContextSystem,
+ 	WordPressComponentProps,
+ } from '../../ui/context';
++import { useCx } from '../../utils/hooks/use-cx';
+ import { View } from '../../view';
+ import { NavigatorContext } from '../context';
+-import type { NavigatorProviderProps, NavigatorPath } from '../types';
++import type { NavigatorProviderProps, NavigatorLocation } from '../types';
+ 
+ function NavigatorProvider(
+ 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
+ 	forwardedRef: Ref< any >
+ ) {
+-	const { initialPath, children, ...otherProps } = useContextSystem(
+-		props,
+-		'NavigatorProvider'
+-	);
++	const {
++		initialPath,
++		children,
++		className,
++		...otherProps
++	} = useContextSystem( props, 'NavigatorProvider' );
+ 
+-	const [ path, setPath ] = useState< NavigatorPath >( {
++	const [ location, setLocation ] = useState< NavigatorLocation >( {
+ 		path: initialPath,
+ 	} );
++	const [ isAnimating, setIsAnimating ] = useState< boolean >( false );
++
++	const cx = useCx();
++	const classes = useMemo(
++		() => cx( isAnimating && css( { overflow: 'hidden' } ), className ),
++		[ className, isAnimating ]
++	);
+ 
+ 	return (
+-		<View ref={ forwardedRef } { ...otherProps }>
+-			<NavigatorContext.Provider value={ [ path, setPath ] }>
++		<View ref={ forwardedRef } className={ classes } { ...otherProps }>
++			<NavigatorContext.Provider
++				value={ {
++					location,
++					setLocation,
++					isAnimating,
++					setIsAnimating,
++				} }
++			>
+ 				{ children }
+ 			</NavigatorContext.Provider>
+ 		</View>
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 95d7fec931dbbe..eff2e7c2f21d12 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -9,7 +9,12 @@ import { motion, MotionProps } from 'framer-motion';
+ /**
+  * WordPress dependencies
+  */
+-import { useContext, useEffect, useState } from '@wordpress/element';
++import {
++	useContext,
++	useEffect,
++	useState,
++	useCallback,
++} from '@wordpress/element';
+ import { useReducedMotion, useFocusOnMount } from '@wordpress/compose';
+ import { isRTL } from '@wordpress/i18n';
+ 
+@@ -44,8 +49,10 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 	);
+ 
+ 	const prefersReducedMotion = useReducedMotion();
+-	const [ currentPath ] = useContext( NavigatorContext );
+-	const isMatch = currentPath.path === path;
++	const { location: currentLocation, setIsAnimating } = useContext(
++		NavigatorContext
++	);
++	const isMatch = currentLocation.path === path;
+ 	const ref = useFocusOnMount();
+ 
+ 	// This flag is used to only apply the focus on mount when the actual path changes.
+@@ -55,6 +62,11 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 		setHasPathChanged( true );
+ 	}, [ path ] );
+ 
++	const handleAnimationComplete = useCallback(
++		() => setIsAnimating( false ),
++		[ setIsAnimating ]
++	);
++
+ 	if ( ! isMatch ) {
+ 		return null;
+ 	}
+@@ -79,8 +91,8 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 	const initial = {
+ 		opacity: 0,
+ 		x:
+-			( isRTL() && currentPath.isBack ) ||
+-			( ! isRTL() && ! currentPath.isBack )
++			( isRTL() && currentLocation.isBack ) ||
++			( ! isRTL() && ! currentLocation.isBack )
+ 				? 50
+ 				: -50,
+ 	};
+@@ -88,8 +100,8 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 		delay: animationExitDelay,
+ 		opacity: 0,
+ 		x:
+-			( ! isRTL() && currentPath.isBack ) ||
+-			( isRTL() && ! currentPath.isBack )
++			( ! isRTL() && currentLocation.isBack ) ||
++			( isRTL() && ! currentLocation.isBack )
+ 				? 50
+ 				: -50,
+ 		transition: {
+@@ -107,6 +119,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 	return (
+ 		<motion.div
+ 			ref={ hasPathChanged ? ref : undefined }
++			onAnimationComplete={ handleAnimationComplete }
+ 			{ ...otherProps }
+ 			{ ...animatedProps }
+ 		>
+diff --git a/packages/components/src/navigator/stories/index.js b/packages/components/src/navigator/stories/index.js
+index 42a5a639e6e671..6d18bf0f070497 100644
+--- a/packages/components/src/navigator/stories/index.js
++++ b/packages/components/src/navigator/stories/index.js
+@@ -2,6 +2,8 @@
+  * Internal dependencies
+  */
+ import Button from '../../button';
++import { CardBody, CardHeader } from '../../card';
++import { Flyout } from '../../flyout';
+ import { NavigatorProvider, NavigatorScreen, useNavigator } from '../';
+ 
+ export default {
+@@ -23,9 +25,18 @@ const MyNavigation = () => (
+ 	<NavigatorProvider initialPath="/">
+ 		<NavigatorScreen path="/">
+ 			<p>This is the home screen.</p>
++
+ 			<NavigatorButton isPrimary path="/child">
+ 				Navigate to child screen.
+ 			</NavigatorButton>
++
++			<Flyout
++				trigger={ <Button>Click top open test dialog</Button> }
++				placement="bottom-start"
++			>
++				<CardHeader>Go</CardHeader>
++				<CardBody>Stuff</CardBody>
++			</Flyout>
+ 		</NavigatorScreen>
+ 
+ 		<NavigatorScreen path="/child">
+diff --git a/packages/components/src/navigator/types.ts b/packages/components/src/navigator/types.ts
+index acc5aecb840dff..0698afb793cc0f 100644
+--- a/packages/components/src/navigator/types.ts
++++ b/packages/components/src/navigator/types.ts
+@@ -4,22 +4,24 @@
+ // eslint-disable-next-line no-restricted-imports
+ import type { ReactNode } from 'react';
+ 
+-type NavigatorPathOptions = {
++type NavigatorLocationOptions = {
+ 	isBack?: boolean;
+ };
+ 
+-export type NavigatorPath = NavigatorPathOptions & {
++export type NavigatorLocation = NavigatorLocationOptions & {
+ 	path?: string;
+ };
+ 
+-export type NavigatorContext = [
+-	NavigatorPath,
+-	( path: NavigatorPath ) => void
+-];
++export type NavigatorContext = {
++	location: NavigatorLocation;
++	setLocation: ( location: NavigatorLocation ) => void;
++	isAnimating: boolean;
++	setIsAnimating: ( isAnimating: boolean ) => void;
++};
+ 
+ // Returned by the `useNavigator` hook
+ export type Navigator = {
+-	push: ( path: string, options: NavigatorPathOptions ) => void;
++	push: ( path: string, options: NavigatorLocationOptions ) => void;
+ };
+ 
+ export type NavigatorProviderProps = {
+diff --git a/packages/components/src/navigator/use-navigator.ts b/packages/components/src/navigator/use-navigator.ts
+index 4d39de1fe5ceb4..8fa90f27ee584b 100644
+--- a/packages/components/src/navigator/use-navigator.ts
++++ b/packages/components/src/navigator/use-navigator.ts
+@@ -1,6 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
++import { useReducedMotion } from '@wordpress/compose';
+ import { useContext } from '@wordpress/element';
+ 
+ /**
+@@ -13,11 +14,15 @@ import type { Navigator } from './types';
+  * Retrieves a `navigator` instance.
+  */
+ function useNavigator(): Navigator {
+-	const [ , setPath ] = useContext( NavigatorContext );
++	const { setLocation, setIsAnimating } = useContext( NavigatorContext );
++	const prefersReducedMotion = useReducedMotion();
+ 
+ 	return {
+ 		push( path, options ) {
+-			setPath( { path, ...options } );
++			if ( ! prefersReducedMotion ) {
++				setIsAnimating( true );
++			}
++			setLocation( { path, ...options } );
+ 		},
+ 	};
+ }

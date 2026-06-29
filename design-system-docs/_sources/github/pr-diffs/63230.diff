@@ -1,0 +1,29 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 289a1b3f99f6a4..0b26ccca6c7794 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -34,6 +34,7 @@
+ -   `CustomSelectControlV2`: fix trigger text alignment in RTL languages ([#62869](https://github.com/WordPress/gutenberg/pull/62869)).
+ -   `CustomSelectControlV2`: allow wrapping item hint to new line ([#62848](https://github.com/WordPress/gutenberg/pull/62848)).
+ -   `CustomSelectControlV2`: fix select popover content overflow. ([#62844](https://github.com/WordPress/gutenberg/pull/62844))
++-   `CustomSelectControlV2`: keep item checkmark top aligned. ([#63230](https://github.com/WordPress/gutenberg/pull/63230))
+ -   `CustomSelectControlV2`: keep legacy arrow down behavior only for legacy wrapper. ([#62919](https://github.com/WordPress/gutenberg/pull/62919))
+ -   `CustomSelectControlV2`: fix trigger button font size. ([#63131](https://github.com/WordPress/gutenberg/pull/63131))
+ -   `CustomSelectControlV2`: fix labelling with a visually hidden label. ([#63137](https://github.com/WordPress/gutenberg/pull/63137))
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index 21b093ac69b64a..7296d5bc6359a7 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -187,6 +187,12 @@ export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
+ 	align-items: center;
+ 	margin-inline-start: ${ space( 2 ) };
+ 
++	// Keep the checkmark vertically aligned at the top. Since the item text has a
++	// 28px line height and the checkmark is 24px tall, a (28-24)/2 = 2px margin
++	// is applied to keep the correct alignment between the text and the checkmark.
++	align-self: start;
++	margin-block-start: 2px;
++
+ 	// Since the checkmark's dimensions are applied with 'em' units, setting a
+ 	// font size of 0 allows the space reserved for the checkmark to collapse for
+ 	// items that are not selected or that don't have an associated item hint.

@@ -1,0 +1,47 @@
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index 32648aa67edf76..f97452637d462b 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -223,9 +223,20 @@ Possible values:
+ 
+ Adjusts the size of the popover to prevent its contents from going out of view when meeting the viewport edges.
+ 
++**Note:** The `resize` and `shift` props are not intended to be used together. Enabling both can cause unexpected behavior.
++
+ -   Required: No
+ -   Default: `true`
+ 
++### `shift`: `boolean`
++
++Enables the `Popover` to shift in order to stay in view when meeting the viewport edges.
++
++**Note:** The `shift` and `resize` props are not intended to be used together. If you enable `shift`, set `resize` to `false`.
++
++-   Required: No
++-   Default: `false`
++
+ ### `variant`: `'toolbar' | 'unstyled'`
+ 
+ Specifies the popover's style.
+diff --git a/packages/components/src/popover/types.ts b/packages/components/src/popover/types.ts
+index ca21f55c3fa79c..aa30840318771d 100644
+--- a/packages/components/src/popover/types.ts
++++ b/packages/components/src/popover/types.ts
+@@ -129,6 +129,8 @@ export type PopoverProps = {
+ 	/**
+ 	 * Adjusts the size of the popover to prevent its contents from going out of
+ 	 * view when meeting the viewport edges.
++	 * _Note: The `resize` and `shift` props are not intended to be used together.
++	 * Enabling both can cause unexpected behavior._
+ 	 *
+ 	 * @default true
+ 	 */
+@@ -136,6 +138,8 @@ export type PopoverProps = {
+ 	/**
+ 	 * Enables the `Popover` to shift in order to stay in view when meeting the
+ 	 * viewport edges.
++	 * _Note: The `resize` and `shift` props are not intended to be used together.
++	 * Enabling both can cause unexpected behavior._
+ 	 *
+ 	 * @default false
+ 	 */

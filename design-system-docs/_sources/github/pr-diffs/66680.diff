@@ -1,0 +1,14 @@
+diff --git a/packages/components/src/menu/stories/index.story.tsx b/packages/components/src/menu/stories/index.story.tsx
+index ecb4cc3c7593f8..92501c33269580 100644
+--- a/packages/components/src/menu/stories/index.story.tsx
++++ b/packages/components/src/menu/stories/index.story.tsx
+@@ -22,7 +22,8 @@ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+ import { ContextSystemProvider } from '../../context';
+ 
+ const meta: Meta< typeof Menu > = {
+-	title: 'Components (Experimental)/Menu',
++	id: 'components-experimental-menu',
++	title: 'Components (Experimental)/Actions/Menu',
+ 	component: Menu,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170

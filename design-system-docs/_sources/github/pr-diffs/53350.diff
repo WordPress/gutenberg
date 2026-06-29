@@ -1,0 +1,70 @@
+diff --git a/packages/block-editor/src/components/media-placeholder/README.md b/packages/block-editor/src/components/media-placeholder/README.md
+index 8c26484ead115a..001c18673f45c6 100644
+--- a/packages/block-editor/src/components/media-placeholder/README.md
++++ b/packages/block-editor/src/components/media-placeholder/README.md
+@@ -133,9 +133,9 @@ An object that can contain a `title` and `instructions` properties. These proper
+ 
+ ### multiple
+ 
+-Whether to allow multiple selection of files or not.
++Whether to allow multiple selection of files or not. This property will also accept a string with the value `add` to allow multiple selection of files without the need to use the `Shift` or `Ctrl`/`Cmd` keys.
+ 
+--   Type: `Boolean`
++-   Type: `Boolean|String`
+ -   Required: No
+ -   Default: `false`
+ -   Platform: Web
+diff --git a/packages/block-editor/src/components/media-placeholder/index.js b/packages/block-editor/src/components/media-placeholder/index.js
+index 4208e5665cfd4f..41b1d3fe37c56a 100644
+--- a/packages/block-editor/src/components/media-placeholder/index.js
++++ b/packages/block-editor/src/components/media-placeholder/index.js
+@@ -469,7 +469,7 @@ export function MediaPlaceholder( {
+ 					<FormFileUpload
+ 						onChange={ onUpload }
+ 						accept={ accept }
+-						multiple={ multiple }
++						multiple={ !! multiple }
+ 						render={ ( { openFileDialog } ) => {
+ 							const content = (
+ 								<>
+@@ -508,7 +508,7 @@ export function MediaPlaceholder( {
+ 						) }
+ 						onChange={ onUpload }
+ 						accept={ accept }
+-						multiple={ multiple }
++						multiple={ !! multiple }
+ 					>
+ 						{ __( 'Upload' ) }
+ 					</FormFileUpload>
+diff --git a/packages/block-editor/src/components/media-replace-flow/index.js b/packages/block-editor/src/components/media-replace-flow/index.js
+index 9aa36b1b88c852..9010e0a1a90049 100644
+--- a/packages/block-editor/src/components/media-replace-flow/index.js
++++ b/packages/block-editor/src/components/media-replace-flow/index.js
+@@ -179,7 +179,7 @@ const MediaReplaceFlow = ( {
+ 									uploadFiles( event, onClose );
+ 								} }
+ 								accept={ accept }
+-								multiple={ multiple }
++								multiple={ !! multiple }
+ 								render={ ( { openFileDialog } ) => {
+ 									return (
+ 										<MenuItem
+diff --git a/packages/block-editor/src/components/media-upload/README.md b/packages/block-editor/src/components/media-upload/README.md
+index cec211005e9cd6..592d64e42f497d 100644
+--- a/packages/block-editor/src/components/media-upload/README.md
++++ b/packages/block-editor/src/components/media-upload/README.md
+@@ -72,11 +72,12 @@ Value of Frame content default mode like 'browse', 'upload' etc.
+ -   Required: No
+ -   Default: false
+ -   Platform: Web
++
+ ### multiple
+ 
+-Whether to allow multiple selections or not.
++Whether to allow multiple selection of files or not. This property will also accept a string with the value `add` to allow multiple selection of files without the need to use the `Shift` or `Ctrl`/`Cmd` keys.
+ 
+--   Type: `Boolean`
++-   Type: `Boolean|String`
+ -   Required: No
+ -   Default: false
+ -   Platform: Web

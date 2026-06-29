@@ -1,0 +1,33 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3cc2bd70a828db..f98e5fb73173f6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,9 +22,9 @@
+ -   `CustomGradientBar` updated to satisfy `react/exhuastive-deps` eslint rule ([#41463](https://github.com/WordPress/gutenberg/pull/41463))
+ -   `TreeSelect`: Convert to TypeScript ([#41536](https://github.com/WordPress/gutenberg/pull/41536)).
+ -   `FontSizePicker`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41600](https://github.com/WordPress/gutenberg/pull/41600)).
++-   `Dropdown`: Make sure cleanup (closing the dropdown) only runs when the menu has actually been opened.
+ -   Enhance the TypeScript migration guidelines ([#41669](https://github.com/WordPress/gutenberg/pull/41669)).
+ 
+-
+ ## 19.12.0 (2022-06-01)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index df70e3689eee45..3e152cf6e7fe1f 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -46,11 +46,11 @@ export default function Dropdown( props ) {
+ 
+ 	useEffect(
+ 		() => () => {
+-			if ( onToggle ) {
++			if ( onToggle && isOpen ) {
+ 				onToggle( false );
+ 			}
+ 		},
+-		[ onToggle ]
++		[ onToggle, isOpen ]
+ 	);
+ 
+ 	function toggle() {

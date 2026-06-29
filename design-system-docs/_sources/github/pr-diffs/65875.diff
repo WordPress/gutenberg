@@ -1,0 +1,106 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f70fce00c3983b..f7f22160c2187b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fixes
+ 
+ -   `PaletteEdit`: dedupe palette element slugs ([#65772](https://github.com/WordPress/gutenberg/pull/65772)).
++-   `RangeControl`: do not tooltip contents to the DOM when not shown ([#65875](https://github.com/WordPress/gutenberg/pull/65875)).
+ -   `Tabs`: fix skipping indication animation glitch ([#65878](https://github.com/WordPress/gutenberg/pull/65878)).
+ 
+ ## 28.9.0 (2024-10-03)
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index dae1d0de3ddb66..6e9c68ace97532 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -57,7 +57,10 @@ const wrapperMargin = ( { marks, __nextHasNoMarginBottom }: WrapperProps ) => {
+ 	return '';
+ };
+ 
+-export const Wrapper = styled.div< WrapperProps >`
++export const Wrapper = styled( 'div', {
++	shouldForwardProp: ( prop: string ) =>
++		! [ 'color', '__nextHasNoMarginBottom', 'marks' ].includes( prop ),
++} )< WrapperProps >`
+ 	display: block;
+ 	flex: 1;
+ 	position: relative;
+@@ -261,9 +264,20 @@ export const InputRange = styled.input`
+ `;
+ 
+ const tooltipShow = ( { show }: TooltipProps ) => {
+-	return css( {
+-		opacity: show ? 1 : 0,
+-	} );
++	return css`
++		display: ${ show ? 'inline-block' : 'none' };
++		opacity: ${ show ? 1 : 0 };
++
++		@media not ( prefers-reduced-motion ) {
++			transition:
++				opacity 120ms ease,
++				display 120ms ease allow-discrete;
++		}
++
++		@starting-style {
++			opacity: 0;
++		}
++	`;
+ };
+ 
+ const tooltipPosition = ( { position }: TooltipProps ) => {
+@@ -284,10 +298,8 @@ export const Tooltip = styled.span< TooltipProps >`
+ 	background: rgba( 0, 0, 0, 0.8 );
+ 	border-radius: ${ CONFIG.radiusSmall };
+ 	color: white;
+-	display: inline-block;
+ 	font-size: 12px;
+ 	min-width: 32px;
+-	opacity: 0;
+ 	padding: 4px 8px;
+ 	pointer-events: none;
+ 	position: absolute;
+@@ -295,11 +307,8 @@ export const Tooltip = styled.span< TooltipProps >`
+ 	user-select: none;
+ 	line-height: 1.4;
+ 
+-	@media not ( prefers-reduced-motion ) {
+-		transition: opacity 120ms ease;
+-	}
+-
+ 	${ tooltipShow };
++
+ 	${ tooltipPosition };
+ 	${ rtl(
+ 		{ transform: 'translateX(-50%)' },
+diff --git a/packages/components/src/range-control/tooltip.tsx b/packages/components/src/range-control/tooltip.tsx
+index 432415086dcef9..4156c026464347 100644
+--- a/packages/components/src/range-control/tooltip.tsx
++++ b/packages/components/src/range-control/tooltip.tsx
+@@ -40,7 +40,7 @@ export default function SimpleTooltip(
+ 	return (
+ 		<Tooltip
+ 			{ ...restProps }
+-			aria-hidden={ show }
++			aria-hidden="false"
+ 			className={ classes }
+ 			position={ position }
+ 			show={ show }
+diff --git a/packages/edit-site/src/components/global-styles/font-sizes/font-size.js b/packages/edit-site/src/components/global-styles/font-sizes/font-size.js
+index 63310203ef05b1..b99703d39c8d62 100644
+--- a/packages/edit-site/src/components/global-styles/font-sizes/font-size.js
++++ b/packages/edit-site/src/components/global-styles/font-sizes/font-size.js
+@@ -197,7 +197,11 @@ function FontSize() {
+ 				</HStack>
+ 
+ 				<View>
+-					<Spacer paddingX={ 4 }>
++					<Spacer
++						paddingX={ 4 }
++						marginBottom={ 0 }
++						paddingBottom={ 6 }
++					>
+ 						<VStack spacing={ 4 }>
+ 							<FlexItem>
+ 								<FontSizePreview fontSize={ fontSize } />

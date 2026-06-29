@@ -1,0 +1,80 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b3b67164e984e5..39ec52d6e11856 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
++
+ ## 25.11.0 (2023-11-02)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 4ac2524456ab75..3870c2f12c4fc3 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ // eslint-disable-next-line no-restricted-imports
+-import { Separator } from 'reakit';
++import * as Ariakit from '@ariakit/react';
+ import type { ForwardedRef } from 'react';
+ 
+ /**
+@@ -20,8 +20,8 @@ function UnconnectedDivider(
+ 	const contextProps = useContextSystem( props, 'Divider' );
+ 
+ 	return (
+-		<Separator
+-			as={ DividerView }
++		<Ariakit.Separator
++			render={ <DividerView /> }
+ 			{ ...contextProps }
+ 			ref={ forwardedRef }
+ 		/>
+diff --git a/packages/components/src/divider/stories/index.story.tsx b/packages/components/src/divider/stories/index.story.tsx
+index d60a43164506b3..4910c1b591c524 100644
+--- a/packages/components/src/divider/stories/index.story.tsx
++++ b/packages/components/src/divider/stories/index.story.tsx
+@@ -23,6 +23,14 @@ const meta: Meta< typeof Divider > = {
+ 		marginEnd: {
+ 			control: { type: 'text' },
+ 		},
++		wrapElement: {
++			control: { type: null },
++		},
++		ref: {
++			table: {
++				disable: true,
++			},
++		},
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
+diff --git a/packages/components/src/divider/types.ts b/packages/components/src/divider/types.ts
+index 03caedb6a5b3e7..cb29823eb4ca1a 100644
+--- a/packages/components/src/divider/types.ts
++++ b/packages/components/src/divider/types.ts
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ // eslint-disable-next-line no-restricted-imports
+-import type { SeparatorProps } from 'reakit';
++import type { SeparatorProps } from '@ariakit/react';
+ 
+ /**
+  * Internal dependencies
+@@ -11,7 +11,7 @@ import type { SpaceInput } from '../utils/space';
+ 
+ export type DividerProps = Omit<
+ 	SeparatorProps,
+-	'children' | 'unstable_system' | 'orientation'
++	'children' | 'unstable_system' | 'orientation' | 'as' | 'render'
+ > & {
+ 	/**
+ 	 * Adjusts all margins on the inline dimension.

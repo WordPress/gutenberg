@@ -1,0 +1,1935 @@
+diff --git a/package-lock.json b/package-lock.json
+index 6680025d768bef..3ba71e19665c84 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -86,7 +86,7 @@
+ 				"@actions/core": "1.9.1",
+ 				"@actions/github": "5.0.0",
+ 				"@apidevtools/json-schema-ref-parser": "11.6.4",
+-				"@ariakit/test": "^0.3.7",
++				"@ariakit/test": "0.3.16",
+ 				"@babel/core": "7.24.3",
+ 				"@babel/plugin-proposal-export-namespace-from": "7.18.9",
+ 				"@babel/plugin-syntax-jsx": "7.24.1",
+@@ -1527,55 +1527,24 @@
+ 				"url": "https://github.com/sponsors/sindresorhus"
+ 			}
+ 		},
+-		"node_modules/@ariakit/core": {
+-			"version": "0.3.10",
+-			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.3.10.tgz",
+-			"integrity": "sha512-AcN+GSoVXuUOzKx5d3xPL3YsEHevh4PIO6QIt/mg/nRX1XQ6cvxQEiAjO/BJQm+/MVl7/VbuGBoTFjr0tPU6NQ=="
+-		},
+-		"node_modules/@ariakit/react": {
+-			"version": "0.3.12",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.3.12.tgz",
+-			"integrity": "sha512-HxKMZZhWSkwwS/Sh9OdWyuNKQ2tjDAIQIy2KVI7IRa8ZQ6ze/4g3YLUHbfCxO7oDupXHfXaeZ4hWx8lP7l1U/g==",
+-			"dependencies": {
+-				"@ariakit/react-core": "0.3.12"
+-			},
+-			"funding": {
+-				"type": "opencollective",
+-				"url": "https://opencollective.com/ariakit"
+-			},
+-			"peerDependencies": {
+-				"react": "^17.0.0 || ^18.0.0",
+-				"react-dom": "^17.0.0 || ^18.0.0"
+-			}
+-		},
+-		"node_modules/@ariakit/react-core": {
+-			"version": "0.3.12",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.3.12.tgz",
+-			"integrity": "sha512-w6P1A7TYb1fKUe9QbwaoTOWofl13g7TEuXdV4JyefJCQL1e9HQdEw9UL67I8aXRo8/cFHH94/z0N37t8hw5Ogg==",
+-			"dependencies": {
+-				"@ariakit/core": "0.3.10",
+-				"@floating-ui/dom": "^1.0.0",
+-				"use-sync-external-store": "^1.2.0"
+-			},
+-			"peerDependencies": {
+-				"react": "^17.0.0 || ^18.0.0",
+-				"react-dom": "^17.0.0 || ^18.0.0"
+-			}
+-		},
+ 		"node_modules/@ariakit/test": {
+-			"version": "0.3.7",
+-			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.3.7.tgz",
+-			"integrity": "sha512-rOa9pJA0ZfPPSI4SkDX41CsBcvxs6BmxgzFEElZWZo/uBBqtnr8ZL4oe5HySeZKEAHRH86XDqfxFISkhV76m5g==",
++			"version": "0.3.16",
++			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.3.16.tgz",
++			"integrity": "sha512-cfcprjA1Wii7BjS9a1cVwhCbsnBBSfpZtTJRCNY3dES+xcBnDgHfOlK/4uG85GiYVaJl3Gih/1NiddVebSKUdA==",
+ 			"dev": true,
+ 			"dependencies": {
+-				"@ariakit/core": "0.3.10",
+-				"@testing-library/dom": "^8.0.0 || ^9.0.0"
++				"@ariakit/core": "0.4.7",
++				"@testing-library/dom": "^8.0.0 || ^9.0.0 || ^10.0.0"
+ 			},
+ 			"peerDependencies": {
+-				"@testing-library/react": "^12.0.0 || ^13.0.0 || ^14.0.0",
+-				"react": "^17.0.0 || ^18.0.0"
++				"@playwright/test": "^1.27.0",
++				"@testing-library/react": "^12.0.0 || ^13.0.0 || ^14.0.0 || ^15.0.0",
++				"react": "^17.0.0 || ^18.0.0 || ^19.0.0"
+ 			},
+ 			"peerDependenciesMeta": {
++				"@playwright/test": {
++					"optional": true
++				},
+ 				"@testing-library/react": {
+ 					"optional": true
+ 				},
+@@ -1584,6 +1553,12 @@
+ 				}
+ 			}
+ 		},
++		"node_modules/@ariakit/test/node_modules/@ariakit/core": {
++			"version": "0.4.7",
++			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.7.tgz",
++			"integrity": "sha512-GUy/3ZY4kW1KdYHtMZRrRlj5FYbZTAyHlimxHI7Zs0xsC+kAzIf8lopnf67Y9IYLgEMr37KosIV7kwpkJpNs5Q==",
++			"dev": true
++		},
+ 		"node_modules/@aw-web-design/x-default-browser": {
+ 			"version": "1.4.126",
+ 			"resolved": "https://registry.npmjs.org/@aw-web-design/x-default-browser/-/x-default-browser-1.4.126.tgz",
+@@ -52645,7 +52620,7 @@
+ 			"version": "28.4.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@ariakit/react": "^0.3.12",
++				"@ariakit/react": "0.4.7",
+ 				"@babel/runtime": "^7.16.0",
+ 				"@emotion/cache": "^11.7.1",
+ 				"@emotion/css": "^11.7.1",
+@@ -52701,6 +52676,41 @@
+ 				"react-dom": "^18.0.0"
+ 			}
+ 		},
++		"packages/components/node_modules/@ariakit/core": {
++			"version": "0.4.7",
++			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.7.tgz",
++			"integrity": "sha512-GUy/3ZY4kW1KdYHtMZRrRlj5FYbZTAyHlimxHI7Zs0xsC+kAzIf8lopnf67Y9IYLgEMr37KosIV7kwpkJpNs5Q=="
++		},
++		"packages/components/node_modules/@ariakit/react": {
++			"version": "0.4.7",
++			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.7.tgz",
++			"integrity": "sha512-uUruuCo1M0Nj2oq1nTwDfUlVTLuoI9xeHP75EkuXX46lg5hzE5vVWbSMO1D6MCy7UwrUx2Ts4IqxdKr97suTwQ==",
++			"dependencies": {
++				"@ariakit/react-core": "0.4.7"
++			},
++			"funding": {
++				"type": "opencollective",
++				"url": "https://opencollective.com/ariakit"
++			},
++			"peerDependencies": {
++				"react": "^17.0.0 || ^18.0.0 || ^19.0.0",
++				"react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
++			}
++		},
++		"packages/components/node_modules/@ariakit/react-core": {
++			"version": "0.4.7",
++			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.7.tgz",
++			"integrity": "sha512-OogUyQ20cxkRNRuqLI05JbmpR4Lr5HwhUIqnb/sipzt6bkg/3wCXEnUAjfxg3nPjLTMjJ8+ODWmPC9JMJTW/yg==",
++			"dependencies": {
++				"@ariakit/core": "0.4.7",
++				"@floating-ui/dom": "^1.0.0",
++				"use-sync-external-store": "^1.2.0"
++			},
++			"peerDependencies": {
++				"react": "^17.0.0 || ^18.0.0 || ^19.0.0",
++				"react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
++			}
++		},
+ 		"packages/components/node_modules/@floating-ui/react-dom": {
+ 			"version": "2.0.1",
+ 			"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.0.1.tgz",
+@@ -52969,7 +52979,7 @@
+ 			"version": "4.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@ariakit/react": "^0.3.12",
++				"@ariakit/react": "0.4.7",
+ 				"@babel/runtime": "^7.16.0",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/compose": "file:../compose",
+@@ -52991,38 +53001,38 @@
+ 			}
+ 		},
+ 		"packages/dataviews/node_modules/@ariakit/core": {
+-			"version": "0.4.1",
+-			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.1.tgz",
+-			"integrity": "sha512-Rdhw0/K0x+50gFvzuMW9wp+WJxpkrgiMgegRTOZSU92bv1K+6XfQWnlieIkLt2FC7pZGrDpGlS4C7ztEVF+JRg=="
++			"version": "0.4.7",
++			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.7.tgz",
++			"integrity": "sha512-GUy/3ZY4kW1KdYHtMZRrRlj5FYbZTAyHlimxHI7Zs0xsC+kAzIf8lopnf67Y9IYLgEMr37KosIV7kwpkJpNs5Q=="
+ 		},
+ 		"packages/dataviews/node_modules/@ariakit/react": {
+-			"version": "0.4.1",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.1.tgz",
+-			"integrity": "sha512-hKfCYjc3MFW20kn2dcvejB5zbYt/uU33Teq82c414/utf5sEoeRF+bxjNku8x1baJby9/SDP6zj2IgWPuedFNA==",
++			"version": "0.4.7",
++			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.7.tgz",
++			"integrity": "sha512-uUruuCo1M0Nj2oq1nTwDfUlVTLuoI9xeHP75EkuXX46lg5hzE5vVWbSMO1D6MCy7UwrUx2Ts4IqxdKr97suTwQ==",
+ 			"dependencies": {
+-				"@ariakit/react-core": "0.4.1"
++				"@ariakit/react-core": "0.4.7"
+ 			},
+ 			"funding": {
+ 				"type": "opencollective",
+ 				"url": "https://opencollective.com/ariakit"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^17.0.0 || ^18.0.0",
+-				"react-dom": "^17.0.0 || ^18.0.0"
++				"react": "^17.0.0 || ^18.0.0 || ^19.0.0",
++				"react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
+ 			}
+ 		},
+ 		"packages/dataviews/node_modules/@ariakit/react-core": {
+-			"version": "0.4.1",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.1.tgz",
+-			"integrity": "sha512-cwDczl9XWBloXNg0CuHmJtBfEe7qF265JE0Pwlcp8wMSY9PsJeb0mKBlTygUPKn/FsKpKGaYSI7DlDntbcZciw==",
++			"version": "0.4.7",
++			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.7.tgz",
++			"integrity": "sha512-OogUyQ20cxkRNRuqLI05JbmpR4Lr5HwhUIqnb/sipzt6bkg/3wCXEnUAjfxg3nPjLTMjJ8+ODWmPC9JMJTW/yg==",
+ 			"dependencies": {
+-				"@ariakit/core": "0.4.1",
++				"@ariakit/core": "0.4.7",
+ 				"@floating-ui/dom": "^1.0.0",
+ 				"use-sync-external-store": "^1.2.0"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^17.0.0 || ^18.0.0",
+-				"react-dom": "^17.0.0 || ^18.0.0"
++				"react": "^17.0.0 || ^18.0.0 || ^19.0.0",
++				"react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
+ 			}
+ 		},
+ 		"packages/date": {
+@@ -56146,37 +56156,22 @@
+ 				}
+ 			}
+ 		},
+-		"@ariakit/core": {
+-			"version": "0.3.10",
+-			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.3.10.tgz",
+-			"integrity": "sha512-AcN+GSoVXuUOzKx5d3xPL3YsEHevh4PIO6QIt/mg/nRX1XQ6cvxQEiAjO/BJQm+/MVl7/VbuGBoTFjr0tPU6NQ=="
+-		},
+-		"@ariakit/react": {
+-			"version": "0.3.12",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.3.12.tgz",
+-			"integrity": "sha512-HxKMZZhWSkwwS/Sh9OdWyuNKQ2tjDAIQIy2KVI7IRa8ZQ6ze/4g3YLUHbfCxO7oDupXHfXaeZ4hWx8lP7l1U/g==",
+-			"requires": {
+-				"@ariakit/react-core": "0.3.12"
+-			}
+-		},
+-		"@ariakit/react-core": {
+-			"version": "0.3.12",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.3.12.tgz",
+-			"integrity": "sha512-w6P1A7TYb1fKUe9QbwaoTOWofl13g7TEuXdV4JyefJCQL1e9HQdEw9UL67I8aXRo8/cFHH94/z0N37t8hw5Ogg==",
+-			"requires": {
+-				"@ariakit/core": "0.3.10",
+-				"@floating-ui/dom": "^1.0.0",
+-				"use-sync-external-store": "^1.2.0"
+-			}
+-		},
+ 		"@ariakit/test": {
+-			"version": "0.3.7",
+-			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.3.7.tgz",
+-			"integrity": "sha512-rOa9pJA0ZfPPSI4SkDX41CsBcvxs6BmxgzFEElZWZo/uBBqtnr8ZL4oe5HySeZKEAHRH86XDqfxFISkhV76m5g==",
++			"version": "0.3.16",
++			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.3.16.tgz",
++			"integrity": "sha512-cfcprjA1Wii7BjS9a1cVwhCbsnBBSfpZtTJRCNY3dES+xcBnDgHfOlK/4uG85GiYVaJl3Gih/1NiddVebSKUdA==",
+ 			"dev": true,
+ 			"requires": {
+-				"@ariakit/core": "0.3.10",
+-				"@testing-library/dom": "^8.0.0 || ^9.0.0"
++				"@ariakit/core": "0.4.7",
++				"@testing-library/dom": "^8.0.0 || ^9.0.0 || ^10.0.0"
++			},
++			"dependencies": {
++				"@ariakit/core": {
++					"version": "0.4.7",
++					"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.7.tgz",
++					"integrity": "sha512-GUy/3ZY4kW1KdYHtMZRrRlj5FYbZTAyHlimxHI7Zs0xsC+kAzIf8lopnf67Y9IYLgEMr37KosIV7kwpkJpNs5Q==",
++					"dev": true
++				}
+ 			}
+ 		},
+ 		"@aw-web-design/x-default-browser": {
+@@ -67524,7 +67519,7 @@
+ 		"@wordpress/components": {
+ 			"version": "file:packages/components",
+ 			"requires": {
+-				"@ariakit/react": "^0.3.12",
++				"@ariakit/react": "0.4.7",
+ 				"@babel/runtime": "^7.16.0",
+ 				"@emotion/cache": "^11.7.1",
+ 				"@emotion/css": "^11.7.1",
+@@ -67572,6 +67567,29 @@
+ 				"uuid": "^9.0.1"
+ 			},
+ 			"dependencies": {
++				"@ariakit/core": {
++					"version": "0.4.7",
++					"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.7.tgz",
++					"integrity": "sha512-GUy/3ZY4kW1KdYHtMZRrRlj5FYbZTAyHlimxHI7Zs0xsC+kAzIf8lopnf67Y9IYLgEMr37KosIV7kwpkJpNs5Q=="
++				},
++				"@ariakit/react": {
++					"version": "0.4.7",
++					"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.7.tgz",
++					"integrity": "sha512-uUruuCo1M0Nj2oq1nTwDfUlVTLuoI9xeHP75EkuXX46lg5hzE5vVWbSMO1D6MCy7UwrUx2Ts4IqxdKr97suTwQ==",
++					"requires": {
++						"@ariakit/react-core": "0.4.7"
++					}
++				},
++				"@ariakit/react-core": {
++					"version": "0.4.7",
++					"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.7.tgz",
++					"integrity": "sha512-OogUyQ20cxkRNRuqLI05JbmpR4Lr5HwhUIqnb/sipzt6bkg/3wCXEnUAjfxg3nPjLTMjJ8+ODWmPC9JMJTW/yg==",
++					"requires": {
++						"@ariakit/core": "0.4.7",
++						"@floating-ui/dom": "^1.0.0",
++						"use-sync-external-store": "^1.2.0"
++					}
++				},
+ 				"@floating-ui/react-dom": {
+ 					"version": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.0.1.tgz",
+ 					"integrity": "sha512-rZtAmSht4Lry6gdhAJDrCp/6rKN7++JnL1/Anbr/DdeyYXQPxvg/ivrbYvJulbRf4vL8b212suwMM2lxbv+RQA==",
+@@ -67757,7 +67775,7 @@
+ 		"@wordpress/dataviews": {
+ 			"version": "file:packages/dataviews",
+ 			"requires": {
+-				"@ariakit/react": "^0.3.12",
++				"@ariakit/react": "0.4.7",
+ 				"@babel/runtime": "^7.16.0",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/compose": "file:../compose",
+@@ -67772,23 +67790,24 @@
+ 			},
+ 			"dependencies": {
+ 				"@ariakit/core": {
+-					"version": "0.4.1",
+-					"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.1.tgz",
+-					"integrity": "sha512-Rdhw0/K0x+50gFvzuMW9wp+WJxpkrgiMgegRTOZSU92bv1K+6XfQWnlieIkLt2FC7pZGrDpGlS4C7ztEVF+JRg=="
++					"version": "0.4.7",
++					"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.7.tgz",
++					"integrity": "sha512-GUy/3ZY4kW1KdYHtMZRrRlj5FYbZTAyHlimxHI7Zs0xsC+kAzIf8lopnf67Y9IYLgEMr37KosIV7kwpkJpNs5Q=="
+ 				},
+ 				"@ariakit/react": {
+-					"version": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.1.tgz",
+-					"integrity": "sha512-hKfCYjc3MFW20kn2dcvejB5zbYt/uU33Teq82c414/utf5sEoeRF+bxjNku8x1baJby9/SDP6zj2IgWPuedFNA==",
++					"version": "0.4.7",
++					"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.7.tgz",
++					"integrity": "sha512-uUruuCo1M0Nj2oq1nTwDfUlVTLuoI9xeHP75EkuXX46lg5hzE5vVWbSMO1D6MCy7UwrUx2Ts4IqxdKr97suTwQ==",
+ 					"requires": {
+-						"@ariakit/react-core": "0.4.1"
++						"@ariakit/react-core": "0.4.7"
+ 					}
+ 				},
+ 				"@ariakit/react-core": {
+-					"version": "0.4.1",
+-					"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.1.tgz",
+-					"integrity": "sha512-cwDczl9XWBloXNg0CuHmJtBfEe7qF265JE0Pwlcp8wMSY9PsJeb0mKBlTygUPKn/FsKpKGaYSI7DlDntbcZciw==",
++					"version": "0.4.7",
++					"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.7.tgz",
++					"integrity": "sha512-OogUyQ20cxkRNRuqLI05JbmpR4Lr5HwhUIqnb/sipzt6bkg/3wCXEnUAjfxg3nPjLTMjJ8+ODWmPC9JMJTW/yg==",
+ 					"requires": {
+-						"@ariakit/core": "0.4.1",
++						"@ariakit/core": "0.4.7",
+ 						"@floating-ui/dom": "^1.0.0",
+ 						"use-sync-external-store": "^1.2.0"
+ 					}
+diff --git a/package.json b/package.json
+index 412ff34b91d8c1..91189b4d394e2e 100644
+--- a/package.json
++++ b/package.json
+@@ -98,7 +98,7 @@
+ 		"@actions/core": "1.9.1",
+ 		"@actions/github": "5.0.0",
+ 		"@apidevtools/json-schema-ref-parser": "11.6.4",
+-		"@ariakit/test": "^0.3.7",
++		"@ariakit/test": "0.3.16",
+ 		"@babel/core": "7.24.3",
+ 		"@babel/plugin-proposal-export-namespace-from": "7.18.9",
+ 		"@babel/plugin-syntax-jsx": "7.24.1",
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 7a04f41a29b050..9decaf2d1e5947 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -220,7 +220,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                           aria-label="Color: red"
+                           aria-selected="true"
+                           class="components-button components-circular-option-picker__option"
+-                          data-active-item=""
++                          data-active-item="true"
+                           id="components-circular-option-picker-0-0"
+                           role="option"
+                           style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
+diff --git a/packages/block-editor/src/components/colors-gradients/test/control.js b/packages/block-editor/src/components/colors-gradients/test/control.js
+index 0bda16071ef99b..19640d41daeb35 100644
+--- a/packages/block-editor/src/components/colors-gradients/test/control.js
++++ b/packages/block-editor/src/components/colors-gradients/test/control.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen } from '@testing-library/react';
++import { screen } from '@testing-library/react';
++import { render } from '@ariakit/test/react';
+ 
+ /**
+  * Internal dependencies
+@@ -12,7 +13,7 @@ const noop = () => {};
+ 
+ describe( 'ColorPaletteControl', () => {
+ 	it( 'renders tabs if it is possible to select a color and a gradient rendering a color picker at the start', async () => {
+-		render(
++		await render(
+ 			<ColorGradientControl
+ 				label="Test Color Gradient"
+ 				colorValue="#f00"
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 7c1b62f8bba22d..ad560523665ed2 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -31,7 +31,7 @@
+ 	],
+ 	"types": "build-types",
+ 	"dependencies": {
+-		"@ariakit/react": "^0.3.12",
++		"@ariakit/react": "0.4.7",
+ 		"@babel/runtime": "^7.16.0",
+ 		"@emotion/cache": "^11.7.1",
+ 		"@emotion/css": "^11.7.1",
+diff --git a/packages/components/src/composite/legacy/test/index.tsx b/packages/components/src/composite/legacy/test/index.tsx
+index 315532a8b50869..085ac572e3e8a1 100644
+--- a/packages/components/src/composite/legacy/test/index.tsx
++++ b/packages/components/src/composite/legacy/test/index.tsx
+@@ -47,7 +47,7 @@ async function renderAndValidate( ...args: Parameters< typeof render > ) {
+ 		const activeButton = queryByAttribute(
+ 			'data-active-item',
+ 			view.baseElement,
+-			''
++			'true'
+ 		);
+ 		expect( activeButton ).not.toBeNull();
+ 	} );
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index 701f69aa5757bd..6b7fa590f9d0b2 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -132,12 +132,13 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
+ 	min-width: min-content;
+ 
+ 	/* Animation */
+-	animation-duration: ${ ANIMATION_PARAMS.DURATION };
+-	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
+-	animation-name: ${ slideDownAndFade };
+-	will-change: transform, opacity;
+-	@media ( prefers-reduced-motion ) {
+-		animation-duration: 0s;
++	&[data-open] {
++		@media not ( prefers-reduced-motion ) {
++			animation-duration: ${ ANIMATION_PARAMS.DURATION };
++			animation-timing-function: ${ ANIMATION_PARAMS.EASING };
++			animation-name: ${ slideDownAndFade };
++			will-change: transform, opacity;
++		}
+ 	}
+ 
+ 	&[data-focus-visible] {
+diff --git a/packages/components/src/custom-select-control-v2/test/index.tsx b/packages/components/src/custom-select-control-v2/test/index.tsx
+index 3ff384852be04f..e02eb0f774a401 100644
+--- a/packages/components/src/custom-select-control-v2/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/test/index.tsx
+@@ -1,8 +1,9 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen } from '@testing-library/react';
++import { screen } from '@testing-library/react';
+ import { click, press, sleep, type } from '@ariakit/test';
++import { render } from '@ariakit/test/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -66,7 +67,7 @@ describe.each( [
+ 	const [ , Component ] = modeAndComponent;
+ 
+ 	it( 'Should replace the initial selection when a new item is selected', async () => {
+-		render( <Component { ...defaultProps } /> );
++		await render( <Component { ...defaultProps } /> );
+ 
+ 		const currentSelectedItem = screen.getByRole( 'combobox', {
+ 			expanded: false,
+@@ -94,7 +95,7 @@ describe.each( [
+ 	} );
+ 
+ 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
+-		render( <Component { ...defaultProps } /> );
++		await render( <Component { ...defaultProps } /> );
+ 
+ 		const currentSelectedItem = screen.getByRole( 'combobox', {
+ 			expanded: false,
+@@ -121,7 +122,7 @@ describe.each( [
+ 
+ 	describe( 'Keyboard behavior and accessibility', () => {
+ 		it( 'Should be able to change selection using keyboard', async () => {
+-			render( <Component { ...defaultProps } /> );
++			await render( <Component { ...defaultProps } /> );
+ 
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+ 				expanded: false,
+@@ -145,7 +146,7 @@ describe.each( [
+ 		} );
+ 
+ 		it( 'Should be able to type characters to select matching options', async () => {
+-			render( <Component { ...defaultProps } /> );
++			await render( <Component { ...defaultProps } /> );
+ 
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+ 				expanded: false,
+@@ -166,7 +167,7 @@ describe.each( [
+ 		} );
+ 
+ 		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
+-			render( <Component { ...defaultProps } /> );
++			await render( <Component { ...defaultProps } /> );
+ 
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+ 				expanded: false,
+@@ -194,7 +195,7 @@ describe.each( [
+ 		} );
+ 
+ 		it( 'Should have correct aria-selected value for selections', async () => {
+-			render( <Component { ...defaultProps } /> );
++			await render( <Component { ...defaultProps } /> );
+ 
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+ 				expanded: false,
+@@ -244,7 +245,7 @@ describe.each( [
+ 				'ultraviolet morning light',
+ 			];
+ 
+-			render(
++			await render(
+ 				<Component
+ 					defaultValue={ defaultValues }
+ 					onChange={ onChangeMock }
+@@ -326,7 +327,7 @@ describe.each( [
+ 				'ultraviolet morning light',
+ 			];
+ 
+-			render(
++			await render(
+ 				<Component defaultValue={ defaultValues } label="Multi-select">
+ 					{ defaultValues.map( ( item ) => (
+ 						<UncontrolledCustomSelectControlV2.Item
+@@ -382,7 +383,7 @@ describe.each( [
+ 			return <img src={ `${ value }.jpg` } alt={ value as string } />;
+ 		};
+ 
+-		render(
++		await render(
+ 			<Component label="Rendered" renderSelectedValue={ renderValue }>
+ 				<UncontrolledCustomSelectControlV2.Item value="april-29">
+ 					{ renderValue( 'april-29' ) }
+@@ -418,7 +419,7 @@ describe.each( [
+ 	} );
+ 
+ 	it( 'Should open the select popover when focussing the trigger button and pressing arrow down', async () => {
+-		render( <Component { ...defaultProps } /> );
++		await render( <Component { ...defaultProps } /> );
+ 
+ 		const currentSelectedItem = screen.getByRole( 'combobox', {
+ 			expanded: false,
+@@ -437,8 +438,8 @@ describe.each( [
+ 		).toBeVisible();
+ 	} );
+ 
+-	it( 'Should label the component correctly even when the label is not visible', () => {
+-		render( <Component { ...defaultProps } hideLabelFromVision /> );
++	it( 'Should label the component correctly even when the label is not visible', async () => {
++		await render( <Component { ...defaultProps } hideLabelFromVision /> );
+ 
+ 		expect(
+ 			screen.getByRole( 'combobox', {
+diff --git a/packages/components/src/custom-select-control/test/index.tsx b/packages/components/src/custom-select-control/test/index.tsx
+index 4bc96f318138c5..df9ace3fc18383 100644
+--- a/packages/components/src/custom-select-control/test/index.tsx
++++ b/packages/components/src/custom-select-control/test/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen } from '@testing-library/react';
++import { screen } from '@testing-library/react';
+ import { click, press, sleep, type, waitFor } from '@ariakit/test';
+ 
+ /**
+@@ -13,6 +13,7 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import UncontrolledCustomSelectControl from '..';
++import { render } from '../../utils/tmp-ariakit-test-render-replacement';
+ 
+ const customClassName = 'amber-skies';
+ const customStyles = {
+@@ -85,7 +86,7 @@ const ControlledCustomSelectControl = ( {
+ 
+ it( 'Should apply external controlled updates', async () => {
+ 	const mockOnChange = jest.fn();
+-	const { rerender } = render(
++	const { rerender } = await render(
+ 		<UncontrolledCustomSelectControl
+ 			{ ...props }
+ 			value={ props.options[ 0 ] }
+@@ -101,7 +102,7 @@ it( 'Should apply external controlled updates', async () => {
+ 
+ 	expect( mockOnChange ).not.toHaveBeenCalled();
+ 
+-	rerender(
++	await rerender(
+ 		<UncontrolledCustomSelectControl
+ 			{ ...props }
+ 			value={ props.options[ 1 ] }
+@@ -124,7 +125,7 @@ describe.each( [
+ 
+ 	it( 'Should select the first option when no explicit initial value is passed without firing onChange', async () => {
+ 		const mockOnChange = jest.fn();
+-		render( <Component { ...props } onChange={ mockOnChange } /> );
++		await render( <Component { ...props } onChange={ mockOnChange } /> );
+ 
+ 		expect(
+ 			screen.getByRole( 'combobox', {
+@@ -140,7 +141,7 @@ describe.each( [
+ 
+ 	it( 'Should pick the initially selected option if the value prop is passed without firing onChange', async () => {
+ 		const mockOnChange = jest.fn();
+-		render(
++		await render(
+ 			<Component
+ 				{ ...props }
+ 				onChange={ mockOnChange }
+@@ -161,7 +162,7 @@ describe.each( [
+ 	} );
+ 
+ 	it( 'Should replace the initial selection when a new item is selected', async () => {
+-		render( <Component { ...props } /> );
++		await render( <Component { ...props } /> );
+ 
+ 		const currentSelectedItem = screen.getByRole( 'combobox', {
+ 			expanded: false,
+@@ -189,7 +190,7 @@ describe.each( [
+ 	} );
+ 
+ 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
+-		render( <Component { ...props } /> );
++		await render( <Component { ...props } /> );
+ 
+ 		const currentSelectedItem = screen.getByRole( 'combobox', {
+ 			expanded: false,
+@@ -217,7 +218,7 @@ describe.each( [
+ 	} );
+ 
+ 	it( 'Should apply class only to options that have a className defined', async () => {
+-		render( <Component { ...props } /> );
++		await render( <Component { ...props } /> );
+ 
+ 		await click(
+ 			screen.getByRole( 'combobox', {
+@@ -251,7 +252,7 @@ describe.each( [
+ 	} );
+ 
+ 	it( 'Should apply styles only to options that have styles defined', async () => {
+-		render( <Component { ...props } /> );
++		await render( <Component { ...props } /> );
+ 
+ 		await click(
+ 			screen.getByRole( 'combobox', {
+@@ -285,7 +286,7 @@ describe.each( [
+ 	} );
+ 
+ 	it( 'does not show selected hint by default', async () => {
+-		render(
++		await render(
+ 			<Component
+ 				{ ...props }
+ 				label="Custom select"
+@@ -306,7 +307,7 @@ describe.each( [
+ 	} );
+ 
+ 	it( 'shows selected hint when showSelectedHint is set', async () => {
+-		render(
++		await render(
+ 			<Component
+ 				{ ...props }
+ 				label="Custom select"
+@@ -331,7 +332,7 @@ describe.each( [
+ 	} );
+ 
+ 	it( 'shows selected hint in list of options when added, regardless of showSelectedHint prop', async () => {
+-		render(
++		await render(
+ 			<Component
+ 				{ ...props }
+ 				label="Custom select"
+@@ -355,7 +356,7 @@ describe.each( [
+ 	it( 'Should return object onChange', async () => {
+ 		const mockOnChange = jest.fn();
+ 
+-		render( <Component { ...props } onChange={ mockOnChange } /> );
++		await render( <Component { ...props } onChange={ mockOnChange } /> );
+ 
+ 		await click(
+ 			screen.getByRole( 'combobox', {
+@@ -385,7 +386,7 @@ describe.each( [
+ 	it( 'Should return selectedItem object when specified onChange', async () => {
+ 		const mockOnChange = jest.fn();
+ 
+-		render( <Component { ...props } onChange={ mockOnChange } /> );
++		await render( <Component { ...props } onChange={ mockOnChange } /> );
+ 
+ 		await sleep();
+ 		await press.Tab();
+@@ -412,7 +413,7 @@ describe.each( [
+ 	it( "Should pass arbitrary props to onChange's selectedItem, but apply only style and className to DOM elements", async () => {
+ 		const onChangeMock = jest.fn();
+ 
+-		render( <Component { ...props } onChange={ onChangeMock } /> );
++		await render( <Component { ...props } onChange={ onChangeMock } /> );
+ 
+ 		const currentSelectedItem = screen.getByRole( 'combobox', {
+ 			expanded: false,
+@@ -449,8 +450,8 @@ describe.each( [
+ 		);
+ 	} );
+ 
+-	it( 'Should label the component correctly even when the label is not visible', () => {
+-		render( <Component { ...props } hideLabelFromVision /> );
++	it( 'Should label the component correctly even when the label is not visible', async () => {
++		await render( <Component { ...props } hideLabelFromVision /> );
+ 
+ 		expect(
+ 			screen.getByRole( 'combobox', {
+@@ -463,7 +464,7 @@ describe.each( [
+ 		it( 'Captures the keypress event and does not let it propagate', async () => {
+ 			const onKeyDown = jest.fn();
+ 
+-			render(
++			await render(
+ 				<div
+ 					// This role="none" is required to prevent an eslint warning about accessibility.
+ 					role="none"
+@@ -487,7 +488,7 @@ describe.each( [
+ 		} );
+ 
+ 		it( 'Should be able to change selection using keyboard', async () => {
+-			render( <Component { ...props } /> );
++			await render( <Component { ...props } /> );
+ 
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+ 				expanded: false,
+@@ -513,7 +514,7 @@ describe.each( [
+ 		} );
+ 
+ 		it( 'Should be able to type characters to select matching options', async () => {
+-			render( <Component { ...props } /> );
++			await render( <Component { ...props } /> );
+ 
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+ 				expanded: false,
+@@ -534,7 +535,7 @@ describe.each( [
+ 		} );
+ 
+ 		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
+-			render( <Component { ...props } /> );
++			await render( <Component { ...props } /> );
+ 
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+ 				expanded: false,
+@@ -564,7 +565,7 @@ describe.each( [
+ 		} );
+ 
+ 		it( 'Can change selection with a focused input and closed dropdown while pressing arrow keys', async () => {
+-			render( <Component { ...props } /> );
++			await render( <Component { ...props } /> );
+ 
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+ 				expanded: false,
+@@ -591,7 +592,7 @@ describe.each( [
+ 		} );
+ 
+ 		it( 'Should have correct aria-selected value for selections', async () => {
+-			render( <Component { ...props } /> );
++			await render( <Component { ...props } /> );
+ 
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+ 				expanded: false,
+@@ -646,7 +647,7 @@ describe.each( [
+ 			const onFocusMock = jest.fn();
+ 			const onBlurMock = jest.fn();
+ 
+-			render(
++			await render(
+ 				<>
+ 					<Component
+ 						{ ...props }
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/dropdown-menu-v2/styles.ts
+index b36f69e62c5094..322136e006b009 100644
+--- a/packages/components/src/dropdown-menu-v2/styles.ts
++++ b/packages/components/src/dropdown-menu-v2/styles.ts
+@@ -101,23 +101,24 @@ export const DropdownMenu = styled( Ariakit.Menu )<
+ 	outline: 2px solid transparent !important;
+ 
+ 	/* Animation */
+-	animation-duration: ${ ANIMATION_PARAMS.DURATION };
+-	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
+-	will-change: transform, opacity;
+-	/* Default animation.*/
+-	animation-name: ${ slideDownAndFade };
+-
+-	&[data-side='left'] {
+-		animation-name: ${ slideLeftAndFade };
+-	}
+-	&[data-side='up'] {
+-		animation-name: ${ slideUpAndFade };
+-	}
+-	&[data-side='right'] {
+-		animation-name: ${ slideRightAndFade };
+-	}
+-	@media ( prefers-reduced-motion ) {
+-		animation-duration: 0s;
++	&[data-open] {
++		@media not ( prefers-reduced-motion ) {
++			animation-duration: ${ ANIMATION_PARAMS.DURATION };
++			animation-timing-function: ${ ANIMATION_PARAMS.EASING };
++			will-change: transform, opacity;
++			/* Default animation.*/
++			animation-name: ${ slideDownAndFade };
++
++			&[data-side='left'] {
++				animation-name: ${ slideLeftAndFade };
++			}
++			&[data-side='up'] {
++				animation-name: ${ slideUpAndFade };
++			}
++			&[data-side='right'] {
++				animation-name: ${ slideRightAndFade };
++			}
++		}
+ 	}
+ `;
+ 
+diff --git a/packages/components/src/font-size-picker/test/index.tsx b/packages/components/src/font-size-picker/test/index.tsx
+index f91c12e352bf80..cd4967d6746053 100644
+--- a/packages/components/src/font-size-picker/test/index.tsx
++++ b/packages/components/src/font-size-picker/test/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen, fireEvent } from '@testing-library/react';
++import { screen, fireEvent } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+ /**
+@@ -13,6 +13,7 @@ import type { FontSize } from '../types';
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
++import { render } from '../../utils/tmp-ariakit-test-render-replacement';
+ 
+ const ControlledFontSizePicker = ( {
+ 	onChange,
+@@ -44,7 +45,9 @@ describe( 'FontSizePicker', () => {
+ 		async ( { value, expectedValue } ) => {
+ 			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+-			render( <FontSizePicker value={ value } onChange={ onChange } /> );
++			await render(
++				<FontSizePicker value={ value } onChange={ onChange } />
++			);
+ 			const input = screen.getByLabelText( 'Custom' );
+ 			await user.clear( input );
+ 			await user.type( input, '80' );
+@@ -63,7 +66,7 @@ describe( 'FontSizePicker', () => {
+ 		async ( { firstFontSize, expectedValue } ) => {
+ 			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+-			render(
++			await render(
+ 				<FontSizePicker
+ 					fontSizes={ [ { slug: 'slug', size: firstFontSize } ] }
+ 					onChange={ onChange }
+@@ -115,7 +118,7 @@ describe( 'FontSizePicker', () => {
+ 
+ 		it( 'displays a select control', async () => {
+ 			const user = userEvent.setup();
+-			render( <FontSizePicker fontSizes={ fontSizes } /> );
++			await render( <FontSizePicker fontSizes={ fontSizes } /> );
+ 			await user.click(
+ 				screen.getByRole( 'combobox', { name: 'Font size' } )
+ 			);
+@@ -137,8 +140,8 @@ describe( 'FontSizePicker', () => {
+ 			{ value: '3px', expectedLabel: 'Size Custom' },
+ 		] )(
+ 			'displays $expectedLabel as label when value is $value',
+-			( { value, expectedLabel } ) => {
+-				render(
++			async ( { value, expectedLabel } ) => {
++				await render(
+ 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
+ 				);
+ 				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
+@@ -161,7 +164,7 @@ describe( 'FontSizePicker', () => {
+ 			async ( { option, value, expectedArguments } ) => {
+ 				const user = userEvent.setup();
+ 				const onChange = jest.fn();
+-				render(
++				await render(
+ 					<FontSizePicker
+ 						fontSizes={ fontSizes }
+ 						value={ value }
+@@ -219,7 +222,7 @@ describe( 'FontSizePicker', () => {
+ 
+ 		it( 'displays a select control', async () => {
+ 			const user = userEvent.setup();
+-			render( <FontSizePicker fontSizes={ fontSizes } /> );
++			await render( <FontSizePicker fontSizes={ fontSizes } /> );
+ 			await user.click(
+ 				screen.getByRole( 'combobox', { name: 'Font size' } )
+ 			);
+@@ -241,8 +244,8 @@ describe( 'FontSizePicker', () => {
+ 			{ value: '8px', option: 'Tiny' },
+ 		] )(
+ 			'defaults to $option when value is $value',
+-			( { value, option } ) => {
+-				render(
++			async ( { value, option } ) => {
++				await render(
+ 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
+ 				);
+ 				expect(
+@@ -260,8 +263,8 @@ describe( 'FontSizePicker', () => {
+ 			{ value: '3px', expectedLabel: 'Size Custom' },
+ 		] )(
+ 			'displays $expectedLabel as label when value is $value',
+-			( { value, expectedLabel } ) => {
+-				render(
++			async ( { value, expectedLabel } ) => {
++				await render(
+ 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
+ 				);
+ 				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
+@@ -302,7 +305,7 @@ describe( 'FontSizePicker', () => {
+ 			async ( { option, value, expectedArguments } ) => {
+ 				const user = userEvent.setup();
+ 				const onChange = jest.fn();
+-				render(
++				await render(
+ 					<FontSizePicker
+ 						fontSizes={ fontSizes }
+ 						value={ value }
+@@ -353,8 +356,8 @@ describe( 'FontSizePicker', () => {
+ 			},
+ 		];
+ 
+-		it( 'displays a toggle group control with t-shirt sizes', () => {
+-			render( <FontSizePicker fontSizes={ fontSizes } /> );
++		it( 'displays a toggle group control with t-shirt sizes', async () => {
++			await render( <FontSizePicker fontSizes={ fontSizes } /> );
+ 			const options = screen.getAllByRole( 'radio' );
+ 			expect( options ).toHaveLength( 5 );
+ 			expect( options[ 0 ] ).toHaveTextContent( 'S' );
+@@ -375,8 +378,8 @@ describe( 'FontSizePicker', () => {
+ 			{ value: '40px', expectedLabel: 'Size Gigantosaurus' },
+ 		] )(
+ 			'displays $expectedLabel as label when value is $value',
+-			( { value, expectedLabel } ) => {
+-				render(
++			async ( { value, expectedLabel } ) => {
++				await render(
+ 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
+ 				);
+ 				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
+@@ -386,7 +389,7 @@ describe( 'FontSizePicker', () => {
+ 		it( 'calls onChange when a font size is selected', async () => {
+ 			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+-			render(
++			await render(
+ 				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
+ 			);
+ 			await user.click( screen.getByRole( 'radio', { name: 'Medium' } ) );
+@@ -422,8 +425,8 @@ describe( 'FontSizePicker', () => {
+ 			},
+ 		];
+ 
+-		it( 'displays a toggle group control with t-shirt sizes', () => {
+-			render( <FontSizePicker fontSizes={ fontSizes } /> );
++		it( 'displays a toggle group control with t-shirt sizes', async () => {
++			await render( <FontSizePicker fontSizes={ fontSizes } /> );
+ 			const options = screen.getAllByRole( 'radio' );
+ 			expect( options ).toHaveLength( 4 );
+ 			expect( options[ 0 ] ).toHaveTextContent( 'S' );
+@@ -447,8 +450,8 @@ describe( 'FontSizePicker', () => {
+ 			},
+ 		] )(
+ 			'displays $expectedLabel as label when value is $value',
+-			( { value, expectedLabel } ) => {
+-				render(
++			async ( { value, expectedLabel } ) => {
++				await render(
+ 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
+ 				);
+ 				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
+@@ -471,7 +474,7 @@ describe( 'FontSizePicker', () => {
+ 			async ( { radio, expectedArguments } ) => {
+ 				const user = userEvent.setup();
+ 				const onChange = jest.fn();
+-				render(
++				await render(
+ 					<FontSizePicker
+ 						fontSizes={ fontSizes }
+ 						onChange={ onChange }
+@@ -490,8 +493,8 @@ describe( 'FontSizePicker', () => {
+ 	} );
+ 
+ 	function commonToggleGroupTests( fontSizes: FontSize[] ) {
+-		it( 'defaults to M when value is 16px', () => {
+-			render(
++		it( 'defaults to M when value is 16px', async () => {
++			await render(
+ 				<FontSizePicker
+ 					fontSizes={ fontSizes }
+ 					value={ fontSizes[ 0 ].size }
+@@ -504,8 +507,8 @@ describe( 'FontSizePicker', () => {
+ 
+ 		test.each( [ undefined, '' ] )(
+ 			'has no selection when value is %p',
+-			( value ) => {
+-				render(
++			async ( value ) => {
++				await render(
+ 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
+ 				);
+ 				expect( screen.getByRole( 'radiogroup' ) ).toBeVisible();
+@@ -520,7 +523,7 @@ describe( 'FontSizePicker', () => {
+ 		it( 'shows custom input when Custom is selected', async () => {
+ 			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+-			render(
++			await render(
+ 				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
+ 			);
+ 			await user.click(
+@@ -535,13 +538,15 @@ describe( 'FontSizePicker', () => {
+ 	}
+ 
+ 	function commonTests( fontSizes: FontSize[] ) {
+-		it( 'shows custom input when value is unknown', () => {
+-			render( <FontSizePicker fontSizes={ fontSizes } value="3px" /> );
++		it( 'shows custom input when value is unknown', async () => {
++			await render(
++				<FontSizePicker fontSizes={ fontSizes } value="3px" />
++			);
+ 			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
+ 		} );
+ 
+-		it( 'hides custom input when disableCustomFontSizes is set to `true` with a custom font size', () => {
+-			const { rerender } = render(
++		it( 'hides custom input when disableCustomFontSizes is set to `true` with a custom font size', async () => {
++			const { rerender } = await render(
+ 				<FontSizePicker fontSizes={ fontSizes } value="3px" />
+ 			);
+ 			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
+@@ -558,8 +563,8 @@ describe( 'FontSizePicker', () => {
+ 			).not.toBeInTheDocument();
+ 		} );
+ 
+-		it( "doesn't hide custom input when the selected font size is a predef", () => {
+-			const { rerender } = render(
++		it( "doesn't hide custom input when the selected font size is a predef", async () => {
++			const { rerender } = await render(
+ 				<FontSizePicker fontSizes={ fontSizes } value="3px" />
+ 			);
+ 			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
+@@ -576,7 +581,7 @@ describe( 'FontSizePicker', () => {
+ 		it( 'allows custom values by default', async () => {
+ 			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+-			render(
++			await render(
+ 				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
+ 			);
+ 			await user.click(
+@@ -590,7 +595,9 @@ describe( 'FontSizePicker', () => {
+ 		it( 'allows switching between custom and predef inputs when pressing the dedicated toggle', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <ControlledFontSizePicker fontSizes={ fontSizes } /> );
++			await render(
++				<ControlledFontSizePicker fontSizes={ fontSizes } />
++			);
+ 
+ 			await user.click(
+ 				screen.getByRole( 'button', { name: 'Set custom size' } )
+@@ -607,8 +614,8 @@ describe( 'FontSizePicker', () => {
+ 			).not.toBeInTheDocument();
+ 		} );
+ 
+-		it( 'does not allow custom values when disableCustomFontSizes is set', () => {
+-			render(
++		it( 'does not allow custom values when disableCustomFontSizes is set', async () => {
++			await render(
+ 				<FontSizePicker
+ 					fontSizes={ fontSizes }
+ 					disableCustomFontSizes
+@@ -621,7 +628,7 @@ describe( 'FontSizePicker', () => {
+ 
+ 		it( 'does not display a slider by default', async () => {
+ 			const user = userEvent.setup();
+-			render( <FontSizePicker fontSizes={ fontSizes } /> );
++			await render( <FontSizePicker fontSizes={ fontSizes } /> );
+ 			await user.click(
+ 				screen.getByRole( 'button', { name: 'Set custom size' } )
+ 			);
+@@ -633,7 +640,7 @@ describe( 'FontSizePicker', () => {
+ 		it( 'allows a slider to be used when withSlider is set', async () => {
+ 			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+-			render(
++			await render(
+ 				<FontSizePicker
+ 					fontSizes={ fontSizes }
+ 					withSlider
+@@ -654,7 +661,7 @@ describe( 'FontSizePicker', () => {
+ 		it( 'allows reset by default', async () => {
+ 			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+-			render(
++			await render(
+ 				<FontSizePicker
+ 					fontSizes={ fontSizes }
+ 					value={ fontSizes[ 0 ].size }
+@@ -671,7 +678,7 @@ describe( 'FontSizePicker', () => {
+ 
+ 		it( 'does not allow reset when withReset is false', async () => {
+ 			const user = userEvent.setup();
+-			render(
++			await render(
+ 				<FontSizePicker
+ 					fontSizes={ fontSizes }
+ 					value={ fontSizes[ 0 ].size }
+@@ -689,7 +696,7 @@ describe( 'FontSizePicker', () => {
+ 		it( 'applies custom units to custom font size control', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render(
++			await render(
+ 				<FontSizePicker
+ 					fontSizes={ fontSizes }
+ 					value={ fontSizes[ 0 ].size }
+diff --git a/packages/components/src/tabs/test/index.tsx b/packages/components/src/tabs/test/index.tsx
+index bbb7f591d0ffc7..d78a96751b0ca8 100644
+--- a/packages/components/src/tabs/test/index.tsx
++++ b/packages/components/src/tabs/test/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen, waitFor } from '@testing-library/react';
++import { screen, waitFor } from '@testing-library/react';
+ import { press, click, sleep } from '@ariakit/test';
+ 
+ /**
+@@ -14,6 +14,7 @@ import { useEffect, useState } from '@wordpress/element';
+  */
+ import Tabs from '..';
+ import type { TabsProps } from '../types';
++import { render } from '../../utils/tmp-ariakit-test-render-replacement';
+ 
+ type Tab = {
+ 	tabId: string;
+@@ -159,7 +160,7 @@ describe( 'Tabs', () => {
+ 
+ 	describe( 'Accessibility and semantics', () => {
+ 		it( 'should use the correct aria attributes', async () => {
+-			render( <UncontrolledTabs tabs={ TABS } /> );
++			await render( <UncontrolledTabs tabs={ TABS } /> );
+ 
+ 			const tabList = screen.getByRole( 'tablist' );
+ 			const allTabs = screen.getAllByRole( 'tab' );
+@@ -188,7 +189,7 @@ describe( 'Tabs', () => {
+ 	} );
+ 	describe( 'Focus Behavior', () => {
+ 		it( 'should focus on the related TabPanel when pressing the Tab key', async () => {
+-			render( <UncontrolledTabs tabs={ TABS } /> );
++			await render( <UncontrolledTabs tabs={ TABS } /> );
+ 
+ 			const selectedTabPanel = await screen.findByRole( 'tabpanel' );
+ 
+@@ -221,7 +222,7 @@ describe( 'Tabs', () => {
+ 					: tabObj
+ 			);
+ 
+-			render(
++			await render(
+ 				<UncontrolledTabs tabs={ TABS_WITH_ALPHA_FOCUSABLE_FALSE } />
+ 			);
+ 
+@@ -256,7 +257,7 @@ describe( 'Tabs', () => {
+ 					: tabObj
+ 			);
+ 
+-			render(
++			await render(
+ 				<ControlledTabs
+ 					tabs={ TABS_WITH_ALPHA_DISABLED }
+ 					selectedTabId={ null }
+@@ -284,7 +285,7 @@ describe( 'Tabs', () => {
+ 
+ 	describe( 'Tab Attributes', () => {
+ 		it( "should apply the tab's `className` to the tab button", async () => {
+-			render( <UncontrolledTabs tabs={ TABS } /> );
++			await render( <UncontrolledTabs tabs={ TABS } /> );
+ 
+ 			expect(
+ 				await screen.findByRole( 'tab', { name: 'Alpha' } )
+@@ -302,7 +303,7 @@ describe( 'Tabs', () => {
+ 		it( 'defaults to automatic tab activation (pointer clicks)', async () => {
+ 			const mockOnSelect = jest.fn();
+ 
+-			render(
++			await render(
+ 				<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
+ 			);
+ 
+@@ -335,7 +336,7 @@ describe( 'Tabs', () => {
+ 		it( 'defaults to automatic tab activation (arrow keys)', async () => {
+ 			const mockOnSelect = jest.fn();
+ 
+-			render(
++			await render(
+ 				<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
+ 			);
+ 
+@@ -371,7 +372,7 @@ describe( 'Tabs', () => {
+ 		it( 'wraps around the last/first tab when using arrow keys', async () => {
+ 			const mockOnSelect = jest.fn();
+ 
+-			render(
++			await render(
+ 				<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
+ 			);
+ 
+@@ -405,7 +406,7 @@ describe( 'Tabs', () => {
+ 		it( 'should not move tab selection when pressing the up/down arrow keys, unless the orientation is changed to `vertical`', async () => {
+ 			const mockOnSelect = jest.fn();
+ 
+-			const { rerender } = render(
++			const { rerender } = await render(
+ 				<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
+ 			);
+ 
+@@ -437,7 +438,7 @@ describe( 'Tabs', () => {
+ 
+ 			// Change orientation to `vertical`. When the orientation is vertical,
+ 			// left/right arrow keys are replaced by up/down arrow keys.
+-			rerender(
++			await rerender(
+ 				<UncontrolledTabs
+ 					tabs={ TABS }
+ 					onSelect={ mockOnSelect }
+@@ -502,7 +503,7 @@ describe( 'Tabs', () => {
+ 					: tabObj
+ 			);
+ 
+-			render(
++			await render(
+ 				<UncontrolledTabs
+ 					tabs={ TABS_WITH_DELTA_DISABLED }
+ 					onSelect={ mockOnSelect }
+@@ -556,7 +557,7 @@ describe( 'Tabs', () => {
+ 		} );
+ 
+ 		it( 'should not focus the next tab when the Tab key is pressed', async () => {
+-			render( <UncontrolledTabs tabs={ TABS } /> );
++			await render( <UncontrolledTabs tabs={ TABS } /> );
+ 
+ 			// Tab should initially focus the first tab in the tablist, which
+ 			// is Alpha.
+@@ -581,7 +582,7 @@ describe( 'Tabs', () => {
+ 		it( 'switches to manual tab activation when the `selectOnMove` prop is set to `false`', async () => {
+ 			const mockOnSelect = jest.fn();
+ 
+-			render(
++			await render(
+ 				<UncontrolledTabs
+ 					tabs={ TABS }
+ 					onSelect={ mockOnSelect }
+@@ -638,7 +639,7 @@ describe( 'Tabs', () => {
+ 	describe( 'Uncontrolled mode', () => {
+ 		describe( 'Without `defaultTabId` prop', () => {
+ 			it( 'should render first tab', async () => {
+-				render( <UncontrolledTabs tabs={ TABS } /> );
++				await render( <UncontrolledTabs tabs={ TABS } /> );
+ 
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+ 				expect(
+@@ -646,12 +647,12 @@ describe( 'Tabs', () => {
+ 				).toBeInTheDocument();
+ 			} );
+ 			it( 'should fall back to first enabled tab if the active tab is removed', async () => {
+-				const { rerender } = render(
++				const { rerender } = await render(
+ 					<UncontrolledTabs tabs={ TABS } />
+ 				);
+ 
+ 				// Remove first item from `TABS` array
+-				rerender( <UncontrolledTabs tabs={ TABS.slice( 1 ) } /> );
++				await rerender( <UncontrolledTabs tabs={ TABS.slice( 1 ) } /> );
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+ 			} );
+ 			it( 'should not load any tab if the active tab is removed and there are no enabled tabs', async () => {
+@@ -667,13 +668,13 @@ describe( 'Tabs', () => {
+ 						: tabObj
+ 				);
+ 
+-				const { rerender } = render(
++				const { rerender } = await render(
+ 					<UncontrolledTabs tabs={ TABS_WITH_BETA_GAMMA_DISABLED } />
+ 				);
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+ 
+ 				// Remove alpha
+-				rerender(
++				await rerender(
+ 					<UncontrolledTabs
+ 						tabs={ TABS_WITH_BETA_GAMMA_DISABLED.slice( 1 ) }
+ 					/>
+@@ -695,15 +696,15 @@ describe( 'Tabs', () => {
+ 
+ 		describe( 'With `defaultTabId`', () => {
+ 			it( 'should render the tab set by `defaultTabId` prop', async () => {
+-				render(
++				await render(
+ 					<UncontrolledTabs tabs={ TABS } defaultTabId="beta" />
+ 				);
+ 
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+ 			} );
+ 
+-			it( 'should not select a tab when `defaultTabId` does not match any known tab', () => {
+-				render(
++			it( 'should not select a tab when `defaultTabId` does not match any known tab', async () => {
++				await render(
+ 					<UncontrolledTabs
+ 						tabs={ TABS }
+ 						defaultTabId="does-not-exist"
+@@ -721,11 +722,11 @@ describe( 'Tabs', () => {
+ 				).not.toBeInTheDocument();
+ 			} );
+ 			it( 'should not change tabs when defaultTabId is changed', async () => {
+-				const { rerender } = render(
++				const { rerender } = await render(
+ 					<UncontrolledTabs tabs={ TABS } defaultTabId="beta" />
+ 				);
+ 
+-				rerender(
++				await rerender(
+ 					<UncontrolledTabs tabs={ TABS } defaultTabId="alpha" />
+ 				);
+ 
+@@ -735,7 +736,7 @@ describe( 'Tabs', () => {
+ 			it( 'should fall back to the tab associated to `defaultTabId` if the currently active tab is removed', async () => {
+ 				const mockOnSelect = jest.fn();
+ 
+-				const { rerender } = render(
++				const { rerender } = await render(
+ 					<UncontrolledTabs
+ 						tabs={ TABS }
+ 						defaultTabId="gamma"
+@@ -749,7 +750,7 @@ describe( 'Tabs', () => {
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
+ 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+ 
+-				rerender(
++				await rerender(
+ 					<UncontrolledTabs
+ 						tabs={ TABS.slice( 1 ) }
+ 						defaultTabId="gamma"
+@@ -763,7 +764,7 @@ describe( 'Tabs', () => {
+ 			it( 'should fall back to the tab associated to `defaultTabId` if the currently active tab becomes disabled', async () => {
+ 				const mockOnSelect = jest.fn();
+ 
+-				const { rerender } = render(
++				const { rerender } = await render(
+ 					<UncontrolledTabs
+ 						tabs={ TABS }
+ 						defaultTabId="gamma"
+@@ -789,7 +790,7 @@ describe( 'Tabs', () => {
+ 						: tabObj
+ 				);
+ 
+-				rerender(
++				await rerender(
+ 					<UncontrolledTabs
+ 						tabs={ TABS_WITH_ALPHA_DISABLED }
+ 						defaultTabId="gamma"
+@@ -801,14 +802,14 @@ describe( 'Tabs', () => {
+ 			} );
+ 
+ 			it( 'should have no active tabs when the tab associated to `defaultTabId` is removed while being the active tab', async () => {
+-				const { rerender } = render(
++				const { rerender } = await render(
+ 					<UncontrolledTabs tabs={ TABS } defaultTabId="gamma" />
+ 				);
+ 
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+ 
+ 				// Remove gamma
+-				rerender(
++				await rerender(
+ 					<UncontrolledTabs
+ 						tabs={ TABS.slice( 0, 2 ) }
+ 						defaultTabId="gamma"
+@@ -827,7 +828,7 @@ describe( 'Tabs', () => {
+ 			} );
+ 
+ 			it( 'waits for the tab with the `defaultTabId` to be present in the `tabs` array before selecting it', async () => {
+-				const { rerender } = render(
++				const { rerender } = await render(
+ 					<UncontrolledTabs tabs={ TABS } defaultTabId="delta" />
+ 				);
+ 
+@@ -836,7 +837,7 @@ describe( 'Tabs', () => {
+ 					screen.queryByRole( 'tab', { selected: true } )
+ 				).not.toBeInTheDocument();
+ 
+-				rerender(
++				await rerender(
+ 					<UncontrolledTabs
+ 						tabs={ TABS_WITH_DELTA }
+ 						defaultTabId="delta"
+@@ -864,7 +865,7 @@ describe( 'Tabs', () => {
+ 							: tabObj
+ 				);
+ 
+-				render(
++				await render(
+ 					<UncontrolledTabs
+ 						tabs={ TABS_WITH_DELTA_DISABLED }
+ 						onSelect={ mockOnSelect }
+@@ -913,7 +914,7 @@ describe( 'Tabs', () => {
+ 						: tabObj
+ 				);
+ 
+-				const { rerender } = render(
++				const { rerender } = await render(
+ 					<UncontrolledTabs tabs={ TABS_WITH_ALPHA_DISABLED } />
+ 				);
+ 
+@@ -922,7 +923,7 @@ describe( 'Tabs', () => {
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+ 
+ 				// Re-enable all tabs
+-				rerender( <UncontrolledTabs tabs={ TABS } /> );
++				await rerender( <UncontrolledTabs tabs={ TABS } /> );
+ 
+ 				// Even if the initial tab becomes enabled again, the selected
+ 				// tab doesn't change.
+@@ -941,7 +942,7 @@ describe( 'Tabs', () => {
+ 						  }
+ 						: tabObj
+ 				);
+-				const { rerender } = render(
++				const { rerender } = await render(
+ 					<UncontrolledTabs
+ 						tabs={ TABS_ONLY_GAMMA_ENABLED }
+ 						defaultTabId="beta"
+@@ -953,7 +954,7 @@ describe( 'Tabs', () => {
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+ 
+ 				// Re-enable all tabs
+-				rerender(
++				await rerender(
+ 					<UncontrolledTabs tabs={ TABS } defaultTabId="beta" />
+ 				);
+ 
+@@ -964,7 +965,7 @@ describe( 'Tabs', () => {
+ 
+ 			it( 'should select the first enabled tab when the selected tab becomes disabled', async () => {
+ 				const mockOnSelect = jest.fn();
+-				const { rerender } = render(
++				const { rerender } = await render(
+ 					<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
+ 				);
+ 
+@@ -985,7 +986,7 @@ describe( 'Tabs', () => {
+ 				);
+ 
+ 				// Disable alpha
+-				rerender(
++				await rerender(
+ 					<UncontrolledTabs
+ 						tabs={ TABS_WITH_ALPHA_DISABLED }
+ 						onSelect={ mockOnSelect }
+@@ -997,7 +998,7 @@ describe( 'Tabs', () => {
+ 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+ 
+ 				// Re-enable all tabs
+-				rerender(
++				await rerender(
+ 					<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
+ 				);
+ 
+@@ -1009,7 +1010,7 @@ describe( 'Tabs', () => {
+ 			it( 'should select the first enabled tab when the tab associated to `defaultTabId` becomes disabled while being the active tab', async () => {
+ 				const mockOnSelect = jest.fn();
+ 
+-				const { rerender } = render(
++				const { rerender } = await render(
+ 					<UncontrolledTabs
+ 						tabs={ TABS }
+ 						onSelect={ mockOnSelect }
+@@ -1032,7 +1033,7 @@ describe( 'Tabs', () => {
+ 				);
+ 
+ 				// Disable gamma
+-				rerender(
++				await rerender(
+ 					<UncontrolledTabs
+ 						tabs={ TABS_WITH_GAMMA_DISABLED }
+ 						onSelect={ mockOnSelect }
+@@ -1045,7 +1046,7 @@ describe( 'Tabs', () => {
+ 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+ 
+ 				// Re-enable all tabs
+-				rerender(
++				await rerender(
+ 					<UncontrolledTabs
+ 						tabs={ TABS }
+ 						onSelect={ mockOnSelect }
+@@ -1063,7 +1064,9 @@ describe( 'Tabs', () => {
+ 
+ 	describe( 'Controlled mode', () => {
+ 		it( 'should render the tab specified by the `selectedTabId` prop', async () => {
+-			render( <ControlledTabs tabs={ TABS } selectedTabId="beta" /> );
++			await render(
++				<ControlledTabs tabs={ TABS } selectedTabId="beta" />
++			);
+ 
+ 			expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+ 			expect(
+@@ -1071,7 +1074,7 @@ describe( 'Tabs', () => {
+ 			).toBeInTheDocument();
+ 		} );
+ 		it( 'should render the specified `selectedTabId`, and ignore the `defaultTabId` prop', async () => {
+-			render(
++			await render(
+ 				<ControlledTabs
+ 					tabs={ TABS }
+ 					selectedTabId="gamma"
+@@ -1082,7 +1085,7 @@ describe( 'Tabs', () => {
+ 			expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
+ 		} );
+ 		it( 'should not render any tab if `selectedTabId` does not match any known tab', async () => {
+-			render(
++			await render(
+ 				<ControlledTabs
+ 					tabs={ TABS_WITH_DELTA }
+ 					selectedTabId="does-not-exist"
+@@ -1097,12 +1100,12 @@ describe( 'Tabs', () => {
+ 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
+ 		} );
+ 		it( 'should not render any tab if the active tab is removed', async () => {
+-			const { rerender } = render(
++			const { rerender } = await render(
+ 				<ControlledTabs tabs={ TABS } selectedTabId="beta" />
+ 			);
+ 
+ 			// Remove beta
+-			rerender(
++			await rerender(
+ 				<ControlledTabs
+ 					tabs={ TABS.filter( ( tab ) => tab.tabId !== 'beta' ) }
+ 					selectedTabId="beta"
+@@ -1123,7 +1126,9 @@ describe( 'Tabs', () => {
+ 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
+ 
+ 			// Restore beta
+-			rerender( <ControlledTabs tabs={ TABS } selectedTabId="beta" /> );
++			await rerender(
++				<ControlledTabs tabs={ TABS } selectedTabId="beta" />
++			);
+ 
+ 			// No tab should be selected i.e. it doesn't reselect the previously
+ 			// removed tab.
+@@ -1149,7 +1154,7 @@ describe( 'Tabs', () => {
+ 							: tabObj
+ 				);
+ 
+-				render(
++				await render(
+ 					<ControlledTabs
+ 						tabs={ TABS_WITH_DELTA_WITH_BETA_DISABLED }
+ 						selectedTabId="beta"
+@@ -1168,7 +1173,7 @@ describe( 'Tabs', () => {
+ 				).not.toBeInTheDocument();
+ 			} );
+ 			it( 'should not render any tab when the selected tab becomes disabled', async () => {
+-				const { rerender } = render(
++				const { rerender } = await render(
+ 					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
+ 				);
+ 
+@@ -1186,7 +1191,7 @@ describe( 'Tabs', () => {
+ 						: tabObj
+ 				);
+ 
+-				rerender(
++				await rerender(
+ 					<ControlledTabs
+ 						tabs={ TABS_WITH_BETA_DISABLED }
+ 						selectedTabId="beta"
+@@ -1206,7 +1211,7 @@ describe( 'Tabs', () => {
+ 				).not.toBeInTheDocument();
+ 
+ 				// re-enable all tabs
+-				rerender(
++				await rerender(
+ 					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
+ 				);
+ 
+@@ -1226,7 +1231,7 @@ describe( 'Tabs', () => {
+ 				'and `selectOnMove` is %s',
+ 				( selectOnMove ) => {
+ 					it( 'should continue to handle arrow key navigation properly', async () => {
+-						const { rerender } = render(
++						const { rerender } = await render(
+ 							<ControlledTabs
+ 								tabs={ TABS }
+ 								selectedTabId="beta"
+@@ -1249,7 +1254,7 @@ describe( 'Tabs', () => {
+ 						);
+ 						expect( await getSelectedTab() ).toHaveFocus();
+ 
+-						rerender(
++						await rerender(
+ 							<ControlledTabs
+ 								tabs={ TABS }
+ 								selectedTabId="gamma"
+@@ -1275,7 +1280,7 @@ describe( 'Tabs', () => {
+ 					} );
+ 
+ 					it( 'should focus the correct tab when tabbing out and back into the tablist', async () => {
+-						const { rerender } = render(
++						const { rerender } = await render(
+ 							<>
+ 								<button>Focus me</button>
+ 								<ControlledTabs
+@@ -1296,7 +1301,7 @@ describe( 'Tabs', () => {
+ 						);
+ 						expect( await getSelectedTab() ).toHaveFocus();
+ 
+-						rerender(
++						await rerender(
+ 							<>
+ 								<button>Focus me</button>
+ 								<ControlledTabs
+@@ -1344,7 +1349,9 @@ describe( 'Tabs', () => {
+ 
+ 		describe( 'When `selectOnMove` is `true`', () => {
+ 			it( 'should automatically select a newly focused tab', async () => {
+-				render( <ControlledTabs tabs={ TABS } selectedTabId="beta" /> );
++				await render(
++					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
++				);
+ 
+ 				await sleep();
+ 				await press.Tab();
+@@ -1361,7 +1368,7 @@ describe( 'Tabs', () => {
+ 		} );
+ 		describe( 'When `selectOnMove` is `false`', () => {
+ 			it( 'should apply focus without automatically changing the selected tab', async () => {
+-				render(
++				await render(
+ 					<ControlledTabs
+ 						tabs={ TABS }
+ 						selectedTabId="beta"
+@@ -1407,7 +1414,7 @@ describe( 'Tabs', () => {
+ 	it( 'should associate each `Tab` with the correct `TabPanel`, even if they are not rendered in the same order', async () => {
+ 		const TABS_WITH_DELTA_REVERSED = [ ...TABS_WITH_DELTA ].reverse();
+ 
+-		render(
++		await render(
+ 			<Tabs>
+ 				<Tabs.TabList>
+ 					{ TABS_WITH_DELTA.map( ( tabObj ) => (
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index cdfa4b1883cc16..8270a911f6ec6a 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -258,7 +258,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+             aria-checked="true"
+             aria-label="Uppercase"
+             class="emotion-12 components-toggle-group-control-option-base"
+-            data-active-item=""
++            data-active-item="true"
+             data-value="uppercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -818,7 +818,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+             aria-checked="true"
+             aria-label="Uppercase"
+             class="emotion-12 components-toggle-group-control-option-base"
+-            data-active-item=""
++            data-active-item="true"
+             data-value="uppercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+diff --git a/packages/components/src/tooltip/test/index.tsx b/packages/components/src/tooltip/test/index.tsx
+index e406ff997c7295..f70d32e7b7d491 100644
+--- a/packages/components/src/tooltip/test/index.tsx
++++ b/packages/components/src/tooltip/test/index.tsx
+@@ -65,36 +65,6 @@ describe( 'Tooltip', () => {
+ 			expectTooltipToBeHidden();
+ 		} );
+ 
+-		it( 'should associate the tooltip text with its anchor via the accessible description when visible', async () => {
+-			render( <Tooltip { ...props } /> );
+-
+-			// The anchor can not be found by querying for its description,
+-			// since that is present only when the tooltip is visible
+-			expect(
+-				screen.queryByRole( 'button', { description: 'tooltip text' } )
+-			).not.toBeInTheDocument();
+-
+-			// Hover the anchor. The tooltip shows and its text is used to describe
+-			// the tooltip anchor
+-			await hover(
+-				screen.getByRole( 'button', {
+-					name: 'Tooltip anchor',
+-				} )
+-			);
+-			expect(
+-				await screen.findByRole( 'button', {
+-					description: 'tooltip text',
+-				} )
+-			).toBeInTheDocument();
+-
+-			// Hover outside of the anchor, tooltip should hide
+-			await hoverOutside();
+-			await waitExpectTooltipToHide();
+-			expect(
+-				screen.queryByRole( 'button', { description: 'tooltip text' } )
+-			).not.toBeInTheDocument();
+-		} );
+-
+ 		it( 'should not leak Tooltip props to the tooltip anchor', () => {
+ 			render(
+ 				<Tooltip data-foo>
+@@ -493,11 +463,6 @@ describe( 'Tooltip', () => {
+ 			expect(
+ 				screen.queryByRole( 'tooltip', { name: 'Inner tooltip' } )
+ 			).not.toBeInTheDocument();
+-			expect(
+-				screen.getByRole( 'button', {
+-					description: 'Outer tooltip',
+-				} )
+-			).toBeVisible();
+ 
+ 			// Hover outside of the anchor, tooltip should hide
+ 			await hoverOutside();
+diff --git a/packages/components/src/utils/tmp-ariakit-test-render-replacement.ts b/packages/components/src/utils/tmp-ariakit-test-render-replacement.ts
+new file mode 100644
+index 00000000000000..01ffa1303830a1
+--- /dev/null
++++ b/packages/components/src/utils/tmp-ariakit-test-render-replacement.ts
+@@ -0,0 +1,171 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line @typescript-eslint/no-restricted-imports
++import { createElement, StrictMode, type ReactNode } from 'react';
++// eslint-disable-next-line import/no-extraneous-dependencies
++import * as ReactTestingLibrary from '@testing-library/react';
++
++// eslint-disable-next-line import/no-extraneous-dependencies
++import { isFocusable } from '@ariakit/core/utils/focus';
++// eslint-disable-next-line import/no-extraneous-dependencies
++import { noop } from '@ariakit/core/utils/misc';
++
++export type DirtiableElement = Element & { dirty?: boolean };
++
++export type TextField = HTMLInputElement | HTMLTextAreaElement;
++
++export const isBrowser =
++	typeof navigator !== 'undefined' &&
++	// eslint-disable-next-line ssr-friendly/no-dom-globals-in-module-scope
++	! navigator.userAgent.includes( 'jsdom' ) &&
++	typeof window !== 'undefined' &&
++	// eslint-disable-next-line ssr-friendly/no-dom-globals-in-module-scope
++	! ( 'happyDOM' in window );
++
++export async function flushMicrotasks() {
++	await Promise.resolve();
++	await Promise.resolve();
++	await Promise.resolve();
++}
++
++export function nextFrame() {
++	return new Promise( requestAnimationFrame );
++}
++
++export function setActEnvironment( value: boolean ) {
++	const scope = globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean };
++	const previousValue = scope.IS_REACT_ACT_ENVIRONMENT;
++	scope.IS_REACT_ACT_ENVIRONMENT = value;
++	const restoreActEnvironment = () => {
++		scope.IS_REACT_ACT_ENVIRONMENT = previousValue;
++	};
++	return restoreActEnvironment;
++}
++
++export function applyBrowserPolyfills() {
++	if ( isBrowser ) {
++		return noop;
++	}
++
++	const originalFocus = HTMLElement.prototype.focus;
++
++	HTMLElement.prototype.focus = function focus( options ) {
++		if ( ! isFocusable( this ) ) {
++			return;
++		}
++		return originalFocus.call( this, options );
++	};
++
++	const originalGetClientRects = Element.prototype.getClientRects;
++
++	// @ts-expect-error
++	Element.prototype.getClientRects = function getClientRects() {
++		const isHidden = ( element: Element ) => {
++			if ( ! element.isConnected ) {
++				return true;
++			}
++			if ( element.parentElement && isHidden( element.parentElement ) ) {
++				return true;
++			}
++			if ( ! ( element instanceof HTMLElement ) ) {
++				return false;
++			}
++			if ( element.hidden ) {
++				return true;
++			}
++			const style = getComputedStyle( element );
++			return style.display === 'none' || style.visibility === 'hidden';
++		};
++		if ( isHidden( this ) ) {
++			return [];
++		}
++		return [ { width: 1, height: 1 } ];
++	};
++
++	if ( ! Element.prototype.scrollIntoView ) {
++		Element.prototype.scrollIntoView = noop;
++	}
++
++	if ( ! Element.prototype.hasPointerCapture ) {
++		Element.prototype.hasPointerCapture = noop;
++	}
++
++	if ( ! Element.prototype.setPointerCapture ) {
++		Element.prototype.setPointerCapture = noop;
++	}
++
++	if ( ! Element.prototype.releasePointerCapture ) {
++		Element.prototype.releasePointerCapture = noop;
++	}
++
++	if ( typeof window.ClipboardEvent === 'undefined' ) {
++		// @ts-expect-error
++		window.ClipboardEvent = class ClipboardEvent extends Event {};
++	}
++
++	if ( typeof window.PointerEvent === 'undefined' ) {
++		// @ts-expect-error
++		window.PointerEvent = class PointerEvent extends MouseEvent {};
++	}
++
++	return () => {
++		HTMLElement.prototype.focus = originalFocus;
++		Element.prototype.getClientRects = originalGetClientRects;
++	};
++}
++
++export async function wrapAsync< T >( fn: () => Promise< T > ) {
++	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
++	const restoreActEnvironment = setActEnvironment( false );
++	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
++	const removeBrowserPolyfills = applyBrowserPolyfills();
++	try {
++		return await fn();
++	} finally {
++		restoreActEnvironment();
++		removeBrowserPolyfills();
++	}
++}
++
++export interface RenderOptions
++	extends Omit< ReactTestingLibrary.RenderOptions, 'queries' > {
++	strictMode?: boolean;
++}
++
++export async function render( ui: ReactNode, options?: RenderOptions ) {
++	const wrapper = ( props: { children: ReactNode } ) => {
++		const Wrapper = options?.wrapper;
++		const element = Wrapper
++			? createElement( Wrapper, props )
++			: props.children;
++		if ( ! options?.strictMode ) {
++			return element;
++		}
++		return createElement( StrictMode, undefined, element );
++	};
++
++	function wrapRender< T extends ( ...args: any[] ) => any >(
++		renderFn: T
++	): Promise< ReturnType< T > > {
++		return wrapAsync( async () => {
++			const output: ReturnType< T > = renderFn();
++			await flushMicrotasks();
++			await nextFrame();
++			await flushMicrotasks();
++			return output;
++		} );
++	}
++
++	return wrapRender( () => {
++		const output = ReactTestingLibrary.render( ui, {
++			...options,
++			wrapper,
++		} );
++		return {
++			...output,
++			rerender: ( newUi: ReactNode ) =>
++				wrapRender( () => output.rerender( newUi ) ),
++		};
++	} );
++}
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index 238e2bdd5be8bc..2597d5ea5085b8 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -28,7 +28,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@ariakit/react": "^0.3.12",
++		"@ariakit/react": "0.4.7",
+ 		"@babel/runtime": "^7.16.0",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/compose": "file:../compose",

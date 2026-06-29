@@ -1,0 +1,24 @@
+diff --git a/packages/components/src/color-list-picker/index.js b/packages/components/src/color-list-picker/index.js
+index c15910b0c8e723..d5ffd11c598129 100644
+--- a/packages/components/src/color-list-picker/index.js
++++ b/packages/components/src/color-list-picker/index.js
+@@ -29,6 +29,7 @@ function ColorOption( {
+ 			</Button>
+ 			{ isOpen && (
+ 				<ColorPalette
++					className="components-color-list-picker__color-picker"
+ 					colors={ colors }
+ 					value={ value }
+ 					clearable={ false }
+diff --git a/packages/components/src/color-list-picker/style.scss b/packages/components/src/color-list-picker/style.scss
+index 09a8e7348066cc..232be723ed9585 100644
+--- a/packages/components/src/color-list-picker/style.scss
++++ b/packages/components/src/color-list-picker/style.scss
+@@ -2,3 +2,7 @@
+ .components-color-list-picker__swatch-button {
+ 	width: 100%;
+ }
++
++.components-color-list-picker__color-picker {
++	margin: $grid-unit-10 0;
++}

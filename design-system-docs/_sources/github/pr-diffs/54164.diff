@@ -1,0 +1,790 @@
+diff --git a/package-lock.json b/package-lock.json
+index cc0ac9a5d4bbda..8ffcf1fa8f129e 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -47266,6 +47266,7 @@
+ 			"version": "5.3.1",
+ 			"resolved": "https://registry.npmjs.org/react-colorful/-/react-colorful-5.3.1.tgz",
+ 			"integrity": "sha512-nkP1w1LGe8PzhtOQO10xSDTsMWAYVj/Wm5c7ORk7CBngjCE7hHsknFRtosT5qMYkwWs8wSiU0sBwZ8dyzRbNEQ==",
++			"dev": true,
+ 			"peerDependencies": {
+ 				"react": ">=16.8.0",
+ 				"react-dom": ">=16.8.0"
+@@ -56256,7 +56257,7 @@
+ 				"memize": "^2.1.0",
+ 				"path-to-regexp": "^6.2.1",
+ 				"re-resizable": "^6.4.0",
+-				"react-colorful": "^5.3.1",
++				"react-colorful": "^5.6.1",
+ 				"reakit": "^1.3.11",
+ 				"remove-accents": "^0.5.0",
+ 				"use-lilius": "^2.0.1",
+@@ -56334,6 +56335,15 @@
+ 			"resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-6.2.1.tgz",
+ 			"integrity": "sha512-JLyh7xT1kizaEvcaXOQwOc2/Yhw6KZOvPf1S8401UyLk86CU79LN3vl7ztXGm/pZ+YjoyAJ4rxmHwbkBXJX+yw=="
+ 		},
++		"packages/components/node_modules/react-colorful": {
++			"version": "5.6.1",
++			"resolved": "https://registry.npmjs.org/react-colorful/-/react-colorful-5.6.1.tgz",
++			"integrity": "sha512-1exovf0uGTGyq5mXQT0zgQ80uvj2PCwvF8zY1RN9/vbJVSjSo3fsB/4L3ObbF7u70NduSiK4xu4Y6q1MHoUGEw==",
++			"peerDependencies": {
++				"react": ">=16.8.0",
++				"react-dom": ">=16.8.0"
++			}
++		},
+ 		"packages/components/node_modules/uuid": {
+ 			"version": "8.3.2",
+ 			"resolved": "https://registry.npmjs.org/uuid/-/uuid-8.3.2.tgz",
+@@ -69611,7 +69621,7 @@
+ 				"memize": "^2.1.0",
+ 				"path-to-regexp": "^6.2.1",
+ 				"re-resizable": "^6.4.0",
+-				"react-colorful": "^5.3.1",
++				"react-colorful": "^5.6.1",
+ 				"reakit": "^1.3.11",
+ 				"remove-accents": "^0.5.0",
+ 				"use-lilius": "^2.0.1",
+@@ -69664,6 +69674,11 @@
+ 					"resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-6.2.1.tgz",
+ 					"integrity": "sha512-JLyh7xT1kizaEvcaXOQwOc2/Yhw6KZOvPf1S8401UyLk86CU79LN3vl7ztXGm/pZ+YjoyAJ4rxmHwbkBXJX+yw=="
+ 				},
++				"react-colorful": {
++					"version": "5.6.1",
++					"resolved": "https://registry.npmjs.org/react-colorful/-/react-colorful-5.6.1.tgz",
++					"integrity": "sha512-1exovf0uGTGyq5mXQT0zgQ80uvj2PCwvF8zY1RN9/vbJVSjSo3fsB/4L3ObbF7u70NduSiK4xu4Y6q1MHoUGEw=="
++				},
+ 				"uuid": {
+ 					"version": "https://registry.npmjs.org/uuid/-/uuid-8.3.2.tgz",
+ 					"integrity": "sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg=="
+@@ -96348,7 +96363,8 @@
+ 		"react-colorful": {
+ 			"version": "5.3.1",
+ 			"resolved": "https://registry.npmjs.org/react-colorful/-/react-colorful-5.3.1.tgz",
+-			"integrity": "sha512-nkP1w1LGe8PzhtOQO10xSDTsMWAYVj/Wm5c7ORk7CBngjCE7hHsknFRtosT5qMYkwWs8wSiU0sBwZ8dyzRbNEQ=="
++			"integrity": "sha512-nkP1w1LGe8PzhtOQO10xSDTsMWAYVj/Wm5c7ORk7CBngjCE7hHsknFRtosT5qMYkwWs8wSiU0sBwZ8dyzRbNEQ==",
++			"dev": true
+ 		},
+ 		"react-devtools-core": {
+ 			"version": "4.28.0",
+diff --git a/packages/block-editor/src/components/block-canvas/context.js b/packages/block-editor/src/components/block-canvas/context.js
+new file mode 100644
+index 00000000000000..2eb8911a7923be
+--- /dev/null
++++ b/packages/block-editor/src/components/block-canvas/context.js
+@@ -0,0 +1,30 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext, useState } from '@wordpress/element';
++
++const BlockCanvasContext = createContext( {
++	disableInteractions: false,
++	setDisableInteractions: () => {},
++} );
++
++export const BlockCanvasContextProvider = ( { children } ) => {
++	const [ disableInteractions, setDisableInteractions ] = useState( false );
++	return (
++		<BlockCanvasContext.Provider
++			value={ { disableInteractions, setDisableInteractions } }
++		>
++			{ children }
++		</BlockCanvasContext.Provider>
++	);
++};
++
++export const useBlockCanvasContext = () => {
++	const context = useContext( BlockCanvasContext );
++	if ( context === undefined ) {
++		throw new Error(
++			'useBlockCanvasContext must be used within a BlockCanvasContextProvider'
++		);
++	}
++	return context;
++};
+diff --git a/packages/block-editor/src/components/block-canvas/index.js b/packages/block-editor/src/components/block-canvas/index.js
+index 70d6bbad99e522..ceaa4b7c4865ed 100644
+--- a/packages/block-editor/src/components/block-canvas/index.js
++++ b/packages/block-editor/src/components/block-canvas/index.js
+@@ -13,6 +13,7 @@ import WritingFlow from '../writing-flow';
+ import { useMouseMoveTypingReset } from '../observe-typing';
+ import { useClipboardHandler } from '../copy-handler';
+ import { useBlockSelectionClearer } from '../block-selection-clearer';
++import { useBlockCanvasContext } from './context';
+ 
+ export function ExperimentalBlockCanvas( {
+ 	shouldIframe = true,
+@@ -31,6 +32,8 @@ export function ExperimentalBlockCanvas( {
+ 		clearerRef,
+ 	] );
+ 
++	const { disableInteractions } = useBlockCanvasContext();
++
+ 	if ( ! shouldIframe ) {
+ 		return (
+ 			<>
+@@ -58,6 +61,7 @@ export function ExperimentalBlockCanvas( {
+ 			style={ {
+ 				width: '100%',
+ 				height,
++				pointerEvents: disableInteractions ? 'none' : '',
+ 				...iframeProps?.style,
+ 			} }
+ 			name="editor-canvas"
+diff --git a/packages/block-editor/src/components/colors-gradients/control.js b/packages/block-editor/src/components/colors-gradients/control.js
+index 14fb9841e5f921..d22f83c9844a55 100644
+--- a/packages/block-editor/src/components/colors-gradients/control.js
++++ b/packages/block-editor/src/components/colors-gradients/control.js
+@@ -19,6 +19,7 @@ import {
+  * Internal dependencies
+  */
+ import useSetting from '../use-setting';
++import { useBlockCanvasContext } from '../block-canvas/context';
+ 
+ const colorsAndGradientKeys = [
+ 	'colors',
+@@ -64,6 +65,8 @@ function ColorGradientControlInner( {
+ 		onGradientChange &&
+ 		( ( gradients && gradients.length > 0 ) || ! disableCustomGradients );
+ 
++	const { setDisableInteractions } = useBlockCanvasContext();
++
+ 	if ( ! canChooseAColor && ! canChooseAGradient ) {
+ 		return null;
+ 	}
+@@ -87,6 +90,9 @@ function ColorGradientControlInner( {
+ 				clearable={ clearable }
+ 				enableAlpha={ enableAlpha }
+ 				headingLevel={ headingLevel }
++				onPickerDragStart={ () => setDisableInteractions( true ) }
++				onPickerDragEnd={ () => setDisableInteractions( false ) }
++				onPopoverClose={ () => setDisableInteractions( false ) }
+ 			/>
+ 		),
+ 		[ TAB_GRADIENT.value ]: (
+diff --git a/packages/block-editor/src/components/provider/index.js b/packages/block-editor/src/components/provider/index.js
+index 0fa3f042053d08..520d6cebec4de2 100644
+--- a/packages/block-editor/src/components/provider/index.js
++++ b/packages/block-editor/src/components/provider/index.js
+@@ -14,6 +14,7 @@ import { store as blockEditorStore } from '../../store';
+ import { BlockRefsProvider } from './block-refs-provider';
+ import { unlock } from '../../lock-unlock';
+ import KeyboardShortcuts from '../keyboard-shortcuts';
++import { BlockCanvasContextProvider } from '../block-canvas/context';
+ 
+ /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
+ 
+@@ -47,7 +48,11 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
+ 		return (
+ 			<SlotFillProvider>
+ 				<KeyboardShortcuts.Register />
+-				<BlockRefsProvider>{ children }</BlockRefsProvider>
++				<BlockRefsProvider>
++					<BlockCanvasContextProvider>
++						{ children }
++					</BlockCanvasContextProvider>
++				</BlockRefsProvider>
+ 			</SlotFillProvider>
+ 		);
+ 	}
+diff --git a/packages/block-editor/src/private-apis.js b/packages/block-editor/src/private-apis.js
+index fe16d791dc7c5a..6caec6f2bf55f0 100644
+--- a/packages/block-editor/src/private-apis.js
++++ b/packages/block-editor/src/private-apis.js
+@@ -24,6 +24,7 @@ import {
+ } from './components/inserter/reusable-block-rename-hint';
+ import { usesContextKey } from './components/rich-text/format-edit';
+ import { ExperimentalBlockCanvas } from './components/block-canvas';
++import { useBlockCanvasContext as experimentalUseBlockCanvasContext } from './components/block-canvas/context';
+ import { getDuotoneFilter } from './components/duotone/utils';
+ 
+ /**
+@@ -33,6 +34,7 @@ export const privateApis = {};
+ lock( privateApis, {
+ 	...globalStyles,
+ 	ExperimentalBlockCanvas,
++	experimentalUseBlockCanvasContext,
+ 	ExperimentalBlockEditorProvider,
+ 	getDuotoneFilter,
+ 	getRichTextValues,
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 805b105e4934d7..9378e21d1bf71e 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -73,7 +73,7 @@
+ 		"memize": "^2.1.0",
+ 		"path-to-regexp": "^6.2.1",
+ 		"re-resizable": "^6.4.0",
+-		"react-colorful": "^5.3.1",
++		"react-colorful": "^5.6.1",
+ 		"reakit": "^1.3.11",
+ 		"remove-accents": "^0.5.0",
+ 		"use-lilius": "^2.0.1",
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index 86f52305587c06..a12778f72d9075 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -147,6 +147,7 @@ export function CustomColorPickerDropdown( {
+ 	const popoverProps = useMemo< DropdownProps[ 'popoverProps' ] >(
+ 		() => ( {
+ 			shift: true,
++			resize: false,
+ 			...( isRenderedInSidebar
+ 				? {
+ 						// When in the sidebar: open to the left (stacking),
+@@ -190,6 +191,9 @@ function UnforwardedColorPalette(
+ 		headingLevel = 2,
+ 		'aria-label': ariaLabel,
+ 		'aria-labelledby': ariaLabelledby,
++		onPickerDragStart,
++		onPickerDragEnd,
++		onPopoverClose,
+ 		...additionalProps
+ 	} = props;
+ 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
+@@ -220,6 +224,8 @@ function UnforwardedColorPalette(
+ 				color={ normalizedColorValue }
+ 				onChange={ ( color ) => onChange( color ) }
+ 				enableAlpha={ enableAlpha }
++				onPickerDragStart={ onPickerDragStart }
++				onPickerDragEnd={ onPickerDragEnd }
+ 			/>
+ 		</DropdownContentWrapper>
+ 	);
+@@ -328,6 +334,7 @@ function UnforwardedColorPalette(
+ 							</VStack>
+ 						</VStack>
+ 					) }
++					onClose={ () => onPopoverClose?.() }
+ 				/>
+ 			) }
+ 			<CircularOptionPicker
+diff --git a/packages/components/src/color-palette/stories/index.story.tsx b/packages/components/src/color-palette/stories/index.story.tsx
+index b49de51c1d16e3..454f646f3179f7 100644
+--- a/packages/components/src/color-palette/stories/index.story.tsx
++++ b/packages/components/src/color-palette/stories/index.story.tsx
+@@ -19,10 +19,11 @@ const meta: Meta< typeof ColorPalette > = {
+ 	component: ColorPalette,
+ 	argTypes: {
+ 		as: { control: { type: null } },
+-		onChange: { action: 'onChange', control: { type: null } },
++		onChange: { control: { type: null } },
+ 		value: { control: { type: null } },
+ 	},
+ 	parameters: {
++		actions: { argTypesRegex: '^on.*' },
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 	},
+diff --git a/packages/components/src/color-palette/types.ts b/packages/components/src/color-palette/types.ts
+index b2a7a884fec57d..526fd6d918c9ed 100644
+--- a/packages/components/src/color-palette/types.ts
++++ b/packages/components/src/color-palette/types.ts
+@@ -102,6 +102,10 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
+ 	 * @default false
+ 	 */
+ 	__experimentalIsRenderedInSidebar?: boolean;
++	// TODO: consider better prop names
++	onPickerDragStart?: ( event: MouseEvent ) => void;
++	onPickerDragEnd?: ( event: MouseEvent ) => void;
++	onPopoverClose?: () => void;
+ } & (
+ 		| {
+ 				/**
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index cff3b5d9c8ae4f..f0136737f3a42d 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -49,6 +49,8 @@ const UnconnectedColorPicker = (
+ 		onChange,
+ 		defaultValue = '#fff',
+ 		copyFormat,
++		onPickerDragStart,
++		onPickerDragEnd,
+ 		...divProps
+ 	} = useContextSystem( props, 'ColorPicker' );
+ 
+@@ -82,6 +84,8 @@ const UnconnectedColorPicker = (
+ 				onChange={ handleChange }
+ 				color={ safeColordColor }
+ 				enableAlpha={ enableAlpha }
++				onDragStart={ onPickerDragStart }
++				onDragEnd={ onPickerDragEnd }
+ 			/>
+ 			<AuxiliaryColorArtefactWrapper>
+ 				<AuxiliaryColorArtefactHStackHeader justify="space-between">
+diff --git a/packages/components/src/color-picker/picker.tsx b/packages/components/src/color-picker/picker.tsx
+index f2d7a84a485565..301aa35ec32851 100644
+--- a/packages/components/src/color-picker/picker.tsx
++++ b/packages/components/src/color-picker/picker.tsx
+@@ -7,18 +7,75 @@ import { colord } from 'colord';
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo } from '@wordpress/element';
++import { useMemo, useEffect, useRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+ import type { PickerProps } from './types';
+ 
+-export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
++export const Picker = ( {
++	color,
++	enableAlpha,
++	onChange,
++	onDragStart,
++	onDragEnd,
++}: PickerProps ) => {
+ 	const Component = enableAlpha
+ 		? RgbaStringColorPicker
+ 		: RgbStringColorPicker;
+ 	const rgbColor = useMemo( () => color.toRgbString(), [ color ] );
+ 
++	const isDragging = useRef( false );
++	const leftWhileDragging = useRef( false );
++	useEffect( () => {
++		const picker = document.querySelector( '.react-colorful__saturation' );
++		if ( ! picker ) {
++			return;
++		}
++
++		const doc = picker.ownerDocument;
++
++		const onPointerUp: EventListener = ( event ) => {
++			isDragging.current = false;
++			leftWhileDragging.current = false;
++			onDragEnd?.( event as MouseEvent );
++		};
++
++		const onPointerDown: EventListener = ( event ) => {
++			isDragging.current = true;
++			onDragStart?.( event as MouseEvent );
++		};
++
++		const onPointerLeave: EventListener = () => {
++			leftWhileDragging.current = isDragging.current;
++		};
++
++		const onPointerEnter: EventListener = ( event ) => {
++			const noPointerButtonsArePressed =
++				( event as PointerEvent ).buttons === 0;
++
++			if ( leftWhileDragging.current && noPointerButtonsArePressed ) {
++				onPointerUp( event );
++			}
++		};
++
++		picker.addEventListener( 'pointerdown', onPointerDown );
++		doc.addEventListener( 'pointerup', onPointerUp );
++		doc.addEventListener( 'pointerenter', onPointerEnter );
++		doc.addEventListener( 'pointerleave', onPointerLeave );
++
++		return () => {
++			picker.removeEventListener( 'pointerdown', onPointerDown );
++			doc.removeEventListener( 'pointerup', onPointerUp );
++			doc.removeEventListener( 'pointerenter', onPointerEnter );
++			doc.removeEventListener( 'pointerleave', onPointerUp );
++
++			// Make sure that we don't get stuck with the iframe without pointer events
++			// if the component unmounts
++			// Idea: timeout in the `onChange` function?
++		};
++	}, [ onDragStart, onDragEnd ] );
++
+ 	return (
+ 		<Component
+ 			color={ rgbColor }
+diff --git a/packages/components/src/color-picker/stories/index.story.tsx b/packages/components/src/color-picker/stories/index.story.tsx
+index 81500c15588222..3febd67cce098f 100644
+--- a/packages/components/src/color-picker/stories/index.story.tsx
++++ b/packages/components/src/color-picker/stories/index.story.tsx
+@@ -12,6 +12,8 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { ColorPicker } from '../component';
++import Dropdown from '../../dropdown';
++import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
+ 
+ const meta: Meta< typeof ColorPicker > = {
+ 	component: ColorPicker,
+@@ -46,3 +48,57 @@ const Template: StoryFn< typeof ColorPicker > = ( { onChange, ...props } ) => {
+ };
+ 
+ export const Default = Template.bind( {} );
++
++export const WithDropdown: StoryFn< typeof ColorPicker > = ( {
++	onChange,
++	...props
++} ) => {
++	const [ color, setColor ] = useState< string | undefined >();
++
++	return (
++		<div style={ { width: '100%', height: '600px', position: 'relative' } }>
++			<Dropdown
++				renderContent={ () => (
++					<DropdownContentWrapper paddingSize="none">
++						<ColorPicker
++							{ ...props }
++							color={ color }
++							onChange={ ( ...changeArgs ) => {
++								onChange?.( ...changeArgs );
++								setColor( ...changeArgs );
++							} }
++						/>
++					</DropdownContentWrapper>
++				) }
++				renderToggle={ ( { isOpen, onToggle } ) => (
++					<button
++						onClick={ onToggle }
++						style={ {
++							marginLeft: '100px',
++							marginTop: '100px',
++							zIndex: 1,
++							position: 'relative',
++						} }
++					>
++						{ isOpen ? 'Close' : 'Open' }
++					</button>
++				) }
++				popoverProps={ {
++					resize: false,
++					placement: 'right-start',
++				} }
++			/>
++			<iframe
++				style={ {
++					position: 'absolute',
++					top: 0,
++					left: 0,
++					height: '100%',
++					width: '100%',
++					zIndex: 0,
++				} }
++				title="test"
++			/>
++		</div>
++	);
++};
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index eee163d047ff06..02c99924bb1380 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -81,7 +81,6 @@ export const ColorfulWrapper = styled.div`
+ 		align-items: center;
+ 		width: 216px;
+ 		height: auto;
+-		overflow: hidden;
+ 	}
+ 
+ 	.react-colorful__saturation {
+diff --git a/packages/components/src/color-picker/types.ts b/packages/components/src/color-picker/types.ts
+index 5f98404c528444..bbb2c548c7e7ea 100644
+--- a/packages/components/src/color-picker/types.ts
++++ b/packages/components/src/color-picker/types.ts
+@@ -50,6 +50,9 @@ export type ColorPickerProps = WordPressComponentProps<
+ 		 * The format to copy when clicking the displayed color format.
+ 		 */
+ 		copyFormat?: ColorType;
++		// TODO: consider better prop names
++		onPickerDragStart?: ( event: MouseEvent ) => void;
++		onPickerDragEnd?: ( event: MouseEvent ) => void;
+ 	},
+ 	'div',
+ 	false
+@@ -59,6 +62,8 @@ export interface PickerProps {
+ 	color: Colord;
+ 	enableAlpha: boolean;
+ 	onChange: ( nextColor: Colord ) => void;
++	onDragStart?: ( event: MouseEvent ) => void;
++	onDragEnd?: ( event: MouseEvent ) => void;
+ }
+ 
+ export interface ColorInputProps {
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+index 291776b91f2ff1..44af02a3f09904 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+@@ -122,6 +122,8 @@ function ControlPoints( {
+ 	onStartControlPointChange,
+ 	onStopControlPointChange,
+ 	__experimentalIsRenderedInSidebar,
++	onPickerDragStart,
++	onPickerDragEnd,
+ }: ControlPointsProps ) {
+ 	const controlPointMoveState = useRef< ControlPointMoveState >();
+ 
+@@ -286,6 +288,8 @@ function ControlPoints( {
+ 												)
+ 											);
+ 										} }
++										onPickerDragStart={ onPickerDragStart }
++										onPickerDragEnd={ onPickerDragEnd }
+ 									/>
+ 									{ ! disableRemove &&
+ 										controlPoints.length > 2 && (
+@@ -333,6 +337,8 @@ function InsertPoint( {
+ 	insertPosition,
+ 	disableAlpha,
+ 	__experimentalIsRenderedInSidebar,
++	onPickerDragStart,
++	onPickerDragEnd,
+ }: InsertPointProps ) {
+ 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
+ 	return (
+@@ -382,6 +388,8 @@ function InsertPoint( {
+ 							);
+ 						}
+ 					} }
++					onPickerDragStart={ onPickerDragStart }
++					onPickerDragEnd={ onPickerDragEnd }
+ 				/>
+ 			) }
+ 			style={
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx b/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
+index 53589aa1d3efd8..3ea3bb55097a13 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
+@@ -86,6 +86,8 @@ export default function CustomGradientBar( {
+ 	disableInserter = false,
+ 	disableAlpha = false,
+ 	__experimentalIsRenderedInSidebar = false,
++	onPickerDragStart,
++	onPickerDragEnd,
+ }: CustomGradientBarProps ) {
+ 	const gradientMarkersContainerDomRef = useRef< HTMLDivElement >( null );
+ 
+@@ -172,6 +174,8 @@ export default function CustomGradientBar( {
+ 									type: 'CLOSE_INSERTER',
+ 								} );
+ 							} }
++							onPickerDragStart={ onPickerDragStart }
++							onPickerDragEnd={ onPickerDragEnd }
+ 						/>
+ 					) }
+ 				<ControlPoints
+@@ -198,6 +202,8 @@ export default function CustomGradientBar( {
+ 							type: 'STOP_CONTROL_CHANGE',
+ 						} );
+ 					} }
++					onPickerDragStart={ onPickerDragStart }
++					onPickerDragEnd={ onPickerDragEnd }
+ 				/>
+ 			</div>
+ 		</div>
+diff --git a/packages/components/src/custom-gradient-picker/index.tsx b/packages/components/src/custom-gradient-picker/index.tsx
+index 19cfd8f740df7d..4aaa3f9858ee93 100644
+--- a/packages/components/src/custom-gradient-picker/index.tsx
++++ b/packages/components/src/custom-gradient-picker/index.tsx
+@@ -146,6 +146,8 @@ export function CustomGradientPicker( {
+ 	value,
+ 	onChange,
+ 	__experimentalIsRenderedInSidebar = false,
++	onPickerDragStart,
++	onPickerDragEnd,
+ }: CustomGradientPickerProps ) {
+ 	const { gradientAST, hasGradient } = getGradientAstWithDefault( value );
+ 
+@@ -201,6 +203,8 @@ export function CustomGradientPicker( {
+ 						)
+ 					);
+ 				} }
++				onPickerDragStart={ onPickerDragStart }
++				onPickerDragEnd={ onPickerDragEnd }
+ 			/>
+ 			<Flex
+ 				gap={ 3 }
+diff --git a/packages/components/src/custom-gradient-picker/types.ts b/packages/components/src/custom-gradient-picker/types.ts
+index f0dc50094a5b6e..5088881996fded 100644
+--- a/packages/components/src/custom-gradient-picker/types.ts
++++ b/packages/components/src/custom-gradient-picker/types.ts
+@@ -30,6 +30,8 @@ export type CustomGradientPickerProps = {
+ 	 * @default false
+ 	 */
+ 	__experimentalIsRenderedInSidebar?: boolean;
++	onPickerDragStart?: ( event: MouseEvent ) => void;
++	onPickerDragEnd?: ( event: MouseEvent ) => void;
+ };
+ 
+ export type GradientAnglePickerProps = {
+@@ -56,6 +58,10 @@ export type CustomGradientBarProps = {
+ 	disableInserter?: boolean;
+ 	disableAlpha?: boolean;
+ 	__experimentalIsRenderedInSidebar?: boolean;
++
++	// TODO: consider better prop names
++	onPickerDragStart?: ( event: MouseEvent ) => void;
++	onPickerDragEnd?: ( event: MouseEvent ) => void;
+ };
+ 
+ export type CustomGradientBarIdleState = { id: 'IDLE' };
+@@ -99,6 +105,8 @@ export type ControlPointsProps = {
+ 	onStartControlPointChange: () => void;
+ 	onStopControlPointChange: () => void;
+ 	__experimentalIsRenderedInSidebar: boolean;
++	onPickerDragStart?: ( event: MouseEvent ) => void;
++	onPickerDragEnd?: ( event: MouseEvent ) => void;
+ };
+ 
+ export type ControlPointMoveState = {
+@@ -116,4 +124,6 @@ export type InsertPointProps = {
+ 	insertPosition: number;
+ 	disableAlpha: boolean;
+ 	__experimentalIsRenderedInSidebar: boolean;
++	onPickerDragStart?: ( event: MouseEvent ) => void;
++	onPickerDragEnd?: ( event: MouseEvent ) => void;
+ };
+diff --git a/packages/components/src/gradient-picker/index.tsx b/packages/components/src/gradient-picker/index.tsx
+index 13e2a430660380..f776ab56f435ba 100644
+--- a/packages/components/src/gradient-picker/index.tsx
++++ b/packages/components/src/gradient-picker/index.tsx
+@@ -221,6 +221,8 @@ export function GradientPicker( {
+ 	disableCustomGradients = false,
+ 	__experimentalIsRenderedInSidebar,
+ 	headingLevel = 2,
++	onPickerDragStart,
++	onPickerDragEnd,
+ 	...additionalProps
+ }: GradientPickerComponentProps ) {
+ 	const clearGradient = useCallback(
+@@ -255,6 +257,8 @@ export function GradientPicker( {
+ 						}
+ 						value={ value }
+ 						onChange={ onChange }
++						onPickerDragStart={ onPickerDragStart }
++						onPickerDragEnd={ onPickerDragEnd }
+ 					/>
+ 				) }
+ 				{ ( gradients.length || clearable ) && (
+diff --git a/packages/components/src/gradient-picker/types.ts b/packages/components/src/gradient-picker/types.ts
+index 8deb9513cc0dbe..54cbeeb504c12a 100644
+--- a/packages/components/src/gradient-picker/types.ts
++++ b/packages/components/src/gradient-picker/types.ts
+@@ -108,6 +108,8 @@ export type GradientPickerComponentProps = GradientPickerBaseProps & {
+ 	 * @default false
+ 	 */
+ 	__experimentalIsRenderedInSidebar?: boolean;
++	onPickerDragStart?: ( event: MouseEvent ) => void;
++	onPickerDragEnd?: ( event: MouseEvent ) => void;
+ };
+ 
+ export type PickerProps< TOriginType extends GradientObject | OriginObject > =
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index 9061222567103a..f3a3d6f2c784a7 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -115,6 +115,8 @@ function ColorPickerPopover< T extends Color | Gradient >( {
+ 	onChange,
+ 	popoverProps: receivedPopoverProps,
+ 	onClose = () => {},
++	onPickerDragStart,
++	onPickerDragEnd,
+ }: ColorPickerPopoverProps< T > ) {
+ 	const popoverProps: ColorPickerPopoverProps< T >[ 'popoverProps' ] =
+ 		useMemo(
+@@ -143,6 +145,8 @@ function ColorPickerPopover< T extends Color | Gradient >( {
+ 							color: newColor,
+ 						} );
+ 					} }
++					onPickerDragStart={ onPickerDragStart }
++					onPickerDragEnd={ onPickerDragEnd }
+ 				/>
+ 			) }
+ 			{ isGradient && (
+@@ -175,6 +179,8 @@ function Option< T extends Color | Gradient >( {
+ 	popoverProps: receivedPopoverProps,
+ 	slugPrefix,
+ 	isGradient,
++	onPickerDragStart,
++	onPickerDragEnd,
+ }: OptionProps< T > ) {
+ 	const focusOutsideProps = useFocusOutside( onStopEditing );
+ 	const value = isGradient ? element.gradient : element.color;
+@@ -251,6 +257,8 @@ function Option< T extends Color | Gradient >( {
+ 					onChange={ onChange }
+ 					element={ element }
+ 					popoverProps={ popoverProps }
++					onPickerDragStart={ onPickerDragStart }
++					onPickerDragEnd={ onPickerDragEnd }
+ 				/>
+ 			) }
+ 		</PaletteItem>
+@@ -392,6 +400,8 @@ export function PaletteEdit( {
+ 	canReset,
+ 	slugPrefix = '',
+ 	popoverProps,
++	onPickerDragStart,
++	onPickerDragEnd,
+ }: PaletteEditProps ) {
+ 	const isGradient = !! gradients;
+ 	const elements = isGradient ? gradients : colors;
+@@ -606,6 +616,8 @@ export function PaletteEdit( {
+ 							} }
+ 							element={ elements[ editingElement ?? -1 ] }
+ 							popoverProps={ popoverProps }
++							onPickerDragStart={ onPickerDragStart }
++							onPickerDragEnd={ onPickerDragEnd }
+ 						/>
+ 					) }
+ 					{ ! isEditing &&
+@@ -616,6 +628,8 @@ export function PaletteEdit( {
+ 								onChange={ onSelectPaletteItem }
+ 								clearable={ false }
+ 								disableCustomGradients={ true }
++								onPickerDragStart={ onPickerDragStart }
++								onPickerDragEnd={ onPickerDragEnd }
+ 							/>
+ 						) : (
+ 							<ColorPalette
+@@ -623,6 +637,8 @@ export function PaletteEdit( {
+ 								onChange={ onSelectPaletteItem }
+ 								clearable={ false }
+ 								disableCustomColors={ true }
++								onPickerDragStart={ onPickerDragStart }
++								onPickerDragEnd={ onPickerDragEnd }
+ 							/>
+ 						) ) }
+ 				</>
+diff --git a/packages/components/src/palette-edit/types.ts b/packages/components/src/palette-edit/types.ts
+index 1cc0611628c2f4..505d9e9ec04dd7 100644
+--- a/packages/components/src/palette-edit/types.ts
++++ b/packages/components/src/palette-edit/types.ts
+@@ -66,6 +66,8 @@ export type BasePaletteEdit = {
+ 		React.ComponentPropsWithoutRef< typeof Popover >,
+ 		'children'
+ 	>;
++	onPickerDragStart?: ( event: MouseEvent ) => void;
++	onPickerDragEnd?: ( event: MouseEvent ) => void;
+ };
+ 
+ type PaletteEditColors = {
+@@ -103,6 +105,8 @@ export type ColorPickerPopoverProps< T extends Color | Gradient > = {
+ 	isGradient?: T extends Gradient ? true : false;
+ 	onClose?: () => void;
+ 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
++	onPickerDragStart?: ( event: MouseEvent ) => void;
++	onPickerDragEnd?: ( event: MouseEvent ) => void;
+ };
+ 
+ export type NameInputProps = {
+@@ -123,6 +127,8 @@ export type OptionProps< T extends Color | Gradient > = {
+ 	onStopEditing: () => void;
+ 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
+ 	slugPrefix: string;
++	onPickerDragStart?: ( event: MouseEvent ) => void;
++	onPickerDragEnd?: ( event: MouseEvent ) => void;
+ };
+ 
+ export type PaletteEditListViewProps< T extends Color | Gradient > = {
+diff --git a/packages/edit-site/src/components/block-editor/editor-canvas.js b/packages/edit-site/src/components/block-editor/editor-canvas.js
+index 235eaf6617aa8f..b605a81d785bd7 100644
+--- a/packages/edit-site/src/components/block-editor/editor-canvas.js
++++ b/packages/edit-site/src/components/block-editor/editor-canvas.js
+@@ -72,6 +72,7 @@ function EditorCanvas( {
+ 	};
+ 
+ 	return (
++		// Site editor
+ 		<BlockCanvas
+ 			height="100%"
+ 			iframeProps={ {

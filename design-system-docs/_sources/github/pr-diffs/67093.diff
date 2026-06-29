@@ -1,0 +1,86 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d93eb30ac0ec50..dfb9454d8da1f0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,10 @@
+ -   `ToggleGroupControl`: Fix active background for `0` value ([#66855](https://github.com/WordPress/gutenberg/pull/66855)).
+ -   `SlotFill`: Fix a bug where a stale value of `fillProps` could be used ([#67000](https://github.com/WordPress/gutenberg/pull/67000)).
+ 
++### Enhancements
++
++-   `ColorPicker`: Update sizes of color format select and copy button ([#67093](https://github.com/WordPress/gutenberg/pull/67093)).
++
+ ### Experimental
+ 
+ -   `SlotFill`: Remove registration API methods from return value of `__experimentalUseSlot` ([#67070](https://github.com/WordPress/gutenberg/pull/67070)).
+diff --git a/packages/components/src/color-picker/color-copy-button.tsx b/packages/components/src/color-picker/color-copy-button.tsx
+index b8a4822544322c..0076a2125d00c0 100644
+--- a/packages/components/src/color-picker/color-copy-button.tsx
++++ b/packages/components/src/color-picker/color-copy-button.tsx
+@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import { CopyButton } from './styles';
++import { Button } from '../button';
+ import Tooltip from '../tooltip';
+ 
+ import type { ColorCopyButtonProps } from './types';
+@@ -63,8 +63,8 @@ export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
+ 				copiedColor === color.toHex() ? __( 'Copied!' ) : __( 'Copy' )
+ 			}
+ 		>
+-			<CopyButton
+-				size="small"
++			<Button
++				size="compact"
+ 				ref={ copyRef }
+ 				icon={ copy }
+ 				showTooltip={ false }
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index a1112d2e1ecd23..a2ddb6cd8ee4b6 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -87,6 +87,7 @@ const UnconnectedColorPicker = (
+ 				<AuxiliaryColorArtefactHStackHeader justify="space-between">
+ 					<SelectControl
+ 						__nextHasNoMarginBottom
++						size="compact"
+ 						options={ options }
+ 						value={ colorType }
+ 						onChange={ ( nextColorType ) =>
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index a78f10de2e4a32..50ce33da9f2333 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -11,7 +11,6 @@ import InnerSelectControl from '../select-control';
+ import InnerRangeControl from '../range-control';
+ import { space } from '../utils/space';
+ import { boxSizingReset } from '../utils';
+-import Button from '../button';
+ import { Flex } from '../flex';
+ import { HStack } from '../h-stack';
+ import CONFIG from '../utils/config-values';
+@@ -22,7 +21,6 @@ export const NumberControlWrapper = styled( NumberControl )`
+ 
+ export const SelectControl = styled( InnerSelectControl )`
+ 	margin-left: ${ space( -2 ) };
+-	width: 5em;
+ `;
+ 
+ export const RangeControl = styled( InnerRangeControl )`
+@@ -101,14 +99,3 @@ export const ColorfulWrapper = styled.div`
+ 
+ 	${ interactiveHueStyles }
+ `;
+-
+-export const CopyButton = styled( Button )`
+-	&&&&& {
+-		min-width: ${ space( 6 ) };
+-		padding: 0;
+-
+-		> svg {
+-			margin-right: 0;
+-		}
+-	}
+-`;

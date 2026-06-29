@@ -1,0 +1,269 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a68a1d7d39480a..56956bbeada9dd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ 
+ -   Add `box-sizing` reset style mixin to utils ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
+ -   `ResizableBox`: Make tooltip background match `Tooltip` component's ([#42800](https://github.com/WordPress/gutenberg/pull/42800)).
++-   `UnitControl`: Update unit dropdown design for the large size variant ([#42000](https://github.com/WordPress/gutenberg/pull/42000)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/unit-control/stories/index.tsx b/packages/components/src/unit-control/stories/index.tsx
+index e90744c51920ea..98bfc649c90543 100644
+--- a/packages/components/src/unit-control/stories/index.tsx
++++ b/packages/components/src/unit-control/stories/index.tsx
+@@ -24,9 +24,6 @@ const meta: ComponentMeta< typeof UnitControl > = {
+ 		__unstableStateReducer: {
+ 			control: { type: null },
+ 		},
+-		size: {
+-			control: { type: 'select' },
+-		},
+ 		onChange: {
+ 			action: 'onChange',
+ 			control: { type: null },
+@@ -54,16 +51,14 @@ const DefaultTemplate: ComponentStory< typeof UnitControl > = ( {
+ 	const [ value, setValue ] = useState< string | undefined >( '10px' );
+ 
+ 	return (
+-		<div style={ { maxWidth: '100px' } }>
+-			<UnitControl
+-				{ ...args }
+-				value={ value }
+-				onChange={ ( v, extra ) => {
+-					setValue( v );
+-					onChange?.( v, extra );
+-				} }
+-			/>
+-		</div>
++		<UnitControl
++			{ ...args }
++			value={ value }
++			onChange={ ( v, extra ) => {
++				setValue( v );
++				onChange?.( v, extra );
++			} }
++		/>
+ 	);
+ };
+ 
+@@ -125,16 +120,14 @@ export const WithCustomUnits: ComponentStory< typeof UnitControl > = ( {
+ 	const [ value, setValue ] = useState< string | undefined >( '80km' );
+ 
+ 	return (
+-		<div style={ { maxWidth: '100px' } }>
+-			<UnitControl
+-				{ ...args }
+-				value={ value }
+-				onChange={ ( v, extra ) => {
+-					setValue( v );
+-					onChange?.( v, extra );
+-				} }
+-			/>
+-		</div>
++		<UnitControl
++			{ ...args }
++			value={ value }
++			onChange={ ( v, extra ) => {
++				setValue( v );
++				onChange?.( v, extra );
++			} }
++		/>
+ 	);
+ };
+ WithCustomUnits.args = {
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.ts b/packages/components/src/unit-control/styles/unit-control-styles.ts
+index d8cb1f9b32bdf1..312e2a41372672 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.ts
++++ b/packages/components/src/unit-control/styles/unit-control-styles.ts
+@@ -10,6 +10,7 @@ import { COLORS, CONFIG, rtl } from '../../utils';
+ import NumberControl from '../../number-control';
+ import { BackdropUI } from '../../input-control/styles/input-control-styles';
+ import type { SelectSize } from '../types';
++import { space } from '../../ui/utils/space';
+ 
+ // Using `selectSize` instead of `size` to avoid a type conflict with the
+ // `size` HTML attribute of the `select` element.
+@@ -59,62 +60,113 @@ export const ValueInput = styled( NumberControl )`
+ 	}
+ `;
+ 
+-const baseUnitLabelStyles = css`
+-	appearance: none;
+-	background: transparent;
+-	border-radius: 2px;
+-	border: none;
+-	box-sizing: border-box;
+-	color: ${ COLORS.darkGray[ 500 ] };
+-	display: block;
+-	font-size: 8px;
+-	letter-spacing: -0.5px;
+-	outline: none;
+-	padding: 2px 1px;
+-	text-align-last: center;
+-	text-transform: uppercase;
+-	width: 20px;
+-
+-	${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
+-`;
++const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
++	const sizes = {
++		default: css`
++			box-sizing: border-box;
++			padding: 2px 1px;
++			width: 20px;
++			color: ${ COLORS.darkGray[ 500 ] };
++			font-size: 8px;
++			line-height: 1;
++			letter-spacing: -0.5px;
++			text-transform: uppercase;
++			text-align-last: center;
++		`,
++		large: css`
++			box-sizing: border-box;
++			min-width: 24px;
++			max-width: 48px;
++			height: 24px;
++			margin-inline-end: ${ space( 2 ) };
++			padding: ${ space( 1 ) };
++			color: ${ COLORS.ui.theme };
++			font-size: 13px;
++			line-height: 1;
++			text-align-last: center;
++			white-space: nowrap;
++			overflow: hidden;
++			text-overflow: ellipsis;
++		`,
++	};
++
++	return selectSize === '__unstable-large' ? sizes.large : sizes.default;
++};
+ 
+ export const UnitLabel = styled.div< SelectProps >`
+ 	&&& {
+ 		pointer-events: none;
+ 
+ 		${ baseUnitLabelStyles };
++
++		color: ${ COLORS.gray[ 900 ] };
+ 	}
+ `;
+ 
+-export const UnitSelect = styled.select< SelectProps >`
+-	&&& {
+-		${ baseUnitLabelStyles };
+-		cursor: pointer;
+-		border: 1px solid transparent;
+-		height: 100%;
+-		/* Removing margin ensures focus styles neatly overlay the wrapper. */
+-		margin: 0;
+-		transition: box-shadow 0.1s linear, border 0.1s linear;
++const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
++	const sizes = {
++		default: css`
++			height: 100%;
++			border: 1px solid transparent;
++			transition: box-shadow 0.1s linear, border 0.1s linear;
+ 
+-		&:hover {
+-			background-color: ${ COLORS.lightGray[ 300 ] };
+-		}
++			${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
+ 
+-		&:focus {
+-			border: 1px solid ${ COLORS.ui.borderFocus };
+-			box-shadow: inset 0 0 0 ${ CONFIG.borderWidth }
+-				${ COLORS.ui.borderFocus };
+-			outline-offset: 0;
+-			outline: 2px solid transparent;
+-			z-index: 1;
+-		}
++			&:not(:disabled):hover {
++				background-color: ${ COLORS.lightGray[ 300 ] };
++			}
+ 
+-		&:disabled {
+-			cursor: initial;
++			&:focus {
++				border: 1px solid ${ COLORS.ui.borderFocus };
++				box-shadow: inset 0 0 0
++					${ CONFIG.borderWidth + ' ' + COLORS.ui.borderFocus };
++				outline-offset: 0;
++				outline: 2px solid transparent;
++				z-index: 1;
++			}
++		`,
++		large: css`
++			display: flex;
++			justify-content: center;
++			align-items: center;
+ 
+ 			&:hover {
+-				background-color: transparent;
++				color: ${ COLORS.ui.borderFocus };
++				box-shadow: inset 0 0 0
++					${ CONFIG.borderWidth + ' ' + COLORS.ui.borderFocus };
++				outline: ${ CONFIG.borderWidth } solid transparent; // For High Contrast Mode
++			}
++
++			&:focus {
++				box-shadow: 0 0 0
++					${ CONFIG.borderWidthFocus + ' ' + COLORS.ui.borderFocus };
++				outline: ${ CONFIG.borderWidthFocus } solid transparent; // For High Contrast Mode
+ 			}
++		`,
++	};
++
++	return selectSize === '__unstable-large' ? sizes.large : sizes.default;
++};
++
++export const UnitSelect = styled.select< SelectProps >`
++	// The && counteracts <select> styles in WP forms.css
++	&& {
++		appearance: none;
++		background: transparent;
++		border-radius: 2px;
++		border: none;
++		display: block;
++		outline: none;
++		/* Removing margin ensures focus styles neatly overlay the wrapper. */
++		margin: 0;
++		min-height: auto;
++		font-family: inherit;
++
++		&:not( :disabled ) {
++			cursor: pointer;
+ 		}
++
++		${ baseUnitLabelStyles };
++		${ unitSelectSizes };
+ 	}
+ `;
+diff --git a/packages/components/src/unit-control/types.ts b/packages/components/src/unit-control/types.ts
+index d967378f1432d5..0372d2935733bb 100644
+--- a/packages/components/src/unit-control/types.ts
++++ b/packages/components/src/unit-control/types.ts
+@@ -43,7 +43,7 @@ export type UnitControlOnChangeCallback = InputChangeCallback<
+ 	{ data?: WPUnitControlUnit }
+ >;
+ 
+-export type UnitSelectControlProps = {
++export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
+ 	/**
+ 	 * Whether the control can be focused via keyboard navigation.
+ 	 *
+@@ -54,12 +54,6 @@ export type UnitSelectControlProps = {
+ 	 * A callback function invoked when the value is changed.
+ 	 */
+ 	onChange?: UnitControlOnChangeCallback;
+-	/**
+-	 * Size of the control option. Supports "default" and "small".
+-	 *
+-	 * @default 'default'
+-	 */
+-	size?: SelectSize;
+ 	/**
+ 	 * Current unit.
+ 	 */

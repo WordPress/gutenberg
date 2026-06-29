@@ -1,0 +1,448 @@
+diff --git a/packages/block-editor/src/components/button-block-appender/index.js b/packages/block-editor/src/components/button-block-appender/index.js
+index eecd1bf51af174..59e3838cca3a22 100644
+--- a/packages/block-editor/src/components/button-block-appender/index.js
++++ b/packages/block-editor/src/components/button-block-appender/index.js
+@@ -6,7 +6,7 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
++import { Button, VisuallyHidden } from '@wordpress/components';
+ import { forwardRef } from '@wordpress/element';
+ import { _x, sprintf } from '@wordpress/i18n';
+ import { Icon, plus } from '@wordpress/icons';
+@@ -47,7 +47,7 @@ function ButtonBlockAppender(
+ 				}
+ 				const isToggleButton = ! hasSingleBlockType;
+ 
+-				let inserterButton = (
++				return (
+ 					<Button
+ 						ref={ ref }
+ 						onFocus={ onFocus }
+@@ -61,6 +61,8 @@ function ButtonBlockAppender(
+ 						aria-expanded={ isToggleButton ? isOpen : undefined }
+ 						disabled={ disabled }
+ 						label={ label }
++						showTooltip
++						tooltipPosition="bottom"
+ 					>
+ 						{ ! hasSingleBlockType && (
+ 							<VisuallyHidden as="span">{ label }</VisuallyHidden>
+@@ -68,13 +70,6 @@ function ButtonBlockAppender(
+ 						<Icon icon={ plus } />
+ 					</Button>
+ 				);
+-
+-				if ( isToggleButton || hasSingleBlockType ) {
+-					inserterButton = (
+-						<Tooltip text={ label }>{ inserterButton }</Tooltip>
+-					);
+-				}
+-				return inserterButton;
+ 			} }
+ 			isAppender
+ 		/>
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 1328665a03eb5d..d707f817ee273e 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -98,6 +98,8 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+               aria-label="Custom color picker"
+               className="components-button is-link"
+               onClick={[Function]}
++              onMouseDown={[Function]}
++              onMouseUp={[Function]}
+               type="button"
+             >
+               Custom color
+diff --git a/packages/block-library/src/template-part/edit/index.js b/packages/block-library/src/template-part/edit/index.js
+index b3673a17775b8e..640f152f3560bc 100644
+--- a/packages/block-library/src/template-part/edit/index.js
++++ b/packages/block-library/src/template-part/edit/index.js
+@@ -131,16 +131,12 @@ export default function TemplatePartEdit( {
+ 				<BlockControls>
+ 					<ToolbarGroup className="wp-block-template-part__block-control-group">
+ 						<Dropdown
+-							className="wp-block-template-part__preview-dropdown-button"
+ 							contentClassName="wp-block-template-part__preview-dropdown-content"
+ 							position="bottom right left"
+ 							renderToggle={ ( { isOpen, onToggle } ) => (
+ 								<ToolbarButton
+ 									aria-expanded={ isOpen }
+ 									onClick={ onToggle }
+-									// Disable when open to prevent odd FireFox bug causing reopening.
+-									// As noted in https://github.com/WordPress/gutenberg/pull/24990#issuecomment-689094119 .
+-									disabled={ isOpen }
+ 								>
+ 									{ __( 'Replace' ) }
+ 								</ToolbarButton>
+diff --git a/packages/block-library/src/template-part/edit/placeholder/index.js b/packages/block-library/src/template-part/edit/placeholder/index.js
+index 4a8462b278b9c7..48f204862b67c4 100644
+--- a/packages/block-library/src/template-part/edit/placeholder/index.js
++++ b/packages/block-library/src/template-part/edit/placeholder/index.js
+@@ -55,21 +55,17 @@ export default function TemplatePartPlaceholder( {
+ 			) }
+ 		>
+ 			<Dropdown
++				className="wp-block-template-part__placeholder-preview-dropdown"
+ 				contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
+ 				position="bottom right left"
+ 				renderToggle={ ( { isOpen, onToggle } ) => (
+-					<>
+-						<Button
+-							isPrimary
+-							onClick={ onToggle }
+-							aria-expanded={ isOpen }
+-						>
+-							{ __( 'Choose existing' ) }
+-						</Button>
+-						<Button isTertiary onClick={ onCreate }>
+-							{ __( 'New template part' ) }
+-						</Button>
+-					</>
++					<Button
++						isPrimary
++						onClick={ onToggle }
++						aria-expanded={ isOpen }
++					>
++						{ __( 'Choose existing' ) }
++					</Button>
+ 				) }
+ 				renderContent={ ( { onClose } ) => (
+ 					<TemplatePartSelection
+@@ -78,6 +74,9 @@ export default function TemplatePartPlaceholder( {
+ 					/>
+ 				) }
+ 			/>
++			<Button isTertiary onClick={ onCreate }>
++				{ __( 'New template part' ) }
++			</Button>
+ 		</Placeholder>
+ 	);
+ }
+diff --git a/packages/block-library/src/template-part/editor.scss b/packages/block-library/src/template-part/editor.scss
+index c61e0651ae7251..e96c7746c5272e 100644
+--- a/packages/block-library/src/template-part/editor.scss
++++ b/packages/block-library/src/template-part/editor.scss
+@@ -1,3 +1,8 @@
++// Make dropdown margins the same as Placeholder component does for buttons
++.wp-block-template-part__placeholder-preview-dropdown {
++	margin-right: $grid-unit-15;
++	margin-bottom: $grid-unit-15;
++}
+ 
+ .wp-block-template-part__placeholder-preview-dropdown-content,
+ .wp-block-template-part__preview-dropdown-content {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7dfa5a68dabd61..e2c92d3b0e3898 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,14 @@
+ 
+ ## Unreleased
+ 
++### Breaking Change
++
++-   The callback provided to `renderToggle` prop of `Dropdown` must return a single child in order to ensure expected toggling behavior when the toggle is pressed while the dropdown is open.
++
++### Bug Fix
++
++-   Fix for broken toggling behavior exhibited by `Dropdown` and `DropdownMenu` in some browsers.
++
+ ## 13.0.0 (2021-03-17)
+ 
+ ### Breaking Change
+diff --git a/packages/components/src/color-edit/index.js b/packages/components/src/color-edit/index.js
+index 31b49ad1454b33..54673a20136c28 100644
+--- a/packages/components/src/color-edit/index.js
++++ b/packages/components/src/color-edit/index.js
+@@ -8,7 +8,7 @@ import { isEmpty, kebabCase } from 'lodash';
+  * WordPress dependencies
+  */
+ import { __, sprintf } from '@wordpress/i18n';
+-import { useEffect, useState } from '@wordpress/element';
++import { useEffect, useRef, useState } from '@wordpress/element';
+ import { edit, close, chevronDown, chevronUp, plus } from '@wordpress/icons';
+ 
+ /**
+@@ -21,15 +21,6 @@ import Button from '../button';
+ import TextControl from '../text-control';
+ import BaseControl from '../base-control';
+ 
+-function DropdownOpenOnMount( { shouldOpen, isOpen, onToggle } ) {
+-	useEffect( () => {
+-		if ( shouldOpen && ! isOpen ) {
+-			onToggle();
+-		}
+-	}, [] );
+-	return null;
+-}
+-
+ function ColorOption( {
+ 	color,
+ 	name,
+@@ -56,6 +47,14 @@ function ColorOption( {
+ 		( isHover || isFocused || isEditingName || isShowingAdvancedPanel ) &&
+ 		! immutableColorSlugs.includes( slug );
+ 
++	const dropdownHandle = useRef();
++	useEffect( () => {
++		const { isOpen, onToggle } = dropdownHandle.current;
++		if ( isEditingColorOnMount && isOpen === false ) {
++			onToggle();
++		}
++	}, [ isEditingColorOnMount ] );
++
+ 	return (
+ 		<div
+ 			tabIndex={ 0 }
+@@ -77,13 +76,11 @@ function ColorOption( {
+ 		>
+ 			<div className="components-color-edit__color-option-main-area">
+ 				<Dropdown
+-					renderToggle={ ( { isOpen, onToggle } ) => (
+-						<>
+-							<DropdownOpenOnMount
+-								shouldOpen={ isEditingColorOnMount }
+-								isOpen={ isOpen }
+-								onToggle={ onToggle }
+-							/>
++					renderToggle={ ( { isOpen, onToggle } ) => {
++						if ( isOpen !== dropdownHandle.current?.isOpen ) {
++							dropdownHandle.current = { isOpen, onToggle };
++						}
++						return (
+ 							<CircularOptionPicker.Option
+ 								style={ { backgroundColor: color, color } }
+ 								aria-expanded={ isOpen }
+@@ -91,8 +88,8 @@ function ColorOption( {
+ 								onClick={ onToggle }
+ 								aria-label={ __( 'Edit color value' ) }
+ 							/>
+-						</>
+-					) }
++						);
++					} }
+ 					renderContent={ () => (
+ 						<ColorPicker
+ 							color={ color }
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.js.snap b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+index 1db3cdb27938f3..c4bff0c9438d91 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+@@ -118,6 +118,8 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+       aria-label="Custom color picker"
+       isLink={true}
+       onClick={[Function]}
++      onMouseDown={[Function]}
++      onMouseUp={[Function]}
+     >
+       <button
+         aria-describedby={null}
+@@ -126,6 +128,8 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+         aria-label="Custom color picker"
+         className="components-button is-link"
+         onClick={[Function]}
++        onMouseDown={[Function]}
++        onMouseUp={[Function]}
+         type="button"
+       >
+         Custom color
+@@ -552,6 +556,8 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                 aria-label="Custom color picker"
+                 isLink={true}
+                 onClick={[Function]}
++                onMouseDown={[Function]}
++                onMouseUp={[Function]}
+               >
+                 <button
+                   aria-describedby={null}
+@@ -560,6 +566,8 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                   aria-label="Custom color picker"
+                   className="components-button is-link"
+                   onClick={[Function]}
++                  onMouseDown={[Function]}
++                  onMouseUp={[Function]}
+                   type="button"
+                 >
+                   Custom color
+diff --git a/packages/components/src/dropdown/README.md b/packages/components/src/dropdown/README.md
+index d3d515c0ce8656..dc414f164d345c 100644
+--- a/packages/components/src/dropdown/README.md
++++ b/packages/components/src/dropdown/README.md
+@@ -1,8 +1,8 @@
+ # Dropdown
+ 
+-Dropdown is a React component to render a button that opens a floating content modal when clicked.
+-This components takes care of updating the state of the dropdown menu (opened/closed), handles closing the menu when clicking outside
+-and uses render props to render the button and the content.
++Dropdown is a React component to render a button that opens a floating content dialog when clicked.
++The component takes care of updating the state of the dropdown (opened/closed), handles closing
++the popover when clicking outside and uses render props to render the button and the content.
+ 
+ ## Usage
+ 
+@@ -52,7 +52,9 @@ The direction in which the popover should open relative to its parent node. Spec
+ 
+ ### renderToggle
+ 
+-A callback invoked to render the Dropdown Toggle Button.
++A callback invoked to render the Dropdown Toggle Button. NOTE: The return must be a single child as it
++will be cloned and have some event handlers added to ensure that a press of the toggle while the
++dropdown is open will bypass the auto-closing behavior and defer control to the toggle.
+ 
+ -   Type: `Function`
+ -   Required: Yes
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index c5775fdaf09d97..67949c28106c6c 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -6,7 +6,7 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { useRef, useEffect, useState } from '@wordpress/element';
++import { useRef, useEffect, useState, cloneElement } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -56,16 +56,15 @@ export default function Dropdown( {
+ 	}
+ 
+ 	/**
+-	 * Closes the dropdown if a focus leaves the dropdown wrapper. This is
+-	 * intentionally distinct from `onClose` since focus loss from the popover
+-	 * is expected to occur when using the Dropdown's toggle button, in which
+-	 * case the correct behavior is to keep the dropdown closed. The same applies
+-	 * in case when focus is moved to the modal dialog.
++	 * Closes the dropdown if focus leaves its popover unless its toggle was
++	 * pressed or focus was moved to within a modal dialog. The former is to
++	 * let the toggle act to close the dropdown and the latter is to enable
++	 * the focus to return after the dialog is dismissed.
+ 	 */
+ 	function closeIfFocusOutside() {
+ 		const { ownerDocument } = containerRef.current;
+ 		if (
+-			! containerRef.current.contains( ownerDocument.activeElement ) &&
++			! isPressingToggle.current &&
+ 			! ownerDocument.activeElement.closest( '[role="dialog"]' )
+ 		) {
+ 			close();
+@@ -81,17 +80,30 @@ export default function Dropdown( {
+ 
+ 	const args = { isOpen, onToggle: toggle, onClose: close };
+ 
++	const isPressingToggle = useRef();
++	let toggleElement = renderToggle( args );
++	const { props } = toggleElement;
++	const pressHandlers = {
++		onMouseDown: ( event ) => {
++			isPressingToggle.current = true;
++			props.onMouseDown?.( event );
++		},
++		onMouseUp: ( event ) => {
++			isPressingToggle.current = false;
++			props.onMouseUp?.( event );
++		},
++	};
++	toggleElement = cloneElement( toggleElement, pressHandlers );
+ 	return (
+ 		<div
+ 			className={ classnames( 'components-dropdown', className ) }
+ 			ref={ containerRef }
+ 		>
+-			{ renderToggle( args ) }
++			{ toggleElement }
+ 			{ isOpen && (
+ 				<Popover
+ 					position={ position }
+-					onClose={ close }
+-					onFocusOutside={ closeIfFocusOutside }
++					onClose={ closeIfFocusOutside }
+ 					expandOnMobile={ expandOnMobile }
+ 					headerTitle={ headerTitle }
+ 					focusOnMount={ focusOnMount }
+diff --git a/packages/components/src/dropdown/test/index.js b/packages/components/src/dropdown/test/index.js
+index a18e2479d37e8f..82048902f2be50 100644
+--- a/packages/components/src/dropdown/test/index.js
++++ b/packages/components/src/dropdown/test/index.js
+@@ -65,20 +65,20 @@ describe( 'Dropdown', () => {
+ 			<Dropdown
+ 				className="container"
+ 				contentClassName="content"
+-				renderToggle={ ( { isOpen, onToggle, onClose } ) => [
++				renderToggle={ ( { isOpen, onToggle } ) => (
+ 					<button
+-						key="open"
+ 						className="open"
+ 						aria-expanded={ isOpen }
+ 						onClick={ onToggle }
+ 					>
+ 						Toggleee
+-					</button>,
+-					<button key="close" className="close" onClick={ onClose }>
+-						closee
+-					</button>,
+-				] }
+-				renderContent={ () => null }
++					</button>
++				) }
++				renderContent={ ( { onClose } ) => (
++					<button className="close" onClick={ onClose }>
++						test
++					</button>
++				) }
+ 			/>
+ 		);
+ 
+diff --git a/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap
+index af117caedc07b9..56d5c9270b378b 100644
+--- a/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap
+@@ -60,6 +60,8 @@ exports[`MoreMenu should match snapshot 1`] = `
+           label="Options"
+           onClick={[Function]}
+           onKeyDown={[Function]}
++          onMouseDown={[Function]}
++          onMouseUp={[Function]}
+           showTooltip={true}
+           tooltipPosition="bottom"
+         >
+@@ -80,6 +82,7 @@ exports[`MoreMenu should match snapshot 1`] = `
+               onMouseDown={[Function]}
+               onMouseEnter={[Function]}
+               onMouseLeave={[Function]}
++              onMouseUp={[Function]}
+               type="button"
+             >
+               <Icon
+diff --git a/packages/edit-post/src/components/sidebar/post-schedule/index.js b/packages/edit-post/src/components/sidebar/post-schedule/index.js
+index 6d99ccf506141a..59a958c9339f85 100644
+--- a/packages/edit-post/src/components/sidebar/post-schedule/index.js
++++ b/packages/edit-post/src/components/sidebar/post-schedule/index.js
+@@ -22,16 +22,14 @@ export function PostSchedule() {
+ 					position="bottom left"
+ 					contentClassName="edit-post-post-schedule__dialog"
+ 					renderToggle={ ( { onToggle, isOpen } ) => (
+-						<>
+-							<Button
+-								className="edit-post-post-schedule__toggle"
+-								onClick={ onToggle }
+-								aria-expanded={ isOpen }
+-								isTertiary
+-							>
+-								<PostScheduleLabel />
+-							</Button>
+-						</>
++						<Button
++							className="edit-post-post-schedule__toggle"
++							onClick={ onToggle }
++							aria-expanded={ isOpen }
++							isTertiary
++						>
++							<PostScheduleLabel />
++						</Button>
+ 					) }
+ 					renderContent={ () => <PostScheduleForm /> }
+ 				/>

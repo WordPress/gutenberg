@@ -1,0 +1,68 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 52277deca063e5..b81869c8e7cbe5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,10 @@
+ -   `AlignmentMatrixControl` updated to satisfy `react/exhuastive-deps` eslint rule ([#41167](https://github.com/WordPress/gutenberg/pull/41167))
+ -   `CheckboxControl`: Add unit tests ([#41165](https://github.com/WordPress/gutenberg/pull/41165)).
+ 
++### Experimental
++
++-   `Spacer`: Add RTL support. ([#41172](https://github.com/WordPress/gutenberg/pull/41172))
++
+ ## 19.11.0 (2022-05-18)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/spacer/hook.ts b/packages/components/src/spacer/hook.ts
+index c833ec90d896ae..326bc5c3845cfc 100644
+--- a/packages/components/src/spacer/hook.ts
++++ b/packages/components/src/spacer/hook.ts
+@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
+  */
+ import { useContextSystem, WordPressComponentProps } from '../ui/context';
+ import { space } from '../ui/utils/space';
+-import { useCx } from '../utils/hooks/use-cx';
++import { rtl, useCx } from '../utils';
+ import type { Props } from './types';
+ 
+ const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
+@@ -60,13 +60,13 @@ export function useSpacer( props: WordPressComponentProps< Props, 'div' > ) {
+ 				margin-bottom: ${ space( marginBottom ) };
+ 			`,
+ 		isDefined( marginLeft ) &&
+-			css`
+-				margin-left: ${ space( marginLeft ) };
+-			`,
++			rtl( {
++				marginLeft: space( marginLeft ),
++			} )(),
+ 		isDefined( marginRight ) &&
+-			css`
+-				margin-right: ${ space( marginRight ) };
+-			`,
++			rtl( {
++				marginRight: space( marginRight ),
++			} )(),
+ 		isDefined( padding ) &&
+ 			css`
+ 				padding: ${ space( padding ) };
+@@ -90,13 +90,13 @@ export function useSpacer( props: WordPressComponentProps< Props, 'div' > ) {
+ 				padding-bottom: ${ space( paddingBottom ) };
+ 			`,
+ 		isDefined( paddingLeft ) &&
+-			css`
+-				padding-left: ${ space( paddingLeft ) };
+-			`,
++			rtl( {
++				paddingLeft: space( paddingLeft ),
++			} )(),
+ 		isDefined( paddingRight ) &&
+-			css`
+-				padding-right: ${ space( paddingRight ) };
+-			`,
++			rtl( {
++				paddingRight: space( paddingRight ),
++			} )(),
+ 		className
+ 	);
+ 

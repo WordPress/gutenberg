@@ -1,0 +1,72 @@
+diff --git a/packages/components/src/panel/README.md b/packages/components/src/panel/README.md
+index 6b944732381ede..58e59a4f85a04c 100644
+--- a/packages/components/src/panel/README.md
++++ b/packages/components/src/panel/README.md
+@@ -172,6 +172,12 @@ The class that will be added with `components-panel__row`. to the classes of the
+ -   Type: `String`
+ -   Required: No
+ 
++##### Ref
++
++PanelRow accepts a forwarded ref that will be added to the wrapper div. Usage:
++
++`<PanelRow className="edit-post-post-schedule" ref={ anchorRef }>`
++
+ ---
+ 
+ #### PanelHeader
+diff --git a/packages/components/src/panel/row.js b/packages/components/src/panel/row.js
+index 8600b8b03306bb..9da08b06c84ba3 100644
+--- a/packages/components/src/panel/row.js
++++ b/packages/components/src/panel/row.js
+@@ -3,10 +3,18 @@
+  */
+ import classnames from 'classnames';
+ 
+-function PanelRow( { className, children } ) {
+-	const classes = classnames( 'components-panel__row', className );
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
+ 
+-	return <div className={ classes }>{ children }</div>;
+-}
++const PanelRow = forwardRef( ( { className, children }, ref ) => (
++	<div
++		className={ classnames( 'components-panel__row', className ) }
++		ref={ ref }
++	>
++		{ children }
++	</div>
++) );
+ 
+ export default PanelRow;
+diff --git a/packages/edit-post/src/components/sidebar/post-schedule/index.js b/packages/edit-post/src/components/sidebar/post-schedule/index.js
+index cf644bc9a6ae1e..6d99ccf506141a 100644
+--- a/packages/edit-post/src/components/sidebar/post-schedule/index.js
++++ b/packages/edit-post/src/components/sidebar/post-schedule/index.js
+@@ -3,6 +3,7 @@
+  */
+ import { __ } from '@wordpress/i18n';
+ import { PanelRow, Dropdown, Button } from '@wordpress/components';
++import { useRef } from '@wordpress/element';
+ import {
+ 	PostSchedule as PostScheduleForm,
+ 	PostScheduleLabel,
+@@ -10,11 +11,14 @@ import {
+ } from '@wordpress/editor';
+ 
+ export function PostSchedule() {
++	const anchorRef = useRef();
++
+ 	return (
+ 		<PostScheduleCheck>
+-			<PanelRow className="edit-post-post-schedule">
++			<PanelRow className="edit-post-post-schedule" ref={ anchorRef }>
+ 				<span>{ __( 'Publish' ) }</span>
+ 				<Dropdown
++					popoverProps={ { anchorRef: anchorRef.current } }
+ 					position="bottom left"
+ 					contentClassName="edit-post-post-schedule__dialog"
+ 					renderToggle={ ( { onToggle, isOpen } ) => (

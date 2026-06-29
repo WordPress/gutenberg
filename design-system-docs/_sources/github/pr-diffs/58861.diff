@@ -1,0 +1,31 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 58b0d5a95fa0d6..1de4ef3769d33a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -26,6 +26,7 @@
+ -   `Placeholder`: Fix Global Styles typography settings bleeding into placeholder component ([#58303](https://github.com/WordPress/gutenberg/pull/58303)).
+ -   `PaletteEdit`: Fix palette item accessibility in details view ([#58214](https://github.com/WordPress/gutenberg/pull/58214)).
+ -   `Snackbar`: Fix the auto-dismissal timers ([#58604](https://github.com/WordPress/gutenberg/pull/58604)).
++-   `Tabs`: Fix infinite loop in `useEffect` ([#58861](https://github.com/WordPress/gutenberg/pull/58861)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/tabs/index.tsx b/packages/components/src/tabs/index.tsx
+index 4573f7a6968df9..685c5cb32bd05a 100644
+--- a/packages/components/src/tabs/index.tsx
++++ b/packages/components/src/tabs/index.tsx
+@@ -151,13 +151,7 @@ function Tabs( {
+ 		if ( tabsHavePopulated.current && !! selectedTabId && ! selectedTab ) {
+ 			setSelectedId( null );
+ 		}
+-	}, [
+-		isControlled,
+-		selectedId,
+-		selectedTab,
+-		selectedTabId,
+-		setSelectedId,
+-	] );
++	}, [ isControlled, selectedTab, selectedTabId, setSelectedId ] );
+ 
+ 	useEffect( () => {
+ 		if ( ! isControlled ) {

@@ -1,0 +1,711 @@
+diff --git a/packages/block-editor/src/components/inserter/style.scss b/packages/block-editor/src/components/inserter/style.scss
+index dd0cc50e31fcb4..35c18e1d9acce5 100644
+--- a/packages/block-editor/src/components/inserter/style.scss
++++ b/packages/block-editor/src/components/inserter/style.scss
+@@ -108,10 +108,6 @@ $block-inserter-tabs-height: 44px;
+ 
+ .block-editor-inserter__search {
+ 	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
+-
+-	.components-search-control__icon {
+-		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
+-	}
+ }
+ 
+ .block-editor-inserter__tabs {
+@@ -615,15 +611,9 @@ $block-inserter-tabs-height: 44px;
+ 	}
+ 
+ 	.block-editor-inserter__media-panel-search {
+-		&.components-search-control {
+-			input[type="search"].components-search-control__input {
+-				background: $white;
+-			}
+-			button.components-button {
+-				min-width: auto;
+-				padding-left: $grid-unit-05 * 0.5;
+-				padding-right: $grid-unit-05 * 0.5;
+-			}
++		// TODO: Consider using the Theme component to automatically adapt to a gray background.
++		&:not(:focus-within) {
++			--wp-components-color-background: #{$white};
+ 		}
+ 	}
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fe71930db85dd3..5d3d580018f838 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -41,6 +41,7 @@
+ -   Removing Reakit as a dependency of the components package ([#58631](https://github.com/WordPress/gutenberg/pull/58631)).
+ -   `CustomSelect`: add unit tests ([#58583](https://github.com/WordPress/gutenberg/pull/58583)).
+ -   `InputBase`: Add `isBorderless` prop ([#58750](https://github.com/WordPress/gutenberg/pull/58750)).
++-   `SearchControl`: Replace internal implementation to use `InputControl` ([#56524](https://github.com/WordPress/gutenberg/pull/56524)).
+ 
+ ## 25.16.0 (2024-01-24)
+ 
+diff --git a/packages/components/src/navigation/menu/menu-title-search.tsx b/packages/components/src/navigation/menu/menu-title-search.tsx
+index d03766f28d7522..c1dbda5af88fb0 100644
+--- a/packages/components/src/navigation/menu/menu-title-search.tsx
++++ b/packages/components/src/navigation/menu/menu-title-search.tsx
+@@ -10,10 +10,11 @@ import { __, _n, sprintf } from '@wordpress/i18n';
+ import withSpokenMessages from '../../higher-order/with-spoken-messages';
+ import { useNavigationMenuContext } from './context';
+ import { useNavigationContext } from '../context';
+-import { MenuTitleSearchUI } from '../styles/navigation-styles';
+ import { SEARCH_FOCUS_DELAY } from '../constants';
+ 
+ import type { NavigationMenuTitleSearchProps } from '../types';
++import SearchControl from '../../search-control';
++import { MenuTitleSearchControlWrapper } from '../styles/navigation-styles';
+ 
+ function MenuTitleSearch( {
+ 	debouncedSpeak,
+@@ -80,9 +81,9 @@ function MenuTitleSearch( {
+ 	).trim();
+ 
+ 	return (
+-		<div className="components-navigation__menu-title-search">
+-			<MenuTitleSearchUI
+-				autoComplete="off"
++		<MenuTitleSearchControlWrapper>
++			<SearchControl
++				__nextHasNoMarginBottom
+ 				className="components-navigation__menu-search-input"
+ 				id={ inputId }
+ 				onChange={ ( value ) => onSearch?.( value ) }
+@@ -90,10 +91,9 @@ function MenuTitleSearch( {
+ 				placeholder={ placeholder }
+ 				onClose={ onClose }
+ 				ref={ inputRef }
+-				type="search"
+ 				value={ search }
+ 			/>
+-		</div>
++		</MenuTitleSearchControlWrapper>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/navigation/styles/navigation-styles.tsx b/packages/components/src/navigation/styles/navigation-styles.tsx
+index 27c508b98f26dc..820cf2224be885 100644
+--- a/packages/components/src/navigation/styles/navigation-styles.tsx
++++ b/packages/components/src/navigation/styles/navigation-styles.tsx
+@@ -17,7 +17,6 @@ import { Text } from '../../text';
+ import { Heading } from '../../heading';
+ import { reduceMotion, rtl } from '../../utils';
+ import { space } from '../../utils/space';
+-import SearchControl from '../../search-control';
+ 
+ export const NavigationUI = styled.div`
+ 	width: 100%;
+@@ -69,6 +68,11 @@ export const MenuTitleUI = styled.div`
+ 	width: 100%;
+ `;
+ 
++export const MenuTitleSearchControlWrapper = styled.div`
++	margin: 11px 0; // non-ideal hardcoding to maintain same height as Heading, could be improved
++	padding: 1px; // so the focus border doesn't get cut off by the overflow hidden on MenuTitleUI
++`;
++
+ export const MenuTitleActionsUI = styled.span`
+ 	height: ${ space( 6 ) }; // 24px, same height as the buttons inside
+ 
+@@ -91,32 +95,6 @@ export const MenuTitleActionsUI = styled.span`
+ 	}
+ `;
+ 
+-export const MenuTitleSearchUI = styled( SearchControl )`
+-	input[type='search'].components-search-control__input {
+-		margin: 0;
+-		background: #303030;
+-		color: #fff;
+-
+-		&:focus {
+-			background: #434343;
+-			color: #fff;
+-		}
+-
+-		&::placeholder {
+-			color: rgba( 255, 255, 255, 0.6 );
+-		}
+-	}
+-
+-	svg {
+-		fill: white;
+-	}
+-
+-	.components-button.has-icon {
+-		padding: 0;
+-		min-width: auto;
+-	}
+-`;
+-
+ export const GroupTitleUI = styled( Heading )`
+ 	min-height: ${ space( 12 ) };
+ 	align-items: center;
+diff --git a/packages/components/src/search-control/README.md b/packages/components/src/search-control/README.md
+index c52256b951ebba..52513ab47f582e 100644
+--- a/packages/components/src/search-control/README.md
++++ b/packages/components/src/search-control/README.md
+@@ -20,6 +20,7 @@ function MySearchControl( { className, setState } ) {
+ 
+     return (
+         <SearchControl
++            __nextHasNoMarginBottom
+             label={ __( 'Search posts' ) }
+             value={ searchInput }
+             onChange={ setSearchInput }
+@@ -35,13 +36,14 @@ Props not included in this set will be applied to the input element.
+ 
+ #### label
+ 
+-If this property is added, a label will be generated using label property as the content.
++The accessible label for the input.
+ 
+ A label should always be provided as an accessibility best practice, even when a placeholder is defined
+ and `hideLabelFromVision` is `true`.
+ 
+ -   Type: `String`
+--   Required: Yes
++-   Required: No
++-   Default: `__( 'Search' )`
+ 
+ #### placeholder
+ 
+@@ -72,6 +74,15 @@ A function that receives the value of the input.
+ -   Type: `function`
+ -   Required: Yes
+ 
++#### onClose
++
++When an `onClose` callback is provided, the search control will render a close button that will trigger the given callback.
++
++Use this if you want the button to trigger your own logic to close the search field entirely, rather than just clearing the input value.
++
++-   Type: `function`
++-   Required: No
++
+ #### help
+ 
+ If this property is added, a help text will be generated using help property as the content.
+@@ -79,12 +90,21 @@ If this property is added, a help text will be generated using help property as
+ -   Type: `String|Element`
+ -   Required: No
+ 
+-### hideLabelFromVision
++#### hideLabelFromVision
+ 
+ If true, the label will not be visible, but will be read by screen readers. Defaults to `true`.
+ 
+ -   Type: `Boolean`
+ -   Required: No
++-   Default: `true`
++
++#### __nextHasNoMarginBottom
++
++Start opting into the new margin-free styles that will become the default in a future version.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
+ 
+ #### `size`: `'default'` | `'compact'`
+ 
+diff --git a/packages/components/src/search-control/index.tsx b/packages/components/src/search-control/index.tsx
+index a896ca1aa3d8fe..66b7ae619ab7e5 100644
+--- a/packages/components/src/search-control/index.tsx
++++ b/packages/components/src/search-control/index.tsx
+@@ -9,100 +9,117 @@ import classnames from 'classnames';
+ import { useInstanceId, useMergeRefs } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+ import { Icon, search, closeSmall } from '@wordpress/icons';
+-import { forwardRef, useRef } from '@wordpress/element';
++import { forwardRef, useMemo, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Button from '../button';
+-import BaseControl from '../base-control';
+ import type { WordPressComponentProps } from '../context/wordpress-component';
+-import type { SearchControlProps } from './types';
++import type { SearchControlProps, SuffixItemProps } from './types';
+ import type { ForwardedRef } from 'react';
++import { ContextSystemProvider } from '../context';
++import { StyledInputControl, SuffixItemWrapper } from './styles';
++
++function SuffixItem( {
++	searchRef,
++	value,
++	onChange,
++	onClose,
++}: SuffixItemProps ) {
++	if ( ! onClose && ! value ) {
++		return <Icon icon={ search } />;
++	}
++
++	const onReset = () => {
++		onChange( '' );
++		searchRef.current?.focus();
++	};
++
++	return (
++		<Button
++			size="small"
++			icon={ closeSmall }
++			label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
++			onClick={ onClose ?? onReset }
++		/>
++	);
++}
+ 
+ function UnforwardedSearchControl(
+ 	{
+-		__nextHasNoMarginBottom,
+-		__next40pxDefaultSize = false,
++		__nextHasNoMarginBottom = false,
+ 		className,
+ 		onChange,
+-		onKeyDown,
+ 		value,
+-		label,
++		label = __( 'Search' ),
+ 		placeholder = __( 'Search' ),
+ 		hideLabelFromVision = true,
+-		help,
+ 		onClose,
+ 		size = 'default',
+ 		...restProps
+-	}: WordPressComponentProps< SearchControlProps, 'input', false >,
++	}: Omit<
++		WordPressComponentProps< SearchControlProps, 'input', false >,
++		// TODO: Background styling currently doesn't support a disabled state. Needs design work.
++		'disabled'
++	>,
+ 	forwardedRef: ForwardedRef< HTMLInputElement >
+ ) {
+-	const searchRef = useRef< HTMLInputElement >();
+-	const instanceId = useInstanceId( SearchControl );
+-	const id = `components-search-control-${ instanceId }`;
+-
+-	const renderRightButton = () => {
+-		if ( onClose ) {
+-			return (
+-				<Button
+-					__next40pxDefaultSize={ __next40pxDefaultSize }
+-					icon={ closeSmall }
+-					label={ __( 'Close search' ) }
+-					onClick={ onClose }
+-					size={ size }
+-				/>
+-			);
+-		}
++	// @ts-expect-error The `disabled` prop is not yet supported in the SearchControl component.
++	// Work with the design team (@WordPress/gutenberg-design) if you need this feature.
++	delete restProps.disabled;
+ 
+-		if ( !! value ) {
+-			return (
+-				<Button
+-					__next40pxDefaultSize={ __next40pxDefaultSize }
+-					icon={ closeSmall }
+-					label={ __( 'Reset search' ) }
+-					onClick={ () => {
+-						onChange( '' );
+-						searchRef.current?.focus();
+-					} }
+-					size={ size }
+-				/>
+-			);
+-		}
++	const searchRef = useRef< HTMLInputElement >( null );
++	const instanceId = useInstanceId(
++		SearchControl,
++		'components-search-control'
++	);
+ 
+-		return <Icon icon={ search } />;
+-	};
++	const contextValue = useMemo(
++		() => ( {
++			// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
++			// to provide backwards compatibile margin for SearchControl.
++			// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
++			BaseControl: { _overrides: { __nextHasNoMarginBottom } },
++			// `isBorderless` is still experimental and not a public prop for InputControl yet.
++			InputBase: { isBorderless: true },
++		} ),
++		[ __nextHasNoMarginBottom ]
++	);
+ 
+ 	return (
+-		<BaseControl
+-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-			label={ label }
+-			id={ id }
+-			hideLabelFromVision={ hideLabelFromVision }
+-			help={ help }
+-			className={ classnames( className, 'components-search-control', {
+-				'is-next-40px-default-size': __next40pxDefaultSize,
+-				'is-size-compact': size === 'compact',
+-			} ) }
+-		>
+-			<div className="components-search-control__input-wrapper">
+-				<input
+-					{ ...restProps }
+-					ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
+-					className="components-search-control__input"
+-					id={ id }
+-					type="search"
+-					placeholder={ placeholder }
+-					onChange={ ( event ) => onChange( event.target.value ) }
+-					onKeyDown={ onKeyDown }
+-					autoComplete="off"
+-					value={ value || '' }
+-				/>
+-				<div className="components-search-control__icon">
+-					{ renderRightButton() }
+-				</div>
+-			</div>
+-		</BaseControl>
++		<ContextSystemProvider value={ contextValue }>
++			<StyledInputControl
++				__next40pxDefaultSize
++				id={ instanceId }
++				hideLabelFromVision={ hideLabelFromVision }
++				label={ label }
++				ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
++				type="search"
++				size={ size }
++				className={ classnames(
++					'components-search-control',
++					className
++				) }
++				onChange={ ( nextValue?: string ) =>
++					onChange( nextValue ?? '' )
++				}
++				autoComplete="off"
++				placeholder={ placeholder }
++				value={ value ?? '' }
++				suffix={
++					<SuffixItemWrapper size={ size }>
++						<SuffixItem
++							searchRef={ searchRef }
++							value={ value }
++							onChange={ onChange }
++							onClose={ onClose }
++						/>
++					</SuffixItemWrapper>
++				}
++				{ ...restProps }
++			/>
++		</ContextSystemProvider>
+ 	);
+ }
+ 
+@@ -118,6 +135,7 @@ function UnforwardedSearchControl(
+  *
+  *   return (
+  *     <SearchControl
++ *       __nextHasNoMarginBottom
+  *       value={ searchInput }
+  *       onChange={ setSearchInput }
+  *     />
+diff --git a/packages/components/src/search-control/stories/index.story.tsx b/packages/components/src/search-control/stories/index.story.tsx
+index 1a6e58724ccb2d..433d3eef655adf 100644
+--- a/packages/components/src/search-control/stories/index.story.tsx
++++ b/packages/components/src/search-control/stories/index.story.tsx
+@@ -18,6 +18,7 @@ const meta: Meta< typeof SearchControl > = {
+ 	component: SearchControl,
+ 	argTypes: {
+ 		onChange: { action: 'onChange' },
++		value: { control: { type: null } },
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
+@@ -46,7 +47,6 @@ const Template: StoryFn< typeof SearchControl > = ( {
+ 
+ export const Default = Template.bind( {} );
+ Default.args = {
+-	label: 'Label Text',
+ 	help: 'Help text to explain the input.',
+ };
+ 
+diff --git a/packages/components/src/search-control/style.scss b/packages/components/src/search-control/style.scss
+deleted file mode 100644
+index 21bd875f699a98..00000000000000
+--- a/packages/components/src/search-control/style.scss
++++ /dev/null
+@@ -1,71 +0,0 @@
+-.components-search-control {
+-	position: relative;
+-
+-	input[type="search"].components-search-control__input {
+-		@include input-control;
+-		display: block;
+-		padding: 0 $grid-unit-60 0 $grid-unit-20;
+-		background: $gray-100;
+-		border: none;
+-		width: 100%;
+-		height: $grid-unit-60;
+-
+-		// Unset inherited values.
+-		margin-left: 0;
+-		margin-right: 0;
+-
+-		/* Fonts smaller than 16px causes mobile safari to zoom. */
+-		font-size: $mobile-text-min-font-size;
+-		@include break-small {
+-			font-size: $default-font-size;
+-		}
+-
+-		&:focus {
+-			background: $white;
+-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+-		}
+-
+-		&::placeholder {
+-			color: $gray-700;
+-		}
+-
+-		&::-webkit-search-decoration,
+-		&::-webkit-search-cancel-button,
+-		&::-webkit-search-results-button,
+-		&::-webkit-search-results-decoration {
+-			-webkit-appearance: none;
+-		}
+-	}
+-
+-	&.is-next-40px-default-size input[type="search"].components-search-control__input {
+-		height: $grid-unit-50;
+-	}
+-
+-	&.is-size-compact input[type="search"].components-search-control__input {
+-		height: $grid-unit-40;
+-		padding-left: $grid-unit-10;
+-		padding-right: $grid-unit-40;
+-	}
+-
+-}
+-
+-.components-search-control__icon {
+-	position: absolute;
+-	right: ( $grid-unit-60 - $icon-size ) * 0.5;
+-	top: 50%;
+-	transform: translateY(-50%);
+-
+-	display: flex;
+-	align-items: center;
+-	justify-content: center;
+-
+-	width: $icon-size;
+-
+-	.is-size-compact & {
+-		right: $grid-unit-05;
+-	}
+-}
+-
+-.components-search-control__input-wrapper {
+-	position: relative;
+-}
+diff --git a/packages/components/src/search-control/styles.ts b/packages/components/src/search-control/styles.ts
+new file mode 100644
+index 00000000000000..183c7a26e172e9
+--- /dev/null
++++ b/packages/components/src/search-control/styles.ts
+@@ -0,0 +1,42 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import { space } from '../utils/space';
++import InputControl from '../input-control';
++import { COLORS } from '../utils';
++import type { SearchControlProps } from './types';
++
++const inlinePadding = ( {
++	size,
++}: Required< Pick< SearchControlProps, 'size' > > ) => {
++	return space( size === 'compact' ? 1 : 2 );
++};
++
++export const SuffixItemWrapper = styled.div`
++	display: flex;
++	padding-inline-end: ${ inlinePadding };
++
++	svg {
++		fill: currentColor;
++	}
++`;
++
++export const StyledInputControl = styled( InputControl )`
++	input[type='search'] {
++		&::-webkit-search-decoration,
++		&::-webkit-search-cancel-button,
++		&::-webkit-search-results-button,
++		&::-webkit-search-results-decoration {
++			-webkit-appearance: none;
++		}
++	}
++
++	&:not( :focus-within ) {
++		--wp-components-color-background: ${ COLORS.theme.gray[ 100 ] };
++	}
++`;
+diff --git a/packages/components/src/search-control/types.ts b/packages/components/src/search-control/types.ts
+index a3ae13b6d4985a..1bf38d1c25f6fb 100644
+--- a/packages/components/src/search-control/types.ts
++++ b/packages/components/src/search-control/types.ts
+@@ -1,23 +1,35 @@
+-/**
+- * External dependencies
+- */
+-import type { HTMLAttributes } from 'react';
+-
+ /**
+  * Internal dependencies
+  */
+-import type { BaseControlProps } from '../base-control/types';
++import type { InputControlProps } from '../input-control/types';
+ 
+-export type SearchControlProps = Pick<
+-	BaseControlProps,
+-	'__nextHasNoMarginBottom' | 'help' | 'label'
+-> & {
++export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
++	/**
++	 * @deprecated This is now the default.
++	 * @ignore
++	 */
++	__next40pxDefaultSize?: InputControlProps[ '__next40pxDefaultSize' ];
++	/**
++	 * Start opting into the new margin-free styles that will become the default in a future version.
++	 *
++	 * @default false
++	 */
++	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * If true, the label will only be visible to screen readers.
+ 	 *
+ 	 * @default true
+ 	 */
+-	hideLabelFromVision?: boolean;
++	hideLabelFromVision?: InputControlProps[ 'hideLabelFromVision' ];
++	/**
++	 * The accessible label for the input.
++	 *
++	 * A label should always be provided as an accessibility best practice,
++	 * even when a placeholder is defined and `hideLabelFromVision` is `true`.
++	 *
++	 * @default 'Search'
++	 */
++	label?: string;
+ 	/**
+ 	 * A function that receives the value of the input when the value is changed.
+ 	 */
+@@ -30,26 +42,29 @@ export type SearchControlProps = Pick<
+ 	 * rather than just clearing the input value.
+ 	 */
+ 	onClose?: () => void;
++	/** @ignore */
++	onDrag?: InputControlProps[ 'onDrag' ];
++	/** @ignore */
++	onDragStart?: InputControlProps[ 'onDragStart' ];
++	/** @ignore */
++	onDragEnd?: InputControlProps[ 'onDragEnd' ];
+ 	/**
+ 	 * A placeholder for the input.
+ 	 *
+ 	 * @default 'Search'
+ 	 */
+-	placeholder?: HTMLAttributes< HTMLInputElement >[ 'placeholder' ];
+-	/**
+-	 * The current value of the input.
+-	 */
+-	value?: string;
++	placeholder?: InputControlProps[ 'placeholder' ];
+ 	/**
+ 	 * The size of the component
+ 	 *
+ 	 * @default 'default'
+ 	 */
+ 	size?: 'default' | 'compact';
+-	/**
+-	 * Start opting into the larger default height that will become the default size in a future version.
+-	 *
+-	 * @default false
+-	 */
+-	__next40pxDefaultSize?: boolean;
++};
++
++export type SuffixItemProps = Pick<
++	SearchControlProps,
++	'value' | 'onChange' | 'onClose'
++> & {
++	searchRef: React.RefObject< HTMLInputElement >;
+ };
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 02dce83f66dcc6..5c7813cdb1cc1d 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -44,7 +44,6 @@
+ @import "./responsive-wrapper/style.scss";
+ @import "./sandbox/style.scss";
+ @import "./scroll-lock/style.scss";
+-@import "./search-control/style.scss";
+ @import "./select-control/style.scss";
+ @import "./snackbar/style.scss";
+ @import "./tab-panel/style.scss";
+diff --git a/packages/edit-site/src/components/add-new-template/style.scss b/packages/edit-site/src/components/add-new-template/style.scss
+index 4881745c92afae..305119eeb14e2c 100644
+--- a/packages/edit-site/src/components/add-new-template/style.scss
++++ b/packages/edit-site/src/components/add-new-template/style.scss
+@@ -21,18 +21,6 @@
+ 		}
+ 	}
+ 
+-	.components-search-control {
+-		input[type="search"].components-search-control__input {
+-			background: $white;
+-			border: 1px solid $gray-300;
+-
+-			&:focus {
+-				border-color: var(--wp-admin-theme-color);
+-				box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+-			}
+-		}
+-	}
+-
+ 	@include break-medium() {
+ 		width: 456px;
+ 	}
+diff --git a/packages/edit-site/src/components/page-patterns/style.scss b/packages/edit-site/src/components/page-patterns/style.scss
+index 0f119773bdf215..e5bd44956b2629 100644
+--- a/packages/edit-site/src/components/page-patterns/style.scss
++++ b/packages/edit-site/src/components/page-patterns/style.scss
+@@ -31,17 +31,12 @@
+ 		flex-grow: 1;
+ 	}
+ 
+-	// The increased specificity here is to overcome component styles
+-	// without relying on internal component class names.
++	// TODO: Consider using the Theme component to automatically adapt to a dark background.
+ 	.edit-site-patterns__search {
+-		input[type="search"] {
+-			height: $button-size-next-default-40px;
+-			background: $gray-800;
+-			color: $gray-200;
++		--wp-components-color-foreground: #{$gray-200};
+ 
+-			&:focus {
+-				background: $gray-800;
+-			}
++		.components-input-control__container {
++			background: $gray-800;
+ 		}
+ 
+ 		svg {

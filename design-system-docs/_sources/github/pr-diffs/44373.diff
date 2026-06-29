@@ -1,0 +1,237 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 30311411bb979a..1cce62dd3f3789 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -   `RangeControl`: updated to pass `react/exhaustive-deps` eslint rule ([#44271](https://github.com/WordPress/gutenberg/pull/44271)).
+ -   `UnitControl` updated to pass the `react/exhaustive-deps` eslint rule ([#44161](https://github.com/WordPress/gutenberg/pull/44161)).
+ -   `Notice`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44157](https://github.com/WordPress/gutenberg/pull/44157))
++-   `Popover`: refactor unit tests to TypeScript and modern RTL assertions ([#44373](https://github.com/WordPress/gutenberg/pull/44373)).
+ 
+ ## 21.0.0 (2022-09-13)
+ 
+diff --git a/packages/components/src/popover/test/__snapshots__/index.js.snap b/packages/components/src/popover/test/__snapshots__/index.js.snap
+deleted file mode 100644
+index e3eb977180bf21..00000000000000
+--- a/packages/components/src/popover/test/__snapshots__/index.js.snap
++++ /dev/null
+@@ -1,34 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`Popover Component should pass additional props to portaled element 1`] = `
+-<span>
+-  <div
+-    class="components-popover"
+-    role="tooltip"
+-    style="position: absolute; opacity: 0; transform: translateY(-2em) scale(0) translateZ(0); transform-origin: 0% 0% 0;"
+-    tabindex="-1"
+-  >
+-    <div
+-      class="components-popover__content"
+-    >
+-      Hello
+-    </div>
+-  </div>
+-</span>
+-`;
+-
+-exports[`Popover Component should render content 1`] = `
+-<span>
+-  <div
+-    class="components-popover"
+-    style="position: absolute; opacity: 0; transform: translateY(-2em) scale(0) translateZ(0); transform-origin: 0% 0% 0;"
+-    tabindex="-1"
+-  >
+-    <div
+-      class="components-popover__content"
+-    >
+-      Hello
+-    </div>
+-  </div>
+-</span>
+-`;
+diff --git a/packages/components/src/popover/test/index.js b/packages/components/src/popover/test/index.tsx
+similarity index 52%
+rename from packages/components/src/popover/test/index.js
+rename to packages/components/src/popover/test/index.tsx
+index dff33914659693..2a0c5db545da3a 100644
+--- a/packages/components/src/popover/test/index.js
++++ b/packages/components/src/popover/test/index.tsx
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { act, render, screen } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
++import type { CSSProperties } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -11,69 +12,83 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import Popover from '../';
+-
+ import { positionToPlacement, placementToMotionAnimationProps } from '../utils';
++import Popover from '..';
++import type { PopoverProps } from '../types';
++
++type PositionToPlacementTuple = [
++	NonNullable< PopoverProps[ 'position' ] >,
++	NonNullable< PopoverProps[ 'placement' ] >
++];
++type PlacementToAnimationOriginTuple = [
++	NonNullable< PopoverProps[ 'placement' ] >,
++	number,
++	number
++];
++type PlacementToInitialTranslationTuple = [
++	NonNullable< PopoverProps[ 'placement' ] >,
++	'translateY' | 'translateX',
++	CSSProperties[ 'translate' ]
++];
+ 
+ describe( 'Popover', () => {
+ 	describe( 'Component', () => {
+-		afterEach( () => {
+-			if ( document.activeElement ) {
+-				document.activeElement.blur();
+-			}
+-		} );
++		describe( 'basic behavior', () => {
++			it( 'should render content', () => {
++				render( <Popover>Hello</Popover> );
+ 
+-		it( 'should allow focus-on-open behavior to be disabled', () => {
+-			expect( document.activeElement ).toBe( document.body );
++				expect( screen.getByText( 'Hello' ) ).toBeInTheDocument();
++			} );
+ 
+-			act( () => {
+-				render( <Popover focusOnMount={ false } /> );
++			it( 'should forward additional props to portaled element', () => {
++				render( <Popover role="tooltip">Hello</Popover> );
+ 
+-				jest.advanceTimersByTime( 1 );
++				expect( screen.getByRole( 'tooltip' ) ).toBeInTheDocument();
+ 			} );
+-
+-			expect( document.activeElement ).toBe( document.body );
+ 		} );
+ 
+-		it( 'should render content', () => {
+-			let result;
+-			act( () => {
+-				result = render( <Popover>Hello</Popover> );
+-			} );
++		describe( 'anchor', () => {
++			it( 'should render correctly when anchor is provided', () => {
++				const PopoverWithAnchor = ( args: PopoverProps ) => {
++					// Use internal state instead of a ref to make sure that the component
++					// re-renders when the popover's anchor updates.
++					const [ anchor, setAnchor ] =
++						useState< HTMLParagraphElement | null >( null );
++
++					return (
++						<div>
++							<p ref={ setAnchor }>Anchor</p>
++							<Popover { ...args } anchor={ anchor } />
++						</div>
++					);
++				};
+ 
+-			expect(
+-				result.container.querySelector( 'span' )
+-			).toMatchSnapshot();
+-		} );
++				render(
++					<PopoverWithAnchor>Popover content</PopoverWithAnchor>
++				);
+ 
+-		it( 'should pass additional props to portaled element', () => {
+-			let result;
+-			act( () => {
+-				result = render( <Popover role="tooltip">Hello</Popover> );
++				expect(
++					screen.getByText( 'Popover content' )
++				).toBeInTheDocument();
+ 			} );
+-
+-			expect(
+-				result.container.querySelector( 'span' )
+-			).toMatchSnapshot();
+ 		} );
+ 
+-		it( 'should render correctly when anchor is provided', () => {
+-			const PopoverWithAnchor = ( args ) => {
+-				// Use internal state instead of a ref to make sure that the component
+-				// re-renders when the popover's anchor updates.
+-				const [ anchor, setAnchor ] = useState( null );
+-
+-				return (
+-					<div>
+-						<p ref={ setAnchor }>Anchor</p>
+-						<Popover { ...args } anchor={ anchor } />
+-					</div>
+-				);
+-			};
++		describe( 'focus behavior', () => {
++			it( 'should focus the popover by default when opened', () => {
++				render( <Popover>Popover content</Popover> );
+ 
+-			render( <PopoverWithAnchor>Popover content</PopoverWithAnchor> );
++				expect(
++					screen.getByText( 'Popover content' ).parentElement
++				).toHaveFocus();
++			} );
+ 
+-			expect( screen.getByText( 'Popover content' ) ).toBeInTheDocument();
++			it( 'should allow focus-on-open behavior to be disabled', () => {
++				render(
++					<Popover focusOnMount={ false }>Popover content</Popover>
++				);
++
++				expect( document.body ).toHaveFocus();
++			} );
+ 		} );
+ 	} );
+ 
+@@ -88,11 +103,14 @@ describe( 'Popover', () => {
+ 			[ 'bottom left', 'bottom-end' ],
+ 			[ 'bottom center', 'bottom' ],
+ 			[ 'bottom right', 'bottom-start' ],
+-		] )( 'converts `%s` to `%s`', ( inputPosition, expectedPlacement ) => {
+-			expect( positionToPlacement( inputPosition ) ).toEqual(
+-				expectedPlacement
+-			);
+-		} );
++		] as PositionToPlacementTuple[] )(
++			'converts `%s` to `%s`',
++			( inputPosition, expectedPlacement ) => {
++				expect( positionToPlacement( inputPosition ) ).toEqual(
++					expectedPlacement
++				);
++			}
++		);
+ 	} );
+ 
+ 	describe( 'placementToMotionAnimationProps', () => {
+@@ -110,7 +128,7 @@ describe( 'Popover', () => {
+ 				[ 'left', 1, 0.5 ],
+ 				[ 'left-start', 1, 0 ],
+ 				[ 'left-end', 1, 1 ],
+-			] )(
++			] as PlacementToAnimationOriginTuple[] )(
+ 				'for the `%s` placement computes an animation origin of (%d, %d)',
+ 				( inputPlacement, expectedOriginX, expectedOriginY ) => {
+ 					expect(
+@@ -140,7 +158,7 @@ describe( 'Popover', () => {
+ 				[ 'left', 'translateX', '2em' ],
+ 				[ 'left-start', 'translateX', '2em' ],
+ 				[ 'left-end', 'translateX', '2em' ],
+-			] )(
++			] as PlacementToInitialTranslationTuple[] )(
+ 				'for the `%s` placement computes an initial `%s` of `%s',
+ 				(
+ 					inputPlacement,

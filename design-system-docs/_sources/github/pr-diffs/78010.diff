@@ -1,0 +1,200 @@
+diff --git a/packages/components/src/tools-panel/test/index.tsx b/packages/components/src/tools-panel/test/index.tsx
+index 68cf72233121e0..8b320d1752e814 100644
+--- a/packages/components/src/tools-panel/test/index.tsx
++++ b/packages/components/src/tools-panel/test/index.tsx
+@@ -390,6 +390,32 @@ describe( 'ToolsPanel', () => {
+ 			expect( controlRerendered ).toBeInTheDocument();
+ 		} );
+ 
++		it( 'should render optional item on first render when isShownOnFirstRender is true', () => {
++			const { rerender } = render(
++				<ToolsPanel { ...defaultProps }>
++					<ToolsPanelItem { ...altControlProps }>
++						<div>Optional control</div>
++					</ToolsPanelItem>
++				</ToolsPanel>
++			);
++
++			expect(
++				screen.queryByText( 'Optional control' )
++			).not.toBeInTheDocument();
++
++			rerender(
++				<ToolsPanel { ...defaultProps }>
++					<ToolsPanelItem { ...altControlProps } isShownOnFirstRender>
++						<div>Optional control</div>
++					</ToolsPanelItem>
++				</ToolsPanel>
++			);
++
++			expect(
++				screen.getByText( 'Optional control' )
++			).toBeInTheDocument();
++		} );
++
+ 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
+ 			render(
+ 				<ToolsPanel { ...defaultProps }>
+@@ -749,6 +775,23 @@ describe( 'ToolsPanel', () => {
+ 			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
+ 		} );
+ 
++		it( 'should call onDeselect when optional item with no value is hidden', async () => {
++			// Covers the case where an optional item is shown via the menu but
++			// never receives a value. Previously, onDeselect would silently not
++			// fire because it was gated on hasValue() being true.
++			renderPanel();
++
++			await openDropdownMenu();
++			await selectMenuItem( altControlProps.label );
++
++			expect( altControlProps.onSelect ).toHaveBeenCalledTimes( 1 );
++			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
++
++			await selectMenuItem( altControlProps.label );
++
++			expect( altControlProps.onDeselect ).toHaveBeenCalledTimes( 1 );
++		} );
++
+ 		it( 'should call resetAll callback when its menu item is selected', async () => {
+ 			renderPanel();
+ 
+diff --git a/packages/components/src/tools-panel/tools-panel-item/README.md b/packages/components/src/tools-panel/tools-panel-item/README.md
+index 91f9c78ff9cbe8..67af180b8102d7 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/README.md
++++ b/packages/components/src/tools-panel/tools-panel-item/README.md
+@@ -34,6 +34,13 @@ panel's menu.
+ -   Required: No
+ -   Default: `false`
+ 
++### `isShownOnFirstRender`: `boolean`
++
++For optional controls only, this determines whether the item should be visible
++when it first renders, even if `hasValue()` is `false`.
++
++-   Required: No
++
+ ### `label`: `string`
+ 
+ The supplied label is dual purpose.
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index e0a1f0139dcace..53960200507616 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -7,6 +7,7 @@ import {
+ 	useEffect,
+ 	useLayoutEffect,
+ 	useMemo,
++	useRef,
+ } from '@wordpress/element';
+ 
+ /**
+@@ -28,6 +29,7 @@ export function useToolsPanelItem(
+ 		className,
+ 		hasValue,
+ 		isShownByDefault = false,
++		isShownOnFirstRender,
+ 		label,
+ 		panelId,
+ 		resetAllFilter = noop,
+@@ -74,6 +76,7 @@ export function useToolsPanelItem(
+ 			registerPanelItem( {
+ 				hasValue: hasValueCallback,
+ 				isShownByDefault,
++				isShownOnFirstRender,
+ 				label,
+ 				panelId,
+ 			} );
+@@ -91,6 +94,7 @@ export function useToolsPanelItem(
+ 		currentPanelId,
+ 		hasMatchingPanel,
+ 		isShownByDefault,
++		isShownOnFirstRender,
+ 		label,
+ 		hasValueCallback,
+ 		panelId,
+@@ -139,6 +143,11 @@ export function useToolsPanelItem(
+ 		isShownByDefault,
+ 	] );
+ 
++	// Tracks whether the item was explicitly shown by a user menu action.
++	// This allows onDeselect to fire even when hasValue() is false, but only
++	// for items the user intentionally toggled on.
++	const wasShownByUserRef = useRef( false );
++
+ 	// Determine if the panel item's corresponding menu is being toggled and
+ 	// trigger appropriate callback if it is.
+ 	useEffect( () => {
+@@ -150,11 +159,15 @@ export function useToolsPanelItem(
+ 		}
+ 
+ 		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
++			wasShownByUserRef.current = true;
+ 			onSelect?.();
+ 		}
+ 
+-		if ( ! isMenuItemChecked && isValueSet && wasMenuItemChecked ) {
+-			onDeselect?.();
++		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
++			if ( isValueSet || wasShownByUserRef.current ) {
++				onDeselect?.();
++			}
++			wasShownByUserRef.current = false;
+ 		}
+ 	}, [
+ 		hasMatchingPanel,
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.ts b/packages/components/src/tools-panel/tools-panel/hook.ts
+index 583a079ab20026..b522c5fd9c2a71 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel/hook.ts
+@@ -62,17 +62,23 @@ const generateMenuItems = ( {
+ 	const newMenuItems: ToolsPanelMenuItems = emptyMenuItems();
+ 	const menuItems: ToolsPanelMenuItems = emptyMenuItems();
+ 
+-	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
+-		const group = isShownByDefault ? 'default' : 'optional';
+-
+-		// If a menu item for this label has already been flagged as customized
+-		// (for default controls), or toggled on (for optional controls), do not
+-		// overwrite its value as those controls would lose that state.
+-		const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
+-		const value = existingItemValue ? existingItemValue : hasValue();
+-
+-		newMenuItems[ group ][ label ] = shouldReset ? false : value;
+-	} );
++	panelItems.forEach(
++		( { hasValue, isShownByDefault, isShownOnFirstRender, label } ) => {
++			const group = isShownByDefault ? 'default' : 'optional';
++
++			// If a menu item for this label has already been flagged as customized
++			// (for default controls), or toggled on (for optional controls), do not
++			// overwrite its value as those controls would lose that state.
++			const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
++			const initialValue =
++				! isShownByDefault && isShownOnFirstRender !== undefined
++					? isShownOnFirstRender
++					: hasValue();
++			const value = existingItemValue ?? initialValue;
++
++			newMenuItems[ group ][ label ] = shouldReset ? false : value;
++		}
++	);
+ 
+ 	// Loop the known, previously registered items first to maintain menu order.
+ 	menuItemOrder.forEach( ( key ) => {
+diff --git a/packages/components/src/tools-panel/types.ts b/packages/components/src/tools-panel/types.ts
+index ac1fca74a465ea..57b9b3a301a9fc 100644
+--- a/packages/components/src/tools-panel/types.ts
++++ b/packages/components/src/tools-panel/types.ts
+@@ -123,6 +123,11 @@ export type ToolsPanelItem = {
+ 	 * @default false
+ 	 */
+ 	isShownByDefault?: boolean;
++	/**
++	 * For optional items only, determines whether the item should be visible on
++	 * first render even when `hasValue()` is false.
++	 */
++	isShownOnFirstRender?: boolean;
+ 	/**
+ 	 * The supplied label is dual purpose. It is used as:
+ 	 * 1. the human-readable label for the panel's dropdown menu

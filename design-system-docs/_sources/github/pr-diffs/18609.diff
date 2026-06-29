@@ -1,0 +1,300 @@
+diff --git a/docs/manifest-devhub.json b/docs/manifest-devhub.json
+index e36e868ac92e99..dc53d5f8b9305d 100644
+--- a/docs/manifest-devhub.json
++++ b/docs/manifest-devhub.json
+@@ -965,6 +965,12 @@
+ 		"markdown_source": "../packages/components/src/text-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "TextHighlight",
++		"slug": "text-highlight",
++		"markdown_source": "../packages/components/src/text-highlight/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "TextareaControl",
+ 		"slug": "textarea-control",
+diff --git a/packages/block-editor/src/components/link-control/search-item.js b/packages/block-editor/src/components/link-control/search-item.js
+index 432b4bb3dff17a..df872b7fc9ebbd 100644
+--- a/packages/block-editor/src/components/link-control/search-item.js
++++ b/packages/block-editor/src/components/link-control/search-item.js
+@@ -3,11 +3,6 @@
+  */
+ import classnames from 'classnames';
+ 
+-/**
+- * Internal dependencies
+- */
+-import TextHighlight from './text-highlight';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -16,6 +11,7 @@ import { __ } from '@wordpress/i18n';
+ 
+ import {
+ 	Icon,
++	TextHighlight,
+ } from '@wordpress/components';
+ 
+ export const LinkControlSearchItem = ( { itemProps, suggestion, isSelected = false, onClick, isURL = false, searchTerm = '' } ) => {
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index eef936406b81b9..b89847f5a184ee 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -66,6 +66,7 @@ export { default as Spinner } from './spinner';
+ export { default as TabPanel } from './tab-panel';
+ export { default as TextControl } from './text-control';
+ export { default as TextareaControl } from './textarea-control';
++export { default as TextHighlight } from './text-highlight';
+ export { default as Tip } from './tip';
+ export { default as ToggleControl } from './toggle-control';
+ export { default as Toolbar } from './toolbar';
+diff --git a/packages/components/src/text-highlight/README.md b/packages/components/src/text-highlight/README.md
+new file mode 100644
+index 00000000000000..e8a1e4be5d8429
+--- /dev/null
++++ b/packages/components/src/text-highlight/README.md
+@@ -0,0 +1,39 @@
++# TextHighlight
++
++Highlights occurances of a given string within another string of text. Wraps each match with a [`<mark>` tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/mark) which provides browser default styling.
++
++## Usage
++
++Pass in the `text` and the `highlight` string to be matched against. 
++
++In the example below, the string `Gutenberg` would be highlighted twice. 
++
++```jsx
++import { TextHighlight } from '@wordpress/components';
++
++const MyTextHighlight = () => (
++	<TextHighlight
++		text="Why do we like Gutenberg? Because Gutenberg is the best!"
++		highlight="Gutenberg"
++	/>
++);
++```
++
++## Props
++
++The component accepts the following props. 
++
++### text
++
++The string of text to be tested for occurances of then given `highlight`.
++
++- Type: `String`
++- Required: Yes
++
++
++### highlight
++
++The string to search for and highlight within the `text`. Case insensitive. Multiple matches.
++
++- Type: `String`
++- Required: Yes
+diff --git a/packages/block-editor/src/components/link-control/text-highlight.js b/packages/components/src/text-highlight/index.js
+similarity index 59%
+rename from packages/block-editor/src/components/link-control/text-highlight.js
+rename to packages/components/src/text-highlight/index.js
+index dc7b35a3d6d2bc..5d92f42f5382dc 100644
+--- a/packages/block-editor/src/components/link-control/text-highlight.js
++++ b/packages/components/src/text-highlight/index.js
+@@ -7,7 +7,7 @@ import { escapeRegExp } from 'lodash';
+  * WordPress dependencies
+  */
+ import {
+-	Fragment,
++	__experimentalCreateInterpolateElement,
+ } from '@wordpress/element';
+ 
+ const TextHighlight = ( { text = '', highlight = '' } ) => {
+@@ -16,13 +16,12 @@ const TextHighlight = ( { text = '', highlight = '' } ) => {
+ 	}
+ 
+ 	const regex = new RegExp( `(${ escapeRegExp( highlight ) })`, 'gi' );
+-	const parts = text.split( regex );
+-	return (
+-		<Fragment>
+-			{ parts.filter( ( part ) => part ).map( ( part, i ) => (
+-				regex.test( part ) ? <mark key={ i }>{ part }</mark> : <span key={ i }>{ part }</span>
+-			) ) }
+-		</Fragment>
++
++	return __experimentalCreateInterpolateElement(
++		text.replace( regex, '<mark>$&</mark>' ),
++		{
++			mark: <mark />,
++		}
+ 	);
+ };
+ 
+diff --git a/packages/components/src/text-highlight/stories/index.js b/packages/components/src/text-highlight/stories/index.js
+new file mode 100644
+index 00000000000000..71bc81fc125032
+--- /dev/null
++++ b/packages/components/src/text-highlight/stories/index.js
+@@ -0,0 +1,21 @@
++/**
++ * External dependencies
++ */
++import { text } from '@storybook/addon-knobs';
++
++/**
++ * Internal dependencies
++ */
++import TextHighlight from '../';
++
++export default { title: 'Components|TextHighlight', component: TextHighlight };
++
++export const _default = () => {
++	const textToMatch = text( 'Text', 'We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts.' );
++
++	const textToHighlight = text( 'Text to be highlighted ', 'Gutenberg' );
++
++	return (
++		<TextHighlight text={ textToMatch } highlight={ textToHighlight } />
++	);
++};
+diff --git a/packages/components/src/text-highlight/test/index.js b/packages/components/src/text-highlight/test/index.js
+new file mode 100644
+index 00000000000000..a93f28fc826b5d
+--- /dev/null
++++ b/packages/components/src/text-highlight/test/index.js
+@@ -0,0 +1,112 @@
++/**
++ * External dependencies
++ */
++import { render, unmountComponentAtNode } from 'react-dom';
++import { act } from 'react-dom/test-utils';
++
++/**
++ * Internal dependencies
++ */
++import TextHighlight from '../index';
++
++let container = null;
++
++beforeEach( () => {
++	// setup a DOM element as a render target
++	container = document.createElement( 'div' );
++	document.body.appendChild( container );
++} );
++
++afterEach( () => {
++	// cleanup on exiting
++	unmountComponentAtNode( container );
++	container.remove();
++	container = null;
++} );
++
++const defaultText = 'We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts.';
++
++describe( 'Basic rendering', () => {
++	it.each( [
++		[ 'Gutenberg' ],
++		[ 'media' ],
++	] )( 'should highlight the singular occurance of the text "%s" in the text if it exists', ( highlight ) => {
++		act( () => {
++			render(
++				<TextHighlight
++					text={ defaultText }
++					highlight={ highlight }
++				/>, container
++			);
++		} );
++
++		const highlightedEls = Array.from( container.querySelectorAll( 'mark' ) );
++
++		highlightedEls.forEach( ( el ) => {
++			expect( el.innerHTML ).toEqual( expect.stringContaining( highlight ) );
++		} );
++	} );
++
++	it( 'should highlight multiple occurances of the string every time it exists in the text', () => {
++		const highlight = 'edit';
++
++		act( () => {
++			render(
++				<TextHighlight
++					text={ defaultText }
++					highlight={ highlight }
++				/>, container
++			);
++		} );
++
++		const highlightedEls = Array.from( container.querySelectorAll( 'mark' ) );
++
++		expect( highlightedEls ).toHaveLength( 2 );
++
++		highlightedEls.forEach( ( el ) => {
++			expect( el.innerHTML ).toEqual( expect.stringContaining( highlight ) );
++		} );
++	} );
++
++	it( 'should highlight occurances of a string regardless of capitalisation', () => {
++		const highlight = 'The'; // note this occurs in both sentance of lowercase forms
++
++		act( () => {
++			render(
++				<TextHighlight
++					text={ defaultText }
++					highlight={ highlight }
++				/>, container
++			);
++		} );
++
++		const highlightedEls = Array.from( container.querySelectorAll( 'mark' ) );
++
++		// Our component matcher is case insensitive so string.Containing will
++		// return a false failure
++		const regex = new RegExp( highlight, 'i' );
++
++		expect( highlightedEls ).toHaveLength( 2 );
++
++		highlightedEls.forEach( ( el ) => {
++			expect( el.innerHTML ).toMatch( regex );
++		} );
++	} );
++
++	it( 'should not highlight a string that is not in the text', () => {
++		const highlight = 'Antidisestablishmentarianism';
++
++		act( () => {
++			render(
++				<TextHighlight
++					text={ defaultText }
++					highlight={ highlight }
++				/>, container
++			);
++		} );
++
++		const highlightedEls = Array.from( container.querySelectorAll( 'mark' ) );
++
++		expect( highlightedEls ).toHaveLength( 0 );
++	} );
++} );
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index b8a1abeec7cfd4..aeab6cd3eb29e1 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -3262,6 +3262,16 @@ exports[`Storyshots Components|TabPanel Default 1`] = `
+ </div>
+ `;
+ 
++exports[`Storyshots Components|TextHighlight Default 1`] = `
++Array [
++  "We call the new editor ",
++  <mark>
++    Gutenberg
++  </mark>,
++  ". The entire editing experience has been rebuilt for media rich pages and posts.",
++]
++`;
++
+ exports[`Storyshots Components|Tip Default 1`] = `
+ <div
+   className="components-tip"

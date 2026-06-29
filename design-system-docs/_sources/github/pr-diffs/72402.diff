@@ -1,0 +1,99 @@
+diff --git a/packages/block-editor/src/components/global-styles/border-panel.js b/packages/block-editor/src/components/global-styles/border-panel.js
+index fc524c4457af34..221b2b765ac508 100644
+--- a/packages/block-editor/src/components/global-styles/border-panel.js
++++ b/packages/block-editor/src/components/global-styles/border-panel.js
+@@ -105,6 +105,7 @@ export default function BorderPanel( {
+ 	defaultControls = DEFAULT_CONTROLS,
+ } ) {
+ 	const colors = useColorsPerOrigin( settings );
++	const areCustomSolidsEnabled = settings?.color?.custom;
+ 	const decodeValue = useCallback(
+ 		( rawValue ) => getValueFromVariable( { settings }, '', rawValue ),
+ 		[ settings ]
+@@ -270,6 +271,7 @@ export default function BorderPanel( {
+ 				>
+ 					<BorderBoxControl
+ 						colors={ colors }
++						disableCustomColors={ ! areCustomSolidsEnabled }
+ 						enableAlpha
+ 						enableStyle={ showBorderStyle }
+ 						onChange={ onBorderChange }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a8a7bdcb69566f..9c0a2f82ddfebb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,10 @@
+ 
+ -   `Tooltip`: Use `--wpds-border-radius-md` for portaled popup surfaces, aligning with menus and popovers ([#78983](https://github.com/WordPress/gutenberg/pull/78983)).
+ 
++### Bug Fixes
++
++-   `ColorPalette`: Avoid rendering an empty palette when custom colors are disabled and no color presets are available ([#72402](https://github.com/WordPress/gutenberg/pull/72402)).
++
+ ### Internal
+ 
+ -   `UnitControl`: Remove dead native code branches now that `Platform.OS` is always `'web'` following the React Native removal ([#79031](https://github.com/WordPress/gutenberg/pull/79031)).
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index 4877ecc4b09211..5a720520f3dcec 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -276,6 +276,11 @@ function UnforwardedColorPalette(
+ 		ariaLabelledby
+ 	);
+ 
++	// If disableCustomColors is true and colors.length is 0, return null to avoid rendering an empty palette wrapper.
++	if ( disableCustomColors && colors.length === 0 && ! actions ) {
++		return null;
++	}
++
+ 	return (
+ 		<VStack spacing={ 3 } ref={ forwardedRef } { ...additionalProps }>
+ 			{ ! disableCustomColors && (
+diff --git a/packages/components/src/color-palette/test/index.tsx b/packages/components/src/color-palette/test/index.tsx
+index 34ba249b7949f7..7f124047dd2ef5 100644
+--- a/packages/components/src/color-palette/test/index.tsx
++++ b/packages/components/src/color-palette/test/index.tsx
+@@ -151,6 +151,20 @@ describe( 'ColorPalette', () => {
+ 		).not.toBeInTheDocument();
+ 	} );
+ 
++	it( 'should render nothing when custom colors are disabled, there are no colors, and it is not clearable', () => {
++		const onChange = jest.fn();
++		const { container } = render(
++			<ColorPalette
++				colors={ [] }
++				disableCustomColors
++				clearable={ false }
++				onChange={ onChange }
++			/>
++		);
++
++		expect( container ).toBeEmptyDOMElement();
++	} );
++
+ 	it( 'should render dropdown and its content', async () => {
+ 		const user = userEvent.setup();
+ 		const onChange = jest.fn();
+@@ -217,6 +231,22 @@ describe( 'ColorPalette', () => {
+ 		).toBeInTheDocument();
+ 	} );
+ 
++	it( 'should still show the clear button when colors is empty and custom colors are disabled', () => {
++		const onChange = jest.fn();
++
++		render(
++			<ColorPalette
++				colors={ [] }
++				disableCustomColors
++				onChange={ onChange }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'button', { name: 'Clear' } )
++		).toBeInTheDocument();
++	} );
++
+ 	it( 'should display the selected color name and value', async () => {
+ 		const user = userEvent.setup();
+ 

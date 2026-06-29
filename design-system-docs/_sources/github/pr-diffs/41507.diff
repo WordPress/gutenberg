@@ -1,0 +1,42 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0898ecda762ac0..16b7a0e309124c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ 
+ -   `FormTokenField`: Convert to TypeScript and refactor to functional component ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
+ -   `RadioControl`: Convert to TypeScript ([#41568](https://github.com/WordPress/gutenberg/pull/41568)).
++-   `Flex` updated to satisfy `react/exhuastive-deps` eslint rule ([#41507](https://github.com/WordPress/gutenberg/pull/41507)).
+ 
+ ## 19.12.0 (2022-06-01)
+ 
+diff --git a/packages/components/src/flex/flex/hook.js b/packages/components/src/flex/flex/hook.js
+index 409a6e3d0c3124..950ae160813076 100644
+--- a/packages/components/src/flex/flex/hook.js
++++ b/packages/components/src/flex/flex/hook.js
+@@ -64,6 +64,7 @@ export function useFlex( props ) {
+ 		typeof direction === 'string' && direction.includes( 'reverse' );
+ 
+ 	const cx = useCx();
++	const rtlWatchResult = rtl.watch();
+ 
+ 	const classes = useMemo( () => {
+ 		const sx = {};
+@@ -123,6 +124,8 @@ export function useFlex( props ) {
+ 			isColumn ? styles.ItemsColumn : styles.ItemsRow,
+ 			className
+ 		);
++		// rtlWatchResult is needed to refresh styles when the writing direction changes
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [
+ 		align,
+ 		className,
+@@ -134,7 +137,7 @@ export function useFlex( props ) {
+ 		isReverse,
+ 		justify,
+ 		wrap,
+-		rtl.watch(),
++		rtlWatchResult,
+ 	] );
+ 
+ 	return { ...otherProps, className: classes, isColumn };

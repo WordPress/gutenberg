@@ -1,0 +1,15 @@
+diff --git a/packages/edit-site/src/components/sidebar-navigation-screen-main/template-part-hint.js b/packages/edit-site/src/components/sidebar-navigation-screen-main/template-part-hint.js
+index 8fbe74f81bb4d9..c6f270465b86f3 100644
+--- a/packages/edit-site/src/components/sidebar-navigation-screen-main/template-part-hint.js
++++ b/packages/edit-site/src/components/sidebar-navigation-screen-main/template-part-hint.js
+@@ -28,9 +28,7 @@ export default function TemplatePartHint() {
+ 				setPreference( 'core', PREFERENCE_NAME, false );
+ 			} }
+ 		>
+-			{ __(
+-				'Looking for template parts? You can now find them in the new "Patterns" page.'
+-			) }
++			{ __( 'Looking for template parts? Find them in "Patterns".' ) }
+ 		</Notice>
+ 	);
+ }

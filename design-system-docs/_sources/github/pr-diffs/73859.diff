@@ -1,0 +1,1641 @@
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index 27027c4d5ffe71..eb84cc1fce9981 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -13,27 +13,91 @@ A theming package that's part of the WordPress Design System. It has two parts:
+ 
+ In the **[Design Tokens Reference](docs/ds-tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
+ 
+-### Color Tokens
++### Architecture
+ 
+-The design system defines color tokens using the following naming scheme:
++Internally, the design system uses a tiered token architecture:
++
++- **Primitive tokens**: Raw values like hex colors or pixel dimensions which are what the browsers eventually interpret. These live in the `/tokens` directory as JSON source files and are an internal implementation detail.
++- **Semantic tokens**: Purpose-driven tokens with meaningful names that reference primitives and describe their intended use. These are what get exported as CSS custom properties.
++
++This separation allows the design system to maintain consistency while providing flexibility, since primitive values can be updated without changing the semantic token names that developers use in their code.
++
++### Design Tokens
++
++Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
++
++Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-bg-interactive-brand-strong` or `--wpds-dimension-padding-surface-md` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
++
++#### Structure
++
++The design system follows the [Design Tokens Community Group (DTCG)](https://design-tokens.github.io/community-group/format/) specification and organizes tokens into distinct types based on what kind of visual property they represent. Token definitions are stored as JSON files in the `/tokens` directory:
++
++| File              | Description                                                                                                                      |
++| ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
++| `color.json`      | Color palettes including primitive color ramps and semantic color tokens for backgrounds, foregrounds, strokes, and focus states |
++| `dimension.json`  | Spacing scale and semantic spacing tokens for padding, margins, and sizing                                                       |
++| `typography.json` | Font family stacks, font sizes, and line heights                                                                                 |
++| `border.json`     | Border radius and width values                                                                                                   |
++| `elevation.json`  | Shadow definitions for creating depth and layering                                                                               |
++
++Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate CSS custom properties and other output formats in `/src/prebuilt`.
++
++#### Token Naming
++
++Semantic tokens follow a consistent naming pattern:
+ 
+ ```
+---wpds-<element>-<tone>[-<emphasis>][-<state>]
++--wpds-<type>-<property>-<target>[-<modifier>]
+ ```
+ 
+-**Element** specifies what the color is applied to.
++**Type** indicates what kind of value it represents, usually mapping to a DTCG token type.
+ 
+-| Value                | Description                                                                                 |
+-| -------------------- | ------------------------------------------------------------------------------------------- |
+-| `bg-surface`         | Backgrounds of layout or container surfaces.                                                |
+-| `bg-interactive`     | Backgrounds of interactive elements such as buttons, inputs, and toggles.                   |
+-| `bg-track`           | Backgrounds of track components like scrollbars and slider tracks.                          |
+-| `bg-thumb`           | Backgrounds of thumb components like scrollbar thumbs and slider thumbs.                    |
+-| `fg-content`         | Foreground color for text and icons in static content.                                      |
+-| `fg-interactive`     | Foreground color for text and icons in interactive elements such as links and buttons.      |
+-| `stroke-surface`     | Decorative borders and dividers for non-interactive surfaces.                               |
+-| `stroke-interactive` | Accessible borders for interactive controls.                                                |
+-| `stroke-focus`       | Stroke color specifically for focus rings.                                                  |
++| Value       | Description                                                                    |
++| ----------- | ------------------------------------------------------------------------------ |
++| `color`     | Color values for backgrounds, foregrounds, and strokes                         |
++| `dimension` | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
++| `border`    | Border properties like radius and width                                        |
++| `elevation` | Shadow definitions for layering and depth                                      |
++| `font`      | Typography properties like family, size, and line-height                       |
++
++**Property** is the specific design property being defined.
++
++| Value    | Description                        |
++| -------- | ---------------------------------- |
++| `bg`     | Background color                   |
++| `fg`     | Foreground color (text and icons)  |
++| `stroke` | Border and outline color           |
++| `padding`| Internal spacing within an element |
++| `gap`    | Spacing between elements           |
++| `radius` | Border radius for rounded corners  |
++| `width`  | Border width                       |
++| `size`   | Font size                          |
++| `family` | Font family                        |
++
++**Target** is the component or element type the token applies to.
++
++| Value         | Description                                                  |
++| ------------- | ------------------------------------------------------------ |
++| `surface`     | Container or layout backgrounds and borders                  |
++| `interactive` | Interactive elements like buttons, inputs, and controls      |
++| `content`     | Static content like text and icons                           |
++| `track`       | Track components like scrollbars and slider tracks           |
++| `thumb`       | Thumb components like scrollbar thumbs and slider handles    |
++| `focus`       | Focus indicators and rings                                   |
++
++**Modifier** is an optional size or intensity modifier.
++
++| Value                               | Description          |
++| ----------------------------------- | -------------------- |
++| `2xs`, `xs`, `sm`, `md`, `lg`, `xl` | Size scale modifiers |
++
++#### Color Token Modifiers
++
++Color tokens extend the base pattern with additional modifiers for tone, emphasis, and state:
++
++```
++--wpds-color-<property>-<target>-<tone>[-<emphasis>][-<state>]
++```
+ 
+ **Tone** defines the semantic intent of the color.
+ 
+@@ -53,9 +117,9 @@ The design system defines color tokens using the following naming scheme:
+ 
+ **Emphasis** adjusts color strength relative to the base tone, if specified. The default is a normal emphasis.
+ 
+-| Value                | Description                                 |
+-| -------------------- | ------------------------------------------- |
+-| `strong`             | Higher contrast and/or elevated emphasis.   |
++| Value                | Description                                     |
++| -------------------- | ----------------------------------------------- |
++| `strong`             | Higher contrast and/or elevated emphasis.       |
+ | `weak`               | Subtle variant for secondary or muted elements. |
+ 
+ **State** represents the interactive state of the element, if specified. The default is an idle state.
+diff --git a/packages/theme/bin/generate-primitive-tokens/index.ts b/packages/theme/bin/generate-primitive-tokens/index.ts
+index b8d0f97ff5d1a8..b222340fbd3925 100644
+--- a/packages/theme/bin/generate-primitive-tokens/index.ts
++++ b/packages/theme/bin/generate-primitive-tokens/index.ts
+@@ -74,13 +74,14 @@ function generatePrimitiveColorTokens() {
+ 			},
+ 			...accentRamps,
+ 		].forEach( ( { scaleName, ramp } ) => {
+-			colorJson.color.primitive[ scaleName ] = {};
++			colorJson[ 'wpds-color' ].primitive[ scaleName ] = {};
+ 			for ( const [ tokenName, tokenValue ] of Object.entries(
+ 				ramp.ramp
+ 			) ) {
+-				colorJson.color.primitive[ scaleName ][ tokenName ] = {
+-					$value: transformColorStringToDTCGValue( tokenValue ),
+-				};
++				colorJson[ 'wpds-color' ].primitive[ scaleName ][ tokenName ] =
++					{
++						$value: transformColorStringToDTCGValue( tokenValue ),
++					};
+ 			}
+ 		} );
+ 
+diff --git a/packages/theme/docs/ds-tokens.md b/packages/theme/docs/ds-tokens.md
+index d26b4f16a7e4cb..12a0fe9f4d9559 100644
+--- a/packages/theme/docs/ds-tokens.md
++++ b/packages/theme/docs/ds-tokens.md
+@@ -109,7 +109,7 @@ Do not edit directly.
+ | `--wpds-color-stroke-surface-neutral-weak`            | Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis.                                               |
+ | `--wpds-color-stroke-surface-neutral-strong`          | Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis.                                             |
+ | `--wpds-color-stroke-surface-brand`                   | Decorative stroke color used to define brand-toned surface boundaries with normal emphasis.                                                 |
+-| `--wpds-color-stroke-surface-brand-strong`            | Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis.                                             |
++| `--wpds-color-stroke-surface-brand-strong`            | Decorative stroke color used to define brand-toned surface boundaries with strong emphasis.                                                 |
+ | `--wpds-color-stroke-surface-success`                 | Decorative stroke color used to define success-toned surface boundaries with normal emphasis.                                               |
+ | `--wpds-color-stroke-surface-success-strong`          | Decorative stroke color used to define success-toned surface boundaries with strong emphasis.                                               |
+ | `--wpds-color-stroke-surface-info`                    | Decorative stroke color used to define info-toned surface boundaries with normal emphasis.                                                  |
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 9853ab7e31bb49..d63c02438976cd 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -103,7 +103,7 @@
+ 	--wpds-color-stroke-interactive-neutral-disabled: #d8d8d8; /* Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state. */
+ 	--wpds-color-stroke-interactive-neutral-strong: #6c6c6c; /* Accessible stroke color used for interactive neutrally-toned elements with strong emphasis. */
+ 	--wpds-color-stroke-surface-brand: #a3b1d4; /* Decorative stroke color used to define brand-toned surface boundaries with normal emphasis. */
+-	--wpds-color-stroke-surface-brand-strong: #3858e9; /* Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis. */
++	--wpds-color-stroke-surface-brand-strong: #3858e9; /* Decorative stroke color used to define brand-toned surface boundaries with strong emphasis. */
+ 	--wpds-color-stroke-surface-error: #daa39b; /* Decorative stroke color used to define error-toned surface boundaries with normal emphasis. */
+ 	--wpds-color-stroke-surface-error-strong: #cc1818; /* Decorative stroke color used to define error-toned surface boundaries with strong emphasis. */
+ 	--wpds-color-stroke-surface-info: #9fbcdc; /* Decorative stroke color used to define info-toned surface boundaries with normal emphasis. */
+diff --git a/packages/theme/src/prebuilt/ts/color-tokens.ts b/packages/theme/src/prebuilt/ts/color-tokens.ts
+index 4d4fad3e199da0..2a2c7a74561c94 100644
+--- a/packages/theme/src/prebuilt/ts/color-tokens.ts
++++ b/packages/theme/src/prebuilt/ts/color-tokens.ts
+@@ -6,19 +6,19 @@
+ export default {
+ 	'primary-bgFill1': [ 'bg-interactive-brand-strong' ],
+ 	'primary-fgFill': [
+-		'fg-interactive-brand-strong-active',
+ 		'fg-interactive-brand-strong',
++		'fg-interactive-brand-strong-active',
+ 	],
+ 	'primary-bgFill2': [ 'bg-interactive-brand-strong-active' ],
+ 	'primary-surface2': [ 'bg-interactive-brand-active' ],
+ 	'primary-surface4': [ 'bg-interactive-brand-weak-active' ],
+ 	'primary-fgSurface3': [
+-		'fg-interactive-brand-active',
+ 		'fg-interactive-brand',
++		'fg-interactive-brand-active',
+ 	],
+ 	'primary-stroke3': [
+-		'bg-thumb-brand-active',
+ 		'bg-thumb-brand',
++		'bg-thumb-brand-active',
+ 		'stroke-focus-brand',
+ 		'stroke-interactive-brand',
+ 		'stroke-surface-brand-strong',
+@@ -46,8 +46,8 @@ export default {
+ 	'warning-stroke1': [ 'stroke-surface-warning' ],
+ 	'error-bgFill1': [ 'bg-interactive-error-strong' ],
+ 	'error-fgFill': [
+-		'fg-interactive-error-strong-active',
+ 		'fg-interactive-error-strong',
++		'fg-interactive-error-strong-active',
+ 	],
+ 	'error-bgFill2': [ 'bg-interactive-error-strong-active' ],
+ 	'error-surface2': [
+@@ -61,8 +61,8 @@ export default {
+ 	'error-fgSurface4': [ 'fg-content-error' ],
+ 	'error-fgSurface3': [
+ 		'fg-content-error-weak',
+-		'fg-interactive-error-active',
+ 		'fg-interactive-error',
++		'fg-interactive-error-active',
+ 	],
+ 	'error-stroke3': [
+ 		'stroke-interactive-error',
+@@ -92,8 +92,8 @@ export default {
+ 	'bg-surface3': [ 'bg-surface-neutral-strong' ],
+ 	'bg-fgSurface4': [
+ 		'fg-content-neutral',
+-		'fg-interactive-neutral-active',
+ 		'fg-interactive-neutral',
++		'fg-interactive-neutral-active',
+ 	],
+ 	'bg-fgSurface3': [
+ 		'fg-content-neutral-weak',
+@@ -128,8 +128,8 @@ export default {
+ 	'bg-bgFillInverted2': [ 'bg-interactive-neutral-strong-active' ],
+ 	'bg-bgFillInverted1': [ 'bg-interactive-neutral-strong' ],
+ 	'bg-fgFillInverted': [
+-		'fg-interactive-neutral-strong-active',
+ 		'fg-interactive-neutral-strong',
++		'fg-interactive-neutral-strong-active',
+ 	],
+ 	'bg-surface1': [ 'bg-surface-neutral-weak' ],
+ 	'caution-surface2': [ 'bg-surface-caution-weak' ],
+diff --git a/packages/theme/src/test/token-id.test.ts b/packages/theme/src/test/token-id.test.ts
+deleted file mode 100644
+index 2a7b347ff8ecd8..00000000000000
+--- a/packages/theme/src/test/token-id.test.ts
++++ /dev/null
+@@ -1,12 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { publicTokenId } from '../token-id';
+-
+-describe( 'publicTokenId', () => {
+-	it( 'should remove default states and visibility identifiers from the token id', () => {
+-		expect(
+-			publicTokenId( 'color.semantic.bg-surface.success.weak.resting' )
+-		).toBe( 'color.bg-surface.success.weak' );
+-	} );
+-} );
+diff --git a/packages/theme/src/token-id.ts b/packages/theme/src/token-id.ts
+deleted file mode 100644
+index d74f4c54fdbe0e..00000000000000
+--- a/packages/theme/src/token-id.ts
++++ /dev/null
+@@ -1,9 +0,0 @@
+-/**
+- * Normalizes a token ID by removing default states and visibility identifiers,
+- * making it human-readable as a publicly-accessible variable name.
+- *
+- * @param id The token ID to normalize.
+- * @return The normalized token ID.
+- */
+-export const publicTokenId = ( id: string ) =>
+-	id.replace( /\.(normal|resting|semantic|primitive)/g, '' );
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index f2c111228a41b7..a84b835815f533 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -8,11 +8,9 @@ import { makeCSSVar } from '@terrazzo/token-tools/css';
+ /**
+  * Internal dependencies
+  */
+-import pluginFigmaDsTokenManager from './bin/terrazzo-plugin-figma-ds-token-manager/index';
+ import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
+ import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
+ import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index';
+-import { publicTokenId } from './src/token-id.ts';
+ 
+ export default defineConfig( {
+ 	tokens: [
+@@ -26,36 +24,36 @@ export default defineConfig( {
+ 
+ 	plugins: [
+ 		inlineAliasValues( {
+-			pattern: /^color\.primitive\./,
++			pattern: /^wpds-color\.primitive\./,
+ 			filename: 'ts/color-tokens.ts',
+ 			tokenId: ( tokenId ) =>
+-				publicTokenId( tokenId )
+-					.replace( /^color\./, '' )
++				tokenId
++					.replace( /\.primitive/, '' )
++					.replace( /^wpds-color\./, '' )
+ 					.replace( /\./g, '-' ),
+ 		} ),
+-		inlineAliasValues( { pattern: /^dimension\.primitive\./ } ),
++		inlineAliasValues( { pattern: /^wpds-dimension\.primitive\./ } ),
+ 		pluginCSS( {
+ 			filename: 'css/design-tokens.css',
+-			variableName: ( token ) =>
+-				makeCSSVar( `wpds.${ publicTokenId( token.id ) }` ),
++			variableName: ( token ) => makeCSSVar( token.id ),
+ 			baseSelector: ':root',
+ 			modeSelectors: [
+ 				{
+-					tokens: [ 'dimension.*' ],
++					tokens: [ 'wpds-dimension.*' ],
+ 					mode: '.',
+ 					selectors: [
+ 						"[data-wpds-theme-provider-id][data-wpds-density='default']",
+ 					],
+ 				},
+ 				{
+-					tokens: [ 'dimension.*' ],
++					tokens: [ 'wpds-dimension.*' ],
+ 					mode: 'compact',
+ 					selectors: [
+ 						"[data-wpds-theme-provider-id][data-wpds-density='compact']",
+ 					],
+ 				},
+ 				{
+-					tokens: [ 'dimension.*' ],
++					tokens: [ 'wpds-dimension.*' ],
+ 					mode: 'comfortable',
+ 					selectors: [
+ 						"[data-wpds-theme-provider-id][data-wpds-density='comfortable']",
+@@ -70,9 +68,6 @@ export default defineConfig( {
+ 			],
+ 			legacyHex: true,
+ 		} ),
+-		pluginFigmaDsTokenManager( {
+-			filename: 'json/figma.json',
+-		} ),
+ 		pluginKnownWpdsCssVariables( {
+ 			filename: 'js/design-tokens.js',
+ 		} ),
+diff --git a/packages/theme/tokens/border.json b/packages/theme/tokens/border.json
+index 7f589be824d6ab..77b8d1ca4e8e36 100644
+--- a/packages/theme/tokens/border.json
++++ b/packages/theme/tokens/border.json
+@@ -1,5 +1,5 @@
+ {
+-	"border": {
++	"wpds-border": {
+ 		"$type": "dimension",
+ 		"radius": {
+ 			"surface": {
+diff --git a/packages/theme/tokens/color.json b/packages/theme/tokens/color.json
+index 6be7d23a1c3047..5f399518fa958f 100644
+--- a/packages/theme/tokens/color.json
++++ b/packages/theme/tokens/color.json
+@@ -1,5 +1,5 @@
+ {
+-	"color": {
++	"wpds-color": {
+ 		"$type": "color",
+ 		"primitive": {
+ 			"primary": {
+@@ -1095,645 +1095,463 @@
+ 				}
+ 			}
+ 		},
+-		"semantic": {
+-			"bg-surface": {
++		"bg": {
++			"surface": {
+ 				"neutral": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.surface2}",
+-							"$description": "Background color for surfaces with normal emphasis."
+-						}
+-					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.surface3}",
+-							"$description": "Background color for surfaces with strong emphasis."
+-						}
+-					},
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.surface1}",
+-							"$description": "Background color for surfaces with weak emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.bg.surface2}",
++					"$description": "Background color for surfaces with normal emphasis."
++				},
++				"neutral-strong": {
++					"$value": "{wpds-color.primitive.bg.surface3}",
++					"$description": "Background color for surfaces with strong emphasis."
++				},
++				"neutral-weak": {
++					"$value": "{wpds-color.primitive.bg.surface1}",
++					"$description": "Background color for surfaces with weak emphasis."
+ 				},
+ 				"brand": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.primary.surface1}",
+-							"$description": "Background color for surfaces with brand tone and normal emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.primary.surface1}",
++					"$description": "Background color for surfaces with brand tone and normal emphasis."
+ 				},
+ 				"success": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.success.surface4}",
+-							"$description": "Background color for surfaces with success tone and normal emphasis."
+-						}
+-					},
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.success.surface2}",
+-							"$description": "Background color for surfaces with success tone and weak emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.success.surface4}",
++					"$description": "Background color for surfaces with success tone and normal emphasis."
++				},
++				"success-weak": {
++					"$value": "{wpds-color.primitive.success.surface2}",
++					"$description": "Background color for surfaces with success tone and weak emphasis."
+ 				},
+ 				"info": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.info.surface4}",
+-							"$description": "Background color for surfaces with info tone and normal emphasis."
+-						}
+-					},
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.info.surface2}",
+-							"$description": "Background color for surfaces with info tone and weak emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.info.surface4}",
++					"$description": "Background color for surfaces with info tone and normal emphasis."
++				},
++				"info-weak": {
++					"$value": "{wpds-color.primitive.info.surface2}",
++					"$description": "Background color for surfaces with info tone and weak emphasis."
+ 				},
+ 				"warning": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.warning.surface4}",
+-							"$description": "Background color for surfaces with warning tone and normal emphasis."
+-						}
+-					},
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.warning.surface2}",
+-							"$description": "Background color for surfaces with warning tone and weak emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.warning.surface4}",
++					"$description": "Background color for surfaces with warning tone and normal emphasis."
++				},
++				"warning-weak": {
++					"$value": "{wpds-color.primitive.warning.surface2}",
++					"$description": "Background color for surfaces with warning tone and weak emphasis."
+ 				},
+ 				"caution": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.caution.surface4}",
+-							"$description": "Background color for surfaces with caution tone and normal emphasis."
+-						}
+-					},
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.caution.surface2}",
+-							"$description": "Background color for surfaces with caution tone and weak emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.caution.surface4}",
++					"$description": "Background color for surfaces with caution tone and normal emphasis."
++				},
++				"caution-weak": {
++					"$value": "{wpds-color.primitive.caution.surface2}",
++					"$description": "Background color for surfaces with caution tone and weak emphasis."
+ 				},
+ 				"error": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.error.surface4}",
+-							"$description": "Background color for surfaces with error tone and normal emphasis."
+-						}
+-					},
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.error.surface2}",
+-							"$description": "Background color for surfaces with error tone and weak emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.error.surface4}",
++					"$description": "Background color for surfaces with error tone and normal emphasis."
++				},
++				"error-weak": {
++					"$value": "{wpds-color.primitive.error.surface2}",
++					"$description": "Background color for surfaces with error tone and weak emphasis."
+ 				}
+ 			},
+-			"bg-interactive": {
++			"interactive": {
+ 				"neutral": {
+-					"normal": {
+-						"resting": {
+-							"$value": {
+-								"colorSpace": "srgb",
+-								"components": [ 0, 0, 0 ],
+-								"alpha": 0
+-							},
+-							"$description": "Background color for interactive elements with neutral tone and normal emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.bg.surface4}",
+-							"$description": "Background color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.surface5}",
+-							"$description": "Background color for interactive elements with neutral tone and normal emphasis, in their disabled state."
+-						}
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0, 0 ],
++						"alpha": 0
+ 					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.bgFillInverted1}",
+-							"$description": "Background color for interactive elements with neutral tone and strong emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.bg.bgFillInverted2}",
+-							"$description": "Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.surface6}",
+-							"$description": "Background color for interactive elements with neutral tone and strong emphasis, in their disabled state."
+-						}
++					"$description": "Background color for interactive elements with neutral tone and normal emphasis."
++				},
++				"neutral-active": {
++					"$value": "{wpds-color.primitive.bg.surface4}",
++					"$description": "Background color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
++				},
++				"neutral-disabled": {
++					"$value": "{wpds-color.primitive.bg.surface5}",
++					"$description": "Background color for interactive elements with neutral tone and normal emphasis, in their disabled state."
++				},
++				"neutral-strong": {
++					"$value": "{wpds-color.primitive.bg.bgFillInverted1}",
++					"$description": "Background color for interactive elements with neutral tone and strong emphasis."
++				},
++				"neutral-strong-active": {
++					"$value": "{wpds-color.primitive.bg.bgFillInverted2}",
++					"$description": "Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
++				},
++				"neutral-strong-disabled": {
++					"$value": "{wpds-color.primitive.bg.surface6}",
++					"$description": "Background color for interactive elements with neutral tone and strong emphasis, in their disabled state."
++				},
++				"neutral-weak": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0, 0 ],
++						"alpha": 0
+ 					},
+-					"weak": {
+-						"resting": {
+-							"$value": {
+-								"colorSpace": "srgb",
+-								"components": [ 0, 0, 0 ],
+-								"alpha": 0
+-							},
+-							"$description": "Background color for interactive elements with neutral tone and weak emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.bg.surface4}",
+-							"$description": "Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.surface5}",
+-							"$description": "Background color for interactive elements with neutral tone and weak emphasis, in their disabled state."
+-						}
+-					}
++					"$description": "Background color for interactive elements with neutral tone and weak emphasis."
++				},
++				"neutral-weak-active": {
++					"$value": "{wpds-color.primitive.bg.surface4}",
++					"$description": "Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active."
++				},
++				"neutral-weak-disabled": {
++					"$value": "{wpds-color.primitive.bg.surface5}",
++					"$description": "Background color for interactive elements with neutral tone and weak emphasis, in their disabled state."
+ 				},
+ 				"brand": {
+-					"normal": {
+-						"resting": {
+-							"$value": {
+-								"colorSpace": "srgb",
+-								"components": [ 0, 0, 0 ],
+-								"alpha": 0
+-							},
+-							"$description": "Background color for interactive elements with brand tone and normal emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.primary.surface2}",
+-							"$description": "Background color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.surface5}",
+-							"$description": "Background color for interactive elements with brand tone and normal emphasis, in their disabled state."
+-						}
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0, 0 ],
++						"alpha": 0
+ 					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.primary.bgFill1}",
+-							"$description": "Background color for interactive elements with brand tone and strong emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.primary.bgFill2}",
+-							"$description": "Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.surface6}",
+-							"$description": "Background color for interactive elements with brand tone and strong emphasis, in their disabled state."
+-						}
++					"$description": "Background color for interactive elements with brand tone and normal emphasis."
++				},
++				"brand-active": {
++					"$value": "{wpds-color.primitive.primary.surface2}",
++					"$description": "Background color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
++				},
++				"brand-disabled": {
++					"$value": "{wpds-color.primitive.bg.surface5}",
++					"$description": "Background color for interactive elements with brand tone and normal emphasis, in their disabled state."
++				},
++				"brand-strong": {
++					"$value": "{wpds-color.primitive.primary.bgFill1}",
++					"$description": "Background color for interactive elements with brand tone and strong emphasis."
++				},
++				"brand-strong-active": {
++					"$value": "{wpds-color.primitive.primary.bgFill2}",
++					"$description": "Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
++				},
++				"brand-strong-disabled": {
++					"$value": "{wpds-color.primitive.bg.surface6}",
++					"$description": "Background color for interactive elements with brand tone and strong emphasis, in their disabled state."
++				},
++				"brand-weak": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0, 0 ],
++						"alpha": 0
+ 					},
+-					"weak": {
+-						"resting": {
+-							"$value": {
+-								"colorSpace": "srgb",
+-								"components": [ 0, 0, 0 ],
+-								"alpha": 0
+-							},
+-							"$description": "Background color for interactive elements with brand tone and weak emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.primary.surface4}",
+-							"$description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.surface5}",
+-							"$description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
+-						}
+-					}
++					"$description": "Background color for interactive elements with brand tone and weak emphasis."
++				},
++				"brand-weak-active": {
++					"$value": "{wpds-color.primitive.primary.surface4}",
++					"$description": "Background color for interactive elements with brand tone and weak emphasis that are hovered, focused, or active."
++				},
++				"brand-weak-disabled": {
++					"$value": "{wpds-color.primitive.bg.surface5}",
++					"$description": "Background color for interactive elements with brand tone and weak emphasis, in their disabled state."
+ 				},
+ 				"error": {
+-					"normal": {
+-						"resting": {
+-							"$value": "transparent",
+-							"$description": "Background color for interactive elements with error tone and normal emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.error.surface2}",
+-							"$description": "Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.surface5}",
+-							"$description": "Background color for interactive elements with error tone and normal emphasis, in their disabled state."
+-						}
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0, 0 ],
++						"alpha": 0
+ 					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.error.bgFill1}",
+-							"$description": "Background color for interactive elements with error tone and strong emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.error.bgFill2}",
+-							"$description": "Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.surface6}",
+-							"$description": "Background color for interactive elements with error tone and strong emphasis, in their disabled state."
+-						}
++					"$description": "Background color for interactive elements with error tone and normal emphasis."
++				},
++				"error-active": {
++					"$value": "{wpds-color.primitive.error.surface2}",
++					"$description": "Background color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
++				},
++				"error-disabled": {
++					"$value": "{wpds-color.primitive.bg.surface5}",
++					"$description": "Background color for interactive elements with error tone and normal emphasis, in their disabled state."
++				},
++				"error-strong": {
++					"$value": "{wpds-color.primitive.error.bgFill1}",
++					"$description": "Background color for interactive elements with error tone and strong emphasis."
++				},
++				"error-strong-active": {
++					"$value": "{wpds-color.primitive.error.bgFill2}",
++					"$description": "Background color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
++				},
++				"error-strong-disabled": {
++					"$value": "{wpds-color.primitive.bg.surface6}",
++					"$description": "Background color for interactive elements with error tone and strong emphasis, in their disabled state."
++				},
++				"error-weak": {
++					"$value": {
++						"colorSpace": "srgb",
++						"components": [ 0, 0, 0 ],
++						"alpha": 0
+ 					},
+-					"weak": {
+-						"resting": {
+-							"$value": "transparent",
+-							"$description": "Background color for interactive elements with error tone and weak emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.error.surface4}",
+-							"$description": "Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.surface5}",
+-							"$description": "Background color for interactive elements with error tone and weak emphasis, in their disabled state."
+-						}
+-					}
++					"$description": "Background color for interactive elements with error tone and weak emphasis."
++				},
++				"error-weak-active": {
++					"$value": "{wpds-color.primitive.error.surface4}",
++					"$description": "Background color for interactive elements with error tone and weak emphasis that are hovered, focused, or active."
++				},
++				"error-weak-disabled": {
++					"$value": "{wpds-color.primitive.bg.surface5}",
++					"$description": "Background color for interactive elements with error tone and weak emphasis, in their disabled state."
+ 				}
+ 			},
+-			"bg-track": {
++			"track": {
++				"neutral-weak": {
++					"$value": "{wpds-color.primitive.bg.stroke1}",
++					"$description": "Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track)."
++				},
+ 				"neutral": {
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.stroke1}",
+-							"$description": "Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track)."
+-						}
+-					},
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.stroke2}",
+-							"$description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track)."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.bg.stroke2}",
++					"$description": "Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track)."
+ 				}
+ 			},
+-			"bg-thumb": {
+-				"neutral": {
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.stroke3}",
+-							"$description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb)."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.bg.stroke4}",
+-							"$description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active."
+-						}
+-					}
++			"thumb": {
++				"neutral-weak": {
++					"$value": "{wpds-color.primitive.bg.stroke3}",
++					"$description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb)."
++				},
++				"neutral-weak-active": {
++					"$value": "{wpds-color.primitive.bg.stroke4}",
++					"$description": "Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active."
+ 				},
+ 				"brand": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.primary.stroke3}",
+-							"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track)."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.primary.stroke3}",
+-							"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.stroke2}",
+-							"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.primary.stroke3}",
++					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track)."
++				},
++				"brand-active": {
++					"$value": "{wpds-color.primitive.primary.stroke3}",
++					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active."
++				},
++				"brand-disabled": {
++					"$value": "{wpds-color.primitive.bg.stroke2}",
++					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
+ 				}
+-			},
+-			"fg-content": {
++			}
++		},
++		"fg": {
++			"content": {
+ 				"neutral": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.fgSurface4}",
+-							"$description": "Foreground color for content like text with normal emphasis."
+-						}
+-					},
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.fgSurface3}",
+-							"$description": "Foreground color for content like text with weak emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.bg.fgSurface4}",
++					"$description": "Foreground color for content like text with normal emphasis."
++				},
++				"neutral-weak": {
++					"$value": "{wpds-color.primitive.bg.fgSurface3}",
++					"$description": "Foreground color for content like text with weak emphasis."
+ 				},
+ 				"success": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.success.fgSurface4}",
+-							"$description": "Foreground color for content like text with success tone and normal emphasis."
+-						}
+-					},
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.success.fgSurface3}",
+-							"$description": "Foreground color for content like text with success tone and weak emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.success.fgSurface4}",
++					"$description": "Foreground color for content like text with success tone and normal emphasis."
++				},
++				"success-weak": {
++					"$value": "{wpds-color.primitive.success.fgSurface3}",
++					"$description": "Foreground color for content like text with success tone and weak emphasis."
+ 				},
+ 				"info": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.info.fgSurface4}",
+-							"$description": "Foreground color for content like text with info tone and normal emphasis."
+-						}
+-					},
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.info.fgSurface3}",
+-							"$description": "Foreground color for content like text with info tone and weak emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.info.fgSurface4}",
++					"$description": "Foreground color for content like text with info tone and normal emphasis."
++				},
++				"info-weak": {
++					"$value": "{wpds-color.primitive.info.fgSurface3}",
++					"$description": "Foreground color for content like text with info tone and weak emphasis."
+ 				},
+ 				"warning": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.warning.fgSurface4}",
+-							"$description": "Foreground color for content like text with warning tone and normal emphasis."
+-						}
+-					},
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.warning.fgSurface3}",
+-							"$description": "Foreground color for content like text with warning tone and weak emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.warning.fgSurface4}",
++					"$description": "Foreground color for content like text with warning tone and normal emphasis."
++				},
++				"warning-weak": {
++					"$value": "{wpds-color.primitive.warning.fgSurface3}",
++					"$description": "Foreground color for content like text with warning tone and weak emphasis."
+ 				},
+ 				"caution": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.caution.fgSurface4}",
+-							"$description": "Foreground color for content like text with caution tone and normal emphasis."
+-						}
+-					},
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.caution.fgSurface3}",
+-							"$description": "Foreground color for content like text with caution tone and weak emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.caution.fgSurface4}",
++					"$description": "Foreground color for content like text with caution tone and normal emphasis."
++				},
++				"caution-weak": {
++					"$value": "{wpds-color.primitive.caution.fgSurface3}",
++					"$description": "Foreground color for content like text with caution tone and weak emphasis."
+ 				},
+ 				"error": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.error.fgSurface4}",
+-							"$description": "Foreground color for content like text with error tone and normal emphasis."
+-						}
+-					},
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.error.fgSurface3}",
+-							"$description": "Foreground color for content like text with error tone and weak emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.error.fgSurface4}",
++					"$description": "Foreground color for content like text with error tone and normal emphasis."
++				},
++				"error-weak": {
++					"$value": "{wpds-color.primitive.error.fgSurface3}",
++					"$description": "Foreground color for content like text with error tone and weak emphasis."
+ 				}
+ 			},
+-			"fg-interactive": {
++			"interactive": {
+ 				"neutral": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.fgSurface4}",
+-							"$description": "Foreground color for interactive elements with neutral tone and normal emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.bg.fgSurface4}",
+-							"$description": "Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.fgSurface2}",
+-							"$description": "Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state."
+-						}
+-					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.fgFillInverted}",
+-							"$description": "Foreground color for interactive elements with neutral tone and strong emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.bg.fgFillInverted}",
+-							"$description": "Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.fgSurface3}",
+-							"$description": "Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state."
+-						}
+-					},
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.fgSurface3}",
+-							"$description": "Foreground color for interactive elements with neutral tone and weak emphasis."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.fgSurface2}",
+-							"$description": "Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.bg.fgSurface4}",
++					"$description": "Foreground color for interactive elements with neutral tone and normal emphasis."
++				},
++				"neutral-active": {
++					"$value": "{wpds-color.primitive.bg.fgSurface4}",
++					"$description": "Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active."
++				},
++				"neutral-disabled": {
++					"$value": "{wpds-color.primitive.bg.fgSurface2}",
++					"$description": "Foreground color for interactive elements with neutral tone and normal emphasis, in their disabled state."
++				},
++				"neutral-strong": {
++					"$value": "{wpds-color.primitive.bg.fgFillInverted}",
++					"$description": "Foreground color for interactive elements with neutral tone and strong emphasis."
++				},
++				"neutral-strong-active": {
++					"$value": "{wpds-color.primitive.bg.fgFillInverted}",
++					"$description": "Foreground color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active."
++				},
++				"neutral-strong-disabled": {
++					"$value": "{wpds-color.primitive.bg.fgSurface3}",
++					"$description": "Foreground color for interactive elements with neutral tone and strong emphasis, in their disabled state."
++				},
++				"neutral-weak": {
++					"$value": "{wpds-color.primitive.bg.fgSurface3}",
++					"$description": "Foreground color for interactive elements with neutral tone and weak emphasis."
++				},
++				"neutral-weak-disabled": {
++					"$value": "{wpds-color.primitive.bg.fgSurface2}",
++					"$description": "Foreground color for interactive elements with neutral tone and weak emphasis, in their disabled state."
+ 				},
+ 				"brand": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.primary.fgSurface3}",
+-							"$description": "Foreground color for interactive elements with brand tone and normal emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.primary.fgSurface3}",
+-							"$description": "Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.fgSurface2}",
+-							"$description": "Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state."
+-						}
+-					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.primary.fgFill}",
+-							"$description": "Foreground color for interactive elements with brand tone and strong emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.primary.fgFill}",
+-							"$description": "Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.fgSurface3}",
+-							"$description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.primary.fgSurface3}",
++					"$description": "Foreground color for interactive elements with brand tone and normal emphasis."
++				},
++				"brand-active": {
++					"$value": "{wpds-color.primitive.primary.fgSurface3}",
++					"$description": "Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
++				},
++				"brand-disabled": {
++					"$value": "{wpds-color.primitive.bg.fgSurface2}",
++					"$description": "Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state."
++				},
++				"brand-strong": {
++					"$value": "{wpds-color.primitive.primary.fgFill}",
++					"$description": "Foreground color for interactive elements with brand tone and strong emphasis."
++				},
++				"brand-strong-active": {
++					"$value": "{wpds-color.primitive.primary.fgFill}",
++					"$description": "Foreground color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active."
++				},
++				"brand-strong-disabled": {
++					"$value": "{wpds-color.primitive.bg.fgSurface3}",
++					"$description": "Foreground color for interactive elements with brand tone and strong emphasis, in their disabled state."
+ 				},
+ 				"error": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.error.fgSurface3}",
+-							"$description": "Foreground color for interactive elements with error tone and normal emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.error.fgSurface3}",
+-							"$description": "Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.fgSurface2}",
+-							"$description": "Foreground color for interactive elements with error tone and normal emphasis, in their disabled state."
+-						}
+-					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.error.fgFill}",
+-							"$description": "Foreground color for interactive elements with error tone and strong emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.error.fgFill}",
+-							"$description": "Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.fgSurface3}",
+-							"$description": "Foreground color for interactive elements with error tone and strong emphasis, in their disabled state."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.error.fgSurface3}",
++					"$description": "Foreground color for interactive elements with error tone and normal emphasis."
++				},
++				"error-active": {
++					"$value": "{wpds-color.primitive.error.fgSurface3}",
++					"$description": "Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
++				},
++				"error-disabled": {
++					"$value": "{wpds-color.primitive.bg.fgSurface2}",
++					"$description": "Foreground color for interactive elements with error tone and normal emphasis, in their disabled state."
++				},
++				"error-strong": {
++					"$value": "{wpds-color.primitive.error.fgFill}",
++					"$description": "Foreground color for interactive elements with error tone and strong emphasis."
++				},
++				"error-strong-active": {
++					"$value": "{wpds-color.primitive.error.fgFill}",
++					"$description": "Foreground color for interactive elements with error tone and strong emphasis that are hovered, focused, or active."
++				},
++				"error-strong-disabled": {
++					"$value": "{wpds-color.primitive.bg.fgSurface3}",
++					"$description": "Foreground color for interactive elements with error tone and strong emphasis, in their disabled state."
+ 				}
+-			},
+-			"stroke-surface": {
++			}
++		},
++		"stroke": {
++			"surface": {
+ 				"neutral": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.stroke2}",
+-							"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis."
+-						}
+-					},
+-					"weak": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.stroke1}",
+-							"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis."
+-						}
+-					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.stroke3}",
+-							"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.bg.stroke2}",
++					"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with normal emphasis."
++				},
++				"neutral-weak": {
++					"$value": "{wpds-color.primitive.bg.stroke1}",
++					"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with weak emphasis."
++				},
++				"neutral-strong": {
++					"$value": "{wpds-color.primitive.bg.stroke3}",
++					"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
+ 				},
+ 				"brand": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.primary.stroke1}",
+-							"$description": "Decorative stroke color used to define brand-toned surface boundaries with normal emphasis."
+-						}
+-					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.primary.stroke3}",
+-							"$description": "Decorative stroke color used to define neutrally-toned surface boundaries with strong emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.primary.stroke1}",
++					"$description": "Decorative stroke color used to define brand-toned surface boundaries with normal emphasis."
++				},
++				"brand-strong": {
++					"$value": "{wpds-color.primitive.primary.stroke3}",
++					"$description": "Decorative stroke color used to define brand-toned surface boundaries with strong emphasis."
+ 				},
+ 				"success": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.success.stroke1}",
+-							"$description": "Decorative stroke color used to define success-toned surface boundaries with normal emphasis."
+-						}
+-					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.success.stroke3}",
+-							"$description": "Decorative stroke color used to define success-toned surface boundaries with strong emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.success.stroke1}",
++					"$description": "Decorative stroke color used to define success-toned surface boundaries with normal emphasis."
++				},
++				"success-strong": {
++					"$value": "{wpds-color.primitive.success.stroke3}",
++					"$description": "Decorative stroke color used to define success-toned surface boundaries with strong emphasis."
+ 				},
+ 				"info": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.info.stroke1}",
+-							"$description": "Decorative stroke color used to define info-toned surface boundaries with normal emphasis."
+-						}
+-					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.info.stroke3}",
+-							"$description": "Decorative stroke color used to define info-toned surface boundaries with strong emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.info.stroke1}",
++					"$description": "Decorative stroke color used to define info-toned surface boundaries with normal emphasis."
++				},
++				"info-strong": {
++					"$value": "{wpds-color.primitive.info.stroke3}",
++					"$description": "Decorative stroke color used to define info-toned surface boundaries with strong emphasis."
+ 				},
+ 				"warning": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.warning.stroke1}",
+-							"$description": "Decorative stroke color used to define warning-toned surface boundaries with normal emphasis."
+-						}
+-					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.warning.stroke3}",
+-							"$description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.warning.stroke1}",
++					"$description": "Decorative stroke color used to define warning-toned surface boundaries with normal emphasis."
++				},
++				"warning-strong": {
++					"$value": "{wpds-color.primitive.warning.stroke3}",
++					"$description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis."
+ 				},
+ 				"error": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.error.stroke1}",
+-							"$description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis."
+-						}
+-					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.error.stroke3}",
+-							"$description": "Decorative stroke color used to define error-toned surface boundaries with strong emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.error.stroke1}",
++					"$description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis."
++				},
++				"error-strong": {
++					"$value": "{wpds-color.primitive.error.stroke3}",
++					"$description": "Decorative stroke color used to define error-toned surface boundaries with strong emphasis."
+ 				}
+ 			},
+-			"stroke-interactive": {
++			"interactive": {
+ 				"neutral": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.stroke3}",
+-							"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.bg.stroke4}",
+-							"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active."
+-						},
+-						"disabled": {
+-							"$value": "{color.primitive.bg.stroke2}",
+-							"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state."
+-						}
+-					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.bg.stroke4}",
+-							"$description": "Accessible stroke color used for interactive neutrally-toned elements with strong emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.bg.stroke3}",
++					"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis."
++				},
++				"neutral-active": {
++					"$value": "{wpds-color.primitive.bg.stroke4}",
++					"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis that are hovered, focused, or active."
++				},
++				"neutral-disabled": {
++					"$value": "{wpds-color.primitive.bg.stroke2}",
++					"$description": "Accessible stroke color used for interactive neutrally-toned elements with normal emphasis, in their disabled state."
++				},
++				"neutral-strong": {
++					"$value": "{wpds-color.primitive.bg.stroke4}",
++					"$description": "Accessible stroke color used for interactive neutrally-toned elements with strong emphasis."
+ 				},
+ 				"brand": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.primary.stroke3}",
+-							"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.primary.stroke4}",
+-							"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.primary.stroke3}",
++					"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis."
++				},
++				"brand-active": {
++					"$value": "{wpds-color.primitive.primary.stroke4}",
++					"$description": "Accessible stroke color used for interactive brand-toned elements with normal emphasis that are hovered, focused, or active."
+ 				},
+ 				"error": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.error.stroke3}",
+-							"$description": "Accessible stroke color used for interactive error-toned elements with normal emphasis."
+-						},
+-						"active": {
+-							"$value": "{color.primitive.error.stroke4}",
+-							"$description": "Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active."
+-						}
+-					},
+-					"strong": {
+-						"resting": {
+-							"$value": "{color.primitive.error.stroke3}",
+-							"$description": "Accessible stroke color used for interactive error-toned elements with strong emphasis."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.error.stroke3}",
++					"$description": "Accessible stroke color used for interactive error-toned elements with normal emphasis."
++				},
++				"error-active": {
++					"$value": "{wpds-color.primitive.error.stroke4}",
++					"$description": "Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active."
++				},
++				"error-strong": {
++					"$value": "{wpds-color.primitive.error.stroke3}",
++					"$description": "Accessible stroke color used for interactive error-toned elements with strong emphasis."
+ 				}
+ 			},
+-			"stroke-focus": {
++			"focus": {
+ 				"brand": {
+-					"normal": {
+-						"resting": {
+-							"$value": "{color.primitive.primary.stroke3}",
+-							"$description": "Accessible stroke color applied to focus rings."
+-						}
+-					}
++					"$value": "{wpds-color.primitive.primary.stroke3}",
++					"$description": "Accessible stroke color applied to focus rings."
+ 				}
+ 			}
+ 		}
+diff --git a/packages/theme/tokens/dimension.json b/packages/theme/tokens/dimension.json
+index 707d38cb1d8e5d..19466db13636ae 100644
+--- a/packages/theme/tokens/dimension.json
++++ b/packages/theme/tokens/dimension.json
+@@ -1,5 +1,5 @@
+ {
+-	"dimension": {
++	"wpds-dimension": {
+ 		"$type": "dimension",
+ 		"primitive": {
+ 			"space": {
+@@ -45,124 +45,122 @@
+ 				}
+ 			}
+ 		},
+-		"semantic": {
+-			"base": {
+-				"$value": "{dimension.primitive.space.10}",
+-				"$description": "Base dimension unit"
+-			},
+-			"padding": {
+-				"surface": {
+-					"2xs": {
+-						"$value": "{dimension.primitive.space.10}",
+-						"$description": "2x extra small spacing for surfaces",
+-						"$extensions": {
+-							"mode": {
+-								"compact": "{dimension.primitive.space.10}",
+-								"comfortable": "{dimension.primitive.space.20}"
+-							}
+-						}
+-					},
+-					"xs": {
+-						"$value": "{dimension.primitive.space.20}",
+-						"$description": "Extra small spacing for surfaces",
+-						"$extensions": {
+-							"mode": {
+-								"compact": "{dimension.primitive.space.10}",
+-								"comfortable": "{dimension.primitive.space.30}"
+-							}
+-						}
+-					},
+-					"sm": {
+-						"$value": "{dimension.primitive.space.40}",
+-						"$description": "Small spacing for surfaces",
+-						"$extensions": {
+-							"mode": {
+-								"compact": "{dimension.primitive.space.30}",
+-								"comfortable": "{dimension.primitive.space.50}"
+-							}
+-						}
+-					},
+-					"md": {
+-						"$value": "{dimension.primitive.space.60}",
+-						"$description": "Medium spacing for surfaces",
+-						"$extensions": {
+-							"mode": {
+-								"compact": "{dimension.primitive.space.50}",
+-								"comfortable": "{dimension.primitive.space.70}"
+-							}
+-						}
+-					},
+-					"lg": {
+-						"$value": "{dimension.primitive.space.70}",
+-						"$description": "Large spacing for surfaces",
+-						"$extensions": {
+-							"mode": {
+-								"compact": "{dimension.primitive.space.60}",
+-								"comfortable": "{dimension.primitive.space.80}"
+-							}
+-						}
+-					}
+-				}
+-			},
+-			"gap": {
++		"base": {
++			"$value": "{wpds-dimension.primitive.space.10}",
++			"$description": "Base dimension unit"
++		},
++		"padding": {
++			"surface": {
+ 				"2xs": {
+-					"$value": "{dimension.primitive.space.10}",
+-					"$description": "2x extra small gap",
++					"$value": "{wpds-dimension.primitive.space.10}",
++					"$description": "2x extra small spacing for surfaces",
+ 					"$extensions": {
+ 						"mode": {
+-							"compact": "{dimension.primitive.space.10}",
+-							"comfortable": "{dimension.primitive.space.20}"
++							"compact": "{wpds-dimension.primitive.space.10}",
++							"comfortable": "{wpds-dimension.primitive.space.20}"
+ 						}
+ 					}
+ 				},
+ 				"xs": {
+-					"$value": "{dimension.primitive.space.20}",
+-					"$description": "Extra small gap",
++					"$value": "{wpds-dimension.primitive.space.20}",
++					"$description": "Extra small spacing for surfaces",
+ 					"$extensions": {
+ 						"mode": {
+-							"compact": "{dimension.primitive.space.10}",
+-							"comfortable": "{dimension.primitive.space.30}"
++							"compact": "{wpds-dimension.primitive.space.10}",
++							"comfortable": "{wpds-dimension.primitive.space.30}"
+ 						}
+ 					}
+ 				},
+ 				"sm": {
+-					"$value": "{dimension.primitive.space.30}",
+-					"$description": "Small gap",
++					"$value": "{wpds-dimension.primitive.space.40}",
++					"$description": "Small spacing for surfaces",
+ 					"$extensions": {
+ 						"mode": {
+-							"compact": "{dimension.primitive.space.20}",
+-							"comfortable": "{dimension.primitive.space.40}"
++							"compact": "{wpds-dimension.primitive.space.30}",
++							"comfortable": "{wpds-dimension.primitive.space.50}"
+ 						}
+ 					}
+ 				},
+ 				"md": {
+-					"$value": "{dimension.primitive.space.40}",
+-					"$description": "Medium gap",
++					"$value": "{wpds-dimension.primitive.space.60}",
++					"$description": "Medium spacing for surfaces",
+ 					"$extensions": {
+ 						"mode": {
+-							"compact": "{dimension.primitive.space.30}",
+-							"comfortable": "{dimension.primitive.space.50}"
++							"compact": "{wpds-dimension.primitive.space.50}",
++							"comfortable": "{wpds-dimension.primitive.space.70}"
+ 						}
+ 					}
+ 				},
+ 				"lg": {
+-					"$value": "{dimension.primitive.space.60}",
+-					"$description": "Large gap",
++					"$value": "{wpds-dimension.primitive.space.70}",
++					"$description": "Large spacing for surfaces",
+ 					"$extensions": {
+ 						"mode": {
+-							"compact": "{dimension.primitive.space.50}",
+-							"comfortable": "{dimension.primitive.space.70}"
++							"compact": "{wpds-dimension.primitive.space.60}",
++							"comfortable": "{wpds-dimension.primitive.space.80}"
+ 						}
+ 					}
+-				},
+-				"xl": {
+-					"$value": "{dimension.primitive.space.80}",
+-					"$description": "Extra large gap",
+-					"$extensions": {
+-						"mode": {
+-							"compact": "{dimension.primitive.space.70}",
+-							"comfortable": "{dimension.primitive.space.90}"
+-						}
++				}
++			}
++		},
++		"gap": {
++			"2xs": {
++				"$value": "{wpds-dimension.primitive.space.10}",
++				"$description": "2x extra small gap",
++				"$extensions": {
++					"mode": {
++						"compact": "{wpds-dimension.primitive.space.10}",
++						"comfortable": "{wpds-dimension.primitive.space.20}"
++					}
++				}
++			},
++			"xs": {
++				"$value": "{wpds-dimension.primitive.space.20}",
++				"$description": "Extra small gap",
++				"$extensions": {
++					"mode": {
++						"compact": "{wpds-dimension.primitive.space.10}",
++						"comfortable": "{wpds-dimension.primitive.space.30}"
++					}
++				}
++			},
++			"sm": {
++				"$value": "{wpds-dimension.primitive.space.30}",
++				"$description": "Small gap",
++				"$extensions": {
++					"mode": {
++						"compact": "{wpds-dimension.primitive.space.20}",
++						"comfortable": "{wpds-dimension.primitive.space.40}"
++					}
++				}
++			},
++			"md": {
++				"$value": "{wpds-dimension.primitive.space.40}",
++				"$description": "Medium gap",
++				"$extensions": {
++					"mode": {
++						"compact": "{wpds-dimension.primitive.space.30}",
++						"comfortable": "{wpds-dimension.primitive.space.50}"
++					}
++				}
++			},
++			"lg": {
++				"$value": "{wpds-dimension.primitive.space.60}",
++				"$description": "Large gap",
++				"$extensions": {
++					"mode": {
++						"compact": "{wpds-dimension.primitive.space.50}",
++						"comfortable": "{wpds-dimension.primitive.space.70}"
++					}
++				}
++			},
++			"xl": {
++				"$value": "{wpds-dimension.primitive.space.80}",
++				"$description": "Extra large gap",
++				"$extensions": {
++					"mode": {
++						"compact": "{wpds-dimension.primitive.space.70}",
++						"comfortable": "{wpds-dimension.primitive.space.90}"
+ 					}
+ 				}
+ 			}
+diff --git a/packages/theme/tokens/elevation.json b/packages/theme/tokens/elevation.json
+index 2711ee22e8fe14..b338bed33149e8 100644
+--- a/packages/theme/tokens/elevation.json
++++ b/packages/theme/tokens/elevation.json
+@@ -1,5 +1,5 @@
+ {
+-	"elevation": {
++	"wpds-elevation": {
+ 		"$type": "shadow",
+ 		"x-small": {
+ 			"$value": [
+diff --git a/packages/theme/tokens/typography.json b/packages/theme/tokens/typography.json
+index 8ffa6d6537bf1d..b781daff612e3a 100644
+--- a/packages/theme/tokens/typography.json
++++ b/packages/theme/tokens/typography.json
+@@ -1,5 +1,5 @@
+ {
+-	"font": {
++	"wpds-font": {
+ 		"family": {
+ 			"$type": "fontFamily",
+ 			"heading": {

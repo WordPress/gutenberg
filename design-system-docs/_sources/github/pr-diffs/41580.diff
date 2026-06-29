@@ -1,0 +1,330 @@
+diff --git a/packages/components/src/h-stack/component.js b/packages/components/src/h-stack/component.tsx
+similarity index 61%
+rename from packages/components/src/h-stack/component.js
+rename to packages/components/src/h-stack/component.tsx
+index ba01bf8a02e742..1f1deb474db4b8 100644
+--- a/packages/components/src/h-stack/component.js
++++ b/packages/components/src/h-stack/component.tsx
+@@ -1,15 +1,15 @@
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect } from '../ui/context';
++import { contextConnect, WordPressComponentProps } from '../ui/context';
+ import { View } from '../view';
+ import { useHStack } from './hook';
++import type { Props } from './types';
+ 
+-/**
+- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                               forwardedRef
+- */
+-function HStack( props, forwardedRef ) {
++function UnconnectedHStack(
++	props: WordPressComponentProps< Props, 'div' >,
++	forwardedRef: React.ForwardedRef< any >
++) {
+ 	const hStackProps = useHStack( props );
+ 
+ 	return <View { ...hStackProps } ref={ forwardedRef } />;
+@@ -38,6 +38,6 @@ function HStack( props, forwardedRef ) {
+  * }
+  * ```
+  */
+-const ConnectedHStack = contextConnect( HStack, 'HStack' );
++export const HStack = contextConnect( UnconnectedHStack, 'HStack' );
+ 
+-export default ConnectedHStack;
++export default HStack;
+diff --git a/packages/components/src/h-stack/hook.js b/packages/components/src/h-stack/hook.tsx
+similarity index 50%
+rename from packages/components/src/h-stack/hook.js
+rename to packages/components/src/h-stack/hook.tsx
+index dd4795776f9534..2c281757c0fecd 100644
+--- a/packages/components/src/h-stack/hook.js
++++ b/packages/components/src/h-stack/hook.tsx
+@@ -1,16 +1,22 @@
++/**
++ * External dependencies
++ */
++import type { ReactElement } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import { hasConnectNamespace, useContextSystem } from '../ui/context';
++import {
++	hasConnectNamespace,
++	useContextSystem,
++	WordPressComponentProps,
++} from '../ui/context';
+ import { FlexItem, useFlex } from '../flex';
+ import { getAlignmentProps } from './utils';
+ import { getValidChildren } from '../ui/utils/get-valid-children';
++import type { Props } from './types';
+ 
+-/**
+- *
+- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- */
+-export function useHStack( props ) {
++export function useHStack( props: WordPressComponentProps< Props, 'div' > ) {
+ 	const {
+ 		alignment = 'edge',
+ 		children,
+@@ -22,19 +28,18 @@ export function useHStack( props ) {
+ 	const align = getAlignmentProps( alignment, direction );
+ 
+ 	const validChildren = getValidChildren( children );
+-	const clonedChildren = validChildren.map(
+-		// @ts-ignore
+-		( /** @type {import('react').ReactElement} */ child, index ) => {
+-			const _key = child.key || `hstack-${ index }`;
+-			const _isSpacer = hasConnectNamespace( child, [ 'Spacer' ] );
++	const clonedChildren = validChildren.map( ( child, index ) => {
++		const _isSpacer = hasConnectNamespace( child, [ 'Spacer' ] );
+ 
+-			if ( _isSpacer ) {
+-				return <FlexItem isBlock key={ _key } { ...child.props } />;
+-			}
++		if ( _isSpacer ) {
++			const childElement = child as ReactElement;
++			const _key = childElement.key || `hstack-${ index }`;
+ 
+-			return child;
++			return <FlexItem isBlock key={ _key } { ...childElement.props } />;
+ 		}
+-	);
++
++		return child;
++	} );
+ 
+ 	const propsForFlex = {
+ 		children: clonedChildren,
+diff --git a/packages/components/src/h-stack/index.js b/packages/components/src/h-stack/index.ts
+similarity index 100%
+rename from packages/components/src/h-stack/index.js
+rename to packages/components/src/h-stack/index.ts
+diff --git a/packages/components/src/h-stack/stories/index.js b/packages/components/src/h-stack/stories/index.js
+deleted file mode 100644
+index a0b672035b51e5..00000000000000
+--- a/packages/components/src/h-stack/stories/index.js
++++ /dev/null
+@@ -1,22 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { View } from '../../view';
+-import { HStack } from '..';
+-
+-export default {
+-	component: HStack,
+-	title: 'Components (Experimental)/HStack',
+-};
+-
+-export const _default = () => {
+-	return (
+-		<HStack spacing={ 3 }>
+-			<View>One</View>
+-			<View>Two</View>
+-			<View>Three</View>
+-			<View>Four</View>
+-			<View>Five</View>
+-		</HStack>
+-	);
+-};
+diff --git a/packages/components/src/h-stack/stories/index.tsx b/packages/components/src/h-stack/stories/index.tsx
+new file mode 100644
+index 00000000000000..479ac04c8acce2
+--- /dev/null
++++ b/packages/components/src/h-stack/stories/index.tsx
+@@ -0,0 +1,92 @@
++/**
++ * External dependencies
++ */
++import type { ComponentStory, ComponentMeta } from '@storybook/react';
++/**
++ * Internal dependencies
++ */
++import { View } from '../../view';
++import { HStack } from '..';
++
++const ALIGNMENTS = {
++	top: 'top',
++	topLeft: 'topLeft',
++	topRight: 'topRight',
++	left: 'left',
++	center: 'center',
++	right: 'right',
++	bottom: 'bottom',
++	bottomLeft: 'bottomLeft',
++	bottomRight: 'bottomRight',
++	edge: 'edge',
++	stretch: 'stretch',
++};
++
++const DIRECTIONS = {
++	row: 'row',
++	column: 'column',
++	responsive: [ 'column', 'row' ],
++};
++
++const JUSTIFICATIONS = {
++	'space-around': 'space-around',
++	'space-between': 'space-between',
++	'space-evenly': 'space-evenly',
++	stretch: 'stretch',
++	center: 'center',
++	end: 'end',
++	'flex-end': 'flex-end',
++	'flex-start': 'flex-start',
++	start: 'start',
++};
++
++const meta: ComponentMeta< typeof HStack > = {
++	component: HStack,
++	title: 'Components (Experimental)/HStack',
++	argTypes: {
++		as: {
++			control: { type: null },
++		},
++		children: {
++			control: { type: null },
++		},
++		alignment: {
++			control: { type: 'select' },
++			options: Object.keys( ALIGNMENTS ),
++			mapping: ALIGNMENTS,
++		},
++		direction: {
++			control: { type: 'select' },
++			options: Object.keys( DIRECTIONS ),
++			mapping: DIRECTIONS,
++		},
++		justify: {
++			control: { type: 'select' },
++			options: Object.keys( JUSTIFICATIONS ),
++			mapping: JUSTIFICATIONS,
++		},
++		spacing: {
++			control: { type: 'text' },
++		},
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof HStack > = ( args ) => (
++	<HStack { ...args } style={ { background: '#eee', minHeight: '3rem' } }>
++		{ [ 'One', 'Two', 'Three', 'Four', 'Five' ].map( ( text ) => (
++			<View key={ text } style={ { background: '#b9f9ff' } }>
++				{ text }
++			</View>
++		) ) }
++	</HStack>
++);
++
++export const Default: ComponentStory< typeof HStack > = Template.bind( {} );
++Default.args = {
++	spacing: '3',
++};
+diff --git a/packages/components/src/h-stack/test/__snapshots__/index.js.snap b/packages/components/src/h-stack/test/__snapshots__/index.tsx.snap
+similarity index 100%
+rename from packages/components/src/h-stack/test/__snapshots__/index.js.snap
+rename to packages/components/src/h-stack/test/__snapshots__/index.tsx.snap
+diff --git a/packages/components/src/h-stack/test/index.js b/packages/components/src/h-stack/test/index.tsx
+similarity index 100%
+rename from packages/components/src/h-stack/test/index.js
+rename to packages/components/src/h-stack/test/index.tsx
+diff --git a/packages/components/src/h-stack/utils.js b/packages/components/src/h-stack/utils.ts
+similarity index 66%
+rename from packages/components/src/h-stack/utils.js
+rename to packages/components/src/h-stack/utils.ts
+index 7b916d7ca522ca..3abddd0309f51c 100644
+--- a/packages/components/src/h-stack/utils.js
++++ b/packages/components/src/h-stack/utils.ts
+@@ -1,10 +1,15 @@
++/**
++ * External dependencies
++ */
++import type { CSSProperties } from 'react';
+ /**
+  * Internal dependencies
+  */
++import type { FlexDirection } from '../flex/types';
++import type { HStackAlignment, AlignmentProps, Alignments } from './types';
+ import { isValueDefined } from '../utils/values';
+ 
+-/** @type {import('./types').Alignments} */
+-const ALIGNMENTS = {
++const H_ALIGNMENTS: Alignments = {
+ 	bottom: { align: 'flex-end', justify: 'center' },
+ 	bottomLeft: { align: 'flex-start', justify: 'flex-end' },
+ 	bottomRight: { align: 'flex-end', justify: 'flex-end' },
+@@ -18,8 +23,7 @@ const ALIGNMENTS = {
+ 	topRight: { align: 'flex-start', justify: 'flex-end' },
+ };
+ 
+-/** @type {import('./types').Alignments} */
+-const V_ALIGNMENTS = {
++const V_ALIGNMENTS: Alignments = {
+ 	bottom: { justify: 'flex-end', align: 'center' },
+ 	bottomLeft: { justify: 'flex-start', align: 'flex-end' },
+ 	bottomRight: { justify: 'flex-end', align: 'flex-end' },
+@@ -33,23 +37,19 @@ const V_ALIGNMENTS = {
+ 	topRight: { justify: 'flex-start', align: 'flex-end' },
+ };
+ 
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * @param {import('./types').HStackAlignment | import('react').CSSProperties[ 'alignItems' ]} alignment         Where to align.
+- * @param {import('../flex/types').FlexDirection}                                             [direction='row'] Direction to align.
+- * @return {import('./types').AlignmentProps} Alignment props.
+- */
+-/* eslint-enable jsdoc/valid-types */
+-export function getAlignmentProps( alignment, direction = 'row' ) {
++export function getAlignmentProps(
++	alignment: HStackAlignment | CSSProperties[ 'alignItems' ],
++	direction: FlexDirection = 'row'
++): AlignmentProps {
+ 	if ( ! isValueDefined( alignment ) ) {
+ 		return {};
+ 	}
+ 	const isVertical = direction === 'column';
+-	const props = isVertical ? V_ALIGNMENTS : ALIGNMENTS;
++	const props = isVertical ? V_ALIGNMENTS : H_ALIGNMENTS;
+ 
+ 	const alignmentProps =
+ 		alignment in props
+-			? props[ /** @type {keyof typeof ALIGNMENTS} */ ( alignment ) ]
++			? props[ alignment as keyof typeof props ]
+ 			: { align: alignment };
+ 
+ 	return alignmentProps;
+diff --git a/packages/components/src/ui/utils/get-valid-children.ts b/packages/components/src/ui/utils/get-valid-children.ts
+index b969cd7fc63999..5b147029a73ee9 100644
+--- a/packages/components/src/ui/utils/get-valid-children.ts
++++ b/packages/components/src/ui/utils/get-valid-children.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { ReactNode, ReactNodeArray } from 'react';
++import type { ReactNode, ReactChild, ReactFragment, ReactPortal } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -15,7 +15,9 @@ import { Children, isValidElement } from '@wordpress/element';
+  *
+  * @return An array of available children.
+  */
+-export function getValidChildren( children: ReactNode ): ReactNodeArray {
++export function getValidChildren(
++	children: ReactNode
++): Array< ReactChild | ReactFragment | ReactPortal > {
+ 	if ( typeof children === 'string' ) return [ children ];
+ 
+ 	return Children.toArray( children ).filter( ( child ) =>

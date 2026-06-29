@@ -1,0 +1,20 @@
+diff --git a/packages/components/src/responsive-wrapper/stories/index.tsx b/packages/components/src/responsive-wrapper/stories/index.tsx
+index 5f48b91d279b2d..354b6ee4156f77 100644
+--- a/packages/components/src/responsive-wrapper/stories/index.tsx
++++ b/packages/components/src/responsive-wrapper/stories/index.tsx
+@@ -36,3 +36,15 @@ Default.args = {
+ 		/>
+ 	),
+ };
++
++export const SVGImage = Template.bind( {} );
++SVGImage.args = {
++	naturalWidth: undefined,
++	naturalHeight: undefined,
++	children: (
++		<img
++			src="https://stp-cdn.lottiefiles.com/wordpress_seeklogo_com_75e7d26fcb.svg"
++			alt="WordPress"
++		/>
++	),
++};

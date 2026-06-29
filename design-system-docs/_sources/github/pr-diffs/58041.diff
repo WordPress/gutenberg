@@ -1,0 +1,137 @@
+diff --git a/packages/edit-post/src/components/sidebar/settings-header/index.js b/packages/edit-post/src/components/sidebar/settings-header/index.js
+index 4f7efaa5948998..244e21b1acd432 100644
+--- a/packages/edit-post/src/components/sidebar/settings-header/index.js
++++ b/packages/edit-post/src/components/sidebar/settings-header/index.js
+@@ -4,6 +4,7 @@
+ import { privateApis as componentsPrivateApis } from '@wordpress/components';
+ import { __, _x } from '@wordpress/i18n';
+ import { useSelect } from '@wordpress/data';
++import { forwardRef } from '@wordpress/element';
+ import { store as editorStore } from '@wordpress/editor';
+ 
+ /**
+@@ -14,7 +15,7 @@ import { sidebars } from '../settings-sidebar';
+ 
+ const { Tabs } = unlock( componentsPrivateApis );
+ 
+-const SettingsHeader = () => {
++const SettingsHeader = ( _, ref ) => {
+ 	const { documentLabel } = useSelect( ( select ) => {
+ 		const { getPostTypeLabel } = select( editorStore );
+ 
+@@ -25,9 +26,19 @@ const SettingsHeader = () => {
+ 	}, [] );
+ 
+ 	return (
+-		<Tabs.TabList>
+-			<Tabs.Tab tabId={ sidebars.document }>{ documentLabel }</Tabs.Tab>
+-			<Tabs.Tab tabId={ sidebars.block }>
++		<Tabs.TabList ref={ ref }>
++			<Tabs.Tab
++				tabId={ sidebars.document }
++				// Used for focus management in the SettingsSidebar component.
++				data-tab-id={ sidebars.document }
++			>
++				{ documentLabel }
++			</Tabs.Tab>
++			<Tabs.Tab
++				tabId={ sidebars.block }
++				// Used for focus management in the SettingsSidebar component.
++				data-tab-id={ sidebars.block }
++			>
+ 				{ /* translators: Text label for the Block Settings Sidebar tab. */ }
+ 				{ __( 'Block' ) }
+ 			</Tabs.Tab>
+@@ -35,4 +46,4 @@ const SettingsHeader = () => {
+ 	);
+ };
+ 
+-export default SettingsHeader;
++export default forwardRef( SettingsHeader );
+diff --git a/packages/edit-post/src/components/sidebar/settings-sidebar/index.js b/packages/edit-post/src/components/sidebar/settings-sidebar/index.js
+index 44900fff3f7be2..31381fad5a2c44 100644
+--- a/packages/edit-post/src/components/sidebar/settings-sidebar/index.js
++++ b/packages/edit-post/src/components/sidebar/settings-sidebar/index.js
+@@ -6,7 +6,13 @@ import {
+ 	store as blockEditorStore,
+ } from '@wordpress/block-editor';
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { Platform, useCallback, useContext } from '@wordpress/element';
++import {
++	Platform,
++	useCallback,
++	useContext,
++	useEffect,
++	useRef,
++} from '@wordpress/element';
+ import { isRTL, __ } from '@wordpress/i18n';
+ import { drawerLeft, drawerRight } from '@wordpress/icons';
+ import { store as interfaceStore } from '@wordpress/interface';
+@@ -50,17 +56,45 @@ const SidebarContent = ( {
+ 	keyboardShortcut,
+ 	isEditingTemplate,
+ } ) => {
++	const tabListRef = useRef( null );
+ 	// Because `PluginSidebarEditPost` renders a `ComplementaryArea`, we
+ 	// need to forward the `Tabs` context so it can be passed through the
+ 	// underlying slot/fill.
+ 	const tabsContextValue = useContext( Tabs.Context );
+ 
++	// This effect addresses a race condition caused by tabbing from the last
++	// block in the editor into the settings sidebar. Without this effect, the
++	// selected tab and browser focus can become separated in an unexpected way
++	// (e.g the "block" tab is focused, but the "post" tab is selected).
++	useEffect( () => {
++		const tabsElements = Array.from(
++			tabListRef.current?.querySelectorAll( '[role="tab"]' ) || []
++		);
++		const selectedTabElement = tabsElements.find(
++			// We are purposefully using a custom `data-tab-id` attribute here
++			// because we don't want rely on any assumptions about `Tabs`
++			// component internals.
++			( element ) => element.getAttribute( 'data-tab-id' ) === sidebarName
++		);
++		const activeElement = selectedTabElement?.ownerDocument.activeElement;
++		const tabsHasFocus = tabsElements.some( ( element ) => {
++			return activeElement && activeElement.id === element.id;
++		} );
++		if (
++			tabsHasFocus &&
++			selectedTabElement &&
++			selectedTabElement.id !== activeElement?.id
++		) {
++			selectedTabElement?.focus();
++		}
++	}, [ sidebarName ] );
++
+ 	return (
+ 		<PluginSidebarEditPost
+ 			identifier={ sidebarName }
+ 			header={
+ 				<Tabs.Context.Provider value={ tabsContextValue }>
+-					<SettingsHeader />
++					<SettingsHeader ref={ tabListRef } />
+ 				</Tabs.Context.Provider>
+ 			}
+ 			closeLabel={ __( 'Close Settings' ) }
+@@ -157,6 +191,7 @@ const SettingsSidebar = () => {
+ 			// the selected tab to `null` avoids that.
+ 			selectedTabId={ isSettingsSidebarActive ? sidebarName : null }
+ 			onSelect={ onTabSelect }
++			selectOnMove={ false }
+ 		>
+ 			<SidebarContent
+ 				sidebarName={ sidebarName }
+diff --git a/test/e2e/specs/editor/various/keyboard-navigable-blocks.spec.js b/test/e2e/specs/editor/various/keyboard-navigable-blocks.spec.js
+index 6b55f68897cbd0..84536c88227ce9 100644
+--- a/test/e2e/specs/editor/various/keyboard-navigable-blocks.spec.js
++++ b/test/e2e/specs/editor/various/keyboard-navigable-blocks.spec.js
+@@ -75,7 +75,7 @@ test.describe( 'Order of block keyboard navigation', () => {
+ 		);
+ 
+ 		await page.keyboard.press( 'Tab' );
+-		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Block' );
++		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Post' );
+ 	} );
+ 
+ 	test( 'allows tabbing in navigation mode if no block is selected (reverse)', async ( {

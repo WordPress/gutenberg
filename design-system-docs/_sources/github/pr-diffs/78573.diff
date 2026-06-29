@@ -1,0 +1,344 @@
+diff --git a/packages/theme/bin/generate-default-ramps/index.ts b/packages/theme/bin/generate-default-ramps/index.ts
+index 2ecd1221fc853b..594fe0e2cce098 100644
+--- a/packages/theme/bin/generate-default-ramps/index.ts
++++ b/packages/theme/bin/generate-default-ramps/index.ts
+@@ -1,13 +1,6 @@
+-/**
+- * External dependencies
+- */
+ import { writeFile } from 'node:fs/promises';
+ import { dirname, join } from 'node:path';
+ import { fileURLToPath } from 'node:url';
+-
+-/**
+- * Internal dependencies
+- */
+ import {
+ 	DEFAULT_SEED_COLORS,
+ 	buildBgRamp,
+@@ -34,9 +27,6 @@ const outputPath = join(
+ );
+ 
+ const content = `
+-/**
+- * Internal dependencies
+- */
+ import type { RampResult } from './types';
+ import type { DEFAULT_SEED_COLORS } from './constants';
+ 
+diff --git a/packages/theme/bin/generate-primitive-tokens/index.ts b/packages/theme/bin/generate-primitive-tokens/index.ts
+index 14a729e552b02e..d0bb8bc4f57a5f 100644
+--- a/packages/theme/bin/generate-primitive-tokens/index.ts
++++ b/packages/theme/bin/generate-primitive-tokens/index.ts
+@@ -1,14 +1,7 @@
+-/**
+- * External dependencies
+- */
+ import fs from 'fs';
+ import path from 'path';
+ import { fileURLToPath } from 'url';
+ import { ColorSpace, to, sRGB, getAll } from 'colorjs.io/fn';
+-
+-/**
+- * Internal dependencies
+- */
+ import {
+ 	DEFAULT_SEED_COLORS,
+ 	buildBgRamp,
+diff --git a/packages/theme/bin/terrazzo-plugin-ds-tokens-docs/index.ts b/packages/theme/bin/terrazzo-plugin-ds-tokens-docs/index.ts
+index 6bf21d3094f5d9..c421d0e1f4e13d 100644
+--- a/packages/theme/bin/terrazzo-plugin-ds-tokens-docs/index.ts
++++ b/packages/theme/bin/terrazzo-plugin-ds-tokens-docs/index.ts
+@@ -1,6 +1,3 @@
+-/**
+- * External dependencies
+- */
+ import { FORMAT_ID } from '@terrazzo/plugin-css';
+ import type { Plugin } from '@terrazzo/parser';
+ 
+diff --git a/packages/theme/bin/terrazzo-plugin-inline-alias-values/index.ts b/packages/theme/bin/terrazzo-plugin-inline-alias-values/index.ts
+index 349f11bd30c2f2..2155d612105bc4 100644
+--- a/packages/theme/bin/terrazzo-plugin-inline-alias-values/index.ts
++++ b/packages/theme/bin/terrazzo-plugin-inline-alias-values/index.ts
+@@ -1,6 +1,3 @@
+-/**
+- * External dependencies
+- */
+ import { type Plugin, type TokenNormalized } from '@terrazzo/parser';
+ 
+ interface InlineAliasValuesOptions {
+diff --git a/packages/theme/bin/terrazzo-plugin-known-wpds-css-variables/index.ts b/packages/theme/bin/terrazzo-plugin-known-wpds-css-variables/index.ts
+index 9f203ae1093ee2..09e5604887a26b 100644
+--- a/packages/theme/bin/terrazzo-plugin-known-wpds-css-variables/index.ts
++++ b/packages/theme/bin/terrazzo-plugin-known-wpds-css-variables/index.ts
+@@ -1,6 +1,3 @@
+-/**
+- * External dependencies
+- */
+ import { FORMAT_ID } from '@terrazzo/plugin-css';
+ import type { Plugin } from '@terrazzo/parser';
+ 
+diff --git a/packages/theme/bin/terrazzo-plugin-mode-overrides/index.ts b/packages/theme/bin/terrazzo-plugin-mode-overrides/index.ts
+index 973d13b0b70dc9..20f5f1238ed7d1 100644
+--- a/packages/theme/bin/terrazzo-plugin-mode-overrides/index.ts
++++ b/packages/theme/bin/terrazzo-plugin-mode-overrides/index.ts
+@@ -1,6 +1,3 @@
+-/**
+- * External dependencies
+- */
+ import { basename } from 'node:path';
+ import { fileURLToPath } from 'node:url';
+ import type { Plugin } from '@terrazzo/parser';
+diff --git a/packages/theme/src/color-ramps/index.ts b/packages/theme/src/color-ramps/index.ts
+index cdce989fff9d1a..5ad0b6f4d119b0 100644
+--- a/packages/theme/src/color-ramps/index.ts
++++ b/packages/theme/src/color-ramps/index.ts
+@@ -1,11 +1,4 @@
+-/**
+- * External dependencies
+- */
+ import { get, OKLCH } from 'colorjs.io/fn';
+-
+-/**
+- * Internal dependencies
+- */
+ import { buildRamp } from './lib/index';
+ import { clampAccentScaleReferenceLightness } from './lib/utils';
+ import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs';
+diff --git a/packages/theme/src/color-ramps/lib/default-ramps.ts b/packages/theme/src/color-ramps/lib/default-ramps.ts
+index 624e9fff689748..dd0f8bf9b65aa8 100644
+--- a/packages/theme/src/color-ramps/lib/default-ramps.ts
++++ b/packages/theme/src/color-ramps/lib/default-ramps.ts
+@@ -1,6 +1,3 @@
+-/**
+- * Internal dependencies
+- */
+ import type { RampResult } from './types';
+ import type { DEFAULT_SEED_COLORS } from './constants';
+ 
+diff --git a/packages/theme/src/color-ramps/lib/index.ts b/packages/theme/src/color-ramps/lib/index.ts
+index c752685ffdbdfe..535c54b3485b90 100644
+--- a/packages/theme/src/color-ramps/lib/index.ts
++++ b/packages/theme/src/color-ramps/lib/index.ts
+@@ -1,8 +1,4 @@
+ import { clone, get, OKLCH, set, type PlainColorObject } from 'colorjs.io/fn';
+-
+-/**
+- * Internal dependencies
+- */
+ import { clampToGamut, getContrast, getColorString } from './color-utils';
+ import { findColorMeetingRequirements } from './find-color-with-constraints';
+ import {
+diff --git a/packages/theme/src/color-ramps/lib/ramp-configs.ts b/packages/theme/src/color-ramps/lib/ramp-configs.ts
+index b3b8acb05045ff..79f8ab26e8ccd8 100644
+--- a/packages/theme/src/color-ramps/lib/ramp-configs.ts
++++ b/packages/theme/src/color-ramps/lib/ramp-configs.ts
+@@ -1,6 +1,3 @@
+-/**
+- * Internal dependencies
+- */
+ import type { RampStepConfig, RampConfig, RampDirection } from './types';
+ import type { TaperChromaOptions } from './taper-chroma';
+ 
+diff --git a/packages/theme/src/color-ramps/lib/types.ts b/packages/theme/src/color-ramps/lib/types.ts
+index 0f87fcce425575..ac7731851d4250 100644
+--- a/packages/theme/src/color-ramps/lib/types.ts
++++ b/packages/theme/src/color-ramps/lib/types.ts
+@@ -1,6 +1,3 @@
+-/**
+- * Internal dependencies
+- */
+ import type { TaperChromaOptions } from './taper-chroma';
+ 
+ export type Ramp = {
+diff --git a/packages/theme/src/color-ramps/stories/index.story.tsx b/packages/theme/src/color-ramps/stories/index.story.tsx
+index 98af596a664173..96c56719d04a41 100644
+--- a/packages/theme/src/color-ramps/stories/index.story.tsx
++++ b/packages/theme/src/color-ramps/stories/index.story.tsx
+@@ -1,11 +1,4 @@
+-/**
+- * External dependencies
+- */
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+-
+-/**
+- * Internal dependencies
+- */
+ import { RampTable } from './ramp-table';
+ import { buildBgRamp, buildAccentRamp, checkAccessibleCombinations } from '..';
+ import { DEFAULT_SEED_COLORS } from '../lib/constants';
+diff --git a/packages/theme/src/color-ramps/stories/ramp-table.tsx b/packages/theme/src/color-ramps/stories/ramp-table.tsx
+index 17e2f72871d02c..437832bf9aee8c 100644
+--- a/packages/theme/src/color-ramps/stories/ramp-table.tsx
++++ b/packages/theme/src/color-ramps/stories/ramp-table.tsx
+@@ -1,11 +1,4 @@
+-/**
+- * WordPress dependencies
+- */
+ import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+ import type { Ramp } from '../lib/types';
+ 
+ // TODO: show token groups better
+diff --git a/packages/theme/src/context.ts b/packages/theme/src/context.ts
+index e1d630ab421391..2193f3fbe85336 100644
+--- a/packages/theme/src/context.ts
++++ b/packages/theme/src/context.ts
+@@ -1,11 +1,4 @@
+-/**
+- * WordPress dependencies
+- */
+ import { createContext } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+ import type { ThemeProviderSettings } from './types';
+ 
+ interface ThemeContextType {
+diff --git a/packages/theme/src/lock-unlock.ts b/packages/theme/src/lock-unlock.ts
+index b1a535e3859773..add4c4108f0e27 100644
+--- a/packages/theme/src/lock-unlock.ts
++++ b/packages/theme/src/lock-unlock.ts
+@@ -1,6 +1,3 @@
+-/**
+- * WordPress dependencies
+- */
+ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+ 
+ export const { lock, unlock } =
+diff --git a/packages/theme/src/private-apis.ts b/packages/theme/src/private-apis.ts
+index 5c5678317ab7d3..399e3a2ea5f4ba 100644
+--- a/packages/theme/src/private-apis.ts
++++ b/packages/theme/src/private-apis.ts
+@@ -1,6 +1,3 @@
+-/**
+- * Internal dependencies
+- */
+ import { lock } from './lock-unlock';
+ import { ThemeProvider } from './theme-provider';
+ import { useThemeProviderStyles } from './use-theme-provider-styles';
+diff --git a/packages/theme/src/stories/index.story.tsx b/packages/theme/src/stories/index.story.tsx
+index 419bdda86ebbb0..6e7d27fc372ece 100644
+--- a/packages/theme/src/stories/index.story.tsx
++++ b/packages/theme/src/stories/index.story.tsx
+@@ -1,11 +1,4 @@
+-/**
+- * External dependencies
+- */
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+-
+-/**
+- * WordPress dependencies
+- */
+ import {
+ 	useEffect,
+ 	useState,
+@@ -13,10 +6,6 @@ import {
+ 	useId,
+ 	createPortal,
+ } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+ import { ThemeProvider } from '../theme-provider';
+ 
+ const meta: Meta< typeof ThemeProvider > = {
+diff --git a/packages/theme/src/theme-provider.tsx b/packages/theme/src/theme-provider.tsx
+index f2299c12eeed62..a039e3aab416c9 100644
+--- a/packages/theme/src/theme-provider.tsx
++++ b/packages/theme/src/theme-provider.tsx
+@@ -1,16 +1,5 @@
+-/**
+- * External dependencies
+- */
+ import type { CSSProperties } from 'react';
+-
+-/**
+- * WordPress dependencies
+- */
+ import { useMemo, useId } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+ import { ThemeContext } from './context';
+ import { useThemeProviderStyles } from './use-theme-provider-styles';
+ import { type ThemeProviderProps } from './types';
+diff --git a/packages/theme/src/types.ts b/packages/theme/src/types.ts
+index c4dd2a27cd6a42..22c6eda3f38763 100644
+--- a/packages/theme/src/types.ts
++++ b/packages/theme/src/types.ts
+@@ -1,6 +1,3 @@
+-/**
+- * External dependencies
+- */
+ import { type ReactNode } from 'react';
+ 
+ export interface ThemeProviderSettings {
+diff --git a/packages/theme/src/use-theme-provider-styles.ts b/packages/theme/src/use-theme-provider-styles.ts
+index 025e23fe71512d..223e6a8f6164ef 100644
+--- a/packages/theme/src/use-theme-provider-styles.ts
++++ b/packages/theme/src/use-theme-provider-styles.ts
+@@ -1,6 +1,3 @@
+-/**
+- * External dependencies
+- */
+ import type { CSSProperties } from 'react';
+ import {
+ 	ColorSpace,
+@@ -12,15 +9,7 @@ import {
+ 	type PlainColorObject,
+ } from 'colorjs.io/fn';
+ import memoize from 'memize';
+-
+-/**
+- * WordPress dependencies
+- */
+ import { useMemo, useContext } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+ import { ThemeContext } from './context';
+ import colorTokens from './prebuilt/ts/color-tokens';
+ import {
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index ec2fcbb056992b..e0e250b981cad3 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -1,13 +1,6 @@
+-/**
+- * External dependencies
+- */
+ import { defineConfig, type Config } from '@terrazzo/parser';
+ import pluginCSS from '@terrazzo/plugin-css';
+ import { makeCSSVar } from '@terrazzo/token-tools/css';
+-
+-/**
+- * Internal dependencies
+- */
+ import pluginModeOverrides from './bin/terrazzo-plugin-mode-overrides/index';
+ import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
+ import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index 37c9fd936a364e..8580686aef5f7a 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -799,7 +799,11 @@ export default dedupePlugins( [
+ 	// Override: Packages which have eliminated dependency grouping comments
+ 	// and explicitly prevent new additions.
+ 	{
+-		files: [ 'packages/ui/**', 'packages/design-system-mcp/**' ],
++		files: [
++			'packages/design-system-mcp/**',
++			'packages/ui/**',
++			'packages/theme/**',
++		],
+ 		rules: {
+ 			'@wordpress/dependency-group': [ 'error', 'never' ],
+ 		},

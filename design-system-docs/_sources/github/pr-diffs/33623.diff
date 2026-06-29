@@ -1,0 +1,21 @@
+diff --git a/packages/components/src/form-token-field/token-input.js b/packages/components/src/form-token-field/token-input.js
+index 3f1de495d72651..2cf93e157cbf8f 100644
+--- a/packages/components/src/form-token-field/token-input.js
++++ b/packages/components/src/form-token-field/token-input.js
+@@ -40,6 +40,7 @@ class TokenInput extends Component {
+ 			instanceId,
+ 			selectedSuggestionIndex,
+ 			className,
++			onChange,
+ 			...props
+ 		} = this.props;
+ 		const size = value ? value.length + 1 : 0;
+@@ -51,7 +52,7 @@ class TokenInput extends Component {
+ 				type="text"
+ 				{ ...props }
+ 				value={ value || '' }
+-				onChange={ this.onChange }
++				onChange={ onChange ? this.onChange : undefined }
+ 				size={ size }
+ 				className={ classnames(
+ 					className,

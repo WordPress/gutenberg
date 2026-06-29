@@ -1,0 +1,858 @@
+diff --git a/packages/block-editor/src/components/height-control/index.js b/packages/block-editor/src/components/height-control/index.js
+index fdd7f47fe0b748..c0e1c947c8e65b 100644
+--- a/packages/block-editor/src/components/height-control/index.js
++++ b/packages/block-editor/src/components/height-control/index.js
+@@ -172,7 +172,6 @@ export default function HeightControl( {
+ 				<FlexItem isBlock>
+ 					<Spacer marginX={ 2 } marginBottom={ 0 }>
+ 						<RangeControl
+-							__next40pxDefaultSize
+ 							value={ customRangeValue }
+ 							min={ 0 }
+ 							max={
+diff --git a/packages/block-editor/src/components/image-editor/zoom-dropdown.js b/packages/block-editor/src/components/image-editor/zoom-dropdown.js
+index cbcb61d628ef8c..0ace45e1728941 100644
+--- a/packages/block-editor/src/components/image-editor/zoom-dropdown.js
++++ b/packages/block-editor/src/components/image-editor/zoom-dropdown.js
+@@ -34,7 +34,6 @@ export default function ZoomDropdown() {
+ 			renderContent={ () => (
+ 				<DropdownContentWrapper paddingSize="medium">
+ 					<RangeControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Zoom' ) }
+ 						min={ MIN_ZOOM }
+ 						max={ MAX_ZOOM }
+diff --git a/packages/block-editor/src/components/preset-input-control/custom-value-controls.js b/packages/block-editor/src/components/preset-input-control/custom-value-controls.js
+index 1960998524efb0..5f0667eb282508 100644
+--- a/packages/block-editor/src/components/preset-input-control/custom-value-controls.js
++++ b/packages/block-editor/src/components/preset-input-control/custom-value-controls.js
+@@ -126,7 +126,6 @@ export default function CustomValueControls( {
+ 				step={ step }
+ 				value={ parsedQuantity }
+ 				withInputField={ false }
+-				__next40pxDefaultSize
+ 			/>
+ 		</>
+ 	);
+diff --git a/packages/block-editor/src/components/preset-input-control/index.js b/packages/block-editor/src/components/preset-input-control/index.js
+index c13697fad76a71..9b688918b4b15b 100644
+--- a/packages/block-editor/src/components/preset-input-control/index.js
++++ b/packages/block-editor/src/components/preset-input-control/index.js
+@@ -267,7 +267,6 @@ export default function PresetInputControl( {
+ 					step={ 1 }
+ 					value={ currentValue }
+ 					withInputField={ false }
+-					__next40pxDefaultSize
+ 				/>
+ 			) }
+ 			{ hasPresets && ! showRangeControl && ! showCustomValueControl && (
+diff --git a/packages/block-editor/src/components/text-indent-control/index.js b/packages/block-editor/src/components/text-indent-control/index.js
+index d69c25819cb02d..43a9f13d003226 100644
+--- a/packages/block-editor/src/components/text-indent-control/index.js
++++ b/packages/block-editor/src/components/text-indent-control/index.js
+@@ -101,7 +101,6 @@ export default function TextIndentControl( {
+ 					<FlexItem isBlock>
+ 						<Spacer marginX={ 2 } marginBottom={ 0 }>
+ 							<RangeControl
+-								__next40pxDefaultSize
+ 								label={ __( 'Line indent' ) }
+ 								hideLabelFromVision
+ 								value={ valueQuantity }
+diff --git a/packages/block-editor/src/layouts/grid.js b/packages/block-editor/src/layouts/grid.js
+index d85ca9949fa730..c0bd3aa2ecb1c2 100644
+--- a/packages/block-editor/src/layouts/grid.js
++++ b/packages/block-editor/src/layouts/grid.js
+@@ -409,7 +409,6 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
+ 				</FlexItem>
+ 				<FlexItem isBlock>
+ 					<RangeControl
+-						__next40pxDefaultSize
+ 						onChange={ handleSliderChange }
+ 						value={ quantity || 0 }
+ 						min={ 0 }
+@@ -497,7 +496,6 @@ function GridLayoutColumnsAndRowsControl( {
+ 							/>
+ 						) : (
+ 							<RangeControl
+-								__next40pxDefaultSize
+ 								value={ columnCount ?? 1 }
+ 								onChange={ ( value ) =>
+ 									onChange( {
+diff --git a/packages/block-library/src/avatar/edit.js b/packages/block-library/src/avatar/edit.js
+index 6eddf24eb0727d..44f8f63c981dc3 100644
+--- a/packages/block-library/src/avatar/edit.js
++++ b/packages/block-library/src/avatar/edit.js
+@@ -56,7 +56,6 @@ const AvatarInspectorControls = ( {
+ 					onDeselect={ () => setAttributes( { size: 96 } ) }
+ 				>
+ 					<RangeControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Image size' ) }
+ 						onChange={ ( newSize ) =>
+ 							setAttributes( {
+diff --git a/packages/block-library/src/columns/edit.js b/packages/block-library/src/columns/edit.js
+index 5d22166823c18f..5c8fd57deffc0d 100644
+--- a/packages/block-library/src/columns/edit.js
++++ b/packages/block-library/src/columns/edit.js
+@@ -162,7 +162,6 @@ function ColumnInspectorControls( {
+ 			{ canInsertColumnBlock && (
+ 				<VStack spacing={ 4 } style={ { gridColumn: '1 / -1' } }>
+ 					<RangeControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Columns' ) }
+ 						value={ count }
+ 						onChange={ ( value ) =>
+diff --git a/packages/block-library/src/comment-author-avatar/edit.js b/packages/block-library/src/comment-author-avatar/edit.js
+index 1d2cf835120520..f132f9253d5604 100644
+--- a/packages/block-library/src/comment-author-avatar/edit.js
++++ b/packages/block-library/src/comment-author-avatar/edit.js
+@@ -51,7 +51,6 @@ export default function Edit( {
+ 		<InspectorControls>
+ 			<PanelBody title={ __( 'Settings' ) }>
+ 				<RangeControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Image size' ) }
+ 					onChange={ ( newWidth ) =>
+ 						setAttributes( {
+diff --git a/packages/block-library/src/cover/edit/inspector-controls.js b/packages/block-library/src/cover/edit/inspector-controls.js
+index 786437984b0628..076d9f5d89de73 100644
+--- a/packages/block-library/src/cover/edit/inspector-controls.js
++++ b/packages/block-library/src/cover/edit/inspector-controls.js
+@@ -476,7 +476,6 @@ export default function CoverInspectorControls( {
+ 							max={ 100 }
+ 							step={ 10 }
+ 							required
+-							__next40pxDefaultSize
+ 						/>
+ 					</ToolsPanelItem>
+ 				</InspectorControls>
+diff --git a/packages/block-library/src/file/inspector.js b/packages/block-library/src/file/inspector.js
+index 2df826e95ef472..2c9bc46bd12652 100644
+--- a/packages/block-library/src/file/inspector.js
++++ b/packages/block-library/src/file/inspector.js
+@@ -79,7 +79,6 @@ export default function FileBlockInspector( {
+ 								onDeselect={ () => changePreviewHeight( 600 ) }
+ 							>
+ 								<RangeControl
+-									__next40pxDefaultSize
+ 									label={ __( 'Height in pixels' ) }
+ 									min={ MIN_PREVIEW_HEIGHT }
+ 									max={ Math.max(
+diff --git a/packages/block-library/src/gallery/edit.js b/packages/block-library/src/gallery/edit.js
+index 21fe3b6702d117..54677e09e60c85 100644
+--- a/packages/block-library/src/gallery/edit.js
++++ b/packages/block-library/src/gallery/edit.js
+@@ -663,7 +663,6 @@ export default function GalleryEdit( props ) {
+ 								min={ 1 }
+ 								max={ Math.min( MAX_COLUMNS, images.length ) }
+ 								required
+-								__next40pxDefaultSize
+ 							/>
+ 						</ToolsPanelItem>
+ 					) }
+diff --git a/packages/block-library/src/latest-comments/edit.js b/packages/block-library/src/latest-comments/edit.js
+index 576813a6591eb4..9f7b0e704df7fa 100644
+--- a/packages/block-library/src/latest-comments/edit.js
++++ b/packages/block-library/src/latest-comments/edit.js
+@@ -139,7 +139,6 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
+ 						isShownByDefault
+ 					>
+ 						<RangeControl
+-							__next40pxDefaultSize
+ 							label={ __( 'Number of comments' ) }
+ 							value={ commentsToShow }
+ 							onChange={ ( value ) =>
+diff --git a/packages/block-library/src/latest-posts/edit.js b/packages/block-library/src/latest-posts/edit.js
+index 8396590cf4852d..07f381575c4ad5 100644
+--- a/packages/block-library/src/latest-posts/edit.js
++++ b/packages/block-library/src/latest-posts/edit.js
+@@ -265,7 +265,6 @@ function Controls( { attributes, setAttributes } ) {
+ 							isShownByDefault
+ 						>
+ 							<RangeControl
+-								__next40pxDefaultSize
+ 								label={ __( 'Max number of words' ) }
+ 								value={ excerptLength }
+ 								onChange={ ( value ) =>
+diff --git a/packages/block-library/src/media-text/edit.js b/packages/block-library/src/media-text/edit.js
+index 134fada66be19f..eae04b5a741af0 100644
+--- a/packages/block-library/src/media-text/edit.js
++++ b/packages/block-library/src/media-text/edit.js
+@@ -366,7 +366,6 @@ function MediaTextEdit( {
+ 				onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
+ 			>
+ 				<RangeControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Media width' ) }
+ 					value={ temporaryMediaWidth || mediaWidth }
+ 					onChange={ commitWidthChange }
+diff --git a/packages/block-library/src/post-excerpt/edit.js b/packages/block-library/src/post-excerpt/edit.js
+index 3fbcb35ddd3f7c..f4e1e1f4138ada 100644
+--- a/packages/block-library/src/post-excerpt/edit.js
++++ b/packages/block-library/src/post-excerpt/edit.js
+@@ -248,7 +248,6 @@ export default function PostExcerptEditor( props ) {
+ 						isShownByDefault
+ 					>
+ 						<RangeControl
+-							__next40pxDefaultSize
+ 							label={ __( 'Max number of words' ) }
+ 							value={ excerptLength }
+ 							onChange={ ( value ) => {
+diff --git a/packages/block-library/src/post-featured-image/overlay-controls.js b/packages/block-library/src/post-featured-image/overlay-controls.js
+index b07a24a30a67b3..84bf021aeb0b24 100644
+--- a/packages/block-library/src/post-featured-image/overlay-controls.js
++++ b/packages/block-library/src/post-featured-image/overlay-controls.js
+@@ -75,7 +75,6 @@ const Overlay = ( {
+ 					max={ 100 }
+ 					step={ 10 }
+ 					required
+-					__next40pxDefaultSize
+ 				/>
+ 			</ToolsPanelItem>
+ 		</>
+diff --git a/packages/block-library/src/query-pagination-numbers/edit.js b/packages/block-library/src/query-pagination-numbers/edit.js
+index 1f77febd7703f2..e53765a8eb322e 100644
+--- a/packages/block-library/src/query-pagination-numbers/edit.js
++++ b/packages/block-library/src/query-pagination-numbers/edit.js
+@@ -72,7 +72,6 @@ export default function QueryPaginationNumbersEdit( {
+ 						isShownByDefault
+ 					>
+ 						<RangeControl
+-							__next40pxDefaultSize
+ 							label={ __( 'Number of links' ) }
+ 							help={ __(
+ 								'Specify how many links can appear before and after the current page number. Links to the first, current and last page are always visible.'
+diff --git a/packages/block-library/src/query/edit/inspector-controls/per-page-control.js b/packages/block-library/src/query/edit/inspector-controls/per-page-control.js
+index 97e3291927ca35..3f17da99b5c105 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/per-page-control.js
++++ b/packages/block-library/src/query/edit/inspector-controls/per-page-control.js
+@@ -10,7 +10,6 @@ const MAX_POSTS_PER_PAGE = 100;
+ const PerPageControl = ( { perPage, offset = 0, onChange } ) => {
+ 	return (
+ 		<RangeControl
+-			__next40pxDefaultSize
+ 			label={ __( 'Items per page' ) }
+ 			min={ MIN_POSTS_PER_PAGE }
+ 			max={ MAX_POSTS_PER_PAGE }
+diff --git a/packages/block-library/src/rss/edit.js b/packages/block-library/src/rss/edit.js
+index 77a7331be961da..f239aeafe2516f 100644
+--- a/packages/block-library/src/rss/edit.js
++++ b/packages/block-library/src/rss/edit.js
+@@ -168,7 +168,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
+ 						isShownByDefault
+ 					>
+ 						<RangeControl
+-							__next40pxDefaultSize
+ 							label={ __( 'Number of items' ) }
+ 							value={ itemsToShow }
+ 							onChange={ ( value ) =>
+@@ -235,7 +234,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
+ 							isShownByDefault
+ 						>
+ 							<RangeControl
+-								__next40pxDefaultSize
+ 								label={ __( 'Max number of words in excerpt' ) }
+ 								value={ excerptLength }
+ 								onChange={ ( value ) =>
+@@ -256,7 +254,6 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
+ 							isShownByDefault
+ 						>
+ 							<RangeControl
+-								__next40pxDefaultSize
+ 								label={ __( 'Columns' ) }
+ 								value={ columns }
+ 								onChange={ ( value ) =>
+diff --git a/packages/block-library/src/site-logo/edit.js b/packages/block-library/src/site-logo/edit.js
+index 8e5745cf95d3ae..e7a7dba162f69f 100644
+--- a/packages/block-library/src/site-logo/edit.js
++++ b/packages/block-library/src/site-logo/edit.js
+@@ -265,7 +265,6 @@ const SiteLogo = ( {
+ 						}
+ 					>
+ 						<RangeControl
+-							__next40pxDefaultSize
+ 							label={ __( 'Image width' ) }
+ 							onChange={ ( newWidth ) =>
+ 								setAttributes( { width: newWidth } )
+diff --git a/packages/block-library/src/tag-cloud/edit.js b/packages/block-library/src/tag-cloud/edit.js
+index 84d6b8861e8cc1..a41f044b57e9af 100644
+--- a/packages/block-library/src/tag-cloud/edit.js
++++ b/packages/block-library/src/tag-cloud/edit.js
+@@ -203,7 +203,6 @@ function TagCloudEdit( { attributes, setAttributes, name } ) {
+ 					isShownByDefault
+ 				>
+ 					<RangeControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Number of tags' ) }
+ 						value={ numberOfTags }
+ 						onChange={ ( value ) =>
+diff --git a/packages/block-library/src/terms-query/edit/inspector-controls/max-terms-control.js b/packages/block-library/src/terms-query/edit/inspector-controls/max-terms-control.js
+index 963afc3f0bd565..0b40b716472ae9 100644
+--- a/packages/block-library/src/terms-query/edit/inspector-controls/max-terms-control.js
++++ b/packages/block-library/src/terms-query/edit/inspector-controls/max-terms-control.js
+@@ -7,7 +7,6 @@ import { RangeControl } from '@wordpress/components';
+ export default function MaxTermsControl( { value, onChange, ...props } ) {
+ 	return (
+ 		<RangeControl
+-			__next40pxDefaultSize
+ 			value={ value }
+ 			min={ 0 }
+ 			max={ 100 }
+diff --git a/packages/block-library/src/text-columns/edit.js b/packages/block-library/src/text-columns/edit.js
+index 759a684b4434ce..56cb551f018b8b 100644
+--- a/packages/block-library/src/text-columns/edit.js
++++ b/packages/block-library/src/text-columns/edit.js
+@@ -34,7 +34,6 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
+ 			<InspectorControls>
+ 				<PanelBody>
+ 					<RangeControl
+-						__next40pxDefaultSize
+ 						label={ __( 'Columns' ) }
+ 						value={ columns }
+ 						onChange={ ( value ) =>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 691a5ad13d17a5..f831ccf2e3f335 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+     -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
+     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
+     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
++    -   `RangeControl` ([#79590](https://github.com/WordPress/gutenberg/pull/79590))
+     -   `TreeSelect` ([#79550](https://github.com/WordPress/gutenberg/pull/79550))
+ 
+ ### Documentation
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 790ce526756fda..ff194048b52d16 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -117,7 +117,6 @@ const UnconnectedBorderControl = (
+ 						step={ [ 'px', '%' ].includes( widthUnit ) ? 1 : 0.1 }
+ 						value={ widthValue || undefined }
+ 						withInputField={ false }
+-						__next40pxDefaultSize
+ 					/>
+ 				) }
+ 			</HStack>
+diff --git a/packages/components/src/box-control/box-input-control.tsx b/packages/components/src/box-control/box-input-control.tsx
+index d435704afa8edd..ff1aee2402d5e7 100644
+--- a/packages/components/src/box-control/box-input-control.tsx
++++ b/packages/components/src/box-control/box-input-control.tsx
+@@ -223,8 +223,6 @@ export default function BoxInputControl( {
+ 					</Tooltip>
+ 
+ 					<FlexedRangeControl
+-						__next40pxDefaultSize
+-						__shouldNotWarnDeprecated36pxSize
+ 						aria-controls={ inputId }
+ 						label={ LABELS[ side ] }
+ 						hideLabelFromVision
+@@ -252,7 +250,6 @@ export default function BoxInputControl( {
+ 
+ 			{ hasPresets && ! showCustomValueControl && (
+ 				<FlexedRangeControl
+-					__next40pxDefaultSize
+ 					className="spacing-sizes-control__range-control"
+ 					value={ presetIndex !== undefined ? presetIndex + 1 : 0 }
+ 					onChange={ ( newIndex ) => {
+diff --git a/packages/components/src/color-picker/input-with-slider.tsx b/packages/components/src/color-picker/input-with-slider.tsx
+index bd294c7db5f9c7..4464d9f02334d0 100644
+--- a/packages/components/src/color-picker/input-with-slider.tsx
++++ b/packages/components/src/color-picker/input-with-slider.tsx
+@@ -48,7 +48,6 @@ export const InputWithSlider = ( {
+ 				spinControls="none"
+ 			/>
+ 			<RangeControl
+-				__next40pxDefaultSize
+ 				label={ label }
+ 				hideLabelFromVision
+ 				min={ min }
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index 34675b0dfc9cc7..a9e873f299874a 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -220,7 +220,6 @@ const UnforwardedFontSizePicker = (
+ 							<FlexItem isBlock>
+ 								<Spacer marginX={ 2 } marginBottom={ 0 }>
+ 									<RangeControl
+-										__next40pxDefaultSize
+ 										className="components-font-size-picker__custom-input"
+ 										label={ __( 'Font size' ) }
+ 										hideLabelFromVision
+diff --git a/packages/components/src/query-controls/index.tsx b/packages/components/src/query-controls/index.tsx
+index 2ebc98d5236f0f..2f65f9556a7481 100644
+--- a/packages/components/src/query-controls/index.tsx
++++ b/packages/components/src/query-controls/index.tsx
+@@ -184,7 +184,6 @@ export function QueryControls( {
+ 				),
+ 				onNumberOfItemsChange && (
+ 					<RangeControl
+-						__next40pxDefaultSize
+ 						key="query-controls-range-control"
+ 						label={ __( 'Number of items' ) }
+ 						value={ numberOfItems }
+diff --git a/packages/components/src/range-control/README.md b/packages/components/src/range-control/README.md
+index 047e876cd28192..313be420690591 100644
+--- a/packages/components/src/range-control/README.md
++++ b/packages/components/src/range-control/README.md
+@@ -90,7 +90,6 @@ const MyRangeControl = () => {
+ 
+ 	return (
+ 		<RangeControl
+-			__next40pxDefaultSize
+ 			label="Columns"
+ 			value={ columns }
+ 			onChange={ ( value ) => setColumns( value ) }
+@@ -362,13 +361,6 @@ Determines if the `input` number field will render next to the RangeControl. Thi
+ -   Required: No
+ -   Platform: Web
+ 
+-### `__next40pxDefaultSize`: `boolean`
+-
+-Start opting into the larger default height that will become the default size in a future version.
+-
+--   Required: No
+--   Default: `false`
+-
+ ## Related components
+ 
+ -   To collect a numerical input in a text field, use the `TextControl` component.
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index 9afd419b514776..822820edfcb80c 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -38,7 +38,6 @@ import {
+ import type { RangeControlProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ import { space } from '../utils/space';
+-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ const noop = () => {};
+ 
+@@ -66,7 +65,10 @@ function UnforwardedRangeControl(
+ 	forwardedRef: ForwardedRef< HTMLInputElement >
+ ) {
+ 	const {
+-		__nextHasNoMarginBottom: _, // Prevent passing to internal component
++		// Prevent passing legacy props to internal component.
++		__nextHasNoMarginBottom: _,
++		__next40pxDefaultSize: _next40pxDefaultSize,
++		__shouldNotWarnDeprecated36pxSize: _shouldNotWarnDeprecated36pxSize,
+ 		afterIcon,
+ 		allowReset = false,
+ 		beforeIcon,
+@@ -90,14 +92,12 @@ function UnforwardedRangeControl(
+ 		railColor,
+ 		renderTooltipContent = ( v ) => v,
+ 		resetFallbackValue,
+-		__next40pxDefaultSize = false,
+ 		shiftStep = 10,
+ 		showTooltip: showTooltipProp,
+ 		step = 1,
+ 		trackColor,
+ 		value: valueProp,
+ 		withInputField = true,
+-		__shouldNotWarnDeprecated36pxSize,
+ 		...otherProps
+ 	} = props;
+ 
+@@ -231,14 +231,6 @@ function UnforwardedRangeControl(
+ 		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
+ 	};
+ 
+-	// Add default size deprecation warning.
+-	maybeWarnDeprecated36pxSize( {
+-		componentName: 'RangeControl',
+-		__next40pxDefaultSize,
+-		size: undefined,
+-		__shouldNotWarnDeprecated36pxSize,
+-	} );
+-
+ 	return (
+ 		<BaseControl
+ 			className={ classes }
+@@ -247,10 +239,7 @@ function UnforwardedRangeControl(
+ 			id={ `${ id }` }
+ 			help={ help }
+ 		>
+-			<Root
+-				className="components-range-control__root"
+-				__next40pxDefaultSize={ __next40pxDefaultSize }
+-			>
++			<Root className="components-range-control__root">
+ 				{ beforeIcon && (
+ 					<BeforeIconWrapper>
+ 						<Icon icon={ beforeIcon } />
+@@ -336,18 +325,11 @@ function UnforwardedRangeControl(
+ 						onBlur={ handleOnInputNumberBlur }
+ 						onChange={ handleOnChange }
+ 						shiftStep={ shiftStep }
+-						size={
+-							__next40pxDefaultSize
+-								? '__unstable-large'
+-								: 'default'
+-						}
+-						__unstableInputWidth={
+-							__next40pxDefaultSize ? space( 20 ) : space( 16 )
+-						}
++						__unstableInputWidth={ space( 20 ) }
++						__next40pxDefaultSize
+ 						step={ step }
+ 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
+ 						value={ inputSliderValue }
+-						__shouldNotWarnDeprecated36pxSize
+ 					/>
+ 				) }
+ 				{ allowReset && (
+@@ -391,7 +373,6 @@ function UnforwardedRangeControl(
+  *   const [ value, setValue ] = useState();
+  *   return (
+  *     <RangeControl
+- *       __next40pxDefaultSize
+  *       help="Please select how transparent you would like this."
+  *       initialPosition={ 50 }
+  *       label="Opacity"
+diff --git a/packages/components/src/range-control/stories/index.story.tsx b/packages/components/src/range-control/stories/index.story.tsx
+index 731359bb15eafe..327175ecce7c56 100644
+--- a/packages/components/src/range-control/stories/index.story.tsx
++++ b/packages/components/src/range-control/stories/index.story.tsx
+@@ -71,7 +71,6 @@ const Template: StoryFn< typeof RangeControl > = ( { onChange, ...args } ) => {
+ 
+ 	return (
+ 		<RangeControl
+-			__next40pxDefaultSize
+ 			{ ...args }
+ 			value={ value }
+ 			onChange={ ( v ) => {
+@@ -84,7 +83,6 @@ const Template: StoryFn< typeof RangeControl > = ( { onChange, ...args } ) => {
+ 
+ export const Default: StoryFn< typeof RangeControl > = Template.bind( {} );
+ Default.args = {
+-	__next40pxDefaultSize: true,
+ 	help: 'Please select how transparent you would like this.',
+ 	initialPosition: 50,
+ 	label: 'Opacity',
+@@ -106,7 +104,6 @@ export const WithAnyStep: StoryFn< typeof RangeControl > = ( {
+ 	return (
+ 		<>
+ 			<RangeControl
+-				__next40pxDefaultSize
+ 				{ ...args }
+ 				value={ value }
+ 				onChange={ ( v ) => {
+@@ -120,7 +117,6 @@ export const WithAnyStep: StoryFn< typeof RangeControl > = ( {
+ 	);
+ };
+ WithAnyStep.args = {
+-	__next40pxDefaultSize: true,
+ 	label: 'Brightness',
+ 	step: 'any',
+ };
+@@ -137,7 +133,6 @@ const MarkTemplate: StoryFn< typeof RangeControl > = ( {
+ 		<>
+ 			<h2>{ label }</h2>
+ 			<RangeControl
+-				__next40pxDefaultSize
+ 				{ ...args }
+ 				label="Automatic marks"
+ 				marks
+@@ -148,7 +143,6 @@ const MarkTemplate: StoryFn< typeof RangeControl > = ( {
+ 				value={ automaticValue }
+ 			/>
+ 			<RangeControl
+-				__next40pxDefaultSize
+ 				{ ...args }
+ 				label="Custom marks"
+ 				onChange={ ( v ) => {
+@@ -186,7 +180,6 @@ export const WithIntegerStepAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithIntegerStepAndMarks.args = {
+-	__next40pxDefaultSize: true,
+ 	label: 'Integer Step',
+ 	marks: marksBase,
+ 	max: 10,
+@@ -203,7 +196,6 @@ export const WithDecimalStepAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithDecimalStepAndMarks.args = {
+-	__next40pxDefaultSize: true,
+ 	marks: [
+ 		...marksBase,
+ 		{ value: 3.5, label: '3.5' },
+@@ -223,7 +215,6 @@ export const WithNegativeMinimumAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithNegativeMinimumAndMarks.args = {
+-	__next40pxDefaultSize: true,
+ 	marks: marksWithNegatives,
+ 	max: 10,
+ 	min: -10,
+@@ -239,7 +230,6 @@ export const WithNegativeRangeAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithNegativeRangeAndMarks.args = {
+-	__next40pxDefaultSize: true,
+ 	marks: marksWithNegatives,
+ 	max: -1,
+ 	min: -10,
+@@ -255,7 +245,6 @@ export const WithAnyStepAndMarks: StoryFn< typeof RangeControl > =
+ 	MarkTemplate.bind( {} );
+ 
+ WithAnyStepAndMarks.args = {
+-	__next40pxDefaultSize: true,
+ 	marks: marksBase,
+ 	max: 10,
+ 	min: 0,
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index 36c2660af1ea2c..0d9d7ad563668b 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -18,7 +18,6 @@ import type {
+ 	TooltipProps,
+ 	TrackProps,
+ 	WrapperProps,
+-	RangeControlProps,
+ } from '../types';
+ 
+ const rangeHeightValue = 30;
+@@ -27,13 +26,7 @@ const rangeHeight = () =>
+ 	css( { height: rangeHeightValue, minHeight: rangeHeightValue } );
+ const thumbSize = 12;
+ 
+-const deprecatedHeight = ( {
+-	__next40pxDefaultSize,
+-}: Pick< RangeControlProps, '__next40pxDefaultSize' > ) =>
+-	! __next40pxDefaultSize && css( { minHeight: rangeHeightValue } );
+-
+-type RootProps = Pick< RangeControlProps, '__next40pxDefaultSize' >;
+-export const Root = styled.div< RootProps >`
++export const Root = styled.div`
+ 	-webkit-tap-highlight-color: transparent;
+ 	align-items: center;
+ 	display: flex;
+@@ -43,8 +36,6 @@ export const Root = styled.div< RootProps >`
+ 	touch-action: none;
+ 	width: 100%;
+ 	min-height: 40px;
+-	/* TODO: remove after removing the __next40pxDefaultSize prop */
+-	${ deprecatedHeight };
+ `;
+ 
+ const wrapperColor = ( { color = COLORS.ui.borderFocus }: WrapperProps ) =>
+diff --git a/packages/components/src/range-control/test/index.tsx b/packages/components/src/range-control/test/index.tsx
+index 40f23eceed4f15..bc87acf7353597 100644
+--- a/packages/components/src/range-control/test/index.tsx
++++ b/packages/components/src/range-control/test/index.tsx
+@@ -1,12 +1,5 @@
+-/**
+- * External dependencies
+- */
+ import { act, fireEvent, render, screen } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import _RangeControl from '../';
++import RangeControl from '../';
+ 
+ const getRangeInput = (): HTMLInputElement => screen.getByRole( 'slider' );
+ const getNumberInput = (): HTMLInputElement => screen.getByRole( 'spinbutton' );
+@@ -15,12 +8,6 @@ const getResetButton = (): HTMLButtonElement => screen.getByRole( 'button' );
+ const fireChangeEvent = ( input: HTMLInputElement, value?: number | string ) =>
+ 	fireEvent.change( input, { target: { value } } );
+ 
+-const RangeControl = (
+-	props: React.ComponentProps< typeof _RangeControl >
+-) => {
+-	return <_RangeControl { ...props } __next40pxDefaultSize />;
+-};
+-
+ describe( 'RangeControl', () => {
+ 	describe( '#render()', () => {
+ 		it( 'should trigger change callback with numeric value', () => {
+diff --git a/packages/components/src/range-control/types.ts b/packages/components/src/range-control/types.ts
+index c890b4874ef68f..cb3aa8635f6ea9 100644
+--- a/packages/components/src/range-control/types.ts
++++ b/packages/components/src/range-control/types.ts
+@@ -202,7 +202,8 @@ export type RangeControlProps = Pick<
+ 		/**
+ 		 * Start opting into the larger default height that will become the default size in a future version.
+ 		 *
+-		 * @default false
++		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
++		 * @ignore
+ 		 */
+ 		__next40pxDefaultSize?: boolean;
+ 		/**
+@@ -233,6 +234,7 @@ export type RangeControlProps = Pick<
+ 		 * Do not throw a warning for the deprecated 36px default size.
+ 		 * For internal components of other components that already throw the warning.
+ 		 *
++		 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+ 		 * @ignore
+ 		 */
+ 		__shouldNotWarnDeprecated36pxSize?: boolean;
+diff --git a/packages/components/src/validated-form-controls/components/range-control.tsx b/packages/components/src/validated-form-controls/components/range-control.tsx
+index 3610cc8396d8a5..006f94d9f1e929 100644
+--- a/packages/components/src/validated-form-controls/components/range-control.tsx
++++ b/packages/components/src/validated-form-controls/components/range-control.tsx
+@@ -17,11 +17,7 @@ const UnforwardedValidatedRangeControl = (
+ 		customValidity,
+ 		markWhenOptional,
+ 		...restProps
+-	}: Omit<
+-		React.ComponentProps< typeof RangeControl >,
+-		'__next40pxDefaultSize'
+-	> &
+-		ValidatedControlProps,
++	}: React.ComponentProps< typeof RangeControl > & ValidatedControlProps,
+ 	forwardedRef: React.ForwardedRef< HTMLInputElement >
+ ) => {
+ 	const validityTargetRef = useRef< HTMLInputElement >( null );
+@@ -34,11 +30,7 @@ const UnforwardedValidatedRangeControl = (
+ 			customValidity={ customValidity }
+ 			getValidityTarget={ () => validityTargetRef.current }
+ 		>
+-			<RangeControl
+-				__next40pxDefaultSize
+-				ref={ mergedRefs }
+-				{ ...restProps }
+-			/>
++			<RangeControl ref={ mergedRefs } { ...restProps } />
+ 		</ControlWithError>
+ 	);
+ };
+diff --git a/packages/dataviews/src/components/dataviews-layouts/grid/preview-size-picker.tsx b/packages/dataviews/src/components/dataviews-layouts/grid/preview-size-picker.tsx
+index 82e4bb2ffa0a09..4afd89b577e983 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/grid/preview-size-picker.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/grid/preview-size-picker.tsx
+@@ -84,7 +84,6 @@ export default function PreviewSizePicker() {
+ 
+ 	return (
+ 		<RangeControl
+-			__next40pxDefaultSize
+ 			showTooltip={ false }
+ 			label={ __( 'Preview size' ) }
+ 			value={ previewSizeToUse }
+diff --git a/packages/dataviews/src/components/dataviews-layouts/utils/preview-size-picker.tsx b/packages/dataviews/src/components/dataviews-layouts/utils/preview-size-picker.tsx
+index 61254fa16d2e82..e64138e659bff3 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/utils/preview-size-picker.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/utils/preview-size-picker.tsx
+@@ -63,7 +63,6 @@ export default function PreviewSizePicker() {
+ 
+ 	return (
+ 		<RangeControl
+-			__next40pxDefaultSize
+ 			showTooltip={ false }
+ 			label={ __( 'Preview size' ) }
+ 			value={ previewSizeToUse }
+diff --git a/packages/editor/src/components/post-revisions-preview/revisions-slider.js b/packages/editor/src/components/post-revisions-preview/revisions-slider.js
+index cf40eacd20407d..df57db0bbf180b 100644
+--- a/packages/editor/src/components/post-revisions-preview/revisions-slider.js
++++ b/packages/editor/src/components/post-revisions-preview/revisions-slider.js
+@@ -132,7 +132,6 @@ function RevisionsSlider() {
+ 			<Spinner />
+ 		) : (
+ 			<RangeControl
+-				__next40pxDefaultSize
+ 				aria-valuetext={ renderTooltipContent( selectedIndex ) }
+ 				className="editor-revisions-header__slider"
+ 				hideLabelFromVision
+diff --git a/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md b/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
+index 7e9fc7b3c27f4c..1a599a20522f6e 100644
+--- a/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
++++ b/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
+@@ -16,7 +16,6 @@ The following components are checked by this rule:
+ -   FormTokenField
+ -   InputControl
+ -   NumberControl
+--   RangeControl
+ -   SelectControl
+ -   ToggleGroupControl
+ -   UnitControl
+diff --git a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+index d73a1b7dcf8d35..0ee548303a6cc3 100644
+--- a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+@@ -128,7 +128,7 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
+ 					<FormTokenField __next40pxDefaultSize />
+ 					<InputControl __next40pxDefaultSize />
+ 					<NumberControl __next40pxDefaultSize />
+-					<RangeControl __next40pxDefaultSize />
++					<RangeControl />
+ 					<SelectControl __next40pxDefaultSize />
+ 					<ToggleGroupControl __next40pxDefaultSize />
+ 					<UnitControl __next40pxDefaultSize />
+diff --git a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+index ad22f45e3ac877..3d1eda9e026cac 100644
+--- a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+@@ -22,7 +22,6 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
+ 	'InputControl',
+ 	'NumberControl',
+ 	'Radio',
+-	'RangeControl',
+ 	'SelectControl',
+ 	'ToggleGroupControl',
+ 	'UnitControl',
+diff --git a/packages/global-styles-ui/src/size-control/index.tsx b/packages/global-styles-ui/src/size-control/index.tsx
+index 975fc25a785fe6..c90cddb329da25 100644
+--- a/packages/global-styles-ui/src/size-control/index.tsx
++++ b/packages/global-styles-ui/src/size-control/index.tsx
+@@ -69,7 +69,6 @@ function SizeControl( props: SizeControlProps ) {
+ 				<FlexItem isBlock>
+ 					<Spacer marginX={ 2 } marginBottom={ 0 }>
+ 						<RangeControl
+-							__next40pxDefaultSize
+ 							label={ label }
+ 							hideLabelFromVision
+ 							value={ valueQuantity }
+diff --git a/packages/media-editor/src/image-editor/stories/rectangle-crop.story.tsx b/packages/media-editor/src/image-editor/stories/rectangle-crop.story.tsx
+index 293bca39a6907a..fcde4b9214780f 100644
+--- a/packages/media-editor/src/image-editor/stories/rectangle-crop.story.tsx
++++ b/packages/media-editor/src/image-editor/stories/rectangle-crop.story.tsx
+@@ -450,7 +450,6 @@ const WithControlsComponent = () => {
+ 				</Flex>
+ 				<div className="image-editor-story__sliders">
+ 					<RangeControl
+-						__next40pxDefaultSize
+ 						label="Fine rotation"
+ 						min={ -MAX_ROTATION_OFFSET }
+ 						max={ MAX_ROTATION_OFFSET }
+@@ -459,7 +458,6 @@ const WithControlsComponent = () => {
+ 						onChange={ handleRotationSlider }
+ 					/>
+ 					<RangeControl
+-						__next40pxDefaultSize
+ 						label="Zoom"
+ 						min={ getMinZoom( state ) }
+ 						max={ MAX_ZOOM }
+@@ -866,7 +864,6 @@ const DebugComponent = () => {
+ 				</Flex>
+ 				<div className="image-editor-story__sliders">
+ 					<RangeControl
+-						__next40pxDefaultSize
+ 						label="Fine rotation"
+ 						min={ -MAX_ROTATION_OFFSET }
+ 						max={ MAX_ROTATION_OFFSET }
+@@ -875,7 +872,6 @@ const DebugComponent = () => {
+ 						onChange={ handleRotationSlider }
+ 					/>
+ 					<RangeControl
+-						__next40pxDefaultSize
+ 						label="Zoom"
+ 						min={ getMinZoom( state ) }
+ 						max={ MAX_ZOOM }
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index b940e5ee33926b..3671adfda39eca 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -179,6 +179,7 @@ const restrictedSyntax = [
+ 		'LetterSpacingControl',
+ 		'LineHeightControl',
+ 		'QueryControls',
++		'RangeControl',
+ 		'SearchControl',
+ 		'TextControl',
+ 		'TextIndentControl',

@@ -1,0 +1,36 @@
+diff --git a/packages/components/src/card/card/README.md b/packages/components/src/card/card/README.md
+index b640b7159c33db..ffad1e2ec36e53 100644
+--- a/packages/components/src/card/card/README.md
++++ b/packages/components/src/card/card/README.md
+@@ -20,7 +20,7 @@ function Example() {
+ 	return (
+ 		<Card>
+ 			<CardHeader>
+-				<Heading size={ 4 }>Card Title</Heading>
++				<Heading level={ 4 }>Card Title</Heading>
+ 			</CardHeader>
+ 			<CardBody>
+ 				<Text>Card Content</Text>
+diff --git a/packages/components/src/card/card/component.tsx b/packages/components/src/card/card/component.tsx
+index 57f9c6430c0c08..3de29bbd055e7f 100644
+--- a/packages/components/src/card/card/component.tsx
++++ b/packages/components/src/card/card/component.tsx
+@@ -88,15 +88,15 @@ function UnconnectedCard(
+  *   CardHeader,
+  *   CardBody,
+  *   CardFooter,
+- *   Text,
+- *   Heading,
++ *   __experimentalText as Text,
++ *   __experimentalHeading as Heading,
+  * } from `@wordpress/components`;
+  *
+  * function Example() {
+  *   return (
+  *     <Card>
+  *       <CardHeader>
+- *         <Heading size={ 4 }>Card Title</Heading>
++ *         <Heading level={ 4 }>Card Title</Heading>
+  *       </CardHeader>
+  *       <CardBody>
+  *         <Text>Card Content</Text>

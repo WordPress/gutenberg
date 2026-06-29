@@ -1,0 +1,75 @@
+diff --git a/packages/block-editor/src/hooks/margin.js b/packages/block-editor/src/hooks/margin.js
+index 8ae0a9d7d90835..b4287646f02219 100644
+--- a/packages/block-editor/src/hooks/margin.js
++++ b/packages/block-editor/src/hooks/margin.js
+@@ -124,26 +124,12 @@ export function MarginEdit( props ) {
+ 		} );
+ 	};
+ 
+-	const onChangeShowVisualizer = ( next ) => {
+-		const newStyle = {
+-			...style,
+-			visualizers: {
+-				margin: next,
+-			},
+-		};
+-
+-		setAttributes( {
+-			style: cleanEmptyObject( newStyle ),
+-		} );
+-	};
+-
+ 	return Platform.select( {
+ 		web: (
+ 			<>
+ 				<BoxControl
+ 					values={ style?.spacing?.margin }
+ 					onChange={ onChange }
+-					onChangeShowVisualizer={ onChangeShowVisualizer }
+ 					label={ __( 'Margin' ) }
+ 					sides={ sides }
+ 					units={ units }
+diff --git a/packages/block-editor/src/hooks/padding.js b/packages/block-editor/src/hooks/padding.js
+index f01276baefdf17..f4bfe1dced09ca 100644
+--- a/packages/block-editor/src/hooks/padding.js
++++ b/packages/block-editor/src/hooks/padding.js
+@@ -124,26 +124,12 @@ export function PaddingEdit( props ) {
+ 		} );
+ 	};
+ 
+-	const onChangeShowVisualizer = ( next ) => {
+-		const newStyle = {
+-			...style,
+-			visualizers: {
+-				padding: next,
+-			},
+-		};
+-
+-		setAttributes( {
+-			style: cleanEmptyObject( newStyle ),
+-		} );
+-	};
+-
+ 	return Platform.select( {
+ 		web: (
+ 			<>
+ 				<BoxControl
+ 					values={ style?.spacing?.padding }
+ 					onChange={ onChange }
+-					onChangeShowVisualizer={ onChangeShowVisualizer }
+ 					label={ __( 'Padding' ) }
+ 					sides={ sides }
+ 					units={ units }
+diff --git a/packages/components/src/box-control/README.md b/packages/components/src/box-control/README.md
+index 328bfb78c67721..7acdb444827ac6 100644
+--- a/packages/components/src/box-control/README.md
++++ b/packages/components/src/box-control/README.md
+@@ -140,7 +140,7 @@ A callback function when an input value changes.
+ A callback function for visualizer changes, based on input hover interactions.
+ 
+ -   Type: `Function`
+--   Required: Yes
++-   Required: No
+ 
+ ### resetValues
+ 

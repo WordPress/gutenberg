@@ -1,0 +1,57 @@
+diff --git a/packages/base-styles/CHANGELOG.md b/packages/base-styles/CHANGELOG.md
+index 74ebd7b570c307..4fa3364bf7e4eb 100644
+--- a/packages/base-styles/CHANGELOG.md
++++ b/packages/base-styles/CHANGELOG.md
+@@ -4,11 +4,12 @@
+ 
+ ### Breaking Changes
+ 
+--   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77759](https://github.com/WordPress/gutenberg/pull/77759), [#77772](https://github.com/WordPress/gutenberg/pull/77772), [#77806](https://github.com/WordPress/gutenberg/pull/77806), [#77807](https://github.com/WordPress/gutenberg/pull/77807), [#77808](https://github.com/WordPress/gutenberg/pull/77808)):
++-   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77759](https://github.com/WordPress/gutenberg/pull/77759), [#77772](https://github.com/WordPress/gutenberg/pull/77772), [#77806](https://github.com/WordPress/gutenberg/pull/77806), [#77807](https://github.com/WordPress/gutenberg/pull/77807), [#77808](https://github.com/WordPress/gutenberg/pull/77808), [#78180](https://github.com/WordPress/gutenberg/pull/78180)):
+     -   `.block-editor-block-manager__category-title`
+     -   `.block-editor-block-manager__disabled-blocks-count`
+     -   `.block-library-query-pattern__selection-search`
+     -   `.block-library-template-part__selection-search`
++    -   `.components-popover__close`
+     -   `.edit-site-layout__canvas-container.is-resizing::after`
+     -   `.edit-site-layout__canvas-container`
+     -   `.edit-site-layout__sidebar`
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index 550f680ecf4a56..51e4882cefd670 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -11,7 +11,6 @@ $z-layers: (
+ 	".components-modal__header": 10,
+ 	".edit-post-meta-boxes-area.is-loading::before": 1,
+ 	".edit-post-meta-boxes-area .spinner": 5,
+-	".components-popover__close": 5,
+ 	".edit-post-layout__footer": 30,
+ 	".interface-interface-skeleton__header": 30,
+ 	".interface-interface-skeleton__content": 20,
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fc3625c07ce951..ae1eee7f986513 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -21,6 +21,7 @@
+ -   Update `date-fns` dependency to `v4.1.0` ([#78057](https://github.com/WordPress/gutenberg/pull/78057)).
+ -   Update code to comply with `eslint-plugin-react-hooks` v7 ([#69962](https://github.com/WordPress/gutenberg/pull/69962)).
+ -   `SlotFill`: Add dependencies to `updateFill` effect ([#77907](https://github.com/WordPress/gutenberg/pull/77907)).
++-   `Popover`: Remove unnecessary close button z-index style ([#78180](https://github.com/WordPress/gutenberg/pull/78180)).
+ 
+ ## 33.0.0 (2026-04-29)
+ 
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index 50b9788e48e518..947c35baae34c1 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -73,10 +73,6 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
+ 	width: 100%;
+ }
+ 
+-.components-popover__close.components-button {
+-	z-index: z-index(".components-popover__close");
+-}
+-
+ .components-popover__arrow {
+ 	position: absolute;
+ 	width: $arrow-triangle-base-size;

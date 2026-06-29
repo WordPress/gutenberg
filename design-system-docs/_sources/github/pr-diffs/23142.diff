@@ -1,0 +1,442 @@
+diff --git a/packages/components/src/dropdown-menu/test/index.js b/packages/components/src/dropdown-menu/test/index.js
+index b72b6efbbe90d8..b8d57e8d851ecf 100644
+--- a/packages/components/src/dropdown-menu/test/index.js
++++ b/packages/components/src/dropdown-menu/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { shallow, mount } from 'enzyme';
++import { fireEvent, render } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -13,7 +13,14 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import DropdownMenu from '../';
+-import { Button, MenuItem, NavigableMenu } from '../../';
++import { MenuItem } from '../../';
++
++function getMenuToggleButton( container ) {
++	return container.querySelector( '.components-dropdown-menu__toggle' );
++}
++function getNavigableMenu( container ) {
++	return container.querySelector( '.components-dropdown-menu__menu' );
++}
+ 
+ describe( 'DropdownMenu', () => {
+ 	const children = ( { onClose } ) => <MenuItem onClick={ onClose } />;
+@@ -46,55 +53,60 @@ describe( 'DropdownMenu', () => {
+ 
+ 	describe( 'basic rendering', () => {
+ 		it( 'should render a null element when neither controls nor children are assigned', () => {
+-			const wrapper = shallow( <DropdownMenu /> );
++			const { container } = render( <DropdownMenu /> );
+ 
+-			expect( wrapper.type() ).toBeNull();
++			expect( container.firstChild ).toBeNull();
+ 		} );
+ 
+ 		it( 'should render a null element when controls are empty and children is not specified', () => {
+-			const wrapper = shallow( <DropdownMenu controls={ [] } /> );
++			const { container } = render( <DropdownMenu controls={ [] } /> );
+ 
+-			expect( wrapper.type() ).toBeNull();
++			expect( container.firstChild ).toBeNull();
+ 		} );
+ 
+ 		it( 'should open menu on arrow down (controls)', () => {
+-			const wrapper = mount( <DropdownMenu controls={ controls } /> );
+-			const button = wrapper
+-				.find( Button )
+-				.filter( '.components-dropdown-menu__toggle' );
++			const {
++				container: { firstChild: dropdownMenuContainer },
++			} = render( <DropdownMenu controls={ controls } /> );
+ 
+-			button.simulate( 'keydown', {
++			const button = getMenuToggleButton( dropdownMenuContainer );
++			button.focus();
++			fireEvent.keyDown( button, {
++				keyCode: DOWN,
+ 				stopPropagation: () => {},
+ 				preventDefault: () => {},
+-				keyCode: DOWN,
+ 			} );
++			const menu = getNavigableMenu( dropdownMenuContainer );
++			expect( menu ).toBeTruthy();
+ 
+-			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 1 );
+ 			expect(
+-				wrapper
+-					.find( Button )
+-					.filter( '.components-dropdown-menu__menu-item' )
++				dropdownMenuContainer.querySelectorAll(
++					'.components-dropdown-menu__menu-item'
++				)
+ 			).toHaveLength( controls.length );
+ 		} );
+ 
+ 		it( 'should open menu on arrow down (children)', () => {
+-			const wrapper = mount( <DropdownMenu children={ children } /> );
+-			const button = wrapper
+-				.find( Button )
+-				.filter( '.components-dropdown-menu__toggle' );
++			const {
++				container: { firstChild: dropdownMenuContainer },
++			} = render( <DropdownMenu children={ children } /> );
+ 
+-			button.simulate( 'keydown', {
++			const button = getMenuToggleButton( dropdownMenuContainer );
++			button.focus();
++			fireEvent.keyDown( button, {
++				keyCode: DOWN,
+ 				stopPropagation: () => {},
+ 				preventDefault: () => {},
+-				keyCode: DOWN,
+ 			} );
+ 
+-			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 1 );
++			expect( getNavigableMenu( dropdownMenuContainer ) ).toBeTruthy();
+ 
+-			wrapper.find( MenuItem ).props().onClick();
+-			wrapper.update();
++			const menuItem = dropdownMenuContainer.querySelector(
++				'.components-menu-item__button'
++			);
++			fireEvent.click( menuItem );
+ 
+-			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 0 );
++			expect( getNavigableMenu( dropdownMenuContainer ) ).toBeNull();
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/dropdown/README.md b/packages/components/src/dropdown/README.md
+index 31f5de665bea34..a19aa1afdb5ed4 100644
+--- a/packages/components/src/dropdown/README.md
++++ b/packages/components/src/dropdown/README.md
+@@ -108,3 +108,18 @@ Use this o object to access properties/feature if the `Popover` component that a
+  
+  - Type: `Object`
+  - Required: No
++
++### onClose
++
++A callback invoked when the popover should be closed.
++
++- Type: `Function`
++- Required: No
++
++### onToggle
++
++A callback invoked when the state of the popover changes from open to closed and vice versa.
++Function receives a boolean as a parameter. If `true`, the popover will open. If `false`, the popover will close.
++
++- Type: `Function`
++- Required: No
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index dbf8380b1ffa47..6418e2c173472f 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -6,48 +6,53 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { Component, createRef } from '@wordpress/element';
++import { useRef, useEffect, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Popover from '../popover';
+ 
+-class Dropdown extends Component {
+-	constructor() {
+-		super( ...arguments );
+-
+-		this.toggle = this.toggle.bind( this );
+-		this.close = this.close.bind( this );
+-		this.closeIfFocusOutside = this.closeIfFocusOutside.bind( this );
+-
+-		this.containerRef = createRef();
+-
+-		this.state = {
+-			isOpen: false,
+-		};
+-	}
++function useObservableState( initialState, onStateChange ) {
++	const [ state, setState ] = useState( initialState );
++	return [
++		state,
++		( value ) => {
++			setState( value );
++			if ( onStateChange ) {
++				onStateChange( value );
++			}
++		},
++	];
++}
+ 
+-	componentWillUnmount() {
+-		const { isOpen } = this.state;
+-		const { onToggle } = this.props;
+-		if ( isOpen && onToggle ) {
+-			onToggle( false );
+-		}
+-	}
++export default function Dropdown( {
++	renderContent,
++	renderToggle,
++	position = 'bottom right',
++	className,
++	contentClassName,
++	expandOnMobile,
++	headerTitle,
++	focusOnMount,
++	popoverProps,
++	onClose,
++	onToggle,
++} ) {
++	const containerRef = useRef();
++	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
+ 
+-	componentDidUpdate( prevProps, prevState ) {
+-		const { isOpen } = this.state;
+-		const { onToggle } = this.props;
+-		if ( prevState.isOpen !== isOpen && onToggle ) {
+-			onToggle( isOpen );
+-		}
+-	}
++	useEffect(
++		() => () => {
++			if ( onToggle ) {
++				onToggle( false );
++			}
++		},
++		[]
++	);
+ 
+-	toggle() {
+-		this.setState( ( state ) => ( {
+-			isOpen: ! state.isOpen,
+-		} ) );
++	function toggle() {
++		setIsOpen( ! isOpen );
+ 	}
+ 
+ 	/**
+@@ -57,65 +62,48 @@ class Dropdown extends Component {
+ 	 * case the correct behavior is to keep the dropdown closed. The same applies
+ 	 * in case when focus is moved to the modal dialog.
+ 	 */
+-	closeIfFocusOutside() {
++	function closeIfFocusOutside() {
+ 		if (
+-			! this.containerRef.current.contains( document.activeElement ) &&
++			! containerRef.current.contains( document.activeElement ) &&
+ 			! document.activeElement.closest( '[role="dialog"]' )
+ 		) {
+-			this.close();
++			close();
+ 		}
+ 	}
+ 
+-	close() {
+-		if ( this.props.onClose ) {
+-			this.props.onClose();
++	function close() {
++		if ( onClose ) {
++			onClose();
+ 		}
+-		this.setState( { isOpen: false } );
++		setIsOpen( false );
+ 	}
+ 
+-	render() {
+-		const { isOpen } = this.state;
+-		const {
+-			renderContent,
+-			renderToggle,
+-			position = 'bottom right',
+-			className,
+-			contentClassName,
+-			expandOnMobile,
+-			headerTitle,
+-			focusOnMount,
+-			popoverProps,
+-		} = this.props;
++	const args = { isOpen, onToggle: toggle, onClose: close };
+ 
+-		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
+-
+-		return (
+-			<div
+-				className={ classnames( 'components-dropdown', className ) }
+-				ref={ this.containerRef }
+-			>
+-				{ renderToggle( args ) }
+-				{ isOpen && (
+-					<Popover
+-						position={ position }
+-						onClose={ this.close }
+-						onFocusOutside={ this.closeIfFocusOutside }
+-						expandOnMobile={ expandOnMobile }
+-						headerTitle={ headerTitle }
+-						focusOnMount={ focusOnMount }
+-						{ ...popoverProps }
+-						className={ classnames(
+-							'components-dropdown__content',
+-							popoverProps ? popoverProps.className : undefined,
+-							contentClassName
+-						) }
+-					>
+-						{ renderContent( args ) }
+-					</Popover>
+-				) }
+-			</div>
+-		);
+-	}
++	return (
++		<div
++			className={ classnames( 'components-dropdown', className ) }
++			ref={ containerRef }
++		>
++			{ renderToggle( args ) }
++			{ isOpen && (
++				<Popover
++					position={ position }
++					onClose={ close }
++					onFocusOutside={ closeIfFocusOutside }
++					expandOnMobile={ expandOnMobile }
++					headerTitle={ headerTitle }
++					focusOnMount={ focusOnMount }
++					{ ...popoverProps }
++					className={ classnames(
++						'components-dropdown__content',
++						popoverProps ? popoverProps.className : undefined,
++						contentClassName
++					) }
++				>
++					{ renderContent( args ) }
++				</Popover>
++			) }
++		</div>
++	);
+ }
+-
+-export default Dropdown;
+diff --git a/packages/components/src/dropdown/test/index.js b/packages/components/src/dropdown/test/index.js
+index 44e57b56532dbf..a18e2479d37e8f 100644
+--- a/packages/components/src/dropdown/test/index.js
++++ b/packages/components/src/dropdown/test/index.js
+@@ -1,38 +1,41 @@
+ /**
+  * External dependencies
+  */
+-import TestUtils from 'react-dom/test-utils';
++import { fireEvent, render } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Dropdown from '../';
+ 
++function getButtonElement( container ) {
++	return container.querySelector( 'button' );
++}
++function getOpenCloseButton( container, selector ) {
++	return container.querySelector( selector );
++}
++
+ describe( 'Dropdown', () => {
+-	const expectPopoverVisible = ( wrapper, visible ) => {
+-		expect(
+-			TestUtils.scryRenderedDOMComponentsWithClass(
+-				wrapper,
+-				'components-popover'
+-			)
+-		).toHaveLength( visible ? 1 : 0 );
+-	};
+-	const buttonElement = ( wrapper ) =>
+-		TestUtils.findRenderedDOMComponentWithTag( wrapper, 'button' );
+-	const openCloseElement = ( wrapper, className ) =>
+-		TestUtils.findRenderedDOMComponentWithClass( wrapper, className );
++	function expectPopoverVisible( container, value ) {
++		const popover = container.querySelector( '.components-popover' );
++		if ( value ) {
++			expect( popover ).toBeTruthy();
++		} else {
++			expect( popover ).toBeFalsy();
++		}
++	}
+ 
+ 	it( 'should toggle the dropdown properly', () => {
+-		const expectButtonExpanded = ( wrapper, expanded ) => {
+-			expect(
+-				TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'button' )
+-			).toHaveLength( 1 );
++		const expectButtonExpanded = ( container, expanded ) => {
++			expect( container.querySelectorAll( 'button' ) ).toHaveLength( 1 );
+ 			expect(
+-				buttonElement( wrapper ).getAttribute( 'aria-expanded' )
++				getButtonElement( container ).getAttribute( 'aria-expanded' )
+ 			).toBe( expanded.toString() );
+ 		};
+ 
+-		const wrapper = TestUtils.renderIntoDocument(
++		const {
++			container: { firstChild: dropdownContainer },
++		} = render(
+ 			<Dropdown
+ 				className="container"
+ 				contentClassName="content"
+@@ -45,17 +48,20 @@ describe( 'Dropdown', () => {
+ 			/>
+ 		);
+ 
+-		expectButtonExpanded( wrapper, false );
+-		expectPopoverVisible( wrapper, false );
++		expectButtonExpanded( dropdownContainer, false );
++		expectPopoverVisible( dropdownContainer, false );
+ 
+-		TestUtils.Simulate.click( buttonElement( wrapper ) );
++		const button = getButtonElement( dropdownContainer );
++		fireEvent.click( button );
+ 
+-		expectButtonExpanded( wrapper, true );
+-		expectPopoverVisible( wrapper, true );
++		expectButtonExpanded( dropdownContainer, true );
++		expectPopoverVisible( dropdownContainer, true );
+ 	} );
+ 
+ 	it( 'should close the dropdown when calling onClose', () => {
+-		const wrapper = TestUtils.renderIntoDocument(
++		const {
++			container: { firstChild: dropdownContainer },
++		} = render(
+ 			<Dropdown
+ 				className="container"
+ 				contentClassName="content"
+@@ -76,14 +82,16 @@ describe( 'Dropdown', () => {
+ 			/>
+ 		);
+ 
+-		expectPopoverVisible( wrapper, false );
++		expectPopoverVisible( dropdownContainer, false );
+ 
+-		TestUtils.Simulate.click( openCloseElement( wrapper, 'open' ) );
++		const openButton = getOpenCloseButton( dropdownContainer, '.open' );
++		fireEvent.click( openButton );
+ 
+-		expectPopoverVisible( wrapper, true );
++		expectPopoverVisible( dropdownContainer, true );
+ 
+-		TestUtils.Simulate.click( openCloseElement( wrapper, 'close' ) );
++		const closeButton = getOpenCloseButton( dropdownContainer, '.close' );
++		fireEvent.click( closeButton );
+ 
+-		expectPopoverVisible( wrapper, false );
++		expectPopoverVisible( dropdownContainer, false );
+ 	} );
+ } );

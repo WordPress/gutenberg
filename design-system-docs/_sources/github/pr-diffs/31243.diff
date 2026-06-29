@@ -1,0 +1,495 @@
+diff --git a/packages/components/src/ui/control-group/hook.js b/packages/components/src/ui/control-group/hook.js
+index 15d881e7bef0e3..db3db0c60c19b1 100644
+--- a/packages/components/src/ui/control-group/hook.js
++++ b/packages/components/src/ui/control-group/hook.js
+@@ -1,12 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import { cx } from '@wp-g2/styles';
+-import { getValidChildren } from '@wp-g2/utils';
++import { cx } from 'emotion';
+ 
+ /**
+  * Internal dependencies
+  */
++import { getValidChildren } from '../utils/get-valid-children';
+ import { useContextSystem } from '../context';
+ import { ControlGroupContext } from './context';
+ import * as styles from './styles';
+diff --git a/packages/components/src/ui/flex/context.ts b/packages/components/src/ui/flex/context.ts
+new file mode 100644
+index 00000000000000..45d6a0d4878a8c
+--- /dev/null
++++ b/packages/components/src/ui/flex/context.ts
+@@ -0,0 +1,12 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++export const FlexContext = createContext< {
++	flexItemDisplay: 'block' | undefined;
++} >( {
++	flexItemDisplay: undefined,
++} );
++
++export const useFlexContext = () => useContext( FlexContext );
+diff --git a/packages/components/src/ui/flex/flex.js b/packages/components/src/ui/flex/flex.js
+index 69dc4be48af498..e9cd94b19df2cf 100644
+--- a/packages/components/src/ui/flex/flex.js
++++ b/packages/components/src/ui/flex/flex.js
+@@ -1,8 +1,28 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../utils';
++import { contextConnect } from '../context';
+ import { useFlex } from './use-flex';
++import { FlexContext } from './context';
++import { View } from '../view';
++
++/**
++ * @param {import('../context').ViewOwnProps<import('./types').FlexProps, 'div'>} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function Flex( props, forwardedRef ) {
++	const { children, isColumn, ...otherProps } = useFlex( props );
++
++	return (
++		<FlexContext.Provider
++			value={ { flexItemDisplay: isColumn ? 'block' : undefined } }
++		>
++			<View { ...otherProps } ref={ forwardedRef }>
++				{ children }
++			</View>
++		</FlexContext.Provider>
++	);
++}
+ 
+ /**
+  * `Flex` is a primitive layout component that adaptively aligns child content
+@@ -28,11 +48,8 @@ import { useFlex } from './use-flex';
+  * 	);
+  * }
+  * ```
++ *
+  */
+-const Flex = createComponent( {
+-	as: 'div',
+-	useHook: useFlex,
+-	name: 'Flex',
+-} );
++const ConnectedFlex = contextConnect( Flex, 'Flex' );
+ 
+-export default Flex;
++export default ConnectedFlex;
+diff --git a/packages/components/src/ui/flex/test/__snapshots__/index.js.snap b/packages/components/src/ui/flex/test/__snapshots__/index.js.snap
+index e34cc720107925..6d30b0cc90e2c6 100644
+--- a/packages/components/src/ui/flex/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/flex/test/__snapshots__/index.js.snap
+@@ -6,7 +6,7 @@ Snapshot Diff:
+ + Second value
+ 
+ @@ -7,14 +7,10 @@
+-      class="css-1636tkh-Item css-1bncg8t components-flex-item css-1mm2cvy-View egi4jkx0"
++      class="components-flex-item css-1636tkh-Item css-1mm2cvy-View egi4jkx0"
+       data-wp-c16t="true"
+       data-wp-component="FlexItem"
+     />
+@@ -15,7 +15,7 @@ Snapshot Diff:
+ -   />
+ -   <div />
+ -   <div
+-      class="css-1636tkh-Item css-1bncg8t css-jhhyjf-block components-flex-item components-flex-block css-1mm2cvy-View egi4jkx0"
++      class="components-flex-item components-flex-block css-1fgvc79-Item-block css-1mm2cvy-View egi4jkx0"
+       data-wp-c16t="true"
+       data-wp-component="FlexBlock"
+     />
+@@ -60,12 +60,6 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ .emotion-6 {
+-  -webkit-flex: 1;
+-  -ms-flex: 1;
+-  flex: 1;
+-}
+-
+-.emotion-9 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -84,30 +78,37 @@ exports[`props should render correctly 1`] = `
+   width: 100%;
+ }
+ 
+-.emotion-9 > * + *:not(marquee) {
++.emotion-6 > * + *:not(marquee) {
+   margin-left: calc(4px * 2);
+ }
+ 
+-.emotion-9 > * {
++.emotion-6 > * {
+   min-width: 0;
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+-  display: var(--wp-g2-flex-item-display);
++.emotion-3 {
++  display: block;
++  max-height: 100%;
++  max-width: 100%;
++  min-height: 0;
++  min-width: 0;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
+ }
+ 
+ <div
+-  class="components-flex emotion-9 emotion-2 emotion-3"
++  class="components-flex emotion-6 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Flex"
+ >
+   <div
+-    class="emotion-0 emotion-1 components-flex-item emotion-2 emotion-3"
++    class="components-flex-item emotion-0 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="FlexItem"
+   />
+   <div
+-    class="emotion-0 emotion-1 emotion-6 components-flex-item components-flex-block emotion-2 emotion-3"
++    class="components-flex-item components-flex-block emotion-3 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="FlexBlock"
+   />
+diff --git a/packages/components/src/ui/flex/use-flex-item.js b/packages/components/src/ui/flex/use-flex-item.js
+index 93c533b8e56f89..b2b691fd95eb0d 100644
+--- a/packages/components/src/ui/flex/use-flex-item.js
++++ b/packages/components/src/ui/flex/use-flex-item.js
+@@ -1,12 +1,13 @@
+ /**
+  * External dependencies
+  */
+-import { css, cx, ui } from '@wp-g2/styles';
++import { css, cx } from 'emotion';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { useContextSystem } from '../context';
++import { useFlexContext } from './context';
+ import * as styles from './styles';
+ 
+ /**
+@@ -21,8 +22,10 @@ export function useFlexItem( props ) {
+ 	} = useContextSystem( props, 'FlexItem' );
+ 	const sx = {};
+ 
++	const contextDisplay = useFlexContext().flexItemDisplay;
++
+ 	sx.Base = css( {
+-		display: displayProp || ui.get( 'flexItemDisplay' ),
++		display: displayProp || contextDisplay,
+ 	} );
+ 
+ 	const classes = cx(
+diff --git a/packages/components/src/ui/flex/use-flex.js b/packages/components/src/ui/flex/use-flex.js
+index 7465b41fd69169..873a9c3b88745b 100644
+--- a/packages/components/src/ui/flex/use-flex.js
++++ b/packages/components/src/ui/flex/use-flex.js
+@@ -102,5 +102,5 @@ export function useFlex( props ) {
+ 		wrap,
+ 	] );
+ 
+-	return { ...otherProps, className: classes };
++	return { ...otherProps, className: classes, isColumn };
+ }
+diff --git a/packages/components/src/ui/h-stack/hook.js b/packages/components/src/ui/h-stack/hook.js
+index b3c9b9e30a9da4..687e44cd91c41a 100644
+--- a/packages/components/src/ui/h-stack/hook.js
++++ b/packages/components/src/ui/h-stack/hook.js
+@@ -1,15 +1,10 @@
+-/**
+- * External dependencies
+- */
+-import { ui } from '@wp-g2/styles';
+-import { getValidChildren } from '@wp-g2/utils';
+-
+ /**
+  * Internal dependencies
+  */
+ import { hasConnectNamespace, useContextSystem } from '../context';
+ import { FlexItem, useFlex } from '../flex';
+ import { getAlignmentProps } from './utils';
++import { getValidChildren } from '../utils/get-valid-children';
+ 
+ /**
+  *
+@@ -34,14 +29,7 @@ export function useHStack( props ) {
+ 			const _isSpacer = hasConnectNamespace( child, [ 'Spacer' ] );
+ 
+ 			if ( _isSpacer ) {
+-				return (
+-					<FlexItem
+-						isBlock
+-						key={ _key }
+-						{ ...child.props }
+-						{ ...ui.$( 'Spacer' ) }
+-					/>
+-				);
++				return <FlexItem isBlock key={ _key } { ...child.props } />;
+ 			}
+ 
+ 			return child;
+diff --git a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+index 89d5bf7a0460a8..1bd1ff79415665 100644
+--- a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+@@ -1,16 +1,6 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12 {
+-  background-color: #ffffff;
+-  background-color: var(--wp-g2-surface-color);
+-  color: #1e1e1e;
+-  color: var(--wp-g2-color-text);
+-  position: relative;
+-  --wp-g2-surface-background-size: 12px;
+-  --wp-g2-surface-background-size-dotted: 11px;
+-}
+-
+ .emotion-11 {
+   box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+   outline: none;
+@@ -105,6 +95,16 @@ exports[`props should render correctly 1`] = `
+   border-radius: 2px;
+ }
+ 
++.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12 {
++  background-color: #ffffff;
++  background-color: var(--wp-g2-surface-color);
++  color: #1e1e1e;
++  color: var(--wp-g2-color-text);
++  position: relative;
++  --wp-g2-surface-background-size: 12px;
++  --wp-g2-surface-background-size-dotted: 11px;
++}
++
+ <div
+   class="components-surface components-card emotion-11 emotion-12 emotion-1 emotion-2"
+   data-wp-c16t="true"
+diff --git a/packages/components/src/ui/spinner/component.js b/packages/components/src/ui/spinner/component.js
+index a5f17cc76ad5c7..17775157a23ad6 100644
+--- a/packages/components/src/ui/spinner/component.js
++++ b/packages/components/src/ui/spinner/component.js
+@@ -1,14 +1,10 @@
+-/**
+- * External dependencies
+- */
+-import { get } from '@wp-g2/styles';
+-
+ /**
+  * Internal dependencies
+  */
+ import { BarsView, BarsWrapperView, ContainerView } from './styles';
+ import { BASE_SIZE, WRAPPER_SIZE } from './utils';
+ import { contextConnect, useContextSystem } from '../context';
++import { COLORS } from '../../utils/colors-values';
+ 
+ /* eslint-disable jsdoc/valid-types */
+ /**
+@@ -25,7 +21,7 @@ import { contextConnect, useContextSystem } from '../context';
+  */
+ function Spinner( props, forwardedRef ) {
+ 	const {
+-		color = get( 'colorText' ),
++		color = COLORS.black,
+ 		size = BASE_SIZE,
+ 		...otherProps
+ 	} = useContextSystem( props, 'Spinner' );
+diff --git a/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap b/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
+index f775458f874de3..3259fe3757e44b 100644
+--- a/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
+@@ -5,13 +5,14 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -10,11 +10,10 @@
++@@ -10,11 +10,11 @@
+       class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
+       style="transform: scale(0.4444444444444444);"
+     >
+       <div
+         class="css-lrlbd4-BarsView e1s9yo7h2"
+ -       style="color: blue;"
+++       style="color: rgb(0, 0, 0);"
+       >
+         <div
+           class="InnerBar1"
+@@ -181,6 +182,7 @@ exports[`props should render correctly 1`] = `
+   >
+     <div
+       class="emotion-0 emotion-1"
++      style="color: rgb(0, 0, 0);"
+     >
+       <div
+         class="InnerBar1"
+@@ -245,6 +247,6 @@ Snapshot Diff:
+     >
+       <div
+         class="css-lrlbd4-BarsView e1s9yo7h2"
++        style="color: rgb(0, 0, 0);"
+       >
+-        <div
+ `;
+diff --git a/packages/components/src/ui/text/test/__snapshots__/text.js.snap b/packages/components/src/ui/text/test/__snapshots__/text.js.snap
+index 838b0f9389276a..6b0ae73ebfec20 100644
+--- a/packages/components/src/ui/text/test/__snapshots__/text.js.snap
++++ b/packages/components/src/ui/text/test/__snapshots__/text.js.snap
+@@ -22,7 +22,6 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] =
+ >
+   <span
+     class=""
+-    data-g2-component="Text"
+   >
+     Lorem ipsum.
+   </span>
+diff --git a/packages/components/src/ui/text/test/text.js b/packages/components/src/ui/text/test/text.js
+index 46580a6cfed14e..45b3d956c0809b 100644
+--- a/packages/components/src/ui/text/test/text.js
++++ b/packages/components/src/ui/text/test/text.js
+@@ -92,7 +92,7 @@ describe( 'Text', () => {
+ 		expect( wrapper.container.firstChild.childNodes ).toHaveLength( 5 );
+ 		const words = await wrapper.findAllByText( 'm' );
+ 		expect( words ).toHaveLength( 2 );
+-		expect( words[ 0 ].dataset.g2Component ).toBe( 'TextHighlight' );
++		words.forEach( ( word ) => expect( word.tagName ).toEqual( 'MARK' ) );
+ 	} );
+ 
+ 	test( 'should render highlighted words with undefined passed', () => {
+diff --git a/packages/components/src/ui/text/utils.js b/packages/components/src/ui/text/utils.js
+index 49536b158260c3..4d674cd6871dcf 100644
+--- a/packages/components/src/ui/text/utils.js
++++ b/packages/components/src/ui/text/utils.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { ui } from '@wp-g2/styles';
+ import memoize from 'memize';
+ import { findAll } from 'highlight-words-core';
+ 
+@@ -126,7 +125,6 @@ export function createHighlighterText( {
+ 
+ 			/** @type {Record<string, any>} */
+ 			const props = {
+-				...ui.$( 'TextHighlight' ),
+ 				children: text,
+ 				className: highlightClassNames,
+ 				key: index,
+@@ -142,7 +140,6 @@ export function createHighlighterText( {
+ 			return createElement( HighlightTag, props );
+ 		}
+ 		return createElement( 'span', {
+-			...ui.$( 'Text' ),
+ 			children: text,
+ 			className: unhighlightClassName,
+ 			key: index,
+diff --git a/packages/components/src/ui/utils/get-valid-children.ts b/packages/components/src/ui/utils/get-valid-children.ts
+new file mode 100644
+index 00000000000000..47daa26bfc0b1a
+--- /dev/null
++++ b/packages/components/src/ui/utils/get-valid-children.ts
+@@ -0,0 +1,25 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { ReactNode, ReactNodeArray } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { Children, isValidElement } from '@wordpress/element';
++
++/**
++ * Gets a collection of available children elements from a React component's children prop.
++ *
++ * @param {import('react').ReactNode} children
++ *
++ * @return {import('react').ReactNodeArray} An array of available children.
++ */
++export function getValidChildren( children: ReactNode ): ReactNodeArray {
++	if ( typeof children === 'string' ) return [ children ];
++
++	return Children.toArray( children ).filter( ( child ) =>
++		isValidElement( child )
++	);
++}
+diff --git a/packages/components/src/ui/v-stack/hook.js b/packages/components/src/ui/v-stack/hook.js
+index 8f241444854d37..83dd12053e1bad 100644
+--- a/packages/components/src/ui/v-stack/hook.js
++++ b/packages/components/src/ui/v-stack/hook.js
+@@ -1,11 +1,7 @@
+-/**
+- * External dependencies
+- */
+-import { useContextSystem } from '@wp-g2/context';
+-
+ /**
+  * Internal dependencies
+  */
++import { useContextSystem } from '../context';
+ import { useHStack } from '../h-stack';
+ 
+ /**
+diff --git a/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap b/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap
+index 02dc6825bb9ccc..54e0d72bd011b0 100644
+--- a/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap
+@@ -28,11 +28,9 @@ exports[`props should render alignment 1`] = `
+ }
+ 
+ <div
+-  class="components-flex components-h-stack components-v-stack wp-components-v-stack ic-osizff emotion-4 emotion-0 emotion-1"
+-  data-g2-c16t="true"
+-  data-g2-component="VStack"
++  class="components-flex components-h-stack components-v-stack emotion-4 emotion-0 emotion-1"
+   data-wp-c16t="true"
+-  data-wp-component="HStack"
++  data-wp-component="VStack"
+ >
+   <div
+     class="emotion-0 emotion-1"
+@@ -71,11 +69,9 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-flex components-h-stack components-v-stack wp-components-v-stack ic-osizff emotion-4 emotion-0 emotion-1"
+-  data-g2-c16t="true"
+-  data-g2-component="VStack"
++  class="components-flex components-h-stack components-v-stack emotion-4 emotion-0 emotion-1"
+   data-wp-c16t="true"
+-  data-wp-component="HStack"
++  data-wp-component="VStack"
+ >
+   <div
+     class="emotion-0 emotion-1"
+@@ -114,11 +110,9 @@ exports[`props should render spacing 1`] = `
+ }
+ 
+ <div
+-  class="components-flex components-h-stack components-v-stack wp-components-v-stack ic-osizff emotion-4 emotion-0 emotion-1"
+-  data-g2-c16t="true"
+-  data-g2-component="VStack"
++  class="components-flex components-h-stack components-v-stack emotion-4 emotion-0 emotion-1"
+   data-wp-c16t="true"
+-  data-wp-component="HStack"
++  data-wp-component="VStack"
+ >
+   <div
+     class="emotion-0 emotion-1"

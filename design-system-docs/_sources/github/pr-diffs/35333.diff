@@ -1,0 +1,68 @@
+diff --git a/packages/components/src/card/card/hook.js b/packages/components/src/card/card/hook.js
+index d5a5cf0b478411..ad3f4dc99f5bb5 100644
+--- a/packages/components/src/card/card/hook.js
++++ b/packages/components/src/card/card/hook.js
+@@ -59,8 +59,6 @@ export function useCard( props ) {
+ 			styles.Card,
+ 			isBorderless && styles.boxShadowless,
+ 			isRounded && styles.rounded,
+-			// This classname is added for legacy compatibility reasons.
+-			'components-card',
+ 			className
+ 		);
+ 	}, [ className, isBorderless, isRounded ] );
+diff --git a/packages/components/src/card/test/__snapshots__/index.js.snap b/packages/components/src/card/test/__snapshots__/index.js.snap
+index 88a4c8801e75a8..adf11cff8056a3 100644
+--- a/packages/components/src/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/card/test/__snapshots__/index.js.snap
+@@ -157,8 +157,8 @@ Snapshot Diff:
+ @@ -1,30 +1,30 @@
+   <div>
+     <div
+--     class="components-surface components-card components-card css-ssx2ib-View-Surface-getBorders-primary-Card-boxShadowless-rounded em57xhy0"
+-+     class="components-surface components-card components-card css-1vyvcpq-View-Surface-getBorders-primary-Card-rounded em57xhy0"
++-     class="components-surface components-card css-ssx2ib-View-Surface-getBorders-primary-Card-boxShadowless-rounded em57xhy0"
+++     class="components-surface components-card css-1vyvcpq-View-Surface-getBorders-primary-Card-rounded em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="Card"
+     >
+@@ -375,7 +375,7 @@ Object {
+ <body>
+     <div>
+       <div
+-        class="components-surface components-card components-card emotion-0 emotion-1"
++        class="components-surface components-card emotion-0 emotion-1"
+         data-wp-c16t="true"
+         data-wp-component="Card"
+       >
+@@ -630,7 +630,7 @@ Object {
+ 
+ <div>
+     <div
+-      class="components-surface components-card components-card emotion-0 emotion-1"
++      class="components-surface components-card emotion-0 emotion-1"
+       data-wp-c16t="true"
+       data-wp-component="Card"
+     >
+@@ -850,7 +850,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`]
+ 
+ <div>
+   <div
+-    class="components-surface components-card components-card emotion-0 emotion-1"
++    class="components-surface components-card emotion-0 emotion-1"
+     data-wp-c16t="true"
+     data-wp-component="Card"
+   >
+diff --git a/packages/components/src/flyout/test/__snapshots__/index.js.snap b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+index 1a03000beb4167..9aeeace655ce5e 100644
+--- a/packages/components/src/flyout/test/__snapshots__/index.js.snap
++++ b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+@@ -86,7 +86,7 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-surface components-card components-card emotion-0 emotion-1 emotion-2"
++  class="components-surface components-card emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Card"
+ >

@@ -1,0 +1,57 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 17975b105967fa..2d132c096efc8c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `InputControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40622](https://github.com/WordPress/gutenberg/pull/40622)).
++-   `UnitControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40627](https://github.com/WordPress/gutenberg/pull/40627)).
+ 
+ ## 19.9.0 (2022-04-21)
+ 
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.ts b/packages/components/src/unit-control/styles/unit-control-styles.ts
+index 7035df6f47d1b2..6085f1fe9cdf65 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.ts
++++ b/packages/components/src/unit-control/styles/unit-control-styles.ts
+@@ -26,21 +26,11 @@ export const Root = styled.div`
+ 	position: relative;
+ `;
+ 
+-const paddingStyles = ( { disableUnits, size }: InputProps ) => {
+-	const paddings = {
+-		default: {
+-			paddingRight: 8,
+-		},
+-		small: {
+-			paddingRight: 8,
+-		},
+-		'__unstable-large': {
+-			paddingRight: disableUnits ? 16 : 8,
+-		},
+-	};
++const paddingStyles = ( { disableUnits }: InputProps ) => {
++	if ( disableUnits ) return '';
+ 
+ 	return css`
+-		${ rtl( paddings[ size ] )() };
++		${ rtl( { paddingRight: 8 } )() };
+ 	`;
+ };
+ 
+diff --git a/packages/components/src/unit-control/types.ts b/packages/components/src/unit-control/types.ts
+index c48a230997ce8a..c2b18361d82ba8 100644
+--- a/packages/components/src/unit-control/types.ts
++++ b/packages/components/src/unit-control/types.ts
+@@ -74,7 +74,10 @@ export type UnitSelectControlProps = {
+ 
+ // TODO: when available, should (partially) extend `NumberControl` props.
+ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
+-	Pick< InputControlProps, 'hideLabelFromVision' > & {
++	Pick<
++		InputControlProps,
++		'hideLabelFromVision' | '__next36pxDefaultSize'
++	> & {
+ 		__unstableStateReducer?: StateReducer;
+ 		__unstableInputWidth?: CSSProperties[ 'width' ];
+ 		/**

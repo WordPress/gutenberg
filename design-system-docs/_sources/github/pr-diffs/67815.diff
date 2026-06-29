@@ -1,0 +1,36 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2dc35bd54b3eeb..55840b9c2e06e6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -46,6 +46,7 @@
+ 
+ -   `ResizableBox`: Make drag handles focusable ([#67305](https://github.com/WordPress/gutenberg/pull/67305)).
+ -   `CustomSelectControl`: Update correctly when `showSelectedHint` is enabled ([#67733](https://github.com/WordPress/gutenberg/pull/67733)).
++-   `CustomSelectControl`: Use `useStoreState` to get `currentValue` and avoid stale values ([#67815](https://github.com/WordPress/gutenberg/pull/67815)).
+ 
+ ## 28.13.0 (2024-11-27)
+ 
+diff --git a/packages/components/src/custom-select-control/index.tsx b/packages/components/src/custom-select-control/index.tsx
+index 339944f4198722..e014e4bc642eef 100644
+--- a/packages/components/src/custom-select-control/index.tsx
++++ b/packages/components/src/custom-select-control/index.tsx
+@@ -149,16 +149,16 @@ function CustomSelectControl< T extends CustomSelectOption >(
+ 			);
+ 		} );
+ 
+-	const { value: currentValue } = store.getState();
++	const currentValue = Ariakit.useStoreState( store, 'value' );
+ 
+ 	const renderSelectedValueHint = () => {
+ 		const selectedOptionHint = options
+ 			?.map( applyOptionDeprecations )
+-			?.find( ( { name } ) => store.getState().value === name )?.hint;
++			?.find( ( { name } ) => currentValue === name )?.hint;
+ 
+ 		return (
+ 			<Styled.SelectedExperimentalHintWrapper>
+-				{ store.getState().value }
++				{ currentValue }
+ 				{ selectedOptionHint && (
+ 					<Styled.SelectedExperimentalHintItem
+ 						// Keeping the classname for legacy reasons

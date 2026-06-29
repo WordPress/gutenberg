@@ -1,0 +1,491 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3be2e8f6a8cbcb..e00986f2bd4715 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,10 @@
+ -   `CustomGradientPicker`: improve initial state UI ([#49146](https://github.com/WordPress/gutenberg/pull/49146)).
+ -	`AnglePickerControl`: Style to better fit in narrow contexts and improve RTL layout ([#49046](https://github.com/WordPress/gutenberg/pull/49046)).
+ 
++### Internal
++
++-   `DuotonePicker`, `DuotoneSwatch`: Convert to TypeScript ([#49060](https://github.com/WordPress/gutenberg/pull/49060)).
++
+ ## 23.6.0 (2023-03-15)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/color-list-picker/index.tsx b/packages/components/src/duotone-picker/color-list-picker/index.tsx
+similarity index 86%
+rename from packages/components/src/color-list-picker/index.tsx
+rename to packages/components/src/duotone-picker/color-list-picker/index.tsx
+index 48f56ca9abac6d..95ed02c639e632 100644
+--- a/packages/components/src/color-list-picker/index.tsx
++++ b/packages/components/src/duotone-picker/color-list-picker/index.tsx
+@@ -7,11 +7,11 @@ import { swatch } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import Button from '../button';
+-import ColorPalette from '../color-palette';
+-import ColorIndicator from '../color-indicator';
+-import Icon from '../icon';
+-import { HStack } from '../h-stack';
++import Button from '../../button';
++import ColorPalette from '../../color-palette';
++import ColorIndicator from '../../color-indicator';
++import Icon from '../../icon';
++import { HStack } from '../../h-stack';
+ import type { ColorListPickerProps, ColorOptionProps } from './types';
+ 
+ function ColorOption( {
+@@ -75,7 +75,8 @@ function ColorListPicker( {
+ 					disableCustomColors={ disableCustomColors }
+ 					enableAlpha={ enableAlpha }
+ 					onChange={ ( newColor ) => {
+-						const newColors = value.slice();
++						const newColors: ( string | undefined )[] =
++							value.slice();
+ 						newColors[ index ] = newColor;
+ 						onChange( newColors );
+ 					} }
+diff --git a/packages/components/src/color-list-picker/style.scss b/packages/components/src/duotone-picker/color-list-picker/style.scss
+similarity index 100%
+rename from packages/components/src/color-list-picker/style.scss
+rename to packages/components/src/duotone-picker/color-list-picker/style.scss
+diff --git a/packages/components/src/color-list-picker/types.ts b/packages/components/src/duotone-picker/color-list-picker/types.ts
+similarity index 91%
+rename from packages/components/src/color-list-picker/types.ts
+rename to packages/components/src/duotone-picker/color-list-picker/types.ts
+index becfc405b2b955..5c42e6c9371b62 100644
+--- a/packages/components/src/color-list-picker/types.ts
++++ b/packages/components/src/duotone-picker/color-list-picker/types.ts
+@@ -5,7 +5,7 @@ import type { CSSProperties } from 'react';
+ 
+ export type ColorListPickerProps = {
+ 	/**
+-	 * A list of predifened colors. Each color is an object with a `name` and a
++	 * A list of predefined colors. Each color is an object with a `name` and a
+ 	 * `color` value.
+ 	 * The `name` is a string used to identify the color in the UI.
+ 	 * The `color` is a valid CSS color string.
+@@ -21,7 +21,7 @@ export type ColorListPickerProps = {
+ 	/**
+ 	 * An array containing the currently selected colors.
+ 	 */
+-	value?: Array< string | undefined >;
++	value?: Array< string >;
+ 	/**
+ 	 * Controls whether the custom color picker is displayed.
+ 	 */
+diff --git a/packages/components/src/duotone-picker/custom-duotone-bar.js b/packages/components/src/duotone-picker/custom-duotone-bar.tsx
+similarity index 84%
+rename from packages/components/src/duotone-picker/custom-duotone-bar.js
+rename to packages/components/src/duotone-picker/custom-duotone-bar.tsx
+index 8aef83f8a4bfab..f72db529ebd481 100644
+--- a/packages/components/src/duotone-picker/custom-duotone-bar.js
++++ b/packages/components/src/duotone-picker/custom-duotone-bar.tsx
+@@ -11,7 +11,13 @@ import {
+ 
+ const PLACEHOLDER_VALUES = [ '#333', '#CCC' ];
+ 
+-export default function CustomDuotoneBar( { value, onChange } ) {
++export default function CustomDuotoneBar( {
++	value,
++	onChange,
++}: {
++	value?: string[];
++	onChange: ( value?: string[] ) => void;
++} ) {
+ 	const hasGradient = !! value;
+ 	const values = hasGradient ? value : PLACEHOLDER_VALUES;
+ 	const background = getGradientFromCSSColors( values );
+diff --git a/packages/components/src/duotone-picker/duotone-picker.js b/packages/components/src/duotone-picker/duotone-picker.tsx
+similarity index 70%
+rename from packages/components/src/duotone-picker/duotone-picker.js
+rename to packages/components/src/duotone-picker/duotone-picker.tsx
+index 4f9e5ea7b23ce6..2daacb15c9159c 100644
+--- a/packages/components/src/duotone-picker/duotone-picker.js
++++ b/packages/components/src/duotone-picker/duotone-picker.tsx
+@@ -12,14 +12,48 @@ import { __, sprintf } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import ColorListPicker from '../color-list-picker';
++import ColorListPicker from './color-list-picker';
+ import CircularOptionPicker from '../circular-option-picker';
+ import { VStack } from '../v-stack';
+ 
+ import CustomDuotoneBar from './custom-duotone-bar';
+ import { getDefaultColors, getGradientFromCSSColors } from './utils';
+ import { Spacer } from '../spacer';
++import type { DuotonePickerProps } from './types';
+ 
++/**
++ * ```jsx
++ * import { DuotonePicker, DuotoneSwatch } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const DUOTONE_PALETTE = [
++ * 	{ colors: [ '#8c00b7', '#fcff41' ], name: 'Purple and yellow', slug: 'purple-yellow' },
++ * 	{ colors: [ '#000097', '#ff4747' ], name: 'Blue and red', slug: 'blue-red' },
++ * ];
++ *
++ * const COLOR_PALETTE = [
++ * 	{ color: '#ff4747', name: 'Red', slug: 'red' },
++ * 	{ color: '#fcff41', name: 'Yellow', slug: 'yellow' },
++ * 	{ color: '#000097', name: 'Blue', slug: 'blue' },
++ * 	{ color: '#8c00b7', name: 'Purple', slug: 'purple' },
++ * ];
++ *
++ * const Example = () => {
++ * 	const [ duotone, setDuotone ] = useState( [ '#000000', '#ffffff' ] );
++ * 	return (
++ * 		<>
++ * 			<DuotonePicker
++ * 				duotonePalette={ DUOTONE_PALETTE }
++ * 				colorPalette={ COLOR_PALETTE }
++ * 				value={ duotone }
++ * 				onChange={ setDuotone }
++ * 			/>
++ * 			<DuotoneSwatch values={ duotone } />
++ * 		</>
++ * 	);
++ * };
++ * ```
++ */
+ function DuotonePicker( {
+ 	clearable = true,
+ 	unsetable = true,
+@@ -29,7 +63,7 @@ function DuotonePicker( {
+ 	disableCustomDuotone,
+ 	value,
+ 	onChange,
+-} ) {
++}: DuotonePickerProps ) {
+ 	const [ defaultDark, defaultLight ] = useMemo(
+ 		() => getDefaultColors( colorPalette ),
+ 		[ colorPalette ]
+@@ -125,6 +159,9 @@ function DuotonePicker( {
+ 									newColors.length >= 2
+ 										? newColors
+ 										: undefined;
++								// @ts-expect-error TODO: The color arrays for a DuotonePicker should be a tuple of two colors,
++								// but it's currently typed as a string[].
++								// See also https://github.com/WordPress/gutenberg/pull/49060#discussion_r1136951035
+ 								onChange( newValue );
+ 							} }
+ 						/>
+diff --git a/packages/components/src/duotone-picker/duotone-swatch.js b/packages/components/src/duotone-picker/duotone-swatch.tsx
+similarity index 79%
+rename from packages/components/src/duotone-picker/duotone-swatch.js
+rename to packages/components/src/duotone-picker/duotone-swatch.tsx
+index d98671affbbd13..1a40bb68f1c51f 100644
+--- a/packages/components/src/duotone-picker/duotone-swatch.js
++++ b/packages/components/src/duotone-picker/duotone-swatch.tsx
+@@ -9,8 +9,9 @@ import { swatch } from '@wordpress/icons';
+ import ColorIndicator from '../color-indicator';
+ import Icon from '../icon';
+ import { getGradientFromCSSColors } from './utils';
++import type { DuotoneSwatchProps } from './types';
+ 
+-function DuotoneSwatch( { values } ) {
++function DuotoneSwatch( { values }: DuotoneSwatchProps ) {
+ 	return values ? (
+ 		<ColorIndicator
+ 			colorValue={ getGradientFromCSSColors( values, '135deg' ) }
+diff --git a/packages/components/src/duotone-picker/index.js b/packages/components/src/duotone-picker/index.ts
+similarity index 100%
+rename from packages/components/src/duotone-picker/index.js
+rename to packages/components/src/duotone-picker/index.ts
+diff --git a/packages/components/src/duotone-picker/stories/duotone-picker.js b/packages/components/src/duotone-picker/stories/duotone-picker.tsx
+similarity index 69%
+rename from packages/components/src/duotone-picker/stories/duotone-picker.js
+rename to packages/components/src/duotone-picker/stories/duotone-picker.tsx
+index 6186dd1b3ad37f..a8a1111720d369 100644
+--- a/packages/components/src/duotone-picker/stories/duotone-picker.js
++++ b/packages/components/src/duotone-picker/stories/duotone-picker.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -6,23 +11,22 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { DuotonePicker } from '../';
++import { DuotonePicker } from '..';
++import type { DuotonePickerProps } from '../types';
+ 
+-export default {
++const meta: ComponentMeta< typeof DuotonePicker > = {
+ 	title: 'Components/DuotonePicker',
+ 	component: DuotonePicker,
+ 	argTypes: {
+-		clearable: { control: { type: 'boolean' } },
+-		disableCustomColors: { control: { type: 'boolean' } },
+-		disableCustomDuotone: { control: { type: 'boolean' } },
+ 		onChange: { action: 'onChange' },
+-		unsetable: { control: { type: 'boolean' } },
++		value: { control: { type: null } },
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { source: { state: 'open' } },
+ 	},
+ };
++export default meta;
+ 
+ const DUOTONE_PALETTE = [
+ 	{
+@@ -44,8 +48,11 @@ const COLOR_PALETTE = [
+ 	{ color: '#8c00b7', name: 'Purple', slug: 'purple' },
+ ];
+ 
+-const Template = ( { onChange, ...args } ) => {
+-	const [ value, setValue ] = useState();
++const Template: ComponentStory< typeof DuotonePicker > = ( {
++	onChange,
++	...args
++} ) => {
++	const [ value, setValue ] = useState< DuotonePickerProps[ 'value' ] >();
+ 
+ 	return (
+ 		<DuotonePicker
+diff --git a/packages/components/src/duotone-picker/stories/duotone-swatch.js b/packages/components/src/duotone-picker/stories/duotone-swatch.tsx
+similarity index 63%
+rename from packages/components/src/duotone-picker/stories/duotone-swatch.js
+rename to packages/components/src/duotone-picker/stories/duotone-swatch.tsx
+index e64b3e3c2c295f..1485bca10e1d8f 100644
+--- a/packages/components/src/duotone-picker/stories/duotone-swatch.js
++++ b/packages/components/src/duotone-picker/stories/duotone-swatch.tsx
+@@ -1,9 +1,14 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
+ /**
+  * Internal dependencies
+  */
+-import { DuotoneSwatch } from '../';
++import { DuotoneSwatch } from '..';
+ 
+-export default {
++const meta: ComponentMeta< typeof DuotoneSwatch > = {
+ 	title: 'Components/DuotoneSwatch',
+ 	component: DuotoneSwatch,
+ 	parameters: {
+@@ -11,8 +16,9 @@ export default {
+ 		docs: { source: { state: 'open' } },
+ 	},
+ };
++export default meta;
+ 
+-const Template = ( args ) => {
++const Template: ComponentStory< typeof DuotoneSwatch > = ( args ) => {
+ 	return <DuotoneSwatch { ...args } />;
+ };
+ 
+diff --git a/packages/components/src/duotone-picker/types.ts b/packages/components/src/duotone-picker/types.ts
+new file mode 100644
+index 00000000000000..3d5927675f542f
+--- /dev/null
++++ b/packages/components/src/duotone-picker/types.ts
+@@ -0,0 +1,61 @@
++export type DuotonePickerProps = {
++	/**
++	 * Whether there should be a button to clear the duotone value.
++	 *
++	 * @default true
++	 */
++	clearable?: boolean;
++	/**
++	 * Whether there should be an `unset` option.
++	 *
++	 * @default true
++	 */
++	unsetable?: boolean;
++	/**
++	 * Array of color presets of the form `{ color: '#000000', name: 'Black', slug: 'black' }`.
++	 */
++	colorPalette: Color[];
++	/**
++	 * Array of duotone presets of the form `{ colors: [ '#000000', '#ffffff' ], name: 'Grayscale', slug: 'grayscale' }`.
++	 */
++	duotonePalette: DuotoneColor[];
++	/**
++	 * Whether custom colors should be disabled.
++	 *
++	 * @default false
++	 */
++	disableCustomColors?: boolean;
++	/**
++	 * Whether custom duotone values should be disabled.
++	 *
++	 * @default false
++	 */
++	disableCustomDuotone?: boolean;
++	/**
++	 * An array of colors for the duotone effect.
++	 */
++	value?: string[] | 'unset';
++	/**
++	 * Callback which is called when the duotone colors change.
++	 */
++	onChange: ( value: DuotonePickerProps[ 'value' ] | undefined ) => void;
++};
++
++type Color = {
++	color: string;
++	name: string;
++	slug: string;
++};
++
++type DuotoneColor = {
++	colors: string[];
++	name: string;
++	slug: string;
++};
++
++export type DuotoneSwatchProps = {
++	/**
++	 * An array of colors to show or `null` to show the placeholder swatch icon.
++	 */
++	values?: string[] | null;
++};
+diff --git a/packages/components/src/duotone-picker/utils.js b/packages/components/src/duotone-picker/utils.ts
+similarity index 63%
+rename from packages/components/src/duotone-picker/utils.js
+rename to packages/components/src/duotone-picker/utils.ts
+index f33aff4f965d52..06d371902f882b 100644
+--- a/packages/components/src/duotone-picker/utils.js
++++ b/packages/components/src/duotone-picker/utils.ts
+@@ -4,6 +4,11 @@
+ import { colord, extend } from 'colord';
+ import namesPlugin from 'colord/plugins/names';
+ 
++/**
++ * Internal dependencies
++ */
++import type { DuotonePickerProps } from './types';
++
+ extend( [ namesPlugin ] );
+ 
+ /**
+@@ -18,11 +23,13 @@ extend( [ namesPlugin ] );
+ /**
+  * Calculate the brightest and darkest values from a color palette.
+  *
+- * @param {Object[]} palette Color palette for the theme.
++ * @param palette Color palette for the theme.
+  *
+- * @return {string[]} Tuple of the darkest color and brightest color.
++ * @return Tuple of the darkest color and brightest color.
+  */
+-export function getDefaultColors( palette ) {
++export function getDefaultColors(
++	palette: DuotonePickerProps[ 'colorPalette' ]
++) {
+ 	// A default dark and light color are required.
+ 	if ( ! palette || palette.length < 2 ) return [ '#000', '#fff' ];
+ 
+@@ -38,7 +45,10 @@ export function getDefaultColors( palette ) {
+ 					current.brightness >= max.brightness ? current : max,
+ 				];
+ 			},
+-			[ { brightness: 1 }, { brightness: 0 } ]
++			[
++				{ brightness: 1, color: '' },
++				{ brightness: 0, color: '' },
++			]
+ 		)
+ 		.map( ( { color } ) => color );
+ }
+@@ -46,12 +56,15 @@ export function getDefaultColors( palette ) {
+ /**
+  * Generate a duotone gradient from a list of colors.
+  *
+- * @param {string[]} colors CSS color strings.
+- * @param {string}   angle  CSS gradient angle.
++ * @param colors CSS color strings.
++ * @param angle  CSS gradient angle.
+  *
+- * @return {string} CSS gradient string for the duotone swatch.
++ * @return  CSS gradient string for the duotone swatch.
+  */
+-export function getGradientFromCSSColors( colors = [], angle = '90deg' ) {
++export function getGradientFromCSSColors(
++	colors: string[] = [],
++	angle = '90deg'
++) {
+ 	const l = 100 / colors.length;
+ 
+ 	const stops = colors
+@@ -64,11 +77,11 @@ export function getGradientFromCSSColors( colors = [], angle = '90deg' ) {
+ /**
+  * Convert a color array to an array of color stops.
+  *
+- * @param {string[]} colors CSS colors array
++ * @param colors CSS colors array
+  *
+- * @return {Object[]} Color stop information.
++ * @return Color stop information.
+  */
+-export function getColorStopsFromColors( colors ) {
++export function getColorStopsFromColors( colors: string[] ) {
+ 	return colors.map( ( color, i ) => ( {
+ 		position: ( i * 100 ) / ( colors.length - 1 ),
+ 		color,
+@@ -78,10 +91,12 @@ export function getColorStopsFromColors( colors ) {
+ /**
+  * Convert a color stop array to an array colors.
+  *
+- * @param {Object[]} colorStops Color stop information.
++ * @param colorStops Color stop information.
+  *
+- * @return {string[]} CSS colors array.
++ * @return CSS colors array.
+  */
+-export function getColorsFromColorStops( colorStops = [] ) {
++export function getColorsFromColorStops(
++	colorStops: { position: number; color: string }[] = []
++) {
+ 	return colorStops.map( ( { color } ) => color );
+ }
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 1cb363cb6d50c2..1c19336552aba4 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -11,7 +11,6 @@
+ @import "./palette-edit/style.scss";
+ @import "./color-indicator/style.scss";
+ @import "./combobox-control/style.scss";
+-@import "./color-list-picker/style.scss";
+ @import "./color-palette/style.scss";
+ @import "./custom-gradient-picker/style.scss";
+ @import "./custom-select-control/style.scss";
+@@ -21,6 +20,7 @@
+ @import "./dropdown/style.scss";
+ @import "./dropdown-menu/style.scss";
+ @import "./duotone-picker/style.scss";
++@import "./duotone-picker/color-list-picker/style.scss";
+ @import "./form-toggle/style.scss";
+ @import "./form-token-field/style.scss";
+ @import "./guide/style.scss";
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 6aaadae65b49cc..242ff98906cccd 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -44,7 +44,6 @@
+ 		"src/**/react-native-*",
+ 		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
+ 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
+-		"src/index.js",
+-		"src/duotone-picker"
++		"src/index.js"
+ 	]
+ }

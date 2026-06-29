@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e267a3246c4470..a68a1d7d39480a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,10 @@
+ -   Add `box-sizing` reset style mixin to utils ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
+ -   `ResizableBox`: Make tooltip background match `Tooltip` component's ([#42800](https://github.com/WordPress/gutenberg/pull/42800)).
+ 
++### Internal
++
++-   `InputControl`: Fix incorrect `size` prop passing ([#42793](https://github.com/WordPress/gutenberg/pull/42793)).
++
+ ## 19.16.0 (2022-07-27)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index 9333be8b837fa4..2b7d4123adcbba 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -101,7 +101,6 @@ export function InputBase(
+ 					hideLabelFromVision={ hideLabelFromVision }
+ 					labelPosition={ labelPosition }
+ 					htmlFor={ id }
+-					size={ size }
+ 				>
+ 					{ label }
+ 				</Label>

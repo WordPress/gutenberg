@@ -1,0 +1,280 @@
+diff --git a/package-lock.json b/package-lock.json
+index 6f17ffb7edef6a..a461be9fbb16a7 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -25554,11 +25554,6 @@
+ 				"utila": "~0.4"
+ 			}
+ 		},
+-		"node_modules/dom-scroll-into-view": {
+-			"version": "1.2.1",
+-			"resolved": "https://registry.npmjs.org/dom-scroll-into-view/-/dom-scroll-into-view-1.2.1.tgz",
+-			"integrity": "sha512-LwNVg3GJOprWDO+QhLL1Z9MMgWe/KAFLxVWKzjRTxNSPn8/LLDIfmuG71YHznXCqaqTjvHJDYO1MEAgX6XCNbQ=="
+-		},
+ 		"node_modules/dom-serializer": {
+ 			"version": "0.2.2",
+ 			"resolved": "https://registry.npmjs.org/dom-serializer/-/dom-serializer-0.2.2.tgz",
+@@ -54386,7 +54381,6 @@
+ 				"colord": "^2.7.0",
+ 				"deepmerge": "^4.3.0",
+ 				"diff": "^4.0.2",
+-				"dom-scroll-into-view": "^1.2.1",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"memize": "^2.1.0",
+ 				"postcss": "^8.4.21",
+@@ -54654,7 +54648,6 @@
+ 				"colord": "^2.7.0",
+ 				"date-fns": "^2.28.0",
+ 				"deepmerge": "^4.3.0",
+-				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^6.0.15",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"framer-motion": "^10.13.0",
+@@ -69759,7 +69752,6 @@
+ 				"colord": "^2.7.0",
+ 				"deepmerge": "^4.3.0",
+ 				"diff": "^4.0.2",
+-				"dom-scroll-into-view": "^1.2.1",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"memize": "^2.1.0",
+ 				"postcss": "^8.4.21",
+@@ -69954,7 +69946,6 @@
+ 				"colord": "^2.7.0",
+ 				"date-fns": "^2.28.0",
+ 				"deepmerge": "^4.3.0",
+-				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^6.0.15",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"framer-motion": "^10.13.0",
+@@ -76787,11 +76778,6 @@
+ 				"utila": "~0.4"
+ 			}
+ 		},
+-		"dom-scroll-into-view": {
+-			"version": "1.2.1",
+-			"resolved": "https://registry.npmjs.org/dom-scroll-into-view/-/dom-scroll-into-view-1.2.1.tgz",
+-			"integrity": "sha512-LwNVg3GJOprWDO+QhLL1Z9MMgWe/KAFLxVWKzjRTxNSPn8/LLDIfmuG71YHznXCqaqTjvHJDYO1MEAgX6XCNbQ=="
+-		},
+ 		"dom-serializer": {
+ 			"version": "0.2.2",
+ 			"resolved": "https://registry.npmjs.org/dom-serializer/-/dom-serializer-0.2.2.tgz",
+diff --git a/packages/block-editor/package.json b/packages/block-editor/package.json
+index 59eede6f9d4db0..fcc36c14a09d06 100644
+--- a/packages/block-editor/package.json
++++ b/packages/block-editor/package.json
+@@ -69,7 +69,6 @@
+ 		"colord": "^2.7.0",
+ 		"deepmerge": "^4.3.0",
+ 		"diff": "^4.0.2",
+-		"dom-scroll-into-view": "^1.2.1",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"memize": "^2.1.0",
+ 		"postcss": "^8.4.21",
+diff --git a/packages/block-editor/src/components/url-input/index.js b/packages/block-editor/src/components/url-input/index.js
+index 947c39abfd0c7d..56426d2eaf4796 100644
+--- a/packages/block-editor/src/components/url-input/index.js
++++ b/packages/block-editor/src/components/url-input/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import scrollIntoView from 'dom-scroll-into-view';
+ 
+ /**
+  * WordPress dependencies
+@@ -83,21 +82,13 @@ class URLInput extends Component {
+ 		if (
+ 			showSuggestions &&
+ 			selectedSuggestion !== null &&
+-			this.suggestionNodes[ selectedSuggestion ] &&
+-			! this.scrollingIntoView
++			this.suggestionNodes[ selectedSuggestion ]
+ 		) {
+-			this.scrollingIntoView = true;
+-			scrollIntoView(
+-				this.suggestionNodes[ selectedSuggestion ],
+-				this.autocompleteRef.current,
+-				{
+-					onlyScrollIfNeeded: true,
+-				}
+-			);
+-
+-			this.props.setTimeout( () => {
+-				this.scrollingIntoView = false;
+-			}, 100 );
++			this.suggestionNodes[ selectedSuggestion ].scrollIntoView( {
++				behavior: 'instant',
++				block: 'nearest',
++				inline: 'nearest',
++			} );
+ 		}
+ 
+ 		// Update suggestions when the value changes.
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ebce7cbd6fdad4..b5def99012dbe9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,8 @@
+ 
+ -   `ColorPicker`: Style without accessing internal `InputControl` classes ([#59069](https://github.com/WordPress/gutenberg/pull/59069)).
+ -   Add lint rules for theme color CSS var usage ([#59022](https://github.com/WordPress/gutenberg/pull/59022)).
++-   `FormTokenField`: Use `Element.scrollIntoView()` instead of `dom-scroll-into-view` ([#59085](https://github.com/WordPress/gutenberg/pull/59085)).
++-   Removing `dom-scroll-into-view` as a dependency of the components package ([#59085](https://github.com/WordPress/gutenberg/pull/59085)).
+ 
+ ## 26.0.1 (2024-02-13)
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 32c3620ec45190..4f7d68bc9a0593 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -64,7 +64,6 @@
+ 		"colord": "^2.7.0",
+ 		"date-fns": "^2.28.0",
+ 		"deepmerge": "^4.3.0",
+-		"dom-scroll-into-view": "^1.2.1",
+ 		"downshift": "^6.0.15",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"framer-motion": "^10.13.0",
+diff --git a/packages/components/src/form-token-field/suggestions-list.tsx b/packages/components/src/form-token-field/suggestions-list.tsx
+index 81302d5bfebe81..ff2036a3472e0a 100644
+--- a/packages/components/src/form-token-field/suggestions-list.tsx
++++ b/packages/components/src/form-token-field/suggestions-list.tsx
+@@ -1,14 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import scrollView from 'dom-scroll-into-view';
+ import classnames from 'classnames';
+ import type { MouseEventHandler, ReactNode } from 'react';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { useState } from '@wordpress/element';
+ import { useRefEffect } from '@wordpress/compose';
+ 
+ /**
+@@ -32,8 +30,6 @@ export function SuggestionsList< T extends string | { value: string } >( {
+ 	instanceId,
+ 	__experimentalRenderItem,
+ }: SuggestionsListProps< T > ) {
+-	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
+-
+ 	const listRef = useRefEffect< HTMLUListElement >(
+ 		( listNode ) => {
+ 			// only have to worry about scrolling selected suggestion into view
+@@ -44,16 +40,10 @@ export function SuggestionsList< T extends string | { value: string } >( {
+ 				scrollIntoView &&
+ 				listNode.children[ selectedIndex ]
+ 			) {
+-				setScrollingIntoView( true );
+-				scrollView(
+-					listNode.children[ selectedIndex ] as HTMLLIElement,
+-					listNode,
+-					{
+-						onlyScrollIfNeeded: true,
+-					}
+-				);
+-				rafId = requestAnimationFrame( () => {
+-					setScrollingIntoView( false );
++				listNode.children[ selectedIndex ].scrollIntoView( {
++					behavior: 'instant',
++					block: 'nearest',
++					inline: 'nearest',
+ 				} );
+ 			}
+ 
+@@ -68,9 +58,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
+ 
+ 	const handleHover = ( suggestion: T ) => {
+ 		return () => {
+-			if ( ! scrollingIntoView ) {
+-				onHover?.( suggestion );
+-			}
++			onHover?.( suggestion );
+ 		};
+ 	};
+ 
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 1ee9a35f1a8b22..ceb08fdfbc7033 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -6,7 +6,6 @@
+ 		"types": [
+ 			"gutenberg-env",
+ 			"gutenberg-test-env",
+-			"dom-scroll-into-view",
+ 			"jest",
+ 			"@testing-library/jest-dom"
+ 		],
+diff --git a/patches/dom-scroll-into-view+1.2.1.patch b/patches/dom-scroll-into-view+1.2.1.patch
+deleted file mode 100644
+index abf9482fb11f06..00000000000000
+--- a/patches/dom-scroll-into-view+1.2.1.patch
++++ /dev/null
+@@ -1,25 +0,0 @@
+-diff --git a/node_modules/dom-scroll-into-view/lib/dom-scroll-into-view.js b/node_modules/dom-scroll-into-view/lib/dom-scroll-into-view.js
+-index 557ed5c..23dfbad 100644
+---- a/node_modules/dom-scroll-into-view/lib/dom-scroll-into-view.js
+-+++ b/node_modules/dom-scroll-into-view/lib/dom-scroll-into-view.js
+-@@ -21,6 +21,7 @@ function scrollIntoView(elem, container, config) {
+-   allowHorizontalScroll = allowHorizontalScroll === undefined ? true : allowHorizontalScroll;
+- 
+-   var isWin = util.isWindow(container);
+-+  var isFramed = !!(isWin && container.frameElement);
+-   var elemOffset = util.offset(elem);
+-   var eh = util.outerHeight(elem);
+-   var ew = util.outerWidth(elem);
+-@@ -35,7 +36,11 @@ function scrollIntoView(elem, container, config) {
+-   var ww = undefined;
+-   var wh = undefined;
+- 
+--  if (isWin) {
+-+  if (isFramed) {
+-+    container = container.document.scrollingElement || container.document.body;
+-+  }
+-+
+-+  if (isWin || isFramed) {
+-     win = container;
+-     wh = util.height(win);
+-     ww = util.width(win);
+diff --git a/test/unit/config/global-mocks.js b/test/unit/config/global-mocks.js
+index 84ec5acbe91923..fd5a934efe85b8 100644
+--- a/test/unit/config/global-mocks.js
++++ b/test/unit/config/global-mocks.js
+@@ -28,3 +28,11 @@ global.ResizeObserver = require( 'resize-observer-polyfill' );
+ if ( ! window.DOMRect ) {
+ 	window.DOMRect = class DOMRect {};
+ }
++
++/**
++ * Polyfill for Element.scrollIntoView().
++ * Necessary because it's not implemented in jsdom, and likely will never be.
++ *
++ * @see https://github.com/jsdom/jsdom/issues/1695
++ */
++global.Element.prototype.scrollIntoView = jest.fn();
+diff --git a/typings/dom-scroll-into-view/index.d.ts b/typings/dom-scroll-into-view/index.d.ts
+deleted file mode 100644
+index 0b299a71a27fba..00000000000000
+--- a/typings/dom-scroll-into-view/index.d.ts
++++ /dev/null
+@@ -1,18 +0,0 @@
+-interface Config {
+-	alignWithLeft?: boolean;
+-	alignWithTop?: boolean;
+-	offsetTop?: number;
+-	offsetLeft?: number;
+-	offsetBottom?: number;
+-	offsetRight?: number;
+-	allowHorizontalScroll?: boolean;
+-	onlyScrollIfNeeded?: boolean;
+-}
+-
+-declare module 'dom-scroll-into-view' {
+-	export default function scrollIntoView(
+-		source: HTMLElement,
+-		container: HTMLElement,
+-		config: Config
+-	): void;
+-}

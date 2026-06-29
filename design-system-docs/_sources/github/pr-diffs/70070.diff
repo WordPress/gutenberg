@@ -1,0 +1,22 @@
+diff --git a/packages/components/src/notice/README.md b/packages/components/src/notice/README.md
+index 1bbf4df0e11705..0695f5d7ce3cf3 100644
+--- a/packages/components/src/notice/README.md
++++ b/packages/components/src/notice/README.md
+@@ -61,7 +61,7 @@ If an icon is included in the Notice, it should be color-coded to match the Noti
+ To display a plain notice, pass `Notice` a string:
+ 
+ ```jsx
+-import { Notice } from `@wordpress/components`;
++import { Notice } from '@wordpress/components';
+ 
+ const MyNotice = () => (
+ 	<Notice status="error">An unknown error occurred.</Notice>
+@@ -71,7 +71,7 @@ const MyNotice = () => (
+ For more complex markup, you can pass any JSX element:
+ 
+ ```jsx
+-import { Notice } from `@wordpress/components`;
++import { Notice } from '@wordpress/components';
+ 
+ const MyNotice = () => (
+ 	<Notice status="error">

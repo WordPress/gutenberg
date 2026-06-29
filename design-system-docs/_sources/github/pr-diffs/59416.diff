@@ -1,0 +1,77 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 769d201e587d07..40c2462eb497b6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fix
+ 
+ -   `Tooltip`: Explicitly set system font to avoid CSS bleed ([#59307](https://github.com/WordPress/gutenberg/pull/59307)).
++-   `HStack`, `VStack`: Stop passing invalid props to underlying element ([#59416](https://github.com/WordPress/gutenberg/pull/59416)).
+ -   `Button`: Fix focus outline in disabled primary variant ([#59391](https://github.com/WordPress/gutenberg/pull/59391)).
+ 
+ ### Internal
+diff --git a/packages/components/src/flex/flex/hook.ts b/packages/components/src/flex/flex/hook.ts
+index df53667915999c..f5648c187c7628 100644
+--- a/packages/components/src/flex/flex/hook.ts
++++ b/packages/components/src/flex/flex/hook.ts
+@@ -22,7 +22,7 @@ import type { FlexProps } from '../types';
+ 
+ function useDeprecatedProps(
+ 	props: WordPressComponentProps< FlexProps, 'div' >
+-): WordPressComponentProps< FlexProps, 'div' > {
++): Omit< typeof props, 'isReversed' > {
+ 	const { isReversed, ...otherProps } = props;
+ 
+ 	if ( typeof isReversed !== 'undefined' ) {
+diff --git a/packages/components/src/h-stack/hook.tsx b/packages/components/src/h-stack/hook.tsx
+index b7b8cf92954a1d..bb473a881b9dea 100644
+--- a/packages/components/src/h-stack/hook.tsx
++++ b/packages/components/src/h-stack/hook.tsx
+@@ -47,7 +47,8 @@ export function useHStack( props: WordPressComponentProps< Props, 'div' > ) {
+ 		gap: spacing,
+ 	};
+ 
+-	const flexProps = useFlex( propsForFlex );
++	// Omit `isColumn` because it's not used in HStack.
++	const { isColumn, ...flexProps } = useFlex( propsForFlex );
+ 
+ 	return flexProps;
+ }
+diff --git a/packages/components/src/h-stack/test/index.tsx b/packages/components/src/h-stack/test/index.tsx
+index ea4f9c94fbe7f8..75352f3dfd22f0 100644
+--- a/packages/components/src/h-stack/test/index.tsx
++++ b/packages/components/src/h-stack/test/index.tsx
+@@ -39,4 +39,14 @@ describe( 'props', () => {
+ 		);
+ 		expect( container ).toMatchSnapshot();
+ 	} );
++
++	test( 'should not pass through invalid props to the `as` component', () => {
++		const AsComponent = ( props: JSX.IntrinsicElements[ 'div' ] ) => {
++			return <div { ...props } />;
++		};
++
++		render( <HStack as={ AsComponent }>foobar</HStack> );
++
++		expect( console ).not.toHaveErrored();
++	} );
+ } );
+diff --git a/packages/components/src/v-stack/test/index.tsx b/packages/components/src/v-stack/test/index.tsx
+index cf35691d0858f6..e8ea1ab0ee396f 100644
+--- a/packages/components/src/v-stack/test/index.tsx
++++ b/packages/components/src/v-stack/test/index.tsx
+@@ -39,4 +39,14 @@ describe( 'props', () => {
+ 		);
+ 		expect( container ).toMatchSnapshot();
+ 	} );
++
++	test( 'should not pass through invalid props to the `as` component', () => {
++		const AsComponent = ( props: JSX.IntrinsicElements[ 'div' ] ) => {
++			return <div { ...props } />;
++		};
++
++		render( <VStack as={ AsComponent }>foobar</VStack> );
++
++		expect( console ).not.toHaveErrored();
++	} );
+ } );

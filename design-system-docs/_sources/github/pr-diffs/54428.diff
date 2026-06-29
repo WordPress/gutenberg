@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d8690b46a2ca77..266b25a38c50f6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -1,7 +1,6 @@
+ <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
+ 
+ ## Unreleased
+--   `ProgressBar`: Export component to allow it to be used ([#54404](https://github.com/WordPress/gutenberg/pull/54404)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index 85ce7b14fffaec..a824162cb24129 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -132,7 +132,6 @@ export { default as PanelHeader } from './panel/header';
+ export { default as PanelRow } from './panel/row';
+ export { default as Placeholder } from './placeholder';
+ export { default as Popover } from './popover';
+-export { default as __experimentalProgressBar } from './progress-bar';
+ export { default as QueryControls } from './query-controls';
+ export { default as __experimentalRadio } from './radio-group/radio';
+ export { default as __experimentalRadioGroup } from './radio-group';

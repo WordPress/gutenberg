@@ -1,0 +1,109 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 4643eec483b055..7d8861d38f70b8 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### New Features
+ 
++-   Add `--wpds-color-stroke-surface-caution` and `--wpds-color-stroke-surface-caution-strong` so the `caution` tone has the same stroke-surface coverage as the other status tones ([#79198](https://github.com/WordPress/gutenberg/pull/79198)).
+ -   Add `--wpds-border-radius-xl` for page and app shell surfaces so nested cards and notices can stay on `--wpds-border-radius-lg` without matching the parent radius ([#78913](https://github.com/WordPress/gutenberg/pull/78913)).
+ -   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `subtle`, `moderate`, `pronounced`) via prebuilt design token modes. [#78816](https://github.com/WordPress/gutenberg/pull/78816).
+ 
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index 9d00eaa1ff2b39..e0fe65adca17f2 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -218,6 +218,8 @@ The interactive state of the element. The default (no modifier) is the idle stat
+ | `--wpds-color-stroke-surface-info-strong`                     | Decorative stroke color used to define info-toned surface boundaries with strong emphasis.                                                  |
+ | `--wpds-color-stroke-surface-warning`                         | Decorative stroke color used to define warning-toned surface boundaries with normal emphasis.                                               |
+ | `--wpds-color-stroke-surface-warning-strong`                  | Decorative stroke color used to define warning-toned surface boundaries with strong emphasis.                                               |
++| `--wpds-color-stroke-surface-caution`                         | Decorative stroke color used to define caution-toned surface boundaries with normal emphasis.                                               |
++| `--wpds-color-stroke-surface-caution-strong`                  | Decorative stroke color used to define caution-toned surface boundaries with strong emphasis.                                               |
+ | `--wpds-color-stroke-surface-error`                           | Decorative stroke color used to define error-toned surface boundaries with normal emphasis.                                                 |
+ | `--wpds-color-stroke-surface-error-strong`                    | Decorative stroke color used to define error-toned surface boundaries with strong emphasis.                                                 |
+ | `--wpds-color-stroke-interactive-neutral`                     | Accessible stroke color used for interactive neutrally-toned elements with normal emphasis.                                                 |
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 695197af9b80e4..b2e08f6837182c 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -175,6 +175,10 @@
+ 	--wpds-color-stroke-surface-warning: #e1bc7c;
+ 	/* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
+ 	--wpds-color-stroke-surface-warning-strong: #926300;
++	/* Decorative stroke color used to define caution-toned surface boundaries with normal emphasis. */
++	--wpds-color-stroke-surface-caution: #cfc28d;
++	/* Decorative stroke color used to define caution-toned surface boundaries with strong emphasis. */
++	--wpds-color-stroke-surface-caution-strong: #826a00;
+ 	/* Decorative stroke color used to define error-toned surface boundaries with normal emphasis. */
+ 	--wpds-color-stroke-surface-error: #dab1aa;
+ 	/* Decorative stroke color used to define error-toned surface boundaries with strong emphasis. */
+diff --git a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+index 2ec2990558f780..b5a7211bb688a6 100644
+--- a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
++++ b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+@@ -103,6 +103,8 @@ export default {
+ 		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 40%, white)',
+ 	'--wpds-color-stroke-surface-brand-strong':
+ 		'var(--wp-admin-theme-color, #3858e9)',
++	'--wpds-color-stroke-surface-caution': '#cfc28d',
++	'--wpds-color-stroke-surface-caution-strong': '#826a00',
+ 	'--wpds-color-stroke-surface-error': '#dab1aa',
+ 	'--wpds-color-stroke-surface-error-strong': '#cc1818',
+ 	'--wpds-color-stroke-surface-info': '#a9c6e7',
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index 3fba96a3f96111..52604e446c7a92 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -90,6 +90,8 @@ export default [
+ 	'--wpds-color-stroke-surface-info-strong',
+ 	'--wpds-color-stroke-surface-warning',
+ 	'--wpds-color-stroke-surface-warning-strong',
++	'--wpds-color-stroke-surface-caution',
++	'--wpds-color-stroke-surface-caution-strong',
+ 	'--wpds-color-stroke-surface-error',
+ 	'--wpds-color-stroke-surface-error-strong',
+ 	'--wpds-color-stroke-interactive-neutral',
+diff --git a/packages/theme/src/prebuilt/ts/color-tokens.ts b/packages/theme/src/prebuilt/ts/color-tokens.ts
+index 3e900d96211b49..5132abe64f5064 100644
+--- a/packages/theme/src/prebuilt/ts/color-tokens.ts
++++ b/packages/theme/src/prebuilt/ts/color-tokens.ts
+@@ -119,4 +119,6 @@ export default {
+ 	'caution-surface4': [ 'background-surface-caution' ],
+ 	'caution-fgSurface4': [ 'foreground-content-caution' ],
+ 	'caution-fgSurface3': [ 'foreground-content-caution-weak' ],
++	'caution-stroke3': [ 'stroke-surface-caution-strong' ],
++	'caution-stroke1': [ 'stroke-surface-caution' ],
+ } as Record< string, string[] >;
+diff --git a/packages/theme/src/prebuilt/ts/token-types.ts b/packages/theme/src/prebuilt/ts/token-types.ts
+index 6bd44d3ee136dc..b538ace153a9b9 100644
+--- a/packages/theme/src/prebuilt/ts/token-types.ts
++++ b/packages/theme/src/prebuilt/ts/token-types.ts
+@@ -131,6 +131,8 @@ export type SurfaceStrokeColor =
+ 	| 'info-strong'
+ 	| 'warning'
+ 	| 'warning-strong'
++	| 'caution'
++	| 'caution-strong'
+ 	| 'error'
+ 	| 'error-strong';
+ 
+diff --git a/packages/theme/tokens/color.json b/packages/theme/tokens/color.json
+index 787c48eb20010d..227f694b6194f4 100644
+--- a/packages/theme/tokens/color.json
++++ b/packages/theme/tokens/color.json
+@@ -1443,6 +1443,14 @@
+ 					"$value": "{wpds-color.primitive.warning.stroke3}",
+ 					"$description": "Decorative stroke color used to define warning-toned surface boundaries with strong emphasis."
+ 				},
++				"caution": {
++					"$value": "{wpds-color.primitive.caution.stroke1}",
++					"$description": "Decorative stroke color used to define caution-toned surface boundaries with normal emphasis."
++				},
++				"caution-strong": {
++					"$value": "{wpds-color.primitive.caution.stroke3}",
++					"$description": "Decorative stroke color used to define caution-toned surface boundaries with strong emphasis."
++				},
+ 				"error": {
+ 					"$value": "{wpds-color.primitive.error.stroke1}",
+ 					"$description": "Decorative stroke color used to define error-toned surface boundaries with normal emphasis."

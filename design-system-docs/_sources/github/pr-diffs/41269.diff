@@ -1,0 +1,96 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b81869c8e7cbe5..cc7608fcfca5b4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `SelectControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#41269](https://github.com/WordPress/gutenberg/pull/41269)).
++
+ ### Internal
+ 
+ -   `AlignmentMatrixControl` updated to satisfy `react/exhuastive-deps` eslint rule ([#41167](https://github.com/WordPress/gutenberg/pull/41167))
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index 1f12c0594ee140..1d96f2ba92b76e 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -98,6 +98,7 @@ const MySelectControl = () => {
+ 				{ label: 'Small', value: '25%' },
+ 			] }
+ 			onChange={ ( newSize ) => setSize( newSize ) }
++			__nextHasNoMarginBottom
+ 		/>
+ 	);
+ };
+@@ -119,6 +120,7 @@ Render a user interface to select multiple users from a list.
+ 		{ value: 'b', label: 'User B' },
+ 		{ value: 'c', label: 'User c' },
+ 	] }
++	__nextHasNoMarginBottom
+ />
+ ```
+ 
+@@ -133,6 +135,7 @@ const [ item, setItem ] = useState( '' );
+     label={ __( 'Select an item:' ) }
+     value={ item } // e.g: value = 'a'
+     onChange={ ( selection ) => { setItem( selection ) } }
++    __nextHasNoMarginBottom
+ >
+ 	<optgroup label="Theropods">
+ 		<option value="Tyrannosaurus">Tyrannosaurus</option>
+@@ -215,6 +218,14 @@ If multiple is false the value received is a single value with the new selected
+ -   Type: `function`
+ -   Required: Yes
+ 
++### __nextHasNoMarginBottom
++
++Start opting into the new margin-free styles that will become the default in a future version.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
+ ## Related components
+ 
+ -   To select one option from a set, and you want to show them all the available options at once, use the `Radio` component.
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 95614becc2ac59..fc5f36c32d5bc7 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -47,6 +47,7 @@ function UnforwardedSelectControl(
+ 		children,
+ 		prefix,
+ 		suffix,
++		__nextHasNoMarginBottom = false,
+ 		...props
+ 	}: WordPressComponentProps< SelectControlProps, 'select', false >,
+ 	ref: ForwardedRef< HTMLSelectElement >
+@@ -85,7 +86,11 @@ function UnforwardedSelectControl(
+ 
+ 	/* eslint-disable jsx-a11y/no-onchange */
+ 	return (
+-		<BaseControl help={ help } id={ id }>
++		<BaseControl
++			help={ help }
++			id={ id }
++			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++		>
+ 			<InputBase
+ 				className={ classes }
+ 				disabled={ disabled }
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+index 81f62b55982a71..6c1e273c259a54 100644
+--- a/packages/components/src/select-control/types.ts
++++ b/packages/components/src/select-control/types.ts
+@@ -20,7 +20,7 @@ export interface SelectControlProps
+ 			| 'size'
+ 			| 'suffix'
+ 		>,
+-		Pick< BaseControlProps, 'help' > {
++		Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > {
+ 	/**
+ 	 * If this property is added, multiple values can be selected. The value passed should be an array.
+ 	 *

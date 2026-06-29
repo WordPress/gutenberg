@@ -1,0 +1,33 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5cdf14f89937f1..31cd61305a730c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fixes
+ 
+ -   `TextControl`: Ensures email and url inputs have consistent LTR alignment in RTL languages ([#68561](https://github.com/WordPress/gutenberg/pull/68561)).
++-   `InputControl`: Ensure consistent placeholder color ([#69334](https://github.com/WordPress/gutenberg/pull/69334)).
+ 
+ ### Enhancement
+ 
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index db24a5e60f137a..492c4bef0f4e20 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -285,7 +285,15 @@ export const Input = styled.input< InputProps >`
+ 		${ customPaddings }
+ 
+ 		&::-webkit-input-placeholder {
+-			line-height: normal;
++			color: ${ COLORS.ui.darkGrayPlaceholder };
++		}
++
++		&::-moz-placeholder {
++			color: ${ COLORS.ui.darkGrayPlaceholder };
++		}
++
++		&:-ms-input-placeholder {
++			color: ${ COLORS.ui.darkGrayPlaceholder };
+ 		}
+ 
+ 		&[type='email'],

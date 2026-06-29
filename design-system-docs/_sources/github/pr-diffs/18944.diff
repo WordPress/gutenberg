@@ -1,0 +1,429 @@
+diff --git a/packages/components/src/custom-select/index.js b/packages/components/src/custom-select-control/index.js
+similarity index 82%
+rename from packages/components/src/custom-select/index.js
+rename to packages/components/src/custom-select-control/index.js
+index 2244b13fe818f5..0d49c08e4de137 100644
+--- a/packages/components/src/custom-select/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -45,7 +45,7 @@ const stateReducer = (
+ 			return changes;
+ 	}
+ };
+-export default function CustomSelect( {
++export default function CustomSelectControl( {
+ 	className,
+ 	hideLabelFromVision,
+ 	label,
+@@ -70,7 +70,7 @@ export default function CustomSelect( {
+ 		stateReducer,
+ 	} );
+ 	const menuProps = getMenuProps( {
+-		className: 'components-custom-select__menu',
++		className: 'components-custom-select-control__menu',
+ 	} );
+ 	// We need this here, because the null active descendant is not
+ 	// fully ARIA compliant.
+@@ -82,11 +82,11 @@ export default function CustomSelect( {
+ 		delete menuProps[ 'aria-activedescendant' ];
+ 	}
+ 	return (
+-		<div className={ classnames( 'components-custom-select', className ) }>
++		<div className={ classnames( 'components-custom-select-control', className ) }>
+ 			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */ }
+ 			<label
+ 				{ ...getLabelProps( {
+-					className: classnames( 'components-custom-select__label', {
++					className: classnames( 'components-custom-select-control__label', {
+ 						'screen-reader-text': hideLabelFromVision,
+ 					} ),
+ 				} ) }
+@@ -98,13 +98,13 @@ export default function CustomSelect( {
+ 					// This is needed because some speech recognition software don't support `aria-labelledby`.
+ 					'aria-label': label,
+ 					'aria-labelledby': undefined,
+-					className: 'components-custom-select__button',
++					className: 'components-custom-select-control__button',
+ 				} ) }
+ 			>
+ 				{ itemToString( selectedItem ) }
+ 				<Dashicon
+ 					icon="arrow-down-alt2"
+-					className="components-custom-select__button-icon"
++					className="components-custom-select-control__button-icon"
+ 				/>
+ 			</Button>
+ 			<ul { ...menuProps }>
+@@ -116,16 +116,19 @@ export default function CustomSelect( {
+ 								item,
+ 								index,
+ 								key: item.key,
+-								className: classnames( 'components-custom-select__item', {
+-									'is-highlighted': index === highlightedIndex,
+-								} ),
++								className: classnames(
++									'components-custom-select-control__item',
++									{
++										'is-highlighted': index === highlightedIndex,
++									}
++								),
+ 								style: item.style,
+ 							} ) }
+ 						>
+ 							{ item === selectedItem && (
+ 								<Dashicon
+ 									icon="saved"
+-									className="components-custom-select__item-icon"
++									className="components-custom-select-control__item-icon"
+ 								/>
+ 							) }
+ 							{ item.name }
+diff --git a/packages/components/src/custom-select/stories/index.js b/packages/components/src/custom-select-control/stories/index.js
+similarity index 67%
+rename from packages/components/src/custom-select/stories/index.js
+rename to packages/components/src/custom-select-control/stories/index.js
+index 16dd86ed83593d..4313e736a24617 100644
+--- a/packages/components/src/custom-select/stories/index.js
++++ b/packages/components/src/custom-select-control/stories/index.js
+@@ -1,9 +1,9 @@
+ /**
+  * Internal dependencies
+  */
+-import CustomSelect from '../';
++import CustomSelectControl from '../';
+ 
+-export default { title: 'CustomSelect', component: CustomSelect };
++export default { title: 'CustomSelectControl', component: CustomSelectControl };
+ 
+ const options = [
+ 	{
+@@ -28,5 +28,5 @@ const options = [
+ 	},
+ ];
+ export const _default = () => (
+-	<CustomSelect label="Font Size" options={ options } />
++	<CustomSelectControl label="Font Size" options={ options } />
+ );
+diff --git a/packages/components/src/custom-select/style.scss b/packages/components/src/custom-select-control/style.scss
+similarity index 77%
+rename from packages/components/src/custom-select/style.scss
+rename to packages/components/src/custom-select-control/style.scss
+index dfbd9fc55a9dc1..fbd2d46bb5cb4e 100644
+--- a/packages/components/src/custom-select/style.scss
++++ b/packages/components/src/custom-select-control/style.scss
+@@ -1,14 +1,14 @@
+-.components-custom-select {
++.components-custom-select-control {
+ 	color: $dark-gray-500;
+ 	position: relative;
+ }
+ 
+-.components-custom-select__label {
++.components-custom-select-control__label {
+ 	display: block;
+ 	margin-bottom: 5px;
+ }
+ 
+-.components-custom-select__button {
++.components-custom-select-control__button {
+ 	border: 1px solid $dark-gray-200;
+ 	border-radius: 4px;
+ 	color: $dark-gray-500;
+@@ -31,7 +31,7 @@
+ 	}
+ }
+ 
+-.components-custom-select__menu {
++.components-custom-select-control__menu {
+ 	background: $white;
+ 	padding: 0;
+ 	position: absolute;
+@@ -39,7 +39,7 @@
+ 	z-index: z-index(".components-popover");
+ }
+ 
+-.components-custom-select__item {
++.components-custom-select-control__item {
+ 	align-items: center;
+ 	display: flex;
+ 	list-style-type: none;
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 15724a4d73bb3a..429e6fd8a10fa5 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -11,7 +11,7 @@ import { withInstanceId } from '@wordpress/compose';
+  */
+ import Button from '../button';
+ import RangeControl from '../range-control';
+-import CustomSelect from '../custom-select';
++import CustomSelectControl from '../custom-select-control';
+ 
+ function getSelectValueFromFontSize( fontSizes, value ) {
+ 	if ( value ) {
+@@ -79,7 +79,7 @@ function FontSizePicker( {
+ 			</legend>
+ 			<div className="components-font-size-picker__controls">
+ 				{ fontSizes.length > 0 && (
+-					<CustomSelect
++					<CustomSelectControl
+ 						className={ 'components-font-size-picker__select' }
+ 						label={ __( 'Preset Size' ) }
+ 						options={ options }
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index b89847f5a184ee..131eb6fc2120b1 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -16,7 +16,7 @@ export { default as ClipboardButton } from './clipboard-button';
+ export { default as ColorIndicator } from './color-indicator';
+ export { default as ColorPalette } from './color-palette';
+ export { default as ColorPicker } from './color-picker';
+-export { default as CustomSelect } from './custom-select';
++export { default as CustomSelectControl } from './custom-select-control';
+ export { default as Dashicon } from './dashicon';
+ export { DateTimePicker, DatePicker, TimePicker } from './date-time';
+ export { default as __experimentalDimensionControl } from './dimension-control';
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 27f6bf2b47a0dc..f8b6fda6c54307 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -7,7 +7,7 @@
+ @import "./circular-option-picker/style.scss";
+ @import "./color-indicator/style.scss";
+ @import "./color-picker/style.scss";
+-@import "./custom-select/style.scss";
++@import "./custom-select-control/style.scss";
+ @import "./dashicon/style.scss";
+ @import "./date-time/style.scss";
+ @import "./dimension-control/style.scss";
+diff --git a/packages/e2e-tests/specs/editor/various/change-detection.test.js b/packages/e2e-tests/specs/editor/various/change-detection.test.js
+index afc029a6895b3c..7add035fd79256 100644
+--- a/packages/e2e-tests/specs/editor/various/change-detection.test.js
++++ b/packages/e2e-tests/specs/editor/various/change-detection.test.js
+@@ -371,7 +371,7 @@ describe( 'Change detection', () => {
+ 		// Increase the paragraph's font size.
+ 		await page.click( '[data-type="core/paragraph"]' );
+ 		await page.click( '.components-font-size-picker__select' );
+-		await page.click( '.components-custom-select__item:nth-child(3)' );
++		await page.click( '.components-custom-select-control__item:nth-child(3)' );
+ 		await page.click( '[data-type="core/paragraph"]' );
+ 
+ 		// Check that the post is dirty.
+@@ -386,7 +386,7 @@ describe( 'Change detection', () => {
+ 		// Increase the paragraph's font size again.
+ 		await page.click( '[data-type="core/paragraph"]' );
+ 		await page.click( '.components-font-size-picker__select' );
+-		await page.click( '.components-custom-select__item:nth-child(4)' );
++		await page.click( '.components-custom-select-control__item:nth-child(4)' );
+ 		await page.click( '[data-type="core/paragraph"]' );
+ 
+ 		// Check that the post is dirty.
+diff --git a/packages/e2e-tests/specs/editor/various/editor-modes.test.js b/packages/e2e-tests/specs/editor/various/editor-modes.test.js
+index 17cd734cc648e1..ac5c7180d39067 100644
+--- a/packages/e2e-tests/specs/editor/various/editor-modes.test.js
++++ b/packages/e2e-tests/specs/editor/various/editor-modes.test.js
+@@ -79,7 +79,7 @@ describe( 'Editing modes (visual/HTML)', () => {
+ 
+ 		// Change the font size using the sidebar.
+ 		await page.click( '.components-font-size-picker__select' );
+-		await page.click( '.components-custom-select__item:nth-child(4)' );
++		await page.click( '.components-custom-select-control__item:nth-child(4)' );
+ 
+ 		// Make sure the HTML content updated.
+ 		htmlBlockContent = await page.$eval( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea', ( node ) => node.textContent );
+diff --git a/packages/e2e-tests/specs/editor/various/font-size-picker.test.js b/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
+index 8285d52dfb9076..04639b26814861 100644
+--- a/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
++++ b/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
+@@ -18,7 +18,7 @@ describe( 'Font Size Picker', () => {
+ 		await clickBlockAppender();
+ 		await page.keyboard.type( 'Paragraph to be made "large"' );
+ 		await page.click( '.components-font-size-picker__select' );
+-		await page.click( '.components-custom-select__item:nth-child(4)' );
++		await page.click( '.components-custom-select-control__item:nth-child(4)' );
+ 
+ 		// Ensure content matches snapshot.
+ 		const content = await getEditedPostContent();
+@@ -58,7 +58,7 @@ describe( 'Font Size Picker', () => {
+ 		await page.keyboard.type( 'Paragraph with font size reset using button' );
+ 
+ 		await page.click( '.components-font-size-picker__select' );
+-		await page.click( '.components-custom-select__item:nth-child(2)' );
++		await page.click( '.components-custom-select-control__item:nth-child(2)' );
+ 
+ 		const resetButton = ( await page.$x( '//*[contains(concat(" ", @class, " "), " components-font-size-picker__controls ")]//*[text()=\'Reset\']' ) )[ 0 ];
+ 		await resetButton.click();
+@@ -74,7 +74,7 @@ describe( 'Font Size Picker', () => {
+ 		await page.keyboard.type( 'Paragraph with font size reset using input field' );
+ 
+ 		await page.click( '.components-font-size-picker__select' );
+-		await page.click( '.components-custom-select__item:nth-child(3)' );
++		await page.click( '.components-custom-select-control__item:nth-child(3)' );
+ 
+ 		// Clear the custom font size input.
+ 		await page.click( '.blocks-font-size .components-range-control__number' );
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index b34d7ad67005b5..9d724a9324cb3e 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -1550,10 +1550,10 @@ exports[`Storyshots Components|FontSizePicker Default 1`] = `
+     className="components-font-size-picker__controls"
+   >
+     <div
+-      className="components-custom-select components-font-size-picker__select"
++      className="components-custom-select-control components-font-size-picker__select"
+     >
+       <label
+-        className="components-custom-select__label"
++        className="components-custom-select-control__label"
+         htmlFor="downshift-null-toggle-button"
+         id="downshift-null-label"
+       >
+@@ -1563,7 +1563,7 @@ exports[`Storyshots Components|FontSizePicker Default 1`] = `
+         aria-expanded={false}
+         aria-haspopup="listbox"
+         aria-label="Preset Size"
+-        className="components-button components-custom-select__button"
++        className="components-button components-custom-select-control__button"
+         id="downshift-null-toggle-button"
+         onClick={[Function]}
+         onKeyDown={[Function]}
+@@ -1572,7 +1572,7 @@ exports[`Storyshots Components|FontSizePicker Default 1`] = `
+         Normal
+         <svg
+           aria-hidden="true"
+-          className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
++          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
+           focusable="false"
+           height={20}
+           role="img"
+@@ -1587,7 +1587,7 @@ exports[`Storyshots Components|FontSizePicker Default 1`] = `
+       </button>
+       <ul
+         aria-labelledby="downshift-null-label"
+-        className="components-custom-select__menu"
++        className="components-custom-select-control__menu"
+         id="downshift-null-menu"
+         onBlur={[Function]}
+         onKeyDown={[Function]}
+@@ -1638,10 +1638,10 @@ exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
+     className="components-font-size-picker__controls"
+   >
+     <div
+-      className="components-custom-select components-font-size-picker__select"
++      className="components-custom-select-control components-font-size-picker__select"
+     >
+       <label
+-        className="components-custom-select__label"
++        className="components-custom-select-control__label"
+         htmlFor="downshift-null-toggle-button"
+         id="downshift-null-label"
+       >
+@@ -1651,7 +1651,7 @@ exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
+         aria-expanded={false}
+         aria-haspopup="listbox"
+         aria-label="Preset Size"
+-        className="components-button components-custom-select__button"
++        className="components-button components-custom-select-control__button"
+         id="downshift-null-toggle-button"
+         onClick={[Function]}
+         onKeyDown={[Function]}
+@@ -1660,7 +1660,7 @@ exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
+         Normal
+         <svg
+           aria-hidden="true"
+-          className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
++          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
+           focusable="false"
+           height={20}
+           role="img"
+@@ -1675,7 +1675,7 @@ exports[`Storyshots Components|FontSizePicker With Slider 1`] = `
+       </button>
+       <ul
+         aria-labelledby="downshift-null-label"
+-        className="components-custom-select__menu"
++        className="components-custom-select-control__menu"
+         id="downshift-null-menu"
+         onBlur={[Function]}
+         onKeyDown={[Function]}
+@@ -1770,10 +1770,10 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
+     className="components-font-size-picker__controls"
+   >
+     <div
+-      className="components-custom-select components-font-size-picker__select"
++      className="components-custom-select-control components-font-size-picker__select"
+     >
+       <label
+-        className="components-custom-select__label"
++        className="components-custom-select-control__label"
+         htmlFor="downshift-null-toggle-button"
+         id="downshift-null-label"
+       >
+@@ -1783,7 +1783,7 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
+         aria-expanded={false}
+         aria-haspopup="listbox"
+         aria-label="Preset Size"
+-        className="components-button components-custom-select__button"
++        className="components-button components-custom-select-control__button"
+         id="downshift-null-toggle-button"
+         onClick={[Function]}
+         onKeyDown={[Function]}
+@@ -1792,7 +1792,7 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
+         Normal
+         <svg
+           aria-hidden="true"
+-          className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
++          className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
+           focusable="false"
+           height={20}
+           role="img"
+@@ -1807,7 +1807,7 @@ exports[`Storyshots Components|FontSizePicker Without Custom Sizes 1`] = `
+       </button>
+       <ul
+         aria-labelledby="downshift-null-label"
+-        className="components-custom-select__menu"
++        className="components-custom-select-control__menu"
+         id="downshift-null-menu"
+         onBlur={[Function]}
+         onKeyDown={[Function]}
+@@ -3928,12 +3928,12 @@ Array [
+ ]
+ `;
+ 
+-exports[`Storyshots CustomSelect Default 1`] = `
++exports[`Storyshots CustomSelectControl Default 1`] = `
+ <div
+-  className="components-custom-select"
++  className="components-custom-select-control"
+ >
+   <label
+-    className="components-custom-select__label"
++    className="components-custom-select-control__label"
+     htmlFor="downshift-null-toggle-button"
+     id="downshift-null-label"
+   >
+@@ -3943,7 +3943,7 @@ exports[`Storyshots CustomSelect Default 1`] = `
+     aria-expanded={false}
+     aria-haspopup="listbox"
+     aria-label="Font Size"
+-    className="components-button components-custom-select__button"
++    className="components-button components-custom-select-control__button"
+     id="downshift-null-toggle-button"
+     onClick={[Function]}
+     onKeyDown={[Function]}
+@@ -3951,7 +3951,7 @@ exports[`Storyshots CustomSelect Default 1`] = `
+   >
+     <svg
+       aria-hidden="true"
+-      className="dashicon dashicons-arrow-down-alt2 components-custom-select__button-icon"
++      className="dashicon dashicons-arrow-down-alt2 components-custom-select-control__button-icon"
+       focusable="false"
+       height={20}
+       role="img"
+@@ -3966,7 +3966,7 @@ exports[`Storyshots CustomSelect Default 1`] = `
+   </button>
+   <ul
+     aria-labelledby="downshift-null-label"
+-    className="components-custom-select__menu"
++    className="components-custom-select-control__menu"
+     id="downshift-null-menu"
+     onBlur={[Function]}
+     onKeyDown={[Function]}

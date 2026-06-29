@@ -1,0 +1,40 @@
+diff --git a/packages/block-library/src/embed/test/__snapshots__/index.js.snap b/packages/block-library/src/embed/test/__snapshots__/index.js.snap
+index 78923aa24c5f6b..2023cab5e5b65f 100644
+--- a/packages/block-library/src/embed/test/__snapshots__/index.js.snap
++++ b/packages/block-library/src/embed/test/__snapshots__/index.js.snap
+@@ -61,7 +61,7 @@ exports[`core/embed block edit matches snapshot 1`] = `
+       >
+         Learn more about embeds
+         <span
+-          class="screen-reader-text"
++          class="components-visually-hidden"
+         >
+           (opens in a new tab)
+         </span>
+diff --git a/packages/components/src/external-link/index.js b/packages/components/src/external-link/index.js
+index 68bf56394b8f86..cc9750a4b779c9 100644
+--- a/packages/components/src/external-link/index.js
++++ b/packages/components/src/external-link/index.js
+@@ -14,6 +14,7 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Dashicon from '../dashicon';
++import VisuallyHidden from '../visually-hidden';
+ 
+ export function ExternalLink( { href, children, className, rel = '', ...additionalProps }, ref ) {
+ 	rel = uniq( compact( [
+@@ -27,12 +28,12 @@ export function ExternalLink( { href, children, className, rel = '', ...addition
+ 		// eslint-disable-next-line react/jsx-no-target-blank
+ 		<a { ...additionalProps } className={ classes } href={ href } target="_blank" rel={ rel } ref={ ref }>
+ 			{ children }
+-			<span className="screen-reader-text">
++			<VisuallyHidden as="span">
+ 				{
+ 					/* translators: accessibility text */
+ 					__( '(opens in a new tab)' )
+ 				}
+-			</span>
++			</VisuallyHidden>
+ 			<Dashicon icon="external" className="components-external-link__icon" />
+ 		</a>
+ 	);

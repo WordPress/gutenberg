@@ -1,0 +1,92 @@
+diff --git a/packages/block-editor/src/components/inserter/style.scss b/packages/block-editor/src/components/inserter/style.scss
+index 1f651f71f8b3ae..c2d07cda793d95 100644
+--- a/packages/block-editor/src/components/inserter/style.scss
++++ b/packages/block-editor/src/components/inserter/style.scss
+@@ -467,14 +467,9 @@ $block-inserter-tabs-height: 44px;
+ 
+ 	.block-editor-inserter__media-panel-search {
+ 		margin-bottom: $grid-unit-30;
+-		// TODO: Consider using the Theme component to automatically adapt to a gray background.
+ 		@include break-medium() {
+ 			margin-bottom: 0;
+ 			padding: $grid-unit-20 $grid-unit-30 $grid-unit-20;
+-
+-			&:not(:focus-within) {
+-				--wp-components-color-background: #{$white};
+-			}
+ 		}
+ 	}
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 55ff44d607445e..fbec75c01653e0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `SearchControl`: Move search icon to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
+ -   `SearchControl`: Flip search icon depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
++-   `SearchControl`: Normalize styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/search-control/index.tsx b/packages/components/src/search-control/index.tsx
+index 2f371c8457ab7f..f6be806e7246df 100644
+--- a/packages/components/src/search-control/index.tsx
++++ b/packages/components/src/search-control/index.tsx
+@@ -95,8 +95,6 @@ function UnforwardedSearchControl(
+ 				_overrides: { __nextHasNoMarginBottom },
+ 				__associatedWPComponentName: 'SearchControl',
+ 			},
+-			// `isBorderless` is still experimental and not a public prop for InputControl yet.
+-			InputBase: { isBorderless: true },
+ 		} ),
+ 		[ __nextHasNoMarginBottom ]
+ 	);
+diff --git a/packages/components/src/search-control/styles.ts b/packages/components/src/search-control/styles.ts
+index 8b89813ff990eb..cc2a40004bbaac 100644
+--- a/packages/components/src/search-control/styles.ts
++++ b/packages/components/src/search-control/styles.ts
+@@ -8,7 +8,6 @@ import styled from '@emotion/styled';
+  */
+ import InputControl from '../input-control';
+ import Icon from '../icon';
+-import { COLORS } from '../utils';
+ 
+ export const StyledInputControl = styled( InputControl )`
+ 	input[type='search'] {
+@@ -19,10 +18,6 @@ export const StyledInputControl = styled( InputControl )`
+ 			-webkit-appearance: none;
+ 		}
+ 	}
+-
+-	&:not( :focus-within ) {
+-		--wp-components-color-background: ${ COLORS.theme.gray[ 100 ] };
+-	}
+ `;
+ 
+ export const StyledIcon = styled( Icon )`
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 939ce57b5dc9f3..03e2f26dc0cf76 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ - Move search icon in search fields to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
+ - Flip search icons depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
+ - DataViews: Improve renderItemLink event propagation handling. ([#72081](https://github.com/WordPress/gutenberg/pull/72081)).
++- Normalize search field styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
+ 
+ ### Breaking changes
+ 
+diff --git a/packages/dataviews/src/components/dataviews-filters/style.scss b/packages/dataviews/src/components/dataviews-filters/style.scss
+index 36726e1fec101a..13422153b69884 100644
+--- a/packages/dataviews/src/components/dataviews-filters/style.scss
++++ b/packages/dataviews/src/components/dataviews-filters/style.scss
+@@ -318,8 +318,6 @@
+ 		@include input-control;
+ 		display: block;
+ 		padding: 0 $grid-unit-10 0 $grid-unit-40;
+-		background: $gray-100;
+-		border: none;
+ 		width: 100%;
+ 		height: $grid-unit-40;
+ 

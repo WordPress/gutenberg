@@ -1,0 +1,294 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7443f7f02e59a3..e496176e93595c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,10 +6,15 @@
+ 
+ -   `ColorPicker`: Remove horizontal scrollbar when using HSL or RGB color input types. ([#41646](https://github.com/WordPress/gutenberg/pull/41646))
+ 
++### Enhancements
++
++-   Wrapped `ColorIndicator` in a `forwardRef` call ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
++
+ ### Internal
+ 
+ -   `Spinner`: Convert to TypeScript and update storybook ([#41540](https://github.com/WordPress/gutenberg/pull/41540/)).
+ -   `InputControl`: Add tests and update to use `@testing-library/user-event` ([#41421](https://github.com/WordPress/gutenberg/pull/41421)).
++-   `ColorIndicator`: Convert to TypeScript ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
+ -   `AlignmentMatrixControl`: Refactor away from `_.flattenDeep()` in utils ([#41814](https://github.com/WordPress/gutenberg/pull/41814/)).
+ 
+ ## 19.13.0 (2022-06-15)
+@@ -42,7 +47,6 @@
+ -   `InputControl` updated to satisfy `react/exhuastive-deps` eslint rule ([#41601](https://github.com/WordPress/gutenberg/pull/41601))
+ -   `Modal`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41610](https://github.com/WordPress/gutenberg/pull/41610))
+ 
+-
+ ### Experimental
+ 
+ -   `Navigation`: improve unit tests by using `@testing-library/user-event` and modern `@testing-library` assertions; add unit test for controlled component ([#41668](https://github.com/WordPress/gutenberg/pull/41668)).
+diff --git a/packages/components/src/color-indicator/README.md b/packages/components/src/color-indicator/README.md
+index a1bf8150e6e181..3a16e1412d82ac 100644
+--- a/packages/components/src/color-indicator/README.md
++++ b/packages/components/src/color-indicator/README.md
+@@ -1,6 +1,6 @@
+ # ColorIndicator
+ 
+-ColorIndicator is a React component that renders a specific color in a squared box. It's often used to summarize a collection of used colors in a child component.
++ColorIndicator is a React component that renders a specific color in a circle. It's often used to summarize a collection of used colors in a child component.
+ 
+ ### Single component
+ 
+@@ -22,16 +22,14 @@ const MyColorIndicator = () => <ColorIndicator colorValue="#0073aa" />;
+ 
+ The component accepts the following props:
+ 
+-### colorValue
++### `className`: `string`
+ 
+-The color of the indicator. Any value from the [`background`](https://developer.mozilla.org/en-US/docs/Web/CSS/background) property is supported.
++Extra classes for the used `<span>` element. By default only `component-color-indicator` is added.
+ 
+--   Type: `string`
+--   Required: Yes
++-   Required: No
+ 
+-### className
++### `colorValue`: `CSSProperties[ 'background' ]`
+ 
+-Extra classes for the used `<span>` element. By default only `component-color-indicator` is added.
++The color of the indicator. Any value from the CSS [`background`](https://developer.mozilla.org/en-US/docs/Web/CSS/background) property is supported.
+ 
+--   Type: `string`
+--   Required: No
++-   Required: Yes
+diff --git a/packages/components/src/color-indicator/index.js b/packages/components/src/color-indicator/index.js
+deleted file mode 100644
+index 6c93094454d99c..00000000000000
+--- a/packages/components/src/color-indicator/index.js
++++ /dev/null
+@@ -1,16 +0,0 @@
+-// @ts-nocheck
+-
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-const ColorIndicator = ( { className, colorValue, ...props } ) => (
+-	<span
+-		className={ classnames( 'component-color-indicator', className ) }
+-		style={ { background: colorValue } }
+-		{ ...props }
+-	/>
+-);
+-
+-export default ColorIndicator;
+diff --git a/packages/components/src/color-indicator/index.tsx b/packages/components/src/color-indicator/index.tsx
+new file mode 100644
+index 00000000000000..fc402eac03f8c1
+--- /dev/null
++++ b/packages/components/src/color-indicator/index.tsx
+@@ -0,0 +1,47 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++import type { ForwardedRef } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { WordPressComponentProps } from '../ui/context';
++import type { ColorIndicatorProps } from './types';
++
++function UnforwardedColorIndicator(
++	props: WordPressComponentProps< ColorIndicatorProps, 'span', false >,
++	forwardedRef: ForwardedRef< HTMLSpanElement >
++) {
++	const { className, colorValue, ...additionalProps } = props;
++
++	return (
++		<span
++			className={ classnames( 'component-color-indicator', className ) }
++			style={ { background: colorValue } }
++			ref={ forwardedRef }
++			{ ...additionalProps }
++		/>
++	);
++}
++
++/**
++ * ColorIndicator is a React component that renders a specific color in a
++ * circle. It's often used to summarize a collection of used colors in a child
++ * component.
++ *
++ * ```jsx
++ * import { ColorIndicator } from '@wordpress/components';
++ *
++ * const MyColorIndicator = () => <ColorIndicator colorValue="#0073aa" />;
++ * ```
++ */
++export const ColorIndicator = forwardRef( UnforwardedColorIndicator );
++
++export default ColorIndicator;
+diff --git a/packages/components/src/color-indicator/stories/index.js b/packages/components/src/color-indicator/stories/index.js
+deleted file mode 100644
+index 0f143e467f5df8..00000000000000
+--- a/packages/components/src/color-indicator/stories/index.js
++++ /dev/null
+@@ -1,22 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { text } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-import ColorIndicator from '../';
+-
+-export default {
+-	title: 'Components/ColorIndicator',
+-	component: ColorIndicator,
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-export const _default = () => {
+-	const color = text( 'Color', '#0073aa' );
+-	return <ColorIndicator colorValue={ color } />;
+-};
+diff --git a/packages/components/src/color-indicator/stories/index.tsx b/packages/components/src/color-indicator/stories/index.tsx
+new file mode 100644
+index 00000000000000..40019fbf0ba1a2
+--- /dev/null
++++ b/packages/components/src/color-indicator/stories/index.tsx
+@@ -0,0 +1,37 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import ColorIndicator from '..';
++
++const meta: ComponentMeta< typeof ColorIndicator > = {
++	component: ColorIndicator,
++	title: 'Components/ColorIndicator',
++	argTypes: {
++		colorValue: {
++			control: { type: 'color' },
++		},
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof ColorIndicator > = ( { ...args } ) => (
++	<ColorIndicator { ...args } />
++);
++
++export const Default: ComponentStory< typeof ColorIndicator > = Template.bind(
++	{}
++);
++Default.args = {
++	colorValue: '#0073aa',
++};
+diff --git a/packages/components/src/color-indicator/test/__snapshots__/index.js.snap b/packages/components/src/color-indicator/test/__snapshots__/index.js.snap
+deleted file mode 100644
+index 3485db28d09195..00000000000000
+--- a/packages/components/src/color-indicator/test/__snapshots__/index.js.snap
++++ /dev/null
+@@ -1,13 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`ColorIndicator matches the snapshot 1`] = `
+-<span
+-  aria-label="sample label"
+-  className="component-color-indicator"
+-  style={
+-    Object {
+-      "background": "#fff",
+-    }
+-  }
+-/>
+-`;
+diff --git a/packages/components/src/color-indicator/test/__snapshots__/index.tsx.snap b/packages/components/src/color-indicator/test/__snapshots__/index.tsx.snap
+new file mode 100644
+index 00000000000000..f213ccf18d6a66
+--- /dev/null
++++ b/packages/components/src/color-indicator/test/__snapshots__/index.tsx.snap
+@@ -0,0 +1,11 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`ColorIndicator matches the snapshot 1`] = `
++<div>
++  <span
++    aria-label="sample label"
++    class="component-color-indicator"
++    style="background: rgb(255, 255, 255);"
++  />
++</div>
++`;
+diff --git a/packages/components/src/color-indicator/test/index.js b/packages/components/src/color-indicator/test/index.tsx
+similarity index 59%
+rename from packages/components/src/color-indicator/test/index.js
+rename to packages/components/src/color-indicator/test/index.tsx
+index dfa595ff2b4092..bcc68b7cbdb3af 100644
+--- a/packages/components/src/color-indicator/test/index.js
++++ b/packages/components/src/color-indicator/test/index.tsx
+@@ -1,19 +1,19 @@
+ /**
+  * External dependencies
+  */
+-import { shallow } from 'enzyme';
++import { render } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+  */
+-import ColorIndicator from '../';
++import ColorIndicator from '..';
+ 
+ describe( 'ColorIndicator', () => {
+ 	it( 'matches the snapshot', () => {
+-		const wrapper = shallow(
++		const { container } = render(
+ 			<ColorIndicator aria-label="sample label" colorValue="#fff" />
+ 		);
+ 
+-		expect( wrapper ).toMatchSnapshot();
++		expect( container ).toMatchSnapshot();
+ 	} );
+ } );
+diff --git a/packages/components/src/color-indicator/types.ts b/packages/components/src/color-indicator/types.ts
+new file mode 100644
+index 00000000000000..ceaf7efa8127a2
+--- /dev/null
++++ b/packages/components/src/color-indicator/types.ts
+@@ -0,0 +1,12 @@
++/**
++ * External dependencies
++ */
++import type { CSSProperties } from 'react';
++
++export type ColorIndicatorProps = {
++	/**
++	 * The color of the indicator. Any value from the CSS `background` property
++	 * is supported.
++	 */
++	colorValue: CSSProperties[ 'background' ];
++};

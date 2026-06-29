@@ -1,0 +1,45 @@
+diff --git a/packages/components/src/search-control/index.tsx b/packages/components/src/search-control/index.tsx
+index aac905e137e025..bd1e2aaeb9e2ef 100644
+--- a/packages/components/src/search-control/index.tsx
++++ b/packages/components/src/search-control/index.tsx
+@@ -27,23 +27,27 @@ function SuffixItem( {
+ 	onChange,
+ 	onClose,
+ }: SuffixItemProps ) {
+-	if ( ! onClose && ! value ) {
++	if ( ! onClose ) {
+ 		return <Icon icon={ search } />;
+ 	}
+ 
+-	const onReset = () => {
+-		onChange( '' );
+-		searchRef.current?.focus();
+-	};
++	if ( value ) {
++		const onReset = () => {
++			onChange( '' );
++			searchRef.current?.focus();
++		};
+ 
+-	return (
+-		<Button
+-			size="small"
+-			icon={ closeSmall }
+-			label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
+-			onClick={ onClose ?? onReset }
+-		/>
+-	);
++		return (
++			<Button
++				size="small"
++				icon={ closeSmall }
++				label={ __( 'Reset search' ) }
++				onClick={ onClose ?? onReset }
++			/>
++		);
++	}
++
++	return <Icon icon={ search } />;
+ }
+ 
+ function UnforwardedSearchControl(

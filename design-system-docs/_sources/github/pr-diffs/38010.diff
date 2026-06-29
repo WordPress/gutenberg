@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/color-picker/README.md b/packages/components/src/color-picker/README.md
+index 1b065203196a7a..3aa595183ac735 100644
+--- a/packages/components/src/color-picker/README.md
++++ b/packages/components/src/color-picker/README.md
+@@ -5,7 +5,7 @@
+ ## Usage
+ 
+ ```jsx
+-import { ColorPicker } from '@wordpress/components/ui';
++import { ColorPicker } from '@wordpress/components';
+ 
+ function Example() {
+ 	const [color, setColor] = useState();

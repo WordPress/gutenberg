@@ -1,0 +1,152 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9d20924dcfe610..fdeea311958938 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `CustomGradientPicker`: Add state persistence when switching between Linear and Radial Gradient ([#76595](https://github.com/WordPress/gutenberg/pull/76595)).
++
+ ## 32.4.0 (2026-03-18)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/custom-gradient-picker/index.tsx b/packages/components/src/custom-gradient-picker/index.tsx
+index 1777f5260eb0a4..ceab70c0a82dc3 100644
+--- a/packages/components/src/custom-gradient-picker/index.tsx
++++ b/packages/components/src/custom-gradient-picker/index.tsx
+@@ -7,6 +7,7 @@ import { type LinearGradientNode } from 'gradient-parser';
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
++import { useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -25,8 +26,8 @@ import {
+ import { serializeGradient } from './serializer';
+ import {
+ 	DEFAULT_LINEAR_GRADIENT_ANGLE,
+-	HORIZONTAL_GRADIENT_ORIENTATION,
+ 	GRADIENT_OPTIONS,
++	HORIZONTAL_GRADIENT_ORIENTATION,
+ } from './constants';
+ import {
+ 	AccessoryWrapper,
+@@ -70,14 +71,24 @@ const GradientTypePicker = ( {
+ 	onChange,
+ }: GradientTypePickerProps ) => {
+ 	const { type } = gradientAST;
++	const lastLinearOrientationAngle = useRef(
++		Number( HORIZONTAL_GRADIENT_ORIENTATION.value )
++	);
++
++	if ( type === 'linear-gradient' && gradientAST.orientation ) {
++		lastLinearOrientationAngle.current = Number(
++			gradientAST.orientation.value
++		);
++	}
+ 
+ 	const onSetLinearGradient = () => {
+ 		onChange(
+ 			serializeGradient( {
+ 				...gradientAST,
+-				orientation: gradientAST.orientation
+-					? undefined
+-					: HORIZONTAL_GRADIENT_ORIENTATION,
++				orientation: {
++					type: 'angular' as const,
++					value: `${ lastLinearOrientationAngle.current }`,
++				},
+ 				type: 'linear-gradient',
+ 			} satisfies LinearGradientNode )
+ 		);
+diff --git a/packages/components/src/custom-gradient-picker/test/index.tsx b/packages/components/src/custom-gradient-picker/test/index.tsx
+new file mode 100644
+index 00000000000000..69b32d8f1a3521
+--- /dev/null
++++ b/packages/components/src/custom-gradient-picker/test/index.tsx
+@@ -0,0 +1,81 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * Internal dependencies
++ */
++import CustomGradientPicker from '../';
++
++describe( 'CustomGradientPicker', () => {
++	describe( 'GradientTypePicker angle persistence', () => {
++		it( 'should restore the previous linear angle when switching from radial back to linear', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++
++			render(
++				<CustomGradientPicker
++					value="linear-gradient(125deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
++					onChange={ onChange }
++				/>
++			);
++
++			const typeSelect = screen.getByRole( 'combobox', {
++				name: /type/i,
++			} );
++			await user.selectOptions( typeSelect, 'radial-gradient' );
++			await user.selectOptions( typeSelect, 'linear-gradient' );
++
++			// Verify the angle from before the radial switch is restored, not the default
++			const lastCall =
++				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
++			expect( lastCall ).toContain( '125deg' );
++		} );
++
++		it( 'should use HORIZONTAL_GRADIENT_ORIENTATION when no prior linear angle exists', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++
++			// Start with a radial gradient so there is no previous linear angle in the ref
++			render(
++				<CustomGradientPicker
++					value="radial-gradient(rgb(0,0,0) 0%, rgb(255,255,255) 100%)"
++					onChange={ onChange }
++				/>
++			);
++
++			const typeSelect = screen.getByRole( 'combobox', {
++				name: /type/i,
++			} );
++			await user.selectOptions( typeSelect, 'linear-gradient' );
++
++			const lastCall =
++				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
++			expect( lastCall ).toContain( '90deg' );
++		} );
++
++		it( 'should not restore angle when switching to radial', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++
++			render(
++				<CustomGradientPicker
++					value="linear-gradient(45deg, rgb(0,0,0) 0%, rgb(255,255,255) 100%)"
++					onChange={ onChange }
++				/>
++			);
++
++			const typeSelect = screen.getByRole( 'combobox', {
++				name: /type/i,
++			} );
++			await user.selectOptions( typeSelect, 'radial-gradient' );
++
++			// Radial gradients have no orientation, so deg should not appear in the output
++			const lastCall =
++				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
++			expect( lastCall ).not.toContain( 'deg' );
++		} );
++	} );
++} );

@@ -1,0 +1,1159 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 7afc7b3355bfd4..977de2f308fbed 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   Add `Card` and `CollapsibleCard` primitives ([#76252](https://github.com/WordPress/gutenberg/pull/76252)).
++
+ ## 0.8.0 (2026-03-04)
+ 
+ ### Breaking Changes
+diff --git a/packages/ui/src/card/content.tsx b/packages/ui/src/card/content.tsx
+new file mode 100644
+index 00000000000000..b8819e6d5d7da3
+--- /dev/null
++++ b/packages/ui/src/card/content.tsx
+@@ -0,0 +1,20 @@
++import { mergeProps, useRender } from '@base-ui/react';
++import { forwardRef } from '@wordpress/element';
++import styles from './style.module.css';
++import type { ContentProps } from './types';
++
++/**
++ * The main content area of the card.
++ */
++export const Content = forwardRef< HTMLDivElement, ContentProps >(
++	function CardContent( { render, ...props }, ref ) {
++		const element = useRender( {
++			defaultTagName: 'div',
++			render,
++			ref,
++			props: mergeProps< 'div' >( { className: styles.content }, props ),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/card/full-bleed.tsx b/packages/ui/src/card/full-bleed.tsx
+new file mode 100644
+index 00000000000000..5132a92fb30e41
+--- /dev/null
++++ b/packages/ui/src/card/full-bleed.tsx
+@@ -0,0 +1,26 @@
++import { mergeProps, useRender } from '@base-ui/react';
++import { forwardRef } from '@wordpress/element';
++import styles from './style.module.css';
++import type { FullBleedProps } from './types';
++
++/**
++ * A container that breaks out of the card's padding to span edge-to-edge.
++ * Useful for full-width images, dividers, or embedded content.
++ *
++ * Must be used as a direct child of `Card.Content` or `Card.Header`.
++ */
++export const FullBleed = forwardRef< HTMLDivElement, FullBleedProps >(
++	function CardFullBleed( { render, ...props }, ref ) {
++		const element = useRender( {
++			defaultTagName: 'div',
++			render,
++			ref,
++			props: mergeProps< 'div' >(
++				{ className: styles.fullbleed },
++				props
++			),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/card/header.tsx b/packages/ui/src/card/header.tsx
+new file mode 100644
+index 00000000000000..1a7642830e2899
+--- /dev/null
++++ b/packages/ui/src/card/header.tsx
+@@ -0,0 +1,21 @@
++import { mergeProps, useRender } from '@base-ui/react';
++import { forwardRef } from '@wordpress/element';
++import styles from './style.module.css';
++import type { HeaderProps } from './types';
++
++/**
++ * A structural container for the card's heading area, typically containing
++ * `Card.Title`.
++ */
++export const Header = forwardRef< HTMLDivElement, HeaderProps >(
++	function CardHeader( { render, ...props }, ref ) {
++		const element = useRender( {
++			defaultTagName: 'div',
++			render,
++			ref,
++			props: mergeProps< 'div' >( { className: styles.header }, props ),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/card/index.ts b/packages/ui/src/card/index.ts
+new file mode 100644
+index 00000000000000..c23fa3474fb191
+--- /dev/null
++++ b/packages/ui/src/card/index.ts
+@@ -0,0 +1,7 @@
++import { Root } from './root';
++import { Header } from './header';
++import { Content } from './content';
++import { FullBleed } from './full-bleed';
++import { Title } from './title';
++
++export { Root, Header, Content, FullBleed, Title };
+diff --git a/packages/ui/src/card/root.tsx b/packages/ui/src/card/root.tsx
+new file mode 100644
+index 00000000000000..3cb19e6fe2b227
+--- /dev/null
++++ b/packages/ui/src/card/root.tsx
+@@ -0,0 +1,42 @@
++import { mergeProps, useRender } from '@base-ui/react';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import resetStyles from '../utils/css/resets.module.css';
++import styles from './style.module.css';
++import type { RootProps } from './types';
++
++/**
++ * A visually contained surface that groups related content and actions.
++ *
++ * ```jsx
++ * import { Card } from '@wordpress/ui';
++ *
++ * function MyComponent() {
++ * 	return (
++ * 		<Card.Root>
++ * 			<Card.Header>
++ * 				<Card.Title>Heading</Card.Title>
++ * 			</Card.Header>
++ * 			<Card.Content>
++ * 				<p>Main content here.</p>
++ * 			</Card.Content>
++ * 		</Card.Root>
++ * 	);
++ * }
++ * ```
++ */
++export const Root = forwardRef< HTMLDivElement, RootProps >( function Card(
++	{ render, ...restProps },
++	ref
++) {
++	const mergedClassName = clsx( styles.root, resetStyles[ 'box-sizing' ] );
++
++	const element = useRender( {
++		defaultTagName: 'div',
++		render,
++		ref,
++		props: mergeProps< 'div' >( { className: mergedClassName }, restProps ),
++	} );
++
++	return element;
++} );
+diff --git a/packages/ui/src/card/stories/index.story.tsx b/packages/ui/src/card/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..7f55b6575666a8
+--- /dev/null
++++ b/packages/ui/src/card/stories/index.story.tsx
+@@ -0,0 +1,128 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import * as Card from '../index';
++
++/**
++ * Temporary text component for story examples. This will be replaced by an
++ * official DS `<Text />` component once it's available.
++ */
++function Text( { children }: { children: React.ReactNode } ) {
++	return (
++		<p
++			style={ {
++				margin: 0,
++				fontFamily: [ 'var(--wp', 'ds-font-family-body)' ].join( '' ),
++				fontSize: 'var(--wpds-font-size-md)',
++				fontWeight: 'var(--wpds-font-weight-regular)',
++				lineHeight: 'var(--wpds-font-line-height-sm)',
++				textWrap: 'pretty',
++				color: 'var(--wpds-color-fg-content-neutral-weak)',
++			} }
++		>
++			{ children }
++		</p>
++	);
++}
++
++const meta: Meta< typeof Card.Root > = {
++	title: 'Design System/Components/Card',
++	component: Card.Root,
++	subcomponents: {
++		'Card.Header': Card.Header,
++		'Card.Content': Card.Content,
++		'Card.FullBleed': Card.FullBleed,
++		'Card.Title': Card.Title,
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof Card.Root >;
++
++export const Default: Story = {
++	args: {
++		children: (
++			<>
++				<Card.Header>
++					<Card.Title>Card title</Card.Title>
++				</Card.Header>
++				<Card.Content>
++					<Text>
++						This is the main content area. It can contain any
++						elements. This is the main content area. It can contain
++						any elements. This is the main content area. It can
++						contain any elements. This is the main content area. It
++						can contain any elements. This is the main content area.
++						It can contain any elements. This is the main content
++						area. It can contain any elements.
++					</Text>
++					<Text>
++						This is the main content area. It can contain any
++						elements.
++					</Text>
++				</Card.Content>
++			</>
++		),
++	},
++};
++
++/**
++ * `Card.FullBleed` breaks out of the card's padding to span
++ * edge-to-edge. Useful for images, dividers, or embedded content.
++ */
++export const WithFullBleed: Story = {
++	args: {
++		children: (
++			<>
++				<Card.Header>
++					<Card.Title>Featured image</Card.Title>
++				</Card.Header>
++				<Card.Content>
++					<Card.FullBleed>
++						<div
++							style={ {
++								height: 160,
++								background:
++									'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
++							} }
++						/>
++					</Card.FullBleed>
++					<Text>Content below the full-bleed area.</Text>
++				</Card.Content>
++			</>
++		),
++	},
++};
++
++/**
++ * A minimal card with only a header.
++ */
++export const HeaderOnly: Story = {
++	args: {
++		children: (
++			<Card.Header>
++				<Card.Title>Simple card</Card.Title>
++			</Card.Header>
++		),
++	},
++};
++
++/**
++ * Use the `render` prop to change the underlying HTML elements for
++ * better semantics. Here, `Card.Root` renders as a `<section>` and
++ * `Card.Title` renders as an `<h2>`.
++ */
++export const CustomSemantics: Story = {
++	args: {
++		render: <section />,
++		children: (
++			<>
++				<Card.Header>
++					{ /* eslint-disable-next-line jsx-a11y/heading-has-content -- content provided via render prop */ }
++					<Card.Title render={ <h2 /> }>Section heading</Card.Title>
++				</Card.Header>
++				<Card.Content>
++					<Text>Semantically meaningful card content.</Text>
++				</Card.Content>
++			</>
++		),
++	},
++};
+diff --git a/packages/ui/src/card/style.module.css b/packages/ui/src/card/style.module.css
+new file mode 100644
+index 00000000000000..ddee784525c299
+--- /dev/null
++++ b/packages/ui/src/card/style.module.css
+@@ -0,0 +1,47 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.root {
++		--wp-ui-card-padding: var(--wpds-dimension-padding-xl);
++		--wp-ui-card-header-content-gap: var(--wpds-dimension-gap-lg);
++
++		display: flex;
++		flex-direction: column;
++		border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
++		border-radius: var(--wpds-border-radius-lg);
++		background-color: var(--wpds-color-bg-surface-neutral-strong);
++	}
++
++	/* Padding is applied to the individual header/content elements to enable
++	 * the higher-level `CollapsibleCard` component to be fully clickable
++	 * to expand/collapse the card.
++	*/
++	.header,
++	.content {
++		padding: var(--wp-ui-card-padding);
++
++		&:not(:first-child):not(:last-child) {
++			padding-block-end: 0;
++		}
++	}
++
++	/* Custom vertical gap between header and content */
++	.header + .content {
++		padding-block-start: 0;
++		margin-block-start: calc(var(--wp-ui-card-header-content-gap) - var(--wp-ui-card-padding));
++	}
++
++	.fullbleed {
++		margin-inline: calc(-1 * var(--wp-ui-card-padding));
++		width: calc(100% + 2 * var(--wp-ui-card-padding));
++	}
++
++	.title {
++		margin: 0;
++		font-family: var(--wpds-font-family-heading);
++		font-size: var(--wpds-font-size-lg);
++		font-weight: var(--wpds-font-weight-medium);
++		line-height: var(--wpds-font-line-height-sm);
++		color: var(--wpds-color-fg-content-neutral);
++	}
++}
+diff --git a/packages/ui/src/card/test/index.test.tsx b/packages/ui/src/card/test/index.test.tsx
+new file mode 100644
+index 00000000000000..bd4de43b61b38c
+--- /dev/null
++++ b/packages/ui/src/card/test/index.test.tsx
+@@ -0,0 +1,96 @@
++import { render, screen } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import * as Card from '../index';
++
++describe( 'Card', () => {
++	describe( 'basic behaviour', () => {
++		it( 'forwards ref', () => {
++			const rootRef = createRef< HTMLDivElement >();
++			const headerRef = createRef< HTMLDivElement >();
++			const contentRef = createRef< HTMLDivElement >();
++			const fullBleedRef = createRef< HTMLDivElement >();
++			const titleRef = createRef< HTMLDivElement >();
++
++			render(
++				<Card.Root ref={ rootRef }>
++					<Card.Header ref={ headerRef }>
++						<Card.Title ref={ titleRef }>Title</Card.Title>
++					</Card.Header>
++					<Card.Content ref={ contentRef }>
++						<Card.FullBleed ref={ fullBleedRef }>
++							Full width
++						</Card.FullBleed>
++					</Card.Content>
++				</Card.Root>
++			);
++
++			expect( rootRef.current ).toBeInstanceOf( HTMLDivElement );
++			expect( headerRef.current ).toBeInstanceOf( HTMLDivElement );
++			expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
++			expect( fullBleedRef.current ).toBeInstanceOf( HTMLDivElement );
++			expect( titleRef.current ).toBeInstanceOf( HTMLDivElement );
++		} );
++
++		it( 'renders content', () => {
++			render(
++				<Card.Root>
++					<Card.Header>
++						<Card.Title>Card heading</Card.Title>
++					</Card.Header>
++					<Card.Content>
++						<p>Main content</p>
++					</Card.Content>
++				</Card.Root>
++			);
++
++			expect( screen.getByText( 'Card heading' ) ).toBeVisible();
++			expect( screen.getByText( 'Main content' ) ).toBeVisible();
++		} );
++	} );
++
++	describe( 'fullbleed', () => {
++		it( 'renders children', () => {
++			render(
++				<Card.Root>
++					<Card.Content>
++						<Card.FullBleed>
++							<img
++								src="https://example.com/image.jpg"
++								alt="test"
++							/>
++						</Card.FullBleed>
++					</Card.Content>
++				</Card.Root>
++			);
++
++			expect( screen.getByRole( 'img', { name: 'test' } ) ).toBeVisible();
++		} );
++	} );
++
++	describe( 'render prop', () => {
++		it( 'allows Root to render as a different element', () => {
++			render(
++				<Card.Root render={ <section /> } data-testid="card">
++					<Card.Content>Content</Card.Content>
++				</Card.Root>
++			);
++
++			expect( screen.getByTestId( 'card' ).tagName ).toBe( 'SECTION' );
++		} );
++
++		it( 'allows Title to render as a heading element', () => {
++			render(
++				<Card.Root>
++					<Card.Header>
++						{ /* eslint-disable-next-line jsx-a11y/heading-has-content -- content provided via render prop */ }
++						<Card.Title render={ <h2 /> }>Heading</Card.Title>
++					</Card.Header>
++				</Card.Root>
++			);
++
++			expect(
++				screen.getByRole( 'heading', { level: 2, name: 'Heading' } )
++			).toBeVisible();
++		} );
++	} );
++} );
+diff --git a/packages/ui/src/card/title.tsx b/packages/ui/src/card/title.tsx
+new file mode 100644
+index 00000000000000..fb6d14bd1642e7
+--- /dev/null
++++ b/packages/ui/src/card/title.tsx
+@@ -0,0 +1,22 @@
++import { mergeProps, useRender } from '@base-ui/react';
++import { forwardRef } from '@wordpress/element';
++import styles from './style.module.css';
++import type { TitleProps } from './types';
++
++/**
++ * The title for a card. Renders as a `<div>` by default — use the `render`
++ * prop to swap in a semantic heading element when appropriate.
++ */
++export const Title = forwardRef< HTMLDivElement, TitleProps >(
++	function CardTitle( { render, ...props }, ref ) {
++		const element = useRender( {
++			defaultTagName: 'div',
++			render,
++			ref,
++			// TODO: use `Text` component instead, when ready
++			props: mergeProps< 'div' >( { className: styles.title }, props ),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/card/types.ts b/packages/ui/src/card/types.ts
+new file mode 100644
+index 00000000000000..e6327ee0171a55
+--- /dev/null
++++ b/packages/ui/src/card/types.ts
+@@ -0,0 +1,38 @@
++import type { ReactNode } from 'react';
++import type { ComponentProps } from '../utils/types';
++
++export interface RootProps extends ComponentProps< 'div' > {
++	/**
++	 * The content to be rendered inside the card.
++	 */
++	children?: ReactNode;
++}
++
++export interface HeaderProps extends ComponentProps< 'div' > {
++	/**
++	 * The content to be rendered inside the header.
++	 */
++	children?: ReactNode;
++}
++
++export interface ContentProps extends ComponentProps< 'div' > {
++	/**
++	 * The content to be rendered inside the content area.
++	 */
++	children?: ReactNode;
++}
++
++export interface FullBleedProps extends ComponentProps< 'div' > {
++	/**
++	 * The content to be rendered edge-to-edge, breaking out of the
++	 * card's padding.
++	 */
++	children?: ReactNode;
++}
++
++export interface TitleProps extends ComponentProps< 'div' > {
++	/**
++	 * The title text for the card.
++	 */
++	children?: ReactNode;
++}
+diff --git a/packages/ui/src/collapsible-card/content.tsx b/packages/ui/src/collapsible-card/content.tsx
+new file mode 100644
+index 00000000000000..ce4a740e2dc728
+--- /dev/null
++++ b/packages/ui/src/collapsible-card/content.tsx
+@@ -0,0 +1,20 @@
++import { Collapsible } from '@base-ui/react/collapsible';
++import { forwardRef } from '@wordpress/element';
++import * as Card from '../card';
++import type { ContentProps } from './types';
++
++/**
++ * The collapsible content area of the card. Hidden when collapsed,
++ * visible when expanded.
++ */
++export const Content = forwardRef< HTMLDivElement, ContentProps >(
++	function CollapsibleCardContent( { render, ...restProps }, ref ) {
++		return (
++			<Collapsible.Panel
++				ref={ ref }
++				render={ <Card.Content render={ render } /> }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/collapsible-card/header.tsx b/packages/ui/src/collapsible-card/header.tsx
+new file mode 100644
+index 00000000000000..a017bd29d8505f
+--- /dev/null
++++ b/packages/ui/src/collapsible-card/header.tsx
+@@ -0,0 +1,71 @@
++import { Collapsible } from '@base-ui/react/collapsible';
++import clsx from 'clsx';
++import type { MouseEvent } from 'react';
++import { forwardRef, useCallback, useRef } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
++import { chevronDown, chevronUp } from '@wordpress/icons';
++import * as Card from '../card';
++import { IconButton } from '../icon-button';
++import styles from './style.module.css';
++import type { HeaderProps } from './types';
++
++/**
++ * The header of a collapsible card. Always visible, and acts as the
++ * toggle trigger — clicking anywhere on it expands or collapses the
++ * card's content.
++ *
++ * Avoid placing interactive elements (buttons, links, inputs) inside the
++ * header, since the entire area is clickable and their events will bubble
++ * to trigger the collapse toggle.
++ */
++export const Header = forwardRef< HTMLDivElement, HeaderProps >(
++	function CollapsibleCardHeader(
++		{ children, className, onClick, ...restProps },
++		ref
++	) {
++		const triggerRef = useRef< HTMLButtonElement >( null );
++
++		const handleHeaderClick = useCallback(
++			( event: MouseEvent< HTMLDivElement > ) => {
++				const trigger = triggerRef.current;
++				if (
++					trigger &&
++					event.target instanceof Node &&
++					! trigger.contains( event.target )
++				) {
++					trigger.click();
++				}
++
++				onClick?.( event );
++			},
++			[ onClick ]
++		);
++
++		return (
++			<Card.Header
++				ref={ ref }
++				className={ clsx( styles.header, className ) }
++				onClick={ handleHeaderClick }
++				{ ...restProps }
++			>
++				<div className={ styles[ 'header-content' ] }>{ children }</div>
++				<div className={ styles[ 'header-trigger-wrapper' ] }>
++					<Collapsible.Trigger
++						ref={ triggerRef }
++						render={ ( props, state ) => (
++							<IconButton
++								{ ...props }
++								label={ __( 'Expand or collapse card' ) }
++								icon={ state.open ? chevronUp : chevronDown }
++								variant="minimal"
++								tone="neutral"
++								size="compact"
++							/>
++						) }
++						className={ styles[ 'header-trigger' ] }
++					/>
++				</div>
++			</Card.Header>
++		);
++	}
++);
+diff --git a/packages/ui/src/collapsible-card/index.ts b/packages/ui/src/collapsible-card/index.ts
+new file mode 100644
+index 00000000000000..3387b70e220616
+--- /dev/null
++++ b/packages/ui/src/collapsible-card/index.ts
+@@ -0,0 +1,5 @@
++import { Root } from './root';
++import { Header } from './header';
++import { Content } from './content';
++
++export { Root, Header, Content };
+diff --git a/packages/ui/src/collapsible-card/root.tsx b/packages/ui/src/collapsible-card/root.tsx
+new file mode 100644
+index 00000000000000..230ec22c6ef50d
+--- /dev/null
++++ b/packages/ui/src/collapsible-card/root.tsx
+@@ -0,0 +1,37 @@
++import { Collapsible } from '@base-ui/react/collapsible';
++import { forwardRef } from '@wordpress/element';
++import * as Card from '../card';
++import type { RootProps } from './types';
++
++/**
++ * A card that can be expanded and collapsed. When collapsed, only the
++ * header is visible.
++ *
++ * ```jsx
++ * import { CollapsibleCard, Card } from '@wordpress/ui';
++ *
++ * function MyComponent() {
++ * 	return (
++ * 		<CollapsibleCard.Root defaultOpen>
++ * 			<CollapsibleCard.Header>
++ * 				<Card.Title>Heading</Card.Title>
++ * 			</CollapsibleCard.Header>
++ * 			<CollapsibleCard.Content>
++ * 				<p>Collapsible content here.</p>
++ * 			</CollapsibleCard.Content>
++ * 		</CollapsibleCard.Root>
++ * 	);
++ * }
++ * ```
++ */
++export const Root = forwardRef< HTMLDivElement, RootProps >(
++	function CollapsibleCardRoot( { render, ...restProps }, ref ) {
++		return (
++			<Collapsible.Root
++				ref={ ref }
++				render={ <Card.Root render={ render } /> }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/collapsible-card/stories/index.story.tsx b/packages/ui/src/collapsible-card/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..97b0b19b3f2507
+--- /dev/null
++++ b/packages/ui/src/collapsible-card/stories/index.story.tsx
+@@ -0,0 +1,156 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import * as Card from '../../card';
++import * as CollapsibleCard from '../index';
++
++/**
++ * Temporary text component for story examples. This will be replaced by an
++ * official DS `<Text />` component once it's available.
++ */
++function Text( { children }: { children: React.ReactNode } ) {
++	return (
++		<p
++			style={ {
++				margin: 0,
++				fontFamily: [ 'var(--wp', 'ds-font-family-body)' ].join( '' ),
++				fontSize: 'var(--wpds-font-size-md)',
++				fontWeight: 'var(--wpds-font-weight-regular)',
++				lineHeight: 'var(--wpds-font-line-height-sm)',
++				textWrap: 'pretty',
++				color: 'var(--wpds-color-fg-content-neutral-weak)',
++			} }
++		>
++			{ children }
++		</p>
++	);
++}
++
++const meta: Meta< typeof CollapsibleCard.Root > = {
++	title: 'Design System/Components/CollapsibleCard',
++	component: CollapsibleCard.Root,
++	subcomponents: {
++		'CollapsibleCard.Header': CollapsibleCard.Header,
++		'CollapsibleCard.Content': CollapsibleCard.Content,
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof CollapsibleCard.Root >;
++
++/**
++ * A collapsible card that is open by default.
++ */
++export const Default: Story = {
++	args: {
++		children: (
++			<>
++				<CollapsibleCard.Header>
++					<Card.Title>
++						Collapsible card (closed by default)
++					</Card.Title>
++				</CollapsibleCard.Header>
++				<CollapsibleCard.Content>
++					<Text>
++						This is the collapsible content area. It can contain any
++						elements, just like a regular Card.Content.
++					</Text>
++					<Text>
++						When collapsed, only the header and chevron are visible.
++					</Text>
++				</CollapsibleCard.Content>
++			</>
++		),
++	},
++};
++
++/**
++ * A collapsible card that starts collapsed.
++ */
++export const InitiallyOpened: Story = {
++	// `defaultOpen` (uncontrolled) and `open` (controlled) should not be
++	// used together — disable the `open` control to avoid confusion.
++	argTypes: { open: { control: false } },
++	args: {
++		...Default.args,
++		defaultOpen: true,
++		children: (
++			<>
++				<CollapsibleCard.Header>
++					<Card.Title>Collapsed by default</Card.Title>
++				</CollapsibleCard.Header>
++				<CollapsibleCard.Content>
++					<Text>This content was hidden until you expanded it.</Text>
++				</CollapsibleCard.Content>
++			</>
++		),
++	},
++};
++
++/**
++ * A disabled collapsible card cannot be toggled by the user.
++ */
++export const Disabled: Story = {
++	args: {
++		...Default.args,
++		disabled: true,
++		children: (
++			<>
++				<CollapsibleCard.Header>
++					<Card.Title>Disabled card</Card.Title>
++				</CollapsibleCard.Header>
++				<CollapsibleCard.Content>
++					<Text>The header is not interactive when disabled.</Text>
++				</CollapsibleCard.Content>
++			</>
++		),
++	},
++};
++
++/**
++ * Visual comparison: a `CollapsibleCard` (open) next to a regular `Card`
++ * to verify identical spacing and layout.
++ */
++export const ComparedToCard: Story = {
++	// `defaultOpen` (uncontrolled) and `open` (controlled) should not be
++	// used together — disable the `open` control to avoid confusion.
++	argTypes: { open: { control: false } },
++	args: {
++		...Default.args,
++		defaultOpen: true,
++	},
++	render: ( { open, defaultOpen, onOpenChange, disabled, ...restArgs } ) => (
++		<div
++			style={ {
++				display: 'flex',
++				flexDirection: 'column',
++				gap: 'var( --wpds-dimension-gap-lg )',
++			} }
++		>
++			<CollapsibleCard.Root
++				open={ open }
++				defaultOpen={ defaultOpen }
++				onOpenChange={ onOpenChange }
++				disabled={ disabled }
++				{ ...restArgs }
++			>
++				<CollapsibleCard.Header>
++					<Card.Title>CollapsibleCard (open)</Card.Title>
++				</CollapsibleCard.Header>
++				<CollapsibleCard.Content>
++					<Text>
++						Content should align with the regular card below.
++					</Text>
++				</CollapsibleCard.Content>
++			</CollapsibleCard.Root>
++			<Card.Root { ...restArgs }>
++				<Card.Header>
++					<Card.Title>Regular Card</Card.Title>
++				</Card.Header>
++				<Card.Content>
++					<Text>
++						Content should align with the collapsible card above.
++					</Text>
++				</Card.Content>
++			</Card.Root>
++		</div>
++	),
++};
+diff --git a/packages/ui/src/collapsible-card/style.module.css b/packages/ui/src/collapsible-card/style.module.css
+new file mode 100644
+index 00000000000000..cc1f8659afc1d5
+--- /dev/null
++++ b/packages/ui/src/collapsible-card/style.module.css
+@@ -0,0 +1,37 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.header-content {
++		flex: 1;
++		min-width: 0;
++	}
++
++	.header-trigger-wrapper {
++		flex-shrink: 0;
++		align-self: center;
++		/* Prevent the trigger from making the header taller than its content,
++		   preserving the same metrics between `Card` and `CollapsibleCard`. */
++		max-height: 0;
++		overflow: visible;
++	}
++
++	.header-trigger {
++		/* Offset by half the button's own height so it visually centers
++		   at the wrapper's midpoint (which `align-self: center` places at
++		   the vertical center of the header). */
++		transform: translateY(-50%);
++	}
++}
++
++@layer wp-ui-compositions {
++	.header {
++		display: flex;
++		flex-direction: row;
++		align-items: stretch;
++		gap: var(--wpds-dimension-gap-sm);
++
++		&:has(.header-trigger:not([data-disabled])) {
++			cursor: var(--wpds-cursor-control);
++		}
++	}
++}
+diff --git a/packages/ui/src/collapsible-card/test/index.test.tsx b/packages/ui/src/collapsible-card/test/index.test.tsx
+new file mode 100644
+index 00000000000000..6c2004807c4229
+--- /dev/null
++++ b/packages/ui/src/collapsible-card/test/index.test.tsx
+@@ -0,0 +1,207 @@
++import { render, screen } from '@testing-library/react';
++import { userEvent } from '@testing-library/user-event';
++import { createRef } from '@wordpress/element';
++import * as Card from '../../card';
++import * as CollapsibleCard from '../index';
++
++describe( 'CollapsibleCard', () => {
++	describe( 'basic behaviour', () => {
++		it( 'forwards ref', () => {
++			const rootRef = createRef< HTMLDivElement >();
++			const headerRef = createRef< HTMLDivElement >();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<CollapsibleCard.Root ref={ rootRef } defaultOpen>
++					<CollapsibleCard.Header ref={ headerRef }>
++						<Card.Title>Title</Card.Title>
++					</CollapsibleCard.Header>
++					<CollapsibleCard.Content ref={ contentRef }>
++						<p>Content</p>
++					</CollapsibleCard.Content>
++				</CollapsibleCard.Root>
++			);
++
++			expect( rootRef.current ).toBeInstanceOf( HTMLDivElement );
++			expect( headerRef.current ).toBeInstanceOf( HTMLDivElement );
++			expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
++		} );
++
++		it( 'renders header content', () => {
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header>
++						<Card.Title>Card heading</Card.Title>
++					</CollapsibleCard.Header>
++				</CollapsibleCard.Root>
++			);
++
++			expect( screen.getByText( 'Card heading' ) ).toBeVisible();
++		} );
++	} );
++
++	describe( 'collapsing', () => {
++		it( 'hides content when collapsed (default)', () => {
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header>
++						<Card.Title>Title</Card.Title>
++					</CollapsibleCard.Header>
++					<CollapsibleCard.Content>
++						<p>Hidden content</p>
++					</CollapsibleCard.Content>
++				</CollapsibleCard.Root>
++			);
++
++			expect(
++				screen.queryByText( 'Hidden content' )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'shows content when defaultOpen is true', () => {
++			render(
++				<CollapsibleCard.Root defaultOpen>
++					<CollapsibleCard.Header>
++						<Card.Title>Title</Card.Title>
++					</CollapsibleCard.Header>
++					<CollapsibleCard.Content>
++						<p>Visible content</p>
++					</CollapsibleCard.Content>
++				</CollapsibleCard.Root>
++			);
++
++			expect( screen.getByText( 'Visible content' ) ).toBeVisible();
++		} );
++
++		it( 'toggles content on trigger click', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header>
++						<Card.Title>Title</Card.Title>
++					</CollapsibleCard.Header>
++					<CollapsibleCard.Content>
++						<p>Toggle content</p>
++					</CollapsibleCard.Content>
++				</CollapsibleCard.Root>
++			);
++
++			expect(
++				screen.queryByText( 'Toggle content' )
++			).not.toBeInTheDocument();
++
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Expand or collapse card',
++				} )
++			);
++
++			expect( screen.getByText( 'Toggle content' ) ).toBeVisible();
++
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Expand or collapse card',
++				} )
++			);
++
++			expect(
++				screen.queryByText( 'Toggle content' )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'toggles content when clicking the header area', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header>
++						<Card.Title>Header click test</Card.Title>
++					</CollapsibleCard.Header>
++					<CollapsibleCard.Content>
++						<p>Header toggled content</p>
++					</CollapsibleCard.Content>
++				</CollapsibleCard.Root>
++			);
++
++			expect(
++				screen.queryByText( 'Header toggled content' )
++			).not.toBeInTheDocument();
++
++			await user.click( screen.getByText( 'Header click test' ) );
++
++			expect(
++				screen.getByText( 'Header toggled content' )
++			).toBeVisible();
++		} );
++
++		it( 'calls onOpenChange when toggled', async () => {
++			const onOpenChange = jest.fn();
++			const user = userEvent.setup();
++
++			render(
++				<CollapsibleCard.Root onOpenChange={ onOpenChange }>
++					<CollapsibleCard.Header>
++						<Card.Title>Title</Card.Title>
++					</CollapsibleCard.Header>
++					<CollapsibleCard.Content>
++						<p>Content</p>
++					</CollapsibleCard.Content>
++				</CollapsibleCard.Root>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Expand or collapse card',
++				} )
++			);
++
++			expect( onOpenChange.mock.calls[ 0 ][ 0 ] ).toBe( true );
++		} );
++	} );
++
++	describe( 'disabled', () => {
++		it( 'does not toggle when disabled', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<CollapsibleCard.Root defaultOpen disabled>
++					<CollapsibleCard.Header>
++						<Card.Title>Title</Card.Title>
++					</CollapsibleCard.Header>
++					<CollapsibleCard.Content>
++						<p>Should stay visible</p>
++					</CollapsibleCard.Content>
++				</CollapsibleCard.Root>
++			);
++
++			expect( screen.getByText( 'Should stay visible' ) ).toBeVisible();
++
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Expand or collapse card',
++				} )
++			);
++
++			expect( screen.getByText( 'Should stay visible' ) ).toBeVisible();
++		} );
++	} );
++
++	describe( 'trigger', () => {
++		it( 'renders a toggle button', () => {
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header>
++						<Card.Title>Title</Card.Title>
++					</CollapsibleCard.Header>
++				</CollapsibleCard.Root>
++			);
++
++			expect(
++				screen.getByRole( 'button', {
++					name: 'Expand or collapse card',
++				} )
++			).toBeVisible();
++		} );
++	} );
++} );
+diff --git a/packages/ui/src/collapsible-card/types.ts b/packages/ui/src/collapsible-card/types.ts
+new file mode 100644
+index 00000000000000..2cb5a0eb1cc3fe
+--- /dev/null
++++ b/packages/ui/src/collapsible-card/types.ts
+@@ -0,0 +1,44 @@
++import type { ReactNode } from 'react';
++import type { ComponentProps } from '../utils/types';
++
++export interface RootProps extends ComponentProps< 'div' > {
++	/**
++	 * The content to be rendered inside the collapsible card.
++	 * Should include `CollapsibleCard.Header` and `CollapsibleCard.Content`.
++	 */
++	children?: ReactNode;
++	/**
++	 * Whether the collapsible panel is currently open (controlled).
++	 *
++	 * To render an uncontrolled collapsible card, use `defaultOpen` instead.
++	 */
++	open?: boolean;
++	/**
++	 * Whether the collapsible panel is initially open (uncontrolled).
++	 * @default false
++	 */
++	defaultOpen?: boolean;
++	/**
++	 * Event handler called when the panel is opened or closed.
++	 */
++	onOpenChange?: ( open: boolean ) => void;
++	/**
++	 * Whether the component should ignore user interaction.
++	 * @default false
++	 */
++	disabled?: boolean;
++}
++
++export interface HeaderProps extends ComponentProps< 'div' > {
++	/**
++	 * The content to be rendered inside the header.
++	 */
++	children?: ReactNode;
++}
++
++export interface ContentProps extends ComponentProps< 'div' > {
++	/**
++	 * The content to be rendered inside the collapsible content area.
++	 */
++	children?: ReactNode;
++}
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 77f9b56c39885b..5bedff80ff4f83 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -1,5 +1,7 @@
+ export * from './badge';
+ export * from './button';
++export * as Card from './card';
++export * as CollapsibleCard from './collapsible-card';
+ export * as Dialog from './dialog';
+ export * from './form/primitives';
+ export * from './icon';

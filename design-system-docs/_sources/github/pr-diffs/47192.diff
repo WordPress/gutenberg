@@ -1,0 +1,100 @@
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.js b/packages/components/src/autocomplete/autocompleter-ui.js
+index 4ec217925e65c2..97a0c81d22607d 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.js
++++ b/packages/components/src/autocomplete/autocompleter-ui.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { map } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -70,7 +69,7 @@ export function getAutoCompleterUI( autocompleter ) {
+ 					role="listbox"
+ 					className="components-autocomplete__results"
+ 				>
+-					{ map( items, ( option, index ) => (
++					{ items.map( ( option, index ) => (
+ 						<Button
+ 							key={ option.key }
+ 							id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
+diff --git a/packages/components/src/color-palette/index.native.js b/packages/components/src/color-palette/index.native.js
+index 5ce545b3c64ffa..ffb063f7f23f49 100644
+--- a/packages/components/src/color-palette/index.native.js
++++ b/packages/components/src/color-palette/index.native.js
+@@ -11,7 +11,6 @@ import {
+ 	Platform,
+ 	Text,
+ } from 'react-native';
+-import { map } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -64,13 +63,21 @@ function ColorPalette( {
+ 	const opacity = useRef( new Animated.Value( 1 ) ).current;
+ 
+ 	const defaultColors = [
+-		...new Set( map( defaultSettings.colors, 'color' ) ),
++		...new Set(
++			( defaultSettings.colors ?? [] ).map( ( { color } ) => color )
++		),
+ 	];
+ 	const mergedColors = [
+-		...new Set( map( defaultSettings.allColors, 'color' ) ),
++		...new Set(
++			( defaultSettings.allColors ?? [] ).map( ( { color } ) => color )
++		),
+ 	];
+ 	const defaultGradientColors = [
+-		...new Set( map( defaultSettings.gradients, 'gradient' ) ),
++		...new Set(
++			( defaultSettings.gradients ?? [] ).map(
++				( { gradient } ) => gradient
++			)
++		),
+ 	];
+ 	const colors = isGradientSegment ? defaultGradientColors : defaultColors;
+ 
+diff --git a/packages/components/src/keyboard-shortcuts/index.js b/packages/components/src/keyboard-shortcuts/index.js
+index 07d3801cf54d07..b7538b95197939 100644
+--- a/packages/components/src/keyboard-shortcuts/index.js
++++ b/packages/components/src/keyboard-shortcuts/index.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { map } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -28,16 +23,18 @@ function KeyboardShortcut( {
+ function KeyboardShortcuts( { children, shortcuts, bindGlobal, eventName } ) {
+ 	const target = useRef();
+ 
+-	const element = map( shortcuts, ( callback, shortcut ) => (
+-		<KeyboardShortcut
+-			key={ shortcut }
+-			shortcut={ shortcut }
+-			callback={ callback }
+-			bindGlobal={ bindGlobal }
+-			eventName={ eventName }
+-			target={ target }
+-		/>
+-	) );
++	const element = Object.entries( shortcuts ?? {} ).map(
++		( [ shortcut, callback ] ) => (
++			<KeyboardShortcut
++				key={ shortcut }
++				shortcut={ shortcut }
++				callback={ callback }
++				bindGlobal={ bindGlobal }
++				eventName={ eventName }
++				target={ target }
++			/>
++		)
++	);
+ 
+ 	// Render as non-visual if there are no children pressed. Keyboard
+ 	// events will be bound to the document instead.

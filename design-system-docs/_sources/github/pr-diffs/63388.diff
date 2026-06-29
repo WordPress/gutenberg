@@ -1,0 +1,1298 @@
+diff --git a/packages/components/src/card/stories/index.story.tsx b/packages/components/src/card/stories/index.story.tsx
+index 8a20d82b318e3b..1d75c044f1e270 100644
+--- a/packages/components/src/card/stories/index.story.tsx
++++ b/packages/components/src/card/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react';
+ 
+ /**
+  * Internal dependencies
+@@ -41,51 +41,52 @@ const meta: Meta< typeof Card > = {
+ 
+ export default meta;
+ 
+-const Template: StoryFn< typeof Card > = ( args ) => <Card { ...args } />;
+-
+-export const Default = Template.bind( {} );
+-Default.args = {
+-	children: (
+-		<>
+-			<CardHeader>
+-				<Heading>CardHeader</Heading>
+-			</CardHeader>
+-			<CardBody>
+-				<Text>CardBody</Text>
+-			</CardBody>
+-			<CardBody>
+-				<Text>CardBody (before CardDivider)</Text>
+-			</CardBody>
+-			<CardDivider />
+-			<CardBody>
+-				<Text>CardBody (after CardDivider)</Text>
+-			</CardBody>
+-			<CardMedia>
+-				<img
+-					alt="Card Media"
+-					src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
+-				/>
+-			</CardMedia>
+-			<CardFooter>
+-				<Text>CardFooter</Text>
+-				<Button variant="secondary">Action Button</Button>
+-			</CardFooter>
+-		</>
+-	),
++export const Default: StoryObj< typeof Card > = {
++	args: {
++		children: (
++			<>
++				<CardHeader>
++					<Heading>CardHeader</Heading>
++				</CardHeader>
++				<CardBody>
++					<Text>CardBody</Text>
++				</CardBody>
++				<CardBody>
++					<Text>CardBody (before CardDivider)</Text>
++				</CardBody>
++				<CardDivider />
++				<CardBody>
++					<Text>CardBody (after CardDivider)</Text>
++				</CardBody>
++				<CardMedia>
++					<img
++						alt="Card Media"
++						src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
++					/>
++				</CardMedia>
++				<CardFooter>
++					<Text>CardFooter</Text>
++					<Button variant="secondary">Action Button</Button>
++				</CardFooter>
++			</>
++		),
++	},
+ };
+ 
+ /**
+  * `CardMedia` provides a container for full-bleed content within a `Card`,
+  * such as images, video, or even just a background color. The corners will be rounded if necessary.
+  */
+-export const FullBleedContent = Template.bind( {} );
+-FullBleedContent.args = {
+-	...Default.args,
+-	children: (
+-		<CardMedia>
+-			<div style={ { padding: 16, background: 'beige' } }>
+-				Some full bleed content
+-			</div>
+-		</CardMedia>
+-	),
++export const FullBleedContent: StoryObj< typeof Card > = {
++	...Default,
++	args: {
++		...Default.args,
++		children: (
++			<CardMedia>
++				<div style={ { padding: 16, background: 'beige' } }>
++					Some full bleed content
++				</div>
++			</CardMedia>
++		),
++	},
+ };
+diff --git a/packages/components/src/color-picker/stories/index.story.tsx b/packages/components/src/color-picker/stories/index.story.tsx
+index 81500c15588222..9f2198515db1e6 100644
+--- a/packages/components/src/color-picker/stories/index.story.tsx
++++ b/packages/components/src/color-picker/stories/index.story.tsx
+@@ -1,12 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
++import type { Meta, StoryObj } from '@storybook/react';
+ 
+ /**
+  * Internal dependencies
+@@ -30,19 +25,4 @@ const meta: Meta< typeof ColorPicker > = {
+ };
+ export default meta;
+ 
+-const Template: StoryFn< typeof ColorPicker > = ( { onChange, ...props } ) => {
+-	const [ color, setColor ] = useState< string | undefined >();
+-
+-	return (
+-		<ColorPicker
+-			{ ...props }
+-			color={ color }
+-			onChange={ ( ...changeArgs ) => {
+-				onChange?.( ...changeArgs );
+-				setColor( ...changeArgs );
+-			} }
+-		/>
+-	);
+-};
+-
+-export const Default = Template.bind( {} );
++export const Default: StoryObj< typeof ColorPicker > = {};
+diff --git a/packages/components/src/dropdown-menu/stories/index.story.tsx b/packages/components/src/dropdown-menu/stories/index.story.tsx
+index d4b856380db92a..63ddc76ede9904 100644
+--- a/packages/components/src/dropdown-menu/stories/index.story.tsx
++++ b/packages/components/src/dropdown-menu/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react';
+ 
+ /**
+  * Internal dependencies
+@@ -43,39 +43,42 @@ const meta: Meta< typeof DropdownMenu > = {
+ };
+ export default meta;
+ 
+-const Template: StoryFn< typeof DropdownMenu > = ( props ) => (
+-	<div style={ { height: 150 } }>
+-		<DropdownMenu { ...props } />
+-	</div>
+-);
+-
+-export const Default = Template.bind( {} );
+-Default.args = {
+-	label: 'Select a direction.',
+-	icon: menu,
+-	controls: [
+-		{
+-			title: 'First Menu Item Label',
+-			icon: arrowUp,
+-			// eslint-disable-next-line no-console
+-			onClick: () => console.log( 'up!' ),
+-		},
+-		{
+-			title: 'Second Menu Item Label',
+-			icon: arrowDown,
+-			// eslint-disable-next-line no-console
+-			onClick: () => console.log( 'down!' ),
+-		},
++export const Default: StoryObj< typeof DropdownMenu > = {
++	decorators: [
++		( Story ) => (
++			<div style={ { height: 150 } }>
++				<Story />
++			</div>
++		),
+ 	],
++	args: {
++		label: 'Select a direction.',
++		icon: menu,
++		controls: [
++			{
++				title: 'First Menu Item Label',
++				icon: arrowUp,
++				// eslint-disable-next-line no-console
++				onClick: () => console.log( 'up!' ),
++			},
++			{
++				title: 'Second Menu Item Label',
++				icon: arrowDown,
++				// eslint-disable-next-line no-console
++				onClick: () => console.log( 'down!' ),
++			},
++		],
++	},
+ };
+ 
+-export const WithChildren = Template.bind( {} );
+-// Adding custom source because Storybook is not able to show the contents of
+-// the `children` prop correctly in the code snippet.
+-WithChildren.parameters = {
+-	docs: {
+-		source: {
+-			code: `<DropdownMenu label="Select a direction." icon={ more }>
++export const WithChildren: StoryObj< typeof DropdownMenu > = {
++	...Default,
++	// Adding custom source because Storybook is not able to show the contents of
++	// the `children` prop correctly in the code snippet.
++	parameters: {
++		docs: {
++			source: {
++				code: `<DropdownMenu label="Select a direction." icon={ more }>
+   <MenuGroup>
+     <MenuItem icon={ arrowUp } onClick={ onClose }>
+       Move Up
+@@ -90,29 +93,30 @@ WithChildren.parameters = {
+     </MenuItem>
+   </MenuGroup>
+ </DropdownMenu>`,
+-			language: 'jsx',
+-			type: 'auto',
++				language: 'jsx',
++				type: 'auto',
++			},
+ 		},
+ 	},
+-};
+-WithChildren.args = {
+-	label: 'Select a direction.',
+-	icon: more,
+-	children: ( { onClose } ) => (
+-		<>
+-			<MenuGroup>
+-				<MenuItem icon={ arrowUp } onClick={ onClose }>
+-					Move Up
+-				</MenuItem>
+-				<MenuItem icon={ arrowDown } onClick={ onClose }>
+-					Move Down
+-				</MenuItem>
+-			</MenuGroup>
+-			<MenuGroup>
+-				<MenuItem icon={ trash } onClick={ onClose }>
+-					Remove
+-				</MenuItem>
+-			</MenuGroup>
+-		</>
+-	),
++	args: {
++		label: 'Select a direction.',
++		icon: more,
++		children: ( { onClose } ) => (
++			<>
++				<MenuGroup>
++					<MenuItem icon={ arrowUp } onClick={ onClose }>
++						Move Up
++					</MenuItem>
++					<MenuItem icon={ arrowDown } onClick={ onClose }>
++						Move Down
++					</MenuItem>
++				</MenuGroup>
++				<MenuGroup>
++					<MenuItem icon={ trash } onClick={ onClose }>
++						Remove
++					</MenuItem>
++				</MenuGroup>
++			</>
++		),
++	},
+ };
+diff --git a/packages/components/src/dropdown/stories/index.story.tsx b/packages/components/src/dropdown/stories/index.story.tsx
+index 3df2f783450666..b9d143ee1aa572 100644
+--- a/packages/components/src/dropdown/stories/index.story.tsx
++++ b/packages/components/src/dropdown/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react';
+ 
+ /**
+  * Internal dependencies
+@@ -41,36 +41,44 @@ const meta: Meta< typeof Dropdown > = {
+ };
+ export default meta;
+ 
+-const Template: StoryFn< typeof Dropdown > = ( args ) => (
+-	<div style={ { height: 150 } }>
+-		<Dropdown { ...args } />
+-	</div>
+-);
+-
+-export const Default = Template.bind( {} );
+-Default.args = {
+-	renderToggle: ( { isOpen, onToggle } ) => (
+-		<Button onClick={ onToggle } aria-expanded={ isOpen } variant="primary">
+-			Open dropdown
+-		</Button>
+-	),
+-	renderContent: () => <div>This is the dropdown content.</div>,
++export const Default: StoryObj< typeof Dropdown > = {
++	decorators: [
++		( Story ) => (
++			<div style={ { height: 150 } }>
++				<Story />
++			</div>
++		),
++	],
++	args: {
++		renderToggle: ( { isOpen, onToggle } ) => (
++			<Button
++				onClick={ onToggle }
++				aria-expanded={ isOpen }
++				variant="primary"
++			>
++				Open dropdown
++			</Button>
++		),
++		renderContent: () => <div>This is the dropdown content.</div>,
++	},
+ };
+ 
+ /**
+  * To apply more padding to the dropdown content, use the provided `<DropdownContentWrapper>`
+  * convenience wrapper. A `paddingSize` of `"medium"` is suitable for relatively larger dropdowns (default is `"small"`).
+  */
+-export const WithMorePadding = Template.bind( {} );
+-WithMorePadding.args = {
+-	...Default.args,
+-	renderContent: () => (
+-		<DropdownContentWrapper paddingSize="medium">
+-			{ /* eslint-disable react/no-unescaped-entities */ }
+-			Content wrapped with <code>paddingSize="medium"</code>.
+-			{ /* eslint-enable react/no-unescaped-entities */ }
+-		</DropdownContentWrapper>
+-	),
++export const WithMorePadding: StoryObj< typeof Dropdown > = {
++	...Default,
++	args: {
++		...Default.args,
++		renderContent: () => (
++			<DropdownContentWrapper paddingSize="medium">
++				{ /* eslint-disable react/no-unescaped-entities */ }
++				Content wrapped with <code>paddingSize="medium"</code>.
++				{ /* eslint-enable react/no-unescaped-entities */ }
++			</DropdownContentWrapper>
++		),
++	},
+ };
+ 
+ /**
+@@ -78,31 +86,35 @@ WithMorePadding.args = {
+  * with a `paddingSize` of `"none"`. This can also serve as a clean foundation to add arbitrary
+  * paddings, for example when child components already have padding on their own.
+  */
+-export const WithNoPadding = Template.bind( {} );
+-WithNoPadding.args = {
+-	...Default.args,
+-	renderContent: () => (
+-		<DropdownContentWrapper paddingSize="none">
+-			{ /* eslint-disable react/no-unescaped-entities */ }
+-			Content wrapped with <code>paddingSize="none"</code>.
+-			{ /* eslint-enable react/no-unescaped-entities */ }
+-		</DropdownContentWrapper>
+-	),
++export const WithNoPadding: StoryObj< typeof Dropdown > = {
++	...Default,
++	args: {
++		...Default.args,
++		renderContent: () => (
++			<DropdownContentWrapper paddingSize="none">
++				{ /* eslint-disable react/no-unescaped-entities */ }
++				Content wrapped with <code>paddingSize="none"</code>.
++				{ /* eslint-enable react/no-unescaped-entities */ }
++			</DropdownContentWrapper>
++		),
++	},
+ };
+ 
+-export const WithMenuItems = Template.bind( {} );
+-WithMenuItems.args = {
+-	...Default.args,
+-	renderContent: () => (
+-		<>
+-			<MenuGroup label="Group 1">
+-				<MenuItem>Item 1</MenuItem>
+-				<MenuItem>Item 2</MenuItem>
+-			</MenuGroup>
+-			<MenuGroup label="Group 2">
+-				<MenuItem>Item 1</MenuItem>
+-				<MenuItem>Item 2</MenuItem>
+-			</MenuGroup>
+-		</>
+-	),
++export const WithMenuItems: StoryObj< typeof Dropdown > = {
++	...Default,
++	args: {
++		...Default.args,
++		renderContent: () => (
++			<>
++				<MenuGroup label="Group 1">
++					<MenuItem>Item 1</MenuItem>
++					<MenuItem>Item 2</MenuItem>
++				</MenuGroup>
++				<MenuGroup label="Group 2">
++					<MenuItem>Item 1</MenuItem>
++					<MenuItem>Item 2</MenuItem>
++				</MenuGroup>
++			</>
++		),
++	},
+ };
+diff --git a/packages/components/src/navigator/stories/index.story.tsx b/packages/components/src/navigator/stories/index.story.tsx
+index 5adeadcf7ac1d6..218580a4cc3ba2 100644
+--- a/packages/components/src/navigator/stories/index.story.tsx
++++ b/packages/components/src/navigator/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react';
+ 
+ /**
+  * Internal dependencies
+@@ -36,153 +36,157 @@ const meta: Meta< typeof NavigatorProvider > = {
+ };
+ export default meta;
+ 
+-const Template: StoryFn< typeof NavigatorProvider > = ( {
+-	style,
+-	...props
+-} ) => (
+-	<NavigatorProvider
+-		style={ { ...style, height: '100vh', maxHeight: '450px' } }
+-		{ ...props }
+-	>
+-		<NavigatorScreen path="/">
+-			<Card>
+-				<CardBody>
+-					<p>This is the home screen.</p>
+-
+-					<VStack alignment="left">
+-						<NavigatorButton variant="secondary" path="/child">
+-							Navigate to child screen.
+-						</NavigatorButton>
++export const Default: StoryObj< typeof NavigatorProvider > = {
++	args: {
++		initialPath: '/',
++		style: { height: '100vh', maxHeight: '450px' },
++		children: (
++			<>
++				<NavigatorScreen path="/">
++					<Card>
++						<CardBody>
++							<p>This is the home screen.</p>
+ 
+-						<NavigatorButton
+-							variant="secondary"
+-							path="/overflow-child"
+-						>
+-							Navigate to screen with horizontal overflow.
+-						</NavigatorButton>
++							<VStack alignment="left">
++								<NavigatorButton
++									variant="secondary"
++									path="/child"
++								>
++									Navigate to child screen.
++								</NavigatorButton>
+ 
+-						<NavigatorButton variant="secondary" path="/stickies">
+-							Navigate to screen with sticky content.
+-						</NavigatorButton>
++								<NavigatorButton
++									variant="secondary"
++									path="/overflow-child"
++								>
++									Navigate to screen with horizontal overflow.
++								</NavigatorButton>
+ 
+-						<NavigatorButton variant="secondary" path="/product/1">
+-							Navigate to product screen with id 1.
+-						</NavigatorButton>
++								<NavigatorButton
++									variant="secondary"
++									path="/stickies"
++								>
++									Navigate to screen with sticky content.
++								</NavigatorButton>
+ 
+-						<Dropdown
+-							renderToggle={ ( {
+-								isOpen,
+-								onToggle,
+-							}: {
+-								// TODO: remove once `Dropdown` is refactored to TypeScript
+-								isOpen: boolean;
+-								onToggle: () => void;
+-							} ) => (
+-								<Button
+-									onClick={ onToggle }
+-									aria-expanded={ isOpen }
+-									variant="primary"
++								<NavigatorButton
++									variant="secondary"
++									path="/product/1"
+ 								>
+-									Open test dialog
+-								</Button>
+-							) }
+-							renderContent={ () => (
+-								<Card>
+-									<CardHeader>Go</CardHeader>
+-									<CardBody>Stuff</CardBody>
+-								</Card>
+-							) }
+-						/>
+-					</VStack>
+-				</CardBody>
+-			</Card>
+-		</NavigatorScreen>
++									Navigate to product screen with id 1.
++								</NavigatorButton>
+ 
+-		<NavigatorScreen path="/child">
+-			<Card>
+-				<CardBody>
+-					<p>This is the child screen.</p>
+-					<NavigatorBackButton variant="secondary">
+-						Go back
+-					</NavigatorBackButton>
+-				</CardBody>
+-			</Card>
+-		</NavigatorScreen>
++								<Dropdown
++									renderToggle={ ( {
++										isOpen,
++										onToggle,
++									}: {
++										// TODO: remove once `Dropdown` is refactored to TypeScript
++										isOpen: boolean;
++										onToggle: () => void;
++									} ) => (
++										<Button
++											onClick={ onToggle }
++											aria-expanded={ isOpen }
++											variant="primary"
++										>
++											Open test dialog
++										</Button>
++									) }
++									renderContent={ () => (
++										<Card>
++											<CardHeader>Go</CardHeader>
++											<CardBody>Stuff</CardBody>
++										</Card>
++									) }
++								/>
++							</VStack>
++						</CardBody>
++					</Card>
++				</NavigatorScreen>
+ 
+-		<NavigatorScreen path="/overflow-child">
+-			<Card>
+-				<CardBody>
+-					<NavigatorBackButton variant="secondary">
+-						Go back
+-					</NavigatorBackButton>
+-					<div
+-						style={ {
+-							display: 'inline-block',
+-							background: 'papayawhip',
+-						} }
+-					>
+-						<span
+-							style={ {
+-								color: 'palevioletred',
+-								whiteSpace: 'nowrap',
+-								fontSize: '42vw',
+-							} }
+-						>
+-							¯\_(ツ)_/¯
+-						</span>
+-					</div>
+-				</CardBody>
+-			</Card>
+-		</NavigatorScreen>
++				<NavigatorScreen path="/child">
++					<Card>
++						<CardBody>
++							<p>This is the child screen.</p>
++							<NavigatorBackButton variant="secondary">
++								Go back
++							</NavigatorBackButton>
++						</CardBody>
++					</Card>
++				</NavigatorScreen>
+ 
+-		<NavigatorScreen path="/stickies">
+-			<Card>
+-				<CardHeader style={ getStickyStyles( { zIndex: 2 } ) }>
+-					<NavigatorBackButton variant="secondary">
+-						Go back
+-					</NavigatorBackButton>
+-				</CardHeader>
+-				<CardBody>
+-					<div
+-						style={ getStickyStyles( {
+-							top: 69,
+-							bgColor: 'peachpuff',
+-						} ) }
+-					>
+-						<h2>A wild sticky element appears</h2>
+-					</div>
+-					<MetaphorIpsum quantity={ 3 } />
+-				</CardBody>
+-				<CardBody>
+-					<div
+-						style={ getStickyStyles( {
+-							top: 69,
+-							bgColor: 'paleturquoise',
+-						} ) }
+-					>
+-						<h2>Another wild sticky element appears</h2>
+-					</div>
+-					<MetaphorIpsum quantity={ 3 } />
+-				</CardBody>
+-				<CardFooter
+-					style={ getStickyStyles( {
+-						bgColor: 'mistyrose',
+-					} ) }
+-				>
+-					<Button variant="primary">Primary noop</Button>
+-				</CardFooter>
+-			</Card>
+-		</NavigatorScreen>
++				<NavigatorScreen path="/overflow-child">
++					<Card>
++						<CardBody>
++							<NavigatorBackButton variant="secondary">
++								Go back
++							</NavigatorBackButton>
++							<div
++								style={ {
++									display: 'inline-block',
++									background: 'papayawhip',
++								} }
++							>
++								<span
++									style={ {
++										color: 'palevioletred',
++										whiteSpace: 'nowrap',
++										fontSize: '42vw',
++									} }
++								>
++									¯\_(ツ)_/¯
++								</span>
++							</div>
++						</CardBody>
++					</Card>
++				</NavigatorScreen>
+ 
+-		<NavigatorScreen path="/product/:id">
+-			<ProductDetails />
+-		</NavigatorScreen>
+-	</NavigatorProvider>
+-);
++				<NavigatorScreen path="/stickies">
++					<Card>
++						<CardHeader style={ getStickyStyles( { zIndex: 2 } ) }>
++							<NavigatorBackButton variant="secondary">
++								Go back
++							</NavigatorBackButton>
++						</CardHeader>
++						<CardBody>
++							<div
++								style={ getStickyStyles( {
++									top: 69,
++									bgColor: 'peachpuff',
++								} ) }
++							>
++								<h2>A wild sticky element appears</h2>
++							</div>
++							<MetaphorIpsum quantity={ 3 } />
++						</CardBody>
++						<CardBody>
++							<div
++								style={ getStickyStyles( {
++									top: 69,
++									bgColor: 'paleturquoise',
++								} ) }
++							>
++								<h2>Another wild sticky element appears</h2>
++							</div>
++							<MetaphorIpsum quantity={ 3 } />
++						</CardBody>
++						<CardFooter
++							style={ getStickyStyles( {
++								bgColor: 'mistyrose',
++							} ) }
++						>
++							<Button variant="primary">Primary noop</Button>
++						</CardFooter>
++					</Card>
++				</NavigatorScreen>
+ 
+-export const Default: StoryFn< typeof NavigatorProvider > = Template.bind( {} );
+-Default.args = {
+-	initialPath: '/',
++				<NavigatorScreen path="/product/:id">
++					<ProductDetails />
++				</NavigatorScreen>
++			</>
++		),
++	},
+ };
+ 
+ function getStickyStyles( {
+@@ -234,69 +238,64 @@ function ProductDetails() {
+ 	);
+ }
+ 
+-const NestedNavigatorTemplate: StoryFn< typeof NavigatorProvider > = ( {
+-	style,
+-	...props
+-} ) => (
+-	<NavigatorProvider
+-		style={ { ...style, height: '100vh', maxHeight: '450px' } }
+-		{ ...props }
+-	>
+-		<NavigatorScreen path="/">
+-			<Card>
+-				<CardBody>
+-					<NavigatorButton variant="secondary" path="/child1">
+-						Go to first child.
+-					</NavigatorButton>
+-					<NavigatorButton variant="secondary" path="/child2">
+-						Go to second child.
+-					</NavigatorButton>
+-				</CardBody>
+-			</Card>
+-		</NavigatorScreen>
+-		<NavigatorScreen path="/child1">
+-			<Card>
+-				<CardBody>
+-					This is the first child
+-					<NavigatorToParentButton variant="secondary">
+-						Go back to parent
+-					</NavigatorToParentButton>
+-				</CardBody>
+-			</Card>
+-		</NavigatorScreen>
+-		<NavigatorScreen path="/child2">
+-			<Card>
+-				<CardBody>
+-					This is the second child
+-					<NavigatorToParentButton variant="secondary">
+-						Go back to parent
+-					</NavigatorToParentButton>
+-					<NavigatorButton
+-						variant="secondary"
+-						path="/child2/grandchild"
+-					>
+-						Go to grand child.
+-					</NavigatorButton>
+-				</CardBody>
+-			</Card>
+-		</NavigatorScreen>
+-		<NavigatorScreen path="/child2/grandchild">
+-			<Card>
+-				<CardBody>
+-					This is the grand child
+-					<NavigatorToParentButton variant="secondary">
+-						Go back to parent
+-					</NavigatorToParentButton>
+-				</CardBody>
+-			</Card>
+-		</NavigatorScreen>
+-	</NavigatorProvider>
+-);
+-
+-export const NestedNavigator: StoryFn< typeof NavigatorProvider > =
+-	NestedNavigatorTemplate.bind( {} );
+-NestedNavigator.args = {
+-	initialPath: '/child2/grandchild',
++export const NestedNavigator: StoryObj< typeof NavigatorProvider > = {
++	...Default,
++	args: {
++		...Default.args,
++		initialPath: '/child2/grandchild',
++		children: (
++			<>
++				<NavigatorScreen path="/">
++					<Card>
++						<CardBody>
++							<NavigatorButton variant="secondary" path="/child1">
++								Go to first child.
++							</NavigatorButton>
++							<NavigatorButton variant="secondary" path="/child2">
++								Go to second child.
++							</NavigatorButton>
++						</CardBody>
++					</Card>
++				</NavigatorScreen>
++				<NavigatorScreen path="/child1">
++					<Card>
++						<CardBody>
++							This is the first child
++							<NavigatorToParentButton variant="secondary">
++								Go back to parent
++							</NavigatorToParentButton>
++						</CardBody>
++					</Card>
++				</NavigatorScreen>
++				<NavigatorScreen path="/child2">
++					<Card>
++						<CardBody>
++							This is the second child
++							<NavigatorToParentButton variant="secondary">
++								Go back to parent
++							</NavigatorToParentButton>
++							<NavigatorButton
++								variant="secondary"
++								path="/child2/grandchild"
++							>
++								Go to grand child.
++							</NavigatorButton>
++						</CardBody>
++					</Card>
++				</NavigatorScreen>
++				<NavigatorScreen path="/child2/grandchild">
++					<Card>
++						<CardBody>
++							This is the grand child
++							<NavigatorToParentButton variant="secondary">
++								Go back to parent
++							</NavigatorToParentButton>
++						</CardBody>
++					</Card>
++				</NavigatorScreen>
++			</>
++		),
++	},
+ };
+ 
+ const NavigatorButtonWithSkipFocus = ( {
+@@ -317,50 +316,49 @@ const NavigatorButtonWithSkipFocus = ( {
+ 	);
+ };
+ 
+-export const SkipFocus: StoryFn< typeof NavigatorProvider > = ( args ) => {
+-	return <NavigatorProvider { ...args } />;
+-};
+-SkipFocus.args = {
+-	initialPath: '/',
+-	children: (
+-		<>
+-			<div
+-				style={ {
+-					height: 250,
+-					border: '1px solid black',
+-				} }
+-			>
+-				<NavigatorScreen
+-					path="/"
++export const SkipFocus: StoryObj< typeof NavigatorProvider > = {
++	args: {
++		initialPath: '/',
++		children: (
++			<>
++				<div
+ 					style={ {
+-						height: '100%',
++						height: 250,
++						border: '1px solid black',
+ 					} }
+ 				>
+-					<h1>Home screen</h1>
+-					<NavigatorButton variant="secondary" path="/child">
+-						Go to child screen.
+-					</NavigatorButton>
+-				</NavigatorScreen>
+-				<NavigatorScreen
++					<NavigatorScreen
++						path="/"
++						style={ {
++							height: '100%',
++						} }
++					>
++						<h1>Home screen</h1>
++						<NavigatorButton variant="secondary" path="/child">
++							Go to child screen.
++						</NavigatorButton>
++					</NavigatorScreen>
++					<NavigatorScreen
++						path="/child"
++						style={ {
++							height: '100%',
++						} }
++					>
++						<h2>Child screen</h2>
++						<NavigatorToParentButton variant="secondary">
++							Go to parent screen.
++						</NavigatorToParentButton>
++					</NavigatorScreen>
++				</div>
++
++				<NavigatorButtonWithSkipFocus
++					variant="secondary"
+ 					path="/child"
+-					style={ {
+-						height: '100%',
+-					} }
++					style={ { margin: '1rem 2rem' } }
+ 				>
+-					<h2>Child screen</h2>
+-					<NavigatorToParentButton variant="secondary">
+-						Go to parent screen.
+-					</NavigatorToParentButton>
+-				</NavigatorScreen>
+-			</div>
+-
+-			<NavigatorButtonWithSkipFocus
+-				variant="secondary"
+-				path="/child"
+-				style={ { margin: '1rem 2rem' } }
+-			>
+-				Go to child screen, but keep focus on this button
+-			</NavigatorButtonWithSkipFocus>
+-		</>
+-	),
++					Go to child screen, but keep focus on this button
++				</NavigatorButtonWithSkipFocus>
++			</>
++		),
++	},
+ };
+diff --git a/packages/components/src/popover/stories/index.story.tsx b/packages/components/src/popover/stories/index.story.tsx
+index e0670ac275afaa..dfffaefe802a49 100644
+--- a/packages/components/src/popover/stories/index.story.tsx
++++ b/packages/components/src/popover/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { StoryFn, Meta } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -79,174 +79,176 @@ const PopoverWithAnchor = ( args: PopoverProps ) => {
+ 	);
+ };
+ 
+-const Template: StoryFn< typeof Popover > = ( args ) => {
+-	const [ isVisible, setIsVisible ] = useState( false );
+-	const toggleVisible = () => {
+-		setIsVisible( ( state ) => ! state );
+-	};
+-	const buttonRef = useRef< HTMLButtonElement | undefined >();
+-	useEffect( () => {
+-		buttonRef.current?.scrollIntoView?.( {
+-			block: 'center',
+-			inline: 'center',
+-		} );
+-	}, [] );
++export const Default: StoryObj< typeof Popover > = {
++	decorators: [
++		( Story ) => {
++			const [ isVisible, setIsVisible ] = useState( false );
++			const toggleVisible = () => {
++				setIsVisible( ( state ) => ! state );
++			};
++			const buttonRef = useRef< HTMLButtonElement | undefined >();
++			useEffect( () => {
++				buttonRef.current?.scrollIntoView?.( {
++					block: 'center',
++					inline: 'center',
++				} );
++			}, [] );
++
++			return (
++				<div
++					style={ {
++						width: '300vw',
++						height: '300vh',
++						display: 'flex',
++						alignItems: 'center',
++						justifyContent: 'center',
++					} }
++				>
++					<Button
++						variant="secondary"
++						onClick={ toggleVisible }
++						ref={ buttonRef }
++					>
++						Toggle Popover
++						{ isVisible && <Story /> }
++					</Button>
++				</div>
++			);
++		},
++	],
++	args: {
++		children: (
++			<div style={ { width: '280px', whiteSpace: 'normal' } }>
++				Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
++				eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
++				enim ad minim veniam, quis nostrud exercitation ullamco laboris
++				nisi ut aliquip ex ea commodo consequat.
++			</div>
++		),
++	},
++};
+ 
+-	return (
++export const Unstyled: StoryObj< typeof Popover > = {
++	...Default,
++	args: {
++		...Default.args,
++
++		variant: 'unstyled',
++	},
++};
++
++export const AllPlacements: StoryObj< typeof Popover > = {
++	render: ( { children, ...args } ) => (
+ 		<div
+ 			style={ {
+-				width: '300vw',
+-				height: '300vh',
+-				display: 'flex',
+-				alignItems: 'center',
+-				justifyContent: 'center',
++				minWidth: '600px',
++				marginLeft: 'auto',
++				marginRight: 'auto',
+ 			} }
+ 		>
+-			<Button
+-				variant="secondary"
+-				onClick={ toggleVisible }
+-				ref={ buttonRef }
+-			>
+-				Toggle Popover
+-				{ isVisible && <Popover { ...args } /> }
+-			</Button>
+-		</div>
+-	);
+-};
+-
+-export const Default: StoryFn< typeof Popover > = Template.bind( {} );
+-Default.args = {
+-	children: (
+-		<div style={ { width: '280px', whiteSpace: 'normal' } }>
+-			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+-			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+-			ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+-			aliquip ex ea commodo consequat.
++			<h2>
++				Resize / scroll the viewport to test the behavior of the
++				popovers when they reach the viewport boundaries.
++			</h2>
++			<div>
++				{ AVAILABLE_PLACEMENTS.map( ( p ) => (
++					<PopoverWithAnchor
++						key={ p }
++						placement={ p }
++						{ ...args }
++						resize={ p === 'overlay' ? true : args.resize }
++					>
++						{ children }
++						<div>
++							<small>(placement: { p })</small>
++						</div>
++					</PopoverWithAnchor>
++				) ) }
++			</div>
+ 		</div>
+ 	),
++	// Excluding placement and position since they all possible values
++	// are passed directly in code.
++	parameters: {
++		controls: {
++			exclude: [ 'placement', 'position' ],
++		},
++	},
++	args: {
++		...Default.args,
++		children: (
++			<div style={ { width: '280px', whiteSpace: 'normal' } }>
++				Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
++				eiusmod tempor incididunt ut labore et dolore magna aliqua.
++			</div>
++		),
++		noArrow: false,
++		offset: 10,
++		resize: false,
++		flip: false,
++	},
+ };
+ 
+-export const Unstyled: StoryFn< typeof Popover > = Template.bind( {} );
+-Unstyled.args = {
+-	children: (
+-		<div style={ { width: '280px', whiteSpace: 'normal' } }>
+-			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+-			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+-			ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+-			aliquip ex ea commodo consequat.
+-		</div>
+-	),
+-	variant: 'unstyled',
+-};
++export const DynamicHeight: StoryObj< typeof Popover > = {
++	decorators: [
++		( Story ) => {
++			const [ height, setHeight ] = useState( 200 );
++			const increase = () => setHeight( height + 100 );
++			const decrease = () => setHeight( height - 100 );
+ 
+-export const AllPlacements: StoryFn< typeof Popover > = ( {
+-	children,
+-	...args
+-} ) => (
+-	<div
+-		style={ {
+-			minWidth: '600px',
+-			marginLeft: 'auto',
+-			marginRight: 'auto',
+-		} }
+-	>
+-		<h2>
+-			Resize / scroll the viewport to test the behavior of the popovers
+-			when they reach the viewport boundaries.
+-		</h2>
+-		<div>
+-			{ AVAILABLE_PLACEMENTS.map( ( p ) => (
+-				<PopoverWithAnchor
+-					key={ p }
+-					placement={ p }
+-					{ ...args }
+-					resize={ p === 'overlay' ? true : args.resize }
+-				>
+-					{ children }
++			return (
++				<div style={ { padding: '20px' } }>
+ 					<div>
+-						<small>(placement: { p })</small>
++						<Button
++							variant="primary"
++							onClick={ increase }
++							style={ {
++								marginRight: '20px',
++							} }
++						>
++							Increase Size
++						</Button>
++
++						<Button variant="primary" onClick={ decrease }>
++							Decrease Size
++						</Button>
+ 					</div>
+-				</PopoverWithAnchor>
+-			) ) }
+-		</div>
+-	</div>
+-);
+-// Excluding placement and position since they all possible values
+-// are passed directly in code.
+-AllPlacements.parameters = {
+-	controls: {
+-		exclude: [ 'placement', 'position' ],
+-	},
+-};
+-AllPlacements.args = {
+-	...Default.args,
+-	children: (
+-		<div style={ { width: '280px', whiteSpace: 'normal' } }>
+-			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+-			eiusmod tempor incididunt ut labore et dolore magna aliqua.
+-		</div>
+-	),
+-	noArrow: false,
+-	offset: 10,
+-	resize: false,
+-	flip: false,
+-};
+ 
+-export const DynamicHeight: StoryFn< typeof Popover > = ( {
+-	children,
+-	...args
+-} ) => {
+-	const [ height, setHeight ] = useState( 200 );
+-	const increase = () => setHeight( height + 100 );
+-	const decrease = () => setHeight( height - 100 );
+-
+-	return (
+-		<div style={ { padding: '20px' } }>
+-			<div>
+-				<Button
+-					variant="primary"
+-					onClick={ increase }
+-					style={ {
+-						marginRight: '20px',
+-					} }
+-				>
+-					Increase Size
+-				</Button>
+-
+-				<Button variant="primary" onClick={ decrease }>
+-					Decrease Size
+-				</Button>
+-			</div>
++					<p>
++						When the height of the popover exceeds the available
++						space in the canvas, a scrollbar inside the popover
++						should appear.
++					</p>
+ 
+-			<p>
+-				When the height of the popover exceeds the available space in
+-				the canvas, a scrollbar inside the popover should appear.
+-			</p>
+-
+-			<div>
+-				<Popover { ...args }>
+-					<div
+-						style={ {
+-							height,
+-							background: '#eee',
+-							padding: '20px',
+-						} }
+-					>
+-						{ children }
++					<div>
++						<style>{ `.components-popover { --dynamic-height: ${ height }px; }` }</style>
++						<Story />
+ 					</div>
+-				</Popover>
++				</div>
++			);
++		},
++	],
++	args: {
++		...Default.args,
++		children: (
++			<div
++				style={ {
++					height: 'var(--dynamic-height)',
++					background: '#eee',
++					padding: '20px',
++				} }
++			>
++				Content with dynamic height
+ 			</div>
+-		</div>
+-	);
+-};
+-DynamicHeight.args = {
+-	...Default.args,
+-	children: 'Content with dynamic height',
++		),
++	},
+ };
+ 
+-export const WithSlotOutsideIframe: StoryFn< typeof Popover > = ( args ) => {
+-	return <PopoverInsideIframeRenderedInExternalSlot { ...args } />;
+-};
+-WithSlotOutsideIframe.args = {
+-	...Default.args,
++export const WithSlotOutsideIframe: StoryObj< typeof Popover > = {
++	render: ( args ) => (
++		<PopoverInsideIframeRenderedInExternalSlot { ...args } />
++	),
++	args: {
++		...Default.args,
++	},
+ };

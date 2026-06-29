@@ -1,0 +1,88 @@
+diff --git a/package-lock.json b/package-lock.json
+index 03c40adf1615bc..a9aeea6678a3b1 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -16610,7 +16610,7 @@
+ 				"change-case": "^4.1.2",
+ 				"classnames": "^2.3.1",
+ 				"colord": "^2.7.0",
+-				"fast-average-color": "4.3.0",
++				"fast-average-color": "^4.3.0",
+ 				"lodash": "^4.17.21",
+ 				"memize": "^1.1.0",
+ 				"micromodal": "^0.4.10",
+@@ -16686,8 +16686,8 @@
+ 				"@emotion/react": "^11.7.1",
+ 				"@emotion/serialize": "^1.0.2",
+ 				"@emotion/styled": "^11.6.0",
+-				"@emotion/utils": "1.0.0",
+-				"@floating-ui/react-dom": "1.0.0",
++				"@emotion/utils": "^1.0.0",
++				"@floating-ui/react-dom": "^1.0.0",
+ 				"@use-gesture/react": "^10.2.6",
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
+diff --git a/packages/block-library/CHANGELOG.md b/packages/block-library/CHANGELOG.md
+index 591c642d9ca50e..fe41dc065008a8 100644
+--- a/packages/block-library/CHANGELOG.md
++++ b/packages/block-library/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   Ensure all dependencies allow version ranges ([#43355](https://github.com/WordPress/gutenberg/pull/43355)).
++
+ ## 7.12.0 (2022-08-10)
+ 
+ ## 7.11.0 (2022-07-27)
+@@ -18,7 +22,7 @@
+ 
+ ### Enhancement
+ 
+--   Declare blocks as __experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
++-   Declare blocks as \_\_experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
+ 
+ ## 7.5.0 (2022-05-04)
+ 
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index 8bd388c6e9f66a..1a22fe7cf0823a 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -63,7 +63,7 @@
+ 		"change-case": "^4.1.2",
+ 		"classnames": "^2.3.1",
+ 		"colord": "^2.7.0",
+-		"fast-average-color": "4.3.0",
++		"fast-average-color": "^4.3.0",
+ 		"lodash": "^4.17.21",
+ 		"memize": "^1.1.0",
+ 		"micromodal": "^0.4.10",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a5e6502bb1d9a5..21a31c011a52bb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   `Popover`: fix and improve opening animation ([#43186](https://github.com/WordPress/gutenberg/pull/43186)).
+ -   `Popover`: fix incorrect deps in hooks resulting in incorrect positioning after calling `update` ([#43267](https://github.com/WordPress/gutenberg/pull/43267/)).
+ -   `FontSizePicker`: Fix excessive margin between label and input ([#43304](https://github.com/WordPress/gutenberg/pull/43304)).
++-   Ensure all dependencies allow version ranges ([#43355](https://github.com/WordPress/gutenberg/pull/43355)).
+ -   `Popover`: make sure offset middleware always applies the latest frame offset values ([#43329](https://github.com/WordPress/gutenberg/pull/43329/)).
+ 
+ ### Enhancements
+diff --git a/packages/components/package.json b/packages/components/package.json
+index deeee6b65da696..e9e2c395dbf975 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -35,8 +35,8 @@
+ 		"@emotion/react": "^11.7.1",
+ 		"@emotion/serialize": "^1.0.2",
+ 		"@emotion/styled": "^11.6.0",
+-		"@emotion/utils": "1.0.0",
+-		"@floating-ui/react-dom": "1.0.0",
++		"@emotion/utils": "^1.0.0",
++		"@floating-ui/react-dom": "^1.0.0",
+ 		"@use-gesture/react": "^10.2.6",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",

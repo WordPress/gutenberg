@@ -1,0 +1,229 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 902d32765a9607..df6a1003c945aa 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -34,6 +34,7 @@
+ ### Internal
+ 
+ -   Add unit tests for `ThemeProvider` and `useThemeProviderStyles` ([#79126](https://github.com/WordPress/gutenberg/pull/79126)).
++-   Run the stylelint plugin tests through the stylelint Node API instead of spawning the CLI via `child_process` ([#79199](https://github.com/WordPress/gutenberg/pull/79199)).
+ 
+ ### Documentation
+ 
+diff --git a/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-setting-wpds-custom-properties.json b/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-setting-wpds-custom-properties.json
+deleted file mode 100644
+index e4440c5b5bb0ad..00000000000000
+--- a/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-setting-wpds-custom-properties.json
++++ /dev/null
+@@ -1,6 +0,0 @@
+-{
+-	"plugins": [ "../no-setting-wpds-custom-properties.mjs" ],
+-	"rules": {
+-		"plugin-wpds/no-setting-wpds-custom-properties": true
+-	}
+-}
+diff --git a/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-token-fallback-values.json b/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-token-fallback-values.json
+deleted file mode 100644
+index a1a38d72946d56..00000000000000
+--- a/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-token-fallback-values.json
++++ /dev/null
+@@ -1,6 +0,0 @@
+-{
+-	"plugins": [ "../no-token-fallback-values.mjs" ],
+-	"rules": {
+-		"plugin-wpds/no-token-fallback-values": true
+-	}
+-}
+diff --git a/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-unknown-ds-tokens.json b/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-unknown-ds-tokens.json
+deleted file mode 100644
+index b3bf716185d82c..00000000000000
+--- a/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-unknown-ds-tokens.json
++++ /dev/null
+@@ -1,6 +0,0 @@
+-{
+-	"plugins": [ "../no-unknown-ds-tokens.mjs" ],
+-	"rules": {
+-		"plugin-wpds/no-unknown-ds-tokens": true
+-	}
+-}
+diff --git a/packages/theme/src/stylelint-plugins/test/no-setting-wpds-custom-properties.test.ts b/packages/theme/src/stylelint-plugins/test/no-setting-wpds-custom-properties.test.ts
+index 86d07ecbd36d31..b232ad7db5641c 100644
+--- a/packages/theme/src/stylelint-plugins/test/no-setting-wpds-custom-properties.test.ts
++++ b/packages/theme/src/stylelint-plugins/test/no-setting-wpds-custom-properties.test.ts
+@@ -1,11 +1,18 @@
++/**
++ * @jest-environment node
++ */
++import plugin from '../no-setting-wpds-custom-properties.mjs';
+ import { getStylelintResult } from './utils';
+ 
+-const CONFIG = './.stylelintrc.no-setting-wpds-custom-properties.json';
++const CONFIG = {
++	plugins: [ plugin ],
++	rules: { 'plugin-wpds/no-setting-wpds-custom-properties': true },
++};
+ 
+ describe( 'flags no warnings with valid wpds custom properties css', () => {
+ 	let result: ReturnType< typeof getStylelintResult >;
+ 
+-	beforeEach( () => {
++	beforeAll( () => {
+ 		result = getStylelintResult(
+ 			'./fixtures/no-setting-wpds-custom-properties-valid.css',
+ 			CONFIG
+@@ -26,7 +33,7 @@ describe( 'flags no warnings with valid wpds custom properties css', () => {
+ describe( 'flags warnings with invalid wpds custom properties css', () => {
+ 	let result: ReturnType< typeof getStylelintResult >;
+ 
+-	beforeEach( () => {
++	beforeAll( () => {
+ 		result = getStylelintResult(
+ 			'./fixtures/no-setting-wpds-custom-properties-invalid.css',
+ 			CONFIG
+diff --git a/packages/theme/src/stylelint-plugins/test/no-token-fallback-values.test.ts b/packages/theme/src/stylelint-plugins/test/no-token-fallback-values.test.ts
+index d8b7c9938615f7..65e54bc90dd839 100644
+--- a/packages/theme/src/stylelint-plugins/test/no-token-fallback-values.test.ts
++++ b/packages/theme/src/stylelint-plugins/test/no-token-fallback-values.test.ts
+@@ -1,11 +1,18 @@
++/**
++ * @jest-environment node
++ */
++import plugin from '../no-token-fallback-values.mjs';
+ import { getStylelintResult } from './utils';
+ 
+-const CONFIG = './.stylelintrc.no-token-fallback-values.json';
++const CONFIG = {
++	plugins: [ plugin ],
++	rules: { 'plugin-wpds/no-token-fallback-values': true },
++};
+ 
+ describe( 'flags no warnings with valid css (no wpds fallbacks)', () => {
+ 	let result: ReturnType< typeof getStylelintResult >;
+ 
+-	beforeEach( () => {
++	beforeAll( () => {
+ 		result = getStylelintResult(
+ 			'./fixtures/no-token-fallback-values-valid.css',
+ 			CONFIG
+@@ -26,7 +33,7 @@ describe( 'flags no warnings with valid css (no wpds fallbacks)', () => {
+ describe( 'flags warnings with invalid css (wpds fallbacks)', () => {
+ 	let result: ReturnType< typeof getStylelintResult >;
+ 
+-	beforeEach( () => {
++	beforeAll( () => {
+ 		result = getStylelintResult(
+ 			'./fixtures/no-token-fallback-values-invalid.css',
+ 			CONFIG
+diff --git a/packages/theme/src/stylelint-plugins/test/no-unknown-ds-tokens.test.ts b/packages/theme/src/stylelint-plugins/test/no-unknown-ds-tokens.test.ts
+index e8a2957eaa11fe..3efd374bbc9ac0 100644
+--- a/packages/theme/src/stylelint-plugins/test/no-unknown-ds-tokens.test.ts
++++ b/packages/theme/src/stylelint-plugins/test/no-unknown-ds-tokens.test.ts
+@@ -1,11 +1,18 @@
++/**
++ * @jest-environment node
++ */
++import plugin from '../no-unknown-ds-tokens.mjs';
+ import { getStylelintResult } from './utils';
+ 
+-const CONFIG = './.stylelintrc.no-unknown-ds-tokens.json';
++const CONFIG = {
++	plugins: [ plugin ],
++	rules: { 'plugin-wpds/no-unknown-ds-tokens': true },
++};
+ 
+ describe( 'flags no warnings with valid wpds tokens css', () => {
+ 	let result: ReturnType< typeof getStylelintResult >;
+ 
+-	beforeEach( () => {
++	beforeAll( () => {
+ 		result = getStylelintResult(
+ 			'./fixtures/no-unknown-ds-tokens-valid.css',
+ 			CONFIG
+@@ -26,7 +33,7 @@ describe( 'flags no warnings with valid wpds tokens css', () => {
+ describe( 'flags warnings with invalid wpds tokens css', () => {
+ 	let result: ReturnType< typeof getStylelintResult >;
+ 
+-	beforeEach( () => {
++	beforeAll( () => {
+ 		result = getStylelintResult(
+ 			'./fixtures/no-unknown-ds-tokens-invalid.css',
+ 			CONFIG
+diff --git a/packages/theme/src/stylelint-plugins/test/utils/index.ts b/packages/theme/src/stylelint-plugins/test/utils/index.ts
+index f958584abca1f3..ae9fb4ae59a9f7 100644
+--- a/packages/theme/src/stylelint-plugins/test/utils/index.ts
++++ b/packages/theme/src/stylelint-plugins/test/utils/index.ts
+@@ -1,44 +1,35 @@
+-import util from 'node:util';
+ import path from 'node:path';
+-import childProcess from 'node:child_process';
++import stylelint from 'stylelint';
+ 
+-const execute = util.promisify( childProcess.exec );
+-
+-/*
+- * Resolve Stylelint's binary through Node's module resolution rather than a
+- * fixed `node_modules/.bin` path, so the test works regardless of whether the
+- * dependency is hoisted to the repo root or isolated in this package.
++/**
++ * Lints a fixture file with the stylelint Node API.
++ *
++ * The plugin is passed inline (rather than as a config-file path) so stylelint
++ * loads it directly instead of `import()`-ing it, which keeps the tests working
++ * under Jest without `--experimental-vm-modules`. The local `.stylelintignore`
++ * overrides the repo-root ignore that would otherwise skip the fixtures.
++ *
++ * The JSON formatter output is parsed so the returned shape matches what the
++ * previous CLI-based helper produced. `quietDeprecationWarnings` silences
++ * stylelint's "CommonJS Node.js API is deprecated" notice, which it emits
++ * because Jest loads the CommonJS build.
++ *
++ * @param filename Fixture path relative to the `test` directory.
++ * @param config   Inline stylelint config (plugin + rule under test).
+  */
+-const stylelintBin = path.join(
+-	path.dirname( require.resolve( 'stylelint/package.json' ) ),
+-	'bin/stylelint.mjs'
+-);
+-
+-const generateStylelintCommand = (
++export const getStylelintResult = (
+ 	filename: string,
+-	configFile: string
+-): string =>
+-	'node ' +
+-	stylelintBin +
+-	' ' +
+-	path.resolve( __dirname, '../', filename ) +
+-	' -c ' +
+-	path.resolve( __dirname, '../', configFile ) +
+-	' --formatter json' +
+-	' --ignore-path ' +
+-	path.resolve( __dirname, '../', './.stylelintignore' );
+-
+-export const getStylelintResult = ( filename: string, configFile: string ) =>
+-	execute( generateStylelintCommand( filename, configFile ) )
+-		.then( ( { stderr } ) => {
+-			return {
+-				errored: false,
+-				results: JSON.parse( stderr as string ),
+-			};
++	config: stylelint.Config
++) =>
++	stylelint
++		.lint( {
++			files: path.resolve( __dirname, '../', filename ),
++			config,
++			ignorePath: path.resolve( __dirname, '../', './.stylelintignore' ),
++			formatter: 'json',
++			quietDeprecationWarnings: true,
+ 		} )
+-		.catch( ( { stderr } ) => {
+-			return {
+-				errored: true,
+-				results: JSON.parse( stderr ),
+-			};
+-		} );
++		.then( ( { errored, report } ) => ( {
++			errored,
++			results: JSON.parse( report ),
++		} ) );

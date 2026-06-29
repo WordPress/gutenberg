@@ -1,0 +1,1556 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 039d35937294b4..3fa7e6fd690e8e 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -199,34 +199,44 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                 </div>
+               </div>
+               <div
++                aria-label="Custom color picker."
+                 class="components-circular-option-picker"
++                id="option-picker-0"
++                role="listbox"
+               >
+                 <div
+                   class="components-circular-option-picker__swatches"
+                 >
+                   <div
+-                    class="components-circular-option-picker__option-wrapper"
++                    class="components-circular-option-picker__option-group components-circular-option-picker__swatches"
+                   >
+-                    <button
+-                      aria-label="Color: red"
+-                      aria-pressed="true"
+-                      class="components-button components-circular-option-picker__option is-pressed"
+-                      style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
+-                      type="button"
+-                    />
+-                    <svg
+-                      aria-hidden="true"
+-                      fill="#000"
+-                      focusable="false"
+-                      height="24"
+-                      viewBox="0 0 24 24"
+-                      width="24"
+-                      xmlns="http://www.w3.org/2000/svg"
++                    <div
++                      class="components-circular-option-picker__option-wrapper"
+                     >
+-                      <path
+-                        d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
++                      <button
++                        aria-label="Color: red"
++                        aria-selected="true"
++                        class="components-button components-circular-option-picker__option is-pressed"
++                        id="option-picker-0-0"
++                        role="option"
++                        style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
++                        tabindex="0"
++                        type="button"
+                       />
+-                    </svg>
++                      <svg
++                        aria-hidden="true"
++                        fill="#000"
++                        focusable="false"
++                        height="24"
++                        viewBox="0 0 24 24"
++                        width="24"
++                        xmlns="http://www.w3.org/2000/svg"
++                      >
++                        <path
++                          d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
++                        />
++                      </svg>
++                    </div>
+                   </div>
+                 </div>
+                 <div
+diff --git a/packages/block-library/src/cover/test/edit.js b/packages/block-library/src/cover/test/edit.js
+index 23005d1d0a8dbd..74db754ff16969 100644
+--- a/packages/block-library/src/cover/test/edit.js
++++ b/packages/block-library/src/cover/test/edit.js
+@@ -47,7 +47,7 @@ async function setup( attributes, useCoreBlocks, customSettings ) {
+ 
+ async function createAndSelectBlock() {
+ 	await userEvent.click(
+-		screen.getByRole( 'button', {
++		screen.getByRole( 'option', {
+ 			name: 'Color: Black',
+ 		} )
+ 	);
+@@ -72,7 +72,7 @@ describe( 'Cover block', () => {
+ 
+ 		test( 'can set overlay color using color picker on block placeholder', async () => {
+ 			const { container } = await setup();
+-			const colorPicker = screen.getByRole( 'button', {
++			const colorPicker = screen.getByRole( 'option', {
+ 				name: 'Color: Black',
+ 			} );
+ 			await userEvent.click( colorPicker );
+@@ -96,7 +96,7 @@ describe( 'Cover block', () => {
+ 			await setup();
+ 
+ 			await userEvent.click(
+-				screen.getByRole( 'button', {
++				screen.getByRole( 'option', {
+ 					name: 'Color: Black',
+ 				} )
+ 			);
+@@ -389,7 +389,7 @@ describe( 'Cover block', () => {
+ 	describe( 'isDark settings', () => {
+ 		test( 'should toggle is-light class if background changed from light to dark', async () => {
+ 			await setup();
+-			const colorPicker = screen.getByRole( 'button', {
++			const colorPicker = screen.getByRole( 'option', {
+ 				name: 'Color: White',
+ 			} );
+ 			await userEvent.click( colorPicker );
+@@ -405,7 +405,7 @@ describe( 'Cover block', () => {
+ 				} )
+ 			);
+ 			await userEvent.click( screen.getByText( 'Overlay' ) );
+-			const popupColorPicker = screen.getByRole( 'button', {
++			const popupColorPicker = screen.getByRole( 'option', {
+ 				name: 'Color: Black',
+ 			} );
+ 			await userEvent.click( popupColorPicker );
+@@ -413,7 +413,7 @@ describe( 'Cover block', () => {
+ 		} );
+ 		test( 'should remove is-light class if overlay color is removed', async () => {
+ 			await setup();
+-			const colorPicker = screen.getByRole( 'button', {
++			const colorPicker = screen.getByRole( 'option', {
+ 				name: 'Color: White',
+ 			} );
+ 			await userEvent.click( colorPicker );
+@@ -428,7 +428,7 @@ describe( 'Cover block', () => {
+ 			await userEvent.click( screen.getByText( 'Overlay' ) );
+ 			// The default color is black, so clicking the black color option will remove the background color,
+ 			// which should remove the isDark setting and assign the is-light class.
+-			const popupColorPicker = screen.getByRole( 'button', {
++			const popupColorPicker = screen.getByRole( 'option', {
+ 				name: 'Color: White',
+ 			} );
+ 			await userEvent.click( popupColorPicker );
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fee3c9b8bf44a7..a2cf4d1ad248bd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   Make the `Popover.Slot` optional and render popovers at the bottom of the document's body by default. ([#53889](https://github.com/WordPress/gutenberg/pull/53889), [#53982](https://github.com/WordPress/gutenberg/pull/53982)).
+ 
++### Enhancements
++
++-   Making Circular Option Picker a `listbox`. Note that while this changes some public API, new props are optional, and currently have default values; this will change in another patch. ([#52255](https://github.com/WordPress/gutenberg/pull/52255))
++
+ ### Bug Fix
+ 
+ -   `PaletteEdit`: Fix padding in RTL languages ([#54034](https://github.com/WordPress/gutenberg/pull/54034)).
+diff --git a/packages/components/src/border-control/test/index.js b/packages/components/src/border-control/test/index.js
+index 4e971e59e87b21..0652beefee0ff6 100644
+--- a/packages/components/src/border-control/test/index.js
++++ b/packages/components/src/border-control/test/index.js
+@@ -67,6 +67,10 @@ const getButton = ( name ) => {
+ 	return screen.getByRole( 'button', { name } );
+ };
+ 
++const getColorOption = ( name ) => {
++	return screen.getByRole( 'option', { name } );
++};
++
+ const queryButton = ( name ) => {
+ 	return screen.queryByRole( 'button', { name } );
+ };
+@@ -75,6 +79,10 @@ const clickButton = ( name ) => {
+ 	fireEvent.click( getButton( name ) );
+ };
+ 
++const selectColorOption = ( name ) => {
++	fireEvent.click( getColorOption( name ) );
++};
++
+ const getSliderInput = () => {
+ 	return screen.getByRole( 'slider', { name: 'Border width' } );
+ };
+@@ -151,7 +159,7 @@ describe( 'BorderControl', () => {
+ 			await openPopover();
+ 
+ 			const customColorPicker = getButton( /Custom color picker/ );
+-			const colorSwatchButtons = screen.getAllByRole( 'button', {
++			const colorSwatchButtons = screen.getAllByRole( 'option', {
+ 				name: /^Color:/,
+ 			} );
+ 			const styleLabel = screen.getByText( 'Style' );
+@@ -324,7 +332,7 @@ describe( 'BorderControl', () => {
+ 			const props = createProps();
+ 			render( <BorderControl { ...props } /> );
+ 			await openPopover();
+-			clickButton( 'Color: Green' );
++			selectColorOption( 'Color: Green' );
+ 
+ 			expect( props.onChange ).toHaveBeenNthCalledWith( 1, {
+ 				...defaultBorder,
+@@ -336,7 +344,7 @@ describe( 'BorderControl', () => {
+ 			const props = createProps();
+ 			render( <BorderControl { ...props } /> );
+ 			await openPopover();
+-			clickButton( 'Color: Blue' );
++			selectColorOption( 'Color: Blue' );
+ 
+ 			expect( props.onChange ).toHaveBeenNthCalledWith( 1, {
+ 				...defaultBorder,
+@@ -384,7 +392,7 @@ describe( 'BorderControl', () => {
+ 			clearWidthInput();
+ 			rerender( <BorderControl { ...props } /> );
+ 			await openPopover();
+-			clickButton( 'Color: Blue' );
++			selectColorOption( 'Color: Blue' );
+ 
+ 			expect( props.onChange ).toHaveBeenCalledWith( undefined );
+ 		} );
+@@ -397,7 +405,7 @@ describe( 'BorderControl', () => {
+ 			clearWidthInput();
+ 			rerender( <BorderControl { ...props } /> );
+ 			await openPopover();
+-			clickButton( 'Color: Blue' );
++			selectColorOption( 'Color: Blue' );
+ 
+ 			expect( props.onChange ).toHaveBeenNthCalledWith( 2, {
+ 				color: undefined,
+@@ -410,7 +418,7 @@ describe( 'BorderControl', () => {
+ 			const props = createProps();
+ 			render( <BorderControl { ...props } /> );
+ 			await openPopover();
+-			clickButton( 'Color: Green' );
++			selectColorOption( 'Color: Green' );
+ 			clickButton( 'Dotted' );
+ 			setWidthInput( '0' );
+ 
+@@ -425,7 +433,7 @@ describe( 'BorderControl', () => {
+ 			const props = createProps();
+ 			const { rerender } = render( <BorderControl { ...props } /> );
+ 			await openPopover();
+-			clickButton( 'Color: Green' );
++			selectColorOption( 'Color: Green' );
+ 			rerender( <BorderControl { ...props } /> );
+ 			clickButton( 'Dotted' );
+ 			rerender( <BorderControl { ...props } /> );
+@@ -443,7 +451,7 @@ describe( 'BorderControl', () => {
+ 			const props = createProps( { value: undefined } );
+ 			const { rerender } = render( <BorderControl { ...props } /> );
+ 			await openPopover();
+-			clickButton( 'Color: Yellow' );
++			selectColorOption( 'Color: Yellow' );
+ 
+ 			expect( props.onChange ).toHaveBeenCalledWith( {
+ 				color: '#bd8600',
+@@ -453,7 +461,7 @@ describe( 'BorderControl', () => {
+ 
+ 			setWidthInput( '0' );
+ 			rerender( <BorderControl { ...props } /> );
+-			clickButton( 'Color: Green' );
++			selectColorOption( 'Color: Green' );
+ 
+ 			expect( props.onChange ).toHaveBeenCalledWith( {
+ 				color: '#00a32a',
+diff --git a/packages/components/src/circular-option-picker/index.tsx b/packages/components/src/circular-option-picker/index.tsx
+index 1736d2227ee770..e32cfb822808c8 100644
+--- a/packages/components/src/circular-option-picker/index.tsx
++++ b/packages/components/src/circular-option-picker/index.tsx
+@@ -6,22 +6,31 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
++import { useInstanceId } from '@wordpress/compose';
++import { createContext, useContext, useEffect } from '@wordpress/element';
+ import { Icon, check } from '@wordpress/icons';
++import { isRTL } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Button from '../button';
++import { Composite, CompositeItem, useCompositeState } from '../composite';
+ import Dropdown from '../dropdown';
+ import Tooltip from '../tooltip';
+ import type {
+ 	CircularOptionPickerProps,
+ 	DropdownLinkActionProps,
++	OptionGroupProps,
+ 	OptionProps,
+ } from './types';
+ import type { WordPressComponentProps } from '../ui/context';
+ import type { ButtonAsButtonProps } from '../button/types';
+ 
++const CircularOptionPickerContext = createContext( {} );
++
++const hasSelectedOption = new Map();
++
+ export function Option( {
+ 	className,
+ 	isSelected,
+@@ -29,13 +38,44 @@ export function Option( {
+ 	tooltipText,
+ 	...additionalProps
+ }: OptionProps ) {
+-	const optionButton = (
+-		<Button
+-			isPressed={ isSelected }
+-			className="components-circular-option-picker__option"
++	const compositeState = useContext( CircularOptionPickerContext );
++	const {
++		baseId = 'option',
++		currentId,
++		setCurrentId,
++	} = compositeState as any;
++	const id = useInstanceId( Option, baseId );
++
++	useEffect( () => {
++		// If we call `setCurrentId` here, it doesn't update for other
++		// Option renders in the same pass. So we have to store our own
++		// map to make sure that we only set the first selected option.
++		// We still need to check `currentId` because the control will
++		// update this as the user moves around, and that state should
++		// be maintained as the group gains and loses focus.
++		if ( isSelected && ! currentId && ! hasSelectedOption.get( baseId ) ) {
++			hasSelectedOption.set( baseId, true );
++			setCurrentId( id );
++		}
++	} );
++
++	const optionControl = (
++		<CompositeItem
++			as={ Button }
++			className={ classnames(
++				'components-circular-option-picker__option',
++				{
++					'is-pressed': isSelected,
++				}
++			) }
++			id={ id }
+ 			{ ...additionalProps }
++			{ ...compositeState }
++			role="option"
++			aria-selected={ !! isSelected }
+ 		/>
+ 	);
++
+ 	return (
+ 		<div
+ 			className={ classnames(
+@@ -44,9 +84,9 @@ export function Option( {
+ 			) }
+ 		>
+ 			{ tooltipText ? (
+-				<Tooltip text={ tooltipText }>{ optionButton }</Tooltip>
++				<Tooltip text={ tooltipText }>{ optionControl }</Tooltip>
+ 			) : (
+-				optionButton
++				optionControl
+ 			) }
+ 			{ isSelected && (
+ 				<Icon
+@@ -58,6 +98,30 @@ export function Option( {
+ 	);
+ }
+ 
++export function OptionGroup( {
++	className,
++	options,
++	...additionalProps
++}: OptionGroupProps ) {
++	const { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby } =
++		additionalProps as any;
++	const role = ariaLabel || ariaLabelledby ? 'group' : undefined;
++
++	return (
++		<div
++			{ ...additionalProps }
++			role={ role }
++			className={ classnames(
++				'components-circular-option-picker__option-group',
++				'components-circular-option-picker__swatches',
++				className
++			) }
++		>
++			{ options }
++		</div>
++	);
++}
++
+ export function DropdownLinkAction( {
+ 	buttonProps,
+ 	className,
+@@ -152,28 +216,48 @@ export function ButtonAction( {
+  */
+ 
+ function CircularOptionPicker( props: CircularOptionPickerProps ) {
+-	const { actions, className, options, children } = props;
++	const {
++		actions,
++		className,
++		id: idProp,
++		options,
++		children,
++		loop = true,
++		...additionalProps
++	} = props;
++	const id = useInstanceId( CircularOptionPicker, 'option-picker', idProp );
++	const rtl = isRTL();
++	const compositeState = useCompositeState( { baseId: id, loop, rtl } );
++
+ 	return (
+-		<div
++		<Composite
++			{ ...additionalProps }
++			{ ...compositeState }
++			role={ 'listbox' }
+ 			className={ classnames(
+ 				'components-circular-option-picker',
+ 				className
+ 			) }
+ 		>
+-			<div className="components-circular-option-picker__swatches">
+-				{ options }
+-			</div>
+-			{ children }
+-			{ actions && (
+-				<div className="components-circular-option-picker__custom-clear-wrapper">
+-					{ actions }
++			<CircularOptionPickerContext.Provider value={ compositeState }>
++				<div
++					className={ 'components-circular-option-picker__swatches' }
++				>
++					{ options }
+ 				</div>
+-			) }
+-		</div>
++				{ children }
++				{ actions && (
++					<div className="components-circular-option-picker__custom-clear-wrapper">
++						{ actions }
++					</div>
++				) }
++			</CircularOptionPickerContext.Provider>
++		</Composite>
+ 	);
+ }
+ 
+ CircularOptionPicker.Option = Option;
++CircularOptionPicker.OptionGroup = OptionGroup;
+ CircularOptionPicker.ButtonAction = ButtonAction;
+ CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
+ 
+diff --git a/packages/components/src/circular-option-picker/types.ts b/packages/components/src/circular-option-picker/types.ts
+index a72ad44356dcd2..7ebd78da4020f3 100644
+--- a/packages/components/src/circular-option-picker/types.ts
++++ b/packages/components/src/circular-option-picker/types.ts
+@@ -16,6 +16,10 @@ import type { DropdownProps } from '../dropdown/types';
+ import type { WordPressComponentProps } from '../ui/context';
+ 
+ export type CircularOptionPickerProps = {
++	/**
++	 * An ID to apply to the component.
++	 */
++	id?: string;
+ 	/**
+ 	 * A CSS class to apply to the wrapper element.
+ 	 */
+@@ -36,7 +40,22 @@ export type CircularOptionPickerProps = {
+ 	 * The child elements.
+ 	 */
+ 	children?: ReactNode;
+-};
++	/**
++	 * Whether the keyboard interaction should wrap around.
++	 *
++	 * @default true
++	 */
++	loop?: boolean;
++} & (
++	| {
++			'aria-label': string;
++			'aria-labelledby'?: never;
++	  }
++	| {
++			'aria-label'?: never;
++			'aria-labelledby': string;
++	  }
++ );
+ 
+ export type DropdownLinkActionProps = {
+ 	buttonProps?: Omit<
+@@ -48,6 +67,11 @@ export type DropdownLinkActionProps = {
+ 	className?: string;
+ };
+ 
++export type OptionGroupProps = {
++	className?: string;
++	options: ReactNode;
++};
++
+ export type OptionProps = Omit<
+ 	WordPressComponentProps< ButtonAsButtonProps, 'button', false >,
+ 	'isPressed' | 'className'
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index b3b46a68ff21f4..72cd4c0f171ae5 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -10,6 +10,7 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
++import { useInstanceId } from '@wordpress/compose';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
+ 
+@@ -47,7 +48,7 @@ function SinglePalette( {
+ 	colors,
+ 	onChange,
+ 	value,
+-	actions,
++	...otherProps
+ }: SinglePaletteProps ) {
+ 	const colorOptions = useMemo( () => {
+ 		return colors.map( ( { color, name }, index ) => {
+@@ -91,10 +92,10 @@ function SinglePalette( {
+ 	}, [ colors, value, onChange, clearColor ] );
+ 
+ 	return (
+-		<CircularOptionPicker
++		<CircularOptionPicker.OptionGroup
+ 			className={ className }
+ 			options={ colorOptions }
+-			actions={ actions }
++			{ ...otherProps }
+ 		/>
+ 	);
+ }
+@@ -105,9 +106,10 @@ function MultiplePalettes( {
+ 	colors,
+ 	onChange,
+ 	value,
+-	actions,
+ 	headingLevel,
+ }: MultiplePalettesProps ) {
++	const instanceId = useInstanceId( MultiplePalettes, 'color-palette' );
++
+ 	if ( colors.length === 0 ) {
+ 		return null;
+ 	}
+@@ -115,9 +117,10 @@ function MultiplePalettes( {
+ 	return (
+ 		<VStack spacing={ 3 } className={ className }>
+ 			{ colors.map( ( { name, colors: colorPalette }, index ) => {
++				const id = `${ instanceId }-${ index }`;
+ 				return (
+ 					<VStack spacing={ 2 } key={ index }>
+-						<ColorHeading level={ headingLevel }>
++						<ColorHeading id={ id } level={ headingLevel }>
+ 							{ name }
+ 						</ColorHeading>
+ 						<SinglePalette
+@@ -127,9 +130,7 @@ function MultiplePalettes( {
+ 								onChange( newColor, index )
+ 							}
+ 							value={ value }
+-							actions={
+-								colors.length === index + 1 ? actions : null
+-							}
++							aria-labelledby={ id }
+ 						/>
+ 					</VStack>
+ 				);
+@@ -185,6 +186,8 @@ function UnforwardedColorPalette(
+ 		value,
+ 		__experimentalIsRenderedInSidebar = false,
+ 		headingLevel = 2,
++		'aria-label': ariaLabel,
++		'aria-labelledby': ariaLabelledby,
+ 		...otherProps
+ 	} = props;
+ 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
+@@ -234,18 +237,26 @@ function UnforwardedColorPalette(
+ 		: __( 'Custom color picker.' );
+ 
+ 	const paletteCommonProps = {
+-		clearable,
+ 		clearColor,
+ 		onChange,
+ 		value,
+-		actions: !! clearable && (
+-			<CircularOptionPicker.ButtonAction onClick={ clearColor }>
+-				{ __( 'Clear' ) }
+-			</CircularOptionPicker.ButtonAction>
+-		),
+-		headingLevel,
+ 	};
+ 
++	const actions = !! clearable && (
++		<CircularOptionPicker.ButtonAction onClick={ clearColor }>
++			{ __( 'Clear' ) }
++		</CircularOptionPicker.ButtonAction>
++	);
++
++	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
++	if ( ariaLabel ) {
++		ariaProps = { 'aria-label': ariaLabel };
++	} else if ( ariaLabelledby ) {
++		ariaProps = { 'aria-labelledby': ariaLabelledby };
++	} else {
++		ariaProps = { 'aria-label': __( 'Custom color picker.' ) };
++	}
++
+ 	return (
+ 		<VStack spacing={ 3 } ref={ forwardedRef } { ...otherProps }>
+ 			{ ! disableCustomColors && (
+@@ -298,17 +309,26 @@ function UnforwardedColorPalette(
+ 					) }
+ 				/>
+ 			) }
+-			{ hasMultipleColorOrigins ? (
+-				<MultiplePalettes
+-					{ ...paletteCommonProps }
+-					colors={ colors as PaletteObject[] }
+-				/>
+-			) : (
+-				<SinglePalette
+-					{ ...paletteCommonProps }
+-					colors={ colors as ColorObject[] }
+-				/>
+-			) }
++			<CircularOptionPicker
++				{ ...ariaProps }
++				actions={ actions }
++				options={
++					hasMultipleColorOrigins ? (
++						<MultiplePalettes
++							{ ...paletteCommonProps }
++							headingLevel={ headingLevel }
++							colors={ colors as PaletteObject[] }
++							value={ value }
++						/>
++					) : (
++						<SinglePalette
++							{ ...paletteCommonProps }
++							colors={ colors as ColorObject[] }
++							value={ value }
++						/>
++					)
++				}
++			/>
+ 		</VStack>
+ 	);
+ }
+diff --git a/packages/components/src/color-palette/stories/index.story.tsx b/packages/components/src/color-palette/stories/index.story.tsx
+index 9ef253dea4fa36..b49de51c1d16e3 100644
+--- a/packages/components/src/color-palette/stories/index.story.tsx
++++ b/packages/components/src/color-palette/stories/index.story.tsx
+@@ -29,8 +29,12 @@ const meta: Meta< typeof ColorPalette > = {
+ };
+ export default meta;
+ 
+-const Template: StoryFn< typeof ColorPalette > = ( { onChange, ...args } ) => {
+-	const [ color, setColor ] = useState< string | undefined >();
++const Template: StoryFn< typeof ColorPalette > = ( {
++	onChange,
++	value,
++	...args
++} ) => {
++	const [ color, setColor ] = useState< string | undefined >( value );
+ 
+ 	return (
+ 		<ColorPalette
+@@ -53,6 +57,16 @@ Default.args = {
+ 	],
+ };
+ 
++export const InitialValue = Template.bind( {} );
++InitialValue.args = {
++	colors: [
++		{ name: 'Red', color: '#f00' },
++		{ name: 'White', color: '#fff' },
++		{ name: 'Blue', color: '#00f' },
++	],
++	value: '#00f',
++};
++
+ export const MultipleOrigins = Template.bind( {} );
+ MultipleOrigins.args = {
+ 	colors: [
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap b/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap
+deleted file mode 100644
+index a08760a33e252a..00000000000000
+--- a/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap
++++ /dev/null
+@@ -1,288 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`ColorPalette should allow disabling custom color picker 1`] = `
+-.emotion-0 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  -webkit-align-items: stretch;
+-  -webkit-box-align: stretch;
+-  -ms-flex-align: stretch;
+-  align-items: stretch;
+-  -webkit-flex-direction: column;
+-  -ms-flex-direction: column;
+-  flex-direction: column;
+-  gap: calc(4px * 3);
+-  -webkit-box-pack: center;
+-  -ms-flex-pack: center;
+-  -webkit-justify-content: center;
+-  justify-content: center;
+-}
+-
+-.emotion-0>* {
+-  min-height: 0;
+-}
+-
+-<div>
+-  <div
+-    class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
+-    data-wp-c16t="true"
+-    data-wp-component="VStack"
+-  >
+-    <div
+-      class="components-circular-option-picker"
+-    >
+-      <div
+-        class="components-circular-option-picker__swatches"
+-      >
+-        <div
+-          class="components-circular-option-picker__option-wrapper"
+-        >
+-          <button
+-            aria-label="Color: red"
+-            aria-pressed="true"
+-            class="components-button components-circular-option-picker__option is-pressed"
+-            style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
+-            type="button"
+-          />
+-          <svg
+-            aria-hidden="true"
+-            fill="#000"
+-            focusable="false"
+-            height="24"
+-            viewBox="0 0 24 24"
+-            width="24"
+-            xmlns="http://www.w3.org/2000/svg"
+-          >
+-            <path
+-              d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
+-            />
+-          </svg>
+-        </div>
+-        <div
+-          class="components-circular-option-picker__option-wrapper"
+-        >
+-          <button
+-            aria-label="Color: green"
+-            aria-pressed="false"
+-            class="components-button components-circular-option-picker__option"
+-            style="background-color: rgb(0, 255, 0); color: rgb(0, 255, 0);"
+-            type="button"
+-          />
+-        </div>
+-        <div
+-          class="components-circular-option-picker__option-wrapper"
+-        >
+-          <button
+-            aria-label="Color: blue"
+-            aria-pressed="false"
+-            class="components-button components-circular-option-picker__option"
+-            style="background-color: rgb(0, 0, 255); color: rgb(0, 0, 255);"
+-            type="button"
+-          />
+-        </div>
+-      </div>
+-      <div
+-        class="components-circular-option-picker__custom-clear-wrapper"
+-      >
+-        <button
+-          class="components-button components-circular-option-picker__clear is-tertiary"
+-          type="button"
+-        >
+-          Clear
+-        </button>
+-      </div>
+-    </div>
+-  </div>
+-</div>
+-`;
+-
+-exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+-.emotion-0 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  -webkit-align-items: stretch;
+-  -webkit-box-align: stretch;
+-  -ms-flex-align: stretch;
+-  align-items: stretch;
+-  -webkit-flex-direction: column;
+-  -ms-flex-direction: column;
+-  flex-direction: column;
+-  gap: calc(4px * 3);
+-  -webkit-box-pack: center;
+-  -ms-flex-pack: center;
+-  -webkit-justify-content: center;
+-  justify-content: center;
+-}
+-
+-.emotion-0>* {
+-  min-height: 0;
+-}
+-
+-.emotion-2 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  -webkit-align-items: stretch;
+-  -webkit-box-align: stretch;
+-  -ms-flex-align: stretch;
+-  align-items: stretch;
+-  -webkit-flex-direction: column;
+-  -ms-flex-direction: column;
+-  flex-direction: column;
+-  gap: 0;
+-  -webkit-box-pack: center;
+-  -ms-flex-pack: center;
+-  -webkit-justify-content: center;
+-  justify-content: center;
+-}
+-
+-.emotion-2>* {
+-  min-height: 0;
+-}
+-
+-.emotion-4 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  -webkit-align-items: stretch;
+-  -webkit-box-align: stretch;
+-  -ms-flex-align: stretch;
+-  align-items: stretch;
+-  -webkit-flex-direction: column;
+-  -ms-flex-direction: column;
+-  flex-direction: column;
+-  gap: calc(4px * 0.5);
+-  -webkit-box-pack: center;
+-  -ms-flex-pack: center;
+-  -webkit-justify-content: center;
+-  justify-content: center;
+-}
+-
+-.emotion-4>* {
+-  min-height: 0;
+-}
+-
+-.emotion-6 {
+-  display: block;
+-  overflow: hidden;
+-  text-overflow: ellipsis;
+-  white-space: nowrap;
+-}
+-
+-<div>
+-  <div
+-    class="components-flex components-h-stack components-v-stack emotion-0 emotion-1"
+-    data-wp-c16t="true"
+-    data-wp-component="VStack"
+-  >
+-    <div
+-      class="components-dropdown"
+-      tabindex="-1"
+-    >
+-      <div
+-        class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-wrapper emotion-2 emotion-1"
+-        data-wp-c16t="true"
+-        data-wp-component="VStack"
+-      >
+-        <button
+-          aria-expanded="false"
+-          aria-haspopup="true"
+-          aria-label="Custom color picker. The currently selected color is called "red" and has a value of "#f00"."
+-          class="components-color-palette__custom-color-button"
+-          style="background: rgb(255, 0, 0);"
+-        />
+-        <div
+-          class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper emotion-4 emotion-1"
+-          data-wp-c16t="true"
+-          data-wp-component="VStack"
+-        >
+-          <span
+-            class="components-truncate components-color-palette__custom-color-name emotion-6 emotion-1"
+-            data-wp-c16t="true"
+-            data-wp-component="Truncate"
+-          >
+-            red
+-          </span>
+-          <span
+-            class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-6 emotion-1"
+-            data-wp-c16t="true"
+-            data-wp-component="Truncate"
+-          >
+-            #f00
+-          </span>
+-        </div>
+-      </div>
+-    </div>
+-    <div
+-      class="components-circular-option-picker"
+-    >
+-      <div
+-        class="components-circular-option-picker__swatches"
+-      >
+-        <div
+-          class="components-circular-option-picker__option-wrapper"
+-        >
+-          <button
+-            aria-label="Color: red"
+-            aria-pressed="true"
+-            class="components-button components-circular-option-picker__option is-pressed"
+-            style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
+-            type="button"
+-          />
+-          <svg
+-            aria-hidden="true"
+-            fill="#000"
+-            focusable="false"
+-            height="24"
+-            viewBox="0 0 24 24"
+-            width="24"
+-            xmlns="http://www.w3.org/2000/svg"
+-          >
+-            <path
+-              d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
+-            />
+-          </svg>
+-        </div>
+-        <div
+-          class="components-circular-option-picker__option-wrapper"
+-        >
+-          <button
+-            aria-label="Color: green"
+-            aria-pressed="false"
+-            class="components-button components-circular-option-picker__option"
+-            style="background-color: rgb(0, 255, 0); color: rgb(0, 255, 0);"
+-            type="button"
+-          />
+-        </div>
+-        <div
+-          class="components-circular-option-picker__option-wrapper"
+-        >
+-          <button
+-            aria-label="Color: blue"
+-            aria-pressed="false"
+-            class="components-button components-circular-option-picker__option"
+-            style="background-color: rgb(0, 0, 255); color: rgb(0, 0, 255);"
+-            type="button"
+-          />
+-        </div>
+-      </div>
+-      <div
+-        class="components-circular-option-picker__custom-clear-wrapper"
+-      >
+-        <button
+-          class="components-button components-circular-option-picker__clear is-tertiary"
+-          type="button"
+-        >
+-          Clear
+-        </button>
+-      </div>
+-    </div>
+-  </div>
+-</div>
+-`;
+diff --git a/packages/components/src/color-palette/test/index.tsx b/packages/components/src/color-palette/test/index.tsx
+index 62b9cdf51a59d9..144a303093609a 100644
+--- a/packages/components/src/color-palette/test/index.tsx
++++ b/packages/components/src/color-palette/test/index.tsx
+@@ -43,20 +43,6 @@ const ControlledColorPalette = ( {
+ };
+ 
+ describe( 'ColorPalette', () => {
+-	it( 'should render a dynamic toolbar of colors', () => {
+-		const onChange = jest.fn();
+-
+-		const { container } = render(
+-			<ColorPalette
+-				colors={ EXAMPLE_COLORS }
+-				value={ INITIAL_COLOR }
+-				onChange={ onChange }
+-			/>
+-		);
+-
+-		expect( container ).toMatchSnapshot();
+-	} );
+-
+ 	it( 'should render three color button options', () => {
+ 		const onChange = jest.fn();
+ 
+@@ -69,7 +55,7 @@ describe( 'ColorPalette', () => {
+ 		);
+ 
+ 		expect(
+-			screen.getAllByRole( 'button', { name: /^Color:/ } )
++			screen.getAllByRole( 'option', { name: /^Color:/ } )
+ 		).toHaveLength( 3 );
+ 	} );
+ 
+@@ -86,7 +72,7 @@ describe( 'ColorPalette', () => {
+ 		);
+ 
+ 		await user.click(
+-			screen.getByRole( 'button', { name: /^Color:/, pressed: true } )
++			screen.getByRole( 'option', { name: /^Color:/, selected: true } )
+ 		);
+ 
+ 		expect( onChange ).toHaveBeenCalledTimes( 1 );
+@@ -108,9 +94,9 @@ describe( 'ColorPalette', () => {
+ 		// Click the first unpressed button
+ 		// (i.e. a button representing a color that is not the current color)
+ 		await user.click(
+-			screen.getAllByRole( 'button', {
++			screen.getAllByRole( 'option', {
+ 				name: /^Color:/,
+-				pressed: false,
++				selected: false,
+ 			} )[ 0 ]
+ 		);
+ 
+@@ -137,10 +123,26 @@ describe( 'ColorPalette', () => {
+ 		expect( onChange ).toHaveBeenCalledWith( undefined );
+ 	} );
+ 
++	it( 'should render custom color picker', () => {
++		const onChange = jest.fn();
++
++		render(
++			<ColorPalette
++				colors={ EXAMPLE_COLORS }
++				value={ INITIAL_COLOR }
++				onChange={ onChange }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'button', { name: /^Custom color picker\./ } )
++		).toBeInTheDocument();
++	} );
++
+ 	it( 'should allow disabling custom color picker', () => {
+ 		const onChange = jest.fn();
+ 
+-		const { container } = render(
++		render(
+ 			<ColorPalette
+ 				colors={ EXAMPLE_COLORS }
+ 				disableCustomColors
+@@ -149,7 +151,9 @@ describe( 'ColorPalette', () => {
+ 			/>
+ 		);
+ 
+-		expect( container ).toMatchSnapshot();
++		expect(
++			screen.queryByRole( 'button', { name: /^Custom color picker\./ } )
++		).not.toBeInTheDocument();
+ 	} );
+ 
+ 	it( 'should render dropdown and its content', async () => {
+@@ -231,9 +235,9 @@ describe( 'ColorPalette', () => {
+ 
+ 		// Click the first unpressed button
+ 		await user.click(
+-			screen.getAllByRole( 'button', {
++			screen.getAllByRole( 'option', {
+ 				name: /^Color:/,
+-				pressed: false,
++				selected: false,
+ 			} )[ 0 ]
+ 		);
+ 
+diff --git a/packages/components/src/color-palette/types.ts b/packages/components/src/color-palette/types.ts
+index a5136341aa68a4..7025ef156127b4 100644
+--- a/packages/components/src/color-palette/types.ts
++++ b/packages/components/src/color-palette/types.ts
+@@ -88,4 +88,23 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
+ 	 * @default false
+ 	 */
+ 	__experimentalIsRenderedInSidebar?: boolean;
+-};
++} & (
++		| {
++				/**
++				 * A label to identify the purpose of the control.
++				 *
++				 * @todo [#54055] Either this or `aria-labelledby` should be required
++				 */
++				'aria-label'?: string;
++				'aria-labelledby'?: never;
++		  }
++		| {
++				/**
++				 * An ID of an element to provide a label for the control.
++				 *
++				 * @todo [#54055] Either this or `aria-label` should be required
++				 */
++				'aria-labelledby'?: string;
++				'aria-label'?: never;
++		  }
++	 );
+diff --git a/packages/components/src/duotone-picker/duotone-picker.tsx b/packages/components/src/duotone-picker/duotone-picker.tsx
+index 2daacb15c9159c..7a681f67bec8b7 100644
+--- a/packages/components/src/duotone-picker/duotone-picker.tsx
++++ b/packages/components/src/duotone-picker/duotone-picker.tsx
+@@ -63,6 +63,8 @@ function DuotonePicker( {
+ 	disableCustomDuotone,
+ 	value,
+ 	onChange,
++	'aria-label': ariaLabel,
++	'aria-labelledby': ariaLabelledby,
+ }: DuotonePickerProps ) {
+ 	const [ defaultDark, defaultLight ] = useMemo(
+ 		() => getDefaultColors( colorPalette ),
+@@ -120,8 +122,18 @@ function DuotonePicker( {
+ 		);
+ 	} );
+ 
++	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
++	if ( ariaLabel ) {
++		ariaProps = { 'aria-label': ariaLabel };
++	} else if ( ariaLabelledby ) {
++		ariaProps = { 'aria-labelledby': ariaLabelledby };
++	} else {
++		ariaProps = { 'aria-label': __( 'Custom color picker.' ) };
++	}
++
+ 	return (
+ 		<CircularOptionPicker
++			{ ...ariaProps }
+ 			options={ unsetable ? [ unsetOption, ...options ] : options }
+ 			actions={
+ 				!! clearable && (
+diff --git a/packages/components/src/duotone-picker/types.ts b/packages/components/src/duotone-picker/types.ts
+index 3d5927675f542f..80f3c369f13164 100644
+--- a/packages/components/src/duotone-picker/types.ts
++++ b/packages/components/src/duotone-picker/types.ts
+@@ -39,7 +39,26 @@ export type DuotonePickerProps = {
+ 	 * Callback which is called when the duotone colors change.
+ 	 */
+ 	onChange: ( value: DuotonePickerProps[ 'value' ] | undefined ) => void;
+-};
++} & (
++	| {
++			/**
++			 * A label to identify the purpose of the control.
++			 *
++			 * @todo [#54055] Either this or `aria-labelledby` should be required
++			 */
++			'aria-label'?: string;
++			'aria-labelledby'?: never;
++	  }
++	| {
++			/**
++			 * An ID of an element to provide a label for the control.
++			 *
++			 * @todo [#54055] Either this or `aria-label` should be required
++			 */
++			'aria-labelledby'?: string;
++			'aria-label'?: never;
++	  }
++ );
+ 
+ type Color = {
+ 	color: string;
+diff --git a/packages/components/src/gradient-picker/index.tsx b/packages/components/src/gradient-picker/index.tsx
+index 70ff9fcf4802a9..e384d62925bcb4 100644
+--- a/packages/components/src/gradient-picker/index.tsx
++++ b/packages/components/src/gradient-picker/index.tsx
+@@ -2,6 +2,7 @@
+  * WordPress dependencies
+  */
+ import { __, sprintf } from '@wordpress/i18n';
++import { useInstanceId } from '@wordpress/compose';
+ import { useCallback, useMemo } from '@wordpress/element';
+ import deprecated from '@wordpress/deprecated';
+ 
+@@ -40,7 +41,7 @@ function SingleOrigin( {
+ 	gradients,
+ 	onChange,
+ 	value,
+-	actions,
++	...otherProps
+ }: PickerProps< GradientObject > ) {
+ 	const gradientOptions = useMemo( () => {
+ 		return gradients.map( ( { gradient, name }, index ) => (
+@@ -70,10 +71,10 @@ function SingleOrigin( {
+ 		) );
+ 	}, [ gradients, value, onChange, clearGradient ] );
+ 	return (
+-		<CircularOptionPicker
++		<CircularOptionPicker.OptionGroup
+ 			className={ className }
+ 			options={ gradientOptions }
+-			actions={ actions }
++			{ ...otherProps }
+ 		/>
+ 	);
+ }
+@@ -84,15 +85,17 @@ function MultipleOrigin( {
+ 	gradients,
+ 	onChange,
+ 	value,
+-	actions,
+ 	headingLevel,
+ }: PickerProps< OriginObject > ) {
++	const instanceId = useInstanceId( MultipleOrigin );
++
+ 	return (
+ 		<VStack spacing={ 3 } className={ className }>
+ 			{ gradients.map( ( { name, gradients: gradientSet }, index ) => {
++				const id = `color-palette-${ instanceId }-${ index }`;
+ 				return (
+ 					<VStack spacing={ 2 } key={ index }>
+-						<ColorHeading level={ headingLevel }>
++						<ColorHeading level={ headingLevel } id={ id }>
+ 							{ name }
+ 						</ColorHeading>
+ 						<SingleOrigin
+@@ -102,9 +105,7 @@ function MultipleOrigin( {
+ 								onChange( gradient, index )
+ 							}
+ 							value={ value }
+-							{ ...( gradients.length === index + 1
+-								? { actions }
+-								: {} ) }
++							aria-labelledby={ id }
+ 						/>
+ 					</VStack>
+ 				);
+@@ -114,10 +115,35 @@ function MultipleOrigin( {
+ }
+ 
+ function Component( props: PickerProps< any > ) {
+-	if ( isMultipleOriginArray( props.gradients ) ) {
+-		return <MultipleOrigin { ...props } />;
++	const {
++		actions,
++		headingLevel,
++		'aria-label': ariaLabel,
++		'aria-labelledby': ariaLabelledby,
++		...otherProps
++	} = props;
++	const options = isMultipleOriginArray( props.gradients ) ? (
++		<MultipleOrigin headingLevel={ headingLevel } { ...otherProps } />
++	) : (
++		<SingleOrigin { ...otherProps } />
++	);
++
++	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
++	if ( ariaLabel ) {
++		ariaProps = { 'aria-label': ariaLabel };
++	} else if ( ariaLabelledby ) {
++		ariaProps = { 'aria-labelledby': ariaLabelledby };
++	} else {
++		ariaProps = { 'aria-label': __( 'Custom gradient picker.' ) };
+ 	}
+-	return <SingleOrigin { ...props } />;
++
++	return (
++		<CircularOptionPicker
++			{ ...ariaProps }
++			actions={ actions }
++			options={ options }
++		/>
++	);
+ }
+ 
+ /**
+diff --git a/packages/components/src/gradient-picker/types.ts b/packages/components/src/gradient-picker/types.ts
+index ad38f152abbfd7..9eca42f0b7f868 100644
+--- a/packages/components/src/gradient-picker/types.ts
++++ b/packages/components/src/gradient-picker/types.ts
+@@ -42,7 +42,26 @@ type GradientPickerBaseProps = {
+ 	 * @default 2
+ 	 */
+ 	headingLevel?: HeadingSize;
+-};
++} & (
++	| {
++			/**
++			 * A label to identify the purpose of the control.
++			 *
++			 * @todo [#54055] Either this or `aria-labelledby` should be required
++			 */
++			'aria-label'?: string;
++			'aria-labelledby'?: never;
++	  }
++	| {
++			/**
++			 * An ID of an element to provide a label for the control.
++			 *
++			 * @todo [#54055] Either this or `aria-label` should be required
++			 */
++			'aria-labelledby'?: string;
++			'aria-label'?: never;
++	  }
++ );
+ 
+ export type GradientPickerComponentProps = GradientPickerBaseProps & {
+ 	/**
+diff --git a/test/e2e/specs/editor/blocks/buttons.spec.js b/test/e2e/specs/editor/blocks/buttons.spec.js
+index 0341e3dfc63426..39d6e76eaf6689 100644
+--- a/test/e2e/specs/editor/blocks/buttons.spec.js
++++ b/test/e2e/specs/editor/blocks/buttons.spec.js
+@@ -196,11 +196,11 @@ test.describe( 'Buttons', () => {
+ 		await page.click(
+ 			'role=region[name="Editor settings"i] >> role=button[name="Color Text styles"i]'
+ 		);
+-		await page.click( 'role=button[name="Color: Cyan bluish gray"i]' );
++		await page.click( 'role=option[name="Color: Cyan bluish gray"i]' );
+ 		await page.click(
+ 			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
+ 		);
+-		await page.click( 'role=button[name="Color: Vivid red"i]' );
++		await page.click( 'role=option[name="Color: Vivid red"i]' );
+ 
+ 		// Check the content.
+ 		const content = await editor.getEditedPostContent();
+@@ -261,7 +261,7 @@ test.describe( 'Buttons', () => {
+ 			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
+ 		);
+ 		await page.click( 'role=tab[name="Gradient"i]' );
+-		await page.click( 'role=button[name="Gradient: Purple to yellow"i]' );
++		await page.click( 'role=option[name="Gradient: Purple to yellow"i]' );
+ 
+ 		// Check the content.
+ 		const content = await editor.getEditedPostContent();
+diff --git a/test/e2e/specs/editor/blocks/cover.spec.js b/test/e2e/specs/editor/blocks/cover.spec.js
+index 90555eca548c2b..e6042648b0e8da 100644
+--- a/test/e2e/specs/editor/blocks/cover.spec.js
++++ b/test/e2e/specs/editor/blocks/cover.spec.js
+@@ -34,7 +34,7 @@ test.describe( 'Cover', () => {
+ 		} );
+ 
+ 		// Locate the Black color swatch.
+-		const blackColorSwatch = coverBlock.getByRole( 'button', {
++		const blackColorSwatch = coverBlock.getByRole( 'option', {
+ 			name: 'Color: Black',
+ 		} );
+ 		await expect( blackColorSwatch ).toBeVisible();
+@@ -112,7 +112,7 @@ test.describe( 'Cover', () => {
+ 		// Choose a color swatch to transform the placeholder block into
+ 		// a functioning block.
+ 		await coverBlock
+-			.getByRole( 'button', {
++			.getByRole( 'option', {
+ 				name: 'Color: Black',
+ 			} )
+ 			.click();
+@@ -135,7 +135,7 @@ test.describe( 'Cover', () => {
+ 			name: 'Block: Cover',
+ 		} );
+ 		await coverBlock
+-			.getByRole( 'button', {
++			.getByRole( 'option', {
+ 				name: 'Color: Black',
+ 			} )
+ 			.click();
+diff --git a/test/e2e/specs/editor/blocks/heading.spec.js b/test/e2e/specs/editor/blocks/heading.spec.js
+index 1413b4cad9e9d3..4af974d7b4af6f 100644
+--- a/test/e2e/specs/editor/blocks/heading.spec.js
++++ b/test/e2e/specs/editor/blocks/heading.spec.js
+@@ -160,7 +160,7 @@ test.describe( 'Heading', () => {
+ 		await textColor.click();
+ 
+ 		await page
+-			.getByRole( 'button', {
++			.getByRole( 'option', {
+ 				name: 'Color: Luminous vivid orange',
+ 			} )
+ 			.click();
+diff --git a/test/e2e/specs/editor/blocks/navigation-colors.spec.js b/test/e2e/specs/editor/blocks/navigation-colors.spec.js
+index 2763b1c208cd00..1fd8bd39f520a0 100644
+--- a/test/e2e/specs/editor/blocks/navigation-colors.spec.js
++++ b/test/e2e/specs/editor/blocks/navigation-colors.spec.js
+@@ -93,14 +93,14 @@ test.describe( 'Navigation colors', () => {
+ 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
+ 		await page.getByRole( 'button', { name: 'Color Text styles' } ).click();
+ 		await page
+-			.getByRole( 'button', { name: 'Color: White' } )
++			.getByRole( 'option', { name: 'Color: White' } )
+ 			.click( { force: true } );
+ 
+ 		await page
+ 			.getByRole( 'button', { name: 'Color Background styles' } )
+ 			.click();
+ 		await page
+-			.getByRole( 'button', { name: 'Color: Black' } )
++			.getByRole( 'option', { name: 'Color: Black' } )
+ 			.click( { force: true } );
+ 
+ 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
+@@ -151,12 +151,12 @@ test.describe( 'Navigation colors', () => {
+ 		await page.getByRole( 'button', { name: 'Color Link styles' } ).click();
+ 		// rga(207, 46 ,46) is the color of the "vivid red" color preset.
+ 		await page
+-			.getByRole( 'button', { name: 'Color: Vivid red' } )
++			.getByRole( 'option', { name: 'Color: Vivid red' } )
+ 			.click( { force: true } );
+ 		await page.getByRole( 'tab', { name: 'Hover' } ).click();
+ 		// rgb(155, 81, 224) is the color of the "vivid purple" color preset.
+ 		await page
+-			.getByRole( 'button', { name: 'Color: Vivid purple' } )
++			.getByRole( 'option', { name: 'Color: Vivid purple' } )
+ 			.click( { force: true } );
+ 
+ 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
+@@ -198,7 +198,7 @@ test.describe( 'Navigation colors', () => {
+ 		// 247, 141, 167 is the color of the "Pale pink" color preset.
+ 		const palePink = 'rgb(247, 141, 167)';
+ 		await page
+-			.getByRole( 'button', { name: 'Color: Pale pink' } )
++			.getByRole( 'option', { name: 'Color: Pale pink' } )
+ 			.click( { force: true } );
+ 
+ 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
+@@ -242,7 +242,7 @@ test.describe( 'Navigation colors', () => {
+ 		// 142, 209, 252 is the color of the "Pale cyan blue" color preset.
+ 		const paleCyan = 'rgb(142, 209, 252)';
+ 		await page
+-			.getByRole( 'button', { name: 'Color: Pale cyan blue' } )
++			.getByRole( 'option', { name: 'Color: Pale cyan blue' } )
+ 			.click( { force: true } );
+ 
+ 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
+@@ -285,7 +285,7 @@ test.describe( 'Navigation colors', () => {
+ 		// 247, 141, 167 is the color of the "Pale pink" color preset.
+ 		const palePink = 'rgb(247, 141, 167)';
+ 		await page
+-			.getByRole( 'button', { name: 'Color: Pale pink' } )
++			.getByRole( 'option', { name: 'Color: Pale pink' } )
+ 			.click( { force: true } );
+ 		// Pale cyan blue for the background color.
+ 		await page
+@@ -294,7 +294,7 @@ test.describe( 'Navigation colors', () => {
+ 		// 142, 209, 252 is the color of the "Pale cyan blue" color preset.
+ 		const paleCyan = 'rgb(142, 209, 252)';
+ 		await page
+-			.getByRole( 'button', { name: 'Color: Pale cyan blue' } )
++			.getByRole( 'option', { name: 'Color: Pale cyan blue' } )
+ 			.click( { force: true } );
+ 		// Cyan bluish gray for the submenu and overlay text color.
+ 		await page
+@@ -303,7 +303,7 @@ test.describe( 'Navigation colors', () => {
+ 		// 171, 184, 195 is the color of the "Cyan bluish gray" color preset.
+ 		const cyanBluishGray = 'rgb(171, 184, 195)';
+ 		await page
+-			.getByRole( 'button', { name: 'Color: Cyan bluish gray' } )
++			.getByRole( 'option', { name: 'Color: Cyan bluish gray' } )
+ 			.click( { force: true } );
+ 		// Luminous vivid amber for the submenu and overlay background color.
+ 		await page
+@@ -312,7 +312,7 @@ test.describe( 'Navigation colors', () => {
+ 		// 252, 185, 0 is the color of the "Luminous vivid amber" color preset.
+ 		const vividAmber = 'rgb(252, 185, 0)';
+ 		await page
+-			.getByRole( 'button', { name: 'Color: Luminous vivid amber' } )
++			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
+ 			.click( { force: true } );
+ 
+ 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
+diff --git a/test/e2e/specs/editor/various/keep-styles-on-block-transforms.spec.js b/test/e2e/specs/editor/various/keep-styles-on-block-transforms.spec.js
+index c8ca539bda4150..3a75c1842834c5 100644
+--- a/test/e2e/specs/editor/various/keep-styles-on-block-transforms.spec.js
++++ b/test/e2e/specs/editor/various/keep-styles-on-block-transforms.spec.js
+@@ -16,7 +16,7 @@ test.describe( 'Keep styles on block transforms', () => {
+ 		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+ 		await page.keyboard.type( '## Heading' );
+ 		await page.click( 'role=button[name="Color Text styles"i]' );
+-		await page.click( 'role=button[name="Color: Luminous vivid orange"i]' );
++		await page.click( 'role=option[name="Color: Luminous vivid orange"i]' );
+ 
+ 		await page.click( 'role=button[name="Heading"i]' );
+ 		await page.click( 'role=menuitem[name="Paragraph"i]' );
+diff --git a/test/e2e/specs/editor/various/list-view.spec.js b/test/e2e/specs/editor/various/list-view.spec.js
+index 304007f4d0d252..cb2e668b337bfd 100644
+--- a/test/e2e/specs/editor/various/list-view.spec.js
++++ b/test/e2e/specs/editor/various/list-view.spec.js
+@@ -132,7 +132,7 @@ test.describe( 'List View', () => {
+ 		// make the inner blocks appear.
+ 		await editor.canvas
+ 			.getByRole( 'document', { name: 'Block: Cover' } )
+-			.getByRole( 'button', { name: /Color: /i } )
++			.getByRole( 'option', { name: /Color: /i } )
+ 			.first()
+ 			.click();
+ 
+diff --git a/test/e2e/specs/editor/various/rich-text.spec.js b/test/e2e/specs/editor/various/rich-text.spec.js
+index 1644bf50252c9d..d39264eccc1ea3 100644
+--- a/test/e2e/specs/editor/various/rich-text.spec.js
++++ b/test/e2e/specs/editor/various/rich-text.spec.js
+@@ -585,7 +585,7 @@ test.describe( 'RichText', () => {
+ 		// Tab to black.
+ 		await page.keyboard.press( 'Tab' );
+ 		// Select color other than black.
+-		await page.keyboard.press( 'Tab' );
++		await page.keyboard.press( 'ArrowRight' );
+ 		await page.keyboard.press( 'Enter' );
+ 
+ 		const result = {
+diff --git a/test/e2e/specs/site-editor/style-variations.spec.js b/test/e2e/specs/site-editor/style-variations.spec.js
+index de56652c102f33..ee71e856269b04 100644
+--- a/test/e2e/specs/site-editor/style-variations.spec.js
++++ b/test/e2e/specs/site-editor/style-variations.spec.js
+@@ -174,15 +174,15 @@ test.describe( 'Global styles variations', () => {
+ 		await page.click( 'role=button[name="Color palettes"i]' );
+ 
+ 		await expect(
+-			page.locator( 'role=button[name="Color: Foreground"i]' )
++			page.locator( 'role=option[name="Color: Foreground"i]' )
+ 		).toHaveCSS( 'background-color', 'rgb(74, 7, 74)' );
+ 
+ 		await expect(
+-			page.locator( 'role=button[name="Color: Background"i]' )
++			page.locator( 'role=option[name="Color: Background"i]' )
+ 		).toHaveCSS( 'background-color', 'rgb(202, 105, 211)' );
+ 
+ 		await expect(
+-			page.locator( 'role=button[name="Color: Awesome pink"i]' )
++			page.locator( 'role=option[name="Color: Awesome pink"i]' )
+ 		).toHaveCSS( 'background-color', 'rgba(204, 0, 255, 0.77)' );
+ 	} );
+ 
+diff --git a/test/e2e/specs/site-editor/user-global-styles-revisions.spec.js b/test/e2e/specs/site-editor/user-global-styles-revisions.spec.js
+index 73d49741b825b3..a7ecebfd9ed443 100644
+--- a/test/e2e/specs/site-editor/user-global-styles-revisions.spec.js
++++ b/test/e2e/specs/site-editor/user-global-styles-revisions.spec.js
+@@ -43,7 +43,7 @@ test.describe( 'Global styles revisions', () => {
+ 			.getByRole( 'button', { name: 'Color Background styles' } )
+ 			.click();
+ 		await page
+-			.getByRole( 'button', { name: 'Color: Cyan bluish gray' } )
++			.getByRole( 'option', { name: 'Color: Cyan bluish gray' } )
+ 			.click( { force: true } );
+ 
+ 		await editor.saveSiteEditorEntities();
+@@ -73,7 +73,7 @@ test.describe( 'Global styles revisions', () => {
+ 			.getByRole( 'button', { name: 'Color Background styles' } )
+ 			.click();
+ 		await page
+-			.getByRole( 'button', { name: 'Color: Luminous vivid amber' } )
++			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
+ 			.click( { force: true } );
+ 
+ 		await userGlobalStylesRevisions.openRevisions();

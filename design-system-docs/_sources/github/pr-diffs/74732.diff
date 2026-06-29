@@ -1,0 +1,88 @@
+diff --git a/packages/components/src/navigator/test/index.tsx b/packages/components/src/navigator/test/index.tsx
+index 07b118eaaef70d..c0edb52a00231b 100644
+--- a/packages/components/src/navigator/test/index.tsx
++++ b/packages/components/src/navigator/test/index.tsx
+@@ -20,7 +20,7 @@ import type { NavigateOptions } from '../types';
+ 
+ const INVALID_HTML_ATTRIBUTE = {
+ 	raw: '/ "\'><=invalid_path',
+-	escaped: "/ &quot;'&gt;<=invalid_path",
++	escaped: "/ &quot;'&gt;&lt;=invalid_path",
+ };
+ 
+ const PATHS = {
+diff --git a/packages/element/src/test/index.js b/packages/element/src/test/index.js
+index a38e307f6f8a6b..eb52818f266e3d 100644
+--- a/packages/element/src/test/index.js
++++ b/packages/element/src/test/index.js
+@@ -63,7 +63,7 @@ describe( 'element', () => {
+ 			);
+ 
+ 			expect( result ).toBe(
+-				'<a href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;&gt;" style="background-color:red">' +
++				'<a href="/index.php?foo=bar&amp;qux=&lt;&quot;scary&quot;&gt;" style="background-color:red">' +
+ 					'&lt;"WordPress" &amp; Friends>' +
+ 					'</a>'
+ 			);
+diff --git a/packages/element/src/test/serialize.js b/packages/element/src/test/serialize.js
+index 4bafcd71456025..8f7c11a4bf01e5 100644
+--- a/packages/element/src/test/serialize.js
++++ b/packages/element/src/test/serialize.js
+@@ -578,7 +578,7 @@ describe( 'renderAttributes()', () => {
+ 			} );
+ 
+ 			expect( result ).toBe(
+-				' style="background:url(&quot;foo.png&quot;)" href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;&gt;"'
++				' style="background:url(&quot;foo.png&quot;)" href="/index.php?foo=bar&amp;qux=&lt;&quot;scary&quot;&gt;"'
+ 			);
+ 		} );
+ 
+diff --git a/packages/escape-html/README.md b/packages/escape-html/README.md
+index c6bdbb4c600ceb..5ab0c7a993056a 100644
+--- a/packages/escape-html/README.md
++++ b/packages/escape-html/README.md
+@@ -49,6 +49,9 @@ split HTML strings. This is a WordPress specific fix
+ Note that if a resolution for Trac#45387 comes to fruition, it is no longer
+ necessary for `__unstableEscapeGreaterThan` to be used.
+ 
++Note we also escape the less-than symbol to prevent HTML injection vulnerabilities
++and parsing issues, particularly for users without the unfiltered_html capability.
++
+ See: <https://core.trac.wordpress.org/ticket/45387>
+ 
+ _Parameters_
+diff --git a/packages/escape-html/src/index.ts b/packages/escape-html/src/index.ts
+index 71206695bb7d3b..a2207187be2f76 100644
+--- a/packages/escape-html/src/index.ts
++++ b/packages/escape-html/src/index.ts
+@@ -69,6 +69,9 @@ export function escapeLessThan( value: string ): string {
+  * Note that if a resolution for Trac#45387 comes to fruition, it is no longer
+  * necessary for `__unstableEscapeGreaterThan` to be used.
+  *
++ * Note we also escape the less-than symbol to prevent HTML injection vulnerabilities
++ * and parsing issues, particularly for users without the unfiltered_html capability.
++ *
+  * See: https://core.trac.wordpress.org/ticket/45387
+  *
+  * @param value Attribute value.
+@@ -77,7 +80,7 @@ export function escapeLessThan( value: string ): string {
+  */
+ export function escapeAttribute( value: string ): string {
+ 	return __unstableEscapeGreaterThan(
+-		escapeQuotationMark( escapeAmpersand( value ) )
++		escapeLessThan( escapeQuotationMark( escapeAmpersand( value ) ) )
+ 	);
+ }
+ 
+diff --git a/packages/escape-html/src/test/index.ts b/packages/escape-html/src/test/index.ts
+index 6862fa3a1d18f2..5fba8fc5e9207e 100644
+--- a/packages/escape-html/src/test/index.ts
++++ b/packages/escape-html/src/test/index.ts
+@@ -68,6 +68,7 @@ describe( 'escapeGreaterThan', () => {
+ describe( 'escapeAttribute', () => {
+ 	testEscapeAmpersand( escapeAttribute );
+ 	testEscapeQuotationMark( escapeAttribute );
++	testEscapeLessThan( escapeAttribute );
+ 	testUnstableEscapeGreaterThan( escapeAttribute );
+ } );
+ 

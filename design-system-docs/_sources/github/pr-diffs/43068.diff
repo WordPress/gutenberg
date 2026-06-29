@@ -1,0 +1,204 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 37dd824c6b6247..f345b9c92cf32f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -34,7 +34,7 @@
+ -   `InputControl`: Fix incorrect `size` prop passing ([#42793](https://github.com/WordPress/gutenberg/pull/42793)).
+ -   `Placeholder`: Convert to TypeScript ([#42990](https://github.com/WordPress/gutenberg/pull/42990)).
+ -   `Popover`: rewrite Storybook examples using controls [#42903](https://github.com/WordPress/gutenberg/pull/42903)).
+--   `Swatch`: Convert to TypeScript ([#42162](https://github.com/WordPress/gutenberg/pull/42162)).
++-   `Swatch`: Remove component in favor of `ColorIndicator` [#43068](https://github.com/WordPress/gutenberg/pull/43068)).
+ 
+ ## 19.16.0 (2022-07-27)
+ 
+diff --git a/packages/components/src/color-list-picker/index.js b/packages/components/src/color-list-picker/index.js
+index 7a0bf8acdc47ad..9748a8ea3ba72b 100644
+--- a/packages/components/src/color-list-picker/index.js
++++ b/packages/components/src/color-list-picker/index.js
+@@ -2,13 +2,16 @@
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
++import { swatch } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Button from '../button';
+ import ColorPalette from '../color-palette';
+-import Swatch from '../swatch';
++import ColorIndicator from '../color-indicator';
++import Icon from '../icon';
++import { HStack } from '../h-stack';
+ 
+ function ColorOption( {
+ 	label,
+@@ -23,10 +26,19 @@ function ColorOption( {
+ 		<>
+ 			<Button
+ 				className="components-color-list-picker__swatch-button"
+-				icon={ <Swatch fill={ value } /> }
+ 				onClick={ () => setIsOpen( ( prev ) => ! prev ) }
+ 			>
+-				{ label }
++				<HStack justify="flex-start" spacing={ 2 }>
++					{ value ? (
++						<ColorIndicator
++							colorValue={ value }
++							className="components-color-list-picker__swatch-color"
++						/>
++					) : (
++						<Icon icon={ swatch } />
++					) }
++					<span>{ label }</span>
++				</HStack>
+ 			</Button>
+ 			{ isOpen && (
+ 				<ColorPalette
+diff --git a/packages/components/src/color-list-picker/style.scss b/packages/components/src/color-list-picker/style.scss
+index 232be723ed9585..dd0c79ffb8062b 100644
+--- a/packages/components/src/color-list-picker/style.scss
++++ b/packages/components/src/color-list-picker/style.scss
+@@ -6,3 +6,14 @@
+ .components-color-list-picker__color-picker {
+ 	margin: $grid-unit-10 0;
+ }
++
++.components-color-list-picker__swatch-button {
++	// Used to simulate styles as a .button.has-icon (which this component can't
++	// opt into, because it has to show more than a simple SVG as the "icon")
++	padding: 6px;
++}
++
++.components-color-list-picker__swatch-color {
++	// Match the 24px size of the `swatch` icon (used when no color is set)
++	margin: 2px;
++}
+diff --git a/packages/components/src/duotone-picker/duotone-swatch.js b/packages/components/src/duotone-picker/duotone-swatch.js
+index 1ab35b53034c7d..d98671affbbd13 100644
+--- a/packages/components/src/duotone-picker/duotone-swatch.js
++++ b/packages/components/src/duotone-picker/duotone-swatch.js
+@@ -1,15 +1,22 @@
+ /**
+- * Internal dependencies
++ * WordPress dependencies
+  */
+-import Swatch from '../swatch';
++import { swatch } from '@wordpress/icons';
+ 
++/**
++ * Internal dependencies
++ */
++import ColorIndicator from '../color-indicator';
++import Icon from '../icon';
+ import { getGradientFromCSSColors } from './utils';
+ 
+ function DuotoneSwatch( { values } ) {
+-	return (
+-		<Swatch
+-			fill={ values && getGradientFromCSSColors( values, '135deg' ) }
++	return values ? (
++		<ColorIndicator
++			colorValue={ getGradientFromCSSColors( values, '135deg' ) }
+ 		/>
++	) : (
++		<Icon icon={ swatch } />
+ 	);
+ }
+ 
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index fbcdbc59c3f451..d26b4aee22c7d2 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -39,7 +39,6 @@
+ @import "./search-control/style.scss";
+ @import "./select-control/style.scss";
+ @import "./snackbar/style.scss";
+-@import "./swatch/style.scss";
+ @import "./tab-panel/style.scss";
+ @import "./text-control/style.scss";
+ @import "./tip/style.scss";
+diff --git a/packages/components/src/swatch/index.tsx b/packages/components/src/swatch/index.tsx
+deleted file mode 100644
+index 955fb3079fe4ae..00000000000000
+--- a/packages/components/src/swatch/index.tsx
++++ /dev/null
+@@ -1,22 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { swatch } from '@wordpress/icons';
+-
+-/**
+- * Internal dependencies
+- */
+-import Icon from '../icon';
+-import type { SwatchProps } from './types';
+-
+-// This component will be deprecated. Use `ColorIndicator` instead.
+-// TODO: Consolidate this component with `ColorIndicator`.
+-function Swatch( { fill }: SwatchProps ) {
+-	return fill ? (
+-		<span className="components-swatch" style={ { background: fill } } />
+-	) : (
+-		<Icon icon={ swatch } />
+-	);
+-}
+-
+-export default Swatch;
+diff --git a/packages/components/src/swatch/style.scss b/packages/components/src/swatch/style.scss
+deleted file mode 100644
+index b18b361f39d652..00000000000000
+--- a/packages/components/src/swatch/style.scss
++++ /dev/null
+@@ -1,21 +0,0 @@
+-.components-swatch {
+-	width: 18px;
+-	height: 18px;
+-	border-radius: 50%;
+-	color: transparent;
+-	background: transparent;
+-
+-	// Regular border doesn't seem to work in the toolbar button, but pseudo-selector border does.
+-	&::after {
+-		content: "";
+-		display: block;
+-		width: 100%;
+-		height: 100%;
+-		border: $border-width solid rgba(0, 0, 0, 0.2);
+-		border-radius: 50%;
+-	}
+-}
+-
+-.components-button.has-icon.has-text .components-swatch {
+-	margin-right: $grid-unit;
+-}
+diff --git a/packages/components/src/swatch/types.ts b/packages/components/src/swatch/types.ts
+deleted file mode 100644
+index 96db68094ad6fe..00000000000000
+--- a/packages/components/src/swatch/types.ts
++++ /dev/null
+@@ -1,11 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { CSSProperties } from 'react';
+-
+-export type SwatchProps = {
+-	/**
+-	 * The color to display in the swatch.
+-	 */
+-	fill?: CSSProperties[ 'background' ];
+-};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index adc46ae2925e32..0d63f0483fb495 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -86,7 +86,6 @@
+ 		"src/spacer/**/*",
+ 		"src/spinner/**/*",
+ 		"src/surface/**/*",
+-		"src/swatch/**/*",
+ 		"src/text/**/*",
+ 		"src/text-control/**/*",
+ 		"src/text-highlight/**/*",

@@ -1,0 +1,44 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 22a08c2f0dd08c..d2580e0b009b5f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ 
+ ### Internal
+ 
++-   `LinkedButton`: remove unnecessary `span` tag ([#46063](https://github.com/WordPress/gutenberg/pull/46063))
+ -   NumberControl: refactor styles/tests/stories to TypeScript, replace fireEvent with user-event ([#45990](https://github.com/WordPress/gutenberg/pull/45990)).
+ 
+ ## 22.1.0 (2022-11-16)
+diff --git a/packages/components/src/box-control/linked-button.js b/packages/components/src/box-control/linked-button.js
+index 39de0e894783f2..67fb1cebf7b091 100644
+--- a/packages/components/src/box-control/linked-button.js
++++ b/packages/components/src/box-control/linked-button.js
+@@ -13,19 +13,16 @@ import Tooltip from '../tooltip';
+ export default function LinkedButton( { isLinked, ...props } ) {
+ 	const label = isLinked ? __( 'Unlink sides' ) : __( 'Link sides' );
+ 
+-	// TODO: Remove span after merging https://github.com/WordPress/gutenberg/pull/44198
+ 	return (
+ 		<Tooltip text={ label }>
+-			<span>
+-				<Button
+-					{ ...props }
+-					className="component-box-control__linked-button"
+-					isSmall
+-					icon={ isLinked ? link : linkOff }
+-					iconSize={ 24 }
+-					aria-label={ label }
+-				/>
+-			</span>
++			<Button
++				{ ...props }
++				className="component-box-control__linked-button"
++				isSmall
++				icon={ isLinked ? link : linkOff }
++				iconSize={ 24 }
++				aria-label={ label }
++			/>
+ 		</Tooltip>
+ 	);
+ }

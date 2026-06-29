@@ -1,0 +1,93 @@
+diff --git a/packages/components/src/radio-control/README.md b/packages/components/src/radio-control/README.md
+index 5d7204ef627be3..095cfcdff9137a 100644
+--- a/packages/components/src/radio-control/README.md
++++ b/packages/components/src/radio-control/README.md
+@@ -104,7 +104,8 @@ A function that receives the value of the new option that is being selected as i
+ 
+ An array of objects containing the value and label of the options.
+ 
+--   `label`: `string` The label to be shown to the user.
++-   `label`: `string` | `React.ReactElement` The label to be shown to the user. When the label is not a string, make sure that the element is accessibly labeled.
++- ```
+ -   `value`: `string` The internal value compared against select and passed to onChange.
+ 
+ *   Required: No
+diff --git a/packages/components/src/radio-control/stories/index.story.tsx b/packages/components/src/radio-control/stories/index.story.tsx
+index 7b7bc773f323a9..3d26cbeb15308f 100644
+--- a/packages/components/src/radio-control/stories/index.story.tsx
++++ b/packages/components/src/radio-control/stories/index.story.tsx
+@@ -6,12 +6,14 @@ import type { Meta, StoryFn } from '@storybook/react';
+ /**
+  * WordPress dependencies
+  */
++import { starFilled } from '@wordpress/icons';
+ import { useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import RadioControl from '..';
++import Icon from '../../icon';
+ 
+ const meta: Meta< typeof RadioControl > = {
+ 	component: RadioControl,
+@@ -92,3 +94,41 @@ WithOptionDescriptions.args = {
+ 		},
+ 	],
+ };
++
++/**
++ * When the label is not a string,
++ * make sure that the element is accessibly labeled.
++ */
++export const WithComponentLabels: StoryFn< typeof RadioControl > =
++	Template.bind( {} );
++
++function Rating( {
++	stars,
++	...restProps
++}: { stars: number } & JSX.IntrinsicElements[ 'div' ] ) {
++	return (
++		<div style={ { display: 'flex' } } { ...restProps }>
++			{ Array.from( { length: stars }, ( _, index ) => (
++				<Icon key={ index } icon={ starFilled } />
++			) ) }
++		</div>
++	);
++}
++
++WithComponentLabels.args = {
++	label: 'Rating',
++	options: [
++		{
++			label: <Rating stars={ 3 } aria-label="Three Stars" />,
++			value: '3',
++		},
++		{
++			label: <Rating stars={ 2 } aria-label="Two Stars" />,
++			value: '2',
++		},
++		{
++			label: <Rating stars={ 1 } aria-label="One Star" />,
++			value: '1',
++		},
++	],
++};
+diff --git a/packages/components/src/radio-control/types.ts b/packages/components/src/radio-control/types.ts
+index d1c3aa40d96481..be42504d91c0aa 100644
+--- a/packages/components/src/radio-control/types.ts
++++ b/packages/components/src/radio-control/types.ts
+@@ -17,9 +17,11 @@ export type RadioControlProps = Pick<
+ 	 */
+ 	options?: {
+ 		/**
+-		 * The label to be shown to the user
++		 * The label to be shown to the user.
++		 *
++		 * When the label is not a string, make sure that the element is accessibly labeled.
+ 		 */
+-		label: string;
++		label: string | React.ReactElement;
+ 		/**
+ 		 * The internal value compared against select and passed to onChange
+ 		 */

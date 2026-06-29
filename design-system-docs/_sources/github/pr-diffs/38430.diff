@@ -1,0 +1,84 @@
+diff --git a/packages/components/src/circular-option-picker/index.js b/packages/components/src/circular-option-picker/index.js
+index 21de49e39816e3..63ad85a40311a2 100644
+--- a/packages/components/src/circular-option-picker/index.js
++++ b/packages/components/src/circular-option-picker/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/color-palette/index.js b/packages/components/src/color-palette/index.js
+index 5694650f188b11..59596e78f33ae9 100644
+--- a/packages/components/src/color-palette/index.js
++++ b/packages/components/src/color-palette/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/color-picker/color-display.tsx b/packages/components/src/color-picker/color-display.tsx
+index be78b948b1e89a..3e5fa5610a3c56 100644
+--- a/packages/components/src/color-picker/color-display.tsx
++++ b/packages/components/src/color-picker/color-display.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { colord, extend, Colord } from 'colord';
++import type { Colord } from 'colord';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/color-picker/color-input.tsx b/packages/components/src/color-picker/color-input.tsx
+index 82e9d67e899dc5..c57077bb3e5fe6 100644
+--- a/packages/components/src/color-picker/color-input.tsx
++++ b/packages/components/src/color-picker/color-input.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { colord, extend, Colord } from 'colord';
++import type { Colord } from 'colord';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index 34708694dd5106..dc4711339aa556 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -73,7 +73,7 @@ const ColorPicker = (
+ 	} );
+ 
+ 	const safeColordColor = useMemo( () => {
+-		return colord( color );
++		return colord( color || '' );
+ 	}, [ color ] );
+ 
+ 	const debouncedSetColor = useDebounce( setColor );
+diff --git a/packages/components/src/color-picker/use-deprecated-props.ts b/packages/components/src/color-picker/use-deprecated-props.ts
+index 5f89ac121040ca..49f00b7dd7f4cb 100644
+--- a/packages/components/src/color-picker/use-deprecated-props.ts
++++ b/packages/components/src/color-picker/use-deprecated-props.ts
+@@ -83,6 +83,8 @@ function getColorFromLegacyProps( props: LegacyProps ): string | undefined {
+ 	if ( props.color.hex ) {
+ 		return props.color.hex;
+ 	}
++
++	return undefined;
+ }
+ 
+ const transformColorStringToLegacyColor = memoize(
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 29818cc95acf22..a3077fd06012ec 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -28,6 +28,9 @@
+ 		"src/base-field/**/*",
+ 		"src/button/**/*",
+ 		"src/card/**/*",
++		"src/circular-option-picker/**/*",
++		"src/color-palette/**/*",
++		"src/color-picker/**/*",
+ 		"src/confirm-dialog/**/*",
+ 		"src/dashicon/**/*",
+ 		"src/disabled/**/*",

@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ddaae6ec370ece..9a8aa39e9f06ce 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
+ -   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
++-   `ToggleControl`: Prevent `__nextHasNoMarginBottom` from logging a console warning ([#75296](https://github.com/WordPress/gutenberg/pull/75296)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/toggle-control/index.tsx b/packages/components/src/toggle-control/index.tsx
+index 39a52c7788da23..22e11b25026b27 100644
+--- a/packages/components/src/toggle-control/index.tsx
++++ b/packages/components/src/toggle-control/index.tsx
+@@ -28,6 +28,8 @@ function UnforwardedToggleControl(
+ 		className,
+ 		onChange,
+ 		disabled,
++		// Prevent passing to internal component.
++		__nextHasNoMarginBottom: _,
+ 		...additionalProps
+ 	}: WordPressComponentProps< ToggleControlProps, 'input', false >,
+ 	ref: ForwardedRef< HTMLInputElement >

@@ -1,0 +1,58 @@
+diff --git a/packages/block-editor/src/components/inserter/style.scss b/packages/block-editor/src/components/inserter/style.scss
+index f3fa8d1e7df04b..5e0f76f748d7fb 100644
+--- a/packages/block-editor/src/components/inserter/style.scss
++++ b/packages/block-editor/src/components/inserter/style.scss
+@@ -231,13 +231,6 @@ $block-inserter-tabs-height: 44px;
+ 		margin-top: auto;
+ 	}
+ 
+-	// Temporarily disable the component's indicator animation.
+-	// TODO: remove in favor of using the native component's styles and behavior,
+-	// see https://github.com/WordPress/gutenberg/pull/62879#issuecomment-2219720582
+-	&[aria-orientation="vertical"]::after {
+-		content: none;
+-	}
+-
+ 	.block-editor-inserter__category-tab {
+ 		// Account for the icon on the right so that it's visually balanced.
+ 		padding: $grid-unit-10 $grid-unit-05 $grid-unit-10 $grid-unit-15;
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index 283d6421f5b768..ba5d87e7e4e4d3 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -156,10 +156,6 @@ export const Tab = styled( Ariakit.Tab )`
+ 		&::after {
+ 			content: '';
+ 			position: absolute;
+-			top: ${ space( 3 ) };
+-			right: ${ space( 3 ) };
+-			bottom: ${ space( 3 ) };
+-			left: ${ space( 3 ) };
+ 			pointer-events: none;
+ 
+ 			// Draw the indicator.
+@@ -185,10 +181,24 @@ export const Tab = styled( Ariakit.Tab )`
+ 		min-height: ${ space(
+ 			10
+ 		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
++
++		&::after {
++			top: ${ space( 0.5 ) };
++			right: ${ space( 0.5 ) };
++			bottom: ${ space( 0.5 ) };
++			left: ${ space( 0.5 ) };
++		}
+ 	}
+ 
+ 	[aria-orientation='horizontal'] & {
+ 		justify-content: center;
++
++		&::after {
++			top: ${ space( 3 ) };
++			right: ${ space( 3 ) };
++			bottom: ${ space( 3 ) };
++			left: ${ space( 3 ) };
++		}
+ 	}
+ `;
+ 

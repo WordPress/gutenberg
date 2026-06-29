@@ -1,0 +1,410 @@
+diff --git a/packages/base-styles/_animations.scss b/packages/base-styles/_animations.scss
+index 8706d185aa221b..b17478ed24f040 100644
+--- a/packages/base-styles/_animations.scss
++++ b/packages/base-styles/_animations.scss
+@@ -4,7 +4,7 @@
+ 	}
+ }
+ 
+-@mixin animation__fade-in($speed: 0.08s, $delay: 0s) {
++@mixin animation__fade-in($speed: 0.08s, $delay: 0s, $easing: linear) {
+ 	@include keyframes(__wp-base-styles-fade-in) {
+ 		from {
+ 			opacity: 0;
+@@ -15,12 +15,12 @@
+ 	}
+ 
+ 
+-	animation: __wp-base-styles-fade-in $speed linear $delay;
++	animation: __wp-base-styles-fade-in $speed $easing $delay;
+ 	animation-fill-mode: forwards;
+ 	@include reduce-motion("animation");
+ }
+ 
+-@mixin animation__fade-out($speed: 0.08s, $delay: 0s) {
++@mixin animation__fade-out($speed: 0.08s, $delay: 0s, $easing: linear) {
+ 	@include keyframes(__wp-base-styles-fade-out) {
+ 		from {
+ 			opacity: 1;
+@@ -31,7 +31,7 @@
+ 	}
+ 
+ 
+-	animation: __wp-base-styles-fade-out $speed linear $delay;
++	animation: __wp-base-styles-fade-out $speed $easing $delay;
+ 	animation-fill-mode: forwards;
+ 	@include reduce-motion("animation");
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c705257a827c5e..dc89bf6543f402 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -29,6 +29,7 @@
+ -   `ResizeableBox`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+ -   `Snackbar`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+ -   `Tooltip`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
++-   `Modal`: add exit animation for internally triggered events ([#65203](https://github.com/WordPress/gutenberg/pull/65203)).
+ -   `Card`: Adopt radius scale ([#65053](https://github.com/WordPress/gutenberg/pull/65053)).
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 7d988a0e7240b3..7d55c9a4d5d1e6 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import clsx from 'clsx';
+-import type { ForwardedRef, KeyboardEvent, RefObject, UIEvent } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -38,10 +37,11 @@ import StyleProvider from '../style-provider';
+ import type { ModalProps } from './types';
+ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ import { Spacer } from '../spacer';
++import { useModalExitAnimation } from './use-modal-exit-animation';
+ 
+ // Used to track and dismiss the prior modal when another opens unless nested.
+ type Dismissers = Set<
+-	RefObject< ModalProps[ 'onRequestClose' ] | undefined >
++	React.RefObject< ModalProps[ 'onRequestClose' ] | undefined >
+ >;
+ const ModalContext = createContext< Dismissers >( new Set() );
+ 
+@@ -50,7 +50,7 @@ const bodyOpenClasses = new Map< string, number >();
+ 
+ function UnforwardedModal(
+ 	props: ModalProps,
+-	forwardedRef: ForwardedRef< HTMLDivElement >
++	forwardedRef: React.ForwardedRef< HTMLDivElement >
+ ) {
+ 	const {
+ 		bodyOpenClassName = 'modal-open',
+@@ -70,7 +70,7 @@ function UnforwardedModal(
+ 		closeButtonLabel,
+ 		children,
+ 		style,
+-		overlayClassName,
++		overlayClassName: overlayClassnameProp,
+ 		className,
+ 		contentLabel,
+ 		onKeyDown,
+@@ -184,6 +184,9 @@ function UnforwardedModal(
+ 		};
+ 	}, [ bodyOpenClassName ] );
+ 
++	const { closeModal, frameRef, frameStyle, overlayClassname } =
++		useModalExitAnimation();
++
+ 	// Calls the isContentScrollable callback when the Modal children container resizes.
+ 	useLayoutEffect( () => {
+ 		if ( ! window.ResizeObserver || ! childrenContainerRef.current ) {
+@@ -200,21 +203,21 @@ function UnforwardedModal(
+ 		};
+ 	}, [ isContentScrollable, childrenContainerRef ] );
+ 
+-	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
++	function handleEscapeKeyDown(
++		event: React.KeyboardEvent< HTMLDivElement >
++	) {
+ 		if (
+ 			shouldCloseOnEsc &&
+ 			( event.code === 'Escape' || event.key === 'Escape' ) &&
+ 			! event.defaultPrevented
+ 		) {
+ 			event.preventDefault();
+-			if ( onRequestClose ) {
+-				onRequestClose( event );
+-			}
++			closeModal().then( () => onRequestClose( event ) );
+ 		}
+ 	}
+ 
+ 	const onContentContainerScroll = useCallback(
+-		( e: UIEvent< HTMLDivElement > ) => {
++		( e: React.UIEvent< HTMLDivElement > ) => {
+ 			const scrollY = e?.currentTarget?.scrollTop ?? -1;
+ 
+ 			if ( ! hasScrolledContent && scrollY > 0 ) {
+@@ -248,7 +251,7 @@ function UnforwardedModal(
+ 			const isSameTarget = target === pressTarget;
+ 			pressTarget = null;
+ 			if ( button === 0 && isSameTarget ) {
+-				onRequestClose();
++				closeModal().then( () => onRequestClose() );
+ 			}
+ 		},
+ 	};
+@@ -259,7 +262,8 @@ function UnforwardedModal(
+ 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
+ 			className={ clsx(
+ 				'components-modal__screen-overlay',
+-				overlayClassName
++				overlayClassname,
++				overlayClassnameProp
+ 			) }
+ 			onKeyDown={ withIgnoreIMEEvents( handleEscapeKeyDown ) }
+ 			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
+@@ -271,8 +275,12 @@ function UnforwardedModal(
+ 						sizeClass,
+ 						className
+ 					) }
+-					style={ style }
++					style={ {
++						...frameStyle,
++						...style,
++					} }
+ 					ref={ useMergeRefs( [
++						frameRef,
+ 						constrainedTabbingRef,
+ 						focusReturnRef,
+ 						focusOnMount !== 'firstContentElement'
+@@ -331,7 +339,13 @@ function UnforwardedModal(
+ 										/>
+ 										<Button
+ 											size="small"
+-											onClick={ onRequestClose }
++											onClick={ (
++												event: React.MouseEvent< HTMLButtonElement >
++											) =>
++												closeModal().then( () =>
++													onRequestClose( event )
++												)
++											}
+ 											icon={ close }
+ 											label={
+ 												closeButtonLabel ||
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index 3790e0b7368a64..70959f69392d1c 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -10,6 +10,13 @@
+ 	display: flex;
+ 	// This animates the appearance of the backdrop.
+ 	@include animation__fade-in();
++
++	&.is-animating-out {
++		// Note: it's important that the fade-out animation doesn't end after the
++		// modal frame's disappear animation, because the component will be removed
++		// from the DOM when that animation ends.
++		@include animation__fade-out($delay: 80ms);
++	}
+ }
+ 
+ // The modal window element.
+@@ -25,10 +32,17 @@
+ 	// Have the content element fill the vertical space yet not overflow.
+ 	display: flex;
+ 	// Animate the modal frame/contents appearing on the page.
+-	animation: components-modal__appear-animation 0.26s cubic-bezier(0.29, 0, 0, 1);
++	animation-name: components-modal__appear-animation;
++	animation-duration: var(--modal-frame-animation-duration);
+ 	animation-fill-mode: forwards;
++	animation-timing-function: cubic-bezier(0.29, 0, 0, 1);
+ 	@include reduce-motion("animation");
+ 
++	.components-modal__screen-overlay.is-animating-out & {
++		animation-name: components-modal__disappear-animation;
++		animation-timing-function: cubic-bezier(1, 0, 0.2, 1);
++	}
++
+ 	// Show a centered modal on bigger screens.
+ 	@include break-small() {
+ 		border-radius: $radius-large;
+@@ -88,6 +102,19 @@
+ 	}
+ }
+ 
++// Note: this animation is also used in the animationend JS event listener.
++// Make sure that the animation name is kept in sync across the two files.
++@keyframes components-modal__disappear-animation {
++	from {
++		opacity: 1;
++		transform: scale(1);
++	}
++	to {
++		opacity: 0;
++		transform: scale(0.9);
++	}
++}
++
+ // Fix header to the top so it is always there to provide context to the modal
+ // if the content needs to be scrolled (for example, on the keyboard shortcuts
+ // modal screen).
+diff --git a/packages/components/src/modal/types.ts b/packages/components/src/modal/types.ts
+index 0a422718b1be14..f6f35eec85fc73 100644
+--- a/packages/components/src/modal/types.ts
++++ b/packages/components/src/modal/types.ts
+@@ -1,15 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import type {
+-	AriaRole,
+-	CSSProperties,
+-	ReactNode,
+-	KeyboardEventHandler,
+-	KeyboardEvent,
+-	SyntheticEvent,
+-} from 'react';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -42,7 +30,7 @@ export type ModalProps = {
+ 	/**
+ 	 * The children elements.
+ 	 */
+-	children: ReactNode;
++	children: React.ReactNode;
+ 	/**
+ 	 * If this property is added, it will an additional class name to the modal
+ 	 * content `div`.
+@@ -77,7 +65,7 @@ export type ModalProps = {
+ 	 *
+ 	 * @default null
+ 	 */
+-	headerActions?: ReactNode;
++	headerActions?: React.ReactNode;
+ 
+ 	/**
+ 	 * If this property is added, an icon will be added before the title.
+@@ -108,12 +96,12 @@ export type ModalProps = {
+ 	/**
+ 	 *  Handle the key down on the modal frame `div`.
+ 	 */
+-	onKeyDown?: KeyboardEventHandler< HTMLDivElement >;
++	onKeyDown?: React.KeyboardEventHandler< HTMLDivElement >;
+ 	/**
+ 	 * This function is called to indicate that the modal should be closed.
+ 	 */
+ 	onRequestClose: (
+-		event?: KeyboardEvent< HTMLDivElement > | SyntheticEvent
++		event?: React.KeyboardEvent< HTMLDivElement > | React.SyntheticEvent
+ 	) => void;
+ 	/**
+ 	 * If this property is added, it will an additional class name to the modal
+@@ -126,7 +114,7 @@ export type ModalProps = {
+ 	 *
+ 	 * @default 'dialog'
+ 	 */
+-	role?: AriaRole;
++	role?: React.AriaRole;
+ 	/**
+ 	 * If this property is added, it will determine whether the modal requests
+ 	 * to close when a mouse click occurs outside of the modal content.
+@@ -144,7 +132,7 @@ export type ModalProps = {
+ 	/**
+ 	 * If this property is added, it will be added to the modal frame `div`.
+ 	 */
+-	style?: CSSProperties;
++	style?: React.CSSProperties;
+ 	/**
+ 	 * This property is used as the modal header's title.
+ 	 *
+diff --git a/packages/components/src/modal/use-modal-exit-animation.ts b/packages/components/src/modal/use-modal-exit-animation.ts
+new file mode 100644
+index 00000000000000..729b4f9ea6f86c
+--- /dev/null
++++ b/packages/components/src/modal/use-modal-exit-animation.ts
+@@ -0,0 +1,99 @@
++/**
++ * WordPress dependencies
++ */
++import { useReducedMotion } from '@wordpress/compose';
++import { useCallback, useRef, useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { CONFIG } from '../utils';
++import warning from '@wordpress/warning';
++
++// Animation duration (ms) extracted to JS in order to be used on a setTimeout.
++const FRAME_ANIMATION_DURATION = CONFIG.transitionDuration;
++const FRAME_ANIMATION_DURATION_NUMBER = Number.parseInt(
++	CONFIG.transitionDuration
++);
++
++const EXIT_ANIMATION_NAME = 'components-modal__disappear-animation';
++
++export function useModalExitAnimation() {
++	const frameRef = useRef< HTMLDivElement >();
++	const [ isAnimatingOut, setIsAnimatingOut ] = useState( false );
++	const isReducedMotion = useReducedMotion();
++
++	const closeModal = useCallback(
++		() =>
++			new Promise< void >( ( closeModalResolve ) => {
++				// Grab a "stable" reference of the frame element, since
++				// the value held by the react ref might change at runtime.
++				const frameEl = frameRef.current;
++
++				if ( isReducedMotion ) {
++					closeModalResolve();
++					return;
++				}
++
++				if ( ! frameEl ) {
++					warning(
++						"wp.components.Modal: the Modal component can't be closed with an exit animation because of a missing reference to the modal frame element."
++					);
++					closeModalResolve();
++					return;
++				}
++
++				let handleAnimationEnd:
++					| undefined
++					| ( ( e: AnimationEvent ) => void );
++
++				const startAnimation = () =>
++					new Promise< void >( ( animationResolve ) => {
++						handleAnimationEnd = ( e: AnimationEvent ) => {
++							if ( e.animationName === EXIT_ANIMATION_NAME ) {
++								animationResolve();
++							}
++						};
++
++						frameEl.addEventListener(
++							'animationend',
++							handleAnimationEnd
++						);
++						setIsAnimatingOut( true );
++					} );
++				const animationTimeout = () =>
++					new Promise< void >( ( timeoutResolve ) => {
++						setTimeout(
++							() => timeoutResolve(),
++							// Allow an extra 20% of the animation duration for the
++							// animationend event to fire, in case the animation frame is
++							// slightly delayes by some other events in the event loop.
++							FRAME_ANIMATION_DURATION_NUMBER * 1.2
++						);
++					} );
++
++				Promise.race( [ startAnimation(), animationTimeout() ] ).then(
++					() => {
++						if ( handleAnimationEnd ) {
++							frameEl.removeEventListener(
++								'animationend',
++								handleAnimationEnd
++							);
++						}
++						setIsAnimatingOut( false );
++						closeModalResolve();
++					}
++				);
++			} ),
++		[ isReducedMotion ]
++	);
++
++	return {
++		overlayClassname: isAnimatingOut ? 'is-animating-out' : undefined,
++		frameRef,
++		frameStyle: {
++			'--modal-frame-animation-duration': `${ FRAME_ANIMATION_DURATION }`,
++		},
++		closeModal,
++	};
++}

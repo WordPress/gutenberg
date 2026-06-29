@@ -1,0 +1,788 @@
+diff --git a/packages/theme/bin/terrazzo-plugin-inline-alias-values/index.ts b/packages/theme/bin/terrazzo-plugin-inline-alias-values/index.ts
+index 12d145013a4092..33f4aad331fed2 100644
+--- a/packages/theme/bin/terrazzo-plugin-inline-alias-values/index.ts
++++ b/packages/theme/bin/terrazzo-plugin-inline-alias-values/index.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { type Plugin } from '@terrazzo/parser';
++import { type Plugin, type TokenNormalized } from '@terrazzo/parser';
+ 
+ interface InlineAliasValuesOptions {
+ 	/**
+@@ -40,25 +40,54 @@ export default function inlineAliasValues( {
+ 	return {
+ 		name: '@wordpress/terrazzo-plugin-inline-alias-values',
+ 		async transform( { tokens } ) {
+-			Object.keys( tokens )
+-				.filter( ( id ) => pattern.test( id ) )
+-				.forEach( ( id ) => {
+-					const token = tokens[ id ];
++			// Map of primitive token ID -> array of references to inline
++			const inlineMap: Record< string, TokenNormalized[] > = {};
++
++			// Single pass: identify primitives and collect references
++			for ( const [ id, token ] of Object.entries( tokens ) ) {
++				const shouldInline = pattern.test( id );
++
++				if ( shouldInline ) {
++					// Track this token for inlining
++					inlineMap[ id ] = [];
++
++					// Track aliased tokens for output file
+ 					if ( token.aliasedBy ) {
+ 						aliasedBy[ tokenId( id ) ] =
+ 							token.aliasedBy.map( tokenId );
++					}
++				}
++
++				// Check if this token's main value references a primitive
++				if ( token.aliasOf && pattern.test( token.aliasOf ) ) {
++					inlineMap[ token.aliasOf ] ??= [];
++					inlineMap[ token.aliasOf ].push( token );
++				}
+ 
+-						for ( const aliasedId of token.aliasedBy ) {
+-							Object.assign( tokens[ aliasedId ], {
+-								$value: token.$value,
+-								mode: token.mode,
+-								originalValue: token.originalValue,
+-							} );
+-						}
++				// Check if any mode values reference a primitive
++				for ( const modeValue of Object.values( token.mode ) ) {
++					const { aliasOf } = modeValue;
++					if ( aliasOf && pattern.test( aliasOf ) ) {
++						const primitiveId = aliasOf;
++						inlineMap[ primitiveId ] ??= [];
++						inlineMap[ primitiveId ].push( modeValue );
+ 					}
++				}
++			}
++
++			// Inline values and delete primitives
++			for ( const [ id, references ] of Object.entries( inlineMap ) ) {
++				const token = tokens[ id ];
+ 
+-					delete tokens[ id ];
+-				} );
++				for ( const target of references ) {
++					target.$value = token.$value;
++					target.originalValue = token.originalValue;
++					delete target.aliasOf;
++					delete target.aliasChain;
++				}
++
++				delete tokens[ id ];
++			}
+ 		},
+ 		async build( { outputFile } ) {
+ 			if ( ! filename ) {
+diff --git a/packages/theme/docs/ds-tokens.md b/packages/theme/docs/ds-tokens.md
+index 9148ba1bea01fa..e2d2464244d499 100644
+--- a/packages/theme/docs/ds-tokens.md
++++ b/packages/theme/docs/ds-tokens.md
+@@ -111,13 +111,14 @@ Do not edit directly.
+ 
+ ### Dimension
+ 
+-| Variable name                              | Description                      |
+-| ------------------------------------------ | -------------------------------- |
+-| `--wpds-dimension-base`                    | Base dimension unit              |
+-| `--wpds-dimension-padding-surface-x-small` | Extra small spacing for surfaces |
+-| `--wpds-dimension-padding-surface-small`   | Small spacing for surfaces       |
+-| `--wpds-dimension-padding-surface-medium`  | Medium spacing for surfaces      |
+-| `--wpds-dimension-padding-surface-large`   | Large spacing for surfaces       |
++| Variable name                          | Description                         |
++| -------------------------------------- | ----------------------------------- |
++| `--wpds-dimension-base`                | Base dimension unit                 |
++| `--wpds-dimension-padding-surface-2xs` | 2x extra small spacing for surfaces |
++| `--wpds-dimension-padding-surface-xs`  | Extra small spacing for surfaces    |
++| `--wpds-dimension-padding-surface-sm`  | Small spacing for surfaces          |
++| `--wpds-dimension-padding-surface-md`  | Medium spacing for surfaces         |
++| `--wpds-dimension-padding-surface-lg`  | Large spacing for surfaces          |
+ 
+ ### Elevation
+ 
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index b54fdaedf2ba40..9c575baa96f3e2 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -96,10 +96,11 @@
+ 	--wpds-color-stroke-surface-warning: #d2b581; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
+ 	--wpds-color-stroke-surface-warning-strong: #936400; /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
+ 	--wpds-dimension-base: 4px; /* Base dimension unit */
+-	--wpds-dimension-padding-surface-large: 24px; /* Large spacing for surfaces */
+-	--wpds-dimension-padding-surface-medium: 16px; /* Medium spacing for surfaces */
+-	--wpds-dimension-padding-surface-small: 12px; /* Small spacing for surfaces */
+-	--wpds-dimension-padding-surface-x-small: 8px; /* Extra small spacing for surfaces */
++	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
++	--wpds-dimension-padding-surface-lg: 32px; /* Large spacing for surfaces */
++	--wpds-dimension-padding-surface-md: 24px; /* Medium spacing for surfaces */
++	--wpds-dimension-padding-surface-sm: 16px; /* Small spacing for surfaces */
++	--wpds-dimension-padding-surface-xs: 8px; /* Extra small spacing for surfaces */
+ 	--wpds-elevation-large: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
+ 		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005; /* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
+ 	--wpds-elevation-medium: 0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a,
+@@ -127,6 +128,31 @@
+ 	--wpds-font-size-x-small: 11px; /* Extra small font size */
+ }
+ 
++[data-wpds-theme-provider-id][data-wpds-density='default'] {
++	--wpds-dimension-base: 4px; /* Base dimension unit */
++	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
++	--wpds-dimension-padding-surface-lg: 32px; /* Large spacing for surfaces */
++	--wpds-dimension-padding-surface-md: 24px; /* Medium spacing for surfaces */
++	--wpds-dimension-padding-surface-sm: 16px; /* Small spacing for surfaces */
++	--wpds-dimension-padding-surface-xs: 8px; /* Extra small spacing for surfaces */
++}
++
++[data-wpds-theme-provider-id][data-wpds-density='compact'] {
++	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
++	--wpds-dimension-padding-surface-lg: 24px; /* Large spacing for surfaces */
++	--wpds-dimension-padding-surface-md: 20px; /* Medium spacing for surfaces */
++	--wpds-dimension-padding-surface-sm: 12px; /* Small spacing for surfaces */
++	--wpds-dimension-padding-surface-xs: 4px; /* Extra small spacing for surfaces */
++}
++
++[data-wpds-theme-provider-id][data-wpds-density='comfortable'] {
++	--wpds-dimension-padding-surface-2xs: 8px; /* 2x extra small spacing for surfaces */
++	--wpds-dimension-padding-surface-lg: 40px; /* Large spacing for surfaces */
++	--wpds-dimension-padding-surface-md: 32px; /* Medium spacing for surfaces */
++	--wpds-dimension-padding-surface-sm: 20px; /* Small spacing for surfaces */
++	--wpds-dimension-padding-surface-xs: 12px; /* Extra small spacing for surfaces */
++}
++
+ @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {
+ 	:root {
+ 		--wpds-border-width-focus: 1.5px; /* Border width for focus ring */
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.js b/packages/theme/src/prebuilt/js/design-tokens.js
+index 8cf736c9760a6c..e5bb76c76005d1 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.js
++++ b/packages/theme/src/prebuilt/js/design-tokens.js
+@@ -97,10 +97,11 @@ export default [
+ 	'--wpds-color-stroke-interactive-error-strong',
+ 	'--wpds-color-stroke-focus-brand',
+ 	'--wpds-dimension-base',
+-	'--wpds-dimension-padding-surface-x-small',
+-	'--wpds-dimension-padding-surface-small',
+-	'--wpds-dimension-padding-surface-medium',
+-	'--wpds-dimension-padding-surface-large',
++	'--wpds-dimension-padding-surface-2xs',
++	'--wpds-dimension-padding-surface-xs',
++	'--wpds-dimension-padding-surface-sm',
++	'--wpds-dimension-padding-surface-md',
++	'--wpds-dimension-padding-surface-lg',
+ 	'--wpds-elevation-x-small',
+ 	'--wpds-elevation-small',
+ 	'--wpds-elevation-medium',
+diff --git a/packages/theme/src/prebuilt/json/figma.json b/packages/theme/src/prebuilt/json/figma.json
+index 07325261569bdd..39b74a0d267213 100644
+--- a/packages/theme/src/prebuilt/json/figma.json
++++ b/packages/theme/src/prebuilt/json/figma.json
+@@ -558,27 +558,43 @@
+ 		},
+ 		"description": "Base dimension unit"
+ 	},
+-	"Dimension/Semantic/padding-surface-x-small": {
++	"Dimension/Semantic/padding-surface-2xs": {
+ 		"value": {
+-			".": "8px"
++			".": "4px",
++			"compact": "4px",
++			"comfortable": "8px"
++		},
++		"description": "2x extra small spacing for surfaces"
++	},
++	"Dimension/Semantic/padding-surface-xs": {
++		"value": {
++			".": "8px",
++			"compact": "4px",
++			"comfortable": "12px"
+ 		},
+ 		"description": "Extra small spacing for surfaces"
+ 	},
+-	"Dimension/Semantic/padding-surface-small": {
++	"Dimension/Semantic/padding-surface-sm": {
+ 		"value": {
+-			".": "12px"
++			".": "16px",
++			"compact": "12px",
++			"comfortable": "20px"
+ 		},
+ 		"description": "Small spacing for surfaces"
+ 	},
+-	"Dimension/Semantic/padding-surface-medium": {
++	"Dimension/Semantic/padding-surface-md": {
+ 		"value": {
+-			".": "16px"
++			".": "24px",
++			"compact": "20px",
++			"comfortable": "32px"
+ 		},
+ 		"description": "Medium spacing for surfaces"
+ 	},
+-	"Dimension/Semantic/padding-surface-large": {
++	"Dimension/Semantic/padding-surface-lg": {
+ 		"value": {
+-			".": "24px"
++			".": "32px",
++			"compact": "24px",
++			"comfortable": "40px"
+ 		},
+ 		"description": "Large spacing for surfaces"
+ 	},
+diff --git a/packages/theme/src/stories/index.story.tsx b/packages/theme/src/stories/index.story.tsx
+index 68f1423f3e84f9..3118dff9efb6d5 100644
+--- a/packages/theme/src/stories/index.story.tsx
++++ b/packages/theme/src/stories/index.story.tsx
+@@ -18,6 +18,7 @@ import {
+  * Internal dependencies
+  */
+ import { ThemeProvider } from '../theme-provider';
++import '../prebuilt/css/design-tokens.css';
+ 
+ const meta: Meta< typeof ThemeProvider > = {
+ 	title: 'Design System/Theme Provider',
+@@ -198,10 +199,10 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
+ 	},
+ };
+ 
+-const NestingDebug = ( { bg = '', primary = '' } ) => (
++const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
+ 	<div
+ 		style={ {
+-			padding: '0.25rem',
++			padding: 'var(--wpds-dimension-padding-surface-sm)',
+ 			color: 'var(--wpds-color-fg-content-neutral)',
+ 			backgroundColor: 'var(--wpds-color-bg-surface-neutral)',
+ 			display: 'flex',
+@@ -210,13 +211,13 @@ const NestingDebug = ( { bg = '', primary = '' } ) => (
+ 			gap: '1rem',
+ 		} }
+ 	>
+-		<pre>
+-			bg: { bg } | primary: { primary }
++		<pre style={ { margin: 0 } }>
++			bg: { bg } | primary: { primary } | density: { density }
+ 		</pre>
+ 		<span
+ 			style={ {
+ 				display: 'inline-block',
+-				padding: '0.25rem',
++				padding: 'var(--wpds-dimension-padding-surface-xs)',
+ 				borderRadius: '0.25rem',
+ 				backgroundColor:
+ 					'var(--wpds-color-bg-interactive-brand-strong)',
+@@ -229,7 +230,7 @@ const NestingDebug = ( { bg = '', primary = '' } ) => (
+ 			style={ {
+ 				display: 'inline-block',
+ 				marginInlineStart: '0.25rem',
+-				padding: '0.25rem',
++				padding: 'var(--wpds-dimension-padding-surface-xs)',
+ 				borderRadius: '0.25rem',
+ 				backgroundColor:
+ 					'var(--wpds-color-bg-interactive-brand-weak-disabled)',
+@@ -245,27 +246,39 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
+ 	render: () => {
+ 		return (
+ 			<ThemeProvider>
+-				<NestingDebug bg="inherit (root)" primary="inherit (root)" />
++				<NestingDebug
++					bg="inherit (root)"
++					primary="inherit (root)"
++					density="inherit (root)"
++				/>
+ 				<div style={ { paddingInlineStart: '1rem' } }>
+ 					<ThemeProvider
+ 						color={ {
+ 							bg: '#1e1e1e',
+ 						} }
++						density="compact"
+ 					>
+-						<NestingDebug bg="#1e1e1e" primary="inherit (root)" />
++						<NestingDebug
++							bg="#1e1e1e"
++							primary="inherit (root)"
++							density="compact"
++						/>
+ 						<div style={ { paddingInlineStart: '1rem' } }>
+ 							<ThemeProvider>
+ 								<NestingDebug
+ 									bg="inherit (#1e1e1e)"
+ 									primary="inherit (root)"
++									density="inherit (compact)"
+ 								/>
+ 								<div style={ { paddingInlineStart: '1rem' } }>
+ 									<ThemeProvider
+ 										color={ { primary: 'hotpink' } }
++										density="default"
+ 									>
+ 										<NestingDebug
+ 											bg="inherit (#1e1e1e)"
+ 											primary="hotpink"
++											density="default"
+ 										/>
+ 										<div
+ 											style={ {
+@@ -278,6 +291,7 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
+ 												<NestingDebug
+ 													bg="#f8f8f8"
+ 													primary="inherit (hotpink)"
++													density="inherit (default)"
+ 												/>
+ 											</ThemeProvider>
+ 										</div>
+@@ -397,7 +411,7 @@ export const AcrossIframes: StoryObj< typeof ThemeProvider > = {
+ 				<span
+ 					style={ {
+ 						display: 'inline-block',
+-						padding: '0.25rem',
++						padding: 'var(--wpds-dimension-padding-surface-xs)',
+ 						borderRadius: '0.25rem',
+ 						backgroundColor:
+ 							'var(--wpds-color-bg-interactive-brand-strong)',
+diff --git a/packages/theme/src/theme-provider.tsx b/packages/theme/src/theme-provider.tsx
+index b63a6c7561f185..19b899834c43e0 100644
+--- a/packages/theme/src/theme-provider.tsx
++++ b/packages/theme/src/theme-provider.tsx
+@@ -49,6 +49,7 @@ export const ThemeProvider = ( {
+ 	children,
+ 	color = {},
+ 	isRoot = false,
++	density,
+ }: ThemeProviderProps ) => {
+ 	const instanceId = useId();
+ 
+@@ -76,6 +77,7 @@ export const ThemeProvider = ( {
+ 			<div
+ 				data-wpds-theme-provider-id={ instanceId }
+ 				data-wpds-root-provider={ isRoot }
++				data-wpds-density={ density }
+ 				className={ styles.root }
+ 			>
+ 				<ThemeContext.Provider value={ contextValue }>
+diff --git a/packages/theme/src/types.ts b/packages/theme/src/types.ts
+index f5f20e07a64ef2..49bad28227afbf 100644
+--- a/packages/theme/src/types.ts
++++ b/packages/theme/src/types.ts
+@@ -23,6 +23,15 @@ export interface ThemeProviderSettings {
+ 		 */
+ 		bg?: string;
+ 	};
++
++	/**
++	 * The density of the theme. If left unspecified, the theme inherits from
++	 * the density of the closest `ThemeProvider`, or uses the default density
++	 * if there is no inherited density.
++	 *
++	 * @default undefined
++	 */
++	density?: undefined | 'default' | 'compact' | 'comfortable';
+ }
+ 
+ export interface ThemeProviderProps extends ThemeProviderSettings {
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index f7b6829a921461..f2c111228a41b7 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -40,6 +40,27 @@ export default defineConfig( {
+ 				makeCSSVar( `wpds.${ publicTokenId( token.id ) }` ),
+ 			baseSelector: ':root',
+ 			modeSelectors: [
++				{
++					tokens: [ 'dimension.*' ],
++					mode: '.',
++					selectors: [
++						"[data-wpds-theme-provider-id][data-wpds-density='default']",
++					],
++				},
++				{
++					tokens: [ 'dimension.*' ],
++					mode: 'compact',
++					selectors: [
++						"[data-wpds-theme-provider-id][data-wpds-density='compact']",
++					],
++				},
++				{
++					tokens: [ 'dimension.*' ],
++					mode: 'comfortable',
++					selectors: [
++						"[data-wpds-theme-provider-id][data-wpds-density='comfortable']",
++					],
++				},
+ 				{
+ 					mode: 'high-dpi',
+ 					selectors: [
+diff --git a/packages/theme/tokens/dimension.json b/packages/theme/tokens/dimension.json
+index 3a1f5edc1897af..37d10449f252a7 100644
+--- a/packages/theme/tokens/dimension.json
++++ b/packages/theme/tokens/dimension.json
+@@ -52,21 +52,55 @@
+ 			},
+ 			"padding": {
+ 				"surface": {
+-					"x-small": {
+-						"$value": "{dimension.primitive.space.20}",
+-						"$description": "Extra small spacing for surfaces"
++					"2xs": {
++						"$value": "{dimension.primitive.space.10}",
++						"$description": "2x extra small spacing for surfaces",
++						"$extensions": {
++							"mode": {
++								"compact": "{dimension.primitive.space.10}",
++								"comfortable": "{dimension.primitive.space.20}"
++							}
++						}
+ 					},
+-					"small": {
+-						"$value": "{dimension.primitive.space.30}",
+-						"$description": "Small spacing for surfaces"
++					"xs": {
++						"$value": "{dimension.primitive.space.20}",
++						"$description": "Extra small spacing for surfaces",
++						"$extensions": {
++							"mode": {
++								"compact": "{dimension.primitive.space.10}",
++								"comfortable": "{dimension.primitive.space.30}"
++							}
++						}
+ 					},
+-					"medium": {
++					"sm": {
+ 						"$value": "{dimension.primitive.space.40}",
+-						"$description": "Medium spacing for surfaces"
++						"$description": "Small spacing for surfaces",
++						"$extensions": {
++							"mode": {
++								"compact": "{dimension.primitive.space.30}",
++								"comfortable": "{dimension.primitive.space.50}"
++							}
++						}
+ 					},
+-					"large": {
++					"md": {
+ 						"$value": "{dimension.primitive.space.60}",
+-						"$description": "Large spacing for surfaces"
++						"$description": "Medium spacing for surfaces",
++						"$extensions": {
++							"mode": {
++								"compact": "{dimension.primitive.space.50}",
++								"comfortable": "{dimension.primitive.space.70}"
++							}
++						}
++					},
++					"lg": {
++						"$value": "{dimension.primitive.space.70}",
++						"$description": "Large spacing for surfaces",
++						"$extensions": {
++							"mode": {
++								"compact": "{dimension.primitive.space.60}",
++								"comfortable": "{dimension.primitive.space.80}"
++							}
++						}
+ 					}
+ 				}
+ 			}
+diff --git a/packages/ui/src/box/stories/index.story.tsx b/packages/ui/src/box/stories/index.story.tsx
+index fbfcb421be2469..00ea84e8b33c2b 100644
+--- a/packages/ui/src/box/stories/index.story.tsx
++++ b/packages/ui/src/box/stories/index.story.tsx
+@@ -6,27 +6,16 @@ import { type Meta, type StoryObj } from '@storybook/react';
+ /**
+  * WordPress dependencies
+  */
+-import { privateApis } from '@wordpress/theme';
+ import '@wordpress/theme/design-tokens.css'; // eslint-disable-line no-restricted-syntax
+ 
+ /**
+  * Internal dependencies
+  */
+ import { Box } from '../box';
+-import { unlock } from '../../lock-unlock';
+-
+-const { ThemeProvider } = unlock( privateApis );
+ 
+ const meta: Meta< typeof Box > = {
+ 	title: 'Design System/Components/Box',
+ 	component: Box,
+-	decorators: [
+-		( Story ) => (
+-			<ThemeProvider>
+-				<Story />
+-			</ThemeProvider>
+-		),
+-	],
+ 	tags: [ 'status-experimental' ],
+ };
+ export default meta;
+@@ -38,29 +27,28 @@ export const Default: Story = {
+ 		children: 'Box',
+ 		backgroundColor: 'info',
+ 		color: 'info',
+-		padding: 4,
++		padding: 'sm',
+ 	},
+ 	argTypes: {
+ 		p: {
+ 			control: 'select',
+-			options: [ 'x-small', 'small', 'medium', 'large', 1, 2, 3, 4 ],
++			options: [ '2xs', 'xs', 'sm', 'md', 'lg', 1, 2, 3, 4 ],
+ 		},
+ 		padding: {
+ 			control: 'select',
+-			options: [ 'x-small', 'small', 'medium', 'large', 1, 2, 3, 4 ],
++			options: [ '2xs', 'xs', 'sm', 'md', 'lg', 1, 2, 3, 4 ],
+ 		},
+ 	},
+ };
+ 
+ export const DirectionalPadding: Story = {
++	...Default,
+ 	args: {
+-		children: 'Box',
+-		backgroundColor: 'info',
+-		color: 'info',
++		...Default.args,
+ 		padding: {
+-			blockStart: 'small',
+-			inline: 'medium',
+-			blockEnd: 'large',
++			blockStart: 'sm',
++			inline: 'md',
++			blockEnd: 'lg',
+ 		},
+ 	},
+ };
+diff --git a/packages/ui/src/box/types.ts b/packages/ui/src/box/types.ts
+index 96716a8330119d..f66226f7dbc217 100644
+--- a/packages/ui/src/box/types.ts
++++ b/packages/ui/src/box/types.ts
+@@ -3,7 +3,7 @@
+  */
+ import { type ComponentProps } from '../utils/types';
+ 
+-type SizeToken = 'x-small' | 'small' | 'medium' | 'large';
++type SizeToken = '2xs' | 'xs' | 'sm' | 'md' | 'lg';
+ 
+ type Size = number | SizeToken;
+ 
+diff --git a/storybook/addons/design-system-theme/register.tsx b/storybook/addons/design-system-theme/register.tsx
+new file mode 100644
+index 00000000000000..2d27b12f83ca19
+--- /dev/null
++++ b/storybook/addons/design-system-theme/register.tsx
+@@ -0,0 +1,99 @@
++/**
++ * External dependencies
++ */
++import { addons, types, useGlobals } from '@storybook/manager-api';
++import { MirrorIcon } from '@storybook/icons';
++import {
++	IconButton,
++	WithTooltip,
++	TooltipMessage,
++	TooltipLinkList,
++} from '@storybook/components';
++
++interface ThemeOption {
++	id: string;
++	title: string;
++}
++
++interface ThemeTooltipMessageProps {
++	title: string;
++	globalName: string;
++	options: ThemeOption[];
++}
++
++const ADDON_ID = '@wordpress/storybook-addon-design-system-theme';
++
++const COLOR_OPTIONS: ThemeOption[] = [
++	{ id: '', title: 'Default' },
++	{ id: 'dark', title: 'Dark' },
++];
++
++const DENSITY_OPTIONS: ThemeOption[] = [
++	{ id: 'compact', title: 'Compact' },
++	{ id: '', title: 'Default' },
++	{ id: 'comfortable', title: 'Comfortable' },
++];
++
++function ThemeTooltipMessage( {
++	title,
++	globalName,
++	options,
++}: ThemeTooltipMessageProps ) {
++	const [ globals, updateGlobals ] = useGlobals();
++	const currentGlobal = globals[ globalName ] ?? '';
++
++	const links = options.map( ( option ) => ( {
++		id: option.id,
++		title: option.title,
++		active: currentGlobal === option.id,
++		onClick: () =>
++			updateGlobals( { [ globalName ]: option.id || undefined } ),
++	} ) );
++
++	return (
++		<TooltipMessage
++			title={ title }
++			desc={ <TooltipLinkList links={ links } /> }
++		/>
++	);
++}
++
++const ThemeTool = () => {
++	return (
++		<WithTooltip
++			placement="top"
++			trigger="click"
++			closeOnOutsideClick
++			tooltip={
++				<>
++					<ThemeTooltipMessage
++						title="Density"
++						globalName="dsDensity"
++						options={ DENSITY_OPTIONS }
++					/>
++					<ThemeTooltipMessage
++						title="Color"
++						globalName="dsColorTheme"
++						options={ COLOR_OPTIONS }
++					/>
++				</>
++			}
++		>
++			<IconButton title="Design System Theme" active>
++				<MirrorIcon />
++				Theme
++			</IconButton>
++		</WithTooltip>
++	);
++};
++
++addons.register( ADDON_ID, () => {
++	addons.add( `${ ADDON_ID }/tool`, {
++		type: types.TOOL,
++		title: 'Design System Theme',
++		match: ( { storyId, viewMode } ) =>
++			!! storyId?.startsWith( 'design-system-components-' ) &&
++			( [ 'story', 'docs' ] as any[] ).includes( viewMode ),
++		render: ThemeTool,
++	} );
++} );
+diff --git a/storybook/decorators/with-design-system-theme.tsx b/storybook/decorators/with-design-system-theme.tsx
+new file mode 100644
+index 00000000000000..2d21023dd5dab4
+--- /dev/null
++++ b/storybook/decorators/with-design-system-theme.tsx
+@@ -0,0 +1,50 @@
++/**
++ * External dependencies
++ */
++import type { StoryContext } from '@storybook/types';
++
++/**
++ * WordPress dependencies
++ */
++import { privateApis as themeApis } from '@wordpress/theme';
++import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
++
++const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
++	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
++	'@wordpress/theme'
++);
++
++const { ThemeProvider } = unlock( themeApis );
++
++/**
++ * Decorator that applies Design System theme based on toolbar selections.
++ *
++ * @param Story   - The story component to render
++ * @param context - The story context
++ * @return The wrapped story element
++ */
++export function WithDesignSystemTheme(
++	Story: React.ComponentType< any >,
++	context: StoryContext
++) {
++	const isDesignSystemComponentsStory = context.id?.startsWith(
++		'design-system-components-'
++	);
++	if ( ! isDesignSystemComponentsStory ) {
++		return <Story { ...context } />;
++	}
++
++	const colorTheme = context.globals.dsColorTheme;
++	const density = context.globals.dsDensity;
++
++	let color;
++	if ( colorTheme === 'dark' ) {
++		color = { bg: '#1e1e1e', primary: '#3858e9' };
++	}
++
++	return (
++		<ThemeProvider color={ color } density={ density } isRoot>
++			<Story { ...context } />
++		</ThemeProvider>
++	);
++}
+diff --git a/storybook/main.js b/storybook/main.js
+index 3e8a342dce96a8..08e840d78c9984 100644
+--- a/storybook/main.js
++++ b/storybook/main.js
+@@ -62,6 +62,7 @@ module.exports = {
+ 		'@storybook/addon-webpack5-compiler-babel',
+ 		'storybook-source-link',
+ 		'@geometricpanda/storybook-addon-badges',
++		'./addons/design-system-theme/register',
+ 	],
+ 	framework: {
+ 		name: '@storybook/react-webpack5',
+diff --git a/storybook/preview.jsx b/storybook/preview.jsx
+index 4b54beb8d3eba3..16420c5b6da275 100644
+--- a/storybook/preview.jsx
++++ b/storybook/preview.jsx
+@@ -18,6 +18,7 @@ import { WithMarginChecker } from './decorators/with-margin-checker';
+ import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
+ import { WithRTL } from './decorators/with-rtl';
+ import { WithTheme } from './decorators/with-theme';
++import { WithDesignSystemTheme } from './decorators/with-design-system-theme';
+ import badgesConfig from './badges';
+ 
+ export const globalTypes = {
+@@ -91,6 +92,8 @@ export const globalTypes = {
+ 			],
+ 		},
+ 	},
++	dsColorTheme: {},
++	dsDensity: {},
+ };
+ 
+ export const decorators = [
+@@ -99,6 +102,7 @@ export const decorators = [
+ 	WithRTL,
+ 	WithMaxWidthWrapper,
+ 	WithTheme,
++	WithDesignSystemTheme,
+ ];
+ 
+ export const parameters = {
+diff --git a/storybook/tsconfig.json b/storybook/tsconfig.json
+new file mode 100644
+index 00000000000000..ff8022c0b75067
+--- /dev/null
++++ b/storybook/tsconfig.json
+@@ -0,0 +1,10 @@
++{
++	"$schema": "https://json.schemastore.org/tsconfig.json",
++	"extends": "../tsconfig.base.json",
++	"compilerOptions": {
++		"jsx": "react-jsx",
++		"rootDir": ".",
++		"noEmit": true
++	},
++	"include": [ "**/*.tsx", "**/*.ts" ]
++}

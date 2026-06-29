@@ -1,0 +1,67 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 80d7fc93d22071..d686ce975cd98f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -26,6 +26,7 @@
+ -   `TextareaControl`: Convert to TypeScript ([#41215](https://github.com/WordPress/gutenberg/pull/41215)).
+ -   `BoxControl`: Update unit tests to use `@testing-library/user-event` ([#41422](https://github.com/WordPress/gutenberg/pull/41422)).
+ -   `Surface`: Convert to TypeScript ([#41212](https://github.com/WordPress/gutenberg/pull/41212)).
++-   `Autocomplete` updated to satisfy `react/exhuastive-deps` eslint rule ([#41382](https://github.com/WordPress/gutenberg/pull/41382))
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.js b/packages/components/src/autocomplete/autocompleter-ui.js
+index f3ae2937acd6de..ad7ebc3d0846f1 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.js
++++ b/packages/components/src/autocomplete/autocompleter-ui.js
+@@ -39,7 +39,7 @@ export function getAutoCompleterUI( autocompleter ) {
+ 
+ 		useLayoutEffect( () => {
+ 			onChangeOptions( items );
+-		}, [ items ] );
++		}, [ onChangeOptions, items ] );
+ 
+ 		if ( ! items.length > 0 ) {
+ 			return null;
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.native.js b/packages/components/src/autocomplete/autocompleter-ui.native.js
+index 9d6113e0a67ceb..f3d15a14254a43 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.native.js
++++ b/packages/components/src/autocomplete/autocompleter-ui.native.js
+@@ -71,7 +71,7 @@ export function getAutoCompleterUI( autocompleter ) {
+ 			} else if ( isVisible && text.length === 0 ) {
+ 				startAnimation( false );
+ 			}
+-		}, [ items, isVisible, text ] );
++		}, [ onChangeOptions, items, isVisible, text, startAnimation ] );
+ 
+ 		const activeItemStyles = usePreferredColorSchemeStyle(
+ 			styles[ 'components-autocomplete__item-active' ],
+@@ -111,7 +111,7 @@ export function getAutoCompleterUI( autocompleter ) {
+ 					}
+ 				} );
+ 			},
+-			[ isVisible ]
++			[ animationValue, isVisible, reset ]
+ 		);
+ 
+ 		const contentStyles = {
+diff --git a/packages/components/src/autocomplete/index.js b/packages/components/src/autocomplete/index.js
+index 3b052d826e8a41..c2fefc6af7e136 100644
+--- a/packages/components/src/autocomplete/index.js
++++ b/packages/components/src/autocomplete/index.js
+@@ -375,7 +375,14 @@ function useAutocomplete( {
+ 				: AutocompleterUI
+ 		);
+ 		setFilterValue( query );
+-	}, [ textContent ] );
++	}, [
++		textContent,
++		AutocompleterUI,
++		autocompleter,
++		completers,
++		record,
++		filteredOptions.length,
++	] );
+ 
+ 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
+ 	const { className } = autocompleter || {};

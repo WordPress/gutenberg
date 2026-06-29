@@ -1,0 +1,70 @@
+diff --git a/packages/components/src/form-file-upload/README.md b/packages/components/src/form-file-upload/README.md
+index 18008e0f121d7c..5c0244b9e07f42 100644
+--- a/packages/components/src/form-file-upload/README.md
++++ b/packages/components/src/form-file-upload/README.md
+@@ -8,7 +8,7 @@ import { FormFileUpload } from '@wordpress/components';
+ const MyFormFileUpload = () => (
+ 	<FormFileUpload
+ 		accept="image/*"
+-		onChange={ () => console.log( 'new image' ) }
++		onChange={ ( event ) => console.log( event.target.files ) }
+ 	>
+ 		Upload
+ 	</FormFileUpload>
+diff --git a/packages/components/src/form-file-upload/stories/index.js b/packages/components/src/form-file-upload/stories/index.js
+new file mode 100644
+index 00000000000000..4c367c96c8165f
+--- /dev/null
++++ b/packages/components/src/form-file-upload/stories/index.js
+@@ -0,0 +1,51 @@
++/**
++ * WordPress dependencies
++ */
++import { upload as uploadIcon } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import FormFileUpload from '../';
++
++export default {
++	title: 'Components/FormFileUpload',
++	component: FormFileUpload,
++};
++
++export const Default = FormFileUpload.bind( {} );
++Default.args = {
++	accept: '',
++	children: 'Select file',
++	multiple: false,
++};
++
++export const RestrictFileTypes = FormFileUpload.bind( {} );
++RestrictFileTypes.args = {
++	...Default.args,
++	accept: 'image/*',
++	children: 'Select image',
++	multiple: false,
++};
++
++export const AllowMultipleFiles = FormFileUpload.bind( {} );
++AllowMultipleFiles.args = {
++	...Default.args,
++	children: 'Select files',
++	multiple: true,
++};
++
++export const WithIcon = FormFileUpload.bind( {} );
++WithIcon.args = {
++	...Default.args,
++	children: 'Upload',
++	icon: uploadIcon,
++};
++
++export const WithCustomRender = FormFileUpload.bind( {} );
++WithCustomRender.args = {
++	...Default.args,
++	render: ( { openFileDialog } ) => (
++		<button onClick={ openFileDialog }>Custom Upload Button</button>
++	),
++};

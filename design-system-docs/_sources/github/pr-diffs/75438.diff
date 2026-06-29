@@ -1,0 +1,79 @@
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index 719ac2206ef657..f54f6a9d25bee2 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { __ } from '@wordpress/i18n';
++import { __, isRTL } from '@wordpress/i18n';
+ import { useMemo, useState } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+ 
+@@ -72,6 +72,34 @@ const BorderBoxControlSplitControls = (
+ 
+ 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
+ 
++	// In RTL mode, the layout is mirrored, so we need to swap the left and right controls.
++	const leftBorderControl = (
++		/* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component */
++		/* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */
++		<BorderControl
++			hideLabelFromVision
++			label={ __( 'Left border' ) }
++			onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
++			__unstablePopoverProps={ popoverProps }
++			value={ value?.left }
++			{ ...sharedBorderControlProps }
++		/>
++	);
++
++	const rightBorderControl = (
++		/* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */
++		/* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */
++		<BorderControl
++			className={ rightAlignedClassName }
++			hideLabelFromVision
++			label={ __( 'Right border' ) }
++			onChange={ ( newBorder ) => onChange( newBorder, 'right' ) }
++			__unstablePopoverProps={ popoverProps }
++			value={ value?.right }
++			{ ...sharedBorderControlProps }
++		/>
++	);
++
+ 	return (
+ 		<Grid { ...otherProps } ref={ mergedRef } gap={ 3 }>
+ 			<BorderBoxControlVisualizer value={ value } size={ size } />
+@@ -87,27 +115,9 @@ const BorderBoxControlSplitControls = (
+ 				value={ value?.top }
+ 				{ ...sharedBorderControlProps }
+ 			/>
+-			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
+-			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+-			<BorderControl
+-				hideLabelFromVision
+-				label={ __( 'Left border' ) }
+-				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
+-				__unstablePopoverProps={ popoverProps }
+-				value={ value?.left }
+-				{ ...sharedBorderControlProps }
+-			/>
+-			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
+-			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+-			<BorderControl
+-				className={ rightAlignedClassName }
+-				hideLabelFromVision
+-				label={ __( 'Right border' ) }
+-				onChange={ ( newBorder ) => onChange( newBorder, 'right' ) }
+-				__unstablePopoverProps={ popoverProps }
+-				value={ value?.right }
+-				{ ...sharedBorderControlProps }
+-			/>
++			{ /* In RTL mode, the layout is mirrored, so we swap the left and right controls */ }
++			{ isRTL() ? rightBorderControl : leftBorderControl }
++			{ isRTL() ? leftBorderControl : rightBorderControl }
+ 			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
+ 			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+ 			<BorderControl

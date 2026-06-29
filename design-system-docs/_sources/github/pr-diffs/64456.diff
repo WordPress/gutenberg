@@ -1,0 +1,126 @@
+diff --git a/packages/block-editor/src/components/global-styles/background-panel.js b/packages/block-editor/src/components/global-styles/background-panel.js
+index 906202206d1b76..14b37bb3007658 100644
+--- a/packages/block-editor/src/components/global-styles/background-panel.js
++++ b/packages/block-editor/src/components/global-styles/background-panel.js
+@@ -585,7 +585,6 @@ function BackgroundSizeControls( {
+ 	return (
+ 		<VStack spacing={ 3 } className="single-column">
+ 			<FocalPointPicker
+-				__next40pxDefaultSize
+ 				__nextHasNoMarginBottom
+ 				label={ __( 'Focal point' ) }
+ 				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
+diff --git a/packages/block-library/src/cover/edit/inspector-controls.js b/packages/block-library/src/cover/edit/inspector-controls.js
+index 5f93df58ad6fa4..eedd94de88e4aa 100644
+--- a/packages/block-library/src/cover/edit/inspector-controls.js
++++ b/packages/block-library/src/cover/edit/inspector-controls.js
+@@ -188,7 +188,6 @@ export default function CoverInspectorControls( {
+ 						{ showFocalPointPicker && (
+ 							<FocalPointPicker
+ 								__nextHasNoMarginBottom
+-								__next40pxDefaultSize
+ 								label={ __( 'Focal point' ) }
+ 								url={ url }
+ 								value={ focalPoint }
+diff --git a/packages/block-library/src/media-text/edit.js b/packages/block-library/src/media-text/edit.js
+index 5a3b4fab04ab63..2c020506dc889c 100644
+--- a/packages/block-library/src/media-text/edit.js
++++ b/packages/block-library/src/media-text/edit.js
+@@ -360,7 +360,6 @@ function MediaTextEdit( {
+ 					>
+ 						<FocalPointPicker
+ 							__nextHasNoMarginBottom
+-							__next40pxDefaultSize
+ 							label={ __( 'Focal point' ) }
+ 							url={
+ 								useFeaturedImage && featuredImageURL
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 36b1c8fcc55d00..98ad3e662ad25b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -30,6 +30,7 @@
+ -   `Composite`: improve Storybook examples and add interactive controls ([#64397](https://github.com/WordPress/gutenberg/pull/64397)).
+ -   `QueryControls`: Default to new 40px size ([#64457](https://github.com/WordPress/gutenberg/pull/64457)).
+ -   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
++-   `FocalPointPicker`: Default to new 40px size ([#64456](https://github.com/WordPress/gutenberg/pull/64456)).
+ -   `DropdownMenuV2`: adopt elevation scale ([#64432](https://github.com/WordPress/gutenberg/pull/64432)).
+ 
+ ## 28.5.0 (2024-08-07)
+diff --git a/packages/components/src/focal-point-picker/controls.tsx b/packages/components/src/focal-point-picker/controls.tsx
+index 3df1725bf3bedb..1ecf846b10635e 100644
+--- a/packages/components/src/focal-point-picker/controls.tsx
++++ b/packages/components/src/focal-point-picker/controls.tsx
+@@ -23,7 +23,6 @@ const noop = () => {};
+ 
+ export default function FocalPointPickerControls( {
+ 	__nextHasNoMarginBottom,
+-	__next40pxDefaultSize,
+ 	hasHelpText,
+ 	onChange = noop,
+ 	point = {
+@@ -57,7 +56,6 @@ export default function FocalPointPickerControls( {
+ 			gap={ 4 }
+ 		>
+ 			<FocalPointUnitControl
+-				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 				label={ __( 'Left' ) }
+ 				aria-label={ __( 'Focal point left position' ) }
+ 				value={ [ valueX, '%' ].join( '' ) }
+@@ -71,7 +69,6 @@ export default function FocalPointPickerControls( {
+ 				dragDirection="e"
+ 			/>
+ 			<FocalPointUnitControl
+-				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 				label={ __( 'Top' ) }
+ 				aria-label={ __( 'Focal point top position' ) }
+ 				value={ [ valueY, '%' ].join( '' ) }
+@@ -91,6 +88,7 @@ export default function FocalPointPickerControls( {
+ function FocalPointUnitControl( props: UnitControlProps ) {
+ 	return (
+ 		<StyledUnitControl
++			__next40pxDefaultSize
+ 			className="focal-point-picker__controls-position-unit-control"
+ 			labelPosition="top"
+ 			max={ TEXTCONTROL_MAX }
+diff --git a/packages/components/src/focal-point-picker/index.tsx b/packages/components/src/focal-point-picker/index.tsx
+index 8f299751be0d48..cad14aff5b693f 100644
+--- a/packages/components/src/focal-point-picker/index.tsx
++++ b/packages/components/src/focal-point-picker/index.tsx
+@@ -85,7 +85,6 @@ const GRID_OVERLAY_TIMEOUT = 600;
+  */
+ export function FocalPointPicker( {
+ 	__nextHasNoMarginBottom,
+-	__next40pxDefaultSize = false,
+ 	autoPlay = true,
+ 	className,
+ 	help,
+@@ -286,7 +285,6 @@ export function FocalPointPicker( {
+ 			</MediaWrapper>
+ 			<Controls
+ 				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 				hasHelpText={ !! help }
+ 				point={ { x, y } }
+ 				onChange={ ( value ) => {
+diff --git a/packages/components/src/focal-point-picker/types.ts b/packages/components/src/focal-point-picker/types.ts
+index bd66ae02451a95..357af1e090d7f5 100644
+--- a/packages/components/src/focal-point-picker/types.ts
++++ b/packages/components/src/focal-point-picker/types.ts
+@@ -29,7 +29,8 @@ export type FocalPointPickerProps = Pick<
+ 	/**
+ 	 * Start opting into the larger default height that will become the default size in a future version.
+ 	 *
+-	 * @default false
++	 * @deprecated Default behavior since WP 6.7. Prop can be safely removed.
++	 * @ignore
+ 	 */
+ 	__next40pxDefaultSize?: boolean;
+ 	/**
+@@ -68,7 +69,6 @@ export type FocalPointPickerProps = Pick<
+ 
+ export type FocalPointPickerControlsProps = {
+ 	__nextHasNoMarginBottom?: boolean;
+-	__next40pxDefaultSize?: boolean;
+ 	/**
+ 	 * A bit of extra bottom margin will be added if a `help` text
+ 	 * needs to be rendered under it.

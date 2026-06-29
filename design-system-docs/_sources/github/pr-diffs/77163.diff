@@ -1,0 +1,435 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index b2d085e377d31c..67491008746074 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -23,6 +23,7 @@
+ 
+ -   `Dialog`: Update `Header` layout to support multiple trailing elements alongside the title ([#77161](https://github.com/WordPress/gutenberg/pull/77161)).
+ -   `Dialog`: Use `Text` internally for `Dialog.Title`, adopting the `heading-xl` variant for consistent typography ([#77161](https://github.com/WordPress/gutenberg/pull/77161)).
++-   `Dialog`, `AlertDialog`, `Tooltip`, `Select`: Add `container` prop to `Popup` for custom portal targets ([#77163](https://github.com/WordPress/gutenberg/pull/77163)).
+ -   Add defensive styles against global WordPress stylesheets like common.css and forms.css ([#76783](https://github.com/WordPress/gutenberg/pull/76783)).
+ 
+ ### Internal
+diff --git a/packages/ui/src/alert-dialog/popup.tsx b/packages/ui/src/alert-dialog/popup.tsx
+index 2eefc898292e6d..58af2412e54de1 100644
+--- a/packages/ui/src/alert-dialog/popup.tsx
++++ b/packages/ui/src/alert-dialog/popup.tsx
+@@ -23,6 +23,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
+ 	function AlertDialogPopup(
+ 		{
+ 			className,
++			container,
+ 			intent = 'default',
+ 			title,
+ 			description,
+@@ -44,7 +45,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
+ 		const buttonsDisabled = phase !== 'idle' || undefined;
+ 
+ 		return (
+-			<_AlertDialog.Portal>
++			<_AlertDialog.Portal container={ container }>
+ 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
+ 				<ThemeProvider>
+ 					<_AlertDialog.Popup
+diff --git a/packages/ui/src/alert-dialog/test/index.test.tsx b/packages/ui/src/alert-dialog/test/index.test.tsx
+index aad12e7c54787f..20846777fb4fb7 100644
+--- a/packages/ui/src/alert-dialog/test/index.test.tsx
++++ b/packages/ui/src/alert-dialog/test/index.test.tsx
+@@ -1452,4 +1452,58 @@ describe( 'AlertDialog', () => {
+ 			consoleSpy.mockRestore();
+ 		} );
+ 	} );
++
++	describe( 'container', () => {
++		it( 'should render inside the container when provided', async () => {
++			const user = userEvent.setup();
++			const containerRef = createRef< HTMLDivElement >();
++
++			render(
++				<div data-testid="wrapper">
++					<AlertDialog.Root>
++						<AlertDialog.Trigger>Open</AlertDialog.Trigger>
++						<div
++							ref={ containerRef }
++							data-testid="custom-container"
++						/>
++						<AlertDialog.Popup
++							title="Confirm"
++							container={ containerRef }
++						/>
++					</AlertDialog.Root>
++				</div>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			const dialog = await screen.findByRole( 'alertdialog' );
++			expect( dialog ).toBeVisible();
++
++			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
++				dialog
++			);
++		} );
++
++		it( 'should render with a portal by default', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<div data-testid="wrapper">
++					<AlertDialog.Root>
++						<AlertDialog.Trigger>Open</AlertDialog.Trigger>
++						<AlertDialog.Popup title="Confirm" />
++					</AlertDialog.Root>
++				</div>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			const dialog = await screen.findByRole( 'alertdialog' );
++			expect( dialog ).toBeVisible();
++
++			expect( screen.getByTestId( 'wrapper' ) ).not.toContainElement(
++				dialog
++			);
++		} );
++	} );
+ } );
+diff --git a/packages/ui/src/alert-dialog/types.ts b/packages/ui/src/alert-dialog/types.ts
+index 7f34f8bd9c54e0..778009d12154ef 100644
+--- a/packages/ui/src/alert-dialog/types.ts
++++ b/packages/ui/src/alert-dialog/types.ts
+@@ -62,6 +62,11 @@ export interface TriggerProps extends ComponentProps< 'button' > {
+ export interface PopupProps
+ 	extends ComponentProps< 'div' >,
+ 		Pick< _AlertDialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
++	/**
++	 * A parent element to render the portal into.
++	 */
++	container?: _AlertDialog.Portal.Props[ 'container' ];
++
+ 	/**
+ 	 * The semantic intent of the dialog, which determines its styling.
+ 	 *
+diff --git a/packages/ui/src/dialog/popup.tsx b/packages/ui/src/dialog/popup.tsx
+index 43eec71a115c11..02954d7c8633d7 100644
+--- a/packages/ui/src/dialog/popup.tsx
++++ b/packages/ui/src/dialog/popup.tsx
+@@ -24,6 +24,7 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
+ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
+ 	{
+ 		className,
++		container,
+ 		size = 'medium',
+ 		initialFocus,
+ 		finalFocus,
+@@ -39,7 +40,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
+ 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
+ 
+ 	return (
+-		<_Dialog.Portal>
++		<_Dialog.Portal container={ container }>
+ 			<_Dialog.Backdrop className={ styles.backdrop } />
+ 			<ThemeProvider>
+ 				<_Dialog.Popup
+diff --git a/packages/ui/src/dialog/test/index.test.tsx b/packages/ui/src/dialog/test/index.test.tsx
+index f06286c7018182..2f4cf79c3a1930 100644
+--- a/packages/ui/src/dialog/test/index.test.tsx
++++ b/packages/ui/src/dialog/test/index.test.tsx
+@@ -423,4 +423,65 @@ describe( 'Dialog', () => {
+ 			expect( customFocus ).toHaveBeenCalled();
+ 		} );
+ 	} );
++
++	describe( 'container', () => {
++		it( 'should render inside the container when provided', async () => {
++			const user = userEvent.setup();
++			const containerRef = createRef< HTMLDivElement >();
++
++			render(
++				<div data-testid="wrapper">
++					<Dialog.Root>
++						<Dialog.Trigger>Open</Dialog.Trigger>
++						<div
++							ref={ containerRef }
++							data-testid="custom-container"
++						/>
++						<Dialog.Popup container={ containerRef }>
++							<Dialog.Header>
++								<Dialog.Title>Title</Dialog.Title>
++							</Dialog.Header>
++							Dialog content
++						</Dialog.Popup>
++					</Dialog.Root>
++				</div>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			const content = await screen.findByText( 'Dialog content' );
++			expect( content ).toBeVisible();
++
++			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
++				content
++			);
++		} );
++
++		it( 'should render with a portal by default', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<div data-testid="wrapper">
++					<Dialog.Root>
++						<Dialog.Trigger>Open</Dialog.Trigger>
++						<Dialog.Popup>
++							<Dialog.Header>
++								<Dialog.Title>Title</Dialog.Title>
++							</Dialog.Header>
++							Portal content
++						</Dialog.Popup>
++					</Dialog.Root>
++				</div>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			const content = await screen.findByText( 'Portal content' );
++			expect( content ).toBeVisible();
++
++			expect( screen.getByTestId( 'wrapper' ) ).not.toContainElement(
++				content
++			);
++		} );
++	} );
+ } );
+diff --git a/packages/ui/src/dialog/types.ts b/packages/ui/src/dialog/types.ts
+index 28db2a69988a2c..ccb590d19c6e79 100644
+--- a/packages/ui/src/dialog/types.ts
++++ b/packages/ui/src/dialog/types.ts
+@@ -34,6 +34,11 @@ export interface PopupProps
+ 	 */
+ 	children?: ReactNode;
+ 
++	/**
++	 * A parent element to render the portal into.
++	 */
++	container?: _Dialog.Portal.Props[ 'container' ];
++
+ 	/**
+ 	 * Renders the dialog at a preset width (excluding additional padding from
+ 	 * the viewport edges).
+diff --git a/packages/ui/src/form/primitives/select/popup.tsx b/packages/ui/src/form/primitives/select/popup.tsx
+index 6e8a3ad54b746a..0d153d05cf3036 100644
+--- a/packages/ui/src/form/primitives/select/popup.tsx
++++ b/packages/ui/src/form/primitives/select/popup.tsx
+@@ -16,9 +16,12 @@ const ThemeProvider: typeof ThemeProviderType =
+ 	unlock( themePrivateApis ).ThemeProvider;
+ 
+ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
+-	function Popup( { className, children, style, ...restProps }, ref ) {
++	function Popup(
++		{ className, container, children, style, ...restProps },
++		ref
++	) {
+ 		return (
+-			<_Select.Portal>
++			<_Select.Portal container={ container }>
+ 				<_Select.Positioner
+ 					{ ...ITEM_POPUP_POSITIONER_PROPS }
+ 					alignItemWithTrigger={ false }
+diff --git a/packages/ui/src/form/primitives/select/test/index.test.tsx b/packages/ui/src/form/primitives/select/test/index.test.tsx
+index c55352f8619187..89371c691e1eae 100644
+--- a/packages/ui/src/form/primitives/select/test/index.test.tsx
++++ b/packages/ui/src/form/primitives/select/test/index.test.tsx
+@@ -1,4 +1,4 @@
+-import { render } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ import { createRef } from '@wordpress/element';
+ import * as Select from '../index';
+@@ -30,4 +30,63 @@ describe( 'Select', () => {
+ 		expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+ 		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
+ 	} );
++
++	describe( 'container', () => {
++		it( 'should render inside the container when provided', async () => {
++			const user = userEvent.setup();
++			const containerRef = createRef< HTMLDivElement >();
++
++			render(
++				<div data-testid="wrapper">
++					<Select.Root>
++						<Select.Trigger />
++						<div
++							ref={ containerRef }
++							data-testid="custom-container"
++						/>
++						<Select.Popup container={ containerRef }>
++							<Select.Item value="Item 1" />
++						</Select.Popup>
++					</Select.Root>
++				</div>
++			);
++
++			await user.click( screen.getByRole( 'combobox' ) );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++
++			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
++				item
++			);
++		} );
++
++		it( 'should render with a portal by default', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<div data-testid="wrapper">
++					<Select.Root>
++						<Select.Trigger />
++						<Select.Popup>
++							<Select.Item value="Item 1" />
++						</Select.Popup>
++					</Select.Root>
++				</div>
++			);
++
++			await user.click( screen.getByRole( 'combobox' ) );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++
++			expect( screen.getByTestId( 'wrapper' ) ).not.toContainElement(
++				item
++			);
++		} );
++	} );
+ } );
+diff --git a/packages/ui/src/form/primitives/select/types.ts b/packages/ui/src/form/primitives/select/types.ts
+index 591104f8806fcb..62c5f529736b30 100644
+--- a/packages/ui/src/form/primitives/select/types.ts
++++ b/packages/ui/src/form/primitives/select/types.ts
+@@ -27,7 +27,12 @@ export type SelectTriggerProps = Omit< _Select.Trigger.Props, 'children' > & {
+ 	children?: _Select.Value.Props[ 'children' ];
+ };
+ 
+-export type SelectPopupProps = _Select.Popup.Props;
++export type SelectPopupProps = _Select.Popup.Props & {
++	/**
++	 * A parent element to render the portal into.
++	 */
++	container?: _Select.Portal.Props[ 'container' ];
++};
+ 
+ export type SelectItemProps = Omit<
+ 	_Select.Item.Props,
+diff --git a/packages/ui/src/tooltip/popup.tsx b/packages/ui/src/tooltip/popup.tsx
+index e203b1f6dbcc34..6613b2d859112c 100644
+--- a/packages/ui/src/tooltip/popup.tsx
++++ b/packages/ui/src/tooltip/popup.tsx
+@@ -16,6 +16,7 @@ const ThemeProvider: typeof ThemeProviderType =
+ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
+ 	{
+ 		align = 'center',
++		container,
+ 		side = 'top',
+ 		sideOffset = 4,
+ 		children,
+@@ -26,7 +27,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
+ 	ref
+ ) {
+ 	return (
+-		<Tooltip.Portal>
++		<Tooltip.Portal container={ container }>
+ 			<Tooltip.Positioner
+ 				align={ align }
+ 				side={ side }
+diff --git a/packages/ui/src/tooltip/test/index.test.tsx b/packages/ui/src/tooltip/test/index.test.tsx
+index 1cd4cbfba56ad3..0f5ed252677ea0 100644
+--- a/packages/ui/src/tooltip/test/index.test.tsx
++++ b/packages/ui/src/tooltip/test/index.test.tsx
+@@ -84,4 +84,65 @@ describe( 'Tooltip', () => {
+ 			screen.queryByText( 'Tooltip content' )
+ 		).not.toBeInTheDocument();
+ 	} );
++
++	describe( 'container', () => {
++		it( 'should render inside the container when provided', async () => {
++			const user = userEvent.setup();
++			const containerRef = createRef< HTMLDivElement >();
++
++			render(
++				<TestProvider>
++					<div data-testid="wrapper">
++						<Tooltip.Root>
++							<Tooltip.Trigger>Hover me</Tooltip.Trigger>
++							<div
++								ref={ containerRef }
++								data-testid="custom-container"
++							/>
++							<Tooltip.Popup container={ containerRef }>
++								Tooltip content
++							</Tooltip.Popup>
++						</Tooltip.Root>
++					</div>
++				</TestProvider>
++			);
++
++			await user.hover(
++				screen.getByRole( 'button', { name: 'Hover me' } )
++			);
++
++			const content = await screen.findByText( 'Tooltip content' );
++			expect( content ).toBeVisible();
++
++			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
++				content
++			);
++		} );
++
++		it( 'should render with a portal by default', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<TestProvider>
++					<div data-testid="wrapper">
++						<Tooltip.Root>
++							<Tooltip.Trigger>Hover me</Tooltip.Trigger>
++							<Tooltip.Popup>Tooltip content</Tooltip.Popup>
++						</Tooltip.Root>
++					</div>
++				</TestProvider>
++			);
++
++			await user.hover(
++				screen.getByRole( 'button', { name: 'Hover me' } )
++			);
++
++			const content = await screen.findByText( 'Tooltip content' );
++			expect( content ).toBeVisible();
++
++			expect( screen.getByTestId( 'wrapper' ) ).not.toContainElement(
++				content
++			);
++		} );
++	} );
+ } );
+diff --git a/packages/ui/src/tooltip/types.ts b/packages/ui/src/tooltip/types.ts
+index e368e832075a6c..c81c388af18aa4 100644
+--- a/packages/ui/src/tooltip/types.ts
++++ b/packages/ui/src/tooltip/types.ts
+@@ -23,4 +23,9 @@ export interface PopupProps
+ 	 * The content to be rendered inside the component.
+ 	 */
+ 	children?: ReactNode;
++
++	/**
++	 * A parent element to render the portal into.
++	 */
++	container?: Tooltip.Portal.Props[ 'container' ];
+ }

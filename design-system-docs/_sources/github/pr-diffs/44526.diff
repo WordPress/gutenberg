@@ -1,0 +1,143 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index cb3f378ff042bb..f7df0f0bb9078d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Popover`: fix limitShift logic by adding iframe offset correctly [#42950](https://github.com/WordPress/gutenberg/pull/42950)).
+ -   `Popover`: refine position-to-placement conversion logic, add tests ([#44377](https://github.com/WordPress/gutenberg/pull/44377)).
++-   `TokenInput`: improve logic around the `aria-activedescendant` attribute, which was causing unintended focus behavior for some screen readers ([#44526](https://github.com/WordPress/gutenberg/pull/44526)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index a12b58f8eaa516..eae04e09d8cf71 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -247,11 +247,6 @@ function ComboboxControl( {
+ 								instanceId={ instanceId }
+ 								ref={ inputContainer }
+ 								value={ isExpanded ? inputValue : currentLabel }
+-								aria-label={
+-									currentLabel
+-										? `${ currentLabel }, ${ label }`
+-										: null
+-								}
+ 								onFocus={ onFocus }
+ 								onBlur={ onBlur }
+ 								isExpanded={ isExpanded }
+diff --git a/packages/components/src/form-token-field/test/index.tsx b/packages/components/src/form-token-field/test/index.tsx
+index 2dc08d02fa4f88..c0926a9a630e5c 100644
+--- a/packages/components/src/form-token-field/test/index.tsx
++++ b/packages/components/src/form-token-field/test/index.tsx
+@@ -2057,7 +2057,12 @@ describe( 'FormTokenField', () => {
+ 
+ 			const suggestions = [ 'Pine', 'Pistachio', 'Sage' ];
+ 
+-			render( <FormTokenFieldWithState suggestions={ suggestions } /> );
++			render(
++				<>
++					<FormTokenFieldWithState suggestions={ suggestions } />
++					<button>Click me</button>
++				</>
++			);
+ 
+ 			// No suggestions visible
+ 			const input = screen.getByRole( 'combobox' );
+@@ -2093,6 +2098,22 @@ describe( 'FormTokenField', () => {
+ 				pineSuggestion.id
+ 			);
+ 
++			// Blur the input and make sure that the `aria-activedescendant`
++			// is removed
++			const button = screen.getByRole( 'button', { name: 'Click me' } );
++
++			await user.click( button );
++
++			expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
++
++			// Focus the input again, `aria-activedescendant` should be added back.
++			await user.click( input );
++
++			expect( input ).toHaveAttribute(
++				'aria-activedescendant',
++				pineSuggestion.id
++			);
++
+ 			// Add the suggestion, which hides the list
+ 			await user.keyboard( '[Enter]' );
+ 
+diff --git a/packages/components/src/form-token-field/token-input.tsx b/packages/components/src/form-token-field/token-input.tsx
+index 478cce3f3733cc..196ac03c799af8 100644
+--- a/packages/components/src/form-token-field/token-input.tsx
++++ b/packages/components/src/form-token-field/token-input.tsx
+@@ -2,12 +2,12 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import type { ChangeEvent, ForwardedRef } from 'react';
++import type { ChangeEvent, ForwardedRef, FocusEventHandler } from 'react';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { forwardRef } from '@wordpress/element';
++import { forwardRef, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -26,9 +26,13 @@ export function UnForwardedTokenInput(
+ 		selectedSuggestionIndex,
+ 		className,
+ 		onChange,
++		onFocus,
++		onBlur,
+ 		...restProps
+ 	} = props;
+ 
++	const [ hasFocus, setHasFocus ] = useState( false );
++
+ 	const size = value ? value.length + 1 : 0;
+ 
+ 	const onChangeHandler = ( event: ChangeEvent< HTMLInputElement > ) => {
+@@ -39,6 +43,18 @@ export function UnForwardedTokenInput(
+ 		}
+ 	};
+ 
++	const onFocusHandler: FocusEventHandler< HTMLInputElement > = ( e ) => {
++		setHasFocus( true );
++		onFocus?.( e );
++	};
++
++	const onBlurHandler: React.FocusEventHandler< HTMLInputElement > = (
++		e
++	) => {
++		setHasFocus( false );
++		onBlur?.( e );
++	};
++
+ 	return (
+ 		<input
+ 			ref={ ref }
+@@ -47,6 +63,8 @@ export function UnForwardedTokenInput(
+ 			{ ...restProps }
+ 			value={ value || '' }
+ 			onChange={ onChangeHandler }
++			onFocus={ onFocusHandler }
++			onBlur={ onBlurHandler }
+ 			size={ size }
+ 			className={ classnames(
+ 				className,
+@@ -62,7 +80,11 @@ export function UnForwardedTokenInput(
+ 					: undefined
+ 			}
+ 			aria-activedescendant={
+-				selectedSuggestionIndex !== -1
++				// Only add the `aria-activedescendant` attribute when:
++				// - the user is actively interacting with the input (`hasFocus`)
++				// - there is a selected suggestion (`selectedSuggestionIndex !== -1`)
++				// - the list of suggestions are rendered in the DOM (`isExpanded`)
++				hasFocus && selectedSuggestionIndex !== -1 && isExpanded
+ 					? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
+ 					: undefined
+ 			}

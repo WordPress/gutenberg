@@ -1,0 +1,114 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 962531a07d942b..d9f196bfeb8150 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `Popover`: Allow legitimate 0 positions to update popover position ([#51320](https://github.com/WordPress/gutenberg/pull/51320)).
+ 
++### Internal
++
++-   `ClipboardButton`: Convert to TypeScript ([#51334](https://github.com/WordPress/gutenberg/pull/51334)).
++
+ ## 25.1.0 (2023-06-07)
+ 
+ ### Enhancements
+@@ -27,7 +31,7 @@
+ ### Experimental
+ 
+ -   `DropdownMenu` v2: Tweak styles ([#50967](https://github.com/WordPress/gutenberg/pull/50967), [#51097](https://github.com/WordPress/gutenberg/pull/51097)).
+--   `DropdownMenu` v2: change default placement to match the legacy `DropdownMenu` component  ([#51133](https://github.com/WordPress/gutenberg/pull/51133)).
++-   `DropdownMenu` v2: change default placement to match the legacy `DropdownMenu` component ([#51133](https://github.com/WordPress/gutenberg/pull/51133)).
+ -   `DropdownMenu` v2: Render in the default `Popover.Slot` ([#51046](https://github.com/WordPress/gutenberg/pull/51046)).
+ 
+ ## 25.0.0 (2023-05-24)
+diff --git a/packages/components/src/clipboard-button/index.js b/packages/components/src/clipboard-button/index.tsx
+similarity index 63%
+rename from packages/components/src/clipboard-button/index.js
+rename to packages/components/src/clipboard-button/index.tsx
+index 9cce2dbefa9a79..ded4e9ad45d1a6 100644
+--- a/packages/components/src/clipboard-button/index.js
++++ b/packages/components/src/clipboard-button/index.tsx
+@@ -14,17 +14,11 @@ import deprecated from '@wordpress/deprecated';
+  * Internal dependencies
+  */
+ import Button from '../button';
++import type { ClipboardButtonProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+ const TIMEOUT = 4000;
+ 
+-/**
+- * @param {Object}                    props
+- * @param {string}                    [props.className]
+- * @param {import('react').ReactNode} props.children
+- * @param {() => void}                props.onCopy
+- * @param {() => void}                [props.onFinishCopy]
+- * @param {string}                    props.text
+- */
+ export default function ClipboardButton( {
+ 	className,
+ 	children,
+@@ -32,18 +26,18 @@ export default function ClipboardButton( {
+ 	onFinishCopy,
+ 	text,
+ 	...buttonProps
+-} ) {
++}: WordPressComponentProps< ClipboardButtonProps, 'button', false > ) {
+ 	deprecated( 'wp.components.ClipboardButton', {
+ 		since: '5.8',
+ 		alternative: 'wp.compose.useCopyToClipboard',
+ 	} );
+ 
+-	/** @type {import('react').MutableRefObject<ReturnType<setTimeout> | undefined>} */
+-	const timeoutId = useRef();
++	const timeoutId = useRef< NodeJS.Timeout >();
+ 	const ref = useCopyToClipboard( text, () => {
+ 		onCopy();
+-		// @ts-expect-error: Should check if .current is defined, but not changing because this component is deprecated.
+-		clearTimeout( timeoutId.current );
++		if ( timeoutId.current ) {
++			clearTimeout( timeoutId.current );
++		}
+ 
+ 		if ( onFinishCopy ) {
+ 			timeoutId.current = setTimeout( () => onFinishCopy(), TIMEOUT );
+@@ -51,8 +45,9 @@ export default function ClipboardButton( {
+ 	} );
+ 
+ 	useEffect( () => {
+-		// @ts-expect-error: Should check if .current is defined, but not changing because this component is deprecated.
+-		clearTimeout( timeoutId.current );
++		if ( timeoutId.current ) {
++			clearTimeout( timeoutId.current );
++		}
+ 	}, [] );
+ 
+ 	const classes = classnames( 'components-clipboard-button', className );
+@@ -62,8 +57,7 @@ export default function ClipboardButton( {
+ 	// This causes documentHasSelection() in the copy-handler component to
+ 	// mistakenly override the ClipboardButton, and copy a serialized string
+ 	// of the current block instead.
+-	/** @type {import('react').ClipboardEventHandler<HTMLButtonElement>} */
+-	const focusOnCopyEventTarget = ( event ) => {
++	const focusOnCopyEventTarget: React.ClipboardEventHandler = ( event ) => {
+ 		// @ts-expect-error: Should be currentTarget, but not changing because this component is deprecated.
+ 		event.target.focus();
+ 	};
+diff --git a/packages/components/src/clipboard-button/types.ts b/packages/components/src/clipboard-button/types.ts
+new file mode 100644
+index 00000000000000..7987230598fbbb
+--- /dev/null
++++ b/packages/components/src/clipboard-button/types.ts
+@@ -0,0 +1,11 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++export interface ClipboardButtonProps {
++	children: ReactNode;
++	onCopy: () => void;
++	onFinishCopy?: () => void;
++	text: string;
++}

@@ -1,0 +1,1486 @@
+diff --git a/packages/components/src/box-control/test/index.js b/packages/components/src/box-control/test/index.js
+index 81b1ab7bd2bf68..613aac6092fe65 100644
+--- a/packages/components/src/box-control/test/index.js
++++ b/packages/components/src/box-control/test/index.js
+@@ -28,7 +28,6 @@ describe( 'BoxControl', () => {
+ 			const input = container.querySelector( 'input' );
+ 			const unitSelect = container.querySelector( 'select' );
+ 
+-			input.focus();
+ 			fireEvent.change( input, { target: { value: '100%' } } );
+ 			fireEvent.keyDown( input, { keyCode: ENTER } );
+ 
+@@ -42,17 +41,14 @@ describe( 'BoxControl', () => {
+ 			const { container, getByText } = render( <BoxControl /> );
+ 			const input = container.querySelector( 'input' );
+ 			const unitSelect = container.querySelector( 'select' );
+-			const reset = getByText( /Reset/ );
+ 
+-			input.focus();
+ 			fireEvent.change( input, { target: { value: '100px' } } );
+ 			fireEvent.keyDown( input, { keyCode: ENTER } );
+ 
+ 			expect( input.value ).toBe( '100' );
+ 			expect( unitSelect.value ).toBe( 'px' );
+ 
+-			reset.focus();
+-			fireEvent.click( reset );
++			fireEvent.click( getByText( /Reset/ ) );
+ 
+ 			expect( input.value ).toBe( '' );
+ 			expect( unitSelect.value ).toBe( 'px' );
+@@ -72,17 +68,14 @@ describe( 'BoxControl', () => {
+ 			const { container, getByText } = render( <Example /> );
+ 			const input = container.querySelector( 'input' );
+ 			const unitSelect = container.querySelector( 'select' );
+-			const reset = getByText( /Reset/ );
+ 
+-			input.focus();
+ 			fireEvent.change( input, { target: { value: '100px' } } );
+ 			fireEvent.keyDown( input, { keyCode: ENTER } );
+ 
+ 			expect( input.value ).toBe( '100' );
+ 			expect( unitSelect.value ).toBe( 'px' );
+ 
+-			reset.focus();
+-			fireEvent.click( reset );
++			fireEvent.click( getByText( /Reset/ ) );
+ 
+ 			expect( input.value ).toBe( '' );
+ 			expect( unitSelect.value ).toBe( 'px' );
+@@ -109,17 +102,14 @@ describe( 'BoxControl', () => {
+ 			const { container, getByText } = render( <Example /> );
+ 			const input = container.querySelector( 'input' );
+ 			const unitSelect = container.querySelector( 'select' );
+-			const reset = getByText( /Reset/ );
+ 
+-			input.focus();
+ 			fireEvent.change( input, { target: { value: '100px' } } );
+ 			fireEvent.keyDown( input, { keyCode: ENTER } );
+ 
+ 			expect( input.value ).toBe( '100' );
+ 			expect( unitSelect.value ).toBe( 'px' );
+ 
+-			reset.focus();
+-			fireEvent.click( reset );
++			fireEvent.click( getByText( /Reset/ ) );
+ 
+ 			expect( input.value ).toBe( '' );
+ 			expect( unitSelect.value ).toBe( 'px' );
+diff --git a/packages/components/src/input-control/index.js b/packages/components/src/input-control/index.js
+index e56e86e8a384b5..bd6cb82d8be982 100644
+--- a/packages/components/src/input-control/index.js
++++ b/packages/components/src/input-control/index.js
+@@ -33,7 +33,9 @@ export function InputControl(
+ 		isPressEnterToChange = false,
+ 		label,
+ 		labelPosition = 'top',
++		onBlur = noop,
+ 		onChange = noop,
++		onFocus = noop,
+ 		onValidate = noop,
+ 		onKeyDown = noop,
+ 		prefix,
+@@ -49,6 +51,16 @@ export function InputControl(
+ 	const id = useUniqueId( idProp );
+ 	const classes = classNames( 'components-input-control', className );
+ 
++	const handleOnBlur = ( event ) => {
++		onBlur( event );
++		setIsFocused( false );
++	};
++
++	const handleOnFocus = ( event ) => {
++		onFocus( event );
++		setIsFocused( true );
++	};
++
+ 	return (
+ 		<InputBase
+ 			className={ classes }
+@@ -69,9 +81,10 @@ export function InputControl(
+ 				className="components-input-control__input"
+ 				disabled={ disabled }
+ 				id={ id }
+-				isFocused={ isFocused }
+ 				isPressEnterToChange={ isPressEnterToChange }
++				onBlur={ handleOnBlur }
+ 				onChange={ onChange }
++				onFocus={ handleOnFocus }
+ 				onKeyDown={ onKeyDown }
+ 				onValidate={ onValidate }
+ 				ref={ ref }
+diff --git a/packages/components/src/input-control/input-field.js b/packages/components/src/input-control/input-field.js
+index 425d42ea890142..d6c183afced3cc 100644
+--- a/packages/components/src/input-control/input-field.js
++++ b/packages/components/src/input-control/input-field.js
+@@ -7,7 +7,7 @@ import { useDrag } from 'react-use-gesture';
+ /**
+  * WordPress dependencies
+  */
+-import { forwardRef } from '@wordpress/element';
++import { useEffect, useRef, forwardRef } from '@wordpress/element';
+ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+ /**
+  * Internal dependencies
+@@ -16,7 +16,6 @@ import { useDragCursor } from './utils';
+ import { Input } from './styles/input-control-styles';
+ import { useInputControlStateReducer } from './state';
+ import { isValueEmpty } from '../utils/values';
+-import { useUpdateEffect } from '../utils';
+ 
+ function InputField(
+ 	{
+@@ -25,7 +24,6 @@ function InputField(
+ 		dragThreshold = 10,
+ 		id,
+ 		isDragEnabled = false,
+-		isFocused,
+ 		isPressEnterToChange = false,
+ 		onBlur = noop,
+ 		onChange = noop,
+@@ -36,7 +34,6 @@ function InputField(
+ 		onKeyDown = noop,
+ 		onValidate = noop,
+ 		size = 'default',
+-		setIsFocused,
+ 		stateReducer = ( state ) => state,
+ 		value: valueProp,
+ 		...props
+@@ -66,27 +63,35 @@ function InputField(
+ 
+ 	const { _event, value, isDragging, isDirty } = state;
+ 
++	const valueRef = useRef( value );
+ 	const dragCursor = useDragCursor( isDragging, dragDirection );
+ 
+-	/*
+-	 * Syncs value state using the focus state to determine the direction.
+-	 * Without focus it updates the value from the props. With focus it
+-	 * propagates the value and event through onChange.
+-	 */
+-	useUpdateEffect( () => {
+-		if ( valueProp === value ) {
++	useEffect( () => {
++		/**
++		 * Handles syncing incoming value changes with internal state.
++		 * This effectively enables a "controlled" state.
++		 * https://reactjs.org/docs/forms.html#controlled-components
++		 */
++		if ( valueProp !== valueRef.current ) {
++			update( valueProp );
++			valueRef.current = valueProp;
++
++			// Quick return to avoid firing the onChange callback
+ 			return;
+ 		}
+-		if ( ! isFocused ) {
+-			update( valueProp );
+-		} else if ( ! isDirty ) {
++
++		/**
++		 * Fires the onChange callback when internal state value changes.
++		 */
++		if ( value !== valueRef.current && ! isDirty ) {
+ 			onChange( value, { event: _event } );
++
++			valueRef.current = value;
+ 		}
+-	}, [ value, isDirty, isFocused, valueProp ] );
++	}, [ value, isDirty, valueProp ] );
+ 
+ 	const handleOnBlur = ( event ) => {
+ 		onBlur( event );
+-		setIsFocused( false );
+ 
+ 		/**
+ 		 * If isPressEnterToChange is set, this commits the value to
+@@ -103,7 +108,6 @@ function InputField(
+ 
+ 	const handleOnFocus = ( event ) => {
+ 		onFocus( event );
+-		setIsFocused( true );
+ 	};
+ 
+ 	const handleOnChange = ( event ) => {
+diff --git a/packages/components/src/input-control/test/index.js b/packages/components/src/input-control/test/index.js
+index 4198a2308fd473..86615318497fc6 100644
+--- a/packages/components/src/input-control/test/index.js
++++ b/packages/components/src/input-control/test/index.js
+@@ -49,7 +49,7 @@ describe( 'InputControl', () => {
+ 			render( <InputControl value="Hello" onChange={ spy } /> );
+ 
+ 			const input = getInput();
+-			input.focus();
++
+ 			fireEvent.change( input, { target: { value: 'There' } } );
+ 
+ 			expect( input.value ).toBe( 'There' );
+@@ -59,23 +59,21 @@ describe( 'InputControl', () => {
+ 		it( 'should work as a controlled component', () => {
+ 			const spy = jest.fn();
+ 			const { rerender } = render(
+-				<InputControl value="one" onChange={ spy } />
++				<InputControl value="Original" onChange={ spy } />
+ 			);
+ 
+ 			const input = getInput();
+ 
+-			input.focus();
+-			fireEvent.change( input, { target: { value: 'two' } } );
++			fireEvent.change( input, { target: { value: 'State' } } );
+ 
+-			// Ensuring <InputControl /> is controlled
+-			fireEvent.blur( input );
++			// Assuming <InputControl /> is controlled...
+ 
+ 			// Updating the value
+-			rerender( <InputControl value="three" onChange={ spy } /> );
++			rerender( <InputControl value="New" onChange={ spy } /> );
+ 
+-			expect( input.value ).toBe( 'three' );
++			expect( input.value ).toBe( 'New' );
+ 
+-			/*
++			/**
+ 			 * onChange called only once. onChange is not called when a
+ 			 * parent component explicitly passed a (new value) change down to
+ 			 * the <InputControl />.
+@@ -91,7 +89,7 @@ describe( 'InputControl', () => {
+ 
+ 			const input = getInput();
+ 
+-			// Assuming <InputControl /> is controlled (not focused)
++			// Assuming <InputControl /> is controlled...
+ 
+ 			// Updating the value
+ 			rerender( <InputControl value="New" onChange={ spy } /> );
+diff --git a/packages/components/src/number-control/test/index.js b/packages/components/src/number-control/test/index.js
+index 883b7f6d9591fd..8c006647bd2ff3 100644
+--- a/packages/components/src/number-control/test/index.js
++++ b/packages/components/src/number-control/test/index.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen, fireEvent } from '@testing-library/react';
++import { render, unmountComponentAtNode } from 'react-dom';
++import { act, Simulate } from 'react-dom/test-utils';
+ 
+ /**
+  * WordPress dependencies
+@@ -12,16 +13,24 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+ /**
+  * Internal dependencies
+  */
+-import BaseNumberControl from '../';
++import NumberControl from '../';
+ 
+-const getInput = () => screen.getByTestId( 'input' );
++let container = null;
+ 
+-const fireKeyDown = ( data ) =>
+-	fireEvent.keyDown( document.activeElement || document.body, data );
++function getInput() {
++	return container.querySelector( 'input' );
++}
++
++beforeEach( () => {
++	container = document.createElement( 'div' );
++	document.body.appendChild( container );
++} );
+ 
+-const NumberControl = ( props ) => (
+-	<BaseNumberControl { ...props } data-testid="input" />
+-);
++afterEach( () => {
++	unmountComponentAtNode( container );
++	container.remove();
++	container = null;
++} );
+ 
+ function StatefulNumberControl( props ) {
+ 	const [ value, setValue ] = useState( props.value );
+@@ -39,56 +48,86 @@ function StatefulNumberControl( props ) {
+ describe( 'NumberControl', () => {
+ 	describe( 'Basic rendering', () => {
+ 		it( 'should render', () => {
+-			render( <NumberControl /> );
+-			expect( getInput() ).not.toBeNull();
++			act( () => {
++				render( <NumberControl />, container );
++			} );
++
++			const input = getInput();
++
++			expect( input ).not.toBeNull();
+ 		} );
+ 
+ 		it( 'should render custom className', () => {
+-			render( <NumberControl className="hello" /> );
+-			expect( getInput() ).toBeTruthy();
++			act( () => {
++				render( <NumberControl className="hello" />, container );
++			} );
++
++			const input = container.querySelector( '.hello' );
++
++			expect( input ).toBeTruthy();
+ 		} );
+ 	} );
+ 
+ 	describe( 'onChange handling', () => {
+ 		it( 'should provide onChange callback with number value', () => {
+ 			const spy = jest.fn();
+-
+-			render(
+-				<NumberControl value={ 5 } onChange={ ( v ) => spy( v ) } />
+-			);
++			act( () => {
++				render(
++					<NumberControl value={ 5 } onChange={ spy } />,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: 10 } } );
+ 
+-			expect( spy ).toHaveBeenCalledWith( '10' );
++			input.value = 10;
++
++			act( () => {
++				Simulate.change( input );
++			} );
++
++			const changeValue = spy.mock.calls[ 0 ][ 0 ];
++
++			expect( changeValue ).toBe( '10' );
+ 		} );
+ 	} );
+ 
+ 	describe( 'Validation', () => {
+ 		it( 'should clamp value within range on ENTER keypress', () => {
+-			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
++			act( () => {
++				render(
++					<NumberControl value={ 5 } min={ 0 } max={ 10 } />,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: -100 } } );
+-			fireKeyDown( { keyCode: ENTER } );
++			input.value = -100;
++
++			act( () => {
++				Simulate.change( input );
++				Simulate.keyDown( input, { keyCode: ENTER } );
++			} );
+ 
+ 			/**
+ 			 * This is zero because the value has been adjusted to
+ 			 * respect the min/max range of the input.
+ 			 */
+-
+ 			expect( input.value ).toBe( '0' );
+ 		} );
+ 
+ 		it( 'should parse to number value on ENTER keypress', () => {
+-			render( <NumberControl value={ 5 } /> );
++			act( () => {
++				render( <NumberControl value={ 5 } />, container );
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: '10 abc' } } );
+-			fireKeyDown( { keyCode: ENTER } );
++			input.value = '10 abc';
++
++			act( () => {
++				Simulate.change( input );
++				Simulate.keyDown( input, { keyCode: ENTER } );
++			} );
+ 
+ 			expect( input.value ).toBe( '0' );
+ 		} );
+@@ -97,83 +136,122 @@ describe( 'NumberControl', () => {
+ 	describe( 'Key UP interactions', () => {
+ 		it( 'should fire onKeyDown callback', () => {
+ 			const spy = jest.fn();
++			act( () => {
++				render(
++					<StatefulNumberControl value={ 5 } onKeyDown={ spy } />,
++					container
++				);
++			} );
+ 
+-			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
++			const input = getInput();
+ 
+-			getInput().focus();
+-			fireKeyDown( { keyCode: UP } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP } );
++			} );
+ 
+ 			expect( spy ).toHaveBeenCalled();
+ 		} );
+ 
+ 		it( 'should increment by step on key UP press', () => {
+-			render( <StatefulNumberControl value={ 5 } /> );
++			act( () => {
++				render( <StatefulNumberControl value={ 5 } />, container );
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: UP } );
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP } );
++			} );
+ 
+ 			expect( input.value ).toBe( '6' );
+ 		} );
+ 
+ 		it( 'should increment from a negative value', () => {
+-			render( <StatefulNumberControl value={ -5 } /> );
++			act( () => {
++				render( <StatefulNumberControl value={ -5 } />, container );
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: UP } );
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP } );
++			} );
+ 
+ 			expect( input.value ).toBe( '-4' );
+ 		} );
+ 
+ 		it( 'should increment by shiftStep on key UP + shift press', () => {
+-			render( <StatefulNumberControl value={ 5 } shiftStep={ 10 } /> );
++			act( () => {
++				render(
++					<StatefulNumberControl value={ 5 } shiftStep={ 10 } />,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: UP, shiftKey: true } );
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
++			} );
+ 
+ 			expect( input.value ).toBe( '20' );
+ 		} );
+ 
+ 		it( 'should increment by custom shiftStep on key UP + shift press', () => {
+-			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
++			act( () => {
++				render(
++					<StatefulNumberControl value={ 5 } shiftStep={ 100 } />,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: UP, shiftKey: true } );
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
++			} );
+ 
+ 			expect( input.value ).toBe( '100' );
+ 		} );
+ 
+ 		it( 'should increment but be limited by max on shiftStep', () => {
+-			render(
+-				<StatefulNumberControl
+-					value={ 5 }
+-					shiftStep={ 100 }
+-					max={ 99 }
+-				/>
+-			);
++			act( () => {
++				render(
++					<StatefulNumberControl
++						value={ 5 }
++						shiftStep={ 100 }
++						max={ 99 }
++					/>,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: UP, shiftKey: true } );
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
++			} );
+ 
+ 			expect( input.value ).toBe( '99' );
+ 		} );
+ 
+ 		it( 'should not increment by shiftStep if disabled', () => {
+-			render(
+-				<StatefulNumberControl
+-					value={ 5 }
+-					shiftStep={ 100 }
+-					isShiftStepEnabled={ false }
+-				/>
+-			);
++			act( () => {
++				render(
++					<StatefulNumberControl
++						value={ 5 }
++						shiftStep={ 100 }
++						isShiftStepEnabled={ false }
++					/>,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: UP, shiftKey: true } );
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
++			} );
+ 
+ 			expect( input.value ).toBe( '6' );
+ 		} );
+@@ -182,82 +260,119 @@ describe( 'NumberControl', () => {
+ 	describe( 'Key DOWN interactions', () => {
+ 		it( 'should fire onKeyDown callback', () => {
+ 			const spy = jest.fn();
+-			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
++			act( () => {
++				render(
++					<StatefulNumberControl value={ 5 } onKeyDown={ spy } />,
++					container
++				);
++			} );
+ 
+-			getInput().focus();
+-			fireKeyDown( { keyCode: DOWN } );
++			const input = getInput();
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN } );
++			} );
+ 
+ 			expect( spy ).toHaveBeenCalled();
+ 		} );
+ 
+ 		it( 'should decrement by step on key DOWN press', () => {
+-			render( <StatefulNumberControl value={ 5 } /> );
++			act( () => {
++				render( <StatefulNumberControl value={ 5 } />, container );
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: DOWN } );
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN } );
++			} );
+ 
+ 			expect( input.value ).toBe( '4' );
+ 		} );
+ 
+ 		it( 'should decrement from a negative value', () => {
+-			render( <StatefulNumberControl value={ -5 } /> );
++			act( () => {
++				render( <StatefulNumberControl value={ -5 } />, container );
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: DOWN } );
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN } );
++			} );
+ 
+ 			expect( input.value ).toBe( '-6' );
+ 		} );
+ 
+ 		it( 'should decrement by shiftStep on key DOWN + shift press', () => {
+-			render( <StatefulNumberControl value={ 5 } /> );
++			act( () => {
++				render( <StatefulNumberControl value={ 5 } />, container );
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
++			} );
+ 
+ 			expect( input.value ).toBe( '0' );
+ 		} );
+ 
+ 		it( 'should decrement by custom shiftStep on key DOWN + shift press', () => {
+-			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
++			act( () => {
++				render(
++					<StatefulNumberControl value={ 5 } shiftStep={ 100 } />,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
++			} );
+ 
+ 			expect( input.value ).toBe( '-100' );
+ 		} );
+ 
+ 		it( 'should decrement but be limited by min on shiftStep', () => {
+-			render(
+-				<StatefulNumberControl
+-					value={ 5 }
+-					shiftStep={ 100 }
+-					min={ 4 }
+-				/>
+-			);
++			act( () => {
++				render(
++					<StatefulNumberControl
++						value={ 5 }
++						shiftStep={ 100 }
++						min={ 4 }
++					/>,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
++			} );
+ 
+ 			expect( input.value ).toBe( '4' );
+ 		} );
+ 
+ 		it( 'should not decrement by shiftStep if disabled', () => {
+-			render(
+-				<StatefulNumberControl
+-					value={ 5 }
+-					shiftStep={ 100 }
+-					isShiftStepEnabled={ false }
+-				/>
+-			);
++			act( () => {
++				render(
++					<StatefulNumberControl
++						value={ 5 }
++						shiftStep={ 100 }
++						isShiftStepEnabled={ false }
++					/>,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
++			} );
+ 
+ 			expect( input.value ).toBe( '4' );
+ 		} );
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index 4d97729cf85c62..536b0d84ba0a86 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -26,13 +26,13 @@ import {
+ 	ActionRightWrapper,
+ 	AfterIconWrapper,
+ 	BeforeIconWrapper,
+-	InputNumber,
+ 	Root,
+ 	Track,
+ 	ThumbWrapper,
+ 	Thumb,
+ 	Wrapper,
+ } from './styles/range-control-styles';
++import InputField from './input-field';
+ import { useRTL } from '../utils/rtl';
+ 
+ function RangeControl(
+@@ -119,12 +119,10 @@ function RangeControl(
+ 
+ 	const handleOnRangeChange = ( event ) => {
+ 		const nextValue = parseFloat( event.target.value );
+-		setValue( nextValue );
+-		onChange( nextValue );
++		handleOnChange( nextValue );
+ 	};
+ 
+ 	const handleOnChange = ( nextValue ) => {
+-		nextValue = parseFloat( nextValue );
+ 		if ( isNaN( nextValue ) ) {
+ 			handleOnReset();
+ 			return;
+@@ -258,19 +256,16 @@ function RangeControl(
+ 					</AfterIconWrapper>
+ 				) }
+ 				{ withInputField && (
+-					<InputNumber
+-						aria-label={ label }
+-						className="components-range-control__number"
++					<InputField
+ 						disabled={ disabled }
+-						inputMode="decimal"
+ 						isShiftStepEnabled={ isShiftStepEnabled }
++						label={ label }
+ 						max={ max }
+ 						min={ min }
+ 						onChange={ handleOnChange }
+ 						onReset={ handleOnReset }
+ 						shiftStep={ shiftStep }
+ 						step={ step }
+-						type={ 'number' }
+ 						value={ inputSliderValue }
+ 					/>
+ 				) }
+diff --git a/packages/components/src/range-control/input-field.js b/packages/components/src/range-control/input-field.js
+new file mode 100644
+index 00000000000000..b71351b2c4973f
+--- /dev/null
++++ b/packages/components/src/range-control/input-field.js
+@@ -0,0 +1,86 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { ENTER } from '@wordpress/keycodes';
++
++/**
++ * Internal dependencies
++ */
++import { useControlledState } from '../utils/hooks';
++import { InputNumber } from './styles/range-control-styles';
++
++export default function InputField( {
++	label,
++	onBlur = noop,
++	onChange = noop,
++	onReset = noop,
++	onKeyDown = noop,
++	value: valueProp,
++	...props
++} ) {
++	/**
++	 * This component stores an internal (input) value state, derived from
++	 * the incoming value prop.
++	 *
++	 * This allows for the <input /> to be updated independently before the
++	 * value is applied and propagated. This independent updating action is
++	 * necessary to accommodate individual keystroke values that may not
++	 * be considered "valid" (e.g. within the min - max range).
++	 */
++	const [ value, setValue ] = useControlledState( valueProp );
++
++	const handleOnReset = ( event ) => {
++		onReset( event );
++		setValue( '' );
++	};
++
++	const handleOnCommit = ( event ) => {
++		const nextValue = parseFloat( event.target.value );
++
++		if ( isNaN( nextValue ) ) {
++			handleOnReset();
++			return;
++		}
++
++		setValue( nextValue );
++		onChange( nextValue );
++	};
++
++	const handleOnBlur = ( event ) => {
++		onBlur( event );
++		handleOnCommit( event );
++	};
++
++	const handleOnChange = ( next ) => {
++		handleOnCommit( { target: { value: next } } );
++	};
++
++	const handleOnKeyDown = ( event ) => {
++		const { keyCode } = event;
++		onKeyDown( event );
++
++		if ( keyCode === ENTER ) {
++			event.preventDefault();
++			handleOnCommit( event );
++		}
++	};
++
++	return (
++		<InputNumber
++			aria-label={ label }
++			className="components-range-control__number"
++			inputMode="decimal"
++			onBlur={ handleOnBlur }
++			onChange={ handleOnChange }
++			onKeyDown={ handleOnKeyDown }
++			type="number"
++			value={ value }
++			{ ...props }
++		/>
++	);
++}
+diff --git a/packages/components/src/range-control/test/index.js b/packages/components/src/range-control/test/index.js
+index 4755978c55414b..e3d75083f4e4f4 100644
+--- a/packages/components/src/range-control/test/index.js
++++ b/packages/components/src/range-control/test/index.js
+@@ -27,11 +27,10 @@ describe( 'RangeControl', () => {
+ 			const rangeInput = getRangeInput( container );
+ 			const numberInput = getNumberInput( container );
+ 
+-			rangeInput.focus();
+ 			fireEvent.change( rangeInput, { target: { value: '5' } } );
+ 
+-			numberInput.focus();
+ 			fireEvent.change( numberInput, { target: { value: '10' } } );
++			fireEvent.blur( numberInput );
+ 
+ 			expect( onChange ).toHaveBeenCalledWith( 5 );
+ 			expect( onChange ).toHaveBeenCalledWith( 10 );
+@@ -82,38 +81,20 @@ describe( 'RangeControl', () => {
+ 			expect( rangeInput.value ).not.toBe( '21' );
+ 		} );
+ 
+-		it( 'should call onChange if new value is invalid', () => {
++		it( 'should call onChange if new value is valid', () => {
+ 			const onChange = jest.fn();
+ 			const { container } = render(
+ 				<RangeControl onChange={ onChange } min={ 10 } max={ 20 } />
+ 			);
+ 
+-			const numberInput = getNumberInput( container );
+-
+-			numberInput.focus();
+-			fireEvent.change( numberInput, { target: { value: '25' } } );
+-
+-			expect( onChange ).toHaveBeenCalledWith( 25 );
+-		} );
+-
+-		it( 'should keep invalid values in number input until loss of focus', () => {
+-			const onChange = jest.fn();
+-			const { container } = render(
+-				<RangeControl onChange={ onChange } min={ -1 } max={ 1 } />
+-			);
+-
+ 			const rangeInput = getRangeInput( container );
+ 			const numberInput = getNumberInput( container );
+ 
+-			numberInput.focus();
+-			fireEvent.change( numberInput, { target: { value: '-1.1' } } );
+-
+-			expect( numberInput.value ).toBe( '-1.1' );
+-			expect( rangeInput.value ).toBe( '-1' );
+-
++			fireEvent.change( numberInput, { target: { value: '15' } } );
+ 			fireEvent.blur( numberInput );
+-			expect( onChange ).toHaveBeenCalledWith( -1.1 );
+-			expect( numberInput.value ).toBe( '-1' );
++
++			expect( onChange ).toHaveBeenCalledWith( 15 );
++			expect( rangeInput.value ).toBe( '15' );
+ 		} );
+ 
+ 		it( 'should validate when provided a max or min of zero', () => {
+@@ -124,8 +105,8 @@ describe( 'RangeControl', () => {
+ 			const rangeInput = getRangeInput( container );
+ 			const numberInput = getNumberInput( container );
+ 
+-			numberInput.focus();
+ 			fireEvent.change( numberInput, { target: { value: '1' } } );
++			fireEvent.blur( numberInput );
+ 
+ 			expect( rangeInput.value ).toBe( '0' );
+ 		} );
+@@ -138,15 +119,19 @@ describe( 'RangeControl', () => {
+ 			const rangeInput = getRangeInput( container );
+ 			const numberInput = getNumberInput( container );
+ 
+-			numberInput.focus();
+-
+ 			fireEvent.change( numberInput, { target: { value: '-101' } } );
++			fireEvent.blur( numberInput );
++
+ 			expect( rangeInput.value ).toBe( '-100' );
+ 
+ 			fireEvent.change( numberInput, { target: { value: '-49' } } );
++			fireEvent.blur( numberInput );
++
+ 			expect( rangeInput.value ).toBe( '-50' );
+ 
+ 			fireEvent.change( numberInput, { target: { value: '-50' } } );
++			fireEvent.blur( numberInput );
++
+ 			expect( rangeInput.value ).toBe( '-50' );
+ 		} );
+ 
+@@ -163,13 +148,14 @@ describe( 'RangeControl', () => {
+ 			const rangeInput = getRangeInput( container );
+ 			const numberInput = getNumberInput( container );
+ 
+-			numberInput.focus();
+ 			fireEvent.change( numberInput, { target: { value: '0.125' } } );
++			fireEvent.blur( numberInput );
+ 
+ 			expect( onChange ).toHaveBeenCalledWith( 0.125 );
+ 			expect( rangeInput.value ).toBe( '0.125' );
+ 
+ 			fireEvent.change( numberInput, { target: { value: '0.225' } } );
++			fireEvent.blur( numberInput );
+ 
+ 			expect( onChange ).toHaveBeenCalledWith( 0.225 );
+ 			expect( rangeInput.value ).toBe( '0.225' );
+@@ -243,14 +229,13 @@ describe( 'RangeControl', () => {
+ 			const rangeInput = getRangeInput( container );
+ 			const numberInput = getNumberInput( container );
+ 
+-			rangeInput.focus();
+ 			fireEvent.change( rangeInput, { target: { value: 13 } } );
+ 
+ 			expect( rangeInput.value ).toBe( '13' );
+ 			expect( numberInput.value ).toBe( '13' );
+ 
+-			numberInput.focus();
+ 			fireEvent.change( numberInput, { target: { value: 7 } } );
++			fireEvent.blur( numberInput );
+ 
+ 			expect( rangeInput.value ).toBe( '7' );
+ 			expect( numberInput.value ).toBe( '7' );
+diff --git a/packages/components/src/unit-control/test/index.js b/packages/components/src/unit-control/test/index.js
+index 21d102a6f97e34..8eac58f0dfdbaf 100644
+--- a/packages/components/src/unit-control/test/index.js
++++ b/packages/components/src/unit-control/test/index.js
+@@ -1,32 +1,46 @@
+ /**
+  * External dependencies
+  */
+-import { render, fireEvent } from '@testing-library/react';
++import { render, unmountComponentAtNode } from 'react-dom';
++import { act, Simulate } from 'react-dom/test-utils';
++import { render as testRender } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { UP, DOWN, ENTER } from '@wordpress/keycodes';
++import { UP, DOWN } from '@wordpress/keycodes';
+ 
+ /**
+  * Internal dependencies
+  */
+ import UnitControl from '../';
+ 
++let container = null;
++
++beforeEach( () => {
++	container = document.createElement( 'div' );
++	document.body.appendChild( container );
++} );
++
++afterEach( () => {
++	unmountComponentAtNode( container );
++	container.remove();
++	container = null;
++} );
++
+ const getComponent = () =>
+-	document.body.querySelector( '.components-unit-control' );
++	container.querySelector( '.components-unit-control' );
+ const getInput = () =>
+-	document.body.querySelector( '.components-unit-control input' );
++	container.querySelector( '.components-unit-control input' );
+ const getSelect = () =>
+-	document.body.querySelector( '.components-unit-control select' );
+-
+-const fireKeyDown = ( data ) =>
+-	fireEvent.keyDown( document.activeElement || document.body, data );
++	container.querySelector( '.components-unit-control select' );
+ 
+ describe( 'UnitControl', () => {
+ 	describe( 'Basic rendering', () => {
+ 		it( 'should render', () => {
+-			render( <UnitControl /> );
++			act( () => {
++				render( <UnitControl />, container );
++			} );
+ 			const input = getInput();
+ 			const select = getSelect();
+ 
+@@ -35,7 +49,9 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should render custom className', () => {
+-			render( <UnitControl className="hello" /> );
++			act( () => {
++				render( <UnitControl className="hello" />, container );
++			} );
+ 
+ 			const el = getComponent();
+ 
+@@ -43,7 +59,9 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should not render select, if units are disabled', () => {
+-			render( <UnitControl unit="em" units={ false } /> );
++			act( () => {
++				render( <UnitControl unit="em" units={ false } />, container );
++			} );
+ 			const input = getInput();
+ 			const select = getSelect();
+ 
+@@ -54,39 +72,61 @@ describe( 'UnitControl', () => {
+ 
+ 	describe( 'Value', () => {
+ 		it( 'should update value on change', () => {
+-			let state = '50px';
+-			const setState = jest.fn( ( value ) => ( state = value ) );
++			let state = 50;
++			const setState = ( nextState ) => ( state = nextState );
+ 
+-			render( <UnitControl value={ state } onChange={ setState } /> );
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: 62 } } );
+ 
+-			expect( setState ).toHaveBeenCalledTimes( 1 );
++			act( () => {
++				Simulate.change( input, { target: { value: 62 } } );
++			} );
++
+ 			expect( state ).toBe( '62px' );
+ 		} );
+ 
+ 		it( 'should increment value on UP press', () => {
+-			let state = '50px';
++			let state = 50;
+ 			const setState = ( nextState ) => ( state = nextState );
+ 
+-			render( <UnitControl value={ state } onChange={ setState } /> );
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
++
++			const input = getInput();
+ 
+-			getInput().focus();
+-			fireKeyDown( { keyCode: UP } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP } );
++			} );
+ 
+ 			expect( state ).toBe( '51px' );
+ 		} );
+ 
+ 		it( 'should increment value on UP + SHIFT press, with step', () => {
+-			let state = '50px';
++			let state = 50;
+ 			const setState = ( nextState ) => ( state = nextState );
+ 
+-			render( <UnitControl value={ state } onChange={ setState } /> );
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
+ 
+-			getInput().focus();
+-			fireKeyDown( { keyCode: UP, shiftKey: true } );
++			const input = getInput();
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: UP, shiftKey: true } );
++			} );
+ 
+ 			expect( state ).toBe( '60px' );
+ 		} );
+@@ -95,10 +135,18 @@ describe( 'UnitControl', () => {
+ 			let state = 50;
+ 			const setState = ( nextState ) => ( state = nextState );
+ 
+-			render( <UnitControl value={ state } onChange={ setState } /> );
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
++
++			const input = getInput();
+ 
+-			getInput().focus();
+-			fireKeyDown( { keyCode: DOWN } );
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN } );
++			} );
+ 
+ 			expect( state ).toBe( '49px' );
+ 		} );
+@@ -107,10 +155,18 @@ describe( 'UnitControl', () => {
+ 			let state = 50;
+ 			const setState = ( nextState ) => ( state = nextState );
+ 
+-			render( <UnitControl value={ state } onChange={ setState } /> );
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
+ 
+-			getInput().focus();
+-			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
++			const input = getInput();
++
++			act( () => {
++				Simulate.keyDown( input, { keyCode: DOWN, shiftKey: true } );
++			} );
+ 
+ 			expect( state ).toBe( '40px' );
+ 		} );
+@@ -121,11 +177,18 @@ describe( 'UnitControl', () => {
+ 			let state = 'px';
+ 			const setState = ( nextState ) => ( state = nextState );
+ 
+-			render( <UnitControl unit={ state } onUnitChange={ setState } /> );
++			act( () => {
++				render(
++					<UnitControl unit={ state } onUnitChange={ setState } />,
++					container
++				);
++			} );
+ 
+ 			const select = getSelect();
+-			select.focus();
+-			fireEvent.change( select, { target: { value: 'em' } } );
++
++			act( () => {
++				Simulate.change( select, { target: { value: 'em' } } );
++			} );
+ 
+ 			expect( state ).toBe( 'em' );
+ 		} );
+@@ -135,8 +198,9 @@ describe( 'UnitControl', () => {
+ 				{ value: 'pt', label: 'pt', default: 0 },
+ 				{ value: 'vmax', label: 'vmax', default: 10 },
+ 			];
+-
+-			render( <UnitControl units={ units } /> );
++			act( () => {
++				render( <UnitControl units={ units } />, container );
++			} );
+ 
+ 			const select = getSelect();
+ 			const options = select.querySelectorAll( 'option' );
+@@ -157,24 +221,29 @@ describe( 'UnitControl', () => {
+ 				{ value: 'pt', label: 'pt', default: 25 },
+ 				{ value: 'vmax', label: 'vmax', default: 75 },
+ 			];
+-
+-			render(
+-				<UnitControl
+-					isResetValueOnUnitChange
+-					units={ units }
+-					onChange={ setState }
+-					value={ state }
+-				/>
+-			);
++			act( () => {
++				render(
++					<UnitControl
++						isResetValueOnUnitChange
++						units={ units }
++						onChange={ setState }
++						value={ state }
++					/>,
++					container
++				);
++			} );
+ 
+ 			const select = getSelect();
+-			select.focus();
+ 
+-			fireEvent.change( select, { target: { value: 'vmax' } } );
++			act( () => {
++				Simulate.change( select, { target: { value: 'vmax' } } );
++			} );
+ 
+ 			expect( state ).toBe( '75vmax' );
+ 
+-			fireEvent.change( select, { target: { value: 'pt' } } );
++			act( () => {
++				Simulate.change( select, { target: { value: 'pt' } } );
++			} );
+ 
+ 			expect( state ).toBe( '25pt' );
+ 		} );
+@@ -187,136 +256,146 @@ describe( 'UnitControl', () => {
+ 				{ value: 'pt', label: 'pt', default: 25 },
+ 				{ value: 'vmax', label: 'vmax', default: 75 },
+ 			];
+-
+-			render(
+-				<UnitControl
+-					isResetValueOnUnitChange={ false }
+-					value={ state }
+-					units={ units }
+-					onChange={ setState }
+-				/>
+-			);
++			act( () => {
++				render(
++					<UnitControl
++						isResetValueOnUnitChange={ false }
++						value={ state }
++						units={ units }
++						onChange={ setState }
++					/>,
++					container
++				);
++			} );
+ 
+ 			const select = getSelect();
+-			select.focus();
+ 
+-			fireEvent.change( select, { target: { value: 'vmax' } } );
++			act( () => {
++				Simulate.change( select, { target: { value: 'vmax' } } );
++			} );
+ 
+ 			expect( state ).toBe( '50vmax' );
+ 
+-			fireEvent.change( select, { target: { value: 'pt' } } );
++			act( () => {
++				Simulate.change( select, { target: { value: 'pt' } } );
++			} );
+ 
+ 			expect( state ).toBe( '50pt' );
+ 		} );
+ 	} );
+-
+ 	describe( 'Unit Parser', () => {
+ 		let state = '10px';
+-		const setState = jest.fn( ( nextState ) => ( state = nextState ) );
++		const setState = ( nextState ) => ( state = nextState );
+ 
+ 		it( 'should parse unit from input', () => {
+-			render(
+-				<UnitControl
+-					value={ state }
+-					onChange={ setState }
+-					isPressEnterToChange
+-				/>
+-			);
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: '55 em' } } );
+-			fireKeyDown( { keyCode: ENTER } );
++
++			act( () => {
++				Simulate.change( input, { target: { value: '55 em' } } );
++			} );
+ 
+ 			expect( state ).toBe( '55em' );
+ 		} );
+ 
+ 		it( 'should parse PX unit from input', () => {
+-			render(
+-				<UnitControl
+-					value={ state }
+-					onChange={ setState }
+-					isPressEnterToChange
+-				/>
+-			);
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: '61   PX' } } );
+-			fireKeyDown( { keyCode: ENTER } );
++
++			act( () => {
++				Simulate.change( input, { target: { value: '61   PX' } } );
++			} );
+ 
+ 			expect( state ).toBe( '61px' );
+ 		} );
+ 
+ 		it( 'should parse EM unit from input', () => {
+-			render(
+-				<UnitControl
+-					value={ state }
+-					onChange={ setState }
+-					isPressEnterToChange
+-				/>
+-			);
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: '55 em' } } );
+-			fireKeyDown( { keyCode: ENTER } );
++
++			act( () => {
++				Simulate.change( input, { target: { value: '55 em' } } );
++			} );
+ 
+ 			expect( state ).toBe( '55em' );
+ 		} );
+ 
+ 		it( 'should parse % unit from input', () => {
+-			render(
+-				<UnitControl
+-					value={ state }
+-					onChange={ setState }
+-					isPressEnterToChange
+-				/>
+-			);
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: '-10  %' } } );
+-			fireKeyDown( { keyCode: ENTER } );
++
++			act( () => {
++				Simulate.change( input, { target: { value: '-10  %' } } );
++			} );
+ 
+ 			expect( state ).toBe( '-10%' );
+ 		} );
+ 
+ 		it( 'should parse REM unit from input', () => {
+-			render(
+-				<UnitControl
+-					value={ state }
+-					onChange={ setState }
+-					isPressEnterToChange
+-				/>
+-			);
++			act( () => {
++				render(
++					<UnitControl value={ state } onChange={ setState } />,
++					container
++				);
++			} );
+ 
+ 			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, {
+-				target: { value: '123       rEm  ' },
++
++			act( () => {
++				Simulate.change( input, {
++					target: { value: '123       rEm  ' },
++				} );
+ 			} );
+-			fireKeyDown( { keyCode: ENTER } );
+ 
+ 			expect( state ).toBe( '123rem' );
+ 		} );
+ 
+ 		it( 'should update unit after initial render and with new unit prop', () => {
+-			const { rerender } = render( <UnitControl value={ '10%' } /> );
++			const { container: testContainer, rerender } = testRender(
++				<UnitControl value={ '10%' } />
++			);
+ 
+-			const select = getSelect();
++			const select = testContainer.querySelector( 'select' );
+ 
+ 			expect( select.value ).toBe( '%' );
+ 
+-			rerender( <UnitControl value={ '20' } unit="em" /> );
++			rerender( <UnitControl value={ state } unit="em" /> );
+ 
+ 			expect( select.value ).toBe( 'em' );
+ 		} );
+ 
+ 		it( 'should fallback to default unit if parsed unit is invalid', () => {
+-			render( <UnitControl value={ '10null' } /> );
++			const { container: testContainer } = testRender(
++				<UnitControl value={ '10null' } />
++			);
++
++			const select = testContainer.querySelector( 'select' );
+ 
+-			expect( getSelect().value ).toBe( 'px' );
++			expect( select.value ).toBe( 'px' );
+ 		} );
+ 	} );
+ } );

@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2c17553b489bcb..be1d83468d29d2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ -   `InputControl`: Fix internal `Flex` wrapper usage that could add an unintended `height: 100%` ([#46213](https://github.com/WordPress/gutenberg/pull/46213)).
+ -   `Navigator`: Allow calling `goTo` and `goBack` twice in one render cycle ([#46391](https://github.com/WordPress/gutenberg/pull/46391)).
+ -   `Modal`: Fix unexpected modal closing in IME Composition ([#46453](https://github.com/WordPress/gutenberg/pull/46453)).
++-   `Toolbar`: Fix duplicate focus style on anchor link button ([#46759](https://github.com/WordPress/gutenberg/pull/46759)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/toolbar/style.scss b/packages/components/src/toolbar/style.scss
+index d24a3317328d64..53b6d8a65286b7 100644
+--- a/packages/components/src/toolbar/style.scss
++++ b/packages/components/src/toolbar/style.scss
+@@ -21,7 +21,7 @@
+ 		padding-right: $grid-unit-20;
+ 
+ 		// Don't show the focus inherited by the Button component.
+-		&:focus:enabled {
++		&:focus:not(:disabled) {
+ 			box-shadow: none;
+ 			outline: none;
+ 		}

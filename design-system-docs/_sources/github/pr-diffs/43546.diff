@@ -1,0 +1,214 @@
+diff --git a/packages/block-editor/src/components/block-popover/inbetween.js b/packages/block-editor/src/components/block-popover/inbetween.js
+index 37fb597d790b9c..f68a7532f58b83 100644
+--- a/packages/block-editor/src/components/block-popover/inbetween.js
++++ b/packages/block-editor/src/components/block-popover/inbetween.js
+@@ -186,7 +186,8 @@ function BlockPopoverInbetween( {
+ 				'block-editor-block-popover__inbetween',
+ 				props.className
+ 			) }
+-			__unstableForcePosition
++			resize={ false }
++			flip={ false }
+ 		>
+ 			<div style={ style }>{ children }</div>
+ 		</Popover>
+diff --git a/packages/block-editor/src/components/block-popover/index.js b/packages/block-editor/src/components/block-popover/index.js
+index 15be18b0a8c82e..06b878e618be17 100644
+--- a/packages/block-editor/src/components/block-popover/index.js
++++ b/packages/block-editor/src/components/block-popover/index.js
+@@ -66,7 +66,8 @@ function BlockPopover(
+ 			// Render in the old slot if needed for backward compatibility,
+ 			// otherwise render in place (not in the default popover slot).
+ 			__unstableSlotName={ __unstablePopoverSlot || null }
+-			__unstableForcePosition
++			resize={ false }
++			flip={ false }
+ 			__unstableShift
+ 			{ ...props }
+ 			className={ classnames(
+diff --git a/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js b/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
+index 3d42e994f5943f..fdbf5831ae98a1 100644
+--- a/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
++++ b/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
+@@ -14,14 +14,19 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
+ // By default the toolbar sets the `shift` prop. If the user scrolls the page
+ // down the toolbar will stay on screen by adopting a sticky position at the
+ // top of the viewport.
+-const DEFAULT_PROPS = { __unstableForcePosition: true, __unstableShift: true };
++const DEFAULT_PROPS = {
++	resize: false,
++	flip: false,
++	__unstableShift: true,
++};
+ 
+ // When there isn't enough height between the top of the block and the editor
+ // canvas, the `shift` prop is set to `false`, as it will cause the block to be
+-// obscured. The `flip` behavior is enabled (by setting `forcePosition` to
+-// `false`), which positions the toolbar below the block.
++// obscured. The `flip` behavior is enabled, which positions the toolbar below
++// the block.
+ const RESTRICTED_HEIGHT_PROPS = {
+-	__unstableForcePosition: false,
++	resize: false,
++	flip: true,
+ 	__unstableShift: false,
+ };
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ca4cc66bc63f5b..5459fa35d806a2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -43,6 +43,7 @@
+ -   `FormTokenField`: Refactor away from `_.difference()` ([#43224](https://github.com/WordPress/gutenberg/pull/43224/)).
+ -   `Autocomplete`: use `KeyboardEvent.code` instead of `KeyboardEvent.keyCode` ([#43432](https://github.com/WordPress/gutenberg/pull/43432/)).
+ -   `ConfirmDialog`: replace (almost) every usage of `fireEvent` with `@testing-library/user-event`  ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
++-   `Popover`: Introduce new `flip` and `resize` props ([#43546](https://github.com/WordPress/gutenberg/pull/43546/)).
+ 
+ ### Internal
+ 
+@@ -83,6 +84,7 @@
+ ### Experimental
+ 
+ -   `FormTokenField`: add `__experimentalAutoSelectFirstMatch` prop to auto select the first matching suggestion on typing ([#42527](https://github.com/WordPress/gutenberg/pull/42527/)).
++-   `Popover`: Deprecate `__unstableForcePosition`, now replaced by new `flip` and `resize` props ([#43546](https://github.com/WordPress/gutenberg/pull/43546/)).
+ 
+ ## 19.17.0 (2022-08-10)
+ 
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index 3031798a5af9cb..6dfd1f6bdd7243 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -71,6 +71,26 @@ Each of these base placements has an alignment in the form -start and -end. For
+ -   Required: No
+ -   Default: `"bottom-start"`
+ 
++### flip
++
++Specifies whether the `Popover` should flip across its axis if there isn't space for it in the normal placement.
++
++When the using a 'top' placement, the `Popover` will switch to a 'bottom' placement. When using a 'left' placement, the popover will switch to a 'right' placement.
++
++The `Popover` will retain its alignment of 'start' or 'end' when flipping.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `true`
++
++### resize
++
++Adjusts the height of the `Popover` to prevent overflow.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `true`
++
+ ### offset
+ 
+ The distance (in pixels) between the anchor and popover.
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 67e7c0abc89e90..269c15d946df3a 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -5,7 +5,7 @@
+ import classnames from 'classnames';
+ import {
+ 	useFloating,
+-	flip,
++	flip as flipMiddleware,
+ 	shift,
+ 	autoUpdate,
+ 	arrow,
+@@ -143,8 +143,10 @@ const Popover = (
+ 		expandOnMobile,
+ 		onFocusOutside,
+ 		__unstableSlotName = SLOT_NAME,
+-		__unstableForcePosition = false,
++		flip = true,
++		resize = true,
+ 		__unstableShift = false,
++		__unstableForcePosition,
+ 		...contentProps
+ 	},
+ 	forwardedRef
+@@ -156,6 +158,19 @@ const Popover = (
+ 		} );
+ 	}
+ 
++	if ( __unstableForcePosition !== undefined ) {
++		deprecated( '__unstableForcePosition prop in Popover component', {
++			since: '6.1',
++			version: '6.3',
++			alternative: '`flip={ false }` and  `resize={ false }`',
++		} );
++
++		// Back-compat, set the `flip` and `resize` props
++		// to `false` to replicate `__unstableForcePosition`.
++		flip = ! __unstableForcePosition;
++		resize = ! __unstableForcePosition;
++	}
++
+ 	const arrowRef = useRef( null );
+ 	const anchorRefFallback = useRef( null );
+ 
+@@ -232,10 +247,9 @@ const Popover = (
+ 				crossAxis: frameOffsetRef.current[ crossAxis ],
+ 			};
+ 		} ),
+-		__unstableForcePosition ? undefined : flip(),
+-		__unstableForcePosition
+-			? undefined
+-			: size( {
++		flip ? flipMiddleware() : undefined,
++		resize
++			? size( {
+ 					apply( sizeProps ) {
+ 						const { availableHeight } = sizeProps;
+ 						if ( ! refs.floating.current ) return;
+@@ -245,7 +259,8 @@ const Popover = (
+ 							overflow: 'auto',
+ 						} );
+ 					},
+-			  } ),
++			  } )
++			: undefined,
+ 		__unstableShift
+ 			? shift( {
+ 					crossAxis: true,
+diff --git a/packages/components/src/popover/stories/index.js b/packages/components/src/popover/stories/index.js
+index cc9b3a8e85ed49..ee2991105b130b 100644
+--- a/packages/components/src/popover/stories/index.js
++++ b/packages/components/src/popover/stories/index.js
+@@ -73,7 +73,8 @@ export default {
+ 			options: AVAILABLE_POSITIONS,
+ 		},
+ 		__unstableSlotName: { control: { type: null } },
+-		__unstableForcePosition: { control: { type: 'boolean' } },
++		resize: { control: { type: 'boolean' } },
++		flip: { control: { type: 'boolean' } },
+ 		__unstableShift: { control: { type: 'boolean' } },
+ 	},
+ };
+@@ -180,7 +181,8 @@ AllPlacements.args = {
+ 	),
+ 	noArrow: false,
+ 	offset: 10,
+-	__unstableForcePosition: true,
++	resize: false,
++	flip: false,
+ };
+ 
+ export const DynamicHeight = ( { children, ...args } ) => {
+diff --git a/packages/widgets/src/blocks/legacy-widget/edit/form.js b/packages/widgets/src/blocks/legacy-widget/edit/form.js
+index dd0fcb57baebcd..0498587f2a3ccb 100644
+--- a/packages/widgets/src/blocks/legacy-widget/edit/form.js
++++ b/packages/widgets/src/blocks/legacy-widget/edit/form.js
+@@ -105,7 +105,8 @@ export default function Form( {
+ 					focusOnMount={ false }
+ 					placement="right"
+ 					offset={ 32 }
+-					__unstableForcePosition
++					resize={ false }
++					flip={ false }
+ 					__unstableShift
+ 				>
+ 					<div

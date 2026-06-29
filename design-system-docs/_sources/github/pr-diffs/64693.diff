@@ -1,0 +1,560 @@
+diff --git a/packages/block-editor/src/components/block-list/content.scss b/packages/block-editor/src/components/block-list/content.scss
+index fb7687e69ffbe4..15f0239d0f0765 100644
+--- a/packages/block-editor/src/components/block-list/content.scss
++++ b/packages/block-editor/src/components/block-list/content.scss
+@@ -421,7 +421,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
+ 	width: 100%;
+ 	border: none;
+ 	outline: none;
+-	border-radius: 2px;
++	border-radius: $radius-small;
+ 	box-shadow: inset 0 0 0 $border-width $gray-900;
+ 	resize: none;
+ 	overflow: hidden;
+diff --git a/packages/block-editor/src/components/block-popover/style.scss b/packages/block-editor/src/components/block-popover/style.scss
+index e393e77c63b056..c49538378a12ca 100644
+--- a/packages/block-editor/src/components/block-popover/style.scss
++++ b/packages/block-editor/src/components/block-popover/style.scss
+@@ -57,6 +57,6 @@
+ 		position: absolute;
+ 		inset: 0;
+ 		background-color: var(--wp-admin-theme-color);
+-		border-radius: 2px;
++		border-radius: $radius-small;
+ 	}
+ }
+diff --git a/packages/block-editor/src/components/block-tools/style.scss b/packages/block-editor/src/components/block-tools/style.scss
+index 000be3d239e8d9..a37271e609b179 100644
+--- a/packages/block-editor/src/components/block-tools/style.scss
++++ b/packages/block-editor/src/components/block-tools/style.scss
+@@ -13,7 +13,7 @@
+ .block-editor-block-list__insertion-point-indicator {
+ 	position: absolute;
+ 	background: var(--wp-admin-theme-color);
+-	border-radius: 2px;
++	border-radius: $radius-small;
+ 	transform-origin: center;
+ 	opacity: 0;
+ 	will-change: transform, opacity;
+diff --git a/packages/block-editor/src/components/global-styles/style.scss b/packages/block-editor/src/components/global-styles/style.scss
+index e979ed77f53da2..6fb07eb090a55f 100644
+--- a/packages/block-editor/src/components/global-styles/style.scss
++++ b/packages/block-editor/src/components/global-styles/style.scss
+@@ -74,7 +74,7 @@
+ 
+ .block-editor-global-styles-background-panel__inspector-media-replace-container {
+ 	border: $border-width solid $gray-300;
+-	border-radius: 2px;
++	border-radius: $radius-small;
+ 	// Full width. ToolsPanel lays out children in a grid.
+ 	grid-column: 1 / -1;
+ 
+@@ -102,7 +102,6 @@
+ 
+ .block-editor-global-styles-background-panel__image-tools-panel-item {
+ 	border: $border-width solid $gray-300;
+-	border-radius: 2px;
+ 
+ 	// Full width. ToolsPanel lays out children in a grid.
+ 	grid-column: 1 / -1;
+diff --git a/packages/block-editor/src/components/inserter/style.scss b/packages/block-editor/src/components/inserter/style.scss
+index a567ce1cee07e5..21f8abfa59c9e8 100644
+--- a/packages/block-editor/src/components/inserter/style.scss
++++ b/packages/block-editor/src/components/inserter/style.scss
+@@ -285,7 +285,7 @@ $block-inserter-tabs-height: 44px;
+ 
+ 		&:focus-visible,
+ 		&:focus:not(:disabled) {
+-			border-radius: 2px;
++			border-radius: $radius-small;
+ 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+ 			// Windows high contrast mode.
+ 			outline: 2px solid transparent;
+@@ -604,7 +604,7 @@ $block-inserter-tabs-height: 44px;
+ 		display: flex;
+ 		align-items: center;
+ 		overflow: hidden;
+-		border-radius: 2px;
++		border-radius: $radius-small;
+ 
+ 		> * {
+ 			margin: 0 auto;
+diff --git a/packages/block-editor/src/components/list-view/style.scss b/packages/block-editor/src/components/list-view/style.scss
+index 2dce32d535d881..406053af89317c 100644
+--- a/packages/block-editor/src/components/list-view/style.scss
++++ b/packages/block-editor/src/components/list-view/style.scss
+@@ -553,7 +553,6 @@ svg {
+ 	background-color: #1e1e1e;
+ 	color: #fff;
+ 	margin: $grid-unit-10 0 0 24px;
+-	border-radius: 2px;
+ 	height: 24px;
+ 	min-width: 24px;
+ 	padding: 0;
+diff --git a/packages/block-editor/src/components/rich-text/content.scss b/packages/block-editor/src/components/rich-text/content.scss
+index 6f6d88c777ea74..6f118479fc6b03 100644
+--- a/packages/block-editor/src/components/rich-text/content.scss
++++ b/packages/block-editor/src/components/rich-text/content.scss
+@@ -15,7 +15,7 @@
+ 		outline: none;
+ 
+ 		[data-rich-text-format-boundary] {
+-			border-radius: 2px;
++			border-radius: $radius-small;
+ 		}
+ 	}
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2fe344090bcdfc..542d2b8334ed67 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,17 @@
+ 
+ ### Enhancements
+ 
++-   `ColorPicker`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
++-   `CustomSelectControl V2`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
++-   `DateTime`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
++-   `FormToggle`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
++-   `FormTokenField`: Remove unused border-radius ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
++-   `InputControl`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
++-   `Navigation`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
++-   `RangeControl`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
++-   `ResizeableBox`: Adopt radius scale ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
++-   `TabPanel`: Remove radius applied to panel focus style ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
++-   `Tabs`: Remove radius applied to panel focus style ([#64693](https://github.com/WordPress/gutenberg/pull/64693)).
+ -   `UnitControl`: Update unit select styles ([#64712](https://github.com/WordPress/gutenberg/pull/64712)).
+ -   Decrease horizontal padding from 16px to 12px on the following components, when in the 40px default size ([#64708](https://github.com/WordPress/gutenberg/pull/64708)).
+     -   `AnglePickerControl`
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index ecc75f5157625b..a78f10de2e4a32 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -81,7 +81,7 @@ export const ColorfulWrapper = styled.div`
+ 	.react-colorful__alpha {
+ 		width: 184px;
+ 		height: 16px;
+-		border-radius: 16px;
++		border-radius: ${ CONFIG.radiusFull };
+ 		margin-bottom: ${ space( 2 ) };
+ 	}
+ 
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index a0b616d6ca1d72..fea18f340951e5 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -48,7 +48,7 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ 		height: inherit;
+ 		width: inherit;
+ 		min-width: $grid-unit-20;
+-		border-radius: 50%;
++		border-radius: $radius-round;
+ 
+ 		background: $white;
+ 		padding: 2px;
+@@ -65,7 +65,7 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ 		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
+ 		height: inherit;
+ 		width: inherit;
+-		border-radius: 50%;
++		border-radius: $radius-round;
+ 		padding: 0;
+ 
+ 		// Shadow and stroke.
+@@ -100,25 +100,6 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ 	height: 20px;
+ }
+ 
+-.components-custom-gradient-picker .components-custom-gradient-picker__toolbar {
+-	border: none;
+-
+-	// Work-around to target the inner button containers rendered by <ToolbarGroup />
+-	> div + div {
+-		margin-left: 1px;
+-	}
+-
+-	button {
+-		&.is-pressed {
+-			> svg {
+-				background: $white;
+-				border: $border-width solid $gray-600;
+-				border-radius: 2px;
+-			}
+-		}
+-	}
+-}
+-
+ .components-custom-gradient-picker__ui-line {
+ 	position: relative;
+ 	z-index: 0;
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index add1a29e1602d6..c82d6eba2e1a76 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -118,7 +118,7 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
+ 	flex-direction: column;
+ 
+ 	background-color: ${ COLORS.theme.background };
+-	border-radius: 2px;
++	border-radius: ${ CONFIG.radiusSmall };
+ 	border: 1px solid ${ COLORS.theme.foreground };
+ 
+ 	/* z-index(".components-popover") */
+diff --git a/packages/components/src/date-time/date/styles.ts b/packages/components/src/date-time/date/styles.ts
+index c25cdca367910a..8f208b53fac22a 100644
+--- a/packages/components/src/date-time/date/styles.ts
++++ b/packages/components/src/date-time/date/styles.ts
+@@ -83,7 +83,7 @@ export const DayButton = styled( Button, {
+ 		` }
+ 
+ 	&&& {
+-		border-radius: 100%;
++		border-radius: ${ CONFIG.radiusRound };
+ 		height: ${ space( 7 ) };
+ 		width: ${ space( 7 ) };
+ 
+@@ -107,7 +107,6 @@ export const DayButton = styled( Button, {
+ 		`
+ 		::before {
+ 			background: ${ props.isSelected ? COLORS.white : COLORS.theme.accent };
+-			border-radius: 2px;
+ 			bottom: 2px;
+ 			content: " ";
+ 			height: 4px;
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-style.ts b/packages/components/src/focal-point-picker/styles/focal-point-style.ts
+index 6f95978256f72e..ad1e8eeb286779 100644
+--- a/packages/components/src/focal-point-picker/styles/focal-point-style.ts
++++ b/packages/components/src/focal-point-picker/styles/focal-point-style.ts
+@@ -3,6 +3,11 @@
+  */
+ import styled from '@emotion/styled';
+ 
++/**
++ * Internal dependencies
++ */
++import { CONFIG } from '../../utils';
++
+ export const PointerCircle = styled.div`
+ 	background-color: transparent;
+ 	cursor: grab;
+@@ -15,7 +20,7 @@ export const PointerCircle = styled.div`
+ 	z-index: 10000;
+ 	background: rgba( 255, 255, 255, 0.4 );
+ 	border: 1px solid rgba( 255, 255, 255, 0.4 );
+-	border-radius: 50%;
++	border-radius: ${ CONFIG.radiusRound };
+ 	backdrop-filter: blur( 16px ) saturate( 180% );
+ 	box-shadow: rgb( 0 0 0 / 10% ) 0px 0px 8px;
+ 
+diff --git a/packages/components/src/form-toggle/style.scss b/packages/components/src/form-toggle/style.scss
+index 6fd25590b56e41..dd7888403b34d4 100644
+--- a/packages/components/src/form-toggle/style.scss
++++ b/packages/components/src/form-toggle/style.scss
+@@ -54,7 +54,7 @@ $transition-duration: 0.2s;
+ 		left: math.div($toggle-thumb-size, 6);
+ 		width: $toggle-thumb-size;
+ 		height: $toggle-thumb-size;
+-		border-radius: 50%;
++		border-radius: $radius-round;
+ 		transition:
+ 			$transition-duration transform ease,
+ 			$transition-duration background-color ease-out;
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index 57435a3f62ad26..cf5cc5b63e2227 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -102,7 +102,6 @@
+ 		&.is-error {
+ 			.components-form-token-field__token-text {
+ 				color: $alert-red;
+-				border-radius: 4px 0 0 4px;
+ 				padding: 0 4px 0 6px;
+ 			}
+ 		}
+@@ -133,7 +132,7 @@
+ }
+ 
+ .components-form-token-field__token-text {
+-	border-radius: 2px 0 0 2px;
++	border-radius: $radius-x-small 0 0 $radius-x-small;
+ 	padding: 0 0 0 8px;
+ 	white-space: nowrap;
+ 	overflow: hidden;
+@@ -142,7 +141,7 @@
+ 
+ .components-form-token-field__remove-token.components-button {
+ 	cursor: pointer;
+-	border-radius: 0 2px 2px 0;
++	border-radius: 0 $radius-x-small $radius-x-small 0;
+ 	padding: 0 2px;
+ 	color: $gray-900;
+ 	line-height: 10px;
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 7a2040af9bdff9..c2be294424f50a 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -77,7 +77,7 @@ export const BackdropUI = styled.div< BackdropProps >`
+ export const Root = styled( Flex )`
+ 	box-sizing: border-box;
+ 	position: relative;
+-	border-radius: 2px;
++	border-radius: ${ CONFIG.radiusSmall };
+ 	padding-top: 0;
+ 
+ 	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
+diff --git a/packages/components/src/navigation/styles/navigation-styles.tsx b/packages/components/src/navigation/styles/navigation-styles.tsx
+index 299a9b89bec709..580c0eef4dba8f 100644
+--- a/packages/components/src/navigation/styles/navigation-styles.tsx
++++ b/packages/components/src/navigation/styles/navigation-styles.tsx
+@@ -15,7 +15,7 @@ import { COLORS } from '../../utils/colors-values';
+ import Button from '../../button';
+ import { Text } from '../../text';
+ import { Heading } from '../../heading';
+-import { rtl } from '../../utils';
++import { rtl, CONFIG } from '../../utils';
+ import { space } from '../../utils/space';
+ 
+ export const NavigationUI = styled.div`
+@@ -111,7 +111,7 @@ export const GroupTitleUI = styled( Heading )`
+ `;
+ 
+ export const ItemBaseUI = styled.li`
+-	border-radius: 2px;
++	border-radius: ${ CONFIG.radiusSmall };
+ 	color: inherit;
+ 	margin-bottom: 0;
+ 
+@@ -172,7 +172,7 @@ export const ItemBadgeUI = styled.span`
+ 	margin-right: ${ () => ( isRTL() ? space( 2 ) : '0' ) };
+ 	display: inline-flex;
+ 	padding: ${ space( 1 ) } ${ space( 3 ) };
+-	border-radius: 2px;
++	border-radius: ${ CONFIG.radiusSmall };
+ 
+ 	@keyframes fade-in {
+ 		from {
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index ec1572d2679247..e2b651bd317da5 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import NumberControl from '../../number-control';
+-import { COLORS, rtl } from '../../utils';
++import { COLORS, rtl, CONFIG } from '../../utils';
+ import { space } from '../../utils/space';
+ 
+ import type {
+@@ -102,7 +102,7 @@ export const Rail = styled.span`
+ 	position: absolute;
+ 	margin-top: ${ ( rangeHeightValue - railHeight ) / 2 }px;
+ 	top: 0;
+-	border-radius: ${ railHeight }px;
++	border-radius: ${ CONFIG.radiusFull };
+ 
+ 	${ railBackgroundColor };
+ `;
+@@ -119,7 +119,7 @@ const trackBackgroundColor = ( { disabled, trackColor }: TrackProps ) => {
+ 
+ export const Track = styled.span`
+ 	background-color: currentColor;
+-	border-radius: ${ railHeight }px;
++	border-radius: ${ CONFIG.radiusFull };
+ 	height: ${ railHeight }px;
+ 	pointer-events: none;
+ 	display: block;
+@@ -203,7 +203,7 @@ export const ThumbWrapper = styled.span`
+ 	top: 0;
+ 	user-select: none;
+ 	width: ${ thumbSize }px;
+-	border-radius: 50%;
++	border-radius: ${ CONFIG.radiusRound };
+ 
+ 	${ thumbColor };
+ 	${ rtl( { marginLeft: -10 } ) };
+@@ -221,7 +221,7 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
+ 					position: absolute;
+ 					background-color: ${ COLORS.theme.accent };
+ 					opacity: 0.4;
+-					border-radius: 50%;
++					border-radius: ${ CONFIG.radiusRound };
+ 					height: ${ thumbSize + 8 }px;
+ 					width: ${ thumbSize + 8 }px;
+ 					top: -4px;
+@@ -233,7 +233,7 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
+ 
+ export const Thumb = styled.span< ThumbProps >`
+ 	align-items: center;
+-	border-radius: 50%;
++	border-radius: ${ CONFIG.radiusRound };
+ 	height: 100%;
+ 	outline: 0;
+ 	position: absolute;
+@@ -281,7 +281,7 @@ const tooltipPosition = ( { position }: TooltipProps ) => {
+ 
+ export const Tooltip = styled.span< TooltipProps >`
+ 	background: rgba( 0, 0, 0, 0.8 );
+-	border-radius: 2px;
++	border-radius: ${ CONFIG.radiusSmall };
+ 	color: white;
+ 	display: inline-block;
+ 	font-size: 12px;
+diff --git a/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts
+index acd015687f81b8..1cfc2f381f2c11 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts
++++ b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts
+@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import { Text } from '../../../text';
+-import { font, COLORS } from '../../../utils';
++import { font, COLORS, CONFIG } from '../../../utils';
+ 
+ export const Root = styled.div`
+ 	bottom: 0;
+@@ -31,7 +31,7 @@ export const TooltipWrapper = styled.div`
+ 
+ export const Tooltip = styled.div`
+ 	background: ${ COLORS.theme.foreground };
+-	border-radius: 2px;
++	border-radius: ${ CONFIG.radiusSmall };
+ 	box-sizing: border-box;
+ 	font-family: ${ font( 'default.fontFamily' ) };
+ 	font-size: 12px;
+diff --git a/packages/components/src/resizable-box/style.scss b/packages/components/src/resizable-box/style.scss
+index eed13578b3f0c4..2e709a5bbb382d 100644
+--- a/packages/components/src/resizable-box/style.scss
++++ b/packages/components/src/resizable-box/style.scss
+@@ -28,7 +28,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
+ 	content: "";
+ 	width: $resize-handler-size;
+ 	height: $resize-handler-size;
+-	border-radius: 50%;
++	border-radius: $radius-round;
+ 	background: $white;
+ 	cursor: inherit;
+ 	position: absolute;
+@@ -43,7 +43,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
+ // This is the "visible" resize handle for side handles - the line
+ .components-resizable-box__side-handle::before {
+ 	display: block;
+-	border-radius: 2px;
++	border-radius: $radius-full;
+ 	content: "";
+ 	width: 3px;
+ 	height: 3px;
+diff --git a/packages/components/src/tab-panel/style.scss b/packages/components/src/tab-panel/style.scss
+index ab73a7affaeed4..229b32c7477e87 100644
+--- a/packages/components/src/tab-panel/style.scss
++++ b/packages/components/src/tab-panel/style.scss
+@@ -89,7 +89,6 @@
+ 	}
+ 
+ 	&:focus-visible {
+-		border-radius: 2px;
+ 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 
+ 		// Windows high contrast mode.
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index ddad0f7b2d767d..fcdb43512d82f9 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -7,7 +7,7 @@ import * as Ariakit from '@ariakit/react';
+ /**
+  * Internal dependencies
+  */
+-import { COLORS } from '../utils';
++import { COLORS, CONFIG } from '../utils';
+ import { space } from '../utils/space';
+ 
+ export const TabListWrapper = styled.div`
+@@ -107,7 +107,7 @@ export const Tab = styled( Ariakit.Tab )`
+ 			// Outline works for Windows high contrast mode as well.
+ 			outline: var( --wp-admin-border-width-focus ) solid
+ 				${ COLORS.theme.accent };
+-			border-radius: 2px;
++			border-radius: ${ CONFIG.radiusSmall };
+ 
+ 			// Animation
+ 			opacity: 0;
+@@ -136,7 +136,6 @@ export const TabPanel = styled( Ariakit.TabPanel )`
+ 	}
+ 
+ 	&:focus-visible {
+-		border-radius: 2px;
+ 		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+ 			${ COLORS.theme.accent };
+ 		// Windows high contrast mode.
+diff --git a/packages/customize-widgets/src/components/header/style.scss b/packages/customize-widgets/src/components/header/style.scss
+index 27460a82e0ad10..5c3f37a0bf0d42 100644
+--- a/packages/customize-widgets/src/components/header/style.scss
++++ b/packages/customize-widgets/src/components/header/style.scss
+@@ -30,7 +30,7 @@
+ 	align-items: center;
+ 
+ 	.customize-widgets-header-toolbar__inserter-toggle.components-button.has-icon {
+-		border-radius: 2px;
++		border-radius: $radius-small;
+ 		color: $white;
+ 		padding: 0;
+ 		min-width: $grid-unit-30;
+diff --git a/packages/edit-site/src/components/layout/style.scss b/packages/edit-site/src/components/layout/style.scss
+index e4c95fed8b88b7..64fb1914af3dd3 100644
+--- a/packages/edit-site/src/components/layout/style.scss
++++ b/packages/edit-site/src/components/layout/style.scss
+@@ -259,25 +259,3 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
+ 	padding-left: 16px;
+ 	padding-right: 16px;
+ }
+-
+-.edit-site-layout.is-full-canvas {
+-	.edit-site-layout__view-mode-toggle.components-button {
+-		&:focus-visible,
+-		&:focus {
+-
+-			box-shadow: none;
+-			outline: none;
+-			outline-offset: 0;
+-
+-			.edit-site-site-icon svg {
+-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #3858e9);
+-				outline: 3px solid #0000;
+-				height: 40px;
+-				width: 40px;
+-				padding: 2px;
+-				border-radius: 2px;
+-			}
+-
+-		}
+-	}
+-}
+diff --git a/packages/edit-site/src/components/page-patterns/style.scss b/packages/edit-site/src/components/page-patterns/style.scss
+index ffcefd1924a535..34b258e3a92041 100644
+--- a/packages/edit-site/src/components/page-patterns/style.scss
++++ b/packages/edit-site/src/components/page-patterns/style.scss
+@@ -11,11 +11,6 @@
+ 	.dataviews-view-table & {
+ 		width: 96px;
+ 		flex-grow: 0;
+-		border-radius: 2px;
+-
+-		.page-patterns-preview-field__button {
+-			border-radius: 2px;
+-		}
+ 	}
+ 
+ 	.page-patterns-preview-field__button {
+diff --git a/packages/editor/src/components/create-template-part-modal/style.scss b/packages/editor/src/components/create-template-part-modal/style.scss
+index 85df0270e3a5a5..be15e8d76d536e 100644
+--- a/packages/editor/src/components/create-template-part-modal/style.scss
++++ b/packages/editor/src/components/create-template-part-modal/style.scss
+@@ -5,7 +5,7 @@
+ .editor-create-template-part-modal__area-radio-group {
+ 	width: 100%;
+ 	border: $border-width solid $gray-700;
+-	border-radius: 2px;
++	border-radius: $radius-small;
+ 
+ 	.components-button.editor-create-template-part-modal__area-radio {
+ 		display: block;

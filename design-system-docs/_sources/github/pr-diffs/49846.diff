@@ -1,0 +1,180 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 59160a89f036c6..d473c14e6a6c06 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,9 @@
+ 
+ -   `onDragStart` in `<Draggable>` is now a synchronous function to allow setting additional data for `event.dataTransfer` ([#49673](https://github.com/WordPress/gutenberg/pull/49673)).
+ 
++### Bug Fix
++
++-   `NavigableContainer`: do not trap focus in `TabbableContainer` ([#49846](https://github.com/WordPress/gutenberg/pull/49846)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/navigable-container/container.tsx b/packages/components/src/navigable-container/container.tsx
+index f52754e06d61ab..c5f92f8effcade 100644
+--- a/packages/components/src/navigable-container/container.tsx
++++ b/packages/components/src/navigable-container/container.tsx
+@@ -122,11 +122,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
+ 			const targetHasMenuItemRole =
+ 				!! targetRole && MENU_ITEM_ROLES.includes( targetRole );
+ 
+-			// `preventDefault()` on tab to avoid having the browser move the focus
+-			// after this component has already moved it.
+-			const isTab = event.code === 'Tab';
+-
+-			if ( targetHasMenuItemRole || isTab ) {
++			if ( targetHasMenuItemRole ) {
+ 				event.preventDefault();
+ 			}
+ 		}
+@@ -150,9 +146,16 @@ class NavigableContainer extends Component< NavigableContainerProps > {
+ 		const nextIndex = cycle
+ 			? cycleValue( index, focusables.length, offset )
+ 			: index + offset;
++
+ 		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
+ 			focusables[ nextIndex ].focus();
+ 			onNavigate( nextIndex, focusables[ nextIndex ] );
++
++			// `preventDefault()` on tab to avoid having the browser move the focus
++			// after this component has already moved it.
++			if ( event.code === 'Tab' ) {
++				event.preventDefault();
++			}
+ 		}
+ 	}
+ 
+diff --git a/packages/components/src/navigable-container/test/tababble-container.tsx b/packages/components/src/navigable-container/test/tababble-container.tsx
+index 88fc10bd98560f..eb14842025bec2 100644
+--- a/packages/components/src/navigable-container/test/tababble-container.tsx
++++ b/packages/components/src/navigable-container/test/tababble-container.tsx
+@@ -11,18 +11,22 @@ import { TabbableContainer } from '../tabbable';
+ import type { TabbableContainerProps } from '../types';
+ 
+ const TabbableContainerTestCase = ( props: TabbableContainerProps ) => (
+-	<TabbableContainer { ...props }>
+-		<button>Item 1</button>
+-		<span>
+-			<span tabIndex={ -1 }>Item 2 (not tabbable)</span>
+-		</span>
+-		<span>
+-			<span tabIndex={ 0 }>Item 3</span>
+-		</span>
+-		<p>I can not be tabbed</p>
+-		<input type="text" disabled name="disabled-input" />
+-		<a href="https://example.com">Item 4</a>
+-	</TabbableContainer>
++	<>
++		<button>Before container</button>
++		<TabbableContainer { ...props }>
++			<button>Item 1</button>
++			<span>
++				<span tabIndex={ -1 }>Item 2 (not tabbable)</span>
++			</span>
++			<span>
++				<span tabIndex={ 0 }>Item 3</span>
++			</span>
++			<p>I can not be tabbed</p>
++			<input type="text" disabled name="disabled-input" />
++			<a href="https://example.com">Item 4</a>
++		</TabbableContainer>
++		<button>After container</button>
++	</>
+ );
+ 
+ const getTabbableContainerTabbables = () => [
+@@ -57,7 +61,11 @@ describe( 'TabbableContainer', () => {
+ 
+ 		const tabbables = getTabbableContainerTabbables();
+ 
+-		// Move focus to first item.
++		await user.tab();
++		expect(
++			screen.getByRole( 'button', { name: 'Before container' } )
++		).toHaveFocus();
++
+ 		await user.tab();
+ 		expect( tabbables[ 0 ] ).toHaveFocus();
+ 
+@@ -91,7 +99,11 @@ describe( 'TabbableContainer', () => {
+ 		const lastTabbableIndex = tabbables.length - 1;
+ 		const lastTabbable = tabbables[ lastTabbableIndex ];
+ 
+-		// Move focus to first item.
++		await user.tab();
++		expect(
++			screen.getByRole( 'button', { name: 'Before container' } )
++		).toHaveFocus();
++
+ 		await user.tab();
+ 		expect( firstTabbable ).toHaveFocus();
+ 
+@@ -116,12 +128,17 @@ describe( 'TabbableContainer', () => {
+ 			/>
+ 		);
+ 
+-		// With the `cycle` prop set to `false`, cycling is not allowed.
+ 		// By default, cycling from first to last and from last to first is allowed.
++		// With the `cycle` prop set to `false`, cycling is not allowed.
++		// Therefore, focus will escape the `TabbableContainer` and continue its
++		// natural path in the page.
+ 		await user.tab( { shift: true } );
+-		expect( firstTabbable ).toHaveFocus();
++		expect(
++			screen.getByRole( 'button', { name: 'Before container' } )
++		).toHaveFocus();
+ 		expect( onNavigateSpy ).toHaveBeenCalledTimes( 2 );
+ 
++		await user.tab();
+ 		await user.tab();
+ 		await user.tab();
+ 		expect( lastTabbable ).toHaveFocus();
+@@ -131,8 +148,12 @@ describe( 'TabbableContainer', () => {
+ 			lastTabbable
+ 		);
+ 
++		// Focus will move to the next natively focusable elements after
++		// `TabbableContainer`
+ 		await user.tab();
+-		expect( lastTabbable ).toHaveFocus();
++		expect(
++			screen.getByRole( 'button', { name: 'After container' } )
++		).toHaveFocus();
+ 		expect( onNavigateSpy ).toHaveBeenCalledTimes( 4 );
+ 	} );
+ 
+@@ -151,21 +172,27 @@ describe( 'TabbableContainer', () => {
+ 
+ 		const tabbables = getTabbableContainerTabbables();
+ 
+-		// Move focus to first item
++		await user.tab();
++		expect(
++			screen.getByRole( 'button', { name: 'Before container' } )
++		).toHaveFocus();
++		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 0 );
++
+ 		await user.tab();
+ 		expect( tabbables[ 0 ] ).toHaveFocus();
++		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 1 );
+ 
+ 		await user.keyboard( '[Space]' );
+-		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 1 );
++		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 2 );
+ 
+ 		await user.tab();
+-		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 1 );
++		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 2 );
+ 		await user.tab( { shift: true } );
+ 		// This extra call is caused by the "shift" key being pressed
+ 		// on its own before "tab"
+-		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 2 );
++		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 3 );
+ 
+ 		await user.keyboard( '[Escape]' );
+-		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 3 );
++		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 4 );
+ 	} );
+ } );

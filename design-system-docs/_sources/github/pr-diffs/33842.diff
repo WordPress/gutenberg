@@ -1,0 +1,39 @@
+diff --git a/packages/components/src/base-field/test/__snapshots__/index.js.snap b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+index a5644180ad8970..99ee459d1a2e2e 100644
+--- a/packages/components/src/base-field/test/__snapshots__/index.js.snap
++++ b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+@@ -130,7 +130,7 @@ exports[`base field should render correctly 1`] = `
+ .emotion-0:focus,
+ .emotion-0[data-focused='true'] {
+   border-color: var( --wp-admin-theme-color, #00669b);
+-  box-shadow: 0 0 0,0.5px,var( --wp-admin-theme-color, #00669b);
++  box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #00669b);
+ }
+ 
+ <div
+diff --git a/packages/components/src/segmented-control/test/__snapshots__/index.js.snap b/packages/components/src/segmented-control/test/__snapshots__/index.js.snap
+index 589da552388e3f..0e255fb885d0a0 100644
+--- a/packages/components/src/segmented-control/test/__snapshots__/index.js.snap
++++ b/packages/components/src/segmented-control/test/__snapshots__/index.js.snap
+@@ -30,7 +30,7 @@ exports[`SegmentedControl should render correctly 1`] = `
+ 
+ .emotion-0:focus-within {
+   border-color: var( --wp-admin-theme-color-darker-10, #007cba);
+-  box-shadow: 0 0 0,0.5px,var( --wp-admin-theme-color, #00669b);
++  box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #00669b);
+   outline: none;
+   z-index: 1;
+ }
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index b32c0101c933fb..c5a0758eadf003 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -18,7 +18,7 @@ const CONTROL_PROPS = {
+ 	controlBorderColor: COLORS.gray[ 700 ],
+ 	controlBoxShadow: 'transparent',
+ 	controlBorderColorHover: COLORS.gray[ 700 ],
+-	controlBoxShadowFocus: `0 0 0, 0.5px, ${ COLORS.admin.theme }`,
++	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.admin.theme }`,
+ 	controlDestructiveBorderColor: COLORS.alert.red,
+ 	controlHeight: CONTROL_HEIGHT,
+ 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,

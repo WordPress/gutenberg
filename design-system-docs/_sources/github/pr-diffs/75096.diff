@@ -1,0 +1,141 @@
+diff --git a/packages/base-styles/_mixins.scss b/packages/base-styles/_mixins.scss
+index 560f1188c1ef5a..13752b172d66c4 100644
+--- a/packages/base-styles/_mixins.scss
++++ b/packages/base-styles/_mixins.scss
+@@ -497,6 +497,15 @@
+ 	}
+ }
+ 
++// Focus style width.
++// Avoid rounding issues by showing a whole 2px for 1x screens, and 1.5px on high resolution screens.
++@mixin admin-border-width-focus() {
++	--wp-admin-border-width-focus: 2px;
++	@media ( -webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
++		--wp-admin-border-width-focus: 1.5px;
++	}
++}
++
+ @mixin admin-scheme($color-primary) {
+ 	// Define RGB equivalents for use in rgba function.
+ 	// Hexadecimal css vars do not work in the rgba function.
+@@ -508,45 +517,20 @@
+ 	--wp-admin-theme-color-darker-20: #{color.adjust($color-primary, $lightness: -10%)};
+ 	--wp-admin-theme-color-darker-20--rgb: #{functions.hex-to-rgb(color.adjust($color-primary, $lightness: -10%))};
+ 
+-	// Focus style width.
+-	// Avoid rounding issues by showing a whole 2px for 1x screens, and 1.5px on high resolution screens.
+-	--wp-admin-border-width-focus: 2px;
+-	@media ( -webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+-		--wp-admin-border-width-focus: 1.5px;
+-	}
++	@include admin-border-width-focus();
+ }
+ 
++// Using Core's CSS custom properties as the source of truth.
+ @mixin wordpress-admin-schemes() {
+-	body.admin-color-light {
+-		@include admin-scheme(#0085ba);
+-	}
+-
+-	body.admin-color-modern {
+-		@include admin-scheme(#3858e9);
+-	}
+-
+-	body.admin-color-blue {
+-		@include admin-scheme(#096484);
+-	}
+-
+-	body.admin-color-coffee {
+-		@include admin-scheme(#46403c);
+-	}
+-
+-	body.admin-color-ectoplasm {
+-		@include admin-scheme(#523f6d);
+-	}
+-
+-	body.admin-color-midnight {
+-		@include admin-scheme(#e14d43);
+-	}
+-
+-	body.admin-color-ocean {
+-		@include admin-scheme(#627c83);
+-	}
+-
+-	body.admin-color-sunrise {
+-		@include admin-scheme(#dd823b);
++	body {
++		--wp-admin-theme-color: var(--wp-admin-color-highlight);
++		--wp-admin-theme-color--rgb: var(--wp-admin-color-highlight--rgb);
++		--wp-admin-theme-color-darker-10: var(--wp-admin-color-highlight-darker-10);
++		--wp-admin-theme-color-darker-10--rgb: var(--wp-admin-color-highlight-darker-10--rgb);
++		--wp-admin-theme-color-darker-20: var(--wp-admin-color-highlight-darker-20);
++		--wp-admin-theme-color-darker-20--rgb: var(--wp-admin-color-highlight-darker-20--rgb);
++
++		@include admin-border-width-focus();
+ 	}
+ }
+ 
+diff --git a/packages/boot/src/components/user-theme-provider/index.tsx b/packages/boot/src/components/user-theme-provider/index.tsx
+index f7f04b05bfbfa2..0aa0e498d0a33c 100644
+--- a/packages/boot/src/components/user-theme-provider/index.tsx
++++ b/packages/boot/src/components/user-theme-provider/index.tsx
+@@ -7,22 +7,35 @@ import { unlock } from '../../lock-unlock';
+ const ThemeProvider: typeof ThemeProviderType =
+ 	unlock( themePrivateApis ).ThemeProvider;
+ 
+-const THEME_PRIMARY_COLORS = new Map< string, string >( [
+-	[ 'light', '#0085ba' ],
+-	[ 'modern', '#3858e9' ],
+-	[ 'blue', '#096484' ],
+-	[ 'coffee', '#46403c' ],
+-	[ 'ectoplasm', '#523f6d' ],
+-	[ 'midnight', '#e14d43' ],
+-	[ 'ocean', '#627c83' ],
+-	[ 'sunrise', '#dd823b' ],
+-] );
++/**
++ * Get a CSS custom property value from the body element.
++ *
++ * @param propertyName The CSS custom property name (e.g., '--wp-admin-color-highlight').
++ * @return The property value or undefined if not set.
++ */
++function getCSSCustomProperty( propertyName: string ): string | undefined {
++	const value = getComputedStyle( document.body )
++		.getPropertyValue( propertyName )
++		.trim();
++	return value || undefined;
++}
+ 
++/**
++ * Get the admin theme primary color from Core's CSS custom properties.
++ *
++ * @return The highlight color or undefined.
++ */
+ export function getAdminThemePrimaryColor(): string | undefined {
+-	const theme =
+-		document.body.className.match( /admin-color-([a-z]+)/ )?.[ 1 ];
++	return getCSSCustomProperty( '--wp-admin-color-highlight' );
++}
+ 
+-	return theme && THEME_PRIMARY_COLORS.get( theme );
++/**
++ * Get the admin theme background color from Core's CSS custom properties.
++ *
++ * @return The menu background color or undefined.
++ */
++export function getAdminThemeBgColor(): string | undefined {
++	return getCSSCustomProperty( '--wp-admin-color-menu-background' );
+ }
+ 
+ export function UserThemeProvider( {
+@@ -30,6 +43,9 @@ export function UserThemeProvider( {
+ 	...restProps
+ }: React.ComponentProps< typeof ThemeProvider > ) {
+ 	const primary = getAdminThemePrimaryColor();
++	const bg = getAdminThemeBgColor();
+ 
+-	return <ThemeProvider { ...restProps } color={ { primary, ...color } } />;
++	return (
++		<ThemeProvider { ...restProps } color={ { primary, bg, ...color } } />
++	);
+ }

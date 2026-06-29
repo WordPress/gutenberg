@@ -1,0 +1,45 @@
+diff --git a/packages/components/src/composite/legacy/test/index.tsx b/packages/components/src/composite/legacy/test/index.tsx
+index ee6654f9fd3698..49b1915a6a14fb 100644
+--- a/packages/components/src/composite/legacy/test/index.tsx
++++ b/packages/components/src/composite/legacy/test/index.tsx
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { queryByAttribute, render, screen } from '@testing-library/react';
+-import { press, waitFor } from '@ariakit/test';
++import { press, sleep, waitFor } from '@ariakit/test';
+ 
+ /**
+  * Internal dependencies
+@@ -274,8 +274,9 @@ describe.each( [
+ 		renderAndValidate( <Test /> );
+ 		const { item2 } = getOneDimensionalItems();
+ 
++		await sleep();
+ 		await press.Tab();
+-		expect( item2 ).toHaveFocus();
++		await waitFor( () => expect( item2 ).toHaveFocus() );
+ 	} );
+ } );
+ 
+diff --git a/packages/components/src/tabs/test/index.tsx b/packages/components/src/tabs/test/index.tsx
+index 75db47d69f9925..7262a53702c31d 100644
+--- a/packages/components/src/tabs/test/index.tsx
++++ b/packages/components/src/tabs/test/index.tsx
+@@ -1319,10 +1319,13 @@ describe( 'Tabs', () => {
+ 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
+ 
+ 				// Tab key should focus the currently selected tab, which is Beta.
++				await sleep();
+ 				await press.Tab();
+-				expect(
+-					await screen.findByRole( 'tab', { name: 'Beta' } )
+-				).toHaveFocus();
++				await waitFor( async () =>
++					expect(
++						await screen.findByRole( 'tab', { name: 'Beta' } )
++					).toHaveFocus()
++				);
+ 
+ 				// Arrow key should move focus but not automatically change the selected tab.
+ 				await press.ArrowRight();

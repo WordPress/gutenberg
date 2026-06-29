@@ -1,0 +1,59 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ff03a5ba483e9f..ece9bfcfd40852 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fix
+ 
++-   `DropdownMenu V2 `: better fallback on browsers that don't support CSS subgrid([#57327](https://github.com/WordPress/gutenberg/pull/57327)).
+ -   `FontSizePicker`: Use Button API for keeping focus on reset ([#57221](https://github.com/WordPress/gutenberg/pull/57221)).
+ -   `FontSizePicker`: Fix Reset button focus loss ([#57196](https://github.com/WordPress/gutenberg/pull/57196)).
+ -   `PaletteEdit`: Consider digits when generating kebab-cased slug ([#56713](https://github.com/WordPress/gutenberg/pull/56713)).
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/dropdown-menu-v2/styles.ts
+index ec6b2cb74d2172..f73ad97e7793c8 100644
+--- a/packages/components/src/dropdown-menu-v2/styles.ts
++++ b/packages/components/src/dropdown-menu-v2/styles.ts
+@@ -35,6 +35,8 @@ const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
+ const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.popoverShadow }`;
+ const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
+ 
++const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
++
+ const slideUpAndFade = keyframes( {
+ 	'0%': {
+ 		opacity: 0,
+@@ -76,7 +78,7 @@ export const DropdownMenu = styled( Ariakit.Menu )<
+ 	z-index: 1000000;
+ 
+ 	display: grid;
+-	grid-template-columns: minmax( 0, max-content ) 1fr;
++	grid-template-columns: ${ GRID_TEMPLATE_COLS };
+ 	grid-template-rows: auto;
+ 
+ 	box-sizing: border-box;
+@@ -130,14 +132,19 @@ const baseItem = css`
+ 	/* Occupy the width of all grid columns (ie. full width) */
+ 	grid-column: 1 / -1;
+ 
+-	/*
+-	 * Define a grid layout which inherits the same columns configuration
+-	 * from the parent layout (ie. subgrid).
+-	 */
+ 	display: grid;
+-	grid-template-columns: subgrid;
++	grid-template-columns: ${ GRID_TEMPLATE_COLS };
+ 	align-items: center;
+ 
++	@supports ( grid-template-columns: subgrid ) {
++		/*
++		 * Define a grid layout which inherits the same columns configuration
++		 * from the parent layout (ie. subgrid). This allows the menu
++		 * to synchronize the indentation of all its items.
++		 */
++		grid-template-columns: subgrid;
++	}
++
+ 	font-size: ${ font( 'default.fontSize' ) };
+ 	font-family: inherit;
+ 	font-weight: normal;

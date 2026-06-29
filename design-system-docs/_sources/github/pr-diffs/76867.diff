@@ -1,0 +1,468 @@
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index fcdad5093a7a26..4d0ec716f604ed 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ 
+ - DataForm: Add `compact` configuration option to the `datetime` control. [#76905](https://github.com/WordPress/gutenberg/pull/76905)
+ - DataViews: Field's description can accept ReactElements. [#76829](https://github.com/WordPress/gutenberg/pull/76829)
++- DataForm: Use `CollapsibleCard.HeaderDescription` for card layout header descriptions instead of manual `aria-describedby`. [#76867](https://github.com/WordPress/gutenberg/pull/76867)
+ 
+ ## 13.1.0 (2026-03-18)
+ 
+diff --git a/packages/dataviews/src/components/dataform-layouts/card/index.tsx b/packages/dataviews/src/components/dataform-layouts/card/index.tsx
+index 29a153042023e6..bd18e5bab84637 100644
+--- a/packages/dataviews/src/components/dataform-layouts/card/index.tsx
++++ b/packages/dataviews/src/components/dataform-layouts/card/index.tsx
+@@ -5,7 +5,6 @@ import {
+ 	useCallback,
+ 	useContext,
+ 	useEffect,
+-	useId,
+ 	useMemo,
+ 	useRef,
+ 	useState,
+@@ -87,7 +86,6 @@ function isSummaryFieldVisible< Item >(
+ function HeaderContent< Item >( {
+ 	data,
+ 	fields,
+-	descriptionId,
+ 	label,
+ 	layout,
+ 	isOpen,
+@@ -96,7 +94,6 @@ function HeaderContent< Item >( {
+ }: {
+ 	data: Item;
+ 	fields: NormalizedField< Item >[];
+-	descriptionId: string;
+ 	label: string | undefined;
+ 	layout: NormalizedCardLayout;
+ 	isOpen: boolean;
+@@ -120,11 +117,7 @@ function HeaderContent< Item >( {
+ 		>
+ 			<Card.Title>{ label }</Card.Title>
+ 			{ ( hasBadge || hasSummary ) && (
+-				<div
+-					id={ descriptionId }
+-					aria-hidden="true"
+-					className="dataforms-layouts-card__field-header-content-description"
+-				>
++				<CollapsibleCard.HeaderDescription className="dataforms-layouts-card__field-header-content-description">
+ 					{ hasBadge && <ValidationBadge validity={ validity } /> }
+ 					{ hasSummary && (
+ 						<div className="dataforms-layouts-card__field-summary">
+@@ -137,7 +130,7 @@ function HeaderContent< Item >( {
+ 							) ) }
+ 						</div>
+ 					) }
+-				</div>
++				</CollapsibleCard.HeaderDescription>
+ 			) }
+ 		</Stack>
+ 	);
+@@ -208,7 +201,6 @@ export default function FormCardField< Item >( {
+ 	const { fields } = useContext( DataFormContext );
+ 	const layout = field.layout as NormalizedCardLayout;
+ 	const contentRef = useRef< HTMLDivElement >( null );
+-	const descriptionId = useId();
+ 
+ 	const form: NormalizedForm = useMemo(
+ 		() => ( {
+@@ -284,7 +276,6 @@ export default function FormCardField< Item >( {
+ 		<HeaderContent
+ 			data={ data }
+ 			fields={ fields }
+-			descriptionId={ descriptionId }
+ 			label={ label }
+ 			layout={ layout }
+ 			isOpen={ isCollapsible ? !! isOpen : true }
+@@ -300,7 +291,7 @@ export default function FormCardField< Item >( {
+ 				open={ isOpen }
+ 				onOpenChange={ handleOpenChange }
+ 			>
+-				<CollapsibleCard.Header aria-describedby={ descriptionId }>
++				<CollapsibleCard.Header>
+ 					{ headerContent }
+ 				</CollapsibleCard.Header>
+ 				<CollapsibleCard.Content
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index fb73a8dbe4a4d5..7abef86fdb9086 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   Add `AlertDialog` primitive ([#76847](https://github.com/WordPress/gutenberg/pull/76847)).
+ -   Add `InputControl` component ([#76653](https://github.com/WordPress/gutenberg/pull/76653)).
+ -   `Dialog`: Expose `initialFocus` and `finalFocus` props on `Dialog.Popup` for custom focus management ([#76860](https://github.com/WordPress/gutenberg/pull/76860)).
++-   `CollapsibleCard`: Add `HeaderDescription` subcomponent for supplementary header content with `aria-describedby` relationship ([#76867](https://github.com/WordPress/gutenberg/pull/76867)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/ui/src/collapsible-card/context.ts b/packages/ui/src/collapsible-card/context.ts
+new file mode 100644
+index 00000000000000..2c538f9f81b3e8
+--- /dev/null
++++ b/packages/ui/src/collapsible-card/context.ts
+@@ -0,0 +1,7 @@
++import { createContext } from '@wordpress/element';
++
++export const HeaderDescriptionIdContext = createContext< {
++	setDescriptionId: ( id: string | undefined ) => void;
++} >( {
++	setDescriptionId: () => {},
++} );
+diff --git a/packages/ui/src/collapsible-card/header-description.tsx b/packages/ui/src/collapsible-card/header-description.tsx
+new file mode 100644
+index 00000000000000..08c24560bee84b
+--- /dev/null
++++ b/packages/ui/src/collapsible-card/header-description.tsx
+@@ -0,0 +1,43 @@
++import { forwardRef, useContext, useEffect, useId } from '@wordpress/element';
++import { HeaderDescriptionIdContext } from './context';
++import type { HeaderDescriptionProps } from './types';
++
++/**
++ * Secondary content placed in the collapsible card header that describes
++ * the trigger button via `aria-describedby`. Use it for supplementary
++ * information such as status badges or summary values.
++ *
++ * The content is visually rendered but marked `aria-hidden` so that
++ * assistive technologies consume it only through the `aria-describedby`
++ * relationship on the trigger, avoiding double announcements.
++ *
++ * Avoid interactive elements (buttons, links, inputs) inside this
++ * component — the entire header is the toggle trigger.
++ */
++export const HeaderDescription = forwardRef<
++	HTMLDivElement,
++	HeaderDescriptionProps
++>( function CollapsibleCardHeaderDescription(
++	{ children, className, ...restProps },
++	ref
++) {
++	const descriptionId = useId();
++	const { setDescriptionId } = useContext( HeaderDescriptionIdContext );
++
++	useEffect( () => {
++		setDescriptionId( descriptionId );
++		return () => setDescriptionId( undefined );
++	}, [ descriptionId, setDescriptionId ] );
++
++	return (
++		<div
++			ref={ ref }
++			id={ descriptionId }
++			aria-hidden="true"
++			className={ className }
++			{ ...restProps }
++		>
++			{ children }
++		</div>
++	);
++} );
+diff --git a/packages/ui/src/collapsible-card/header.tsx b/packages/ui/src/collapsible-card/header.tsx
+index fdb7d88a8705e1..230f05b2d9f654 100644
+--- a/packages/ui/src/collapsible-card/header.tsx
++++ b/packages/ui/src/collapsible-card/header.tsx
+@@ -1,11 +1,12 @@
+ import clsx from 'clsx';
+-import { forwardRef } from '@wordpress/element';
++import { forwardRef, useMemo, useState } from '@wordpress/element';
+ import { chevronDown } from '@wordpress/icons';
+ import * as Card from '../card';
+ import * as Collapsible from '../collapsible';
+ import { Icon } from '../icon';
+ import styles from './style.module.css';
+ import focusStyles from '../utils/css/focus.module.css';
++import { HeaderDescriptionIdContext } from './context';
+ import type { HeaderProps } from './types';
+ 
+ /**
+@@ -22,38 +23,54 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
+ 		{ children, className, render, ...restProps },
+ 		ref
+ 	) {
++		const [ descriptionId, setDescriptionId ] = useState< string >();
++
++		const contextValue = useMemo(
++			() => ( { setDescriptionId } ),
++			[ setDescriptionId ]
++		);
++
+ 		return (
+-			<Collapsible.Trigger
+-				className={ clsx( styles.header, className ) }
+-				render={
+-					<Card.Header
+-						ref={ ref }
+-						render={ render }
+-						{ ...restProps }
+-					/>
+-				}
+-				nativeButton={ false }
+-			>
+-				<div className={ styles[ 'header-content' ] }>{ children }</div>
+-				<div
+-					className={ clsx( styles[ 'header-trigger-positioner' ] ) }
++			<HeaderDescriptionIdContext.Provider value={ contextValue }>
++				<Collapsible.Trigger
++					className={ clsx( styles.header, className ) }
++					render={
++						<Card.Header
++							ref={ ref }
++							render={ render }
++							{ ...restProps }
++						/>
++					}
++					nativeButton={ false }
++					aria-describedby={ descriptionId }
+ 				>
++					<div className={ styles[ 'header-content' ] }>
++						{ children }
++					</div>
+ 					<div
+ 						className={ clsx(
+-							styles[ 'header-trigger-wrapper' ],
+-							// While the interactive trigger element is the whole header,
+-							// the focus ring will be displayed only on the icon to visually
+-							// emulate it being the button.
+-							focusStyles[ 'outset-ring--focus-parent-visible' ]
++							styles[ 'header-trigger-positioner' ]
+ 						) }
+ 					>
+-						<Icon
+-							icon={ chevronDown }
+-							className={ styles[ 'header-trigger' ] }
+-						/>
++						<div
++							className={ clsx(
++								styles[ 'header-trigger-wrapper' ],
++								// While the interactive trigger element is the whole header,
++								// the focus ring will be displayed only on the icon to visually
++								// emulate it being the button.
++								focusStyles[
++									'outset-ring--focus-parent-visible'
++								]
++							) }
++						>
++							<Icon
++								icon={ chevronDown }
++								className={ styles[ 'header-trigger' ] }
++							/>
++						</div>
+ 					</div>
+-				</div>
+-			</Collapsible.Trigger>
++				</Collapsible.Trigger>
++			</HeaderDescriptionIdContext.Provider>
+ 		);
+ 	}
+ );
+diff --git a/packages/ui/src/collapsible-card/index.ts b/packages/ui/src/collapsible-card/index.ts
+index 3387b70e220616..d8d00f0202a394 100644
+--- a/packages/ui/src/collapsible-card/index.ts
++++ b/packages/ui/src/collapsible-card/index.ts
+@@ -1,5 +1,6 @@
+ import { Root } from './root';
+ import { Header } from './header';
++import { HeaderDescription } from './header-description';
+ import { Content } from './content';
+ 
+-export { Root, Header, Content };
++export { Root, Header, HeaderDescription, Content };
+diff --git a/packages/ui/src/collapsible-card/stories/index.story.tsx b/packages/ui/src/collapsible-card/stories/index.story.tsx
+index d7148a5105d1f0..b587604c8e63a8 100644
+--- a/packages/ui/src/collapsible-card/stories/index.story.tsx
++++ b/packages/ui/src/collapsible-card/stories/index.story.tsx
+@@ -1,6 +1,7 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import * as Card from '../../card';
+ import * as CollapsibleCard from '../index';
++import { Stack } from '../../stack';
+ 
+ /**
+  * Temporary text component for story examples. This will be replaced by an
+@@ -29,6 +30,7 @@ const meta: Meta< typeof CollapsibleCard.Root > = {
+ 	component: CollapsibleCard.Root,
+ 	subcomponents: {
+ 		'CollapsibleCard.Header': CollapsibleCard.Header,
++		'CollapsibleCard.HeaderDescription': CollapsibleCard.HeaderDescription,
+ 		'CollapsibleCard.Content': CollapsibleCard.Content,
+ 	},
+ };
+@@ -156,6 +158,51 @@ export const Stacked: Story = {
+ 	),
+ };
+ 
++/**
++ * A collapsible card with a `HeaderDescription` that provides supplementary
++ * information (e.g. status, summary) as an `aria-describedby` relationship.
++ */
++export const WithHeaderDescription: Story = {
++	// `defaultOpen` (uncontrolled) and `open` (controlled) should not be
++	// used together — disable the `open` control to avoid confusion.
++	argTypes: { open: { control: false } },
++	args: {
++		defaultOpen: true,
++	},
++	render: ( { open, defaultOpen, onOpenChange, disabled, ...restArgs } ) => (
++		<CollapsibleCard.Root
++			open={ open }
++			defaultOpen={ defaultOpen }
++			onOpenChange={ onOpenChange }
++			disabled={ disabled }
++			{ ...restArgs }
++		>
++			<CollapsibleCard.Header>
++				<Stack justify="space-between">
++					<Card.Title>Settings</Card.Title>
++					<CollapsibleCard.HeaderDescription>
++						<span
++							style={ {
++								fontSize: 'var(--wpds-font-size-sm)',
++								color: 'var(--wpds-color-fg-content-neutral-weak)',
++							} }
++						>
++							3 items configured
++						</span>
++					</CollapsibleCard.HeaderDescription>
++				</Stack>
++			</CollapsibleCard.Header>
++			<CollapsibleCard.Content>
++				<Text>
++					The header description provides supplementary context to the
++					trigger button. Assistive technologies will announce the
++					description alongside the button label.
++				</Text>
++			</CollapsibleCard.Content>
++		</CollapsibleCard.Root>
++	),
++};
++
+ /**
+  * Visual comparison: a `CollapsibleCard` (open) next to a regular `Card`
+  * to verify identical spacing and layout.
+diff --git a/packages/ui/src/collapsible-card/test/index.test.tsx b/packages/ui/src/collapsible-card/test/index.test.tsx
+index 1d23797d399303..5ce044713dd492 100644
+--- a/packages/ui/src/collapsible-card/test/index.test.tsx
++++ b/packages/ui/src/collapsible-card/test/index.test.tsx
+@@ -178,4 +178,97 @@ describe( 'CollapsibleCard', () => {
+ 			).toBeVisible();
+ 		} );
+ 	} );
++
++	describe( 'HeaderDescription', () => {
++		it( 'sets aria-describedby on the trigger pointing to the description', () => {
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header>
++						<Card.Title>Settings</Card.Title>
++						<CollapsibleCard.HeaderDescription data-testid="desc">
++							3 errors
++						</CollapsibleCard.HeaderDescription>
++					</CollapsibleCard.Header>
++					<CollapsibleCard.Content>
++						<p>Content</p>
++					</CollapsibleCard.Content>
++				</CollapsibleCard.Root>
++			);
++
++			const trigger = screen.getByRole( 'button', {
++				name: 'Settings',
++			} );
++			const descriptionElement = screen.getByTestId( 'desc' );
++
++			expect( descriptionElement ).toHaveAttribute( 'id' );
++			expect( trigger ).toHaveAttribute(
++				'aria-describedby',
++				descriptionElement.id
++			);
++		} );
++
++		it( 'marks the description content as aria-hidden', () => {
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header>
++						<Card.Title>Settings</Card.Title>
++						<CollapsibleCard.HeaderDescription data-testid="desc">
++							<span>Status: OK</span>
++						</CollapsibleCard.HeaderDescription>
++					</CollapsibleCard.Header>
++				</CollapsibleCard.Root>
++			);
++
++			const descriptionWrapper = screen.getByTestId( 'desc' );
++			expect( descriptionWrapper ).toHaveAttribute(
++				'aria-hidden',
++				'true'
++			);
++		} );
++
++		it( 'does not set aria-describedby when HeaderDescription is absent', () => {
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header>
++						<Card.Title>Title</Card.Title>
++					</CollapsibleCard.Header>
++				</CollapsibleCard.Root>
++			);
++
++			const trigger = screen.getByRole( 'button', { name: 'Title' } );
++			expect( trigger ).not.toHaveAttribute( 'aria-describedby' );
++		} );
++
++		it( 'forwards ref on HeaderDescription', () => {
++			const descRef = createRef< HTMLDivElement >();
++
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header>
++						<Card.Title>Title</Card.Title>
++						<CollapsibleCard.HeaderDescription ref={ descRef }>
++							Description
++						</CollapsibleCard.HeaderDescription>
++					</CollapsibleCard.Header>
++				</CollapsibleCard.Root>
++			);
++
++			expect( descRef.current ).toBeInstanceOf( HTMLDivElement );
++		} );
++
++		it( 'renders description content visually', () => {
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header>
++						<Card.Title>Title</Card.Title>
++						<CollapsibleCard.HeaderDescription>
++							Badge content
++						</CollapsibleCard.HeaderDescription>
++					</CollapsibleCard.Header>
++				</CollapsibleCard.Root>
++			);
++
++			expect( screen.getByText( 'Badge content' ) ).toBeVisible();
++		} );
++	} );
+ } );
+diff --git a/packages/ui/src/collapsible-card/types.ts b/packages/ui/src/collapsible-card/types.ts
+index f76986ef1a49b5..35763ccc7910dd 100644
+--- a/packages/ui/src/collapsible-card/types.ts
++++ b/packages/ui/src/collapsible-card/types.ts
+@@ -37,6 +37,18 @@ export interface HeaderProps extends ComponentProps< 'div' > {
+ 	children?: ReactNode;
+ }
+ 
++export interface HeaderDescriptionProps extends ComponentProps< 'div' > {
++	/**
++	 * Secondary content that describes the header trigger via
++	 * `aria-describedby`. Rendered visually but marked `aria-hidden`
++	 * so assistive technologies consume it only through the description
++	 * relationship, avoiding double announcements.
++	 *
++	 * Avoid interactive elements — the entire header is the toggle trigger.
++	 */
++	children?: ReactNode;
++}
++
+ export interface ContentProps extends ComponentProps< 'div' > {
+ 	/**
+ 	 * The content to be rendered inside the collapsible content area.

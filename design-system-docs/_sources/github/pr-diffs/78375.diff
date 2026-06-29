@@ -1,0 +1,306 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 09ded72032435a..67152620600551 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ 
+ -   Export `getWpCompatOverlaySlot()` so consumers can route their own portals into the compat overlay slot ([#78183](https://github.com/WordPress/gutenberg/pull/78183)).
+ -   `Select`, `SelectControl`: Default the popup's portal container to the `@wordpress/ui` compat overlay slot when present, so select popups stack reliably above other overlays in mixed-library compositions. A caller-supplied `Select.Portal` `container` prop continues to take precedence ([#78372](https://github.com/WordPress/gutenberg/pull/78372)).
++-   `Autocomplete`: Default the popup's portal container to the `@wordpress/ui` compat overlay slot when present, so autocomplete popups stack reliably above other overlays in mixed-library compositions. A caller-supplied `Autocomplete.Portal` `container` prop continues to take precedence ([#78375](https://github.com/WordPress/gutenberg/pull/78375)).
+ 
+ ## 0.13.0 (2026-05-14)
+ 
+diff --git a/packages/ui/src/form/primitives/autocomplete/portal.tsx b/packages/ui/src/form/primitives/autocomplete/portal.tsx
+index e311099fc1ac07..c9e008e6e8a802 100644
+--- a/packages/ui/src/form/primitives/autocomplete/portal.tsx
++++ b/packages/ui/src/form/primitives/autocomplete/portal.tsx
+@@ -1,13 +1,21 @@
+ import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
+ import { forwardRef } from '@wordpress/element';
+ import type { PortalProps } from './types';
++import { getWpCompatOverlaySlot } from '../../../utils/wp-compat-overlay-slot';
+ 
+ /**
+  * Used to apply custom portal behavior to `Autocomplete`'s popup content.
++ * `container` defaults to the `@wordpress/ui` compat overlay slot.
+  */
+ const Portal = forwardRef< HTMLDivElement, PortalProps >(
+-	function AutocompletePortal( props, ref ) {
+-		return <_Autocomplete.Portal ref={ ref } { ...props } />;
++	function AutocompletePortal( { container, ...restProps }, ref ) {
++		return (
++			<_Autocomplete.Portal
++				container={ container ?? getWpCompatOverlaySlot() }
++				{ ...restProps }
++				ref={ ref }
++			/>
++		);
+ 	}
+ );
+ 
+diff --git a/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx b/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx
+index 48abc63a61ef17..1c742d5a9d7e1c 100644
+--- a/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx
++++ b/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx
+@@ -1,7 +1,9 @@
+ import { render, screen, waitFor } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ import { createRef } from '@wordpress/element';
++import type { ReactNode } from 'react';
+ import * as Autocomplete from '../index';
++import { useEnableWpCompatOverlaySlot } from '../../../../utils/use-enable-wp-compat-overlay-slot';
+ 
+ const ITEMS = [
+ 	{ id: '1', value: 'Item 1' },
+@@ -200,4 +202,149 @@ describe( 'Autocomplete', () => {
+ 			expect( positioner ).toContainElement( item );
+ 		} );
+ 	} );
++
++	// Slot is identified by a data attribute, not a user-facing role/text.
++	/* eslint-disable testing-library/no-node-access */
++	describe( 'wp compat overlay slot', () => {
++		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
++
++		// Exercises the public opt-in path rather than poking the flag.
++		function WithSlotEnabled( { children }: { children: ReactNode } ) {
++			useEnableWpCompatOverlaySlot();
++			return <>{ children }</>;
++		}
++
++		afterEach( () => {
++			// The hook is one-way at runtime; reset explicitly between tests.
++			delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
++				.__wpUiCompatOverlaySlotEnabled;
++			document
++				.querySelectorAll( SLOT_SELECTOR )
++				.forEach( ( el ) => el.remove() );
++		} );
++
++		it( 'portals the popup into the slot when the consumer opts in', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<WithSlotEnabled>
++					<Autocomplete.Root items={ ITEMS }>
++						<Autocomplete.Input placeholder="Search" />
++						<Autocomplete.Popup>
++							<Autocomplete.List>
++								<Autocomplete.ListBody>
++									<Autocomplete.Collection>
++										{ ( item ) => (
++											<Autocomplete.Item
++												key={ item.id }
++												value={ item }
++											>
++												{ item.value }
++											</Autocomplete.Item>
++										) }
++									</Autocomplete.Collection>
++								</Autocomplete.ListBody>
++							</Autocomplete.List>
++						</Autocomplete.Popup>
++					</Autocomplete.Root>
++				</WithSlotEnabled>
++			);
++
++			await user.type( screen.getByRole( 'combobox' ), 'Item 1' );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++
++			const slot = document.querySelector( SLOT_SELECTOR );
++			expect( slot ).not.toBeNull();
++			expect( slot ).toContainElement( item );
++		} );
++
++		it( 'does not create a slot when the consumer has not opted in (dormant default)', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Autocomplete.Root items={ ITEMS }>
++					<Autocomplete.Input placeholder="Search" />
++					<Autocomplete.Popup>
++						<Autocomplete.List>
++							<Autocomplete.ListBody>
++								<Autocomplete.Collection>
++									{ ( item ) => (
++										<Autocomplete.Item
++											key={ item.id }
++											value={ item }
++										>
++											{ item.value }
++										</Autocomplete.Item>
++									) }
++								</Autocomplete.Collection>
++							</Autocomplete.ListBody>
++						</Autocomplete.List>
++					</Autocomplete.Popup>
++				</Autocomplete.Root>
++			);
++
++			await user.type( screen.getByRole( 'combobox' ), 'Item 1' );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++
++			expect( document.querySelector( SLOT_SELECTOR ) ).toBeNull();
++		} );
++
++		it( 'lets a caller-supplied portal container override the slot', async () => {
++			const user = userEvent.setup();
++			const containerRef = createRef< HTMLDivElement >();
++
++			render(
++				<WithSlotEnabled>
++					<Autocomplete.Root items={ ITEMS }>
++						<Autocomplete.Input placeholder="Search" />
++						<div
++							ref={ containerRef }
++							data-testid="custom-container"
++						/>
++						<Autocomplete.Popup
++							portal={
++								<Autocomplete.Portal
++									container={ containerRef }
++								/>
++							}
++						>
++							<Autocomplete.List>
++								<Autocomplete.ListBody>
++									<Autocomplete.Collection>
++										{ ( item ) => (
++											<Autocomplete.Item
++												key={ item.id }
++												value={ item }
++											>
++												{ item.value }
++											</Autocomplete.Item>
++										) }
++									</Autocomplete.Collection>
++								</Autocomplete.ListBody>
++							</Autocomplete.List>
++						</Autocomplete.Popup>
++					</Autocomplete.Root>
++				</WithSlotEnabled>
++			);
++
++			await user.type( screen.getByRole( 'combobox' ), 'Item 1' );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
++				item
++			);
++		} );
++	} );
++	/* eslint-enable testing-library/no-node-access */
+ } );
+diff --git a/storybook/stories/playground/wp-compat-overlay-slot.story.jsx b/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
+index 476dcda6a71686..3624d6a170396a 100644
+--- a/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
++++ b/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
+@@ -10,6 +10,7 @@ import { useState } from '@wordpress/element';
+ import * as Tooltip from '../../../packages/ui/src/tooltip';
+ import * as Select from '../../../packages/ui/src/form/primitives/select';
+ import { SelectControl } from '../../../packages/ui/src/form/select-control';
++import * as Autocomplete from '../../../packages/ui/src/form/primitives/autocomplete';
+ import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
+ 
+ const selectItems = [
+@@ -18,10 +19,16 @@ const selectItems = [
+ 	{ value: 'option-3', label: 'Option 3' },
+ ];
+ 
++const autocompleteItems = [
++	{ id: '1', value: 'Item 1' },
++	{ id: '2', value: 'Item 2' },
++	{ id: '3', value: 'Item 3' },
++];
++
+ // Cross-library stacking: `@wordpress/ui` overlays (`Tooltip`, `Select`,
+-// `SelectControl`) inside a `@wordpress/components` Modal / Popover
+-// should sit above the components-side overlay via the compat overlay
+-// slot.
++// `SelectControl`, `Autocomplete`) inside a `@wordpress/components`
++// Modal / Popover should sit above the components-side overlay via the
++// compat overlay slot.
+ export default {
+ 	title: 'Playground/Debug fixtures/WP Compat Overlay Slot',
+ 	decorators: [ WithWpCompatOverlaySlot ],
+@@ -78,6 +85,34 @@ export const InsideComponentsModal = {
+ 								items={ selectItems }
+ 							/>
+ 						</div>
++
++						<div style={ { marginTop: '1rem' } }>
++							<Autocomplete.Root items={ autocompleteItems }>
++								<Autocomplete.Input
++									placeholder="Search items"
++									aria-label="Autocomplete primitive"
++								/>
++								<Autocomplete.Popup>
++									<Autocomplete.Empty>
++										No matching items.
++									</Autocomplete.Empty>
++									<Autocomplete.List>
++										<Autocomplete.ListBody>
++											<Autocomplete.Collection>
++												{ ( item ) => (
++													<Autocomplete.Item
++														key={ item.id }
++														value={ item }
++													>
++														{ item.value }
++													</Autocomplete.Item>
++												) }
++											</Autocomplete.Collection>
++										</Autocomplete.ListBody>
++									</Autocomplete.List>
++								</Autocomplete.Popup>
++							</Autocomplete.Root>
++						</div>
+ 					</Modal>
+ 				) }
+ 			</>
+@@ -141,6 +176,34 @@ export const InsideComponentsPopover = {
+ 									items={ selectItems }
+ 								/>
+ 							</div>
++
++							<div style={ { marginTop: '1rem' } }>
++								<Autocomplete.Root items={ autocompleteItems }>
++									<Autocomplete.Input
++										placeholder="Search items"
++										aria-label="Autocomplete primitive"
++									/>
++									<Autocomplete.Popup>
++										<Autocomplete.Empty>
++											No matching items.
++										</Autocomplete.Empty>
++										<Autocomplete.List>
++											<Autocomplete.ListBody>
++												<Autocomplete.Collection>
++													{ ( item ) => (
++														<Autocomplete.Item
++															key={ item.id }
++															value={ item }
++														>
++															{ item.value }
++														</Autocomplete.Item>
++													) }
++												</Autocomplete.Collection>
++											</Autocomplete.ListBody>
++										</Autocomplete.List>
++									</Autocomplete.Popup>
++								</Autocomplete.Root>
++							</div>
+ 						</div>
+ 					</Popover>
+ 				) }

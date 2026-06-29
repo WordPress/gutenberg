@@ -1,0 +1,331 @@
+diff --git a/packages/components/src/ui/item-group/context.ts b/packages/components/src/ui/item-group/context.ts
+index 72b5f476414d74..3c27afa64ef30a 100644
+--- a/packages/components/src/ui/item-group/context.ts
++++ b/packages/components/src/ui/item-group/context.ts
+@@ -3,9 +3,13 @@
+  */
+ import { createContext, useContext } from '@wordpress/element';
+ 
+-export const ItemGroupContext = createContext( { size: 'medium' } as {
+-	spacedAround: boolean;
+-	size: 'small' | 'medium' | 'large';
+-} );
++/**
++ * Internal dependencies
++ */
++import type { ItemGroupContext as Context } from './types';
++
++export const ItemGroupContext = createContext( {
++	size: 'medium',
++} as Context );
+ 
+ export const useItemGroupContext = () => useContext( ItemGroupContext );
+diff --git a/packages/components/src/ui/item-group/item-group.tsx b/packages/components/src/ui/item-group/item-group.tsx
+index f25f073be335d6..8e863c0a690b1c 100644
+--- a/packages/components/src/ui/item-group/item-group.tsx
++++ b/packages/components/src/ui/item-group/item-group.tsx
+@@ -11,22 +11,24 @@ import type { PolymorphicComponentProps } from '../context';
+ // eslint-disable-next-line no-duplicate-imports
+ import { contextConnect } from '../context';
+ import { useItemGroup } from './use-item-group';
+-// eslint-disable-next-line no-duplicate-imports
+-import type { Props } from './use-item-group';
+ import { ItemGroupContext, useItemGroupContext } from './context';
+ import { View } from '../../view';
++import type { ItemGroupProps } from './types';
+ 
+ function ItemGroup(
+-	props: PolymorphicComponentProps< Props, 'div' >,
++	props: PolymorphicComponentProps< ItemGroupProps, 'div' >,
+ 	forwardedRef: Ref< any >
+ ) {
+-	const { bordered, separated, size: sizeProp, ...otherProps } = useItemGroup(
+-		props
+-	);
++	const {
++		isBordered,
++		isSeparated,
++		size: sizeProp,
++		...otherProps
++	} = useItemGroup( props );
+ 
+ 	const { size: contextSize } = useItemGroupContext();
+ 
+-	const spacedAround = ! bordered && ! separated;
++	const spacedAround = ! isBordered && ! isSeparated;
+ 	const size = sizeProp || contextSize;
+ 
+ 	const contextValue = {
+diff --git a/packages/components/src/ui/item-group/stories/index.js b/packages/components/src/ui/item-group/stories/index.js
+index 47e69902735f2c..7eaa16ed3f4c1f 100644
+--- a/packages/components/src/ui/item-group/stories/index.js
++++ b/packages/components/src/ui/item-group/stories/index.js
+@@ -1,5 +1,13 @@
+ /* eslint-disable no-alert */
+ /* globals alert */
++/**
++ * External dependencies
++ */
++import { boolean, select } from '@storybook/addon-knobs';
++
++/**
++ * Internal dependencies
++ */
+ /**
+  * Internal dependencies
+  */
+@@ -12,22 +20,44 @@ export default {
+ 	title: 'Components (Experimental)/ItemGroup',
+ };
+ 
+-export const _default = () => (
+-	<ItemGroup style={ { width: '350px' } } bordered>
+-		<Item action onClick={ () => alert( 'WordPress.org' ) }>
+-			Code is Poetry — Click me!
+-		</Item>
+-		<Item action onClick={ () => alert( 'WordPress.org' ) }>
+-			Code is Poetry — Click me!
+-		</Item>
+-		<Item action onClick={ () => alert( 'WordPress.org' ) }>
+-			Code is Poetry — Click me!
+-		</Item>
+-		<Item action onClick={ () => alert( 'WordPress.org' ) }>
+-			Code is Poetry — Click me!
+-		</Item>
+-	</ItemGroup>
+-);
++export const _default = () => {
++	const itemGroupProps = {
++		isBordered: boolean( 'ItemGroup: isBordered', true ),
++		size: select(
++			'ItemGroup: size',
++			[ 'small', 'medium', 'large' ],
++			'medium'
++		),
++		isSeparated: boolean( 'ItemGroup: isSeparated', false ),
++		isRounded: boolean( 'ItemGroup: isRounded', false ),
++	};
++
++	const itemProps = {
++		size: select(
++			'Item 1: size',
++			[ 'small', 'medium', 'large' ],
++			'medium'
++		),
++		isAction: boolean( 'Item 1: isAction', true ),
++	};
++
++	return (
++		<ItemGroup style={ { width: '350px' } } { ...itemGroupProps }>
++			<Item { ...itemProps } onClick={ () => alert( 'WordPress.org' ) }>
++				Code is Poetry — Click me!
++			</Item>
++			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
++				Code is Poetry — Click me!
++			</Item>
++			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
++				Code is Poetry — Click me!
++			</Item>
++			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
++				Code is Poetry — Click me!
++			</Item>
++		</ItemGroup>
++	);
++};
+ 
+ export const dropdown = () => (
+ 	<Flyout
+@@ -35,16 +65,16 @@ export const dropdown = () => (
+ 		trigger={ <Button>Open Popover</Button> }
+ 	>
+ 		<ItemGroup style={ { padding: 4 } }>
+-			<Item action onClick={ () => alert( 'WordPress.org' ) }>
++			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
+ 				Code is Poetry — Click me!
+ 			</Item>
+-			<Item action onClick={ () => alert( 'WordPress.org' ) }>
++			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
+ 				Code is Poetry — Click me!
+ 			</Item>
+-			<Item action onClick={ () => alert( 'WordPress.org' ) }>
++			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
+ 				Code is Poetry — Click me!
+ 			</Item>
+-			<Item action onClick={ () => alert( 'WordPress.org' ) }>
++			<Item isAction onClick={ () => alert( 'WordPress.org' ) }>
+ 				Code is Poetry — Click me!
+ 			</Item>
+ 		</ItemGroup>
+diff --git a/packages/components/src/ui/item-group/styles.ts b/packages/components/src/ui/item-group/styles.ts
+index d6c5f2fdfcbc27..2f863a1d109eed 100644
+--- a/packages/components/src/ui/item-group/styles.ts
++++ b/packages/components/src/ui/item-group/styles.ts
+@@ -42,7 +42,7 @@ export const separated = css`
+ 		border-bottom: 1px solid ${ CONFIG.surfaceBorderColor };
+ 	}
+ 
+-	> *:last-child:not( :focus ) {
++	> *:last-of-type:not( :focus ) {
+ 		border-bottom-color: transparent;
+ 	}
+ `;
+@@ -56,12 +56,12 @@ export const spacedAround = css`
+ export const rounded = css`
+ 	border-radius: ${ borderRadius };
+ 
+-	> *:first-child {
++	> *:first-of-type {
+ 		border-top-left-radius: ${ borderRadius };
+ 		border-top-right-radius: ${ borderRadius };
+ 	}
+ 
+-	> *:last-child {
++	> *:last-of-type {
+ 		border-bottom-left-radius: ${ borderRadius };
+ 		border-bottom-right-radius: ${ borderRadius };
+ 	}
+@@ -82,12 +82,12 @@ const paddingYLarge = `calc((${ CONFIG.controlHeightLarge } - ${ baseFontHeight
+ 
+ export const itemSizes = {
+ 	small: css`
+-		padding: ${ paddingYSmall }, ${ CONFIG.controlPaddingXSmall };
++		padding: ${ paddingYSmall } ${ CONFIG.controlPaddingXSmall };
+ 	`,
+ 	medium: css`
+-		padding: ${ paddingY }, ${ CONFIG.controlPaddingX };
++		padding: ${ paddingY } ${ CONFIG.controlPaddingX };
+ 	`,
+ 	large: css`
+-		padding: ${ paddingYLarge }, ${ CONFIG.controlPaddingXLarge };
++		padding: ${ paddingYLarge } ${ CONFIG.controlPaddingXLarge };
+ 	`,
+ };
+diff --git a/packages/components/src/ui/item-group/types.ts b/packages/components/src/ui/item-group/types.ts
+new file mode 100644
+index 00000000000000..f6273259fbf099
+--- /dev/null
++++ b/packages/components/src/ui/item-group/types.ts
+@@ -0,0 +1,18 @@
++type ItemSize = 'small' | 'medium' | 'large';
++
++export interface ItemGroupProps {
++	isBordered?: boolean;
++	isRounded?: boolean;
++	isSeparated?: boolean;
++	size?: ItemSize;
++}
++
++export interface ItemProps {
++	isAction?: boolean;
++	size?: ItemSize;
++}
++
++export type ItemGroupContext = {
++	spacedAround: boolean;
++	size: ItemSize;
++};
+diff --git a/packages/components/src/ui/item-group/use-item-group.ts b/packages/components/src/ui/item-group/use-item-group.ts
+index 346fd27a58c559..a8844e0af55f92 100644
+--- a/packages/components/src/ui/item-group/use-item-group.ts
++++ b/packages/components/src/ui/item-group/use-item-group.ts
+@@ -10,22 +10,16 @@ import type { PolymorphicComponentProps } from '../context';
+  */
+ import * as styles from './styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+-
+-export interface Props {
+-	bordered?: boolean;
+-	rounded?: boolean;
+-	separated?: boolean;
+-	size?: 'large' | 'medium' | 'small';
+-}
++import type { ItemGroupProps } from './types';
+ 
+ export function useItemGroup(
+-	props: PolymorphicComponentProps< Props, 'div' >
++	props: PolymorphicComponentProps< ItemGroupProps, 'div' >
+ ) {
+ 	const {
+ 		className,
+-		bordered = false,
+-		rounded = true,
+-		separated = false,
++		isBordered = false,
++		isRounded = true,
++		isSeparated = false,
+ 		role = 'list',
+ 		...otherProps
+ 	} = useContextSystem( props, 'ItemGroup' );
+@@ -33,17 +27,17 @@ export function useItemGroup(
+ 	const cx = useCx();
+ 
+ 	const classes = cx(
+-		bordered && styles.bordered,
+-		( bordered || separated ) && styles.separated,
+-		rounded && styles.rounded,
++		isBordered && styles.bordered,
++		( isBordered || isSeparated ) && styles.separated,
++		isRounded && styles.rounded,
+ 		className
+ 	);
+ 
+ 	return {
+-		bordered,
++		isBordered,
+ 		className: classes,
+ 		role,
+-		separated,
++		isSeparated,
+ 		...otherProps,
+ 	};
+ }
+diff --git a/packages/components/src/ui/item-group/use-item.ts b/packages/components/src/ui/item-group/use-item.ts
+index ae64a961019e2e..5f5fad66e6644b 100644
+--- a/packages/components/src/ui/item-group/use-item.ts
++++ b/packages/components/src/ui/item-group/use-item.ts
+@@ -1,3 +1,9 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { ElementType } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+@@ -7,15 +13,13 @@ import type { PolymorphicComponentProps } from '../context';
+ import * as styles from './styles';
+ import { useItemGroupContext } from './context';
+ import { useCx } from '../../utils/hooks/use-cx';
++import type { ItemProps } from './types';
+ 
+-export interface Props {
+-	action?: boolean;
+-	size?: 'small' | 'medium' | 'large';
+-}
+-
+-export function useItem( props: PolymorphicComponentProps< Props, 'div' > ) {
++export function useItem(
++	props: PolymorphicComponentProps< ItemProps, 'div' >
++) {
+ 	const {
+-		action = false,
++		isAction = false,
+ 		as: asProp,
+ 		className,
+ 		role = 'listitem',
+@@ -27,12 +31,12 @@ export function useItem( props: PolymorphicComponentProps< Props, 'div' > ) {
+ 
+ 	const size = sizeProp || contextSize;
+ 
+-	const as = asProp || action ? 'button' : 'div';
++	const as = ( asProp || isAction ? 'button' : 'div' ) as ElementType;
+ 
+ 	const cx = useCx();
+ 
+ 	const classes = cx(
+-		action && styles.unstyledButton,
++		isAction && styles.unstyledButton,
+ 		styles.itemSizes[ size ] || styles.itemSizes.medium,
+ 		styles.item,
+ 		spacedAround && styles.spacedAround,

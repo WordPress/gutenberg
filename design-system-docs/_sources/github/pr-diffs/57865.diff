@@ -1,0 +1,44 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9a245d85ebf849..a97b666e029447 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ ### Experimental
+ 
+ -   `BoxControl`: Update design ([#56665](https://github.com/WordPress/gutenberg/pull/56665)).
++-   `CustomSelect`: adjust `renderSelectedValue` to fix sizing ([#57865](https://github.com/WordPress/gutenberg/pull/57865)).
+ 
+ ## 25.15.0 (2024-01-10)
+ 
+diff --git a/packages/components/src/custom-select-control-v2/index.tsx b/packages/components/src/custom-select-control-v2/index.tsx
+index 614f52105513f4..87750eaaec99eb 100644
+--- a/packages/components/src/custom-select-control-v2/index.tsx
++++ b/packages/components/src/custom-select-control-v2/index.tsx
+@@ -49,7 +49,7 @@ export function CustomSelect( {
+ 	onChange,
+ 	size = 'default',
+ 	value,
+-	renderSelectedValue = defaultRenderSelectedValue,
++	renderSelectedValue,
+ 	...props
+ }: WordPressComponentProps< CustomSelectProps, 'button', false > ) {
+ 	const store = Ariakit.useSelectStore( {
+@@ -60,6 +60,9 @@ export function CustomSelect( {
+ 
+ 	const { value: currentValue } = store.useState();
+ 
++	const computedRenderSelectedValue =
++		renderSelectedValue ?? defaultRenderSelectedValue;
++
+ 	return (
+ 		<>
+ 			<Styled.CustomSelectLabel store={ store }>
+@@ -71,7 +74,7 @@ export function CustomSelect( {
+ 				hasCustomRenderProp={ !! renderSelectedValue }
+ 				store={ store }
+ 			>
+-				{ renderSelectedValue( currentValue ) }
++				{ computedRenderSelectedValue( currentValue ) }
+ 				<Ariakit.SelectArrow />
+ 			</Styled.CustomSelectButton>
+ 			<Styled.CustomSelectPopover gutter={ 12 } store={ store } sameWidth>

@@ -1,0 +1,551 @@
+diff --git a/packages/block-editor/src/hooks/padding.js b/packages/block-editor/src/hooks/padding.js
+index ce9316309e4231..e042a2de83cac4 100644
+--- a/packages/block-editor/src/hooks/padding.js
++++ b/packages/block-editor/src/hooks/padding.js
+@@ -37,7 +37,22 @@ export function PaddingEdit( props ) {
+ 	const onChange = ( next ) => {
+ 		const newStyle = {
+ 			...style,
+-			padding: next,
++			spacing: {
++				padding: next,
++			},
++		};
++
++		setAttributes( {
++			style: cleanEmptyObject( newStyle ),
++		} );
++	};
++
++	const onChangeShowVisualizer = ( next ) => {
++		const newStyle = {
++			...style,
++			visualizers: {
++				padding: next,
++			},
+ 		};
+ 
+ 		setAttributes( {
+@@ -49,8 +64,9 @@ export function PaddingEdit( props ) {
+ 		web: (
+ 			<>
+ 				<BoxControl
+-					values={ style?.padding }
++					values={ style?.spacing?.padding }
+ 					onChange={ onChange }
++					onChangeShowVisualizer={ onChangeShowVisualizer }
+ 					label={ __( 'Padding' ) }
+ 					units={ units }
+ 				/>
+@@ -61,8 +77,8 @@ export function PaddingEdit( props ) {
+ }
+ 
+ export const paddingStyleMappings = {
+-	paddingTop: [ 'padding', 'top' ],
+-	paddingRight: [ 'padding', 'right' ],
+-	paddingBottom: [ 'padding', 'bottom' ],
+-	paddingLeft: [ 'padding', 'left' ],
++	paddingTop: [ 'spacing', 'padding', 'top' ],
++	paddingRight: [ 'spacing', 'padding', 'right' ],
++	paddingBottom: [ 'spacing', 'padding', 'bottom' ],
++	paddingLeft: [ 'spacing', 'padding', 'left' ],
+ };
+diff --git a/packages/block-editor/src/hooks/style.js b/packages/block-editor/src/hooks/style.js
+index f8fbf30c6b6e3f..a3b101b86790aa 100644
+--- a/packages/block-editor/src/hooks/style.js
++++ b/packages/block-editor/src/hooks/style.js
+@@ -74,11 +74,17 @@ export function getInlineStyles( styles = {} ) {
+ 	};
+ 
+ 	const output = {};
+-	Object.entries( mappings ).forEach( ( [ styleKey, objectKey ] ) => {
+-		if ( has( styles, objectKey ) ) {
+-			output[ styleKey ] = compileStyleValue( get( styles, objectKey ) );
++	Object.entries( mappings ).forEach(
++		( [ styleKey, ...otherObjectKeys ] ) => {
++			const [ objectKeys ] = otherObjectKeys;
++
++			if ( has( styles, objectKeys ) ) {
++				output[ styleKey ] = compileStyleValue(
++					get( styles, objectKeys )
++				);
++			}
+ 		}
+-	} );
++	);
+ 
+ 	return output;
+ }
+diff --git a/packages/block-library/src/cover/edit.js b/packages/block-library/src/cover/edit.js
+index 076d0881cbe6e1..6f2794da106b25 100644
+--- a/packages/block-library/src/cover/edit.js
++++ b/packages/block-library/src/cover/edit.js
+@@ -475,7 +475,10 @@ function CoverEdit( {
+ 		<>
+ 			{ controls }
+ 			<Block.div className={ classes } data-url={ url } style={ style }>
+-				<BoxControlVisualizer values={ styleAttribute?.padding } />
++				<BoxControlVisualizer
++					values={ styleAttribute?.spacing?.padding }
++					showValues={ styleAttribute?.visualizers?.padding }
++				/>
+ 				<ResizableCover
+ 					className="block-library-cover__resize-container"
+ 					onResizeStart={ () => {
+diff --git a/packages/components/src/box-control/README.md b/packages/components/src/box-control/README.md
+index e4105871042dc3..47d398243297fd 100644
+--- a/packages/components/src/box-control/README.md
++++ b/packages/components/src/box-control/README.md
+@@ -111,7 +111,14 @@ Heading label for BoxControl.
+ 
+ ### onChange
+ 
+-A function that receives the values of the inputs.
++A callback function when an input value changes.
++
++-   Type: `Function`
++-   Required: Yes
++
++### onChangeShowVisualizer
++
++A callback function for visualizer changes, based on input hover interactions.
+ 
+ -   Type: `Function`
+ -   Required: Yes
+diff --git a/packages/components/src/box-control/all-input-control.js b/packages/components/src/box-control/all-input-control.js
+index 8a40dd47e6612d..1f1260898505d1 100644
+--- a/packages/components/src/box-control/all-input-control.js
++++ b/packages/components/src/box-control/all-input-control.js
+@@ -6,16 +6,19 @@ import { noop } from 'lodash';
+  * Internal dependencies
+  */
+ import UnitControl from './unit-control';
+-import { LABELS, getAllValue, isValuesMixed } from './utils';
++import { LABELS, getAllValue, isValuesMixed, isValuesDefined } from './utils';
+ 
+ export default function AllInputControl( {
+ 	onChange = noop,
+ 	onFocus = noop,
++	onHoverOn = noop,
++	onHoverOff = noop,
+ 	values,
+ 	...props
+ } ) {
+ 	const allValue = getAllValue( values );
+-	const isMixed = isValuesMixed( values );
++	const hasValues = isValuesDefined( values );
++	const isMixed = hasValues && isValuesMixed( values );
+ 
+ 	const allPlaceholder = isMixed ? LABELS.mixed : null;
+ 
+@@ -34,6 +37,24 @@ export default function AllInputControl( {
+ 		onChange( nextValues );
+ 	};
+ 
++	const handleOnHoverOn = () => {
++		onHoverOn( {
++			top: true,
++			bottom: true,
++			left: true,
++			right: true,
++		} );
++	};
++
++	const handleOnHoverOff = () => {
++		onHoverOff( {
++			top: false,
++			bottom: false,
++			left: false,
++			right: false,
++		} );
++	};
++
+ 	return (
+ 		<UnitControl
+ 			{ ...props }
+@@ -42,6 +63,8 @@ export default function AllInputControl( {
+ 			value={ allValue }
+ 			onChange={ handleOnChange }
+ 			onFocus={ handleOnFocus }
++			onHoverOn={ handleOnHoverOn }
++			onHoverOff={ handleOnHoverOff }
+ 			placeholder={ allPlaceholder }
+ 		/>
+ 	);
+diff --git a/packages/components/src/box-control/index.js b/packages/components/src/box-control/index.js
+index 387fd317563f35..f75a4aee4b77d6 100644
+--- a/packages/components/src/box-control/index.js
++++ b/packages/components/src/box-control/index.js
+@@ -7,7 +7,7 @@ import { noop } from 'lodash';
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { useState, useRef } from '@wordpress/element';
++import { useState } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+@@ -26,7 +26,12 @@ import {
+ 	Header,
+ 	HeaderControlWrapper,
+ } from './styles/box-control-styles';
+-import { DEFAULT_VALUES, isValuesMixed } from './utils';
++import {
++	DEFAULT_VALUES,
++	DEFAULT_VISUALIZER_VALUES,
++	isValuesMixed,
++	isValuesDefined,
++} from './utils';
+ import { useControlledState } from '../utils/hooks';
+ 
+ const defaultInputProps = {
+@@ -43,17 +48,21 @@ export default function BoxControl( {
+ 	id: idProp,
+ 	inputProps = defaultInputProps,
+ 	onChange = noop,
++	onChangeShowVisualizer = noop,
+ 	label = __( 'Box Control' ),
+-	values: valuesProp = DEFAULT_VALUES,
++	values: valuesProp,
+ 	units,
+ } ) {
+ 	const [ values, setValues ] = useControlledState( valuesProp );
++	const inputValues = values || DEFAULT_VALUES;
++	const hasInitialValue = isValuesDefined( valuesProp );
+ 
+-	const [ isDirty, setIsDirty ] = useState( false );
+-	const [ isLinked, setIsLinked ] = useState( ! isValuesMixed( values ) );
+-	const [ side, setSide ] = useState( isLinked ? 'all' : 'top' );
++	const [ isDirty, setIsDirty ] = useState( hasInitialValue );
++	const [ isLinked, setIsLinked ] = useState(
++		! hasInitialValue || ! isValuesMixed( inputValues )
++	);
+ 
+-	const initialValuesRef = useRef( values );
++	const [ side, setSide ] = useState( isLinked ? 'all' : 'top' );
+ 
+ 	const id = useUniqueId( idProp );
+ 	const headingId = `${ id }-heading`;
+@@ -73,8 +82,16 @@ export default function BoxControl( {
+ 		setIsDirty( true );
+ 	};
+ 
++	const handleOnHoverOn = ( next = {} ) => {
++		onChangeShowVisualizer( { ...DEFAULT_VISUALIZER_VALUES, ...next } );
++	};
++
++	const handleOnHoverOff = ( next = {} ) => {
++		onChangeShowVisualizer( { ...DEFAULT_VISUALIZER_VALUES, ...next } );
++	};
++
+ 	const handleOnReset = () => {
+-		const initialValues = initialValuesRef.current;
++		const initialValues = DEFAULT_VALUES;
+ 
+ 		onChange( initialValues );
+ 		setValues( initialValues );
+@@ -85,9 +102,11 @@ export default function BoxControl( {
+ 		...inputProps,
+ 		onChange: handleOnChange,
+ 		onFocus: handleOnFocus,
++		onHoverOn: handleOnHoverOn,
++		onHoverOff: handleOnHoverOff,
+ 		isLinked,
+ 		units,
+-		values,
++		values: inputValues,
+ 	};
+ 
+ 	return (
+diff --git a/packages/components/src/box-control/input-controls.js b/packages/components/src/box-control/input-controls.js
+index 36242e1e2a0f26..0177052151273f 100644
+--- a/packages/components/src/box-control/input-controls.js
++++ b/packages/components/src/box-control/input-controls.js
+@@ -13,6 +13,8 @@ import { LayoutContainer, Layout } from './styles/box-control-styles';
+ export default function BoxInputControls( {
+ 	onChange = noop,
+ 	onFocus = noop,
++	onHoverOn = noop,
++	onHoverOff = noop,
+ 	values,
+ 	...props
+ } ) {
+@@ -20,6 +22,14 @@ export default function BoxInputControls( {
+ 		onFocus( event, { side } );
+ 	};
+ 
++	const createHandleOnHoverOn = ( side ) => () => {
++		onHoverOn( { [ side ]: true } );
++	};
++
++	const createHandleOnHoverOff = ( side ) => () => {
++		onHoverOff( { [ side ]: false } );
++	};
++
+ 	const handleOnChange = ( nextValues ) => {
+ 		onChange( nextValues );
+ 	};
+@@ -69,6 +79,8 @@ export default function BoxInputControls( {
+ 					value={ top }
+ 					onChange={ createHandleOnChange( 'top' ) }
+ 					onFocus={ createHandleOnFocus( 'top' ) }
++					onHoverOn={ createHandleOnHoverOn( 'top' ) }
++					onHoverOff={ createHandleOnHoverOff( 'top' ) }
+ 					label={ LABELS.top }
+ 				/>
+ 				<UnitControl
+@@ -76,6 +88,8 @@ export default function BoxInputControls( {
+ 					value={ right }
+ 					onChange={ createHandleOnChange( 'right' ) }
+ 					onFocus={ createHandleOnFocus( 'right' ) }
++					onHoverOn={ createHandleOnHoverOn( 'right' ) }
++					onHoverOff={ createHandleOnHoverOff( 'right' ) }
+ 					label={ LABELS.right }
+ 				/>
+ 				<UnitControl
+@@ -83,6 +97,8 @@ export default function BoxInputControls( {
+ 					value={ bottom }
+ 					onChange={ createHandleOnChange( 'bottom' ) }
+ 					onFocus={ createHandleOnFocus( 'bottom' ) }
++					onHoverOn={ createHandleOnHoverOn( 'bottom' ) }
++					onHoverOff={ createHandleOnHoverOff( 'bottom' ) }
+ 					label={ LABELS.bottom }
+ 				/>
+ 				<UnitControl
+@@ -91,6 +107,8 @@ export default function BoxInputControls( {
+ 					value={ left }
+ 					onChange={ createHandleOnChange( 'left' ) }
+ 					onFocus={ createHandleOnFocus( 'left' ) }
++					onHoverOn={ createHandleOnHoverOn( 'left' ) }
++					onHoverOff={ createHandleOnHoverOff( 'left' ) }
+ 					label={ LABELS.left }
+ 				/>
+ 			</Layout>
+diff --git a/packages/components/src/box-control/stories/index.js b/packages/components/src/box-control/stories/index.js
+index 47e8520eeb9fb9..60205d435fb944 100644
+--- a/packages/components/src/box-control/stories/index.js
++++ b/packages/components/src/box-control/stories/index.js
+@@ -28,6 +28,8 @@ function DemoExample() {
+ 		left: '10px',
+ 	} );
+ 
++	const [ showVisualizer, setShowVisualizer ] = useState( {} );
++
+ 	return (
+ 		<Container align="top" gap={ 8 }>
+ 			<FlexBlock>
+@@ -36,13 +38,17 @@ function DemoExample() {
+ 						label="Padding"
+ 						values={ values }
+ 						onChange={ setValues }
++						onChangeShowVisualizer={ setShowVisualizer }
+ 					/>
+ 				</Content>
+ 			</FlexBlock>
+ 			<FlexBlock>
+ 				<Content>
+ 					<BoxContainer>
+-						<BoxControlVisualizer values={ values }>
++						<BoxControlVisualizer
++							showValues={ showVisualizer }
++							values={ values }
++						>
+ 							<Box />
+ 						</BoxControlVisualizer>
+ 					</BoxContainer>
+diff --git a/packages/components/src/box-control/unit-control.js b/packages/components/src/box-control/unit-control.js
+index d5842da2168841..1211452f7d3155 100644
+--- a/packages/components/src/box-control/unit-control.js
++++ b/packages/components/src/box-control/unit-control.js
+@@ -1,3 +1,9 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++import { useHover } from 'react-use-gesture';
++
+ /**
+  * Internal dependencies
+  */
+@@ -8,12 +14,22 @@ export default function BoxUnitControl( {
+ 	isFirst,
+ 	isLast,
+ 	isOnly,
++	onHoverOn = noop,
++	onHoverOff = noop,
+ 	label,
+ 	value,
+ 	...props
+ } ) {
++	const bindHoverGesture = useHover( ( { event, ...state } ) => {
++		if ( state.hovering ) {
++			onHoverOn( event, state );
++		} else {
++			onHoverOff( event, state );
++		}
++	} );
++
+ 	return (
+-		<UnitControlWrapper aria-label={ label }>
++		<UnitControlWrapper aria-label={ label } { ...bindHoverGesture() }>
+ 			<Tooltip text={ label }>
+ 				<UnitControl
+ 					className="component-box-control__unit-control"
+diff --git a/packages/components/src/box-control/utils.js b/packages/components/src/box-control/utils.js
+index c387122a072d71..63051c3ea0823e 100644
+--- a/packages/components/src/box-control/utils.js
++++ b/packages/components/src/box-control/utils.js
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import { isEmpty, isNumber } from 'lodash';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -18,10 +23,17 @@ export const LABELS = {
+ };
+ 
+ export const DEFAULT_VALUES = {
+-	top: '0px',
+-	right: '0px',
+-	bottom: '0px',
+-	left: '0px',
++	top: null,
++	right: null,
++	bottom: null,
++	left: null,
++};
++
++export const DEFAULT_VISUALIZER_VALUES = {
++	top: false,
++	right: false,
++	bottom: false,
++	left: false,
+ };
+ 
+ /**
+@@ -58,7 +70,16 @@ export function getAllValue( values = {} ) {
+ 		: '';
+ 	const unit = mode( allUnits );
+ 
+-	const allValue = `${ value }${ unit }`;
++	/**
++	 * The isNumber check is important. On reset actions, the incoming value
++	 * may be null or an empty string.
++	 *
++	 * Also, the value may also be zero (0), which is considered a valid unit value.
++	 *
++	 * isNumber() is more specific for these cases, rather than relying on a
++	 * simple truthy check.
++	 */
++	const allValue = isNumber( value ) ? `${ value }${ unit }` : null;
+ 
+ 	return allValue;
+ }
+@@ -75,3 +96,17 @@ export function isValuesMixed( values = {} ) {
+ 
+ 	return isMixed;
+ }
++
++/**
++ * Checks to determine if values are defined.
++ *
++ * @param {Object} values Box values.
++ *
++ * @return {boolean} Whether values are mixed.
++ */
++export function isValuesDefined( values ) {
++	return (
++		values !== undefined &&
++		! isEmpty( Object.values( values ).filter( Boolean ) )
++	);
++}
+diff --git a/packages/components/src/box-control/visualizer.js b/packages/components/src/box-control/visualizer.js
+index 5792157777b62f..ad36cdcf30f7be 100644
+--- a/packages/components/src/box-control/visualizer.js
++++ b/packages/components/src/box-control/visualizer.js
+@@ -13,10 +13,11 @@ import {
+ 	BottomView,
+ 	LeftView,
+ } from './styles/box-control-visualizer-styles';
+-import { DEFAULT_VALUES } from './utils';
++import { DEFAULT_VALUES, DEFAULT_VISUALIZER_VALUES } from './utils';
+ 
+ export default function BoxControlVisualizer( {
+ 	children,
++	showValues = DEFAULT_VISUALIZER_VALUES,
+ 	values: valuesProp = DEFAULT_VALUES,
+ 	...props
+ } ) {
+@@ -27,51 +28,55 @@ export default function BoxControlVisualizer( {
+ 			isPositionAbsolute={ isPositionAbsolute }
+ 			aria-hidden="true"
+ 		>
+-			<Sides values={ valuesProp } />
++			<Sides showValues={ showValues } values={ valuesProp } />
+ 			{ children }
+ 		</Container>
+ 	);
+ }
+ 
+-function Sides( { values } ) {
++function Sides( { showValues = DEFAULT_VISUALIZER_VALUES, values } ) {
+ 	const { top, right, bottom, left } = values;
+ 
+ 	return (
+ 		<>
+-			<Top value={ top } />
+-			<Right value={ right } />
+-			<Bottom value={ bottom } />
+-			<Left value={ left } />
++			<Top isVisible={ showValues.top } value={ top } />
++			<Right isVisible={ showValues.right } value={ right } />
++			<Bottom isVisible={ showValues.bottom } value={ bottom } />
++			<Left isVisible={ showValues.left } value={ left } />
+ 		</>
+ 	);
+ }
+ 
+-function Top( { value } ) {
++function Top( { isVisible = false, value } ) {
+ 	const height = value;
+ 	const animationProps = useSideAnimation( height );
++	const isActive = animationProps.isActive || isVisible;
+ 
+-	return <TopView { ...animationProps } style={ { height } } />;
++	return <TopView isActive={ isActive } style={ { height } } />;
+ }
+ 
+-function Right( { value } ) {
++function Right( { isVisible = false, value } ) {
+ 	const width = value;
+ 	const animationProps = useSideAnimation( width );
++	const isActive = animationProps.isActive || isVisible;
+ 
+-	return <RightView { ...animationProps } style={ { width } } />;
++	return <RightView isActive={ isActive } style={ { width } } />;
+ }
+ 
+-function Bottom( { value } ) {
++function Bottom( { isVisible = false, value } ) {
+ 	const height = value;
+ 	const animationProps = useSideAnimation( height );
++	const isActive = animationProps.isActive || isVisible;
+ 
+-	return <BottomView { ...animationProps } style={ { height } } />;
++	return <BottomView isActive={ isActive } style={ { height } } />;
+ }
+ 
+-function Left( { value } ) {
++function Left( { isVisible = false, value } ) {
+ 	const width = value;
+ 	const animationProps = useSideAnimation( width );
++	const isActive = animationProps.isActive || isVisible;
+ 
+-	return <LeftView { ...animationProps } style={ { width } } />;
++	return <LeftView isActive={ isActive } style={ { width } } />;
+ }
+ 
+ /**

@@ -1,0 +1,252 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 725c6e30237081..b9fa56b7f6cfc3 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -102,6 +102,7 @@ module.exports = {
+ 							'flatten',
+ 							'flattenDeep',
+ 							'fromPairs',
++							'has',
+ 							'identity',
+ 							'invoke',
+ 							'isArray',
+diff --git a/packages/block-editor/src/hooks/align.js b/packages/block-editor/src/hooks/align.js
+index c790a1cce20e0f..4d3a22340b1eed 100644
+--- a/packages/block-editor/src/hooks/align.js
++++ b/packages/block-editor/src/hooks/align.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { has, without } from 'lodash';
++import { without } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -87,7 +87,7 @@ export function getValidAlignments(
+  */
+ export function addAttribute( settings ) {
+ 	// Allow blocks to specify their own attribute definition with default values if needed.
+-	if ( has( settings.attributes, [ 'align', 'type' ] ) ) {
++	if ( 'type' in ( settings.attributes?.align ?? {} ) ) {
+ 		return settings;
+ 	}
+ 	if ( hasBlockSupport( settings, 'align' ) ) {
+diff --git a/packages/block-editor/src/hooks/anchor.js b/packages/block-editor/src/hooks/anchor.js
+index 4be1719ec90925..804375da6e2d0c 100644
+--- a/packages/block-editor/src/hooks/anchor.js
++++ b/packages/block-editor/src/hooks/anchor.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { has } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -42,7 +37,7 @@ const ANCHOR_SCHEMA = {
+  */
+ export function addAttribute( settings ) {
+ 	// Allow blocks to specify their own attribute definition with default values if needed.
+-	if ( has( settings.attributes, [ 'anchor', 'type' ] ) ) {
++	if ( 'type' in ( settings.attributes?.anchor ?? {} ) ) {
+ 		return settings;
+ 	}
+ 	if ( hasBlockSupport( settings, 'anchor' ) ) {
+diff --git a/packages/block-editor/src/hooks/layout.js b/packages/block-editor/src/hooks/layout.js
+index 30a5b265ca10ab..c4d4af0b95d4c3 100644
+--- a/packages/block-editor/src/hooks/layout.js
++++ b/packages/block-editor/src/hooks/layout.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { has, kebabCase } from 'lodash';
++import { kebabCase } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -246,7 +246,7 @@ function LayoutTypeSwitcher( { type, onChange } ) {
+  * @return {Object} Filtered block settings.
+  */
+ export function addAttribute( settings ) {
+-	if ( has( settings.attributes, [ 'layout', 'type' ] ) ) {
++	if ( 'type' in ( settings.attributes?.layout ?? {} ) ) {
+ 		return settings;
+ 	}
+ 	if ( hasBlockSupport( settings, layoutBlockSupportKey ) ) {
+diff --git a/packages/block-editor/src/hooks/lock.js b/packages/block-editor/src/hooks/lock.js
+index 24ac0feeaa2ef3..7e9423edcc4bba 100644
+--- a/packages/block-editor/src/hooks/lock.js
++++ b/packages/block-editor/src/hooks/lock.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { has } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -17,7 +12,7 @@ import { addFilter } from '@wordpress/hooks';
+  */
+ export function addAttribute( settings ) {
+ 	// Allow blocks to specify their own attribute definition with default values if needed.
+-	if ( has( settings.attributes, [ 'lock', 'type' ] ) ) {
++	if ( 'type' in ( settings.attributes?.lock ?? {} ) ) {
+ 		return settings;
+ 	}
+ 	// Gracefully handle if settings.attributes is undefined.
+diff --git a/packages/block-library/src/image/edit.js b/packages/block-library/src/image/edit.js
+index 7e45b27e546c64..bfc72d7cde4767 100644
+--- a/packages/block-library/src/image/edit.js
++++ b/packages/block-library/src/image/edit.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { get, has, isEmpty, omit, pick } from 'lodash';
++import { get, isEmpty, omit, pick } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -98,8 +98,8 @@ export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
+  */
+ function hasDefaultSize( image, defaultSize ) {
+ 	return (
+-		has( image, [ 'sizes', defaultSize, 'url' ] ) ||
+-		has( image, [ 'media_details', 'sizes', defaultSize, 'source_url' ] )
++		'url' in ( image?.sizes?.[ defaultSize ] ?? {} ) ||
++		'source_url' in ( image?.media_details?.sizes?.[ defaultSize ] ?? {} )
+ 	);
+ }
+ 
+diff --git a/packages/blocks/src/api/utils.js b/packages/blocks/src/api/utils.js
+index 5cb5a6a07d5e87..391bac42245dcd 100644
+--- a/packages/blocks/src/api/utils.js
++++ b/packages/blocks/src/api/utils.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { every, has, reduce } from 'lodash';
++import { every, reduce } from 'lodash';
+ import { colord, extend } from 'colord';
+ import namesPlugin from 'colord/plugins/names';
+ import a11yPlugin from 'colord/plugins/a11y';
+@@ -99,7 +99,7 @@ export function normalizeIconObject( icon ) {
+ 		return { src: icon };
+ 	}
+ 
+-	if ( has( icon, [ 'background' ] ) ) {
++	if ( 'background' in icon ) {
+ 		const colordBgColor = colord( icon.background );
+ 		const getColorContrast = ( iconColor ) =>
+ 			colordBgColor.contrast( iconColor );
+diff --git a/packages/components/src/mobile/global-styles-context/utils.native.js b/packages/components/src/mobile/global-styles-context/utils.native.js
+index badf1bc4066653..7d985a9cccb6f6 100644
+--- a/packages/components/src/mobile/global-styles-context/utils.native.js
++++ b/packages/components/src/mobile/global-styles-context/utils.native.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { camelCase } from 'change-case';
+-import { find, get, has } from 'lodash';
++import { find, get } from 'lodash';
+ import { Dimensions } from 'react-native';
+ 
+ /**
+@@ -224,7 +224,12 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
+ 			const customValuesData = customValues ?? JSON.parse( stylesBase );
+ 			stylesBase = stylesBase.replace( regex, ( _$1, $2 ) => {
+ 				const path = $2.split( '--' );
+-				if ( has( customValuesData, path ) ) {
++				if (
++					path.reduce(
++						( prev, curr ) => prev && prev[ curr ],
++						customValuesData
++					)
++				) {
+ 					return get( customValuesData, path );
+ 				}
+ 
+diff --git a/packages/data/src/redux-store/metadata/reducer.ts b/packages/data/src/redux-store/metadata/reducer.ts
+index fd9aeaa343115e..43f27bfd09f4d6 100644
+--- a/packages/data/src/redux-store/metadata/reducer.ts
++++ b/packages/data/src/redux-store/metadata/reducer.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { omit, has } from 'lodash';
++import { omit } from 'lodash';
+ import EquivalentKeyMap from 'equivalent-key-map';
+ import type { Reducer } from 'redux';
+ 
+@@ -126,7 +126,7 @@ const isResolved = ( state: Record< string, State > = {}, action: Action ) => {
+ 		case 'INVALIDATE_RESOLUTION_FOR_STORE':
+ 			return {};
+ 		case 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR':
+-			return has( state, [ action.selectorName ] )
++			return action.selectorName in state
+ 				? omit( state, [ action.selectorName ] )
+ 				: state;
+ 		case 'START_RESOLUTION':
+diff --git a/packages/edit-site/src/components/global-styles/hooks.js b/packages/edit-site/src/components/global-styles/hooks.js
+index 1da9a7293835fa..662aeed77519b1 100644
+--- a/packages/edit-site/src/components/global-styles/hooks.js
++++ b/packages/edit-site/src/components/global-styles/hooks.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { get, cloneDeep, set, isEqual, has } from 'lodash';
++import { get, cloneDeep, set, isEqual } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -210,10 +210,8 @@ export function getSupportedGlobalStylesPanels( name ) {
+ 		// unset, we still enable it.
+ 		if ( STYLE_PROPERTY[ styleName ].requiresOptOut ) {
+ 			if (
+-				has(
+-					blockType.supports,
+-					STYLE_PROPERTY[ styleName ].support[ 0 ]
+-				) &&
++				STYLE_PROPERTY[ styleName ].support[ 0 ] in
++					blockType.supports &&
+ 				get(
+ 					blockType.supports,
+ 					STYLE_PROPERTY[ styleName ].support
+diff --git a/packages/editor/src/components/post-featured-image/index.js b/packages/editor/src/components/post-featured-image/index.js
+index 800177adfccd04..dd50d9bd588051 100644
+--- a/packages/editor/src/components/post-featured-image/index.js
++++ b/packages/editor/src/components/post-featured-image/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { has, get } from 'lodash';
++import { get } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -59,7 +59,7 @@ function getMediaDetails( media, postId ) {
+ 		media.id,
+ 		postId
+ 	);
+-	if ( has( media, [ 'media_details', 'sizes', defaultSize ] ) ) {
++	if ( defaultSize in ( media?.media_details?.sizes ?? {} ) ) {
+ 		return {
+ 			mediaWidth: media.media_details.sizes[ defaultSize ].width,
+ 			mediaHeight: media.media_details.sizes[ defaultSize ].height,
+@@ -74,7 +74,7 @@ function getMediaDetails( media, postId ) {
+ 		media.id,
+ 		postId
+ 	);
+-	if ( has( media, [ 'media_details', 'sizes', fallbackSize ] ) ) {
++	if ( fallbackSize in ( media?.media_details?.sizes ?? {} ) ) {
+ 		return {
+ 			mediaWidth: media.media_details.sizes[ fallbackSize ].width,
+ 			mediaHeight: media.media_details.sizes[ fallbackSize ].height,

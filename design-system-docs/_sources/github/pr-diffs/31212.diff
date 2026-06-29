@@ -1,0 +1,150 @@
+diff --git a/packages/components/src/ui/divider/component.tsx b/packages/components/src/ui/divider/component.tsx
+index fc920d7494d001..555c3e510d7d52 100644
+--- a/packages/components/src/ui/divider/component.tsx
++++ b/packages/components/src/ui/divider/component.tsx
+@@ -1,13 +1,11 @@
+ /**
+  * External dependencies
+  */
+-import { contextConnect, useContextSystem } from '@wp-g2/context';
+-import { css, cx, ui } from '@wp-g2/styles';
++import { css, cx } from 'emotion';
+ // eslint-disable-next-line no-restricted-imports
+ import { Separator } from 'reakit';
+ // eslint-disable-next-line no-restricted-imports, no-duplicate-imports
+ import type { SeparatorProps } from 'reakit';
+-import type { ViewOwnProps } from '@wp-g2/create-styles';
+ // eslint-disable-next-line no-restricted-imports
+ import type { Ref } from 'react';
+ 
+@@ -19,7 +17,11 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
++import { contextConnect, useContextSystem } from '../context';
++// eslint-disable-next-line no-duplicate-imports
++import type { ViewOwnProps } from '../context';
+ import * as styles from './styles';
++import { space } from '../utils/space';
+ 
+ export interface DividerProps extends SeparatorProps {
+ 	/**
+@@ -50,19 +52,19 @@ function Divider(
+ 
+ 		if ( typeof m !== 'undefined' ) {
+ 			sx.m = css`
+-				margin-bottom: ${ ui.space( m ) };
+-				margin-top: ${ ui.space( m ) };
++				margin-bottom: ${ space( m ) };
++				margin-top: ${ space( m ) };
+ 			`;
+ 		} else {
+ 			if ( typeof mt !== 'undefined' ) {
+ 				sx.mt = css`
+-					margin-top: ${ ui.space( mt ) };
++					margin-top: ${ space( mt ) };
+ 				`;
+ 			}
+ 
+ 			if ( typeof mb !== 'undefined' ) {
+ 				sx.mb = css`
+-					margin-bottom: ${ ui.space( mb ) };
++					margin-bottom: ${ space( mb ) };
+ 				`;
+ 			}
+ 		}
+diff --git a/packages/components/src/ui/divider/styles.ts b/packages/components/src/ui/divider/styles.ts
+index bfb8ca218b5bc4..3dca592c0afe7f 100644
+--- a/packages/components/src/ui/divider/styles.ts
++++ b/packages/components/src/ui/divider/styles.ts
+@@ -1,10 +1,15 @@
+ /**
+  * External dependencies
+  */
+-import { css, ui } from '@wp-g2/styles';
++import { css } from 'emotion';
++
++/**
++ * Internal dependencies
++ */
++import CONFIG from '../../utils/config-values';
+ 
+ export const Divider = css`
+-	border-color: ${ ui.get( 'colorDivider' ) };
++	border-color: ${ CONFIG.colorDivider };
+ 	border-width: 0 0 1px 0;
+ 	height: 0;
+ 	margin: 0;
+diff --git a/packages/components/src/ui/divider/test/__snapshots__/index.js.snap b/packages/components/src/ui/divider/test/__snapshots__/index.js.snap
+index b1f8239dc123ff..c9bb8770ff64d6 100644
+--- a/packages/components/src/ui/divider/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/divider/test/__snapshots__/index.js.snap
+@@ -1,9 +1,8 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-  border-color: rgba(0, 0, 0, 0.1);
+-  border-color: var(--wp-g2-color-divider);
++.emotion-0 {
++  border-color: rgba(0,0,0,0.1);
+   border-width: 0 0 1px 0;
+   height: 0;
+   margin: 0;
+@@ -12,9 +11,9 @@ exports[`props should render correctly 1`] = `
+ 
+ <hr
+   aria-orientation="horizontal"
+-  class="emotion-0 components-divider wp-components-divider ic-d9awm7"
+-  data-g2-c16t="true"
+-  data-g2-component="Divider"
++  class="emotion-0 components-divider"
++  data-wp-c16t="true"
++  data-wp-component="Divider"
+   role="separator"
+ />
+ `;
+@@ -26,12 +25,12 @@ Snapshot Diff:
+ 
+ @@ -2,10 +2,8 @@
+     Object {
+-      "border-color": "var(--wp-g2-color-divider)",
++      "border-color": "rgba(0,0,0,0.1)",
+       "border-width": "0 0 1px 0",
+       "height": "0",
+       "margin": "0",
+--     "margin-bottom": "calc(var(--wp-g2-grid-base) * 7)",
+--     "margin-top": "calc(var(--wp-g2-grid-base) * 7)",
++-     "margin-bottom": "calc(4px * 7)",
++-     "margin-top": "calc(4px * 7)",
+       "width": "auto",
+     },
+   ]
+@@ -44,11 +43,11 @@ Snapshot Diff:
+ 
+ @@ -2,9 +2,8 @@
+     Object {
+-      "border-color": "var(--wp-g2-color-divider)",
++      "border-color": "rgba(0,0,0,0.1)",
+       "border-width": "0 0 1px 0",
+       "height": "0",
+       "margin": "0",
+--     "margin-bottom": "calc(var(--wp-g2-grid-base) * 5)",
++-     "margin-bottom": "calc(4px * 5)",
+       "width": "auto",
+     },
+   ]
+@@ -61,11 +60,11 @@ Snapshot Diff:
+ 
+ @@ -2,9 +2,8 @@
+     Object {
+-      "border-color": "var(--wp-g2-color-divider)",
++      "border-color": "rgba(0,0,0,0.1)",
+       "border-width": "0 0 1px 0",
+       "height": "0",
+       "margin": "0",
+--     "margin-top": "calc(var(--wp-g2-grid-base) * 5)",
++-     "margin-top": "calc(4px * 5)",
+       "width": "auto",
+     },
+   ]

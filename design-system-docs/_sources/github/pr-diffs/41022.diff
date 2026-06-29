@@ -1,0 +1,24 @@
+diff --git a/packages/components/src/guide/style.scss b/packages/components/src/guide/style.scss
+index 6d2d001a4bbe15..ab7ac55f7d1a38 100644
+--- a/packages/components/src/guide/style.scss
++++ b/packages/components/src/guide/style.scss
+@@ -117,15 +117,15 @@
+ 
+ 	&.components-guide__back-button {
+ 		left: $grid-unit-40;
+-	}
+-
+-	&.components-guide__forward-button {
+-		right: $grid-unit-40;
+ 		color: #1386bf;
+ 		font-weight: bold;
+ 	}
+ 
++	&.components-guide__forward-button,
+ 	&.components-guide__finish-button {
+ 		right: $grid-unit-40;
++		color: #1386bf;
++		font-weight: bold;
+ 	}
++
+ }

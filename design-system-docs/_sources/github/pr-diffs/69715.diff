@@ -1,0 +1,85 @@
+diff --git a/packages/components/src/toggle-group-control/stories/index.story.tsx b/packages/components/src/toggle-group-control/stories/index.story.tsx
+index 0f3c0a299617af..2d28ee02b59cf9 100644
+--- a/packages/components/src/toggle-group-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-group-control/stories/index.story.tsx
+@@ -142,3 +142,24 @@ Deselectable.args = {
+ 	...WithIcons.args,
+ 	isDeselectable: true,
+ };
++
++/**
++ * This story demonstrates how individual options can be disabled.
++ */
++export const WithSomeDisabledOptions: StoryFn< typeof ToggleGroupControl > =
++	Template.bind( {} );
++WithSomeDisabledOptions.args = {
++	...Default.args,
++	label: 'Sort order (Disabled)',
++	children: [
++		{
++			value: 'asc',
++			label: 'A→Z',
++		},
++		{
++			value: 'desc',
++			label: 'Z→A',
++			disabled: true,
++		},
++	].map( mapPropsToOptionComponent ),
++};
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md
+index e673a1ed45bbf6..76007090931678 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/README.md
+@@ -25,3 +25,7 @@ The value of the `ToggleGroupControlOptionBase`.
+ Whether to show a tooltip when hovering over the option. The tooltip will only show if a label for it is provided using the `aria-label` prop.
+ 
+ -   Required: No
++
++### `disabled` : `boolean`
++
++Whether the option should be disabled.
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+index 411857d260a311..dba337e6ce7357 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+@@ -53,3 +53,7 @@ The value of the `ToggleGroupControlOption`.
+ Whether to show a tooltip when hovering over the option. The tooltip will attempt to use the `aria-label` prop text first, then the `label` prop text if no `aria-label` prop is found.
+ 
+ -   Required: No
++
++### `disabled` : `boolean`
++
++Whether the option should be disabled.
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index cfa9d00080467c..a647ec97f46d2b 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -25,11 +25,17 @@ export type ToggleGroupControlOptionBaseProps = {
+ 	 * @default false
+ 	 */
+ 	showTooltip?: boolean;
++	/**
++	 * Whether the option is disabled.
++	 *
++	 * @default false
++	 */
++	disabled?: boolean;
+ };
+ 
+ export type ToggleGroupControlOptionIconProps = Pick<
+ 	ToggleGroupControlOptionBaseProps,
+-	'value'
++	'value' | 'disabled'
+ > & {
+ 	/**
+ 	 * Icon displayed as the content of the option. Usually one of the icons from
+@@ -44,7 +50,7 @@ export type ToggleGroupControlOptionIconProps = Pick<
+ 
+ export type ToggleGroupControlOptionProps = Pick<
+ 	ToggleGroupControlOptionBaseProps,
+-	'value' | 'showTooltip'
++	'value' | 'showTooltip' | 'disabled'
+ > & {
+ 	/**
+ 	 * Label for the option. If needed, the `aria-label` prop can be used in addition

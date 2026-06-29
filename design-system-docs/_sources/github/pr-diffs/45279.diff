@@ -1,0 +1,351 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3881fea0860ffc..6ac59eb1ef0e17 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ## Enhancements
+ 
+ -   `FontSizePicker`: Improved slider design when `withSlider` is set ([#44598](https://github.com/WordPress/gutenberg/pull/44598)).
++-   `ToggleControl`: Improved types for the `help` prop, covering the dynamic render function option, and enabled the dynamic `help` behavior only for a controlled component ([#45279](https://github.com/WordPress/gutenberg/pull/45279)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/form-file-upload/README.md b/packages/components/src/form-file-upload/README.md
+index ca3f356fade0f8..38dd50dd039155 100644
+--- a/packages/components/src/form-file-upload/README.md
++++ b/packages/components/src/form-file-upload/README.md
+@@ -81,9 +81,7 @@ This can be useful when you want to force a `change` event to fire when the user
+ 
+ ### render
+ 
+-Optional callback function used to render the UI. If passed the component does not render any UI and calls this function to render it.
+-
+-This function receives an object with the property `openFileDialog`. The property is a function that when called opens the browser window to upload files.
++Optional callback function used to render the UI. If passed, the component does not render the default UI (a button) and calls this function to render it. The function receives an object with property `openFileDialog`, a function that, when called, opens the browser native file upload modal window.
+ 
+ -   Type: `Function`
+ -   Required: No
+diff --git a/packages/components/src/form-file-upload/index.tsx b/packages/components/src/form-file-upload/index.tsx
+index ce2392365fe1af..608fdf837300f4 100644
+--- a/packages/components/src/form-file-upload/index.tsx
++++ b/packages/components/src/form-file-upload/index.tsx
+@@ -47,6 +47,7 @@ export function FormFileUpload( {
+ 			{ children }
+ 		</Button>
+ 	);
++
+ 	return (
+ 		<div className="components-form-file-upload">
+ 			{ ui }
+diff --git a/packages/components/src/form-file-upload/types.ts b/packages/components/src/form-file-upload/types.ts
+index 4e4281383d0879..5b9054fa869eea 100644
+--- a/packages/components/src/form-file-upload/types.ts
++++ b/packages/components/src/form-file-upload/types.ts
+@@ -55,9 +55,10 @@ export type FormFileUploadProps = {
+ 	/**
+ 	 * Optional callback function used to render the UI.
+ 	 *
+-	 * If passed, the component does not render any UI and calls this function to render it.
+-	 * This function receives an object with the property `openFileDialog`.
+-	 * The property is a function that when called opens the browser window to upload files.
++	 * If passed, the component does not render the default UI (a button) and
++	 * calls this function to render it. The function receives an object with
++	 * property `openFileDialog`, a function that, when called, opens the browser
++	 * native file upload modal window.
+ 	 */
+-	render?: ( arg: { openFileDialog: () => void } ) => void;
++	render?: ( arg: { openFileDialog: () => void } ) => ReactNode;
+ };
+diff --git a/packages/components/src/isolated-event-container/index.js b/packages/components/src/isolated-event-container/index.js
+deleted file mode 100644
+index 5b24d36d0b1acb..00000000000000
+--- a/packages/components/src/isolated-event-container/index.js
++++ /dev/null
+@@ -1,28 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-import deprecated from '@wordpress/deprecated';
+-
+-/**
+- * @type {import('react').MouseEventHandler<HTMLDivElement>}
+- */
+-function stopPropagation( event ) {
+-	event.stopPropagation();
+-}
+-
+-export default forwardRef( ( { children, ...props }, ref ) => {
+-	deprecated( 'wp.components.IsolatedEventContainer', {
+-		since: '5.7',
+-	} );
+-
+-	// Disable reason: this stops certain events from propagating outside of the component.
+-	// - onMouseDown is disabled as this can cause interactions with other DOM elements.
+-	/* eslint-disable jsx-a11y/no-static-element-interactions */
+-	return (
+-		<div { ...props } ref={ ref } onMouseDown={ stopPropagation }>
+-			{ children }
+-		</div>
+-	);
+-	/* eslint-enable jsx-a11y/no-static-element-interactions */
+-} );
+diff --git a/packages/components/src/isolated-event-container/index.tsx b/packages/components/src/isolated-event-container/index.tsx
+new file mode 100644
+index 00000000000000..267efd945a31e9
+--- /dev/null
++++ b/packages/components/src/isolated-event-container/index.tsx
+@@ -0,0 +1,32 @@
++/**
++ * External dependencies
++ */
++import type { ComponentPropsWithoutRef, MouseEvent } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
++
++function stopPropagation( event: MouseEvent ) {
++	event.stopPropagation();
++}
++
++type DivProps = ComponentPropsWithoutRef< 'div' >;
++
++const IsolatedEventContainer = forwardRef< HTMLDivElement, DivProps >(
++	( props, ref ) => {
++		deprecated( 'wp.components.IsolatedEventContainer', {
++			since: '5.7',
++		} );
++
++		// Disable reason: this stops certain events from propagating outside of the component.
++		// - onMouseDown is disabled as this can cause interactions with other DOM elements.
++		/* eslint-disable jsx-a11y/no-static-element-interactions */
++		return <div { ...props } ref={ ref } onMouseDown={ stopPropagation } />;
++		/* eslint-enable jsx-a11y/no-static-element-interactions */
++	}
++);
++
++export default IsolatedEventContainer;
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 25bb157247a361..fba4dedb7a0044 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -252,7 +252,7 @@ const UnforwardedPopover = (
+ 		} );
+ 	}
+ 
+-	const arrowRef = useRef( null );
++	const arrowRef = useRef< HTMLElement | null >( null );
+ 
+ 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
+ 		useState< HTMLSpanElement | null >( null );
+@@ -385,7 +385,7 @@ const UnforwardedPopover = (
+ 	} );
+ 
+ 	const arrowCallbackRef = useCallback(
+-		( node ) => {
++		( node: HTMLElement | null ) => {
+ 			arrowRef.current = node;
+ 			update();
+ 		},
+diff --git a/packages/components/src/toggle-control/README.md b/packages/components/src/toggle-control/README.md
+index e149dcd5f4d2c9..d22c99a414d165 100644
+--- a/packages/components/src/toggle-control/README.md
++++ b/packages/components/src/toggle-control/README.md
+@@ -44,14 +44,16 @@ If this property is added, a label will be generated using label property as the
+ ### help
+ 
+ If this property is added, a help text will be generated using help property as the content.
++For controlled components the `help` prop can also be a function which will return a help text
++dynamically depending on the boolean `checked` parameter.
+ 
+--   Type: `String|WPElement`
++-   Type: `String|WPElement|Function`
+ -   Required: No
+ 
+ ### checked
+ 
+ If checked is true the toggle will be checked. If checked is false the toggle will be unchecked.
+-If no value is passed the toggle will be unchecked.
++If no value is passed the toggle will be an uncontrolled component with unchecked initial value.
+ 
+ -   Type: `Boolean`
+ -   Required: No
+@@ -74,5 +76,5 @@ A function that receives the checked state (boolean) as input.
+ 
+ The class that will be added with `components-base-control` and `components-toggle-control` to the classes of the wrapper div. If no className is passed only `components-base-control` and `components-toggle-control` are used.
+ 
+-Type: String
+-Required: No
++-		Type: `String`
++-		Required: No
+diff --git a/packages/components/src/toggle-control/index.tsx b/packages/components/src/toggle-control/index.tsx
+index cb31677a356ec1..4dfcda30e7cab4 100644
+--- a/packages/components/src/toggle-control/index.tsx
++++ b/packages/components/src/toggle-control/index.tsx
+@@ -64,8 +64,19 @@ export function ToggleControl( {
+ 
+ 	let describedBy, helpLabel;
+ 	if ( help ) {
+-		describedBy = id + '__help';
+-		helpLabel = typeof help === 'function' ? help( checked ) : help;
++		if ( typeof help === 'function' ) {
++			// `help` as a function works only for controlled components where
++			// `checked` is passed down from parent component. Uncontrolled
++			// component can show only a static help label.
++			if ( checked !== undefined ) {
++				helpLabel = help( checked );
++			}
++		} else {
++			helpLabel = help;
++		}
++		if ( helpLabel ) {
++			describedBy = id + '__help';
++		}
+ 	}
+ 
+ 	return (
+diff --git a/packages/components/src/toggle-control/types.ts b/packages/components/src/toggle-control/types.ts
+index 3ad8d815f39d9e..568c44fb64af07 100644
+--- a/packages/components/src/toggle-control/types.ts
++++ b/packages/components/src/toggle-control/types.ts
+@@ -13,10 +13,8 @@ export type ToggleControlProps = Pick<
+ 	FormToggleProps,
+ 	'checked' | 'disabled'
+ > &
+-	Pick<
+-		BaseControlProps,
+-		'__nextHasNoMarginBottom' | 'help' | 'className'
+-	> & {
++	Pick< BaseControlProps, '__nextHasNoMarginBottom' | 'className' > & {
++		help?: ReactNode | ( ( checked: boolean ) => ReactNode );
+ 		/**
+ 		 * The label for the toggle.
+ 		 */
+diff --git a/packages/compose/src/hooks/use-dialog/index.ts b/packages/compose/src/hooks/use-dialog/index.ts
+index 28086799c0dede..b8ec91a5f206a9 100644
+--- a/packages/compose/src/hooks/use-dialog/index.ts
++++ b/packages/compose/src/hooks/use-dialog/index.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { KeyboardEvent, RefCallback, SyntheticEvent } from 'react';
++import type { RefCallback, SyntheticEvent } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -64,7 +64,7 @@ function useDialog( options: DialogOptions ): useDialogReturn {
+ 			currentOptions.current.onClose();
+ 		}
+ 	} );
+-	const closeOnEscapeRef = useCallback( ( node ) => {
++	const closeOnEscapeRef = useCallback( ( node: HTMLElement ) => {
+ 		if ( ! node ) {
+ 			return;
+ 		}
+diff --git a/packages/compose/src/hooks/use-focus-outside/index.js b/packages/compose/src/hooks/use-focus-outside/index.js
+index fdccb6ea01330c..045c946bbcfecc 100644
+--- a/packages/compose/src/hooks/use-focus-outside/index.js
++++ b/packages/compose/src/hooks/use-focus-outside/index.js
+@@ -125,19 +125,23 @@ export default function useFocusOutside( onFocusOutside ) {
+ 	 * intends to normalize this as treating click on buttons as focus.
+ 	 *
+ 	 * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+-	 *
+-	 * @param {SyntheticEvent} event Event for mousedown or mouseup.
+ 	 */
+-	const normalizeButtonFocus = useCallback( ( event ) => {
+-		const { type, target } = event;
+-		const isInteractionEnd = [ 'mouseup', 'touchend' ].includes( type );
+-
+-		if ( isInteractionEnd ) {
+-			preventBlurCheck.current = false;
+-		} else if ( isFocusNormalizedButton( target ) ) {
+-			preventBlurCheck.current = true;
+-		}
+-	}, [] );
++	const normalizeButtonFocus = useCallback(
++		/**
++		 * @param {SyntheticEvent} event Event for mousedown or mouseup.
++		 */
++		( event ) => {
++			const { type, target } = event;
++			const isInteractionEnd = [ 'mouseup', 'touchend' ].includes( type );
++
++			if ( isInteractionEnd ) {
++				preventBlurCheck.current = false;
++			} else if ( isFocusNormalizedButton( target ) ) {
++				preventBlurCheck.current = true;
++			}
++		},
++		[]
++	);
+ 
+ 	/**
+ 	 * A callback triggered when a blur event occurs on the element the handler
+@@ -145,34 +149,38 @@ export default function useFocusOutside( onFocusOutside ) {
+ 	 *
+ 	 * Calls the `onFocusOutside` callback in an immediate timeout if focus has
+ 	 * move outside the bound element and is still within the document.
+-	 *
+-	 * @param {SyntheticEvent} event Blur event.
+ 	 */
+-	const queueBlurCheck = useCallback( ( event ) => {
+-		// React does not allow using an event reference asynchronously
+-		// due to recycling behavior, except when explicitly persisted.
+-		event.persist();
+-
+-		// Skip blur check if clicking button. See `normalizeButtonFocus`.
+-		if ( preventBlurCheck.current ) {
+-			return;
+-		}
+-
+-		blurCheckTimeoutId.current = setTimeout( () => {
+-			// If document is not focused then focus should remain
+-			// inside the wrapped component and therefore we cancel
+-			// this blur event thereby leaving focus in place.
+-			// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
+-			if ( ! document.hasFocus() ) {
+-				event.preventDefault();
++	const queueBlurCheck = useCallback(
++		/**
++		 * @param {SyntheticEvent} event Blur event.
++		 */
++		( event ) => {
++			// React does not allow using an event reference asynchronously
++			// due to recycling behavior, except when explicitly persisted.
++			event.persist();
++
++			// Skip blur check if clicking button. See `normalizeButtonFocus`.
++			if ( preventBlurCheck.current ) {
+ 				return;
+ 			}
+ 
+-			if ( 'function' === typeof currentOnFocusOutside.current ) {
+-				currentOnFocusOutside.current( event );
+-			}
+-		}, 0 );
+-	}, [] );
++			blurCheckTimeoutId.current = setTimeout( () => {
++				// If document is not focused then focus should remain
++				// inside the wrapped component and therefore we cancel
++				// this blur event thereby leaving focus in place.
++				// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
++				if ( ! document.hasFocus() ) {
++					event.preventDefault();
++					return;
++				}
++
++				if ( 'function' === typeof currentOnFocusOutside.current ) {
++					currentOnFocusOutside.current( event );
++				}
++			}, 0 );
++		},
++		[]
++	);
+ 
+ 	return {
+ 		onFocus: cancelBlurCheck,

@@ -1,0 +1,344 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index b2d085e377d31c..38cdb3f9b3e6ea 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -24,10 +24,12 @@
+ -   `Dialog`: Update `Header` layout to support multiple trailing elements alongside the title ([#77161](https://github.com/WordPress/gutenberg/pull/77161)).
+ -   `Dialog`: Use `Text` internally for `Dialog.Title`, adopting the `heading-xl` variant for consistent typography ([#77161](https://github.com/WordPress/gutenberg/pull/77161)).
+ -   Add defensive styles against global WordPress stylesheets like common.css and forms.css ([#76783](https://github.com/WordPress/gutenberg/pull/76783)).
++-   `VisuallyHidden`: Improve Storybook stories and documentation for the `render` prop composition pattern.
+ 
+ ### Internal
+ 
+ -   `AlertDialog`: Rewrite internals to use Base UI's `AlertDialog` primitives directly instead of `Dialog` wrappers. Introduces an internal state machine for async confirm flows ([#76937](https://github.com/WordPress/gutenberg/pull/76937)).
++-   `Field.Label`, `Fieldset.Legend`, `Field.Details`: Refactor `VisuallyHidden` composition to preserve semantic HTML elements when visually hiding content.
+ 
+ ## 0.10.0 (2026-04-01)
+ 
+diff --git a/packages/ui/src/dialog/stories/index.story.tsx b/packages/ui/src/dialog/stories/index.story.tsx
+index 086af1fa06170b..09f5d3ae3479dc 100644
+--- a/packages/ui/src/dialog/stories/index.story.tsx
++++ b/packages/ui/src/dialog/stories/index.story.tsx
+@@ -1,6 +1,7 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { useId, useState } from '@wordpress/element';
+ import type { ComponentProps } from 'react';
++import { VisuallyHidden } from '../../visually-hidden';
+ import * as Dialog from '../index';
+ 
+ const meta: Meta< typeof Dialog.Root > = {
+@@ -161,3 +162,35 @@ export const WithCustomZIndex: Story = {
+ 	..._Default,
+ 	name: 'With Custom z-index',
+ };
++
++/**
++ * A dialog with a visually hidden title. The title is still present in the
++ * DOM for `aria-labelledby`, but is not visible to sighted users.
++ *
++ * Use `<VisuallyHidden render={ <Dialog.Title /> }>` so that `Dialog.Title`
++ * keeps its `<h2>` element while being visually hidden.
++ */
++export const WithVisuallyHiddenTitle: Story = {
++	args: {
++		children: (
++			<>
++				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++				<Dialog.Popup>
++					<Dialog.Header>
++						<VisuallyHidden render={ <Dialog.Title /> }>
++							Accessible dialog heading
++						</VisuallyHidden>
++						<Dialog.CloseIcon />
++					</Dialog.Header>
++					<p>
++						This dialog has a visually hidden title. Inspect the DOM
++						or use a screen reader to verify the heading is present.
++					</p>
++					<Dialog.Footer>
++						<Dialog.Action>Got it</Dialog.Action>
++					</Dialog.Footer>
++				</Dialog.Popup>
++			</>
++		),
++	},
++};
+diff --git a/packages/ui/src/dialog/test/index.test.tsx b/packages/ui/src/dialog/test/index.test.tsx
+index f06286c7018182..7e80ff3b62167a 100644
+--- a/packages/ui/src/dialog/test/index.test.tsx
++++ b/packages/ui/src/dialog/test/index.test.tsx
+@@ -203,10 +203,8 @@ describe( 'Dialog', () => {
+ 						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+ 						<Dialog.Popup>
+ 							<Dialog.Header>
+-								{ /* @ts-expect-error this is just for test purposes */ }
+-								<Dialog.Title>
+-									{ /* Empty title */ }
+-								</Dialog.Title>
++								{ /* Empty title */ }
++								<Dialog.Title />
+ 							</Dialog.Header>
+ 							<p>Content with empty title</p>
+ 							<Dialog.Footer>
+diff --git a/packages/ui/src/dialog/title.tsx b/packages/ui/src/dialog/title.tsx
+index a51f5508ed66fc..23160042557783 100644
+--- a/packages/ui/src/dialog/title.tsx
++++ b/packages/ui/src/dialog/title.tsx
+@@ -11,9 +11,18 @@ import type { TitleProps } from './types';
+  * and serves as both the visible heading and the accessible label for
+  * the dialog.
+  *
+- * Uses the `heading-xl` text variant, matching Popover. Base UI's
+- * Dialog.Title renders an `<h2>` by default. Use the `render` prop
+- * to customize the element if needed.
++ * **Required** — every dialog must include a `Dialog.Title`, even if
++ * visually hidden. The rendered element is linked to the popup via
++ * `aria-labelledby`. Renders an `<h2>` by default.
++ *
++ * To visually hide the title while keeping it accessible, wrap it with
++ * `VisuallyHidden` using the `render` prop:
++ *
++ * ```jsx
++ * <VisuallyHidden render={ <Dialog.Title /> }>
++ *   Accessible title text
++ * </VisuallyHidden>
++ * ```
+  */
+ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
+ 	function DialogTitle( { children, ...props }, forwardedRef ) {
+diff --git a/packages/ui/src/dialog/types.ts b/packages/ui/src/dialog/types.ts
+index 28db2a69988a2c..88abf2d70fa3d7 100644
+--- a/packages/ui/src/dialog/types.ts
++++ b/packages/ui/src/dialog/types.ts
+@@ -74,8 +74,11 @@ export interface TitleProps extends ComponentProps< 'h2' > {
+ 	/**
+ 	 * The title content to be rendered. This serves as both the visible
+ 	 * heading and the accessible label for the dialog.
++	 *
++	 * When `Dialog.Title` is passed as a render element (e.g. to
++	 * `VisuallyHidden`), children can be provided by the wrapper instead.
+ 	 */
+-	children: ReactNode;
++	children?: ReactNode;
+ }
+ 
+ export interface CloseIconProps
+diff --git a/packages/ui/src/form/primitives/field/details.tsx b/packages/ui/src/form/primitives/field/details.tsx
+index f30725b9e3f142..847124f467c9df 100644
+--- a/packages/ui/src/form/primitives/field/details.tsx
++++ b/packages/ui/src/form/primitives/field/details.tsx
+@@ -22,9 +22,11 @@ export const Details = forwardRef< HTMLDivElement, FieldDetailsProps >(
+ 	function Details( { className, ...restProps }, ref ) {
+ 		return (
+ 			<>
+-				<_Field.Description render={ <VisuallyHidden /> }>
++				{ /* VisuallyHidden is the host so that _Field.Description's
++				   semantic element is preserved. See VisuallyHidden docs. */ }
++				<VisuallyHidden render={ <_Field.Description /> }>
+ 					{ __( 'More details follow the field.' ) }
+-				</_Field.Description>
++				</VisuallyHidden>
+ 				<div
+ 					ref={ ref }
+ 					className={ clsx( fieldStyles.description, className ) }
+diff --git a/packages/ui/src/form/primitives/field/label.tsx b/packages/ui/src/form/primitives/field/label.tsx
+index bd50a2f11be8ad..69a278d8a9c9e2 100644
+--- a/packages/ui/src/form/primitives/field/label.tsx
++++ b/packages/ui/src/form/primitives/field/label.tsx
+@@ -10,7 +10,7 @@ export const Label = forwardRef< HTMLLabelElement, FieldLabelProps >(
+ 		{ className, hideFromVision, variant, ...restProps },
+ 		ref
+ 	) {
+-		return (
++		const label = (
+ 			<_Field.Label
+ 				ref={ ref }
+ 				className={ clsx(
+@@ -18,12 +18,16 @@ export const Label = forwardRef< HTMLLabelElement, FieldLabelProps >(
+ 					variant && fieldStyles[ `is-${ variant }` ],
+ 					className
+ 				) }
+-				{ ...( hideFromVision && {
+-					render: <VisuallyHidden />,
+-					nativeLabel: false,
+-				} ) }
+ 				{ ...restProps }
+ 			/>
+ 		);
++
++		// VisuallyHidden is the host so that _Field.Label's semantic
++		// element is preserved. See VisuallyHidden docs for details.
++		if ( hideFromVision ) {
++			return <VisuallyHidden render={ label } />;
++		}
++
++		return label;
+ 	}
+ );
+diff --git a/packages/ui/src/form/primitives/field/test/index.test.tsx b/packages/ui/src/form/primitives/field/test/index.test.tsx
+index 69aeddcab6ce2f..d677d1f66bb226 100644
+--- a/packages/ui/src/form/primitives/field/test/index.test.tsx
++++ b/packages/ui/src/form/primitives/field/test/index.test.tsx
+@@ -47,6 +47,17 @@ describe( 'Field', () => {
+ 		).toBeVisible();
+ 	} );
+ 
++	it( 'preserves the native label element when hideFromVision is enabled', () => {
++		render(
++			<Field.Root>
++				<Field.Label hideFromVision>Field Label</Field.Label>
++				<Field.Control render={ <input /> } />
++			</Field.Root>
++		);
++
++		expect( screen.getByText( 'Field Label' ).tagName ).toBe( 'LABEL' );
++	} );
++
+ 	it( 'renders details with a semantically associated description for the control', () => {
+ 		render(
+ 			<Field.Root>
+diff --git a/packages/ui/src/form/primitives/fieldset/legend.tsx b/packages/ui/src/form/primitives/fieldset/legend.tsx
+index aa5b37e83ae0e9..3fa2c99b155bd1 100644
+--- a/packages/ui/src/form/primitives/fieldset/legend.tsx
++++ b/packages/ui/src/form/primitives/fieldset/legend.tsx
+@@ -10,15 +10,20 @@ export const FieldsetLegend = forwardRef< HTMLDivElement, FieldsetLegendProps >(
+ 		{ className, hideFromVision, ...restProps },
+ 		ref
+ 	) {
+-		return (
++		const legend = (
+ 			<_Fieldset.Legend
+ 				ref={ ref }
+ 				className={ clsx( fieldStyles.label, className ) }
+-				{ ...( hideFromVision && {
+-					render: <VisuallyHidden />,
+-				} ) }
+ 				{ ...restProps }
+ 			/>
+ 		);
++
++		// VisuallyHidden is the host so that _Fieldset.Legend's semantic
++		// element is preserved. See VisuallyHidden docs for details.
++		if ( hideFromVision ) {
++			return <VisuallyHidden render={ legend } />;
++		}
++
++		return legend;
+ 	}
+ );
+diff --git a/packages/ui/src/form/primitives/fieldset/test/index.test.tsx b/packages/ui/src/form/primitives/fieldset/test/index.test.tsx
+index da4ddcd3e378a1..402700b888ad91 100644
+--- a/packages/ui/src/form/primitives/fieldset/test/index.test.tsx
++++ b/packages/ui/src/form/primitives/fieldset/test/index.test.tsx
+@@ -43,6 +43,28 @@ describe( 'Fieldset', () => {
+ 		).toBeVisible();
+ 	} );
+ 
++	it( 'preserves the legend element type when hideFromVision is enabled', () => {
++		const { rerender } = render(
++			<Fieldset.Root>
++				<Fieldset.Legend>Choose your options</Fieldset.Legend>
++			</Fieldset.Root>
++		);
++
++		const tagWithout = screen.getByText( 'Choose your options' ).tagName;
++
++		rerender(
++			<Fieldset.Root>
++				<Fieldset.Legend hideFromVision>
++					Choose your options
++				</Fieldset.Legend>
++			</Fieldset.Root>
++		);
++
++		expect( screen.getByText( 'Choose your options' ).tagName ).toBe(
++			tagWithout
++		);
++	} );
++
+ 	it( 'accessibly associates description when Fieldset.Description is present', () => {
+ 		render(
+ 			<Fieldset.Root>
+diff --git a/packages/ui/src/visually-hidden/stories/index.story.tsx b/packages/ui/src/visually-hidden/stories/index.story.tsx
+index 005ed0516bdce8..9c705b5a6601bf 100644
+--- a/packages/ui/src/visually-hidden/stories/index.story.tsx
++++ b/packages/ui/src/visually-hidden/stories/index.story.tsx
+@@ -1,4 +1,5 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
++import { useId } from '@wordpress/element';
+ import { VisuallyHidden } from '../';
+ 
+ const meta: Meta< typeof VisuallyHidden > = {
+@@ -20,3 +21,27 @@ export const Default: Story = {
+ 		</>
+ 	),
+ };
++
++/**
++ * Use the `render` prop to change the underlying HTML element.
++ * By default, `VisuallyHidden` renders a `<div>`. Here it renders
++ * a `<label>` instead, keeping the native label–input association
++ * while hiding the label text visually.
++ */
++export const WithCustomElement: Story = {
++	render: function WithCustomElementStory() {
++		const inputId = useId();
++		return (
++			<>
++				{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
++				<VisuallyHidden render={ <label htmlFor={ inputId } /> }>
++					Accessible label
++				</VisuallyHidden>
++				<input
++					id={ inputId }
++					placeholder="This input has a visually hidden label"
++				/>
++			</>
++		);
++	},
++};
+diff --git a/packages/ui/src/visually-hidden/visually-hidden.tsx b/packages/ui/src/visually-hidden/visually-hidden.tsx
+index 49996d07e0d8bc..9ff1645411f839 100644
+--- a/packages/ui/src/visually-hidden/visually-hidden.tsx
++++ b/packages/ui/src/visually-hidden/visually-hidden.tsx
+@@ -6,6 +6,40 @@ import styles from './style.module.css';
+ /**
+  * Visually hides content while keeping it accessible to screen readers.
+  * Useful when providing context that's only meaningful to assistive technology.
++ *
++ * Renders a `<div>` by default. Use the `render` prop to swap the
++ * underlying element while preserving the visually-hidden behavior.
++ *
++ * ## Composing with other components
++ *
++ * When composing with another component that uses the `render` prop
++ * pattern, there are two directions — and they produce different results.
++ *
++ * Most of the time you'll want `VisuallyHidden` as the **host** (outer
++ * component) and pass the other component via `render`. This keeps the
++ * other component's HTML element and semantics intact, while
++ * `VisuallyHidden` only adds its hiding styles:
++ *
++ * ```jsx
++ * // OtherComponent keeps its semantic element (e.g. <h2>).
++ * <VisuallyHidden render={ <OtherComponent /> }>
++ *   Accessible text
++ * </VisuallyHidden>
++ * ```
++ *
++ * The opposite direction is also possible, but be aware that it replaces
++ * the other component's element with VisuallyHidden's default `<div>`:
++ *
++ * ```jsx
++ * // OtherComponent's element becomes a <div>.
++ * <OtherComponent render={ <VisuallyHidden /> }>
++ *   Accessible text
++ * </OtherComponent>
++ * ```
++ *
++ * Choose based on what you need: if the other component's semantic
++ * element matters (e.g. `<label>`, `<legend>`, `<h2>`), keep
++ * `VisuallyHidden` as the host so the element is preserved.
+  */
+ export const VisuallyHidden = forwardRef< HTMLDivElement, VisuallyHiddenProps >(
+ 	function VisuallyHidden( { render, ...restProps }, ref ) {

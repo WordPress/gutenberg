@@ -1,0 +1,2030 @@
+diff --git a/package-lock.json b/package-lock.json
+index 173dc2adfa1bd8..86445e18976909 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -18090,6 +18090,7 @@
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
+ 				"@wordpress/data": "file:packages/data",
++				"@wordpress/deprecated": "file:packages/deprecated",
+ 				"@wordpress/element": "file:packages/element",
+ 				"@wordpress/escape-html": "file:packages/escape-html",
+ 				"@wordpress/i18n": "file:packages/i18n",
+diff --git a/packages/block-editor/src/components/block-popover/inbetween.js b/packages/block-editor/src/components/block-popover/inbetween.js
+index cf76527f4910a0..442ae06edffe08 100644
+--- a/packages/block-editor/src/components/block-popover/inbetween.js
++++ b/packages/block-editor/src/components/block-popover/inbetween.js
+@@ -8,7 +8,6 @@ import classnames from 'classnames';
+  */
+ import { useSelect } from '@wordpress/data';
+ import {
+-	useCallback,
+ 	useMemo,
+ 	createContext,
+ 	useReducer,
+@@ -107,66 +106,65 @@ function BlockPopoverInbetween( {
+ 		isVisible,
+ 	] );
+ 
+-	const getAnchorRect = useCallback( () => {
++	const popoverAnchor = useMemo( () => {
+ 		if ( ( ! previousElement && ! nextElement ) || ! isVisible ) {
+-			return {};
++			return undefined;
+ 		}
+ 
+ 		const { ownerDocument } = previousElement || nextElement;
+ 
+-		const previousRect = previousElement
+-			? previousElement.getBoundingClientRect()
+-			: null;
+-		const nextRect = nextElement
+-			? nextElement.getBoundingClientRect()
+-			: null;
++		return {
++			ownerDocument,
++			getBoundingClientRect() {
++				const previousRect = previousElement
++					? previousElement.getBoundingClientRect()
++					: null;
++				const nextRect = nextElement
++					? nextElement.getBoundingClientRect()
++					: null;
+ 
+-		if ( isVertical ) {
+-			if ( isRTL() ) {
+-				return {
+-					top: previousRect ? previousRect.bottom : nextRect.top,
+-					left: previousRect ? previousRect.right : nextRect.right,
+-					right: previousRect ? previousRect.right : nextRect.right,
+-					bottom: previousRect ? previousRect.bottom : nextRect.top,
+-					height: 0,
+-					width: 0,
+-					ownerDocument,
+-				};
+-			}
++				let left = 0;
++				let top = 0;
+ 
+-			return {
+-				top: previousRect ? previousRect.bottom : nextRect.top,
+-				left: previousRect ? previousRect.left : nextRect.left,
+-				right: previousRect ? previousRect.left : nextRect.left,
+-				bottom: previousRect ? previousRect.bottom : nextRect.top,
+-				height: 0,
+-				width: 0,
+-				ownerDocument,
+-			};
+-		}
++				if ( isVertical ) {
++					// vertical
++					top = previousRect ? previousRect.bottom : nextRect.top;
+ 
+-		if ( isRTL() ) {
+-			return {
+-				top: previousRect ? previousRect.top : nextRect.top,
+-				left: previousRect ? previousRect.left : nextRect.right,
+-				right: previousRect ? previousRect.left : nextRect.right,
+-				bottom: previousRect ? previousRect.top : nextRect.top,
+-				height: 0,
+-				width: 0,
+-				ownerDocument,
+-			};
+-		}
++					if ( isRTL() ) {
++						// vertical, rtl
++						left = previousRect
++							? previousRect.right
++							: nextRect.right;
++					} else {
++						// vertical, ltr
++						left = previousRect ? previousRect.left : nextRect.left;
++					}
++				} else {
++					top = previousRect ? previousRect.top : nextRect.top;
+ 
+-		return {
+-			top: previousRect ? previousRect.top : nextRect.top,
+-			left: previousRect ? previousRect.right : nextRect.left,
+-			right: previousRect ? previousRect.right : nextRect.left,
+-			bottom: previousRect ? previousRect.left : nextRect.right,
+-			height: 0,
+-			width: 0,
+-			ownerDocument,
++					if ( isRTL() ) {
++						// non vertical, rtl
++						left = previousRect
++							? previousRect.left
++							: nextRect.right;
++					} else {
++						// non vertical, ltr
++						left = previousRect
++							? previousRect.right
++							: nextRect.left;
++					}
++				}
++
++				return new window.DOMRect( left, top, 0, 0 );
++			},
+ 		};
+-	}, [ previousElement, nextElement, positionRecompute, isVisible ] );
++	}, [
++		previousElement,
++		nextElement,
++		positionRecompute,
++		isVertical,
++		isVisible,
++	] );
+ 
+ 	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
+ 
+@@ -229,7 +227,7 @@ function BlockPopoverInbetween( {
+ 		<Popover
+ 			ref={ popoverScrollRef }
+ 			animate={ false }
+-			getAnchorRect={ getAnchorRect }
++			anchor={ popoverAnchor }
+ 			focusOnMount={ false }
+ 			// Render in the old slot if needed for backward compatibility,
+ 			// otherwise render in place (not in the default popover slot).
+diff --git a/packages/block-editor/src/components/block-popover/index.js b/packages/block-editor/src/components/block-popover/index.js
+index 2a66623e2fbd6d..e2b2f58d5d4e31 100644
+--- a/packages/block-editor/src/components/block-popover/index.js
++++ b/packages/block-editor/src/components/block-popover/index.js
+@@ -47,22 +47,60 @@ function BlockPopover(
+ 		};
+ 	}, [ selectedElement, lastSelectedElement, __unstableRefreshSize ] );
+ 
++	const popoverAnchor = useMemo( () => {
++		if (
++			! selectedElement ||
++			( bottomClientId && ! lastSelectedElement )
++		) {
++			return undefined;
++		}
++
++		return {
++			getBoundingClientRect() {
++				const selectedBCR = selectedElement.getBoundingClientRect();
++				const lastSelectedBCR =
++					lastSelectedElement?.getBoundingClientRect();
++
++				// Get the biggest rectangle that encompasses completely the currently
++				// selected element and the last selected element:
++				// - for top/left coordinates, use the smaller numbers
++				// - for the bottom/right coordinates, use the largest numbers
++				const left = Math.min(
++					selectedBCR.left,
++					lastSelectedBCR?.left ?? Infinity
++				);
++				const top = Math.min(
++					selectedBCR.top,
++					lastSelectedBCR?.top ?? Infinity
++				);
++				const right = Math.max(
++					selectedBCR.right,
++					lastSelectedBCR.right ?? -Infinity
++				);
++				const bottom = Math.max(
++					selectedBCR.bottom,
++					lastSelectedBCR.bottom ?? -Infinity
++				);
++				const width = right - left;
++				const height = bottom - top;
++
++				return new window.DOMRect( left, top, width, height );
++			},
++			ownerDocument: selectedElement.ownerDocument,
++		};
++	}, [ bottomClientId, lastSelectedElement, selectedElement ] );
++
+ 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {
+ 		return null;
+ 	}
+ 
+-	const anchorRef = {
+-		top: selectedElement,
+-		bottom: lastSelectedElement,
+-	};
+-
+ 	return (
+ 		<Popover
+ 			ref={ mergedRefs }
+ 			animate={ false }
+ 			position="top right left"
+ 			focusOnMount={ false }
+-			anchorRef={ anchorRef }
++			anchor={ popoverAnchor }
+ 			// Render in the old slot if needed for backward compatibility,
+ 			// otherwise render in place (not in the default popover slot).
+ 			__unstableSlotName={ __unstablePopoverSlot || null }
+diff --git a/packages/block-editor/src/components/list-view/drop-indicator.js b/packages/block-editor/src/components/list-view/drop-indicator.js
+index 0661e1717f4b72..1500e2f887fada 100644
+--- a/packages/block-editor/src/components/list-view/drop-indicator.js
++++ b/packages/block-editor/src/components/list-view/drop-indicator.js
+@@ -68,40 +68,41 @@ export default function ListViewDropIndicator( {
+ 		};
+ 	}, [ getDropIndicatorIndent, targetElement ] );
+ 
+-	const getAnchorRect = useCallback( () => {
+-		if ( ! targetElement ) {
+-			return {};
++	const popoverAnchor = useMemo( () => {
++		const isValidDropPosition =
++			dropPosition === 'top' ||
++			dropPosition === 'bottom' ||
++			dropPosition === 'inside';
++		if ( ! targetElement || ! isValidDropPosition ) {
++			return undefined;
+ 		}
+ 
+-		const ownerDocument = targetElement.ownerDocument;
+-		const rect = targetElement.getBoundingClientRect();
+-		const indent = getDropIndicatorIndent();
+-
+-		const anchorRect = {
+-			left: rect.left + indent,
+-			right: rect.right,
+-			width: 0,
+-			height: 0,
+-			ownerDocument,
++		return {
++			ownerDocument: targetElement.ownerDocument,
++			getBoundingClientRect() {
++				const rect = targetElement.getBoundingClientRect();
++				const indent = getDropIndicatorIndent();
++
++				const left = rect.left + indent;
++				const right = rect.right;
++				let top = 0;
++				let bottom = 0;
++
++				if ( dropPosition === 'top' ) {
++					top = rect.top;
++					bottom = rect.top;
++				} else {
++					// `dropPosition` is either `bottom` or `inside`
++					top = rect.bottom;
++					bottom = rect.bottom;
++				}
++
++				const width = right - left;
++				const height = bottom - top;
++
++				return new window.DOMRect( left, top, width, height );
++			},
+ 		};
+-
+-		if ( dropPosition === 'top' ) {
+-			return {
+-				...anchorRect,
+-				top: rect.top,
+-				bottom: rect.top,
+-			};
+-		}
+-
+-		if ( dropPosition === 'bottom' || dropPosition === 'inside' ) {
+-			return {
+-				...anchorRect,
+-				top: rect.bottom,
+-				bottom: rect.bottom,
+-			};
+-		}
+-
+-		return {};
+ 	}, [ targetElement, dropPosition, getDropIndicatorIndent ] );
+ 
+ 	if ( ! targetElement ) {
+@@ -111,7 +112,7 @@ export default function ListViewDropIndicator( {
+ 	return (
+ 		<Popover
+ 			animate={ false }
+-			getAnchorRect={ getAnchorRect }
++			anchor={ popoverAnchor }
+ 			focusOnMount={ false }
+ 			className="block-editor-list-view-drop-indicator"
+ 		>
+diff --git a/packages/block-editor/src/components/rich-text/format-toolbar-container.js b/packages/block-editor/src/components/rich-text/format-toolbar-container.js
+index a2fae8e1b9a8e5..18027af27a05fb 100644
+--- a/packages/block-editor/src/components/rich-text/format-toolbar-container.js
++++ b/packages/block-editor/src/components/rich-text/format-toolbar-container.js
+@@ -7,7 +7,7 @@ import { useSelect } from '@wordpress/data';
+ import {
+ 	isCollapsed,
+ 	getActiveFormats,
+-	useAnchorRef,
++	useAnchor,
+ 	store as richTextStore,
+ } from '@wordpress/rich-text';
+ 
+@@ -19,28 +19,32 @@ import FormatToolbar from './format-toolbar';
+ import NavigableToolbar from '../navigable-toolbar';
+ import { store as blockEditorStore } from '../../store';
+ 
+-function InlineSelectionToolbar( { value, anchorRef, activeFormats } ) {
++function InlineSelectionToolbar( {
++	value,
++	editableContentElement,
++	activeFormats,
++} ) {
+ 	const lastFormat = activeFormats[ activeFormats.length - 1 ];
+ 	const lastFormatType = lastFormat?.type;
+ 	const settings = useSelect(
+ 		( select ) => select( richTextStore ).getFormatType( lastFormatType ),
+ 		[ lastFormatType ]
+ 	);
+-	const selectionRef = useAnchorRef( {
+-		ref: anchorRef,
++	const popoverAnchor = useAnchor( {
++		editableContentElement,
+ 		value,
+ 		settings,
+ 	} );
+ 
+-	return <InlineToolbar anchorRef={ selectionRef } />;
++	return <InlineToolbar popoverAnchor={ popoverAnchor } />;
+ }
+ 
+-function InlineToolbar( { anchorRef } ) {
++function InlineToolbar( { popoverAnchor } ) {
+ 	return (
+ 		<Popover
+ 			position="top center"
+ 			focusOnMount={ false }
+-			anchorRef={ anchorRef }
++			anchor={ popoverAnchor }
+ 			className="block-editor-rich-text__inline-format-toolbar"
+ 			__unstableSlotName="block-toolbar"
+ 		>
+@@ -57,14 +61,18 @@ function InlineToolbar( { anchorRef } ) {
+ 	);
+ }
+ 
+-const FormatToolbarContainer = ( { inline, anchorRef, value } ) => {
++const FormatToolbarContainer = ( {
++	inline,
++	editableContentElement,
++	value,
++} ) => {
+ 	const hasInlineToolbar = useSelect(
+ 		( select ) => select( blockEditorStore ).getSettings().hasInlineToolbar,
+ 		[]
+ 	);
+ 
+ 	if ( inline ) {
+-		return <InlineToolbar anchorRef={ anchorRef } />;
++		return <InlineToolbar popoverAnchor={ editableContentElement } />;
+ 	}
+ 
+ 	if ( hasInlineToolbar ) {
+@@ -76,7 +84,7 @@ const FormatToolbarContainer = ( { inline, anchorRef, value } ) => {
+ 
+ 		return (
+ 			<InlineSelectionToolbar
+-				anchorRef={ anchorRef }
++				editableContentElement={ editableContentElement }
+ 				value={ value }
+ 				activeFormats={ activeFormats }
+ 			/>
+diff --git a/packages/block-editor/src/components/rich-text/index.js b/packages/block-editor/src/components/rich-text/index.js
+index a49286e3ce38a3..c6340ff4f94bc0 100644
+--- a/packages/block-editor/src/components/rich-text/index.js
++++ b/packages/block-editor/src/components/rich-text/index.js
+@@ -328,7 +328,7 @@ function RichTextWrapper(
+ 	}
+ 
+ 	function onFocus() {
+-		anchorRef.current.focus();
++		anchorRef.current?.focus();
+ 	}
+ 
+ 	const TagName = tagName;
+@@ -354,7 +354,7 @@ function RichTextWrapper(
+ 			{ isSelected && hasFormats && (
+ 				<FormatToolbarContainer
+ 					inline={ inlineToolbar }
+-					anchorRef={ anchorRef }
++					editableContentElement={ anchorRef.current }
+ 					value={ value }
+ 				/>
+ 			) }
+diff --git a/packages/block-editor/src/components/url-popover/image-url-input-ui.js b/packages/block-editor/src/components/url-popover/image-url-input-ui.js
+index f3680358c436a9..99a0d27bb91fd3 100644
+--- a/packages/block-editor/src/components/url-popover/image-url-input-ui.js
++++ b/packages/block-editor/src/components/url-popover/image-url-input-ui.js
+@@ -51,7 +51,9 @@ const ImageURLInputUI = ( {
+ 	rel,
+ } ) => {
+ 	const [ isOpen, setIsOpen ] = useState( false );
+-	const buttonRef = useRef( null );
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+ 	const openLinkUI = useCallback( () => {
+ 		setIsOpen( true );
+ 	} );
+@@ -246,11 +248,11 @@ const ImageURLInputUI = ( {
+ 				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
+ 				aria-expanded={ isOpen }
+ 				onClick={ openLinkUI }
+-				ref={ buttonRef }
++				ref={ setPopoverAnchor }
+ 			/>
+ 			{ isOpen && (
+ 				<URLPopover
+-					anchorRef={ buttonRef }
++					anchor={ popoverAnchor }
+ 					onFocusOutside={ onFocusOutside() }
+ 					onClose={ closeLinkUI }
+ 					renderSettings={ () => advancedOptions }
+diff --git a/packages/block-library/src/button/edit.js b/packages/block-library/src/button/edit.js
+index 97775bc0bcd10a..55b095f9e848bb 100644
+--- a/packages/block-library/src/button/edit.js
++++ b/packages/block-library/src/button/edit.js
+@@ -30,6 +30,7 @@ import {
+ import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
+ import { link, linkOff } from '@wordpress/icons';
+ import { createBlock } from '@wordpress/blocks';
++import { useMergeRefs } from '@wordpress/compose';
+ 
+ const NEW_TAB_REL = 'noreferrer noopener';
+ 
+@@ -114,12 +115,19 @@ function ButtonEdit( props ) {
+ 		}
+ 	}
+ 
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
++
+ 	const borderProps = useBorderProps( attributes );
+ 	const colorProps = useColorProps( attributes );
+ 	const spacingProps = useSpacingProps( attributes );
+ 	const ref = useRef();
+ 	const richTextRef = useRef();
+-	const blockProps = useBlockProps( { ref, onKeyDown } );
++	const blockProps = useBlockProps( {
++		ref: useMergeRefs( [ setPopoverAnchor, ref ] ),
++		onKeyDown,
++	} );
+ 
+ 	const [ isEditingURL, setIsEditingURL ] = useState( false );
+ 	const isURLSet = !! url;
+@@ -218,7 +226,7 @@ function ButtonEdit( props ) {
+ 						setIsEditingURL( false );
+ 						richTextRef.current?.focus();
+ 					} }
+-					anchorRef={ ref?.current }
++					anchor={ popoverAnchor }
+ 					focusOnMount={ isEditingURL ? 'firstElement' : false }
+ 					__unstableSlotName={ '__unstable-block-tools-after' }
+ 					shift
+diff --git a/packages/block-library/src/navigation-link/edit.js b/packages/block-library/src/navigation-link/edit.js
+index c208d83c1a45e5..466f032a9e86ea 100644
+--- a/packages/block-library/src/navigation-link/edit.js
++++ b/packages/block-library/src/navigation-link/edit.js
+@@ -47,6 +47,7 @@ import {
+ 	useResourcePermissions,
+ } from '@wordpress/core-data';
+ import { decodeEntities } from '@wordpress/html-entities';
++import { useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -461,6 +462,9 @@ export default function NavigationLinkEdit( {
+ 	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
+ 		useDispatch( blockEditorStore );
+ 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+ 	const listItemRef = useRef( null );
+ 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
+ 	const itemLabelPlaceholder = __( 'Add link…' );
+@@ -651,7 +655,7 @@ export default function NavigationLinkEdit( {
+ 	}
+ 
+ 	const blockProps = useBlockProps( {
+-		ref: listItemRef,
++		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
+ 		className: classnames( 'wp-block-navigation-item', {
+ 			'is-editing': isSelected || isParentOfSelectedBlock,
+ 			'is-dragging-within': isDraggingWithin,
+@@ -844,7 +848,7 @@ export default function NavigationLinkEdit( {
+ 						<Popover
+ 							position="bottom center"
+ 							onClose={ () => setIsLinkOpen( false ) }
+-							anchorRef={ listItemRef.current }
++							anchor={ popoverAnchor }
+ 							shift
+ 						>
+ 							<LinkControl
+diff --git a/packages/block-library/src/navigation-submenu/edit.js b/packages/block-library/src/navigation-submenu/edit.js
+index 99b5ccff153972..77030e4ec47462 100644
+--- a/packages/block-library/src/navigation-submenu/edit.js
++++ b/packages/block-library/src/navigation-submenu/edit.js
+@@ -45,6 +45,7 @@ import {
+ } from '@wordpress/core-data';
+ import { speak } from '@wordpress/a11y';
+ import { createBlock } from '@wordpress/blocks';
++import { useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -292,6 +293,9 @@ export default function NavigationSubmenuEdit( {
+ 	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
+ 		useDispatch( blockEditorStore );
+ 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+ 	const listItemRef = useRef( null );
+ 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
+ 	const itemLabelPlaceholder = __( 'Add text…' );
+@@ -458,7 +462,7 @@ export default function NavigationSubmenuEdit( {
+ 	}
+ 
+ 	const blockProps = useBlockProps( {
+-		ref: listItemRef,
++		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
+ 		className: classnames( 'wp-block-navigation-item', {
+ 			'is-editing': isSelected || isParentOfSelectedBlock,
+ 			'is-dragging-within': isDraggingWithin,
+@@ -629,7 +633,7 @@ export default function NavigationSubmenuEdit( {
+ 						<Popover
+ 							position="bottom center"
+ 							onClose={ () => setIsLinkOpen( false ) }
+-							anchorRef={ listItemRef.current }
++							anchor={ popoverAnchor }
+ 							shift
+ 						>
+ 							<LinkControl
+diff --git a/packages/block-library/src/post-date/edit.js b/packages/block-library/src/post-date/edit.js
+index e0b642e06c825a..810eea2ebc9051 100644
+--- a/packages/block-library/src/post-date/edit.js
++++ b/packages/block-library/src/post-date/edit.js
+@@ -7,7 +7,7 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+-import { useRef } from '@wordpress/element';
++import { useMemo, useState } from '@wordpress/element';
+ import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
+ import {
+ 	AlignmentControl,
+@@ -39,7 +39,16 @@ export default function PostDateEdit( {
+ 			[ `has-text-align-${ textAlign }` ]: textAlign,
+ 		} ),
+ 	} );
+-	const timeRef = useRef();
++
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
++	// Memoize popoverProps to avoid returning a new object every time.
++	const popoverProps = useMemo(
++		() => ( { anchor: popoverAnchor } ),
++		[ popoverAnchor ]
++	);
++
+ 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+ 	const dateSettings = getDateSettings();
+ 	const [ siteFormat = dateSettings.formats.date ] = useEntityProp(
+@@ -68,7 +77,7 @@ export default function PostDateEdit( {
+ 	);
+ 
+ 	let postDate = date ? (
+-		<time dateTime={ dateI18n( 'c', date ) } ref={ timeRef }>
++		<time dateTime={ dateI18n( 'c', date ) } ref={ setPopoverAnchor }>
+ 			{ dateI18n( format || siteFormat, date ) }
+ 		</time>
+ 	) : (
+@@ -98,7 +107,7 @@ export default function PostDateEdit( {
+ 				{ date && ! isDescendentOfQueryLoop && (
+ 					<ToolbarGroup>
+ 						<Dropdown
+-							popoverProps={ { anchorRef: timeRef.current } }
++							popoverProps={ popoverProps }
+ 							renderContent={ ( { onClose } ) => (
+ 								<PublishDateTimePicker
+ 									currentDate={ date }
+diff --git a/packages/block-library/src/social-link/edit.js b/packages/block-library/src/social-link/edit.js
+index 278caef9be8733..7e6a51618a8972 100644
+--- a/packages/block-library/src/social-link/edit.js
++++ b/packages/block-library/src/social-link/edit.js
+@@ -12,7 +12,7 @@ import {
+ 	URLInput,
+ 	useBlockProps,
+ } from '@wordpress/block-editor';
+-import { Fragment, useState, useRef } from '@wordpress/element';
++import { Fragment, useState } from '@wordpress/element';
+ import {
+ 	Button,
+ 	PanelBody,
+@@ -31,12 +31,9 @@ const SocialLinkURLPopover = ( {
+ 	url,
+ 	setAttributes,
+ 	setPopover,
+-	anchorRef,
++	popoverAnchor,
+ } ) => (
+-	<URLPopover
+-		anchorRef={ anchorRef?.current }
+-		onClose={ () => setPopover( false ) }
+-	>
++	<URLPopover anchor={ popoverAnchor } onClose={ () => setPopover( false ) }>
+ 		<form
+ 			className="block-editor-url-popover__link-editor"
+ 			onSubmit={ ( event ) => {
+@@ -76,7 +73,10 @@ const SocialLinkEdit = ( {
+ 		'wp-social-link__is-incomplete': ! url,
+ 	} );
+ 
+-	const ref = useRef();
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
++
+ 	const IconComponent = getIconBySite( service );
+ 	const socialLinkName = getNameBySite( service );
+ 	const socialLinkLabel = label ?? socialLinkName;
+@@ -116,7 +116,7 @@ const SocialLinkEdit = ( {
+ 			<li { ...blockProps }>
+ 				<Button
+ 					className="wp-block-social-link-anchor"
+-					ref={ ref }
++					ref={ setPopoverAnchor }
+ 					onClick={ () => setPopover( true ) }
+ 				>
+ 					<IconComponent />
+@@ -132,7 +132,7 @@ const SocialLinkEdit = ( {
+ 							url={ url }
+ 							setAttributes={ setAttributes }
+ 							setPopover={ setPopover }
+-							anchorRef={ ref }
++							popoverAnchor={ popoverAnchor }
+ 						/>
+ 					) }
+ 				</Button>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a90e7125b8f2d9..c7438626278df6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   `Popover`: added new `anchor` prop, supposed to supersede all previous anchor-related props (`anchorRef`, `anchorRect`, `getAnchorRect`). These older anchor-related props are now marked as deprecated and are scheduled to be removed in WordPress 6.3 ([#43691](https://github.com/WordPress/gutenberg/pull/43691)).
++
+ ### Internal
+ 
+ -   `NavigationMenu` updated to ignore `react/exhaustive-deps` eslint rule ([#44090](https://github.com/WordPress/gutenberg/pull/44090)).
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.js b/packages/components/src/autocomplete/autocompleter-ui.js
+index c909aa6a4a5783..f8a9fd08eaf95e 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.js
++++ b/packages/components/src/autocomplete/autocompleter-ui.js
+@@ -8,7 +8,7 @@ import { map } from 'lodash';
+  * WordPress dependencies
+  */
+ import { useLayoutEffect } from '@wordpress/element';
+-import { useAnchorRef } from '@wordpress/rich-text';
++import { useAnchor } from '@wordpress/rich-text';
+ 
+ /**
+  * Internal dependencies
+@@ -35,7 +35,10 @@ export function getAutoCompleterUI( autocompleter ) {
+ 		contentRef,
+ 	} ) {
+ 		const [ items ] = useItems( filterValue );
+-		const anchorRef = useAnchorRef( { ref: contentRef, value } );
++		const popoverAnchor = useAnchor( {
++			editableContentElement: contentRef.current,
++			value,
++		} );
+ 
+ 		useLayoutEffect( () => {
+ 			onChangeOptions( items );
+@@ -54,7 +57,7 @@ export function getAutoCompleterUI( autocompleter ) {
+ 				onClose={ onReset }
+ 				position="top right"
+ 				className="components-autocomplete__popover"
+-				anchorRef={ anchorRef }
++				anchor={ popoverAnchor }
+ 			>
+ 				<div
+ 					id={ listBoxId }
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index d5cf6e2ca33707..e0d44852bca582 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -1,12 +1,8 @@
+-/**
+- * External dependencies
+- */
+-import type { ComponentProps } from 'react';
+ /**
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { useRef } from '@wordpress/element';
++import { useMemo, useState } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+@@ -18,6 +14,7 @@ import { Grid } from '../../grid';
+ import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import { useBorderBoxControlSplitControls } from './hook';
+ 
++import type { BorderControlProps } from '../../border-control/types';
+ import type { SplitControlsProps } from '../types';
+ 
+ const BorderBoxControlSplitControls = (
+@@ -40,18 +37,27 @@ const BorderBoxControlSplitControls = (
+ 		__next36pxDefaultSize,
+ 		...otherProps
+ 	} = useBorderBoxControlSplitControls( props );
+-	const containerRef = useRef();
+-	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
+-	const popoverProps: ComponentProps<
+-		typeof BorderControl
+-	>[ '__unstablePopoverProps' ] = popoverPlacement
+-		? {
+-				placement: popoverPlacement,
+-				offset: popoverOffset,
+-				anchorRef: containerRef,
+-				shift: true,
+-		  }
+-		: undefined;
++
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState< Element | null >(
++		null
++	);
++
++	// Memoize popoverProps to avoid returning a new object every time.
++	const popoverProps: BorderControlProps[ '__unstablePopoverProps' ] =
++		useMemo(
++			() =>
++				popoverPlacement
++					? {
++							placement: popoverPlacement,
++							offset: popoverOffset,
++							anchor: popoverAnchor,
++							shift: true,
++					  }
++					: undefined,
++			[ popoverPlacement, popoverOffset, popoverAnchor ]
++		);
+ 
+ 	const sharedBorderControlProps = {
+ 		colors,
+@@ -64,6 +70,8 @@ const BorderBoxControlSplitControls = (
+ 		__next36pxDefaultSize,
+ 	};
+ 
++	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
++
+ 	return (
+ 		<Grid { ...otherProps } ref={ mergedRef } gap={ 4 }>
+ 			<BorderBoxControlVisualizer
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index 19814d8cef7209..a49a2aa53d41d7 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -1,13 +1,8 @@
+-/**
+- * External dependencies
+- */
+-import type { ComponentProps } from 'react';
+-
+ /**
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { useRef } from '@wordpress/element';
++import { useMemo, useState } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+@@ -24,7 +19,10 @@ import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import { useBorderBoxControl } from './hook';
+ 
+ import type { BorderBoxControlProps } from '../types';
+-import type { LabelProps } from '../../border-control/types';
++import type {
++	LabelProps,
++	BorderControlProps,
++} from '../../border-control/types';
+ 
+ const BorderLabel = ( props: LabelProps ) => {
+ 	const { label, hideLabelFromVision } = props;
+@@ -67,18 +65,29 @@ const BorderBoxControl = (
+ 		__next36pxDefaultSize = false,
+ 		...otherProps
+ 	} = useBorderBoxControl( props );
+-	const containerRef = useRef();
+-	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
+-	const popoverProps: ComponentProps<
+-		typeof BorderControl
+-	>[ '__unstablePopoverProps' ] = popoverPlacement
+-		? {
+-				placement: popoverPlacement,
+-				offset: popoverOffset,
+-				anchorRef: containerRef,
+-				shift: true,
+-		  }
+-		: undefined;
++
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState< Element | null >(
++		null
++	);
++
++	// Memoize popoverProps to avoid returning a new object every time.
++	const popoverProps: BorderControlProps[ '__unstablePopoverProps' ] =
++		useMemo(
++			() =>
++				popoverPlacement
++					? {
++							placement: popoverPlacement,
++							offset: popoverOffset,
++							anchor: popoverAnchor,
++							shift: true,
++					  }
++					: undefined,
++			[ popoverPlacement, popoverOffset, popoverAnchor ]
++		);
++
++	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
+ 
+ 	return (
+ 		<View className={ className } { ...otherProps } ref={ mergedRef }>
+diff --git a/packages/components/src/border-box-control/stories/index.js b/packages/components/src/border-box-control/stories/index.js
+index 1f6413fa50ab08..469d6d4d3407f0 100644
+--- a/packages/components/src/border-box-control/stories/index.js
++++ b/packages/components/src/border-box-control/stories/index.js
+@@ -85,6 +85,7 @@ Default.args = {
+ 		width: '1px',
+ 	},
+ 	__next36pxDefaultSize: false,
++	popoverPlacement: 'right-start',
+ };
+ 
+ const WrapperView = styled.div`
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index c260d27ffee7df..0092256a61225c 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -8,6 +8,7 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { useRef, useEffect, useState } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -42,6 +43,10 @@ export default function Dropdown( props ) {
+ 		onToggle,
+ 		style,
+ 	} = props;
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
++		useState( null );
+ 	const containerRef = useRef();
+ 	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
+ 
+@@ -83,7 +88,10 @@ export default function Dropdown( props ) {
+ 	}
+ 
+ 	const args = { isOpen, onToggle: toggle, onClose: close };
+-	const hasAnchorRef =
++	const popoverPropsHaveAnchor =
++		!! popoverProps?.anchor ||
++		// Note: `anchorRef`, `getAnchorRect` and `anchorRect` are deprecated and
++		// be removed from `Popover` from WordPress 6.3
+ 		!! popoverProps?.anchorRef ||
+ 		!! popoverProps?.getAnchorRect ||
+ 		!! popoverProps?.anchorRect;
+@@ -91,7 +99,7 @@ export default function Dropdown( props ) {
+ 	return (
+ 		<div
+ 			className={ classnames( 'components-dropdown', className ) }
+-			ref={ containerRef }
++			ref={ useMergeRefs( [ setFallbackPopoverAnchor, containerRef ] ) }
+ 			// Some UAs focus the closest focusable parent when the toggle is
+ 			// clicked. Making this div focusable ensures such UAs will focus
+ 			// it and `closeIfFocusOutside` can tell if the toggle was clicked.
+@@ -110,7 +118,11 @@ export default function Dropdown( props ) {
+ 					// This value is used to ensure that the dropdowns
+ 					// align with the editor header by default.
+ 					offset={ 13 }
+-					anchorRef={ ! hasAnchorRef ? containerRef : undefined }
++					anchor={
++						! popoverPropsHaveAnchor
++							? fallbackPopoverAnchor
++							: undefined
++					}
+ 					{ ...popoverProps }
+ 					className={ classnames(
+ 						'components-dropdown__content',
+diff --git a/packages/components/src/panel/README.md b/packages/components/src/panel/README.md
+index 83f7d66af4bd2b..7cfc2eb8a5e6ea 100644
+--- a/packages/components/src/panel/README.md
++++ b/packages/components/src/panel/README.md
+@@ -176,7 +176,7 @@ The class that will be added with `components-panel__row`. to the classes of the
+ 
+ PanelRow accepts a forwarded ref that will be added to the wrapper div. Usage:
+ 
+-`<PanelRow className="edit-post-post-schedule" ref={ anchorRef }>`
++`<PanelRow className="edit-post-post-schedule" ref={ panelRowRef }>`
+ 
+ ---
+ 
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index 1778690a08b146..85ae701894616d 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -6,7 +6,9 @@ The behavior of the popover when it exceeds the viewport's edges can be controll
+ 
+ ## Usage
+ 
+-Render a Popover within the parent to which it should anchor:
++Render a Popover within the parent to which it should anchor.
++
++If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
+ 
+ ```jsx
+ import { Button, Popover } from '@wordpress/components';
+@@ -27,7 +29,36 @@ const MyPopover = () => {
+ };
+ ```
+ 
+-If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
++In order to pass an explicit anchor, you can use the `anchor` prop. When doing so, **the anchor element should be stored in local state** rather than a plain React ref to ensure reactive updating when it changes.
++
++```jsx
++import { Button, Popover } from '@wordpress/components';
++import { useState } from '@wordpress/element';
++
++const MyPopover = () => {
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState();
++	const [ isVisible, setIsVisible ] = useState( false );
++	const toggleVisible = () => {
++		setIsVisible( ( state ) => ! state );
++	};
++
++	return (
++		<p ref={ setPopoverAnchor }>Popover s anchor</p>
++		<Button variant="secondary" onClick={ toggleVisible }>
++			Toggle Popover!
++		</Button>
++		{ isVisible && (
++			<Popover
++				anchor={ popoverAnchor }
++			>
++				Popover is toggled!
++			</Popover>
++		) }
++	);
++};
++```
+ 
+ If you want Popover elements to render to a specific location on the page to allow style cascade to take effect, you must render a `Popover.Slot` further up the element tree:
+ 
+@@ -51,14 +82,26 @@ render(
+ 
+ The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
+ 
++### `anchor`: `Element | VirtualElement | null`
++
++The element that should be used by the `Popover` as its anchor. It can either be an `Element` or, alternatively, a `VirtualElement` — ie. an object with the `getBoundingClientRect()` and the `ownerDocument` properties defined.
++
++The element should be stored in state rather than a plain ref to ensure reactive updating when it changes.
++
++-   Required: No
++
+ ### `anchorRect`: `DomRectWithOwnerDocument`
+ 
++_Note: this prop is deprecated and will be removed in WordPress 6.3. Please use the `anchor` prop instead._
++
+ An object extending a `DOMRect` with an additional optional `ownerDocument` property, used to specify a fixed popover position.
+ 
+ -   Required: No
+ 
+ ### `anchorRef`: `Element | PopoverAnchorRefReference | PopoverAnchorRefTopBottom | Range`
+ 
++_Note: this prop is deprecated and will be removed in WordPress 6.3. Please use the `anchor` prop instead._
++
+ Used to specify a fixed popover position. It can be an `Element`, a React reference to an `element`, an object with a `top` and a `bottom` properties (both pointing to elements), or a `range`.
+ 
+ -   Required: No
+@@ -114,6 +157,8 @@ When not provided, the `onClose` callback will be called instead.
+ 
+ ### `getAnchorRect`: `( fallbackReferenceElement: Element | null ) => DomRectWithOwnerDocument`
+ 
++_Note: this prop is deprecated and will be removed in WordPress 6.3. Please use the `anchor` prop instead._
++
+ A function returning the same value as the one expected by the `anchorRect` prop, used to specify a dynamic popover position.
+ 
+ -   Required: No
+@@ -180,6 +225,6 @@ Adjusts the size of the popover to prevent its contents from going out of view w
+ 
+ ### `range`: `unknown`
+ 
+-_Note: this prop is deprecated and has no effect on the component._
++_Note: this prop is deprecated and will be removed in WordPress 6.3. It has no effect on the component._
+ 
+ -   Required: No
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 905943fc7cba27..1e9060b9a42356 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -163,7 +163,6 @@ const UnforwardedPopover = (
+ 	forwardedRef: ForwardedRef< any >
+ ) => {
+ 	const {
+-		range,
+ 		animate = true,
+ 		headerTitle,
+ 		onClose,
+@@ -175,22 +174,28 @@ const UnforwardedPopover = (
+ 		placement: placementProp = 'bottom-start',
+ 		offset: offsetProp = 0,
+ 		focusOnMount = 'firstElement',
+-		anchorRef,
+-		anchorRect,
+-		getAnchorRect,
++		anchor,
+ 		expandOnMobile,
+ 		onFocusOutside,
+ 		__unstableSlotName = SLOT_NAME,
+ 		flip = true,
+ 		resize = true,
+ 		shift = false,
+-		__unstableShift,
++
++		// Deprecated props
+ 		__unstableForcePosition,
++		__unstableShift,
++		anchorRef,
++		anchorRect,
++		getAnchorRect,
++		range,
++
++		// Rest
+ 		...contentProps
+ 	} = props;
+ 
+ 	if ( range ) {
+-		deprecated( 'range prop in Popover component', {
++		deprecated( '`range` prop in wp.components.Popover', {
+ 			since: '6.1',
+ 			version: '6.3',
+ 		} );
+@@ -199,7 +204,7 @@ const UnforwardedPopover = (
+ 	let computedFlipProp = flip;
+ 	let computedResizeProp = resize;
+ 	if ( __unstableForcePosition !== undefined ) {
+-		deprecated( '__unstableForcePosition prop in Popover component', {
++		deprecated( '`__unstableForcePosition` prop wp.components.Popover', {
+ 			since: '6.1',
+ 			version: '6.3',
+ 			alternative: '`flip={ false }` and  `resize={ false }`',
+@@ -213,7 +218,7 @@ const UnforwardedPopover = (
+ 
+ 	let shouldShift = shift;
+ 	if ( __unstableShift !== undefined ) {
+-		deprecated( '`__unstableShift` prop in Popover component', {
++		deprecated( '`__unstableShift` prop in wp.components.Popover', {
+ 			since: '6.1',
+ 			version: '6.3',
+ 			alternative: '`shift` prop`',
+@@ -223,6 +228,30 @@ const UnforwardedPopover = (
+ 		shouldShift = __unstableShift;
+ 	}
+ 
++	if ( anchorRef !== undefined ) {
++		deprecated( '`anchorRef` prop in wp.components.Popover', {
++			since: '6.1',
++			version: '6.3',
++			alternative: '`anchor` prop',
++		} );
++	}
++
++	if ( anchorRect !== undefined ) {
++		deprecated( '`anchorRect` prop in wp.components.Popover', {
++			since: '6.1',
++			version: '6.3',
++			alternative: '`anchor` prop',
++		} );
++	}
++
++	if ( getAnchorRect !== undefined ) {
++		deprecated( '`getAnchorRect` prop in wp.components.Popover', {
++			since: '6.1',
++			version: '6.3',
++			alternative: '`anchor` prop',
++		} );
++	}
++
+ 	const arrowRef = useRef( null );
+ 
+ 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
+@@ -383,6 +412,7 @@ const UnforwardedPopover = (
+ 	// recompute the reference element (real or virtual) and its owner document.
+ 	useLayoutEffect( () => {
+ 		const resultingReferenceOwnerDoc = getReferenceOwnerDocument( {
++			anchor,
+ 			anchorRef,
+ 			anchorRect,
+ 			getAnchorRect,
+@@ -390,6 +420,7 @@ const UnforwardedPopover = (
+ 			fallbackDocument: document,
+ 		} );
+ 		const resultingReferenceElement = getReferenceElement( {
++			anchor,
+ 			anchorRef,
+ 			anchorRect,
+ 			getAnchorRect,
+@@ -400,6 +431,7 @@ const UnforwardedPopover = (
+ 
+ 		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
+ 	}, [
++		anchor,
+ 		anchorRef as Element | undefined,
+ 		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top,
+ 		( anchorRef as PopoverAnchorRefTopBottom | undefined )?.bottom,
+@@ -527,7 +559,7 @@ const UnforwardedPopover = (
+ 		content = <Fill name={ slotName }>{ content }</Fill>;
+ 	}
+ 
+-	if ( anchorRef || anchorRect ) {
++	if ( anchorRef || anchorRect || anchor ) {
+ 		return content;
+ 	}
+ 
+diff --git a/packages/components/src/popover/stories/index.tsx b/packages/components/src/popover/stories/index.tsx
+index 60743c885bd2ac..95284909b0a954 100644
+--- a/packages/components/src/popover/stories/index.tsx
++++ b/packages/components/src/popover/stories/index.tsx
+@@ -37,6 +37,7 @@ const meta: ComponentMeta< typeof Popover > = {
+ 	title: 'Components/Popover',
+ 	component: Popover,
+ 	argTypes: {
++		anchor: { control: { type: null } },
+ 		anchorRef: { control: { type: null } },
+ 		anchorRect: { control: { type: null } },
+ 		children: { control: { type: null } },
+diff --git a/packages/components/src/popover/test/index.js b/packages/components/src/popover/test/index.js
+index 1551ec6586753d..dff33914659693 100644
+--- a/packages/components/src/popover/test/index.js
++++ b/packages/components/src/popover/test/index.js
+@@ -6,7 +6,7 @@ import { act, render, screen } from '@testing-library/react';
+ /**
+  * WordPress dependencies
+  */
+-import { useRef } from '@wordpress/element';
++import { useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -57,14 +57,16 @@ describe( 'Popover', () => {
+ 			).toMatchSnapshot();
+ 		} );
+ 
+-		it( 'should render correctly when anchorRef is provided', () => {
++		it( 'should render correctly when anchor is provided', () => {
+ 			const PopoverWithAnchor = ( args ) => {
+-				const anchorRef = useRef( null );
++				// Use internal state instead of a ref to make sure that the component
++				// re-renders when the popover's anchor updates.
++				const [ anchor, setAnchor ] = useState( null );
+ 
+ 				return (
+ 					<div>
+-						<p ref={ anchorRef }>Anchor</p>
+-						<Popover { ...args } anchorRef={ anchorRef } />
++						<p ref={ setAnchor }>Anchor</p>
++						<Popover { ...args } anchor={ anchor } />
+ 					</div>
+ 				);
+ 			};
+diff --git a/packages/components/src/popover/types.ts b/packages/components/src/popover/types.ts
+index e9b9a83bdcd17c..b80e266c1fe2ce 100644
+--- a/packages/components/src/popover/types.ts
++++ b/packages/components/src/popover/types.ts
+@@ -22,6 +22,10 @@ export type PopoverAnchorRefReference = MutableRefObject<
+ >;
+ export type PopoverAnchorRefTopBottom = { top: Element; bottom: Element };
+ 
++export type VirtualElement = Pick< Element, 'getBoundingClientRect' > & {
++	ownerDocument?: Document;
++};
++
+ export type PopoverProps = {
+ 	/**
+ 	 * The name of the Slot in which the popover should be rendered. It should
+@@ -31,20 +35,14 @@ export type PopoverProps = {
+ 	 */
+ 	__unstableSlotName?: string;
+ 	/**
+-	 * An object extending a `DOMRect` with an additional optional `ownerDocument`
+-	 * property, used to specify a fixed popover position.
+-	 */
+-	anchorRect?: DomRectWithOwnerDocument;
+-	/**
+-	 * Used to specify a fixed popover position. It can be an `Element`, a React
+-	 * reference to an `element`, an object with a `top` and a `bottom` properties
+-	 * (both pointing to elements), or a `range`.
++	 * The element that should be used by the popover as its anchor. It can either
++	 * be an `Element` or, alternatively, a `VirtualElement` — ie. an object with
++	 * the `getBoundingClientRect()` and the `ownerDocument` properties defined.
++	 *
++	 * **The anchor element should be stored in local state** rather than a
++	 * plain React ref to ensure reactive updating when it changes.
+ 	 */
+-	anchorRef?:
+-		| Element
+-		| PopoverAnchorRefReference
+-		| PopoverAnchorRefTopBottom
+-		| Range;
++	anchor?: Element | VirtualElement | null;
+ 	/**
+ 	 * Whether the popover should animate when opening.
+ 	 *
+@@ -89,13 +87,6 @@ export type PopoverProps = {
+ 	 * When not provided, the `onClose` callback will be called instead.
+ 	 */
+ 	onFocusOutside?: ( event: SyntheticEvent ) => void;
+-	/**
+-	 * A function returning the same value as the one expected by the `anchorRect`
+-	 * prop, used to specify a dynamic popover position.
+-	 */
+-	getAnchorRect?: (
+-		fallbackReferenceElement: Element | null
+-	) => DomRectWithOwnerDocument;
+ 	/**
+ 	 * Used to customize the header text shown when the popover is toggled to
+ 	 * fullscreen on mobile viewports (see the `expandOnMobile` prop).
+@@ -164,6 +155,34 @@ export type PopoverProps = {
+ 	 * @deprecated
+ 	 */
+ 	__unstableShift?: boolean;
++	/**
++	 * An object extending a `DOMRect` with an additional optional `ownerDocument`
++	 * property, used to specify a fixed popover position.
++	 *
++	 * @deprecated
++	 */
++	anchorRect?: DomRectWithOwnerDocument;
++	/**
++	 * Used to specify a fixed popover position. It can be an `Element`, a React
++	 * reference to an `element`, an object with a `top` and a `bottom` properties
++	 * (both pointing to elements), or a `range`.
++	 *
++	 * @deprecated
++	 */
++	anchorRef?:
++		| Element
++		| PopoverAnchorRefReference
++		| PopoverAnchorRefTopBottom
++		| Range;
++	/**
++	 * A function returning the same value as the one expected by the `anchorRect`
++	 * prop, used to specify a dynamic popover position.
++	 *
++	 * @deprecated
++	 */
++	getAnchorRect?: (
++		fallbackReferenceElement: Element | null
++	) => DomRectWithOwnerDocument;
+ 	/**
+ 	 * _Note: this prop is deprecated and has no effect on the component._
+ 	 *
+diff --git a/packages/components/src/popover/utils.ts b/packages/components/src/popover/utils.ts
+index 6f838cb14d9c00..c5b15a076114fc 100644
+--- a/packages/components/src/popover/utils.ts
++++ b/packages/components/src/popover/utils.ts
+@@ -116,12 +116,16 @@ export const getFrameOffset = (
+ };
+ 
+ export const getReferenceOwnerDocument = ( {
++	anchor,
+ 	anchorRef,
+ 	anchorRect,
+ 	getAnchorRect,
+ 	fallbackReferenceElement,
+ 	fallbackDocument,
+-}: Pick< PopoverProps, 'anchorRef' | 'anchorRect' | 'getAnchorRect' > & {
++}: Pick<
++	PopoverProps,
++	'anchorRef' | 'anchorRect' | 'getAnchorRect' | 'anchor'
++> & {
+ 	fallbackReferenceElement: Element | null;
+ 	fallbackDocument: Document;
+ } ): Document => {
+@@ -133,7 +137,9 @@ export const getReferenceOwnerDocument = ( {
+ 	// with the `getBoundingClientRect()` function (like real elements).
+ 	// See https://floating-ui.com/docs/virtual-elements for more info.
+ 	let resultingReferenceOwnerDoc;
+-	if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
++	if ( anchor ) {
++		resultingReferenceOwnerDoc = anchor.ownerDocument;
++	} else if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
+ 		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefTopBottom )
+ 			?.top.ownerDocument;
+ 	} else if ( ( anchorRef as Range | undefined )?.startContainer ) {
+@@ -160,16 +166,22 @@ export const getReferenceOwnerDocument = ( {
+ };
+ 
+ export const getReferenceElement = ( {
++	anchor,
+ 	anchorRef,
+ 	anchorRect,
+ 	getAnchorRect,
+ 	fallbackReferenceElement,
+-}: Pick< PopoverProps, 'anchorRef' | 'anchorRect' | 'getAnchorRect' > & {
++}: Pick<
++	PopoverProps,
++	'anchorRef' | 'anchorRect' | 'getAnchorRect' | 'anchor'
++> & {
+ 	fallbackReferenceElement: Element | null;
+ } ): ReferenceType | null => {
+ 	let referenceElement = null;
+ 
+-	if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
++	if ( anchor ) {
++		referenceElement = anchor;
++	} else if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
+ 		// Create a virtual element for the ref. The expectation is that
+ 		// if anchorRef.top is defined, then anchorRef.bottom is defined too.
+ 		// Seems to be used by the block toolbar, when multiple blocks are selected
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index 75508d7a78b784..c4b8a5ea6c147c 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -9,7 +9,6 @@ import {
+ 	concatChildren,
+ 	useEffect,
+ 	useState,
+-	useRef,
+ } from '@wordpress/element';
+ import { useDebounce, useMergeRefs } from '@wordpress/compose';
+ 
+@@ -60,7 +59,7 @@ const getRegularElement = ( {
+ };
+ 
+ const addPopoverToGrandchildren = ( {
+-	anchorRef,
++	anchor,
+ 	grandchildren,
+ 	isOver,
+ 	offset,
+@@ -78,7 +77,7 @@ const addPopoverToGrandchildren = ( {
+ 				aria-hidden="true"
+ 				animate={ false }
+ 				offset={ offset }
+-				anchorRef={ anchorRef }
++				anchor={ anchor }
+ 				shift
+ 			>
+ 				{ text }
+@@ -124,13 +123,18 @@ function Tooltip( props ) {
+ 	const [ isMouseDown, setIsMouseDown ] = useState( false );
+ 	const [ isOver, setIsOver ] = useState( false );
+ 	const delayedSetIsOver = useDebounce( setIsOver, delay );
++	// Using internal state (instead of a ref) for the popover anchor to make sure
++	// that the component re-renders when the anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+ 
+ 	// Create a reference to the Tooltip's child, to be passed to the Popover
+ 	// so that the Tooltip can be correctly positioned. Also, merge with the
+ 	// existing ref for the first child, so that its ref is preserved.
+-	const childRef = useRef( null );
+ 	const existingChildRef = Children.toArray( children )[ 0 ]?.ref;
+-	const mergedChildRefs = useMergeRefs( [ childRef, existingChildRef ] );
++	const mergedChildRefs = useMergeRefs( [
++		setPopoverAnchor,
++		existingChildRef,
++	] );
+ 
+ 	const createMouseDown = ( event ) => {
+ 		// In firefox, the mouse down event is also fired when the select
+@@ -253,7 +257,7 @@ function Tooltip( props ) {
+ 		: getRegularElement;
+ 
+ 	const popoverData = {
+-		anchorRef: childRef,
++		anchor: popoverAnchor,
+ 		isOver,
+ 		offset: 4,
+ 		position,
+diff --git a/packages/edit-navigation/src/components/header/menu-actions.js b/packages/edit-navigation/src/components/header/menu-actions.js
+index 84310a1c8941b8..be9871a775a60a 100644
+--- a/packages/edit-navigation/src/components/header/menu-actions.js
++++ b/packages/edit-navigation/src/components/header/menu-actions.js
+@@ -7,7 +7,7 @@ import {
+ 	__experimentalText as Text,
+ } from '@wordpress/components';
+ import { chevronDown } from '@wordpress/icons';
+-import { useRef } from '@wordpress/element';
++import { useMemo, useState } from '@wordpress/element';
+ import { decodeEntities } from '@wordpress/html-entities';
+ 
+ /**
+@@ -20,10 +20,21 @@ export default function MenuActions( { menus, isLoading } ) {
+ 	const [ selectedMenuId, setSelectedMenuId ] = useSelectedMenuId();
+ 	const [ menuName ] = useMenuEntityProp( 'name', selectedMenuId );
+ 
+-	// The title ref is passed to the popover as the anchorRef so that the
+-	// dropdown is centered over the whole title area rather than just one
+-	// part of it.
+-	const titleRef = useRef();
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
++
++	// Memoize popoverProps to avoid returning a new object every time.
++	const popoverProps = useMemo(
++		() => ( {
++			className: 'edit-navigation-menu-actions__switcher-dropdown',
++			position: 'bottom center',
++			// Use the title ref as the popover's anchor so that the dropdown is
++			// centered over the whole title area rather than just on part of it.
++			anchor: popoverAnchor,
++		} ),
++		[ popoverAnchor ]
++	);
+ 
+ 	if ( isLoading ) {
+ 		return (
+@@ -36,7 +47,7 @@ export default function MenuActions( { menus, isLoading } ) {
+ 	return (
+ 		<div className="edit-navigation-menu-actions">
+ 			<div
+-				ref={ titleRef }
++				ref={ setPopoverAnchor }
+ 				className="edit-navigation-menu-actions__subtitle-wrapper"
+ 			>
+ 				<Text
+@@ -59,12 +70,7 @@ export default function MenuActions( { menus, isLoading } ) {
+ 						showTooltip: false,
+ 						__experimentalIsFocusable: true,
+ 					} }
+-					popoverProps={ {
+-						className:
+-							'edit-navigation-menu-actions__switcher-dropdown',
+-						position: 'bottom center',
+-						anchorRef: titleRef.current,
+-					} }
++					popoverProps={ popoverProps }
+ 				>
+ 					{ ( { onClose } ) => (
+ 						<MenuSwitcher
+diff --git a/packages/edit-post/src/components/sidebar/post-schedule/index.js b/packages/edit-post/src/components/sidebar/post-schedule/index.js
+index f8b96fe6669e7b..8ef3291e6096c7 100644
+--- a/packages/edit-post/src/components/sidebar/post-schedule/index.js
++++ b/packages/edit-post/src/components/sidebar/post-schedule/index.js
+@@ -3,7 +3,7 @@
+  */
+ import { __, sprintf } from '@wordpress/i18n';
+ import { PanelRow, Dropdown, Button } from '@wordpress/components';
+-import { useRef } from '@wordpress/element';
++import { useState, useMemo } from '@wordpress/element';
+ import {
+ 	PostSchedule as PostScheduleForm,
+ 	PostScheduleCheck,
+@@ -11,13 +11,24 @@ import {
+ } from '@wordpress/editor';
+ 
+ export default function PostSchedule() {
+-	const anchorRef = useRef();
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
++	// Memoize popoverProps to avoid returning a new object every time.
++	const popoverProps = useMemo(
++		() => ( { anchor: popoverAnchor } ),
++		[ popoverAnchor ]
++	);
++
+ 	return (
+ 		<PostScheduleCheck>
+-			<PanelRow className="edit-post-post-schedule" ref={ anchorRef }>
++			<PanelRow
++				className="edit-post-post-schedule"
++				ref={ setPopoverAnchor }
++			>
+ 				<span>{ __( 'Publish' ) }</span>
+ 				<Dropdown
+-					popoverProps={ { anchorRef } }
++					popoverProps={ popoverProps }
+ 					position="bottom left"
+ 					contentClassName="edit-post-post-schedule__dialog"
+ 					focusOnMount
+diff --git a/packages/edit-post/src/components/sidebar/post-schedule/style.scss b/packages/edit-post/src/components/sidebar/post-schedule/style.scss
+index 8e251f47f58574..e1d6c4cd09f950 100644
+--- a/packages/edit-post/src/components/sidebar/post-schedule/style.scss
++++ b/packages/edit-post/src/components/sidebar/post-schedule/style.scss
+@@ -15,7 +15,7 @@
+ 	white-space: normal;
+ 	height: auto;
+ 
+-	// This span is added by the Popover in Tooltip when no anchorRef is
++	// This span is added by the Popover in Tooltip when no anchor is
+ 	// provided. We set its width to 0 so that it does not cause the button text
+ 	// to wrap to a new line when displaying the tooltip. A better fix would be
+ 	// to pass anchorRef and avoid the need for a span alltogether, which is
+diff --git a/packages/edit-post/src/components/sidebar/post-template/index.js b/packages/edit-post/src/components/sidebar/post-template/index.js
+index b16330a0350f96..469f9319bee51a 100644
+--- a/packages/edit-post/src/components/sidebar/post-template/index.js
++++ b/packages/edit-post/src/components/sidebar/post-template/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRef } from '@wordpress/element';
++import { useState, useMemo } from '@wordpress/element';
+ import { PanelRow, Dropdown, Button } from '@wordpress/components';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { useSelect } from '@wordpress/data';
+@@ -15,7 +15,14 @@ import PostTemplateForm from './form';
+ import { store as editPostStore } from '../../../store';
+ 
+ export default function PostTemplate() {
+-	const anchorRef = useRef();
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
++	// Memoize popoverProps to avoid returning a new object every time.
++	const popoverProps = useMemo(
++		() => ( { anchor: popoverAnchor } ),
++		[ popoverAnchor ]
++	);
+ 
+ 	const isVisible = useSelect( ( select ) => {
+ 		const postTypeSlug = select( editorStore ).getCurrentPostType();
+@@ -46,10 +53,10 @@ export default function PostTemplate() {
+ 	}
+ 
+ 	return (
+-		<PanelRow className="edit-post-post-template" ref={ anchorRef }>
++		<PanelRow className="edit-post-post-template" ref={ setPopoverAnchor }>
+ 			<span>{ __( 'Template' ) }</span>
+ 			<Dropdown
+-				popoverProps={ { anchorRef } }
++				popoverProps={ popoverProps }
+ 				position="bottom left"
+ 				className="edit-post-post-template__dropdown"
+ 				contentClassName="edit-post-post-template__dialog"
+diff --git a/packages/edit-post/src/components/sidebar/post-url/index.js b/packages/edit-post/src/components/sidebar/post-url/index.js
+index e7b3db09d94219..46b592c82b4964 100644
+--- a/packages/edit-post/src/components/sidebar/post-url/index.js
++++ b/packages/edit-post/src/components/sidebar/post-url/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRef } from '@wordpress/element';
++import { useMemo, useState } from '@wordpress/element';
+ import { PanelRow, Dropdown, Button } from '@wordpress/components';
+ import { __, sprintf } from '@wordpress/i18n';
+ import {
+@@ -11,13 +11,21 @@ import {
+ } from '@wordpress/editor';
+ 
+ export default function PostURL() {
+-	const anchorRef = useRef();
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
++	// Memoize popoverProps to avoid returning a new object every time.
++	const popoverProps = useMemo(
++		() => ( { anchor: popoverAnchor } ),
++		[ popoverAnchor ]
++	);
++
+ 	return (
+ 		<PostURLCheck>
+-			<PanelRow className="edit-post-post-url" ref={ anchorRef }>
++			<PanelRow className="edit-post-post-url" ref={ setPopoverAnchor }>
+ 				<span>{ __( 'URL' ) }</span>
+ 				<Dropdown
+-					popoverProps={ { anchorRef } }
++					popoverProps={ popoverProps }
+ 					position="bottom left"
+ 					className="edit-post-post-url__dropdown"
+ 					contentClassName="edit-post-post-url__dialog"
+diff --git a/packages/edit-post/src/components/sidebar/post-visibility/index.js b/packages/edit-post/src/components/sidebar/post-visibility/index.js
+index f7c38ee45f86bd..43d9e6ab4264b9 100644
+--- a/packages/edit-post/src/components/sidebar/post-visibility/index.js
++++ b/packages/edit-post/src/components/sidebar/post-visibility/index.js
+@@ -9,14 +9,29 @@ import {
+ 	PostVisibilityCheck,
+ 	usePostVisibilityLabel,
+ } from '@wordpress/editor';
+-import { useRef } from '@wordpress/element';
++import { useMemo, useState } from '@wordpress/element';
+ 
+ export function PostVisibility() {
+-	const rowRef = useRef();
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
++	// Memoize popoverProps to avoid returning a new object every time.
++	const popoverProps = useMemo(
++		() => ( {
++			// Anchor the popover to the middle of the entire row so that it doesn't
++			// move around when the label changes.
++			anchor: popoverAnchor,
++		} ),
++		[ popoverAnchor ]
++	);
++
+ 	return (
+ 		<PostVisibilityCheck
+ 			render={ ( { canEdit } ) => (
+-				<PanelRow ref={ rowRef } className="edit-post-post-visibility">
++				<PanelRow
++					ref={ setPopoverAnchor }
++					className="edit-post-post-visibility"
++				>
+ 					<span>{ __( 'Visibility' ) }</span>
+ 					{ ! canEdit && (
+ 						<span>
+@@ -27,12 +42,7 @@ export function PostVisibility() {
+ 						<Dropdown
+ 							position="bottom left"
+ 							contentClassName="edit-post-post-visibility__dialog"
+-							popoverProps={ {
+-								// Anchor the popover to the middle of the
+-								// entire row so that it doesn't move around
+-								// when the label changes.
+-								anchorRef: rowRef.current,
+-							} }
++							popoverProps={ popoverProps }
+ 							focusOnMount
+ 							renderToggle={ ( { isOpen, onToggle } ) => (
+ 								<PostVisibilityToggle
+diff --git a/packages/edit-site/src/components/header/document-actions/index.js b/packages/edit-site/src/components/header/document-actions/index.js
+index 53ae4c395c5a81..449f7b98ee8a25 100644
+--- a/packages/edit-site/src/components/header/document-actions/index.js
++++ b/packages/edit-site/src/components/header/document-actions/index.js
+@@ -19,7 +19,7 @@ import {
+ 	__experimentalText as Text,
+ } from '@wordpress/components';
+ import { chevronDown } from '@wordpress/icons';
+-import { useRef } from '@wordpress/element';
++import { useState, useMemo } from '@wordpress/element';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+ 
+ function getBlockDisplayText( block ) {
+@@ -73,10 +73,19 @@ export default function DocumentActions( {
+ } ) {
+ 	const { label } = useSecondaryText();
+ 
+-	// The title ref is passed to the popover as the anchorRef so that the
+-	// dropdown is centered over the whole title area rather than just one
+-	// part of it.
+-	const titleRef = useRef();
++	// Use internal state instead of a ref to make sure that the component
++	// re-renders when the popover's anchor updates.
++	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
++
++	// Memoize popoverProps to avoid returning a new object every time.
++	const popoverProps = useMemo(
++		() => ( {
++			// Use the title wrapper as the popover anchor so that the dropdown is
++			// centered over the whole title area rather than just one part of it.
++			anchor: popoverAnchor,
++		} ),
++		[ popoverAnchor ]
++	);
+ 
+ 	// Return a simple loading indicator until we have information to show.
+ 	if ( ! isLoaded ) {
+@@ -103,7 +112,7 @@ export default function DocumentActions( {
+ 			} ) }
+ 		>
+ 			<div
+-				ref={ titleRef }
++				ref={ setPopoverAnchor }
+ 				className="edit-site-document-actions__title-wrapper"
+ 			>
+ 				<Text
+@@ -130,9 +139,7 @@ export default function DocumentActions( {
+ 
+ 				{ dropdownContent && (
+ 					<Dropdown
+-						popoverProps={ {
+-							anchorRef: titleRef.current,
+-						} }
++						popoverProps={ popoverProps }
+ 						position="bottom center"
+ 						renderToggle={ ( { isOpen, onToggle } ) => (
+ 							<Button
+diff --git a/packages/format-library/src/image/index.js b/packages/format-library/src/image/index.js
+index 3c1c2a08e62665..d45296474ed2dc 100644
+--- a/packages/format-library/src/image/index.js
++++ b/packages/format-library/src/image/index.js
+@@ -4,7 +4,7 @@
+ import { Path, SVG, TextControl, Popover, Button } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import { useState } from '@wordpress/element';
+-import { insertObject, useAnchorRef } from '@wordpress/rich-text';
++import { insertObject, useAnchor } from '@wordpress/rich-text';
+ import {
+ 	MediaUpload,
+ 	RichTextToolbarButton,
+@@ -36,8 +36,8 @@ export const image = {
+ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
+ 	const { style } = activeObjectAttributes;
+ 	const [ width, setWidth ] = useState( style?.replace( /\D/g, '' ) );
+-	const anchorRef = useAnchorRef( {
+-		ref: contentRef,
++	const popoverAnchor = useAnchor( {
++		editableContentElement: contentRef.current,
+ 		value,
+ 		settings: image,
+ 	} );
+@@ -46,7 +46,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
+ 		<Popover
+ 			position="bottom center"
+ 			focusOnMount={ false }
+-			anchorRef={ anchorRef }
++			anchor={ popoverAnchor }
+ 			className="block-editor-format-toolbar__image-popover"
+ 		>
+ 			<form
+diff --git a/packages/format-library/src/link/inline.js b/packages/format-library/src/link/inline.js
+index d648ce3a04e348..c47733e6bf9e9f 100644
+--- a/packages/format-library/src/link/inline.js
++++ b/packages/format-library/src/link/inline.js
+@@ -10,7 +10,7 @@ import {
+ 	insert,
+ 	isCollapsed,
+ 	applyFormat,
+-	useAnchorRef,
++	useAnchor,
+ 	removeFormat,
+ 	slice,
+ 	replace,
+@@ -183,13 +183,17 @@ function InlineLinkUI( {
+ 		}
+ 	}
+ 
+-	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
++	const popoverAnchor = useAnchor( {
++		editableContentElement: contentRef.current,
++		value,
++		settings,
++	} );
+ 
+ 	// Generate a string based key that is unique to this anchor reference.
+ 	// This is used to force re-mount the LinkControl component to avoid
+ 	// potential stale state bugs caused by the component not being remounted
+ 	// See https://github.com/WordPress/gutenberg/pull/34742.
+-	const forceRemountKey = useLinkInstanceKey( anchorRef );
++	const forceRemountKey = useLinkInstanceKey( popoverAnchor );
+ 
+ 	// The focusOnMount prop shouldn't evolve during render of a Popover
+ 	// otherwise it causes a render of the content.
+@@ -223,7 +227,7 @@ function InlineLinkUI( {
+ 
+ 	return (
+ 		<Popover
+-			anchorRef={ anchorRef }
++			anchor={ popoverAnchor }
+ 			focusOnMount={ focusOnMount.current }
+ 			onClose={ stopAddingLink }
+ 			position="bottom center"
+diff --git a/packages/format-library/src/text-color/inline.js b/packages/format-library/src/text-color/inline.js
+index ce8d4a43c14a44..f956afa7d323ab 100644
+--- a/packages/format-library/src/text-color/inline.js
++++ b/packages/format-library/src/text-color/inline.js
+@@ -7,7 +7,7 @@ import {
+ 	applyFormat,
+ 	removeFormat,
+ 	getActiveFormat,
+-	useAnchorRef,
++	useAnchor,
+ } from '@wordpress/rich-text';
+ import {
+ 	ColorPalette,
+@@ -137,22 +137,26 @@ export default function InlineColorUI( {
+ 	onClose,
+ 	contentRef,
+ } ) {
+-	/* 
++	/*
+ 	 As you change the text color by typing a HEX value into a field,
+ 	 the return value of document.getSelection jumps to the field you're editing,
+-	 not the highlighted text. Given that useAnchorRef uses document.getSelection,
++	 not the highlighted text. Given that useAnchor uses document.getSelection,
+ 	 it will return null, since it can't find the <mark> element within the HEX input.
+ 	 This caches the last truthy value of the selection anchor reference.
+ 	 */
+-	const anchorRef = useCachedTruthy(
+-		useAnchorRef( { ref: contentRef, value, settings } )
++	const popoverAnchor = useCachedTruthy(
++		useAnchor( {
++			editableContentElement: contentRef.current,
++			value,
++			settings,
++		} )
+ 	);
+ 
+ 	return (
+ 		<Popover
+ 			onClose={ onClose }
+ 			className="components-inline-color-popover"
+-			anchorRef={ anchorRef }
++			anchor={ popoverAnchor }
+ 		>
+ 			<TabPanel
+ 				tabs={ [
+diff --git a/packages/rich-text/CHANGELOG.md b/packages/rich-text/CHANGELOG.md
+index cb8a7713327df8..3a94b3bb4ccc1e 100644
+--- a/packages/rich-text/CHANGELOG.md
++++ b/packages/rich-text/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New features
++
++-   Introduced new `useAnchor` hook, which works better with the new `Popover` component APIs. The previous `useAnchorRef` hook is now marked as deprecated, and is scheduled to be removed in WordPress 6.3 ([#43691](https://github.com/WordPress/gutenberg/pull/43691)).
++
+ ## 5.15.0 (2022-09-13)
+ 
+ ## 5.14.0 (2022-08-24)
+diff --git a/packages/rich-text/README.md b/packages/rich-text/README.md
+index 006f0b8b095cd5..6e5a01b3554629 100644
+--- a/packages/rich-text/README.md
++++ b/packages/rich-text/README.md
+@@ -474,6 +474,24 @@ _Returns_
+ 
+ -   `RichTextFormatType|undefined`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
+ 
++### useAnchor
++
++This hook, to be used in a format type's Edit component, returns the active
++element that is formatted, or a virtual element for the selection range if
++no format is active. The returned value is meant to be used for positioning
++UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
++
++_Parameters_
++
++-   _$1_ `Object`: Named parameters.
++-   _$1.editableContentElement_ `HTMLElement|null`: The element containing the editable content.
++-   _$1.value_ `RichTextValue`: Value to check for selection.
++-   _$1.settings_ `RichTextFormatType`: The format type's settings.
++
++_Returns_
++
++-   `Element|VirtualAnchorElement|undefined|null`: The active element or selection range.
++
+ ### useAnchorRef
+ 
+ This hook, to be used in a format type's Edit component, returns the active
+diff --git a/packages/rich-text/package.json b/packages/rich-text/package.json
+index cb157c909ba048..b493df7d8276c6 100644
+--- a/packages/rich-text/package.json
++++ b/packages/rich-text/package.json
+@@ -33,6 +33,7 @@
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/data": "file:../data",
++		"@wordpress/deprecated": "file:../deprecated",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/escape-html": "file:../escape-html",
+ 		"@wordpress/i18n": "file:../i18n",
+diff --git a/packages/rich-text/src/component/use-anchor-ref.js b/packages/rich-text/src/component/use-anchor-ref.js
+index 4be4fdd93096a7..a66a7bbbeb2de3 100644
+--- a/packages/rich-text/src/component/use-anchor-ref.js
++++ b/packages/rich-text/src/component/use-anchor-ref.js
+@@ -2,6 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useMemo } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -27,6 +28,12 @@ import { getActiveFormat } from '../get-active-format';
+  * @return {Element|Range} The active element or selection range.
+  */
+ export function useAnchorRef( { ref, value, settings = {} } ) {
++	deprecated( '`useAnchorRef` hook', {
++		since: '6.1',
++		version: '6.3',
++		alternative: '`useAnchor` hook',
++	} );
++
+ 	const { tagName, className, name } = settings;
+ 	const activeFormat = name ? getActiveFormat( value, name ) : undefined;
+ 
+diff --git a/packages/rich-text/src/component/use-anchor.js b/packages/rich-text/src/component/use-anchor.js
+new file mode 100644
+index 00000000000000..dd6172a1661db3
+--- /dev/null
++++ b/packages/rich-text/src/component/use-anchor.js
+@@ -0,0 +1,79 @@
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { getActiveFormat } from '../get-active-format';
++
++/** @typedef {import('../register-format-type').RichTextFormatType} RichTextFormatType */
++/** @typedef {import('../create').RichTextValue} RichTextValue */
++
++/**
++ * @typedef {Object} VirtualAnchorElement
++ * @property {Function} getBoundingClientRect A function returning a DOMRect
++ * @property {Document} ownerDocument         The element's ownerDocument
++ */
++
++/**
++ * This hook, to be used in a format type's Edit component, returns the active
++ * element that is formatted, or a virtual element for the selection range if
++ * no format is active. The returned value is meant to be used for positioning
++ * UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
++ *
++ * @param {Object}             $1                        Named parameters.
++ * @param {HTMLElement|null}   $1.editableContentElement The element containing
++ *                                                       the editable content.
++ * @param {RichTextValue}      $1.value                  Value to check for selection.
++ * @param {RichTextFormatType} $1.settings               The format type's settings.
++ * @return {Element|VirtualAnchorElement|undefined|null} The active element or selection range.
++ */
++export function useAnchor( { editableContentElement, value, settings = {} } ) {
++	const { tagName, className, name } = settings;
++	const activeFormat = name ? getActiveFormat( value, name ) : undefined;
++
++	return useMemo( () => {
++		if ( ! editableContentElement ) return;
++		const {
++			ownerDocument: { defaultView },
++		} = editableContentElement;
++		const selection = defaultView.getSelection();
++
++		if ( ! selection.rangeCount ) {
++			return;
++		}
++
++		const range = selection.getRangeAt( 0 );
++
++		if ( ! activeFormat ) {
++			return {
++				ownerDocument: range.startContainer.ownerDocument,
++				getBoundingClientRect() {
++					return range.getBoundingClientRect();
++				},
++			};
++		}
++
++		let element = range.startContainer;
++
++		// If the caret is right before the element, select the next element.
++		element = element.nextElementSibling || element;
++
++		while ( element.nodeType !== element.ELEMENT_NODE ) {
++			element = element.parentNode;
++		}
++
++		return element.closest(
++			tagName + ( className ? '.' + className : '' )
++		);
++	}, [
++		editableContentElement,
++		activeFormat,
++		value.start,
++		value.end,
++		tagName,
++		className,
++	] );
++}
+diff --git a/packages/rich-text/src/index.js b/packages/rich-text/src/index.js
+index b4d2b19e362853..33e6e054a68a63 100644
+--- a/packages/rich-text/src/index.js
++++ b/packages/rich-text/src/index.js
+@@ -26,6 +26,7 @@ export { unregisterFormatType } from './unregister-format-type';
+ export { createElement as __unstableCreateElement } from './create-element';
+ 
+ export { useAnchorRef } from './component/use-anchor-ref';
++export { useAnchor } from './component/use-anchor';
+ 
+ export {
+ 	default as __experimentalRichText,

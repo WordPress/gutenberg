@@ -1,0 +1,122 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 1ce2bb869ff1e1..51921f01b30e88 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -18,6 +18,10 @@
+ -   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).
+ -   Rename the `--wpds-color-stroke-focus-brand` design token to `--wpds-color-stroke-focus` ([#79125](https://github.com/WordPress/gutenberg/pull/79125)).
+ 
++### Enhancements
++
++-   Tweak `--wpds-color-foreground-interactive-brand-active` and `--wpds-color-foreground-interactive-error-active` to differentiate them from the non-`active` counterparts ([#79151](https://github.com/WordPress/gutenberg/pull/79151)).
++
+ ### Bug Fixes
+ 
+ -   `ThemeProvider`: Strictly enforce the documented seed-color input contract for `color.primary` / `color.background`. Inputs outside sRGB (e.g. `oklch()`), previously accepted incidentally, now throw a clear error ([#79148](https://github.com/WordPress/gutenberg/pull/79148)).
+@@ -47,7 +51,8 @@
+ -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+ 
+ ### Breaking Changes
+-- Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
++
++-   Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
+ -   Drop the experimental `density` support from `ThemeProvider`. The `density` prop has been removed, along with the related `data-wpds-density` attribute and the per-density overrides on `--wpds-dimension-padding-*` / `--wpds-dimension-gap-*` tokens ([#78741](https://github.com/WordPress/gutenberg/pull/78741)).
+ -   Rename the `color.bg` prop on `ThemeProvider` to `color.background` ([#79007](https://github.com/WordPress/gutenberg/pull/79007)).
+ 
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 2e63b88c174c11..86f696da40078c 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -150,7 +150,7 @@
+ 	/* Foreground color for interactive elements with brand tone and normal emphasis. */
+ 	--wpds-color-foreground-interactive-brand: #3858e9;
+ 	/* Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active. */
+-	--wpds-color-foreground-interactive-brand-active: #3858e9;
++	--wpds-color-foreground-interactive-brand-active: #0b0070;
+ 	/* Foreground color for interactive elements with brand tone and normal emphasis, in their disabled state. */
+ 	--wpds-color-foreground-interactive-brand-disabled: #8d8d8d;
+ 	/* Foreground color for interactive elements with brand tone and strong emphasis. */
+@@ -162,7 +162,7 @@
+ 	/* Foreground color for interactive elements with error tone and normal emphasis. */
+ 	--wpds-color-foreground-interactive-error: #cc1818;
+ 	/* Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active. */
+-	--wpds-color-foreground-interactive-error-active: #cc1818;
++	--wpds-color-foreground-interactive-error-active: #470000;
+ 	/* Foreground color for interactive elements with error tone and normal emphasis, in their disabled state. */
+ 	--wpds-color-foreground-interactive-error-disabled: #8d8d8d;
+ 	/* Foreground color for interactive elements with error tone and strong emphasis. */
+diff --git a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+index 974059e0dd2dd0..a78762c4706779 100644
+--- a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
++++ b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+@@ -77,13 +77,13 @@ export default {
+ 	'--wpds-color-foreground-interactive-brand':
+ 		'var(--wp-admin-theme-color, #3858e9)',
+ 	'--wpds-color-foreground-interactive-brand-active':
+-		'var(--wp-admin-theme-color, #3858e9)',
++		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 52%, black)',
+ 	'--wpds-color-foreground-interactive-brand-disabled': '#8d8d8d',
+ 	'--wpds-color-foreground-interactive-brand-strong': '#fff',
+ 	'--wpds-color-foreground-interactive-brand-strong-active': '#fff',
+ 	'--wpds-color-foreground-interactive-brand-strong-disabled': '#8d8d8d',
+ 	'--wpds-color-foreground-interactive-error': '#cc1818',
+-	'--wpds-color-foreground-interactive-error-active': '#cc1818',
++	'--wpds-color-foreground-interactive-error-active': '#470000',
+ 	'--wpds-color-foreground-interactive-error-disabled': '#8d8d8d',
+ 	'--wpds-color-foreground-interactive-error-strong': '#f2efef',
+ 	'--wpds-color-foreground-interactive-error-strong-active': '#f2efef',
+diff --git a/packages/theme/src/prebuilt/ts/color-tokens.ts b/packages/theme/src/prebuilt/ts/color-tokens.ts
+index 0be1e5c43fc984..955696f11dd04e 100644
+--- a/packages/theme/src/prebuilt/ts/color-tokens.ts
++++ b/packages/theme/src/prebuilt/ts/color-tokens.ts
+@@ -21,10 +21,8 @@ export default {
+ 	],
+ 	'primary-bgFill2': [ 'background-interactive-brand-strong-active' ],
+ 	'primary-surface4': [ 'background-interactive-brand-weak-active' ],
+-	'primary-fgSurface3': [
+-		'foreground-interactive-brand',
+-		'foreground-interactive-brand-active',
+-	],
++	'primary-fgSurface4': [ 'foreground-interactive-brand-active' ],
++	'primary-fgSurface3': [ 'foreground-interactive-brand' ],
+ 	'primary-stroke3': [
+ 		'background-thumb-brand',
+ 		'background-thumb-brand-active',
+@@ -67,11 +65,13 @@ export default {
+ 		'background-interactive-error-weak-active',
+ 		'background-surface-error',
+ 	],
+-	'error-fgSurface4': [ 'foreground-content-error' ],
++	'error-fgSurface4': [
++		'foreground-content-error',
++		'foreground-interactive-error-active',
++	],
+ 	'error-fgSurface3': [
+ 		'foreground-content-error-weak',
+ 		'foreground-interactive-error',
+-		'foreground-interactive-error-active',
+ 	],
+ 	'error-stroke3': [
+ 		'stroke-interactive-error',
+diff --git a/packages/theme/tokens/color.json b/packages/theme/tokens/color.json
+index 2fd6d11a6ef67f..e0fb8ff180c04e 100644
+--- a/packages/theme/tokens/color.json
++++ b/packages/theme/tokens/color.json
+@@ -1372,7 +1372,7 @@
+ 					"$description": "Foreground color for interactive elements with brand tone and normal emphasis."
+ 				},
+ 				"brand-active": {
+-					"$value": "{wpds-color.primitive.primary.fgSurface3}",
++					"$value": "{wpds-color.primitive.primary.fgSurface4}",
+ 					"$description": "Foreground color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active."
+ 				},
+ 				"brand-disabled": {
+@@ -1396,7 +1396,7 @@
+ 					"$description": "Foreground color for interactive elements with error tone and normal emphasis."
+ 				},
+ 				"error-active": {
+-					"$value": "{wpds-color.primitive.error.fgSurface3}",
++					"$value": "{wpds-color.primitive.error.fgSurface4}",
+ 					"$description": "Foreground color for interactive elements with error tone and normal emphasis that are hovered, focused, or active."
+ 				},
+ 				"error-disabled": {

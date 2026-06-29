@@ -1,0 +1,61 @@
+diff --git a/docs/how-to-guides/accessibility.md b/docs/how-to-guides/accessibility.md
+index f38e8c4e81834c..75458d6690cab4 100644
+--- a/docs/how-to-guides/accessibility.md
++++ b/docs/how-to-guides/accessibility.md
+@@ -12,6 +12,6 @@ For setting up navigation between different regions, see the [navigateRegions pa
+ 
+ Read more regarding landmark design from W3C:
+ 
+--   [General Principles of Landmark Design](https://www.w3.org/TR/wai-aria-practices-1.1/#general-principles-of-landmark-design)
+--   [ARIA Landmarks Example](https://www.w3.org/TR/wai-aria-practices/examples/landmarks/)
+--   [HTML5 elements that by default define ARIA landmarks](https://www.w3.org/TR/wai-aria-practices/examples/landmarks/HTML5.html)
++-   [General Principles of Landmark Design](https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/#x4-2-general-principles-of-landmark-design)
++-   [ARIA Landmarks Examples](https://www.w3.org/WAI/ARIA/apg/example-index/landmarks/)
++-   [HTML5 elements that by default define ARIA landmarks](https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/#x4-1-html-sectioning-elements)
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index cf44d92e6f17fb..a26a188251f017 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `BoxControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#42094](https://github.com/WordPress/gutenberg/pull/42094)).
++
+ ### Internal
+ 
+ -   `Grid`: Convert to TypeScript ([#41923](https://github.com/WordPress/gutenberg/pull/41923)).
+diff --git a/packages/components/src/box-control/index.js b/packages/components/src/box-control/index.js
+index 63305c7b956d6d..a8411ba9a1af30 100644
+--- a/packages/components/src/box-control/index.js
++++ b/packages/components/src/box-control/index.js
+@@ -117,7 +117,7 @@ export default function BoxControl( {
+ 	};
+ 
+ 	return (
+-		<Root id={ id } role="region" aria-labelledby={ headingId }>
++		<Root id={ id } role="group" aria-labelledby={ headingId }>
+ 			<Header className="component-box-control__header">
+ 				<FlexItem>
+ 					<Text
+diff --git a/packages/components/src/higher-order/navigate-regions/README.md b/packages/components/src/higher-order/navigate-regions/README.md
+index da1e2de104016e..f03eebbb52e124 100644
+--- a/packages/components/src/higher-order/navigate-regions/README.md
++++ b/packages/components/src/higher-order/navigate-regions/README.md
+@@ -1,6 +1,6 @@
+ # navigateRegions
+ 
+-`navigateRegions` is a React [higher-order component](https://facebook.github.io/react/docs/higher-order-components.html) adding keyboard navigation to switch between the different DOM elements marked as "regions" (role="region"). These regions should be focusable (By adding a tabIndex attribute for example). For better accessibility, these elements must be properly labelled to briefly describe the purpose of the content in the region. For more details, see "ARIA landmarks" in the [WAI-ARIA specification](https://www.w3.org/TR/wai-aria/).
++`navigateRegions` is a React [higher-order component](https://facebook.github.io/react/docs/higher-order-components.html) adding keyboard navigation to switch between the different DOM elements marked as "regions" (role="region"). These regions should be focusable (By adding a tabIndex attribute for example). For better accessibility, these elements must be properly labelled to briefly describe the purpose of the content in the region. For more details, see "Landmark Roles" in the [WAI-ARIA specification](https://www.w3.org/TR/wai-aria/) and "Landmark Regions" in the [ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/practices/landmark-regions/).
+ 
+ ## Example:
+ 
+@@ -21,3 +21,6 @@ const MyComponentWithNavigateRegions = navigateRegions( () => (
+ 	</div>
+ ) );
+ ```
++
++## Notes:
++It's important to note that an ARIA `role="region"` is an ARIA landmark role. It should be reserved for sections of content sufficiently important to have it listed in a summary of the page. Only use this ARIA role for the main sections of a page. All perceivable content should reside in a semantically meaningful landmark in order that content is not missed by the user.

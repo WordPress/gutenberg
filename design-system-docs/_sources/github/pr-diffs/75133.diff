@@ -1,0 +1,54 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 8b27905637e8a6..64415a5f667699 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   Add `Tabs` primitive ([#74652](https://github.com/WordPress/gutenberg/pull/74652)).
+ 
++### Enhancements
++
++-   `Button`: Add minimum content width (`6ch` + padding) to prevent overly narrow buttons with short labels ([#75133](https://github.com/WordPress/gutenberg/pull/75133)).
++
+ ## 0.6.0 (2026-01-29)
+ 
+ ### New Features
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+index ed1aad330b5704..9b9addd3242e8c 100644
+--- a/packages/ui/src/button/style.module.css
++++ b/packages/ui/src/button/style.module.css
+@@ -21,6 +21,7 @@
+ 		--wp-ui-button-height: 40px;
+ 		--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
+ 		--wp-ui-button-font-size: var(--wpds-font-size-md);
++		--wp-ui-button-min-width: calc(4ch + 2 * var(--wp-ui-button-padding-inline));
+ 
+ 		/* by default, borders have the same color as the background */
+ 		--wp-ui-button-border-color: var(--wp-ui-button-background-color);
+@@ -34,6 +35,7 @@
+ 		align-items: center;
+ 		gap: calc(2 * var(--wpds-dimension-base)); /* TODO: Consider new interactive/control gap tokens */
+ 		aspect-ratio: var(--wp-ui-button-aspect-ratio);
++		min-width: var(--wp-ui-button-min-width);
+ 		height: var(--wp-ui-button-height);
+ 		padding-inline: var(--wp-ui-button-padding-inline);
+ 		border-style: solid;
+@@ -188,6 +190,7 @@
+ 	}
+ 
+ 	.is-unstyled {
++		min-width: unset;
+ 		border: none;
+ 		background: none;
+ 	}
+diff --git a/packages/ui/src/icon-button/style.module.css b/packages/ui/src/icon-button/style.module.css
+index 26258177253f97..a02a972a6f46a7 100644
+--- a/packages/ui/src/icon-button/style.module.css
++++ b/packages/ui/src/icon-button/style.module.css
+@@ -4,5 +4,6 @@
+ 	.icon-button {
+ 		--wp-ui-button-aspect-ratio: 1;
+ 		--wp-ui-button-padding-inline: 0;
++		--wp-ui-button-min-width: unset;
+ 	}
+ }

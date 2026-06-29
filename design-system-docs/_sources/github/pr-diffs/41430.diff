@@ -1,0 +1,259 @@
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index 2127807739d9b0..c7fef19b9ab3b3 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -151,6 +151,15 @@ export default function CustomSelectControl( {
+ 					describedBy: getDescribedBy(),
+ 				} ) }
+ 			>
++				{ selectedItem.__experimentalImage && (
++					<img
++						className="components-custom-select-control__button-image"
++						alt=""
++						width={ 32 }
++						height={ 32 }
++						{ ...selectedItem.__experimentalImage }
++					/>
++				) }
+ 				{ itemToString( selectedItem ) }
+ 				<Icon
+ 					icon={ chevronDown }
+@@ -179,6 +188,7 @@ export default function CustomSelectControl( {
+ 									{
+ 										'is-highlighted':
+ 											index === highlightedIndex,
++										'has-image': !! item.__experimentalImage,
+ 										'has-hint': !! item.__experimentalHint,
+ 										'is-next-36px-default-size': __next36pxDefaultSize,
+ 									}
+@@ -186,6 +196,15 @@ export default function CustomSelectControl( {
+ 								style: item.style,
+ 							} ) }
+ 						>
++							{ item.__experimentalImage && (
++								<img
++									className="components-custom-select-control__item-image"
++									alt=""
++									width={ 32 }
++									height={ 32 }
++									{ ...item.__experimentalImage }
++								/>
++							) }
+ 							{ item.name }
+ 							{ item.__experimentalHint && (
+ 								<span className="components-custom-select-control__item-hint">
+diff --git a/packages/components/src/custom-select-control/stories/index.js b/packages/components/src/custom-select-control/stories/index.js
+index 524482bdf4b71d..f733a9ba919abf 100644
+--- a/packages/components/src/custom-select-control/stories/index.js
++++ b/packages/components/src/custom-select-control/stories/index.js
+@@ -87,3 +87,60 @@ WithHints.args = {
+ 		},
+ 	],
+ };
++
++export const WithImages = CustomSelectControl.bind( {} );
++WithImages.args = {
++	...Default.args,
++	options: [
++		{
++			key: 'adam',
++			name: 'Adam Zielinski',
++			__experimentalImage: {
++				src:
++					'https://www.gravatar.com/avatar/3b7ea537531208d83deed8f3e78bc771?s=100&r=g',
++				width: 48,
++				height: 48,
++			},
++		},
++		{
++			key: 'greg',
++			name: 'Greg Ziółkowski',
++			__experimentalImage: {
++				src:
++					'https://www.gravatar.com/avatar/475d323ceec2e73597729eef1c5bf263?s=100&r=g',
++				width: 48,
++				height: 48,
++			},
++		},
++		{
++			key: 'robert',
++			name: 'Robert Anderson',
++			__experimentalImage: {
++				src:
++					'https://www.gravatar.com/avatar/c9ae983c4a94490f209c06dd46b801e4?s=100&r=g',
++				width: 48,
++				height: 48,
++			},
++		},
++		{
++			key: 'george',
++			name: 'George Mamadashvili',
++			__experimentalImage: {
++				src:
++					'https://www.gravatar.com/avatar/ddda3dc3a8502b3e1889905a9d500f3f?s=100&r=g',
++				width: 48,
++				height: 48,
++			},
++		},
++		{
++			key: 'isabel',
++			name: 'Isabel Brison',
++			__experimentalImage: {
++				src:
++					'https://www.gravatar.com/avatar/0236f3f6facfcca37aa798f9c6766116?s=100&r=g',
++				width: 48,
++				height: 48,
++			},
++		},
++	],
++};
+diff --git a/packages/components/src/custom-select-control/style.scss b/packages/components/src/custom-select-control/style.scss
+index 1171ae8efd396c..ac12f120020057 100644
+--- a/packages/components/src/custom-select-control/style.scss
++++ b/packages/components/src/custom-select-control/style.scss
+@@ -21,6 +21,8 @@
+ 	// For all button sizes allow sufficient space for the
+ 	// dropdown "arrow" icon to display.
+ 	&.components-custom-select-control__button {
++		padding-top: $grid-unit-05;
++		padding-bottom: $grid-unit-05;
+ 		// TODO: Some of these can be removed after some internal inconsistencies are addressed, such as the chevron
+ 		// (https://github.com/WordPress/gutenberg/issues/39400) and Button padding (https://github.com/WordPress/gutenberg/issues/39431)
+ 		padding-left: $grid-unit-20;
+@@ -37,6 +39,12 @@
+ 		box-shadow: 0 0 0 ($border-width-focus - $border-width) var(--wp-admin-theme-color);
+ 	}
+ 
++	.components-custom-select-control__button-image {
++		max-height: 100%;
++		width: auto;
++		margin-right: $grid-unit-05;
++	}
++
+ 	.components-custom-select-control__button-icon {
+ 		height: 100%;
+ 		padding: 0;
+@@ -74,7 +82,7 @@
+ .components-custom-select-control__item {
+ 	align-items: center;
+ 	display: grid;
+-	grid-template-columns: auto auto;
++	grid-template-columns: auto 30px;
+ 	list-style-type: none;
+ 	padding: $grid-unit-10 $grid-unit-20;
+ 	cursor: default;
+@@ -84,12 +92,25 @@
+ 		padding: $grid-unit-10;
+ 	}
+ 
++	&.has-image {
++		grid-template-columns: max-content auto 30px;
++	}
+ 	&.has-hint {
+ 		grid-template-columns: auto auto 30px;
+ 	}
++	&.has-image.has-hint {
++		grid-template-columns: max-content auto auto 30px;
++	}
++
+ 	&.is-highlighted {
+ 		background: $gray-300;
+ 	}
++
++	.components-custom-select-control__item-image {
++		max-height: $button-size - $grid-unit-05 * 2 - $border-width * 2;
++		width: auto;
++		margin-right: $grid-unit-05;
++	}
+ 	.components-custom-select-control__item-hint {
+ 		color: $gray-700;
+ 		text-align: right;
+diff --git a/packages/editor/src/components/post-author/constants.js b/packages/editor/src/components/post-author/constants.js
+index d29995e27f4e5a..b2b41f87a09f6e 100644
+--- a/packages/editor/src/components/post-author/constants.js
++++ b/packages/editor/src/components/post-author/constants.js
+@@ -1,6 +1,6 @@
+ export const AUTHORS_QUERY = {
+ 	who: 'authors',
+ 	per_page: 50,
+-	_fields: 'id,name',
++	_fields: 'id,name,avatar_urls',
+ 	context: 'view', // Allows non-admins to perform requests.
+ };
+diff --git a/packages/editor/src/components/post-author/select.js b/packages/editor/src/components/post-author/select.js
+index fee86bf491f720..403ae1bd56b280 100644
+--- a/packages/editor/src/components/post-author/select.js
++++ b/packages/editor/src/components/post-author/select.js
+@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
+ import { useMemo } from '@wordpress/element';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { decodeEntities } from '@wordpress/html-entities';
+-import { SelectControl } from '@wordpress/components';
++import { CustomSelectControl } from '@wordpress/components';
+ import { store as coreStore } from '@wordpress/core-data';
+ 
+ /**
+@@ -27,25 +27,34 @@ function PostAuthorSelect() {
+ 
+ 	const authorOptions = useMemo( () => {
+ 		return ( authors ?? [] ).map( ( author ) => {
++			const [ avatarSize, avatarURL ] = Object.entries(
++				author.avatar_urls
++			).find( ( [ size ] ) => size >= 26 * 2 );
+ 			return {
+-				value: author.id,
+-				label: decodeEntities( author.name ),
++				key: author.id,
++				name: decodeEntities( author.name ),
++				__experimentalImage: {
++					src: avatarURL,
++					width: avatarSize / 2,
++					height: avatarSize / 2,
++				},
+ 			};
+ 		} );
+ 	}, [ authors ] );
+ 
+-	const setAuthorId = ( value ) => {
+-		const author = Number( value );
++	const setAuthorId = ( option ) => {
++		const author = Number( option.key );
+ 		editPost( { author } );
+ 	};
+ 
+ 	return (
+-		<SelectControl
+-			className="post-author-selector"
++		<CustomSelectControl
++			className="editor-post-author-select"
+ 			label={ __( 'Author' ) }
+ 			options={ authorOptions }
+ 			onChange={ setAuthorId }
+-			value={ postAuthor }
++			value={ authorOptions.find( ( { key } ) => key === postAuthor ) }
++			__next36pxDefaultSize
+ 		/>
+ 	);
+ }
+diff --git a/packages/editor/src/components/post-author/style.scss b/packages/editor/src/components/post-author/style.scss
+new file mode 100644
+index 00000000000000..faeeab44aee089
+--- /dev/null
++++ b/packages/editor/src/components/post-author/style.scss
+@@ -0,0 +1,4 @@
++.editor-post-author-select,
++.editor-post-author-select .components-custom-select-control__button {
++	width: 100%;
++}
+diff --git a/packages/editor/src/style.scss b/packages/editor/src/style.scss
+index 88ed59125a939b..55005276387fed 100644
+--- a/packages/editor/src/style.scss
++++ b/packages/editor/src/style.scss
+@@ -4,6 +4,7 @@
+ @import "./components/entities-saved-states/style.scss";
+ @import "./components/error-boundary/style.scss";
+ @import "./components/page-attributes/style.scss";
++@import "./components/post-author/style.scss";
+ @import "./components/post-excerpt/style.scss";
+ @import "./components/post-featured-image/style.scss";
+ @import "./components/post-format/style.scss";

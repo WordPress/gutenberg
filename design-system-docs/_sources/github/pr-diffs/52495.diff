@@ -1,0 +1,214 @@
+diff --git a/packages/block-library/src/block/block.json b/packages/block-library/src/block/block.json
+index d6630177fc6853..4cb53960725d21 100644
+--- a/packages/block-library/src/block/block.json
++++ b/packages/block-library/src/block/block.json
+@@ -5,7 +5,7 @@
+ 	"title": "Pattern",
+ 	"category": "reusable",
+ 	"description": "Create and save content to reuse across your site. Update the pattern, and the changes apply everywhere it’s used.",
+- 	"keywords": [ "reusable" ],
++	"keywords": [ "reusable" ],
+ 	"textdomain": "default",
+ 	"attributes": {
+ 		"ref": {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a5f163a623e392..1e7e654ac1c819 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,7 +9,8 @@
+ 
+ ### Bug Fix
+ 
+--   `Popover`: Pin `react-dropdown-menu` version to avoid breaking changes in dependency updates. ([52356](https://github.com/WordPress/gutenberg/pull/52356)).
++-   `Popover`: Pin `react-dropdown-menu` version to avoid breaking changes in dependency updates. ([#52356](https://github.com/WordPress/gutenberg/pull/52356)).
++-   `Item`: Unify focus style and add default font styles. ([#52495](https://github.com/WordPress/gutenberg/pull/52495)).
+ 
+ ## 25.3.0 (2023-07-05)
+ 
+diff --git a/packages/components/src/item-group/item/hook.ts b/packages/components/src/item-group/item/hook.ts
+index bd3be96c618b89..ff97e3adae1603 100644
+--- a/packages/components/src/item-group/item/hook.ts
++++ b/packages/components/src/item-group/item/hook.ts
+@@ -42,7 +42,8 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+-				as === 'button' && styles.unstyledButton,
++				( as === 'button' || as === 'a' ) &&
++					styles.unstyledButton( as ),
+ 				styles.itemSizes[ size ] || styles.itemSizes.medium,
+ 				styles.item,
+ 				spacedAround && styles.spacedAround,
+diff --git a/packages/components/src/item-group/stories/index.tsx b/packages/components/src/item-group/stories/index.tsx
+index 3fa35c67cfb533..e520ff10c160f5 100644
+--- a/packages/components/src/item-group/stories/index.tsx
++++ b/packages/components/src/item-group/stories/index.tsx
+@@ -39,20 +39,25 @@ Default.args = {
+ 	children: (
+ 		[
+ 			{
+-				children: 'First item',
++				children: 'First button item',
+ 				// eslint-disable-next-line no-alert
+ 				onClick: () => alert( 'First item clicked' ),
+ 			},
+ 			{
+-				children: 'Second item',
++				children: 'Second button item',
+ 				// eslint-disable-next-line no-alert
+ 				onClick: () => alert( 'Second item clicked' ),
+ 			},
+ 			{
+-				children: 'Third item',
++				children: 'Third button item',
+ 				// eslint-disable-next-line no-alert
+ 				onClick: () => alert( 'Third item clicked' ),
+ 			},
++			{
++				children: 'Anchor item',
++				as: 'a',
++				href: 'https://wordpress.org',
++			},
+ 		] as ItemProps[]
+ 	 ).map( mapPropsToItem ),
+ };
+diff --git a/packages/components/src/item-group/styles.ts b/packages/components/src/item-group/styles.ts
+index 670fdf987dd932..95076f0bb4081d 100644
+--- a/packages/components/src/item-group/styles.ts
++++ b/packages/components/src/item-group/styles.ts
+@@ -6,34 +6,45 @@ import { css } from '@emotion/react';
+ /**
+  * Internal dependencies
+  */
+-import { CONFIG, COLORS } from '../utils';
+-
+-export const unstyledButton = css`
+-	appearance: none;
+-	border: 1px solid transparent;
+-	cursor: pointer;
+-	background: none;
+-	text-align: start;
+-
+-	svg,
+-	path {
+-		fill: currentColor;
+-	}
+-
+-	&:hover {
+-		color: ${ COLORS.ui.theme };
+-	}
+-
+-	&:focus-visible {
+-		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+-			var(
+-				--wp-components-color-accent,
+-				var( --wp-admin-theme-color, ${ COLORS.ui.theme } )
+-			);
+-		// Windows high contrast mode.
+-		outline: 2px solid transparent;
+-	}
+-`;
++import { CONFIG, COLORS, font } from '../utils';
++
++export const unstyledButton = ( as: 'a' | 'button' ) => {
++	return css`
++		font-size: ${ font( 'default.fontSize' ) };
++		font-family: inherit;
++		appearance: none;
++		border: 1px solid transparent;
++		cursor: pointer;
++		background: none;
++		text-align: start;
++		text-decoration: ${ as === 'a' ? 'none' : undefined };
++
++		svg,
++		path {
++			fill: currentColor;
++		}
++
++		&:hover {
++			color: ${ COLORS.ui.theme };
++		}
++
++		&:focus {
++			box-shadow: none;
++			outline: none;
++		}
++
++		&:focus-visible {
++			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
++				var(
++					--wp-components-color-accent,
++					var( --wp-admin-theme-color, ${ COLORS.ui.theme } )
++				);
++			// Windows high contrast mode.
++			outline: 2px solid transparent;
++			outline-offset: 0;
++		}
++	`;
++};
+ 
+ export const itemWrapper = css`
+ 	width: 100%;
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+index 182531ee01c02f..32254bb91c6955 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+@@ -590,6 +590,8 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+ }
+ 
+ .emotion-13 {
++  font-size: 13px;
++  font-family: inherit;
+   -webkit-appearance: none;
+   -moz-appearance: none;
+   -ms-appearance: none;
+@@ -616,12 +618,18 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+   color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+ }
+ 
++.emotion-13:focus {
++  box-shadow: none;
++  outline: none;
++}
++
+ .emotion-13:focus-visible {
+   box-shadow: 0 0 0 var( --wp-admin-border-width-focus ) var(
+-  				--wp-components-color-accent,
+-  				var( --wp-admin-theme-color, var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) )
+-  			);
++  					--wp-components-color-accent,
++  					var( --wp-admin-theme-color, var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) )
++  				);
+   outline: 2px solid transparent;
++  outline-offset: 0;
+ }
+ 
+ .emotion-15 {
+diff --git a/packages/edit-site/src/components/sidebar-navigation-item/style.scss b/packages/edit-site/src/components/sidebar-navigation-item/style.scss
+index 14dbc54efe5238..88ff27a9c1d2f0 100644
+--- a/packages/edit-site/src/components/sidebar-navigation-item/style.scss
++++ b/packages/edit-site/src/components/sidebar-navigation-item/style.scss
+@@ -26,22 +26,6 @@
+ 		fill: $gray-600;
+ 	}
+ 
+-	&:is(a) {
+-		text-decoration: none;
+-		display: flex;
+-		align-items: center;
+-
+-		&:focus {
+-			box-shadow: none;
+-			outline: none;
+-		}
+-
+-		&:focus-visible {
+-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+-			outline: 2px solid transparent;
+-		}
+-	}
+-
+ 	&.with-suffix {
+ 		padding-right: $grid-unit-20;
+ 	}

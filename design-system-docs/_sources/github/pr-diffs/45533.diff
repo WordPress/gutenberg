@@ -1,0 +1,997 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 0fc100088bb561..0f71c3660dd026 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -327,12 +327,12 @@ module.exports = {
+ 			extends: [ 'plugin:@wordpress/eslint-plugin/test-unit' ],
+ 		},
+ 		{
+-			files: [ '**/test/**/*.js' ],
++			files: [ '**/test/**/*.[tj]s?(x)' ],
+ 			excludedFiles: [
+-				'**/*.@(android|ios|native).js',
+-				'packages/react-native-*/**/*.js',
+-				'test/native/**/*.js',
+-				'test/e2e/**/*.[tj]s',
++				'**/*.@(android|ios|native).[tj]s?(x)',
++				'packages/react-native-*/**/*.[tj]s?(x)',
++				'test/native/**/*.[tj]s?(x)',
++				'test/e2e/**/*.[tj]s?(x)',
+ 			],
+ 			extends: [
+ 				'plugin:jest-dom/recommended',
+diff --git a/packages/components/src/card/test/__snapshots__/index.tsx.snap b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+index 2abd66b0067eac..b86714d86636a8 100644
+--- a/packages/components/src/card/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+@@ -209,9 +209,7 @@ Snapshot Diff:
+ `;
+ 
+ exports[`Card Card component should render correctly 1`] = `
+-Object {
+-  "asFragment": [Function],
+-  "baseElement": .emotion-0 {
++.emotion-0 {
+   background-color: #fff;
+   color: #1e1e1e;
+   position: relative;
+@@ -383,384 +381,82 @@ Object {
+   }
+ }
+ 
+-<body>
+-    <div>
++<div>
++  <div
++    class="components-surface components-card emotion-0 emotion-1"
++    data-wp-c16t="true"
++    data-wp-component="Card"
++  >
++    <div
++      class="emotion-2 emotion-1"
++    >
+       <div
+-        class="components-surface components-card emotion-0 emotion-1"
++        class="components-flex components-card__header components-card-header emotion-4 emotion-1"
+         data-wp-c16t="true"
+-        data-wp-component="Card"
++        data-wp-component="CardHeader"
+       >
+-        <div
+-          class="emotion-2 emotion-1"
+-        >
+-          <div
+-            class="components-flex components-card__header components-card-header emotion-4 emotion-1"
+-            data-wp-c16t="true"
+-            data-wp-component="CardHeader"
+-          >
+-            Card Header
+-          </div>
+-          <div
+-            class="components-card__body components-card-body emotion-6 emotion-1"
+-            data-wp-c16t="true"
+-            data-wp-component="CardBody"
+-          >
+-            Card Body 1
+-          </div>
+-          <div
+-            class="components-card__body components-card-body emotion-6 emotion-1"
+-            data-wp-c16t="true"
+-            data-wp-component="CardBody"
+-          >
+-            Card Body 2
+-          </div>
+-          <hr
+-            aria-orientation="horizontal"
+-            class="components-divider components-card__divider components-card-divider emotion-10 emotion-11"
+-            data-wp-c16t="true"
+-            data-wp-component="CardDivider"
+-            role="separator"
+-          />
+-          <div
+-            class="components-card__body components-card-body emotion-6 emotion-1"
+-            data-wp-c16t="true"
+-            data-wp-component="CardBody"
+-          >
+-            Card Body 3
+-          </div>
+-          <div
+-            class="components-card__media components-card-media emotion-14 emotion-1"
+-            data-wp-c16t="true"
+-            data-wp-component="CardMedia"
+-          >
+-            <img
+-              alt="Card Media"
+-              src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
+-            />
+-          </div>
+-          <div
+-            class="components-flex components-card__footer components-card-footer emotion-16 emotion-1"
+-            data-wp-c16t="true"
+-            data-wp-component="CardFooter"
+-          >
+-            Card Footer
+-          </div>
+-        </div>
+-        <div
+-          aria-hidden="true"
+-          class="components-elevation emotion-18 emotion-1"
+-          data-wp-c16t="true"
+-          data-wp-component="Elevation"
+-        />
+-        <div
+-          aria-hidden="true"
+-          class="components-elevation emotion-18 emotion-1"
+-          data-wp-c16t="true"
+-          data-wp-component="Elevation"
+-        />
++        Card Header
+       </div>
+-    </div>
+-  </body>,
+-  "container": .emotion-0 {
+-  background-color: #fff;
+-  color: #1e1e1e;
+-  position: relative;
+-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+-  outline: none;
+-  border-radius: calc(2px - 1px);
+-}
+-
+-.emotion-2 {
+-  height: 100%;
+-}
+-
+-.emotion-4 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  -webkit-align-items: center;
+-  -webkit-box-align: center;
+-  -ms-flex-align: center;
+-  align-items: center;
+-  -webkit-flex-direction: row;
+-  -ms-flex-direction: row;
+-  flex-direction: row;
+-  gap: calc(4px * 2);
+-  -webkit-box-pack: justify;
+-  -webkit-justify-content: space-between;
+-  justify-content: space-between;
+-  width: 100%;
+-  border-bottom: 1px solid;
+-  box-sizing: border-box;
+-  border-color: rgba(0, 0, 0, 0.1);
+-  padding: calc(4px * 4) calc(4px * 6);
+-}
+-
+-.emotion-4>* {
+-  min-width: 0;
+-}
+-
+-.emotion-4:last-child {
+-  border-bottom: none;
+-}
+-
+-.emotion-4:first-of-type {
+-  border-top-left-radius: calc(2px - 1px);
+-  border-top-right-radius: calc(2px - 1px);
+-}
+-
+-.emotion-4:last-of-type {
+-  border-bottom-left-radius: calc(2px - 1px);
+-  border-bottom-right-radius: calc(2px - 1px);
+-}
+-
+-.emotion-6 {
+-  box-sizing: border-box;
+-  height: auto;
+-  max-height: 100%;
+-  padding: calc(4px * 4) calc(4px * 6);
+-}
+-
+-.emotion-6:first-of-type {
+-  border-top-left-radius: calc(2px - 1px);
+-  border-top-right-radius: calc(2px - 1px);
+-}
+-
+-.emotion-6:last-of-type {
+-  border-bottom-left-radius: calc(2px - 1px);
+-  border-bottom-right-radius: calc(2px - 1px);
+-}
+-
+-.emotion-10 {
+-  border: 0;
+-  margin: 0;
+-  border-bottom: 1px solid currentColor;
+-  height: 0;
+-  width: auto;
+-  box-sizing: border-box;
+-  display: block;
+-  width: 100%;
+-  border-color: rgba(0, 0, 0, 0.1);
+-}
+-
+-.emotion-14 {
+-  box-sizing: border-box;
+-  overflow: hidden;
+-}
+-
+-.emotion-14>img,
+-.emotion-14>iframe {
+-  display: block;
+-  height: auto;
+-  max-width: 100%;
+-  width: 100%;
+-}
+-
+-.emotion-14:first-of-type {
+-  border-top-left-radius: calc(2px - 1px);
+-  border-top-right-radius: calc(2px - 1px);
+-}
+-
+-.emotion-14:last-of-type {
+-  border-bottom-left-radius: calc(2px - 1px);
+-  border-bottom-right-radius: calc(2px - 1px);
+-}
+-
+-.emotion-16 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  -webkit-align-items: center;
+-  -webkit-box-align: center;
+-  -ms-flex-align: center;
+-  align-items: center;
+-  -webkit-flex-direction: row;
+-  -ms-flex-direction: row;
+-  flex-direction: row;
+-  gap: calc(4px * 2);
+-  -webkit-box-pack: justify;
+-  -webkit-justify-content: space-between;
+-  justify-content: space-between;
+-  width: 100%;
+-  border-top: 1px solid;
+-  box-sizing: border-box;
+-  border-color: rgba(0, 0, 0, 0.1);
+-  padding: calc(4px * 4) calc(4px * 6);
+-}
+-
+-.emotion-16>* {
+-  min-width: 0;
+-}
+-
+-.emotion-16:first-of-type {
+-  border-top: none;
+-}
+-
+-.emotion-16:first-of-type {
+-  border-top-left-radius: calc(2px - 1px);
+-  border-top-right-radius: calc(2px - 1px);
+-}
+-
+-.emotion-16:last-of-type {
+-  border-bottom-left-radius: calc(2px - 1px);
+-  border-bottom-right-radius: calc(2px - 1px);
+-}
+-
+-.emotion-18 {
+-  background: transparent;
+-  display: block;
+-  margin: 0!important;
+-  pointer-events: none;
+-  position: absolute;
+-  will-change: box-shadow;
+-  border-radius: inherit;
+-  bottom: 0;
+-  box-shadow: 0 0px 0px 0 rgba(0, 0, 0, 0);
+-  opacity: 1;
+-  left: 0;
+-  right: 0;
+-  top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  border-radius: 2px;
+-}
+-
+-@media ( prefers-reduced-motion: reduce ) {
+-  .emotion-18 {
+-    transition-duration: 0ms;
+-  }
+-}
+-
+-<div>
+-    <div
+-      class="components-surface components-card emotion-0 emotion-1"
+-      data-wp-c16t="true"
+-      data-wp-component="Card"
+-    >
+       <div
+-        class="emotion-2 emotion-1"
++        class="components-card__body components-card-body emotion-6 emotion-1"
++        data-wp-c16t="true"
++        data-wp-component="CardBody"
+       >
+-        <div
+-          class="components-flex components-card__header components-card-header emotion-4 emotion-1"
+-          data-wp-c16t="true"
+-          data-wp-component="CardHeader"
+-        >
+-          Card Header
+-        </div>
+-        <div
+-          class="components-card__body components-card-body emotion-6 emotion-1"
+-          data-wp-c16t="true"
+-          data-wp-component="CardBody"
+-        >
+-          Card Body 1
+-        </div>
+-        <div
+-          class="components-card__body components-card-body emotion-6 emotion-1"
+-          data-wp-c16t="true"
+-          data-wp-component="CardBody"
+-        >
+-          Card Body 2
+-        </div>
+-        <hr
+-          aria-orientation="horizontal"
+-          class="components-divider components-card__divider components-card-divider emotion-10 emotion-11"
+-          data-wp-c16t="true"
+-          data-wp-component="CardDivider"
+-          role="separator"
+-        />
+-        <div
+-          class="components-card__body components-card-body emotion-6 emotion-1"
+-          data-wp-c16t="true"
+-          data-wp-component="CardBody"
+-        >
+-          Card Body 3
+-        </div>
+-        <div
+-          class="components-card__media components-card-media emotion-14 emotion-1"
+-          data-wp-c16t="true"
+-          data-wp-component="CardMedia"
+-        >
+-          <img
+-            alt="Card Media"
+-            src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
+-          />
+-        </div>
+-        <div
+-          class="components-flex components-card__footer components-card-footer emotion-16 emotion-1"
+-          data-wp-c16t="true"
+-          data-wp-component="CardFooter"
+-        >
+-          Card Footer
+-        </div>
++        Card Body 1
+       </div>
+       <div
+-        aria-hidden="true"
+-        class="components-elevation emotion-18 emotion-1"
++        class="components-card__body components-card-body emotion-6 emotion-1"
+         data-wp-c16t="true"
+-        data-wp-component="Elevation"
++        data-wp-component="CardBody"
++      >
++        Card Body 2
++      </div>
++      <hr
++        aria-orientation="horizontal"
++        class="components-divider components-card__divider components-card-divider emotion-10 emotion-11"
++        data-wp-c16t="true"
++        data-wp-component="CardDivider"
++        role="separator"
+       />
+       <div
+-        aria-hidden="true"
+-        class="components-elevation emotion-18 emotion-1"
++        class="components-card__body components-card-body emotion-6 emotion-1"
+         data-wp-c16t="true"
+-        data-wp-component="Elevation"
+-      />
++        data-wp-component="CardBody"
++      >
++        Card Body 3
++      </div>
++      <div
++        class="components-card__media components-card-media emotion-14 emotion-1"
++        data-wp-c16t="true"
++        data-wp-component="CardMedia"
++      >
++        <img
++          alt="Card Media"
++          src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
++        />
++      </div>
++      <div
++        class="components-flex components-card__footer components-card-footer emotion-16 emotion-1"
++        data-wp-c16t="true"
++        data-wp-component="CardFooter"
++      >
++        Card Footer
++      </div>
+     </div>
+-  </div>,
+-  "debug": [Function],
+-  "findAllByAltText": [Function],
+-  "findAllByDisplayValue": [Function],
+-  "findAllByLabelText": [Function],
+-  "findAllByPlaceholderText": [Function],
+-  "findAllByRole": [Function],
+-  "findAllByTestId": [Function],
+-  "findAllByText": [Function],
+-  "findAllByTitle": [Function],
+-  "findByAltText": [Function],
+-  "findByDisplayValue": [Function],
+-  "findByLabelText": [Function],
+-  "findByPlaceholderText": [Function],
+-  "findByRole": [Function],
+-  "findByTestId": [Function],
+-  "findByText": [Function],
+-  "findByTitle": [Function],
+-  "getAllByAltText": [Function],
+-  "getAllByDisplayValue": [Function],
+-  "getAllByLabelText": [Function],
+-  "getAllByPlaceholderText": [Function],
+-  "getAllByRole": [Function],
+-  "getAllByTestId": [Function],
+-  "getAllByText": [Function],
+-  "getAllByTitle": [Function],
+-  "getByAltText": [Function],
+-  "getByDisplayValue": [Function],
+-  "getByLabelText": [Function],
+-  "getByPlaceholderText": [Function],
+-  "getByRole": [Function],
+-  "getByTestId": [Function],
+-  "getByText": [Function],
+-  "getByTitle": [Function],
+-  "queryAllByAltText": [Function],
+-  "queryAllByDisplayValue": [Function],
+-  "queryAllByLabelText": [Function],
+-  "queryAllByPlaceholderText": [Function],
+-  "queryAllByRole": [Function],
+-  "queryAllByTestId": [Function],
+-  "queryAllByText": [Function],
+-  "queryAllByTitle": [Function],
+-  "queryByAltText": [Function],
+-  "queryByDisplayValue": [Function],
+-  "queryByLabelText": [Function],
+-  "queryByPlaceholderText": [Function],
+-  "queryByRole": [Function],
+-  "queryByTestId": [Function],
+-  "queryByText": [Function],
+-  "queryByTitle": [Function],
+-  "rerender": [Function],
+-  "unmount": [Function],
+-}
++    <div
++      aria-hidden="true"
++      class="components-elevation emotion-18 emotion-1"
++      data-wp-c16t="true"
++      data-wp-component="Elevation"
++    />
++    <div
++      aria-hidden="true"
++      class="components-elevation emotion-18 emotion-1"
++      data-wp-c16t="true"
++      data-wp-component="Elevation"
++    />
++  </div>
++</div>
+ `;
+ 
+ exports[`Card Card component should show a box shadow when the elevation prop is greater than 0 1`] = `
+diff --git a/packages/components/src/card/test/index.tsx b/packages/components/src/card/test/index.tsx
+index 7508a87e24d3c8..ee10655fae0b21 100644
+--- a/packages/components/src/card/test/index.tsx
++++ b/packages/components/src/card/test/index.tsx
+@@ -18,7 +18,7 @@ import {
+ describe( 'Card', () => {
+ 	describe( 'Card component', () => {
+ 		it( 'should render correctly', () => {
+-			const wrapper = render(
++			const { container } = render(
+ 				<Card>
+ 					<CardHeader>Card Header</CardHeader>
+ 					<CardBody>Card Body 1</CardBody>
+@@ -34,7 +34,7 @@ describe( 'Card', () => {
+ 					<CardFooter>Card Footer</CardFooter>
+ 				</Card>
+ 			);
+-			expect( wrapper ).toMatchSnapshot();
++			expect( container ).toMatchSnapshot();
+ 		} );
+ 
+ 		it( 'should remove borders when the isBorderless prop is true', () => {
+diff --git a/packages/components/src/date-time/date/test/index.tsx b/packages/components/src/date-time/date/test/index.tsx
+index c519d34d911692..7a1a52ee929a9e 100644
+--- a/packages/components/src/date-time/date/test/index.tsx
++++ b/packages/components/src/date-time/date/test/index.tsx
+@@ -16,7 +16,7 @@ describe( 'DatePicker', () => {
+ 
+ 		expect(
+ 			screen.getByRole( 'button', { name: 'May 2, 2022. Selected' } )
+-		).not.toBeNull();
++		).toBeInTheDocument();
+ 	} );
+ 
+ 	it( "should highlight today's date when not provided a currentDate", () => {
+@@ -27,7 +27,7 @@ describe( 'DatePicker', () => {
+ 			screen.getByRole( 'button', {
+ 				name: `${ todayDescription }. Selected`,
+ 			} )
+-		).not.toBeNull();
++		).toBeInTheDocument();
+ 	} );
+ 
+ 	it( 'should call onChange when a day is selected', async () => {
+diff --git a/packages/components/src/divider/test/index.tsx b/packages/components/src/divider/test/index.tsx
+index f89e715c555f70..b069f49dc3d58a 100644
+--- a/packages/components/src/divider/test/index.tsx
++++ b/packages/components/src/divider/test/index.tsx
+@@ -9,15 +9,13 @@ import { render, screen } from '@testing-library/react';
+ import { Divider } from '..';
+ 
+ describe( 'props', () => {
+-	beforeEach( () => {
+-		render( <Divider /> );
+-	} );
+-
+ 	test( 'should render correctly', () => {
++		render( <Divider /> );
+ 		expect( screen.getByRole( 'separator' ) ).toMatchSnapshot();
+ 	} );
+ 
+ 	test( 'should render marginStart', () => {
++		render( <Divider /> );
+ 		render( <Divider marginStart={ 5 } /> );
+ 
+ 		const dividers = screen.getAllByRole( 'separator' );
+@@ -25,6 +23,7 @@ describe( 'props', () => {
+ 	} );
+ 
+ 	test( 'should render marginEnd', () => {
++		render( <Divider /> );
+ 		render( <Divider marginEnd={ 5 } /> );
+ 
+ 		const dividers = screen.getAllByRole( 'separator' );
+@@ -32,6 +31,7 @@ describe( 'props', () => {
+ 	} );
+ 
+ 	test( 'should render margin', () => {
++		render( <Divider /> );
+ 		render( <Divider margin={ 7 } /> );
+ 
+ 		const dividers = screen.getAllByRole( 'separator' );
+diff --git a/packages/components/src/flex/test/index.tsx b/packages/components/src/flex/test/index.tsx
+index 417b73f07a5d46..c4147278b47747 100644
+--- a/packages/components/src/flex/test/index.tsx
++++ b/packages/components/src/flex/test/index.tsx
+@@ -10,20 +10,25 @@ import { View } from '../../view';
+ import { Flex, FlexBlock, FlexItem } from '../';
+ 
+ describe( 'props', () => {
+-	beforeEach( () => {
++	test( 'should render correctly', () => {
+ 		render(
+ 			<Flex data-testid="base-flex">
+ 				<FlexItem>Item</FlexItem>
+ 				<FlexBlock>Item</FlexBlock>
+ 			</Flex>
+ 		);
+-	} );
+ 
+-	test( 'should render correctly', () => {
+ 		expect( screen.getByTestId( 'base-flex' ) ).toMatchSnapshot();
+ 	} );
+ 
+ 	test( 'should render + wrap non Flex children', () => {
++		render(
++			<Flex data-testid="base-flex">
++				<FlexItem>Item</FlexItem>
++				<FlexBlock>Item</FlexBlock>
++			</Flex>
++		);
++
+ 		render(
+ 			<Flex data-testid="flex">
+ 				<FlexItem>Item</FlexItem>
+@@ -39,6 +44,13 @@ describe( 'props', () => {
+ 	} );
+ 
+ 	test( 'should render align', () => {
++		render(
++			<Flex data-testid="base-flex">
++				<FlexItem>Item</FlexItem>
++				<FlexBlock>Item</FlexBlock>
++			</Flex>
++		);
++
+ 		render(
+ 			<Flex align="flex-start" data-testid="flex">
+ 				<FlexItem>Item</FlexItem>
+@@ -51,6 +63,13 @@ describe( 'props', () => {
+ 	} );
+ 
+ 	test( 'should render justify', () => {
++		render(
++			<Flex data-testid="base-flex">
++				<FlexItem>Item</FlexItem>
++				<FlexBlock>Item</FlexBlock>
++			</Flex>
++		);
++
+ 		render(
+ 			<Flex justify="flex-start" data-testid="flex">
+ 				<FlexItem>Item</FlexItem>
+@@ -63,6 +82,13 @@ describe( 'props', () => {
+ 	} );
+ 
+ 	test( 'should render spacing', () => {
++		render(
++			<Flex data-testid="base-flex">
++				<FlexItem>Item</FlexItem>
++				<FlexBlock>Item</FlexBlock>
++			</Flex>
++		);
++
+ 		render(
+ 			<>
+ 				<Flex>
+diff --git a/packages/components/src/form-token-field/test/index.tsx b/packages/components/src/form-token-field/test/index.tsx
+index c0926a9a630e5c..ddae1f8c06b894 100644
+--- a/packages/components/src/form-token-field/test/index.tsx
++++ b/packages/components/src/form-token-field/test/index.tsx
+@@ -277,8 +277,8 @@ describe( 'FormTokenField', () => {
+ 
+ 			// There should be 1 "remove item" button for the "bergamot" token
+ 			expect(
+-				screen.getAllByRole( 'button', { name: 'Remove item' } )
+-			).toHaveLength( 1 );
++				screen.getByRole( 'button', { name: 'Remove item' } )
++			).toBeInTheDocument();
+ 
+ 			// Click the "X" button for the "bergamot" token (the only one)
+ 			await user.click(
+@@ -827,10 +827,10 @@ describe( 'FormTokenField', () => {
+ 
+ 			// Currently, none of the suggestions are selected
+ 			expect(
+-				within( suggestionList ).queryAllByRole( 'option', {
++				within( suggestionList ).queryByRole( 'option', {
+ 					selected: true,
+ 				} )
+-			).toHaveLength( 0 );
++			).not.toBeInTheDocument();
+ 
+ 			// Pressing the down arrow will select "Salmon"
+ 			await user.keyboard( '[ArrowDown]' );
+@@ -900,10 +900,10 @@ describe( 'FormTokenField', () => {
+ 
+ 			// Currently, none of the suggestions are selected
+ 			expect(
+-				within( suggestionList ).queryAllByRole( 'option', {
++				within( suggestionList ).queryByRole( 'option', {
+ 					selected: true,
+ 				} )
+-			).toHaveLength( 0 );
++			).not.toBeInTheDocument();
+ 
+ 			const tigerOption = within( suggestionList ).getByRole( 'option', {
+ 				name: 'Tiger',
+diff --git a/packages/components/src/scrollable/test/index.tsx b/packages/components/src/scrollable/test/index.tsx
+index 7f5e172c4d53ca..c35c22982de503 100644
+--- a/packages/components/src/scrollable/test/index.tsx
++++ b/packages/components/src/scrollable/test/index.tsx
+@@ -9,24 +9,28 @@ import { render, screen } from '@testing-library/react';
+ import { Scrollable } from '../index';
+ 
+ describe( 'props', () => {
+-	beforeEach( () => {
++	test( 'should render correctly', () => {
+ 		render(
+ 			<Scrollable data-testid="scrollable">
+ 				WordPress.org - Code is Poetry
+ 			</Scrollable>
+ 		);
+-	} );
+ 
+-	test( 'should render correctly', () => {
+ 		expect( screen.getByTestId( 'scrollable' ) ).toMatchSnapshot();
+ 	} );
+ 
+ 	test( 'should render smoothScroll', () => {
++		render(
++			<Scrollable data-testid="scrollable">
++				WordPress.org - Code is Poetry
++			</Scrollable>
++		);
+ 		render(
+ 			<Scrollable smoothScroll data-testid="smooth-scrollable">
+ 				WordPress.org - Code is Poetry
+ 			</Scrollable>
+ 		);
++
+ 		expect(
+ 			screen.getByTestId( 'smooth-scrollable' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'scrollable' ) );
+diff --git a/packages/components/src/spacer/test/index.tsx b/packages/components/src/spacer/test/index.tsx
+index 6ab6a9d3667ffc..1dfdd45615185a 100644
+--- a/packages/components/src/spacer/test/index.tsx
++++ b/packages/components/src/spacer/test/index.tsx
+@@ -9,64 +9,77 @@ import { render, screen } from '@testing-library/react';
+ import { Spacer } from '../index';
+ 
+ describe( 'props', () => {
+-	beforeEach( () => {
++	test( 'should render correctly', () => {
+ 		render( <Spacer data-testid="spacer" /> );
+-	} );
+ 
+-	test( 'should render correctly', () => {
+ 		expect( screen.getByTestId( 'spacer' ) ).toMatchSnapshot();
+ 	} );
+ 
+ 	test( 'should render margin', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render( <Spacer margin={ 5 } data-testid="customized-spacer" /> );
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should render marginX', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render( <Spacer marginX={ 5 } data-testid="customized-spacer" /> );
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should render marginY', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render( <Spacer marginY={ 5 } data-testid="customized-spacer" /> );
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should render marginTop', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render( <Spacer marginTop={ 5 } data-testid="customized-spacer" /> );
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should render marginBottom', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render( <Spacer marginBottom={ 5 } data-testid="customized-spacer" /> );
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should render marginLeft', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render( <Spacer marginLeft={ 5 } data-testid="customized-spacer" /> );
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should render marginRight', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render( <Spacer marginRight={ 5 } data-testid="customized-spacer" /> );
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should override margin props from less to more specific', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render(
+ 			<Spacer
+ 				margin={ 10 }
+@@ -76,63 +89,79 @@ describe( 'props', () => {
+ 				data-testid="customized-spacer"
+ 			/>
+ 		);
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should render padding', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render( <Spacer padding={ 5 } data-testid="customized-spacer" /> );
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should render paddingX', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render( <Spacer paddingX={ 5 } data-testid="customized-spacer" /> );
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should render paddingY', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render( <Spacer paddingY={ 5 } data-testid="customized-spacer" /> );
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should render paddingTop', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render( <Spacer paddingTop={ 5 } data-testid="customized-spacer" /> );
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should render paddingBottom', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render(
+ 			<Spacer paddingBottom={ 5 } data-testid="customized-spacer" />
+ 		);
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should render paddingLeft', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render( <Spacer paddingLeft={ 5 } data-testid="customized-spacer" /> );
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should render paddingRight', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render( <Spacer paddingRight={ 5 } data-testid="customized-spacer" /> );
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+ 	} );
+ 
+ 	test( 'should override padding props from less to more specific', () => {
++		render( <Spacer data-testid="spacer" /> );
+ 		render(
+ 			<Spacer
+ 				padding={ 10 }
+@@ -142,6 +171,7 @@ describe( 'props', () => {
+ 				data-testid="customized-spacer"
+ 			/>
+ 		);
++
+ 		expect(
+ 			screen.getByTestId( 'customized-spacer' )
+ 		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
+diff --git a/packages/components/src/surface/test/index.tsx b/packages/components/src/surface/test/index.tsx
+index c9a4b0598e32aa..26deae8a1927ea 100644
+--- a/packages/components/src/surface/test/index.tsx
++++ b/packages/components/src/surface/test/index.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { render } from '@testing-library/react';
+-import type { RenderResult } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -10,39 +9,40 @@ import type { RenderResult } from '@testing-library/react';
+ import { Surface } from '../index';
+ 
+ describe( 'props', () => {
+-	let base: RenderResult;
+-	beforeEach( () => {
+-		base = render( <Surface>Surface</Surface> );
+-	} );
+-
+ 	test( 'should render correctly', () => {
+-		expect( base.container ).toMatchSnapshot();
++		const { container } = render( <Surface>Surface</Surface> );
++		expect( container ).toMatchSnapshot();
+ 	} );
+ 
+ 	test( 'should render variants', () => {
++		const view = render( <Surface>Surface</Surface> );
+ 		const { container } = render(
+ 			<Surface variant="secondary">Surface</Surface>
+ 		);
+-		expect( container ).toMatchDiffSnapshot( base.container );
++		expect( container ).toMatchDiffSnapshot( view.container );
+ 	} );
+ 
+ 	test( 'should render borderLeft', () => {
++		const view = render( <Surface>Surface</Surface> );
+ 		const { container } = render( <Surface borderLeft>Surface</Surface> );
+-		expect( container ).toMatchDiffSnapshot( base.container );
++		expect( container ).toMatchDiffSnapshot( view.container );
+ 	} );
+ 
+ 	test( 'should render borderRight', () => {
++		const view = render( <Surface>Surface</Surface> );
+ 		const { container } = render( <Surface borderRight>Surface</Surface> );
+-		expect( container ).toMatchDiffSnapshot( base.container );
++		expect( container ).toMatchDiffSnapshot( view.container );
+ 	} );
+ 
+ 	test( 'should render borderTop', () => {
++		const view = render( <Surface>Surface</Surface> );
+ 		const { container } = render( <Surface borderTop>Surface</Surface> );
+-		expect( container ).toMatchDiffSnapshot( base.container );
++		expect( container ).toMatchDiffSnapshot( view.container );
+ 	} );
+ 
+ 	test( 'should render borderBottom', () => {
++		const view = render( <Surface>Surface</Surface> );
+ 		const { container } = render( <Surface borderBottom>Surface</Surface> );
+-		expect( container ).toMatchDiffSnapshot( base.container );
++		expect( container ).toMatchDiffSnapshot( view.container );
+ 	} );
+ } );
+diff --git a/packages/components/src/text/test/index.tsx b/packages/components/src/text/test/index.tsx
+index cb33a017bcdbd9..d9ff2bb787d212 100644
+--- a/packages/components/src/text/test/index.tsx
++++ b/packages/components/src/text/test/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -92,11 +92,11 @@ describe( 'Text', () => {
+ 	} );
+ 
+ 	test( 'should render highlighted words', async () => {
+-		const wrapper = render(
++		const { container } = render(
+ 			<Text highlightWords={ [ 'm' ] }>Lorem ipsum.</Text>
+ 		);
+-		expect( wrapper.container.firstChild?.childNodes ).toHaveLength( 5 );
+-		const words = await wrapper.findAllByText( 'm' );
++		expect( container.firstChild?.childNodes ).toHaveLength( 5 );
++		const words = await screen.findAllByText( 'm' );
+ 		expect( words ).toHaveLength( 2 );
+ 		words.forEach( ( word ) => expect( word.tagName ).toEqual( 'MARK' ) );
+ 	} );
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index 4abf44c6e00439..361cbb789f64c7 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -196,7 +196,7 @@ describe( 'ToggleGroupControl', () => {
+ 				);
+ 
+ 				await user.click(
+-					await screen.getByRole( 'button', {
++					screen.getByRole( 'button', {
+ 						name: 'R',
+ 						pressed: true,
+ 					} )

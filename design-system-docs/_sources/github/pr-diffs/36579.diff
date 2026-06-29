@@ -1,0 +1,418 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2a6102335c2f68..9b02dfe344aa9c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ -   Fixed race conditions causing conditionally displayed `ToolsPanelItem` components to be erroneously deregistered ([#36588](https://github.com/WordPress/gutenberg/pull/36588)).
+ -   Added `__experimentalHideHeader` prop to `Modal` component ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
+ -   Added experimental `ConfirmDialog` component ([#34153](https://github.com/WordPress/gutenberg/pull/34153)).
++-   Divider: improve support for vertical orientation and RTL styles, use start/end logical props instead of top/bottom, change border-color to `currentColor` ([#36579](https://github.com/WordPress/gutenberg/pull/36579)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/card/test/__snapshots__/index.js.snap b/packages/components/src/card/test/__snapshots__/index.js.snap
+index adf11cff8056a3..ca20d69a5c18dc 100644
+--- a/packages/components/src/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/card/test/__snapshots__/index.js.snap
+@@ -269,10 +269,10 @@ Object {
+ }
+ 
+ .emotion-10 {
+-  border-color: rgba(0, 0, 0, 0.1);
+-  border-width: 0 0 1px 0;
+-  height: 0;
++  border: 0;
+   margin: 0;
++  border-bottom: 1px solid currentColor;
++  height: 0;
+   width: auto;
+   box-sizing: border-box;
+   display: block;
+@@ -525,10 +525,10 @@ Object {
+ }
+ 
+ .emotion-10 {
+-  border-color: rgba(0, 0, 0, 0.1);
+-  border-width: 0 0 1px 0;
+-  height: 0;
++  border: 0;
+   margin: 0;
++  border-bottom: 1px solid currentColor;
++  height: 0;
+   width: auto;
+   box-sizing: border-box;
+   display: block;
+diff --git a/packages/components/src/divider/README.md b/packages/components/src/divider/README.md
+index ae9b961dad5e54..977f969d40ff51 100644
+--- a/packages/components/src/divider/README.md
++++ b/packages/components/src/divider/README.md
+@@ -9,15 +9,43 @@ This feature is still experimental. “Experimental” means this is an early im
+ ## Usage
+ 
+ ```jsx
+-import { Divider, FormGroup, ListGroup } from '@wordpress/components/ui';
++import {
++	__experimentalDivider as Divider,
++	__experimentalText as Text,
++	__experimentalVStack as VStack,
++} from `@wordpress/components`;
+ 
+ function Example() {
+ 	return (
+-		<ListGroup>
+-			<FormGroup>...</FormGroup>
++		<VStack spacing={4}>
++			<Text>Some text here</Text>
+ 			<Divider />
+-			<FormGroup>...</FormGroup>
+-		</ListGroup>
++			<Text>Some more text here</Text>
++		</VStack>
+ 	);
+ }
+ ```
++
++## Props
++
++### `margin`: `number`
++
++Adjusts all margins on the inline dimension.
++
++- Required: No
++
++### `marginStart`: `number`
++
++Adjusts the inline-start margin.
++
++- Required: No
++
++### `marginEnd`: `number`
++
++Adjusts the inline-end margin.
++
++- Required: No
++
++### Inherited props
++
++`Divider` also inherits all of the [`Separator` props](https://reakit.io/docs/separator/).
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 085d2f5f012b71..15a61adab5c2ac 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -38,17 +38,18 @@ function Divider(
+  * @example
+  * ```js
+  * import {
+- *     __experimentalDivider as Divider,
+- *     __experimentalText as Text }
+- * from `@wordpress/components`;
++ * 		__experimentalDivider as Divider,
++ * 		__experimentalText as Text,
++ * 		__experimentalVStack as VStack,
++ * } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return (
+- * 		<ListGroup>
+- * 			<FormGroup>...</FormGroup>
++ * 		<VStack spacing={4}>
++ * 			<Text>Some text here</Text>
+  * 			<Divider />
+- * 			<FormGroup>...</FormGroup>
+- * 		</ListGroup>
++ * 			<Text>Some more text here</Text>
++ * 		</VStack>
+  * 	);
+  * }
+  * ```
+diff --git a/packages/components/src/divider/stories/index.js b/packages/components/src/divider/stories/index.js
+index a3a7b595db3bf9..a721007068aaa6 100644
+--- a/packages/components/src/divider/stories/index.js
++++ b/packages/components/src/divider/stories/index.js
+@@ -1,38 +1,64 @@
+ /**
+  * External dependencies
+  */
+-import { number } from '@storybook/addon-knobs';
++import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+  */
++import { useCx } from '../../utils';
++import { Text } from '../../text';
+ import { Divider } from '..';
+ 
+ export default {
+ 	component: Divider,
+ 	title: 'Components (Experimental)/Divider',
+-	parameters: {
+-		knobs: { disabled: false },
++	argTypes: {
++		margin: {
++			control: { type: 'number' },
++		},
++		marginStart: {
++			control: { type: 'number' },
++		},
++		marginEnd: {
++			control: { type: 'number' },
++		},
+ 	},
+ };
+ 
+-const BlackDivider = ( props ) => (
+-	<Divider { ...props } style={ { borderColor: 'black' } } />
++const HorizontalTemplate = ( args ) => (
++	<div>
++		<Text>Some text before the divider</Text>
++		<Divider { ...args } />
++		<Text>Some text after the divider</Text>
++	</div>
+ );
+ 
+-export const _default = () => {
+-	const props = {
+-		margin: number( 'margin', 0 ),
+-	};
+-	// make the border color black to give higher contrast and help it appear in storybook better
+-	return <BlackDivider { ...props } />;
++const VerticalTemplate = ( args ) => {
++	const cx = useCx();
++	const wrapperClassName = cx( css`
++		display: flex;
++		align-items: stretch;
++		justify-content: start;
++	` );
++
++	return (
++		<div className={ wrapperClassName }>
++			<Text>Some text before the divider</Text>
++			<Divider orientation="vertical" { ...args } />
++			<Text>Some text after the divider</Text>
++		</div>
++	);
+ };
+ 
+-export const splitMargins = () => {
+-	const props = {
+-		marginTop: number( 'marginTop', 0 ),
+-		marginBottom: number( 'marginBottom', 0 ),
+-	};
++export const Horizontal = HorizontalTemplate.bind( {} );
++Horizontal.args = {
++	margin: 2,
++	marginStart: undefined,
++	marginEnd: undefined,
++};
+ 
+-	return <BlackDivider { ...props } />;
++export const Vertical = VerticalTemplate.bind( {} );
++Vertical.args = {
++	...Horizontal.args,
+ };
+diff --git a/packages/components/src/divider/styles.ts b/packages/components/src/divider/styles.ts
+index 270cc27cd80a0d..50b49342118027 100644
+--- a/packages/components/src/divider/styles.ts
++++ b/packages/components/src/divider/styles.ts
+@@ -8,29 +8,66 @@ import { css } from '@emotion/react';
+  * Internal dependencies
+  */
+ import { space } from '../ui/utils/space';
+-import CONFIG from '../utils/config-values';
+-import type { OwnProps } from './types';
++import { rtl } from '../utils';
++import type { Props } from './types';
+ 
+-const renderMargin = ( { margin, marginTop, marginBottom }: OwnProps ) => {
+-	if ( typeof margin !== 'undefined' ) {
+-		return css( {
+-			marginBottom: space( margin ),
+-			marginTop: space( margin ),
+-		} );
+-	}
++const MARGIN_DIRECTIONS: Record<
++	NonNullable< Props[ 'orientation' ] >,
++	Record< 'start' | 'end', string >
++> = {
++	vertical: {
++		start: 'marginLeft',
++		end: 'marginRight',
++	},
++	horizontal: {
++		start: 'marginTop',
++		end: 'marginBottom',
++	},
++};
++
++// Renders the correct margins given the Divider's `orientation` and the writing direction.
++// When both the generic `margin` and the specific `marginStart|marginEnd` props are defined,
++// the latter will take priority.
++const renderMargin = ( {
++	'aria-orientation': orientation = 'horizontal',
++	margin,
++	marginStart,
++	marginEnd,
++}: Props ) =>
++	css(
++		rtl( {
++			[ MARGIN_DIRECTIONS[ orientation ].start ]: space(
++				marginStart ?? margin
++			),
++			[ MARGIN_DIRECTIONS[ orientation ].end ]: space(
++				marginEnd ?? margin
++			),
++		} )()
++	);
+ 
++const renderBorder = ( {
++	'aria-orientation': orientation = 'horizontal',
++}: Props ) => {
+ 	return css( {
+-		marginTop: space( marginTop ),
+-		marginBottom: space( marginBottom ),
++		[ orientation === 'vertical'
++			? 'borderRight'
++			: 'borderBottom' ]: '1px solid currentColor',
+ 	} );
+ };
+ 
+-export const DividerView = styled.hr< OwnProps >`
+-	border-color: ${ CONFIG.colorDivider };
+-	border-width: 0 0 1px 0;
+-	height: 0;
++const renderSize = ( {
++	'aria-orientation': orientation = 'horizontal',
++}: Props ) =>
++	css( {
++		height: orientation === 'vertical' ? 'auto' : 0,
++		width: orientation === 'vertical' ? 0 : 'auto',
++	} );
++
++export const DividerView = styled.hr< Props >`
++	border: 0;
+ 	margin: 0;
+-	width: auto;
+ 
++	${ renderBorder }
++	${ renderSize }
+ 	${ renderMargin }
+ `;
+diff --git a/packages/components/src/divider/test/__snapshots__/index.js.snap b/packages/components/src/divider/test/__snapshots__/index.js.snap
+index d19ce16daf39c5..5a330d602a5608 100644
+--- a/packages/components/src/divider/test/__snapshots__/index.js.snap
++++ b/packages/components/src/divider/test/__snapshots__/index.js.snap
+@@ -2,10 +2,10 @@
+ 
+ exports[`props should render correctly 1`] = `
+ .emotion-0 {
+-  border-color: rgba(0, 0, 0, 0.1);
+-  border-width: 0 0 1px 0;
+-  height: 0;
++  border: 0;
+   margin: 0;
++  border-bottom: 1px solid currentColor;
++  height: 0;
+   width: auto;
+ }
+ 
+@@ -25,8 +25,8 @@ Snapshot Diff:
+ 
+ @@ -2,10 +2,8 @@
+     Object {
+-      "border-color": "rgba(0, 0, 0, 0.1)",
+-      "border-width": "0 0 1px 0",
++      "border": "0",
++      "border-bottom": "1px solid currentColor",
+       "height": "0",
+       "margin": "0",
+ -     "margin-bottom": "calc(4px * 7)",
+@@ -36,15 +36,15 @@ Snapshot Diff:
+   ]
+ `;
+ 
+-exports[`props should render marginBottom 1`] = `
++exports[`props should render marginEnd 1`] = `
+ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
+ @@ -2,9 +2,8 @@
+     Object {
+-      "border-color": "rgba(0, 0, 0, 0.1)",
+-      "border-width": "0 0 1px 0",
++      "border": "0",
++      "border-bottom": "1px solid currentColor",
+       "height": "0",
+       "margin": "0",
+ -     "margin-bottom": "calc(4px * 5)",
+@@ -53,15 +53,15 @@ Snapshot Diff:
+   ]
+ `;
+ 
+-exports[`props should render marginTop 1`] = `
++exports[`props should render marginStart 1`] = `
+ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
+ @@ -2,9 +2,8 @@
+     Object {
+-      "border-color": "rgba(0, 0, 0, 0.1)",
+-      "border-width": "0 0 1px 0",
++      "border": "0",
++      "border-bottom": "1px solid currentColor",
+       "height": "0",
+       "margin": "0",
+ -     "margin-top": "calc(4px * 5)",
+diff --git a/packages/components/src/divider/test/index.js b/packages/components/src/divider/test/index.js
+index 239206a5f54422..424fa33ce368b3 100644
+--- a/packages/components/src/divider/test/index.js
++++ b/packages/components/src/divider/test/index.js
+@@ -18,15 +18,15 @@ describe( 'props', () => {
+ 		expect( base.container.firstChild ).toMatchSnapshot();
+ 	} );
+ 
+-	test( 'should render marginTop', () => {
+-		const { container } = render( <Divider marginTop={ 5 } /> );
++	test( 'should render marginStart', () => {
++		const { container } = render( <Divider marginStart={ 5 } /> );
+ 		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+ 			base.container.firstChild
+ 		);
+ 	} );
+ 
+-	test( 'should render marginBottom', () => {
+-		const { container } = render( <Divider marginBottom={ 5 } /> );
++	test( 'should render marginEnd', () => {
++		const { container } = render( <Divider marginEnd={ 5 } /> );
+ 		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+ 			base.container.firstChild
+ 		);
+diff --git a/packages/components/src/divider/types.ts b/packages/components/src/divider/types.ts
+index 70a17881cc0e6a..e531aa0561afdb 100644
+--- a/packages/components/src/divider/types.ts
++++ b/packages/components/src/divider/types.ts
+@@ -11,17 +11,17 @@ import type { SpaceInput } from '../ui/utils/space';
+ 
+ export interface OwnProps {
+ 	/**
+-	 * Adjusts all margins.
++	 * Adjusts all margins on the inline dimension.
+ 	 */
+ 	margin?: SpaceInput;
+ 	/**
+-	 * Adjusts top margins.
++	 * Adjusts the inline-start margin.
+ 	 */
+-	marginTop?: SpaceInput;
++	marginStart?: SpaceInput;
+ 	/**
+-	 * Adjusts bottom margins.
++	 * Adjusts the inline-end margin.
+ 	 */
+-	marginBottom?: SpaceInput;
++	marginEnd?: SpaceInput;
+ }
+ 
+ export interface Props extends Omit< SeparatorProps, 'children' >, OwnProps {}

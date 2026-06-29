@@ -1,0 +1,52 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 68368efca525be..71b300a96a5d8d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Internal
+ 
+ -   `Popover`, `ColorPicker`: Obviate pointer event trap #59449 ([#59449](https://github.com/WordPress/gutenberg/pull/59449)).
++-   `Popover`, `ToggleGroupControl`: Use `useReducedMotion()` ([#60168](https://github.com/WordPress/gutenberg/pull/60168)).
+ 
+ ## 27.2.0 (2024-03-21)
+ 
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 1f41ffcd331083..5fcb5407e4a3f4 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -16,7 +16,7 @@ import {
+ // eslint-disable-next-line no-restricted-imports
+ import type { HTMLMotionProps, MotionProps } from 'framer-motion';
+ // eslint-disable-next-line no-restricted-imports
+-import { motion, useReducedMotion } from 'framer-motion';
++import { motion } from 'framer-motion';
+ 
+ /**
+  * WordPress dependencies
+@@ -33,6 +33,7 @@ import {
+ 	createPortal,
+ } from '@wordpress/element';
+ import {
++	useReducedMotion,
+ 	useViewportMatch,
+ 	useMergeRefs,
+ 	__experimentalUseDialog as useDialog,
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index 3149a2d0464c8a..421a6078b04956 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -5,12 +5,12 @@ import type { ForwardedRef } from 'react';
+ // eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ // eslint-disable-next-line no-restricted-imports
+-import { motion, useReducedMotion } from 'framer-motion';
++import { motion } from 'framer-motion';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { useInstanceId } from '@wordpress/compose';
++import { useReducedMotion, useInstanceId } from '@wordpress/compose';
+ import { useMemo } from '@wordpress/element';
+ 
+ /**

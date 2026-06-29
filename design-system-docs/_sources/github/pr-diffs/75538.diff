@@ -1,0 +1,51 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 88d46470b10c0a..a29ebe6b85195e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `ExternalLink`: Add `wp-exclude-emoji` class to prevent Twemoji from replacing the arrow icon ([#75538](https://github.com/WordPress/gutenberg/pull/75538)).
+ -   `TimePicker`: Fix date parsing for years below 1000 by implementing ISO 8601 compliant year formatting with zero-padding ([#75343](https://github.com/WordPress/gutenberg/pull/75343)).
+ -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
+ -   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
+diff --git a/packages/components/src/external-link/index.tsx b/packages/components/src/external-link/index.tsx
+index 35d9012834a7ed..c19e86a9cd5efd 100644
+--- a/packages/components/src/external-link/index.tsx
++++ b/packages/components/src/external-link/index.tsx
+@@ -67,7 +67,11 @@ function UnforwardedExternalLink(
+ 				{ children }
+ 			</span>
+ 			<span
+-				className="components-external-link__icon"
++				className={ clsx(
++					'components-external-link__icon',
++					// This class prevents the arrow from being replaced by a Twemoji image.
++					'wp-exclude-emoji'
++				) }
+ 				aria-label={
+ 					/* translators: accessibility text */
+ 					__( '(opens in a new tab)' )
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index bf105ebdf158e1..7e1252d01f4aae 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -99,7 +99,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+             </span>
+             <span
+               aria-label="(opens in a new tab)"
+-              class="components-external-link__icon"
++              class="components-external-link__icon wp-exclude-emoji"
+             >
+               ↗
+             </span>
+@@ -326,7 +326,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+             </span>
+             <span
+               aria-label="(opens in a new tab)"
+-              class="components-external-link__icon"
++              class="components-external-link__icon wp-exclude-emoji"
+             >
+               ↗
+             </span>

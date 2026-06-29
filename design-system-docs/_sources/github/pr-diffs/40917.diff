@@ -1,0 +1,56 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 15f862992ec81c..00994b4d9dd5b4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++- `BorderControl` now only displays the reset button in its popover when selections have already been made. [#40917](https://github.com/WordPress/gutenberg/pull/40917)
++
+ ## 19.10.0 (2022-05-04)
+ 
+ ### Internal
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index e7bad227f72edd..80940164afcd0d 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -164,6 +164,7 @@ const BorderControlDropdown = (
+ 		enableStyle
+ 	);
+ 
++	const showResetButton = color || ( style && style !== 'none' );
+ 	const dropdownPosition = __experimentalIsRenderedInSidebar
+ 		? 'bottom left'
+ 		: undefined;
+@@ -220,16 +221,18 @@ const BorderControlDropdown = (
+ 					/>
+ 				) }
+ 			</VStack>
+-			<Button
+-				className={ resetButtonClassName }
+-				variant="tertiary"
+-				onClick={ () => {
+-					onReset();
+-					onClose();
+-				} }
+-			>
+-				{ __( 'Reset to default' ) }
+-			</Button>
++			{ showResetButton && (
++				<Button
++					className={ resetButtonClassName }
++					variant="tertiary"
++					onClick={ () => {
++						onReset();
++						onClose();
++					} }
++				>
++					{ __( 'Reset to default' ) }
++				</Button>
++			) }
+ 		</>
+ 	);
+ 

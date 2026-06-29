@@ -1,0 +1,182 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eccd9e639e5f20..ecf4d3628c0839 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ ### Enhancements
+ 
+ -   `DateTimePicker`: Adjustment of the dot position on DayButton and expansion of the button area. ([#55502](https://github.com/WordPress/gutenberg/pull/55502)).
++-   `Modal`: Improve application of body class names ([#55430](https://github.com/WordPress/gutenberg/pull/55430)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 041c592166ab73..b1bee51805f782 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -43,12 +43,12 @@ import StyleProvider from '../style-provider';
+ import type { ModalProps } from './types';
+ 
+ // Used to track and dismiss the prior modal when another opens unless nested.
+-const level0Dismissers: MutableRefObject<
+-	ModalProps[ 'onRequestClose' ] | undefined
+->[] = [];
+-const ModalContext = createContext( level0Dismissers );
++const ModalContext = createContext<
++	MutableRefObject< ModalProps[ 'onRequestClose' ] | undefined >[]
++>( [] );
+ 
+-let isBodyOpenClassActive = false;
++// Used to track body class names applied while modals are open.
++const bodyOpenClasses = new Map< string, number >();
+ 
+ function UnforwardedModal(
+ 	props: ModalProps,
+@@ -146,7 +146,7 @@ function UnforwardedModal(
+ 	// one should remain open at a time and the list enables closing prior ones.
+ 	const dismissers = useContext( ModalContext );
+ 	// Used for the tracking and dismissing any nested modals.
+-	const nestedDismissers = useRef< typeof level0Dismissers >( [] );
++	const nestedDismissers = useRef< typeof dismissers >( [] );
+ 
+ 	// Updates the stack tracking open modals at this level and calls
+ 	// onRequestClose for any prior and/or nested modals as applicable.
+@@ -162,20 +162,22 @@ function UnforwardedModal(
+ 		};
+ 	}, [ dismissers ] );
+ 
+-	const isLevel0 = dismissers === level0Dismissers;
+ 	// Adds/removes the value of bodyOpenClassName to body element.
+ 	useEffect( () => {
+-		if ( ! isBodyOpenClassActive ) {
+-			isBodyOpenClassActive = true;
+-			document.body.classList.add( bodyOpenClassName );
+-		}
++		const theClass = bodyOpenClassName;
++		const oneMore = 1 + ( bodyOpenClasses.get( theClass ) ?? 0 );
++		bodyOpenClasses.set( theClass, oneMore );
++		document.body.classList.add( bodyOpenClassName );
+ 		return () => {
+-			if ( isLevel0 && dismissers.length === 0 ) {
+-				document.body.classList.remove( bodyOpenClassName );
+-				isBodyOpenClassActive = false;
++			const oneLess = bodyOpenClasses.get( theClass )! - 1;
++			if ( oneLess === 0 ) {
++				document.body.classList.remove( theClass );
++				bodyOpenClasses.delete( theClass );
++			} else {
++				bodyOpenClasses.set( theClass, oneLess );
+ 			}
+ 		};
+-	}, [ bodyOpenClassName, dismissers, isLevel0 ] );
++	}, [ bodyOpenClassName ] );
+ 
+ 	// Calls the isContentScrollable callback when the Modal children container resizes.
+ 	useLayoutEffect( () => {
+diff --git a/packages/components/src/modal/test/index.tsx b/packages/components/src/modal/test/index.tsx
+index 9073735e94dbe9..99f68345eec90c 100644
+--- a/packages/components/src/modal/test/index.tsx
++++ b/packages/components/src/modal/test/index.tsx
+@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * WordPress dependencies
+  */
+-import { useState } from '@wordpress/element';
++import { useEffect, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -388,4 +388,93 @@ describe( 'Modal', () => {
+ 			expect( opener ).toHaveFocus();
+ 		} );
+ 	} );
++
++	describe( 'Body class name', () => {
++		const overrideClass = 'is-any-open';
++		const BodyClassDemo = () => {
++			const [ isAShown, setIsAShown ] = useState( false );
++			const [ isA1Shown, setIsA1Shown ] = useState( false );
++			const [ isBShown, setIsBShown ] = useState( false );
++			const [ isClassOverriden, setIsClassOverriden ] = useState( false );
++			useEffect( () => {
++				const toggles: ( e: KeyboardEvent ) => void = ( {
++					key,
++					metaKey,
++				} ) => {
++					if ( key === 'a' ) {
++						if ( metaKey ) return setIsA1Shown( ( v ) => ! v );
++						return setIsAShown( ( v ) => ! v );
++					}
++					if ( key === 'b' ) return setIsBShown( ( v ) => ! v );
++					if ( key === 'c' )
++						return setIsClassOverriden( ( v ) => ! v );
++				};
++				document.addEventListener( 'keydown', toggles );
++				return () =>
++					void document.removeEventListener( 'keydown', toggles );
++			}, [] );
++			return (
++				<>
++					{ isAShown && (
++						<Modal
++							bodyOpenClassName={
++								isClassOverriden ? overrideClass : 'is-A-open'
++							}
++							onRequestClose={ () => setIsAShown( false ) }
++						>
++							<p>Modal A contents</p>
++							{ isA1Shown && (
++								<Modal
++									title="Nested"
++									onRequestClose={ () =>
++										setIsA1Shown( false )
++									}
++								>
++									<p>Modal A1 contents</p>
++								</Modal>
++							) }
++						</Modal>
++					) }
++					{ isBShown && (
++						<Modal
++							bodyOpenClassName={
++								isClassOverriden ? overrideClass : 'is-B-open'
++							}
++							onRequestClose={ () => setIsBShown( false ) }
++						>
++							<p>Modal B contents</p>
++						</Modal>
++					) }
++				</>
++			);
++		};
++
++		it( 'is added and removed when modal opens and closes including when closed due to another modal opening', async () => {
++			const user = userEvent.setup();
++
++			const { baseElement } = render( <BodyClassDemo /> );
++
++			await user.keyboard( 'a' ); // Opens modal A.
++			expect( baseElement ).toHaveClass( 'is-A-open' );
++
++			await user.keyboard( 'b' ); // Opens modal B > closes modal A.
++			expect( baseElement ).toHaveClass( 'is-B-open' );
++			expect( baseElement ).not.toHaveClass( 'is-A-open' );
++
++			await user.keyboard( 'b' ); // Closes modal B.
++			expect( baseElement ).not.toHaveClass( 'is-B-open' );
++		} );
++
++		it( 'is removed even when prop changes while nested modal is open', async () => {
++			const user = userEvent.setup();
++
++			const { baseElement } = render( <BodyClassDemo /> );
++
++			await user.keyboard( 'a' ); // Opens modal A.
++			await user.keyboard( '{Meta>}a{/Meta}' ); // Opens nested modal.
++			await user.keyboard( 'c' ); // Changes `bodyOpenClassName`.
++			await user.keyboard( 'a' ); // Closes modal A.
++			expect( baseElement ).not.toHaveClass( 'is-A-open' );
++		} );
++	} );
+ } );

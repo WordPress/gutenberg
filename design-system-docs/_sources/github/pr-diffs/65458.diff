@@ -1,0 +1,1054 @@
+diff --git a/packages/block-editor/src/components/inserter/block-patterns-explorer/pattern-explorer-sidebar.js b/packages/block-editor/src/components/inserter/block-patterns-explorer/pattern-explorer-sidebar.js
+index d258c24da10cfb..89384bc0537143 100644
+--- a/packages/block-editor/src/components/inserter/block-patterns-explorer/pattern-explorer-sidebar.js
++++ b/packages/block-editor/src/components/inserter/block-patterns-explorer/pattern-explorer-sidebar.js
+@@ -40,7 +40,7 @@ function PatternsExplorerSearch( { searchValue, setSearchValue } ) {
+ 				__nextHasNoMarginBottom
+ 				onChange={ setSearchValue }
+ 				value={ searchValue }
+-				label={ __( 'Search for patterns' ) }
++				label={ __( 'Search' ) }
+ 				placeholder={ __( 'Search' ) }
+ 			/>
+ 		</div>
+diff --git a/packages/block-editor/src/components/inserter/menu.js b/packages/block-editor/src/components/inserter/menu.js
+index 4bc26196cb5243..516d54d2d8267d 100644
+--- a/packages/block-editor/src/components/inserter/menu.js
++++ b/packages/block-editor/src/components/inserter/menu.js
+@@ -163,7 +163,7 @@ function InserterMenu(
+ 						setFilterValue( value );
+ 					} }
+ 					value={ filterValue }
+-					label={ __( 'Search for blocks and patterns' ) }
++					label={ __( 'Search' ) }
+ 					placeholder={ __( 'Search' ) }
+ 				/>
+ 				{ !! delayedFilterValue && (
+diff --git a/packages/block-editor/src/components/inserter/quick-inserter.js b/packages/block-editor/src/components/inserter/quick-inserter.js
+index 7c7f836842b418..9f393a7ce15202 100644
+--- a/packages/block-editor/src/components/inserter/quick-inserter.js
++++ b/packages/block-editor/src/components/inserter/quick-inserter.js
+@@ -116,7 +116,7 @@ export default function QuickInserter( {
+ 					onChange={ ( value ) => {
+ 						setFilterValue( value );
+ 					} }
+-					label={ __( 'Search for blocks and patterns' ) }
++					label={ __( 'Search' ) }
+ 					placeholder={ __( 'Search' ) }
+ 				/>
+ 			) }
+diff --git a/packages/block-editor/src/components/link-control/search-input.js b/packages/block-editor/src/components/link-control/search-input.js
+index f41884092e4894..3f109b8a371552 100644
+--- a/packages/block-editor/src/components/link-control/search-input.js
++++ b/packages/block-editor/src/components/link-control/search-input.js
+@@ -1,7 +1,6 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useInstanceId } from '@wordpress/compose';
+ import { forwardRef, useState } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ 
+@@ -58,7 +57,6 @@ const LinkControlSearchInput = forwardRef(
+ 			? fetchSuggestions || genericSearchHandler
+ 			: noopSearchHandler;
+ 
+-		const instanceId = useInstanceId( LinkControlSearchInput );
+ 		const [ focusedSuggestion, setFocusedSuggestion ] = useState();
+ 
+ 		/**
+@@ -76,7 +74,6 @@ const LinkControlSearchInput = forwardRef(
+ 		const handleRenderSuggestions = ( props ) =>
+ 			renderSuggestions( {
+ 				...props,
+-				instanceId,
+ 				withCreateSuggestion,
+ 				createSuggestionButtonText,
+ 				suggestionsQuery,
+@@ -116,16 +113,18 @@ const LinkControlSearchInput = forwardRef(
+ 			}
+ 		};
+ 
++		const inputLabel = placeholder ?? __( 'Search or type URL' );
++
+ 		return (
+ 			<div className="block-editor-link-control__search-input-container">
+ 				<URLInput
+ 					disableSuggestions={ currentLink?.url === value }
+-					label={ __( 'Link' ) }
++					label={ inputLabel }
+ 					hideLabelFromVision={ hideLabelFromVision }
+ 					className={ className }
+ 					value={ value }
+ 					onChange={ onInputChange }
+-					placeholder={ placeholder ?? __( 'Search or type URL' ) }
++					placeholder={ inputLabel }
+ 					__experimentalRenderSuggestions={
+ 						showSuggestions ? handleRenderSuggestions : null
+ 					}
+diff --git a/packages/block-editor/src/components/link-control/search-results.js b/packages/block-editor/src/components/link-control/search-results.js
+index 2186b5d8b62f7f..29558f69291c57 100644
+--- a/packages/block-editor/src/components/link-control/search-results.js
++++ b/packages/block-editor/src/components/link-control/search-results.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { __, sprintf } from '@wordpress/i18n';
+-import { VisuallyHidden, MenuGroup } from '@wordpress/components';
++import { MenuGroup } from '@wordpress/components';
+ 
+ /**
+  * External dependencies
+@@ -17,7 +17,6 @@ import LinkControlSearchItem from './search-item';
+ import { CREATE_TYPE, LINK_ENTRY_TYPES } from './constants';
+ 
+ export default function LinkControlSearchResults( {
+-	instanceId,
+ 	withCreateSuggestion,
+ 	currentInputValue,
+ 	handleSuggestionClick,
+@@ -47,10 +46,6 @@ export default function LinkControlSearchResults( {
+ 	// If the query has a specified type, then we can skip showing them in the result. See #24839.
+ 	const shouldShowSuggestionsTypes = ! suggestionsQuery?.type;
+ 
+-	// According to guidelines aria-label should be added if the label
+-	// itself is not visible.
+-	// See: https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/listbox_role
+-	const searchResultsLabelId = `block-editor-link-control-search-results-label-${ instanceId }`;
+ 	const labelText = isInitialSuggestions
+ 		? __( 'Suggestions' )
+ 		: sprintf(
+@@ -58,19 +53,13 @@ export default function LinkControlSearchResults( {
+ 				__( 'Search results for "%s"' ),
+ 				currentInputValue
+ 		  );
+-	const searchResultsLabel = (
+-		<VisuallyHidden id={ searchResultsLabelId }>
+-			{ labelText }
+-		</VisuallyHidden>
+-	);
+ 
+ 	return (
+ 		<div className="block-editor-link-control__search-results-wrapper">
+-			{ searchResultsLabel }
+ 			<div
+ 				{ ...suggestionsListProps }
+ 				className={ resultsListClasses }
+-				aria-labelledby={ searchResultsLabelId }
++				aria-label={ labelText }
+ 			>
+ 				<MenuGroup>
+ 					{ suggestions.map( ( suggestion, index ) => {
+diff --git a/packages/block-editor/src/components/link-control/test/index.js b/packages/block-editor/src/components/link-control/test/index.js
+index fa8c4d86eae5c9..e416b9b522a53c 100644
+--- a/packages/block-editor/src/components/link-control/test/index.js
++++ b/packages/block-editor/src/components/link-control/test/index.js
+@@ -138,7 +138,9 @@ describe( 'Basic rendering', () => {
+ 		render( <LinkControl /> );
+ 
+ 		// Search Input UI.
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		expect( searchInput ).toBeVisible();
+ 	} );
+@@ -147,7 +149,9 @@ describe( 'Basic rendering', () => {
+ 		render( <LinkControl /> );
+ 
+ 		// Search Input UI.
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		expect( searchInput ).toBeVisible();
+ 		// Make sure we use the ARIA 1.0 pattern with aria-owns.
+@@ -170,7 +174,9 @@ describe( 'Basic rendering', () => {
+ 		render( <LinkControl /> );
+ 
+ 		// Search Input UI.
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		// Simulate searching for a term.
+ 		await user.type( searchInput, 'Hello' );
+@@ -283,7 +289,9 @@ describe( 'Basic rendering', () => {
+ 		render( <LinkControl /> );
+ 
+ 		// Search Input UI.
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		// Simulate searching for a term.
+ 		await user.type( searchInput, searchTerm );
+@@ -296,7 +304,7 @@ describe( 'Basic rendering', () => {
+ 			render( <LinkControl value={ { url: 'https://example.com' } } /> );
+ 
+ 			expect(
+-				screen.queryByRole( 'combobox', { name: 'Link' } )
++				screen.queryByRole( 'combobox', { name: 'Search or type URL' } )
+ 			).not.toBeInTheDocument();
+ 		} );
+ 
+@@ -309,7 +317,7 @@ describe( 'Basic rendering', () => {
+ 			);
+ 
+ 			expect(
+-				screen.getByRole( 'combobox', { name: 'Link' } )
++				screen.getByRole( 'combobox', { name: 'Search or type URL' } )
+ 			).toBeVisible();
+ 		} );
+ 
+@@ -327,7 +335,7 @@ describe( 'Basic rendering', () => {
+ 			await user.click( editButton );
+ 
+ 			expect(
+-				screen.getByRole( 'combobox', { name: 'Link' } )
++				screen.getByRole( 'combobox', { name: 'Search or type URL' } )
+ 			).toBeVisible();
+ 
+ 			// If passed `forceIsEditingLink` of `false` while editing, should
+@@ -340,7 +348,7 @@ describe( 'Basic rendering', () => {
+ 			);
+ 
+ 			expect(
+-				screen.queryByRole( 'combobox', { name: 'Link' } )
++				screen.queryByRole( 'combobox', { name: 'Search or type URL' } )
+ 			).not.toBeInTheDocument();
+ 		} );
+ 
+@@ -428,7 +436,7 @@ describe( 'Basic rendering', () => {
+ 
+ 			// Should revert back to editing mode.
+ 			expect(
+-				screen.getByRole( 'combobox', { name: 'Link' } )
++				screen.getByRole( 'combobox', { name: 'Search or type URL' } )
+ 			).toBeVisible();
+ 		} );
+ 	} );
+@@ -450,7 +458,9 @@ describe( 'Searching for a link', () => {
+ 		render( <LinkControl /> );
+ 
+ 		// Search Input UI.
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		// Simulate searching for a term.
+ 		await user.type( searchInput, searchTerm );
+@@ -475,7 +485,7 @@ describe( 'Searching for a link', () => {
+ 
+ 			// Search Input UI.
+ 			const searchInput = screen.getByRole( 'combobox', {
+-				name: 'Link',
++				name: 'Search or type URL',
+ 			} );
+ 
+ 			// Simulate searching for a term.
+@@ -526,7 +536,7 @@ describe( 'Searching for a link', () => {
+ 
+ 			// Search Input UI.
+ 			const searchInput = screen.getByRole( 'combobox', {
+-				name: 'Link',
++				name: 'Search or type URL',
+ 			} );
+ 
+ 			// Simulate searching for a term.
+@@ -558,7 +568,9 @@ describe( 'Searching for a link', () => {
+ 		render( <LinkControl /> );
+ 
+ 		// Search Input UI.
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		// Simulate searching for a term.
+ 		await user.type( searchInput, searchTerm );
+@@ -601,7 +613,9 @@ describe( 'Searching for a link', () => {
+ 		render( <LinkControl showSuggestions={ false } /> );
+ 
+ 		// Search Input UI.
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		// Simulate searching for a term.
+ 		await user.type( searchInput, 'anything' );
+@@ -618,7 +632,9 @@ describe( 'Searching for a link', () => {
+ 		render( <LinkControl /> );
+ 
+ 		// Search Input UI.
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		// Simulate searching for a term.
+ 		await user.type( searchInput, searchTerm );
+@@ -648,7 +664,9 @@ describe( 'Searching for a link', () => {
+ 		render( <LinkControl noURLSuggestion /> );
+ 
+ 		// Search Input UI.
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		// Simulate searching for a term.
+ 		await user.type( searchInput, 'couldbeurlorentitysearchterm' );
+@@ -679,7 +697,7 @@ describe( 'Manual link entry', () => {
+ 
+ 			// Search Input UI.
+ 			const searchInput = screen.getByRole( 'combobox', {
+-				name: 'Link',
++				name: 'Search or type URL',
+ 			} );
+ 
+ 			// Simulate searching for a term.
+@@ -715,7 +733,7 @@ describe( 'Manual link entry', () => {
+ 
+ 				// Search Input UI.
+ 				const searchInput = screen.getByRole( 'combobox', {
+-					name: 'Link',
++					name: 'Search or type URL',
+ 				} );
+ 
+ 				if ( searchString.length ) {
+@@ -749,7 +767,7 @@ describe( 'Manual link entry', () => {
+ 
+ 				// Search Input UI.
+ 				const searchInput = screen.getByRole( 'combobox', {
+-					name: 'Link',
++					name: 'Search or type URL',
+ 				} );
+ 
+ 				// Remove the existing link.
+@@ -830,7 +848,7 @@ describe( 'Manual link entry', () => {
+ 			await toggleSettingsDrawer( user );
+ 
+ 			let searchInput = screen.getByRole( 'combobox', {
+-				name: 'Link',
++				name: 'Search or type URL',
+ 			} );
+ 
+ 			let textInput = screen.getByRole( 'textbox', {
+@@ -865,7 +883,7 @@ describe( 'Manual link entry', () => {
+ 
+ 			// Re-query the inputs as they have been replaced.
+ 			searchInput = screen.getByRole( 'combobox', {
+-				name: 'Link',
++				name: 'Search or type URL',
+ 			} );
+ 
+ 			textInput = screen.getByRole( 'textbox', {
+@@ -913,7 +931,7 @@ describe( 'Manual link entry', () => {
+ 
+ 				// Search Input UI.
+ 				const searchInput = screen.getByRole( 'combobox', {
+-					name: 'Link',
++					name: 'Search or type URL',
+ 				} );
+ 
+ 				// Simulate searching for a term.
+@@ -949,7 +967,7 @@ describe( 'Link submission', () => {
+ 		render( <LinkControlConsumer /> );
+ 
+ 		const searchInput = screen.getByRole( 'combobox', {
+-			name: 'Link',
++			name: 'Search or type URL',
+ 		} );
+ 
+ 		const submitButton = screen.getByRole( 'button', {
+@@ -988,7 +1006,7 @@ describe( 'Link submission', () => {
+ 		render( <LinkControlConsumer /> );
+ 
+ 		const searchInput = screen.getByRole( 'combobox', {
+-			name: 'Link',
++			name: 'Search or type URL',
+ 		} );
+ 
+ 		const createSubmitButton = screen.queryByRole( 'button', {
+@@ -1035,9 +1053,9 @@ describe( 'Default search suggestions', () => {
+ 		// Verify input has no value has default suggestions should only show
+ 		// when this does not have a value.
+ 		// Search Input UI.
+-		expect( screen.getByRole( 'combobox', { name: 'Link' } ) ).toHaveValue(
+-			''
+-		);
++		expect(
++			screen.getByRole( 'combobox', { name: 'Search or type URL' } )
++		).toHaveValue( '' );
+ 
+ 		// Ensure only called once as a guard against potential infinite
+ 		// re-render loop within `componentDidUpdate` calling `updateSuggestions`
+@@ -1064,7 +1082,9 @@ describe( 'Default search suggestions', () => {
+ 		} );
+ 		await user.click( currentLinkBtn );
+ 
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		// Search input is set to the URL value.
+ 		expect( searchInput ).toHaveValue( initialValue.url );
+@@ -1086,7 +1106,9 @@ describe( 'Default search suggestions', () => {
+ 		render( <LinkControl showInitialSuggestions /> );
+ 
+ 		// Search Input UI.
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		// Simulate searching for a term.
+ 		await user.type( searchInput, searchTerm );
+@@ -1124,7 +1146,9 @@ describe( 'Default search suggestions', () => {
+ 
+ 		render( <LinkControl showInitialSuggestions /> );
+ 
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		const searchResultsField = screen.queryByRole( 'listbox', {
+ 			name: 'Suggestions',
+@@ -1183,7 +1207,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 
+ 			// Search Input UI.
+ 			const searchInput = screen.getByRole( 'combobox', {
+-				name: 'Link',
++				name: 'Search or type URL',
+ 			} );
+ 
+ 			// Simulate searching for a term.
+@@ -1250,7 +1274,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 		render( <LinkControlConsumer /> );
+ 
+ 		// Search Input UI.
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		// Simulate searching for a term.
+ 		await user.type( searchInput, 'Some new page to create' );
+@@ -1299,7 +1325,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 		render( <LinkControlConsumer /> );
+ 
+ 		// Search Input UI.
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		// Simulate searching for a term.
+ 		await user.type( searchInput, entityNameText );
+@@ -1342,7 +1370,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 		render( <LinkControlConsumer /> );
+ 
+ 		// Search Input UI.
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		// Simulate searching for a term.
+ 		await user.type( searchInput, entityNameText );
+@@ -1366,7 +1396,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 
+ 				// Search Input UI.
+ 				const searchInput = screen.getByRole( 'combobox', {
+-					name: 'Link',
++					name: 'Search or type URL',
+ 				} );
+ 
+ 				const searchResultsField = screen.queryByRole( 'listbox' );
+@@ -1387,7 +1417,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 
+ 			// Search Input UI.
+ 			const searchInput = screen.getByRole( 'combobox', {
+-				name: 'Link',
++				name: 'Search or type URL',
+ 			} );
+ 
+ 			const searchResultsField = screen.queryByRole( 'listbox' );
+@@ -1411,7 +1441,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 
+ 				// Search Input UI.
+ 				const searchInput = screen.getByRole( 'combobox', {
+-					name: 'Link',
++					name: 'Search or type URL',
+ 				} );
+ 
+ 				// Simulate searching for a term.
+@@ -1445,7 +1475,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 			render( <LinkControl createSuggestion={ createSuggestion } /> );
+ 
+ 			// Search Input UI.
+-			searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++			searchInput = screen.getByRole( 'combobox', {
++				name: 'Search or type URL',
++			} );
+ 
+ 			// Simulate searching for a term.
+ 			await user.type( searchInput, searchText );
+@@ -1460,7 +1492,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 
+ 			await user.click( createButton );
+ 
+-			searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++			searchInput = screen.getByRole( 'combobox', {
++				name: 'Search or type URL',
++			} );
+ 
+ 			const errorNotice = screen.getAllByText(
+ 				'API response returned invalid entity.'
+@@ -1533,7 +1567,9 @@ describe( 'Selecting links', () => {
+ 		// Simulate searching for a term.
+ 		await user.click( currentLinkBtn );
+ 
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 		currentLinkUI = screen.queryByLabelText( 'Currently selected' );
+ 
+ 		// We should be back to showing the search input.
+@@ -1574,7 +1610,7 @@ describe( 'Selecting links', () => {
+ 
+ 				// Search Input UI.
+ 				const searchInput = screen.getByRole( 'combobox', {
+-					name: 'Link',
++					name: 'Search or type URL',
+ 				} );
+ 
+ 				// Simulate searching for a term.
+@@ -1636,7 +1672,7 @@ describe( 'Selecting links', () => {
+ 
+ 				// Search Input UI.
+ 				const searchInput = screen.getByRole( 'combobox', {
+-					name: 'Link',
++					name: 'Search or type URL',
+ 				} );
+ 
+ 				// Simulate searching for a term.
+@@ -1726,7 +1762,7 @@ describe( 'Selecting links', () => {
+ 
+ 			// Search Input UI.
+ 			const searchInput = screen.getByRole( 'combobox', {
+-				name: 'Link',
++				name: 'Search or type URL',
+ 			} );
+ 
+ 			// Step down into the search results, highlighting the first result item.
+@@ -1784,7 +1820,7 @@ describe( 'Selecting links', () => {
+ 
+ 			// focus the search input
+ 			const searchInput = screen.getByRole( 'combobox', {
+-				name: 'Link',
++				name: 'Search or type URL',
+ 			} );
+ 
+ 			fireEvent.focus( searchInput );
+@@ -2006,7 +2042,9 @@ describe( 'Post types', () => {
+ 		render( <LinkControl /> );
+ 
+ 		// Search Input UI.
+-		const searchInput = screen.getByRole( 'combobox', { name: 'Link' } );
++		const searchInput = screen.getByRole( 'combobox', {
++			name: 'Search or type URL',
++		} );
+ 
+ 		// Simulate searching for a term.
+ 		await user.type( searchInput, searchTerm );
+@@ -2034,7 +2072,7 @@ describe( 'Post types', () => {
+ 
+ 			// Search Input UI.
+ 			const searchInput = screen.getByRole( 'combobox', {
+-				name: 'Link',
++				name: 'Search or type URL',
+ 			} );
+ 
+ 			// Simulate searching for a term.
+diff --git a/packages/block-editor/src/components/media-replace-flow/test/index.js b/packages/block-editor/src/components/media-replace-flow/test/index.js
+index 1d326804f0dcca..dace470aa67b0f 100644
+--- a/packages/block-editor/src/components/media-replace-flow/test/index.js
++++ b/packages/block-editor/src/components/media-replace-flow/test/index.js
+@@ -110,7 +110,7 @@ describe( 'General media replace flow', () => {
+ 		);
+ 
+ 		const mediaURLInput = screen.getByRole( 'combobox', {
+-			name: 'Link',
++			name: 'Search or type URL',
+ 			expanded: false,
+ 		} );
+ 
+diff --git a/packages/block-library/src/query/edit/pattern-selection-modal.js b/packages/block-library/src/query/edit/pattern-selection-modal.js
+index 7fa29d0d894f1d..41a339908c5644 100644
+--- a/packages/block-library/src/query/edit/pattern-selection-modal.js
++++ b/packages/block-library/src/query/edit/pattern-selection-modal.js
+@@ -70,7 +70,7 @@ export default function PatternSelectionModal( {
+ 						__nextHasNoMarginBottom
+ 						onChange={ setSearchValue }
+ 						value={ searchValue }
+-						label={ __( 'Search for patterns' ) }
++						label={ __( 'Search' ) }
+ 						placeholder={ __( 'Search' ) }
+ 					/>
+ 				</div>
+diff --git a/packages/block-library/src/template-part/edit/selection-modal.js b/packages/block-library/src/template-part/edit/selection-modal.js
+index 1df7314aaca0bb..5fa5d9786d8c96 100644
+--- a/packages/block-library/src/template-part/edit/selection-modal.js
++++ b/packages/block-library/src/template-part/edit/selection-modal.js
+@@ -80,7 +80,7 @@ export default function TemplatePartSelectionModal( {
+ 					__nextHasNoMarginBottom
+ 					onChange={ setSearchValue }
+ 					value={ searchValue }
+-					label={ __( 'Search for replacements' ) }
++					label={ __( 'Search' ) }
+ 					placeholder={ __( 'Search' ) }
+ 				/>
+ 			</div>
+diff --git a/packages/edit-site/src/components/global-styles/screen-block-list.js b/packages/edit-site/src/components/global-styles/screen-block-list.js
+index 0f7d2540fb04df..51807ba79aa111 100644
+--- a/packages/edit-site/src/components/global-styles/screen-block-list.js
++++ b/packages/edit-site/src/components/global-styles/screen-block-list.js
+@@ -174,7 +174,7 @@ function ScreenBlockList() {
+ 				className="edit-site-block-types-search"
+ 				onChange={ setFilterValue }
+ 				value={ filterValue }
+-				label={ __( 'Search for blocks' ) }
++				label={ __( 'Search' ) }
+ 				placeholder={ __( 'Search' ) }
+ 			/>
+ 			<MemoizedBlockList filterValue={ deferredFilterValue } />
+diff --git a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+index 071453f4f3f626..e019185b8a97cd 100644
+--- a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
++++ b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+@@ -411,6 +411,7 @@ export function HierarchicalTermSelector( { slug } ) {
+ 					__next40pxDefaultSize
+ 					__nextHasNoMarginBottom
+ 					label={ filterLabel }
++					placeholder={ filterLabel }
+ 					value={ filterValue }
+ 					onChange={ setFilter }
+ 				/>
+diff --git a/test/e2e/specs/editor/blocks/buttons.spec.js b/test/e2e/specs/editor/blocks/buttons.spec.js
+index f62732470d9747..25bc2d6101024a 100644
+--- a/test/e2e/specs/editor/blocks/buttons.spec.js
++++ b/test/e2e/specs/editor/blocks/buttons.spec.js
+@@ -60,7 +60,7 @@ test.describe( 'Buttons', () => {
+ 		).toBeFocused();
+ 		await pageUtils.pressKeys( 'primary+k' );
+ 		await expect(
+-			page.locator( 'role=combobox[name="Link"i]' )
++			page.locator( 'role=combobox[name="Search or type URL"i]' )
+ 		).toBeFocused();
+ 		await page.keyboard.press( 'Escape' );
+ 		await expect(
+@@ -91,7 +91,7 @@ test.describe( 'Buttons', () => {
+ 		).toBeFocused();
+ 		await pageUtils.pressKeys( 'primary+k' );
+ 		await expect(
+-			page.locator( 'role=combobox[name="Link"i]' )
++			page.locator( 'role=combobox[name="Search or type URL"i]' )
+ 		).toBeFocused();
+ 		await page.keyboard.type( 'https://example.com' );
+ 		await page.keyboard.press( 'Enter' );
+@@ -123,7 +123,9 @@ test.describe( 'Buttons', () => {
+ 		).toBeFocused();
+ 		await pageUtils.pressKeys( 'primary+k' );
+ 
+-		const urlInput = page.locator( 'role=combobox[name="Link"i]' );
++		const urlInput = page.locator(
++			'role=combobox[name="Search or type URL"i]'
++		);
+ 
+ 		await expect( urlInput ).toBeFocused();
+ 		await page.keyboard.type( 'example.com' );
+diff --git a/test/e2e/specs/editor/blocks/group.spec.js b/test/e2e/specs/editor/blocks/group.spec.js
+index ccf522d8c4d533..871974c1f44dd4 100644
+--- a/test/e2e/specs/editor/blocks/group.spec.js
++++ b/test/e2e/specs/editor/blocks/group.spec.js
+@@ -19,10 +19,7 @@ test.describe( 'Group', () => {
+ 
+ 		await inserterButton.click();
+ 
+-		await page.type(
+-			'role=searchbox[name="Search for blocks and patterns"i]',
+-			'Group'
+-		);
++		await page.type( 'role=searchbox[name="Search"i]', 'Group' );
+ 
+ 		await page.click(
+ 			'role=listbox[name="Blocks"i] >> role=option[name="Group"i]'
+diff --git a/test/e2e/specs/editor/blocks/links.spec.js b/test/e2e/specs/editor/blocks/links.spec.js
+index 02400fe9c9dd8a..5206f5b6689e14 100644
+--- a/test/e2e/specs/editor/blocks/links.spec.js
++++ b/test/e2e/specs/editor/blocks/links.spec.js
+@@ -116,7 +116,7 @@ test.describe( 'Links', () => {
+ 
+ 		await expect(
+ 			page.getByRole( 'combobox', {
+-				name: 'Link',
++				name: 'Search or type URL',
+ 			} )
+ 		).toHaveValue( '' );
+ 	} );
+@@ -393,7 +393,7 @@ test.describe( 'Links', () => {
+ 		await pageUtils.pressKeys( 'primary+k' );
+ 
+ 		const urlInput = page.getByRole( 'combobox', {
+-			name: 'Link',
++			name: 'Search or type URL',
+ 		} );
+ 
+ 		// Expect the "Link" combobox to be visible and focused
+@@ -498,7 +498,7 @@ test.describe( 'Links', () => {
+ 
+ 		await expect(
+ 			linkPopover.getByRole( 'combobox', {
+-				name: 'Link',
++				name: 'Search or type URL',
+ 			} )
+ 		).toHaveValue( URL );
+ 
+diff --git a/test/e2e/specs/editor/blocks/navigation-list-view.spec.js b/test/e2e/specs/editor/blocks/navigation-list-view.spec.js
+index 2d5189a6bd6529..2f9963169a5230 100644
+--- a/test/e2e/specs/editor/blocks/navigation-list-view.spec.js
++++ b/test/e2e/specs/editor/blocks/navigation-list-view.spec.js
+@@ -174,7 +174,7 @@ test.describe( 'Navigation block - List view editing', () => {
+ 		// Expect to see the block inserter.
+ 		await expect(
+ 			page.getByRole( 'searchbox', {
+-				name: 'Search for blocks and patterns',
++				name: 'Search',
+ 			} )
+ 		).toBeFocused();
+ 
+@@ -588,7 +588,7 @@ class LinkControl {
+ 
+ 	getSearchInput() {
+ 		return this.page.getByRole( 'combobox', {
+-			name: 'Link',
++			name: 'Search or type URL',
+ 		} );
+ 	}
+ 
+diff --git a/test/e2e/specs/editor/blocks/navigation.spec.js b/test/e2e/specs/editor/blocks/navigation.spec.js
+index 19da69cd27c4aa..83e95a08c0f6a2 100644
+--- a/test/e2e/specs/editor/blocks/navigation.spec.js
++++ b/test/e2e/specs/editor/blocks/navigation.spec.js
+@@ -615,7 +615,7 @@ class Navigation {
+ 
+ 	getLinkControlSearch() {
+ 		return this.page.getByRole( 'combobox', {
+-			name: 'Link',
++			name: 'Search or type URL',
+ 		} );
+ 	}
+ 
+@@ -668,7 +668,7 @@ class Navigation {
+ 	 */
+ 	async addPage( label ) {
+ 		const linkControlSearch = this.page.getByRole( 'combobox', {
+-			name: 'Link',
++			name: 'Search or type URL',
+ 		} );
+ 
+ 		await expect( linkControlSearch ).toBeFocused();
+diff --git a/test/e2e/specs/editor/plugins/allowed-blocks.spec.js b/test/e2e/specs/editor/plugins/allowed-blocks.spec.js
+index 4211e428238218..6c8f4ead41c6f9 100644
+--- a/test/e2e/specs/editor/plugins/allowed-blocks.spec.js
++++ b/test/e2e/specs/editor/plugins/allowed-blocks.spec.js
+@@ -27,7 +27,7 @@ test.describe( 'Allowed Blocks Filter', () => {
+ 		const searchbox = page
+ 			.getByRole( 'region', { name: 'Block Library' } )
+ 			.getByRole( 'searchbox', {
+-				name: 'Search for blocks and patterns',
++				name: 'Search',
+ 			} );
+ 
+ 		await searchbox.fill( 'Paragraph' );
+diff --git a/test/e2e/specs/editor/plugins/block-directory.spec.js b/test/e2e/specs/editor/plugins/block-directory.spec.js
+index 28700e787e8836..f9bf1f85151864 100644
+--- a/test/e2e/specs/editor/plugins/block-directory.spec.js
++++ b/test/e2e/specs/editor/plugins/block-directory.spec.js
+@@ -135,7 +135,7 @@ test.describe( 'Block Directory', () => {
+ 		 */
+ 		await blockLibrary
+ 			.getByRole( 'searchbox', {
+-				name: 'Search for blocks and patterns',
++				name: 'Search',
+ 			} )
+ 			.fill( '@$@@Dsdsdfw2$@' );
+ 
+@@ -226,7 +226,7 @@ test.describe( 'Block Directory', () => {
+ 
+ 		await blockLibrary
+ 			.getByRole( 'searchbox', {
+-				name: 'Search for blocks and patterns',
++				name: 'Search',
+ 			} )
+ 			.fill( MOCK_BLOCK1.title );
+ 
+diff --git a/test/e2e/specs/editor/plugins/block-variations.spec.js b/test/e2e/specs/editor/plugins/block-variations.spec.js
+index 4c5488af4443f6..653680b48e1e66 100644
+--- a/test/e2e/specs/editor/plugins/block-variations.spec.js
++++ b/test/e2e/specs/editor/plugins/block-variations.spec.js
+@@ -28,7 +28,7 @@ test.describe( 'Block variations', () => {
+ 		await page
+ 			.getByRole( 'region', { name: 'Block Library' } )
+ 			.getByRole( 'searchbox', {
+-				name: 'Search for blocks and patterns',
++				name: 'Search',
+ 			} )
+ 			.fill( 'Quote' );
+ 
+@@ -69,7 +69,7 @@ test.describe( 'Block variations', () => {
+ 		await page
+ 			.getByRole( 'region', { name: 'Block Library' } )
+ 			.getByRole( 'searchbox', {
+-				name: 'Search for blocks and patterns',
++				name: 'Search',
+ 			} )
+ 			.fill( 'Paragraph' );
+ 
+diff --git a/test/e2e/specs/editor/various/adding-patterns.spec.js b/test/e2e/specs/editor/various/adding-patterns.spec.js
+index 35192dd364dc66..b634798b455403 100644
+--- a/test/e2e/specs/editor/various/adding-patterns.spec.js
++++ b/test/e2e/specs/editor/various/adding-patterns.spec.js
+@@ -13,7 +13,7 @@ test.describe( 'adding patterns', () => {
+ 
+ 		await page.getByRole( 'tab', { name: 'Patterns' } ).click();
+ 		await page.fill(
+-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
++			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
+ 			'Standard'
+ 		);
+ 
+diff --git a/test/e2e/specs/editor/various/allowed-patterns.spec.js b/test/e2e/specs/editor/various/allowed-patterns.spec.js
+index 83d44403d60ee2..a99b1f5c291066 100644
+--- a/test/e2e/specs/editor/various/allowed-patterns.spec.js
++++ b/test/e2e/specs/editor/various/allowed-patterns.spec.js
+@@ -26,7 +26,7 @@ test.describe( 'Allowed Patterns', () => {
+ 				name: 'Block Library',
+ 			} )
+ 			.getByRole( 'searchbox', {
+-				name: 'Search for blocks and patterns',
++				name: 'Search',
+ 			} )
+ 			.fill( 'Test:' );
+ 
+@@ -69,7 +69,7 @@ test.describe( 'Allowed Patterns', () => {
+ 					name: 'Block Library',
+ 				} )
+ 				.getByRole( 'searchbox', {
+-					name: 'Search for blocks and patterns',
++					name: 'Search',
+ 				} )
+ 				.fill( 'Test:' );
+ 
+diff --git a/test/e2e/specs/editor/various/inserting-blocks.spec.js b/test/e2e/specs/editor/various/inserting-blocks.spec.js
+index b4f23c8b8e2bbf..83b919585a695c 100644
+--- a/test/e2e/specs/editor/various/inserting-blocks.spec.js
++++ b/test/e2e/specs/editor/various/inserting-blocks.spec.js
+@@ -76,7 +76,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
+ 		);
+ 
+ 		await page.fill(
+-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
++			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
+ 			'Heading'
+ 		);
+ 
+@@ -139,7 +139,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
+ 		);
+ 
+ 		await page.fill(
+-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
++			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
+ 			'Heading'
+ 		);
+ 
+@@ -197,7 +197,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
+ 		const PATTERN_NAME = 'Standard';
+ 
+ 		await page.fill(
+-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
++			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
+ 			PATTERN_NAME
+ 		);
+ 
+@@ -286,7 +286,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
+ 			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
+ 		);
+ 		await page.fill(
+-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
++			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
+ 			PATTERN_NAME
+ 		);
+ 		await page.hover(
+@@ -353,7 +353,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
+ 		const PATTERN_NAME = 'Standard';
+ 
+ 		await page.fill(
+-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
++			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
+ 			PATTERN_NAME
+ 		);
+ 
+@@ -596,7 +596,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
+ 
+ 		await page
+ 			.getByRole( 'searchbox', {
+-				name: 'Search for blocks and patterns',
++				name: 'Search',
+ 			} )
+ 			.first()
+ 			.fill( 'Verse' );
+@@ -606,7 +606,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
+ 			page
+ 				.getByRole( 'region', { name: 'Block Library' } )
+ 				.getByRole( 'searchbox', {
+-					name: 'Search for blocks and patterns',
++					name: 'Search',
+ 				} )
+ 				.first()
+ 		).toHaveValue( 'Verse' );
+diff --git a/test/e2e/specs/editor/various/parsing-patterns.spec.js b/test/e2e/specs/editor/various/parsing-patterns.spec.js
+index d8abe7a46fbc1b..62c8ba2de24104 100644
+--- a/test/e2e/specs/editor/various/parsing-patterns.spec.js
++++ b/test/e2e/specs/editor/various/parsing-patterns.spec.js
+@@ -37,7 +37,7 @@ test.describe( 'Parsing patterns', () => {
+ 			} );
+ 		} );
+ 		await page.fill(
+-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
++			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
+ 			'whitespace'
+ 		);
+ 		await page
+diff --git a/test/e2e/specs/editor/various/patterns.spec.js b/test/e2e/specs/editor/various/patterns.spec.js
+index 781d4657a20b90..7204f2bace51a5 100644
+--- a/test/e2e/specs/editor/various/patterns.spec.js
++++ b/test/e2e/specs/editor/various/patterns.spec.js
+@@ -500,7 +500,7 @@ test.describe( 'Synced pattern', () => {
+ 			.click();
+ 		await page
+ 			.getByRole( 'searchbox', {
+-				name: 'Search for blocks and patterns',
++				name: 'Search',
+ 			} )
+ 			.fill( 'Awesome empty' );
+ 
+diff --git a/test/e2e/specs/site-editor/block-style-variations.spec.js b/test/e2e/specs/site-editor/block-style-variations.spec.js
+index 122b42a571b078..97ebc74db8308a 100644
+--- a/test/e2e/specs/site-editor/block-style-variations.spec.js
++++ b/test/e2e/specs/site-editor/block-style-variations.spec.js
+@@ -321,10 +321,7 @@ async function addPageContent( editor, page ) {
+ 		'role=button[name="Toggle block inserter"i]'
+ 	);
+ 	await inserterButton.click();
+-	await page.type(
+-		'role=searchbox[name="Search for blocks and patterns"i]',
+-		'Group'
+-	);
++	await page.type( 'role=searchbox[name="Search"i]', 'Group' );
+ 	await page.click(
+ 		'role=listbox[name="Blocks"i] >> role=option[name="Group"i]'
+ 	);
+diff --git a/test/e2e/specs/site-editor/global-styles-sidebar.spec.js b/test/e2e/specs/site-editor/global-styles-sidebar.spec.js
+index 257ebc38f3b4dd..0b034def6a3063 100644
+--- a/test/e2e/specs/site-editor/global-styles-sidebar.spec.js
++++ b/test/e2e/specs/site-editor/global-styles-sidebar.spec.js
+@@ -32,7 +32,7 @@ test.describe( 'Global styles sidebar', () => {
+ 			.click();
+ 
+ 		await page
+-			.getByRole( 'searchbox', { name: 'Search for blocks' } )
++			.getByRole( 'searchbox', { name: 'Search' } )
+ 			.fill( 'heading' );
+ 
+ 		// Matches both Heading and Table of Contents blocks.
+diff --git a/test/e2e/specs/site-editor/site-editor-inserter.spec.js b/test/e2e/specs/site-editor/site-editor-inserter.spec.js
+index 98cb8e4e74149c..acb0c5409f9b09 100644
+--- a/test/e2e/specs/site-editor/site-editor-inserter.spec.js
++++ b/test/e2e/specs/site-editor/site-editor-inserter.spec.js
+@@ -28,16 +28,12 @@ test.describe( 'Site Editor Inserter', () => {
+ 
+ 		// Visibility check
+ 		await expect(
+-			page.locator(
+-				'role=searchbox[name="Search for blocks and patterns"i]'
+-			)
++			page.locator( 'role=searchbox[name="Search"i]' )
+ 		).toBeVisible();
+ 		await page.click( 'role=button[name="Toggle block inserter"i]' );
+ 		//Hidden State check
+ 		await expect(
+-			page.locator(
+-				'role=searchbox[name="Search for blocks and patterns"i]'
+-			)
++			page.locator( 'role=searchbox[name="Search"i]' )
+ 		).toBeHidden();
+ 	} );
+ 
+diff --git a/test/e2e/specs/widgets/customizing-widgets.spec.js b/test/e2e/specs/widgets/customizing-widgets.spec.js
+index 38e9d3ee2c58ab..04b09da84928e1 100644
+--- a/test/e2e/specs/widgets/customizing-widgets.spec.js
++++ b/test/e2e/specs/widgets/customizing-widgets.spec.js
+@@ -79,7 +79,7 @@ test.describe( 'Widgets Customizer', () => {
+ 		);
+ 
+ 		const inlineInserterSearchBox = page.locator(
+-			'role=searchbox[name="Search for blocks and patterns"i]'
++			'role=searchbox[name="Search"i]'
+ 		);
+ 
+ 		await expect( inlineInserterSearchBox ).toBeFocused();
+@@ -651,9 +651,7 @@ class WidgetsCustomizerPage {
+ 			'role=toolbar[name="Document tools"i] >> role=button[name="Add block"i]'
+ 		);
+ 
+-		const searchBox = this.page.locator(
+-			'role=searchbox[name="Search for blocks and patterns"i]'
+-		);
++		const searchBox = this.page.locator( 'role=searchbox[name="Search"i]' );
+ 
+ 		// Clear the input.
+ 		await searchBox.evaluate( ( node ) => {
+diff --git a/test/e2e/specs/widgets/editing-widgets.spec.js b/test/e2e/specs/widgets/editing-widgets.spec.js
+index 28e9aac437572c..92a264492c018d 100644
+--- a/test/e2e/specs/widgets/editing-widgets.spec.js
++++ b/test/e2e/specs/widgets/editing-widgets.spec.js
+@@ -207,7 +207,7 @@ test.describe( 'Widgets screen', () => {
+ 		await inBetweenInserterButton.click();
+ 
+ 		const inserterSearchBox = page.getByRole( 'searchbox', {
+-			name: 'Search for blocks and patterns',
++			name: 'Search',
+ 		} );
+ 		await expect( inserterSearchBox ).toBeFocused();
+ 
+@@ -704,7 +704,7 @@ class WidgetsScreen {
+ 
+ 		await blockLibrary
+ 			.getByRole( 'searchbox', {
+-				name: 'Search for blocks and patterns',
++				name: 'Search',
+ 			} )
+ 			.fill( blockName );
+ 

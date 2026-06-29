@@ -1,0 +1,143 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a54f231f2aa0e4..bee17daddc3491 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,11 +2,14 @@
+ 
+ ## Unreleased
+ 
++### Documentation 
++
++-   `Popover`: Expose Popover TypeScript types for subcomponents. ([#69619](https://github.com/WordPress/gutenberg/pull/69619))
++
+ ### Internal
+ 
+ -   Update `gradient-parser` to version `1.0.2` ([#69783](https://github.com/WordPress/gutenberg/pull/69783)).
+ 
+-
+ ### Bug Fixes
+ 
+ -   `Button`: Fix tertiary variant displaying incorrect text color in pressed and hover states ([#68542](https://github.com/WordPress/gutenberg/pull/68542)).
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 7db476db6b1db1..63c24b4c1f2abf 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -59,6 +59,7 @@ import type {
+ 	PopoverProps,
+ 	PopoverAnchorRefReference,
+ 	PopoverAnchorRefTopBottom,
++	PopoverSlotProps,
+ } from './types';
+ import { overlayMiddlewares } from './overlay-middlewares';
+ import { StyleProvider } from '../style-provider';
+@@ -478,6 +479,20 @@ const UnforwardedPopover = (
+ 	);
+ };
+ 
++// Export the PopoverSlot individually to allow typescript to pick the types up.
++export const PopoverSlot = forwardRef< HTMLDivElement, PopoverSlotProps >(
++	( { name = SLOT_NAME }, ref ) => {
++		return (
++			<Slot
++				bubblesVirtually
++				name={ name }
++				className="popover-slot"
++				ref={ ref }
++			/>
++		);
++	}
++);
++
+ /**
+  * `Popover` renders its content in a floating modal. If no explicit anchor is passed via props, it anchors to its parent element by default.
+  *
+@@ -501,25 +516,24 @@ const UnforwardedPopover = (
+  * ```
+  *
+  */
+-export const Popover = contextConnect( UnforwardedPopover, 'Popover' );
+-
+-function PopoverSlot(
+-	{ name = SLOT_NAME }: { name?: string },
+-	ref: ForwardedRef< any >
+-) {
+-	return (
+-		<Slot
+-			bubblesVirtually
+-			name={ name }
+-			className="popover-slot"
+-			ref={ ref }
+-		/>
+-	);
+-}
+-
+-// @ts-expect-error For Legacy Reasons
+-Popover.Slot = forwardRef( PopoverSlot );
+-// @ts-expect-error For Legacy Reasons
+-Popover.__unstableSlotNameProvider = slotNameContext.Provider;
++export const Popover = Object.assign(
++	contextConnect( UnforwardedPopover, 'Popover' ),
++	{
++		/**
++		 * Renders a slot that is used internally by Popover for rendering content.
++		 */
++		Slot: Object.assign( PopoverSlot, {
++			displayName: 'Popover.Slot',
++		} ),
++		/**
++		 * Provides a context to manage popover slot names.
++		 *
++		 * This is marked as unstable and should not be used directly.
++		 */
++		__unstableSlotNameProvider: Object.assign( slotNameContext.Provider, {
++			displayName: 'Popover.__unstableSlotNameProvider',
++		} ),
++	}
++);
+ 
+ export default Popover;
+diff --git a/packages/components/src/popover/stories/index.story.tsx b/packages/components/src/popover/stories/index.story.tsx
+index 1e1d4225bd0233..2496e4e5068067 100644
+--- a/packages/components/src/popover/stories/index.story.tsx
++++ b/packages/components/src/popover/stories/index.story.tsx
+@@ -36,6 +36,10 @@ const meta: Meta< typeof Popover > = {
+ 	title: 'Components/Overlays/Popover',
+ 	id: 'components-popover',
+ 	component: Popover,
++	subcomponents: {
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		'Popover.Slot': Popover.Slot,
++	},
+ 	argTypes: {
+ 		anchor: { control: false },
+ 		anchorRef: { control: false },
+diff --git a/packages/components/src/popover/test/utils/index.tsx b/packages/components/src/popover/test/utils/index.tsx
+index 91fa26d8102437..bfef6dbb090d3e 100644
+--- a/packages/components/src/popover/test/utils/index.tsx
++++ b/packages/components/src/popover/test/utils/index.tsx
+@@ -46,7 +46,6 @@ export const PopoverInsideIframeRenderedInExternalSlot = (
+ 
+ 	return (
+ 		<SlotFillProvider>
+-			{ /* @ts-expect-error Slot is not currently typed on Popover */ }
+ 			<Popover.Slot name={ SLOT_NAME } />
+ 			<GenericIframe
+ 				style={ {
+diff --git a/packages/components/src/popover/types.ts b/packages/components/src/popover/types.ts
+index 427f4afb81bfb9..ca21f55c3fa79c 100644
+--- a/packages/components/src/popover/types.ts
++++ b/packages/components/src/popover/types.ts
+@@ -206,3 +206,13 @@ export type PopoverProps = {
+ 	 */
+ 	isAlternate?: boolean;
+ };
++
++export type PopoverSlotProps = {
++	/**
++	 * The name of the Slot in which the popover should be rendered. It should
++	 * be also passed to the corresponding `PopoverSlot` component.
++	 *
++	 * @default 'Popover'
++	 */
++	name?: string;
++};

@@ -1,0 +1,302 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4f4a1fadf18f8a..eaabc6903b18f3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -61,6 +61,7 @@
+ -   `BorderControl`: Render dropdown as prefix within its `UnitControl` ([#42212](https://github.com/WordPress/gutenberg/pull/42212/))
+ -   `UnitControl`: Update prop types to allow ReactNode as prefix ([#42212](https://github.com/WordPress/gutenberg/pull/42212/))
+ -   `ToolsPanel`: Updated README with panel layout information and more expansive usage example ([#42615](https://github.com/WordPress/gutenberg/pull/42615)).
++-   `ComboboxControl`, `FormTokenField`: Add custom render callback for options in suggestions list ([#42597](https://github.com/WordPress/gutenberg/pull/42597/)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/combobox-control/README.md b/packages/components/src/combobox-control/README.md
+index e0d5a71ab14152..f6e81d2cff3513 100644
+--- a/packages/components/src/combobox-control/README.md
++++ b/packages/components/src/combobox-control/README.md
+@@ -116,6 +116,13 @@ The current value of the input.
+ -   Type: `mixed`
+ -   Required: Yes
+ 
++#### __experimentalRenderItem
++
++Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
++
++-   Type: `Function` - `( args: { item: object } ) => ReactNode`
++-   Required: No
++
+ ## Related components
+ 
+ -   Like this component, but without a search input, the `CustomSelectControl` component.
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index f5f69bb0832dbb..5ede9201c4718e 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -59,6 +59,7 @@ function ComboboxControl( {
+ 	messages = {
+ 		selected: __( 'Item selected.' ),
+ 	},
++	__experimentalRenderItem,
+ } ) {
+ 	const [ value, setValue ] = useControlledValue( {
+ 		value: valueProp,
+@@ -285,6 +286,9 @@ function ComboboxControl( {
+ 							onHover={ setSelectedSuggestion }
+ 							onSelect={ onSuggestionSelected }
+ 							scrollIntoView
++							__experimentalRenderItem={
++								__experimentalRenderItem
++							}
+ 						/>
+ 					) }
+ 				</div>
+diff --git a/packages/components/src/combobox-control/stories/index.js b/packages/components/src/combobox-control/stories/index.js
+index 3ba34f74dc8a95..3c6974e954afa6 100644
+--- a/packages/components/src/combobox-control/stories/index.js
++++ b/packages/components/src/combobox-control/stories/index.js
+@@ -266,7 +266,7 @@ const mapCountryOption = ( country ) => ( {
+ 
+ const countryOptions = countries.map( mapCountryOption );
+ 
+-function CountryCodeComboboxControl( args ) {
++function Template( args ) {
+ 	const [ value, setValue ] = useState( null );
+ 
+ 	return (
+@@ -275,15 +275,59 @@ function CountryCodeComboboxControl( args ) {
+ 				{ ...args }
+ 				value={ value }
+ 				onChange={ setValue }
+-				label="Select a country"
+-				options={ countryOptions }
+ 			/>
+ 			<p>Value: { value }</p>
+ 		</>
+ 	);
+ }
+-export const _default = CountryCodeComboboxControl.bind( {} );
+-_default.args = {
++export const Default = Template.bind( {} );
++Default.args = {
+ 	__next36pxDefaultSize: false,
+ 	allowReset: false,
++	label: 'Select a country',
++	options: countryOptions,
++};
++
++const authorOptions = [
++	{
++		value: 'parsley',
++		label: 'Parsley Montana',
++		age: 48,
++		country: 'Germany',
++	},
++	{
++		value: 'cabbage',
++		label: 'Cabbage New York',
++		age: 44,
++		country: 'France',
++	},
++	{
++		value: 'jake',
++		label: 'Jake Weary',
++		age: 41,
++		country: 'United Kingdom',
++	},
++];
++
++/**
++ * The rendered output of each suggestion can be customized by passing a
++ * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature
++ * and is subject to change.)
++ */
++export const WithCustomRenderItem = Template.bind( {} );
++WithCustomRenderItem.args = {
++	...Default.args,
++	label: 'Select an author',
++	options: authorOptions,
++	__experimentalRenderItem: ( { item } ) => {
++		const { label, age, country } = item;
++		return (
++			<div>
++				<div style={ { marginBottom: '0.2rem' } }>{ label }</div>
++				<small>
++					Age: { age }, Country: { country }
++				</small>
++			</div>
++		);
++	},
+ };
+diff --git a/packages/components/src/form-token-field/README.md b/packages/components/src/form-token-field/README.md
+index e24f2f2ed7d8c4..2df2ad3c501759 100644
+--- a/packages/components/src/form-token-field/README.md
++++ b/packages/components/src/form-token-field/README.md
+@@ -56,6 +56,7 @@ The `value` property is handled in a manner similar to controlled form component
+     -   `removed` - The user removed an existing token.
+     -   `remove` - The user focused the button to remove the token.
+     -   `__experimentalInvalid` - The user tried to add a token that didn't pass the validation.
++-   `__experimentalRenderItem` - Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
+ -   `__experimentalExpandOnFocus` - If true, the suggestions list will be always expanded when the input field has the focus.
+ -   `__experimentalShowHowTo` - If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
+ -   `__experimentalValidateInput` - If passed, all introduced values will be validated before being added as tokens.
+@@ -78,7 +79,7 @@ const continents = [
+ const MyFormTokenField = () => {
+ 	const [ selectedContinents, setSelectedContinents ] = useState( [] );
+ 
+-	return(
++	return (
+ 		<FormTokenField
+ 			value={ selectedContinents }
+ 			suggestions={ continents }
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 2d070cec1850a3..9195f2d5ba59aa 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -73,6 +73,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 			remove: __( 'Remove item' ),
+ 			__experimentalInvalid: __( 'Invalid item' ),
+ 		},
++		__experimentalRenderItem,
+ 		__experimentalExpandOnFocus = false,
+ 		__experimentalValidateInput = () => true,
+ 		__experimentalShowHowTo = true,
+@@ -693,6 +694,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 						scrollIntoView={ selectedSuggestionScroll }
+ 						onHover={ onSuggestionHovered }
+ 						onSelect={ onSuggestionSelected }
++						__experimentalRenderItem={ __experimentalRenderItem }
+ 					/>
+ 				) }
+ 			</div>
+diff --git a/packages/components/src/form-token-field/stories/index.tsx b/packages/components/src/form-token-field/stories/index.tsx
+index 0d7fcad6564be0..54a4467a791eb5 100644
+--- a/packages/components/src/form-token-field/stories/index.tsx
++++ b/packages/components/src/form-token-field/stories/index.tsx
+@@ -101,3 +101,17 @@ Async.args = {
+ 	label: 'Type a continent',
+ 	suggestions: continents,
+ };
++
++/**
++ * The rendered output of each suggestion can be customized by passing a
++ * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature
++ * and is subject to change.)
++ */
++export const WithCustomRenderItem: ComponentStory< typeof FormTokenField > =
++	DefaultTemplate.bind( {} );
++WithCustomRenderItem.args = {
++	...Default.args,
++	__experimentalRenderItem: ( { item } ) => (
++		<div>{ `${ item } — a nice place to visit` }</div>
++	),
++};
+diff --git a/packages/components/src/form-token-field/suggestions-list.tsx b/packages/components/src/form-token-field/suggestions-list.tsx
+index 3828feef5dfab2..cb3f8299c935f7 100644
+--- a/packages/components/src/form-token-field/suggestions-list.tsx
++++ b/packages/components/src/form-token-field/suggestions-list.tsx
+@@ -4,7 +4,7 @@
+ import { map } from 'lodash';
+ import scrollView from 'dom-scroll-into-view';
+ import classnames from 'classnames';
+-import type { MouseEventHandler } from 'react';
++import type { MouseEventHandler, ReactNode } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -31,6 +31,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
+ 	suggestions = [],
+ 	displayTransform,
+ 	instanceId,
++	__experimentalRenderItem,
+ }: SuggestionsListProps< T > ) {
+ 	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
+ 
+@@ -122,6 +123,24 @@ export function SuggestionsList< T extends string | { value: string } >( {
+ 					}
+ 				);
+ 
++				let output: ReactNode;
++
++				if ( typeof __experimentalRenderItem === 'function' ) {
++					output = __experimentalRenderItem( { item: suggestion } );
++				} else if ( matchText ) {
++					output = (
++						<span aria-label={ displayTransform( suggestion ) }>
++							{ matchText.suggestionBeforeMatch }
++							<strong className="components-form-token-field__suggestion-match">
++								{ matchText.suggestionMatch }
++							</strong>
++							{ matchText.suggestionAfterMatch }
++						</span>
++					);
++				} else {
++					output = displayTransform( suggestion );
++				}
++
+ 				/* eslint-disable jsx-a11y/click-events-have-key-events */
+ 				return (
+ 					<li
+@@ -139,17 +158,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
+ 						onMouseEnter={ handleHover( suggestion ) }
+ 						aria-selected={ index === selectedIndex }
+ 					>
+-						{ matchText ? (
+-							<span aria-label={ displayTransform( suggestion ) }>
+-								{ matchText.suggestionBeforeMatch }
+-								<strong className="components-form-token-field__suggestion-match">
+-									{ matchText.suggestionMatch }
+-								</strong>
+-								{ matchText.suggestionAfterMatch }
+-							</span>
+-						) : (
+-							displayTransform( suggestion )
+-						) }
++						{ output }
+ 					</li>
+ 				);
+ 				/* eslint-enable jsx-a11y/click-events-have-key-events */
+diff --git a/packages/components/src/form-token-field/types.ts b/packages/components/src/form-token-field/types.ts
+index f7e0a11e0e4140..8a032700b411a1 100644
+--- a/packages/components/src/form-token-field/types.ts
++++ b/packages/components/src/form-token-field/types.ts
+@@ -1,7 +1,11 @@
+ /**
+  * External dependencies
+  */
+-import type { ComponentPropsWithRef, MouseEventHandler } from 'react';
++import type {
++	ComponentPropsWithRef,
++	MouseEventHandler,
++	ReactNode,
++} from 'react';
+ 
+ type Messages = {
+ 	/**
+@@ -154,9 +158,18 @@ export interface FormTokenFieldProps
+ 	 * @default false
+ 	 */
+ 	__next36pxDefaultSize?: boolean;
++	/**
++	 * Custom renderer for suggestions.
++	 */
++	__experimentalRenderItem?: ( args: { item: string } ) => ReactNode;
+ }
+ 
+-export interface SuggestionsListProps< T = string | { value: string } > {
++/**
++ * `T` can be either a `string` or an object which must have a `value` prop as a string.
++ */
++export interface SuggestionsListProps<
++	T = string | ( Record< string, unknown > & { value: string } )
++> {
+ 	selectedIndex: number;
+ 	scrollIntoView: boolean;
+ 	match: T;
+@@ -165,6 +178,7 @@ export interface SuggestionsListProps< T = string | { value: string } > {
+ 	suggestions: T[];
+ 	displayTransform: ( value: T ) => string;
+ 	instanceId: string | number;
++	__experimentalRenderItem?: ( args: { item: T } ) => ReactNode;
+ }
+ 
+ export interface TokenProps extends TokenItem {

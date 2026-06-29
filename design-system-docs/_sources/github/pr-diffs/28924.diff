@@ -1,0 +1,263 @@
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 84d87495b37c21..27ef6fc072618b 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -164,3 +164,5 @@ export {
+ 	__unstableWithNext,
+ 	__unstableComponentSystemProvider,
+ } from './__next/context';
++
++export { useInlineEdit as __unstableUseInlineEdit } from './inline-edit';
+diff --git a/packages/components/src/inline-edit/README.MD b/packages/components/src/inline-edit/README.MD
+new file mode 100644
+index 00000000000000..0805d7ca67f1d7
+--- /dev/null
++++ b/packages/components/src/inline-edit/README.MD
+@@ -0,0 +1,5 @@
++Hook providing with refs to bind two elements.
++
++One ref is used to set 'isEdit' state to true upon clicking. The second is used to set 'isEdit' state to false on 'Enter'/onBlur event and triggering onCommit callback with its value.
++
++The hook was designed to be a component in the first place, but a hook gives more flexibility.
+diff --git a/packages/components/src/inline-edit/hook.js b/packages/components/src/inline-edit/hook.js
+new file mode 100644
+index 00000000000000..56aebc3f0800f0
+--- /dev/null
++++ b/packages/components/src/inline-edit/hook.js
+@@ -0,0 +1,129 @@
++/**
++ * External dependencies
++ */
++import { isUndefined, negate, noop, flow } from 'lodash';
++/**
++ * WordPress dependencies
++ */
++import { useEffect, useState, useRef } from '@wordpress/element';
++
++/**
++ * @param {import("react").ChangeEvent<HTMLInputElement>} event
++ */
++const cancelEvent = ( event ) => (
++	event.preventDefault(), event.stopPropagation(), event
++);
++
++/**
++ * @param {import("react").ChangeEvent<HTMLInputElement>} event
++ */
++const getEventValue = ( { target: { value } } ) => value;
++
++/**
++ * @param {Function[]} handlers
++ */
++const mergeEvent = ( ...handlers ) =>
++	/**
++	 * @param {import("react").ChangeEvent<HTMLInputElement>} event
++	 */
++	( event ) => handlers.forEach( ( handler = noop ) => handler( event ) );
++
++/**
++ * @typedef Props
++ * @property {(value: string) => boolean} validate predicate
++ * @property {( value: string ) => void} onWrongInput called when a validate predicate fails
++ * @property {( value: string ) => void} onCommit called on enter/blur
++ * @property {string} value input value
++ */
++
++/**
++ * @param {Props} props
++ */
++export default function useInlineEdit( {
++	validate = negate( isUndefined ),
++	onWrongInput = noop,
++	onCommit = noop,
++	value: propValue,
++} ) {
++	const [ isInEditMode, setIsInEditMode ] = useState( false );
++	const [ editingValue, setEditingValue ] = useState( propValue );
++	const value = isInEditMode ? editingValue : propValue;
++	/** @type {import('react').RefObject<HTMLInputElement>} */
++	const inputRef = useRef( null );
++	/** @type {import('react').RefObject<HTMLButtonElement>} */
++	const toggleRef = useRef( null );
++	const changeToEditMode = () => setIsInEditMode( true );
++	const changeToToggleMode = () => setIsInEditMode( false );
++
++	useEffect( () => {
++		setEditingValue( propValue );
++	}, [ propValue ] );
++
++	useEffect( () => {
++		if ( isInEditMode ) {
++			inputRef.current?.focus();
++			inputRef.current?.select();
++		} else {
++			toggleRef.current?.focus();
++		}
++	}, [ isInEditMode ] );
++
++	/**
++	 * @param {import("react").ChangeEvent<HTMLInputElement>} event
++	 */
++	const commit = ( event ) => {
++		const { value: _value } = event.target;
++		cancelEvent( event );
++		if ( validate( _value ) ) {
++			changeToToggleMode();
++			onCommit( _value );
++		} else {
++			onWrongInput( _value );
++		}
++	};
++
++	/**
++	 * @param {import("react").KeyboardEvent<HTMLInputElement> & import("react").ChangeEvent<HTMLInputElement>} event
++	 */
++	const handleInputActions = ( event ) => {
++		if ( 'Enter' === event.key ) {
++			commit( event );
++		}
++		if ( 'Escape' === event.key ) {
++			cancelEvent( event );
++			event.target.blur();
++			changeToToggleMode();
++		} else {
++			setEditingValue( event.target.value );
++		}
++	};
++
++	const amendInputProps = ( {
++		onChange = noop,
++		onKeyDown = noop,
++		onBlur = noop,
++		...inputProps
++	} = {} ) => ( {
++		ref: inputRef,
++		onChange: mergeEvent(
++			flow( [ getEventValue, setEditingValue ] ),
++			onChange
++		),
++		onKeyDown: mergeEvent( handleInputActions, onKeyDown ),
++		onBlur: mergeEvent( commit, onBlur ),
++		...inputProps,
++	} );
++
++	const amendToggleProps = ( { onClick = noop, ...toggleProps } = {} ) => ( {
++		ref: toggleRef,
++		onClick: mergeEvent( changeToEditMode, onClick ),
++		...toggleProps,
++	} );
++
++	return {
++		isEdit: isInEditMode,
++		amendInputProps,
++		amendToggleProps,
++		value,
++	};
++}
+diff --git a/packages/components/src/inline-edit/index.js b/packages/components/src/inline-edit/index.js
+new file mode 100644
+index 00000000000000..e757912862ddbd
+--- /dev/null
++++ b/packages/components/src/inline-edit/index.js
+@@ -0,0 +1 @@
++export { default as useInlineEdit } from './hook';
+diff --git a/packages/components/src/inline-edit/stories/index.js b/packages/components/src/inline-edit/stories/index.js
+new file mode 100644
+index 00000000000000..957b040b1397a9
+--- /dev/null
++++ b/packages/components/src/inline-edit/stories/index.js
+@@ -0,0 +1,80 @@
++/**
++ * External dependencies
++ */
++import { text } from '@storybook/addon-knobs';
++/**
++ * WordPress dependencies
++ */
++import { useEffect, useState } from '@wordpress/element';
++import { pick } from 'lodash';
++
++/**
++ * Internal dependencies
++ */
++import useInlineEdit from '../hook';
++
++export default {
++	title: 'Components/EditInPlaceControl',
++	component: MyCustomEditInPlaceControl,
++};
++
++function MyCustomEditInPlaceControl( props = {} ) {
++	const { isEdit, amendInputProps, amendToggleProps, value } = useInlineEdit(
++		props
++	);
++	return (
++		<>
++			{ isEdit ? (
++				<input { ...amendInputProps( { value } ) } />
++			) : (
++				<button { ...amendToggleProps( pick( props, 'onClick' ) ) }>
++					{ value }
++				</button>
++			) }
++		</>
++	);
++}
++
++export const _default = () => {
++	const validate = ( _value = '' ) => _value.length > 0;
++	const initialValue = text( 'Initial value', 'Input initial value' );
++	const [ onClickCallbacks, setOnClickCallbacks ] = useState( 0 );
++	const [ ocCommitCallbacks, setOnCommitCallbacks ] = useState( 0 );
++	const [ value, setValue ] = useState( initialValue );
++	const [ isInputValid, setIsInputValid ] = useState( true );
++
++	useEffect( () => {
++		setValue( initialValue );
++	}, [ initialValue ] );
++
++	const incrementOnClickCallbacks = () =>
++		setOnClickCallbacks( 1 + onClickCallbacks );
++
++	const incrementOnCommitCallbacks = () =>
++		setOnCommitCallbacks( 1 + ocCommitCallbacks );
++
++	const props = {
++		value,
++		validate,
++		onClick: incrementOnClickCallbacks,
++		inputValidator: validate,
++		onCommit: ( _value ) => (
++			setValue( _value ),
++			incrementOnCommitCallbacks(),
++			setIsInputValid( true )
++		),
++		onWrongInput: () => setIsInputValid( false ),
++	};
++
++	return (
++		<>
++			<MyCustomEditInPlaceControl { ...props } />
++			<ul>
++				<li> onClick callbacks: { onClickCallbacks } </li>
++				<li> onCommit callback: { ocCommitCallbacks } </li>
++				<li> inputValidator: is defined </li>
++				<li> is commited input valid: { isInputValid + '' } </li>
++			</ul>
++		</>
++	);
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 9965ad27817733..875f201916e148 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -20,7 +20,8 @@
+ 		"src/utils/**/*",
+ 		"src/view/**/*",
+ 		"src/visually-hidden/**/*",
+-		"src/text/**/*",
++	  	"src/text/**/*",
++	  	"src/inline-edit/**/*",
+ 		"src/grid/**/*",
+ 		"src/__next/**/*"
+ 	],

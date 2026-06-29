@@ -1,0 +1,279 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f704d5dcc3d357..34f8c772070835 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   `Divider`: Complete TypeScript migration ([#41991](https://github.com/WordPress/gutenberg/pull/41991)).
+ -   `Divider`, `Flex`, `Spacer`: Improve documentation for the `SpaceInput` prop ([#42376](https://github.com/WordPress/gutenberg/pull/42376)).
+ -   `Elevation`: Convert to TypeScript ([#42302](https://github.com/WordPress/gutenberg/pull/42302)).
++-   `ScrollLock`: Convert to TypeScript ([#42303](https://github.com/WordPress/gutenberg/pull/42303)).
+ 
+ ## 19.15.0 (2022-07-13)
+ 
+diff --git a/packages/components/src/scroll-lock/README.md b/packages/components/src/scroll-lock/README.md
+index 3bbb96c41f505d..33c5948ac0367e 100644
+--- a/packages/components/src/scroll-lock/README.md
++++ b/packages/components/src/scroll-lock/README.md
+@@ -7,7 +7,7 @@ ScrollLock is a content-free React component for declaratively preventing scroll
+ Declare scroll locking as part of modal UI.
+ 
+ ```jsx
+-import { ScrollLock } from '@wordpress/components';
++import { ScrollLock, Button } from '@wordpress/components';
+ import { useState } from '@wordpress/element';
+ 
+ const MyScrollLock = () => {
+diff --git a/packages/components/src/scroll-lock/index.js b/packages/components/src/scroll-lock/index.tsx
+similarity index 50%
+rename from packages/components/src/scroll-lock/index.js
+rename to packages/components/src/scroll-lock/index.tsx
+index 5ae82e8a61ddee..a5c34be2f40a66 100644
+--- a/packages/components/src/scroll-lock/index.js
++++ b/packages/components/src/scroll-lock/index.tsx
+@@ -12,10 +12,7 @@ import { useEffect } from '@wordpress/element';
+  */
+ let previousScrollTop = 0;
+ 
+-/**
+- * @param {boolean} locked
+- */
+-function setLocked( locked ) {
++function setLocked( locked: boolean ) {
+ 	const scrollingElement = document.scrollingElement || document.body;
+ 
+ 	if ( locked ) {
+@@ -36,11 +33,39 @@ function setLocked( locked ) {
+ let lockCounter = 0;
+ 
+ /**
+- * A component that will lock scrolling when it is mounted and unlock scrolling when it is unmounted.
++ * ScrollLock is a content-free React component for declaratively preventing
++ * scroll bleed from modal UI to the page body. This component applies a
++ * `lockscroll` class to the `document.documentElement` and
++ * `document.scrollingElement` elements to stop the body from scrolling. When it
++ * is present, the lock is applied.
++ *
++ * ```jsx
++ * import { ScrollLock, Button } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
+  *
+- * @return {null} Render nothing.
++ * const MyScrollLock = () => {
++ *   const [ isScrollLocked, setIsScrollLocked ] = useState( false );
++ *
++ *   const toggleLock = () => {
++ *     setIsScrollLocked( ( locked ) => ! locked ) );
++ *   };
++ *
++ *   return (
++ *     <div>
++ *       <Button variant="secondary" onClick={ toggleLock }>
++ *         Toggle scroll lock
++ *       </Button>
++ *       { isScrollLocked && <ScrollLock /> }
++ *       <p>
++ *         Scroll locked:
++ *         <strong>{ isScrollLocked ? 'Yes' : 'No' }</strong>
++ *       </p>
++ *     </div>
++ *   );
++ * };
++ * ```
+  */
+-export default function ScrollLock() {
++export function ScrollLock(): null {
+ 	useEffect( () => {
+ 		if ( lockCounter === 0 ) {
+ 			setLocked( true );
+@@ -59,3 +84,5 @@ export default function ScrollLock() {
+ 
+ 	return null;
+ }
++
++export default ScrollLock;
+diff --git a/packages/components/src/scroll-lock/stories/index.js b/packages/components/src/scroll-lock/stories/index.tsx
+similarity index 62%
+rename from packages/components/src/scroll-lock/stories/index.js
+rename to packages/components/src/scroll-lock/stories/index.tsx
+index 9a9de3584e465c..0fec923ae4bfc0 100644
+--- a/packages/components/src/scroll-lock/stories/index.js
++++ b/packages/components/src/scroll-lock/stories/index.tsx
+@@ -1,3 +1,9 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++import type { ReactNode } from 'react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -7,32 +13,19 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Button from '../../button';
+-import ScrollLock from '../';
+-
+-export default { title: 'Components/ScrollLock', component: ScrollLock };
+-
+-const Example = () => {
+-	const [ isScrollLocked, setScrollLocked ] = useState( false );
+-	const toggleLock = () => setScrollLocked( ! isScrollLocked );
++import ScrollLock from '..';
+ 
+-	return (
+-		<StripedBackground>
+-			<div>Start scrolling down...</div>
+-			<ToggleContainer>
+-				<Button variant="secondary" onClick={ toggleLock }>
+-					Toggle Scroll Lock
+-				</Button>
+-				{ isScrollLocked && <ScrollLock /> }
+-				<p>
+-					Scroll locked:{ ' ' }
+-					<strong>{ isScrollLocked ? 'Yes' : 'No' }</strong>
+-				</p>
+-			</ToggleContainer>
+-		</StripedBackground>
+-	);
++const meta: ComponentMeta< typeof ScrollLock > = {
++	component: ScrollLock,
++	title: 'Components/ScrollLock',
++	parameters: {
++		controls: { hideNoControlsWarning: true },
++		docs: { source: { state: 'open' } },
++	},
+ };
++export default meta;
+ 
+-function StripedBackground( props ) {
++function StripedBackground( props: { children: ReactNode } ) {
+ 	return (
+ 		<div
+ 			style={ {
+@@ -48,7 +41,7 @@ function StripedBackground( props ) {
+ 	);
+ }
+ 
+-function ToggleContainer( props ) {
++function ToggleContainer( props: { children: ReactNode } ) {
+ 	const { children } = props;
+ 	return (
+ 		<div
+@@ -66,6 +59,23 @@ function ToggleContainer( props ) {
+ 	);
+ }
+ 
+-export const _default = () => {
+-	return <Example />;
++export const Default: ComponentStory< typeof ScrollLock > = () => {
++	const [ isScrollLocked, setScrollLocked ] = useState( false );
++	const toggleLock = () => setScrollLocked( ! isScrollLocked );
++
++	return (
++		<StripedBackground>
++			<div>Start scrolling down...</div>
++			<ToggleContainer>
++				<Button variant="primary" onClick={ toggleLock }>
++					Toggle Scroll Lock
++				</Button>
++				{ isScrollLocked && <ScrollLock /> }
++				<p>
++					Scroll locked:{ ' ' }
++					<strong>{ isScrollLocked ? 'Yes' : 'No' }</strong>
++				</p>
++			</ToggleContainer>
++		</StripedBackground>
++	);
+ };
+diff --git a/packages/components/src/scroll-lock/test/index.js b/packages/components/src/scroll-lock/test/index.js
+deleted file mode 100644
+index 4579806908c97f..00000000000000
+--- a/packages/components/src/scroll-lock/test/index.js
++++ /dev/null
+@@ -1,53 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { mount } from 'enzyme';
+-
+-/**
+- * Internal dependencies
+- */
+-import ScrollLock from '..';
+-
+-describe( 'scroll-lock', () => {
+-	const lockingClassName = 'lockscroll';
+-
+-	// Use a separate document to reduce the risk of test side-effects.
+-	let wrapper = null;
+-
+-	function expectLocked( locked ) {
+-		expect(
+-			document.documentElement.classList.contains( lockingClassName )
+-		).toBe( locked );
+-		// Assert against `body` because `scrollingElement` does not exist on our test DOM implementation.
+-		expect( document.body.classList.contains( lockingClassName ) ).toBe(
+-			locked
+-		);
+-	}
+-
+-	afterEach( () => {
+-		if ( wrapper && wrapper.length ) {
+-			wrapper.unmount();
+-			wrapper = null;
+-		}
+-	} );
+-
+-	it( 'locks when mounted', () => {
+-		expectLocked( false );
+-		wrapper = mount( <ScrollLock /> );
+-		expectLocked( true );
+-	} );
+-
+-	it( 'unlocks when unmounted', () => {
+-		wrapper = mount( <ScrollLock /> );
+-		expectLocked( true );
+-		wrapper.unmount();
+-
+-		// Running cleanup functions now works asynchronously. the unofficial
+-		// enzyme adapter for react 17 we're currently using does not account
+-		// for this, yet. So for now, we'll use jest.advanceTimersByTime to wait for cleanup.
+-		//
+-		// @see https://reactjs.org/blog/2020/08/10/react-v17-rc.html#effect-cleanup-timing
+-		jest.advanceTimersByTime( 1 );
+-		expectLocked( false );
+-	} );
+-} );
+diff --git a/packages/components/src/scroll-lock/test/index.tsx b/packages/components/src/scroll-lock/test/index.tsx
+new file mode 100644
+index 00000000000000..012251d5f3296a
+--- /dev/null
++++ b/packages/components/src/scroll-lock/test/index.tsx
+@@ -0,0 +1,26 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import ScrollLock from '..';
++
++describe( 'scroll-lock', () => {
++	const lockingClassName = 'lockscroll';
++
++	it( 'locks when mounted', () => {
++		expect( document.documentElement ).not.toHaveClass( lockingClassName );
++		render( <ScrollLock /> );
++		expect( document.documentElement ).toHaveClass( lockingClassName );
++	} );
++
++	it( 'unlocks when unmounted', () => {
++		const { unmount } = render( <ScrollLock /> );
++		expect( document.documentElement ).toHaveClass( lockingClassName );
++		unmount();
++		expect( document.documentElement ).not.toHaveClass( lockingClassName );
++	} );
++} );

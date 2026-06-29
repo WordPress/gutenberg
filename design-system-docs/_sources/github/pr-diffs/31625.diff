@@ -1,0 +1,169 @@
+diff --git a/packages/components/src/mobile/utils/alignments.native.js b/packages/components/src/mobile/utils/alignments.native.js
+index 52d3ec9b43aa93..98635ea4681ada 100644
+--- a/packages/components/src/mobile/utils/alignments.native.js
++++ b/packages/components/src/mobile/utils/alignments.native.js
+@@ -1,18 +1,19 @@
++/**
++ * WordPress dependencies
++ */
++import { getBlockType } from '@wordpress/blocks';
++
+ export const WIDE_ALIGNMENTS = {
+ 	alignments: {
+ 		wide: 'wide',
+ 		full: 'full',
+ 	},
+-	// `innerContainers`: Group of blocks based on `InnerBlocks` component,
+-	// used to nest other blocks inside
+-	innerContainers: [
+-		'core/group',
+-		'core/columns',
+-		'core/column',
+-		'core/buttons',
+-		'core/button',
+-	],
+ 	excludeBlocks: [ 'core/heading' ],
++	notInnerContainers: [
++		'core/separator',
++		'core/media-text',
++		'core/pullquote',
++	],
+ };
+ 
+ export const ALIGNMENT_BREAKPOINTS = {
+@@ -30,8 +31,42 @@ const isWideWidth = ( align ) => align === WIDE_ALIGNMENTS.alignments.wide;
+ const isWider = ( width, breakpoint ) =>
+ 	width > ALIGNMENT_BREAKPOINTS[ breakpoint ];
+ 
+-const isContainerRelated = ( blockName ) =>
+-	WIDE_ALIGNMENTS.innerContainers.includes( blockName );
++const isContainerRelated = ( blockName ) => {
++	if ( WIDE_ALIGNMENTS.notInnerContainers.includes( blockName ) ) {
++		return false;
++	}
++
++	if ( hasFullWidthSupport( blockName ) ) {
++		return true;
++	}
++
++	return hasParentFullWidthSupport( blockName );
++};
++
++/**
++ * Whether the block has support for full width alignment.
++ *
++ * @param {string} blockName
++ * @return {boolean} Return whether the block supports full width alignment.
++ */
++function hasFullWidthSupport( blockName ) {
++	const blockType = getBlockType( blockName );
++	const blockAlign = blockType?.supports?.align;
++	return (
++		!! Array.isArray( blockAlign ) &&
++		blockAlign.includes( WIDE_ALIGNMENTS.alignments.full )
++	);
++}
++/**
++ * Whether the block's parent has support for full width alignment.
++ *
++ * @param {string} blockName
++ * @return {boolean} Return whether the block's parent supports full width alignment.
++ */
++function hasParentFullWidthSupport( blockName ) {
++	const blockType = getBlockType( blockName );
++	return !! blockType?.parent?.some( hasFullWidthSupport );
++}
+ 
+ export const alignmentHelpers = {
+ 	isFullWidth,
+diff --git a/packages/components/src/mobile/utils/test/index.native.js b/packages/components/src/mobile/utils/test/index.native.js
+index b14294f417e0e8..c665d8b9f4cb48 100644
+--- a/packages/components/src/mobile/utils/test/index.native.js
++++ b/packages/components/src/mobile/utils/test/index.native.js
+@@ -2,6 +2,18 @@
+  * Internal dependencies
+  */
+ import { removeNonDigit, toFixed } from '../';
++import { alignmentHelpers } from '../alignments.native.js';
++
++/**
++ * WordPress dependencies
++ */
++import {
++	getBlockTypes,
++	registerBlockType,
++	unregisterBlockType,
++} from '@wordpress/blocks';
++
++const { isContainerRelated } = alignmentHelpers;
+ 
+ describe( 'removeNonDigit', () => {
+ 	it( 'function returns empty string if passed text does not contain digit characters', () => {
+@@ -46,3 +58,67 @@ describe( 'toFixed', () => {
+ 		expect( result ).toBe( 12 );
+ 	} );
+ } );
++
++describe( 'isContainerRelated', () => {
++	const currentlySupportedBlocks = [
++		'core/group',
++		'core/columns',
++		'core/column',
++		'core/buttons',
++		'core/button',
++	];
++
++	beforeAll( () => {
++		const registerCoreBlocks = require( '@wordpress/block-library' )
++			.registerCoreBlocks;
++		registerCoreBlocks();
++	} );
++
++	afterAll( () => {
++		getBlockTypes().forEach( ( blockname ) => {
++			unregisterBlockType( blockname.name );
++		} );
++	} );
++
++	it( 'function returns True for currently supported block types', () => {
++		currentlySupportedBlocks.forEach( ( blockName ) => {
++			const result = isContainerRelated( blockName );
++			expect( result ).toBe( true );
++		} );
++	} );
++
++	it( 'function returns false for currently NOT supported Blocks types', () => {
++		getBlockTypes().forEach( ( blockType ) => {
++			if ( currentlySupportedBlocks.includes( blockType.name ) ) {
++				return;
++			}
++			const result = isContainerRelated( blockType.name );
++			expect( result ).toBe( false );
++		} );
++	} );
++
++	it( 'function return true from no core blocks if they meet the criteria', () => {
++		registerBlockType( 'foo/bar', {
++			title: 'Foo block',
++			attributes: {},
++			supports: {
++				align: [ 'full' ],
++			},
++		} );
++
++		const resultFoo = isContainerRelated( 'foo/bar' );
++		expect( resultFoo ).toBe( true );
++
++		registerBlockType( 'foo/bar-sup', {
++			title: 'bar block',
++			attributes: {},
++			parent: [ 'foo/bar' ],
++		} );
++
++		const resultBar = isContainerRelated( 'foo/bar-sup' );
++		expect( resultBar ).toBe( true );
++
++		unregisterBlockType( 'foo/bar' );
++		unregisterBlockType( 'foo/bar-sup' );
++	} );
++} );

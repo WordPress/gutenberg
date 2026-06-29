@@ -1,0 +1,591 @@
+diff --git a/packages/block-library/src/post-featured-image/dimension-controls.js b/packages/block-library/src/post-featured-image/dimension-controls.js
+index 9d0b11a6318d26..1437bc2c20578c 100644
+--- a/packages/block-library/src/post-featured-image/dimension-controls.js
++++ b/packages/block-library/src/post-featured-image/dimension-controls.js
+@@ -12,25 +12,22 @@ import {
+ } from '@wordpress/components';
+ import { InspectorControls, useSetting } from '@wordpress/block-editor';
+ 
+-const SCALE_OPTIONS = (
+-	<>
+-		<ToggleGroupControlOption
+-			value="cover"
+-			label={ _x( 'Cover', 'Scale option for Image dimension control' ) }
+-		/>
+-		<ToggleGroupControlOption
+-			value="contain"
+-			label={ _x(
+-				'Contain',
+-				'Scale option for Image dimension control'
+-			) }
+-		/>
+-		<ToggleGroupControlOption
+-			value="fill"
+-			label={ _x( 'Fill', 'Scale option for Image dimension control' ) }
+-		/>
+-	</>
+-);
++const SCALE_OPTIONS = [
++	{
++		value: 'cover',
++		label: _x( 'Cover', 'Scale option for Image dimension control' ),
++	},
++	{
++		value: 'contain',
++		label: _x( 'Contain', 'Scale option for Image dimension control' ),
++	},
++	{
++		value: 'fill',
++		label: _x( 'Fill', 'Scale option for Image dimension control' ),
++	},
++].map( ( props ) => (
++	<ToggleGroupControlOption key={ props.value } { ...props } />
++) );
+ 
+ const DEFAULT_SCALE = 'cover';
+ const DEFAULT_SIZE = 'full';
+@@ -140,7 +137,7 @@ const DimensionControls = ( {
+ 								scale: value,
+ 							} )
+ 						}
+-						isBlock
++						isAdaptiveWidth
+ 					>
+ 						{ SCALE_OPTIONS }
+ 					</ToggleGroupControl>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bff41ad8b1971e..e95073e8377773 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `ToggleGroupControl`: rewrite backdrop animation with `framer-motion` ([#40107](https://github.com/WordPress/gutenberg/pull/40107)).
++
+ ## 19.8.0 (2022-04-08)
+ 
+ ### Enhancements
+@@ -10,6 +14,7 @@
+ -   `ToggleGroupControl`: Reintroduce backdrop animation ([#40021](https://github.com/WordPress/gutenberg/pull/40021)).
+ -   `Card`: Adjust border radius effective size ([#40032](https://github.com/WordPress/gutenberg/pull/40032)).
+ -   `InputControl`: Improved TypeScript type annotations ([#40119](https://github.com/WordPress/gutenberg/pull/40119)).
++-   `ToggleGroupControl`: rewrite backdrop animation with `framer-motion` ([#40107](https://github.com/WordPress/gutenberg/pull/40107)).
+ 
+ ### Internal
+ 
+@@ -27,6 +32,7 @@
+ -   `ItemGroup`: Ensure that the Item's text color is not overriden by the user agent's button color ([#40055](https://github.com/WordPress/gutenberg/pull/40055)).
+ -   `Surface`: Use updated UI text color `#1e1e1e` instead of `#000` ([#40055](https://github.com/WordPress/gutenberg/pull/40055)).
+ -   `CustomSelectControl`: Make chevron consistent with `SelectControl` ([#40049](https://github.com/WordPress/gutenberg/pull/40049)).
++-   `ToggleGroupControl`: fix rendering glitch when used in combination with `Popover` ([#40107](https://github.com/WordPress/gutenberg/pull/40107)).
+ 
+ ## 19.7.0 (2022-03-23)
+ 
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+index 0eac732eed09b9..e1b2ee095be5b4 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+@@ -32,14 +32,6 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+   min-width: 0;
+   padding: 2px;
+   position: relative;
+-  -webkit-transition: -webkit-transform 100ms linear;
+-  transition: transform 100ms linear;
+-}
+-
+-@media ( prefers-reduced-motion: reduce ) {
+-  .emotion-6 {
+-    transition-duration: 0ms;
+-  }
+ }
+ 
+ .emotion-6:hover {
+@@ -56,22 +48,14 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ .emotion-8 {
+   background: #1e1e1e;
+   border-radius: 2px;
+-  box-shadow: transparent;
++  box-shadow: none;
+   left: 0;
+   position: absolute;
+   top: 2px;
+   bottom: 2px;
+-  -webkit-transition: -webkit-transform 160ms ease;
+-  transition: transform 160ms ease;
+   z-index: 1;
+ }
+ 
+-@media ( prefers-reduced-motion: reduce ) {
+-  .emotion-8 {
+-    transition-duration: 0ms;
+-  }
+-}
+-
+ .emotion-10 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+@@ -183,7 +167,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+       <div
+         class="emotion-8 emotion-9"
+         role="presentation"
+-        style="transform: translateX(0px); transition: none; width: 0px;"
++        style="width: 100px; transform: translateX(2px) translateZ(0);"
+       />
+       <div
+         class="emotion-10 emotion-11"
+@@ -288,14 +272,6 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+   min-width: 0;
+   padding: 2px;
+   position: relative;
+-  -webkit-transition: -webkit-transform 100ms linear;
+-  transition: transform 100ms linear;
+-}
+-
+-@media ( prefers-reduced-motion: reduce ) {
+-  .emotion-6 {
+-    transition-duration: 0ms;
+-  }
+ }
+ 
+ .emotion-6:hover {
+@@ -310,6 +286,17 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+ }
+ 
+ .emotion-8 {
++  background: #1e1e1e;
++  border-radius: 2px;
++  box-shadow: none;
++  left: 0;
++  position: absolute;
++  top: 2px;
++  bottom: 2px;
++  z-index: 1;
++}
++
++.emotion-10 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+   display: -ms-inline-flexbox;
+@@ -322,7 +309,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+   flex: 1;
+ }
+ 
+-.emotion-10 {
++.emotion-12 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -363,20 +350,20 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+-  .emotion-10 {
++  .emotion-12 {
+     transition-duration: 0ms;
+   }
+ }
+ 
+-.emotion-10::-moz-focus-inner {
++.emotion-12::-moz-focus-inner {
+   border: 0;
+ }
+ 
+-.emotion-10:active {
++.emotion-12:active {
+   background: #fff;
+ }
+ 
+-.emotion-11 {
++.emotion-13 {
+   font-size: 13px;
+   line-height: 1;
+ }
+@@ -411,12 +398,17 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+       />
+       <div
+         class="emotion-8 emotion-9"
++        role="presentation"
++        style="width: 100px; transform: translateX(2px) translateZ(0);"
++      />
++      <div
++        class="emotion-10 emotion-11"
+         data-active="false"
+       >
+         <button
+           aria-checked="false"
+           aria-label="R"
+-          class="emotion-10 components-toggle-group-control-option-base"
++          class="emotion-12 components-toggle-group-control-option-base"
+           data-value="rigas"
+           data-wp-c16t="true"
+           data-wp-component="ToggleGroupControlOptionBase"
+@@ -425,20 +417,20 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+           tabindex="0"
+         >
+           <div
+-            class="emotion-11 emotion-12"
++            class="emotion-13 emotion-14"
+           >
+             R
+           </div>
+         </button>
+       </div>
+       <div
+-        class="emotion-8 emotion-9"
++        class="emotion-10 emotion-11"
+         data-active="false"
+       >
+         <button
+           aria-checked="false"
+           aria-label="J"
+-          class="emotion-10 components-toggle-group-control-option-base"
++          class="emotion-12 components-toggle-group-control-option-base"
+           data-value="jack"
+           data-wp-c16t="true"
+           data-wp-component="ToggleGroupControlOptionBase"
+@@ -447,7 +439,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+           tabindex="-1"
+         >
+           <div
+-            class="emotion-11 emotion-12"
++            class="emotion-13 emotion-14"
+           >
+             J
+           </div>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index e1520e4ac58265..8c6aa0d7cc9678 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -89,6 +89,7 @@ function ToggleGroupControlOptionBase(
+ 					as="button"
+ 					aria-label={ radioProps[ 'aria-label' ] }
+ 					className={ classes }
++					// Useful to find the `Radio` holding the selected value from outside this component
+ 					data-value={ value }
+ 					ref={ forwardedRef }
+ 					value={ value }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/README.md b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+index cf15d479235247..37e325d9c0a0e9 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+@@ -4,7 +4,7 @@
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-`ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use [`ToggleGroupControlOption`](/packages/components/src/toggle-group-control/toggle-group-control-option/README.md) component.
++`ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use the [`ToggleGroupControlOption`](/packages/components/src/toggle-group-control/toggle-group-control-option/README.md) or the [`ToggleGroupControlOptionIcon`](/packages/components/src/toggle-group-control/toggle-group-control-option-icon//README.md) components.
+ 
+ Only use this control when you know for sure the labels of items inside won't wrap. For items with longer labels, you can consider a [`SelectControl`](/packages/components/src/select-control/README.md) or a [`CustomSelectControl`](/packages/components/src/custom-select-control/README.md) component instead.
+ 
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 0ee7b7af82c4b4..6be41a610ba810 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -10,8 +10,8 @@ import useResizeAware from 'react-resize-aware';
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { useRef, useMemo } from '@wordpress/element';
+-import { useMergeRefs, useInstanceId, usePrevious } from '@wordpress/compose';
++import { Children, useMemo } from '@wordpress/element';
++import { useInstanceId, usePrevious } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -48,7 +48,6 @@ function ToggleGroupControl(
+ 		...otherProps
+ 	} = useContextSystem( props, 'ToggleGroupControl' );
+ 	const cx = useCx();
+-	const containerRef = useRef();
+ 	const [ resizeListener, sizes ] = useResizeAware();
+ 	const baseId = useInstanceId(
+ 		ToggleGroupControl,
+@@ -86,6 +85,20 @@ function ToggleGroupControl(
+ 			),
+ 		[ className, cx, isBlock ]
+ 	);
++
++	const optionSizes = useMemo< number[] | undefined >( () => {
++		return radio.items?.map( ( item ) => {
++			if ( ! item.ref.current ) return 0;
++			const { width } = getComputedStyle( item.ref.current );
++			return parseFloat( width );
++		} );
++	}, [ radio.items, radio.items.length, sizes.width ] );
++
++	let activeIndex;
++	Children.forEach( children, ( option, index ) => {
++		if ( option.props.value === radio.state ) activeIndex = index;
++	} );
++
+ 	return (
+ 		<BaseControl help={ help }>
+ 			<ToggleGroupControlContext.Provider
+@@ -104,14 +117,12 @@ function ToggleGroupControl(
+ 					as={ View }
+ 					className={ classes }
+ 					{ ...otherProps }
+-					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
++					ref={ forwardedRef }
+ 				>
+ 					{ resizeListener }
+ 					<ToggleGroupControlBackdrop
+-						{ ...radio }
+-						containerRef={ containerRef }
+-						containerWidth={ sizes.width }
+-						isAdaptiveWidth={ isAdaptiveWidth }
++						activeIndex={ activeIndex }
++						optionSizes={ optionSizes }
+ 					/>
+ 					{ children }
+ 				</RadioGroup>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+index 0bc2039d507729..83a99126cf9771 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -3,11 +3,15 @@
+  */
+ import { css } from '@emotion/react';
+ import styled from '@emotion/styled';
++// eslint-disable-next-line no-restricted-imports
++import { motion } from 'framer-motion';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { CONFIG, COLORS, reduceMotion } from '../../utils';
++import { CONFIG, COLORS } from '../../utils';
++
++export const inset = 2;
+ 
+ export const ToggleGroupControl = css`
+ 	background: ${ COLORS.ui.background };
+@@ -17,10 +21,8 @@ export const ToggleGroupControl = css`
+ 	display: inline-flex;
+ 	min-height: ${ CONFIG.controlHeight };
+ 	min-width: 0;
+-	padding: 2px;
++	padding: ${ inset }px;
+ 	position: relative;
+-	transition: transform ${ CONFIG.transitionDurationFastest } linear;
+-	${ reduceMotion( 'transition' ) }
+ 	&:hover {
+ 		border-color: ${ COLORS.ui.borderHover };
+ 	}
+@@ -38,15 +40,13 @@ export const block = css`
+ 	width: 100%;
+ `;
+ 
+-export const BackdropView = styled.div`
++export const AnimatedBackdrop = styled( motion.div )`
+ 	background: ${ COLORS.gray[ 900 ] };
+ 	border-radius: ${ CONFIG.controlBorderRadius };
+-	box-shadow: ${ CONFIG.toggleGroupControlBackdropBoxShadow };
++	box-shadow: none;
+ 	left: 0;
+ 	position: absolute;
+ 	top: 2px;
+ 	bottom: 2px;
+-	transition: transform ${ CONFIG.transitionDurationFast } ease;
+-	${ reduceMotion( 'transition' ) }
+ 	z-index: 1;
+ `;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/toggle-group-control-backdrop.tsx b/packages/components/src/toggle-group-control/toggle-group-control/toggle-group-control-backdrop.tsx
+index db53128a178c61..6e18bcb869cbf7 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/toggle-group-control-backdrop.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/toggle-group-control-backdrop.tsx
+@@ -1,86 +1,56 @@
+ /**
+- * WordPress dependencies
++ * External dependencies
+  */
+-import { useState, useEffect, memo } from '@wordpress/element';
++// eslint-disable-next-line no-restricted-imports
++import { useReducedMotion } from 'framer-motion';
+ 
+ /**
+  * Internal dependencies
+  */
+ import type { ToggleGroupControlBackdropProps } from '../types';
+-import { BackdropView } from './styles';
+-
+-function ToggleGroupControlBackdrop( {
+-	containerRef,
+-	containerWidth,
+-	isAdaptiveWidth,
+-	state,
++import { CONFIG } from '../../utils';
++import { AnimatedBackdrop, inset } from './styles';
++
++const TRANSITION_CONFIG = {
++	type: 'tween',
++	ease: [ 0.25, 0.1, 0.25, 1 ],
++	// Transition durations in the config are expressed as a string in milliseconds,
++	// while `framer-motion` needs them as integers in seconds.
++	duration: parseInt( CONFIG.transitionDurationFast, 10 ) / 1000,
++};
++
++const sumToNth = ( list: number[], toIndex: number ) => {
++	let sum = 0;
++	for ( let i = toIndex; i > 0; sum += list[ --i ] );
++	return sum;
++};
++
++export default function ToggleGroupControlBackdrop( {
++	activeIndex = -1,
++	optionSizes,
+ }: ToggleGroupControlBackdropProps ) {
+-	const [ left, setLeft ] = useState( 0 );
+-	const [ width, setWidth ] = useState( 0 );
+-	const [ canAnimate, setCanAnimate ] = useState( false );
+-	const [ renderBackdrop, setRenderBackdrop ] = useState( false );
+-
+-	useEffect( () => {
+-		const containerNode = containerRef?.current;
+-		if ( ! containerNode ) return;
+-
+-		/**
+-		 * Workaround for Reakit
+-		 */
+-		const targetNode = containerNode.querySelector(
+-			`[data-value="${ state }"]`
+-		);
+-		setRenderBackdrop( !! targetNode );
+-		if ( ! targetNode ) {
+-			return;
+-		}
+-
+-		const computeDimensions = () => {
+-			const {
+-				width: offsetWidth,
+-				x,
+-			} = targetNode.getBoundingClientRect();
+-
+-			const { x: parentX } = containerNode.getBoundingClientRect();
++	const shouldReduceMotion = useReducedMotion();
+ 
+-			const borderWidth = 1;
+-			const offsetLeft = x - parentX - borderWidth;
+-
+-			setLeft( offsetLeft );
+-			setWidth( offsetWidth );
+-		};
+-		// Fix to make the component appear as expected inside popovers.
+-		// If the targetNode width is 0 it means the element was not yet rendered we should allow
+-		// some time for the render to happen.
+-		// requestAnimationFrame instead of setTimeout with a small time does not seems to work.
+-		const dimensionsRequestId = window.setTimeout( computeDimensions, 100 );
+-
+-		let animationRequestId: number;
+-		if ( ! canAnimate ) {
+-			animationRequestId = window.requestAnimationFrame( () => {
+-				setCanAnimate( true );
+-			} );
+-		}
+-		return () => {
+-			window.clearTimeout( dimensionsRequestId );
+-			window.cancelAnimationFrame( animationRequestId );
+-		};
+-	}, [ canAnimate, containerRef, containerWidth, state, isAdaptiveWidth ] );
+-
+-	if ( ! renderBackdrop ) {
++	if ( activeIndex < 0 || ! optionSizes || ! optionSizes[ activeIndex ] ) {
+ 		return null;
+ 	}
+ 
++	const width = optionSizes[ activeIndex ];
++	const x = inset + sumToNth( optionSizes, activeIndex );
++
+ 	return (
+-		<BackdropView
++		<AnimatedBackdrop
+ 			role="presentation"
+-			style={ {
+-				transform: `translateX(${ left }px)`,
+-				transition: canAnimate ? undefined : 'none',
+-				width,
+-			} }
++			transition={
++				shouldReduceMotion
++					? {
++							...TRANSITION_CONFIG,
++							duration: 0,
++					  }
++					: TRANSITION_CONFIG
++			}
++			animate={ { width, x } }
++			initial={ false }
+ 		/>
+ 	);
+ }
+-
+-export default memo( ToggleGroupControlBackdrop );
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 39f9f87af68695..1f08e00ddc9d76 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { MutableRefObject, ReactNode, ReactText } from 'react';
++import type { ReactElement, ReactNode, ReactText } from 'react';
+ // eslint-disable-next-line no-restricted-imports
+ import type { RadioStateReturn } from 'reakit';
+ 
+@@ -10,6 +10,10 @@ import type { RadioStateReturn } from 'reakit';
+  */
+ import type { FormElementProps } from '../utils/types';
+ 
++type AllowedToggleGroupControlOptionChild =
++	| ReactElement< ToggleGroupControlOptionProps >
++	| ReactElement< ToggleGroupControlOptionIconProps >;
++
+ export type ToggleGroupControlOptionBaseProps = {
+ 	children: ReactNode;
+ 	value: ReactText;
+@@ -98,7 +102,9 @@ export type ToggleGroupControlProps = Omit<
+ 	/**
+ 	 * React children
+ 	 */
+-	children: ReactNode;
++	children:
++		| AllowedToggleGroupControlOptionChild
++		| AllowedToggleGroupControlOptionChild[];
+ 	/**
+ 	 * If this property is added, a help text will be generated
+ 	 * using help property as the content.
+@@ -116,8 +122,6 @@ export type ToggleGroupControlContextProps = RadioStateReturn & {
+ };
+ 
+ export type ToggleGroupControlBackdropProps = {
+-	containerRef: MutableRefObject< HTMLElement | undefined >;
+-	containerWidth?: number | null;
+-	isAdaptiveWidth?: boolean;
+-	state?: any;
++	activeIndex: number | undefined;
++	optionSizes: number[] | undefined;
+ };
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 8f3e044261d730..9ff34b7513b05e 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -33,7 +33,6 @@ const TOGGLE_GROUP_CONTROL_PROPS = {
+ 	toggleGroupControlBackdropBackgroundColor:
+ 		CONTROL_PROPS.controlSurfaceColor,
+ 	toggleGroupControlBackdropBorderColor: COLORS.ui.border,
+-	toggleGroupControlBackdropBoxShadow: 'transparent',
+ 	toggleGroupControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
+ };
+ 
+@@ -78,6 +77,7 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
+ 	surfaceBorderSubtleColor: 'rgba(0, 0, 0, 0.05)',
+ 	surfaceBackgroundTertiaryColor: COLORS.white,
+ 	surfaceColor: COLORS.white,
++	transitionDurationSlow: '250ms',
+ 	transitionDuration: '200ms',
+ 	transitionDurationFast: '160ms',
+ 	transitionDurationFaster: '120ms',

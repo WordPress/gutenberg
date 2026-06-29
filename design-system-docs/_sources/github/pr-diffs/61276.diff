@@ -1,0 +1,59 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3009b0a882891b..944140dec6e309 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `View`: Fix prop types ([#60919](https://github.com/WordPress/gutenberg/pull/60919)).
+ -   `Placeholder`: Unify appearance across. ([#59275](https://github.com/WordPress/gutenberg/pull/59275)).
+ -   `Toolbar`: Adjust top toolbar to use same metrics as block toolbar ([#61126](https://github.com/WordPress/gutenberg/pull/61126)).
++-   `Button`: Ensure busy styles are visible on hover ([#61276](https://github.com/WordPress/gutenberg/pull/61276)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index 456e563c8159e4..2b1c9bd5a932f2 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -174,7 +174,7 @@ export function UnforwardedButton(
+ 	const anchorProps: ComponentPropsWithoutRef< 'a' > =
+ 		Tag === 'a' ? { href, target } : {};
+ 
+-	if ( disabled && isFocusable ) {
++	if ( ( disabled && isFocusable ) || isBusy ) {
+ 		// In this case, the button will be disabled, but still focusable and
+ 		// perceivable by screen reader users.
+ 		buttonProps[ 'aria-disabled' ] = true;
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 25095d33958976..d6e01a7a779c05 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -75,7 +75,7 @@
+ 		&:disabled:active:enabled,
+ 		&[aria-disabled="true"],
+ 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
+-		&[aria-disabled="true"]:active:enabled {
++		&[aria-disabled="true"]:active:enabled:not(.is-busy) {
+ 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+ 			color: rgba($white, 0.4);
+ 			background: $components-color-accent;
+@@ -121,13 +121,17 @@
+ 		}
+ 
+ 		&:disabled,
+-		&[aria-disabled="true"],
+-		&[aria-disabled="true"]:hover {
+-			color: $gray-600;
++		&[aria-disabled="true"]:not(.is-busy),
++		&[aria-disabled="true"]:hover:not(.is-busy) {
+ 			background: transparent;
+ 			transform: none;
+ 			opacity: 1;
+ 		}
++
++		&[aria-disabled="true"],
++		&[aria-disabled="true"]:hover {
++			color: $gray-600;
++		}
+ 	}
+ 
+ 	/**

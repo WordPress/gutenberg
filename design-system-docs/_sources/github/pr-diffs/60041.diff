@@ -1,0 +1,206 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index acf5caa5de042e..b98da061176462 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -1,12 +1,14 @@
+ <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
+ 
+ ## Unreleased
+--	`Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
+--	`Placeholder` : Allow overflow but only when placeholder is selected, to fix a layout shift. `MenuGroup` ([#59857](https://github.com/WordPress/gutenberg/pull/59857)).
++
++-   `Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
++-   `Placeholder` : Allow overflow but only when placeholder is selected, to fix a layout shift. ([#59857](https://github.com/WordPress/gutenberg/pull/59857)).
+ 
+ ### Enhancements
+ 
+ -   `TextControl`: Add typings for `date`, `time` and `datetime-local` ([#59666](https://github.com/WordPress/gutenberg/pull/59666)).
++-   `Text`, `Heading`, `ItemGroup` : Update the line height from 1.2 to 1.4 ([#60041](https://github.com/WordPress/gutenberg/pull/60041)).
+ 
+ ### Deprecation
+ 
+@@ -17,12 +19,14 @@
+ -   `Button`: Keep deprecated props in type definitions ([#59913](https://github.com/WordPress/gutenberg/pull/59913)).
+ 
+ ### Bug Fix
++
+ -   `PaletteEdit`: Fix number incrementing of default names for new colors added in non-en-US locales ([#52212](https://github.com/WordPress/gutenberg/pull/52212)).
+ -   `DateTimePicker`: Change day button size back from 32px to 28px ([#59990](https://github.com/WordPress/gutenberg/pull/59990)).
+ 
+ ## 27.1.0 (2024-03-06)
+ 
+ ### Bug Fix
++
+ -   `InputControl`: Fix sample code on InputControl docs [#59517](https://github.com/WordPress/gutenberg/pull/59517)
+ -   `Tooltip`: Explicitly set system font to avoid CSS bleed ([#59307](https://github.com/WordPress/gutenberg/pull/59307)).
+ -   `HStack`, `VStack`: Stop passing invalid props to underlying element ([#59416](https://github.com/WordPress/gutenberg/pull/59416)).
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index 85aa4b82bf31ea..1c19005c806045 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -59,7 +59,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+ 
+ .emotion-11 {
+   color: #1e1e1e;
+-  line-height: 1.2;
++  line-height: 1.4;
+   margin: 0;
+   font-size: calc((13 / 13) * 13px);
+   font-weight: normal;
+@@ -330,7 +330,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+ 
+ .emotion-11 {
+   color: #1e1e1e;
+-  line-height: 1.2;
++  line-height: 1.4;
+   margin: 0;
+   font-size: calc((13 / 13) * 13px);
+   font-weight: normal;
+@@ -611,7 +611,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+ 
+ .emotion-11 {
+   color: #1e1e1e;
+-  line-height: 1.2;
++  line-height: 1.4;
+   margin: 0;
+   font-size: calc((13 / 13) * 13px);
+   font-weight: normal;
+@@ -904,7 +904,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+ 
+ .emotion-11 {
+   color: #1e1e1e;
+-  line-height: 1.2;
++  line-height: 1.4;
+   margin: 0;
+   font-size: calc((13 / 13) * 13px);
+   font-weight: normal;
+diff --git a/packages/components/src/heading/test/__snapshots__/index.tsx.snap b/packages/components/src/heading/test/__snapshots__/index.tsx.snap
+index 554446c2840cbc..847ab26657aac0 100644
+--- a/packages/components/src/heading/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/heading/test/__snapshots__/index.tsx.snap
+@@ -3,7 +3,7 @@
+ exports[`props should render correctly 1`] = `
+ .emotion-0 {
+   color: #1e1e1e;
+-  line-height: 1.2;
++  line-height: 1.4;
+   margin: 0;
+   color: #1e1e1e;
+   font-size: calc(1.95 * 13px);
+@@ -32,7 +32,7 @@ Snapshot Diff:
+ -     "font-size": "calc(1.25 * 13px)",
+ +     "font-size": "calc(1.95 * 13px)",
+       "font-weight": "600",
+-      "line-height": "1.2",
++      "line-height": "1.4",
+       "margin": "0",
+     },
+   ]
+@@ -50,7 +50,7 @@ Snapshot Diff:
+ -     "font-size": "calc(1.25 * 13px)",
+ +     "font-size": "calc(1.95 * 13px)",
+       "font-weight": "600",
+-      "line-height": "1.2",
++      "line-height": "1.4",
+       "margin": "0",
+     },
+   ]
+diff --git a/packages/components/src/item-group/test/__snapshots__/index.js.snap b/packages/components/src/item-group/test/__snapshots__/index.js.snap
+index c31562a222b6c9..f5211b7b1683fe 100644
+--- a/packages/components/src/item-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/item-group/test/__snapshots__/index.js.snap
+@@ -11,8 +11,8 @@ Snapshot Diff:
+         role="listitem"
+       >
+         <div
+--         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
+-+         class="components-item css-17haj95-View-large-item-spacedAround e19lxcc00"
++-         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
+++         class="components-item css-gg7ygh-View-large-item-spacedAround e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="Item"
+         >
+@@ -24,8 +24,8 @@ Snapshot Diff:
+         role="listitem"
+       >
+         <div
+--         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
+-+         class="components-item css-17haj95-View-large-item-spacedAround e19lxcc00"
++-         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
+++         class="components-item css-gg7ygh-View-large-item-spacedAround e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="Item"
+         >
+@@ -44,8 +44,8 @@ Snapshot Diff:
+       role="listitem"
+     >
+       <div
+--       class="components-item css-cl593w-View-medium-item e19lxcc00"
+-+       class="components-item css-1yvqxd-View-large-item e19lxcc00"
++-       class="components-item css-1lf4kzd-View-medium-item e19lxcc00"
+++       class="components-item css-1vv4aem-View-large-item e19lxcc00"
+         data-wp-c16t="true"
+         data-wp-component="Item"
+       >
+@@ -74,7 +74,7 @@ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
+ }
+ 
+ .emotion-3 {
+-  padding: calc((36px - calc(13px * 1.2) - 2px) / 2) 12px;
++  padding: calc((36px - calc(13px * 1.4) - 2px) / 2) 12px;
+   box-sizing: border-box;
+   width: 100%;
+   display: block;
+@@ -125,8 +125,8 @@ Snapshot Diff:
+         role="listitem"
+       >
+         <div
+--         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
+-+         class="components-item css-cl593w-View-medium-item e19lxcc00"
++-         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
+++         class="components-item css-1lf4kzd-View-medium-item e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="Item"
+         >
+@@ -153,8 +153,8 @@ Snapshot Diff:
+         role="listitem"
+       >
+         <div
+--         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
+-+         class="components-item css-cl593w-View-medium-item e19lxcc00"
++-         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
+++         class="components-item css-1lf4kzd-View-medium-item e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="Item"
+         >
+diff --git a/packages/components/src/text/test/__snapshots__/index.tsx.snap b/packages/components/src/text/test/__snapshots__/index.tsx.snap
+index f63684c25d8695..02ff4072eabf3d 100644
+--- a/packages/components/src/text/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/text/test/__snapshots__/index.tsx.snap
+@@ -9,7 +9,7 @@ Snapshot Diff:
+       "color": "#1e1e1e",
+       "font-size": "calc((13 / 13) * 13px)",
+       "font-weight": "normal",
+-      "line-height": "1.2",
++      "line-height": "1.4",
+       "margin": "0",
+ +     "text-align": "center",
+     },
+@@ -19,7 +19,7 @@ Snapshot Diff:
+ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = `
+ .emotion-0 {
+   color: #1e1e1e;
+-  line-height: 1.2;
++  line-height: 1.4;
+   margin: 0;
+   font-size: calc((13 / 13) * 13px);
+   font-weight: normal;
+@@ -50,7 +50,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] =
+ exports[`Text snapshot tests should render correctly 1`] = `
+ .emotion-0 {
+   color: #1e1e1e;
+-  line-height: 1.2;
++  line-height: 1.4;
+   margin: 0;
+   font-size: calc((13 / 13) * 13px);
+   font-weight: normal;

@@ -1,0 +1,305 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1e368b8baa75b8..f729172db6aa6d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -73,6 +73,7 @@
+ -   `StyleProvider`: Convert to TypeScript ([#42541](https://github.com/WordPress/gutenberg/pull/42541)).
+ -   `ComboboxControl`: Replace `keyboardEvent.keyCode` with `keyboardEvent.code`([#42569](https://github.com/WordPress/gutenberg/pull/42569)).
+ -   `ComboboxControl`: Add support for uncontrolled mode ([#42752](https://github.com/WordPress/gutenberg/pull/42752)).
++-   `useBaseField`: Convert to TypeScript ([#42622](https://github.com/WordPress/gutenberg/pull/42622)).
+ 
+ ## 19.15.0 (2022-07-13)
+ 
+@@ -85,7 +86,6 @@
+ -   `Popover`: call `getAnchorRect` callback prop even if `anchorRefFallback` has no value. ([#42329](https://github.com/WordPress/gutenberg/pull/42329)).
+ -   Fix `ToolTip` position to ensure it is always positioned relative to the first child of the ToolTip. ([#41268](https://github.com/WordPress/gutenberg/pull/41268))
+ 
+-
+ ### Enhancements
+ 
+ -   `ToggleGroupControl`: Add large size variant ([#42008](https://github.com/WordPress/gutenberg/pull/42008/)).
+diff --git a/packages/components/src/base-field/hook.js b/packages/components/src/base-field/hook.js
+deleted file mode 100644
+index afaa9e56f74b02..00000000000000
+--- a/packages/components/src/base-field/hook.js
++++ /dev/null
+@@ -1,61 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useMemo } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useContextSystem } from '../ui/context';
+-import { useControlGroupContext } from '../ui/control-group';
+-import { useFlex } from '../flex';
+-import * as styles from './styles';
+-import { useCx } from '../utils/hooks/use-cx';
+-
+-/**
+- * @typedef OwnProps
+- * @property {boolean} [hasError=false] Renders an error.
+- * @property {boolean} [disabled]       Whether the field is disabled.
+- * @property {boolean} [isInline=false] Renders as an inline element (layout).
+- * @property {boolean} [isSubtle=false] Renders a subtle variant.
+- */
+-
+-/** @typedef {import('../flex/types').FlexProps & OwnProps} Props */
+-
+-/**
+- * @param {import('../ui/context').WordPressComponentProps<Props, 'div'>} props
+- */
+-export function useBaseField( props ) {
+-	const {
+-		className,
+-		hasError = false,
+-		isInline = false,
+-		isSubtle = false,
+-		// Extract these because useFlex doesn't accept it.
+-		defaultValue,
+-		disabled,
+-		...flexProps
+-	} = useContextSystem( props, 'BaseField' );
+-
+-	const { styles: controlGroupStyles } = useControlGroupContext();
+-	const cx = useCx();
+-
+-	const classes = useMemo(
+-		() =>
+-			cx(
+-				styles.BaseField,
+-				controlGroupStyles,
+-				isSubtle && styles.subtle,
+-				hasError && styles.error,
+-				isInline && styles.inline,
+-				className
+-			),
+-		[ className, controlGroupStyles, cx, hasError, isInline, isSubtle ]
+-	);
+-
+-	return {
+-		...useFlex( { ...flexProps, className: classes } ),
+-		disabled,
+-		defaultValue,
+-	};
+-}
+diff --git a/packages/components/src/base-field/hook.ts b/packages/components/src/base-field/hook.ts
+new file mode 100644
+index 00000000000000..0e71ef2cd32a73
+--- /dev/null
++++ b/packages/components/src/base-field/hook.ts
+@@ -0,0 +1,97 @@
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem, WordPressComponentProps } from '../ui/context';
++import { useControlGroupContext } from '../ui/control-group';
++import { useFlex } from '../flex';
++import * as styles from './styles';
++import { useCx } from '../utils/hooks/use-cx';
++import type { UseBaseFieldProps } from './types';
++
++/**
++ * `useBaseField` is an internal (i.e., not exported in the `index.js`) hook
++ * used for building more complex fields like `TextField`.
++ * It provides error handling and focus styles for field components.
++ * It does _not_ handle layout of the component aside from wrapping the field in a `Flex` wrapper.
++ *
++ * ```js
++ * function useExampleField( props ) {
++ * 	const {
++ * 		as = 'input',
++ * 		...baseProps,
++ * 	} = useBaseField( props );
++ *
++ * 	const inputProps = {
++ * 		as,
++ * 		// more cool stuff here
++ * 	}
++ *
++ * 	return { inputProps, ...baseProps };
++ * }
++ *
++ * function ExampleField( props, forwardRef ) {
++ * 	const {
++ * 		preFix,
++ * 		affix,
++ * 		disabled,
++ * 		inputProps,
++ * 		...baseProps
++ * 	} = useExampleField( props );
++ *
++ * 	return (
++ * 		<View { ...baseProps } disabled={ disabled }>
++ * 			{preFix}
++ * 			<View
++ * 				autocomplete="off"
++ * 				{ ...inputProps }
++ * 				disabled={ disabled }
++ * 			/>
++ * 			{affix}
++ * 		</View>
++ * 	);
++ * }
++ * ```
++ *
++ * @param {WordPressComponentProps< UseBaseFieldProps, 'div' >} props
++ */
++export function useBaseField(
++	props: WordPressComponentProps< UseBaseFieldProps, 'div' >
++) {
++	const {
++		className,
++		hasError = false,
++		isInline = false,
++		isSubtle = false,
++		// Extract these because useFlex doesn't accept it.
++		defaultValue,
++		disabled,
++		...flexProps
++	} = useContextSystem( props, 'BaseField' );
++
++	const { styles: controlGroupStyles } = useControlGroupContext();
++	const cx = useCx();
++
++	const classes = useMemo(
++		() =>
++			cx(
++				styles.BaseField,
++				controlGroupStyles,
++				isSubtle && styles.subtle,
++				hasError && styles.error,
++				isInline && styles.inline,
++				className
++			),
++		[ className, controlGroupStyles, cx, hasError, isInline, isSubtle ]
++	);
++
++	return {
++		...useFlex( { children: null, ...flexProps, className: classes } ),
++		disabled,
++		defaultValue,
++	};
++}
+diff --git a/packages/components/src/base-field/index.js b/packages/components/src/base-field/index.ts
+similarity index 100%
+rename from packages/components/src/base-field/index.js
+rename to packages/components/src/base-field/index.ts
+diff --git a/packages/components/src/base-field/styles.js b/packages/components/src/base-field/styles.ts
+similarity index 100%
+rename from packages/components/src/base-field/styles.js
+rename to packages/components/src/base-field/styles.ts
+diff --git a/packages/components/src/base-field/test/__snapshots__/index.js.snap b/packages/components/src/base-field/test/__snapshots__/index.tsx.snap
+similarity index 100%
+rename from packages/components/src/base-field/test/__snapshots__/index.js.snap
+rename to packages/components/src/base-field/test/__snapshots__/index.tsx.snap
+diff --git a/packages/components/src/base-field/test/index.js b/packages/components/src/base-field/test/index.tsx
+similarity index 69%
+rename from packages/components/src/base-field/test/index.js
+rename to packages/components/src/base-field/test/index.tsx
+index b5ed5ef4b05fa4..b380dbe6a21c6f 100644
+--- a/packages/components/src/base-field/test/index.js
++++ b/packages/components/src/base-field/test/index.tsx
+@@ -8,13 +8,17 @@ import { render } from '@testing-library/react';
+  */
+ import { useBaseField } from '../index';
+ import { View } from '../../view';
++import type { WordPressComponentProps } from '../../ui/context';
++import type { UseBaseFieldProps } from '../types';
+ 
+-const TestField = ( props ) => {
++const TestField = (
++	props: WordPressComponentProps< UseBaseFieldProps, 'div' >
++) => {
+ 	return <View { ...useBaseField( props ) } />;
+ };
+ 
+ describe( 'base field', () => {
+-	let base;
++	let base: HTMLElement;
+ 
+ 	beforeEach( () => {
+ 		base = render( <TestField /> ).container;
+@@ -28,21 +32,21 @@ describe( 'base field', () => {
+ 		it( 'should render error styles', () => {
+ 			const { container } = render( <TestField hasError /> );
+ 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-				base.firstChild
++				base.firstElementChild
+ 			);
+ 		} );
+ 
+ 		it( 'should render inline styles', () => {
+ 			const { container } = render( <TestField isInline /> );
+ 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-				base.firstChild
++				base.firstElementChild
+ 			);
+ 		} );
+ 
+ 		it( 'should render subtle styles', () => {
+ 			const { container } = render( <TestField isSubtle /> );
+ 			expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-				base.firstChild
++				base.firstElementChild
+ 			);
+ 		} );
+ 	} );
+@@ -52,10 +56,18 @@ describe( 'base field', () => {
+ 			// wrap this in a component so that `useContext` calls don't fail inside the hook
+ 			// assertions will still run as normal when we `render` the component :)
+ 			const Component = () => {
+-				const disabled = Symbol.for( 'disabled' );
+-				const defaultValue = Symbol.for( 'defaultValue' );
++				let disabled = true;
++				let defaultValue = 'test';
+ 
+-				const result = useBaseField( { disabled, defaultValue } );
++				let result = useBaseField( { disabled, defaultValue } );
++
++				expect( result.disabled ).toBe( disabled );
++				expect( result.defaultValue ).toBe( defaultValue );
++
++				disabled = false;
++				defaultValue = 'something-else';
++
++				result = useBaseField( { disabled, defaultValue } );
+ 
+ 				expect( result.disabled ).toBe( disabled );
+ 				expect( result.defaultValue ).toBe( defaultValue );
+diff --git a/packages/components/src/base-field/types.ts b/packages/components/src/base-field/types.ts
+new file mode 100644
+index 00000000000000..f190e0e8cdcddb
+--- /dev/null
++++ b/packages/components/src/base-field/types.ts
+@@ -0,0 +1,23 @@
++/**
++ * Internal dependencies
++ */
++import type { FlexProps } from '../flex/types';
++
++export interface UseBaseFieldProps extends Partial< FlexProps > {
++	/**
++	 * Renders an error.
++	 */
++	hasError?: boolean;
++	/**
++	 * Whether the field is disabled.
++	 */
++	disabled?: boolean;
++	/**
++	 * Renders as an inline element (layout).
++	 */
++	isInline?: boolean;
++	/**
++	 * Renders a subtle variant.
++	 */
++	isSubtle?: boolean;
++}

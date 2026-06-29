@@ -1,0 +1,614 @@
+diff --git a/storybook/preview.js b/storybook/preview.js
+index a7c9aa0c085fc1..20a6f39df75e1e 100644
+--- a/storybook/preview.js
++++ b/storybook/preview.js
+@@ -124,6 +124,13 @@ export const parameters = {
+ 		storySort: {
+ 			order: [
+ 				'Docs',
++				'Contributing', 
++        [
++	        'Overview',
++	        'Get Ready to Contribute',
++	        'Documentation',
++	        'Components'
++        ],
+ 				'Playground',
+ 				'BlockEditor',
+ 				'Components',
+diff --git a/storybook/stories/contributing/contributing-components.txt b/storybook/stories/contributing/contributing-components.txt
+new file mode 100644
+index 00000000000000..84c24fb362084e
+--- /dev/null
++++ b/storybook/stories/contributing/contributing-components.txt
+@@ -0,0 +1,345 @@
++import { Meta } from '@storybook/addon-docs';
++
++<Meta title="Contributing/Components" />
++
++# Contribute to components
++
++At WordPress, component contributions are major changes and [need to be backward compatible](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/). They require at least one formal review from a designer.
++
++*Is this your first contribution? You’ll first need to follow <Link story="Contributing/Get Ready to Contribute">a couple of steps to get started</Link>.*
++
++## Quick Links
++- [Creating a New Component](#creating-a-new-component)
++- [Extending Existing Components](#extending-existing-components)
++- [Code Standards and Best Practices](#code-standards-and-best-practices)
++- [Testing and Storybook](#testing-and-storybook)
++- [Documentation Guidelines](#documentation-guidelines)
++
++### Creating a New Component
++
++There are 5 steps to add a new component to WPDS.
++
++Step 1: [Do we need this component?](#step-1)
++Step 2: [Open a GitHub issue](#step-2) 
++Step 3: [Implement your change](#step-3) 
++Step 4: [Refinement](#step-4) 
++Step 5: [Publish and Maintain](#step-5) 
++
++#### Step 1: Do we need this component? {#step-1}
++
++It’s important to ask yourself this question before starting your contribution. Our library should include components that are generic and flexible enough to work across various products. It should include what’s shared across products and leave out what’s not.
++
++A great first step is to share your idea with our community to see if there’s a need for your component. You can leave a comment in the [Design Systems Figma Library](https://www.figma.com/design/ficiK5ADsOuiCromUZam1E/WordPress-Design-System-(Community)?node-id=13482-72792&t=ofEJnkdwKdS5mhGX-1), or drop a question in #design-systems on Slack, where people will be happy to help.
++
++Some more questions you can ask yourself if you’re thinking of creating a new component:
++
++- Could it be used by other products or plugins?  
++- Does it overlap functionally or visually with any existing components? Can we use existing components to implement an alternative solution?  
++- How much effort will be required to create and maintain it?  
++- Is there a clear purpose for it?  
++- Can we introduce this change without causing breaking changes? Will we be able to keep this change and iterate on it in the future without causing future breaking changes?
++
++This flowchart can help determine if a new component is necessary:
++
++ADD IMAGE
++
++#### Step 2: Open a GitHub issue {#step-2}
++
++If you’ve decided you want to create a new component, you’ll need to open a GitHub issue on Project Gutenberg. This is where we’ll be able to discuss the proposed changes and track progress.
++
++[Click here to open a new issue](https://github.com/WordPress/gutenberg/issues/new?labels=Design+System&body=Then%2C+write+a+detailed+description%3A%0D%0A%0D%0A-+Explain+your+rationale+for+adding+this+component%0D%0A-+Detail+the+intended+behavior%0D%0A-+Clarify+if+it%E2%80%99s+a+new+component+or+a+variation+of+an+existing+one%0D%0A-+Include+a+basic+mockup+%28optional%29%0D%0A-+Include+inspiration+from+other+products+%28optional%29).
++
++Then, write a detailed description:
++
++- Explain your rationale for adding this component  
++- Detail the intended behavior  
++- Clarify if it’s a new component or a variation of an existing one  
++- Include a basic mockup (optional)  
++- Include inspiration from other products (optional)  
++- Tag the [@WordPress/gutenberg-components](https://github.com/orgs/WordPress/teams/gutenberg-components) and [@WordPress/gutenberg-design](https://github.com/orgs/WordPress/teams/gutenberg-design) GitHub groups
++
++Add the “Design System” label to correctly categorize your work. Also, consider adding other labels depending on your needs, like Needs Design, Needs Copy Review, Needs Dev, or Needs Accessibility Feedback.
++
++After opening your issue, reviewers will start a discussion in the comments to see if it's an appropriate addition, or if there's overlap with an existing component.
++
++It’s encouraged to open an issue even if you can’t complete every part yourself, as someone in the community might be able to pick up where you left off.
++
++#### Step 3: Implement your change {#step-3}
++
++Once the community has discussed and approved your change, it’s time to implement it.
++
++Remember, it’s unlikely that everything will be done by one person. Contribute where you can, and others will help.
++
++**Write a detailed rationale**  
++Explain how your component will add value to WPDS and the greater product ecosystem. Make sure to describe how it works and how someone can interact with it.
++
++**Draft documentation**  
++New components need development, design, and accessibility guidelines. If your change adds additional behavior or expands a component’s features, those changes will need to be documented as well.
++
++Read through existing component documentation for inspiration. Start with a rough draft, and the community will help polish documentation.
++
++**Provide working code**  
++The component or enhancement must be built in React. For more information, see our [developer contribution guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/README.md) and, specifically for the @wordpress/components package, [the package’s contributing guidelines](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/CONTRIBUTING.md).
++
++**Create a design spec**  
++You’ll need to share sizing and styling annotations for all aspects of the component, so a developer has everything they need to create the design in code. Figma’s [Dev Mode](https://help.figma.com/hc/en-us/articles/15023124644247-Guide-to-Dev-Mode) can do this automatically for you.
++
++#### Step 4: Refinement {#step-4}
++
++You’re almost ready to publish your component, but you’ll still need to spend some time finetuning it. You can do the following:
++
++- First, clearly define and agree on which features will be included in the component.  
++- Then, reduce the scope by removing features that lack consensus.  
++- When that’s done, you’ll have to do quality assurance to ensure that your contribution adheres to the system standards.
++
++**Quality assurance**  
++Every component should be tested for quality during its development, rather than after it’s published.
++
++Make sure to test the following aspects of your component:
++
++- Accessibility  
++- Correct semantics  
++- Key user interactions
++
++**Accessibility**  
++Has your design and implementation accounted for the standards set by the [WordPress accessibility guidelines](https://make.wordpress.org/accessibility/handbook/which-questions-should-you-ask/)?
++
++#### Accessibility Standards
++
++Use the [WordPress Accessibility Guidelines](https://make.wordpress.org/accessibility/handbook/) as your benchmark and ensure components meet ARIA standards, work with screen readers, and are keyboard-navigable.
++
++Important: Add the “Needs Accessibility Feedback” label to your GitHub issue early to get a review from the Accessibility team, as it can help you design inclusively from the start.
++
++**Visual quality**  
++Does it apply visual styles correctly? Color, typography, icons, space, borders need to use appropriate variables and follow the [WordPress Style Guide](https://make.wordpress.org/docs/style-guide/). If you can’t find the guidance you’re looking for, note that in your issue.
++
++Important: Add the “Needs Design Feedback” label to your issue to get a review from the Design team.
++
++**Documentation**  
++Does it have proper documentation for development, design, and accessibility?
++
++**States and variations**  
++Does it cover all necessary variations (primary, secondary, dense, etc) and states (default, hover, active, disabled, loading, etc.), within your intended scope?
++
++**Functionality**  
++Does it function as expected?
++
++**Mobile**  
++Is it designed mobile-first, does it responsively adapt to different screen sizes, and do all touch interactions work as expected?
++
++**Content resilience**  
++Is each dynamic word or image element resilient to too much, too little, and no content at all? How long can labels be, and what happens when you run out of space?
++
++**Composability**  
++Does it fit well when placed next to or layered with other components to form a larger composition?
++
++It’s recommended to break down your component into modular subcomponents that can be composed together as needed. On the other hand, monolithic components are less flexible and harder to customize.
++
++**Browser support**  
++Has its visual quality and accuracy been checked across Safari, Chrome, Firefox, Internet Explorer, and [other browsers we support](https://github.com/WordPress/gutenberg/blob/HEAD/packages/browserslist-config/index.js)?
++
++#### Step 5: Publish and Maintain {#step-5}
++
++Once your component has been fully refined, tested, and approved, it’s time to finalize its integration and ensure the broader community can benefit from it.
++
++**Merge and Release**  
++After all feedback is addressed and approvals are in place, merge your pull request. Your component is now part of the WordPress Design System.
++
++**Communicate Changes**  
++If you’ve introduced significant features, fixed critical issues, or made changes that might affect other contributors, consider posting in #design-systems on Slack or writing a dev note. This keeps the community informed and helps maintain ecosystem stability.
++
++**Ongoing Maintenance**  
++Components aren’t “set and forget.” Over time, standards, accessibility requirements, and design patterns may evolve. Stay open to feedback and consider revisiting your component periodically to ensure it still meets current needs without introducing breaking changes.
++
++**Backward Compatibility and Deprecation**  
++If your component needs updates in the future, plan changes carefully. Introduce new features in a backward-compatible way, and if you must remove or alter existing APIs, follow our guidelines for soft-deprecation and communicate timelines clearly.
++
++By completing these steps, you ensure your component remains robust, useful, and aligned with the WordPress Design System’s mission to deliver accessible, consistent, and forward-looking UI solutions.
++
++## Extending Existing Components
++
++### Compatibility
++
++The `@wordpress/components` package includes components that are relied upon by many developers across different projects. It is, therefore, very important to avoid introducing breaking changes.
++
++In these situations, one possible approach is to "soft-deprecate" a given legacy API. This is achieved by:
++
++1. Removing traces of the API from the docs, while still supporting it in code.  
++2. Updating all places in Gutenberg that use that API.  
++3. Adding deprecation warnings (only after the previous point is completed).
++
++When adding new components or new props to existing components, consider creating a private or experimental version until the changes are stable enough to expose publicly.
++
++Learn more:  
++- [How to preserve backward compatibility for a React Component](https://developer.wordpress.org/block-editor/contributors/code/backward-compatibility/#how-to-preserve-backward-compatibility-for-a-react-component)  
++- [Experimental and Unstable APIs](https://developer.wordpress.org/block-editor/contributors/code/coding-guidelines/#legacy-experimental-apis-plugin-only-apis-and-private-apis)
++
++## Code Standards and Best Practices
++
++### Compound Components
++
++When creating components that render a list of subcomponents, prefer the compound components pattern over passing arrays of items. 
++
++Compound Components: Do's and Don'ts
++
++Do:
++```jsx
++<List>
++  <List.Item value="Item 1" />
++  <List.Item value="Item 2" />
++</List>
++```
++
++Don’t:
++```jsx
++<List
++  items={[ { value: 'Item 1' }, { value: 'Item 2' } ]}
++/>
++```
++
++When creating components that render a list of subcomponents, always prefer the **compound components** pattern over passing arrays of items. This pattern ensures better flexibility and readability while keeping the API consistent.
++
++Do:
++- Use React Context to manage state for subcomponents.
++- Ensure subcomponents are composable and reusable.
++
++Don’t:
++- Use `React.Children.map` or `React.cloneElement` to pass props to children. This can lead to complex and error-prone code.
++
++### Performance Considerations
++
++- Optimize component rendering by memoizing expensive calculations or avoiding unnecessary re-renders.
++- Use React's `useMemo` or `React.memo` for performance-critical subcomponents.
++- Test components for responsiveness under varying content loads and browser environments.
++
++### Components & Hooks
++
++Extract the logic into a custom hook (`hook.ts`) and use it inside your component (`component.tsx`). This approach enables reusability and simpler composition of complex functionality.
++
++### Naming Conventions
++
++- Boolean props should be prefixed with `is*` or `has*` (e.g., `isChecked`, `hasBorder`).  
++- Event callback props should be prefixed with `on*` (e.g., `onChange`).  
++- Use `Component.SubComponent` naming for compound components.  
++- Set `displayName` for subcomponents to improve dev tooling support.
++
++### TypeScript
++
++We strongly encourage using TypeScript for all new components. Document your props using JSDoc comments and `@default` values. Avoid `any` and prefer explicit types or `unknown`. When forwarding props, consider `WordPressComponentProps`.
++
++```ts
++type NumberControlProps = Omit<
++	InputControlProps,
++	'isDragEnabled' | 'min' | 'max'
++> & {
++	/* Additional props specific to NumberControl */
++};
++```
++
++### Styling (with Emotion) and Deprecating Styles
++
++All new components should be styled using Emotion. Use the `useCx` hook instead of `cx`. When changing styles of a stable component, consider using a feature flag (`__next*` prop) and `deprecated()` warnings. After the grace period, remove the deprecated styles.
++
++#### Deprecating Styles or APIs
++
++When changing styles or APIs, avoid introducing breaking changes. Use feature flags to allow opt-in for new behavior while preserving the old.
++
++**Example**:
++
++```jsx
++// Deprecation in styles
++function MyComponent({ __nextHasNewStyle = false }) {
++  if (!__nextHasNewStyle) {
++    deprecated(
++      'Old styles for MyComponent',
++      {
++        since: '1.0',
++        version: '2.0',
++        hint: 'Set `__nextHasNewStyle` to true to opt into the new behavior.',
++      }
++    );
++  }
++
++  return <div className={__nextHasNewStyle ? 'new-style' : 'old-style'} />;
++}
++```
++
++* Use clear warnings to inform developers of upcoming changes.
++* Define a clear timeline for transitioning to new styles or APIs.
++* Update documentation and examples to encourage adoption of the new standard.
++
++### Context System
++
++Use the `ContextSystemProvider` to provide values to components and `useContextSystem` to read them. Connect components to the context system with `contextConnect` so that props can be adapted automatically depending on the rendering context.
++
++### Folder Structure
++
++A recommended folder structure for a component:
++
++component-name/ ├── stories │ └── index.js ├── test │ └── index.js ├── component.tsx ├── context.ts ├── hook.ts ├── index.ts ├── README.md ├── styles.ts └── types.ts\
++
++For component families, each subcomponent gets its own folder, with shared code at the root.
++
++### Component Versioning
++
++If you need to introduce a radically new version of a component:
++- Attempt to keep the same API surface and update the internal implementation.
++- If not possible, create a new component (e.g., `ComponentV2`) and maintain backward compatibility, deprecating the old component over time.
++
++#### Versioning Approaches
++
++- **Swap the Implementation**: Keep the API surface consistent while updating the internal implementation. Ideal for non-breaking changes.
++- **Create a New Version**: Use this when breaking changes are unavoidable. For example, name the new component `ComponentV2` and maintain backward compatibility for the old version.
++
++**Example**:
++
++```jsx
++// LegacyComponent.js
++function LegacyComponent(props) {
++  const newProps = mapLegacyProps(props);
++  return <NewComponent {...newProps} />;
++}
++
++// NewComponent.js
++function NewComponent(props) {
++  return <div>{props.children}</div>;
++}
++```
++
++* Use clear naming conventions (ComponentV2) for clarity.
++
++## Testing and Storybook
++
++### Unit Tests
++
++Follow the [JavaScript Testing Overview docs](https://developer.wordpress.org/block-editor/contributors/code/testing-overview/). Write tests for functionality and accessibility. Use snapshot tests sparingly. Ensure all tests pass before merging changes.
++
++### Storybook
++
++Use Storybook to visualize and test your component’s states and variations in isolation. Provide multiple stories and use Storybook Controls to interactively modify props. Start Storybook locally with `npm run storybook:dev` or view the latest components at [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/).
++
++#### Storybook Controls
++
++Use Storybook Controls to make component props interactively adjustable in the Storybook interface.
++
++**Example**:
++
++```jsx
++export const Default = (args) => <Button {...args} />;
++Default.args = {
++  text: 'Click me',
++  isPrimary: true,
++};
++```
++
++## Documentation Guidelines
++
++Each component should have a `README.md` that includes:
++
++- A description and rationale
++- Usage examples
++- Prop documentation (with defaults and required flags)
++- Accessibility and responsive behavior guidance
++- Any known limitations
++
++Add JSDoc comments to your component code to align with the README. Avoid `@example` in JSDoc, as it may not be recognized by Storybook docgen. Keep documentation updated as your component evolves.
+diff --git a/storybook/stories/contributing/contributing-documentation.txt b/storybook/stories/contributing/contributing-documentation.txt
+new file mode 100644
+index 00000000000000..931becdb1d1a01
+--- /dev/null
++++ b/storybook/stories/contributing/contributing-documentation.txt
+@@ -0,0 +1,77 @@
++import { Meta } from '@storybook/addon-docs';
++
++<Meta title="Contributing/Documentation">
++
++This website is composed of articles with guidance on how we create products, which we call documentation.
++
++Our components and patterns need detailed documentation for usage, style, code, and accessibility — that way everyone can easily use them to do great work.
++
++We’d love for you to help us improve our documentation. It’s easy to get started.
++
++*Is this your first contribution? You’ll first need to follow <Link story="Contributing/Get Ready to Contribute">a couple of steps to get started</Link>.*
++
++### **Small copy changes**
++
++If you see a spelling, punctuation, or grammatical error anywhere in the documentation, you can help fix it. 
++
++You can suggest one or multiple small copy changes in a GitHub issue, which will then be approved and added by the community.
++
++[Click here to open a new issue](https://github.com/WordPress/gutenberg/issues/new?labels=Design+System&body=Then%2C+write+a+detailed+description%3A%0D%0A%0D%0A-+Explain+your+rationale+for+adding+this+component%0D%0A-+Detail+the+intended+behavior%0D%0A-+Clarify+if+it%E2%80%99s+a+new+component+of+a+variation+of+an+existing+one%0D%0A-+Include+a+basic+mockup+%28optional%29%0D%0A-+Include+inspiration+from+other+products+%28optional%29). Then, write a detailed description that explains the change(s) you’re making to the writing.
++
++After opening your issue, reviewers will start a discussion in the comments to see if it's an appropriate change. When it’s approved, the community will take care of making the change — unless you want to create a PR yourself.
++
++### **Adding new pages**
++
++If you’re adding a new component or pattern to the design system, or are adding other kinds of information, you’ll need to create a new page.
++
++Creating a new page takes more work and will need feedback from the community. That’s why you’ll need to open an issue on GitHub to track the progress of your new page.
++
++#### **Step 1: Open a GitHub issue**
++
++If you want to create a new page, you’ll need to open a GitHub issue on Project Gutenberg. This is where the discussion of the proposed changes and progress tracking will happen.
++
++It’s encouraged to open an issue even if you can’t complete every part yourself, as someone in the community might be able to pick up where you left off.
++
++[Click here to open a new issue](https://github.com/WordPress/gutenberg/issues/new?labels=Design+System&body=Then%2C+write+a+detailed+description%3A%0D%0A%0D%0A-+Explain+your+rationale+for+adding+this+component%0D%0A-+Detail+the+intended+behavior%0D%0A-+Clarify+if+it%E2%80%99s+a+new+component+of+a+variation+of+an+existing+one%0D%0A-+Include+a+basic+mockup+%28optional%29%0D%0A-+Include+inspiration+from+other+products+%28optional%29).
++
++Then, write a detailed description:
++
++* Explain your rationale for adding this page  
++* Describe why this content hasn’t been covered yet in the design system
++
++After opening your issue, reviewers will start a discussion in the comments to see if it's an appropriate addition, or if there's overlap with an existing page. They will also discuss what would be the best place for your place to live in the design system.
++
++#### **Step 2: Write, share, refine**
++
++Once the community approves your idea, it’s time to start writing. We recommend doing this in [Google Docs](http://docs.google.com), as it’s easy to leave suggestions or comments on your writing.
++
++Make sure to [use Markdown in your writing](https://www.markdownguide.org/cheat-sheet/) so it can easily be moved to the documentation website when it’s done. To enable Markdown in Google Docs, click Tools \> Preferences \> Enable Markdown.
++
++It’s important that your writing aligns with the [Copy Guidelines](https://developer.wordpress.org/block-editor/contributors/documentation/copy-guide/). You’ll find guidance on lots of topics related to how we write at WordPress — here are some that might be of particular interest:
++
++[Style, voice, and tone](https://make.wordpress.org/docs/style-guide/general-guidelines/style-voice-tone/)  
++[Language and grammar](https://make.wordpress.org/docs/style-guide/language-grammar/)  
++[Accessibility](https://make.wordpress.org/docs/style-guide/general-guidelines/accessibility/)  
++[Punctuation](https://make.wordpress.org/docs/style-guide/punctuation/)
++
++You can share your progress in an issue as early as a basic outline. 
++
++It’s helpful to share your draft early — that way you can collect feedback and catch errors at an earlier stage, which will increase the quality of your contribution. 
++
++Once you’ve received feedback, refine your writing, then keep sharing and refining. When you and the reviewers are happy with it, you can add it to the website with a pull request.
++
++**Step 3: Create a pull request**
++
++Follow the following steps to fork and clone the Gutenberg repository, and create a pull request. 
++
++[Create a pull request](https://developer.wordpress.org/block-editor/contributors/code/git-workflow/#git-workflow-walkthrough)
++
++When your PR is live, you can link it to your issue by selecting it in the sidebar under ‘development’. This makes it easy to keep track of both simultaneously.
++
++If you need help with this part, feel free to reach out to us in #design-systems on Slack, where we’ll be happy to help you get your PR live.
++
++**Step 4: Work towards merging your pull request**
++
++Collaborate with the community to integrate feedback you’ve received from reviewers, fix any issues that have been brought to your attention, and refine the writing for your page.
++
++Once your page is done, and you’ve got the green light from the reviewers of your issue, you’ll be able to merge your pull request to add your page to the design system.
+\ No newline at end of file
+diff --git a/storybook/stories/contributing/contributing-get-ready.txt b/storybook/stories/contributing/contributing-get-ready.txt
+new file mode 100644
+index 00000000000000..11043dec607999
+--- /dev/null
++++ b/storybook/stories/contributing/contributing-get-ready.txt
+@@ -0,0 +1,87 @@
++import { Meta } from '@storybook/addon-docs';
++
++<Meta title="Contributing/Get Ready to Contribute" />
++
++Ready to start contributing to WPDS? There are a couple of steps you’ll need to take to get set up — here's how.
++
++We understand GitHub might seem complicated if you’ve never used it before. Don’t worry — we’re happy to help you out with any questions in #design-systems on Slack.
++
++[Step 1: Get GitHub access](#step-1:-get-github-access)  
++[Step 2: Link your GitHub and WP.org accounts](#step-2:-link-your-github-and-wp.org-accounts)  
++[Step 3: Learn about the contribution process](#step-3:-learn-about-the-contribution-process)  
++[Step 4: Create your first PR](#step-4:-create-your-first-pr)
++
++#### **Step 1: Get GitHub access** {#step-1:-get-github-access}
++
++The WordPress design system lives [on GitHub in the Gutenberg repository](https://github.com/WordPress/gutenberg) — it’s where everyone collaborates on the code and documentation, and where your contributions will be started, tracked, and finished.
++
++You’ll need a GitHub account to get started. If you don’t have one yet, [please sign up here](https://github.com/join).
++
++#### **Step 2: Link your GitHub and WP.org accounts** {#step-2:-link-your-github-and-wp.org-accounts}
++
++Then, you’ll need to connect your GitHub and WordPress.org accounts to make sure your contributions are correctly attributed. It’ll take just two minutes if you follow these steps:
++
++[Connect GitHub and WP.org accounts](https://make.wordpress.org/core/handbook/tutorials/linking-your-github-and-w-org-profiles/)
++
++#### **Step 3: Learn about the contribution process** {#step-3:-learn-about-the-contribution-process}
++
++In order to make effective contributions to WPDS, it’s important to know the basics of our contribution process. While we’ll take you through a step-by-step process depending on your contribution, we’ll explain the basics below.  
++   
++Depending on the contribution you’re making to the design system, you’ll either need to create an issue, or both an issue and a pull request (PR). 
++
++**What’s an issue?**
++
++Issues are the GitHub tool where you can keep track of changes to the WordPress design system. You can find [all open issues on the Gutenberg repository](https://github.com/WordPress/gutenberg/issues).
++
++Smaller changes, like fixing a typo, don’t require you to create a PR yourself, and the implementation can be handled by the community. In this case, you can just create a new issue and add a clear description of the work you’re doing.
++
++Make sure to add the [Design System ](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22Design%20System%22)label when creating an issue, and consider adding one of the following labels when needed:
++
++[Needs Design](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22Needs%20Design%22) — Needs design efforts  
++Needs Copy Review — Needs review of user-facing copy (language, phrasing)  
++[Needs Dev ](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue%20state%3Aopen%20%22Needs%20Dev%22%20)— Ready for, and needs developer efforts  
++[Needs Accessibility Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Accessibility%20Feedback) — Needs input from accessibility
++
++Reviewers will chime in to discuss if your change is worth adding to the design system. When it’s accepted, someone will gladly help you with pushing the change.
++
++**What’s a pull request?**
++
++Pull requests are how you propose changes to the design system on GitHub. You can find [all open PRs on the Gutenberg repository](https://github.com/WordPress/gutenberg/pulls).
++
++If you’re making a bigger change to the design system, you’re expected to make the change to the design system yourself. Think of documenting a new pattern, adding a component, or overhauling an existing component.
++
++First, you create an issue to track all work related to your change, with a clear description and the right tags. Reviewers will chime in to decide if your change is worth pursuing, and once it’s been greenlit, you can start working on it.
++
++When you’re ready to share what you’ve been working on, you can add a PR to your issue to show your proposed changes.
++
++#### **Step 4: Create your first PR** {#step-4:-create-your-first-pr}
++
++Creating a PR takes a couple of steps that involve copying the Gutenberg repository to your device.
++
++You can find a step-by-step explanation [on this page](https://developer.wordpress.org/block-editor/contributors/code/git-workflow/#git-workflow-walkthrough). If you’re running into any issues, let us know in #design-systems on Slack.
++
++The full process is as follows:
++
++**Fork the Gutenberg repository**  
++Create your own online copy of the Gutenberg project by “forking” it. This makes sure you can safely experiment without affecting the main codebase.
++
++**Clone the forked repository**  
++Download your forked copy onto your computer. This allows you to work on the code locally.
++
++**Create a new branch**  
++Start a separate branch for your changes to keep your work organized and updates manageable.
++
++**Make code changes**  
++Implement your improvements or fixes directly in the code files.
++
++**Confirm tests pass**  
++Run the project’s automated tests to ensure your changes don’t break existing functionality.
++
++**Commit the code changes within the newly created branch**  
++Save your changes locally by creating a commit that describes what you’ve done.
++
++**Push the branch to the forked repository**  
++Upload your committed changes back to your fork on GitHub, getting them ready for review.
++
++**Submit a pull request to the Gutenberg repository**  
++Request that your changes be merged into the official project, so maintainers can review and approve your work.
+\ No newline at end of file
+diff --git a/storybook/stories/contributing/contributing-overview.txt b/storybook/stories/contributing/contributing-overview.txt
+new file mode 100644
+index 00000000000000..0931a79c467d7b
+--- /dev/null
++++ b/storybook/stories/contributing/contributing-overview.txt
+@@ -0,0 +1,48 @@
++import { Meta } from '@storybook/addon-docs';
++
++<Meta title="Contributing/Overview" />
++
++A design system is never finished. That’s why all designers, developers, and writers from across the world are invited to help improve the WordPress Design System. This documentation is designed to help you get started quickly and with confidence. 
++
++### **Get connected**
++
++In order to stay up to date on all things design systems at WordPress, join the #design-systems channel on Slack.
++It’s a great place to ask what could be your first contribution, and we’ll be happy to help you make it happen.
++
++Also feel free to ask questions, join discussions, or just read along.
++
++For anything specific to the code implementation of UI components (and the @wordpress/components package), join the #components channel.
++
++### **Get ready to contribute**
++
++There are a couple of steps before you can start contributing to the design system. You’ll need access to GitHub, for example, where all contributions to our design system are started, followed, and finished.
++
++<Link story="Contributing/Get Ready to Contribute">Follow our guide to get ready to contribute</Link>
++
++**How can you contribute?**
++
++You're encouraged to make all kinds of contributions, no matter how big or small. Below you’ll find some ideas.
++
++**Documentation**
++
++Creating a new page, adding an illustration, expanding existing content, or just fixing a typo.
++
++<Link story="Contributing/Documentation">Get Started</Link>
++
++**Components**
++
++Proposing a new component, updating an existing one, or adding new variants.
++
++<Link story="Contributing/Components">Get Started</Link>
++
++**Icons**
++
++Adding a new icon, updating an existing one, or adding new variants.
++
++Coming soon
++
++**Patterns**
++
++Proposing a new pattern for a specific use case or improving existing ones.
++
++Coming soon
+\ No newline at end of file
+diff --git a/storybook/stories/docs/components/contributing.mdx b/storybook/stories/docs/components/contributing.mdx
+deleted file mode 100644
+index 7593cdd97a810e..00000000000000
+--- a/storybook/stories/docs/components/contributing.mdx
++++ /dev/null
+@@ -1,6 +0,0 @@
+-import { Meta, Markdown } from '@storybook/blocks';
+-import Contributing from '@wordpress/components/CONTRIBUTING.md?raw';
+-
+-<Meta title="Components/Contributing Guidelines" />
+-
+-<Markdown>{Contributing}</Markdown>

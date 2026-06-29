@@ -1,0 +1,39 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 205749b3336bb5..fa2e6ac57d1769 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,7 +7,9 @@
+ -   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+ 
+ ### Enhancements
++
+ -   `PaletteEdit`: Use consistent spacing and metrics. ([#61368](https://github.com/WordPress/gutenberg/pull/61368)).
++-   `FormTokenField`: Hide label when not defined ([#61336](https://github.com/WordPress/gutenberg/pull/61336)).
+ 
+ ## 27.5.0 (2024-05-02)
+ 
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index c7ec536e90effc..d89080b4410c41 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -694,12 +694,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 	/* eslint-disable jsx-a11y/no-static-element-interactions */
+ 	return (
+ 		<div { ...tokenFieldProps }>
+-			<StyledLabel
+-				htmlFor={ `components-form-token-input-${ instanceId }` }
+-				className="components-form-token-field__label"
+-			>
+-				{ label }
+-			</StyledLabel>
++			{ label && (
++				<StyledLabel
++					htmlFor={ `components-form-token-input-${ instanceId }` }
++					className="components-form-token-field__label"
++				>
++					{ label }
++				</StyledLabel>
++			) }
+ 			<div
+ 				ref={ tokensAndInput }
+ 				className={ classes }

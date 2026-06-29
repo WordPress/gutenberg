@@ -1,0 +1,312 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 13f7b96bfc16e6..682fd936ac00a5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Improve typing of `focusOnMount` prop in `Dropdown`, `Modal` and `Popover` ([#75442](https://github.com/WordPress/gutenberg/pull/75442)).
++
+ ### Bug Fixes
+ 
+ -   `SnackbarList`: Fix scaling distortion when a snackbar's content is updated in place via a shared notice ID ([#75709](https://github.com/WordPress/gutenberg/pull/75709)).
+diff --git a/packages/components/src/dropdown/types.ts b/packages/components/src/dropdown/types.ts
+index b185ec6fe14f71..6e7c65313aa4c6 100644
+--- a/packages/components/src/dropdown/types.ts
++++ b/packages/components/src/dropdown/types.ts
+@@ -1,11 +1,5 @@
+-/**
+- * External dependencies
+- */
++import type { useFocusOnMount } from '@wordpress/compose';
+ import type { ComponentPropsWithoutRef, CSSProperties, ReactNode } from 'react';
+-
+-/**
+- * Internal dependencies
+- */
+ import type Popover from '../popover';
+ import type { PopoverProps } from '../popover/types';
+ 
+@@ -42,16 +36,17 @@ export type DropdownProps = {
+ 	 */
+ 	expandOnMobile?: boolean;
+ 	/**
+-	 * By default, the first tabbable element in the popover will receive focus
+-	 * when it mounts. This is the same as setting this prop to "firstElement".
+-	 * Specifying a true value will focus the container instead.
+-	 * Specifying a false value disables the focus handling entirely
+-	 * (this should only be done when an appropriately accessible
+-	 * substitute behavior exists).
++	 * Determines focus behavior when the dialog mounts.
++	 *
++	 * - `"firstElement"` focuses the first tabbable element within.
++	 * - `"firstInputElement"` focuses the first value control within.
++	 * - `true` focuses the element itself.
++	 * - `false` does nothing and _should not be used unless an accessible
++	 *    substitute behavior is implemented_.
+ 	 *
+ 	 * @default 'firstElement'
+ 	 */
+-	focusOnMount?: 'firstElement' | boolean;
++	focusOnMount?: useFocusOnMount.Mode;
+ 	/**
+ 	 * Set this to customize the text that is shown in the dropdown's header
+ 	 * when it is fullscreen on mobile.
+diff --git a/packages/components/src/modal/types.ts b/packages/components/src/modal/types.ts
+index c46052819cac7c..99dfa1b37a69cc 100644
+--- a/packages/components/src/modal/types.ts
++++ b/packages/components/src/modal/types.ts
+@@ -51,14 +51,18 @@ export type ModalProps = {
+ 	 */
+ 	contentLabel?: string;
+ 	/**
+-	 * If this property is true, it will focus the first tabbable element
+-	 * rendered in the modal.
++	 * Determines focus behavior when the modal opens.
++	 *
++	 * - `"firstElement"` focuses the first tabbable element within.
++	 * - `"firstInputElement"` focuses the first value control within.
++	 * - `"firstContentElement"` focuses the first tabbable element within the modal’s content element.
++	 * - `true` focuses the element itself.
++	 * - `false` does nothing and _should not be used unless an accessible
++	 *    substitute behavior is implemented_.
+ 	 *
+ 	 * @default true
+ 	 */
+-	focusOnMount?:
+-		| Parameters< typeof useFocusOnMount >[ 0 ]
+-		| 'firstContentElement';
++	focusOnMount?: useFocusOnMount.Mode | 'firstContentElement';
+ 	/**
+ 	 * Elements that are injected into the modal header to the left of the close button (if rendered).
+ 	 * Hidden if `__experimentalHideHeader` is `true`.
+diff --git a/packages/components/src/popover/types.ts b/packages/components/src/popover/types.ts
+index aa30840318771d..644ca9512d7e23 100644
+--- a/packages/components/src/popover/types.ts
++++ b/packages/components/src/popover/types.ts
+@@ -1,8 +1,6 @@
+-/**
+- * External dependencies
+- */
+-import type { ReactNode, MutableRefObject, SyntheticEvent } from 'react';
+ import type { Placement } from '@floating-ui/react-dom';
++import type { useFocusOnMount } from '@wordpress/compose';
++import type { MutableRefObject, ReactNode, SyntheticEvent } from 'react';
+ 
+ type PositionYAxis = 'top' | 'middle' | 'bottom';
+ type PositionXAxis = 'left' | 'center' | 'right';
+@@ -75,15 +73,17 @@ export type PopoverProps = {
+ 	 */
+ 	constrainTabbing?: boolean;
+ 	/**
+-	 * By default, the _first tabbable element_ in the popover will receive focus
+-	 * when it mounts. This is the same as setting this prop to `"firstElement"`.
+-	 * Specifying a `false` value disables the focus handling entirely (this
+-	 * should only be done when an appropriately accessible substitute behavior
+-	 * exists).
++	 * Determines focus behavior when the popover mounts.
++	 *
++	 * - `"firstElement"` focuses the first tabbable element within.
++	 * - `"firstInputElement"` focuses the first value control within.
++	 * - `true` focuses the element itself.
++	 * - `false` does nothing and _should not be used unless an accessible
++	 *    substitute behavior is implemented_.
+ 	 *
+ 	 * @default 'firstElement'
+ 	 */
+-	focusOnMount?: 'firstElement' | boolean;
++	focusOnMount?: useFocusOnMount.Mode;
+ 	/**
+ 	 * A callback invoked when the focus leaves the opened popover. This should
+ 	 * only be provided in advanced use-cases when a popover should close under
+diff --git a/packages/compose/README.md b/packages/compose/README.md
+index b78faa9840cae4..77d791eee5c3d3 100644
+--- a/packages/compose/README.md
++++ b/packages/compose/README.md
+@@ -338,7 +338,7 @@ _Returns_
+ 
+ ### useFocusOnMount
+ 
+-Hook used to focus the first tabbable element on mount.
++Determines focus behavior when the element mounts.
+ 
+ _Usage_
+ 
+@@ -358,11 +358,11 @@ const WithFocusOnMount = () => {
+ 
+ _Parameters_
+ 
+--   _focusOnMount_ `boolean | 'firstElement' | 'firstInputElement'`: Focus on mount mode.
++-   _focusOnMount_ `useFocusOnMount.Mode`: Behavioral mode. Defaults to `"firstElement"` which focuses the first tabbable element within; `"firstInputElement"` focuses the first value control within; `true` focuses the element itself; `false` does nothing.
+ 
+ _Returns_
+ 
+--   `React.RefCallback<HTMLElement>`: Ref callback.
++-   Ref callback.
+ 
+ ### useFocusReturn
+ 
+diff --git a/packages/compose/src/hooks/use-dialog/index.ts b/packages/compose/src/hooks/use-dialog/index.ts
+index b839c33dc16053..7de790ebb4b1b3 100644
+--- a/packages/compose/src/hooks/use-dialog/index.ts
++++ b/packages/compose/src/hooks/use-dialog/index.ts
+@@ -13,21 +13,24 @@ import { ESCAPE } from '@wordpress/keycodes';
+  * Internal dependencies
+  */
+ import useConstrainedTabbing from '../use-constrained-tabbing';
+-import useFocusOnMount from '../use-focus-on-mount';
++import { useFocusOnMount } from '../use-focus-on-mount';
+ import useFocusReturn from '../use-focus-return';
+ import useFocusOutside from '../use-focus-outside';
+ import useMergeRefs from '../use-merge-refs';
+ 
+ type DialogOptions = {
+ 	/**
+-	 * Determines whether focus should be automatically moved to the popover
+-	 * when it mounts. `false` causes no focus shift, `true` causes the popover
+-	 * itself to gain focus, and `firstElement` focuses the first focusable
+-	 * element within the popover.
++	 * Determines focus behavior when the dialog mounts.
++	 *
++	 * - `"firstElement"` focuses the first tabbable element within.
++	 * - `"firstInputElement"` focuses the first value control within.
++	 * - `true` focuses the element itself.
++	 * - `false` does nothing and _should not be used unless an accessible
++	 *    substitute behavior is implemented_.
+ 	 *
+ 	 * @default 'firstElement'
+ 	 */
+-	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
++	focusOnMount?: useFocusOnMount.Mode;
+ 	/**
+ 	 * Determines whether tabbing is constrained to within the popover,
+ 	 * preventing keyboard focus from leaving the popover content without
+diff --git a/packages/compose/src/hooks/use-focus-on-mount/index.js b/packages/compose/src/hooks/use-focus-on-mount/index.ts
+similarity index 56%
+rename from packages/compose/src/hooks/use-focus-on-mount/index.js
+rename to packages/compose/src/hooks/use-focus-on-mount/index.ts
+index 8aa3723a17c598..ecf348f7e741a2 100644
+--- a/packages/compose/src/hooks/use-focus-on-mount/index.js
++++ b/packages/compose/src/hooks/use-focus-on-mount/index.ts
+@@ -1,19 +1,15 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useRef, useEffect } from '@wordpress/element';
+ import { focus } from '@wordpress/dom';
+-
+-/**
+- * Internal dependencies
+- */
++import { useEffect, useRef } from '@wordpress/element';
+ import useRefEffect from '../use-ref-effect';
+ 
+ /**
+- * Hook used to focus the first tabbable element on mount.
++ * Determines focus behavior when the element mounts.
+  *
+- * @param {boolean | 'firstElement' | 'firstInputElement'} focusOnMount Focus on mount mode.
+- * @return {React.RefCallback<HTMLElement>} Ref callback.
++ * @param focusOnMount Behavioral mode. Defaults to `"firstElement"` which focuses the
++ *                     first tabbable element within; `"firstInputElement"` focuses the
++ *                     first value control within; `true` focuses the element itself;
++ *                     `false` does nothing.
++ * @return Ref callback.
+  *
+  * @example
+  * ```js
+@@ -30,16 +26,17 @@ import useRefEffect from '../use-ref-effect';
+  * }
+  * ```
+  */
+-export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
++export function useFocusOnMount(
++	focusOnMount: useFocusOnMount.Mode = 'firstElement'
++) {
+ 	const focusOnMountRef = useRef( focusOnMount );
+ 
+ 	/**
+ 	 * Sets focus on a DOM element.
+ 	 *
+-	 * @param {HTMLElement} target The DOM element to set focus to.
+-	 * @return {void}
++	 * @param target The DOM element to set focus to.
+ 	 */
+-	const setFocus = ( target ) => {
++	const setFocus = ( target: HTMLElement ): void => {
+ 		target.focus( {
+ 			// When focusing newly mounted dialogs,
+ 			// the position of the popover is often not right on the first render
+@@ -48,15 +45,12 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
+ 		} );
+ 	};
+ 
+-	/** @type {React.MutableRefObject<ReturnType<setTimeout> | undefined>} */
+-	const timerIdRef = useRef( undefined );
+-
+ 	useEffect( () => {
+ 		focusOnMountRef.current = focusOnMount;
+ 	}, [ focusOnMount ] );
+ 
+-	return useRefEffect( ( node ) => {
+-		if ( ! node || focusOnMountRef.current === false ) {
++	return useRefEffect< HTMLElement >( ( node ) => {
++		if ( focusOnMountRef.current === false ) {
+ 			return;
+ 		}
+ 
+@@ -72,19 +66,12 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
+ 			return;
+ 		}
+ 
+-		timerIdRef.current = setTimeout( () => {
++		const timerId = setTimeout( () => {
+ 			// For 'firstInputElement' mode, try to find a form input element first
+ 			if ( focusOnMountRef.current === 'firstInputElement' ) {
+-				/** @type {HTMLElement | null} */
+-				let formInput = null;
+-				if (
+-					typeof window !== 'undefined' &&
+-					node instanceof window.Element
+-				) {
+-					formInput = node.querySelector(
+-						'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
+-					);
+-				}
++				const formInput = node.querySelector< HTMLElement >(
++					'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
++				);
+ 
+ 				if ( formInput ) {
+ 					setFocus( formInput );
+@@ -100,9 +87,11 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
+ 		}, 0 );
+ 
+ 		return () => {
+-			if ( timerIdRef.current ) {
+-				clearTimeout( timerIdRef.current );
+-			}
++			clearTimeout( timerId );
+ 		};
+ 	}, [] );
+ }
++
++export namespace useFocusOnMount {
++	export type Mode = boolean | 'firstElement' | 'firstInputElement';
++}
+diff --git a/packages/compose/src/index.js b/packages/compose/src/index.js
+index 29a9aa61737440..3b428a07776a3a 100644
+--- a/packages/compose/src/index.js
++++ b/packages/compose/src/index.js
+@@ -27,7 +27,7 @@ export { default as __experimentalUseDialog } from './hooks/use-dialog';
+ export { default as useDisabled } from './hooks/use-disabled';
+ export { default as useEvent } from './hooks/use-event';
+ export { default as __experimentalUseDragging } from './hooks/use-dragging';
+-export { default as useFocusOnMount } from './hooks/use-focus-on-mount';
++export { useFocusOnMount } from './hooks/use-focus-on-mount';
+ export { default as __experimentalUseFocusOutside } from './hooks/use-focus-outside';
+ export { default as useFocusReturn } from './hooks/use-focus-return';
+ export { default as useInstanceId } from './hooks/use-instance-id';

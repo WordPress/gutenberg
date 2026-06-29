@@ -1,0 +1,459 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d9b08962296782..46d8f268941284 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `Components`: Standardize reduced motion handling using media queries ([#68421](https://github.com/WordPress/gutenberg/pull/68421)).
++
+ ## 29.1.0 (2025-01-02)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/animate/style.scss b/packages/components/src/animate/style.scss
+index 1d64423e42f1f0..0375b116a552ff 100644
+--- a/packages/components/src/animate/style.scss
++++ b/packages/components/src/animate/style.scss
+@@ -1,7 +1,8 @@
+ .components-animate__appear {
+-	animation: components-animate__appear-animation 0.1s cubic-bezier(0, 0, 0.2, 1) 0s;
+-	animation-fill-mode: forwards;
+-	@include reduce-motion("animation");
++	@media not (prefers-reduced-motion) {
++		animation: components-animate__appear-animation 0.1s cubic-bezier(0, 0, 0.2, 1) 0s;
++		animation-fill-mode: forwards;
++	}
+ 
+ 	&.is-from-top,
+ 	&.is-from-top.is-from-left {
+@@ -29,16 +30,17 @@
+ }
+ 
+ .components-animate__slide-in {
+-	animation: components-animate__slide-in-animation 0.1s cubic-bezier(0, 0, 0.2, 1);
+-	animation-fill-mode: forwards;
+-	@include reduce-motion("animation");
++	@media not (prefers-reduced-motion) {
++		animation: components-animate__slide-in-animation 0.1s cubic-bezier(0, 0, 0.2, 1);
++		animation-fill-mode: forwards;
+ 
+-	&.is-from-left {
+-		transform: translateX(+100%);
+-	}
++		&.is-from-left {
++			transform: translateX(+100%);
++		}
+ 
+-	&.is-from-right {
+-		transform: translateX(-100%);
++		&.is-from-right {
++			transform: translateX(-100%);
++		}
+ 	}
+ }
+ 
+@@ -49,7 +51,9 @@
+ }
+ 
+ .components-animate__loading {
+-	animation: components-animate__loading 1.6s ease-in-out infinite;
++	@media not (prefers-reduced-motion) {
++		animation: components-animate__loading 1.6s ease-in-out infinite;
++	}
+ }
+ 
+ @keyframes components-animate__loading {
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 460aeaa2781cdf..f1b666999f0038 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -15,8 +15,11 @@
+ 	cursor: pointer;
+ 	-webkit-appearance: none;
+ 	background: none;
+-	transition: box-shadow 0.1s linear;
+-	@include reduce-motion("transition");
++
++	@media not (prefers-reduced-motion) {
++		transition: box-shadow 0.1s linear;
++	}
++
+ 	height: $button-size;
+ 	align-items: center;
+ 	box-sizing: border-box;
+@@ -245,10 +248,13 @@
+ 		text-align: left;
+ 		color: $components-color-accent;
+ 		text-decoration: underline;
+-		transition-property: border, background, color;
+-		transition-duration: 0.05s;
+-		transition-timing-function: ease-in-out;
+-		@include reduce-motion("transition");
++
++		@media not (prefers-reduced-motion) {
++			transition-property: border, background, color;
++			transition-duration: 0.05s;
++			transition-timing-function: ease-in-out;
++		}
++
+ 		height: auto;
+ 
+ 		&:focus {
+@@ -275,11 +281,8 @@
+ 	&.is-secondary.is-busy,
+ 	&.is-secondary.is-busy:disabled,
+ 	&.is-secondary.is-busy[aria-disabled="true"] {
+-		animation: components-button__busy-animation 2500ms infinite linear;
+-		// This should be refactored to use the reduce-motion("animation") mixin
+-		// as soon as https://github.com/WordPress/gutenberg/issues/55566 is closed.
+-		@media (prefers-reduced-motion: reduce) {
+-			animation-duration: 0s;
++		@media not (prefers-reduced-motion) {
++			animation: components-button__busy-animation 2500ms infinite linear;
+ 		}
+ 		background-size: 100px 100%;
+ 		/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
+diff --git a/packages/components/src/checkbox-control/style.scss b/packages/components/src/checkbox-control/style.scss
+index 25394ba645ee80..63cd023302bcb1 100644
+--- a/packages/components/src/checkbox-control/style.scss
++++ b/packages/components/src/checkbox-control/style.scss
+@@ -32,8 +32,10 @@
+ 	height: var(--checkbox-input-size);
+ 
+ 	appearance: none;
+-	transition: 0.1s border-color ease-in-out;
+-	@include reduce-motion("transition");
++
++	@media not (prefers-reduced-motion) {
++		transition: 0.1s border-color ease-in-out;
++	}
+ 
+ 	&:focus {
+ 		@include button-style-outset__focus(var(--wp-admin-theme-color));
+diff --git a/packages/components/src/circular-option-picker/style.scss b/packages/components/src/circular-option-picker/style.scss
+index e47764a3a60d7f..5cbedb4f89053a 100644
+--- a/packages/components/src/circular-option-picker/style.scss
++++ b/packages/components/src/circular-option-picker/style.scss
+@@ -35,9 +35,11 @@ $color-palette-circle-spacing: 12px;
+ 	width: $color-palette-circle-size;
+ 	vertical-align: top;
+ 	transform: scale(1);
+-	transition: 100ms transform ease;
+-	will-change: transform;
+-	@include reduce-motion("transition");
++
++	@media not (prefers-reduced-motion) {
++		transition: 100ms transform ease;
++		will-change: transform;
++	}
+ 
+ 	&:hover {
+ 		transform: scale(1.2);
+@@ -73,8 +75,11 @@ $color-palette-circle-spacing: 12px;
+ 	border-radius: $radius-round;
+ 	background: transparent;
+ 	box-shadow: inset 0 0 0 ($color-palette-circle-size * 0.5);
+-	transition: 100ms box-shadow ease;
+-	@include reduce-motion("transition");
++
++	@media not (prefers-reduced-motion) {
++		transition: 100ms box-shadow ease;
++	}
++
+ 	cursor: pointer;
+ 
+ 	&:hover {
+diff --git a/packages/components/src/drop-zone/style.scss b/packages/components/src/drop-zone/style.scss
+index d66eaee87b8a1f..4c2da2df0b4a52 100644
+--- a/packages/components/src/drop-zone/style.scss
++++ b/packages/components/src/drop-zone/style.scss
+@@ -46,9 +46,8 @@
+ 		.components-drop-zone__content {
+ 			opacity: 1;
+ 
+-			transition: opacity 0.2s ease-in-out;
+-			@media (prefers-reduced-motion) {
+-				transition: none;
++			@media not (prefers-reduced-motion) {
++				transition: opacity 0.2s ease-in-out;
+ 			}
+ 		}
+ 
+@@ -56,12 +55,10 @@
+ 			opacity: 1;
+ 			transform: scale(1);
+ 
+-			transition:
+-				opacity 0.1s ease-in-out 0.1s,
+-				transform 0.1s ease-in-out 0.1s;
+-
+-			@media (prefers-reduced-motion) {
+-				transition: none;
++			@media not (prefers-reduced-motion) {
++				transition:
++					opacity 0.1s ease-in-out 0.1s,
++					transform 0.1s ease-in-out 0.1s;
+ 			}
+ 		}
+ 	}
+diff --git a/packages/components/src/form-toggle/style.scss b/packages/components/src/form-toggle/style.scss
+index 900874b59004b8..8ae46d23558276 100644
+--- a/packages/components/src/form-toggle/style.scss
++++ b/packages/components/src/form-toggle/style.scss
+@@ -24,10 +24,13 @@ $transition-duration: 0.2s;
+ 		width: $toggle-width;
+ 		height: $toggle-height;
+ 		border-radius: math.div($toggle-height, 2);
+-		transition:
+-			$transition-duration background-color ease,
+-			$transition-duration border-color ease;
+-		@include reduce-motion("transition");
++
++		@media not (prefers-reduced-motion) {
++			transition:
++				$transition-duration background-color ease,
++				$transition-duration border-color ease;
++		}
++
+ 		overflow: hidden;
+ 
+ 		// Windows High Contrast Mode
+@@ -39,8 +42,9 @@ $transition-duration: 0.2s;
+ 			// Expand the border to fake a solid in Windows High Contrast Mode.
+ 			border-top: #{ $toggle-height } solid transparent;
+ 
+-			transition: $transition-duration opacity ease;
+-			@include reduce-motion("transition");
++			@media not (prefers-reduced-motion) {
++				transition: $transition-duration opacity ease;
++			}
+ 
+ 			opacity: 0;
+ 		}
+@@ -55,10 +59,13 @@ $transition-duration: 0.2s;
+ 		width: $toggle-thumb-size;
+ 		height: $toggle-thumb-size;
+ 		border-radius: $radius-round;
+-		transition:
+-			$transition-duration transform ease,
+-			$transition-duration background-color ease-out;
+-		@include reduce-motion("transition");
++
++		@media not (prefers-reduced-motion) {
++			transition:
++				$transition-duration transform ease,
++				$transition-duration background-color ease-out;
++		}
++
+ 		background-color: $gray-900;
+ 		box-shadow: $elevation-x-small;
+ 
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index d18ca274d76764..40e5aca989fbe1 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -124,8 +124,10 @@
+ 	height: auto;
+ 	background: $gray-300;
+ 	min-width: unset;
+-	transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
+-	@include reduce-motion;
++
++	@media not (prefers-reduced-motion) {
++		transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
++	}
+ }
+ 
+ .components-form-token-field__token-text {
+@@ -154,8 +156,11 @@
+ 	min-width: 100%;
+ 	max-height: $grid-unit-80 * 2;
+ 	overflow-y: auto;
+-	transition: all 0.15s ease-in-out;
+-	@include reduce-motion("transition");
++
++	@media not (prefers-reduced-motion) {
++		transition: all 0.15s ease-in-out;
++	}
++
+ 	list-style: none;
+ 	box-shadow: inset 0 $border-width 0 0 $gray-600; // Matches the border color of the input.
+ 	margin: 0;
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index 70959f69392d1c..de35d46a704d78 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -33,10 +33,12 @@
+ 	display: flex;
+ 	// Animate the modal frame/contents appearing on the page.
+ 	animation-name: components-modal__appear-animation;
+-	animation-duration: var(--modal-frame-animation-duration);
+ 	animation-fill-mode: forwards;
+ 	animation-timing-function: cubic-bezier(0.29, 0, 0, 1);
+-	@include reduce-motion("animation");
++
++	@media not (prefers-reduced-motion) {
++		animation-duration: var(--modal-frame-animation-duration);
++	}
+ 
+ 	.components-modal__screen-overlay.is-animating-out & {
+ 		animation-name: components-modal__disappear-animation;
+diff --git a/packages/components/src/panel/style.scss b/packages/components/src/panel/style.scss
+index e525cd92569182..3aff9d24b079f5 100644
+--- a/packages/components/src/panel/style.scss
++++ b/packages/components/src/panel/style.scss
+@@ -62,9 +62,12 @@
+ 	font-size: inherit;
+ 	margin-top: 0;
+ 	margin-bottom: 0;
+-	transition: 0.1s background ease-in-out;
+-	@include reduce-motion("transition");
++
++	@media not (prefers-reduced-motion) {
++		transition: 0.1s background ease-in-out;
++	}
+ }
++
+ .components-panel__body.is-opened > .components-panel__body-title {
+ 	margin: -1 * $grid-unit-20;
+ 	margin-bottom: 5px;
+@@ -87,8 +90,11 @@
+ 	color: $gray-900;
+ 	border: none;
+ 	box-shadow: none;
+-	transition: 0.1s background ease-in-out;
+-	@include reduce-motion("transition");
++
++	@media not (prefers-reduced-motion) {
++		transition: 0.1s background ease-in-out;
++	}
++
+ 	height: auto;
+ 
+ 	&:focus {
+@@ -103,8 +109,10 @@
+ 		transform: translateY(-50%);
+ 		color: $gray-900;
+ 		fill: currentColor;
+-		transition: 0.1s color ease-in-out;
+-		@include reduce-motion("transition");
++
++		@media not (prefers-reduced-motion) {
++			transition: 0.1s color ease-in-out;
++		}
+ 	}
+ 
+ 	// mirror the arrow horizontally in RTL languages
+diff --git a/packages/components/src/placeholder/style.scss b/packages/components/src/placeholder/style.scss
+index a38d7d3e3ace8b..84e0ecfa1f985d 100644
+--- a/packages/components/src/placeholder/style.scss
++++ b/packages/components/src/placeholder/style.scss
+@@ -173,8 +173,10 @@
+ 	.components-button {
+ 		opacity: 0;
+ 		pointer-events: none;
+-		transition: opacity 0.1s linear;
+-		@include reduce-motion("transition");
++
++		@media not (prefers-reduced-motion) {
++			transition: opacity 0.1s linear;
++		}
+ 	}
+ 
+ 	.is-selected > & {
+diff --git a/packages/components/src/resizable-box/style.scss b/packages/components/src/resizable-box/style.scss
+index 4db3d27b5fab6b..a9ff7ea237e5f6 100644
+--- a/packages/components/src/resizable-box/style.scss
++++ b/packages/components/src/resizable-box/style.scss
+@@ -60,9 +60,12 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
+ 	position: absolute;
+ 	top: calc(50% - 1px);
+ 	right: calc(50% - 1px);
+-	transition: transform 0.1s ease-in;
+-	@include reduce-motion("transition");
+-	will-change: transform;
++
++	@media not (prefers-reduced-motion) {
++		transition: transform 0.1s ease-in;
++		will-change: transform;
++	}
++
+ 	opacity: 0;
+ }
+ 
+@@ -102,18 +105,20 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
+ .components-resizable-box__side-handle.components-resizable-box__handle-bottom:hover::before,
+ .components-resizable-box__side-handle.components-resizable-box__handle-top:active::before,
+ .components-resizable-box__side-handle.components-resizable-box__handle-bottom:active::before {
+-	animation: components-resizable-box__top-bottom-animation 0.1s ease-out 0s;
+-	animation-fill-mode: forwards;
+-	@include reduce-motion("animation");
++	@media not (prefers-reduced-motion) {
++		animation: components-resizable-box__top-bottom-animation 0.1s ease-out 0s;
++		animation-fill-mode: forwards;
++	}
+ }
+ 
+ .components-resizable-box__side-handle.components-resizable-box__handle-left:hover::before,
+ .components-resizable-box__side-handle.components-resizable-box__handle-right:hover::before,
+ .components-resizable-box__side-handle.components-resizable-box__handle-left:active::before,
+ .components-resizable-box__side-handle.components-resizable-box__handle-right:active::before {
+-	animation: components-resizable-box__left-right-animation 0.1s ease-out 0s;
+-	animation-fill-mode: forwards;
+-	@include reduce-motion("animation");
++	@media not (prefers-reduced-motion) {
++		animation: components-resizable-box__left-right-animation 0.1s ease-out 0s;
++		animation-fill-mode: forwards;
++	}
+ }
+ 
+ /* This CSS is shown only to Safari, which has a bug with table-caption making it jumpy.
+diff --git a/packages/components/src/tab-panel/style.scss b/packages/components/src/tab-panel/style.scss
+index b54f7af1bf4ded..7e811b21b65b6e 100644
+--- a/packages/components/src/tab-panel/style.scss
++++ b/packages/components/src/tab-panel/style.scss
+@@ -40,8 +40,9 @@
+ 		border-radius: 0;
+ 
+ 		// Animation
+-		transition: all 0.1s linear;
+-		@include reduce-motion("transition");
++		@media not (prefers-reduced-motion) {
++			transition: all 0.1s linear;
++		}
+ 	}
+ 
+ 	// Active.
+@@ -68,8 +69,9 @@
+ 		border-radius: $radius-small;
+ 
+ 		// Animation
+-		transition: all 0.1s linear;
+-		@include reduce-motion("transition");
++		@media not (prefers-reduced-motion) {
++			transition: all 0.1s linear;
++		}
+ 	}
+ 
+ 	&:focus-visible::before {
+diff --git a/packages/components/src/toolbar/toolbar/style.scss b/packages/components/src/toolbar/toolbar/style.scss
+index c0cabacb84c77e..b53df6303e0fbf 100644
+--- a/packages/components/src/toolbar/toolbar/style.scss
++++ b/packages/components/src/toolbar/toolbar/style.scss
+@@ -56,9 +56,10 @@
+ 			z-index: -1;
+ 
+ 			// Animate in.
+-			animation: components-button__appear-animation 0.1s ease;
+-			animation-fill-mode: forwards;
+-			@include reduce-motion("animation");
++			@media not (prefers-reduced-motion) {
++				animation: components-button__appear-animation 0.1s ease;
++				animation-fill-mode: forwards;
++			}
+ 		}
+ 
+ 		svg {

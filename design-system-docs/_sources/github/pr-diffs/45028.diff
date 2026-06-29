@@ -1,0 +1,116 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2b26f0498a914d..3d1eb506298399 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,8 @@
+ -   `Navigator`: refactor unit tests to TypeScript and to `user-event` ([#44970](https://github.com/WordPress/gutenberg/pull/44970)).
+ -   `Navigator`: Refactor Storybook code to TypeScript and controls ([#44979](https://github.com/WordPress/gutenberg/pull/44979)).
+ -   `withFocusReturn`: Refactor tests to `@testing-library/react` ([#45012](https://github.com/WordPress/gutenberg/pull/45012)).
++-   `ToolsPanel`: updated to satisfy `react/exhaustive-deps` eslint rule ([#45028](https://github.com/WordPress/gutenberg/pull/45028))
++-   `Tooltip`: updated to ignore `react/exhaustive-deps` eslint rule ([#45043](https://github.com/WordPress/gutenberg/pull/45043))
+ 
+ ## 21.2.0 (2022-10-05)
+ 
+@@ -50,7 +52,6 @@
+ -   `Sandbox`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44378](https://github.com/WordPress/gutenberg/pull/44378))
+ -   `FontSizePicker`: Convert to TypeScript ([#44449](https://github.com/WordPress/gutenberg/pull/44449)).
+ -   `FontSizePicker`: Replace SCSS with Emotion + components ([#44483](https://github.com/WordPress/gutenberg/pull/44483)).
+--   `Tooltip`: updated to ignore `react/exhaustive-deps` eslint rule ([#45043](https://github.com/WordPress/gutenberg/pull/45043))
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index 39bed6310547b8..582ff88113dba5 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -42,8 +42,11 @@ export function useToolsPanelItem(
+ 		__experimentalLastVisibleItemClass,
+ 	} = useToolsPanelContext();
+ 
+-	const hasValueCallback = useCallback( hasValue, [ panelId ] );
+-	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
++	const hasValueCallback = useCallback( hasValue, [ panelId, hasValue ] );
++	const resetAllFilterCallback = useCallback( resetAllFilter, [
++		panelId,
++		resetAllFilter,
++	] );
+ 	const previousPanelId = usePrevious( currentPanelId );
+ 
+ 	const hasMatchingPanel =
+@@ -79,6 +82,8 @@ export function useToolsPanelItem(
+ 		panelId,
+ 		previousPanelId,
+ 		resetAllFilterCallback,
++		registerPanelItem,
++		deregisterPanelItem,
+ 	] );
+ 
+ 	const isValueSet = hasValue();
+@@ -90,7 +95,13 @@ export function useToolsPanelItem(
+ 		if ( isShownByDefault && isValueSet && ! wasValueSet ) {
+ 			flagItemCustomization( label );
+ 		}
+-	}, [ isValueSet, wasValueSet, isShownByDefault, label ] );
++	}, [
++		isValueSet,
++		wasValueSet,
++		isShownByDefault,
++		label,
++		flagItemCustomization,
++	] );
+ 
+ 	// Note: `label` is used as a key when building menu item state in
+ 	// `ToolsPanel`.
+@@ -118,6 +129,8 @@ export function useToolsPanelItem(
+ 		isResetting,
+ 		isValueSet,
+ 		wasMenuItemChecked,
++		onSelect,
++		onDeselect,
+ 	] );
+ 
+ 	// The item is shown if it is a default control regardless of whether it
+@@ -153,6 +166,7 @@ export function useToolsPanelItem(
+ 		lastDisplayedItem,
+ 		__experimentalFirstVisibleItemClass,
+ 		__experimentalLastVisibleItemClass,
++		label,
+ 	] );
+ 
+ 	return {
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.ts b/packages/components/src/tools-panel/tools-panel/hook.ts
+index 7eab36f07bfed2..2cbce4aad169f5 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel/hook.ts
+@@ -139,7 +139,7 @@ export function useToolsPanel(
+ 			} );
+ 			return items;
+ 		} );
+-	}, [ generateMenuItems, panelItems, setMenuItems ] );
++	}, [ panelItems, setMenuItems ] );
+ 
+ 	// Force a menu item to be checked.
+ 	// This is intended for use with default panel items. They are displayed
+@@ -255,13 +255,7 @@ export function useToolsPanel(
+ 			shouldReset: true,
+ 		} );
+ 		setMenuItems( resetMenuItems );
+-	}, [
+-		generateMenuItems,
+-		isResetting.current,
+-		panelItems,
+-		resetAll,
+-		setMenuItems,
+-	] );
++	}, [ panelItems, resetAll, setMenuItems ] );
+ 
+ 	// Assist ItemGroup styling when there are potentially hidden placeholder
+ 	// items by identifying first & last items that are toggled on for display.
+@@ -300,7 +294,6 @@ export function useToolsPanel(
+ 			deregisterPanelItem,
+ 			firstDisplayedItem,
+ 			flagItemCustomization,
+-			isResetting.current,
+ 			lastDisplayedItem,
+ 			menuItems,
+ 			panelId,

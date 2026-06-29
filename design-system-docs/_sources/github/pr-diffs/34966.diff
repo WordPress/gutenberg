@@ -1,0 +1,54 @@
+diff --git a/packages/components/src/ui/control-label/component.js b/packages/components/src/ui/control-label/component.js
+index 6706818e155d39..1f3ecc25fc8cbb 100644
+--- a/packages/components/src/ui/control-label/component.js
++++ b/packages/components/src/ui/control-label/component.js
+@@ -6,8 +6,8 @@ import { View } from '../../view';
+ import { useControlLabel } from './hook';
+ 
+ /**
+- * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label'>} props
+- * @param {import('react').Ref<any>}                                                       forwardedRef
++ * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label', false>} props
++ * @param {import('react').Ref<any>}                                                              forwardedRef
+  */
+ function ControlLabel( props, forwardedRef ) {
+ 	const controlLabelProps = useControlLabel( props );
+diff --git a/packages/components/src/ui/control-label/hook.js b/packages/components/src/ui/control-label/hook.js
+index c7f10444fab792..dcdd5bb7e7effc 100644
+--- a/packages/components/src/ui/control-label/hook.js
++++ b/packages/components/src/ui/control-label/hook.js
+@@ -8,7 +8,7 @@ import * as styles from './styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label'>} props
++ * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label', false>} props
+  */
+ export function useControlLabel( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/form-group/form-group-content.js b/packages/components/src/ui/form-group/form-group-content.js
+index 21b95ff9068233..7dad39918676ee 100644
+--- a/packages/components/src/ui/form-group/form-group-content.js
++++ b/packages/components/src/ui/form-group/form-group-content.js
+@@ -12,7 +12,7 @@ import FormGroupHelp from './form-group-help';
+ import FormGroupLabel from './form-group-label';
+ 
+ /**
+- * @param {import('../context').WordPressComponentProps<import('./types').FormGroupContentProps, 'label'>} props
++ * @param {import('../context').WordPressComponentProps<import('./types').FormGroupContentProps, 'label', false>} props
+  */
+ function FormGroupContent( {
+ 	alignLabel,
+diff --git a/packages/components/src/ui/form-group/form-group-label.js b/packages/components/src/ui/form-group/form-group-label.js
+index 01e9f9be3c51e9..21a4a2dda5b129 100644
+--- a/packages/components/src/ui/form-group/form-group-label.js
++++ b/packages/components/src/ui/form-group/form-group-label.js
+@@ -10,7 +10,7 @@ import { ControlLabel } from '../control-label';
+ import { VisuallyHidden } from '../../visually-hidden';
+ 
+ /**
+- * @param {import('../context').WordPressComponentProps<import('./types').FormGroupLabelProps, 'label'>} props
++ * @param {import('../context').WordPressComponentProps<import('./types').FormGroupLabelProps, 'label', false>} props
+  * @return {JSX.Element | null} The form group's label.
+  */
+ function FormGroupLabel( { children, id, labelHidden = false, ...props } ) {

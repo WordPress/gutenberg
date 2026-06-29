@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/panel/style.scss b/packages/components/src/panel/style.scss
+index 62ec3f1c9c7598..17a2404b0c98ee 100644
+--- a/packages/components/src/panel/style.scss
++++ b/packages/components/src/panel/style.scss
+@@ -76,7 +76,7 @@
+ 
+ .components-panel__body-toggle.components-button {
+ 	position: relative;
+-	padding: $grid-unit-20;
++	padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
+ 	outline: none;
+ 	width: 100%;
+ 	font-weight: 500;

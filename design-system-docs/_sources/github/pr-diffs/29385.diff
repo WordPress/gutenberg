@@ -1,0 +1,720 @@
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index 294b0df6e93772..8b850123a2eb7c 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -13,13 +13,14 @@ import {
+ 	useEffect,
+ 	useState,
+ } from '@wordpress/element';
++import { useDebounce } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Popover from '../popover';
+ import Shortcut from '../shortcut';
+-import { useDebounce } from '@wordpress/compose';
++import { withNextComponent } from './next';
+ 
+ /**
+  * Time over children to wait before showing tooltip
+@@ -216,4 +217,4 @@ function Tooltip( { children, position, text, shortcut } ) {
+ 	} );
+ }
+ 
+-export default Tooltip;
++export default withNextComponent( Tooltip );
+diff --git a/packages/components/src/tooltip/next.js b/packages/components/src/tooltip/next.js
+new file mode 100644
+index 00000000000000..98fd4fa1d02cfe
+--- /dev/null
++++ b/packages/components/src/tooltip/next.js
+@@ -0,0 +1,17 @@
++/**
++ * Internal dependencies
++ */
++import { withNext } from '../ui/context';
++import { Tooltip as NextTooltip } from '../ui/tooltip';
++
++const Tooltip =
++	process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextTooltip : undefined;
++
++const adapter = ( { text, ...props } ) => ( {
++	...props,
++	content: text,
++} );
++
++export function withNextComponent( Component ) {
++	return withNext( Component, Tooltip, 'WPComponentsTooltip', adapter );
++}
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index 78eae6ae3ac473..27c505f247c936 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -6,6 +6,7 @@ export * from './flex';
+ export * from './form-group';
+ export * from './grid';
+ export * from './h-stack';
++export * from './shortcut';
+ export * from './spinner';
+ export * from './text';
+ export * from './truncate';
+diff --git a/packages/components/src/ui/shortcut/component.tsx b/packages/components/src/ui/shortcut/component.tsx
+new file mode 100644
+index 00000000000000..8bef7084d65523
+--- /dev/null
++++ b/packages/components/src/ui/shortcut/component.tsx
+@@ -0,0 +1,55 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++import type { ViewOwnProps } from '@wp-g2/create-styles';
++import { useContextSystem, contextConnect } from '@wp-g2/context';
++
++export interface ShortcutDescription {
++	display: string;
++	ariaLabel: string;
++}
++
++export interface Props {
++	shortcut?: ShortcutDescription | string;
++	className?: string;
++}
++
++function Shortcut(
++	props: ViewOwnProps< Props, 'span' >,
++	forwardedRef: Ref< any >
++): JSX.Element | null {
++	const { shortcut, className, ...otherProps } = useContextSystem(
++		props,
++		'Shortcut'
++	);
++	if ( ! shortcut ) {
++		return null;
++	}
++
++	let displayText: string;
++	let ariaLabel: string | undefined;
++
++	if ( typeof shortcut === 'string' ) {
++		displayText = shortcut;
++	} else {
++		displayText = shortcut.display;
++		ariaLabel = shortcut.ariaLabel;
++	}
++
++	return (
++		<span
++			className={ className }
++			aria-label={ ariaLabel }
++			ref={ forwardedRef }
++			{ ...otherProps }
++		>
++			{ displayText }
++		</span>
++	);
++}
++
++const ConnectedShortcut = contextConnect( Shortcut, 'Shortcut' );
++
++export default ConnectedShortcut;
+diff --git a/packages/components/src/ui/shortcut/index.ts b/packages/components/src/ui/shortcut/index.ts
+new file mode 100644
+index 00000000000000..6b107e956edb2f
+--- /dev/null
++++ b/packages/components/src/ui/shortcut/index.ts
+@@ -0,0 +1,2 @@
++export { default as Shortcut } from './component';
++export type { Props as ShortcutProps, ShortcutDescription } from './component';
+diff --git a/packages/components/src/ui/shortcut/test/__snapshots__/index.js.snap b/packages/components/src/ui/shortcut/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..dc66c48331aefb
+--- /dev/null
++++ b/packages/components/src/ui/shortcut/test/__snapshots__/index.js.snap
+@@ -0,0 +1,13 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`Shortcut should render a span with the shortcut text 1`] = `
++<span
++  class="components-shortcut wp-components-shortcut ic-1x9nauu"
++  data-g2-c16t="true"
++  data-g2-component="Shortcut"
++>
++  meta + P
++</span>
++`;
++
++exports[`Shortcut should render null when no shortcut is provided 1`] = `null`;
+diff --git a/packages/components/src/ui/shortcut/test/index.js b/packages/components/src/ui/shortcut/test/index.js
+new file mode 100644
+index 00000000000000..56f6ac73e4907b
+--- /dev/null
++++ b/packages/components/src/ui/shortcut/test/index.js
+@@ -0,0 +1,35 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { Shortcut } from '..';
++
++describe( 'Shortcut', () => {
++	it( 'should render null when no shortcut is provided', () => {
++		const { container } = render( <Shortcut /> );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	it( 'should render a span with the shortcut text', () => {
++		const shortcutText = 'meta + P';
++		render( <Shortcut shortcut={ shortcutText } /> );
++		const shortcut = screen.getByText( shortcutText );
++		expect( shortcut ).toMatchSnapshot();
++	} );
++
++	it( 'should render a span with aria label', () => {
++		const shortcutObject = {
++			display: 'meta + P',
++			ariaLabel: 'print',
++		};
++		render( <Shortcut shortcut={ shortcutObject } /> );
++		const shortcut = screen.getByText( shortcutObject.display );
++		expect( shortcut.getAttribute( 'aria-label' ) ).toBe(
++			shortcutObject.ariaLabel
++		);
++	} );
++} );
+diff --git a/packages/components/src/ui/tooltip/README.md b/packages/components/src/ui/tooltip/README.md
+new file mode 100644
+index 00000000000000..ac9e3789c84520
+--- /dev/null
++++ b/packages/components/src/ui/tooltip/README.md
+@@ -0,0 +1,17 @@
++# Tooltip
++
++`Tooltip` is a component to render floating help text relative to a node when it receives focus or when the user places the mouse cursor atop it.
++
++## Usage
++
++```jsx
++import { Tooltip, Text } from '@wordpress/components/ui';
++
++function Example() {
++	return (
++		<Tooltip content="Code is Poetry">
++			<Text>WordPress.org</Text>
++		</Tooltip>
++	);
++}
++```
+diff --git a/packages/components/src/ui/tooltip/component.js b/packages/components/src/ui/tooltip/component.js
+new file mode 100644
+index 00000000000000..e1219df644e947
+--- /dev/null
++++ b/packages/components/src/ui/tooltip/component.js
+@@ -0,0 +1,102 @@
++/**
++ * External dependencies
++ */
++import { contextConnect, useContextSystem } from '@wp-g2/context';
++// eslint-disable-next-line no-restricted-imports
++import { TooltipReference, useTooltipState } from 'reakit';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo, cloneElement } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { TooltipContext } from './context';
++import TooltipContent from './content';
++import { TooltipShortcut } from './styles';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function Tooltip( props, forwardedRef ) {
++	const {
++		animated = true,
++		animationDuration = 160,
++		baseId,
++		children,
++		content,
++		focusable = true,
++		gutter = 4,
++		id,
++		modal = true,
++		placement,
++		visible = false,
++		shortcut,
++		...otherProps
++	} = useContextSystem( props, 'Tooltip' );
++
++	const tooltip = useTooltipState( {
++		animated: animated ? animationDuration : undefined,
++		baseId: baseId || id,
++		gutter,
++		placement,
++		visible,
++		...otherProps,
++	} );
++
++	const contextProps = useMemo(
++		() => ( {
++			tooltip,
++		} ),
++		[ tooltip ]
++	);
++
++	return (
++		<TooltipContext.Provider value={ contextProps }>
++			{ content && (
++				<TooltipContent unstable_portal={ modal } ref={ forwardedRef }>
++					{ content }
++					{ shortcut && <TooltipShortcut shortcut={ shortcut } /> }
++				</TooltipContent>
++			) }
++			{ children && (
++				<TooltipReference
++					{ ...tooltip }
++					{ ...children.props }
++					// @ts-ignore If ref doesn't exist that's fine with us, it'll just be undefined, but it can exist on ReactElement and there's no reason to try to scope this (it'll just overcomplicate things)
++					ref={ children?.ref }
++				>
++					{ ( referenceProps ) => {
++						if ( ! focusable ) {
++							referenceProps.tabIndex = undefined;
++						}
++						return cloneElement( children, referenceProps );
++					} }
++				</TooltipReference>
++			) }
++		</TooltipContext.Provider>
++	);
++}
++
++/**
++ * `Tooltip` is a component that provides context for a user interface element.
++ *
++ * @example
++ * ```jsx
++ * import { Tooltip, Text } from `@wordpress/components/ui`;
++ *
++ * function Example() {
++ * 	return (
++ * 		<Tooltip content="Code is Poetry">
++ * 			<Text>WordPress.org</Text>
++ * 		</Tooltip>
++ * 	)
++ * }
++ * ```
++ */
++const ConnectedTooltip = contextConnect( Tooltip, 'Tooltip' );
++
++export default ConnectedTooltip;
+diff --git a/packages/components/src/ui/tooltip/content.js b/packages/components/src/ui/tooltip/content.js
+new file mode 100644
+index 00000000000000..82e6b5f7de3ff6
+--- /dev/null
++++ b/packages/components/src/ui/tooltip/content.js
+@@ -0,0 +1,44 @@
++/**
++ * External dependencies
++ */
++import { contextConnect, useContextSystem } from '@wp-g2/context';
++import { cx } from '@wp-g2/styles';
++// eslint-disable-next-line no-restricted-imports
++import { Tooltip as ReakitTooltip } from 'reakit';
++
++/**
++ * Internal dependencies
++ */
++import { View } from '../view';
++import { useTooltipContext } from './context';
++import * as styles from './styles';
++
++const { TooltipPopoverView } = styles;
++
++/**
++ *
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('reakit').TooltipProps, 'div'>} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function TooltipContent( props, forwardedRef ) {
++	const { children, className, ...otherProps } = useContextSystem(
++		props,
++		'TooltipContent'
++	);
++	const { tooltip } = useTooltipContext();
++	const classes = cx( styles.TooltipContent, className );
++
++	return (
++		<ReakitTooltip
++			as={ View }
++			{ ...otherProps }
++			{ ...tooltip }
++			className={ classes }
++			ref={ forwardedRef }
++		>
++			<TooltipPopoverView>{ children }</TooltipPopoverView>
++		</ReakitTooltip>
++	);
++}
++
++export default contextConnect( TooltipContent, 'TooltipContent' );
+diff --git a/packages/components/src/ui/tooltip/context.js b/packages/components/src/ui/tooltip/context.js
+new file mode 100644
+index 00000000000000..de7f81f9cdeb04
+--- /dev/null
++++ b/packages/components/src/ui/tooltip/context.js
+@@ -0,0 +1,10 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++/**
++ * @type {import('react').Context<{ tooltip?: import('reakit').TooltipState }>}
++ */
++export const TooltipContext = createContext( {} );
++export const useTooltipContext = () => useContext( TooltipContext );
+diff --git a/packages/components/src/ui/tooltip/index.js b/packages/components/src/ui/tooltip/index.js
+new file mode 100644
+index 00000000000000..96841fe7ff4ed9
+--- /dev/null
++++ b/packages/components/src/ui/tooltip/index.js
+@@ -0,0 +1,2 @@
++export { default as Tooltip } from './component';
++export * from './context';
+diff --git a/packages/components/src/ui/tooltip/stories/index.js b/packages/components/src/ui/tooltip/stories/index.js
+new file mode 100644
+index 00000000000000..2822df04a46a6b
+--- /dev/null
++++ b/packages/components/src/ui/tooltip/stories/index.js
+@@ -0,0 +1,26 @@
++/**
++ * Internal dependencies
++ */
++import { Text } from '../../index';
++import { Tooltip } from '../index';
++
++export default {
++	component: Tooltip,
++	title: 'G2 Components (Experimental)/Tooltip',
++};
++
++export const _default = () => {
++	return (
++		<Tooltip
++			content="Tooltip"
++			visible
++			gutter={ 10 }
++			shortcut={ {
++				display: 'meta + 1',
++				ariaLabel: 'shortcut-aria-label',
++			} }
++		>
++			<Text>Hello</Text>
++		</Tooltip>
++	);
++};
+diff --git a/packages/components/src/ui/tooltip/styles.js b/packages/components/src/ui/tooltip/styles.js
+new file mode 100644
+index 00000000000000..c079be3d3d0924
+--- /dev/null
++++ b/packages/components/src/ui/tooltip/styles.js
+@@ -0,0 +1,38 @@
++/**
++ * External dependencies
++ */
++import { css, styled, ui } from '@wp-g2/styles';
++/**
++ * Internal dependencies
++ */
++import { Shortcut } from '../shortcut';
++
++export const TooltipContent = css`
++	${ ui.zIndex( 'Tooltip', 1000002 ) };
++	box-sizing: border-box;
++	opacity: 0;
++	outline: none;
++	transform-origin: top center;
++	transition: opacity ${ ui.get( 'transitionDurationFastest' ) } ease;
++
++	&[data-enter] {
++		opacity: 1;
++	}
++`;
++
++export const TooltipPopoverView = styled.div`
++	background: rgba( 0, 0, 0, 0.8 );
++	border-radius: 6px;
++	box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.04 );
++	color: ${ ui.color.white };
++	padding: 4px 8px;
++`;
++
++export const noOutline = css`
++	outline: none;
++`;
++
++export const TooltipShortcut = styled( Shortcut )`
++	display: inline-block;
++	margin-left: ${ ui.space( 1 ) };
++`;
+diff --git a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..a3176b338b2e33
+--- /dev/null
++++ b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+@@ -0,0 +1,89 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render correctly 1`] = `
++.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  z-index: 1000002;
++  box-sizing: border-box;
++  opacity: 0;
++  outline: none;
++  -webkit-transform-origin: top center;
++  -ms-transform-origin: top center;
++  transform-origin: top center;
++  -webkit-transition: opacity 100ms ease;
++  -webkit-transition: opacity var(--wp-g2-transition-duration-fastest) ease;
++  transition: opacity 100ms ease;
++  transition: opacity var(--wp-g2-transition-duration-fastest) ease;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1[data-enter] {
++  opacity: 1;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  background: rgba( 0,0,0,0.8 );
++  border-radius: 6px;
++  box-shadow: 0 0 0 1px rgba( 255,255,255,0.04 );
++  color: #ffffff;
++  color: var(--wp-g2-white);
++  padding: 4px 8px;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<div
++  class="components-tooltip-content wp-components-tooltip-content ic-1av77e4 ic-192yz5d emotion-1"
++  data-g2-c16t="true"
++  data-g2-component="TooltipContent"
++  id="base-tooltip"
++  role="tooltip"
++  style="pointer-events: none;"
++>
++  <div
++    class="ic-otytyz ic-192yz5d emotion-0"
++  >
++    Code is Poetry
++  </div>
++</div>
++`;
+diff --git a/packages/components/src/ui/tooltip/test/index.js b/packages/components/src/ui/tooltip/test/index.js
+new file mode 100644
+index 00000000000000..7d135792cb75da
+--- /dev/null
++++ b/packages/components/src/ui/tooltip/test/index.js
+@@ -0,0 +1,78 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { Text } from '../../text';
++import { Tooltip } from '../index';
++
++describe( 'props', () => {
++	const baseTooltipId = 'base-tooltip';
++	const baseTooltipTriggerContent = 'WordPress.org - Base trigger content';
++	const byId = ( id ) => ( t ) => t.id === id;
++	beforeEach( () => {
++		render(
++			<Tooltip baseId={ baseTooltipId } content="Code is Poetry" visible>
++				<Text>{ baseTooltipTriggerContent }</Text>
++			</Tooltip>
++		);
++	} );
++
++	test( 'should render correctly', () => {
++		const tooltip = screen.getByRole( /tooltip/i );
++		expect( tooltip ).toMatchSnapshot();
++	} );
++
++	test( 'should render invisible', () => {
++		const invisibleTooltipTriggerContent = 'WordPress.org - Invisible';
++		render(
++			<Tooltip
++				baseId="test-tooltip"
++				content="Code is Poetry"
++				visible={ false }
++			>
++				<Text>{ invisibleTooltipTriggerContent }</Text>
++			</Tooltip>
++		);
++		const tooltips = screen.getAllByRole( /tooltip/i );
++		const invisibleTooltipTrigger = screen.getByText(
++			invisibleTooltipTriggerContent
++		);
++		// The invisible tooltip should not render
++		expect( tooltips ).toHaveLength( 1 );
++		// Assert that the rendered tooltip is indeed the base tooltip
++		expect( tooltips[ 0 ].id ).toBe( baseTooltipId );
++		// But the invisible tooltip's trigger still should have rendered
++		expect( invisibleTooltipTrigger ).not.toBeUndefined();
++	} );
++
++	test( 'should render without children', () => {
++		const childlessTooltipId = 'tooltip-without-children';
++		render(
++			<Tooltip
++				baseId={ childlessTooltipId }
++				content="Code is Poetry"
++				visible
++			/>
++		);
++		const tooltips = screen.getAllByRole( /tooltip/i );
++		const childlessTooltip = tooltips.find( byId( childlessTooltipId ) );
++		expect( childlessTooltip ).not.toBeUndefined();
++	} );
++
++	test( 'should not render a tooltip without content', () => {
++		const contentlessTooltipId = 'contentless-tooltip';
++		render(
++			<Tooltip baseId={ contentlessTooltipId } visible>
++				<Text>WordPress.org</Text>
++			</Tooltip>
++		);
++		const tooltips = screen.getAllByRole( /tooltip/ );
++		// assert only the base tooltip rendered
++		expect( tooltips ).toHaveLength( 1 );
++		expect( tooltips[ 0 ].id ).toBe( baseTooltipId );
++	} );
++} );
+diff --git a/packages/components/src/ui/tooltip/types.ts b/packages/components/src/ui/tooltip/types.ts
+new file mode 100644
+index 00000000000000..34c8add7b520aa
+--- /dev/null
++++ b/packages/components/src/ui/tooltip/types.ts
+@@ -0,0 +1,64 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { TooltipInitialState } from 'reakit';
++// eslint-disable-next-line no-restricted-imports
++import type { ReactElement } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { PopperProps } from '../utils/types';
++import type { ShortcutProps } from '../shortcut';
++
++export type Props = TooltipInitialState &
++	PopperProps &
++	Pick< ShortcutProps, 'shortcut' > & {
++		/**
++		 * Determines if `Tooltip` has animations.
++		 */
++		animated?: boolean;
++		/**
++		 * The duration of `Tooltip` animations.
++		 *
++		 * @default 160
++		 */
++		animationDuration?: boolean;
++		/**
++		 * ID that will serve as a base for all the items IDs.
++		 *
++		 * @see https://reakit.io/docs/tooltip/#usetooltipstate
++		 */
++		baseId?: string;
++		/**
++		 * Content to render within the `Tooltip` floating label.
++		 */
++		content?: ReactElement;
++		/**
++		 * Spacing between the `Tooltip` reference and the floating label.
++		 *
++		 * @default 4
++		 *
++		 * @see https://reakit.io/docs/tooltip/#usetooltipstate
++		 */
++		gutter?: number;
++		/**
++		 * Whether or not the dialog should be rendered within `Portal`. It's true by default if modal is true.
++		 *
++		 * @default true
++		 *
++		 * @see https://reakit.io/docs/tooltip/#tooltip
++		 */
++		modal?: boolean;
++		/**
++		 * Whether `Tooltip` is visible.
++		 *
++		 * @default false
++		 *
++		 * @see https://reakit.io/docs/tooltip/#usetooltipstate
++		 */
++		visible?: boolean;
++		children: JSX.Element;
++		focusable?: boolean;
++	};

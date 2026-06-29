@@ -1,0 +1,172 @@
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index a52f6ccd841d2f..38ed91d8fcbb35 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -4,13 +4,14 @@
+  */
+ import { useState } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
++import { withInstanceId } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+  */
++import ButtonGroup from '../button-group';
+ import Button from '../button';
+ import RangeControl from '../range-control';
+-import SelectControl from '../select-control';
+ 
+ function getSelectValueFromFontSize( fontSizes, value ) {
+ 	if ( value ) {
+@@ -20,13 +21,6 @@ function getSelectValueFromFontSize( fontSizes, value ) {
+ 	return 'normal';
+ }
+ 
+-function getSelectOptions( optionsArray ) {
+-	return [
+-		...optionsArray.map( ( option ) => ( { value: option.slug, label: option.name } ) ),
+-		{ value: 'custom', label: __( 'Custom' ) },
+-	];
+-}
+-
+ function FontSizePicker( {
+ 	fallbackFontSize,
+ 	fontSizes = [],
+@@ -34,6 +28,7 @@ function FontSizePicker( {
+ 	onChange,
+ 	value,
+ 	withSlider = false,
++	instanceId,
+ } ) {
+ 	const [ currentSelectValue, setCurrentSelectValue ] = useState( getSelectValueFromFontSize( fontSizes, value ) );
+ 
+@@ -51,7 +46,7 @@ function FontSizePicker( {
+ 		onChange( Number( newValue ) );
+ 	};
+ 
+-	const onSelectChangeValue = ( eventValue ) => {
++	const onSelectChangeValue = ( { currentTarget: { id: eventValue } } ) => {
+ 		setCurrentSelectValue( eventValue );
+ 		const selectedFont = fontSizes.find( ( font ) => font.slug === eventValue );
+ 		if ( selectedFont ) {
+@@ -66,23 +61,43 @@ function FontSizePicker( {
+ 			</legend>
+ 			<div className="components-font-size-picker__controls">
+ 				{ ( fontSizes.length > 0 ) &&
+-					<SelectControl
+-						className={ 'components-font-size-picker__select' }
+-						label={ 'Choose preset' }
+-						hideLabelFromVision={ true }
+-						value={ currentSelectValue }
+-						onChange={ onSelectChangeValue }
+-						options={ getSelectOptions( fontSizes ) }
+-					/>
++					<ButtonGroup
++						className="components-font-size-picker__button-group"
++						aria-label={ __( 'Font Size Preset' ) }
++					>
++						{ fontSizes.map( ( fontSize ) => {
++							const selected = fontSize.slug === currentSelectValue;
++							return (
++								<Button
++									key={ fontSize.slug }
++									id={ fontSize.slug }
++									className="components-font-size-picker__button-group-button"
++									onClick={ onSelectChangeValue }
++									aria-pressed={ selected }
++									isPrimary={ selected }
++									style={ { fontSize: fontSize.size } }
++									isDefault
++								>
++									{ fontSize.name }
++								</Button>
++							);
++						} ) }
++					</ButtonGroup>
+ 				}
+ 				{ ( ! withSlider && ! disableCustomFontSizes ) &&
+-					<input
+-						className="components-range-control__number"
+-						type="number"
+-						onChange={ onChangeValue }
+-						aria-label={ __( 'Custom' ) }
+-						value={ value || '' }
+-					/>
++					<>
++						<label htmlFor={ `components-range-control__number-${ instanceId }` }>
++							{ __( 'Custom' ) }
++						</label>
++						<input
++							id={ `components-range-control__number-${ instanceId }` }
++							className="components-range-control__number"
++							type="number"
++							onChange={ onChangeValue }
++							aria-label={ __( 'Custom' ) }
++							value={ value || '' }
++						/>
++					</>
+ 				}
+ 				<Button
+ 					className="components-color-palette__clear"
+@@ -115,4 +130,4 @@ function FontSizePicker( {
+ 	);
+ }
+ 
+-export default FontSizePicker;
++export default withInstanceId( FontSizePicker );
+diff --git a/packages/components/src/font-size-picker/style.scss b/packages/components/src/font-size-picker/style.scss
+index 2444087dcf30e3..ccc5bbf50dd6ab 100644
+--- a/packages/components/src/font-size-picker/style.scss
++++ b/packages/components/src/font-size-picker/style.scss
+@@ -1,13 +1,11 @@
+ .components-font-size-picker__controls {
+ 	max-width: $sidebar-width - ( 2 * $panel-padding );
+-	display: flex;
+-	align-items: center;
+ 	margin-bottom: $grid-size * 3;
+ 
+ 	// Apply the same height as the isSmall Reset button.
+ 	.components-range-control__number {
+ 		height: 30px;
+-		margin-left: 0;
++		margin-left: $grid-size;
+ 		margin-right: $grid-size;
+ 
+ 		// Show the reset button as disabled until a value is entered.
+@@ -17,18 +15,22 @@
+ 			pointer-events: none;
+ 		}
+ 	}
++}
++
++.components-font-size-picker__button-group {
++	display: grid;
++	grid-gap: $grid-size;
++	grid-template-columns: 1fr 1fr;
++	margin: $grid-size 0;
+ 
+-	// Allow the font-size picker dropdown to grow in width.
+-	.components-font-size-picker__select {
+-		margin-right: $grid-size;
+-		flex-grow: 1;
+-	}
+ }
+ 
+-// Needed to override CSS set in https://github.com/WordPress/gutenberg/blob/9c438f93a7215d50d1efc0492c308e4cbaa59c52/packages/edit-post/src/components/sidebar/settings-sidebar/style.scss#L6.
+-.components-font-size-picker__select.components-font-size-picker__select.components-font-size-picker__select.components-font-size-picker__select,
+-.components-font-size-picker__select .components-base-control__field {
+-	margin-bottom: 0;
++.components-font-size-picker__button-group-button {
++	align-items: center;
++	border-radius: 5px !important;
++	height: 50px !important;
++	justify-content: center;
++	line-height: 50px !important;
+ }
+ 
+ .components-font-size-picker__custom-input {
+@@ -37,4 +39,3 @@
+ 		height: 30px;
+ 	}
+ }
+-

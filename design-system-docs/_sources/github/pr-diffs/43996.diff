@@ -1,0 +1,151 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4aa5eb6c3c7108..481f3aafb5be87 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ 
+ -   `ToggleControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43717](https://github.com/WordPress/gutenberg/pull/43717)).
+ -   `CheckboxControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43720](https://github.com/WordPress/gutenberg/pull/43720)).
++-   `FocalPointControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43996](https://github.com/WordPress/gutenberg/pull/43996)).
+ -   `TextControl`, `TextareaControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43782](https://github.com/WordPress/gutenberg/pull/43782)).
+ -   `RangeControl`: Tweak dark gray marking color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
+ -   `UnitControl`: Tweak unit dropdown color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
+diff --git a/packages/components/src/focal-point-picker/controls.tsx b/packages/components/src/focal-point-picker/controls.tsx
+index 80cd6ad6a41511..3e6d33011da730 100644
+--- a/packages/components/src/focal-point-picker/controls.tsx
++++ b/packages/components/src/focal-point-picker/controls.tsx
+@@ -22,6 +22,8 @@ const TEXTCONTROL_MAX = 100;
+ const noop = () => {};
+ 
+ export default function FocalPointPickerControls( {
++	__nextHasNoMarginBottom,
++	hasHelpText,
+ 	onChange = noop,
+ 	point = {
+ 		x: 0.5,
+@@ -45,7 +47,11 @@ export default function FocalPointPickerControls( {
+ 	};
+ 
+ 	return (
+-		<ControlWrapper className="focal-point-picker__controls">
++		<ControlWrapper
++			className="focal-point-picker__controls"
++			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++			hasHelpText={ hasHelpText }
++		>
+ 			<FocalPointUnitControl
+ 				label={ __( 'Left' ) }
+ 				value={ [ valueX, '%' ].join( '' ) }
+diff --git a/packages/components/src/focal-point-picker/index.tsx b/packages/components/src/focal-point-picker/index.tsx
+index bf4107d51af50c..1c9077483dfda3 100644
+--- a/packages/components/src/focal-point-picker/index.tsx
++++ b/packages/components/src/focal-point-picker/index.tsx
+@@ -83,6 +83,7 @@ const GRID_OVERLAY_TIMEOUT = 600;
+  * ```
+  */
+ export function FocalPointPicker( {
++	__nextHasNoMarginBottom,
+ 	autoPlay = true,
+ 	className,
+ 	help,
+@@ -239,6 +240,7 @@ export function FocalPointPicker( {
+ 	return (
+ 		<BaseControl
+ 			{ ...restProps }
++			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 			label={ label }
+ 			id={ id }
+ 			help={ help }
+@@ -270,6 +272,8 @@ export function FocalPointPicker( {
+ 				</MediaContainer>
+ 			</MediaWrapper>
+ 			<Controls
++				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++				hasHelpText={ !! help }
+ 				point={ { x, y } }
+ 				onChange={ ( value ) => {
+ 					onChange?.( getFinalValue( value ) );
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
+index 54304213a82d8e..9bae330f258f20 100644
+--- a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
++++ b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
+@@ -1,6 +1,7 @@
+ /**
+  * External dependencies
+  */
++import { css } from '@emotion/react';
+ import styled from '@emotion/styled';
+ 
+ /**
+@@ -9,6 +10,7 @@ import styled from '@emotion/styled';
+ import { Flex } from '../../flex';
+ import UnitControl from '../../unit-control';
+ import { COLORS } from '../../utils';
++import type { FocalPointPickerControlsProps } from '../types';
+ import { INITIAL_BOUNDS } from '../utils';
+ 
+ export const MediaWrapper = styled.div`
+@@ -54,9 +56,32 @@ export const StyledUnitControl = styled( UnitControl )`
+ 	width: 100px;
+ `;
+ 
++const deprecatedBottomMargin = ( {
++	__nextHasNoMarginBottom,
++}: FocalPointPickerControlsProps ) => {
++	return ! __nextHasNoMarginBottom
++		? css`
++				padding-bottom: 1em;
++		  `
++		: undefined;
++};
++
++const extraHelpTextMargin = ( {
++	hasHelpText = false,
++}: FocalPointPickerControlsProps ) => {
++	return hasHelpText
++		? css`
++				padding-bottom: 1em;
++		  `
++		: undefined;
++};
++
+ export const ControlWrapper = styled( Flex )`
+ 	max-width: 320px;
+-	padding: 1em 0;
++	padding-top: 1em;
++
++	${ extraHelpTextMargin }
++	${ deprecatedBottomMargin }
+ `;
+ 
+ export const GridView = styled.div`
+diff --git a/packages/components/src/focal-point-picker/types.ts b/packages/components/src/focal-point-picker/types.ts
+index 89e632f9e0925b..81b683b7ce16cb 100644
+--- a/packages/components/src/focal-point-picker/types.ts
++++ b/packages/components/src/focal-point-picker/types.ts
+@@ -20,6 +20,12 @@ export type FocalPointPickerProps = Pick<
+ 	BaseControlProps,
+ 	'help' | 'hideLabelFromVision' | 'label'
+ > & {
++	/**
++	 * Start opting into the new margin-free styles that will become the default in a future version.
++	 *
++	 * @default false
++	 */
++	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * Autoplays HTML5 video. This only applies to video sources (`url`).
+ 	 *
+@@ -55,6 +61,12 @@ export type FocalPointPickerProps = Pick<
+ };
+ 
+ export type FocalPointPickerControlsProps = {
++	__nextHasNoMarginBottom?: boolean;
++	/**
++	 * A bit of extra bottom margin will be added if a `help` text
++	 * needs to be rendered under it.
++	 */
++	hasHelpText: boolean;
+ 	onChange?: ( value: FocalPoint ) => void;
+ 	point?: FocalPoint;
+ };

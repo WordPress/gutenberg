@@ -1,0 +1,33 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3e4e32ffdf955f..94e84cf3a1e6ee 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `PanelBody`: Convert to TypeScript ([#47702](https://github.com/WordPress/gutenberg/pull/47702)).
+ -   `withFallbackStyles` HOC: Convert to TypeScript ([#48720](https://github.com/WordPress/gutenberg/pull/48720)).
+ -   `navigateRegions` HOC: Convert to TypeScript ([#48632](https://github.com/WordPress/gutenberg/pull/48632)).
++-   `withSpokenMessages`: HOC: Convert to TypeScript ([#48163](https://github.com/WordPress/gutenberg/pull/48163)).
+ 
+ ## 23.5.0 (2023-03-01)
+ 
+diff --git a/packages/components/src/higher-order/with-spoken-messages/index.js b/packages/components/src/higher-order/with-spoken-messages/index.tsx
+similarity index 100%
+rename from packages/components/src/higher-order/with-spoken-messages/index.js
+rename to packages/components/src/higher-order/with-spoken-messages/index.tsx
+diff --git a/packages/components/src/higher-order/with-spoken-messages/test/index.js b/packages/components/src/higher-order/with-spoken-messages/test/index.tsx
+similarity index 90%
+rename from packages/components/src/higher-order/with-spoken-messages/test/index.js
+rename to packages/components/src/higher-order/with-spoken-messages/test/index.tsx
+index ea8efec351bc4f..b4d37eaa840962 100644
+--- a/packages/components/src/higher-order/with-spoken-messages/test/index.js
++++ b/packages/components/src/higher-order/with-spoken-messages/test/index.tsx
+@@ -12,7 +12,8 @@ describe( 'withSpokenMessages', () => {
+ 	it( 'should generate speak and debouncedSpeak props', () => {
+ 		const testSpeak = jest.fn();
+ 		const testDebouncedSpeak = jest.fn();
+-		const isFunction = ( maybeFunc ) => typeof maybeFunc === 'function';
++		const isFunction = ( maybeFunc: any ) =>
++			typeof maybeFunc === 'function';
+ 		const DumpComponent = withSpokenMessages(
+ 			( { speak, debouncedSpeak } ) => {
+ 				testSpeak( isFunction( speak ) );

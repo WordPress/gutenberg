@@ -1,0 +1,51 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 38e44d1c10cfba..b54dcec4b412bc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -1,3 +1,10 @@
++## Next release
++
++### New Features
++
++- Added a new `popoverProps` prop to the `Dropdown` component which allows users of the `Dropdown` component to pass props directly to the `PopOver` component.
++
++
+ ## 8.0.0 (2019-06-12)
+ 
+ ### New Feature
+diff --git a/packages/components/src/dropdown/README.md b/packages/components/src/dropdown/README.md
+index 0e09a6651dcd92..31f5de665bea34 100644
+--- a/packages/components/src/dropdown/README.md
++++ b/packages/components/src/dropdown/README.md
+@@ -100,3 +100,11 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to
+  - Type: `String` or `Boolean`
+  - Required: No
+  - Default: `"firstElement"`
++
++ ### popoverProps
++ 
++Properties of popoverProps object will be passed as props to the `Popover` component.
++Use this o object to access properties/feature if the `Popover` component that are not already exposed in the `Dropdown`component, e.g.: the hability to have the popover without an arrow. 
++ 
++ - Type: `Object`
++ - Required: No
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index b4d9082af3cdc0..bff463f6655f9c 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -74,6 +74,7 @@ class Dropdown extends Component {
+ 			expandOnMobile,
+ 			headerTitle,
+ 			focusOnMount,
++			popoverProps,
+ 		} = this.props;
+ 
+ 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
+@@ -90,6 +91,7 @@ class Dropdown extends Component {
+ 						expandOnMobile={ expandOnMobile }
+ 						headerTitle={ headerTitle }
+ 						focusOnMount={ focusOnMount }
++						{ ...popoverProps }
+ 					>
+ 						{ renderContent( args ) }
+ 					</Popover>

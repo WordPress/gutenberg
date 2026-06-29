@@ -1,0 +1,33 @@
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 5cd52073b412af..8d08faa224e7b8 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -28,6 +28,7 @@
+ 		"build-style/**",
+ 		"src/**/*.scss"
+ 	],
++	"types": "build-types",
+ 	"dependencies": {
+ 		"@babel/runtime": "^7.16.0",
+ 		"@emotion/cache": "^11.7.1",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.ts
+similarity index 100%
+rename from packages/components/src/index.js
+rename to packages/components/src/index.ts
+diff --git a/packages/components/src/private-apis.js b/packages/components/src/private-apis.ts
+similarity index 100%
+rename from packages/components/src/private-apis.js
+rename to packages/components/src/private-apis.ts
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 242ff98906cccd..55f368924c2337 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -43,7 +43,6 @@
+ 		"src/**/*.native.js",
+ 		"src/**/react-native-*",
+ 		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
+-		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
+-		"src/index.js"
++		"src/**/test/**/*.js" // only exclude js files, ts{x} files should be checked
+ 	]
+ }

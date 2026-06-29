@@ -1,0 +1,34 @@
+diff --git a/packages/edit-site/src/components/global-styles/font-library-modal/index.js b/packages/edit-site/src/components/global-styles/font-library-modal/index.js
+index 1128ca0811977e..e5960ec1f643e9 100644
+--- a/packages/edit-site/src/components/global-styles/font-library-modal/index.js
++++ b/packages/edit-site/src/components/global-styles/font-library-modal/index.js
+@@ -51,7 +51,7 @@ function FontLibraryModal( {
+ 		<Modal
+ 			title={ __( 'Fonts' ) }
+ 			onRequestClose={ onRequestClose }
+-			isFullScreen
++			size="large"
+ 			className="font-library-modal"
+ 		>
+ 			<TabPanel
+diff --git a/packages/edit-site/src/components/global-styles/font-library-modal/style.scss b/packages/edit-site/src/components/global-styles/font-library-modal/style.scss
+index 86cac4244dea93..f3e8f66943e696 100644
+--- a/packages/edit-site/src/components/global-styles/font-library-modal/style.scss
++++ b/packages/edit-site/src/components/global-styles/font-library-modal/style.scss
+@@ -1,11 +1,12 @@
+ .font-library-modal {
+-	// @todo: If a new prop is added to the Modal component that constrains
+-	// the content width, we should use that prop instead of this style.
+-	// see https://github.com/WordPress/gutenberg/issues/54471.
++	// @todo: If a new prop is added to the Modal component that fixes the height
++	// and/or constrains the origin, we should use that instead of this style.
++	// see https://github.com/WordPress/gutenberg/issues/55062.
+ 	&.font-library-modal {
+ 
+ 		@include break-medium() {
+-			width: 65vw;
++			height: calc(100% - #{ $grid-unit-50 * 2 }); /* match full-screen `Modal` height */
++			max-height: none;
+ 		}
+ 	}
+ 

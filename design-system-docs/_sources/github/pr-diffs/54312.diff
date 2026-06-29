@@ -1,0 +1,304 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index fa4083bf62ab14..3fa7e6fd690e8e 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -214,7 +214,6 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                       class="components-circular-option-picker__option-wrapper"
+                     >
+                       <button
+-                        aria-describedby="tooltip-0"
+                         aria-label="Color: red"
+                         aria-selected="true"
+                         class="components-button components-circular-option-picker__option is-pressed"
+diff --git a/packages/block-editor/src/components/link-control/test/index.js b/packages/block-editor/src/components/link-control/test/index.js
+index e12232130be1b1..bce5ca5233192a 100644
+--- a/packages/block-editor/src/components/link-control/test/index.js
++++ b/packages/block-editor/src/components/link-control/test/index.js
+@@ -176,9 +176,7 @@ describe( 'Basic rendering', () => {
+ 		await user.type( searchInput, 'Hello' );
+ 
+ 		// Wait for the spinner SVG icon to be rendered.
+-		expect(
+-			await screen.findByTestId( 'components-spinner' )
+-		).toBeVisible();
++		expect( await screen.findByRole( 'presentation' ) ).toBeVisible();
+ 		// Check the suggestions list is not rendered yet.
+ 		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+ 
+@@ -192,9 +190,7 @@ describe( 'Basic rendering', () => {
+ 		// Check the suggestions list is rendered.
+ 		expect( resultsList ).toBeVisible();
+ 		// Check the spinner SVG icon is not rendered any longer.
+-		expect(
+-			screen.queryByTestId( 'components-spinner' )
+-		).not.toBeInTheDocument();
++		expect( screen.queryByRole( 'presentation' ) ).not.toBeInTheDocument();
+ 
+ 		const searchResultElements =
+ 			within( resultsList ).getAllByRole( 'option' );
+@@ -459,18 +455,14 @@ describe( 'Searching for a link', () => {
+ 		// Simulate searching for a term.
+ 		await user.type( searchInput, searchTerm );
+ 
+-		expect(
+-			await screen.findByTestId( 'components-spinner' )
+-		).toBeVisible();
++		expect( await screen.findByRole( 'presentation' ) ).toBeVisible();
+ 		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+ 
+ 		// make the search suggestions fetch return a response
+ 		resolver( fauxEntitySuggestions );
+ 
+ 		expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
+-		expect(
+-			screen.queryByTestId( 'components-spinner' )
+-		).not.toBeInTheDocument();
++		expect( screen.queryByRole( 'presentation' ) ).not.toBeInTheDocument();
+ 	} );
+ 
+ 	it.each( [ 'With spaces', 'Uppercase', 'lowercase' ] )(
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ca2d278909aa78..2ae22caf76d05c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ 
+ ### Bug Fix
+ 
++-   `Tooltip`: dynamically render in the DOM only when visible ([#54312](https://github.com/WordPress/gutenberg/pull/54312)).
+ -   `PaletteEdit`: Fix padding in RTL languages ([#54034](https://github.com/WordPress/gutenberg/pull/54034)).
+ -   `CircularOptionPicker`: make focus styles resilient to button size changes ([#54196](https://github.com/WordPress/gutenberg/pull/54196)).
+ 
+diff --git a/packages/components/src/button/test/index.tsx b/packages/components/src/button/test/index.tsx
+index af1afa801b507f..7f65337508bd89 100644
+--- a/packages/components/src/button/test/index.tsx
++++ b/packages/components/src/button/test/index.tsx
+@@ -194,7 +194,7 @@ describe( 'Button', () => {
+ 
+ 			render( <Button icon={ plusCircle } label="WordPress" /> );
+ 
+-			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
++			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
+ 
+ 			// Move focus to the button
+ 			await user.tab();
+@@ -231,7 +231,7 @@ describe( 'Button', () => {
+ 				/>
+ 			);
+ 
+-			expect( screen.queryByText( 'Label' ) ).not.toBeVisible();
++			expect( screen.queryByText( 'Label' ) ).not.toBeInTheDocument();
+ 
+ 			// Move focus to the button
+ 			await user.tab();
+@@ -290,7 +290,7 @@ describe( 'Button', () => {
+ 				<Button icon={ plusCircle } label="WordPress" children={ [] } />
+ 			);
+ 
+-			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
++			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
+ 
+ 			// Move focus to the button
+ 			await user.tab();
+@@ -326,7 +326,7 @@ describe( 'Button', () => {
+ 				</Button>
+ 			);
+ 
+-			expect( screen.queryByText( 'WordPress' ) ).not.toBeVisible();
++			expect( screen.queryByText( 'WordPress' ) ).not.toBeInTheDocument();
+ 
+ 			// Move focus to the button
+ 			await user.tab();
+diff --git a/packages/components/src/spinner/index.tsx b/packages/components/src/spinner/index.tsx
+index 6b8131783ff5ae..9eee9dde18ef23 100644
+--- a/packages/components/src/spinner/index.tsx
++++ b/packages/components/src/spinner/index.tsx
+@@ -30,7 +30,6 @@ export function UnforwardedSpinner(
+ 			focusable="false"
+ 			{ ...props }
+ 			ref={ forwardedRef }
+-			data-testid="components-spinner"
+ 		>
+ 			{ /* Gray circular background */ }
+ 			<SpinnerTrack
+diff --git a/packages/components/src/tab-panel/test/index.tsx b/packages/components/src/tab-panel/test/index.tsx
+index aa9cec2d993383..c07685935ce162 100644
+--- a/packages/components/src/tab-panel/test/index.tsx
++++ b/packages/components/src/tab-panel/test/index.tsx
+@@ -117,7 +117,7 @@ describe.each( [
+ 			for ( let i = 0; i < allTabs.length; i++ ) {
+ 				expect(
+ 					screen.queryByText( TABS_WITH_ICON[ i ].title )
+-				).not.toBeVisible();
++				).not.toBeInTheDocument();
+ 
+ 				await user.hover( allTabs[ i ] );
+ 
+@@ -160,37 +160,37 @@ describe.each( [
+ 
+ 			// Tab to focus the tablist. Make sure alpha is focused, and that the
+ 			// corresponding tooltip is shown.
+-			expect( screen.queryByText( 'Alpha' ) ).not.toBeVisible();
++			expect( screen.queryByText( 'Alpha' ) ).not.toBeInTheDocument();
+ 			await user.keyboard( '[Tab]' );
+ 			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
+-			expect( screen.getByText( 'Alpha' ) ).toBeVisible();
++			expect( screen.getByText( 'Alpha' ) ).toBeInTheDocument();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 
+ 			// Move selection with arrow keys. Make sure beta is focused, and that
+ 			// the corresponding tooltip is shown.
+-			expect( screen.queryByText( 'Beta' ) ).not.toBeVisible();
++			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
+ 			await user.keyboard( '[ArrowRight]' );
+ 			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
+ 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+-			expect( screen.getByText( 'Beta' ) ).toBeVisible();
++			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 
+ 			// Move selection with arrow keys. Make sure gamma is focused, and that
+ 			// the corresponding tooltip is shown.
+-			expect( screen.queryByText( 'Gamma' ) ).not.toBeVisible();
++			expect( screen.queryByText( 'Gamma' ) ).not.toBeInTheDocument();
+ 			await user.keyboard( '[ArrowRight]' );
+ 			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
+ 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
+-			expect( screen.getByText( 'Gamma' ) ).toBeVisible();
++			expect( screen.getByText( 'Gamma' ) ).toBeInTheDocument();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 
+ 			// Move selection with arrow keys. Make sure beta is focused, and that
+ 			// the corresponding tooltip is shown.
+-			expect( screen.queryByText( 'Beta' ) ).not.toBeVisible();
++			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
+ 			await user.keyboard( '[ArrowLeft]' );
+ 			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
+ 			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+-			expect( screen.getByText( 'Beta' ) ).toBeVisible();
++			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
+ 			expect( await getSelectedTab() ).toHaveFocus();
+ 
+ 			await cleanupTooltip( user );
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index ce95e3d739c2cc..296e9483b9f705 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -246,7 +246,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+         >
+           <button
+             aria-checked="true"
+-            aria-describedby="tooltip-4"
+             aria-label="Uppercase"
+             class="emotion-12 components-toggle-group-control-option-base"
+             data-active-item=""
+@@ -285,7 +284,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+         >
+           <button
+             aria-checked="false"
+-            aria-describedby="tooltip-5"
+             aria-label="Lowercase"
+             class="emotion-18 components-toggle-group-control-option-base"
+             data-command=""
+@@ -789,7 +787,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+         >
+           <button
+             aria-checked="true"
+-            aria-describedby="tooltip-0"
+             aria-label="Uppercase"
+             class="emotion-12 components-toggle-group-control-option-base"
+             data-active-item=""
+@@ -828,7 +825,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+         >
+           <button
+             aria-checked="false"
+-            aria-describedby="tooltip-1"
+             aria-label="Lowercase"
+             class="emotion-18 components-toggle-group-control-option-base"
+             data-command=""
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index 9d2a272b810fc6..5fedfedb81cb89 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -49,6 +49,8 @@ function Tooltip( props: TooltipProps ) {
+ 		timeout: delay,
+ 	} );
+ 
++	const isTooltipOpen = tooltipStore.useState( 'open' );
++
+ 	return (
+ 		<>
+ 			<Ariakit.TooltipAnchor
+@@ -59,7 +61,7 @@ function Tooltip( props: TooltipProps ) {
+ 			>
+ 				{ isOnlyChild ? undefined : children }
+ 			</Ariakit.TooltipAnchor>
+-			{ isOnlyChild && ( text || shortcut ) && (
++			{ isOnlyChild && ( text || shortcut ) && isTooltipOpen && (
+ 				<Ariakit.Tooltip
+ 					className="components-tooltip"
+ 					gutter={ 4 }
+diff --git a/packages/components/src/tooltip/test/index.tsx b/packages/components/src/tooltip/test/index.tsx
+index 14270d2a76fc3f..aefc927d76840a 100644
+--- a/packages/components/src/tooltip/test/index.tsx
++++ b/packages/components/src/tooltip/test/index.tsx
+@@ -272,9 +272,9 @@ describe( 'Tooltip', () => {
+ 			</Modal>
+ 		);
+ 
+-		const tooltip = await screen.findByRole( 'tooltip', { hidden: true } );
+-
+-		expect( tooltip ).toBeInTheDocument();
++		expect(
++			screen.queryByRole( 'tooltip', { name: /close/i } )
++		).not.toBeInTheDocument();
+ 
+ 		await user.hover(
+ 			screen.getByRole( 'button', {
+@@ -282,7 +282,11 @@ describe( 'Tooltip', () => {
+ 			} )
+ 		);
+ 
+-		await waitFor( () => expect( tooltip ).toBeVisible() );
++		await waitFor( () =>
++			expect(
++				screen.getByRole( 'tooltip', { name: /close/i } )
++			).toBeVisible()
++		);
+ 
+ 		await user.keyboard( '[Escape]' );
+ 
+@@ -291,11 +295,19 @@ describe( 'Tooltip', () => {
+ 		await cleanupTooltip( user );
+ 	} );
+ 
+-	it( 'should associate the tooltip text with its anchor via the accessible description', async () => {
++	it( 'should associate the tooltip text with its anchor via the accessible description when visible', async () => {
++		const user = userEvent.setup();
++
+ 		render( <Tooltip { ...props } /> );
+ 
++		await user.hover(
++			screen.getByRole( 'button', {
++				name: /Button/i,
++			} )
++		);
++
+ 		expect(
+-			screen.getByRole( 'button', { description: 'tooltip text' } )
++			await screen.findByRole( 'button', { description: 'tooltip text' } )
+ 		).toBeInTheDocument();
+ 	} );
+ } );
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index 0a3c1fa0f171fa..c5aad5aa3be9b9 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -665,7 +665,6 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
+     >
+       <svg
+         class="components-spinner emotion-0 emotion-1"
+-        data-testid="components-spinner"
+         focusable="false"
+         height="16"
+         role="presentation"

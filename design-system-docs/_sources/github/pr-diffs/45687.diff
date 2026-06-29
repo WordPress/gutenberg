@@ -1,0 +1,94 @@
+diff --git a/packages/components/src/base-field/test/__snapshots__/index.js.snap b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+index 273234b79c1f9a..99582f8d40879f 100644
+--- a/packages/components/src/base-field/test/__snapshots__/index.js.snap
++++ b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+@@ -131,9 +131,11 @@ exports[`base field should render correctly 1`] = `
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+ }
+ 
+-<div
+-  class="components-flex components-base-field emotion-0 emotion-1"
+-  data-wp-c16t="true"
+-  data-wp-component="BaseField"
+-/>
++<div>
++  <div
++    class="components-flex components-base-field emotion-0 emotion-1"
++    data-wp-c16t="true"
++    data-wp-component="BaseField"
++  />
++</div>
+ `;
+diff --git a/packages/components/src/base-field/test/index.js b/packages/components/src/base-field/test/index.js
+index 8204163c2b6c40..871bd8b3f595ee 100644
+--- a/packages/components/src/base-field/test/index.js
++++ b/packages/components/src/base-field/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -15,33 +15,45 @@ const TestField = ( props ) => {
+ 
+ describe( 'base field', () => {
+ 	it( 'should render correctly', () => {
+-		const base = render( <TestField /> ).container;
+-		expect( base.firstChild ).toMatchSnapshot();
++		const { container } = render( <TestField /> );
++		expect( container ).toMatchSnapshot();
+ 	} );
+ 
+ 	describe( 'props', () => {
+ 		it( 'should render error styles', () => {
+-			const base = render( <TestField /> ).container;
+-			const { container } = render( <TestField hasError /> );
+-			expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-				base.firstChild
++			render(
++				<>
++					<TestField data-testid="base-field" />
++					<TestField hasError data-testid="base-field-error" />
++				</>
+ 			);
++			expect(
++				screen.getByTestId( 'base-field-error' )
++			).toMatchStyleDiffSnapshot( screen.getByTestId( 'base-field' ) );
+ 		} );
+ 
+ 		it( 'should render inline styles', () => {
+-			const base = render( <TestField /> ).container;
+-			const { container } = render( <TestField isInline /> );
+-			expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-				base.firstChild
++			render(
++				<>
++					<TestField data-testid="base-field" />
++					<TestField isInline data-testid="base-field-inline" />
++				</>
+ 			);
++			expect(
++				screen.getByTestId( 'base-field-inline' )
++			).toMatchStyleDiffSnapshot( screen.getByTestId( 'base-field' ) );
+ 		} );
+ 
+ 		it( 'should render subtle styles', () => {
+-			const base = render( <TestField /> ).container;
+-			const { container } = render( <TestField isSubtle /> );
+-			expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-				base.firstChild
++			render(
++				<>
++					<TestField data-testid="base-field" />
++					<TestField isSubtle data-testid="base-field-subtle" />
++				</>
+ 			);
++			expect(
++				screen.getByTestId( 'base-field-subtle' )
++			).toMatchStyleDiffSnapshot( screen.getByTestId( 'base-field' ) );
+ 		} );
+ 	} );
+ 

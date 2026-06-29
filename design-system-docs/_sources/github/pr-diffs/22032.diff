@@ -1,0 +1,192 @@
+diff --git a/packages/components/src/date-time/README.md b/packages/components/src/date-time/README.md
+index 3cd2392b09e2fc..6fcdea239fa71e 100644
+--- a/packages/components/src/date-time/README.md
++++ b/packages/components/src/date-time/README.md
+@@ -75,3 +75,12 @@ A callback function which receives a Date object representing a day as an argume
+ 
+ - Type: `Function`
+ - Required: No
++
++### isDayHighlighted
++
++A callback function which receives a moment object representing a day as an argument, and should return a Boolean to signify if the day is visually highlighted in the calendar.
++
++This function will be called on each day, every time user browses into a different month. If you want to force an update to highlights, pass a new reference to your function. Otherwise, make sure the reference does not change between renders to fully leverage the caching.
++
++- Type: `Function`
++- Required: No
+diff --git a/packages/components/src/date-time/date.js b/packages/components/src/date-time/date.js
+index c650df693c4da2..4f395f4ebeff74 100644
+--- a/packages/components/src/date-time/date.js
++++ b/packages/components/src/date-time/date.js
+@@ -24,6 +24,7 @@ class DatePicker extends Component {
+ 		this.onChangeMoment = this.onChangeMoment.bind( this );
+ 		this.nodeRef = createRef();
+ 		this.keepFocusInside = this.keepFocusInside.bind( this );
++		this.isDayHighlighted = this.isDayHighlighted.bind( this );
+ 	}
+ 
+ 	/*
+@@ -81,9 +82,24 @@ class DatePicker extends Component {
+ 		return currentDate ? moment( currentDate ) : moment();
+ 	}
+ 
++	// todo change reference to `isDayHighlighted` every time, `events` prop change
++	isDayHighlighted( date ) {
++		// Do not highlight when no events.
++		if ( ! this.props.events?.length ) {
++			return false;
++		}
++		if ( this.props.onMonthPreviewed ) {
++			this.props.onMonthPreviewed( date.toDate() );
++		}
++
++		// Compare date against highlighted events.
++		return this.props.events.some( ( highlighted ) =>
++			date.isSame( highlighted.date, 'day' )
++		);
++	}
++
+ 	render() {
+ 		const { currentDate, isInvalidDate } = this.props;
+-
+ 		const momentDate = this.getMomentDate( currentDate );
+ 
+ 		return (
+@@ -107,6 +123,7 @@ class DatePicker extends Component {
+ 					isOutsideRange={ ( date ) => {
+ 						return isInvalidDate && isInvalidDate( date.toDate() );
+ 					} }
++					isDayHighlighted={ this.isDayHighlighted }
+ 					onPrevMonthClick={ this.keepFocusInside }
+ 					onNextMonthClick={ this.keepFocusInside }
+ 				/>
+diff --git a/packages/components/src/date-time/index.js b/packages/components/src/date-time/index.js
+index 45b069b6c3d157..32d5c5535ed273 100644
+--- a/packages/components/src/date-time/index.js
++++ b/packages/components/src/date-time/index.js
+@@ -38,7 +38,14 @@ export class DateTimePicker extends Component {
+ 	}
+ 
+ 	render() {
+-		const { currentDate, is12Hour, isInvalidDate, onChange } = this.props;
++		const {
++			currentDate,
++			is12Hour,
++			isInvalidDate,
++			onMonthPreviewed,
++			onChange,
++			events,
++		} = this.props;
+ 
+ 		return (
+ 			<div className="components-datetime">
+@@ -53,6 +60,8 @@ export class DateTimePicker extends Component {
+ 							currentDate={ currentDate }
+ 							onChange={ onChange }
+ 							isInvalidDate={ isInvalidDate }
++							onMonthPreviewed={ onMonthPreviewed }
++							events={ events }
+ 						/>
+ 					</>
+ 				) }
+diff --git a/packages/components/src/date-time/stories/index.js b/packages/components/src/date-time/stories/index.js
+new file mode 100644
+index 00000000000000..1fa91a6470859c
+--- /dev/null
++++ b/packages/components/src/date-time/stories/index.js
+@@ -0,0 +1,36 @@
++/**
++ * External dependencies
++ */
++import { boolean } from '@storybook/addon-knobs';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { DateTimePicker } from '../';
++
++export default {
++	title: 'Components/DateTimePicker',
++	component: DateTimePicker,
++};
++
++const DateTimePickerWithState = ( { is12Hour } ) => {
++	const [ date, setDate ] = useState();
++
++	return (
++		<DateTimePicker
++			currentDate={ date }
++			onChange={ setDate }
++			is12Hour={ is12Hour }
++		/>
++	);
++};
++
++export const _default = () => {
++	const is12Hour = boolean( 'Is 12 hour (shows AM/PM)', false );
++	return <DateTimePickerWithState is12Hour={ is12Hour } />;
++};
+diff --git a/packages/components/src/date-time/stories/with-days-highlighted.js b/packages/components/src/date-time/stories/with-days-highlighted.js
+new file mode 100644
+index 00000000000000..81838bea518381
+--- /dev/null
++++ b/packages/components/src/date-time/stories/with-days-highlighted.js
+@@ -0,0 +1,52 @@
++/**
++ * External dependencies
++ */
++import { button } from '@storybook/addon-knobs';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { DateTimePicker } from '..';
++
++export default {
++	title: 'Components/DateTimePicker',
++	component: DateTimePicker,
++};
++
++// Date utils, for demo purposes.
++const DAY_IN_MS = 24 * 60 * 60 * 1000;
++const aFewDaysAfter = ( date ) => {
++	// eslint-disable-next-line no-restricted-syntax
++	return new Date( date.getTime() + ( 1 + Math.random() * 5 ) * DAY_IN_MS );
++};
++
++const now = new Date();
++
++export const WithDaysHighlighted = () => {
++	const [ date, setDate ] = useState( now );
++
++	const [ highlights, setHighlights ] = useState( [
++		{ date: aFewDaysAfter( now ) },
++	] );
++
++	button( 'Add random highlight', () => {
++		const lastHighlight = highlights[ highlights.length - 1 ];
++		setHighlights( [
++			...highlights,
++			{ date: aFewDaysAfter( lastHighlight.date ) },
++		] );
++	} );
++
++	return (
++		<DateTimePicker
++			currentDate={ date }
++			onChange={ setDate }
++			events={ highlights }
++		/>
++	);
++};

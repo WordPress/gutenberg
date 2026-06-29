@@ -1,0 +1,154 @@
+diff --git a/packages/components/src/box-control/stories/index.js b/packages/components/src/box-control/stories/index.js
+index f0bab8e21481d6..55cf2628c670c7 100644
+--- a/packages/components/src/box-control/stories/index.js
++++ b/packages/components/src/box-control/stories/index.js
+@@ -1,17 +1,12 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-
+ /**
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+ import BoxControl from '../';
+-import { Flex, FlexBlock } from '../../flex';
+ 
+ export default {
+ 	title: 'Components (Experimental)/BoxControl',
+@@ -37,19 +32,13 @@ function DemoExample( {
+ 	const [ values, setValues ] = useState( defaultValues );
+ 
+ 	return (
+-		<Container align="top" gap={ 8 }>
+-			<FlexBlock>
+-				<Content>
+-					<BoxControl
+-						label="Padding"
+-						values={ values }
+-						sides={ sides }
+-						onChange={ setValues }
+-						splitOnAxis={ splitOnAxis }
+-					/>
+-				</Content>
+-			</FlexBlock>
+-		</Container>
++		<BoxControl
++			label="Padding"
++			values={ values }
++			sides={ sides }
++			onChange={ setValues }
++			splitOnAxis={ splitOnAxis }
++		/>
+ 	);
+ }
+ 
+@@ -84,11 +73,3 @@ export const axialControlsWithSingleSide = () => {
+ 		/>
+ 	);
+ };
+-
+-const Container = styled( Flex )`
+-	max-width: 780px;
+-`;
+-
+-const Content = styled.div`
+-	padding: 20px;
+-`;
+diff --git a/packages/components/src/card/stories/index.tsx b/packages/components/src/card/stories/index.tsx
+index c771dc62cdbfe9..a6de3a458cf60a 100644
+--- a/packages/components/src/card/stories/index.tsx
++++ b/packages/components/src/card/stories/index.tsx
+@@ -40,36 +40,32 @@ const meta: ComponentMeta< typeof Card > = {
+ 
+ export default meta;
+ 
+-const Template: ComponentStory< typeof Card > = ( args ) => {
+-	return (
+-		<div style={ { maxWidth: '280px' } }>
+-			<Card { ...args }>
+-				<CardHeader>
+-					<Heading>CardHeader</Heading>
+-				</CardHeader>
+-				<CardBody>
+-					<Text>CardBody</Text>
+-				</CardBody>
+-				<CardBody>
+-					<Text>CardBody (before CardDivider)</Text>
+-				</CardBody>
+-				<CardDivider />
+-				<CardBody>
+-					<Text>CardBody (after CardDivider)</Text>
+-				</CardBody>
+-				<CardMedia>
+-					<img
+-						alt="Card Media"
+-						src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
+-					/>
+-				</CardMedia>
+-				<CardFooter>
+-					<Text>CardFooter</Text>
+-					<Button variant="secondary">Action Button</Button>
+-				</CardFooter>
+-			</Card>
+-		</div>
+-	);
+-};
++const Template: ComponentStory< typeof Card > = ( args ) => (
++	<Card { ...args }>
++		<CardHeader>
++			<Heading>CardHeader</Heading>
++		</CardHeader>
++		<CardBody>
++			<Text>CardBody</Text>
++		</CardBody>
++		<CardBody>
++			<Text>CardBody (before CardDivider)</Text>
++		</CardBody>
++		<CardDivider />
++		<CardBody>
++			<Text>CardBody (after CardDivider)</Text>
++		</CardBody>
++		<CardMedia>
++			<img
++				alt="Card Media"
++				src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
++			/>
++		</CardMedia>
++		<CardFooter>
++			<Text>CardFooter</Text>
++			<Button variant="secondary">Action Button</Button>
++		</CardFooter>
++	</Card>
++);
+ 
+ export const Default: ComponentStory< typeof Card > = Template.bind( {} );
+diff --git a/packages/components/src/tools-panel/stories/index.js b/packages/components/src/tools-panel/stories/index.js
+index b9d317a0fb71f2..9f03ebbede6372 100644
+--- a/packages/components/src/tools-panel/stories/index.js
++++ b/packages/components/src/tools-panel/stories/index.js
+@@ -497,7 +497,6 @@ export const WithConditionallyRenderedControl = () => {
+ export { ToolsPanelWithItemGroupSlot } from './tools-panel-with-item-group-slot';
+ 
+ const PanelWrapperView = styled.div`
+-	max-width: 280px;
+ 	font-size: 13px;
+ 
+ 	.components-dropdown-menu__menu {
+diff --git a/packages/components/src/tools-panel/stories/tools-panel-with-item-group-slot.js b/packages/components/src/tools-panel/stories/tools-panel-with-item-group-slot.js
+index 39122539baf34d..717fd3a4485275 100644
+--- a/packages/components/src/tools-panel/stories/tools-panel-with-item-group-slot.js
++++ b/packages/components/src/tools-panel/stories/tools-panel-with-item-group-slot.js
+@@ -203,7 +203,6 @@ export const ToolsPanelWithItemGroupSlot = () => {
+ };
+ 
+ const PanelWrapperView = styled.div`
+-	max-width: 280px;
+ 	font-size: 13px;
+ 
+ 	.components-dropdown-menu__menu {

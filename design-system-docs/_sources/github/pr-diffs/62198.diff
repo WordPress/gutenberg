@@ -1,0 +1,128 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7210a25bbf7dd4..689be70595c5d5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   `CustomSelectControl`: align unit tests for v1 and legacy v2 versions. ([#62706](https://github.com/WordPress/gutenberg/pull/62706))
+ -   `CustomSelectControlV2`: fix handling of extra option attributes in the `onChange` callbacks and when forwarding them to the option DOM elements. ([#62255](https://github.com/WordPress/gutenberg/pull/62255))
+ -   `CustomSelectControlV2`: fix setting initial value and reacting to external controlled updates. ([#62733](https://github.com/WordPress/gutenberg/pull/62733))
++-   `CustomSelectControlV2`: Handle long strings in selected value ([#62198](https://github.com/WordPress/gutenberg/pull/62198)).
+ 
+ ## 28.1.0 (2024-06-15)
+ 
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index 9ae402d37f40d9..414a805eccfb1a 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -74,7 +74,7 @@ const CustomSelectButton = ( {
+ 			// move selection rather than open the popover
+ 			showOnKeyDown={ false }
+ 		>
+-			<div>{ computedRenderSelectedValue( currentValue ) }</div>
++			{ computedRenderSelectedValue( currentValue ) }
+ 		</Styled.Select>
+ 	);
+ };
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+index 41be4f58d9147f..e2b9a8a7471e5f 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+@@ -90,12 +90,12 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 		);
+ 
+ 		return (
+-			<>
++			<Styled.SelectedExperimentalHintWrapper>
+ 				{ currentValue }
+ 				<Styled.SelectedExperimentalHintItem className="components-custom-select-control__hint">
+ 					{ currentHint?.__experimentalHint }
+ 				</Styled.SelectedExperimentalHintItem>
+-			</>
++			</Styled.SelectedExperimentalHintWrapper>
+ 		);
+ 	};
+ 
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index 676a9c1a1ec590..c75a9a79c71c5f 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -10,16 +10,27 @@ import styled from '@emotion/styled';
+  */
+ import { COLORS, CONFIG } from '../utils';
+ import { space } from '../utils/space';
++import { chevronIconSize } from '../select-control/styles/select-control-styles';
+ import type { CustomSelectButtonSize } from './types';
+ 
+ const ITEM_PADDING = space( 2 );
+ 
++const truncateStyles = css`
++	overflow: hidden;
++	text-overflow: ellipsis;
++	white-space: nowrap;
++`;
++
+ export const WithHintWrapper = styled.div`
+ 	display: flex;
+ 	justify-content: space-between;
+ 	flex: 1;
+ `;
+ 
++export const SelectedExperimentalHintWrapper = styled.div`
++	${ truncateStyles }
++`;
++
+ export const SelectedExperimentalHintItem = styled.span`
+ 	color: ${ COLORS.theme.gray[ 600 ] };
+ 	margin-inline-start: ${ space( 2 ) };
+@@ -55,19 +66,18 @@ export const Select = styled( Ariakit.Select, {
+ 		const sizes = {
+ 			compact: {
+ 				[ heightProperty ]: 32,
+-				paddingInlineStart: space( 2 ),
+-				paddingInlineEnd: space( 1 ),
++				paddingInlineStart: 8,
++				paddingInlineEnd: 8 + chevronIconSize,
+ 			},
+ 			default: {
+ 				[ heightProperty ]: 40,
+-				paddingInlineStart: space( 4 ),
+-				paddingInlineEnd: space( 3 ),
++				paddingInlineStart: 16,
++				paddingInlineEnd: 16 + chevronIconSize,
+ 			},
+ 			small: {
+ 				[ heightProperty ]: 24,
+-				paddingInlineStart: space( 2 ),
+-				paddingInlineEnd: space( 1 ),
+-				fontSize: 11,
++				paddingInlineStart: 8,
++				paddingInlineEnd: 8 + chevronIconSize,
+ 			},
+ 		};
+ 
+@@ -75,13 +85,14 @@ export const Select = styled( Ariakit.Select, {
+ 	};
+ 
+ 	return css`
+-		display: flex;
+-		align-items: center;
+-		justify-content: space-between;
++		display: block;
+ 		background-color: ${ COLORS.theme.background };
+ 		border: none;
++		color: ${ COLORS.theme.foreground };
+ 		cursor: pointer;
++		font-family: inherit;
+ 		font-size: ${ CONFIG.fontSize };
++		text-align: left;
+ 		width: 100%;
+ 
+ 		&[data-focus-visible] {
+@@ -89,6 +100,7 @@ export const Select = styled( Ariakit.Select, {
+ 		}
+ 
+ 		${ getSize() }
++		${ ! hasCustomRenderProp && truncateStyles }
+ 	`;
+ } );
+ 

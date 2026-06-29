@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2322d6f48ae73b..38d41246bfa161 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `UnitControl`: Revamp support for changing unit by typing ([#39303](https://github.com/WordPress/gutenberg/pull/39303)).
+ -   `Modal`: Update corner radius to be between buttons and the site view frame, in a 2-4-8 system. ([#51254](https://github.com/WordPress/gutenberg/pull/51254)).
+ -   `ItemGroup`: Update button focus state styles to be inline with other button focus states in the editor. ([#51576](https://github.com/WordPress/gutenberg/pull/51576)).
++-   `ItemGroup`: Update button focus state styles to target `:focus-visible` rather than `:focus`. ([#51787](https://github.com/WordPress/gutenberg/pull/51787)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/item-group/styles.ts b/packages/components/src/item-group/styles.ts
+index 07ef6ba28db6e5..670fdf987dd932 100644
+--- a/packages/components/src/item-group/styles.ts
++++ b/packages/components/src/item-group/styles.ts
+@@ -24,7 +24,7 @@ export const unstyledButton = css`
+ 		color: ${ COLORS.ui.theme };
+ 	}
+ 
+-	&:focus {
++	&:focus-visible {
+ 		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+ 			var(
+ 				--wp-components-color-accent,
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+index a962cfbe81919d..182531ee01c02f 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+@@ -616,7 +616,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+   color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+ }
+ 
+-.emotion-13:focus {
++.emotion-13:focus-visible {
+   box-shadow: 0 0 0 var( --wp-admin-border-width-focus ) var(
+   				--wp-components-color-accent,
+   				var( --wp-admin-theme-color, var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9)) )

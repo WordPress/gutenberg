@@ -1,0 +1,19 @@
+diff --git a/packages/components/src/drop-zone/stories/index.story.tsx b/packages/components/src/drop-zone/stories/index.story.tsx
+index 7e2dcbf03c03b1..fe0be94e74fe85 100644
+--- a/packages/components/src/drop-zone/stories/index.story.tsx
++++ b/packages/components/src/drop-zone/stories/index.story.tsx
+@@ -21,7 +21,13 @@ export default meta;
+ 
+ const Template: StoryFn< typeof DropZone > = ( props ) => {
+ 	return (
+-		<div style={ { background: 'lightgray', padding: 16 } }>
++		<div
++			style={ {
++				background: 'lightgray',
++				padding: 32,
++				position: 'relative',
++			} }
++		>
+ 			Drop something here
+ 			<DropZone { ...props } />
+ 		</div>

@@ -1,0 +1,188 @@
+diff --git a/package-lock.json b/package-lock.json
+index 47ce7d8b516ec1..ae2e67c82e0ef9 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -58259,7 +58259,7 @@
+ 				"clsx": "^2.1.1",
+ 				"colord": "^2.7.0",
+ 				"csstype": "^3.2.3",
+-				"date-fns": "^3.6.0",
++				"date-fns": "^4.1.0",
+ 				"deepmerge": "^4.3.0",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"framer-motion": "^11.15.0",
+@@ -58339,6 +58339,16 @@
+ 				"@emotion/utils": "^1.4.2"
+ 			}
+ 		},
++		"packages/components/node_modules/date-fns": {
++			"version": "4.1.0",
++			"resolved": "https://registry.npmjs.org/date-fns/-/date-fns-4.1.0.tgz",
++			"integrity": "sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==",
++			"license": "MIT",
++			"funding": {
++				"type": "github",
++				"url": "https://github.com/sponsors/kossnocorp"
++			}
++		},
+ 		"packages/components/node_modules/framer-motion": {
+ 			"version": "11.15.0",
+ 			"resolved": "https://registry.npmjs.org/framer-motion/-/framer-motion-11.15.0.tgz",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ecb1a58c3df63e..356b04a27ef167 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ 
+ ### Internal
+ 
++-   Upgrade `date-fns` dependency from `^3.6.0` to `^4.1.0`; replace `startOfMinute` with an inline `truncateToMinute` helper to avoid `timezone-mock` crashes in tests ([#78005](https://github.com/WordPress/gutenberg/issues/78005)).
+ -   Update code to comply with `eslint-plugin-react-hooks` v7 ([#69962](https://github.com/WordPress/gutenberg/pull/69962)).
+ -   `SlotFill`: Add dependencies to `updateFill` effect ([#77907](https://github.com/WordPress/gutenberg/pull/77907)).
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index dfba4cae50a80c..feb83a08084117 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -86,7 +86,7 @@
+ 		"clsx": "^2.1.1",
+ 		"colord": "^2.7.0",
+ 		"csstype": "^3.2.3",
+-		"date-fns": "^3.6.0",
++		"date-fns": "^4.1.0",
+ 		"deepmerge": "^4.3.0",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"framer-motion": "^11.15.0",
+diff --git a/packages/components/src/date-time/time-picker/index.tsx b/packages/components/src/date-time/time-picker/index.tsx
+index fd0c80d9e87cc4..bd56aca6b4f373 100644
+--- a/packages/components/src/date-time/time-picker/index.tsx
++++ b/packages/components/src/date-time/time-picker/index.tsx
+@@ -1,4 +1,3 @@
+-import { startOfMinute } from 'date-fns';
+ import { useState, useMemo, useEffect } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import { date as formatDate } from '@wordpress/date';
+@@ -29,6 +28,23 @@ import { TimeInput } from './time-input';
+ 
+ const VALID_DATE_ORDERS = [ 'dmy', 'mdy', 'ymd' ];
+ 
++/*
++ * Truncate to the start of the minute (see #15495). Avoids `date-fns`
++ * helpers that route through `toDate()` — in v4 that path constructs a
++ * new instance via `new input.constructor(value)`, which fails when
++ * combined with `@date-fns/utc`'s `UTCDateMini` and `timezone-mock`
++ * during tests. Setting seconds/ms directly on the UTCDateMini sticks
++ * to UTC because UTCDateMini's prototype shim reroutes setSeconds to
++ * setUTCSeconds.
++ */
++function truncateToMinute(
++	currentTime: Date | string | number | null | undefined
++): Date {
++	const date = inputToDate( currentTime ?? new Date() );
++	date.setSeconds( 0, 0 );
++	return date;
++}
++
+ /**
+  * TimePicker is a React component that renders form inputs for time and date selection. It can be used independently or as part of the `DateTimePicker` component.
+  *
+@@ -58,13 +74,13 @@ export function TimePicker( {
+ }: TimePickerProps ) {
+ 	const [ date, setDate ] = useState( () =>
+ 		// Truncate the date at the minutes, see: #15495.
+-		startOfMinute( inputToDate( currentTime ?? new Date() ) )
++		truncateToMinute( currentTime )
+ 	);
+ 
+ 	// Reset the state when currentTime changed.
+ 	// TODO: useEffect() shouldn't be used like this, causes an unnecessary render
+ 	useEffect( () => {
+-		setDate( startOfMinute( inputToDate( currentTime ?? new Date() ) ) );
++		setDate( truncateToMinute( currentTime ) );
+ 	}, [ currentTime ] );
+ 
+ 	const monthOptions = [
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 3122729d43562a..c883f3dfe818b3 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Upgrade `date-fns` dependency from `^3.6.0` to `^4.1.0`; replace `isValid` helper with native `!isNaN( date.valueOf() )` to avoid `timezone-mock` crashes under tests ([#78005](https://github.com/WordPress/gutenberg/issues/78005)).
++
+ ## 14.2.0 (2026-04-29)
+ 
+ ### Enhancements
+diff --git a/packages/dataviews/src/components/dataform-controls/date.tsx b/packages/dataviews/src/components/dataform-controls/date.tsx
+index d7e8a88e514f5e..79ca4347452ce1 100644
+--- a/packages/dataviews/src/components/dataform-controls/date.tsx
++++ b/packages/dataviews/src/components/dataform-controls/date.tsx
+@@ -4,7 +4,6 @@
+ import clsx from 'clsx';
+ import {
+ 	format,
+-	isValid as isValidDate,
+ 	subMonths,
+ 	subDays,
+ 	subYears,
+@@ -141,7 +140,7 @@ const parseDate = ( dateString?: string ): Date | null => {
+ 		return null;
+ 	}
+ 	const parsed = getDate( dateString );
+-	return parsed && isValidDate( parsed ) ? parsed : null;
++	return parsed && ! isNaN( parsed.valueOf() ) ? parsed : null;
+ };
+ 
+ const formatDate = ( date?: Date | string ): string => {
+diff --git a/packages/dataviews/src/field-types/utils/is-valid-date-boundary.ts b/packages/dataviews/src/field-types/utils/is-valid-date-boundary.ts
+index 5e8c3a4baef191..c01063dc4fd859 100644
+--- a/packages/dataviews/src/field-types/utils/is-valid-date-boundary.ts
++++ b/packages/dataviews/src/field-types/utils/is-valid-date-boundary.ts
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { isValid as isValidDate } from 'date-fns';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -22,12 +17,12 @@ function parseDateLike( value?: string ) {
+ 
+ 	// Pre-check to avoid passing unparseable strings to getDate,
+ 	// which uses moment.js and emits deprecation warnings.
+-	if ( ! isValidDate( new Date( value ) ) ) {
++	if ( isNaN( new Date( value ).valueOf() ) ) {
+ 		return null;
+ 	}
+ 
+ 	const parsed = getDate( value );
+-	return parsed && isValidDate( parsed ) ? parsed : null;
++	return parsed && ! isNaN( parsed.valueOf() ) ? parsed : null;
+ }
+ 
+ function validateDateLikeBoundary< Item >(
+diff --git a/packages/dataviews/src/field-types/utils/parse-date-time.ts b/packages/dataviews/src/field-types/utils/parse-date-time.ts
+index 0f71475a9b8baf..403903a44c6e31 100644
+--- a/packages/dataviews/src/field-types/utils/parse-date-time.ts
++++ b/packages/dataviews/src/field-types/utils/parse-date-time.ts
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { isValid as isValidDate } from 'date-fns';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -13,5 +8,5 @@ export default function parseDateTime( dateTimeString?: string ): Date | null {
+ 		return null;
+ 	}
+ 	const parsed = getDate( dateTimeString );
+-	return parsed && isValidDate( parsed ) ? parsed : null;
++	return parsed && ! isNaN( parsed.valueOf() ) ? parsed : null;
+ }

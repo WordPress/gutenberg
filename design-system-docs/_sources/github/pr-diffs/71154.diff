@@ -1,0 +1,155 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index aea6b4485259bd..cc25b6eb90d774 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancement
+ 
+ -   Upgrade `gradient-parser` to version `1.1.1` to support HSL/HSLA color, CSS variables, and `calc()` expressions ([#71186](https://github.com/WordPress/gutenberg/pull/71186)).
++-   `Snackbar`: Add duration prop to component ([#71154](https://github.com/WordPress/gutenberg/pull/71154)).
+ 
+ ## 30.1.0 (2025-08-07)
+ 
+diff --git a/packages/components/src/snackbar/README.md b/packages/components/src/snackbar/README.md
+index 7fc734c69ac9b8..12b360d187f77c 100644
+--- a/packages/components/src/snackbar/README.md
++++ b/packages/components/src/snackbar/README.md
+@@ -97,6 +97,13 @@ Used to provide a custom spoken message.
+ -   Required: No
+ -   Default: `children`
+ 
++#### `duration`: `number`
++
++How long the notice is displayed to users in milliseconds.
++
++-   Required: No
++-   Default: 10000
++
+ ## Related components
+ 
+ -   To create a prominent message that requires a higher-level of attention, use a Notice.
+diff --git a/packages/components/src/snackbar/index.tsx b/packages/components/src/snackbar/index.tsx
+index 97b09f9534c46a..8b4350b910eb56 100644
+--- a/packages/components/src/snackbar/index.tsx
++++ b/packages/components/src/snackbar/index.tsx
+@@ -27,8 +27,6 @@ import type { SnackbarProps } from './types';
+ import type { NoticeAction } from '../notice/types';
+ import type { WordPressComponentProps } from '../context';
+ 
+-const NOTICE_TIMEOUT = 10000;
+-
+ /**
+  * Custom hook which announces the message with the given politeness, if a
+  * valid message is provided.
+@@ -60,6 +58,7 @@ function UnforwardedSnackbar(
+ 		onRemove,
+ 		icon = null,
+ 		explicitDismiss = false,
++		duration = 10000,
+ 		// onDismiss is a callback executed when the snackbar is dismissed.
+ 		// It is distinct from onRemove, which _looks_ like a callback but is
+ 		// actually the function to call to remove the snackbar from the UI.
+@@ -109,7 +108,7 @@ function UnforwardedSnackbar(
+ 				callbacksRef.current.onDismiss?.();
+ 				callbacksRef.current.onRemove?.();
+ 			}
+-		}, NOTICE_TIMEOUT );
++		}, duration );
+ 
+ 		return () => clearTimeout( timeoutHandle );
+ 	}, [ explicitDismiss ] );
+diff --git a/packages/components/src/snackbar/test/index.tsx b/packages/components/src/snackbar/test/index.tsx
+index 6be4e58c928123..3639c9af7cd82a 100644
+--- a/packages/components/src/snackbar/test/index.tsx
++++ b/packages/components/src/snackbar/test/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen, within } from '@testing-library/react';
++import { act, render, screen, within } from '@testing-library/react';
+ import { click } from '@ariakit/test';
+ 
+ /**
+@@ -264,4 +264,64 @@ describe( 'Snackbar', () => {
+ 			expect( speak ).toHaveBeenCalledTimes( 1 );
+ 		} );
+ 	} );
++
++	describe( 'duration', () => {
++		it( 'should clear away after 10 seconds by default', () => {
++			jest.useFakeTimers();
++
++			const mockDismiss = jest.fn();
++			const mockRemove = jest.fn();
++
++			render(
++				<Snackbar onDismiss={ mockDismiss } onRemove={ mockRemove }>
++					Message
++				</Snackbar>
++			);
++
++			act( () => {
++				jest.advanceTimersByTime( 5000 );
++			} );
++
++			expect( mockDismiss ).not.toHaveBeenCalled();
++			expect( mockRemove ).not.toHaveBeenCalled();
++
++			act( () => {
++				jest.advanceTimersByTime( 5000 );
++			} );
++
++			expect( mockDismiss ).toHaveBeenCalledTimes( 1 );
++			expect( mockRemove ).toHaveBeenCalledTimes( 1 );
++		} );
++
++		it( 'should clear away after the number of milliseconds passed in the duration prop', () => {
++			jest.useFakeTimers();
++
++			const mockDismiss = jest.fn();
++			const mockRemove = jest.fn();
++
++			render(
++				<Snackbar
++					duration={ 15000 }
++					onDismiss={ mockDismiss }
++					onRemove={ mockRemove }
++				>
++					Message
++				</Snackbar>
++			);
++
++			act( () => {
++				jest.advanceTimersByTime( 10000 );
++			} );
++
++			expect( mockDismiss ).not.toHaveBeenCalled();
++			expect( mockRemove ).not.toHaveBeenCalled();
++
++			act( () => {
++				jest.advanceTimersByTime( 5000 );
++			} );
++
++			expect( mockDismiss ).toHaveBeenCalledTimes( 1 );
++			expect( mockRemove ).toHaveBeenCalledTimes( 1 );
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/snackbar/types.ts b/packages/components/src/snackbar/types.ts
+index b35466c439d0ff..0d7485ad665e30 100644
+--- a/packages/components/src/snackbar/types.ts
++++ b/packages/components/src/snackbar/types.ts
+@@ -30,6 +30,12 @@ type SnackbarOnlyProps = {
+ 	 * A ref to the list that contains the snackbar.
+ 	 */
+ 	listRef?: MutableRefObject< HTMLDivElement | null >;
++	/**
++	 * How long the notice should be presented to users.
++	 *
++	 * @default 10000
++	 */
++	duration?: number;
+ };
+ 
+ export type SnackbarProps = Pick<

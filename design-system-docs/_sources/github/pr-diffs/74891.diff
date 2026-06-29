@@ -1,0 +1,278 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e642a6a48cb61a..c19d4d681d2c12 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   Add `displayName` to components to improve debugging and fix Storybook source code. [#74716](https://github.com/WordPress/gutenberg/pull/74716)
+ 
++### Internal
++
++-   `ValidatedComboboxControl`: Expose the component under private API's. [#74891](https://github.com/WordPress/gutenberg/pull/74891)
++
+ ## 32.0.0 (2026-01-16)
+ 
+ ### Code Quality
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index a6e3235ccd79f4..2a54124833af45 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -14,6 +14,7 @@ import Badge from './badge';
+ import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
+ import {
+ 	ValidatedCheckboxControl,
++	ValidatedComboboxControl,
+ 	ValidatedInputControl,
+ 	ValidatedNumberControl,
+ 	ValidatedSelectControl,
+@@ -43,6 +44,7 @@ lock( privateApis, {
+ 	Picker,
+ 	ValidatedInputControl,
+ 	ValidatedCheckboxControl,
++	ValidatedComboboxControl,
+ 	ValidatedNumberControl,
+ 	ValidatedSelectControl,
+ 	ValidatedRadioControl,
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 2029a098dcc615..421d660b4c3452 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ 
+ ### Enhancements
+ 
++- Add new `combobox` DataForm control. [#74891](https://github.com/WordPress/gutenberg/pull/74891)
+ - Include total items count in footer. [#73491](https://github.com/WordPress/gutenberg/pull/73491)
+ 
+ ## 11.2.0 (2026-01-16)
+diff --git a/packages/dataviews/src/components/dataform-controls/combobox.tsx b/packages/dataviews/src/components/dataform-controls/combobox.tsx
+new file mode 100644
+index 00000000000000..ea059ea6962fc6
+--- /dev/null
++++ b/packages/dataviews/src/components/dataform-controls/combobox.tsx
+@@ -0,0 +1,58 @@
++/**
++ * WordPress dependencies
++ */
++import { privateApis, Spinner } from '@wordpress/components';
++import { useCallback } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { DataFormControlProps } from '../../types';
++import useElements from '../../hooks/use-elements';
++import { unlock } from '../../lock-unlock';
++import getCustomValidity from './utils/get-custom-validity';
++
++const { ValidatedComboboxControl } = unlock( privateApis );
++
++export default function Combobox< Item >( {
++	data,
++	field,
++	onChange,
++	hideLabelFromVision,
++	validity,
++}: DataFormControlProps< Item > ) {
++	const { label, description, placeholder, getValue, setValue, isValid } =
++		field;
++	const value = getValue( { item: data } ) ?? '';
++
++	const onChangeControl = useCallback(
++		( newValue: string | null ) =>
++			onChange( setValue( { item: data, value: newValue ?? '' } ) ),
++		[ data, onChange, setValue ]
++	);
++
++	const { elements, isLoading } = useElements( {
++		elements: field.elements,
++		getElements: field.getElements,
++	} );
++
++	if ( isLoading ) {
++		return <Spinner />;
++	}
++
++	return (
++		<ValidatedComboboxControl
++			required={ !! field.isValid?.required }
++			customValidity={ getCustomValidity( isValid, validity ) }
++			label={ label }
++			value={ value }
++			help={ description }
++			placeholder={ placeholder }
++			options={ elements }
++			onChange={ onChangeControl }
++			hideLabelFromVision={ hideLabelFromVision }
++			allowReset
++			expandOnFocus
++		/>
++	);
++}
+diff --git a/packages/dataviews/src/components/dataform-controls/index.tsx b/packages/dataviews/src/components/dataform-controls/index.tsx
+index b233d09f2eb6f9..2cb2712cc34733 100644
+--- a/packages/dataviews/src/components/dataform-controls/index.tsx
++++ b/packages/dataviews/src/components/dataform-controls/index.tsx
+@@ -8,6 +8,7 @@ import type { ComponentType } from 'react';
+  */
+ import type { DataFormControlProps, Field, EditConfig } from '../../types';
+ import checkbox from './checkbox';
++import combobox from './combobox';
+ import datetime from './datetime';
+ import date from './date';
+ import email from './email';
+@@ -34,6 +35,7 @@ const FORM_CONTROLS: FormControls = {
+ 	array,
+ 	checkbox,
+ 	color,
++	combobox,
+ 	datetime,
+ 	date,
+ 	email,
+diff --git a/packages/dataviews/src/dataform/stories/validation.tsx b/packages/dataviews/src/dataform/stories/validation.tsx
+index 59158c5c2ebaff..cc1d668d315177 100644
+--- a/packages/dataviews/src/dataform/stories/validation.tsx
++++ b/packages/dataviews/src/dataform/stories/validation.tsx
+@@ -106,6 +106,7 @@ const ValidationComponent = ( {
+ 		password: string;
+ 		toggle?: boolean;
+ 		toggleGroup?: string;
++		combobox?: string;
+ 		date?: string;
+ 		dateRange?: string;
+ 		datetime?: string;
+@@ -129,6 +130,7 @@ const ValidationComponent = ( {
+ 		password: 'secretpassword123',
+ 		toggle: undefined,
+ 		toggleGroup: undefined,
++		combobox: undefined,
+ 		date: undefined,
+ 		dateRange: undefined,
+ 		datetime: undefined,
+@@ -242,6 +244,25 @@ const ValidationComponent = ( {
+ 						);
+ 						break;
+ 
++					case 'combobox':
++						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
++							setTimeout(
++								() =>
++									resolve( [
++										{ value: 'apple', label: 'Apple' },
++										{ value: 'banana', label: 'Banana' },
++										{ value: 'cherry', label: 'Cherry' },
++										{ value: 'date', label: 'Date' },
++										{
++											value: 'elderberry',
++											label: 'Elderberry',
++										},
++									] ),
++								3500
++							)
++						);
++						break;
++
+ 					default:
+ 						throw new Error( `Unknown field ID: ${ fieldId }` );
+ 				}
+@@ -364,6 +385,14 @@ const ValidationComponent = ( {
+ 			return null;
+ 		};
+ 
++		const customComboboxRule = ( value: ValidatedItem ) => {
++			if ( value.combobox !== 'apple' ) {
++				return 'Value must be Apple.';
++			}
++
++			return null;
++		};
++
+ 		const customPasswordRule = ( value: ValidatedItem ) => {
+ 			if ( value.password.length < 8 ) {
+ 				return 'Password must be at least 8 characters long.';
+@@ -768,6 +797,48 @@ const ValidationComponent = ( {
+ 					custom: maybeCustomRule( customToggleGroupRule ),
+ 				},
+ 			},
++			{
++				id: 'combobox',
++				type: 'text',
++				Edit: 'combobox',
++				label: 'Combobox',
++				placeholder: 'Search and select a fruit',
++				elements:
++					elements === 'async'
++						? undefined
++						: [
++								{ value: 'apple', label: 'Apple' },
++								{ value: 'banana', label: 'Banana' },
++								{ value: 'blueberry', label: 'Blueberry' },
++								{ value: 'cherry', label: 'Cherry' },
++								{ value: 'date', label: 'Date' },
++								{ value: 'elderberry', label: 'Elderberry' },
++								{ value: 'fig', label: 'Fig' },
++								{ value: 'grape', label: 'Grape' },
++								{ value: 'honeydew', label: 'Honeydew' },
++								{ value: 'kiwi', label: 'Kiwi' },
++								{ value: 'lemon', label: 'Lemon' },
++								{ value: 'mango', label: 'Mango' },
++								{ value: 'nectarine', label: 'Nectarine' },
++								{ value: 'orange', label: 'Orange' },
++								{ value: 'papaya', label: 'Papaya' },
++								{ value: 'pear', label: 'Pear' },
++								{ value: 'quince', label: 'Quince' },
++								{ value: 'raspberry', label: 'Raspberry' },
++								{ value: 'strawberry', label: 'Strawberry' },
++								{ value: 'tangerine', label: 'Tangerine' },
++								{ value: 'watermelon', label: 'Watermelon' },
++						  ],
++				getElements:
++					elements === 'async'
++						? getElements( 'combobox' )
++						: undefined,
++				isValid: {
++					required,
++					elements: elements !== 'none' ? true : false,
++					custom: maybeCustomRule( customComboboxRule ),
++				},
++			},
+ 			{
+ 				id: 'date',
+ 				type: 'date',
+@@ -853,6 +924,7 @@ const ValidationComponent = ( {
+ 					'password',
+ 					'textarea',
+ 					'select',
++					'combobox',
+ 					'textWithRadio',
+ 					'boolean',
+ 					'toggle',
+@@ -885,7 +957,7 @@ const ValidationComponent = ( {
+ 			{
+ 				id: 'selectFields',
+ 				label: 'Selection Fields',
+-				children: [ 'select', 'textWithRadio' ],
++				children: [ 'select', 'combobox', 'textWithRadio' ],
+ 			},
+ 			{
+ 				id: 'booleanFields',
+diff --git a/packages/dataviews/src/field-types/stories/index.story.tsx b/packages/dataviews/src/field-types/stories/index.story.tsx
+index 1bb36f820cf0fd..7d31fa9e5f1178 100644
+--- a/packages/dataviews/src/field-types/stories/index.story.tsx
++++ b/packages/dataviews/src/field-types/stories/index.story.tsx
+@@ -37,6 +37,7 @@ const meta = {
+ 				'array',
+ 				'checkbox',
+ 				'color',
++				'combobox',
+ 				'date',
+ 				'datetime',
+ 				'email',
+@@ -530,6 +531,7 @@ type ControlTypes =
+ 	| 'array'
+ 	| 'checkbox'
+ 	| 'color'
++	| 'combobox'
+ 	| 'date'
+ 	| 'datetime'
+ 	| 'email'

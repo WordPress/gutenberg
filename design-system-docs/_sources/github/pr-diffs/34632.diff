@@ -1,0 +1,565 @@
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 04146b32a2fb16..b605bd852db998 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -141,6 +141,7 @@ export { default as ToolbarItem } from './toolbar-item';
+ export {
+ 	ToolsPanel as __experimentalToolsPanel,
+ 	ToolsPanelItem as __experimentalToolsPanelItem,
++	ToolsPanelContext as __experimentalToolsPanelContext,
+ } from './tools-panel';
+ export { default as Tooltip } from './tooltip';
+ export {
+diff --git a/packages/components/src/tools-panel/index.js b/packages/components/src/tools-panel/index.js
+index e557e232330b5e..bd749977d256ea 100644
+--- a/packages/components/src/tools-panel/index.js
++++ b/packages/components/src/tools-panel/index.js
+@@ -1,2 +1,3 @@
+ export { default as ToolsPanel } from './tools-panel';
+ export { default as ToolsPanelItem } from './tools-panel-item';
++export { ToolsPanelContext } from './context';
+diff --git a/packages/components/src/tools-panel/stories/index.js b/packages/components/src/tools-panel/stories/index.js
+index 407b356089ed50..fe735390cce2fb 100644
+--- a/packages/components/src/tools-panel/stories/index.js
++++ b/packages/components/src/tools-panel/stories/index.js
+@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
+ import { ToolsPanel, ToolsPanelItem } from '../';
+ import Panel from '../../panel';
+ import UnitControl from '../../unit-control';
++import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+ 
+ export default {
+ 	title: 'Components (Experimental)/ToolsPanel',
+@@ -28,16 +29,13 @@ export const _default = () => {
+ 	const resetAll = () => {
+ 		setHeight( undefined );
+ 		setWidth( undefined );
++		setMinHeight( undefined );
+ 	};
+ 
+ 	return (
+ 		<PanelWrapperView>
+ 			<Panel>
+-				<ToolsPanel
+-					header="Tools Panel"
+-					label="Display options"
+-					resetAll={ resetAll }
+-				>
++				<ToolsPanel label="Tools Panel" resetAll={ resetAll }>
+ 					<ToolsPanelItem
+ 						className="single-column"
+ 						hasValue={ () => !! width }
+@@ -79,7 +77,97 @@ export const _default = () => {
+ 	);
+ };
+ 
++const { Fill: ToolsPanelItems, Slot } = createSlotFill( 'ToolsPanelSlot' );
++const panelId = 'unique-tools-panel-id';
++
++export const WithSlotFillItems = () => {
++	const [ attributes, setAttributes ] = useState( {} );
++	const { width, height } = attributes;
++
++	const resetAll = ( resetFilters = [] ) => {
++		let newAttributes = {};
++
++		resetFilters.forEach( ( resetFilter ) => {
++			newAttributes = {
++				...newAttributes,
++				...resetFilter( newAttributes ),
++			};
++		} );
++
++		setAttributes( newAttributes );
++	};
++
++	const updateAttribute = ( name, value ) => {
++		setAttributes( {
++			...attributes,
++			[ name ]: value,
++		} );
++	};
++
++	return (
++		<SlotFillProvider>
++			<ToolsPanelItems>
++				<ToolsPanelItem
++					className="single-column"
++					hasValue={ () => !! width }
++					label="Injected Width"
++					onDeselect={ () => updateAttribute( 'width', undefined ) }
++					resetAllFilter={ () => ( { width: undefined } ) }
++					panelId={ panelId }
++				>
++					<UnitControl
++						label="Injected Width"
++						value={ width }
++						onChange={ ( next ) =>
++							updateAttribute( 'width', next )
++						}
++					/>
++				</ToolsPanelItem>
++				<ToolsPanelItem
++					className="single-column"
++					hasValue={ () => !! height }
++					label="Injected Height"
++					onDeselect={ () => updateAttribute( 'height', undefined ) }
++					resetAllFilter={ () => ( { height: undefined } ) }
++					panelId={ panelId }
++				>
++					<UnitControl
++						label="Injected Height"
++						value={ height }
++						onChange={ ( next ) =>
++							updateAttribute( 'height', next )
++						}
++					/>
++				</ToolsPanelItem>
++				<ToolsPanelItem
++					hasValue={ () => true }
++					label="Item for alternate panel"
++					onDeselect={ () => undefined }
++					resetAllFilter={ () => undefined }
++					panelId={ 'intended-for-another-panel-via-shared-slot' }
++				>
++					<p>
++						This panel item will not be displayed in the demo as its
++						panelId does not match the panel being rendered.
++					</p>
++				</ToolsPanelItem>
++			</ToolsPanelItems>
++			<PanelWrapperView>
++				<Panel>
++					<ToolsPanel
++						label="Tools Panel With SlotFill Items"
++						resetAll={ resetAll }
++						panelId={ panelId }
++					>
++						<Slot />
++					</ToolsPanel>
++				</Panel>
++			</PanelWrapperView>
++		</SlotFillProvider>
++	);
++};
++
+ const PanelWrapperView = styled.div`
+-	max-width: 250px;
++	max-width: 260px;
+ 	font-size: 13px;
+ `;
+diff --git a/packages/components/src/tools-panel/test/index.js b/packages/components/src/tools-panel/test/index.js
+index d371edabc8be4b..cf5b7621f7760b 100644
+--- a/packages/components/src/tools-panel/test/index.js
++++ b/packages/components/src/tools-panel/test/index.js
+@@ -12,8 +12,7 @@ const resetAll = jest.fn();
+ 
+ // Default props for the tools panel.
+ const defaultProps = {
+-	header: 'Panel header',
+-	label: 'Display options',
++	label: 'Panel header',
+ 	resetAll,
+ };
+ 
+@@ -231,9 +230,9 @@ describe( 'ToolsPanel', () => {
+ 			expect( menuItems[ 1 ] ).toHaveAttribute( 'aria-checked', 'false' );
+ 		} );
+ 
+-		it( 'should render panel header', () => {
++		it( 'should render panel label as header text', () => {
+ 			renderPanel();
+-			const header = screen.getByText( defaultProps.header );
++			const header = screen.getByText( defaultProps.label );
+ 
+ 			expect( header ).toBeInTheDocument();
+ 		} );
+@@ -316,6 +315,26 @@ describe( 'ToolsPanel', () => {
+ 			await selectMenuItem( 'Reset all' );
+ 
+ 			expect( resetAll ).toHaveBeenCalledTimes( 1 );
++			expect( controlProps.onSelect ).not.toHaveBeenCalled();
++			expect( controlProps.onDeselect ).not.toHaveBeenCalled();
++			expect( altControlProps.onSelect ).not.toHaveBeenCalled();
++			expect( altControlProps.onDeselect ).not.toHaveBeenCalled();
++		} );
++
++		// This confirms the internal `isResetting` state when resetting all
++		// controls does not prevent subsequent individual reset requests.
++		// i.e. onDeselect callbacks are called correctly after a resetAll.
++		it( 'should call onDeselect after previous reset all', async () => {
++			renderPanel();
++
++			await selectMenuItem( 'Reset all' ); // Initial control is displayed by default.
++			await selectMenuItem( controlProps.label ); // Re-display control.
++
++			expect( controlProps.onDeselect ).not.toHaveBeenCalled();
++
++			await selectMenuItem( controlProps.label ); // Reset control.
++
++			expect( controlProps.onDeselect ).toHaveBeenCalled();
+ 		} );
+ 	} );
+ 
+diff --git a/packages/components/src/tools-panel/tools-panel-header/README.md b/packages/components/src/tools-panel/tools-panel-header/README.md
+index da6840b8a2a1fa..90c50006dca29e 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/README.md
++++ b/packages/components/src/tools-panel/tools-panel-header/README.md
+@@ -18,22 +18,17 @@ This component is generated automatically by its parent
+ 
+ ## Props
+ 
+-### `header`: `string`
++### `label`: `string`
+ 
+-Text to be displayed within the panel header.
++Text to be displayed within the panel header. It is also passed along as the
++`label` for the panel header's `DropdownMenu`.
+ 
+ -   Required: Yes
+ 
+-### `menuLabel`: `string`
+-
+-This is passed along as the `label` for the panel header's `DropdownMenu`.
+-
+--   Required: No
+-
+ ### `resetAll`: `function`
+ 
+ The `resetAll` prop provides the callback to execute when the "Reset all" menu
+-item is selected. It's purpose is to facilitate resetting any control values
++item is selected. Its purpose is to facilitate resetting any control values
+ for items contained within this header's panel.
+ 
+ -   Required: Yes
+diff --git a/packages/components/src/tools-panel/tools-panel-header/component.js b/packages/components/src/tools-panel/tools-panel-header/component.js
+index b7e2e41634086b..09331069378493 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/component.js
++++ b/packages/components/src/tools-panel/tools-panel-header/component.js
+@@ -16,23 +16,22 @@ import { contextConnect } from '../../ui/context';
+ const ToolsPanelHeader = ( props, forwardedRef ) => {
+ 	const {
+ 		hasMenuItems,
+-		header,
++		label: labelText,
+ 		menuItems,
+-		menuLabel,
+ 		resetAll,
+ 		toggleItem,
+ 		...headerProps
+ 	} = useToolsPanelHeader( props );
+ 
+-	if ( ! header ) {
++	if ( ! labelText ) {
+ 		return null;
+ 	}
+ 
+ 	return (
+ 		<h2 { ...headerProps } ref={ forwardedRef }>
+-			{ header }
++			{ labelText }
+ 			{ hasMenuItems && (
+-				<DropdownMenu icon={ moreVertical } label={ menuLabel }>
++				<DropdownMenu icon={ moreVertical } label={ labelText }>
+ 					{ ( { onClose } ) => (
+ 						<>
+ 							<MenuGroup label={ __( 'Display options' ) }>
+diff --git a/packages/components/src/tools-panel/tools-panel-item/README.md b/packages/components/src/tools-panel/tools-panel-item/README.md
+index 2384b32f7be41e..35a5fae6dba44f 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/README.md
++++ b/packages/components/src/tools-panel/tools-panel-item/README.md
+@@ -6,7 +6,7 @@ implementation subject to drastic and breaking changes.
+ </div>
+ <br />
+ 
+-This component acts a wrapper and controls the display of items to be contained
++This component acts as a wrapper and controls the display of items to be contained
+ within a ToolsPanel. An item is displayed if it is flagged as a default control
+ or the corresponding panel menu item, provided via context, is toggled on for
+ this item.
+@@ -18,6 +18,13 @@ for how to use `ToolsPanelItem`.
+ 
+ ## Props
+ 
++### `hasValue`: `function`
++
++This is called when building the `ToolsPanel` menu to determine the item's
++initial checked state.
++
++-   Required: Yes
++
+ ### `isShownByDefault`: `boolean`
+ 
+ This prop identifies the current item as being displayed by default. This means
+@@ -30,10 +37,39 @@ panel's menu.
+ 
+ The supplied label is dual purpose.
+ It is used as:
+-1. the human readable label for the panel's dropdown menu
++1. the human-readable label for the panel's dropdown menu
+ 2. a key to locate the corresponding item in the panel's menu context to
+ determine if the panel item should be displayed.
+ 
+ A panel item's `label` should be unique among all items within a single panel.
+ 
+ -   Required: Yes
++
++### `onDeselect`: `function`
++
++Called when this item is deselected in the `ToolsPanel` menu. This is normally
++used to reset the panel item control's value.
++
++-   Required: No
++
++### `onSelect`: `function`
++
++A callback to take action when this item is selected in the `ToolsPanel` menu.
++
++-   Required: No
++
++### `panelId`: `string`
++
++Panel items will ensure they are only registering with their intended panel by
++comparing the `panelId` props set on both the item and the panel itself. This
++allows items to be injected from a shared source.
++
++-   Required: No
++
++### `resetAllFilter`: `function`
++
++A `ToolsPanel` will collect each item's `resetAllFilter` and pass an array of
++these functions through to the panel's `resetAll` callback. They can then be
++iterated over to perform additional tasks.
++
++-   Required: No
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.js b/packages/components/src/tools-panel/tools-panel-item/hook.js
+index 1847f172ab7901..7d29e99790dc16 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.js
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.js
+@@ -18,6 +18,8 @@ export function useToolsPanelItem( props ) {
+ 		hasValue,
+ 		isShownByDefault,
+ 		label,
++		panelId,
++		resetAllFilter,
+ 		onDeselect = () => undefined,
+ 		onSelect = () => undefined,
+ 		...otherProps
+@@ -29,19 +31,25 @@ export function useToolsPanelItem( props ) {
+ 	} );
+ 
+ 	const {
++		panelId: currentPanelId,
+ 		menuItems,
+ 		registerPanelItem,
+ 		deregisterPanelItem,
++		isResetting,
+ 	} = useToolsPanelContext();
+ 
+ 	// Registering the panel item allows the panel to include it in its
+ 	// automatically generated menu and determine its initial checked status.
+ 	useEffect( () => {
+-		registerPanelItem( {
+-			hasValue,
+-			isShownByDefault,
+-			label,
+-		} );
++		if ( currentPanelId === panelId ) {
++			registerPanelItem( {
++				hasValue,
++				isShownByDefault,
++				label,
++				resetAllFilter,
++				panelId,
++			} );
++		}
+ 
+ 		return () => deregisterPanelItem( label );
+ 	}, [] );
+@@ -56,6 +64,10 @@ export function useToolsPanelItem( props ) {
+ 	// Determine if the panel item's corresponding menu is being toggled and
+ 	// trigger appropriate callback if it is.
+ 	useEffect( () => {
++		if ( isResetting ) {
++			return;
++		}
++
+ 		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
+ 			onSelect();
+ 		}
+@@ -63,7 +75,7 @@ export function useToolsPanelItem( props ) {
+ 		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
+ 			onDeselect();
+ 		}
+-	}, [ isMenuItemChecked, wasMenuItemChecked, isValueSet ] );
++	}, [ isMenuItemChecked, wasMenuItemChecked, isValueSet, isResetting ] );
+ 
+ 	return {
+ 		...otherProps,
+diff --git a/packages/components/src/tools-panel/tools-panel/README.md b/packages/components/src/tools-panel/tools-panel/README.md
+index 4424ef880af9b8..889950361eb2f6 100644
+--- a/packages/components/src/tools-panel/tools-panel/README.md
++++ b/packages/components/src/tools-panel/tools-panel/README.md
+@@ -50,11 +50,7 @@ export function DimensionPanel( props ) {
+ 	};
+ 
+ 	return (
+-		<ToolsPanel
+-			header={ __( 'Dimensions' ) }
+-			label={ __( 'Dimensions options' ) }
+-			resetAll={ resetAll }
+-		>
++		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
+ 			{ ! isPaddingDisabled && (
+ 				<ToolsPanelItem
+ 					hasValue={ () => hasPaddingValue( props ) }
+@@ -73,19 +69,22 @@ export function DimensionPanel( props ) {
+ 
+ ### `label`: `string`
+ 
+-The label for the panel's dropdown menu.
++Text to be displayed within the panel's header and as the `aria-label` for the
++panel's dropdown menu.
+ 
+ - Required: Yes
+ 
+-### `resetAll`: `function`
++### `panelId`: `function`
+ 
+-A function to call when the `Reset all` menu option is selected. This is passed
+-through to the panel's header component.
++If a `panelId` is set, it is passed through the `ToolsPanelContext` and used
++to restrict panel items. Only items with a matching `panelId` will be able
++to register themselves with this panel.
+ 
+-- Required: Yes
++- Required: No
+ 
+-### `header`: `string`
++### `resetAll`: `function`
+ 
+-Text to be displayed within the panel's header.
++A function to call when the `Reset all` menu option is selected. This is passed
++through to the panel's header component.
+ 
+ - Required: Yes
+diff --git a/packages/components/src/tools-panel/tools-panel/component.js b/packages/components/src/tools-panel/tools-panel/component.js
+index 99ac9baebec1fa..8f38889fbc8e3c 100644
+--- a/packages/components/src/tools-panel/tools-panel/component.js
++++ b/packages/components/src/tools-panel/tools-panel/component.js
+@@ -10,7 +10,6 @@ import { contextConnect } from '../../ui/context';
+ const ToolsPanel = ( props, forwardedRef ) => {
+ 	const {
+ 		children,
+-		header,
+ 		label,
+ 		panelContext,
+ 		resetAllItems,
+@@ -22,8 +21,7 @@ const ToolsPanel = ( props, forwardedRef ) => {
+ 		<View { ...toolsPanelProps } ref={ forwardedRef }>
+ 			<ToolsPanelContext.Provider value={ panelContext }>
+ 				<ToolsPanelHeader
+-					header={ header }
+-					menuLabel={ label }
++					label={ label }
+ 					resetAll={ resetAllItems }
+ 					toggleItem={ toggleItem }
+ 				/>
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.js b/packages/components/src/tools-panel/tools-panel/hook.js
+index f64039bb492533..13adb434e42763 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.js
++++ b/packages/components/src/tools-panel/tools-panel/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useEffect, useMemo, useState } from '@wordpress/element';
++import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -11,7 +11,7 @@ import { useContextSystem } from '../../ui/context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ export function useToolsPanel( props ) {
+-	const { className, resetAll, ...otherProps } = useContextSystem(
++	const { className, resetAll, panelId, ...otherProps } = useContextSystem(
+ 		props,
+ 		'ToolsPanel'
+ 	);
+@@ -21,6 +21,8 @@ export function useToolsPanel( props ) {
+ 		return cx( styles.ToolsPanel, className );
+ 	}, [ className ] );
+ 
++	const isResetting = useRef( false );
++
+ 	// Allow panel items to register themselves.
+ 	const [ panelItems, setPanelItems ] = useState( [] );
+ 
+@@ -31,14 +33,32 @@ export function useToolsPanel( props ) {
+ 	// Panels need to deregister on unmount to avoid orphans in menu state.
+ 	// This is an issue when panel items are being injected via SlotFills.
+ 	const deregisterPanelItem = ( label ) => {
+-		setPanelItems( ( items ) =>
+-			items.filter( ( item ) => item.label !== label )
+-		);
++		// When switching selections between components injecting matching
++		// controls, e.g. both panels have a "padding" control, the
++		// deregistration of the first panel doesn't occur until after the
++		// registration of the next.
++		const index = panelItems.findIndex( ( item ) => item.label === label );
++
++		if ( index !== -1 ) {
++			setPanelItems( ( items ) => items.splice( index, 1 ) );
++		}
+ 	};
+ 
+ 	// Manage and share display state of menu items representing child controls.
+ 	const [ menuItems, setMenuItems ] = useState( {} );
+ 
++	const getResetAllFilters = () => {
++		const filters = [];
++
++		panelItems.forEach( ( item ) => {
++			if ( item.resetAllFilter ) {
++				filters.push( item.resetAllFilter );
++			}
++		} );
++
++		return filters;
++	};
++
+ 	// Setup menuItems state as panel items register themselves.
+ 	useEffect( () => {
+ 		const items = {};
+@@ -62,7 +82,8 @@ export function useToolsPanel( props ) {
+ 	// Resets display of children and executes resetAll callback if available.
+ 	const resetAllItems = () => {
+ 		if ( typeof resetAll === 'function' ) {
+-			resetAll();
++			isResetting.current = true;
++			resetAll( getResetAllFilters() );
+ 		}
+ 
+ 		// Turn off display of all non-default items.
+@@ -75,7 +96,19 @@ export function useToolsPanel( props ) {
+ 		setMenuItems( resetMenuItems );
+ 	};
+ 
+-	const panelContext = { menuItems, registerPanelItem, deregisterPanelItem };
++	const panelContext = {
++		panelId,
++		menuItems,
++		registerPanelItem,
++		deregisterPanelItem,
++		isResetting: isResetting.current,
++	};
++
++	// Clean up isResetting after advising panel context we were resetting
++	// all controls. This lets panel items know to skip onDeselect callbacks.
++	if ( isResetting.current ) {
++		isResetting.current = false;
++	}
+ 
+ 	return {
+ 		...otherProps,

@@ -1,0 +1,446 @@
+diff --git a/docs/tool/manifest.js b/docs/tool/manifest.js
+index 2004fae84f7ccc..569d78bc5bea8a 100644
+--- a/docs/tool/manifest.js
++++ b/docs/tool/manifest.js
+@@ -18,6 +18,7 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
+ 		'packages/components/src/menu/README.md',
+ 		'packages/components/src/tabs/README.md',
+ 		'packages/components/src/custom-select-control-v2/README.md',
++		'packages/components/src/badge/README.md',
+ 	],
+ } );
+ const packagePaths = glob( 'packages/*/package.json' )
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index af71c4104b4d97..c58817a420a746 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,10 @@
+ 
+ -   `BoxControl`: Better respect for the `min` prop in the Range Slider ([#67819](https://github.com/WordPress/gutenberg/pull/67819)).
+ 
++### Experimental
++
++-   Add new `Badge` component ([#66555](https://github.com/WordPress/gutenberg/pull/66555)).
++
+ ## 29.0.0 (2024-12-11)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/badge/README.md b/packages/components/src/badge/README.md
+new file mode 100644
+index 00000000000000..0be531ca6f2df8
+--- /dev/null
++++ b/packages/components/src/badge/README.md
+@@ -0,0 +1,22 @@
++# Badge
++
++<!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
++
++<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-badge--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
++
++## Props
++
++### `children`
++
++Text to display inside the badge.
++
++ - Type: `string`
++ - Required: Yes
++
++### `intent`
++
++Badge variant.
++
++ - Type: `"default" | "info" | "success" | "warning" | "error"`
++ - Required: No
++ - Default: `default`
+diff --git a/packages/components/src/badge/docs-manifest.json b/packages/components/src/badge/docs-manifest.json
+new file mode 100644
+index 00000000000000..3b70c0ef228432
+--- /dev/null
++++ b/packages/components/src/badge/docs-manifest.json
+@@ -0,0 +1,5 @@
++{
++	"$schema": "../../schemas/docs-manifest.json",
++	"displayName": "Badge",
++	"filePath": "./index.tsx"
++}
+diff --git a/packages/components/src/badge/index.tsx b/packages/components/src/badge/index.tsx
+new file mode 100644
+index 00000000000000..8a55f3881215f3
+--- /dev/null
++++ b/packages/components/src/badge/index.tsx
+@@ -0,0 +1,66 @@
++/**
++ * External dependencies
++ */
++import clsx from 'clsx';
++
++/**
++ * WordPress dependencies
++ */
++import { info, caution, error, published } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import type { BadgeProps } from './types';
++import type { WordPressComponentProps } from '../context';
++import Icon from '../icon';
++
++function Badge( {
++	className,
++	intent = 'default',
++	children,
++	...props
++}: WordPressComponentProps< BadgeProps, 'span', false > ) {
++	/**
++	 * Returns an icon based on the badge context.
++	 *
++	 * @return The corresponding icon for the provided context.
++	 */
++	function contextBasedIcon() {
++		switch ( intent ) {
++			case 'info':
++				return info;
++			case 'success':
++				return published;
++			case 'warning':
++				return caution;
++			case 'error':
++				return error;
++			default:
++				return null;
++		}
++	}
++
++	return (
++		<span
++			className={ clsx(
++				'components-badge',
++				`is-${ intent }`,
++				intent !== 'default' && 'has-icon',
++				className
++			) }
++			{ ...props }
++		>
++			{ intent !== 'default' && (
++				<Icon
++					icon={ contextBasedIcon() }
++					size={ 16 }
++					fill="currentColor"
++				/>
++			) }
++			{ children }
++		</span>
++	);
++}
++
++export default Badge;
+diff --git a/packages/components/src/badge/stories/index.story.tsx b/packages/components/src/badge/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..aaa4bfb3c08f60
+--- /dev/null
++++ b/packages/components/src/badge/stories/index.story.tsx
+@@ -0,0 +1,53 @@
++/**
++ * External dependencies
++ */
++import type { Meta, StoryObj } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import Badge from '..';
++
++const meta = {
++	component: Badge,
++	title: 'Components/Containers/Badge',
++	tags: [ 'status-private' ],
++} satisfies Meta< typeof Badge >;
++
++export default meta;
++
++type Story = StoryObj< typeof meta >;
++
++export const Default: Story = {
++	args: {
++		children: 'Code is Poetry',
++	},
++};
++
++export const Info: Story = {
++	args: {
++		...Default.args,
++		intent: 'info',
++	},
++};
++
++export const Success: Story = {
++	args: {
++		...Default.args,
++		intent: 'success',
++	},
++};
++
++export const Warning: Story = {
++	args: {
++		...Default.args,
++		intent: 'warning',
++	},
++};
++
++export const Error: Story = {
++	args: {
++		...Default.args,
++		intent: 'error',
++	},
++};
+diff --git a/packages/components/src/badge/styles.scss b/packages/components/src/badge/styles.scss
+new file mode 100644
+index 00000000000000..e1e9cd5312d11a
+--- /dev/null
++++ b/packages/components/src/badge/styles.scss
+@@ -0,0 +1,38 @@
++$badge-colors: (
++	"info": #3858e9,
++	"warning": $alert-yellow,
++	"error": $alert-red,
++	"success": $alert-green,
++);
++
++.components-badge {
++	background-color: color-mix(in srgb, $white 90%, var(--base-color));
++	color: color-mix(in srgb, $black 50%, var(--base-color));
++	padding: 0 $grid-unit-10;
++	min-height: $grid-unit-30;
++	border-radius: $radius-small;
++	font-size: $font-size-small;
++	font-weight: 400;
++	flex-shrink: 0;
++	line-height: $font-line-height-small;
++	width: fit-content;
++	display: flex;
++	align-items: center;
++	gap: 2px;
++
++	&:where(.is-default) {
++		background-color: $gray-100;
++		color: $gray-800;
++	}
++
++	&.has-icon {
++		padding-inline-start: $grid-unit-05;
++	}
++
++	// Generate color variants
++	@each $type, $color in $badge-colors {
++		&.is-#{$type} {
++			--base-color: #{$color};
++		}
++	}
++}
+diff --git a/packages/components/src/badge/test/index.tsx b/packages/components/src/badge/test/index.tsx
+new file mode 100644
+index 00000000000000..47c832eb3c8300
+--- /dev/null
++++ b/packages/components/src/badge/test/index.tsx
+@@ -0,0 +1,40 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import Badge from '..';
++
++describe( 'Badge', () => {
++	it( 'should render correctly with default props', () => {
++		render( <Badge>Code is Poetry</Badge> );
++		const badge = screen.getByText( 'Code is Poetry' );
++		expect( badge ).toBeInTheDocument();
++		expect( badge.tagName ).toBe( 'SPAN' );
++		expect( badge ).toHaveClass( 'components-badge' );
++	} );
++
++	it( 'should render as per its intent and contain an icon', () => {
++		render( <Badge intent="error">Code is Poetry</Badge> );
++		const badge = screen.getByText( 'Code is Poetry' );
++		expect( badge ).toHaveClass( 'components-badge', 'is-error' );
++		expect( badge ).toHaveClass( 'has-icon' );
++	} );
++
++	it( 'should combine custom className with default class', () => {
++		render( <Badge className="custom-class">Code is Poetry</Badge> );
++		const badge = screen.getByText( 'Code is Poetry' );
++		expect( badge ).toHaveClass( 'components-badge' );
++		expect( badge ).toHaveClass( 'custom-class' );
++	} );
++
++	it( 'should pass through additional props', () => {
++		render( <Badge data-testid="custom-badge">Code is Poetry</Badge> );
++		const badge = screen.getByTestId( 'custom-badge' );
++		expect( badge ).toHaveTextContent( 'Code is Poetry' );
++		expect( badge ).toHaveClass( 'components-badge' );
++	} );
++} );
+diff --git a/packages/components/src/badge/types.ts b/packages/components/src/badge/types.ts
+new file mode 100644
+index 00000000000000..91cd7c39b549bb
+--- /dev/null
++++ b/packages/components/src/badge/types.ts
+@@ -0,0 +1,12 @@
++export type BadgeProps = {
++	/**
++	 * Badge variant.
++	 *
++	 * @default 'default'
++	 */
++	intent?: 'default' | 'info' | 'success' | 'warning' | 'error';
++	/**
++	 * Text to display inside the badge.
++	 */
++	children: string;
++};
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 2ced100dc576be..f5a9ee90519c2d 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -8,6 +8,7 @@ import Theme from './theme';
+ import { Tabs } from './tabs';
+ import { kebabCase } from './utils/strings';
+ import { lock } from './lock-unlock';
++import Badge from './badge';
+ 
+ export const privateApis = {};
+ lock( privateApis, {
+@@ -17,4 +18,5 @@ lock( privateApis, {
+ 	Theme,
+ 	Menu,
+ 	kebabCase,
++	Badge,
+ } );
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 70317f4a2d0e0b..368dec0f5e253d 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -10,6 +10,7 @@
+ // Components
+ @import "./animate/style.scss";
+ @import "./autocomplete/style.scss";
++@import "./badge/styles.scss";
+ @import "./button-group/style.scss";
+ @import "./button/style.scss";
+ @import "./checkbox-control/style.scss";
+diff --git a/packages/icons/CHANGELOG.md b/packages/icons/CHANGELOG.md
+index 952e3164d45072..64c1a58b549caf 100644
+--- a/packages/icons/CHANGELOG.md
++++ b/packages/icons/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++-   Add new `caution` icon ([#66555](https://github.com/WordPress/gutenberg/pull/66555)).
++-   Add new `error` icon ([#66555](https://github.com/WordPress/gutenberg/pull/66555)).
+ -   Deprecate `warning` icon and rename to `cautionFilled` ([#67895](https://github.com/WordPress/gutenberg/pull/67895)).
+ 
+ ## 10.14.0 (2024-12-11)
+diff --git a/packages/icons/src/icon/stories/keywords.ts b/packages/icons/src/icon/stories/keywords.ts
+index 4965bc38c3451c..4de5ae9a7dae93 100644
+--- a/packages/icons/src/icon/stories/keywords.ts
++++ b/packages/icons/src/icon/stories/keywords.ts
+@@ -1,7 +1,9 @@
+ const keywords: Partial< Record< keyof typeof import('../../'), string[] > > = {
+ 	cancelCircleFilled: [ 'close' ],
+-	cautionFilled: [ 'alert', 'caution', 'warning' ],
++	caution: [ 'alert', 'warning' ],
++	cautionFilled: [ 'alert', 'warning' ],
+ 	create: [ 'add' ],
++	error: [ 'alert', 'caution', 'warning' ],
+ 	file: [ 'folder' ],
+ 	seen: [ 'show' ],
+ 	thumbsDown: [ 'dislike' ],
+diff --git a/packages/icons/src/index.js b/packages/icons/src/index.js
+index ab7edf65e496b9..e82b09e5d5afe9 100644
+--- a/packages/icons/src/index.js
++++ b/packages/icons/src/index.js
+@@ -37,6 +37,7 @@ export { default as caption } from './library/caption';
+ export { default as capturePhoto } from './library/capture-photo';
+ export { default as captureVideo } from './library/capture-video';
+ export { default as category } from './library/category';
++export { default as caution } from './library/caution';
+ export {
+ 	/** @deprecated Import `cautionFilled` instead. */
+ 	default as warning,
+@@ -89,6 +90,7 @@ export { default as download } from './library/download';
+ export { default as edit } from './library/edit';
+ export { default as envelope } from './library/envelope';
+ export { default as external } from './library/external';
++export { default as error } from './library/error';
+ export { default as file } from './library/file';
+ export { default as filter } from './library/filter';
+ export { default as flipHorizontal } from './library/flip-horizontal';
+diff --git a/packages/icons/src/library/caution.js b/packages/icons/src/library/caution.js
+new file mode 100644
+index 00000000000000..f6d23fdfc7eddf
+--- /dev/null
++++ b/packages/icons/src/library/caution.js
+@@ -0,0 +1,16 @@
++/**
++ * WordPress dependencies
++ */
++import { SVG, Path } from '@wordpress/primitives';
++
++const caution = (
++	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
++		<Path
++			fillRule="evenodd"
++			clipRule="evenodd"
++			d="M5.5 12a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0ZM12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm-.75 12v-1.5h1.5V16h-1.5Zm0-8v5h1.5V8h-1.5Z"
++		/>
++	</SVG>
++);
++
++export default caution;
+diff --git a/packages/icons/src/library/error.js b/packages/icons/src/library/error.js
+new file mode 100644
+index 00000000000000..2dc2bccbf639ce
+--- /dev/null
++++ b/packages/icons/src/library/error.js
+@@ -0,0 +1,16 @@
++/**
++ * WordPress dependencies
++ */
++import { SVG, Path } from '@wordpress/primitives';
++
++const error = (
++	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
++		<Path
++			fillRule="evenodd"
++			clipRule="evenodd"
++			d="M12.218 5.377a.25.25 0 0 0-.436 0l-7.29 12.96a.25.25 0 0 0 .218.373h14.58a.25.25 0 0 0 .218-.372l-7.29-12.96Zm-1.743-.735c.669-1.19 2.381-1.19 3.05 0l7.29 12.96a1.75 1.75 0 0 1-1.525 2.608H4.71a1.75 1.75 0 0 1-1.525-2.608l7.29-12.96ZM12.75 17.46h-1.5v-1.5h1.5v1.5Zm-1.5-3h1.5v-5h-1.5v5Z"
++		/>
++	</SVG>
++);
++
++export default error;
+diff --git a/packages/icons/src/library/info.js b/packages/icons/src/library/info.js
+index f3425d9e950415..24d41d798263f7 100644
+--- a/packages/icons/src/library/info.js
++++ b/packages/icons/src/library/info.js
+@@ -4,8 +4,12 @@
+ import { SVG, Path } from '@wordpress/primitives';
+ 
+ const info = (
+-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+-		<Path d="M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-6h-2v6zm0-8h2V7h-2v2z" />
++	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
++		<Path
++			fillRule="evenodd"
++			clipRule="evenodd"
++			d="M5.5 12a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0ZM12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm.75 4v1.5h-1.5V8h1.5Zm0 8v-5h-1.5v5h1.5Z"
++		/>
+ 	</SVG>
+ );
+ 

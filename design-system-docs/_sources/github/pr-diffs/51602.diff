@@ -1,0 +1,221 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 779c1b42382904..e5f86ff78bc299 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `Modal`: fix closing when contained iframe is focused ([#51602](https://github.com/WordPress/gutenberg/pull/51602)).
++
+ ## 25.9.0 (2023-10-05)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 2746c40fcaab02..041c592166ab73 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -2,7 +2,12 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import type { ForwardedRef, KeyboardEvent, UIEvent } from 'react';
++import type {
++	ForwardedRef,
++	KeyboardEvent,
++	MutableRefObject,
++	UIEvent,
++} from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -15,12 +20,13 @@ import {
+ 	useState,
+ 	forwardRef,
+ 	useLayoutEffect,
++	createContext,
++	useContext,
+ } from '@wordpress/element';
+ import {
+ 	useInstanceId,
+ 	useFocusReturn,
+ 	useFocusOnMount,
+-	__experimentalUseFocusOutside as useFocusOutside,
+ 	useConstrainedTabbing,
+ 	useMergeRefs,
+ } from '@wordpress/compose';
+@@ -36,8 +42,13 @@ import Button from '../button';
+ import StyleProvider from '../style-provider';
+ import type { ModalProps } from './types';
+ 
+-// Used to count the number of open modals.
+-let openModalCount = 0;
++// Used to track and dismiss the prior modal when another opens unless nested.
++const level0Dismissers: MutableRefObject<
++	ModalProps[ 'onRequestClose' ] | undefined
++>[] = [];
++const ModalContext = createContext( level0Dismissers );
++
++let isBodyOpenClassActive = false;
+ 
+ function UnforwardedModal(
+ 	props: ModalProps,
+@@ -91,7 +102,6 @@ function UnforwardedModal(
+ 	);
+ 	const constrainedTabbingRef = useConstrainedTabbing();
+ 	const focusReturnRef = useFocusReturn();
+-	const focusOutsideProps = useFocusOutside( onRequestClose );
+ 	const contentRef = useRef< HTMLDivElement >( null );
+ 	const childrenContainerRef = useRef< HTMLDivElement >( null );
+ 
+@@ -120,26 +130,52 @@ function UnforwardedModal(
+ 		}
+ 	}, [ contentRef ] );
+ 
++	// Accessibly isolates/unisolates the modal.
+ 	useEffect( () => {
+ 		ariaHelper.modalize( ref.current );
+ 		return () => ariaHelper.unmodalize();
+ 	}, [] );
+ 
++	// Keeps a fresh ref for the subsequent effect.
++	const refOnRequestClose = useRef< ModalProps[ 'onRequestClose' ] >();
+ 	useEffect( () => {
+-		openModalCount++;
++		refOnRequestClose.current = onRequestClose;
++	}, [ onRequestClose ] );
+ 
+-		if ( openModalCount === 1 ) {
+-			document.body.classList.add( bodyOpenClassName );
+-		}
++	// The list of `onRequestClose` callbacks of open (non-nested) Modals. Only
++	// one should remain open at a time and the list enables closing prior ones.
++	const dismissers = useContext( ModalContext );
++	// Used for the tracking and dismissing any nested modals.
++	const nestedDismissers = useRef< typeof level0Dismissers >( [] );
+ 
++	// Updates the stack tracking open modals at this level and calls
++	// onRequestClose for any prior and/or nested modals as applicable.
++	useEffect( () => {
++		dismissers.push( refOnRequestClose );
++		const [ first, second ] = dismissers;
++		if ( second ) first?.current?.();
++
++		const nested = nestedDismissers.current;
+ 		return () => {
+-			openModalCount--;
++			nested[ 0 ]?.current?.();
++			dismissers.shift();
++		};
++	}, [ dismissers ] );
+ 
+-			if ( openModalCount === 0 ) {
++	const isLevel0 = dismissers === level0Dismissers;
++	// Adds/removes the value of bodyOpenClassName to body element.
++	useEffect( () => {
++		if ( ! isBodyOpenClassActive ) {
++			isBodyOpenClassActive = true;
++			document.body.classList.add( bodyOpenClassName );
++		}
++		return () => {
++			if ( isLevel0 && dismissers.length === 0 ) {
+ 				document.body.classList.remove( bodyOpenClassName );
++				isBodyOpenClassActive = false;
+ 			}
+ 		};
+-	}, [ bodyOpenClassName ] );
++	}, [ bodyOpenClassName, dismissers, isLevel0 ] );
+ 
+ 	// Calls the isContentScrollable callback when the Modal children container resizes.
+ 	useLayoutEffect( () => {
+@@ -200,12 +236,9 @@ function UnforwardedModal(
+ 		onPointerUp: React.PointerEventHandler< HTMLDivElement >;
+ 	} = {
+ 		onPointerDown: ( event ) => {
+-			if ( event.isPrimary && event.target === event.currentTarget ) {
++			if ( event.target === event.currentTarget ) {
+ 				pressTarget = event.target;
+-				// Avoids loss of focus yet also leaves `useFocusOutside`
+-				// practically useless with its only potential trigger being
+-				// programmatic focus movement. TODO opt for either removing
+-				// the hook or enhancing it such that this isn't needed.
++				// Avoids focus changing so that focus return works as expected.
+ 				event.preventDefault();
+ 			}
+ 		},
+@@ -222,7 +255,7 @@ function UnforwardedModal(
+ 		},
+ 	};
+ 
+-	return createPortal(
++	const modal = (
+ 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+ 		<div
+ 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
+@@ -253,9 +286,6 @@ function UnforwardedModal(
+ 					aria-labelledby={ contentLabel ? undefined : headingId }
+ 					aria-describedby={ aria.describedby }
+ 					tabIndex={ -1 }
+-					{ ...( shouldCloseOnClickOutside
+-						? focusOutsideProps
+-						: {} ) }
+ 					onKeyDown={ onKeyDown }
+ 				>
+ 					<div
+@@ -320,7 +350,13 @@ function UnforwardedModal(
+ 					</div>
+ 				</div>
+ 			</StyleProvider>
+-		</div>,
++		</div>
++	);
++
++	return createPortal(
++		<ModalContext.Provider value={ nestedDismissers.current }>
++			{ modal }
++		</ModalContext.Provider>,
+ 		document.body
+ 	);
+ }
+diff --git a/packages/components/src/modal/test/index.tsx b/packages/components/src/modal/test/index.tsx
+index 69f28508c14059..9073735e94dbe9 100644
+--- a/packages/components/src/modal/test/index.tsx
++++ b/packages/components/src/modal/test/index.tsx
+@@ -167,6 +167,35 @@ describe( 'Modal', () => {
+ 		expect( onRequestClose ).not.toHaveBeenCalled();
+ 	} );
+ 
++	it( 'should request closing of nested modal when outer modal unmounts', async () => {
++		const user = userEvent.setup();
++		const onRequestClose = jest.fn();
++
++		const RequestCloseOfNested = () => {
++			const [ isShown, setIsShown ] = useState( true );
++			return (
++				<>
++					{ isShown && (
++						<Modal
++							onKeyDown={ ( { key } ) => {
++								if ( key === 'o' ) setIsShown( false );
++							} }
++							onRequestClose={ noop }
++						>
++							<Modal onRequestClose={ onRequestClose }>
++								<p>Nested modal content</p>
++							</Modal>
++						</Modal>
++					) }
++				</>
++			);
++		};
++		render( <RequestCloseOfNested /> );
++
++		await user.keyboard( 'o' );
++		expect( onRequestClose ).toHaveBeenCalled();
++	} );
++
+ 	it( 'should accessibly hide and show siblings including outer modals', async () => {
+ 		const user = userEvent.setup();
+ 

@@ -1,0 +1,144 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 4eeda3a532d3cc..bd765613970e33 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `IconButton`: Restore the default tooltip delay on hover ([#79505](https://github.com/WordPress/gutenberg/pull/79505)).
++
+ ### Internal
+ 
+ -   Update `@base-ui/react` from `1.5.0` to [`1.6.0`](https://github.com/mui/base-ui/releases/tag/v1.6.0) ([#79408](https://github.com/WordPress/gutenberg/pull/79408)).
+diff --git a/packages/ui/src/icon-button/icon-button.tsx b/packages/ui/src/icon-button/icon-button.tsx
+index 8ed7de1577eea1..d19d21bc323b1e 100644
+--- a/packages/ui/src/icon-button/icon-button.tsx
++++ b/packages/ui/src/icon-button/icon-button.tsx
+@@ -9,6 +9,9 @@ import { type IconButtonProps } from './types';
+ /**
+  * An icon-only button with automatic tooltip and optimized styling.
+  * Inherits all Button props while providing icon-specific enhancements.
++ *
++ * When rendering a group of `IconButton`s, wrap them in a `Tooltip.Provider`
++ * to coordinate tooltip delays across the group.
+  */
+ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
+ 	function IconButton(
+@@ -30,42 +33,36 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
+ 		const classes = clsx( styles[ 'icon-button' ], className );
+ 
+ 		return (
+-			<Tooltip.Provider delay={ 0 }>
+-				<Tooltip.Root>
+-					<Tooltip.Trigger
+-						ref={ ref }
+-						disabled={ disabled && ! focusableWhenDisabled }
+-						render={
+-							<Button
+-								{ ...restProps }
+-								size={ size }
+-								aria-label={ label }
+-								aria-keyshortcuts={ shortcut?.ariaKeyShortcut }
+-								disabled={ disabled }
+-								focusableWhenDisabled={ focusableWhenDisabled }
+-							/>
+-						}
+-						className={ classes }
+-					>
+-						<Icon
+-							icon={ icon }
+-							size={ 24 }
+-							className={ styles.icon }
++			<Tooltip.Root>
++				<Tooltip.Trigger
++					ref={ ref }
++					disabled={ disabled && ! focusableWhenDisabled }
++					render={
++						<Button
++							{ ...restProps }
++							size={ size }
++							aria-label={ label }
++							aria-keyshortcuts={ shortcut?.ariaKeyShortcut }
++							disabled={ disabled }
++							focusableWhenDisabled={ focusableWhenDisabled }
+ 						/>
+-					</Tooltip.Trigger>
+-					<Tooltip.Popup positioner={ positioner }>
+-						{ label }
+-						{ shortcut && (
+-							<>
+-								{ ' ' }
+-								<span aria-hidden="true">
+-									{ shortcut.displayShortcut }
+-								</span>
+-							</>
+-						) }
+-					</Tooltip.Popup>
+-				</Tooltip.Root>
+-			</Tooltip.Provider>
++					}
++					className={ classes }
++				>
++					<Icon icon={ icon } size={ 24 } className={ styles.icon } />
++				</Tooltip.Trigger>
++				<Tooltip.Popup positioner={ positioner }>
++					{ label }
++					{ shortcut && (
++						<>
++							{ ' ' }
++							<span aria-hidden="true">
++								{ shortcut.displayShortcut }
++							</span>
++						</>
++					) }
++				</Tooltip.Popup>
++			</Tooltip.Root>
+ 		);
+ 	}
+ );
+diff --git a/packages/ui/src/icon-button/stories/index.story.tsx b/packages/ui/src/icon-button/stories/index.story.tsx
+index 3eae2476cfc1b8..3aeddd76fd1ab2 100644
+--- a/packages/ui/src/icon-button/stories/index.story.tsx
++++ b/packages/ui/src/icon-button/stories/index.story.tsx
+@@ -87,21 +87,23 @@ export const Disabled: Story = {
+ export const WithDifferentIcons: Story = {
+ 	...Default,
+ 	render: ( args ) => (
+-		<div
+-			style={ {
+-				display: 'flex',
+-				gap: '1rem',
+-				alignItems: 'center',
+-				flexWrap: 'wrap',
+-			} }
+-		>
+-			<IconButton { ...args } icon={ wordpress } label="WordPress" />
+-			<IconButton { ...args } icon={ plus } label="Add" />
+-			<IconButton { ...args } icon={ pencil } label="Edit" />
+-			<IconButton { ...args } icon={ trash } label="Delete" />
+-			<IconButton { ...args } icon={ download } label="Download" />
+-			<IconButton { ...args } icon={ upload } label="Upload" />
+-		</div>
++		<Tooltip.Provider>
++			<div
++				style={ {
++					display: 'flex',
++					gap: '1rem',
++					alignItems: 'center',
++					flexWrap: 'wrap',
++				} }
++			>
++				<IconButton { ...args } icon={ wordpress } label="WordPress" />
++				<IconButton { ...args } icon={ plus } label="Add" />
++				<IconButton { ...args } icon={ pencil } label="Edit" />
++				<IconButton { ...args } icon={ trash } label="Delete" />
++				<IconButton { ...args } icon={ download } label="Download" />
++				<IconButton { ...args } icon={ upload } label="Upload" />
++			</div>
++		</Tooltip.Provider>
+ 	),
+ };
+ 

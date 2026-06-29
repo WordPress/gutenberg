@@ -1,0 +1,132 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 33f0719b3297e0..629513035d62ad 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Bug Fix
+ 
+ -   `Popover`: Allow legitimate 0 positions to update popover position ([#51320](https://github.com/WordPress/gutenberg/pull/51320)).
++-   `Button`: Remove unnecessary margin from dashicon ([#51395](https://github.com/WordPress/gutenberg/pull/51395)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/button/stories/e2e/index.tsx b/packages/components/src/button/stories/e2e/index.tsx
+index e68cb67a524daf..0d955b5b6c5a85 100644
+--- a/packages/components/src/button/stories/e2e/index.tsx
++++ b/packages/components/src/button/stories/e2e/index.tsx
+@@ -56,3 +56,25 @@ export const Icon = VariantStates.bind( {} );
+ Icon.args = {
+ 	icon: wordpress,
+ };
++
++export const Dashicons: ComponentStory< typeof Button > = ( props ) => {
++	return (
++		<div style={ { display: 'flex', gap: 8 } }>
++			<Button { ...props } />
++			<Button { ...props }>Children</Button>
++			<Button { ...props } iconPosition="right">
++				Children (icon right)
++			</Button>
++			<Button { ...props } text="Text" />
++			<Button
++				{ ...props }
++				text="Text (icon right)"
++				iconPosition="right"
++			/>
++		</div>
++	);
++};
++Dashicons.args = {
++	icon: 'editor-help',
++	variant: 'primary',
++};
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 5916876aad589d..c93d7e2070c43b 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -168,11 +168,6 @@
+ 			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+ 		}
+ 
+-		.dashicon {
+-			display: inline-block;
+-			flex: 0 0 auto;
+-		}
+-
+ 		// Pull left if the tertiary button stands alone after a description, so as to vertically align with items above.
+ 		p + & {
+ 			margin-left: -($grid-unit-15 * 0.5);
+@@ -296,10 +291,11 @@
+ 		}
+ 
+ 		.dashicon {
+-			display: inline-block;
+-			flex: 0 0 auto;
+-			margin-left: 2px;
+-			margin-right: 2px;
++			display: inline-flex;
++			justify-content: center;
++			align-items: center;
++			padding: 2px;
++			box-sizing: content-box;
+ 		}
+ 
+ 		&.has-text {
+@@ -308,10 +304,6 @@
+ 			padding-left: $grid-unit-10;
+ 			gap: $grid-unit-05;
+ 		}
+-
+-		&.has-text .dashicon {
+-			margin-right: $grid-unit-10 + 2px;
+-		}
+ 	}
+ 
+ 	// Toggled style.
+diff --git a/test/storybook-playwright/specs/button.spec.ts b/test/storybook-playwright/specs/button.spec.ts
+index 66049d8c63f4cc..d45fddfec0b5a1 100644
+--- a/test/storybook-playwright/specs/button.spec.ts
++++ b/test/storybook-playwright/specs/button.spec.ts
+@@ -54,4 +54,20 @@ test.describe( 'Button', () => {
+ 			} );
+ 		} );
+ 	} );
++
++	test.describe( 'dashicon', () => {
++		test.beforeEach( async ( { page } ) => {
++			await gotoStoryId( page, 'components-button--dashicons', {
++				decorators: { css: 'wordpress' },
++			} );
++			// Wait for dashicons font to load
++			await page.waitForFunction( () =>
++				document.fonts.check( '20px dashicons' )
++			);
++		} );
++
++		test( 'should render with correct spacing', async ( { page } ) => {
++			expect( await page.screenshot() ).toMatchSnapshot();
++		} );
++	} );
+ } );
+diff --git a/test/storybook-playwright/utils.ts b/test/storybook-playwright/utils.ts
+index 1f0fe7235abeed..61ab7b3552edd2 100644
+--- a/test/storybook-playwright/utils.ts
++++ b/test/storybook-playwright/utils.ts
+@@ -21,7 +21,7 @@ const buildDecoratorString = ( decorators: Decorators = {} ) => {
+ 	return decoratorParamStrings.join( ';' );
+ };
+ 
+-export const gotoStoryId = (
++export const gotoStoryId = async (
+ 	page: Page,
+ 	storyId: string,
+ 	{ decorators }: Options = {}
+@@ -35,7 +35,7 @@ export const gotoStoryId = (
+ 
+ 	params.set( 'id', storyId );
+ 
+-	page.goto(
++	await page.goto(
+ 		`http://localhost:${ STORYBOOK_PORT }/iframe.html?${ params.toString() }`,
+ 		{ waitUntil: 'load' }
+ 	);

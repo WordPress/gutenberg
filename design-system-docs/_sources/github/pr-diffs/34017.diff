@@ -1,0 +1,624 @@
+diff --git a/packages/block-library/src/post-featured-image/dimension-controls.js b/packages/block-library/src/post-featured-image/dimension-controls.js
+index 69336d03848421..362b57d5a41f53 100644
+--- a/packages/block-library/src/post-featured-image/dimension-controls.js
++++ b/packages/block-library/src/post-featured-image/dimension-controls.js
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import classNames from 'classnames';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -5,7 +10,6 @@ import { __, _x } from '@wordpress/i18n';
+ import {
+ 	PanelBody,
+ 	__experimentalUnitControl as UnitControl,
+-	BaseControl,
+ 	Flex,
+ 	FlexItem,
+ 	__experimentalSegmentedControl as SegmentedControl,
+@@ -60,7 +64,13 @@ const DimensionControls = ( {
+ 	const scaleLabel = _x( 'Scale', 'Image scaling options' );
+ 	return (
+ 		<PanelBody title={ __( 'Dimensions' ) }>
+-			<Flex justify="space-between">
++			<Flex
++				justify="space-between"
++				className={ classNames(
++					'block-library-post-featured-image-dimension-controls',
++					{ 'scale-control-is-visible': !! height }
++				) }
++			>
+ 				<FlexItem>
+ 					<UnitControl
+ 						label={ __( 'Height' ) }
+@@ -85,30 +95,18 @@ const DimensionControls = ( {
+ 				</FlexItem>
+ 			</Flex>
+ 			{ !! height && (
+-				<>
+-					<BaseControl
+-						aria-label={ scaleLabel }
+-						className="block-library-post-featured-image-scale-controls"
+-					>
+-						<div>
+-							<BaseControl.VisualLabel>
+-								{ scaleLabel }
+-							</BaseControl.VisualLabel>
+-						</div>
+-						<SegmentedControl
+-							label={ scaleLabel }
+-							value={ scale }
+-							onChange={ ( value ) => {
+-								setAttributes( {
+-									scale: value,
+-								} );
+-							} }
+-							isBlock
+-						>
+-							{ SCALE_OPTIONS }
+-						</SegmentedControl>
+-					</BaseControl>
+-				</>
++				<SegmentedControl
++					label={ scaleLabel }
++					value={ scale }
++					onChange={ ( value ) => {
++						setAttributes( {
++							scale: value,
++						} );
++					} }
++					isBlock
++				>
++					{ SCALE_OPTIONS }
++				</SegmentedControl>
+ 			) }
+ 		</PanelBody>
+ 	);
+diff --git a/packages/block-library/src/post-featured-image/editor.scss b/packages/block-library/src/post-featured-image/editor.scss
+index 73ef68fc25970f..68e1c171e009c9 100644
+--- a/packages/block-library/src/post-featured-image/editor.scss
++++ b/packages/block-library/src/post-featured-image/editor.scss
+@@ -26,14 +26,9 @@ div[data-type="core/post-featured-image"] {
+ 	}
+ }
+ 
+-// TODO this is temp styles.
+-.block-library-post-featured-image-scale-controls {
+-	margin-top: $grid-unit-20;
+-	.components-flex {
+-		border: $border-width solid $gray-700;
+-	}
+-	button {
+-		width: 100%;
+-		display: block;
++.block-library-post-featured-image-dimension-controls {
++	margin-bottom: $grid-unit-10;
++	&.scale-control-is-visible {
++		margin-bottom: $grid-unit-20;
+ 	}
+ }
+diff --git a/packages/components/src/base-control/index.js b/packages/components/src/base-control/index.js
+index 4ec051c01159bd..2d21ebe4cae27a 100644
+--- a/packages/components/src/base-control/index.js
++++ b/packages/components/src/base-control/index.js
+@@ -16,7 +16,7 @@ import {
+ 
+ /**
+  * @typedef Props
+- * @property {string}                    id                    The id of the element to which labels and help text are being generated.
++ * @property {string}                    [id]                  The id of the element to which labels and help text are being generated.
+  *                                                             That element should be passed as a child.
+  * @property {import('react').ReactNode} help                  If this property is added, a help text will be
+  *                                                             generated using help property as the content.
+diff --git a/packages/components/src/segmented-control/README.md b/packages/components/src/segmented-control/README.md
+index aa823811312d78..26955d0aea9a7d 100644
+--- a/packages/components/src/segmented-control/README.md
++++ b/packages/components/src/segmented-control/README.md
+@@ -32,12 +32,13 @@ function Example() {
+ 
+ Label for the form element.
+ 
+-### `baseId`
++### `hideLabelFromVision`
+ 
+--   Type: `string`
++-   Type: `boolean`
+ -   Required: No
++-   Default: `false`
+ 
+-ID that will serve as a base for all the items IDs.
++If true, the label will only be visible to screen readers.
+ 
+ ### `isAdaptiveWidth`
+ 
+@@ -68,3 +69,10 @@ Callback when a segment is selected.
+ -   Type: `string | number`
+ 
+ The value of the `SegmentedControl`.
++
++### `help`
++
++-   Type: `ReactNode`
++-   Required: No
++
++If this property is added, a help text will be generated using help property as the content.
+diff --git a/packages/components/src/segmented-control/component.tsx b/packages/components/src/segmented-control/component.tsx
+index 71607e99864d4d..7026df0b44fac3 100644
+--- a/packages/components/src/segmented-control/component.tsx
++++ b/packages/components/src/segmented-control/component.tsx
+@@ -10,7 +10,7 @@ import useResizeAware from 'react-resize-aware';
+  */
+ import { __ } from '@wordpress/i18n';
+ import { useRef, useMemo } from '@wordpress/element';
+-import { useMergeRefs } from '@wordpress/compose';
++import { useMergeRefs, useInstanceId } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -21,6 +21,7 @@ import {
+ 	PolymorphicComponentProps,
+ } from '../ui/context';
+ import { View } from '../view';
++import BaseControl from '../base-control';
+ import * as styles from './styles';
+ import { useUpdateEffect, useCx } from '../utils/hooks';
+ import Backdrop from './segmented-control-backdrop';
+@@ -35,11 +36,11 @@ function SegmentedControl(
+ ) {
+ 	const {
+ 		className,
+-		baseId,
+ 		isAdaptiveWidth = false,
+ 		isBlock = false,
+-		id,
+ 		label,
++		hideLabelFromVision = false,
++		help,
+ 		onChange = noop,
+ 		value,
+ 		children,
+@@ -48,9 +49,12 @@ function SegmentedControl(
+ 	const cx = useCx();
+ 	const containerRef = useRef();
+ 	const [ resizeListener, sizes ] = useResizeAware();
+-
++	const baseId = useInstanceId(
++		SegmentedControl,
++		'segmented-control'
++	).toString();
+ 	const radio = useRadioState( {
+-		baseId: baseId || id,
++		baseId,
+ 		state: value,
+ 	} );
+ 
+@@ -74,29 +78,38 @@ function SegmentedControl(
+ 				'medium',
+ 				className
+ 			),
+-		[ className ]
++		[ className, isBlock ]
+ 	);
+ 	return (
+-		<SegmentedControlContext.Provider
+-			value={ { ...radio, isBlock: ! isAdaptiveWidth } }
+-		>
+-			<RadioGroup
+-				{ ...radio }
+-				aria-label={ label }
+-				as={ View }
+-				className={ classes }
+-				{ ...otherProps }
+-				ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
++		<BaseControl help={ help }>
++			<SegmentedControlContext.Provider
++				value={ { ...radio, isBlock: ! isAdaptiveWidth } }
+ 			>
+-				{ resizeListener }
+-				<Backdrop
++				{ ! hideLabelFromVision && (
++					<div>
++						<BaseControl.VisualLabel>
++							{ label }
++						</BaseControl.VisualLabel>
++					</div>
++				) }
++				<RadioGroup
+ 					{ ...radio }
+-					containerRef={ containerRef }
+-					containerWidth={ sizes.width }
+-				/>
+-				{ children }
+-			</RadioGroup>
+-		</SegmentedControlContext.Provider>
++					aria-label={ label }
++					as={ View }
++					className={ classes }
++					{ ...otherProps }
++					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
++				>
++					{ resizeListener }
++					<Backdrop
++						{ ...radio }
++						containerRef={ containerRef }
++						containerWidth={ sizes.width }
++					/>
++					{ children }
++				</RadioGroup>
++			</SegmentedControlContext.Provider>
++		</BaseControl>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/segmented-control/stories/index.js b/packages/components/src/segmented-control/stories/index.js
+index dbce70d59ecc93..8a9b6fc091c503 100644
+--- a/packages/components/src/segmented-control/stories/index.js
++++ b/packages/components/src/segmented-control/stories/index.js
+@@ -46,7 +46,12 @@ export const _default = () => {
+ 				</SegmentedControl>
+ 			</Spacer>
+ 			<Spacer>
+-				<SegmentedControl isAdaptiveWidth label={ label } value="long">
++				<SegmentedControl
++					isAdaptiveWidth
++					label={ label }
++					value="long"
++					hideLabelFromVision={ true }
++				>
+ 					<SegmentedControlOption value="short" label="Short" />
+ 					<SegmentedControlOption
+ 						value="long"
+diff --git a/packages/components/src/segmented-control/test/__snapshots__/index.js.snap b/packages/components/src/segmented-control/test/__snapshots__/index.js.snap
+index 0e255fb885d0a0..6e0c296135ddb0 100644
+--- a/packages/components/src/segmented-control/test/__snapshots__/index.js.snap
++++ b/packages/components/src/segmented-control/test/__snapshots__/index.js.snap
+@@ -2,6 +2,19 @@
+ 
+ exports[`SegmentedControl should render correctly 1`] = `
+ .emotion-0 {
++  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
++  font-size: 13px;
++}
++
++.emotion-2 {
++  margin-bottom: calc(4px * 2);
++}
++
++.components-panel__row .emotion-2 {
++  margin-bottom: inherit;
++}
++
++.emotion-4 {
+   background: #fff;
+   border: 1px solid;
+   border-color: #757575;
+@@ -19,23 +32,23 @@ exports[`SegmentedControl should render correctly 1`] = `
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+-  .emotion-0 {
++  .emotion-4 {
+     transition-duration: 0ms;
+   }
+ }
+ 
+-.emotion-0:hover {
++.emotion-4:hover {
+   border-color: #757575;
+ }
+ 
+-.emotion-0:focus-within {
++.emotion-4:focus-within {
+   border-color: var( --wp-admin-theme-color-darker-10, #007cba);
+   box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #00669b);
+   outline: none;
+   z-index: 1;
+ }
+ 
+-.emotion-2 {
++.emotion-6 {
+   background: #1e1e1e;
+   border-radius: 2px;
+   box-shadow: transparent;
+@@ -49,12 +62,12 @@ exports[`SegmentedControl should render correctly 1`] = `
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+-  .emotion-2 {
++  .emotion-6 {
+     transition-duration: 0ms;
+   }
+ }
+ 
+-.emotion-4 {
++.emotion-8 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+   display: -ms-inline-flexbox;
+@@ -67,7 +80,7 @@ exports[`SegmentedControl should render correctly 1`] = `
+   flex: 1;
+ }
+ 
+-.emotion-6 {
++.emotion-10 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -106,20 +119,20 @@ exports[`SegmentedControl should render correctly 1`] = `
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+-  .emotion-6 {
++  .emotion-10 {
+     transition-duration: 0ms;
+   }
+ }
+ 
+-.emotion-6::-moz-focus-inner {
++.emotion-10::-moz-focus-inner {
+   border: 0;
+ }
+ 
+-.emotion-6:active {
++.emotion-10:active {
+   background: #fff;
+ }
+ 
+-.emotion-7 {
++.emotion-11 {
+   font-size: 13px;
+   line-height: 1;
+   position: absolute;
+@@ -131,7 +144,7 @@ exports[`SegmentedControl should render correctly 1`] = `
+   transform: translate( -50%, -50% );
+ }
+ 
+-.emotion-9 {
++.emotion-13 {
+   font-size: 13px;
+   font-weight: bold;
+   height: 0;
+@@ -139,7 +152,7 @@ exports[`SegmentedControl should render correctly 1`] = `
+   visibility: hidden;
+ }
+ 
+-.emotion-11 {
++.emotion-15 {
+   background: rgba(0, 0, 0, 0.1);
+   height: calc( 100% - 4px - 4px );
+   position: absolute;
+@@ -152,94 +165,109 @@ exports[`SegmentedControl should render correctly 1`] = `
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+-  .emotion-11 {
++  .emotion-15 {
+     transition-duration: 0ms;
+   }
+ }
+ 
+ <div
+-  aria-label="Test Segmented Control"
+-  class="medium components-segmented-control emotion-0 emotion-1"
+-  data-wp-c16t="true"
+-  data-wp-component="SegmentedControl"
+-  id="segmented"
+-  role="radiogroup"
++  class="components-base-control emotion-0 emotion-1"
+ >
+-  <iframe
+-    aria-hidden="true"
+-    frameborder="0"
+-    src="about:blank"
+-    style="display: block; opacity: 0; position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;"
+-    tabindex="-1"
+-  />
+   <div
+-    class="emotion-2 emotion-3"
+-    role="presentation"
+-    style="transform: translateX(0px); transition: none; width: 0px;"
+-  />
+-  <div
+-    class="emotion-4 emotion-5"
+-    data-active="false"
++    class="components-base-control__field emotion-2 emotion-3"
+   >
+-    <button
+-      aria-checked="false"
+-      aria-label="R"
+-      class="emotion-6 components-segmented-control-option"
+-      data-value="rigas"
+-      data-wp-c16t="true"
+-      data-wp-component="SegmentedControlOption"
+-      id="segmented-0"
+-      role="radio"
+-      tabindex="0"
+-    >
+-      <div
+-        class="emotion-7 emotion-8"
+-      >
+-        R
+-      </div>
+-      <div
+-        aria-hidden="true"
+-        class="emotion-9 emotion-10"
++    <div>
++      <span
++        class="components-base-control__label"
+       >
+-        R
+-      </div>
+-    </button>
++        Test Segmented Control
++      </span>
++    </div>
+     <div
+-      aria-hidden="true"
+-      class="emotion-11 emotion-12"
+-    />
+-  </div>
+-  <div
+-    class="emotion-4 emotion-5"
+-    data-active="false"
+-  >
+-    <button
+-      aria-checked="false"
+-      aria-label="J"
+-      class="emotion-6 components-segmented-control-option"
+-      data-value="jack"
++      aria-label="Test Segmented Control"
++      class="medium components-segmented-control emotion-4 emotion-5"
+       data-wp-c16t="true"
+-      data-wp-component="SegmentedControlOption"
+-      id="segmented-1"
+-      role="radio"
+-      tabindex="-1"
++      data-wp-component="SegmentedControl"
++      id="segmented-control-0"
++      role="radiogroup"
+     >
++      <iframe
++        aria-hidden="true"
++        frameborder="0"
++        src="about:blank"
++        style="display: block; opacity: 0; position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;"
++        tabindex="-1"
++      />
++      <div
++        class="emotion-6 emotion-7"
++        role="presentation"
++        style="transform: translateX(0px); transition: none; width: 0px;"
++      />
+       <div
+-        class="emotion-7 emotion-8"
++        class="emotion-8 emotion-9"
++        data-active="false"
+       >
+-        J
++        <button
++          aria-checked="false"
++          aria-label="R"
++          class="emotion-10 components-segmented-control-option"
++          data-value="rigas"
++          data-wp-c16t="true"
++          data-wp-component="SegmentedControlOption"
++          id="segmented-control-0-0"
++          role="radio"
++          tabindex="0"
++        >
++          <div
++            class="emotion-11 emotion-12"
++          >
++            R
++          </div>
++          <div
++            aria-hidden="true"
++            class="emotion-13 emotion-14"
++          >
++            R
++          </div>
++        </button>
++        <div
++          aria-hidden="true"
++          class="emotion-15 emotion-16"
++        />
+       </div>
+       <div
+-        aria-hidden="true"
+-        class="emotion-9 emotion-10"
++        class="emotion-8 emotion-9"
++        data-active="false"
+       >
+-        J
++        <button
++          aria-checked="false"
++          aria-label="J"
++          class="emotion-10 components-segmented-control-option"
++          data-value="jack"
++          data-wp-c16t="true"
++          data-wp-component="SegmentedControlOption"
++          id="segmented-control-0-1"
++          role="radio"
++          tabindex="-1"
++        >
++          <div
++            class="emotion-11 emotion-12"
++          >
++            J
++          </div>
++          <div
++            aria-hidden="true"
++            class="emotion-13 emotion-14"
++          >
++            J
++          </div>
++        </button>
++        <div
++          aria-hidden="true"
++          class="emotion-15 emotion-16"
++        />
+       </div>
+-    </button>
+-    <div
+-      aria-hidden="true"
+-      class="emotion-11 emotion-12"
+-    />
++    </div>
+   </div>
+ </div>
+ `;
+diff --git a/packages/components/src/segmented-control/test/index.js b/packages/components/src/segmented-control/test/index.js
+index 269921f8db436c..f2dcd59a52b2f5 100644
+--- a/packages/components/src/segmented-control/test/index.js
++++ b/packages/components/src/segmented-control/test/index.js
+@@ -17,7 +17,7 @@ describe( 'SegmentedControl', () => {
+ 	);
+ 	it( 'should render correctly', () => {
+ 		const { container } = render(
+-			<SegmentedControl baseId="segmented" label="Test Segmented Control">
++			<SegmentedControl label="Test Segmented Control">
+ 				{ options }
+ 			</SegmentedControl>
+ 		);
+@@ -27,7 +27,6 @@ describe( 'SegmentedControl', () => {
+ 		const mockOnChange = jest.fn();
+ 		const { getByLabelText } = render(
+ 			<SegmentedControl
+-				baseId="segmented"
+ 				value="jack"
+ 				onChange={ mockOnChange }
+ 				label="Test Segmented Control"
+diff --git a/packages/components/src/segmented-control/types.ts b/packages/components/src/segmented-control/types.ts
+index 14e5cba75043cf..6bb3ba2ebe2a96 100644
+--- a/packages/components/src/segmented-control/types.ts
++++ b/packages/components/src/segmented-control/types.ts
+@@ -25,11 +25,11 @@ export type SegmentedControlProps = Omit<
+ 	 */
+ 	label: string;
+ 	/**
+-	 * ID that will serve as a base for all the items IDs.
++	 * If true, the label will only be visible to screen readers.
+ 	 *
+-	 * @see https://reakit.io/docs/radio/#useradiostate
++	 * @default false
+ 	 */
+-	baseId?: string;
++	hideLabelFromVision: boolean;
+ 	/**
+ 	 * Determines if segments should be rendered with equal widths.
+ 	 *
+@@ -54,6 +54,11 @@ export type SegmentedControlProps = Omit<
+ 	 * React children
+ 	 */
+ 	children: ReactNode;
++	/**
++	 * If this property is added, a help text will be generated
++	 * using help property as the content.
++	 */
++	help?: ReactNode;
+ };
+ 
+ export type SegmentedControlContextProps = RadioStateReturn & {

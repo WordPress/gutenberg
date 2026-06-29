@@ -1,0 +1,28 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4e965c7960b8e3..73365bda8de59e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Internal
+ 
+ -   Remove usage of deprecated spreading of `key` prop in JSX in CustomSelectControl and FormTokenField components ([#61692](https://github.com/WordPress/gutenberg/pull/61692)).
++-   Tooltip: Fix Ariakit tooltip store usage ([#61858](https://github.com/WordPress/gutenberg/pull/61858)).
+ 
+ ## 27.6.0 (2024-05-16)
+ 
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index 87c7506a9c5f7d..1eb0de7fed009d 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -87,10 +87,7 @@ function UnforwardedTooltip(
+ 	}
+ 	computedPlacement = computedPlacement || 'bottom';
+ 
+-	// Removing the `Ariakit` namespace from the hook name allows ESLint to
+-	// properly identify the hook, and apply the correct linting rules.
+-	const useAriakitTooltipStore = Ariakit.useTooltipStore;
+-	const tooltipStore = useAriakitTooltipStore( {
++	const tooltipStore = Ariakit.useTooltipStore( {
+ 		placement: computedPlacement,
+ 		showTimeout: delay,
+ 	} );

@@ -1,0 +1,194 @@
+diff --git a/package-lock.json b/package-lock.json
+index 6baad99eca16ef..53136a8331afab 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -4066,15 +4066,15 @@
+ 			}
+ 		},
+ 		"node_modules/@base-ui/react": {
+-			"version": "1.2.0",
+-			"resolved": "https://registry.npmjs.org/@base-ui/react/-/react-1.2.0.tgz",
+-			"integrity": "sha512-O6aEQHcm+QyGTFY28xuwRD3SEJGZOBDpyjN2WvpfWYFVhg+3zfXPysAILqtM0C1kWC82MccOE/v1j+GHXE4qIw==",
++			"version": "1.3.0",
++			"resolved": "https://registry.npmjs.org/@base-ui/react/-/react-1.3.0.tgz",
++			"integrity": "sha512-FwpKqZbPz14AITp1CVgf4AjhKPe1OeeVKSBMdgD10zbFlj3QSWelmtCMLi2+/PFZZcIm3l87G7rwtCZJwHyXWA==",
+ 			"license": "MIT",
+ 			"dependencies": {
+ 				"@babel/runtime": "^7.28.6",
+-				"@base-ui/utils": "0.2.5",
+-				"@floating-ui/react-dom": "^2.1.6",
+-				"@floating-ui/utils": "^0.2.10",
++				"@base-ui/utils": "0.2.6",
++				"@floating-ui/react-dom": "^2.1.8",
++				"@floating-ui/utils": "^0.2.11",
+ 				"tabbable": "^6.4.0",
+ 				"use-sync-external-store": "^1.6.0"
+ 			},
+@@ -4097,12 +4097,12 @@
+ 			}
+ 		},
+ 		"node_modules/@base-ui/react/node_modules/@floating-ui/react-dom": {
+-			"version": "2.1.6",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.1.6.tgz",
+-			"integrity": "sha512-4JX6rEatQEvlmgU80wZyq9RT96HZJa88q8hp0pBd+LrczeDI4o6uA2M+uvxngVHo4Ihr8uibXxH6+70zhAFrVw==",
++			"version": "2.1.8",
++			"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.1.8.tgz",
++			"integrity": "sha512-cC52bHwM/n/CxS87FH0yWdngEZrjdtLW/qVruo68qg+prK7ZQ4YGdut2GyDVpoGeAYe/h899rVeOVm6Oi40k2A==",
+ 			"license": "MIT",
+ 			"dependencies": {
+-				"@floating-ui/dom": "^1.7.4"
++				"@floating-ui/dom": "^1.7.6"
+ 			},
+ 			"peerDependencies": {
+ 				"react": ">=16.8.0",
+@@ -4110,13 +4110,13 @@
+ 			}
+ 		},
+ 		"node_modules/@base-ui/utils": {
+-			"version": "0.2.5",
+-			"resolved": "https://registry.npmjs.org/@base-ui/utils/-/utils-0.2.5.tgz",
+-			"integrity": "sha512-oYC7w0gp76RI5MxprlGLV0wze0SErZaRl3AAkeP3OnNB/UBMb6RqNf6ZSIlxOc9Qp68Ab3C2VOcJQyRs7Xc7Vw==",
++			"version": "0.2.6",
++			"resolved": "https://registry.npmjs.org/@base-ui/utils/-/utils-0.2.6.tgz",
++			"integrity": "sha512-yQ+qeuqohwhsNpoYDqqXaLllYAkPCP4vYdDrVo8FQXaAPfHWm1pG/Vm+jmGTA5JFS0BAIjookyapuJFY8F9PIw==",
+ 			"license": "MIT",
+ 			"dependencies": {
+ 				"@babel/runtime": "^7.28.6",
+-				"@floating-ui/utils": "^0.2.10",
++				"@floating-ui/utils": "^0.2.11",
+ 				"reselect": "^5.1.1",
+ 				"use-sync-external-store": "^1.6.0"
+ 			},
+@@ -5255,22 +5255,22 @@
+ 			}
+ 		},
+ 		"node_modules/@floating-ui/core": {
+-			"version": "1.7.3",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/core/-/core-1.7.3.tgz",
+-			"integrity": "sha512-sGnvb5dmrJaKEZ+LDIpguvdX3bDlEllmv4/ClQ9awcmCZrlx5jQyyMWFM5kBI+EyNOCDDiKk8il0zeuX3Zlg/w==",
++			"version": "1.7.5",
++			"resolved": "https://registry.npmjs.org/@floating-ui/core/-/core-1.7.5.tgz",
++			"integrity": "sha512-1Ih4WTWyw0+lKyFMcBHGbb5U5FtuHJuujoyyr5zTaWS5EYMeT6Jb2AuDeftsCsEuchO+mM2ij5+q9crhydzLhQ==",
+ 			"license": "MIT",
+ 			"dependencies": {
+-				"@floating-ui/utils": "^0.2.10"
++				"@floating-ui/utils": "^0.2.11"
+ 			}
+ 		},
+ 		"node_modules/@floating-ui/dom": {
+-			"version": "1.7.4",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/dom/-/dom-1.7.4.tgz",
+-			"integrity": "sha512-OOchDgh4F2CchOX94cRVqhvy7b3AFb+/rQXyswmzmGakRfkMgoWVjfnLWkRirfLEfuD4ysVW16eXzwt3jHIzKA==",
++			"version": "1.7.6",
++			"resolved": "https://registry.npmjs.org/@floating-ui/dom/-/dom-1.7.6.tgz",
++			"integrity": "sha512-9gZSAI5XM36880PPMm//9dfiEngYoC6Am2izES1FF406YFsjvyBMmeJ2g4SAju3xWwtuynNRFL2s9hgxpLI5SQ==",
+ 			"license": "MIT",
+ 			"dependencies": {
+-				"@floating-ui/core": "^1.7.3",
+-				"@floating-ui/utils": "^0.2.10"
++				"@floating-ui/core": "^1.7.5",
++				"@floating-ui/utils": "^0.2.11"
+ 			}
+ 		},
+ 		"node_modules/@floating-ui/react-dom": {
+@@ -5286,9 +5286,9 @@
+ 			}
+ 		},
+ 		"node_modules/@floating-ui/utils": {
+-			"version": "0.2.10",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.2.10.tgz",
+-			"integrity": "sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==",
++			"version": "0.2.11",
++			"resolved": "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.2.11.tgz",
++			"integrity": "sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==",
+ 			"license": "MIT"
+ 		},
+ 		"node_modules/@formatjs/ecma402-abstract": {
+@@ -62665,7 +62665,7 @@
+ 			"version": "0.8.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@base-ui/react": "^1.2.0",
++				"@base-ui/react": "^1.3.0",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/element": "file:../element",
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 129da635c06b8a..f143268bfaca68 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -25,6 +25,10 @@
+ -   `CollapsibleCard`: add animations ([#76378](https://github.com/WordPress/gutenberg/pull/76378)).
+ -   `CollapsibleCard`: allows the browser page search to find and expand the panel contents via the `hiddenUntilFound` prop. ([#76498](https://github.com/WordPress/gutenberg/pull/76498)).
+ 
++### Internal
++
++-   Update `@base-ui/react` from 1.2.0 to [1.3.0](https://github.com/mui/base-ui/blob/master/CHANGELOG.md#v130) ([#76603](https://github.com/WordPress/gutenberg/pull/76603)).
++
+ ## 0.8.0 (2026-03-04)
+ 
+ ### Breaking Changes
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index d488c9d23b03e4..61dc3ab77b3475 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -43,7 +43,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@base-ui/react": "^1.2.0",
++		"@base-ui/react": "^1.3.0",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/element": "file:../element",
+diff --git a/packages/ui/src/form/primitives/field/root.tsx b/packages/ui/src/form/primitives/field/root.tsx
+index c131f8fadc0315..95afb6dc58e232 100644
+--- a/packages/ui/src/form/primitives/field/root.tsx
++++ b/packages/ui/src/form/primitives/field/root.tsx
+@@ -5,7 +5,7 @@ import resetStyles from '../../../utils/css/resets.module.css';
+ import type { FieldRootProps } from './types';
+ import { Stack } from '../../../stack';
+ 
+-const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
++const defaultRender = ( props: React.ComponentProps< typeof Stack > ) => (
+ 	<Stack { ...props } direction="column" gap="sm" />
+ );
+ 
+@@ -19,7 +19,7 @@ const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
+  * accessible labeling. See examples for how to associate the label in different cases.
+  */
+ export const Root = forwardRef< HTMLDivElement, FieldRootProps >( function Root(
+-	{ className, render = DEFAULT_RENDER, ...restProps },
++	{ className, render = defaultRender, ...restProps },
+ 	ref
+ ) {
+ 	return (
+diff --git a/packages/ui/src/form/primitives/textarea/textarea.tsx b/packages/ui/src/form/primitives/textarea/textarea.tsx
+index af97f9d611762e..c2caf9dbd689ad 100644
+--- a/packages/ui/src/form/primitives/textarea/textarea.tsx
++++ b/packages/ui/src/form/primitives/textarea/textarea.tsx
+@@ -9,7 +9,7 @@ const wrappedRender = (
+ 	render: NonNullable< TextareaProps[ 'render' ] >,
+ 	restProps: TextareaProps & { ref: React.Ref< HTMLTextAreaElement > }
+ ) => {
+-	return function Render(
++	return function textareaRender(
+ 		props: React.HTMLAttributes< HTMLTextAreaElement >
+ 	) {
+ 		return typeof render === 'function'
+diff --git a/test/unit/config/global-mocks.js b/test/unit/config/global-mocks.js
+index 4c05cdca5674a0..05f7fb39bf9efb 100644
+--- a/test/unit/config/global-mocks.js
++++ b/test/unit/config/global-mocks.js
+@@ -36,6 +36,11 @@ jest.mock( 'client-zip', () => ( {
+ 
+ global.ResizeObserver = require( 'resize-observer-polyfill' );
+ 
++// jsdom lacks Element.getAnimations (needed by Base UI ScrollArea ≥1.3)
++if ( ! global.HTMLElement.prototype.getAnimations ) {
++	global.HTMLElement.prototype.getAnimations = () => [];
++}
++
+ /**
+  * The following mock is for block integration tests that might render
+  * components leveraging DOMRect. For example, the Cover block which now renders

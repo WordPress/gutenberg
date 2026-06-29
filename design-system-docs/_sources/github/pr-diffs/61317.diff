@@ -1,0 +1,36 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8f0bb757903979..8968218dee2336 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ ### Bug Fixes
+ 
+ -   `Autocomplete`: Stabilize rendering of autocomplete items ([#61877](https://github.com/WordPress/gutenberg/pull/61877)).
++-   `TabPanel`: Make the the focus styles consistent with `Tabs`. ([#61317](https://github.com/WordPress/gutenberg/pull/61317)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/tab-panel/style.scss b/packages/components/src/tab-panel/style.scss
+index a6b6189e6c204b..2855f8c2b06a01 100644
+--- a/packages/components/src/tab-panel/style.scss
++++ b/packages/components/src/tab-panel/style.scss
+@@ -81,3 +81,19 @@
+ 		outline: 2px solid transparent;
+ 	}
+ }
++
++.components-tab-panel__tab-content {
++	&:focus {
++		box-shadow: none;
++		outline: none;
++	}
++
++	&:focus-visible {
++		border-radius: 2px;
++		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
++
++		// Windows high contrast mode.
++		outline: 2px solid transparent;
++		outline-offset: 0;
++	}
++}

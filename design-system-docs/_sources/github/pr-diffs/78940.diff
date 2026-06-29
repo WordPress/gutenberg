@@ -1,0 +1,4845 @@
+diff --git a/package-lock.json b/package-lock.json
+index ef78d72dda84ee..5b1589ca86a125 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -26,8 +26,8 @@
+ 				"@babel/core": "7.25.7",
+ 				"@emotion/babel-plugin": "11.13.5",
+ 				"@eslint/eslintrc": "^3.0.0",
+-				"@types/react": "19.2.13",
+-				"@types/react-dom": "19.2.3",
++				"@types/react": "^18.3.27",
++				"@types/react-dom": "^18.3.1",
+ 				"@typescript/native-preview": "7.0.0-dev.20260423.1",
+ 				"@wordpress/eslint-tools": "file:./tools/eslint",
+ 				"@wordpress/release-tools": "file:./tools/release",
+@@ -45,9 +45,9 @@
+ 				"npm-run-all": "4.1.5",
+ 				"patch-package": "8.0.0",
+ 				"prettier": "npm:wp-prettier@3.0.3",
+-				"react": "19.2.4",
++				"react": "18.3.1",
+ 				"react-docgen-typescript": "2.2.2",
+-				"react-dom": "19.2.4",
++				"react-dom": "18.3.1",
+ 				"react-scanner": "1.2.0",
+ 				"rimraf": "5.0.10",
+ 				"stylelint-plugin-logical-css": "^1.2.3",
+@@ -18423,21 +18423,22 @@
+ 			"integrity": "sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw=="
+ 		},
+ 		"node_modules/@types/react": {
+-			"version": "19.2.13",
+-			"resolved": "https://registry.npmjs.org/@types/react/-/react-19.2.13.tgz",
+-			"integrity": "sha512-KkiJeU6VbYbUOp5ITMIc7kBfqlYkKA5KhEHVrGMmUUMt7NeaZg65ojdPk+FtNrBAOXNVM5QM72jnADjM+XVRAQ==",
++			"version": "18.3.27",
++			"resolved": "https://registry.npmjs.org/@types/react/-/react-18.3.27.tgz",
++			"integrity": "sha512-cisd7gxkzjBKU2GgdYrTdtQx1SORymWyaAFhaxQPK9bYO9ot3Y5OikQRvY0VYQtvwjeQnizCINJAenh/V7MK2w==",
+ 			"license": "MIT",
+ 			"dependencies": {
++				"@types/prop-types": "*",
+ 				"csstype": "^3.2.2"
+ 			}
+ 		},
+ 		"node_modules/@types/react-dom": {
+-			"version": "19.2.3",
+-			"resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-19.2.3.tgz",
+-			"integrity": "sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==",
++			"version": "18.3.7",
++			"resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-18.3.7.tgz",
++			"integrity": "sha512-MEe3UeoENYVFXzoXEWsvcpg6ZvlrFNlOQ7EOsvhI3CfAXwzPfO8Qwuxd40nepsYKqyyVQnTdEfv68q91yLcKrQ==",
+ 			"license": "MIT",
+ 			"peerDependencies": {
+-				"@types/react": "^19.2.0"
++				"@types/react": "^18.0.0"
+ 			}
+ 		},
+ 		"node_modules/@types/readdir-glob": {
+@@ -48196,10 +48197,12 @@
+ 			}
+ 		},
+ 		"node_modules/react": {
+-			"version": "19.2.4",
+-			"resolved": "https://registry.npmjs.org/react/-/react-19.2.4.tgz",
+-			"integrity": "sha512-9nfp2hYpCwOjAN+8TZFGhtWEwgvWHXqESH8qT89AT/lWklpLON22Lc8pEtnpsZz7VmawabSU0gCjnj8aC0euHQ==",
+-			"license": "MIT",
++			"version": "18.3.1",
++			"resolved": "https://registry.npmjs.org/react/-/react-18.3.1.tgz",
++			"integrity": "sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==",
++			"dependencies": {
++				"loose-envify": "^1.1.0"
++			},
+ 			"engines": {
+ 				"node": ">=0.10.0"
+ 			}
+@@ -48435,15 +48438,15 @@
+ 			}
+ 		},
+ 		"node_modules/react-dom": {
+-			"version": "19.2.4",
+-			"resolved": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.4.tgz",
+-			"integrity": "sha512-AXJdLo8kgMbimY95O2aKQqsz2iWi9jMgKJhRBAxECE4IFxfcazB2LmzloIoibJI3C12IlY20+KFaLv+71bUJeQ==",
+-			"license": "MIT",
++			"version": "18.3.1",
++			"resolved": "https://registry.npmjs.org/react-dom/-/react-dom-18.3.1.tgz",
++			"integrity": "sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==",
+ 			"dependencies": {
+-				"scheduler": "^0.27.0"
++				"loose-envify": "^1.1.0",
++				"scheduler": "^0.23.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.3.1"
+ 			}
+ 		},
+ 		"node_modules/react-easy-crop": {
+@@ -50889,10 +50892,12 @@
+ 			}
+ 		},
+ 		"node_modules/scheduler": {
+-			"version": "0.27.0",
+-			"resolved": "https://registry.npmjs.org/scheduler/-/scheduler-0.27.0.tgz",
+-			"integrity": "sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==",
+-			"license": "MIT"
++			"version": "0.23.2",
++			"resolved": "https://registry.npmjs.org/scheduler/-/scheduler-0.23.2.tgz",
++			"integrity": "sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==",
++			"dependencies": {
++				"loose-envify": "^1.1.0"
++			}
+ 		},
+ 		"node_modules/schema-utils": {
+ 			"version": "1.0.0",
+@@ -58892,7 +58897,7 @@
+ 			"version": "2.2.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/i18n": "file:../i18n",
+@@ -58911,7 +58916,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/admin-ui/node_modules/@testing-library/dom": {
+@@ -58991,14 +58996,14 @@
+ 				"uuid": "^14.0.0"
+ 			},
+ 			"devDependencies": {
+-				"@types/react": "^19.2.13"
++				"@types/react": "^18.3.27"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/api-fetch": {
+@@ -59083,7 +59088,7 @@
+ 				"@wordpress/warning": "file:../warning",
+ 				"browserslist": "^4.21.10",
+ 				"core-js": "^3.31.0",
+-				"react": "^19.2.4"
++				"react": "^18.3.0"
+ 			},
+ 			"devDependencies": {
+ 				"core-js-builder": "3.39.0",
+@@ -59330,8 +59335,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/block-directory/node_modules/@testing-library/dom": {
+@@ -59405,7 +59410,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@react-spring/web": "^9.4.5",
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/blob": "file:../blob",
+@@ -59470,8 +59475,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/block-editor/node_modules/@testing-library/dom": {
+@@ -59563,7 +59568,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@arraypress/waveform-player": "1.2.1",
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/autop": "file:../autop",
+@@ -59623,8 +59628,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/block-library/node_modules/@arraypress/waveform-player": {
+@@ -59735,7 +59740,7 @@
+ 			"version": "15.20.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/autop": "file:../autop",
+ 				"@wordpress/blob": "file:../blob",
+ 				"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
+@@ -59757,7 +59762,7 @@
+ 				"hpq": "^1.3.0",
+ 				"is-plain-object": "^5.0.0",
+ 				"memize": "^2.1.0",
+-				"react-is": "^19.0.0",
++				"react-is": "^18.3.0",
+ 				"remove-accents": "^0.5.0",
+ 				"showdown": "^1.9.1",
+ 				"simple-html-tokenizer": "^0.5.7",
+@@ -59771,20 +59776,20 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/blocks/node_modules/react-is": {
+-			"version": "19.0.0",
+-			"resolved": "https://registry.npmjs.org/react-is/-/react-is-19.0.0.tgz",
+-			"integrity": "sha512-H91OHcwjZsbq3ClIDHMzBShc1rotbfACdWENsmEf0IFvZ3FgGPtdHMcsv45bQ1hAbgdfiA8SnxTKfDS+x/8m2g=="
++			"version": "18.3.1",
++			"resolved": "https://registry.npmjs.org/react-is/-/react-is-18.3.1.tgz",
++			"integrity": "sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg=="
+ 		},
+ 		"packages/boot": {
+ 			"name": "@wordpress/boot",
+ 			"version": "0.14.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/admin-ui": "file:../admin-ui",
+ 				"@wordpress/base-styles": "file:../base-styles",
+@@ -59815,8 +59820,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/browserslist-config": {
+@@ -59851,8 +59856,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/components": {
+@@ -59872,7 +59877,7 @@
+ 				"@floating-ui/react-dom": "2.0.8",
+ 				"@types/gradient-parser": "1.1.0",
+ 				"@types/highlight-words-core": "1.2.1",
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@use-gesture/react": "^10.3.1",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/base-styles": "file:../base-styles",
+@@ -59922,7 +59927,7 @@
+ 				"@testing-library/react": "^16.3.2",
+ 				"@testing-library/user-event": "^14.6.1",
+ 				"@types/jest": "^29.5.14",
+-				"@types/react-dom": "^19.2.3",
++				"@types/react-dom": "^18.3.1",
+ 				"@wordpress/jest-console": "file:../jest-console",
+ 				"snapshot-diff": "^0.10.0",
+ 				"storybook": "^10.2.8",
+@@ -59933,8 +59938,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/components/node_modules/@ariakit/react": {
+@@ -60095,7 +60100,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@types/mousetrap": "^1.6.8",
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/deprecated": "file:../deprecated",
+ 				"@wordpress/dom": "file:../dom",
+ 				"@wordpress/element": "file:../element",
+@@ -60119,7 +60124,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/compose/node_modules/@testing-library/dom": {
+@@ -60192,7 +60197,7 @@
+ 			"version": "1.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/data": "file:../data",
+ 				"@wordpress/element": "file:../element",
+@@ -60206,7 +60211,7 @@
+ 			"version": "1.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/admin-ui": "file:../admin-ui",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+@@ -60264,8 +60269,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/core-data": {
+@@ -60273,7 +60278,7 @@
+ 			"version": "7.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/block-editor": "file:../block-editor",
+ 				"@wordpress/blocks": "file:../blocks",
+@@ -60309,8 +60314,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/core-data/node_modules/@babel/core": {
+@@ -61182,8 +61187,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/customize-widgets/node_modules/@testing-library/dom": {
+@@ -61256,7 +61261,7 @@
+ 			"version": "10.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/deprecated": "file:../deprecated",
+ 				"@wordpress/element": "file:../element",
+@@ -61283,7 +61288,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/data-controls": {
+@@ -61300,7 +61305,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/data/node_modules/@testing-library/dom": {
+@@ -61374,7 +61379,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@ariakit/react": "^0.4.21",
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/compose": "file:../compose",
+@@ -61412,8 +61417,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/dataviews/node_modules/@testing-library/dom": {
+@@ -61691,8 +61696,8 @@
+ 			"peerDependencies": {
+ 				"jest": ">=29",
+ 				"puppeteer-core": ">=23",
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/edit-post": {
+@@ -61745,8 +61750,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/edit-post/node_modules/@testing-library/dom": {
+@@ -61877,8 +61882,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/edit-site-init": {
+@@ -61940,8 +61945,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/edit-widgets/node_modules/@testing-library/dom": {
+@@ -62014,7 +62019,7 @@
+ 			"version": "14.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+@@ -62082,8 +62087,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/editor/node_modules/@testing-library/dom": {
+@@ -62156,14 +62161,14 @@
+ 			"version": "7.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
+-				"@types/react-dom": "^19.2.3",
++				"@types/react": "^18.3.27",
++				"@types/react-dom": "^18.3.1",
+ 				"@wordpress/deprecated": "file:../deprecated",
+ 				"@wordpress/escape-html": "file:../escape-html",
+ 				"change-case": "^4.1.2",
+ 				"is-plain-object": "^5.0.0",
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.3.0",
++				"react-dom": "^18.3.0"
+ 			},
+ 			"devDependencies": {
+ 				"@testing-library/dom": "^10.4.1",
+@@ -62507,7 +62512,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@react-spring/web": "^9.4.5",
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/blob": "file:../blob",
+@@ -62543,7 +62548,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/format-library": {
+@@ -62577,8 +62582,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/format-library/node_modules/@testing-library/dom": {
+@@ -62675,7 +62680,7 @@
+ 			"version": "1.14.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+@@ -62706,8 +62711,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/global-styles-ui/node_modules/@testing-library/dom": {
+@@ -62783,7 +62788,7 @@
+ 				"@dnd-kit/core": "^6.3.1",
+ 				"@dnd-kit/sortable": "^10.0.0",
+ 				"@dnd-kit/utilities": "^3.2.2",
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/style-runtime": "file:../style-runtime",
+@@ -62801,8 +62806,8 @@
+ 				"npm": ">=10.2.3"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/grid/node_modules/@testing-library/dom": {
+@@ -62918,7 +62923,7 @@
+ 			"version": "13.2.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/primitives": "file:../primitives",
+ 				"change-case": "4.1.2"
+@@ -62928,7 +62933,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/image-cropper": {
+@@ -62936,7 +62941,7 @@
+ 			"version": "1.11.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/i18n": "file:../i18n",
+@@ -62949,8 +62954,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/interactivity": {
+@@ -63012,8 +63017,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/interface/node_modules/@testing-library/dom": {
+@@ -63156,7 +63161,7 @@
+ 			"version": "5.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/data": "file:../data",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/keycodes": "file:../keycodes"
+@@ -63166,7 +63171,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/keycodes": {
+@@ -63174,7 +63179,7 @@
+ 			"version": "4.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/i18n": "file:../i18n"
+ 			},
+ 			"engines": {
+@@ -63199,7 +63204,7 @@
+ 			"version": "1.13.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/asset-loader": "file:../asset-loader",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/block-editor": "file:../block-editor",
+@@ -63242,7 +63247,7 @@
+ 			"version": "5.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/blob": "file:../blob",
+@@ -63258,8 +63263,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/media-editor": {
+@@ -63267,7 +63272,7 @@
+ 			"version": "0.10.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+@@ -63298,7 +63303,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/media-editor/node_modules/@testing-library/dom": {
+@@ -63371,7 +63376,7 @@
+ 			"version": "0.12.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/compose": "file:../compose",
+@@ -63398,7 +63403,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/media-fields/node_modules/@testing-library/dom": {
+@@ -63471,7 +63476,7 @@
+ 			"version": "5.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/blob": "file:../blob",
+@@ -63499,7 +63504,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/media-utils/node_modules/@testing-library/dom": {
+@@ -63572,7 +63577,7 @@
+ 			"version": "5.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/data": "file:../data",
+@@ -63588,7 +63593,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/notices/node_modules/@testing-library/dom": {
+@@ -63686,8 +63691,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/nux/node_modules/@testing-library/dom": {
+@@ -63781,8 +63786,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/plugins": {
+@@ -63790,7 +63795,7 @@
+ 			"version": "7.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/deprecated": "file:../deprecated",
+@@ -63809,8 +63814,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/plugins/node_modules/@testing-library/dom": {
+@@ -63912,7 +63917,7 @@
+ 			"version": "4.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+@@ -63930,8 +63935,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/preferences-persistence": {
+@@ -63967,7 +63972,7 @@
+ 			"version": "4.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/element": "file:../element",
+ 				"clsx": "^2.1.1"
+ 			},
+@@ -63976,7 +63981,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/priority-queue": {
+@@ -64040,7 +64045,7 @@
+ 			"version": "4.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/i18n": "file:../i18n",
+ 				"utility-types": "^3.10.0"
+@@ -64405,8 +64410,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/rich-text": {
+@@ -64414,7 +64419,7 @@
+ 			"version": "7.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/data": "file:../data",
+@@ -64436,7 +64441,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/route": {
+@@ -64453,7 +64458,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/router": {
+@@ -64461,7 +64466,7 @@
+ 			"version": "1.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/private-apis": "file:../private-apis",
+@@ -64474,7 +64479,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/scripts": {
+@@ -64552,8 +64557,8 @@
+ 			"peerDependencies": {
+ 				"@playwright/test": "^1.58.2",
+ 				"@wordpress/env": ">=10.0.0",
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			},
+ 			"peerDependenciesMeta": {
+ 				"@wordpress/env": {
+@@ -64603,7 +64608,7 @@
+ 			"version": "6.23.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/blocks": "file:../blocks",
+ 				"@wordpress/components": "file:../components",
+@@ -64619,8 +64624,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/shortcode": {
+@@ -64640,7 +64645,7 @@
+ 			"version": "2.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"change-case": "^4.1.2"
+ 			},
+ 			"engines": {
+@@ -65522,7 +65527,7 @@
+ 			"version": "0.14.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/style-runtime": "file:../style-runtime",
+@@ -65546,8 +65551,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4",
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0",
+ 				"stylelint": "^16.8.2"
+ 			},
+ 			"peerDependenciesMeta": {
+@@ -65619,7 +65624,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@base-ui/react": "^1.4.1",
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/element": "file:../element",
+@@ -65649,8 +65654,8 @@
+ 				"npm": ">=10.2.3"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/ui/node_modules/@testing-library/dom": {
+@@ -65738,7 +65743,7 @@
+ 			"version": "0.32.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/blob": "file:../blob",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/data": "file:../data",
+@@ -65755,8 +65760,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/url": {
+@@ -65776,7 +65781,7 @@
+ 			"version": "6.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/data": "file:../data",
+ 				"@wordpress/element": "file:../element"
+@@ -65791,7 +65796,7 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4"
++				"react": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/viewport/node_modules/@testing-library/dom": {
+@@ -65932,8 +65937,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/wordcount": {
+@@ -65980,8 +65985,8 @@
+ 				"npm": ">=8.19.2"
+ 			},
+ 			"peerDependencies": {
+-				"react": "^19.2.4",
+-				"react-dom": "^19.2.4"
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
+ 			}
+ 		},
+ 		"packages/wp-build": {
+@@ -66596,7 +66601,7 @@
+ 				"@storybook/addon-docs": "^10.2.8",
+ 				"@storybook/icons": "^2.0.1",
+ 				"@storybook/react-vite": "^10.2.8",
+-				"@types/react": "^19.2.13",
++				"@types/react": "^18.3.27",
+ 				"@vitejs/plugin-react": "^5.1.2",
+ 				"@wordpress/theme": "file:../packages/theme",
+ 				"storybook": "^10.2.8",
+@@ -66744,19 +66749,6 @@
+ 				"reassure": "^0.7.1"
+ 			}
+ 		},
+-		"test/native/node_modules/react": {
+-			"version": "18.3.1",
+-			"resolved": "https://registry.npmjs.org/react/-/react-18.3.1.tgz",
+-			"integrity": "sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==",
+-			"dev": true,
+-			"license": "MIT",
+-			"dependencies": {
+-				"loose-envify": "^1.1.0"
+-			},
+-			"engines": {
+-				"node": ">=0.10.0"
+-			}
+-		},
+ 		"test/performance": {
+ 			"name": "@wordpress/performance-tests",
+ 			"version": "0.0.0",
+@@ -68980,7 +68972,7 @@
+ 				"@wordpress/ui": "file:../../packages/ui"
+ 			},
+ 			"devDependencies": {
+-				"@types/react": "^19.2.13"
++				"@types/react": "^18.3.27"
+ 			}
+ 		},
+ 		"widgets/events": {
+@@ -68998,7 +68990,7 @@
+ 				"@wordpress/ui": "file:../../packages/ui"
+ 			},
+ 			"devDependencies": {
+-				"@types/react": "^19.2.13"
++				"@types/react": "^18.3.27"
+ 			}
+ 		},
+ 		"widgets/hello-dolly": {
+@@ -69011,7 +69003,7 @@
+ 				"@wordpress/ui": "file:../../packages/ui"
+ 			},
+ 			"devDependencies": {
+-				"@types/react": "^19.2.13"
++				"@types/react": "^18.3.27"
+ 			}
+ 		},
+ 		"widgets/hello-world": {
+@@ -69023,7 +69015,7 @@
+ 				"clsx": "^2.1.1"
+ 			},
+ 			"devDependencies": {
+-				"@types/react": "^19.2.13"
++				"@types/react": "^18.3.27"
+ 			}
+ 		},
+ 		"widgets/news": {
+@@ -69039,7 +69031,7 @@
+ 				"@wordpress/ui": "file:../../packages/ui"
+ 			},
+ 			"devDependencies": {
+-				"@types/react": "^19.2.13"
++				"@types/react": "^18.3.27"
+ 			}
+ 		},
+ 		"widgets/quick-draft": {
+@@ -69063,7 +69055,7 @@
+ 				"clsx": "^2.1.1"
+ 			},
+ 			"devDependencies": {
+-				"@types/react": "^19.2.13"
++				"@types/react": "^18.3.27"
+ 			}
+ 		},
+ 		"widgets/site-health": {
+@@ -69079,7 +69071,7 @@
+ 				"@wordpress/ui": "file:../../packages/ui"
+ 			},
+ 			"devDependencies": {
+-				"@types/react": "^19.2.13"
++				"@types/react": "^18.3.27"
+ 			}
+ 		},
+ 		"widgets/site-preview": {
+@@ -69096,7 +69088,7 @@
+ 				"@wordpress/url": "file:../../packages/url"
+ 			},
+ 			"devDependencies": {
+-				"@types/react": "^19.2.13"
++				"@types/react": "^18.3.27"
+ 			}
+ 		},
+ 		"widgets/welcome": {
+@@ -69112,9 +69104,6 @@
+ 				"@wordpress/primitives": "file:../../packages/primitives",
+ 				"@wordpress/ui": "file:../../packages/ui",
+ 				"clsx": "^2.1.1"
+-			},
+-			"devDependencies": {
+-				"@types/react": "^19.2.13"
+ 			}
+ 		}
+ 	}
+diff --git a/package.json b/package.json
+index 5846a00a62c84e..71006884b5c373 100644
+--- a/package.json
++++ b/package.json
+@@ -47,8 +47,8 @@
+ 		"@babel/core": "7.25.7",
+ 		"@emotion/babel-plugin": "11.13.5",
+ 		"@eslint/eslintrc": "^3.0.0",
+-		"@types/react": "19.2.13",
+-		"@types/react-dom": "19.2.3",
++		"@types/react": "^18.3.27",
++		"@types/react-dom": "^18.3.1",
+ 		"@typescript/native-preview": "7.0.0-dev.20260423.1",
+ 		"@wordpress/eslint-tools": "file:./tools/eslint",
+ 		"@wordpress/release-tools": "file:./tools/release",
+@@ -66,9 +66,9 @@
+ 		"npm-run-all": "4.1.5",
+ 		"patch-package": "8.0.0",
+ 		"prettier": "npm:wp-prettier@3.0.3",
+-		"react": "19.2.4",
++		"react": "18.3.1",
+ 		"react-docgen-typescript": "2.2.2",
+-		"react-dom": "19.2.4",
++		"react-dom": "18.3.1",
+ 		"react-scanner": "1.2.0",
+ 		"rimraf": "5.0.10",
+ 		"stylelint-plugin-logical-css": "^1.2.3",
+diff --git a/packages/admin-ui/package.json b/packages/admin-ui/package.json
+index 15dacc7b7aa910..7f42a67f702402 100644
+--- a/packages/admin-ui/package.json
++++ b/packages/admin-ui/package.json
+@@ -45,7 +45,7 @@
+ 		"src/**/*.module.css"
+ 	],
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/i18n": "file:../i18n",
+@@ -60,7 +60,7 @@
+ 		"@testing-library/react": "^16.3.2"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/admin-ui/src/breadcrumbs/test/index.test.tsx b/packages/admin-ui/src/breadcrumbs/test/index.test.tsx
+index a8bddec0a38cf8..57cd53503a17dd 100644
+--- a/packages/admin-ui/src/breadcrumbs/test/index.test.tsx
++++ b/packages/admin-ui/src/breadcrumbs/test/index.test.tsx
+@@ -28,6 +28,7 @@ describe( 'Breadcrumbs', () => {
+ 					/>
+ 				)
+ 			).toThrow( /item "Home" is missing a `to` prop/ );
++			expect( console ).toHaveErrored();
+ 		} );
+ 
+ 		it( 'should throw for the first preceding item missing `to`', () => {
+@@ -42,6 +43,7 @@ describe( 'Breadcrumbs', () => {
+ 					/>
+ 				)
+ 			).toThrow( /item "Home" is missing a `to` prop/ );
++			expect( console ).toHaveErrored();
+ 		} );
+ 
+ 		it( 'should not throw when all preceding items have `to`', () => {
+diff --git a/packages/annotations/package.json b/packages/annotations/package.json
+index a609e391c1dece..84ebd6df1575d5 100644
+--- a/packages/annotations/package.json
++++ b/packages/annotations/package.json
+@@ -50,10 +50,10 @@
+ 		"uuid": "^14.0.0"
+ 	},
+ 	"devDependencies": {
+-		"@types/react": "^19.2.13"
++		"@types/react": "^18.3.27"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/babel-preset-default/package.json b/packages/babel-preset-default/package.json
+index 5ef310d171d933..3adea3b29c99bf 100644
+--- a/packages/babel-preset-default/package.json
++++ b/packages/babel-preset-default/package.json
+@@ -48,7 +48,7 @@
+ 		"@wordpress/warning": "file:../warning",
+ 		"browserslist": "^4.21.10",
+ 		"core-js": "^3.31.0",
+-		"react": "^19.2.4"
++		"react": "^18.3.0"
+ 	},
+ 	"devDependencies": {
+ 		"core-js-builder": "3.39.0",
+diff --git a/packages/block-directory/package.json b/packages/block-directory/package.json
+index cb46cee2ab2787..ec5e99e31207ee 100644
+--- a/packages/block-directory/package.json
++++ b/packages/block-directory/package.json
+@@ -72,8 +72,8 @@
+ 		"deep-freeze": "0.0.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/block-editor/package.json b/packages/block-editor/package.json
+index 3294c067c487c0..3be3c0af91f0b2 100644
+--- a/packages/block-editor/package.json
++++ b/packages/block-editor/package.json
+@@ -61,7 +61,7 @@
+ 	],
+ 	"dependencies": {
+ 		"@react-spring/web": "^9.4.5",
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/blob": "file:../blob",
+@@ -122,8 +122,8 @@
+ 		"deep-freeze": "0.0.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/index.js b/packages/block-editor/src/components/block-list/use-block-props/index.js
+index 5a94135a8e0b09..4b4521a089ef15 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/index.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/index.js
+@@ -185,7 +185,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
+ 		'data-block': clientId,
+ 		'data-type': name,
+ 		'data-title': blockTitle,
+-		inert: isSubtreeDisabled ? true : undefined,
++		inert: isSubtreeDisabled ? 'true' : undefined,
+ 		className: clsx(
+ 			'block-editor-block-list__block',
+ 			{
+diff --git a/packages/block-editor/src/components/colors/test/with-colors.js b/packages/block-editor/src/components/colors/test/with-colors.js
+index 64bb026d188912..47753a800c9bcb 100644
+--- a/packages/block-editor/src/components/colors/test/with-colors.js
++++ b/packages/block-editor/src/components/colors/test/with-colors.js
+@@ -37,7 +37,7 @@ describe( 'createCustomColorsHOC', () => {
+ 				colors: undefined,
+ 				setBackgroundColor: expect.any( Function ),
+ 			} ),
+-			undefined
++			expect.anything()
+ 		);
+ 	} );
+ 
+diff --git a/packages/block-editor/src/components/iframe/index.js b/packages/block-editor/src/components/iframe/index.js
+index fe7fd6799b7eae..f0cfc9f09d9490 100644
+--- a/packages/block-editor/src/components/iframe/index.js
++++ b/packages/block-editor/src/components/iframe/index.js
+@@ -125,6 +125,9 @@ function getIframeSrc( resolvedAssets ) {
+ 		${ resolvedAssets.styles ?? '' }
+ 		${ resolvedAssets.scripts ?? '' }
+ 	</head>
++	<body>
++		<script>document.currentScript.parentElement.remove()</script>
++	</body>
+ </html>`;
+ 
+ 	src = URL.createObjectURL( new Blob( [ html ], { type: 'text/html' } ) );
+diff --git a/packages/block-editor/src/components/inserter/media-tab/utils.js b/packages/block-editor/src/components/inserter/media-tab/utils.js
+index 156eb46aa971ea..7a2c1fb28e2dbd 100644
+--- a/packages/block-editor/src/components/inserter/media-tab/utils.js
++++ b/packages/block-editor/src/components/inserter/media-tab/utils.js
+@@ -34,7 +34,7 @@ export function getBlockAndPreviewFromMedia( media, mediaType ) {
+ 			src={ media.previewUrl || mediaSrc }
+ 			alt={ alt }
+ 			controls={ mediaType === 'audio' ? true : undefined }
+-			inert
++			inert="true"
+ 			onError={ ( { currentTarget } ) => {
+ 				// Fall back to the media source if the preview cannot be loaded.
+ 				if ( currentTarget.src === media.previewUrl ) {
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index 59abf4f80a59e7..ff827f17a79530 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -95,7 +95,7 @@
+ 	],
+ 	"dependencies": {
+ 		"@arraypress/waveform-player": "1.2.1",
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/autop": "file:../autop",
+@@ -151,8 +151,8 @@
+ 		"deep-freeze": "0.0.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/block-library/src/comments/edit/placeholder.js b/packages/block-library/src/comments/edit/placeholder.js
+index 475535dda3ea16..57c3edcf60d043 100644
+--- a/packages/block-library/src/comments/edit/placeholder.js
++++ b/packages/block-library/src/comments/edit/placeholder.js
+@@ -24,7 +24,7 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
+ 	);
+ 
+ 	return (
+-		<div className="wp-block-comments__legacy-placeholder" inert>
++		<div className="wp-block-comments__legacy-placeholder" inert="true">
+ 			<h3>
+ 				{
+ 					/* translators: %s: Post title. */
+diff --git a/packages/block-library/src/navigation-link/test/__snapshots__/hooks.js.snap b/packages/block-library/src/navigation-link/test/__snapshots__/hooks.js.snap
+index 0596cd858c4a8e..5c9aeb8284b453 100644
+--- a/packages/block-library/src/navigation-link/test/__snapshots__/hooks.js.snap
++++ b/packages/block-library/src/navigation-link/test/__snapshots__/hooks.js.snap
+@@ -8,30 +8,14 @@ exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and
+     {
+       "attributes": {},
+       "description": "A link to a custom URL.",
+-      "icon": {
+-        "$$typeof": Symbol(react.transitional.element),
+-        "_owner": null,
+-        "_store": {},
+-        "key": null,
+-        "props": {
+-          "children": {
+-            "$$typeof": Symbol(react.transitional.element),
+-            "_owner": null,
+-            "_store": {},
+-            "key": null,
+-            "props": {
+-              "d": "M4 20h9v-1.5H4V20zm0-5.5V16h16v-1.5H4zm.8-4l.7.7 2-2V12h1V9.2l2 2 .7-.7-2-2H12v-1H9.2l2-2-.7-.7-2 2V4h-1v2.8l-2-2-.7.7 2 2H4v1h2.8l-2 2z",
+-            },
+-            "type": [Function],
+-          },
+-          "viewBox": "0 0 24 24",
+-          "xmlns": "http://www.w3.org/2000/svg",
+-        },
+-        "type": {
+-          "$$typeof": Symbol(react.forward_ref),
+-          "render": [Function],
+-        },
+-      },
++      "icon": <SVG
++        viewBox="0 0 24 24"
++        xmlns="http://www.w3.org/2000/svg"
++      >
++        <Path
++          d="M4 20h9v-1.5H4V20zm0-5.5V16h16v-1.5H4zm.8-4l.7.7 2-2V12h1V9.2l2 2 .7-.7-2-2H12v-1H9.2l2-2-.7-.7-2 2V4h-1v2.8l-2-2-.7.7 2 2H4v1h2.8l-2 2z"
++        />
++      </SVG>,
+       "isActive": [Function],
+       "name": "link",
+       "title": "Custom Link",
+@@ -41,30 +25,14 @@ exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and
+         "type": "post",
+       },
+       "description": "A link to a post.",
+-      "icon": {
+-        "$$typeof": Symbol(react.transitional.element),
+-        "_owner": null,
+-        "_store": {},
+-        "key": null,
+-        "props": {
+-          "children": {
+-            "$$typeof": Symbol(react.transitional.element),
+-            "_owner": null,
+-            "_store": {},
+-            "key": null,
+-            "props": {
+-              "d": "M18 5.5H6a.5.5 0 0 0-.5.5v12a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5V6a.5.5 0 0 0-.5-.5ZM6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm1 5h1.5v1.5H7V9Zm1.5 4.5H7V15h1.5v-1.5ZM10 9h7v1.5h-7V9Zm7 4.5h-7V15h7v-1.5Z",
+-            },
+-            "type": [Function],
+-          },
+-          "viewBox": "0 0 24 24",
+-          "xmlns": "http://www.w3.org/2000/svg",
+-        },
+-        "type": {
+-          "$$typeof": Symbol(react.forward_ref),
+-          "render": [Function],
+-        },
+-      },
++      "icon": <SVG
++        viewBox="0 0 24 24"
++        xmlns="http://www.w3.org/2000/svg"
++      >
++        <Path
++          d="M18 5.5H6a.5.5 0 0 0-.5.5v12a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5V6a.5.5 0 0 0-.5-.5ZM6 4h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm1 5h1.5v1.5H7V9Zm1.5 4.5H7V15h1.5v-1.5ZM10 9h7v1.5h-7V9Zm7 4.5h-7V15h7v-1.5Z"
++        />
++      </SVG>,
+       "isActive": [Function],
+       "name": "post",
+       "title": "Post Link",
+@@ -74,42 +42,17 @@ exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and
+         "type": "page",
+       },
+       "description": "A link to a page.",
+-      "icon": {
+-        "$$typeof": Symbol(react.transitional.element),
+-        "_owner": null,
+-        "_store": {},
+-        "key": null,
+-        "props": {
+-          "children": [
+-            {
+-              "$$typeof": Symbol(react.transitional.element),
+-              "_owner": null,
+-              "_store": {},
+-              "key": null,
+-              "props": {
+-                "d": "M15.5 7.5h-7V9h7V7.5Zm-7 3.5h7v1.5h-7V11Zm7 3.5h-7V16h7v-1.5Z",
+-              },
+-              "type": [Function],
+-            },
+-            {
+-              "$$typeof": Symbol(react.transitional.element),
+-              "_owner": null,
+-              "_store": {},
+-              "key": null,
+-              "props": {
+-                "d": "M17 4H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2ZM7 5.5h10a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-.5.5H7a.5.5 0 0 1-.5-.5V6a.5.5 0 0 1 .5-.5Z",
+-              },
+-              "type": [Function],
+-            },
+-          ],
+-          "viewBox": "0 0 24 24",
+-          "xmlns": "http://www.w3.org/2000/svg",
+-        },
+-        "type": {
+-          "$$typeof": Symbol(react.forward_ref),
+-          "render": [Function],
+-        },
+-      },
++      "icon": <SVG
++        viewBox="0 0 24 24"
++        xmlns="http://www.w3.org/2000/svg"
++      >
++        <Path
++          d="M15.5 7.5h-7V9h7V7.5Zm-7 3.5h7v1.5h-7V11Zm7 3.5h-7V16h7v-1.5Z"
++        />
++        <Path
++          d="M17 4H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2ZM7 5.5h10a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-.5.5H7a.5.5 0 0 1-.5-.5V6a.5.5 0 0 1 .5-.5Z"
++        />
++      </SVG>,
+       "isActive": [Function],
+       "name": "page",
+       "title": "Page Link",
+@@ -119,32 +62,16 @@ exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and
+         "type": "category",
+       },
+       "description": "A link to a category.",
+-      "icon": {
+-        "$$typeof": Symbol(react.transitional.element),
+-        "_owner": null,
+-        "_store": {},
+-        "key": null,
+-        "props": {
+-          "children": {
+-            "$$typeof": Symbol(react.transitional.element),
+-            "_owner": null,
+-            "_store": {},
+-            "key": null,
+-            "props": {
+-              "clipRule": "evenodd",
+-              "d": "M6 5.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM4 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm11-.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5h-3a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM13 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2h-3a2 2 0 01-2-2V6zm5 8.5h-3a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5zM15 13a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2v-3a2 2 0 00-2-2h-3zm-9 1.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5v-3a.5.5 0 01.5-.5zM4 15a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2v-3z",
+-              "fillRule": "evenodd",
+-            },
+-            "type": [Function],
+-          },
+-          "viewBox": "0 0 24 24",
+-          "xmlns": "http://www.w3.org/2000/svg",
+-        },
+-        "type": {
+-          "$$typeof": Symbol(react.forward_ref),
+-          "render": [Function],
+-        },
+-      },
++      "icon": <SVG
++        viewBox="0 0 24 24"
++        xmlns="http://www.w3.org/2000/svg"
++      >
++        <Path
++          clipRule="evenodd"
++          d="M6 5.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM4 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm11-.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5h-3a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM13 6a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2h-3a2 2 0 01-2-2V6zm5 8.5h-3a.5.5 0 00-.5.5v3a.5.5 0 00.5.5h3a.5.5 0 00.5-.5v-3a.5.5 0 00-.5-.5zM15 13a2 2 0 00-2 2v3a2 2 0 002 2h3a2 2 0 002-2v-3a2 2 0 00-2-2h-3zm-9 1.5h3a.5.5 0 01.5.5v3a.5.5 0 01-.5.5H6a.5.5 0 01-.5-.5v-3a.5.5 0 01.5-.5zM4 15a2 2 0 012-2h3a2 2 0 012 2v3a2 2 0 01-2 2H6a2 2 0 01-2-2v-3z"
++          fillRule="evenodd"
++        />
++      </SVG>,
+       "isActive": [Function],
+       "name": "category",
+       "title": "Category Link",
+@@ -154,30 +81,14 @@ exports[`hooks enhanceNavigationLinkVariations enhances variations with icon and
+         "type": "tag",
+       },
+       "description": "A link to a tag.",
+-      "icon": {
+-        "$$typeof": Symbol(react.transitional.element),
+-        "_owner": null,
+-        "_store": {},
+-        "key": null,
+-        "props": {
+-          "children": {
+-            "$$typeof": Symbol(react.transitional.element),
+-            "_owner": null,
+-            "_store": {},
+-            "key": null,
+-            "props": {
+-              "d": "M4.75 4a.75.75 0 0 0-.75.75v7.826c0 .2.08.39.22.53l6.72 6.716a2.313 2.313 0 0 0 3.276-.001l5.61-5.611-.531-.53.532.528a2.315 2.315 0 0 0 0-3.264L13.104 4.22a.75.75 0 0 0-.53-.22H4.75ZM19 12.576a.815.815 0 0 1-.236.574l-5.61 5.611a.814.814 0 0 1-1.153 0L5.5 12.264V5.5h6.763l6.5 6.502a.816.816 0 0 1 .237.574ZM8.75 9.75a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z",
+-            },
+-            "type": [Function],
+-          },
+-          "viewBox": "0 0 24 24",
+-          "xmlns": "http://www.w3.org/2000/svg",
+-        },
+-        "type": {
+-          "$$typeof": Symbol(react.forward_ref),
+-          "render": [Function],
+-        },
+-      },
++      "icon": <SVG
++        viewBox="0 0 24 24"
++        xmlns="http://www.w3.org/2000/svg"
++      >
++        <Path
++          d="M4.75 4a.75.75 0 0 0-.75.75v7.826c0 .2.08.39.22.53l6.72 6.716a2.313 2.313 0 0 0 3.276-.001l5.61-5.611-.531-.53.532.528a2.315 2.315 0 0 0 0-3.264L13.104 4.22a.75.75 0 0 0-.53-.22H4.75ZM19 12.576a.815.815 0 0 1-.236.574l-5.61 5.611a.814.814 0 0 1-1.153 0L5.5 12.264V5.5h6.763l6.5 6.502a.816.816 0 0 1 .237.574ZM8.75 9.75a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
++        />
++      </SVG>,
+       "isActive": [Function],
+       "name": "tag",
+       "title": "Tag Link",
+diff --git a/packages/blocks/package.json b/packages/blocks/package.json
+index e675580a686df9..2be1993650a99e 100644
+--- a/packages/blocks/package.json
++++ b/packages/blocks/package.json
+@@ -51,7 +51,7 @@
+ 		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/autop": "file:../autop",
+ 		"@wordpress/blob": "file:../blob",
+ 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
+@@ -73,7 +73,7 @@
+ 		"hpq": "^1.3.0",
+ 		"is-plain-object": "^5.0.0",
+ 		"memize": "^2.1.0",
+-		"react-is": "^19.0.0",
++		"react-is": "^18.3.0",
+ 		"remove-accents": "^0.5.0",
+ 		"showdown": "^1.9.1",
+ 		"simple-html-tokenizer": "^0.5.7",
+@@ -83,7 +83,7 @@
+ 		"deep-freeze": "0.0.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/blocks/src/api/serializer.tsx b/packages/blocks/src/api/serializer.tsx
+index 6c192e93742ebd..224c31efc2c145 100644
+--- a/packages/blocks/src/api/serializer.tsx
++++ b/packages/blocks/src/api/serializer.tsx
+@@ -177,7 +177,7 @@ export function getSaveElement(
+ 		 */
+ 		const props = applyFilters(
+ 			'blocks.getSaveContent.extraProps',
+-			{ ...( element.props as {} ) },
++			{ ...element.props },
+ 			blockType,
+ 			attributes
+ 		);
+diff --git a/packages/boot/package.json b/packages/boot/package.json
+index 2b4eeab4700d44..6eab6468f95f12 100644
+--- a/packages/boot/package.json
++++ b/packages/boot/package.json
+@@ -41,7 +41,7 @@
+ 	"wpScriptModuleExports": "./build-module/index.mjs",
+ 	"types": "build-types",
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/admin-ui": "file:../admin-ui",
+ 		"@wordpress/base-styles": "file:../base-styles",
+@@ -68,8 +68,8 @@
+ 		"clsx": "^2.1.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/commands/package.json b/packages/commands/package.json
+index 249213d8c25a17..41d9f0173d3b3d 100644
+--- a/packages/commands/package.json
++++ b/packages/commands/package.json
+@@ -58,8 +58,8 @@
+ 		"cmdk": "^1.0.0"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e12081c7fe54eb..21ea42af77d56b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
++
+ ### Documentation
+ 
+ -   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+@@ -10,7 +14,6 @@
+ 
+ ### Breaking Changes
+ 
+--   Upgrade React to v19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+ -   `BoxControl`: Remove deprecated `__experimentalApplyValueToSides` export ([#78528](https://github.com/WordPress/gutenberg/pull/78528)).
+ -   `Navigation`: Completely remove deprecated component family ([#78529](https://github.com/WordPress/gutenberg/pull/78529)).
+ -   `Notice`: Rework internal DOM structure and class names ([#78231](https://github.com/WordPress/gutenberg/pull/78231)). Consumers relying on those implementation details should update their projects accordingly:
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 687ab71e141f49..14bda286f98ab2 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -63,7 +63,7 @@
+ 		"@floating-ui/react-dom": "2.0.8",
+ 		"@types/gradient-parser": "1.1.0",
+ 		"@types/highlight-words-core": "1.2.1",
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@use-gesture/react": "^10.3.1",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/base-styles": "file:../base-styles",
+@@ -113,15 +113,15 @@
+ 		"@testing-library/react": "^16.3.2",
+ 		"@testing-library/user-event": "^14.6.1",
+ 		"@types/jest": "^29.5.14",
+-		"@types/react-dom": "^19.2.3",
++		"@types/react-dom": "^18.3.1",
+ 		"@wordpress/jest-console": "file:../jest-console",
+ 		"snapshot-diff": "^0.10.0",
+ 		"storybook": "^10.2.8",
+ 		"timezone-mock": "^1.3.6"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/components/src/autocomplete/README.md b/packages/components/src/autocomplete/README.md
+index 87a0b64c8f594e..b549a2e47e2707 100644
+--- a/packages/components/src/autocomplete/README.md
++++ b/packages/components/src/autocomplete/README.md
+@@ -39,7 +39,7 @@ An array of all of the completers to apply to the current element.
+ A ref containing the editable element that will serve as the anchor for `Autocomplete`'s `Popover`.
+ 
+ -   Required: Yes
+--   `RefObject< HTMLElement | undefined >`
++-   `MutableRefObject< HTMLElement | undefined >`
+ 
+ ### children
+ 
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index c02da4d8ada2eb..23ee902df5ffc3 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -160,7 +160,6 @@ const BorderControlDropdown = (
+ 		resetButtonWrapperClassName,
+ 		size,
+ 		__unstablePopoverProps,
+-		onToggle: onToggleProp, // Remove from `otherProps` to avoid type errors (native HTML `onToggle` vs `Dropdown` `onToggle`).
+ 		...otherProps
+ 	} = useBorderControlDropdown( props );
+ 
+@@ -200,42 +199,44 @@ const BorderControlDropdown = (
+ 		</Button>
+ 	);
+ 
+-	const renderContent = () => (
+-		<DropdownContentWrapper paddingSize="medium">
+-			<VStack className={ popoverControlsClassName } spacing={ 6 }>
+-				<ColorPalette
+-					className={ popoverContentClassName }
+-					value={ color }
+-					onChange={ onColorChange }
+-					{ ...{ colors, disableCustomColors } }
+-					__experimentalIsRenderedInSidebar={
+-						__experimentalIsRenderedInSidebar
+-					}
+-					clearable={ false }
+-					enableAlpha={ enableAlpha }
+-				/>
+-				{ enableStyle && isStyleSettable && (
+-					<BorderControlStylePicker
+-						label={ __( 'Style' ) }
+-						value={ style }
+-						onChange={ onStyleChange }
++	const renderContent: DropdownComponentProps[ 'renderContent' ] = () => (
++		<>
++			<DropdownContentWrapper paddingSize="medium">
++				<VStack className={ popoverControlsClassName } spacing={ 6 }>
++					<ColorPalette
++						className={ popoverContentClassName }
++						value={ color }
++						onChange={ onColorChange }
++						{ ...{ colors, disableCustomColors } }
++						__experimentalIsRenderedInSidebar={
++							__experimentalIsRenderedInSidebar
++						}
++						clearable={ false }
++						enableAlpha={ enableAlpha }
+ 					/>
+-				) }
+-			</VStack>
+-			<div className={ resetButtonWrapperClassName }>
+-				<Button
+-					variant="tertiary"
+-					onClick={ () => {
+-						onReset();
+-					} }
+-					disabled={ ! enableResetButton }
+-					accessibleWhenDisabled
+-					__next40pxDefaultSize
+-				>
+-					{ __( 'Reset' ) }
+-				</Button>
+-			</div>
+-		</DropdownContentWrapper>
++					{ enableStyle && isStyleSettable && (
++						<BorderControlStylePicker
++							label={ __( 'Style' ) }
++							value={ style }
++							onChange={ onStyleChange }
++						/>
++					) }
++				</VStack>
++				<div className={ resetButtonWrapperClassName }>
++					<Button
++						variant="tertiary"
++						onClick={ () => {
++							onReset();
++						} }
++						disabled={ ! enableResetButton }
++						accessibleWhenDisabled
++						__next40pxDefaultSize
++					>
++						{ __( 'Reset' ) }
++					</Button>
++				</div>
++			</DropdownContentWrapper>
++		</>
+ 	);
+ 
+ 	return (
+diff --git a/packages/components/src/composite/stories/index.story.tsx b/packages/components/src/composite/stories/index.story.tsx
+index 5c4c5e2d0965cd..45811bb6632614 100644
+--- a/packages/components/src/composite/stories/index.story.tsx
++++ b/packages/components/src/composite/stories/index.story.tsx
+@@ -27,6 +27,7 @@ const meta: Meta< typeof Composite > = {
+ 		'Composite.Item': Composite.Item,
+ 		'Composite.Hover': Composite.Hover,
+ 		'Composite.Typeahead': Composite.Typeahead,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 		'Composite.Context': Composite.Context,
+ 	},
+ 	argTypes: {
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx b/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
+index 944ce3744e84ca..4f5eafb17523b4 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import clsx from 'clsx';
+-import type { MouseEventHandler } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -21,6 +20,7 @@ import type {
+ 	CustomGradientBarReducerAction,
+ 	CustomGradientBarIdleState,
+ } from '../types';
++import type { MouseEventHandler } from 'react';
+ 
+ const customGradientBarReducer = (
+ 	state: CustomGradientBarReducerState,
+diff --git a/packages/components/src/disabled/index.tsx b/packages/components/src/disabled/index.tsx
+index 4c348d3a4b7701..d66d5b2ef713e5 100644
+--- a/packages/components/src/disabled/index.tsx
++++ b/packages/components/src/disabled/index.tsx
+@@ -61,7 +61,7 @@ function Disabled( {
+ 		<Provider value={ isDisabled }>
+ 			<div
+ 				// @ts-ignore Reason: inert is a recent HTML attribute
+-				inert={ isDisabled ? true : undefined }
++				inert={ isDisabled ? 'true' : undefined }
+ 				className={
+ 					isDisabled
+ 						? cx( disabledStyles, className, 'components-disabled' )
+diff --git a/packages/components/src/form-file-upload/README.md b/packages/components/src/form-file-upload/README.md
+index d2952ed59d129e..ace5a9e8512def 100644
+--- a/packages/components/src/form-file-upload/README.md
++++ b/packages/components/src/form-file-upload/README.md
+@@ -65,7 +65,7 @@ Whether to allow multiple selection of files or not.
+ 
+ ### `onChange`
+ 
+- - Type: `ChangeEventHandler<HTMLInputElement, HTMLInputElement> | undefined`
++ - Type: `ChangeEventHandler<HTMLInputElement> | undefined`
+  - Required: Yes
+ 
+ Callback function passed directly to the `input` file element.
+diff --git a/packages/components/src/h-stack/hook.tsx b/packages/components/src/h-stack/hook.tsx
+index 272991961c8b3d..bb473a881b9dea 100644
+--- a/packages/components/src/h-stack/hook.tsx
++++ b/packages/components/src/h-stack/hook.tsx
+@@ -29,7 +29,7 @@ export function useHStack( props: WordPressComponentProps< Props, 'div' > ) {
+ 		const _isSpacer = hasConnectNamespace( child, [ 'Spacer' ] );
+ 
+ 		if ( _isSpacer ) {
+-			const childElement = child as ReactElement< typeof FlexItem >;
++			const childElement = child as ReactElement;
+ 			const _key = childElement.key || `hstack-${ index }`;
+ 
+ 			return <FlexItem isBlock key={ _key } { ...childElement.props } />;
+diff --git a/packages/components/src/higher-order/with-notices/index.tsx b/packages/components/src/higher-order/with-notices/index.tsx
+index d1d84f2f73e1e7..734fd8b2b1056c 100644
+--- a/packages/components/src/higher-order/with-notices/index.tsx
++++ b/packages/components/src/higher-order/with-notices/index.tsx
+@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
+ /**
+  * WordPress dependencies
+  */
+-import { useState, useMemo } from '@wordpress/element';
++import { forwardRef, useState, useMemo } from '@wordpress/element';
+ import { createHigherOrderComponent } from '@wordpress/compose';
+ 
+ /**
+@@ -45,7 +45,10 @@ import type { WithNoticeProps } from './types';
+  * @return Wrapped component.
+  */
+ export default createHigherOrderComponent( ( OriginalComponent ) => {
+-	return function Component( props: { [ key: string ]: any } ) {
++	function Component(
++		props: { [ key: string ]: any },
++		ref: React.ForwardedRef< any >
++	) {
+ 		const [ noticeList, setNoticeList ] = useState<
+ 			WithNoticeProps[ 'noticeList' ]
+ 		>( [] );
+@@ -94,6 +97,20 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
+ 			),
+ 		};
+ 
+-		return <OriginalComponent { ...propsOut } />;
+-	};
++		return isForwardRef ? (
++			<OriginalComponent { ...propsOut } ref={ ref } />
++		) : (
++			<OriginalComponent { ...propsOut } />
++		);
++	}
++
++	let isForwardRef: boolean;
++	// @ts-expect-error - `render` will only be present when OriginalComponent was wrapped with forwardRef().
++	const { render } = OriginalComponent;
++	// Returns a forwardRef if OriginalComponent appears to be a forwardRef.
++	if ( typeof render === 'function' ) {
++		isForwardRef = true;
++		return forwardRef( Component );
++	}
++	return Component;
+ }, 'withNotices' );
+diff --git a/packages/components/src/higher-order/with-notices/test/index.tsx b/packages/components/src/higher-order/with-notices/test/index.tsx
+index 9de247e01fce16..f7bacc20d7834a 100644
+--- a/packages/components/src/higher-order/with-notices/test/index.tsx
++++ b/packages/components/src/higher-order/with-notices/test/index.tsx
+@@ -33,6 +33,14 @@ function noticesFrom( list: string[] ) {
+ 	return list.map( ( item ) => ( { id: item, content: item } ) );
+ }
+ 
++function isComponentLike( object: any ) {
++	return typeof object === 'function';
++}
++
++function isForwardRefLike( { render: renderMethod }: any ) {
++	return typeof renderMethod === 'function';
++}
++
+ const content = 'Base content';
+ 
+ const BaseComponent = ( {
+@@ -72,6 +80,16 @@ const TestNoticeOperations = withNotices(
+ 	} )
+ );
+ 
++describe( 'withNotices return type', () => {
++	it( 'should be a component given a component', () => {
++		expect( isComponentLike( TestComponent ) ).toBe( true );
++	} );
++
++	it( 'should be a forwardRef given a forwardRef', () => {
++		expect( isForwardRefLike( TestNoticeOperations ) ).toBe( true );
++	} );
++} );
++
+ describe( 'withNotices operations', () => {
+ 	function setup( props: any = {} ) {
+ 		const handle = createRef< any >();
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index fc7bc39e66b885..f1b8227563cfdc 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -23,7 +23,6 @@ import {
+ 	useContextSystem,
+ } from '../context';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+-import type { FlexDirection } from '../flex/types';
+ 
+ function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( InputBase );
+@@ -35,7 +34,7 @@ function useUniqueId( idProp?: string ) {
+ // Adapter to map props for the new ui/flex component.
+ function getUIFlexProps( labelPosition?: LabelPosition ) {
+ 	const props: {
+-		direction?: FlexDirection;
++		direction?: string;
+ 		gap?: number;
+ 		justify?: string;
+ 		expanded?: boolean;
+@@ -93,6 +92,7 @@ function InputBase(
+ 	}, [ __next40pxDefaultSize, size ] );
+ 
+ 	return (
++		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
+ 		<Root
+ 			{ ...restProps }
+ 			{ ...getUIFlexProps( labelPosition ) }
+diff --git a/packages/components/src/menu/README.md b/packages/components/src/menu/README.md
+index faf9d0965a5ae1..79274fe60e40e0 100644
+--- a/packages/components/src/menu/README.md
++++ b/packages/components/src/menu/README.md
+@@ -120,7 +120,7 @@ make disabled elements still accessible via keyboard.
+ 
+ ##### `render`
+ 
+- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+  - Required: No
+ 
+ Allows the component to be rendered as a different HTML element or React
+@@ -245,7 +245,7 @@ The contents of the menu item's prefix, such as an icon.
+ 
+ ##### `render`
+ 
+- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+  - Required: No
+ 
+ Allows the component to be rendered as a different HTML element or React
+@@ -329,14 +329,14 @@ The radio item's name.
+ 
+ ##### `onChange`
+ 
+- - Type: `BivariantCallback<(event: ChangeEvent<HTMLInputElement, Element>) => void>`
++ - Type: `BivariantCallback<(event: ChangeEvent<HTMLInputElement>) => void>`
+  - Required: No
+ 
+ A function that is called when the checkbox's checked state changes.
+ 
+ ##### `render`
+ 
+- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+  - Required: No
+ 
+ Allows the component to be rendered as a different HTML element or React
+@@ -427,14 +427,14 @@ The checkbox menu item's name.
+ 
+ ##### `onChange`
+ 
+- - Type: `ChangeEventHandler<HTMLInputElement, HTMLInputElement>`
++ - Type: `ChangeEventHandler<HTMLInputElement>`
+  - Required: No
+ 
+ A function that is called when the checkbox's checked state changes.
+ 
+ ##### `render`
+ 
+- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+  - Required: No
+ 
+ Allows the component to be rendered as a different HTML element or React
+@@ -575,7 +575,7 @@ The contents of the menu item's prefix, such as an icon.
+ 
+ ##### `render`
+ 
+- - Type: `ReactElement<unknown, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
+  - Required: No
+ 
+ Allows the component to be rendered as a different HTML element or React
+diff --git a/packages/components/src/menu/stories/index.story.tsx b/packages/components/src/menu/stories/index.story.tsx
+index 7a23a7227a3a5d..756a7cf8721935 100644
+--- a/packages/components/src/menu/stories/index.story.tsx
++++ b/packages/components/src/menu/stories/index.story.tsx
+@@ -33,6 +33,7 @@ const meta: Meta< typeof Menu > = {
+ 		Group: Menu.Group,
+ 		GroupLabel: Menu.GroupLabel,
+ 		Separator: Menu.Separator,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 		Context: Menu.Context,
+ 		RadioItem: Menu.RadioItem,
+ 		ItemLabel: Menu.ItemLabel,
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 03c536550c8a1a..c75c8a4a8000cb 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -199,7 +199,7 @@ const UnforwardedPopover = (
+ 		} );
+ 	}
+ 
+-	const arrowRef = useRef< HTMLElement >( null );
++	const arrowRef = useRef< HTMLElement | null >( null );
+ 
+ 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
+ 		useState< HTMLSpanElement | null >( null );
+diff --git a/packages/components/src/popover/types.ts b/packages/components/src/popover/types.ts
+index 156c90266651a8..644ca9512d7e23 100644
+--- a/packages/components/src/popover/types.ts
++++ b/packages/components/src/popover/types.ts
+@@ -1,6 +1,6 @@
+ import type { Placement } from '@floating-ui/react-dom';
+ import type { useFocusOnMount } from '@wordpress/compose';
+-import type { RefObject, ReactNode, SyntheticEvent } from 'react';
++import type { MutableRefObject, ReactNode, SyntheticEvent } from 'react';
+ 
+ type PositionYAxis = 'top' | 'middle' | 'bottom';
+ type PositionXAxis = 'left' | 'center' | 'right';
+@@ -12,7 +12,9 @@ type DomRectWithOwnerDocument = DOMRect & {
+ 
+ type PopoverPlacement = Placement | 'overlay';
+ 
+-export type PopoverAnchorRefReference = RefObject< Element | null | undefined >;
++export type PopoverAnchorRefReference = MutableRefObject<
++	Element | null | undefined
++>;
+ export type PopoverAnchorRefTopBottom = { top: Element; bottom: Element };
+ 
+ export type VirtualElement = Pick< Element, 'getBoundingClientRect' > & {
+diff --git a/packages/components/src/range-control/types.ts b/packages/components/src/range-control/types.ts
+index 2500f0a25701ba..c890b4874ef68f 100644
+--- a/packages/components/src/range-control/types.ts
++++ b/packages/components/src/range-control/types.ts
+@@ -149,7 +149,7 @@ export type RangeControlProps = Pick<
+ 		 *
+ 		 * @default () => void
+ 		 */
+-		onChange?: ( value: number | undefined ) => void;
++		onChange?: ( value?: number ) => void;
+ 		/**
+ 		 * Callback for when `RangeControl` input gains focus.
+ 		 *
+diff --git a/packages/components/src/responsive-wrapper/index.tsx b/packages/components/src/responsive-wrapper/index.tsx
+index 97dfc3ce701237..98e0493ad3e833 100644
+--- a/packages/components/src/responsive-wrapper/index.tsx
++++ b/packages/components/src/responsive-wrapper/index.tsx
+@@ -45,20 +45,16 @@ function ResponsiveWrapper( {
+ 		aspectRatio = `${ naturalWidth } / ${ naturalHeight }`;
+ 	}
+ 
+-	const ch = children as React.ReactElement<
+-		Pick< React.HTMLAttributes< Element >, 'className' | 'style' >
+-	>;
+-
+ 	return (
+ 		<TagName className="components-responsive-wrapper">
+ 			<div>
+-				{ cloneElement( ch, {
++				{ cloneElement( children, {
+ 					className: clsx(
+ 						'components-responsive-wrapper__content',
+-						ch.props.className
++						children.props.className
+ 					),
+ 					style: {
+-						...ch.props.style,
++						...children.props.style,
+ 						aspectRatio,
+ 					},
+ 				} ) }
+diff --git a/packages/components/src/snackbar/README.md b/packages/components/src/snackbar/README.md
+index f558165cd667fb..7fc734c69ac9b8 100644
+--- a/packages/components/src/snackbar/README.md
++++ b/packages/components/src/snackbar/README.md
+@@ -61,7 +61,7 @@ The icon to render in the snackbar.
+ -   Required: No
+ -   Default: `null`
+ 
+-#### `listRef`: `RefObject< HTMLDivElement | null >`
++#### `listRef`: `MutableRefObject< HTMLDivElement | null >`
+ 
+ A ref to the list that contains the snackbar.
+ 
+diff --git a/packages/components/src/snackbar/types.ts b/packages/components/src/snackbar/types.ts
+index efddce396ace38..d22a3d1c174259 100644
+--- a/packages/components/src/snackbar/types.ts
++++ b/packages/components/src/snackbar/types.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { RefObject, ReactNode } from 'react';
++import type { MutableRefObject, ReactNode } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -25,7 +25,7 @@ type SnackbarOnlyProps = {
+ 	/**
+ 	 * A ref to the list that contains the snackbar.
+ 	 */
+-	listRef?: RefObject< HTMLDivElement | null >;
++	listRef?: MutableRefObject< HTMLDivElement | null >;
+ };
+ 
+ export type SnackbarProps = Pick<
+diff --git a/packages/components/src/tabs/README.md b/packages/components/src/tabs/README.md
+index 90be73eb8acc6e..0307e76ae8d2fe 100644
+--- a/packages/components/src/tabs/README.md
++++ b/packages/components/src/tabs/README.md
+@@ -164,7 +164,7 @@ still be accessed via the keyboard when navigating through the tablist.
+ 
+ ##### `render`
+ 
+- - Type: `RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }> | ReactElement<unknown, string | JSXElementConstructor<any>>`
++ - Type: `RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }> | ReactElement<any, string | JSXElementConstructor<any>>`
+  - Required: No
+ 
+ Allows the component to be rendered as a different HTML element or React
+diff --git a/packages/components/src/tabs/stories/index.story.tsx b/packages/components/src/tabs/stories/index.story.tsx
+index f6be8b176f9159..1fbf8a08c45c99 100644
+--- a/packages/components/src/tabs/stories/index.story.tsx
++++ b/packages/components/src/tabs/stories/index.story.tsx
+@@ -16,6 +16,7 @@ const meta: Meta< typeof Tabs > = {
+ 		'Tabs.TabList': Tabs.TabList,
+ 		'Tabs.Tab': Tabs.Tab,
+ 		'Tabs.TabPanel': Tabs.TabPanel,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 		'Tabs.Context': Tabs.Context,
+ 	},
+ 	tags: [ 'status-private' ],
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index 56b6873f8883a3..b7cfef7e19a096 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -133,7 +133,7 @@ export const TabList = forwardRef<
+ 		<StyledTabList
+ 			ref={ refs }
+ 			store={ store }
+-			render={ ( props: React.HTMLAttributes< HTMLDivElement > ) => (
++			render={ ( props ) => (
+ 				<div
+ 					{ ...props }
+ 					// Fallback to -1 to prevent browsers from making the tablist
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index 5cad3083455f26..0c0d9d1d183bae 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -93,13 +93,7 @@ function UnforwardedTooltip(
+ 	// `aria-label`
+ 	// See: https://github.com/WordPress/gutenberg/pull/64066
+ 	// See: https://github.com/WordPress/gutenberg/pull/65989
+-	function addDescribedById( el: React.ReactElement ) {
+-		const element = el as React.ReactElement<
+-			Pick<
+-				React.HTMLAttributes< Element >,
+-				'aria-describedby' | 'aria-label'
+-			>
+-		>;
++	function addDescribedById( element: React.ReactElement ) {
+ 		return describedById &&
+ 			mounted &&
+ 			element.props[ 'aria-describedby' ] === undefined &&
+diff --git a/packages/components/src/tree-grid/test/cell.tsx b/packages/components/src/tree-grid/test/cell.tsx
+index 88cf26e179f274..e0791d6206dc7b 100644
+--- a/packages/components/src/tree-grid/test/cell.tsx
++++ b/packages/components/src/tree-grid/test/cell.tsx
+@@ -34,6 +34,7 @@ describe( 'TreeGridCell', () => {
+ 				</TreeGridCell>
+ 			)
+ 		).toThrow();
++		expect( console ).toHaveErrored();
+ 	} );
+ 
+ 	it( 'uses a child render function to render children', () => {
+diff --git a/packages/components/src/tree-grid/test/roving-tab-index-item.tsx b/packages/components/src/tree-grid/test/roving-tab-index-item.tsx
+index c6ab0ff47982d2..fe426d1bb5c535 100644
+--- a/packages/components/src/tree-grid/test/roving-tab-index-item.tsx
++++ b/packages/components/src/tree-grid/test/roving-tab-index-item.tsx
+@@ -26,6 +26,7 @@ describe( 'RovingTabIndexItem', () => {
+ 		expect( () =>
+ 			render( <RovingTabIndexItem as={ TestButton } /> )
+ 		).toThrow();
++		expect( console ).toHaveErrored();
+ 	} );
+ 
+ 	it( 'allows another component to be specified as the rendered component using the `as` prop', () => {
+diff --git a/packages/components/src/tree-select/README.md b/packages/components/src/tree-select/README.md
+index 1078b39f7514a6..bfd0a5940fe2ff 100644
+--- a/packages/components/src/tree-select/README.md
++++ b/packages/components/src/tree-select/README.md
+@@ -118,7 +118,7 @@ If this property is added, an option will be added with this label to represent
+ 
+ ### `onChange`
+ 
+- - Type: `((value: string, extra?: { event?: ChangeEvent<HTMLSelectElement, Element>; }) => void) | undefined`
++ - Type: `((value: string, extra?: { event?: ChangeEvent<HTMLSelectElement>; }) => void) | undefined`
+  - Required: No
+ 
+ A function that receives the value of the new option that is being selected as input.
+diff --git a/packages/components/src/utils/get-node-text.ts b/packages/components/src/utils/get-node-text.ts
+index 84372163537443..eb3bc045c3a653 100644
+--- a/packages/components/src/utils/get-node-text.ts
++++ b/packages/components/src/utils/get-node-text.ts
+@@ -12,13 +12,7 @@ const getNodeText = ( node: React.ReactNode ): string => {
+ 				return node.map( getNodeText ).join( '' );
+ 			}
+ 			if ( 'props' in node ) {
+-				return getNodeText(
+-					(
+-						node as React.ReactElement<
+-							React.PropsWithChildren< unknown >
+-						>
+-					 ).props.children
+-				);
++				return getNodeText( node.props.children );
+ 			}
+ 			return '';
+ 		}
+diff --git a/packages/components/src/validated-form-controls/control-with-error.tsx b/packages/components/src/validated-form-controls/control-with-error.tsx
+index 11cb4f585088ef..ef3f985bd33c30 100644
+--- a/packages/components/src/validated-form-controls/control-with-error.tsx
++++ b/packages/components/src/validated-form-controls/control-with-error.tsx
+@@ -60,12 +60,7 @@ type ValidityTarget =
+ 	| HTMLSelectElement
+ 	| HTMLTextAreaElement;
+ 
+-function UnforwardedControlWithError<
+-	C extends React.ReactElement< {
+-		label: React.ReactNode;
+-		required: boolean;
+-	} >,
+->(
++function UnforwardedControlWithError< C extends React.ReactElement >(
+ 	{
+ 		required,
+ 		markWhenOptional,
+diff --git a/packages/compose/package.json b/packages/compose/package.json
+index b4700c402da51f..e07ee746c3245e 100644
+--- a/packages/compose/package.json
++++ b/packages/compose/package.json
+@@ -47,7 +47,7 @@
+ 	"sideEffects": false,
+ 	"dependencies": {
+ 		"@types/mousetrap": "^1.6.8",
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/deprecated": "file:../deprecated",
+ 		"@wordpress/dom": "file:../dom",
+ 		"@wordpress/element": "file:../element",
+@@ -67,7 +67,7 @@
+ 		"mock-match-media": "0.4.2"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/compose/src/hooks/use-disabled/index.ts b/packages/compose/src/hooks/use-disabled/index.ts
+index fc3b0ab552b8db..e45d3b55e95e4d 100644
+--- a/packages/compose/src/hooks/use-disabled/index.ts
++++ b/packages/compose/src/hooks/use-disabled/index.ts
+@@ -45,14 +45,14 @@ export default function useDisabled( {
+ 			}
+ 
+ 			/** A variable keeping track of the previous updates in order to restore them. */
+-			const updates: ( () => void )[] = [];
++			const updates: Function[] = [];
+ 			const disable = () => {
+ 				node.childNodes.forEach( ( child ) => {
+ 					if ( ! ( child instanceof defaultView.HTMLElement ) ) {
+ 						return;
+ 					}
+-					if ( ! child.hasAttribute( 'inert' ) ) {
+-						child.setAttribute( 'inert', '' );
++					if ( ! child.getAttribute( 'inert' ) ) {
++						child.setAttribute( 'inert', 'true' );
+ 						updates.push( () => {
+ 							child.removeAttribute( 'inert' );
+ 						} );
+diff --git a/packages/compose/src/hooks/use-disabled/test/index.js b/packages/compose/src/hooks/use-disabled/test/index.js
+index df48d4c9ce53ac..d51b2d5bf2d6e6 100644
+--- a/packages/compose/src/hooks/use-disabled/test/index.js
++++ b/packages/compose/src/hooks/use-disabled/test/index.js
+@@ -37,9 +37,9 @@ describe( 'useDisabled', () => {
+ 		const link = screen.getByRole( 'link' );
+ 		const p = screen.getByRole( 'document' );
+ 
+-		expect( input ).toHaveAttribute( 'inert' );
+-		expect( link ).toHaveAttribute( 'inert' );
+-		expect( p ).toHaveAttribute( 'inert' );
++		expect( input ).toHaveAttribute( 'inert', 'true' );
++		expect( link ).toHaveAttribute( 'inert', 'true' );
++		expect( p ).toHaveAttribute( 'inert', 'true' );
+ 	} );
+ 
+ 	it( 'will disable an element rendered in an update to the component', async () => {
+@@ -52,7 +52,7 @@ describe( 'useDisabled', () => {
+ 
+ 		const button = screen.getByText( 'Button' );
+ 		await waitFor( () => {
+-			expect( button ).toHaveAttribute( 'inert' );
++			expect( button ).toHaveAttribute( 'inert', 'true' );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/compose/src/hooks/use-focus-outside/index.native.js b/packages/compose/src/hooks/use-focus-outside/index.native.js
+index 7d6d4be3ac1cf6..b6a3f12475f948 100644
+--- a/packages/compose/src/hooks/use-focus-outside/index.native.js
++++ b/packages/compose/src/hooks/use-focus-outside/index.native.js
+@@ -55,7 +55,7 @@ function isFocusNormalizedButton( eventTarget ) {
+  */
+ 
+ /**
+- * @typedef {React.RefObject<FocusOutsideReactElement | undefined>} FocusOutsideRef
++ * @typedef {React.MutableRefObject<FocusOutsideReactElement | undefined>} FocusOutsideRef
+  */
+ 
+ /**
+@@ -88,7 +88,7 @@ export default function useFocusOutside( onFocusOutside ) {
+ 	const preventBlurCheck = useRef( false );
+ 
+ 	/**
+-	 * @type {React.RefObject<number | undefined>}
++	 * @type {React.MutableRefObject<number | undefined>}
+ 	 */
+ 	const blurCheckTimeoutId = useRef();
+ 
+diff --git a/packages/compose/src/hooks/use-focus-return/index.js b/packages/compose/src/hooks/use-focus-return/index.js
+index 316d0d85082f3e..14f11d77906cb0 100644
+--- a/packages/compose/src/hooks/use-focus-return/index.js
++++ b/packages/compose/src/hooks/use-focus-return/index.js
+@@ -29,9 +29,9 @@ let origin = null;
+  * ```
+  */
+ function useFocusReturn( onFocusReturn ) {
+-	/** @type {React.RefObject<HTMLElement| null>} */
++	/** @type {React.MutableRefObject<null | HTMLElement>} */
+ 	const ref = useRef( null );
+-	/** @type {React.RefObject<Element | null>} */
++	/** @type {React.MutableRefObject<null | Element>} */
+ 	const focusedBeforeMount = useRef( null );
+ 	const onFocusReturnRef = useRef( onFocusReturn );
+ 	useEffect( () => {
+diff --git a/packages/compose/src/hooks/use-merge-refs/index.ts b/packages/compose/src/hooks/use-merge-refs/index.ts
+index 277563afec2ca9..2a242c9d63fead 100644
+--- a/packages/compose/src/hooks/use-merge-refs/index.ts
++++ b/packages/compose/src/hooks/use-merge-refs/index.ts
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
+-import type { Ref, RefCallback } from 'react';
++import type { MutableRefObject, Ref, RefCallback } from 'react';
+ 
+ // Returns a cleanup function if the ref callback returned one (React 19 ref
+ // callback cleanup pattern), otherwise `undefined`. Object refs never have a
+@@ -12,7 +12,7 @@ function assignRef< T >( ref: Ref< T >, value: T ): ( () => void ) | undefined {
+ 		const returned = ref( value );
+ 		return typeof returned === 'function' ? returned : undefined;
+ 	} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
+-		ref.current = value;
++		( ref as MutableRefObject< T > ).current = value;
+ 	}
+ 	return undefined;
+ }
+diff --git a/packages/compose/src/hooks/use-resize-observer/use-resize-observer.ts b/packages/compose/src/hooks/use-resize-observer/use-resize-observer.ts
+index 54b5d1f8b2d0e5..4b3d2cb5f96c07 100644
+--- a/packages/compose/src/hooks/use-resize-observer/use-resize-observer.ts
++++ b/packages/compose/src/hooks/use-resize-observer/use-resize-observer.ts
+@@ -18,7 +18,7 @@ export function useResizeObserver< T extends HTMLElement >(
+ ): ( element?: T | null ) => void {
+ 	const callbackEvent = useEvent( callback );
+ 
+-	const observedElementRef = useRef< T >( null );
++	const observedElementRef = useRef< T | null >( null );
+ 	const resizeObserverRef = useRef< ResizeObserver >( undefined );
+ 	return useEvent( ( element?: T | null ) => {
+ 		if ( element === observedElementRef.current ) {
+diff --git a/packages/connectors/package.json b/packages/connectors/package.json
+index b0c63a7395698c..5b6fea3684842d 100644
+--- a/packages/connectors/package.json
++++ b/packages/connectors/package.json
+@@ -30,7 +30,7 @@
+ 	"wpScriptModuleExports": "./build-module/index.mjs",
+ 	"types": "build-types",
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/data": "file:../data",
+ 		"@wordpress/element": "file:../element",
+diff --git a/packages/content-types/package.json b/packages/content-types/package.json
+index 91258521aa4961..d11df127a20d1a 100644
+--- a/packages/content-types/package.json
++++ b/packages/content-types/package.json
+@@ -33,7 +33,7 @@
+ 	"wpScriptModuleExports": "./build-module/index.mjs",
+ 	"types": "build-types",
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/admin-ui": "file:../admin-ui",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+diff --git a/packages/core-commands/package.json b/packages/core-commands/package.json
+index d859928d8b6096..3d55a48d818a7e 100644
+--- a/packages/core-commands/package.json
++++ b/packages/core-commands/package.json
+@@ -57,8 +57,8 @@
+ 		"@wordpress/url": "file:../url"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/core-data/package.json b/packages/core-data/package.json
+index 8827d75d55d7d5..914ac7ea443b8e 100644
+--- a/packages/core-data/package.json
++++ b/packages/core-data/package.json
+@@ -49,7 +49,7 @@
+ 		"build-module/index.mjs"
+ 	],
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/block-editor": "file:../block-editor",
+ 		"@wordpress/blocks": "file:../blocks",
+@@ -81,8 +81,8 @@
+ 		"deep-freeze": "0.0.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/customize-widgets/package.json b/packages/customize-widgets/package.json
+index c3f36176a287f6..2a448ef4f05511 100644
+--- a/packages/customize-widgets/package.json
++++ b/packages/customize-widgets/package.json
+@@ -70,8 +70,8 @@
+ 		"@testing-library/react": "^16.3.2"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/data-controls/package.json b/packages/data-controls/package.json
+index 06554df0ea7e4b..1b7bd4f0c43737 100644
+--- a/packages/data-controls/package.json
++++ b/packages/data-controls/package.json
+@@ -49,7 +49,7 @@
+ 		"@wordpress/deprecated": "file:../deprecated"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/data/package.json b/packages/data/package.json
+index 94851cca759f65..bf1f8cc52e8060 100644
+--- a/packages/data/package.json
++++ b/packages/data/package.json
+@@ -45,7 +45,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/deprecated": "file:../deprecated",
+ 		"@wordpress/element": "file:../element",
+@@ -68,7 +68,7 @@
+ 		"deep-freeze": "0.0.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/data/src/components/use-select/test/suspense.js b/packages/data/src/components/use-select/test/suspense.js
+index 1d2b609646b3e3..de215c297df018 100644
+--- a/packages/data/src/components/use-select/test/suspense.js
++++ b/packages/data/src/components/use-select/test/suspense.js
+@@ -6,13 +6,13 @@ import { render, screen } from '@testing-library/react';
+ /**
+  * WordPress dependencies
+  */
+-import { Component, Suspense } from '@wordpress/element';
+ import {
+ 	createRegistry,
+ 	createReduxStore,
+ 	useSuspenseSelect,
+ 	RegistryProvider,
+ } from '@wordpress/data';
++import { Component, Suspense } from '@wordpress/element';
+ 
+ function createRegistryWithStore() {
+ 	const initialState = {
+@@ -110,12 +110,10 @@ describe( 'useSuspenseSelect', () => {
+ 		render( <App /> );
+ 		await screen.findByLabelText( 'loaded' );
+ 
+-		// Verify there were 4 attempts to render:
+-		// - initial render with `getToken` not being resolved and suspending, rendering fallback;
+-		// - second render for sibling prerendering which collects all other suspending promises early;
+-		// - third render after `getToken` is resolved and `getData` suspends;
+-		// - final fourth render after all data got loaded.
+-		expect( attempts ).toBe( 4 );
++		// Verify there were 3 attempts to render. Suspended twice because of
++		// `getToken` and `getData` selectors not being resolved, and then finally
++		// rendered after all data got loaded.
++		expect( attempts ).toBe( 3 );
+ 		expect( renders ).toBe( 1 );
+ 	} );
+ 
+@@ -231,23 +229,7 @@ describe( 'useSuspenseSelect', () => {
+ 		const slowLabel = await screen.findByLabelText( 'slow loaded' );
+ 		expect( slowLabel ).toHaveTextContent( 'slow' );
+ 
+-		// Verify the number of renders. The reasoning behind is subtle but not that complicated:
+-		// - initial render where both `FastUI` and `SlowUI` suspend and fallbacks are rendered;
+-		// - second (async) render for sibling prerendering that tries to collect all suspending promises.
+-		//   Both `FastUI` and `SlowUI` suspend again but this time the result is not committed, its purpose
+-		//   was just to collect suspending promises.
+-		// - `FastUI` renders for third time after its suspended promise is resolved. However, this render
+-		//   is _not_ committed because of "suspense fallback throttling". The render is delayed/throttled for 300ms
+-		//   so that the user doesn't see too many and too fast UI flashes. The fallback continues to be rendered.
+-		// - `SlowUI` suspended promise is resolved and a third render is triggered. However, as the `FastUI` render
+-		//   is not yet committed, a _fourth_ render is triggered, to make sure that we'll be committing the most
+-		//   up-to-date state of the `FastUI` component.
+-		//
+-		// The above explains why there are 4 renders of `FastUI` and 3 renders of `SlowUI`. The non-obvious part
+-		// is explained by a combination of two React features:
+-		// - sibling prerendering that triggers an extra rerender after one component suspends;
+-		// - fallback throttling that delays commit by 300ms and triggers an extra rerender.
+-		expect( FastUI ).toHaveBeenCalledTimes( 4 );
+-		expect( SlowUI ).toHaveBeenCalledTimes( 3 );
++		expect( FastUI ).toHaveBeenCalledTimes( 2 );
++		expect( SlowUI ).toHaveBeenCalledTimes( 2 );
+ 	} );
+ } );
+diff --git a/packages/data/src/components/with-select/index.tsx b/packages/data/src/components/with-select/index.tsx
+index 04e35a2dc3994d..55407c57612440 100644
+--- a/packages/data/src/components/with-select/index.tsx
++++ b/packages/data/src/components/with-select/index.tsx
+@@ -2,7 +2,8 @@
+  * WordPress dependencies
+  */
+ import { createHigherOrderComponent } from '@wordpress/compose';
+-import { memo } from '@wordpress/element';
++import { forwardRef, memo } from '@wordpress/element';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -59,14 +60,25 @@ const withSelect = (
+ ) =>
+ 	createHigherOrderComponent(
+ 		( WrappedComponent ) =>
+-			memo( function WithSelect( ownProps: Record< string, unknown > ) {
+-				const mapSelect = (
+-					select: SelectFunction,
+-					registry: DataRegistry
+-				) => mapSelectToProps( select, ownProps, registry );
+-				const mergeProps = useSelect( mapSelect );
+-				return <WrappedComponent { ...ownProps } { ...mergeProps } />;
+-			} ),
++			memo(
++				forwardRef( function WithSelect(
++					ownProps: Record< string, unknown >,
++					ref: ForwardedRef< unknown >
++				) {
++					const mapSelect = (
++						select: SelectFunction,
++						registry: DataRegistry
++					) => mapSelectToProps( select, ownProps, registry );
++					const mergeProps = useSelect( mapSelect );
++					return (
++						<WrappedComponent
++							ref={ ref }
++							{ ...ownProps }
++							{ ...mergeProps }
++						/>
++					);
++				} )
++			),
+ 		'withSelect'
+ 	);
+ 
+diff --git a/packages/data/src/components/with-select/test/index.js b/packages/data/src/components/with-select/test/index.js
+index 3538aeb129990b..fa409865ddd13f 100644
+--- a/packages/data/src/components/with-select/test/index.js
++++ b/packages/data/src/components/with-select/test/index.js
+@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
+  * WordPress dependencies
+  */
+ import { compose } from '@wordpress/compose';
+-import { Component, createRef } from '@wordpress/element';
++import { Component, createRef, forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -636,11 +636,11 @@ describe( 'withSelect', () => {
+ 			},
+ 		} );
+ 
+-		const OriginalComponent = ( { value, ref } ) => (
++		const OriginalComponent = forwardRef( ( { value }, ref ) => (
+ 			<div ref={ ref } role="status">
+ 				{ value }
+ 			</div>
+-		);
++		) );
+ 
+ 		const DataBoundComponent = withSelect( ( _select ) => ( {
+ 			value: _select( 'demo' ).getValue(),
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 05ab59ec761bca..017b8d77cb561a 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++- Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
++
+ ### Code Quality
+ 
+ -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index 81995eb45954ab..0225159731e6f0 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -53,7 +53,7 @@
+ 	"sideEffects": false,
+ 	"dependencies": {
+ 		"@ariakit/react": "^0.4.21",
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/compose": "file:../compose",
+@@ -87,8 +87,8 @@
+ 		"storybook": "^10.2.8"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/dataviews/src/components/dataform-controls/datetime.tsx b/packages/dataviews/src/components/dataform-controls/datetime.tsx
+index e4a688a6def9aa..d8388d53096b15 100644
+--- a/packages/dataviews/src/components/dataform-controls/datetime.tsx
++++ b/packages/dataviews/src/components/dataform-controls/datetime.tsx
+@@ -54,7 +54,7 @@ function CalendarDateTimeControl< Item >( {
+ 	const inputControlRef = useRef< HTMLInputElement >( null );
+ 	const validationTimeoutRef =
+ 		useRef< ReturnType< typeof setTimeout > >( undefined );
+-	const previousFocusRef = useRef< Element >( null );
++	const previousFocusRef = useRef< Element | null >( null );
+ 
+ 	const { minConstraint, maxConstraint, disabledMatchers } =
+ 		useDisabledDateMatchers( isValid, parseDateTime );
+diff --git a/packages/dataviews/src/components/dataviews-context/index.ts b/packages/dataviews/src/components/dataviews-context/index.ts
+index e6233489fe1a53..88d4779fafca6f 100644
+--- a/packages/dataviews/src/components/dataviews-context/index.ts
++++ b/packages/dataviews/src/components/dataviews-context/index.ts
+@@ -46,8 +46,10 @@ type DataViewsContextType< Item > = {
+ 	) => ReactElement;
+ 	isItemClickable: ( item: Item ) => boolean;
+ 	containerWidth: number;
+-	containerRef: React.RefObject< HTMLDivElement | null >;
+-	resizeObserverRef: React.Ref< HTMLDivElement | null >;
++	containerRef: React.MutableRefObject< HTMLDivElement | null >;
++	resizeObserverRef:
++		| ( ( element?: HTMLDivElement | null ) => void )
++		| React.RefObject< HTMLDivElement >;
+ 	defaultLayouts: NormalizedSupportedLayouts;
+ 	filters: NormalizedFilter[];
+ 	isShowingFilter: boolean;
+diff --git a/packages/dataviews/src/components/dataviews-layouts/table/use-scroll-state.ts b/packages/dataviews/src/components/dataviews-layouts/table/use-scroll-state.ts
+index d8710152537796..dbe60371d7a762 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/table/use-scroll-state.ts
++++ b/packages/dataviews/src/components/dataviews-layouts/table/use-scroll-state.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { RefObject } from 'react';
++import type { MutableRefObject } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -30,16 +30,16 @@ const isScrolledToEnd = ( element: Element ) => {
+  *
+  * See https://github.com/Automattic/wp-calypso/pull/103005#discussion_r2077567912.
+  *
+- * @param params                           The parameters for the hook.
+- * @param params.scrollContainerRef        The ref to the scroll container element.
+- * @param [params.enabledHorizontal=false] Whether to track horizontal scroll end.
+- * @return  The scroll state.
++ * @param {Object}                                  params                           The parameters for the hook.
++ * @param {MutableRefObject<HTMLDivElement | null>} params.scrollContainerRef        The ref to the scroll container element.
++ * @param {boolean}                                 [params.enabledHorizontal=false] Whether to track horizontal scroll end.
++ * @return {{ isHorizontalScrollEnd: boolean, isVerticallyScrolled: boolean }} The scroll state.
+  */
+ export function useScrollState( {
+ 	scrollContainerRef,
+ 	enabledHorizontal = false,
+ }: {
+-	scrollContainerRef: RefObject< HTMLDivElement | null >;
++	scrollContainerRef: React.MutableRefObject< HTMLDivElement | null >;
+ 	enabledHorizontal?: boolean;
+ } ): { isHorizontalScrollEnd: boolean; isVerticallyScrolled: boolean } {
+ 	const [ isHorizontalScrollEnd, setIsHorizontalScrollEnd ] =
+diff --git a/packages/dataviews/src/components/dataviews-layouts/utils/item-click-wrapper.tsx b/packages/dataviews/src/components/dataviews-layouts/utils/item-click-wrapper.tsx
+index bce06156dca832..e238ec3f7a902e 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/utils/item-click-wrapper.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/utils/item-click-wrapper.tsx
+@@ -86,9 +86,7 @@ export function ItemClickWrapper< Item >( {
+ 			className: `${ className } ${ className }--clickable`,
+ 			...extraProps,
+ 			children,
+-		} ) as ReactElement<
+-			Pick< React.DOMAttributes< Element >, 'onClick' | 'onKeyDown' >
+-		>;
++		} );
+ 
+ 		// Clone the element and enhance onClick to stop propagation
+ 		return cloneElement( renderedElement, {
+diff --git a/packages/dataviews/src/hooks/use-form-validity.ts b/packages/dataviews/src/hooks/use-form-validity.ts
+index b1379cdb6fcfe3..81f60b6de9ecfb 100644
+--- a/packages/dataviews/src/hooks/use-form-validity.ts
++++ b/packages/dataviews/src/hooks/use-form-validity.ts
+@@ -392,8 +392,8 @@ function handleCustomValidationAsync< Item >(
+ }
+ 
+ type PromiseHandler< Item > = {
+-	customCounterRef: React.RefObject< Record< string, number > >;
+-	elementsCounterRef: React.RefObject< Record< string, number > >;
++	customCounterRef: React.MutableRefObject< Record< string, number > >;
++	elementsCounterRef: React.MutableRefObject< Record< string, number > >;
+ 	setFormValidity: React.Dispatch< React.SetStateAction< FormValidity > >;
+ 	path: string[];
+ 	item: Item;
+diff --git a/packages/e2e-tests/package.json b/packages/e2e-tests/package.json
+index b931dfad674c4e..bd611f4ffe347d 100644
+--- a/packages/e2e-tests/package.json
++++ b/packages/e2e-tests/package.json
+@@ -30,8 +30,8 @@
+ 	"peerDependencies": {
+ 		"jest": ">=29",
+ 		"puppeteer-core": ">=23",
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/edit-post/package.json b/packages/edit-post/package.json
+index 285e6d210fc391..ee3b4e0e4217e9 100644
+--- a/packages/edit-post/package.json
++++ b/packages/edit-post/package.json
+@@ -89,8 +89,8 @@
+ 		"@testing-library/user-event": "^14.6.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/edit-site/package.json b/packages/edit-site/package.json
+index 2c05a3a44238c1..9d56382981a329 100644
+--- a/packages/edit-site/package.json
++++ b/packages/edit-site/package.json
+@@ -101,8 +101,8 @@
+ 		"react-autosize-textarea": "^7.1.0"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/edit-widgets/package.json b/packages/edit-widgets/package.json
+index a95d7e8bf00d96..a03a80af2737f1 100644
+--- a/packages/edit-widgets/package.json
++++ b/packages/edit-widgets/package.json
+@@ -84,8 +84,8 @@
+ 		"deep-freeze": "0.0.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/editor/package.json b/packages/editor/package.json
+index aa9927c0d10011..1a7ab506907751 100644
+--- a/packages/editor/package.json
++++ b/packages/editor/package.json
+@@ -60,7 +60,7 @@
+ 		"build-module/bindings/**"
+ 	],
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+@@ -124,8 +124,8 @@
+ 		"deep-freeze": "0.0.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/element/CHANGELOG.md b/packages/element/CHANGELOG.md
+index c0f7867e70f03b..5c7ed919327799 100644
+--- a/packages/element/CHANGELOG.md
++++ b/packages/element/CHANGELOG.md
+@@ -2,9 +2,9 @@
+ 
+ ## Unreleased
+ 
+-### New Features
++### Breaking Changes
+ 
+--   Added polyfills for the `render`, `hydrate` and `unmountComponentAtNode` APIs that React 19 no longer ships.
++-   Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
+ 
+ ## 7.0.0 (2026-05-27)
+ 
+diff --git a/packages/element/README.md b/packages/element/README.md
+index 2aa4300ba78a56..00c01e5c414e5a 100755
+--- a/packages/element/README.md
++++ b/packages/element/README.md
+@@ -27,18 +27,6 @@ The offerings of any framework necessarily become more complex as these requirem
+ 
+ <!-- START TOKEN(Autogenerated API docs) -->
+ 
+-### Activity
+-
+-Hide and show parts of the UI while preserving state.
+-
+-_Related_
+-
+--   <https://react.dev/reference/react/Activity>
+-
+-_Changelog_
+-
+-`7.1.0`
+-
+ ### Children
+ 
+ Object that provides utilities for dealing with React children.
+@@ -158,17 +146,11 @@ _Changelog_
+ 
+ ### findDOMNode
+ 
+-> **Deprecated** since WordPress 7.1.0. Use DOM refs instead.
+-
+-Finds the DOM node of a React component instance.
+-
+-_Related_
+-
+--   <https://react.dev/reference/react-dom/findDOMNode>
++Finds the dom node of a React component.
+ 
+ _Parameters_
+ 
+--   _instance_ `any`: Component's instance.
++-   _component_ `React.ComponentType`: Component's instance.
+ 
+ ### flushSync
+ 
+@@ -204,12 +186,6 @@ _Related_
+ 
+ -   <https://react.dev/reference/react-dom/hydrate>
+ 
+-_Parameters_
+-
+--   _element_ `React.ReactNode`: Element to hydrate.
+--   _container_ `Element`: DOM node to hydrate.
+--   _callback_ `() => void`: Optional callback called after hydration.
+-
+ ### hydrateRoot
+ 
+ Creates a new React root for the target DOM node and hydrates it with a pre-generated markup.
+@@ -281,78 +257,6 @@ const placeholderLabel = Platform.select( {
+ } );
+ ```
+ 
+-### preconnect
+-
+-Eagerly connect to a server that you expect to load resources from.
+-
+-_Related_
+-
+--   <https://react.dev/reference/react-dom/preconnect>
+-
+-_Changelog_
+-
+-`7.1.0`
+-
+-### prefetchDNS
+-
+-Eagerly look up the IP of a server that you expect to load resources from.
+-
+-_Related_
+-
+--   <https://react.dev/reference/react-dom/prefetchDNS>
+-
+-_Changelog_
+-
+-`7.1.0`
+-
+-### preinit
+-
+-Eagerly fetch and evaluate a stylesheet or external script.
+-
+-_Related_
+-
+--   <https://react.dev/reference/react-dom/preinit>
+-
+-_Changelog_
+-
+-`7.1.0`
+-
+-### preinitModule
+-
+-Eagerly fetch and evaluate an ESM module.
+-
+-_Related_
+-
+--   <https://react.dev/reference/react-dom/preinitModule>
+-
+-_Changelog_
+-
+-`7.1.0`
+-
+-### preload
+-
+-Eagerly fetch a resource such as a stylesheet, font, or external script.
+-
+-_Related_
+-
+--   <https://react.dev/reference/react-dom/preload>
+-
+-_Changelog_
+-
+-`7.1.0`
+-
+-### preloadModule
+-
+-Eagerly fetch an ESM module that you expect to use.
+-
+-_Related_
+-
+--   <https://react.dev/reference/react-dom/preloadModule>
+-
+-_Changelog_
+-
+-`7.1.0`
+-
+ ### PureComponent
+ 
+ _Related_
+@@ -397,12 +301,6 @@ _Related_
+ 
+ -   <https://react.dev/reference/react-dom/render>
+ 
+-_Parameters_
+-
+--   _element_ `React.ReactNode`: Element to render.
+--   _container_ `Element`: DOM node into which to render.
+--   _callback_ `() => void`: Optional callback called after render.
+-
+ ### renderToString
+ 
+ Serializes a React element to string.
+@@ -452,38 +350,6 @@ _Related_
+ 
+ -   <https://react.dev/reference/react-dom/unmountComponentAtNode>
+ 
+-_Parameters_
+-
+--   _container_ `Element`: DOM node in which to unmount.
+-
+-_Returns_
+-
+--   `boolean`: Whether the node was unmounted.
+-
+-### use
+-
+-Read the value of a resource like a Promise or context.
+-
+-_Related_
+-
+--   <https://react.dev/reference/react/use>
+-
+-_Changelog_
+-
+-`7.1.0`
+-
+-### useActionState
+-
+-Manage state based on the result of a form action.
+-
+-_Related_
+-
+--   <https://react.dev/reference/react/useActionState>
+-
+-_Changelog_
+-
+-`7.1.0`
+-
+ ### useCallback
+ 
+ _Related_
+@@ -514,30 +380,6 @@ _Related_
+ 
+ -   <https://react.dev/reference/react/useEffect>
+ 
+-### useEffectEvent
+-
+-Extract non-reactive logic from an Effect into an Effect Event.
+-
+-_Related_
+-
+--   <https://react.dev/reference/react/useEffectEvent>
+-
+-_Changelog_
+-
+-`7.1.0`
+-
+-### useFormStatus
+-
+-Read the status information of the parent form.
+-
+-_Related_
+-
+--   <https://react.dev/reference/react-dom/hooks/useFormStatus>
+-
+-_Changelog_
+-
+-`7.1.0`
+-
+ ### useId
+ 
+ _Related_
+@@ -568,18 +410,6 @@ _Related_
+ 
+ -   <https://react.dev/reference/react/useMemo>
+ 
+-### useOptimistic
+-
+-Show a different state while an async action is underway.
+-
+-_Related_
+-
+--   <https://react.dev/reference/react/useOptimistic>
+-
+-_Changelog_
+-
+-`7.1.0`
+-
+ ### useReducer
+ 
+ _Related_
+diff --git a/packages/element/package.json b/packages/element/package.json
+index d3ff0000c5288a..67e99c564f72d3 100644
+--- a/packages/element/package.json
++++ b/packages/element/package.json
+@@ -46,14 +46,14 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
+-		"@types/react-dom": "^19.2.3",
++		"@types/react": "^18.3.27",
++		"@types/react-dom": "^18.3.1",
+ 		"@wordpress/deprecated": "file:../deprecated",
+ 		"@wordpress/escape-html": "file:../escape-html",
+ 		"change-case": "^4.1.2",
+ 		"is-plain-object": "^5.0.0",
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.3.0",
++		"react-dom": "^18.3.0"
+ 	},
+ 	"devDependencies": {
+ 		"@testing-library/dom": "^10.4.1",
+diff --git a/packages/element/src/index.ts b/packages/element/src/index.ts
+index 6c501b8c864a22..c4a9e2cfae4ab2 100644
+--- a/packages/element/src/index.ts
++++ b/packages/element/src/index.ts
+@@ -5,9 +5,9 @@ export * from './utils';
+ export { default as Platform } from './platform';
+ export { default as renderToString } from './serialize';
+ export { default as RawHTML } from './raw-html';
+-export {
+-	findDOMNode,
+-	render,
+-	hydrate,
+-	unmountComponentAtNode,
+-} from './react-polyfill';
++// export {
++// 	findDOMNode,
++// 	render,
++// 	hydrate,
++// 	unmountComponentAtNode,
++// } from './react-polyfill';
+diff --git a/packages/element/src/react-platform.ts b/packages/element/src/react-platform.ts
+index a6b4b43e73db12..2010d09ece7ecd 100644
+--- a/packages/element/src/react-platform.ts
++++ b/packages/element/src/react-platform.ts
+@@ -3,14 +3,13 @@
+  */
+ import {
+ 	createPortal,
++	findDOMNode,
+ 	flushSync,
+-	preconnect,
+-	prefetchDNS,
+-	preinit,
+-	preinitModule,
+-	preload,
+-	preloadModule,
+-	useFormStatus,
++	/* eslint-disable react/no-deprecated */
++	render,
++	hydrate,
++	unmountComponentAtNode,
++	/* eslint-enable react/no-deprecated */
+ } from 'react-dom';
+ import { createRoot, hydrateRoot } from 'react-dom/client';
+ 
+@@ -22,67 +21,34 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
+ export { createPortal };
+ 
+ /**
+- * Forces React to flush any updates inside the provided callback synchronously.
+- *
+- * @see https://react.dev/reference/react-dom/flushSync
+- */
+-export { flushSync };
+-
+-/**
+- * Eagerly connect to a server that you expect to load resources from.
+- *
+- * @since 7.1.0
+- * @see https://react.dev/reference/react-dom/preconnect
+- */
+-export { preconnect };
+-
+-/**
+- * Eagerly look up the IP of a server that you expect to load resources from.
+- *
+- * @since 7.1.0
+- * @see https://react.dev/reference/react-dom/prefetchDNS
+- */
+-export { prefetchDNS };
+-
+-/**
+- * Eagerly fetch and evaluate a stylesheet or external script.
++ * Finds the dom node of a React component.
+  *
+- * @since 7.1.0
+- * @see https://react.dev/reference/react-dom/preinit
++ * @param {React.ComponentType} component Component's instance.
+  */
+-export { preinit };
++export { findDOMNode };
+ 
+ /**
+- * Eagerly fetch and evaluate an ESM module.
+- *
+- * @since 7.1.0
+- * @see https://react.dev/reference/react-dom/preinitModule
+- */
+-export { preinitModule };
+-
+-/**
+- * Eagerly fetch a resource such as a stylesheet, font, or external script.
++ * Forces React to flush any updates inside the provided callback synchronously.
+  *
+- * @since 7.1.0
+- * @see https://react.dev/reference/react-dom/preload
++ * @see https://react.dev/reference/react-dom/flushSync
+  */
+-export { preload };
++export { flushSync };
+ 
+ /**
+- * Eagerly fetch an ESM module that you expect to use.
++ * Renders a given element into the target DOM node.
+  *
+- * @since 7.1.0
+- * @see https://react.dev/reference/react-dom/preloadModule
++ * @deprecated since WordPress 6.2.0. Use `createRoot` instead.
++ * @see https://react.dev/reference/react-dom/render
+  */
+-export { preloadModule };
++export { render };
+ 
+ /**
+- * Read the status information of the parent form.
++ * Hydrates a given element into the target DOM node.
+  *
+- * @since 7.1.0
+- * @see https://react.dev/reference/react-dom/hooks/useFormStatus
++ * @deprecated since WordPress 6.2.0. Use `hydrateRoot` instead.
++ * @see https://react.dev/reference/react-dom/hydrate
+  */
+-export { useFormStatus };
++export { hydrate };
+ 
+ /**
+  * Creates a new React root for the target DOM node.
+@@ -99,3 +65,11 @@ export { createRoot };
+  * @see https://react.dev/reference/react-dom/client/hydrateRoot
+  */
+ export { hydrateRoot };
++
++/**
++ * Removes any mounted element from the target DOM node.
++ *
++ * @deprecated since WordPress 6.2.0. Use `root.unmount()` instead.
++ * @see https://react.dev/reference/react-dom/unmountComponentAtNode
++ */
++export { unmountComponentAtNode };
+diff --git a/packages/element/src/react.ts b/packages/element/src/react.ts
+index 28ca1c3a836306..4b66ec2ae59c68 100644
+--- a/packages/element/src/react.ts
++++ b/packages/element/src/react.ts
+@@ -3,7 +3,6 @@
+  */
+ // eslint-disable-next-line @typescript-eslint/no-restricted-imports
+ import {
+-	Activity,
+ 	Children,
+ 	cloneElement,
+ 	Component,
+@@ -16,20 +15,16 @@ import {
+ 	memo,
+ 	PureComponent,
+ 	StrictMode,
+-	use,
+-	useActionState,
+ 	useCallback,
+ 	useContext,
+ 	useDebugValue,
+ 	useDeferredValue,
+ 	useEffect,
+-	useEffectEvent,
+ 	useId,
+ 	useMemo,
+ 	useImperativeHandle,
+ 	useInsertionEffect,
+ 	useLayoutEffect,
+-	useOptimistic,
+ 	useReducer,
+ 	useRef,
+ 	useState,
+@@ -71,14 +66,6 @@ export type RefCallback< T > = React.RefCallback< T >;
+  */
+ export type Ref< T > = React.Ref< T >;
+ 
+-/**
+- * Hide and show parts of the UI while preserving state.
+- *
+- * @since 7.1.0
+- * @see https://react.dev/reference/react/Activity
+- */
+-export { Activity };
+-
+ /**
+  * Object that provides utilities for dealing with React children.
+  */
+@@ -168,22 +155,6 @@ export { memo };
+  */
+ export { StrictMode };
+ 
+-/**
+- * Read the value of a resource like a Promise or context.
+- *
+- * @since 7.1.0
+- * @see https://react.dev/reference/react/use
+- */
+-export { use };
+-
+-/**
+- * Manage state based on the result of a form action.
+- *
+- * @since 7.1.0
+- * @see https://react.dev/reference/react/useActionState
+- */
+-export { useActionState };
+-
+ /**
+  * @see https://react.dev/reference/react/useCallback
+  */
+@@ -209,14 +180,6 @@ export { useDeferredValue };
+  */
+ export { useEffect };
+ 
+-/**
+- * Extract non-reactive logic from an Effect into an Effect Event.
+- *
+- * @since 7.1.0
+- * @see https://react.dev/reference/react/useEffectEvent
+- */
+-export { useEffectEvent };
+-
+ /**
+  * @see https://react.dev/reference/react/useId
+  */
+@@ -242,14 +205,6 @@ export { useLayoutEffect };
+  */
+ export { useMemo };
+ 
+-/**
+- * Show a different state while an async action is underway.
+- *
+- * @since 7.1.0
+- * @see https://react.dev/reference/react/useOptimistic
+- */
+-export { useOptimistic };
+-
+ /**
+  * @see https://react.dev/reference/react/useReducer
+  */
+@@ -344,9 +299,7 @@ export function switchChildrenNodeName(
+ 				return elt;
+ 			}
+ 
+-			const { children: childrenProp, ...props } = (
+-				elt as React.ReactElement< React.PropsWithChildren< unknown > >
+-			 ).props;
++			const { children: childrenProp, ...props } = elt.props;
+ 			return createElement(
+ 				nodeName,
+ 				{ key: index, ...props },
+diff --git a/packages/element/src/serialize.ts b/packages/element/src/serialize.ts
+index 7007ef2f1ac814..8d7a97e68b1ea7 100644
+--- a/packages/element/src/serialize.ts
++++ b/packages/element/src/serialize.ts
+@@ -626,9 +626,7 @@ export function renderElement(
+ 
+ 		case Consumer.$$typeof:
+ 			return renderElement(
+-				props.children(
+-					context || type._currentValue || type._context._currentValue
+-				),
++				props.children( context || type._currentValue ),
+ 				context,
+ 				legacyContext
+ 			);
+diff --git a/packages/element/src/test/find-dom-node.js b/packages/element/src/test/find-dom-node.js
+index 0f217007a442ef..7f0c6c6e3ba1ca 100644
+--- a/packages/element/src/test/find-dom-node.js
++++ b/packages/element/src/test/find-dom-node.js
+@@ -2,7 +2,7 @@ import { act, render } from '@testing-library/react';
+ import { Component } from '..';
+ import { findDOMNode as findDOMNodePolyfill } from '../react-polyfill';
+ 
+-describe( 'findDOMNode', () => {
++describe.skip( 'findDOMNode', () => {
+ 	it( 'should return null when passed null', () => {
+ 		expect( findDOMNodePolyfill( null ) ).toBeNull();
+ 		expect( console ).toHaveWarned();
+diff --git a/packages/element/src/test/react-polyfill.js b/packages/element/src/test/react-polyfill.js
+index b76767459334d6..f6ca746344a2f7 100644
+--- a/packages/element/src/test/react-polyfill.js
++++ b/packages/element/src/test/react-polyfill.js
+@@ -4,7 +4,7 @@
+ import { createElement } from '..';
+ import { render, hydrate, unmountComponentAtNode } from '../react-polyfill';
+ 
+-describe( 'render', () => {
++describe.skip( 'render', () => {
+ 	it( 'should render into a container', () => {
+ 		const container = document.createElement( 'div' );
+ 
+@@ -34,7 +34,7 @@ describe( 'render', () => {
+ 	} );
+ } );
+ 
+-describe( 'hydrate', () => {
++describe.skip( 'hydrate', () => {
+ 	it( 'should hydrate into a container with matching markup', () => {
+ 		const container = document.createElement( 'div' );
+ 		container.innerHTML = '<p>hello</p>';
+@@ -56,7 +56,7 @@ describe( 'hydrate', () => {
+ 	} );
+ } );
+ 
+-describe( 'unmountComponentAtNode', () => {
++describe.skip( 'unmountComponentAtNode', () => {
+ 	it( 'should return false when the container has no root', () => {
+ 		const container = document.createElement( 'div' );
+ 
+diff --git a/packages/fields/package.json b/packages/fields/package.json
+index 467d5ed4c21990..13f5f2f46be81b 100644
+--- a/packages/fields/package.json
++++ b/packages/fields/package.json
+@@ -48,7 +48,7 @@
+ 	],
+ 	"dependencies": {
+ 		"@react-spring/web": "^9.4.5",
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/blob": "file:../blob",
+@@ -80,7 +80,7 @@
+ 		"remove-accents": "^0.5.0"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/fields/src/components/media-edit/index.tsx b/packages/fields/src/components/media-edit/index.tsx
+index 82aee568dc2ec0..801ab1e1f73b9d 100644
+--- a/packages/fields/src/components/media-edit/index.tsx
++++ b/packages/fields/src/components/media-edit/index.tsx
+@@ -641,7 +641,9 @@ export default function MediaEdit< Item >( {
+ 	// reorders (same IDs), we fall back to the cached list to avoid a visual
+ 	// flash in compact mode. For replacements/uploads (new IDs not in cache),
+ 	// we let attachments be null as normal.
+-	const stableAttachmentsRef = useRef< Attachment< 'view' >[] >( null );
++	const stableAttachmentsRef = useRef< Attachment< 'view' >[] | null >(
++		null
++	);
+ 	if ( attachments !== null ) {
+ 		stableAttachmentsRef.current = attachments;
+ 	}
+diff --git a/packages/format-library/package.json b/packages/format-library/package.json
+index 9a27bf379c3470..b38f52e8aee60a 100644
+--- a/packages/format-library/package.json
++++ b/packages/format-library/package.json
+@@ -64,8 +64,8 @@
+ 		"@testing-library/user-event": "^14.6.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/global-styles-ui/package.json b/packages/global-styles-ui/package.json
+index 23cfaa9ea59fe4..2a4aba5202149e 100644
+--- a/packages/global-styles-ui/package.json
++++ b/packages/global-styles-ui/package.json
+@@ -44,7 +44,7 @@
+ 	},
+ 	"react-native": "src/index",
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+@@ -71,8 +71,8 @@
+ 		"@testing-library/react": "^16.3.2"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/grid/package.json b/packages/grid/package.json
+index a75a94cb940d22..2c661da539163f 100644
+--- a/packages/grid/package.json
++++ b/packages/grid/package.json
+@@ -50,7 +50,7 @@
+ 		"@dnd-kit/core": "^6.3.1",
+ 		"@dnd-kit/sortable": "^10.0.0",
+ 		"@dnd-kit/utilities": "^3.2.2",
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/style-runtime": "file:../style-runtime",
+@@ -64,8 +64,8 @@
+ 		"@wordpress/ui": "file:../ui"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/grid/src/dashboard-grid/grid-item.tsx b/packages/grid/src/dashboard-grid/grid-item.tsx
+index 63c9c42dcc30d1..86bcaced5d759f 100644
+--- a/packages/grid/src/dashboard-grid/grid-item.tsx
++++ b/packages/grid/src/dashboard-grid/grid-item.tsx
+@@ -154,7 +154,7 @@ export function GridItem( {
+ 				>
+ 					<div
+ 						style={ { display: 'contents' } }
+-						inert={ dragging || undefined }
++						{ ...( dragging ? { inert: '' } : {} ) }
+ 					>
+ 						{ actionableArea }
+ 					</div>
+diff --git a/packages/grid/src/dashboard-grid/index.tsx b/packages/grid/src/dashboard-grid/index.tsx
+index 80437a23971aac..cbd7008fcc700e 100644
+--- a/packages/grid/src/dashboard-grid/index.tsx
++++ b/packages/grid/src/dashboard-grid/index.tsx
+@@ -145,9 +145,9 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
+ 		} | null >( null );
+ 		// Mirror of `temporaryLayout` read synchronously on drag end —
+ 		// the state update from `handleDragMove` may still be batched.
+-		const latestLayoutRef = useRef< DashboardGridLayoutItem[] | undefined >(
+-			undefined
+-		);
++		const latestLayoutRef = useRef<
++			DashboardGridLayoutItem[] | undefined
++		>();
+ 		// Cursor center at the last applied reorder. Used to skip the
+ 		// cascade of re-measured `onDragMove` events after a layout
+ 		// change, when the cursor has not actually moved.
+@@ -315,13 +315,10 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
+ 
+ 					// Strip `actionableArea` so it does not leak to the DOM;
+ 					// the grid lifts it to a slot separately.
+-					const typedChild = child as React.ReactElement< {
+-						actionableArea?: React.ReactNode;
+-					} >;
+-					const { actionableArea } = typedChild.props;
++					const { actionableArea } = child.props;
+ 					const stripped =
+ 						actionableArea !== undefined
+-							? cloneElement( typedChild, {
++							? cloneElement( child, {
+ 									actionableArea: undefined,
+ 							  } )
+ 							: child;
+diff --git a/packages/grid/src/dashboard-lanes/index.tsx b/packages/grid/src/dashboard-lanes/index.tsx
+index 175e12498af9b2..b34af4629eb2e2 100644
+--- a/packages/grid/src/dashboard-lanes/index.tsx
++++ b/packages/grid/src/dashboard-lanes/index.tsx
+@@ -140,7 +140,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
+ 		} | null >( null );
+ 		const latestLayoutRef = useRef<
+ 			DashboardLanesLayoutItem[] | undefined
+-		>( undefined );
++		>();
+ 		const lastReorderCursorRef = useRef< {
+ 			x: number;
+ 			y: number;
+diff --git a/packages/grid/src/dashboard-lanes/lanes-item.tsx b/packages/grid/src/dashboard-lanes/lanes-item.tsx
+index f2be9999efa9e9..0cbed16d1ffc40 100644
+--- a/packages/grid/src/dashboard-lanes/lanes-item.tsx
++++ b/packages/grid/src/dashboard-lanes/lanes-item.tsx
+@@ -197,7 +197,7 @@ export function LanesItem( {
+ 				>
+ 					<div
+ 						style={ { display: 'contents' } }
+-						inert={ dragging || undefined }
++						{ ...( dragging ? { inert: '' } : {} ) }
+ 					>
+ 						{ actionableArea }
+ 					</div>
+diff --git a/packages/icons/package.json b/packages/icons/package.json
+index 81b5000fb11e21..bd7e3b3b0a87bc 100644
+--- a/packages/icons/package.json
++++ b/packages/icons/package.json
+@@ -44,13 +44,13 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"change-case": "4.1.2"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/icons/src/icon/index.ts b/packages/icons/src/icon/index.ts
+index 9928619f9b55af..e30a0d6a00e154 100644
+--- a/packages/icons/src/icon/index.ts
++++ b/packages/icons/src/icon/index.ts
+@@ -30,15 +30,12 @@ export interface IconProps extends SVGProps {
+  * @return Icon component
+  */
+ export default forwardRef< HTMLElement, IconProps >(
+-	( { icon, size = 24, ...props }, ref ) => {
+-		return cloneElement(
+-			icon as ReactElement< React.RefAttributes< Element > >,
+-			{
+-				width: size,
+-				height: size,
+-				...props,
+-				ref,
+-			}
+-		);
++	( { icon, size = 24, ...props }: IconProps, ref ) => {
++		return cloneElement( icon, {
++			width: size,
++			height: size,
++			...props,
++			ref,
++		} );
+ 	}
+ );
+diff --git a/packages/image-cropper/package.json b/packages/image-cropper/package.json
+index aa89ecece6a522..3dc813c2fe04f3 100644
+--- a/packages/image-cropper/package.json
++++ b/packages/image-cropper/package.json
+@@ -44,7 +44,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/i18n": "file:../i18n",
+@@ -53,8 +53,8 @@
+ 		"react-easy-crop": "^5.4.2"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/interface/package.json b/packages/interface/package.json
+index b28303837ed753..5ad81ac0c92a4d 100644
+--- a/packages/interface/package.json
++++ b/packages/interface/package.json
+@@ -73,8 +73,8 @@
+ 		"@testing-library/react": "^16.3.2"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/keyboard-shortcuts/package.json b/packages/keyboard-shortcuts/package.json
+index 76042df7f0926a..56bd766643d0ff 100644
+--- a/packages/keyboard-shortcuts/package.json
++++ b/packages/keyboard-shortcuts/package.json
+@@ -43,13 +43,13 @@
+ 	"wpScript": true,
+ 	"types": "build-types/index.d.ts",
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/data": "file:../data",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/keycodes": "file:../keycodes"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/keyboard-shortcuts/src/hooks/use-shortcut.ts b/packages/keyboard-shortcuts/src/hooks/use-shortcut.ts
+index 1aba2524d1fc73..e33ec06bbf2bfc 100644
+--- a/packages/keyboard-shortcuts/src/hooks/use-shortcut.ts
++++ b/packages/keyboard-shortcuts/src/hooks/use-shortcut.ts
+@@ -28,9 +28,7 @@ export default function useShortcut(
+ ) {
+ 	const shortcuts = useContext( context );
+ 	const isMatch = useShortcutEventMatch();
+-	const callbackRef = useRef<
+-		( ( event: KeyboardEvent ) => void ) | undefined
+-	>( undefined );
++	const callbackRef = useRef< ( event: KeyboardEvent ) => void >();
+ 
+ 	useEffect( () => {
+ 		callbackRef.current = callback;
+diff --git a/packages/keycodes/package.json b/packages/keycodes/package.json
+index ae89662d7877e3..e119d49619c530 100644
+--- a/packages/keycodes/package.json
++++ b/packages/keycodes/package.json
+@@ -44,7 +44,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/i18n": "file:../i18n"
+ 	},
+ 	"publishConfig": {
+diff --git a/packages/lazy-editor/package.json b/packages/lazy-editor/package.json
+index b88d18e318b620..ca64fd496f012e 100644
+--- a/packages/lazy-editor/package.json
++++ b/packages/lazy-editor/package.json
+@@ -45,7 +45,7 @@
+ 	"wpScriptModuleExports": "./build-module/index.mjs",
+ 	"types": "build-types",
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/asset-loader": "file:../asset-loader",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/block-editor": "file:../block-editor",
+diff --git a/packages/list-reusable-blocks/package.json b/packages/list-reusable-blocks/package.json
+index 112cbf87a47196..86fa539e81285f 100644
+--- a/packages/list-reusable-blocks/package.json
++++ b/packages/list-reusable-blocks/package.json
+@@ -45,7 +45,7 @@
+ 	"wpScript": true,
+ 	"types": "build-types",
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/blob": "file:../blob",
+@@ -57,8 +57,8 @@
+ 		"change-case": "^4.1.2"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/media-editor/package.json b/packages/media-editor/package.json
+index 6858d45f625de7..0d948c0f9cedc1 100644
+--- a/packages/media-editor/package.json
++++ b/packages/media-editor/package.json
+@@ -44,7 +44,7 @@
+ 		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+@@ -71,7 +71,7 @@
+ 		"@testing-library/user-event": "^14.6.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/media-editor/src/components/media-editor/index.tsx b/packages/media-editor/src/components/media-editor/index.tsx
+index 87f87e044f49dc..89ddad42045556 100644
+--- a/packages/media-editor/src/components/media-editor/index.tsx
++++ b/packages/media-editor/src/components/media-editor/index.tsx
+@@ -37,11 +37,7 @@ import {
+ 	// No type declarations available for @wordpress/interface.
+ 	// @ts-expect-error
+ } from '@wordpress/interface';
+-import type {
+-	JSX,
+-	KeyboardEvent as ReactKeyboardEvent,
+-	ReactNode,
+-} from 'react';
++import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -398,9 +394,8 @@ function MediaEditorContent( {
+ 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
+ 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
+ 		useState( false );
+-	const placementControlTimerRef = useRef<
+-		ReturnType< typeof setTimeout > | undefined
+-	>( undefined );
++	const placementControlTimerRef =
++		useRef< ReturnType< typeof setTimeout > >();
+ 
+ 	const signalPlacementControlInteraction = useCallback( () => {
+ 		setIsPlacementActive( true );
+diff --git a/packages/media-editor/src/hooks/use-crop-gesture-handlers.ts b/packages/media-editor/src/hooks/use-crop-gesture-handlers.ts
+index 7b9d5b04c71465..660cf400aadb27 100644
+--- a/packages/media-editor/src/hooks/use-crop-gesture-handlers.ts
++++ b/packages/media-editor/src/hooks/use-crop-gesture-handlers.ts
+@@ -50,9 +50,7 @@ export function useCropGestureHandlers(
+ ) {
+ 	const { commitOnKeyUp = true } = options;
+ 	const { beginGesture, endGesture } = useMediaEditor();
+-	const keyboardTimerRef = useRef<
+-		ReturnType< typeof setTimeout > | undefined
+-	>( undefined );
++	const keyboardTimerRef = useRef< ReturnType< typeof setTimeout > >();
+ 
+ 	const clearKeyboardTimer = useCallback( () => {
+ 		clearTimeout( keyboardTimerRef.current );
+diff --git a/packages/media-editor/src/image-editor/react/components/cropper.tsx b/packages/media-editor/src/image-editor/react/components/cropper.tsx
+index ca56e02366d5b1..778d9dcab6942b 100644
+--- a/packages/media-editor/src/image-editor/react/components/cropper.tsx
++++ b/packages/media-editor/src/image-editor/react/components/cropper.tsx
+@@ -541,9 +541,7 @@ function CropperInner(
+ 
+ 	// Settling animation: brief linear transition after resize end.
+ 	const [ settling, setSettling ] = useState( false );
+-	const settleTimerRef = useRef<
+-		ReturnType< typeof setTimeout > | undefined
+-	>( undefined );
++	const settleTimerRef = useRef< ReturnType< typeof setTimeout > >();
+ 
+ 	// Clear the pending settle timer on unmount so it can't fire a
+ 	// state update on an unmounted component.
+diff --git a/packages/media-editor/src/image-editor/react/components/stencils/rectangle-stencil.tsx b/packages/media-editor/src/image-editor/react/components/stencils/rectangle-stencil.tsx
+index 219131546ced7b..79c1590b93e465 100644
+--- a/packages/media-editor/src/image-editor/react/components/stencils/rectangle-stencil.tsx
++++ b/packages/media-editor/src/image-editor/react/components/stencils/rectangle-stencil.tsx
+@@ -134,9 +134,7 @@ export function RectangleStencil( {
+ 		} ),
+ 		[ boundsMinX, boundsMinY, boundsMaxX, boundsMaxY ]
+ 	);
+-	const keyboardSettleTimerRef = useRef<
+-		ReturnType< typeof setTimeout > | undefined
+-	>( undefined );
++	const keyboardSettleTimerRef = useRef< ReturnType< typeof setTimeout > >();
+ 	const keyboardResizeActiveRef = useRef( false );
+ 	const resizeHandleDescriptionId = useId();
+ 	const hasLockedRatio = !! ( aspectRatio && aspectRatio > 0 );
+diff --git a/packages/media-editor/src/image-editor/react/hooks/use-aria-announcer.ts b/packages/media-editor/src/image-editor/react/hooks/use-aria-announcer.ts
+index fb587cfa5abe5f..0134362b185ac2 100644
+--- a/packages/media-editor/src/image-editor/react/hooks/use-aria-announcer.ts
++++ b/packages/media-editor/src/image-editor/react/hooks/use-aria-announcer.ts
+@@ -89,9 +89,7 @@ function buildAnnouncement(
+  */
+ export function useAriaAnnouncer( state: CropperState ): string {
+ 	const [ ariaMessage, setAriaMessage ] = useState( '' );
+-	const timerRef = useRef< ReturnType< typeof setTimeout > | undefined >(
+-		undefined
+-	);
++	const timerRef = useRef< ReturnType< typeof setTimeout > >();
+ 	const prevMessageRef = useRef( '' );
+ 	const prevStateRef = useRef< CropperState | null >( null );
+ 	const latestStateRef = useRef( state );
+diff --git a/packages/media-editor/src/image-editor/react/hooks/use-interaction.ts b/packages/media-editor/src/image-editor/react/hooks/use-interaction.ts
+index ba24e3b889fcf6..3a1306b333c52c 100644
+--- a/packages/media-editor/src/image-editor/react/hooks/use-interaction.ts
++++ b/packages/media-editor/src/image-editor/react/hooks/use-interaction.ts
+@@ -108,9 +108,8 @@ export function useInteraction(
+ 	const [ isZooming, setIsZooming ] = useState( false );
+ 	const [ isGestureActive, setIsGestureActive ] = useState( false );
+ 	const [ isKeyboardPanning, setIsKeyboardPanning ] = useState( false );
+-	const keyboardInteractionTimerRef = useRef<
+-		ReturnType< typeof setTimeout > | undefined
+-	>( undefined );
++	const keyboardInteractionTimerRef =
++		useRef< ReturnType< typeof setTimeout > >();
+ 	// Tracks whether a keyboard gesture (pan or zoom) is currently active so
+ 	// onGestureStart is only fired once per gesture, not on every key repeat.
+ 	const isKeyboardGestureActiveRef = useRef( false );
+diff --git a/packages/media-fields/package.json b/packages/media-fields/package.json
+index 3d4e4dbb0187b0..d56ebb833f592c 100644
+--- a/packages/media-fields/package.json
++++ b/packages/media-fields/package.json
+@@ -49,7 +49,7 @@
+ 		"src/**/*.scss"
+ 	],
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/compose": "file:../compose",
+@@ -72,7 +72,7 @@
+ 		"@types/jest": "^29.5.14"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/media-utils/package.json b/packages/media-utils/package.json
+index d63fd9078466a7..aa24d20ffc6ffa 100644
+--- a/packages/media-utils/package.json
++++ b/packages/media-utils/package.json
+@@ -47,7 +47,7 @@
+ 		"build-style/**"
+ 	],
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/blob": "file:../blob",
+@@ -71,7 +71,7 @@
+ 		"@testing-library/user-event": "^14.6.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/notices/package.json b/packages/notices/package.json
+index 5cd15d7c04fcfa..389e84dc4e6226 100644
+--- a/packages/notices/package.json
++++ b/packages/notices/package.json
+@@ -49,7 +49,7 @@
+ 		"src/**/*.scss"
+ 	],
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/data": "file:../data",
+@@ -61,7 +61,7 @@
+ 		"deep-freeze": "0.0.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/nux/package.json b/packages/nux/package.json
+index 989f244fc35357..bbbe496e7e6767 100644
+--- a/packages/nux/package.json
++++ b/packages/nux/package.json
+@@ -62,8 +62,8 @@
+ 		"@testing-library/user-event": "^14.6.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/patterns/package.json b/packages/patterns/package.json
+index 2f03dea4984701..598f18e9d790fa 100644
+--- a/packages/patterns/package.json
++++ b/packages/patterns/package.json
+@@ -69,8 +69,8 @@
+ 		"@wordpress/url": "file:../url"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/plugins/package.json b/packages/plugins/package.json
+index c62ebffa6318f1..0b2dca54dbf18b 100644
+--- a/packages/plugins/package.json
++++ b/packages/plugins/package.json
+@@ -43,7 +43,7 @@
+ 	"wpScript": true,
+ 	"types": "build-types",
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/deprecated": "file:../deprecated",
+@@ -58,8 +58,8 @@
+ 		"@testing-library/react": "^16.3.2"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/preferences/package.json b/packages/preferences/package.json
+index 85915cfe908adf..01968a83106485 100644
+--- a/packages/preferences/package.json
++++ b/packages/preferences/package.json
+@@ -51,7 +51,7 @@
+ 	],
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+@@ -65,8 +65,8 @@
+ 		"clsx": "^2.1.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/primitives/package.json b/packages/primitives/package.json
+index 857bb31f2913ad..986a93b5039440 100644
+--- a/packages/primitives/package.json
++++ b/packages/primitives/package.json
+@@ -47,12 +47,12 @@
+ 		"src/**/*.scss"
+ 	],
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/element": "file:../element",
+ 		"clsx": "^2.1.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/react-i18n/package.json b/packages/react-i18n/package.json
+index e9582d63b552b8..b057d7ea2bc9de 100644
+--- a/packages/react-i18n/package.json
++++ b/packages/react-i18n/package.json
+@@ -44,7 +44,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"utility-types": "^3.10.0"
+diff --git a/packages/reusable-blocks/package.json b/packages/reusable-blocks/package.json
+index 3ae636cb833510..bffd5927f3f7f6 100644
+--- a/packages/reusable-blocks/package.json
++++ b/packages/reusable-blocks/package.json
+@@ -64,8 +64,8 @@
+ 		"@wordpress/url": "file:../url"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/rich-text/package.json b/packages/rich-text/package.json
+index e34488299033e2..293bcc403013b8 100644
+--- a/packages/rich-text/package.json
++++ b/packages/rich-text/package.json
+@@ -52,7 +52,7 @@
+ 		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/data": "file:../data",
+@@ -70,7 +70,7 @@
+ 		"deep-freeze": "0.0.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/route/package.json b/packages/route/package.json
+index 381031fa984f2a..39f0dfb75ca17b 100644
+--- a/packages/route/package.json
++++ b/packages/route/package.json
+@@ -48,7 +48,7 @@
+ 		"@wordpress/private-apis": "file:../private-apis"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/router/package.json b/packages/router/package.json
+index 0b41292fccb2a7..e126994d4a6ccd 100644
+--- a/packages/router/package.json
++++ b/packages/router/package.json
+@@ -43,7 +43,7 @@
+ 	"wpScript": true,
+ 	"types": "build-types",
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/private-apis": "file:../private-apis",
+@@ -52,7 +52,7 @@
+ 		"route-recognizer": "^0.3.4"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/scripts/package.json b/packages/scripts/package.json
+index f530b92e01b210..13693d3ab89771 100644
+--- a/packages/scripts/package.json
++++ b/packages/scripts/package.json
+@@ -96,8 +96,8 @@
+ 	"peerDependencies": {
+ 		"@playwright/test": "^1.58.2",
+ 		"@wordpress/env": ">=10.0.0",
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"peerDependenciesMeta": {
+ 		"@wordpress/env": {
+diff --git a/packages/server-side-render/package.json b/packages/server-side-render/package.json
+index 955b3d3935e830..b535e88af70d02 100644
+--- a/packages/server-side-render/package.json
++++ b/packages/server-side-render/package.json
+@@ -45,7 +45,7 @@
+ 	"wpScriptDefaultExport": true,
+ 	"types": "build-types/index.d.ts",
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/blocks": "file:../blocks",
+ 		"@wordpress/components": "file:../components",
+@@ -57,8 +57,8 @@
+ 		"@wordpress/url": "file:../url"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/style-engine/package.json b/packages/style-engine/package.json
+index 3217dcb79239bf..aa44553c8e4091 100644
+--- a/packages/style-engine/package.json
++++ b/packages/style-engine/package.json
+@@ -65,7 +65,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"change-case": "^4.1.2"
+ 	},
+ 	"publishConfig": {
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 52849565a22cc4..d16a6bdb983b31 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -7,14 +7,13 @@
+ -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+ 
+ ### Breaking Changes
+-
++- Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
+ -   Drop the experimental `density` support from `ThemeProvider`. The `density` prop has been removed, along with the related `data-wpds-density` attribute and the per-density overrides on `--wpds-dimension-padding-*` / `--wpds-dimension-gap-*` tokens ([#78741](https://github.com/WordPress/gutenberg/pull/78741)).
+ 
+ ## 0.14.0 (2026-05-27)
+ 
+ ### Breaking Changes
+ 
+--   Upgrade React to v19 ([#61521](https://github.com/WordPress/gutenberg/pull/61521)).
+ -   The `color.primary` and `color.bg` props on `ThemeProvider` now require an sRGB-parseable string (hex, `rgb(...)`, or CSS named color). Other CSS color formats like `hsl(...)`, `oklch(...)`, and `lab(...)` are no longer supported ([#77653](https://github.com/WordPress/gutenberg/pull/77653)).
+ 
+ ### Documentation
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index d00ee3621678cd..894398952b3ab0 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -80,7 +80,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/style-runtime": "file:../style-runtime",
+@@ -100,8 +100,8 @@
+ 		"storybook": "^10.2.8"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4",
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0",
+ 		"stylelint": "^16.8.2"
+ 	},
+ 	"peerDependenciesMeta": {
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index fa921b0dc08716..c45b456e269206 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
++
+ ### Code Quality
+ 
+ -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index ba26a4c93acd18..b20eeab05d0681 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -44,7 +44,7 @@
+ 	"sideEffects": false,
+ 	"dependencies": {
+ 		"@base-ui/react": "^1.4.1",
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/element": "file:../element",
+@@ -70,8 +70,8 @@
+ 		"storybook": "^10.2.8"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/ui/src/utils/create-overlay-title-validation.tsx b/packages/ui/src/utils/create-overlay-title-validation.tsx
+index 35e591aa0b8335..ac18b928814b76 100644
+--- a/packages/ui/src/utils/create-overlay-title-validation.tsx
++++ b/packages/ui/src/utils/create-overlay-title-validation.tsx
+@@ -46,7 +46,7 @@ export function createOverlayTitleValidation( componentName: string ) {
+ 	function ValidationProviderDev( {
+ 		children,
+ 	}: OverlayValidationProviderProps ) {
+-		const titleElementRef = useRef< HTMLElement >( null );
++		const titleElementRef = useRef< HTMLElement | null >( null );
+ 
+ 		const scheduleValidation = useScheduleValidation( () => {
+ 			const titleElement = titleElementRef.current;
+diff --git a/packages/ui/src/utils/render-slot-with-children.ts b/packages/ui/src/utils/render-slot-with-children.ts
+index fe54ab0b873597..ee8e8114d1dea9 100644
+--- a/packages/ui/src/utils/render-slot-with-children.ts
++++ b/packages/ui/src/utils/render-slot-with-children.ts
+@@ -27,8 +27,5 @@ export function renderSlotWithChildren(
+ 	defaultSlot: ReactElement,
+ 	children: ReactNode
+ ): ReactElement {
+-	return cloneElement(
+-		( slot ?? defaultSlot ) as ReactElement< { children?: ReactNode } >,
+-		{ children }
+-	);
++	return cloneElement( slot ?? defaultSlot, { children } );
+ }
+diff --git a/packages/upload-media/package.json b/packages/upload-media/package.json
+index 2fbf7a1c2c29b9..d045bd8a82c34d 100644
+--- a/packages/upload-media/package.json
++++ b/packages/upload-media/package.json
+@@ -49,7 +49,7 @@
+ 		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/blob": "file:../blob",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/data": "file:../data",
+@@ -62,8 +62,8 @@
+ 		"uuid": "^14.0.0"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/viewport/package.json b/packages/viewport/package.json
+index ed0162fbbe8a3e..ba0b769aaca56f 100644
+--- a/packages/viewport/package.json
++++ b/packages/viewport/package.json
+@@ -43,7 +43,7 @@
+ 	"wpScript": true,
+ 	"types": "build-types",
+ 	"dependencies": {
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/data": "file:../data",
+ 		"@wordpress/element": "file:../element"
+@@ -54,7 +54,7 @@
+ 		"deep-freeze": "0.0.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4"
++		"react": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/widgets/package.json b/packages/widgets/package.json
+index 1db266b1c216ba..94b3d5037669bb 100644
+--- a/packages/widgets/package.json
++++ b/packages/widgets/package.json
+@@ -79,8 +79,8 @@
+ 		"clsx": "^2.1.1"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/workflow/package.json b/packages/workflow/package.json
+index 643374c1ff741b..fc59fd66ba89b5 100644
+--- a/packages/workflow/package.json
++++ b/packages/workflow/package.json
+@@ -61,8 +61,8 @@
+ 		"cmdk": "^1.0.0"
+ 	},
+ 	"peerDependencies": {
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/platform-docs/package.json b/platform-docs/package.json
+index 31ea5f238fb56f..d2d40a9258a0b9 100644
+--- a/platform-docs/package.json
++++ b/platform-docs/package.json
+@@ -25,8 +25,8 @@
+ 		"@mdx-js/react": "^3.0.0",
+ 		"clsx": "^1.2.1",
+ 		"docusaurus-lunr-search": "^3.3.2",
+-		"react": "^19.2.4",
+-		"react-dom": "^19.2.4"
++		"react": "^18.3.0",
++		"react-dom": "^18.3.0"
+ 	},
+ 	"devDependencies": {
+ 		"@docusaurus/module-type-aliases": "^3.1.1",
+diff --git a/routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.tsx b/routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.tsx
+index 53690527c0ea56..ffcb6af6af9c1a 100644
+--- a/routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.tsx
++++ b/routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.tsx
+@@ -226,7 +226,7 @@ export const DashboardWidgetChrome = forwardRef<
+ 				ref={ ref }
+ 				className={ clsx( styles.widgetChrome, className ) }
+ 				aria-labelledby={ widgetType.title ? titleId : undefined }
+-				inert={ editMode || undefined }
++				inert={ editMode ? 'true' : undefined }
+ 			>
+ 				{ isHeaderHidden ? (
+ 					<VisuallyHidden>{ header }</VisuallyHidden>
+diff --git a/routes/dashboard/widget-dashboard/components/widget-picker/widget-picker.tsx b/routes/dashboard/widget-dashboard/components/widget-picker/widget-picker.tsx
+index 800a8a85db3fa1..05799d87070226 100644
+--- a/routes/dashboard/widget-dashboard/components/widget-picker/widget-picker.tsx
++++ b/routes/dashboard/widget-dashboard/components/widget-picker/widget-picker.tsx
+@@ -32,7 +32,7 @@ function WidgetPreview( { item }: { item: WidgetType } ) {
+ 	);
+ 
+ 	return (
+-		<div className={ styles.preview } inert>
++		<div className={ styles.preview } { ...{ inert: '' } }>
+ 			<Suspense fallback={ null }>
+ 				<DashboardWidgetRender
+ 					widget={ exampleWidget }
+diff --git a/storybook/package.json b/storybook/package.json
+index 7ae1c447f1b610..660ce58b20c7f7 100644
+--- a/storybook/package.json
++++ b/storybook/package.json
+@@ -31,7 +31,7 @@
+ 		"@storybook/addon-docs": "^10.2.8",
+ 		"@storybook/icons": "^2.0.1",
+ 		"@storybook/react-vite": "^10.2.8",
+-		"@types/react": "^19.2.13",
++		"@types/react": "^18.3.27",
+ 		"@vitejs/plugin-react": "^5.1.2",
+ 		"@wordpress/theme": "file:../packages/theme",
+ 		"storybook": "^10.2.8",
+diff --git a/test/e2e/specs/editor/various/pattern-overrides.spec.js b/test/e2e/specs/editor/various/pattern-overrides.spec.js
+index 616a1be411b767..9c2b2b7a5db27a 100644
+--- a/test/e2e/specs/editor/various/pattern-overrides.spec.js
++++ b/test/e2e/specs/editor/various/pattern-overrides.spec.js
+@@ -152,8 +152,14 @@ test.describe( 'Pattern Overrides', () => {
+ 			} );
+ 			// Ensure the first pattern is selected.
+ 			await patternBlocks.first().selectText();
+-			await expect( paragraphs.first() ).not.toHaveAttribute( 'inert' );
+-			await expect( paragraphs.last() ).toHaveAttribute( 'inert' );
++			await expect( paragraphs.first() ).not.toHaveAttribute(
++				'inert',
++				'true'
++			);
++			await expect( paragraphs.last() ).toHaveAttribute(
++				'inert',
++				'true'
++			);
+ 
+ 			await expect( paragraphs.first() ).toHaveText(
+ 				'This paragraph can be edited'
+@@ -460,11 +466,21 @@ test.describe( 'Pattern Overrides', () => {
+ 				// are inert due to the 'click-through' behavior, that requires the
+ 				// pattern block be selected first before its inner blocks are selectable.
+ 				await editor.selectBlocks( groupBlock );
+-				await expect( patternBlock ).not.toHaveAttribute( 'inert' );
+-				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
+-				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
++				await expect( patternBlock ).not.toHaveAttribute(
++					'inert',
++					'true'
++				);
++				await expect( blockWithOverrides ).toHaveAttribute(
++					'inert',
++					'true'
++				);
++				await expect( blockWithBindings ).toHaveAttribute(
++					'inert',
++					'true'
++				);
+ 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
+-					'inert'
++					'inert',
++					'true'
+ 				);
+ 			} );
+ 
+@@ -475,13 +491,16 @@ test.describe( 'Pattern Overrides', () => {
+ 				// of the pattern with bindings are editable, but unbound
+ 				// blocks are inert.
+ 				await expect( blockWithOverrides ).not.toHaveAttribute(
+-					'inert'
++					'inert',
++					'true'
+ 				);
+ 				await expect( blockWithBindings ).not.toHaveAttribute(
+-					'inert'
++					'inert',
++					'true'
+ 				);
+ 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
+-					'inert'
++					'inert',
++					'true'
+ 				);
+ 			} );
+ 
+@@ -490,16 +509,26 @@ test.describe( 'Pattern Overrides', () => {
+ 
+ 				// In zoomed out only the pattern block is editable,
+ 				// as in this scenario it's a section.
+-				await expect( patternBlock ).not.toHaveAttribute( 'inert' );
++				await expect( patternBlock ).not.toHaveAttribute(
++					'inert',
++					'true'
++				);
+ 
+ 				// Ensure the pattern block is selected before checking the child blocks
+ 				// to ensure the click-through behavior isn't interfering.
+ 				await editor.selectBlocks( patternBlock );
+ 
+-				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
+-				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
++				await expect( blockWithOverrides ).toHaveAttribute(
++					'inert',
++					'true'
++				);
++				await expect( blockWithBindings ).toHaveAttribute(
++					'inert',
++					'true'
++				);
+ 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
+-					'inert'
++					'inert',
++					'true'
+ 				);
+ 			} );
+ 
+@@ -510,10 +539,17 @@ test.describe( 'Pattern Overrides', () => {
+ 
+ 			await test.step( 'Zoomed out - pattern nested in a section', async () => {
+ 				// None of the pattern is editable in zoomed out when nested in a section.
+-				await expect( blockWithOverrides ).toHaveAttribute( 'inert' );
+-				await expect( blockWithBindings ).toHaveAttribute( 'inert' );
++				await expect( blockWithOverrides ).toHaveAttribute(
++					'inert',
++					'true'
++				);
++				await expect( blockWithBindings ).toHaveAttribute(
++					'inert',
++					'true'
++				);
+ 				await expect( blockWithoutOverridesOrBindings ).toHaveAttribute(
+-					'inert'
++					'inert',
++					'true'
+ 				);
+ 			} );
+ 		} );
+@@ -579,11 +615,11 @@ test.describe( 'Pattern Overrides', () => {
+ 				name: 'Block: Paragraph',
+ 			} );
+ 			await expect( headingBlock ).toHaveText( 'Outer heading (edited)' );
+-			await expect( headingBlock ).not.toHaveAttribute( 'inert' );
++			await expect( headingBlock ).not.toHaveAttribute( 'inert', 'true' );
+ 			await expect( paragraphBlock ).toHaveText(
+ 				'Inner paragraph (edited)'
+ 			);
+-			await expect( paragraphBlock ).toHaveAttribute( 'inert' );
++			await expect( paragraphBlock ).toHaveAttribute( 'inert', 'true' );
+ 
+ 			// Edit the outer pattern.
+ 			await editor.selectBlocks(
+@@ -608,7 +644,7 @@ test.describe( 'Pattern Overrides', () => {
+ 					name: 'Block: Paragraph',
+ 				} ),
+ 				'The inner paragraph should be editable'
+-			).not.toHaveAttribute( 'inert' );
++			).not.toHaveAttribute( 'inert', 'true' );
+ 
+ 			// Visit the post on the frontend.
+ 			await page.goto( `/?p=${ postId }` );
+diff --git a/test/e2e/specs/editor/various/post-content-focus-mode.spec.js b/test/e2e/specs/editor/various/post-content-focus-mode.spec.js
+index 679d12fadc1f31..db09993a47ea5f 100644
+--- a/test/e2e/specs/editor/various/post-content-focus-mode.spec.js
++++ b/test/e2e/specs/editor/various/post-content-focus-mode.spec.js
+@@ -224,7 +224,7 @@ test.describe( 'Post Content focus mode', () => {
+ 			const siteTitle = headerTemplatePart.getByRole( 'document', {
+ 				name: 'Block: Site Title',
+ 			} );
+-			await expect( siteTitle ).toHaveAttribute( 'inert' );
++			await expect( siteTitle ).toHaveAttribute( 'inert', 'true' );
+ 		} );
+ 
+ 		test( 'inserts blocks into Post Content from different selection states', async ( {
+diff --git a/tools/build-scripts/packages/build-vendors.mjs b/tools/build-scripts/packages/build-vendors.mjs
+index eacf2abe328873..b9b2297eb4a43f 100644
+--- a/tools/build-scripts/packages/build-vendors.mjs
++++ b/tools/build-scripts/packages/build-vendors.mjs
+@@ -20,7 +20,7 @@ const VENDOR_SCRIPTS = [
+ 			'module.exports = {',
+ 			'  ...require("react"),',
+ 			// Polyfill React 18 internals for older versions of `framer-motion`.
+-			'  __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: { ReactCurrentOwner: { current: null } },',
++			// '  __SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED: { ReactCurrentOwner: { current: null } },',
+ 			'};',
+ 		].join( '\n' ),
+ 	},
+@@ -33,7 +33,7 @@ const VENDOR_SCRIPTS = [
+ 			'module.exports = {',
+ 			'  ...require("react-dom"),',
+ 			'  ...require("react-dom/client"),',
+-			'  ...require("@wordpress/element/react-polyfill"),',
++			// '  ...require("@wordpress/element/react-polyfill"),',
+ 			'};',
+ 		].join( '\n' ),
+ 	},
+diff --git a/widgets/activity/package.json b/widgets/activity/package.json
+index 3d8e79f69bc501..f0b475dc3a6619 100644
+--- a/widgets/activity/package.json
++++ b/widgets/activity/package.json
+@@ -15,6 +15,6 @@
+ 		"@wordpress/ui": "file:../../packages/ui"
+ 	},
+ 	"devDependencies": {
+-		"@types/react": "^19.2.13"
++		"@types/react": "^18.3.27"
+ 	}
+ }
+diff --git a/widgets/events/package.json b/widgets/events/package.json
+index 7beaf764f7135c..16f720f9946bd1 100644
+--- a/widgets/events/package.json
++++ b/widgets/events/package.json
+@@ -14,6 +14,6 @@
+ 		"@wordpress/ui": "file:../../packages/ui"
+ 	},
+ 	"devDependencies": {
+-		"@types/react": "^19.2.13"
++		"@types/react": "^18.3.27"
+ 	}
+ }
+diff --git a/widgets/hello-dolly/package.json b/widgets/hello-dolly/package.json
+index d9a8c85d7d3dad..ebfdc929c61eaa 100644
+--- a/widgets/hello-dolly/package.json
++++ b/widgets/hello-dolly/package.json
+@@ -9,6 +9,6 @@
+ 		"@wordpress/ui": "file:../../packages/ui"
+ 	},
+ 	"devDependencies": {
+-		"@types/react": "^19.2.13"
++		"@types/react": "^18.3.27"
+ 	}
+ }
+diff --git a/widgets/hello-world/package.json b/widgets/hello-world/package.json
+index 98e609bb62c198..bba42f33dfd598 100644
+--- a/widgets/hello-world/package.json
++++ b/widgets/hello-world/package.json
+@@ -8,6 +8,6 @@
+ 		"clsx": "^2.1.1"
+ 	},
+ 	"devDependencies": {
+-		"@types/react": "^19.2.13"
++		"@types/react": "^18.3.27"
+ 	}
+ }
+diff --git a/widgets/news/package.json b/widgets/news/package.json
+index 3224b370c705b7..53434640786f3d 100644
+--- a/widgets/news/package.json
++++ b/widgets/news/package.json
+@@ -12,6 +12,6 @@
+ 		"@wordpress/ui": "file:../../packages/ui"
+ 	},
+ 	"devDependencies": {
+-		"@types/react": "^19.2.13"
++		"@types/react": "^18.3.27"
+ 	}
+ }
+diff --git a/widgets/quick-draft/package.json b/widgets/quick-draft/package.json
+index 2277319b64d014..461f18adefdca6 100644
+--- a/widgets/quick-draft/package.json
++++ b/widgets/quick-draft/package.json
+@@ -20,6 +20,6 @@
+ 		"clsx": "^2.1.1"
+ 	},
+ 	"devDependencies": {
+-		"@types/react": "^19.2.13"
++		"@types/react": "^18.3.27"
+ 	}
+ }
+diff --git a/widgets/site-health/package.json b/widgets/site-health/package.json
+index 8135ef3bafed23..b49747e341ebf6 100644
+--- a/widgets/site-health/package.json
++++ b/widgets/site-health/package.json
+@@ -12,6 +12,6 @@
+ 		"@wordpress/ui": "file:../../packages/ui"
+ 	},
+ 	"devDependencies": {
+-		"@types/react": "^19.2.13"
++		"@types/react": "^18.3.27"
+ 	}
+ }
+diff --git a/widgets/site-preview/package.json b/widgets/site-preview/package.json
+index 02ab0a6f6b9003..8355c89f5bf24b 100644
+--- a/widgets/site-preview/package.json
++++ b/widgets/site-preview/package.json
+@@ -13,6 +13,6 @@
+ 		"@wordpress/url": "file:../../packages/url"
+ 	},
+ 	"devDependencies": {
+-		"@types/react": "^19.2.13"
++		"@types/react": "^18.3.27"
+ 	}
+ }
+diff --git a/widgets/welcome/package.json b/widgets/welcome/package.json
+index 4359fe9b1ec715..5e20b238149bf4 100644
+--- a/widgets/welcome/package.json
++++ b/widgets/welcome/package.json
+@@ -9,11 +9,8 @@
+ 		"@wordpress/element": "file:../../packages/element",
+ 		"@wordpress/i18n": "file:../../packages/i18n",
+ 		"@wordpress/icons": "file:../../packages/icons",
+-		"@wordpress/primitives": "file:../../packages/primitives",
+ 		"@wordpress/ui": "file:../../packages/ui",
++		"@wordpress/primitives": "file:../../packages/primitives",
+ 		"clsx": "^2.1.1"
+-	},
+-	"devDependencies": {
+-		"@types/react": "^19.2.13"
+ 	}
+ }

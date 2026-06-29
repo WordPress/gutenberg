@@ -1,0 +1,233 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3674084f38e9e3..7ad6becdb8aef6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ -   `ToggleGroupControl`: Improve controlled value detection ([#57770](https://github.com/WordPress/gutenberg/pull/57770)).
+ -   `Tooltip`: Improve props forwarding to children of nested `Tooltip` components ([#57878](https://github.com/WordPress/gutenberg/pull/57878)).
+ -   `Tooltip`: revert prop types to only accept component-specific props ([#58125](https://github.com/WordPress/gutenberg/pull/58125)).
++-   `Button`: prevent the component from trashing and re-creating the HTML element ([#56490](https://github.com/WordPress/gutenberg/pull/56490)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index bd91de2ec2e83e..966075dd6e2b9a 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -195,9 +195,9 @@ export function UnforwardedButton(
+ 	const shouldShowTooltip =
+ 		! trulyDisabled &&
+ 		// An explicit tooltip is passed or...
+-		( ( showTooltip && label ) ||
++		( ( showTooltip && !! label ) ||
+ 			// There's a shortcut or...
+-			shortcut ||
++			!! shortcut ||
+ 			// There's a label and...
+ 			( !! label &&
+ 				// The children are empty and...
+@@ -249,40 +249,28 @@ export function UnforwardedButton(
+ 			</button>
+ 		);
+ 
+-	// Convert legacy `position` values to be used with the new `placement` prop
+-	let computedPlacement;
+-	// if `tooltipPosition` is defined, compute value to `placement`
+-	if ( tooltipPosition !== undefined ) {
+-		computedPlacement = positionToPlacement( tooltipPosition );
+-	}
+-
+-	if ( ! shouldShowTooltip ) {
+-		return (
+-			<>
+-				{ element }
+-				{ describedBy && (
+-					<VisuallyHidden>
+-						<span id={ descriptionId }>{ describedBy }</span>
+-					</VisuallyHidden>
+-				) }
+-			</>
+-		);
+-	}
+-
+-	return (
+-		<>
+-			<Tooltip
+-				text={
++	// In order to avoid some React reconciliation issues, we are always rendering
++	// the `Tooltip` component even when `shouldShowTooltip` is `false`.
++	// In order to make sure that the tooltip doesn't show when it shouldn't,
++	// we don't pass the props to the `Tooltip` component.
++	const tooltipProps = shouldShowTooltip
++		? {
++				text:
+ 					( children as string | ReactElement[] )?.length &&
+ 					describedBy
+ 						? describedBy
+-						: label
+-				}
+-				shortcut={ shortcut }
+-				placement={ computedPlacement }
+-			>
+-				{ element }
+-			</Tooltip>
++						: label,
++				shortcut,
++				placement:
++					tooltipPosition &&
++					// Convert legacy `position` values to be used with the new `placement` prop
++					positionToPlacement( tooltipPosition ),
++		  }
++		: {};
++
++	return (
++		<>
++			<Tooltip { ...tooltipProps }>{ element }</Tooltip>
+ 			{ describedBy && (
+ 				<VisuallyHidden>
+ 					<span id={ descriptionId }>{ describedBy }</span>
+diff --git a/packages/components/src/button/test/index.tsx b/packages/components/src/button/test/index.tsx
+index 345ae3813fe067..9b719f23a923f1 100644
+--- a/packages/components/src/button/test/index.tsx
++++ b/packages/components/src/button/test/index.tsx
+@@ -197,6 +197,43 @@ describe( 'Button', () => {
+ 			).not.toBeInTheDocument();
+ 		} );
+ 
++		it( 'should not trash the rendered HTML elements when toggling between showing and not showing a tooltip', async () => {
++			const user = userEvent.setup();
++
++			const { rerender } = render(
++				<Button label="Button label">Test button</Button>
++			);
++
++			const button = screen.getByRole( 'button', {
++				name: 'Button label',
++			} );
++
++			expect( button ).toBeVisible();
++
++			await user.tab();
++
++			expect( button ).toHaveFocus();
++
++			// Re-render the button, but this time change the settings so that it
++			// shows a tooltip.
++			rerender(
++				<Button label="Button label" showTooltip>
++					Test button
++				</Button>
++			);
++
++			// The same button element that we referenced before should still be
++			// in the document and have focus.
++			expect( button ).toHaveFocus();
++
++			// Re-render the button, but stop showing a tooltip.
++			rerender( <Button label="Button label">Test button</Button> );
++
++			// The same button element that we referenced before should still be
++			// in the document and have focus.
++			expect( button ).toHaveFocus();
++		} );
++
+ 		it( 'should add a disabled prop to the button', () => {
+ 			render( <Button disabled /> );
+ 
+diff --git a/packages/editor/src/components/post-saved-state/index.js b/packages/editor/src/components/post-saved-state/index.js
+index c3089057757d9d..ae9e03b5c300e6 100644
+--- a/packages/editor/src/components/post-saved-state/index.js
++++ b/packages/editor/src/components/post-saved-state/index.js
+@@ -9,7 +9,6 @@ import classnames from 'classnames';
+ import {
+ 	__unstableGetAnimateClassName as getAnimateClassName,
+ 	Button,
+-	Tooltip,
+ } from '@wordpress/components';
+ import { usePrevious, useViewportMatch } from '@wordpress/compose';
+ import { useDispatch, useSelect } from '@wordpress/data';
+@@ -129,54 +128,38 @@ export default function PostSavedState( { forceIsDirty } ) {
+ 		text = shortLabel;
+ 	}
+ 
+-	const buttonAccessibleLabel = text || label;
+-
+-	/**
+-	 * The tooltip needs to be enabled only if the button is not disabled. When
+-	 * relying on the internal Button tooltip functionality, this causes the
+-	 * resulting `button` element to be always removed and re-added to the DOM,
+-	 * causing focus loss. An alternative approach to circumvent the issue
+-	 * is not to use the `label` and `shortcut` props on `Button` (which would
+-	 * trigger the tooltip), and instead manually wrap the `Button` in a separate
+-	 * `Tooltip` component.
+-	 */
+-	const tooltipProps = isDisabled
+-		? undefined
+-		: {
+-				text: buttonAccessibleLabel,
+-				shortcut: displayShortcut.primary( 's' ),
+-		  };
+-
+ 	// Use common Button instance for all saved states so that focus is not
+ 	// lost.
+ 	return (
+-		<Tooltip { ...tooltipProps }>
+-			<Button
+-				className={
+-					isSaveable || isSaving
+-						? classnames( {
+-								'editor-post-save-draft': ! isSavedState,
+-								'editor-post-saved-state': isSavedState,
+-								'is-saving': isSaving,
+-								'is-autosaving': isAutosaving,
+-								'is-saved': isSaved,
+-								[ getAnimateClassName( {
+-									type: 'loading',
+-								} ) ]: isSaving,
+-						  } )
+-						: undefined
+-				}
+-				onClick={ isDisabled ? undefined : () => savePost() }
+-				variant="tertiary"
+-				size="compact"
+-				icon={ isLargeViewport ? undefined : cloudUpload }
+-				// Make sure the aria-label has always a value, as the default `text` is undefined on small screens.
+-				aria-label={ buttonAccessibleLabel }
+-				aria-disabled={ isDisabled }
+-			>
+-				{ isSavedState && <Icon icon={ isSaved ? check : cloud } /> }
+-				{ text }
+-			</Button>
+-		</Tooltip>
++		<Button
++			className={
++				isSaveable || isSaving
++					? classnames( {
++							'editor-post-save-draft': ! isSavedState,
++							'editor-post-saved-state': isSavedState,
++							'is-saving': isSaving,
++							'is-autosaving': isAutosaving,
++							'is-saved': isSaved,
++							[ getAnimateClassName( {
++								type: 'loading',
++							} ) ]: isSaving,
++					  } )
++					: undefined
++			}
++			onClick={ isDisabled ? undefined : () => savePost() }
++			/*
++			 * We want the tooltip to show the keyboard shortcut only when the
++			 * button does something, i.e. when it's not disabled.
++			 */
++			shortcut={ isDisabled ? undefined : displayShortcut.primary( 's' ) }
++			variant="tertiary"
++			size="compact"
++			icon={ isLargeViewport ? undefined : cloudUpload }
++			label={ text || label }
++			aria-disabled={ isDisabled }
++		>
++			{ isSavedState && <Icon icon={ isSaved ? check : cloud } /> }
++			{ text }
++		</Button>
+ 	);
+ }

@@ -1,0 +1,109 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3a4689facc6c81..dd4b7842e4ab6e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `Toolbar`: unify Storybook examples under one file, migrate from knobs to controls ([47117](https://github.com/WordPress/gutenberg/pull/47117)).
+ -   `DropdownMenu`: migrate Storybook to controls ([47149](https://github.com/WordPress/gutenberg/pull/47149)).
+ -   Removed deprecated `@storybook/addon-knobs` dependency from the package ([47152](https://github.com/WordPress/gutenberg/pull/47152)).
++-   `ColorListPicker`: Convert to TypeScript ([#46358](https://github.com/WordPress/gutenberg/pull/46358)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/color-list-picker/index.js b/packages/components/src/color-list-picker/index.tsx
+similarity index 93%
+rename from packages/components/src/color-list-picker/index.js
+rename to packages/components/src/color-list-picker/index.tsx
+index 9748a8ea3ba72b..48f56ca9abac6d 100644
+--- a/packages/components/src/color-list-picker/index.js
++++ b/packages/components/src/color-list-picker/index.tsx
+@@ -12,6 +12,7 @@ import ColorPalette from '../color-palette';
+ import ColorIndicator from '../color-indicator';
+ import Icon from '../icon';
+ import { HStack } from '../h-stack';
++import type { ColorListPickerProps, ColorOptionProps } from './types';
+ 
+ function ColorOption( {
+ 	label,
+@@ -20,7 +21,7 @@ function ColorOption( {
+ 	disableCustomColors,
+ 	enableAlpha,
+ 	onChange,
+-} ) {
++}: ColorOptionProps ) {
+ 	const [ isOpen, setIsOpen ] = useState( false );
+ 	return (
+ 		<>
+@@ -62,7 +63,7 @@ function ColorListPicker( {
+ 	disableCustomColors,
+ 	enableAlpha,
+ 	onChange,
+-} ) {
++}: ColorListPickerProps ) {
+ 	return (
+ 		<div className="components-color-list-picker">
+ 			{ labels.map( ( label, index ) => (
+diff --git a/packages/components/src/color-list-picker/types.ts b/packages/components/src/color-list-picker/types.ts
+new file mode 100644
+index 00000000000000..becfc405b2b955
+--- /dev/null
++++ b/packages/components/src/color-list-picker/types.ts
+@@ -0,0 +1,46 @@
++/**
++ * External dependencies
++ */
++import type { CSSProperties } from 'react';
++
++export type ColorListPickerProps = {
++	/**
++	 * A list of predifened colors. Each color is an object with a `name` and a
++	 * `color` value.
++	 * The `name` is a string used to identify the color in the UI.
++	 * The `color` is a valid CSS color string.
++	 */
++	colors: Array< {
++		name: string;
++		color: NonNullable< CSSProperties[ 'color' ] >;
++	} >;
++	/**
++	 * A list of labels for each of the options displayed in the UI.
++	 */
++	labels: Array< string >;
++	/**
++	 * An array containing the currently selected colors.
++	 */
++	value?: Array< string | undefined >;
++	/**
++	 * Controls whether the custom color picker is displayed.
++	 */
++	disableCustomColors?: boolean;
++	/**
++	 * Controls whether the ColorPalette should show an alpha channel control.
++	 */
++	enableAlpha?: boolean;
++	/**
++	 * A function that receives the updated color value.
++	 */
++	onChange: ( newValue: Array< string | undefined > ) => void;
++};
++
++export type ColorOptionProps = Pick<
++	ColorListPickerProps,
++	'colors' | 'disableCustomColors' | 'enableAlpha'
++> & {
++	label: ColorListPickerProps[ 'labels' ][ number ];
++	value: string | undefined;
++	onChange: ( newValue: string | undefined ) => void;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index a116639b9df341..7570fa13a60ada 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -43,7 +43,6 @@
+ 		"src/angle-picker-control",
+ 		"src/autocomplete",
+ 		"src/box-control",
+-		"src/color-list-picker",
+ 		"src/combobox-control",
+ 		"src/custom-gradient-picker",
+ 		"src/dimension-control",

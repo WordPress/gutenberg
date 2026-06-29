@@ -1,0 +1,32 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5b292d0e21fdfc..98d12002606e50 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
++
+ ## 23.1.0 (2023-01-02)
+ 
+ ## 23.0.0 (2022-12-14)
+diff --git a/packages/components/src/dashicon/types.ts b/packages/components/src/dashicon/types.ts
+index a53f9f275da42e..eeee9c2d40a19d 100644
+--- a/packages/components/src/dashicon/types.ts
++++ b/packages/components/src/dashicon/types.ts
+@@ -3,12 +3,6 @@ export type DashiconProps = {
+ 	 * The icon name
+ 	 */
+ 	icon: IconKey;
+-
+-	/**
+-	 * Class name
+-	 */
+-	className?: string;
+-
+ 	/**
+ 	 * Size of the icon
+ 	 */

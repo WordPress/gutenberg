@@ -1,0 +1,1315 @@
+diff --git a/package-lock.json b/package-lock.json
+index 64e6f7b3d450b4..51404430bd182b 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -57859,6 +57859,7 @@
+ 				"@wordpress/notices": "file:../notices",
+ 				"@wordpress/plugins": "file:../plugins",
+ 				"@wordpress/private-apis": "file:../private-apis",
++				"@wordpress/ui": "file:../ui",
+ 				"@wordpress/url": "file:../url",
+ 				"change-case": "^4.1.2",
+ 				"clsx": "^2.1.1"
+@@ -58002,6 +58003,7 @@
+ 				"@wordpress/reusable-blocks": "file:../reusable-blocks",
+ 				"@wordpress/rich-text": "file:../rich-text",
+ 				"@wordpress/server-side-render": "file:../server-side-render",
++				"@wordpress/ui": "file:../ui",
+ 				"@wordpress/upload-media": "file:../upload-media",
+ 				"@wordpress/url": "file:../url",
+ 				"@wordpress/viewport": "file:../viewport",
+@@ -59272,6 +59274,7 @@
+ 				"@wordpress/media-utils": "file:../media-utils",
+ 				"@wordpress/preferences": "file:../preferences",
+ 				"@wordpress/private-apis": "file:../private-apis",
++				"@wordpress/ui": "file:../ui",
+ 				"@wordpress/widgets": "file:../widgets",
+ 				"clsx": "^2.1.1",
+ 				"fast-deep-equal": "^3.1.3"
+@@ -59631,6 +59634,7 @@
+ 				"@wordpress/plugins": "file:../plugins",
+ 				"@wordpress/preferences": "file:../preferences",
+ 				"@wordpress/private-apis": "file:../private-apis",
++				"@wordpress/ui": "file:../ui",
+ 				"@wordpress/url": "file:../url",
+ 				"@wordpress/viewport": "file:../viewport",
+ 				"@wordpress/warning": "file:../warning",
+@@ -59692,6 +59696,7 @@
+ 				"@wordpress/reusable-blocks": "file:../reusable-blocks",
+ 				"@wordpress/router": "file:../router",
+ 				"@wordpress/style-engine": "file:../style-engine",
++				"@wordpress/ui": "file:../ui",
+ 				"@wordpress/url": "file:../url",
+ 				"@wordpress/viewport": "file:../viewport",
+ 				"@wordpress/views": "file:../views",
+@@ -59757,6 +59762,7 @@
+ 				"@wordpress/preferences": "file:../preferences",
+ 				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/reusable-blocks": "file:../reusable-blocks",
++				"@wordpress/ui": "file:../ui",
+ 				"@wordpress/url": "file:../url",
+ 				"@wordpress/widgets": "file:../widgets",
+ 				"clsx": "^2.1.1"
+@@ -60351,6 +60357,7 @@
+ 				"@wordpress/primitives": "file:../primitives",
+ 				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/router": "file:../router",
++				"@wordpress/ui": "file:../ui",
+ 				"@wordpress/url": "file:../url",
+ 				"@wordpress/warning": "file:../warning",
+ 				"@wordpress/wordcount": "file:../wordcount",
+@@ -60385,6 +60392,7 @@
+ 				"@wordpress/latex-to-mathml": "file:../latex-to-mathml",
+ 				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/rich-text": "file:../rich-text",
++				"@wordpress/ui": "file:../ui",
+ 				"@wordpress/url": "file:../url"
+ 			},
+ 			"engines": {
+diff --git a/packages/block-directory/package.json b/packages/block-directory/package.json
+index 7ba9a1b6e0cfea..87cc49335ee4fe 100644
+--- a/packages/block-directory/package.json
++++ b/packages/block-directory/package.json
+@@ -60,6 +60,7 @@
+ 		"@wordpress/notices": "file:../notices",
+ 		"@wordpress/plugins": "file:../plugins",
+ 		"@wordpress/private-apis": "file:../private-apis",
++		"@wordpress/ui": "file:../ui",
+ 		"@wordpress/url": "file:../url",
+ 		"change-case": "^4.1.2",
+ 		"clsx": "^2.1.1"
+diff --git a/packages/block-directory/src/components/downloadable-block-list-item/index.js b/packages/block-directory/src/components/downloadable-block-list-item/index.js
+index c04ea8ea1767bd..3a2dc6e5367f54 100644
+--- a/packages/block-directory/src/components/downloadable-block-list-item/index.js
++++ b/packages/block-directory/src/components/downloadable-block-list-item/index.js
+@@ -7,16 +7,12 @@ import clsx from 'clsx';
+  * WordPress dependencies
+  */
+ import { __, _n, sprintf } from '@wordpress/i18n';
+-import {
+-	Tooltip,
+-	Spinner,
+-	VisuallyHidden,
+-	Composite,
+-} from '@wordpress/components';
++import { Tooltip, Spinner, Composite } from '@wordpress/components';
+ import { createInterpolateElement } from '@wordpress/element';
+ import { decodeEntities } from '@wordpress/html-entities';
+ import { getBlockType } from '@wordpress/blocks';
+ import { useSelect } from '@wordpress/data';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/block-editor/src/components/background-image-control/index.js b/packages/block-editor/src/components/background-image-control/index.js
+index f28ed1a6f62f1e..62f86e730ac525 100644
+--- a/packages/block-editor/src/components/background-image-control/index.js
++++ b/packages/block-editor/src/components/background-image-control/index.js
+@@ -16,7 +16,6 @@ import {
+ 	FlexBlock,
+ 	FocalPointPicker,
+ 	MenuItem,
+-	VisuallyHidden,
+ 	__experimentalHStack as HStack,
+ 	__experimentalTruncate as Truncate,
+ 	Dropdown,
+@@ -25,6 +24,7 @@ import {
+ 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+ 	Button,
+ } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ import { reset as resetIcon } from '@wordpress/icons';
+ import { __, _x, sprintf } from '@wordpress/i18n';
+ import { store as noticesStore } from '@wordpress/notices';
+@@ -162,7 +162,7 @@ function InspectorImagePreviewItem( {
+ 					>
+ 						{ label }
+ 					</Truncate>
+-					<VisuallyHidden as="span">
++					<VisuallyHidden render={ <span /> }>
+ 						{ imgUrl
+ 							? sprintf(
+ 									/* translators: %s: file name */
+diff --git a/packages/block-editor/src/components/block-mover/button.js b/packages/block-editor/src/components/block-mover/button.js
+index 2e13b39bb02545..dd6157ba395a37 100644
+--- a/packages/block-editor/src/components/block-mover/button.js
++++ b/packages/block-editor/src/components/block-mover/button.js
+@@ -7,10 +7,11 @@ import clsx from 'clsx';
+  * WordPress dependencies
+  */
+ import { getBlockType } from '@wordpress/blocks';
+-import { Button, VisuallyHidden } from '@wordpress/components';
++import { Button } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ import { useInstanceId, useViewportMatch } from '@wordpress/compose';
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { forwardRef } from '@wordpress/element';
++import { forwardRef, useMemo } from '@wordpress/element';
+ import { __, isRTL } from '@wordpress/i18n';
+ import { displayShortcut } from '@wordpress/keycodes';
+ 
+@@ -62,9 +63,10 @@ const BlockMoverButton = forwardRef(
+ 		ref
+ 	) => {
+ 		const instanceId = useInstanceId( BlockMoverButton );
+-		const normalizedClientIds = Array.isArray( clientIds )
+-			? clientIds
+-			: [ clientIds ];
++		const normalizedClientIds = useMemo(
++			() => ( Array.isArray( clientIds ) ? clientIds : [ clientIds ] ),
++			[ clientIds ]
++		);
+ 		const blocksCount = normalizedClientIds.length;
+ 		const isMobileViewport = useViewportMatch( 'small', '<' );
+ 
+@@ -108,7 +110,7 @@ const BlockMoverButton = forwardRef(
+ 					orientation: moverOrientation || blockListOrientation,
+ 				};
+ 			},
+-			[ clientIds, direction ]
++			[ direction, moverOrientation, normalizedClientIds ]
+ 		);
+ 
+ 		const { moveBlocksDown, moveBlocksUp } =
+diff --git a/packages/block-editor/src/components/block-pattern-setup/index.js b/packages/block-editor/src/components/block-pattern-setup/index.js
+index 83cceca7a20a79..a6f75afe6ee235 100644
+--- a/packages/block-editor/src/components/block-pattern-setup/index.js
++++ b/packages/block-editor/src/components/block-pattern-setup/index.js
+@@ -3,7 +3,8 @@
+  */
+ import { useDispatch } from '@wordpress/data';
+ import { cloneBlock } from '@wordpress/blocks';
+-import { Composite, VisuallyHidden } from '@wordpress/components';
++import { Composite } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ import { useState } from '@wordpress/element';
+ import { useInstanceId } from '@wordpress/compose';
+diff --git a/packages/block-editor/src/components/block-patterns-list/index.js b/packages/block-editor/src/components/block-patterns-list/index.js
+index 0c7e54c3c62b24..d51e3dbc080601 100644
+--- a/packages/block-editor/src/components/block-patterns-list/index.js
++++ b/packages/block-editor/src/components/block-patterns-list/index.js
+@@ -10,10 +10,10 @@ import { cloneBlock } from '@wordpress/blocks';
+ import { useEffect, useState, forwardRef, useMemo } from '@wordpress/element';
+ import {
+ 	Composite,
+-	VisuallyHidden,
+ 	Tooltip,
+ 	__experimentalHStack as HStack,
+ } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ import { useInstanceId } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+ import { Icon, symbol } from '@wordpress/icons';
+diff --git a/packages/block-editor/src/components/block-switcher/pattern-transformations-menu.js b/packages/block-editor/src/components/block-switcher/pattern-transformations-menu.js
+index 7d66e19a214a28..54cc5f78cc17d3 100644
+--- a/packages/block-editor/src/components/block-switcher/pattern-transformations-menu.js
++++ b/packages/block-editor/src/components/block-switcher/pattern-transformations-menu.js
+@@ -6,13 +6,8 @@ import { useState } from '@wordpress/element';
+ import { useInstanceId, useViewportMatch } from '@wordpress/compose';
+ import { chevronRight } from '@wordpress/icons';
+ 
+-import {
+-	Composite,
+-	MenuGroup,
+-	MenuItem,
+-	Popover,
+-	VisuallyHidden,
+-} from '@wordpress/components';
++import { Composite, MenuGroup, MenuItem, Popover } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/block-editor/src/components/block-variation-transforms/index.js b/packages/block-editor/src/components/block-variation-transforms/index.js
+index acb306c8840f93..460f004b3df787 100644
+--- a/packages/block-editor/src/components/block-variation-transforms/index.js
++++ b/packages/block-editor/src/components/block-variation-transforms/index.js
+@@ -7,9 +7,9 @@ import {
+ 	Button,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+ 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+-	VisuallyHidden,
+ 	privateApis as componentsPrivateApis,
+ } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { useMemo } from '@wordpress/element';
+ 
+@@ -30,7 +30,7 @@ function VariationsButtons( {
+ } ) {
+ 	return (
+ 		<fieldset className={ className }>
+-			<VisuallyHidden as="legend">
++			<VisuallyHidden render={ <legend /> }>
+ 				{ __( 'Transform to variation' ) }
+ 			</VisuallyHidden>
+ 			{ variations.map( ( variation ) => (
+diff --git a/packages/block-editor/src/components/date-format-picker/index.js b/packages/block-editor/src/components/date-format-picker/index.js
+index bb8f475587549a..76cefe7dbc5654 100644
+--- a/packages/block-editor/src/components/date-format-picker/index.js
++++ b/packages/block-editor/src/components/date-format-picker/index.js
+@@ -7,11 +7,11 @@ import { useState, createInterpolateElement } from '@wordpress/element';
+ import {
+ 	TextControl,
+ 	ExternalLink,
+-	VisuallyHidden,
+ 	ToggleControl,
+ 	__experimentalVStack as VStack,
+ 	CustomSelectControl,
+ } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ // So that we illustrate the different formats in the dropdown properly, show a date that is
+ // somewhat recent, has a day greater than 12, and a month with more than three letters.
+@@ -45,7 +45,9 @@ export default function DateFormatPicker( {
+ 			spacing={ 4 }
+ 			className="block-editor-date-format-picker"
+ 		>
+-			<VisuallyHidden as="legend">{ __( 'Date format' ) }</VisuallyHidden>
++			<VisuallyHidden render={ <legend /> }>
++				{ __( 'Date format' ) }
++			</VisuallyHidden>
+ 			<ToggleControl
+ 				label={ __( 'Default format' ) }
+ 				help={ `${ __( 'Example:' ) }  ${ dateI18n(
+diff --git a/packages/block-editor/src/components/grid/grid-item-movers.js b/packages/block-editor/src/components/grid/grid-item-movers.js
+index a7f21181eb9a5f..4ff76750b9df8d 100644
+--- a/packages/block-editor/src/components/grid/grid-item-movers.js
++++ b/packages/block-editor/src/components/grid/grid-item-movers.js
+@@ -7,11 +7,8 @@ import clsx from 'clsx';
+  * WordPress dependencies
+  */
+ import { __, isRTL } from '@wordpress/i18n';
+-import {
+-	VisuallyHidden,
+-	ToolbarButton,
+-	ToolbarGroup,
+-} from '@wordpress/components';
++import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ import {
+ 	chevronLeft,
+ 	chevronUp,
+diff --git a/packages/block-editor/src/components/inserter/menu.js b/packages/block-editor/src/components/inserter/menu.js
+index e8e18b8973cf56..3e6cfcfe852229 100644
+--- a/packages/block-editor/src/components/inserter/menu.js
++++ b/packages/block-editor/src/components/inserter/menu.js
+@@ -14,7 +14,8 @@ import {
+ 	useRef,
+ 	useLayoutEffect,
+ } from '@wordpress/element';
+-import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
++import { SearchControl, Popover } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ import { __ } from '@wordpress/i18n';
+ import { useDebouncedInput, useViewportMatch } from '@wordpress/compose';
+ import { useSelect } from '@wordpress/data';
+@@ -235,7 +236,7 @@ function InserterMenu(
+ 				</div>
+ 				{ showInserterHelpPanel && (
+ 					<div className="block-editor-inserter__tips">
+-						<VisuallyHidden as="h2">
++						<VisuallyHidden render={ <h2 /> }>
+ 							{ __( 'A tip for using the block editor' ) }
+ 						</VisuallyHidden>
+ 						<Tips />
+diff --git a/packages/block-editor/src/components/inserter/search-results.js b/packages/block-editor/src/components/inserter/search-results.js
+index c020e86f99a638..1a24577b3d22b1 100644
+--- a/packages/block-editor/src/components/inserter/search-results.js
++++ b/packages/block-editor/src/components/inserter/search-results.js
+@@ -3,7 +3,7 @@
+  */
+ import { useMemo, useEffect } from '@wordpress/element';
+ import { __, _n, sprintf } from '@wordpress/i18n';
+-import { VisuallyHidden } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ import { useDebounce, useAsyncList } from '@wordpress/compose';
+ import { speak } from '@wordpress/a11y';
+ import { useSelect } from '@wordpress/data';
+diff --git a/packages/block-editor/src/components/link-control/settings.js b/packages/block-editor/src/components/link-control/settings.js
+index 2978d5f96665a8..2af55f5c77e0ec 100644
+--- a/packages/block-editor/src/components/link-control/settings.js
++++ b/packages/block-editor/src/components/link-control/settings.js
+@@ -2,7 +2,8 @@
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { CheckboxControl, VisuallyHidden } from '@wordpress/components';
++import { CheckboxControl } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ const noop = () => {};
+ 
+@@ -58,7 +59,7 @@ const LinkControlSettings = ( { value, onChange = noop, settings } ) => {
+ 
+ 	return (
+ 		<fieldset className="block-editor-link-control__settings">
+-			<VisuallyHidden as="legend">
++			<VisuallyHidden render={ <legend /> }>
+ 				{ __( 'Currently selected link settings' ) }
+ 			</VisuallyHidden>
+ 			{ theSettings }
+diff --git a/packages/block-editor/src/components/link-picker/link-picker.js b/packages/block-editor/src/components/link-picker/link-picker.js
+index ae8372c540e7f3..c97a728ff676df 100644
+--- a/packages/block-editor/src/components/link-picker/link-picker.js
++++ b/packages/block-editor/src/components/link-picker/link-picker.js
+@@ -5,9 +5,9 @@ import {
+ 	BaseControl,
+ 	Button,
+ 	Popover,
+-	VisuallyHidden,
+ 	useBaseControlProps,
+ } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ import { useState, useId, useRef } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ 
+diff --git a/packages/block-editor/src/components/list-view/index.js b/packages/block-editor/src/components/list-view/index.js
+index f93a5d09785050..10ad965baaf28e 100644
+--- a/packages/block-editor/src/components/list-view/index.js
++++ b/packages/block-editor/src/components/list-view/index.js
+@@ -11,10 +11,8 @@ import {
+ 	useMergeRefs,
+ 	__experimentalUseFixedWindowList as useFixedWindowList,
+ } from '@wordpress/compose';
+-import {
+-	__experimentalTreeGrid as TreeGrid,
+-	VisuallyHidden,
+-} from '@wordpress/components';
++import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ import { AsyncModeProvider, useSelect } from '@wordpress/data';
+ import deprecated from '@wordpress/deprecated';
+ import {
+diff --git a/packages/block-editor/src/components/responsive-block-control/label.js b/packages/block-editor/src/components/responsive-block-control/label.js
+index 49be9ba5227ed1..e924f52c0625ce 100644
+--- a/packages/block-editor/src/components/responsive-block-control/label.js
++++ b/packages/block-editor/src/components/responsive-block-control/label.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { VisuallyHidden } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ import { _x, sprintf } from '@wordpress/i18n';
+ 
+ export default function ResponsiveBlockControlLabel( {
+@@ -27,7 +27,10 @@ export default function ResponsiveBlockControlLabel( {
+ 			<span aria-describedby={ `rbc-desc-${ instanceId }` }>
+ 				{ viewport.label }
+ 			</span>
+-			<VisuallyHidden as="span" id={ `rbc-desc-${ instanceId }` }>
++			<VisuallyHidden
++				id={ `rbc-desc-${ instanceId }` }
++				render={ <span /> }
++			>
+ 				{ accessibleLabel }
+ 			</VisuallyHidden>
+ 		</>
+diff --git a/packages/block-editor/src/utils/test/dom.js b/packages/block-editor/src/utils/test/dom.js
+index 9f6c30072f6207..81e8a7bac6741a 100644
+--- a/packages/block-editor/src/utils/test/dom.js
++++ b/packages/block-editor/src/utils/test/dom.js
+@@ -1,6 +1,6 @@
+ import { render, screen } from '@testing-library/react';
++// eslint-disable-next-line @wordpress/use-recommended-components -- Required for testing
+ import { VisuallyHidden as WCVisuallyHidden } from '@wordpress/components';
+-// eslint-disable-next-line @wordpress/use-recommended-components -- Only for testing
+ import { VisuallyHidden } from '@wordpress/ui';
+ import {
+ 	getElementBounds,
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index e8b9b035657473..0e434cdad3798b 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -127,6 +127,7 @@
+ 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
+ 		"@wordpress/rich-text": "file:../rich-text",
+ 		"@wordpress/server-side-render": "file:../server-side-render",
++		"@wordpress/ui": "file:../ui",
+ 		"@wordpress/upload-media": "file:../upload-media",
+ 		"@wordpress/url": "file:../url",
+ 		"@wordpress/viewport": "file:../viewport",
+diff --git a/packages/block-library/src/categories/edit.js b/packages/block-library/src/categories/edit.js
+index 566e17175f4aaa..7aa9596ff7ca98 100644
+--- a/packages/block-library/src/categories/edit.js
++++ b/packages/block-library/src/categories/edit.js
+@@ -11,7 +11,6 @@ import {
+ 	SelectControl,
+ 	Spinner,
+ 	ToggleControl,
+-	VisuallyHidden,
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ } from '@wordpress/components';
+@@ -26,6 +25,7 @@ import { __, sprintf } from '@wordpress/i18n';
+ import { pin } from '@wordpress/icons';
+ import { useEntityRecords } from '@wordpress/core-data';
+ import { useDispatch } from '@wordpress/data';
++import { VisuallyHidden } from '@wordpress/ui';
+ import { store as noticeStore } from '@wordpress/notices';
+ 
+ /**
+@@ -146,7 +146,8 @@ export default function CategoriesEdit( {
+ 						}
+ 					/>
+ 				) : (
+-					<VisuallyHidden as="label" htmlFor={ selectId }>
++					// eslint-disable-next-line jsx-a11y/label-has-associated-control
++					<VisuallyHidden render={ <label htmlFor={ selectId } /> }>
+ 						{ label ? label : taxonomy?.name }
+ 					</VisuallyHidden>
+ 				) }
+diff --git a/packages/block-library/src/navigation-link/edit.js b/packages/block-library/src/navigation-link/edit.js
+index 81b5b53b59396a..b59a488faae79e 100644
+--- a/packages/block-library/src/navigation-link/edit.js
++++ b/packages/block-library/src/navigation-link/edit.js
+@@ -8,11 +8,7 @@ import clsx from 'clsx';
+  */
+ import { createBlock } from '@wordpress/blocks';
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import {
+-	ToolbarButton,
+-	ToolbarGroup,
+-	VisuallyHidden,
+-} from '@wordpress/components';
++import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+ import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
+ import { __, sprintf } from '@wordpress/i18n';
+ import {
+@@ -26,6 +22,7 @@ import {
+ } from '@wordpress/block-editor';
+ import { isURL, prependHTTP } from '@wordpress/url';
+ import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
++import { VisuallyHidden } from '@wordpress/ui';
+ import { link as linkIcon, addSubmenu } from '@wordpress/icons';
+ import { useMergeRefs, useInstanceId } from '@wordpress/compose';
+ 
+diff --git a/packages/block-library/src/navigation-link/link-ui/dialog-wrapper.js b/packages/block-library/src/navigation-link/link-ui/dialog-wrapper.js
+index e37166a1dfc7c2..e7dd1b812133b0 100644
+--- a/packages/block-library/src/navigation-link/link-ui/dialog-wrapper.js
++++ b/packages/block-library/src/navigation-link/link-ui/dialog-wrapper.js
+@@ -1,10 +1,11 @@
+ /**
+  * WordPress dependencies
+  */
+-import { Button, VisuallyHidden } from '@wordpress/components';
++import { Button } from '@wordpress/components';
+ import { __, isRTL } from '@wordpress/i18n';
+ import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
+ import { useInstanceId, useFocusOnMount } from '@wordpress/compose';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Shared BackButton component for consistent navigation across LinkUI sub-components.
+diff --git a/packages/block-library/src/navigation-link/link-ui/index.js b/packages/block-library/src/navigation-link/link-ui/index.js
+index eecbd4f3c7a897..4c2dcde356b06c 100644
+--- a/packages/block-library/src/navigation-link/link-ui/index.js
++++ b/packages/block-library/src/navigation-link/link-ui/index.js
+@@ -5,7 +5,6 @@ import { __unstableStripHTML as stripHTML, focus } from '@wordpress/dom';
+ import {
+ 	Popover,
+ 	Button,
+-	VisuallyHidden,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+@@ -20,6 +19,7 @@ import {
+ import { useResourcePermissions } from '@wordpress/core-data';
+ import { plus } from '@wordpress/icons';
+ import { useInstanceId } from '@wordpress/compose';
++import { VisuallyHidden } from '@wordpress/ui';
+ import { isURL } from '@wordpress/url';
+ 
+ /**
+diff --git a/packages/block-library/src/navigation/edit/accessible-description.js b/packages/block-library/src/navigation/edit/accessible-description.js
+index c93ecfa9ceb604..636416d1b14224 100644
+--- a/packages/block-library/src/navigation/edit/accessible-description.js
++++ b/packages/block-library/src/navigation/edit/accessible-description.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { VisuallyHidden } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ export default function AccessibleDescription( { id, children } ) {
+ 	return (
+diff --git a/packages/block-library/src/post-comments-form/edit.js b/packages/block-library/src/post-comments-form/edit.js
+index 75d1d5358363bc..68ff1d821ff606 100644
+--- a/packages/block-library/src/post-comments-form/edit.js
++++ b/packages/block-library/src/post-comments-form/edit.js
+@@ -2,9 +2,9 @@
+  * WordPress dependencies
+  */
+ import { useBlockProps } from '@wordpress/block-editor';
+-import { VisuallyHidden } from '@wordpress/components';
+ import { useInstanceId } from '@wordpress/compose';
+ import { __, sprintf } from '@wordpress/i18n';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/block-library/tsconfig.json b/packages/block-library/tsconfig.json
+index 17de04196f221a..dbf6eb8fc77177 100644
+--- a/packages/block-library/tsconfig.json
++++ b/packages/block-library/tsconfig.json
+@@ -34,6 +34,7 @@
+ 		{ "path": "../keyboard-shortcuts" },
+ 		{ "path": "../primitives" },
+ 		{ "path": "../rich-text" },
++		{ "path": "../ui" },
+ 		{ "path": "../upload-media" },
+ 		{ "path": "../url" },
+ 		{ "path": "../viewport" },
+diff --git a/packages/components/src/visually-hidden/stories/index.story.tsx b/packages/components/src/visually-hidden/stories/index.story.tsx
+index 9128f043e1528b..0439a598e4369c 100644
+--- a/packages/components/src/visually-hidden/stories/index.story.tsx
++++ b/packages/components/src/visually-hidden/stories/index.story.tsx
+@@ -1,15 +1,7 @@
+-/**
+- * External dependencies
+- */
+ import type { Meta, StoryFn } from '@storybook/react-vite';
+-
+-/**
+- * Internal dependencies
+- */
+ import { VisuallyHidden } from '..';
+ 
+ const meta: Meta< typeof VisuallyHidden > = {
+-	tags: [ 'manifest' ],
+ 	component: VisuallyHidden,
+ 	title: 'Components/Typography/VisuallyHidden',
+ 	id: 'components-visuallyhidden',
+@@ -23,8 +15,9 @@ const meta: Meta< typeof VisuallyHidden > = {
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 		componentStatus: {
+-			status: 'stable',
++			status: 'not-recommended',
+ 			whereUsed: 'global',
++			notes: 'Use `VisuallyHidden` from `@wordpress/ui` instead.',
+ 		},
+ 	},
+ };
+diff --git a/packages/customize-widgets/package.json b/packages/customize-widgets/package.json
+index d44b3856ce6cfe..df81b599e71125 100644
+--- a/packages/customize-widgets/package.json
++++ b/packages/customize-widgets/package.json
+@@ -60,6 +60,7 @@
+ 		"@wordpress/media-utils": "file:../media-utils",
+ 		"@wordpress/preferences": "file:../preferences",
+ 		"@wordpress/private-apis": "file:../private-apis",
++		"@wordpress/ui": "file:../ui",
+ 		"@wordpress/widgets": "file:../widgets",
+ 		"clsx": "^2.1.1",
+ 		"fast-deep-equal": "^3.1.3"
+diff --git a/packages/customize-widgets/src/components/more-menu/index.js b/packages/customize-widgets/src/components/more-menu/index.js
+index eb6aa84cf8c4c4..708a7f211d0c07 100644
+--- a/packages/customize-widgets/src/components/more-menu/index.js
++++ b/packages/customize-widgets/src/components/more-menu/index.js
+@@ -5,7 +5,6 @@ import {
+ 	MenuGroup,
+ 	MenuItem,
+ 	ToolbarDropdownMenu,
+-	VisuallyHidden,
+ } from '@wordpress/components';
+ import { useState } from '@wordpress/element';
+ import { __, _x } from '@wordpress/i18n';
+@@ -13,6 +12,7 @@ import { external, moreVertical } from '@wordpress/icons';
+ import { displayShortcut } from '@wordpress/keycodes';
+ import { useShortcut } from '@wordpress/keyboard-shortcuts';
+ import { PreferenceToggleMenuItem } from '@wordpress/preferences';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+@@ -88,7 +88,7 @@ export default function MoreMenu() {
+ 								rel="noopener"
+ 							>
+ 								{ __( 'Help' ) }
+-								<VisuallyHidden as="span">
++								<VisuallyHidden render={ <span /> }>
+ 									{
+ 										/* translators: accessibility text */
+ 										__( '(opens in a new tab)' )
+diff --git a/packages/dataviews/src/components/dataviews-filters/search-widget.tsx b/packages/dataviews/src/components/dataviews-filters/search-widget.tsx
+index 75d0c3d49f34e5..ce6481232085d3 100644
+--- a/packages/dataviews/src/components/dataviews-filters/search-widget.tsx
++++ b/packages/dataviews/src/components/dataviews-filters/search-widget.tsx
+@@ -12,13 +12,9 @@ import clsx from 'clsx';
+ import { useInstanceId } from '@wordpress/compose';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { useState, useMemo, useDeferredValue } from '@wordpress/element';
+-import {
+-	VisuallyHidden,
+-	Icon,
+-	Composite,
+-	Spinner,
+-} from '@wordpress/components';
++import { Icon, Composite, Spinner } from '@wordpress/components';
+ import { search, check } from '@wordpress/icons';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+@@ -267,15 +263,9 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
+ 			setValue={ setSearchValue }
+ 		>
+ 			<div className="dataviews-filters__search-widget-filter-combobox__wrapper">
+-				<Ariakit.ComboboxLabel
+-					render={
+-						<VisuallyHidden>
+-							{ __( 'Search items' ) }
+-						</VisuallyHidden>
+-					}
+-				>
++				<VisuallyHidden render={ <Ariakit.ComboboxLabel /> }>
+ 					{ __( 'Search items' ) }
+-				</Ariakit.ComboboxLabel>
++				</VisuallyHidden>
+ 				<Ariakit.Combobox
+ 					autoSelect="always"
+ 					placeholder={ __( 'Search' ) }
+diff --git a/packages/dataviews/src/components/dataviews-layouts/activity/activity-item.tsx b/packages/dataviews/src/components/dataviews-layouts/activity/activity-item.tsx
+index 62dcb981075641..c1c608225054b1 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/activity/activity-item.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/activity/activity-item.tsx
+@@ -6,11 +6,10 @@ import clsx from 'clsx';
+ /**
+  * WordPress dependencies
+  */
+-import { VisuallyHidden } from '@wordpress/components';
+ import { useRef, useContext, useMemo } from '@wordpress/element';
+ import { useRegistry } from '@wordpress/data';
+ import { useViewportMatch } from '@wordpress/compose';
+-import { Stack } from '@wordpress/ui';
++import { Stack, VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+@@ -162,8 +161,8 @@ function ActivityItem< Item >(
+ 								className="dataviews-view-activity__item-field"
+ 							>
+ 								<VisuallyHidden
+-									as="span"
+ 									className="dataviews-view-activity__item-field-label"
++									render={ <span /> }
+ 								>
+ 									{ field.label }
+ 								</VisuallyHidden>
+diff --git a/packages/dataviews/src/components/dataviews-layouts/list/index.tsx b/packages/dataviews/src/components/dataviews-layouts/list/index.tsx
+index 26a9b5ef953921..573f026c832edf 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/list/index.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/list/index.tsx
+@@ -11,7 +11,6 @@ import {
+ 	Button,
+ 	privateApis as componentsPrivateApis,
+ 	Spinner,
+-	VisuallyHidden,
+ 	Composite,
+ } from '@wordpress/components';
+ import {
+@@ -25,7 +24,7 @@ import {
+ import { __, sprintf } from '@wordpress/i18n';
+ import { moreVertical } from '@wordpress/icons';
+ import { useRegistry } from '@wordpress/data';
+-import { Stack } from '@wordpress/ui';
++import { Stack, VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+@@ -355,8 +354,8 @@ function ListItem< Item >( {
+ 									className="dataviews-view-list__field"
+ 								>
+ 									<VisuallyHidden
+-										as="span"
+ 										className="dataviews-view-list__field-label"
++										render={ <span /> }
+ 									>
+ 										{ field.label }
+ 									</VisuallyHidden>
+diff --git a/packages/edit-post/package.json b/packages/edit-post/package.json
+index 9a67f20cd31a62..604c92782b9512 100644
+--- a/packages/edit-post/package.json
++++ b/packages/edit-post/package.json
+@@ -75,6 +75,7 @@
+ 		"@wordpress/plugins": "file:../plugins",
+ 		"@wordpress/preferences": "file:../preferences",
+ 		"@wordpress/private-apis": "file:../private-apis",
++		"@wordpress/ui": "file:../ui",
+ 		"@wordpress/url": "file:../url",
+ 		"@wordpress/viewport": "file:../viewport",
+ 		"@wordpress/warning": "file:../warning",
+diff --git a/packages/edit-post/src/components/layout/index.js b/packages/edit-post/src/components/layout/index.js
+index d1c116780dbfea..0d2a3b464f973f 100644
+--- a/packages/edit-post/src/components/layout/index.js
++++ b/packages/edit-post/src/components/layout/index.js
+@@ -41,7 +41,6 @@ import {
+ 	Icon,
+ 	SlotFillProvider,
+ 	Tooltip,
+-	VisuallyHidden,
+ 	__unstableUseNavigateRegions as useNavigateRegions,
+ 	privateApis as componentsPrivateApis,
+ } from '@wordpress/components';
+@@ -51,6 +50,7 @@ import {
+ 	useRefEffect,
+ 	useViewportMatch,
+ } from '@wordpress/compose';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/edit-site/package.json b/packages/edit-site/package.json
+index 797387f01ec326..70cf5f0246d779 100644
+--- a/packages/edit-site/package.json
++++ b/packages/edit-site/package.json
+@@ -87,6 +87,7 @@
+ 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
+ 		"@wordpress/router": "file:../router",
+ 		"@wordpress/style-engine": "file:../style-engine",
++		"@wordpress/ui": "file:../ui",
+ 		"@wordpress/url": "file:../url",
+ 		"@wordpress/viewport": "file:../viewport",
+ 		"@wordpress/views": "file:../views",
+diff --git a/packages/edit-site/src/components/site-hub/index.js b/packages/edit-site/src/components/site-hub/index.js
+index f700d5b2386f90..39853d891a7e9f 100644
+--- a/packages/edit-site/src/components/site-hub/index.js
++++ b/packages/edit-site/src/components/site-hub/index.js
+@@ -7,11 +7,7 @@ import clsx from 'clsx';
+  * WordPress dependencies
+  */
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import {
+-	Button,
+-	__experimentalHStack as HStack,
+-	VisuallyHidden,
+-} from '@wordpress/components';
++import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import { store as coreStore } from '@wordpress/core-data';
+ import { decodeEntities } from '@wordpress/html-entities';
+@@ -19,6 +15,7 @@ import { memo, forwardRef, useContext } from '@wordpress/element';
+ import { search } from '@wordpress/icons';
+ import { store as commandsStore } from '@wordpress/commands';
+ import { displayShortcut } from '@wordpress/keycodes';
++import { VisuallyHidden } from '@wordpress/ui';
+ import { filterURLForDisplay } from '@wordpress/url';
+ import { privateApis as routerPrivateApis } from '@wordpress/router';
+ 
+@@ -84,7 +81,7 @@ const SiteHub = memo(
+ 								target="_blank"
+ 							>
+ 								{ decodeEntities( siteTitle ) }
+-								<VisuallyHidden as="span">
++								<VisuallyHidden render={ <span /> }>
+ 									{
+ 										/* translators: accessibility text */
+ 										__( '(opens in a new tab)' )
+diff --git a/packages/edit-site/tsconfig.json b/packages/edit-site/tsconfig.json
+index b4d96194de5b15..6a44d4143f99c4 100644
+--- a/packages/edit-site/tsconfig.json
++++ b/packages/edit-site/tsconfig.json
+@@ -41,6 +41,7 @@
+ 		{ "path": "../rich-text" },
+ 		{ "path": "../router" },
+ 		{ "path": "../style-engine" },
++		{ "path": "../ui" },
+ 		{ "path": "../url" },
+ 		{ "path": "../viewport" },
+ 		{ "path": "../views" },
+diff --git a/packages/edit-widgets/package.json b/packages/edit-widgets/package.json
+index 625b5861e905cc..3cbc528ffb7e0d 100644
+--- a/packages/edit-widgets/package.json
++++ b/packages/edit-widgets/package.json
+@@ -73,6 +73,7 @@
+ 		"@wordpress/preferences": "file:../preferences",
+ 		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
++		"@wordpress/ui": "file:../ui",
+ 		"@wordpress/url": "file:../url",
+ 		"@wordpress/widgets": "file:../widgets",
+ 		"clsx": "^2.1.1"
+diff --git a/packages/edit-widgets/src/components/header/index.js b/packages/edit-widgets/src/components/header/index.js
+index 80dda479d59ed6..c3d26d7f17b388 100644
+--- a/packages/edit-widgets/src/components/header/index.js
++++ b/packages/edit-widgets/src/components/header/index.js
+@@ -5,10 +5,11 @@ import { BlockToolbar } from '@wordpress/block-editor';
+ import { useSelect } from '@wordpress/data';
+ import { useRef } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+-import { Popover, VisuallyHidden } from '@wordpress/components';
++import { Popover } from '@wordpress/components';
+ import { PinnedItems } from '@wordpress/interface';
+ import { useViewportMatch } from '@wordpress/compose';
+ import { store as preferencesStore } from '@wordpress/preferences';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+@@ -41,8 +42,8 @@ function Header() {
+ 					) }
+ 					{ ! isLargeViewport && (
+ 						<VisuallyHidden
+-							as="h1"
+ 							className="edit-widgets-header__title"
++							render={ <h1 /> }
+ 						>
+ 							{ __( 'Widgets' ) }
+ 						</VisuallyHidden>
+diff --git a/packages/edit-widgets/src/components/more-menu/index.js b/packages/edit-widgets/src/components/more-menu/index.js
+index 9f7063b032186c..778c17ca63c40f 100644
+--- a/packages/edit-widgets/src/components/more-menu/index.js
++++ b/packages/edit-widgets/src/components/more-menu/index.js
+@@ -1,12 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	MenuGroup,
+-	MenuItem,
+-	VisuallyHidden,
+-	DropdownMenu,
+-} from '@wordpress/components';
++import { MenuGroup, MenuItem, DropdownMenu } from '@wordpress/components';
+ import { useState } from '@wordpress/element';
+ import { __, _x } from '@wordpress/i18n';
+ import { external, moreVertical } from '@wordpress/icons';
+@@ -14,6 +9,7 @@ import { PreferenceToggleMenuItem } from '@wordpress/preferences';
+ import { displayShortcut } from '@wordpress/keycodes';
+ import { useShortcut } from '@wordpress/keyboard-shortcuts';
+ import { useViewportMatch } from '@wordpress/compose';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+@@ -94,7 +90,7 @@ export default function MoreMenu() {
+ 								rel="noopener"
+ 							>
+ 								{ __( 'Help' ) }
+-								<VisuallyHidden as="span">
++								<VisuallyHidden render={ <span /> }>
+ 									{
+ 										/* translators: accessibility text */
+ 										__( '(opens in a new tab)' )
+diff --git a/packages/editor/src/components/collab-sidebar/comment-form.js b/packages/editor/src/components/collab-sidebar/comment-form.js
+index e22d123d157f64..a0388bfdd36f8f 100644
+--- a/packages/editor/src/components/collab-sidebar/comment-form.js
++++ b/packages/editor/src/components/collab-sidebar/comment-form.js
+@@ -10,9 +10,8 @@ import { useState } from '@wordpress/element';
+ import {
+ 	__experimentalTruncate as Truncate,
+ 	Button,
+-	VisuallyHidden,
+ } from '@wordpress/components';
+-import { Stack } from '@wordpress/ui';
++import { Stack, VisuallyHidden } from '@wordpress/ui';
+ import { __ } from '@wordpress/i18n';
+ import { useInstanceId } from '@wordpress/compose';
+ import { isKeyboardEvent } from '@wordpress/keycodes';
+@@ -50,7 +49,8 @@ function CommentForm( {
+ 				setInputComment( '' );
+ 			} }
+ 		>
+-			<VisuallyHidden as="label" htmlFor={ inputId }>
++			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
++			<VisuallyHidden render={ <label htmlFor={ inputId } /> }>
+ 				{ labelText ?? __( 'Note' ) }
+ 			</VisuallyHidden>
+ 			<TextareaAutosize
+diff --git a/packages/editor/src/components/more-menu/index.js b/packages/editor/src/components/more-menu/index.js
+index 196e1a4f556a7a..3a4cf8a66d5926 100644
+--- a/packages/editor/src/components/more-menu/index.js
++++ b/packages/editor/src/components/more-menu/index.js
+@@ -5,17 +5,13 @@ import { __, _x } from '@wordpress/i18n';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { displayShortcut } from '@wordpress/keycodes';
+ import { external, moreVertical } from '@wordpress/icons';
+-import {
+-	MenuGroup,
+-	MenuItem,
+-	VisuallyHidden,
+-	DropdownMenu,
+-} from '@wordpress/components';
++import { MenuGroup, MenuItem, DropdownMenu } from '@wordpress/components';
+ import {
+ 	PreferenceToggleMenuItem,
+ 	store as preferencesStore,
+ } from '@wordpress/preferences';
+ import { store as interfaceStore, ActionItem } from '@wordpress/interface';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+@@ -135,7 +131,7 @@ export default function MoreMenu( { disabled = false } ) {
+ 								rel="noopener"
+ 							>
+ 								{ __( 'Help' ) }
+-								<VisuallyHidden as="span">
++								<VisuallyHidden render={ <span /> }>
+ 									{
+ 										/* translators: accessibility text */
+ 										__( '(opens in a new tab)' )
+diff --git a/packages/editor/src/components/post-preview-button/index.js b/packages/editor/src/components/post-preview-button/index.js
+index 0429ce691b4f17..bb061d53e5c1b4 100644
+--- a/packages/editor/src/components/post-preview-button/index.js
++++ b/packages/editor/src/components/post-preview-button/index.js
+@@ -2,11 +2,12 @@
+  * WordPress dependencies
+  */
+ import { renderToString } from '@wordpress/element';
+-import { Button, Path, SVG, VisuallyHidden } from '@wordpress/components';
++import { Button, Path, SVG } from '@wordpress/components';
+ import { __, _x } from '@wordpress/i18n';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { applyFilters } from '@wordpress/hooks';
+ import { store as coreStore } from '@wordpress/core-data';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+@@ -196,7 +197,7 @@ export default function PostPreviewButton( {
+ 			{ textContent || (
+ 				<>
+ 					{ _x( 'Preview', 'imperative verb' ) }
+-					<VisuallyHidden as="span">
++					<VisuallyHidden render={ <span /> }>
+ 						{
+ 							/* translators: accessibility text */
+ 							__( '(opens in a new tab)' )
+diff --git a/packages/editor/src/components/post-publish-panel/postpublish.js b/packages/editor/src/components/post-publish-panel/postpublish.js
+index a596d506e41136..9ebdb895a8d5bf 100644
+--- a/packages/editor/src/components/post-publish-panel/postpublish.js
++++ b/packages/editor/src/components/post-publish-panel/postpublish.js
+@@ -6,7 +6,6 @@ import {
+ 	Button,
+ 	TextControl,
+ 	ExternalLink,
+-	VisuallyHidden,
+ } from '@wordpress/components';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
+@@ -16,6 +15,7 @@ import { decodeEntities } from '@wordpress/html-entities';
+ import { useCopyToClipboard } from '@wordpress/compose';
+ import { store as coreStore } from '@wordpress/core-data';
+ import { external } from '@wordpress/icons';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+@@ -164,7 +164,7 @@ export default function PostPublishPanelPostpublish( {
+ 							target="_blank"
+ 						>
+ 							{ viewPostLabel }
+-							<VisuallyHidden as="span">
++							<VisuallyHidden render={ <span /> }>
+ 								{
+ 									/* translators: accessibility text */
+ 									__( '(opens in a new tab)' )
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index 9ff4d2854ad9ea..6a98f8847f63ef 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -27,7 +27,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+   padding: 0;
+ }
+ 
+-.emotion-12 {
++.emotion-10 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -47,7 +47,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+   width: 100%;
+ }
+ 
+-.emotion-12>* {
++.emotion-10>* {
+   min-width: 0;
+ }
+ 
+@@ -161,11 +161,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+               target="_blank"
+             >
+               <span
+-                class="components-visually-hidden emotion-6 emotion-7"
+                 data-visually-hidden=""
+-                data-wp-c16t="true"
+-                data-wp-component="VisuallyHidden"
+-                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
+               >
+                 (opens in a new tab)
+               </span>
+@@ -200,7 +196,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+           class="components-base-control__field emotion-2 emotion-3"
+         >
+           <div
+-            class="components-flex components-h-stack emotion-12 emotion-7"
++            class="components-flex components-h-stack emotion-10 emotion-11"
+             data-wp-c16t="true"
+             data-wp-component="HStack"
+           >
+@@ -255,7 +251,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+   padding: 0;
+ }
+ 
+-.emotion-12 {
++.emotion-10 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -275,7 +271,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+   width: 100%;
+ }
+ 
+-.emotion-12>* {
++.emotion-10>* {
+   min-width: 0;
+ }
+ 
+@@ -389,11 +385,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+               target="_blank"
+             >
+               <span
+-                class="components-visually-hidden emotion-6 emotion-7"
+                 data-visually-hidden=""
+-                data-wp-c16t="true"
+-                data-wp-component="VisuallyHidden"
+-                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
+               >
+                 (opens in a new tab)
+               </span>
+@@ -428,7 +420,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+           class="components-base-control__field emotion-2 emotion-3"
+         >
+           <div
+-            class="components-flex components-h-stack emotion-12 emotion-7"
++            class="components-flex components-h-stack emotion-10 emotion-11"
+             data-wp-c16t="true"
+             data-wp-component="HStack"
+           >
+diff --git a/packages/editor/src/components/post-text-editor/index.js b/packages/editor/src/components/post-text-editor/index.js
+index 8cf1a8b1279f55..b40072178389c0 100644
+--- a/packages/editor/src/components/post-text-editor/index.js
++++ b/packages/editor/src/components/post-text-editor/index.js
+@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
+ import { store as coreStore } from '@wordpress/core-data';
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import { useInstanceId } from '@wordpress/compose';
+-import { VisuallyHidden } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+@@ -38,8 +38,8 @@ export default function PostTextEditor() {
+ 	return (
+ 		<>
+ 			<VisuallyHidden
+-				as="label"
+-				htmlFor={ `post-content-${ instanceId }` }
++				// eslint-disable-next-line jsx-a11y/label-has-associated-control
++				render={ <label htmlFor={ `post-content-${ instanceId }` } /> }
+ 			>
+ 				{ __( 'Type text or HTML' ) }
+ 			</VisuallyHidden>
+diff --git a/packages/editor/src/components/preview-dropdown/index.js b/packages/editor/src/components/preview-dropdown/index.js
+index 7fc9c2a397b3a5..0c7c108d94f717 100644
+--- a/packages/editor/src/components/preview-dropdown/index.js
++++ b/packages/editor/src/components/preview-dropdown/index.js
+@@ -12,7 +12,6 @@ import {
+ 	MenuGroup,
+ 	MenuItem,
+ 	MenuItemsChoice,
+-	VisuallyHidden,
+ 	Icon,
+ } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+@@ -22,6 +21,7 @@ import { store as coreStore } from '@wordpress/core-data';
+ import { store as preferencesStore } from '@wordpress/preferences';
+ import { ActionItem } from '@wordpress/interface';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+@@ -151,7 +151,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
+ 								onClick={ onClose }
+ 							>
+ 								{ __( 'View site' ) }
+-								<VisuallyHidden as="span">
++								<VisuallyHidden render={ <span /> }>
+ 									{
+ 										/* translators: accessibility text */
+ 										__( '(opens in a new tab)' )
+diff --git a/packages/editor/src/components/resizable-editor/resize-handle.js b/packages/editor/src/components/resizable-editor/resize-handle.js
+index ccd903d0f3a172..eb023e33433152 100644
+--- a/packages/editor/src/components/resizable-editor/resize-handle.js
++++ b/packages/editor/src/components/resizable-editor/resize-handle.js
+@@ -3,11 +3,8 @@
+  */
+ import { __ } from '@wordpress/i18n';
+ import { LEFT, RIGHT } from '@wordpress/keycodes';
+-import {
+-	VisuallyHidden,
+-	Tooltip,
+-	__unstableMotion as motion,
+-} from '@wordpress/components';
++import { Tooltip, __unstableMotion as motion } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ const DELTA_DISTANCE = 20; // The distance to resize per keydown in pixels.
+ 
+diff --git a/packages/eslint-plugin/CHANGELOG.md b/packages/eslint-plugin/CHANGELOG.md
+index 9e9d89df908604..9a22cc10854087 100644
+--- a/packages/eslint-plugin/CHANGELOG.md
++++ b/packages/eslint-plugin/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ ### Enhancements
+ 
+ -   Improved the Design System token lint rules to recognize CSS declaration strings more accurately, avoiding false bare-token reports for declarations while still flagging invalid token assignments and unknown token names ([#77384](https://github.com/WordPress/gutenberg/pull/77384)).
++-   Update `use-recommended-components` rule to prefer `VisuallyHidden` from `@wordpress/ui` over `@wordpress/components` ([#77575](https://github.com/WordPress/gutenberg/pull/77575)).
+ 
+ ## 25.0.0 (2026-04-15)
+ 
+diff --git a/packages/eslint-plugin/rules/use-recommended-components.js b/packages/eslint-plugin/rules/use-recommended-components.js
+index 7f105331648c7d..63c77b78847614 100644
+--- a/packages/eslint-plugin/rules/use-recommended-components.js
++++ b/packages/eslint-plugin/rules/use-recommended-components.js
+@@ -15,6 +15,7 @@ const ALLOWLIST = {
+ 			'CollapsibleCard',
+ 			'Stack',
+ 			'Text',
++			'VisuallyHidden',
+ 		],
+ 		message:
+ 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
+@@ -44,6 +45,7 @@ const DENYLIST = {
+ 		CardHeader:
+ 			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
+ 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
++		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
+ 	},
+ };
+ 
+diff --git a/packages/fields/package.json b/packages/fields/package.json
+index 33941728ba12e9..09fff9ae7b1429 100644
+--- a/packages/fields/package.json
++++ b/packages/fields/package.json
+@@ -69,6 +69,7 @@
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/router": "file:../router",
++		"@wordpress/ui": "file:../ui",
+ 		"@wordpress/url": "file:../url",
+ 		"@wordpress/warning": "file:../warning",
+ 		"@wordpress/wordcount": "file:../wordcount",
+diff --git a/packages/fields/src/components/media-edit/index.tsx b/packages/fields/src/components/media-edit/index.tsx
+index d86624b13decb3..b3e59b61e10a8d 100644
+--- a/packages/fields/src/components/media-edit/index.tsx
++++ b/packages/fields/src/components/media-edit/index.tsx
+@@ -17,7 +17,6 @@ import {
+ 	__experimentalHStack as HStack,
+ 	BaseControl,
+ 	Tooltip,
+-	VisuallyHidden,
+ } from '@wordpress/components';
+ import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
+ import { store as coreStore, type Attachment } from '@wordpress/core-data';
+@@ -42,6 +41,7 @@ import {
+ 	chevronLeft,
+ 	chevronRight,
+ } from '@wordpress/icons';
++import { VisuallyHidden } from '@wordpress/ui';
+ import {
+ 	MediaUpload,
+ 	uploadMedia,
+@@ -914,7 +914,7 @@ export default function MediaEdit< Item >( {
+ 							<VStack spacing={ 2 }>
+ 								{ field.label &&
+ 									( hideLabelFromVision ? (
+-										<VisuallyHidden as="legend">
++										<VisuallyHidden render={ <legend /> }>
+ 											{ field.label }
+ 										</VisuallyHidden>
+ 									) : (
+diff --git a/packages/fields/tsconfig.json b/packages/fields/tsconfig.json
+index 5e05bac674bc83..9cbb63a0bd84dd 100644
+--- a/packages/fields/tsconfig.json
++++ b/packages/fields/tsconfig.json
+@@ -25,6 +25,7 @@
+ 		{ "path": "../primitives" },
+ 		{ "path": "../private-apis" },
+ 		{ "path": "../router" },
++		{ "path": "../ui" },
+ 		{ "path": "../url" },
+ 		{ "path": "../block-editor" },
+ 		{ "path": "../warning" },
+diff --git a/packages/format-library/package.json b/packages/format-library/package.json
+index e091dde2bfa025..6ede0747cd03b3 100644
+--- a/packages/format-library/package.json
++++ b/packages/format-library/package.json
+@@ -55,6 +55,7 @@
+ 		"@wordpress/latex-to-mathml": "file:../latex-to-mathml",
+ 		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/rich-text": "file:../rich-text",
++		"@wordpress/ui": "file:../ui",
+ 		"@wordpress/url": "file:../url"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/format-library/src/link/css-classes-setting.js b/packages/format-library/src/link/css-classes-setting.js
+index fbcc903f894d9e..95fef40a9ab37c 100644
+--- a/packages/format-library/src/link/css-classes-setting.js
++++ b/packages/format-library/src/link/css-classes-setting.js
+@@ -7,9 +7,9 @@ import { __ } from '@wordpress/i18n';
+ import {
+ 	__experimentalInputControl as InputControl,
+ 	CheckboxControl,
+-	VisuallyHidden,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/ui';
+ 
+ /**
+  * CSSClassesSettingComponent
+@@ -55,7 +55,9 @@ const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
+ 
+ 	return (
+ 		<fieldset>
+-			<VisuallyHidden as="legend">{ setting.title }</VisuallyHidden>
++			<VisuallyHidden render={ <legend /> }>
++				{ setting.title }
++			</VisuallyHidden>
+ 			<VStack spacing={ 3 }>
+ 				<CheckboxControl
+ 					label={ setting.title }
+diff --git a/packages/ui/src/visually-hidden/stories/index.story.tsx b/packages/ui/src/visually-hidden/stories/index.story.tsx
+index 9c705b5a6601bf..b630b6ecf2e0ff 100644
+--- a/packages/ui/src/visually-hidden/stories/index.story.tsx
++++ b/packages/ui/src/visually-hidden/stories/index.story.tsx
+@@ -3,6 +3,7 @@ import { useId } from '@wordpress/element';
+ import { VisuallyHidden } from '../';
+ 
+ const meta: Meta< typeof VisuallyHidden > = {
++	tags: [ 'manifest' ],
+ 	title: 'Design System/Components/VisuallyHidden',
+ 	component: VisuallyHidden,
+ };
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index 42a319177f4905..b8d56c597c87fe 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -809,9 +809,9 @@ export default dedupePlugins( [
+ 		},
+ 	},
+ 
+-	// Override: Storybook stories — disable use-recommended-components.
++	// Override: Components package and root Storybook stories — disable use-recommended-components.
+ 	{
+-		files: [ 'storybook/stories/**' ],
++		files: [ 'packages/components/**', 'storybook/stories/**' ],
+ 		rules: {
+ 			'@wordpress/use-recommended-components': 'off',
+ 		},

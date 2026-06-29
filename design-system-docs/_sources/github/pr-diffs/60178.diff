@@ -1,0 +1,477 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b1709ffbc63488..739b09d11f72d5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `InputControl`: Ignore IME events when `isPressEnterToChange` is enabled ([#60090](https://github.com/WordPress/gutenberg/pull/60090)).
+ 
++### Experimental
++
++-   `CustomSelectControlV2`: Rename for consistency ([#60178](https://github.com/WordPress/gutenberg/pull/60178)).
++
+ ### Internal
+ 
+ -   `Popover`, `ColorPicker`: Obviate pointer event trap #59449 ([#59449](https://github.com/WordPress/gutenberg/pull/59449)).
+diff --git a/packages/components/src/custom-select-control-v2/README.md b/packages/components/src/custom-select-control-v2/README.md
+index 634b25808c7d4a..e44801681128b1 100644
+--- a/packages/components/src/custom-select-control-v2/README.md
++++ b/packages/components/src/custom-select-control-v2/README.md
+@@ -1,4 +1,4 @@
+-# CustomSelect
++# CustomSelectControlV2
+ 
+ <div class="callout callout-alert">
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+@@ -12,31 +12,31 @@ Used to render a customizable select control component.
+ 
+ #### Uncontrolled Mode
+ 
+-CustomSelect can be used in an uncontrolled mode, where the component manages its own state. In this mode, the `defaultValue` prop can be used to set the initial selected value. If this prop is not set, the first value from the children will be selected by default.
++`CustomSelectControlV2` can be used in an uncontrolled mode, where the component manages its own state. In this mode, the `defaultValue` prop can be used to set the initial selected value. If this prop is not set, the first value from the children will be selected by default.
+ 
+ ```jsx
+-const UncontrolledCustomSelect = () => (
+-	<CustomSelect label="Colors">
+-		<CustomSelectItem value="Blue">
++const UncontrolledCustomSelectControlV2 = () => (
++	<CustomSelectControlV2 label="Colors">
++		<CustomSelectControlV2.Item value="Blue">
+ 			{ /* The `defaultValue` since it wasn't defined */ }
+ 			<span style={ { color: 'blue' } }>Blue</span>
+-		</CustomSelectItem>
+-		<CustomSelectItem value="Purple">
++		</CustomSelectControlV2.Item>
++		<CustomSelectControlV2.Item value="Purple">
+ 			<span style={ { color: 'purple' } }>Purple</span>
+-		</CustomSelectItem>
+-		<CustomSelectItem value="Pink">
++		</CustomSelectControlV2.Item>
++		<CustomSelectControlV2.Item value="Pink">
+ 			<span style={ { color: 'deeppink' } }>Pink</span>
+-		</CustomSelectItem>
+-	</CustomSelect>
++		</CustomSelectControlV2.Item>
++	</CustomSelectControlV2>
+ );
+ ```
+ 
+ #### Controlled Mode
+ 
+-CustomSelect can also be used in a controlled mode, where the parent component specifies the `value` and the `onChange` props to control selection.
++`CustomSelectControlV2` can also be used in a controlled mode, where the parent component specifies the `value` and the `onChange` props to control selection.
+ 
+ ```jsx
+-const ControlledCustomSelect = () => {
++const ControlledCustomSelectControlV2 = () => {
+ 	const [ value, setValue ] = useState< string | string[] >();
+ 
+     const renderControlledValue = ( renderValue: string | string[] ) => (
+@@ -46,7 +46,7 @@ const ControlledCustomSelect = () => {
+     );
+ 
+ 	return (
+-		<CustomSelect
++		<CustomSelectControlV2
+ 			{ ...props }
+ 			onChange={ ( nextValue ) => {
+ 				setValue( nextValue );
+@@ -55,11 +55,11 @@ const ControlledCustomSelect = () => {
+ 			value={ value }
+ 		>
+ 			{ [ 'blue', 'purple', 'pink' ].map( ( option ) => (
+-				<CustomSelectItem key={ option } value={ option }>
++				<CustomSelectControlV2.Item key={ option } value={ option }>
+ 					{ renderControlledValue( option ) }
+-				</CustomSelectItem>
++				</CustomSelectControlV2.Item>
+ 			) ) }
+-		</CustomSelect>
++		</CustomSelectControlV2>
+ 	);
+ };
+ ```
+@@ -70,23 +70,23 @@ Multiple selection can be enabled by using an array for the `value` and
+ `defaultValue` props. The argument of the `onChange` function will also change accordingly.
+ 
+ ```jsx
+-const MultiSelectCustomSelect = () => (
+-	<CustomSelect defaultValue={ [ 'blue', 'pink' ] } label="Colors">
++const MultiSelectCustomSelectControlV2 = () => (
++	<CustomSelectControlV2 defaultValue={ [ 'blue', 'pink' ] } label="Colors">
+ 		{ [ 'blue', 'purple', 'pink' ].map( ( item ) => (
+-			<CustomSelectItem key={ item } value={ item }>
++			<CustomSelectControlV2.Item key={ item } value={ item }>
+ 				{ item }
+-			</CustomSelectItem>
++			</CustomSelectControlV2.Item>
+ 		) ) }
+-	</CustomSelect>
++	</CustomSelectControlV2>
+ );
+ ```
+ 
+ ### Components and Sub-components
+ 
+-CustomSelect is comprised of two individual components:
++`CustomSelectControlV2` is comprised of two individual components:
+ 
+--   `CustomSelect`: a wrapper component and context provider. It is responsible for managing the state of the `CustomSelectItem` children.
+--   `CustomSelectItem`: renders a single select item. The first `CustomSelectItem` child will be used as the `defaultValue` when `defaultValue` is undefined.
++-   `CustomSelectControlV2`: a wrapper component and context provider. It is responsible for managing the state of the `CustomSelectControlV2.Item` children.
++-   `CustomSelectControlV2.Item`: renders a single select item. The first `CustomSelectControlV2.Item` child will be used as the `defaultValue` when `defaultValue` is undefined.
+ 
+ #### Props
+ 
+@@ -94,7 +94,7 @@ The component accepts the following props:
+ 
+ ##### `children`: `React.ReactNode`
+ 
+-The child elements. This should be composed of CustomSelect.Item components.
++The child elements. This should be composed of `CustomSelectControlV2.Item` components.
+ 
+ -   Required: yes
+ 
+@@ -142,7 +142,7 @@ Can be used to externally control the value of the control.
+ 
+ -   Required: no
+ 
+-### `CustomSelectItem`
++### `CustomSelectControlV2.Item`
+ 
+ Used to render a select item.
+ 
+diff --git a/packages/components/src/custom-select-control-v2/default-component/index.tsx b/packages/components/src/custom-select-control-v2/default-component/index.tsx
+index e5650202a41605..e9a2a9d8f59183 100644
+--- a/packages/components/src/custom-select-control-v2/default-component/index.tsx
++++ b/packages/components/src/custom-select-control-v2/default-component/index.tsx
+@@ -9,8 +9,9 @@ import * as Ariakit from '@ariakit/react';
+ import _CustomSelect from '../custom-select';
+ import type { CustomSelectProps } from '../types';
+ import type { WordPressComponentProps } from '../../context';
++import Item from '../item';
+ 
+-function CustomSelect(
++function CustomSelectControlV2(
+ 	props: WordPressComponentProps< CustomSelectProps, 'button', false >
+ ) {
+ 	const { defaultValue, onChange, value, ...restProps } = props;
+@@ -24,4 +25,6 @@ function CustomSelect(
+ 	return <_CustomSelect { ...restProps } store={ store } />;
+ }
+ 
+-export default CustomSelect;
++CustomSelectControlV2.Item = Item;
++
++export default CustomSelectControlV2;
+diff --git a/packages/components/src/custom-select-control-v2/index.tsx b/packages/components/src/custom-select-control-v2/index.tsx
+index f05191ad8fc0b1..f07e8f6f9f3115 100644
+--- a/packages/components/src/custom-select-control-v2/index.tsx
++++ b/packages/components/src/custom-select-control-v2/index.tsx
+@@ -1,5 +1,4 @@
+ /**
+  * Internal dependencies
+  */
+-export { default as CustomSelect } from './default-component';
+-export { default as CustomSelectItem } from './custom-select-item';
++export { default } from './default-component';
+diff --git a/packages/components/src/custom-select-control-v2/custom-select-item.tsx b/packages/components/src/custom-select-control-v2/item.tsx
+similarity index 93%
+rename from packages/components/src/custom-select-control-v2/custom-select-item.tsx
+rename to packages/components/src/custom-select-control-v2/item.tsx
+index b3e8cfeb1363e1..bd60f974cc43a6 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select-item.tsx
++++ b/packages/components/src/custom-select-control-v2/item.tsx
+@@ -26,4 +26,6 @@ export function CustomSelectItem( {
+ 	);
+ }
+ 
++CustomSelectItem.displayName = 'CustomSelectControlV2.Item';
++
+ export default CustomSelectItem;
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+index a9c68e344a7870..8071a7e932a8bd 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+@@ -11,12 +11,12 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import _CustomSelect from '../custom-select';
++import CustomSelectItem from '../item';
+ import type { LegacyCustomSelectProps } from '../types';
+-import { CustomSelectItem } from '..';
+ import * as Styled from '../styles';
+ import { ContextSystemProvider } from '../../context';
+ 
+-function CustomSelect( props: LegacyCustomSelectProps ) {
++function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 	const {
+ 		__experimentalShowSelectedHint,
+ 		__next40pxDefaultSize = false,
+@@ -128,4 +128,4 @@ function CustomSelect( props: LegacyCustomSelectProps ) {
+ 	);
+ }
+ 
+-export default CustomSelect;
++export default CustomSelectControl;
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+index c14eca2b7c54d3..825a9b63464ca4 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import UncontrolledCustomSelect from '..';
++import UncontrolledCustomSelectControl from '..';
+ 
+ const customClass = 'amber-skies';
+ 
+@@ -48,14 +48,14 @@ const legacyProps = {
+ 	],
+ };
+ 
+-const LegacyControlledCustomSelect = ( {
++const ControlledCustomSelectControl = ( {
+ 	options,
+ 	onChange,
+ 	...restProps
+-}: React.ComponentProps< typeof UncontrolledCustomSelect > ) => {
++}: React.ComponentProps< typeof UncontrolledCustomSelectControl > ) => {
+ 	const [ value, setValue ] = useState( options[ 0 ] );
+ 	return (
+-		<UncontrolledCustomSelect
++		<UncontrolledCustomSelectControl
+ 			{ ...restProps }
+ 			options={ options }
+ 			onChange={ ( args: any ) => {
+@@ -70,8 +70,8 @@ const LegacyControlledCustomSelect = ( {
+ };
+ 
+ describe.each( [
+-	[ 'Uncontrolled', UncontrolledCustomSelect ],
+-	[ 'Controlled', LegacyControlledCustomSelect ],
++	[ 'Uncontrolled', UncontrolledCustomSelectControl ],
++	[ 'Controlled', ControlledCustomSelectControl ],
+ ] )( 'CustomSelectControl (%s)', ( ...modeAndComponent ) => {
+ 	const [ , Component ] = modeAndComponent;
+ 
+diff --git a/packages/components/src/custom-select-control-v2/stories/default.story.tsx b/packages/components/src/custom-select-control-v2/stories/default.story.tsx
+index ee7dba0694c278..ac2f9a51d5951d 100644
+--- a/packages/components/src/custom-select-control-v2/stories/default.story.tsx
++++ b/packages/components/src/custom-select-control-v2/stories/default.story.tsx
+@@ -11,15 +11,14 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import CustomSelect from '../default-component';
+-import { CustomSelectItem } from '..';
++import CustomSelectControlV2 from '..';
+ 
+-const meta: Meta< typeof CustomSelect > = {
++const meta: Meta< typeof CustomSelectControlV2 > = {
+ 	title: 'Components (Experimental)/CustomSelectControl v2/Default',
+-	component: CustomSelect,
++	component: CustomSelectControlV2,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		CustomSelectItem,
++		'CustomSelectControlV2.Item': CustomSelectControlV2.Item,
+ 	},
+ 	argTypes: {
+ 		children: { control: { type: null } },
+@@ -48,10 +47,10 @@ const meta: Meta< typeof CustomSelect > = {
+ };
+ export default meta;
+ 
+-const Template: StoryFn< typeof CustomSelect > = ( props ) => {
++const Template: StoryFn< typeof CustomSelectControlV2 > = ( props ) => {
+ 	const [ value, setValue ] = useState< string | string[] >();
+ 	return (
+-		<CustomSelect
++		<CustomSelectControlV2
+ 			{ ...props }
+ 			onChange={ ( nextValue: string | string[] ) => {
+ 				setValue( nextValue );
+@@ -68,15 +67,15 @@ Default.args = {
+ 	defaultValue: 'Select a color...',
+ 	children: (
+ 		<>
+-			<CustomSelectItem value="Blue">
++			<CustomSelectControlV2.Item value="Blue">
+ 				<span style={ { color: 'blue' } }>Blue</span>
+-			</CustomSelectItem>
+-			<CustomSelectItem value="Purple">
++			</CustomSelectControlV2.Item>
++			<CustomSelectControlV2.Item value="Purple">
+ 				<span style={ { color: 'purple' } }>Purple</span>
+-			</CustomSelectItem>
+-			<CustomSelectItem value="Pink">
++			</CustomSelectControlV2.Item>
++			<CustomSelectControlV2.Item value="Pink">
+ 				<span style={ { color: 'deeppink' } }>Pink</span>
+-			</CustomSelectItem>
++			</CustomSelectControlV2.Item>
+ 		</>
+ 	),
+ };
+@@ -100,9 +99,9 @@ MultipleSelection.args = {
+ 				'maroon',
+ 				'tangerine',
+ 			].map( ( item ) => (
+-				<CustomSelectItem key={ item } value={ item }>
++				<CustomSelectControlV2.Item key={ item } value={ item }>
+ 					{ item }
+-				</CustomSelectItem>
++				</CustomSelectControlV2.Item>
+ 			) ) }
+ 		</>
+ 	),
+@@ -134,9 +133,9 @@ CustomSelectedValue.args = {
+ 		<>
+ 			{ [ 'mystery-person', 'identicon', 'wavatar', 'retro' ].map(
+ 				( option ) => (
+-					<CustomSelectItem key={ option } value={ option }>
++					<CustomSelectControlV2.Item key={ option } value={ option }>
+ 						{ renderItem( option ) }
+-					</CustomSelectItem>
++					</CustomSelectControlV2.Item>
+ 				)
+ 			) }
+ 		</>
+diff --git a/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx b/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx
+index 0deecc0bed5a5e..120686ea84af61 100644
+--- a/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx
++++ b/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx
+@@ -11,12 +11,12 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import CustomSelect from '../legacy-component';
++import CustomSelectControl from '../legacy-component';
+ import * as V1Story from '../../custom-select-control/stories/index.story';
+ 
+-const meta: Meta< typeof CustomSelect > = {
++const meta: Meta< typeof CustomSelectControl > = {
+ 	title: 'Components (Experimental)/CustomSelectControl v2/Legacy',
+-	component: CustomSelect,
++	component: CustomSelectControl,
+ 	argTypes: {
+ 		onChange: { control: { type: null } },
+ 		value: { control: { type: null } },
+@@ -43,17 +43,23 @@ const meta: Meta< typeof CustomSelect > = {
+ };
+ export default meta;
+ 
+-const Template: StoryFn< typeof CustomSelect > = ( props ) => {
++const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
+ 	const [ value, setValue ] = useState( props.options[ 0 ] );
+ 
+ 	const onChange: React.ComponentProps<
+-		typeof CustomSelect
++		typeof CustomSelectControl
+ 	>[ 'onChange' ] = ( changeObject ) => {
+ 		setValue( changeObject.selectedItem );
+ 		props.onChange?.( changeObject );
+ 	};
+ 
+-	return <CustomSelect { ...props } onChange={ onChange } value={ value } />;
++	return (
++		<CustomSelectControl
++			{ ...props }
++			onChange={ onChange }
++			value={ value }
++		/>
++	);
+ };
+ 
+ export const Default = Template.bind( {} );
+diff --git a/packages/components/src/custom-select-control-v2/test/index.tsx b/packages/components/src/custom-select-control-v2/test/index.tsx
+index 52097e4f8bc5bb..13421479c0dd55 100644
+--- a/packages/components/src/custom-select-control-v2/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/test/index.tsx
+@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { CustomSelect as UncontrolledCustomSelect, CustomSelectItem } from '..';
++import UncontrolledCustomSelectControlV2 from '..';
+ import type { CustomSelectProps } from '../types';
+ 
+ const items = [
+@@ -41,14 +41,14 @@ const items = [
+ const defaultProps = {
+ 	label: 'label!',
+ 	children: items.map( ( { value, key } ) => (
+-		<CustomSelectItem value={ value } key={ key } />
++		<UncontrolledCustomSelectControlV2.Item value={ value } key={ key } />
+ 	) ),
+ };
+ 
+-const ControlledCustomSelect = ( props: CustomSelectProps ) => {
++const ControlledCustomSelectControl = ( props: CustomSelectProps ) => {
+ 	const [ value, setValue ] = useState< string | string[] >();
+ 	return (
+-		<UncontrolledCustomSelect
++		<UncontrolledCustomSelectControlV2
+ 			{ ...props }
+ 			onChange={ ( nextValue: string | string[] ) => {
+ 				setValue( nextValue );
+@@ -60,8 +60,8 @@ const ControlledCustomSelect = ( props: CustomSelectProps ) => {
+ };
+ 
+ describe.each( [
+-	[ 'Uncontrolled', UncontrolledCustomSelect ],
+-	[ 'Controlled', ControlledCustomSelect ],
++	[ 'Uncontrolled', UncontrolledCustomSelectControlV2 ],
++	[ 'Controlled', ControlledCustomSelectControl ],
+ ] )( 'CustomSelectControlV2 (%s)', ( ...modeAndComponent ) => {
+ 	const [ , Component ] = modeAndComponent;
+ 
+@@ -257,9 +257,12 @@ describe.each( [
+ 						'rose blush',
+ 						'ultraviolet morning light',
+ 					].map( ( item ) => (
+-						<CustomSelectItem key={ item } value={ item }>
++						<UncontrolledCustomSelectControlV2.Item
++							key={ item }
++							value={ item }
++						>
+ 							{ item }
+-						</CustomSelectItem>
++						</UncontrolledCustomSelectControlV2.Item>
+ 					) ) }
+ 				</Component>
+ 			);
+@@ -326,9 +329,12 @@ describe.each( [
+ 			render(
+ 				<Component defaultValue={ defaultValues } label="Multi-select">
+ 					{ defaultValues.map( ( item ) => (
+-						<CustomSelectItem key={ item } value={ item }>
++						<UncontrolledCustomSelectControlV2.Item
++							key={ item }
++							value={ item }
++						>
+ 							{ item }
+-						</CustomSelectItem>
++						</UncontrolledCustomSelectControlV2.Item>
+ 					) ) }
+ 				</Component>
+ 			);
+@@ -378,12 +384,12 @@ describe.each( [
+ 
+ 		render(
+ 			<Component label="Rendered" renderSelectedValue={ renderValue }>
+-				<CustomSelectItem value="april-29">
++				<UncontrolledCustomSelectControlV2.Item value="april-29">
+ 					{ renderValue( 'april-29' ) }
+-				</CustomSelectItem>
+-				<CustomSelectItem value="july-9">
++				</UncontrolledCustomSelectControlV2.Item>
++				<UncontrolledCustomSelectControlV2.Item value="july-9">
+ 					{ renderValue( 'july-9' ) }
+-				</CustomSelectItem>
++				</UncontrolledCustomSelectControlV2.Item>
+ 			</Component>
+ 		);
+ 

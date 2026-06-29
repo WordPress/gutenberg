@@ -1,0 +1,700 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 73995624c75e1c..51ef56408761fb 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -839,6 +839,12 @@
+ 		"markdown_source": "../packages/components/src/guide/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "HStack",
++		"slug": "h-stack",
++		"markdown_source": "../packages/components/src/h-stack/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "Heading",
+ 		"slug": "heading",
+@@ -1157,6 +1163,12 @@
+ 		"markdown_source": "../packages/components/src/unit-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "VStack",
++		"slug": "v-stack",
++		"markdown_source": "../packages/components/src/v-stack/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "VisuallyHidden",
+ 		"slug": "visually-hidden",
+diff --git a/packages/components/src/alignment-matrix-control/cell.js b/packages/components/src/alignment-matrix-control/cell.js
+index 48dd339ebfc5a0..2aeb839831c0c0 100644
+--- a/packages/components/src/alignment-matrix-control/cell.js
++++ b/packages/components/src/alignment-matrix-control/cell.js
+@@ -3,7 +3,7 @@
+  */
+ import { CompositeItem } from '../composite';
+ import Tooltip from '../tooltip';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/base-control/index.js b/packages/components/src/base-control/index.js
+index 912a547591a405..cabb05732ff13a 100644
+--- a/packages/components/src/base-control/index.js
++++ b/packages/components/src/base-control/index.js
+@@ -6,7 +6,7 @@ import classnames from 'classnames';
+ /**
+  * Internal dependencies
+  */
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ import {
+ 	Wrapper,
+ 	StyledField,
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.js
+index d3804056cd2a89..59d1765de9cc45 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.js
+@@ -15,7 +15,7 @@ import { forwardRef } from '@wordpress/element';
+  */
+ import Tooltip from '../tooltip';
+ import Icon from '../icon';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
+ 
+diff --git a/packages/components/src/button/test/index.js b/packages/components/src/button/test/index.js
+index 7c16354c42e8de..86973bdd64860f 100644
+--- a/packages/components/src/button/test/index.js
++++ b/packages/components/src/button/test/index.js
+@@ -13,7 +13,7 @@ import { plusCircle } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import ButtonWithForwardedRef, { Button } from '../';
+-import VisuallyHidden from '../../visually-hidden';
++import { VisuallyHidden } from '../../visually-hidden';
+ 
+ describe( 'Button', () => {
+ 	describe( 'basic rendering', () => {
+diff --git a/packages/components/src/color-picker/hue.js b/packages/components/src/color-picker/hue.js
+index 7261b729a29477..b454712555b5c0 100644
+--- a/packages/components/src/color-picker/hue.js
++++ b/packages/components/src/color-picker/hue.js
+@@ -43,7 +43,7 @@ import { TAB } from '@wordpress/keycodes';
+  */
+ import { calculateHueChange } from './utils';
+ import KeyboardShortcuts from '../keyboard-shortcuts';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ export class Hue extends Component {
+ 	constructor() {
+diff --git a/packages/components/src/color-picker/inputs.js b/packages/components/src/color-picker/inputs.js
+index aa8d9ff7900367..eb649795047da3 100644
+--- a/packages/components/src/color-picker/inputs.js
++++ b/packages/components/src/color-picker/inputs.js
+@@ -18,7 +18,7 @@ import { chevronDown } from '@wordpress/icons';
+  */
+ import Button from '../button';
+ import TextControl from '../text-control';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ import { isValidHex } from './utils';
+ 
+ /* Wrapper for TextControl, only used to handle intermediate state while typing. */
+diff --git a/packages/components/src/color-picker/saturation.js b/packages/components/src/color-picker/saturation.js
+index 3b9666d734588f..fa0604bb11379b 100644
+--- a/packages/components/src/color-picker/saturation.js
++++ b/packages/components/src/color-picker/saturation.js
+@@ -44,7 +44,7 @@ import { compose, pure, withInstanceId } from '@wordpress/compose';
+ import { calculateSaturationChange } from './utils';
+ import Button from '../button';
+ import KeyboardShortcuts from '../keyboard-shortcuts';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ export class Saturation extends Component {
+ 	constructor( props ) {
+diff --git a/packages/components/src/custom-gradient-bar/control-points.js b/packages/components/src/custom-gradient-bar/control-points.js
+index 5bec42a2f2ae6c..095ef3600977f2 100644
+--- a/packages/components/src/custom-gradient-bar/control-points.js
++++ b/packages/components/src/custom-gradient-bar/control-points.js
+@@ -18,7 +18,7 @@ import Button from '../button';
+ import ColorPicker from '../color-picker';
+ import Dropdown from '../dropdown';
+ import KeyboardShortcuts from '../keyboard-shortcuts';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ import {
+ 	addControlPoint,
+diff --git a/packages/components/src/external-link/index.js b/packages/components/src/external-link/index.js
+index 14b11492e4fb7f..45c2e403f14c4e 100644
+--- a/packages/components/src/external-link/index.js
++++ b/packages/components/src/external-link/index.js
+@@ -14,7 +14,7 @@ import { external } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ import { StyledIcon } from './styles/external-link-styles';
+ 
+ export function ExternalLink(
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index da6c925aaac5d2..d918f40d10c1bc 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -17,7 +17,7 @@ import Button from '../button';
+ import RangeControl from '../range-control';
+ import UnitControl from '../unit-control';
+ import CustomSelectControl from '../custom-select-control';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ const DEFAULT_FONT_SIZE = 'default';
+ const CUSTOM_FONT_SIZE = 'custom';
+diff --git a/packages/components/src/form-token-field/token.js b/packages/components/src/form-token-field/token.js
+index bf6f9d814635c4..fb34d9d20d8cbc 100644
+--- a/packages/components/src/form-token-field/token.js
++++ b/packages/components/src/form-token-field/token.js
+@@ -15,7 +15,7 @@ import { closeSmall } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import Button from '../button';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ export default function Token( {
+ 	value,
+diff --git a/packages/components/src/ui/h-stack/README.md b/packages/components/src/h-stack/README.md
+similarity index 83%
+rename from packages/components/src/ui/h-stack/README.md
+rename to packages/components/src/h-stack/README.md
+index a1361cce5a3384..8ced1105d6c9c0 100644
+--- a/packages/components/src/ui/h-stack/README.md
++++ b/packages/components/src/h-stack/README.md
+@@ -1,5 +1,7 @@
+ # HStack
+ 
++> **Experimental!**
++
+ `HStack` (Horizontal Stack) arranges child elements in a horizontal line.
+ 
+ ## Usage
+@@ -7,7 +9,11 @@
+ `HStack` can render anything inside.
+ 
+ ```jsx
+-import { HStack, Text, View } from '@wordpress/components/ui';
++import {
++	__experimentalHStack as HStack,
++	__experimentalText as Text,
++	__experimentalView as View,
++} from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+@@ -83,7 +89,12 @@ Determines if children should wrap.
+ When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to take up the remaining space.
+ 
+ ```jsx
+-import { HStack, Spacer, Text, View } from '@wordpress/components/ui';
++import {
++	__experimentalHStack as HStack,
++	__experimentalSpacer as Spacer,
++	__experimentalText as Text,
++	__experimentalView as View,
++} from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+@@ -105,7 +116,12 @@ function Example() {
+ `Spacer` also be used in-between items to push them apart.
+ 
+ ```jsx
+-import { HStack, Spacer, Text, View } from '@wordpress/components/ui';
++import {
++	__experimentalHStack as HStack,
++	__experimentalSpacer as Spacer,
++	__experimentalText as Text,
++	__experimentalView as View,
++} from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+diff --git a/packages/components/src/ui/h-stack/component.js b/packages/components/src/h-stack/component.js
+similarity index 74%
+rename from packages/components/src/ui/h-stack/component.js
+rename to packages/components/src/h-stack/component.js
+index 2367010857f64a..24a5b658f9265b 100644
+--- a/packages/components/src/ui/h-stack/component.js
++++ b/packages/components/src/h-stack/component.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../utils';
++import { createComponent } from '../ui/utils';
+ import { useHStack } from './hook';
+ 
+ /**
+@@ -11,7 +11,11 @@ import { useHStack } from './hook';
+  *
+  * @example
+  * ```jsx
+- * import { HStack, Text, View } from `@wordpress/components/ui`;
++ * import {
++ * 	__experimentalHStack as HStack,
++ * 	__experimentalText as Text,
++ * 	__experimentalView as View,
++ * } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return (
+diff --git a/packages/components/src/ui/h-stack/hook.js b/packages/components/src/h-stack/hook.js
+similarity index 77%
+rename from packages/components/src/ui/h-stack/hook.js
+rename to packages/components/src/h-stack/hook.js
+index 4f10464f28cf9c..8d05fa1ada0d7b 100644
+--- a/packages/components/src/ui/h-stack/hook.js
++++ b/packages/components/src/h-stack/hook.js
+@@ -1,14 +1,14 @@
+ /**
+  * Internal dependencies
+  */
+-import { hasConnectNamespace, useContextSystem } from '../context';
+-import { FlexItem, useFlex } from '../../flex';
++import { hasConnectNamespace, useContextSystem } from '../ui/context';
++import { FlexItem, useFlex } from '../flex';
+ import { getAlignmentProps } from './utils';
+-import { getValidChildren } from '../utils/get-valid-children';
++import { getValidChildren } from '../ui/utils/get-valid-children';
+ 
+ /**
+  *
+- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'div'>} props
+  */
+ export function useHStack( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/h-stack/index.js b/packages/components/src/h-stack/index.js
+similarity index 57%
+rename from packages/components/src/ui/h-stack/index.js
+rename to packages/components/src/h-stack/index.js
+index 52bb18bf77ab6b..efe27ae9b6a2e3 100644
+--- a/packages/components/src/ui/h-stack/index.js
++++ b/packages/components/src/h-stack/index.js
+@@ -1,2 +1,2 @@
+ export { default as HStack } from './component';
+-export * from './hook';
++export { useHStack } from './hook';
+diff --git a/packages/components/src/ui/h-stack/stories/index.js b/packages/components/src/h-stack/stories/index.js
+similarity index 81%
+rename from packages/components/src/ui/h-stack/stories/index.js
+rename to packages/components/src/h-stack/stories/index.js
+index 1d777bc6ea7a61..f452b76e872954 100644
+--- a/packages/components/src/ui/h-stack/stories/index.js
++++ b/packages/components/src/h-stack/stories/index.js
+@@ -1,8 +1,8 @@
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../../view';
+-import { HStack } from '../index';
++import { View } from '../../ui/view';
++import { HStack } from '..';
+ 
+ export default {
+ 	component: HStack,
+diff --git a/packages/components/src/ui/h-stack/test/__snapshots__/index.js.snap b/packages/components/src/h-stack/test/__snapshots__/index.js.snap
+similarity index 100%
+rename from packages/components/src/ui/h-stack/test/__snapshots__/index.js.snap
+rename to packages/components/src/h-stack/test/__snapshots__/index.js.snap
+diff --git a/packages/components/src/ui/h-stack/test/index.js b/packages/components/src/h-stack/test/index.js
+similarity index 95%
+rename from packages/components/src/ui/h-stack/test/index.js
+rename to packages/components/src/h-stack/test/index.js
+index 56190f81db4cdd..f11e9f8ea0117c 100644
+--- a/packages/components/src/ui/h-stack/test/index.js
++++ b/packages/components/src/h-stack/test/index.js
+@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../../view';
++import { View } from '../../ui/view';
+ import { HStack } from '..';
+ 
+ describe( 'props', () => {
+diff --git a/packages/components/src/ui/h-stack/types.ts b/packages/components/src/h-stack/types.ts
+similarity index 96%
+rename from packages/components/src/ui/h-stack/types.ts
+rename to packages/components/src/h-stack/types.ts
+index 163e7ec5f9255d..2dcdf4e83ff62b 100644
+--- a/packages/components/src/ui/h-stack/types.ts
++++ b/packages/components/src/h-stack/types.ts
+@@ -7,7 +7,7 @@ import type { CSSProperties } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { FlexProps } from '../../flex/types';
++import type { FlexProps } from '../flex/types';
+ 
+ export type HStackAlignment =
+ 	| 'bottom'
+diff --git a/packages/components/src/ui/h-stack/utils.js b/packages/components/src/h-stack/utils.js
+similarity index 95%
+rename from packages/components/src/ui/h-stack/utils.js
+rename to packages/components/src/h-stack/utils.js
+index 780096da20b29c..288cdc79b7db96 100644
+--- a/packages/components/src/ui/h-stack/utils.js
++++ b/packages/components/src/h-stack/utils.js
+@@ -36,7 +36,7 @@ const V_ALIGNMENTS = {
+ /* eslint-disable jsdoc/valid-types */
+ /**
+  * @param {import('./types').HStackAlignment | import('react').CSSProperties[ 'alignItems' ]} alignment Where to align.
+- * @param {import('../../flex/types').FlexDirection} [direction='row'] Direction to align.
++ * @param {import('../flex/types').FlexDirection} [direction='row'] Direction to align.
+  * @return {import('./types').AlignmentProps} Alignment props.
+  */
+ /* eslint-enable jsdoc/valid-types */
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index c37301e3a0206c..78a6620ca2341c 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -66,6 +66,7 @@ export { default as __experimentalCustomGradientPicker } from './custom-gradient
+ export { default as Guide } from './guide';
+ export { default as GuidePage } from './guide/page';
+ export { Heading as __experimentalHeading } from './heading';
++export { HStack as __experimentalHStack } from './h-stack';
+ export { default as Icon } from './icon';
+ export { default as IconButton } from './button/deprecated';
+ export { default as __experimentalInputControl } from './input-control';
+@@ -124,7 +125,8 @@ export {
+ export { default as TreeSelect } from './tree-select';
+ export { Truncate as __experimentalTruncate } from './truncate';
+ export { default as __experimentalUnitControl } from './unit-control';
+-export { default as VisuallyHidden } from './visually-hidden';
++export { VisuallyHidden } from './visually-hidden';
++export { VStack as __experimentalVStack } from './v-stack';
+ export { default as IsolatedEventContainer } from './isolated-event-container';
+ export {
+ 	createSlotFill,
+diff --git a/packages/components/src/input-control/label.js b/packages/components/src/input-control/label.js
+index c02dd57f9f770f..1c5888fa965128 100644
+--- a/packages/components/src/input-control/label.js
++++ b/packages/components/src/input-control/label.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ import { Label as BaseLabel } from './styles/input-control-styles';
+ 
+ export default function Label( {
+diff --git a/packages/components/src/navigation/menu/menu-title-search.js b/packages/components/src/navigation/menu/menu-title-search.js
+index 02b87e8b089f14..0630dc74d8dba7 100644
+--- a/packages/components/src/navigation/menu/menu-title-search.js
++++ b/packages/components/src/navigation/menu/menu-title-search.js
+@@ -15,7 +15,7 @@ import { ESCAPE } from '@wordpress/keycodes';
+  * Internal dependencies
+  */
+ import Button from '../../button';
+-import VisuallyHidden from '../../visually-hidden';
++import { VisuallyHidden } from '../../visually-hidden';
+ import withSpokenMessages from '../../higher-order/with-spoken-messages';
+ import { useNavigationMenuContext } from './context';
+ import { useNavigationContext } from '../context';
+diff --git a/packages/components/src/ui/__storybook-utils/example-grid.js b/packages/components/src/ui/__storybook-utils/example-grid.js
+index 7ba8a2725329cd..7f648fa1c80fa2 100644
+--- a/packages/components/src/ui/__storybook-utils/example-grid.js
++++ b/packages/components/src/ui/__storybook-utils/example-grid.js
+@@ -5,7 +5,7 @@ import { Grid } from '../grid';
+ import { Surface } from '../surface';
+ import { Text } from '../../text';
+ import { View } from '../view';
+-import { VStack } from '../v-stack';
++import { VStack } from '../../v-stack';
+ 
+ const Container = ( { children } ) => (
+ 	<div
+diff --git a/packages/components/src/ui/__storybook-utils/page.js b/packages/components/src/ui/__storybook-utils/page.js
+index 130b5fdb3044d3..232c9502af9f2f 100644
+--- a/packages/components/src/ui/__storybook-utils/page.js
++++ b/packages/components/src/ui/__storybook-utils/page.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { VStack } from '../v-stack';
++import { VStack } from '../../v-stack';
+ import { View } from '../view';
+ import { Heading } from '../../heading';
+ import { Divider } from '../divider';
+diff --git a/packages/components/src/ui/card/stories/index.js b/packages/components/src/ui/card/stories/index.js
+index fa6a90bad4afe2..a48e680e8feb01 100644
+--- a/packages/components/src/ui/card/stories/index.js
++++ b/packages/components/src/ui/card/stories/index.js
+@@ -3,7 +3,7 @@
+  */
+ import { Grid } from '../../grid';
+ import { Text } from '../../../text';
+-import { VStack } from '../../v-stack';
++import { VStack } from '../../../v-stack';
+ import { Card, CardBody, CardFooter } from '../index';
+ import { Divider } from '../../divider';
+ import { Heading } from '../../../heading';
+diff --git a/packages/components/src/ui/context/stories/ComponentsProvider.stories.js b/packages/components/src/ui/context/stories/ComponentsProvider.stories.js
+index a660d0591dce27..0e8d01432d2a35 100644
+--- a/packages/components/src/ui/context/stories/ComponentsProvider.stories.js
++++ b/packages/components/src/ui/context/stories/ComponentsProvider.stories.js
+@@ -6,7 +6,8 @@ import { createContext, useContext, memo, useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { Card, CardBody, Text, View } from '../../';
++import { Card, CardBody, View } from '../../';
++import { Text } from '../../../text';
+ import { ContextSystemProvider } from '../index';
+ 
+ const SomeContext = createContext();
+diff --git a/packages/components/src/ui/elevation/stories/index.js b/packages/components/src/ui/elevation/stories/index.js
+index 25b78c6c081889..21fc446766b7b3 100644
+--- a/packages/components/src/ui/elevation/stories/index.js
++++ b/packages/components/src/ui/elevation/stories/index.js
+@@ -9,7 +9,7 @@ import { number } from '@storybook/addon-knobs';
+ import { Elevation } from '../index';
+ import { Grid } from '../../grid';
+ import { View } from '../../view';
+-import { HStack } from '../../h-stack';
++import { HStack } from '../../../h-stack';
+ import { Divider } from '../../divider';
+ import {
+ 	ExampleGrid,
+diff --git a/packages/components/src/ui/form-group/form-group-content.js b/packages/components/src/ui/form-group/form-group-content.js
+index 453eff093c19b0..98dbd1a1a83583 100644
+--- a/packages/components/src/ui/form-group/form-group-content.js
++++ b/packages/components/src/ui/form-group/form-group-content.js
+@@ -6,7 +6,7 @@ import { useMemo, memo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { VStack } from '../v-stack';
++import { VStack } from '../../v-stack';
+ import { FormGroupContext } from './form-group-context';
+ import FormGroupHelp from './form-group-help';
+ import FormGroupLabel from './form-group-label';
+diff --git a/packages/components/src/ui/form-group/form-group-label.js b/packages/components/src/ui/form-group/form-group-label.js
+index 1b3e3665205f76..16aa54e1f329aa 100644
+--- a/packages/components/src/ui/form-group/form-group-label.js
++++ b/packages/components/src/ui/form-group/form-group-label.js
+@@ -7,7 +7,7 @@ import { memo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { ControlLabel } from '../control-label';
+-import VisuallyHidden from '../../visually-hidden';
++import { VisuallyHidden } from '../../visually-hidden';
+ 
+ /**
+  * @param {import('../context').ViewOwnProps<import('./types').FormGroupLabelProps, 'label'>} props
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index fb4ceeeba33a6f..7c6c4741c401aa 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -5,8 +5,6 @@ export * from './divider';
+ export * from './elevation';
+ export * from './form-group';
+ export * from './grid';
+-export * from './h-stack';
+ export * from './shortcut';
+ export * from './spinner';
+-export * from './v-stack';
+ export * from './view';
+diff --git a/packages/components/src/ui/v-stack/README.md b/packages/components/src/v-stack/README.md
+similarity index 83%
+rename from packages/components/src/ui/v-stack/README.md
+rename to packages/components/src/v-stack/README.md
+index 2fa95655dfbaaa..a1ae16ecae3237 100644
+--- a/packages/components/src/ui/v-stack/README.md
++++ b/packages/components/src/v-stack/README.md
+@@ -1,5 +1,7 @@
+ # VStack
+ 
++> **Experimental!**
++
+ `VStack` (or Vertical Stack) is a layout component that arranges child elements in a vertical line.
+ 
+ ## Usage
+@@ -7,7 +9,11 @@
+ `VStack` can render anything inside.
+ 
+ ```jsx
+-import { VStack, Text, View } from '@wordpress/components/ui';
++import {
++	__experimentalText as Text,
++	__experimentalView as View
++	__experimentalVStack as VStack,
++} from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+@@ -83,6 +89,13 @@ Determines if children should wrap.
+ When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to take up the remaining space.
+ 
+ ```jsx
++import {
++	__experimentalSpacer as Spacer,
++	__experimentalText as Text,
++	__experimentalView as View
++	__experimentalVStack as VStack,
++} from '@wordpress/components';
++
+ function Example() {
+ 	return (
+ 		<VStack>
+@@ -103,6 +116,13 @@ function Example() {
+ `Spacer` can also be used in-between items to push them apart.
+ 
+ ```jsx
++import {
++	__experimentalSpacer as Spacer,
++	__experimentalText as Text,
++	__experimentalView as View
++	__experimentalVStack as VStack,
++} from '@wordpress/components';
++
+ function Example() {
+ 	return (
+ 		<VStack>
+diff --git a/packages/components/src/ui/v-stack/component.js b/packages/components/src/v-stack/component.js
+similarity index 75%
+rename from packages/components/src/ui/v-stack/component.js
+rename to packages/components/src/v-stack/component.js
+index 9531b82cc5271f..631cd0f103634c 100644
+--- a/packages/components/src/ui/v-stack/component.js
++++ b/packages/components/src/v-stack/component.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../utils';
++import { createComponent } from '../ui/utils';
+ import { useVStack } from './hook';
+ 
+ /**
+@@ -11,7 +11,11 @@ import { useVStack } from './hook';
+  *
+  * @example
+  * ```jsx
+- * import { VStack, Text, View } from `@wordpress/components/ui`;
++ * import {
++ * 	__experimentalText as Text,
++ * 	__experimentalView as View,
++ * 	__experimentalVStack as VStack,
++ * } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return (
+diff --git a/packages/components/src/ui/v-stack/hook.js b/packages/components/src/v-stack/hook.js
+similarity index 70%
+rename from packages/components/src/ui/v-stack/hook.js
+rename to packages/components/src/v-stack/hook.js
+index 83dd12053e1bad..86cd61076ffcee 100644
+--- a/packages/components/src/ui/v-stack/hook.js
++++ b/packages/components/src/v-stack/hook.js
+@@ -1,12 +1,12 @@
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../context';
++import { useContextSystem } from '../ui/context';
+ import { useHStack } from '../h-stack';
+ 
+ /**
+  *
+- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'div'>} props
+  */
+ export function useVStack( props ) {
+ 	const { expanded = false, ...otherProps } = useContextSystem(
+diff --git a/packages/components/src/ui/v-stack/index.js b/packages/components/src/v-stack/index.js
+similarity index 57%
+rename from packages/components/src/ui/v-stack/index.js
+rename to packages/components/src/v-stack/index.js
+index 96f0a2a02fe891..932237a92adf93 100644
+--- a/packages/components/src/ui/v-stack/index.js
++++ b/packages/components/src/v-stack/index.js
+@@ -1,3 +1,2 @@
+ export { default as VStack } from './component';
+-
+-export * from './hook';
++export { useVStack } from './hook';
+diff --git a/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap b/packages/components/src/v-stack/test/__snapshots__/index.js.snap
+similarity index 100%
+rename from packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap
+rename to packages/components/src/v-stack/test/__snapshots__/index.js.snap
+diff --git a/packages/components/src/ui/v-stack/test/index.js b/packages/components/src/v-stack/test/index.js
+similarity index 91%
+rename from packages/components/src/ui/v-stack/test/index.js
+rename to packages/components/src/v-stack/test/index.js
+index cfb2df75e0f469..deb49e4e2d7bdb 100644
+--- a/packages/components/src/ui/v-stack/test/index.js
++++ b/packages/components/src/v-stack/test/index.js
+@@ -6,8 +6,8 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../../view';
+-import { VStack } from '../index';
++import { View } from '../../ui/view';
++import { VStack } from '..';
+ 
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {
+diff --git a/packages/components/src/ui/v-stack/types.ts b/packages/components/src/v-stack/types.ts
+similarity index 100%
+rename from packages/components/src/ui/v-stack/types.ts
+rename to packages/components/src/v-stack/types.ts
+diff --git a/packages/components/src/visually-hidden/index.js b/packages/components/src/visually-hidden/index.js
+index 4c59b9138c4f21..815ddc1ad47cc3 100644
+--- a/packages/components/src/visually-hidden/index.js
++++ b/packages/components/src/visually-hidden/index.js
+@@ -1,2 +1,2 @@
+-export { default } from './component';
+-export * from './hook';
++export { default as VisuallyHidden } from './component';
++export { useVisuallyHidden } from './hook';
+diff --git a/packages/components/src/visually-hidden/test/index.js b/packages/components/src/visually-hidden/test/index.js
+index f753a7c41f050a..6925edbee9eefb 100644
+--- a/packages/components/src/visually-hidden/test/index.js
++++ b/packages/components/src/visually-hidden/test/index.js
+@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import VisuallyHidden, { useVisuallyHidden } from '..';
++import { VisuallyHidden, useVisuallyHidden } from '..';
+ 
+ describe( 'useVisuallyHidden', () => {
+ 	it( 'should apply the expected classnames', () => {
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 275e6bc5163f49..f4c7d9364e0b6f 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -32,7 +32,9 @@
+ 		"src/visually-hidden/**/*",
+ 		"src/text/**/*",
+ 		"src/grid/**/*",
+-		"src/__next/**/*"
++		"src/__next/**/*",
++		"src/h-stack/**/*",
++		"src/v-stack/**/*"
+ 	],
+ 	"exclude": [
+ 		"src/**/*.android.js",

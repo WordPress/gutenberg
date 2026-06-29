@@ -1,0 +1,1394 @@
+diff --git a/packages/components/src/base-control/index.js b/packages/components/src/base-control/index.js
+index bbeb0a7b77bb4d..4ec051c01159bd 100644
+--- a/packages/components/src/base-control/index.js
++++ b/packages/components/src/base-control/index.js
+@@ -20,7 +20,7 @@ import {
+  *                                                             That element should be passed as a child.
+  * @property {import('react').ReactNode} help                  If this property is added, a help text will be
+  *                                                             generated using help property as the content.
+- * @property {import('react').ReactNode} label                 If this property is added, a label will be generated
++ * @property {import('react').ReactNode} [label]               If this property is added, a label will be generated
+  *                                                             using label property as the content.
+  * @property {boolean}                   [hideLabelFromVision] If true, the label will only be visible to screen readers.
+  * @property {string}                    [className]           The class that will be added with "components-base-control" to the
+diff --git a/packages/components/src/input-control/backdrop.js b/packages/components/src/input-control/backdrop.tsx
+similarity index 100%
+rename from packages/components/src/input-control/backdrop.js
+rename to packages/components/src/input-control/backdrop.tsx
+diff --git a/packages/components/src/input-control/index.js b/packages/components/src/input-control/index.tsx
+similarity index 89%
+rename from packages/components/src/input-control/index.js
+rename to packages/components/src/input-control/index.tsx
+index 56eb23d950f704..cb20755bc54c9b 100644
+--- a/packages/components/src/input-control/index.js
++++ b/packages/components/src/input-control/index.tsx
+@@ -3,6 +3,8 @@
+  */
+ import { noop } from 'lodash';
+ import classNames from 'classnames';
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -15,8 +17,9 @@ import { useState, forwardRef } from '@wordpress/element';
+  */
+ import InputBase from './input-base';
+ import InputField from './input-field';
++import type { InputControlProps } from './types';
+ 
+-function useUniqueId( idProp ) {
++function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( InputControl );
+ 	const id = `inspector-input-control-${ instanceId }`;
+ 
+@@ -42,8 +45,8 @@ export function InputControl(
+ 		suffix,
+ 		value,
+ 		...props
+-	},
+-	ref
++	}: InputControlProps,
++	ref: Ref< HTMLInputElement >
+ ) {
+ 	const [ isFocused, setIsFocused ] = useState( false );
+ 
+diff --git a/packages/components/src/input-control/input-base.js b/packages/components/src/input-control/input-base.tsx
+similarity index 75%
+rename from packages/components/src/input-control/input-base.js
+rename to packages/components/src/input-control/input-base.tsx
+index 232e5c16a1f238..59fc18e5d93b52 100644
+--- a/packages/components/src/input-control/input-base.js
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -1,3 +1,9 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -16,8 +22,9 @@ import {
+ 	Suffix,
+ 	LabelWrapper,
+ } from './styles/input-control-styles';
++import type { InputBaseProps, LabelPosition } from './types';
+ 
+-function useUniqueId( idProp ) {
++function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( InputBase );
+ 	const id = `input-base-control-${ instanceId }`;
+ 
+@@ -25,8 +32,8 @@ function useUniqueId( idProp ) {
+ }
+ 
+ // Adapter to map props for the new ui/flex compopnent.
+-function getUIFlexProps( { labelPosition } ) {
+-	const props = {};
++function getUIFlexProps( labelPosition?: LabelPosition ) {
++	const props: { direction?: string; gap?: number; justify?: string } = {};
+ 	switch ( labelPosition ) {
+ 		case 'top':
+ 			props.direction = 'column';
+@@ -59,21 +66,21 @@ export function InputBase(
+ 		size = 'default',
+ 		suffix,
+ 		...props
+-	},
+-	ref
++	}: InputBaseProps,
++	ref: Ref< HTMLDivElement >
+ ) {
+ 	const id = useUniqueId( idProp );
+ 	const hideLabel = hideLabelFromVision || ! label;
+ 
+ 	return (
++		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions
+ 		<Root
+ 			{ ...props }
+-			{ ...getUIFlexProps( { labelPosition } ) }
++			{ ...getUIFlexProps( labelPosition ) }
+ 			className={ className }
+ 			isFocused={ isFocused }
+ 			labelPosition={ labelPosition }
+ 			ref={ ref }
+-			__unstableVersion="next"
+ 		>
+ 			<LabelWrapper>
+ 				<Label
+@@ -91,7 +98,6 @@ export function InputBase(
+ 				className="components-input-control__container"
+ 				disabled={ disabled }
+ 				hideLabel={ hideLabel }
+-				isFocused={ isFocused }
+ 				labelPosition={ labelPosition }
+ 			>
+ 				{ prefix && (
+@@ -105,13 +111,7 @@ export function InputBase(
+ 						{ suffix }
+ 					</Suffix>
+ 				) }
+-				<Backdrop
+-					aria-hidden="true"
+-					disabled={ disabled }
+-					isFocused={ isFocused }
+-					label={ label }
+-					size={ size }
+-				/>
++				<Backdrop disabled={ disabled } isFocused={ isFocused } />
+ 			</Container>
+ 		</Root>
+ 	);
+diff --git a/packages/components/src/input-control/input-field.js b/packages/components/src/input-control/input-field.tsx
+similarity index 76%
+rename from packages/components/src/input-control/input-field.js
+rename to packages/components/src/input-control/input-field.tsx
+index 5931c789f651b9..099c72890fcfe7 100644
+--- a/packages/components/src/input-control/input-field.js
++++ b/packages/components/src/input-control/input-field.tsx
+@@ -3,6 +3,16 @@
+  */
+ import { noop } from 'lodash';
+ import { useDrag } from 'react-use-gesture';
++// eslint-disable-next-line no-restricted-imports
++import type {
++	SyntheticEvent,
++	ChangeEvent,
++	KeyboardEvent,
++	PointerEvent,
++	FocusEvent,
++	Ref,
++	MouseEvent,
++} from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -12,11 +22,13 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+ /**
+  * Internal dependencies
+  */
++import type { PolymorphicComponentProps } from '../ui/context';
+ import { useDragCursor } from './utils';
+ import { Input } from './styles/input-control-styles';
+-import { useInputControlStateReducer } from './state';
++import { useInputControlStateReducer } from './reducer/reducer';
+ import { isValueEmpty } from '../utils/values';
+ import { useUpdateEffect } from '../utils';
++import type { InputFieldProps } from './types';
+ 
+ function InputField(
+ 	{
+@@ -37,12 +49,12 @@ function InputField(
+ 		onValidate = noop,
+ 		size = 'default',
+ 		setIsFocused,
+-		stateReducer = ( state ) => state,
++		stateReducer = ( state: any ) => state,
+ 		value: valueProp,
+ 		type,
+ 		...props
+-	},
+-	ref
++	}: PolymorphicComponentProps< InputFieldProps, 'input', false >,
++	ref: Ref< HTMLInputElement >
+ ) {
+ 	const {
+ 		// State
+@@ -82,14 +94,16 @@ function InputField(
+ 			return;
+ 		}
+ 		if ( ! isFocused && ! wasDirtyOnBlur.current ) {
+-			update( valueProp );
++			update( valueProp, _event as SyntheticEvent );
+ 		} else if ( ! isDirty ) {
+-			onChange( value, { event: _event } );
++			onChange( value, {
++				event: _event as ChangeEvent< HTMLInputElement >,
++			} );
+ 			wasDirtyOnBlur.current = false;
+ 		}
+ 	}, [ value, isDirty, isFocused, valueProp ] );
+ 
+-	const handleOnBlur = ( event ) => {
++	const handleOnBlur = ( event: FocusEvent< HTMLInputElement > ) => {
+ 		onBlur( event );
+ 		setIsFocused( false );
+ 
+@@ -102,23 +116,23 @@ function InputField(
+ 			if ( ! isValueEmpty( value ) ) {
+ 				handleOnCommit( event );
+ 			} else {
+-				reset( valueProp );
++				reset( valueProp, event );
+ 			}
+ 		}
+ 	};
+ 
+-	const handleOnFocus = ( event ) => {
++	const handleOnFocus = ( event: FocusEvent< HTMLInputElement > ) => {
+ 		onFocus( event );
+ 		setIsFocused( true );
+ 	};
+ 
+-	const handleOnChange = ( event ) => {
++	const handleOnChange = ( event: ChangeEvent< HTMLInputElement > ) => {
+ 		const nextValue = event.target.value;
+ 		change( nextValue, event );
+ 	};
+ 
+-	const handleOnCommit = ( event ) => {
+-		const nextValue = event.target.value;
++	const handleOnCommit = ( event: SyntheticEvent< HTMLInputElement > ) => {
++		const nextValue = event.currentTarget.value;
+ 
+ 		try {
+ 			onValidate( nextValue, event );
+@@ -128,7 +142,7 @@ function InputField(
+ 		}
+ 	};
+ 
+-	const handleOnKeyDown = ( event ) => {
++	const handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
+ 		const { keyCode } = event;
+ 		onKeyDown( event );
+ 
+@@ -152,7 +166,7 @@ function InputField(
+ 		}
+ 	};
+ 
+-	const dragGestureProps = useDrag(
++	const dragGestureProps = useDrag< PointerEvent< HTMLInputElement > >(
+ 		( dragProps ) => {
+ 			const { distance, dragging, event } = dragProps;
+ 			// The event is persisted to prevent errors in components using this
+@@ -193,10 +207,13 @@ function InputField(
+ 	 */
+ 	let handleOnMouseDown;
+ 	if ( type === 'number' ) {
+-		handleOnMouseDown = ( event ) => {
++		handleOnMouseDown = ( event: MouseEvent< HTMLInputElement > ) => {
+ 			props.onMouseDown?.( event );
+-			if ( event.target !== event.target.ownerDocument.activeElement ) {
+-				event.target.focus();
++			if (
++				event.currentTarget !==
++				event.currentTarget.ownerDocument.activeElement
++			) {
++				event.currentTarget.focus();
+ 			}
+ 		};
+ 	}
+@@ -216,7 +233,7 @@ function InputField(
+ 			onKeyDown={ handleOnKeyDown }
+ 			onMouseDown={ handleOnMouseDown }
+ 			ref={ ref }
+-			size={ size }
++			inputSize={ size }
+ 			value={ value }
+ 			type={ type }
+ 		/>
+diff --git a/packages/components/src/input-control/label.js b/packages/components/src/input-control/label.tsx
+similarity index 72%
+rename from packages/components/src/input-control/label.js
+rename to packages/components/src/input-control/label.tsx
+index 1c5888fa965128..537c335373b5d8 100644
+--- a/packages/components/src/input-control/label.js
++++ b/packages/components/src/input-control/label.tsx
+@@ -3,13 +3,15 @@
+  */
+ import { VisuallyHidden } from '../visually-hidden';
+ import { Label as BaseLabel } from './styles/input-control-styles';
++import type { PolymorphicComponentProps } from '../ui/context';
++import type { InputControlLabelProps } from './types';
+ 
+ export default function Label( {
+ 	children,
+ 	hideLabelFromVision,
+ 	htmlFor,
+ 	...props
+-} ) {
++}: PolymorphicComponentProps< InputControlLabelProps, 'label', false > ) {
+ 	if ( ! children ) return null;
+ 
+ 	if ( hideLabelFromVision ) {
+diff --git a/packages/components/src/input-control/reducer/actions.ts b/packages/components/src/input-control/reducer/actions.ts
+new file mode 100644
+index 00000000000000..652e7211e251e4
+--- /dev/null
++++ b/packages/components/src/input-control/reducer/actions.ts
+@@ -0,0 +1,66 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { SyntheticEvent } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { DragProps } from '../types';
++
++export const CHANGE = 'CHANGE';
++export const COMMIT = 'COMMIT';
++export const DRAG_END = 'DRAG_END';
++export const DRAG_START = 'DRAG_START';
++export const DRAG = 'DRAG';
++export const INVALIDATE = 'INVALIDATE';
++export const PRESS_DOWN = 'PRESS_DOWN';
++export const PRESS_ENTER = 'PRESS_ENTER';
++export const PRESS_UP = 'PRESS_UP';
++export const RESET = 'RESET';
++export const UPDATE = 'UPDATE';
++
++interface EventPayload {
++	event?: SyntheticEvent;
++}
++
++interface Action< Type, ExtraPayload = {} > {
++	type: Type;
++	payload: EventPayload & ExtraPayload;
++}
++
++interface ValuePayload {
++	value: string;
++}
++
++export type ChangeAction = Action< typeof CHANGE, ValuePayload >;
++export type CommitAction = Action< typeof COMMIT, ValuePayload >;
++export type PressUpAction = Action< typeof PRESS_UP >;
++export type PressDownAction = Action< typeof PRESS_DOWN >;
++export type PressEnterAction = Action< typeof PRESS_ENTER >;
++export type DragStartAction = Action< typeof DRAG_START, DragProps >;
++export type DragEndAction = Action< typeof DRAG_END, DragProps >;
++export type DragAction = Action< typeof DRAG, DragProps >;
++export type ResetAction = Action< typeof RESET, Partial< ValuePayload > >;
++export type UpdateAction = Action< typeof UPDATE, ValuePayload >;
++export type InvalidateAction = Action<
++	typeof INVALIDATE,
++	{ error: Error | null }
++>;
++
++export type ChangeEventAction =
++	| ChangeAction
++	| ResetAction
++	| CommitAction
++	| UpdateAction;
++
++export type DragEventAction = DragStartAction | DragEndAction | DragAction;
++
++export type KeyEventAction = PressDownAction | PressUpAction | PressEnterAction;
++
++export type InputAction =
++	| ChangeEventAction
++	| KeyEventAction
++	| DragEventAction
++	| InvalidateAction;
+diff --git a/packages/components/src/input-control/state.js b/packages/components/src/input-control/reducer/reducer.ts
+similarity index 51%
+rename from packages/components/src/input-control/state.js
+rename to packages/components/src/input-control/reducer/reducer.ts
+index d0e0a413ed578b..2499096a843384 100644
+--- a/packages/components/src/input-control/state.js
++++ b/packages/components/src/input-control/reducer/reducer.ts
+@@ -2,47 +2,34 @@
+  * External dependencies
+  */
+ import { isEmpty } from 'lodash';
++// eslint-disable-next-line no-restricted-imports
++import type { SyntheticEvent } from 'react';
++
+ /**
+  * WordPress dependencies
+  */
+ import { useReducer } from '@wordpress/element';
+ 
+-const initialStateReducer = ( state ) => state;
+-
+-const initialInputControlState = {
+-	_event: {},
+-	error: null,
+-	initialValue: '',
+-	isDirty: false,
+-	isDragEnabled: false,
+-	isDragging: false,
+-	isPressEnterToChange: false,
+-	value: '',
+-};
+-
+-const actionTypes = {
+-	CHANGE: 'CHANGE',
+-	COMMIT: 'COMMIT',
+-	DRAG_END: 'DRAG_END',
+-	DRAG_START: 'DRAG_START',
+-	DRAG: 'DRAG',
+-	INVALIDATE: 'INVALIDATE',
+-	PRESS_DOWN: 'PRESS_DOWN',
+-	PRESS_ENTER: 'PRESS_ENTER',
+-	PRESS_UP: 'PRESS_UP',
+-	RESET: 'RESET',
+-	UPDATE: 'UPDATE',
+-};
+-
+-export const inputControlActionTypes = actionTypes;
++/**
++ * Internal dependencies
++ */
++import {
++	InputState,
++	StateReducer,
++	initialInputControlState,
++	initialStateReducer,
++} from './state';
++import * as actions from './actions';
+ 
+ /**
+  * Prepares initialState for the reducer.
+  *
+- * @param {Object} initialState The initial state.
+- * @return {Object} Prepared initialState for the reducer
++ * @param  initialState The initial state.
++ * @return Prepared initialState for the reducer
+  */
+-function mergeInitialState( initialState = initialInputControlState ) {
++function mergeInitialState(
++	initialState: Partial< InputState > = initialInputControlState
++): InputState {
+ 	const { value } = initialState;
+ 
+ 	return {
+@@ -56,15 +43,17 @@ function mergeInitialState( initialState = initialInputControlState ) {
+  * Composes multiple stateReducers into a single stateReducer, building
+  * the pipeline to control the flow for state and actions.
+  *
+- * @param {...Function} fns State reducers.
+- * @return {Function} The single composed stateReducer.
++ * @param  fns State reducers.
++ * @return The single composed stateReducer.
+  */
+-export const composeStateReducers = ( ...fns ) => {
++export const composeStateReducers = (
++	...fns: StateReducer[]
++): StateReducer => {
+ 	return ( ...args ) => {
+ 		return fns.reduceRight( ( state, fn ) => {
+ 			const fnState = fn( ...args );
+ 			return isEmpty( fnState ) ? state : { ...state, ...fnState };
+-		}, {} );
++		}, {} as InputState );
+ 	};
+ };
+ 
+@@ -75,43 +64,44 @@ export const composeStateReducers = ( ...fns ) => {
+  * This technique uses the "stateReducer" design pattern:
+  * https://kentcdodds.com/blog/the-state-reducer-pattern/
+  *
+- * @param {Function} composedStateReducers A custom reducer that can subscribe and modify state.
+- * @return {Function} The reducer.
++ * @param  composedStateReducers A custom reducer that can subscribe and modify state.
++ * @return The reducer.
+  */
+-function inputControlStateReducer( composedStateReducers ) {
++function inputControlStateReducer(
++	composedStateReducers: StateReducer
++): StateReducer {
+ 	return ( state, action ) => {
+ 		const nextState = { ...state };
+-		const { type, payload } = action;
+ 
+-		switch ( type ) {
++		switch ( action.type ) {
+ 			/**
+ 			 * Keyboard events
+ 			 */
+-			case actionTypes.PRESS_UP:
++			case actions.PRESS_UP:
+ 				nextState.isDirty = false;
+ 				break;
+ 
+-			case actionTypes.PRESS_DOWN:
++			case actions.PRESS_DOWN:
+ 				nextState.isDirty = false;
+ 				break;
+ 
+ 			/**
+ 			 * Drag events
+ 			 */
+-			case actionTypes.DRAG_START:
++			case actions.DRAG_START:
+ 				nextState.isDragging = true;
+ 				break;
+ 
+-			case actionTypes.DRAG_END:
++			case actions.DRAG_END:
+ 				nextState.isDragging = false;
+ 				break;
+ 
+ 			/**
+ 			 * Input events
+ 			 */
+-			case actionTypes.CHANGE:
++			case actions.CHANGE:
+ 				nextState.error = null;
+-				nextState.value = payload.value;
++				nextState.value = action.payload.value;
+ 
+ 				if ( state.isPressEnterToChange ) {
+ 					nextState.isDirty = true;
+@@ -119,32 +109,32 @@ function inputControlStateReducer( composedStateReducers ) {
+ 
+ 				break;
+ 
+-			case actionTypes.COMMIT:
+-				nextState.value = payload.value;
++			case actions.COMMIT:
++				nextState.value = action.payload.value;
+ 				nextState.isDirty = false;
+ 				break;
+ 
+-			case actionTypes.RESET:
++			case actions.RESET:
+ 				nextState.error = null;
+ 				nextState.isDirty = false;
+-				nextState.value = payload.value || state.initialValue;
++				nextState.value = action.payload.value || state.initialValue;
+ 				break;
+ 
+-			case actionTypes.UPDATE:
+-				nextState.value = payload.value;
++			case actions.UPDATE:
++				nextState.value = action.payload.value;
+ 				nextState.isDirty = false;
+ 				break;
+ 
+ 			/**
+ 			 * Validation
+ 			 */
+-			case actionTypes.INVALIDATE:
+-				nextState.error = payload.error;
++			case actions.INVALIDATE:
++				nextState.error = action.payload.error;
+ 				break;
+ 		}
+ 
+-		if ( payload.event ) {
+-			nextState._event = payload.event;
++		if ( action.payload.event ) {
++			nextState._event = action.payload.event;
+ 		}
+ 
+ 		/**
+@@ -166,20 +156,23 @@ function inputControlStateReducer( composedStateReducers ) {
+  * This technique uses the "stateReducer" design pattern:
+  * https://kentcdodds.com/blog/the-state-reducer-pattern/
+  *
+- * @param {Function} stateReducer An external state reducer.
+- * @param {Object}   initialState The initial state for the reducer.
+- * @return {Object} State, dispatch, and a collection of actions.
++ * @param  stateReducer An external state reducer.
++ * @param  initialState The initial state for the reducer.
++ * @return State, dispatch, and a collection of actions.
+  */
+ export function useInputControlStateReducer(
+-	stateReducer = initialStateReducer,
+-	initialState = initialInputControlState
++	stateReducer: StateReducer = initialStateReducer,
++	initialState: Partial< InputState > = initialInputControlState
+ ) {
+-	const [ state, dispatch ] = useReducer(
++	const [ state, dispatch ] = useReducer< StateReducer >(
+ 		inputControlStateReducer( stateReducer ),
+ 		mergeInitialState( initialState )
+ 	);
+ 
+-	const createChangeEvent = ( type ) => ( nextValue, event ) => {
++	const createChangeEvent = ( type: actions.ChangeEventAction[ 'type' ] ) => (
++		nextValue: actions.ChangeEventAction[ 'payload' ][ 'value' ],
++		event: actions.ChangeEventAction[ 'payload' ][ 'event' ]
++	) => {
+ 		/**
+ 		 * Persist allows for the (Synthetic) event to be used outside of
+ 		 * this function call.
+@@ -192,10 +185,12 @@ export function useInputControlStateReducer(
+ 		dispatch( {
+ 			type,
+ 			payload: { value: nextValue, event },
+-		} );
++		} as actions.InputAction );
+ 	};
+ 
+-	const createKeyEvent = ( type ) => ( event ) => {
++	const createKeyEvent = ( type: actions.KeyEventAction[ 'type' ] ) => (
++		event: actions.KeyEventAction[ 'payload' ][ 'event' ]
++	) => {
+ 		/**
+ 		 * Persist allows for the (Synthetic) event to be used outside of
+ 		 * this function call.
+@@ -208,26 +203,29 @@ export function useInputControlStateReducer(
+ 		dispatch( { type, payload: { event } } );
+ 	};
+ 
+-	const createDragEvent = ( type ) => ( dragProps ) => {
+-		dispatch( { type, payload: dragProps } );
++	const createDragEvent = ( type: actions.DragEventAction[ 'type' ] ) => (
++		payload: actions.DragEventAction[ 'payload' ]
++	) => {
++		dispatch( { type, payload } );
+ 	};
+ 
+ 	/**
+ 	 * Actions for the reducer
+ 	 */
+-	const change = createChangeEvent( actionTypes.CHANGE );
+-	const invalidate = createChangeEvent( actionTypes.INVALIDATE );
+-	const reset = createChangeEvent( actionTypes.RESET );
+-	const commit = createChangeEvent( actionTypes.COMMIT );
+-	const update = createChangeEvent( actionTypes.UPDATE );
++	const change = createChangeEvent( actions.CHANGE );
++	const invalidate = ( error: Error, event: SyntheticEvent ) =>
++		dispatch( { type: actions.INVALIDATE, payload: { error, event } } );
++	const reset = createChangeEvent( actions.RESET );
++	const commit = createChangeEvent( actions.COMMIT );
++	const update = createChangeEvent( actions.UPDATE );
+ 
+-	const dragStart = createDragEvent( actionTypes.DRAG_START );
+-	const drag = createDragEvent( actionTypes.DRAG );
+-	const dragEnd = createDragEvent( actionTypes.DRAG_END );
++	const dragStart = createDragEvent( actions.DRAG_START );
++	const drag = createDragEvent( actions.DRAG );
++	const dragEnd = createDragEvent( actions.DRAG_END );
+ 
+-	const pressUp = createKeyEvent( actionTypes.PRESS_UP );
+-	const pressDown = createKeyEvent( actionTypes.PRESS_DOWN );
+-	const pressEnter = createKeyEvent( actionTypes.PRESS_ENTER );
++	const pressUp = createKeyEvent( actions.PRESS_UP );
++	const pressDown = createKeyEvent( actions.PRESS_DOWN );
++	const pressEnter = createKeyEvent( actions.PRESS_ENTER );
+ 
+ 	return {
+ 		change,
+@@ -243,5 +241,5 @@ export function useInputControlStateReducer(
+ 		reset,
+ 		state,
+ 		update,
+-	};
++	} as const;
+ }
+diff --git a/packages/components/src/input-control/reducer/state.ts b/packages/components/src/input-control/reducer/state.ts
+new file mode 100644
+index 00000000000000..9fcbfad2d1ae28
+--- /dev/null
++++ b/packages/components/src/input-control/reducer/state.ts
+@@ -0,0 +1,36 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Reducer } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { InputAction } from './actions';
++
++export interface InputState {
++	_event: Event | {};
++	error: Error | null;
++	initialValue?: string;
++	isDirty: boolean;
++	isDragEnabled: boolean;
++	isDragging: boolean;
++	isPressEnterToChange: boolean;
++	value?: string;
++}
++
++export type StateReducer = Reducer< InputState, InputAction >;
++
++export const initialStateReducer: StateReducer = ( state: InputState ) => state;
++
++export const initialInputControlState: InputState = {
++	_event: {},
++	error: null,
++	initialValue: '',
++	isDirty: false,
++	isDragEnabled: false,
++	isDragging: false,
++	isPressEnterToChange: false,
++	value: '',
++};
+diff --git a/packages/components/src/input-control/styles/input-control-styles.js b/packages/components/src/input-control/styles/input-control-styles.tsx
+similarity index 64%
+rename from packages/components/src/input-control/styles/input-control-styles.js
+rename to packages/components/src/input-control/styles/input-control-styles.tsx
+index f588268f0cf3e4..bbd518ccb4822d 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.js
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -1,27 +1,39 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/react';
++import { css, SerializedStyles } from '@emotion/react';
+ import styled from '@emotion/styled';
++// eslint-disable-next-line no-restricted-imports
++import type { CSSProperties, ReactNode } from 'react';
+ 
+ /**
+  * Internal dependencies
+  */
++import type { PolymorphicComponentProps } from '../../ui/context';
+ import { Flex, FlexItem } from '../../flex';
+ import { Text } from '../../text';
+ import { COLORS, rtl } from '../../utils';
++import type { LabelPosition } from '../types';
+ 
+-const rootFloatLabelStyles = () => {
+-	return css( { paddingTop: 0 } );
++type ContainerProps = {
++	disabled?: boolean;
++	hideLabel?: boolean;
++	__unstableInputWidth?: CSSProperties[ 'width' ];
++	labelPosition?: LabelPosition;
+ };
+ 
+-const rootFocusedStyles = ( { isFocused } ) => {
++type RootProps = {
++	isFocused?: boolean;
++	labelPosition?: LabelPosition;
++};
++
++const rootFocusedStyles = ( { isFocused }: RootProps ) => {
+ 	if ( ! isFocused ) return '';
+ 
+ 	return css( { zIndex: 1 } );
+ };
+ 
+-const rootLabelPositionStyles = ( { labelPosition } ) => {
++const rootLabelPositionStyles = ( { labelPosition }: RootProps ) => {
+ 	switch ( labelPosition ) {
+ 		case 'top':
+ 			return css`
+@@ -42,16 +54,15 @@ const rootLabelPositionStyles = ( { labelPosition } ) => {
+ 	}
+ };
+ 
+-export const Root = styled( Flex )`
++export const Root = styled( Flex )< RootProps >`
+ 	position: relative;
+ 	border-radius: 2px;
+-
+-	${ rootFloatLabelStyles }
++	padding-top: 0;
+ 	${ rootFocusedStyles }
+ 	${ rootLabelPositionStyles }
+ `;
+ 
+-const containerDisabledStyles = ( { disabled } ) => {
++const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
+ 	const backgroundColor = disabled
+ 		? COLORS.ui.backgroundDisabled
+ 		: COLORS.ui.background;
+@@ -60,11 +71,14 @@ const containerDisabledStyles = ( { disabled } ) => {
+ };
+ 
+ // Normalizes the margins from the <Flex /> (components/ui/flex/) container.
+-const containerMarginStyles = ( { hideLabel } ) => {
++const containerMarginStyles = ( { hideLabel }: ContainerProps ) => {
+ 	return hideLabel ? css( { margin: '0 !important' } ) : null;
+ };
+ 
+-const containerWidthStyles = ( { __unstableInputWidth, labelPosition } ) => {
++const containerWidthStyles = ( {
++	__unstableInputWidth,
++	labelPosition,
++}: ContainerProps ) => {
+ 	if ( ! __unstableInputWidth ) return css( { width: '100%' } );
+ 
+ 	if ( labelPosition === 'side' ) return '';
+@@ -78,7 +92,7 @@ const containerWidthStyles = ( { __unstableInputWidth, labelPosition } ) => {
+ 	return css( { width: __unstableInputWidth } );
+ };
+ 
+-export const Container = styled.div`
++export const Container = styled.div< ContainerProps >`
+ 	align-items: center;
+ 	box-sizing: border-box;
+ 	border-radius: inherit;
+@@ -91,7 +105,16 @@ export const Container = styled.div`
+ 	${ containerWidthStyles }
+ `;
+ 
+-const disabledStyles = ( { disabled } ) => {
++type Size = 'default' | 'small';
++
++type InputProps = {
++	disabled?: boolean;
++	inputSize?: Size;
++	isDragging?: boolean;
++	dragCursor?: CSSProperties[ 'cursor' ];
++};
++
++const disabledStyles = ( { disabled }: InputProps ) => {
+ 	if ( ! disabled ) return '';
+ 
+ 	return css( {
+@@ -99,13 +122,13 @@ const disabledStyles = ( { disabled } ) => {
+ 	} );
+ };
+ 
+-const fontSizeStyles = ( { size } ) => {
++const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
+ 	const sizes = {
+ 		default: '13px',
+ 		small: '11px',
+ 	};
+ 
+-	const fontSize = sizes[ size ];
++	const fontSize = sizes[ size as Size ] || sizes.default;
+ 	const fontSizeMobile = '16px';
+ 
+ 	if ( ! fontSize ) return '';
+@@ -119,7 +142,7 @@ const fontSizeStyles = ( { size } ) => {
+ 	`;
+ };
+ 
+-const sizeStyles = ( { size } ) => {
++const sizeStyles = ( { inputSize: size }: InputProps ) => {
+ 	const sizes = {
+ 		default: {
+ 			height: 30,
+@@ -133,22 +156,14 @@ const sizeStyles = ( { size } ) => {
+ 		},
+ 	};
+ 
+-	const style = sizes[ size ] || sizes.default;
++	const style = sizes[ size as Size ] || sizes.default;
+ 
+ 	return css( style );
+ };
+ 
+-const placeholderStyles = () => {
+-	return css`
+-		&::-webkit-input-placeholder {
+-			line-height: normal;
+-		}
+-	`;
+-};
+-
+-const dragStyles = ( { isDragging, dragCursor } ) => {
+-	let defaultArrowStyles = '';
+-	let activeDragCursorStyles = '';
++const dragStyles = ( { isDragging, dragCursor }: InputProps ) => {
++	let defaultArrowStyles: SerializedStyles | undefined;
++	let activeDragCursorStyles: SerializedStyles | undefined;
+ 
+ 	if ( isDragging ) {
+ 		defaultArrowStyles = css`
+@@ -180,7 +195,7 @@ const dragStyles = ( { isDragging, dragCursor } ) => {
+ // TODO: Resolve need to use &&& to increase specificity
+ // https://github.com/WordPress/gutenberg/issues/18483
+ 
+-export const Input = styled.input`
++export const Input = styled.input< InputProps >`
+ 	&&& {
+ 		background-color: transparent;
+ 		box-sizing: border-box;
+@@ -199,19 +214,17 @@ export const Input = styled.input`
+ 		${ fontSizeStyles }
+ 		${ sizeStyles }
+ 
+-		${ placeholderStyles }
++		&::-webkit-input-placeholder {
++			line-height: normal;
++		}
+ 	}
+ `;
+ 
+-const labelTruncation = () => {
+-	return css`
+-		overflow: hidden;
+-		text-overflow: ellipsis;
+-		white-space: nowrap;
+-	`;
+-};
+-
+-const labelPadding = ( { labelPosition } ) => {
++const labelPadding = ( {
++	labelPosition,
++}: {
++	labelPosition?: LabelPosition;
++} ) => {
+ 	let paddingBottom = 4;
+ 
+ 	if ( labelPosition === 'edge' || labelPosition === 'side' ) {
+@@ -221,7 +234,7 @@ const labelPadding = ( { labelPosition } ) => {
+ 	return css( { paddingTop: 0, paddingBottom } );
+ };
+ 
+-const BaseLabel = styled( Text )`
++const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
+ 	&&& {
+ 		box-sizing: border-box;
+ 		color: currentColor;
+@@ -231,20 +244,36 @@ const BaseLabel = styled( Text )`
+ 		z-index: 1;
+ 
+ 		${ labelPadding }
+-		${ labelTruncation }
++		overflow: hidden;
++		text-overflow: ellipsis;
++		white-space: nowrap;
+ 	}
+ `;
+ 
+-export const Label = ( props ) => <BaseLabel { ...props } as="label" />;
++export const Label = (
++	props: PolymorphicComponentProps<
++		{ labelPosition?: LabelPosition; children: ReactNode },
++		'label',
++		false
++	>
++) => <BaseLabel { ...props } as="label" />;
+ 
+ export const LabelWrapper = styled( FlexItem )`
+ 	max-width: calc( 100% - 10px );
+ `;
+ 
+-const backdropFocusedStyles = ( { disabled, isFocused } ) => {
++type BackdropProps = {
++	disabled?: boolean;
++	isFocused?: boolean;
++};
++
++const backdropFocusedStyles = ( {
++	disabled,
++	isFocused,
++}: BackdropProps ): SerializedStyles => {
+ 	let borderColor = isFocused ? COLORS.ui.borderFocus : COLORS.ui.border;
+ 
+-	let boxShadow = null;
++	let boxShadow;
+ 
+ 	if ( isFocused ) {
+ 		boxShadow = `0 0 0 1px ${ COLORS.ui.borderFocus } inset`;
+@@ -262,7 +291,7 @@ const backdropFocusedStyles = ( { disabled, isFocused } ) => {
+ 	} );
+ };
+ 
+-export const BackdropUI = styled.div`
++export const BackdropUI = styled.div< BackdropProps >`
+ 	&&& {
+ 		box-sizing: border-box;
+ 		border-radius: inherit;
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+new file mode 100644
+index 00000000000000..bb22b704005655
+--- /dev/null
++++ b/packages/components/src/input-control/types.ts
+@@ -0,0 +1,86 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type {
++	CSSProperties,
++	ReactNode,
++	ChangeEvent,
++	SyntheticEvent,
++} from 'react';
++import type { useDrag } from 'react-use-gesture';
++
++/**
++ * Internal dependencies
++ */
++import type { StateReducer } from './reducer/state';
++import type { FlexProps } from '../flex/types';
++import type { PolymorphicComponentProps } from '../ui/context';
++
++export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge';
++
++export type DragDirection = 'n' | 's' | 'e' | 'w';
++
++export type DragProps = Parameters< Parameters< typeof useDrag >[ 0 ] >[ 0 ];
++
++interface BaseProps {
++	__unstableInputWidth?: CSSProperties[ 'width' ];
++	hideLabelFromVision?: boolean;
++	isFocused: boolean;
++	labelPosition?: LabelPosition;
++	size?: 'default' | 'small';
++}
++
++export interface InputFieldProps extends BaseProps {
++	dragDirection?: DragDirection;
++	dragThreshold?: number;
++	isDragEnabled?: boolean;
++	isPressEnterToChange?: boolean;
++	onChange?: (
++		nextValue: string | undefined,
++		extra: { event: ChangeEvent< HTMLInputElement > }
++	) => void;
++	onValidate?: (
++		nextValue: string,
++		event?: SyntheticEvent< HTMLInputElement >
++	) => void;
++	setIsFocused: ( isFocused: boolean ) => void;
++	stateReducer?: StateReducer;
++	value?: string;
++	onDragEnd?: ( dragProps: DragProps ) => void;
++	onDragStart?: ( dragProps: DragProps ) => void;
++	onDrag?: ( dragProps: DragProps ) => void;
++}
++
++export interface InputBaseProps extends BaseProps, FlexProps {
++	children: ReactNode;
++	prefix?: ReactNode;
++	suffix?: ReactNode;
++	disabled?: boolean;
++	className?: string;
++	id?: string;
++	label?: ReactNode;
++}
++
++export interface InputControlProps
++	extends Omit< InputBaseProps, 'children' >,
++		/**
++		 * The `prefix` prop in `PolymorphicComponentProps< InputFieldProps, 'input', false >` comes from the
++		 * `HTMLInputAttributes` and clashes with the one from `InputBaseProps`. So we have to omit it from
++		 * `PolymorphicComponentProps< InputFieldProps, 'input', false >` in order that `InputBaseProps[ 'prefix' ]`
++		 * be the only prefix prop. Otherwise it tries to do a union of the two prefix properties and you end up
++		 * with an unresolvable type.
++		 */
++		Omit<
++			PolymorphicComponentProps< InputFieldProps, 'input', false >,
++			'stateReducer' | 'prefix'
++		> {
++	__unstableStateReducer?: InputFieldProps[ 'stateReducer' ];
++}
++
++export interface InputControlLabelProps {
++	children: ReactNode;
++	hideLabelFromVision?: BaseProps[ 'hideLabelFromVision' ];
++	labelPosition?: BaseProps[ 'labelPosition' ];
++	size?: BaseProps[ 'size' ];
++}
+diff --git a/packages/components/src/input-control/utils.js b/packages/components/src/input-control/utils.ts
+similarity index 76%
+rename from packages/components/src/input-control/utils.js
+rename to packages/components/src/input-control/utils.ts
+index ae896c4932e55d..3c755de9b7c174 100644
+--- a/packages/components/src/input-control/utils.js
++++ b/packages/components/src/input-control/utils.ts
+@@ -6,10 +6,10 @@ import { useEffect } from '@wordpress/element';
+ /**
+  * Gets a CSS cursor value based on a drag direction.
+  *
+- * @param {string} dragDirection The drag direction.
+- * @return {string} The CSS cursor value.
++ * @param  dragDirection The drag direction.
++ * @return  The CSS cursor value.
+  */
+-export function getDragCursor( dragDirection ) {
++export function getDragCursor( dragDirection: string ): string {
+ 	let dragCursor = 'ns-resize';
+ 
+ 	switch ( dragDirection ) {
+@@ -35,13 +35,17 @@ export function getDragCursor( dragDirection ) {
+  *
+  * @return {string} The CSS cursor value.
+  */
+-export function useDragCursor( isDragging, dragDirection ) {
++export function useDragCursor(
++	isDragging: boolean,
++	dragDirection: string
++): string {
+ 	const dragCursor = getDragCursor( dragDirection );
+ 
+ 	useEffect( () => {
+ 		if ( isDragging ) {
+ 			document.documentElement.style.cursor = dragCursor;
+ 		} else {
++			// @ts-expect-error
+ 			document.documentElement.style.cursor = null;
+ 		}
+ 	}, [ isDragging ] );
+diff --git a/packages/components/src/number-control/index.js b/packages/components/src/number-control/index.js
+index 86cbe0dca6b2de..dee6663000cbe9 100644
+--- a/packages/components/src/number-control/index.js
++++ b/packages/components/src/number-control/index.js
+@@ -13,10 +13,8 @@ import { isRTL } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import { Input } from './styles/number-control-styles';
+-import {
+-	inputControlActionTypes,
+-	composeStateReducers,
+-} from '../input-control/state';
++import * as inputControlActionTypes from '../input-control/reducer/actions';
++import { composeStateReducers } from '../input-control/reducer/reducer';
+ import { add, subtract, roundClamp } from '../utils/math';
+ import { useJumpStep } from '../utils/hooks';
+ import { isValueEmpty } from '../utils/values';
+diff --git a/packages/components/src/select-control/index.js b/packages/components/src/select-control/index.tsx
+similarity index 66%
+rename from packages/components/src/select-control/index.js
+rename to packages/components/src/select-control/index.tsx
+index d93be19e11b353..7a036f5ce9234e 100644
+--- a/packages/components/src/select-control/index.js
++++ b/packages/components/src/select-control/index.tsx
+@@ -3,6 +3,8 @@
+  */
+ import { isEmpty, noop } from 'lodash';
+ import classNames from 'classnames';
++// eslint-disable-next-line no-restricted-imports
++import type { ChangeEvent, FocusEvent, Ref } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,15 +18,39 @@ import { Icon, chevronDown } from '@wordpress/icons';
+  */
+ import BaseControl from '../base-control';
+ import InputBase from '../input-control/input-base';
++import type { InputBaseProps, LabelPosition } from '../input-control/types';
+ import { Select, DownArrowWrapper } from './styles/select-control-styles';
++import type { Size } from './types';
++import type { PolymorphicComponentProps } from '../ui/context';
+ 
+-function useUniqueId( idProp ) {
++function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( SelectControl );
+ 	const id = `inspector-select-control-${ instanceId }`;
+ 
+ 	return idProp || id;
+ }
+ 
++export interface SelectControlProps extends Omit< InputBaseProps, 'children' > {
++	help?: string;
++	hideLabelFromVision?: boolean;
++	multiple?: boolean;
++	onBlur?: ( event: FocusEvent< HTMLSelectElement > ) => void;
++	onFocus?: ( event: FocusEvent< HTMLSelectElement > ) => void;
++	onChange?: (
++		value: string | string[],
++		extra?: { event?: ChangeEvent< HTMLSelectElement > }
++	) => void;
++	options?: {
++		label: string;
++		value: string;
++		id?: string;
++		disabled?: boolean;
++	}[];
++	size?: Size;
++	value?: string | string[];
++	labelPosition?: LabelPosition;
++}
++
+ function SelectControl(
+ 	{
+ 		className,
+@@ -41,9 +67,11 @@ function SelectControl(
+ 		size = 'default',
+ 		value: valueProp,
+ 		labelPosition = 'top',
++		prefix,
++		suffix,
+ 		...props
+-	},
+-	ref
++	}: PolymorphicComponentProps< SelectControlProps, 'select', false >,
++	ref: Ref< HTMLSelectElement >
+ ) {
+ 	const [ isFocused, setIsFocused ] = useState( false );
+ 	const id = useUniqueId( idProp );
+@@ -52,17 +80,17 @@ function SelectControl(
+ 	// Disable reason: A select with an onchange throws a warning
+ 	if ( isEmpty( options ) ) return null;
+ 
+-	const handleOnBlur = ( event ) => {
++	const handleOnBlur = ( event: FocusEvent< HTMLSelectElement > ) => {
+ 		onBlur( event );
+ 		setIsFocused( false );
+ 	};
+ 
+-	const handleOnFocus = ( event ) => {
++	const handleOnFocus = ( event: FocusEvent< HTMLSelectElement > ) => {
+ 		onFocus( event );
+ 		setIsFocused( true );
+ 	};
+ 
+-	const handleOnChange = ( event ) => {
++	const handleOnChange = ( event: ChangeEvent< HTMLSelectElement > ) => {
+ 		if ( multiple ) {
+ 			const selectedOptions = [ ...event.target.options ].filter(
+ 				( { selected } ) => selected
+@@ -79,7 +107,7 @@ function SelectControl(
+ 
+ 	/* eslint-disable jsx-a11y/no-onchange */
+ 	return (
+-		<BaseControl help={ help }>
++		<BaseControl help={ help } id={ id }>
+ 			<InputBase
+ 				className={ classes }
+ 				disabled={ disabled }
+@@ -89,12 +117,14 @@ function SelectControl(
+ 				label={ label }
+ 				size={ size }
+ 				suffix={
+-					<DownArrowWrapper>
+-						<Icon icon={ chevronDown } size={ 18 } />
+-					</DownArrowWrapper>
++					suffix || (
++						<DownArrowWrapper>
++							<Icon icon={ chevronDown } size={ 18 } />
++						</DownArrowWrapper>
++					)
+ 				}
++				prefix={ prefix }
+ 				labelPosition={ labelPosition }
+-				{ ...props }
+ 			>
+ 				<Select
+ 					{ ...props }
+@@ -107,7 +137,7 @@ function SelectControl(
+ 					onChange={ handleOnChange }
+ 					onFocus={ handleOnFocus }
+ 					ref={ ref }
+-					size={ size }
++					selectSize={ size }
+ 					value={ valueProp }
+ 				>
+ 					{ options.map( ( option, index ) => {
+diff --git a/packages/components/src/select-control/styles/select-control-styles.js b/packages/components/src/select-control/styles/select-control-styles.ts
+similarity index 72%
+rename from packages/components/src/select-control/styles/select-control-styles.js
+rename to packages/components/src/select-control/styles/select-control-styles.ts
+index ddcb7cbab42b69..2bcb0c24d51825 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.js
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -8,8 +8,14 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import { COLORS, rtl } from '../../utils';
++import type { Size } from '../types';
+ 
+-const disabledStyles = ( { disabled } ) => {
++interface SelectProps {
++	disabled?: boolean;
++	selectSize?: Size;
++}
++
++const disabledStyles = ( { disabled }: SelectProps ) => {
+ 	if ( ! disabled ) return '';
+ 
+ 	return css( {
+@@ -17,13 +23,13 @@ const disabledStyles = ( { disabled } ) => {
+ 	} );
+ };
+ 
+-const fontSizeStyles = ( { size } ) => {
++const fontSizeStyles = ( { selectSize }: SelectProps ) => {
+ 	const sizes = {
+ 		default: '13px',
+ 		small: '11px',
+ 	};
+ 
+-	const fontSize = sizes[ size ];
++	const fontSize = sizes[ selectSize ];
+ 	const fontSizeMobile = '16px';
+ 
+ 	if ( ! fontSize ) return '';
+@@ -37,7 +43,7 @@ const fontSizeStyles = ( { size } ) => {
+ 	`;
+ };
+ 
+-const sizeStyles = ( { size } ) => {
++const sizeStyles = ( { selectSize }: SelectProps ) => {
+ 	const sizes = {
+ 		default: {
+ 			height: 30,
+@@ -51,7 +57,7 @@ const sizeStyles = ( { size } ) => {
+ 		},
+ 	};
+ 
+-	const style = sizes[ size ] || sizes.default;
++	const style = sizes[ selectSize ] || sizes.default;
+ 
+ 	return css( style );
+ };
+@@ -59,7 +65,7 @@ const sizeStyles = ( { size } ) => {
+ // TODO: Resolve need to use &&& to increase specificity
+ // https://github.com/WordPress/gutenberg/issues/18483
+ 
+-export const Select = styled.select`
++export const Select = styled.select< SelectProps >`
+ 	&&& {
+ 		appearance: none;
+ 		background: transparent;
+@@ -75,7 +81,7 @@ export const Select = styled.select`
+ 		${ fontSizeStyles };
+ 		${ sizeStyles };
+ 
+-		${ rtl( { paddingLeft: 8, paddingRight: 24 } )() }
++		${ rtl( { paddingLeft: 8, paddingRight: 24 } ) }
+ 	}
+ `;
+ 
+@@ -89,7 +95,7 @@ export const DownArrowWrapper = styled.div`
+ 	position: absolute;
+ 	top: 0;
+ 
+-	${ rtl( { right: 0 } )() }
++	${ rtl( { right: 0 } ) }
+ 
+ 	svg {
+ 		display: block;
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+new file mode 100644
+index 00000000000000..e69c3c45a9eb2f
+--- /dev/null
++++ b/packages/components/src/select-control/types.ts
+@@ -0,0 +1 @@
++export type Size = 'default' | 'small';
+diff --git a/packages/components/src/unit-control/index.js b/packages/components/src/unit-control/index.js
+index b3f4313dec0632..38b0dab271315d 100644
+--- a/packages/components/src/unit-control/index.js
++++ b/packages/components/src/unit-control/index.js
+@@ -14,10 +14,8 @@ import { ENTER } from '@wordpress/keycodes';
+ /**
+  * Internal dependencies
+  */
+-import {
+-	inputControlActionTypes,
+-	composeStateReducers,
+-} from '../input-control/state';
++import * as inputControlActionTypes from '../input-control/reducer/actions';
++import { composeStateReducers } from '../input-control/reducer/reducer';
+ import { Root, ValueInput } from './styles/unit-control-styles';
+ import UnitSelectControl from './unit-select-control';
+ import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
+diff --git a/packages/components/src/utils/rtl.js b/packages/components/src/utils/rtl.js
+index 9695e5539be97f..412419e74f8326 100644
+--- a/packages/components/src/utils/rtl.js
++++ b/packages/components/src/utils/rtl.js
+@@ -66,7 +66,7 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
+  * @param {import('react').CSSProperties} ltrStyles   Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
+  * @param {import('react').CSSProperties} [rtlStyles] Rtl styles. Renders if provided.
+  *
+- * @return {Function} A function to output CSS styles for Emotion's renderer
++ * @return {() => import('@emotion/react').SerializedStyles} A function to output CSS styles for Emotion's renderer
+  */
+ export function rtl( ltrStyles = {}, rtlStyles ) {
+ 	return () => {
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index d01a781b3f9c91..95e05ba5497d61 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -34,6 +34,7 @@
+ 		"src/grid/**/*",
+ 		"src/h-stack/**/*",
+ 		"src/heading/**/*",
++		"src/input-control/**/*",
+ 		"src/icon/**/*",
+ 		"src/scroll-lock/**/*",
+ 		"src/scrollable/**/*",

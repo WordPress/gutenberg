@@ -1,0 +1,619 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 7415ab658f48bd..3369ab5d7afad3 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -707,10 +707,40 @@
+ 		"markdown_source": "../packages/components/src/button/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "CardBody",
++		"slug": "card-body",
++		"markdown_source": "../packages/components/src/card/card-body/README.md",
++		"parent": "components"
++	},
++	{
++		"title": "CardDivider",
++		"slug": "card-divider",
++		"markdown_source": "../packages/components/src/card/card-divider/README.md",
++		"parent": "components"
++	},
++	{
++		"title": "CardFooter",
++		"slug": "card-footer",
++		"markdown_source": "../packages/components/src/card/card-footer/README.md",
++		"parent": "components"
++	},
++	{
++		"title": "CardHeader",
++		"slug": "card-header",
++		"markdown_source": "../packages/components/src/card/card-header/README.md",
++		"parent": "components"
++	},
++	{
++		"title": "CardMedia",
++		"slug": "card-media",
++		"markdown_source": "../packages/components/src/card/card-media/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "Card",
+ 		"slug": "card",
+-		"markdown_source": "../packages/components/src/card/README.md",
++		"markdown_source": "../packages/components/src/card/card/README.md",
+ 		"parent": "components"
+ 	},
+ 	{
+diff --git a/packages/components/src/card/docs/body.md b/packages/components/src/card/card-body/README.md
+similarity index 73%
+rename from packages/components/src/card/docs/body.md
+rename to packages/components/src/card/card-body/README.md
+index f0d95287aed78a..73b450f7604d83 100644
+--- a/packages/components/src/card/docs/body.md
++++ b/packages/components/src/card/card-body/README.md
+@@ -32,4 +32,4 @@ Determines the amount of padding within the component.
+ -   Required: No
+ -   Default: `medium`
+ 
+-Note: This component is connected to [`<Card />`'s Context](../README.md#context). Passing props directly to this component will override the props derived from context.
++Note: This component is connected to [`<Card />`'s Context](../card/README.md#context). Passing props directly to this component will override the props derived from context.
+diff --git a/packages/components/src/card/body.js b/packages/components/src/card/card-body/index.js
+similarity index 86%
+rename from packages/components/src/card/body.js
+rename to packages/components/src/card/card-body/index.js
+index 9194d601169ea9..6a762463fcfe46 100644
+--- a/packages/components/src/card/body.js
++++ b/packages/components/src/card/card-body/index.js
+@@ -6,8 +6,8 @@ import classnames from 'classnames';
+ /**
+  * Internal dependencies
+  */
+-import { BodyUI } from './styles/card-styles';
+-import { useCardContext } from './context';
++import { BodyUI } from '../styles';
++import { useCardContext } from '../context';
+ 
+ export const defaultProps = {
+ 	isShady: false,
+diff --git a/packages/components/src/card/docs/divider.md b/packages/components/src/card/card-divider/README.md
+similarity index 94%
+rename from packages/components/src/card/docs/divider.md
+rename to packages/components/src/card/card-divider/README.md
+index feac94af529568..05dd2207a38e39 100644
+--- a/packages/components/src/card/docs/divider.md
++++ b/packages/components/src/card/card-divider/README.md
+@@ -1,6 +1,6 @@
+ # CardDivider
+ 
+-CardDivider renders an optional divider within a [`<Card />`](../).
++CardDivider renders an optional divider within a [`<Card />`](../card/README.md).
+ 
+ ## Usage
+ 
+diff --git a/packages/components/src/card/divider.js b/packages/components/src/card/card-divider/index.js
+similarity index 89%
+rename from packages/components/src/card/divider.js
+rename to packages/components/src/card/card-divider/index.js
+index 09a4a59c726643..33e8a420ca0d6b 100644
+--- a/packages/components/src/card/divider.js
++++ b/packages/components/src/card/card-divider/index.js
+@@ -6,7 +6,7 @@ import classnames from 'classnames';
+ /**
+  * Internal dependencies
+  */
+-import { DividerUI } from './styles/card-styles';
++import { DividerUI } from '../styles';
+ 
+ export function CardDivider( props ) {
+ 	const { className, ...additionalProps } = props;
+diff --git a/packages/components/src/card/docs/footer.md b/packages/components/src/card/card-footer/README.md
+similarity index 68%
+rename from packages/components/src/card/docs/footer.md
+rename to packages/components/src/card/card-footer/README.md
+index 22745bff7f27e5..0a350c6f2c0b11 100644
+--- a/packages/components/src/card/docs/footer.md
++++ b/packages/components/src/card/card-footer/README.md
+@@ -1,6 +1,6 @@
+ # CardFooter
+ 
+-CardFooter renders an optional footer within a [`<Card />`](../).
++CardFooter renders an optional footer within a [`<Card />`](../card/README.md).
+ 
+ ## Usage
+ 
+@@ -16,7 +16,7 @@ const Example = () => (
+ 
+ ### Flex
+ 
+-Underneath, CardFooter uses the layout component [`<Flex/>`](../../flex/README.md). This improves the alignment of child items within the component.
++Underneath, CardFooter uses the layout component [`<Flex/>`](../../flex/flex/README.md). This improves the alignment of child items within the component.
+ 
+ ```jsx
+ import {
+@@ -39,7 +39,7 @@ const Example = () => (
+ );
+ ```
+ 
+-Check out [the documentation](../../flex/README.md) on `<Flex/>` for more details on layout composition.
++Check out [the documentation](../../flex/flex/README.md) on `<Flex/>` for more details on layout composition.
+ 
+ ## Props
+ 
+@@ -75,4 +75,4 @@ Determines the amount of padding within the component.
+ -   Required: No
+ -   Default: `medium`
+ 
+-Note: This component is connected to [`<Card />`'s Context](../README.md#context). Passing props directly to this component will override the props derived from context.
++Note: This component is connected to [`<Card />`'s Context](../card/README.md#context). Passing props directly to this component will override the props derived from context.
+diff --git a/packages/components/src/card/footer.js b/packages/components/src/card/card-footer/index.js
+similarity index 87%
+rename from packages/components/src/card/footer.js
+rename to packages/components/src/card/card-footer/index.js
+index e4b66ce4022c78..a54ff8dfc0c321 100644
+--- a/packages/components/src/card/footer.js
++++ b/packages/components/src/card/card-footer/index.js
+@@ -6,8 +6,8 @@ import classnames from 'classnames';
+ /**
+  * Internal dependencies
+  */
+-import { FooterUI } from './styles/card-styles';
+-import { useCardContext } from './context';
++import { FooterUI } from '../styles';
++import { useCardContext } from '../context';
+ 
+ export const defaultProps = {
+ 	isBorderless: false,
+diff --git a/packages/components/src/card/docs/header.md b/packages/components/src/card/card-header/README.md
+similarity index 68%
+rename from packages/components/src/card/docs/header.md
+rename to packages/components/src/card/card-header/README.md
+index b3597d0376aaa5..911c8fb2892bf2 100644
+--- a/packages/components/src/card/docs/header.md
++++ b/packages/components/src/card/card-header/README.md
+@@ -1,6 +1,6 @@
+ # CardHeader
+ 
+-CardHeader renders an optional header within a [`<Card />`](../).
++CardHeader renders an optional header within a [`<Card />`](../card/README.md).
+ 
+ ## Usage
+ 
+@@ -16,7 +16,7 @@ const Example = () => (
+ 
+ ### Flex
+ 
+-Underneath, CardHeader uses the layout component [`<Flex/>`](../../flex/README.md). This improves the alignment of child items within the component.
++Underneath, CardHeader uses the layout component [`<Flex/>`](../../flex/flex/README.md). This improves the alignment of child items within the component.
+ 
+ ```jsx
+ import {
+@@ -39,7 +39,7 @@ const Example = () => (
+ );
+ ```
+ 
+-Check out [the documentation](../../flex/README.md) on `<Flex/>` for more details on layout composition.
++Check out [the documentation](../../flex/flex/README.md) on `<Flex/>` for more details on layout composition.
+ 
+ ## Props
+ 
+@@ -75,4 +75,4 @@ Determines the amount of padding within the component.
+ -   Required: No
+ -   Default: `medium`
+ 
+-Note: This component is connected to [`<Card />`'s Context](../README.md#context). Passing props directly to this component will override the props derived from context.
++Note: This component is connected to [`<Card />`'s Context](../card/README.md#context). Passing props directly to this component will override the props derived from context.
+diff --git a/packages/components/src/card/header.js b/packages/components/src/card/card-header/index.js
+similarity index 87%
+rename from packages/components/src/card/header.js
+rename to packages/components/src/card/card-header/index.js
+index ece890cddd4604..7aa0296929a2fc 100644
+--- a/packages/components/src/card/header.js
++++ b/packages/components/src/card/card-header/index.js
+@@ -6,8 +6,8 @@ import classnames from 'classnames';
+ /**
+  * Internal dependencies
+  */
+-import { HeaderUI } from './styles/card-styles';
+-import { useCardContext } from './context';
++import { HeaderUI } from '../styles';
++import { useCardContext } from '../context';
+ 
+ export const defaultProps = {
+ 	isBorderless: false,
+diff --git a/packages/components/src/card/docs/media.md b/packages/components/src/card/card-media/README.md
+similarity index 97%
+rename from packages/components/src/card/docs/media.md
+rename to packages/components/src/card/card-media/README.md
+index 980e32127792ec..a93fd81ff8a68e 100644
+--- a/packages/components/src/card/docs/media.md
++++ b/packages/components/src/card/card-media/README.md
+@@ -1,6 +1,6 @@
+ # CardMedia
+ 
+-CardMedia provides a container for media elements, and renders within a [`<Card />`](../).
++CardMedia provides a container for media elements, and renders within a [`<Card />`](../card/README.md).
+ 
+ ## Usage
+ 
+diff --git a/packages/components/src/card/media.js b/packages/components/src/card/card-media/index.js
+similarity index 88%
+rename from packages/components/src/card/media.js
+rename to packages/components/src/card/card-media/index.js
+index c660f6705649de..4458d74cda3514 100644
+--- a/packages/components/src/card/media.js
++++ b/packages/components/src/card/card-media/index.js
+@@ -6,7 +6,7 @@ import classnames from 'classnames';
+ /**
+  * Internal dependencies
+  */
+-import { MediaUI } from './styles/card-styles';
++import { MediaUI } from '../styles';
+ 
+ export function CardMedia( props ) {
+ 	const { className, ...additionalProps } = props;
+diff --git a/packages/components/src/card/README.md b/packages/components/src/card/card/README.md
+similarity index 89%
+rename from packages/components/src/card/README.md
+rename to packages/components/src/card/card/README.md
+index c2738917028494..6a755a167eb229 100644
+--- a/packages/components/src/card/README.md
++++ b/packages/components/src/card/card/README.md
+@@ -44,11 +44,11 @@ Determines the amount of padding within the component.
+ 
+ This component provides a collection of sub-component that can be used to compose various interfaces.
+ 
+--   [`<CardBody />`](./docs/body.md)
+--   [`<CardDivider />`](./docs/divider.md)
+--   [`<CardFooter />`](./docs/footer.md)
+--   [`<CardHeader />`](./docs/header.md)
+--   [`<CardMedia />`](./docs/media.md)
++-   [`<CardBody />`](../card-body/README.md)
++-   [`<CardDivider />`](../card-divider/README.md)
++-   [`<CardFooter />`](../card-footer/README.md)
++-   [`<CardHeader />`](../card-header/README.md)
++-   [`<CardMedia />`](../card-media/README.md)
+ 
+ ### Sub-Components Example
+ 
+diff --git a/packages/components/src/card/card/index.js b/packages/components/src/card/card/index.js
+new file mode 100644
+index 00000000000000..5731d5296d2a23
+--- /dev/null
++++ b/packages/components/src/card/card/index.js
+@@ -0,0 +1,51 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import { CardContext } from '../context';
++import { CardUI } from '../styles';
++
++export const defaultProps = {
++	isBorderless: false,
++	isElevated: false,
++	size: 'medium',
++};
++
++export function Card( props ) {
++	const {
++		className,
++		isBorderless,
++		isElevated,
++		size,
++		...additionalProps
++	} = props;
++	const { Provider } = CardContext;
++
++	const contextProps = {
++		isBorderless,
++		isElevated,
++		size,
++	};
++
++	const classes = classnames(
++		'components-card',
++		isBorderless && 'is-borderless',
++		isElevated && 'is-elevated',
++		size && `is-size-${ size }`,
++		className
++	);
++
++	return (
++		<Provider value={ contextProps }>
++			<CardUI { ...additionalProps } className={ classes } />
++		</Provider>
++	);
++}
++
++Card.defaultProps = defaultProps;
++
++export default Card;
+diff --git a/packages/components/src/card/index.js b/packages/components/src/card/index.js
+index 765b980567abf5..7101c549e9bceb 100644
+--- a/packages/components/src/card/index.js
++++ b/packages/components/src/card/index.js
+@@ -1,51 +1,6 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * Internal dependencies
+- */
+-import { CardContext } from './context';
+-import { CardUI } from './styles/card-styles';
+-
+-export const defaultProps = {
+-	isBorderless: false,
+-	isElevated: false,
+-	size: 'medium',
+-};
+-
+-export function Card( props ) {
+-	const {
+-		className,
+-		isBorderless,
+-		isElevated,
+-		size,
+-		...additionalProps
+-	} = props;
+-	const { Provider } = CardContext;
+-
+-	const contextProps = {
+-		isBorderless,
+-		isElevated,
+-		size,
+-	};
+-
+-	const classes = classnames(
+-		'components-card',
+-		isBorderless && 'is-borderless',
+-		isElevated && 'is-elevated',
+-		size && `is-size-${ size }`,
+-		className
+-	);
+-
+-	return (
+-		<Provider value={ contextProps }>
+-			<CardUI { ...additionalProps } className={ classes } />
+-		</Provider>
+-	);
+-}
+-
+-Card.defaultProps = defaultProps;
+-
+-export default Card;
++export { default as Card } from './card';
++export { default as CardBody } from './card-body';
++export { default as CardDivider } from './card-divider';
++export { default as CardFooter } from './card-footer';
++export { default as CardHeader } from './card-header';
++export { default as CardMedia } from './card-media';
+diff --git a/packages/components/src/card/stories/_index.js b/packages/components/src/card/stories/_index.js
+index 0f976e55a2a111..be87a44e6d6a78 100644
+--- a/packages/components/src/card/stories/_index.js
++++ b/packages/components/src/card/stories/_index.js
+@@ -6,10 +6,7 @@ import { text, boolean } from '@storybook/addon-knobs';
+ /**
+  * Internal dependencies
+  */
+-import Card from '../index';
+-import CardBody from '../body';
+-import CardFooter from '../footer';
+-import CardHeader from '../header';
++import { Card, CardBody, CardFooter, CardHeader } from '../';
+ import { getCardStoryProps } from './_utils';
+ 
+ export default { title: 'Components/Card', component: Card };
+diff --git a/packages/components/src/card/stories/body.js b/packages/components/src/card/stories/body.js
+index e2c1d7d00bbcbb..e67ac663bd50a8 100644
+--- a/packages/components/src/card/stories/body.js
++++ b/packages/components/src/card/stories/body.js
+@@ -6,8 +6,7 @@ import { boolean, text } from '@storybook/addon-knobs';
+ /**
+  * Internal dependencies
+  */
+-import Card from '../index';
+-import CardBody from '../body';
++import { Card, CardBody } from '../';
+ import { getCardStoryProps } from './_utils';
+ 
+ export default { title: 'Components/Card/Body', component: CardBody };
+diff --git a/packages/components/src/card/stories/divider.js b/packages/components/src/card/stories/divider.js
+index e793541a498e68..a6eda85335f19e 100644
+--- a/packages/components/src/card/stories/divider.js
++++ b/packages/components/src/card/stories/divider.js
+@@ -1,9 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import Card from '../index';
+-import CardBody from '../body';
+-import CardDivider from '../divider';
++import { Card, CardBody, CardDivider } from '../';
+ import { getCardStoryProps } from './_utils';
+ 
+ export default { title: 'Components/Card/Divider', component: CardDivider };
+diff --git a/packages/components/src/card/stories/footer.js b/packages/components/src/card/stories/footer.js
+index 50e461aae8347f..e33bc6acd02ca5 100644
+--- a/packages/components/src/card/stories/footer.js
++++ b/packages/components/src/card/stories/footer.js
+@@ -6,8 +6,7 @@ import { boolean, text } from '@storybook/addon-knobs';
+ /**
+  * Internal dependencies
+  */
+-import Card from '../index';
+-import CardFooter from '../footer';
++import { Card, CardFooter } from '../';
+ import Button from '../../button';
+ import { FlexBlock, FlexItem } from '../../flex';
+ import { getCardStoryProps } from './_utils';
+diff --git a/packages/components/src/card/stories/header.js b/packages/components/src/card/stories/header.js
+index 63d37f7bc0514b..67a413a6db94bf 100644
+--- a/packages/components/src/card/stories/header.js
++++ b/packages/components/src/card/stories/header.js
+@@ -6,8 +6,7 @@ import { boolean, text } from '@storybook/addon-knobs';
+ /**
+  * Internal dependencies
+  */
+-import Card from '../index';
+-import CardHeader from '../header';
++import { Card, CardHeader } from '../';
+ import Button from '../../button';
+ import { FlexBlock, FlexItem } from '../../flex';
+ import { getCardStoryProps } from './_utils';
+diff --git a/packages/components/src/card/stories/media.js b/packages/components/src/card/stories/media.js
+index 4d499b3067f7e0..db7597d9c6b571 100644
+--- a/packages/components/src/card/stories/media.js
++++ b/packages/components/src/card/stories/media.js
+@@ -7,11 +7,7 @@ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+  */
+-import Card from '../index';
+-import CardBody from '../body';
+-import CardFooter from '../footer';
+-import CardHeader from '../header';
+-import CardMedia from '../media';
++import { Card, CardBody, CardFooter, CardHeader, CardMedia } from '../';
+ import { getCardStoryProps } from './_utils';
+ 
+ export default { title: 'Components/Card/Media', component: CardMedia };
+diff --git a/packages/components/src/card/styles/card-styles.js b/packages/components/src/card/styles.js
+similarity index 97%
+rename from packages/components/src/card/styles/card-styles.js
+rename to packages/components/src/card/styles.js
+index a3415843312c43..8be50a25c36007 100644
+--- a/packages/components/src/card/styles/card-styles.js
++++ b/packages/components/src/card/styles.js
+@@ -11,8 +11,8 @@ import { HorizontalRule } from '@wordpress/primitives';
+ /**
+  * Internal dependencies
+  */
+-import { Flex } from '../../flex';
+-import { COLORS, space } from '../../utils';
++import { Flex } from '../flex';
++import { COLORS, space } from '../utils';
+ 
+ export const styleProps = {
+ 	borderColor: COLORS.lightGray[ 500 ],
+diff --git a/packages/components/src/card/test/body.js b/packages/components/src/card/test/body.js
+index dbbe21cdd6028a..a88823a216bbf5 100644
+--- a/packages/components/src/card/test/body.js
++++ b/packages/components/src/card/test/body.js
+@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
+ /**
+  * Internal dependencies
+  */
+-import CardBody from '../body';
++import { CardBody } from '../';
+ 
+ describe( 'CardBody', () => {
+ 	describe( 'basic rendering', () => {
+diff --git a/packages/components/src/card/test/divider.js b/packages/components/src/card/test/divider.js
+index 81f6012c9cd59a..8d39242d9fa145 100644
+--- a/packages/components/src/card/test/divider.js
++++ b/packages/components/src/card/test/divider.js
+@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
+ /**
+  * Internal dependencies
+  */
+-import CardDivider from '../divider';
++import { CardDivider } from '../';
+ 
+ describe( 'CardDivider', () => {
+ 	describe( 'basic rendering', () => {
+diff --git a/packages/components/src/card/test/footer.js b/packages/components/src/card/test/footer.js
+index bcd4308782437a..88f9ac55402e64 100644
+--- a/packages/components/src/card/test/footer.js
++++ b/packages/components/src/card/test/footer.js
+@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
+ /**
+  * Internal dependencies
+  */
+-import CardFooter from '../footer';
++import { CardFooter } from '../';
+ 
+ describe( 'CardFooter', () => {
+ 	describe( 'basic rendering', () => {
+diff --git a/packages/components/src/card/test/header.js b/packages/components/src/card/test/header.js
+index 3323658aaa7b6b..440ab1707e1885 100644
+--- a/packages/components/src/card/test/header.js
++++ b/packages/components/src/card/test/header.js
+@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
+ /**
+  * Internal dependencies
+  */
+-import CardHeader from '../header';
++import { CardHeader } from '../';
+ 
+ describe( 'CardHeader', () => {
+ 	describe( 'basic rendering', () => {
+diff --git a/packages/components/src/card/test/index.js b/packages/components/src/card/test/index.js
+index 16b4d3158971a0..2ce59a9fa7f317 100644
+--- a/packages/components/src/card/test/index.js
++++ b/packages/components/src/card/test/index.js
+@@ -6,12 +6,14 @@ import { mount, shallow } from 'enzyme';
+ /**
+  * Internal dependencies
+  */
+-import Card from '../';
+-import CardBody from '../body';
+-import CardDivider from '../divider';
+-import CardFooter from '../footer';
+-import CardHeader from '../header';
+-import CardMedia from '../media';
++import {
++	Card,
++	CardBody,
++	CardDivider,
++	CardFooter,
++	CardHeader,
++	CardMedia,
++} from '../';
+ 
+ describe( 'Card', () => {
+ 	describe( 'basic rendering', () => {
+diff --git a/packages/components/src/card/test/media.js b/packages/components/src/card/test/media.js
+index 935134d281dc21..c9e118f68e6df1 100644
+--- a/packages/components/src/card/test/media.js
++++ b/packages/components/src/card/test/media.js
+@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
+ /**
+  * Internal dependencies
+  */
+-import CardMedia from '../media';
++import { CardMedia } from '../';
+ 
+ describe( 'CardMedia', () => {
+ 	describe( 'basic rendering', () => {
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index dbf39333441b41..6a6097486e6307 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -25,12 +25,14 @@ export { default as BaseControl } from './base-control';
+ export { default as __experimentalBoxControl } from './box-control';
+ export { default as Button } from './button';
+ export { default as ButtonGroup } from './button-group';
+-export { default as Card } from './card';
+-export { default as CardBody } from './card/body';
+-export { default as CardDivider } from './card/divider';
+-export { default as CardFooter } from './card/footer';
+-export { default as CardHeader } from './card/header';
+-export { default as CardMedia } from './card/media';
++export {
++	Card,
++	CardBody,
++	CardDivider,
++	CardFooter,
++	CardHeader,
++	CardMedia,
++} from './card';
+ export { default as CheckboxControl } from './checkbox-control';
+ export { default as ClipboardButton } from './clipboard-button';
+ export { default as __experimentalColorEdit } from './color-edit';

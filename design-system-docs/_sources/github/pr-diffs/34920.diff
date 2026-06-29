@@ -1,0 +1,39 @@
+diff --git a/packages/components/src/h-stack/component.js b/packages/components/src/h-stack/component.js
+index c26ae1c05abc6a..392e00ba55f4b5 100644
+--- a/packages/components/src/h-stack/component.js
++++ b/packages/components/src/h-stack/component.js
+@@ -1,9 +1,20 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../ui/utils';
++import { contextConnect } from '../ui/context';
++import { View } from '../view';
+ import { useHStack } from './hook';
+ 
++/**
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('react').Ref<any>}                                                        forwardedRef
++ */
++function HStack( props, forwardedRef ) {
++	const hStackProps = useHStack( props );
++
++	return <View { ...hStackProps } ref={ forwardedRef } />;
++}
++
+ /**
+  * `HStack` (Horizontal Stack) arranges child elements in a horizontal line.
+  *
+@@ -27,10 +38,6 @@ import { useHStack } from './hook';
+  * }
+  * ```
+  */
+-const HStack = createComponent( {
+-	as: 'div',
+-	useHook: useHStack,
+-	name: 'HStack',
+-} );
++const ConnectedHStack = contextConnect( HStack, 'HStack' );
+ 
+-export default HStack;
++export default ConnectedHStack;

@@ -1,0 +1,229 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ed6af6c7baba4f..8f9b6362ede2ee 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,11 @@
+ -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
+ -   `ColorPicker`: Fix issue where clearing the hex input entirely doesn't reset the selected color to black ([#77912](https://github.com/WordPress/gutenberg/pull/77912)).
+ -   `ExternalLink`: Fix focus outline rendered in wp-admin ([#77935](https://github.com/WordPress/gutenberg/pull/77935)).
++-   `CustomSelectControl`: Portal the dropdown popover into the registered `Popover.Slot` (with a `document.body` fallback) so it can no longer be clipped by ancestor `overflow` containers (e.g. the Style Panel) or covered by sticky elements (e.g. the block toolbar). Pass `inline` to opt back into the previous inline rendering ([#77969](https://github.com/WordPress/gutenberg/pull/77969)).
++
++### New Features
++
++-   `CustomSelectControlV2` (unstable): Add `portal` and `portalElement` props that forward to the underlying Ariakit `SelectPopover`, allowing the dropdown to be rendered in a React portal ([#77969](https://github.com/WordPress/gutenberg/pull/77969)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index 546948d554c670..c69a4db3cd3ea1 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -99,6 +99,8 @@ function CustomSelect(
+ 		store,
+ 		className,
+ 		isLegacy = false,
++		portal,
++		portalElement,
+ 		...restProps
+ 	} = props;
+ 
+@@ -149,8 +151,9 @@ function CustomSelect(
+ 					sameWidth
+ 					slide={ false }
+ 					onKeyDown={ onSelectPopoverKeyDown }
+-					// Match legacy behavior
+-					flip={ ! isLegacy }
++					flip
++					portal={ portal }
++					portalElement={ portalElement }
+ 				>
+ 					<CustomSelectContext.Provider value={ contextValue }>
+ 						{ children }
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+index 5167c5ff38a740..33b59990648fd3 100644
+--- a/packages/components/src/custom-select-control-v2/types.ts
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -77,6 +77,21 @@ export type _CustomSelectProps = CustomSelectButtonProps & {
+ 	 * Accessible label for the control.
+ 	 */
+ 	label: string;
++	/**
++	 * Determines whether the dropdown popover should be rendered as a React
++	 * Portal. When portaled, the popover escapes ancestor stacking contexts
++	 * and `overflow` containers, but consumers lose the ability to target it
++	 * via descendant selectors.
++	 *
++	 * @default false
++	 */
++	portal?: Ariakit.SelectPopoverProps[ 'portal' ];
++	/**
++	 * The DOM element (or a memoized callback returning one) into which the
++	 * popover should be rendered when `portal` is `true`. When omitted, the
++	 * popover is appended to the document `body`.
++	 */
++	portalElement?: Ariakit.SelectPopoverProps[ 'portalElement' ];
+ };
+ 
+ export type CustomSelectProps = _CustomSelectProps & CustomSelectSize;
+diff --git a/packages/components/src/custom-select-control/index.tsx b/packages/components/src/custom-select-control/index.tsx
+index 88c5e7b68ad66e..06ffabfa8db9bf 100644
+--- a/packages/components/src/custom-select-control/index.tsx
++++ b/packages/components/src/custom-select-control/index.tsx
+@@ -19,6 +19,8 @@ import * as Styled from '../custom-select-control-v2/styles';
+ import type { CustomSelectProps, CustomSelectOption } from './types';
+ import { VisuallyHidden } from '../visually-hidden';
+ import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
++import { useSlot } from '../slot-fill';
++import { SLOT_NAME as POPOVER_SLOT_NAME } from '../popover';
+ 
+ function useDeprecatedProps< T extends CustomSelectOption >( {
+ 	__experimentalShowSelectedHint,
+@@ -65,6 +67,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
+ 		value,
+ 		className: classNameProp,
+ 		showSelectedHint = false,
++		inline = false,
+ 		...restProps
+ 	} = useDeprecatedProps( props );
+ 
+@@ -187,6 +190,16 @@ function CustomSelectControl< T extends CustomSelectOption >(
+ 		return size;
+ 	} )();
+ 
++	// Portal into the registered `Popover.Slot` so the dropdown escapes the
++	// ancestor stacking contexts (e.g. the block toolbar) and `overflow`
++	// containers (e.g. the Style Panel) of the trigger. When no slot is
++	// registered, hand `undefined` to Ariakit so it falls back to its
++	// default (a fresh wrapper div appended to the document `body`, which
++	// is properly cleaned up on unmount). Consumers can opt back into
++	// inline rendering via the `inline` prop.
++	const popoverSlot = useSlot( POPOVER_SLOT_NAME );
++	const portalElement = popoverSlot.ref?.current ?? undefined;
++
+ 	return (
+ 		<>
+ 			<CustomSelect
+@@ -200,6 +213,8 @@ function CustomSelectControl< T extends CustomSelectOption >(
+ 					classNameProp
+ 				) }
+ 				isLegacy
++				portal={ ! inline }
++				portalElement={ inline ? undefined : portalElement }
+ 				{ ...restProps }
+ 			>
+ 				{ children }
+diff --git a/packages/components/src/custom-select-control/stories/index.story.tsx b/packages/components/src/custom-select-control/stories/index.story.tsx
+index ec9544b1eb65ba..d6627123f05563 100644
+--- a/packages/components/src/custom-select-control/stories/index.story.tsx
++++ b/packages/components/src/custom-select-control/stories/index.story.tsx
+@@ -13,6 +13,8 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import CustomSelectControl from '..';
++import { Popover } from '../../popover';
++import { Provider as SlotFillProvider } from '../../slot-fill';
+ 
+ const meta: Meta< typeof CustomSelectControl > = {
+ 	tags: [ 'manifest' ],
+@@ -38,14 +40,22 @@ const meta: Meta< typeof CustomSelectControl > = {
+ 		},
+ 	},
+ 	decorators: [
++		// Mirror the editor's setup: a `SlotFillProvider` at the root with a
++		// `Popover.Slot` registered above the trigger's wrapper. By default,
++		// `CustomSelectControl` portals its dropdown into this slot. Without
++		// this setup, the dropdown falls back to a fresh container in the
++		// document `body`.
+ 		( Story ) => (
+-			<div
+-				style={ {
+-					minHeight: '150px',
+-				} }
+-			>
+-				<Story />
+-			</div>
++			<SlotFillProvider>
++				<div
++					style={ {
++						minHeight: '150px',
++					} }
++				>
++					<Story />
++				</div>
++				<Popover.Slot />
++			</SlotFillProvider>
+ 		),
+ 	],
+ };
+diff --git a/packages/components/src/custom-select-control/test/index.tsx b/packages/components/src/custom-select-control/test/index.tsx
+index 61d212c26c619e..f3b9c2e86ca145 100644
+--- a/packages/components/src/custom-select-control/test/index.tsx
++++ b/packages/components/src/custom-select-control/test/index.tsx
+@@ -694,6 +694,45 @@ describe.each( [
+ 	} );
+ } );
+ 
++describe( 'Portaling', () => {
++	/* These tests intentionally assert on DOM tree position to verify the
++	 * popover is portaled (or not) relative to the trigger's wrapper. */
++	/* eslint-disable testing-library/no-node-access */
++	it( 'portals the dropdown listbox outside the trigger wrapper by default', async () => {
++		await render( <UncontrolledCustomSelectControl { ...props } /> );
++
++		const trigger = screen.getByRole( 'combobox', { expanded: false } );
++		const triggerWrapper = trigger.closest(
++			'.components-custom-select-control'
++		);
++		expect( triggerWrapper ).not.toBeNull();
++
++		await click( trigger );
++
++		const listbox = screen.getByRole( 'listbox', { name: props.label } );
++		expect( listbox ).toBeVisible();
++		expect( triggerWrapper?.contains( listbox ) ).toBe( false );
++		expect( document.body.contains( listbox ) ).toBe( true );
++	} );
++
++	it( 'renders the dropdown listbox inline when `inline` is enabled', async () => {
++		await render( <UncontrolledCustomSelectControl { ...props } inline /> );
++
++		const trigger = screen.getByRole( 'combobox', { expanded: false } );
++		const triggerWrapper = trigger.closest(
++			'.components-custom-select-control'
++		);
++		expect( triggerWrapper ).not.toBeNull();
++
++		await click( trigger );
++
++		const listbox = screen.getByRole( 'listbox', { name: props.label } );
++		expect( listbox ).toBeVisible();
++		expect( triggerWrapper?.contains( listbox ) ).toBe( true );
++	} );
++	/* eslint-enable testing-library/no-node-access */
++} );
++
+ describe( 'Type checking', () => {
+ 	// eslint-disable-next-line jest/expect-expect
+ 	it( 'should infer the value type from available `options`, but not the `value` or `onChange` prop', () => {
+diff --git a/packages/components/src/custom-select-control/types.ts b/packages/components/src/custom-select-control/types.ts
+index dd3db6d3bb0f95..fa86e26f2435fd 100644
+--- a/packages/components/src/custom-select-control/types.ts
++++ b/packages/components/src/custom-select-control/types.ts
+@@ -127,4 +127,17 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
+ 	 * @ignore
+ 	 */
+ 	__shouldNotWarnDeprecated36pxSize?: boolean;
++	/**
++	 * By default, the dropdown popover is portaled into the registered
++	 * `Popover.Slot` (or, when no slot is registered, into the document
++	 * `body`). Portaling allows the popover to escape ancestor stacking
++	 * contexts and `overflow` containers, which prevents it from being
++	 * clipped or covered by sticky elements like the block toolbar.
++	 *
++	 * Set this to `true` to opt back into the previous inline rendering,
++	 * where the popover is rendered next to the trigger in the DOM tree.
++	 *
++	 * @default false
++	 */
++	inline?: boolean;
+ };

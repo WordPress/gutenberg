@@ -1,0 +1,119 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 052d81c944a33e..0d36245e1c9bda 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,7 +12,7 @@
+ 
+ ### Internal
+ 
+-- `AlignmentMatrixControl`: Migrate styles from Emotion to a CSS module ([#73714](https://github.com/WordPress/gutenberg/pull/73714)).
++- `AlignmentMatrixControl`: Migrate styles from Emotion to a CSS module ([#73714](https://github.com/WordPress/gutenberg/pull/73714) and [#73757](https://github.com/WordPress/gutenberg/pull/73757)).
+ 
+ ## 30.9.0 (2025-11-26)
+ 
+diff --git a/packages/components/src/alignment-matrix-control/index.tsx b/packages/components/src/alignment-matrix-control/index.tsx
+index 730a27ba7e8c77..94a9c2024908f5 100644
+--- a/packages/components/src/alignment-matrix-control/index.tsx
++++ b/packages/components/src/alignment-matrix-control/index.tsx
+@@ -51,7 +51,7 @@ function UnforwardedAlignmentMatrixControl( {
+ 
+ 	const classes = clsx(
+ 		'component-alignment-matrix-control',
+-		styles.gridContainer,
++		styles[ 'grid-container' ],
+ 		className
+ 	);
+ 
+@@ -74,7 +74,9 @@ function UnforwardedAlignmentMatrixControl( {
+ 		>
+ 			{ GRID.map( ( cells, index ) => (
+ 				<Composite.Row
+-					render={ <div className={ styles.gridRow } role="row" /> }
++					render={
++						<div className={ styles[ 'grid-row' ] } role="row" />
++					}
+ 					key={ index }
+ 				>
+ 					{ cells.map( ( cell ) => (
+diff --git a/packages/components/src/alignment-matrix-control/style.module.scss b/packages/components/src/alignment-matrix-control/style.module.scss
+index b44091a399b6e4..e278280a519a89 100644
+--- a/packages/components/src/alignment-matrix-control/style.module.scss
++++ b/packages/components/src/alignment-matrix-control/style.module.scss
+@@ -1,8 +1,7 @@
+ @use "@wordpress/base-styles/variables" as *;
+ @use "../utils/theme-variables" as *;
+ 
+-/* Grid structure */
+-.gridContainer {
++.grid-container {
+ 	direction: ltr;
+ 
+ 	display: grid;
+@@ -19,7 +18,7 @@
+ 	cursor: pointer;
+ }
+ 
+-.gridRow {
++.grid-row {
+ 	grid-column: 1 / -1;
+ 
+ 	box-sizing: border-box;
+@@ -27,7 +26,6 @@
+ 	grid-template-columns: repeat(3, 1fr);
+ }
+ 
+-/* Cell */
+ .cell {
+ 	position: relative;
+ 
+@@ -44,7 +42,6 @@
+ 	outline: none;
+ }
+ 
+-/* Point */
+ .point {
+ 	display: block;
+ 	contain: strict;
+@@ -60,27 +57,25 @@
+ 	/* Use border instead of background color so that the point shows
+ 	in Windows High Contrast Mode */
+ 	border: 3px solid currentColor;
+-}
+ 
+-/* Highlight active item */
+-.cell[data-active-item] .point {
+-	color: $components-color-foreground;
+-	transform: scale(calc(5 / 3));
+-}
++	/* Highlight active item */
++	.cell[data-active-item] & {
++		color: $components-color-foreground;
++		transform: scale(calc(5 / 3));
++	}
+ 
+-/* Hover styles for non-active items */
+-.cell:not([data-active-item]):hover .point {
+-	color: $components-color-accent;
+-}
++	/* Hover styles for non-active items */
++	.cell:not([data-active-item]):hover & {
++		color: $components-color-accent;
++	}
+ 
+-/* Show an outline only when interacting with keyboard */
+-.cell[data-focus-visible] .point {
+-	outline: 1px solid $components-color-accent;
+-	outline-offset: 1px;
+-}
++	/* Show an outline only when interacting with keyboard */
++	.cell[data-focus-visible] & {
++		outline: 1px solid $components-color-accent;
++		outline-offset: 1px;
++	}
+ 
+-@media not (prefers-reduced-motion) {
+-	.point {
++	@media not (prefers-reduced-motion) {
+ 		transition-property: color, transform;
+ 		transition-duration: 120ms;
+ 		transition-timing-function: linear;

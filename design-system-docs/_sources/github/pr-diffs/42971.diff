@@ -1,0 +1,75 @@
+diff --git a/packages/block-editor/src/components/url-popover/image-url-input-ui.js b/packages/block-editor/src/components/url-popover/image-url-input-ui.js
+index 1066b50e1ed2bf..f3680358c436a9 100644
+--- a/packages/block-editor/src/components/url-popover/image-url-input-ui.js
++++ b/packages/block-editor/src/components/url-popover/image-url-input-ui.js
+@@ -51,6 +51,7 @@ const ImageURLInputUI = ( {
+ 	rel,
+ } ) => {
+ 	const [ isOpen, setIsOpen ] = useState( false );
++	const buttonRef = useRef( null );
+ 	const openLinkUI = useCallback( () => {
+ 		setIsOpen( true );
+ 	} );
+@@ -245,9 +246,11 @@ const ImageURLInputUI = ( {
+ 				label={ url ? __( 'Edit link' ) : __( 'Insert link' ) }
+ 				aria-expanded={ isOpen }
+ 				onClick={ openLinkUI }
++				ref={ buttonRef }
+ 			/>
+ 			{ isOpen && (
+ 				<URLPopover
++					anchorRef={ buttonRef }
+ 					onFocusOutside={ onFocusOutside() }
+ 					onClose={ closeLinkUI }
+ 					renderSettings={ () => advancedOptions }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f3b42ea3a185bb..71f81688c2e234 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `Popover`: fix arrow placement and design ([#42874](https://github.com/WordPress/gutenberg/pull/42874/)).
+ -   `Popover`: fix minor glitch in arrow [#42903](https://github.com/WordPress/gutenberg/pull/42903)).
+ -   `ToolsPanel`: Constrain grid columns to 50% max-width ([#42795](https://github.com/WordPress/gutenberg/pull/42795)).
++-   `Popover`: anchor correctly to parent node when no explicit anchor is passed ([#42971](https://github.com/WordPress/gutenberg/pull/42971)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index ef3d515587fd25..0dac37685281d9 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -351,7 +351,9 @@ const Popover = (
+ 				},
+ 			};
+ 		} else if ( anchorRefFallback.current ) {
+-			resultingReferenceRef = anchorRefFallback.current;
++			// If no explicit ref is passed via props, fall back to
++			// anchoring to the popover's parent node.
++			resultingReferenceRef = anchorRefFallback.current.parentNode;
+ 		}
+ 
+ 		if ( ! resultingReferenceRef ) {
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index 13649142c2caec..d8b57e50013766 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -65,6 +65,7 @@ $arrow-triangle-base-size: 14px;
+ 	width: $arrow-triangle-base-size;
+ 	height: $arrow-triangle-base-size;
+ 	pointer-events: none;
++	display: flex;
+ 
+ 	// Thin line that helps to make sure that the underlying
+ 	// popover__content's outline is fully overlapped by the
+@@ -103,9 +104,8 @@ $arrow-triangle-base-size: 14px;
+ }
+ 
+ .components-popover__triangle {
+-	position: absolute;
+-	height: 100%;
+-	width: 100%;
++	display: block;
++	flex: 1;
+ }
+ 
+ .components-popover__triangle-bg {

@@ -1,0 +1,128 @@
+diff --git a/packages/components/src/select-control/stories/index.js b/packages/components/src/select-control/stories/index.js
+new file mode 100644
+index 00000000000000..dec6d48405e5a4
+--- /dev/null
++++ b/packages/components/src/select-control/stories/index.js
+@@ -0,0 +1,59 @@
++/**
++ * External dependencies
++ */
++import { boolean, object, text } from '@storybook/addon-knobs';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import SelectControl from '../';
++
++export default {
++	title: 'Components/SelectControl',
++	component: SelectControl,
++};
++
++const SelectControlWithState = ( props ) => {
++	const [ selection, setSelection ] = useState();
++
++	return (
++		<SelectControl
++			{ ...props }
++			value={ selection }
++			onChange={ setSelection }
++		/>
++	);
++};
++
++export const _default = () => {
++	const label = text( 'Label', 'Label Text' );
++	const hideLabelFromVision = boolean( 'Hide Label From Vision', false );
++	const help = text(
++		'Help Text',
++		'Help text to explain the select control.'
++	);
++	const multiple = boolean( 'Allow Multiple Selection', false );
++	const options = object( 'Options', [
++		{ value: null, label: 'Select an Option', disabled: true },
++		{ value: 'a', label: 'Option A' },
++		{ value: 'b', label: 'Option B' },
++		{ value: 'c', label: 'Option C' },
++	] );
++	const className = text( 'Class Name', '' );
++
++	return (
++		<SelectControlWithState
++			label={ label }
++			hideLabelFromVision={ hideLabelFromVision }
++			help={ help }
++			multiple={ multiple }
++			options={ options }
++			className={ className }
++		/>
++	);
++};
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index d17f24d407078a..4a47cfa8b14a0c 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -7887,6 +7887,58 @@ exports[`Storyshots Components/ScrollLock Default 1`] = `
+ </div>
+ `;
+ 
++exports[`Storyshots Components/SelectControl Default 1`] = `
++<div
++  className="components-base-control"
++>
++  <div
++    className="components-base-control__field"
++  >
++    <label
++      className="components-base-control__label"
++      htmlFor="inspector-select-control-0"
++    >
++      Label Text
++    </label>
++    <select
++      aria-describedby="inspector-select-control-0__help"
++      className="components-select-control__input"
++      id="inspector-select-control-0"
++      multiple={false}
++      onChange={[Function]}
++    >
++      <option
++        disabled={true}
++        value={null}
++      >
++        Select an Option
++      </option>
++      <option
++        value="a"
++      >
++        Option A
++      </option>
++      <option
++        value="b"
++      >
++        Option B
++      </option>
++      <option
++        value="c"
++      >
++        Option C
++      </option>
++    </select>
++  </div>
++  <p
++    className="components-base-control__help"
++    id="inspector-select-control-0__help"
++  >
++    Help text to explain the select control.
++  </p>
++</div>
++`;
++
+ exports[`Storyshots Components/Snackbar Default 1`] = `
+ <div
+   className="components-snackbar"

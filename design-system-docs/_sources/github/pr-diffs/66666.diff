@@ -1,0 +1,80 @@
+diff --git a/packages/components/src/menu/radio-item.tsx b/packages/components/src/menu/radio-item.tsx
+index 3848d2062c0c25..5f4c874186f94b 100644
+--- a/packages/components/src/menu/radio-item.tsx
++++ b/packages/components/src/menu/radio-item.tsx
+@@ -29,7 +29,7 @@ export const MenuRadioItem = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< MenuRadioItemProps, 'div', false >
+ >( function MenuRadioItem(
+-	{ suffix, children, onBlur, hideOnClick = false, ...props },
++	{ suffix, children, onBlur, hideOnClick = false, checkedPrefix, ...props },
+ 	ref
+ ) {
+ 	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
+@@ -51,7 +51,7 @@ export const MenuRadioItem = forwardRef<
+ 				// Override some ariakit inline styles
+ 				style={ { width: 'auto', height: 'auto' } }
+ 			>
+-				<Icon icon={ radioCheck } size={ 24 } />
++				{ checkedPrefix || <Icon icon={ radioCheck } size={ 24 } /> }
+ 			</Ariakit.MenuItemCheck>
+ 
+ 			<Styled.MenuItemContentWrapper>
+diff --git a/packages/components/src/menu/stories/index.story.tsx b/packages/components/src/menu/stories/index.story.tsx
+index ecb4cc3c7593f8..3830ac42f39761 100644
+--- a/packages/components/src/menu/stories/index.story.tsx
++++ b/packages/components/src/menu/stories/index.story.tsx
+@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
+ /**
+  * WordPress dependencies
+  */
+-import { customLink, formatCapitalize } from '@wordpress/icons';
++import { customLink, formatCapitalize, check } from '@wordpress/icons';
+ import { useState, useMemo, useContext } from '@wordpress/element';
+ 
+ /**
+@@ -308,6 +308,29 @@ export const WithRadios: StoryFn< typeof Menu > = ( props ) => {
+ 					<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
+ 				</Menu.RadioItem>
+ 			</Menu.Group>
++			<Menu.Group>
++				<Menu.GroupLabel>With custom checked prefix</Menu.GroupLabel>
++				<Menu.RadioItem
++					name="radio-uncontrolled-custom-checked-prefix"
++					value="one"
++					defaultChecked
++					checkedPrefix={ <Icon icon={ check } size={ 24 } /> }
++				>
++					<Menu.ItemLabel>Radio item 1</Menu.ItemLabel>
++					<Menu.ItemHelpText>
++						Checked with custom prefix
++					</Menu.ItemHelpText>
++				</Menu.RadioItem>
++				<Menu.RadioItem
++					name="radio-uncontrolled-custom-checked-prefix"
++					value="two"
++					checkedPrefix={ <Icon icon={ check } size={ 24 } /> }
++				>
++					<Menu.ItemLabel>Radio item 2</Menu.ItemLabel>
++					<Menu.ItemHelpText>Initially unchecked</Menu.ItemHelpText>
++				</Menu.RadioItem>
++			</Menu.Group>
++			<Menu.Separator />
+ 		</Menu>
+ 	);
+ };
+diff --git a/packages/components/src/menu/types.ts b/packages/components/src/menu/types.ts
+index 7b58cef241743e..9e70c53b74295e 100644
+--- a/packages/components/src/menu/types.ts
++++ b/packages/components/src/menu/types.ts
+@@ -172,6 +172,10 @@ export interface MenuRadioItemProps
+ 	 * The controlled checked state of the radio menu item.
+ 	 */
+ 	checked?: boolean;
++	/**
++	 * The contents of the checked radio menu item's prefix.
++	 */
++	checkedPrefix?: React.ReactNode;
+ 	/**
+ 	 * The checked state of the radio menu item when it is initially rendered.
+ 	 * Use when not wanting to control its checked state.

@@ -1,0 +1,53 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ad2e5be8e71211..1ec2b397bcea6d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,10 @@
+ 
+ - Resolves a conflict where two instance of Slot would produce an inconsistent or duplicated rendering output.
+ 
++### New Feature
++
++- `Dropdown` now has a `focusOnMount` prop which is passed directly to the contained `Popover`.
++
+ ## 7.0.5 (2019-01-03)
+ 
+ ## 7.0.4 (2018-12-12)
+diff --git a/packages/components/src/dropdown/README.md b/packages/components/src/dropdown/README.md
+index 552fb2741776ea..0e09a6651dcd92 100644
+--- a/packages/components/src/dropdown/README.md
++++ b/packages/components/src/dropdown/README.md
+@@ -90,3 +90,13 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to
+ 
+  - Type: `String`
+  - Required: No
++ 
++ ### focusOnMount
++ 
++ By default, the *first tabblable element* in the popover will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"`.
++ 
++ Set this prop to `false` to disable focus changing entirely. This should only be set when an appropriately accessible substitute behavior exists.
++ 
++ - Type: `String` or `Boolean`
++ - Required: No
++ - Default: `"firstElement"`
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index 81ebe65da6534d..b4d9082af3cdc0 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -73,6 +73,7 @@ class Dropdown extends Component {
+ 			contentClassName,
+ 			expandOnMobile,
+ 			headerTitle,
++			focusOnMount,
+ 		} = this.props;
+ 
+ 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
+@@ -88,6 +89,7 @@ class Dropdown extends Component {
+ 						onClickOutside={ this.closeIfClickOutside }
+ 						expandOnMobile={ expandOnMobile }
+ 						headerTitle={ headerTitle }
++						focusOnMount={ focusOnMount }
+ 					>
+ 						{ renderContent( args ) }
+ 					</Popover>

@@ -1,0 +1,77 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 2829e6bd4c9535..de1de990024850 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Enhancements
+ 
++-   Focus ring utilities: Remove the shared outline transition so focus ring styles are not accidentally overridden by component transitions ([#78823](https://github.com/WordPress/gutenberg/pull/78823)).
+ -   `Field.Description`: Apply `text-wrap: pretty` to description text to avoid typographic widows ([#79143](https://github.com/WordPress/gutenberg/pull/79143)).
+ -   `Autocomplete`: Add `Autocomplete.Group` and `Autocomplete.GroupLabel` subcomponents ([#78901](https://github.com/WordPress/gutenberg/pull/78901)).
+ 
+diff --git a/packages/ui/src/utils/css/focus.module.css b/packages/ui/src/utils/css/focus.module.css
+index 20c3d182dd6d57..5e6691615936f4 100644
+--- a/packages/ui/src/utils/css/focus.module.css
++++ b/packages/ui/src/utils/css/focus.module.css
+@@ -2,25 +2,6 @@
+ 	@layer utilities, components, compositions, overrides;
+ 
+ 	@layer utilities {
+-		.outset-ring--focus,
+-		.outset-ring--focus-except-active,
+-		.outset-ring--focus-visible,
+-		.outset-ring--focus-within,
+-		.outset-ring--focus-within-except-active,
+-		.outset-ring--focus-within-visible,
+-		.outset-ring--focus-parent-visible {
+-			@media not ( prefers-reduced-motion ) {
+-				--_gcd-a-transition: outline 0.1s ease-out;
+-
+-				transition: outline 0.1s ease-out;
+-			}
+-
+-			/* Outline width must be kept at 0 even with a transparent color,
+-			or else the outline will be visible in forced-colors mode. */
+-			outline: 0 solid transparent;
+-			outline-offset: 1px;
+-		}
+-
+ 		.outset-ring--focus:focus,
+ 		.outset-ring--focus-except-active:focus:not(:active),
+ 		.outset-ring--focus-visible:focus-visible,
+@@ -32,6 +13,7 @@
+ 			--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+ 
+ 			outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
++			outline-offset: var(--wpds-border-width-focus);
+ 		}
+ 	}
+ }
+diff --git a/packages/ui/src/utils/css/overlay-chrome.module.css b/packages/ui/src/utils/css/overlay-chrome.module.css
+index 56e63f4fd3b840..881ebcbf95f003 100644
+--- a/packages/ui/src/utils/css/overlay-chrome.module.css
++++ b/packages/ui/src/utils/css/overlay-chrome.module.css
+@@ -95,17 +95,11 @@
+ 
+ 			/*
+ 			 * The shared `outset-ring--focus-visible` utility (composed by
+-			 * the Content components) uses an `outline-offset` of `+1px`,
+-			 * which for this scroll container would put the ring outside
+-			 * the popup's rounded corners and have it clipped by the
+-			 * popup's `overflow: hidden`. Inset the ring by the focus
+-			 * width instead, so it sits flush inside the content box.
+-			 *
+-			 * The shared utility's transition shorthand (`transition:
+-			 * outline …`) only animates outline-color and outline-width,
+-			 * not outline-offset, so the negative offset applied here is
+-			 * static — visually, the ring still fades in/out via color
+-			 * change while the offset stays put.
++			 * the Content components) uses a positive `outline-offset`,
++			 * which for this scroll container would put the ring outside the
++			 * popup's rounded corners and have it clipped by the popup's
++			 * `overflow: hidden`. Inset the ring by the focus width instead,
++			 * so it sits flush inside the content box.
+ 			 */
+ 			&:focus-visible {
+ 				outline-offset: calc(var(--wpds-border-width-focus) * -1);

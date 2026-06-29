@@ -1,0 +1,15 @@
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 1fc3b14ca2fed7..6e2c7afdf48f81 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -324,7 +324,9 @@ const Popover = ( {
+ 			onFocusOutside( event );
+ 			return;
+ 		} else if ( ! onClickOutside ) {
+-			onClose();
++			if ( onClose ) {
++				onClose();
++			}
+ 			return;
+ 		}
+ 

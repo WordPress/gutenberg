@@ -1,0 +1,49 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index acf8112b4111ac..4114a32f148542 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Experimental
++
++-   `TabPanel`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
++
+ ## 25.14.0 (2023-12-13)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/tabs/tabpanel.tsx b/packages/components/src/tabs/tabpanel.tsx
+index 14c449bf41d135..6762c123cce817 100644
+--- a/packages/components/src/tabs/tabpanel.tsx
++++ b/packages/components/src/tabs/tabpanel.tsx
+@@ -32,6 +32,7 @@ export const TabPanel = forwardRef<
+ 	}
+ 	const { store, instanceId } = context;
+ 	const instancedTabId = `${ instanceId }-${ tabId }`;
++	const selectedId = store.useState( ( state ) => state.selectedId );
+ 
+ 	return (
+ 		<StyledTabPanel
+@@ -41,7 +42,7 @@ export const TabPanel = forwardRef<
+ 			focusable={ focusable }
+ 			{ ...otherProps }
+ 		>
+-			{ children }
++			{ selectedId === instancedTabId && children }
+ 		</StyledTabPanel>
+ 	);
+ } );
+diff --git a/packages/e2e-tests/specs/editor/various/editor-modes.test.js b/packages/e2e-tests/specs/editor/various/editor-modes.test.js
+index aea6536f605bb6..017237df9fbede 100644
+--- a/packages/e2e-tests/specs/editor/various/editor-modes.test.js
++++ b/packages/e2e-tests/specs/editor/various/editor-modes.test.js
+@@ -120,7 +120,7 @@ describe( 'Editing modes (visual/HTML)', () => {
+ 			'//button[@role="tab"][contains(text(), "Block")]'
+ 		);
+ 		inactiveBlockInspectorTab.click();
+-		const noBlocksElement = await page.$(
++		const noBlocksElement = page.waitForSelector(
+ 			'.block-editor-block-inspector__no-blocks'
+ 		);
+ 		expect( noBlocksElement ).not.toBeNull();

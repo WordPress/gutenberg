@@ -1,0 +1,220 @@
+diff --git a/package-lock.json b/package-lock.json
+index 0c3ae3680947d5..8cd8b00723fe41 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -57921,6 +57921,7 @@
+ 				"@wordpress/rich-text": "file:../rich-text",
+ 				"@wordpress/style-engine": "file:../style-engine",
+ 				"@wordpress/token-list": "file:../token-list",
++				"@wordpress/ui": "file:../ui",
+ 				"@wordpress/upload-media": "file:../upload-media",
+ 				"@wordpress/url": "file:../url",
+ 				"@wordpress/warning": "file:../warning",
+diff --git a/packages/block-editor/package.json b/packages/block-editor/package.json
+index 1079b4c9551e4f..57fe35bfec77b9 100644
+--- a/packages/block-editor/package.json
++++ b/packages/block-editor/package.json
+@@ -93,6 +93,7 @@
+ 		"@wordpress/rich-text": "file:../rich-text",
+ 		"@wordpress/style-engine": "file:../style-engine",
+ 		"@wordpress/token-list": "file:../token-list",
++		"@wordpress/ui": "file:../ui",
+ 		"@wordpress/upload-media": "file:../upload-media",
+ 		"@wordpress/url": "file:../url",
+ 		"@wordpress/warning": "file:../warning",
+diff --git a/packages/block-editor/src/utils/dom.js b/packages/block-editor/src/utils/dom.js
+index 6d55f2468d24b6..e07efd6f2e0df2 100644
+--- a/packages/block-editor/src/utils/dom.js
++++ b/packages/block-editor/src/utils/dom.js
+@@ -80,14 +80,14 @@ export function rectUnion( rect1, rect2 ) {
+  * @param {Element} element Element.
+  * @return {boolean} Whether the element is visible.
+  */
+-function isElementVisible( element ) {
++export function isElementVisible( element ) {
+ 	const viewport = element.ownerDocument.defaultView;
+ 	if ( ! viewport ) {
+ 		return false;
+ 	}
+ 
+-	// Check for <VisuallyHidden> component.
+-	if ( element.classList.contains( 'components-visually-hidden' ) ) {
++	// Check for <VisuallyHidden> components.
++	if ( element.hasAttribute( 'data-visually-hidden' ) ) {
+ 		return false;
+ 	}
+ 
+diff --git a/packages/block-editor/src/utils/test/dom.js b/packages/block-editor/src/utils/test/dom.js
+index 50a16a27cf9617..9f6c30072f6207 100644
+--- a/packages/block-editor/src/utils/test/dom.js
++++ b/packages/block-editor/src/utils/test/dom.js
+@@ -1,8 +1,51 @@
+-/**
+- * Internal dependencies
+- */
+-import { getElementBounds, WITH_OVERFLOW_ELEMENT_BLOCKS } from '../dom';
++import { render, screen } from '@testing-library/react';
++import { VisuallyHidden as WCVisuallyHidden } from '@wordpress/components';
++// eslint-disable-next-line @wordpress/use-recommended-components -- Only for testing
++import { VisuallyHidden } from '@wordpress/ui';
++import {
++	getElementBounds,
++	isElementVisible,
++	WITH_OVERFLOW_ELEMENT_BLOCKS,
++} from '../dom';
++
++function mockVisibleBoundingClientRect( element ) {
++	element.getBoundingClientRect = jest.fn().mockReturnValue( {
++		left: 0,
++		top: 0,
++		right: 100,
++		bottom: 20,
++		width: 100,
++		height: 20,
++		x: 0,
++		y: 0,
++	} );
++}
++
+ describe( 'dom', () => {
++	describe( 'isElementVisible', () => {
++		it( 'returns false for @wordpress/components VisuallyHidden', () => {
++			render(
++				<WCVisuallyHidden data-testid="wc-visually-hidden">
++					Hidden
++				</WCVisuallyHidden>
++			);
++			const element = screen.getByTestId( 'wc-visually-hidden' );
++			mockVisibleBoundingClientRect( element );
++			expect( isElementVisible( element ) ).toBe( false );
++		} );
++
++		it( 'returns false for @wordpress/ui VisuallyHidden', () => {
++			render(
++				<VisuallyHidden data-testid="ui-visually-hidden">
++					Hidden
++				</VisuallyHidden>
++			);
++			const element = screen.getByTestId( 'ui-visually-hidden' );
++			mockVisibleBoundingClientRect( element );
++			expect( isElementVisible( element ) ).toBe( false );
++		} );
++	} );
++
+ 	describe( 'getElementBounds', () => {
+ 		it( 'should return a DOMRectReadOnly object if the viewport is not available', () => {
+ 			const element = {
+diff --git a/packages/block-editor/tsconfig.json b/packages/block-editor/tsconfig.json
+index 62179d64135b39..d559464a210717 100644
+--- a/packages/block-editor/tsconfig.json
++++ b/packages/block-editor/tsconfig.json
+@@ -32,6 +32,7 @@
+ 		{ "path": "../rich-text" },
+ 		{ "path": "../style-engine" },
+ 		{ "path": "../token-list" },
++		{ "path": "../ui" },
+ 		{ "path": "../url" },
+ 		{ "path": "../upload-media" },
+ 		{ "path": "../warning" },
+diff --git a/packages/components/src/notice/test/__snapshots__/index.tsx.snap b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+index 51d03be3e71c65..9703cc3fb045b2 100644
+--- a/packages/components/src/notice/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+@@ -7,6 +7,7 @@ exports[`Notice should match snapshot 1`] = `
+   >
+     <div
+       class="components-visually-hidden css-1ragr82-PolymorphicDiv emotion-0"
++      data-visually-hidden=""
+       data-wp-c16t="true"
+       data-wp-component="VisuallyHidden"
+       style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
+diff --git a/packages/components/src/visually-hidden/component.tsx b/packages/components/src/visually-hidden/component.tsx
+index ddf697c9373db6..c76fbdf1c51402 100644
+--- a/packages/components/src/visually-hidden/component.tsx
++++ b/packages/components/src/visually-hidden/component.tsx
+@@ -24,6 +24,7 @@ function UnconnectedVisuallyHidden(
+ 		<View
+ 			ref={ forwardedRef }
+ 			{ ...contextProps }
++			data-visually-hidden=""
+ 			style={ { ...visuallyHidden, ...( styleProp || {} ) } }
+ 		/>
+ 	);
+diff --git a/packages/components/src/visually-hidden/test/__snapshots__/index.tsx.snap b/packages/components/src/visually-hidden/test/__snapshots__/index.tsx.snap
+deleted file mode 100644
+index 5efd6b306c2347..00000000000000
+--- a/packages/components/src/visually-hidden/test/__snapshots__/index.tsx.snap
++++ /dev/null
+@@ -1,12 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`VisuallyHidden should render correctly 1`] = `
+-<div
+-  class="components-visually-hidden css-1ragr82-PolymorphicDiv emotion-0"
+-  data-wp-c16t="true"
+-  data-wp-component="VisuallyHidden"
+-  style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
+->
+-  This is hidden
+-</div>
+-`;
+diff --git a/packages/components/src/visually-hidden/test/index.tsx b/packages/components/src/visually-hidden/test/index.tsx
+deleted file mode 100644
+index 9c66dbe4685a8e..00000000000000
+--- a/packages/components/src/visually-hidden/test/index.tsx
++++ /dev/null
+@@ -1,17 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, screen } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { VisuallyHidden } from '..';
+-
+-describe( 'VisuallyHidden', () => {
+-	it( 'should render correctly', () => {
+-		const text = 'This is hidden';
+-		render( <VisuallyHidden>{ text }</VisuallyHidden> );
+-		expect( screen.getByText( text ) ).toMatchSnapshot();
+-	} );
+-} );
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index 5e1d87fbb85112..9ff4d2854ad9ea 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -162,6 +162,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+             >
+               <span
+                 class="components-visually-hidden emotion-6 emotion-7"
++                data-visually-hidden=""
+                 data-wp-c16t="true"
+                 data-wp-component="VisuallyHidden"
+                 style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
+@@ -389,6 +390,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+             >
+               <span
+                 class="components-visually-hidden emotion-6 emotion-7"
++                data-visually-hidden=""
+                 data-wp-c16t="true"
+                 data-wp-component="VisuallyHidden"
+                 style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
+diff --git a/packages/ui/src/visually-hidden/visually-hidden.tsx b/packages/ui/src/visually-hidden/visually-hidden.tsx
+index 9ff1645411f839..0ecb0a7b2f2d6f 100644
+--- a/packages/ui/src/visually-hidden/visually-hidden.tsx
++++ b/packages/ui/src/visually-hidden/visually-hidden.tsx
+@@ -48,7 +48,11 @@ export const VisuallyHidden = forwardRef< HTMLDivElement, VisuallyHiddenProps >(
+ 			ref,
+ 			props: mergeProps< 'div' >(
+ 				{ className: styles[ 'visually-hidden' ] },
+-				restProps
++				restProps,
++				{
++					// @ts-expect-error Arbitrary data-* attributes aren't indexable on the typed div props. Kept hardcoded so consumers can't change or remove it.
++					'data-visually-hidden': '',
++				}
+ 			),
+ 		} );
+ 

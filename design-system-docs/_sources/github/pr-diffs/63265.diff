@@ -1,0 +1,181 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ed1469de74e5eb..392d11fdd6673e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,13 @@
+ -   `ComboboxControl`: Fix ComboboxControl reset button when using the keyboard. ([#63410](https://github.com/WordPress/gutenberg/pull/63410))
+ -   `Button`: Never apply `aria-disabled` to anchor ([#63376](https://github.com/WordPress/gutenberg/pull/63376)).
+ 
++### Enhancements
++
++-   `Button`: Rename Button describedBy prop to description and deprecate old name. ([#63486](https://github.com/WordPress/gutenberg/pull/63486))
++-   `ToggleGroupControl`: support disabled options ([#63450](https://github.com/WordPress/gutenberg/pull/63450)).
++-   `CustomSelectControl`: Stabilize `__experimentalShowSelectedHint` and `options[]. __experimentalHint` props ([#63248](https://github.com/WordPress/gutenberg/pull/63248)).
++-   `SelectControl`: Add `"minimal"` variant ([#63265](https://github.com/WordPress/gutenberg/pull/63265)).
++
+ ### Internal
+ 
+ -   `CustomSelectControl`: switch to ariakit-based implementation ([#63258](https://github.com/WordPress/gutenberg/pull/63258)).
+@@ -19,12 +26,6 @@
+ -   `DropdownMenuV2`: invert animation direction. ([#63443](https://github.com/WordPress/gutenberg/pull/63443)).
+ -   `Tabs`: Vertical Tabs should be 40px min height. ([#63446](https://github.com/WordPress/gutenberg/pull/63446)).
+ 
+-### Enhancements
+-
+--   `Button`: Rename Button describedBy prop to description and deprecate old name. ([#63486](https://github.com/WordPress/gutenberg/pull/63486))
+--   `ToggleGroupControl`: support disabled options ([#63450](https://github.com/WordPress/gutenberg/pull/63450)).
+--   `CustomSelectControl`: Stabilize `__experimentalShowSelectedHint` and `options[]. __experimentalHint` props ([#63248](https://github.com/WordPress/gutenberg/pull/63248)).
+-
+ ## 28.3.0 (2024-07-10)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index 34d3134365d9f3..bc37942231091b 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -214,6 +214,14 @@ If multiple is false the value received is a single value with the new selected
+ -   Type: `function`
+ -   Required: Yes
+ 
++#### variant
++
++The style variant of the control.
++
++-   Type: `'default' | 'minimal'`
++-   Required: No
++-   Default: `'default'`
++
+ ### __nextHasNoMarginBottom
+ 
+ Start opting into the new margin-free styles that will become the default in a future version.
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 5acde6ba4c7600..5db0316d02b129 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -46,6 +46,7 @@ function UnforwardedSelectControl(
+ 		children,
+ 		prefix,
+ 		suffix,
++		variant = 'default',
+ 		__next40pxDefaultSize = false,
+ 		__nextHasNoMarginBottom = false,
+ 		...restProps
+@@ -86,6 +87,7 @@ function UnforwardedSelectControl(
+ 				disabled={ disabled }
+ 				hideLabelFromVision={ hideLabelFromVision }
+ 				id={ id }
++				isBorderless={ variant === 'minimal' }
+ 				label={ label }
+ 				size={ size }
+ 				suffix={
+@@ -93,6 +95,10 @@ function UnforwardedSelectControl(
+ 				}
+ 				prefix={ prefix }
+ 				labelPosition={ labelPosition }
++				__unstableInputWidth={
++					variant === 'minimal' ? 'auto' : undefined
++				}
++				variant={ variant }
+ 				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 			>
+ 				<Select
+@@ -107,6 +113,7 @@ function UnforwardedSelectControl(
+ 					ref={ ref }
+ 					selectSize={ size }
+ 					value={ valueProp }
++					variant={ variant }
+ 				>
+ 					{ children ||
+ 						options.map( ( option, index ) => {
+diff --git a/packages/components/src/select-control/stories/index.story.tsx b/packages/components/src/select-control/stories/index.story.tsx
+index 42966ef4f05f47..11a63510d9337c 100644
+--- a/packages/components/src/select-control/stories/index.story.tsx
++++ b/packages/components/src/select-control/stories/index.story.tsx
+@@ -100,3 +100,9 @@ export const WithCustomChildren: StoryFn< typeof SelectControl > = ( args ) => {
+ 		</SelectControlWithState>
+ 	);
+ };
++
++export const Minimal = SelectControlWithState.bind( {} );
++Minimal.args = {
++	...Default.args,
++	variant: 'minimal',
++};
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index b597a52f797c11..989c5fa62ecff7 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -17,7 +17,7 @@ import InputBase from '../../input-control/input-base';
+ interface SelectProps
+ 	extends Pick<
+ 		SelectControlProps,
+-		'__next40pxDefaultSize' | 'disabled' | 'multiple'
++		'__next40pxDefaultSize' | 'disabled' | 'multiple' | 'variant'
+ 	> {
+ 	// Using `selectSize` instead of `size` to avoid a type conflict with the
+ 	// `size` HTML attribute of the `select` element.
+@@ -35,11 +35,22 @@ const disabledStyles = ( { disabled }: SelectProps ) => {
+ 	`;
+ };
+ 
++const inputBaseVariantStyles = ( { variant }: SelectProps ) => {
++	if ( variant === 'minimal' ) {
++		return css`
++			display: inline-flex;
++		`;
++	}
++
++	return '';
++};
++
+ export const StyledInputBase = styled( InputBase )`
+ 	color: ${ COLORS.theme.foreground };
+ 	cursor: pointer;
+ 
+ 	${ disabledStyles }
++	${ inputBaseVariantStyles }
+ `;
+ 
+ const sizeStyles = ( {
+@@ -127,6 +138,16 @@ const overflowStyles = ( { multiple }: SelectProps ) => {
+ 	};
+ };
+ 
++const variantStyles = ( { variant }: SelectProps ) => {
++	if ( variant === 'minimal' ) {
++		return css( {
++			fieldSizing: 'content',
++		} );
++	}
++
++	return '';
++};
++
+ // TODO: Resolve need to use &&& to increase specificity
+ // https://github.com/WordPress/gutenberg/issues/18483
+ 
+@@ -150,6 +171,7 @@ export const Select = styled.select< SelectProps >`
+ 		${ sizeStyles };
+ 		${ sizePaddings };
+ 		${ overflowStyles }
++		${ variantStyles }
+ 	}
+ `;
+ 
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+index b8ec42cc4b72f2..a1d02d444c1474 100644
+--- a/packages/components/src/select-control/types.ts
++++ b/packages/components/src/select-control/types.ts
+@@ -53,6 +53,12 @@ type SelectControlBaseProps = Pick<
+ 		 * passed in as `children` for more customizability.
+ 		 */
+ 		children?: ReactNode;
++		/**
++		 * The style variant of the control.
++		 *
++		 * @default 'default'
++		 */
++		variant?: 'default' | 'minimal';
+ 	};
+ 
+ export type SelectControlSingleSelectionProps = SelectControlBaseProps & {

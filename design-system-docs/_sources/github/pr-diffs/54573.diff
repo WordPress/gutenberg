@@ -1,0 +1,787 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b0ce4acaa591eb..0cdcb59841f40f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,10 @@
+ -   `Placeholder`: Improved DOM structure and screen reader announcements ([#45801](https://github.com/WordPress/gutenberg/pull/45801)).
+ -   `DateTimePicker`: fix onChange callback check so that it also works inside iframes ([#54669](https://github.com/WordPress/gutenberg/pull/54669)).
+ 
++### Internal
++
++-   `Tooltip`, `Shortcut`: Remove unused `ui/` components from the codebase ([#54573](https://github.com/WordPress/gutenberg/pull/54573))
++
+ ## 25.8.0 (2023-09-20)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/color-picker/color-copy-button.tsx b/packages/components/src/color-picker/color-copy-button.tsx
+index f5d7f2978ddfce..99450b07628c21 100644
+--- a/packages/components/src/color-picker/color-copy-button.tsx
++++ b/packages/components/src/color-picker/color-copy-button.tsx
+@@ -10,8 +10,7 @@ import { __ } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import { CopyButton } from './styles';
+-import { Text } from '../text';
+-import { Tooltip } from '../ui/tooltip';
++import Tooltip from '../tooltip';
+ 
+ import type { ColorCopyButtonProps } from './types';
+ 
+@@ -56,14 +55,11 @@ export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
+ 
+ 	return (
+ 		<Tooltip
+-			content={
+-				<Text color="white">
+-					{ copiedColor === color.toHex()
+-						? __( 'Copied!' )
+-						: __( 'Copy' ) }
+-				</Text>
++			delay={ 0 }
++			hideOnClick={ false }
++			text={
++				copiedColor === color.toHex() ? __( 'Copied!' ) : __( 'Copy' )
+ 			}
+-			placement="bottom"
+ 		>
+ 			<CopyButton
+ 				isSmall
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index f31a2a4f264d90..bbb8a8d24b8086 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -73,7 +73,6 @@ function Tooltip( props: TooltipProps ) {
+ 	return (
+ 		<>
+ 			<Ariakit.TooltipAnchor
+-				onBlur={ tooltipStore.hide }
+ 				onClick={ hideOnClick ? tooltipStore.hide : undefined }
+ 				store={ tooltipStore }
+ 				render={ isOnlyChild ? children : undefined }
+diff --git a/packages/components/src/ui/shortcut/component.tsx b/packages/components/src/ui/shortcut/component.tsx
+deleted file mode 100644
+index f6131428a2546f..00000000000000
+--- a/packages/components/src/ui/shortcut/component.tsx
++++ /dev/null
+@@ -1,62 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { ForwardedRef } from 'react';
+-
+-/**
+- * Internal dependencies
+- */
+-import type { WordPressComponentProps } from '../context';
+-import { useContextSystem, contextConnect } from '../context';
+-import { View } from '../../view';
+-
+-export interface ShortcutDescription {
+-	display: string;
+-	ariaLabel: string;
+-}
+-
+-export interface Props {
+-	shortcut?: ShortcutDescription | string;
+-	className?: string;
+-}
+-
+-function Shortcut(
+-	props: WordPressComponentProps< Props, 'span' >,
+-	forwardedRef: ForwardedRef< any >
+-): JSX.Element | null {
+-	const {
+-		as: asProp = 'span',
+-		shortcut,
+-		className,
+-		...otherProps
+-	} = useContextSystem( props, 'Shortcut' );
+-	if ( ! shortcut ) {
+-		return null;
+-	}
+-
+-	let displayText: string;
+-	let ariaLabel: string | undefined;
+-
+-	if ( typeof shortcut === 'string' ) {
+-		displayText = shortcut;
+-	} else {
+-		displayText = shortcut.display;
+-		ariaLabel = shortcut.ariaLabel;
+-	}
+-
+-	return (
+-		<View
+-			as={ asProp }
+-			className={ className }
+-			aria-label={ ariaLabel }
+-			ref={ forwardedRef }
+-			{ ...otherProps }
+-		>
+-			{ displayText }
+-		</View>
+-	);
+-}
+-
+-const ConnectedShortcut = contextConnect( Shortcut, 'Shortcut' );
+-
+-export default ConnectedShortcut;
+diff --git a/packages/components/src/ui/shortcut/index.ts b/packages/components/src/ui/shortcut/index.ts
+deleted file mode 100644
+index 6b107e956edb2f..00000000000000
+--- a/packages/components/src/ui/shortcut/index.ts
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export { default as Shortcut } from './component';
+-export type { Props as ShortcutProps, ShortcutDescription } from './component';
+diff --git a/packages/components/src/ui/shortcut/test/__snapshots__/index.js.snap b/packages/components/src/ui/shortcut/test/__snapshots__/index.js.snap
+deleted file mode 100644
+index edd4ed91bc3529..00000000000000
+--- a/packages/components/src/ui/shortcut/test/__snapshots__/index.js.snap
++++ /dev/null
+@@ -1,13 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`Shortcut should render a span with the shortcut text 1`] = `
+-<span
+-  class="components-shortcut emotion-0 emotion-1"
+-  data-wp-c16t="true"
+-  data-wp-component="Shortcut"
+->
+-  meta + P
+-</span>
+-`;
+-
+-exports[`Shortcut should render null when no shortcut is provided 1`] = `<div />`;
+diff --git a/packages/components/src/ui/shortcut/test/index.js b/packages/components/src/ui/shortcut/test/index.js
+deleted file mode 100644
+index 7dc49f7b3f6632..00000000000000
+--- a/packages/components/src/ui/shortcut/test/index.js
++++ /dev/null
+@@ -1,36 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, screen } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Shortcut } from '..';
+-
+-describe( 'Shortcut', () => {
+-	it( 'should render null when no shortcut is provided', () => {
+-		const { container } = render( <Shortcut /> );
+-		expect( container ).toMatchSnapshot();
+-	} );
+-
+-	it( 'should render a span with the shortcut text', () => {
+-		const shortcutText = 'meta + P';
+-		render( <Shortcut shortcut={ shortcutText } /> );
+-		const shortcut = screen.getByText( shortcutText );
+-		expect( shortcut ).toMatchSnapshot();
+-	} );
+-
+-	it( 'should render a span with aria label', () => {
+-		const shortcutObject = {
+-			display: 'meta + P',
+-			ariaLabel: 'print',
+-		};
+-		render( <Shortcut shortcut={ shortcutObject } /> );
+-		const shortcut = screen.getByText( shortcutObject.display );
+-		expect( shortcut ).toHaveAttribute(
+-			'aria-label',
+-			shortcutObject.ariaLabel
+-		);
+-	} );
+-} );
+diff --git a/packages/components/src/ui/tooltip/README.md b/packages/components/src/ui/tooltip/README.md
+deleted file mode 100644
+index 424da79828a487..00000000000000
+--- a/packages/components/src/ui/tooltip/README.md
++++ /dev/null
+@@ -1,21 +0,0 @@
+-# Tooltip
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-`Tooltip` is a component to render floating help text relative to a node when it receives focus or when the user places the mouse cursor atop it.
+-
+-## Usage
+-
+-```jsx
+-import { Tooltip, Text } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return (
+-		<Tooltip content="Code is Poetry">
+-			<Text>WordPress.org</Text>
+-		</Tooltip>
+-	);
+-}
+-```
+diff --git a/packages/components/src/ui/tooltip/component.js b/packages/components/src/ui/tooltip/component.js
+deleted file mode 100644
+index 33106379140ffb..00000000000000
+--- a/packages/components/src/ui/tooltip/component.js
++++ /dev/null
+@@ -1,102 +0,0 @@
+-/**
+- * External dependencies
+- */
+-// eslint-disable-next-line no-restricted-imports
+-import { TooltipReference, useTooltipState } from 'reakit';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useMemo, cloneElement } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { contextConnect, useContextSystem } from '../context';
+-import { TooltipContext } from './context';
+-import TooltipContent from './content';
+-import { TooltipShortcut } from './styles';
+-
+-/**
+- * @param {import('../context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                            forwardedRef
+- */
+-function Tooltip( props, forwardedRef ) {
+-	const {
+-		animated = true,
+-		animationDuration = 160,
+-		baseId,
+-		children,
+-		content,
+-		focusable = true,
+-		gutter = 4,
+-		id,
+-		modal = true,
+-		placement,
+-		visible = false,
+-		shortcut,
+-		...otherProps
+-	} = useContextSystem( props, 'Tooltip' );
+-
+-	const tooltip = useTooltipState( {
+-		animated: animated ? animationDuration : undefined,
+-		baseId: baseId || id,
+-		gutter,
+-		placement,
+-		visible,
+-		...otherProps,
+-	} );
+-
+-	const contextProps = useMemo(
+-		() => ( {
+-			tooltip,
+-		} ),
+-		[ tooltip ]
+-	);
+-
+-	return (
+-		<TooltipContext.Provider value={ contextProps }>
+-			{ content && (
+-				<TooltipContent unstable_portal={ modal } ref={ forwardedRef }>
+-					{ content }
+-					{ shortcut && <TooltipShortcut shortcut={ shortcut } /> }
+-				</TooltipContent>
+-			) }
+-			{ children && (
+-				<TooltipReference
+-					{ ...tooltip }
+-					{ ...children.props }
+-					// @ts-ignore If ref doesn't exist that's fine with us, it'll just be undefined, but it can exist on ReactElement and there's no reason to try to scope this (it'll just overcomplicate things)
+-					ref={ children?.ref }
+-				>
+-					{ ( referenceProps ) => {
+-						if ( ! focusable ) {
+-							referenceProps.tabIndex = undefined;
+-						}
+-						return cloneElement( children, referenceProps );
+-					} }
+-				</TooltipReference>
+-			) }
+-		</TooltipContext.Provider>
+-	);
+-}
+-
+-/**
+- * `Tooltip` is a component that provides context for a user interface element.
+- *
+- * @example
+- * ```jsx
+- * import { Tooltip, Text } from `@wordpress/components/ui`;
+- *
+- * function Example() {
+- * 	return (
+- * 		<Tooltip content="Code is Poetry">
+- * 			<Text>WordPress.org</Text>
+- * 		</Tooltip>
+- * 	)
+- * }
+- * ```
+- */
+-const ConnectedTooltip = contextConnect( Tooltip, 'Tooltip' );
+-
+-export default ConnectedTooltip;
+diff --git a/packages/components/src/ui/tooltip/content.js b/packages/components/src/ui/tooltip/content.js
+deleted file mode 100644
+index 7bbf21b44aea8a..00000000000000
+--- a/packages/components/src/ui/tooltip/content.js
++++ /dev/null
+@@ -1,45 +0,0 @@
+-/**
+- * External dependencies
+- */
+-// eslint-disable-next-line no-restricted-imports
+-import { Tooltip as ReakitTooltip } from 'reakit';
+-
+-/**
+- * Internal dependencies
+- */
+-import { contextConnect, useContextSystem } from '../context';
+-import { View } from '../../view';
+-import { useTooltipContext } from './context';
+-import * as styles from './styles';
+-import { useCx } from '../../utils/hooks/use-cx';
+-
+-const { TooltipPopoverView } = styles;
+-
+-/**
+- *
+- * @param {import('../context').WordPressComponentProps<import('./types').ContentProps, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                                   forwardedRef
+- */
+-function TooltipContent( props, forwardedRef ) {
+-	const { children, className, ...otherProps } = useContextSystem(
+-		props,
+-		'TooltipContent'
+-	);
+-	const { tooltip } = useTooltipContext();
+-	const cx = useCx();
+-	const classes = cx( styles.TooltipContent, className );
+-
+-	return (
+-		<ReakitTooltip
+-			as={ View }
+-			{ ...otherProps }
+-			{ ...tooltip }
+-			className={ classes }
+-			ref={ forwardedRef }
+-		>
+-			<TooltipPopoverView>{ children }</TooltipPopoverView>
+-		</ReakitTooltip>
+-	);
+-}
+-
+-export default contextConnect( TooltipContent, 'TooltipContent' );
+diff --git a/packages/components/src/ui/tooltip/context.js b/packages/components/src/ui/tooltip/context.js
+deleted file mode 100644
+index de7f81f9cdeb04..00000000000000
+--- a/packages/components/src/ui/tooltip/context.js
++++ /dev/null
+@@ -1,10 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext, useContext } from '@wordpress/element';
+-
+-/**
+- * @type {import('react').Context<{ tooltip?: import('reakit').TooltipState }>}
+- */
+-export const TooltipContext = createContext( {} );
+-export const useTooltipContext = () => useContext( TooltipContext );
+diff --git a/packages/components/src/ui/tooltip/index.js b/packages/components/src/ui/tooltip/index.js
+deleted file mode 100644
+index 96841fe7ff4ed9..00000000000000
+--- a/packages/components/src/ui/tooltip/index.js
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export { default as Tooltip } from './component';
+-export * from './context';
+diff --git a/packages/components/src/ui/tooltip/stories/index.story.js b/packages/components/src/ui/tooltip/stories/index.story.js
+deleted file mode 100644
+index a0032da0d0ab9b..00000000000000
+--- a/packages/components/src/ui/tooltip/stories/index.story.js
++++ /dev/null
+@@ -1,26 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { Text } from '../../../text';
+-import { Tooltip } from '../index';
+-
+-export default {
+-	component: Tooltip,
+-	title: 'Components (Experimental)/Tooltip',
+-};
+-
+-export const _default = () => {
+-	return (
+-		<Tooltip
+-			content="Tooltip"
+-			visible
+-			gutter={ 10 }
+-			shortcut={ {
+-				display: 'meta + 1',
+-				ariaLabel: 'shortcut-aria-label',
+-			} }
+-		>
+-			<Text>Hello</Text>
+-		</Tooltip>
+-	);
+-};
+diff --git a/packages/components/src/ui/tooltip/styles.js b/packages/components/src/ui/tooltip/styles.js
+deleted file mode 100644
+index fca4875a9d1c17..00000000000000
+--- a/packages/components/src/ui/tooltip/styles.js
++++ /dev/null
+@@ -1,45 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-import styled from '@emotion/styled';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Shortcut } from '../shortcut';
+-import * as ZIndex from '../../utils/z-index';
+-import CONFIG from '../../utils/config-values';
+-import { space } from '../utils/space';
+-import { COLORS } from '../../utils/colors-values';
+-
+-export const TooltipContent = css`
+-	z-index: ${ ZIndex.Tooltip };
+-	box-sizing: border-box;
+-	opacity: 0;
+-	outline: none;
+-	transform-origin: top center;
+-	transition: opacity ${ CONFIG.transitionDurationFastest } ease;
+-	font-size: ${ CONFIG.fontSize };
+-
+-	&[data-enter] {
+-		opacity: 1;
+-	}
+-`;
+-
+-export const TooltipPopoverView = styled.div`
+-	background: rgba( 0, 0, 0, 0.8 );
+-	border-radius: 2px;
+-	box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.04 );
+-	color: ${ COLORS.white };
+-	padding: 4px 8px;
+-`;
+-
+-export const noOutline = css`
+-	outline: none;
+-`;
+-
+-export const TooltipShortcut = styled( Shortcut )`
+-	display: inline-block;
+-	margin-left: ${ space( 1 ) };
+-`;
+diff --git a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+deleted file mode 100644
+index 60edeba1681a25..00000000000000
+--- a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
++++ /dev/null
+@@ -1,41 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`props should render correctly 1`] = `
+-.emotion-0 {
+-  z-index: 1000002;
+-  box-sizing: border-box;
+-  opacity: 0;
+-  outline: none;
+-  transform-origin: top center;
+-  -webkit-transition: opacity 100ms ease;
+-  transition: opacity 100ms ease;
+-  font-size: 13px;
+-}
+-
+-.emotion-0[data-enter] {
+-  opacity: 1;
+-}
+-
+-.emotion-2 {
+-  background: rgba( 0, 0, 0, 0.8 );
+-  border-radius: 2px;
+-  box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.04 );
+-  color: #fff;
+-  padding: 4px 8px;
+-}
+-
+-<div
+-  class="components-tooltip-content emotion-0 emotion-1"
+-  data-wp-c16t="true"
+-  data-wp-component="TooltipContent"
+-  id="base-tooltip"
+-  role="tooltip"
+-  style="position: fixed; left: 100%; top: 100%; pointer-events: none;"
+->
+-  <div
+-    class="emotion-2 emotion-3"
+-  >
+-    Code is Poetry
+-  </div>
+-</div>
+-`;
+diff --git a/packages/components/src/ui/tooltip/test/index.js b/packages/components/src/ui/tooltip/test/index.js
+deleted file mode 100644
+index b95a866738bd20..00000000000000
+--- a/packages/components/src/ui/tooltip/test/index.js
++++ /dev/null
+@@ -1,80 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, screen } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Text } from '../../../text';
+-import { Tooltip } from '../index';
+-
+-describe( 'props', () => {
+-	const baseTooltipId = 'base-tooltip';
+-	const baseTooltipTriggerContent = 'WordPress.org - Base trigger content';
+-	const byId = ( id ) => ( t ) => t.id === id;
+-	const VisibleTooltip = () => (
+-		<Tooltip baseId={ baseTooltipId } content="Code is Poetry" visible>
+-			<Text>{ baseTooltipTriggerContent }</Text>
+-		</Tooltip>
+-	);
+-
+-	test( 'should render correctly', () => {
+-		render( <VisibleTooltip /> );
+-		const tooltip = screen.getByRole( 'tooltip' );
+-		expect( tooltip ).toMatchSnapshot();
+-	} );
+-
+-	test( 'should render invisible', () => {
+-		render( <VisibleTooltip /> );
+-		const invisibleTooltipTriggerContent = 'WordPress.org - Invisible';
+-		render(
+-			<Tooltip
+-				baseId="test-tooltip"
+-				content="Code is Poetry"
+-				visible={ false }
+-			>
+-				<Text>{ invisibleTooltipTriggerContent }</Text>
+-			</Tooltip>
+-		);
+-		const tooltip = screen.getByRole( 'tooltip' );
+-		const invisibleTooltipTrigger = screen.getByText(
+-			invisibleTooltipTriggerContent
+-		);
+-		// The base tooltip should render only; invisible tooltip should not render.
+-		expect( tooltip ).toBeInTheDocument();
+-		// Assert that the rendered tooltip is indeed the base tooltip.
+-		expect( tooltip.id ).toBe( baseTooltipId );
+-		// But the invisible tooltip's trigger still should have rendered.
+-		expect( invisibleTooltipTrigger ).not.toBeUndefined();
+-	} );
+-
+-	test( 'should render without children', () => {
+-		render( <VisibleTooltip /> );
+-		const childlessTooltipId = 'tooltip-without-children';
+-		render(
+-			<Tooltip
+-				baseId={ childlessTooltipId }
+-				content="Code is Poetry"
+-				visible
+-			/>
+-		);
+-		const tooltips = screen.getAllByRole( 'tooltip' );
+-		const childlessTooltip = tooltips.find( byId( childlessTooltipId ) );
+-		expect( childlessTooltip ).not.toBeUndefined();
+-	} );
+-
+-	test( 'should not render a tooltip without content', () => {
+-		render( <VisibleTooltip /> );
+-		const contentlessTooltipId = 'contentless-tooltip';
+-		render(
+-			<Tooltip baseId={ contentlessTooltipId } visible>
+-				<Text>WordPress.org</Text>
+-			</Tooltip>
+-		);
+-		const tooltip = screen.getByRole( 'tooltip' );
+-		// Assert only the base tooltip rendered.
+-		expect( tooltip ).toBeInTheDocument();
+-		expect( tooltip.id ).toBe( baseTooltipId );
+-	} );
+-} );
+diff --git a/packages/components/src/ui/tooltip/types.ts b/packages/components/src/ui/tooltip/types.ts
+deleted file mode 100644
+index 7c50dca3a29371..00000000000000
+--- a/packages/components/src/ui/tooltip/types.ts
++++ /dev/null
+@@ -1,67 +0,0 @@
+-/**
+- * External dependencies
+- */
+-// eslint-disable-next-line no-restricted-imports
+-import type { TooltipInitialState, TooltipProps } from 'reakit';
+-import type { ReactElement, ReactNode } from 'react';
+-
+-/**
+- * Internal dependencies
+- */
+-import type { PopperProps } from '../utils/types';
+-import type { ShortcutProps } from '../shortcut';
+-
+-export type Props = TooltipInitialState &
+-	PopperProps &
+-	Pick< ShortcutProps, 'shortcut' > & {
+-		/**
+-		 * Determines if `Tooltip` has animations.
+-		 */
+-		animated?: boolean;
+-		/**
+-		 * The duration of `Tooltip` animations.
+-		 *
+-		 * @default 160
+-		 */
+-		animationDuration?: boolean;
+-		/**
+-		 * ID that will serve as a base for all the items IDs.
+-		 *
+-		 * @see https://reakit.io/docs/tooltip/#usetooltipstate
+-		 */
+-		baseId?: string;
+-		/**
+-		 * Content to render within the `Tooltip` floating label.
+-		 */
+-		content?: ReactElement;
+-		/**
+-		 * Spacing between the `Tooltip` reference and the floating label.
+-		 *
+-		 * @default 4
+-		 *
+-		 * @see https://reakit.io/docs/tooltip/#usetooltipstate
+-		 */
+-		gutter?: number;
+-		/**
+-		 * Whether or not the dialog should be rendered within `Portal`. It's true by default if modal is true.
+-		 *
+-		 * @default true
+-		 *
+-		 * @see https://reakit.io/docs/tooltip/#tooltip
+-		 */
+-		modal?: boolean;
+-		/**
+-		 * Whether `Tooltip` is visible.
+-		 *
+-		 * @default false
+-		 *
+-		 * @see https://reakit.io/docs/tooltip/#usetooltipstate
+-		 */
+-		visible?: boolean;
+-		children: ReactElement;
+-		focusable?: boolean;
+-	};
+-
+-export type ContentProps = TooltipProps & {
+-	children: ReactNode;
+-};
+diff --git a/packages/components/src/ui/utils/types.ts b/packages/components/src/ui/utils/types.ts
+index 538413204f7814..d0ea62501a1f6b 100644
+--- a/packages/components/src/ui/utils/types.ts
++++ b/packages/components/src/ui/utils/types.ts
+@@ -1,36 +1 @@
+ export type ResponsiveCSSValue< T > = Array< T | undefined > | T;
+-
+-export type PopperPlacement =
+-	| 'auto'
+-	| 'auto-start'
+-	| 'auto-end'
+-	| 'top'
+-	| 'top-start'
+-	| 'top-end'
+-	| 'right'
+-	| 'right-start'
+-	| 'right-end'
+-	| 'bottom'
+-	| 'bottom-start'
+-	| 'bottom-end'
+-	| 'left'
+-	| 'left-start'
+-	| 'left-end';
+-
+-export type PopperProps = {
+-	/**
+-	 * Position of the popover element.
+-	 *
+-	 * @default 'auto'
+-	 *
+-	 * @see https://popper.js.org/docs/v1/#popperplacements--codeenumcode
+-	 */
+-	placement?: PopperPlacement;
+-};
+-
+-export type SizeRangeDefault =
+-	| 'xLarge'
+-	| 'large'
+-	| 'medium'
+-	| 'small'
+-	| 'xSmall';
+diff --git a/packages/components/src/utils/types.ts b/packages/components/src/utils/types.ts
+deleted file mode 100644
+index 54fe75edaa306b..00000000000000
+--- a/packages/components/src/utils/types.ts
++++ /dev/null
+@@ -1,36 +0,0 @@
+-export type SizeRangeDefault =
+-	| 'xLarge'
+-	| 'large'
+-	| 'medium'
+-	| 'small'
+-	| 'xSmall';
+-
+-export type SizeRangeReduced = 'large' | 'medium' | 'small';
+-
+-export type PopperPlacement =
+-	| 'auto'
+-	| 'auto-start'
+-	| 'auto-end'
+-	| 'top'
+-	| 'top-start'
+-	| 'top-end'
+-	| 'right'
+-	| 'right-start'
+-	| 'right-end'
+-	| 'bottom'
+-	| 'bottom-start'
+-	| 'bottom-end'
+-	| 'left'
+-	| 'left-start'
+-	| 'left-end';
+-
+-export type PopperProps = {
+-	/**
+-	 * Position of the popover element.
+-	 *
+-	 * @default 'auto'
+-	 *
+-	 * @see https://popper.js.org/docs/v1/#popperplacements--codeenumcode
+-	 */
+-	placement?: PopperPlacement;
+-};
+diff --git a/packages/components/src/utils/z-index.js b/packages/components/src/utils/z-index.js
+deleted file mode 100644
+index 600f51c673aacf..00000000000000
+--- a/packages/components/src/utils/z-index.js
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export const Flyout = 10000;
+-export const Tooltip = 1000002;

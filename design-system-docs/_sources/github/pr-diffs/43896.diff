@@ -1,0 +1,294 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7a4540b391deb3..ddd39540d77520 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -39,6 +39,7 @@
+ -   `FormTokenField`: Refactor away from Lodash ([#43744](https://github.com/WordPress/gutenberg/pull/43744/)).
+ -   `NavigatorButton`: updated to satisfy `react/exhaustive-deps` eslint rule ([#42051](https://github.com/WordPress/gutenberg/pull/42051))
+ -   `TabPanel`: Refactor away from `_.partial()` ([#43895](https://github.com/WordPress/gutenberg/pull/43895/)).
++-   `Panel`: Refactor tests to `@testing-library/react` ([#43896](https://github.com/WordPress/gutenberg/pull/43896)).
+ 
+ ## 20.0.0 (2022-08-24)
+ 
+diff --git a/packages/components/src/panel/test/__snapshots__/header.js.snap b/packages/components/src/panel/test/__snapshots__/header.js.snap
+new file mode 100644
+index 00000000000000..3d740c6f7df646
+--- /dev/null
++++ b/packages/components/src/panel/test/__snapshots__/header.js.snap
+@@ -0,0 +1,9 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`PanelHeader basic rendering should render PanelHeader with empty div inside 1`] = `
++<div>
++  <div
++    class="components-panel__header"
++  />
++</div>
++`;
+diff --git a/packages/components/src/panel/test/__snapshots__/index.js.snap b/packages/components/src/panel/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..1acb8eaab19292
+--- /dev/null
++++ b/packages/components/src/panel/test/__snapshots__/index.js.snap
+@@ -0,0 +1,17 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`Panel basic rendering should render an additional className 1`] = `
++<div>
++  <div
++    class="the-panel components-panel"
++  />
++</div>
++`;
++
++exports[`Panel basic rendering should render an empty div without any provided props 1`] = `
++<div>
++  <div
++    class="components-panel"
++  />
++</div>
++`;
+diff --git a/packages/components/src/panel/test/__snapshots__/row.js.snap b/packages/components/src/panel/test/__snapshots__/row.js.snap
+new file mode 100644
+index 00000000000000..0de615c53f8d88
+--- /dev/null
++++ b/packages/components/src/panel/test/__snapshots__/row.js.snap
+@@ -0,0 +1,17 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`PanelRow should render with the custom class name 1`] = `
++<div>
++  <div
++    class="components-panel__row custom"
++  />
++</div>
++`;
++
++exports[`PanelRow should render with the default class name 1`] = `
++<div>
++  <div
++    class="components-panel__row"
++  />
++</div>
++`;
+diff --git a/packages/components/src/panel/test/header.js b/packages/components/src/panel/test/header.js
+index 82fc88519af7a0..0179012e00242e 100644
+--- a/packages/components/src/panel/test/header.js
++++ b/packages/components/src/panel/test/header.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { shallow } from 'enzyme';
++import { render, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -11,38 +11,45 @@ import PanelHeader from '../header.js';
+ describe( 'PanelHeader', () => {
+ 	describe( 'basic rendering', () => {
+ 		it( 'should render PanelHeader with empty div inside', () => {
+-			const panelHeader = shallow( <PanelHeader /> );
+-			expect( panelHeader.hasClass( 'components-panel__header' ) ).toBe(
+-				true
+-			);
+-			expect( panelHeader.type() ).toBe( 'div' );
+-			expect(
+-				panelHeader.find( 'div' ).shallow().children()
+-			).toHaveLength( 0 );
++			const { container } = render( <PanelHeader /> );
++
++			expect( container ).toMatchSnapshot();
+ 		} );
+ 
+ 		it( 'should render a label matching the text provided in the prop', () => {
+-			const panelHeader = shallow( <PanelHeader label="Some Text" /> );
+-			const label = panelHeader.find( 'h2' ).shallow();
+-			expect( label.text() ).toBe( 'Some Text' );
+-			expect( label.type() ).toBe( 'h2' );
++			render( <PanelHeader label="Some Label" /> );
++
++			const heading = screen.getByRole( 'heading' );
++			expect( heading ).toBeVisible();
++			expect( heading ).toHaveTextContent( 'Some Label' );
+ 		} );
+ 
+ 		it( 'should render child elements in the panel header body when provided', () => {
+-			const panelHeader = shallow( <PanelHeader children="Some Text" /> );
+-			expect( panelHeader.text() ).toBe( 'Some Text' );
+-			expect(
+-				panelHeader.find( 'div' ).shallow().children()
+-			).toHaveLength( 1 );
++			render(
++				<PanelHeader>
++					<dfn>Some text</dfn>
++				</PanelHeader>
++			);
++
++			const term = screen.getByRole( 'term' );
++			expect( term ).toBeVisible();
++			expect( term ).toHaveTextContent( 'Some text' );
+ 		} );
+ 
+ 		it( 'should render both child elements and label when passed in', () => {
+-			const panelHeader = shallow(
+-				<PanelHeader label="Some Label" children="Some Text" />
++			render(
++				<PanelHeader label="Some Label">
++					<dfn>Some text</dfn>
++				</PanelHeader>
+ 			);
+-			expect(
+-				panelHeader.find( 'div' ).shallow().children()
+-			).toHaveLength( 2 );
++
++			const heading = screen.getByRole( 'heading' );
++			expect( heading ).toBeVisible();
++			expect( heading ).toHaveTextContent( 'Some Label' );
++
++			const term = screen.getByRole( 'term' );
++			expect( term ).toBeVisible();
++			expect( term ).toHaveTextContent( 'Some text' );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/panel/test/index.js b/packages/components/src/panel/test/index.js
+index 7a6840aafbe71d..4247af577ca568 100644
+--- a/packages/components/src/panel/test/index.js
++++ b/packages/components/src/panel/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { shallow } from 'enzyme';
++import { render, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -11,43 +11,51 @@ import Panel from '../';
+ describe( 'Panel', () => {
+ 	describe( 'basic rendering', () => {
+ 		it( 'should render an empty div without any provided props', () => {
+-			const panel = shallow( <Panel /> );
+-			expect( panel.hasClass( 'components-panel' ) ).toBe( true );
+-			expect( panel.type() ).toBe( 'div' );
+-			expect( panel.find( 'div' ).shallow().children() ).toHaveLength(
+-				0
+-			);
++			const { container } = render( <Panel /> );
++
++			expect( container ).toMatchSnapshot();
+ 		} );
+ 
+-		it( 'should render a PanelHeader component when provided text in the header prop', () => {
+-			const panel = shallow( <Panel header="Header Label" /> );
+-			const panelHeader = panel.find( 'PanelHeader' );
+-			expect( panelHeader.prop( 'label' ) ).toBe( 'Header Label' );
+-			expect( panel.find( 'div' ).shallow().children() ).toHaveLength(
+-				1
+-			);
++		it( 'should render a heading when provided text in the header prop', () => {
++			render( <Panel header="Header Label" /> );
++
++			const heading = screen.getByRole( 'heading' );
++			expect( heading ).toBeVisible();
++			expect( heading ).toHaveTextContent( 'Header Label' );
+ 		} );
+ 
+ 		it( 'should render an additional className', () => {
+-			const panel = shallow( <Panel className="the-panel" /> );
+-			expect( panel.hasClass( 'the-panel' ) ).toBe( true );
++			const { container } = render( <Panel className="the-panel" /> );
++
++			expect( container ).toMatchSnapshot();
+ 		} );
+ 
+ 		it( 'should add additional child elements to be rendered in the panel', () => {
+-			const panel = shallow( <Panel children="The Panel" /> );
+-			expect( panel.text() ).toBe( 'The Panel' );
+-			expect( panel.find( 'div' ).shallow().children() ).toHaveLength(
+-				1
++			render(
++				<Panel>
++					<dfn>The Panel</dfn>
++				</Panel>
+ 			);
++
++			const term = screen.getByRole( 'term' );
++			expect( term ).toBeVisible();
++			expect( term ).toHaveTextContent( 'The Panel' );
+ 		} );
+ 
+ 		it( 'should render both children and header when provided as props', () => {
+-			const panel = shallow(
+-				<Panel children="The Panel" header="The Header" />
+-			);
+-			expect( panel.find( 'div' ).shallow().children() ).toHaveLength(
+-				2
++			render(
++				<Panel header="The header">
++					<dfn>The Panel</dfn>
++				</Panel>
+ 			);
++
++			const heading = screen.getByRole( 'heading' );
++			expect( heading ).toBeVisible();
++			expect( heading ).toHaveTextContent( 'The header' );
++
++			const term = screen.getByRole( 'term' );
++			expect( term ).toBeVisible();
++			expect( term ).toHaveTextContent( 'The Panel' );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/panel/test/row.js b/packages/components/src/panel/test/row.js
+index ca049f7ae937f9..2dbf09782e70fb 100644
+--- a/packages/components/src/panel/test/row.js
++++ b/packages/components/src/panel/test/row.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { shallow } from 'enzyme';
++import { render, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -9,20 +9,27 @@ import { shallow } from 'enzyme';
+ import PanelRow from '../row';
+ 
+ describe( 'PanelRow', () => {
+-	it( 'should defined default class name', () => {
+-		const wrapper = shallow( <PanelRow /> );
+-		expect( wrapper.hasClass( 'components-panel__row' ) ).toBe( true );
++	it( 'should render with the default class name', () => {
++		const { container } = render( <PanelRow /> );
++
++		expect( container ).toMatchSnapshot();
+ 	} );
+-	it( 'should defined custom class name', () => {
+-		const wrapper = shallow( <PanelRow className="custom" /> );
+-		expect( wrapper.hasClass( 'custom' ) ).toBe( true );
++
++	it( 'should render with the custom class name', () => {
++		const { container } = render( <PanelRow className="custom" /> );
++
++		expect( container ).toMatchSnapshot();
+ 	} );
+-	it( 'should return child components', () => {
+-		const wrapper = shallow(
++
++	it( 'should render child components', () => {
++		render(
+ 			<PanelRow>
+-				<p>children</p>
++				<dfn>Some text</dfn>
+ 			</PanelRow>
+ 		);
+-		expect( wrapper.find( 'p' ).text() ).toBe( 'children' );
++
++		const term = screen.getByRole( 'term' );
++		expect( term ).toBeVisible();
++		expect( term ).toHaveTextContent( 'Some text' );
+ 	} );
+ } );

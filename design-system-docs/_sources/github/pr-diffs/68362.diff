@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8853f4c94e689b..093cb149c35148 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ 
+ -   `BoxControl`: Better respect for the `min` prop in the Range Slider ([#67819](https://github.com/WordPress/gutenberg/pull/67819)).
+ -   `FontSizePicker`: Add `display:contents` rule to fix overflowing text in the custom size select. ([#68280](https://github.com/WordPress/gutenberg/pull/68280)).
++-   `BoxControl`: Fix aria-valuetext value ([#68362](https://github.com/WordPress/gutenberg/pull/68362)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/box-control/input-control.tsx b/packages/components/src/box-control/input-control.tsx
+index 81fbcad42c1d08..27dff1991d8572 100644
+--- a/packages/components/src/box-control/input-control.tsx
++++ b/packages/components/src/box-control/input-control.tsx
+@@ -264,7 +264,7 @@ export default function BoxInputControl( {
+ 					}
+ 					aria-valuetext={
+ 						marks[ presetIndex !== undefined ? presetIndex + 1 : 0 ]
+-							.label
++							.tooltip
+ 					}
+ 					renderTooltipContent={ ( index ) =>
+ 						marks[ ! index ? 0 : index ].tooltip

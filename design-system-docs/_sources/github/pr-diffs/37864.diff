@@ -1,0 +1,160 @@
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index dc0b3a46fa73f6..f6c5fe8db94c58 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ // eslint-disable-next-line no-restricted-imports
+-import { Ref } from 'react';
++import { ReactNode, Ref } from 'react';
+ import { colord, extend, Colord } from 'colord';
+ import namesPlugin from 'colord/plugins/names';
+ 
+@@ -45,6 +45,8 @@ export interface ColorPickerProps {
+ 	onChange?: ( color: string ) => void;
+ 	defaultValue?: string;
+ 	copyFormat?: ColorType;
++	hideAuxiliaryControls?: boolean;
++	children?: ReactNode;
+ }
+ 
+ const options = [
+@@ -63,6 +65,8 @@ const ColorPicker = (
+ 		onChange,
+ 		defaultValue = '#fff',
+ 		copyFormat,
++		hideAuxiliaryControls,
++		children,
+ 		...divProps
+ 	} = useContextSystem( props, 'ColorPicker' );
+ 
+@@ -98,47 +102,51 @@ const ColorPicker = (
+ 				color={ safeColordColor }
+ 				enableAlpha={ enableAlpha }
+ 			/>
+-			<AuxiliaryColorArtefactWrapper>
+-				<HStack justify="space-between">
+-					{ showInputs ? (
+-						<SelectControl
+-							options={ options }
+-							value={ colorType }
+-							onChange={ ( nextColorType ) =>
+-								setColorType( nextColorType as ColorType )
++			{ hideAuxiliaryControls ? null : (
++				<AuxiliaryColorArtefactWrapper>
++					<HStack justify="space-between">
++						{ showInputs ? (
++							<SelectControl
++								options={ options }
++								value={ colorType }
++								onChange={ ( nextColorType ) =>
++									setColorType( nextColorType as ColorType )
++								}
++								label={ __( 'Color format' ) }
++								hideLabelFromVision
++							/>
++						) : (
++							<ColorDisplay
++								color={ safeColordColor }
++								colorType={ copyFormat || colorType }
++								enableAlpha={ enableAlpha }
++							/>
++						) }
++						<DetailsControlButton
++							isSmall
++							onClick={ () => setShowInputs( ! showInputs ) }
++							icon={ settings }
++							isPressed={ showInputs }
++							label={
++								showInputs
++									? __( 'Hide detailed inputs' )
++									: __( 'Show detailed inputs' )
+ 							}
+-							label={ __( 'Color format' ) }
+-							hideLabelFromVision
+ 						/>
+-					) : (
+-						<ColorDisplay
++					</HStack>
++					<Spacer margin={ 4 } />
++					{ showInputs && (
++						<ColorInput
++							colorType={ colorType }
+ 							color={ safeColordColor }
+-							colorType={ copyFormat || colorType }
++							onChange={ handleChange }
+ 							enableAlpha={ enableAlpha }
+ 						/>
+ 					) }
+-					<DetailsControlButton
+-						isSmall
+-						onClick={ () => setShowInputs( ! showInputs ) }
+-						icon={ settings }
+-						isPressed={ showInputs }
+-						label={
+-							showInputs
+-								? __( 'Hide detailed inputs' )
+-								: __( 'Show detailed inputs' )
+-						}
+-					/>
+-				</HStack>
+-				<Spacer margin={ 4 } />
+-				{ showInputs && (
+-					<ColorInput
+-						colorType={ colorType }
+-						color={ safeColordColor }
+-						onChange={ handleChange }
+-						enableAlpha={ enableAlpha }
+-					/>
+-				) }
+-			</AuxiliaryColorArtefactWrapper>
++				</AuxiliaryColorArtefactWrapper>
++			) }
++
++			{ children }
+ 		</ColorfulWrapper>
+ 	);
+ };
+diff --git a/packages/components/src/color-picker/stories/index.js b/packages/components/src/color-picker/stories/index.js
+index 98bd612e631218..b5895f6f9c0833 100644
+--- a/packages/components/src/color-picker/stories/index.js
++++ b/packages/components/src/color-picker/stories/index.js
+@@ -30,6 +30,7 @@ const Example = () => {
+ 	const [ color, setColor ] = useState( undefined );
+ 	const props = {
+ 		enableAlpha: boolean( 'enableAlpha', false ),
++		hideAuxiliaryControls: boolean( 'hideAuxiliaryControls', false ),
+ 		copyFormat: select(
+ 			'copyFormat',
+ 			[ PROP_UNSET, 'rgb', 'hsl', 'hex' ],
+@@ -79,3 +80,29 @@ const LegacyExample = () => {
+ };
+ 
+ export const legacy = () => <LegacyExample />;
++
++const CustomAuxiliaryControls = () => {
++	const [ color, setColor ] = useState( undefined );
++	const props = {
++		enableAlpha: boolean( 'enableAlpha', false ),
++	};
++
++	if ( props.copyFormat === PROP_UNSET ) {
++		delete props.copyFormat;
++	}
++
++	return (
++		<ColorPicker
++			{ ...props }
++			hideAuxiliaryControls
++			color={ color }
++			onChange={ setColor }
++		>
++			<input type="text" value={ color } />
++		</ColorPicker>
++	);
++};
++
++export const customAuxiliaryControls = () => {
++	return <CustomAuxiliaryControls />;
++};

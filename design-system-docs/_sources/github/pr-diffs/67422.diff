@@ -1,0 +1,3004 @@
+diff --git a/packages/block-editor/src/hooks/block-bindings.js b/packages/block-editor/src/hooks/block-bindings.js
+index 2dab67d6293328..11e17aba3b30da 100644
+--- a/packages/block-editor/src/hooks/block-bindings.js
++++ b/packages/block-editor/src/hooks/block-bindings.js
+@@ -51,7 +51,7 @@ const useToolsPanelDropdownMenuProps = () => {
+ 		: {};
+ };
+ 
+-function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
++function BlockBindingsPanelMenuContent( { fieldsList, attribute, binding } ) {
+ 	const { clientId } = useBlockEditContext();
+ 	const registeredSources = getBlockBindingsSources();
+ 	const { updateBlockBindings } = useBlockBindingsUtils();
+@@ -179,22 +179,21 @@ function EditableBlockBindingsPanelItems( {
+ 							placement={
+ 								isMobile ? 'bottom-start' : 'left-start'
+ 							}
+-							gutter={ isMobile ? 8 : 36 }
+-							trigger={
+-								<Item>
+-									<BlockBindingsAttribute
+-										attribute={ attribute }
+-										binding={ binding }
+-										fieldsList={ fieldsList }
+-									/>
+-								</Item>
+-							}
+ 						>
+-							<BlockBindingsPanelDropdown
+-								fieldsList={ fieldsList }
+-								attribute={ attribute }
+-								binding={ binding }
+-							/>
++							<Menu.TriggerButton render={ <Item /> }>
++								<BlockBindingsAttribute
++									attribute={ attribute }
++									binding={ binding }
++									fieldsList={ fieldsList }
++								/>
++							</Menu.TriggerButton>
++							<Menu.Popover gutter={ isMobile ? 8 : 36 }>
++								<BlockBindingsPanelMenuContent
++									fieldsList={ fieldsList }
++									attribute={ attribute }
++									binding={ binding }
++								/>
++							</Menu.Popover>
+ 						</Menu>
+ 					</ToolsPanelItem>
+ 				);
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fef1769c19b0f7..7b5ec64bd44ca5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ ### Experimental
+ 
+ -   Add new `Badge` component ([#66555](https://github.com/WordPress/gutenberg/pull/66555)).
++-   `Menu`: refactor to more granular sub-components ([#67422](https://github.com/WordPress/gutenberg/pull/67422)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/menu/index.tsx b/packages/components/src/menu/index.tsx
+index 9886f324823212..2e0fc91cfbc34f 100644
+--- a/packages/components/src/menu/index.tsx
++++ b/packages/components/src/menu/index.tsx
+@@ -6,23 +6,14 @@ import * as Ariakit from '@ariakit/react';
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	useContext,
+-	useMemo,
+-	cloneElement,
+-	isValidElement,
+-	useCallback,
+-} from '@wordpress/element';
+-import { isRTL } from '@wordpress/i18n';
+-import { chevronRightSmall } from '@wordpress/icons';
++import { useContext, useMemo } from '@wordpress/element';
++import { isRTL as isRTLFn } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem, contextConnect } from '../context';
+-import type { WordPressComponentProps } from '../context';
++import { useContextSystem, contextConnectWithoutRef } from '../context';
+ import type { MenuContext as MenuContextType, MenuProps } from './types';
+-import * as Styled from './styles';
+ import { MenuContext } from './context';
+ import { MenuItem } from './item';
+ import { MenuCheckboxItem } from './checkbox-item';
+@@ -32,49 +23,36 @@ import { MenuGroupLabel } from './group-label';
+ import { MenuSeparator } from './separator';
+ import { MenuItemLabel } from './item-label';
+ import { MenuItemHelpText } from './item-help-text';
++import { MenuTriggerButton } from './trigger-button';
++import { MenuSubmenuTriggerItem } from './submenu-trigger-item';
++import { MenuPopover } from './popover';
+ 
+-const UnconnectedMenu = (
+-	props: WordPressComponentProps< MenuProps, 'div', false >,
+-	ref: React.ForwardedRef< HTMLDivElement >
+-) => {
++const UnconnectedMenu = ( props: MenuProps ) => {
+ 	const {
+-		// Store props
+-		open,
++		children,
+ 		defaultOpen = false,
++		open,
+ 		onOpenChange,
+ 		placement,
+ 
+-		// Menu trigger props
+-		trigger,
+-
+-		// Menu props
+-		gutter,
+-		children,
+-		shift,
+-		modal = true,
+-
+ 		// From internal components context
+ 		variant,
+-
+-		// Rest
+-		...otherProps
+-	} = useContextSystem< typeof props & Pick< MenuContextType, 'variant' > >(
+-		props,
+-		'Menu'
+-	);
++	} = useContextSystem<
++		// @ts-expect-error TODO: missing 'className' in MenuProps
++		typeof props & Pick< MenuContextType, 'variant' >
++	>( props, 'Menu' );
+ 
+ 	const parentContext = useContext( MenuContext );
+ 
+-	const computedDirection = isRTL() ? 'rtl' : 'ltr';
++	const rtl = isRTLFn();
+ 
+ 	// If an explicit value for the `placement` prop is not passed,
+ 	// apply a default placement of `bottom-start` for the root menu popover,
+ 	// and of `right-start` for nested menu popovers.
+ 	let computedPlacement =
+-		props.placement ??
+-		( parentContext?.store ? 'right-start' : 'bottom-start' );
++		placement ?? ( parentContext?.store ? 'right-start' : 'bottom-start' );
+ 	// Swap left/right in case of RTL direction
+-	if ( computedDirection === 'rtl' ) {
++	if ( rtl ) {
+ 		if ( /right/.test( computedPlacement ) ) {
+ 			computedPlacement = computedPlacement.replace(
+ 				'right',
+@@ -97,7 +75,7 @@ const UnconnectedMenu = (
+ 		setOpen( willBeOpen ) {
+ 			onOpenChange?.( willBeOpen );
+ 		},
+-		rtl: computedDirection === 'rtl',
++		rtl,
+ 	} );
+ 
+ 	const contextValue = useMemo(
+@@ -105,134 +83,53 @@ const UnconnectedMenu = (
+ 		[ menuStore, variant ]
+ 	);
+ 
+-	// Extract the side from the applied placement — useful for animations.
+-	// Using `currentPlacement` instead of `placement` to make sure that we
+-	// use the final computed placement (including "flips" etc).
+-	const appliedPlacementSide = Ariakit.useStoreState(
+-		menuStore,
+-		'currentPlacement'
+-	).split( '-' )[ 0 ];
+-
+-	if (
+-		menuStore.parent &&
+-		! ( isValidElement( trigger ) && MenuItem === trigger.type )
+-	) {
+-		// eslint-disable-next-line no-console
+-		console.warn(
+-			'For nested Menus, the `trigger` should always be a `MenuItem`.'
+-		);
+-	}
+-
+-	const hideOnEscape = useCallback(
+-		( event: React.KeyboardEvent< Element > ) => {
+-			// Pressing Escape can cause unexpected consequences (ie. exiting
+-			// full screen mode on MacOs, close parent modals...).
+-			event.preventDefault();
+-			// Returning `true` causes the menu to hide.
+-			return true;
+-		},
+-		[]
+-	);
+-
+-	const wrapperProps = useMemo(
+-		() => ( {
+-			dir: computedDirection,
+-			style: {
+-				direction:
+-					computedDirection as React.CSSProperties[ 'direction' ],
+-			},
+-		} ),
+-		[ computedDirection ]
+-	);
+-
+ 	return (
+-		<>
+-			{ /* Menu trigger */ }
+-			<Ariakit.MenuButton
+-				ref={ ref }
+-				store={ menuStore }
+-				render={
+-					menuStore.parent
+-						? cloneElement( trigger, {
+-								// Add submenu arrow, unless a `suffix` is explicitly specified
+-								suffix: (
+-									<>
+-										{ trigger.props.suffix }
+-										<Styled.SubmenuChevronIcon
+-											aria-hidden="true"
+-											icon={ chevronRightSmall }
+-											size={ 24 }
+-											preserveAspectRatio="xMidYMid slice"
+-										/>
+-									</>
+-								),
+-						  } )
+-						: trigger
+-				}
+-			/>
+-
+-			{ /* Menu popover */ }
+-			<Ariakit.Menu
+-				{ ...otherProps }
+-				modal={ modal }
+-				store={ menuStore }
+-				// Root menu has an 8px distance from its trigger,
+-				// otherwise 0 (which causes the submenu to slightly overlap)
+-				gutter={ gutter ?? ( menuStore.parent ? 0 : 8 ) }
+-				// Align nested menu by the same (but opposite) amount
+-				// as the menu container's padding.
+-				shift={ shift ?? ( menuStore.parent ? -4 : 0 ) }
+-				hideOnHoverOutside={ false }
+-				data-side={ appliedPlacementSide }
+-				wrapperProps={ wrapperProps }
+-				hideOnEscape={ hideOnEscape }
+-				unmountOnHide
+-				render={ ( renderProps ) => (
+-					// Two wrappers are needed for the entry animation, where the menu
+-					// container scales with a different factor than its contents.
+-					// The {...renderProps} are passed to the inner wrapper, so that the
+-					// menu element is the direct parent of the menu item elements.
+-					<Styled.MenuPopoverOuterWrapper variant={ variant }>
+-						<Styled.MenuPopoverInnerWrapper { ...renderProps } />
+-					</Styled.MenuPopoverOuterWrapper>
+-				) }
+-			>
+-				<MenuContext.Provider value={ contextValue }>
+-					{ children }
+-				</MenuContext.Provider>
+-			</Ariakit.Menu>
+-		</>
++		<MenuContext.Provider value={ contextValue }>
++			{ children }
++		</MenuContext.Provider>
+ 	);
+ };
+ 
+-export const Menu = Object.assign( contextConnect( UnconnectedMenu, 'Menu' ), {
+-	Context: Object.assign( MenuContext, {
+-		displayName: 'Menu.Context',
+-	} ),
+-	Item: Object.assign( MenuItem, {
+-		displayName: 'Menu.Item',
+-	} ),
+-	RadioItem: Object.assign( MenuRadioItem, {
+-		displayName: 'Menu.RadioItem',
+-	} ),
+-	CheckboxItem: Object.assign( MenuCheckboxItem, {
+-		displayName: 'Menu.CheckboxItem',
+-	} ),
+-	Group: Object.assign( MenuGroup, {
+-		displayName: 'Menu.Group',
+-	} ),
+-	GroupLabel: Object.assign( MenuGroupLabel, {
+-		displayName: 'Menu.GroupLabel',
+-	} ),
+-	Separator: Object.assign( MenuSeparator, {
+-		displayName: 'Menu.Separator',
+-	} ),
+-	ItemLabel: Object.assign( MenuItemLabel, {
+-		displayName: 'Menu.ItemLabel',
+-	} ),
+-	ItemHelpText: Object.assign( MenuItemHelpText, {
+-		displayName: 'Menu.ItemHelpText',
+-	} ),
+-} );
++export const Menu = Object.assign(
++	contextConnectWithoutRef( UnconnectedMenu, 'Menu' ),
++	{
++		Context: Object.assign( MenuContext, {
++			displayName: 'Menu.Context',
++		} ),
++		Item: Object.assign( MenuItem, {
++			displayName: 'Menu.Item',
++		} ),
++		RadioItem: Object.assign( MenuRadioItem, {
++			displayName: 'Menu.RadioItem',
++		} ),
++		CheckboxItem: Object.assign( MenuCheckboxItem, {
++			displayName: 'Menu.CheckboxItem',
++		} ),
++		Group: Object.assign( MenuGroup, {
++			displayName: 'Menu.Group',
++		} ),
++		GroupLabel: Object.assign( MenuGroupLabel, {
++			displayName: 'Menu.GroupLabel',
++		} ),
++		Separator: Object.assign( MenuSeparator, {
++			displayName: 'Menu.Separator',
++		} ),
++		ItemLabel: Object.assign( MenuItemLabel, {
++			displayName: 'Menu.ItemLabel',
++		} ),
++		ItemHelpText: Object.assign( MenuItemHelpText, {
++			displayName: 'Menu.ItemHelpText',
++		} ),
++		Popover: Object.assign( MenuPopover, {
++			displayName: 'Menu.Popover',
++		} ),
++		TriggerButton: Object.assign( MenuTriggerButton, {
++			displayName: 'Menu.TriggerButton',
++		} ),
++		SubmenuTriggerItem: Object.assign( MenuSubmenuTriggerItem, {
++			displayName: 'Menu.SubmenuTriggerItem',
++		} ),
++	}
++);
+ 
+ export default Menu;
+diff --git a/packages/components/src/menu/item.tsx b/packages/components/src/menu/item.tsx
+index 6d09bdf3d0f591..84ff050bcc2236 100644
+--- a/packages/components/src/menu/item.tsx
++++ b/packages/components/src/menu/item.tsx
+@@ -15,7 +15,7 @@ export const MenuItem = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< MenuItemProps, 'div', false >
+ >( function MenuItem(
+-	{ prefix, suffix, children, hideOnClick = true, ...props },
++	{ prefix, suffix, children, hideOnClick = true, store, ...props },
+ 	ref
+ ) {
+ 	const menuContext = useContext( MenuContext );
+@@ -26,13 +26,19 @@ export const MenuItem = forwardRef<
+ 		);
+ 	}
+ 
++	// In most cases, the menu store will be retrieved from context (ie. the store
++	// created by the top-level menu component). But in rare cases (ie.
++	// `Menu.SubmenuTriggerItem`), the context store wouldn't be correct. This is
++	// why the component accepts a `store` prop to override the context store.
++	const computedStore = store ?? menuContext.store;
++
+ 	return (
+ 		<Styled.MenuItem
+ 			ref={ ref }
+ 			{ ...props }
+ 			accessibleWhenDisabled
+ 			hideOnClick={ hideOnClick }
+-			store={ menuContext.store }
++			store={ computedStore }
+ 		>
+ 			<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
+ 
+diff --git a/packages/components/src/menu/popover.tsx b/packages/components/src/menu/popover.tsx
+new file mode 100644
+index 00000000000000..19972a31027ce1
+--- /dev/null
++++ b/packages/components/src/menu/popover.tsx
+@@ -0,0 +1,103 @@
++/**
++ * External dependencies
++ */
++import * as Ariakit from '@ariakit/react';
++
++/**
++ * WordPress dependencies
++ */
++import {
++	useContext,
++	useMemo,
++	forwardRef,
++	useCallback,
++} from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { WordPressComponentProps } from '../context';
++import type { MenuPopoverProps } from './types';
++import * as Styled from './styles';
++import { MenuContext } from './context';
++
++export const MenuPopover = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< MenuPopoverProps, 'div', false >
++>( function MenuPopover(
++	{ gutter, children, shift, modal = true, ...otherProps },
++	ref
++) {
++	const menuContext = useContext( MenuContext );
++
++	// Extract the side from the applied placement — useful for animations.
++	// Using `currentPlacement` instead of `placement` to make sure that we
++	// use the final computed placement (including "flips" etc).
++	const appliedPlacementSide = Ariakit.useStoreState(
++		menuContext?.store,
++		'currentPlacement'
++	)?.split( '-' )[ 0 ];
++
++	const hideOnEscape = useCallback(
++		( event: React.KeyboardEvent< Element > ) => {
++			// Pressing Escape can cause unexpected consequences (ie. exiting
++			// full screen mode on MacOs, close parent modals...).
++			event.preventDefault();
++			// Returning `true` causes the menu to hide.
++			return true;
++		},
++		[]
++	);
++
++	const computedDirection = Ariakit.useStoreState( menuContext?.store, 'rtl' )
++		? 'rtl'
++		: 'ltr';
++
++	const wrapperProps = useMemo(
++		() => ( {
++			dir: computedDirection,
++			style: {
++				direction:
++					computedDirection as React.CSSProperties[ 'direction' ],
++			},
++		} ),
++		[ computedDirection ]
++	);
++
++	if ( ! menuContext?.store ) {
++		throw new Error(
++			'Menu.Popover can only be rendered inside a Menu component'
++		);
++	}
++
++	return (
++		<Ariakit.Menu
++			{ ...otherProps }
++			ref={ ref }
++			modal={ modal }
++			store={ menuContext.store }
++			// Root menu has an 8px distance from its trigger,
++			// otherwise 0 (which causes the submenu to slightly overlap)
++			gutter={ gutter ?? ( menuContext.store.parent ? 0 : 8 ) }
++			// Align nested menu by the same (but opposite) amount
++			// as the menu container's padding.
++			shift={ shift ?? ( menuContext.store.parent ? -4 : 0 ) }
++			hideOnHoverOutside={ false }
++			data-side={ appliedPlacementSide }
++			wrapperProps={ wrapperProps }
++			hideOnEscape={ hideOnEscape }
++			unmountOnHide
++			render={ ( renderProps ) => (
++				// Two wrappers are needed for the entry animation, where the menu
++				// container scales with a different factor than its contents.
++				// The {...renderProps} are passed to the inner wrapper, so that the
++				// menu element is the direct parent of the menu item elements.
++				<Styled.MenuPopoverOuterWrapper variant={ menuContext.variant }>
++					<Styled.MenuPopoverInnerWrapper { ...renderProps } />
++				</Styled.MenuPopoverOuterWrapper>
++			) }
++		>
++			{ children }
++		</Ariakit.Menu>
++	);
++} );
+diff --git a/packages/components/src/menu/stories/index.story.tsx b/packages/components/src/menu/stories/index.story.tsx
+index ad4794057e0e03..dcd890370a1e0a 100644
+--- a/packages/components/src/menu/stories/index.story.tsx
++++ b/packages/components/src/menu/stories/index.story.tsx
+@@ -20,6 +20,7 @@ import Button from '../../button';
+ import Modal from '../../modal';
+ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+ import { ContextSystemProvider } from '../../context';
++import type { MenuProps } from '../types';
+ 
+ const meta: Meta< typeof Menu > = {
+ 	id: 'components-experimental-menu',
+@@ -44,10 +45,15 @@ const meta: Meta< typeof Menu > = {
+ 		ItemLabel: Menu.ItemLabel,
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 		ItemHelpText: Menu.ItemHelpText,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		TriggerButton: Menu.TriggerButton,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		SubmenuTriggerItem: Menu.SubmenuTriggerItem,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Popover: Menu.Popover,
+ 	},
+ 	argTypes: {
+ 		children: { control: false },
+-		trigger: { control: false },
+ 	},
+ 	tags: [ 'status-private' ],
+ 	parameters: {
+@@ -61,95 +67,103 @@ const meta: Meta< typeof Menu > = {
+ };
+ export default meta;
+ 
+-export const Default: StoryFn< typeof Menu > = ( props ) => (
++export const Default: StoryFn< typeof Menu > = ( props: MenuProps ) => (
+ 	<Menu { ...props }>
+-		<Menu.Item>
+-			<Menu.ItemLabel>Label</Menu.ItemLabel>
+-		</Menu.Item>
+-		<Menu.Item>
+-			<Menu.ItemLabel>Label</Menu.ItemLabel>
+-			<Menu.ItemHelpText>Help text</Menu.ItemHelpText>
+-		</Menu.Item>
+-		<Menu.Item>
+-			<Menu.ItemLabel>Label</Menu.ItemLabel>
+-			<Menu.ItemHelpText>
+-				The menu item help text is automatically truncated when there
+-				are more than two lines of text
+-			</Menu.ItemHelpText>
+-		</Menu.Item>
+-		<Menu.Item hideOnClick={ false }>
+-			<Menu.ItemLabel>Label</Menu.ItemLabel>
+-			<Menu.ItemHelpText>
+-				This item doesn&apos;t close the menu on click
+-			</Menu.ItemHelpText>
+-		</Menu.Item>
+-		<Menu.Item disabled>Disabled item</Menu.Item>
+-		<Menu.Separator />
+-		<Menu.Group>
+-			<Menu.GroupLabel>Group label</Menu.GroupLabel>
+-			<Menu.Item prefix={ <Icon icon={ customLink } size={ 24 } /> }>
+-				<Menu.ItemLabel>With prefix</Menu.ItemLabel>
++		<Menu.TriggerButton
++			render={ <Button __next40pxDefaultSize variant="secondary" /> }
++		>
++			Open menu
++		</Menu.TriggerButton>
++		<Menu.Popover>
++			<Menu.Item>
++				<Menu.ItemLabel>Label</Menu.ItemLabel>
+ 			</Menu.Item>
+-			<Menu.Item suffix="⌘S">With suffix</Menu.Item>
+-			<Menu.Item
+-				disabled
+-				prefix={ <Icon icon={ formatCapitalize } size={ 24 } /> }
+-				suffix="⌥⌘T"
+-			>
+-				<Menu.ItemLabel>Disabled with prefix and suffix</Menu.ItemLabel>
+-				<Menu.ItemHelpText>And help text</Menu.ItemHelpText>
++			<Menu.Item>
++				<Menu.ItemLabel>Label</Menu.ItemLabel>
++				<Menu.ItemHelpText>Help text</Menu.ItemHelpText>
+ 			</Menu.Item>
+-		</Menu.Group>
++			<Menu.Item>
++				<Menu.ItemLabel>Label</Menu.ItemLabel>
++				<Menu.ItemHelpText>
++					The menu item help text is automatically truncated when
++					there are more than two lines of text
++				</Menu.ItemHelpText>
++			</Menu.Item>
++			<Menu.Item hideOnClick={ false }>
++				<Menu.ItemLabel>Label</Menu.ItemLabel>
++				<Menu.ItemHelpText>
++					This item doesn&apos;t close the menu on click
++				</Menu.ItemHelpText>
++			</Menu.Item>
++			<Menu.Item disabled>Disabled item</Menu.Item>
++			<Menu.Separator />
++			<Menu.Group>
++				<Menu.GroupLabel>Group label</Menu.GroupLabel>
++				<Menu.Item prefix={ <Icon icon={ customLink } size={ 24 } /> }>
++					<Menu.ItemLabel>With prefix</Menu.ItemLabel>
++				</Menu.Item>
++				<Menu.Item suffix="⌘S">With suffix</Menu.Item>
++				<Menu.Item
++					disabled
++					prefix={ <Icon icon={ formatCapitalize } size={ 24 } /> }
++					suffix="⌥⌘T"
++				>
++					<Menu.ItemLabel>
++						Disabled with prefix and suffix
++					</Menu.ItemLabel>
++					<Menu.ItemHelpText>And help text</Menu.ItemHelpText>
++				</Menu.Item>
++			</Menu.Group>
++		</Menu.Popover>
+ 	</Menu>
+ );
+-Default.args = {
+-	trigger: (
+-		<Button __next40pxDefaultSize variant="secondary">
+-			Open menu
+-		</Button>
+-	),
+-};
++Default.args = {};
+ 
+-export const WithSubmenu: StoryFn< typeof Menu > = ( props ) => (
++export const WithSubmenu: StoryFn< typeof Menu > = ( props: MenuProps ) => (
+ 	<Menu { ...props }>
+-		<Menu.Item>Level 1 item</Menu.Item>
+-		<Menu
+-			trigger={
+-				<Menu.Item suffix="Suffix">
++		<Menu.TriggerButton
++			render={ <Button __next40pxDefaultSize variant="secondary" /> }
++		>
++			Open menu
++		</Menu.TriggerButton>
++		<Menu.Popover>
++			<Menu.Item>Level 1 item</Menu.Item>
++			<Menu>
++				<Menu.SubmenuTriggerItem suffix="Suffix">
+ 					<Menu.ItemLabel>
+ 						Submenu trigger item with a long label
+ 					</Menu.ItemLabel>
+-				</Menu.Item>
+-			}
+-		>
+-			<Menu.Item>
+-				<Menu.ItemLabel>Level 2 item</Menu.ItemLabel>
+-			</Menu.Item>
+-			<Menu.Item>
+-				<Menu.ItemLabel>Level 2 item</Menu.ItemLabel>
+-			</Menu.Item>
+-			<Menu
+-				trigger={
++				</Menu.SubmenuTriggerItem>
++				<Menu.Popover>
+ 					<Menu.Item>
+-						<Menu.ItemLabel>Submenu trigger</Menu.ItemLabel>
++						<Menu.ItemLabel>Level 2 item</Menu.ItemLabel>
+ 					</Menu.Item>
+-				}
+-			>
+-				<Menu.Item>
+-					<Menu.ItemLabel>Level 3 item</Menu.ItemLabel>
+-				</Menu.Item>
+-				<Menu.Item>
+-					<Menu.ItemLabel>Level 3 item</Menu.ItemLabel>
+-				</Menu.Item>
++					<Menu.Item>
++						<Menu.ItemLabel>Level 2 item</Menu.ItemLabel>
++					</Menu.Item>
++					<Menu>
++						<Menu.SubmenuTriggerItem>
++							<Menu.ItemLabel>Submenu trigger</Menu.ItemLabel>
++						</Menu.SubmenuTriggerItem>
++						<Menu.Popover>
++							<Menu.Item>
++								<Menu.ItemLabel>Level 3 item</Menu.ItemLabel>
++							</Menu.Item>
++							<Menu.Item>
++								<Menu.ItemLabel>Level 3 item</Menu.ItemLabel>
++							</Menu.Item>
++						</Menu.Popover>
++					</Menu>
++				</Menu.Popover>
+ 			</Menu>
+-		</Menu>
++		</Menu.Popover>
+ 	</Menu>
+ );
+ WithSubmenu.args = {
+ 	...Default.args,
+ };
+ 
+-export const WithCheckboxes: StoryFn< typeof Menu > = ( props ) => {
++export const WithCheckboxes: StoryFn< typeof Menu > = ( props: MenuProps ) => {
+ 	const [ isAChecked, setAChecked ] = useState( false );
+ 	const [ isBChecked, setBChecked ] = useState( true );
+ 	const [ multipleCheckboxesValue, setMultipleCheckboxesValue ] = useState<
+@@ -169,94 +183,113 @@ export const WithCheckboxes: StoryFn< typeof Menu > = ( props ) => {
+ 
+ 	return (
+ 		<Menu { ...props }>
+-			<Menu.Group>
+-				<Menu.GroupLabel>
+-					Single selection, uncontrolled
+-				</Menu.GroupLabel>
+-				<Menu.CheckboxItem
+-					name="checkbox-individual-uncontrolled-a"
+-					value="a"
+-					suffix="⌥⌘T"
+-				>
+-					<Menu.ItemLabel>Checkbox item A</Menu.ItemLabel>
+-					<Menu.ItemHelpText>Initially unchecked</Menu.ItemHelpText>
+-				</Menu.CheckboxItem>
+-				<Menu.CheckboxItem
+-					name="checkbox-individual-uncontrolled-b"
+-					value="b"
+-					defaultChecked
+-				>
+-					<Menu.ItemLabel>Checkbox item B</Menu.ItemLabel>
+-					<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
+-				</Menu.CheckboxItem>
+-			</Menu.Group>
+-			<Menu.Separator />
+-			<Menu.Group>
+-				<Menu.GroupLabel>Single selection, controlled</Menu.GroupLabel>
+-				<Menu.CheckboxItem
+-					name="checkbox-individual-controlled-a"
+-					value="a"
+-					checked={ isAChecked }
+-					onChange={ ( e ) => setAChecked( e.target.checked ) }
+-				>
+-					<Menu.ItemLabel>Checkbox item A</Menu.ItemLabel>
+-					<Menu.ItemHelpText>Initially unchecked</Menu.ItemHelpText>
+-				</Menu.CheckboxItem>
+-				<Menu.CheckboxItem
+-					name="checkbox-individual-controlled-b"
+-					value="b"
+-					checked={ isBChecked }
+-					onChange={ ( e ) => setBChecked( e.target.checked ) }
+-				>
+-					<Menu.ItemLabel>Checkbox item B</Menu.ItemLabel>
+-					<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
+-				</Menu.CheckboxItem>
+-			</Menu.Group>
+-			<Menu.Separator />
+-			<Menu.Group>
+-				<Menu.GroupLabel>
+-					Multiple selection, uncontrolled
+-				</Menu.GroupLabel>
+-				<Menu.CheckboxItem
+-					name="checkbox-multiple-uncontrolled"
+-					value="a"
+-				>
+-					<Menu.ItemLabel>Checkbox item A</Menu.ItemLabel>
+-					<Menu.ItemHelpText>Initially unchecked</Menu.ItemHelpText>
+-				</Menu.CheckboxItem>
+-				<Menu.CheckboxItem
+-					name="checkbox-multiple-uncontrolled"
+-					value="b"
+-					defaultChecked
+-				>
+-					<Menu.ItemLabel>Checkbox item B</Menu.ItemLabel>
+-					<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
+-				</Menu.CheckboxItem>
+-			</Menu.Group>
+-			<Menu.Separator />
+-			<Menu.Group>
+-				<Menu.GroupLabel>
+-					Multiple selection, controlled
+-				</Menu.GroupLabel>
+-				<Menu.CheckboxItem
+-					name="checkbox-multiple-controlled"
+-					value="a"
+-					checked={ multipleCheckboxesValue.includes( 'a' ) }
+-					onChange={ onMultipleCheckboxesCheckedChange }
+-				>
+-					<Menu.ItemLabel>Checkbox item A</Menu.ItemLabel>
+-					<Menu.ItemHelpText>Initially unchecked</Menu.ItemHelpText>
+-				</Menu.CheckboxItem>
+-				<Menu.CheckboxItem
+-					name="checkbox-multiple-controlled"
+-					value="b"
+-					checked={ multipleCheckboxesValue.includes( 'b' ) }
+-					onChange={ onMultipleCheckboxesCheckedChange }
+-				>
+-					<Menu.ItemLabel>Checkbox item B</Menu.ItemLabel>
+-					<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
+-				</Menu.CheckboxItem>
+-			</Menu.Group>
++			<Menu.TriggerButton
++				render={ <Button __next40pxDefaultSize variant="secondary" /> }
++			>
++				Open menu
++			</Menu.TriggerButton>
++			<Menu.Popover>
++				<Menu.Group>
++					<Menu.GroupLabel>
++						Single selection, uncontrolled
++					</Menu.GroupLabel>
++					<Menu.CheckboxItem
++						name="checkbox-individual-uncontrolled-a"
++						value="a"
++						suffix="⌥⌘T"
++					>
++						<Menu.ItemLabel>Checkbox item A</Menu.ItemLabel>
++						<Menu.ItemHelpText>
++							Initially unchecked
++						</Menu.ItemHelpText>
++					</Menu.CheckboxItem>
++					<Menu.CheckboxItem
++						name="checkbox-individual-uncontrolled-b"
++						value="b"
++						defaultChecked
++					>
++						<Menu.ItemLabel>Checkbox item B</Menu.ItemLabel>
++						<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
++					</Menu.CheckboxItem>
++				</Menu.Group>
++				<Menu.Separator />
++				<Menu.Group>
++					<Menu.GroupLabel>
++						Single selection, controlled
++					</Menu.GroupLabel>
++					<Menu.CheckboxItem
++						name="checkbox-individual-controlled-a"
++						value="a"
++						checked={ isAChecked }
++						onChange={ ( e ) => {
++							setAChecked( e.target.checked );
++						} }
++					>
++						<Menu.ItemLabel>Checkbox item A</Menu.ItemLabel>
++						<Menu.ItemHelpText>
++							Initially unchecked
++						</Menu.ItemHelpText>
++					</Menu.CheckboxItem>
++					<Menu.CheckboxItem
++						name="checkbox-individual-controlled-b"
++						value="b"
++						checked={ isBChecked }
++						onChange={ ( e ) => setBChecked( e.target.checked ) }
++					>
++						<Menu.ItemLabel>Checkbox item B</Menu.ItemLabel>
++						<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
++					</Menu.CheckboxItem>
++				</Menu.Group>
++				<Menu.Separator />
++				<Menu.Group>
++					<Menu.GroupLabel>
++						Multiple selection, uncontrolled
++					</Menu.GroupLabel>
++					<Menu.CheckboxItem
++						name="checkbox-multiple-uncontrolled"
++						value="a"
++					>
++						<Menu.ItemLabel>Checkbox item A</Menu.ItemLabel>
++						<Menu.ItemHelpText>
++							Initially unchecked
++						</Menu.ItemHelpText>
++					</Menu.CheckboxItem>
++					<Menu.CheckboxItem
++						name="checkbox-multiple-uncontrolled"
++						value="b"
++						defaultChecked
++					>
++						<Menu.ItemLabel>Checkbox item B</Menu.ItemLabel>
++						<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
++					</Menu.CheckboxItem>
++				</Menu.Group>
++				<Menu.Separator />
++				<Menu.Group>
++					<Menu.GroupLabel>
++						Multiple selection, controlled
++					</Menu.GroupLabel>
++					<Menu.CheckboxItem
++						name="checkbox-multiple-controlled"
++						value="a"
++						checked={ multipleCheckboxesValue.includes( 'a' ) }
++						onChange={ onMultipleCheckboxesCheckedChange }
++					>
++						<Menu.ItemLabel>Checkbox item A</Menu.ItemLabel>
++						<Menu.ItemHelpText>
++							Initially unchecked
++						</Menu.ItemHelpText>
++					</Menu.CheckboxItem>
++					<Menu.CheckboxItem
++						name="checkbox-multiple-controlled"
++						value="b"
++						checked={ multipleCheckboxesValue.includes( 'b' ) }
++						onChange={ onMultipleCheckboxesCheckedChange }
++					>
++						<Menu.ItemLabel>Checkbox item B</Menu.ItemLabel>
++						<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
++					</Menu.CheckboxItem>
++				</Menu.Group>
++			</Menu.Popover>
+ 		</Menu>
+ 	);
+ };
+@@ -264,7 +297,7 @@ WithCheckboxes.args = {
+ 	...Default.args,
+ };
+ 
+-export const WithRadios: StoryFn< typeof Menu > = ( props ) => {
++export const WithRadios: StoryFn< typeof Menu > = ( props: MenuProps ) => {
+ 	const [ radioValue, setRadioValue ] = useState( 'two' );
+ 	const onRadioChange: React.ComponentProps<
+ 		typeof Menu.RadioItem
+@@ -272,43 +305,54 @@ export const WithRadios: StoryFn< typeof Menu > = ( props ) => {
+ 
+ 	return (
+ 		<Menu { ...props }>
+-			<Menu.Group>
+-				<Menu.GroupLabel>Uncontrolled</Menu.GroupLabel>
+-				<Menu.RadioItem name="radio-uncontrolled" value="one">
+-					<Menu.ItemLabel>Radio item 1</Menu.ItemLabel>
+-					<Menu.ItemHelpText>Initially unchecked</Menu.ItemHelpText>
+-				</Menu.RadioItem>
+-				<Menu.RadioItem
+-					name="radio-uncontrolled"
+-					value="two"
+-					defaultChecked
+-				>
+-					<Menu.ItemLabel>Radio item 2</Menu.ItemLabel>
+-					<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
+-				</Menu.RadioItem>
+-			</Menu.Group>
+-			<Menu.Separator />
+-			<Menu.Group>
+-				<Menu.GroupLabel>Controlled</Menu.GroupLabel>
+-				<Menu.RadioItem
+-					name="radio-controlled"
+-					value="one"
+-					checked={ radioValue === 'one' }
+-					onChange={ onRadioChange }
+-				>
+-					<Menu.ItemLabel>Radio item 1</Menu.ItemLabel>
+-					<Menu.ItemHelpText>Initially unchecked</Menu.ItemHelpText>
+-				</Menu.RadioItem>
+-				<Menu.RadioItem
+-					name="radio-controlled"
+-					value="two"
+-					checked={ radioValue === 'two' }
+-					onChange={ onRadioChange }
+-				>
+-					<Menu.ItemLabel>Radio item 2</Menu.ItemLabel>
+-					<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
+-				</Menu.RadioItem>
+-			</Menu.Group>
++			<Menu.TriggerButton
++				render={ <Button __next40pxDefaultSize variant="secondary" /> }
++			>
++				Open menu
++			</Menu.TriggerButton>
++			<Menu.Popover>
++				<Menu.Group>
++					<Menu.GroupLabel>Uncontrolled</Menu.GroupLabel>
++					<Menu.RadioItem name="radio-uncontrolled" value="one">
++						<Menu.ItemLabel>Radio item 1</Menu.ItemLabel>
++						<Menu.ItemHelpText>
++							Initially unchecked
++						</Menu.ItemHelpText>
++					</Menu.RadioItem>
++					<Menu.RadioItem
++						name="radio-uncontrolled"
++						value="two"
++						defaultChecked
++					>
++						<Menu.ItemLabel>Radio item 2</Menu.ItemLabel>
++						<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
++					</Menu.RadioItem>
++				</Menu.Group>
++				<Menu.Separator />
++				<Menu.Group>
++					<Menu.GroupLabel>Controlled</Menu.GroupLabel>
++					<Menu.RadioItem
++						name="radio-controlled"
++						value="one"
++						checked={ radioValue === 'one' }
++						onChange={ onRadioChange }
++					>
++						<Menu.ItemLabel>Radio item 1</Menu.ItemLabel>
++						<Menu.ItemHelpText>
++							Initially unchecked
++						</Menu.ItemHelpText>
++					</Menu.RadioItem>
++					<Menu.RadioItem
++						name="radio-controlled"
++						value="two"
++						checked={ radioValue === 'two' }
++						onChange={ onRadioChange }
++					>
++						<Menu.ItemLabel>Radio item 2</Menu.ItemLabel>
++						<Menu.ItemHelpText>Initially checked</Menu.ItemHelpText>
++					</Menu.RadioItem>
++				</Menu.Group>
++			</Menu.Popover>
+ 		</Menu>
+ 	);
+ };
+@@ -323,7 +367,7 @@ const modalOnTopOfMenuPopover = css`
+ `;
+ 
+ // For more examples with `Modal`, check https://ariakit.org/examples/menu-wordpress-modal
+-export const WithModals: StoryFn< typeof Menu > = ( props ) => {
++export const WithModals: StoryFn< typeof Menu > = ( props: MenuProps ) => {
+ 	const [ isOuterModalOpen, setOuterModalOpen ] = useState( false );
+ 	const [ isInnerModalOpen, setInnerModalOpen ] = useState( false );
+ 
+@@ -333,29 +377,40 @@ export const WithModals: StoryFn< typeof Menu > = ( props ) => {
+ 	return (
+ 		<>
+ 			<Menu { ...props }>
+-				<Menu.Item
+-					onClick={ () => setOuterModalOpen( true ) }
+-					hideOnClick={ false }
+-				>
+-					<Menu.ItemLabel>Open outer modal</Menu.ItemLabel>
+-				</Menu.Item>
+-				<Menu.Item
+-					onClick={ () => setInnerModalOpen( true ) }
+-					hideOnClick={ false }
++				<Menu.TriggerButton
++					render={
++						<Button __next40pxDefaultSize variant="secondary" />
++					}
+ 				>
+-					<Menu.ItemLabel>Open inner modal</Menu.ItemLabel>
+-				</Menu.Item>
+-				{ isInnerModalOpen && (
+-					<Modal
+-						onRequestClose={ () => setInnerModalOpen( false ) }
+-						overlayClassName={ modalOverlayClassName }
++					Open menu
++				</Menu.TriggerButton>
++				<Menu.Popover>
++					<Menu.Item
++						onClick={ () => setOuterModalOpen( true ) }
++						hideOnClick={ false }
+ 					>
+-						Modal&apos;s contents
+-						<button onClick={ () => setInnerModalOpen( false ) }>
+-							Close
+-						</button>
+-					</Modal>
+-				) }
++						<Menu.ItemLabel>Open outer modal</Menu.ItemLabel>
++					</Menu.Item>
++					<Menu.Item
++						onClick={ () => setInnerModalOpen( true ) }
++						hideOnClick={ false }
++					>
++						<Menu.ItemLabel>Open inner modal</Menu.ItemLabel>
++					</Menu.Item>
++					{ isInnerModalOpen && (
++						<Modal
++							onRequestClose={ () => setInnerModalOpen( false ) }
++							overlayClassName={ modalOverlayClassName }
++						>
++							Modal&apos;s contents
++							<button
++								onClick={ () => setInnerModalOpen( false ) }
++							>
++								Close
++							</button>
++						</Modal>
++					) }
++				</Menu.Popover>
+ 			</Menu>
+ 			{ isOuterModalOpen && (
+ 				<Modal
+@@ -423,30 +478,40 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
+ 	);
+ };
+ 
+-export const WithSlotFill: StoryFn< typeof Menu > = ( props ) => {
++export const WithSlotFill: StoryFn< typeof Menu > = ( props: MenuProps ) => {
+ 	return (
+ 		<SlotFillProvider>
+ 			<Menu { ...props }>
+-				<Menu.Item>
+-					<Menu.ItemLabel>Item</Menu.ItemLabel>
+-				</Menu.Item>
+-				<Slot />
++				<Menu.TriggerButton
++					render={
++						<Button __next40pxDefaultSize variant="secondary" />
++					}
++				>
++					Open menu
++				</Menu.TriggerButton>
++				<Menu.Popover>
++					<Menu.Item>
++						<Menu.ItemLabel>Item</Menu.ItemLabel>
++					</Menu.Item>
++					<Slot />
++				</Menu.Popover>
+ 			</Menu>
+ 
+ 			<Fill>
+ 				<Menu.Item>
+ 					<Menu.ItemLabel>Item from fill</Menu.ItemLabel>
+ 				</Menu.Item>
+-				<Menu
+-					trigger={
++				<Menu>
++					<Menu.SubmenuTriggerItem>
++						<Menu.ItemLabel>Submenu from fill</Menu.ItemLabel>
++					</Menu.SubmenuTriggerItem>
++					<Menu.Popover>
+ 						<Menu.Item>
+-							<Menu.ItemLabel>Submenu from fill</Menu.ItemLabel>
++							<Menu.ItemLabel>
++								Submenu item from fill
++							</Menu.ItemLabel>
+ 						</Menu.Item>
+-					}
+-				>
+-					<Menu.Item>
+-						<Menu.ItemLabel>Submenu item from fill</Menu.ItemLabel>
+-					</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			</Fill>
+ 		</SlotFillProvider>
+@@ -461,28 +526,34 @@ const toolbarVariantContextValue = {
+ 		variant: 'toolbar',
+ 	},
+ };
+-export const ToolbarVariant: StoryFn< typeof Menu > = ( props ) => (
++export const ToolbarVariant: StoryFn< typeof Menu > = ( props: MenuProps ) => (
+ 	// TODO: add toolbar
+ 	<ContextSystemProvider value={ toolbarVariantContextValue }>
+ 		<Menu { ...props }>
+-			<Menu.Item>
+-				<Menu.ItemLabel>Level 1 item</Menu.ItemLabel>
+-			</Menu.Item>
+-			<Menu.Item>
+-				<Menu.ItemLabel>Level 1 item</Menu.ItemLabel>
+-			</Menu.Item>
+-			<Menu.Separator />
+-			<Menu
+-				trigger={
+-					<Menu.Item>
+-						<Menu.ItemLabel>Submenu trigger</Menu.ItemLabel>
+-					</Menu.Item>
+-				}
++			<Menu.TriggerButton
++				render={ <Button __next40pxDefaultSize variant="secondary" /> }
+ 			>
++				Open menu
++			</Menu.TriggerButton>
++			<Menu.Popover>
+ 				<Menu.Item>
+-					<Menu.ItemLabel>Level 2 item</Menu.ItemLabel>
++					<Menu.ItemLabel>Level 1 item</Menu.ItemLabel>
+ 				</Menu.Item>
+-			</Menu>
++				<Menu.Item>
++					<Menu.ItemLabel>Level 1 item</Menu.ItemLabel>
++				</Menu.Item>
++				<Menu.Separator />
++				<Menu>
++					<Menu.SubmenuTriggerItem>
++						<Menu.ItemLabel>Submenu trigger</Menu.ItemLabel>
++					</Menu.SubmenuTriggerItem>
++					<Menu.Popover>
++						<Menu.Item>
++							<Menu.ItemLabel>Level 2 item</Menu.ItemLabel>
++						</Menu.Item>
++					</Menu.Popover>
++				</Menu>
++			</Menu.Popover>
+ 		</Menu>
+ 	</ContextSystemProvider>
+ );
+@@ -490,7 +561,7 @@ ToolbarVariant.args = {
+ 	...Default.args,
+ };
+ 
+-export const InsideModal: StoryFn< typeof Menu > = ( props ) => {
++export const InsideModal: StoryFn< typeof Menu > = ( props: MenuProps ) => {
+ 	const [ isModalOpen, setModalOpen ] = useState( false );
+ 	return (
+ 		<>
+@@ -502,28 +573,44 @@ export const InsideModal: StoryFn< typeof Menu > = ( props ) => {
+ 				Open modal
+ 			</Button>
+ 			{ isModalOpen && (
+-				<Modal onRequestClose={ () => setModalOpen( false ) }>
++				<Modal
++					onRequestClose={ () => setModalOpen( false ) }
++					title="Menu inside modal"
++				>
+ 					<Menu { ...props }>
+-						<Menu.Item>
+-							<Menu.ItemLabel>Level 1 item</Menu.ItemLabel>
+-						</Menu.Item>
+-						<Menu.Item>
+-							<Menu.ItemLabel>Level 1 item</Menu.ItemLabel>
+-						</Menu.Item>
+-						<Menu.Separator />
+-						<Menu
+-							trigger={
+-								<Menu.Item>
+-									<Menu.ItemLabel>
+-										Submenu trigger
+-									</Menu.ItemLabel>
+-								</Menu.Item>
++						<Menu.TriggerButton
++							render={
++								<Button
++									__next40pxDefaultSize
++									variant="secondary"
++								/>
+ 							}
+ 						>
++							Open menu
++						</Menu.TriggerButton>
++						<Menu.Popover>
++							<Menu.Item>
++								<Menu.ItemLabel>Level 1 item</Menu.ItemLabel>
++							</Menu.Item>
+ 							<Menu.Item>
+-								<Menu.ItemLabel>Level 2 item</Menu.ItemLabel>
++								<Menu.ItemLabel>Level 1 item</Menu.ItemLabel>
+ 							</Menu.Item>
+-						</Menu>
++							<Menu.Separator />
++							<Menu>
++								<Menu.SubmenuTriggerItem>
++									<Menu.ItemLabel>
++										Submenu trigger
++									</Menu.ItemLabel>
++								</Menu.SubmenuTriggerItem>
++								<Menu.Popover>
++									<Menu.Item>
++										<Menu.ItemLabel>
++											Level 2 item
++										</Menu.ItemLabel>
++									</Menu.Item>
++								</Menu.Popover>
++							</Menu>
++						</Menu.Popover>
+ 					</Menu>
+ 					<Button onClick={ () => setModalOpen( false ) }>
+ 						Close modal
+diff --git a/packages/components/src/menu/submenu-trigger-item.tsx b/packages/components/src/menu/submenu-trigger-item.tsx
+new file mode 100644
+index 00000000000000..23932a14bdaff4
+--- /dev/null
++++ b/packages/components/src/menu/submenu-trigger-item.tsx
+@@ -0,0 +1,61 @@
++/**
++ * External dependencies
++ */
++import * as Ariakit from '@ariakit/react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef, useContext } from '@wordpress/element';
++import { chevronRightSmall } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import type { WordPressComponentProps } from '../context';
++import type { MenuItemProps } from './types';
++import { MenuContext } from './context';
++import { MenuItem } from './item';
++import * as Styled from './styles';
++
++export const MenuSubmenuTriggerItem = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< MenuItemProps, 'div', false >
++>( function MenuSubmenuTriggerItem( { suffix, ...otherProps }, ref ) {
++	const menuContext = useContext( MenuContext );
++
++	if ( ! menuContext?.store.parent ) {
++		throw new Error(
++			'Menu.SubmenuTriggerItem can only be rendered inside a nested Menu component'
++		);
++	}
++
++	return (
++		<Ariakit.MenuButton
++			ref={ ref }
++			accessibleWhenDisabled
++			store={ menuContext.store }
++			render={
++				<MenuItem
++					{ ...otherProps }
++					// The menu item needs to register and be part of the parent menu.
++					// Without specifying the store explicitly, the `MenuItem` component
++					// would otherwise read the store via context and pick up the one from
++					// the sub-menu `Menu` component.
++					store={ menuContext.store.parent }
++					suffix={
++						<>
++							{ suffix }
++							<Styled.SubmenuChevronIcon
++								aria-hidden="true"
++								icon={ chevronRightSmall }
++								size={ 24 }
++								preserveAspectRatio="xMidYMid slice"
++							/>
++						</>
++					}
++				/>
++			}
++		/>
++	);
++} );
+diff --git a/packages/components/src/menu/test/index.tsx b/packages/components/src/menu/test/index.tsx
+index 60276cdb2379a0..42e1516d94bbba 100644
+--- a/packages/components/src/menu/test/index.tsx
++++ b/packages/components/src/menu/test/index.tsx
+@@ -18,17 +18,28 @@ const delay = ( delayInMs: number ) => {
+ 	return new Promise( ( resolve ) => setTimeout( resolve, delayInMs ) );
+ };
+ 
++// Open dropdown => open menu
++// Submenu trigger item => open submenu
++
+ describe( 'Menu', () => {
+ 	// See https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/
+ 	it( 'should follow the WAI-ARIA spec', async () => {
+ 		render(
+-			<Menu trigger={ <button>Open dropdown</button> }>
+-				<Menu.Item>Menu item</Menu.Item>
+-				<Menu.Separator />
+-				<Menu trigger={ <Menu.Item>Submenu trigger item</Menu.Item> }>
+-					<Menu.Item>Submenu item 1</Menu.Item>
+-					<Menu.Item>Submenu item 2</Menu.Item>
+-				</Menu>
++			<Menu>
++				<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++				<Menu.Popover>
++					<Menu.Item>Menu item</Menu.Item>
++					<Menu.Separator />
++					<Menu>
++						<Menu.SubmenuTriggerItem>
++							Submenu trigger item
++						</Menu.SubmenuTriggerItem>
++						<Menu.Popover>
++							<Menu.Item>Submenu item 1</Menu.Item>
++							<Menu.Item>Submenu item 2</Menu.Item>
++						</Menu.Popover>
++					</Menu>
++				</Menu.Popover>
+ 			</Menu>
+ 		);
+ 
+@@ -84,8 +95,11 @@ describe( 'Menu', () => {
+ 	describe( 'pointer and keyboard interactions', () => {
+ 		it( 'should open and focus the menu when clicking the trigger', async () => {
+ 			render(
+-				<Menu trigger={ <button>Open dropdown</button> }>
+-					<Menu.Item>Menu item</Menu.Item>
++				<Menu>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Item>Menu item</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -105,10 +119,13 @@ describe( 'Menu', () => {
+ 
+ 		it( 'should open and focus the first item when pressing the arrow down key on the trigger', async () => {
+ 			render(
+-				<Menu trigger={ <button>Open dropdown</button> }>
+-					<Menu.Item disabled>First item</Menu.Item>
+-					<Menu.Item>Second item</Menu.Item>
+-					<Menu.Item>Third item</Menu.Item>
++				<Menu>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Item disabled>First item</Menu.Item>
++						<Menu.Item>Second item</Menu.Item>
++						<Menu.Item>Third item</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -135,10 +152,13 @@ describe( 'Menu', () => {
+ 
+ 		it( 'should open and focus the first item when pressing the space key on the trigger', async () => {
+ 			render(
+-				<Menu trigger={ <button>Open dropdown</button> }>
+-					<Menu.Item disabled>First item</Menu.Item>
+-					<Menu.Item>Second item</Menu.Item>
+-					<Menu.Item>Third item</Menu.Item>
++				<Menu>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Item disabled>First item</Menu.Item>
++						<Menu.Item>Second item</Menu.Item>
++						<Menu.Item>Third item</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -165,8 +185,11 @@ describe( 'Menu', () => {
+ 
+ 		it( 'should close when pressing the escape key', async () => {
+ 			render(
+-				<Menu trigger={ <button>Open dropdown</button> }>
+-					<Menu.Item>Menu item</Menu.Item>
++				<Menu>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Item>Menu item</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -194,8 +217,11 @@ describe( 'Menu', () => {
+ 
+ 		it( 'should close when clicking outside of the content', async () => {
+ 			render(
+-				<Menu defaultOpen trigger={ <button>Open dropdown</button> }>
+-					<Menu.Item>Menu item</Menu.Item>
++				<Menu defaultOpen>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Item>Menu item</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -209,8 +235,11 @@ describe( 'Menu', () => {
+ 
+ 		it( 'should close when clicking on a menu item', async () => {
+ 			render(
+-				<Menu defaultOpen trigger={ <button>Open dropdown</button> }>
+-					<Menu.Item>Menu item</Menu.Item>
++				<Menu defaultOpen>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Item>Menu item</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -224,8 +253,11 @@ describe( 'Menu', () => {
+ 
+ 		it( 'should not close when clicking on a menu item when the `hideOnClick` prop is set to `false`', async () => {
+ 			render(
+-				<Menu defaultOpen trigger={ <button>Open dropdown</button> }>
+-					<Menu.Item hideOnClick={ false }>Menu item</Menu.Item>
++				<Menu defaultOpen>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Item hideOnClick={ false }>Menu item</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -239,8 +271,11 @@ describe( 'Menu', () => {
+ 
+ 		it( 'should not close when clicking on a disabled menu item', async () => {
+ 			render(
+-				<Menu defaultOpen trigger={ <button>Open dropdown</button> }>
+-					<Menu.Item disabled>Menu item</Menu.Item>
++				<Menu defaultOpen>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Item disabled>Menu item</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -254,16 +289,22 @@ describe( 'Menu', () => {
+ 
+ 		it( 'should reveal submenu content when hovering over the submenu trigger', async () => {
+ 			render(
+-				<Menu defaultOpen trigger={ <button>Open dropdown</button> }>
+-					<Menu.Item>Menu item 1</Menu.Item>
+-					<Menu.Item>Menu item 2</Menu.Item>
+-					<Menu
+-						trigger={ <Menu.Item>Submenu trigger item</Menu.Item> }
+-					>
+-						<Menu.Item>Submenu item 1</Menu.Item>
+-						<Menu.Item>Submenu item 2</Menu.Item>
+-					</Menu>
+-					<Menu.Item>Menu item 3</Menu.Item>
++				<Menu defaultOpen>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Item>Menu item 1</Menu.Item>
++						<Menu.Item>Menu item 2</Menu.Item>
++						<Menu>
++							<Menu.SubmenuTriggerItem>
++								Submenu trigger item
++							</Menu.SubmenuTriggerItem>
++							<Menu.Popover>
++								<Menu.Item>Submenu item 1</Menu.Item>
++								<Menu.Item>Submenu item 2</Menu.Item>
++							</Menu.Popover>
++						</Menu>
++						<Menu.Item>Menu item 3</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -288,16 +329,22 @@ describe( 'Menu', () => {
+ 
+ 		it( 'should navigate menu items and subitems using the arrow, spacebar and enter keys', async () => {
+ 			render(
+-				<Menu defaultOpen trigger={ <button>Open dropdown</button> }>
+-					<Menu.Item>Menu item 1</Menu.Item>
+-					<Menu.Item>Menu item 2</Menu.Item>
+-					<Menu
+-						trigger={ <Menu.Item>Submenu trigger item</Menu.Item> }
+-					>
+-						<Menu.Item>Submenu item 1</Menu.Item>
+-						<Menu.Item>Submenu item 2</Menu.Item>
+-					</Menu>
+-					<Menu.Item>Menu item 3</Menu.Item>
++				<Menu defaultOpen>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Item>Menu item 1</Menu.Item>
++						<Menu.Item>Menu item 2</Menu.Item>
++						<Menu>
++							<Menu.SubmenuTriggerItem>
++								Submenu trigger item
++							</Menu.SubmenuTriggerItem>
++							<Menu.Popover>
++								<Menu.Item>Submenu item 1</Menu.Item>
++								<Menu.Item>Submenu item 2</Menu.Item>
++							</Menu.Popover>
++						</Menu>
++						<Menu.Item>Menu item 3</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -407,25 +454,28 @@ describe( 'Menu', () => {
+ 					setRadioValue( e.target.value );
+ 				};
+ 				return (
+-					<Menu trigger={ <button>Open dropdown</button> }>
+-						<Menu.Group>
+-							<Menu.RadioItem
+-								name="radio-test"
+-								value="radio-one"
+-								checked={ radioValue === 'radio-one' }
+-								onChange={ onRadioChange }
+-							>
+-								Radio item one
+-							</Menu.RadioItem>
+-							<Menu.RadioItem
+-								name="radio-test"
+-								value="radio-two"
+-								checked={ radioValue === 'radio-two' }
+-								onChange={ onRadioChange }
+-							>
+-								Radio item two
+-							</Menu.RadioItem>
+-						</Menu.Group>
++					<Menu>
++						<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++						<Menu.Popover>
++							<Menu.Group>
++								<Menu.RadioItem
++									name="radio-test"
++									value="radio-one"
++									checked={ radioValue === 'radio-one' }
++									onChange={ onRadioChange }
++								>
++									Radio item one
++								</Menu.RadioItem>
++								<Menu.RadioItem
++									name="radio-test"
++									value="radio-two"
++									checked={ radioValue === 'radio-two' }
++									onChange={ onRadioChange }
++								>
++									Radio item two
++								</Menu.RadioItem>
++							</Menu.Group>
++						</Menu.Popover>
+ 					</Menu>
+ 				);
+ 			};
+@@ -484,28 +534,31 @@ describe( 'Menu', () => {
+ 		it( 'should check radio items and keep the menu open when clicking (uncontrolled)', async () => {
+ 			const onRadioValueChangeSpy = jest.fn();
+ 			render(
+-				<Menu trigger={ <button>Open dropdown</button> }>
+-					<Menu.Group>
+-						<Menu.RadioItem
+-							name="radio-test"
+-							value="radio-one"
+-							onChange={ ( e ) =>
+-								onRadioValueChangeSpy( e.target.value )
+-							}
+-						>
+-							Radio item one
+-						</Menu.RadioItem>
+-						<Menu.RadioItem
+-							name="radio-test"
+-							value="radio-two"
+-							defaultChecked
+-							onChange={ ( e ) =>
+-								onRadioValueChangeSpy( e.target.value )
+-							}
+-						>
+-							Radio item two
+-						</Menu.RadioItem>
+-					</Menu.Group>
++				<Menu>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Group>
++							<Menu.RadioItem
++								name="radio-test"
++								value="radio-one"
++								onChange={ ( e ) =>
++									onRadioValueChangeSpy( e.target.value )
++								}
++							>
++								Radio item one
++							</Menu.RadioItem>
++							<Menu.RadioItem
++								name="radio-test"
++								value="radio-two"
++								defaultChecked
++								onChange={ ( e ) =>
++									onRadioValueChangeSpy( e.target.value )
++								}
++							>
++								Radio item two
++							</Menu.RadioItem>
++						</Menu.Group>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -568,38 +621,41 @@ describe( 'Menu', () => {
+ 					useState< boolean >();
+ 
+ 				return (
+-					<Menu trigger={ <button>Open dropdown</button> }>
+-						<Menu.CheckboxItem
+-							name="item-one"
+-							value="item-one-value"
+-							checked={ itemOneChecked }
+-							onChange={ ( e ) => {
+-								onCheckboxValueChangeSpy(
+-									e.target.name,
+-									e.target.value,
+-									e.target.checked
+-								);
+-								setItemOneChecked( e.target.checked );
+-							} }
+-						>
+-							Checkbox item one
+-						</Menu.CheckboxItem>
+-
+-						<Menu.CheckboxItem
+-							name="item-two"
+-							value="item-two-value"
+-							checked={ itemTwoChecked }
+-							onChange={ ( e ) => {
+-								onCheckboxValueChangeSpy(
+-									e.target.name,
+-									e.target.value,
+-									e.target.checked
+-								);
+-								setItemTwoChecked( e.target.checked );
+-							} }
+-						>
+-							Checkbox item two
+-						</Menu.CheckboxItem>
++					<Menu>
++						<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++						<Menu.Popover>
++							<Menu.CheckboxItem
++								name="item-one"
++								value="item-one-value"
++								checked={ itemOneChecked }
++								onChange={ ( e ) => {
++									onCheckboxValueChangeSpy(
++										e.target.name,
++										e.target.value,
++										e.target.checked
++									);
++									setItemOneChecked( e.target.checked );
++								} }
++							>
++								Checkbox item one
++							</Menu.CheckboxItem>
++
++							<Menu.CheckboxItem
++								name="item-two"
++								value="item-two-value"
++								checked={ itemTwoChecked }
++								onChange={ ( e ) => {
++									onCheckboxValueChangeSpy(
++										e.target.name,
++										e.target.value,
++										e.target.checked
++									);
++									setItemTwoChecked( e.target.checked );
++								} }
++							>
++								Checkbox item two
++							</Menu.CheckboxItem>
++						</Menu.Popover>
+ 					</Menu>
+ 				);
+ 			};
+@@ -691,35 +747,38 @@ describe( 'Menu', () => {
+ 			const onCheckboxValueChangeSpy = jest.fn();
+ 
+ 			render(
+-				<Menu trigger={ <button>Open dropdown</button> }>
+-					<Menu.CheckboxItem
+-						name="item-one"
+-						value="item-one-value"
+-						onChange={ ( e ) => {
+-							onCheckboxValueChangeSpy(
+-								e.target.name,
+-								e.target.value,
+-								e.target.checked
+-							);
+-						} }
+-					>
+-						Checkbox item one
+-					</Menu.CheckboxItem>
+-
+-					<Menu.CheckboxItem
+-						name="item-two"
+-						value="item-two-value"
+-						defaultChecked
+-						onChange={ ( e ) => {
+-							onCheckboxValueChangeSpy(
+-								e.target.name,
+-								e.target.value,
+-								e.target.checked
+-							);
+-						} }
+-					>
+-						Checkbox item two
+-					</Menu.CheckboxItem>
++				<Menu>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.CheckboxItem
++							name="item-one"
++							value="item-one-value"
++							onChange={ ( e ) => {
++								onCheckboxValueChangeSpy(
++									e.target.name,
++									e.target.value,
++									e.target.checked
++								);
++							} }
++						>
++							Checkbox item one
++						</Menu.CheckboxItem>
++
++						<Menu.CheckboxItem
++							name="item-two"
++							value="item-two-value"
++							defaultChecked
++							onChange={ ( e ) => {
++								onCheckboxValueChangeSpy(
++									e.target.name,
++									e.target.value,
++									e.target.checked
++								);
++							} }
++						>
++							Checkbox item two
++						</Menu.CheckboxItem>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -809,8 +868,11 @@ describe( 'Menu', () => {
+ 		it( 'should be modal by default', async () => {
+ 			render(
+ 				<>
+-					<Menu trigger={ <button>Open dropdown</button> }>
+-						<Menu.Item>Menu item</Menu.Item>
++					<Menu>
++						<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++						<Menu.Popover>
++							<Menu.Item>Menu item</Menu.Item>
++						</Menu.Popover>
+ 					</Menu>
+ 					<button>Button outside of dropdown</button>
+ 				</>
+@@ -836,11 +898,11 @@ describe( 'Menu', () => {
+ 		it( 'should not be modal when the `modal` prop is set to `false`', async () => {
+ 			render(
+ 				<>
+-					<Menu
+-						trigger={ <button>Open dropdown</button> }
+-						modal={ false }
+-					>
+-						<Menu.Item>Menu item</Menu.Item>
++					<Menu>
++						<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++						<Menu.Popover modal={ false }>
++							<Menu.Item>Menu item</Menu.Item>
++						</Menu.Popover>
+ 					</Menu>
+ 					<button>Button outside of dropdown</button>
+ 				</>
+@@ -873,8 +935,13 @@ describe( 'Menu', () => {
+ 	describe( 'items prefix and suffix', () => {
+ 		it( 'should display a prefix on regular items', async () => {
+ 			render(
+-				<Menu trigger={ <button>Open dropdown</button> }>
+-					<Menu.Item prefix={ <>Item prefix</> }>Menu item</Menu.Item>
++				<Menu>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Item prefix={ <>Item prefix</> }>
++							Menu item
++						</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -895,8 +962,13 @@ describe( 'Menu', () => {
+ 
+ 		it( 'should display a suffix on regular items', async () => {
+ 			render(
+-				<Menu trigger={ <button>Open dropdown</button> }>
+-					<Menu.Item suffix={ <>Item suffix</> }>Menu item</Menu.Item>
++				<Menu>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Item suffix={ <>Item suffix</> }>
++							Menu item
++						</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -917,14 +989,17 @@ describe( 'Menu', () => {
+ 
+ 		it( 'should display a suffix on radio items', async () => {
+ 			render(
+-				<Menu trigger={ <button>Open dropdown</button> }>
+-					<Menu.RadioItem
+-						name="radio-test"
+-						value="radio-one"
+-						suffix="Radio suffix"
+-					>
+-						Radio item one
+-					</Menu.RadioItem>
++				<Menu>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.RadioItem
++							name="radio-test"
++							value="radio-one"
++							suffix="Radio suffix"
++						>
++							Radio item one
++						</Menu.RadioItem>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -945,14 +1020,17 @@ describe( 'Menu', () => {
+ 
+ 		it( 'should display a suffix on checkbox items', async () => {
+ 			render(
+-				<Menu trigger={ <button>Open dropdown</button> }>
+-					<Menu.CheckboxItem
+-						name="checkbox-test"
+-						value="checkbox-one"
+-						suffix="Checkbox suffix"
+-					>
+-						Checkbox item one
+-					</Menu.CheckboxItem>
++				<Menu>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.CheckboxItem
++							name="checkbox-test"
++							value="checkbox-one"
++							suffix="Checkbox suffix"
++						>
++							Checkbox item one
++						</Menu.CheckboxItem>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -975,9 +1053,12 @@ describe( 'Menu', () => {
+ 	describe( 'typeahead', () => {
+ 		it( 'should highlight matching item', async () => {
+ 			render(
+-				<Menu trigger={ <button>Open dropdown</button> }>
+-					<Menu.Item>One</Menu.Item>
+-					<Menu.Item>Two</Menu.Item>
++				<Menu>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Item>One</Menu.Item>
++						<Menu.Item>Two</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+@@ -1008,9 +1089,12 @@ describe( 'Menu', () => {
+ 
+ 		it( 'should keep previous focus when no matches are found', async () => {
+ 			render(
+-				<Menu trigger={ <button>Open dropdown</button> }>
+-					<Menu.Item>One</Menu.Item>
+-					<Menu.Item>Two</Menu.Item>
++				<Menu>
++					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
++					<Menu.Popover>
++						<Menu.Item>One</Menu.Item>
++						<Menu.Item>Two</Menu.Item>
++					</Menu.Popover>
+ 				</Menu>
+ 			);
+ 
+diff --git a/packages/components/src/menu/trigger-button.tsx b/packages/components/src/menu/trigger-button.tsx
+new file mode 100644
+index 00000000000000..b99804efef0f17
+--- /dev/null
++++ b/packages/components/src/menu/trigger-button.tsx
+@@ -0,0 +1,46 @@
++/**
++ * External dependencies
++ */
++import * as Ariakit from '@ariakit/react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef, useContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { WordPressComponentProps } from '../context';
++import type { MenuTriggerButtonProps } from './types';
++import { MenuContext } from './context';
++
++export const MenuTriggerButton = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< MenuTriggerButtonProps, 'button', false >
++>( function MenuTriggerButton( { children, disabled = false, ...props }, ref ) {
++	const menuContext = useContext( MenuContext );
++
++	if ( ! menuContext?.store ) {
++		throw new Error(
++			'Menu.TriggerButton can only be rendered inside a Menu component'
++		);
++	}
++
++	if ( menuContext.store.parent ) {
++		throw new Error(
++			'Menu.TriggerButton should not be rendered inside a nested Menu component. Use Menu.SubmenuTriggerItem instead.'
++		);
++	}
++
++	return (
++		<Ariakit.MenuButton
++			ref={ ref }
++			{ ...props }
++			disabled={ disabled }
++			store={ menuContext.store }
++		>
++			{ children }
++		</Ariakit.MenuButton>
++	);
++} );
+diff --git a/packages/components/src/menu/types.ts b/packages/components/src/menu/types.ts
+index 7b58cef241743e..f58b5bcc89b953 100644
+--- a/packages/components/src/menu/types.ts
++++ b/packages/components/src/menu/types.ts
+@@ -16,10 +16,6 @@ export interface MenuContext {
+ }
+ 
+ export interface MenuProps {
+-	/**
+-	 * The button triggering the menu popover.
+-	 */
+-	trigger: React.ReactElement;
+ 	/**
+ 	 * The contents of the menu (ie. one or more menu items).
+ 	 */
+@@ -40,6 +36,19 @@ export interface MenuProps {
+ 	 * Event handler called when the open state of the menu popover changes.
+ 	 */
+ 	onOpenChange?: ( open: boolean ) => void;
++	/**
++	 * The placement of the menu popover.
++	 *
++	 * @default 'bottom-start' for root-level menus, 'right-start' for nested menus
++	 */
++	placement?: Placement;
++}
++
++export interface MenuPopoverProps {
++	/**
++	 * The contents of the dropdown.
++	 */
++	children?: React.ReactNode;
+ 	/**
+ 	 * The modality of the menu popover. When set to true, interaction with
+ 	 * outside elements will be disabled and only menu content will be visible to
+@@ -48,12 +57,6 @@ export interface MenuProps {
+ 	 * @default true
+ 	 */
+ 	modal?: boolean;
+-	/**
+-	 * The placement of the menu popover.
+-	 *
+-	 * @default 'bottom-start' for root-level menus, 'right-start' for nested menus
+-	 */
+-	placement?: Placement;
+ 	/**
+ 	 * The distance between the popover and the anchor element.
+ 	 *
+@@ -80,6 +83,50 @@ export interface MenuProps {
+ 		  ) => boolean );
+ }
+ 
++export interface MenuTriggerButtonProps {
++	/**
++	 * The contents of the menu trigger button.
++	 */
++	children?: React.ReactNode;
++	/**
++	 * Allows the component to be rendered as a different HTML element or React
++	 * component. The value can be a React element or a function that takes in the
++	 * original component props and gives back a React element with the props
++	 * merged.
++	 */
++	render?: Ariakit.MenuButtonProps[ 'render' ];
++	/**
++	 * Determines if the element is disabled. This sets the `aria-disabled`
++	 * attribute accordingly, enabling support for all elements, including those
++	 * that don't support the native `disabled` attribute.
++	 *
++	 * This feature can be combined with the `accessibleWhenDisabled` prop to
++	 * make disabled elements still accessible via keyboard.
++	 *
++	 * **Note**: For this prop to work, the `focusable` prop must be set to
++	 * `true`, if it's not set by default.
++	 *
++	 * @default false
++	 */
++	disabled?: Ariakit.MenuButtonProps[ 'disabled' ];
++	/**
++	 * Indicates whether the element should be focusable even when it is
++	 * `disabled`.
++	 *
++	 * This is important when discoverability is a concern. For example:
++	 *
++	 * > A toolbar in an editor contains a set of special smart paste functions
++	 * that are disabled when the clipboard is empty or when the function is not
++	 * applicable to the current content of the clipboard. It could be helpful to
++	 * keep the disabled buttons focusable if the ability to discover their
++	 * functionality is primarily via their presence on the toolbar.
++	 *
++	 * Learn more on [Focusability of disabled
++	 * controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols).
++	 */
++	accessibleWhenDisabled?: Ariakit.MenuButtonProps[ 'accessibleWhenDisabled' ];
++}
++
+ export interface MenuGroupProps {
+ 	/**
+ 	 * The contents of the menu group (ie. an optional menu group label and one
+@@ -118,6 +165,18 @@ export interface MenuItemProps {
+ 	 * Determines if the element is disabled.
+ 	 */
+ 	disabled?: boolean;
++	/**
++	 * Allows the component to be rendered as a different HTML element or React
++	 * component. The value can be a React element or a function that takes in the
++	 * original component props and gives back a React element with the props
++	 * merged.
++	 */
++	render?: Ariakit.MenuItemProps[ 'render' ];
++	/**
++	 * The ariakit store. This prop is only meant for internal use.
++	 * @ignore
++	 */
++	store?: Ariakit.MenuItemProps[ 'store' ];
+ }
+ 
+ export interface MenuCheckboxItemProps
+diff --git a/packages/dataviews/src/components/dataviews-filters/add-filter.tsx b/packages/dataviews/src/components/dataviews-filters/add-filter.tsx
+index 94aebb71ea5874..3921fd88eaaa29 100644
+--- a/packages/dataviews/src/components/dataviews-filters/add-filter.tsx
++++ b/packages/dataviews/src/components/dataviews-filters/add-filter.tsx
+@@ -33,37 +33,40 @@ export function AddFilterMenu( {
+ 	view,
+ 	onChangeView,
+ 	setOpenedFilter,
+-	trigger,
++	triggerProps,
+ }: AddFilterProps & {
+-	trigger: React.ReactNode;
++	triggerProps: React.ComponentProps< typeof Menu.TriggerButton >;
+ } ) {
+ 	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
+ 	return (
+-		<Menu trigger={ trigger }>
+-			{ inactiveFilters.map( ( filter ) => {
+-				return (
+-					<Menu.Item
+-						key={ filter.field }
+-						onClick={ () => {
+-							setOpenedFilter( filter.field );
+-							onChangeView( {
+-								...view,
+-								page: 1,
+-								filters: [
+-									...( view.filters || [] ),
+-									{
+-										field: filter.field,
+-										value: undefined,
+-										operator: filter.operators[ 0 ],
+-									},
+-								],
+-							} );
+-						} }
+-					>
+-						<Menu.ItemLabel>{ filter.name }</Menu.ItemLabel>
+-					</Menu.Item>
+-				);
+-			} ) }
++		<Menu>
++			<Menu.TriggerButton { ...triggerProps } />
++			<Menu.Popover>
++				{ inactiveFilters.map( ( filter ) => {
++					return (
++						<Menu.Item
++							key={ filter.field }
++							onClick={ () => {
++								setOpenedFilter( filter.field );
++								onChangeView( {
++									...view,
++									page: 1,
++									filters: [
++										...( view.filters || [] ),
++										{
++											field: filter.field,
++											value: undefined,
++											operator: filter.operators[ 0 ],
++										},
++									],
++								} );
++							} }
++						>
++							<Menu.ItemLabel>{ filter.name }</Menu.ItemLabel>
++						</Menu.Item>
++					);
++				} ) }
++			</Menu.Popover>
+ 		</Menu>
+ 	);
+ }
+@@ -78,18 +81,19 @@ function AddFilter(
+ 	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
+ 	return (
+ 		<AddFilterMenu
+-			trigger={
+-				<Button
+-					accessibleWhenDisabled
+-					size="compact"
+-					className="dataviews-filters-button"
+-					variant="tertiary"
+-					disabled={ ! inactiveFilters.length }
+-					ref={ ref }
+-				>
+-					{ __( 'Add filter' ) }
+-				</Button>
+-			}
++			triggerProps={ {
++				render: (
++					<Button
++						accessibleWhenDisabled
++						size="compact"
++						className="dataviews-filters-button"
++						variant="tertiary"
++						disabled={ ! inactiveFilters.length }
++						ref={ ref }
++					/>
++				),
++				children: __( 'Add filter' ),
++			} }
+ 			{ ...{ filters, view, onChangeView, setOpenedFilter } }
+ 		/>
+ 	);
+diff --git a/packages/dataviews/src/components/dataviews-filters/index.tsx b/packages/dataviews/src/components/dataviews-filters/index.tsx
+index 440df4f17310d6..180e17d4b7f0cc 100644
+--- a/packages/dataviews/src/components/dataviews-filters/index.tsx
++++ b/packages/dataviews/src/components/dataviews-filters/index.tsx
+@@ -136,7 +136,7 @@ export function FiltersToggle( {
+ 					view={ view }
+ 					onChangeView={ onChangeViewWithFilterVisibility }
+ 					setOpenedFilter={ setOpenedFilter }
+-					trigger={ buttonComponent }
++					triggerProps={ { render: buttonComponent } }
+ 				/>
+ 			) : (
+ 				<FilterVisibilityToggle
+diff --git a/packages/dataviews/src/components/dataviews-item-actions/index.tsx b/packages/dataviews/src/components/dataviews-item-actions/index.tsx
+index abe63e27a15b3b..f849eca7c783f0 100644
+--- a/packages/dataviews/src/components/dataviews-item-actions/index.tsx
++++ b/packages/dataviews/src/components/dataviews-item-actions/index.tsx
+@@ -229,25 +229,27 @@ function CompactItemActions< Item >( {
+ 	);
+ 	return (
+ 		<>
+-			<Menu
+-				trigger={
+-					<Button
+-						size={ isSmall ? 'small' : 'compact' }
+-						icon={ moreVertical }
+-						label={ __( 'Actions' ) }
+-						accessibleWhenDisabled
+-						disabled={ ! actions.length }
+-						className="dataviews-all-actions-button"
+-					/>
+-				}
+-				placement="bottom-end"
+-			>
+-				<ActionsMenuGroup
+-					actions={ actions }
+-					item={ item }
+-					registry={ registry }
+-					setActiveModalAction={ setActiveModalAction }
++			<Menu placement="bottom-end">
++				<Menu.TriggerButton
++					render={
++						<Button
++							size={ isSmall ? 'small' : 'compact' }
++							icon={ moreVertical }
++							label={ __( 'Actions' ) }
++							accessibleWhenDisabled
++							disabled={ ! actions.length }
++							className="dataviews-all-actions-button"
++						/>
++					}
+ 				/>
++				<Menu.Popover>
++					<ActionsMenuGroup
++						actions={ actions }
++						item={ item }
++						registry={ registry }
++						setActiveModalAction={ setActiveModalAction }
++					/>
++				</Menu.Popover>
+ 			</Menu>
+ 			{ !! activeModalAction && (
+ 				<ActionModal
+diff --git a/packages/dataviews/src/components/dataviews-view-config/index.tsx b/packages/dataviews/src/components/dataviews-view-config/index.tsx
+index 3146064a41922b..bd16f3f9cdca3b 100644
+--- a/packages/dataviews/src/components/dataviews-view-config/index.tsx
++++ b/packages/dataviews/src/components/dataviews-view-config/index.tsx
+@@ -69,50 +69,57 @@ function ViewTypeMenu( {
+ 	}
+ 	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
+ 	return (
+-		<Menu
+-			trigger={
+-				<Button
+-					size="compact"
+-					icon={ activeView?.icon }
+-					label={ __( 'Layout' ) }
+-				/>
+-			}
+-		>
+-			{ availableLayouts.map( ( layout ) => {
+-				const config = VIEW_LAYOUTS.find( ( v ) => v.type === layout );
+-				if ( ! config ) {
+-					return null;
++		<Menu>
++			<Menu.TriggerButton
++				render={
++					<Button
++						size="compact"
++						icon={ activeView?.icon }
++						label={ __( 'Layout' ) }
++					/>
+ 				}
+-				return (
+-					<Menu.RadioItem
+-						key={ layout }
+-						value={ layout }
+-						name="view-actions-available-view"
+-						checked={ layout === view.type }
+-						hideOnClick
+-						onChange={ ( e: ChangeEvent< HTMLInputElement > ) => {
+-							switch ( e.target.value ) {
+-								case 'list':
+-								case 'grid':
+-								case 'table':
+-									const viewWithoutLayout = { ...view };
+-									if ( 'layout' in viewWithoutLayout ) {
+-										delete viewWithoutLayout.layout;
+-									}
+-									// @ts-expect-error
+-									return onChangeView( {
+-										...viewWithoutLayout,
+-										type: e.target.value,
+-										...defaultLayouts[ e.target.value ],
+-									} );
+-							}
+-							warning( 'Invalid dataview' );
+-						} }
+-					>
+-						<Menu.ItemLabel>{ config.label }</Menu.ItemLabel>
+-					</Menu.RadioItem>
+-				);
+-			} ) }
++			/>
++			<Menu.Popover>
++				{ availableLayouts.map( ( layout ) => {
++					const config = VIEW_LAYOUTS.find(
++						( v ) => v.type === layout
++					);
++					if ( ! config ) {
++						return null;
++					}
++					return (
++						<Menu.RadioItem
++							key={ layout }
++							value={ layout }
++							name="view-actions-available-view"
++							checked={ layout === view.type }
++							hideOnClick
++							onChange={ (
++								e: ChangeEvent< HTMLInputElement >
++							) => {
++								switch ( e.target.value ) {
++									case 'list':
++									case 'grid':
++									case 'table':
++										const viewWithoutLayout = { ...view };
++										if ( 'layout' in viewWithoutLayout ) {
++											delete viewWithoutLayout.layout;
++										}
++										// @ts-expect-error
++										return onChangeView( {
++											...viewWithoutLayout,
++											type: e.target.value,
++											...defaultLayouts[ e.target.value ],
++										} );
++								}
++								warning( 'Invalid dataview' );
++							} }
++						>
++							<Menu.ItemLabel>{ config.label }</Menu.ItemLabel>
++						</Menu.RadioItem>
++					);
++				} ) }
++			</Menu.Popover>
+ 		</Menu>
+ 	);
+ }
+diff --git a/packages/dataviews/src/dataviews-layouts/list/index.tsx b/packages/dataviews/src/dataviews-layouts/list/index.tsx
+index 960865164fd6c1..651834599f8acd 100644
+--- a/packages/dataviews/src/dataviews-layouts/list/index.tsx
++++ b/packages/dataviews/src/dataviews-layouts/list/index.tsx
+@@ -215,32 +215,36 @@ function ListItem< Item >( {
+ 			) }
+ 			{ ! hasOnlyOnePrimaryAction && (
+ 				<div role="gridcell">
+-					<Menu
+-						trigger={
+-							<Composite.Item
+-								id={ generateDropdownTriggerCompositeId(
+-									idPrefix
+-								) }
+-								render={
+-									<Button
+-										size="small"
+-										icon={ moreVertical }
+-										label={ __( 'Actions' ) }
+-										accessibleWhenDisabled
+-										disabled={ ! actions.length }
+-										onKeyDown={ onDropdownTriggerKeyDown }
+-									/>
+-								}
+-							/>
+-						}
+-						placement="bottom-end"
+-					>
+-						<ActionsMenuGroup
+-							actions={ eligibleActions }
+-							item={ item }
+-							registry={ registry }
+-							setActiveModalAction={ setActiveModalAction }
++					<Menu placement="bottom-end">
++						<Menu.TriggerButton
++							render={
++								<Composite.Item
++									id={ generateDropdownTriggerCompositeId(
++										idPrefix
++									) }
++									render={
++										<Button
++											size="small"
++											icon={ moreVertical }
++											label={ __( 'Actions' ) }
++											accessibleWhenDisabled
++											disabled={ ! actions.length }
++											onKeyDown={
++												onDropdownTriggerKeyDown
++											}
++										/>
++									}
++								/>
++							}
+ 						/>
++						<Menu.Popover>
++							<ActionsMenuGroup
++								actions={ eligibleActions }
++								item={ item }
++								registry={ registry }
++								setActiveModalAction={ setActiveModalAction }
++							/>
++						</Menu.Popover>
+ 					</Menu>
+ 					{ !! activeModalAction && (
+ 						<ActionModal
+diff --git a/packages/dataviews/src/dataviews-layouts/table/column-header-menu.tsx b/packages/dataviews/src/dataviews-layouts/table/column-header-menu.tsx
+index 763cf83b5c2f93..55cd8d867eff40 100644
+--- a/packages/dataviews/src/dataviews-layouts/table/column-header-menu.tsx
++++ b/packages/dataviews/src/dataviews-layouts/table/column-header-menu.tsx
+@@ -93,168 +93,171 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
+ 		! field.filterBy?.isPrimary;
+ 
+ 	return (
+-		<Menu
+-			align="start"
+-			trigger={
+-				<Button
+-					size="compact"
+-					className="dataviews-view-table-header-button"
+-					ref={ ref }
+-					variant="tertiary"
+-				>
+-					{ header }
+-					{ view.sort && isSorted && (
+-						<span aria-hidden="true">
+-							{ sortArrows[ view.sort.direction ] }
+-						</span>
+-					) }
+-				</Button>
+-			}
+-			style={ { minWidth: '240px' } }
+-		>
+-			<WithMenuSeparators>
+-				{ isSortable && (
+-					<Menu.Group>
+-						{ SORTING_DIRECTIONS.map(
+-							( direction: SortDirection ) => {
+-								const isChecked =
+-									view.sort &&
+-									isSorted &&
+-									view.sort.direction === direction;
++		<Menu>
++			<Menu.TriggerButton
++				render={
++					<Button
++						size="compact"
++						className="dataviews-view-table-header-button"
++						ref={ ref }
++						variant="tertiary"
++					/>
++				}
++			>
++				{ header }
++				{ view.sort && isSorted && (
++					<span aria-hidden="true">
++						{ sortArrows[ view.sort.direction ] }
++					</span>
++				) }
++			</Menu.TriggerButton>
++			<Menu.Popover style={ { minWidth: '240px' } }>
++				<WithMenuSeparators>
++					{ isSortable && (
++						<Menu.Group>
++							{ SORTING_DIRECTIONS.map(
++								( direction: SortDirection ) => {
++									const isChecked =
++										view.sort &&
++										isSorted &&
++										view.sort.direction === direction;
+ 
+-								const value = `${ fieldId }-${ direction }`;
++									const value = `${ fieldId }-${ direction }`;
+ 
+-								return (
+-									<Menu.RadioItem
+-										key={ value }
+-										// All sorting radio items share the same name, so that
+-										// selecting a sorting option automatically deselects the
+-										// previously selected one, even if it is displayed in
+-										// another submenu. The field and direction are passed via
+-										// the `value` prop.
+-										name="view-table-sorting"
+-										value={ value }
+-										checked={ isChecked }
+-										onChange={ () => {
+-											onChangeView( {
+-												...view,
+-												sort: {
+-													field: fieldId,
+-													direction,
+-												},
+-											} );
+-										} }
+-									>
+-										<Menu.ItemLabel>
+-											{ sortLabels[ direction ] }
+-										</Menu.ItemLabel>
+-									</Menu.RadioItem>
+-								);
+-							}
+-						) }
+-					</Menu.Group>
+-				) }
+-				{ canAddFilter && (
+-					<Menu.Group>
+-						<Menu.Item
+-							prefix={ <Icon icon={ funnel } /> }
+-							onClick={ () => {
+-								setOpenedFilter( fieldId );
+-								onChangeView( {
+-									...view,
+-									page: 1,
+-									filters: [
+-										...( view.filters || [] ),
+-										{
+-											field: fieldId,
+-											value: undefined,
+-											operator: operators[ 0 ],
+-										},
+-									],
+-								} );
+-							} }
+-						>
+-							<Menu.ItemLabel>
+-								{ __( 'Add filter' ) }
+-							</Menu.ItemLabel>
+-						</Menu.Item>
+-					</Menu.Group>
+-				) }
+-				{ ( canMove || isHidable ) && field && (
+-					<Menu.Group>
+-						{ canMove && (
++									return (
++										<Menu.RadioItem
++											key={ value }
++											// All sorting radio items share the same name, so that
++											// selecting a sorting option automatically deselects the
++											// previously selected one, even if it is displayed in
++											// another submenu. The field and direction are passed via
++											// the `value` prop.
++											name="view-table-sorting"
++											value={ value }
++											checked={ isChecked }
++											onChange={ () => {
++												onChangeView( {
++													...view,
++													sort: {
++														field: fieldId,
++														direction,
++													},
++												} );
++											} }
++										>
++											<Menu.ItemLabel>
++												{ sortLabels[ direction ] }
++											</Menu.ItemLabel>
++										</Menu.RadioItem>
++									);
++								}
++							) }
++						</Menu.Group>
++					) }
++					{ canAddFilter && (
++						<Menu.Group>
+ 							<Menu.Item
+-								prefix={ <Icon icon={ arrowLeft } /> }
+-								disabled={ index < 1 }
++								prefix={ <Icon icon={ funnel } /> }
+ 								onClick={ () => {
++									setOpenedFilter( fieldId );
+ 									onChangeView( {
+ 										...view,
+-										fields: [
+-											...( visibleFieldIds.slice(
+-												0,
+-												index - 1
+-											) ?? [] ),
+-											fieldId,
+-											visibleFieldIds[ index - 1 ],
+-											...visibleFieldIds.slice(
+-												index + 1
+-											),
++										page: 1,
++										filters: [
++											...( view.filters || [] ),
++											{
++												field: fieldId,
++												value: undefined,
++												operator: operators[ 0 ],
++											},
+ 										],
+ 									} );
+ 								} }
+ 							>
+ 								<Menu.ItemLabel>
+-									{ __( 'Move left' ) }
++									{ __( 'Add filter' ) }
+ 								</Menu.ItemLabel>
+ 							</Menu.Item>
+-						) }
+-						{ canMove && (
+-							<Menu.Item
+-								prefix={ <Icon icon={ arrowRight } /> }
+-								disabled={ index >= visibleFieldIds.length - 1 }
+-								onClick={ () => {
+-									onChangeView( {
+-										...view,
+-										fields: [
+-											...( visibleFieldIds.slice(
+-												0,
+-												index
+-											) ?? [] ),
+-											visibleFieldIds[ index + 1 ],
+-											fieldId,
+-											...visibleFieldIds.slice(
+-												index + 2
++						</Menu.Group>
++					) }
++					{ ( canMove || isHidable ) && field && (
++						<Menu.Group>
++							{ canMove && (
++								<Menu.Item
++									prefix={ <Icon icon={ arrowLeft } /> }
++									disabled={ index < 1 }
++									onClick={ () => {
++										onChangeView( {
++											...view,
++											fields: [
++												...( visibleFieldIds.slice(
++													0,
++													index - 1
++												) ?? [] ),
++												fieldId,
++												visibleFieldIds[ index - 1 ],
++												...visibleFieldIds.slice(
++													index + 1
++												),
++											],
++										} );
++									} }
++								>
++									<Menu.ItemLabel>
++										{ __( 'Move left' ) }
++									</Menu.ItemLabel>
++								</Menu.Item>
++							) }
++							{ canMove && (
++								<Menu.Item
++									prefix={ <Icon icon={ arrowRight } /> }
++									disabled={
++										index >= visibleFieldIds.length - 1
++									}
++									onClick={ () => {
++										onChangeView( {
++											...view,
++											fields: [
++												...( visibleFieldIds.slice(
++													0,
++													index
++												) ?? [] ),
++												visibleFieldIds[ index + 1 ],
++												fieldId,
++												...visibleFieldIds.slice(
++													index + 2
++												),
++											],
++										} );
++									} }
++								>
++									<Menu.ItemLabel>
++										{ __( 'Move right' ) }
++									</Menu.ItemLabel>
++								</Menu.Item>
++							) }
++							{ isHidable && field && (
++								<Menu.Item
++									prefix={ <Icon icon={ unseen } /> }
++									onClick={ () => {
++										onHide( field );
++										onChangeView( {
++											...view,
++											fields: visibleFieldIds.filter(
++												( id ) => id !== fieldId
+ 											),
+-										],
+-									} );
+-								} }
+-							>
+-								<Menu.ItemLabel>
+-									{ __( 'Move right' ) }
+-								</Menu.ItemLabel>
+-							</Menu.Item>
+-						) }
+-						{ isHidable && field && (
+-							<Menu.Item
+-								prefix={ <Icon icon={ unseen } /> }
+-								onClick={ () => {
+-									onHide( field );
+-									onChangeView( {
+-										...view,
+-										fields: visibleFieldIds.filter(
+-											( id ) => id !== fieldId
+-										),
+-									} );
+-								} }
+-							>
+-								<Menu.ItemLabel>
+-									{ __( 'Hide column' ) }
+-								</Menu.ItemLabel>
+-							</Menu.Item>
+-						) }
+-					</Menu.Group>
+-				) }
+-			</WithMenuSeparators>
++										} );
++									} }
++								>
++									<Menu.ItemLabel>
++										{ __( 'Hide column' ) }
++									</Menu.ItemLabel>
++								</Menu.Item>
++							) }
++						</Menu.Group>
++					) }
++				</WithMenuSeparators>
++			</Menu.Popover>
+ 		</Menu>
+ 	);
+ } );
+diff --git a/packages/edit-site/src/components/global-styles/font-sizes/font-size.js b/packages/edit-site/src/components/global-styles/font-sizes/font-size.js
+index 25dcc69185cae6..cca4a26e1b7368 100644
+--- a/packages/edit-site/src/components/global-styles/font-sizes/font-size.js
++++ b/packages/edit-site/src/components/global-styles/font-sizes/font-size.js
+@@ -166,25 +166,34 @@ function FontSize() {
+ 								marginBottom={ 0 }
+ 								paddingX={ 4 }
+ 							>
+-								<Menu
+-									trigger={
+-										<Button
+-											size="small"
+-											icon={ moreVertical }
+-											label={ __( 'Font size options' ) }
+-										/>
+-									}
+-								>
+-									<Menu.Item onClick={ toggleRenameDialog }>
+-										<Menu.ItemLabel>
+-											{ __( 'Rename' ) }
+-										</Menu.ItemLabel>
+-									</Menu.Item>
+-									<Menu.Item onClick={ toggleDeleteConfirm }>
+-										<Menu.ItemLabel>
+-											{ __( 'Delete' ) }
+-										</Menu.ItemLabel>
+-									</Menu.Item>
++								<Menu>
++									<Menu.TriggerButton
++										render={
++											<Button
++												size="small"
++												icon={ moreVertical }
++												label={ __(
++													'Font size options'
++												) }
++											/>
++										}
++									/>
++									<Menu.Popover>
++										<Menu.Item
++											onClick={ toggleRenameDialog }
++										>
++											<Menu.ItemLabel>
++												{ __( 'Rename' ) }
++											</Menu.ItemLabel>
++										</Menu.Item>
++										<Menu.Item
++											onClick={ toggleDeleteConfirm }
++										>
++											<Menu.ItemLabel>
++												{ __( 'Delete' ) }
++											</Menu.ItemLabel>
++										</Menu.Item>
++									</Menu.Popover>
+ 								</Menu>
+ 							</Spacer>
+ 						</FlexItem>
+diff --git a/packages/edit-site/src/components/global-styles/font-sizes/font-sizes.js b/packages/edit-site/src/components/global-styles/font-sizes/font-sizes.js
+index 7498dd7c78fb30..5b759d1e0468d8 100644
+--- a/packages/edit-site/src/components/global-styles/font-sizes/font-sizes.js
++++ b/packages/edit-site/src/components/global-styles/font-sizes/font-sizes.js
+@@ -26,14 +26,15 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { unlock } from '../../../lock-unlock';
+-const { Menu } = unlock( componentsPrivateApis );
+-const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+ import Subtitle from '../subtitle';
+ import { NavigationButtonAsItem } from '../navigation-button';
+ import { getNewIndexFromPresets } from '../utils';
+ import ScreenHeader from '../header';
+ import ConfirmResetFontSizesDialog from './confirm-reset-font-sizes-dialog';
+ 
++const { Menu } = unlock( componentsPrivateApis );
++const { useGlobalSetting } = unlock( blockEditorPrivateApis );
++
+ function FontSizeGroup( {
+ 	label,
+ 	origin,
+@@ -80,24 +81,31 @@ function FontSizeGroup( {
+ 							/>
+ 						) }
+ 						{ !! handleResetFontSizes && (
+-							<Menu
+-								trigger={
+-									<Button
+-										size="small"
+-										icon={ moreVertical }
+-										label={ __(
+-											'Font size presets options'
+-										) }
+-									/>
+-								}
+-							>
+-								<Menu.Item onClick={ toggleResetDialog }>
+-									<Menu.ItemLabel>
+-										{ origin === 'custom'
+-											? __( 'Remove font size presets' )
+-											: __( 'Reset font size presets' ) }
+-									</Menu.ItemLabel>
+-								</Menu.Item>
++							<Menu>
++								<Menu.TriggerButton
++									render={
++										<Button
++											size="small"
++											icon={ moreVertical }
++											label={ __(
++												'Font size presets options'
++											) }
++										/>
++									}
++								/>
++								<Menu.Popover>
++									<Menu.Item onClick={ toggleResetDialog }>
++										<Menu.ItemLabel>
++											{ origin === 'custom'
++												? __(
++														'Remove font size presets'
++												  )
++												: __(
++														'Reset font size presets'
++												  ) }
++										</Menu.ItemLabel>
++									</Menu.Item>
++								</Menu.Popover>
+ 							</Menu>
+ 						) }
+ 					</FlexItem>
+diff --git a/packages/edit-site/src/components/global-styles/shadows-edit-panel.js b/packages/edit-site/src/components/global-styles/shadows-edit-panel.js
+index 0de1f2c99362ca..9fd7959a6c09cb 100644
+--- a/packages/edit-site/src/components/global-styles/shadows-edit-panel.js
++++ b/packages/edit-site/src/components/global-styles/shadows-edit-panel.js
+@@ -163,33 +163,38 @@ export default function ShadowsEditPanel() {
+ 				<ScreenHeader title={ selectedShadow.name } />
+ 				<FlexItem>
+ 					<Spacer marginTop={ 2 } marginBottom={ 0 } paddingX={ 4 }>
+-						<Menu
+-							trigger={
+-								<Button
+-									size="small"
+-									icon={ moreVertical }
+-									label={ __( 'Menu' ) }
+-								/>
+-							}
+-						>
+-							{ ( category === 'custom'
+-								? customShadowMenuItems
+-								: presetShadowMenuItems
+-							).map( ( item ) => (
+-								<Menu.Item
+-									key={ item.action }
+-									onClick={ () => onMenuClick( item.action ) }
+-									disabled={
+-										item.action === 'reset' &&
+-										selectedShadow.shadow ===
+-											baseSelectedShadow.shadow
+-									}
+-								>
+-									<Menu.ItemLabel>
+-										{ item.label }
+-									</Menu.ItemLabel>
+-								</Menu.Item>
+-							) ) }
++						<Menu>
++							<Menu.TriggerButton
++								render={
++									<Button
++										size="small"
++										icon={ moreVertical }
++										label={ __( 'Menu' ) }
++									/>
++								}
++							/>
++							<Menu.Popover>
++								{ ( category === 'custom'
++									? customShadowMenuItems
++									: presetShadowMenuItems
++								).map( ( item ) => (
++									<Menu.Item
++										key={ item.action }
++										onClick={ () =>
++											onMenuClick( item.action )
++										}
++										disabled={
++											item.action === 'reset' &&
++											selectedShadow.shadow ===
++												baseSelectedShadow.shadow
++										}
++									>
++										<Menu.ItemLabel>
++											{ item.label }
++										</Menu.ItemLabel>
++									</Menu.Item>
++								) ) }
++							</Menu.Popover>
+ 						</Menu>
+ 					</Spacer>
+ 				</FlexItem>
+diff --git a/packages/editor/src/components/post-actions/index.js b/packages/editor/src/components/post-actions/index.js
+index 4b541d52d429cc..d6adf6c0721667 100644
+--- a/packages/editor/src/components/post-actions/index.js
++++ b/packages/editor/src/components/post-actions/index.js
+@@ -74,24 +74,26 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
+ 
+ 	return (
+ 		<>
+-			<Menu
+-				trigger={
+-					<Button
+-						size="small"
+-						icon={ moreVertical }
+-						label={ __( 'Actions' ) }
+-						disabled={ ! actions.length }
+-						accessibleWhenDisabled
+-						className="editor-all-actions-button"
+-					/>
+-				}
+-				placement="bottom-end"
+-			>
+-				<ActionsDropdownMenuGroup
+-					actions={ actions }
+-					items={ itemsWithPermissions }
+-					setActiveModalAction={ setActiveModalAction }
++			<Menu placement="bottom-end">
++				<Menu.TriggerButton
++					render={
++						<Button
++							size="small"
++							icon={ moreVertical }
++							label={ __( 'Actions' ) }
++							disabled={ ! actions.length }
++							accessibleWhenDisabled
++							className="editor-all-actions-button"
++						/>
++					}
+ 				/>
++				<Menu.Popover>
++					<ActionsDropdownMenuGroup
++						actions={ actions }
++						items={ itemsWithPermissions }
++						setActiveModalAction={ setActiveModalAction }
++					/>
++				</Menu.Popover>
+ 			</Menu>
+ 			{ !! activeModalAction && (
+ 				<ActionModal

@@ -1,0 +1,66 @@
+diff --git a/packages/block-library/src/spacer/edit.js b/packages/block-library/src/spacer/edit.js
+index 9a457c6e8ad173..31e35d5b09c1d5 100644
+--- a/packages/block-library/src/spacer/edit.js
++++ b/packages/block-library/src/spacer/edit.js
+@@ -53,7 +53,6 @@ const SpacerEdit = ( {
+ 					bottomLeft: false,
+ 					topLeft: false,
+ 				} }
+-				isSelected={ isSelected }
+ 				onResizeStart={ onResizeStart }
+ 				onResizeStop={ ( event, direction, elt, delta ) => {
+ 					onResizeStop();
+@@ -63,6 +62,7 @@ const SpacerEdit = ( {
+ 					);
+ 					updateHeight( spacerHeight );
+ 				} }
++				showHandle={ isSelected }
+ 			/>
+ 			<InspectorControls>
+ 				<PanelBody title={ __( 'Spacer settings' ) }>
+diff --git a/packages/block-library/src/spacer/editor.scss b/packages/block-library/src/spacer/editor.scss
+index 271aa968a36b56..2ad8039709960b 100644
+--- a/packages/block-library/src/spacer/editor.scss
++++ b/packages/block-library/src/spacer/editor.scss
+@@ -1,4 +1,4 @@
+-.block-library-spacer__resize-container.is-selected {
++.block-library-spacer__resize-container.has-show-handle {
+ 	background: $light-gray-200;
+ 
+ 	.is-dark-theme & {
+diff --git a/packages/components/src/resizable-box/index.native.js b/packages/components/src/resizable-box/index.native.js
+index 8c152613064f80..9de483e20c5096 100644
+--- a/packages/components/src/resizable-box/index.native.js
++++ b/packages/components/src/resizable-box/index.native.js
+@@ -12,7 +12,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
+ import styles from './style.scss';
+ 
+ function ResizableBox( props ) {
+-	const { size, isSelected, getStylesFromColorScheme } = props;
++	const { size, showHandle, getStylesFromColorScheme } = props;
+ 	const { height } = size;
+ 	const defaultStyle = getStylesFromColorScheme(
+ 		styles.staticSpacer,
+@@ -22,7 +22,7 @@ function ResizableBox( props ) {
+ 		<View
+ 			style={ [
+ 				defaultStyle,
+-				isSelected && styles.selectedSpacer,
++				showHandle && styles.selectedSpacer,
+ 				{ height },
+ 			] }
+ 		></View>
+diff --git a/packages/components/src/resizable-box/style.scss b/packages/components/src/resizable-box/style.scss
+index d993048cc399d6..51231b060fc123 100644
+--- a/packages/components/src/resizable-box/style.scss
++++ b/packages/components/src/resizable-box/style.scss
+@@ -8,9 +8,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
+ 	width: $resize-handler-container-size;
+ 	height: $resize-handler-container-size;
+ 
+-	// Show the resize handle when selected OR
+ 	// Show the resize handle if set in props
+-	.components-resizable-box__container.is-selected &,
+ 	.components-resizable-box__container.has-show-handle & {
+ 		display: block;
+ 	}

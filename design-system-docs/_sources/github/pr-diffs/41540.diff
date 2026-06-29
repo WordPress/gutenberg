@@ -1,0 +1,182 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 28212ff5cae664..5fc095dfcada75 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Internal
+ 
++-   `Spinner`: Convert to TypeScript and update storybook ([#41540](https://github.com/WordPress/gutenberg/pull/41540/)).
+ -   `InputControl`: Add tests and update to use `@testing-library/user-event` ([#41421](https://github.com/WordPress/gutenberg/pull/41421)).
+ 
+ ## 19.13.0 (2022-06-15)
+diff --git a/packages/components/src/spinner/index.js b/packages/components/src/spinner/index.tsx
+similarity index 51%
+rename from packages/components/src/spinner/index.js
+rename to packages/components/src/spinner/index.tsx
+index e8612a076affc4..1748ba658324f5 100644
+--- a/packages/components/src/spinner/index.js
++++ b/packages/components/src/spinner/index.tsx
+@@ -2,24 +2,23 @@
+  * External dependencies
+  */
+ import classNames from 'classnames';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { StyledSpinner, SpinnerTrack, SpinnerIndicator } from './styles';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+ /**
+- * @typedef OwnProps
+- *
+- * @property {string} [className] Class name
++ * WordPress dependencies
+  */
+-/** @typedef {import('react').ComponentPropsWithoutRef<'svg'> & OwnProps} Props */
++import { forwardRef } from '@wordpress/element';
+ 
+-/**
+- * @param {Props} props
+- * @return {JSX.Element} Element
+- */
+-export default function Spinner( { className, ...props } ) {
++export function UnforwardedSpinner(
++	{ className, ...props }: WordPressComponentProps< {}, 'svg', false >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	return (
+ 		<StyledSpinner
+ 			className={ classNames( 'components-spinner', className ) }
+@@ -28,6 +27,7 @@ export default function Spinner( { className, ...props } ) {
+ 			role="presentation"
+ 			focusable="false"
+ 			{ ...props }
++			ref={ forwardedRef }
+ 		>
+ 			{ /* Gray circular background */ }
+ 			<SpinnerTrack
+@@ -45,3 +45,17 @@ export default function Spinner( { className, ...props } ) {
+ 		</StyledSpinner>
+ 	);
+ }
++/**
++ * `Spinner` is a component used to notify users that their action is being processed.
++ *
++ * @example
++ * ```js
++ *   import { Spinner } from '@wordpress/components';
++ *
++ *   function Example() {
++ *     return <Spinner />;
++ *   }
++ * ```
++ */
++export const Spinner = forwardRef( UnforwardedSpinner );
++export default Spinner;
+diff --git a/packages/components/src/spinner/stories/index.js b/packages/components/src/spinner/stories/index.js
+deleted file mode 100644
+index 8fd0716d2ade08..00000000000000
+--- a/packages/components/src/spinner/stories/index.js
++++ /dev/null
+@@ -1,43 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useCx } from '../../utils';
+-import { space } from '../../ui/utils/space';
+-import Spinner from '../';
+-
+-const sizes = {
+-	default: undefined,
+-	medium: space( 20 ),
+-	large: space( 40 ),
+-};
+-
+-export default {
+-	title: 'Components/Spinner',
+-	component: Spinner,
+-	argTypes: {
+-		size: {
+-			options: Object.keys( sizes ),
+-			mapping: sizes,
+-			control: { type: 'select' },
+-		},
+-	},
+-};
+-
+-const Template = ( { size } ) => {
+-	const cx = useCx();
+-	const spinnerClassname = cx( css`
+-		width: ${ size };
+-		height: ${ size };
+-	` );
+-	return <Spinner className={ spinnerClassname } />;
+-};
+-
+-export const Default = Template.bind( {} );
+-Default.args = {
+-	size: 'default',
+-};
+diff --git a/packages/components/src/spinner/stories/index.tsx b/packages/components/src/spinner/stories/index.tsx
+new file mode 100644
+index 00000000000000..7afaa35d3871fe
+--- /dev/null
++++ b/packages/components/src/spinner/stories/index.tsx
+@@ -0,0 +1,32 @@
++/**
++ * External dependencies
++ */
++import type { ComponentStory, ComponentMeta } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import Spinner from '../';
++import { space } from '../../ui/utils/space';
++
++const meta: ComponentMeta< typeof Spinner > = {
++	title: 'Components/Spinner',
++	component: Spinner,
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof Spinner > = ( args ) => {
++	return <Spinner { ...args } />;
++};
++
++export const Default: ComponentStory< typeof Spinner > = Template.bind( {} );
++
++// The Spinner can be resized to any size, but the stroke width will remain unchanged.
++export const CustomSize: ComponentStory< typeof Spinner > = Template.bind( {} );
++CustomSize.args = { style: { width: space( 20 ), height: space( 20 ) } };
+diff --git a/packages/components/src/spinner/styles.js b/packages/components/src/spinner/styles.ts
+similarity index 100%
+rename from packages/components/src/spinner/styles.js
+rename to packages/components/src/spinner/styles.ts
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index 7bd560d187275c..894133a7b6fbee 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -184,7 +184,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
+   <div
+     className="editor-post-publish-panel__content"
+   >
+-    <Spinner />
++    <ForwardRef(UnforwardedSpinner) />
+   </div>
+   <div
+     className="editor-post-publish-panel__footer"

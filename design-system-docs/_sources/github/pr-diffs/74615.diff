@@ -1,0 +1,201 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 23a62fdd5e4f57..525dbce2da40c0 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -15,3 +15,4 @@
+ -   Add `Icon` component ([#74311](https://github.com/WordPress/gutenberg/pull/74311)).
+ -   Add `Button` component ([#74415](https://github.com/WordPress/gutenberg/pull/74415), [#74416](https://github.com/WordPress/gutenberg/pull/74416), [#74470](https://github.com/WordPress/gutenberg/pull/74470)).
+ -   Add `InputLayout` primitive ([#74313](https://github.com/WordPress/gutenberg/pull/74313)).
++-   Add `Input` primitive ([#74615](https://github.com/WordPress/gutenberg/pull/74615)).
+diff --git a/packages/ui/src/form/primitives/index.ts b/packages/ui/src/form/primitives/index.ts
+index 94bd05d3e9a651..36932e88a872a9 100644
+--- a/packages/ui/src/form/primitives/index.ts
++++ b/packages/ui/src/form/primitives/index.ts
+@@ -1,3 +1,4 @@
+ export * as Field from './field';
+ export * as Fieldset from './fieldset';
++export { Input } from './input';
+ export { InputLayout } from './input-layout';
+diff --git a/packages/ui/src/form/primitives/input/index.ts b/packages/ui/src/form/primitives/input/index.ts
+new file mode 100644
+index 00000000000000..f376f8cdbee941
+--- /dev/null
++++ b/packages/ui/src/form/primitives/input/index.ts
+@@ -0,0 +1 @@
++export { Input } from './input';
+diff --git a/packages/ui/src/form/primitives/input/input.tsx b/packages/ui/src/form/primitives/input/input.tsx
+new file mode 100644
+index 00000000000000..00711988bcf62f
+--- /dev/null
++++ b/packages/ui/src/form/primitives/input/input.tsx
+@@ -0,0 +1,28 @@
++import { Input as _Input } from '@base-ui/react/input';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import focusStyles from '../../../utils/css/focus.module.css';
++import styles from './style.module.css';
++import type { InputProps } from './types';
++import { InputLayout } from '../input-layout';
++
++export const Input = forwardRef< HTMLInputElement, InputProps >( function Input(
++	{ className, size = 'default', prefix, suffix, style, ...restProps },
++	ref
++) {
++	return (
++		<InputLayout
++			className={ clsx(
++				focusStyles[ 'outset-ring--focus-within' ],
++				className
++			) }
++			style={ style }
++			size={ size }
++			visuallyDisabled={ restProps.disabled }
++			prefix={ prefix }
++			suffix={ suffix }
++		>
++			<_Input ref={ ref } className={ styles.input } { ...restProps } />
++		</InputLayout>
++	);
++} );
+diff --git a/packages/ui/src/form/primitives/input/stories/index.story.tsx b/packages/ui/src/form/primitives/input/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..0bae94c4286def
+--- /dev/null
++++ b/packages/ui/src/form/primitives/input/stories/index.story.tsx
+@@ -0,0 +1,40 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { Input, InputLayout } from '../../../..';
++
++const meta: Meta< typeof Input > = {
++	title: 'Design System/Components/Form/Primitives/Input',
++	component: Input,
++	argTypes: {
++		defaultValue: { control: false },
++		onValueChange: { action: 'onValueChange' },
++		value: { control: false },
++		type: { control: 'text' },
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof Input >;
++
++export const Default: Story = {
++	args: {
++		placeholder: 'Placeholder',
++	},
++};
++
++/**
++ * The `InputLayout.Slot` component can be used to add standard padding in
++ * the `prefix` or `suffix` slot.
++ */
++export const WithPrefix: Story = {
++	args: {
++		placeholder: 'username',
++		prefix: <InputLayout.Slot>@</InputLayout.Slot>,
++	},
++};
++
++export const Disabled: Story = {
++	args: {
++		...Default.args,
++		disabled: true,
++	},
++};
+diff --git a/packages/ui/src/form/primitives/input/style.module.css b/packages/ui/src/form/primitives/input/style.module.css
+new file mode 100644
+index 00000000000000..8bda471799ee72
+--- /dev/null
++++ b/packages/ui/src/form/primitives/input/style.module.css
+@@ -0,0 +1,34 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.input {
++		padding-block: var(--wp-ui-input-padding-block, 0);
++		padding-inline: var(--wp-ui-input-layout-padding-inline, 0);
++		width: 100%;
++		background: transparent;
++		border: none;
++		outline: none;
++		color: var(--wpds-color-fg-interactive-neutral);
++		font-family: inherit;
++		font-size: inherit;
++		line-height: inherit;
++
++		&::placeholder {
++			color: var(--wpds-color-fg-interactive-neutral-disabled);
++		}
++
++		&:disabled,
++		&[aria-disabled="true"] {
++			color: var(--wpds-color-fg-interactive-neutral-disabled);
++
++			@media ( forced-colors: active ) {
++				color: GrayText;
++			}
++		}
++
++		&[type="email"],
++		&[type="url"] {
++			direction: ltr; /* maintain LTR in RTL languages */
++		}
++	}
++}
+diff --git a/packages/ui/src/form/primitives/input/test/index.test.tsx b/packages/ui/src/form/primitives/input/test/index.test.tsx
+new file mode 100644
+index 00000000000000..5fb12f5c84c28d
+--- /dev/null
++++ b/packages/ui/src/form/primitives/input/test/index.test.tsx
+@@ -0,0 +1,13 @@
++import { render } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import { Input } from '../index';
++
++describe( 'Input', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLInputElement >();
++
++		render( <Input ref={ ref } /> );
++
++		expect( ref.current ).toBeInstanceOf( HTMLInputElement );
++	} );
++} );
+diff --git a/packages/ui/src/form/primitives/input/types.ts b/packages/ui/src/form/primitives/input/types.ts
+new file mode 100644
+index 00000000000000..20502d5d46428a
+--- /dev/null
++++ b/packages/ui/src/form/primitives/input/types.ts
+@@ -0,0 +1,31 @@
++import type { Input } from '@base-ui/react/input';
++import type { InputLayoutProps } from '../input-layout/types';
++import type { ComponentProps } from '../../../utils/types';
++
++export type InputProps = Omit<
++	ComponentProps< typeof Input >,
++	'value' | 'defaultValue' | 'type' | 'disabled' | 'prefix' | 'size'
++> &
++	Pick< InputLayoutProps, 'prefix' | 'suffix' > & {
++		/**
++		 * Whether the field is disabled.
++		 */
++		disabled?: boolean;
++	} & {
++		/**
++		 * The type of the input element.
++		 */
++		type?: Input.Props[ 'type' ];
++		/**
++		 * The default value to use in uncontrolled mode.
++		 */
++		defaultValue?: Input.Props[ 'defaultValue' ];
++		/**
++		 * The value to use in controlled mode.
++		 */
++		value?: Input.Props[ 'value' ];
++		/**
++		 * The size of the field.
++		 */
++		size?: Exclude< InputLayoutProps[ 'size' ], 'small' >;
++	};

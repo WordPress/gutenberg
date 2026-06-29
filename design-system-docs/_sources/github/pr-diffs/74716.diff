@@ -1,0 +1,1801 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 1f510c80fcfbe8..fe71c7ac4c8a7d 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -431,6 +431,19 @@ module.exports = {
+ 			plugins: [ 'ssr-friendly' ],
+ 			extends: [ 'plugin:ssr-friendly/recommended' ],
+ 		},
++		{
++			files: [
++				'packages/block-editor/src/**',
++				'packages/components/src/**',
++				'packages/dataviews/src/**',
++				'packages/ui/src/**',
++			],
++			excludedFiles: [ '**/@(test|stories)/**', '*.native.*' ],
++			rules: {
++				// Enforce display names for easier debugging and better storybook integration.
++				'react/display-name': 'error',
++			},
++		},
+ 		{
+ 			files: [ 'packages/components/src/**', 'packages/ui/src/**' ],
+ 			rules: {
+diff --git a/bin/api-docs/gen-components-docs/index.mjs b/bin/api-docs/gen-components-docs/index.mjs
+index 30888acf851cab..7dba60d087bbbc 100644
+--- a/bin/api-docs/gen-components-docs/index.mjs
++++ b/bin/api-docs/gen-components-docs/index.mjs
+@@ -15,7 +15,10 @@ import { getTagsFromStorybook } from './get-tags-from-storybook.mjs';
+ 
+ const MANIFEST_GLOB = 'packages/components/src/**/docs-manifest.json';
+ 
+-// For consistency, options should generally match the options used in Storybook.
++/**
++ * For consistency, options should generally match the options used in Storybook.
++ * @type {import('react-docgen-typescript').ParserOptions}
++ */
+ const OPTIONS = {
+ 	shouldExtractLiteralValuesFromEnum: true,
+ 	shouldRemoveUndefinedFromOptional: true,
+diff --git a/package-lock.json b/package-lock.json
+index 78aea80e63174d..51ca1f8da54a81 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -55520,7 +55520,47 @@
+ 				"@storybook/icons": "^2.0.1",
+ 				"@storybook/react-vite": "^10.1.11",
+ 				"storybook": "^10.1.11",
+-				"storybook-addon-tag-badges": "^3.0.4"
++				"storybook-addon-tag-badges": "^3.0.4",
++				"terser": "^5.37.0"
++			}
++		},
++		"storybook/node_modules/acorn": {
++			"version": "8.15.0",
++			"resolved": "https://registry.npmjs.org/acorn/-/acorn-8.15.0.tgz",
++			"integrity": "sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg==",
++			"dev": true,
++			"license": "MIT",
++			"bin": {
++				"acorn": "bin/acorn"
++			},
++			"engines": {
++				"node": ">=0.4.0"
++			}
++		},
++		"storybook/node_modules/commander": {
++			"version": "2.20.3",
++			"resolved": "https://registry.npmjs.org/commander/-/commander-2.20.3.tgz",
++			"integrity": "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==",
++			"dev": true,
++			"license": "MIT"
++		},
++		"storybook/node_modules/terser": {
++			"version": "5.46.0",
++			"resolved": "https://registry.npmjs.org/terser/-/terser-5.46.0.tgz",
++			"integrity": "sha512-jTwoImyr/QbOWFFso3YoU3ik0jBBDJ6JTOQiy/J2YxVJdZCc+5u7skhNwiOR3FQIygFqVUPHl7qbbxtjW2K3Qg==",
++			"dev": true,
++			"license": "BSD-2-Clause",
++			"dependencies": {
++				"@jridgewell/source-map": "^0.3.3",
++				"acorn": "^8.15.0",
++				"commander": "^2.20.0",
++				"source-map-support": "~0.5.20"
++			},
++			"bin": {
++				"terser": "bin/terser"
++			},
++			"engines": {
++				"node": ">=10"
+ 			}
+ 		}
+ 	}
+diff --git a/packages/block-editor/src/components/block-controls/index.js b/packages/block-editor/src/components/block-controls/index.js
+index b47a142825f29b..80dbf69582eefe 100644
+--- a/packages/block-editor/src/components/block-controls/index.js
++++ b/packages/block-editor/src/components/block-controls/index.js
+@@ -12,7 +12,7 @@ BlockControls.Slot = BlockControlsSlot;
+ export const BlockFormatControls = ( props ) => {
+ 	return <BlockControlsFill group="inline" { ...props } />;
+ };
+-BlockFormatControls.Slot = ( props ) => {
++BlockFormatControls.Slot = function Slot( props ) {
+ 	return <BlockControlsSlot group="inline" { ...props } />;
+ };
+ 
+diff --git a/packages/block-editor/src/components/color-palette/with-color-context.js b/packages/block-editor/src/components/color-palette/with-color-context.js
+index 38c90531edaac1..98c61ec3f71861 100644
+--- a/packages/block-editor/src/components/color-palette/with-color-context.js
++++ b/packages/block-editor/src/components/color-palette/with-color-context.js
+@@ -9,7 +9,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
+ import { useSettings } from '../use-settings';
+ 
+ export default createHigherOrderComponent( ( WrappedComponent ) => {
+-	return ( props ) => {
++	return function WithColorContext( props ) {
+ 		// Get the default colors, theme colors, and custom colors
+ 		const [
+ 			defaultColors,
+diff --git a/packages/block-editor/src/components/color-style-selector/index.js b/packages/block-editor/src/components/color-style-selector/index.js
+index 4a76a1da8369e2..17988af5914c1b 100644
+--- a/packages/block-editor/src/components/color-style-selector/index.js
++++ b/packages/block-editor/src/components/color-style-selector/index.js
+@@ -49,9 +49,8 @@ const ColorSelectorIcon = ( { style, className } ) => {
+  *
+  * @return {*} React toggle button component.
+  */
+-const renderToggleComponent =
+-	( { TextColor, BackgroundColor } ) =>
+-	( { onToggle, isOpen } ) => {
++const renderToggleComponent = ( { TextColor, BackgroundColor } ) =>
++	function ToggleComponent( { onToggle, isOpen } ) {
+ 		const openOnArrowDown = ( event ) => {
+ 			if ( ! isOpen && event.keyCode === DOWN ) {
+ 				event.preventDefault();
+diff --git a/packages/block-editor/src/components/colors-gradients/dropdown.js b/packages/block-editor/src/components/colors-gradients/dropdown.js
+index e667927bee7601..744c071bd00242 100644
+--- a/packages/block-editor/src/components/colors-gradients/dropdown.js
++++ b/packages/block-editor/src/components/colors-gradients/dropdown.js
+@@ -80,9 +80,8 @@ const LabeledColorIndicator = ( { colorValue, label } ) => (
+ // Renders a color dropdown's toggle as an `Item` if it is within an `ItemGroup`
+ // or as a `Button` if it isn't e.g. the controls are being rendered in
+ // a `ToolsPanel`.
+-const renderToggle =
+-	( settings ) =>
+-	( { onToggle, isOpen } ) => {
++const renderToggle = ( settings ) =>
++	function Toggle( { onToggle, isOpen } ) {
+ 		const {
+ 			clearable,
+ 			colorValue,
+diff --git a/packages/block-editor/src/components/colors/with-colors.js b/packages/block-editor/src/components/colors/with-colors.js
+index 680521fb6519c3..e2298e08b33d3a 100644
+--- a/packages/block-editor/src/components/colors/with-colors.js
++++ b/packages/block-editor/src/components/colors/with-colors.js
+@@ -39,9 +39,10 @@ const upperFirst = ( [ firstLetter, ...rest ] ) =>
+  */
+ const withCustomColorPalette = ( colorsArray ) =>
+ 	createHigherOrderComponent(
+-		( WrappedComponent ) => ( props ) => (
+-			<WrappedComponent { ...props } colors={ colorsArray } />
+-		),
++		( WrappedComponent ) =>
++			function WithCustomColorPalette( props ) {
++				return <WrappedComponent { ...props } colors={ colorsArray } />;
++			},
+ 		'withCustomColorPalette'
+ 	);
+ 
+@@ -53,22 +54,24 @@ const withCustomColorPalette = ( colorsArray ) =>
+  */
+ const withEditorColorPalette = () =>
+ 	createHigherOrderComponent(
+-		( WrappedComponent ) => ( props ) => {
+-			const [ userPalette, themePalette, defaultPalette ] = useSettings(
+-				'color.palette.custom',
+-				'color.palette.theme',
+-				'color.palette.default'
+-			);
+-			const allColors = useMemo(
+-				() => [
+-					...( userPalette || [] ),
+-					...( themePalette || [] ),
+-					...( defaultPalette || [] ),
+-				],
+-				[ userPalette, themePalette, defaultPalette ]
+-			);
+-			return <WrappedComponent { ...props } colors={ allColors } />;
+-		},
++		( WrappedComponent ) =>
++			function WithEditorColorPalette( props ) {
++				const [ userPalette, themePalette, defaultPalette ] =
++					useSettings(
++						'color.palette.custom',
++						'color.palette.theme',
++						'color.palette.default'
++					);
++				const allColors = useMemo(
++					() => [
++						...( userPalette || [] ),
++						...( themePalette || [] ),
++						...( defaultPalette || [] ),
++					],
++					[ userPalette, themePalette, defaultPalette ]
++				);
++				return <WrappedComponent { ...props } colors={ allColors } />;
++			},
+ 		'withEditorColorPalette'
+ 	);
+ 
+@@ -94,7 +97,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
+ 	return compose( [
+ 		withColorPalette,
+ 		( WrappedComponent ) => {
+-			return class extends Component {
++			return class WithColors extends Component {
+ 				constructor( props ) {
+ 					super( props );
+ 
+diff --git a/packages/block-editor/src/components/editable-text/index.js b/packages/block-editor/src/components/editable-text/index.js
+index 62bb166efa8e6b..b994c0075b330c 100644
+--- a/packages/block-editor/src/components/editable-text/index.js
++++ b/packages/block-editor/src/components/editable-text/index.js
+@@ -12,7 +12,11 @@ const EditableText = forwardRef( ( props, ref ) => {
+ 	return <RichText ref={ ref } { ...props } __unstableDisableFormats />;
+ } );
+ 
+-EditableText.Content = ( { value = '', tagName: Tag = 'div', ...props } ) => {
++EditableText.Content = function Content( {
++	value = '',
++	tagName: Tag = 'div',
++	...props
++} ) {
+ 	return <Tag { ...props }>{ value }</Tag>;
+ };
+ 
+diff --git a/packages/block-editor/src/components/font-sizes/with-font-sizes.js b/packages/block-editor/src/components/font-sizes/with-font-sizes.js
+index 8402a2c23afeb3..0918861c1e596b 100644
+--- a/packages/block-editor/src/components/font-sizes/with-font-sizes.js
++++ b/packages/block-editor/src/components/font-sizes/with-font-sizes.js
+@@ -51,19 +51,22 @@ export default ( ...fontSizeNames ) => {
+ 	return createHigherOrderComponent(
+ 		compose( [
+ 			createHigherOrderComponent(
+-				( WrappedComponent ) => ( props ) => {
+-					const [ fontSizes ] = useSettings( 'typography.fontSizes' );
+-					return (
+-						<WrappedComponent
+-							{ ...props }
+-							fontSizes={ fontSizes || DEFAULT_FONT_SIZES }
+-						/>
+-					);
+-				},
++				( WrappedComponent ) =>
++					function WithFontSizesInner( props ) {
++						const [ fontSizes ] = useSettings(
++							'typography.fontSizes'
++						);
++						return (
++							<WrappedComponent
++								{ ...props }
++								fontSizes={ fontSizes || DEFAULT_FONT_SIZES }
++							/>
++						);
++					},
+ 				'withFontSizes'
+ 			),
+ 			( WrappedComponent ) => {
+-				return class extends Component {
++				return class WithFontSizes extends Component {
+ 					constructor( props ) {
+ 						super( props );
+ 
+diff --git a/packages/block-editor/src/components/global-styles/filters-panel.js b/packages/block-editor/src/components/global-styles/filters-panel.js
+index be518125df698f..befd8b7acdcbfd 100644
+--- a/packages/block-editor/src/components/global-styles/filters-panel.js
++++ b/packages/block-editor/src/components/global-styles/filters-panel.js
+@@ -118,9 +118,8 @@ const LabeledColorIndicator = ( { indicator, label } ) => (
+ 	</HStack>
+ );
+ 
+-const renderToggle =
+-	( duotone, resetDuotone ) =>
+-	( { onToggle, isOpen } ) => {
++const renderToggle = ( duotone, resetDuotone ) =>
++	function Toggle( { onToggle, isOpen } ) {
+ 		const duotoneButtonRef = useRef( undefined );
+ 
+ 		const toggleProps = {
+diff --git a/packages/block-editor/src/components/global-styles/shadow-panel-components.js b/packages/block-editor/src/components/global-styles/shadow-panel-components.js
+index 7f7ce4317bdc3f..5be18bd46643cd 100644
+--- a/packages/block-editor/src/components/global-styles/shadow-panel-components.js
++++ b/packages/block-editor/src/components/global-styles/shadow-panel-components.js
+@@ -136,7 +136,7 @@ export function ShadowPopover( { shadow, onShadowChange, settings } ) {
+ }
+ 
+ function renderShadowToggle( shadow, onShadowChange ) {
+-	return ( { onToggle, isOpen } ) => {
++	return function ShadowToggle( { onToggle, isOpen } ) {
+ 		const shadowButtonRef = useRef( undefined );
+ 
+ 		const toggleProps = {
+diff --git a/packages/block-editor/src/components/gradients/with-gradient.js b/packages/block-editor/src/components/gradients/with-gradient.js
+index 468a3ae43cbf4e..e5873e26c4842f 100644
+--- a/packages/block-editor/src/components/gradients/with-gradient.js
++++ b/packages/block-editor/src/components/gradients/with-gradient.js
+@@ -3,7 +3,10 @@
+  */
+ import { __experimentalUseGradient } from './use-gradient';
+ 
+-export const withGradient = ( WrappedComponent ) => ( props ) => {
+-	const { gradientValue } = __experimentalUseGradient();
+-	return <WrappedComponent { ...props } gradientValue={ gradientValue } />;
+-};
++export const withGradient = ( WrappedComponent ) =>
++	function WithGradient( props ) {
++		const { gradientValue } = __experimentalUseGradient();
++		return (
++			<WrappedComponent { ...props } gradientValue={ gradientValue } />
++		);
++	};
+diff --git a/packages/block-editor/src/components/inspector-controls/index.js b/packages/block-editor/src/components/inspector-controls/index.js
+index f066f059235064..f50e23cc579e00 100644
+--- a/packages/block-editor/src/components/inspector-controls/index.js
++++ b/packages/block-editor/src/components/inspector-controls/index.js
+@@ -12,7 +12,7 @@ InspectorControls.Slot = InspectorControlsSlot;
+ export const InspectorAdvancedControls = ( props ) => {
+ 	return <InspectorControlsFill { ...props } group="advanced" />;
+ };
+-InspectorAdvancedControls.Slot = ( props ) => {
++InspectorAdvancedControls.Slot = function Slot( props ) {
+ 	return <InspectorControlsSlot { ...props } group="advanced" />;
+ };
+ InspectorAdvancedControls.slotName = 'InspectorAdvancedControls';
+diff --git a/packages/block-editor/src/components/provider/with-registry-provider.js b/packages/block-editor/src/components/provider/with-registry-provider.js
+index 582a9bd547f20e..321d1d9f292511 100644
+--- a/packages/block-editor/src/components/provider/with-registry-provider.js
++++ b/packages/block-editor/src/components/provider/with-registry-provider.js
+@@ -26,7 +26,7 @@ function getSubRegistry( subRegistries, registry, useSubRegistry ) {
+ 
+ const withRegistryProvider = createHigherOrderComponent(
+ 	( WrappedComponent ) =>
+-		( { useSubRegistry = true, ...props } ) => {
++		function WithRegistryProvider( { useSubRegistry = true, ...props } ) {
+ 			const registry = useRegistry();
+ 			const [ subRegistries ] = useState( () => new WeakMap() );
+ 			const subRegistry = getSubRegistry(
+diff --git a/packages/block-editor/src/hooks/cross-origin-isolation.js b/packages/block-editor/src/hooks/cross-origin-isolation.js
+index 017441c0621c78..e5bfa25b3eaeff 100644
+--- a/packages/block-editor/src/hooks/cross-origin-isolation.js
++++ b/packages/block-editor/src/hooks/cross-origin-isolation.js
+@@ -113,25 +113,26 @@ if ( window.crossOriginIsolated ) {
+ 		'credentialless' in window.HTMLIFrameElement.prototype;
+ 
+ 	const disableEmbedPreviews = createHigherOrderComponent(
+-		( BlockEdit ) => ( props ) => {
+-			if ( 'core/embed' !== props.name ) {
+-				return <BlockEdit { ...props } />;
+-			}
+-
+-			// List of embeds that do not support a preview is from packages/block-library/src/embed/variations.js.
+-			const previewable =
+-				supportsCredentialless &&
+-				! [ 'facebook', 'smugmug' ].includes(
+-					props.attributes.providerNameSlug
++		( BlockEdit ) =>
++			function DisableEmbedPreviews( props ) {
++				if ( 'core/embed' !== props.name ) {
++					return <BlockEdit { ...props } />;
++				}
++
++				// List of embeds that do not support a preview is from packages/block-library/src/embed/variations.js.
++				const previewable =
++					supportsCredentialless &&
++					! [ 'facebook', 'smugmug' ].includes(
++						props.attributes.providerNameSlug
++					);
++
++				return (
++					<BlockEdit
++						{ ...props }
++						attributes={ { ...props.attributes, previewable } }
++					/>
+ 				);
+-
+-			return (
+-				<BlockEdit
+-					{ ...props }
+-					attributes={ { ...props.attributes, previewable } }
+-				/>
+-			);
+-		},
++			},
+ 		'withDisabledEmbedPreview'
+ 	);
+ 
+diff --git a/packages/block-editor/src/hooks/fit-text.js b/packages/block-editor/src/hooks/fit-text.js
+index b765e936c3a8d6..7774f837b4ed60 100644
+--- a/packages/block-editor/src/hooks/fit-text.js
++++ b/packages/block-editor/src/hooks/fit-text.js
+@@ -360,7 +360,7 @@ function WithFitTextFontSize( { fitText, name, clientId, children } ) {
+  * `editor.BlockEdit` filter.
+  */
+ const addFitTextControl = createHigherOrderComponent( ( BlockEdit ) => {
+-	return ( props ) => {
++	return function AddFitTextControl( props ) {
+ 		const { name, attributes, clientId, isSelected, setAttributes } = props;
+ 		const { fitText } = attributes;
+ 		const supportsFitText = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
+diff --git a/packages/block-editor/src/hooks/grid-visualizer.js b/packages/block-editor/src/hooks/grid-visualizer.js
+index 26650c85ea5094..431ad96d090c51 100644
+--- a/packages/block-editor/src/hooks/grid-visualizer.js
++++ b/packages/block-editor/src/hooks/grid-visualizer.js
+@@ -51,21 +51,22 @@ function GridTools( { clientId, layout } ) {
+ }
+ 
+ const addGridVisualizerToBlockEdit = createHigherOrderComponent(
+-	( BlockEdit ) => ( props ) => {
+-		if ( props.attributes.layout?.type !== 'grid' ) {
+-			return <BlockEdit key="edit" { ...props } />;
+-		}
++	( BlockEdit ) =>
++		function AddGridVisualizerToBlockEdit( props ) {
++			if ( props.attributes.layout?.type !== 'grid' ) {
++				return <BlockEdit key="edit" { ...props } />;
++			}
+ 
+-		return (
+-			<>
+-				<GridTools
+-					clientId={ props.clientId }
+-					layout={ props.attributes.layout }
+-				/>
+-				<BlockEdit key="edit" { ...props } />
+-			</>
+-		);
+-	},
++			return (
++				<>
++					<GridTools
++						clientId={ props.clientId }
++						layout={ props.attributes.layout }
++					/>
++					<BlockEdit key="edit" { ...props } />
++				</>
++			);
++		},
+ 	'addGridVisualizerToBlockEdit'
+ );
+ 
+diff --git a/packages/block-editor/src/hooks/layout.js b/packages/block-editor/src/hooks/layout.js
+index 58a662dfa8aaab..e1bc1649d5b638 100644
+--- a/packages/block-editor/src/hooks/layout.js
++++ b/packages/block-editor/src/hooks/layout.js
+@@ -421,56 +421,57 @@ function BlockWithLayoutStyles( {
+  * @return {Function} Wrapped component.
+  */
+ export const withLayoutStyles = createHigherOrderComponent(
+-	( BlockListBlock ) => ( props ) => {
+-		const { clientId, name, attributes } = props;
+-		const blockSupportsLayout = hasLayoutBlockSupport( name );
+-		const layoutClasses = useLayoutClasses( attributes, name );
+-		const extraProps = useSelect(
+-			( select ) => {
+-				// The callback returns early to avoid block editor subscription.
+-				if ( ! blockSupportsLayout ) {
+-					return;
+-				}
+-
+-				const { getSettings, getBlockSettings } = unlock(
+-					select( blockEditorStore )
+-				);
+-				const { disableLayoutStyles } = getSettings();
++	( BlockListBlock ) =>
++		function WithLayoutStyles( props ) {
++			const { clientId, name, attributes } = props;
++			const blockSupportsLayout = hasLayoutBlockSupport( name );
++			const layoutClasses = useLayoutClasses( attributes, name );
++			const extraProps = useSelect(
++				( select ) => {
++					// The callback returns early to avoid block editor subscription.
++					if ( ! blockSupportsLayout ) {
++						return;
++					}
+ 
+-				if ( disableLayoutStyles ) {
+-					return;
+-				}
++					const { getSettings, getBlockSettings } = unlock(
++						select( blockEditorStore )
++					);
++					const { disableLayoutStyles } = getSettings();
+ 
+-				const [ blockGapSupport ] = getBlockSettings(
+-					clientId,
+-					'spacing.blockGap'
+-				);
++					if ( disableLayoutStyles ) {
++						return;
++					}
+ 
+-				return { blockGapSupport };
+-			},
+-			[ blockSupportsLayout, clientId ]
+-		);
++					const [ blockGapSupport ] = getBlockSettings(
++						clientId,
++						'spacing.blockGap'
++					);
++
++					return { blockGapSupport };
++				},
++				[ blockSupportsLayout, clientId ]
++			);
++
++			if ( ! extraProps ) {
++				return (
++					<BlockListBlock
++						{ ...props }
++						__unstableLayoutClassNames={
++							blockSupportsLayout ? layoutClasses : undefined
++						}
++					/>
++				);
++			}
+ 
+-		if ( ! extraProps ) {
+ 			return (
+-				<BlockListBlock
+-					{ ...props }
+-					__unstableLayoutClassNames={
+-						blockSupportsLayout ? layoutClasses : undefined
+-					}
++				<BlockWithLayoutStyles
++					block={ BlockListBlock }
++					props={ props }
++					layoutClasses={ layoutClasses }
++					{ ...extraProps }
+ 				/>
+ 			);
+-		}
+-
+-		return (
+-			<BlockWithLayoutStyles
+-				block={ BlockListBlock }
+-				props={ props }
+-				layoutClasses={ layoutClasses }
+-				{ ...extraProps }
+-			/>
+-		);
+-	},
++		},
+ 	'withLayoutStyles'
+ );
+ 
+diff --git a/packages/block-editor/src/hooks/utils.js b/packages/block-editor/src/hooks/utils.js
+index 794b65f0523869..87a5e70ec53bef 100644
+--- a/packages/block-editor/src/hooks/utils.js
++++ b/packages/block-editor/src/hooks/utils.js
+@@ -522,63 +522,66 @@ export function createBlockEditFilter( features ) {
+ 		return { ...settings, Edit: memo( settings.edit ) };
+ 	} );
+ 	const withBlockEditHooks = createHigherOrderComponent(
+-		( OriginalBlockEdit ) => ( props ) => {
+-			const context = useBlockEditContext();
+-			// CAUTION: code added before this line will be executed for all
+-			// blocks, not just those that support the feature! Code added
+-			// above this line should be carefully evaluated for its impact on
+-			// performance.
+-			return [
+-				...features.map( ( feature, i ) => {
+-					const {
+-						Edit,
+-						hasSupport,
+-						attributeKeys = [],
+-						shareWithChildBlocks,
+-						supportsPatternEditing,
+-					} = feature;
+-					const shouldDisplayControls =
+-						( supportsPatternEditing &&
+-							context[ mayDisplayPatternEditingControlsKey ] ) ||
+-						context[ mayDisplayControlsKey ] ||
+-						( context[ mayDisplayParentControlsKey ] &&
+-							shareWithChildBlocks );
++		( OriginalBlockEdit ) =>
++			function WithBlockEditHooks( props ) {
++				const context = useBlockEditContext();
++				// CAUTION: code added before this line will be executed for all
++				// blocks, not just those that support the feature! Code added
++				// above this line should be carefully evaluated for its impact on
++				// performance.
++				return [
++					...features.map( ( feature, i ) => {
++						const {
++							Edit,
++							hasSupport,
++							attributeKeys = [],
++							shareWithChildBlocks,
++							supportsPatternEditing,
++						} = feature;
++						const shouldDisplayControls =
++							( supportsPatternEditing &&
++								context[
++									mayDisplayPatternEditingControlsKey
++								] ) ||
++							context[ mayDisplayControlsKey ] ||
++							( context[ mayDisplayParentControlsKey ] &&
++								shareWithChildBlocks );
+ 
+-					if (
+-						! shouldDisplayControls ||
+-						! hasSupport( props.name )
+-					) {
+-						return null;
+-					}
+-
+-					const neededProps = {};
+-					for ( const key of attributeKeys ) {
+-						if ( props.attributes[ key ] ) {
+-							neededProps[ key ] = props.attributes[ key ];
++						if (
++							! shouldDisplayControls ||
++							! hasSupport( props.name )
++						) {
++							return null;
+ 						}
+-					}
+ 
+-					return (
+-						<Edit
+-							// We can use the index because the array length
+-							// is fixed per page load right now.
+-							key={ i }
+-							name={ props.name }
+-							isSelected={ props.isSelected }
+-							clientId={ props.clientId }
+-							setAttributes={ props.setAttributes }
+-							__unstableParentLayout={
+-								props.__unstableParentLayout
++						const neededProps = {};
++						for ( const key of attributeKeys ) {
++							if ( props.attributes[ key ] ) {
++								neededProps[ key ] = props.attributes[ key ];
+ 							}
+-							// This component is pure, so only pass needed
+-							// props!!!
+-							{ ...neededProps }
+-						/>
+-					);
+-				} ),
+-				<OriginalBlockEdit key="edit" { ...props } />,
+-			];
+-		},
++						}
++
++						return (
++							<Edit
++								// We can use the index because the array length
++								// is fixed per page load right now.
++								key={ i }
++								name={ props.name }
++								isSelected={ props.isSelected }
++								clientId={ props.clientId }
++								setAttributes={ props.setAttributes }
++								__unstableParentLayout={
++									props.__unstableParentLayout
++								}
++								// This component is pure, so only pass needed
++								// props!!!
++								{ ...neededProps }
++							/>
++						);
++					} ),
++					<OriginalBlockEdit key="edit" { ...props } />,
++				];
++			},
+ 		'withBlockEditHooks'
+ 	);
+ 	addFilter( 'editor.BlockEdit', 'core/editor/hooks', withBlockEditHooks );
+@@ -614,76 +617,77 @@ const BlockPropsPure = memo( BlockProps );
+ 
+ export function createBlockListBlockFilter( features ) {
+ 	const withBlockListBlockHooks = createHigherOrderComponent(
+-		( BlockListBlock ) => ( props ) => {
+-			const [ allWrapperProps, setAllWrapperProps ] = useState(
+-				Array( features.length ).fill( undefined )
+-			);
+-			return [
+-				...features.map( ( feature, i ) => {
+-					const {
+-						hasSupport,
+-						attributeKeys = [],
+-						useBlockProps,
+-						isMatch,
+-					} = feature;
++		( BlockListBlock ) =>
++			function WithBlockListBlockHooks( props ) {
++				const [ allWrapperProps, setAllWrapperProps ] = useState(
++					Array( features.length ).fill( undefined )
++				);
++				return [
++					...features.map( ( feature, i ) => {
++						const {
++							hasSupport,
++							attributeKeys = [],
++							useBlockProps,
++							isMatch,
++						} = feature;
+ 
+-					const neededProps = {};
+-					for ( const key of attributeKeys ) {
+-						if ( props.attributes[ key ] ) {
+-							neededProps[ key ] = props.attributes[ key ];
++						const neededProps = {};
++						for ( const key of attributeKeys ) {
++							if ( props.attributes[ key ] ) {
++								neededProps[ key ] = props.attributes[ key ];
++							}
+ 						}
+-					}
+ 
+-					if (
+-						// Skip rendering if none of the needed attributes are
+-						// set.
+-						! Object.keys( neededProps ).length ||
+-						! hasSupport( props.name ) ||
+-						( isMatch && ! isMatch( neededProps ) )
+-					) {
+-						return null;
+-					}
++						if (
++							// Skip rendering if none of the needed attributes are
++							// set.
++							! Object.keys( neededProps ).length ||
++							! hasSupport( props.name ) ||
++							( isMatch && ! isMatch( neededProps ) )
++						) {
++							return null;
++						}
+ 
+-					return (
+-						<BlockPropsPure
+-							// We can use the index because the array length
+-							// is fixed per page load right now.
+-							key={ i }
+-							index={ i }
+-							useBlockProps={ useBlockProps }
+-							// This component is pure, so we must pass a stable
+-							// function reference.
+-							setAllWrapperProps={ setAllWrapperProps }
+-							name={ props.name }
+-							clientId={ props.clientId }
+-							// This component is pure, so only pass needed
+-							// props!!!
+-							{ ...neededProps }
+-						/>
+-					);
+-				} ),
+-				<BlockListBlock
+-					key="edit"
+-					{ ...props }
+-					wrapperProps={ allWrapperProps
+-						.filter( Boolean )
+-						.reduce( ( acc, wrapperProps ) => {
+-							return {
+-								...acc,
+-								...wrapperProps,
+-								className: clsx(
+-									acc.className,
+-									wrapperProps.className
+-								),
+-								style: {
+-									...acc.style,
+-									...wrapperProps.style,
+-								},
+-							};
+-						}, props.wrapperProps || {} ) }
+-				/>,
+-			];
+-		},
++						return (
++							<BlockPropsPure
++								// We can use the index because the array length
++								// is fixed per page load right now.
++								key={ i }
++								index={ i }
++								useBlockProps={ useBlockProps }
++								// This component is pure, so we must pass a stable
++								// function reference.
++								setAllWrapperProps={ setAllWrapperProps }
++								name={ props.name }
++								clientId={ props.clientId }
++								// This component is pure, so only pass needed
++								// props!!!
++								{ ...neededProps }
++							/>
++						);
++					} ),
++					<BlockListBlock
++						key="edit"
++						{ ...props }
++						wrapperProps={ allWrapperProps
++							.filter( Boolean )
++							.reduce( ( acc, wrapperProps ) => {
++								return {
++									...acc,
++									...wrapperProps,
++									className: clsx(
++										acc.className,
++										wrapperProps.className
++									),
++									style: {
++										...acc.style,
++										...wrapperProps.style,
++									},
++								};
++							}, props.wrapperProps || {} ) }
++					/>,
++				];
++			},
+ 		'withBlockListBlockHooks'
+ 	);
+ 	addFilter(
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ebb5b0392d64b3..e642a6a48cb61a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add `displayName` to components to improve debugging and fix Storybook source code. [#74716](https://github.com/WordPress/gutenberg/pull/74716)
++
+ ## 32.0.0 (2026-01-16)
+ 
+ ### Code Quality
+@@ -59,7 +63,7 @@
+ -   `AnglePickerControl`: Migrate styles from Emotion to a CSS module ([#73786](https://github.com/WordPress/gutenberg/pull/73786)).
+ -   `Menu`: Clean up popover wrappers ([#74207](https://github.com/WordPress/gutenberg/pull/74207)).
+ -   `Button`, `DateCalendar`, `DateRangeCalendar`, `CheckboxControl`, `Panel`, `Placeholder`: Remove outdated vendor prefix properties in CSS ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
+--    Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530)).
++-   Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530)).
+ -   `SlotFill`: unify context providers and `Fill` implementations ([#68056](https://github.com/WordPress/gutenberg/pull/68056)).
+ 
+ ## 30.9.0 (2025-11-26)
+diff --git a/packages/components/CONTRIBUTING.md b/packages/components/CONTRIBUTING.md
+index 7e88400d456eda..d8d629180e0005 100644
+--- a/packages/components/CONTRIBUTING.md
++++ b/packages/components/CONTRIBUTING.md
+@@ -570,6 +570,12 @@ Please refer to the [JavaScript Testing Overview docs](https://developer.wordpre
+ 
+ All new components should add stories to the project's [Storybook](https://storybook.js.org/). Each [story](https://storybook.js.org/docs/react/get-started/whats-a-story) captures the rendered state of a UI component in isolation. This greatly simplifies working on a given component, while also serving as an interactive form of documentation.
+ 
++### Source code display
++
++Storybook displays source code snippets in the Docs tab. To ensure component names display correctly (instead of minified names like `<J>`), the build uses [terser](https://terser.org/) with `keep_fnames: true` (configured in `storybook/main.ts`).
++
++For function declaration components, no additional configuration is needed — the function name is preserved automatically. For `forwardRef` components, ensure the unforwarded function is named (not an arrow function), and set `displayName` on the forwarded component.
++
+ A component's story should be showcasing its different states — for example, the different variants of a `Button`:
+ 
+ ```jsx
+diff --git a/packages/components/src/angle-picker-control/index.tsx b/packages/components/src/angle-picker-control/index.tsx
+index c4b73a5e75d4ab..9a1cc857da7feb 100644
+--- a/packages/components/src/angle-picker-control/index.tsx
++++ b/packages/components/src/angle-picker-control/index.tsx
+@@ -104,5 +104,6 @@ function UnforwardedAnglePickerControl(
+  * ```
+  */
+ export const AnglePickerControl = forwardRef( UnforwardedAnglePickerControl );
++AnglePickerControl.displayName = 'AnglePickerControl';
+ 
+ export default AnglePickerControl;
+diff --git a/packages/components/src/button-group/index.tsx b/packages/components/src/button-group/index.tsx
+index e073b0c3b359b8..fe4362e97770c4 100644
+--- a/packages/components/src/button-group/index.tsx
++++ b/packages/components/src/button-group/index.tsx
+@@ -53,5 +53,6 @@ function UnforwardedButtonGroup(
+  * ```
+  */
+ export const ButtonGroup = forwardRef( UnforwardedButtonGroup );
++ButtonGroup.displayName = 'ButtonGroup';
+ 
+ export default ButtonGroup;
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index ca4533c679108b..fe19821bf40361 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -89,6 +89,21 @@ function useDeprecatedProps( {
+ 	};
+ }
+ 
++/**
++ * Lets users take actions and make choices with a single click or tap.
++ *
++ * ```jsx
++ * import { Button } from '@wordpress/components';
++ * const Mybutton = () => (
++ *   <Button
++ *     variant="primary"
++ *     onClick={ handleClick }
++ *   >
++ *     Click here
++ *   </Button>
++ * );
++ * ```
++ */
+ export function UnforwardedButton(
+ 	props: ButtonProps & DeprecatedButtonProps,
+ 	ref: ForwardedRef< any >
+@@ -288,20 +303,6 @@ export function UnforwardedButton(
+ 	);
+ }
+ 
+-/**
+- * Lets users take actions and make choices with a single click or tap.
+- *
+- * ```jsx
+- * import { Button } from '@wordpress/components';
+- * const Mybutton = () => (
+- *   <Button
+- *     variant="primary"
+- *     onClick={ handleClick }
+- *   >
+- *     Click here
+- *   </Button>
+- * );
+- * ```
+- */
+ export const Button = forwardRef( UnforwardedButton );
++Button.displayName = 'Button';
+ export default Button;
+diff --git a/packages/components/src/button/stories/index.story.tsx b/packages/components/src/button/stories/index.story.tsx
+index 63759ea7929808..b491d64508891d 100644
+--- a/packages/components/src/button/stories/index.story.tsx
++++ b/packages/components/src/button/stories/index.story.tsx
+@@ -119,11 +119,10 @@ Icon.args = {
+ 	icon: 'wordpress',
+ };
+ 
+-export const GroupedIcons = () => {
+-	const GroupContainer = ( { children }: { children: ReactNode } ) => (
+-		<div style={ { display: 'inline-flex' } }>{ children }</div>
+-	);
+-
++const GroupContainer = ( { children }: { children: ReactNode } ) => (
++	<div style={ { display: 'inline-flex' } }>{ children }</div>
++);
++export function GroupedIcons() {
+ 	return (
+ 		<GroupContainer>
+ 			<Button __next40pxDefaultSize icon={ formatBold } label="Bold" />
+@@ -135,4 +134,4 @@ export const GroupedIcons = () => {
+ 			<Button __next40pxDefaultSize icon={ link } label="Link" />
+ 		</GroupContainer>
+ 	);
+-};
++}
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker.tsx b/packages/components/src/circular-option-picker/circular-option-picker.tsx
+index c4309ecf4dda3d..41c709dd742bd3 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker.tsx
+@@ -192,4 +192,6 @@ CircularOptionPicker.OptionGroup = OptionGroup;
+ CircularOptionPicker.ButtonAction = ButtonAction;
+ CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
+ 
++CircularOptionPicker.displayName = 'CircularOptionPicker';
++
+ export default CircularOptionPicker;
+diff --git a/packages/components/src/color-indicator/index.tsx b/packages/components/src/color-indicator/index.tsx
+index 9d4c0de452b246..a031efde28311f 100644
+--- a/packages/components/src/color-indicator/index.tsx
++++ b/packages/components/src/color-indicator/index.tsx
+@@ -43,5 +43,6 @@ function UnforwardedColorIndicator(
+  * ```
+  */
+ export const ColorIndicator = forwardRef( UnforwardedColorIndicator );
++ColorIndicator.displayName = 'ColorIndicator';
+ 
+ export default ColorIndicator;
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index eb981e8b9acc70..37791bdee9d498 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -365,5 +365,6 @@ function UnforwardedColorPalette(
+  * ```
+  */
+ export const ColorPalette = forwardRef( UnforwardedColorPalette );
++ColorPalette.displayName = 'ColorPalette';
+ 
+ export default ColorPalette;
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index ba954ab7dd9cf5..88cbf5979c270f 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -45,7 +45,7 @@ interface DetectOutsideComponentProps {
+ }
+ 
+ const DetectOutside = withFocusOutside(
+-	class extends Component< DetectOutsideComponentProps > {
++	class DetectOutsideComponent extends Component< DetectOutsideComponentProps > {
+ 		handleFocusOutside( event: React.FocusEvent ) {
+ 			this.props.onFocusOutside( event );
+ 		}
+diff --git a/packages/components/src/date-time/date-time/index.tsx b/packages/components/src/date-time/date-time/index.tsx
+index 82e34cff8e14e9..2be59694253700 100644
+--- a/packages/components/src/date-time/date-time/index.tsx
++++ b/packages/components/src/date-time/date-time/index.tsx
+@@ -78,5 +78,6 @@ function UnforwardedDateTimePicker(
+  * ```
+  */
+ export const DateTimePicker = forwardRef( UnforwardedDateTimePicker );
++DateTimePicker.displayName = 'DateTimePicker';
+ 
+ export default DateTimePicker;
+diff --git a/packages/components/src/disclosure/index.tsx b/packages/components/src/disclosure/index.tsx
+index fa8570fc1d4c5b..ccec6b8bd23104 100644
+--- a/packages/components/src/disclosure/index.tsx
++++ b/packages/components/src/disclosure/index.tsx
+@@ -40,4 +40,5 @@ const UnforwardedDisclosureContent = (
+ };
+ 
+ export const DisclosureContent = forwardRef( UnforwardedDisclosureContent );
++DisclosureContent.displayName = 'DisclosureContent';
+ export default DisclosureContent;
+diff --git a/packages/components/src/external-link/index.tsx b/packages/components/src/external-link/index.tsx
+index e8e3f080d4bf2b..35d9012834a7ed 100644
+--- a/packages/components/src/external-link/index.tsx
++++ b/packages/components/src/external-link/index.tsx
+@@ -92,5 +92,6 @@ function UnforwardedExternalLink(
+  * ```
+  */
+ export const ExternalLink = forwardRef( UnforwardedExternalLink );
++ExternalLink.displayName = 'ExternalLink';
+ 
+ export default ExternalLink;
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index 547180103721e7..dea913176bd87a 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -295,5 +295,6 @@ const UnforwardedFontSizePicker = (
+ };
+ 
+ export const FontSizePicker = forwardRef( UnforwardedFontSizePicker );
++FontSizePicker.displayName = 'FontSizePicker';
+ 
+ export default FontSizePicker;
+diff --git a/packages/components/src/form-toggle/index.tsx b/packages/components/src/form-toggle/index.tsx
+index 37cc312da4f4d4..1c22f2d81d05b2 100644
+--- a/packages/components/src/form-toggle/index.tsx
++++ b/packages/components/src/form-toggle/index.tsx
+@@ -79,5 +79,6 @@ function UnforwardedFormToggle(
+  * ```
+  */
+ export const FormToggle = forwardRef( UnforwardedFormToggle );
++FormToggle.displayName = 'FormToggle';
+ 
+ export default FormToggle;
+diff --git a/packages/components/src/form-token-field/token-input.tsx b/packages/components/src/form-token-field/token-input.tsx
+index daf1df4223354a..f57cddffad089c 100644
+--- a/packages/components/src/form-token-field/token-input.tsx
++++ b/packages/components/src/form-token-field/token-input.tsx
+@@ -92,5 +92,6 @@ export function UnForwardedTokenInput(
+ }
+ 
+ export const TokenInput = forwardRef( UnForwardedTokenInput );
++TokenInput.displayName = 'TokenInput';
+ 
+ export default TokenInput;
+diff --git a/packages/components/src/higher-order/navigate-regions/index.tsx b/packages/components/src/higher-order/navigate-regions/index.tsx
+index 1f4e79654e5bc1..432de1fad5087d 100644
+--- a/packages/components/src/higher-order/navigate-regions/index.tsx
++++ b/packages/components/src/higher-order/navigate-regions/index.tsx
+@@ -139,10 +139,12 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
+  */
+ export default createHigherOrderComponent(
+ 	( Component ) =>
+-		( { shortcuts, ...props } ) => (
+-			<div { ...useNavigateRegions( shortcuts ) }>
+-				<Component { ...props } />
+-			</div>
+-		),
++		function NavigateRegions( { shortcuts, ...props } ) {
++			return (
++				<div { ...useNavigateRegions( shortcuts ) }>
++					<Component { ...props } />
++				</div>
++			);
++		},
+ 	'navigateRegions'
+ );
+diff --git a/packages/components/src/higher-order/with-fallback-styles/index.tsx b/packages/components/src/higher-order/with-fallback-styles/index.tsx
+index cdfd29e7f07470..618b86b422a60f 100644
+--- a/packages/components/src/higher-order/with-fallback-styles/index.tsx
++++ b/packages/components/src/higher-order/with-fallback-styles/index.tsx
+@@ -26,7 +26,7 @@ export default (
+ 	) => { [ key: string ]: any }
+ ) =>
+ 	createHigherOrderComponent( ( WrappedComponent ) => {
+-		return class extends Component< Props, State > {
++		return class WithFallbackStyles extends Component< Props, State > {
+ 			nodeRef?: HTMLElement;
+ 
+ 			constructor( props: Props ) {
+diff --git a/packages/components/src/higher-order/with-focus-outside/index.tsx b/packages/components/src/higher-order/with-focus-outside/index.tsx
+index d340874b8bf136..4c3624fe9a22bc 100644
+--- a/packages/components/src/higher-order/with-focus-outside/index.tsx
++++ b/packages/components/src/higher-order/with-focus-outside/index.tsx
+@@ -8,31 +8,32 @@ import {
+ } from '@wordpress/compose';
+ 
+ export default createHigherOrderComponent(
+-	( WrappedComponent ) => ( props ) => {
+-		const [ handleFocusOutside, setHandleFocusOutside ] = useState<
+-			undefined | ( ( event: React.FocusEvent ) => void )
+-		>( undefined );
++	( WrappedComponent ) =>
++		function WithFocusOutside( props ) {
++			const [ handleFocusOutside, setHandleFocusOutside ] = useState<
++				undefined | ( ( event: React.FocusEvent ) => void )
++			>( undefined );
+ 
+-		const bindFocusOutsideHandler = useCallback<
+-			( node: React.FocusEvent ) => void
+-		>(
+-			( node: any ) =>
+-				setHandleFocusOutside( () =>
+-					node?.handleFocusOutside
+-						? node.handleFocusOutside.bind( node )
+-						: undefined
+-				),
+-			[]
+-		);
++			const bindFocusOutsideHandler = useCallback<
++				( node: React.FocusEvent ) => void
++			>(
++				( node: any ) =>
++					setHandleFocusOutside( () =>
++						node?.handleFocusOutside
++							? node.handleFocusOutside.bind( node )
++							: undefined
++					),
++				[]
++			);
+ 
+-		return (
+-			<div { ...useFocusOutside( handleFocusOutside ) }>
+-				<WrappedComponent
+-					ref={ bindFocusOutsideHandler }
+-					{ ...props }
+-				/>
+-			</div>
+-		);
+-	},
++			return (
++				<div { ...useFocusOutside( handleFocusOutside ) }>
++					<WrappedComponent
++						ref={ bindFocusOutsideHandler }
++						{ ...props }
++					/>
++				</div>
++			);
++		},
+ 	'withFocusOutside'
+ );
+diff --git a/packages/components/src/higher-order/with-spoken-messages/index.tsx b/packages/components/src/higher-order/with-spoken-messages/index.tsx
+index df97427594ef36..1d07fc68d5d25d 100644
+--- a/packages/components/src/higher-order/with-spoken-messages/index.tsx
++++ b/packages/components/src/higher-order/with-spoken-messages/index.tsx
+@@ -16,12 +16,15 @@ import { speak } from '@wordpress/a11y';
+  * @return {ComponentType} The wrapped component.
+  */
+ export default createHigherOrderComponent(
+-	( Component ) => ( props ) => (
+-		<Component
+-			{ ...props }
+-			speak={ speak }
+-			debouncedSpeak={ useDebounce( speak, 500 ) }
+-		/>
+-	),
++	( Component ) =>
++		function WithSpokenMessages( props ) {
++			return (
++				<Component
++					{ ...props }
++					speak={ speak }
++					debouncedSpeak={ useDebounce( speak, 500 ) }
++				/>
++			);
++		},
+ 	'withSpokenMessages'
+ );
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index 2d279ed1867ce6..2e142e4ac523bf 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -138,5 +138,6 @@ export function UnforwardedInputControl(
+  * ```
+  */
+ export const InputControl = forwardRef( UnforwardedInputControl );
++InputControl.displayName = 'InputControl';
+ 
+ export default InputControl;
+diff --git a/packages/components/src/menu-item/index.tsx b/packages/components/src/menu-item/index.tsx
+index 980cab50f80699..1e78a820d62983 100644
+--- a/packages/components/src/menu-item/index.tsx
++++ b/packages/components/src/menu-item/index.tsx
+@@ -109,5 +109,6 @@ function UnforwardedMenuItem(
+  * ```
+  */
+ export const MenuItem = forwardRef( UnforwardedMenuItem );
++MenuItem.displayName = 'MenuItem';
+ 
+ export default MenuItem;
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 75c73ea9609ad2..7572ee2e1f7077 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -415,5 +415,6 @@ function UnforwardedModal(
+  * ```
+  */
+ export const Modal = forwardRef( UnforwardedModal );
++Modal.displayName = 'Modal';
+ 
+ export default Modal;
+diff --git a/packages/components/src/navigable-container/menu.tsx b/packages/components/src/navigable-container/menu.tsx
+index ae865fe443aaec..8b480c4b500456 100644
+--- a/packages/components/src/navigable-container/menu.tsx
++++ b/packages/components/src/navigable-container/menu.tsx
+@@ -96,5 +96,6 @@ export function UnforwardedNavigableMenu(
+  *  ```
+  */
+ export const NavigableMenu = forwardRef( UnforwardedNavigableMenu );
++NavigableMenu.displayName = 'NavigableMenu';
+ 
+ export default NavigableMenu;
+diff --git a/packages/components/src/navigable-container/tabbable.tsx b/packages/components/src/navigable-container/tabbable.tsx
+index 565007bf62d831..a28067fe770c08 100644
+--- a/packages/components/src/navigable-container/tabbable.tsx
++++ b/packages/components/src/navigable-container/tabbable.tsx
+@@ -88,5 +88,6 @@ export function UnforwardedTabbableContainer(
+  *  ```
+  */
+ export const TabbableContainer = forwardRef( UnforwardedTabbableContainer );
++TabbableContainer.displayName = 'TabbableContainer';
+ 
+ export default TabbableContainer;
+diff --git a/packages/components/src/navigation/back-button/index.tsx b/packages/components/src/navigation/back-button/index.tsx
+index ce4a90d9ae7a51..f3593382f537c0 100644
+--- a/packages/components/src/navigation/back-button/index.tsx
++++ b/packages/components/src/navigation/back-button/index.tsx
+@@ -68,5 +68,6 @@ function UnforwardedNavigationBackButton(
+ export const NavigationBackButton = forwardRef(
+ 	UnforwardedNavigationBackButton
+ );
++NavigationBackButton.displayName = 'NavigationBackButton';
+ 
+ export default NavigationBackButton;
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index 2302d10e2d45bd..85043c5c750e6d 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -281,5 +281,6 @@ function UnforwardedNumberControl(
+ }
+ 
+ export const NumberControl = forwardRef( UnforwardedNumberControl );
++NumberControl.displayName = 'NumberControl';
+ 
+ export default NumberControl;
+diff --git a/packages/components/src/panel/body.tsx b/packages/components/src/panel/body.tsx
+index ee1121ef04f4cb..22d698f9f47344 100644
+--- a/packages/components/src/panel/body.tsx
++++ b/packages/components/src/panel/body.tsx
+@@ -147,5 +147,6 @@ const PanelBodyTitle = forwardRef(
+ );
+ 
+ export const PanelBody = forwardRef( UnforwardedPanelBody );
++PanelBody.displayName = 'PanelBody';
+ 
+ export default PanelBody;
+diff --git a/packages/components/src/panel/index.tsx b/packages/components/src/panel/index.tsx
+index de44af6bdfa3f8..08da63e2a36a87 100644
+--- a/packages/components/src/panel/index.tsx
++++ b/packages/components/src/panel/index.tsx
+@@ -44,5 +44,6 @@ function UnforwardedPanel(
+  * ```
+  */
+ export const Panel = forwardRef( UnforwardedPanel );
++Panel.displayName = 'Panel';
+ 
+ export default Panel;
+diff --git a/packages/components/src/panel/row.tsx b/packages/components/src/panel/row.tsx
+index 392f215c2c6754..2b13e279d5f3fd 100644
+--- a/packages/components/src/panel/row.tsx
++++ b/packages/components/src/panel/row.tsx
+@@ -33,5 +33,6 @@ function UnforwardedPanelRow(
+  * It is a flex container with a top margin for spacing.
+  */
+ export const PanelRow = forwardRef( UnforwardedPanelRow );
++PanelRow.displayName = 'PanelRow';
+ 
+ export default PanelRow;
+diff --git a/packages/components/src/progress-bar/index.tsx b/packages/components/src/progress-bar/index.tsx
+index e6a34850954563..72ae320c36b75e 100644
+--- a/packages/components/src/progress-bar/index.tsx
++++ b/packages/components/src/progress-bar/index.tsx
+@@ -60,5 +60,6 @@ function UnforwardedProgressBar(
+  * ```
+  */
+ export const ProgressBar = forwardRef( UnforwardedProgressBar );
++ProgressBar.displayName = 'ProgressBar';
+ 
+ export default ProgressBar;
+diff --git a/packages/components/src/radio-group/index.tsx b/packages/components/src/radio-group/index.tsx
+index 589d20ffdaae5b..c2d67097141818 100644
+--- a/packages/components/src/radio-group/index.tsx
++++ b/packages/components/src/radio-group/index.tsx
+@@ -74,4 +74,5 @@ function UnforwardedRadioGroup(
+  * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
+  */
+ export const RadioGroup = forwardRef( UnforwardedRadioGroup );
++RadioGroup.displayName = 'RadioGroup';
+ export default RadioGroup;
+diff --git a/packages/components/src/radio-group/radio.tsx b/packages/components/src/radio-group/radio.tsx
+index ac864d181b5155..bcf8ca7475aaf1 100644
+--- a/packages/components/src/radio-group/radio.tsx
++++ b/packages/components/src/radio-group/radio.tsx
+@@ -60,4 +60,5 @@ function UnforwardedRadio(
+  * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
+  */
+ export const Radio = forwardRef( UnforwardedRadio );
++Radio.displayName = 'Radio';
+ export default Radio;
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index 5bd2318a487253..3daee9584de72f 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -405,5 +405,6 @@ function UnforwardedRangeControl(
+  * ```
+  */
+ export const RangeControl = forwardRef( UnforwardedRangeControl );
++RangeControl.displayName = 'RangeControl';
+ 
+ export default RangeControl;
+diff --git a/packages/components/src/resizable-box/index.tsx b/packages/components/src/resizable-box/index.tsx
+index 3bf3d36aa0d5c3..6c08cdc3e308ae 100644
+--- a/packages/components/src/resizable-box/index.tsx
++++ b/packages/components/src/resizable-box/index.tsx
+@@ -134,5 +134,6 @@ function UnforwardedResizableBox(
+ }
+ 
+ export const ResizableBox = forwardRef( UnforwardedResizableBox );
++ResizableBox.displayName = 'ResizableBox';
+ 
+ export default ResizableBox;
+diff --git a/packages/components/src/search-control/index.tsx b/packages/components/src/search-control/index.tsx
+index dad793c5496874..7f975fe8b604ab 100644
+--- a/packages/components/src/search-control/index.tsx
++++ b/packages/components/src/search-control/index.tsx
+@@ -137,5 +137,6 @@ function UnforwardedSearchControl(
+  * ```
+  */
+ export const SearchControl = forwardRef( UnforwardedSearchControl );
++SearchControl.displayName = 'SearchControl';
+ 
+ export default SearchControl;
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 36fba573545e14..f59b9b8d26cc6a 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -180,4 +180,7 @@ export const SelectControl = forwardRef( UnforwardedSelectControl ) as <
+ 	> & { ref?: React.Ref< HTMLSelectElement > }
+ ) => React.JSX.Element | null;
+ 
++// @ts-expect-error TS says: "Property 'displayName' does not exist on type ..."
++SelectControl.displayName = 'SelectControl';
++
+ export default SelectControl;
+diff --git a/packages/components/src/slot-fill/index.tsx b/packages/components/src/slot-fill/index.tsx
+index 23e8fa9807457c..7038a424029315 100644
+--- a/packages/components/src/slot-fill/index.tsx
++++ b/packages/components/src/slot-fill/index.tsx
+@@ -43,6 +43,7 @@ export const Slot = forwardRef(
+ 		return <BaseSlot { ...restProps } />;
+ 	}
+ );
++Slot.displayName = 'Slot';
+ 
+ export function Provider( {
+ 	children,
+diff --git a/packages/components/src/snackbar/index.tsx b/packages/components/src/snackbar/index.tsx
+index c6e8b73da92182..a43e46466654d0 100644
+--- a/packages/components/src/snackbar/index.tsx
++++ b/packages/components/src/snackbar/index.tsx
+@@ -206,5 +206,6 @@ function UnforwardedSnackbar(
+  * ```
+  */
+ export const Snackbar = forwardRef( UnforwardedSnackbar );
++Snackbar.displayName = 'Snackbar';
+ 
+ export default Snackbar;
+diff --git a/packages/components/src/spinner/index.tsx b/packages/components/src/spinner/index.tsx
+index e71c80e4381661..9d58fe7754fe9d 100644
+--- a/packages/components/src/spinner/index.tsx
++++ b/packages/components/src/spinner/index.tsx
+@@ -59,4 +59,5 @@ export function UnforwardedSpinner(
+  * ```
+  */
+ export const Spinner = forwardRef( UnforwardedSpinner );
++Spinner.displayName = 'Spinner';
+ export default Spinner;
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index ec4f33d875a381..2c5cb13948fad9 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -246,4 +246,5 @@ const UnforwardedTabPanel = (
+ };
+ 
+ export const TabPanel = forwardRef( UnforwardedTabPanel );
++TabPanel.displayName = 'TabPanel';
+ export default TabPanel;
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+index 2b4ea21f4de744..472da782a73f7d 100644
+--- a/packages/components/src/text-control/index.tsx
++++ b/packages/components/src/text-control/index.tsx
+@@ -92,5 +92,6 @@ function UnforwardedTextControl(
+  * ```
+  */
+ export const TextControl = forwardRef( UnforwardedTextControl );
++TextControl.displayName = 'TextControl';
+ 
+ export default TextControl;
+diff --git a/packages/components/src/text-highlight/index.tsx b/packages/components/src/text-highlight/index.tsx
+index dd2e909898653c..580cb96616e1bc 100644
+--- a/packages/components/src/text-highlight/index.tsx
++++ b/packages/components/src/text-highlight/index.tsx
+@@ -42,4 +42,6 @@ export const TextHighlight = ( props: TextHighlightProps ) => {
+ 	} );
+ };
+ 
++TextHighlight.displayName = 'TextHighlight';
++
+ export default TextHighlight;
+diff --git a/packages/components/src/textarea-control/index.tsx b/packages/components/src/textarea-control/index.tsx
+index aab176d1595862..19b9979cb46efd 100644
+--- a/packages/components/src/textarea-control/index.tsx
++++ b/packages/components/src/textarea-control/index.tsx
+@@ -86,5 +86,6 @@ function UnforwardedTextareaControl(
+  * ```
+  */
+ export const TextareaControl = forwardRef( UnforwardedTextareaControl );
++TextareaControl.displayName = 'TextareaControl';
+ 
+ export default TextareaControl;
+diff --git a/packages/components/src/toggle-control/index.tsx b/packages/components/src/toggle-control/index.tsx
+index ac6f3dc5536550..a2373af62a62d8 100644
+--- a/packages/components/src/toggle-control/index.tsx
++++ b/packages/components/src/toggle-control/index.tsx
+@@ -110,5 +110,6 @@ function UnforwardedToggleControl(
+  * ```
+  */
+ export const ToggleControl = forwardRef( UnforwardedToggleControl );
++ToggleControl.displayName = 'ToggleControl';
+ 
+ export default ToggleControl;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+index 2f80e66b2bbf9a..116de0d0c2ad77 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+@@ -71,5 +71,6 @@ function UnforwardedToggleGroupControlOptionIcon(
+ export const ToggleGroupControlOptionIcon = forwardRef(
+ 	UnforwardedToggleGroupControlOptionIcon
+ );
++ToggleGroupControlOptionIcon.displayName = 'ToggleGroupControlOptionIcon';
+ 
+ export default ToggleGroupControlOptionIcon;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+index cb1535f943b48e..01e7ae507e1507 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+@@ -64,5 +64,6 @@ function UnforwardedToggleGroupControlOption(
+ export const ToggleGroupControlOption = forwardRef(
+ 	UnforwardedToggleGroupControlOption
+ );
++ToggleGroupControlOption.displayName = 'ToggleGroupControlOption';
+ 
+ export default ToggleGroupControlOption;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
+index 743c67ba215f1d..051bec811a02f3 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
+@@ -93,3 +93,4 @@ function UnforwardedToggleGroupControlAsButtonGroup(
+ export const ToggleGroupControlAsButtonGroup = forwardRef(
+ 	UnforwardedToggleGroupControlAsButtonGroup
+ );
++ToggleGroupControlAsButtonGroup.displayName = 'ToggleGroupControlAsButtonGroup';
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+index 56fb5faca56385..72edc2b4b38494 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+@@ -122,3 +122,4 @@ function UnforwardedToggleGroupControlAsRadioGroup(
+ export const ToggleGroupControlAsRadioGroup = forwardRef(
+ 	UnforwardedToggleGroupControlAsRadioGroup
+ );
++ToggleGroupControlAsRadioGroup.displayName = 'ToggleGroupControlAsRadioGroup';
+diff --git a/packages/components/src/toolbar/toolbar-button/index.tsx b/packages/components/src/toolbar/toolbar-button/index.tsx
+index 710cd599507624..347dba7203bc8e 100644
+--- a/packages/components/src/toolbar/toolbar-button/index.tsx
++++ b/packages/components/src/toolbar/toolbar-button/index.tsx
+@@ -132,4 +132,5 @@ function UnforwardedToolbarButton(
+  * ```
+  */
+ export const ToolbarButton = forwardRef( UnforwardedToolbarButton );
++ToolbarButton.displayName = 'ToolbarButton';
+ export default ToolbarButton;
+diff --git a/packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx b/packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx
+index 93b1aced0aa91c..a4141f35694944 100644
+--- a/packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx
++++ b/packages/components/src/toolbar/toolbar-dropdown-menu/index.tsx
+@@ -45,4 +45,5 @@ function UnforwardedToolbarDropdownMenu(
+ }
+ 
+ export const ToolbarDropdownMenu = forwardRef( UnforwardedToolbarDropdownMenu );
++ToolbarDropdownMenu.displayName = 'ToolbarDropdownMenu';
+ export default ToolbarDropdownMenu;
+diff --git a/packages/components/src/toolbar/toolbar-item/index.tsx b/packages/components/src/toolbar/toolbar-item/index.tsx
+index 4a7ca177bfbf95..5c01239aafbed2 100644
+--- a/packages/components/src/toolbar/toolbar-item/index.tsx
++++ b/packages/components/src/toolbar/toolbar-item/index.tsx
+@@ -58,4 +58,5 @@ function UnforwardedToolbarItem(
+ }
+ 
+ export const ToolbarItem = forwardRef( UnforwardedToolbarItem );
++ToolbarItem.displayName = 'ToolbarItem';
+ export default ToolbarItem;
+diff --git a/packages/components/src/toolbar/toolbar/index.tsx b/packages/components/src/toolbar/toolbar/index.tsx
+index 6b7f4843560fe7..c887cf53e695a0 100644
+--- a/packages/components/src/toolbar/toolbar/index.tsx
++++ b/packages/components/src/toolbar/toolbar/index.tsx
+@@ -102,4 +102,5 @@ function UnforwardedToolbar(
+  * ```
+  */
+ export const Toolbar = forwardRef( UnforwardedToolbar );
++Toolbar.displayName = 'Toolbar';
+ export default Toolbar;
+diff --git a/packages/components/src/toolbar/toolbar/toolbar-container.tsx b/packages/components/src/toolbar/toolbar/toolbar-container.tsx
+index 5a12ba61c5d8a3..2a7ecfb6172734 100644
+--- a/packages/components/src/toolbar/toolbar/toolbar-container.tsx
++++ b/packages/components/src/toolbar/toolbar/toolbar-container.tsx
+@@ -40,4 +40,5 @@ function UnforwardedToolbarContainer(
+ }
+ 
+ export const ToolbarContainer = forwardRef( UnforwardedToolbarContainer );
++ToolbarContainer.displayName = 'ToolbarContainer';
+ export default ToolbarContainer;
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index df2c49b65a9bf3..d29960945887c5 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -158,5 +158,6 @@ function UnforwardedTooltip(
+ 	);
+ }
+ export const Tooltip = forwardRef( UnforwardedTooltip );
++Tooltip.displayName = 'Tooltip';
+ 
+ export default Tooltip;
+diff --git a/packages/components/src/tree-grid/cell.tsx b/packages/components/src/tree-grid/cell.tsx
+index 08261abe10313a..36809fb36b0d85 100644
+--- a/packages/components/src/tree-grid/cell.tsx
++++ b/packages/components/src/tree-grid/cell.tsx
+@@ -41,5 +41,6 @@ function UnforwardedTreeGridCell(
+  * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
+  */
+ export const TreeGridCell = forwardRef( UnforwardedTreeGridCell );
++TreeGridCell.displayName = 'TreeGridCell';
+ 
+ export default TreeGridCell;
+diff --git a/packages/components/src/tree-grid/index.tsx b/packages/components/src/tree-grid/index.tsx
+index 6a02f333854941..ffaf56ae047b8b 100644
+--- a/packages/components/src/tree-grid/index.tsx
++++ b/packages/components/src/tree-grid/index.tsx
+@@ -386,6 +386,7 @@ function UnforwardedTreeGrid(
+  * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
+  */
+ export const TreeGrid = forwardRef( UnforwardedTreeGrid );
++TreeGrid.displayName = 'TreeGrid';
+ 
+ export default TreeGrid;
+ export { default as TreeGridRow } from './row';
+diff --git a/packages/components/src/tree-grid/item.tsx b/packages/components/src/tree-grid/item.tsx
+index 7e32fb346248fa..91f8e98bdca616 100644
+--- a/packages/components/src/tree-grid/item.tsx
++++ b/packages/components/src/tree-grid/item.tsx
+@@ -28,5 +28,6 @@ function UnforwardedTreeGridItem(
+  * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
+  */
+ export const TreeGridItem = forwardRef( UnforwardedTreeGridItem );
++TreeGridItem.displayName = 'TreeGridItem';
+ 
+ export default TreeGridItem;
+diff --git a/packages/components/src/tree-grid/roving-tab-index-item.tsx b/packages/components/src/tree-grid/roving-tab-index-item.tsx
+index d5ed3410ddf684..7723267a575885 100644
+--- a/packages/components/src/tree-grid/roving-tab-index-item.tsx
++++ b/packages/components/src/tree-grid/roving-tab-index-item.tsx
+@@ -48,5 +48,6 @@ export const RovingTabIndexItem = forwardRef(
+ 		return <Component { ...allProps }>{ children }</Component>;
+ 	}
+ );
++RovingTabIndexItem.displayName = 'RovingTabIndexItem';
+ 
+ export default RovingTabIndexItem;
+diff --git a/packages/components/src/tree-grid/row.tsx b/packages/components/src/tree-grid/row.tsx
+index a6ea0624fa6a86..7b307874e64abf 100644
+--- a/packages/components/src/tree-grid/row.tsx
++++ b/packages/components/src/tree-grid/row.tsx
+@@ -43,5 +43,6 @@ function UnforwardedTreeGridRow(
+  * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
+  */
+ export const TreeGridRow = forwardRef( UnforwardedTreeGridRow );
++TreeGridRow.displayName = 'TreeGridRow';
+ 
+ export default TreeGridRow;
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 65e1e56cda3b3b..148c51cb11b55d 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -261,6 +261,7 @@ function UnforwardedUnitControl(
+  * ```
+  */
+ export const UnitControl = forwardRef( UnforwardedUnitControl );
++UnitControl.displayName = 'UnitControl';
+ 
+ export { parseQuantityAndUnitFromRawValue, useCustomUnits } from './utils';
+ export default UnitControl;
+diff --git a/packages/components/src/validated-form-controls/components/checkbox-control.tsx b/packages/components/src/validated-form-controls/components/checkbox-control.tsx
+index bd1472816e1072..cb1454bf44d159 100644
+--- a/packages/components/src/validated-form-controls/components/checkbox-control.tsx
++++ b/packages/components/src/validated-form-controls/components/checkbox-control.tsx
+@@ -46,3 +46,4 @@ const UnforwardedValidatedCheckboxControl = (
+ export const ValidatedCheckboxControl = forwardRef(
+ 	UnforwardedValidatedCheckboxControl
+ );
++ValidatedCheckboxControl.displayName = 'ValidatedCheckboxControl';
+diff --git a/packages/components/src/validated-form-controls/components/combobox-control.tsx b/packages/components/src/validated-form-controls/components/combobox-control.tsx
+index 8df0556b83ab21..98d79a546ec2be 100644
+--- a/packages/components/src/validated-form-controls/components/combobox-control.tsx
++++ b/packages/components/src/validated-form-controls/components/combobox-control.tsx
+@@ -60,3 +60,4 @@ const UnforwardedValidatedComboboxControl = (
+ export const ValidatedComboboxControl = forwardRef(
+ 	UnforwardedValidatedComboboxControl
+ );
++ValidatedComboboxControl.displayName = 'ValidatedComboboxControl';
+diff --git a/packages/components/src/validated-form-controls/components/custom-select-control.tsx b/packages/components/src/validated-form-controls/components/custom-select-control.tsx
+index 372ca3a5fc122e..6ae6ad4a0dd8f6 100644
+--- a/packages/components/src/validated-form-controls/components/custom-select-control.tsx
++++ b/packages/components/src/validated-form-controls/components/custom-select-control.tsx
+@@ -68,3 +68,4 @@ const UnforwardedValidatedCustomSelectControl = (
+ export const ValidatedCustomSelectControl = forwardRef(
+ 	UnforwardedValidatedCustomSelectControl
+ );
++ValidatedCustomSelectControl.displayName = 'ValidatedCustomSelectControl';
+diff --git a/packages/components/src/validated-form-controls/components/form-token-field.tsx b/packages/components/src/validated-form-controls/components/form-token-field.tsx
+index f5ba6427fafc16..d80777fcfcca8e 100644
+--- a/packages/components/src/validated-form-controls/components/form-token-field.tsx
++++ b/packages/components/src/validated-form-controls/components/form-token-field.tsx
+@@ -65,3 +65,4 @@ const UnforwardedValidatedFormTokenField = (
+ export const ValidatedFormTokenField = forwardRef(
+ 	UnforwardedValidatedFormTokenField
+ );
++ValidatedFormTokenField.displayName = 'ValidatedFormTokenField';
+diff --git a/packages/components/src/validated-form-controls/components/input-control.tsx b/packages/components/src/validated-form-controls/components/input-control.tsx
+index 25143134c13c1e..5274ef0b2f6115 100644
+--- a/packages/components/src/validated-form-controls/components/input-control.tsx
++++ b/packages/components/src/validated-form-controls/components/input-control.tsx
+@@ -46,3 +46,4 @@ const UnforwardedValidatedInputControl = (
+ export const ValidatedInputControl = forwardRef(
+ 	UnforwardedValidatedInputControl
+ );
++ValidatedInputControl.displayName = 'ValidatedInputControl';
+diff --git a/packages/components/src/validated-form-controls/components/number-control.tsx b/packages/components/src/validated-form-controls/components/number-control.tsx
+index 1126d5d27eba0b..36cfa1ebebad5e 100644
+--- a/packages/components/src/validated-form-controls/components/number-control.tsx
++++ b/packages/components/src/validated-form-controls/components/number-control.tsx
+@@ -46,3 +46,4 @@ const UnforwardedValidatedNumberControl = (
+ export const ValidatedNumberControl = forwardRef(
+ 	UnforwardedValidatedNumberControl
+ );
++ValidatedNumberControl.displayName = 'ValidatedNumberControl';
+diff --git a/packages/components/src/validated-form-controls/components/radio-control.tsx b/packages/components/src/validated-form-controls/components/radio-control.tsx
+index 788e4107803899..12f5001a9c6868 100644
+--- a/packages/components/src/validated-form-controls/components/radio-control.tsx
++++ b/packages/components/src/validated-form-controls/components/radio-control.tsx
+@@ -44,3 +44,4 @@ const UnforwardedValidatedRadioControl = (
+ export const ValidatedRadioControl = forwardRef(
+ 	UnforwardedValidatedRadioControl
+ );
++ValidatedRadioControl.displayName = 'ValidatedRadioControl';
+diff --git a/packages/components/src/validated-form-controls/components/range-control.tsx b/packages/components/src/validated-form-controls/components/range-control.tsx
+index c0a82a5e42e674..3610cc8396d8a5 100644
+--- a/packages/components/src/validated-form-controls/components/range-control.tsx
++++ b/packages/components/src/validated-form-controls/components/range-control.tsx
+@@ -46,3 +46,4 @@ const UnforwardedValidatedRangeControl = (
+ export const ValidatedRangeControl = forwardRef(
+ 	UnforwardedValidatedRangeControl
+ );
++ValidatedRangeControl.displayName = 'ValidatedRangeControl';
+diff --git a/packages/components/src/validated-form-controls/components/select-control.tsx b/packages/components/src/validated-form-controls/components/select-control.tsx
+index 18faa1cfb996a4..8a159c6772852a 100644
+--- a/packages/components/src/validated-form-controls/components/select-control.tsx
++++ b/packages/components/src/validated-form-controls/components/select-control.tsx
+@@ -48,3 +48,4 @@ const UnforwardedValidatedSelectControl = (
+ export const ValidatedSelectControl = forwardRef(
+ 	UnforwardedValidatedSelectControl
+ );
++ValidatedSelectControl.displayName = 'ValidatedSelectControl';
+diff --git a/packages/components/src/validated-form-controls/components/text-control.tsx b/packages/components/src/validated-form-controls/components/text-control.tsx
+index b1d8285db192dd..5e15d935303425 100644
+--- a/packages/components/src/validated-form-controls/components/text-control.tsx
++++ b/packages/components/src/validated-form-controls/components/text-control.tsx
+@@ -46,3 +46,4 @@ const UnforwardedValidatedTextControl = (
+ export const ValidatedTextControl = forwardRef(
+ 	UnforwardedValidatedTextControl
+ );
++ValidatedTextControl.displayName = 'ValidatedTextControl';
+diff --git a/packages/components/src/validated-form-controls/components/textarea-control.tsx b/packages/components/src/validated-form-controls/components/textarea-control.tsx
+index 45e218b129e5cf..ae1af5d0eef60f 100644
+--- a/packages/components/src/validated-form-controls/components/textarea-control.tsx
++++ b/packages/components/src/validated-form-controls/components/textarea-control.tsx
+@@ -38,3 +38,4 @@ const UnforwardedValidatedTextareaControl = (
+ export const ValidatedTextareaControl = forwardRef(
+ 	UnforwardedValidatedTextareaControl
+ );
++ValidatedTextareaControl.displayName = 'ValidatedTextareaControl';
+diff --git a/packages/components/src/validated-form-controls/components/toggle-control.tsx b/packages/components/src/validated-form-controls/components/toggle-control.tsx
+index 05589943baa2a8..332b64e1e3214b 100644
+--- a/packages/components/src/validated-form-controls/components/toggle-control.tsx
++++ b/packages/components/src/validated-form-controls/components/toggle-control.tsx
+@@ -48,3 +48,4 @@ const UnforwardedValidatedToggleControl = (
+ export const ValidatedToggleControl = forwardRef(
+ 	UnforwardedValidatedToggleControl
+ );
++ValidatedToggleControl.displayName = 'ValidatedToggleControl';
+diff --git a/packages/components/src/validated-form-controls/components/toggle-group-control.tsx b/packages/components/src/validated-form-controls/components/toggle-group-control.tsx
+index 291ec7e9896b38..3cb39c6953aafa 100644
+--- a/packages/components/src/validated-form-controls/components/toggle-group-control.tsx
++++ b/packages/components/src/validated-form-controls/components/toggle-group-control.tsx
+@@ -66,3 +66,4 @@ const UnforwardedValidatedToggleGroupControl = (
+ export const ValidatedToggleGroupControl = forwardRef(
+ 	UnforwardedValidatedToggleGroupControl
+ );
++ValidatedToggleGroupControl.displayName = 'ValidatedToggleGroupControl';
+diff --git a/packages/components/src/validated-form-controls/control-with-error.tsx b/packages/components/src/validated-form-controls/control-with-error.tsx
+index 0e5c22c162ffa2..448bbb94827f1c 100644
+--- a/packages/components/src/validated-form-controls/control-with-error.tsx
++++ b/packages/components/src/validated-form-controls/control-with-error.tsx
+@@ -271,3 +271,4 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ }
+ 
+ export const ControlWithError = forwardRef( UnforwardedControlWithError );
++ControlWithError.displayName = 'ControlWithError';
+diff --git a/storybook/main.ts b/storybook/main.ts
+index 73f4bc2ad72b81..fef94010e8e857 100644
+--- a/storybook/main.ts
++++ b/storybook/main.ts
+@@ -91,7 +91,19 @@ export default {
+ 				},
+ 			],
+ 			build: {
+-				minify: NODE_ENV === 'production',
++				/**
++				 * Use terser with keep_fnames to preserve component names in source code display.
++				 * Without this, Vite's esbuild minifier mangles component names (e.g., BoxControl -> J)
++				 * which breaks the Storybook docs source code display.
++				 * @see https://github.com/storybookjs/storybook/issues/20769
++				 */
++				minify: NODE_ENV === 'production' ? 'terser' : false,
++				terserOptions: {
++					keep_fnames: true,
++					mangle: {
++						keep_fnames: true,
++					},
++				},
+ 			},
+ 			define: {
+ 				// Ensures that `@wordpress/warning` can properly detect dev mode.
+diff --git a/storybook/package.json b/storybook/package.json
+index 70fea1e0d46c64..b5adf80819583d 100644
+--- a/storybook/package.json
++++ b/storybook/package.json
+@@ -25,7 +25,8 @@
+ 		"@storybook/icons": "^2.0.1",
+ 		"@storybook/react-vite": "^10.1.11",
+ 		"storybook": "^10.1.11",
+-		"storybook-addon-tag-badges": "^3.0.4"
++		"storybook-addon-tag-badges": "^3.0.4",
++		"terser": "^5.37.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"

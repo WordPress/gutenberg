@@ -1,0 +1,232 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 8956c4a30b8a59..c45bcf462473e2 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -4,64 +4,56 @@
+ 
+ ### Breaking changes
+ 
+--   Renamed padding tokens to remove the `surface` segment and updated the scale from `2xs`–`lg` to `xs`–`3xl`. To preserve the same values:
+-    - `--wpds-dimension-padding-surface-2xs`: use `--wpds-dimension-padding-xs` instead.
+-    - `--wpds-dimension-padding-surface-xs`: use `--wpds-dimension-padding-sm` instead.
+-    - `--wpds-dimension-padding-surface-sm`: use `--wpds-dimension-padding-lg` instead.
+-    - `--wpds-dimension-padding-surface-md`: use `--wpds-dimension-padding-2xl` instead.
+-    - `--wpds-dimension-padding-surface-lg`: use `--wpds-dimension-padding-3xl` instead.
+--   Updated gap token scale from `2xs`–`xl` to `xs`–`3xl`. To preserve the same values:
+-    - `--wpds-dimension-gap-2xs`: use `--wpds-dimension-gap-xs` instead.
+-    - `--wpds-dimension-gap-xs`: use `--wpds-dimension-gap-sm` instead.
+-    - `--wpds-dimension-gap-sm`: use `--wpds-dimension-gap-md` instead.
+-    - `--wpds-dimension-gap-md`: use `--wpds-dimension-gap-lg` instead.
+-    - `--wpds-dimension-gap-lg`: use `--wpds-dimension-gap-xl` instead.
+-    - `--wpds-dimension-gap-xl`: use `--wpds-dimension-gap-2xl` instead.
+-    - `--wpds-dimension-gap-2xl`: use `--wpds-dimension-gap-3xl` instead.
++-   Renamed elevation tokens to use abbreviated size names for consistency with other tokens ([#75103](https://github.com/WordPress/gutenberg/pull/75103)):
++    -   `--wpds-elevation-x-small`: use `--wpds-elevation-xs` instead.
++    -   `--wpds-elevation-small`: use `--wpds-elevation-sm` instead.
++    -   `--wpds-elevation-medium`: use `--wpds-elevation-md` instead.
++    -   `--wpds-elevation-large`: use `--wpds-elevation-lg` instead.
+ 
+ ## 0.6.0 (2026-01-29)
+ 
+ ### Breaking changes
+ 
+ -   Renamed border tokens to remove the `surface` segment from token names ([#74617](https://github.com/WordPress/gutenberg/pull/74617)):
+-    - `--wpds-border-radius-surface-xs`: use `--wpds-border-radius-xs` instead.
+-    - `--wpds-border-radius-surface-sm`: use `--wpds-border-radius-sm` instead.
+-    - `--wpds-border-radius-surface-md`: use `--wpds-border-radius-md` instead.
+-    - `--wpds-border-radius-surface-lg`: use `--wpds-border-radius-lg` instead.
+-    - `--wpds-border-width-surface-xs`: use `--wpds-border-width-xs` instead.
+-    - `--wpds-border-width-surface-sm`: use `--wpds-border-width-sm` instead.
+-    - `--wpds-border-width-surface-md`: use `--wpds-border-width-md` instead.
+-    - `--wpds-border-width-surface-lg`: use `--wpds-border-width-lg` instead.
+-    - `--wpds-border-width-interactive-focus`: use `--wpds-border-width-focus` instead.
++
++    -   `--wpds-border-radius-surface-xs`: use `--wpds-border-radius-xs` instead.
++    -   `--wpds-border-radius-surface-sm`: use `--wpds-border-radius-sm` instead.
++    -   `--wpds-border-radius-surface-md`: use `--wpds-border-radius-md` instead.
++    -   `--wpds-border-radius-surface-lg`: use `--wpds-border-radius-lg` instead.
++    -   `--wpds-border-width-surface-xs`: use `--wpds-border-width-xs` instead.
++    -   `--wpds-border-width-surface-sm`: use `--wpds-border-width-sm` instead.
++    -   `--wpds-border-width-surface-md`: use `--wpds-border-width-md` instead.
++    -   `--wpds-border-width-surface-lg`: use `--wpds-border-width-lg` instead.
++    -   `--wpds-border-width-interactive-focus`: use `--wpds-border-width-focus` instead.
+ 
+ ## 0.5.0 (2026-01-16)
+ 
+ ### Breaking changes
+ 
+ -   Removed the following tokens ([#74470](https://github.com/WordPress/gutenberg/pull/74470)):
+-    - `--wpds-color-bg-interactive-neutral`: use `--wpds-color-bg-interactive-neutral-weak` instead.
+-    - `--wpds-color-bg-interactive-neutral-active`: use `--wpds-color-bg-interactive-neutral-weak-active` instead.
+-    - `--wpds-color-bg-interactive-neutral-disabled`: use `--wpds-color-bg-interactive-neutral-weak-disabled` instead.
+-    - `--wpds-color-bg-interactive-brand`: use `--wpds-color-bg-interactive-brand-weak` instead.
+-    - `--wpds-color-bg-interactive-brand-active`: use `--wpds-color-bg-interactive-brand-weak-active` instead.
+-    - `--wpds-color-bg-interactive-brand-disabled`: use `--wpds-color-bg-interactive-neutral-weak-disabled` instead.
+-    - `--wpds-color-bg-interactive-brand-strong-disabled`: use `--wpds-color-bg-interactive-neutral-strong-disabled` instead.
+-    - `--wpds-color-bg-interactive-brand-weak-disabled`: use `--wpds-color-bg-interactive-neutral-weak-disabled` instead.
+-    - `--wpds-color-bg-interactive-error-disabled`: use `--wpds-color-bg-interactive-neutral-weak-disabled` instead.
+-    - `--wpds-color-bg-interactive-error-strong-disabled`: use `--wpds-color-bg-interactive-neutral-strong-disabled` instead.
+-    - `--wpds-color-bg-interactive-error-weak-disabled`: use `--wpds-color-bg-interactive-neutral-weak-disabled` instead.
+-    - `--wpds-color-fg-interactive-brand-disabled`: use `--wpds-color-fg-interactive-neutral-disabled` instead.
+-    - `--wpds-color-fg-interactive-brand-strong-disabled`: use `--wpds-color-fg-interactive-neutral-strong-disabled` instead.
+-    - `--wpds-color-fg-interactive-error-disabled`: use `--wpds-color-fg-interactive-neutral-disabled` instead.
+-    - `--wpds-color-fg-interactive-error-strong-disabled`: use `--wpds-color-fg-interactive-neutral-strong-disabled` instead.
+-    - `--wpds-color-bg-thumb-brand-disabled`: use the newly added `--wpds-color-bg-thumb-neutral-disabled` instead.
++    -   `--wpds-color-bg-interactive-neutral`: use `--wpds-color-bg-interactive-neutral-weak` instead.
++    -   `--wpds-color-bg-interactive-neutral-active`: use `--wpds-color-bg-interactive-neutral-weak-active` instead.
++    -   `--wpds-color-bg-interactive-neutral-disabled`: use `--wpds-color-bg-interactive-neutral-weak-disabled` instead.
++    -   `--wpds-color-bg-interactive-brand`: use `--wpds-color-bg-interactive-brand-weak` instead.
++    -   `--wpds-color-bg-interactive-brand-active`: use `--wpds-color-bg-interactive-brand-weak-active` instead.
++    -   `--wpds-color-bg-interactive-brand-disabled`: use `--wpds-color-bg-interactive-neutral-weak-disabled` instead.
++    -   `--wpds-color-bg-interactive-brand-strong-disabled`: use `--wpds-color-bg-interactive-neutral-strong-disabled` instead.
++    -   `--wpds-color-bg-interactive-brand-weak-disabled`: use `--wpds-color-bg-interactive-neutral-weak-disabled` instead.
++    -   `--wpds-color-bg-interactive-error-disabled`: use `--wpds-color-bg-interactive-neutral-weak-disabled` instead.
++    -   `--wpds-color-bg-interactive-error-strong-disabled`: use `--wpds-color-bg-interactive-neutral-strong-disabled` instead.
++    -   `--wpds-color-bg-interactive-error-weak-disabled`: use `--wpds-color-bg-interactive-neutral-weak-disabled` instead.
++    -   `--wpds-color-fg-interactive-brand-disabled`: use `--wpds-color-fg-interactive-neutral-disabled` instead.
++    -   `--wpds-color-fg-interactive-brand-strong-disabled`: use `--wpds-color-fg-interactive-neutral-strong-disabled` instead.
++    -   `--wpds-color-fg-interactive-error-disabled`: use `--wpds-color-fg-interactive-neutral-disabled` instead.
++    -   `--wpds-color-fg-interactive-error-strong-disabled`: use `--wpds-color-fg-interactive-neutral-strong-disabled` instead.
++    -   `--wpds-color-bg-thumb-brand-disabled`: use the newly added `--wpds-color-bg-thumb-neutral-disabled` instead.
+ 
+ ### Enhancements
+ 
+ -   Tweaked the values of the following tokens ([#74470](https://github.com/WordPress/gutenberg/pull/74470)):
+-    - `--wpds-color-bg-interactive-neutral-strong-disabled` from `#d2d2d2` to `#e2e2e2`.
+-    - `--wpds-color-bg-interactive-neutral-weak-disabled` from `#e2e2e2` to `#00000000`.
+-    - `--wpds-color-fg-interactive-neutral-strong-disabled` from `#6d6d6d` to `#8a8a8a`.
++    -   `--wpds-color-bg-interactive-neutral-strong-disabled` from `#d2d2d2` to `#e2e2e2`.
++    -   `--wpds-color-bg-interactive-neutral-weak-disabled` from `#e2e2e2` to `#00000000`.
++    -   `--wpds-color-fg-interactive-neutral-strong-disabled` from `#6d6d6d` to `#8a8a8a`.
+ 
+ ### New Features
+ 
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index 1141e7ec8a9602..4580de704f5162 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -136,12 +136,12 @@ Do not edit directly.
+ 
+ ### Elevation
+ 
+-| Variable name              | Description                                                                                                                       |
+-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+-| `--wpds-elevation-x-small` | For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame.     |
+-| `--wpds-elevation-small`   | For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. |
+-| `--wpds-elevation-medium`  | For components that offer additional actions. Example: Menus, Command Palette                                                     |
+-| `--wpds-elevation-large`   | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
++| Variable name         | Description                                                                                                                       |
++| --------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
++| `--wpds-elevation-xs` | For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame.     |
++| `--wpds-elevation-sm` | For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. |
++| `--wpds-elevation-md` | For components that offer additional actions. Example: Menus, Command Palette                                                     |
++| `--wpds-elevation-lg` | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
+ 
+ ### Typography
+ 
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index be79f5bd21b547..1034f318c90064 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -115,13 +115,13 @@
+ 	--wpds-dimension-padding-sm: 8px; /* Small padding */
+ 	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
+ 	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
+-	--wpds-elevation-large: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
++	--wpds-elevation-lg: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
+ 		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005; /* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
+-	--wpds-elevation-medium: 0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a,
++	--wpds-elevation-md: 0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a,
+ 		0 12px 12px 0 #00000008, 0 16px 16px 0 #00000005; /* For components that offer additional actions. Example: Menus, Command Palette */
+-	--wpds-elevation-small: 0 1px 2px 0 #0000000d, 0 2px 3px 0 #0000000a,
++	--wpds-elevation-sm: 0 1px 2px 0 #0000000d, 0 2px 3px 0 #0000000a,
+ 		0 6px 6px 0 #00000008, 0 8px 8px 0 #00000005; /* For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. */
+-	--wpds-elevation-x-small: 0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005,
++	--wpds-elevation-xs: 0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005,
+ 		0 3px 3px 0 #00000005, 0 4px 4px 0 #00000003; /* For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame. */
+ 	--wpds-font-family-body: -apple-system, system-ui, 'Segoe UI', 'Roboto',
+ 		'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif; /* Body font family */
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index 92a6ddaa497752..5703bf28b6d1ec 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -116,10 +116,10 @@ export default [
+ 	'--wpds-dimension-gap-xl',
+ 	'--wpds-dimension-gap-2xl',
+ 	'--wpds-dimension-gap-3xl',
+-	'--wpds-elevation-x-small',
+-	'--wpds-elevation-small',
+-	'--wpds-elevation-medium',
+-	'--wpds-elevation-large',
++	'--wpds-elevation-xs',
++	'--wpds-elevation-sm',
++	'--wpds-elevation-md',
++	'--wpds-elevation-lg',
+ 	'--wpds-font-family-heading',
+ 	'--wpds-font-family-body',
+ 	'--wpds-font-family-mono',
+diff --git a/packages/theme/tokens/elevation.json b/packages/theme/tokens/elevation.json
+index b338bed33149e8..da79235b6c1acf 100644
+--- a/packages/theme/tokens/elevation.json
++++ b/packages/theme/tokens/elevation.json
+@@ -1,7 +1,7 @@
+ {
+ 	"wpds-elevation": {
+ 		"$type": "shadow",
+-		"x-small": {
++		"xs": {
+ 			"$value": [
+ 				{
+ 					"color": {
+@@ -50,7 +50,7 @@
+ 			],
+ 			"$description": "For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame."
+ 		},
+-		"small": {
++		"sm": {
+ 			"$value": [
+ 				{
+ 					"color": {
+@@ -99,7 +99,7 @@
+ 			],
+ 			"$description": "For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar."
+ 		},
+-		"medium": {
++		"md": {
+ 			"$value": [
+ 				{
+ 					"color": {
+@@ -148,7 +148,7 @@
+ 			],
+ 			"$description": "For components that offer additional actions. Example: Menus, Command Palette"
+ 		},
+-		"large": {
++		"lg": {
+ 			"$value": [
+ 				{
+ 					"color": {
+diff --git a/packages/ui/src/tooltip/style.module.css b/packages/ui/src/tooltip/style.module.css
+index dc9ee334cb4533..e189357fb57c0c 100644
+--- a/packages/ui/src/tooltip/style.module.css
++++ b/packages/ui/src/tooltip/style.module.css
+@@ -15,6 +15,6 @@
+ 		font-size: var(--wpds-font-size-sm);
+ 		line-height: 1.4; /* TODO: use DS token for line height */
+ 		color: var(--wpds-color-fg-content-neutral);
+-		box-shadow: var(--wpds-elevation-small);
++		box-shadow: var(--wpds-elevation-sm);
+ 	}
+ }
+diff --git a/packages/ui/src/utils/css/item-popup.module.css b/packages/ui/src/utils/css/item-popup.module.css
+index 3402d88636d2f7..5b6a37da74b08e 100644
+--- a/packages/ui/src/utils/css/item-popup.module.css
++++ b/packages/ui/src/utils/css/item-popup.module.css
+@@ -14,7 +14,7 @@
+ 		max-width: var(--available-width);
+ 		border-radius: var(--wpds-border-radius-md);
+ 		border: 1px solid var(--wpds-color-stroke-surface-neutral);
+-		box-shadow: var(--wpds-elevation-medium);
++		box-shadow: var(--wpds-elevation-md);
+ 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+ 		font-family: var(--wpds-font-family-body);
+ 		font-size: var(--wpds-font-size-md);

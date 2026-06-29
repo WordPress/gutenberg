@@ -1,0 +1,24 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 7bd9bbe2e5f5fe..df66ef99a14ff3 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Select`: Hide the browser focus ring on highlighted popup items ([#77919](https://github.com/WordPress/gutenberg/pull/77919)).
+ -   `Drawer`: Restore the slide-out animation when the popup closes ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+ 
+ ### Enhancements
+diff --git a/packages/ui/src/utils/css/item-popup.module.css b/packages/ui/src/utils/css/item-popup.module.css
+index a157d1677fe516..61bab8d8f7f818 100644
+--- a/packages/ui/src/utils/css/item-popup.module.css
++++ b/packages/ui/src/utils/css/item-popup.module.css
+@@ -90,6 +90,7 @@
+ 		&[data-highlighted]:not([aria-disabled="true"]) {
+ 			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
+ 			color: var(--wpds-color-fg-interactive-neutral);
++			outline: none; /* Disable user agent focus ring */
+ 
+ 			@media ( forced-colors: active ) {
+ 				outline: 1px solid Highlight;

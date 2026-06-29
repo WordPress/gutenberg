@@ -1,0 +1,114 @@
+diff --git a/packages/components/src/slot-fill/slot.js b/packages/components/src/slot-fill/slot.js
+index 5df02f615d1459..9d3a5126977b06 100644
+--- a/packages/components/src/slot-fill/slot.js
++++ b/packages/components/src/slot-fill/slot.js
+@@ -1,13 +1,24 @@
+ /**
+  * External dependencies
+  */
+-import { noop, map, isString, isFunction } from 'lodash';
++import {
++	isFunction,
++	isString,
++	map,
++	negate,
++	noop,
++} from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { Component, Children, cloneElement, Fragment } from '@wordpress/element';
+ 
++/**
++ * Internal dependencies
++ */
++import { isEmptyElement } from './utils';
++
+ class Slot extends Component {
+ 	constructor() {
+ 		super( ...arguments );
+@@ -64,11 +75,16 @@ class Slot extends Component {
+ 				const childKey = `${ fillKey }---${ child.key || childIndex }`;
+ 				return cloneElement( child, { key: childKey } );
+ 			} );
+-		} );
++		} ).filter(
++			// In some cases fills are rendered only when some conditions apply.
++			// This ensures that we only use non-empty fills when rendering, i.e.,
++			// it allows us to render wrappers only when the fills are actually present.
++			negate( isEmptyElement )
++		);
+ 
+ 		return (
+ 			<Fragment>
+-				{ isFunction( children ) ? children( fills.filter( Boolean ) ) : fills }
++				{ isFunction( children ) ? children( fills ) : fills }
+ 			</Fragment>
+ 		);
+ 	}
+diff --git a/packages/components/src/slot-fill/test/utils.js b/packages/components/src/slot-fill/test/utils.js
+new file mode 100644
+index 00000000000000..d69eb0f4a77a1a
+--- /dev/null
++++ b/packages/components/src/slot-fill/test/utils.js
+@@ -0,0 +1,27 @@
++/**
++ * WordPress dependencies
++ */
++import { createElement } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { isEmptyElement } from '../utils';
++
++describe( 'isEmptyElement', () => {
++	test( 'should be empty', () => {
++		expect( isEmptyElement( undefined ) ).toBe( true );
++		expect( isEmptyElement( false ) ).toBe( true );
++		expect( isEmptyElement( '' ) ).toBe( true );
++		expect( isEmptyElement( new String( '' ) ) ).toBe( true );
++		expect( isEmptyElement( [] ) ).toBe( true );
++	} );
++
++	test( 'should not be empty', () => {
++		expect( isEmptyElement( 0 ) ).toBe( false );
++		expect( isEmptyElement( 100 ) ).toBe( false );
++		expect( isEmptyElement( 'test' ) ).toBe( false );
++		expect( isEmptyElement( createElement( 'div' ) ) ).toBe( false );
++		expect( isEmptyElement( [ 'x' ] ) ).toBe( false );
++	} );
++} );
+diff --git a/packages/components/src/slot-fill/utils.js b/packages/components/src/slot-fill/utils.js
+new file mode 100644
+index 00000000000000..d7149b943535d8
+--- /dev/null
++++ b/packages/components/src/slot-fill/utils.js
+@@ -0,0 +1,26 @@
++/**
++ * External dependencies
++ */
++import {
++	isArray,
++	isNumber,
++	isString,
++} from 'lodash';
++
++/**
++ * Checks if the provided WP element is empty.
++ *
++ * @param {*} element WP element to check.
++ * @return {boolean} True when an element is considered empty.
++ */
++export const isEmptyElement = ( element ) => {
++	if ( isNumber( element ) ) {
++		return false;
++	}
++
++	if ( isString( element ) || isArray( element ) ) {
++		return ! element.length;
++	}
++
++	return ! element;
++};

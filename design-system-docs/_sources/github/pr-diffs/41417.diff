@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0148b78c5915c8..cda63891a2b023 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
+ -   `Navigation`: use `code` instead of `keyCode` for keyboard events ([#43644](https://github.com/WordPress/gutenberg/pull/43644/)).
+ -   `ComboboxControl`: Add unit tests ([#42403](https://github.com/WordPress/gutenberg/pull/42403)).
++-   `ComboboxControl`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41417](https://github.com/WordPress/gutenberg/pull/41417))
+ 
+ ## 20.0.0 (2022-08-24)
+ 
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index c8862d9437bb79..a12b58f8eaa516 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -96,7 +96,7 @@ function ComboboxControl( {
+ 		} );
+ 
+ 		return startsWithMatch.concat( containsMatch );
+-	}, [ inputValue, options, value ] );
++	}, [ inputValue, options ] );
+ 
+ 	const onSuggestionSelected = ( newSelectedSuggestion ) => {
+ 		setValue( newSelectedSuggestion.value );

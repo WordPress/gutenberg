@@ -1,0 +1,1727 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4af772a5060927..4466716bdc47c5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ 
+ -   `Guide`: Convert to TypeScript ([#47493](https://github.com/WordPress/gutenberg/pull/47493)).
+ -   `SelectControl`: improve prop types for single vs multiple selection ([#47390](https://github.com/WordPress/gutenberg/pull/47390)).
++-   `Navigation`: Convert to TypeScript ([#48742](https://github.com/WordPress/gutenberg/pull/48742)).
+ -   `PanelBody`: Convert to TypeScript ([#47702](https://github.com/WordPress/gutenberg/pull/47702)).
+ -   `withFallbackStyles` HOC: Convert to TypeScript ([#48720](https://github.com/WordPress/gutenberg/pull/48720)).
+ -   `navigateRegions` HOC: Convert to TypeScript ([#48632](https://github.com/WordPress/gutenberg/pull/48632)).
+diff --git a/packages/components/src/animate/index.js b/packages/components/src/animate/index.js
+index 1ef1e272dbb453..f648b00ed3a640 100644
+--- a/packages/components/src/animate/index.js
++++ b/packages/components/src/animate/index.js
+@@ -25,7 +25,7 @@ function getDefaultOrigin( type ) {
+ /**
+  * @param {GetAnimateOptions} options
+  *
+- * @return {string | void} ClassName that applies the animations
++ * @return {string | undefined} ClassName that applies the animations
+  */
+ export function getAnimateClassName( options ) {
+ 	if ( options.type === 'loading' ) {
+@@ -48,6 +48,8 @@ export function getAnimateClassName( options ) {
+ 			'is-from-' + origin
+ 		);
+ 	}
++
++	return undefined;
+ }
+ 
+ // @ts-ignore Reason: Planned for deprecation
+diff --git a/packages/components/src/navigation/README.md b/packages/components/src/navigation/README.md
+index 1128874463d574..3a1fa992611b62 100644
+--- a/packages/components/src/navigation/README.md
++++ b/packages/components/src/navigation/README.md
+@@ -122,7 +122,7 @@ The unique identifier of the menu. The root menu can omit this, and it will defa
+ 
+ ### onSearch
+ 
+--   Type: `function`
++-   Type: `( searchString: string ) => void;`
+ -   Required: No
+ 
+ When `hasSearch` is active, this function handles the search input's `onChange` event, making it controlled from the outside. It requires setting the `search` prop as well.
+@@ -162,6 +162,13 @@ Indicates whether the menu is empty or not. Used together with the `hideIfTarget
+ 
+ The menu title. It's also the field used by the menu search function.
+ 
++### `titleAction`
++
++-   Type: `React.ReactNode`
++-   Required: No
++
++Use this prop to render additional actions in the menu title.
++
+ ## Navigation Group Props
+ 
+ `NavigationGroup` supports the following props.
+@@ -205,6 +212,13 @@ Optional className for the `NavigationItem` component.
+ 
+ If provided, renders `a` instead of `button`.
+ 
++### `icon`
++
++-   Type: `JSX.Element`
++-   Required: No
++
++If no `children` are passed, this prop allows to specify a custom icon for the menu item.
++
+ ### `item`
+ 
+ -   Type: `string`
+@@ -228,7 +242,7 @@ Indicates whether this item should be hidden if the menu specified in `navigateT
+ 
+ ### `onClick`
+ 
+--   Type: `function`
++-   Type: `React.MouseEventHandler`
+ -   Required: No
+ 
+ A callback to handle clicking on a menu item.
+diff --git a/packages/components/src/navigation/back-button/index.js b/packages/components/src/navigation/back-button/index.tsx
+similarity index 65%
+rename from packages/components/src/navigation/back-button/index.js
+rename to packages/components/src/navigation/back-button/index.tsx
+index 5912e104d2cbb7..182faa8773726d 100644
+--- a/packages/components/src/navigation/back-button/index.js
++++ b/packages/components/src/navigation/back-button/index.tsx
+@@ -15,9 +15,17 @@ import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
+ import { useNavigationContext } from '../context';
+ import { MenuBackButtonUI } from '../styles/navigation-styles';
+ 
+-function NavigationBackButton(
+-	{ backButtonLabel, className, href, onClick, parentMenu },
+-	ref
++import type { NavigationBackButtonProps } from '../types';
++
++function UnforwardedNavigationBackButton(
++	{
++		backButtonLabel,
++		className,
++		href,
++		onClick,
++		parentMenu,
++	}: NavigationBackButtonProps,
++	ref: React.ForwardedRef< HTMLAnchorElement | HTMLButtonElement >
+ ) {
+ 	const { setActiveMenu, navigationTree } = useNavigationContext();
+ 
+@@ -26,9 +34,12 @@ function NavigationBackButton(
+ 		className
+ 	);
+ 
+-	const parentMenuTitle = navigationTree.getMenu( parentMenu )?.title;
++	const parentMenuTitle =
++		parentMenu !== undefined
++			? navigationTree.getMenu( parentMenu )?.title
++			: undefined;
+ 
+-	const handleOnClick = ( event ) => {
++	const handleOnClick: React.MouseEventHandler< HTMLElement > = ( event ) => {
+ 		if ( typeof onClick === 'function' ) {
+ 			onClick( event );
+ 		}
+@@ -52,4 +63,9 @@ function NavigationBackButton(
+ 		</MenuBackButtonUI>
+ 	);
+ }
+-export default forwardRef( NavigationBackButton );
++
++export const NavigationBackButton = forwardRef(
++	UnforwardedNavigationBackButton
++);
++
++export default NavigationBackButton;
+diff --git a/packages/components/src/navigation/constants.js b/packages/components/src/navigation/constants.tsx
+similarity index 100%
+rename from packages/components/src/navigation/constants.js
+rename to packages/components/src/navigation/constants.tsx
+diff --git a/packages/components/src/navigation/context.js b/packages/components/src/navigation/context.tsx
+similarity index 62%
+rename from packages/components/src/navigation/context.js
+rename to packages/components/src/navigation/context.tsx
+index 58fcb9712a22eb..3b14faf47d315d 100644
+--- a/packages/components/src/navigation/context.js
++++ b/packages/components/src/navigation/context.tsx
+@@ -8,27 +8,30 @@ import { createContext, useContext } from '@wordpress/element';
+  */
+ import { ROOT_MENU } from './constants';
+ 
++import type { NavigationContext as NavigationContextType } from './types';
++
+ const noop = () => {};
++const defaultIsEmpty = () => false;
++const defaultGetter = () => undefined;
+ 
+-export const NavigationContext = createContext( {
++export const NavigationContext = createContext< NavigationContextType >( {
+ 	activeItem: undefined,
+ 	activeMenu: ROOT_MENU,
+ 	setActiveMenu: noop,
+-	isMenuEmpty: noop,
+ 
+ 	navigationTree: {
+ 		items: {},
+-		getItem: noop,
++		getItem: defaultGetter,
+ 		addItem: noop,
+ 		removeItem: noop,
+ 
+ 		menus: {},
+-		getMenu: noop,
++		getMenu: defaultGetter,
+ 		addMenu: noop,
+ 		removeMenu: noop,
+ 		childMenu: {},
+ 		traverseMenu: noop,
+-		isMenuEmpty: noop,
++		isMenuEmpty: defaultIsEmpty,
+ 	},
+ } );
+ export const useNavigationContext = () => useContext( NavigationContext );
+diff --git a/packages/components/src/navigation/group/context.js b/packages/components/src/navigation/group/context.js
+deleted file mode 100644
+index d6725504ba8f2c..00000000000000
+--- a/packages/components/src/navigation/group/context.js
++++ /dev/null
+@@ -1,9 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext, useContext } from '@wordpress/element';
+-
+-export const NavigationGroupContext = createContext( { group: undefined } );
+-
+-export const useNavigationGroupContext = () =>
+-	useContext( NavigationGroupContext );
+diff --git a/packages/components/src/navigation/group/context.tsx b/packages/components/src/navigation/group/context.tsx
+new file mode 100644
+index 00000000000000..822a0bb067c882
+--- /dev/null
++++ b/packages/components/src/navigation/group/context.tsx
+@@ -0,0 +1,15 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { NavigationGroupContext as NavigationGroupContextType } from '../types';
++
++export const NavigationGroupContext =
++	createContext< NavigationGroupContextType >( { group: undefined } );
++
++export const useNavigationGroupContext = () =>
++	useContext( NavigationGroupContext );
+diff --git a/packages/components/src/navigation/group/index.js b/packages/components/src/navigation/group/index.tsx
+similarity index 88%
+rename from packages/components/src/navigation/group/index.js
+rename to packages/components/src/navigation/group/index.tsx
+index 5ebebc2ed3b27f..cd91fb97365d26 100644
+--- a/packages/components/src/navigation/group/index.js
++++ b/packages/components/src/navigation/group/index.tsx
+@@ -15,9 +15,15 @@ import { NavigationGroupContext } from './context';
+ import { GroupTitleUI } from '../styles/navigation-styles';
+ import { useNavigationContext } from '../context';
+ 
++import type { NavigationGroupProps } from '../types';
++
+ let uniqueId = 0;
+ 
+-export default function NavigationGroup( { children, className, title } ) {
++export function NavigationGroup( {
++	children,
++	className,
++	title,
++}: NavigationGroupProps ) {
+ 	const [ groupId ] = useState( `group-${ ++uniqueId }` );
+ 	const {
+ 		navigationTree: { items },
+@@ -60,3 +66,5 @@ export default function NavigationGroup( { children, className, title } ) {
+ 		</NavigationGroupContext.Provider>
+ 	);
+ }
++
++export default NavigationGroup;
+diff --git a/packages/components/src/navigation/index.js b/packages/components/src/navigation/index.tsx
+similarity index 52%
+rename from packages/components/src/navigation/index.js
+rename to packages/components/src/navigation/index.tsx
+index ab1f5cb5b58aa3..e3d309783e1ee9 100644
+--- a/packages/components/src/navigation/index.js
++++ b/packages/components/src/navigation/index.tsx
+@@ -18,21 +18,70 @@ import { NavigationContext } from './context';
+ import { NavigationUI } from './styles/navigation-styles';
+ import { useCreateNavigationTree } from './use-create-navigation-tree';
+ 
++import type {
++	NavigationProps,
++	NavigationContext as NavigationContextType,
++} from './types';
++
+ const noop = () => {};
+ 
+-export default function Navigation( {
++/**
++ * Render a navigation list with optional groupings and hierarchy.
++ *
++ * @example
++ * ```jsx
++ * import {
++ *   __experimentalNavigation as Navigation,
++ *   __experimentalNavigationGroup as NavigationGroup,
++ *   __experimentalNavigationItem as NavigationItem,
++ *   __experimentalNavigationMenu as NavigationMenu,
++ * } from '@wordpress/components';
++ *
++ * const MyNavigation = () => (
++ *   <Navigation>
++ *     <NavigationMenu title="Home">
++ *       <NavigationGroup title="Group 1">
++ *         <NavigationItem item="item-1" title="Item 1" />
++ *         <NavigationItem item="item-2" title="Item 2" />
++ *       </NavigationGroup>
++ *       <NavigationGroup title="Group 2">
++ *         <NavigationItem
++ *           item="item-3"
++ *           navigateToMenu="category"
++ *           title="Category"
++ *         />
++ *       </NavigationGroup>
++ *     </NavigationMenu>
++ *
++ *     <NavigationMenu
++ *       backButtonLabel="Home"
++ *       menu="category"
++ *       parentMenu="root"
++ *       title="Category"
++ *     >
++ *       <NavigationItem badge="1" item="child-1" title="Child 1" />
++ *       <NavigationItem item="child-2" title="Child 2" />
++ *     </NavigationMenu>
++ *   </Navigation>
++ * );
++ * ```
++ */
++export function Navigation( {
+ 	activeItem,
+ 	activeMenu = ROOT_MENU,
+ 	children,
+ 	className,
+ 	onActivateMenu = noop,
+-} ) {
++}: NavigationProps ) {
+ 	const [ menu, setMenu ] = useState( activeMenu );
+-	const [ slideOrigin, setSlideOrigin ] = useState();
++	const [ slideOrigin, setSlideOrigin ] = useState< 'left' | 'right' >();
+ 	const navigationTree = useCreateNavigationTree();
+ 	const defaultSlideOrigin = isRTL() ? 'right' : 'left';
+ 
+-	const setActiveMenu = ( menuId, slideInOrigin = defaultSlideOrigin ) => {
++	const setActiveMenu: NavigationContextType[ 'setActiveMenu' ] = (
++		menuId,
++		slideInOrigin = defaultSlideOrigin
++	) => {
+ 		if ( ! navigationTree.getMenu( menuId ) ) {
+ 			return;
+ 		}
+@@ -76,9 +125,14 @@ export default function Navigation( {
+ 		<NavigationUI className={ classes }>
+ 			<div
+ 				key={ menu }
+-				className={ classnames( {
+-					[ animateClassName ]: isMounted.current && slideOrigin,
+-				} ) }
++				className={
++					animateClassName
++						? classnames( {
++								[ animateClassName ]:
++									isMounted.current && slideOrigin,
++						  } )
++						: undefined
++				}
+ 			>
+ 				<NavigationContext.Provider value={ context }>
+ 					{ children }
+@@ -87,3 +141,5 @@ export default function Navigation( {
+ 		</NavigationUI>
+ 	);
+ }
++
++export default Navigation;
+diff --git a/packages/components/src/navigation/item/base-content.js b/packages/components/src/navigation/item/base-content.tsx
+similarity index 73%
+rename from packages/components/src/navigation/item/base-content.js
+rename to packages/components/src/navigation/item/base-content.tsx
+index f4b6fc5b41a8a8..3bda9a71251698 100644
+--- a/packages/components/src/navigation/item/base-content.js
++++ b/packages/components/src/navigation/item/base-content.tsx
+@@ -3,7 +3,11 @@
+  */
+ import { ItemBadgeUI, ItemTitleUI } from '../styles/navigation-styles';
+ 
+-export default function NavigationItemBaseContent( props ) {
++import type { NavigationItemBaseContentProps } from '../types';
++
++export default function NavigationItemBaseContent(
++	props: NavigationItemBaseContentProps
++) {
+ 	const { badge, title } = props;
+ 
+ 	return (
+@@ -11,7 +15,6 @@ export default function NavigationItemBaseContent( props ) {
+ 			{ title && (
+ 				<ItemTitleUI
+ 					className="components-navigation__item-title"
+-					variant="body.small"
+ 					as="span"
+ 				>
+ 					{ title }
+diff --git a/packages/components/src/navigation/item/base.js b/packages/components/src/navigation/item/base.tsx
+similarity index 87%
+rename from packages/components/src/navigation/item/base.js
+rename to packages/components/src/navigation/item/base.tsx
+index 1cbe80d466941b..e5d106bf71c1ac 100644
+--- a/packages/components/src/navigation/item/base.js
++++ b/packages/components/src/navigation/item/base.tsx
+@@ -15,9 +15,11 @@ import { useNavigationContext } from '../context';
+ import { useNavigationTreeItem } from './use-navigation-tree-item';
+ import { ItemBaseUI } from '../styles/navigation-styles';
+ 
++import type { NavigationItemBaseProps } from '../types';
++
+ let uniqueId = 0;
+ 
+-export default function NavigationItemBase( props ) {
++export default function NavigationItemBase( props: NavigationItemBaseProps ) {
+ 	// Also avoid to pass the `title` and `href` props to the ItemBaseUI styled component.
+ 	const { children, className, title, href, ...restProps } = props;
+ 
+diff --git a/packages/components/src/navigation/item/index.js b/packages/components/src/navigation/item/index.tsx
+similarity index 88%
+rename from packages/components/src/navigation/item/index.js
+rename to packages/components/src/navigation/item/index.tsx
+index 7f9369b5c9e2bd..2fd1aebefcbbac 100644
+--- a/packages/components/src/navigation/item/index.js
++++ b/packages/components/src/navigation/item/index.tsx
+@@ -18,9 +18,11 @@ import { ItemUI, ItemIconUI } from '../styles/navigation-styles';
+ import NavigationItemBaseContent from './base-content';
+ import NavigationItemBase from './base';
+ 
++import type { NavigationItemProps } from '../types';
++
+ const noop = () => {};
+ 
+-export default function NavigationItem( props ) {
++export function NavigationItem( props: NavigationItemProps ) {
+ 	const {
+ 		badge,
+ 		children,
+@@ -59,7 +61,9 @@ export default function NavigationItem( props ) {
+ 		'is-active': isActive,
+ 	} );
+ 
+-	const onItemClick = ( event ) => {
++	const onItemClick: React.MouseEventHandler<
++		HTMLButtonElement | HTMLAnchorElement
++	> = ( event ) => {
+ 		if ( navigateToMenu ) {
+ 			setActiveMenu( navigateToMenu );
+ 		}
+@@ -99,3 +103,5 @@ export default function NavigationItem( props ) {
+ 		</NavigationItemBase>
+ 	);
+ }
++
++export default NavigationItem;
+diff --git a/packages/components/src/navigation/item/use-navigation-tree-item.js b/packages/components/src/navigation/item/use-navigation-tree-item.tsx
+similarity index 79%
+rename from packages/components/src/navigation/item/use-navigation-tree-item.js
+rename to packages/components/src/navigation/item/use-navigation-tree-item.tsx
+index 28db2e526e1b4a..e294af4169517e 100644
+--- a/packages/components/src/navigation/item/use-navigation-tree-item.js
++++ b/packages/components/src/navigation/item/use-navigation-tree-item.tsx
+@@ -11,7 +11,12 @@ import { useNavigationGroupContext } from '../group/context';
+ import { useNavigationMenuContext } from '../menu/context';
+ import { normalizedSearch } from '../utils';
+ 
+-export const useNavigationTreeItem = ( itemId, props ) => {
++import type { NavigationItemProps } from '../types';
++
++export const useNavigationTreeItem = (
++	itemId: string,
++	props: NavigationItemProps
++) => {
+ 	const {
+ 		activeMenu,
+ 		navigationTree: { addItem, removeItem },
+@@ -22,7 +27,9 @@ export const useNavigationTreeItem = ( itemId, props ) => {
+ 	useEffect( () => {
+ 		const isMenuActive = activeMenu === menu;
+ 		const isItemVisible =
+-			! search || normalizedSearch( props.title, search );
++			! search ||
++			( props.title !== undefined &&
++				normalizedSearch( props.title, search ) );
+ 
+ 		addItem( itemId, {
+ 			...props,
+diff --git a/packages/components/src/navigation/menu/context.js b/packages/components/src/navigation/menu/context.js
+deleted file mode 100644
+index 29b4814757c7cd..00000000000000
+--- a/packages/components/src/navigation/menu/context.js
++++ /dev/null
+@@ -1,11 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext, useContext } from '@wordpress/element';
+-
+-export const NavigationMenuContext = createContext( {
+-	menu: undefined,
+-	search: '',
+-} );
+-export const useNavigationMenuContext = () =>
+-	useContext( NavigationMenuContext );
+diff --git a/packages/components/src/navigation/menu/context.tsx b/packages/components/src/navigation/menu/context.tsx
+new file mode 100644
+index 00000000000000..53b71e4ccc368f
+--- /dev/null
++++ b/packages/components/src/navigation/menu/context.tsx
+@@ -0,0 +1,18 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { NavigationMenuContext as NavigationMenuContextType } from '../types';
++
++export const NavigationMenuContext = createContext< NavigationMenuContextType >(
++	{
++		menu: undefined,
++		search: '',
++	}
++);
++export const useNavigationMenuContext = () =>
++	useContext( NavigationMenuContext );
+diff --git a/packages/components/src/navigation/menu/index.js b/packages/components/src/navigation/menu/index.tsx
+similarity index 94%
+rename from packages/components/src/navigation/menu/index.js
+rename to packages/components/src/navigation/menu/index.tsx
+index 2e3aa30db0de8e..b001bd0fa0f3d8 100644
+--- a/packages/components/src/navigation/menu/index.js
++++ b/packages/components/src/navigation/menu/index.tsx
+@@ -21,7 +21,9 @@ import NavigationSearchNoResultsFound from './search-no-results-found';
+ import { NavigableMenu } from '../../navigable-container';
+ import { MenuUI } from '../styles/navigation-styles';
+ 
+-export default function NavigationMenu( props ) {
++import type { NavigationMenuProps } from '../types';
++
++export function NavigationMenu( props: NavigationMenuProps ) {
+ 	const {
+ 		backButtonLabel,
+ 		children,
+@@ -96,3 +98,5 @@ export default function NavigationMenu( props ) {
+ 		</NavigationMenuContext.Provider>
+ 	);
+ }
++
++export default NavigationMenu;
+diff --git a/packages/components/src/navigation/menu/menu-title-search.js b/packages/components/src/navigation/menu/menu-title-search.tsx
+similarity index 86%
+rename from packages/components/src/navigation/menu/menu-title-search.js
+rename to packages/components/src/navigation/menu/menu-title-search.tsx
+index cba2ddf2ffe308..d03766f28d7522 100644
+--- a/packages/components/src/navigation/menu/menu-title-search.js
++++ b/packages/components/src/navigation/menu/menu-title-search.tsx
+@@ -13,24 +13,26 @@ import { useNavigationContext } from '../context';
+ import { MenuTitleSearchUI } from '../styles/navigation-styles';
+ import { SEARCH_FOCUS_DELAY } from '../constants';
+ 
++import type { NavigationMenuTitleSearchProps } from '../types';
++
+ function MenuTitleSearch( {
+ 	debouncedSpeak,
+ 	onCloseSearch,
+ 	onSearch,
+ 	search,
+ 	title,
+-} ) {
++}: NavigationMenuTitleSearchProps ) {
+ 	const {
+ 		navigationTree: { items },
+ 	} = useNavigationContext();
+ 	const { menu } = useNavigationMenuContext();
+-	const inputRef = useRef();
++	const inputRef = useRef< HTMLInputElement >( null );
+ 
+ 	// Wait for the slide-in animation to complete before autofocusing the input.
+ 	// This prevents scrolling to the input during the animation.
+ 	useEffect( () => {
+ 		const delayedFocus = setTimeout( () => {
+-			inputRef.current.focus();
++			inputRef.current?.focus();
+ 		}, SEARCH_FOCUS_DELAY );
+ 
+ 		return () => {
+@@ -57,16 +59,18 @@ function MenuTitleSearch( {
+ 	}, [ items, search ] );
+ 
+ 	const onClose = () => {
+-		onSearch( '' );
++		onSearch?.( '' );
+ 		onCloseSearch();
+ 	};
+ 
+-	function onKeyDown( event ) {
++	const onKeyDown: React.KeyboardEventHandler< HTMLInputElement > = (
++		event
++	) => {
+ 		if ( event.code === 'Escape' && ! event.defaultPrevented ) {
+ 			event.preventDefault();
+ 			onClose();
+ 		}
+-	}
++	};
+ 
+ 	const inputId = `components-navigation__menu-title-search-${ menu }`;
+ 	const placeholder = sprintf(
+@@ -81,7 +85,7 @@ function MenuTitleSearch( {
+ 				autoComplete="off"
+ 				className="components-navigation__menu-search-input"
+ 				id={ inputId }
+-				onChange={ ( value ) => onSearch( value ) }
++				onChange={ ( value ) => onSearch?.( value ) }
+ 				onKeyDown={ onKeyDown }
+ 				placeholder={ placeholder }
+ 				onClose={ onClose }
+diff --git a/packages/components/src/navigation/menu/menu-title.js b/packages/components/src/navigation/menu/menu-title.tsx
+similarity index 92%
+rename from packages/components/src/navigation/menu/menu-title.js
+rename to packages/components/src/navigation/menu/menu-title.tsx
+index 7dcc0a02084902..8a9c7fcd59963c 100644
+--- a/packages/components/src/navigation/menu/menu-title.js
++++ b/packages/components/src/navigation/menu/menu-title.tsx
+@@ -19,16 +19,18 @@ import {
+ import { useNavigationMenuContext } from './context';
+ import { SEARCH_FOCUS_DELAY } from '../constants';
+ 
++import type { NavigationMenuTitleProps } from '../types';
++
+ export default function NavigationMenuTitle( {
+ 	hasSearch,
+ 	onSearch,
+ 	search,
+ 	title,
+ 	titleAction,
+-} ) {
++}: NavigationMenuTitleProps ) {
+ 	const [ isSearching, setIsSearching ] = useState( false );
+ 	const { menu } = useNavigationMenuContext();
+-	const searchButtonRef = useRef();
++	const searchButtonRef = useRef< HTMLElement >( null );
+ 
+ 	if ( ! title ) {
+ 		return null;
+@@ -40,7 +42,7 @@ export default function NavigationMenuTitle( {
+ 		// Wait for the slide-in animation to complete before focusing the search button.
+ 		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+ 		setTimeout( () => {
+-			searchButtonRef.current.focus();
++			searchButtonRef.current?.focus();
+ 		}, SEARCH_FOCUS_DELAY );
+ 	};
+ 
+diff --git a/packages/components/src/navigation/menu/search-no-results-found.js b/packages/components/src/navigation/menu/search-no-results-found.tsx
+similarity index 75%
+rename from packages/components/src/navigation/menu/search-no-results-found.js
+rename to packages/components/src/navigation/menu/search-no-results-found.tsx
+index 1297ff1656db9b..c239f74ce8173a 100644
+--- a/packages/components/src/navigation/menu/search-no-results-found.js
++++ b/packages/components/src/navigation/menu/search-no-results-found.tsx
+@@ -9,7 +9,11 @@ import { __ } from '@wordpress/i18n';
+ import { useNavigationContext } from '../context';
+ import { ItemBaseUI, ItemUI } from '../styles/navigation-styles';
+ 
+-export default function NavigationSearchNoResultsFound( { search } ) {
++import type { NavigationSearchNoResultsFoundProps } from '../types';
++
++export default function NavigationSearchNoResultsFound( {
++	search,
++}: NavigationSearchNoResultsFoundProps ) {
+ 	const {
+ 		navigationTree: { items },
+ 	} = useNavigationContext();
+diff --git a/packages/components/src/navigation/menu/use-navigation-tree-menu.js b/packages/components/src/navigation/menu/use-navigation-tree-menu.tsx
+similarity index 82%
+rename from packages/components/src/navigation/menu/use-navigation-tree-menu.js
+rename to packages/components/src/navigation/menu/use-navigation-tree-menu.tsx
+index f50f25370f9380..1db2ee87fa7847 100644
+--- a/packages/components/src/navigation/menu/use-navigation-tree-menu.js
++++ b/packages/components/src/navigation/menu/use-navigation-tree-menu.tsx
+@@ -9,7 +9,9 @@ import { useEffect } from '@wordpress/element';
+ import { useNavigationContext } from '../context';
+ import { ROOT_MENU } from '../constants';
+ 
+-export const useNavigationTreeMenu = ( props ) => {
++import type { NavigationMenuProps } from '../types';
++
++export const useNavigationTreeMenu = ( props: NavigationMenuProps ) => {
+ 	const {
+ 		navigationTree: { addMenu, removeMenu },
+ 	} = useNavigationContext();
+diff --git a/packages/components/src/navigation/stories/index.js b/packages/components/src/navigation/stories/index.js
+deleted file mode 100644
+index 8fbdde44fe7dff..00000000000000
+--- a/packages/components/src/navigation/stories/index.js
++++ /dev/null
+@@ -1,33 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import Navigation from '..';
+-import NavigationBackButton from '../back-button';
+-import NavigationGroup from '../group';
+-import NavigationItem from '../item';
+-import NavigationMenu from '../menu';
+-import { DefaultStory } from './utils/default';
+-import { GroupStory } from './utils/group';
+-import { ControlledStateStory } from './utils/controlled-state';
+-import { SearchStory } from './utils/search';
+-import { MoreExamplesStory } from './utils/more-examples';
+-import { HideIfEmptyStory } from './utils/hide-if-empty';
+-import './style.css';
+-
+-export default {
+-	title: 'Components (Experimental)/Navigation',
+-	component: Navigation,
+-	subcomponents: {
+-		NavigationBackButton,
+-		NavigationGroup,
+-		NavigationItem,
+-		NavigationMenu,
+-	},
+-};
+-
+-export const _default = () => <DefaultStory />;
+-export const controlledState = () => <ControlledStateStory />;
+-export const groups = () => <GroupStory />;
+-export const search = () => <SearchStory />;
+-export const moreExamples = () => <MoreExamplesStory />;
+-export const hideIfEmpty = () => <HideIfEmptyStory />;
+diff --git a/packages/components/src/navigation/stories/index.tsx b/packages/components/src/navigation/stories/index.tsx
+new file mode 100644
+index 00000000000000..2605de6f296673
+--- /dev/null
++++ b/packages/components/src/navigation/stories/index.tsx
+@@ -0,0 +1,53 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { Navigation } from '..';
++import { NavigationBackButton } from '../back-button';
++import { NavigationGroup } from '../group';
++import { NavigationItem } from '../item';
++import { NavigationMenu } from '../menu';
++import { DefaultStory } from './utils/default';
++import { GroupStory } from './utils/group';
++import { ControlledStateStory } from './utils/controlled-state';
++import { SearchStory } from './utils/search';
++import { MoreExamplesStory } from './utils/more-examples';
++import { HideIfEmptyStory } from './utils/hide-if-empty';
++import './style.css';
++
++const meta: ComponentMeta< typeof Navigation > = {
++	title: 'Components (Experimental)/Navigation',
++	component: Navigation,
++	subcomponents: {
++		NavigationBackButton,
++		NavigationGroup,
++		NavigationItem,
++		NavigationMenu,
++	},
++	argTypes: {
++		activeItem: { control: { type: null } },
++		activeMenu: { control: { type: null } },
++		children: { control: { type: null } },
++		onActivateMenu: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++
++export default meta;
++
++export const _default = DefaultStory.bind( {} );
++export const controlledState = ControlledStateStory.bind( {} );
++export const groups = GroupStory.bind( {} );
++export const search = SearchStory.bind( {} );
++export const moreExamples = MoreExamplesStory.bind( {} );
++export const hideIfEmpty = HideIfEmptyStory.bind( {} );
+diff --git a/packages/components/src/navigation/stories/utils/controlled-state.js b/packages/components/src/navigation/stories/utils/controlled-state.tsx
+similarity index 75%
+rename from packages/components/src/navigation/stories/utils/controlled-state.js
+rename to packages/components/src/navigation/stories/utils/controlled-state.tsx
+index ed7d652d0df778..fa9687c981f2ee 100644
+--- a/packages/components/src/navigation/stories/utils/controlled-state.js
++++ b/packages/components/src/navigation/stories/utils/controlled-state.tsx
+@@ -1,30 +1,46 @@
++/**
++ * External dependencies
++ */
++import type { ComponentStory } from '@storybook/react';
++
+ /**
+  * WordPress dependencies
+  */
+-import { Button } from '@wordpress/components';
+ import { useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+-import Navigation from '../..';
+-import NavigationItem from '../../item';
+-import NavigationMenu from '../../menu';
++import Button from '../../../button';
++import { Navigation } from '../..';
++import { NavigationItem } from '../../item';
++import { NavigationMenu } from '../../menu';
+ 
+-export function ControlledStateStory() {
++export const ControlledStateStory: ComponentStory< typeof Navigation > = ( {
++	className,
++	...props
++} ) => {
+ 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+ 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
+ 
+ 	// Mock navigation link.
+-	const MockLink = ( { href, children } ) => (
++	const MockLink = ( {
++		href,
++		children,
++	}: {
++		href: string;
++		children: React.ReactNode;
++	} ) => (
+ 		<Button
+ 			href={ href }
+ 			// Since we're not actually navigating pages, simulate it with onClick.
+-			onClick={ ( event ) => {
+-				event.preventDefault();
+-				const item = href.replace( 'https://example.com/', '' );
+-				setActiveItem( item );
+-			} }
++			onClick={
++				( ( event ) => {
++					event.preventDefault();
++					const item = href.replace( 'https://example.com/', '' );
++					setActiveItem( item );
++				} ) as React.MouseEventHandler< HTMLAnchorElement >
++			}
+ 		>
+ 			{ children }
+ 		</Button>
+@@ -33,9 +49,12 @@ export function ControlledStateStory() {
+ 	return (
+ 		<>
+ 			<Navigation
++				{ ...props }
+ 				activeItem={ activeItem }
+ 				activeMenu={ activeMenu }
+-				className="navigation-story"
++				className={ [ 'navigation-story', className ]
++					.filter( Boolean )
++					.join( ' ' ) }
+ 				onActivateMenu={ setActiveMenu }
+ 			>
+ 				<NavigationMenu title="Home">
+@@ -124,4 +143,4 @@ export function ControlledStateStory() {
+ 			</div>
+ 		</>
+ 	);
+-}
++};
+diff --git a/packages/components/src/navigation/stories/utils/default.js b/packages/components/src/navigation/stories/utils/default.tsx
+similarity index 77%
+rename from packages/components/src/navigation/stories/utils/default.js
+rename to packages/components/src/navigation/stories/utils/default.tsx
+index 569cb8aa17b4bc..78188802861d36 100644
+--- a/packages/components/src/navigation/stories/utils/default.js
++++ b/packages/components/src/navigation/stories/utils/default.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { ComponentStory } from '@storybook/react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -6,15 +11,24 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import Navigation from '../..';
+-import NavigationItem from '../../item';
+-import NavigationMenu from '../../menu';
++import { Navigation } from '../..';
++import { NavigationItem } from '../../item';
++import { NavigationMenu } from '../../menu';
+ 
+-export function DefaultStory() {
++export const DefaultStory: ComponentStory< typeof Navigation > = ( {
++	className,
++	...props
++} ) => {
+ 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+ 
+ 	return (
+-		<Navigation activeItem={ activeItem } className="navigation-story">
++		<Navigation
++			{ ...props }
++			activeItem={ activeItem }
++			className={ [ 'navigation-story', className ]
++				.filter( Boolean )
++				.join( ' ' ) }
++		>
+ 			<NavigationMenu title="Home">
+ 				<NavigationItem
+ 					item="item-1"
+@@ -75,4 +89,4 @@ export function DefaultStory() {
+ 			</NavigationMenu>
+ 		</Navigation>
+ 	);
+-}
++};
+diff --git a/packages/components/src/navigation/stories/utils/group.js b/packages/components/src/navigation/stories/utils/group.tsx
+similarity index 62%
+rename from packages/components/src/navigation/stories/utils/group.js
+rename to packages/components/src/navigation/stories/utils/group.tsx
+index 7e11071a63b9a4..007a71e3f40d16 100644
+--- a/packages/components/src/navigation/stories/utils/group.js
++++ b/packages/components/src/navigation/stories/utils/group.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { ComponentStory } from '@storybook/react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -6,16 +11,25 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import Navigation from '../..';
+-import NavigationItem from '../../item';
+-import NavigationMenu from '../../menu';
+-import NavigationGroup from '../../group';
++import { Navigation } from '../..';
++import { NavigationItem } from '../../item';
++import { NavigationMenu } from '../../menu';
++import { NavigationGroup } from '../../group';
+ 
+-export function GroupStory() {
++export const GroupStory: ComponentStory< typeof Navigation > = ( {
++	className,
++	...props
++} ) => {
+ 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+ 
+ 	return (
+-		<Navigation activeItem={ activeItem } className="navigation-story">
++		<Navigation
++			{ ...props }
++			activeItem={ activeItem }
++			className={ [ 'navigation-story', className ]
++				.filter( Boolean )
++				.join( ' ' ) }
++		>
+ 			<NavigationMenu title="Home">
+ 				<NavigationGroup title="Group 1">
+ 					<NavigationItem
+@@ -44,4 +58,4 @@ export function GroupStory() {
+ 			</NavigationMenu>
+ 		</Navigation>
+ 	);
+-}
++};
+diff --git a/packages/components/src/navigation/stories/utils/hide-if-empty.js b/packages/components/src/navigation/stories/utils/hide-if-empty.tsx
+similarity index 69%
+rename from packages/components/src/navigation/stories/utils/hide-if-empty.js
+rename to packages/components/src/navigation/stories/utils/hide-if-empty.tsx
+index ef9e889932a895..2595aba6b26a7b 100644
+--- a/packages/components/src/navigation/stories/utils/hide-if-empty.js
++++ b/packages/components/src/navigation/stories/utils/hide-if-empty.tsx
+@@ -1,14 +1,27 @@
++/**
++ * External dependencies
++ */
++import type { ComponentStory } from '@storybook/react';
++
+ /**
+  * Internal dependencies
+  */
+-import Navigation from '../..';
+-import NavigationItem from '../../item';
+-import NavigationMenu from '../../menu';
++import { Navigation } from '../..';
++import { NavigationItem } from '../../item';
++import { NavigationMenu } from '../../menu';
+ 
+-export function HideIfEmptyStory() {
++export const HideIfEmptyStory: ComponentStory< typeof Navigation > = ( {
++	className,
++	...props
++} ) => {
+ 	return (
+ 		<>
+-			<Navigation className="navigation-story">
++			<Navigation
++				{ ...props }
++				className={ [ 'navigation-story', className ]
++					.filter( Boolean )
++					.join( ' ' ) }
++			>
+ 				<NavigationMenu title="Home" menu="root" isEmpty={ false }>
+ 					<NavigationItem
+ 						navigateToMenu="root-sub-1"
+@@ -54,4 +67,4 @@ export function HideIfEmptyStory() {
+ 			</p>
+ 		</>
+ 	);
+-}
++};
+diff --git a/packages/components/src/navigation/stories/utils/more-examples.js b/packages/components/src/navigation/stories/utils/more-examples.tsx
+similarity index 81%
+rename from packages/components/src/navigation/stories/utils/more-examples.js
+rename to packages/components/src/navigation/stories/utils/more-examples.tsx
+index 43bd33835db370..c2a181dce58f69 100644
+--- a/packages/components/src/navigation/stories/utils/more-examples.js
++++ b/packages/components/src/navigation/stories/utils/more-examples.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { ComponentStory } from '@storybook/react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -7,14 +12,17 @@ import { Icon, wordpress, home } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import Navigation from '../..';
+-import NavigationGroup from '../../group';
+-import NavigationItem from '../../item';
+-import NavigationMenu from '../../menu';
++import { Navigation } from '../..';
++import { NavigationGroup } from '../../group';
++import { NavigationItem } from '../../item';
++import { NavigationMenu } from '../../menu';
+ 
+-export function MoreExamplesStory() {
++export const MoreExamplesStory: ComponentStory< typeof Navigation > = ( {
++	className,
++	...props
++} ) => {
+ 	const [ activeItem, setActiveItem ] = useState( 'child-1' );
+-	const [ delayedBadge, setDelayedBadge ] = useState();
++	const [ delayedBadge, setDelayedBadge ] = useState< number | undefined >();
+ 	useEffect( () => {
+ 		const timeout = setTimeout( () => setDelayedBadge( 2 ), 1500 );
+ 		return () => clearTimeout( timeout );
+@@ -24,7 +32,13 @@ export function MoreExamplesStory() {
+ 		useState( 1 );
+ 
+ 	return (
+-		<Navigation activeItem={ activeItem } className="navigation-story">
++		<Navigation
++			{ ...props }
++			activeItem={ activeItem }
++			className={ [ 'navigation-story', className ]
++				.filter( Boolean )
++				.join( ' ' ) }
++		>
+ 			<NavigationMenu title="Home">
+ 				<NavigationGroup title="Items without Active State">
+ 					<NavigationItem item="item-1" title="Item 1" />
+@@ -126,10 +140,14 @@ export function MoreExamplesStory() {
+ 				menu="custom-back-click-handler-prevented-menu"
+ 				title="Custom back button click handler prevented"
+ 				parentMenu="root"
+-				onBackButtonClick={ ( event ) => {
+-					event.preventDefault();
+-					setBackButtonPreventedBadge( backButtonPreventedBadge + 1 );
+-				} }
++				onBackButtonClick={
++					( ( event ) => {
++						event.preventDefault();
++						setBackButtonPreventedBadge(
++							backButtonPreventedBadge + 1
++						);
++					} ) as React.MouseEventHandler
++				}
+ 				backButtonLabel="Increment badge"
+ 			>
+ 				<NavigationItem
+@@ -140,4 +158,4 @@ export function MoreExamplesStory() {
+ 			</NavigationMenu>
+ 		</Navigation>
+ 	);
+-}
++};
+diff --git a/packages/components/src/navigation/stories/utils/search.js b/packages/components/src/navigation/stories/utils/search.tsx
+similarity index 77%
+rename from packages/components/src/navigation/stories/utils/search.js
+rename to packages/components/src/navigation/stories/utils/search.tsx
+index 6fb1a176970233..74f1457adf0b70 100644
+--- a/packages/components/src/navigation/stories/utils/search.js
++++ b/packages/components/src/navigation/stories/utils/search.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { ComponentStory } from '@storybook/react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -6,10 +11,10 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import Navigation from '../..';
+-import NavigationGroup from '../../group';
+-import NavigationItem from '../../item';
+-import NavigationMenu from '../../menu';
++import { Navigation } from '../..';
++import { NavigationGroup } from '../../group';
++import { NavigationItem } from '../../item';
++import { NavigationMenu } from '../../menu';
+ import { normalizedSearch } from '../../utils';
+ 
+ const searchItems = [
+@@ -24,12 +29,21 @@ const searchItems = [
+ 	{ item: 'waldo', title: 'Waldo' },
+ ];
+ 
+-export function SearchStory() {
++export const SearchStory: ComponentStory< typeof Navigation > = ( {
++	className,
++	...props
++} ) => {
+ 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+ 	const [ search, setSearch ] = useState( '' );
+ 
+ 	return (
+-		<Navigation activeItem={ activeItem } className="navigation-story">
++		<Navigation
++			{ ...props }
++			activeItem={ activeItem }
++			className={ [ 'navigation-story', className ]
++				.filter( Boolean )
++				.join( ' ' ) }
++		>
+ 			<NavigationMenu hasSearch title="Home">
+ 				<NavigationGroup title="Items">
+ 					{ searchItems.map( ( { item, title } ) => (
+@@ -74,4 +88,4 @@ export function SearchStory() {
+ 			</NavigationMenu>
+ 		</Navigation>
+ 	);
+-}
++};
+diff --git a/packages/components/src/navigation/styles/navigation-styles.js b/packages/components/src/navigation/styles/navigation-styles.tsx
+similarity index 100%
+rename from packages/components/src/navigation/styles/navigation-styles.js
+rename to packages/components/src/navigation/styles/navigation-styles.tsx
+diff --git a/packages/components/src/navigation/test/index.js b/packages/components/src/navigation/test/index.tsx
+similarity index 95%
+rename from packages/components/src/navigation/test/index.js
+rename to packages/components/src/navigation/test/index.tsx
+index 7a8d7dec67c77f..20646a6c809bfc 100644
+--- a/packages/components/src/navigation/test/index.js
++++ b/packages/components/src/navigation/test/index.tsx
+@@ -16,11 +16,19 @@ import Navigation from '..';
+ import NavigationItem from '../item';
+ import NavigationMenu from '../menu';
+ 
+-const TestNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
++const TestNavigation = ( {
++	activeItem,
++	rootTitle,
++	showBadge,
++}: {
++	activeItem?: string;
++	rootTitle?: string;
++	showBadge?: boolean;
++} ) => (
+ 	<Navigation activeItem={ activeItem }>
+ 		<NavigationMenu title={ rootTitle }>
+ 			<NavigationItem
+-				badge={ showBadge && 21 }
++				badge={ showBadge ? 21 : undefined }
+ 				item="item-1"
+ 				title="Item 1"
+ 			/>
+@@ -55,9 +63,14 @@ const TestNavigationControlled = () => {
+ 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
+ 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
+ 
+-	const onMockLinkClick = ( event ) => {
++	const onMockLinkClick: React.MouseEventHandler< HTMLAnchorElement > = (
++		event
++	) => {
+ 		event.preventDefault();
+-		const item = event.target.href.replace( 'https://example.com/', '' );
++		const item = ( event.target as HTMLAnchorElement ).href.replace(
++			'https://example.com/',
++			''
++		);
+ 		setActiveItem( item );
+ 	};
+ 
+diff --git a/packages/components/src/navigation/types.ts b/packages/components/src/navigation/types.ts
+new file mode 100644
+index 00000000000000..4dbc9f5236cc33
+--- /dev/null
++++ b/packages/components/src/navigation/types.ts
+@@ -0,0 +1,325 @@
++/**
++ * Internal dependencies
++ */
++import type { ButtonProps } from '../button/types';
++
++type IfDiscriminantDefinedBothRequired< TDiscriminant, TOther > =
++	// When props in TDiscriminant are specified,
++	// then props from TOther are required too
++	| {
++			[ K in keyof ( TDiscriminant & TOther ) ]: NonNullable<
++				( TDiscriminant & TOther )[ K ]
++			>;
++	  }
++	// When props in TDiscriminant are not specified,
++	// then props from TOther are optional
++	| ( {
++			[ K in keyof TDiscriminant ]?: never;
++	  } & {
++			[ K in keyof TOther ]?: TOther[ K ];
++	  } );
++
++// React Components
++
++export type NavigationProps = {
++	/**
++	 * The active item slug.
++	 */
++	activeItem?: string;
++	/**
++	 * The active menu slug.
++	 *
++	 * @default 'root'
++	 */
++	activeMenu?: string;
++	/**
++	 * The children components.
++	 */
++	children?: React.ReactNode;
++	/**
++	 * Optional classname for the component.
++	 */
++	className?: string;
++	/**
++	 * Callback used to sync the active menu between the external state
++	 * and the Navigation's internal state.
++	 */
++	onActivateMenu?: ( activeMenuSlug: string ) => void;
++};
++
++// When `onSearch` is specified, `search` should be specified too
++type _NavigationMenuSearchProps = IfDiscriminantDefinedBothRequired<
++	{
++		/**
++		 * When the `hasSearch` prop is `true`, this callback handles the search
++		 * input's `onChange` event, making it controlled from the outside.
++		 * When using this prop, the `search` prop should be also set.
++		 */
++		onSearch: ( searchString: string ) => void;
++	},
++	{
++		/**
++		 * When the `hasSearch` is `true` and the `onSearch` prop is provided, this
++		 * prop controls the value of the search input.
++		 * Required when the `onSearch` prop is provided.
++		 */
++		search: string;
++	}
++>;
++
++export type NavigationMenuProps = _NavigationMenuSearchProps & {
++	/**
++	 * The back button label used in nested menus.
++	 * If not provided, the label will be inferred from the parent menu's title.
++	 * If the parent menu's title is not available then it will default to "Back".
++	 *
++	 * @default parentMenuTitle ?? 'Back'
++	 */
++	backButtonLabel?: string;
++	/**
++	 * A callback to handle clicking on the back button.
++	 * If this prop is provided then the back button will be shown.
++	 */
++	onBackButtonClick?: React.MouseEventHandler< HTMLElement >;
++	/**
++	 * The children components.
++	 */
++	children?: React.ReactNode;
++	/**
++	 * Optional classname for the component.
++	 */
++	className?: string;
++	/**
++	 * When `true`, enables the search feature on the menu title.
++	 */
++	hasSearch?: boolean;
++	/**
++	 * Indicates whether the menu is empty or not. Used together with the
++	 * `hideIfTargetMenuEmpty` prop of `NavigationItem`.
++	 */
++	isEmpty?: boolean;
++	/**
++	 * Indicates whether the search is debouncing or not. In case of `true`, the
++	 * "No results found." text is omitted. Used to prevent showing the
++	 * "No results found." text between debounced searches.
++	 */
++	isSearchDebouncing?: boolean;
++	/**
++	 * The unique identifier of the menu.
++	 * The root menu can omit this prop, and it will default to "root".
++	 * All other menus need to specify it.
++	 *
++	 * @default 'root'
++	 */
++	menu?: string;
++	/**
++	 * The parent menu slug; used by nested menus to indicate their parent menu.
++	 */
++	parentMenu?: string;
++	/**
++	 * The menu title. It's also the field used by the menu search function.
++	 */
++	title?: string;
++	/**
++	 * Use this prop to render additional actions in the menu title.
++	 */
++	titleAction?: React.ReactNode;
++};
++
++export type NavigationGroupProps = {
++	/**
++	 * Optional classname for the component.
++	 */
++	className?: string;
++	/**
++	 * The group title.
++	 */
++	title?: string;
++	/**
++	 * The children components.
++	 */
++	children: React.ReactNode;
++};
++
++type _NavigationItemButtonProps =
++	| ( ButtonProps & {
++			/**
++			 * If set to `true` the menu item will only act as a text-only item,
++			 * rather than a `<button />` or `<a />` element.
++			 */
++			isText?: false;
++	  } )
++	| {
++			/**
++			 * If set to `true` the menu item will only act as a text-only item,
++			 * rather than a `<button />` or `<a />` element.
++			 */
++			isText: true;
++	  };
++
++export type NavigationItemBaseProps = {
++	/**
++	 * The item badge content.
++	 */
++	badge?: string | number;
++	/**
++	 * The children components. When not specified, the item will render the
++	 * default item UI.
++	 */
++	children?: React.ReactNode;
++	/**
++	 * Optional classname for the component.
++	 */
++	className?: string;
++	/**
++	 * If provided, causes the component to render an `<a />` element
++	 * instead of a `<button />` element.
++	 */
++	href?: string;
++	/**
++	 * If no `children` are passed, this prop allows to specify a custom icon for
++	 * the menu item.
++	 */
++	icon?: JSX.Element;
++	/**
++	 * The unique identifier of the item.
++	 */
++	item?: string;
++	/**
++	 * The child menu slug. If provided, clicking on the item will navigate
++	 * to the target menu.
++	 */
++	navigateToMenu?: string;
++	/**
++	 * Indicates whether this item should be hidden if the menu specified in
++	 * `navigateToMenu` is marked as empty in the `isEmpty` prop.
++	 * Used together with the `isEmpty` prop of `NavigationMenu`.
++	 */
++	hideIfTargetMenuEmpty?: boolean;
++	/**
++	 * A callback to handle clicking on a menu item.
++	 *
++	 * @default noop
++	 */
++	onClick?: React.MouseEventHandler;
++	/**
++	 * The item title.
++	 */
++	title?: string;
++};
++
++export type NavigationItemProps = _NavigationItemButtonProps &
++	NavigationItemBaseProps;
++
++export type NavigationItemBaseContentProps = Pick<
++	NavigationItemProps,
++	'badge' | 'title'
++>;
++
++export type NavigationBackButtonProps = {
++	/**
++	 * The text displayed for the button
++	 */
++	backButtonLabel?: string;
++	/**
++	 * Optional classname for the component.
++	 */
++	className?: string;
++	/**
++	 * If provided, causes the component to render an `<a />` element
++	 * instead of a `<button />` element.
++	 */
++	href?: string;
++	/**
++	 * Callback function called when the button is clicked.
++	 */
++	onClick?: React.MouseEventHandler;
++	/**
++	 * Id of the parent menu
++	 */
++	parentMenu?: string;
++};
++
++export type NavigationMenuTitleSearchProps = Pick<
++	NavigationMenuProps,
++	'onSearch' | 'search' | 'title'
++> & {
++	// @see `speak` function from `@wordpress/a11y`
++	debouncedSpeak: (
++		message: string,
++		ariaLive?: 'off' | 'polite' | 'assertive'
++	) => void;
++	onCloseSearch: () => void;
++};
++
++export type NavigationMenuTitleProps = Pick<
++	NavigationMenuProps,
++	'hasSearch' | 'onSearch' | 'search' | 'title' | 'titleAction'
++>;
++
++export type NavigationSearchNoResultsFoundProps = Pick<
++	NavigationMenuProps,
++	'search'
++>;
++
++// Data objects & context
++
++export type Item = Omit< NavigationItemBaseProps, 'children' > & {
++	/**
++	 * The group id
++	 */
++	group?: string;
++	/**
++	 * The menu id
++	 */
++	menu?: string;
++	/**
++	 * True is the item is currently visible (ie. the item is part
++	 * of the active menu, and — if there is a search query — its title
++	 * matches the search query).
++	 */
++	_isVisible: boolean;
++};
++
++export type Menu = Omit< NavigationMenuProps, 'children' > & {
++	menu: string;
++};
++
++export type NavigationGroupContext = {
++	/**
++	 * The unique id of the group
++	 */
++	group?: string;
++};
++
++export type NavigationMenuContext = {
++	menu?: string;
++	search?: string;
++};
++
++export type NavigationContext = {
++	activeItem?: string;
++	activeMenu: string;
++	setActiveMenu: (
++		parentMenu: string,
++		animationDirection?: 'left' | 'right'
++	) => void;
++
++	navigationTree: {
++		items: Record< string, Item >;
++		getItem: ( itemId: string ) => Item | undefined;
++		addItem: ( itemId: string, itemProps: Item ) => void;
++		removeItem: ( itemId: string ) => void;
++
++		menus: Record< string, Menu >;
++		getMenu: ( menuId: string ) => Menu | undefined;
++		addMenu: ( menuId: string, menuProps: Menu ) => void;
++		removeMenu: ( menuId: string ) => void;
++		childMenu: Record< string, string[] >;
++		traverseMenu: (
++			startMenu: string,
++			callback: ( menuObject: Menu ) => boolean | undefined
++		) => void;
++		isMenuEmpty: ( menuId: string ) => boolean;
++	};
++};
+diff --git a/packages/components/src/navigation/use-create-navigation-tree.js b/packages/components/src/navigation/use-create-navigation-tree.tsx
+similarity index 50%
+rename from packages/components/src/navigation/use-create-navigation-tree.js
+rename to packages/components/src/navigation/use-create-navigation-tree.tsx
+index 63d5d4a6e2bbb9..7133ec08e4b4aa 100644
+--- a/packages/components/src/navigation/use-create-navigation-tree.js
++++ b/packages/components/src/navigation/use-create-navigation-tree.tsx
+@@ -8,20 +8,22 @@ import { useState } from '@wordpress/element';
+  */
+ import { useNavigationTreeNodes } from './use-navigation-tree-nodes';
+ 
++import type { NavigationContext, Item, Menu } from './types';
++
+ export const useCreateNavigationTree = () => {
+ 	const {
+ 		nodes: items,
+ 		getNode: getItem,
+ 		addNode: addItem,
+ 		removeNode: removeItem,
+-	} = useNavigationTreeNodes();
++	} = useNavigationTreeNodes< Item >();
+ 
+ 	const {
+ 		nodes: menus,
+ 		getNode: getMenu,
+ 		addNode: addMenu,
+ 		removeNode: removeMenu,
+-	} = useNavigationTreeNodes();
++	} = useNavigationTreeNodes< Menu >();
+ 
+ 	/**
+ 	 * Stores direct nested menus of menus
+@@ -30,38 +32,44 @@ export const useCreateNavigationTree = () => {
+ 	 * Key is the menu prop of the menu
+ 	 * Value is an array of menu keys
+ 	 */
+-	const [ childMenu, setChildMenu ] = useState( {} );
+-	const getChildMenu = ( menu ) => childMenu[ menu ] || [];
+-
+-	const traverseMenu = ( startMenu, callback ) => {
+-		const visited = [];
+-		let queue = [ startMenu ];
+-		let current;
+-
+-		while ( queue.length > 0 ) {
+-			current = getMenu( queue.shift() );
+-
+-			if ( ! current || visited.includes( current.menu ) ) {
+-				continue;
+-			}
++	const [ childMenu, setChildMenu ] = useState< Record< string, string[] > >(
++		{}
++	);
++	const getChildMenu = ( menu: string ) => childMenu[ menu ] || [];
++
++	const traverseMenu: NavigationContext[ 'navigationTree' ][ 'traverseMenu' ] =
++		( startMenu, callback ) => {
++			const visited: string[] = [];
++			let queue = [ startMenu ];
++			let current: Menu;
++
++			while ( queue.length > 0 ) {
++				// Type cast to string is safe because of the `length > 0` check above.
++				current = getMenu( queue.shift() as string );
++
++				if ( ! current || visited.includes( current.menu ) ) {
++					continue;
++				}
+ 
+-			visited.push( current.menu );
+-			queue = [ ...queue, ...getChildMenu( current.menu ) ];
++				visited.push( current.menu );
++				queue = [ ...queue, ...getChildMenu( current.menu ) ];
+ 
+-			if ( callback( current ) === false ) {
+-				break;
++				if ( callback( current ) === false ) {
++					break;
++				}
+ 			}
+-		}
+-	};
++		};
+ 
+-	const isMenuEmpty = ( menuToCheck ) => {
++	const isMenuEmpty = ( menuToCheck: string ) => {
+ 		let isEmpty = true;
+ 
+-		traverseMenu( menuToCheck, ( current ) => {
++		traverseMenu( menuToCheck, ( current: Menu ) => {
+ 			if ( ! current.isEmpty ) {
+ 				isEmpty = false;
+ 				return false;
+ 			}
++
++			return undefined;
+ 		} );
+ 
+ 		return isEmpty;
+@@ -75,10 +83,14 @@ export const useCreateNavigationTree = () => {
+ 
+ 		menus,
+ 		getMenu,
+-		addMenu: ( key, value ) => {
++		addMenu: ( key: string, value: Menu ) => {
+ 			setChildMenu( ( state ) => {
+ 				const newState = { ...state };
+ 
++				if ( ! value.parentMenu ) {
++					return newState;
++				}
++
+ 				if ( ! newState[ value.parentMenu ] ) {
+ 					newState[ value.parentMenu ] = [];
+ 				}
+diff --git a/packages/components/src/navigation/use-navigation-tree-nodes.js b/packages/components/src/navigation/use-navigation-tree-nodes.tsx
+similarity index 52%
+rename from packages/components/src/navigation/use-navigation-tree-nodes.js
+rename to packages/components/src/navigation/use-navigation-tree-nodes.tsx
+index b69c49b970f266..2d13b967acbc75 100644
+--- a/packages/components/src/navigation/use-navigation-tree-nodes.js
++++ b/packages/components/src/navigation/use-navigation-tree-nodes.tsx
+@@ -3,12 +3,16 @@
+  */
+ import { useState } from '@wordpress/element';
+ 
+-export const useNavigationTreeNodes = () => {
+-	const [ nodes, setNodes ] = useState( {} );
++export function useNavigationTreeNodes<
++	TNode extends { children?: React.ReactNode; [ key: string ]: unknown }
++>() {
++	const [ nodes, setNodes ] = useState<
++		Record< string, Omit< TNode, 'children' > >
++	>( {} );
+ 
+-	const getNode = ( key ) => nodes[ key ];
++	const getNode = ( key: string ) => nodes[ key ];
+ 
+-	const addNode = ( key, value ) => {
++	const addNode = ( key: string, value: TNode ) => {
+ 		const { children, ...newNode } = value;
+ 		return setNodes( ( original ) => ( {
+ 			...original,
+@@ -16,7 +20,7 @@ export const useNavigationTreeNodes = () => {
+ 		} ) );
+ 	};
+ 
+-	const removeNode = ( key ) => {
++	const removeNode = ( key: keyof typeof nodes ) => {
+ 		return setNodes( ( original ) => {
+ 			const { [ key ]: removedNode, ...remainingNodes } = original;
+ 			return remainingNodes;
+@@ -24,4 +28,4 @@ export const useNavigationTreeNodes = () => {
+ 	};
+ 
+ 	return { nodes, getNode, addNode, removeNode };
+-};
++}
+diff --git a/packages/components/src/navigation/utils.js b/packages/components/src/navigation/utils.tsx
+similarity index 69%
+rename from packages/components/src/navigation/utils.js
+rename to packages/components/src/navigation/utils.tsx
+index 8b4d4f4701839c..47ef5f12cafcdb 100644
+--- a/packages/components/src/navigation/utils.js
++++ b/packages/components/src/navigation/utils.tsx
+@@ -4,8 +4,8 @@
+ import removeAccents from 'remove-accents';
+ 
+ // @see packages/block-editor/src/components/inserter/search-items.js
+-export const normalizeInput = ( input ) =>
++export const normalizeInput = ( input: string ) =>
+ 	removeAccents( input ).replace( /^\//, '' ).toLowerCase();
+ 
+-export const normalizedSearch = ( title, search ) =>
++export const normalizedSearch = ( title: string, search: string ) =>
+ 	-1 !== normalizeInput( title ).indexOf( normalizeInput( search ) );
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 149fede3458fd8..953bf2b67c3c9a 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -51,7 +51,6 @@
+ 		"src/higher-order/with-filters",
+ 		"src/higher-order/with-focus-return",
+ 		"src/higher-order/with-notices",
+-		"src/navigation",
+ 		"src/palette-edit"
+ 	]
+ }

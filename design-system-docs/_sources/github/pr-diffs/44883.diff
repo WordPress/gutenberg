@@ -1,0 +1,128 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index be1d83468d29d2..22f5c4bd4fd94e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ -   `Navigator`: Allow calling `goTo` and `goBack` twice in one render cycle ([#46391](https://github.com/WordPress/gutenberg/pull/46391)).
+ -   `Modal`: Fix unexpected modal closing in IME Composition ([#46453](https://github.com/WordPress/gutenberg/pull/46453)).
+ -   `Toolbar`: Fix duplicate focus style on anchor link button ([#46759](https://github.com/WordPress/gutenberg/pull/46759)).
++-   `useNavigateRegions`: Ensure region navigation picks the next region based on where the current user focus is located instead of starting at the beginning ([#44883](https://github.com/WordPress/gutenberg/pull/44883)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/higher-order/navigate-regions/index.js b/packages/components/src/higher-order/navigate-regions/index.js
+index 0e76349cf3c0af..5b5a7737897313 100644
+--- a/packages/components/src/higher-order/navigate-regions/index.js
++++ b/packages/components/src/higher-order/navigate-regions/index.js
+@@ -42,14 +42,17 @@ export function useNavigateRegions( shortcuts = defaultShortcuts ) {
+ 
+ 	function focusRegion( offset ) {
+ 		const regions = Array.from(
+-			ref.current.querySelectorAll( '[role="region"]' )
++			ref.current.querySelectorAll( '[role="region"][tabindex="-1"]' )
+ 		);
+ 		if ( ! regions.length ) {
+ 			return;
+ 		}
+ 		let nextRegion = regions[ 0 ];
++		// Based off the current element, use closest to determine the wrapping region since this operates up the DOM. Also, match tabindex to avoid edge cases with regions we do not want.
+ 		const selectedIndex = regions.indexOf(
+-			ref.current.ownerDocument.activeElement
++			ref.current.ownerDocument.activeElement.closest(
++				'[role="region"][tabindex="-1"]'
++			)
+ 		);
+ 		if ( selectedIndex !== -1 ) {
+ 			let nextIndex = selectedIndex + offset;
+diff --git a/packages/e2e-tests/specs/editor/various/a11y.test.js b/packages/e2e-tests/specs/editor/various/a11y.test.js
+index cb9b62dbcdf634..1f87cea42fa3c8 100644
+--- a/packages/e2e-tests/specs/editor/various/a11y.test.js
++++ b/packages/e2e-tests/specs/editor/various/a11y.test.js
+@@ -16,7 +16,9 @@ describe( 'a11y', () => {
+ 
+ 	it( 'tabs header bar', async () => {
+ 		await pressKeyWithModifier( 'ctrl', '`' );
+-
++		await pressKeyWithModifier( 'ctrl', '`' );
++		await pressKeyWithModifier( 'ctrl', '`' );
++		await pressKeyWithModifier( 'ctrl', '`' );
+ 		await page.keyboard.press( 'Tab' );
+ 
+ 		const isFocusedToggle = await page.$eval(
+diff --git a/packages/e2e-tests/specs/editor/various/block-hierarchy-navigation.test.js b/packages/e2e-tests/specs/editor/various/block-hierarchy-navigation.test.js
+index 6adcfa2d878bc3..c067ead926a5b7 100644
+--- a/packages/e2e-tests/specs/editor/various/block-hierarchy-navigation.test.js
++++ b/packages/e2e-tests/specs/editor/various/block-hierarchy-navigation.test.js
+@@ -111,16 +111,14 @@ describe( 'Navigating the block hierarchy', () => {
+ 
+ 		// Move focus to the sidebar area.
+ 		await pressKeyWithModifier( 'ctrl', '`' );
+-		await pressKeyWithModifier( 'ctrl', '`' );
+-		await pressKeyWithModifier( 'ctrl', '`' );
+ 		await tabToColumnsControl();
+ 
+ 		// Tweak the columns count by increasing it by one.
+ 		await page.keyboard.press( 'ArrowRight' );
+ 
+ 		// Navigate to the third column in the columns block.
+-		await pressKeyWithModifier( 'ctrl', '`' );
+-		await pressKeyWithModifier( 'ctrl', '`' );
++		await pressKeyWithModifier( 'ctrlShift', '`' );
++		await pressKeyWithModifier( 'ctrlShift', '`' );
+ 		await pressKeyTimes( 'Tab', 4 );
+ 		await pressKeyTimes( 'ArrowDown', 4 );
+ 		await page.waitForSelector(
+diff --git a/packages/e2e-tests/specs/editor/various/keyboard-navigable-blocks.test.js b/packages/e2e-tests/specs/editor/various/keyboard-navigable-blocks.test.js
+index 9a6a432d465a6f..eb64afd1847100 100644
+--- a/packages/e2e-tests/specs/editor/various/keyboard-navigable-blocks.test.js
++++ b/packages/e2e-tests/specs/editor/various/keyboard-navigable-blocks.test.js
+@@ -23,6 +23,9 @@ const navigateToContentEditorTop = async () => {
+ 	// Use 'Ctrl+`' to return to the top of the editor.
+ 	await pressKeyWithModifier( 'ctrl', '`' );
+ 	await pressKeyWithModifier( 'ctrl', '`' );
++	await pressKeyWithModifier( 'ctrl', '`' );
++	await pressKeyWithModifier( 'ctrl', '`' );
++	await pressKeyWithModifier( 'ctrl', '`' );
+ };
+ 
+ const tabThroughParagraphBlock = async ( paragraphText ) => {
+@@ -36,6 +39,10 @@ const tabThroughParagraphBlock = async ( paragraphText ) => {
+ 
+ 	await page.keyboard.press( 'Tab' );
+ 	await expect( await getActiveLabel() ).toBe( 'Open document settings' );
++
++	// Need to shift+tab here to end back in the block. If not, we'll be in the next region and it will only require 4 region jumps instead of 5.
++	await pressKeyWithModifier( 'shift', 'Tab' );
++	await expect( await getActiveLabel() ).toBe( 'Paragraph block' );
+ };
+ 
+ const tabThroughBlockToolbar = async () => {
+diff --git a/packages/e2e-tests/specs/editor/various/sidebar.test.js b/packages/e2e-tests/specs/editor/various/sidebar.test.js
+index 39409b0fbeb7bc..2e5d46eec2f7a2 100644
+--- a/packages/e2e-tests/specs/editor/various/sidebar.test.js
++++ b/packages/e2e-tests/specs/editor/various/sidebar.test.js
+@@ -96,8 +96,6 @@ describe( 'Sidebar', () => {
+ 
+ 		// Region navigate to Sidebar.
+ 		await pressKeyWithModifier( 'ctrl', '`' );
+-		await pressKeyWithModifier( 'ctrl', '`' );
+-		await pressKeyWithModifier( 'ctrl', '`' );
+ 
+ 		// Tab lands at first (presumed selected) option "Post".
+ 		await page.keyboard.press( 'Tab' );
+diff --git a/test/e2e/specs/editor/various/a11y-region-navigation.spec.js b/test/e2e/specs/editor/various/a11y-region-navigation.spec.js
+index 7eee32af2b08eb..2c28ba311d8c71 100644
+--- a/test/e2e/specs/editor/various/a11y-region-navigation.spec.js
++++ b/test/e2e/specs/editor/various/a11y-region-navigation.spec.js
+@@ -22,7 +22,10 @@ test.describe( 'Region navigation (@firefox, @webkit)', () => {
+ 			attributes: { content: 'Dummy text' },
+ 		} );
+ 
+-		// Navigate to first region and check that we made it.
++		// Navigate to first region and check that we made it. Must navigate forward 4 times as initial focus is placed in post title field.
++		await page.keyboard.press( 'Control+`' );
++		await page.keyboard.press( 'Control+`' );
++		await page.keyboard.press( 'Control+`' );
+ 		await page.keyboard.press( 'Control+`' );
+ 		const editorTopBar = page.locator(
+ 			'role=region[name="Editor top bar"i]'

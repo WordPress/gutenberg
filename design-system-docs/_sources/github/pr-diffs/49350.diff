@@ -1,0 +1,376 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index db4f80eb5f7fed..bb5597178f0de9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,7 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
+ -   `DropZone`: Smooth animation ([#49517](https://github.com/WordPress/gutenberg/pull/49517)).
++-   `Navigator`: Add `skipFocus` property in `NavigateOptions`. ([#49350](https://github.com/WordPress/gutenberg/pull/49350)).
+ 
+ ## 23.7.0 (2023-03-29)
+ 
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index 28e710fa577b2d..4c98db5b1a4d18 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -147,6 +147,7 @@ function UnconnectedNavigatorProvider(
+ 			const {
+ 				focusTargetSelector,
+ 				isBack = false,
++				skipFocus = false,
+ 				...restOptions
+ 			} = options;
+ 
+@@ -168,6 +169,7 @@ function UnconnectedNavigatorProvider(
+ 					path,
+ 					isBack,
+ 					hasRestoredFocus: false,
++					skipFocus,
+ 				};
+ 
+ 				if ( prevLocationHistory.length < 1 ) {
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 2d4588d91b14d6..47b37ab65e96df 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -43,7 +43,7 @@ const animationExitDelay = 0;
+ // as some of them would overlap with HTML props (e.g. `onAnimationStart`, ...)
+ type Props = Omit<
+ 	WordPressComponentProps< NavigatorScreenProps, 'div', false >,
+-	keyof MotionProps
++	Exclude< keyof MotionProps, 'style' >
+ >;
+ 
+ function UnconnectedNavigatorScreen(
+@@ -100,11 +100,13 @@ function UnconnectedNavigatorScreen(
+ 		// - when the screen becomes visible
+ 		// - if the wrapper ref has been assigned
+ 		// - if focus hasn't already been restored for the current location
++		// - if the `skipFocus` option is not set to `true`. This is useful when we trigger the navigation outside of NavigatorScreen.
+ 		if (
+ 			isInitialLocation ||
+ 			! isMatch ||
+ 			! wrapperRef.current ||
+-			locationRef.current.hasRestoredFocus
++			locationRef.current.hasRestoredFocus ||
++			location.skipFocus
+ 		) {
+ 			return;
+ 		}
+@@ -143,6 +145,7 @@ function UnconnectedNavigatorScreen(
+ 		isMatch,
+ 		location.isBack,
+ 		location.focusTargetSelector,
++		location.skipFocus,
+ 	] );
+ 
+ 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
+diff --git a/packages/components/src/navigator/stories/index.tsx b/packages/components/src/navigator/stories/index.tsx
+index 4c8a968e881f19..fb353a354d5446 100644
+--- a/packages/components/src/navigator/stories/index.tsx
++++ b/packages/components/src/navigator/stories/index.tsx
+@@ -298,3 +298,71 @@ export const NestedNavigator: ComponentStory< typeof NavigatorProvider > =
+ NestedNavigator.args = {
+ 	initialPath: '/child2/grandchild',
+ };
++
++const NavigatorButtonWithSkipFocus = ( {
++	path,
++	onClick,
++	...props
++}: React.ComponentProps< typeof NavigatorButton > ) => {
++	const { goTo } = useNavigator();
++
++	return (
++		<Button
++			{ ...props }
++			onClick={ ( e: React.MouseEvent< HTMLButtonElement > ) => {
++				goTo( path, { skipFocus: true } );
++				onClick?.( e );
++			} }
++		/>
++	);
++};
++
++export const SkipFocus: ComponentStory< typeof NavigatorProvider > = (
++	args
++) => {
++	return <NavigatorProvider { ...args } />;
++};
++SkipFocus.args = {
++	initialPath: '/',
++	children: (
++		<>
++			<div
++				style={ {
++					height: 250,
++					border: '1px solid black',
++				} }
++			>
++				<NavigatorScreen
++					path="/"
++					style={ {
++						height: '100%',
++					} }
++				>
++					<h1>Home screen</h1>
++					<NavigatorButton variant="secondary" path="/child">
++						Go to child screen.
++					</NavigatorButton>
++				</NavigatorScreen>
++				<NavigatorScreen
++					path="/child"
++					style={ {
++						height: '100%',
++					} }
++				>
++					<h2>Child screen</h2>
++					<NavigatorToParentButton variant="secondary">
++						Go to parent screen.
++					</NavigatorToParentButton>
++				</NavigatorScreen>
++			</div>
++
++			<NavigatorButtonWithSkipFocus
++				variant="secondary"
++				path="/child"
++				style={ { margin: '1rem 2rem' } }
++			>
++				Go to child screen, but keep focus on this button
++			</NavigatorButtonWithSkipFocus>
++		</>
++	),
++};
+diff --git a/packages/components/src/navigator/test/index.tsx b/packages/components/src/navigator/test/index.tsx
+index a27be5475d8028..5a711b8730224a 100644
+--- a/packages/components/src/navigator/test/index.tsx
++++ b/packages/components/src/navigator/test/index.tsx
+@@ -22,6 +22,7 @@ import {
+ 	NavigatorToParentButton,
+ 	useNavigator,
+ } from '..';
++import type { NavigateOptions } from '../types';
+ 
+ const INVALID_HTML_ATTRIBUTE = {
+ 	raw: ' "\'><=invalid_path',
+@@ -57,6 +58,7 @@ const BUTTON_TEXT = {
+ 		'Navigate to screen with an invalid HTML value as a path.',
+ 	back: 'Go back',
+ 	backUsingGoTo: 'Go back using goTo',
++	goToWithSkipFocus: 'Go to with skipFocus',
+ };
+ 
+ type CustomTestOnClickHandler = (
+@@ -64,6 +66,7 @@ type CustomTestOnClickHandler = (
+ 		| {
+ 				type: 'goTo';
+ 				path: string;
++				options?: NavigateOptions;
+ 		  }
+ 		| { type: 'goBack' }
+ 		| { type: 'goToParent' }
+@@ -108,6 +111,26 @@ function CustomNavigatorGoToBackButton( {
+ 	);
+ }
+ 
++function CustomNavigatorGoToSkipFocusButton( {
++	path,
++	onClick,
++	...props
++}: Omit< ComponentPropsWithoutRef< typeof NavigatorButton >, 'onClick' > & {
++	onClick?: CustomTestOnClickHandler;
++} ) {
++	const { goTo } = useNavigator();
++	return (
++		<Button
++			onClick={ () => {
++				goTo( path, { skipFocus: true } );
++				// Used to spy on the values passed to `navigator.goTo`.
++				onClick?.( { type: 'goTo', path } );
++			} }
++			{ ...props }
++		/>
++	);
++}
++
+ function CustomNavigatorBackButton( {
+ 	onClick,
+ 	...props
+@@ -342,6 +365,12 @@ const MyHierarchicalNavigation = ( {
+ 						{ BUTTON_TEXT.backUsingGoTo }
+ 					</CustomNavigatorGoToBackButton>
+ 				</NavigatorScreen>
++				<CustomNavigatorGoToSkipFocusButton
++					path={ PATHS.NESTED }
++					onClick={ onNavigatorButtonClick }
++				>
++					{ BUTTON_TEXT.goToWithSkipFocus }
++				</CustomNavigatorGoToSkipFocusButton>
+ 			</NavigatorProvider>
+ 		</>
+ 	);
+@@ -716,6 +745,29 @@ describe( 'Navigator', () => {
+ 			await user.click( getNavigationButton( 'back' ) );
+ 			expect( getNavigationButton( 'toChildScreen' ) ).toHaveFocus();
+ 		} );
++
++		it( 'should skip focus based on location `skipFocus` option', async () => {
++			const user = userEvent.setup();
++			render( <MyHierarchicalNavigation /> );
++
++			// Navigate to child screen with skipFocus.
++			await user.click( getNavigationButton( 'goToWithSkipFocus' ) );
++			expect( queryScreen( 'home' ) ).not.toBeInTheDocument();
++			expect( getScreen( 'nested' ) ).toBeInTheDocument();
++
++			// The clicked button should remain focused.
++			expect( getNavigationButton( 'goToWithSkipFocus' ) ).toHaveFocus();
++
++			// Navigate back to parent screen.
++			await user.click( getNavigationButton( 'back' ) );
++			expect( getScreen( 'child' ) ).toBeInTheDocument();
++			// The first tabbable element receives focus.
++			expect(
++				screen.getByRole( 'button', {
++					name: 'First tabbable child screen button',
++				} )
++			).toHaveFocus();
++		} );
+ 	} );
+ 
+ 	describe( 'animation', () => {
+diff --git a/packages/components/src/navigator/types.ts b/packages/components/src/navigator/types.ts
+index f6d8f5c22b0a5f..e638084e8376d5 100644
+--- a/packages/components/src/navigator/types.ts
++++ b/packages/components/src/navigator/types.ts
+@@ -10,9 +10,10 @@ import type { ButtonAsButtonProps } from '../button/types';
+ 
+ export type MatchParams = Record< string, string | string[] >;
+ 
+-type NavigateOptions = {
++export type NavigateOptions = {
+ 	focusTargetSelector?: string;
+ 	isBack?: boolean;
++	skipFocus?: boolean;
+ };
+ 
+ export type NavigatorLocation = NavigateOptions & {
+diff --git a/packages/edit-site/src/components/global-styles/screen-block-list.js b/packages/edit-site/src/components/global-styles/screen-block-list.js
+index 7c60273beda76c..b929339860b2aa 100644
+--- a/packages/edit-site/src/components/global-styles/screen-block-list.js
++++ b/packages/edit-site/src/components/global-styles/screen-block-list.js
+@@ -57,21 +57,25 @@ function useSortedBlockTypes() {
+ 	return [ ...coreItems, ...nonCoreItems ];
+ }
+ 
+-function BlockMenuItem( { block } ) {
+-	const [ rawSettings ] = useGlobalSetting( '', block.name );
+-	const settings = useSettingsForBlockElement( rawSettings, block.name );
++export function useBlockHasGlobalStyles( blockName ) {
++	const [ rawSettings ] = useGlobalSetting( '', blockName );
++	const settings = useSettingsForBlockElement( rawSettings, blockName );
+ 	const hasTypographyPanel = useHasTypographyPanel( settings );
+ 	const hasColorPanel = useHasColorPanel( settings );
+ 	const hasBorderPanel = useHasBorderPanel( settings );
+ 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
+ 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
+-	const hasVariationsPanel = useHasVariationsPanel( block.name );
+-	const hasBlockMenuItem =
++	const hasVariationsPanel = useHasVariationsPanel( blockName );
++	const hasGlobalStyles =
+ 		hasTypographyPanel ||
+ 		hasColorPanel ||
+ 		hasLayoutPanel ||
+ 		hasVariationsPanel;
++	return hasGlobalStyles;
++}
+ 
++function BlockMenuItem( { block } ) {
++	const hasBlockMenuItem = useBlockHasGlobalStyles( block.name );
+ 	if ( ! hasBlockMenuItem ) {
+ 		return null;
+ 	}
+diff --git a/packages/edit-site/src/components/global-styles/ui.js b/packages/edit-site/src/components/global-styles/ui.js
+index b9319df5a4a9f1..b2f3da2306a1d0 100644
+--- a/packages/edit-site/src/components/global-styles/ui.js
++++ b/packages/edit-site/src/components/global-styles/ui.js
+@@ -10,17 +10,24 @@ import {
+ } from '@wordpress/components';
+ import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
++import {
++	privateApis as blockEditorPrivateApis,
++	store as blockEditorStore,
++} from '@wordpress/block-editor';
+ import { __ } from '@wordpress/i18n';
+ import { store as preferencesStore } from '@wordpress/preferences';
+ import { moreVertical } from '@wordpress/icons';
+ import { store as coreStore } from '@wordpress/core-data';
++import { useEffect, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import ScreenRoot from './screen-root';
+-import ScreenBlockList from './screen-block-list';
++import {
++	useBlockHasGlobalStyles,
++	default as ScreenBlockList,
++} from './screen-block-list';
+ import ScreenBlock from './screen-block';
+ import ScreenTypography from './screen-typography';
+ import ScreenTypographyElement from './screen-typography-element';
+@@ -255,6 +262,40 @@ function GlobalStylesStyleBook( { onClose } ) {
+ 	);
+ }
+ 
++function GlobalStylesBlockLink() {
++	const navigator = useNavigator();
++	const isMounted = useRef();
++	const { selectedBlockName, selectedBlockClientId } = useSelect(
++		( select ) => {
++			const { getSelectedBlockClientId, getBlockName } =
++				select( blockEditorStore );
++			const clientId = getSelectedBlockClientId();
++			return {
++				selectedBlockName: getBlockName( clientId ),
++				selectedBlockClientId: clientId,
++			};
++		},
++		[]
++	);
++	const blockHasGlobalStyles = useBlockHasGlobalStyles( selectedBlockName );
++	useEffect( () => {
++		// Avoid navigating to the block screen on mount.
++		if ( ! isMounted.current ) {
++			isMounted.current = true;
++			return;
++		}
++		if ( ! selectedBlockClientId || ! blockHasGlobalStyles ) {
++			return;
++		}
++		const path = '/blocks/' + encodeURIComponent( selectedBlockName );
++		// Avoid navigating to the same path. This can happen when selecting
++		// a new block of the same type.
++		if ( path !== navigator.location.path ) {
++			navigator.goTo( path, { skipFocus: true } );
++		}
++	}, [ selectedBlockClientId, selectedBlockName, blockHasGlobalStyles ] );
++}
++
+ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
+ 	const blocks = getBlockTypes();
+ 
+@@ -307,6 +348,7 @@ function GlobalStylesUI( { isStyleBookOpened, onCloseStyleBook } ) {
+ 			) }
+ 
+ 			<GlobalStylesActionMenu />
++			<GlobalStylesBlockLink />
+ 		</NavigatorProvider>
+ 	);
+ }

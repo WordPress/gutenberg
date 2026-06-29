@@ -1,0 +1,57 @@
+diff --git a/.prettierrc.js b/.prettierrc.js
+index 0a95f2da679606..f451c1242d74e3 100644
+--- a/.prettierrc.js
++++ b/.prettierrc.js
+@@ -1,7 +1,7 @@
+ // Import the default config file and expose it in the project root.
+ // Useful for editor integrations.
+ module.exports = {
+-	...require( '@wordpress/prettier-config' ),
++	...require( './packages/prettier-config' ),
+ 	overrides: [
+ 		{
+ 			files: [ 'changelog.txt' ],
+diff --git a/package-lock.json b/package-lock.json
+index eedaa9e91f7b50..7dfe8c324d1bc7 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -35,7 +35,6 @@
+ 				"lint-staged": "^16.4.0",
+ 				"npm-run-all": "^4.1.5",
+ 				"patch-package": "^8.0.0",
+-				"prettier": "npm:wp-prettier@^3.0.3",
+ 				"rimraf": "^5.0.10",
+ 				"stylelint-plugin-logical-css": "^1.2.3",
+ 				"syncpack": "^15.3.1",
+@@ -53217,6 +53216,7 @@
+ 				"@types/node": "^20.19.39",
+ 				"esbuild": "^0.27.2",
+ 				"esbuild-esm-loader": "^0.3.3",
++				"prettier": "npm:wp-prettier@^3.0.3",
+ 				"storybook": "^10.2.8",
+ 				"stylelint": "^16.8.2"
+ 			},
+diff --git a/package.json b/package.json
+index 9b88425f4eef06..36b816218c52ce 100644
+--- a/package.json
++++ b/package.json
+@@ -75,7 +75,6 @@
+ 		"lint-staged": "^16.4.0",
+ 		"npm-run-all": "^4.1.5",
+ 		"patch-package": "^8.0.0",
+-		"prettier": "npm:wp-prettier@^3.0.3",
+ 		"rimraf": "^5.0.10",
+ 		"stylelint-plugin-logical-css": "^1.2.3",
+ 		"syncpack": "^15.3.1",
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index 2bcda1de5fa76b..bc6f648b9a8ae9 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -97,6 +97,7 @@
+ 		"@types/node": "^20.19.39",
+ 		"esbuild": "^0.27.2",
+ 		"esbuild-esm-loader": "^0.3.3",
++		"prettier": "npm:wp-prettier@^3.0.3",
+ 		"storybook": "^10.2.8",
+ 		"stylelint": "^16.8.2"
+ 	},

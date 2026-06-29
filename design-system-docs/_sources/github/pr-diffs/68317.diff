@@ -1,0 +1,124 @@
+diff --git a/bin/api-docs/gen-components-docs/get-tags-from-storybook.mjs b/bin/api-docs/gen-components-docs/get-tags-from-storybook.mjs
+new file mode 100644
+index 00000000000000..84d7beaf1e4076
+--- /dev/null
++++ b/bin/api-docs/gen-components-docs/get-tags-from-storybook.mjs
+@@ -0,0 +1,30 @@
++/**
++ * External dependencies
++ */
++import fs from 'node:fs/promises';
++import babel from '@babel/core';
++
++/**
++ * Returns `meta.tags` from a Storybook file.
++ *
++ * @param {string} filePath
++ * @return {Promise<string[]>} Array of tags.
++ */
++export async function getTagsFromStorybook( filePath ) {
++	const fileContent = await fs.readFile( filePath, 'utf8' );
++	const parsedFile = babel.parse( fileContent, {
++		filename: filePath,
++	} );
++
++	const meta = parsedFile.program.body.find(
++		( node ) =>
++			node.type === 'VariableDeclaration' &&
++			node.declarations[ 0 ].id.name === 'meta'
++	);
++
++	return (
++		meta.declarations[ 0 ].init.properties
++			.find( ( node ) => node.key.name === 'tags' )
++			?.value.elements.map( ( node ) => node.value ) ?? []
++	);
++}
+diff --git a/bin/api-docs/gen-components-docs/index.mjs b/bin/api-docs/gen-components-docs/index.mjs
+index c7109dc4982c36..30888acf851cab 100644
+--- a/bin/api-docs/gen-components-docs/index.mjs
++++ b/bin/api-docs/gen-components-docs/index.mjs
+@@ -11,6 +11,7 @@ import path from 'path';
+  */
+ import { generateMarkdownDocs } from './markdown/index.mjs';
+ import { getDescriptionsForSubcomponents } from './get-subcomponent-descriptions.mjs';
++import { getTagsFromStorybook } from './get-tags-from-storybook.mjs';
+ 
+ const MANIFEST_GLOB = 'packages/components/src/**/docs-manifest.json';
+ 
+@@ -113,9 +114,17 @@ await Promise.all(
+ 			} ) ?? []
+ 		);
+ 
++		const tags = await getTagsFromStorybook(
++			path.resolve(
++				path.dirname( manifestPath ),
++				'stories/index.story.tsx'
++			)
++		);
++
+ 		const docs = generateMarkdownDocs( {
+ 			typeDocs,
+ 			subcomponentTypeDocs,
++			tags,
+ 		} );
+ 		const outputFile = path.resolve(
+ 			path.dirname( manifestPath ),
+diff --git a/bin/api-docs/gen-components-docs/markdown/index.mjs b/bin/api-docs/gen-components-docs/markdown/index.mjs
+index 5978e7e80fe260..99715b5d4752b6 100644
+--- a/bin/api-docs/gen-components-docs/markdown/index.mjs
++++ b/bin/api-docs/gen-components-docs/markdown/index.mjs
+@@ -21,10 +21,19 @@ function normalizeTrailingNewline( str ) {
+ 	return str.replace( /\n*$/, '\n' );
+ }
+ 
+-export function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
++export function generateMarkdownDocs( {
++	typeDocs,
++	subcomponentTypeDocs,
++	tags,
++} ) {
+ 	const mainDocsJson = [
+ 		{ h1: typeDocs.displayName },
+ 		'<!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->',
++		tags.includes( 'status-private' ) && [
++			{
++				p: '🔒 This component is locked as a [private API](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/). We do not yet recommend using this outside of the Gutenberg project.',
++			},
++		],
+ 		{
+ 			p: `<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-${ typeDocs.displayName.toLowerCase() }--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>`,
+ 		},
+diff --git a/packages/components/src/badge/README.md b/packages/components/src/badge/README.md
+index 0be531ca6f2df8..befe4ce13b8151 100644
+--- a/packages/components/src/badge/README.md
++++ b/packages/components/src/badge/README.md
+@@ -2,6 +2,9 @@
+ 
+ <!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
+ 
++🔒 This component is locked as a [private API](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/). We do not yet recommend using this outside of the Gutenberg project.
++
++
+ <p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-badge--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
+ 
+ ## Props
+diff --git a/packages/components/src/badge/stories/index.story.tsx b/packages/components/src/badge/stories/index.story.tsx
+index 7f827d3bfabf5a..bbe0bef2a79472 100644
+--- a/packages/components/src/badge/stories/index.story.tsx
++++ b/packages/components/src/badge/stories/index.story.tsx
+@@ -8,12 +8,12 @@ import type { Meta, StoryObj } from '@storybook/react';
+  */
+ import Badge from '..';
+ 
+-const meta = {
++const meta: Meta< typeof Badge > = {
+ 	component: Badge,
+ 	title: 'Components/Containers/Badge',
+ 	id: 'components-badge',
+ 	tags: [ 'status-private' ],
+-} satisfies Meta< typeof Badge >;
++};
+ 
+ export default meta;
+ 

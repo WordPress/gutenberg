@@ -1,0 +1,116 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3c97c3c429d659..fda15ca8fcb19e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `Autocomplete`: Fix matching logic to prefer longest overlapping trigger ([#77018](https://github.com/WordPress/gutenberg/pull/77018)).
++
+ ### Internal
+ 
+ -   Autocomplete: Refactor `useAutocomplete` to use `useReducer` ([#77020](https://github.com/WordPress/gutenberg/pull/77020)).
+diff --git a/packages/components/src/autocomplete/get-autocomplete-match.ts b/packages/components/src/autocomplete/get-autocomplete-match.ts
+index 03d131e8fcbad5..2318ddb59e9288 100644
+--- a/packages/components/src/autocomplete/get-autocomplete-match.ts
++++ b/packages/components/src/autocomplete/get-autocomplete-match.ts
+@@ -24,19 +24,32 @@ export function getAutocompleteMatch(
+ 		return null;
+ 	}
+ 
+-	// Find the completer with the highest triggerPrefix index in the
+-	// textContent. Compute lastIndexOf once per completer to avoid
+-	// redundant lookups in the reduce accumulator.
++	// Find the completer whose trigger prefix ends closest to the cursor
++	// (rightmost end position). Comparing end positions instead of start
++	// positions correctly resolves overlapping prefixes like "@" and "@@".
+ 	let completer: WPCompleter | null = null;
+ 	let triggerIndex = -1;
++	let matchedEndIndex = -1;
++	let matchedPrefixLength = 0;
+ 
+ 	for ( const currentCompleter of completers ) {
+ 		const currentIndex = textContent.lastIndexOf(
+ 			currentCompleter.triggerPrefix
+ 		);
+-		if ( currentIndex > triggerIndex ) {
++		if ( currentIndex < 0 ) {
++			continue;
++		}
++		const currentEndIndex =
++			currentIndex + currentCompleter.triggerPrefix.length;
++		if (
++			currentEndIndex > matchedEndIndex ||
++			( currentEndIndex === matchedEndIndex &&
++				currentCompleter.triggerPrefix.length > matchedPrefixLength )
++		) {
+ 			completer = currentCompleter;
+ 			triggerIndex = currentIndex;
++			matchedEndIndex = currentEndIndex;
++			matchedPrefixLength = currentCompleter.triggerPrefix.length;
+ 		}
+ 	}
+ 
+diff --git a/packages/components/src/autocomplete/test/get-autocomplete-match.ts b/packages/components/src/autocomplete/test/get-autocomplete-match.ts
+index 33993fa24226d2..d8e094dcdfd431 100644
+--- a/packages/components/src/autocomplete/test/get-autocomplete-match.ts
++++ b/packages/components/src/autocomplete/test/get-autocomplete-match.ts
+@@ -71,7 +71,7 @@ describe( 'getAutocompleteMatch', () => {
+ 		} );
+ 	} );
+ 
+-	it( 'should select the completer with the latest trigger index', () => {
++	it( 'should prefer the rightmost matching trigger when multiple completers match', () => {
+ 		const slashCompleter = createCompleter( {
+ 			name: 'slash',
+ 			triggerPrefix: '/',
+@@ -221,6 +221,46 @@ describe( 'getAutocompleteMatch', () => {
+ 		expect( result?.filterValue ).toBe( 'cafe' );
+ 	} );
+ 
++	it( 'should match the longer trigger when prefixes overlap', () => {
++		const singleAt = createCompleter( {
++			name: 'single',
++			triggerPrefix: '@',
++		} );
++		const doubleAt = createCompleter( {
++			name: 'double',
++			triggerPrefix: '@@',
++		} );
++		const result = getAutocompleteMatch(
++			'@@user',
++			[ singleAt, doubleAt ],
++			1,
++			false,
++			() => ''
++		);
++		expect( result?.completer.name ).toBe( 'double' );
++		expect( result?.filterValue ).toBe( 'user' );
++	} );
++
++	it( 'should match the shorter trigger when only it is present', () => {
++		const singleAt = createCompleter( {
++			name: 'single',
++			triggerPrefix: '@',
++		} );
++		const doubleAt = createCompleter( {
++			name: 'double',
++			triggerPrefix: '@@',
++		} );
++		const result = getAutocompleteMatch(
++			'hello @user',
++			[ singleAt, doubleAt ],
++			1,
++			false,
++			() => ''
++		);
++		expect( result?.completer.name ).toBe( 'single' );
++		expect( result?.filterValue ).toBe( 'user' );
++	} );
++
+ 	it( 'should handle special regex characters in trigger prefix', () => {
+ 		const completers = [ createCompleter( { triggerPrefix: '$$' } ) ];
+ 		const result = getAutocompleteMatch(

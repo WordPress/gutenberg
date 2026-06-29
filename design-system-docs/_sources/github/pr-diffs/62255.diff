@@ -1,0 +1,327 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bc4c7da0734d1f..9a595827ffb0c8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,11 +4,12 @@
+ 
+ ### Enhancements
+ 
+--   DropZone: rewrite animation without depending on framer-motion. ([#62044](https://github.com/WordPress/gutenberg/pull/62044))
++-   `DropZone`: rewrite animation without depending on framer-motion. ([#62044](https://github.com/WordPress/gutenberg/pull/62044))
+ 
+ ### Internal
+ 
+--   CustomSelectControl: align unit tests for v1 and legacy v2 versions. ([#62706](https://github.com/WordPress/gutenberg/pull/62706))
++-   `CustomSelectControl`: align unit tests for v1 and legacy v2 versions. ([#62706](https://github.com/WordPress/gutenberg/pull/62706))
++-   `CustomSelectControl`: fix handling of extra option attributes in the `onChange` callbacks and when forwarding them to the option DOM elements. ([#62255](https://github.com/WordPress/gutenberg/pull/62255))
+ 
+ ## 28.1.0 (2024-06-15)
+ 
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+index 43f102e6ee0493..089d55c9a0a06c 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+@@ -14,7 +14,7 @@ import * as Styled from '../styles';
+ 
+ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 	const {
+-		__experimentalShowSelectedHint,
++		__experimentalShowSelectedHint = false,
+ 		__next40pxDefaultSize = false,
+ 		describedBy,
+ 		options,
+@@ -27,7 +27,11 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 	// Forward props + store from v2 implementation
+ 	const store = Ariakit.useSelectStore( {
+ 		async setValue( nextValue ) {
+-			if ( ! onChange ) {
++			const nextOption = options.find(
++				( item ) => item.name === nextValue
++			);
++
++			if ( ! onChange || ! nextOption ) {
+ 				return;
+ 			}
+ 
+@@ -42,10 +46,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 				),
+ 				inputValue: '',
+ 				isOpen: state.open,
+-				selectedItem: {
+-					name: nextValue as string,
+-					key: nextValue as string,
+-				},
++				selectedItem: nextOption,
+ 				type: '',
+ 			};
+ 			onChange( changeObject );
+@@ -53,7 +54,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 	} );
+ 
+ 	const children = options.map(
+-		( { name, key, __experimentalHint, ...rest } ) => {
++		( { name, key, __experimentalHint, style, className } ) => {
+ 			const withHint = (
+ 				<Styled.WithHintWrapper>
+ 					<span>{ name }</span>
+@@ -68,7 +69,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 					key={ key }
+ 					value={ name }
+ 					children={ __experimentalHint ? withHint : name }
+-					{ ...rest }
++					style={ style }
++					className={ className }
+ 				/>
+ 			);
+ 		}
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+index 02680e76cdb81b..06af287a142367 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+@@ -46,6 +46,16 @@ const legacyProps = {
+ 			name: 'aquamarine',
+ 			style: customStyles,
+ 		},
++		{
++			key: 'color3',
++			name: 'tomato (with custom props)',
++			className: customClassName,
++			style: customStyles,
++			// try passing a valid HTML attribute
++			'aria-label': 'test label',
++			// try adding a custom prop
++			customPropFoo: 'foo',
++		},
+ 	],
+ };
+ 
+@@ -289,8 +299,7 @@ describe.each( [
+ 			expect.objectContaining( {
+ 				inputValue: '',
+ 				isOpen: false,
+-				// TODO: key should be different — this is a known bug and will be fixed
+-				selectedItem: { key: 'violets', name: 'violets' },
++				selectedItem: { key: 'flower1', name: 'violets' },
+ 				type: '',
+ 			} )
+ 		);
+@@ -333,8 +342,7 @@ describe.each( [
+ 			1,
+ 			expect.objectContaining( {
+ 				selectedItem: expect.objectContaining( {
+-					// TODO: key should be different — this is a known bug and will be fixed
+-					key: 'violets',
++					key: 'flower1',
+ 					name: 'violets',
+ 				} ),
+ 			} )
+@@ -347,14 +355,56 @@ describe.each( [
+ 			2,
+ 			expect.objectContaining( {
+ 				selectedItem: expect.objectContaining( {
+-					// TODO: key should be different — this is a known bug and will be fixed
+-					key: 'poppy',
++					key: 'flower3',
+ 					name: 'poppy',
+ 				} ),
+ 			} )
+ 		);
+ 	} );
+ 
++	it( "Should pass arbitrary props to onChange's selectedItem, but apply only style and className to DOM elements", async () => {
++		const onChangeMock = jest.fn();
++
++		render( <Component { ...legacyProps } onChange={ onChangeMock } /> );
++
++		const currentSelectedItem = screen.getByRole( 'combobox', {
++			expanded: false,
++		} );
++
++		await click( currentSelectedItem );
++
++		const optionWithCustomAttributes = screen.getByRole( 'option', {
++			name: 'tomato (with custom props)',
++		} );
++
++		// Assert that the option element does not have the custom attributes
++		expect( optionWithCustomAttributes ).not.toHaveAttribute(
++			'customPropFoo'
++		);
++		expect( optionWithCustomAttributes ).not.toHaveAttribute(
++			'aria-label'
++		);
++
++		await click( optionWithCustomAttributes );
++
++		// NOTE: legacy CustomSelectControl doesn't fire onChange
++		// on first render, and so at this point in time `onChangeMock`
++		// would be called only once.
++		expect( onChangeMock ).toHaveBeenCalledTimes( 2 );
++		expect( onChangeMock ).toHaveBeenCalledWith(
++			expect.objectContaining( {
++				selectedItem: expect.objectContaining( {
++					key: 'color3',
++					name: 'tomato (with custom props)',
++					className: customClassName,
++					style: customStyles,
++					'aria-label': 'test label',
++					customPropFoo: 'foo',
++				} ),
++			} )
++		);
++	} );
++
+ 	describe( 'Keyboard behavior and accessibility', () => {
+ 		// skip reason: legacy v2 doesn't currently implement this behavior
+ 		it.skip( 'Captures the keypress event and does not let it propagate', async () => {
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+index 5540a533c09d45..12b41ba54f4a20 100644
+--- a/packages/components/src/custom-select-control-v2/types.ts
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -79,6 +79,7 @@ type LegacyOption = {
+ 	style?: React.CSSProperties;
+ 	className?: string;
+ 	__experimentalHint?: string;
++	[ key: string ]: any;
+ };
+ 
+ /**
+diff --git a/packages/components/src/custom-select-control/stories/index.story.tsx b/packages/components/src/custom-select-control/stories/index.story.tsx
+index a27ad6b3894b6f..8ff9a023c5821b 100644
+--- a/packages/components/src/custom-select-control/stories/index.story.tsx
++++ b/packages/components/src/custom-select-control/stories/index.story.tsx
+@@ -3,6 +3,11 @@
+  */
+ import type { StoryFn } from '@storybook/react';
+ 
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+@@ -20,10 +25,34 @@ export default {
+ 				type: 'radio',
+ 			},
+ 		},
++		onChange: { control: { type: null } },
++		value: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
+ 	},
+ };
+ 
+-export const Default: StoryFn = CustomSelectControl.bind( {} );
++const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
++	const [ value, setValue ] = useState( props.options[ 0 ] );
++
++	const onChange: React.ComponentProps<
++		typeof CustomSelectControl
++	>[ 'onChange' ] = ( changeObject: { selectedItem: any } ) => {
++		setValue( changeObject.selectedItem );
++		props.onChange?.( changeObject );
++	};
++
++	return (
++		<CustomSelectControl
++			{ ...props }
++			onChange={ onChange }
++			value={ value }
++		/>
++	);
++};
++
++export const Default: StoryFn = Template.bind( {} );
+ Default.args = {
+ 	label: 'Label',
+ 	options: [
+@@ -51,7 +80,7 @@ Default.args = {
+ 	],
+ };
+ 
+-export const WithLongLabels: StoryFn = CustomSelectControl.bind( {} );
++export const WithLongLabels: StoryFn = Template.bind( {} );
+ WithLongLabels.args = {
+ 	...Default.args,
+ 	options: [
+@@ -70,7 +99,7 @@ WithLongLabels.args = {
+ 	],
+ };
+ 
+-export const WithHints: StoryFn = CustomSelectControl.bind( {} );
++export const WithHints: StoryFn = Template.bind( {} );
+ WithHints.args = {
+ 	...Default.args,
+ 	options: [
+diff --git a/packages/components/src/custom-select-control/test/index.js b/packages/components/src/custom-select-control/test/index.js
+index 867571650ed4e7..2eb855c15b51f9 100644
+--- a/packages/components/src/custom-select-control/test/index.js
++++ b/packages/components/src/custom-select-control/test/index.js
+@@ -46,6 +46,16 @@ const props = {
+ 			name: 'aquamarine',
+ 			style: customStyles,
+ 		},
++		{
++			key: 'color3',
++			name: 'tomato (with custom props)',
++			className: customClassName,
++			style: customStyles,
++			// try passing a valid HTML attribute
++			'aria-label': 'test label',
++			// try adding a custom prop
++			customPropFoo: 'foo',
++		},
+ 	],
+ };
+ 
+@@ -346,6 +356,47 @@ describe.each( [
+ 		);
+ 	} );
+ 
++	it( "Should pass arbitrary props to onChange's selectedItem, but apply only style and className to DOM elements", async () => {
++		const user = userEvent.setup();
++		const onChangeMock = jest.fn();
++
++		render( <Component { ...props } onChange={ onChangeMock } /> );
++
++		const currentSelectedItem = screen.getByRole( 'button', {
++			expanded: false,
++		} );
++
++		await user.click( currentSelectedItem );
++
++		const optionWithCustomAttributes = screen.getByRole( 'option', {
++			name: 'tomato (with custom props)',
++		} );
++
++		// Assert that the option element does not have the custom attributes
++		expect( optionWithCustomAttributes ).not.toHaveAttribute(
++			'customPropFoo'
++		);
++		expect( optionWithCustomAttributes ).not.toHaveAttribute(
++			'aria-label'
++		);
++
++		await user.click( optionWithCustomAttributes );
++
++		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
++		expect( onChangeMock ).toHaveBeenCalledWith(
++			expect.objectContaining( {
++				selectedItem: expect.objectContaining( {
++					key: 'color3',
++					name: 'tomato (with custom props)',
++					className: customClassName,
++					style: customStyles,
++					'aria-label': 'test label',
++					customPropFoo: 'foo',
++				} ),
++			} )
++		);
++	} );
++
+ 	describe( 'Keyboard behavior and accessibility', () => {
+ 		it( 'Captures the keypress event and does not let it propagate', async () => {
+ 			const user = userEvent.setup();

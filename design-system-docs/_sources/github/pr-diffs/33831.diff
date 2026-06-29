@@ -1,0 +1,23 @@
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index de136f99d16d1b..732fdef6a09b70 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -10,7 +10,9 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
+ 	height: $button-size;
+ 	border-radius: $button-size;
+ 	margin-bottom: $grid-unit-15;
++	/*rtl:ignore*/
+ 	padding-left: $components-custom-gradient-picker__padding;
++	/*rtl:ignore*/
+ 	padding-right: $button-size - $components-custom-gradient-picker__padding;
+ 
+ 	.components-custom-gradient-picker__markers-container {
+@@ -61,6 +63,8 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
+ }
+ 
+ .components-custom-gradient-picker__inserter {
++	/*rtl:ignore*/
++	direction: ltr;
+ 	width: 100%;
+ }
+ 

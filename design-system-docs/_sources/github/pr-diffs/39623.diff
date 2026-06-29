@@ -1,0 +1,23 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b9099425eb9ec4..1865318a1fdcfd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -21,6 +21,7 @@
+ 
+ -   `NumberControl`: commit (and constrain) value on `blur` event ([#39186](https://github.com/WordPress/gutenberg/pull/39186)).
+ -   Fix `UnitControl`'s reset of unit when the quantity value is cleared. ([#39531](https://github.com/WordPress/gutenberg/pull/39531/)).
++-   `ResizableBox`: Ensure tooltip text remains on a single line. ([#39623](https://github.com/WordPress/gutenberg/pull/39623)).
+ 
+ ### Deprecation
+ 
+diff --git a/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js
+index 87aded4b133674..551d1be939af46 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js
++++ b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js
+@@ -48,5 +48,6 @@ export const LabelText = styled( Text )`
+ 		display: block;
+ 		font-size: 13px;
+ 		line-height: 1.4;
++		white-space: nowrap;
+ 	}
+ `;

@@ -1,0 +1,52 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a5cf55e2ac9edb..e768dce86fc136 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ -   `Flex`: Update to pass `exhaustive-deps` eslint rule ([#45528](https://github.com/WordPress/gutenberg/pull/45528)).
+ -   `withNotices`: Update to pass `exhaustive-deps` eslint rule ([#45530](https://github.com/WordPress/gutenberg/pull/45530)).
+ -   `ItemGroup`: Update to pass `exhaustive-deps` eslint rule ([#45531](https://github.com/WordPress/gutenberg/pull/45531)).
++-   `TabPanel`: Update to pass `exhaustive-deps` eslint rule ([#45660](https://github.com/WordPress/gutenberg/pull/45660)).
+ -   `NavigatorScreen`: Update to pass `exhaustive-deps` eslint rule ([#45648](https://github.com/WordPress/gutenberg/pull/45648)).
+ -   `Draggable`: Convert to TypeScript ([#45471](https://github.com/WordPress/gutenberg/pull/45471)).
+ -   `MenuGroup`: Convert to TypeScript ([#45617](https://github.com/WordPress/gutenberg/pull/45617)).
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index 4e0b0394bd7409..206c2b8aab0a71 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -7,7 +7,7 @@ import { find } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+-import { useState, useEffect } from '@wordpress/element';
++import { useState, useEffect, useCallback } from '@wordpress/element';
+ import { useInstanceId } from '@wordpress/compose';
+ 
+ /**
+@@ -85,10 +85,13 @@ export function TabPanel( {
+ 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
+ 	const [ selected, setSelected ] = useState< string >();
+ 
+-	const handleTabSelection = ( tabKey: string ) => {
+-		setSelected( tabKey );
+-		onSelect?.( tabKey );
+-	};
++	const handleTabSelection = useCallback(
++		( tabKey: string ) => {
++			setSelected( tabKey );
++			onSelect?.( tabKey );
++		},
++		[ onSelect ]
++	);
+ 
+ 	const onNavigate = ( _childIndex: number, child: HTMLButtonElement ) => {
+ 		child.click();
+@@ -100,7 +103,7 @@ export function TabPanel( {
+ 		if ( ! selectedTab?.name && tabs.length > 0 ) {
+ 			handleTabSelection( initialTabName || tabs[ 0 ].name );
+ 		}
+-	}, [ tabs, selectedTab?.name, initialTabName ] );
++	}, [ tabs, selectedTab?.name, initialTabName, handleTabSelection ] );
+ 
+ 	return (
+ 		<div className={ className }>

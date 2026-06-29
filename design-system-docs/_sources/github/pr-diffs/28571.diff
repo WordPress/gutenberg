@@ -1,0 +1,459 @@
+diff --git a/package-lock.json b/package-lock.json
+index 593b8323a19f60..209b5114356708 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -10817,6 +10817,12 @@
+ 				"@types/unist": "*"
+ 			}
+ 		},
++		"@types/highlight-words-core": {
++			"version": "1.2.0",
++			"resolved": "https://registry.npmjs.org/@types/highlight-words-core/-/highlight-words-core-1.2.0.tgz",
++			"integrity": "sha512-yy+e7t3P5ABzT/Bl0Wy0hxworXGKKSJVQljaUQxco9ddXY5OZVbRm+yyzZAPBhP4C7KwfkZRRhNOCYkLbloFYw==",
++			"dev": true
++		},
+ 		"@types/history": {
+ 			"version": "4.7.8",
+ 			"resolved": "https://registry.npmjs.org/@types/history/-/history-4.7.8.tgz",
+@@ -10935,9 +10941,9 @@
+ 			"dev": true
+ 		},
+ 		"@types/node": {
+-			"version": "12.7.11",
+-			"resolved": "https://registry.npmjs.org/@types/node/-/node-12.7.11.tgz",
+-			"integrity": "sha512-Otxmr2rrZLKRYIybtdG/sgeO+tHY20GxeDjcGmUnmmlCWyEnv2a2x1ZXBo3BTec4OiTXMQCiazB8NMBf0iRlFw==",
++			"version": "14.14.22",
++			"resolved": "https://registry.npmjs.org/@types/node/-/node-14.14.22.tgz",
++			"integrity": "sha512-g+f/qj/cNcqKkc3tFqlXOYjrmZA+jNBiDzbP3kH+B+otKFqAdPgVTGP1IeKRdMml/aE69as5S4FqtxAbl+LaMw==",
+ 			"dev": true
+ 		},
+ 		"@types/node-fetch": {
+diff --git a/package.json b/package.json
+index 96df6b474a836e..2e7ab13087bba6 100644
+--- a/package.json
++++ b/package.json
+@@ -100,6 +100,7 @@
+ 		"@types/classnames": "2.2.10",
+ 		"@types/eslint": "6.8.0",
+ 		"@types/estree": "0.0.44",
++		"@types/highlight-words-core": "1.2.0",
+ 		"@types/lodash": "4.14.149",
+ 		"@types/npm-package-arg": "6.1.0",
+ 		"@types/prettier": "1.19.0",
+diff --git a/packages/components/src/__next/context/component-system-provider.js b/packages/components/src/__next/context/component-system-provider.js
+index 2b6ef12bc8a3b4..1ba31238c27b6a 100644
+--- a/packages/components/src/__next/context/component-system-provider.js
++++ b/packages/components/src/__next/context/component-system-provider.js
+@@ -1,8 +1,14 @@
+ /**
+  * External dependencies
+  */
+-import { ContextSystemProvider } from '@wp-g2/components';
++import { ContextSystemProvider } from '@wp-g2/context';
+ 
++/**
++ * @param {Object} props
++ * @param {string[]} [props.__unstableNextInclude]
++ * @param {import('react').ReactNode} props.children
++ * @param {any} props.value
++ */
+ export function ComponentSystemProvider( {
+ 	__unstableNextInclude = [],
+ 	children,
+diff --git a/packages/components/src/__next/context/with-next.js b/packages/components/src/__next/context/with-next.js
+index d52ed5bb456ec9..a0b7770f582be0 100644
+--- a/packages/components/src/__next/context/with-next.js
++++ b/packages/components/src/__next/context/with-next.js
+@@ -1,22 +1,38 @@
+ /**
+  * External dependencies
+  */
+-import { contextConnect, useContextSystem } from '@wp-g2/components';
++import { contextConnect, useContextSystem } from '@wp-g2/context';
+ 
++/**
++ * @template {{}} TCurrentProps
++ * @template {{}} TNextProps
++ * @param {import('react').ComponentType<TCurrentProps>} CurrentComponent
++ * @param {import('react').ComponentType<TNextProps>} NextComponent
++ * @param {string} namespace
++ * @param {(props: TCurrentProps) => TNextProps} adapter
++ */
+ export function withNext(
+ 	CurrentComponent = () => null,
+ 	NextComponent = () => null,
+ 	namespace = 'Component',
+-	adapter = ( p ) => p
++	adapter = ( p ) => /** @type {any} */ ( p )
+ ) {
+ 	if ( process.env.COMPONENT_SYSTEM_PHASE === 1 ) {
++		/* eslint-disable jsdoc/no-undefined-types */
++		/**
++		 * @param {TCurrentProps} props
++		 * @param {import('react').Ref<any>} ref
++		 */
++		/* eslint-enable jsdoc/no-undefined-types */
+ 		const WrappedComponent = ( props, ref ) => {
++			// @ts-ignore
+ 			const { __unstableVersion, ...otherProps } = useContextSystem(
+ 				props,
+ 				namespace
+ 			);
+ 
+ 			if ( __unstableVersion === 'next' ) {
++				// @ts-ignore
+ 				const nextProps = adapter( otherProps );
+ 				return <NextComponent { ...nextProps } ref={ ref } />;
+ 			}
+diff --git a/packages/components/src/grid/grid-utils.js b/packages/components/src/grid/grid-utils.js
+index 583108964b67f7..bff93d0f41f3b0 100644
+--- a/packages/components/src/grid/grid-utils.js
++++ b/packages/components/src/grid/grid-utils.js
+@@ -12,8 +12,14 @@ const ALIGNMENTS = {
+ 	topRight: { alignItems: 'flex-start', justifyContent: 'flex-end' },
+ };
+ 
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param {keyof typeof ALIGNMENTS | undefined} alignment
++ * @return {{ alignItems?: import('react').CSSProperties['alignItems'], justifyContent?: import('react').CSSProperties['justifyContent']}} CSS props for alignment
++ */
+ export function getAlignmentProps( alignment ) {
+-	const alignmentProps = ALIGNMENTS[ alignment ] || {};
++	const alignmentProps = alignment ? ALIGNMENTS[ alignment ] : {};
+ 
+ 	return alignmentProps;
+ }
++/* eslint-enable jsdoc/valid-types */
+diff --git a/packages/components/src/grid/use-grid.js b/packages/components/src/grid/use-grid.js
+index 9dc0d6da698999..d7d2ad2c1ae73d 100644
+--- a/packages/components/src/grid/use-grid.js
++++ b/packages/components/src/grid/use-grid.js
+@@ -34,8 +34,10 @@ export function useGrid( props ) {
+ 		...otherProps
+ 	} = useContextSystem( props, 'Grid' );
+ 
+-	const column = useResponsiveValue( columns );
+-	const row = useResponsiveValue( rows );
++	const columnsAsArray = Array.isArray( columns ) ? columns : [ columns ];
++	const column = useResponsiveValue( columnsAsArray );
++	const rowsAsArray = Array.isArray( rows ) ? rows : [ rows ];
++	const row = useResponsiveValue( rowsAsArray );
+ 
+ 	const gridTemplateColumns =
+ 		templateColumns || ( !! columns && `repeat(${ column }, 1fr)` );
+@@ -49,12 +51,12 @@ export function useGrid( props ) {
+ 			alignItems: align,
+ 			display: isInline ? 'inline-grid' : 'grid',
+ 			gap,
+-			gridTemplateColumns,
+-			gridTemplateRows,
++			gridTemplateColumns: gridTemplateColumns || undefined,
++			gridTemplateRows: gridTemplateRows || undefined,
+ 			gridRowGap: rowGap,
+ 			gridColumnGap: columnGap,
+ 			justifyContent: justify,
+-			verticalAlign: isInline ? 'middle' : null,
++			verticalAlign: isInline ? 'middle' : undefined,
+ 			...alignmentProps,
+ 		} );
+ 
+diff --git a/packages/components/src/text/next/index.js b/packages/components/src/text/next/index.js
+index 54092b3f5155c0..f91e9628109074 100644
+--- a/packages/components/src/text/next/index.js
++++ b/packages/components/src/text/next/index.js
+@@ -7,15 +7,31 @@ import { text } from '../styles/text-mixins';
+ 
+ const Text = process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextText : undefined;
+ 
++/**
++ * @typedef AdaptedTextProps
++ * @property {keyof JSX.IntrinsicElements} as Styled components `as` prop.
++ * @property {import('../styles/text-mixins').TextVariant} variant The variant to render.
++ * @property {import('react').ReactNode} children Children to render.
++ * @property {string} [className] Classname to render on the element.
++ */
++
++/**
++ * @param {AdaptedTextProps} props
++ */
+ export const adapter = ( { as, variant, ...restProps } ) => ( {
+ 	// as has not changed
+ 	as,
+ 	// luckily `text` just returns an emotion CSS object, so we can pass the styles from that directly to the handy `css` prop
+ 	css: text( { variant } ).styles,
+-	// mostly className
++	// mostly className and children
+ 	...restProps,
+ } );
+ 
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param {import('react').ComponentType<AdaptedTextProps>} Current
++ */
++/* eslint-enable jsdoc/valid-types */
+ export function withNextComponent( Current ) {
+ 	return withNext( Current, Text, 'WPComponentsText', adapter );
+ }
+diff --git a/packages/components/src/text/next/text-utils.js b/packages/components/src/text/next/text-utils.js
+index 72941af4f2f737..93d8992a07e9ad 100644
+--- a/packages/components/src/text/next/text-utils.js
++++ b/packages/components/src/text/next/text-utils.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { ui } from '@wp-g2/styles';
+-import { memoize } from '@wp-g2/utils';
++import memoize from 'memize';
+ import { findAll } from 'highlight-words-core';
+ 
+ /**
+@@ -20,20 +20,38 @@ import { createElement } from '@wordpress/element';
+  * @typedef Options
+  * @property {string} [activeClassName=''] Classname for active highlighted areas.
+  * @property {number} [activeIndex=-1] The index of the active highlighted area.
+- * @property {import('react').AllHTMLAttributes['style']} [activeStyle] Styles to apply to the active highlighted area.
++ * @property {import('react').AllHTMLAttributes<HTMLDivElement>['style']} [activeStyle] Styles to apply to the active highlighted area.
+  * @property {boolean} [autoEscape] Whether to automatically escape text.
+  * @property {boolean} [caseSensitive=false] Whether to highlight in a case-sensitive manner.
+  * @property {string} children Children to highlight.
+  * @property {import('highlight-words-core').FindAllArgs['findChunks']} [findChunks] Custom `findChunks` function to pass to `highlight-words-core`.
+- * @property {string | Record<string, string>} [highlightClassName=''] Classname to apply to highlighted text or a Record of classnames to apply to given text (which should be the key).
+- * @property {import('react').AllHTMLAttributes['style']} [highlightStyle={}] Styles to apply to highlighted text.
++ * @property {string | Record<string, unknown>} [highlightClassName=''] Classname to apply to highlighted text or a Record of classnames to apply to given text (which should be the key).
++ * @property {import('react').AllHTMLAttributes<HTMLDivElement>['style']} [highlightStyle={}] Styles to apply to highlighted text.
+  * @property {keyof JSX.IntrinsicElements} [highlightTag='mark'] Tag to use for the highlighted text.
+  * @property {import('highlight-words-core').FindAllArgs['sanitize']} [sanitize] Custom `santize` function to pass to `highlight-words-core`.
+  * @property {string[]} [searchWords=[]] Words to search for and highlight.
+  * @property {string} [unhighlightClassName=''] Classname to apply to unhighlighted text.
+- * @property {import('react').AllHTMLAttributes['style']} [unhighlightStyle] Style to apply to unhighlighted text.
++ * @property {import('react').AllHTMLAttributes<HTMLDivElement>['style']} [unhighlightStyle] Style to apply to unhighlighted text.
++ */
++
++/**
++ * Maps props to lowercase names.
++ *
++ * @template {Record<string, unknown>} T
++ * @param {T} object Props to map.
++ * @return {{[K in keyof T as Lowercase<string & K>]: T[K]}} The mapped props.
+  */
+ /* eslint-enable jsdoc/valid-types */
++const lowercaseProps = ( object ) => {
++	/** @type {any} */
++	const mapped = {};
++	for ( const key in object ) {
++		mapped[ key.toLowerCase() ] = object[ key ];
++	}
++	return mapped;
++};
++
++const memoizedLowercaseProps = memoize( lowercaseProps );
+ 
+ /**
+  *
+@@ -73,16 +91,6 @@ export function createHighlighterText( {
+ 	let highlightClassNames = '';
+ 	let highlightStyles;
+ 
+-	const lowercaseProps = ( object ) => {
+-		const mapped = {};
+-		for ( const key in object ) {
+-			mapped[ key.toLowerCase() ] = object[ key ];
+-		}
+-		return mapped;
+-	};
+-
+-	const memoizedLowercaseProps = memoize( lowercaseProps );
+-
+ 	const textContent = chunks.map( ( chunk, index ) => {
+ 		const text = textToHighlight.substr(
+ 			chunk.start,
+@@ -116,6 +124,7 @@ export function createHighlighterText( {
+ 					? Object.assign( {}, highlightStyle, activeStyle )
+ 					: highlightStyle;
+ 
++			/** @type {Record<string, any>} */
+ 			const props = {
+ 				...ui.$( 'TextHighlight' ),
+ 				children: text,
+diff --git a/packages/components/src/text/next/types.ts b/packages/components/src/text/next/types.ts
+index 6fbb38ffefd3fc..bb1db45d443f9f 100644
+--- a/packages/components/src/text/next/types.ts
++++ b/packages/components/src/text/next/types.ts
+@@ -1,5 +1,5 @@
+ import type { Props as TruncateProps } from '../../truncate/use-truncate';
+-import type { CSSProperties } from 'react';
++import type { CSSProperties, ReactNode } from 'react';
+ 
+ type TextAdjustLineHeightForInnerControls =
+ 	| boolean
+@@ -20,7 +20,36 @@ type TextVariant = 'muted';
+ 
+ type TextWeight = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
+ 
+-export type Props = TruncateProps & {
++type Highlighted = {
++		/**
++	 * Letters or words within `Text` can be highlighted using `highlightWords`.
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Text } from `@wp-g2/components`
++	 *
++	 * function Example() {
++	 *   return (
++	 *     <Text highlightWords={["the"]}>
++	 *       Where the north wind meets the sea, there's a river full of memory. Sleep,
++	 *       my darling, safe and sound, for in this river all is found. In her waters,
++	 *       deep and true, lay the answers and a path for you. Dive down deep into her
++	 *       sound, but not too far or you'll be drowned
++	 *     </Text>
++	 *   )
++	 * }
++	 * ```
++	 */
++	highlightWords?: string[];
++	children: string;
++}
++
++type Unhighlighted = {
++	highlightWords?: undefined;
++	children: ReactNode;
++}
++
++export type Props = TruncateProps & (Highlighted | Unhighlighted) & {
+ 	/**
+ 	 * Adjusts the text alignment.
+ 	 *
+@@ -77,26 +106,6 @@ export type Props = TruncateProps & {
+ 	 * Determines if `highlightWords` should be case sensitive.
+ 	 */
+ 	highlightCaseSensitive?: boolean;
+-	/**
+-	 * Letters or words within `Text` can be highlighted using `highlightWords`.
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { Text } from `@wp-g2/components`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <Text highlightWords={["the"]}>
+-	 *       Where the north wind meets the sea, there's a river full of memory. Sleep,
+-	 *       my darling, safe and sound, for in this river all is found. In her waters,
+-	 *       deep and true, lay the answers and a path for you. Dive down deep into her
+-	 *       sound, but not too far or you'll be drowned
+-	 *     </Text>
+-	 *   )
+-	 * }
+-	 * ```
+-	 */
+-	highlightWords?: string[];
+ 	/**
+ 	 * Array of search words. String search terms are automatically cast to RegExps unless `highlightEscape` is true.
+ 	 */
+@@ -185,4 +194,8 @@ export type Props = TruncateProps & {
+ 	 * Adjusts font-weight of the text.
+ 	 */
+ 	weight?: CSSProperties[ 'fontWeight' ] | TextWeight;
++	/**
++	 * Adjusts letter-spacing of the text.
++	 */
++	letterSpacing?: CSSProperties[ 'letterSpacing' ];
+ };
+diff --git a/packages/components/src/text/next/use-text.js b/packages/components/src/text/next/use-text.js
+index 88f7fdca6bcdb7..1925e3fa20d67d 100644
+--- a/packages/components/src/text/next/use-text.js
++++ b/packages/components/src/text/next/use-text.js
+@@ -33,7 +33,7 @@ export function useText( props ) {
+ 		display,
+ 		highlightEscape = false,
+ 		highlightCaseSensitive = false,
+-		highlightWords = [],
++		highlightWords,
+ 		highlightSanitize,
+ 		isBlock = false,
+ 		letterSpacing,
+@@ -47,15 +47,17 @@ export function useText( props ) {
+ 		...otherProps
+ 	} = useContextSystem( props, 'Text' );
+ 
++	/** @type {import('react').ReactNode} */
+ 	let content = children;
+-	const isHighlighter =
+-		Array.isArray( highlightWords ) && highlightWords.length;
++	const isHighlighter = Array.isArray( highlightWords );
+ 	const isCaption = size === 'caption';
+ 
+ 	if ( isHighlighter ) {
+ 		content = createHighlighterText( {
+ 			autoEscape: highlightEscape,
+-			children,
++			// Disable reason: We need to disable this otherwise it erases the cast
++			// eslint-disable-next-line object-shorthand
++			children: /** @type {string} */ ( children ),
+ 			caseSensitive: highlightCaseSensitive,
+ 			searchWords: highlightWords,
+ 			sanitize: highlightSanitize,
+@@ -74,7 +76,9 @@ export function useText( props ) {
+ 			color,
+ 			display,
+ 			fontSize: getFontSize( size ),
+-			fontWeight: weight,
++			/* eslint-disable jsdoc/valid-types */
++			fontWeight: /** @type {import('react').CSSProperties['fontWeight']} */ ( weight ),
++			/* eslint-enable jsdoc/valid-types */
+ 			lineHeight,
+ 			letterSpacing,
+ 			textAlign: align,
+@@ -169,6 +173,13 @@ export function useText( props ) {
+ 	};
+ }
+ 
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param {Object} props
++ * @param {import('./types').Props['adjustLineHeightForInnerControls']} [props.adjustLineHeightForInnerControls]
++ * @param {import('react').CSSProperties['lineHeight']} [props.lineHeight]
++ */
++/* eslint-enable jsdoc/valid-types */
+ function getLineHeight( { adjustLineHeightForInnerControls, lineHeight } ) {
+ 	if ( ! isNil( lineHeight ) ) return lineHeight;
+ 
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 7d6a733e557940..9965ad27817733 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -2,7 +2,8 @@
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
+ 		"rootDir": "src",
+-		"declarationDir": "build-types"
++		"declarationDir": "build-types",
++		"types": [ "gutenberg-env" ]
+ 	},
+ 	"references": [
+ 		{ "path": "../deprecated" },
+@@ -18,7 +19,10 @@
+ 		"src/truncate/**/*",
+ 		"src/utils/**/*",
+ 		"src/view/**/*",
+-		"src/visually-hidden/**/*"
++		"src/visually-hidden/**/*",
++		"src/text/**/*",
++		"src/grid/**/*",
++		"src/__next/**/*"
+ 	],
+ 	"exclude": [
+ 		"src/**/*.android.js",
+diff --git a/typings/gutenberg-env/index.d.ts b/typings/gutenberg-env/index.d.ts
+index 7fe6d587446f59..660691553849df 100644
+--- a/typings/gutenberg-env/index.d.ts
++++ b/typings/gutenberg-env/index.d.ts
+@@ -1,5 +1,6 @@
+ interface Environment {
+ 	NODE_ENV: unknown;
++	COMPONENT_SYSTEM_PHASE: number | undefined;
+ }
+ interface Process {
+ 	env: Environment;

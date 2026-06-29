@@ -1,0 +1,109 @@
+diff --git a/packages/components/src/query-controls/README.md b/packages/components/src/query-controls/README.md
+index e7429417e90590..14b52e50f0536c 100644
+--- a/packages/components/src/query-controls/README.md
++++ b/packages/components/src/query-controls/README.md
+@@ -247,10 +247,3 @@ The selected category for the `categoriesList` prop.
+ 
+ -   Required: No
+ -   Platform: Web
+-
+-#### `__next40pxDefaultSize`: `boolean`
+-
+-Start opting into the larger default height that will become the default size in a future version.
+-
+-- Required: No
+-- Default: `false`
+diff --git a/packages/components/src/query-controls/author-select.tsx b/packages/components/src/query-controls/author-select.tsx
+index 8fd5a26fff9ed5..af49e01a727fcd 100644
+--- a/packages/components/src/query-controls/author-select.tsx
++++ b/packages/components/src/query-controls/author-select.tsx
+@@ -6,7 +6,6 @@ import TreeSelect from '../tree-select';
+ import type { AuthorSelectProps } from './types';
+ 
+ export default function AuthorSelect( {
+-	__next40pxDefaultSize,
+ 	label,
+ 	noOptionLabel,
+ 	authorList,
+@@ -30,7 +29,7 @@ export default function AuthorSelect( {
+ 					? String( selectedAuthorId )
+ 					: undefined
+ 			}
+-			__next40pxDefaultSize={ __next40pxDefaultSize }
++			__next40pxDefaultSize
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/query-controls/category-select.tsx b/packages/components/src/query-controls/category-select.tsx
+index 325735181b287d..675e081740f753 100644
+--- a/packages/components/src/query-controls/category-select.tsx
++++ b/packages/components/src/query-controls/category-select.tsx
+@@ -4,7 +4,6 @@ import TreeSelect from '../tree-select';
+ import type { CategorySelectProps } from './types';
+ 
+ export default function CategorySelect( {
+-	__next40pxDefaultSize,
+ 	label,
+ 	noOptionLabel,
+ 	categoriesList,
+@@ -30,7 +29,7 @@ export default function CategorySelect( {
+ 					: undefined
+ 			}
+ 			{ ...props }
+-			__next40pxDefaultSize={ __next40pxDefaultSize }
++			__next40pxDefaultSize
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/query-controls/index.tsx b/packages/components/src/query-controls/index.tsx
+index 055d56442b04b4..2ebc98d5236f0f 100644
+--- a/packages/components/src/query-controls/index.tsx
++++ b/packages/components/src/query-controls/index.tsx
+@@ -139,7 +139,6 @@ export function QueryControls( {
+ 					props.categoriesList &&
+ 					props.onCategoryChange && (
+ 						<CategorySelect
+-							__next40pxDefaultSize
+ 							key="query-controls-category-select"
+ 							categoriesList={ props.categoriesList }
+ 							label={ __( 'Category' ) }
+@@ -175,7 +174,6 @@ export function QueryControls( {
+ 					),
+ 				onAuthorChange && (
+ 					<AuthorSelect
+-						__next40pxDefaultSize
+ 						key="query-controls-author-select"
+ 						authorList={ authorList }
+ 						label={ __( 'Author' ) }
+diff --git a/packages/components/src/query-controls/types.ts b/packages/components/src/query-controls/types.ts
+index 8ac7ca54e6719d..3a35e333dd6d2f 100644
+--- a/packages/components/src/query-controls/types.ts
++++ b/packages/components/src/query-controls/types.ts
+@@ -31,7 +31,6 @@ export type CategorySelectProps = Pick<
+ 	categoriesList: Category[];
+ 	onChange: ( newCategory: string ) => void;
+ 	selectedCategoryId?: Category[ 'id' ];
+-	__next40pxDefaultSize: boolean;
+ };
+ 
+ export type AuthorSelectProps = Pick<
+@@ -41,7 +40,6 @@ export type AuthorSelectProps = Pick<
+ 	authorList?: Author[];
+ 	onChange: ( newAuthor: string ) => void;
+ 	selectedAuthorId?: Author[ 'id' ];
+-	__next40pxDefaultSize: boolean;
+ };
+ 
+ type Order = 'asc' | 'desc';
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index ac56ff94767007..b5aa7b9584d36e 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -173,6 +173,7 @@ const restrictedSyntax = [
+ 		'BorderBoxControl',
+ 		'BoxControl',
+ 		'FontSizePicker',
++		'QueryControls',
+ 		'TextControl',
+ 	].map( ( componentName ) => ( {
+ 		selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,

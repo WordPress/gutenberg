@@ -1,0 +1,298 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 90c0a22166cffe..79b58409d6133e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ -   Soft deprecate `ButtonGroup` component. Use `ToggleGroupControl` instead ([#65429](https://github.com/WordPress/gutenberg/pull/65429)).
+ -   `Navigation`: Log deprecation warning for removal in WP 7.1. Use `Navigator` instead ([#68158](https://github.com/WordPress/gutenberg/pull/68158)).
+ -   `DropdownMenu`: Deprecate 36px default size for default toggle button ([#68329](https://github.com/WordPress/gutenberg/pull/68329)).
++-   `Navigator.Button`, `Navigator.BackButton`: Deprecate 36px default size ([#68330](https://github.com/WordPress/gutenberg/pull/68330)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/navigator/README.md b/packages/components/src/navigator/README.md
+index b56a82e0524eef..91d2f6f8937f28 100644
+--- a/packages/components/src/navigator/README.md
++++ b/packages/components/src/navigator/README.md
+@@ -11,13 +11,15 @@ const MyNavigation = () => (
+ 	<Navigator initialPath="/">
+ 		<Navigator.Screen path="/">
+ 			<p>This is the home screen.</p>
+-			<Navigator.Button path="/child">
++			<Navigator.Button path="/child" __next40pxDefaultSize>
+ 				Navigate to child screen.
+ 			</Navigator.Button>
+ 		</Navigator.Screen>
+ 		<Navigator.Screen path="/child">
+ 			<p>This is the child screen.</p>
+-			<Navigator.BackButton>Go back</Navigator.BackButton>
++			<Navigator.BackButton __next40pxDefaultSize>
++				Go back
++			</Navigator.BackButton>
+ 		</Navigator.Screen>
+ 	</Navigator>
+ );
+diff --git a/packages/components/src/navigator/index.tsx b/packages/components/src/navigator/index.tsx
+index 1d9ae95441e01a..a427284d9f5fee 100644
+--- a/packages/components/src/navigator/index.tsx
++++ b/packages/components/src/navigator/index.tsx
+@@ -19,14 +19,14 @@ export { useNavigator } from './use-navigator';
+  *   <Navigator initialPath="/">
+  *     <Navigator.Screen path="/">
+  *       <p>This is the home screen.</p>
+- *        <Navigator.Button path="/child">
++ *        <Navigator.Button path="/child" __next40pxDefaultSize>
+  *          Navigate to child screen.
+  *       </Navigator.Button>
+  *     </Navigator.Screen>
+  *
+  *     <Navigator.Screen path="/child">
+  *       <p>This is the child screen.</p>
+- *       <Navigator.BackButton>
++ *       <Navigator.BackButton __next40pxDefaultSize>
+  *         Go back
+  *       </Navigator.BackButton>
+  *     </Navigator.Screen>
+@@ -48,14 +48,14 @@ export const Navigator = Object.assign( TopLevelNavigator, {
+ 	 *   <Navigator initialPath="/">
+ 	 *     <Navigator.Screen path="/">
+ 	 *       <p>This is the home screen.</p>
+-	 *        <Navigator.Button path="/child">
++	 *        <Navigator.Button path="/child" __next40pxDefaultSize>
+ 	 *          Navigate to child screen.
+ 	 *       </Navigator.Button>
+ 	 *     </Navigator.Screen>
+ 	 *
+ 	 *     <Navigator.Screen path="/child">
+ 	 *       <p>This is the child screen.</p>
+-	 *       <Navigator.BackButton>
++	 *       <Navigator.BackButton __next40pxDefaultSize>
+ 	 *         Go back
+ 	 *       </Navigator.BackButton>
+ 	 *     </Navigator.Screen>
+@@ -79,14 +79,14 @@ export const Navigator = Object.assign( TopLevelNavigator, {
+ 	 *   <Navigator initialPath="/">
+ 	 *     <Navigator.Screen path="/">
+ 	 *       <p>This is the home screen.</p>
+-	 *        <Navigator.Button path="/child">
++	 *        <Navigator.Button path="/child" __next40pxDefaultSize>
+ 	 *          Navigate to child screen.
+ 	 *       </Navigator.Button>
+ 	 *     </Navigator.Screen>
+ 	 *
+ 	 *     <Navigator.Screen path="/child">
+ 	 *       <p>This is the child screen.</p>
+-	 *       <Navigator.BackButton>
++	 *       <Navigator.BackButton __next40pxDefaultSize>
+ 	 *         Go back
+ 	 *       </Navigator.BackButton>
+ 	 *     </Navigator.Screen>
+@@ -110,14 +110,14 @@ export const Navigator = Object.assign( TopLevelNavigator, {
+ 	 *   <Navigator initialPath="/">
+ 	 *     <Navigator.Screen path="/">
+ 	 *       <p>This is the home screen.</p>
+-	 *        <Navigator.Button path="/child">
++	 *        <Navigator.Button path="/child" __next40pxDefaultSize>
+ 	 *          Navigate to child screen.
+ 	 *       </Navigator.Button>
+ 	 *     </Navigator.Screen>
+ 	 *
+ 	 *     <Navigator.Screen path="/child">
+ 	 *       <p>This is the child screen.</p>
+-	 *       <Navigator.BackButton>
++	 *       <Navigator.BackButton __next40pxDefaultSize>
+ 	 *         Go back
+ 	 *       </Navigator.BackButton>
+ 	 *     </Navigator.Screen>
+diff --git a/packages/components/src/navigator/navigator-back-button/hook.ts b/packages/components/src/navigator/navigator-back-button/hook.ts
+index d6fcd39647bff9..129742241a6036 100644
+--- a/packages/components/src/navigator/navigator-back-button/hook.ts
++++ b/packages/components/src/navigator/navigator-back-button/hook.ts
+@@ -11,13 +11,14 @@ import { useContextSystem } from '../../context';
+ import Button from '../../button';
+ import { useNavigator } from '../use-navigator';
+ import type { NavigatorBackButtonProps } from '../types';
++import { maybeWarnDeprecated36pxSize } from '../../utils/deprecated-36px-size';
+ 
+ export function useNavigatorBackButton(
+ 	props: WordPressComponentProps< NavigatorBackButtonProps, 'button' >
+ ) {
+ 	const {
+ 		onClick,
+-		as = Button,
++		as,
+ 
+ 		...otherProps
+ 	} = useContextSystem( props, 'Navigator.BackButton' );
+@@ -33,8 +34,18 @@ export function useNavigatorBackButton(
+ 			[ goBack, onClick ]
+ 		);
+ 
++	if ( as === undefined ) {
++		maybeWarnDeprecated36pxSize( {
++			componentName: 'Navigator.BackButton',
++			__next40pxDefaultSize: otherProps.__next40pxDefaultSize,
++			size: otherProps.size,
++			hint: 'Set the `__next40pxDefaultSize` prop to true to start opting into the new default size, which will become the default in a future version. For icon buttons, consider setting a non-default size like `size: "compact"`.',
++		} );
++	}
++
+ 	return {
+-		as,
++		as: as ?? Button,
++		__shouldNotWarnDeprecated36pxSize: as === undefined,
+ 		onClick: handleClick,
+ 		...otherProps,
+ 	};
+diff --git a/packages/components/src/navigator/navigator-button/hook.ts b/packages/components/src/navigator/navigator-button/hook.ts
+index 59d2aaa65662d7..5b9981e1f58aad 100644
+--- a/packages/components/src/navigator/navigator-button/hook.ts
++++ b/packages/components/src/navigator/navigator-button/hook.ts
+@@ -12,6 +12,7 @@ import { useContextSystem } from '../../context';
+ import Button from '../../button';
+ import { useNavigator } from '../use-navigator';
+ import type { NavigatorButtonProps } from '../types';
++import { maybeWarnDeprecated36pxSize } from '../../utils/deprecated-36px-size';
+ 
+ const cssSelectorForAttribute = ( attrName: string, attrValue: string ) =>
+ 	`[${ attrName }="${ attrValue }"]`;
+@@ -22,7 +23,7 @@ export function useNavigatorButton(
+ 	const {
+ 		path,
+ 		onClick,
+-		as = Button,
++		as,
+ 		attributeName = 'id',
+ 		...otherProps
+ 	} = useContextSystem( props, 'Navigator.Button' );
+@@ -45,8 +46,18 @@ export function useNavigatorButton(
+ 			[ goTo, onClick, attributeName, escapedPath ]
+ 		);
+ 
++	if ( as === undefined ) {
++		maybeWarnDeprecated36pxSize( {
++			componentName: 'Navigator.Button',
++			__next40pxDefaultSize: otherProps.__next40pxDefaultSize,
++			size: otherProps.size,
++			hint: 'Set the `__next40pxDefaultSize` prop to true to start opting into the new default size, which will become the default in a future version. For icon buttons, consider setting a non-default size like `size: "compact"`.',
++		} );
++	}
++
+ 	return {
+-		as,
++		as: as ?? Button,
++		__shouldNotWarnDeprecated36pxSize: as === undefined,
+ 		onClick: handleClick,
+ 		...otherProps,
+ 		[ attributeName ]: escapedPath,
+diff --git a/packages/components/src/navigator/stories/index.story.tsx b/packages/components/src/navigator/stories/index.story.tsx
+index 2dfff7e6716f43..bc3d94a6d15fdb 100644
+--- a/packages/components/src/navigator/stories/index.story.tsx
++++ b/packages/components/src/navigator/stories/index.story.tsx
+@@ -65,15 +65,27 @@ export const Default: StoryObj< typeof Navigator > = {
+ 					<h2>This is the home screen.</h2>
+ 
+ 					<VStack alignment="left">
+-						<Navigator.Button variant="primary" path="/child">
++						<Navigator.Button
++							variant="primary"
++							path="/child"
++							__next40pxDefaultSize
++						>
+ 							Go to child screen.
+ 						</Navigator.Button>
+ 
+-						<Navigator.Button variant="primary" path="/product/1">
++						<Navigator.Button
++							variant="primary"
++							path="/product/1"
++							__next40pxDefaultSize
++						>
+ 							Go to dynamic path screen with id 1.
+ 						</Navigator.Button>
+ 
+-						<Navigator.Button variant="primary" path="/product/2">
++						<Navigator.Button
++							variant="primary"
++							path="/product/2"
++							__next40pxDefaultSize
++						>
+ 							Go to dynamic path screen with id 2.
+ 						</Navigator.Button>
+ 					</VStack>
+@@ -82,13 +94,17 @@ export const Default: StoryObj< typeof Navigator > = {
+ 				<Navigator.Screen path="/child">
+ 					<h2>This is the child screen.</h2>
+ 					<HStack spacing={ 2 } alignment="left">
+-						<Navigator.BackButton variant="secondary">
++						<Navigator.BackButton
++							variant="secondary"
++							__next40pxDefaultSize
++						>
+ 							Go back
+ 						</Navigator.BackButton>
+ 
+ 						<Navigator.Button
+ 							variant="primary"
+ 							path="/child/grandchild"
++							__next40pxDefaultSize
+ 						>
+ 							Go to grand child screen.
+ 						</Navigator.Button>
+@@ -97,7 +113,10 @@ export const Default: StoryObj< typeof Navigator > = {
+ 
+ 				<Navigator.Screen path="/child/grandchild">
+ 					<h2>This is the grand child screen.</h2>
+-					<Navigator.BackButton variant="secondary">
++					<Navigator.BackButton
++						variant="secondary"
++						__next40pxDefaultSize
++					>
+ 						Go back
+ 					</Navigator.BackButton>
+ 				</Navigator.Screen>
+@@ -120,7 +139,7 @@ function DynamicScreen() {
+ 				This screen can parse params dynamically. The current id is:{ ' ' }
+ 				{ params.id }
+ 			</p>
+-			<Navigator.BackButton variant="secondary">
++			<Navigator.BackButton variant="secondary" __next40pxDefaultSize>
+ 				Go back
+ 			</Navigator.BackButton>
+ 		</>
+@@ -174,14 +193,21 @@ export const SkipFocus: StoryObj< typeof Navigator > = {
+ 				>
+ 					<Navigator.Screen path="/">
+ 						<h2>Home screen</h2>
+-						<Navigator.Button variant="primary" path="/child">
++						<Navigator.Button
++							variant="primary"
++							path="/child"
++							__next40pxDefaultSize
++						>
+ 							Go to child screen.
+ 						</Navigator.Button>
+ 					</Navigator.Screen>
+ 
+ 					<Navigator.Screen path="/child">
+ 						<h2>Child screen</h2>
+-						<Navigator.BackButton variant="secondary">
++						<Navigator.BackButton
++							variant="secondary"
++							__next40pxDefaultSize
++						>
+ 							Go back to home screen
+ 						</Navigator.BackButton>
+ 					</Navigator.Screen>
+diff --git a/packages/preferences/src/components/preferences-modal-tabs/index.js b/packages/preferences/src/components/preferences-modal-tabs/index.js
+index f73bdd7f029dc7..747c502f6a577c 100644
+--- a/packages/preferences/src/components/preferences-modal-tabs/index.js
++++ b/packages/preferences/src/components/preferences-modal-tabs/index.js
+@@ -146,6 +146,7 @@ export default function PreferencesModalTabs( { sections } ) {
+ 										gap="6"
+ 									>
+ 										<Navigator.BackButton
++											size="compact"
+ 											icon={
+ 												isRTL()
+ 													? chevronRight

@@ -1,0 +1,559 @@
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index de958e4c75a7ff..c55a12b656529c 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -33,6 +33,7 @@ import {
+ import { close } from '@wordpress/icons';
+ import deprecated from '@wordpress/deprecated';
+ import { Path, SVG } from '@wordpress/primitives';
++import { isRTL } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+@@ -41,6 +42,11 @@ import Button from '../button';
+ import ScrollLock from '../scroll-lock';
+ import { Slot, Fill, useSlot } from '../slot-fill';
+ import { getAnimateClassName } from '../animate';
++import {
++	positionToPlacement,
++	placementToAnimationOrigin,
++	getMainAxisFromPlacement,
++} from './utils';
+ 
+ /**
+  * Name of slot in which popover should fill.
+@@ -75,49 +81,6 @@ const ArrowTriangle = ( props ) => (
+ 
+ const slotNameContext = createContext();
+ 
+-const positionToPlacement = ( position ) => {
+-	const [ x, y, z ] = position.split( ' ' );
+-
+-	if ( [ 'top', 'bottom' ].includes( x ) ) {
+-		let suffix = '';
+-		if ( ( !! z && z === 'left' ) || y === 'right' ) {
+-			suffix = '-start';
+-		} else if ( ( !! z && z === 'right' ) || y === 'left' ) {
+-			suffix = '-end';
+-		}
+-		return x + suffix;
+-	}
+-
+-	return y;
+-};
+-
+-const placementToAnimationOrigin = ( placement ) => {
+-	const [ a, b ] = placement.split( '-' );
+-
+-	let x, y;
+-	if ( a === 'top' || a === 'bottom' ) {
+-		x = a === 'top' ? 'bottom' : 'top';
+-		y = 'middle';
+-		if ( b === 'start' ) {
+-			y = 'left';
+-		} else if ( b === 'end' ) {
+-			y = 'right';
+-		}
+-	}
+-
+-	if ( a === 'left' || a === 'right' ) {
+-		x = 'center';
+-		y = a === 'left' ? 'right' : 'left';
+-		if ( b === 'start' ) {
+-			x = 'top';
+-		} else if ( b === 'end' ) {
+-			x = 'bottom';
+-		}
+-	}
+-
+-	return x + ' ' + y;
+-};
+-
+ const Popover = (
+ 	{
+ 		range,
+@@ -129,7 +92,7 @@ const Popover = (
+ 		noArrow = true,
+ 		isAlternate,
+ 		position,
+-		placement = 'bottom-start',
++		placement: placementProp = 'bottom-start',
+ 		offset,
+ 		focusOnMount = 'firstElement',
+ 		anchorRef,
+@@ -139,11 +102,11 @@ const Popover = (
+ 		onFocusOutside,
+ 		__unstableSlotName = SLOT_NAME,
+ 		__unstableObserveElement,
+-		__unstableForcePosition,
++		__unstableForcePosition = false,
+ 		__unstableShift = false,
+ 		...contentProps
+ 	},
+-	ref
++	forwardedRef
+ ) => {
+ 	if ( range ) {
+ 		deprecated( 'range prop in Popover component', {
+@@ -154,12 +117,14 @@ const Popover = (
+ 
+ 	const arrowRef = useRef( null );
+ 	const anchorRefFallback = useRef( null );
++
+ 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+ 	const isExpanded = expandOnMobile && isMobileViewport;
+ 	const hasArrow = ! isExpanded && ! noArrow;
+-	const usedPlacement = position
++
++	const normalizedPlacementProp = position
+ 		? positionToPlacement( position )
+-		: placement;
++		: placementProp;
+ 
+ 	const ownerDocument = useMemo( () => {
+ 		let documentToReturn;
+@@ -199,7 +164,7 @@ const Popover = (
+ 		return { x: iframeRect.left, y: iframeRect.top };
+ 	}, [ ownerDocument ] );
+ 
+-	const middlewares = [
++	const middleware = [
+ 		frameOffset || offset
+ 			? offsetMiddleware( ( { placement: currentPlacement } ) => {
+ 					if ( ! frameOffset ) {
+@@ -249,7 +214,29 @@ const Popover = (
+ 		__unstableShift
+ 			? shift( {
+ 					crossAxis: true,
+-					limiter: limitShift(),
++					limiter: limitShift( {
++						offset: ( { floating, placement } ) => {
++							// iFrame-specific correction aimed at allowing the floating element
++							// to shift fully below the reference element.
++							if ( ownerDocument === document ) {
++								return 0;
++							}
++
++							const computedMainAxis =
++								getMainAxisFromPlacement( placement );
++
++							return {
++								mainAxis:
++									computedMainAxis === 'x'
++										? 0
++										: -floating.height,
++								crossAxis:
++									computedMainAxis === 'x'
++										? -floating.height
++										: 0,
++							};
++						},
++					} ),
+ 					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
+ 			  } )
+ 			: undefined,
+@@ -279,28 +266,36 @@ const Popover = (
+ 	} );
+ 
+ 	const {
++		// Positioning coordinates
+ 		x,
+ 		y,
++		// Callback refs *not regular refs) This allows the position to be updated
++		// when either elements change.
+ 		reference,
+ 		floating,
+-		strategy,
++		// Object with "regular" refs to both "reference" and "floating"
+ 		refs,
++		// Type of CSS position property to use (absolute or fixed)
++		strategy,
+ 		update,
+-		placement: placementData,
++		placement: computedPlacement,
+ 		middlewareData: { arrow: arrowData = {} },
+-	} = useFloating( {
+-		placement: usedPlacement,
+-		middleware: middlewares,
+-	} );
+-
+-	const mergedRefs = useMergeRefs( [ floating, dialogRef, ref ] );
+-
+-	// Updates references
++	} = useFloating( { placement: normalizedPlacementProp, middleware } );
++
++	// Update the `reference`'s ref.
++	//
++	// In floating-ui's terms:
++	// - "reference" refers to the popover's anchor element.
++	// - "floating" refers the floating popover's element.
++	// A floating element can also be positioned relative to a virtual element,
++	// instead of a real one — a virtual element is represented by an object
++	// with the `getBoundingClientRect()` function (like real elements).
++	// See https://floating-ui.com/docs/virtual-elements for more info.
+ 	useLayoutEffect( () => {
+-		// No ref or position have been passed
+-		let usedRef;
++		let resultingReferenceRef;
++
+ 		if ( anchorRef?.top ) {
+-			usedRef = {
++			resultingReferenceRef = {
+ 				getBoundingClientRect() {
+ 					const topRect = anchorRef.top.getBoundingClientRect();
+ 					const bottomRect = anchorRef.bottom.getBoundingClientRect();
+@@ -313,17 +308,21 @@ const Popover = (
+ 				},
+ 			};
+ 		} else if ( anchorRef?.current ) {
+-			usedRef = anchorRef.current;
++			// Use the anchor's reference (real element)
++			resultingReferenceRef = anchorRef.current;
+ 		} else if ( anchorRef ) {
+-			usedRef = anchorRef;
++			// TODO: Is this for older-style refs?
++			resultingReferenceRef = anchorRef;
+ 		} else if ( anchorRect ) {
+-			usedRef = {
++			// Virtual element
++			resultingReferenceRef = {
+ 				getBoundingClientRect() {
+ 					return anchorRect;
+ 				},
+ 			};
+ 		} else if ( getAnchorRect ) {
+-			usedRef = {
++			// Virtual element
++			resultingReferenceRef = {
+ 				getBoundingClientRect() {
+ 					const rect = getAnchorRect( anchorRefFallback.current );
+ 					return new window.DOMRect(
+@@ -335,23 +334,27 @@ const Popover = (
+ 				},
+ 			};
+ 		} else if ( anchorRefFallback.current ) {
+-			usedRef = anchorRefFallback.current;
++			resultingReferenceRef = anchorRefFallback.current;
+ 		}
+ 
+-		if ( ! usedRef ) {
++		if ( ! resultingReferenceRef ) {
+ 			return;
+ 		}
+ 
+-		reference( usedRef );
++		reference( resultingReferenceRef );
+ 
+ 		if ( ! refs.floating.current ) {
+ 			return;
+ 		}
+ 
+-		return autoUpdate( usedRef, refs.floating.current, update );
+-	}, [ anchorRef, anchorRect, getAnchorRect ] );
++		return autoUpdate(
++			resultingReferenceRef,
++			refs.floating.current,
++			update
++		);
++	}, [ anchorRef, anchorRect, getAnchorRect, reference, update ] );
+ 
+-	// This is only needed for a smoth transition when moving blocks.
++	// This is only needed for a smooth transition when moving blocks.
+ 	useLayoutEffect( () => {
+ 		if ( ! __unstableObserveElement ) {
+ 			return;
+@@ -364,7 +367,8 @@ const Popover = (
+ 		};
+ 	}, [ __unstableObserveElement ] );
+ 
+-	// If we're using getAnchorRect, we need to update the position as we scroll the iframe.
++	// If the reference element is in a different ownerDocument (e.g. iFrame),
++	// we need to manually update the floating's position on scroll.
+ 	useLayoutEffect( () => {
+ 		if ( ownerDocument === document ) {
+ 			return;
+@@ -379,9 +383,15 @@ const Popover = (
+ 		!! animate &&
+ 		getAnimateClassName( {
+ 			type: 'appear',
+-			origin: placementToAnimationOrigin( placementData ),
++			origin: placementToAnimationOrigin( computedPlacement, isRTL() ),
+ 		} );
+ 
++	const mergedFloatingRef = useMergeRefs( [
++		floating,
++		dialogRef,
++		forwardedRef,
++	] );
++
+ 	// Disable reason: We care to capture the _bubbled_ events from inputs
+ 	// within popover as inferring close intent.
+ 
+@@ -399,7 +409,7 @@ const Popover = (
+ 				}
+ 			) }
+ 			{ ...contentProps }
+-			ref={ mergedRefs }
++			ref={ mergedFloatingRef }
+ 			{ ...dialogProps }
+ 			tabIndex="-1"
+ 			style={
+@@ -412,6 +422,7 @@ const Popover = (
+ 					  }
+ 			}
+ 		>
++			{ /* Prevents scroll on the document */ }
+ 			{ isExpanded && <ScrollLock /> }
+ 			{ isExpanded && (
+ 				<div className="components-popover__header">
+@@ -431,7 +442,7 @@ const Popover = (
+ 					ref={ arrowRef }
+ 					className={ [
+ 						'components-popover__arrow',
+-						`is-${ placementData.split( '-' )[ 0 ] }`,
++						`is-${ computedPlacement.split( '-' )[ 0 ] }`,
+ 					].join( ' ' ) }
+ 					style={ {
+ 						left: Number.isFinite( arrowData?.x )
+diff --git a/packages/components/src/popover/test/__snapshots__/index.js.snap b/packages/components/src/popover/test/__snapshots__/index.js.snap
+index d985500486625f..f27d2c1ab2b062 100644
+--- a/packages/components/src/popover/test/__snapshots__/index.js.snap
++++ b/packages/components/src/popover/test/__snapshots__/index.js.snap
+@@ -1,6 +1,6 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Popover should pass additional props to portaled element 1`] = `
++exports[`Popover Component should pass additional props to portaled element 1`] = `
+ <span>
+   <div
+     class="components-popover components-animate__appear is-from-left is-from-top"
+@@ -17,7 +17,7 @@ exports[`Popover should pass additional props to portaled element 1`] = `
+ </span>
+ `;
+ 
+-exports[`Popover should render content 1`] = `
++exports[`Popover Component should render content 1`] = `
+ <span>
+   <div
+     class="components-popover components-animate__appear is-from-left is-from-top"
+diff --git a/packages/components/src/popover/test/index.js b/packages/components/src/popover/test/index.js
+index 68ede81280f4b9..fbf45ff51f8bec 100644
+--- a/packages/components/src/popover/test/index.js
++++ b/packages/components/src/popover/test/index.js
+@@ -12,58 +12,83 @@ import { useRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Popover from '../';
++import { positionToPlacement } from '../utils';
+ 
+ describe( 'Popover', () => {
+-	afterEach( () => {
+-		if ( document.activeElement ) {
+-			document.activeElement.blur();
+-		}
+-	} );
++	describe( 'Component', () => {
++		afterEach( () => {
++			if ( document.activeElement ) {
++				document.activeElement.blur();
++			}
++		} );
++
++		it( 'should allow focus-on-open behavior to be disabled', () => {
++			expect( document.activeElement ).toBe( document.body );
+ 
+-	it( 'should allow focus-on-open behavior to be disabled', () => {
+-		expect( document.activeElement ).toBe( document.body );
++			act( () => {
++				render( <Popover focusOnMount={ false } /> );
+ 
+-		act( () => {
+-			render( <Popover focusOnMount={ false } /> );
++				jest.advanceTimersByTime( 1 );
++			} );
+ 
+-			jest.advanceTimersByTime( 1 );
++			expect( document.activeElement ).toBe( document.body );
+ 		} );
+ 
+-		expect( document.activeElement ).toBe( document.body );
+-	} );
++		it( 'should render content', () => {
++			let result;
++			act( () => {
++				result = render( <Popover>Hello</Popover> );
++			} );
+ 
+-	it( 'should render content', () => {
+-		let result;
+-		act( () => {
+-			result = render( <Popover>Hello</Popover> );
++			expect(
++				result.container.querySelector( 'span' )
++			).toMatchSnapshot();
+ 		} );
+ 
+-		expect( result.container.querySelector( 'span' ) ).toMatchSnapshot();
+-	} );
++		it( 'should pass additional props to portaled element', () => {
++			let result;
++			act( () => {
++				result = render( <Popover role="tooltip">Hello</Popover> );
++			} );
+ 
+-	it( 'should pass additional props to portaled element', () => {
+-		let result;
+-		act( () => {
+-			result = render( <Popover role="tooltip">Hello</Popover> );
++			expect(
++				result.container.querySelector( 'span' )
++			).toMatchSnapshot();
+ 		} );
+ 
+-		expect( result.container.querySelector( 'span' ) ).toMatchSnapshot();
+-	} );
++		it( 'should render correctly when anchorRef is provided', () => {
++			const PopoverWithAnchor = ( args ) => {
++				const anchorRef = useRef( null );
+ 
+-	it( 'should render correctly when anchorRef is provided', () => {
+-		const PopoverWithAnchor = ( args ) => {
+-			const anchorRef = useRef( null );
++				return (
++					<div>
++						<p ref={ anchorRef }>Anchor</p>
++						<Popover { ...args } anchorRef={ anchorRef } />
++					</div>
++				);
++			};
+ 
+-			return (
+-				<div>
+-					<p ref={ anchorRef }>Anchor</p>
+-					<Popover { ...args } anchorRef={ anchorRef } />
+-				</div>
+-			);
+-		};
++			render( <PopoverWithAnchor>Popover content</PopoverWithAnchor> );
+ 
+-		render( <PopoverWithAnchor>Popover content</PopoverWithAnchor> );
++			expect( screen.getByText( 'Popover content' ) ).toBeInTheDocument();
++		} );
++	} );
+ 
+-		expect( screen.getByText( 'Popover content' ) ).toBeInTheDocument();
++	describe( 'positionToPlacement', () => {
++		it.each( [
++			[ 'top left', 'top-end' ],
++			[ 'top center', 'top' ],
++			[ 'top right', 'top-start' ],
++			[ 'middle left', 'left' ],
++			[ 'middle center', 'center' ],
++			[ 'middle right', 'right' ],
++			[ 'bottom left', 'bottom-end' ],
++			[ 'bottom center', 'bottom' ],
++			[ 'bottom right', 'bottom-start' ],
++		] )( 'converts `%s` to `%s`', ( inputPosition, expectedPlacement ) => {
++			expect( positionToPlacement( inputPosition ) ).toEqual(
++				expectedPlacement
++			);
++		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/popover/utils.js b/packages/components/src/popover/utils.js
+new file mode 100644
+index 00000000000000..126debbf3e6f42
+--- /dev/null
++++ b/packages/components/src/popover/utils.js
+@@ -0,0 +1,91 @@
++/**
++ * @typedef {import('../animate').AppearOrigin} AppearOrigin
++ * @typedef {import('@floating-ui/react-dom').Placement} FloatingUIPlacement
++ * @typedef {	'top left' | 'top center' | 'top right' | 'middle left' | 'middle center' | 'middle right' | 'bottom left' | 'bottom center' | 'bottom right' | 'bottom left' | 'bottom center' | 'bottom right' } LegacyPosition
++ */
++
++/**
++ * Converts the `Popover`'s legacy "position" prop to the new "placement" prop
++ * (used by `floating-ui`).
++ *
++ * @param {LegacyPosition} position The legacy position
++ * @return {FloatingUIPlacement} The corresponding placement
++ */
++export const positionToPlacement = ( position ) => {
++	const [ x, y, z ] = position.split( ' ' );
++
++	if ( [ 'top', 'bottom' ].includes( x ) ) {
++		let suffix = '';
++		if ( ( !! z && z === 'left' ) || y === 'right' ) {
++			suffix = '-start';
++		} else if ( ( !! z && z === 'right' ) || y === 'left' ) {
++			suffix = '-end';
++		}
++
++		// @ts-ignore
++		return x + suffix;
++	}
++
++	// @ts-ignore
++	return y;
++};
++
++/** @type {Object.<FloatingUIPlacement, AppearOrigin>} */
++const PLACEMENT_TO_ANIMATION_ORIGIN_MAP = {
++	top: 'bottom',
++	'top-start': 'bottom left',
++	'top-end': 'bottom right',
++	right: 'middle left',
++	'right-start': 'top left',
++	'right-end': 'bottom left',
++	bottom: 'top',
++	'bottom-start': 'top left',
++	'bottom-end': 'top right',
++	left: 'middle right',
++	'left-start': 'top right',
++	'left-end': 'bottom right',
++};
++
++/**
++ * Given the floating-ui `placement`, compute the origin used for the entrance
++ * animation. The origin should be on the "opposite" side from the placement.
++ *
++ * @param {FloatingUIPlacement} placement A placement string from floating ui
++ * @param {boolean}             rtl
++ * @return {AppearOrigin} The Animation origin string
++ */
++export const placementToAnimationOrigin = ( placement, rtl ) => {
++	/** @type {AppearOrigin} */
++	let animationOrigin =
++		PLACEMENT_TO_ANIMATION_ORIGIN_MAP[ placement ] ?? 'middle';
++
++	if ( rtl && /left/gi.test( animationOrigin ) ) {
++		/** @type {AppearOrigin} */
++		animationOrigin = /** @type {AppearOrigin} */ (
++			animationOrigin.replace( /left/gi, 'right' )
++		);
++	} else if ( rtl && /right/gi.test( animationOrigin ) ) {
++		animationOrigin = /** @type {AppearOrigin} */ (
++			animationOrigin.replace( /right/gi, 'left' )
++		);
++	}
++
++	return animationOrigin;
++};
++
++/**
++ * @param {FloatingUIPlacement} placement
++ * @return {'top' | 'right' | 'bottom' | 'left'} The side
++ */
++function getSide( placement ) {
++	// @ts-ignore
++	return placement.split( '-' )[ 0 ];
++}
++
++/**
++ * @param {FloatingUIPlacement} placement
++ * @return {'x' | 'y'} The axis
++ */
++export function getMainAxisFromPlacement( placement ) {
++	return [ 'top', 'bottom' ].includes( getSide( placement ) ) ? 'x' : 'y';
++}

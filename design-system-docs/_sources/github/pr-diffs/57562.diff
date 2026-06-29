@@ -1,0 +1,330 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e732cbda994afe..3674084f38e9e3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ -   `PaletteEdit` and `CircularOptionPicker`: improve unit tests ([#57809](https://github.com/WordPress/gutenberg/pull/57809)).
+ -   `Tooltip`: no-op when nested inside other `Tooltip` components ([#57202](https://github.com/WordPress/gutenberg/pull/57202)).
+ -   `Tooltip` and `Button`: tidy up unit tests ([#57975](https://github.com/WordPress/gutenberg/pull/57975)).
++-   `BorderControl`, `BorderBoxControl`: Replace style picker with ToggleGroupControl ([#57562](https://github.com/WordPress/gutenberg/pull/57562)).
+ -	`SlotFill`: fix typo in use-slot-fills return docs ([#57654](https://github.com/WordPress/gutenberg/pull/57654))
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index 3ee01bcda8f3b3..0a56edd946308b 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -142,6 +142,7 @@ const BorderControlDropdown = (
+ 		enableStyle,
+ 		indicatorClassName,
+ 		indicatorWrapperClassName,
++		isStyleSettable,
+ 		onReset,
+ 		onColorChange,
+ 		onStyleChange,
+@@ -218,7 +219,7 @@ const BorderControlDropdown = (
+ 						clearable={ false }
+ 						enableAlpha={ enableAlpha }
+ 					/>
+-					{ enableStyle && (
++					{ enableStyle && isStyleSettable && (
+ 						<BorderControlStylePicker
+ 							label={ __( 'Style' ) }
+ 							value={ style }
+diff --git a/packages/components/src/border-control/border-control-style-picker/component.tsx b/packages/components/src/border-control/border-control-style-picker/component.tsx
+index d0621dd8a7c4d4..c0a0fe82111cec 100644
+--- a/packages/components/src/border-control/border-control-style-picker/component.tsx
++++ b/packages/components/src/border-control/border-control-style-picker/component.tsx
+@@ -7,16 +7,12 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import Button from '../../button';
+-import { StyledLabel } from '../../base-control/styles/base-control-styles';
+-import { View } from '../../view';
+-import { Flex } from '../../flex';
+-import { VisuallyHidden } from '../../visually-hidden';
+-import type { WordPressComponentProps } from '../../context';
+ import { contextConnect } from '../../context';
+-import { useBorderControlStylePicker } from './hook';
+-
+-import type { LabelProps, StylePickerProps } from '../types';
++import type { StylePickerProps } from '../types';
++import {
++	ToggleGroupControl,
++	ToggleGroupControlOptionIcon,
++} from '../../toggle-group-control';
+ 
+ const BORDER_STYLES = [
+ 	{ label: __( 'Solid' ), icon: lineSolid, value: 'solid' },
+@@ -24,67 +20,36 @@ const BORDER_STYLES = [
+ 	{ label: __( 'Dotted' ), icon: lineDotted, value: 'dotted' },
+ ];
+ 
+-const Label = ( props: LabelProps ) => {
+-	const { label, hideLabelFromVision } = props;
+-
+-	if ( ! label ) {
+-		return null;
+-	}
+-
+-	return hideLabelFromVision ? (
+-		<VisuallyHidden as="label">{ label }</VisuallyHidden>
+-	) : (
+-		<StyledLabel>{ label }</StyledLabel>
+-	);
+-};
+-
+-const BorderControlStylePicker = (
+-	props: WordPressComponentProps< StylePickerProps, 'div' >,
++function UnconnectedBorderControlStylePicker(
++	{ onChange, ...restProps }: StylePickerProps,
+ 	forwardedRef: React.ForwardedRef< any >
+-) => {
+-	const {
+-		buttonClassName,
+-		hideLabelFromVision,
+-		label,
+-		onChange,
+-		value,
+-		...otherProps
+-	} = useBorderControlStylePicker( props );
+-
++) {
+ 	return (
+-		<View { ...otherProps } ref={ forwardedRef }>
+-			<Label
+-				label={ label }
+-				hideLabelFromVision={ hideLabelFromVision }
+-			/>
+-			<Flex justify="flex-start" gap={ 1 }>
+-				{ BORDER_STYLES.map( ( borderStyle ) => (
+-					<Button
+-						key={ borderStyle.value }
+-						className={ buttonClassName }
+-						icon={ borderStyle.icon }
+-						size="small"
+-						isPressed={ borderStyle.value === value }
+-						onClick={ () =>
+-							onChange(
+-								borderStyle.value === value
+-									? undefined
+-									: borderStyle.value
+-							)
+-						}
+-						aria-label={ borderStyle.label }
+-						label={ borderStyle.label }
+-						showTooltip={ true }
+-					/>
+-				) ) }
+-			</Flex>
+-		</View>
++		<ToggleGroupControl
++			__nextHasNoMarginBottom
++			__next40pxDefaultSize
++			ref={ forwardedRef }
++			isDeselectable
++			onChange={ ( value ) => {
++				onChange?.( value as string | undefined );
++			} }
++			{ ...restProps }
++		>
++			{ BORDER_STYLES.map( ( borderStyle ) => (
++				<ToggleGroupControlOptionIcon
++					key={ borderStyle.value }
++					value={ borderStyle.value }
++					icon={ borderStyle.icon }
++					label={ borderStyle.label }
++				/>
++			) ) }
++		</ToggleGroupControl>
+ 	);
+-};
++}
+ 
+-const ConnectedBorderControlStylePicker = contextConnect(
+-	BorderControlStylePicker,
++const BorderControlStylePicker = contextConnect(
++	UnconnectedBorderControlStylePicker,
+ 	'BorderControlStylePicker'
+ );
+ 
+-export default ConnectedBorderControlStylePicker;
++export default BorderControlStylePicker;
+diff --git a/packages/components/src/border-control/border-control-style-picker/hook.ts b/packages/components/src/border-control/border-control-style-picker/hook.ts
+deleted file mode 100644
+index 27233c40309a3a..00000000000000
+--- a/packages/components/src/border-control/border-control-style-picker/hook.ts
++++ /dev/null
+@@ -1,35 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useMemo } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import * as styles from '../styles';
+-import type { WordPressComponentProps } from '../../context';
+-import { useContextSystem } from '../../context';
+-import { useCx } from '../../utils/hooks/use-cx';
+-
+-import type { StylePickerProps } from '../types';
+-
+-export function useBorderControlStylePicker(
+-	props: WordPressComponentProps< StylePickerProps, 'div' >
+-) {
+-	const { className, ...otherProps } = useContextSystem(
+-		props,
+-		'BorderControlStylePicker'
+-	);
+-
+-	// Generate class names.
+-	const cx = useCx();
+-	const classes = useMemo( () => {
+-		return cx( styles.borderControlStylePicker, className );
+-	}, [ className, cx ] );
+-
+-	const buttonClassName = useMemo( () => {
+-		return cx( styles.borderStyleButton );
+-	}, [ cx ] );
+-
+-	return { ...otherProps, className: classes, buttonClassName };
+-}
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 197067c684373a..5fe2abce1b4117 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -47,6 +47,7 @@ const UnconnectedBorderControl = (
+ 		hideLabelFromVision,
+ 		innerWrapperClassName,
+ 		inputWidth,
++		isStyleSettable,
+ 		label,
+ 		onBorderChange,
+ 		onSliderChange,
+@@ -81,6 +82,7 @@ const UnconnectedBorderControl = (
+ 							disableCustomColors={ disableCustomColors }
+ 							enableAlpha={ enableAlpha }
+ 							enableStyle={ enableStyle }
++							isStyleSettable={ isStyleSettable }
+ 							onChange={ onBorderChange }
+ 							previousStyleSelection={ previousStyleSelection }
+ 							showDropdownHeader={ showDropdownHeader }
+diff --git a/packages/components/src/border-control/border-control/hook.ts b/packages/components/src/border-control/border-control/hook.ts
+index 8a291c4112d91d..676ff9ea2cc6ed 100644
+--- a/packages/components/src/border-control/border-control/hook.ts
++++ b/packages/components/src/border-control/border-control/hook.ts
+@@ -14,16 +14,12 @@ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ import type { Border, BorderControlProps } from '../types';
+ 
+-const sanitizeBorder = ( border?: Border ) => {
+-	const hasNoWidth = border?.width === undefined || border.width === '';
+-	const hasNoColor = border?.color === undefined;
+-
+-	// If width and color are undefined, unset any style selection as well.
+-	if ( hasNoWidth && hasNoColor ) {
+-		return undefined;
+-	}
+-
+-	return border;
++// If either width or color are defined, the border is considered valid
++// and a border style can be set as well.
++const isValidBorder = ( border?: Border ) => {
++	const hasWidth = border?.width !== undefined && border.width !== '';
++	const hasColor = border?.color !== undefined;
++	return hasWidth || hasColor;
+ };
+ 
+ export function useBorderControl(
+@@ -57,12 +53,16 @@ export function useBorderControl(
+ 	const [ colorSelection, setColorSelection ] = useState< string >();
+ 	const [ styleSelection, setStyleSelection ] = useState< string >();
+ 
++	const isStyleSettable = shouldSanitizeBorder
++		? isValidBorder( border )
++		: true;
++
+ 	const onBorderChange = useCallback(
+ 		( newBorder?: Border ) => {
+-			if ( shouldSanitizeBorder ) {
+-				return onChange( sanitizeBorder( newBorder ) );
++			if ( shouldSanitizeBorder && ! isValidBorder( newBorder ) ) {
++				onChange( undefined );
++				return;
+ 			}
+-
+ 			onChange( newBorder );
+ 		},
+ 		[ onChange, shouldSanitizeBorder ]
+@@ -151,6 +151,7 @@ export function useBorderControl(
+ 		enableStyle,
+ 		innerWrapperClassName,
+ 		inputWidth: wrapperWidth,
++		isStyleSettable,
+ 		onBorderChange,
+ 		onSliderChange,
+ 		onWidthChange,
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index 1a2263b9fb6ff2..6a8892e78ef553 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -165,21 +165,6 @@ export const resetButton = css`
+ 	}
+ `;
+ 
+-export const borderControlStylePicker = css`
+-	${ StyledLabel } {
+-		${ labelStyles }
+-	}
+-`;
+-
+-export const borderStyleButton = css`
+-	&&&&& {
+-		min-width: 32px;
+-		width: 32px;
+-		height: 32px;
+-		padding: 4px;
+-	}
+-`;
+-
+ export const borderSlider = () => css`
+ 	flex: 1 1 60%;
+ 	${ rtl( { marginRight: space( 3 ) } )() }
+diff --git a/packages/components/src/border-control/types.ts b/packages/components/src/border-control/types.ts
+index 7752d9760ffe56..b1ff87aaf5da3b 100644
+--- a/packages/components/src/border-control/types.ts
++++ b/packages/components/src/border-control/types.ts
+@@ -8,6 +8,7 @@ import type { CSSProperties } from 'react';
+  */
+ import type { ColorPaletteProps } from '../color-palette/types';
+ import type { PopoverProps } from '../popover/types';
++import type { ToggleGroupControlProps } from '../toggle-group-control/types';
+ 
+ export type Border = {
+ 	color?: CSSProperties[ 'borderColor' ];
+@@ -115,6 +116,10 @@ export type DropdownProps = ColorProps &
+ 		 * values for its popover controls.
+ 		 */
+ 		border?: Border;
++		/**
++		 * Whether a border style can be set, based on the border sanitization settings.
++		 */
++		isStyleSettable: boolean;
+ 		/**
+ 		 * An internal prop used to control the visibility of the dropdown.
+ 		 */
+@@ -137,7 +142,10 @@ export type DropdownProps = ColorProps &
+ 		showDropdownHeader?: boolean;
+ 	};
+ 
+-export type StylePickerProps = LabelProps & {
++export type StylePickerProps = Omit<
++	ToggleGroupControlProps,
++	'value' | 'onChange' | 'children'
++> & {
+ 	/**
+ 	 * A callback function invoked when a border style is selected or cleared.
+ 	 */

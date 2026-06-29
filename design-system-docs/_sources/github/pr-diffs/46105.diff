@@ -1,0 +1,292 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 22a08c2f0dd08c..504ec68a021f55 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,12 @@
+ 
+ -   NumberControl: refactor styles/tests/stories to TypeScript, replace fireEvent with user-event ([#45990](https://github.com/WordPress/gutenberg/pull/45990)).
+ 
++### Breaking changes
++
++-   Remove the deprecated IconButton component.
++-   Remove the deprecated unit prop from the UnitControl component.
++-   Remove the deprecated isDefault prop from the Button component.
++
+ ## 22.1.0 (2022-11-16)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/button/deprecated.js b/packages/components/src/button/deprecated.js
+deleted file mode 100644
+index 5f18e0e5eb1648..00000000000000
+--- a/packages/components/src/button/deprecated.js
++++ /dev/null
+@@ -1,32 +0,0 @@
+-// @ts-nocheck
+-/**
+- * WordPress dependencies
+- */
+-import deprecated from '@wordpress/deprecated';
+-import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import Button from '../button';
+-
+-function IconButton( { labelPosition, size, tooltip, label, ...props }, ref ) {
+-	deprecated( 'wp.components.IconButton', {
+-		since: '5.4',
+-		alternative: 'wp.components.Button',
+-		version: '6.2',
+-	} );
+-
+-	return (
+-		<Button
+-			{ ...props }
+-			ref={ ref }
+-			tooltipPosition={ labelPosition }
+-			iconSize={ size }
+-			showTooltip={ tooltip !== undefined ? !! tooltip : undefined }
+-			label={ tooltip || label }
+-		/>
+-	);
+-}
+-
+-export default forwardRef( IconButton );
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.js
+index 1b0fd57a441a91..4ef56172ecb00f 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.js
+@@ -7,7 +7,6 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import deprecated from '@wordpress/deprecated';
+ import { forwardRef } from '@wordpress/element';
+ import { useInstanceId } from '@wordpress/compose';
+ 
+@@ -43,16 +42,6 @@ function useDeprecatedProps( {
+ 		computedVariant ??= 'secondary';
+ 	}
+ 
+-	if ( isDefault ) {
+-		deprecated( 'Button isDefault prop', {
+-			since: '5.4',
+-			alternative: 'variant="secondary"',
+-			version: '6.2',
+-		} );
+-
+-		computedVariant ??= 'secondary';
+-	}
+-
+ 	if ( isLink ) {
+ 		computedVariant ??= 'link';
+ 	}
+diff --git a/packages/components/src/button/test/index.js b/packages/components/src/button/test/index.js
+index 0536ab585e1c92..0ac202fabedd72 100644
+--- a/packages/components/src/button/test/index.js
++++ b/packages/components/src/button/test/index.js
+@@ -363,13 +363,5 @@ describe( 'Button', () => {
+ 			render( <Button isLink /> );
+ 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-link' );
+ 		} );
+-
+-		it( 'should warn when the isDefault prop is passed', () => {
+-			render( <Button isDefault /> );
+-			expect( screen.getByRole( 'button' ) ).toHaveClass(
+-				'is-secondary'
+-			);
+-			expect( console ).toHaveWarned();
+-		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 114884690e4821..29ded57b178b7f 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -90,7 +90,6 @@ export { default as GuidePage } from './guide/page';
+ export { Heading as __experimentalHeading } from './heading';
+ export { HStack as __experimentalHStack } from './h-stack';
+ export { default as Icon } from './icon';
+-export { default as IconButton } from './button/deprecated';
+ export {
+ 	ItemGroup as __experimentalItemGroup,
+ 	Item as __experimentalItem,
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 5af79504e66b93..bfa808380d7d0b 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -12,7 +12,6 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import deprecated from '@wordpress/deprecated';
+ import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ 
+@@ -25,7 +24,7 @@ import { ValueInput } from './styles/unit-control-styles';
+ import UnitSelectControl from './unit-select-control';
+ import {
+ 	CSS_UNITS,
+-	getParsedQuantityAndUnit,
++	parseQuantityAndUnitFromRawValue,
+ 	getUnitsWithCurrentUnit,
+ 	getValidParsedQuantityAndUnit,
+ } from './utils';
+@@ -56,37 +55,27 @@ function UnforwardedUnitControl(
+ 		onChange: onChangeProp,
+ 		onUnitChange,
+ 		size = 'default',
+-		unit: unitProp,
+ 		units: unitsProp = CSS_UNITS,
+ 		value: valueProp,
+ 		onBlur: onBlurProp,
+ 		...props
+ 	} = unitControlProps;
+ 
+-	if ( 'unit' in unitControlProps ) {
+-		deprecated( 'UnitControl unit prop', {
+-			since: '5.6',
+-			hint: 'The unit should be provided within the `value` prop.',
+-			version: '6.2',
+-		} );
+-	}
+-
+ 	// The `value` prop, in theory, should not be `null`, but the following line
+ 	// ensures it fallback to `undefined` in case a consumer of `UnitControl`
+ 	// still passes `null` as a `value`.
+ 	const nonNullValueProp = valueProp ?? undefined;
+ 	const units = useMemo(
+-		() => getUnitsWithCurrentUnit( nonNullValueProp, unitProp, unitsProp ),
+-		[ nonNullValueProp, unitProp, unitsProp ]
++		() => getUnitsWithCurrentUnit( nonNullValueProp, unitsProp ),
++		[ nonNullValueProp, unitsProp ]
+ 	);
+-	const [ parsedQuantity, parsedUnit ] = getParsedQuantityAndUnit(
++	const [ parsedQuantity, parsedUnit ] = parseQuantityAndUnitFromRawValue(
+ 		nonNullValueProp,
+-		unitProp,
+ 		units
+ 	);
+ 
+ 	const [ unit, setUnit ] = useControlledState< string | undefined >(
+-		units.length === 1 ? units[ 0 ].value : unitProp,
++		units.length === 1 ? units[ 0 ].value : undefined,
+ 		{
+ 			initial: parsedUnit,
+ 			fallback: '',
+diff --git a/packages/components/src/unit-control/test/utils.ts b/packages/components/src/unit-control/test/utils.ts
+index b843764f4a57ee..74e5d48a62578b 100644
+--- a/packages/components/src/unit-control/test/utils.ts
++++ b/packages/components/src/unit-control/test/utils.ts
+@@ -196,22 +196,7 @@ describe( 'UnitControl utils', () => {
+ 		];
+ 
+ 		it( 'should return units list with valid current unit prepended', () => {
+-			const result = getUnitsWithCurrentUnit(
+-				'20%',
+-				undefined,
+-				limitedUnits
+-			);
+-
+-			expect( result ).toHaveLength( 3 );
+-
+-			const currentUnit = result.shift();
+-			expect( currentUnit?.value ).toBe( '%' );
+-			expect( currentUnit?.label ).toBe( '%' );
+-			expect( result ).toEqual( limitedUnits );
+-		} );
+-
+-		it( 'should return units list with valid current unit prepended using legacy values', () => {
+-			const result = getUnitsWithCurrentUnit( 20, '%', limitedUnits );
++			const result = getUnitsWithCurrentUnit( '20%', limitedUnits );
+ 
+ 			expect( result ).toHaveLength( 3 );
+ 
+@@ -222,22 +207,14 @@ describe( 'UnitControl utils', () => {
+ 		} );
+ 
+ 		it( 'should return units list without invalid current unit prepended', () => {
+-			const result = getUnitsWithCurrentUnit(
+-				'20null',
+-				undefined,
+-				limitedUnits
+-			);
++			const result = getUnitsWithCurrentUnit( '20null', limitedUnits );
+ 
+ 			expect( result ).toHaveLength( 2 );
+ 			expect( result ).toEqual( limitedUnits );
+ 		} );
+ 
+ 		it( 'should return units list without an existing current unit prepended', () => {
+-			const result = getUnitsWithCurrentUnit(
+-				'20em',
+-				undefined,
+-				limitedUnits
+-			);
++			const result = getUnitsWithCurrentUnit( '20em', limitedUnits );
+ 
+ 			expect( result ).toHaveLength( 2 );
+ 			expect( result ).toEqual( limitedUnits );
+diff --git a/packages/components/src/unit-control/utils.ts b/packages/components/src/unit-control/utils.ts
+index 573a6f88665109..6ca655637d9b0d 100644
+--- a/packages/components/src/unit-control/utils.ts
++++ b/packages/components/src/unit-control/utils.ts
+@@ -123,32 +123,6 @@ export const CSS_UNITS = [
+ 
+ export const DEFAULT_UNIT = allUnits.px;
+ 
+-/**
+- * Handles legacy value + unit handling.
+- * This component use to manage both incoming value and units separately.
+- *
+- * Moving forward, ideally the value should be a string that contains both
+- * the value and unit, example: '10px'
+- *
+- * @param  rawValue     The raw value as a string (may or may not contain the unit)
+- * @param  fallbackUnit The unit used as a fallback, if not unit is detected in the `value`
+- * @param  allowedUnits Units to derive from.
+- * @return The extracted quantity and unit. The quantity can be `undefined` in case the raw value
+- * could not be parsed to a number correctly. The unit can be `undefined` in case the unit parse
+- * from the raw value could not be matched against the list of allowed units.
+- */
+-export function getParsedQuantityAndUnit(
+-	rawValue?: string | number,
+-	fallbackUnit?: string,
+-	allowedUnits?: WPUnitControlUnit[]
+-): [ number | undefined, string | undefined ] {
+-	const initialValue = fallbackUnit
+-		? `${ rawValue ?? '' }${ fallbackUnit }`
+-		: rawValue;
+-
+-	return parseQuantityAndUnitFromRawValue( initialValue, allowedUnits );
+-}
+-
+ /**
+  * Checks if units are defined.
+  *
+@@ -327,21 +301,18 @@ export const useCustomUnits = ( {
+  * accurately displayed in the UI, even if the intention is to hide
+  * the availability of that unit.
+  *
+- * @param  rawValue   Selected value to parse.
+- * @param  legacyUnit Legacy unit value, if rawValue needs it appended.
+- * @param  units      List of available units.
++ * @param  rawValue Selected value to parse.
++ * @param  units    List of available units.
+  *
+  * @return A collection of units containing the unit for the current value.
+  */
+ export function getUnitsWithCurrentUnit(
+ 	rawValue?: string | number,
+-	legacyUnit?: string,
+ 	units: WPUnitControlUnit[] = ALL_CSS_UNITS
+ ): WPUnitControlUnit[] {
+ 	const unitsToReturn = Array.isArray( units ) ? [ ...units ] : [];
+-	const [ , currentUnit ] = getParsedQuantityAndUnit(
++	const [ , currentUnit ] = parseQuantityAndUnitFromRawValue(
+ 		rawValue,
+-		legacyUnit,
+ 		ALL_CSS_UNITS
+ 	);
+ 

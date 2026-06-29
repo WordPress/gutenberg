@@ -1,0 +1,131 @@
+diff --git a/packages/components/src/text-highlight/README.md b/packages/components/src/text-highlight/README.md
+index e75d67e4c5d248..d36548f420773c 100644
+--- a/packages/components/src/text-highlight/README.md
++++ b/packages/components/src/text-highlight/README.md
+@@ -23,9 +23,9 @@ const MyTextHighlight = () => (
+ 
+ The component accepts the following props.
+ 
+-### `highlight`: `string`
++### `highlight`: `string | string[]`
+ 
+-The string to search for and highlight within the `text`. Case insensitive. Multiple matches.
++The string or array of strings to search for and highlight within the `text`. Case insensitive. Multiple matches.
+ 
+ -   Required: Yes
+ -   Default: `''`
+diff --git a/packages/components/src/text-highlight/index.tsx b/packages/components/src/text-highlight/index.tsx
+index 7c21b26244e0c7..ca4f2ba12fe27c 100644
+--- a/packages/components/src/text-highlight/index.tsx
++++ b/packages/components/src/text-highlight/index.tsx
+@@ -30,16 +30,23 @@ import type { TextHighlightProps } from './types';
+  */
+ export const TextHighlight = ( props: TextHighlightProps ) => {
+ 	const { text = '', highlight = '' } = props;
+-	const trimmedHighlightText = highlight.trim();
++	// Convert single string to array, trim thim & filters empty|null values.
++	const trimmedHighlightText = ( ! Array.isArray( highlight )
++		? [ highlight ]
++		: highlight
++	)
++		// Trim each highlight.
++		.map( ( h ) => h.trim() )
++		// Filter out empty | null items.
++		.filter( ( h ) => !! h )
++		// Escape regex for each string.
++		.map( ( h ) => escapeRegExp( h ) );
+ 
+-	if ( ! trimmedHighlightText ) {
++	if ( ! trimmedHighlightText.length ) {
+ 		return <>{ text }</>;
+ 	}
+ 
+-	const regex = new RegExp(
+-		`(${ escapeRegExp( trimmedHighlightText ) })`,
+-		'gi'
+-	);
++	const regex = new RegExp( `(${ trimmedHighlightText.join( '|' ) })`, 'gi' );
+ 
+ 	return createInterpolateElement( text.replace( regex, '<mark>$&</mark>' ), {
+ 		mark: <mark />,
+diff --git a/packages/components/src/text-highlight/stories/index.tsx b/packages/components/src/text-highlight/stories/index.tsx
+index e844d402f5d6eb..a0dc130b0e52c8 100644
+--- a/packages/components/src/text-highlight/stories/index.tsx
++++ b/packages/components/src/text-highlight/stories/index.tsx
+@@ -28,6 +28,18 @@ export const Default: ComponentStory< typeof TextHighlight > = Template.bind(
+ 	{}
+ );
+ Default.args = {
+-	text: 'We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts.',
++	text:
++		'We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts.',
+ 	highlight: 'Gutenberg',
+ };
++
++export const WithMultipleHighlightTerms: ComponentStory<
++	typeof TextHighlight
++> = Template.bind( {} );
++
++WithMultipleHighlightTerms.args = {
++	...Default.args,
++	text:
++		'We call the new editor Gutenberg. The entire editing experience has been rebuilt for media rich pages and posts.',
++	highlight: [ 'edit', 'post' ],
++};
+diff --git a/packages/components/src/text-highlight/test/index.tsx b/packages/components/src/text-highlight/test/index.tsx
+index c68f7ca630211f..294fdd3d82405f 100644
+--- a/packages/components/src/text-highlight/test/index.tsx
++++ b/packages/components/src/text-highlight/test/index.tsx
+@@ -38,7 +38,7 @@ describe( 'TextHighlight', () => {
+ 			}
+ 		);
+ 
+-		it( 'should highlight multiple occurances of the string every time it exists in the text', () => {
++		it( 'should highlight multiple occurances of a single string every time it exists in the text', () => {
+ 			const highlight = 'edit';
+ 
+ 			const { container } = render(
+@@ -56,7 +56,29 @@ describe( 'TextHighlight', () => {
+ 			} );
+ 		} );
+ 
+-		it( 'should highlight occurances of a string regardless of capitalisation', () => {
++		it( 'should highlight multiple occurances of multiple strings every time they exist in the text', () => {
++			const highlight = [ 'edit', 'post' ];
++
++			const { container } = render(
++				<TextHighlight text={ defaultText } highlight={ highlight } />
++			);
++
++			const highlightedEls = getMarks( container );
++
++			expect( highlightedEls ).toHaveLength( 3 );
++
++			// Join strings & make sure the matcher is case insensitive, since the test should
++			// match regardless of the case of the string.
++			const regex = new RegExp( `(${ highlight.join( '|' ) })`, 'i' );
++
++			highlightedEls.forEach( ( el ) => {
++				expect( el.textContent ).toEqual(
++					expect.stringMatching( regex )
++				);
++			} );
++		} );
++
++		it( 'should highlight occurances of a single string regardless of capitalisation', () => {
+ 			// Note that `The` occurs twice in the default text, once in
+ 			// lowercase and once capitalized.
+ 			const highlight = 'The';
+diff --git a/packages/components/src/text-highlight/types.ts b/packages/components/src/text-highlight/types.ts
+index 51fc05da6c699c..5ab1b7b9679aad 100644
+--- a/packages/components/src/text-highlight/types.ts
++++ b/packages/components/src/text-highlight/types.ts
+@@ -5,7 +5,7 @@ export type TextHighlightProps = {
+ 	 *
+ 	 * @default ''
+ 	 */
+-	highlight: string;
++	highlight: string | string[];
+ 	/**
+ 	 * The string of text to be tested for occurrences of then given
+ 	 * `highlight`.

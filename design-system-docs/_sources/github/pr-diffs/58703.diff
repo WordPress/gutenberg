@@ -1,0 +1,197 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fe71930db85dd3..b1df052179a798 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,7 +14,8 @@
+ -   `Button`: Update secondary variant to show the border even in a disabled state. ([#58606](https://github.com/WordPress/gutenberg/pull/58606)).
+ -   `ConfirmDialog`: Add `__next40pxDefaultSize` to buttons ([#58421](https://github.com/WordPress/gutenberg/pull/58421)).
+ -   `Snackbar`: Update the warning message ([#58591](https://github.com/WordPress/gutenberg/pull/58591)).
+--   `Composite`: Implementing `useCompositeState` with Ariakit ([#57304](https://github.com/WordPress/gutenberg/pull/57304))
++-   `Composite`: Implementing `useCompositeState` with Ariakit ([#57304](https://github.com/WordPress/gutenberg/pull/57304)).
++-   Remove deprecation warnings for `__next36pxDefaultSize` prop ([#58703](https://github.com/WordPress/gutenberg/pull/58703)).
+ -   `CheckboxControl`: Remove ability for label prop to be false ([#58339](https://github.com/WordPress/gutenberg/pull/58339)).
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index f4292d9980ee41..3baaf8a6f5db60 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -124,10 +124,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 			selected: __( 'Item selected.' ),
+ 		},
+ 		__experimentalRenderItem,
+-	} = useDeprecated36pxDefaultSizeProp< ComboboxControlProps >(
+-		props,
+-		'wp.components.ComboboxControl'
+-	);
++	} = useDeprecated36pxDefaultSizeProp( props );
+ 
+ 	const [ value, setValue ] = useControlledValue( {
+ 		value: valueProp,
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index ed9e73e525e449..eb3cf5ba0676e0 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -83,11 +83,7 @@ export default function CustomSelectControl( props ) {
+ 		onFocus,
+ 		onBlur,
+ 		__experimentalShowSelectedHint = false,
+-	} = useDeprecated36pxDefaultSizeProp(
+-		props,
+-		'wp.components.CustomSelectControl',
+-		'6.4'
+-	);
++	} = useDeprecated36pxDefaultSizeProp( props );
+ 
+ 	const {
+ 		getLabelProps,
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 895cbad033212b..2e7ada0dfe6566 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -74,10 +74,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		__experimentalAutoSelectFirstMatch = false,
+ 		__nextHasNoMarginBottom = false,
+ 		tokenizeOnBlur = false,
+-	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >(
+-		props,
+-		'wp.components.FormTokenField'
+-	);
++	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >( props );
+ 
+ 	const instanceId = useInstanceId( FormTokenField );
+ 
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index f9eafb7757e47e..10297cce6fd098 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -55,11 +55,7 @@ export function UnforwardedInputControl(
+ 		suffix,
+ 		value,
+ 		...restProps
+-	} = useDeprecated36pxDefaultSizeProp< InputControlProps >(
+-		props,
+-		'wp.components.InputControl',
+-		'6.4'
+-	);
++	} = useDeprecated36pxDefaultSizeProp< InputControlProps >( props );
+ 
+ 	const [ isFocused, setIsFocused ] = useState( false );
+ 
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index ec468ce7fdc4d1..75d3154a940017 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -85,9 +85,7 @@ export function InputBase(
+ 		suffix,
+ 		...restProps
+ 	} = useDeprecated36pxDefaultSizeProp(
+-		useContextSystem( props, 'InputBase' ),
+-		'wp.components.InputBase',
+-		'6.4'
++		useContextSystem( props, 'InputBase' )
+ 	);
+ 
+ 	const id = useUniqueId( idProp );
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index 57d811d69939b4..8c9c9bec8a8aa6 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -54,11 +54,7 @@ function UnforwardedNumberControl(
+ 		suffix,
+ 		onChange = noop,
+ 		...restProps
+-	} = useDeprecated36pxDefaultSizeProp< NumberControlProps >(
+-		props,
+-		'wp.components.NumberControl',
+-		'6.4'
+-	);
++	} = useDeprecated36pxDefaultSizeProp< NumberControlProps >( props );
+ 
+ 	if ( hideHTMLArrows ) {
+ 		deprecated( 'wp.components.NumberControl hideHTMLArrows prop ', {
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 9c6ce0aba5d27e..3a550be7daa333 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -54,11 +54,7 @@ function UnforwardedSelectControl(
+ 		__next40pxDefaultSize = false,
+ 		__nextHasNoMarginBottom = false,
+ 		...restProps
+-	} = useDeprecated36pxDefaultSizeProp(
+-		props,
+-		'wp.components.SelectControl',
+-		'6.4'
+-	);
++	} = useDeprecated36pxDefaultSizeProp( props );
+ 	const [ isFocused, setIsFocused ] = useState( false );
+ 	const id = useUniqueId( idProp );
+ 	const helpId = help ? `${ id }__help` : undefined;
+diff --git a/packages/components/src/tree-select/index.tsx b/packages/components/src/tree-select/index.tsx
+index 6b7b61b7487a23..d6e0738b6beb37 100644
+--- a/packages/components/src/tree-select/index.tsx
++++ b/packages/components/src/tree-select/index.tsx
+@@ -81,11 +81,7 @@ export function TreeSelect( props: TreeSelectProps ) {
+ 		selectedId,
+ 		tree = [],
+ 		...restProps
+-	} = useDeprecated36pxDefaultSizeProp(
+-		props,
+-		'wp.components.TreeSelect',
+-		'6.4'
+-	);
++	} = useDeprecated36pxDefaultSizeProp( props );
+ 
+ 	const options = useMemo( () => {
+ 		return [
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 2b8b0528637e84..93ec2c358ecf15 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -56,11 +56,7 @@ function UnforwardedUnitControl(
+ 		value: valueProp,
+ 		onFocus: onFocusProp,
+ 		...props
+-	} = useDeprecated36pxDefaultSizeProp(
+-		unitControlProps,
+-		'wp.components.UnitControl',
+-		'6.4'
+-	);
++	} = useDeprecated36pxDefaultSizeProp( unitControlProps );
+ 
+ 	if ( 'unit' in unitControlProps ) {
+ 		deprecated( 'UnitControl unit prop', {
+diff --git a/packages/components/src/utils/use-deprecated-props.ts b/packages/components/src/utils/use-deprecated-props.ts
+index 6df8e25303738c..856aa2e0d1a2c4 100644
+--- a/packages/components/src/utils/use-deprecated-props.ts
++++ b/packages/components/src/utils/use-deprecated-props.ts
+@@ -1,28 +1,11 @@
+-/**
+- * WordPress dependencies
+- */
+-import deprecated from '@wordpress/deprecated';
+-
+ export function useDeprecated36pxDefaultSizeProp<
+ 	P extends Record< string, any > & {
+ 		__next36pxDefaultSize?: boolean;
+ 		__next40pxDefaultSize?: boolean;
+ 	},
+->(
+-	props: P,
+-	/** The component identifier in dot notation, e.g. `wp.components.ComponentName`. */
+-	componentIdentifier: string,
+-	/** Version in which the prop was deprecated. */
+-	since: string = '6.3'
+-) {
++>( props: P ) {
+ 	const { __next36pxDefaultSize, __next40pxDefaultSize, ...otherProps } =
+ 		props;
+-	if ( typeof __next36pxDefaultSize !== 'undefined' ) {
+-		deprecated( '`__next36pxDefaultSize` prop in ' + componentIdentifier, {
+-			alternative: '`__next40pxDefaultSize`',
+-			since,
+-		} );
+-	}
+ 
+ 	return {
+ 		...otherProps,

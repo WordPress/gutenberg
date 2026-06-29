@@ -1,0 +1,90 @@
+diff --git a/packages/edit-post/src/components/header/header-toolbar/index.js b/packages/edit-post/src/components/header/header-toolbar/index.js
+index 8f9e413707d503..bcb81804272916 100644
+--- a/packages/edit-post/src/components/header/header-toolbar/index.js
++++ b/packages/edit-post/src/components/header/header-toolbar/index.js
+@@ -37,8 +37,6 @@ function HeaderToolbar() {
+ 	const inserterButton = useRef();
+ 	const { setIsInserterOpened, setIsListViewOpened } =
+ 		useDispatch( editPostStore );
+-	const { get: getPreference } = useSelect( preferencesStore );
+-	const hasFixedToolbar = getPreference( 'core/edit-post', 'fixedToolbar' );
+ 	const {
+ 		isInserterEnabled,
+ 		isInserterOpened,
+@@ -46,6 +44,7 @@ function HeaderToolbar() {
+ 		showIconLabels,
+ 		isListViewOpen,
+ 		listViewShortcut,
++		hasFixedToolbar,
+ 	} = useSelect( ( select ) => {
+ 		const { hasInserterItems, getBlockRootClientId, getBlockSelectionEnd } =
+ 			select( blockEditorStore );
+@@ -53,6 +52,7 @@ function HeaderToolbar() {
+ 		const { getEditorMode, isFeatureActive, isListViewOpened } =
+ 			select( editPostStore );
+ 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
++		const { get: getPreference } = select( preferencesStore );
+ 
+ 		return {
+ 			// This setting (richEditingEnabled) should not live in the block editor's setting.
+@@ -69,6 +69,7 @@ function HeaderToolbar() {
+ 			listViewShortcut: getShortcutRepresentation(
+ 				'core/edit-post/toggle-list-view'
+ 			),
++			hasFixedToolbar: getPreference( 'core/edit-post', 'fixedToolbar' ),
+ 		};
+ 	}, [] );
+ 
+diff --git a/packages/edit-site/src/components/header-edit-mode/index.js b/packages/edit-site/src/components/header-edit-mode/index.js
+index b8d3b6e4cc2554..40ffc805565e6a 100644
+--- a/packages/edit-site/src/components/header-edit-mode/index.js
++++ b/packages/edit-site/src/components/header-edit-mode/index.js
+@@ -66,6 +66,7 @@ export default function HeaderEditMode() {
+ 		homeUrl,
+ 		showIconLabels,
+ 		editorCanvasView,
++		hasFixedToolbar,
+ 	} = useSelect( ( select ) => {
+ 		const {
+ 			__experimentalGetPreviewDeviceType,
+@@ -83,6 +84,8 @@ export default function HeaderEditMode() {
+ 			getUnstableBase, // Site index.
+ 		} = select( coreStore );
+ 
++		const { get: getPreference } = select( preferencesStore );
++
+ 		return {
+ 			deviceType: __experimentalGetPreviewDeviceType(),
+ 			templateType: postType,
+@@ -94,23 +97,24 @@ export default function HeaderEditMode() {
+ 			isVisualMode: getEditorMode() === 'visual',
+ 			blockEditorMode: __unstableGetEditorMode(),
+ 			homeUrl: getUnstableBase()?.home,
+-			showIconLabels: select( preferencesStore ).get(
+-				'core/edit-site',
++			showIconLabels: getPreference(
++				editSiteStore.name,
+ 				'showIconLabels'
+ 			),
+ 			editorCanvasView: unlock(
+ 				select( editSiteStore )
+ 			).getEditorCanvasContainerView(),
+-			isDistractionFree: select( preferencesStore ).get(
+-				'core/edit-site',
++			isDistractionFree: getPreference(
++				editSiteStore.name,
+ 				'distractionFree'
+ 			),
++			hasFixedToolbar: getPreference(
++				editSiteStore.name,
++				'fixedToolbar'
++			),
+ 		};
+ 	}, [] );
+ 
+-	const { get: getPreference } = useSelect( preferencesStore );
+-	const hasFixedToolbar = getPreference( editSiteStore.name, 'fixedToolbar' );
+-
+ 	const {
+ 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
+ 		setIsInserterOpened,

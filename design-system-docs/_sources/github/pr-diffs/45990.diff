@@ -1,0 +1,1213 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c57f3b01d58256..f46afbb1d18985 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
+ 
++### Internal
++
++-   NumberControl: refactor styles/tests/stories to TypeScript, replace fireEvent with user-event ([#45990](https://github.com/WordPress/gutenberg/pull/45990)).
++
+ ## 22.1.0 (2022-11-16)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/number-control/stories/index.js b/packages/components/src/number-control/stories/index.tsx
+similarity index 56%
+rename from packages/components/src/number-control/stories/index.js
+rename to packages/components/src/number-control/stories/index.tsx
+index 4daff7e34b2baa..8dce45db26d5da 100644
+--- a/packages/components/src/number-control/stories/index.js
++++ b/packages/components/src/number-control/stories/index.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -6,9 +11,9 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import NumberControl from '../';
++import NumberControl from '..';
+ 
+-export default {
++const meta: ComponentMeta< typeof NumberControl > = {
+ 	title: 'Components (Experimental)/NumberControl',
+ 	component: NumberControl,
+ 	argTypes: {
+@@ -19,10 +24,19 @@ export default {
+ 		type: { control: { type: 'text' } },
+ 		value: { control: null },
+ 	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
+ };
+ 
+-function Template( { onChange, ...props } ) {
+-	const [ value, setValue ] = useState( '0' );
++export default meta;
++
++const Template: ComponentStory< typeof NumberControl > = ( {
++	onChange,
++	...props
++} ) => {
++	const [ value, setValue ] = useState< string | undefined >( '0' );
+ 	const [ isValidValue, setIsValidValue ] = useState( true );
+ 
+ 	return (
+@@ -32,14 +46,17 @@ function Template( { onChange, ...props } ) {
+ 				value={ value }
+ 				onChange={ ( v, extra ) => {
+ 					setValue( v );
+-					setIsValidValue( extra.event.target.validity.valid );
+-					onChange( v, extra );
++					setIsValidValue(
++						( extra.event.target as HTMLInputElement ).validity
++							.valid
++					);
++					onChange?.( v, extra );
+ 				} }
+ 			/>
+ 			<p>Is valid? { isValidValue ? 'Yes' : 'No' }</p>
+ 		</>
+ 	);
+-}
++};
+ 
+ export const Default = Template.bind( {} );
+ Default.args = {
+diff --git a/packages/components/src/number-control/styles/number-control-styles.js b/packages/components/src/number-control/styles/number-control-styles.ts
+similarity index 81%
+rename from packages/components/src/number-control/styles/number-control-styles.js
+rename to packages/components/src/number-control/styles/number-control-styles.ts
+index 4f0bcb91bb8dda..dfc6171cf411b4 100644
+--- a/packages/components/src/number-control/styles/number-control-styles.js
++++ b/packages/components/src/number-control/styles/number-control-styles.ts
+@@ -1,4 +1,3 @@
+-// @ts-nocheck
+ /**
+  * External dependencies
+  */
+@@ -12,8 +11,9 @@ import InputControl from '../../input-control';
+ import { COLORS } from '../../utils';
+ import Button from '../../button';
+ import { space } from '../../ui/utils/space';
++import type { NumberControlProps } from '../types';
+ 
+-const htmlArrowStyles = ( { hideHTMLArrows } ) => {
++const htmlArrowStyles = ( { hideHTMLArrows }: { hideHTMLArrows: boolean } ) => {
+ 	if ( ! hideHTMLArrows ) {
+ 		return ``;
+ 	}
+@@ -35,7 +35,9 @@ export const Input = styled( InputControl )`
+ 	${ htmlArrowStyles };
+ `;
+ 
+-const spinButtonSizeStyles = ( { size } ) => {
++const spinButtonSizeStyles = ( {
++	size,
++}: Pick< NumberControlProps, 'size' > ) => {
+ 	if ( size !== 'small' ) {
+ 		return ``;
+ 	}
+diff --git a/packages/components/src/number-control/test/index.js b/packages/components/src/number-control/test/index.js
+deleted file mode 100644
+index b1a57232ef2754..00000000000000
+--- a/packages/components/src/number-control/test/index.js
++++ /dev/null
+@@ -1,478 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+-import userEvent from '@testing-library/user-event';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+-
+-/**
+- * Internal dependencies
+- */
+-import BaseNumberControl from '../';
+-
+-const getInput = () => screen.getByTestId( 'input' );
+-
+-const fireKeyDown = ( data ) =>
+-	fireEvent.keyDown( document.activeElement || document.body, data );
+-
+-const NumberControl = ( props ) => (
+-	<BaseNumberControl { ...props } data-testid="input" />
+-);
+-
+-function StatefulNumberControl( props ) {
+-	const [ value, setValue ] = useState( props.value );
+-	const handleOnChange = ( v ) => setValue( v );
+-
+-	return (
+-		<NumberControl
+-			{ ...props }
+-			value={ value }
+-			onChange={ handleOnChange }
+-		/>
+-	);
+-}
+-
+-describe( 'NumberControl', () => {
+-	describe( 'Basic rendering', () => {
+-		it( 'should render', () => {
+-			render( <NumberControl /> );
+-			expect( getInput() ).not.toBeNull();
+-		} );
+-
+-		it( 'should render custom className', () => {
+-			render( <NumberControl className="hello" /> );
+-			expect( getInput() ).toBeTruthy();
+-		} );
+-	} );
+-
+-	describe( 'onChange handling', () => {
+-		it( 'should provide onChange callback with number value', () => {
+-			const spy = jest.fn();
+-
+-			render(
+-				<NumberControl value={ 5 } onChange={ ( v ) => spy( v ) } />
+-			);
+-
+-			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: 10 } } );
+-
+-			expect( spy ).toHaveBeenCalledWith( '10' );
+-		} );
+-
+-		it( 'should call onChange callback when value is clamped on blur', async () => {
+-			const spy = jest.fn();
+-			render(
+-				<NumberControl
+-					value={ 5 }
+-					min={ 4 }
+-					max={ 10 }
+-					onChange={ ( v ) => spy( v ) }
+-				/>
+-			);
+-
+-			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: 1 } } );
+-
+-			// Before blurring, the value is still un-clamped
+-			expect( input.value ).toBe( '1' );
+-
+-			input.blur();
+-
+-			// After blur, value is clamped
+-			expect( input.value ).toBe( '4' );
+-
+-			// After the blur, the `onChange` callback fires asynchronously.
+-			await waitFor( () => {
+-				expect( spy ).toHaveBeenCalledTimes( 2 );
+-			} );
+-
+-			expect( spy ).toHaveBeenNthCalledWith( 1, '1' );
+-			expect( spy ).toHaveBeenNthCalledWith( 2, 4 );
+-		} );
+-
+-		it( 'should call onChange callback when value is not valid', () => {
+-			const spy = jest.fn();
+-			render(
+-				<NumberControl
+-					value={ 5 }
+-					min={ 1 }
+-					max={ 10 }
+-					onChange={ ( v, extra ) =>
+-						spy( v, extra.event.target.validity.valid )
+-					}
+-				/>
+-			);
+-
+-			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: 14 } } );
+-
+-			expect( input.value ).toBe( '14' );
+-
+-			fireKeyDown( { keyCode: ENTER } );
+-
+-			expect( input.value ).toBe( '10' );
+-
+-			expect( spy ).toHaveBeenCalledTimes( 2 );
+-
+-			// First call: invalid, unclamped value
+-			expect( spy ).toHaveBeenNthCalledWith( 1, '14', false );
+-			// Second call: valid, clamped value
+-			expect( spy ).toHaveBeenNthCalledWith( 2, 10, true );
+-		} );
+-	} );
+-
+-	describe( 'Validation', () => {
+-		it( 'should clamp value within range on ENTER keypress', () => {
+-			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: -100 } } );
+-			fireKeyDown( { keyCode: ENTER } );
+-
+-			/**
+-			 * This is zero because the value has been adjusted to
+-			 * respect the min/max range of the input.
+-			 */
+-
+-			expect( input.value ).toBe( '0' );
+-		} );
+-
+-		it( 'should clamp value within range on blur', () => {
+-			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: 41 } } );
+-
+-			// Before blurring, the value is still un-clamped
+-			expect( input.value ).toBe( '41' );
+-
+-			input.blur();
+-
+-			// After blur, value is clamped
+-			expect( input.value ).toBe( '10' );
+-		} );
+-
+-		it( 'should parse to number value on ENTER keypress when required', () => {
+-			render( <NumberControl value={ 5 } required={ true } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: '10 abc' } } );
+-			fireKeyDown( { keyCode: ENTER } );
+-
+-			expect( input.value ).toBe( '0' );
+-		} );
+-
+-		it( 'should parse to empty string on ENTER keypress when not required', () => {
+-			render( <NumberControl value={ 5 } required={ false } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: '10 abc' } } );
+-			fireKeyDown( { keyCode: ENTER } );
+-
+-			expect( input.value ).toBe( '' );
+-		} );
+-
+-		it( 'should accept empty string on ENTER keypress for optional field', () => {
+-			render( <NumberControl value={ 5 } required={ false } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: '' } } );
+-			fireKeyDown( { keyCode: ENTER } );
+-
+-			expect( input.value ).toBe( '' );
+-		} );
+-
+-		it( 'should not enforce numerical value for empty string when required is omitted', () => {
+-			render( <NumberControl value={ 5 } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: '' } } );
+-			fireKeyDown( { keyCode: ENTER } );
+-
+-			expect( input.value ).toBe( '' );
+-		} );
+-
+-		it( 'should enforce numerical value for empty string when required', () => {
+-			render( <NumberControl value={ 5 } required={ true } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireEvent.change( input, { target: { value: '' } } );
+-			fireKeyDown( { keyCode: ENTER } );
+-
+-			expect( input.value ).toBe( '0' );
+-		} );
+-	} );
+-
+-	describe( 'Key UP interactions', () => {
+-		it( 'should fire onKeyDown callback', () => {
+-			const spy = jest.fn();
+-
+-			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
+-
+-			getInput().focus();
+-			fireKeyDown( { keyCode: UP } );
+-
+-			expect( spy ).toHaveBeenCalled();
+-		} );
+-
+-		it( 'should increment by step on key UP press', () => {
+-			render( <StatefulNumberControl value={ 5 } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: UP } );
+-
+-			expect( input.value ).toBe( '6' );
+-		} );
+-
+-		it( 'should increment from a negative value', () => {
+-			render( <StatefulNumberControl value={ -5 } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: UP } );
+-
+-			expect( input.value ).toBe( '-4' );
+-		} );
+-
+-		it( 'should increment while preserving the decimal value when `step` is “any”', () => {
+-			render( <StatefulNumberControl value={ 866.5309 } step="any" /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: UP } );
+-
+-			expect( input.value ).toBe( '867.5309' );
+-		} );
+-
+-		it( 'should increment by shiftStep on key UP + shift press', () => {
+-			render( <StatefulNumberControl value={ 5 } shiftStep={ 10 } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: UP, shiftKey: true } );
+-
+-			expect( input.value ).toBe( '20' );
+-		} );
+-
+-		it( 'should increment by shiftStep while preserving the decimal value when `step` is “any”', () => {
+-			render( <StatefulNumberControl value={ 857.5309 } step="any" /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: UP, shiftKey: true } );
+-
+-			expect( input.value ).toBe( '867.5309' );
+-		} );
+-
+-		it( 'should increment by custom shiftStep on key UP + shift press', () => {
+-			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: UP, shiftKey: true } );
+-
+-			expect( input.value ).toBe( '100' );
+-		} );
+-
+-		it( 'should increment but be limited by max on shiftStep', () => {
+-			render(
+-				<StatefulNumberControl
+-					value={ 5 }
+-					shiftStep={ 100 }
+-					max={ 99 }
+-				/>
+-			);
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: UP, shiftKey: true } );
+-
+-			expect( input.value ).toBe( '99' );
+-		} );
+-
+-		it( 'should not increment by shiftStep if disabled', () => {
+-			render(
+-				<StatefulNumberControl
+-					value={ 5 }
+-					shiftStep={ 100 }
+-					isShiftStepEnabled={ false }
+-				/>
+-			);
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: UP, shiftKey: true } );
+-
+-			expect( input.value ).toBe( '6' );
+-		} );
+-	} );
+-
+-	describe( 'Key DOWN interactions', () => {
+-		it( 'should fire onKeyDown callback', () => {
+-			const spy = jest.fn();
+-			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
+-
+-			getInput().focus();
+-			fireKeyDown( { keyCode: DOWN } );
+-
+-			expect( spy ).toHaveBeenCalled();
+-		} );
+-
+-		it( 'should decrement by step on key DOWN press', () => {
+-			render( <StatefulNumberControl value={ 5 } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: DOWN } );
+-
+-			expect( input.value ).toBe( '4' );
+-		} );
+-
+-		it( 'should decrement from a negative value', () => {
+-			render( <StatefulNumberControl value={ -5 } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: DOWN } );
+-
+-			expect( input.value ).toBe( '-6' );
+-		} );
+-
+-		it( 'should decrement while preserving the decimal value when `step` is “any”', () => {
+-			render( <StatefulNumberControl value={ 868.5309 } step="any" /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: DOWN } );
+-
+-			expect( input.value ).toBe( '867.5309' );
+-		} );
+-
+-		it( 'should decrement by shiftStep on key DOWN + shift press', () => {
+-			render( <StatefulNumberControl value={ 5 } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
+-
+-			expect( input.value ).toBe( '0' );
+-		} );
+-
+-		it( 'should decrement by shiftStep while preserving the decimal value when `step` is “any”', () => {
+-			render( <StatefulNumberControl value={ 877.5309 } step="any" /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
+-
+-			expect( input.value ).toBe( '867.5309' );
+-		} );
+-
+-		it( 'should decrement by custom shiftStep on key DOWN + shift press', () => {
+-			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
+-
+-			expect( input.value ).toBe( '-100' );
+-		} );
+-
+-		it( 'should decrement but be limited by min on shiftStep', () => {
+-			render(
+-				<StatefulNumberControl
+-					value={ 5 }
+-					shiftStep={ 100 }
+-					min={ 4 }
+-				/>
+-			);
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
+-
+-			expect( input.value ).toBe( '4' );
+-		} );
+-
+-		it( 'should not decrement by shiftStep if disabled', () => {
+-			render(
+-				<StatefulNumberControl
+-					value={ 5 }
+-					shiftStep={ 100 }
+-					isShiftStepEnabled={ false }
+-				/>
+-			);
+-
+-			const input = getInput();
+-			input.focus();
+-			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
+-
+-			expect( input.value ).toBe( '4' );
+-		} );
+-	} );
+-
+-	describe( 'custom spin buttons', () => {
+-		test.each( [ undefined, 'none', 'native' ] )(
+-			'should not appear when spinControls = %s',
+-			( spinControls ) => {
+-				render( <NumberControl spinControls={ spinControls } /> );
+-				expect(
+-					screen.queryByLabelText( 'Increment' )
+-				).not.toBeInTheDocument();
+-				expect(
+-					screen.queryByLabelText( 'Decrement' )
+-				).not.toBeInTheDocument();
+-			}
+-		);
+-
+-		test.each( [
+-			[ 'up', '1', {} ],
+-			[ 'up', '2', { value: '1' } ],
+-			[ 'up', '12', { value: '10', step: '2' } ],
+-			[ 'up', '10', { value: '10', max: '10' } ],
+-			[ 'down', '-1', {} ],
+-			[ 'down', '1', { value: '2' } ],
+-			[ 'down', '10', { value: '12', step: '2' } ],
+-			[ 'down', '10', { value: '10', min: '10' } ],
+-		] )(
+-			'should spin %s to %s when props = %o',
+-			async ( direction, expectedValue, props ) => {
+-				const user = userEvent.setup( {
+-					advanceTimers: jest.advanceTimersByTime,
+-				} );
+-				const onChange = jest.fn();
+-				render(
+-					<NumberControl
+-						{ ...props }
+-						spinControls="custom"
+-						onChange={ onChange }
+-					/>
+-				);
+-				await user.click(
+-					screen.getByLabelText(
+-						direction === 'up' ? 'Increment' : 'Decrement'
+-					)
+-				);
+-				expect( onChange ).toHaveBeenCalledWith( expectedValue, {
+-					event: expect.anything(),
+-				} );
+-			}
+-		);
+-	} );
+-} );
+diff --git a/packages/components/src/number-control/test/index.tsx b/packages/components/src/number-control/test/index.tsx
+new file mode 100644
+index 00000000000000..2eeef4c996ae63
+--- /dev/null
++++ b/packages/components/src/number-control/test/index.tsx
+@@ -0,0 +1,603 @@
++/**
++ * External dependencies
++ */
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import NumberControl from '..';
++import type { NumberControlProps } from '../types';
++
++function StatefulNumberControl( props: NumberControlProps ) {
++	const [ value, setValue ] = useState( props.value );
++	const handleOnChange = ( v: string | undefined ) => setValue( v );
++
++	return (
++		<NumberControl
++			{ ...props }
++			value={ value }
++			onChange={ handleOnChange }
++		/>
++	);
++}
++
++describe( 'NumberControl', () => {
++	describe( 'Basic rendering', () => {
++		it( 'should render', () => {
++			render( <NumberControl /> );
++			expect( screen.getByRole( 'spinbutton' ) ).toBeVisible();
++		} );
++
++		it( 'should render custom className', () => {
++			render( <NumberControl className="hello" /> );
++			expect( screen.getByRole( 'spinbutton' ) ).toBeVisible();
++		} );
++	} );
++
++	describe( 'onChange handling', () => {
++		it( 'should provide onChange callback with number value', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++			const spy = jest.fn();
++
++			render(
++				<NumberControl value={ 5 } onChange={ ( v ) => spy( v ) } />
++			);
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.clear( input );
++			await user.type( input, '10' );
++
++			expect( spy ).toHaveBeenCalledWith( '10' );
++		} );
++
++		it( 'should call onChange callback when value is clamped on blur', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++			const onChangeSpy = jest.fn();
++
++			render(
++				<NumberControl
++					value={ 5 }
++					min={ 4 }
++					max={ 10 }
++					onChange={ ( v, extra ) =>
++						onChangeSpy(
++							v,
++							( extra.event.target as HTMLInputElement ).validity
++								.valid
++						)
++					}
++				/>
++			);
++
++			const input = screen.getByRole( 'spinbutton' );
++
++			await user.clear( input );
++			await user.type( input, '1' );
++
++			// Before blurring, the value is still un-clamped
++			expect( input ).toHaveValue( 1 );
++
++			// Blur the input
++			await user.keyboard( '[Tab]' );
++
++			// After blur, value is clamped
++			expect( input ).toHaveValue( 4 );
++
++			// After the blur, the `onChange` callback fires asynchronously.
++			await waitFor( () => {
++				expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
++			} );
++
++			// First call: clear the input
++			expect( onChangeSpy ).toHaveBeenNthCalledWith( 1, '', true );
++			// Second call: type '1'
++			expect( onChangeSpy ).toHaveBeenNthCalledWith( 2, '1', false );
++			// Third call: clamp value
++			expect( onChangeSpy ).toHaveBeenNthCalledWith( 3, 4, true );
++		} );
++
++		it( 'should call onChange callback when value is not valid', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++			const onChangeSpy = jest.fn();
++
++			render(
++				<NumberControl
++					value={ 5 }
++					min={ 1 }
++					max={ 10 }
++					onChange={ ( v, extra ) =>
++						onChangeSpy(
++							v,
++							( extra.event.target as HTMLInputElement ).validity
++								.valid
++						)
++					}
++				/>
++			);
++
++			const input = screen.getByRole( 'spinbutton' );
++
++			await user.clear( input );
++			await user.type( input, '14' );
++
++			expect( input ).toHaveValue( 14 );
++
++			await user.keyboard( '[Enter]' );
++
++			expect( input ).toHaveValue( 10 );
++
++			expect( onChangeSpy ).toHaveBeenCalledTimes( 4 );
++
++			// First call: clear value
++			expect( onChangeSpy ).toHaveBeenNthCalledWith( 1, '', true );
++			// Second call: valid, unclamped value
++			expect( onChangeSpy ).toHaveBeenNthCalledWith( 2, '1', true );
++			// Third call: invalid, unclamped value
++			expect( onChangeSpy ).toHaveBeenNthCalledWith( 3, '14', false );
++			// Fourth call: valid, clamped value
++			expect( onChangeSpy ).toHaveBeenNthCalledWith( 4, 10, true );
++		} );
++	} );
++
++	describe( 'Validation', () => {
++		it( 'should clamp value within range on ENTER keypress', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++
++			await user.clear( input );
++			await user.type( input, '-100' );
++			await user.keyboard( '[Enter]' );
++
++			/**
++			 * This is zero because the value has been adjusted to
++			 * respect the min/max range of the input.
++			 */
++			expect( input ).toHaveValue( 0 );
++		} );
++
++		it( 'should clamp value within range on blur', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <NumberControl value={ 5 } min={ 0 } max={ 10 } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.clear( input );
++			await user.type( input, '41' );
++
++			// Before blurring, the value is still un-clamped
++			expect( input ).toHaveValue( 41 );
++
++			// Blur the input
++			await user.click( document.body );
++
++			// After blur, value is clamped
++			expect( input ).toHaveValue( 10 );
++		} );
++
++		it( 'should parse non-numeric values to a number on ENTER keypress when required', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <NumberControl value={ 5 } required /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.clear( input );
++			await user.type( input, 'abc' );
++			await user.keyboard( '[Enter]' );
++
++			expect( input ).toHaveValue( 0 );
++		} );
++
++		it( 'should parse non-numeric values to empty string on ENTER keypress when not required', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <NumberControl value={ 5 } required={ false } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.clear( input );
++			await user.type( input, 'abc' );
++			await user.keyboard( '[Enter]' );
++
++			// Note: the `input` field may still visually show the invalid input,
++			// while internally parsing the value as an empty string.
++			//
++			// React Testing Library associates `null` to empty string types for
++			// numeric `input` elements
++			// (see https://github.com/testing-library/jest-dom/blob/v5.16.5/src/utils.js#L191-L192)
++			expect( input ).toHaveValue( null );
++		} );
++
++		it( 'should not enforce numerical value for empty string when required is omitted', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <NumberControl value={ 5 } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.clear( input );
++			await user.keyboard( '[Enter]' );
++
++			// React Testing Library associates `null` to empty string types for
++			// numeric `input` elements
++			// (see https://github.com/testing-library/jest-dom/blob/v5.16.5/src/utils.js#L191-L192)
++			expect( input ).toHaveValue( null );
++		} );
++
++		it( 'should enforce numerical value for empty string when required', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <NumberControl value={ 5 } required /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.clear( input );
++			await user.keyboard( '[Enter]' );
++
++			expect( input ).toHaveValue( 0 );
++		} );
++	} );
++
++	describe( 'Key UP interactions', () => {
++		it( 'should fire onKeyDown callback', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			const spy = jest.fn();
++
++			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '[ArrowUp]' );
++
++			expect( spy ).toHaveBeenCalled();
++		} );
++
++		it( 'should increment by step on key UP press', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <StatefulNumberControl value={ 5 } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '[ArrowUp]' );
++
++			expect( input ).toHaveValue( 6 );
++		} );
++
++		it( 'should increment from a negative value', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <StatefulNumberControl value={ -5 } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '[ArrowUp]' );
++
++			expect( input ).toHaveValue( -4 );
++		} );
++
++		it( 'should increment while preserving the decimal value when `step` is “any”', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <StatefulNumberControl value={ 866.5309 } step="any" /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '[ArrowUp]' );
++
++			expect( input ).toHaveValue( 867.5309 );
++		} );
++
++		it( 'should increment by shiftStep on key UP + shift press', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <StatefulNumberControl value={ 5 } shiftStep={ 10 } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
++
++			expect( input ).toHaveValue( 20 );
++		} );
++
++		it( 'should increment by shiftStep while preserving the decimal value when `step` is “any”', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <StatefulNumberControl value={ 857.5309 } step="any" /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
++
++			expect( input ).toHaveValue( 867.5309 );
++		} );
++
++		it( 'should increment by custom shiftStep on key UP + shift press', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
++
++			expect( input ).toHaveValue( 100 );
++		} );
++
++		it( 'should increment but be limited by max on shiftStep', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render(
++				<StatefulNumberControl
++					value={ 5 }
++					shiftStep={ 100 }
++					max={ 99 }
++				/>
++			);
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
++
++			expect( input ).toHaveValue( 99 );
++		} );
++
++		it( 'should not increment by shiftStep if disabled', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render(
++				<StatefulNumberControl
++					value={ 5 }
++					shiftStep={ 100 }
++					isShiftStepEnabled={ false }
++				/>
++			);
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '{Shift>}[ArrowUp]{/Shift}' );
++
++			expect( input ).toHaveValue( 6 );
++		} );
++	} );
++
++	describe( 'Key DOWN interactions', () => {
++		it( 'should fire onKeyDown callback', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++			const spy = jest.fn();
++
++			render( <StatefulNumberControl value={ 5 } onKeyDown={ spy } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '[ArrowDown]' );
++
++			expect( spy ).toHaveBeenCalled();
++		} );
++
++		it( 'should decrement by step on key DOWN press', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <StatefulNumberControl value={ 5 } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '[ArrowDown]' );
++
++			expect( input ).toHaveValue( 4 );
++		} );
++
++		it( 'should decrement from a negative value', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <StatefulNumberControl value={ -5 } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '[ArrowDown]' );
++
++			expect( input ).toHaveValue( -6 );
++		} );
++
++		it( 'should decrement while preserving the decimal value when `step` is “any”', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <StatefulNumberControl value={ 868.5309 } step="any" /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '[ArrowDown]' );
++
++			expect( input ).toHaveValue( 867.5309 );
++		} );
++
++		it( 'should decrement by shiftStep on key DOWN + shift press', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <StatefulNumberControl value={ 5 } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
++
++			expect( input ).toHaveValue( 0 );
++		} );
++
++		it( 'should decrement by shiftStep while preserving the decimal value when `step` is “any”', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <StatefulNumberControl value={ 877.5309 } step="any" /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
++
++			expect( input ).toHaveValue( 867.5309 );
++		} );
++
++		it( 'should decrement by custom shiftStep on key DOWN + shift press', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
++
++			expect( input ).toHaveValue( -100 );
++		} );
++
++		it( 'should decrement but be limited by min on shiftStep', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render(
++				<StatefulNumberControl
++					value={ 5 }
++					shiftStep={ 100 }
++					min={ 4 }
++				/>
++			);
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
++
++			expect( input ).toHaveValue( 4 );
++		} );
++
++		it( 'should not decrement by shiftStep if disabled', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render(
++				<StatefulNumberControl
++					value={ 5 }
++					shiftStep={ 100 }
++					isShiftStepEnabled={ false }
++				/>
++			);
++
++			const input = screen.getByRole( 'spinbutton' );
++			await user.click( input );
++			await user.keyboard( '{Shift>}[ArrowDown]{/Shift}' );
++
++			expect( input ).toHaveValue( 4 );
++		} );
++	} );
++
++	describe( 'custom spin buttons', () => {
++		test.each( [
++			undefined,
++			'none',
++			'native',
++		] as NumberControlProps[ 'spinControls' ][] )(
++			'should not appear when spinControls = %s',
++			( spinControls ) => {
++				render( <NumberControl spinControls={ spinControls } /> );
++				expect(
++					screen.queryByLabelText( 'Increment' )
++				).not.toBeInTheDocument();
++				expect(
++					screen.queryByLabelText( 'Decrement' )
++				).not.toBeInTheDocument();
++			}
++		);
++
++		test.each( [
++			[ 'up', '1', {} ],
++			[ 'up', '2', { value: '1' } ],
++			[ 'up', '12', { value: '10', step: '2' } ],
++			[ 'up', '10', { value: '10', max: 10 } ],
++			[ 'down', '-1', {} ],
++			[ 'down', '1', { value: '2' } ],
++			[ 'down', '10', { value: '12', step: '2' } ],
++			[ 'down', '10', { value: '10', min: 10 } ],
++		] )(
++			'should spin %s to %s when props = %o',
++			async ( direction, expectedValue, props ) => {
++				const user = userEvent.setup( {
++					advanceTimers: jest.advanceTimersByTime,
++				} );
++				const onChange = jest.fn();
++				render(
++					<NumberControl
++						{ ...props }
++						spinControls="custom"
++						onChange={ onChange }
++					/>
++				);
++				await user.click(
++					screen.getByLabelText(
++						direction === 'up' ? 'Increment' : 'Decrement'
++					)
++				);
++				expect( onChange ).toHaveBeenCalledWith( expectedValue, {
++					event: expect.objectContaining( {
++						target: expect.any( HTMLInputElement ),
++						type: expect.any( String ),
++					} ),
++				} );
++			}
++		);
++	} );
++} );

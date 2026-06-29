@@ -1,0 +1,354 @@
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 2ea05e62d63f4d..614e2a4b251b23 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -23,7 +23,7 @@ import type { PolymorphicComponentProps } from '../ui/context';
+ import * as styles from './styles';
+ import { space } from '../ui/utils/space';
+ 
+-export interface DividerProps extends SeparatorProps {
++export interface DividerProps extends Omit< SeparatorProps, 'children' > {
+ 	/**
+ 	 * Adjusts all margins.
+ 	 */
+diff --git a/packages/components/src/elevation/types.ts b/packages/components/src/elevation/types.ts
+index 02537255988ffa..dee387b07aa368 100644
+--- a/packages/components/src/elevation/types.ts
++++ b/packages/components/src/elevation/types.ts
+@@ -34,5 +34,4 @@ export type Props = {
+ 	 * In the example below, `isInteractive` is activated to give a better sense of depth.
+ 	 */
+ 	value?: number;
+-	children?: never;
+ };
+diff --git a/packages/components/src/flex/types.ts b/packages/components/src/flex/types.ts
+index f4360e145c201b..b52b1e4d282bcf 100644
+--- a/packages/components/src/flex/types.ts
++++ b/packages/components/src/flex/types.ts
+@@ -53,6 +53,10 @@ export type FlexProps = {
+ 	 * @default false
+ 	 */
+ 	wrap?: boolean;
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
+ 	/**
+ 	 * @deprecated
+ 	 */
+@@ -70,6 +74,10 @@ export type FlexItemProps = {
+ 	 * @default true
+ 	 */
+ 	isBlock?: boolean;
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
+ };
+ 
+ export type FlexBlockProps = Omit< FlexItemProps, 'isBlock' >;
+diff --git a/packages/components/src/grid/types.ts b/packages/components/src/grid/types.ts
+index b66529f5253c0a..1830f85c6942cb 100644
+--- a/packages/components/src/grid/types.ts
++++ b/packages/components/src/grid/types.ts
+@@ -72,4 +72,8 @@ export type Props = {
+ 	 * Adjusts the CSS grid `template-rows`.
+ 	 */
+ 	templateRows?: CSSProperties[ 'gridTemplateRows' ];
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
+ };
+diff --git a/packages/components/src/spacer/hook.ts b/packages/components/src/spacer/hook.ts
+index a40bbcc1de44a5..946f4a01398dda 100644
+--- a/packages/components/src/spacer/hook.ts
++++ b/packages/components/src/spacer/hook.ts
+@@ -73,6 +73,10 @@ export interface SpacerProps {
+ 	 * Adjusts right padding.
+ 	 */
+ 	paddingRight?: number;
++	/**
++	 * The children elements.
++	 */
++	children?: React.ReactNode;
+ }
+ 
+ export function useSpacer(
+diff --git a/packages/components/src/truncate/types.ts b/packages/components/src/truncate/types.ts
+index 61ff73ad64c0de..74d07cd89a5608 100644
+--- a/packages/components/src/truncate/types.ts
++++ b/packages/components/src/truncate/types.ts
+@@ -25,7 +25,11 @@ export interface Props {
+ 	 */
+ 	limit?: number;
+ 	/**
+-	 * Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
++	 * Clamps the text content to the specified `numberOfLines`, adding the `ellipsis` at the end.
+ 	 */
+ 	numberOfLines?: number;
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
+ }
+diff --git a/packages/components/src/ui/card/types.ts b/packages/components/src/ui/card/types.ts
+index c934fed5277d77..b8794489bc266f 100644
+--- a/packages/components/src/ui/card/types.ts
++++ b/packages/components/src/ui/card/types.ts
+@@ -51,6 +51,10 @@ export type CardBodyProps = {
+ 	 * @default true
+ 	 */
+ 	scrollable?: boolean;
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
+ };
+ 
+ export type CardHeaderSize = 'medium' | 'small' | 'xSmall';
+@@ -62,6 +66,10 @@ export type CardHeaderProps = {
+ 	 * @default 'medium'
+ 	 */
+ 	size?: CardHeaderSize;
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
+ };
+ 
+ export type CardFooterProps = CardHeaderProps & {
+diff --git a/packages/components/src/ui/context/polymorphic-component.ts b/packages/components/src/ui/context/polymorphic-component.ts
+index 82c992acc1ef5f..488f3a6dc40f93 100644
+--- a/packages/components/src/ui/context/polymorphic-component.ts
++++ b/packages/components/src/ui/context/polymorphic-component.ts
+@@ -3,16 +3,18 @@
+  */
+ // eslint-disable-next-line no-restricted-imports
+ import type * as React from 'react';
+-import type { As, RenderProp, ExtractHTMLAttributes } from 'reakit-utils/types';
+ import type { Interpolation } from 'create-emotion';
+ 
+ /**
+  * Based on https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/types.ts
++ *
++ * The `children` prop is being explicitely omitted since it is otherwise implicitly added
++ * by `ComponentPropsWithRef`. The context is that components should require the `children`
++ * prop explicitely when needed (see https://github.com/WordPress/gutenberg/pull/31817).
+  */
+-export type PolymorphicComponentProps< P, T extends As > = P &
+-	Omit< React.ComponentPropsWithRef< T >, 'as' | keyof P > & {
++export type PolymorphicComponentProps< P, T extends React.ElementType > = P &
++	Omit< React.ComponentPropsWithRef< T >, 'as' | keyof P | 'children' > & {
+ 		as?: T | keyof JSX.IntrinsicElements;
+-		children?: React.ReactNode | RenderProp< ExtractHTMLAttributes< any > >;
+ 	};
+ 
+ export type ElementTypeFromPolymorphicComponentProps<
+@@ -23,8 +25,8 @@ export type PropsFromPolymorphicComponentProps<
+ 	P
+ > = P extends PolymorphicComponentProps< infer PP, any > ? PP : never;
+ 
+-export type PolymorphicComponent< T extends As, O > = {
+-	< TT extends As >(
++export type PolymorphicComponent< T extends React.ElementType, O > = {
++	< TT extends React.ElementType >(
+ 		props: PolymorphicComponentProps< O, TT > & { as: TT }
+ 	): JSX.Element | null;
+ 	( props: PolymorphicComponentProps< O, T > ): JSX.Element | null;
+@@ -40,7 +42,7 @@ export type PolymorphicComponent< T extends As, O > = {
+ 	selector: `.${ string }`;
+ };
+ 
+-export type CreatePolymorphicComponent< T extends As, P > = (
++export type CreatePolymorphicComponent< T extends React.ElementType, P > = (
+ 	template: TemplateStringsArray,
+ 	...styles: (
+ 		| Interpolation< undefined >
+@@ -62,5 +64,8 @@ type CreateStyledComponents = {
+ };
+ 
+ export type CreateStyled = CreateStyledComponents & {
+-	< T extends As >( component: T ): CreatePolymorphicComponent< T, {} >;
++	< T extends React.ElementType >( component: T ): CreatePolymorphicComponent<
++		T,
++		{}
++	>;
+ };
+diff --git a/packages/components/src/ui/context/use-context-system.js b/packages/components/src/ui/context/use-context-system.js
+index 8501aa491e1070..06acef66d1ee59 100644
+--- a/packages/components/src/ui/context/use-context-system.js
++++ b/packages/components/src/ui/context/use-context-system.js
+@@ -15,12 +15,10 @@ import { useComponentsContext } from './context-system-provider';
+ import { getNamespace, getConnectedNamespace } from './utils';
+ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
+ 
+-/* eslint-disable jsdoc/valid-types */
+ /**
+  * @template TProps
+- * @typedef {TProps & { className: string; children?: import('react').ReactNode }} ConnectedProps
++ * @typedef {TProps & { className: string; }} ConnectedProps
+  */
+-/* eslint-enable jsdoc/valid-types */
+ 
+ /**
+  * Custom hook that derives registered props from the Context system.
+@@ -75,6 +73,7 @@ export function useContextSystem( props, namespace ) {
+ 		finalComponentProps[ key ] = overrideProps[ key ];
+ 	}
+ 
++	// @ts-ignore
+ 	finalComponentProps.children = rendered;
+ 	finalComponentProps.className = classes;
+ 
+diff --git a/packages/components/src/ui/context/with-next.js b/packages/components/src/ui/context/with-next.js
+index 8b3ba55e29b3fa..1351869b5f56ce 100644
+--- a/packages/components/src/ui/context/with-next.js
++++ b/packages/components/src/ui/context/with-next.js
+@@ -8,7 +8,7 @@ import { useContextSystem } from './use-context-system';
+  * @template {{}} TCurrentProps
+  * @template {{}} TNextProps
+  * @param {import('react').ForwardRefExoticComponent<TCurrentProps>} CurrentComponent
+- * @param {import('react').ComponentType<TNextProps>} NextComponent
++ * @param {(props: TNextProps) => JSX.Element | null} NextComponent
+  * @param {string} namespace
+  * @param {(props: TCurrentProps) => TNextProps} adapter
+  */
+diff --git a/packages/components/src/ui/control-group/types.ts b/packages/components/src/ui/control-group/types.ts
+index 60e02f0186ed2f..d36592224c066a 100644
+--- a/packages/components/src/ui/control-group/types.ts
++++ b/packages/components/src/ui/control-group/types.ts
+@@ -12,7 +12,7 @@ import type { FlexProps } from '../../flex/types';
+ export type ControlGroupContext = {
+ 	isFirst?: boolean;
+ 	isLast?: boolean;
+-	isMidde?: boolean;
++	isMiddle?: boolean;
+ 	isOnly?: boolean;
+ 	isVertical?: boolean;
+ 	styles?: string;
+@@ -23,4 +23,8 @@ export type Props = Pick< FlexProps, 'direction' > & {
+ 	 * Adjust the layout (width) of content using CSS grid (`grid-template-columns`).
+ 	 */
+ 	templateColumns?: CSSProperties[ 'gridTemplateColumns' ];
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
+ };
+diff --git a/packages/components/src/ui/popover/types.ts b/packages/components/src/ui/popover/types.ts
+index 3f0e0402a4df00..e5ea81a5e5d3ae 100644
+--- a/packages/components/src/ui/popover/types.ts
++++ b/packages/components/src/ui/popover/types.ts
+@@ -72,9 +72,14 @@ export type Props = PopperProps & {
+ 	 * @see https://reakit.io/docs/popover/#usepopoverstate
+ 	 */
+ 	visible?: boolean;
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
+ };
+ 
+ export type ContentProps = {
+ 	elevation?: number;
+ 	maxWidth?: CSSProperties[ 'maxWidth' ];
++	children: React.ReactNode;
+ };
+diff --git a/packages/components/src/ui/scrollable/types.ts b/packages/components/src/ui/scrollable/types.ts
+index 9b5d86db916bff..6e93a7b6d6880e 100644
+--- a/packages/components/src/ui/scrollable/types.ts
++++ b/packages/components/src/ui/scrollable/types.ts
+@@ -13,4 +13,8 @@ export type Props = {
+ 	 * @default false
+ 	 */
+ 	smoothScroll?: boolean;
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
+ };
+diff --git a/packages/components/src/ui/surface/types.ts b/packages/components/src/ui/surface/types.ts
+index 128fb1a2858dbe..e00255581d69ab 100644
+--- a/packages/components/src/ui/surface/types.ts
++++ b/packages/components/src/ui/surface/types.ts
+@@ -38,4 +38,8 @@ export type Props = {
+ 	 * * `tertiary`: Used as the app/site wide background. Visible in **dark mode** only. Use case is rare.
+ 	 */
+ 	variant?: SurfaceVariant;
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
+ };
+diff --git a/packages/components/src/ui/tooltip/content.js b/packages/components/src/ui/tooltip/content.js
+index 1fc0780eae468b..c022c7d52184b5 100644
+--- a/packages/components/src/ui/tooltip/content.js
++++ b/packages/components/src/ui/tooltip/content.js
+@@ -17,7 +17,7 @@ const { TooltipPopoverView } = styles;
+ 
+ /**
+  *
+- * @param {import('../context').PolymorphicComponentProps<import('reakit').TooltipProps, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<import('./types').ContentProps, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function TooltipContent( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/tooltip/types.ts b/packages/components/src/ui/tooltip/types.ts
+index 34c8add7b520aa..446afcdb298b8d 100644
+--- a/packages/components/src/ui/tooltip/types.ts
++++ b/packages/components/src/ui/tooltip/types.ts
+@@ -2,9 +2,9 @@
+  * External dependencies
+  */
+ // eslint-disable-next-line no-restricted-imports
+-import type { TooltipInitialState } from 'reakit';
++import type { TooltipInitialState, TooltipProps } from 'reakit';
+ // eslint-disable-next-line no-restricted-imports
+-import type { ReactElement } from 'react';
++import type { ReactElement, ReactNode } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -59,6 +59,10 @@ export type Props = TooltipInitialState &
+ 		 * @see https://reakit.io/docs/tooltip/#usetooltipstate
+ 		 */
+ 		visible?: boolean;
+-		children: JSX.Element;
++		children: ReactElement;
+ 		focusable?: boolean;
+ 	};
++
++export type ContentProps = TooltipProps & {
++	children: ReactNode;
++};
+diff --git a/packages/components/src/ui/visually-hidden/hook.js b/packages/components/src/ui/visually-hidden/hook.js
+index e8e7980c72dbec..374c8c894fecbd 100644
+--- a/packages/components/src/ui/visually-hidden/hook.js
++++ b/packages/components/src/ui/visually-hidden/hook.js
+@@ -9,10 +9,10 @@ import { cx } from 'emotion';
+ import * as styles from './styles';
+ 
+ // duplicate this for the sake of being able to export it, it'll be removed when we replace VisuallyHidden in components/src anyway
+-/** @typedef {import('../context').PolymorphicComponentProps<{}, 'div'>} Props */
++/** @typedef {import('../context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} Props */
+ 
+ /**
+- * @param {import('../context').PolymorphicComponentProps<{}, 'div'>} props
++ * @param {import('../context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+  */
+ export function useVisuallyHidden( { className, ...props } ) {
+ 	// circumvent the context system and write the classnames ourselves
+diff --git a/packages/components/src/view/component.js b/packages/components/src/view/component.js
+index ed106cab0f624e..571361e070c925 100644
+--- a/packages/components/src/view/component.js
++++ b/packages/components/src/view/component.js
+@@ -20,7 +20,7 @@ import styled from '@emotion/styled';
+  * }
+  * ```
+  *
+- * @type {import('../ui/context').PolymorphicComponent<'div', {}>}
++ * @type {import('../ui/context').PolymorphicComponent<'div', { children?: import('react').ReactNode }>}
+  */
+ // @ts-ignore
+ const View = styled.div``;

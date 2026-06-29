@@ -1,0 +1,63 @@
+diff --git a/packages/block-editor/src/components/block-settings-menu/test/__snapshots__/reusable-block-delete-button.js.snap b/packages/block-editor/src/components/block-settings-menu/test/__snapshots__/reusable-block-delete-button.js.snap
+index 0e2d2d28a3216b..4d7c78b8697658 100644
+--- a/packages/block-editor/src/components/block-settings-menu/test/__snapshots__/reusable-block-delete-button.js.snap
++++ b/packages/block-editor/src/components/block-settings-menu/test/__snapshots__/reusable-block-delete-button.js.snap
+@@ -1,12 +1,12 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`ReusableBlockDeleteButton matches the snapshot 1`] = `
+-<WithInstanceId(MenuItem)
++<MenuItem
+   className="editor-block-settings-menu__control block-editor-block-settings-menu__control"
+   disabled={false}
+   icon="no"
+   onClick={[Function]}
+ >
+   Remove from Reusable Blocks
+-</WithInstanceId(MenuItem)>
++</MenuItem>
+ `;
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ab6e9ee6a141dd..2035d92dd9be94 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -1,3 +1,9 @@
++## 7.2.1 (Unreleased)
++
++### Bug fixes
++
++- Fix `instanceId` prop passed through to `Button` component via `MenuItems` producing React console error. Fixed by removing the unnecessary use of `withInstanceId` on the `MenuItems` component [#14599](https://github.com/WordPress/gutenberg/pull/14599)
++
+ ## 7.2.0 (2019-03-20)
+ 
+ ### Improvements
+diff --git a/packages/components/src/menu-item/index.js b/packages/components/src/menu-item/index.js
+index 1b793a2c5cf265..de5429ddf525f8 100644
+--- a/packages/components/src/menu-item/index.js
++++ b/packages/components/src/menu-item/index.js
+@@ -8,7 +8,6 @@ import { isString } from 'lodash';
+  * WordPress dependencies
+  */
+ import { createElement, cloneElement } from '@wordpress/element';
+-import { withInstanceId } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -77,4 +76,4 @@ export function MenuItem( {
+ 	);
+ }
+ 
+-export default withInstanceId( MenuItem );
++export default MenuItem;
+diff --git a/packages/edit-post/src/components/header/plugin-more-menu-item/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/header/plugin-more-menu-item/test/__snapshots__/index.js.snap
+index 7fa0869a60f223..6e395b2e7ebae9 100644
+--- a/packages/edit-post/src/components/header/plugin-more-menu-item/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/header/plugin-more-menu-item/test/__snapshots__/index.js.snap
+@@ -18,7 +18,6 @@ exports[`PluginMoreMenuItem renders menu item as button properly 1`] = `
+   >
+     <button
+       className="components-button components-icon-button components-menu-item__button has-icon has-text"
+-      instanceId={0}
+       onClick={[Function]}
+       role="menuitem"
+       type="button"

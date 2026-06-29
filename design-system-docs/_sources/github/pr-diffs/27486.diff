@@ -1,0 +1,2330 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 5f856ce44bef88..0b2487a74c3e09 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1805,6 +1805,12 @@
+ 		"markdown_source": "../packages/token-list/README.md",
+ 		"parent": "packages"
+ 	},
++	{
++		"title": "@wordpress/ui-utils",
++		"slug": "packages-ui-utils",
++		"markdown_source": "../packages/ui-utils/README.md",
++		"parent": "packages"
++	},
+ 	{
+ 		"title": "@wordpress/url",
+ 		"slug": "packages-url",
+diff --git a/package-lock.json b/package-lock.json
+index 8bc191f5b665d0..79c6ad6c89a855 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -4620,6 +4620,11 @@
+ 			"integrity": "sha512-tsAQNx32a8CoFhjhijUIhI4kccIAgmGhy8LZMZgGfmXcpMbPRUqn5LWmgRttILi6yeGmBJd2xsPkFMs0PzgPCw==",
+ 			"dev": true
+ 		},
++		"@itsjonq/is": {
++			"version": "0.0.2",
++			"resolved": "https://registry.npmjs.org/@itsjonq/is/-/is-0.0.2.tgz",
++			"integrity": "sha512-P0Ug+chfjCV1JV8MUxAGPz0BM76yDlR76AIfPwRZ6mAJW56k6b9j0s2cIcEsEAu0gNj/RJD1STw777AQyBN3CQ=="
++		},
+ 		"@jest/console": {
+ 			"version": "24.9.0",
+ 			"resolved": "https://registry.npmjs.org/@jest/console/-/console-24.9.0.tgz",
+@@ -18327,6 +18332,71 @@
+ 				"lodash": "^4.17.19"
+ 			}
+ 		},
++		"@wordpress/ui-utils": {
++			"version": "file:packages/ui-utils",
++			"requires": {
++				"@wordpress/compose": "file:packages/compose",
++				"@wordpress/element": "file:packages/element",
++				"create-emotion": "^10.0.27",
++				"deepmerge": "^4.2.2",
++				"fast-deep-equal": "^3.1.3",
++				"hoist-non-react-statics": "^3.3.2",
++				"json2mq": "^0.2.0",
++				"lodash": "^4.17.19",
++				"memize": "^1.1.0",
++				"react-merge-refs": "^1.1.0",
++				"reakit-warning": "^0.5.5",
++				"tinycolor2": "^1.4.1",
++				"use-enhanced-state": "^0.0.12",
++				"use-isomorphic-layout-effect": "^1.0.0"
++			},
++			"dependencies": {
++				"copy-to-clipboard": {
++					"version": "3.3.1",
++					"resolved": "https://registry.npmjs.org/copy-to-clipboard/-/copy-to-clipboard-3.3.1.tgz",
++					"integrity": "sha512-i13qo6kIHTTpCm8/Wup+0b1mVWETvu2kIMzKoK8FpkLkFxlt0znUAHcMzox+T8sPlqtZXq3CulEjQHsYiGFJUw==",
++					"requires": {
++						"toggle-selection": "^1.0.6"
++					}
++				},
++				"deepmerge": {
++					"version": "4.2.2",
++					"resolved": "https://registry.npmjs.org/deepmerge/-/deepmerge-4.2.2.tgz",
++					"integrity": "sha512-FJ3UgI4gIl+PHZm53knsuSFpE+nESMr7M4v9QcgB7S63Kj/6WqMiFQJpBBYz1Pt+66bZpP3Q7Lye0Oo9MPKEdg=="
++				},
++				"fast-deep-equal": {
++					"version": "3.1.3",
++					"resolved": "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz",
++					"integrity": "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
++				},
++				"hoist-non-react-statics": {
++					"version": "3.3.2",
++					"resolved": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz",
++					"integrity": "sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==",
++					"requires": {
++						"react-is": "^16.7.0"
++					}
++				},
++				"react-merge-refs": {
++					"version": "1.1.0",
++					"resolved": "https://registry.npmjs.org/react-merge-refs/-/react-merge-refs-1.1.0.tgz",
++					"integrity": "sha512-alTKsjEL0dKH/ru1Iyn7vliS2QRcBp9zZPGoWxUOvRGWPUYgjo+V01is7p04It6KhgrzhJGnIj9GgX8W4bZoCQ=="
++				},
++				"reakit-utils": {
++					"version": "0.14.4",
++					"resolved": "https://registry.npmjs.org/reakit-utils/-/reakit-utils-0.14.4.tgz",
++					"integrity": "sha512-jDEf/NmZVJ6fs10G16ifD+RFhQikSLN7VfjRHu0CPoUj4g6lFXd5PPcRXCY81qiqc9FVHjr2d2fmsw1hs6xUxA=="
++				},
++				"reakit-warning": {
++					"version": "0.5.5",
++					"resolved": "https://registry.npmjs.org/reakit-warning/-/reakit-warning-0.5.5.tgz",
++					"integrity": "sha512-OuP1r7rlSSJZsoLuc0CPA2ACPKnWO8HDbFktiiidbT67UjuX6udYV1AUsIgMJ8ado9K5gZGjPj7IB/GDYo9Yjg==",
++					"requires": {
++						"reakit-utils": "^0.14.4"
++					}
++				}
++			}
++		},
+ 		"@wordpress/url": {
+ 			"version": "file:packages/url",
+ 			"requires": {
+@@ -26690,6 +26760,11 @@
+ 			"resolved": "https://registry.npmjs.org/array-map/-/array-map-0.0.0.tgz",
+ 			"integrity": "sha1-iKK6tz0c97zVwbEYoAP2b2ZfpmI="
+ 		},
++		"array-move": {
++			"version": "3.0.1",
++			"resolved": "https://registry.npmjs.org/array-move/-/array-move-3.0.1.tgz",
++			"integrity": "sha512-H3Of6NIn2nNU1gsVDqDnYKY/LCdWvCMMOWifNGhKcVQgiZ6nOek39aESOvro6zmueP07exSl93YLvkN4fZOkSg=="
++		},
+ 		"array-reduce": {
+ 			"version": "0.0.0",
+ 			"resolved": "https://registry.npmjs.org/array-reduce/-/array-reduce-0.0.0.tgz",
+@@ -31327,6 +31402,50 @@
+ 				"elliptic": "^6.0.0"
+ 			}
+ 		},
++		"create-emotion": {
++			"version": "10.0.27",
++			"resolved": "https://registry.npmjs.org/create-emotion/-/create-emotion-10.0.27.tgz",
++			"integrity": "sha512-fIK73w82HPPn/RsAij7+Zt8eCE8SptcJ3WoRMfxMtjteYxud8GDTKKld7MYwAX2TVhrw29uR1N/bVGxeStHILg==",
++			"requires": {
++				"@emotion/cache": "^10.0.27",
++				"@emotion/serialize": "^0.11.15",
++				"@emotion/sheet": "0.9.4",
++				"@emotion/utils": "0.11.3"
++			},
++			"dependencies": {
++				"@emotion/cache": {
++					"version": "10.0.29",
++					"resolved": "https://registry.npmjs.org/@emotion/cache/-/cache-10.0.29.tgz",
++					"integrity": "sha512-fU2VtSVlHiF27empSbxi1O2JFdNWZO+2NFHfwO0pxgTep6Xa3uGb+3pVKfLww2l/IBGLNEZl5Xf/++A4wAYDYQ==",
++					"requires": {
++						"@emotion/sheet": "0.9.4",
++						"@emotion/stylis": "0.8.5",
++						"@emotion/utils": "0.11.3",
++						"@emotion/weak-memoize": "0.2.5"
++					}
++				},
++				"@emotion/sheet": {
++					"version": "0.9.4",
++					"resolved": "https://registry.npmjs.org/@emotion/sheet/-/sheet-0.9.4.tgz",
++					"integrity": "sha512-zM9PFmgVSqBw4zL101Q0HrBVTGmpAxFZH/pYx/cjJT5advXguvcgjHFTCaIO3enL/xr89vK2bh0Mfyj9aa0ANA=="
++				},
++				"@emotion/stylis": {
++					"version": "0.8.5",
++					"resolved": "https://registry.npmjs.org/@emotion/stylis/-/stylis-0.8.5.tgz",
++					"integrity": "sha512-h6KtPihKFn3T9fuIrwvXXUOwlx3rfUvfZIcP5a6rh8Y7zjE3O06hT5Ss4S/YI1AYhuZ1kjaE/5EaOOI2NqSylQ=="
++				},
++				"@emotion/utils": {
++					"version": "0.11.3",
++					"resolved": "https://registry.npmjs.org/@emotion/utils/-/utils-0.11.3.tgz",
++					"integrity": "sha512-0o4l6pZC+hI88+bzuaX/6BgOvQVhbt2PfmxauVaYOGgbsAw14wdKyvMCZXnsnsHys94iadcF+RG/wZyx6+ZZBw=="
++				},
++				"@emotion/weak-memoize": {
++					"version": "0.2.5",
++					"resolved": "https://registry.npmjs.org/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz",
++					"integrity": "sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA=="
++				}
++			}
++		},
+ 		"create-hash": {
+ 			"version": "1.2.0",
+ 			"resolved": "https://registry.npmjs.org/create-hash/-/create-hash-1.2.0.tgz",
+@@ -44735,6 +44854,14 @@
+ 			"integrity": "sha1-Epai1Y/UXxmg9s4B1lcB4sc1tus=",
+ 			"dev": true
+ 		},
++		"json2mq": {
++			"version": "0.2.0",
++			"resolved": "https://registry.npmjs.org/json2mq/-/json2mq-0.2.0.tgz",
++			"integrity": "sha1-tje9O6nqvhIsg+lyBIOusQ0skEo=",
++			"requires": {
++				"string-convert": "^0.2.0"
++			}
++		},
+ 		"json2php": {
+ 			"version": "0.0.4",
+ 			"resolved": "https://registry.npmjs.org/json2php/-/json2php-0.0.4.tgz",
+@@ -57329,6 +57456,11 @@
+ 			"integrity": "sha512-a1uQGz7IyVy9YwhqjZIZu1c8JO8dNIe20xBmSS6qu9kv++k3JGzCVmprbNN5Kn+BgzD5E7YYwg1CcjuJMRNsvg==",
+ 			"dev": true
+ 		},
++		"string-convert": {
++			"version": "0.2.1",
++			"resolved": "https://registry.npmjs.org/string-convert/-/string-convert-0.2.1.tgz",
++			"integrity": "sha1-aYLMMEn7tM2F+LJFaLnZvznu/5c="
++		},
+ 		"string-length": {
+ 			"version": "3.1.0",
+ 			"resolved": "https://registry.npmjs.org/string-length/-/string-length-3.1.0.tgz",
+@@ -59905,6 +60037,11 @@
+ 				"qs": "^6.4.0"
+ 			}
+ 		},
++		"tiny-warning": {
++			"version": "1.0.3",
++			"resolved": "https://registry.npmjs.org/tiny-warning/-/tiny-warning-1.0.3.tgz",
++			"integrity": "sha512-lBN9zLN/oAf68o3zNXYrdCt1kP8WsiGW8Oo2ka41b2IM5JL/S1CTyX1rW0mb/zSuJun0ZUrDxx4sqvYS2FWzPA=="
++		},
+ 		"tinycolor2": {
+ 			"version": "1.4.1",
+ 			"resolved": "https://registry.npmjs.org/tinycolor2/-/tinycolor2-1.4.1.tgz",
+@@ -59987,8 +60124,7 @@
+ 		"toggle-selection": {
+ 			"version": "1.0.6",
+ 			"resolved": "https://registry.npmjs.org/toggle-selection/-/toggle-selection-1.0.6.tgz",
+-			"integrity": "sha1-bkWxJj8gF/oKzH2J14sVuL932jI=",
+-			"dev": true
++			"integrity": "sha1-bkWxJj8gF/oKzH2J14sVuL932jI="
+ 		},
+ 		"toidentifier": {
+ 			"version": "1.0.0",
+@@ -60729,11 +60865,20 @@
+ 				"ts-essentials": "^2.0.3"
+ 			}
+ 		},
++		"use-enhanced-state": {
++			"version": "0.0.12",
++			"resolved": "https://registry.npmjs.org/use-enhanced-state/-/use-enhanced-state-0.0.12.tgz",
++			"integrity": "sha512-ll0LP+G/v/S35N9kzQ7PNLr5CFgdIwEv2N+UbOO/j7a/jUXd4TnB3eX532y7YNgJAQjqAfTWcOyMTx5DyapK8Q==",
++			"requires": {
++				"@itsjonq/is": "0.0.2",
++				"array-move": "^3.0.0",
++				"tiny-warning": "^1.0.3"
++			}
++		},
+ 		"use-isomorphic-layout-effect": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/use-isomorphic-layout-effect/-/use-isomorphic-layout-effect-1.0.0.tgz",
+-			"integrity": "sha512-JMwJ7Vd86NwAt1jH7q+OIozZSIxA4ND0fx6AsOe2q1H8ooBUp5aN6DvVCqZiIaYU6JaMRJGyR0FO7EBCIsb/Rg==",
+-			"dev": true
++			"integrity": "sha512-JMwJ7Vd86NwAt1jH7q+OIozZSIxA4ND0fx6AsOe2q1H8ooBUp5aN6DvVCqZiIaYU6JaMRJGyR0FO7EBCIsb/Rg=="
+ 		},
+ 		"use-latest": {
+ 			"version": "1.1.0",
+diff --git a/package.json b/package.json
+index e17fcd716548f4..e04de7b1431ebf 100644
+--- a/package.json
++++ b/package.json
+@@ -74,6 +74,7 @@
+ 		"@wordpress/server-side-render": "file:packages/server-side-render",
+ 		"@wordpress/shortcode": "file:packages/shortcode",
+ 		"@wordpress/token-list": "file:packages/token-list",
++		"@wordpress/ui-utils": "file:packages/ui-utils",
+ 		"@wordpress/url": "file:packages/url",
+ 		"@wordpress/viewport": "file:packages/viewport",
+ 		"@wordpress/warning": "file:packages/warning",
+diff --git a/packages/ui-utils/README.md b/packages/ui-utils/README.md
+new file mode 100644
+index 00000000000000..59579f34644f56
+--- /dev/null
++++ b/packages/ui-utils/README.md
+@@ -0,0 +1,574 @@
++# UI Utils
++
++Collection of utilities for building user interfaces.
++
++## Installation
++
++Install the module
++
++```bash
++npm install @wordpress/ui-utils --save
++```
++
++_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
++
++<!-- START TOKEN(Autogenerated API docs) -->
++
++<a name="add" href="#add">#</a> **add**
++
++Safely adds 2 values.
++
++_Parameters_
++
++-   _args_ `Array<(number|string|undefined)>`: Values to add together.
++
++_Returns_
++
++-   `number`: The sum of values.
++
++<a name="arrayFill" href="#arrayFill">#</a> **arrayFill**
++
++Creates an array prefilled with an amount.
++
++_Parameters_
++
++-   _amount_ `number`: 
++
++_Returns_
++
++-   `Array<number>`: The filled array.
++
++<a name="arrayMove" href="#arrayMove">#</a> **arrayMove**
++
++Moves an array item to a different position.
++
++See:
++<https://github.com/sindresorhus/array-move#readme>
++
++_Parameters_
++
++-   _array_ `Array`: The array containing the items to move.
++-   _from_ `number`: The source index.
++-   _to_ `number`: The destination index.
++
++_Returns_
++
++-   `Array`: The updated array.
++
++<a name="clearSelection" href="#clearSelection">#</a> **clearSelection**
++
++Clears the text selection on screen.
++
++<a name="colorize" href="#colorize">#</a> **colorize**
++
++A library for color manipulation and conversion.
++
++See:
++<https://github.com/bgrins/TinyColor>
++
++<a name="createUnitValue" href="#createUnitValue">#</a> **createUnitValue**
++
++Combines a value and a unit into a unit value.
++
++_Parameters_
++
++-   _value_ `(string|number)`: 
++-   _unit_ `[string]`: 
++
++_Returns_
++
++-   `string`: The unit value.
++
++<a name="deepEqual" href="#deepEqual">#</a> **deepEqual**
++
++Checks to see if 2 values are equal (with support for deeply nested Objects and Arrays).
++
++<a name="deepMerge" href="#deepMerge">#</a> **deepMerge**
++
++Merges two objects together, with support for deeply nested values.
++
++<a name="getComputedBackgroundColor" href="#getComputedBackgroundColor">#</a> **getComputedBackgroundColor**
++
++Retrieves the computed background color. This is useful for getting the
++value of a CSS variable color.
++
++_Parameters_
++
++-   _color_ `(string|unknown)`: The background color to compute.
++
++_Returns_
++
++-   `string`: The computed background color.
++
++<a name="getComputedColor" href="#getComputedColor">#</a> **getComputedColor**
++
++Retrieves the computed text color. This is useful for getting the
++value of a CSS variable color.
++
++_Parameters_
++
++-   _color_ `(string|unknown)`: 
++
++_Returns_
++
++-   `string`: The computed text color.
++
++<a name="getDisplayName" href="#getDisplayName">#</a> **getDisplayName**
++
++Gets the displayName of a React Component or element.
++
++_Parameters_
++
++-   _tagName_ (unknown type): 
++
++_Returns_
++
++-   `string`: The display name of the Component / tagName.
++
++<a name="getNumber" href="#getNumber">#</a> **getNumber**
++
++Parses and retrieves a number value.
++
++_Parameters_
++
++-   _value_ `unknown`: The incoming value.
++
++_Returns_
++
++-   `number`: The parsed number value.
++
++<a name="getOptimalTextColor" href="#getOptimalTextColor">#</a> **getOptimalTextColor**
++
++Get the text shade optimized for readability, based on a background color.
++
++_Parameters_
++
++-   _color_ `(string|unknown)`: The background color.
++
++_Returns_
++
++-   `string`: The optimized text color (black or white).
++
++<a name="getOptimalTextShade" href="#getOptimalTextShade">#</a> **getOptimalTextShade**
++
++Get the text shade optimized for readability, based on a background color.
++
++_Parameters_
++
++-   _color_ `(string|unknown)`: The background color.
++
++_Returns_
++
++-   `string`: The optimized text shade (dark or light).
++
++<a name="getParsedCSSValue" href="#getParsedCSSValue">#</a> **getParsedCSSValue**
++
++Gets the value to be applied to the CSS Object Model.
++
++_Parameters_
++
++-   _initialValue_ `string`: 
++
++_Returns_
++
++-   `(number|string|undefined)`: The parsed CSS value.
++
++<a name="getParsedValue" href="#getParsedValue">#</a> **getParsedValue**
++
++Handles legacy value + unit handling.
++This component use to manage both incoming value and units separately.
++
++Moving forward, ideally the value should be a string that contains both
++the value and unit, example: '10px'
++
++_Parameters_
++
++-   _value_ `(number|string)`: Value
++-   _unit_ `string`: Unit value
++
++_Returns_
++
++-   `ReturnType<parseUnitValue>`: The extracted number and unit.
++
++<a name="getPrecision" href="#getPrecision">#</a> **getPrecision**
++
++Determines the decimal position of a number value.
++
++_Parameters_
++
++-   _value_ `number`: The number to evaluate.
++
++_Returns_
++
++-   `number`: The number of decimal places.
++
++<a name="getValidChildren" href="#getValidChildren">#</a> **getValidChildren**
++
++Gets a collection of available children elements from a React component's children prop.
++
++_Parameters_
++
++-   _children_ (unknown type): 
++
++_Returns_
++
++-   (unknown type): An array of available children.
++
++<a name="hasUnits" href="#hasUnits">#</a> **hasUnits**
++
++Checks if units are defined.
++
++_Parameters_
++
++-   _units_ `any`: Units to check.
++
++_Returns_
++
++-   `boolean`: Whether units are defined.
++
++<a name="hoistNonReactStatics" href="#hoistNonReactStatics">#</a> **hoistNonReactStatics**
++
++Copies non-react specific statics from a child component to a parent component.
++Similar to Object.assign, but with React static keywords prevented from being overridden.
++
++<a name="interpolate" href="#interpolate">#</a> **interpolate**
++
++Gets a value based on an input range and an output range.
++Can be used for a set of numbers or a set of colors.
++
++_Parameters_
++
++-   _input_ `[number]`: 
++-   _inputRange_ `[(number|number)]`: 
++-   _outputRange_ `[(number|number)]`: 
++
++_Returns_
++
++-   `*`: The interpolated value.
++
++<a name="interpolateRounded" href="#interpolateRounded">#</a> **interpolateRounded**
++
++Gets a rounded value based on an input range and an output range.
++
++_Parameters_
++
++-   _args_ `Parameters<interpolate>`: 
++
++_Returns_
++
++-   `number`: The rounded interpolated value.
++
++<a name="is" href="#is">#</a> **is**
++
++A collection of type checks.
++
++<a name="isChrome" href="#isChrome">#</a> **isChrome**
++
++Check if the browser is Chrome.
++
++_Returns_
++
++-   `boolean`: True, if Chrome.
++
++<a name="isColor" href="#isColor">#</a> **isColor**
++
++_Parameters_
++
++-   _value_ `(string|unknown)`: 
++
++_Returns_
++
++-   `boolean`: Whether the value is a valid color.
++
++<a name="isFirefox" href="#isFirefox">#</a> **isFirefox**
++
++Check if the browser is Firefox.
++
++_Returns_
++
++-   `boolean`: True, if Firefox.
++
++<a name="isRenderProp" href="#isRenderProp">#</a> **isRenderProp**
++
++Checks to see if a `children` prop is a render function prop.
++
++_Parameters_
++
++-   _children_ `*`: 
++
++_Returns_
++
++-   `boolean`: True, if children is a render function prop.
++
++<a name="isSafari" href="#isSafari">#</a> **isSafari**
++
++Check if the browser is Safari.
++
++_Returns_
++
++-   `boolean`: True, if Safari.
++
++<a name="isValidCSSValueForProp" href="#isValidCSSValueForProp">#</a> **isValidCSSValueForProp**
++
++Checks if a value is valid given a CSS prop.
++
++_Parameters_
++
++-   _prop_ `string`: 
++-   _value_ `string`: 
++
++_Returns_
++
++-   `boolean`: Whether the value is a valid CSS value.
++
++<a name="isValidNumericUnitValue" href="#isValidNumericUnitValue">#</a> **isValidNumericUnitValue**
++
++Checks a value to see if it is a valid numeric unit value.
++
++Examples of valid numeric unit values include:
++0px, 1em, 0, -1, 12.5px
++
++_Parameters_
++
++-   _value_ `string`: 
++
++_Returns_
++
++-   `boolean`: Whether the value is a valid numeric unit value.
++
++<a name="memoize" href="#memoize">#</a> **memoize**
++
++Creates a function that memoizes the result of a `function`.
++
++See:
++<https://www.npmjs.com/package/memize>
++
++<a name="mergeEvent" href="#mergeEvent">#</a> **mergeEvent**
++
++Merges event handlers together.
++
++_Parameters_
++
++-   _handler_ (unknown type): 
++-   _otherHandler_ (unknown type): 
++
++<a name="mergeEventHandlers" href="#mergeEventHandlers">#</a> **mergeEventHandlers**
++
++Merges a set of event handlers together.
++
++_Parameters_
++
++-   _handlers_ (unknown type): 
++-   _extraHandlers_ (unknown type): 
++
++<a name="mergeRefs" href="#mergeRefs">#</a> **mergeRefs**
++
++Merges React `ref` together.
++
++<a name="mergeValidationFunctions" href="#mergeValidationFunctions">#</a> **mergeValidationFunctions**
++
++Merges validation functions together.
++
++_Parameters_
++
++-   _validate_ (unknown type): 
++-   _extraValidate_ (unknown type): 
++
++_Returns_
++
++-   `(Function|undefined)`: A single merged validation function.
++
++<a name="normalizeArrowKey" href="#normalizeArrowKey">#</a> **normalizeArrowKey**
++
++Normalizes the 'key' property of a KeyboardEvent in IE/Edge
++
++Source:
++<https://github.com/downshift-js/downshift/blob/a71005bd879d05d7dcb892d1e0dc5c6ca74e9d39/src/utils.js#L279>
++
++_Parameters_
++
++-   _event_ (unknown type): A keyboardEvent object
++
++_Returns_
++
++-   `string`: The keyboard key
++
++<a name="parseUnitValue" href="#parseUnitValue">#</a> **parseUnitValue**
++
++Parses a number and unit from a value.
++
++_Parameters_
++
++-   _initialValue_ `(string|number)`: Value to parse
++
++_Returns_
++
++-   (unknown type): The extracted number and unit.
++
++<a name="renderChildren" href="#renderChildren">#</a> **renderChildren**
++
++Handles the rendering of a React component's children prop, which
++may be a render function prop.
++
++_Parameters_
++
++-   _children_ `*`: Children to render.
++-   _props_ `*`: Props to pass into a (potential) children render function.
++
++_Returns_
++
++-   `*`: The rendered children.
++
++<a name="roundClamp" href="#roundClamp">#</a> **roundClamp**
++
++Clamps a value based on a min/max range with rounding
++
++_Parameters_
++
++-   _value_ `[number]`: The value.
++-   _min_ `[number]`: The minimum range.
++-   _max_ `[number]`: The maximum range.
++-   _step_ `[number]`: A multiplier for the value.
++
++_Returns_
++
++-   `number`: The rounded and clamped value.
++
++<a name="roundClampString" href="#roundClampString">#</a> **roundClampString**
++
++Clamps a value based on a min/max range with rounding.
++Returns a string.
++
++_Parameters_
++
++-   _args_ `Parameters<roundClamp>`: Arguments for roundClamp(). \*
++
++_Returns_
++
++-   `string`: The rounded and clamped value.
++
++<a name="simpleEqual" href="#simpleEqual">#</a> **simpleEqual**
++
++Quickly checks to see if two objects (shallow or deep) are equal.
++
++_Parameters_
++
++-   _objA_ `any`: 
++-   _objB_ `any`: 
++
++_Returns_
++
++-   `boolean`: Whether the values are equal.
++
++<a name="subtract" href="#subtract">#</a> **subtract**
++
++Safely subtracts 2 values.
++
++_Parameters_
++
++-   _args_ `Array<(number|string|undefined)>`: Values to subtract together.
++
++_Returns_
++
++-   `number`: The difference of the 2 values.
++
++<a name="useControlledState" href="#useControlledState">#</a> **useControlledState**
++
++Custom hooks for "controlled" components to track and consolidate internal
++state and incoming values. This is useful for components that render
++`input`, `textarea`, or `select` HTML elements.
++
++<https://reactjs.org/docs/forms.html#controlled-components>
++
++At first, a component using useControlledState receives an initial prop
++value, which is used as initial internal state.
++
++This internal state can be maintained and updated without
++relying on new incoming prop values.
++
++Unlike the basic useState hook, useControlledState's state can
++be updated if a new incoming prop value is changed.
++
++_Parameters_
++
++-   _currentState_ `(T|undefined)`: The current value.
++-   _options_ `[Options<T>]`: Additional options for the hook.
++
++_Returns_
++
++-   (unknown type): The controlled value and the value setter.
++
++<a name="useIsomorphicLayoutEffect" href="#useIsomorphicLayoutEffect">#</a> **useIsomorphicLayoutEffect**
++
++`useLayoutEffect` that does not show warning when server-side rendering, see Alex Reardon's article for more info.
++<https://medium.com/@alexandereardon/uselayouteffect-and-ssr-192986cdcf7a>
++
++<a name="useLocalState" href="#useLocalState">#</a> **useLocalState**
++
++Used to read/write state to localStorage.
++
++_Parameters_
++
++-   _currentState_ `(T|undefined)`: The current value.
++
++_Returns_
++
++-   (unknown type): The state an state setter.
++
++<a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
++
++Checks to see if the media query matches the current viewport.
++
++Source:
++<https://github.com/jaredpalmer/the-platform>
++
++_Parameters_
++
++-   _query_ `(string|Object)`: 
++-   _defaultMatches_ `boolean`: 
++
++_Returns_
++
++-   `boolean`: Whether the query matches the current viewport.
++
++<a name="useSealedState" href="#useSealedState">#</a> **useSealedState**
++
++React custom hook that returns the very first value passed to `initialState`,
++even if it changes between re-renders.
++
++_Parameters_
++
++-   _initialState_ `T`: 
++
++_Returns_
++
++-   `T`: The sealed state.
++
++<a name="useUniqueId" href="#useUniqueId">#</a> **useUniqueId**
++
++Provides a unique instance ID.
++
++_Parameters_
++
++-   _object_ `unknown`: Object reference to create an id for.
++-   _prefix_ `string`: Prefix for the unique id.
++-   _preferredId_ `string`: Default ID to use.
++
++_Returns_
++
++-   `(string|number)`: The unique id.
++
++<a name="useUpdateEffect" href="#useUpdateEffect">#</a> **useUpdateEffect**
++
++A `React.useEffect` that will not run on the first render.
++
++Source:
++<https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/useUpdateEffect.ts>
++
++_Parameters_
++
++-   _effect_ (unknown type): 
++-   _deps_ `Array<unknown>`: 
++
++
++<!-- END TOKEN(Autogenerated API docs) -->
+diff --git a/packages/ui-utils/package.json b/packages/ui-utils/package.json
+new file mode 100644
+index 00000000000000..df6c4221e6d24e
+--- /dev/null
++++ b/packages/ui-utils/package.json
+@@ -0,0 +1,45 @@
++{
++	"name": "@wordpress/ui-utils",
++	"version": "0.1.0",
++	"description": "Collection of utilities for building user interfaces.",
++	"author": "The WordPress Contributors",
++	"license": "GPL-2.0-or-later",
++	"keywords": [
++		"wordpress",
++		"gutenberg",
++		"utils",
++		"ui"
++	],
++	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/ui-utils/README.md",
++	"repository": {
++		"type": "git",
++		"url": "https://github.com/WordPress/gutenberg.git",
++		"directory": "packages/ui-utils"
++	},
++	"bugs": {
++		"url": "https://github.com/WordPress/gutenberg/issues"
++	},
++	"main": "build/index.js",
++	"module": "build-module/index.js",
++	"react-native": "src/index",
++	"types": "build-types",
++	"dependencies": {
++		"@wordpress/compose": "file:../compose",
++		"@wordpress/element": "file:../element",
++		"create-emotion": "^10.0.27",
++		"deepmerge": "^4.2.2",
++		"fast-deep-equal": "^3.1.3",
++		"hoist-non-react-statics": "^3.3.2",
++		"json2mq": "^0.2.0",
++		"lodash": "^4.17.19",
++		"memize": "^1.1.0",
++		"react-merge-refs": "^1.1.0",
++		"reakit-warning": "^0.5.5",
++		"tinycolor2": "^1.4.1",
++		"use-enhanced-state": "^0.0.12",
++		"use-isomorphic-layout-effect": "^1.0.0"
++	},
++	"publishConfig": {
++		"access": "public"
++	}
++}
+diff --git a/packages/ui-utils/src/arrays.js b/packages/ui-utils/src/arrays.js
+new file mode 100644
+index 00000000000000..ef4635ebbc94c6
+--- /dev/null
++++ b/packages/ui-utils/src/arrays.js
+@@ -0,0 +1,38 @@
++function arrayMoveMutate( array, from, to ) {
++	const startIndex = from < 0 ? array.length + from : from;
++
++	if ( startIndex >= 0 && startIndex < array.length ) {
++		const endIndex = to < 0 ? array.length + to : to;
++
++		const [ item ] = array.splice( from, 1 );
++		array.splice( endIndex, 0, item );
++	}
++}
++
++/**
++ * Moves an array item to a different position.
++ *
++ * See:
++ * https://github.com/sindresorhus/array-move#readme
++ *
++ * @param {Array} array The array containing the items to move.
++ * @param {number} from The source index.
++ * @param {number} to The destination index.
++ *
++ * @return {Array} The updated array.
++ */
++export function arrayMove( array, from, to ) {
++	array = [ ...array ];
++	arrayMoveMutate( array, from, to );
++	return array;
++}
++
++/**
++ * Creates an array prefilled with an amount.
++ *
++ * @param {number} amount
++ * @return {Array<number>} The filled array.
++ */
++export function arrayFill( amount = 0 ) {
++	return Array.from( Array( amount ).keys() );
++}
+diff --git a/packages/ui-utils/src/browser.js b/packages/ui-utils/src/browser.js
+new file mode 100644
+index 00000000000000..7e84376d107cd7
+--- /dev/null
++++ b/packages/ui-utils/src/browser.js
+@@ -0,0 +1,30 @@
++function detectBrowser( browser ) {
++	return window?.navigator?.userAgent.toLowerCase().indexOf( browser ) > -1;
++}
++
++/**
++ * Check if the browser is Chrome.
++ *
++ * @return {boolean} True, if Chrome.
++ */
++export function isChrome() {
++	return detectBrowser( 'chrome' );
++}
++
++/**
++ * Check if the browser is Firefox.
++ *
++ * @return {boolean} True, if Firefox.
++ */
++export function isFirefox() {
++	return detectBrowser( 'firefox' );
++}
++
++/**
++ * Check if the browser is Safari.
++ *
++ * @return {boolean} True, if Safari.
++ */
++export function isSafari() {
++	return detectBrowser( 'safari' );
++}
+diff --git a/packages/ui-utils/src/colors.js b/packages/ui-utils/src/colors.js
+new file mode 100644
+index 00000000000000..816d7d61a1953e
+--- /dev/null
++++ b/packages/ui-utils/src/colors.js
+@@ -0,0 +1,161 @@
++/**
++ * A library for color manipulation and conversion.
++ *
++ * See:
++ * https://github.com/bgrins/TinyColor
++ */
++export { default as colorize } from 'tinycolor2';
++
++/**
++ * External dependencies
++ */
++import colorize from 'tinycolor2';
++
++/**
++ * Internal dependencies
++ */
++import { is } from './is';
++import { memoize } from './memoize';
++
++/** @type {HTMLDivElement} */
++let __colorComputationNode;
++
++/**
++ * @return {HTMLDivElement | undefined} The HTML element for color computation.
++ */
++function getColorComputationNode() {
++	if ( typeof document === 'undefined' ) return;
++
++	if ( ! __colorComputationNode ) {
++		// Create a temporary element for style computation.
++		const el = document.createElement( 'div' );
++		el.setAttribute( 'data-g2-color-computation-node', '' );
++		// Inject for window computed style.
++		document.body.appendChild( el );
++		__colorComputationNode = el;
++	}
++
++	return __colorComputationNode;
++}
++
++/**
++ * @param {string | unknown} value
++ *
++ * @return {boolean} Whether the value is a valid color.
++ */
++export function isColor( value ) {
++	if ( ! is.string( value ) ) return false;
++	const test = colorize( value );
++
++	return test.isValid();
++}
++
++/**
++ * Retrieves the computed background color. This is useful for getting the
++ * value of a CSS variable color.
++ *
++ * @param {string | unknown} color The background color to compute.
++ *
++ * @return {string} The computed background color.
++ */
++function __getComputedBackgroundColor( color ) {
++	if ( ! is.string( color ) ) return '';
++
++	if ( isColor( color ) ) return color;
++
++	if ( ! color.includes( 'var(' ) ) return '';
++	if ( typeof document === 'undefined' ) return '';
++
++	// Attempts to gracefully handle CSS variables color values.
++	const el = getColorComputationNode();
++	if ( ! el ) return '';
++
++	el.style.background = color;
++	// Grab the style
++	const computedColor = window?.getComputedStyle( el ).background;
++	// Reset
++	el.style.background = '';
++
++	return computedColor || '';
++}
++
++/**
++ * Retrieves the computed background color. This is useful for getting the
++ * value of a CSS variable color.
++ *
++ * @param {string | unknown} color The background color to compute.
++ *
++ * @return {string} The computed background color.
++ */
++export const getComputedBackgroundColor = memoize(
++	__getComputedBackgroundColor
++);
++
++/**
++ * Retrieves the computed text color. This is useful for getting the
++ * value of a CSS variable color.
++ *
++ * @param {string | unknown} color
++ *
++ * @return {string} The computed text color.
++ */
++function __getComputedColor( color ) {
++	if ( ! is.string( color ) ) return '';
++
++	if ( isColor( color ) ) return color;
++
++	if ( ! color.includes( 'var(' ) ) return '';
++	if ( typeof document === 'undefined' ) return '';
++
++	// Attempts to gracefully handle CSS variables color values.
++	const el = getColorComputationNode();
++	if ( ! el ) return '';
++
++	el.style.color = color;
++	// Grab the style
++	const computedColor = window?.getComputedStyle( el ).color;
++	// Reset
++	el.style.color = '';
++
++	return computedColor || '';
++}
++
++/**
++ * Retrieves the computed text color. This is useful for getting the
++ * value of a CSS variable color.
++ *
++ * @param {string | unknown} color
++ *
++ * @return {string} The computed text color.
++ */
++export const getComputedColor = memoize( __getComputedColor );
++
++/**
++ * Get the text shade optimized for readability, based on a background color.
++ *
++ * @param {string | unknown} color  The background color.
++ *
++ * @return {string} The optimized text color (black or white).
++ */
++export function getOptimalTextColor( color ) {
++	const background = getComputedBackgroundColor( color );
++	const isReadableWithBlackText = colorize.isReadable(
++		background,
++		'#000000'
++	);
++
++	return isReadableWithBlackText ? '#000000' : '#ffffff';
++}
++
++/**
++ * Get the text shade optimized for readability, based on a background color.
++ *
++ * @param {string | unknown} color The background color.
++ *
++ * @return {string} The optimized text shade (dark or light).
++ */
++export function getOptimalTextShade( color ) {
++	const result = getOptimalTextColor( color );
++
++	return result === '#000000' ? 'dark' : 'light';
++}
+diff --git a/packages/ui-utils/src/deep-equal.js b/packages/ui-utils/src/deep-equal.js
+new file mode 100644
+index 00000000000000..815df5a852d2dc
+--- /dev/null
++++ b/packages/ui-utils/src/deep-equal.js
+@@ -0,0 +1,4 @@
++/**
++ * Checks to see if 2 values are equal (with support for deeply nested Objects and Arrays).
++ */
++export { default as deepEqual } from 'fast-deep-equal';
+diff --git a/packages/ui-utils/src/deep-merge.js b/packages/ui-utils/src/deep-merge.js
+new file mode 100644
+index 00000000000000..cdcc96f4849828
+--- /dev/null
++++ b/packages/ui-utils/src/deep-merge.js
+@@ -0,0 +1,4 @@
++/**
++ * Merges two objects together, with support for deeply nested values.
++ */
++export { default as deepMerge } from 'deepmerge';
+diff --git a/packages/ui-utils/src/event-handlers.js b/packages/ui-utils/src/event-handlers.js
+new file mode 100644
+index 00000000000000..e0dd5375c37a3a
+--- /dev/null
++++ b/packages/ui-utils/src/event-handlers.js
+@@ -0,0 +1,46 @@
++/**
++ * Internal dependencies
++ */
++import { is } from './is';
++
++/**
++ * Merges event handlers together.
++ *
++ * @template TEvent
++ * @param {(event: TEvent) => void} handler
++ * @param {(event: TEvent) => void} otherHandler
++ */
++export function mergeEvent( handler, otherHandler ) {
++	return (
++		/* eslint-disable jsdoc/no-undefined-types */
++		/** @type {TEvent} */
++		/* eslint-enable jsdoc/no-undefined-types */
++		event
++	) => {
++		if ( is.function( handler ) ) {
++			handler( event );
++		}
++		if ( is.function( otherHandler ) ) {
++			otherHandler( event );
++		}
++	};
++}
++
++/**
++ * Merges a set of event handlers together.
++ *
++ * @template TEvent
++ * @param {Record<string, (event: TEvent) => void>} handlers
++ * @param {Record<string, (event: TEvent) => void>} extraHandlers
++ */
++export function mergeEventHandlers( handlers = {}, extraHandlers = {} ) {
++	const mergedHandlers = { ...handlers };
++
++	for ( const [ key, handler ] of Object.entries( mergedHandlers ) ) {
++		if ( is.function( extraHandlers[ key ] ) ) {
++			mergedHandlers[ key ] = mergeEvent( handler, extraHandlers[ key ] );
++		}
++	}
++
++	return mergedHandlers;
++}
+diff --git a/packages/ui-utils/src/hooks/index.js b/packages/ui-utils/src/hooks/index.js
+new file mode 100644
+index 00000000000000..944c1f99ada7b5
+--- /dev/null
++++ b/packages/ui-utils/src/hooks/index.js
+@@ -0,0 +1,10 @@
++// @todo: Migrate these to @wordpress/compose after upgrading the
++// Component System.
++
++export * from './use-controlled-state';
++export * from './use-isomorphic-layout-effect';
++export * from './use-local-state';
++export * from './use-media-query';
++export * from './use-sealed-state';
++export * from './use-unique-id';
++export * from './use-update-effect';
+diff --git a/packages/ui-utils/src/hooks/use-controlled-state.js b/packages/ui-utils/src/hooks/use-controlled-state.js
+new file mode 100644
+index 00000000000000..ef125ce05f1eea
+--- /dev/null
++++ b/packages/ui-utils/src/hooks/use-controlled-state.js
+@@ -0,0 +1,33 @@
++/**
++ * @template T
++ * @typedef Options
++ * @property {T | undefined} initial  Initial value
++ * @property {T | ""}        fallback Fallback value
++ */
++
++/** @type {Readonly<{ initial: undefined, fallback: '' }>} */
++
++/**
++ * Custom hooks for "controlled" components to track and consolidate internal
++ * state and incoming values. This is useful for components that render
++ * `input`, `textarea`, or `select` HTML elements.
++ *
++ * https://reactjs.org/docs/forms.html#controlled-components
++ *
++ * At first, a component using useControlledState receives an initial prop
++ * value, which is used as initial internal state.
++ *
++ * This internal state can be maintained and updated without
++ * relying on new incoming prop values.
++ *
++ * Unlike the basic useState hook, useControlledState's state can
++ * be updated if a new incoming prop value is changed.
++ *
++ * @template T
++ *
++ * @param {T | undefined} currentState The current value.
++ * @param {Options<T>} [options=defaultOptions] Additional options for the hook.
++ *
++ * @return {[T | "", (nextState: T) => void]} The controlled value and the value setter.
++ */
++export { useControlledState } from 'use-enhanced-state';
+diff --git a/packages/ui-utils/src/hooks/use-isomorphic-layout-effect.js b/packages/ui-utils/src/hooks/use-isomorphic-layout-effect.js
+new file mode 100644
+index 00000000000000..5d580d558d4287
+--- /dev/null
++++ b/packages/ui-utils/src/hooks/use-isomorphic-layout-effect.js
+@@ -0,0 +1,5 @@
++/**
++ * `useLayoutEffect` that does not show warning when server-side rendering, see Alex Reardon's article for more info.
++ * https://medium.com/@alexandereardon/uselayouteffect-and-ssr-192986cdcf7a
++ */
++export { default as useIsomorphicLayoutEffect } from 'use-isomorphic-layout-effect';
+diff --git a/packages/ui-utils/src/hooks/use-local-state.js b/packages/ui-utils/src/hooks/use-local-state.js
+new file mode 100644
+index 00000000000000..f83d9c89fface4
+--- /dev/null
++++ b/packages/ui-utils/src/hooks/use-local-state.js
+@@ -0,0 +1,9 @@
++/**
++ * Used to read/write state to localStorage.
++ *
++ * @template T
++ * @param {T | undefined} currentState The current value.
++ *
++ * @return {[T | "", (nextState: T) => void]} The state an state setter.
++ */
++export { useLocalState } from 'use-enhanced-state';
+diff --git a/packages/ui-utils/src/hooks/use-media-query.js b/packages/ui-utils/src/hooks/use-media-query.js
+new file mode 100644
+index 00000000000000..e813ba3283e5ee
+--- /dev/null
++++ b/packages/ui-utils/src/hooks/use-media-query.js
+@@ -0,0 +1,73 @@
++/**
++ * WordPress dependencies
++ */
++import { useEffect, useState } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++
++/**
++ * Internal dependencies
++ */
++import { is } from '../is';
++import { json2mq } from '../media-queries';
++
++// For SSR
++let __window = {};
++if ( typeof window !== 'undefined' ) {
++	__window = window;
++}
++
++function mockMatchMedia() {
++	return {
++		addListener: noop,
++		removeListener: noop,
++	};
++}
++
++/**
++ * Checks to see if the media query matches the current viewport.
++ *
++ * Source:
++ * https://github.com/jaredpalmer/the-platform
++ *
++ * @param {string | Object} query
++ * @param {boolean} defaultMatches
++ *
++ * @return {boolean} Whether the query matches the current viewport.
++ */
++export function useMediaQuery( query, defaultMatches = true ) {
++	const [ matches, setMatches ] = useState( defaultMatches );
++	const matchMedia = __window.matchMedia || mockMatchMedia;
++
++	useEffect( () => {
++		const mediaQueryList = matchMedia(
++			is.string( query ) ? query : json2mq( query )
++		);
++		let active = true;
++
++		const listener = () => {
++			if ( ! active ) {
++				return;
++			}
++
++			if ( mediaQueryList.matches ) {
++				setMatches( true );
++			} else {
++				setMatches( false );
++			}
++		};
++
++		mediaQueryList.addListener( listener );
++		setMatches( mediaQueryList.matches );
++
++		return () => {
++			active = false;
++			mediaQueryList.removeListener( listener );
++		};
++	}, [ matchMedia, query ] );
++
++	return matches;
++}
+diff --git a/packages/ui-utils/src/hooks/use-sealed-state.js b/packages/ui-utils/src/hooks/use-sealed-state.js
+new file mode 100644
+index 00000000000000..ea9fbda371c7b3
+--- /dev/null
++++ b/packages/ui-utils/src/hooks/use-sealed-state.js
+@@ -0,0 +1,18 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * React custom hook that returns the very first value passed to `initialState`,
++ * even if it changes between re-renders.
++ *
++ * @template T
++ * @param {T} initialState
++ *
++ * @return {T} The sealed state.
++ */
++export function useSealedState( initialState ) {
++	const [ sealed ] = useState( initialState );
++	return sealed;
++}
+diff --git a/packages/ui-utils/src/hooks/use-unique-id.js b/packages/ui-utils/src/hooks/use-unique-id.js
+new file mode 100644
+index 00000000000000..3220e69d752c4e
+--- /dev/null
++++ b/packages/ui-utils/src/hooks/use-unique-id.js
+@@ -0,0 +1,19 @@
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
++
++/**
++ * Provides a unique instance ID.
++ *
++ * @param {unknown} object Object reference to create an id for.
++ * @param {string} prefix Prefix for the unique id.
++ * @param {string} preferredId Default ID to use.
++ *
++ * @return {string | number} The unique id.
++ */
++export function useUniqueId( object, prefix, preferredId = '' ) {
++	const instanceId = useInstanceId( object, prefix );
++
++	return preferredId || instanceId;
++}
+diff --git a/packages/ui-utils/src/hooks/use-update-effect.js b/packages/ui-utils/src/hooks/use-update-effect.js
+new file mode 100644
+index 00000000000000..026f686a7e5758
+--- /dev/null
++++ b/packages/ui-utils/src/hooks/use-update-effect.js
+@@ -0,0 +1,24 @@
++/**
++ * WordPress dependencies
++ */
++import { useEffect, useRef } from '@wordpress/element';
++
++/**
++ * A `React.useEffect` that will not run on the first render.
++ *
++ * Source:
++ * https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/useUpdateEffect.ts
++ *
++ * @param {() => void} effect
++ * @param {unknown[]} deps
++ */
++export function useUpdateEffect( effect, deps ) {
++	const mounted = useRef( false );
++	useEffect( () => {
++		if ( mounted.current ) {
++			return effect();
++		}
++		mounted.current = true;
++		return undefined;
++	}, deps );
++}
+diff --git a/packages/ui-utils/src/index.js b/packages/ui-utils/src/index.js
+new file mode 100644
+index 00000000000000..c0288f4d2a5a58
+--- /dev/null
++++ b/packages/ui-utils/src/index.js
+@@ -0,0 +1,17 @@
++export * from './arrays';
++export * from './browser';
++export * from './colors';
++export * from './deep-equal';
++export * from './deep-merge';
++export * from './event-handlers';
++export * from './hooks';
++export * from './is';
++export * from './keyboard';
++export * from './math';
++export * from './memoize';
++export * from './react';
++export * from './selection';
++export * from './simple-equal';
++export * from './unit-values';
++export * from './validation';
++export * from './warning';
+diff --git a/packages/ui-utils/src/is.js b/packages/ui-utils/src/is.js
+new file mode 100644
+index 00000000000000..7d37a55138a2d1
+--- /dev/null
++++ b/packages/ui-utils/src/is.js
+@@ -0,0 +1,110 @@
++/**
++ * External dependencies
++ */
++import _ from 'lodash';
++
++const { Blob, File } = window;
++
++/**
++ * Checks to see if a value is a numeric value (`number` or `string`).
++ *
++ * @param {any} o
++ *
++ * @return {boolean} Whether value is numeric.
++ */
++const numeric = ( o ) => {
++	const obj = typeof o === 'string' ? o.replace( /,/g, '' ) : o;
++	return (
++		! isNaN( parseFloat( obj ) ) &&
++		! isNaN( Number( obj ) ) &&
++		isFinite( obj ) &&
++		Object.prototype.toString.call( obj ).toLowerCase() !== '[object array]'
++	);
++};
++
++/**
++ * Checks to see if a value is either `0` or `'0'`.
++ *
++ * @param {any} o
++ *
++ * @return {boolean} Whether value is a numeric `0`.
++ */
++const numericZero = ( o ) => {
++	return o === 0 || o === '0';
++};
++
++/* eslint-disable jsdoc/valid-types */
++/**
++ * Checks to see if a value is not undefined and not null.
++ *
++ * @template T
++ * @param {T} o
++ *
++ * @return {o is Exclude<T, undefined | null>} Whether value is defined.
++ */
++/* eslint-enable jsdoc/valid-types */
++const defined = ( o ) => ! _.isNil( o );
++
++/**
++ * Checks if a value is empty, null, or undefined.
++ *
++ * @param {any} value The value to check.
++ *
++ * @return {boolean} Whether value is empty.
++ */
++function valueEmpty( value ) {
++	const isEmptyString = value === '';
++	return ! is.defined( value ) || isEmptyString;
++}
++
++/**
++ * A collection of type checks.
++ */
++export const is = {
++	/* eslint-disable jsdoc/valid-types */
++	/** @type {(o: any) => o is Blob} */
++	/* eslint-enable jsdoc/valid-types */
++	blob: ( o ) => o instanceof Blob,
++	defined,
++	/* eslint-disable jsdoc/valid-types */
++	/** @type {(o: any) => o is File} */
++	/* eslint-enable jsdoc/valid-types */
++	file: ( o ) => o instanceof File,
++	numeric,
++	numericZero,
++	valueEmpty,
++
++	// This is safe because we only accept Interpolation rather than any
++	// _.isPlainObject(TemplateStringsArray) -> false
++	// _.isPlainObject is also `false` for the rest of the values that `Interpolation` covers except for `ObjectInterpolation` :)
++	/* eslint-disable jsdoc/valid-types */
++	/** @type {(o: TemplateStringsArray | import('create-emotion').Interpolation) => o is import('create-emotion').ObjectInterpolation} */
++	/* eslint-enable jsdoc/valid-types */
++	objectInterpolation: ( o ) => _.isPlainObject( o ),
++
++	/**
++	 * Re-exports from lodash
++	 */
++	array: _.isArray,
++	boolean: _.isBoolean,
++	date: _.isDate,
++	empty: _.isEmpty,
++	function: _.isFunction,
++	map: _.isMap,
++	nan: _.isNaN,
++	nil: _.isNil,
++	number: _.isNumber,
++	null: _.isNull,
++	object: _.isObject,
++	objectLike: _.isObjectLike,
++	plainObject: _.isPlainObject,
++	regExp: _.isRegExp,
++	set: _.isSet,
++	string: _.isString,
++	symbol: _.isSymbol,
++	undefined: _.isUndefined,
++	weakSet: _.isWeakSet,
++	weakMap: _.isWeakMap,
++};
++
++export default is;
+diff --git a/packages/ui-utils/src/keyboard.js b/packages/ui-utils/src/keyboard.js
+new file mode 100644
+index 00000000000000..14e0729b2de456
+--- /dev/null
++++ b/packages/ui-utils/src/keyboard.js
+@@ -0,0 +1,18 @@
++/**
++ * Normalizes the 'key' property of a KeyboardEvent in IE/Edge
++ *
++ * Source:
++ * https://github.com/downshift-js/downshift/blob/a71005bd879d05d7dcb892d1e0dc5c6ca74e9d39/src/utils.js#L279
++ *
++ * @param {import('react').KeyboardEvent} event A keyboardEvent object
++ *
++ * @return {string} The keyboard key
++ */
++export function normalizeArrowKey( event ) {
++	const { key, keyCode } = event;
++	/* istanbul ignore next (ie) */
++	if ( keyCode >= 37 && keyCode <= 40 && key.indexOf( 'Arrow' ) !== 0 ) {
++		return `Arrow${ key }`;
++	}
++	return key;
++}
+diff --git a/packages/ui-utils/src/math/base.js b/packages/ui-utils/src/math/base.js
+new file mode 100644
+index 00000000000000..3fecbdacaf299b
+--- /dev/null
++++ b/packages/ui-utils/src/math/base.js
+@@ -0,0 +1,54 @@
++/**
++ * Parses and retrieves a number value.
++ *
++ * @param {unknown} value The incoming value.
++ *
++ * @return {number} The parsed number value.
++ */
++export function getNumber( value ) {
++	const number = Number( value );
++
++	return isNaN( number ) ? 0 : number;
++}
++
++/**
++ * Safely adds 2 values.
++ *
++ * @param {Array<number|string|undefined>} args Values to add together.
++ *
++ * @return {number} The sum of values.
++ */
++export function add( ...args ) {
++	return args.reduce(
++		/** @type {(sum:number, arg: string | number | undefined) => number} */
++		( sum, arg ) => sum + getNumber( arg ),
++		0
++	);
++}
++
++/**
++ * Safely subtracts 2 values.
++ *
++ * @param {Array<number|string|undefined>} args Values to subtract together.
++ *
++ * @return {number} The difference of the 2 values.
++ */
++export function subtract( ...args ) {
++	return /** @type {number[]} */ ( args ).reduce( ( diff, arg, index ) => {
++		/** @type {number} */
++		const value = getNumber( arg );
++		return index === 0 ? value : /** @type {number} */ ( diff ) - value;
++	} );
++}
++
++/**
++ * Determines the decimal position of a number value.
++ *
++ * @param {number} value The number to evaluate.
++ *
++ * @return {number} The number of decimal places.
++ */
++export function getPrecision( value ) {
++	const split = ( value + '' ).split( '.' );
++	return split[ 1 ] !== undefined ? split[ 1 ].length : 0;
++}
+diff --git a/packages/ui-utils/src/math/clamp.js b/packages/ui-utils/src/math/clamp.js
+new file mode 100644
+index 00000000000000..a9d171be021c58
+--- /dev/null
++++ b/packages/ui-utils/src/math/clamp.js
+@@ -0,0 +1,48 @@
++/**
++ * External dependencies
++ */
++import { clamp } from 'lodash';
++
++/**
++ * Internal dependencies
++ */
++import { getNumber, getPrecision } from './base';
++
++/**
++ * Clamps a value based on a min/max range with rounding
++ *
++ * @param {number} [value=0] The value.
++ * @param {number} [min=-Infinity] The minimum range.
++ * @param {number} [max=Infinity] The maximum range.
++ * @param {number} [step=1] A multiplier for the value.
++ *
++ * @return {number} The rounded and clamped value.
++ */
++export function roundClamp(
++	value = 0,
++	min = -Infinity,
++	max = Infinity,
++	step = 1
++) {
++	const baseValue = getNumber( value );
++	const stepValue = getNumber( step );
++	const precision = getPrecision( step );
++	const rounded = Math.round( baseValue / stepValue ) * stepValue;
++	const clampedValue = clamp( rounded, min, max );
++
++	return precision
++		? getNumber( clampedValue.toFixed( precision ) )
++		: clampedValue;
++}
++
++/**
++ * Clamps a value based on a min/max range with rounding.
++ * Returns a string.
++ *
++ * @param {Parameters<roundClamp>} args Arguments for roundClamp(). *
++ *
++ * @return {string} The rounded and clamped value.
++ */
++export function roundClampString( ...args ) {
++	return roundClamp( ...args ).toString();
++}
+diff --git a/packages/ui-utils/src/math/index.js b/packages/ui-utils/src/math/index.js
+new file mode 100644
+index 00000000000000..f99df1a9e737ac
+--- /dev/null
++++ b/packages/ui-utils/src/math/index.js
+@@ -0,0 +1,3 @@
++export * from './base';
++export * from './clamp';
++export * from './interpolate';
+diff --git a/packages/ui-utils/src/math/interpolate.js b/packages/ui-utils/src/math/interpolate.js
+new file mode 100644
+index 00000000000000..706d4fbe857419
+--- /dev/null
++++ b/packages/ui-utils/src/math/interpolate.js
+@@ -0,0 +1,118 @@
++/**
++ * External dependencies
++ */
++import { clamp } from 'lodash';
++
++/**
++ * Internal dependencies
++ */
++import { colorize, isColor } from '../colors';
++
++/**
++ * Interpolation from:
++ * https://github.com/react-spring/react-spring/blob/master/src/animated/createInterpolator.ts
++ */
++
++/**
++ * @param {number} input
++ * @param {number[]} inputRange
++ *
++ * @return {number} The range value
++ */
++function findRange( input, inputRange ) {
++	// eslint-disable-next-line no-var
++	for ( var i = 1; i < inputRange.length - 1; ++i )
++		if ( inputRange[ i ] >= input ) break;
++	return i - 1;
++}
++
++/**
++ * Base interpolate function.
++ *
++ * @param {number} [input=0]
++ * @param {number} [inputMin=0]
++ * @param {number} [inputMax=1]
++ * @param {number} [outputMin=0]
++ * @param {number} [outputMax=1]
++ *
++ * @return {number} The interpolated value.
++ */
++function baseInterpolate(
++	input = 0,
++	inputMin = 0,
++	inputMax = 1,
++	outputMin = 0,
++	outputMax = 1
++) {
++	let result = input;
++
++	if ( outputMin === outputMax ) return outputMin;
++	if ( inputMin === inputMax )
++		return input <= inputMin ? outputMin : outputMax;
++
++	// Input Range
++	if ( inputMin === -Infinity ) result = -result;
++	else if ( inputMax === Infinity ) result = result - inputMin;
++	else result = ( result - inputMin ) / ( inputMax - inputMin );
++
++	// Output Range
++	if ( outputMin === -Infinity ) result = -result;
++	else if ( outputMax === Infinity ) result = result + outputMin;
++	else result = result * ( outputMax - outputMin ) + outputMin;
++
++	let clampMin = outputMin;
++	let clampMax = outputMax;
++
++	if ( outputMax < outputMin ) {
++		clampMin = outputMax;
++		clampMax = outputMin;
++	}
++
++	return clamp( result, clampMin, clampMax );
++}
++
++/**
++ * Gets a value based on an input range and an output range.
++ * Can be used for a set of numbers or a set of colors.
++ *
++ * @param {number} [input=0]
++ * @param {[number, number]} [inputRange=[0,1]]
++ * @param {[number, number]} [outputRange=[0,1]]
++ *
++ * @return {*} The interpolated value.
++ */
++export function interpolate(
++	input = 0,
++	inputRange = [ 0, 1 ],
++	outputRange = [ 0, 1 ]
++) {
++	const range = findRange( input, inputRange );
++	const outputRange1 = outputRange[ range ];
++	const outputRange2 = outputRange[ range + 1 ];
++
++	if ( isColor( outputRange1 ) && isColor( outputRange2 ) ) {
++		const mixAmount = interpolate( input, inputRange, [ 0, 100 ] );
++		return colorize
++			.mix( outputRange1.toString(), outputRange2.toString(), mixAmount )
++			.toRgbString();
++	}
++
++	return baseInterpolate(
++		input,
++		inputRange[ range ],
++		inputRange[ range + 1 ],
++		outputRange1,
++		outputRange2
++	);
++}
++
++/**
++ * Gets a rounded value based on an input range and an output range.
++ *
++ * @param {Parameters<interpolate>} args
++ *
++ * @return {number} The rounded interpolated value.
++ */
++export function interpolateRounded( ...args ) {
++	return Math.round( interpolate( ...args ) );
++}
+diff --git a/packages/ui-utils/src/media-queries.js b/packages/ui-utils/src/media-queries.js
+new file mode 100644
+index 00000000000000..a4a903f6d6bb27
+--- /dev/null
++++ b/packages/ui-utils/src/media-queries.js
+@@ -0,0 +1,90 @@
++/**
++ * Source:
++ * https://github.com/akiran/json2mq
++ */
++
++/**
++ * Internal dependencies
++ */
++import { is } from './is';
++
++/**
++ * @param {string} str
++ *
++ * @return {string} The hyphenated string.
++ */
++function camel2hyphen( str ) {
++	return str
++		.replace( /[A-Z]/g, function ( match ) {
++			return '-' + match.toLowerCase();
++		} )
++		.toLowerCase();
++}
++
++/**
++ * @param {string} feature
++ *
++ * @return {boolean} If the value is either width or height.
++ */
++function isDimension( feature ) {
++	const re = /[height|width]$/;
++	return re.test( feature );
++}
++
++/**
++ * @param {Record<string, boolean | string | number>} obj
++ *
++ * @return {string} The media query.
++ */
++function obj2mq( obj = {} ) {
++	let mq = '';
++	const features = Object.keys( obj );
++
++	features.forEach( ( feature, index ) => {
++		let value = obj[ feature ];
++		feature = camel2hyphen( feature );
++		// Add px to dimension features
++		if ( isDimension( feature ) && is.number( value ) ) {
++			value = value + 'px';
++		}
++
++		if ( value === true ) {
++			mq += feature;
++		} else if ( value === false ) {
++			mq += 'not ' + feature;
++		} else {
++			mq += '(' + feature + ': ' + value + ')';
++		}
++		if ( index < features.length - 1 ) {
++			mq += ' and ';
++		}
++	} );
++
++	return mq;
++}
++
++/**
++ * Generate media query string from JSON or javascript object.
++ *
++ * @param {string | Object} query
++ *
++ * @return {string} The media query.
++ */
++export function json2mq( query ) {
++	let mq = '';
++	if ( is.string( query ) ) {
++		return query;
++	}
++	// Handling array of media queries
++	if ( query instanceof Array ) {
++		query.forEach( ( q, index ) => {
++			mq += obj2mq( q );
++			if ( index < query.length - 1 ) {
++				mq += ', ';
++			}
++		} );
++		return mq;
++	}
++	// Handling single media query
++	return obj2mq( query );
++}
+diff --git a/packages/ui-utils/src/memoize.js b/packages/ui-utils/src/memoize.js
+new file mode 100644
+index 00000000000000..a9be1bde372774
+--- /dev/null
++++ b/packages/ui-utils/src/memoize.js
+@@ -0,0 +1,7 @@
++/**
++ * Creates a function that memoizes the result of a `function`.
++ *
++ * See:
++ * https://www.npmjs.com/package/memize
++ */
++export { default as memoize } from 'memize';
+diff --git a/packages/ui-utils/src/react.js b/packages/ui-utils/src/react.js
+new file mode 100644
+index 00000000000000..edc08f17dcea8f
+--- /dev/null
++++ b/packages/ui-utils/src/react.js
+@@ -0,0 +1,80 @@
++/**
++ * Internal dependencies
++ */
++import { is } from './is';
++
++/**
++ * WordPress dependencies
++ */
++import { Children, isValidElement } from '@wordpress/element';
++
++/**
++ * Merges React `ref` together.
++ */
++export { default as mergeRefs } from 'react-merge-refs';
++
++/**
++ * Copies non-react specific statics from a child component to a parent component.
++ * Similar to Object.assign, but with React static keywords prevented from being overridden.
++ */
++export { default as hoistNonReactStatics } from 'hoist-non-react-statics';
++
++/**
++ * Gets a collection of available children elements from a React component's children prop.
++ *
++ * @param {import('react').ReactNode} children
++ *
++ * @return {import('react').ReactNodeArray} An array of available children.
++ */
++export function getValidChildren( children ) {
++	if ( is.string( children ) ) return [ children ];
++
++	return Children.toArray( children ).filter( ( child ) =>
++		isValidElement( child )
++	);
++}
++
++/**
++ * Gets the displayName of a React Component or element.
++ *
++ * @param {string | import('react').ComponentType} tagName
++ *
++ * @return {string} The display name of the Component / tagName.
++ */
++export function getDisplayName( tagName ) {
++	const displayName = is.string( tagName )
++		? tagName
++		: tagName.displayName || tagName.name || 'Component';
++
++	return displayName;
++}
++
++/**
++ * Checks to see if a `children` prop is a render function prop.
++ *
++ * @param {*} children
++ *
++ * @return {boolean} True, if children is a render function prop.
++ */
++export function isRenderProp( children ) {
++	return is.function( children );
++}
++
++/**
++ * Handles the rendering of a React component's children prop, which
++ * may be a render function prop.
++ *
++ * @param {*} children Children to render.
++ * @param {*} props Props to pass into a (potential) children render function.
++ *
++ * @return {*} The rendered children.
++ */
++export function renderChildren( children, props = {} ) {
++	if ( isRenderProp( children ) ) {
++		// eslint-disable-next-line no-unused-vars
++		const { children: _, ...rest } = props;
++		return children( rest );
++	}
++
++	return children;
++}
+diff --git a/packages/ui-utils/src/selection.js b/packages/ui-utils/src/selection.js
+new file mode 100644
+index 00000000000000..57fb172aee3229
+--- /dev/null
++++ b/packages/ui-utils/src/selection.js
+@@ -0,0 +1,23 @@
++/**
++ * Clears the text selection on screen.
++ */
++export function clearSelection() {
++	if ( window?.getSelection ) {
++		const selection = window?.getSelection();
++		if ( ! selection ) {
++			return;
++		}
++
++		if ( selection.empty ) {
++			// Chrome
++			selection.empty();
++		} else if ( selection.removeAllRanges ) {
++			// Firefox
++			selection.removeAllRanges();
++		}
++		// @ts-ignore IE specific property
++	} else if ( document.selection ) {
++		// @ts-ignore IE specific property
++		document.selection.empty();
++	}
++}
+diff --git a/packages/ui-utils/src/simple-equal.js b/packages/ui-utils/src/simple-equal.js
+new file mode 100644
+index 00000000000000..1fe6c6e0e33388
+--- /dev/null
++++ b/packages/ui-utils/src/simple-equal.js
+@@ -0,0 +1,11 @@
++/**
++ * Quickly checks to see if two objects (shallow or deep) are equal.
++ *
++ * @param {any} objA
++ * @param {any} objB
++ *
++ * @return {boolean} Whether the values are equal.
++ */
++export function simpleEqual( objA, objB ) {
++	return JSON.stringify( objA ) === JSON.stringify( objB );
++}
+diff --git a/packages/ui-utils/src/unit-values.js b/packages/ui-utils/src/unit-values.js
+new file mode 100644
+index 00000000000000..41f726171378ee
+--- /dev/null
++++ b/packages/ui-utils/src/unit-values.js
+@@ -0,0 +1,179 @@
++/**
++ * Internal dependencies
++ */
++import { is } from './is';
++
++let __styleTestNode = null;
++
++const getComputedStyledMap = () => {
++	if ( ! __styleTestNode ) {
++		__styleTestNode = document.createElement( 'div' );
++	}
++
++	return __styleTestNode.style;
++};
++
++/**
++ * Gets the value to be applied to the CSS Object Model.
++ *
++ * @param {string} initialValue
++ *
++ * @return {number | string | undefined} The parsed CSS value.
++ */
++export const getParsedCSSValue = ( initialValue ) => {
++	const [ value, unit ] = parseUnitValue( initialValue );
++	const next = ! unit ? value : `${ value }${ unit }`;
++
++	return next;
++};
++
++/**
++ * Checks if a value is valid given a CSS prop.
++ *
++ * @param {string} prop
++ * @param {string} value
++ *
++ * @return {boolean} Whether the value is a valid CSS value.
++ */
++export const isValidCSSValueForProp = ( prop, value ) => {
++	if ( ! is.string( prop ) ) return true;
++
++	const computedStyleMap = getComputedStyledMap();
++
++	if ( is.undefined( computedStyleMap[ prop ] ) ) return true;
++
++	// 1. Reset current style value.
++	computedStyleMap[ prop ] = '';
++	// 2. Cache current style value for validation (may not be an empty string).
++	const current = computedStyleMap[ prop ];
++	// 3. Apply next value.
++	const next = getParsedCSSValue( value );
++	computedStyleMap[ prop ] = next;
++	// 4. Check to see if next value was correctly applied.
++	return current !== computedStyleMap[ prop ];
++};
++
++/**
++ * Checks a value to see if it is a valid numeric unit value.
++ *
++ * Examples of valid numeric unit values include:
++ * 0px, 1em, 0, -1, 12.5px
++ *
++ * @param {string} value
++ *
++ * @return {boolean} Whether the value is a valid numeric unit value.
++ */
++export const isValidNumericUnitValue = ( value ) => {
++	// Disallow values that contains spaces
++	if ( / /g.test( value ) ) {
++		return false;
++	}
++
++	// Disallow values that start with 0 that isn't a decimal.
++	if ( /^0[0-9]/g.test( value ) ) {
++		return false;
++	}
++
++	// Disallow values where the last character is a symbol
++	if ( /[-!$^&*()_+|~=`{}[\]:";'<>?,./]$/g.test( value ) ) {
++		return false;
++	}
++
++	// Allow numerics.
++	if ( is.numeric( value ) ) return true;
++
++	// Disallow values that do not start with alphanumeric characters.
++	if ( /^\W/g.test( value ) ) {
++		// Allow for negative numbers, e.g. -1
++		if ( ! /^-\w/g.test( value ) ) {
++			return false;
++		}
++	}
++
++	// Disallow values where a dot follows a character, e.g. 1.p
++	if ( /\.[a-zA-Z]/g.test( value ) ) {
++		return false;
++	}
++
++	// Disable values where there are multiple . chracters.
++	if ( /\d+\.\d+\.\d+/g.test( value ) ) {
++		return false;
++	}
++
++	return true;
++};
++
++/**
++ * Handles legacy value + unit handling.
++ * This component use to manage both incoming value and units separately.
++ *
++ * Moving forward, ideally the value should be a string that contains both
++ * the value and unit, example: '10px'
++ *
++ * @param {number|string} value Value
++ * @param {string} unit Unit value
++ *
++ * @return {ReturnType<parseUnitValue>} The extracted number and unit.
++ */
++export function getParsedValue( value, unit ) {
++	const initialValue = unit ? `${ value }${ unit }` : value;
++
++	return parseUnitValue( initialValue );
++}
++
++/**
++ * Checks if units are defined.
++ *
++ * @param {any} units Units to check.
++ *
++ * @return {boolean} Whether units are defined.
++ */
++export function hasUnits( units ) {
++	return ! is.empty( units ) && units.length > 1 && units !== false;
++}
++
++/**
++ * Parses a number and unit from a value.
++ *
++ * @param {string | number} initialValue Value to parse
++ *
++ * @return {[number | string | undefined, string | undefined]} The extracted number and unit.
++ */
++export function parseUnitValue( initialValue ) {
++	if ( ! is.defined( initialValue ) ) {
++		return [ undefined, undefined ];
++	}
++
++	const value = String( initialValue ).trim();
++
++	/** @type {string | number} */
++	let num = parseFloat( value );
++	num = is.nan( num ) ? '' : num;
++
++	const matched = value.match( /[\d.\-+]*\s*(.*)/ );
++	if ( ! matched ) {
++		return [ undefined, undefined ];
++	}
++	const [ , unitMatch ] = matched;
++
++	let unit = is.defined( unitMatch ) ? unitMatch : '';
++	unit = unit.toLowerCase();
++
++	return [ num, unit ];
++}
++
++/**
++ * Combines a value and a unit into a unit value.
++ *
++ * @param {string | number} value
++ * @param {string} [unit]
++ *
++ * @return {string} The unit value.
++ */
++export function createUnitValue( value, unit ) {
++	if ( ! unit || ! is.string( unit ) || ! is.numeric( value ) ) {
++		return value.toString();
++	}
++
++	return `${ value }${ unit }`;
++}
+diff --git a/packages/ui-utils/src/validation.js b/packages/ui-utils/src/validation.js
+new file mode 100644
+index 00000000000000..f464c2146ff0e1
+--- /dev/null
++++ b/packages/ui-utils/src/validation.js
+@@ -0,0 +1,25 @@
++/**
++ * Internal dependencies
++ */
++import { is } from './is';
++
++/**
++ * Merges validation functions together.
++ *
++ * @template {unknown[]} TArgs
++ * @param {(...args: TArgs) => unknown} validate
++ * @param {(...args: TArgs) => unknown} extraValidate
++ *
++ * @return {Function | undefined} A single merged validation function.
++ */
++export function mergeValidationFunctions( validate, extraValidate ) {
++	if ( ! is.function( validate ) ) return;
++	if ( ! is.function( extraValidate ) ) return validate;
++
++	/* eslint-disable jsdoc/no-undefined-types */
++	return ( /** @type {TArgs} */ ...args ) =>
++		/* eslint-enable jsdoc/no-undefined-types */
++		{
++			return validate( ...args ) || extraValidate( ...args );
++		};
++}
+diff --git a/packages/ui-utils/src/warning.js b/packages/ui-utils/src/warning.js
+new file mode 100644
+index 00000000000000..8557c3c6450000
+--- /dev/null
++++ b/packages/ui-utils/src/warning.js
+@@ -0,0 +1 @@
++export * from 'reakit-warning';
+diff --git a/packages/ui-utils/tsconfig.json b/packages/ui-utils/tsconfig.json
+new file mode 100644
+index 00000000000000..cccd60dd6447e1
+--- /dev/null
++++ b/packages/ui-utils/tsconfig.json
+@@ -0,0 +1,9 @@
++{
++	"extends": "../../tsconfig.base.json",
++	"compilerOptions": {
++		"noImplicitAny": false,
++		"rootDir": "src",
++		"declarationDir": "build-types"
++	},
++	"include": [ "src/**/*" ]
++}

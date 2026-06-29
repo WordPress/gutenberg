@@ -1,0 +1,114 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4f26fe1e22dee8..d5110fab10d5ee 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -53,6 +53,7 @@
+ -   `withFilters`: Refactor tests to `@testing-library/react` ([#44017](https://github.com/WordPress/gutenberg/pull/44017)).
+ -   `IsolatedEventContainer`: Refactor tests to `@testing-library/react` ([#44073](https://github.com/WordPress/gutenberg/pull/44073)).
+ -   `KeyboardShortcuts`: Refactor tests to `@testing-library/react` ([#44075](https://github.com/WordPress/gutenberg/pull/44075)).
++-   `Slot`/`Fill`: Refactor tests to `@testing-library/react` ([#44084](https://github.com/WordPress/gutenberg/pull/44084)).
+ 
+ ## 20.0.0 (2022-08-24)
+ 
+diff --git a/packages/components/src/slot-fill/test/index.js b/packages/components/src/slot-fill/test/index.js
+index 6bd4c3a7c9247e..d269cb4e036412 100644
+--- a/packages/components/src/slot-fill/test/index.js
++++ b/packages/components/src/slot-fill/test/index.js
+@@ -1,28 +1,85 @@
+ /**
+  * External dependencies
+  */
+-import { shallow } from 'enzyme';
++import { render, screen, within } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { createSlotFill, Fill, Slot } from '../';
++import { createSlotFill, Provider as SlotFillProvider } from '../';
+ 
+ describe( 'createSlotFill', () => {
+-	const SLOT_NAME = 'MySlotFill';
+-	const MySlotFill = createSlotFill( SLOT_NAME );
++	test( 'should render all slot fills in order of rendering', () => {
++		const PostSidebar = createSlotFill( 'PostSidebar' );
+ 
+-	test( 'should match snapshot for Fill', () => {
+-		const wrapper = shallow( <MySlotFill.Fill /> );
++		render(
++			<SlotFillProvider>
++				<PostSidebar.Fill>
++					<p>Post Section 1</p>
++				</PostSidebar.Fill>
++				<PostSidebar.Fill>
++					<p>Post Section 2</p>
++				</PostSidebar.Fill>
++				<div title="Post Sidebar">
++					<PostSidebar.Slot />
++				</div>
++			</SlotFillProvider>
++		);
+ 
+-		expect( wrapper.type() ).toBe( Fill );
+-		expect( wrapper.prop( 'name' ) ).toBe( SLOT_NAME );
++		const postSidebar = screen.getByTitle( 'Post Sidebar' );
++		const postSections =
++			within( postSidebar ).getAllByText( /Post Section \d/ );
++
++		expect( postSidebar ).toBeVisible();
++		expect( postSections ).toHaveLength( 2 );
++		postSections.forEach( ( postSection, index ) => {
++			expect( postSection ).toBeVisible();
++			expect( postSection ).toHaveTextContent(
++				`Post Section ${ index + 1 }`
++			);
++		} );
+ 	} );
+ 
+-	test( 'should match snapshot for Slot', () => {
+-		const wrapper = shallow( <MySlotFill.Slot /> );
++	test( 'should support separate multiple slots and fills', () => {
++		const PostSidebar = createSlotFill( 'PostSidebar' );
++		const PageSidebar = createSlotFill( 'PageSidebar' );
++
++		render(
++			<SlotFillProvider>
++				<PostSidebar.Fill>
++					<p>Post Section</p>
++				</PostSidebar.Fill>
++				<PageSidebar.Fill>
++					<p>Page Section</p>
++				</PageSidebar.Fill>
++				<div title="Post Sidebar">
++					<PostSidebar.Slot />
++				</div>
++				<div title="Page Sidebar">
++					<PageSidebar.Slot />
++				</div>
++			</SlotFillProvider>
++		);
++
++		const postSidebar = screen.getByTitle( 'Post Sidebar' );
++
++		expect( postSidebar ).toBeVisible();
++		expect(
++			within( postSidebar ).getByText( 'Post Section' )
++		).toBeVisible();
++
++		const pageSidebar = screen.getByTitle( 'Page Sidebar' );
++
++		expect( pageSidebar ).toBeVisible();
++		expect(
++			within( pageSidebar ).getByText( 'Page Section' )
++		).toBeVisible();
+ 
+-		expect( wrapper.type() ).toBe( Slot );
+-		expect( wrapper.prop( 'name' ) ).toBe( SLOT_NAME );
++		expect(
++			within( postSidebar ).queryByText( 'Page Section' )
++		).not.toBeInTheDocument();
++		expect(
++			within( pageSidebar ).queryByText( 'Post Section' )
++		).not.toBeInTheDocument();
+ 	} );
+ } );

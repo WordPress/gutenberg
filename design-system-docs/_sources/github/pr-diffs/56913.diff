@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/search-control/README.md b/packages/components/src/search-control/README.md
+index 8656cc597c7add..bd12580f3c8780 100644
+--- a/packages/components/src/search-control/README.md
++++ b/packages/components/src/search-control/README.md
+@@ -8,8 +8,6 @@ SearchControl components let users display a search control.
+ 1. [Development guidelines](#development-guidelines)
+ 2. [Related components](#related-components)
+ 
+-   Check out the [Storybook page](https://wordpress.github.io/gutenberg/?path=/docs/components-spinner--docs) for a visual exploration of this component.
+-
+ ## Development guidelines
+ 
+ ### Usage

@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index 6ae8b56c95c200..017bc91744853c 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -38,7 +38,6 @@ const getDisabledElement = ( { eventHandlers, child, childrenWithPopover } ) =>
+ 			{ cloneElement( child, {
+ 				children: childrenWithPopover,
+ 			} ) }
+-			,
+ 		</span>,
+ 		eventHandlers
+ 	);

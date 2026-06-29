@@ -1,0 +1,418 @@
+diff --git a/packages/block-library/src/button/edit.js b/packages/block-library/src/button/edit.js
+index 3f36a564272392..44e1676839b160 100644
+--- a/packages/block-library/src/button/edit.js
++++ b/packages/block-library/src/button/edit.js
+@@ -7,22 +7,24 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { useCallback, useState, useRef } from '@wordpress/element';
++import { useCallback, useRef } from '@wordpress/element';
+ import {
+ 	Button,
+ 	ButtonGroup,
++	Dropdown,
+ 	KeyboardShortcuts,
+ 	PanelBody,
+ 	TextControl,
+ 	ToolbarButton,
+-	Popover,
+ } from '@wordpress/components';
++import { useDispatch } from '@wordpress/data';
+ import {
+ 	BlockControls,
+ 	InspectorControls,
+ 	InspectorAdvancedControls,
+ 	RichText,
+ 	useBlockProps,
++	store as blockEditorStore,
+ 	__experimentalUseColorProps as useColorProps,
+ 	__experimentalLinkControl as LinkControl,
+ } from '@wordpress/block-editor';
+@@ -62,83 +64,93 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
+ }
+ 
+ function URLPicker( {
++	anchorRef,
+ 	isSelected,
+-	url,
+-	setAttributes,
+-	opensInNewTab,
+ 	onToggleOpenInNewTab,
+-	anchorRef,
++	opensInNewTab,
++	setAttributes,
++	url,
+ } ) {
+-	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
+ 	const urlIsSet = !! url;
+ 	const urlIsSetandSelected = urlIsSet && isSelected;
+-	const openLinkControl = () => {
+-		setIsURLPickerOpen( true );
+-		return false; // prevents default behaviour for event
+-	};
+-	const unlinkButton = () => {
++	const dropdownRef = useRef();
++	const { stopTyping } = useDispatch( blockEditorStore );
++	const removeLink = () => {
+ 		setAttributes( {
+ 			url: undefined,
+ 			linkTarget: undefined,
+ 			rel: undefined,
+ 		} );
+-		setIsURLPickerOpen( false );
+ 	};
+-	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
+-		<Popover
+-			position="bottom center"
+-			onClose={ () => setIsURLPickerOpen( false ) }
+-			anchorRef={ anchorRef?.current }
+-		>
+-			<LinkControl
+-				className="wp-block-navigation-link__inline-link-input"
+-				value={ { url, opensInNewTab } }
+-				onChange={ ( {
+-					url: newURL = '',
+-					opensInNewTab: newOpensInNewTab,
+-				} ) => {
+-					setAttributes( { url: newURL } );
+-
+-					if ( opensInNewTab !== newOpensInNewTab ) {
+-						onToggleOpenInNewTab( newOpensInNewTab );
+-					}
++	const renderToggle = ( { isOpen, onToggle, onClose } ) => {
++		return ! urlIsSet ? (
++			<ToolbarButton
++				aria-expanded={ isOpen }
++				name="link"
++				icon={ link }
++				title={ __( 'Link' ) }
++				shortcut={ displayShortcut.primary( 'k' ) }
++				onClick={ onToggle }
++			/>
++		) : (
++			<ToolbarButton
++				aria-expanded="true"
++				name="link"
++				icon={ linkOff }
++				title={ __( 'Unlink' ) }
++				shortcut={ displayShortcut.primaryShift( 'k' ) }
++				onClick={ () => {
++					removeLink();
++					onClose();
+ 				} }
++				isActive={ true }
+ 			/>
+-		</Popover>
++		);
++	};
++	const renderContent = () => (
++		<LinkControl
++			className="wp-block-navigation-link__inline-link-input"
++			value={ { url, opensInNewTab } }
++			onChange={ ( {
++				url: newURL = '',
++				opensInNewTab: newOpensInNewTab,
++			} ) => {
++				setAttributes( { url: newURL } );
++
++				if ( opensInNewTab !== newOpensInNewTab ) {
++					onToggleOpenInNewTab( newOpensInNewTab );
++				}
++			} }
++		/>
+ 	);
+ 	return (
+ 		<>
+ 			<BlockControls group="block">
+-				{ ! urlIsSet && (
+-					<ToolbarButton
+-						name="link"
+-						icon={ link }
+-						title={ __( 'Link' ) }
+-						shortcut={ displayShortcut.primary( 'k' ) }
+-						onClick={ openLinkControl }
+-					/>
+-				) }
+-				{ urlIsSetandSelected && (
+-					<ToolbarButton
+-						name="link"
+-						icon={ linkOff }
+-						title={ __( 'Unlink' ) }
+-						shortcut={ displayShortcut.primaryShift( 'k' ) }
+-						onClick={ unlinkButton }
+-						isActive={ true }
+-					/>
+-				) }
++				<Dropdown
++					ref={ dropdownRef }
++					openOnMount={ urlIsSetandSelected }
++					popoverProps={ { anchorRef: anchorRef?.current } }
++					position="bottom center"
++					renderContent={ renderContent }
++					renderToggle={ renderToggle }
++				/>
+ 			</BlockControls>
+ 			{ isSelected && (
+ 				<KeyboardShortcuts
+ 					bindGlobal
+ 					shortcuts={ {
+-						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+-						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
++						[ rawShortcut.primary( 'k' ) ]: () => {
++							stopTyping();
++							dropdownRef.current.toggle();
++							return false; // prevents default for event
++						},
++						[ rawShortcut.primaryShift( 'k' ) ]: () => {
++							removeLink();
++							dropdownRef.current?.close();
++						},
+ 					} }
+ 				/>
+ 			) }
+-			{ linkControl }
+ 		</>
+ 	);
+ }
+@@ -238,12 +250,12 @@ function ButtonEdit( props ) {
+ 				/>
+ 			</div>
+ 			<URLPicker
+-				url={ url }
+-				setAttributes={ setAttributes }
++				anchorRef={ ref }
+ 				isSelected={ isSelected }
+-				opensInNewTab={ linkTarget === '_blank' }
+ 				onToggleOpenInNewTab={ onToggleOpenInNewTab }
+-				anchorRef={ ref }
++				opensInNewTab={ linkTarget === '_blank' }
++				setAttributes={ setAttributes }
++				url={ url }
+ 			/>
+ 			<InspectorControls>
+ 				<WidthPanel
+diff --git a/packages/block-library/src/post-date/edit.js b/packages/block-library/src/post-date/edit.js
+index 5e38d307404da0..d387a0d4ebeece 100644
+--- a/packages/block-library/src/post-date/edit.js
++++ b/packages/block-library/src/post-date/edit.js
+@@ -7,7 +7,7 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { useEntityProp } from '@wordpress/core-data';
+-import { useState } from '@wordpress/element';
++import { useRef } from '@wordpress/element';
+ import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
+ import {
+ 	AlignmentControl,
+@@ -16,9 +16,10 @@ import {
+ 	useBlockProps,
+ } from '@wordpress/block-editor';
+ import {
++	Dropdown,
++	ToolbarGroup,
+ 	ToolbarButton,
+ 	ToggleControl,
+-	Popover,
+ 	DateTimePicker,
+ 	PanelBody,
+ 	CustomSelectControl,
+@@ -37,7 +38,6 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
+ 		'date',
+ 		postId
+ 	);
+-	const [ isPickerOpen, setIsPickerOpen ] = useState( false );
+ 	const settings = __experimentalGetSettings();
+ 	// To know if the current time format is a 12 hour time, look for "a".
+ 	// Also make sure this "a" is not escaped by a "/".
+@@ -62,18 +62,11 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
+ 		} ),
+ 	} );
+ 
++	const timeRef = useRef();
++
+ 	let postDate = date ? (
+-		<time dateTime={ dateI18n( 'c', date ) }>
++		<time dateTime={ dateI18n( 'c', date ) } ref={ timeRef }>
+ 			{ dateI18n( resolvedFormat, date ) }
+-			{ isPickerOpen && (
+-				<Popover onClose={ setIsPickerOpen.bind( null, false ) }>
+-					<DateTimePicker
+-						currentDate={ date }
+-						onChange={ setDate }
+-						is12Hour={ is12Hour }
+-					/>
+-				</Popover>
+-			) }
+ 		</time>
+ 	) : (
+ 		__( 'No Date' )
+@@ -99,15 +92,26 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
+ 				/>
+ 
+ 				{ date && (
+-					<ToolbarButton
+-						icon={ edit }
+-						title={ __( 'Change Date' ) }
+-						onClick={ () =>
+-							setIsPickerOpen(
+-								( _isPickerOpen ) => ! _isPickerOpen
+-							)
+-						}
+-					/>
++					<ToolbarGroup>
++						<Dropdown
++							popoverProps={ { anchorRef: timeRef.current } }
++							renderContent={ () => (
++								<DateTimePicker
++									currentDate={ date }
++									onChange={ setDate }
++									is12Hour={ is12Hour }
++								/>
++							) }
++							renderToggle={ ( { isOpen, onToggle } ) => (
++								<ToolbarButton
++									aria-expanded={ isOpen }
++									icon={ edit }
++									title={ __( 'Change Date' ) }
++									onClick={ onToggle }
++								/>
++							) }
++						/>
++					</ToolbarGroup>
+ 				) }
+ 			</BlockControls>
+ 
+diff --git a/packages/components/src/color-edit/index.js b/packages/components/src/color-edit/index.js
+index 31b49ad1454b33..40db13db029f1c 100644
+--- a/packages/components/src/color-edit/index.js
++++ b/packages/components/src/color-edit/index.js
+@@ -8,7 +8,7 @@ import { isEmpty, kebabCase } from 'lodash';
+  * WordPress dependencies
+  */
+ import { __, sprintf } from '@wordpress/i18n';
+-import { useEffect, useState } from '@wordpress/element';
++import { useState } from '@wordpress/element';
+ import { edit, close, chevronDown, chevronUp, plus } from '@wordpress/icons';
+ 
+ /**
+@@ -21,15 +21,6 @@ import Button from '../button';
+ import TextControl from '../text-control';
+ import BaseControl from '../base-control';
+ 
+-function DropdownOpenOnMount( { shouldOpen, isOpen, onToggle } ) {
+-	useEffect( () => {
+-		if ( shouldOpen && ! isOpen ) {
+-			onToggle();
+-		}
+-	}, [] );
+-	return null;
+-}
+-
+ function ColorOption( {
+ 	color,
+ 	name,
+@@ -77,21 +68,15 @@ function ColorOption( {
+ 		>
+ 			<div className="components-color-edit__color-option-main-area">
+ 				<Dropdown
++					openOnMount={ isEditingColorOnMount }
+ 					renderToggle={ ( { isOpen, onToggle } ) => (
+-						<>
+-							<DropdownOpenOnMount
+-								shouldOpen={ isEditingColorOnMount }
+-								isOpen={ isOpen }
+-								onToggle={ onToggle }
+-							/>
+-							<CircularOptionPicker.Option
+-								style={ { backgroundColor: color, color } }
+-								aria-expanded={ isOpen }
+-								aria-haspopup="true"
+-								onClick={ onToggle }
+-								aria-label={ __( 'Edit color value' ) }
+-							/>
+-						</>
++						<CircularOptionPicker.Option
++							style={ { backgroundColor: color, color } }
++							aria-expanded={ isOpen }
++							aria-haspopup="true"
++							onClick={ onToggle }
++							aria-label={ __( 'Edit color value' ) }
++						/>
+ 					) }
+ 					renderContent={ () => (
+ 						<ColorPicker
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index c5775fdaf09d97..33465a634c492c 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -6,7 +6,13 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { useRef, useEffect, useState } from '@wordpress/element';
++import {
++	forwardRef,
++	useImperativeHandle,
++	useEffect,
++	useRef,
++	useState,
++} from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -26,21 +32,25 @@ function useObservableState( initialState, onStateChange ) {
+ 	];
+ }
+ 
+-export default function Dropdown( {
+-	renderContent,
+-	renderToggle,
+-	position = 'bottom right',
+-	className,
+-	contentClassName,
+-	expandOnMobile,
+-	headerTitle,
+-	focusOnMount,
+-	popoverProps,
+-	onClose,
+-	onToggle,
+-} ) {
++function Dropdown(
++	{
++		className,
++		contentClassName,
++		expandOnMobile,
++		focusOnMount,
++		headerTitle,
++		onClose,
++		onToggle,
++		openOnMount = false,
++		popoverProps,
++		position = 'bottom right',
++		renderContent,
++		renderToggle,
++	},
++	ref
++) {
+ 	const containerRef = useRef();
+-	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
++	const [ isOpen, setIsOpen ] = useObservableState( openOnMount, onToggle );
+ 
+ 	useEffect(
+ 		() => () => {
+@@ -81,6 +91,8 @@ export default function Dropdown( {
+ 
+ 	const args = { isOpen, onToggle: toggle, onClose: close };
+ 
++	useImperativeHandle( ref, () => ( { toggle, close } ), [] );
++
+ 	return (
+ 		<div
+ 			className={ classnames( 'components-dropdown', className ) }
+@@ -111,3 +123,5 @@ export default function Dropdown( {
+ 		</div>
+ 	);
+ }
++
++export default forwardRef( Dropdown );

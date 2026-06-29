@@ -1,0 +1,28 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index abde63ef28198d..d73cd8dbfb85ae 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ ### Bug Fixes
+ 
+ - Fixed display of reset button when using RangeControl `allowReset` prop.
++- Fixed minutes field of `DateTimePicker` missed '0' before single digit values.
+ 
+ ## 7.3.0 (2019-04-16)
+ 
+diff --git a/packages/components/src/date-time/time.js b/packages/components/src/date-time/time.js
+index 3d0092df6155fe..55937b10170319 100644
+--- a/packages/components/src/date-time/time.js
++++ b/packages/components/src/date-time/time.js
+@@ -189,7 +189,10 @@ class TimePicker extends Component {
+ 	}
+ 
+ 	onChangeMinutes( event ) {
+-		this.setState( { minutes: event.target.value } );
++		const minutes = event.target.value;
++		this.setState( {
++			minutes: ( minutes === '' ) ? '' : ( '0' + minutes ).slice( -2 ),
++		} );
+ 	}
+ 
+ 	renderMonth( month ) {

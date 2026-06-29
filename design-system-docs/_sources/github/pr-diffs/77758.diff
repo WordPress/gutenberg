@@ -1,0 +1,72 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b7a386ed87c9a7..3b5950870a7009 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,6 +22,7 @@
+ -   Add `getOverlayLegacySlot()` helper and matching `.wp-overlay-legacy` styles. Lazily mounts a body-level container at `z-index: 99997` with `isolation: isolate` to be used as the portal target for legacy overlays in a follow-up. No runtime behavior change yet.
+ -   `Popover`: Render the fallback container inside the new overlay legacy slot. The popover's per-class z-index is preserved and now stacks relative to the slot.
+ -   `Modal`: Portal modals into the overlay legacy slot. Update the aria-helper to walk up from the modal so siblings of the slot wrapper (and outer modals when nested) continue to be aria-hidden.
++-   `Tooltip`, `Menu`, `CustomSelectControl` v2: Pass `portalElement={ getOverlayLegacySlot }` so each Ariakit-backed overlay portals into the overlay legacy slot. Per-overlay z-indexes are unchanged.
+ -   `NavigableContainer`: Refactor from class component to function component with hooks ([#77171](https://github.com/WordPress/gutenberg/pull/77171)).
+ -   `Menu`: Refactor `Menu.Popover` to use Ariakit’s `render` prop, wrapping content in `MenuMotionRoot` (motion styles) and `MenuSurface` (panel layout and `variant` chrome) ([#77460](https://github.com/WordPress/gutenberg/pull/77460)).
+ -   Fix types for TypeScript 7.0 ([#77177](https://github.com/WordPress/gutenberg/pull/77177)).
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index 546948d554c670..8bf953767900f4 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -25,6 +25,7 @@ import type {
+ import InputBase from '../input-control/input-base';
+ import SelectControlChevronDown from '../select-control/chevron-down';
+ import BaseControl from '../base-control';
++import { getOverlayLegacySlot } from '../utils/overlay-legacy-slot';
+ 
+ export const CustomSelectContext =
+ 	createContext< CustomSelectContextType >( undefined );
+@@ -151,6 +152,7 @@ function CustomSelect(
+ 					onKeyDown={ onSelectPopoverKeyDown }
+ 					// Match legacy behavior
+ 					flip={ ! isLegacy }
++					portalElement={ getOverlayLegacySlot }
+ 				>
+ 					<CustomSelectContext.Provider value={ contextValue }>
+ 						{ children }
+diff --git a/packages/components/src/menu/popover.tsx b/packages/components/src/menu/popover.tsx
+index a4fb2a3a61fa53..03ab6c0120529c 100644
+--- a/packages/components/src/menu/popover.tsx
++++ b/packages/components/src/menu/popover.tsx
+@@ -19,6 +19,7 @@ import {
+ import type { WordPressComponentProps } from '../context';
+ import type { PopoverProps } from './types';
+ import * as Styled from './styles';
++import { getOverlayLegacySlot } from '../utils/overlay-legacy-slot';
+ import { Context } from './context';
+ 
+ export const Popover = forwardRef<
+@@ -96,6 +97,7 @@ export const Popover = forwardRef<
+ 			data-submenu={ !! menuContext.store.parent || undefined }
+ 			wrapperProps={ wrapperProps }
+ 			hideOnEscape={ hideOnEscape }
++			portalElement={ getOverlayLegacySlot }
+ 			unmountOnHide
+ 			render={ renderMenu }
+ 		/>
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index 0c0d9d1d183bae..4827e6b9ab9c85 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -11,6 +11,7 @@ import deprecated from '@wordpress/deprecated';
+ import type { TooltipProps } from './types';
+ import Shortcut from '../shortcut';
+ import { positionToPlacement } from '../popover/utils';
++import { getOverlayLegacySlot } from '../utils/overlay-legacy-slot';
+ import { TooltipInternalContext } from './context';
+ 
+ /**
+@@ -122,6 +123,7 @@ function UnforwardedTooltip(
+ 					gutter={ 4 }
+ 					id={ describedById }
+ 					overflowPadding={ 0.5 }
++					portalElement={ getOverlayLegacySlot }
+ 					store={ tooltipStore }
+ 				>
+ 					{ text }

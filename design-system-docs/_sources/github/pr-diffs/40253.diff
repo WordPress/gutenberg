@@ -1,0 +1,900 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 1c42e00ba5881f..44022b3b44bb3d 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -26,8 +26,8 @@ const majorMinorRegExp =
+  */
+ const developmentFiles = [
+ 	'**/benchmark/**/*.js',
+-	'**/@(__mocks__|__tests__|test)/**/*.js',
+-	'**/@(storybook|stories)/**/*.js',
++	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
++	'**/@(storybook|stories)/**/*.[tj]s?(x)',
+ 	'packages/babel-preset-default/bin/**/*.js',
+ ];
+ 
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 91bebab753a3bd..ecea478d1546c5 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -629,6 +629,12 @@
+ 		"markdown_source": "../packages/components/src/box-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "BoxModelOverlay",
++		"slug": "box-model-overlay",
++		"markdown_source": "../packages/components/src/box-model-overlay/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "ButtonGroup",
+ 		"slug": "button-group",
+diff --git a/packages/components/src/box-model-overlay/README.md b/packages/components/src/box-model-overlay/README.md
+new file mode 100644
+index 00000000000000..5bb7aa592a09ad
+--- /dev/null
++++ b/packages/components/src/box-model-overlay/README.md
+@@ -0,0 +1,158 @@
++# BoxModelOverlay
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`<BoxModelOverlay>` component shows a visual overlay of the [box model](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/The_box_model) (currently only paddings and margins are available) on top of the target element. This is often accompanied by the `<BoxControl>` component to show a preview of the styling changes in the editor.
++
++## Usage
++
++Wrap `<YourComponent>` with `<BoxModelOverlay>` with the `showValues` prop.
++Note that `<YourComponent>` should accept `ref` for `<BoxModelOverlay>` to automatically inject into.
++
++```jsx
++import { __experimentalBoxModelOverlay as BoxModelOverlay } from '@wordpress/components';
++
++// Show all overlays and all sides.
++const showValues = {
++	margin: {
++		top: true,
++		right: true,
++		bottom: true,
++		left: true,
++	},
++	padding: {
++		top: true,
++		right: true,
++		bottom: true,
++		left: true,
++	},
++};
++
++const Example = () => {
++	return (
++		<BoxModelOverlay showValues={ showValues }>
++			<YourComponent />
++		</BoxModelOverlay>
++	);
++};
++```
++
++You can also use the `targetRef` prop to manually pass the ref to `<BoxModelOverlay>` for more advanced usage. This is useful if you need to control where the overlay is rendered or need special handling for the target's `ref`.
++
++```jsx
++const Example = () => {
++	const targetRef = useRef();
++
++	return (
++		<>
++			<YourComponent ref={ targetRef } />
++
++			<BoxModelOverlay
++				showValues={ showValues }
++				targetRef={ targetRef }
++			/>
++		</>
++	);
++};
++```
++
++`<BoxModelOverlay>` internally uses [`Popover`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/components/src/popover/README.md) to position the overlay. This means that you can use `<Popover.Slot>` to alternatively control where the overlay is rendered.
++
++```jsx
++const Example = () => {
++	return (
++		<>
++			<BoxModelOverlay showValues={ showValues }>
++				<YourComponent />
++			</BoxModelOverlay>
++
++			<Popover.Slot />
++		</>
++	);
++};
++```
++
++`<BoxModelOverlay>` under the hood listens to size and style changes of the target element to update the overlay style automatically using `ResizeObserver` and `MutationObserver`. In some edge cases when the observers aren't picking up the changes, you can use the instance method `update` on the ref of the overlay to update it manually.
++
++```jsx
++const Example = () => {
++	const overlayRef = useRef();
++
++	// Update the overlay style manually when `deps` changes.
++	useEffect( () => {
++		overlayRef.current.update();
++	}, [ deps ] );
++
++	return (
++		<BoxModelOverlay showValues={ showValues } ref={ overlayRef }>
++			<YourComponent />
++		</BoxModelOverlay>
++	);
++};
++```
++
++Here's an example of using it with `<BoxControl>`:
++
++```jsx
++const Example = () => {
++	const [ values, setValues ] = useState( {
++		top: '50px',
++		right: '10%',
++		bottom: '50px',
++		left: '10%',
++	} );
++	const [ showValues, setShowValues ] = useState( {} );
++
++	return (
++		<>
++			<BoxControl
++				label="Padding"
++				values={ values }
++				onChange={ ( nextValues ) => setValues( nextValues ) }
++				onChangeShowVisualizer={ setShowValues }
++			/>
++
++			<BoxModelOverlay showValues={ showValues }>
++				<div
++					style={ {
++						height: 300,
++						width: 300,
++						paddingTop: values.top,
++						paddingRight: values.right,
++						paddingBottom: values.bottom,
++						paddingLeft: values.left,
++					} }
++				/>
++			</BoxModelOverlay>
++		</>
++	);
++};
++```
++
++## Props
++
++Additional props not listed below will be passed to the underlying `Popover` component.
++
++### `showValues`
++
++Controls which overlays and sides are visible. Currently the only properties supported are `margin` and `padding`, each with four sides (`top`, `right`, `bottom`, `left`).
++
++- Type: `Object`
++- Required: Yes
++- Default: `{}`
++
++### `children`
++
++A single React element to rendered as the target. It should implicitly accept `ref` to be passed in.
++
++- Type: `React.ReactElement`
++- Required: Yes if `targetRef` is not passed
++
++### `targetRef`
++
++A ref object for the target element.
++
++- Type: `Ref<HTMLElement>`
++- Required: Yes if `children` is not passed
+diff --git a/packages/components/src/box-model-overlay/index.tsx b/packages/components/src/box-model-overlay/index.tsx
+new file mode 100644
+index 00000000000000..cb89dbff525622
+--- /dev/null
++++ b/packages/components/src/box-model-overlay/index.tsx
+@@ -0,0 +1,297 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * WordPress dependencies
++ */
++import {
++	useRef,
++	useLayoutEffect,
++	useMemo,
++	useCallback,
++	forwardRef,
++	useImperativeHandle,
++	cloneElement,
++	Children,
++} from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import Popover from '../popover';
++import type {
++	BoxModelOverlayProps,
++	BoxModelOverlayPropsWithChildren,
++	BoxModelOverlayPropsWithTargetRef,
++	BoxModelOverlayHandle,
++} from './types';
++
++const DEFAULT_SHOW_VALUES: BoxModelOverlayProps[ 'showValues' ] = {};
++
++// Copied from Chrome's DevTools: https://github.com/ChromeDevTools/devtools-frontend/blob/088a8f175bd58f2e0e2d492e991a3253124d7c11/front_end/core/common/Color.ts#L931
++const MARGIN_COLOR = 'rgba( 246, 178, 107, 0.66 )';
++// Copied from Chrome's DevTools: https://github.com/ChromeDevTools/devtools-frontend/blob/088a8f175bd58f2e0e2d492e991a3253124d7c11/front_end/core/common/Color.ts#L927
++const PADDING_COLOR = 'rgba( 147, 196, 125, 0.55 )';
++
++const OverlayPopover = styled( Popover )`
++	&& {
++		pointer-events: none;
++		box-sizing: content-box;
++		border-style: solid;
++		border-color: ${ MARGIN_COLOR };
++		// The overlay's top-left point is positioned at the center of the target,
++		// so we'll have add some negative offsets.
++		transform: translate( -50%, -50% );
++
++		&::before {
++			content: '';
++			display: block;
++			position: absolute;
++			box-sizing: border-box;
++			height: var( --wp-box-model-overlay-height );
++			width: var( --wp-box-model-overlay-width );
++			top: var( --wp-box-model-overlay-top );
++			left: var( --wp-box-model-overlay-left );
++			border-color: ${ PADDING_COLOR };
++			border-style: solid;
++			border-width: var( --wp-box-model-overlay-padding-top )
++				var( --wp-box-model-overlay-padding-right )
++				var( --wp-box-model-overlay-padding-bottom )
++				var( --wp-box-model-overlay-padding-left );
++		}
++
++		.components-popover__content {
++			display: none;
++		}
++	}
++`;
++
++const BoxModelOverlayWithRef = forwardRef<
++	BoxModelOverlayHandle,
++	BoxModelOverlayPropsWithTargetRef
++>( ( { showValues = DEFAULT_SHOW_VALUES, targetRef, ...props }, ref ) => {
++	const overlayRef = useRef< HTMLDivElement >();
++
++	const update = useCallback( () => {
++		const target = targetRef.current;
++		const overlay = overlayRef.current;
++
++		if ( ! target || ! overlay ) {
++			return;
++		}
++
++		const defaultView = target.ownerDocument.defaultView;
++
++		const domRect = target.getBoundingClientRect();
++		const {
++			paddingTop,
++			paddingBottom,
++			paddingLeft,
++			paddingRight,
++			marginTop,
++			marginRight,
++			marginBottom,
++			marginLeft,
++			borderTopWidth,
++			borderRightWidth,
++			borderBottomWidth,
++			borderLeftWidth,
++		} = defaultView.getComputedStyle( target );
++
++		overlay.style.height = `${ domRect.height }px`;
++		overlay.style.width = `${ domRect.width }px`;
++
++		// Setting margin overlays by using borders as the visual representation.
++		const borderWidths = {
++			top: showValues.margin?.top ? parseInt( marginTop, 10 ) : 0,
++			right: showValues.margin?.right ? parseInt( marginRight, 10 ) : 0,
++			bottom: showValues.margin?.bottom
++				? parseInt( marginBottom, 10 )
++				: 0,
++			left: showValues.margin?.left ? parseInt( marginLeft, 10 ) : 0,
++		};
++		overlay.style.borderWidth = [
++			borderWidths.top,
++			borderWidths.right,
++			borderWidths.bottom,
++			borderWidths.left,
++		]
++			.map( ( px ) => `${ px }px` )
++			.join( ' ' );
++
++		// The overlay will always position itself at the center of the target,
++		// but the overlay could have different size than the target because of the
++		// borders we added above.
++		// We want to "cancel out" those offsets by doing a `transform: translate`.
++		overlay.style.transform = `translate(calc(-50% + ${
++			( borderWidths.right - borderWidths.left ) / 2
++		}px), calc(-50% + ${
++			( borderWidths.bottom - borderWidths.top ) / 2
++		}px))`;
++
++		// Set pseudo element's position to take account for borders.
++		overlay.style.setProperty(
++			'--wp-box-model-overlay-height',
++			`${
++				domRect.height -
++				parseInt( borderTopWidth, 10 ) -
++				parseInt( borderBottomWidth, 10 )
++			}px`
++		);
++		overlay.style.setProperty(
++			'--wp-box-model-overlay-width',
++			`${
++				domRect.width -
++				parseInt( borderLeftWidth, 10 ) -
++				parseInt( borderRightWidth, 10 )
++			}px`
++		);
++		overlay.style.setProperty(
++			'--wp-box-model-overlay-top',
++			borderTopWidth
++		);
++		overlay.style.setProperty(
++			'--wp-box-model-overlay-left',
++			borderLeftWidth
++		);
++
++		// Setting padding values via CSS custom properties so that they can
++		// be applied in the pseudo elements.
++		overlay.style.setProperty(
++			'--wp-box-model-overlay-padding-top',
++			showValues.padding?.top ? paddingTop : '0'
++		);
++		overlay.style.setProperty(
++			'--wp-box-model-overlay-padding-right',
++			showValues.padding?.right ? paddingRight : '0'
++		);
++		overlay.style.setProperty(
++			'--wp-box-model-overlay-padding-bottom',
++			showValues.padding?.bottom ? paddingBottom : '0'
++		);
++		overlay.style.setProperty(
++			'--wp-box-model-overlay-padding-left',
++			showValues.padding?.left ? paddingLeft : '0'
++		);
++	}, [ targetRef, showValues.margin, showValues.padding ] );
++
++	// Make the imperative `update` method available via `ref`.
++	useImperativeHandle( ref, () => ( { update } ), [ update ] );
++
++	const getAnchorRect = useCallback(
++		() => targetRef.current.getBoundingClientRect(),
++		[ targetRef ]
++	);
++
++	// Completely skip rendering the popover if none of showValues is true.
++	const shouldShowOverlay = useMemo(
++		() =>
++			Object.values( showValues.margin ?? {} ).some(
++				( value ) => value === true
++			) ||
++			Object.values( showValues.padding ?? {} ).some(
++				( value ) => value === true
++			),
++		[ showValues.margin, showValues.padding ]
++	);
++
++	useLayoutEffect( () => {
++		const target = targetRef.current;
++
++		if ( ! shouldShowOverlay || ! target ) {
++			return;
++		}
++
++		const defaultView = target.ownerDocument.defaultView;
++
++		update();
++
++		const resizeObserver = new defaultView.ResizeObserver( update );
++		const mutationObserver = new defaultView.MutationObserver( update );
++
++		// Observing size changes.
++		resizeObserver.observe( target, { box: 'border-box' } );
++		// Observing padding and margin changes.
++		mutationObserver.observe( target, {
++			attributes: true,
++			attributeFilter: [ 'style' ],
++		} );
++
++		// Percentage paddings are based on parent element's width,
++		// so we need to also listen to the parent's size changes.
++		const parentElement = target.parentElement;
++		let parentResizeObserver: ResizeObserver;
++		if ( parentElement ) {
++			parentResizeObserver = new defaultView.ResizeObserver( update );
++			parentResizeObserver.observe( parentElement, {
++				box: 'content-box',
++			} );
++		}
++
++		return () => {
++			resizeObserver.disconnect();
++			mutationObserver.disconnect();
++			if ( parentResizeObserver ) {
++				parentResizeObserver.disconnect();
++			}
++		};
++	}, [ targetRef, shouldShowOverlay, update ] );
++
++	return shouldShowOverlay ? (
++		<OverlayPopover
++			position="middle center"
++			__unstableForcePosition
++			__unstableForceXAlignment
++			getAnchorRect={ getAnchorRect }
++			animate={ false }
++			aria-hidden="true"
++			focusOnMount={ false }
++			ref={ overlayRef }
++			{ ...props }
++		/>
++	) : null;
++} );
++
++const BoxModelOverlayWithChildren = forwardRef<
++	BoxModelOverlayHandle,
++	BoxModelOverlayPropsWithChildren
++>( ( { children, ...props }, ref ) => {
++	const targetRef = useRef< HTMLElement >();
++
++	return (
++		<>
++			{ cloneElement( Children.only( children ), { ref: targetRef } ) }
++			<BoxModelOverlayWithRef
++				{ ...props }
++				targetRef={ targetRef }
++				ref={ ref }
++			/>
++		</>
++	);
++} );
++
++const hasChildren = (
++	props: BoxModelOverlayProps
++): props is BoxModelOverlayPropsWithChildren => 'children' in props;
++
++const BoxModelOverlay = forwardRef<
++	BoxModelOverlayHandle,
++	BoxModelOverlayProps
++>( ( props, ref ) => {
++	if ( hasChildren( props ) ) {
++		return <BoxModelOverlayWithChildren { ...props } ref={ ref } />;
++	}
++
++	return <BoxModelOverlayWithRef { ...props } ref={ ref } />;
++} );
++
++export {
++	BoxModelOverlayProps,
++	BoxModelOverlayPropsWithChildren,
++	BoxModelOverlayPropsWithTargetRef,
++	BoxModelOverlayHandle,
++};
++
++export default BoxModelOverlay;
+diff --git a/packages/components/src/box-model-overlay/stories/index.tsx b/packages/components/src/box-model-overlay/stories/index.tsx
+new file mode 100644
+index 00000000000000..74820051766742
+--- /dev/null
++++ b/packages/components/src/box-model-overlay/stories/index.tsx
+@@ -0,0 +1,150 @@
++/**
++ * External dependencies
++ */
++import { capitalize } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { useState, useRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import BoxControl from '../../box-control';
++import { Flex, FlexBlock } from '../../flex';
++
++import BoxModelOverlay from '../index';
++
++export default {
++	title: 'Components (Experimental)/BoxModelOverlay',
++	component: BoxModelOverlay,
++};
++
++const SHOW_VALUES = {
++	margin: {
++		top: true,
++		right: true,
++		bottom: true,
++		left: true,
++	},
++	padding: {
++		top: true,
++		right: true,
++		bottom: true,
++		left: true,
++	},
++};
++
++const Template = ( { width, height, showValues, styles } ) => {
++	return (
++		<BoxModelOverlay showValues={ showValues }>
++			<div
++				style={ {
++					width,
++					height,
++					background: '#ddd',
++					resize: 'both',
++					overflow: 'auto',
++					...styles,
++				} }
++			/>
++		</BoxModelOverlay>
++	);
++};
++
++export const _default = Template.bind( {} );
++_default.args = {
++	width: 300,
++	height: 300,
++	showValues: SHOW_VALUES,
++	styles: {
++		margin: '20px 20px 20px 20px',
++		padding: '5% 5% 5% 5%',
++	},
++};
++
++export const WithBoxControl = ( {
++	width,
++	height,
++	parentWidth,
++	parentHeight,
++} ) => {
++	const [ marginValues, setMarginValues ] = useState( {
++		top: '20px',
++		left: '20px',
++		right: '20px',
++		bottom: '20px',
++	} );
++	const [ paddingValues, setPaddingValues ] = useState( {
++		top: '5%',
++		left: '5%',
++		right: '5%',
++		bottom: '5%',
++	} );
++	const [ showMarginValues, setShowMarginValues ] = useState( {} );
++	const [ showPaddingValues, setShowPaddingValues ] = useState( {} );
++
++	const boxStyle = {};
++	Object.entries( marginValues ).forEach( ( [ side, value ] ) => {
++		boxStyle[ `margin${ capitalize( side ) }` ] = value;
++	} );
++	Object.entries( paddingValues ).forEach( ( [ side, value ] ) => {
++		boxStyle[ `padding${ capitalize( side ) }` ] = value;
++	} );
++
++	return (
++		<Flex style={ { maxWidth: '780px' } } align="top" gap={ 8 }>
++			<FlexBlock>
++				<BoxControl
++					label="Margin"
++					values={ marginValues }
++					onChange={ setMarginValues }
++					onChangeShowVisualizer={ setShowMarginValues }
++					// To ignore the error for incorrect types in BoxControl.
++					id={ undefined }
++					units={ undefined }
++					sides={ undefined }
++				/>
++				<BoxControl
++					label="Padding"
++					values={ paddingValues }
++					onChange={ setPaddingValues }
++					onChangeShowVisualizer={ setShowPaddingValues }
++					// To ignore the error for incorrect types in BoxControl.
++					id={ undefined }
++					units={ undefined }
++					sides={ undefined }
++				/>
++			</FlexBlock>
++			<FlexBlock>
++				<div style={ { width: parentWidth, height: parentHeight } }>
++					<BoxModelOverlay
++						showValues={ {
++							margin: showMarginValues,
++							padding: showPaddingValues,
++						} }
++					>
++						<div
++							style={ {
++								width,
++								height,
++								background: '#ddd',
++								resize: 'both',
++								overflow: 'auto',
++								...boxStyle,
++							} }
++						/>
++					</BoxModelOverlay>
++				</div>
++			</FlexBlock>
++		</Flex>
++	);
++};
++
++WithBoxControl.args = {
++	width: 300,
++	height: 300,
++	parentWidth: 500,
++	parentHeight: 500,
++};
+diff --git a/packages/components/src/box-model-overlay/test/index.tsx b/packages/components/src/box-model-overlay/test/index.tsx
+new file mode 100644
+index 00000000000000..71489e4341f298
+--- /dev/null
++++ b/packages/components/src/box-model-overlay/test/index.tsx
+@@ -0,0 +1,186 @@
++/**
++ * External dependencies
++ */
++import { render, screen, act } from '@testing-library/react';
++
++/**
++ * WordPress dependencies
++ */
++import { createRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import BoxModelOverlay from '../index';
++import type { BoxModelOverlayHandle } from '../index';
++import { SlotFillProvider, Popover } from '../..';
++
++const DEFAULT_SHOW_VALUES = {
++	margin: {
++		top: true,
++		right: true,
++		bottom: true,
++		left: true,
++	},
++	padding: {
++		top: true,
++		right: true,
++		bottom: true,
++		left: true,
++	},
++};
++
++// Mock ResizeObserver since it's not available in JSDOM yet.
++beforeAll( () => {
++	window.ResizeObserver = jest.fn( () => ( {
++		observe: () => {},
++		unobserve: () => {},
++		disconnect: () => {},
++	} ) );
++} );
++afterAll( () => {
++	window.ResizeObserver = undefined;
++} );
++
++it( 'renders the overlay visible with the children prop', () => {
++	render(
++		<BoxModelOverlay
++			data-testid="box-model-overlay"
++			showValues={ DEFAULT_SHOW_VALUES }
++		>
++			<div data-testid="box" style={ { height: 300, width: 300 } } />
++		</BoxModelOverlay>
++	);
++
++	const overlay = screen.getByTestId( 'box-model-overlay' );
++
++	expect( overlay ).toBeVisible();
++} );
++
++it( 'renders the overlay visible with the targetRef prop', () => {
++	const targetRef = createRef< HTMLDivElement >();
++
++	render(
++		<>
++			<div
++				data-testid="box"
++				style={ { height: 300, width: 300 } }
++				ref={ targetRef }
++			/>
++			<BoxModelOverlay
++				data-testid="box-model-overlay"
++				showValues={ DEFAULT_SHOW_VALUES }
++				targetRef={ targetRef }
++			/>
++		</>
++	);
++
++	const box = screen.getByTestId( 'box' );
++	const overlay = screen.getByTestId( 'box-model-overlay' );
++
++	act( () => {
++		expect( targetRef.current ).toBe( box );
++	} );
++
++	expect( overlay ).toBeVisible();
++} );
++
++it( 'allows to call update imperatively via ref', async () => {
++	const overlayRef = createRef< BoxModelOverlayHandle >();
++
++	render(
++		<BoxModelOverlay
++			data-testid="box-model-overlay"
++			showValues={ DEFAULT_SHOW_VALUES }
++			ref={ overlayRef }
++		>
++			<div data-testid="box" style={ { height: 300, width: 300 } } />
++		</BoxModelOverlay>
++	);
++
++	const overlay = screen.getByTestId( 'box-model-overlay' );
++
++	const promise = new Promise( ( resolve ) => {
++		const mutationObserver = new window.MutationObserver( resolve );
++
++		mutationObserver.observe( overlay, {
++			attributes: true,
++			attributeFilter: [ 'style' ],
++		} );
++	} );
++
++	overlayRef.current.update();
++
++	const entries = await promise;
++
++	expect( entries[ 0 ].attributeName ).toBe( 'style' );
++} );
++
++it( 'should react to style changes', async () => {
++	render(
++		<BoxModelOverlay
++			data-testid="box-model-overlay"
++			showValues={ DEFAULT_SHOW_VALUES }
++		>
++			<div data-testid="box" style={ { height: 300, width: 300 } } />
++		</BoxModelOverlay>
++	);
++
++	const box = screen.getByTestId( 'box' );
++	const overlay = screen.getByTestId( 'box-model-overlay' );
++
++	const promise = new Promise( ( resolve ) => {
++		const mutationObserver = new window.MutationObserver( resolve );
++
++		mutationObserver.observe( overlay, {
++			attributes: true,
++			attributeFilter: [ 'style' ],
++		} );
++	} );
++
++	box.style.padding = '20px';
++
++	const entries = await promise;
++
++	expect( entries[ 0 ].attributeName ).toBe( 'style' );
++} );
++
++it( 'renders the overlay to where Popover.Slot is', async () => {
++	render(
++		<SlotFillProvider>
++			<BoxModelOverlay
++				data-testid="box-model-overlay"
++				showValues={ DEFAULT_SHOW_VALUES }
++			>
++				<div data-testid="box" style={ { height: 300, width: 300 } } />
++			</BoxModelOverlay>
++
++			<div data-testid="slot">
++				{ /* @ts-ignore-error: The type for Popover is wrong here. */ }
++				<Popover.Slot />
++			</div>
++		</SlotFillProvider>
++	);
++
++	const box = screen.getByTestId( 'box' );
++	const overlay = screen.getByTestId( 'box-model-overlay' );
++	const slot = screen.getByTestId( 'slot' );
++
++	expect( overlay ).toBeVisible();
++
++	expect( slot.contains( overlay ) ).toBe( true );
++	expect( slot.contains( box ) ).toBe( false );
++} );
++
++it( 'should correctly unmount the component', async () => {
++	const { unmount } = render(
++		<BoxModelOverlay
++			data-testid="box-model-overlay"
++			showValues={ DEFAULT_SHOW_VALUES }
++		>
++			<div data-testid="box" style={ { height: 300, width: 300 } } />
++		</BoxModelOverlay>
++	);
++
++	unmount();
++} );
+diff --git a/packages/components/src/box-model-overlay/types.ts b/packages/components/src/box-model-overlay/types.ts
+new file mode 100644
+index 00000000000000..89c403ffce68f1
+--- /dev/null
++++ b/packages/components/src/box-model-overlay/types.ts
+@@ -0,0 +1,35 @@
++/**
++ * External dependencies
++ */
++import type { RefObject, ReactElement } from 'react';
++
++type BoxModelSides = 'top' | 'right' | 'bottom' | 'left';
++
++export interface BoxModelOverlayHandle {
++	update: () => void;
++}
++
++export interface BoxModelOverlayBaseProps {
++	showValues: {
++		margin?: {
++			[ side in BoxModelSides ]?: boolean;
++		};
++		padding?: {
++			[ side in BoxModelSides ]?: boolean;
++		};
++	};
++}
++
++export interface BoxModelOverlayPropsWithTargetRef
++	extends BoxModelOverlayBaseProps {
++	targetRef: RefObject< HTMLElement >;
++}
++
++export interface BoxModelOverlayPropsWithChildren
++	extends BoxModelOverlayBaseProps {
++	children: ReactElement;
++}
++
++export type BoxModelOverlayProps =
++	| BoxModelOverlayPropsWithTargetRef
++	| BoxModelOverlayPropsWithChildren;
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 6b90c5a1142e31..b53a2bd1218106 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -186,6 +186,7 @@ export {
+ } from './slot-fill';
+ export { default as __experimentalStyleProvider } from './style-provider';
+ export { ZStack as __experimentalZStack } from './z-stack';
++export { default as __experimentalBoxModelOverlay } from './box-model-overlay';
+ 
+ // Higher-Order Components.
+ export {

@@ -1,0 +1,29 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5eb8eda2b3b1aa..acf5caa5de042e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,8 +18,7 @@
+ 
+ ### Bug Fix
+ -   `PaletteEdit`: Fix number incrementing of default names for new colors added in non-en-US locales ([#52212](https://github.com/WordPress/gutenberg/pull/52212)).
+-
+-
++-   `DateTimePicker`: Change day button size back from 32px to 28px ([#59990](https://github.com/WordPress/gutenberg/pull/59990)).
+ 
+ ## 27.1.0 (2024-03-06)
+ 
+diff --git a/packages/components/src/date-time/date/styles.ts b/packages/components/src/date-time/date/styles.ts
+index 992dab34544cea..c25cdca367910a 100644
+--- a/packages/components/src/date-time/date/styles.ts
++++ b/packages/components/src/date-time/date/styles.ts
+@@ -84,8 +84,8 @@ export const DayButton = styled( Button, {
+ 
+ 	&&& {
+ 		border-radius: 100%;
+-		height: ${ space( 8 ) };
+-		width: ${ space( 8 ) };
++		height: ${ space( 7 ) };
++		width: ${ space( 7 ) };
+ 
+ 		${ ( props ) =>
+ 			props.isSelected &&

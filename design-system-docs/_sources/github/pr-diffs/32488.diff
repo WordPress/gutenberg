@@ -1,0 +1,328 @@
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index de9ec9d6917e56..ede807ed0ebf9e 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -118,6 +118,9 @@ $z-layers: (
+ 	// Show the FSE template previews above the editor and any open block toolbars
+ 	".edit-site-navigation-panel__preview": 32,
+ 
++	// Show notices above block toolbars
++	".components-notice-list": 32,
++
+ 	// Above the block list and the header.
+ 	".block-editor-block-list__block-popover": 31,
+ 
+diff --git a/packages/block-editor/README.md b/packages/block-editor/README.md
+index 4dc58c54807546..a1dca553bce250 100644
+--- a/packages/block-editor/README.md
++++ b/packages/block-editor/README.md
+@@ -244,6 +244,7 @@ _Parameters_
+ -   _$0_ `Object`: Props.
+ -   _$0.children_ `Object`: The block content and style container.
+ -   _$0.\_\_unstableContentRef_ `Object`: Ref holding the content scroll container.
++-   _$0.\_\_experimentalStickyTop_ `Object`: Offset for the top position of toolbars.
+ 
+ ### BlockVerticalAlignmentControl
+ 
+diff --git a/packages/block-editor/src/components/block-tools/block-contextual-toolbar.js b/packages/block-editor/src/components/block-tools/block-contextual-toolbar.js
+index a8e55abe6f408b..460d6fc5ded5cb 100644
+--- a/packages/block-editor/src/components/block-tools/block-contextual-toolbar.js
++++ b/packages/block-editor/src/components/block-tools/block-contextual-toolbar.js
+@@ -17,7 +17,13 @@ import NavigableToolbar from '../navigable-toolbar';
+ import BlockToolbar from '../block-toolbar';
+ import { store as blockEditorStore } from '../../store';
+ 
+-function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
++function BlockContextualToolbar( {
++	focusOnMount,
++	isFixed,
++	__experimentalStickyTop,
++	style = {},
++	...props
++} ) {
+ 	const { blockType, hasParents, showParentSelector } = useSelect(
+ 		( select ) => {
+ 			const {
+@@ -59,12 +65,17 @@ function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
+ 		'is-fixed': isFixed,
+ 	} );
+ 
++	if ( __experimentalStickyTop ) {
++		style.top = __experimentalStickyTop;
++	}
++
+ 	return (
+ 		<NavigableToolbar
+ 			focusOnMount={ focusOnMount }
+ 			className={ classes }
+ 			/* translators: accessibility text for the block toolbar */
+ 			aria-label={ __( 'Block tools' ) }
++			style={ style }
+ 			{ ...props }
+ 		>
+ 			<BlockToolbar hideDragHandle={ isFixed } />
+diff --git a/packages/block-editor/src/components/block-tools/block-popover.js b/packages/block-editor/src/components/block-tools/block-popover.js
+index 8371cfff9bbba8..de6094a6989f2e 100644
+--- a/packages/block-editor/src/components/block-tools/block-popover.js
++++ b/packages/block-editor/src/components/block-tools/block-popover.js
+@@ -54,6 +54,7 @@ function BlockPopover( {
+ 	capturingClientId,
+ 	__unstablePopoverSlot,
+ 	__unstableContentRef,
++	__experimentalStickyTop,
+ } ) {
+ 	const {
+ 		isNavigationMode,
+@@ -213,6 +214,7 @@ function BlockPopover( {
+ 			// Observe movement for block animations (especially horizontal).
+ 			__unstableObserveElement={ node }
+ 			shouldAnchorIncludePadding
++			__experimentalStickyTop={ __experimentalStickyTop }
+ 		>
+ 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
+ 				<div
+@@ -324,6 +326,7 @@ function wrapperSelector( select ) {
+ export default function WrappedBlockPopover( {
+ 	__unstablePopoverSlot,
+ 	__unstableContentRef,
++	__experimentalStickyTop,
+ } ) {
+ 	const selected = useSelect( wrapperSelector, [] );
+ 
+@@ -353,6 +356,7 @@ export default function WrappedBlockPopover( {
+ 			capturingClientId={ capturingClientId }
+ 			__unstablePopoverSlot={ __unstablePopoverSlot }
+ 			__unstableContentRef={ __unstableContentRef }
++			__experimentalStickyTop={ __experimentalStickyTop }
+ 		/>
+ 	);
+ }
+diff --git a/packages/block-editor/src/components/block-tools/index.js b/packages/block-editor/src/components/block-tools/index.js
+index 4b81040dfa1a60..baf98e088520fa 100644
+--- a/packages/block-editor/src/components/block-tools/index.js
++++ b/packages/block-editor/src/components/block-tools/index.js
+@@ -25,13 +25,15 @@ import { usePopoverScroll } from './use-popover-scroll';
+  * insertion point and a slot for the inline rich text toolbar). Must be wrapped
+  * around the block content and editor styles wrapper or iframe.
+  *
+- * @param {Object} $0                      Props.
+- * @param {Object} $0.children             The block content and style container.
+- * @param {Object} $0.__unstableContentRef Ref holding the content scroll container.
++ * @param {Object} $0                         Props.
++ * @param {Object} $0.children                The block content and style container.
++ * @param {Object} $0.__unstableContentRef    Ref holding the content scroll container.
++ * @param {Object} $0.__experimentalStickyTop Offset for the top position of toolbars.
+  */
+ export default function BlockTools( {
+ 	children,
+ 	__unstableContentRef,
++	__experimentalStickyTop,
+ 	...props
+ } ) {
+ 	const isLargeViewport = useViewportMatch( 'medium' );
+@@ -117,11 +119,17 @@ export default function BlockTools( {
+ 		<div { ...props } onKeyDown={ onKeyDown }>
+ 			<InsertionPoint __unstableContentRef={ __unstableContentRef }>
+ 				{ ( hasFixedToolbar || ! isLargeViewport ) && (
+-					<BlockContextualToolbar isFixed />
++					<BlockContextualToolbar
++						isFixed
++						__experimentalStickyTop={ __experimentalStickyTop }
++					/>
+ 				) }
+ 				{ /* Even if the toolbar is fixed, the block popover is still
+                  needed for navigation mode. */ }
+-				<BlockPopover __unstableContentRef={ __unstableContentRef } />
++				<BlockPopover
++					__unstableContentRef={ __unstableContentRef }
++					__experimentalStickyTop={ __experimentalStickyTop }
++				/>
+ 				{ /* Used for the inline rich text toolbar. */ }
+ 				<Popover.Slot
+ 					name="block-toolbar"
+diff --git a/packages/components/src/notice/style.scss b/packages/components/src/notice/style.scss
+index a4b4838a99cc80..a234df4ce92b21 100644
+--- a/packages/components/src/notice/style.scss
++++ b/packages/components/src/notice/style.scss
+@@ -76,6 +76,7 @@
+ 	// The notice should never be wider than the viewport, or the close button might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
+ 	max-width: 100vw;
+ 	box-sizing: border-box;
++	z-index: z-index(".components-notice-list");
+ 
+ 	.components-notice__content {
+ 		margin-top: $grid-unit-15;
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index a30dfe4fb19faa..89b33bb3484464 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -258,6 +258,7 @@ const Popover = (
+ 		__unstableBoundaryParent,
+ 		__unstableForcePosition,
+ 		__unstableForceXAlignment,
++		__experimentalStickyTop: stickyTop = 0,
+ 		/* eslint-enable no-unused-vars */
+ 		...contentProps
+ 	},
+@@ -306,7 +307,7 @@ const Popover = (
+ 
+ 			const { offsetParent, ownerDocument } = containerRef.current;
+ 
+-			let relativeOffsetTop = 0;
++			let relativeOffsetTop = -stickyTop;
+ 
+ 			// If there is a positioned ancestor element that is not the body,
+ 			// subtract the position from the anchor rect. If the position of
+@@ -316,7 +317,7 @@ const Popover = (
+ 			if ( offsetParent && offsetParent !== ownerDocument.body ) {
+ 				const offsetParentRect = offsetParent.getBoundingClientRect();
+ 
+-				relativeOffsetTop = offsetParentRect.top;
++				relativeOffsetTop += offsetParentRect.top;
+ 				anchor = new window.DOMRect(
+ 					anchor.left - offsetParentRect.left,
+ 					anchor.top - offsetParentRect.top,
+@@ -477,6 +478,7 @@ const Popover = (
+ 		position,
+ 		contentSize,
+ 		__unstableStickyBoundaryElement,
++		stickyTop,
+ 		__unstableObserveElement,
+ 		__unstableBoundaryParent,
+ 	] );
+diff --git a/packages/edit-post/src/components/layout/index.js b/packages/edit-post/src/components/layout/index.js
+index 51311d59ea7b6e..b11feb7ee54845 100644
+--- a/packages/edit-post/src/components/layout/index.js
++++ b/packages/edit-post/src/components/layout/index.js
+@@ -184,6 +184,9 @@ function Layout( { styles } ) {
+ 		return null;
+ 	};
+ 
++	const [ contentStickyTop, setContentStickyTop ] = useState( 0 );
++	const onNoticesResize = ( { height } ) => setContentStickyTop( height );
++
+ 	return (
+ 		<>
+ 			<FullscreenMode isActive={ isFullscreenActive } />
+@@ -229,12 +232,15 @@ function Layout( { styles } ) {
+ 				notices={ <EditorSnackbars /> }
+ 				content={
+ 					<>
+-						<EditorNotices />
++						<EditorNotices onResize={ onNoticesResize } />
+ 						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
+ 							<TextEditor />
+ 						) }
+ 						{ isRichEditingEnabled && mode === 'visual' && (
+-							<VisualEditor styles={ styles } />
++							<VisualEditor
++								styles={ styles }
++								__experimentalStickyTop={ contentStickyTop }
++							/>
+ 						) }
+ 						{ ! isTemplateMode && (
+ 							<div className="edit-post-layout__metaboxes">
+diff --git a/packages/edit-post/src/components/visual-editor/index.js b/packages/edit-post/src/components/visual-editor/index.js
+index 3fbf4b4d217585..071464485be005 100644
+--- a/packages/edit-post/src/components/visual-editor/index.js
++++ b/packages/edit-post/src/components/visual-editor/index.js
+@@ -80,7 +80,7 @@ function MaybeIframe( {
+ 	);
+ }
+ 
+-export default function VisualEditor( { styles } ) {
++export default function VisualEditor( { styles, __experimentalStickyTop } ) {
+ 	const {
+ 		deviceType,
+ 		isTemplateMode,
+@@ -186,6 +186,7 @@ export default function VisualEditor( { styles } ) {
+ 	return (
+ 		<BlockTools
+ 			__unstableContentRef={ ref }
++			__experimentalStickyTop={ __experimentalStickyTop }
+ 			className={ classnames( 'edit-post-visual-editor', {
+ 				'is-template-mode': isTemplateMode,
+ 			} ) }
+diff --git a/packages/editor/src/components/editor-notices/index.js b/packages/editor/src/components/editor-notices/index.js
+index 1dd7b8e0e31bf7..26be4097b88cf8 100644
+--- a/packages/editor/src/components/editor-notices/index.js
++++ b/packages/editor/src/components/editor-notices/index.js
+@@ -7,8 +7,9 @@ import { filter } from 'lodash';
+  * WordPress dependencies
+  */
+ import { NoticeList } from '@wordpress/components';
+-import { withSelect, withDispatch } from '@wordpress/data';
+-import { compose } from '@wordpress/compose';
++import { useResizeObserver } from '@wordpress/compose';
++import { useSelect, useDispatch } from '@wordpress/data';
++import { useEffect } from '@wordpress/element';
+ import { store as noticesStore } from '@wordpress/notices';
+ 
+ /**
+@@ -16,7 +17,17 @@ import { store as noticesStore } from '@wordpress/notices';
+  */
+ import TemplateValidationNotice from '../template-validation-notice';
+ 
+-export function EditorNotices( { notices, onRemove } ) {
++export default function EditorNotices( { onResize } ) {
++	const notices = useSelect( ( select ) => {
++		return select( noticesStore ).getNotices();
++	}, [] );
++	const { removeNotice: onRemove } = useDispatch( noticesStore );
++
++	const [ resizeListener, size ] = useResizeObserver();
++	useEffect( () => {
++		onResize?.( size );
++	}, [ size.width, size.height ] );
++
+ 	const dismissibleNotices = filter( notices, {
+ 		isDismissible: true,
+ 		type: 'default',
+@@ -37,17 +48,9 @@ export function EditorNotices( { notices, onRemove } ) {
+ 				className="components-editor-notices__dismissible"
+ 				onRemove={ onRemove }
+ 			>
++				{ resizeListener }
+ 				<TemplateValidationNotice />
+ 			</NoticeList>
+ 		</>
+ 	);
+ }
+-
+-export default compose( [
+-	withSelect( ( select ) => ( {
+-		notices: select( noticesStore ).getNotices(),
+-	} ) ),
+-	withDispatch( ( dispatch ) => ( {
+-		onRemove: dispatch( noticesStore ).removeNotice,
+-	} ) ),
+-] )( EditorNotices );
+diff --git a/packages/editor/src/components/editor-notices/style.scss b/packages/editor/src/components/editor-notices/style.scss
+index f3b1f76285874f..8ce8fb9004e33c 100644
+--- a/packages/editor/src/components/editor-notices/style.scss
++++ b/packages/editor/src/components/editor-notices/style.scss
+@@ -1,12 +1,22 @@
+-// Dismissible & non-dismissible notices.
+-.components-editor-notices__dismissible,
++// Dismissible notices.
++.components-editor-notices__dismissible {
++	position: sticky;
++	top: 0;
++	right: 0;
++	color: $gray-900;
++}
++
++// Non-dismissible notices.
+ .components-editor-notices__pinned {
+ 	position: relative;
+ 	left: 0;
+ 	top: 0;
+ 	right: 0;
+ 	color: $gray-900;
++}
+ 
++.components-editor-notices__dismissible,
++.components-editor-notices__pinned {
+ 	.components-notice {
+ 		box-sizing: border-box;
+ 		margin: 0;

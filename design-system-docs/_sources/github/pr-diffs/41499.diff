@@ -1,0 +1,31 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 68b96eccbfc220..840367ff8c753b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,11 +11,13 @@
+ ### Internal
+ 
+ -   `FormTokenField`: Convert to TypeScript and refactor to functional component ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
++-   `Draggable`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41499](https://github.com/WordPress/gutenberg/pull/41499))
+ -   `RadioControl`: Convert to TypeScript ([#41568](https://github.com/WordPress/gutenberg/pull/41568)).
+ -   `Flex` updated to satisfy `react/exhuastive-deps` eslint rule ([#41507](https://github.com/WordPress/gutenberg/pull/41507)).
+ -   `CustomGradientBar` updated to satisfy `react/exhuastive-deps` eslint rule ([#41463](https://github.com/WordPress/gutenberg/pull/41463))
+ -   `TreeSelect`: Convert to TypeScript ([#41536](https://github.com/WordPress/gutenberg/pull/41536)).
+ 
++
+ ## 19.12.0 (2022-06-01)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/draggable/index.native.js b/packages/components/src/draggable/index.native.js
+index a9cc6b40070ed4..4d9513a47e3654 100644
+--- a/packages/components/src/draggable/index.native.js
++++ b/packages/components/src/draggable/index.native.js
+@@ -142,7 +142,7 @@ const Draggable = ( {
+ 
+ 	const providerValue = useMemo( () => {
+ 		return { panGestureRef, isDragging, isPanActive, draggingId };
+-	}, [] );
++	}, [ isDragging, isPanActive, draggingId ] );
+ 
+ 	return (
+ 		<GestureDetector gesture={ panGesture }>

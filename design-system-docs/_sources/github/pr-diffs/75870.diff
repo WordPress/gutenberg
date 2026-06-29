@@ -1,0 +1,444 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 956cf975f4588d..e34586f6591068 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,17 +2,19 @@
+ 
+ ## Unreleased
+ 
+-### Bug Fixes
+-
+--   `VisuallyHidden`: Add `word-break: normal` to prevent text wrapping issues in screen reader content ([#75539](https://github.com/WordPress/gutenberg/pull/75539)).
+-
+ ### New Features
+ 
++-   Add `Text` primitive with predefined typographic variants (`heading-2xl` through `heading-sm`, `body-xl` through `body-sm`) built on design tokens ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
+ -   Add `Card` and `CollapsibleCard` primitives ([#76252](https://github.com/WordPress/gutenberg/pull/76252)).
+ 
++### Bug Fixes
++
++-   `VisuallyHidden`: Add `word-break: normal` to prevent text wrapping issues in screen reader content ([#75539](https://github.com/WordPress/gutenberg/pull/75539)).
++
+ ### Enhancements
+ 
+ -   `Notice`: Improve narrow layout by letting description and actions span the icon column when a title is present ([#76202](https://github.com/WordPress/gutenberg/pull/76202)).
++-   `Notice`: Use `Text` component for `Title` and `Description` typography ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
+ 
+ ## 0.8.0 (2026-03-04)
+ 
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 5bedff80ff4f83..57d2e98fc9bb61 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -9,5 +9,6 @@ export * from './icon-button';
+ export * as Notice from './notice';
+ export * from './stack';
+ export * as Tabs from './tabs';
++export * from './text';
+ export * as Tooltip from './tooltip';
+ export * from './visually-hidden';
+diff --git a/packages/ui/src/notice/description.tsx b/packages/ui/src/notice/description.tsx
+index 0613f7a0daeffd..d79d49fba8488a 100644
+--- a/packages/ui/src/notice/description.tsx
++++ b/packages/ui/src/notice/description.tsx
+@@ -1,23 +1,21 @@
+ import { forwardRef } from '@wordpress/element';
+-import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
+ import type { DescriptionProps } from './types';
++import { Text } from '../text';
+ import styles from './style.module.css';
+ 
+ /**
+  * The description text for a notice.
+  */
+-export const Description = forwardRef< HTMLDivElement, DescriptionProps >(
+-	function NoticeDescription( { render, ...props }, ref ) {
+-		const element = useRender( {
+-			defaultTagName: 'div',
+-			render,
+-			ref,
+-			props: mergeProps< 'div' >(
+-				{ className: styles.description },
+-				props
+-			),
+-		} );
+-
+-		return element;
++export const Description = forwardRef< HTMLSpanElement, DescriptionProps >(
++	function NoticeDescription( { className, ...props }, ref ) {
++		return (
++			<Text
++				ref={ ref }
++				variant="body-md"
++				className={ clsx( styles.description, className ) }
++				{ ...props }
++			/>
++		);
+ 	}
+ );
+diff --git a/packages/ui/src/notice/style.module.css b/packages/ui/src/notice/style.module.css
+index b07cfb45672f87..5b0ff9db732bf1 100644
+--- a/packages/ui/src/notice/style.module.css
++++ b/packages/ui/src/notice/style.module.css
+@@ -32,10 +32,6 @@
+ 
+ 		padding-block: var(--text-vertical-padding);
+ 
+-		font-family: var(--wpds-font-family-heading);
+-		font-size: var(--wpds-font-size-md);
+-		font-weight: var(--wpds-font-weight-medium);
+-		line-height: var(--wpds-font-line-height-sm);
+ 		color: var(--wp-ui-notice-text-color);
+ 	}
+ 
+@@ -44,10 +40,6 @@
+ 
+ 		padding-block: var(--text-vertical-padding);
+ 
+-		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-md);
+-		font-weight: var(--wpds-font-weight-regular);
+-		line-height: var(--wpds-font-line-height-sm);
+ 		text-wrap: pretty;
+ 		color: var(--wp-ui-notice-text-color);
+ 	}
+diff --git a/packages/ui/src/notice/test/index.test.tsx b/packages/ui/src/notice/test/index.test.tsx
+index 08257be8d78605..74bfc65b352121 100644
+--- a/packages/ui/src/notice/test/index.test.tsx
++++ b/packages/ui/src/notice/test/index.test.tsx
+@@ -8,7 +8,7 @@ describe( 'Notice', () => {
+ 		it( 'forwards ref', () => {
+ 			const rootRef = createRef< HTMLDivElement >();
+ 			const titleRef = createRef< HTMLSpanElement >();
+-			const descriptionRef = createRef< HTMLDivElement >();
++			const descriptionRef = createRef< HTMLSpanElement >();
+ 			const actionsRef = createRef< HTMLDivElement >();
+ 			const actionButtonRef = createRef< HTMLButtonElement >();
+ 			const actionLinkRef = createRef< HTMLAnchorElement >();
+@@ -36,7 +36,7 @@ describe( 'Notice', () => {
+ 			);
+ 			expect( rootRef.current ).toBeInstanceOf( HTMLDivElement );
+ 			expect( titleRef.current ).toBeInstanceOf( HTMLSpanElement );
+-			expect( descriptionRef.current ).toBeInstanceOf( HTMLDivElement );
++			expect( descriptionRef.current ).toBeInstanceOf( HTMLSpanElement );
+ 			expect( actionsRef.current ).toBeInstanceOf( HTMLDivElement );
+ 			expect( actionButtonRef.current ).toBeInstanceOf(
+ 				HTMLButtonElement
+diff --git a/packages/ui/src/notice/title.tsx b/packages/ui/src/notice/title.tsx
+index ed1fe2edc74358..123242dc6202ee 100644
+--- a/packages/ui/src/notice/title.tsx
++++ b/packages/ui/src/notice/title.tsx
+@@ -1,20 +1,21 @@
+ import { forwardRef } from '@wordpress/element';
+-import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
+ import type { TitleProps } from './types';
++import { Text } from '../text';
+ import styles from './style.module.css';
+ 
+ /**
+  * A short heading that communicates the main message of the notice.
+  */
+ export const Title = forwardRef< HTMLSpanElement, TitleProps >(
+-	function NoticeTitle( { render, ...props }, ref ) {
+-		const element = useRender( {
+-			defaultTagName: 'span',
+-			render,
+-			ref,
+-			props: mergeProps< 'span' >( { className: styles.title }, props ),
+-		} );
+-
+-		return element;
++	function NoticeTitle( { className, ...props }, ref ) {
++		return (
++			<Text
++				ref={ ref }
++				variant="heading-md"
++				className={ clsx( styles.title, className ) }
++				{ ...props }
++			/>
++		);
+ 	}
+ );
+diff --git a/packages/ui/src/notice/types.ts b/packages/ui/src/notice/types.ts
+index 39f7aaad31e37b..9f942fa0414cc3 100644
+--- a/packages/ui/src/notice/types.ts
++++ b/packages/ui/src/notice/types.ts
+@@ -47,7 +47,7 @@ export interface TitleProps extends ComponentProps< 'span' > {
+ 	children?: ReactNode;
+ }
+ 
+-export interface DescriptionProps extends ComponentProps< 'div' > {
++export interface DescriptionProps extends ComponentProps< 'span' > {
+ 	/**
+ 	 * The description text of the notice.
+ 	 */
+diff --git a/packages/ui/src/text/index.ts b/packages/ui/src/text/index.ts
+new file mode 100644
+index 00000000000000..8463c3cf8c7971
+--- /dev/null
++++ b/packages/ui/src/text/index.ts
+@@ -0,0 +1 @@
++export { Text } from './text';
+diff --git a/packages/ui/src/text/stories/index.story.tsx b/packages/ui/src/text/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..f4bb861398039d
+--- /dev/null
++++ b/packages/ui/src/text/stories/index.story.tsx
+@@ -0,0 +1,68 @@
++/* eslint-disable jsx-a11y/heading-has-content */
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { Text } from '../index';
++import { Stack } from '../../stack';
++
++const meta: Meta< typeof Text > = {
++	title: 'Design System/Components/Text',
++	component: Text,
++};
++export default meta;
++
++type Story = StoryObj< typeof Text >;
++
++export const Default: Story = {
++	args: {
++		variant: 'body-md',
++		children: 'The quick brown fox jumps over the lazy dog.',
++	},
++};
++
++export const AllVariants: Story = {
++	render: () => (
++		<Stack
++			direction="column"
++			gap="lg"
++			style={ { color: 'var(--wpds-color-fg-content-neutral)' } }
++		>
++			{ (
++				[
++					'heading-2xl',
++					'heading-xl',
++					'heading-lg',
++					'heading-md',
++					'heading-sm',
++					'body-xl',
++					'body-lg',
++					'body-md',
++					'body-sm',
++				] as const
++			 ).map( ( variant ) => (
++				<Stack key={ variant } direction="column" gap="xs">
++					<Text variant="heading-sm">{ variant }</Text>
++					<Text variant={ variant }>
++						The quick brown fox jumps over the lazy dog.
++					</Text>
++				</Stack>
++			) ) }
++		</Stack>
++	),
++};
++
++export const WithRenderProp: Story = {
++	render: () => (
++		<Stack direction="column" gap="md">
++			<Text variant="heading-2xl" render={ <h1 /> }>
++				Page Title
++			</Text>
++			<Text variant="heading-xl" render={ <h2 /> }>
++				Section Heading
++			</Text>
++			<Text variant="body-md" render={ <p /> }>
++				A paragraph of body text rendered as a semantic paragraph
++				element.
++			</Text>
++		</Stack>
++	),
++};
++/* eslint-enable jsx-a11y/heading-has-content */
+diff --git a/packages/ui/src/text/style.module.css b/packages/ui/src/text/style.module.css
+new file mode 100644
+index 00000000000000..b7867997e829b4
+--- /dev/null
++++ b/packages/ui/src/text/style.module.css
+@@ -0,0 +1,67 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.heading-2xl {
++		font-family: var(--wpds-font-family-heading);
++		font-size: var(--wpds-font-size-2xl);
++		line-height: var(--wpds-font-line-height-2xl);
++		font-weight: var(--wpds-font-weight-medium);
++	}
++
++	.heading-xl {
++		font-family: var(--wpds-font-family-heading);
++		font-size: var(--wpds-font-size-xl);
++		line-height: var(--wpds-font-line-height-md);
++		font-weight: var(--wpds-font-weight-medium);
++	}
++
++	.heading-lg {
++		font-family: var(--wpds-font-family-heading);
++		font-size: var(--wpds-font-size-lg);
++		line-height: var(--wpds-font-line-height-sm);
++		font-weight: var(--wpds-font-weight-medium);
++	}
++
++	.heading-md {
++		font-family: var(--wpds-font-family-heading);
++		font-size: var(--wpds-font-size-md);
++		line-height: var(--wpds-font-line-height-sm);
++		font-weight: var(--wpds-font-weight-medium);
++	}
++
++	.heading-sm {
++		font-family: var(--wpds-font-family-heading);
++		font-size: var(--wpds-font-size-xs);
++		line-height: var(--wpds-font-line-height-xs);
++		font-weight: var(--wpds-font-weight-medium);
++		text-transform: uppercase;
++	}
++
++	.body-xl {
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wpds-font-size-xl);
++		line-height: var(--wpds-font-line-height-xl);
++		font-weight: var(--wpds-font-weight-regular);
++	}
++
++	.body-lg {
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wpds-font-size-lg);
++		line-height: var(--wpds-font-line-height-md);
++		font-weight: var(--wpds-font-weight-regular);
++	}
++
++	.body-md {
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wpds-font-size-md);
++		line-height: var(--wpds-font-line-height-sm);
++		font-weight: var(--wpds-font-weight-regular);
++	}
++
++	.body-sm {
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wpds-font-size-sm);
++		line-height: var(--wpds-font-line-height-xs);
++		font-weight: var(--wpds-font-weight-regular);
++	}
++}
+diff --git a/packages/ui/src/text/test/index.test.tsx b/packages/ui/src/text/test/index.test.tsx
+new file mode 100644
+index 00000000000000..f5ab9751a5d606
+--- /dev/null
++++ b/packages/ui/src/text/test/index.test.tsx
+@@ -0,0 +1,46 @@
++import { render, screen } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import { Text } from '../index';
++
++describe( 'Text', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLSpanElement >();
++
++		render( <Text ref={ ref }>Content</Text> );
++
++		expect( ref.current ).toBeInstanceOf( HTMLSpanElement );
++	} );
++
++	it( 'renders children', () => {
++		render( <Text>Hello world</Text> );
++
++		expect( screen.getByText( 'Hello world' ) ).toBeVisible();
++	} );
++
++	it( 'forwards props to the rendered element', () => {
++		render( <Text data-testid="text">Content</Text> );
++
++		expect( screen.getByTestId( 'text' ) ).toBeInTheDocument();
++	} );
++
++	it( 'forwards the className to the rendered element', () => {
++		render(
++			<Text data-testid="text" className="custom-class">
++				Content
++			</Text>
++		);
++
++		expect( screen.getByTestId( 'text' ) ).toHaveClass( 'custom-class' );
++	} );
++
++	it( 'supports the render prop', () => {
++		render(
++			// eslint-disable-next-line jsx-a11y/heading-has-content
++			<Text render={ <h2 /> }>Section title</Text>
++		);
++
++		expect(
++			screen.getByRole( 'heading', { level: 2, name: 'Section title' } )
++		).toBeVisible();
++	} );
++} );
+diff --git a/packages/ui/src/text/text.tsx b/packages/ui/src/text/text.tsx
+new file mode 100644
+index 00000000000000..4c86b9fdf7845a
+--- /dev/null
++++ b/packages/ui/src/text/text.tsx
+@@ -0,0 +1,25 @@
++import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { type TextProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * A text component for rendering content with predefined typographic variants.
++ * Built on design tokens for consistent typography across the UI.
++ */
++export const Text = forwardRef< HTMLSpanElement, TextProps >( function Text(
++	{ variant = 'body-md', render, className, ...props },
++	ref
++) {
++	const element = useRender( {
++		render,
++		defaultTagName: 'span',
++		ref,
++		props: mergeProps< 'span' >( props, {
++			className: clsx( styles[ variant ], className ),
++		} ),
++	} );
++
++	return element;
++} );
+diff --git a/packages/ui/src/text/types.ts b/packages/ui/src/text/types.ts
+new file mode 100644
+index 00000000000000..163e75d73b2a07
+--- /dev/null
++++ b/packages/ui/src/text/types.ts
+@@ -0,0 +1,25 @@
++import { type ComponentProps } from '../utils/types';
++
++export interface TextProps extends ComponentProps< 'span' > {
++	/**
++	 * The typographic variant to apply, controlling font family, size,
++	 * line height, and weight.
++	 *
++	 * @default "body-md"
++	 */
++	variant?:
++		| 'heading-2xl'
++		| 'heading-xl'
++		| 'heading-lg'
++		| 'heading-md'
++		| 'heading-sm'
++		| 'body-xl'
++		| 'body-lg'
++		| 'body-md'
++		| 'body-sm';
++
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: React.ReactNode;
++}

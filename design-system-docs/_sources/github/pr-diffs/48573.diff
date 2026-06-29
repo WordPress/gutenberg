@@ -1,0 +1,210 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 799703d001b613..854fb6f13cdc24 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,10 @@
+ ### Enhancements
+ -   `FontSizePicker`: Allow custom units for custom font size control ([#48468](https://github.com/WordPress/gutenberg/pull/48468)).
+ 
++### Bug Fix
++
++-  `ResponsiveWrapper`: use `aspect-ratio` CSS prop, add support for `SVG` elements ([#48573](https://github.com/WordPress/gutenberg/pull/48573).
++
+ ### Internal
+ 
+ -   `Guide`: Convert to TypeScript ([#47493](https://github.com/WordPress/gutenberg/pull/47493)).
+@@ -17,7 +21,7 @@
+ 
+ ### Enhancements
+ 
+--   `ToolsPanel`: Separate reset all filter registration from items registration and support global resets ([#48123](https://github.com/WordPress/gutenberg/pull/48123#pullrequestreview-1308386926)).
++-  `ToolsPanel`: Separate reset all filter registration from items registration and support global resets ([#48123](https://github.com/WordPress/gutenberg/pull/48123)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/responsive-wrapper/README.md b/packages/components/src/responsive-wrapper/README.md
+index 5ccfc16c1b84d3..31acf65932d4e6 100644
+--- a/packages/components/src/responsive-wrapper/README.md
++++ b/packages/components/src/responsive-wrapper/README.md
+@@ -17,6 +17,12 @@ const MyResponsiveWrapper = () => (
+ );
+ ```
+ 
++### Usage with `SVG` elements
++
++When passing an `SVG` element as the `<ResponsiveWrapper />`'s child, make sure that it has the `viewbox` and the `preserveAspectRatio` set.
++
++When dealing with SVGs, it may not be possible to derive its `naturalWidth` and `naturalHeight` and therefore passing them as propertied to `<ResponsiveWrapper />`. In this case, the SVG simply keeps scaling up to fill its container, unless the `height` and `width` attributes are specified.
++
+ ## Props
+ 
+ ### `children`: `React.ReactElement`
+@@ -36,10 +42,10 @@ If true, the wrapper will be `span` instead of `div`.
+ 
+ The intrinsic height of the element to wrap. Will be used to determine the aspect ratio.
+ 
+--   Required: Yes
++-   Required: No
+ 
+ ### `naturalWidth`: `number`
+ 
+ The intrinsic width of the element to wrap. Will be used to determine the aspect ratio.
+ 
+--   Required: Yes
+\ No newline at end of file
++-   Required: No
+diff --git a/packages/components/src/responsive-wrapper/index.tsx b/packages/components/src/responsive-wrapper/index.tsx
+index b59731539f3a44..a8b2ef9ff438a5 100644
+--- a/packages/components/src/responsive-wrapper/index.tsx
++++ b/packages/components/src/responsive-wrapper/index.tsx
+@@ -7,7 +7,6 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { cloneElement, Children } from '@wordpress/element';
+-import { useResizeObserver } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -36,28 +35,30 @@ function ResponsiveWrapper( {
+ 	children,
+ 	isInline = false,
+ }: ResponsiveWrapperProps ) {
+-	const [ containerResizeListener, { width: containerWidth } ] =
+-		useResizeObserver();
+ 	if ( Children.count( children ) !== 1 ) {
+ 		return null;
+ 	}
+-	const imageStyle = {
+-		paddingBottom:
+-			naturalWidth < ( containerWidth ?? 0 )
+-				? naturalHeight
+-				: ( naturalHeight / naturalWidth ) * 100 + '%',
+-	};
++
+ 	const TagName = isInline ? 'span' : 'div';
++	let aspectRatio;
++	if ( naturalWidth && naturalHeight ) {
++		aspectRatio = `${ naturalWidth } / ${ naturalHeight }`;
++	}
++
+ 	return (
+ 		<TagName className="components-responsive-wrapper">
+-			{ containerResizeListener }
+-			<TagName style={ imageStyle } />
+-			{ cloneElement( children, {
+-				className: classnames(
+-					'components-responsive-wrapper__content',
+-					children.props.className
+-				),
+-			} ) }
++			<div>
++				{ cloneElement( children, {
++					className: classnames(
++						'components-responsive-wrapper__content',
++						children.props.className
++					),
++					style: {
++						...children.props.style,
++						aspectRatio,
++					},
++				} ) }
++			</div>
+ 		</TagName>
+ 	);
+ }
+diff --git a/packages/components/src/responsive-wrapper/stories/index.tsx b/packages/components/src/responsive-wrapper/stories/index.tsx
+index 5f48b91d279b2d..acca93afe56bc9 100644
+--- a/packages/components/src/responsive-wrapper/stories/index.tsx
++++ b/packages/components/src/responsive-wrapper/stories/index.tsx
+@@ -36,3 +36,44 @@ Default.args = {
+ 		/>
+ 	),
+ };
++
++/**
++ * When passing an `SVG` element as the `<ResponsiveWrapper />`'s child, make
++ * sure that it has the `viewbox` and the `preserveAspectRatio` set.
++ *
++ * When dealing with SVGs, it may not be possible to derive its `naturalWidth`
++ * and `naturalHeight` and therefore passing them as propertied to
++ * `<ResponsiveWrapper />`. In this case, the SVG simply keeps scaling up to fill
++ * its container, unless the `height` and `width` attributes are specified.
++ */
++export const WithSVG: ComponentStory< typeof ResponsiveWrapper > =
++	Template.bind( {} );
++WithSVG.args = {
++	children: (
++		<svg
++			xmlns="http://www.w3.org/2000/svg"
++			viewBox="0 0 280 640"
++			preserveAspectRatio="xMinYMin meet"
++			width="280px"
++			height="640px"
++		>
++			<rect
++				x="0"
++				y="0"
++				width="280"
++				height="640"
++				style={ { fill: 'blue' } }
++			/>
++			<g>
++				<circle style={ { fill: 'red' } } cx="140" cy="160" r="60" />
++				<circle style={ { fill: 'yellow' } } cx="140" cy="320" r="60" />
++				<circle
++					style={ { fill: '#40CC40' } }
++					cx="140"
++					cy="480"
++					r="60"
++				/>
++			</g>
++		</svg>
++	),
++};
+diff --git a/packages/components/src/responsive-wrapper/style.scss b/packages/components/src/responsive-wrapper/style.scss
+index b6a556bf3425d0..d32fed8cd48406 100644
+--- a/packages/components/src/responsive-wrapper/style.scss
++++ b/packages/components/src/responsive-wrapper/style.scss
+@@ -1,19 +1,13 @@
+ .components-responsive-wrapper {
+ 	position: relative;
+ 	max-width: 100%;
+-	&,
+-	& > span {
+-		display: block;
+-	}
++	display: flex;
++	align-items: center;
++	justify-content: center;
+ }
+ 
+ .components-responsive-wrapper__content {
+-	position: absolute;
+-	top: 0;
+-	right: 0;
+-	bottom: 0;
+-	left: 0;
++	display: block;
++	max-width: 100%;
+ 	width: 100%;
+-	height: 100%;
+-	margin: auto;
+ }
+diff --git a/packages/components/src/responsive-wrapper/types.ts b/packages/components/src/responsive-wrapper/types.ts
+index 2f1e4a53aafbf7..7f76ff8af5a552 100644
+--- a/packages/components/src/responsive-wrapper/types.ts
++++ b/packages/components/src/responsive-wrapper/types.ts
+@@ -2,11 +2,11 @@ export type ResponsiveWrapperProps = {
+ 	/**
+ 	 * The intrinsic width of the element to wrap. Will be used to determine the aspect ratio.
+ 	 */
+-	naturalWidth: number;
++	naturalWidth?: number;
+ 	/**
+ 	 * The intrinsic height of the element to wrap. Will be used to determine the aspect ratio.
+ 	 */
+-	naturalHeight: number;
++	naturalHeight?: number;
+ 	/**
+ 	 * The element to wrap.
+ 	 */

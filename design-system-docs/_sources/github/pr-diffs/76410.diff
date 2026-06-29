@@ -1,0 +1,222 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 50fce00a4066bf..20d04f8453e6ed 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### New Features
+ 
++-   Add `cursor` prop to `ThemeProvider` for configuring the `--wpds-cursor-control` design token ([#76410](https://github.com/WordPress/gutenberg/pull/76410)).
+ -   Added `no-token-fallback-values` stylelint rule that disallows manual fallback values for `--wpds-*` design tokens. Available as `@wordpress/theme/stylelint-plugins/no-token-fallback-values` ([#76415](https://github.com/WordPress/gutenberg/pull/76415)).
+ 
+ ## 0.8.0 (2026-03-04)
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index 6f1f51565f8015..66ca51c9e917b2 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -138,7 +138,7 @@ import { ThemeProvider } from '@wordpress/theme';
+ 
+ function App() {
+ 	return (
+-		<ThemeProvider color={ { primary: 'blue' } } density="compact">
++		<ThemeProvider color={ { primary: 'blue' } } cursor={ { control: 'pointer' } } density="compact">
+ 			{ /* Your app content */ }
+ 		</ThemeProvider>
+ 	);
+@@ -152,6 +152,10 @@ The `color` prop accepts an object with the following optional properties:
+ 
+ Both properties accept any valid CSS color value. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
+ 
++The `cursor` prop accepts an object with the following optional properties:
++
++-   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'`.
++
+ The `density` prop controls the spacing scale throughout the UI:
+ 
+ -   `'default'`: Standard spacing for general use.
+@@ -160,7 +164,7 @@ The `density` prop controls the spacing scale throughout the UI:
+ 
+ The density setting adjusts dimension tokens like gaps and paddings to maintain consistent spacing throughout the UI. Changing the density automatically updates spacing of all components that use these tokens.
+ 
+-When the `color` or `density` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
++When the `color`, `cursor`, or `density` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+ 
+ ### Nesting Providers
+ 
+diff --git a/packages/theme/src/context.ts b/packages/theme/src/context.ts
+index b8728b26eaf6e5..e1d630ab421391 100644
+--- a/packages/theme/src/context.ts
++++ b/packages/theme/src/context.ts
+@@ -15,5 +15,6 @@ interface ThemeContextType {
+ export const ThemeContext = createContext< ThemeContextType >( {
+ 	resolvedSettings: {
+ 		color: {},
++		cursor: undefined,
+ 	},
+ } );
+diff --git a/packages/theme/src/theme-provider.tsx b/packages/theme/src/theme-provider.tsx
+index 19b899834c43e0..f2299c12eeed62 100644
+--- a/packages/theme/src/theme-provider.tsx
++++ b/packages/theme/src/theme-provider.tsx
+@@ -48,6 +48,7 @@ function generateCSSSelector( {
+ export const ThemeProvider = ( {
+ 	children,
+ 	color = {},
++	cursor,
+ 	isRoot = false,
+ 	density,
+ }: ThemeProviderProps ) => {
+@@ -55,6 +56,7 @@ export const ThemeProvider = ( {
+ 
+ 	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
+ 		color,
++		cursor,
+ 	} );
+ 
+ 	const contextValue = useMemo(
+diff --git a/packages/theme/src/types.ts b/packages/theme/src/types.ts
+index 49bad28227afbf..d6761f39c4b21d 100644
+--- a/packages/theme/src/types.ts
++++ b/packages/theme/src/types.ts
+@@ -24,6 +24,20 @@ export interface ThemeProviderSettings {
+ 		bg?: string;
+ 	};
+ 
++	/**
++	 * The set of cursor options to apply to the theme.
++	 */
++	cursor?: {
++		/**
++		 * The cursor style for interactive controls that are not links
++		 * (e.g. buttons, checkboxes, and toggles).
++		 *
++		 * By default, it inherits from the parent `ThemeProvider`,
++		 * and falls back to the prebuilt default (`default`).
++		 */
++		control?: 'default' | 'pointer';
++	};
++
+ 	/**
+ 	 * The density of the theme. If left unspecified, the theme inherits from
+ 	 * the density of the closest `ThemeProvider`, or uses the default density
+diff --git a/packages/theme/src/use-theme-provider-styles.ts b/packages/theme/src/use-theme-provider-styles.ts
+index 3af46a501899a4..123dfa6c70bbb9 100644
+--- a/packages/theme/src/use-theme-provider-styles.ts
++++ b/packages/theme/src/use-theme-provider-styles.ts
+@@ -170,8 +170,10 @@ function generateStyles( {
+ 
+ export function useThemeProviderStyles( {
+ 	color = {},
++	cursor,
+ }: {
+ 	color?: ThemeProviderProps[ 'color' ];
++	cursor?: ThemeProviderProps[ 'cursor' ];
+ } = {} ) {
+ 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
+ 
+@@ -185,6 +187,7 @@ export function useThemeProviderStyles( {
+ 		DEFAULT_SEED_COLORS.primary;
+ 	const bg =
+ 		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.bg;
++	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
+ 
+ 	const resolvedSettings = useMemo(
+ 		() => ( {
+@@ -192,11 +195,12 @@ export function useThemeProviderStyles( {
+ 				primary,
+ 				bg,
+ 			},
++			cursor: cursorControl ? { control: cursorControl } : undefined,
+ 		} ),
+-		[ primary, bg ]
++		[ primary, bg, cursorControl ]
+ 	);
+ 
+-	const themeProviderStyles = useMemo( () => {
++	const colorStyles = useMemo( () => {
+ 		// Determine which seeds are needed for generating ramps.
+ 		const seeds = {
+ 			...DEFAULT_SEED_COLORS,
+@@ -224,6 +228,16 @@ export function useThemeProviderStyles( {
+ 		} );
+ 	}, [ primary, bg ] );
+ 
++	const themeProviderStyles = useMemo(
++		() => ( {
++			...colorStyles,
++			...( cursorControl && {
++				'--wpds-cursor-control': cursorControl,
++			} ),
++		} ),
++		[ colorStyles, cursorControl ]
++	);
++
+ 	return {
+ 		resolvedSettings,
+ 		themeProviderStyles,
+diff --git a/storybook/addons/design-system-theme/manager.ts b/storybook/addons/design-system-theme/manager.ts
+index d09011a5cbd65f..940296966f8f15 100644
+--- a/storybook/addons/design-system-theme/manager.ts
++++ b/storybook/addons/design-system-theme/manager.ts
+@@ -30,6 +30,11 @@ const COLOR_OPTIONS: ThemeOption[] = [
+ 	{ id: 'dark', title: 'Dark' },
+ ];
+ 
++const CURSOR_CONTROL_OPTIONS: ThemeOption[] = [
++	{ id: '', title: 'Default' },
++	{ id: 'pointer', title: 'Pointer' },
++];
++
+ const DENSITY_OPTIONS: ThemeOption[] = [
+ 	{ id: 'compact', title: 'Compact' },
+ 	{ id: '', title: 'Default' },
+@@ -72,6 +77,11 @@ const ThemeTool = () => {
+ 			title: 'Color',
+ 			globalName: 'dsColorTheme',
+ 			options: COLOR_OPTIONS,
++		} ),
++		createElement( ThemeTooltipMessage, {
++			title: 'Cursor control',
++			globalName: 'dsCursorControl',
++			options: CURSOR_CONTROL_OPTIONS,
+ 		} )
+ 	);
+ 
+diff --git a/storybook/decorators/with-design-system-theme.tsx b/storybook/decorators/with-design-system-theme.tsx
+index 36c7cf67aff045..8b184b8ab2f0f7 100644
+--- a/storybook/decorators/with-design-system-theme.tsx
++++ b/storybook/decorators/with-design-system-theme.tsx
+@@ -35,6 +35,7 @@ export function WithDesignSystemTheme(
+ 	}
+ 
+ 	const colorTheme = context.globals.dsColorTheme;
++	const cursorControl = context.globals.dsCursorControl || undefined;
+ 	const density = context.globals.dsDensity;
+ 
+ 	let color;
+@@ -43,7 +44,12 @@ export function WithDesignSystemTheme(
+ 	}
+ 
+ 	return (
+-		<ThemeProvider color={ color } density={ density } isRoot>
++		<ThemeProvider
++			color={ color }
++			cursor={ cursorControl ? { control: cursorControl } : undefined }
++			density={ density }
++			isRoot
++		>
+ 			<div
+ 				style={
+ 					color?.bg
+diff --git a/storybook/preview.jsx b/storybook/preview.jsx
+index 096a9c99389e2d..367117897dcc0c 100644
+--- a/storybook/preview.jsx
++++ b/storybook/preview.jsx
+@@ -58,6 +58,7 @@ export const globalTypes = {
+ 		},
+ 	},
+ 	dsColorTheme: {},
++	dsCursorControl: {},
+ 	dsDensity: {},
+ };
+ 

@@ -1,0 +1,124 @@
+diff --git a/packages/components/src/custom-select-control/test/index.js b/packages/components/src/custom-select-control/test/index.js
+index 3ef6d52ab1f6ec..150afe4aa75f51 100644
+--- a/packages/components/src/custom-select-control/test/index.js
++++ b/packages/components/src/custom-select-control/test/index.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { render, fireEvent, screen } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
+ 
+ /**
+  * Internal dependencies
+@@ -9,7 +10,8 @@ import { render, fireEvent, screen } from '@testing-library/react';
+ import CustomSelectControl from '..';
+ 
+ describe( 'CustomSelectControl', () => {
+-	it( 'Captures the keypress event and does not let it propagate', () => {
++	it( 'Captures the keypress event and does not let it propagate', async () => {
++		const user = userEvent.setup();
+ 		const onKeyDown = jest.fn();
+ 		const options = [
+ 			{
+@@ -39,10 +41,10 @@ describe( 'CustomSelectControl', () => {
+ 			</div>
+ 		);
+ 		const toggleButton = screen.getByRole( 'button' );
+-		fireEvent.click( toggleButton );
++		await user.click( toggleButton );
+ 
+ 		const customSelect = screen.getByRole( 'listbox' );
+-		fireEvent.keyDown( customSelect );
++		await user.type( customSelect, '{enter}' );
+ 
+ 		expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
+ 	} );
+diff --git a/packages/components/src/item-group/test/index.js b/packages/components/src/item-group/test/index.js
+index e0471661c2c277..dba3c26d88411a 100644
+--- a/packages/components/src/item-group/test/index.js
++++ b/packages/components/src/item-group/test/index.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { fireEvent, render, screen } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
+ 
+ /**
+  * Internal dependencies
+@@ -72,7 +73,8 @@ describe( 'ItemGroup', () => {
+ 	} );
+ 
+ 	describe( 'Item', () => {
+-		it( 'should render as a `button` if the `onClick` handler is specified', () => {
++		it( 'should render as a `button` if the `onClick` handler is specified', async () => {
++			const user = userEvent.setup();
+ 			const spy = jest.fn();
+ 			render( <Item onClick={ spy }>Code is poetry</Item> );
+ 
+@@ -80,7 +82,7 @@ describe( 'ItemGroup', () => {
+ 
+ 			expect( button ).toBeInTheDocument();
+ 
+-			fireEvent.click( button );
++			await user.click( button );
+ 
+ 			expect( spy ).toHaveBeenCalled();
+ 		} );
+diff --git a/packages/components/src/slot-fill/test/slot.js b/packages/components/src/slot-fill/test/slot.js
+index 941ba278aadc78..99836a94463526 100644
+--- a/packages/components/src/slot-fill/test/slot.js
++++ b/packages/components/src/slot-fill/test/slot.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { render, fireEvent, screen } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
+ 
+ /**
+  * Internal dependencies
+@@ -92,9 +93,9 @@ describe( 'Slot', () => {
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ 
+-	it( 'calls the functions passed as the Slot’s fillProps in the Fill', () => {
++	it( 'calls the functions passed as the Slot’s fillProps in the Fill', async () => {
+ 		const onClose = jest.fn();
+-
++		const user = userEvent.setup();
+ 		render(
+ 			<Provider>
+ 				<Slot name="chicken" fillProps={ { onClose } } />
+@@ -108,7 +109,7 @@ describe( 'Slot', () => {
+ 			</Provider>
+ 		);
+ 
+-		fireEvent.click( screen.getByText( 'Click me' ) );
++		await user.click( screen.getByText( 'Click me' ) );
+ 
+ 		expect( onClose ).toHaveBeenCalledTimes( 1 );
+ 	} );
+@@ -149,7 +150,8 @@ describe( 'Slot', () => {
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ 
+-	it( 'should re-render Slot when not bubbling virtually', () => {
++	it( 'should re-render Slot when not bubbling virtually', async () => {
++		const user = userEvent.setup();
+ 		const { container } = render(
+ 			<Provider>
+ 				<div>
+@@ -161,7 +163,7 @@ describe( 'Slot', () => {
+ 
+ 		expect( container ).toMatchSnapshot();
+ 
+-		fireEvent.click( screen.getByRole( 'button' ) );
++		await user.click( screen.getByRole( 'button' ) );
+ 
+ 		expect( container ).toMatchSnapshot();
+ 	} );

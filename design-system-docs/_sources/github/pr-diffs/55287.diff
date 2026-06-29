@@ -1,0 +1,243 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 72edad0df4e10e..8dd8d4b552d9d8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
+ 
++### Experimental
++
++-   `Tabs`: Add `focusable` prop to the `Tabs.TabPanel` sub-component ([#55287](https://github.com/WordPress/gutenberg/pull/55287))
++
+ ### Enhancements
+ 
+ -   `ToggleGroupControl`: Add opt-in prop for 40px default size ([#55789](https://github.com/WordPress/gutenberg/pull/55789)).
+diff --git a/packages/components/src/tabs/README.md b/packages/components/src/tabs/README.md
+index 6907f385fda371..8fb4e0e73caec2 100644
+--- a/packages/components/src/tabs/README.md
++++ b/packages/components/src/tabs/README.md
+@@ -240,3 +240,10 @@ The class name to apply to the tabpanel.
+ Custom CSS styles for the tab.
+ 
+ - Required: No
++
++###### `focusable`: `boolean`
++
++Determines whether or not the tabpanel element should be focusable. If `false`, pressing the tab key will skip over the tabpanel, and instead focus on the first focusable element in the panel (if there is one).
++
++- Required: No
++- Default: `true`
+diff --git a/packages/components/src/tabs/stories/index.story.tsx b/packages/components/src/tabs/stories/index.story.tsx
+index 3b6ba022f6d91b..08e29589881707 100644
+--- a/packages/components/src/tabs/stories/index.story.tsx
++++ b/packages/components/src/tabs/stories/index.story.tsx
+@@ -42,8 +42,16 @@ const Template: StoryFn< typeof Tabs > = ( props ) => {
+ 			<Tabs.TabPanel id={ 'tab2' }>
+ 				<p>Selected tab: Tab 2</p>
+ 			</Tabs.TabPanel>
+-			<Tabs.TabPanel id={ 'tab3' }>
++			<Tabs.TabPanel id={ 'tab3' } focusable={ false }>
+ 				<p>Selected tab: Tab 3</p>
++				<p>
++					This tabpanel has its <code>focusable</code> prop set to
++					<code> false</code>, so it won&apos;t get a tab stop.
++					<br />
++					Instead, the [Tab] key will move focus to the first
++					focusable element within the panel.
++				</p>
++				<Button variant="primary">I&apos;m a button!</Button>
+ 			</Tabs.TabPanel>
+ 		</Tabs>
+ 	);
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index 091ba608fb6ecd..cb735f3177662a 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -101,3 +101,19 @@ export const Tab = styled( Ariakit.Tab )`
+ 		}
+ 	}
+ `;
++
++export const TabPanel = styled( Ariakit.TabPanel )`
++	&:focus {
++		box-shadow: none;
++		outline: none;
++	}
++
++	&:focus-visible {
++		border-radius: 2px;
++		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
++			${ COLORS.theme.accent };
++		// Windows high contrast mode.
++		outline: 2px solid transparent;
++		outline-offset: 0;
++	}
++`;
+diff --git a/packages/components/src/tabs/tabpanel.tsx b/packages/components/src/tabs/tabpanel.tsx
+index fb62fc91912331..b5339141a56eca 100644
+--- a/packages/components/src/tabs/tabpanel.tsx
++++ b/packages/components/src/tabs/tabpanel.tsx
+@@ -1,8 +1,6 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+-import * as Ariakit from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -14,12 +12,16 @@ import { forwardRef, useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { TabPanelProps } from './types';
++import { TabPanel as StyledTabPanel } from './styles';
+ 
+ import warning from '@wordpress/warning';
+ import { TabsContext } from './context';
+ 
+ export const TabPanel = forwardRef< HTMLDivElement, TabPanelProps >(
+-	function TabPanel( { children, id, className, style }, ref ) {
++	function TabPanel(
++		{ children, id, className, style, focusable = true },
++		ref
++	) {
+ 		const context = useContext( TabsContext );
+ 		if ( ! context ) {
+ 			warning( '`Tabs.TabPanel` must be wrapped in a `Tabs` component.' );
+@@ -28,7 +30,8 @@ export const TabPanel = forwardRef< HTMLDivElement, TabPanelProps >(
+ 		const { store, instanceId } = context;
+ 
+ 		return (
+-			<Ariakit.TabPanel
++			<StyledTabPanel
++				focusable={ focusable }
+ 				ref={ ref }
+ 				style={ style }
+ 				store={ store }
+@@ -36,7 +39,7 @@ export const TabPanel = forwardRef< HTMLDivElement, TabPanelProps >(
+ 				className={ className }
+ 			>
+ 				{ children }
+-			</Ariakit.TabPanel>
++			</StyledTabPanel>
+ 		);
+ 	}
+ );
+diff --git a/packages/components/src/tabs/test/index.tsx b/packages/components/src/tabs/test/index.tsx
+index a89e680e244d8c..67b7bf588e74e8 100644
+--- a/packages/components/src/tabs/test/index.tsx
++++ b/packages/components/src/tabs/test/index.tsx
+@@ -26,6 +26,9 @@ type Tab = {
+ 		icon?: IconType;
+ 		disabled?: boolean;
+ 	};
++	tabpanel?: {
++		focusable?: boolean;
++	};
+ };
+ 
+ const TABS: Tab[] = [
+@@ -83,7 +86,11 @@ const UncontrolledTabs = ( {
+ 				) ) }
+ 			</Tabs.TabList>
+ 			{ tabs.map( ( tabObj ) => (
+-				<Tabs.TabPanel key={ tabObj.id } id={ tabObj.id }>
++				<Tabs.TabPanel
++					key={ tabObj.id }
++					id={ tabObj.id }
++					focusable={ tabObj.tabpanel?.focusable }
++				>
+ 					{ tabObj.content }
+ 				</Tabs.TabPanel>
+ 			) ) }
+@@ -184,6 +191,63 @@ describe( 'Tabs', () => {
+ 			);
+ 		} );
+ 	} );
++	describe( 'Focus Behavior', () => {
++		it( 'should focus on the related TabPanel when pressing the Tab key', async () => {
++			const user = userEvent.setup();
++
++			render( <UncontrolledTabs tabs={ TABS } /> );
++
++			const selectedTabPanel = await screen.findByRole( 'tabpanel' );
++
++			// Tab should initially focus the first tab in the tablist, which
++			// is Alpha.
++			await user.keyboard( '[Tab]' );
++			expect(
++				await screen.findByRole( 'tab', { name: 'Alpha' } )
++			).toHaveFocus();
++
++			// By default the tabpanel should receive focus
++			await user.keyboard( '[Tab]' );
++			expect( selectedTabPanel ).toHaveFocus();
++		} );
++		it( 'should not focus on the related TabPanel when pressing the Tab key if `focusable: false` is set', async () => {
++			const user = userEvent.setup();
++
++			const TABS_WITH_ALPHA_FOCUSABLE_FALSE = TABS.map( ( tabObj ) =>
++				tabObj.id === 'alpha'
++					? {
++							...tabObj,
++							content: (
++								<>
++									Selected Tab: Alpha
++									<button>Alpha Button</button>
++								</>
++							),
++							tabpanel: { focusable: false },
++					  }
++					: tabObj
++			);
++
++			render(
++				<UncontrolledTabs tabs={ TABS_WITH_ALPHA_FOCUSABLE_FALSE } />
++			);
++
++			const alphaButton = await screen.findByRole( 'button', {
++				name: /alpha button/i,
++			} );
++
++			// Tab should initially focus the first tab in the tablist, which
++			// is Alpha.
++			await user.keyboard( '[Tab]' );
++			expect(
++				await screen.findByRole( 'tab', { name: 'Alpha' } )
++			).toHaveFocus();
++			// Because the alpha tabpanel is set to `focusable: false`, pressing
++			// the Tab key should focus the button, not the tabpanel
++			await user.keyboard( '[Tab]' );
++			expect( alphaButton ).toHaveFocus();
++		} );
++	} );
+ 
+ 	describe( 'Tab Attributes', () => {
+ 		it( "should apply the tab's `className` to the tab button", async () => {
+diff --git a/packages/components/src/tabs/types.ts b/packages/components/src/tabs/types.ts
+index 88e25eb5a3863c..9874fe6cb6ccfa 100644
+--- a/packages/components/src/tabs/types.ts
++++ b/packages/components/src/tabs/types.ts
+@@ -128,7 +128,7 @@ export type TabPanelProps = {
+ 	 */
+ 	children?: React.ReactNode;
+ 	/**
+-	 * A unique identifier for the TabPanel, which is used to generate a unique `id` for the underlying element.
++	 * A unique identifier for the tabpanel, which is used to generate a unique `id` for the underlying element.
+ 	 */
+ 	id: string;
+ 	/**
+@@ -139,4 +139,12 @@ export type TabPanelProps = {
+ 	 * Custom CSS styles for the rendered `TabPanel` component.
+ 	 */
+ 	style?: React.CSSProperties;
++	/**
++	 * Determines whether or not the tabpanel element should be focusable.
++	 * If `false`, pressing the tab key will skip over the tabpanel, and instead
++	 * focus on the first focusable element in the panel (if there is one).
++	 *
++	 * @default true
++	 */
++	focusable?: boolean;
+ };

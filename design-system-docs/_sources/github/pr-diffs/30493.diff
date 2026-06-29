@@ -1,0 +1,69 @@
+diff --git a/packages/components/src/color-palette/README.md b/packages/components/src/color-palette/README.md
+index 83fac83707aec6..2f0722dea29592 100644
+--- a/packages/components/src/color-palette/README.md
++++ b/packages/components/src/color-palette/README.md
+@@ -50,6 +50,16 @@ Whether the palette should have a clearing button or not.
+ - Required: No
+ - Default: true
+ 
++### disableAlpha
++
++Whether the custom color picker allows the selection of alpha values. Only relevant, when
++`disableCustomColors` is false. If alpha is enabled, the returned color format will be rgba
++instead of hex.
++
++- Type: `Boolean`
++- Required: No
++- Default: true
++
+ 
+ ## Usage
+ ```jsx
+diff --git a/packages/components/src/color-palette/index.js b/packages/components/src/color-palette/index.js
+index 6f8dc6181ee03d..6058c26a899455 100644
+--- a/packages/components/src/color-palette/index.js
++++ b/packages/components/src/color-palette/index.js
+@@ -23,6 +23,7 @@ export default function ColorPalette( {
+ 	disableCustomColors = false,
+ 	onChange,
+ 	value,
++	disableAlpha = true,
+ } ) {
+ 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
+ 	const colorOptions = useMemo( () => {
+@@ -61,8 +62,12 @@ export default function ColorPalette( {
+ 	const renderCustomColorPicker = () => (
+ 		<ColorPicker
+ 			color={ value }
+-			onChangeComplete={ ( color ) => onChange( color.hex ) }
+-			disableAlpha
++			onChangeComplete={ ( color ) =>
++				disableAlpha
++					? onChange( color.hex )
++					: onChange( tinycolor( color.rgb ).toRgbString() )
++			}
++			disableAlpha={ disableAlpha }
+ 		/>
+ 	);
+ 
+diff --git a/packages/components/src/color-palette/stories/index.js b/packages/components/src/color-palette/stories/index.js
+index 11096ce9ae67cf..d997270f3884ad 100644
+--- a/packages/components/src/color-palette/stories/index.js
++++ b/packages/components/src/color-palette/stories/index.js
+@@ -39,3 +39,16 @@ export const withKnobs = () => {
+ 
+ 	return <ColorPaletteWithState colors={ colors } />;
+ };
++
++export const alphaEnabled = () => {
++	const colors = [
++		object( 'Red', { name: 'red transparent', color: '#f00a' } ),
++		object( 'White', { name: 'white transparent', color: '#fff9' } ),
++		object( 'Blue', {
++			name: 'blue transparent',
++			color: 'rgba(0, 0, 255, 0.5)',
++		} ),
++	];
++
++	return <ColorPaletteWithState colors={ colors } disableAlpha={ false } />;
++};

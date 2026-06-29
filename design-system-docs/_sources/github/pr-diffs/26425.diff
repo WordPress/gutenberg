@@ -1,0 +1,40 @@
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.js
+index a5b3f8eb8bd2e2..32d1b9853a6c2a 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.js
+@@ -40,6 +40,7 @@ export function Button( props, ref ) {
+ 		shortcut,
+ 		label,
+ 		children,
++		text,
+ 		__experimentalIsFocusable: isFocusable,
+ 		...additionalProps
+ 	} = props;
+@@ -111,6 +112,7 @@ export function Button( props, ref ) {
+ 			ref={ ref }
+ 		>
+ 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
++			{ text && <>{ text }</> }
+ 			{ children }
+ 		</Tag>
+ 	);
+diff --git a/packages/components/src/dropdown-menu/index.js b/packages/components/src/dropdown-menu/index.js
+index 2525939403799d..c6e4c69436e18f 100644
+--- a/packages/components/src/dropdown-menu/index.js
++++ b/packages/components/src/dropdown-menu/index.js
+@@ -43,6 +43,7 @@ function DropdownMenu( {
+ 	toggleProps,
+ 	menuProps,
+ 	disableOpenOnArrowDown = false,
++	text,
+ 	// The following props exist for backward compatibility.
+ 	menuLabel,
+ 	position,
+@@ -129,6 +130,7 @@ function DropdownMenu( {
+ 						aria-haspopup="true"
+ 						aria-expanded={ isOpen }
+ 						label={ label }
++						text={ text }
+ 						showTooltip={ toggleProps?.showTooltip ?? true }
+ 					>
+ 						{ mergedToggleProps.children }

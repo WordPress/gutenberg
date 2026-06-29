@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/custom-select-control/style.scss b/packages/components/src/custom-select-control/style.scss
+index 7fd5bcc382821a..0d1b072308c87c 100644
+--- a/packages/components/src/custom-select-control/style.scss
++++ b/packages/components/src/custom-select-control/style.scss
+@@ -43,6 +43,7 @@
+ 
+ .components-custom-select-control__item {
+ 	align-items: center;
++	cursor: default;
+ 	display: flex;
+ 	list-style-type: none;
+ 	padding: 10px 5px 10px 25px;

@@ -1,0 +1,92 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 35815549e280b8..a05d72d4cbbcea 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `SearchControl`: Move search icon to prefix position ([#71984](https://github.com/WordPress/gutenberg/pull/71984)).
+ -   `SearchControl`: Flip search icon depending on placement ([#72070](https://github.com/WordPress/gutenberg/pull/72070)).
+ -   `SearchControl`: Normalize styles ([#72072](https://github.com/WordPress/gutenberg/pull/72072)).
++-   `Badge`: Avoid propagating text-decoration styles from ancestors into the component ([#72097](https://github.com/WordPress/gutenberg/pull/72097)).
+ -   `CheckboxControl`, `RadioControl`, `ToggleControl` (`FormToggle`): Ensure elements are focused when clicked in Safari ([#72115](https://github.com/WordPress/gutenberg/pull/72115)).
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/badge/index.tsx b/packages/components/src/badge/index.tsx
+index e57be66db0a7aa..33e03141da8c14 100644
+--- a/packages/components/src/badge/index.tsx
++++ b/packages/components/src/badge/index.tsx
+@@ -52,15 +52,17 @@ function Badge( {
+ 			} ) }
+ 			{ ...props }
+ 		>
+-			{ hasIcon && (
+-				<Icon
+-					icon={ icon }
+-					size={ 16 }
+-					fill="currentColor"
+-					className="components-badge__icon"
+-				/>
+-			) }
+-			<span className="components-badge__content">{ children }</span>
++			<span className="components-badge__flex-wrapper">
++				{ hasIcon && (
++					<Icon
++						icon={ icon }
++						size={ 16 }
++						fill="currentColor"
++						className="components-badge__icon"
++					/>
++				) }
++				<span className="components-badge__content">{ children }</span>
++			</span>
+ 		</span>
+ 	);
+ }
+diff --git a/packages/components/src/badge/styles.scss b/packages/components/src/badge/styles.scss
+index dca148dbdb30a8..7ea31ed1ad4fd9 100644
+--- a/packages/components/src/badge/styles.scss
++++ b/packages/components/src/badge/styles.scss
+@@ -14,16 +14,9 @@ $badge-colors: (
+ 
+ 	background-color: color-mix(in srgb, $white 90%, var(--base-color));
+ 	color: color-mix(in srgb, $black 50%, var(--base-color));
+-	padding: 0 $grid-unit-10;
++	padding: 2px $grid-unit-10;
+ 	min-height: $grid-unit-30;
+-	max-width: 100%;
+ 	border-radius: $radius-small;
+-	font-size: $font-size-small;
+-	font-weight: 400;
+-	line-height: $font-line-height-small;
+-	display: inline-flex;
+-	align-items: center;
+-	gap: 2px;
+ 
+ 	&:where(.is-default) {
+ 		background-color: $gray-100;
+@@ -42,6 +35,16 @@ $badge-colors: (
+ 	}
+ }
+ 
++.components-badge__flex-wrapper {
++	display: inline-flex;
++	align-items: center;
++	gap: 2px;
++	max-width: 100%;
++	font-size: $font-size-small;
++	font-weight: 400;
++	line-height: $font-line-height-small;
++}
++
+ .components-badge__icon {
+ 	flex-shrink: 0;
+ }
+diff --git a/packages/fields/src/fields/title/style.scss b/packages/fields/src/fields/title/style.scss
+index 5b9977dcaa398c..73eb759db52df8 100644
+--- a/packages/fields/src/fields/title/style.scss
++++ b/packages/fields/src/fields/title/style.scss
+@@ -1,4 +1,4 @@
+-.fields-field__title span:first-child {
++.fields-field__title > span:first-child {
+ 	text-overflow: ellipsis;
+ 	overflow: hidden;
+ 	text-decoration: none;

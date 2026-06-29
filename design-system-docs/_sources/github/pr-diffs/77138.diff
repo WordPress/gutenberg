@@ -1,0 +1,89 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index df0f930314364a..c9f52d189914cb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `CheckboxControl`: Fix disabled styles [#77132](https://github.com/WordPress/gutenberg/pull/77132).
+ -   `FormTokenField`: Fix disabled styles. [#77137](https://github.com/WordPress/gutenberg/pull/77137)
+ -   `Textarea`: Fix disabled styles [#77129](https://github.com/WordPress/gutenberg/pull/77129).
++-   `DateCalendar`: Fix disabled selected day having darker background than other disabled controls [#77138](https://github.com/WordPress/gutenberg/pull/77138).
+ -   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).
+ -   `ValidatedRangeControl`: Fix `aria-label` rendered as `[object Object]` when `required` or `markWhenOptional` is set ([#77042](https://github.com/WordPress/gutenberg/pull/77042)).
+ -   `Autocomplete`: Fix matching logic to prefer longest overlapping trigger ([#77018](https://github.com/WordPress/gutenberg/pull/77018)).
+diff --git a/packages/components/src/calendar/style.scss b/packages/components/src/calendar/style.scss
+index e4d46a4494dcdf..237869a07a182f 100644
+--- a/packages/components/src/calendar/style.scss
++++ b/packages/components/src/calendar/style.scss
+@@ -244,7 +244,7 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
+ 		}
+ 
+ 		&:disabled::before {
+-			background-color: $components-color-disabled;
++			background-color: $components-color-gray-400;
+ 		}
+ 
+ 		&:hover:not(:disabled)::before {
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 1c86e83b55382b..b6f6c571d2f45a 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Bug Fixes
+ 
++- DataForm: Fix disabled state for date(time) control. [#77138](https://github.com/WordPress/gutenberg/pull/77138)
+ - DataViews: Fix `compact` density clipping and remove top/bottom padding. [#77054](https://github.com/WordPress/gutenberg/pull/77054)
+ - DataForm: Remove `text-transform` from `panel` field labels. [#77196](https://github.com/WordPress/gutenberg/pull/77196)
+ 
+diff --git a/packages/dataviews/src/components/dataform-controls/date.tsx b/packages/dataviews/src/components/dataform-controls/date.tsx
+index 5fc114e115cd99..da1a2a15fc596b 100644
+--- a/packages/dataviews/src/components/dataform-controls/date.tsx
++++ b/packages/dataviews/src/components/dataform-controls/date.tsx
+@@ -454,6 +454,7 @@ function CalendarDateControl< Item >( {
+ 						timeZone={ timezoneString || undefined }
+ 						weekStartsOn={ weekStartsOn }
+ 						disabled={ disabled }
++						disableNavigation={ disabled }
+ 					/>
+ 				</Stack>
+ 			</BaseControl>
+diff --git a/packages/dataviews/src/dataform/stories/layout-regular.tsx b/packages/dataviews/src/dataform/stories/layout-regular.tsx
+index d8c5a43aa8e151..8c3ae1fdb5e5da 100644
+--- a/packages/dataviews/src/dataform/stories/layout-regular.tsx
++++ b/packages/dataviews/src/dataform/stories/layout-regular.tsx
+@@ -55,11 +55,16 @@ const fields: Field< SamplePost >[] = [
+ 	{
+ 		id: 'date',
+ 		label: 'Date',
++		type: 'date',
++	},
++	{
++		id: 'datetime',
++		label: 'DateTime',
+ 		type: 'datetime',
+ 	},
+ 	{
+ 		id: 'birthdate',
+-		label: 'Date as options',
++		label: 'DateTime as options',
+ 		type: 'datetime',
+ 		elements: [
+ 			{ value: '', label: 'Select a date' },
+@@ -324,7 +329,8 @@ const LayoutRegularComponent = ( {
+ 		status: 'draft',
+ 		reviewer: 'fulano',
+ 		email: 'hello@wordpress.org',
+-		date: '2021-01-01T12:00:00',
++		date: '2021-01-01',
++		datetime: '2021-01-01T12:00:00',
+ 		birthdate: '1950-02-23T12:00:00',
+ 		sticky: false,
+ 		can_comment: false,
+@@ -363,6 +369,7 @@ const LayoutRegularComponent = ( {
+ 				'email',
+ 				'password',
+ 				'date',
++				'datetime',
+ 				'birthdate',
+ 				'filesize',
+ 				'dimensions',

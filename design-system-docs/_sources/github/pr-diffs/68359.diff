@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/badge/README.md b/packages/components/src/badge/README.md
+index 892f6e2eb741c7..2100939684a856 100644
+--- a/packages/components/src/badge/README.md
++++ b/packages/components/src/badge/README.md
+@@ -4,7 +4,6 @@
+ 
+ 🔒 This component is locked as a [private API](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/). We do not yet recommend using this outside of the Gutenberg project.
+ 
+-
+ <p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-badge--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
+ 
+ ## Props

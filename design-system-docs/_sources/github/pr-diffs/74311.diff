@@ -1,0 +1,194 @@
+diff --git a/package-lock.json b/package-lock.json
+index 30e599e7cb8b93..e6e16fe8bc6f24 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -55066,6 +55066,8 @@
+ 				"@base-ui/react": "^1.0.0",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/i18n": "file:../i18n",
++				"@wordpress/icons": "file:../icons",
++				"@wordpress/primitives": "file:../primitives",
+ 				"clsx": "^2.1.1"
+ 			},
+ 			"devDependencies": {
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index f2661fe7cc9501..83ecb00c00d66f 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -12,3 +12,4 @@
+ -   Add `VisuallyHidden` component ([#74189](https://github.com/WordPress/gutenberg/pull/74189)).
+ -   Add `Field` primitives ([#74190](https://github.com/WordPress/gutenberg/pull/74190)).
+ -   Add `Fieldset` primitives ([#74296](https://github.com/WordPress/gutenberg/pull/74296)).
++-   Add `Icon` component ([#74311](https://github.com/WordPress/gutenberg/pull/74311)).
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 24fadef64633aa..cf263c3c215cb2 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -46,6 +46,8 @@
+ 		"@base-ui/react": "^1.0.0",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/i18n": "file:../i18n",
++		"@wordpress/icons": "file:../icons",
++		"@wordpress/primitives": "file:../primitives",
+ 		"clsx": "^2.1.1"
+ 	},
+ 	"devDependencies": {
+diff --git a/packages/ui/src/icon/icon.tsx b/packages/ui/src/icon/icon.tsx
+new file mode 100644
+index 00000000000000..f426851c7e093e
+--- /dev/null
++++ b/packages/ui/src/icon/icon.tsx
+@@ -0,0 +1,30 @@
++import { forwardRef } from '@wordpress/element';
++import { SVG } from '@wordpress/primitives';
++import type { IconProps } from './types';
++
++/**
++ * Renders an SVG icon with a 24px default size.
++ *
++ * If no `fill` colors are explicitly set on the icon itself, it will be rendered with a `currentColor` fill.
++ *
++ * ```jsx
++ * import { wordpress } from '@wordpress/icons';
++ *
++ * <Icon icon={ wordpress } />
++ * ```
++ */
++export const Icon = forwardRef< SVGSVGElement, IconProps >( function Icon(
++	{ icon, size = 24, ...restProps },
++	ref
++) {
++	return (
++		<SVG
++			ref={ ref }
++			fill="currentColor"
++			{ ...icon.props }
++			{ ...restProps }
++			width={ size }
++			height={ size }
++		/>
++	);
++} );
+diff --git a/packages/ui/src/icon/index.ts b/packages/ui/src/icon/index.ts
+new file mode 100644
+index 00000000000000..127303e617be44
+--- /dev/null
++++ b/packages/ui/src/icon/index.ts
+@@ -0,0 +1 @@
++export { Icon } from './icon';
+diff --git a/packages/ui/src/icon/stories/index.story.tsx b/packages/ui/src/icon/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..c0b504ec05b8d1
+--- /dev/null
++++ b/packages/ui/src/icon/stories/index.story.tsx
+@@ -0,0 +1,47 @@
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
++import { wordpress } from '@wordpress/icons';
++import { Icon } from '../index';
++
++const meta: Meta< typeof Icon > = {
++	title: 'Design System/Components/Icon',
++	component: Icon,
++	decorators: [
++		( Story ) => {
++			return (
++				<div
++					style={ {
++						color: 'var( --wpds-color-fg-content-neutral )',
++					} }
++				>
++					<Story />
++				</div>
++			);
++		},
++	],
++};
++export default meta;
++
++type Story = StoryObj< typeof Icon >;
++
++export const Default: Story = {
++	args: {
++		icon: wordpress,
++	},
++};
++
++/**
++ * Explicit `fill` colors in the icon will be preserved.
++ */
++export const WithIntrinsicFillColor: Story = {
++	args: {
++		icon: (
++			<svg
++				xmlns="http://www.w3.org/2000/svg"
++				viewBox="0 0 24 24"
++				fill="blue"
++			>
++				<rect x="0" y="0" width="24" height="24" />
++			</svg>
++		),
++	},
++};
+diff --git a/packages/ui/src/icon/test/icon.test.tsx b/packages/ui/src/icon/test/icon.test.tsx
+new file mode 100644
+index 00000000000000..f12c4c7c55821a
+--- /dev/null
++++ b/packages/ui/src/icon/test/icon.test.tsx
+@@ -0,0 +1,13 @@
++import { render } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import { Icon } from '../index';
++
++describe( 'Icon', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< SVGSVGElement >();
++
++		render( <Icon ref={ ref } icon={ <svg /> } /> );
++
++		expect( ref.current ).toBeInstanceOf( SVGSVGElement );
++	} );
++} );
+diff --git a/packages/ui/src/icon/types.ts b/packages/ui/src/icon/types.ts
+new file mode 100644
+index 00000000000000..aeeff6924e547e
+--- /dev/null
++++ b/packages/ui/src/icon/types.ts
+@@ -0,0 +1,14 @@
++export type IconProps = React.ComponentProps< 'svg' > & {
++	/**
++	 * The icon to render, which must be an svg element or an `SVG` from `@wordpress/primitives`.
++	 *
++	 * In most cases, you should use an icon from
++	 * [the `@wordpress/icons` package](https://wordpress.github.io/gutenberg/?path=/story/icons-icon--library).
++	 */
++	icon: React.ReactElement< React.ComponentProps< 'svg' > >;
++	/**
++	 * The size (width and height) of the icon.
++	 * @default 24
++	 */
++	size?: number;
++};
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 61e9eace29381f..f293d9295b81f0 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -1,5 +1,6 @@
+ export * from './badge';
+ export * from './box';
+ export * from './form/primitives';
++export * from './icon';
+ export * from './stack';
+ export * from './visually-hidden';
+diff --git a/packages/ui/tsconfig.json b/packages/ui/tsconfig.json
+index b853d74120bdfa..4fd2cd6c5b8e0d 100644
+--- a/packages/ui/tsconfig.json
++++ b/packages/ui/tsconfig.json
+@@ -7,6 +7,8 @@
+ 	"references": [
+ 		{ "path": "../element" },
+ 		{ "path": "../i18n" },
++		{ "path": "../icons" },
++		{ "path": "../primitives" },
+ 		{ "path": "../theme" }
+ 	],
+ 	"exclude": []

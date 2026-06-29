@@ -1,0 +1,170 @@
+diff --git a/packages/block-library/src/heading/editor.scss b/packages/block-library/src/heading/editor.scss
+index a1af2ba3702442..f70daaf4d3e652 100644
+--- a/packages/block-library/src/heading/editor.scss
++++ b/packages/block-library/src/heading/editor.scss
+@@ -1,20 +1,8 @@
+ // Remove padding in heading level control popover since the toolbar buttons already have padding.
+ .block-library-heading-level-dropdown .components-popover__content {
+-	// TODO: Find a less hardcoded way of doing this. `max-content` works on
+-	// Chromium, but it results in a scrollbar on Safari, and isn't supported
+-	// at all in IE11.
+-	min-width: 230px;
++	min-width: auto;
+ 
+ 	> div {
+ 		padding: 0;
+ 	}
+ }
+-
+-// The dropdown already has a border, so we can remove the one on the heading
+-// level toolbar.
+-.block-library-heading-level-toolbar {
+-	border: none;
+-	.components-toolbar-group {
+-		flex-wrap: nowrap;
+-	}
+-}
+diff --git a/packages/block-library/src/heading/heading-level-dropdown.js b/packages/block-library/src/heading/heading-level-dropdown.js
+index 84d00181b71297..592787b5fa9ddc 100644
+--- a/packages/block-library/src/heading/heading-level-dropdown.js
++++ b/packages/block-library/src/heading/heading-level-dropdown.js
+@@ -1,14 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	Dropdown,
+-	Toolbar,
+-	ToolbarButton,
+-	ToolbarGroup,
+-} from '@wordpress/components';
++import { ToolbarDropdownMenu } from '@wordpress/components';
+ import { __, sprintf } from '@wordpress/i18n';
+-import { DOWN } from '@wordpress/keycodes';
+ 
+ /**
+  * Internal dependencies
+@@ -19,7 +13,6 @@ const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
+ 
+ const POPOVER_PROPS = {
+ 	className: 'block-library-heading-level-dropdown',
+-	isAlternate: true,
+ };
+ 
+ /** @typedef {import('@wordpress/element').WPComponent} WPComponent */
+@@ -43,58 +36,33 @@ const POPOVER_PROPS = {
+  */
+ export default function HeadingLevelDropdown( { selectedLevel, onChange } ) {
+ 	return (
+-		<Dropdown
++		<ToolbarDropdownMenu
+ 			popoverProps={ POPOVER_PROPS }
+-			renderToggle={ ( { onToggle, isOpen } ) => {
+-				const openOnArrowDown = ( event ) => {
+-					if ( ! isOpen && event.keyCode === DOWN ) {
+-						event.preventDefault();
+-						onToggle();
+-					}
+-				};
++			icon={ <HeadingLevelIcon level={ selectedLevel } /> }
++			label={ __( 'Change heading level' ) }
++			controls={ HEADING_LEVELS.map( ( targetLevel ) => {
++				{
++					const isActive = targetLevel === selectedLevel;
+ 
+-				return (
+-					<ToolbarButton
+-						aria-expanded={ isOpen }
+-						aria-haspopup="true"
+-						icon={ <HeadingLevelIcon level={ selectedLevel } /> }
+-						label={ __( 'Change heading level' ) }
+-						onClick={ onToggle }
+-						onKeyDown={ openOnArrowDown }
+-						showTooltip
+-					/>
+-				);
+-			} }
+-			renderContent={ () => (
+-				<Toolbar
+-					className="block-library-heading-level-toolbar"
+-					label={ __( 'Change heading level' ) }
+-				>
+-					<ToolbarGroup
+-						isCollapsed={ false }
+-						controls={ HEADING_LEVELS.map( ( targetLevel ) => {
+-							const isActive = targetLevel === selectedLevel;
+-							return {
+-								icon: (
+-									<HeadingLevelIcon
+-										level={ targetLevel }
+-										isPressed={ isActive }
+-									/>
+-								),
+-								title: sprintf(
+-									// translators: %s: heading level e.g: "1", "2", "3"
+-									__( 'Heading %d' ),
+-									targetLevel
+-								),
+-								isActive,
+-								onClick() {
+-									onChange( targetLevel );
+-								},
+-							};
+-						} ) }
+-					/>
+-				</Toolbar>
+-			) }
++					return {
++						icon: (
++							<HeadingLevelIcon
++								level={ targetLevel }
++								isPressed={ isActive }
++							/>
++						),
++						label: sprintf(
++							// translators: %s: heading level e.g: "1", "2", "3"
++							__( 'Heading %d' ),
++							targetLevel
++						),
++						isActive,
++						onClick() {
++							onChange( targetLevel );
++						},
++					};
++				}
++			} ) }
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/dropdown-menu/index.js b/packages/components/src/dropdown-menu/index.js
+index 9f734f31a317c0..f2ae27cd91e7d7 100644
+--- a/packages/components/src/dropdown-menu/index.js
++++ b/packages/components/src/dropdown-menu/index.js
+@@ -173,9 +173,11 @@ function DropdownMenu( {
+ 												indexOfSet > 0 &&
+ 												indexOfControl === 0,
+ 											'is-active': control.isActive,
++											'is-icon-only': ! control.title,
+ 										}
+ 									) }
+ 									icon={ control.icon }
++									label={ control.label }
+ 									aria-checked={
+ 										control.role === 'menuitemcheckbox' ||
+ 										control.role === 'menuitemradio'
+diff --git a/packages/components/src/dropdown-menu/style.scss b/packages/components/src/dropdown-menu/style.scss
+index 958ac9b5a3caeb..60e1a91270294f 100644
+--- a/packages/components/src/dropdown-menu/style.scss
++++ b/packages/components/src/dropdown-menu/style.scss
+@@ -44,6 +44,11 @@
+ 			width: $button-size-small;
+ 			height: $button-size-small;
+ 		}
++
++		// If menu items are icon-only, make them stretch only to the icon size.
++		&.is-icon-only {
++			width: auto;
++		}
+ 	}
+ 
+ 	.components-menu-item__button,

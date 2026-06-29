@@ -1,0 +1,108 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e2455048a61d82..4f17a60a696b0d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `Notice`: Remove margins from `Notice` component ([#54800](https://github.com/WordPress/gutenberg/pull/54800)).
+ -   Allow using CSS level 4 viewport-relative units ([54415](https://github.com/WordPress/gutenberg/pull/54415))
+ -   `ToolsPanel`: do not apply the `className` to prop to `ToolsPanelItem` components when rendered as placeholders ([#55207](https://github.com/WordPress/gutenberg/pull/55207)).
++-   `GradientPicker`: remove overflow styles and padding from `ColorPicker` popovers ([#55265](https://github.com/WordPress/gutenberg/pull/55265)).
+ -   `ColorPalette`/`ToggleGroupControl/ToggleGroupControlOptionBase`: add `type="button"` attribute to native `<button>`s ([#55125](https://github.com/WordPress/gutenberg/pull/55125)).
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+index 291776b91f2ff1..1c64dea91e9f20 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+@@ -42,6 +42,7 @@ import type {
+ 	InsertPointProps,
+ } from '../types';
+ import type { CustomColorPickerDropdownProps } from '../../color-palette/types';
++import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
+ 
+ function ControlPointButton( {
+ 	isOpen,
+@@ -93,6 +94,10 @@ function GradientColorPickerDropdown( {
+ 			( {
+ 				placement: 'bottom',
+ 				offset: 8,
++				// Disabling resize as it would otherwise cause the popover to show
++				// scrollbars while dragging the color picker's handle close to the
++				// popover edge.
++				resize: false,
+ 			} ) as const,
+ 		[]
+ 	);
+@@ -271,7 +276,7 @@ function ControlPoints( {
+ 								/>
+ 							) }
+ 							renderContent={ ( { onClose } ) => (
+-								<>
++								<DropdownContentWrapper paddingSize="none">
+ 									<ColorPicker
+ 										enableAlpha={ ! disableAlpha }
+ 										color={ point.color }
+@@ -311,7 +316,7 @@ function ControlPoints( {
+ 												</Button>
+ 											</HStack>
+ 										) }
+-								</>
++								</DropdownContentWrapper>
+ 							) }
+ 							style={ {
+ 								left: `${ point.position }%`,
+@@ -360,29 +365,31 @@ function InsertPoint( {
+ 				/>
+ 			) }
+ 			renderContent={ () => (
+-				<ColorPicker
+-					enableAlpha={ ! disableAlpha }
+-					onChange={ ( color ) => {
+-						if ( ! alreadyInsertedPoint ) {
+-							onChange(
+-								addControlPoint(
+-									controlPoints,
+-									insertPosition,
+-									colord( color ).toRgbString()
+-								)
+-							);
+-							setAlreadyInsertedPoint( true );
+-						} else {
+-							onChange(
+-								updateControlPointColorByPosition(
+-									controlPoints,
+-									insertPosition,
+-									colord( color ).toRgbString()
+-								)
+-							);
+-						}
+-					} }
+-				/>
++				<DropdownContentWrapper paddingSize="none">
++					<ColorPicker
++						enableAlpha={ ! disableAlpha }
++						onChange={ ( color ) => {
++							if ( ! alreadyInsertedPoint ) {
++								onChange(
++									addControlPoint(
++										controlPoints,
++										insertPosition,
++										colord( color ).toRgbString()
++									)
++								);
++								setAlreadyInsertedPoint( true );
++							} else {
++								onChange(
++									updateControlPointColorByPosition(
++										controlPoints,
++										insertPosition,
++										colord( color ).toRgbString()
++									)
++								);
++							}
++						} }
++					/>
++				</DropdownContentWrapper>
+ 			) }
+ 			style={
+ 				insertPosition !== null

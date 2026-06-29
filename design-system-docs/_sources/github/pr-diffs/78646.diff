@@ -1,0 +1,266 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 691a5ad13d17a5..e8de9e0b5d5410 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -99,6 +99,7 @@
+ 
+ ### Enhancements
+ 
++-   `Button`: Align focus rings with the design system ([#78646](https://github.com/WordPress/gutenberg/pull/78646)).
+ -   `Tooltip`: Mark as not recommended for use in a WordPress environment, in favour of `Tooltip` from `@wordpress/ui` ([#78693](https://github.com/WordPress/gutenberg/pull/78693)).
+ -   `Tabs`, `TabPanel`: Align selected tab colors and indicators with `@wordpress/ui` `Tabs` ([#78418](https://github.com/WordPress/gutenberg/pull/78418)).
+ -   `NoticeList`: Add vertical spacing between notices in a list.
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 302f36f68cccce..5e21b38a10e9b0 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -1,5 +1,6 @@
+ @use "sass:color";
+ @use "@wordpress/base-styles/colors" as *;
++@use "@wordpress/base-styles/mixins";
+ @use "@wordpress/base-styles/variables" as *;
+ @use "../utils/theme-variables" as *;
+ 
+@@ -11,6 +12,10 @@
+  */
+ 
+ .components-button {
++	&:focus:not(:active) {
++		@include mixins.outset-ring__focus();
++	}
++
+ 	display: inline-flex;
+ 	text-decoration: none;
+ 	font-family: inherit;
+@@ -21,11 +26,6 @@
+ 	cursor: var(--wpds-cursor-control);
+ 	appearance: none;
+ 	background: none;
+-
+-	@media not ( prefers-reduced-motion ) {
+-		transition: box-shadow 0.1s linear;
+-	}
+-
+ 	height: $button-size;
+ 	align-items: center;
+ 	box-sizing: border-box;
+@@ -42,12 +42,6 @@
+ 		color: $components-color-accent;
+ 	}
+ 
+-	// Focus.
+-	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
+-	&:focus:not(:active) {
+-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+-	}
+-
+ 	/**
+ 	 * Primary button style.
+ 	 */
+@@ -59,9 +53,6 @@
+ 		text-decoration: none;
+ 		text-shadow: none;
+ 
+-		// Show the boundary of the button, in High Contrast Mode.
+-		outline: 1px solid transparent;
+-
+ 		&:hover:not(:disabled) {
+ 			background: $components-color-accent-darker-10;
+ 			color: $components-color-accent-inverted;
+@@ -69,28 +60,21 @@
+ 
+ 		&:active:not(:disabled) {
+ 			background: $components-color-accent-darker-20;
+-			border-color: $components-color-accent-darker-20;
+ 			color: $components-color-accent-inverted;
+ 		}
+ 
+-		&:focus:not(:active) {
+-			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+-		}
+-
+ 		&:disabled,
+ 		&:disabled:active:enabled,
+ 		&[aria-disabled="true"],
+ 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
+ 		&[aria-disabled="true"]:active:enabled {
++			&:focus:enabled {
++				@include mixins.outset-ring__focus();
++			}
++
+ 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+ 			color: rgba($white, 0.4);
+ 			background: $components-color-accent;
+-			border-color: $components-color-accent;
+-			outline: none;
+-
+-			&:focus:enabled {
+-				box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+-			}
+ 		}
+ 
+ 		&.is-busy,
+@@ -107,7 +91,10 @@
+ 				$components-color-accent 70%
+ 			);
+ 			/* stylelint-enable */
+-			border-color: $components-color-accent;
++		}
++
++		@media (forced-colors: active) {
++			outline: 1px solid ButtonText;
+ 		}
+ 	}
+ 
+@@ -117,9 +104,6 @@
+ 
+ 	&.is-secondary,
+ 	&.is-tertiary {
+-		// Show the boundary of the button, in High Contrast Mode.
+-		outline: 1px solid transparent;
+-
+ 		&:active:not(:disabled) {
+ 			box-shadow: none;
+ 		}
+@@ -131,6 +115,10 @@
+ 			background: transparent;
+ 			transform: none;
+ 		}
++
++		@media (forced-colors: active) {
++			outline: 1px solid ButtonText;
++		}
+ 	}
+ 
+ 	/**
+@@ -138,14 +126,22 @@
+ 	 */
+ 
+ 	&.is-secondary {
+-		box-shadow: inset 0 0 0 $border-width $components-color-accent, 0 0 0 currentColor;
+-		outline: 1px solid transparent; // Shown in high contrast mode.
++		@media not ( prefers-reduced-motion ) {
++			transition:
++				box-shadow 0.1s linear,
++				background 0.1s linear,
++				color 0.1s linear;
++		}
++
++		box-shadow:
++			inset 0 0 0 $border-width var(--wpds-color-stroke-interactive-brand),
++			0 0 0 currentColor;
+ 		white-space: nowrap;
+ 		color: $components-color-accent;
+ 		background: transparent;
+ 
+ 		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
+-			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-20;
++			box-shadow: inset 0 0 0 $border-width var(--wpds-color-stroke-interactive-brand-active);
+ 			color: $components-color-accent-darker-20;
+ 			background: color-mix(in srgb, $components-color-accent 4%, transparent);
+ 		}
+@@ -156,8 +152,9 @@
+ 			box-shadow: inset 0 0 0 $border-width var(--wpds-color-stroke-interactive-neutral-disabled);
+ 		}
+ 
+-		&:focus:not(:active) {
+-			box-shadow: 0 0 0 currentColor inset, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
++		@media (forced-colors: active) {
++			// Inset box-shadow borders are not reliable in forced-colors mode.
++			box-shadow: none;
+ 		}
+ 	}
+ 
+@@ -183,15 +180,6 @@
+ 		p + & {
+ 			margin-left: -($grid-unit-15 * 0.5);
+ 		}
+-
+-		&:disabled,
+-		&[aria-disabled="true"],
+-		&[aria-disabled="true"]:hover {
+-			&:not(:focus) {
+-				box-shadow: none;
+-				outline: none;
+-			}
+-		}
+ 	}
+ 
+ 	/**
+@@ -210,10 +198,6 @@
+ 				color: color.adjust($alert-red, $lightness: -20%);
+ 			}
+ 
+-			&:focus:not(:active) {
+-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $alert-red;
+-			}
+-
+ 			&:active:not(:disabled, [aria-disabled="true"]) {
+ 				background: $gray-400;
+ 			}
+@@ -224,6 +208,16 @@
+ 			}
+ 		}
+ 
++		&.is-secondary {
++			box-shadow:
++				inset 0 0 0 $border-width $components-color-accent,
++				0 0 0 currentColor;
++
++			&:hover:not(:disabled, [aria-disabled="true"]) {
++				box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-20;
++			}
++		}
++
+ 		&.is-tertiary,
+ 		&.is-secondary {
+ 			&:hover:not(:disabled, [aria-disabled="true"]) {
+@@ -263,8 +257,9 @@
+ 
+ 		height: auto;
+ 
+-		&:focus {
++		&:focus:not(:active) {
+ 			border-radius: $radius-small;
++			text-decoration: none;
+ 		}
+ 
+ 		&:disabled,
+@@ -273,14 +268,6 @@
+ 		}
+ 	}
+ 
+-	// Windows High Contrast mode will show this outline, but not the box-shadow.
+-	// This rule is placed after variant outline declarations (e.g. is-primary,
+-	// is-secondary, is-tertiary) to ensure it wins by source order at the same
+-	// specificity, while not using `:not(:active)` to avoid outline flicker.
+-	&:focus {
+-		outline: 3px solid transparent;
+-	}
+-
+ 	&:not(:disabled, [aria-disabled="true"]):active {
+ 		color: $components-color-foreground;
+ 	}
+@@ -383,22 +370,6 @@
+ 			}
+ 		}
+ 
+-		&:focus:not(:active) {
+-			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+-		}
+-
+-		// Windows High Contrast mode will show this outline, but not the box-shadow.
+-		&:focus {
+-			outline: 2px solid transparent;
+-		}
+-	}
+-
+-	// Hide focus outline on :active to provide click feedback in forced-colors
+-	// mode, where box-shadow is not visible. Higher specificity (0,3,0)
+-	// ensures this wins over variant outline declarations. Placed after
+-	// .is-pressed to also win by source order at equal specificity (0,3,0).
+-	&:focus:active {
+-		outline: none;
+ 	}
+ 
+ 	svg {

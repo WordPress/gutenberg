@@ -1,0 +1,91 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6431a62038c269..05f08225788cce 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   `BorderControl`: Apply proper metrics and simpler text ([#53998](https://github.com/WordPress/gutenberg/pull/53998)).
+ -   `FormTokenField`: Update styling for consistency and increased visibility ([#54402](https://github.com/WordPress/gutenberg/pull/54402)).
+ -   `Tooltip`: Add new `hideOnClick` prop ([#54406](https://github.com/WordPress/gutenberg/pull/54406)).
++-   `DuotonePicker/ColorListPicker`: Adds appropriate labels to 'Duotone Filter' color pickers ([#54468](https://github.com/WordPress/gutenberg/pull/54468)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/duotone-picker/color-list-picker/index.tsx b/packages/components/src/duotone-picker/color-list-picker/index.tsx
+index 95ed02c639e632..bd009c5db1d7d4 100644
+--- a/packages/components/src/duotone-picker/color-list-picker/index.tsx
++++ b/packages/components/src/duotone-picker/color-list-picker/index.tsx
+@@ -3,6 +3,7 @@
+  */
+ import { useState } from '@wordpress/element';
+ import { swatch } from '@wordpress/icons';
++import { __ } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+@@ -13,6 +14,7 @@ import ColorIndicator from '../../color-indicator';
+ import Icon from '../../icon';
+ import { HStack } from '../../h-stack';
+ import type { ColorListPickerProps, ColorOptionProps } from './types';
++import { useInstanceId } from '@wordpress/compose';
+ 
+ function ColorOption( {
+ 	label,
+@@ -23,11 +25,17 @@ function ColorOption( {
+ 	onChange,
+ }: ColorOptionProps ) {
+ 	const [ isOpen, setIsOpen ] = useState( false );
++	const idRoot = useInstanceId( ColorOption, 'color-list-picker-option' );
++	const labelId = `${ idRoot }__label`;
++	const contentId = `${ idRoot }__content`;
++
+ 	return (
+ 		<>
+ 			<Button
+ 				className="components-color-list-picker__swatch-button"
+ 				onClick={ () => setIsOpen( ( prev ) => ! prev ) }
++				aria-expanded={ isOpen }
++				aria-controls={ contentId }
+ 			>
+ 				<HStack justify="flex-start" spacing={ 2 }>
+ 					{ value ? (
+@@ -38,20 +46,28 @@ function ColorOption( {
+ 					) : (
+ 						<Icon icon={ swatch } />
+ 					) }
+-					<span>{ label }</span>
++					<span id={ labelId }>{ label }</span>
+ 				</HStack>
+ 			</Button>
+-			{ isOpen && (
+-				<ColorPalette
+-					className="components-color-list-picker__color-picker"
+-					colors={ colors }
+-					value={ value }
+-					clearable={ false }
+-					onChange={ onChange }
+-					disableCustomColors={ disableCustomColors }
+-					enableAlpha={ enableAlpha }
+-				/>
+-			) }
++			<div
++				role="group"
++				id={ contentId }
++				aria-labelledby={ labelId }
++				aria-hidden={ ! isOpen }
++			>
++				{ isOpen && (
++					<ColorPalette
++						aria-label={ __( 'Color options' ) }
++						className="components-color-list-picker__color-picker"
++						colors={ colors }
++						value={ value }
++						clearable={ false }
++						onChange={ onChange }
++						disableCustomColors={ disableCustomColors }
++						enableAlpha={ enableAlpha }
++					/>
++				) }
++			</div>
+ 		</>
+ 	);
+ }

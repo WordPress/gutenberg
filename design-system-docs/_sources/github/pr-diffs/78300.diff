@@ -1,0 +1,67 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 02a4ccf9dbb4c8..c66d649a23607d 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -31,6 +31,7 @@
+ 
+ ### Enhancements
+ 
++-   `Button`: Allow long labels to wrap within constrained containers ([#78300](https://github.com/WordPress/gutenberg/pull/78300)).
+ -   `Select`: Add a `placeholder` prop to `Select.Trigger`, and support `null` item values for clearable placeholder options ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
+ -   `Drawer`: Fade the popup elevation shadow alongside the slide ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+ -   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+diff --git a/packages/ui/src/button/stories/index.story.tsx b/packages/ui/src/button/stories/index.story.tsx
+index b532790112e512..1d7cd1e78cba9f 100644
+--- a/packages/ui/src/button/stories/index.story.tsx
++++ b/packages/ui/src/button/stories/index.story.tsx
+@@ -95,7 +95,7 @@ export const AllTonesAndVariants: Story = {
+ 		<div
+ 			style={ {
+ 				display: 'grid',
+-				gridTemplateColumns: 'max-content repeat(2, min-content)',
++				gridTemplateColumns: 'max-content repeat(2, max-content)',
+ 				color: 'var(--wpds-color-fg-content-neutral)',
+ 			} }
+ 		>
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+index a3ecb4100dbdf4..0d9600700fc493 100644
+--- a/packages/ui/src/button/style.module.css
++++ b/packages/ui/src/button/style.module.css
+@@ -17,6 +17,7 @@
+ 		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand-strong);
+ 		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-strong-active);
+ 		--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
++		--wp-ui-button-padding-block: var(--wpds-dimension-padding-xs);
+ 		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-md);
+ 		--wp-ui-button-height: 40px;
+ 		--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
+@@ -40,7 +41,9 @@
+ 		gap: var(--wpds-dimension-gap-sm);
+ 		aspect-ratio: var(--wp-ui-button-aspect-ratio);
+ 		min-width: var(--wp-ui-button-min-width);
+-		height: var(--wp-ui-button-height);
++		max-width: 100%;
++		min-height: var(--wp-ui-button-height);
++		padding-block: var(--wp-ui-button-padding-block);
+ 		padding-inline: var(--wp-ui-button-padding-inline);
+ 		border-style: solid;
+ 		border-width: 1px;
+@@ -52,8 +55,10 @@
+ 		font-size: var(--wp-ui-button-font-size);
+ 		font-weight: var(--wp-ui-button-font-weight);
+ 		line-height: var(--wpds-typography-line-height-sm);
++		text-align: center;
+ 		text-decoration: none;
+ 		color: var(--wp-ui-button-foreground-color);
++		overflow-wrap: anywhere;
+ 		cursor: var(--wpds-cursor-control);
+ 
+ 		@media not ( prefers-reduced-motion ) {
+@@ -129,6 +134,7 @@
+ 	}
+ 
+ 	.is-small {
++		--wp-ui-button-padding-block: 0;
+ 		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-sm);
+ 		--wp-ui-button-height: 24px;
+ 	}

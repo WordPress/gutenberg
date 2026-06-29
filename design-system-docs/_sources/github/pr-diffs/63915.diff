@@ -1,0 +1,428 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9611c1e5e60c3c..12f38b504196c3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,9 +7,14 @@
+ -   `ColorPalette`: Remove extra bottom margin when `CircularOptionPicker` is unneeded ([#63961](https://github.com/WordPress/gutenberg/pull/63961)).
+ -   `CustomSelectControl`: Restore `describedBy` functionality ([#63957](https://github.com/WordPress/gutenberg/pull/63957)).
+ 
++### Enhancements
++
++-   `CustomGradientPicker`: Support CSS variables ([#63915](https://github.com/WordPress/gutenberg/pull/63915)).
++
+ ### Internal
+ 
+ -   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).
++-   Introduce `CSSVariableReplacer` utility component to get computed CSS variables ([#63915](https://github.com/WordPress/gutenberg/pull/63915)).
+ 
+ ## 28.4.0 (2024-07-24)
+ 
+diff --git a/packages/components/src/custom-gradient-picker/index.tsx b/packages/components/src/custom-gradient-picker/index.tsx
+index dd0659515234a6..02648f624ff67e 100644
+--- a/packages/components/src/custom-gradient-picker/index.tsx
++++ b/packages/components/src/custom-gradient-picker/index.tsx
+@@ -7,6 +7,7 @@ import { type LinearGradientNode } from 'gradient-parser';
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
++import { useCallback, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -16,6 +17,10 @@ import CustomGradientBar from './gradient-bar';
+ import { Flex } from '../flex';
+ import SelectControl from '../select-control';
+ import { VStack } from '../v-stack';
++import {
++	CSSVariableReplacer,
++	getCSSVariablesInString,
++} from '../utils/css-variables';
+ import {
+ 	getGradientAstWithDefault,
+ 	getLinearGradientRepresentation,
+@@ -142,7 +147,19 @@ export function CustomGradientPicker( {
+ 	onChange,
+ 	__experimentalIsRenderedInSidebar = false,
+ }: CustomGradientPickerProps ) {
+-	const { gradientAST, hasGradient } = getGradientAstWithDefault( value );
++	const [ normalizedValue, setNormalizedValue ] = useState(
++		!! getCSSVariablesInString( value ?? '' ).length
++			? 'linear-gradient( #fff, #fff )' // prevent FOUC when there are CSS variables
++			: value
++	);
++	const cssVariableReplacerOnChange: React.ComponentProps<
++		typeof CSSVariableReplacer
++	>[ 'onChange' ] = useCallback( ( { replacedCssString: str } ) => {
++		setNormalizedValue( str );
++	}, [] );
++
++	const { gradientAST, hasGradient } =
++		getGradientAstWithDefault( normalizedValue );
+ 
+ 	// On radial gradients the bar should display a linear gradient.
+ 	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
+@@ -163,6 +180,10 @@ export function CustomGradientPicker( {
+ 
+ 	return (
+ 		<VStack spacing={ 4 } className="components-custom-gradient-picker">
++			<CSSVariableReplacer
++				cssString={ value }
++				onChange={ cssVariableReplacerOnChange }
++			/>
+ 			<CustomGradientBar
+ 				__experimentalIsRenderedInSidebar={
+ 					__experimentalIsRenderedInSidebar
+diff --git a/packages/components/src/custom-gradient-picker/stories/index.story.tsx b/packages/components/src/custom-gradient-picker/stories/index.story.tsx
+index 3be8eb36e5a3c2..7e0d7a623d6c03 100644
+--- a/packages/components/src/custom-gradient-picker/stories/index.story.tsx
++++ b/packages/components/src/custom-gradient-picker/stories/index.story.tsx
+@@ -25,8 +25,8 @@ export default meta;
+ 
+ const CustomGradientPickerWithState: StoryFn<
+ 	typeof CustomGradientPicker
+-> = ( { onChange, ...props } ) => {
+-	const [ gradient, setGradient ] = useState< string >();
++> = ( { onChange, value, ...props } ) => {
++	const [ gradient, setGradient ] = useState( value );
+ 	return (
+ 		<CustomGradientPicker
+ 			{ ...props }
+@@ -40,3 +40,9 @@ const CustomGradientPickerWithState: StoryFn<
+ };
+ 
+ export const Default = CustomGradientPickerWithState.bind( {} );
++
++export const WithCSSVariables = CustomGradientPickerWithState.bind( {} );
++WithCSSVariables.args = {
++	// eslint-disable-next-line no-restricted-syntax
++	value: 'linear-gradient(135deg,var(--wp-admin-theme-color) 0%,var(--undefined-color, magenta) 100%)',
++};
+diff --git a/packages/components/src/utils/css-variables.tsx b/packages/components/src/utils/css-variables.tsx
+new file mode 100644
+index 00000000000000..67387d7f7c325d
+--- /dev/null
++++ b/packages/components/src/utils/css-variables.tsx
+@@ -0,0 +1,201 @@
++/**
++ * WordPress dependencies
++ */
++import { useEffect, useRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { VisuallyHidden } from '../visually-hidden';
++
++type CSSVariableReplacerProps = {
++	cssString?: string | null;
++	/**
++	 * Callback to be called when CSS variables in the given string
++	 * have been replaced with their computed values.
++	 *
++	 * Should be memoized to avoid unnecessary reflows.
++	 */
++	onChange: ( args: {
++		replacedCssString: string;
++		computedVariables: ComputedCSSVariables;
++	} ) => void;
++};
++type ComputedCSSVariables = Record< string, string >;
++type VarFunction = {
++	/** Start index of match. */
++	start: number;
++	/** End index of match. */
++	end: number;
++	/** Matched string, e.g. `var( --foo, #000 )`. */
++	raw: string;
++	/** CSS variable name, e.g. `--foo`. */
++	value: string;
++	/** Second argument of the `var()`, which could be a literal or another `var()`. */
++	fallback?: string;
++};
++
++/**
++ * Find the index of the matching closing parenthesis for a given opening parenthesis in a string.
++ */
++function findMatchingParenthesis( str: string, startPos: number ) {
++	let stack = 0;
++
++	for ( let i = startPos; i < str.length; i++ ) {
++		if ( str[ i ] === '(' ) {
++			stack++;
++		} else if ( str[ i ] === ')' ) {
++			stack--;
++			if ( stack === 0 ) {
++				return i;
++			}
++		}
++	}
++
++	throw new Error( 'No matching closing parenthesis found.' );
++}
++
++/**
++ * Find all `var()` functions in a CSS string.
++ */
++export function findVarFunctionsInString( str: string ) {
++	const regex = /(?<=\bvar)\(/g;
++	const matches: VarFunction[] = [];
++
++	let openingParen;
++	while ( ( openingParen = regex.exec( str ) ) !== null ) {
++		const closingParen = findMatchingParenthesis( str, openingParen.index );
++		const [ start, end ] = [
++			openingParen.index - 'var'.length,
++			closingParen + 1,
++		];
++		const raw = str.slice( start, end );
++		const value = raw.match( /--[\w-]+/ )?.[ 0 ];
++
++		if ( ! value ) {
++			throw new Error( 'No CSS variable found in var() function.' );
++		}
++
++		matches.push( {
++			start,
++			end,
++			raw,
++			value,
++			fallback: raw.match( /,(.+)\)/ )?.[ 1 ].trim(),
++		} );
++
++		regex.lastIndex = closingParen + 1; // resume next regex search after this closing parenthesis
++	}
++
++	return matches;
++}
++
++/**
++ * Get the computed CSS variables for a given element.
++ */
++function getComputedCSSVariables(
++	propertyStrings: string[],
++	element: HTMLDivElement
++) {
++	return propertyStrings.reduce( ( acc, propertyString ) => {
++		acc[ propertyString ] = window
++			.getComputedStyle( element )
++			.getPropertyValue( propertyString );
++		return acc;
++	}, {} as ComputedCSSVariables );
++}
++
++/**
++ * Replace all `var()` functions in a CSS string with their computed values.
++ */
++export function replaceCSSVariablesInString(
++	str: string,
++	computedVariables: ComputedCSSVariables
++): string {
++	const varFunctions = findVarFunctionsInString( str );
++
++	let result = '';
++	let lastIndex = 0;
++
++	varFunctions.forEach( ( { start, end, value, fallback } ) => {
++		const replacement =
++			computedVariables[ value ] ||
++			replaceCSSVariablesInString( fallback ?? '', computedVariables );
++
++		if ( ! replacement ) {
++			throw new Error( `No value found for CSS variable ${ value }.` );
++		}
++
++		result += str.slice( lastIndex, start ) + replacement;
++		lastIndex = end;
++	} );
++
++	result += str.slice( lastIndex );
++
++	return result;
++}
++
++/**
++ * Find all CSS variable names (e.g. `--foo`) in a string.
++ */
++export function getCSSVariablesInString( str: string ) {
++	return str.match( /(?<=\bvar\(\s*)--[\w-]+/g ) ?? [];
++}
++
++/**
++ * A component that replaces CSS variables in a given CSS string with their computed values.
++ * The result is passed to the `onChange` callback.
++ *
++ * ```jsx
++ * function MyComponent() {
++ * 	const onChange = useCallback(
++ * 		( { replacedCssString } ) => console.log( replacedCssString ),
++ * 		[]
++ * 	);
++ * 	return (
++ * 		<CSSVariableReplacer
++ * 			cssString="var(--text-color, red)"
++ * 			onChange={ onChange }
++ * 		/>
++ * 	);
++ * }
++ * ```
++ */
++export function CSSVariableReplacer( {
++	cssString,
++	onChange,
++}: CSSVariableReplacerProps ) {
++	const ref = useRef< HTMLDivElement >( null );
++
++	useEffect( () => {
++		if ( cssString && ref.current ) {
++			const computedVariables = getComputedCSSVariables(
++				getCSSVariablesInString( cssString ),
++				ref.current
++			);
++
++			let replacedCssString = cssString;
++
++			try {
++				replacedCssString = replaceCSSVariablesInString(
++					cssString,
++					computedVariables
++				);
++			} catch ( error ) {
++				// eslint-disable-next-line no-console
++				console.warn(
++					'wp.components.CSSVariableReplacer failed to parse the CSS string with error',
++					error
++				);
++			}
++
++			onChange( { replacedCssString, computedVariables } );
++		}
++	}, [ cssString, onChange ] );
++
++	return (
++		<VisuallyHidden>
++			<div ref={ ref } />
++		</VisuallyHidden>
++	);
++}
+diff --git a/packages/components/src/utils/test/css-variables.ts b/packages/components/src/utils/test/css-variables.ts
+new file mode 100644
+index 00000000000000..82b8891250ed79
+--- /dev/null
++++ b/packages/components/src/utils/test/css-variables.ts
+@@ -0,0 +1,116 @@
++/**
++ * Internal dependencies
++ */
++import {
++	findVarFunctionsInString,
++	replaceCSSVariablesInString,
++} from '../css-variables';
++
++describe( 'findVarFunctionsInString', () => {
++	it( 'should parse var() functions correctly', () => {
++		const result = findVarFunctionsInString(
++			'color: var(--text-color, var(--bar, red)); background: linear-gradient(135deg, var(--background-color, rgb(0,0,0)) 0%, var(--background-color-darker-20) 100%);'
++		);
++		expect( result ).toEqual( [
++			{
++				end: 41,
++				fallback: 'var(--bar, red)',
++				raw: 'var(--text-color, var(--bar, red))',
++				start: 7,
++				value: '--text-color',
++			},
++			{
++				end: 114,
++				fallback: 'rgb(0,0,0)',
++				raw: 'var(--background-color, rgb(0,0,0))',
++				start: 79,
++				value: '--background-color',
++			},
++			{
++				end: 152,
++				fallback: undefined,
++				raw: 'var(--background-color-darker-20)',
++				start: 119,
++				value: '--background-color-darker-20',
++			},
++		] );
++	} );
++} );
++
++describe( 'replaceCSSVariablesInString', () => {
++	it( 'should passthrough a string without CSS variables', () => {
++		const result = replaceCSSVariablesInString(
++			'color: red; background: linear-gradient(135deg, #fff 0%, darkblue 100%);',
++			{}
++		);
++		expect( result ).toEqual(
++			'color: red; background: linear-gradient(135deg, #fff 0%, darkblue 100%);'
++		);
++	} );
++
++	it( 'should replace CSS variables in a string', () => {
++		const result = replaceCSSVariablesInString(
++			'color: var(--text-color, rgb(3,3,3)); background: linear-gradient(135deg, var(--background-color) 0%, var(--background-color-darker-20) 100%);',
++			{
++				'--text-color': 'red',
++				'--background-color': '#fff',
++				'--background-color-darker-20': 'darkblue',
++			}
++		);
++		expect( result ).toEqual(
++			'color: red; background: linear-gradient(135deg, #fff 0%, darkblue 100%);'
++		);
++	} );
++
++	it( 'should replace CSS variables in a string with nested fallbacks', () => {
++		expect(
++			replaceCSSVariablesInString(
++				'color: var(--text-color, var(--undefined-color, #000)); background: linear-gradient(135deg, var( --undefined-color, var(--background-color, #fff) ) 0%, var(--background-color-darker-20, #000) 100%);',
++				{
++					'--text-color': 'red',
++					'--undefined-color': '',
++					'--background-color': 'blue',
++					'--background-color-darker-20': 'darkblue',
++				}
++			)
++		).toEqual(
++			'color: red; background: linear-gradient(135deg, blue 0%, darkblue 100%);'
++		);
++
++		expect(
++			replaceCSSVariablesInString(
++				'linear-gradient(135deg,var(--undefined-color, red) 0%,blue 100%)',
++				{
++					'--undefined-color': '',
++				}
++			)
++		).toEqual( 'linear-gradient(135deg,red 0%,blue 100%)' );
++
++		expect(
++			replaceCSSVariablesInString(
++				'linear-gradient(135deg,var(--undefined-color, red) 0%,pink 100%)',
++				{
++					'--undefined-color': '',
++				}
++			)
++		).toEqual( 'linear-gradient(135deg,red 0%,pink 100%)' );
++	} );
++
++	it( 'should work with non-color values', () => {
++		expect(
++			replaceCSSVariablesInString( 'font-size: var(--font-size, 16px);', {
++				'--font-size': '20px',
++			} )
++		).toEqual( 'font-size: 20px;' );
++
++		expect(
++			replaceCSSVariablesInString(
++				'linear-gradient(var(--deg), var(--color) 0%, pink 100%)',
++				{
++					'--deg': '135deg',
++					'--color': 'red',
++				}
++			)
++		).toEqual( 'linear-gradient(135deg, red 0%, pink 100%)' );
++	} );
++} );

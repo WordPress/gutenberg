@@ -1,0 +1,906 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 3db21b179331ef..5ee1d165b47a94 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1265,6 +1265,18 @@
+ 		"markdown_source": "../packages/components/src/toggle-group-control/toggle-group-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "ToggleMultipleGroupControl",
++		"slug": "toggle-multiple-group-control",
++		"markdown_source": "../packages/components/src/toggle-multiple-group-control/README.md",
++		"parent": "components"
++	},
++	{
++		"title": "ToggleMultipleGroupControlOptionIcon",
++		"slug": "toggle-multiple-group-control-option-icon",
++		"markdown_source": "../packages/components/src/toggle-multiple-group-control/toggle-multiple-group-control-option-icon/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "ToolbarButton",
+ 		"slug": "toolbar-button",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4f62b51db7ce74..9b0b949e0e09a7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ ### Experimental
+ 
+ -   `ToggleGroupControl`: Only show enclosing border when `isBlock` and not `isDeselectable` ([#45492](https://github.com/WordPress/gutenberg/pull/45492)).
++-   `ToggleMultipleGroupControl`: Add new component for choosing multiple options ([#45128](https://github.com/WordPress/gutenberg/pull/45128)).
+ 
+ ## 22.0.0 (2022-11-02)
+ 
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 114884690e4821..0951a6b1ec5abd 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -156,6 +156,10 @@ export {
+ 	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
+ 	ToggleGroupControlOptionIcon as __experimentalToggleGroupControlOptionIcon,
+ } from './toggle-group-control';
++export {
++	ToggleMultipleGroupControl as __experimentalToggleMultipleGroupControl,
++	ToggleMultipleGroupControlOptionIcon as __experimentalToggleMultipleGroupControlOptionIcon,
++} from './toggle-multiple-group-control';
+ export { default as Toolbar } from './toolbar';
+ export { default as ToolbarButton } from './toolbar-button';
+ export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index e8284a4fde11ef..229fa344a073bf 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -122,7 +122,6 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+   display: -ms-flexbox;
+   display: flex;
+   font-family: inherit;
+-  height: 100%;
+   -webkit-box-pack: center;
+   -ms-flex-pack: center;
+   -webkit-justify-content: center;
+@@ -140,6 +139,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+   user-select: none;
+   width: 100%;
+   z-index: 2;
++  height: 30px;
+   color: #1e1e1e;
+   width: 30px;
+   padding-left: 0;
+@@ -194,7 +194,6 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+   display: -ms-flexbox;
+   display: flex;
+   font-family: inherit;
+-  height: 100%;
+   -webkit-box-pack: center;
+   -ms-flex-pack: center;
+   -webkit-justify-content: center;
+@@ -212,6 +211,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+   user-select: none;
+   width: 100%;
+   z-index: 2;
++  height: 30px;
+   color: #1e1e1e;
+   width: 30px;
+   padding-left: 0;
+@@ -439,7 +439,6 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+   display: -ms-flexbox;
+   display: flex;
+   font-family: inherit;
+-  height: 100%;
+   -webkit-box-pack: center;
+   -ms-flex-pack: center;
+   -webkit-justify-content: center;
+@@ -457,6 +456,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+   user-select: none;
+   width: 100%;
+   z-index: 2;
++  height: 30px;
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index 361cbb789f64c7..7421979ea3a050 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -253,4 +253,42 @@ describe( 'ToggleGroupControl', () => {
+ 			} );
+ 		} );
+ 	} );
++
++	it.each( [ false, true ] )(
++		'should not allow multiple selection, when isDeselectable: %p',
++		async ( isDeselectable ) => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			render(
++				<ToggleGroupControl
++					label="Label"
++					isDeselectable={ isDeselectable }
++				>
++					{ options }
++				</ToggleGroupControl>
++			);
++
++			const role = isDeselectable ? 'button' : 'radio';
++
++			await user.click(
++				screen.getByRole( role, {
++					name: 'R',
++				} )
++			);
++
++			await user.click(
++				screen.getByRole( role, {
++					name: 'J',
++				} )
++			);
++
++			const attribute = isDeselectable ? 'pressed' : 'checked';
++			const selectedOptions = screen.getAllByRole( role, {
++				[ attribute ]: true,
++			} );
++			expect( selectedOptions.length ).toBe( 1 );
++		}
++	);
+ } );
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index c0ab8f95409f76..e077f9fb9348a7 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -66,26 +66,34 @@ function ToggleGroupControlOptionBase(
+ 	const {
+ 		className,
+ 		isIcon = false,
++		isMultiple = false,
+ 		value,
+ 		children,
+ 		showTooltip = false,
+ 		...otherButtonProps
+ 	} = buttonProps;
+ 
+-	const isPressed = otherContextProps.state === value;
++	const isPressed =
++		otherContextProps.state === value ||
++		otherButtonProps[ 'aria-pressed' ] === true;
+ 	const cx = useCx();
+ 	const labelViewClasses = cx( isBlock && styles.labelBlock );
+ 	const classes = cx(
+-		styles.buttonView( { isDeselectable, isIcon, isPressed, size } ),
++		styles.buttonView( {
++			isDeselectable,
++			isIcon,
++			isMultiple,
++			isPressed,
++			size,
++		} ),
+ 		className
+ 	);
+ 
+-	const buttonOnClick = () => {
+-		if ( isDeselectable && isPressed ) {
+-			otherContextProps.setState( undefined );
+-		} else {
+-			otherContextProps.setState( value );
+-		}
++	// In the multiple selection case, consumers will handle their own pressed states.
++	const singleSelectButtonProps = {
++		'aria-pressed': isPressed,
++		onClick: () =>
++			otherContextProps.setState( isPressed ? undefined : value ),
+ 	};
+ 
+ 	const commonProps = {
+@@ -104,9 +112,8 @@ function ToggleGroupControlOptionBase(
+ 				{ isDeselectable ? (
+ 					<button
+ 						{ ...commonProps }
+-						aria-pressed={ isPressed }
++						{ ...( isMultiple ? {} : singleSelectButtonProps ) }
+ 						type="button"
+-						onClick={ buttonOnClick }
+ 					>
+ 						<ButtonContentView>{ children }</ButtonContentView>
+ 					</button>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+index d4b5320edff616..a8eeac265d43be 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+@@ -12,6 +12,12 @@ import type {
+ 	ToggleGroupControlProps,
+ 	ToggleGroupControlOptionBaseProps,
+ } from '../types';
++import { BACKDROP_BG_COLOR } from '../toggle-group-control/styles';
++
++const BUTTON_SIZES = {
++	default: '30px',
++	'__unstable-large': '34px',
++};
+ 
+ export const LabelView = styled.div`
+ 	display: inline-flex;
+@@ -27,11 +33,13 @@ export const labelBlock = css`
+ export const buttonView = ( {
+ 	isDeselectable,
+ 	isIcon,
++	isMultiple,
+ 	isPressed,
+ 	size,
+-}: Pick< ToggleGroupControlProps, 'isDeselectable' | 'size' > &
+-	Pick< ToggleGroupControlOptionBaseProps, 'isIcon' > & {
++}: Pick< ToggleGroupControlProps, 'isDeselectable' > &
++	Pick< ToggleGroupControlOptionBaseProps, 'isIcon' | 'isMultiple' > & {
+ 		isPressed?: boolean;
++		size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
+ 	} ) => css`
+ 	align-items: center;
+ 	appearance: none;
+@@ -43,7 +51,6 @@ export const buttonView = ( {
+ 	cursor: pointer;
+ 	display: flex;
+ 	font-family: inherit;
+-	height: 100%;
+ 	justify-content: center;
+ 	line-height: 100%;
+ 	outline: none;
+@@ -65,11 +72,17 @@ export const buttonView = ( {
+ 		background: ${ CONFIG.toggleGroupControlBackgroundColor };
+ 	}
+ 
++	${ buttonHeight( { size } ) }
+ 	${ isDeselectable && deselectable }
+ 	${ isIcon && isIconStyles( { size } ) }
++	${ isMultiple && isPressed && staticBackground }
+ 	${ isPressed && pressed }
+ `;
+ 
++const staticBackground = css`
++	background: ${ BACKDROP_BG_COLOR };
++`;
++
+ const pressed = css`
+ 	color: ${ COLORS.white };
+ 
+@@ -88,6 +101,16 @@ const deselectable = css`
+ 	}
+ `;
+ 
++const buttonHeight = ( {
++	size,
++}: {
++	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
++} ) => {
++	return css`
++		height: ${ BUTTON_SIZES[ size ] };
++	`;
++};
++
+ export const ButtonContentView = styled.div`
+ 	display: flex;
+ 	font-size: ${ CONFIG.fontSize };
+@@ -95,16 +118,13 @@ export const ButtonContentView = styled.div`
+ `;
+ 
+ const isIconStyles = ( {
+-	size = 'default',
+-}: Pick< ToggleGroupControlProps, 'size' > ) => {
+-	const iconButtonSizes = {
+-		default: '30px',
+-		'__unstable-large': '34px',
+-	};
+-
++	size,
++}: {
++	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
++} ) => {
+ 	return css`
+ 		color: ${ COLORS.gray[ 900 ] };
+-		width: ${ iconButtonSizes[ size ] };
++		width: ${ BUTTON_SIZES[ size ] };
+ 		padding-left: 0;
+ 		padding-right: 0;
+ 	`;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/README.md b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+index 1f5fe74bc1a9af..bd6748dc677497 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+@@ -6,9 +6,13 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ `ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use [`ToggleGroupControlOption`](/packages/components/src/toggle-group-control/toggle-group-control-option/README.md) component.
+ 
+-This component is intended for selecting a single persistent value from a set of options, similar to a how a radio button group would work. If you simply want a toggle to switch between views, use a [`TabPanel`](/packages/components/src/tab-panel/README.md) instead.
++## Alternatives
+ 
+-Only use this control when you know for sure the labels of items inside won't wrap. For items with longer labels, you can consider a [`SelectControl`](/packages/components/src/select-control/README.md) or a [`CustomSelectControl`](/packages/components/src/custom-select-control/README.md) component instead.
++This component is intended for selecting a single persistent value from a set of options, similar to a how a radio button group would work.
++
++- If you want to select multiple options, use [`ToggleMultipleGroupControl`](/packages/components/src/toggle-multiple-group-control/README.md) instead.
++- If you simply want a toggle to switch between views, use a [`TabPanel`](/packages/components/src/tab-panel/README.md) instead.
++- Only use this control when you know for sure the labels of items inside won't wrap. For items with longer labels, you can consider a [`SelectControl`](/packages/components/src/select-control/README.md) or a [`CustomSelectControl`](/packages/components/src/custom-select-control/README.md) component instead.
+ 
+ ## Usage
+ 
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
+index 72e247659818f5..e0abaafea588ac 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
+@@ -23,6 +23,7 @@ import ToggleGroupControlContext from '../context';
+ import { useUpdateEffect } from '../../utils/hooks';
+ import type { WordPressComponentProps } from '../../ui/context';
+ import type { ToggleGroupControlMainControlProps } from '../types';
++import { HStack } from '../../h-stack';
+ 
+ function UnforwardedToggleGroupControlAsButtonGroup(
+ 	{
+@@ -92,7 +93,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
+ 					containerWidth={ sizes.width }
+ 					isAdaptiveWidth={ isAdaptiveWidth }
+ 				/>
+-				{ children }
++				<HStack spacing={ 2 }>{ children }</HStack>
+ 			</View>
+ 		</ToggleGroupControlContext.Provider>
+ 	);
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index ebd4893e37fb2f..d725ac66ac3c3f 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -92,12 +92,11 @@ function UnconnectedToggleGroupControl(
+  * `ToggleGroupControlOption` component.
+  *
+  * This component is intended for selecting a single persistent value from a set of options,
+- * similar to a how a radio button group would work. If you simply want a toggle to switch between views,
+- * use a `TabPanel` instead.
++ * similar to a how a radio button group would work.
+  *
+- * Only use this control when you know for sure the labels of items inside won't
+- * wrap. For items with longer labels, you can consider a `SelectControl` or a
+- * `CustomSelectControl` component instead.
++ * - If you want to select multiple options, use `ToggleMultipleGroupControl` instead.
++ * - If you simply want a toggle to switch between views, use a `TabPanel` instead.
++ * - Only use this control when you know for sure the labels of items inside won't wrap. For items with longer labels, you can consider a `SelectControl` or a `CustomSelectControl` component instead.
+  *
+  * ```jsx
+  * import {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+index b48826e8ccbe84..671e4005eb4ae3 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -10,6 +10,8 @@ import styled from '@emotion/styled';
+ import { CONFIG, COLORS, reduceMotion } from '../../utils';
+ import type { ToggleGroupControlProps } from '../types';
+ 
++export const BACKDROP_BG_COLOR = COLORS.gray[ 900 ];
++
+ export const ToggleGroupControl = ( {
+ 	isBlock,
+ 	isDeselectable,
+@@ -71,7 +73,7 @@ export const block = css`
+ `;
+ 
+ export const BackdropView = styled.div`
+-	background: ${ COLORS.gray[ 900 ] };
++	background: ${ BACKDROP_BG_COLOR };
+ 	border-radius: ${ CONFIG.controlBorderRadius };
+ 	left: 0;
+ 	position: absolute;
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 4cc82bd3ac7b0c..82591b7bbeea5c 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -18,6 +18,15 @@ export type ToggleGroupControlOptionBaseProps = {
+ 	 * @default false
+ 	 */
+ 	isIcon?: boolean;
++	/**
++	 * Whether the group supports multiple selection.
++	 *
++	 * @default false
++	 */
++	isMultiple?: boolean;
++	/**
++	 * The unique key of the option.
++	 */
+ 	value: ReactText;
+ 	/**
+ 	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
+diff --git a/packages/components/src/toggle-multiple-group-control/README.md b/packages/components/src/toggle-multiple-group-control/README.md
+new file mode 100644
+index 00000000000000..06180b42a135cc
+--- /dev/null
++++ b/packages/components/src/toggle-multiple-group-control/README.md
+@@ -0,0 +1,65 @@
++# `ToggleMultipleGroupControl`
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`ToggleMultipleGroupControl` is a variant of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md) that allows multiple options to be selected. To render options for this control, use the [`ToggleMultipleGroupControlOptionIcon`](/packages/components/src/toggle-multiple-group-control/toggle-multiple-group-control-option-icon/README.md) component.
++
++Only use this control for icon buttons.
++
++## Usage
++
++```js
++import {
++	__experimentalToggleMultipleGroupControl as ToggleMultipleGroupControl,
++	__experimentalToggleMultipleGroupControlOptionIcon as ToggleMultipleGroupControlOptionIcon,
++} from '@wordpress/components';
++import { useState } from '@wordpress/element';
++import { formatBold, formatItalic } from '@wordpress/icons';
++
++function Example() {
++	const [ bold, setBold ] = useState( false );
++	const [ italic, setItalic ] = useState( false );
++
++	return (
++		<ToggleMultipleGroupControl label="My label">
++			<ToggleMultipleGroupControlOptionIcon
++				value="bold"
++				label="Bold"
++				icon={ formatBold }
++				isPressed={ bold }
++				onClick={ () => setBold( ! bold ) }
++			/>
++			<ToggleMultipleGroupControlOptionIcon
++				value="italic"
++				label="Italic"
++				icon={ formatItalic }
++				isPressed={ italic }
++				onClick={ () => setItalic( ! italic ) }
++			/>
++		</ToggleMultipleGroupControl>
++	);
++}
++```
++
++## Props
++
++### `help`: `ReactNode`
++
++If this property is added, a help text will be generated using help property as the content.
++
++-   Required: No
++
++### `hideLabelFromVision`: `boolean`
++
++If true, the label will only be visible to screen readers.
++
++-   Required: No
++-   Default: `false`
++
++### `label`: `string`
++
++Label for the control.
++
++-   Required: Yes
+\ No newline at end of file
+diff --git a/packages/components/src/toggle-multiple-group-control/component.tsx b/packages/components/src/toggle-multiple-group-control/component.tsx
+new file mode 100644
+index 00000000000000..c6118c5570b07b
+--- /dev/null
++++ b/packages/components/src/toggle-multiple-group-control/component.tsx
+@@ -0,0 +1,93 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import {
++	contextConnect,
++	ContextSystemProvider,
++	WordPressComponentProps,
++} from '../ui/context';
++import type { ToggleMultipleGroupControlProps } from './types';
++import { ToggleGroupControl } from '../toggle-group-control';
++import { useContextSystem } from '../ui/context/use-context-system';
++
++const contextProviderValue = {
++	ToggleGroupControlOptionBase: {
++		isMultiple: true,
++	},
++};
++
++function UnconnectedToggleMultipleGroupControl(
++	props: WordPressComponentProps<
++		ToggleMultipleGroupControlProps,
++		'div',
++		false
++	>,
++	forwardedRef: ForwardedRef< any >
++) {
++	const {
++		onChange, // omit
++		...otherProps
++	} = useContextSystem( props, 'UnconnectedToggleMultipleGroupControl' );
++
++	return (
++		<ContextSystemProvider value={ contextProviderValue }>
++			<ToggleGroupControl
++				{ ...otherProps }
++				isDeselectable
++				__nextHasNoMarginBottom
++				ref={ forwardedRef }
++			/>
++		</ContextSystemProvider>
++	);
++}
++
++/**
++ * `ToggleMultipleGroupControl` is a variant of `ToggleGroupControl` that allows multiple options to be selected.
++ * To render options for this control, use the `ToggleMultipleGroupControlOptionIcon` component.
++ *
++ * Only use this control for icon buttons.
++ *
++ * ```js
++ * import {
++ *   __experimentalToggleMultipleGroupControl as ToggleMultipleGroupControl,
++ *   __experimentalToggleMultipleGroupControlOptionIcon as ToggleMultipleGroupControlOptionIcon,
++ * } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ * import { formatBold, formatItalic } from '@wordpress/icons';
++ *
++ * function Example() {
++ *   const [ bold, setBold ] = useState( false );
++ *   const [ italic, setItalic ] = useState( false );
++ *
++ *   return (
++ *     <ToggleMultipleGroupControl label="My label">
++ *       <ToggleMultipleGroupControlOptionIcon
++ *         value="bold"
++ *         label="Bold"
++ *         icon={ formatBold }
++ *         isPressed={ bold }
++ *         onClick={ () => setBold( ! bold ) }
++ *       />
++ *       <ToggleMultipleGroupControlOptionIcon
++ *         value="italic"
++ *         label="Italic"
++ *         icon={ formatItalic }
++ *         isPressed={ italic }
++ *         onClick={ () => setItalic( ! italic ) }
++ *       />
++ *     </ToggleMultipleGroupControl>
++ *   );
++ * }
++ * ```
++ */
++export const ToggleMultipleGroupControl = contextConnect(
++	UnconnectedToggleMultipleGroupControl,
++	'ToggleMultipleGroupControl'
++);
++
++export default ToggleMultipleGroupControl;
+diff --git a/packages/components/src/toggle-multiple-group-control/index.ts b/packages/components/src/toggle-multiple-group-control/index.ts
+new file mode 100644
+index 00000000000000..faa3a310dd1314
+--- /dev/null
++++ b/packages/components/src/toggle-multiple-group-control/index.ts
+@@ -0,0 +1,2 @@
++export { ToggleMultipleGroupControl } from './component';
++export { ToggleMultipleGroupControlOptionIcon } from './toggle-multiple-group-control-option-icon';
+diff --git a/packages/components/src/toggle-multiple-group-control/stories/index.tsx b/packages/components/src/toggle-multiple-group-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..29df5d7797aaad
+--- /dev/null
++++ b/packages/components/src/toggle-multiple-group-control/stories/index.tsx
+@@ -0,0 +1,70 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++import { formatBold, formatItalic, formatUnderline } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import { ToggleMultipleGroupControl } from '../';
++import { ToggleMultipleGroupControlOptionIcon } from '../toggle-multiple-group-control-option-icon';
++
++const meta: ComponentMeta< typeof ToggleMultipleGroupControl > = {
++	component: ToggleMultipleGroupControl,
++	title: 'Components (Experimental)/ToggleMultipleGroupControl',
++	subcomponents: { ToggleMultipleGroupControlOptionIcon },
++	argTypes: {
++		help: { control: { type: 'text' } },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof ToggleMultipleGroupControl > = (
++	props
++) => {
++	const [ bold, setBold ] = useState( false );
++	const [ italic, setItalic ] = useState( false );
++	const [ underline, setUndeline ] = useState( false );
++
++	return (
++		<ToggleMultipleGroupControl { ...props }>
++			<ToggleMultipleGroupControlOptionIcon
++				value="bold"
++				label="Bold"
++				icon={ formatBold }
++				isPressed={ bold }
++				onClick={ () => setBold( ! bold ) }
++			/>
++			<ToggleMultipleGroupControlOptionIcon
++				value="italic"
++				label="Italic"
++				icon={ formatItalic }
++				isPressed={ italic }
++				onClick={ () => setItalic( ! italic ) }
++			/>
++			<ToggleMultipleGroupControlOptionIcon
++				value="underline"
++				label="Underline"
++				icon={ formatUnderline }
++				isPressed={ underline }
++				onClick={ () => setUndeline( ! underline ) }
++			/>
++		</ToggleMultipleGroupControl>
++	);
++};
++
++export const Default: ComponentStory< typeof ToggleMultipleGroupControl > =
++	Template.bind( {} );
++Default.args = {
++	label: 'Label',
++};
+diff --git a/packages/components/src/toggle-multiple-group-control/test/index.tsx b/packages/components/src/toggle-multiple-group-control/test/index.tsx
+new file mode 100644
+index 00000000000000..c83e97fbfc4f1f
+--- /dev/null
++++ b/packages/components/src/toggle-multiple-group-control/test/index.tsx
+@@ -0,0 +1,71 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++import { formatUppercase } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import ToggleMultipleGroupControl from '../component';
++import { ToggleMultipleGroupControlOptionIcon } from '../toggle-multiple-group-control-option-icon';
++
++const TestComponent = () => {
++	const [ uppercase, setIsUppercase ] = useState( false );
++	const [ lowercase, setIsLowercase ] = useState( false );
++
++	return (
++		<ToggleMultipleGroupControl label="Label">
++			<ToggleMultipleGroupControlOptionIcon
++				value="uppercase"
++				icon={ formatUppercase }
++				label="Uppercase"
++				isPressed={ uppercase }
++				onClick={ () => setIsUppercase( ! uppercase ) }
++			/>
++			<ToggleMultipleGroupControlOptionIcon
++				value="lowercase"
++				icon={ formatUppercase }
++				label="Lowercase"
++				isPressed={ lowercase }
++				onClick={ () => setIsLowercase( ! lowercase ) }
++			/>
++		</ToggleMultipleGroupControl>
++	);
++};
++
++describe( 'ToggleMultipleGroupControl', () => {
++	it( 'should allow multiple selection', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
++
++		render( <TestComponent /> );
++
++		await user.click( screen.getByRole( 'button', { name: 'Uppercase' } ) );
++		await user.click( screen.getByRole( 'button', { name: 'Lowercase' } ) );
++
++		expect(
++			screen.getByRole( 'button', { name: 'Uppercase', pressed: true } )
++		).toBeInTheDocument();
++		expect(
++			screen.getByRole( 'button', { name: 'Lowercase', pressed: true } )
++		).toBeInTheDocument();
++
++		// Deselecting should work
++		await user.click( screen.getByRole( 'button', { name: 'Uppercase' } ) );
++
++		expect(
++			screen.getByRole( 'button', { name: 'Uppercase', pressed: false } )
++		).toBeInTheDocument();
++		expect(
++			screen.getByRole( 'button', { name: 'Lowercase', pressed: true } )
++		).toBeInTheDocument();
++	} );
++} );
+diff --git a/packages/components/src/toggle-multiple-group-control/toggle-multiple-group-control-option-icon/README.md b/packages/components/src/toggle-multiple-group-control/toggle-multiple-group-control-option-icon/README.md
+new file mode 100644
+index 00000000000000..87d2bd6a286092
+--- /dev/null
++++ b/packages/components/src/toggle-multiple-group-control/toggle-multiple-group-control-option-icon/README.md
+@@ -0,0 +1,77 @@
++# `ToggleMultipleGroupControlOptionIcon`
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`ToggleMultipleGroupControlOptionIcon` is a form component which is meant to be used as a child of [`ToggleMultipleGroupControl`](/packages/components/src/toggle-multiple-group-control/README.md) and displays an icon.
++
++## Usage
++
++```js
++import {
++	__experimentalToggleMultipleGroupControl as ToggleMultipleGroupControl,
++	__experimentalToggleMultipleGroupControlOptionIcon as ToggleMultipleGroupControlOptionIcon,
++} from '@wordpress/components';
++import { useState } from '@wordpress/element';
++import { formatBold, formatItalic } from '@wordpress/icons';
++
++function Example() {
++	const [ bold, setBold ] = useState( false );
++	const [ italic, setItalic ] = useState( false );
++
++	return (
++		<ToggleMultipleGroupControl label="My label">
++			<ToggleMultipleGroupControlOptionIcon
++				value="bold"
++				label="Bold"
++				icon={ formatBold }
++				isPressed={ bold }
++				onClick={ () => setBold( ! bold ) }
++			/>
++			<ToggleMultipleGroupControlOptionIcon
++				value="italic"
++				label="Italic"
++				icon={ formatItalic }
++				isPressed={ italic }
++				onClick={ () => setItalic( ! italic ) }
++			/>
++		</ToggleMultipleGroupControl>
++	);
++}
++```
++
++## Props
++
++### `icon`: `WPComponent`
++
++Icon displayed as the content of the option. Usually one of the icons from the `@wordpress/icons` package, or a custom React `<svg>` icon.
++
++-   Required: Yes
++
++### `isPressed`: `boolean`
++
++Whether the button is pressed.
++
++-   Required: Yes
++-   Default: `false`
++
++### `label`: `string`
++
++The text to accessibly label the icon option. Will also be shown in a tooltip.
++
++-   Required: Yes
++
++### `onClick`: `React.MouseEventHandler< HTMLButtonElement >`
++
++Listen to click events to manage the `isPressed` state.
++
++-   Required: Yes 
++
++### `value`: `string | number`
++
++The unique key of the option.
++
++-   Required: Yes
++
++
+diff --git a/packages/components/src/toggle-multiple-group-control/toggle-multiple-group-control-option-icon/index.tsx b/packages/components/src/toggle-multiple-group-control/toggle-multiple-group-control-option-icon/index.tsx
+new file mode 100644
+index 00000000000000..5d2260238e46a5
+--- /dev/null
++++ b/packages/components/src/toggle-multiple-group-control/toggle-multiple-group-control-option-icon/index.tsx
+@@ -0,0 +1,44 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { ToggleGroupControlOptionIcon } from '../../toggle-group-control';
++import type { ToggleMultipleGroupControlOptionIconProps } from '../types';
++import type { WordPressComponentProps } from '../../ui/context';
++
++function UnforwardedToggleMultipleGroupControlOptionIcon(
++	{
++		isPressed,
++		...otherProps
++	}: WordPressComponentProps<
++		ToggleMultipleGroupControlOptionIconProps,
++		'button',
++		false
++	>,
++	ref: ForwardedRef< any >
++) {
++	return (
++		<ToggleGroupControlOptionIcon
++			{ ...otherProps }
++			ref={ ref }
++			aria-pressed={ isPressed }
++		/>
++	);
++}
++
++/**
++ * `ToggleMultipleGroupControlOptionIcon` is a form component which is meant to be used
++ * as a child of `ToggleMultipleGroupControl` and displays an icon.
++ */
++export const ToggleMultipleGroupControlOptionIcon = forwardRef(
++	UnforwardedToggleMultipleGroupControlOptionIcon
++);
+diff --git a/packages/components/src/toggle-multiple-group-control/types.ts b/packages/components/src/toggle-multiple-group-control/types.ts
+new file mode 100644
+index 00000000000000..dff704c88c371b
+--- /dev/null
++++ b/packages/components/src/toggle-multiple-group-control/types.ts
+@@ -0,0 +1,26 @@
++/**
++ * Internal dependencies
++ */
++import type {
++	ToggleGroupControlOptionIconProps,
++	ToggleGroupControlProps,
++} from '../toggle-group-control/types';
++
++export type ToggleMultipleGroupControlProps = Pick<
++	ToggleGroupControlProps,
++	'children' | 'label' | 'help' | 'hideLabelFromVision' | 'size'
++>;
++
++export type ToggleMultipleGroupControlOptionIconProps =
++	ToggleGroupControlOptionIconProps & {
++		/**
++		 * Whether the button is pressed.
++		 *
++		 * @default false
++		 */
++		isPressed: boolean;
++		/**
++		 * Listen to click events to manage the `isPressed` state.
++		 */
++		onClick: React.MouseEventHandler< HTMLButtonElement >;
++	};

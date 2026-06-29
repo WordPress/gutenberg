@@ -1,0 +1,170 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3586c90c1861a1..c55cd318ee80d8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Enhancements
+ 
++-   `Tabs`, `TabPanel`: Align selected tab colors and indicators with `@wordpress/ui` `Tabs` ([#78418](https://github.com/WordPress/gutenberg/pull/78418)).
+ -   `Draggable`: Render the drag clone inside the `@wordpress/ui` compat overlay slot so it shares stacking with `@wordpress/ui` overlays opened mid-drag. Auto-enabled in WordPress environments; other hosts can opt in via `useEnableWpCompatOverlaySlot()` ([#78183](https://github.com/WordPress/gutenberg/pull/78183), [#78354](https://github.com/WordPress/gutenberg/pull/78354)).
+ 
+ ## 33.1.0 (2026-05-14)
+diff --git a/packages/components/src/tab-panel/style.scss b/packages/components/src/tab-panel/style.scss
+index a87fc63a6e7325..9657d5882ad89f 100644
+--- a/packages/components/src/tab-panel/style.scss
++++ b/packages/components/src/tab-panel/style.scss
+@@ -1,11 +1,10 @@
+-@use "@wordpress/base-styles/colors" as *;
+ @use "@wordpress/base-styles/variables" as *;
+-@use "../utils/theme-variables" as *;
+ 
+ .components-tab-panel__tabs {
+ 	display: flex;
+ 	align-items: stretch;
+ 	flex-direction: row;
++
+ 	&[aria-orientation="vertical"] {
+ 		flex-direction: column;
+ 	}
+@@ -19,9 +18,19 @@
+ 	border: none;
+ 	box-shadow: none;
+ 	cursor: var(--wpds-cursor-control);
+-	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
++	padding: 3px var(--wpds-dimension-padding-lg); // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+ 	margin-left: 0;
+-	font-weight: $font-weight-regular;
++	font-weight: var(--wpds-typography-font-weight-regular);
++	color: var(--wpds-color-fg-interactive-neutral);
++
++	&:disabled,
++	&[aria-disabled="true"] {
++		color: var(--wpds-color-fg-interactive-neutral-disabled);
++	}
++
++	&:not(:disabled, [aria-disabled="true"]):is(:hover, :focus-visible) {
++		color: var(--wpds-color-fg-interactive-neutral-active);
++	}
+ 
+ 	&:focus:not(:disabled) {
+ 		position: relative;
+@@ -39,8 +48,8 @@
+ 		pointer-events: none;
+ 
+ 		// Draw the indicator.
+-		background: $components-color-accent;
+-		height: calc(0 * var(--wp-admin-border-width-focus));
++		background: var(--wpds-color-stroke-interactive-neutral-strong);
++		height: calc(0 * var(--wpds-border-width-focus));
+ 		border-radius: 0;
+ 
+ 		// Animation
+@@ -51,7 +60,7 @@
+ 
+ 	// Active.
+ 	&.is-active::after {
+-		height: calc(1 * var(--wp-admin-border-width-focus));
++		height: calc(1 * var(--wpds-border-width-focus));
+ 
+ 		// Windows high contrast mode.
+ 		outline: 2px solid transparent;
+@@ -62,15 +71,12 @@
+ 	&::before {
+ 		content: "";
+ 		position: absolute;
+-		top: $grid-unit-15;
+-		right: $grid-unit-15;
+-		bottom: $grid-unit-15;
+-		left: $grid-unit-15;
++		inset: var(--wpds-dimension-padding-md);
+ 		pointer-events: none;
+ 
+ 		// Draw the indicator.
+ 		box-shadow: 0 0 0 0 transparent;
+-		border-radius: $radius-small;
++		border-radius: var(--wpds-border-radius-sm);
+ 
+ 		// Animation
+ 		@media not (prefers-reduced-motion) {
+@@ -79,11 +85,25 @@
+ 	}
+ 
+ 	&:focus-visible::before {
+-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
++		box-shadow:
++			0 0 0 var(--wpds-border-width-focus)
++			var(--wpds-color-stroke-focus-brand);
+ 
+ 		// Windows high contrast mode.
+ 		outline: 2px solid transparent;
+ 	}
++
++	.components-tab-panel__tabs[aria-orientation="vertical"] & {
++		border-radius: var(--wpds-border-radius-sm);
++
++		&::after {
++			display: none;
++		}
++
++		&.is-active {
++			background: var(--wpds-color-bg-interactive-neutral-weak-active);
++		}
++	}
+ }
+ 
+ .components-tab-panel__tab-content {
+@@ -93,7 +113,9 @@
+ 	}
+ 
+ 	&:focus-visible {
+-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
++		box-shadow:
++			0 0 0 var(--wpds-border-width-focus)
++			var(--wpds-color-stroke-focus-brand);
+ 
+ 		// Windows high contrast mode.
+ 		outline: 2px solid transparent;
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index 0255d22e6ae378..f2d015ce564871 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -99,7 +99,7 @@ export const StyledTabList = styled( Ariakit.TabList )`
+ 					)
+ 				);
+ 			border-bottom: var( --wp-admin-border-width-focus ) solid
+-				${ COLORS.theme.accent };
++				${ COLORS.theme.gray[ 700 ] };
+ 		}
+ 	}
+ 	&[aria-orientation='vertical'] {
+@@ -124,11 +124,7 @@ export const StyledTabList = styled( Ariakit.TabList )`
+ 							var( --antialiasing-factor )
+ 					)
+ 				);
+-			background-color: color-mix(
+-				in srgb,
+-				${ COLORS.theme.accent },
+-				transparent 96%
+-			);
++			background-color: ${ COLORS.theme.gray[ 100 ] };
+ 		}
+ 		&[data-select-on-move='true']:has(
+ 				:is( :focus-visible, [data-focus-visible] )
+@@ -173,7 +169,7 @@ export const Tab = styled( Ariakit.Tab )`
+ 		}
+ 
+ 		&:not( [aria-disabled='true'] ):is( :hover, [data-focus-visible] ) {
+-			color: ${ COLORS.theme.accent };
++			color: ${ COLORS.theme.foreground };
+ 		}
+ 
+ 		&:focus:not( :disabled ) {
+@@ -222,7 +218,6 @@ export const Tab = styled( Ariakit.Tab )`
+ 		min-height: ${ space( 10 ) };
+ 
+ 		&[aria-selected='true'] {
+-			color: ${ COLORS.theme.accent };
+ 			fill: currentColor;
+ 		}
+ 	}

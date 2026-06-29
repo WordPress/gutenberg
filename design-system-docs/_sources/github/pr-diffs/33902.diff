@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a6a8473ed27949..db73fbf4757af6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   Listen to `resize` events correctly in `useBreakpointIndex`. This hook is used in `useResponsiveValue` and consequently in the `Flex` and `Grid` components  ([#33902](https://github.com/WordPress/gutenberg/pull/33902))
++
+ ## 15.0.0 (2021-07-29)
+ 
+ ### Breaking Change
+diff --git a/packages/components/src/ui/utils/use-responsive-value.ts b/packages/components/src/ui/utils/use-responsive-value.ts
+index af18aa432dbb0c..da284a6510a385 100644
+--- a/packages/components/src/ui/utils/use-responsive-value.ts
++++ b/packages/components/src/ui/utils/use-responsive-value.ts
+@@ -40,14 +40,14 @@ export const useBreakpointIndex = (
+ 
+ 		onResize();
+ 
+-		if ( typeof document !== 'undefined' ) {
++		if ( typeof window !== 'undefined' ) {
+ 			// Disable reason: We don't really care about what document we listen to, we just want to know that we're resizing.
+ 			/* eslint-disable @wordpress/no-global-event-listener */
+-			document.addEventListener( 'resize', onResize );
++			window.addEventListener( 'resize', onResize );
+ 		}
+ 		return () => {
+-			if ( typeof document !== 'undefined' ) {
+-				document.removeEventListener( 'resize', onResize );
++			if ( typeof window !== 'undefined' ) {
++				window.removeEventListener( 'resize', onResize );
+ 				/* eslint-enable @wordpress/no-global-event-listener */
+ 			}
+ 		};

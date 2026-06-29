@@ -1,0 +1,67 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f23b7ae308ede0..1ee32494f2db38 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `Snackbar`: Remove erroneous `__unstableHTML` prop from TypeScript definitions ([#57218](https://github.com/WordPress/gutenberg/pull/57218)).
+ -   `Truncate`: improve handling of non-string `children` ([#57261](https://github.com/WordPress/gutenberg/pull/57261)).
+ -   `PaletteEdit`: Don't discard colors with default name and slug ([#54332](https://github.com/WordPress/gutenberg/pull/54332)).
++-   `RadioControl`: Fully encapsulate styles ([#57347](https://github.com/WordPress/gutenberg/pull/57347)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/radio-control/index.tsx b/packages/components/src/radio-control/index.tsx
+index 4a8875bce0a2a3..0f87f5de7c94e2 100644
+--- a/packages/components/src/radio-control/index.tsx
++++ b/packages/components/src/radio-control/index.tsx
+@@ -92,7 +92,10 @@ export function RadioControl(
+ 							}
+ 							{ ...additionalProps }
+ 						/>
+-						<label htmlFor={ `${ id }-${ index }` }>
++						<label
++							className="components-radio-control__label"
++							htmlFor={ `${ id }-${ index }` }
++						>
+ 							{ option.label }
+ 						</label>
+ 					</div>
+diff --git a/packages/components/src/radio-control/style.scss b/packages/components/src/radio-control/style.scss
+index 732dc1201d9d5a..a14fc893a73e04 100644
+--- a/packages/components/src/radio-control/style.scss
++++ b/packages/components/src/radio-control/style.scss
+@@ -1,5 +1,32 @@
++.components-radio-control__option {
++	display: flex;
++	align-items: center;
++}
++
+ .components-radio-control__input[type="radio"] {
+ 	@include radio-control;
+-	margin-top: 0;
+-	margin-right: 6px;
++
++	display: inline-flex;
++	margin: 0 6px 0 0;
++	padding: 0;
++	appearance: none;
++	cursor: pointer;
++
++	&:focus {
++		box-shadow: 0 0 0 ($border-width * 2) $components-color-background, 0 0 0 ($border-width * 2 + $border-width-focus-fallback) $components-color-accent;
++	}
++
++	&:checked {
++		background: $components-color-accent;
++		border-color: $components-color-accent;
++
++		&::before {
++			content: "";
++			border-radius: 50%;
++		}
++	}
++}
++
++.components-radio-control__label {
++	cursor: pointer;
+ }

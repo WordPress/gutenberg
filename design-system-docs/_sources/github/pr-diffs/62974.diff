@@ -1,0 +1,39 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 166e18acb6c354..11b4b66eb8ca19 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fixes
+ 
+ -   `UnitControl`: Fix colors when disabled. ([#62970](https://github.com/WordPress/gutenberg/pull/62970))
++-   `useUpdateEffect`: Correctly track mounted state in strict mode. ([#62974](https://github.com/WordPress/gutenberg/pull/62974))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/utils/hooks/use-update-effect.js b/packages/components/src/utils/hooks/use-update-effect.js
+index 361bce5c9c2889..d49ca951cdcff9 100644
+--- a/packages/components/src/utils/hooks/use-update-effect.js
++++ b/packages/components/src/utils/hooks/use-update-effect.js
+@@ -6,7 +6,7 @@ import { useRef, useEffect } from '@wordpress/element';
+ /**
+  * A `React.useEffect` that will not run on the first render.
+  * Source:
+- * https://github.com/ariakit/ariakit/blob/reakit/packages/reakit-utils/src/useUpdateEffect.ts
++ * https://github.com/ariakit/ariakit/blob/main/packages/ariakit-react-core/src/utils/hooks.ts
+  *
+  * @param {import('react').EffectCallback} effect
+  * @param {import('react').DependencyList} deps
+@@ -25,6 +25,13 @@ function useUpdateEffect( effect, deps ) {
+ 		// see https://github.com/WordPress/gutenberg/pull/41166
+ 		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, deps );
++
++	useEffect(
++		() => () => {
++			mounted.current = false;
++		},
++		[]
++	);
+ }
+ 
+ export default useUpdateEffect;

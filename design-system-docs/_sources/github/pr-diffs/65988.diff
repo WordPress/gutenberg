@@ -1,0 +1,112 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4ae124347187e7..84a51e0f3597ad 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,10 @@
+ -   `RangeControl`: do not tooltip contents to the DOM when not shown ([#65875](https://github.com/WordPress/gutenberg/pull/65875)).
+ -   `Tabs`: fix skipping indication animation glitch ([#65878](https://github.com/WordPress/gutenberg/pull/65878)).
+ 
++### Deprecations
++
++-   `SearchControl`: Soft deprecate `onClose` prop ([#65988](https://github.com/WordPress/gutenberg/pull/65988)).
++
+ ### Enhancements
+ 
+ -   `Tabs`: revamped vertical orientation styles ([#65387](https://github.com/WordPress/gutenberg/pull/65387)).
+diff --git a/packages/components/src/search-control/README.md b/packages/components/src/search-control/README.md
+index 52513ab47f582e..3945f451d6dcf7 100644
+--- a/packages/components/src/search-control/README.md
++++ b/packages/components/src/search-control/README.md
+@@ -76,6 +76,8 @@ A function that receives the value of the input.
+ 
+ #### onClose
+ 
++_Note: this prop is deprecated._
++
+ When an `onClose` callback is provided, the search control will render a close button that will trigger the given callback.
+ 
+ Use this if you want the button to trigger your own logic to close the search field entirely, rather than just clearing the input value.
+diff --git a/packages/components/src/search-control/index.tsx b/packages/components/src/search-control/index.tsx
+index c41eda9b209b6c..0a1b821a0a079a 100644
+--- a/packages/components/src/search-control/index.tsx
++++ b/packages/components/src/search-control/index.tsx
+@@ -10,6 +10,7 @@ import { useInstanceId, useMergeRefs } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+ import { Icon, search, closeSmall } from '@wordpress/icons';
+ import { forwardRef, useMemo, useRef } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -31,6 +32,12 @@ function SuffixItem( {
+ 		return <Icon icon={ search } />;
+ 	}
+ 
++	if ( onClose ) {
++		deprecated( '`onClose` prop in wp.components.SearchControl', {
++			since: '6.8',
++		} );
++	}
++
+ 	const onReset = () => {
+ 		onChange( '' );
+ 		searchRef.current?.focus();
+diff --git a/packages/components/src/search-control/stories/index.story.tsx b/packages/components/src/search-control/stories/index.story.tsx
+index 215288bb67c9b6..59618dd7e0913b 100644
+--- a/packages/components/src/search-control/stories/index.story.tsx
++++ b/packages/components/src/search-control/stories/index.story.tsx
+@@ -50,18 +50,3 @@ Default.args = {
+ 	help: 'Help text to explain the input.',
+ 	__nextHasNoMarginBottom: true,
+ };
+-
+-/**
+- * When an `onClose` callback is provided, the search control will render a close button
+- * that will trigger the given callback.
+- *
+- * Use this if you want the button to trigger your own logic to close the search field entirely,
+- * rather than just clearing the input value.
+- */
+-export const WithOnClose = Template.bind( {} );
+-WithOnClose.args = {
+-	...Default.args,
+-};
+-WithOnClose.argTypes = {
+-	onClose: { action: 'onClose' },
+-};
+diff --git a/packages/components/src/search-control/test/index.tsx b/packages/components/src/search-control/test/index.tsx
+index c6637945adcf63..5250a531f58d09 100644
+--- a/packages/components/src/search-control/test/index.tsx
++++ b/packages/components/src/search-control/test/index.tsx
+@@ -72,13 +72,16 @@ describe( 'SearchControl', () => {
+ 			expect( onChangeSpy ).toHaveBeenLastCalledWith( '' );
+ 		} );
+ 
+-		it( 'should should render a Close button (instead of Reset) when onClose function is provided', async () => {
++		it( 'should render a Close button (instead of Reset) when onClose function is provided', async () => {
+ 			const onChangeSpy = jest.fn();
+ 			const onCloseSpy = jest.fn();
+ 			render(
+ 				<Component onChange={ onChangeSpy } onClose={ onCloseSpy } />
+ 			);
+ 
++			expect( console ).toHaveWarnedWith(
++				'`onClose` prop in wp.components.SearchControl is deprecated since version 6.8.'
++			);
+ 			expect(
+ 				screen.queryByRole( 'button', { name: 'Close search' } )
+ 			).toBeVisible();
+diff --git a/packages/components/src/search-control/types.ts b/packages/components/src/search-control/types.ts
+index 1bf38d1c25f6fb..e4117e5ed57ffb 100644
+--- a/packages/components/src/search-control/types.ts
++++ b/packages/components/src/search-control/types.ts
+@@ -40,6 +40,9 @@ export type SearchControlProps = Pick< InputControlProps, 'help' | 'value' > & {
+ 	 *
+ 	 * Use this if you want the button to trigger your own logic to close the search field entirely,
+ 	 * rather than just clearing the input value.
++	 *
++	 * @deprecated
++	 * @ignore
+ 	 */
+ 	onClose?: () => void;
+ 	/** @ignore */

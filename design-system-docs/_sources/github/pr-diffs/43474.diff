@@ -1,0 +1,222 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f48f8c868a9b69..ad8e928f8890a9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -42,6 +42,11 @@
+ -   `Modal`: use `KeyboardEvent.code` instead of deprecated `KeyboardEvent.keyCode`. improve unit tests ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
+ -   `FocalPointPicker`: use `KeyboardEvent.code`, partially refactor tests to modern RTL and `user-event` ([#43441](https://github.com/WordPress/gutenberg/pull/43441/)).
+ -   `CustomGradientPicker`: use `KeyboardEvent.code` instead of `KeyboardEvent.keyCode` ([#43437](https://github.com/WordPress/gutenberg/pull/43437/)).
++-   `NavigableContainer`: Refactor away from `_.omit()` ([#43474](https://github.com/WordPress/gutenberg/pull/43474/)).
++-   `Notice`: Refactor away from `_.omit()` ([#43474](https://github.com/WordPress/gutenberg/pull/43474/)).
++-   `Snackbar`: Refactor away from `_.omit()` ([#43474](https://github.com/WordPress/gutenberg/pull/43474/)).
++-   `UnitControl`: Refactor away from `_.omit()` ([#43474](https://github.com/WordPress/gutenberg/pull/43474/)).
++-   `BottomSheet`: Refactor away from `_.omit()` ([#43474](https://github.com/WordPress/gutenberg/pull/43474/)).
+ 
+ ### Experimental
+ -   `FormTokenField`: add `__experimentalAutoSelectFirstMatch` prop to auto select the first matching suggestion on typing ([#42527](https://github.com/WordPress/gutenberg/pull/42527/)).
+diff --git a/packages/components/src/mobile/bottom-sheet/index.native.js b/packages/components/src/mobile/bottom-sheet/index.native.js
+index c4e2af52d3b32b..27eaf1b462aca1 100644
+--- a/packages/components/src/mobile/bottom-sheet/index.native.js
++++ b/packages/components/src/mobile/bottom-sheet/index.native.js
+@@ -15,7 +15,6 @@ import {
+ } from 'react-native';
+ import Modal from 'react-native-modal';
+ import SafeArea from 'react-native-safe-area';
+-import { omit } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -400,6 +399,7 @@ class BottomSheet extends Component {
+ 			children,
+ 			withHeaderSeparator = false,
+ 			hasNavigation,
++			onDismiss,
+ 			...rest
+ 		} = this.props;
+ 		const {
+@@ -527,9 +527,7 @@ class BottomSheet extends Component {
+ 					panResponder.panHandlers.onMoveShouldSetResponderCapture
+ 				}
+ 				onAccessibilityEscape={ this.onCloseBottomSheet }
+-				// We need to prevent overwriting the onDismiss prop,
+-				// for this reason it is excluded from the rest object.
+-				{ ...omit( rest, 'onDismiss' ) }
++				{ ...rest }
+ 			>
+ 				<KeyboardAvoidingView
+ 					behavior={ Platform.OS === 'ios' && 'padding' }
+diff --git a/packages/components/src/navigable-container/container.js b/packages/components/src/navigable-container/container.js
+index a4e7377681049d..13e7455abddb11 100644
+--- a/packages/components/src/navigable-container/container.js
++++ b/packages/components/src/navigable-container/container.js
+@@ -1,9 +1,4 @@
+ // @ts-nocheck
+-/**
+- * External dependencies
+- */
+-import { omit } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -131,20 +126,19 @@ class NavigableContainer extends Component {
+ 	}
+ 
+ 	render() {
+-		const { children, ...props } = this.props;
++		const {
++			children,
++			stopNavigationEvents,
++			eventToOffset,
++			onNavigate,
++			onKeyDown,
++			cycle,
++			onlyBrowserTabstops,
++			forwardedRef,
++			...restProps
++		} = this.props;
+ 		return (
+-			<div
+-				ref={ this.bindContainer }
+-				{ ...omit( props, [
+-					'stopNavigationEvents',
+-					'eventToOffset',
+-					'onNavigate',
+-					'onKeyDown',
+-					'cycle',
+-					'onlyBrowserTabstops',
+-					'forwardedRef',
+-				] ) }
+-			>
++			<div ref={ this.bindContainer } { ...restProps }>
+ 				{ children }
+ 			</div>
+ 		);
+diff --git a/packages/components/src/notice/list.js b/packages/components/src/notice/list.js
+index d410aab6482925..23c54605e58230 100644
+--- a/packages/components/src/notice/list.js
++++ b/packages/components/src/notice/list.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { omit } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+@@ -30,15 +29,18 @@ function NoticeList( { notices, onRemove = noop, className, children } ) {
+ 	return (
+ 		<div className={ className }>
+ 			{ children }
+-			{ [ ...notices ].reverse().map( ( notice ) => (
+-				<Notice
+-					{ ...omit( notice, [ 'content' ] ) }
+-					key={ notice.id }
+-					onRemove={ removeNotice( notice.id ) }
+-				>
+-					{ notice.content }
+-				</Notice>
+-			) ) }
++			{ [ ...notices ].reverse().map( ( notice ) => {
++				const { content, ...restNotice } = notice;
++				return (
++					<Notice
++						{ ...restNotice }
++						key={ notice.id }
++						onRemove={ removeNotice( notice.id ) }
++					>
++						{ notice.content }
++					</Notice>
++				);
++			} ) }
+ 		</div>
+ 	);
+ }
+diff --git a/packages/components/src/snackbar/list.js b/packages/components/src/snackbar/list.js
+index a3ab499a543d28..492c883f257049 100644
+--- a/packages/components/src/snackbar/list.js
++++ b/packages/components/src/snackbar/list.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { omit } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -67,6 +66,8 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
+ 			{ children }
+ 			<AnimatePresence>
+ 				{ notices.map( ( notice ) => {
++					const { content, ...restNotice } = notice;
++
+ 					return (
+ 						<motion.div
+ 							layout={ ! isReducedMotion } // See https://www.framer.com/docs/animation/#layout-animations
+@@ -82,7 +83,7 @@ function SnackbarList( { notices, className, children, onRemove = noop } ) {
+ 						>
+ 							<div className="components-snackbar-list__notice-container">
+ 								<Snackbar
+-									{ ...omit( notice, [ 'content' ] ) }
++									{ ...restNotice }
+ 									onRemove={ removeNotice( notice ) }
+ 									listRef={ listRef }
+ 								>
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 2f43494f52ea5f..6f9725950ff00a 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -9,7 +9,6 @@ import type {
+ 	ChangeEvent,
+ 	PointerEvent,
+ } from 'react';
+-import { omit } from 'lodash';
+ import classnames from 'classnames';
+ 
+ /**
+@@ -47,6 +46,7 @@ function UnforwardedUnitControl(
+ 	const {
+ 		__unstableStateReducer: stateReducerProp,
+ 		autoComplete = 'off',
++		children,
+ 		className,
+ 		disabled = false,
+ 		disableUnits = false,
+@@ -261,7 +261,7 @@ function UnforwardedUnitControl(
+ 			<ValueInput
+ 				aria-label={ label }
+ 				type={ isPressEnterToChange ? 'text' : 'number' }
+-				{ ...omit( props, [ 'children' ] ) }
++				{ ...props }
+ 				autoComplete={ autoComplete }
+ 				className={ classes }
+ 				disabled={ disabled }
+diff --git a/packages/components/src/unit-control/types.ts b/packages/components/src/unit-control/types.ts
+index 0372d2935733bb..c88ec3ba91a117 100644
+--- a/packages/components/src/unit-control/types.ts
++++ b/packages/components/src/unit-control/types.ts
+@@ -1,7 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import type { CSSProperties, FocusEventHandler, SyntheticEvent } from 'react';
++import type {
++	CSSProperties,
++	FocusEventHandler,
++	ReactNode,
++	SyntheticEvent,
++} from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -74,6 +79,10 @@ export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
+ 	> & {
+ 		__unstableStateReducer?: StateReducer;
+ 		__unstableInputWidth?: CSSProperties[ 'width' ];
++		/**
++		 * The children elements.
++		 */
++		children?: ReactNode;
+ 		/**
+ 		 * If `true`, the unit `<select>` is hidden.
+ 		 *

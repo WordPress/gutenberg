@@ -1,0 +1,47 @@
+diff --git a/packages/block-editor/src/components/media-placeholder/index.js b/packages/block-editor/src/components/media-placeholder/index.js
+index e3adfa463a652b..09ded06ca7bb57 100644
+--- a/packages/block-editor/src/components/media-placeholder/index.js
++++ b/packages/block-editor/src/components/media-placeholder/index.js
+@@ -328,6 +328,7 @@ export function MediaPlaceholder( {
+ 				multiple={ multiple }
+ 				onSelect={ onSelect }
+ 				allowedTypes={ allowedTypes }
++				mode={ 'browse' }
+ 				value={
+ 					Array.isArray( value )
+ 						? value.map( ( { id } ) => id )
+diff --git a/packages/block-editor/src/components/media-upload/README.md b/packages/block-editor/src/components/media-upload/README.md
+index 3e951c2e1c2837..cec211005e9cd6 100644
+--- a/packages/block-editor/src/components/media-upload/README.md
++++ b/packages/block-editor/src/components/media-upload/README.md
+@@ -64,6 +64,14 @@ If allowedTypes is unset all mime types should be allowed.
+ -   Required: No
+ -   Platform: Web | Mobile
+ 
++### mode
++
++Value of Frame content default mode like 'browse', 'upload' etc.
++
++-   Type: `String`
++-   Required: No
++-   Default: false
++-   Platform: Web
+ ### multiple
+ 
+ Whether to allow multiple selections or not.
+diff --git a/packages/media-utils/src/components/media-upload/index.js b/packages/media-utils/src/components/media-upload/index.js
+index d344cf70c508b0..1e24764a996b48 100644
+--- a/packages/media-utils/src/components/media-upload/index.js
++++ b/packages/media-utils/src/components/media-upload/index.js
+@@ -377,6 +377,11 @@ class MediaUpload extends Component {
+ 	onOpen() {
+ 		this.updateCollection();
+ 
++		//Handle active tab in media model on model open.
++		if ( this.props.mode ) {
++			this.frame.content.mode( this.props.mode );
++		}
++
+ 		// Handle both this.props.value being either (number[]) multiple ids
+ 		// (for galleries) or a (number) singular id (e.g. image block).
+ 		const hasMedia = Array.isArray( this.props.value )

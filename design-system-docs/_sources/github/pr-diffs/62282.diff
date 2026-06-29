@@ -1,0 +1,924 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 7d1bb161a7c3f1..a3ecf750dbb12e 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -143,9 +143,9 @@ const restrictedSyntax = [
+ const restrictedSyntaxComponents = [
+ 	{
+ 		selector:
+-			'JSXOpeningElement[name.name="Button"]:not(:has(JSXAttribute[name.name="__experimentalIsFocusable"])) JSXAttribute[name.name="disabled"]',
++			'JSXOpeningElement[name.name="Button"]:not(:has(JSXAttribute[name.name="accessibleWhenDisabled"])) JSXAttribute[name.name="disabled"]',
+ 		message:
+-			'`disabled` used without the `__experimentalIsFocusable` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
++			'`disabled` used without the `accessibleWhenDisabled` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
+ 	},
+ ];
+ 
+diff --git a/packages/block-directory/src/components/downloadable-block-list-item/index.js b/packages/block-directory/src/components/downloadable-block-list-item/index.js
+index e3a770925551cb..b1ef34ccdba596 100644
+--- a/packages/block-directory/src/components/downloadable-block-list-item/index.js
++++ b/packages/block-directory/src/components/downloadable-block-list-item/index.js
+@@ -96,7 +96,7 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
+ 		<CompositeItem
+ 			render={
+ 				<Button
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 					type="button"
+ 					role="option"
+ 					className="block-directory-downloadable-block-list-item"
+diff --git a/packages/block-directory/src/plugins/get-install-missing/install-button.js b/packages/block-directory/src/plugins/get-install-missing/install-button.js
+index 075fed360c14c8..9dcd45f67760f4 100644
+--- a/packages/block-directory/src/plugins/get-install-missing/install-button.js
++++ b/packages/block-directory/src/plugins/get-install-missing/install-button.js
+@@ -42,7 +42,7 @@ export default function InstallButton( { attributes, block, clientId } ) {
+ 					}
+ 				} )
+ 			}
+-			__experimentalIsFocusable
++			accessibleWhenDisabled
+ 			disabled={ isInstallingBlock }
+ 			isBusy={ isInstallingBlock }
+ 			variant="primary"
+diff --git a/packages/block-editor/src/components/block-mover/button.js b/packages/block-editor/src/components/block-mover/button.js
+index f8ffc128394df5..7e01ee4a359db9 100644
+--- a/packages/block-editor/src/components/block-mover/button.js
++++ b/packages/block-editor/src/components/block-mover/button.js
+@@ -143,7 +143,7 @@ const BlockMoverButton = forwardRef(
+ 					{ ...props }
+ 					onClick={ isDisabled ? null : onClick }
+ 					disabled={ isDisabled }
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 				/>
+ 				<VisuallyHidden id={ descriptionId }>
+ 					{ getBlockMoverDescription(
+diff --git a/packages/block-editor/src/components/block-pattern-setup/setup-toolbar.js b/packages/block-editor/src/components/block-pattern-setup/setup-toolbar.js
+index 91b68456cda71c..df559194e5b78b 100644
+--- a/packages/block-editor/src/components/block-pattern-setup/setup-toolbar.js
++++ b/packages/block-editor/src/components/block-pattern-setup/setup-toolbar.js
+@@ -35,14 +35,14 @@ const CarouselNavigation = ( {
+ 			label={ __( 'Previous pattern' ) }
+ 			onClick={ handlePrevious }
+ 			disabled={ activeSlide === 0 }
+-			__experimentalIsFocusable
++			accessibleWhenDisabled
+ 		/>
+ 		<Button
+ 			icon={ chevronRight }
+ 			label={ __( 'Next pattern' ) }
+ 			onClick={ handleNext }
+ 			disabled={ activeSlide === totalSlides - 1 }
+-			__experimentalIsFocusable
++			accessibleWhenDisabled
+ 		/>
+ 	</div>
+ );
+diff --git a/packages/block-editor/src/components/block-patterns-paging/index.js b/packages/block-editor/src/components/block-patterns-paging/index.js
+index 66be81d1eae19e..7ddbfc4702bf2f 100644
+--- a/packages/block-editor/src/components/block-patterns-paging/index.js
++++ b/packages/block-editor/src/components/block-patterns-paging/index.js
+@@ -42,7 +42,7 @@ export default function Pagination( {
+ 							onClick={ () => changePage( 1 ) }
+ 							disabled={ currentPage === 1 }
+ 							aria-label={ __( 'First page' ) }
+-							__experimentalIsFocusable
++							accessibleWhenDisabled
+ 						>
+ 							<span>«</span>
+ 						</Button>
+@@ -51,7 +51,7 @@ export default function Pagination( {
+ 							onClick={ () => changePage( currentPage - 1 ) }
+ 							disabled={ currentPage === 1 }
+ 							aria-label={ __( 'Previous page' ) }
+-							__experimentalIsFocusable
++							accessibleWhenDisabled
+ 						>
+ 							<span>‹</span>
+ 						</Button>
+@@ -74,7 +74,7 @@ export default function Pagination( {
+ 							onClick={ () => changePage( currentPage + 1 ) }
+ 							disabled={ currentPage === numPages }
+ 							aria-label={ __( 'Next page' ) }
+-							__experimentalIsFocusable
++							accessibleWhenDisabled
+ 						>
+ 							<span>›</span>
+ 						</Button>
+@@ -84,7 +84,7 @@ export default function Pagination( {
+ 							disabled={ currentPage === numPages }
+ 							aria-label={ __( 'Last page' ) }
+ 							size="default"
+-							__experimentalIsFocusable
++							accessibleWhenDisabled
+ 						>
+ 							<span>»</span>
+ 						</Button>
+diff --git a/packages/block-editor/src/components/link-control/link-preview.js b/packages/block-editor/src/components/link-control/link-preview.js
+index d06c9971c680bf..e5de47f0153a82 100644
+--- a/packages/block-editor/src/components/link-control/link-preview.js
++++ b/packages/block-editor/src/components/link-control/link-preview.js
+@@ -166,7 +166,7 @@ export default function LinkPreview( {
+ 						isEmptyURL || showIconLabels ? '' : ': ' + value.url
+ 					) }
+ 					ref={ ref }
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 					disabled={ isEmptyURL }
+ 					size="compact"
+ 				/>
+diff --git a/packages/block-library/src/page-list/convert-to-links-modal.js b/packages/block-library/src/page-list/convert-to-links-modal.js
+index 12277bee01faf1..209987b1942386 100644
+--- a/packages/block-library/src/page-list/convert-to-links-modal.js
++++ b/packages/block-library/src/page-list/convert-to-links-modal.js
+@@ -36,7 +36,7 @@ export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
+ 				</Button>
+ 				<Button
+ 					variant="primary"
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 					disabled={ disabled }
+ 					onClick={ onClick }
+ 				>
+diff --git a/packages/block-library/src/page-list/edit.js b/packages/block-library/src/page-list/edit.js
+index 11ecfa67e18590..fca8096ac05d4e 100644
+--- a/packages/block-library/src/page-list/edit.js
++++ b/packages/block-library/src/page-list/edit.js
+@@ -338,7 +338,7 @@ export default function PageListEdit( {
+ 						<p>{ convertDescription }</p>
+ 						<Button
+ 							variant="primary"
+-							__experimentalIsFocusable
++							accessibleWhenDisabled
+ 							disabled={ ! hasResolvedPages }
+ 							onClick={ convertToNavigationLinks }
+ 						>
+diff --git a/packages/block-library/src/template-part/edit/title-modal.js b/packages/block-library/src/template-part/edit/title-modal.js
+index bae4e893443c8e..0fe4cb08fb8b0d 100644
+--- a/packages/block-library/src/template-part/edit/title-modal.js
++++ b/packages/block-library/src/template-part/edit/title-modal.js
+@@ -43,7 +43,7 @@ export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
+ 						<Button
+ 							variant="primary"
+ 							type="submit"
+-							__experimentalIsFocusable
++							accessibleWhenDisabled
+ 							disabled={ ! title.length }
+ 						>
+ 							{ __( 'Create' ) }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9d3903f70e2add..19ab4ff66815f4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ ### Enhancements
+ 
+ -   `ToolbarButton`: Deprecate `isDisabled` prop and merge with `disabled` ([#63101](https://github.com/WordPress/gutenberg/pull/63101)).
++-   `Button`: Stabilize `__experimentalIsFocusable` prop as `accessibleWhenDisabled` ([#62282](https://github.com/WordPress/gutenberg/pull/62282)).
+ -   `ToolbarButton`: Always keep focusable when disabled ([#63102](https://github.com/WordPress/gutenberg/pull/63102)).
+ 
+ ### Internal
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.tsx b/packages/components/src/autocomplete/autocompleter-ui.tsx
+index 59c88b4e41ecd1..1a5aacf1438abc 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.tsx
++++ b/packages/components/src/autocomplete/autocompleter-ui.tsx
+@@ -58,7 +58,7 @@ function ListBox( {
+ 					id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
+ 					role="option"
+ 					aria-selected={ index === selectedIndex }
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 					disabled={ option.isDisabled }
+ 					className={ clsx(
+ 						'components-autocomplete__result',
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index a8cdcf82c96657..e8b0e7ea697083 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -115,6 +115,17 @@ The presence of a `href` prop determines whether an `anchor` element is rendered
+ 
+ Props not included in this set will be applied to the `a` or `button` element.
+ 
++#### `accessibleWhenDisabled`: `boolean`
++
++Whether to keep the button focusable when disabled.
++
++In most cases, it is recommended to set this to `true`. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or by preventing focus from returning to a trigger element.
++
++Learn more about the [focusability of disabled controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols) in the WAI-ARIA Authoring Practices Guide.
++
++-   Required: No
++-   Default: `false`
++
+ #### `children`: `ReactNode`
+ 
+ The button's children.
+@@ -137,6 +148,8 @@ An accessible description for the button.
+ 
+ Whether the button is disabled. If `true`, this will force a `button` element to be rendered, even when an `href` is given.
+ 
++In most cases, it is recommended to also set the `accessibleWhenDisabled` prop to `true`.
++
+ -   Required: No
+ 
+ #### `href`: `string`
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index e2ef34f35712e7..ac495007838403 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -29,6 +29,7 @@ import { positionToPlacement } from '../popover/utils';
+ const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
+ 
+ function useDeprecatedProps( {
++	__experimentalIsFocusable,
+ 	isDefault,
+ 	isPrimary,
+ 	isSecondary,
+@@ -43,7 +44,8 @@ function useDeprecatedProps( {
+ 	let computedSize = size;
+ 	let computedVariant = variant;
+ 
+-	const newProps: { 'aria-pressed'?: boolean } = {
++	const newProps = {
++		accessibleWhenDisabled: __experimentalIsFocusable,
+ 		// @todo Mark `isPressed` as deprecated
+ 		'aria-pressed': isPressed,
+ 	};
+@@ -91,6 +93,7 @@ export function UnforwardedButton(
+ ) {
+ 	const {
+ 		__next40pxDefaultSize,
++		accessibleWhenDisabled,
+ 		isBusy,
+ 		isDestructive,
+ 		className,
+@@ -106,7 +109,6 @@ export function UnforwardedButton(
+ 		size = 'default',
+ 		text,
+ 		variant,
+-		__experimentalIsFocusable: isFocusable,
+ 		describedBy,
+ 		...buttonOrAnchorProps
+ 	} = useDeprecatedProps( props );
+@@ -159,7 +161,7 @@ export function UnforwardedButton(
+ 		'has-icon': !! icon,
+ 	} );
+ 
+-	const trulyDisabled = disabled && ! isFocusable;
++	const trulyDisabled = disabled && ! accessibleWhenDisabled;
+ 	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
+ 	const buttonProps: ComponentPropsWithoutRef< 'button' > =
+ 		Tag === 'button'
+@@ -177,7 +179,7 @@ export function UnforwardedButton(
+ 	const disableEventProps: {
+ 		[ key: string ]: ( event: MouseEvent ) => void;
+ 	} = {};
+-	if ( disabled && isFocusable ) {
++	if ( disabled && accessibleWhenDisabled ) {
+ 		// In this case, the button will be disabled, but still focusable and
+ 		// perceivable by screen reader users.
+ 		buttonProps[ 'aria-disabled' ] = true;
+diff --git a/packages/components/src/button/stories/e2e/index.story.tsx b/packages/components/src/button/stories/e2e/index.story.tsx
+index 075438fe0579eb..a4fcfdeac5ca48 100644
+--- a/packages/components/src/button/stories/e2e/index.story.tsx
++++ b/packages/components/src/button/stories/e2e/index.story.tsx
+@@ -45,7 +45,7 @@ export const VariantStates: StoryFn< typeof Button > = (
+ 						{ ...props }
+ 						variant={ variant }
+ 						disabled
+-						__experimentalIsFocusable
++						accessibleWhenDisabled
+ 					/>
+ 					<Button { ...props } variant={ variant } isBusy />
+ 					<Button { ...props } variant={ variant } isDestructive />
+diff --git a/packages/components/src/button/test/index.tsx b/packages/components/src/button/test/index.tsx
+index d9608f776d4101..02fe6ecb851c4b 100644
+--- a/packages/components/src/button/test/index.tsx
++++ b/packages/components/src/button/test/index.tsx
+@@ -242,7 +242,7 @@ describe( 'Button', () => {
+ 		} );
+ 
+ 		it( 'should add only aria-disabled attribute when disabled and isFocusable are true', () => {
+-			render( <Button disabled __experimentalIsFocusable /> );
++			render( <Button disabled accessibleWhenDisabled /> );
+ 			const button = screen.getByRole( 'button' );
+ 
+ 			expect( button ).toBeEnabled();
+@@ -619,6 +619,15 @@ describe( 'Button', () => {
+ 				'mixed'
+ 			);
+ 		} );
++
++		it( 'should not break when the legacy __experimentalIsFocusable prop is passed', () => {
++			// eslint-disable-next-line no-restricted-syntax
++			render( <Button disabled __experimentalIsFocusable /> );
++			const button = screen.getByRole( 'button' );
++
++			expect( button ).toBeEnabled();
++			expect( button ).toHaveAttribute( 'aria-disabled' );
++		} );
+ 	} );
+ 
+ 	describe( 'static typing', () => {
+@@ -638,7 +647,7 @@ describe( 'Button', () => {
+ 			{ /* @ts-expect-error */ }
+ 			<Button type="invalidtype" />
+ 			{ /* @ts-expect-error - although the runtime behavior will allow this to be an anchor, this is probably a mistake. */ }
+-			<Button disabled __experimentalIsFocusable href="foo" />
++			<Button disabled accessibleWhenDisabled href="foo" />
+ 		</>;
+ 	} );
+ } );
+diff --git a/packages/components/src/button/types.ts b/packages/components/src/button/types.ts
+index ce6db4b3e914bc..cba06ade2d02ca 100644
+--- a/packages/components/src/button/types.ts
++++ b/packages/components/src/button/types.ts
+@@ -25,6 +25,19 @@ type BaseButtonProps = {
+ 	 * @default false
+ 	 */
+ 	__next40pxDefaultSize?: boolean;
++	/**
++	 * Whether to keep the button focusable when disabled.
++	 *
++	 * In most cases, it is recommended to set this to `true`. Disabling a control without maintaining focusability
++	 * can cause accessibility issues, by hiding their presence from screen reader users,
++	 * or by preventing focus from returning to a trigger element.
++	 *
++	 * Learn more about the [focusability of disabled controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols)
++	 * in the WAI-ARIA Authoring Practices Guide.
++	 *
++	 * @default false
++	 */
++	accessibleWhenDisabled?: boolean;
+ 	/**
+ 	 * The button's children.
+ 	 */
+@@ -105,28 +118,24 @@ type BaseButtonProps = {
+ 	 * 'link' (the link button styles)
+ 	 */
+ 	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
+-	/**
+-	 * Whether to keep the button focusable when disabled.
+-	 *
+-	 * @default false
+-	 */
+-	__experimentalIsFocusable?: boolean;
+ };
+ 
+ type _ButtonProps = {
+ 	/**
+-	 * Whether the button is disabled.
++	 * Whether the button is disabled. If `true`, this will force a `button` element
++	 * to be rendered, even when an `href` is given.
+ 	 *
+-	 * If `true`, this will force a `button` element to be rendered, even when an `href` is given.
++	 * In most cases, it is recommended to also set the `accessibleWhenDisabled` prop to `true`.
+ 	 */
+ 	disabled?: boolean;
+ };
+ 
+ type AnchorProps = {
+ 	/**
+-	 * Whether the button is disabled.
++	 * Whether the button is disabled. If `true`, this will force a `button` element
++	 * to be rendered, even when an `href` is given.
+ 	 *
+-	 * If `true`, this will force a `button` element to be rendered, even when an `href` is given.
++	 * In most cases, it is recommended to also set the `accessibleWhenDisabled` prop to `true`.
+ 	 */
+ 	disabled?: false;
+ 	/**
+@@ -140,6 +149,14 @@ type AnchorProps = {
+ };
+ 
+ export type DeprecatedButtonProps = {
++	/**
++	 * Whether to keep the button focusable when disabled.
++	 *
++	 * @default false
++	 * @deprecated Use the `accessibleWhenDisabled` prop instead.
++	 * @ignore
++	 */
++	__experimentalIsFocusable?: boolean;
+ 	/**
+ 	 * Gives the button a default style.
+ 	 *
+diff --git a/packages/components/src/dropdown-menu/index.tsx b/packages/components/src/dropdown-menu/index.tsx
+index b631be344c2b96..0e4501be4839c0 100644
+--- a/packages/components/src/dropdown-menu/index.tsx
++++ b/packages/components/src/dropdown-menu/index.tsx
+@@ -199,7 +199,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+ 											? control.role
+ 											: 'menuitem'
+ 									}
+-									__experimentalIsFocusable
++									accessibleWhenDisabled
+ 									disabled={ control.isDisabled }
+ 								>
+ 									{ control.title }
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index cb17b7a16e3637..e4de2f6f6f5cf9 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -262,7 +262,7 @@ const UnforwardedFontSizePicker = (
+ 							<FlexItem>
+ 								<Button
+ 									disabled={ isDisabled }
+-									__experimentalIsFocusable
++									accessibleWhenDisabled
+ 									onClick={ () => {
+ 										onChange?.( undefined );
+ 									} }
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index c133e86cd3cf46..b5fff9f56b80d7 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -327,7 +327,7 @@ function UnforwardedRangeControl(
+ 						<Button
+ 							className="components-range-control__reset"
+ 							// If the RangeControl itself is disabled, the reset button shouldn't be in the tab sequence.
+-							__experimentalIsFocusable={ ! disabled }
++							accessibleWhenDisabled={ ! disabled }
+ 							disabled={ disabled || value === undefined }
+ 							variant="secondary"
+ 							size="small"
+diff --git a/packages/components/src/toolbar/toolbar-button/index.tsx b/packages/components/src/toolbar/toolbar-button/index.tsx
+index a8967df75690c0..e230c6ce52be59 100644
+--- a/packages/components/src/toolbar/toolbar-button/index.tsx
++++ b/packages/components/src/toolbar/toolbar-button/index.tsx
+@@ -74,7 +74,7 @@ function UnforwardedToolbarButton(
+ 						className
+ 					) }
+ 					isPressed={ isActive }
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 					data-toolbar-item
+ 					{ ...extraProps }
+ 					{ ...restProps }
+diff --git a/packages/dataviews/src/add-filter.tsx b/packages/dataviews/src/add-filter.tsx
+index b9fc6e9c504c87..095ca9c3a8425f 100644
+--- a/packages/dataviews/src/add-filter.tsx
++++ b/packages/dataviews/src/add-filter.tsx
+@@ -44,7 +44,7 @@ function AddFilter(
+ 		<DropdownMenu
+ 			trigger={
+ 				<Button
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 					size="compact"
+ 					className="dataviews-filters-button"
+ 					variant="tertiary"
+diff --git a/packages/dataviews/src/item-actions.tsx b/packages/dataviews/src/item-actions.tsx
+index 631bcbf485de33..08d82d060b74ca 100644
+--- a/packages/dataviews/src/item-actions.tsx
++++ b/packages/dataviews/src/item-actions.tsx
+@@ -257,7 +257,7 @@ function CompactItemActions< Item >( {
+ 					size="compact"
+ 					icon={ moreVertical }
+ 					label={ __( 'Actions' ) }
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 					disabled={ ! actions.length }
+ 					className="dataviews-all-actions-button"
+ 				/>
+diff --git a/packages/dataviews/src/pagination.tsx b/packages/dataviews/src/pagination.tsx
+index 4020e78525b984..497ae80505bd73 100644
+--- a/packages/dataviews/src/pagination.tsx
++++ b/packages/dataviews/src/pagination.tsx
+@@ -90,7 +90,7 @@ const Pagination = memo( function Pagination( {
+ 							} )
+ 						}
+ 						disabled={ currentPage === 1 }
+-						__experimentalIsFocusable
++						accessibleWhenDisabled
+ 						label={ __( 'Previous page' ) }
+ 						icon={ chevronLeft }
+ 						showTooltip
+@@ -102,7 +102,7 @@ const Pagination = memo( function Pagination( {
+ 							onChangeView( { ...view, page: currentPage + 1 } )
+ 						}
+ 						disabled={ currentPage >= totalPages }
+-						__experimentalIsFocusable
++						accessibleWhenDisabled
+ 						label={ __( 'Next page' ) }
+ 						icon={ chevronRight }
+ 						showTooltip
+diff --git a/packages/dataviews/src/reset-filters.tsx b/packages/dataviews/src/reset-filters.tsx
+index 74570b49d9548c..5c155ac7f05cca 100644
+--- a/packages/dataviews/src/reset-filters.tsx
++++ b/packages/dataviews/src/reset-filters.tsx
+@@ -33,7 +33,7 @@ export default function ResetFilter( {
+ 	return (
+ 		<Button
+ 			disabled={ isDisabled }
+-			__experimentalIsFocusable
++			accessibleWhenDisabled
+ 			size="compact"
+ 			variant="tertiary"
+ 			className="dataviews-filters__reset-button"
+diff --git a/packages/dataviews/src/view-list.tsx b/packages/dataviews/src/view-list.tsx
+index a1150ccda9aada..093bf42cb1d0c9 100644
+--- a/packages/dataviews/src/view-list.tsx
++++ b/packages/dataviews/src/view-list.tsx
+@@ -258,7 +258,7 @@ function ListItem< Item >( {
+ 												size="compact"
+ 												icon={ moreVertical }
+ 												label={ __( 'Actions' ) }
+-												__experimentalIsFocusable
++												accessibleWhenDisabled
+ 												disabled={ ! actions.length }
+ 												onKeyDown={ ( event: {
+ 													key: string;
+diff --git a/packages/edit-post/src/components/init-pattern-modal/index.js b/packages/edit-post/src/components/init-pattern-modal/index.js
+index 1f181006cfec82..e2aef9994fa0f2 100644
+--- a/packages/edit-post/src/components/init-pattern-modal/index.js
++++ b/packages/edit-post/src/components/init-pattern-modal/index.js
+@@ -100,7 +100,7 @@ export default function InitPatternModal() {
+ 									variant="primary"
+ 									type="submit"
+ 									disabled={ ! title }
+-									__experimentalIsFocusable
++									accessibleWhenDisabled
+ 								>
+ 									{ __( 'Create' ) }
+ 								</Button>
+diff --git a/packages/edit-post/src/components/preferences-modal/enable-custom-fields.js b/packages/edit-post/src/components/preferences-modal/enable-custom-fields.js
+index e655a7300c37ee..94d4f28c632cd6 100644
+--- a/packages/edit-post/src/components/preferences-modal/enable-custom-fields.js
++++ b/packages/edit-post/src/components/preferences-modal/enable-custom-fields.js
+@@ -42,7 +42,7 @@ export function CustomFieldsConfirmation( { willEnable } ) {
+ 				className="edit-post-preferences-modal__custom-fields-confirmation-button"
+ 				variant="secondary"
+ 				isBusy={ isReloading }
+-				__experimentalIsFocusable
++				accessibleWhenDisabled
+ 				disabled={ isReloading }
+ 				onClick={ () => {
+ 					setIsReloading( true );
+diff --git a/packages/edit-site/src/components/global-styles-sidebar/index.js b/packages/edit-site/src/components/global-styles-sidebar/index.js
+index f57cc8c417f410..b314b5d7e75244 100644
+--- a/packages/edit-site/src/components/global-styles-sidebar/index.js
++++ b/packages/edit-site/src/components/global-styles-sidebar/index.js
+@@ -152,7 +152,7 @@ export default function GlobalStylesSidebar() {
+ 							isPressed={
+ 								isStyleBookOpened || isRevisionsStyleBookOpened
+ 							}
+-							__experimentalIsFocusable
++							accessibleWhenDisabled
+ 							disabled={ shouldClearCanvasContainerView }
+ 							onClick={ toggleStyleBook }
+ 							size="compact"
+@@ -163,7 +163,7 @@ export default function GlobalStylesSidebar() {
+ 							label={ __( 'Revisions' ) }
+ 							icon={ backup }
+ 							onClick={ toggleRevisions }
+-							__experimentalIsFocusable
++							accessibleWhenDisabled
+ 							disabled={ ! hasRevisions }
+ 							isPressed={
+ 								isRevisionsOpened || isRevisionsStyleBookOpened
+diff --git a/packages/edit-site/src/components/global-styles/font-library-modal/font-collection.js b/packages/edit-site/src/components/global-styles/font-library-modal/font-collection.js
+index db9e3cb402561b..9cb446b1d16ab0 100644
+--- a/packages/edit-site/src/components/global-styles/font-library-modal/font-collection.js
++++ b/packages/edit-site/src/components/global-styles/font-library-modal/font-collection.js
+@@ -438,7 +438,7 @@ function FontCollection( { slug } ) {
+ 								disabled={
+ 									fontsToInstall.length === 0 || isInstalling
+ 								}
+-								__experimentalIsFocusable
++								accessibleWhenDisabled
+ 							>
+ 								{ __( 'Install' ) }
+ 							</Button>
+@@ -455,7 +455,7 @@ function FontCollection( { slug } ) {
+ 								size="compact"
+ 								onClick={ () => setPage( 1 ) }
+ 								disabled={ page === 1 }
+-								__experimentalIsFocusable
++								accessibleWhenDisabled
+ 							>
+ 								<span>«</span>
+ 							</Button>
+@@ -464,7 +464,7 @@ function FontCollection( { slug } ) {
+ 								size="compact"
+ 								onClick={ () => setPage( page - 1 ) }
+ 								disabled={ page === 1 }
+-								__experimentalIsFocusable
++								accessibleWhenDisabled
+ 							>
+ 								<span>‹</span>
+ 							</Button>
+@@ -514,7 +514,7 @@ function FontCollection( { slug } ) {
+ 								size="compact"
+ 								onClick={ () => setPage( page + 1 ) }
+ 								disabled={ page === totalPages }
+-								__experimentalIsFocusable
++								accessibleWhenDisabled
+ 							>
+ 								<span>›</span>
+ 							</Button>
+@@ -523,7 +523,7 @@ function FontCollection( { slug } ) {
+ 								size="compact"
+ 								onClick={ () => setPage( totalPages ) }
+ 								disabled={ page === totalPages }
+-								__experimentalIsFocusable
++								accessibleWhenDisabled
+ 							>
+ 								<span>»</span>
+ 							</Button>
+diff --git a/packages/edit-site/src/components/global-styles/font-library-modal/installed-fonts.js b/packages/edit-site/src/components/global-styles/font-library-modal/installed-fonts.js
+index c644c219348a6e..464540bc2b4ea7 100644
+--- a/packages/edit-site/src/components/global-styles/font-library-modal/installed-fonts.js
++++ b/packages/edit-site/src/components/global-styles/font-library-modal/installed-fonts.js
+@@ -329,7 +329,7 @@ function InstalledFonts() {
+ 								saveFontFamilies( fontFamilies );
+ 							} }
+ 							disabled={ ! fontFamiliesHasChanges }
+-							__experimentalIsFocusable
++							accessibleWhenDisabled
+ 						>
+ 							{ __( 'Update' ) }
+ 						</Button>
+diff --git a/packages/edit-site/src/components/global-styles/screen-revisions/revisions-buttons.js b/packages/edit-site/src/components/global-styles/screen-revisions/revisions-buttons.js
+index 7f4f9896344b4f..a17e5fde5763a7 100644
+--- a/packages/edit-site/src/components/global-styles/screen-revisions/revisions-buttons.js
++++ b/packages/edit-site/src/components/global-styles/screen-revisions/revisions-buttons.js
+@@ -163,7 +163,7 @@ function RevisionsButtons( {
+ 					>
+ 						<Button
+ 							className="edit-site-global-styles-screen-revisions__revision-button"
+-							__experimentalIsFocusable
++							accessibleWhenDisabled
+ 							disabled={ isSelected }
+ 							onClick={ () => {
+ 								onChange( revision );
+diff --git a/packages/edit-site/src/components/pagination/index.js b/packages/edit-site/src/components/pagination/index.js
+index 1552ea81ed8bdc..66b89735b8cb47 100644
+--- a/packages/edit-site/src/components/pagination/index.js
++++ b/packages/edit-site/src/components/pagination/index.js
+@@ -47,7 +47,7 @@ export default function Pagination( {
+ 				<Button
+ 					variant={ buttonVariant }
+ 					onClick={ () => changePage( 1 ) }
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 					disabled={ disabled || currentPage === 1 }
+ 					label={ __( 'First page' ) }
+ 					icon={ previous }
+@@ -56,7 +56,7 @@ export default function Pagination( {
+ 				<Button
+ 					variant={ buttonVariant }
+ 					onClick={ () => changePage( currentPage - 1 ) }
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 					disabled={ disabled || currentPage === 1 }
+ 					label={ __( 'Previous page' ) }
+ 					icon={ chevronLeft }
+@@ -75,7 +75,7 @@ export default function Pagination( {
+ 				<Button
+ 					variant={ buttonVariant }
+ 					onClick={ () => changePage( currentPage + 1 ) }
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 					disabled={ disabled || currentPage === numPages }
+ 					label={ __( 'Next page' ) }
+ 					icon={ chevronRight }
+@@ -84,7 +84,7 @@ export default function Pagination( {
+ 				<Button
+ 					variant={ buttonVariant }
+ 					onClick={ () => changePage( numPages ) }
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 					disabled={ disabled || currentPage === numPages }
+ 					label={ __( 'Last page' ) }
+ 					icon={ next }
+diff --git a/packages/edit-site/src/components/save-panel/index.js b/packages/edit-site/src/components/save-panel/index.js
+index 1422014b08ccc8..ad65fb208b4a06 100644
+--- a/packages/edit-site/src/components/save-panel/index.js
++++ b/packages/edit-site/src/components/save-panel/index.js
+@@ -155,7 +155,7 @@ export default function SavePanel() {
+ 					onClick={ () => setIsSaveViewOpened( true ) }
+ 					aria-haspopup="dialog"
+ 					disabled={ disabled }
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 				>
+ 					{ __( 'Open save panel' ) }
+ 				</Button>
+diff --git a/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/rename-modal.js b/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/rename-modal.js
+index f704f2354e4391..d1a2df9df6cdc3 100644
+--- a/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/rename-modal.js
++++ b/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/rename-modal.js
+@@ -49,7 +49,7 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
+ 
+ 						<Button
+ 							__next40pxDefaultSize
+-							__experimentalIsFocusable
++							accessibleWhenDisabled
+ 							disabled={ ! isEditedMenuTitleValid }
+ 							variant="primary"
+ 							type="submit"
+diff --git a/packages/edit-site/src/hooks/push-changes-to-global-styles/index.js b/packages/edit-site/src/hooks/push-changes-to-global-styles/index.js
+index a81bc107a787c9..60f56e7e9072e9 100644
+--- a/packages/edit-site/src/hooks/push-changes-to-global-styles/index.js
++++ b/packages/edit-site/src/hooks/push-changes-to-global-styles/index.js
+@@ -339,7 +339,7 @@ function PushChangesToGlobalStylesControl( {
+ 			<Button
+ 				__next40pxDefaultSize
+ 				variant="secondary"
+-				__experimentalIsFocusable
++				accessibleWhenDisabled
+ 				disabled={ changes.length === 0 }
+ 				onClick={ pushChanges }
+ 			>
+diff --git a/packages/editor/src/components/entities-saved-states/index.js b/packages/editor/src/components/entities-saved-states/index.js
+index 5d9840855348c9..8c0d59573a44d9 100644
+--- a/packages/editor/src/components/entities-saved-states/index.js
++++ b/packages/editor/src/components/entities-saved-states/index.js
+@@ -134,7 +134,7 @@ export function EntitiesSavedStatesExtensible( {
+ 					ref={ saveButtonRef }
+ 					variant="primary"
+ 					disabled={ ! saveEnabled }
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 					onClick={ () =>
+ 						saveDirtyEntities( {
+ 							onSave,
+diff --git a/packages/editor/src/components/post-actions/actions.js b/packages/editor/src/components/post-actions/actions.js
+index fa6456a05e2c74..f089e9f81f52c4 100644
+--- a/packages/editor/src/components/post-actions/actions.js
++++ b/packages/editor/src/components/post-actions/actions.js
+@@ -120,7 +120,7 @@ const trashPostAction = {
+ 						variant="tertiary"
+ 						onClick={ closeModal }
+ 						disabled={ isBusy }
+-						__experimentalIsFocusable
++						accessibleWhenDisabled
+ 					>
+ 						{ __( 'Cancel' ) }
+ 					</Button>
+@@ -233,7 +233,7 @@ const trashPostAction = {
+ 						} }
+ 						isBusy={ isBusy }
+ 						disabled={ isBusy }
+-						__experimentalIsFocusable
++						accessibleWhenDisabled
+ 					>
+ 						{ __( 'Trash' ) }
+ 					</Button>
+diff --git a/packages/editor/src/components/post-actions/index.js b/packages/editor/src/components/post-actions/index.js
+index 00d256ef67eeef..b2730e760c4270 100644
+--- a/packages/editor/src/components/post-actions/index.js
++++ b/packages/editor/src/components/post-actions/index.js
+@@ -59,7 +59,7 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
+ 					icon={ moreVertical }
+ 					label={ __( 'Actions' ) }
+ 					disabled={ ! actions.length }
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 					className="editor-all-actions-button"
+ 					onClick={ () =>
+ 						setIsActionsMenuOpen( ! isActionsMenuOpen )
+diff --git a/packages/editor/src/components/post-preview-button/index.js b/packages/editor/src/components/post-preview-button/index.js
+index e517ac0e8a0fbc..d57143cd355d80 100644
+--- a/packages/editor/src/components/post-preview-button/index.js
++++ b/packages/editor/src/components/post-preview-button/index.js
+@@ -183,7 +183,7 @@ export default function PostPreviewButton( {
+ 			className={ className || 'editor-post-preview' }
+ 			href={ href }
+ 			target={ targetId }
+-			__experimentalIsFocusable
++			accessibleWhenDisabled
+ 			disabled={ ! isSaveable }
+ 			onClick={ openPreviewWindow }
+ 			role={ role }
+diff --git a/packages/editor/src/components/post-publish-panel/index.js b/packages/editor/src/components/post-publish-panel/index.js
+index 009d008c72c962..28567c60780219 100644
+--- a/packages/editor/src/components/post-publish-panel/index.js
++++ b/packages/editor/src/components/post-publish-panel/index.js
+@@ -93,7 +93,7 @@ export class PostPublishPanel extends Component {
+ 							</div>
+ 							<div className="editor-post-publish-panel__header-cancel-button">
+ 								<Button
+-									__experimentalIsFocusable
++									accessibleWhenDisabled
+ 									disabled={ isSavingNonPostEntityChanges }
+ 									onClick={ onClose }
+ 									variant="secondary"
+diff --git a/packages/editor/src/components/preview-dropdown/index.js b/packages/editor/src/components/preview-dropdown/index.js
+index 1e61b004a20eeb..bc652ea4015c11 100644
+--- a/packages/editor/src/components/preview-dropdown/index.js
++++ b/packages/editor/src/components/preview-dropdown/index.js
+@@ -50,7 +50,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
+ 		size: 'compact',
+ 		showTooltip: ! showIconLabels,
+ 		disabled,
+-		__experimentalIsFocusable: disabled,
++		accessibleWhenDisabled: disabled,
+ 	};
+ 	const menuProps = {
+ 		'aria-label': __( 'View options' ),
+diff --git a/packages/editor/src/components/save-publish-panels/index.js b/packages/editor/src/components/save-publish-panels/index.js
+index 2b1a54b57d9558..91ffca5f9229be 100644
+--- a/packages/editor/src/components/save-publish-panels/index.js
++++ b/packages/editor/src/components/save-publish-panels/index.js
+@@ -92,7 +92,7 @@ export default function SavePublishPanels( {
+ 					onClick={ openEntitiesSavedStates }
+ 					aria-expanded={ false }
+ 					disabled={ ! isDirty }
+-					__experimentalIsFocusable
++					accessibleWhenDisabled
+ 				>
+ 					{ __( 'Open save panel' ) }
+ 				</Button>
+diff --git a/packages/editor/src/dataviews/actions/delete-post.tsx b/packages/editor/src/dataviews/actions/delete-post.tsx
+index e5810e32fde69a..36400702dae3f6 100644
+--- a/packages/editor/src/dataviews/actions/delete-post.tsx
++++ b/packages/editor/src/dataviews/actions/delete-post.tsx
+@@ -77,7 +77,7 @@ const deletePostAction: Action< Post > = {
+ 						variant="tertiary"
+ 						onClick={ closeModal }
+ 						disabled={ isBusy }
+-						__experimentalIsFocusable
++						accessibleWhenDisabled
+ 					>
+ 						{ __( 'Cancel' ) }
+ 					</Button>
+@@ -94,7 +94,7 @@ const deletePostAction: Action< Post > = {
+ 						} }
+ 						isBusy={ isBusy }
+ 						disabled={ isBusy }
+-						__experimentalIsFocusable
++						accessibleWhenDisabled
+ 					>
+ 						{ __( 'Delete' ) }
+ 					</Button>
+diff --git a/packages/editor/src/dataviews/actions/reset-post.tsx b/packages/editor/src/dataviews/actions/reset-post.tsx
+index 56440e6da33838..17c2860444630f 100644
+--- a/packages/editor/src/dataviews/actions/reset-post.tsx
++++ b/packages/editor/src/dataviews/actions/reset-post.tsx
+@@ -116,7 +116,7 @@ const resetPost: Action< Post > = {
+ 						variant="tertiary"
+ 						onClick={ closeModal }
+ 						disabled={ isBusy }
+-						__experimentalIsFocusable
++						accessibleWhenDisabled
+ 					>
+ 						{ __( 'Cancel' ) }
+ 					</Button>
+@@ -131,7 +131,7 @@ const resetPost: Action< Post > = {
+ 						} }
+ 						isBusy={ isBusy }
+ 						disabled={ isBusy }
+-						__experimentalIsFocusable
++						accessibleWhenDisabled
+ 					>
+ 						{ __( 'Reset' ) }
+ 					</Button>
+diff --git a/packages/list-reusable-blocks/src/components/import-form/index.js b/packages/list-reusable-blocks/src/components/import-form/index.js
+index aa2f3133b7a6ef..9c6e8bf57835f1 100644
+--- a/packages/list-reusable-blocks/src/components/import-form/index.js
++++ b/packages/list-reusable-blocks/src/components/import-form/index.js
+@@ -86,7 +86,7 @@ function ImportForm( { instanceId, onUpload } ) {
+ 			<Button
+ 				type="submit"
+ 				isBusy={ isLoading }
+-				__experimentalIsFocusable
++				accessibleWhenDisabled
+ 				disabled={ ! file || isLoading }
+ 				variant="secondary"
+ 				className="list-reusable-blocks-import-form__button"
+diff --git a/packages/patterns/src/components/pattern-overrides-controls.js b/packages/patterns/src/components/pattern-overrides-controls.js
+index b8af8538d8b358..3a5ff3e0674a6e 100644
+--- a/packages/patterns/src/components/pattern-overrides-controls.js
++++ b/packages/patterns/src/components/pattern-overrides-controls.js
+@@ -111,7 +111,7 @@ function PatternOverridesControls( {
+ 						disabled={
+ 							! hasOverrides && hasUnsupportedImageAttributes
+ 						}
+-						__experimentalIsFocusable
++						accessibleWhenDisabled
+ 					>
+ 						{ hasOverrides
+ 							? __( 'Disable overrides' )
+diff --git a/storybook/stories/playground/with-undo-redo/index.js b/storybook/stories/playground/with-undo-redo/index.js
+index c2b2781cd31e4f..77e059247a0515 100644
+--- a/storybook/stories/playground/with-undo-redo/index.js
++++ b/storybook/stories/playground/with-undo-redo/index.js
+@@ -49,14 +49,14 @@ export default function EditorWithUndoRedo() {
+ 					<Button
+ 						onClick={ undo }
+ 						disabled={ ! hasUndo }
+-						__experimentalIsFocusable
++						accessibleWhenDisabled
+ 						icon={ undoIcon }
+ 						label="Undo"
+ 					/>
+ 					<Button
+ 						onClick={ redo }
+ 						disabled={ ! hasRedo }
+-						__experimentalIsFocusable
++						accessibleWhenDisabled
+ 						icon={ redoIcon }
+ 						label="Redo"
+ 					/>

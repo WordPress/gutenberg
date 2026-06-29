@@ -1,0 +1,21 @@
+diff --git a/packages/components/src/menu/test/index.tsx b/packages/components/src/menu/test/index.tsx
+index 2a2b2cfc354cf3..9bd2aeab9414e6 100644
+--- a/packages/components/src/menu/test/index.tsx
++++ b/packages/components/src/menu/test/index.tsx
+@@ -161,7 +161,7 @@ describe( 'Menu', () => {
+ 				<Menu>
+ 					<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+ 					<Menu.Popover>
+-						<Menu.Item disabled>First item</Menu.Item>
++						<Menu.Item>First item</Menu.Item>
+ 						<Menu.Item>Second item</Menu.Item>
+ 						<Menu.Item>Third item</Menu.Item>
+ 					</Menu.Popover>
+@@ -183,7 +183,6 @@ describe( 'Menu', () => {
+ 			await press.Space();
+ 
+ 			// Menu open, focus is on the first focusable item
+-			// (disabled items are still focusable and accessible
+ 			await waitForFocusedMenuItem( 'First item' );
+ 		} );
+ 

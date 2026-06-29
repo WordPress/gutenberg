@@ -1,0 +1,48 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d7c5460c88497d..3586c90c1861a1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,7 +4,7 @@
+ 
+ ### Enhancements
+ 
+--   `Draggable`: Render the drag clone inside the `@wordpress/ui` compat overlay slot so it shares stacking with `@wordpress/ui` overlays opened mid-drag. Auto-enabled in WordPress environments; other hosts can opt in via `useEnableWpCompatOverlaySlot()` ([#78183](https://github.com/WordPress/gutenberg/pull/78183)).
++-   `Draggable`: Render the drag clone inside the `@wordpress/ui` compat overlay slot so it shares stacking with `@wordpress/ui` overlays opened mid-drag. Auto-enabled in WordPress environments; other hosts can opt in via `useEnableWpCompatOverlaySlot()` ([#78183](https://github.com/WordPress/gutenberg/pull/78183), [#78354](https://github.com/WordPress/gutenberg/pull/78354)).
+ 
+ ## 33.1.0 (2026-05-14)
+ 
+diff --git a/packages/components/src/draggable/index.tsx b/packages/components/src/draggable/index.tsx
+index c04594529ded3f..98c6afc7103f7d 100644
+--- a/packages/components/src/draggable/index.tsx
++++ b/packages/components/src/draggable/index.tsx
+@@ -144,6 +144,11 @@ export function Draggable( {
+ 
+ 		cloneWrapper.classList.add( ...cloneWrapperClasses );
+ 
++		const inSlotClass = styles[ 'is-in-compat-slot' ];
++		if ( compatSlot && inSlotClass ) {
++			cloneWrapper.classList.add( inSlotClass );
++		}
++
+ 		if ( cloneClassname ) {
+ 			cloneWrapper.classList.add( cloneClassname );
+ 		}
+diff --git a/packages/components/src/draggable/style.module.scss b/packages/components/src/draggable/style.module.scss
+index 5c1410770e0e8d..eefc8765bd78d6 100644
+--- a/packages/components/src/draggable/style.module.scss
++++ b/packages/components/src/draggable/style.module.scss
+@@ -13,8 +13,12 @@
+ 	padding: 0; // Should match clonePadding variable.
+ 	background: transparent;
+ 	pointer-events: none;
+-	// Stacking fallback for when the clone is not routed into the
+-	// `@wordpress/ui` compat overlay slot.
++}
++
++// Apply the stacking fallback only outside the `@wordpress/ui` compat
++// overlay slot — inside it, the slot's isolated stacking context
++// already handles ordering.
++.clone:not(.is-in-compat-slot) {
+ 	z-index: z-index(".components-draggable__clone");
+ }
+ 

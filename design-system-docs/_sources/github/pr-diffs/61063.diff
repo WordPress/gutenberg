@@ -1,0 +1,102 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..7a0c0b3476d703 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `Scrollable`: Remove "experimental" designation ([#61063](https://github.com/WordPress/gutenberg/pull/61063)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..5ff8124c6b7023 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -144,8 +144,20 @@ export { default as SearchControl } from './search-control';
+ export { default as SelectControl } from './select-control';
+ export { default as Snackbar } from './snackbar';
+ export { default as SnackbarList } from './snackbar/list';
+-export { Spacer as __experimentalSpacer } from './spacer';
+-export { Scrollable as __experimentalScrollable } from './scrollable';
++export {
++	/**
++	 * @deprecated Import `Spacer` instead.
++	 */
++	Spacer as __experimentalSpacer,
++	Spacer,
++} from './spacer';
++export {
++	/**
++	 * @deprecated Import `Scrollable` instead.
++	 */
++	Scrollable as __experimentalScrollable,
++	Scrollable,
++} from './scrollable';
+ export { default as Spinner } from './spinner';
+ export { Surface as __experimentalSurface } from './surface';
+ export { default as TabPanel } from './tab-panel';
+diff --git a/packages/components/src/scrollable/README.md b/packages/components/src/scrollable/README.md
+index db93265340228b..2eab47a94c7ded 100644
+--- a/packages/components/src/scrollable/README.md
++++ b/packages/components/src/scrollable/README.md
+@@ -1,15 +1,11 @@
+ # Scrollable
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `Scrollable` is a layout component that content in a scrollable container.
+ 
+ ## Usage
+ 
+ ```jsx
+-import { __experimentalScrollable as Scrollable } from '@wordpress/components';
++import { Scrollable } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+diff --git a/packages/components/src/scrollable/component.tsx b/packages/components/src/scrollable/component.tsx
+index 415ea6d4628e19..cfa5f2a2c624e0 100644
+--- a/packages/components/src/scrollable/component.tsx
++++ b/packages/components/src/scrollable/component.tsx
+@@ -25,7 +25,7 @@ function UnconnectedScrollable(
+  * `Scrollable` is a layout component that content in a scrollable container.
+  *
+  * ```jsx
+- * import { __experimentalScrollable as Scrollable } from `@wordpress/components`;
++ * import { Scrollable } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return (
+diff --git a/packages/components/src/scrollable/stories/index.story.tsx b/packages/components/src/scrollable/stories/index.story.tsx
+index 53d4919de3aabf..3183138b4c5931 100644
+--- a/packages/components/src/scrollable/stories/index.story.tsx
++++ b/packages/components/src/scrollable/stories/index.story.tsx
+@@ -16,7 +16,7 @@ import { Scrollable } from '..';
+ 
+ const meta: Meta< typeof Scrollable > = {
+ 	component: Scrollable,
+-	title: 'Components (Experimental)/Scrollable',
++	title: 'Components/Scrollable',
+ 	argTypes: {
+ 		as: {
+ 			control: { type: 'text' },
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..261785eb141511 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'scrollable',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

@@ -1,0 +1,14 @@
+diff --git a/packages/components/src/date-time/style.scss b/packages/components/src/date-time/style.scss
+index 3b0609258f88ca..9d2f8ea61240ca 100644
+--- a/packages/components/src/date-time/style.scss
++++ b/packages/components/src/date-time/style.scss
+@@ -119,9 +119,6 @@
+ 		}
+ 
+ 		.components-datetime__time-field {
+-			align-self: center;
+-			flex: 0 1 auto;
+-			order: 1;
+ 
+ 			&.am-pm button {
+ 				font-size: 11px;

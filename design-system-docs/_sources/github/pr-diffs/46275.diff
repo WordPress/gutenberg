@@ -1,0 +1,136 @@
+diff --git a/packages/block-editor/src/components/inspector-controls-tabs/index.js b/packages/block-editor/src/components/inspector-controls-tabs/index.js
+index efdaed591b4fec..ff292525123f0c 100644
+--- a/packages/block-editor/src/components/inspector-controls-tabs/index.js
++++ b/packages/block-editor/src/components/inspector-controls-tabs/index.js
+@@ -11,6 +11,8 @@ import SettingsTab from './settings-tab';
+ import StylesTab from './styles-tab';
+ import InspectorControls from '../inspector-controls';
+ import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
++import { store as blockEditorStore } from '../../store';
++import { useSelect, useDispatch } from '@wordpress/data';
+ 
+ export default function InspectorControlsTabs( {
+ 	blockName,
+@@ -18,6 +20,20 @@ export default function InspectorControlsTabs( {
+ 	hasBlockStyles,
+ 	tabs,
+ } ) {
++	const { selectedTab } = useSelect( ( select ) => {
++		const { __unstableGetInspectorControlsTabSelectedTab: getSelectedTab } =
++			select( blockEditorStore );
++
++		const _selectedTab = getSelectedTab();
++
++		return {
++			selectedTab: _selectedTab,
++		};
++	}, [] );
++
++	const { __unstableSetInspectorControlsTabSelectedTab: setSelectedTab } =
++		useDispatch( blockEditorStore );
++
+ 	// The tabs panel will mount before fills are rendered to the list view
+ 	// slot. This means the list view tab isn't initially included in the
+ 	// available tabs so the panel defaults selection to the styles tab
+@@ -25,7 +41,7 @@ export default function InspectorControlsTabs( {
+ 	// include the list view tab to set it as the tab selected by default.
+ 	const initialTabName = ! useIsListViewTabDisabled( blockName )
+ 		? TAB_LIST_VIEW.name
+-		: undefined;
++		: selectedTab;
+ 
+ 	return (
+ 		<TabPanel
+@@ -33,6 +49,7 @@ export default function InspectorControlsTabs( {
+ 			tabs={ tabs }
+ 			initialTabName={ initialTabName }
+ 			key={ clientId }
++			onSelect={ setSelectedTab }
+ 		>
+ 			{ ( tab ) => {
+ 				if ( tab.name === TAB_SETTINGS.name ) {
+diff --git a/packages/block-editor/src/components/off-canvas-editor/block-edit-button.js b/packages/block-editor/src/components/off-canvas-editor/block-edit-button.js
+index 6281134e8c95e3..4baa5df1012491 100644
+--- a/packages/block-editor/src/components/off-canvas-editor/block-edit-button.js
++++ b/packages/block-editor/src/components/off-canvas-editor/block-edit-button.js
+@@ -15,10 +15,15 @@ export default forwardRef( function BlockEditButton(
+ 	{ clientId, ...props },
+ 	ref
+ ) {
+-	const { selectBlock } = useDispatch( blockEditorStore );
++	const {
++		selectBlock,
++		__unstableSetInspectorControlsTabSelectedTab:
++			setInspectorControlsTabSelectedTab,
++	} = useDispatch( blockEditorStore );
+ 
+ 	const onClick = () => {
+ 		selectBlock( clientId );
++		setInspectorControlsTabSelectedTab( 'settings' );
+ 	};
+ 
+ 	return (
+diff --git a/packages/block-editor/src/store/actions.js b/packages/block-editor/src/store/actions.js
+index e1c88c2bd99b49..183f02514faa07 100644
+--- a/packages/block-editor/src/store/actions.js
++++ b/packages/block-editor/src/store/actions.js
+@@ -1748,3 +1748,10 @@ export function __unstableSetTemporarilyEditingAsBlocks(
+ 		temporarilyEditingAsBlocks,
+ 	};
+ }
++
++export function __unstableSetInspectorControlsTabSelectedTab( tabName ) {
++	return {
++		type: 'SET_INSPECTOR_CONTROLS_TAB_SELECTED_TAB',
++		tabName,
++	};
++}
+diff --git a/packages/block-editor/src/store/reducer.js b/packages/block-editor/src/store/reducer.js
+index a07d02618e5a21..fa6b8be841aceb 100644
+--- a/packages/block-editor/src/store/reducer.js
++++ b/packages/block-editor/src/store/reducer.js
+@@ -1855,6 +1855,13 @@ export function temporarilyEditingAsBlocks( state = '', action ) {
+ 	return state;
+ }
+ 
++export function inspectorControlsTabs( state = '', action ) {
++	if ( action.type === 'SET_INSPECTOR_CONTROLS_TAB_SELECTED_TAB' ) {
++		return action.tabName;
++	}
++	return state;
++}
++
+ export default combineReducers( {
+ 	blocks,
+ 	isTyping,
+@@ -1878,4 +1885,5 @@ export default combineReducers( {
+ 	lastBlockInserted,
+ 	temporarilyEditingAsBlocks,
+ 	blockVisibility,
++	inspectorControlsTabs,
+ } );
+diff --git a/packages/block-editor/src/store/selectors.js b/packages/block-editor/src/store/selectors.js
+index e0baea6230b9b7..8a975b0a1b8f63 100644
+--- a/packages/block-editor/src/store/selectors.js
++++ b/packages/block-editor/src/store/selectors.js
+@@ -2766,3 +2766,7 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
+ 	}
+ 	return false;
+ }
++
++export function __unstableGetInspectorControlsTabSelectedTab( state ) {
++	return state.inspectorControlsTabs;
++}
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index fce688089a55c0..55d7d4a1329688 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -106,7 +106,7 @@ export function TabPanel( {
+ 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
+ 
+ 	useEffect( () => {
+-		if ( ! selectedTab?.name && tabs.length > 0 ) {
++		if ( tabs.length > 0 ) {
+ 			handleTabSelection( initialTabName || tabs[ 0 ].name );
+ 		}
+ 	}, [ tabs, selectedTab?.name, initialTabName, handleTabSelection ] );

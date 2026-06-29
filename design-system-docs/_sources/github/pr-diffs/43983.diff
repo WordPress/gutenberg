@@ -1,0 +1,116 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d8a8147da0e9e0..af042d3f49e520 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -29,6 +29,7 @@
+ 
+ ### Internal
+ 
++-   Fix TypeScript types for `isValueDefined()` and `isValueEmpty()` utility functions ([#43983](https://github.com/WordPress/gutenberg/pull/43983)).
+ -   `RadioControl`: Clean up styles to use less custom CSS ([#43868](https://github.com/WordPress/gutenberg/pull/43868)).
+ -   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
+ -   `SearchControl`: Convert to TypeScript ([#43871](https://github.com/WordPress/gutenberg/pull/43871)).
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index 082418bb571d12..322f4116202c62 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -43,10 +43,13 @@ function UnforwardedNumberControl(
+ 	const isStepAny = step === 'any';
+ 	const baseStep = isStepAny ? 1 : ensureNumber( step );
+ 	const baseValue = roundClamp( 0, min, max, baseStep );
+-	const constrainValue = ( value: number, stepOverride?: number ) => {
++	const constrainValue = (
++		value: number | string,
++		stepOverride?: number
++	) => {
+ 		// When step is "any" clamp the value, otherwise round and clamp it.
+ 		return isStepAny
+-			? Math.min( max, Math.max( min, value ) )
++			? Math.min( max, Math.max( min, ensureNumber( value ) ) )
+ 			: roundClamp( value, min, max, stepOverride ?? baseStep );
+ 	};
+ 
+@@ -91,18 +94,15 @@ function UnforwardedNumberControl(
+ 				}
+ 
+ 				if ( type === inputControlActionTypes.PRESS_UP ) {
+-					// @ts-expect-error TODO: isValueEmpty() needs to be typed properly
+ 					nextValue = add( nextValue, incrementalValue );
+ 				}
+ 
+ 				if ( type === inputControlActionTypes.PRESS_DOWN ) {
+-					// @ts-expect-error TODO: isValueEmpty() needs to be typed properly
+ 					nextValue = subtract( nextValue, incrementalValue );
+ 				}
+ 
+ 				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
+ 				nextState.value = constrainValue(
+-					// @ts-expect-error TODO: isValueEmpty() needs to be typed properly
+ 					nextValue,
+ 					enableShift ? incrementalValue : undefined
+ 				);
+@@ -151,7 +151,7 @@ function UnforwardedNumberControl(
+ 
+ 					// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
+ 					nextState.value = constrainValue(
+-						// @ts-expect-error TODO: isValueEmpty() needs to be typed properly
++						// @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
+ 						add( currentValue, distance ),
+ 						enableShift ? modifier : undefined
+ 					);
+@@ -171,7 +171,7 @@ function UnforwardedNumberControl(
+ 				// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
+ 				nextState.value = applyEmptyValue
+ 					? currentValue
+-					: // @ts-expect-error TODO: isValueEmpty() needs to be typed properly
++					: // @ts-expect-error TODO: Investigate if it's ok for currentValue to be undefined
+ 					  constrainValue( currentValue );
+ 			}
+ 
+diff --git a/packages/components/src/utils/math.js b/packages/components/src/utils/math.js
+index 7ae59df819acc5..5bfb17e700ed39 100644
+--- a/packages/components/src/utils/math.js
++++ b/packages/components/src/utils/math.js
+@@ -73,10 +73,10 @@ export function clamp( value, min, max ) {
+ /**
+  * Clamps a value based on a min/max range with rounding
+  *
+- * @param {number} value The value.
+- * @param {number} min   The minimum range.
+- * @param {number} max   The maximum range.
+- * @param {number} step  A multiplier for the value.
++ * @param {number | string} value The value.
++ * @param {number}          min   The minimum range.
++ * @param {number}          max   The maximum range.
++ * @param {number}          step  A multiplier for the value.
+  *
+  * @return {number} The rounded and clamped value.
+  */
+diff --git a/packages/components/src/utils/values.js b/packages/components/src/utils/values.js
+index 8a124b70325de7..dacad621cc0e68 100644
+--- a/packages/components/src/utils/values.js
++++ b/packages/components/src/utils/values.js
+@@ -4,8 +4,8 @@
+  *
+  * @template T
+  *
+- * @param {T | null | undefined} value The value to check.
+- * @return {value is T} Whether value is not null or undefined.
++ * @param {T} value The value to check.
++ * @return {value is Exclude<T, null | undefined>} Whether value is not null or undefined.
+  */
+ export function isValueDefined( value ) {
+ 	return value !== undefined && value !== null;
+@@ -16,10 +16,8 @@ export function isValueDefined( value ) {
+ /**
+  * Determines if a value is empty, null, or undefined.
+  *
+- * @template T
+- *
+- * @param {T | "" | null | undefined} value The value to check.
+- * @return {value is T} Whether value is empty.
++ * @param {string | number | null | undefined} value The value to check.
++ * @return {value is ("" | null | undefined)} Whether value is empty.
+  */
+ export function isValueEmpty( value ) {
+ 	const isEmptyString = value === '';

@@ -1,0 +1,351 @@
+diff --git a/package.json b/package.json
+index 8050fb330f5004..8eeccdf7dc5d76 100644
+--- a/package.json
++++ b/package.json
+@@ -19,8 +19,7 @@
+ 		"npm": ">=6.9.0 <7"
+ 	},
+ 	"config": {
+-		"GUTENBERG_PHASE": 2,
+-		"COMPONENT_SYSTEM_PHASE": 1
++		"GUTENBERG_PHASE": 2
+ 	},
+ 	"dependencies": {
+ 		"@wordpress/a11y": "file:packages/a11y",
+diff --git a/packages/block-editor/src/hooks/typography.js b/packages/block-editor/src/hooks/typography.js
+index 92186f5e876219..3038fab9662149 100644
+--- a/packages/block-editor/src/hooks/typography.js
++++ b/packages/block-editor/src/hooks/typography.js
+@@ -5,10 +5,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
+ /**
+  * External dependencies
+  */
+-import {
+-	PanelBody,
+-	__unstableComponentSystemProvider as ComponentSystemProvider,
+-} from '@wordpress/components';
++import { PanelBody } from '@wordpress/components';
+ import { Platform } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ 
+@@ -73,16 +70,12 @@ export function TypographyPanel( props ) {
+ 	return (
+ 		<InspectorControls>
+ 			<PanelBody title={ __( 'Typography' ) }>
+-				<ComponentSystemProvider
+-					__unstableNextInclude={ [ 'WPComponentsFontSizePicker' ] }
+-				>
+-					<FontFamilyEdit { ...props } />
+-					<FontSizeEdit { ...props } />
+-					<FontAppearanceEdit { ...props } />
+-					<LineHeightEdit { ...props } />
+-					<TextDecorationAndTransformEdit { ...props } />
+-					<LetterSpacingEdit { ...props } />
+-				</ComponentSystemProvider>
++				<FontFamilyEdit { ...props } />
++				<FontSizeEdit { ...props } />
++				<FontAppearanceEdit { ...props } />
++				<LineHeightEdit { ...props } />
++				<TextDecorationAndTransformEdit { ...props } />
++				<LetterSpacingEdit { ...props } />
+ 			</PanelBody>
+ 		</InspectorControls>
+ 	);
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index be016dfea95afc..7a62e76d3cc4e2 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -164,9 +164,3 @@ export {
+ } from './higher-order/with-focus-return';
+ export { default as withNotices } from './higher-order/with-notices';
+ export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+-
+-// Component System
+-export {
+-	withNext as __unstableWithNext,
+-	ComponentSystemProvider as __unstableComponentSystemProvider,
+-} from './ui/context';
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index 8b850123a2eb7c..6cfc0a39c597dc 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -20,7 +20,6 @@ import { useDebounce } from '@wordpress/compose';
+  */
+ import Popover from '../popover';
+ import Shortcut from '../shortcut';
+-import { withNextComponent } from './next';
+ 
+ /**
+  * Time over children to wait before showing tooltip
+@@ -217,4 +216,4 @@ function Tooltip( { children, position, text, shortcut } ) {
+ 	} );
+ }
+ 
+-export default withNextComponent( Tooltip );
++export default Tooltip;
+diff --git a/packages/components/src/tooltip/next.js b/packages/components/src/tooltip/next.js
+deleted file mode 100644
+index 98fd4fa1d02cfe..00000000000000
+--- a/packages/components/src/tooltip/next.js
++++ /dev/null
+@@ -1,17 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { withNext } from '../ui/context';
+-import { Tooltip as NextTooltip } from '../ui/tooltip';
+-
+-const Tooltip =
+-	process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextTooltip : undefined;
+-
+-const adapter = ( { text, ...props } ) => ( {
+-	...props,
+-	content: text,
+-} );
+-
+-export function withNextComponent( Component ) {
+-	return withNext( Component, Tooltip, 'WPComponentsTooltip', adapter );
+-}
+diff --git a/packages/components/src/ui/context/component-system-provider.js b/packages/components/src/ui/context/component-system-provider.js
+deleted file mode 100644
+index 2d97eb3eed80c6..00000000000000
+--- a/packages/components/src/ui/context/component-system-provider.js
++++ /dev/null
+@@ -1,36 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { ContextSystemProvider } from './context-system-provider';
+-
+-/**
+- * @param {Object} props
+- * @param {string[]} [props.__unstableNextInclude]
+- * @param {import('react').ReactNode} props.children
+- * @param {any} props.value
+- */
+-export function ComponentSystemProvider( {
+-	__unstableNextInclude = [],
+-	children,
+-	value = {},
+-} ) {
+-	if ( process.env.COMPONENT_SYSTEM_PHASE === 1 ) {
+-		const contextValue = { ...value };
+-
+-		__unstableNextInclude.forEach( ( namespace ) => {
+-			const baseValue = contextValue[ namespace ] || {};
+-			contextValue[ namespace ] = {
+-				...baseValue,
+-				__unstableVersion: 'next',
+-			};
+-		} );
+-
+-		return (
+-			<ContextSystemProvider value={ contextValue }>
+-				{ children }
+-			</ContextSystemProvider>
+-		);
+-	}
+-
+-	return children;
+-}
+diff --git a/packages/components/src/ui/context/index.js b/packages/components/src/ui/context/index.js
+index 6a9e824185db9e..e19795d7b7a13b 100644
+--- a/packages/components/src/ui/context/index.js
++++ b/packages/components/src/ui/context/index.js
+@@ -1,5 +1,3 @@
+-export { ComponentSystemProvider } from './component-system-provider';
+-export { withNext } from './with-next';
+ export {
+ 	ContextSystemProvider,
+ 	useComponentsContext,
+diff --git a/packages/components/src/ui/context/with-next.js b/packages/components/src/ui/context/with-next.js
+deleted file mode 100644
+index 1351869b5f56ce..00000000000000
+--- a/packages/components/src/ui/context/with-next.js
++++ /dev/null
+@@ -1,48 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { contextConnect } from './context-connect';
+-import { useContextSystem } from './use-context-system';
+-
+-/**
+- * @template {{}} TCurrentProps
+- * @template {{}} TNextProps
+- * @param {import('react').ForwardRefExoticComponent<TCurrentProps>} CurrentComponent
+- * @param {(props: TNextProps) => JSX.Element | null} NextComponent
+- * @param {string} namespace
+- * @param {(props: TCurrentProps) => TNextProps} adapter
+- */
+-export function withNext(
+-	CurrentComponent,
+-	NextComponent = () => null,
+-	namespace = 'Component',
+-	adapter = ( p ) => /** @type {any} */ ( p )
+-) {
+-	if ( process.env.COMPONENT_SYSTEM_PHASE === 1 ) {
+-		/* eslint-disable jsdoc/no-undefined-types */
+-		/**
+-		 * @param {TCurrentProps} props
+-		 * @param {import('react').Ref<any>} ref
+-		 */
+-		/* eslint-enable jsdoc/no-undefined-types */
+-		const WrappedComponent = ( props, ref ) => {
+-			// @ts-ignore
+-			const { __unstableVersion, ...otherProps } = useContextSystem(
+-				props,
+-				namespace
+-			);
+-
+-			if ( __unstableVersion === 'next' ) {
+-				// @ts-ignore
+-				const nextProps = adapter( otherProps );
+-				return <NextComponent { ...nextProps } ref={ ref } />;
+-			}
+-
+-			return <CurrentComponent { ...props } ref={ ref } />;
+-		};
+-
+-		return contextConnect( WrappedComponent, namespace );
+-	}
+-
+-	return CurrentComponent;
+-}
+diff --git a/packages/components/src/visually-hidden/index.js b/packages/components/src/visually-hidden/index.js
+index 92801940d38b9c..208203a592c3b8 100644
+--- a/packages/components/src/visually-hidden/index.js
++++ b/packages/components/src/visually-hidden/index.js
+@@ -12,7 +12,6 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { renderAsRenderProps } from './utils';
+-import { withNextComponent } from './next';
+ 
+ /**
+  * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+@@ -43,4 +42,4 @@ function VisuallyHidden( { as = 'div', className, ...props }, forwardedRef ) {
+ 	} );
+ }
+ 
+-export default withNextComponent( forwardRef( VisuallyHidden ) );
++export default forwardRef( VisuallyHidden );
+diff --git a/packages/components/src/visually-hidden/next.js b/packages/components/src/visually-hidden/next.js
+deleted file mode 100644
+index 088f90f6be5ed6..00000000000000
+--- a/packages/components/src/visually-hidden/next.js
++++ /dev/null
+@@ -1,31 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { VisuallyHidden as NextVisuallyHidden } from '../ui/visually-hidden';
+-import { withNext } from '../ui/context';
+-
+-const VisuallyHidden =
+-	process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextVisuallyHidden : undefined;
+-
+-/**
+- * There is nothing to adapt, the props are equal.
+- *
+- * @param {import('.').Props<any>} props
+- * @return {import('../ui/visually-hidden/hook').Props} Adapted props
+- */
+-const adapter = ( props ) =>
+-	/** @type {import('../ui/visually-hidden/hook').Props} */ ( props );
+-
+-/**
+- * The generic type is too difficult to type here, default to any to circumvent that.
+- *
+- * @param {import('react').ForwardRefExoticComponent<import('.').Props<any>>} Current
+- */
+-export function withNextComponent( Current ) {
+-	return withNext(
+-		Current,
+-		VisuallyHidden,
+-		'WPComponentsVisuallyHidden',
+-		adapter
+-	);
+-}
+diff --git a/packages/edit-site/src/components/sidebar/global-styles-sidebar.js b/packages/edit-site/src/components/sidebar/global-styles-sidebar.js
+index 020546b12e1564..2186eb4edc3187 100644
+--- a/packages/edit-site/src/components/sidebar/global-styles-sidebar.js
++++ b/packages/edit-site/src/components/sidebar/global-styles-sidebar.js
+@@ -6,12 +6,7 @@ import { map, sortBy } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	Button,
+-	PanelBody,
+-	TabPanel,
+-	__unstableComponentSystemProvider as ComponentSystemProvider,
+-} from '@wordpress/components';
++import { Button, PanelBody, TabPanel } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import { getBlockType } from '@wordpress/blocks';
+ import { useMemo } from '@wordpress/element';
+@@ -50,9 +45,7 @@ function GlobalStylesPanel( {
+ 	}
+ 
+ 	const content = (
+-		<ComponentSystemProvider
+-			__unstableNextInclude={ [ 'WPComponentsFontSizePicker' ] }
+-		>
++		<>
+ 			{ hasTypographyPanel && (
+ 				<TypographyPanel
+ 					context={ context }
+@@ -83,7 +76,7 @@ function GlobalStylesPanel( {
+ 					setStyle={ setStyle }
+ 				/>
+ 			) }
+-		</ComponentSystemProvider>
++		</>
+ 	);
+ 	if ( ! wrapperPanelTitle ) {
+ 		return content;
+diff --git a/storybook/main.js b/storybook/main.js
+index d410195ee23b1b..18f7790acbe428 100644
+--- a/storybook/main.js
++++ b/storybook/main.js
+@@ -5,9 +5,7 @@ const stories = [
+ 	'../packages/icons/src/**/stories/*.js',
+ ].filter( Boolean );
+ 
+-const customEnvVariables = {
+-	COMPONENT_SYSTEM_PHASE: 1,
+-};
++const customEnvVariables = {};
+ 
+ module.exports = {
+ 	stories,
+diff --git a/typings/gutenberg-env/index.d.ts b/typings/gutenberg-env/index.d.ts
+index efdd71bd328783..0d4d4e47028daf 100644
+--- a/typings/gutenberg-env/index.d.ts
++++ b/typings/gutenberg-env/index.d.ts
+@@ -1,6 +1,5 @@
+ interface Environment {
+ 	NODE_ENV: unknown;
+-	COMPONENT_SYSTEM_PHASE: number | undefined;
+ 	FORCE_REDUCED_MOTION: boolean | undefined;
+ }
+ interface Process {
+diff --git a/webpack.config.js b/webpack.config.js
+index 4915d8e0b385f1..af7269181c007e 100644
+--- a/webpack.config.js
++++ b/webpack.config.js
+@@ -178,13 +178,6 @@ module.exports = {
+ 					10
+ 				) || 1
+ 			),
+-			// Inject the `COMPONENT_SYSTEM_PHASE` global, used for controlling Component System roll-out.
+-			'process.env.COMPONENT_SYSTEM_PHASE': JSON.stringify(
+-				parseInt(
+-					process.env.npm_package_config_COMPONENT_SYSTEM_PHASE,
+-					10
+-				) || 0
+-			),
+ 			'process.env.FORCE_REDUCED_MOTION': JSON.stringify(
+ 				process.env.FORCE_REDUCED_MOTION
+ 			),

@@ -1,0 +1,1673 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index cb2e79f7e7f44f..5cc7e1e41570a3 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1139,6 +1139,12 @@
+ 		"markdown_source": "../packages/components/src/tree-select/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "Truncate",
++		"slug": "truncate",
++		"markdown_source": "../packages/components/src/truncate/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "UnitControl",
+ 		"slug": "unit-control",
+diff --git a/packages/components/src/box-control/index.js b/packages/components/src/box-control/index.js
+index 9421792b564717..21bf8314270ba0 100644
+--- a/packages/components/src/box-control/index.js
++++ b/packages/components/src/box-control/index.js
+@@ -18,7 +18,7 @@ import { FlexItem, FlexBlock } from '../flex';
+ import AllInputControl from './all-input-control';
+ import InputControls from './input-controls';
+ import BoxControlIcon from './icon';
+-import Text from '../text';
++import { Text } from '../text';
+ import LinkedButton from './linked-button';
+ import Visualizer from './visualizer';
+ import {
+diff --git a/packages/components/src/flex/flex/component.js b/packages/components/src/flex/flex/component.js
+index 21e8ff24b08163..310b85c53369be 100644
+--- a/packages/components/src/flex/flex/component.js
++++ b/packages/components/src/flex/flex/component.js
+@@ -33,7 +33,12 @@ function Flex( props, forwardedRef ) {
+  *
+  * @example
+  * ```jsx
+- * import { Flex, FlexItem, FlexBlock, Text } from `@wordpress/components/ui`;
++ * import {
++ * 	__experimentalFlex as Flex,
++ * 	__experimentalFlexBlock as FlexBlock,
++ * 	__experimentalFlexItem as FlexItem,
++ * 	__experimentalText as Text
++ * } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return (
+diff --git a/packages/components/src/flex/stories/index.js b/packages/components/src/flex/stories/index.js
+index a1b27e8b8a2656..c5860db4c3ee3c 100644
+--- a/packages/components/src/flex/stories/index.js
++++ b/packages/components/src/flex/stories/index.js
+@@ -1,9 +1,8 @@
+ /**
+  * Internal dependencies
+  */
+-import Flex from '../flex';
+-import FlexItem from '../flex-item';
+-import { View } from '../../view';
++import { Flex, FlexItem } from '../';
++import { View } from '../../ui/view';
+ 
+ export default {
+ 	component: Flex,
+diff --git a/packages/components/src/flex/test/index.js b/packages/components/src/flex/test/index.js
+index d20b383cbb883c..a4ce8fb8ef141a 100644
+--- a/packages/components/src/flex/test/index.js
++++ b/packages/components/src/flex/test/index.js
+@@ -7,9 +7,7 @@ import { render } from '@testing-library/react';
+  * Internal dependencies
+  */
+ import { View } from '../../ui/view';
+-import Flex from '../flex';
+-import FlexItem from '../flex-item';
+-import FlexBlock from '../flex-block';
++import { Flex, FlexBlock, FlexItem } from '../';
+ 
+ describe( 'props', () => {
+ 	let base;
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 69fa690fa7cf35..bed734fbd31bfb 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -102,7 +102,7 @@ export { default as Snackbar } from './snackbar';
+ export { default as SnackbarList } from './snackbar/list';
+ export { default as Spinner } from './spinner';
+ export { default as TabPanel } from './tab-panel';
+-export { default as __experimentalText } from './text';
++export { Text as __experimentalText } from './text';
+ export { default as TextControl } from './text-control';
+ export { default as TextareaControl } from './textarea-control';
+ export { default as TextHighlight } from './text-highlight';
+@@ -121,6 +121,7 @@ export {
+ 	TreeGridItem as __experimentalTreeGridItem,
+ } from './tree-grid';
+ export { default as TreeSelect } from './tree-select';
++export { Truncate as __experimentalTruncate } from './truncate';
+ export { default as __experimentalUnitControl } from './unit-control';
+ export { default as VisuallyHidden } from './visually-hidden';
+ export { default as IsolatedEventContainer } from './isolated-event-container';
+diff --git a/packages/components/src/input-control/styles/input-control-styles.js b/packages/components/src/input-control/styles/input-control-styles.js
+index 9aa80b78db50a1..759f52ef0608b8 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.js
++++ b/packages/components/src/input-control/styles/input-control-styles.js
+@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import { Flex, FlexItem } from '../../flex';
+-import Text from '../../text';
++import { Text } from '../../text';
+ import { color, rtl } from '../../utils/style-mixins';
+ 
+ const rootFloatLabelStyles = () => {
+diff --git a/packages/components/src/navigation/styles/navigation-styles.js b/packages/components/src/navigation/styles/navigation-styles.js
+index 48331fe94a789c..862579cc54b48d 100644
+--- a/packages/components/src/navigation/styles/navigation-styles.js
++++ b/packages/components/src/navigation/styles/navigation-styles.js
+@@ -13,7 +13,7 @@ import { isRTL } from '@wordpress/i18n';
+  */
+ import { G2, UI } from '../../utils/colors-values';
+ import Button from '../../button';
+-import Text from '../../text';
++import { Text } from '../../text';
+ import { reduceMotion, space, rtl } from '../../utils';
+ 
+ export const NavigationUI = styled.div`
+diff --git a/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js
+index 203bee6b3c4397..ea134719d50fe6 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js
++++ b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js
+@@ -6,8 +6,7 @@ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+  */
+-import Text from '../../../text';
+-import { text } from '../../../text/styles/text-mixins';
++import { Text } from '../../../text';
+ import { color } from '../../../utils/style-mixins';
+ 
+ export const Root = styled.div`
+@@ -45,7 +44,7 @@ export const Tooltip = styled.div`
+ 
+ export const LabelText = styled( Text )`
+ 	&&& {
+-		${ text };
++		color: white;
+ 		display: block;
+ 		font-size: 13px;
+ 		line-height: 1.4;
+diff --git a/packages/components/src/text/README.md b/packages/components/src/text/README.md
+index 68113190e0a48e..51ecdbd1d465a4 100644
+--- a/packages/components/src/text/README.md
++++ b/packages/components/src/text/README.md
+@@ -1,54 +1,237 @@
+-# Text
++# Text (Experimental)
+ 
+-A component for rendering text.
++`Text` is a core component that renders text in the library, using the library's typography system.
+ 
+ ## Usage
+ 
++`Text` can be used to render any text-content, like an HTML `p` or `span`.
++
+ ```jsx
+ import { __experimentalText as Text } from '@wordpress/components';
+ 
+-const HeroPanel = () => (
+-	<>
+-		<Text variant="title.large" as="h1">
+-			Hello World!
+-		</Text>
+-		<Text variant="body">Greetings to you!</Text>
+-	</>
+-);
++function Example() {
++	return <Text>Code is Poetry</Text>;
++}
+ ```
+ 
+ ## Props
+ 
+-The component accepts the following props:
++### adjustLineHeightForInnerControls
++
++**Type**: `boolean`,`"large"`,`"medium"`,`"small"`,`"xSmall"`
++
++Automatically calculate the appropriate line-height value for contents that render text and Control elements (e.g. `TextInput`).
++
++```jsx
++import { __experimentalText as Text, TextInput } from '@wordpress/components';
++
++function Example() {
++	return (
++		<Text adjustLineHeightForInnerControls>
++			Lorem ipsum dolor sit amet, consectetur
++			<TextInput value="adipiscing elit..." />
++		</Text>
++	);
++}
++```
++
++### align
++
++**Type**: `CSSProperties['textAlign']`
++
++Adjusts the text alignment.
++
++```jsx
++import { __experimentalText as Text } from '@wordpress/components';
++
++function Example() {
++	return (
++		<Text align="center" isBlock>
++			Lorem ipsum dolor sit amet, consectetur adipiscing elit...
++		</Text>
++	);
++}
++```
++
++### color
++
++**Type**: `CSSProperties['color']`
++
++Adjusts the text color.
++
++### display
++
++**Type**: `CSSProperties['display']`
++
++Adjusts the CSS display.
+ 
+-#### as
++### ellipsis
++
++**Type**: `string`
++
++The ellipsis string when `truncate` is set.
++
++### ellipsizeMode
++
++**Type**: `"auto"`,`"head"`,`"tail"`,`"middle"`
++
++Determines where to truncate. For example, we can truncate text right in the middle. To do this, we need to set `ellipsizeMode` to `middle` and a text `limit`.
++
++-   `auto`: Trims content at the end automatically without a `limit`.
++-   `head`: Trims content at the beginning. Requires a `limit`.
++-   `middle`: Trims content in the middle. Requires a `limit`.
++-   `tail`: Trims content at the end. Requires a `limit`.
++
++### highlightCaseSensitive
++
++**Type**: `boolean`
++
++Escape characters in `highlightWords` which are meaningful in regular expressions.
++
++### highlightEscape
++
++**Type**: `boolean`
++
++Determines if `highlightWords` should be case sensitive.
++
++### highlightSanitize
++
++**Type**: `boolean`
++
++Array of search words. String search terms are automatically cast to RegExps unless `highlightEscape` is true.
++
++### highlightWords
++
++**Type**: `any[]`
++
++Letters or words within `Text` can be highlighted using `highlightWords`.
++
++```jsx
++import { __experimentalText as Text } from '@wordpress/components';
++
++function Example() {
++	return (
++		<Text highlightWords={ [ 'pi' ] }>
++			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ex
++			neque, vulputate a diam et, luctus convallis lacus. Vestibulum ac
++			mollis mi. Morbi id elementum massa. Suspendisse interdum auctor
++			ligula eget cursus. In fermentum ultricies mauris, pharetra
++			fermentum erat pellentesque id.
++		</Text>
++	);
++}
++```
+ 
+-Determines the HTML selector for the text.
++### isBlock
+ 
+-For most use-cases you can use this component instead of a `h1`, `h2`, `h3`, `h4`, `h5`, `h6` or `p`.
++**Type**: `boolean`
+ 
+--   Type: `String`
+--   Required: No
+--   Default: ''
++Sets `Text` to have `display: block`.
+ 
+-#### variant
++### isDestructive
++
++**Type**: `boolean`
++
++Renders a destructive color.
++
++### limit
++
++**Type**: `number`
++
++Determines the max characters when `truncate` is set.
++
++### lineHeight
++
++**Type**: `CSSProperties['lineHeight']`
++
++Adjusts all text line-height based on the typography system.
++
++### numberOfLines
++
++**Type**: `number`
++
++Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
++
++### optimizeReadabilityFor
++
++**Type**: `CSSProperties['color']`
++
++The `Text` color can be adapted to a background color for optimal readability. `optimizeReadabilityFor` can accept CSS variables, in addition to standard CSS color values (e.g. Hex, RGB, HSL, etc...).
++
++```jsx
++import { __experimentalText as Text, View } from '@wordpress/components';
++
++function Example() {
++	const backgroundColor = 'blue';
++
++	return (
++		<View css={ { backgroundColor } }>
++			<Text optimizeReadabilityFor={ backgroundColor }>
++				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
++			</Text>
++		</View>
++	);
++}
++```
++
++### size
++
++**Type**: `CSSProperties['fontSize']`,`TextSize`
++
++Adjusts text size based on the typography system. `Text` can render a wide range of font sizes, which are automatically calculated and adapted to the typography system. The `size` value can be a system preset, a `number`, or a custom unit value (`string`) such as `30em`.
++
++```jsx
++import { __experimentalText as Text } from '@wordpress/components';
++
++function Example() {
++	return <Text size="largeTitle">Code is Poetry</Text>;
++}
++```
++
++### truncate
++
++**Type**: `boolean`
++
++Enables text truncation. When `truncate` is set,we are able to truncate the long text in a variety of ways.
++
++```jsx
++import { __experimentalText as Text } from '@wordpress/components';
++
++function Example() {
++	return (
++		<Text truncate>
++			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ex
++			neque, vulputate a diam et, luctus convallis lacus. Vestibulum ac
++			mollis mi. Morbi id elementum massa. Suspendisse interdum auctor
++			ligula eget cursus. In fermentum ultricies mauris, pharetra
++			fermentum erat pellentesque id.
++		</Text>
++	);
++}
++```
++
++### upperCase
++
++**Type**: `boolean`
++
++Uppercases the text content.
++
++### variant
++
++**Type**: `"muted"`
++
++Adjusts style variation of the text.
++
++```jsx
++import { __experimentalText as Text } from '@wordpress/components';
++
++function Example() {
++	return <Text variant="muted">Code is Poetry</Text>;
++}
++```
+ 
+-Determines the style for the text. Available variants:
++### weight
+ 
+--   `title`
+--   `title.large`
+--   `title.medium`
+--   `title.small`
+--   `subtitle`
+--   `subtitle.large`
+--   `subtitle.small`
+--   `body`
+--   `body.large`
+--   `body.small`
+--   `button`
+--   `caption`
+--   `label`
++**Type**: `CSSProperties['fontWeight']`,`TextWeight`
+ 
+-*   Type: `String`
+-*   Required: No
+-*   Default: 'body'
++Adjusts font-weight of the text.
+diff --git a/packages/components/src/ui/text/component.js b/packages/components/src/text/component.js
+similarity index 80%
+rename from packages/components/src/ui/text/component.js
+rename to packages/components/src/text/component.js
+index a659faa6b67fa8..bd7f063294521e 100644
+--- a/packages/components/src/ui/text/component.js
++++ b/packages/components/src/text/component.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../utils';
++import { createComponent } from '../ui/utils';
+ import useText from './hook';
+ 
+ /**
+@@ -13,7 +13,7 @@ import useText from './hook';
+  * @example
+  *
+  * ```jsx
+- * import { Text } from `@wordpress/components/ui`;
++ * import { __experimentalText as Text } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return <Text>Code is Poetry</Text>;
+diff --git a/packages/components/src/ui/text/get-line-height.ts b/packages/components/src/text/get-line-height.ts
+similarity index 91%
+rename from packages/components/src/ui/text/get-line-height.ts
+rename to packages/components/src/text/get-line-height.ts
+index f298bf07d75e29..5a9b92d5784d3b 100644
+--- a/packages/components/src/ui/text/get-line-height.ts
++++ b/packages/components/src/text/get-line-height.ts
+@@ -8,8 +8,8 @@ import type { CSSProperties } from 'react';
+  * Internal dependencies
+  */
+ import type { Props } from './types';
+-import { space } from '../utils/space';
+-import { CONFIG } from '../../utils';
++import { space } from '../ui/utils/space';
++import { CONFIG } from '../utils';
+ 
+ export function getLineHeight(
+ 	adjustLineHeightForInnerControls: Props[ 'adjustLineHeightForInnerControls' ],
+diff --git a/packages/components/src/ui/text/hook.js b/packages/components/src/text/hook.js
+similarity index 92%
+rename from packages/components/src/ui/text/hook.js
+rename to packages/components/src/text/hook.js
+index 4b6eb65ea0a674..24bc033dc2dbcd 100644
+--- a/packages/components/src/ui/text/hook.js
++++ b/packages/components/src/text/hook.js
+@@ -12,17 +12,17 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { hasConnectNamespace, useContextSystem } from '../context';
++import { hasConnectNamespace, useContextSystem } from '../ui/context';
+ import { useTruncate } from '../truncate';
+-import { getOptimalTextShade } from '../utils';
++import { getOptimalTextShade } from '../ui/utils';
+ import * as styles from './styles';
+ import { createHighlighterText } from './utils';
+-import { getFontSize } from '../utils/font-size';
+-import { CONFIG, COLORS } from '../../utils';
++import { getFontSize } from '../ui/utils/font-size';
++import { CONFIG, COLORS } from '../utils';
+ import { getLineHeight } from './get-line-height';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').Props, 'span'>} props
++ * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'span'>} props
+  */
+ export default function useText( props ) {
+ 	const {
+diff --git a/packages/components/src/text/index.js b/packages/components/src/text/index.js
+index e6eb39c0c6cb34..2341fd018171b0 100644
+--- a/packages/components/src/text/index.js
++++ b/packages/components/src/text/index.js
+@@ -1,21 +1,2 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-
+-/**
+- * Internal dependencies
+- */
+-import { text } from './styles/text-mixins';
+-import { withNextComponent } from './next';
+-
+-const Text = styled.p(
+-	`
+-	box-sizing: border-box;
+-	margin: 0;
+-`,
+-	text
+-);
+-
+-// @ts-ignore Text _is_ forwarded ref but the styled component definition doesn't include $$typeof so we'll just ignore it here
+-export default withNextComponent( Text );
++export { default as Text } from './component';
++export { default as useText } from './hook';
+diff --git a/packages/components/src/text/next.js b/packages/components/src/text/next.js
+deleted file mode 100644
+index a818f51cbe0cd0..00000000000000
+--- a/packages/components/src/text/next.js
++++ /dev/null
+@@ -1,37 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { withNext } from '../ui/context';
+-import { Text as NextText } from '../ui/text';
+-import { text } from './styles/text-mixins';
+-
+-const Text = process.env.COMPONENT_SYSTEM_PHASE === 1 ? NextText : undefined;
+-
+-/**
+- * @typedef AdaptedTextProps
+- * @property {keyof JSX.IntrinsicElements} as Styled components `as` prop.
+- * @property {import('./styles/text-mixins').TextVariant} variant The variant to render.
+- * @property {import('react').ReactNode} children Children to render.
+- * @property {string} [className] Classname to render on the element.
+- */
+-
+-/**
+- * @param {AdaptedTextProps} props
+- */
+-export const adapter = ( { as, variant, ...restProps } ) => ( {
+-	// as has not changed
+-	as,
+-	// luckily `text` just returns an emotion CSS object, so we can pass the styles from that directly to the handy `css` prop
+-	css: text( { variant } ).styles,
+-	// mostly className and children
+-	...restProps,
+-} );
+-
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * @param {import('react').ForwardRefExoticComponent<AdaptedTextProps>} Current
+- */
+-/* eslint-enable jsdoc/valid-types */
+-export function withNextComponent( Current ) {
+-	return withNext( Current, Text, 'WPComponentsText', adapter );
+-}
+diff --git a/packages/components/src/text/stories/index.js b/packages/components/src/text/stories/index.js
+index aeb3cd330fdd3a..34e7e5c21459c7 100644
+--- a/packages/components/src/text/stories/index.js
++++ b/packages/components/src/text/stories/index.js
+@@ -1,30 +1,53 @@
+ /**
+  * Internal dependencies
+  */
+-import Text from '../index';
++import { Text } from '..';
+ 
+ export default {
+-	title: 'Components/Text',
+ 	component: Text,
++	title: 'G2 Components (Experimental)/Text',
+ };
+ 
+-export const _default = () => (
+-	<>
+-		<Text variant="title.large" as="h1">
+-			Title Large
+-		</Text>
+-		<Text variant="title.medium" as="h2">
+-			Title Medium
++export const _default = () => {
++	return <Text>Hello</Text>;
++};
++
++export const truncate = () => {
++	return (
++		<Text numberOfLines={ 2 } truncate>
++			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
++			facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
++			Duis semper dui id augue malesuada, ut feugiat nisi aliquam.
++			Vestibulum venenatis diam sem, finibus dictum massa semper in. Nulla
++			facilisi. Nunc vulputate faucibus diam, in lobortis arcu ornare vel.
++			In dignissim nunc sed facilisis finibus. Etiam imperdiet mattis
++			arcu, sed rutrum sapien blandit gravida. Aenean sollicitudin neque
++			eget enim blandit, sit amet rutrum leo vehicula. Nunc malesuada
++			ultricies eros ut faucibus. Aliquam erat volutpat. Nulla nec feugiat
++			risus. Vivamus iaculis dui aliquet ante ultricies feugiat.
++			Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
++			posuere cubilia curae; Vivamus nec pretium velit, sit amet
++			consectetur ante. Praesent porttitor ex eget fermentum mattis.
+ 		</Text>
+-		<Text variant="title.small" as="h3">
+-			Title Small
++	);
++};
++
++export const highlight = () => {
++	return (
++		<Text highlightWords={ [ 'con' ] }>
++			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
++			facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
++			Duis semper dui id augue malesuada, ut feugiat nisi aliquam.
++			Vestibulum venenatis diam sem, finibus dictum massa semper in. Nulla
++			facilisi. Nunc vulputate faucibus diam, in lobortis arcu ornare vel.
++			In dignissim nunc sed facilisis finibus. Etiam imperdiet mattis
++			arcu, sed rutrum sapien blandit gravida. Aenean sollicitudin neque
++			eget enim blandit, sit amet rutrum leo vehicula. Nunc malesuada
++			ultricies eros ut faucibus. Aliquam erat volutpat. Nulla nec feugiat
++			risus. Vivamus iaculis dui aliquet ante ultricies feugiat.
++			Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
++			posuere cubilia curae; Vivamus nec pretium velit, sit amet
++			consectetur ante. Praesent porttitor ex eget fermentum mattis.
+ 		</Text>
+-		<Text variant="subtitle">Subtitle</Text>
+-		<Text variant="subtitle.small">Subtitle Small</Text>
+-		<Text variant="body">Body</Text>
+-		<Text variant="body.small">Body Small</Text>
+-		<Text variant="button">Button</Text>
+-		<Text variant="caption">Caption</Text>
+-		<Text variant="label">Label</Text>
+-	</>
+-);
++	);
++};
+diff --git a/packages/components/src/ui/text/styles.js b/packages/components/src/text/styles.js
+similarity index 94%
+rename from packages/components/src/ui/text/styles.js
+rename to packages/components/src/text/styles.js
+index 6ded079d76d36f..707e7d7f914d87 100644
+--- a/packages/components/src/ui/text/styles.js
++++ b/packages/components/src/text/styles.js
+@@ -6,7 +6,7 @@ import { css } from 'emotion';
+ /**
+  * Internal dependencies
+  */
+-import { COLORS, CONFIG } from '../../utils';
++import { COLORS, CONFIG } from '../utils';
+ 
+ export const Text = css`
+ 	color: ${ COLORS.black };
+diff --git a/packages/components/src/text/styles/emotion-css.js b/packages/components/src/text/styles/emotion-css.js
+deleted file mode 100644
+index c86ee0154e7630..00000000000000
+--- a/packages/components/src/text/styles/emotion-css.js
++++ /dev/null
+@@ -1,6 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/core';
+-
+-export default css;
+diff --git a/packages/components/src/text/styles/font-family.js b/packages/components/src/text/styles/font-family.js
+deleted file mode 100644
+index 860cd63dee575f..00000000000000
+--- a/packages/components/src/text/styles/font-family.js
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export const fontFamily = `font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+-Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;`;
+diff --git a/packages/components/src/text/styles/text-mixins.js b/packages/components/src/text/styles/text-mixins.native.js
+similarity index 100%
+rename from packages/components/src/text/styles/text-mixins.js
+rename to packages/components/src/text/styles/text-mixins.native.js
+diff --git a/packages/components/src/ui/text/test/__snapshots__/text.js.snap b/packages/components/src/text/test/__snapshots__/index.js.snap
+similarity index 100%
+rename from packages/components/src/ui/text/test/__snapshots__/text.js.snap
+rename to packages/components/src/text/test/__snapshots__/index.js.snap
+diff --git a/packages/components/src/text/test/index.js b/packages/components/src/text/test/index.js
+index d2068ec9a1a828..093f0a4eb29a68 100644
+--- a/packages/components/src/text/test/index.js
++++ b/packages/components/src/text/test/index.js
+@@ -1,98 +1,145 @@
+ /**
+  * External dependencies
+  */
+-import { render, unmountComponentAtNode } from 'react-dom';
+-import { act } from 'react-dom/test-utils';
++import { render } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+  */
+-import Text from '../';
++import { getFontSize } from '../../ui/utils/font-size';
++import { COLORS } from '../../utils';
++import { Text } from '../';
+ 
+-let container = null;
++describe( 'Text', () => {
++	describe( 'snapshot tests', () => {
++		test( 'should render correctly', () => {
++			const { container } = render( <Text>Lorem ipsum.</Text> );
++			expect( container.firstChild ).toMatchSnapshot();
++		} );
++	} );
+ 
+-beforeEach( () => {
+-	container = document.createElement( 'div' );
+-	document.body.appendChild( container );
+-} );
++	test( 'should render optimizeReadabilityFor', () => {
++		const { container } = render(
++			<Text optimizeReadabilityFor="blue">Lorem ipsum.</Text>
++		);
++		expect( container.firstChild ).toHaveStyle( {
++			color: COLORS.white,
++		} );
++	} );
+ 
+-afterEach( () => {
+-	unmountComponentAtNode( container );
+-	container.remove();
+-	container = null;
+-} );
++	test( 'should render truncate', () => {
++		const { container } = render( <Text truncate>Lorem ipsum.</Text> );
++		expect( container.firstChild ).toHaveStyle( {
++			textOverflow: 'ellipsis',
++		} );
++	} );
+ 
+-function getComputedStyle( node ) {
+-	return node.ownerDocument.defaultView.getComputedStyle( node );
+-}
++	test( 'should render size', () => {
++		const { container } = render( <Text size="title">Lorem ipsum.</Text> );
++		expect( container.firstChild ).toHaveStyle( {
++			fontSize: getFontSize( 'title' ),
++		} );
++	} );
+ 
+-function getTextStyle( node ) {
+-	const text = node || container.children[ 0 ];
+-	return getComputedStyle( text );
+-}
++	test( 'should render custom size', () => {
++		const { container } = render( <Text size={ 15 }>Lorem ipsum.</Text> );
++		expect( container.firstChild ).toHaveStyle( {
++			fontSize: getFontSize( 15 ),
++		} );
++	} );
+ 
+-describe( 'Text', () => {
+-	describe( 'Basic rendering', () => {
+-		it( 'should render', () => {
+-			act( () => {
+-				render( <Text>Hello</Text>, container );
+-			} );
++	test( 'should render variant', () => {
++		const { container } = render(
++			<Text variant="muted">Lorem ipsum.</Text>
++		);
++		expect( container.firstChild ).toHaveStyle( {
++			color: COLORS.mediumGray.text,
++		} );
++	} );
+ 
+-			const [ text ] = container.children;
++	test( 'should render as another element', () => {
++		const { container } = render( <Text as="div">Lorem ipsum.</Text> );
++		expect( container.firstChild.nodeName ).toBe( 'DIV' );
++	} );
++
++	test( 'should render align', () => {
++		const { container } = render(
++			<Text align="center">Lorem ipsum.</Text>
++		);
++		expect( container.firstChild ).toHaveStyle( { textAlign: 'center' } );
++	} );
++
++	test( 'should render color', () => {
++		const { container } = render(
++			<Text color="orange">Lorem ipsum.</Text>
++		);
++		expect( container.firstChild ).toHaveStyle( { color: 'orange' } );
++	} );
+ 
+-			expect( text.innerHTML ).toBe( 'Hello' );
++	test( 'should render display', () => {
++		const { container } = render(
++			<Text display="inline-flex">Lorem ipsum.</Text>
++		);
++		expect( container.firstChild ).toHaveStyle( {
++			display: 'inline-flex',
+ 		} );
++	} );
+ 
+-		it( 'should render as a <p>, by default', () => {
+-			act( () => {
+-				render( <Text />, container );
+-			} );
++	test( 'should render highlighted words', async () => {
++		const wrapper = render(
++			<Text highlightWords={ [ 'm' ] }>Lorem ipsum.</Text>
++		);
++		expect( wrapper.container.firstChild.childNodes ).toHaveLength( 5 );
++		const words = await wrapper.findAllByText( 'm' );
++		expect( words ).toHaveLength( 2 );
++		words.forEach( ( word ) => expect( word.tagName ).toEqual( 'MARK' ) );
++	} );
+ 
+-			const [ text ] = container.children;
++	test( 'should render highlighted words with undefined passed', () => {
++		const { container } = render(
++			<Text highlightWords={ undefined }>Lorem ipsum.</Text>
++		);
++		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered
++		expect( container.firstChild.childNodes ).toHaveLength( 1 );
++	} );
+ 
+-			expect( text.tagName ).toBe( 'P' );
+-		} );
++	test( 'should render highlighted words with highlightCaseSensitive', () => {
++		const { container } = render(
++			<Text highlightCaseSensitive highlightWords={ [ 'IPSUM' ] }>
++				Lorem ipsum.
++			</Text>
++		);
++
++		expect( container.firstChild ).toMatchSnapshot();
++		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered
++		expect( container.firstChild.childNodes ).toHaveLength( 1 );
++	} );
+ 
+-		it( 'should render as another selector, if specified', () => {
+-			act( () => {
+-				render(
+-					<>
+-						<Text as="h1" />
+-						<Text as="h2" />
+-						<Text as="span" />
+-						<Text as="div" />
+-					</>,
+-					container
+-				);
+-			} );
+-
+-			const [ h1, h2, span, div ] = container.children;
+-
+-			expect( h1.tagName ).toBe( 'H1' );
+-			expect( h2.tagName ).toBe( 'H2' );
+-			expect( span.tagName ).toBe( 'SPAN' );
+-			expect( div.tagName ).toBe( 'DIV' );
++	test( 'should render isBlock', () => {
++		const { container } = render( <Text isBlock>Lorem ipsum.</Text> );
++		expect( container.firstChild ).toHaveStyle( {
++			display: 'block',
+ 		} );
+ 	} );
+ 
+-	describe( 'Variants', () => {
+-		it( 'should render with specified variantion styles', () => {
+-			act( () => {
+-				render(
+-					<>
+-						<Text>Base</Text>
+-						<Text variant="title.large">Title Large</Text>
+-						<Text variant="caption">Caption</Text>
+-					</>,
+-					container
+-				);
+-			} );
+-
+-			const [ base, title, caption ] = container.children;
+-
+-			expect( getTextStyle( base ).fontSize ).toBeFalsy();
+-			expect( getTextStyle( title ).fontSize ).toBe( '32px' );
+-			expect( getTextStyle( caption ).fontSize ).toBe( '12px' );
++	test( 'should render lineHeight', () => {
++		const { container } = render(
++			<Text lineHeight={ 1.5 }>Lorem ipsum.</Text>
++		);
++		expect( container.firstChild ).toHaveStyle( { lineHeight: '1.5' } );
++	} );
++
++	test( 'should render upperCase', () => {
++		const { container } = render( <Text upperCase>Lorem ipsum.</Text> );
++		expect( container.firstChild ).toHaveStyle( {
++			textTransform: 'uppercase',
+ 		} );
+ 	} );
++
++	test( 'should render weight', () => {
++		const { container } = render(
++			<Text weight={ 700 }>Lorem ipsum.</Text>
++		);
++		expect( container.firstChild ).toHaveStyle( { fontWeight: '700' } );
++	} );
+ } );
+diff --git a/packages/components/src/ui/text/types.ts b/packages/components/src/text/types.ts
+similarity index 100%
+rename from packages/components/src/ui/text/types.ts
+rename to packages/components/src/text/types.ts
+diff --git a/packages/components/src/ui/text/utils.js b/packages/components/src/text/utils.js
+similarity index 100%
+rename from packages/components/src/ui/text/utils.js
+rename to packages/components/src/text/utils.js
+diff --git a/packages/components/src/ui/truncate/README.md b/packages/components/src/truncate/README.md
+similarity index 91%
+rename from packages/components/src/ui/truncate/README.md
+rename to packages/components/src/truncate/README.md
+index 76c98c0a4166bf..663f04b1119f6b 100644
+--- a/packages/components/src/ui/truncate/README.md
++++ b/packages/components/src/truncate/README.md
+@@ -5,7 +5,7 @@
+ ## Usage
+ 
+ ```jsx
+-import { Truncate } from '@wordpress/components/ui';
++import { __experimentalTruncate as Truncate } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+@@ -50,7 +50,7 @@ Determines the max characters when `truncate` is set.
+ Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
+ 
+ ```jsx
+-import { Truncate } from '@wordpress/components/ui';
++import { __experimentalTruncate as Truncate } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+diff --git a/packages/components/src/ui/truncate/component.js b/packages/components/src/truncate/component.js
+similarity index 85%
+rename from packages/components/src/ui/truncate/component.js
+rename to packages/components/src/truncate/component.js
+index d61585c7189980..5cb453b778c8de 100644
+--- a/packages/components/src/ui/truncate/component.js
++++ b/packages/components/src/truncate/component.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../utils';
++import { createComponent } from '../ui/utils';
+ import useTruncate from './hook';
+ 
+ /**
+@@ -12,7 +12,7 @@ import useTruncate from './hook';
+  *
+  * @example
+  * ```jsx
+- * import { Truncate } from `@wordpress/components/ui`;
++ * import { __experimentalTruncate as Truncate } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return (
+diff --git a/packages/components/src/ui/truncate/hook.js b/packages/components/src/truncate/hook.js
+similarity index 90%
+rename from packages/components/src/ui/truncate/hook.js
+rename to packages/components/src/truncate/hook.js
+index 3f2bc5a5a7b3a1..07bfc21f6830fd 100644
+--- a/packages/components/src/ui/truncate/hook.js
++++ b/packages/components/src/truncate/hook.js
+@@ -11,12 +11,12 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../context';
++import { useContextSystem } from '../ui/context';
+ import * as styles from './styles';
+ import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').Props, 'span'>} props
++ * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'span'>} props
+  */
+ export default function useTruncate( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/truncate/index.js b/packages/components/src/truncate/index.js
+similarity index 100%
+rename from packages/components/src/ui/truncate/index.js
+rename to packages/components/src/truncate/index.js
+diff --git a/packages/components/src/ui/truncate/stories/index.js b/packages/components/src/truncate/stories/index.js
+similarity index 100%
+rename from packages/components/src/ui/truncate/stories/index.js
+rename to packages/components/src/truncate/stories/index.js
+diff --git a/packages/components/src/ui/truncate/styles.js b/packages/components/src/truncate/styles.js
+similarity index 100%
+rename from packages/components/src/ui/truncate/styles.js
+rename to packages/components/src/truncate/styles.js
+diff --git a/packages/components/src/ui/truncate/test/truncate.js b/packages/components/src/truncate/test/index.js
+similarity index 100%
+rename from packages/components/src/ui/truncate/test/truncate.js
+rename to packages/components/src/truncate/test/index.js
+diff --git a/packages/components/src/ui/truncate/types.ts b/packages/components/src/truncate/types.ts
+similarity index 100%
+rename from packages/components/src/ui/truncate/types.ts
+rename to packages/components/src/truncate/types.ts
+diff --git a/packages/components/src/ui/truncate/utils.js b/packages/components/src/truncate/utils.js
+similarity index 100%
+rename from packages/components/src/ui/truncate/utils.js
+rename to packages/components/src/truncate/utils.js
+diff --git a/packages/components/src/ui/__storybook-utils/example-grid.js b/packages/components/src/ui/__storybook-utils/example-grid.js
+index 5c079a1490ee4d..7ba8a2725329cd 100644
+--- a/packages/components/src/ui/__storybook-utils/example-grid.js
++++ b/packages/components/src/ui/__storybook-utils/example-grid.js
+@@ -3,7 +3,7 @@
+  */
+ import { Grid } from '../grid';
+ import { Surface } from '../surface';
+-import { Text } from '../text';
++import { Text } from '../../text';
+ import { View } from '../view';
+ import { VStack } from '../v-stack';
+ 
+diff --git a/packages/components/src/ui/card/stories/index.js b/packages/components/src/ui/card/stories/index.js
+index bbbd8c0a5b4590..dff054f89ffb90 100644
+--- a/packages/components/src/ui/card/stories/index.js
++++ b/packages/components/src/ui/card/stories/index.js
+@@ -2,7 +2,7 @@
+  * Internal dependencies
+  */
+ import { Grid } from '../../grid';
+-import { Text } from '../../text';
++import { Text } from '../../../text';
+ import { VStack } from '../../v-stack';
+ import { Card, CardBody, CardFooter } from '../index';
+ import { Divider } from '../../divider';
+diff --git a/packages/components/src/ui/control-label/hook.js b/packages/components/src/ui/control-label/hook.js
+index d758dcb75092b6..81f201d80112ef 100644
+--- a/packages/components/src/ui/control-label/hook.js
++++ b/packages/components/src/ui/control-label/hook.js
+@@ -8,7 +8,7 @@ import { cx } from 'emotion';
+  */
+ import { useContextSystem } from '../context';
+ import { useFormGroupContextId } from '../form-group';
+-import { useText } from '../text';
++import { useText } from '../../text';
+ import * as styles from './styles';
+ 
+ /**
+diff --git a/packages/components/src/ui/control-label/types.ts b/packages/components/src/ui/control-label/types.ts
+index 7fbed983546cd6..e76b7d3d895e73 100644
+--- a/packages/components/src/ui/control-label/types.ts
++++ b/packages/components/src/ui/control-label/types.ts
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import type { Props as TextProps } from '../text/types';
++import type { Props as TextProps } from '../../text/types';
+ 
+ export type Props = TextProps & {
+ 	isBlock?: boolean;
+diff --git a/packages/components/src/ui/form-group/stories/index.js b/packages/components/src/ui/form-group/stories/index.js
+index c207ab2df5456d..ba693c3825fe4e 100644
+--- a/packages/components/src/ui/form-group/stories/index.js
++++ b/packages/components/src/ui/form-group/stories/index.js
+@@ -2,7 +2,7 @@
+  * Internal dependencies
+  */
+ import { FormGroup, useFormGroupContextId } from '../index';
+-import { Text } from '../../text';
++import { Text } from '../../../text';
+ 
+ // @todo: Refactor this after adding next TextInput component.
+ const TextInput = ( { id: idProp, ...props } ) => {
+diff --git a/packages/components/src/ui/heading/hook.ts b/packages/components/src/ui/heading/hook.ts
+index 98337acfc36c6c..44ba244611dcf8 100644
+--- a/packages/components/src/ui/heading/hook.ts
++++ b/packages/components/src/ui/heading/hook.ts
+@@ -4,8 +4,8 @@
+ import { useContextSystem } from '../context';
+ // eslint-disable-next-line no-duplicate-imports
+ import type { ViewOwnProps } from '../context';
+-import type { Props as TextProps } from '../text/types';
+-import { useText } from '../text';
++import type { Props as TextProps } from '../../text/types';
++import { useText } from '../../text';
+ import { getHeadingFontSize } from '../utils/font-size';
+ import { CONFIG, COLORS } from '../../utils';
+ 
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index 40f1bb0fa5a43c..43318054a97bfd 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -9,7 +9,5 @@ export * from './h-stack';
+ export * from './heading';
+ export * from './shortcut';
+ export * from './spinner';
+-export * from './text';
+-export * from './truncate';
+ export * from './v-stack';
+ export * from './view';
+diff --git a/packages/components/src/ui/surface/stories/index.js b/packages/components/src/ui/surface/stories/index.js
+index cac136319bb58e..7ab5b68b329e8d 100644
+--- a/packages/components/src/ui/surface/stories/index.js
++++ b/packages/components/src/ui/surface/stories/index.js
+@@ -7,7 +7,7 @@ import { boolean, number, select } from '@storybook/addon-knobs';
+  * Internal dependencies
+  */
+ import { Surface } from '../index';
+-import { Text } from '../../text';
++import { Text } from '../../../text';
+ 
+ export default {
+ 	component: Surface,
+diff --git a/packages/components/src/ui/text/README.md b/packages/components/src/ui/text/README.md
+deleted file mode 100644
+index 87fbb20ca3b664..00000000000000
+--- a/packages/components/src/ui/text/README.md
++++ /dev/null
+@@ -1,237 +0,0 @@
+-# Text
+-
+-`Text` is a core component that renders text in the library, using the library's typography system.
+-
+-## Usage
+-
+-`Text` can be used to render any text-content, like an HTML `p` or `span`.
+-
+-```jsx
+-import { Text } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return <Text>Code is Poetry</Text>;
+-}
+-```
+-
+-## Props
+-
+-##### adjustLineHeightForInnerControls
+-
+-**Type**: `boolean`,`"large"`,`"medium"`,`"small"`,`"xSmall"`
+-
+-Automatically calculate the appropriate line-height value for contents that render text and Control elements (e.g. `TextInput`).
+-
+-```jsx
+-import { Text, TextInput } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return (
+-		<Text adjustLineHeightForInnerControls>
+-			Lorem ipsum dolor sit amet, consectetur
+-			<TextInput value="adipiscing elit..." />
+-		</Text>
+-	);
+-}
+-```
+-
+-##### align
+-
+-**Type**: `CSS['textAlign']`
+-
+-Adjusts the text alignment.
+-
+-```jsx
+-import { Text } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return (
+-		<Text align="center" isBlock>
+-			Lorem ipsum dolor sit amet, consectetur adipiscing elit...
+-		</Text>
+-	);
+-}
+-```
+-
+-##### color
+-
+-**Type**: `CSS['color']`
+-
+-Adjusts the text color.
+-
+-##### display
+-
+-**Type**: `CSS['display']`
+-
+-Adjusts the CSS display.
+-
+-##### ellipsis
+-
+-**Type**: `string`
+-
+-The ellipsis string when `truncate` is set.
+-
+-##### ellipsizeMode
+-
+-**Type**: `"auto"`,`"head"`,`"tail"`,`"middle"`
+-
+-Determines where to truncate. For example, we can truncate text right in the middle. To do this, we need to set `ellipsizeMode` to `middle` and a text `limit`.
+-
+--   `auto`: Trims content at the end automatically without a `limit`.
+--   `head`: Trims content at the beginning. Requires a `limit`.
+--   `middle`: Trims content in the middle. Requires a `limit`.
+--   `tail`: Trims content at the end. Requires a `limit`.
+-
+-##### highlightCaseSensitive
+-
+-**Type**: `boolean`
+-
+-Escape characters in `highlightWords` which are meaningful in regular expressions.
+-
+-##### highlightEscape
+-
+-**Type**: `boolean`
+-
+-Determines if `highlightWords` should be case sensitive.
+-
+-##### highlightSanitize
+-
+-**Type**: `boolean`
+-
+-Array of search words. String search terms are automatically cast to RegExps unless `highlightEscape` is true.
+-
+-##### highlightWords
+-
+-**Type**: `any[]`
+-
+-Letters or words within `Text` can be highlighted using `highlightWords`.
+-
+-```jsx
+-import { Text } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return (
+-		<Text highlightWords={ [ 'pi' ] }>
+-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ex
+-			neque, vulputate a diam et, luctus convallis lacus. Vestibulum ac
+-			mollis mi. Morbi id elementum massa. Suspendisse interdum auctor
+-			ligula eget cursus. In fermentum ultricies mauris, pharetra
+-			fermentum erat pellentesque id.
+-		</Text>
+-	);
+-}
+-```
+-
+-##### isBlock
+-
+-**Type**: `boolean`
+-
+-Sets `Text` to have `display: block`.
+-
+-##### isDestructive
+-
+-**Type**: `boolean`
+-
+-Renders a destructive color.
+-
+-##### limit
+-
+-**Type**: `number`
+-
+-Determines the max characters when `truncate` is set.
+-
+-##### lineHeight
+-
+-**Type**: `CSS['lineHeight']`
+-
+-Adjusts all text line-height based on the typography system.
+-
+-##### numberOfLines
+-
+-**Type**: `number`
+-
+-Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
+-
+-##### optimizeReadabilityFor
+-
+-**Type**: `CSS['color']`
+-
+-The `Text` color can be adapted to a background color for optimal readability. `optimizeReadabilityFor` can accept CSS variables, in addition to standard CSS color values (e.g. Hex, RGB, HSL, etc...).
+-
+-```jsx
+-import { Text, View } from '@wordpress/components/ui';
+-
+-function Example() {
+-	const backgroundColor = 'blue';
+-
+-	return (
+-		<View css={ { backgroundColor } }>
+-			<Text optimizeReadabilityFor={ backgroundColor }>
+-				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+-			</Text>
+-		</View>
+-	);
+-}
+-```
+-
+-##### size
+-
+-**Type**: `CSS['fontSize']`,`TextSize`
+-
+-Adjusts text size based on the typography system. `Text` can render a wide range of font sizes, which are automatically calculated and adapted to the typography system. The `size` value can be a system preset, a `number`, or a custom unit value (`string`) such as `30em`.
+-
+-```jsx
+-import { Text } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return <Text size="largeTitle">Code is Poetry</Text>;
+-}
+-```
+-
+-##### truncate
+-
+-**Type**: `boolean`
+-
+-Enables text truncation. When `truncate` is set,we are able to truncate the long text in a variety of ways.
+-
+-```jsx
+-import { Text } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return (
+-		<Text truncate>
+-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ex
+-			neque, vulputate a diam et, luctus convallis lacus. Vestibulum ac
+-			mollis mi. Morbi id elementum massa. Suspendisse interdum auctor
+-			ligula eget cursus. In fermentum ultricies mauris, pharetra
+-			fermentum erat pellentesque id.
+-		</Text>
+-	);
+-}
+-```
+-
+-##### upperCase
+-
+-**Type**: `boolean`
+-
+-Uppercases the text content.
+-
+-##### variant
+-
+-**Type**: `"muted"`
+-
+-Adjusts style variation of the text.
+-
+-```jsx
+-import { Text } from '@wordpress/components/ui';
+-
+-function Example() {
+-	return <Text variant="muted">Code is Poetry</Text>;
+-}
+-```
+-
+-##### weight
+-
+-**Type**: `CSS['fontWeight']`,`TextWeight`
+-
+-Adjusts font-weight of the text.
+diff --git a/packages/components/src/ui/text/index.js b/packages/components/src/ui/text/index.js
+deleted file mode 100644
+index 2341fd018171b0..00000000000000
+--- a/packages/components/src/ui/text/index.js
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export { default as Text } from './component';
+-export { default as useText } from './hook';
+diff --git a/packages/components/src/ui/text/stories/index.js b/packages/components/src/ui/text/stories/index.js
+deleted file mode 100644
+index 34e7e5c21459c7..00000000000000
+--- a/packages/components/src/ui/text/stories/index.js
++++ /dev/null
+@@ -1,53 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { Text } from '..';
+-
+-export default {
+-	component: Text,
+-	title: 'G2 Components (Experimental)/Text',
+-};
+-
+-export const _default = () => {
+-	return <Text>Hello</Text>;
+-};
+-
+-export const truncate = () => {
+-	return (
+-		<Text numberOfLines={ 2 } truncate>
+-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+-			facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
+-			Duis semper dui id augue malesuada, ut feugiat nisi aliquam.
+-			Vestibulum venenatis diam sem, finibus dictum massa semper in. Nulla
+-			facilisi. Nunc vulputate faucibus diam, in lobortis arcu ornare vel.
+-			In dignissim nunc sed facilisis finibus. Etiam imperdiet mattis
+-			arcu, sed rutrum sapien blandit gravida. Aenean sollicitudin neque
+-			eget enim blandit, sit amet rutrum leo vehicula. Nunc malesuada
+-			ultricies eros ut faucibus. Aliquam erat volutpat. Nulla nec feugiat
+-			risus. Vivamus iaculis dui aliquet ante ultricies feugiat.
+-			Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
+-			posuere cubilia curae; Vivamus nec pretium velit, sit amet
+-			consectetur ante. Praesent porttitor ex eget fermentum mattis.
+-		</Text>
+-	);
+-};
+-
+-export const highlight = () => {
+-	return (
+-		<Text highlightWords={ [ 'con' ] }>
+-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+-			facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
+-			Duis semper dui id augue malesuada, ut feugiat nisi aliquam.
+-			Vestibulum venenatis diam sem, finibus dictum massa semper in. Nulla
+-			facilisi. Nunc vulputate faucibus diam, in lobortis arcu ornare vel.
+-			In dignissim nunc sed facilisis finibus. Etiam imperdiet mattis
+-			arcu, sed rutrum sapien blandit gravida. Aenean sollicitudin neque
+-			eget enim blandit, sit amet rutrum leo vehicula. Nunc malesuada
+-			ultricies eros ut faucibus. Aliquam erat volutpat. Nulla nec feugiat
+-			risus. Vivamus iaculis dui aliquet ante ultricies feugiat.
+-			Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
+-			posuere cubilia curae; Vivamus nec pretium velit, sit amet
+-			consectetur ante. Praesent porttitor ex eget fermentum mattis.
+-		</Text>
+-	);
+-};
+diff --git a/packages/components/src/ui/text/test/text.js b/packages/components/src/ui/text/test/text.js
+deleted file mode 100644
+index 45b3d956c0809b..00000000000000
+--- a/packages/components/src/ui/text/test/text.js
++++ /dev/null
+@@ -1,145 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { getFontSize } from '../../utils/font-size';
+-import { COLORS } from '../../../utils/colors-values';
+-import { Text } from '..';
+-
+-describe( 'Text', () => {
+-	describe( 'snapshot tests', () => {
+-		test( 'should render correctly', () => {
+-			const { container } = render( <Text>Lorem ipsum.</Text> );
+-			expect( container.firstChild ).toMatchSnapshot();
+-		} );
+-	} );
+-
+-	test( 'should render optimizeReadabilityFor', () => {
+-		const { container } = render(
+-			<Text optimizeReadabilityFor="blue">Lorem ipsum.</Text>
+-		);
+-		expect( container.firstChild ).toHaveStyle( {
+-			color: COLORS.white,
+-		} );
+-	} );
+-
+-	test( 'should render truncate', () => {
+-		const { container } = render( <Text truncate>Lorem ipsum.</Text> );
+-		expect( container.firstChild ).toHaveStyle( {
+-			textOverflow: 'ellipsis',
+-		} );
+-	} );
+-
+-	test( 'should render size', () => {
+-		const { container } = render( <Text size="title">Lorem ipsum.</Text> );
+-		expect( container.firstChild ).toHaveStyle( {
+-			fontSize: getFontSize( 'title' ),
+-		} );
+-	} );
+-
+-	test( 'should render custom size', () => {
+-		const { container } = render( <Text size={ 15 }>Lorem ipsum.</Text> );
+-		expect( container.firstChild ).toHaveStyle( {
+-			fontSize: getFontSize( 15 ),
+-		} );
+-	} );
+-
+-	test( 'should render variant', () => {
+-		const { container } = render(
+-			<Text variant="muted">Lorem ipsum.</Text>
+-		);
+-		expect( container.firstChild ).toHaveStyle( {
+-			color: COLORS.mediumGray.text,
+-		} );
+-	} );
+-
+-	test( 'should render as another element', () => {
+-		const { container } = render( <Text as="div">Lorem ipsum.</Text> );
+-		expect( container.firstChild.nodeName ).toBe( 'DIV' );
+-	} );
+-
+-	test( 'should render align', () => {
+-		const { container } = render(
+-			<Text align="center">Lorem ipsum.</Text>
+-		);
+-		expect( container.firstChild ).toHaveStyle( { textAlign: 'center' } );
+-	} );
+-
+-	test( 'should render color', () => {
+-		const { container } = render(
+-			<Text color="orange">Lorem ipsum.</Text>
+-		);
+-		expect( container.firstChild ).toHaveStyle( { color: 'orange' } );
+-	} );
+-
+-	test( 'should render display', () => {
+-		const { container } = render(
+-			<Text display="inline-flex">Lorem ipsum.</Text>
+-		);
+-		expect( container.firstChild ).toHaveStyle( {
+-			display: 'inline-flex',
+-		} );
+-	} );
+-
+-	test( 'should render highlighted words', async () => {
+-		const wrapper = render(
+-			<Text highlightWords={ [ 'm' ] }>Lorem ipsum.</Text>
+-		);
+-		expect( wrapper.container.firstChild.childNodes ).toHaveLength( 5 );
+-		const words = await wrapper.findAllByText( 'm' );
+-		expect( words ).toHaveLength( 2 );
+-		words.forEach( ( word ) => expect( word.tagName ).toEqual( 'MARK' ) );
+-	} );
+-
+-	test( 'should render highlighted words with undefined passed', () => {
+-		const { container } = render(
+-			<Text highlightWords={ undefined }>Lorem ipsum.</Text>
+-		);
+-		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered
+-		expect( container.firstChild.childNodes ).toHaveLength( 1 );
+-	} );
+-
+-	test( 'should render highlighted words with highlightCaseSensitive', () => {
+-		const { container } = render(
+-			<Text highlightCaseSensitive highlightWords={ [ 'IPSUM' ] }>
+-				Lorem ipsum.
+-			</Text>
+-		);
+-
+-		expect( container.firstChild ).toMatchSnapshot();
+-		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered
+-		expect( container.firstChild.childNodes ).toHaveLength( 1 );
+-	} );
+-
+-	test( 'should render isBlock', () => {
+-		const { container } = render( <Text isBlock>Lorem ipsum.</Text> );
+-		expect( container.firstChild ).toHaveStyle( {
+-			display: 'block',
+-		} );
+-	} );
+-
+-	test( 'should render lineHeight', () => {
+-		const { container } = render(
+-			<Text lineHeight={ 1.5 }>Lorem ipsum.</Text>
+-		);
+-		expect( container.firstChild ).toHaveStyle( { lineHeight: '1.5' } );
+-	} );
+-
+-	test( 'should render upperCase', () => {
+-		const { container } = render( <Text upperCase>Lorem ipsum.</Text> );
+-		expect( container.firstChild ).toHaveStyle( {
+-			textTransform: 'uppercase',
+-		} );
+-	} );
+-
+-	test( 'should render weight', () => {
+-		const { container } = render(
+-			<Text weight={ 700 }>Lorem ipsum.</Text>
+-		);
+-		expect( container.firstChild ).toHaveStyle( { fontWeight: '700' } );
+-	} );
+-} );
+diff --git a/packages/components/src/ui/tooltip/stories/index.js b/packages/components/src/ui/tooltip/stories/index.js
+index 2822df04a46a6b..e216b126def9ea 100644
+--- a/packages/components/src/ui/tooltip/stories/index.js
++++ b/packages/components/src/ui/tooltip/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { Text } from '../../index';
++import { Text } from '../../../text';
+ import { Tooltip } from '../index';
+ 
+ export default {
+diff --git a/packages/components/src/ui/tooltip/test/index.js b/packages/components/src/ui/tooltip/test/index.js
+index 7d135792cb75da..b1ac48ff350437 100644
+--- a/packages/components/src/ui/tooltip/test/index.js
++++ b/packages/components/src/ui/tooltip/test/index.js
+@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { Text } from '../../text';
++import { Text } from '../../../text';
+ import { Tooltip } from '../index';
+ 
+ describe( 'props', () => {
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index b5bf38764f2d95..275e6bc5163f49 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -26,6 +26,7 @@
+ 		"src/shortcut/**/*",
+ 		"src/spinner/**/*",
+ 		"src/tip/**/*",
++		"src/truncate/**/*",
+ 		"src/ui/**/*",
+ 		"src/utils/**/*",
+ 		"src/visually-hidden/**/*",
+diff --git a/packages/edit-site/src/components/header/document-actions/index.js b/packages/edit-site/src/components/header/document-actions/index.js
+index 3890e481958157..99fe151aae290f 100644
+--- a/packages/edit-site/src/components/header/document-actions/index.js
++++ b/packages/edit-site/src/components/header/document-actions/index.js
+@@ -92,7 +92,7 @@ export default function DocumentActions( {
+ 				className="edit-site-document-actions__title-wrapper"
+ 			>
+ 				<Text
+-					variant="body.small"
++					size="body"
+ 					className="edit-site-document-actions__title-prefix"
+ 				>
+ 					<VisuallyHidden as="span">
+@@ -105,7 +105,7 @@ export default function DocumentActions( {
+ 				</Text>
+ 
+ 				<Text
+-					variant="body.small"
++					size="body"
+ 					className="edit-site-document-actions__title"
+ 					as="h1"
+ 				>
+@@ -113,7 +113,7 @@ export default function DocumentActions( {
+ 				</Text>
+ 
+ 				<Text
+-					variant="body.small"
++					size="body"
+ 					className="edit-site-document-actions__secondary-item"
+ 				>
+ 					{ label ?? '' }
+diff --git a/packages/edit-site/src/components/template-details/index.js b/packages/edit-site/src/components/template-details/index.js
+index 103c4f0e4107b2..9876606c38502a 100644
+--- a/packages/edit-site/src/components/template-details/index.js
++++ b/packages/edit-site/src/components/template-details/index.js
+@@ -43,11 +43,13 @@ export default function TemplateDetails( { template, onClose } ) {
+ 	return (
+ 		<>
+ 			<div className="edit-site-template-details">
+-				<Text variant="subtitle">{ title }</Text>
++				<Text size="body" weight={ 600 }>
++					{ title }
++				</Text>
+ 
+ 				{ description && (
+ 					<Text
+-						variant="body"
++						size="body"
+ 						className="edit-site-template-details__description"
+ 					>
+ 						{ description }

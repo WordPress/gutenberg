@@ -1,0 +1,1913 @@
+diff --git a/docs/manifest-devhub.json b/docs/manifest-devhub.json
+index ed5b47cd8b67d5..29ca54d6084946 100644
+--- a/docs/manifest-devhub.json
++++ b/docs/manifest-devhub.json
+@@ -983,6 +983,12 @@
+ 		"markdown_source": "../packages/components/src/text-highlight/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "Text",
++		"slug": "text",
++		"markdown_source": "../packages/components/src/text/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "TextareaControl",
+ 		"slug": "textarea-control",
+diff --git a/package-lock.json b/package-lock.json
+index 196ceaeebf6aad..abd95fee717876 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -1714,14 +1714,13 @@
+ 			}
+ 		},
+ 		"@emotion/css": {
+-			"version": "10.0.14",
+-			"resolved": "https://registry.npmjs.org/@emotion/css/-/css-10.0.14.tgz",
+-			"integrity": "sha512-MozgPkBEWvorcdpqHZE5x1D/PLEHUitALQCQYt2wayf4UNhpgQs2tN0UwHYS4FMy5ROBH+0ALyCFVYJ/ywmwlg==",
+-			"dev": true,
++			"version": "10.0.22",
++			"resolved": "https://registry.npmjs.org/@emotion/css/-/css-10.0.22.tgz",
++			"integrity": "sha512-8phfa5mC/OadBTmGpMpwykIVH0gFCbUoO684LUkyixPq4F1Wwri7fK5Xlm8lURNBrd2TuvTbPUGxFsGxF9UacA==",
+ 			"requires": {
+-				"@emotion/serialize": "^0.11.8",
++				"@emotion/serialize": "^0.11.12",
+ 				"@emotion/utils": "0.11.2",
+-				"babel-plugin-emotion": "^10.0.14"
++				"babel-plugin-emotion": "^10.0.22"
+ 			}
+ 		},
+ 		"@emotion/hash": {
+@@ -1742,11 +1741,26 @@
+ 			"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.3.tgz",
+ 			"integrity": "sha512-2Md9mH6mvo+ygq1trTeVp2uzAKwE2P7In0cRpD/M9Q70aH8L+rxMLbb3JCN2JoSWsV2O+DdFjfbbXoMoLBczow=="
+ 		},
++		"@emotion/native": {
++			"version": "10.0.22",
++			"resolved": "https://registry.npmjs.org/@emotion/native/-/native-10.0.22.tgz",
++			"integrity": "sha512-4Hlb2KSVGTqwQjHIgojdYUPlf660MpVS8kh77EcrOe/MUmKtqNvZVFp/MAdejfX/c0RyzmiZq19WdPQLaWm/LQ==",
++			"requires": {
++				"@emotion/primitives-core": "10.0.22"
++			}
++		},
++		"@emotion/primitives-core": {
++			"version": "10.0.22",
++			"resolved": "https://registry.npmjs.org/@emotion/primitives-core/-/primitives-core-10.0.22.tgz",
++			"integrity": "sha512-T2zPYmOabfm2DzG6LMcNRfBSFyBGwa5yHaM5pGhFpwufd7PiSirI7LuyUpFNQyHRn3XvgfSPIWynRRWOKduM6g==",
++			"requires": {
++				"css-to-react-native": "^2.2.1"
++			}
++		},
+ 		"@emotion/serialize": {
+-			"version": "0.11.11",
+-			"resolved": "https://registry.npmjs.org/@emotion/serialize/-/serialize-0.11.11.tgz",
+-			"integrity": "sha512-YG8wdCqoWtuoMxhHZCTA+egL0RSGdHEc+YCsmiSBPBEDNuVeMWtjEWtGrhUterSChxzwnWBXvzSxIFQI/3sHLw==",
+-			"dev": true,
++			"version": "0.11.14",
++			"resolved": "https://registry.npmjs.org/@emotion/serialize/-/serialize-0.11.14.tgz",
++			"integrity": "sha512-6hTsySIuQTbDbv00AnUO6O6Xafdwo5GswRlMZ5hHqiFx+4pZ7uGWXUQFW46Kc2taGhP89uXMXn/lWQkdyTosPA==",
+ 			"requires": {
+ 				"@emotion/hash": "0.7.3",
+ 				"@emotion/memoize": "0.7.3",
+@@ -7891,6 +7905,12 @@
+ 				"@types/istanbul-lib-report": "*"
+ 			}
+ 		},
++		"@types/jest": {
++			"version": "23.3.14",
++			"resolved": "https://registry.npmjs.org/@types/jest/-/jest-23.3.14.tgz",
++			"integrity": "sha512-Q5hTcfdudEL2yOmluA1zaSyPbzWPmJ3XfSWeP3RyoYvS9hnje1ZyagrZOuQ6+1nQC1Gw+7gap3pLNL3xL6UBug==",
++			"dev": true
++		},
+ 		"@types/json-schema": {
+ 			"version": "7.0.3",
+ 			"resolved": "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.3.tgz",
+@@ -8436,8 +8456,10 @@
+ 			"version": "file:packages/components",
+ 			"requires": {
+ 				"@babel/runtime": "^7.4.4",
+-				"@emotion/core": "10.0.22",
+-				"@emotion/styled": "10.0.23",
++				"@emotion/core": "^10.0.22",
++				"@emotion/css": "^10.0.22",
++				"@emotion/native": "^10.0.22",
++				"@emotion/styled": "^10.0.23",
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
+ 				"@wordpress/deprecated": "file:packages/deprecated",
+@@ -12154,6 +12176,11 @@
+ 				"quick-lru": "^1.0.0"
+ 			}
+ 		},
++		"camelize": {
++			"version": "1.0.0",
++			"resolved": "https://registry.npmjs.org/camelize/-/camelize-1.0.0.tgz",
++			"integrity": "sha1-FkpUg+Yw+kMh5a8HAg5TGDGyYJs="
++		},
+ 		"can-use-dom": {
+ 			"version": "0.1.0",
+ 			"resolved": "https://registry.npmjs.org/can-use-dom/-/can-use-dom-0.1.0.tgz",
+@@ -13761,6 +13788,26 @@
+ 				"randomfill": "^1.0.3"
+ 			}
+ 		},
++		"css": {
++			"version": "2.2.4",
++			"resolved": "https://registry.npmjs.org/css/-/css-2.2.4.tgz",
++			"integrity": "sha512-oUnjmWpy0niI3x/mPL8dVEI1l7MnG3+HHyRPHf+YFSbK+svOhXpmSOcDURUh2aOCgl2grzrOPt1nHLuCVFULLw==",
++			"dev": true,
++			"requires": {
++				"inherits": "^2.0.3",
++				"source-map": "^0.6.1",
++				"source-map-resolve": "^0.5.2",
++				"urix": "^0.1.0"
++			},
++			"dependencies": {
++				"source-map": {
++					"version": "0.6.1",
++					"resolved": "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz",
++					"integrity": "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==",
++					"dev": true
++				}
++			}
++		},
+ 		"css-color-function": {
+ 			"version": "1.3.3",
+ 			"resolved": "https://registry.npmjs.org/css-color-function/-/css-color-function-1.3.3.tgz",
+@@ -13781,6 +13828,11 @@
+ 				}
+ 			}
+ 		},
++		"css-color-keywords": {
++			"version": "1.0.0",
++			"resolved": "https://registry.npmjs.org/css-color-keywords/-/css-color-keywords-1.0.0.tgz",
++			"integrity": "sha1-/qJhbcZ2spYmhrOvjb2+GAskTgU="
++		},
+ 		"css-color-names": {
+ 			"version": "0.0.4",
+ 			"resolved": "https://registry.npmjs.org/css-color-names/-/css-color-names-0.0.4.tgz",
+@@ -13964,6 +14016,16 @@
+ 			"integrity": "sha512-jQVeeRG70QI08vSTwf1jHxp74JoZsr2XSgETae8/xC8ovSnL2WF87GTLO86Sbwdt2lK4Umg4HnnwMO4YF3Ce7w==",
+ 			"dev": true
+ 		},
++		"css-to-react-native": {
++			"version": "2.3.2",
++			"resolved": "https://registry.npmjs.org/css-to-react-native/-/css-to-react-native-2.3.2.tgz",
++			"integrity": "sha512-VOFaeZA053BqvvvqIA8c9n0+9vFppVBAHCp6JgFTtTMU3Mzi+XnelJ9XC9ul3BqFzZyQ5N+H0SnwsWT2Ebchxw==",
++			"requires": {
++				"camelize": "^1.0.0",
++				"css-color-keywords": "^1.0.0",
++				"postcss-value-parser": "^3.3.0"
++			}
++		},
+ 		"css-tree": {
+ 			"version": "1.0.0-alpha.28",
+ 			"resolved": "https://registry.npmjs.org/css-tree/-/css-tree-1.0.0-alpha.28.tgz",
+@@ -20396,6 +20458,29 @@
+ 				}
+ 			}
+ 		},
++		"jest-emotion": {
++			"version": "10.0.17",
++			"resolved": "https://registry.npmjs.org/jest-emotion/-/jest-emotion-10.0.17.tgz",
++			"integrity": "sha512-Z0SqaeXGr9dshhY5z9ctfPiw2qTw5BRbCsbBWziTtSdiLnqFprj2NuF38lMrpSMFKjNY+q+rioRI5gVyQZrrxA==",
++			"dev": true,
++			"requires": {
++				"@babel/runtime": "^7.5.5",
++				"@types/jest": "^23.0.2",
++				"chalk": "^2.4.1",
++				"css": "^2.2.1"
++			},
++			"dependencies": {
++				"@babel/runtime": {
++					"version": "7.7.2",
++					"resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.7.2.tgz",
++					"integrity": "sha512-JONRbXbTXc9WQE2mAZd1p0Z3DZ/6vaQIkgYMSTP3KjRCyd7rCZCcfhCyX+YjwcKxcZ82UrxbRD358bpExNgrjw==",
++					"dev": true,
++					"requires": {
++						"regenerator-runtime": "^0.13.2"
++					}
++				}
++			}
++		},
+ 		"jest-environment-jsdom": {
+ 			"version": "24.7.1",
+ 			"resolved": "https://registry.npmjs.org/jest-environment-jsdom/-/jest-environment-jsdom-24.7.1.tgz",
+@@ -22765,7 +22850,7 @@
+ 			"dependencies": {
+ 				"clone-deep": {
+ 					"version": "0.2.4",
+-					"resolved": "https://registry.npmjs.org/clone-deep/-/clone-deep-0.2.4.tgz",
++					"resolved": "http://registry.npmjs.org/clone-deep/-/clone-deep-0.2.4.tgz",
+ 					"integrity": "sha1-TnPdCen7lxzDhnDF3O2cGJZIHMY=",
+ 					"dev": true,
+ 					"requires": {
+@@ -22799,7 +22884,7 @@
+ 					"dependencies": {
+ 						"kind-of": {
+ 							"version": "2.0.1",
+-							"resolved": "https://registry.npmjs.org/kind-of/-/kind-of-2.0.1.tgz",
++							"resolved": "http://registry.npmjs.org/kind-of/-/kind-of-2.0.1.tgz",
+ 							"integrity": "sha1-AY7HpM5+OobLkUG+UZ0kyPqpgbU=",
+ 							"dev": true,
+ 							"requires": {
+@@ -26794,8 +26879,7 @@
+ 		"postcss-value-parser": {
+ 			"version": "3.3.0",
+ 			"resolved": "https://registry.npmjs.org/postcss-value-parser/-/postcss-value-parser-3.3.0.tgz",
+-			"integrity": "sha1-h/OPnxj3dKSrTIojL1xc6IcqnRU=",
+-			"dev": true
++			"integrity": "sha1-h/OPnxj3dKSrTIojL1xc6IcqnRU="
+ 		},
+ 		"prelude-ls": {
+ 			"version": "1.1.2",
+diff --git a/package.json b/package.json
+index 50dbbd03709d9e..7d0b648f787956 100644
+--- a/package.json
++++ b/package.json
+@@ -126,6 +126,7 @@
+ 		"husky": "3.0.5",
+ 		"inquirer": "6.3.1",
+ 		"is-equal-shallow": "0.1.3",
++		"jest-emotion": "10.0.17",
+ 		"jest-junit": "6.4.0",
+ 		"jest-serializer-enzyme": "1.0.0",
+ 		"jsdom": "11.12.0",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 73c1d8f5e579a6..534e93af5cf2c0 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -23,8 +23,10 @@
+ 	"sideEffects": false,
+ 	"dependencies": {
+ 		"@babel/runtime": "^7.4.4",
+-		"@emotion/core": "10.0.22",
+-		"@emotion/styled": "10.0.23",
++		"@emotion/core": "^10.0.22",
++		"@emotion/css": "^10.0.22",
++		"@emotion/native": "^10.0.22",
++		"@emotion/styled": "^10.0.23",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/deprecated": "file:../deprecated",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 78a3891a6d569a..8fb840d4372004 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -104,3 +104,4 @@ export { default as withNotices } from './higher-order/with-notices';
+ export {
+ 	default as withSpokenMessages,
+ } from './higher-order/with-spoken-messages';
++export * from './text';
+diff --git a/packages/components/src/text/README.md b/packages/components/src/text/README.md
+new file mode 100644
+index 00000000000000..806c60d45a06bc
+--- /dev/null
++++ b/packages/components/src/text/README.md
+@@ -0,0 +1,18 @@
++# Text
++
++A text component for styling text.
++
++## Usage
++
++```jsx
++import {Text} from '@wordpress/components';
++
++const HeroPanel = () => (
++	<>
++		<Text variant="title.large" as="h1">Hello World!</Text>
++		<Text variant="body">Greetings to you!</Text>
++	</>
++);
++```
++
++> For most use-cases you can use this component instead of a `h1`, `h2`, `h3`, `h4`, `h5`, `h6` or `p`.
+diff --git a/packages/components/src/text/font-family.js b/packages/components/src/text/font-family.js
+new file mode 100644
+index 00000000000000..860cd63dee575f
+--- /dev/null
++++ b/packages/components/src/text/font-family.js
+@@ -0,0 +1,2 @@
++export const fontFamily = `font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
++Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;`;
+diff --git a/packages/components/src/text/font-family.native.js b/packages/components/src/text/font-family.native.js
+new file mode 100644
+index 00000000000000..a09cbd5df27960
+--- /dev/null
++++ b/packages/components/src/text/font-family.native.js
+@@ -0,0 +1 @@
++export const fontFamily = '';
+diff --git a/packages/components/src/text/index.js b/packages/components/src/text/index.js
+new file mode 100644
+index 00000000000000..c4ae06e2b4f97f
+--- /dev/null
++++ b/packages/components/src/text/index.js
+@@ -0,0 +1 @@
++export * from './text.styles';
+diff --git a/packages/components/src/text/mixins.js b/packages/components/src/text/mixins.js
+new file mode 100644
+index 00000000000000..4375f708d289de
+--- /dev/null
++++ b/packages/components/src/text/mixins.js
+@@ -0,0 +1,149 @@
++/**
++ * External dependencies
++ */
++import css from '@emotion/css';
++/**
++ * Internal dependencies
++ */
++import { fontFamily } from './font-family';
++
++const fontWeightNormal = `font-weight: 400;`;
++const fontWeightSemibold = `font-weight: 600;`;
++
++const title = `
++  ${ fontWeightNormal }
++`;
++
++const titleLarge = `
++	font-size: 32px;
++	line-height: 40px;
++`;
++
++const titleMedium = `
++	font-size: 24px;
++	line-height: 32px;
++`;
++
++const titleSmall = `
++	font-size: 20px;
++	line-height: 28px;
++`;
++
++const subtitle = `
++	${ fontWeightSemibold }
++	font-size: 14px;
++	line-height: 20px;
++`;
++
++const subtitleLarge = `
++	font-size: 16px;
++	line-height: 24px;
++`;
++
++const subtitleSmall = `
++	font-size: 14px;
++	line-height: 20px;
++`;
++
++const body = `
++	${ fontWeightNormal }
++`;
++
++const bodyLarge = `
++	font-size: 16px;
++	line-height: 24px;
++`;
++
++const bodySmall = `
++	font-size: 14px;
++	line-height: 20px;
++`;
++
++const button = `
++  ${ fontWeightSemibold }
++  font-size: 14px;
++  line-height: 20px;
++`;
++
++const caption = `
++	${ fontWeightNormal }
++	font-size: 12px;
++	line-height: 16px;
++`;
++
++const label = `
++	${ fontWeightSemibold }
++	font-size: 12px;
++	line-height: 16px;
++`;
++
++/**
++ * @typedef {'title.large'|'title.medium'|'title.small'|'subtitle'|'subtitle.small'|'body'|'body.small'|'button'|'caption'|'label'} TextVariant
++ */
++
++/**
++ * @param {TextVariant} variantName
++ */
++const variant = ( variantName ) => {
++	switch ( variantName ) {
++		case 'title.large':
++			return css`
++				${ title }
++				${ titleLarge }
++			`;
++		case 'title.medium':
++			return css`
++				${ title }
++				${ titleMedium }
++			`;
++		case 'title.small':
++			return css`
++				${ title }
++				${ titleSmall }
++			`;
++
++		case 'subtitle':
++			return css`
++				${ subtitle }
++				${ subtitleLarge }
++			`;
++		case 'subtitle.small':
++			return css`
++				${ subtitle }
++				${ subtitleSmall }
++			`;
++
++		case 'body':
++			return css`
++				${ body }
++				${ bodyLarge }
++			`;
++		case 'body.small':
++			return css`
++				${ body }
++				${ bodySmall }
++			`;
++
++		case 'button':
++			return button;
++
++		case 'caption':
++			return caption;
++
++		case 'label':
++			return label;
++	}
++};
++
++/**
++ * @typedef {Object} TextProps
++ * @property {TextVariant} variant
++ */
++
++/**
++ * @param {TextProps} props
++ */
++export const text = ( props ) => css`
++	${ fontFamily }
++	${ variant( props.variant ) }
++`;
+diff --git a/packages/components/src/text/stories/index.js b/packages/components/src/text/stories/index.js
+new file mode 100644
+index 00000000000000..d278fe2c9f11a9
+--- /dev/null
++++ b/packages/components/src/text/stories/index.js
+@@ -0,0 +1,38 @@
++/**
++ * Internal dependencies
++ */
++import { __experimentalText as Text } from '../text.styles';
++
++export default {
++	title: 'Components|Experimental/Text',
++	component: Text,
++};
++
++export const _default = () => (
++	<>
++		<Text variant="title.large" as="h1">Title Large</Text>
++		<Text variant="title.medium" as="h2">Title Medium</Text>
++		<Text variant="title.small" as="h3">Title Small</Text>
++		<Text variant="subtitle">Subtitle</Text>
++		<Text variant="subtitle.small">Subtitle Small</Text>
++		<Text variant="body">Body</Text>
++		<Text variant="body.small">Body Small</Text>
++		<Text variant="button">Button</Text>
++		<Text variant="caption">Caption</Text>
++		<Text variant="label">Label</Text>
++	</>
++);
++
++export const TitleLarge = () => <Text variant="title.large" as="h1">Title Large</Text>;
++export const TitleMedium = () => <Text variant="title.medium" as="h2">Title Medium</Text>;
++export const TitleSmall = () => <Text variant="title.small" as="h3">Title Small</Text>;
++
++export const Subtitle = () => <Text variant="subtitle">Subtitle</Text>;
++export const SubtitleSmall = () => <Text variant="subtitle.small">Subtitle Small</Text>;
++
++export const Body = () => <Text variant="body">Body</Text>;
++export const BodySmall = () => <Text variant="body.small">Body Small</Text>;
++
++export const Button = () => <Text variant="button">Button</Text>;
++export const Caption = () => <Text variant="caption">Caption</Text>;
++export const Label = () => <Text variant="label">Label</Text>;
+diff --git a/packages/components/src/text/text.styles.js b/packages/components/src/text/text.styles.js
+new file mode 100644
+index 00000000000000..6d1546c61c72d4
+--- /dev/null
++++ b/packages/components/src/text/text.styles.js
+@@ -0,0 +1,14 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import { text } from './mixins';
++
++export const __experimentalText = styled.p(
++	`margin: 0;`,
++	text
++);
+diff --git a/packages/components/src/text/text.styles.native.js b/packages/components/src/text/text.styles.native.js
+new file mode 100644
+index 00000000000000..9d738959cf176b
+--- /dev/null
++++ b/packages/components/src/text/text.styles.native.js
+@@ -0,0 +1,13 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/native';
++
++/**
++ * Internal dependencies
++ */
++import { text } from './mixins';
++
++export const __experimentalText = styled.Text(
++	text
++);
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index f972025eaf13b2..83dd6d936e870c 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -778,8 +778,117 @@ exports[`Storyshots Components|ButtonGroup Default 1`] = `
+ `;
+ 
+ exports[`Storyshots Components|Card Default 1`] = `
++.emotion-6 {
++  background: #fff;
++  box-sizing: border-box;
++  border-radius: 3px;
++  border: 1px solid #e2e4e7;
++}
++
++.emotion-6.is-borderless {
++  border: none;
++}
++
++.emotion-6.is-elevated {
++  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
++}
++
++.emotion-0 {
++  border-bottom: 1px solid #e2e4e7;
++  border-top-left-radius: 3px;
++  border-top-right-radius: 3px;
++  box-sizing: border-box;
++}
++
++.emotion-0:last-child {
++  border-bottom: none;
++}
++
++.emotion-0.is-size-large {
++  padding: 20px 28px;
++}
++
++.emotion-0.is-size-medium {
++  padding: 12px 20px;
++}
++
++.emotion-0.is-size-small {
++  padding: 8px 12px;
++}
++
++.emotion-0.is-size-extraSmall {
++  padding: 4px 8px;
++}
++
++.emotion-0.is-borderless {
++  border: none;
++}
++
++.emotion-0.is-shady {
++  background: #f3f4f5;
++}
++
++.emotion-2 {
++  box-sizing: border-box;
++}
++
++.emotion-2.is-size-large {
++  padding: 28px;
++}
++
++.emotion-2.is-size-medium {
++  padding: 20px;
++}
++
++.emotion-2.is-size-small {
++  padding: 12px;
++}
++
++.emotion-2.is-size-extraSmall {
++  padding: 8px;
++}
++
++.emotion-2.is-shady {
++  background: #f3f4f5;
++}
++
++.emotion-4 {
++  border-top: 1px solid #e2e4e7;
++  border-bottom-left-radius: 3px;
++  border-bottom-right-radius: 3px;
++  box-sizing: border-box;
++}
++
++.emotion-4:first-of-type {
++  border-top: none;
++}
++
++.emotion-4.is-size-large {
++  padding: 20px 28px;
++}
++
++.emotion-4.is-size-medium {
++  padding: 12px 20px;
++}
++
++.emotion-4.is-size-small {
++  padding: 8px 12px;
++}
++
++.emotion-4.is-size-extraSmall {
++  padding: 4px 8px;
++}
++
++.emotion-4.is-borderless {
++  border: none;
++}
++
++.emotion-4.is-shady {
++  background: #f3f4f5;
++}
++
+ <div
+-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
++  className="components-card is-size-medium emotion-6 emotion-7"
+   style={
+     Object {
+       "width": "360px",
+@@ -787,17 +896,17 @@ exports[`Storyshots Components|Card Default 1`] = `
+   }
+ >
+   <div
+-    className="components-card__header is-size-medium css-6qsnk-HeaderUI e1q7k77g1"
++    className="components-card__header is-size-medium emotion-0 emotion-1"
+   >
+     Header
+   </div>
+   <div
+-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
++    className="components-card__body is-size-medium emotion-2 emotion-3"
+   >
+     Code is Poetry
+   </div>
+   <div
+-    className="components-card__footer is-size-medium css-wy9sfy-FooterUI e1q7k77g4"
++    className="components-card__footer is-size-medium emotion-4 emotion-5"
+   >
+     Footer
+   </div>
+@@ -805,8 +914,47 @@ exports[`Storyshots Components|Card Default 1`] = `
+ `;
+ 
+ exports[`Storyshots Components|Card/Body Default 1`] = `
++.emotion-2 {
++  background: #fff;
++  box-sizing: border-box;
++  border-radius: 3px;
++  border: 1px solid #e2e4e7;
++}
++
++.emotion-2.is-borderless {
++  border: none;
++}
++
++.emotion-2.is-elevated {
++  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
++}
++
++.emotion-0 {
++  box-sizing: border-box;
++}
++
++.emotion-0.is-size-large {
++  padding: 28px;
++}
++
++.emotion-0.is-size-medium {
++  padding: 20px;
++}
++
++.emotion-0.is-size-small {
++  padding: 12px;
++}
++
++.emotion-0.is-size-extraSmall {
++  padding: 8px;
++}
++
++.emotion-0.is-shady {
++  background: #f3f4f5;
++}
++
+ <div
+-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
++  className="components-card is-size-medium emotion-2 emotion-3"
+   style={
+     Object {
+       "width": "360px",
+@@ -814,7 +962,7 @@ exports[`Storyshots Components|Card/Body Default 1`] = `
+   }
+ >
+   <div
+-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
++    className="components-card__body is-size-medium emotion-0 emotion-1"
+   >
+     Content
+   </div>
+@@ -822,8 +970,56 @@ exports[`Storyshots Components|Card/Body Default 1`] = `
+ `;
+ 
+ exports[`Storyshots Components|Card/Divider Default 1`] = `
++.emotion-6 {
++  background: #fff;
++  box-sizing: border-box;
++  border-radius: 3px;
++  border: 1px solid #e2e4e7;
++}
++
++.emotion-6.is-borderless {
++  border: none;
++}
++
++.emotion-6.is-elevated {
++  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
++}
++
++.emotion-0 {
++  box-sizing: border-box;
++}
++
++.emotion-0.is-size-large {
++  padding: 28px;
++}
++
++.emotion-0.is-size-medium {
++  padding: 20px;
++}
++
++.emotion-0.is-size-small {
++  padding: 12px;
++}
++
++.emotion-0.is-size-extraSmall {
++  padding: 8px;
++}
++
++.emotion-0.is-shady {
++  background: #f3f4f5;
++}
++
++.emotion-2 {
++  all: unset;
++  border-top: 1px solid #e2e4e7;
++  box-sizing: border-box;
++  display: block;
++  height: 0;
++  width: 100%;
++}
++
+ <div
+-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
++  className="components-card is-size-medium emotion-6 emotion-7"
+   style={
+     Object {
+       "width": "360px",
+@@ -831,16 +1027,16 @@ exports[`Storyshots Components|Card/Divider Default 1`] = `
+   }
+ >
+   <div
+-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
++    className="components-card__body is-size-medium emotion-0 emotion-1"
+   >
+     ...
+   </div>
+   <hr
+-    className="components-card__divider css-lh2anh-DividerUI e1q7k77g5"
++    className="components-card__divider emotion-2 emotion-3"
+     role="separator"
+   />
+   <div
+-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
++    className="components-card__body is-size-medium emotion-0 emotion-1"
+   >
+     ...
+   </div>
+@@ -848,8 +1044,58 @@ exports[`Storyshots Components|Card/Divider Default 1`] = `
+ `;
+ 
+ exports[`Storyshots Components|Card/Footer Default 1`] = `
++.emotion-2 {
++  background: #fff;
++  box-sizing: border-box;
++  border-radius: 3px;
++  border: 1px solid #e2e4e7;
++}
++
++.emotion-2.is-borderless {
++  border: none;
++}
++
++.emotion-2.is-elevated {
++  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
++}
++
++.emotion-0 {
++  border-top: 1px solid #e2e4e7;
++  border-bottom-left-radius: 3px;
++  border-bottom-right-radius: 3px;
++  box-sizing: border-box;
++}
++
++.emotion-0:first-of-type {
++  border-top: none;
++}
++
++.emotion-0.is-size-large {
++  padding: 20px 28px;
++}
++
++.emotion-0.is-size-medium {
++  padding: 12px 20px;
++}
++
++.emotion-0.is-size-small {
++  padding: 8px 12px;
++}
++
++.emotion-0.is-size-extraSmall {
++  padding: 4px 8px;
++}
++
++.emotion-0.is-borderless {
++  border: none;
++}
++
++.emotion-0.is-shady {
++  background: #f3f4f5;
++}
++
+ <div
+-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
++  className="components-card is-size-medium emotion-2 emotion-3"
+   style={
+     Object {
+       "width": "360px",
+@@ -857,7 +1103,7 @@ exports[`Storyshots Components|Card/Footer Default 1`] = `
+   }
+ >
+   <div
+-    className="components-card__footer is-size-medium css-wy9sfy-FooterUI e1q7k77g4"
++    className="components-card__footer is-size-medium emotion-0 emotion-1"
+   >
+     Content
+   </div>
+@@ -865,8 +1111,58 @@ exports[`Storyshots Components|Card/Footer Default 1`] = `
+ `;
+ 
+ exports[`Storyshots Components|Card/Header Default 1`] = `
++.emotion-2 {
++  background: #fff;
++  box-sizing: border-box;
++  border-radius: 3px;
++  border: 1px solid #e2e4e7;
++}
++
++.emotion-2.is-borderless {
++  border: none;
++}
++
++.emotion-2.is-elevated {
++  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
++}
++
++.emotion-0 {
++  border-bottom: 1px solid #e2e4e7;
++  border-top-left-radius: 3px;
++  border-top-right-radius: 3px;
++  box-sizing: border-box;
++}
++
++.emotion-0:last-child {
++  border-bottom: none;
++}
++
++.emotion-0.is-size-large {
++  padding: 20px 28px;
++}
++
++.emotion-0.is-size-medium {
++  padding: 12px 20px;
++}
++
++.emotion-0.is-size-small {
++  padding: 8px 12px;
++}
++
++.emotion-0.is-size-extraSmall {
++  padding: 4px 8px;
++}
++
++.emotion-0.is-borderless {
++  border: none;
++}
++
++.emotion-0.is-shady {
++  background: #f3f4f5;
++}
++
+ <div
+-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
++  className="components-card is-size-medium emotion-2 emotion-3"
+   style={
+     Object {
+       "width": "360px",
+@@ -874,7 +1170,7 @@ exports[`Storyshots Components|Card/Header Default 1`] = `
+   }
+ >
+   <div
+-    className="components-card__header is-size-medium css-6qsnk-HeaderUI e1q7k77g1"
++    className="components-card__header is-size-medium emotion-0 emotion-1"
+   >
+     Content
+   </div>
+@@ -882,8 +1178,70 @@ exports[`Storyshots Components|Card/Header Default 1`] = `
+ `;
+ 
+ exports[`Storyshots Components|Card/Media Default 1`] = `
++.emotion-4 {
++  background: #fff;
++  box-sizing: border-box;
++  border-radius: 3px;
++  border: 1px solid #e2e4e7;
++}
++
++.emotion-4.is-borderless {
++  border: none;
++}
++
++.emotion-4.is-elevated {
++  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
++}
++
++.emotion-2 {
++  box-sizing: border-box;
++}
++
++.emotion-2.is-size-large {
++  padding: 28px;
++}
++
++.emotion-2.is-size-medium {
++  padding: 20px;
++}
++
++.emotion-2.is-size-small {
++  padding: 12px;
++}
++
++.emotion-2.is-size-extraSmall {
++  padding: 8px;
++}
++
++.emotion-2.is-shady {
++  background: #f3f4f5;
++}
++
++.emotion-0 {
++  box-sizing: border-box;
++  overflow: hidden;
++}
++
++.emotion-0 > img,
++.emotion-0 > iframe {
++  display: block;
++  height: auto;
++  max-width: 100%;
++  width: 100%;
++}
++
++.emotion-0:first-of-type {
++  border-top-left-radius: 3px;
++  border-top-right-radius: 3px;
++}
++
++.emotion-0:last-of-type {
++  border-bottom-left-radius: 3px;
++  border-bottom-right-radius: 3px;
++}
++
+ <div
+-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
++  className="components-card is-size-medium emotion-4 emotion-5"
+   style={
+     Object {
+       "width": "360px",
+@@ -891,7 +1249,7 @@ exports[`Storyshots Components|Card/Media Default 1`] = `
+   }
+ >
+   <div
+-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
++    className="components-card__media emotion-0 emotion-1"
+   >
+     <img
+       alt="SMELLING MARSHMELLOW ICECREAM CONE"
+@@ -899,7 +1257,7 @@ exports[`Storyshots Components|Card/Media Default 1`] = `
+     />
+   </div>
+   <div
+-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
++    className="components-card__body is-size-medium emotion-2 emotion-3"
+   >
+     Content
+   </div>
+@@ -907,8 +1265,116 @@ exports[`Storyshots Components|Card/Media Default 1`] = `
+ `;
+ 
+ exports[`Storyshots Components|Card/Media Header And Footer 1`] = `
++.emotion-6 {
++  background: #fff;
++  box-sizing: border-box;
++  border-radius: 3px;
++  border: 1px solid #e2e4e7;
++}
++
++.emotion-6.is-borderless {
++  border: none;
++}
++
++.emotion-6.is-elevated {
++  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
++}
++
++.emotion-0 {
++  border-bottom: 1px solid #e2e4e7;
++  border-top-left-radius: 3px;
++  border-top-right-radius: 3px;
++  box-sizing: border-box;
++}
++
++.emotion-0:last-child {
++  border-bottom: none;
++}
++
++.emotion-0.is-size-large {
++  padding: 20px 28px;
++}
++
++.emotion-0.is-size-medium {
++  padding: 12px 20px;
++}
++
++.emotion-0.is-size-small {
++  padding: 8px 12px;
++}
++
++.emotion-0.is-size-extraSmall {
++  padding: 4px 8px;
++}
++
++.emotion-0.is-borderless {
++  border: none;
++}
++
++.emotion-0.is-shady {
++  background: #f3f4f5;
++}
++
++.emotion-4 {
++  border-top: 1px solid #e2e4e7;
++  border-bottom-left-radius: 3px;
++  border-bottom-right-radius: 3px;
++  box-sizing: border-box;
++}
++
++.emotion-4:first-of-type {
++  border-top: none;
++}
++
++.emotion-4.is-size-large {
++  padding: 20px 28px;
++}
++
++.emotion-4.is-size-medium {
++  padding: 12px 20px;
++}
++
++.emotion-4.is-size-small {
++  padding: 8px 12px;
++}
++
++.emotion-4.is-size-extraSmall {
++  padding: 4px 8px;
++}
++
++.emotion-4.is-borderless {
++  border: none;
++}
++
++.emotion-4.is-shady {
++  background: #f3f4f5;
++}
++
++.emotion-2 {
++  box-sizing: border-box;
++  overflow: hidden;
++}
++
++.emotion-2 > img,
++.emotion-2 > iframe {
++  display: block;
++  height: auto;
++  max-width: 100%;
++  width: 100%;
++}
++
++.emotion-2:first-of-type {
++  border-top-left-radius: 3px;
++  border-top-right-radius: 3px;
++}
++
++.emotion-2:last-of-type {
++  border-bottom-left-radius: 3px;
++  border-bottom-right-radius: 3px;
++}
++
+ <div
+-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
++  className="components-card is-size-medium emotion-6 emotion-7"
+   style={
+     Object {
+       "width": "360px",
+@@ -916,12 +1382,12 @@ exports[`Storyshots Components|Card/Media Header And Footer 1`] = `
+   }
+ >
+   <div
+-    className="components-card__header is-size-medium css-6qsnk-HeaderUI e1q7k77g1"
++    className="components-card__header is-size-medium emotion-0 emotion-1"
+   >
+     Header Content
+   </div>
+   <div
+-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
++    className="components-card__media emotion-2 emotion-3"
+   >
+     <img
+       alt="SMELLING MARSHMELLOW ICECREAM CONE"
+@@ -929,7 +1395,7 @@ exports[`Storyshots Components|Card/Media Header And Footer 1`] = `
+     />
+   </div>
+   <div
+-    className="components-card__footer is-shady is-size-medium css-wy9sfy-FooterUI e1q7k77g4"
++    className="components-card__footer is-shady is-size-medium emotion-4 emotion-5"
+   >
+     Caption
+   </div>
+@@ -941,11 +1407,97 @@ Array [
+   <p>
+     Note: This story demonstrates how this UI may be created. It requires extra styling.
+   </p>,
+-  <div
+-    className="components-card is-size-medium is-left e1gk3lep2 css-5mtgus-CardUI-HorizontallyAlignedCard e1q7k77g0"
++  .emotion-7 {
++  background: #fff;
++  box-sizing: border-box;
++  border-radius: 3px;
++  border: 1px solid #e2e4e7;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++}
++
++.emotion-7.is-borderless {
++  border: none;
++}
++
++.emotion-7.is-elevated {
++  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
++}
++
++.emotion-7.is-right {
++  -webkit-flex-direction: row-reverse;
++  -ms-flex-direction: row-reverse;
++  flex-direction: row-reverse;
++}
++
++.emotion-7 .emotion-3 {
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++}
++
++.emotion-7 .emotion-0.is-left {
++  border-radius: 3px 0 0 3px;
++}
++
++.emotion-7 .emotion-0.is-right {
++  border-radius: 0 3px 3px 0;
++}
++
++.emotion-1 {
++  box-sizing: border-box;
++  overflow: hidden;
++}
++
++.emotion-1 > img,
++.emotion-1 > iframe {
++  display: block;
++  height: auto;
++  max-width: 100%;
++  width: 100%;
++}
++
++.emotion-1:first-of-type {
++  border-top-left-radius: 3px;
++  border-top-right-radius: 3px;
++}
++
++.emotion-1:last-of-type {
++  border-bottom-left-radius: 3px;
++  border-bottom-right-radius: 3px;
++}
++
++.emotion-4 {
++  box-sizing: border-box;
++}
++
++.emotion-4.is-size-large {
++  padding: 28px;
++}
++
++.emotion-4.is-size-medium {
++  padding: 20px;
++}
++
++.emotion-4.is-size-small {
++  padding: 12px;
++}
++
++.emotion-4.is-size-extraSmall {
++  padding: 8px;
++}
++
++.emotion-4.is-shady {
++  background: #f3f4f5;
++}
++
++<div
++    className="components-card is-size-medium is-left emotion-6 emotion-7 emotion-8"
+   >
+     <div
+-      className="components-card__media is-left e1gk3lep0 css-7tds6a-MediaUI-StyledCardMedia e1q7k77g2"
++      className="components-card__media is-left emotion-0 emotion-1 emotion-2"
+       style={
+         Object {
+           "maxWidth": 200,
+@@ -958,7 +1510,7 @@ Array [
+       />
+     </div>
+     <div
+-      className="components-card__body is-size-medium e1gk3lep1 css-1drywz3-BodyUI-StyledCardBody e1q7k77g3"
++      className="components-card__body is-size-medium emotion-3 emotion-4 emotion-5"
+     >
+       Content
+     </div>
+@@ -967,8 +1519,81 @@ Array [
+ `;
+ 
+ exports[`Storyshots Components|Card/Media Iframe Embed 1`] = `
++.emotion-4 {
++  background: #fff;
++  box-sizing: border-box;
++  border-radius: 3px;
++  border: 1px solid #e2e4e7;
++}
++
++.emotion-4.is-borderless {
++  border: none;
++}
++
++.emotion-4.is-elevated {
++  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
++}
++
++.emotion-0 {
++  border-bottom: 1px solid #e2e4e7;
++  border-top-left-radius: 3px;
++  border-top-right-radius: 3px;
++  box-sizing: border-box;
++}
++
++.emotion-0:last-child {
++  border-bottom: none;
++}
++
++.emotion-0.is-size-large {
++  padding: 20px 28px;
++}
++
++.emotion-0.is-size-medium {
++  padding: 12px 20px;
++}
++
++.emotion-0.is-size-small {
++  padding: 8px 12px;
++}
++
++.emotion-0.is-size-extraSmall {
++  padding: 4px 8px;
++}
++
++.emotion-0.is-borderless {
++  border: none;
++}
++
++.emotion-0.is-shady {
++  background: #f3f4f5;
++}
++
++.emotion-2 {
++  box-sizing: border-box;
++  overflow: hidden;
++}
++
++.emotion-2 > img,
++.emotion-2 > iframe {
++  display: block;
++  height: auto;
++  max-width: 100%;
++  width: 100%;
++}
++
++.emotion-2:first-of-type {
++  border-top-left-radius: 3px;
++  border-top-right-radius: 3px;
++}
++
++.emotion-2:last-of-type {
++  border-bottom-left-radius: 3px;
++  border-bottom-right-radius: 3px;
++}
++
+ <div
+-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
++  className="components-card is-size-medium emotion-4 emotion-5"
+   style={
+     Object {
+       "width": "360px",
+@@ -976,12 +1601,12 @@ exports[`Storyshots Components|Card/Media Iframe Embed 1`] = `
+   }
+ >
+   <div
+-    className="components-card__header is-size-medium css-6qsnk-HeaderUI e1q7k77g1"
++    className="components-card__header is-size-medium emotion-0 emotion-1"
+   >
+     Header Content
+   </div>
+   <div
+-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
++    className="components-card__media emotion-2 emotion-3"
+   >
+     <iframe
+       allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+@@ -997,8 +1622,70 @@ exports[`Storyshots Components|Card/Media Iframe Embed 1`] = `
+ `;
+ 
+ exports[`Storyshots Components|Card/Media On Bottom 1`] = `
++.emotion-4 {
++  background: #fff;
++  box-sizing: border-box;
++  border-radius: 3px;
++  border: 1px solid #e2e4e7;
++}
++
++.emotion-4.is-borderless {
++  border: none;
++}
++
++.emotion-4.is-elevated {
++  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
++}
++
++.emotion-0 {
++  box-sizing: border-box;
++}
++
++.emotion-0.is-size-large {
++  padding: 28px;
++}
++
++.emotion-0.is-size-medium {
++  padding: 20px;
++}
++
++.emotion-0.is-size-small {
++  padding: 12px;
++}
++
++.emotion-0.is-size-extraSmall {
++  padding: 8px;
++}
++
++.emotion-0.is-shady {
++  background: #f3f4f5;
++}
++
++.emotion-2 {
++  box-sizing: border-box;
++  overflow: hidden;
++}
++
++.emotion-2 > img,
++.emotion-2 > iframe {
++  display: block;
++  height: auto;
++  max-width: 100%;
++  width: 100%;
++}
++
++.emotion-2:first-of-type {
++  border-top-left-radius: 3px;
++  border-top-right-radius: 3px;
++}
++
++.emotion-2:last-of-type {
++  border-bottom-left-radius: 3px;
++  border-bottom-right-radius: 3px;
++}
++
+ <div
+-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
++  className="components-card is-size-medium emotion-4 emotion-5"
+   style={
+     Object {
+       "width": "360px",
+@@ -1006,12 +1693,12 @@ exports[`Storyshots Components|Card/Media On Bottom 1`] = `
+   }
+ >
+   <div
+-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
++    className="components-card__body is-size-medium emotion-0 emotion-1"
+   >
+     Content
+   </div>
+   <div
+-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
++    className="components-card__media emotion-2 emotion-3"
+   >
+     <img
+       alt="SMELLING MARSHMELLOW ICECREAM CONE"
+@@ -1022,8 +1709,70 @@ exports[`Storyshots Components|Card/Media On Bottom 1`] = `
+ `;
+ 
+ exports[`Storyshots Components|Card/Media On Top 1`] = `
++.emotion-4 {
++  background: #fff;
++  box-sizing: border-box;
++  border-radius: 3px;
++  border: 1px solid #e2e4e7;
++}
++
++.emotion-4.is-borderless {
++  border: none;
++}
++
++.emotion-4.is-elevated {
++  box-shadow: 0px 1px 3px 0px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 2px 1px -1px rgba(0,0,0,0.12);
++}
++
++.emotion-2 {
++  box-sizing: border-box;
++}
++
++.emotion-2.is-size-large {
++  padding: 28px;
++}
++
++.emotion-2.is-size-medium {
++  padding: 20px;
++}
++
++.emotion-2.is-size-small {
++  padding: 12px;
++}
++
++.emotion-2.is-size-extraSmall {
++  padding: 8px;
++}
++
++.emotion-2.is-shady {
++  background: #f3f4f5;
++}
++
++.emotion-0 {
++  box-sizing: border-box;
++  overflow: hidden;
++}
++
++.emotion-0 > img,
++.emotion-0 > iframe {
++  display: block;
++  height: auto;
++  max-width: 100%;
++  width: 100%;
++}
++
++.emotion-0:first-of-type {
++  border-top-left-radius: 3px;
++  border-top-right-radius: 3px;
++}
++
++.emotion-0:last-of-type {
++  border-bottom-left-radius: 3px;
++  border-bottom-right-radius: 3px;
++}
++
+ <div
+-  className="components-card is-size-medium css-l3gor6-CardUI e1q7k77g0"
++  className="components-card is-size-medium emotion-4 emotion-5"
+   style={
+     Object {
+       "width": "360px",
+@@ -1031,7 +1780,7 @@ exports[`Storyshots Components|Card/Media On Top 1`] = `
+   }
+ >
+   <div
+-    className="components-card__media css-eunfqt-MediaUI e1q7k77g2"
++    className="components-card__media emotion-0 emotion-1"
+   >
+     <img
+       alt="SMELLING MARSHMELLOW ICECREAM CONE"
+@@ -1039,7 +1788,7 @@ exports[`Storyshots Components|Card/Media On Top 1`] = `
+     />
+   </div>
+   <div
+-    className="components-card__body is-size-medium css-1yyn1r2-BodyUI e1q7k77g3"
++    className="components-card__body is-size-medium emotion-2 emotion-3"
+   >
+     <div>
+       Content
+@@ -1891,6 +2640,309 @@ Array [
+ ]
+ `;
+ 
++exports[`Storyshots Components|Experimental/Text Body 1`] = `
++.emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 16px;
++  line-height: 24px;
++}
++
++<p
++  className="emotion-0 emotion-1"
++>
++  Body
++</p>
++`;
++
++exports[`Storyshots Components|Experimental/Text Body Small 1`] = `
++.emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 14px;
++  line-height: 20px;
++}
++
++<p
++  className="emotion-0 emotion-1"
++>
++  Body Small
++</p>
++`;
++
++exports[`Storyshots Components|Experimental/Text Button 1`] = `
++.emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 600;
++  font-size: 14px;
++  line-height: 20px;
++}
++
++<p
++  className="emotion-0 emotion-1"
++>
++  Button
++</p>
++`;
++
++exports[`Storyshots Components|Experimental/Text Caption 1`] = `
++.emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 12px;
++  line-height: 16px;
++}
++
++<p
++  className="emotion-0 emotion-1"
++>
++  Caption
++</p>
++`;
++
++exports[`Storyshots Components|Experimental/Text Default 1`] = `
++Array [
++  .emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 32px;
++  line-height: 40px;
++}
++
++<h1
++    className="emotion-0 emotion-1"
++  >
++    Title Large
++  </h1>,
++  .emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 24px;
++  line-height: 32px;
++}
++
++<h2
++    className="emotion-0 emotion-1"
++  >
++    Title Medium
++  </h2>,
++  .emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 20px;
++  line-height: 28px;
++}
++
++<h3
++    className="emotion-0 emotion-1"
++  >
++    Title Small
++  </h3>,
++  .emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 600;
++  font-size: 14px;
++  line-height: 20px;
++  font-size: 16px;
++  line-height: 24px;
++}
++
++<p
++    className="emotion-0 emotion-1"
++  >
++    Subtitle
++  </p>,
++  .emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 600;
++  font-size: 14px;
++  line-height: 20px;
++  font-size: 14px;
++  line-height: 20px;
++}
++
++<p
++    className="emotion-0 emotion-1"
++  >
++    Subtitle Small
++  </p>,
++  .emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 16px;
++  line-height: 24px;
++}
++
++<p
++    className="emotion-0 emotion-1"
++  >
++    Body
++  </p>,
++  .emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 14px;
++  line-height: 20px;
++}
++
++<p
++    className="emotion-0 emotion-1"
++  >
++    Body Small
++  </p>,
++  .emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 600;
++  font-size: 14px;
++  line-height: 20px;
++}
++
++<p
++    className="emotion-0 emotion-1"
++  >
++    Button
++  </p>,
++  .emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 12px;
++  line-height: 16px;
++}
++
++<p
++    className="emotion-0 emotion-1"
++  >
++    Caption
++  </p>,
++  .emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 600;
++  font-size: 12px;
++  line-height: 16px;
++}
++
++<p
++    className="emotion-0 emotion-1"
++  >
++    Label
++  </p>,
++]
++`;
++
++exports[`Storyshots Components|Experimental/Text Label 1`] = `
++.emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 600;
++  font-size: 12px;
++  line-height: 16px;
++}
++
++<p
++  className="emotion-0 emotion-1"
++>
++  Label
++</p>
++`;
++
++exports[`Storyshots Components|Experimental/Text Subtitle 1`] = `
++.emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 600;
++  font-size: 14px;
++  line-height: 20px;
++  font-size: 16px;
++  line-height: 24px;
++}
++
++<p
++  className="emotion-0 emotion-1"
++>
++  Subtitle
++</p>
++`;
++
++exports[`Storyshots Components|Experimental/Text Subtitle Small 1`] = `
++.emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 600;
++  font-size: 14px;
++  line-height: 20px;
++  font-size: 14px;
++  line-height: 20px;
++}
++
++<p
++  className="emotion-0 emotion-1"
++>
++  Subtitle Small
++</p>
++`;
++
++exports[`Storyshots Components|Experimental/Text Title Large 1`] = `
++.emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 32px;
++  line-height: 40px;
++}
++
++<h1
++  className="emotion-0 emotion-1"
++>
++  Title Large
++</h1>
++`;
++
++exports[`Storyshots Components|Experimental/Text Title Medium 1`] = `
++.emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 24px;
++  line-height: 32px;
++}
++
++<h2
++  className="emotion-0 emotion-1"
++>
++  Title Medium
++</h2>
++`;
++
++exports[`Storyshots Components|Experimental/Text Title Small 1`] = `
++.emotion-0 {
++  margin: 0;
++  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
++  font-weight: 400;
++  font-size: 20px;
++  line-height: 28px;
++}
++
++<h3
++  className="emotion-0 emotion-1"
++>
++  Title Small
++</h3>
++`;
++
+ exports[`Storyshots Components|ExternalLink Default 1`] = `
+ <a
+   className="components-external-link"
+diff --git a/test/native/jest.config.js b/test/native/jest.config.js
+index 3527fa6d070f2d..5ad3a94e6a0c3c 100644
+--- a/test/native/jest.config.js
++++ b/test/native/jest.config.js
+@@ -68,6 +68,7 @@ module.exports = {
+ 	],
+ 	snapshotSerializers: [
+ 		'enzyme-to-json/serializer',
++		'jest-emotion',
+ 	],
+ 	reporters: [ 'default', 'jest-junit' ],
+ };
+diff --git a/test/unit/jest.config.js b/test/unit/jest.config.js
+index dfa82488822630..757d1d4e8796d0 100644
+--- a/test/unit/jest.config.js
++++ b/test/unit/jest.config.js
+@@ -31,4 +31,5 @@ module.exports = {
+ 	transform: {
+ 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
+ 	},
++	snapshotSerializers: [ 'enzyme-to-json/serializer', 'jest-emotion' ],
+ };

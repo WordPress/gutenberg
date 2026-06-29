@@ -1,0 +1,40 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 52277deca063e5..60930dcc12c483 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Internal
+ 
+ -   `AlignmentMatrixControl` updated to satisfy `react/exhuastive-deps` eslint rule ([#41167](https://github.com/WordPress/gutenberg/pull/41167))
++-   `BorderControl` updated to satisfy `react/exhuastive-deps` eslint rule ([#41259](https://github.com/WordPress/gutenberg/pull/41259))
+ -   `CheckboxControl`: Add unit tests ([#41165](https://github.com/WordPress/gutenberg/pull/41165)).
+ 
+ ## 19.11.0 (2022-05-18)
+diff --git a/packages/components/src/border-control/border-control/hook.ts b/packages/components/src/border-control/border-control/hook.ts
+index 53c6b2959446ba..1c42ee4d22a8a8 100644
+--- a/packages/components/src/border-control/border-control/hook.ts
++++ b/packages/components/src/border-control/border-control/hook.ts
+@@ -56,7 +56,7 @@ export function useBorderControl(
+ 
+ 			onChange( newBorder );
+ 		},
+-		[ onChange, shouldSanitizeBorder, sanitizeBorder ]
++		[ onChange, shouldSanitizeBorder ]
+ 	);
+ 
+ 	const onWidthChange = useCallback(
+@@ -97,7 +97,13 @@ export function useBorderControl(
+ 
+ 			onBorderChange( updatedBorder );
+ 		},
+-		[ border, hadPreviousZeroWidth, onBorderChange ]
++		[
++			border,
++			hadPreviousZeroWidth,
++			colorSelection,
++			styleSelection,
++			onBorderChange,
++		]
+ 	);
+ 
+ 	const onSliderChange = useCallback(

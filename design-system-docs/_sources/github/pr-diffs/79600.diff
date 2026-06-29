@@ -1,0 +1,331 @@
+diff --git a/package-lock.json b/package-lock.json
+index ed7aaaa5f2ed81..7f0467e40e0be2 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -49736,6 +49736,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@ariakit/react": "^0.4.29",
++				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/compose": "file:../compose",
+@@ -50856,6 +50857,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@react-spring/web": "^9.4.5",
++				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/blob": "file:../blob",
+@@ -51669,6 +51671,7 @@
+ 			"version": "0.12.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+diff --git a/packages/components/src/validated-form-controls/control-with-error.tsx b/packages/components/src/validated-form-controls/control-with-error.tsx
+index ef3f985bd33c30..56e7a2b51f26aa 100644
+--- a/packages/components/src/validated-form-controls/control-with-error.tsx
++++ b/packages/components/src/validated-form-controls/control-with-error.tsx
+@@ -1,6 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
++import { speak } from '@wordpress/a11y';
+ import { __ } from '@wordpress/i18n';
+ import {
+ 	cloneElement,
+@@ -270,6 +271,16 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 
+ 	const visibleMessage = showMessage ? message : null;
+ 
++	const spokenMessage = showMessage
++		? errorMessage || statusMessage?.message
++		: undefined;
++
++	useEffect( () => {
++		if ( spokenMessage ) {
++			speak( spokenMessage, 'polite' );
++		}
++	}, [ spokenMessage ] );
++
+ 	// Imperatively manage `aria-describedby` on the validity target so we
+ 	// merge with any value the child control sets internally (e.g. from a
+ 	// `help` prop), rather than competing with it at the props level.
+@@ -310,7 +321,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 				),
+ 				required,
+ 			} ) }
+-			<div aria-live="polite">{ visibleMessage }</div>
++			{ visibleMessage }
+ 		</div>
+ 	);
+ }
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index 1baf77c3c58286..666cc271129c4d 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -52,6 +52,7 @@
+ 	"sideEffects": false,
+ 	"dependencies": {
+ 		"@ariakit/react": "^0.4.29",
++		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/compose": "file:../compose",
+diff --git a/packages/dataviews/src/components/dataform-controls/date.tsx b/packages/dataviews/src/components/dataform-controls/date.tsx
+index afda16c8c8006c..551b189ced37cd 100644
+--- a/packages/dataviews/src/components/dataform-controls/date.tsx
++++ b/packages/dataviews/src/components/dataform-controls/date.tsx
+@@ -22,6 +22,7 @@ import {
+ 	privateApis as componentsPrivateApis,
+ 	__experimentalInputControl as InputControl,
+ } from '@wordpress/components';
++import { speak } from '@wordpress/a11y';
+ import {
+ 	useCallback,
+ 	useEffect,
+@@ -241,6 +242,12 @@ function ValidatedDateControl< Item >( {
+ 		}
+ 	}, [ isTouched, isValid, validity, validateRefs ] );
+ 
++	useEffect( () => {
++		if ( isTouched && customValidity?.message ) {
++			speak( customValidity.message, 'polite' );
++		}
++	}, [ isTouched, customValidity?.message ] );
++
+ 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
+ 		if ( isTouched ) {
+ 			return;
+@@ -259,26 +266,24 @@ function ValidatedDateControl< Item >( {
+ 	return (
+ 		<div onBlur={ onBlur }>
+ 			{ children }
+-			<div aria-live="polite">
+-				{ customValidity && (
+-					<p
+-						className={ clsx(
+-							'components-validated-control__indicator',
+-							customValidity.type === 'invalid'
+-								? 'is-invalid'
+-								: undefined
+-						) }
+-					>
+-						<WCIcon
+-							className="components-validated-control__indicator-icon"
+-							icon={ errorIcon }
+-							size={ 16 }
+-							fill="currentColor"
+-						/>
+-						{ customValidity.message }
+-					</p>
+-				) }
+-			</div>
++			{ customValidity && (
++				<p
++					className={ clsx(
++						'components-validated-control__indicator',
++						customValidity.type === 'invalid'
++							? 'is-invalid'
++							: undefined
++					) }
++				>
++					<WCIcon
++						className="components-validated-control__indicator-icon"
++						icon={ errorIcon }
++						size={ 16 }
++						fill="currentColor"
++					/>
++					{ customValidity.message }
++				</p>
++			) }
+ 		</div>
+ 	);
+ }
+diff --git a/packages/fields/package.json b/packages/fields/package.json
+index de5fbe4a89de59..939c61aa7e5b3d 100644
+--- a/packages/fields/package.json
++++ b/packages/fields/package.json
+@@ -47,6 +47,7 @@
+ 	],
+ 	"dependencies": {
+ 		"@react-spring/web": "^9.4.5",
++		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/blob": "file:../blob",
+diff --git a/packages/fields/src/components/media-edit/index.tsx b/packages/fields/src/components/media-edit/index.tsx
+index 22df1c56177664..c8be134c66ae5c 100644
+--- a/packages/fields/src/components/media-edit/index.tsx
++++ b/packages/fields/src/components/media-edit/index.tsx
+@@ -41,6 +41,7 @@ import {
+ 	chevronRight,
+ } from '@wordpress/icons';
+ import { VisuallyHidden, Tooltip } from '@wordpress/ui';
++import { speak } from '@wordpress/a11y';
+ import {
+ 	MediaUpload,
+ 	uploadMedia,
+@@ -838,6 +839,13 @@ export default function MediaEdit< Item >( {
+ 			setCustomValidity( undefined );
+ 		}
+ 	}, [ isTouched, field.isValid, validity ] );
++
++	useEffect( () => {
++		if ( isTouched && customValidity?.message ) {
++			speak( customValidity.message, 'polite' );
++		}
++	}, [ isTouched, customValidity?.message ] );
++
+ 	const onBlur = useCallback(
+ 		( event: React.FocusEvent< HTMLElement > ) => {
+ 			if ( isTouched ) {
+@@ -961,25 +969,23 @@ export default function MediaEdit< Item >( {
+ 				/>
+ 			</VisuallyHidden>
+ 			{ customValidity && (
+-				<div aria-live="polite">
+-					<p
+-						className={ clsx(
+-							'components-validated-control__indicator',
+-							{
+-								'is-invalid': customValidity.type === 'invalid',
+-								'is-valid': customValidity.type === 'valid',
+-							}
+-						) }
+-					>
+-						<WCIcon
+-							className="components-validated-control__indicator-icon"
+-							icon={ errorIcon }
+-							size={ 16 }
+-							fill="currentColor"
+-						/>
+-						{ customValidity.message }
+-					</p>
+-				</div>
++				<p
++					className={ clsx(
++						'components-validated-control__indicator',
++						{
++							'is-invalid': customValidity.type === 'invalid',
++							'is-valid': customValidity.type === 'valid',
++						}
++					) }
++				>
++					<WCIcon
++						className="components-validated-control__indicator-icon"
++						icon={ errorIcon }
++						size={ 16 }
++						fill="currentColor"
++					/>
++					{ customValidity.message }
++				</p>
+ 			) }
+ 		</div>
+ 	);
+diff --git a/packages/media-editor/package.json b/packages/media-editor/package.json
+index 34b8ba31c7a50a..3495b9a7dc5f1d 100644
+--- a/packages/media-editor/package.json
++++ b/packages/media-editor/package.json
+@@ -43,6 +43,7 @@
+ 		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
++		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+diff --git a/packages/media-editor/src/image-editor/react/components/cropper.tsx b/packages/media-editor/src/image-editor/react/components/cropper.tsx
+index 94154ca7dffc66..3f58f1e7b0af04 100644
+--- a/packages/media-editor/src/image-editor/react/components/cropper.tsx
++++ b/packages/media-editor/src/image-editor/react/components/cropper.tsx
+@@ -276,8 +276,9 @@ function CropperInner(
+ 		onStateChange?.( state );
+ 	}, [ state, onStateChange ] );
+ 
+-	// ARIA live region: announce significant state changes for screen readers.
+-	const ariaMessage = useAriaAnnouncer( state );
++	// ARIA announcements: announce significant state changes for screen readers
++	// via the centralized @wordpress/a11y speak() API called inside the hook.
++	useAriaAnnouncer( state );
+ 
+ 	// Compute fitted image dimensions and visual bounds from camera math.
+ 	const naturalWidth = state.image?.naturalWidth ?? 0;
+@@ -1107,16 +1108,6 @@ function CropperInner(
+ 						/>
+ 					) }
+ 				</div>
+-
+-				{ /* ARIA live region for screen reader announcements */ }
+-				<div
+-					aria-live="polite"
+-					aria-atomic="true"
+-					className="wp-media-editor-image-editor__aria-live"
+-					style={ VISUALLY_HIDDEN_STYLE }
+-				>
+-					{ ariaMessage }
+-				</div>
+ 			</div>
+ 		</div>
+ 	);
+diff --git a/packages/media-editor/src/image-editor/react/hooks/use-aria-announcer.ts b/packages/media-editor/src/image-editor/react/hooks/use-aria-announcer.ts
+index 0134362b185ac2..122e59717cf6dd 100644
+--- a/packages/media-editor/src/image-editor/react/hooks/use-aria-announcer.ts
++++ b/packages/media-editor/src/image-editor/react/hooks/use-aria-announcer.ts
+@@ -1,12 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	useState,
+-	useEffect,
+-	useLayoutEffect,
+-	useRef,
+-} from '@wordpress/element';
++import { speak } from '@wordpress/a11y';
++import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
+ import { __, sprintf } from '@wordpress/i18n';
+ 
+ /**
+@@ -79,16 +75,16 @@ function buildAnnouncement(
+ 
+ /**
+  * Debounce and dedupe ARIA-live announcements for screen readers as the
+- * cropper state changes. Returns the current announcement message to render
+- * inside an `aria-live="polite"` region.
++ * cropper state changes. Calls `speak()` from `@wordpress/a11y` to use the
++ * centralized, persistent live region instead of a local one that may be
++ * dynamically mounted.
+  *
+- * Debouncing avoids flooding the live region during drag/pointermove bursts;
++ * Debouncing avoids flooding announcements during drag/pointermove bursts;
+  * deduping avoids re-announcing the same state.
+  *
+  * @param state The current cropper state to announce.
+  */
+-export function useAriaAnnouncer( state: CropperState ): string {
+-	const [ ariaMessage, setAriaMessage ] = useState( '' );
++export function useAriaAnnouncer( state: CropperState ): void {
+ 	const timerRef = useRef< ReturnType< typeof setTimeout > >();
+ 	const prevMessageRef = useRef( '' );
+ 	const prevStateRef = useRef< CropperState | null >( null );
+@@ -105,7 +101,7 @@ export function useAriaAnnouncer( state: CropperState ): string {
+ 			prevStateRef.current = current;
+ 			if ( msg !== prevMessageRef.current ) {
+ 				prevMessageRef.current = msg;
+-				setAriaMessage( msg );
++				speak( msg, 'polite' );
+ 			}
+ 		}, ARIA_DEBOUNCE_MS );
+ 
+@@ -120,6 +116,4 @@ export function useAriaAnnouncer( state: CropperState ): string {
+ 		state.flip.horizontal,
+ 		state.flip.vertical,
+ 	] );
+-
+-	return ariaMessage;
+ }

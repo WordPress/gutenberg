@@ -1,0 +1,800 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1fbfc07ff817e1..0da72a51ab2b9e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
++
+ ## 20.0.0 (2022-08-24)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/focal-point-picker/README.md b/packages/components/src/focal-point-picker/README.md
+index 55a1bb008afa2d..c2483f01e6a4b1 100644
+--- a/packages/components/src/focal-point-picker/README.md
++++ b/packages/components/src/focal-point-picker/README.md
+@@ -18,10 +18,6 @@ const Example = () => {
+ 	} );
+ 
+ 	const url = '/path/to/image';
+-	const dimensions = {
+-		width: 400,
+-		height: 100,
+-	};
+ 
+ 	/* Example function to render the CSS styles based on Focal Point Picker value */
+ 	const style = {
+@@ -33,9 +29,10 @@ const Example = () => {
+ 		<>
+ 			<FocalPointPicker
+ 				url={ url }
+-				dimensions={ dimensions }
+ 				value={ focalPoint }
+-				onChange={ ( focalPoint ) => setFocalPoint( { focalPoint } ) }
++				onDragStart={ setFocalPoint }
++				onDrag={ setFocalPoint }
++				onChange={ setFocalPoint }
+ 			/>
+ 			<div style={ style } />
+ 		</>
+diff --git a/packages/components/src/focal-point-picker/controls.js b/packages/components/src/focal-point-picker/controls.js
+index c001aa866ca130..dc8ea6404029e0 100644
+--- a/packages/components/src/focal-point-picker/controls.js
++++ b/packages/components/src/focal-point-picker/controls.js
+@@ -18,19 +18,19 @@ const noop = () => {};
+ 
+ export default function FocalPointPickerControls( {
+ 	onChange = noop,
+-	percentages = {
++	point = {
+ 		x: 0.5,
+ 		y: 0.5,
+ 	},
+ } ) {
+-	const valueX = fractionToPercentage( percentages.x );
+-	const valueY = fractionToPercentage( percentages.y );
++	const valueX = fractionToPercentage( point.x );
++	const valueY = fractionToPercentage( point.y );
+ 
+ 	const handleChange = ( value, axis ) => {
+ 		const num = parseInt( value, 10 );
+ 
+ 		if ( ! isNaN( num ) ) {
+-			onChange( { ...percentages, [ axis ]: num / 100 } );
++			onChange( { ...point, [ axis ]: num / 100 } );
+ 		}
+ 	};
+ 
+diff --git a/packages/components/src/focal-point-picker/focal-point.js b/packages/components/src/focal-point-picker/focal-point.js
+index 75bc53a7306e4d..5809bf81af9f16 100644
+--- a/packages/components/src/focal-point-picker/focal-point.js
++++ b/packages/components/src/focal-point-picker/focal-point.js
+@@ -13,18 +13,12 @@ import {
+  */
+ import classnames from 'classnames';
+ 
+-export default function FocalPoint( {
+-	coordinates = { left: '50%', top: '50%' },
+-	...props
+-} ) {
++export default function FocalPoint( { left = '50%', top = '50%', ...props } ) {
+ 	const classes = classnames(
+ 		'components-focal-point-picker__icon_container'
+ 	);
+ 
+-	const style = {
+-		left: coordinates.left,
+-		top: coordinates.top,
+-	};
++	const style = { left, top };
+ 
+ 	return (
+ 		<FocalPointWrapper { ...props } className={ classes } style={ style }>
+diff --git a/packages/components/src/focal-point-picker/grid.js b/packages/components/src/focal-point-picker/grid.js
+index b894e81e946ca2..ed6d8ae51d0316 100644
+--- a/packages/components/src/focal-point-picker/grid.js
++++ b/packages/components/src/focal-point-picker/grid.js
+@@ -1,8 +1,3 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -11,25 +6,16 @@ import {
+ 	GridLineX,
+ 	GridLineY,
+ } from './styles/focal-point-picker-style';
+-import { useUpdateEffect } from '../utils/hooks';
+-
+-export default function FocalPointPickerGrid( {
+-	bounds = {},
+-	value,
+-	...props
+-} ) {
+-	const animationProps = useRevealAnimation( value );
+-	const style = {
+-		width: bounds.width,
+-		height: bounds.height,
+-	};
+ 
++export default function FocalPointPickerGrid( { bounds, ...props } ) {
+ 	return (
+ 		<GridView
+ 			{ ...props }
+-			{ ...animationProps }
+ 			className="components-focal-point-picker__grid"
+-			style={ style }
++			style={ {
++				width: bounds.width,
++				height: bounds.height,
++			} }
+ 		>
+ 			<GridLineX style={ { top: '33%' } } />
+ 			<GridLineX style={ { top: '66%' } } />
+@@ -38,25 +24,3 @@ export default function FocalPointPickerGrid( {
+ 		</GridView>
+ 	);
+ }
+-
+-/**
+- * Custom hook that renders the "flash" animation whenever the value changes.
+- *
+- * @param {string} value Value of (box) side.
+- */
+-function useRevealAnimation( value ) {
+-	const [ isActive, setIsActive ] = useState( false );
+-
+-	useUpdateEffect( () => {
+-		setIsActive( true );
+-		const timeout = window.setTimeout( () => {
+-			setIsActive( false );
+-		}, 600 );
+-
+-		return () => window.clearTimeout( timeout );
+-	}, [ value ] );
+-
+-	return {
+-		isActive,
+-	};
+-}
+diff --git a/packages/components/src/focal-point-picker/index.js b/packages/components/src/focal-point-picker/index.js
+index 021c2481841cb4..5c1f594641c6e9 100644
+--- a/packages/components/src/focal-point-picker/index.js
++++ b/packages/components/src/focal-point-picker/index.js
+@@ -7,8 +7,12 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { Component, createRef } from '@wordpress/element';
+-import { withInstanceId } from '@wordpress/compose';
++import { useEffect, useRef, useState } from '@wordpress/element';
++import {
++	__experimentalUseDragging as useDragging,
++	useInstanceId,
++	useIsomorphicLayoutEffect,
++} from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -22,154 +26,99 @@ import {
+ 	MediaWrapper,
+ 	MediaContainer,
+ } from './styles/focal-point-picker-style';
+-import { roundClamp } from '../utils/math';
+ import { INITIAL_BOUNDS } from './utils';
+-
+-export class FocalPointPicker extends Component {
+-	constructor( props ) {
+-		super( ...arguments );
+-
+-		this.state = {
+-			isDragging: false,
+-			bounds: INITIAL_BOUNDS,
+-			percentages: props.value,
+-		};
+-
+-		this.containerRef = createRef();
+-		this.mediaRef = createRef();
+-
+-		this.onMouseDown = this.startDrag.bind( this );
+-		this.onMouseUp = this.stopDrag.bind( this );
+-		this.onKeyDown = this.onKeyDown.bind( this );
+-		this.onMouseMove = this.doDrag.bind( this );
+-		this.ifDraggingStop = () => {
+-			if ( this.state.isDragging ) {
+-				this.stopDrag();
+-			}
+-		};
+-		this.onChangeAtControls = ( value ) => {
+-			this.updateValue( value, () => {
+-				this.props.onChange( this.state.percentages );
+-			} );
+-		};
+-
+-		this.updateBounds = this.updateBounds.bind( this );
+-		this.updateValue = this.updateValue.bind( this );
+-	}
+-	componentDidMount() {
+-		const { defaultView } = this.containerRef.current.ownerDocument;
+-		defaultView.addEventListener( 'resize', this.updateBounds );
+-
+-		/*
+-		 * Set initial bound values.
+-		 *
+-		 * This is necessary for Safari:
+-		 * https://github.com/WordPress/gutenberg/issues/25814
+-		 */
+-		this.updateBounds();
+-	}
+-	componentDidUpdate( prevProps ) {
+-		if ( prevProps.url !== this.props.url ) {
+-			this.ifDraggingStop();
+-		}
+-		/*
+-		 * Handles cases where the incoming value changes.
+-		 * An example is the values resetting based on an UNDO action.
+-		 */
+-		const {
+-			isDragging,
+-			percentages: { x, y },
+-		} = this.state;
+-		const { value } = this.props;
+-		if ( ! isDragging && ( value.x !== x || value.y !== y ) ) {
+-			this.setState( { percentages: this.props.value } );
+-		}
+-	}
+-	componentWillUnmount() {
+-		const { defaultView } = this.containerRef.current.ownerDocument;
+-		defaultView.removeEventListener( 'resize', this.updateBounds );
+-		this.ifDraggingStop();
+-	}
+-	calculateBounds() {
+-		const bounds = INITIAL_BOUNDS;
+-
+-		if ( ! this.mediaRef.current ) {
+-			return bounds;
+-		}
+-
+-		// Prevent division by zero when updateBounds runs in componentDidMount
+-		if (
+-			this.mediaRef.current.clientWidth === 0 ||
+-			this.mediaRef.current.clientHeight === 0
+-		) {
+-			return bounds;
+-		}
+-
+-		const dimensions = {
+-			width: this.mediaRef.current.clientWidth,
+-			height: this.mediaRef.current.clientHeight,
+-		};
+-
+-		const pickerDimensions = this.pickerDimensions();
+-
+-		const widthRatio = pickerDimensions.width / dimensions.width;
+-		const heightRatio = pickerDimensions.height / dimensions.height;
+-
+-		if ( heightRatio >= widthRatio ) {
+-			bounds.width = bounds.right = pickerDimensions.width;
+-			bounds.height = dimensions.height * widthRatio;
+-			bounds.top = ( pickerDimensions.height - bounds.height ) / 2;
+-			bounds.bottom = bounds.top + bounds.height;
+-		} else {
+-			bounds.height = bounds.bottom = pickerDimensions.height;
+-			bounds.width = dimensions.width * heightRatio;
+-			bounds.left = ( pickerDimensions.width - bounds.width ) / 2;
+-			bounds.right = bounds.left + bounds.width;
++import { useUpdateEffect } from '../utils/hooks';
++
++const GRID_OVERLAY_TIMEOUT = 600;
++
++export default function FocalPointPicker( {
++	autoPlay = true,
++	className,
++	help,
++	label,
++	onChange,
++	onDrag,
++	onDragEnd,
++	onDragStart,
++	resolvePoint,
++	url,
++	value: valueProp = {
++		x: 0.5,
++		y: 0.5,
++	},
++} ) {
++	const [ point, setPoint ] = useState( valueProp );
++	const [ showGridOverlay, setShowGridOverlay ] = useState( false );
++
++	const { startDrag, endDrag, isDragging } = useDragging( {
++		onDragStart: ( event ) => {
++			dragAreaRef.current.focus();
++			const value = getValueWithinDragArea( event );
++			onDragStart?.( value, event );
++			setPoint( value );
++		},
++		onDragMove: ( event ) => {
++			// Prevents text-selection when dragging.
++			event.preventDefault();
++			const value = getValueWithinDragArea( event );
++			onDrag?.( value, event );
++			setPoint( value );
++		},
++		onDragEnd: ( event ) => {
++			onDragEnd?.( event );
++			onChange?.( point );
++		},
++	} );
++
++	// Uses the internal point while dragging or else the value from props.
++	const { x, y } = isDragging ? point : valueProp;
++
++	const dragAreaRef = useRef();
++	const [ bounds, setBounds ] = useState( INITIAL_BOUNDS );
++	const refUpdateBounds = useRef( () => {
++		const { clientWidth: width, clientHeight: height } =
++			dragAreaRef.current;
++		// Falls back to initial bounds if the ref has no size. Since styles
++		// give the drag area dimensions even when the media has not loaded
++		// this should only happen in unit tests (jsdom).
++		setBounds(
++			width > 0 && height > 0 ? { width, height } : { ...INITIAL_BOUNDS }
++		);
++	} );
++
++	useEffect( () => {
++		const updateBounds = refUpdateBounds.current;
++		const { defaultView } = dragAreaRef.current.ownerDocument;
++		defaultView.addEventListener( 'resize', updateBounds );
++		return () => defaultView.removeEventListener( 'resize', updateBounds );
++	}, [] );
++
++	// Updates the bounds to cover cases of unspecified media or load failures.
++	useIsomorphicLayoutEffect( () => void refUpdateBounds.current(), [] );
++
++	const getValueWithinDragArea = ( { clientX, clientY, shiftKey } ) => {
++		const { top, left } = dragAreaRef.current.getBoundingClientRect();
++		let nextX = ( clientX - left ) / bounds.width;
++		let nextY = ( clientY - top ) / bounds.height;
++		// Enables holding shift to jump values by 10%.
++		if ( shiftKey ) {
++			nextX = Math.round( nextX / 0.1 ) * 0.1;
++			nextY = Math.round( nextY / 0.1 ) * 0.1;
+ 		}
+-		return bounds;
+-	}
+-	updateValue( nextValue = {}, callback ) {
+-		const resolvedValue =
+-			this.props.resolvePoint?.( nextValue ) ?? nextValue;
++		return getFinalValue( { x: nextX, y: nextY } );
++	};
+ 
+-		const { x, y } = resolvedValue;
+-
+-		const nextPercentage = {
+-			x: parseFloat( x ).toFixed( 2 ),
+-			y: parseFloat( y ).toFixed( 2 ),
++	const getFinalValue = ( value ) => {
++		const resolvedValue = resolvePoint?.( value ) ?? value;
++		resolvedValue.x = Math.max( 0, Math.min( resolvedValue.x, 1 ) );
++		resolvedValue.y = Math.max( 0, Math.min( resolvedValue.y, 1 ) );
++		return {
++			x: parseFloat( resolvedValue.x ).toFixed( 2 ),
++			y: parseFloat( resolvedValue.y ).toFixed( 2 ),
+ 		};
++	};
+ 
+-		this.setState( { percentages: nextPercentage }, callback );
+-	}
+-	updateBounds() {
+-		this.setState( {
+-			bounds: this.calculateBounds(),
+-		} );
+-	}
+-	startDrag( event ) {
+-		event.persist();
+-		this.containerRef.current.focus();
+-		this.setState( { isDragging: true } );
+-		const { ownerDocument } = this.containerRef.current;
+-		ownerDocument.addEventListener( 'mouseup', this.onMouseUp );
+-		ownerDocument.addEventListener( 'mousemove', this.onMouseMove );
+-		const value = this.getValueFromPoint(
+-			{ x: event.pageX, y: event.pageY },
+-			event.shiftKey
+-		);
+-		this.updateValue( value );
+-		this.props.onDragStart?.( value, event );
+-	}
+-	stopDrag( event ) {
+-		const { ownerDocument } = this.containerRef.current;
+-		ownerDocument.removeEventListener( 'mouseup', this.onMouseUp );
+-		ownerDocument.removeEventListener( 'mousemove', this.onMouseMove );
+-		this.setState( { isDragging: false }, () => {
+-			this.props.onChange( this.state.percentages );
+-		} );
+-		this.props.onDragEnd?.( event );
+-	}
+-	onKeyDown( event ) {
++	const arrowKeyStep = ( event ) => {
+ 		const { code, shiftKey } = event;
+ 		if (
+ 			! [ 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight' ].includes(
+@@ -179,166 +128,75 @@ export class FocalPointPicker extends Component {
+ 			return;
+ 
+ 		event.preventDefault();
+-
+-		const next = { ...this.state.percentages };
++		const value = { x, y };
+ 		const step = shiftKey ? 0.1 : 0.01;
+ 		const delta =
+ 			code === 'ArrowUp' || code === 'ArrowLeft' ? -1 * step : step;
+ 		const axis = code === 'ArrowUp' || code === 'ArrowDown' ? 'y' : 'x';
+-		const value = parseFloat( next[ axis ] ) + delta;
+-
+-		next[ axis ] = roundClamp( value, 0, 1, step );
+-
+-		this.updateValue( next, () => {
+-			this.props.onChange( this.state.percentages );
+-		} );
+-	}
+-	doDrag( event ) {
+-		// Prevents text-selection when dragging.
+-		event.preventDefault();
+-		const value = this.getValueFromPoint(
+-			{ x: event.pageX, y: event.pageY },
+-			event.shiftKey
+-		);
+-		this.updateValue( value );
+-		this.props.onDrag?.( value, event );
+-	}
+-	getValueFromPoint( point, byTenths ) {
+-		const { bounds } = this.state;
+-
+-		const pickerDimensions = this.pickerDimensions();
+-		const relativePoint = {
+-			left: point.x - pickerDimensions.left,
+-			top: point.y - pickerDimensions.top,
+-		};
+-
+-		const left = Math.max(
+-			bounds.left,
+-			Math.min( relativePoint.left, bounds.right )
+-		);
+-		const top = Math.max(
+-			bounds.top,
+-			Math.min( relativePoint.top, bounds.bottom )
+-		);
+-
+-		let nextX =
+-			( left - bounds.left ) /
+-			( pickerDimensions.width - bounds.left * 2 );
+-		let nextY =
+-			( top - bounds.top ) / ( pickerDimensions.height - bounds.top * 2 );
+-
+-		// Enables holding shift to jump values by 10%
+-		const step = byTenths ? 0.1 : 0.01;
+-
+-		nextX = roundClamp( nextX, 0, 1, step );
+-		nextY = roundClamp( nextY, 0, 1, step );
+-
+-		return { x: nextX, y: nextY };
+-	}
+-	pickerDimensions() {
+-		const containerNode = this.containerRef.current;
+-
+-		if ( ! containerNode ) {
+-			return {
+-				width: 0,
+-				height: 0,
+-				left: 0,
+-				top: 0,
+-			};
+-		}
+-
+-		const { clientHeight, clientWidth } = containerNode;
+-		const { top, left } = containerNode.getBoundingClientRect();
+-
+-		return {
+-			width: clientWidth,
+-			height: clientHeight,
+-			top: top + document.body.scrollTop,
+-			left,
+-		};
+-	}
+-	iconCoordinates() {
+-		const {
+-			bounds,
+-			percentages: { x, y },
+-		} = this.state;
+-
+-		if ( bounds.left === undefined || bounds.top === undefined ) {
+-			return {
+-				left: '50%',
+-				top: '50%',
+-			};
+-		}
+-
+-		const { width, height } = this.pickerDimensions();
+-		return {
+-			left: x * ( width - bounds.left * 2 ) + bounds.left,
+-			top: y * ( height - bounds.top * 2 ) + bounds.top,
+-		};
+-	}
+-	render() {
+-		const { autoPlay, className, help, instanceId, label, url } =
+-			this.props;
+-		const { bounds, isDragging, percentages } = this.state;
+-		const iconCoordinates = this.iconCoordinates();
+-
+-		const classes = classnames(
+-			'components-focal-point-picker-control',
+-			className
+-		);
+-
+-		const id = `inspector-focal-point-picker-control-${ instanceId }`;
+-
+-		return (
+-			<BaseControl
+-				label={ label }
+-				id={ id }
+-				help={ help }
+-				className={ classes }
+-			>
+-				<MediaWrapper className="components-focal-point-picker-wrapper">
+-					<MediaContainer
+-						className="components-focal-point-picker"
+-						onKeyDown={ this.onKeyDown }
+-						onMouseDown={ this.onMouseDown }
+-						onBlur={ this.ifDraggingStop }
+-						ref={ this.containerRef }
+-						role="button"
+-						tabIndex="-1"
+-					>
+-						<Grid
+-							bounds={ bounds }
+-							value={ percentages.x + percentages.y }
+-						/>
+-						<Media
+-							alt={ __( 'Media preview' ) }
+-							autoPlay={ autoPlay }
+-							mediaRef={ this.mediaRef }
+-							onLoad={ this.updateBounds }
+-							src={ url }
+-						/>
+-						<FocalPoint
+-							coordinates={ iconCoordinates }
+-							isDragging={ isDragging }
+-						/>
+-					</MediaContainer>
+-				</MediaWrapper>
+-				<Controls
+-					percentages={ percentages }
+-					onChange={ this.onChangeAtControls }
+-				/>
+-			</BaseControl>
+-		);
+-	}
++		value[ axis ] = parseFloat( value[ axis ] ) + delta;
++		onChange?.( getFinalValue( value ) );
++	};
++
++	const focalPointPosition = {
++		left: x * bounds.width,
++		top: y * bounds.height,
++	};
++
++	const classes = classnames(
++		'components-focal-point-picker-control',
++		className
++	);
++
++	const instanceId = useInstanceId( FocalPointPicker );
++	const id = `inspector-focal-point-picker-control-${ instanceId }`;
++
++	useUpdateEffect( () => {
++		setShowGridOverlay( true );
++		const timeout = window.setTimeout( () => {
++			setShowGridOverlay( false );
++		}, GRID_OVERLAY_TIMEOUT );
++
++		return () => window.clearTimeout( timeout );
++	}, [ x, y ] );
++
++	return (
++		<BaseControl
++			label={ label }
++			id={ id }
++			help={ help }
++			className={ classes }
++		>
++			<MediaWrapper className="components-focal-point-picker-wrapper">
++				<MediaContainer
++					className="components-focal-point-picker"
++					onKeyDown={ arrowKeyStep }
++					onMouseDown={ startDrag }
++					onBlur={ () => {
++						if ( isDragging ) endDrag();
++					} }
++					ref={ dragAreaRef }
++					role="button"
++					tabIndex="-1"
++				>
++					<Grid bounds={ bounds } showOverlay={ showGridOverlay } />
++					<Media
++						alt={ __( 'Media preview' ) }
++						autoPlay={ autoPlay }
++						onLoad={ refUpdateBounds.current }
++						src={ url }
++					/>
++					<FocalPoint
++						{ ...focalPointPosition }
++						isDragging={ isDragging }
++					/>
++				</MediaContainer>
++			</MediaWrapper>
++			<Controls
++				point={ { x, y } }
++				onChange={ ( value ) => {
++					onChange?.( getFinalValue( value ) );
++				} }
++			/>
++		</BaseControl>
++	);
+ }
+-
+-FocalPointPicker.defaultProps = {
+-	autoPlay: true,
+-	value: {
+-		x: 0.5,
+-		y: 0.5,
+-	},
+-	url: null,
+-};
+-
+-export default withInstanceId( FocalPointPicker );
+diff --git a/packages/components/src/focal-point-picker/media.js b/packages/components/src/focal-point-picker/media.js
+index fb4c3748e84b16..483cf575e92f8a 100644
+--- a/packages/components/src/focal-point-picker/media.js
++++ b/packages/components/src/focal-point-picker/media.js
+@@ -1,21 +1,14 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useRef, useLayoutEffect } from '@wordpress/element';
+-
+ /**
+  * Internal dependencies
+  */
+ import { MediaPlaceholder } from './styles/focal-point-picker-style';
+ import { isVideoType } from './utils';
+ 
+-const noop = () => {};
+-
+ export default function Media( {
+ 	alt,
+ 	autoPlay,
+ 	src,
+-	onLoad = noop,
++	onLoad,
+ 	mediaRef,
+ 	// Exposing muted prop for test rendering purposes
+ 	// https://github.com/testing-library/react-testing-library/issues/470
+@@ -24,10 +17,10 @@ export default function Media( {
+ } ) {
+ 	if ( ! src ) {
+ 		return (
+-			<MediaPlaceholderElement
++			<MediaPlaceholder
+ 				className="components-focal-point-picker__media components-focal-point-picker__media--placeholder"
+-				onLoad={ onLoad }
+-				mediaRef={ mediaRef }
++				ref={ mediaRef }
++				{ ...props }
+ 			/>
+ 		);
+ 	}
+@@ -56,20 +49,3 @@ export default function Media( {
+ 		/>
+ 	);
+ }
+-
+-function MediaPlaceholderElement( { mediaRef, onLoad = noop, ...props } ) {
+-	const onLoadRef = useRef( onLoad );
+-
+-	/**
+-	 * This async callback mimics the onLoad (img) / onLoadedData (video) callback
+-	 * for media elements. It is used in the main <FocalPointPicker /> component
+-	 * to calculate the dimensions + boundaries for positioning.
+-	 */
+-	useLayoutEffect( () => {
+-		window.requestAnimationFrame( () => {
+-			onLoadRef.current();
+-		} );
+-	}, [] );
+-
+-	return <MediaPlaceholder ref={ mediaRef } { ...props } />;
+-}
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js
+index 10e265a2bb6de9..58fa3eb5de893b 100644
+--- a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js
++++ b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js
+@@ -9,6 +9,7 @@ import styled from '@emotion/styled';
+ import { Flex } from '../../flex';
+ import BaseUnitControl from '../../unit-control';
+ import { COLORS } from '../../utils';
++import { INITIAL_BOUNDS } from '../utils';
+ 
+ export const MediaWrapper = styled.div`
+ 	background-color: transparent;
+@@ -42,9 +43,10 @@ export const MediaContainer = styled.div`
+ 
+ export const MediaPlaceholder = styled.div`
+ 	background: ${ COLORS.lightGray[ 300 ] };
+-	height: 170px;
++	box-sizing: border-box;
++	height: ${ INITIAL_BOUNDS.height }px;
+ 	max-width: 280px;
+-	min-width: 200px;
++	min-width: ${ INITIAL_BOUNDS.width }px;
+ 	width: 100%;
+ `;
+ 
+@@ -59,7 +61,6 @@ export const ControlWrapper = styled( Flex )`
+ 
+ export const GridView = styled.div`
+ 	left: 50%;
+-	opacity: 0;
+ 	overflow: hidden;
+ 	pointer-events: none;
+ 	position: absolute;
+@@ -68,11 +69,7 @@ export const GridView = styled.div`
+ 	transition: opacity 120ms linear;
+ 	z-index: 1;
+ 
+-	${ ( { isActive } ) =>
+-		isActive &&
+-		`
+-		opacity: 1;
+-	` }
++	opacity: ${ ( { showOverlay } ) => ( showOverlay ? 1 : 0 ) };
+ `;
+ 
+ export const GridLine = styled.div`
+diff --git a/packages/components/src/focal-point-picker/test/index.js b/packages/components/src/focal-point-picker/test/index.js
+index 6999af637e2fde..02ae72e3910133 100644
+--- a/packages/components/src/focal-point-picker/test/index.js
++++ b/packages/components/src/focal-point-picker/test/index.js
+@@ -137,7 +137,7 @@ describe( 'FocalPointPicker', () => {
+ 			render(
+ 				<Picker value={ { x: 0.14, y: 0.62 } } onChange={ spyChange } />
+ 			);
+-			// Click and press arrow up
++			// Focus and press arrow up
+ 			const dragArea = screen.getByRole( 'button' );
+ 
+ 			await user.click( dragArea );
+diff --git a/packages/components/src/focal-point-picker/utils.js b/packages/components/src/focal-point-picker/utils.js
+index 8366f8a7a9ebd6..2205ae4ad66c99 100644
+--- a/packages/components/src/focal-point-picker/utils.js
++++ b/packages/components/src/focal-point-picker/utils.js
+@@ -1,10 +1,6 @@
+ export const INITIAL_BOUNDS = {
+-	top: 0,
+-	left: 0,
+-	bottom: 0,
+-	right: 0,
+-	width: 0,
+-	height: 0,
++	width: 200,
++	height: 170,
+ };
+ 
+ const VIDEO_EXTENSIONS = [

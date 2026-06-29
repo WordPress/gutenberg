@@ -1,0 +1,131 @@
+diff --git a/packages/edit-site/src/components/sidebar-global-styles/style.scss b/packages/edit-site/src/components/sidebar-global-styles/style.scss
+index 5a736270520ef8..d8d34bbafdc37d 100644
+--- a/packages/edit-site/src/components/sidebar-global-styles/style.scss
++++ b/packages/edit-site/src/components/sidebar-global-styles/style.scss
+@@ -16,11 +16,14 @@
+ 		padding-right: 0;
+ 
+ 		.global-styles-ui-sidebar__navigator-screen {
+-			padding-top: $grid-unit-15;
+-			padding-left: $grid-unit-15;
+-			padding-right: $grid-unit-15;
+-			padding-bottom: $grid-unit-15;
++			padding: $grid-unit-15;
+ 			outline: none;
++
++			.global-styles-ui-color-palette__tablist-container {
++				margin-inline: -$grid-unit-15;
++				width: calc(100% + #{$grid-unit-15 * 2});
++				padding-inline: $grid-unit-15;
++			}
+ 		}
+ 	}
+ 	.edit-site-sidebar-button {
+diff --git a/packages/global-styles-ui/src/screen-color-palette.tsx b/packages/global-styles-ui/src/screen-color-palette.tsx
+index 685287c315bd72..1a67126f3aff95 100644
+--- a/packages/global-styles-ui/src/screen-color-palette.tsx
++++ b/packages/global-styles-ui/src/screen-color-palette.tsx
+@@ -2,8 +2,7 @@
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-// @ts-ignore - WordPress private APIs
+-import { privateApis as componentsPrivateApis } from '@wordpress/components';
++import { Tabs } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+@@ -12,13 +11,6 @@ import { ScreenHeader } from './screen-header';
+ import ColorPalettePanel from './color-palette-panel';
+ import GradientPalettePanel from './gradients-palette-panel';
+ 
+-/**
+- * External dependencies
+- */
+-import { unlock } from './lock-unlock';
+-
+-const { Tabs } = unlock( componentsPrivateApis );
+-
+ function ScreenColorPalette( { name }: { name?: string } ) {
+ 	return (
+ 		<>
+@@ -28,18 +20,22 @@ function ScreenColorPalette( { name }: { name?: string } ) {
+ 					'The combination of colors used across the site and in color pickers.'
+ 				) }
+ 			/>
+-			<Tabs>
+-				<Tabs.TabList>
+-					<Tabs.Tab tabId="color">{ __( 'Color' ) }</Tabs.Tab>
+-					<Tabs.Tab tabId="gradient">{ __( 'Gradient' ) }</Tabs.Tab>
+-				</Tabs.TabList>
+-				<Tabs.TabPanel tabId="color" focusable={ false }>
++			<Tabs.Root defaultValue="color">
++				<div className="global-styles-ui-color-palette__tablist-container">
++					<Tabs.List className="global-styles-ui-color-palette__tablist">
++						<Tabs.Tab value="color">{ __( 'Color' ) }</Tabs.Tab>
++						<Tabs.Tab value="gradient">
++							{ __( 'Gradient' ) }
++						</Tabs.Tab>
++					</Tabs.List>
++				</div>
++				<Tabs.Panel value="color" tabIndex={ -1 }>
+ 					<ColorPalettePanel name={ name } />
+-				</Tabs.TabPanel>
+-				<Tabs.TabPanel tabId="gradient" focusable={ false }>
++				</Tabs.Panel>
++				<Tabs.Panel value="gradient" tabIndex={ -1 }>
+ 					<GradientPalettePanel name={ name } />
+-				</Tabs.TabPanel>
+-			</Tabs>
++				</Tabs.Panel>
++			</Tabs.Root>
+ 		</>
+ 	);
+ }
+diff --git a/packages/global-styles-ui/src/style.scss b/packages/global-styles-ui/src/style.scss
+index 34c0a042232ffa..ab5d337000e9da 100644
+--- a/packages/global-styles-ui/src/style.scss
++++ b/packages/global-styles-ui/src/style.scss
+@@ -233,6 +233,14 @@
+ 	height: 100%;
+ }
+ 
++.global-styles-ui-color-palette__tablist-container {
++	border-bottom: variables.$border-width solid colors.$gray-300;
++}
++
++.global-styles-ui-color-palette__tablist {
++	margin-bottom: calc(-1 * variables.$border-width);
++}
++
+ .global-styles-ui-sidebar__navigator-screen .single-column {
+ 	grid-column: span 1;
+ }
+diff --git a/packages/ui/src/tabs/stories/best-practices.mdx b/packages/ui/src/tabs/stories/best-practices.mdx
+index 41e7b157e3534e..785d9048d8790a 100644
+--- a/packages/ui/src/tabs/stories/best-practices.mdx
++++ b/packages/ui/src/tabs/stories/best-practices.mdx
+@@ -83,3 +83,7 @@ The semantics implemented by the `Tabs` component don't align well with the sema
+ For these reasons, even if the `Tabs` component is fully extensible, we don't recommend using `Tabs` with links, and we don't currently provide any related Storybook example.
+ 
+ We may provide a dedicated component for tabs-like links in the future based on the feedback received.
++
++### Panel and sidebar tabs
++
++When tabs sit at the top of a panel or sidebar (below a screen header and above padded content) use a **full-bleed tab list with a light bottom border**. The border should span the full width of the panel. The tab labels should stay only as wide as their text.
+diff --git a/tools/eslint/suppressions.json b/tools/eslint/suppressions.json
+index 5a4ca159c64a43..6daf3f3ad152a3 100644
+--- a/tools/eslint/suppressions.json
++++ b/tools/eslint/suppressions.json
+@@ -1709,11 +1709,6 @@
+ 			"count": 1
+ 		}
+ 	},
+-	"packages/global-styles-ui/src/screen-color-palette.tsx": {
+-		"@wordpress/use-recommended-components": {
+-			"count": 1
+-		}
+-	},
+ 	"packages/global-styles-ui/src/screen-colors.tsx": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1

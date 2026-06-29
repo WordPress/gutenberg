@@ -1,0 +1,236 @@
+diff --git a/packages/connectors/src/connector-item.tsx b/packages/connectors/src/connector-item.tsx
+index 0e08b0df96bcb3..fb9dead5eca6a8 100644
+--- a/packages/connectors/src/connector-item.tsx
++++ b/packages/connectors/src/connector-item.tsx
+@@ -190,9 +190,9 @@ export function DefaultConnectorSettings( {
+ 			className="connector-settings"
+ 			style={
+ 				readOnly
+-					? ( {
++					? {
+ 							'--wp-components-color-background': '#f0f0f0',
+-					  } as React.CSSProperties )
++					  }
+ 					: undefined
+ 			}
+ 		>
+diff --git a/packages/connectors/tsconfig.json b/packages/connectors/tsconfig.json
+index 62c44d7383dc2b..5034510271b84e 100644
+--- a/packages/connectors/tsconfig.json
++++ b/packages/connectors/tsconfig.json
+@@ -1,6 +1,9 @@
+ {
+ 	"$schema": "https://json.schemastore.org/tsconfig.json",
+ 	"extends": "../../tsconfig.base.json",
++	"compilerOptions": {
++		"types": [ "react-css-custom-properties" ]
++	},
+ 	"references": [
+ 		{ "path": "../components" },
+ 		{ "path": "../data" },
+diff --git a/packages/dataviews/src/dataviews/stories/layout-activity.tsx b/packages/dataviews/src/dataviews/stories/layout-activity.tsx
+index da605bd343d370..7a82b183afe276 100644
+--- a/packages/dataviews/src/dataviews/stories/layout-activity.tsx
++++ b/packages/dataviews/src/dataviews/stories/layout-activity.tsx
+@@ -640,13 +640,11 @@ const LayoutActivityComponent = ( {
+ 
+ 	return (
+ 		<div
+-			style={
+-				{
+-					height: '100%',
+-					maxWidth: fullWidth ? undefined : '400px',
+-					'--wp-dataviews-color-background': backgroundColor,
+-				} as React.CSSProperties
+-			}
++			style={ {
++				height: '100%',
++				maxWidth: fullWidth ? undefined : '400px',
++				'--wp-dataviews-color-background': backgroundColor,
++			} }
+ 		>
+ 			<DataViews
+ 				getItemId={ ( item ) => item.id.toString() }
+diff --git a/packages/dataviews/src/dataviews/stories/layout-grid.tsx b/packages/dataviews/src/dataviews/stories/layout-grid.tsx
+index 48148b6b40c6bb..2e4ac0f16fe0d8 100644
+--- a/packages/dataviews/src/dataviews/stories/layout-grid.tsx
++++ b/packages/dataviews/src/dataviews/stories/layout-grid.tsx
+@@ -61,12 +61,10 @@ export const LayoutTableComponent = ( {
+ 	}, [ view ] );
+ 	return (
+ 		<div
+-			style={
+-				{
+-					height: '100%',
+-					'--wp-dataviews-color-background': backgroundColor,
+-				} as React.CSSProperties
+-			}
++			style={ {
++				height: '100%',
++				'--wp-dataviews-color-background': backgroundColor,
++			} }
+ 		>
+ 			<DataViews
+ 				getItemId={ ( item ) => item.id.toString() }
+diff --git a/packages/dataviews/src/dataviews/stories/layout-list.tsx b/packages/dataviews/src/dataviews/stories/layout-list.tsx
+index a258617c1feec0..230953dce69e1b 100644
+--- a/packages/dataviews/src/dataviews/stories/layout-list.tsx
++++ b/packages/dataviews/src/dataviews/stories/layout-list.tsx
+@@ -63,13 +63,11 @@ export const LayoutTableComponent = ( {
+ 	}, [ view ] );
+ 	return (
+ 		<div
+-			style={
+-				{
+-					height: '100%',
+-					maxWidth: fullWidth ? undefined : '400px',
+-					'--wp-dataviews-color-background': backgroundColor,
+-				} as React.CSSProperties
+-			}
++			style={ {
++				height: '100%',
++				maxWidth: fullWidth ? undefined : '400px',
++				'--wp-dataviews-color-background': backgroundColor,
++			} }
+ 		>
+ 			<DataViews
+ 				getItemId={ ( item ) => item.id.toString() }
+diff --git a/packages/dataviews/src/dataviews/stories/layout-table.tsx b/packages/dataviews/src/dataviews/stories/layout-table.tsx
+index 296e80f3894714..e2d38d8e3c461a 100644
+--- a/packages/dataviews/src/dataviews/stories/layout-table.tsx
++++ b/packages/dataviews/src/dataviews/stories/layout-table.tsx
+@@ -62,12 +62,10 @@ export const LayoutTableComponent = ( {
+ 	}, [ view ] );
+ 	return (
+ 		<div
+-			style={
+-				{
+-					height: '100%',
+-					'--wp-dataviews-color-background': backgroundColor,
+-				} as React.CSSProperties
+-			}
++			style={ {
++				height: '100%',
++				'--wp-dataviews-color-background': backgroundColor,
++			} }
+ 		>
+ 			<DataViews
+ 				getItemId={ ( item ) => item.id.toString() }
+diff --git a/packages/dataviews/tsconfig.json b/packages/dataviews/tsconfig.json
+index 637057d383d1e3..295c27ee9c04d6 100644
+--- a/packages/dataviews/tsconfig.json
++++ b/packages/dataviews/tsconfig.json
+@@ -6,7 +6,8 @@
+ 			"gutenberg-env",
+ 			"gutenberg-test-env",
+ 			"jest",
+-			"style-imports"
++			"style-imports",
++			"react-css-custom-properties"
+ 		]
+ 	},
+ 	"references": [
+diff --git a/packages/editor/src/components/collaborators-presence/avatar/component.tsx b/packages/editor/src/components/collaborators-presence/avatar/component.tsx
+index f3d6c42b4f13c7..b13e39ed25a52c 100644
+--- a/packages/editor/src/components/collaborators-presence/avatar/component.tsx
++++ b/packages/editor/src/components/collaborators-presence/avatar/component.tsx
+@@ -73,7 +73,7 @@ function Avatar( {
+ 					'--editor-avatar-name-color': nameColor,
+ 			  }
+ 			: {} ),
+-	} as React.CSSProperties;
++	};
+ 
+ 	const avatar = (
+ 		<div
+diff --git a/packages/editor/tsconfig.json b/packages/editor/tsconfig.json
+index 73683e4bad0551..73134a0ca203f8 100644
+--- a/packages/editor/tsconfig.json
++++ b/packages/editor/tsconfig.json
+@@ -2,7 +2,7 @@
+ 	"$schema": "https://json.schemastore.org/tsconfig.json",
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
+-		"types": [ "style-imports" ],
++		"types": [ "style-imports", "react-css-custom-properties" ],
+ 		"checkJs": false
+ 	},
+ 	"references": [
+diff --git a/packages/theme/src/color-ramps/stories/brand-fallbacks.story.tsx b/packages/theme/src/color-ramps/stories/brand-fallbacks.story.tsx
+index e0dc61a7e9f005..01a122208acc53 100644
+--- a/packages/theme/src/color-ramps/stories/brand-fallbacks.story.tsx
++++ b/packages/theme/src/color-ramps/stories/brand-fallbacks.story.tsx
+@@ -72,12 +72,10 @@ export default meta;
+ export const Default: StoryObj< typeof Verifier > = {
+ 	render: ( { adminThemeColor } ) => (
+ 		<div
+-			style={
+-				{
+-					'--wp-admin-theme-color': adminThemeColor,
+-					fontSize: 13,
+-				} as React.CSSProperties
+-			}
++			style={ {
++				'--wp-admin-theme-color': adminThemeColor,
++				fontSize: 13,
++			} }
+ 		>
+ 			<p
+ 				style={ {
+diff --git a/packages/theme/src/use-theme-provider-styles.ts b/packages/theme/src/use-theme-provider-styles.ts
+index 123dfa6c70bbb9..370cc91bee5c5d 100644
+--- a/packages/theme/src/use-theme-provider-styles.ts
++++ b/packages/theme/src/use-theme-provider-styles.ts
+@@ -228,7 +228,7 @@ export function useThemeProviderStyles( {
+ 		} );
+ 	}, [ primary, bg ] );
+ 
+-	const themeProviderStyles = useMemo(
++	const themeProviderStyles: CSSProperties = useMemo(
+ 		() => ( {
+ 			...colorStyles,
+ 			...( cursorControl && {
+diff --git a/packages/theme/tsconfig.src.json b/packages/theme/tsconfig.src.json
+index 2e723c7900c300..5d5953b0e5a972 100644
+--- a/packages/theme/tsconfig.src.json
++++ b/packages/theme/tsconfig.src.json
+@@ -3,7 +3,7 @@
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
+ 		"moduleResolution": "bundler",
+-		"types": [ "jest", "style-imports" ]
++		"types": [ "jest", "style-imports", "react-css-custom-properties" ]
+ 	},
+ 	"exclude": [],
+ 	"files": [ "global.d.ts" ],
+diff --git a/packages/ui/tsconfig.json b/packages/ui/tsconfig.json
+index 6d235e6c5c8be7..ccfbdcfd94f17a 100644
+--- a/packages/ui/tsconfig.json
++++ b/packages/ui/tsconfig.json
+@@ -2,7 +2,12 @@
+ 	"$schema": "https://json.schemastore.org/tsconfig.json",
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
+-		"types": [ "node", "jest", "style-imports" ]
++		"types": [
++			"node",
++			"jest",
++			"style-imports",
++			"react-css-custom-properties"
++		]
+ 	},
+ 	"references": [
+ 		{ "path": "../a11y" },
+diff --git a/packages/ui/src/types/react.d.ts b/typings/react-css-custom-properties/index.d.ts
+similarity index 87%
+rename from packages/ui/src/types/react.d.ts
+rename to typings/react-css-custom-properties/index.d.ts
+index 2130920140b092..fe14cf260ee0d9 100644
+--- a/packages/ui/src/types/react.d.ts
++++ b/typings/react-css-custom-properties/index.d.ts
+@@ -1,4 +1,4 @@
+-import 'react';
++export {};
+ 
+ declare module 'react' {
+ 	interface CSSProperties {

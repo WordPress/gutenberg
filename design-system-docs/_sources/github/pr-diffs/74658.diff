@@ -1,0 +1,390 @@
+diff --git a/packages/components/src/toggle-control/README.md b/packages/components/src/toggle-control/README.md
+index 3a77ef6942d2e5..0ae985f3c82131 100644
+--- a/packages/components/src/toggle-control/README.md
++++ b/packages/components/src/toggle-control/README.md
+@@ -2,7 +2,48 @@
+ 
+ ToggleControl is used to generate a toggle user interface.
+ 
+-## Usage
++![On and off ToggleControls](https://make.wordpress.org/design/files/2019/02/toggle-control.png)
++
++## Design guidelines
++
++### Usage
++
++#### When to use toggles
++
++Use toggles when you want users to:
++
++-   Switch a single option on or off.
++-   Immediately activate or deactivate something.
++
++**Do**
++Use toggles to switch an option on or off.
++
++**Don't**
++Don't use radio buttons for settings that toggle on and off.
++
++Toggles are preferred when the user is not expecting to submit data, as is the case with checkboxes and radio buttons.
++
++#### Toggle position
++
++By default, the toggle switch appears at the start (left in LTR languages) of the control, before the label. In some layouts, it may be preferable to position the toggle at the end (right in LTR languages), after the label.
++
++Use `togglePosition="end"` when:
++
++-   Aligning toggles with other form elements that have their controls on the right.
++-   Creating settings panels where toggles should be visually grouped on one side.
++-   Following platform conventions that place switches at the end.
++
++#### Text label
++
++Toggles should have clear inline labels so users know exactly what option the toggle controls, and whether the option is enabled or disabled.
++
++### Behavior
++
++When a user switches a toggle, its corresponding action takes effect immediately.
++
++## Development guidelines
++
++### Usage
+ 
+ Render a user interface to change fixed background setting.
+ 
+@@ -22,7 +63,7 @@ const MyToggleControl = () => {
+ 					: 'No fixed background.'
+ 			}
+ 			checked={ hasFixedBackground }
+-			onChange={ (newValue) => {
++			onChange={ ( newValue ) => {
+ 				setHasFixedBackground( newValue );
+ 			} }
+ 		/>
+@@ -30,51 +71,75 @@ const MyToggleControl = () => {
+ };
+ ```
+ 
+-## Props
++Render a toggle with the switch positioned at the end.
++
++```jsx
++import { useState } from 'react';
++import { ToggleControl } from '@wordpress/components';
++
++const MyToggleControl = () => {
++	const [ isEnabled, setIsEnabled ] = useState( false );
++
++	return (
++		<ToggleControl
++			label="Enable feature"
++			checked={ isEnabled }
++			onChange={ setIsEnabled }
++			togglePosition="end"
++		/>
++	);
++};
++```
++
++### Props
+ 
+ The component accepts the following props:
+ 
+-### label
++#### `label`: `ReactNode`
+ 
+ If this property is added, a label will be generated using label property as the content.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-### help
++#### `help`: `ReactNode | ( ( checked: boolean ) => ReactNode )`
+ 
+-If this property is added, a help text will be generated using help property as the content.
+-For controlled components the `help` prop can also be a function which will return a help text
+-dynamically depending on the boolean `checked` parameter.
++If this property is added, a help text will be generated using help property as the content. For controlled components, the `help` prop can also be a function which will return help text dynamically depending on the boolean `checked` parameter.
+ 
+--   Type: `String|Element|Function`
+ -   Required: No
+ 
+-### checked
++#### `checked`: `boolean`
+ 
+-If checked is true the toggle will be checked. If checked is false the toggle will be unchecked.
+-If no value is passed the toggle will be an uncontrolled component with unchecked initial value.
++If checked is true the toggle will be checked. If checked is false the toggle will be unchecked. If no value is passed the toggle will be an uncontrolled component with unchecked initial value.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-### disabled
++#### `disabled`: `boolean`
+ 
+ If disabled is true the toggle will be disabled and apply the appropriate styles.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-### onChange
++#### `onChange`: `( value: boolean ) => void`
+ 
+ A function that receives the checked state (boolean) as input.
+ 
+--   Type: `function`
+--   Required: No
++-   Required: Yes
+ 
+-### className
++#### `className`: `string`
+ 
+ The class that will be added with `components-base-control` and `components-toggle-control` to the classes of the wrapper div. If no className is passed only `components-base-control` and `components-toggle-control` are used.
+ 
+--		Type: `String`
+--		Required: No
++-   Required: No
++
++#### `togglePosition`: `'start' | 'end'`
++
++The position of the toggle switch relative to the label. Use `'start'` to position the toggle before the label (default), or `'end'` to position it after the label.
++
++-   Required: No
++-   Default: `'start'`
++
++## Related components
++
++-   For the underlying toggle switch without label and help text, use the `FormToggle` component.
++-   To select one option from a set, and you want to show them all the available options at once, use the `RadioControl` component.
++-   To select one or more items from a set, use the `CheckboxControl` component.
+diff --git a/packages/components/src/toggle-control/index.tsx b/packages/components/src/toggle-control/index.tsx
+index ac6f3dc5536550..ab2022290ebf85 100644
+--- a/packages/components/src/toggle-control/index.tsx
++++ b/packages/components/src/toggle-control/index.tsx
+@@ -28,6 +28,7 @@ function UnforwardedToggleControl(
+ 		className,
+ 		onChange,
+ 		disabled,
++		togglePosition = 'start',
+ 	}: WordPressComponentProps< ToggleControlProps, 'input', false >,
+ 	ref: ForwardedRef< HTMLInputElement >
+ ) {
+@@ -54,36 +55,59 @@ function UnforwardedToggleControl(
+ 		}
+ 	}
+ 
++	const toggle = (
++		<FormToggle
++			id={ id }
++			checked={ checked }
++			onChange={ onChangeToggle }
++			aria-describedby={ describedBy }
++			disabled={ disabled }
++			ref={ ref }
++		/>
++	);
++
++	const labelElement = (
++		<FlexBlock
++			as="label"
++			htmlFor={ id }
++			className={ clsx( 'components-toggle-control__label', {
++				'is-disabled': disabled,
++			} ) }
++		>
++			{ label }
++		</FlexBlock>
++	);
++
+ 	return (
+ 		<BaseControl
+ 			id={ id }
+ 			help={
+ 				helpLabel && (
+-					<span className="components-toggle-control__help">
++					<span
++						className={ clsx( 'components-toggle-control__help', {
++							'is-toggle-end': togglePosition === 'end',
++						} ) }
++					>
+ 						{ helpLabel }
+ 					</span>
+ 				)
+ 			}
+-			className={ clsx( 'components-toggle-control', className ) }
++			className={ clsx( 'components-toggle-control', className, {
++				'is-toggle-end': togglePosition === 'end',
++			} ) }
+ 		>
+ 			<HStack justify="flex-start" spacing={ 2 }>
+-				<FormToggle
+-					id={ id }
+-					checked={ checked }
+-					onChange={ onChangeToggle }
+-					aria-describedby={ describedBy }
+-					disabled={ disabled }
+-					ref={ ref }
+-				/>
+-				<FlexBlock
+-					as="label"
+-					htmlFor={ id }
+-					className={ clsx( 'components-toggle-control__label', {
+-						'is-disabled': disabled,
+-					} ) }
+-				>
+-					{ label }
+-				</FlexBlock>
++				{ togglePosition === 'start' ? (
++					<>
++						{ toggle }
++						{ labelElement }
++					</>
++				) : (
++					<>
++						{ labelElement }
++						{ toggle }
++					</>
++				) }
+ 			</HStack>
+ 		</BaseControl>
+ 	);
+diff --git a/packages/components/src/toggle-control/stories/index.story.tsx b/packages/components/src/toggle-control/stories/index.story.tsx
+index a2d16951a4debb..93dd967586f4d5 100644
+--- a/packages/components/src/toggle-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-control/stories/index.story.tsx
+@@ -22,6 +22,10 @@ const meta: Meta< typeof ToggleControl > = {
+ 		help: { control: { type: 'text' } },
+ 		label: { control: { type: 'text' } },
+ 		onChange: { action: 'onChange' },
++		togglePosition: {
++			control: { type: 'radio' },
++			options: [ 'start', 'end' ],
++		},
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
+@@ -57,3 +61,16 @@ WithHelpText.args = {
+ 	...Default.args,
+ 	help: 'This is some help text.',
+ };
++
++export const ToggleAtEnd = Template.bind( {} );
++ToggleAtEnd.args = {
++	...Default.args,
++	togglePosition: 'end',
++};
++
++export const ToggleAtEndWithHelpText = Template.bind( {} );
++ToggleAtEndWithHelpText.args = {
++	...Default.args,
++	help: 'This is some help text.',
++	togglePosition: 'end',
++};
+diff --git a/packages/components/src/toggle-control/style.scss b/packages/components/src/toggle-control/style.scss
+index f9c81973c92e51..6efc5873095468 100644
+--- a/packages/components/src/toggle-control/style.scss
++++ b/packages/components/src/toggle-control/style.scss
+@@ -12,4 +12,8 @@
+ .components-toggle-control__help {
+ 	display: inline-block;
+ 	margin-inline-start: form-toggle.$toggle-width + $grid-unit-10;
++
++	&.is-toggle-end {
++		margin-inline-start: 0;
++	}
+ }
+diff --git a/packages/components/src/toggle-control/test/index.tsx b/packages/components/src/toggle-control/test/index.tsx
+index cc89031d9affa3..5ca4a3a6c27409 100644
+--- a/packages/components/src/toggle-control/test/index.tsx
++++ b/packages/components/src/toggle-control/test/index.tsx
+@@ -50,4 +50,54 @@ describe( 'ToggleControl', () => {
+ 			).toBeInTheDocument();
+ 		} );
+ 	} );
++
++	describe( 'togglePosition', () => {
++		it( 'should render without error when togglePosition is "start"', () => {
++			render(
++				<ToggleControl
++					label="My toggle"
++					onChange={ () => {} }
++					togglePosition="start"
++				/>
++			);
++			expect(
++				screen.getByRole( 'checkbox', { name: 'My toggle' } )
++			).toBeInTheDocument();
++		} );
++
++		it( 'should render without error when togglePosition is "end"', () => {
++			render(
++				<ToggleControl
++					label="My toggle"
++					onChange={ () => {} }
++					togglePosition="end"
++				/>
++			);
++			expect(
++				screen.getByRole( 'checkbox', { name: 'My toggle' } )
++			).toBeInTheDocument();
++		} );
++
++		it( 'should render different markup for start vs end positions', () => {
++			const { container: containerStart } = render(
++				<ToggleControl
++					label="Position test"
++					onChange={ () => {} }
++					togglePosition="start"
++				/>
++			);
++
++			const { container: containerEnd } = render(
++				<ToggleControl
++					label="Position test"
++					onChange={ () => {} }
++					togglePosition="end"
++				/>
++			);
++
++			expect( containerStart.innerHTML ).not.toBe(
++				containerEnd.innerHTML
++			);
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/toggle-control/types.ts b/packages/components/src/toggle-control/types.ts
+index 568c44fb64af07..7c73dcfe64184f 100644
+--- a/packages/components/src/toggle-control/types.ts
++++ b/packages/components/src/toggle-control/types.ts
+@@ -14,13 +14,29 @@ export type ToggleControlProps = Pick<
+ 	'checked' | 'disabled'
+ > &
+ 	Pick< BaseControlProps, '__nextHasNoMarginBottom' | 'className' > & {
++		/**
++		 * If this property is added, a help text will be generated using help
++		 * property as the content. For controlled components, `help` can also
++		 * be a function which returns help text dynamically depending on the
++		 * `checked` parameter.
++		 */
+ 		help?: ReactNode | ( ( checked: boolean ) => ReactNode );
+ 		/**
+-		 * The label for the toggle.
++		 * If this property is added, a label will be generated using label
++		 * property as the content.
+ 		 */
+ 		label: ReactNode;
+ 		/**
+-		 * A callback function invoked when the toggle is clicked.
++		 * A callback function invoked when the toggle is clicked. Receives the
++		 * new checked state (boolean) as input.
+ 		 */
+ 		onChange: ( value: boolean ) => void;
++		/**
++		 * The position of the toggle switch relative to the label. Use `'start'`
++		 * to position the toggle before the label (default), or `'end'` to
++		 * position it after the label.
++		 *
++		 * @default 'start'
++		 */
++		togglePosition?: 'start' | 'end';
+ 	};

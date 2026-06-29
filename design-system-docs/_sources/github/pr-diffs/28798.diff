@@ -1,0 +1,633 @@
+diff --git a/packages/components/src/ui/h-stack/stories/HStack.stories.js b/packages/components/src/ui/h-stack/stories/index.js
+similarity index 100%
+rename from packages/components/src/ui/h-stack/stories/HStack.stories.js
+rename to packages/components/src/ui/h-stack/stories/index.js
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index bd1d80d9b124a8..ba099d22a5dfa5 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -1,5 +1,7 @@
+ export * from './flex';
+ export * from './grid';
++export * from './h-stack';
+ export * from './text';
+ export * from './truncate';
++export * from './v-stack';
+ export * from './view';
+diff --git a/packages/components/src/ui/v-stack/README.md b/packages/components/src/ui/v-stack/README.md
+new file mode 100644
+index 00000000000000..882465501ad9ef
+--- /dev/null
++++ b/packages/components/src/ui/v-stack/README.md
+@@ -0,0 +1,123 @@
++# VStack
++
++`VStack` (or Vertical Stack) is a layout component that arranges child elements in a vertical line.
++
++## Usage
++
++`VStack` can render anything inside.
++
++```jsx live
++import { VStack, Text, View } from '@wp-g2/components';
++import { ui } from '@wp-g2/styles';
++
++function Example() {
++	return (
++		<VStack css={[ui.frame.height(200)]}>
++			<View css={[ui.background.blue]}>
++				<Text>Ana</Text>
++			</View>
++			<View css={[ui.background.blue]}>
++				<Text>Elsa</Text>
++			</View>
++			<View css={[ui.background.blue]}>
++				<Text>Olaf</Text>
++			</View>
++		</VStack>
++	);
++}
++```
++
++## Props
++
++##### alignment
++
++**Type**: `HStackAlignment`,`CSS['alignItems']`
++
++Determines how the child elements are aligned.
++
++-   `top`: Aligns content to the top.
++-   `topLeft`: Aligns content to the top/left.
++-   `topRight`: Aligns content to the top/right.
++-   `left`: Aligns content to the left.
++-   `center`: Aligns content to the center.
++-   `right`: Aligns content to the right.
++-   `bottom`: Aligns content to the bottom.
++-   `bottomLeft`: Aligns content to the bottom/left.
++-   `bottomRight`: Aligns content to the bottom/right.
++-   `edge`: Aligns content to the edges of the container.
++-   `stretch`: Stretches content to the edges of the container.
++
++##### direction
++
++**Type**: `FlexDirection`
++
++The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
++
++##### expanded
++
++**Type**: `boolean`
++
++Expands to the maximum available width (if horizontal) or height (if vertical).
++
++##### justify
++
++**Type**: `CSS['justifyContent']`
++
++Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
++In the example below, `flex-start` will align the children content to the left.
++
++##### spacing
++
++**Type**: `CSS['width']`
++
++The amount of space between each child element. Spacing in between each child can be adjusted by using `spacing`.
++The value of `spacing` works as a multiplier to the library's grid system (base of `4px`).
++
++##### wrap
++
++**Type**: `boolean`
++
++Determines if children should wrap.
++
++## Spacer
++
++When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to take up the remaining space.
++
++```jsx
++function Example() {
++	return (
++		<VStack css={[ui.frame.height(200)]}>
++			<View css={[ui.background.blue]}>
++				<Text>Ana</Text>
++			</View>
++			<Spacer css={[ui.background.blue]}>
++				<Text>Elsa</Text>
++			</Spacer>
++			<View css={[ui.background.blue]}>
++				<Text>Olaf</Text>
++			</View>
++		</VStack>
++	);
++}
++```
++
++`Spacer` can also be used in-between items to push them apart.
++
++```jsx live
++function Example() {
++	return (
++		<VStack css={[ui.frame.height(200)]}>
++			<View css={[ui.background.blue]}>
++				<Text>Ana</Text>
++			</View>
++			<Spacer />
++			<View css={[ui.background.blue]}>
++				<Text>Elsa</Text>
++			</View>
++			<View css={[ui.background.blue]}>
++				<Text>Olaf</Text>
++			</View>
++		</VStack>
++	);
++}
++```
+diff --git a/packages/components/src/ui/v-stack/index.js b/packages/components/src/ui/v-stack/index.js
+new file mode 100644
+index 00000000000000..780ac6bd4811e2
+--- /dev/null
++++ b/packages/components/src/ui/v-stack/index.js
+@@ -0,0 +1,3 @@
++export { default as VStack } from './v-stack';
++
++export * from './use-v-stack';
+diff --git a/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap b/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..ffa9e3846728df
+--- /dev/null
++++ b/packages/components/src/ui/v-stack/test/__snapshots__/index.js.snap
+@@ -0,0 +1,295 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render alignment 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  --wp-g2-flex-gap: calc(4px * 2);
++  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
++  --wp-g2-flex-item-display: block;
++  --wp-g2-flex-item-margin-bottom: calc(4px * 2);
++  --wp-g2-flex-item-margin-bottom: var(--wp-g2-flex-gap);
++  --wp-g2-flex-item-margin-right: 0;
++  --wp-g2-flex-item-margin-left: 0;
++  -webkit-align-items: normal;
++  -webkit-box-align: normal;
++  -ms-flex-align: normal;
++  align-items: normal;
++  -webkit-flex-direction: column;
++  -ms-flex-direction: column;
++  flex-direction: column;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++  --wp-g2-h-stack-spacing: calc(4px * 2);
++  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 2);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++  margin-top: calc(4px * 2);
++  margin-top: calc(var(--wp-g2-grid-base) * 2);
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++  min-height: 0;
++}
++
++<div
++  class="components-flex wp-components-flex components-h-stack wp-components-h-stack components-v-stack wp-components-v-stack emotion-2"
++  data-g2-c16t="true"
++  data-g2-component="VStack"
++>
++  <div
++    class="emotion-0"
++  />
++  <div
++    class="emotion-0"
++  />
++</div>
++`;
++
++exports[`props should render correctly 1`] = `
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  --wp-g2-flex-gap: calc(4px * 2);
++  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
++  --wp-g2-flex-item-display: block;
++  --wp-g2-flex-item-margin-bottom: calc(4px * 2);
++  --wp-g2-flex-item-margin-bottom: var(--wp-g2-flex-gap);
++  --wp-g2-flex-item-margin-right: 0;
++  --wp-g2-flex-item-margin-left: 0;
++  -webkit-align-items: normal;
++  -webkit-box-align: normal;
++  -ms-flex-align: normal;
++  align-items: normal;
++  -webkit-flex-direction: column;
++  -ms-flex-direction: column;
++  flex-direction: column;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  --wp-g2-h-stack-spacing: calc(4px * 2);
++  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 2);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++  margin-top: calc(4px * 2);
++  margin-top: calc(var(--wp-g2-grid-base) * 2);
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++  min-height: 0;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<div
++  class="components-flex wp-components-flex components-h-stack wp-components-h-stack components-v-stack wp-components-v-stack emotion-2"
++  data-g2-c16t="true"
++  data-g2-component="VStack"
++>
++  <div
++    class="emotion-0"
++  />
++  <div
++    class="emotion-0"
++  />
++</div>
++`;
++
++exports[`props should render spacing 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  --wp-g2-flex-gap: calc(4px * 5);
++  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 5);
++  --wp-g2-flex-item-display: block;
++  --wp-g2-flex-item-margin-bottom: calc(4px * 2);
++  --wp-g2-flex-item-margin-bottom: var(--wp-g2-flex-gap);
++  --wp-g2-flex-item-margin-right: 0;
++  --wp-g2-flex-item-margin-left: 0;
++  -webkit-align-items: normal;
++  -webkit-box-align: normal;
++  -ms-flex-align: normal;
++  align-items: normal;
++  -webkit-flex-direction: column;
++  -ms-flex-direction: column;
++  flex-direction: column;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  --wp-g2-h-stack-spacing: calc(4px * 5);
++  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 5);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++  margin-top: calc(4px * 5);
++  margin-top: calc(var(--wp-g2-grid-base) * 5);
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++  min-height: 0;
++}
++
++<div
++  class="components-flex wp-components-flex components-h-stack wp-components-h-stack components-v-stack wp-components-v-stack emotion-2"
++  data-g2-c16t="true"
++  data-g2-component="VStack"
++>
++  <div
++    class="emotion-0"
++  />
++  <div
++    class="emotion-0"
++  />
++</div>
++`;
+diff --git a/packages/components/src/ui/v-stack/test/index.js b/packages/components/src/ui/v-stack/test/index.js
+new file mode 100644
+index 00000000000000..cfb2df75e0f469
+--- /dev/null
++++ b/packages/components/src/ui/v-stack/test/index.js
+@@ -0,0 +1,42 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { View } from '../../view';
++import { VStack } from '../index';
++
++describe( 'props', () => {
++	test( 'should render correctly', () => {
++		const { container } = render(
++			<VStack>
++				<View />
++				<View />
++			</VStack>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render alignment', () => {
++		const { container } = render(
++			<VStack alignment="center">
++				<View />
++				<View />
++			</VStack>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render spacing', () => {
++		const { container } = render(
++			<VStack spacing={ 5 }>
++				<View />
++				<View />
++			</VStack>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++} );
+diff --git a/packages/components/src/ui/v-stack/types.ts b/packages/components/src/ui/v-stack/types.ts
+new file mode 100644
+index 00000000000000..36153e0a1ff2f7
+--- /dev/null
++++ b/packages/components/src/ui/v-stack/types.ts
+@@ -0,0 +1,47 @@
++import { CSSProperties } from 'react';
++import { HStackAlignment, Props as HStackProps } from '../h-stack/types';
++
++export type Props = HStackProps & {
++	/**
++	 * @example
++	 *```jsx
++	 * function Example() {
++	 *   return (
++	 *     <VStack alignment="center">
++	 *       <View css={ [ ui.background.blue ] }>
++	 *         <Text>Ana</Text>
++	 *       </View>
++	 *       <View css={ [ ui.background.blue ] }>
++	 *         <Text>Elsa</Text>
++	 *       </View>
++	 *       <View css={ [ ui.background.blue ] }>
++	 *         <Text>Olaf</Text>
++	 *       </View>
++	 *     </VStack>
++	 *   );
++	 * }
++	 *```
++	 */
++	alignment?: HStackAlignment | CSSProperties[ 'alignItems' ];
++	/**
++	 * @example
++	 * ```jsx
++	 * function Example() {
++	 *   return (
++	 *     <VStack alignment="center" spacing={8}>
++	 *       <View css={ [ ui.background.blue ] }>
++	 *         <Text>Ana</Text>
++	 *       </View>
++	 *       <View css={ [ ui.background.blue ] }>
++	 *         <Text>Elsa</Text>
++	 *       </View>
++	 *       <View css={ [ ui.background.blue ] }>
++	 *         <Text>Olaf</Text>
++	 *       </View>
++	 *     </VStack>
++	 *   );
++	 * }
++	 *```
++	 */
++	spacing?: CSSProperties[ 'width' ];
++};
+diff --git a/packages/components/src/ui/v-stack/use-v-stack.js b/packages/components/src/ui/v-stack/use-v-stack.js
+new file mode 100644
+index 00000000000000..54b27f4ec76fd9
+--- /dev/null
++++ b/packages/components/src/ui/v-stack/use-v-stack.js
+@@ -0,0 +1,28 @@
++/**
++ * External dependencies
++ */
++import { useContextSystem } from '@wp-g2/context';
++
++/**
++ * Internal dependencies
++ */
++import { useHStack } from '../h-stack';
++
++/**
++ *
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
++ */
++export function useVStack( props ) {
++	const { expanded = false, ...otherProps } = useContextSystem(
++		props,
++		'VStack'
++	);
++
++	const hStackProps = useHStack( {
++		direction: 'column',
++		expanded,
++		...otherProps,
++	} );
++
++	return hStackProps;
++}
+diff --git a/packages/components/src/ui/v-stack/v-stack.js b/packages/components/src/ui/v-stack/v-stack.js
+new file mode 100644
+index 00000000000000..0f1e4a2c778860
+--- /dev/null
++++ b/packages/components/src/ui/v-stack/v-stack.js
+@@ -0,0 +1,37 @@
++/**
++ * Internal dependencies
++ */
++import { createComponent } from '../utils';
++import { useVStack } from './use-v-stack';
++
++/**
++ * `VStack` (or Vertical Stack) is a layout component that arranges child elements in a vertical line.
++ *
++ * `VStack` can render anything inside.
++ *
++ * @example
++ * ```jsx
++ * function Example() {
++ *   return (
++ *     <VStack css={ [ ui.frame.height( 200 ) ] }>
++ *       <View css={ [ ui.background.blue ] }>
++ *         <Text>Ana</Text>
++ *       </View>
++ *       <View css={ [ ui.background.blue ] }>
++ *         <Text>Elsa</Text>
++ *       </View>
++ *       <View css={ [ ui.background.blue ] }>
++ *         <Text>Olaf</Text>
++ *       </View>
++ *     </VStack>
++ *   );
++ * }
++ * ```
++ */
++const VStack = createComponent( {
++	as: 'div',
++	useHook: useVStack,
++	name: 'VStack',
++} );
++
++export default VStack;

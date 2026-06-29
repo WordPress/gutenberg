@@ -1,0 +1,109 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 44351656af3bd8..bb4251ac3506d9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,11 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `GradientPicker`: Add `enableAlpha` prop ([#66974](https://github.com/WordPress/gutenberg/pull/66974))
++-   `CustomGradientPicker`: Add `enableAlpha` prop ([#66974](https://github.com/WordPress/gutenberg/pull/66974))
++
+ ### Deprecations
+ 
+ -   `DimensionControl`: Deprecate 36px default size ([#66705](https://github.com/WordPress/gutenberg/pull/66705)).
+diff --git a/packages/components/src/custom-gradient-picker/index.tsx b/packages/components/src/custom-gradient-picker/index.tsx
+index dd0659515234a6..8d53cd9f3d0ea2 100644
+--- a/packages/components/src/custom-gradient-picker/index.tsx
++++ b/packages/components/src/custom-gradient-picker/index.tsx
+@@ -140,6 +140,7 @@ const GradientTypePicker = ( {
+ export function CustomGradientPicker( {
+ 	value,
+ 	onChange,
++	enableAlpha = true,
+ 	__experimentalIsRenderedInSidebar = false,
+ }: CustomGradientPickerProps ) {
+ 	const { gradientAST, hasGradient } = getGradientAstWithDefault( value );
+@@ -167,6 +168,7 @@ export function CustomGradientPicker( {
+ 				__experimentalIsRenderedInSidebar={
+ 					__experimentalIsRenderedInSidebar
+ 				}
++				disableAlpha={ ! enableAlpha }
+ 				background={ background }
+ 				hasGradient={ hasGradient }
+ 				value={ controlPoints }
+diff --git a/packages/components/src/custom-gradient-picker/types.ts b/packages/components/src/custom-gradient-picker/types.ts
+index f9efb90799daf2..17702c74ef527a 100644
+--- a/packages/components/src/custom-gradient-picker/types.ts
++++ b/packages/components/src/custom-gradient-picker/types.ts
+@@ -26,6 +26,12 @@ export type CustomGradientPickerProps = {
+ 	 * the `currentGradient` as an argument.
+ 	 */
+ 	onChange: ( currentGradient: string ) => void;
++	/**
++	 * Whether to enable alpha transparency options in the picker.
++	 *
++	 * @default true
++	 */
++	enableAlpha?: boolean;
+ 	/**
+ 	 * Whether this is rendered in the sidebar.
+ 	 *
+diff --git a/packages/components/src/gradient-picker/README.md b/packages/components/src/gradient-picker/README.md
+index a8ee9d990c5c2a..ec0210d03c0a43 100644
+--- a/packages/components/src/gradient-picker/README.md
++++ b/packages/components/src/gradient-picker/README.md
+@@ -100,6 +100,14 @@ gradients from `gradients` will be shown.
+  - Required: No
+  - Default: `false`
+ 
++### `enableAlpha`
++
++Whether to enable alpha transparency options in the picker.
++
++ - Type: `boolean`
++ - Required: No
++ - Default: `true`
++
+ ### `gradients`
+ 
+ An array of objects as predefined gradients displayed above the gradient
+diff --git a/packages/components/src/gradient-picker/index.tsx b/packages/components/src/gradient-picker/index.tsx
+index 124a89c7e016e1..28491d8a56010e 100644
+--- a/packages/components/src/gradient-picker/index.tsx
++++ b/packages/components/src/gradient-picker/index.tsx
+@@ -213,6 +213,7 @@ export function GradientPicker( {
+ 	onChange,
+ 	value,
+ 	clearable = true,
++	enableAlpha = true,
+ 	disableCustomGradients = false,
+ 	__experimentalIsRenderedInSidebar,
+ 	headingLevel = 2,
+@@ -230,6 +231,7 @@ export function GradientPicker( {
+ 					__experimentalIsRenderedInSidebar={
+ 						__experimentalIsRenderedInSidebar
+ 					}
++					enableAlpha={ enableAlpha }
+ 					value={ value }
+ 					onChange={ onChange }
+ 				/>
+diff --git a/packages/components/src/gradient-picker/types.ts b/packages/components/src/gradient-picker/types.ts
+index 8ac2c6de9f2cf3..3497dd8c5ac008 100644
+--- a/packages/components/src/gradient-picker/types.ts
++++ b/packages/components/src/gradient-picker/types.ts
+@@ -56,6 +56,12 @@ type GradientPickerBaseProps = {
+ 	 * @default true
+ 	 */
+ 	loop?: boolean;
++	/**
++	 * Whether to enable alpha transparency options in the picker.
++	 *
++	 * @default true
++	 */
++	enableAlpha?: boolean;
+ } & (
+ 	| {
+ 			// TODO: [#54055] Either this or `aria-labelledby` should be required

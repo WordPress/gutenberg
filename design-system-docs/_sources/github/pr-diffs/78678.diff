@@ -1,0 +1,353 @@
+diff --git a/package-lock.json b/package-lock.json
+index 86c5e1933e1c25..d45cde0aa7e6c6 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -53601,6 +53601,7 @@
+ 			"version": "0.15.1",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/style-runtime": "file:../style-runtime",
+ 				"colorjs.io": "^0.6.0",
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index c29f3b737a96f4..22bbee41b80631 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -45,6 +45,7 @@
+ 
+ ### Code Quality
+ 
++-   `ThemeProvider`: Apply scoped custom properties via inline `style` (mirrored onto the wrapper's own document element when `isRoot`) instead of a per-instance `<style>` element ([#78678](https://github.com/WordPress/gutenberg/pull/78678)).
+ -   `ThemeProvider`: Stop serializing `data-wpds-root-provider="false"` on non-root providers by only setting the attribute when `isRoot` is `true` ([#79253](https://github.com/WordPress/gutenberg/pull/79253)).
+ -   Declare `postcss`, `esbuild`, and `vite` as optional peer dependencies for the bundler plugins, and move `@types/react` from `dependencies` to an optional peer dependency ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
+ 
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index d41837744687f1..472d179fb122c0 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -79,6 +79,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
++		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/style-runtime": "file:../style-runtime",
+ 		"colorjs.io": "^0.6.0",
+diff --git a/packages/theme/src/test/theme-provider.test.tsx b/packages/theme/src/test/theme-provider.test.tsx
+index e60a270f60ea99..c668fabfe0ff24 100644
+--- a/packages/theme/src/test/theme-provider.test.tsx
++++ b/packages/theme/src/test/theme-provider.test.tsx
+@@ -8,9 +8,8 @@ import { join } from 'path';
+ import { render, screen } from '@testing-library/react';
+ import { ThemeProvider } from '../theme-provider';
+ 
+-// Mock the CSS module so the provider's scoping class is a real, stable class
+-// name. Without this the global Jest CSS mock leaves the class `undefined`, and
+-// jsdom cannot match the generated rules to compute the custom properties.
++// Give the wrapper a stable class so tests can locate it and read its
++// computed custom properties.
+ jest.mock( '../style.module.css', () => ( {
+ 	root: 'theme-provider-root',
+ } ) );
+@@ -34,7 +33,7 @@ function readProp( element: Element, property: string ) {
+ 
+ // The `ThemeProvider` wrapper element that scopes the given descendant.
+ function getScopingProvider( element: Element ) {
+-	return element.closest< HTMLElement >( '[data-wpds-theme-provider-id]' )!;
++	return element.closest< HTMLElement >( '.theme-provider-root' )!;
+ }
+ 
+ describe( 'ThemeProvider', () => {
+@@ -131,15 +130,91 @@ describe( 'ThemeProvider', () => {
+ 			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
+ 		} );
+ 
+-		// Unlike color/cursor (emitted at runtime in the provider's own
+-		// `<style>`), the `cornerRadius` preset resolves to
+-		// `--wpds-border-radius-*` values through the prebuilt design-token CSS
+-		// (the modes authored in `terrazzo.config.ts`). A root provider relies
+-		// on that stylesheet's `:root:has( [data-wpds-root-provider='true']… )`
+-		// rule to forward the preset to the document element, so these tests
+-		// load the prebuilt CSS to exercise it. It is injected only for this
+-		// block (it also defines base tokens on `:root`) to avoid interfering
+-		// with the color assertions above.
++		it( 'removes the forwarded properties from the document root on unmount', () => {
++			const { unmount } = render(
++				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
++					<div>x</div>
++				</ThemeProvider>
++			);
++
++			expect( readProp( document.documentElement, BRAND_BG ) ).toBe(
++				PRIMARY
++			);
++
++			unmount();
++
++			// No prior value, so cleanup removes the property entirely.
++			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
++		} );
++
++		it( "forwards tokens to the wrapper's own document, not the top document", () => {
++			const iframe = document.createElement( 'iframe' );
++			document.body.appendChild( iframe );
++			const iframeDoc = iframe.contentDocument!;
++			// Mount into a child element (not the iframe `body` directly, which
++			// React warns against) so the wrapper's `ownerDocument` is the iframe.
++			const mount = iframeDoc.createElement( 'div' );
++			iframeDoc.body.appendChild( mount );
++
++			const { unmount } = render(
++				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
++					<div>x</div>
++				</ThemeProvider>,
++				{ container: mount }
++			);
++
++			expect( readProp( iframeDoc.documentElement, BRAND_BG ) ).toBe(
++				PRIMARY
++			);
++			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
++
++			unmount();
++			iframe.remove();
++		} );
++
++		it( 'warns when multiple root providers share a document', () => {
++			const warn = jest
++				.spyOn( console, 'warn' )
++				.mockImplementation( () => {} );
++
++			render(
++				<>
++					<ThemeProvider isRoot color={ { primary: PRIMARY } }>
++						<div>a</div>
++					</ThemeProvider>
++					<ThemeProvider isRoot color={ { primary: OTHER_PRIMARY } }>
++						<div>b</div>
++					</ThemeProvider>
++				</>
++			);
++
++			expect( warn ).toHaveBeenCalledWith(
++				expect.stringContaining( 'More than one root provider' )
++			);
++
++			warn.mockRestore();
++		} );
++
++		it( 'does not warn for a single root provider', () => {
++			const warn = jest
++				.spyOn( console, 'warn' )
++				.mockImplementation( () => {} );
++
++			render(
++				<ThemeProvider isRoot color={ { primary: PRIMARY } }>
++					<div>x</div>
++				</ThemeProvider>
++			);
++
++			expect( warn ).not.toHaveBeenCalled();
++
++			warn.mockRestore();
++		} );
++
++		// `cornerRadius` forwards to `:root` through the prebuilt CSS's
++		// `:root:has( [data-wpds-root-provider='true']… )` rule (not the JS
++		// mirror used for color/cursor), so load that stylesheet to exercise
++		// it. Scoped to this block since it also defines base `:root` tokens.
+ 		describe( 'cornerRadius forwarding', () => {
+ 			let prebuiltStyle: HTMLStyleElement;
+ 
+diff --git a/packages/theme/src/theme-provider.tsx b/packages/theme/src/theme-provider.tsx
+index bfa812b96859b7..4e322dc00ac478 100644
+--- a/packages/theme/src/theme-provider.tsx
++++ b/packages/theme/src/theme-provider.tsx
+@@ -1,38 +1,14 @@
+-import type { CSSProperties } from 'react';
+-import { useMemo, useId } from '@wordpress/element';
++import { useMemo, useRef } from '@wordpress/element';
++import { useIsomorphicLayoutEffect } from '@wordpress/compose';
+ import { ThemeContext } from './context';
+ import { useThemeProviderStyles } from './use-theme-provider-styles';
+ import { type ThemeProviderProps } from './types';
+ import styles from './style.module.css';
+ 
+-function cssObjectToText( values: CSSProperties ) {
+-	return Object.entries( values )
+-		.map( ( [ key, value ] ) => `${ key }: ${ value };` )
+-		.join( '' );
+-}
+-
+-function generateCSSSelector( {
+-	instanceId,
+-	isRoot,
+-}: {
+-	instanceId: string;
+-	isRoot: boolean;
+-} ) {
+-	const rootSel = `[data-wpds-root-provider="true"]`;
+-	const instanceIdSel = `[data-wpds-theme-provider-id="${ instanceId }"]`;
+-
+-	const selectors = [];
+-
+-	if ( isRoot ) {
+-		selectors.push(
+-			`:root:has(.${ styles.root }${ rootSel }${ instanceIdSel })`
+-		);
+-	}
+-
+-	selectors.push( `.${ styles.root }.${ styles.root }${ instanceIdSel }` );
+-
+-	return selectors.join( ',' );
+-}
++// Dev-only: count active root providers per document so we can warn when more
++// than one is mounted on the same document (their forwarded `html` styles
++// would conflict). Keyed weakly so iframe documents don't leak.
++const rootProviderCountByDocument = new WeakMap< Document, number >();
+ 
+ /**
+  * Context provider that generates a theme from a set of seed color values and
+@@ -46,8 +22,6 @@ export const ThemeProvider = ( {
+ 	cornerRadius,
+ 	isRoot = false,
+ }: ThemeProviderProps ) => {
+-	const instanceId = useId();
+-
+ 	const { themeProviderStyles, resolvedSettings } = useThemeProviderStyles( {
+ 		color,
+ 		cursor,
+@@ -63,26 +37,85 @@ export const ThemeProvider = ( {
+ 		[ resolvedSettings ]
+ 	);
+ 
++	const wrapperRef = useRef< HTMLDivElement >( null );
++
++	// For root providers, mirror the wrapper's custom properties onto the
++	// document element of the wrapper's own document (which may be an iframe)
++	// so they reach portals and content rendered outside the React subtree.
++	// `html` is shared, so set/remove individual properties (restoring any
++	// prior value) rather than assigning a whole style object. Preset settings
++	// like `cornerRadius` are forwarded by the prebuilt CSS instead.
++	useIsomorphicLayoutEffect( () => {
++		if ( ! isRoot ) {
++			return;
++		}
++		const doc = wrapperRef.current?.ownerDocument;
++		if ( ! doc ) {
++			return;
++		}
++		const root = doc.documentElement;
++
++		if ( process.env.NODE_ENV !== 'production' ) {
++			const active = rootProviderCountByDocument.get( doc ) ?? 0;
++			if ( active > 0 ) {
++				// eslint-disable-next-line no-console
++				console.warn(
++					'ThemeProvider: More than one root provider (`isRoot`) is mounted on the same document. Their forwarded document-level styles conflict, and unmounting one can reset the others. Render a single root provider per document.'
++				);
++			}
++			rootProviderCountByDocument.set( doc, active + 1 );
++		}
++
++		const previous = new Map< string, string >();
++		const applied: string[] = [];
++
++		for ( const [ rawKey, rawValue ] of Object.entries(
++			themeProviderStyles
++		) ) {
++			if (
++				! rawKey.startsWith( '--' ) ||
++				rawValue === null ||
++				rawValue === undefined
++			) {
++				continue;
++			}
++			previous.set( rawKey, root.style.getPropertyValue( rawKey ) );
++			root.style.setProperty( rawKey, String( rawValue ) );
++			applied.push( rawKey );
++		}
++
++		return () => {
++			if ( process.env.NODE_ENV !== 'production' ) {
++				const active = rootProviderCountByDocument.get( doc ) ?? 1;
++				if ( active <= 1 ) {
++					rootProviderCountByDocument.delete( doc );
++				} else {
++					rootProviderCountByDocument.set( doc, active - 1 );
++				}
++			}
++
++			for ( const key of applied ) {
++				const prev = previous.get( key );
++				if ( prev ) {
++					root.style.setProperty( key, prev );
++				} else {
++					root.style.removeProperty( key );
++				}
++			}
++		};
++	}, [ isRoot, themeProviderStyles ] );
++
+ 	return (
+-		<>
+-			{ themeProviderStyles ? (
+-				<style>
+-					{ `${ generateCSSSelector( {
+-						instanceId,
+-						isRoot,
+-					} ) } {${ cssObjectToText( themeProviderStyles ) }}` }
+-				</style>
+-			) : null }
+-			<div
+-				data-wpds-theme-provider-id={ instanceId }
+-				data-wpds-root-provider={ isRoot || undefined }
+-				data-wpds-corner-radius={ cornerRadiusPreset }
+-				className={ styles.root }
+-			>
+-				<ThemeContext.Provider value={ contextValue }>
+-					{ children }
+-				</ThemeContext.Provider>
+-			</div>
+-		</>
++		<div
++			ref={ wrapperRef }
++			data-wpds-root-provider={ isRoot || undefined }
++			data-wpds-corner-radius={ cornerRadiusPreset }
++			className={ styles.root }
++			style={ themeProviderStyles }
++		>
++			<ThemeContext.Provider value={ contextValue }>
++				{ children }
++			</ThemeContext.Provider>
++		</div>
+ 	);
+ };
+diff --git a/packages/theme/tsconfig.json b/packages/theme/tsconfig.json
+index b88eeb2f72c79f..1411bc4741cefb 100644
+--- a/packages/theme/tsconfig.json
++++ b/packages/theme/tsconfig.json
+@@ -5,6 +5,7 @@
+ 	},
+ 	"files": [],
+ 	"references": [
++		{ "path": "../compose" },
+ 		{ "path": "../style-runtime" },
+ 		{ "path": "./tsconfig.src.json" },
+ 		{ "path": "./tsconfig.bin.json" }
+diff --git a/packages/theme/tsconfig.src.json b/packages/theme/tsconfig.src.json
+index 2aeeda4c18d1af..910a0c8abbf300 100644
+--- a/packages/theme/tsconfig.src.json
++++ b/packages/theme/tsconfig.src.json
+@@ -7,5 +7,9 @@
+ 	},
+ 	"exclude": [],
+ 	"files": [ "global.d.ts" ],
+-	"references": [ { "path": "../element" }, { "path": "../style-runtime" } ]
++	"references": [
++		{ "path": "../compose" },
++		{ "path": "../element" },
++		{ "path": "../style-runtime" }
++	]
+ }

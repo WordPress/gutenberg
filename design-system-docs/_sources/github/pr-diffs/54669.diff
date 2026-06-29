@@ -1,0 +1,35 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d2f03d2ecd6b64..bfa095a9d32bba 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug fix
++
++-   `DateTimePicker`: fix onChange callback check so that it also works inside iframes ([#54669](https://github.com/WordPress/gutenberg/pull/54669)).
++
+ ## 25.8.0 (2023-09-20)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index e5772bf7ab34c0..4821b71c3dd358 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -127,7 +127,14 @@ export function TimePicker( {
+ 		method: 'hours' | 'minutes' | 'date' | 'year'
+ 	) => {
+ 		const callback: InputChangeCallback = ( value, { event } ) => {
+-			if ( ! ( event.target instanceof HTMLInputElement ) ) {
++			// `instanceof` checks need to get the instance definition from the
++			// corresponding window object — therefore, the following logic makes
++			// the component work correctly even when rendered inside an iframe.
++			const HTMLInputElementInstance =
++				( event.target as HTMLInputElement )?.ownerDocument.defaultView
++					?.HTMLInputElement ?? HTMLInputElement;
++
++			if ( ! ( event.target instanceof HTMLInputElementInstance ) ) {
+ 				return;
+ 			}
+ 

@@ -1,0 +1,84 @@
+diff --git a/.vscode/settings.json b/.vscode/settings.json
+new file mode 100644
+index 00000000000000..8e44ca7187c3ea
+--- /dev/null
++++ b/.vscode/settings.json
+@@ -0,0 +1,5 @@
++{
++    "githubPullRequests.ignoredPullRequestBranches": [
++        "trunk"
++    ]
++}
+\ No newline at end of file
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2759cc629a336e..8a027d3248619f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Documentation
++
++-   Button `focus` prop: Update documentation to remove the button `focus` prop ([#50972](https://github.com/WordPress/gutenberg/issues/50972)).
++
+ ### Enhancements
+ 
+ -   `UnitControl`: Revamp support for changing unit by typing ([#39303](https://github.com/WordPress/gutenberg/pull/39303)).
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index 66bbae67ebcd57..4570d4c434b5c9 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -145,12 +145,6 @@ Whether the button is disabled. If `true`, this will force a `button` element to
+ 
+ -   Required: No
+ 
+-#### `focus`: `boolean`
+-
+-Whether the button is focused.
+-
+--   Required: No
+-
+ #### `href`: `string`
+ 
+ If provided, renders `a` instead of `button`.
+diff --git a/packages/components/src/button/types.ts b/packages/components/src/button/types.ts
+index 85188476e5f370..962faeaa718903 100644
+--- a/packages/components/src/button/types.ts
++++ b/packages/components/src/button/types.ts
+@@ -45,10 +45,6 @@ type BaseButtonProps = {
+ 	/**
+ 	 * Whether the button is focused.
+ 	 */
+-	focus?: boolean;
+-	/**
+-	 * If provided, renders an Icon component inside the button.
+-	 */
+ 	icon?: IconProps[ 'icon' ];
+ 	/**
+ 	 * If provided with `icon`, sets the position of icon relative to the `text`.
+diff --git a/packages/scripts/CHANGELOG.md b/packages/scripts/CHANGELOG.md
+index d77fc6f49eb533..ff7e92b0168062 100644
+--- a/packages/scripts/CHANGELOG.md
++++ b/packages/scripts/CHANGELOG.md
+@@ -51,6 +51,8 @@
+ 
+ -   The `WP_DEVTOOL` environment variable can now be used to set the Webpack devtool option for sourcemaps in production builds ([#46812](https://github.com/WordPress/gutenberg/pull/46812)). Previously, this only worked for development builds.
+ -   Update default webpack config and lint-style script to allow PostCSS (`.pcss` extension) file usage ([#45352](https://github.com/WordPress/gutenberg/pull/45352)).
++-   Update scripts documentation to include `--no-watch` option ([#51695](hhttps://github.com/WordPress/gutenberg/issues/51695)).
++
+ 
+ ## 25.3.0 (2023-02-01)
+ 
+diff --git a/packages/scripts/README.md b/packages/scripts/README.md
+index 96a65787c0d8b8..30ed7f943e34b9 100644
+--- a/packages/scripts/README.md
++++ b/packages/scripts/README.md
+@@ -382,6 +382,7 @@ This is how you execute the script with presented setup:
+ This script automatically use the optimized config but sometimes you may want to specify some custom options:
+ 
+ -   `--hot` – enables "Fast Refresh". The page will automatically reload if you make changes to the code. _For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://wordpress.org/documentation/article/debugging-in-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed._
++-	`--no-watch` – Starts the build for development without starting the watcher.
+ -   `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
+ -   `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
+ -   `--webpack-devtool` – controls how source maps are generated. See options at https://webpack.js.org/configuration/devtool/#devtool.

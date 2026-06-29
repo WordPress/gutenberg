@@ -1,0 +1,586 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index c6e657597e2975..3db21b179331ef 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1229,6 +1229,12 @@
+ 		"markdown_source": "../packages/components/src/textarea-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "Theme",
++		"slug": "theme",
++		"markdown_source": "../packages/components/src/theme/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "ToggleControl",
+ 		"slug": "toggle-control",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f462a29f65b1be..ecfe323e612a38 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -31,6 +31,10 @@
+ -   `FontSizePicker`: Convert to TypeScript ([#44449](https://github.com/WordPress/gutenberg/pull/44449)).
+ -   `FontSizePicker`: Replace SCSS with Emotion + components ([#44483](https://github.com/WordPress/gutenberg/pull/44483)).
+ 
++### Experimental
++
++-   Add experimental `Theme` component ([#44668](https://github.com/WordPress/gutenberg/pull/44668)).
++
+ ## 21.1.0 (2022-09-21)
+ 
+ ### Deprecations
+diff --git a/packages/components/CONTRIBUTING.md b/packages/components/CONTRIBUTING.md
+index 306d711bf33c48..1b96d604738cfa 100644
+--- a/packages/components/CONTRIBUTING.md
++++ b/packages/components/CONTRIBUTING.md
+@@ -185,6 +185,26 @@ All new component should be styled using [Emotion](https://emotion.sh/docs/intro
+ 
+ Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hook](/packages/components/src/utils/hooks/use-cx.ts) should be used instead.
+ 
++### Themeing
++
++_Note: Themeing is an experimental feature and still being actively developed. Its APIs are an early implementation subject to drastic and breaking changes_
++
++The [`Theme` component](/packages/components/src/theme/README.md) can be used to tweak the visual appearance of the components from the `@wordpress/components` package.
++
++```jsx
++import { __experimentalTheme as Theme } from '@wordpress/components';
++
++const Example = () => {
++	return (
++		<Theme accent="red">
++			<Button variant="primary">I'm red</Button>
++			<Theme accent="blue">
++				<Button variant="primary">I'm blue</Button>
++			</Theme>
++		</Theme>
++	);
++};
++```
+ 
+ ### Deprecating styles
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index bb0bed82239d54..78edbb6463f647 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -20,7 +20,7 @@
+ 
+ 	&[aria-expanded="true"],
+ 	&:hover {
+-		color: var(--wp-admin-theme-color);
++		color: $components-color-accent;
+ 	}
+ 
+ 	// Unset some hovers, instead of adding :not specificity.
+@@ -31,7 +31,7 @@
+ 	// Focus.
+ 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
+ 	&:focus:not(:disabled) {
+-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
++		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 
+ 		// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 		outline: 3px solid transparent;
+@@ -43,7 +43,7 @@
+ 
+ 	&.is-primary {
+ 		white-space: nowrap;
+-		background: var(--wp-admin-theme-color);
++		background: $components-color-accent;
+ 		color: $white;
+ 		text-decoration: none;
+ 		text-shadow: none;
+@@ -52,18 +52,18 @@
+ 		outline: 1px solid transparent;
+ 
+ 		&:hover:not(:disabled) {
+-			background: var(--wp-admin-theme-color-darker-10);
++			background: $components-color-accent-darker-10;
+ 			color: $white;
+ 		}
+ 
+ 		&:active:not(:disabled) {
+-			background: var(--wp-admin-theme-color-darker-20);
+-			border-color: var(--wp-admin-theme-color-darker-20);
++			background: $components-color-accent-darker-20;
++			border-color: $components-color-accent-darker-20;
+ 			color: $white;
+ 		}
+ 
+ 		&:focus:not(:disabled) {
+-			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
++			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 		}
+ 
+ 		&:disabled,
+@@ -72,15 +72,15 @@
+ 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
+ 		&[aria-disabled="true"]:active:enabled {
+ 			color: rgba($white, 0.4);
+-			background: var(--wp-admin-theme-color);
+-			border-color: var(--wp-admin-theme-color);
++			background: $components-color-accent;
++			border-color: $components-color-accent;
+ 			opacity: 1;
+ 			outline: none;
+ 
+ 			&:focus:enabled {
+ 				box-shadow:
+ 					0 0 0 $border-width $white,
+-					0 0 0 3px var(--wp-admin-theme-color);
++					0 0 0 3px $components-color-accent;
+ 			}
+ 		}
+ 
+@@ -93,13 +93,13 @@
+ 			/* stylelint-disable */
+ 			background-image: linear-gradient(
+ 				-45deg,
+-				var(--wp-admin-theme-color) 33%,
+-				var(--wp-admin-theme-color-darker-20) 33%,
+-				var(--wp-admin-theme-color-darker-20) 70%,
+-				var(--wp-admin-theme-color) 70%
++				$components-color-accent 33%,
++				$components-color-accent-darker-20 33%,
++				$components-color-accent-darker-20 70%,
++				$components-color-accent 70%
+ 			);
+ 			/* stylelint-enable */
+-			border-color: var(--wp-admin-theme-color);
++			border-color: $components-color-accent;
+ 		}
+ 	}
+ 
+@@ -114,13 +114,13 @@
+ 
+ 		&:active:not(:disabled) {
+ 			background: $gray-300;
+-			color: var(--wp-admin-theme-color-darker-10);
++			color: $components-color-accent-darker-10;
+ 			box-shadow: none;
+ 		}
+ 
+ 		&:hover:not(:disabled) {
+-			color: var(--wp-admin-theme-color-darker-10);
+-			box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color-darker-10);
++			color: $components-color-accent-darker-10;
++			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-10;
+ 		}
+ 
+ 		&:disabled,
+@@ -140,10 +140,10 @@
+ 	 */
+ 
+ 	&.is-secondary {
+-		box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
++		box-shadow: inset 0 0 0 $border-width $components-color-accent;
+ 		outline: 1px solid transparent; // Shown in high contrast mode.
+ 		white-space: nowrap;
+-		color: var(--wp-admin-theme-color);
++		color: $components-color-accent;
+ 		background: transparent;
+ 	}
+ 
+@@ -153,7 +153,7 @@
+ 
+ 	&.is-tertiary {
+ 		white-space: nowrap;
+-		color: var(--wp-admin-theme-color);
++		color: $components-color-accent;
+ 		background: transparent;
+ 		padding: $grid-unit-15 * 0.5; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
+ 
+@@ -182,7 +182,7 @@
+ 		}
+ 
+ 		&:focus:not(:disabled) {
+-			color: var(--wp-admin-theme-color);
++			color: $components-color-accent;
+ 		}
+ 
+ 		&:active:not(:disabled) {
+@@ -230,7 +230,7 @@
+ 		background: none;
+ 		outline: none;
+ 		text-align: left;
+-		color: var(--wp-admin-theme-color);
++		color: $components-color-accent;
+ 		text-decoration: underline;
+ 		transition-property: border, background, color;
+ 		transition-duration: 0.05s;
+@@ -253,7 +253,7 @@
+ 			}
+ 
+ 			&:focus:not(:disabled) {
+-				color: var(--wp-admin-theme-color);
++				color: $components-color-accent;
+ 			}
+ 		}
+ 	}
+@@ -333,7 +333,7 @@
+ 		background: $gray-900;
+ 
+ 		&:focus:not(:disabled) {
+-			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
++			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 
+ 			// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 			outline: 2px solid transparent;
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 50abc0b331581f..24ae3bad24815a 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -146,6 +146,7 @@ export { Text as __experimentalText } from './text';
+ export { default as TextControl } from './text-control';
+ export { default as TextareaControl } from './textarea-control';
+ export { default as TextHighlight } from './text-highlight';
++export { default as __experimentalTheme } from './theme';
+ export { default as Tip } from './tip';
+ export { default as ToggleControl } from './toggle-control';
+ export {
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 3c42941e0d7158..80dc3dbb682669 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -1,3 +1,7 @@
++// Variables
++@import "./utils/theme-variables.scss";
++
++// Components
+ @import "./animate/style.scss";
+ @import "./autocomplete/style.scss";
+ @import "./button-group/style.scss";
+diff --git a/packages/components/src/theme/README.md b/packages/components/src/theme/README.md
+new file mode 100644
+index 00000000000000..a63f8a85db1a20
+--- /dev/null
++++ b/packages/components/src/theme/README.md
+@@ -0,0 +1,34 @@
++# Theme
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`Theme` allows defining theme variables for components in the `@wordpress/components` package.
++
++Multiple `Theme` components can be nested in order to override specific theme variables.
++
++## Usage
++
++```jsx
++import { __experimentalTheme as Theme } from '@wordpress/components';
++
++const Example = () => {
++	return (
++		<Theme accent="red">
++			<Button variant="primary">I'm red</Button>
++			<Theme accent="blue">
++				<Button variant="primary">I'm blue</Button>
++			</Theme>
++		</Theme>
++	);
++};
++```
++
++## Props
++
++### `accent`: `string`
++
++Used to set the accent color (used by components as the primary color). If an accent color is not defined, the default fallback value is the original WP Admin main theme color. No all valid CSS color syntaxes are supported — in particular, keywords (like `'currentcolor'`, `'inherit'`, `'initial'`, `'revert'`, `'unset'`...) and CSS custom properties (e.g. `var(--my-custom-property)`) are _not_ supported values for this property.
++
++-   Required: No
+diff --git a/packages/components/src/theme/index.tsx b/packages/components/src/theme/index.tsx
+new file mode 100644
+index 00000000000000..7504c7d5362909
+--- /dev/null
++++ b/packages/components/src/theme/index.tsx
+@@ -0,0 +1,51 @@
++/**
++ * External dependencies
++ */
++import { colord, extend } from 'colord';
++import a11yPlugin from 'colord/plugins/a11y';
++import namesPlugin from 'colord/plugins/names';
++
++/**
++ * Internal dependencies
++ */
++import type { ThemeProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
++import { Wrapper } from './styles';
++
++extend( [ namesPlugin, a11yPlugin ] );
++
++/**
++ * `Theme` allows defining theme variables for components in the `@wordpress/components` package.
++ *
++ * Multiple `Theme` components can be nested in order to override specific theme variables.
++ *
++ *
++ * @example
++ * ```jsx
++ * import { __experimentalTheme as Theme } from '@wordpress/components';
++ *
++ * const Example = () => {
++ *   return (
++ *     <Theme accent="red">
++ *       <Button variant="primary">I'm red</Button>
++ *       <Theme accent="blue">
++ *         <Button variant="primary">I'm blue</Button>
++ *       </Theme>
++ *     </Theme>
++ *   );
++ * };
++ * ```
++ */
++function Theme( props: WordPressComponentProps< ThemeProps, 'div', true > ) {
++	const { accent } = props;
++	if ( accent && ! colord( accent ).isValid() ) {
++		// eslint-disable-next-line no-console
++		console.warn(
++			`wp.components.Theme: "${ accent }" is not a valid color value for the 'accent' prop.`
++		);
++	}
++
++	return <Wrapper { ...props } />;
++}
++
++export default Theme;
+diff --git a/packages/components/src/theme/stories/index.tsx b/packages/components/src/theme/stories/index.tsx
+new file mode 100644
+index 00000000000000..740927be8b00cd
+--- /dev/null
++++ b/packages/components/src/theme/stories/index.tsx
+@@ -0,0 +1,47 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import Theme from '../index';
++import Button from '../../button';
++
++const meta: ComponentMeta< typeof Theme > = {
++	component: Theme,
++	title: 'Components (Experimental)/Theme',
++	argTypes: {
++		accent: { control: { type: 'color' } },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof Theme > = ( args ) => (
++	<Theme { ...args }>
++		<Button variant="primary">Hello</Button>
++	</Theme>
++);
++
++export const Default = Template.bind( {} );
++Default.args = {};
++
++export const Nested: ComponentStory< typeof Theme > = ( args ) => (
++	<Theme accent="tomato">
++		<Button variant="primary">Outer theme (hardcoded)</Button>
++
++		<Theme { ...args }>
++			<Button variant="primary">
++				Inner theme (set via Storybook controls)
++			</Button>
++		</Theme>
++	</Theme>
++);
++Nested.args = {
++	accent: 'blue',
++};
+diff --git a/packages/components/src/theme/styles.ts b/packages/components/src/theme/styles.ts
+new file mode 100644
+index 00000000000000..770632e0fc9346
+--- /dev/null
++++ b/packages/components/src/theme/styles.ts
+@@ -0,0 +1,28 @@
++/**
++ * External dependencies
++ */
++import { colord } from 'colord';
++import styled from '@emotion/styled';
++import { css } from '@emotion/react';
++
++/**
++ * Internal dependencies
++ */
++import type { ThemeProps } from './types';
++
++const accentColor = ( { accent }: ThemeProps ) =>
++	accent
++		? css`
++				--wp-components-color-accent: ${ accent };
++				--wp-components-color-accent-darker-10: ${ colord( accent )
++					.darken( 0.1 )
++					.toHex() };
++				--wp-components-color-accent-darker-20: ${ colord( accent )
++					.darken( 0.2 )
++					.toHex() };
++		  `
++		: undefined;
++
++export const Wrapper = styled.div< ThemeProps >`
++	${ accentColor }
++`;
+diff --git a/packages/components/src/theme/test/index.tsx b/packages/components/src/theme/test/index.tsx
+new file mode 100644
+index 00000000000000..5c46d6e4964245
+--- /dev/null
++++ b/packages/components/src/theme/test/index.tsx
+@@ -0,0 +1,101 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++import type { ReactNode } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import Theme from '../';
++
++type MyThemableComponentProps = {
++	children: ReactNode;
++};
++
++const MyThemableComponent = ( props: MyThemableComponentProps ) => {
++	return (
++		<div
++			{ ...props }
++			style={ {
++				color: 'var(--wp-components-color-accent)',
++			} }
++		/>
++	);
++};
++
++describe( 'Theme', () => {
++	describe( 'accent color', () => {
++		it( 'it does not define the accent color (and its variations) as a CSS variable when the `accent` prop is undefined', () => {
++			render(
++				<Theme>
++					<MyThemableComponent>Inner</MyThemableComponent>
++				</Theme>
++			);
++
++			const inner = screen.getByText( 'Inner' );
++
++			if ( inner?.parentElement === null ) {
++				throw new Error(
++					'Somehow the `Theme` component does not render a DOM element?'
++				);
++			}
++
++			const innerElementStyles = window.getComputedStyle(
++				inner?.parentElement
++			);
++
++			expect(
++				innerElementStyles.getPropertyValue(
++					'--wp-components-color-accent'
++				)
++			).toBe( '' );
++
++			expect(
++				innerElementStyles.getPropertyValue(
++					'--wp-components-color-accent-darker-10'
++				)
++			).toBe( '' );
++
++			expect(
++				innerElementStyles.getPropertyValue(
++					'--wp-components-color-accent-darker-20'
++				)
++			).toBe( '' );
++		} );
++
++		it( 'it defines the accent color (and its variations) as a CSS variable', () => {
++			render(
++				<Theme accent="#123abc">
++					<MyThemableComponent>Inner</MyThemableComponent>
++				</Theme>
++			);
++
++			const inner = screen.getByText( 'Inner' );
++
++			expect( inner?.parentElement ).toHaveStyle( {
++				'--wp-components-color-accent': '#123abc',
++				'--wp-components-color-accent-darker-10': '#0e2c8d',
++				'--wp-components-color-accent-darker-20': '#091d5f',
++			} );
++		} );
++
++		describe( 'unsupported values', () => {
++			it.each( [
++				// Keywords
++				'currentcolor',
++				'initial',
++				'reset',
++				'inherit',
++				'revert',
++				'unset',
++				// CSS Custom properties
++				'var( --my-variable )',
++			] )( 'should warn when the value is "%s"', ( accentValue ) => {
++				render( <Theme accent={ accentValue } /> );
++
++				expect( console ).toHaveWarned();
++			} );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/theme/types.ts b/packages/components/src/theme/types.ts
+new file mode 100644
+index 00000000000000..d031bb0fff3496
+--- /dev/null
++++ b/packages/components/src/theme/types.ts
+@@ -0,0 +1,21 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++export type ThemeProps = {
++	/**
++	 * Used to set the accent color (used by components as the primary color).
++	 *
++	 * If an accent color is not defined, the default fallback value is the original
++	 * WP Admin main theme color. No all valid CSS color syntaxes are supported —
++	 * in particular, keywords (like `'currentcolor'`, `'inherit'`, `'initial'`,
++	 * `'revert'`, `'unset'`...) and CSS custom properties (e.g.
++	 * `var(--my-custom-property)`) are _not_ supported values for this property.
++	 */
++	accent?: string;
++	/**
++	 * The children elements.
++	 */
++	children?: ReactNode;
++};
+diff --git a/packages/components/src/utils/theme-variables.scss b/packages/components/src/utils/theme-variables.scss
+new file mode 100644
+index 00000000000000..9e25f4a8c20b4b
+--- /dev/null
++++ b/packages/components/src/utils/theme-variables.scss
+@@ -0,0 +1,8 @@
++// Accent color
++//
++// If the `--wp-components-color-accent` variable is not defined, fallback to
++// `--wp-admin-theme-color`. If the `--wp-admin-theme-color` variable is not
++// defined, fallback to the default theme color (WP blue).
++$components-color-accent: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
++$components-color-accent-darker-10: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #006ba1));
++$components-color-accent-darker-20: var(--wp-components-color-accent-darker-20, var(--wp-admin-theme-color-darker-20, #005a87));

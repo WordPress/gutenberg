@@ -1,0 +1,43 @@
+diff --git a/packages/block-editor/src/components/url-popover/image-url-input-ui.js b/packages/block-editor/src/components/url-popover/image-url-input-ui.js
+index 2f849eaad78847..7caa218658b24c 100644
+--- a/packages/block-editor/src/components/url-popover/image-url-input-ui.js
++++ b/packages/block-editor/src/components/url-popover/image-url-input-ui.js
+@@ -249,6 +249,7 @@ const ImageURLInputUI = ( {
+ 				aria-expanded={ isOpen }
+ 				onClick={ openLinkUI }
+ 				ref={ setPopoverAnchor }
++				isActive={ !! url }
+ 			/>
+ 			{ isOpen && (
+ 				<URLPopover
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0ca8fb69cde4fd..e67981692d10e2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `Toolbar`: Remove CSS rule that prevented focus outline to be visible for toolbar buttons in the `:active` state. ([#56123](https://github.com/WordPress/gutenberg/pull/56123)).
++
+ ### Internal
+ 
+ -   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
+diff --git a/packages/components/src/toolbar/toolbar-button/style.scss b/packages/components/src/toolbar/toolbar-button/style.scss
+index 1f295c94a2c672..b90b1bec49dfdb 100644
+--- a/packages/components/src/toolbar/toolbar-button/style.scss
++++ b/packages/components/src/toolbar/toolbar-button/style.scss
+@@ -17,11 +17,6 @@
+ 		bottom: 10px;
+ 	}
+ 
+-	// Hide focus rectangle on click.
+-	&:active::before {
+-		display: none;
+-	}
+-
+ 	&:not(:disabled).is-pressed[data-subscript]::after {
+ 		color: $white;
+ 	}

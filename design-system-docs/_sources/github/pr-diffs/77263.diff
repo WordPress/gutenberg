@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 372cbca960e0bc..3bee0610472802 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -29,6 +29,7 @@
+ ### Code Quality
+ 
+ -   `Textarea`: remove unnecessary style [#77221](https://github.com/WordPress/gutenberg/pull/77221).
++-   `FormTokenField`: remove unnecessary style [#77263](https://github.com/WordPress/gutenberg/pull/77263).
+ 
+ ## 32.5.0 (2026-04-01)
+ 
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index a93bf012df9f9c..be8602db147a41 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -14,7 +14,6 @@
+ 		background: $components-color-gray-100;
+ 		border-color: $components-color-gray-400;
+ 		cursor: default;
+-		opacity: 1;
+ 	}
+ 
+ 	&.is-active {

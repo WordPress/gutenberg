@@ -1,0 +1,276 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 497399b9a484b5..32a0a853c04eb0 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -102,6 +102,7 @@ module.exports = {
+ 							'isFunction',
+ 							'isNil',
+ 							'isNumber',
++							'isObject',
+ 							'isObjectLike',
+ 							'isString',
+ 							'isUndefined',
+diff --git a/packages/block-editor/src/hooks/color.js b/packages/block-editor/src/hooks/color.js
+index 18bf33474531b0..d6534627c93c35 100644
+--- a/packages/block-editor/src/hooks/color.js
++++ b/packages/block-editor/src/hooks/color.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { isObject } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -55,13 +54,21 @@ const hasLinkColorSupport = ( blockType ) => {
+ 
+ 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+ 
+-	return isObject( colorSupport ) && !! colorSupport.link;
++	return (
++		colorSupport !== null &&
++		typeof colorSupport === 'object' &&
++		!! colorSupport.link
++	);
+ };
+ 
+ const hasGradientSupport = ( blockType ) => {
+ 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+ 
+-	return isObject( colorSupport ) && !! colorSupport.gradients;
++	return (
++		colorSupport !== null &&
++		typeof colorSupport === 'object' &&
++		!! colorSupport.gradients
++	);
+ };
+ 
+ const hasBackgroundColorSupport = ( blockType ) => {
+diff --git a/packages/block-editor/src/hooks/utils.js b/packages/block-editor/src/hooks/utils.js
+index 4d826f8cb759f0..6b0c9be6e70845 100644
+--- a/packages/block-editor/src/hooks/utils.js
++++ b/packages/block-editor/src/hooks/utils.js
+@@ -4,7 +4,6 @@
+ import {
+ 	pickBy,
+ 	isEmpty,
+-	isObject,
+ 	mapValues,
+ 	forEach,
+ 	get,
+@@ -27,7 +26,11 @@ const identity = ( x ) => x;
+  * @return {*} Object cleaned from falsy values
+  */
+ export const cleanEmptyObject = ( object ) => {
+-	if ( ! isObject( object ) || Array.isArray( object ) ) {
++	if (
++		object === null ||
++		typeof object !== 'object' ||
++		Array.isArray( object )
++	) {
+ 		return object;
+ 	}
+ 	const cleanedNestedObjects = pickBy(
+diff --git a/packages/block-library/src/utils/clean-empty-object.js b/packages/block-library/src/utils/clean-empty-object.js
+index 56e34199eea3e2..f1a897a91b9f4b 100644
+--- a/packages/block-library/src/utils/clean-empty-object.js
++++ b/packages/block-library/src/utils/clean-empty-object.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEmpty, isObject, mapValues, pickBy } from 'lodash';
++import { isEmpty, mapValues, pickBy } from 'lodash';
+ 
+ const identity = ( x ) => x;
+ 
+@@ -12,7 +12,11 @@ const identity = ( x ) => x;
+  * @return {Object} Object cleaned from empty nodes.
+  */
+ const cleanEmptyObject = ( object ) => {
+-	if ( ! isObject( object ) || Array.isArray( object ) ) {
++	if (
++		object === null ||
++		typeof object !== 'object' ||
++		Array.isArray( object )
++	) {
+ 		return object;
+ 	}
+ 	const cleanedNestedObjects = pickBy(
+diff --git a/packages/blocks/src/api/registration.js b/packages/blocks/src/api/registration.js
+index 0d9d5ce575f39e..95ab93e4c47f83 100644
+--- a/packages/blocks/src/api/registration.js
++++ b/packages/blocks/src/api/registration.js
+@@ -3,7 +3,7 @@
+ /**
+  * External dependencies
+  */
+-import { camelCase, isEmpty, isObject, mapKeys, pick, pickBy } from 'lodash';
++import { camelCase, isEmpty, mapKeys, pick, pickBy } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -131,6 +131,10 @@ import { store as blocksStore } from '../store';
+ 
+ export const serverSideBlockDefinitions = {};
+ 
++function isObject( object ) {
++	return object !== null && typeof object === 'object';
++}
++
+ /**
+  * Sets the server side block definition of blocks.
+  *
+diff --git a/packages/blocks/src/api/serializer.js b/packages/blocks/src/api/serializer.js
+index d2f1681be97cbb..690220dbaf6910 100644
+--- a/packages/blocks/src/api/serializer.js
++++ b/packages/blocks/src/api/serializer.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
++import { isEmpty, reduce, castArray, startsWith } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -142,7 +142,8 @@ export function getSaveElement(
+ 	let element = save( { attributes, innerBlocks } );
+ 
+ 	if (
+-		isObject( element ) &&
++		element !== null &&
++		typeof element === 'object' &&
+ 		hasFilter( 'blocks.getSaveContent.extraProps' ) &&
+ 		! ( blockType.apiVersion > 1 )
+ 	) {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9bf6b3b4de816f..e73f78d301692d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -30,6 +30,7 @@
+ -   `Autocomplete`: Refactor away from `_.deburr()` ([#42266](https://github.com/WordPress/gutenberg/pull/42266/)).
+ -   `MenuItem`: Refactor away from `_.isString()` ([#42268](https://github.com/WordPress/gutenberg/pull/42268/)).
+ -   `Shortcut`: Refactor away from `_.isString()` ([#42268](https://github.com/WordPress/gutenberg/pull/42268/)).
++-   `Shortcut`: Refactor away from `_.isObject()` ([#42336](https://github.com/WordPress/gutenberg/pull/42336/)).
+ -   `RangeControl`: Convert to TypeScript ([#40535](https://github.com/WordPress/gutenberg/pull/40535)).
+ -   `ExternalLink`: Refactor away from Lodash ([#42341](https://github.com/WordPress/gutenberg/pull/42341/)).
+ 
+diff --git a/packages/components/src/shortcut/index.js b/packages/components/src/shortcut/index.js
+index 89d2c395cd45e5..4685d8a35c5afb 100644
+--- a/packages/components/src/shortcut/index.js
++++ b/packages/components/src/shortcut/index.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { isObject } from 'lodash';
+-
+ /** @typedef {string | { display: string, ariaLabel: string }} Shortcut */
+ /**
+  * @typedef Props
+@@ -26,7 +21,7 @@ function Shortcut( { shortcut, className } ) {
+ 		displayText = shortcut;
+ 	}
+ 
+-	if ( isObject( shortcut ) ) {
++	if ( shortcut !== null && typeof shortcut === 'object' ) {
+ 		displayText = shortcut.display;
+ 		ariaLabel = shortcut.ariaLabel;
+ 	}
+diff --git a/packages/create-block/lib/templates.js b/packages/create-block/lib/templates.js
+index 8f406e32eff0d0..df574666ed814d 100644
+--- a/packages/create-block/lib/templates.js
++++ b/packages/create-block/lib/templates.js
+@@ -6,7 +6,7 @@ const glob = require( 'fast-glob' );
+ const { resolve } = require( 'path' );
+ const { existsSync } = require( 'fs' );
+ const { mkdtemp, readFile } = require( 'fs' ).promises;
+-const { fromPairs, isObject } = require( 'lodash' );
++const { fromPairs } = require( 'lodash' );
+ const npmPackageArg = require( 'npm-package-arg' );
+ const { tmpdir } = require( 'os' );
+ const { join } = require( 'path' );
+@@ -103,7 +103,7 @@ const configToTemplate = async ( {
+ 	assetsPath,
+ 	...deprecated
+ } ) => {
+-	if ( ! isObject( defaultValues ) ) {
++	if ( defaultValues === null || typeof defaultValues !== 'object' ) {
+ 		throw new CLIError( 'Template found but invalid definition provided.' );
+ 	}
+ 
+diff --git a/packages/data/src/controls.js b/packages/data/src/controls.js
+index 7aef53fd41d55b..508dba8e50c40d 100644
+--- a/packages/data/src/controls.js
++++ b/packages/data/src/controls.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { isObject } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -14,6 +9,10 @@ const SELECT = '@@data/SELECT';
+ const RESOLVE_SELECT = '@@data/RESOLVE_SELECT';
+ const DISPATCH = '@@data/DISPATCH';
+ 
++function isObject( object ) {
++	return object !== null && typeof object === 'object';
++}
++
+ /**
+  * Dispatches a control action for triggering a synchronous registry select.
+  *
+diff --git a/packages/data/src/registry.js b/packages/data/src/registry.js
+index 41df77117ada7e..f94e2dda9b845f 100644
+--- a/packages/data/src/registry.js
++++ b/packages/data/src/registry.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { mapValues, isObject, forEach } from 'lodash';
++import { mapValues, forEach } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -43,6 +43,10 @@ import { createEmitter } from './utils/emitter';
+  * @property {Function} registerStore registers store.
+  */
+ 
++function isObject( object ) {
++	return object !== null && typeof object === 'object';
++}
++
+ /**
+  * Creates a new store registry, given an optional object of initial store
+  * configurations.
+diff --git a/packages/edit-site/src/components/global-styles/global-styles-provider.js b/packages/edit-site/src/components/global-styles/global-styles-provider.js
+index 4ec0ad2e531ef0..ec1cf726c316f8 100644
+--- a/packages/edit-site/src/components/global-styles/global-styles-provider.js
++++ b/packages/edit-site/src/components/global-styles/global-styles-provider.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { mergeWith, pickBy, isEmpty, isObject, mapValues } from 'lodash';
++import { mergeWith, pickBy, isEmpty, mapValues } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -31,7 +31,11 @@ export function mergeBaseAndUserConfigs( base, user ) {
+ }
+ 
+ const cleanEmptyObject = ( object ) => {
+-	if ( ! isObject( object ) || Array.isArray( object ) ) {
++	if (
++		object === null ||
++		typeof object !== 'object' ||
++		Array.isArray( object )
++	) {
+ 		return object;
+ 	}
+ 	const cleanedNestedObjects = pickBy(

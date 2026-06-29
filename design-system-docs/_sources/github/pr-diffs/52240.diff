@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/notice/style.scss b/packages/components/src/notice/style.scss
+index 23378cefe1ec63..ebd76d35ce7065 100644
+--- a/packages/components/src/notice/style.scss
++++ b/packages/components/src/notice/style.scss
+@@ -9,7 +9,6 @@
+ 	align-items: center;
+ 
+ 	&.is-dismissible {
+-		padding-right: 36px;
+ 		position: relative;
+ 	}
+ 

@@ -1,0 +1,137 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index facbc86f3122e2..a3c604d658b991 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ -   `ResizableBox`: Make tooltip background match `Tooltip` component's ([#42800](https://github.com/WordPress/gutenberg/pull/42800)).
+ -   `UnitControl`: Update unit dropdown design for the large size variant ([#42000](https://github.com/WordPress/gutenberg/pull/42000)).
+ -   `BaseControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
++-   `BoxControl`: Export `applyValueToSides` util function. ([#42733](https://github.com/WordPress/gutenberg/pull/42733/)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/box-control/all-input-control.js b/packages/components/src/box-control/all-input-control.js
+index 5a1c8cbb07048e..fcde202fd7de8f 100644
+--- a/packages/components/src/box-control/all-input-control.js
++++ b/packages/components/src/box-control/all-input-control.js
+@@ -3,8 +3,8 @@
+  */
+ import UnitControl from './unit-control';
+ import {
+-	ALL_SIDES,
+ 	LABELS,
++	applyValueToSides,
+ 	getAllValue,
+ 	isValuesMixed,
+ 	isValuesDefined,
+@@ -32,34 +32,10 @@ export default function AllInputControl( {
+ 		onFocus( event, { side: 'all' } );
+ 	};
+ 
+-	// Applies a value to an object representing top, right, bottom and left
+-	// sides while taking into account any custom side configuration.
+-	const applyValueToSides = ( currentValues, newValue ) => {
+-		const newValues = { ...currentValues };
+-
+-		if ( sides?.length ) {
+-			sides.forEach( ( side ) => {
+-				if ( side === 'vertical' ) {
+-					newValues.top = newValue;
+-					newValues.bottom = newValue;
+-				} else if ( side === 'horizontal' ) {
+-					newValues.left = newValue;
+-					newValues.right = newValue;
+-				} else {
+-					newValues[ side ] = newValue;
+-				}
+-			} );
+-		} else {
+-			ALL_SIDES.forEach( ( side ) => ( newValues[ side ] = newValue ) );
+-		}
+-
+-		return newValues;
+-	};
+-
+ 	const handleOnChange = ( next ) => {
+ 		const isNumeric = ! isNaN( parseFloat( next ) );
+ 		const nextValue = isNumeric ? next : undefined;
+-		const nextValues = applyValueToSides( values, nextValue );
++		const nextValues = applyValueToSides( values, nextValue, sides );
+ 
+ 		onChange( nextValues );
+ 	};
+@@ -67,7 +43,7 @@ export default function AllInputControl( {
+ 	// Set selected unit so it can be used as fallback by unlinked controls
+ 	// when individual sides do not have a value containing a unit.
+ 	const handleOnUnitChange = ( unit ) => {
+-		const newUnits = applyValueToSides( selectedUnits, unit );
++		const newUnits = applyValueToSides( selectedUnits, unit, sides );
+ 		setSelectedUnits( newUnits );
+ 	};
+ 
+diff --git a/packages/components/src/box-control/index.js b/packages/components/src/box-control/index.js
+index a8411ba9a1af30..841c22bc33ffe8 100644
+--- a/packages/components/src/box-control/index.js
++++ b/packages/components/src/box-control/index.js
+@@ -173,3 +173,5 @@ export default function BoxControl( {
+ 		</Root>
+ 	);
+ }
++
++export { applyValueToSides } from './utils';
+diff --git a/packages/components/src/box-control/utils.js b/packages/components/src/box-control/utils.js
+index 248f5bc48b621a..1053e8ff81998a 100644
+--- a/packages/components/src/box-control/utils.js
++++ b/packages/components/src/box-control/utils.js
+@@ -194,3 +194,35 @@ export function normalizeSides( sides ) {
+ 
+ 	return filteredSides;
+ }
++
++/**
++ * Applies a value to an object representing top, right, bottom and left sides
++ * while taking into account any custom side configuration.
++ *
++ * @param {Object}        currentValues The current values for each side.
++ * @param {string|number} newValue      The value to apply to the sides object.
++ * @param {string[]}      sides         Array defining valid sides.
++ *
++ * @return {Object} Object containing the updated values for each side.
++ */
++export function applyValueToSides( currentValues, newValue, sides ) {
++	const newValues = { ...currentValues };
++
++	if ( sides?.length ) {
++		sides.forEach( ( side ) => {
++			if ( side === 'vertical' ) {
++				newValues.top = newValue;
++				newValues.bottom = newValue;
++			} else if ( side === 'horizontal' ) {
++				newValues.left = newValue;
++				newValues.right = newValue;
++			} else {
++				newValues[ side ] = newValue;
++			}
++		} );
++	} else {
++		ALL_SIDES.forEach( ( side ) => ( newValues[ side ] = newValue ) );
++	}
++
++	return newValues;
++}
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index e380338ac14ebf..71d2fb2144f25c 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -30,7 +30,10 @@ export {
+ 	isEmptyBorder as __experimentalIsEmptyBorder,
+ } from './border-box-control';
+ export { BorderControl as __experimentalBorderControl } from './border-control';
+-export { default as __experimentalBoxControl } from './box-control';
++export {
++	default as __experimentalBoxControl,
++	applyValueToSides as __experimentalApplyValueToSides,
++} from './box-control';
+ export { default as Button } from './button';
+ export { default as ButtonGroup } from './button-group';
+ export {

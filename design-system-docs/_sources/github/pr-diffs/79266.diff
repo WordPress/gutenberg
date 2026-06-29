@@ -1,0 +1,4394 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 2e1eccbcf69b31..44f4f344685e35 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -51,75 +51,6 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+ }
+ 
+ .emotion-8 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  -webkit-align-items: stretch;
+-  -webkit-box-align: stretch;
+-  -ms-flex-align: stretch;
+-  align-items: stretch;
+-  -webkit-flex-direction: column;
+-  -ms-flex-direction: column;
+-  flex-direction: column;
+-  gap: calc(4px * 3);
+-  -webkit-box-pack: center;
+-  -ms-flex-pack: center;
+-  -webkit-justify-content: center;
+-  justify-content: center;
+-}
+-
+-.emotion-8>* {
+-  min-height: 0;
+-}
+-
+-.emotion-10 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  -webkit-align-items: stretch;
+-  -webkit-box-align: stretch;
+-  -ms-flex-align: stretch;
+-  align-items: stretch;
+-  -webkit-flex-direction: column;
+-  -ms-flex-direction: column;
+-  flex-direction: column;
+-  gap: 0;
+-  -webkit-box-pack: center;
+-  -ms-flex-pack: center;
+-  -webkit-justify-content: center;
+-  justify-content: center;
+-}
+-
+-.emotion-10>* {
+-  min-height: 0;
+-}
+-
+-.emotion-12 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  -webkit-align-items: stretch;
+-  -webkit-box-align: stretch;
+-  -ms-flex-align: stretch;
+-  align-items: stretch;
+-  -webkit-flex-direction: column;
+-  -ms-flex-direction: column;
+-  flex-direction: column;
+-  gap: calc(4px * 0.5);
+-  -webkit-box-pack: center;
+-  -ms-flex-pack: center;
+-  -webkit-justify-content: center;
+-  justify-content: center;
+-}
+-
+-.emotion-12>* {
+-  min-height: 0;
+-}
+-
+-.emotion-14 {
+   display: block;
+   overflow: hidden;
+   text-overflow: ellipsis;
+@@ -156,46 +87,54 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+             class="block-editor-color-gradient-control__panel"
+           >
+             <div
+-              class="components-flex components-h-stack components-v-stack emotion-8 emotion-5"
+-              data-wp-c16t="true"
+-              data-wp-component="VStack"
++              style="gap: var(--wpds-dimension-gap-md); flex-direction: column;"
+             >
+               <div
+                 class="components-dropdown"
+                 tabindex="-1"
+               >
+                 <div
+-                  class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-wrapper emotion-10 emotion-5"
+-                  data-wp-c16t="true"
+-                  data-wp-component="VStack"
++                  class="components-color-palette__custom-color-wrapper"
++                  style="flex-direction: column;"
+                 >
+                   <button
+                     aria-expanded="false"
+-                    aria-haspopup="true"
++                    aria-haspopup="dialog"
+                     aria-label="Custom color picker. The currently selected color is called "red" and has a value of "#f00"."
+                     class="components-color-palette__custom-color-button"
+                     style="background: rgb(255, 0, 0);"
+                     type="button"
+                   />
+                   <div
+-                    class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper emotion-12 emotion-5"
+-                    data-wp-c16t="true"
+-                    data-wp-component="VStack"
++                    class="components-color-palette__custom-color-text-wrapper"
++                    style="gap: var(--wpds-dimension-gap-xs); flex-direction: column;"
+                   >
+-                    <span
+-                      class="components-truncate components-color-palette__custom-color-name emotion-14 emotion-5"
+-                      data-wp-c16t="true"
+-                      data-wp-component="Truncate"
+-                    >
+-                      red
+-                    </span>
+-                    <span
+-                      class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
+-                      data-wp-c16t="true"
+-                      data-wp-component="Truncate"
++                    <div
++                      class="components-color-palette__info-row"
++                      style="gap: var(--wpds-dimension-gap-sm); align-items: center; flex-direction: row;"
+                     >
+-                      #f00
+-                    </span>
++                      <div
++                        class="components-color-palette__info-row-text"
++                        style="gap: var(--wpds-dimension-gap-xs); flex-direction: column;"
++                      >
++                        <span
++                          class="components-truncate components-color-palette__custom-color-name emotion-8 emotion-5"
++                          data-wp-c16t="true"
++                          data-wp-component="Truncate"
++                          title="red"
++                        >
++                          red
++                        </span>
++                        <span
++                          class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-8 emotion-5"
++                          data-wp-c16t="true"
++                          data-wp-component="Truncate"
++                          title="#f00"
++                        >
++                          #f00
++                        </span>
++                      </div>
++                    </div>
+                   </div>
+                 </div>
+               </div>
+diff --git a/packages/block-editor/src/components/colors-gradients/control.js b/packages/block-editor/src/components/colors-gradients/control.js
+index 5b384e774080e0..51840aa6288be9 100644
+--- a/packages/block-editor/src/components/colors-gradients/control.js
++++ b/packages/block-editor/src/components/colors-gradients/control.js
+@@ -21,7 +21,9 @@ import {
+ import { useSettings } from '../use-settings';
+ import { unlock } from '../../lock-unlock';
+ 
+-const { Tabs } = unlock( componentsPrivateApis );
++const { Tabs, colorEditingKey, isColorEditingEnabled } = unlock(
++	componentsPrivateApis
++);
+ const colorsAndGradientKeys = [
+ 	'colors',
+ 	'disableCustomColors',
+@@ -48,6 +50,7 @@ function ColorGradientControlInner( {
+ 	showTitle = true,
+ 	enableAlpha,
+ 	headingLevel,
++	colorEditing,
+ } ) {
+ 	const canChooseAColor =
+ 		onColorChange &&
+@@ -80,6 +83,11 @@ function ColorGradientControlInner( {
+ 				clearable={ clearable }
+ 				enableAlpha={ enableAlpha }
+ 				headingLevel={ headingLevel }
++				{ ...( isColorEditingEnabled( colorEditing, {
++					requireCallbacks: true,
++				} )
++					? { [ colorEditingKey ]: colorEditing }
++					: {} ) }
+ 			/>
+ 		),
+ 		[ TAB_IDS.gradient ]: (
+diff --git a/packages/block-editor/src/components/global-styles/color-panel.js b/packages/block-editor/src/components/global-styles/color-panel.js
+index ee86293babf122..2803c36f0a84be 100644
+--- a/packages/block-editor/src/components/global-styles/color-panel.js
++++ b/packages/block-editor/src/components/global-styles/color-panel.js
+@@ -19,20 +19,24 @@ import {
+ 	Button,
+ 	privateApis as componentsPrivateApis,
+ } from '@wordpress/components';
+-import { useMemo, useRef } from '@wordpress/element';
++import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import { getValueFromVariable } from '@wordpress/global-styles-engine';
+ import { reset as resetIcon } from '@wordpress/icons';
++import { useSelect } from '@wordpress/data';
+ 
+ /**
+  * Internal dependencies
+  */
+ import ColorGradientControl from '../colors-gradients/control';
+ import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
++import { useStyleOverride } from '../../hooks/utils';
+ import { useToolsPanelDropdownMenuProps } from './utils';
+ import { setImmutably } from '../../utils/object';
+ import { extractPresetSlug } from '../../utils/color-values';
+ import { unlock } from '../../lock-unlock';
++import { store as blockEditorStore } from '../../store';
++import { colorEditingSettingsKey } from '../../store/private-keys';
+ 
+ export function useHasColorPanel( settings ) {
+ 	const hasTextPanel = useHasTextPanel( settings );
+@@ -225,6 +229,15 @@ function ColorPanelTab( {
+ 	);
+ }
+ 
++// Hosts (e.g. @wordpress/editor) supply palette editing at `settings.color[ colorEditingSettingsKey ]`.
++// Read from the block-editor store to sync in real time. `useSettings` only reflects theme.json and misses this config.
++function useHostColorEditingSettings() {
++	return useSelect( ( select ) => {
++		const settings = select( blockEditorStore ).getSettings();
++		return settings?.color?.[ colorEditingSettingsKey ];
++	}, [] );
++}
++
+ export function ColorPanelDropdown( {
+ 	label,
+ 	hasValue,
+@@ -357,6 +370,43 @@ export default function ColorPanel( {
+ } ) {
+ 	const colors = useColorsPerOrigin( settings );
+ 	const gradients = useGradientsPerOrigin( settings );
++	const hostColorEditing = useHostColorEditingSettings();
++	const [ palettePreview, setPalettePreview ] = useState( null );
++
++	const onPreview = useCallback( ( payload ) => {
++		setPalettePreview(
++			payload ? { slug: payload.slug, color: payload.color } : null
++		);
++	}, [] );
++
++	const previewCss = useMemo( () => {
++		if ( ! palettePreview ) {
++			return undefined;
++		}
++		const { slug, color } = palettePreview;
++		// Validate slug and color before embedding them in CSS.
++		if ( ! /^[a-zA-Z0-9_-]+$/.test( slug ) ) {
++			return undefined;
++		}
++		const trimmedColor = color.trim();
++		if (
++			/[;{}]/.test( trimmedColor ) ||
++			! /^[\w#(),.%\s-]+$/.test( trimmedColor )
++		) {
++			return undefined;
++		}
++		return `body{--wp--preset--color--${ slug }:${ trimmedColor };}`;
++	}, [ palettePreview ] );
++
++	// Shared across text/background/link pickers; only one dropdown can be open
++	// at a time, so a single preview state cannot be clobbered by another picker.
++	useStyleOverride( { id: 'color-palette-value-preview', css: previewCss } );
++
++	const colorEditing = useMemo(
++		() =>
++			hostColorEditing ? { ...hostColorEditing, onPreview } : undefined,
++		[ hostColorEditing, onPreview ]
++	);
+ 	const areCustomSolidsEnabled = settings?.color?.custom;
+ 	const areCustomGradientsEnabled = settings?.color?.customGradient;
+ 	const hasSolidColors = colors.length > 0 || areCustomSolidsEnabled;
+@@ -836,6 +886,7 @@ export default function ColorPanel( {
+ 							disableCustomColors: ! areCustomSolidsEnabled,
+ 							gradients,
+ 							disableCustomGradients: ! areCustomGradientsEnabled,
++							colorEditing,
+ 						} }
+ 						panelId={ panelId }
+ 					/>
+diff --git a/packages/block-editor/src/components/global-styles/hooks.js b/packages/block-editor/src/components/global-styles/hooks.js
+index 604863722d0f63..225b3fda2be490 100644
+--- a/packages/block-editor/src/components/global-styles/hooks.js
++++ b/packages/block-editor/src/components/global-styles/hooks.js
+@@ -225,6 +225,7 @@ export function useColorsPerOrigin( settings ) {
+ 					'Theme',
+ 					'Indicates this palette comes from the theme.'
+ 				),
++				slug: 'theme',
+ 				colors: themeColors,
+ 			} );
+ 		}
+@@ -238,6 +239,7 @@ export function useColorsPerOrigin( settings ) {
+ 					'Default',
+ 					'Indicates this palette comes from WordPress.'
+ 				),
++				slug: 'default',
+ 				colors: defaultColors,
+ 			} );
+ 		}
+@@ -247,6 +249,7 @@ export function useColorsPerOrigin( settings ) {
+ 					'Custom',
+ 					'Indicates this palette is created by the user.'
+ 				),
++				slug: 'custom',
+ 				colors: customColors,
+ 			} );
+ 		}
+diff --git a/packages/block-editor/src/hooks/contrast-checker.js b/packages/block-editor/src/hooks/contrast-checker.js
+index 42f910e0c3d534..e7712bf4996316 100644
+--- a/packages/block-editor/src/hooks/contrast-checker.js
++++ b/packages/block-editor/src/hooks/contrast-checker.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useLayoutEffect, useReducer } from '@wordpress/element';
++import { useLayoutEffect, useReducer, useRef } from '@wordpress/element';
+ import { useSelect } from '@wordpress/data';
+ import { store as blocksStore } from '@wordpress/blocks';
+ import { getBlockSelector } from '@wordpress/global-styles-engine';
+@@ -11,6 +11,8 @@ import { getBlockSelector } from '@wordpress/global-styles-engine';
+  */
+ import ContrastChecker from '../components/contrast-checker';
+ import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
++import { store as blockEditorStore } from '../store';
++import { unlock } from '../lock-unlock';
+ 
+ function getComputedValue( node, property ) {
+ 	return node.ownerDocument.defaultView
+@@ -93,6 +95,15 @@ export default function BlockColorContrastChecker( { clientId, name } ) {
+ 		[ name ]
+ 	);
+ 
++	// Injected style overrides (palette previews, etc.) change colors without DOM mutations,
++	// so also watch `getStyleOverrides` to re-render contrast checks.
++	useSelect(
++		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
++		[]
++	);
++
++	const rafHandlesRef = useRef( [] );
++
+ 	// There are so many things that can change the color of a block
+ 	// So we perform this check on every render.
+ 	useLayoutEffect( () => {
+@@ -100,13 +111,22 @@ export default function BlockColorContrastChecker( { clientId, name } ) {
+ 			return;
+ 		}
+ 
+-		// Combine `useLayoutEffect` and two rAF calls to ensure that values are read
+-		// after the current paint but before the next paint.
+-		window.requestAnimationFrame( () =>
+-			window.requestAnimationFrame( () =>
++		// Combine `useLayoutEffect` and two rAF calls to ensure that values
++		// are read after the current paint but before the next paint.
++		const outer = window.requestAnimationFrame( () => {
++			const inner = window.requestAnimationFrame( () =>
+ 				setColors( getBlockElementColors( blockEl, blockType ) )
+-			)
+-		);
++			);
++			rafHandlesRef.current.push( inner );
++		} );
++		rafHandlesRef.current.push( outer );
++
++		return () => {
++			rafHandlesRef.current.forEach( ( handle ) =>
++				window.cancelAnimationFrame( handle )
++			);
++			rafHandlesRef.current = [];
++		};
+ 	} );
+ 
+ 	// Runs in its own effect with dependencies so the observer is only
+diff --git a/packages/block-editor/src/private-apis.js b/packages/block-editor/src/private-apis.js
+index 7bccf12d758386..fe8bfa8f7eacb2 100644
+--- a/packages/block-editor/src/private-apis.js
++++ b/packages/block-editor/src/private-apis.js
+@@ -58,6 +58,7 @@ import {
+ 	isNavigationPostEditorKey,
+ 	mediaUploadOnSuccessKey,
+ 	openMediaEditorModalKey,
++	colorEditingSettingsKey,
+ } from './store/private-keys';
+ import { requiresWrapperOnCopy } from './components/writing-flow/utils';
+ import { PrivateRichText } from './components/rich-text/';
+@@ -147,6 +148,7 @@ lock( privateApis, {
+ 	isNavigationPostEditorKey,
+ 	mediaUploadOnSuccessKey,
+ 	openMediaEditorModalKey,
++	colorEditingSettingsKey,
+ 	useBlockElement,
+ 	useBlockElementRef,
+ 	LinkPicker,
+diff --git a/packages/block-editor/src/store/private-keys.js b/packages/block-editor/src/store/private-keys.js
+index 24622db120daea..ccc1c4078b8804 100644
+--- a/packages/block-editor/src/store/private-keys.js
++++ b/packages/block-editor/src/store/private-keys.js
+@@ -17,3 +17,4 @@ export const isNavigationOverlayContextKey = Symbol(
+ export const isNavigationPostEditorKey = Symbol( 'isNavigationPostEditor' );
+ export const mediaUploadOnSuccessKey = Symbol( 'mediaUploadOnSuccess' );
+ export const openMediaEditorModalKey = Symbol( 'openMediaEditorModal' );
++export const colorEditingSettingsKey = Symbol( 'colorEditingSettings' );
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2d2fa59bc2a8ff..953dbab7658fca 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,11 +10,13 @@
+ ### Bug Fixes
+ 
+ -   `SandBox`: Fix the viewport-unit (`vh`, `vw`, etc.) stripping so user-supplied HTML using these units in `width`/`height` no longer triggers a runaway resize loop in the preview ([#78677](https://github.com/WordPress/gutenberg/pull/78677)).
++-   `ColorPicker`: Fix value flicker when changing colors rapidly, most noticeable in Firefox ([#79266](https://github.com/WordPress/gutenberg/pull/79266)).
+ 
+ ### Internal
+ 
+ -   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
+ -   Point the legacy `--wp-components-*` color fallbacks at the design system tokens (`--wpds-*` / `--wp-admin-theme-color*`), so component styles get sensible defaults from the prebuilt token stylesheet without a runtime `<ThemeProvider>` ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
++-   `ColorPalette`: Add a private API for inline palette color editing. ([#79266](https://github.com/WordPress/gutenberg/pull/79266)).
+ 
+ ### Code Quality
+ 
+diff --git a/packages/components/src/color-palette/README.md b/packages/components/src/color-palette/README.md
+index 0fbfbd4d710013..60086e5a3d9150 100644
+--- a/packages/components/src/color-palette/README.md
++++ b/packages/components/src/color-palette/README.md
+@@ -58,6 +58,13 @@ choices (defined via the `colors` prop).
+ -   Required: No
+ -   Default: `false`
+ 
++### Private APIs
++
++Inline palette editing (add, rename, recolor, delete) is available to
++first-party WordPress packages via a symbol-keyed private prop on
++`ColorPalette`. It is intentionally not part of the public component API. See
++the **WithPaletteEditing** Storybook story for a demonstration.
++
+ ### `enableAlpha`: `boolean`
+ 
+ This controls whether the alpha channel will be offered when selecting custom
+diff --git a/packages/components/src/color-palette/color-editing-controls.tsx b/packages/components/src/color-palette/color-editing-controls.tsx
+new file mode 100644
+index 00000000000000..54d0b518a05cd0
+--- /dev/null
++++ b/packages/components/src/color-palette/color-editing-controls.tsx
+@@ -0,0 +1,519 @@
++/**
++ * External dependencies
++ */
++import clsx from 'clsx';
++import type { FormEvent, MouseEvent, RefObject } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
++import { __, sprintf } from '@wordpress/i18n';
++import {
++	useCallback,
++	useContext,
++	useEffect,
++	useMemo,
++	useRef,
++	useState,
++} from '@wordpress/element';
++import { pencil, plus, trash } from '@wordpress/icons';
++import { Text, Stack } from '@wordpress/ui';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../button';
++import { CircularOptionPickerContext } from '../circular-option-picker/circular-option-picker-context';
++import { Composite } from '../composite';
++import { Truncate } from '../truncate';
++import { TextControl } from '../text-control';
++import type { AddFormInitialFocus } from './use-color-editing';
++import { colorsAreEqual } from './utils';
++
++type FormMode = 'add' | 'edit';
++
++function onClickWithTarget(
++	onClick: ( trigger: HTMLElement ) => void
++): ( event: MouseEvent< HTMLButtonElement > ) => void {
++	return ( event ) => onClick( event.currentTarget );
++}
++
++function useEscapeToCancel(
++	onCancel: () => void,
++	formRef: RefObject< HTMLFormElement | null >,
++	shouldClosePickerInstead?: () => boolean,
++	onClosePicker?: () => void
++) {
++	useEffect( () => {
++		const handleDocumentKeyDown = ( event: globalThis.KeyboardEvent ) => {
++			if ( event.key !== 'Escape' ) {
++				return;
++			}
++			const form = formRef.current;
++			if ( ! form?.contains( event.target as Node ) ) {
++				return;
++			}
++			event.preventDefault();
++			event.stopPropagation();
++			if ( shouldClosePickerInstead?.() && onClosePicker ) {
++				onClosePicker();
++				return;
++			}
++			onCancel();
++		};
++		document.addEventListener( 'keydown', handleDocumentKeyDown );
++		return () =>
++			document.removeEventListener( 'keydown', handleDocumentKeyDown );
++	}, [ onCancel, formRef, shouldClosePickerInstead, onClosePicker ] );
++}
++
++function FormActions( {
++	onCancel,
++	confirmLabel,
++	isDestructive = false,
++	disabled = false,
++	className,
++	submitRef,
++}: {
++	onCancel: () => void;
++	confirmLabel: string;
++	isDestructive?: boolean;
++	disabled?: boolean;
++	className?: string;
++	submitRef?: RefObject< HTMLButtonElement | null >;
++} ) {
++	return (
++		<Stack
++			direction="row"
++			gap="sm"
++			justify="flex-end"
++			className={ className }
++		>
++			<Button
++				__next40pxDefaultSize
++				variant="tertiary"
++				size="compact"
++				onClick={ onCancel }
++			>
++				{ __( 'Cancel' ) }
++			</Button>
++			<Button
++				ref={ submitRef }
++				__next40pxDefaultSize
++				variant="primary"
++				size="compact"
++				type="submit"
++				isDestructive={ isDestructive }
++				accessibleWhenDisabled
++				disabled={ disabled }
++			>
++				{ confirmLabel }
++			</Button>
++		</Stack>
++	);
++}
++
++type DefaultInfoRowProps = {
++	name: string;
++	displayValue?: string;
++	isHex?: boolean;
++	canEdit: boolean;
++	canDelete: boolean;
++	canAdd: boolean;
++	onEdit: () => void;
++	onDelete: () => void;
++	onAdd: ( trigger: HTMLElement ) => void;
++};
++
++/**
++ * The default state of the info row beneath the top color preview block:
++ * the selected color's name and value, plus pencil/trash buttons when the
++ * selected entry is editable.
++ */
++export function DefaultInfoRow( {
++	name,
++	displayValue,
++	isHex,
++	canEdit,
++	canDelete,
++	canAdd,
++	onEdit,
++	onDelete,
++	onAdd,
++}: DefaultInfoRowProps ) {
++	return (
++		<Stack
++			className="components-color-palette__info-row"
++			direction="row"
++			gap="sm"
++			align="center"
++		>
++			<Stack
++				className="components-color-palette__info-row-text"
++				direction="column"
++				gap="xs"
++			>
++				<Truncate
++					className="components-color-palette__custom-color-name"
++					title={ name }
++				>
++					{ name }
++				</Truncate>
++				<Truncate
++					className={ clsx(
++						'components-color-palette__custom-color-value',
++						{
++							'components-color-palette__custom-color-value--is-hex':
++								isHex,
++						}
++					) }
++					title={ displayValue }
++				>
++					{ displayValue }
++				</Truncate>
++			</Stack>
++			{ ( canEdit || canDelete || canAdd ) && (
++				<Stack direction="row" gap="xs" justify="flex-end">
++					{ canAdd && (
++						<Button
++							__next40pxDefaultSize
++							size="small"
++							icon={ plus }
++							label={ __( 'Add to custom' ) }
++							showTooltip
++							onClick={ onClickWithTarget( onAdd ) }
++						/>
++					) }
++					{ canEdit && (
++						<Button
++							__next40pxDefaultSize
++							size="small"
++							icon={ pencil }
++							label={ sprintf(
++								// translators: %s: name of the color.
++								__( 'Edit color: %s' ),
++								name
++							) }
++							showTooltip
++							onClick={ onEdit }
++						/>
++					) }
++					{ canDelete && (
++						<Button
++							__next40pxDefaultSize
++							size="small"
++							icon={ trash }
++							label={ sprintf(
++								// translators: %s: name of the custom color.
++								__( 'Delete custom color: %s' ),
++								name
++							) }
++							showTooltip
++							onClick={ onDelete }
++						/>
++					) }
++				</Stack>
++			) }
++		</Stack>
++	);
++}
++
++type ColorEditFormProps = {
++	mode: FormMode;
++	hex?: string;
++	originalName?: string;
++	originalColor?: string;
++	initialName: string;
++	canRename: boolean;
++	initialFocus?: AddFormInitialFocus;
++	onCancel: () => void;
++	onSubmit: ( name: string ) => void;
++};
++
++/**
++ * Inline form rendered in place of the info row when adding or editing a
++ * palette color. Shows the live hex value above a name input (or static name
++ * when renaming is not allowed), plus a Cancel/Save (or Add) pair aligned
++ * right.
++ */
++export function ColorEditForm( {
++	mode,
++	hex,
++	originalName,
++	originalColor,
++	initialName,
++	canRename,
++	initialFocus = 'name',
++	onCancel,
++	onSubmit,
++}: ColorEditFormProps ) {
++	const [ name, setName ] = useState( initialName );
++	const inputRef = useRef< HTMLInputElement >( null );
++	const trimmedName = name.trim();
++	const displayName = canRename ? trimmedName : ( originalName ?? '' ).trim();
++	const hasColor = !! hex;
++
++	const focusNameInput = useCallback( () => {
++		const node = inputRef.current;
++		if ( node ) {
++			node.focus();
++			node.select();
++		}
++	}, [] );
++
++	const formAccessibleName = useMemo( () => {
++		if ( mode === 'add' ) {
++			if ( hasColor ) {
++				return sprintf(
++					// translators: %s: hex value of the selected custom color.
++					__( 'Add custom color. Selected color: %s.' ),
++					hex
++				);
++			}
++			return __( 'Add custom color. Choose a color, then name it.' );
++		}
++		if ( canRename ) {
++			return sprintf(
++				// translators: %s: name of the color being edited.
++				__( 'Edit color: %s' ),
++				originalName ?? ''
++			);
++		}
++		return sprintf(
++			// translators: %s: name of the theme color whose value is being edited.
++			__( 'Edit theme color value: %s' ),
++			displayName
++		);
++	}, [ mode, canRename, originalName, displayName, hasColor, hex ] );
++
++	// Only the add-by-name flow auto-focuses the name input. Edits (custom or
++	// theme) and add-from-swatch focus the color control instead. The parent
++	// focuses the swatch toggle for those flows.
++	useEffect( () => {
++		if ( mode === 'add' && initialFocus !== 'color' ) {
++			focusNameInput();
++		}
++	}, [ mode, initialFocus, focusNameInput ] );
++
++	const hasChanges = useMemo( () => {
++		if ( mode === 'add' ) {
++			return true;
++		}
++		if ( canRename ) {
++			return (
++				trimmedName !== ( originalName ?? '' ).trim() ||
++				! colorsAreEqual( hex, originalColor )
++			);
++		}
++		return ! colorsAreEqual( hex, originalColor );
++	}, [ mode, canRename, trimmedName, originalName, hex, originalColor ] );
++
++	const isSubmitDisabled =
++		( canRename && mode === 'edit' && ! trimmedName ) ||
++		( mode === 'edit' && ! hasChanges );
++
++	const handleSubmit = ( event: FormEvent< HTMLFormElement > ) => {
++		event.preventDefault();
++		if ( isSubmitDisabled ) {
++			// Block submit while the form is invalid; the form keeps focus.
++			if ( canRename ) {
++				inputRef.current?.focus();
++			}
++			return;
++		}
++		onSubmit( displayName );
++	};
++
++	const formRef = useRef< HTMLFormElement >( null );
++
++	useEscapeToCancel( onCancel, formRef );
++
++	const isHex = hex?.startsWith( '#' );
++
++	return (
++		<form
++			ref={ formRef }
++			className="components-color-palette__edit-form"
++			onSubmit={ handleSubmit }
++			noValidate
++			aria-label={ formAccessibleName }
++		>
++			<Stack direction="column" gap="sm">
++				<Stack direction="column" gap="xs">
++					{ canRename ? (
++						<TextControl
++							__next40pxDefaultSize
++							ref={ inputRef }
++							type="text"
++							className="components-color-palette__edit-form-input"
++							aria-label={ __( 'Color name' ) }
++							placeholder={ __( 'Color name' ) }
++							value={ name }
++							onChange={ setName }
++						/>
++					) : (
++						<Truncate
++							className="components-color-palette__custom-color-name"
++							title={ displayName }
++						>
++							{ displayName }
++						</Truncate>
++					) }
++					<Truncate
++						className={ clsx(
++							'components-color-palette__custom-color-value',
++							{
++								'components-color-palette__custom-color-value--is-hex':
++									isHex,
++							}
++						) }
++						title={ hex }
++					>
++						{ hex ?? '' }
++					</Truncate>
++				</Stack>
++				<FormActions
++					onCancel={ onCancel }
++					confirmLabel={ mode === 'add' ? __( 'Add' ) : __( 'Save' ) }
++					disabled={ isSubmitDisabled }
++					className="components-color-palette__edit-form-actions"
++				/>
++			</Stack>
++		</form>
++	);
++}
++
++type DeleteConfirmRowProps = {
++	name: string;
++	onCancel: () => void;
++	onConfirm: () => void;
++};
++
++/**
++ * The destructive confirmation state shown inline (never modal). It
++ * surfaces the CSS variable that will disappear so consumers can audit the
++ * impact before committing.
++ */
++export function DeleteConfirmRow( {
++	name,
++	onCancel,
++	onConfirm,
++}: DeleteConfirmRowProps ) {
++	const deleteButtonRef = useRef< HTMLButtonElement >( null );
++	const formRef = useRef< HTMLFormElement >( null );
++	const headingId = useInstanceId(
++		DeleteConfirmRow,
++		'components-color-palette__delete-confirm-heading'
++	);
++	const descriptionId = useInstanceId(
++		DeleteConfirmRow,
++		'components-color-palette__delete-confirm-description'
++	);
++
++	const handleSubmit = ( event: FormEvent< HTMLFormElement > ) => {
++		event.preventDefault();
++		onConfirm();
++	};
++
++	useEscapeToCancel( onCancel, formRef );
++
++	useEffect( () => {
++		deleteButtonRef.current?.focus();
++	}, [] );
++
++	return (
++		<form
++			ref={ formRef }
++			className="components-color-palette__delete-confirm"
++			onSubmit={ handleSubmit }
++			aria-labelledby={ headingId }
++			aria-describedby={ descriptionId }
++		>
++			<Stack direction="column" gap="sm">
++				<Stack direction="column" gap="xs" role="alert">
++					<Text id={ headingId } variant="heading-md">
++						{ sprintf(
++							// translators: %s: name of the color to be deleted.
++							__( 'Delete "%s"?' ),
++							name
++						) }
++					</Text>
++					<Text id={ descriptionId } variant="body-md">
++						{ __(
++							'This removes the color from your palette and cannot be undone.'
++						) }
++					</Text>
++				</Stack>
++				<FormActions
++					onCancel={ onCancel }
++					confirmLabel={ __( 'Delete' ) }
++					isDestructive
++					submitRef={ deleteButtonRef }
++				/>
++			</Stack>
++		</form>
++	);
++}
++
++type AddCustomColorButtonProps = {
++	onClick: ( trigger: HTMLElement ) => void;
++};
++
++/**
++ * Dashed-border circle rendered at the end of the custom swatches row. Same
++ * size as the swatches so it wraps with them naturally.
++ */
++export function AddCustomColorButton( { onClick }: AddCustomColorButtonProps ) {
++	const label = __( 'Add custom color' );
++	const { setActiveId } = useContext( CircularOptionPickerContext );
++	const isListbox = setActiveId !== undefined;
++	const id = useInstanceId(
++		AddCustomColorButton,
++		'components-color-palette__add-color'
++	);
++
++	const control = isListbox ? (
++		<Composite.Item
++			id={ id }
++			render={
++				<Button
++					__next40pxDefaultSize
++					size="small"
++					// Semantically a command (add color), but `role="option"` keeps
++					// the tile keyboard-reachable inside the listbox (see A1).
++					role="option"
++					className="components-color-palette__add-color-button"
++					icon={ plus }
++					iconSize={ 16 }
++					label={ label }
++					aria-label={ label }
++					showTooltip
++					onClick={ ( event: MouseEvent< HTMLButtonElement > ) =>
++						onClick( event.currentTarget )
++					}
++				/>
++			}
++		/>
++	) : (
++		<Button
++			__next40pxDefaultSize
++			size="small"
++			className="components-color-palette__add-color-button"
++			onClick={ ( event: MouseEvent< HTMLButtonElement > ) =>
++				onClick( event.currentTarget )
++			}
++			label={ label }
++			aria-label={ label }
++			icon={ plus }
++			iconSize={ 16 }
++			showTooltip
++		/>
++	);
++
++	return (
++		<div className="components-circular-option-picker__option-wrapper components-color-palette__add-color-wrapper">
++			{ control }
++		</div>
++	);
++}
+diff --git a/packages/components/src/color-palette/color-editing-ui.tsx b/packages/components/src/color-palette/color-editing-ui.tsx
+new file mode 100644
+index 00000000000000..916d88ca590ed5
+--- /dev/null
++++ b/packages/components/src/color-palette/color-editing-ui.tsx
+@@ -0,0 +1,127 @@
++/**
++ * Internal dependencies
++ */
++import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
++import { ColorPicker } from '../color-picker';
++import {
++	ColorEditForm,
++	DefaultInfoRow,
++	DeleteConfirmRow,
++} from './color-editing-controls';
++import type { EditingState, EnterAddOptions } from './use-color-editing';
++import type { PaletteEditingCapability } from './types';
++
++type CustomColorPickerContentProps = {
++	color: string | undefined;
++	enableAlpha: boolean;
++	onPickerChange: ( color: string ) => void;
++};
++
++export function CustomColorPickerContent( {
++	color,
++	enableAlpha,
++	onPickerChange,
++}: CustomColorPickerContentProps ) {
++	return (
++		<DropdownContentWrapper paddingSize="none">
++			<ColorPicker
++				color={ color }
++				onChange={ onPickerChange }
++				enableAlpha={ enableAlpha }
++			/>
++		</DropdownContentWrapper>
++	);
++}
++
++type InfoAreaProps = {
++	editingState: EditingState;
++	displayValue?: string;
++	editDisplayHex?: string;
++	editingCapability?: PaletteEditingCapability;
++	displayedName: string;
++	isHex: boolean;
++	canEditSelected: boolean;
++	canDeleteSelected: boolean;
++	isDirtyCustomValue: boolean;
++	onEnterAdd: ( options?: EnterAddOptions ) => void;
++	onEnterEdit: () => void;
++	onEnterDelete: () => void;
++	onCancel: () => void;
++	onSubmitAdd: ( name: string ) => void;
++	onSubmitEdit: ( name: string ) => void;
++	onConfirmDelete: () => void;
++};
++
++export function InfoArea( {
++	editingState,
++	displayValue,
++	editDisplayHex,
++	editingCapability,
++	displayedName,
++	isHex,
++	canEditSelected,
++	canDeleteSelected,
++	isDirtyCustomValue,
++	onEnterAdd,
++	onEnterEdit,
++	onEnterDelete,
++	onCancel,
++	onSubmitAdd,
++	onSubmitEdit,
++	onConfirmDelete,
++}: InfoAreaProps ) {
++	if ( editingState.mode === 'delete-confirm' ) {
++		return (
++			<DeleteConfirmRow
++				name={ editingState.entry.name }
++				onCancel={ onCancel }
++				onConfirm={ onConfirmDelete }
++			/>
++		);
++	}
++
++	if ( editingState.mode === 'add' ) {
++		return (
++			<ColorEditForm
++				mode="add"
++				hex={ displayValue }
++				initialName=""
++				canRename
++				initialFocus={ editingState.initialFocus }
++				onCancel={ onCancel }
++				onSubmit={ onSubmitAdd }
++			/>
++		);
++	}
++
++	if ( editingState.mode === 'edit' ) {
++		return (
++			<ColorEditForm
++				mode="edit"
++				hex={ editDisplayHex }
++				originalName={ editingState.entry.name }
++				originalColor={ editingState.entry.color }
++				initialName={ editingState.entry.name }
++				canRename={ editingCapability === 'full' }
++				onCancel={ onCancel }
++				onSubmit={ onSubmitEdit }
++			/>
++		);
++	}
++
++	return (
++		<DefaultInfoRow
++			name={ displayedName }
++			displayValue={ displayValue }
++			isHex={ isHex }
++			canEdit={ canEditSelected }
++			canDelete={ canDeleteSelected }
++			canAdd={ isDirtyCustomValue }
++			onEdit={ onEnterEdit }
++			onDelete={ onEnterDelete }
++			onAdd={ ( trigger ) =>
++				onEnterAdd( { initialFocus: 'name', trigger } )
++			}
++		/>
++	);
++}
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index 5a720520f3dcec..60dacbec31540a 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -2,47 +2,55 @@
+  * External dependencies
+  */
+ import type { ForwardedRef } from 'react';
+-import { colord, extend } from 'colord';
+-import namesPlugin from 'colord/plugins/names';
+-import a11yPlugin from 'colord/plugins/a11y';
+-import clsx from 'clsx';
++import { colord } from 'colord';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { __, sprintf } from '@wordpress/i18n';
+-import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
++import { __, _x, sprintf } from '@wordpress/i18n';
++import {
++	Fragment,
++	useCallback,
++	useEffect,
++	useMemo,
++	useRef,
++	useState,
++	forwardRef,
++} from '@wordpress/element';
++import { Stack } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Dropdown from '../dropdown';
+-import { ColorPicker } from '../color-picker';
+ import CircularOptionPicker, {
+ 	getComputeCircularOptionPickerCommonProps,
+ } from '../circular-option-picker';
+-import { VStack } from '../v-stack';
+-import { Truncate } from '../truncate';
+ import { ColorHeading } from './styles';
+-import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
+ import type {
+-	ColorObject,
++	ColorPaletteInternalProps,
+ 	ColorPaletteProps,
+ 	CustomColorPickerDropdownProps,
+ 	MultiplePalettesProps,
+ 	PaletteObject,
+ 	SinglePaletteProps,
+ } from './types';
++import { colorEditingKey } from './private-keys';
+ import type { WordPressComponentProps } from '../context';
+ import type { DropdownProps } from '../dropdown/types';
+ import {
++	CUSTOM_PALETTE_SLUG,
+ 	extractColorNameFromCurrentValue,
+ 	isMultiplePaletteArray,
++	isSimpleCSSColor,
+ 	normalizeColorValue,
++	toColorObjects,
++	toPaletteObjects,
+ } from './utils';
+-
+-extend( [ namesPlugin, a11yPlugin ] );
++import { AddCustomColorButton } from './color-editing-controls';
++import { CustomColorPickerContent, InfoArea } from './color-editing-ui';
++import { useColorEditing } from './use-color-editing';
+ 
+ function SinglePalette( {
+ 	className,
+@@ -51,17 +59,12 @@ function SinglePalette( {
+ 	onChange,
+ 	value,
+ 	selectedSlug,
++	addAction,
+ 	...additionalProps
+ }: SinglePaletteProps ) {
+ 	const colorOptions = useMemo( () => {
+-		return colors.map( ( { color, name, slug }, index ) => {
++		const options = colors.map( ( { color, name, slug }, index ) => {
+ 			const colordColor = colord( color );
+-			// When a non-empty selectedSlug is provided, selection is decided
+-			// strictly by slug — entries without a slug or with a different slug
+-			// are not selected, even when their color value matches `value`.
+-			// This correctly handles mixed palettes where some entries have slugs
+-			// and others don't. Fall back to color value matching otherwise
+-			// (including when selectedSlug is an empty string).
+ 			const isSelected = selectedSlug
+ 				? slug === selectedSlug
+ 				: value === color;
+@@ -95,7 +98,14 @@ function SinglePalette( {
+ 				/>
+ 			);
+ 		} );
+-	}, [ colors, value, selectedSlug, onChange, clearColor ] );
++		if ( addAction ) {
++			// Wrap the add action in a Fragment so it doesn't break the listbox structure and reachable by the keyboard.
++			options.push(
++				<Fragment key="__add-custom-color">{ addAction }</Fragment>
++			);
++		}
++		return options;
++	}, [ colors, value, selectedSlug, onChange, clearColor, addAction ] );
+ 
+ 	return (
+ 		<CircularOptionPicker.OptionGroup
+@@ -114,6 +124,8 @@ function MultiplePalettes( {
+ 	value,
+ 	selectedSlug,
+ 	headingLevel,
++	canAddCustomColor,
++	onAddCustom,
+ }: MultiplePalettesProps ) {
+ 	const instanceId = useInstanceId( MultiplePalettes, 'color-palette' );
+ 
+@@ -122,28 +134,47 @@ function MultiplePalettes( {
+ 	}
+ 
+ 	return (
+-		<VStack spacing={ 3 } className={ className }>
+-			{ colors.map( ( { name, colors: colorPalette }, index ) => {
+-				const id = `${ instanceId }-${ index }`;
+-				return (
+-					<VStack spacing={ 2 } key={ index }>
+-						<ColorHeading id={ id } level={ headingLevel }>
+-							{ name }
+-						</ColorHeading>
+-						<SinglePalette
+-							clearColor={ clearColor }
+-							colors={ colorPalette }
+-							onChange={ ( newColor, _colorIndex, slug ) =>
+-								onChange( newColor, index, slug )
+-							}
+-							value={ value }
+-							selectedSlug={ selectedSlug }
+-							aria-labelledby={ id }
+-						/>
+-					</VStack>
+-				);
+-			} ) }
+-		</VStack>
++		<Stack direction="column" gap="md" className={ className }>
++			{ colors.map(
++				(
++					{ name, slug: paletteSlug, colors: colorPalette },
++					index
++				) => {
++					const id = `${ instanceId }-${ index }`;
++					const isCustomPalette = paletteSlug === CUSTOM_PALETTE_SLUG;
++					return (
++						<Stack
++							direction="column"
++							gap="sm"
++							key={ paletteSlug ?? name ?? index }
++						>
++							<ColorHeading id={ id } level={ headingLevel }>
++								{ name }
++							</ColorHeading>
++							<SinglePalette
++								clearColor={ clearColor }
++								colors={ colorPalette }
++								onChange={ ( newColor, _colorIndex, slug ) =>
++									onChange( newColor, index, slug )
++								}
++								value={ value }
++								selectedSlug={ selectedSlug }
++								aria-labelledby={ id }
++								addAction={
++									isCustomPalette &&
++									canAddCustomColor &&
++									onAddCustom ? (
++										<AddCustomColorButton
++											onClick={ onAddCustom }
++										/>
++									) : undefined
++								}
++							/>
++						</Stack>
++					);
++				}
++			) }
++		</Stack>
+ 	);
+ }
+ 
+@@ -159,6 +190,7 @@ export function CustomColorPickerDropdown( {
+ 			// scrollbars while dragging the color picker's handle close to the
+ 			// popover edge.
+ 			resize: false,
++			focusOnMount: 'firstElement',
+ 			...( isRenderedInSidebar
+ 				? {
+ 						// When in the sidebar: open to the left (stacking),
+@@ -187,7 +219,7 @@ export function CustomColorPickerDropdown( {
+ 
+ function UnforwardedColorPalette(
+ 	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
+-	forwardedRef: ForwardedRef< any >
++	forwardedRef: ForwardedRef< HTMLDivElement >
+ ) {
+ 	const {
+ 		asButtons,
+@@ -201,16 +233,20 @@ function UnforwardedColorPalette(
+ 		selectedSlug,
+ 		__experimentalIsRenderedInSidebar = false,
+ 		headingLevel = 2,
++		[ colorEditingKey ]: colorEditing,
++		hasColorsToChoose,
+ 		'aria-label': ariaLabel,
+ 		'aria-labelledby': ariaLabelledby,
+ 		...additionalProps
+-	} = props;
++	} = props as ColorPaletteInternalProps;
+ 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
+ 
+ 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
+ 
++	const colorToggleRef = useRef< HTMLElement | null >( null );
+ 	const customColorPaletteCallbackRef = useCallback(
+ 		( node: HTMLElement | null ) => {
++			colorToggleRef.current = node;
+ 			setNormalizedColorValue( normalizeColorValue( value, node ) );
+ 		},
+ 		[ value ]
+@@ -228,19 +264,34 @@ function UnforwardedColorPalette(
+ 		[ value, colors, hasMultipleColorOrigins, selectedSlug ]
+ 	);
+ 
+-	const renderCustomColorPicker = () => (
+-		<DropdownContentWrapper paddingSize="none">
+-			<ColorPicker
+-				color={ normalizedColorValue }
+-				onChange={ ( color ) => onChange( color ) }
+-				enableAlpha={ enableAlpha }
+-			/>
+-		</DropdownContentWrapper>
+-	);
+-	const isHex = value?.startsWith( '#' );
++	const isHex = !! value?.startsWith( '#' );
+ 
+ 	// Leave hex values as-is. Remove the `var()` wrapper from CSS vars.
+ 	const displayValue = value?.replace( /^var\((.+)\)$/, '$1' );
++
++	const resolvedColorValue =
++		value && isSimpleCSSColor( value ) ? value : normalizedColorValue;
++
++	const editing = useColorEditing( {
++		colorEditing,
++		value,
++		selectedSlug,
++		colors,
++		disableCustomColors,
++		onChange,
++		displayValue,
++		isHex,
++		buttonLabelName,
++		resolvedColorValue,
++	} );
++
++	// Recolor-first flows (value-only edits) move focus to the existing
++	// swatch toggle rather than introducing a separate in-form color control.
++	const { registerFocusColorToggle } = editing;
++	useEffect( () => {
++		registerFocusColorToggle( () => colorToggleRef.current?.focus() );
++	}, [ registerFocusColorToggle ] );
++
+ 	const customColorAccessibleLabel = !! displayValue
+ 		? sprintf(
+ 				// translators: 1: The name of the color e.g: "vivid red". 2: The color's hex code e.g: "#f00".
+@@ -276,88 +327,159 @@ function UnforwardedColorPalette(
+ 		ariaLabelledby
+ 	);
+ 
+-	// If disableCustomColors is true and colors.length is 0, return null to avoid rendering an empty palette wrapper.
+-	if ( disableCustomColors && colors.length === 0 && ! actions ) {
++	const shouldDisplayMultiplePalettes =
++		hasMultipleColorOrigins ||
++		( editing.isEditingEnabled && colors.length === 0 );
++
++	const displayedColors = useMemo( () => {
++		if ( ! editing.isEditingEnabled || ! shouldDisplayMultiplePalettes ) {
++			return colors;
++		}
++
++		const palettes = hasMultipleColorOrigins
++			? toPaletteObjects( colors )
++			: [];
++		if (
++			! editing.canEditFullCustom ||
++			palettes.some( ( palette ) => palette.slug === CUSTOM_PALETTE_SLUG )
++		) {
++			return palettes;
++		}
++
++		return [
++			...palettes,
++			{
++				name: _x(
++					'Custom',
++					'Indicates this palette is created by the user.'
++				),
++				slug: CUSTOM_PALETTE_SLUG,
++				colors: [],
++			},
++		];
++	}, [
++		colors,
++		hasMultipleColorOrigins,
++		editing.isEditingEnabled,
++		editing.canEditFullCustom,
++		shouldDisplayMultiplePalettes,
++	] );
++
++	const shouldRenderCustomColorPicker = ! disableCustomColors;
++	const shouldRenderPalette = displayedColors.length > 0 || !! actions;
++
++	if ( ! shouldRenderCustomColorPicker && ! shouldRenderPalette ) {
+ 		return null;
+ 	}
+ 
++	// Toggle swatch uses raw `value` so CSS variables (`var(--*)`) paint
++	// correctly; the picker uses `resolvedColorValue` (computed hex when needed).
++	const toggleSwatchBackground =
++		editing.editingState.mode === 'edit'
++			? editing.editingState.previewColor ?? value
++			: value;
++
+ 	return (
+-		<VStack spacing={ 3 } ref={ forwardedRef } { ...additionalProps }>
+-			{ ! disableCustomColors && (
++		<Stack
++			direction="column"
++			gap="md"
++			ref={ forwardedRef }
++			{ ...additionalProps }
++		>
++			{ shouldRenderCustomColorPicker && (
+ 				<CustomColorPickerDropdown
+ 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
+-					renderContent={ renderCustomColorPicker }
++					open={ editing.isPickerOpen }
++					onToggle={ editing.setIsPickerOpen }
++					renderContent={ () => (
++						<CustomColorPickerContent
++							color={ editing.editPickerColor }
++							enableAlpha={ enableAlpha }
++							onPickerChange={ editing.handlePickerChange }
++						/>
++					) }
+ 					renderToggle={ ( { isOpen, onToggle } ) => (
+-						<VStack
++						<Stack
+ 							className="components-color-palette__custom-color-wrapper"
+-							spacing={ 0 }
++							direction="column"
+ 						>
+ 							<button
+ 								ref={ customColorPaletteCallbackRef }
+ 								className="components-color-palette__custom-color-button"
+ 								aria-expanded={ isOpen }
+-								aria-haspopup="true"
++								aria-haspopup="dialog"
+ 								onClick={ onToggle }
+ 								aria-label={ customColorAccessibleLabel }
+ 								style={ {
+-									background: value,
++									background: toggleSwatchBackground,
+ 								} }
+ 								type="button"
+ 							/>
+-							<VStack
++							<Stack
+ 								className="components-color-palette__custom-color-text-wrapper"
+-								spacing={ 0.5 }
++								direction="column"
++								gap="xs"
+ 							>
+-								<Truncate className="components-color-palette__custom-color-name">
+-									{ value
+-										? buttonLabelName
+-										: __( 'No color selected' ) }
+-								</Truncate>
+-								{ /*
+-								This `Truncate` is always rendered, even if
+-								there is no `displayValue`, to ensure the layout
+-								does not shift
+-								*/ }
+-								<Truncate
+-									className={ clsx(
+-										'components-color-palette__custom-color-value',
+-										{
+-											'components-color-palette__custom-color-value--is-hex':
+-												isHex,
+-										}
+-									) }
+-								>
+-									{ displayValue }
+-								</Truncate>
+-							</VStack>
+-						</VStack>
++								<InfoArea
++									editingState={ editing.editingState }
++									displayValue={ displayValue }
++									editDisplayHex={ editing.editDisplayHex }
++									editingCapability={
++										editing.editingCapability
++									}
++									displayedName={ editing.displayedName }
++									isHex={ isHex }
++									canEditSelected={ editing.canEditSelected }
++									canDeleteSelected={
++										editing.canDeleteSelected
++									}
++									isDirtyCustomValue={
++										editing.isDirtyCustomValue
++									}
++									onEnterAdd={ editing.handleEnterAdd }
++									onEnterEdit={ editing.handleEnterEdit }
++									onEnterDelete={ editing.handleEnterDelete }
++									onCancel={ editing.handleCancel }
++									onSubmitAdd={ editing.handleSubmitAdd }
++									onSubmitEdit={ editing.handleSubmitEdit }
++									onConfirmDelete={
++										editing.handleConfirmDelete
++									}
++								/>
++							</Stack>
++						</Stack>
+ 					) }
+ 				/>
+ 			) }
+-			{ ( colors.length > 0 || actions ) && (
++			{ shouldRenderPalette && (
+ 				<CircularOptionPicker
+ 					{ ...metaProps }
+ 					{ ...labelProps }
+ 					actions={ actions }
+ 					options={
+-						hasMultipleColorOrigins ? (
++						shouldDisplayMultiplePalettes ? (
+ 							<MultiplePalettes
+ 								{ ...paletteCommonProps }
+ 								headingLevel={ headingLevel }
+-								colors={ colors as PaletteObject[] }
+-								value={ value }
++								colors={ displayedColors as PaletteObject[] }
++								canAddCustomColor={ editing.canEditFullCustom }
++								onAddCustom={ ( trigger ) =>
++									editing.handleEnterAdd( {
++										initialFocus: 'color',
++										trigger,
++									} )
++								}
+ 							/>
+ 						) : (
+ 							<SinglePalette
+ 								{ ...paletteCommonProps }
+-								colors={ colors as ColorObject[] }
+-								value={ value }
++								colors={ toColorObjects( colors ) }
+ 							/>
+ 						)
+ 					}
+ 				/>
+ 			) }
+-		</VStack>
++		</Stack>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/color-palette/private-keys.ts b/packages/components/src/color-palette/private-keys.ts
+new file mode 100644
+index 00000000000000..44348eee25bd86
+--- /dev/null
++++ b/packages/components/src/color-palette/private-keys.ts
+@@ -0,0 +1,10 @@
++/**
++ * Private prop key for `ColorPalette` inline editing configuration.
++ *
++ * Uses an opaque string because React won't forward props with Symbol keys.
++ * Hidden from public types. First-party code reads it via `unlock( componentsPrivateApis ).colorEditingKey`.
++ */
++export const colorEditingKey =
++	'wp.components.colorPalette.colorEditing' as const;
++
++export type ColorEditingPropKey = typeof colorEditingKey;
+diff --git a/packages/components/src/color-palette/stories/index.story.tsx b/packages/components/src/color-palette/stories/index.story.tsx
+index df3085ea00d681..4ae365cac88ee4 100644
+--- a/packages/components/src/color-palette/stories/index.story.tsx
++++ b/packages/components/src/color-palette/stories/index.story.tsx
+@@ -12,6 +12,9 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import ColorPalette from '..';
++import { colorEditingKey } from '../private-keys';
++import { slugifyCustomColorName } from '../utils';
++import type { ColorObject } from '../types';
+ 
+ const meta: Meta< typeof ColorPalette > = {
+ 	tags: [ 'manifest' ],
+@@ -140,3 +143,144 @@ export const CSSVariables: ColorPaletteStory = {
+ 		],
+ 	},
+ };
++
++/**
++ * `ColorPalette` supports inline palette editing via a **private** API
++ * (symbol-keyed prop), used by the WordPress editor. It is intentionally not
++ * part of the public component API. This story demonstrates the behavior with
++ * a stateful wrapper.
++ */
++export const WithPaletteEditing: ColorPaletteStory = {
++	render: function WithPaletteEditingStory( args ) {
++		const [ color, setColor ] = useState< string | undefined >();
++		const [ slug, setSlug ] = useState< string | undefined >();
++		const [ themeColors, setThemeColors ] = useState< ColorObject[] >( [
++			{ name: 'Brand', slug: 'brand', color: '#0073aa' },
++			{ name: 'Accent', slug: 'accent', color: '#cc1818' },
++		] );
++		const [ customColors, setCustomColors ] = useState< ColorObject[] >( [
++			{
++				name: 'Color 1',
++				slug: 'custom-color-1',
++				color: '#1d2c5d',
++			},
++			{
++				name: 'Color 2',
++				slug: 'custom-color-2',
++				color: '#f0b849',
++			},
++		] );
++
++		const colors = [
++			{
++				name: 'Theme',
++				slug: 'theme',
++				colors: themeColors,
++			},
++			{
++				name: 'Custom',
++				slug: 'custom',
++				colors: customColors,
++			},
++		];
++
++		const colorEditing = {
++			capabilities: {
++				custom: 'full' as const,
++				theme: 'value' as const,
++			},
++			onAdd: ( {
++				name,
++				nextSlug,
++				color: hex,
++			}: {
++				name: string;
++				nextSlug?: string;
++				color: string;
++			} ) => {
++				const nextColor: ColorObject = {
++					name,
++					slug: nextSlug ?? slugifyCustomColorName( name ),
++					color: hex,
++				};
++				setCustomColors( ( prev ) => [ ...prev, nextColor ] );
++				setColor( hex );
++				setSlug( nextColor.slug );
++			},
++			onUpdate: ( {
++				paletteSlug,
++				slug: prevSlug,
++				nextSlug,
++				name,
++				color: hex,
++			}: {
++				paletteSlug: string;
++				slug?: string;
++				nextSlug?: string;
++				name: string;
++				color: string;
++			} ) => {
++				if ( paletteSlug === 'theme' ) {
++					setThemeColors( ( prev ) =>
++						prev.map( ( entry ) =>
++							entry.slug === prevSlug
++								? { ...entry, color: hex }
++								: entry
++						)
++					);
++					return;
++				}
++
++				const finalSlug = nextSlug ?? slugifyCustomColorName( name );
++				setCustomColors( ( prev ) =>
++					prev.map( ( entry ) =>
++						entry.slug === prevSlug
++							? { name, slug: finalSlug, color: hex }
++							: entry
++					)
++				);
++				setSlug( finalSlug );
++			},
++			onDelete: ( { slug: removedSlug }: { slug: string } ) => {
++				setCustomColors( ( prev ) =>
++					prev.filter( ( entry ) => entry.slug !== removedSlug )
++				);
++			},
++			onPreview: (
++				payload: {
++					paletteSlug: string;
++					slug: string;
++					color: string;
++				} | null
++			) => {
++				if ( payload ) {
++					setColor( payload.color );
++				}
++			},
++		};
++
++		return (
++			<ColorPalette
++				{ ...args }
++				colors={ colors }
++				value={ color }
++				selectedSlug={ slug }
++				onChange={ ( newColor, _index, newSlug ) => {
++					setColor( newColor );
++					setSlug( newSlug );
++				} }
++				{ ...{ [ colorEditingKey ]: colorEditing } }
++			/>
++		);
++	},
++	args: {
++		disableCustomColors: false,
++	},
++	parameters: {
++		docs: {
++			description: {
++				story: 'Demonstrates the **private** `colorEditing` capability: theme colors are value-only (pencil, no rename/delete), custom colors are fully editable (add via the `+` tile or the "Add to custom" action, rename, recolor, delete). This API is symbol-keyed and not public.',
++			},
++		},
++	},
++};
+diff --git a/packages/components/src/color-palette/style.scss b/packages/components/src/color-palette/style.scss
+index 38754945c1e0a5..d25983944886e4 100644
+--- a/packages/components/src/color-palette/style.scss
++++ b/packages/components/src/color-palette/style.scss
+@@ -71,3 +71,52 @@ $border-as-box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
+ 		visibility: hidden;
+ 	}
+ }
++
++.components-color-palette__info-row-text {
++	min-width: 0;
++	flex: 1 1 auto;
++}
++
++.components-color-palette__edit-form-actions {
++	flex: 0 0 auto;
++}
++
++.components-circular-option-picker__option-wrapper.components-color-palette__add-color-wrapper {
++	&:hover {
++		transform: none;
++	}
++
++	// Hide the checkerboard background.
++	&::before {
++		content: none;
++		background: none;
++	}
++}
++
++.components-color-palette__add-color-button.components-button {
++	width: 100%;
++	height: 100%;
++	border-radius: $radius-round;
++	color: $gray-700;
++	border: $border-width solid $gray-400;
++
++	@media not (prefers-reduced-motion) {
++		transition: 100ms transform ease;
++		will-change: transform;
++	}
++
++	&:hover:not(:disabled) {
++		border-color: $components-color-accent;
++		color: $components-color-accent;
++		background: transparent;
++		box-shadow: none;
++		transform: scale(1.2);
++	}
++
++	&:focus:not(:disabled) {
++		border-style: dashed;
++		border-color: $components-color-accent;
++		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
++		outline: 2px solid transparent;
++	}
++}
+diff --git a/packages/components/src/color-palette/test/index.tsx b/packages/components/src/color-palette/test/index.tsx
+index 7f124047dd2ef5..845fd32a008063 100644
+--- a/packages/components/src/color-palette/test/index.tsx
++++ b/packages/components/src/color-palette/test/index.tsx
+@@ -11,6 +11,13 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import ColorPalette from '..';
++import { colorEditingKey } from '../private-keys';
++
++jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
++
++const withColorEditing = ( config: Record< string, unknown > ) => ( {
++	[ colorEditingKey ]: config,
++} );
+ 
+ const EXAMPLE_COLORS = [
+ 	{ name: 'red', color: '#f00' },
+@@ -443,4 +450,612 @@ describe( 'ColorPalette', () => {
+ 			expect( options[ 2 ] ).toHaveAttribute( 'aria-selected', 'false' );
+ 		} );
+ 	} );
++
++	describe( 'color editing', () => {
++		const fullCustomEditing = ( overrides = {} ) => ( {
++			capabilities: { custom: 'full' as const },
++			...overrides,
++		} );
++
++		const MULTI_PALETTE = [
++			{
++				name: 'Theme',
++				slug: 'theme',
++				colors: [ { name: 'Brand', slug: 'brand', color: '#0073aa' } ],
++			},
++			{
++				name: 'Custom',
++				slug: 'custom',
++				colors: [
++					{
++						name: 'Color 1',
++						slug: 'custom-color-1',
++						color: '#111111',
++					},
++					{
++						name: 'Color 2',
++						slug: 'custom-color-2',
++						color: '#222222',
++					},
++				],
++			},
++		];
++
++		const getSwatchToggle = () =>
++			screen.getByRole( 'button', { name: /^Custom color picker/ } );
++
++		it( 'is opt-in: no `+` swatch or edit/delete buttons when `colorEditing` is absent', () => {
++			render(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					value="#111111"
++					selectedSlug="custom-color-1"
++					onChange={ jest.fn() }
++				/>
++			);
++
++			expect(
++				screen.queryByRole( 'option', { name: /Add custom color/ } )
++			).not.toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'button', {
++					name: /Edit color/,
++				} )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'renders a `+` swatch at the end of the custom palette swatches', () => {
++			render(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					value="#111111"
++					selectedSlug="custom-color-1"
++					onChange={ jest.fn() }
++					{ ...withColorEditing( fullCustomEditing() ) }
++				/>
++			);
++
++			expect(
++				screen.getByRole( 'option', { name: /Add custom color/ } )
++			).toBeInTheDocument();
++		} );
++
++		it( 'renders an empty custom palette section when management is enabled and no custom colors exist', () => {
++			render(
++				<ColorPalette
++					colors={ [
++						{
++							name: 'Theme',
++							slug: 'theme',
++							colors: [
++								{
++									name: 'Brand',
++									slug: 'brand',
++									color: '#0073aa',
++								},
++							],
++						},
++					] }
++					value="#0073aa"
++					selectedSlug="brand"
++					onChange={ jest.fn() }
++					{ ...withColorEditing( fullCustomEditing() ) }
++				/>
++			);
++
++			expect(
++				screen.getByRole( 'heading', { name: 'Custom' } )
++			).toBeInTheDocument();
++			expect(
++				screen.getByRole( 'option', { name: 'Add custom color' } )
++			).toBeInTheDocument();
++		} );
++
++		it( 'opens the add form when no color is selected', async () => {
++			const user = userEvent.setup();
++			render(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					onChange={ jest.fn() }
++					{ ...withColorEditing( fullCustomEditing() ) }
++				/>
++			);
++
++			await user.click(
++				screen.getByRole( 'option', { name: 'Add custom color' } )
++			);
++
++			expect(
++				screen.getByRole( 'form', {
++					name: 'Add custom color. Choose a color, then name it.',
++				} )
++			).toBeInTheDocument();
++			expect( screen.getByLabelText( 'Color name' ) ).toHaveValue( '' );
++		} );
++
++		it( 'shows edit/delete buttons only for palettes with the matching capability', () => {
++			const { rerender } = render(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					value="#0073aa"
++					selectedSlug="brand"
++					onChange={ jest.fn() }
++					{ ...withColorEditing( fullCustomEditing() ) }
++				/>
++			);
++
++			// Selected is a theme color → no management buttons.
++			expect(
++				screen.queryByRole( 'button', {
++					name: /Edit color/,
++				} )
++			).not.toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'button', {
++					name: /Delete custom color/,
++				} )
++			).not.toBeInTheDocument();
++
++			rerender(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					value="#111111"
++					selectedSlug="custom-color-1"
++					onChange={ jest.fn() }
++					{ ...withColorEditing( fullCustomEditing() ) }
++				/>
++			);
++
++			expect(
++				screen.getByRole( 'button', {
++					name: 'Edit color: Color 1',
++				} )
++			).toBeInTheDocument();
++			expect(
++				screen.getByRole( 'button', {
++					name: 'Delete custom color: Color 1',
++				} )
++			).toBeInTheDocument();
++		} );
++
++		it( 'cancels the edit form with the Escape key', async () => {
++			const user = userEvent.setup();
++			const onUpdateCustomColor = jest.fn();
++			render(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					value="#111111"
++					selectedSlug="custom-color-1"
++					onChange={ jest.fn() }
++					{ ...withColorEditing(
++						fullCustomEditing( {
++							onUpdate: onUpdateCustomColor,
++						} )
++					) }
++				/>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Edit color: Color 1',
++				} )
++			);
++
++			expect( screen.getByLabelText( 'Color name' ) ).toBeInTheDocument();
++			expect( getSwatchToggle() ).toHaveFocus();
++
++			// Escape only cancels when focus is inside the form; edit opens on
++			// the swatch toggle, so move into the form first.
++			await user.tab();
++			await user.keyboard( '{Escape}' );
++
++			expect(
++				screen.queryByLabelText( 'Color name' )
++			).not.toBeInTheDocument();
++			expect( onUpdateCustomColor ).not.toHaveBeenCalled();
++		} );
++
++		it( 'asks for confirmation before deleting', async () => {
++			const user = userEvent.setup();
++			const onDeleteCustomColor = jest.fn();
++			const onChange = jest.fn();
++			render(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					value="#111111"
++					selectedSlug="custom-color-1"
++					onChange={ onChange }
++					{ ...withColorEditing(
++						fullCustomEditing( {
++							onDelete: onDeleteCustomColor,
++						} )
++					) }
++				/>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Delete custom color: Color 1',
++				} )
++			);
++
++			expect(
++				screen.getByText( 'Delete "Color 1"?' )
++			).toBeInTheDocument();
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Delete' } )
++			);
++
++			expect( onDeleteCustomColor ).toHaveBeenCalledWith( {
++				paletteSlug: 'custom',
++				slug: 'custom-color-1',
++			} );
++			// The selection is cleared after deletion.
++			expect( onChange ).toHaveBeenCalledWith( undefined );
++		} );
++
++		it( 'shows an add-to-custom button for dirty values and routes it into the add form', async () => {
++			const user = userEvent.setup();
++			const onAddCustomColor = jest.fn();
++			const onChange = jest.fn();
++			render(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					value="#ff00aa"
++					onChange={ onChange }
++					{ ...withColorEditing(
++						fullCustomEditing( {
++							onAdd: onAddCustomColor,
++						} )
++					) }
++				/>
++			);
++
++			expect(
++				screen.getByText( 'Custom', {
++					selector: '.components-color-palette__custom-color-name',
++				} )
++			).toBeInTheDocument();
++			expect(
++				screen.getByRole( 'button', { name: 'Add to custom' } )
++			).toBeInTheDocument();
++			expect(
++				screen.queryByText( 'Save as custom color?' )
++			).not.toBeInTheDocument();
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Add to custom' } )
++			);
++
++			const nameInput = screen.getByLabelText( 'Color name' );
++			expect( nameInput ).toHaveValue( '' );
++			expect( nameInput ).toHaveAttribute( 'placeholder', 'Color name' );
++
++			const addButton = screen.getByRole( 'button', { name: 'Add' } );
++			expect( addButton ).not.toHaveAttribute( 'aria-disabled', 'true' );
++
++			await user.click( addButton );
++			expect( onAddCustomColor ).toHaveBeenCalledWith( {
++				paletteSlug: 'custom',
++				name: '#ff00aa',
++				nextSlug: 'custom-ff-00-aa',
++				color: '#ff00aa',
++			} );
++			expect( onChange ).toHaveBeenCalledWith(
++				'#ff00aa',
++				undefined,
++				'custom-ff-00-aa'
++			);
++		} );
++
++		it( 'uses a typed name when submitting the add form from a dirty value', async () => {
++			const user = userEvent.setup();
++			const onAddCustomColor = jest.fn();
++			const onChange = jest.fn();
++			render(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					value="#ff00aa"
++					onChange={ onChange }
++					{ ...withColorEditing(
++						fullCustomEditing( {
++							onAdd: onAddCustomColor,
++						} )
++					) }
++				/>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Add to custom' } )
++			);
++
++			const nameInput = screen.getByLabelText( 'Color name' );
++			await user.type( nameInput, 'Hot Pink' );
++			await user.click( screen.getByRole( 'button', { name: 'Add' } ) );
++
++			expect( onAddCustomColor ).toHaveBeenCalledWith( {
++				paletteSlug: 'custom',
++				name: 'Hot Pink',
++				nextSlug: 'custom-hot-pink',
++				color: '#ff00aa',
++			} );
++			expect( onChange ).toHaveBeenCalledWith(
++				'#ff00aa',
++				undefined,
++				'custom-hot-pink'
++			);
++		} );
++
++		it( 'does not show add-to-custom when the active color matches a saved swatch', () => {
++			render(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					value="#111111"
++					selectedSlug="custom-color-1"
++					onChange={ jest.fn() }
++					{ ...withColorEditing( fullCustomEditing() ) }
++				/>
++			);
++
++			expect(
++				screen.queryByRole( 'button', { name: 'Add to custom' } )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'keeps the edit form open and updates local preview visuals during drag', async () => {
++			const user = userEvent.setup();
++			const onUpdateCustomColor = jest.fn();
++			const onPreview = jest.fn();
++			render(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					value="#111111"
++					selectedSlug="custom-color-1"
++					onChange={ jest.fn() }
++					{ ...withColorEditing(
++						fullCustomEditing( {
++							onUpdate: onUpdateCustomColor,
++							onPreview,
++						} )
++					) }
++				/>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Edit color: Color 1',
++				} )
++			);
++
++			expect( screen.getByLabelText( 'Color name' ) ).toHaveValue(
++				'Color 1'
++			);
++
++			await user.click(
++				screen.getByRole( 'button', {
++					name: /^Custom color picker/,
++				} )
++			);
++			const hexInput = screen.getByLabelText( 'Hex color' );
++			await user.clear( hexInput );
++			await user.paste( '333333' );
++
++			// Edit form stays open; preview is local even though `value` is
++			// unchanged.
++			expect( screen.getByLabelText( 'Color name' ) ).toHaveValue(
++				'Color 1'
++			);
++			expect( onPreview ).toHaveBeenCalledWith(
++				expect.objectContaining( {
++					paletteSlug: 'custom',
++					slug: 'custom-color-1',
++					color: '#333333',
++				} )
++			);
++			expect(
++				await screen.findByText( '#333333', {
++					selector: '.components-color-palette__custom-color-value',
++				} )
++			).toBeInTheDocument();
++			expect(
++				screen.queryByText( 'Save as custom color?' )
++			).not.toBeInTheDocument();
++
++			const saveButton = screen.getByRole( 'button', { name: 'Save' } );
++			expect( saveButton ).not.toHaveAttribute( 'aria-disabled' );
++			await user.click( saveButton );
++
++			expect( onUpdateCustomColor ).toHaveBeenCalledWith( {
++				paletteSlug: 'custom',
++				slug: 'custom-color-1',
++				nextSlug: 'custom-color-1',
++				name: 'Color 1',
++				color: '#333333',
++			} );
++			expect( onPreview ).toHaveBeenLastCalledWith( null );
++		} );
++
++		it( 'routes native picker changes to onPreview while editing a custom color', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++			const onPreviewCustomColor = jest.fn();
++			render(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					value="#111111"
++					selectedSlug="custom-color-1"
++					onChange={ onChange }
++					{ ...withColorEditing(
++						fullCustomEditing( {
++							onUpdate: jest.fn(),
++							onPreview: onPreviewCustomColor,
++						} )
++					) }
++				/>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Edit color: Color 1',
++				} )
++			);
++
++			// Open the native picker and pick a new hex value.
++			await user.click(
++				screen.getByRole( 'button', {
++					name: /^Custom color picker/,
++				} )
++			);
++			const hexInput = screen.getByLabelText( 'Hex color' );
++			await user.clear( hexInput );
++			await user.paste( '00ff00' );
++
++			expect( onPreviewCustomColor ).toHaveBeenCalledWith(
++				expect.objectContaining( {
++					paletteSlug: 'custom',
++					slug: 'custom-color-1',
++					color: '#00ff00',
++				} )
++			);
++			// The consumer's selected value is left untouched: the change is
++			// previewed on the palette entry instead.
++			expect( onChange ).not.toHaveBeenCalled();
++		} );
++
++		it( 'shows pencil but not trash for theme colors with value capability', () => {
++			render(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					value="#0073aa"
++					selectedSlug="brand"
++					onChange={ jest.fn() }
++					{ ...withColorEditing( {
++						capabilities: { theme: 'value' },
++						onUpdate: jest.fn(),
++					} ) }
++				/>
++			);
++
++			expect(
++				screen.getByRole( 'button', { name: 'Edit color: Brand' } )
++			).toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'button', {
++					name: /Delete custom color/,
++				} )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'renders the name as static text when editing a value-capability palette color', async () => {
++			const user = userEvent.setup();
++			const onUpdate = jest.fn();
++			const onChange = jest.fn();
++			render(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					value="#0073aa"
++					selectedSlug="brand"
++					onChange={ onChange }
++					{ ...withColorEditing( {
++						capabilities: { theme: 'value' },
++						onUpdate,
++					} ) }
++				/>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Edit color: Brand' } )
++			);
++
++			expect(
++				screen.queryByLabelText( 'Color name' )
++			).not.toBeInTheDocument();
++			expect(
++				screen.getByText( 'Brand', {
++					selector: '.components-color-palette__custom-color-name',
++				} )
++			).toBeInTheDocument();
++
++			await user.click(
++				screen.getByRole( 'button', {
++					name: /^Custom color picker/,
++				} )
++			);
++			const hexInput = screen.getByLabelText( 'Hex color' );
++			await user.clear( hexInput );
++			await user.paste( '005177' );
++
++			const saveButton = screen.getByRole( 'button', { name: 'Save' } );
++			expect( saveButton ).not.toHaveAttribute( 'aria-disabled' );
++			await user.click( saveButton );
++
++			expect( onUpdate ).toHaveBeenCalledWith( {
++				paletteSlug: 'theme',
++				slug: 'brand',
++				nextSlug: 'brand',
++				name: 'Brand',
++				color: '#005177',
++			} );
++		} );
++
++		it( 'shows no editing affordances for palettes absent from capabilities', () => {
++			const DEFAULT_PALETTE = [
++				{
++					name: 'Default',
++					slug: 'default',
++					colors: [
++						{
++							name: 'Black',
++							slug: 'black',
++							color: '#000000',
++						},
++					],
++				},
++			];
++
++			render(
++				<ColorPalette
++					colors={ DEFAULT_PALETTE }
++					value="#000000"
++					selectedSlug="black"
++					onChange={ jest.fn() }
++					{ ...withColorEditing( {
++						capabilities: { custom: 'full' },
++						onAdd: jest.fn(),
++					} ) }
++				/>
++			);
++
++			expect(
++				screen.queryByRole( 'button', { name: /Edit color/ } )
++			).not.toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'button', {
++					name: /Delete custom color/,
++				} )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'hides add swatch and add-to-custom when custom full capability is absent', () => {
++			render(
++				<ColorPalette
++					colors={ MULTI_PALETTE }
++					value="#ff00aa"
++					onChange={ jest.fn() }
++					{ ...withColorEditing( {
++						capabilities: { theme: 'value' },
++						onUpdate: jest.fn(),
++					} ) }
++				/>
++			);
++
++			expect(
++				screen.queryByRole( 'option', { name: /Add custom color/ } )
++			).not.toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'button', { name: 'Add to custom' } )
++			).not.toBeInTheDocument();
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/color-palette/test/utils.ts b/packages/components/src/color-palette/test/utils.ts
+index 9d12f2a60dc3c0..730957fbb52103 100644
+--- a/packages/components/src/color-palette/test/utils.ts
++++ b/packages/components/src/color-palette/test/utils.ts
+@@ -3,7 +3,9 @@
+  */
+ import {
+ 	extractColorNameFromCurrentValue,
++	findSelectedColorEntry,
+ 	normalizeColorValue,
++	slugifyCustomColorName,
+ } from '../utils';
+ 
+ describe( 'ColorPalette: Utils', () => {
+@@ -77,4 +79,71 @@ describe( 'ColorPalette: Utils', () => {
+ 			expect( normalizeColorValue( '#ff0000', null ) ).toBe( '#ff0000' );
+ 		} );
+ 	} );
++
++	describe( 'slugifyCustomColorName', () => {
++		test( 'kebab-cases the name and prefixes it with `custom-`', () => {
++			expect( slugifyCustomColorName( 'Brand Red' ) ).toBe(
++				'custom-brand-red'
++			);
++		} );
++
++		test( 'normalises the name the same way WP core does for theme.json slugs', () => {
++			// The slug is produced by the same `kebabCase` helper used to
++			// register palette entries in `palette-edit`, so the resulting
++			// CSS variable name stays in sync with whatever WordPress core
++			// would emit for the same display name.
++			expect( slugifyCustomColorName( 'Brand! Red?' ) ).toBe(
++				'custom-brand-red'
++			);
++		} );
++
++		test( 'collapses multiple separators', () => {
++			expect( slugifyCustomColorName( '  Mixed--Case 123  ' ) ).toBe(
++				'custom-mixed-case-123'
++			);
++		} );
++
++		test( 'handles an empty name', () => {
++			expect( slugifyCustomColorName( '' ) ).toBe( 'custom-' );
++		} );
++	} );
++
++	describe( 'findSelectedColorEntry', () => {
++		const PALETTES = [
++			{
++				name: 'Theme',
++				slug: 'theme',
++				colors: [ { name: 'Brand', slug: 'brand', color: '#0073aa' } ],
++			},
++			{
++				name: 'Custom',
++				slug: 'custom',
++				colors: [
++					{
++						name: 'My Red',
++						slug: 'custom-my-red',
++						color: '#ff0000',
++					},
++				],
++			},
++		];
++
++		test( 'returns the matching entry and its palette slug by hex', () => {
++			const result = findSelectedColorEntry( '#ff0000', PALETTES );
++			expect( result?.color.name ).toBe( 'My Red' );
++			expect( result?.paletteSlug ).toBe( 'custom' );
++		} );
++
++		test( 'returns the matching entry by selectedSlug', () => {
++			const result = findSelectedColorEntry( '#000', PALETTES, 'brand' );
++			expect( result?.color.slug ).toBe( 'brand' );
++			expect( result?.paletteSlug ).toBe( 'theme' );
++		} );
++
++		test( 'returns undefined when nothing matches', () => {
++			expect(
++				findSelectedColorEntry( '#abcdef', PALETTES )
++			).toBeUndefined();
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/color-palette/types.ts b/packages/components/src/color-palette/types.ts
+index 40c874b4b36bb0..0c5736f4b2caab 100644
+--- a/packages/components/src/color-palette/types.ts
++++ b/packages/components/src/color-palette/types.ts
+@@ -8,6 +8,7 @@ import type { CSSProperties, ReactNode } from 'react';
+  */
+ import type { DropdownProps } from '../dropdown/types';
+ import type { HeadingSize } from '../heading/types';
++import type { ColorEditingPropKey } from './private-keys';
+ 
+ export type ColorObject = {
+ 	name: string;
+@@ -18,6 +19,35 @@ export type ColorObject = {
+ export type PaletteObject = {
+ 	name: string;
+ 	colors: ColorObject[];
++	slug?: string;
++};
++
++export type PaletteEditingCapability = 'value' | 'full';
++
++export type PaletteColorPayload = {
++	/** Slug of the palette (origin) the color belongs to: 'custom', 'theme', 'default'. */
++	paletteSlug: string;
++	/** Existing slug of the edited/removed color. Omitted on add. */
++	slug?: string;
++	/** Slug after the mutation completes; provided on add and rename. */
++	nextSlug?: string;
++	name: string;
++	color: string;
++};
++
++export type ColorEditingProps = {
++	/** Per-palette editing capability keyed by `slug`: `'full'` (add/rename/recolor/delete) or `'value'` (recolor only). */
++	capabilities: Record< string, PaletteEditingCapability >;
++	/** Called when the user submits the "add color" form (only 'full' palettes). */
++	onAdd?: ( payload: PaletteColorPayload ) => void;
++	/** Called when the user submits the edit form. */
++	onUpdate?: ( payload: PaletteColorPayload ) => void;
++	/** Called when the user confirms deletion (only 'full' palettes). */
++	onDelete?: ( payload: { paletteSlug: string; slug: string } ) => void;
++	/** Live preview while the edit form is open: candidate color on each change, `null` when preview ends. */
++	onPreview?: (
++		payload: { paletteSlug: string; slug: string; color: string } | null
++	) => void;
+ };
+ 
+ type PaletteProps = {
+@@ -47,10 +77,15 @@ type PaletteProps = {
+ 
+ export type SinglePaletteProps = PaletteProps & {
+ 	colors: ColorObject[];
++	/** Optional node appended after swatches (e.g. an add-custom-color control). */
++	addAction?: ReactNode;
+ };
+ 
+ export type MultiplePalettesProps = PaletteProps & {
+ 	colors: PaletteObject[];
++	/** When true, renders an add-custom-color button in the custom palette row. */
++	canAddCustomColor?: boolean;
++	onAddCustom?: ( trigger: HTMLElement ) => void;
+ };
+ 
+ export type CustomColorPickerDropdownProps = DropdownProps & {
+@@ -139,3 +174,13 @@ export type ColorPaletteProps = Pick<
+ 				'aria-label'?: never;
+ 		  }
+ 	);
++
++export type ColorPaletteInternalProps = ColorPaletteProps & {
++	[ K in ColorEditingPropKey ]?: ColorEditingProps;
++} & {
++	/**
++	 * Legacy prop forwarded by some consumers.
++	 * It is destructured only so it isn't spread onto the root element.
++	 */
++	hasColorsToChoose?: boolean;
++};
+diff --git a/packages/components/src/color-palette/use-color-editing.ts b/packages/components/src/color-palette/use-color-editing.ts
+new file mode 100644
+index 00000000000000..2134da3bcc4a32
+--- /dev/null
++++ b/packages/components/src/color-palette/use-color-editing.ts
+@@ -0,0 +1,516 @@
++/**
++ * WordPress dependencies
++ */
++import { speak } from '@wordpress/a11y';
++import { __, sprintf } from '@wordpress/i18n';
++import {
++	useCallback,
++	useEffect,
++	useMemo,
++	useReducer,
++	useRef,
++	useState,
++} from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type {
++	ColorEditingProps,
++	ColorObject,
++	ColorPaletteProps,
++} from './types';
++import {
++	CUSTOM_PALETTE_SLUG,
++	colorsAreEqual,
++	findSelectedColorEntry,
++	getUniqueCustomColorSlug,
++	isColorEditingEnabled,
++	toPaletteObjects,
++} from './utils';
++
++export type AddFormInitialFocus = 'name' | 'color';
++
++export type EnterAddOptions = {
++	initialFocus?: AddFormInitialFocus;
++	trigger?: HTMLElement | null;
++};
++
++export type EditingState =
++	| { mode: 'view' }
++	| { mode: 'add'; initialFocus: AddFormInitialFocus }
++	| {
++			mode: 'edit';
++			entry: ColorObject;
++			paletteSlug: string;
++			previewColor?: string;
++	  }
++	| { mode: 'delete-confirm'; entry: ColorObject; paletteSlug: string };
++
++type EditingAction =
++	| { type: 'reset' }
++	| { type: 'enter-add'; initialFocus: AddFormInitialFocus }
++	| { type: 'enter-edit'; entry: ColorObject; paletteSlug: string }
++	| { type: 'enter-delete'; entry: ColorObject; paletteSlug: string }
++	| { type: 'set-preview'; color: string };
++
++function editingReducer(
++	state: EditingState,
++	action: EditingAction
++): EditingState {
++	switch ( action.type ) {
++		case 'reset':
++			return { mode: 'view' };
++		case 'enter-add':
++			return {
++				mode: 'add',
++				initialFocus: action.initialFocus,
++			};
++		case 'enter-edit':
++			return {
++				mode: 'edit',
++				entry: action.entry,
++				paletteSlug: action.paletteSlug,
++			};
++		case 'enter-delete':
++			return {
++				mode: 'delete-confirm',
++				entry: action.entry,
++				paletteSlug: action.paletteSlug,
++			};
++		case 'set-preview':
++			if ( state.mode === 'edit' ) {
++				return { ...state, previewColor: action.color };
++			}
++			return state;
++		default:
++			return state;
++	}
++}
++
++type UseColorPaletteEditingArgs = {
++	colorEditing?: ColorEditingProps;
++	value?: string;
++	selectedSlug?: string;
++	colors: ColorPaletteProps[ 'colors' ];
++	disableCustomColors: boolean;
++	onChange: ColorPaletteProps[ 'onChange' ];
++	displayValue?: string;
++	isHex: boolean;
++	buttonLabelName: string;
++	resolvedColorValue?: string;
++};
++
++export function useColorEditing( {
++	colorEditing,
++	value,
++	selectedSlug,
++	colors,
++	disableCustomColors,
++	onChange,
++	displayValue,
++	isHex,
++	buttonLabelName,
++	resolvedColorValue,
++}: UseColorPaletteEditingArgs ) {
++	const [ editingState, dispatch ] = useReducer( editingReducer, {
++		mode: 'view',
++	} );
++	const [ isPickerOpen, setIsPickerOpen ] = useState( false );
++	const focusColorToggleRef = useRef< ( () => void ) | null >( null );
++	const addTriggerRef = useRef< HTMLElement | null >( null );
++
++	const isEditingEnabled = isColorEditingEnabled( colorEditing, {
++		disableCustomColors,
++	} );
++	const canEditFullCustom =
++		isEditingEnabled && colorEditing?.capabilities?.custom === 'full';
++
++	const selectedEntry = useMemo(
++		() => findSelectedColorEntry( value, colors, selectedSlug ),
++		[ value, colors, selectedSlug ]
++	);
++
++	const getCapability = useCallback(
++		( slug?: string ) =>
++			slug ? colorEditing?.capabilities?.[ slug ] : undefined,
++		[ colorEditing ]
++	);
++
++	const selectedCapability = getCapability( selectedEntry?.paletteSlug );
++	const canEditSelected =
++		isEditingEnabled &&
++		( selectedCapability === 'value' || selectedCapability === 'full' );
++	const canDeleteSelected = isEditingEnabled && selectedCapability === 'full';
++
++	const isDirtyCustomValue =
++		canEditFullCustom && !! value && isHex && ! selectedEntry;
++
++	const customColors = useMemo( () => {
++		const palettes = toPaletteObjects( colors );
++		const found = palettes.find( ( p ) => p.slug === CUSTOM_PALETTE_SLUG );
++		return found?.colors ?? [];
++	}, [ colors ] );
++
++	const closeDropdown = useCallback( () => {
++		setIsPickerOpen( false );
++	}, [] );
++
++	const resetEditing = useCallback( () => {
++		dispatch( { type: 'reset' } );
++	}, [] );
++
++	const restoreAddTriggerFocus = useCallback( () => {
++		const trigger = addTriggerRef.current;
++		if ( trigger?.isConnected ) {
++			trigger.focus();
++		}
++	}, [] );
++
++	const handleCancel = useCallback( () => {
++		const shouldRestoreFocus = editingState.mode === 'add';
++		if ( editingState.mode === 'edit' ) {
++			if ( colorEditing?.onPreview ) {
++				colorEditing.onPreview( null );
++			} else {
++				onChange(
++					editingState.entry.color,
++					undefined,
++					editingState.entry.slug
++				);
++			}
++		}
++		resetEditing();
++		closeDropdown();
++		if ( shouldRestoreFocus ) {
++			restoreAddTriggerFocus();
++		}
++	}, [
++		editingState,
++		onChange,
++		colorEditing,
++		resetEditing,
++		closeDropdown,
++		restoreAddTriggerFocus,
++	] );
++
++	const handleEnterAdd = useCallback(
++		( { initialFocus, trigger }: EnterAddOptions = {} ) => {
++			addTriggerRef.current = trigger ?? null;
++			const resolvedInitialFocus =
++				initialFocus ?? ( isDirtyCustomValue ? 'name' : 'color' );
++			if ( resolvedInitialFocus === 'color' ) {
++				// Focus the swatch toggle before opening the picker so the
++				// popover captures it as the focus-return target and restores
++				// to it on close.
++				focusColorToggleRef.current?.();
++				setIsPickerOpen( true );
++			}
++			dispatch( {
++				type: 'enter-add',
++				initialFocus: resolvedInitialFocus,
++			} );
++		},
++		[ isDirtyCustomValue ]
++	);
++
++	// Lets the parent register a way to focus the palette's color toggle
++	// (the existing swatch button) for recolor-first flows.
++	const registerFocusColorToggle = useCallback( ( focus: () => void ) => {
++		focusColorToggleRef.current = focus;
++	}, [] );
++
++	// Every flow that opens the picker focuses the swatch toggle first,
++	// so the popover restores focus to the swatch toggle on close.
++	const handlePickerToggle = useCallback( ( isOpen: boolean ) => {
++		setIsPickerOpen( isOpen );
++	}, [] );
++
++	const handleEnterEdit = useCallback( () => {
++		if ( ! selectedEntry ) {
++			return;
++		}
++		dispatch( {
++			type: 'enter-edit',
++			entry: selectedEntry.color,
++			paletteSlug: selectedEntry.paletteSlug ?? '',
++		} );
++		// Editing a color is primarily about re-coloring, so move focus to the
++		// swatch toggle (the color control) rather than the name input.
++		focusColorToggleRef.current?.();
++	}, [ selectedEntry ] );
++	const handleEnterDelete = useCallback( () => {
++		if ( ! selectedEntry?.color.slug ) {
++			return;
++		}
++		dispatch( {
++			type: 'enter-delete',
++			entry: selectedEntry.color,
++			paletteSlug: selectedEntry.paletteSlug ?? CUSTOM_PALETTE_SLUG,
++		} );
++	}, [ selectedEntry ] );
++
++	const handleSubmitAdd = useCallback(
++		( name: string ) => {
++			const trimmedName = name.trim();
++			const finalName = trimmedName || ( displayValue ?? value ?? '' );
++			const nextSlug = getUniqueCustomColorSlug(
++				finalName,
++				customColors
++			);
++			colorEditing?.onAdd?.( {
++				paletteSlug: CUSTOM_PALETTE_SLUG,
++				name: finalName,
++				nextSlug,
++				color: value ?? '',
++			} );
++			onChange( value, undefined, nextSlug );
++			resetEditing();
++			closeDropdown();
++			// The add trigger ("+"/"Add to custom") unmounts once the color is
++			// saved, so return focus to the always-present swatch toggle (now
++			// representing the new selection) instead of leaving it on <body>.
++			focusColorToggleRef.current?.();
++		},
++		[
++			colorEditing,
++			onChange,
++			value,
++			displayValue,
++			customColors,
++			resetEditing,
++			closeDropdown,
++		]
++	);
++
++	const handleSubmitEdit = useCallback(
++		( name: string ) => {
++			if ( editingState.mode !== 'edit' ) {
++				return;
++			}
++			const { entry, paletteSlug, previewColor } = editingState;
++			const currentColor = previewColor ?? entry.color;
++			const capability = getCapability( paletteSlug );
++			const isFullCapability = capability === 'full';
++			const finalName = isFullCapability ? name : entry.name;
++			if (
++				finalName.trim() === entry.name.trim() &&
++				colorsAreEqual( currentColor, entry.color )
++			) {
++				return;
++			}
++
++			const nextSlug = isFullCapability
++				? getUniqueCustomColorSlug(
++						finalName,
++						customColors,
++						entry.slug
++				  )
++				: entry.slug;
++			colorEditing?.onUpdate?.( {
++				paletteSlug,
++				slug: entry.slug,
++				nextSlug,
++				name: finalName,
++				color: currentColor,
++			} );
++			if ( colorEditing?.onPreview ) {
++				colorEditing.onPreview( null );
++			}
++			onChange( currentColor, undefined, nextSlug );
++			resetEditing();
++			closeDropdown();
++			// Return focus to the swatch toggle (the form's submit button just
++			// unmounted) so focus is never left on <body>.
++			focusColorToggleRef.current?.();
++		},
++		[
++			colorEditing,
++			onChange,
++			editingState,
++			customColors,
++			resetEditing,
++			closeDropdown,
++			getCapability,
++		]
++	);
++
++	const handleConfirmDelete = useCallback( () => {
++		if ( editingState.mode !== 'delete-confirm' ) {
++			return;
++		}
++		const { entry, paletteSlug } = editingState;
++		if ( ! entry.slug ) {
++			return;
++		}
++		colorEditing?.onDelete?.( { paletteSlug, slug: entry.slug } );
++		resetEditing();
++		closeDropdown();
++		onChange( undefined );
++		// The Delete button unmounts with the confirmation; return focus to the
++		// swatch toggle rather than leaving it on <body>.
++		focusColorToggleRef.current?.();
++	}, [ colorEditing, editingState, onChange, resetEditing, closeDropdown ] );
++
++	const handlePickerChange = useCallback(
++		( color: string ) => {
++			if (
++				editingState.mode === 'edit' &&
++				editingState.entry.slug &&
++				editingState.paletteSlug
++			) {
++				dispatch( { type: 'set-preview', color } );
++				colorEditing?.onPreview?.( {
++					paletteSlug: editingState.paletteSlug,
++					slug: editingState.entry.slug,
++					color,
++				} );
++				return;
++			}
++			onChange( color );
++		},
++		[ editingState, onChange, colorEditing ]
++	);
++
++	// Close editing when external selection or permissions change.
++	useEffect( () => {
++		if ( editingState.mode === 'view' ) {
++			return;
++		}
++
++		if ( ! isEditingEnabled ) {
++			// Editing was disabled (e.g. `disableCustomColors` or capabilities removed).
++			resetEditing();
++			return;
++		}
++
++		if ( ! value ) {
++			// Edit/delete need a selected swatch; add mode can run without one.
++			if (
++				editingState.mode === 'edit' ||
++				editingState.mode === 'delete-confirm'
++			) {
++				resetEditing();
++			}
++			return;
++		}
++
++		if ( editingState.mode === 'edit' ) {
++			if (
++				selectedEntry &&
++				( selectedEntry.paletteSlug !== editingState.paletteSlug ||
++					selectedEntry.color.slug !== editingState.entry.slug )
++			) {
++				// User picked a different swatch while the edit form was open.
++				resetEditing();
++			}
++			return;
++		}
++
++		if ( editingState.mode === 'delete-confirm' ) {
++			if ( selectedEntry?.color.slug !== editingState.entry.slug ) {
++				// User picked a different swatch while delete confirm was open.
++				resetEditing();
++			}
++		}
++	}, [ isEditingEnabled, editingState, selectedEntry, value, resetEditing ] );
++
++	const prevIsDirtyRef = useRef( isDirtyCustomValue );
++	const prevModeRef = useRef( editingState.mode );
++
++	useEffect( () => {
++		if ( isDirtyCustomValue && ! prevIsDirtyRef.current ) {
++			speak(
++				__( 'Unsaved custom color. Press Add to save to the palette.' ),
++				'polite'
++			);
++		}
++		prevIsDirtyRef.current = isDirtyCustomValue;
++	}, [ isDirtyCustomValue ] );
++
++	useEffect( () => {
++		if ( editingState.mode === prevModeRef.current ) {
++			return;
++		}
++
++		if ( editingState.mode === 'add' ) {
++			if ( editingState.initialFocus === 'color' ) {
++				speak(
++					__( 'Add custom color. Choose a color first.' ),
++					'polite'
++				);
++			} else if ( displayValue ) {
++				speak(
++					sprintf(
++						// translators: %s: hex value of the custom color being added.
++						__( 'Adding custom color %s. Enter a name.' ),
++						displayValue
++					),
++					'polite'
++				);
++			} else {
++				speak( __( 'Add custom color' ), 'polite' );
++			}
++		} else if ( editingState.mode === 'edit' && editingState.entry.name ) {
++			speak(
++				sprintf(
++					// translators: %s: name of the color being edited.
++					__( 'Editing color: %s' ),
++					editingState.entry.name
++				),
++				'polite'
++			);
++		}
++
++		prevModeRef.current = editingState.mode;
++	}, [ editingState, displayValue ] );
++
++	const editPickerColor =
++		editingState.mode === 'edit'
++			? editingState.previewColor ?? editingState.entry.color
++			: resolvedColorValue;
++
++	const editDisplayHex =
++		editingState.mode === 'edit'
++			? editingState.previewColor ?? displayValue
++			: displayValue;
++
++	const editingCapability =
++		editingState.mode === 'edit' || editingState.mode === 'delete-confirm'
++			? getCapability( editingState.paletteSlug )
++			: undefined;
++
++	let displayedName: string;
++	if ( ! value ) {
++		displayedName = __( 'No color selected' );
++	} else if ( isDirtyCustomValue ) {
++		displayedName = __( 'Custom' );
++	} else {
++		displayedName = buttonLabelName;
++	}
++
++	return {
++		editingState,
++		isPickerOpen,
++		setIsPickerOpen: handlePickerToggle,
++		registerFocusColorToggle,
++		closeDropdown,
++		isEditingEnabled,
++		canEditFullCustom,
++		canEditSelected,
++		canDeleteSelected,
++		isDirtyCustomValue,
++		handleEnterAdd,
++		handleEnterEdit,
++		handleEnterDelete,
++		handleCancel,
++		handleSubmitAdd,
++		handleSubmitEdit,
++		handleConfirmDelete,
++		handlePickerChange,
++		editPickerColor,
++		editDisplayHex,
++		editingCapability,
++		displayedName,
++	};
++}
+diff --git a/packages/components/src/color-palette/utils.ts b/packages/components/src/color-palette/utils.ts
+index eda08e3d7443f9..8a355ef8e71ed4 100644
+--- a/packages/components/src/color-palette/utils.ts
++++ b/packages/components/src/color-palette/utils.ts
+@@ -13,7 +13,13 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import type { ColorObject, ColorPaletteProps, PaletteObject } from './types';
++import type {
++	ColorEditingProps,
++	ColorObject,
++	ColorPaletteProps,
++	PaletteObject,
++} from './types';
++import { kebabCase } from '../utils/strings';
+ 
+ extend( [ namesPlugin, a11yPlugin ] );
+ 
+@@ -23,58 +29,110 @@ extend( [ namesPlugin, a11yPlugin ] );
+  * @param value The color value to check.
+  * @return A boolean indicating whether the color value is a simple CSS color.
+  */
+-const isSimpleCSSColor = ( value: string ): boolean => {
++export const isSimpleCSSColor = ( value: string ): boolean => {
+ 	const valueIsCssVariable = /var\(/.test( value ?? '' );
+ 	const valueIsColorMix = /color-mix\(/.test( value ?? '' );
+ 	return ! valueIsCssVariable && ! valueIsColorMix;
+ };
+ 
++/**
++ * Case-insensitive, whitespace-insensitive equality for raw color strings.
++ * Used to detect whether a color value actually changed (NOT for matching a
++ * value against a palette — see `findSelectedColorEntry` for that).
++ *
++ * @param a First color string.
++ * @param b Second color string.
++ * @return Whether the two color strings are equal after normalization.
++ */
++export const colorsAreEqual = ( a?: string, b?: string ): boolean =>
++	( a ?? '' ).trim().toLocaleLowerCase() ===
++	( b ?? '' ).trim().toLocaleLowerCase();
++
++/**
++ * Whether `colorEditing` is active enough to show the editing UI.
++ *
++ * @param colorEditing
++ * @param options
++ * @param options.disableCustomColors
++ * @param options.requireCallbacks
++ * @return Whether editing UI should be shown.
++ */
++export function isColorEditingEnabled(
++	colorEditing?: ColorEditingProps | null,
++	options?: {
++		disableCustomColors?: boolean;
++		requireCallbacks?: boolean;
++	}
++): boolean {
++	if ( ! colorEditing ) {
++		return false;
++	}
++	if ( options?.disableCustomColors ) {
++		return false;
++	}
++	if ( ! Object.keys( colorEditing.capabilities ?? {} ).length ) {
++		return false;
++	}
++	if ( options?.requireCallbacks ) {
++		return !! (
++			colorEditing.onAdd ||
++			colorEditing.onUpdate ||
++			colorEditing.onDelete
++		);
++	}
++	return true;
++}
++
++/**
++ * Normalizes `colors` into an array of palette objects regardless of input
++ * shape, so callers can traverse palettes without repeated type assertions.
++ *
++ * @param colors Palette input from `ColorPalette`.
++ */
++export function toPaletteObjects(
++	colors: ColorPaletteProps[ 'colors' ] = []
++): PaletteObject[] {
++	return isMultiplePaletteArray( colors )
++		? colors
++		: [ { name: '', colors: colors as ColorObject[] } ];
++}
++
++/**
++ * Returns the flat color list when `colors` is a single palette, or `[]` when
++ * multiple palettes are in use.
++ *
++ * @param colors Palette input from `ColorPalette`.
++ */
++export function toColorObjects(
++	colors: ColorPaletteProps[ 'colors' ] = []
++): ColorObject[] {
++	return isMultiplePaletteArray( colors ) ? [] : ( colors as ColorObject[] );
++}
++
++/**
++ * Resolves the display name for the currently selected color value.
++ *
++ * @param currentValue          The selected color value.
++ * @param colors                The palette(s) to look through.
++ * @param _showMultiplePalettes Kept for backwards-compatible signature.
++ * @param selectedSlug          Optional slug that takes priority over value matching.
++ * @return The matched color name, `'Custom'` for unmatched values, or `''` when empty.
++ */
+ export const extractColorNameFromCurrentValue = (
+ 	currentValue?: ColorPaletteProps[ 'value' ],
+ 	colors: ColorPaletteProps[ 'colors' ] = [],
+-	showMultiplePalettes: boolean = false,
++	// eslint-disable-next-line @typescript-eslint/no-unused-vars
++	_showMultiplePalettes: boolean = false,
+ 	selectedSlug?: ColorPaletteProps[ 'selectedSlug' ]
+ ) => {
+ 	if ( ! currentValue ) {
+ 		return '';
+ 	}
+-	const currentValueIsSimpleColor = currentValue
+-		? isSimpleCSSColor( currentValue )
+-		: false;
+-	const normalizedCurrentValue = currentValueIsSimpleColor
+-		? colord( currentValue ).toHex()
+-		: currentValue;
+-
+-	// Normalize format of `colors` to simplify the following loop
+-	type normalizedPaletteObject = { colors: ColorObject[] };
+-	const colorPalettes: normalizedPaletteObject[] = showMultiplePalettes
+-		? ( colors as PaletteObject[] )
+-		: [ { colors: colors as ColorObject[] } ];
+-	for ( const { colors: paletteColors } of colorPalettes ) {
+-		for ( const {
+-			name: colorName,
+-			color: colorValue,
+-			slug,
+-		} of paletteColors ) {
+-			if ( selectedSlug ) {
+-				if ( slug === selectedSlug ) {
+-					return colorName;
+-				}
+-				continue;
+-			}
+-
+-			const normalizedColorValue = currentValueIsSimpleColor
+-				? colord( colorValue ).toHex()
+-				: colorValue;
+-
+-			if ( normalizedCurrentValue === normalizedColorValue ) {
+-				return colorName;
+-			}
+-		}
+-	}
+-
+-	// translators: shown when the user has picked a custom color (i.e not in the palette of colors).
+-	return __( 'Custom' );
++	const found = findSelectedColorEntry( currentValue, colors, selectedSlug );
++	return found
++		? found.color.name
++		: // translators: shown when the user has picked a custom color (i.e not in the palette of colors).
++		  __( 'Custom' );
+ };
+ 
+ // The PaletteObject type has a `colors` property (an array of ColorObject),
+@@ -117,3 +175,95 @@ export const normalizeColorValue = (
+ 		? colord( computedBackgroundColor ).toHex()
+ 		: value;
+ };
++
++// Slug prefix for user-managed custom colors (e.g. `custom-my-color`), matching core's `theme.json` convention and `--wp--preset--color--custom-*` CSS variables.
++export const CUSTOM_COLOR_SLUG_PREFIX = 'custom-';
++
++// Slug for the user-managed custom palette in `MultiplePalettes`.
++export const CUSTOM_PALETTE_SLUG = 'custom';
++
++/**
++ * Generates the slug for a custom color from its display name.
++ *
++ * @param name The (potentially empty) display name.
++ * @return The slug.
++ */
++export const slugifyCustomColorName = ( name: string ): string => {
++	const base = kebabCase( name ?? '' );
++	return `${ CUSTOM_COLOR_SLUG_PREFIX }${ base }`;
++};
++
++/**
++ * Generates a unique custom color slug, following the same convention as
++ * PaletteEdit: the first duplicate slug gets `-1`, then `-2`, and so on.
++ *
++ * @param name         The name to test.
++ * @param customColors Existing custom colors.
++ * @param ignoredSlug  Optional slug to ignore, used when editing a color.
++ * @return The unique custom color slug.
++ */
++export const getUniqueCustomColorSlug = (
++	name: string,
++	customColors: ColorObject[] = [],
++	ignoredSlug?: string
++): string => {
++	const baseSlug = slugifyCustomColorName( name );
++	const usedSlugs = new Set(
++		customColors
++			.map( ( customColor ) => customColor.slug )
++			.filter( ( slug ) => slug && slug !== ignoredSlug )
++	);
++
++	if ( ! usedSlugs.has( baseSlug ) ) {
++		return baseSlug;
++	}
++
++	let suffix = 1;
++	let nextSlug = `${ baseSlug }-${ suffix }`;
++	while ( usedSlugs.has( nextSlug ) ) {
++		suffix += 1;
++		nextSlug = `${ baseSlug }-${ suffix }`;
++	}
++	return nextSlug;
++};
++
++/**
++ * Finds the currently-selected color entry across one or more palettes.
++ *
++ * @param value        The currently selected color value, hex or CSS variable.
++ * @param colors       The palette(s) to look through.
++ * @param selectedSlug Optional slug that takes priority over value matching.
++ * @return The matched palette entry and the slug of the palette it belongs
++ *         to, or `undefined` when nothing matches.
++ */
++export const findSelectedColorEntry = (
++	value: string | undefined,
++	colors: ColorPaletteProps[ 'colors' ] = [],
++	selectedSlug?: string
++): { color: ColorObject; paletteSlug?: string } | undefined => {
++	if ( ! value ) {
++		return undefined;
++	}
++
++	const isSimple = isSimpleCSSColor( value );
++	const normalizedValue = isSimple ? colord( value ).toHex() : value;
++
++	for ( const palette of toPaletteObjects( colors ) ) {
++		for ( const entry of palette.colors ) {
++			if ( selectedSlug ) {
++				if ( entry.slug === selectedSlug ) {
++					return { color: entry, paletteSlug: palette.slug };
++				}
++				continue;
++			}
++			const normalizedEntry = isSimple
++				? colord( entry.color ).toHex()
++				: entry.color;
++			if ( normalizedEntry === normalizedValue ) {
++				return { color: entry, paletteSlug: palette.slug };
++			}
++		}
++	}
++
++	return undefined;
++};
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index 3a427db5bfe8c1..dd74ba3741e4cf 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -94,24 +94,35 @@ const UnconnectedColorPicker = (
+ 		...safeColordColor.toHsl(),
+ 	} ) );
+ 
+-	// Track the last hex we produced so the sync effect can
+-	// distinguish our own updates from external prop changes.
+-	const lastProducedHexRef = useRef( safeColordColor.toHex() );
++	// Hex values we sent via onChange but haven't seen echoed back in `color` yet.
++	// Helps the sync effect ignore our own updates.
++	const producedHexesRef = useRef< string[] >( [ safeColordColor.toHex() ] );
++	const MAX_PRODUCED_QUEUE = 20;
++
++	const pushProducedHex = useCallback( ( nextHex: string ) => {
++		const produced = producedHexesRef.current;
++		produced.push( nextHex );
++		while ( produced.length > MAX_PRODUCED_QUEUE ) {
++			produced.shift();
++		}
++	}, [] );
+ 
+ 	// Sync internalHSLA when the color prop changes externally (e.g.
+ 	// parent passes a new color that wasn't produced by our onChange).
+ 	useEffect( () => {
+ 		const incomingHex = safeColordColor.toHex();
++		const produced = producedHexesRef.current;
++		const matchIndex = produced.indexOf( incomingHex );
+ 
+-		// If this hex matches what we last produced, it's our own
+-		// update arriving back — skip the sync to avoid overwriting
+-		// internalHSLA with lossy round-tripped values.
+-		if ( incomingHex === lastProducedHexRef.current ) {
++		if ( matchIndex !== -1 ) {
++			// Our own update arriving back. Consume it and everything older,
++			// but keep newer in-flight values for recognition.
++			produced.splice( 0, matchIndex + 1 );
+ 			return;
+ 		}
+ 
+-		// Genuinely external change — sync internalHSLA.
+-		lastProducedHexRef.current = incomingHex;
++		// External change — sync state and reset the pending queue.
++		producedHexesRef.current = [ incomingHex ];
+ 		const externalHSLA = safeColordColor.toHsl();
+ 		setInternalHSLA( ( prev ) => mergeHSLA( externalHSLA, prev ) );
+ 	}, [ safeColordColor ] );
+@@ -128,17 +139,18 @@ const UnconnectedColorPicker = (
+ 			// No mergeHSLA here — this handler receives the user's explicit
+ 			// choice from the picker or HSL inputs, with no lossy conversion.
+ 			setInternalHSLA( nextHSLA );
+-			const previousHex = lastProducedHexRef.current;
++			const previousHex =
++				producedHexesRef.current.at( -1 ) ?? safeColordColor.toHex();
+ 			const nextHex = colord( nextHSLA ).toHex();
+ 			// Only notify parent when the hex actually changes. This
+ 			// avoids firing onChange for H/S changes on achromatic
+ 			// colors (e.g. adjusting hue on pure white).
+ 			if ( nextHex !== previousHex ) {
+-				lastProducedHexRef.current = nextHex;
++				pushProducedHex( nextHex );
+ 				setColor( nextHex );
+ 			}
+ 		},
+-		[ setColor ]
++		[ setColor, pushProducedHex, safeColordColor ]
+ 	);
+ 
+ 	// Handler for components that provide Colord values (RGB, Hex inputs).
+@@ -148,10 +160,10 @@ const UnconnectedColorPicker = (
+ 			const nextHSLA = nextValue.toHsl();
+ 			setInternalHSLA( ( prev ) => mergeHSLA( nextHSLA, prev ) );
+ 			const nextHex = nextValue.toHex();
+-			lastProducedHexRef.current = nextHex;
++			pushProducedHex( nextHex );
+ 			debouncedSetColor( nextHex );
+ 		},
+-		[ debouncedSetColor ]
++		[ debouncedSetColor, pushProducedHex ]
+ 	);
+ 
+ 	const [ colorType, setColorType ] = useState< ColorType >(
+diff --git a/packages/components/src/color-picker/test/index.tsx b/packages/components/src/color-picker/test/index.tsx
+index 33f72d2445cc05..a7984114918212 100644
+--- a/packages/components/src/color-picker/test/index.tsx
++++ b/packages/components/src/color-picker/test/index.tsx
+@@ -574,4 +574,116 @@ describe( 'ColorPicker', () => {
+ 			expect( alphaInput ).toHaveValue( 75 );
+ 		} );
+ 	} );
++
++	describe( 'async prop round-trip', () => {
++		const getHexInput = async (
++			user: ReturnType< typeof userEvent.setup >
++		) => {
++			const formatSelector = screen.getByRole( 'combobox' );
++			await user.selectOptions( formatSelector, 'hex' );
++			return screen.getByRole( 'textbox' );
++		};
++
++		it( 'ignores stale prop renders while waiting for its own echo', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++
++			const { rerender } = render(
++				<ColorPicker
++					color="#aaaaaa"
++					onChange={ onChange }
++					enableAlpha={ false }
++				/>
++			);
++
++			const hexInput = await getHexInput( user );
++			await user.clear( hexInput );
++			await user.paste( 'bbbbbb' );
++
++			const changeCountAfterEdit = onChange.mock.calls.length;
++			expect( onChange ).toHaveBeenLastCalledWith( '#bbbbbb' );
++
++			rerender(
++				<ColorPicker
++					color="#aaaaaa"
++					onChange={ onChange }
++					enableAlpha={ false }
++				/>
++			);
++
++			expect( hexInput ).toHaveValue( 'BBBBBB' );
++			expect( onChange ).toHaveBeenCalledTimes( changeCountAfterEdit );
++
++			rerender(
++				<ColorPicker
++					color="#bbbbbb"
++					onChange={ onChange }
++					enableAlpha={ false }
++				/>
++			);
++
++			expect( hexInput ).toHaveValue( 'BBBBBB' );
++			expect( onChange ).toHaveBeenCalledTimes( changeCountAfterEdit );
++
++			rerender(
++				<ColorPicker
++					color="#123456"
++					onChange={ onChange }
++					enableAlpha={ false }
++				/>
++			);
++
++			await waitFor( () => expect( hexInput ).toHaveValue( '123456' ) );
++		} );
++
++		it( 'survives rapid updates with interleaved stale prop renders', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++
++			const { rerender } = render(
++				<ColorPicker
++					color="#aaaaaa"
++					onChange={ onChange }
++					enableAlpha={ false }
++				/>
++			);
++
++			const hexInput = await getHexInput( user );
++			await user.clear( hexInput );
++			await user.paste( 'bbbbbb' );
++			await user.clear( hexInput );
++			await user.paste( 'cccccc' );
++
++			const changeCountAfterEdits = onChange.mock.calls.length;
++			expect( onChange ).toHaveBeenLastCalledWith( '#cccccc' );
++
++			rerender(
++				<ColorPicker
++					color="#aaaaaa"
++					onChange={ onChange }
++					enableAlpha={ false }
++				/>
++			);
++			expect( hexInput ).toHaveValue( 'CCCCCC' );
++
++			rerender(
++				<ColorPicker
++					color="#bbbbbb"
++					onChange={ onChange }
++					enableAlpha={ false }
++				/>
++			);
++			expect( hexInput ).toHaveValue( 'CCCCCC' );
++
++			rerender(
++				<ColorPicker
++					color="#cccccc"
++					onChange={ onChange }
++					enableAlpha={ false }
++				/>
++			);
++			expect( hexInput ).toHaveValue( 'CCCCCC' );
++			expect( onChange ).toHaveBeenCalledTimes( changeCountAfterEdits );
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 43d85db9365f7a..896c49311fa666 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -30,6 +30,8 @@ import {
+ 	ValidatedToggleGroupControl,
+ } from './validated-form-controls';
+ import { ValidatedFormTokenField } from './validated-form-controls/components/form-token-field';
++import { colorEditingKey } from './color-palette/private-keys';
++import { isColorEditingEnabled } from './color-palette/utils';
+ 
+ export const privateApis = {};
+ lock( privateApis, {
+@@ -57,4 +59,6 @@ lock( privateApis, {
+ 	ValidatedToggleControl,
+ 	ValidatedToggleGroupControl,
+ 	ValidatedFormTokenField,
++	colorEditingKey,
++	isColorEditingEnabled,
+ } );
+diff --git a/packages/editor/CHANGELOG.md b/packages/editor/CHANGELOG.md
+index d94ea311a8ec19..c1f900891aee26 100644
+--- a/packages/editor/CHANGELOG.md
++++ b/packages/editor/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Edit palette colors from the block inspector: Change values for theme and default swatches. Add, rename, and delete for custom colors. Changes are saved to global styles ([#79266](https://github.com/WordPress/gutenberg/pull/79266)).
++
+ ## 14.48.1 (2026-06-16)
+ 
+ ## 14.48.0 (2026-06-10)
+diff --git a/packages/editor/src/components/global-styles/test/get-can-manage.js b/packages/editor/src/components/global-styles/test/get-can-manage.js
+new file mode 100644
+index 00000000000000..4531092231c6ee
+--- /dev/null
++++ b/packages/editor/src/components/global-styles/test/get-can-manage.js
+@@ -0,0 +1,56 @@
++/**
++ * Internal dependencies
++ */
++import { getCanManage } from '../use-color-palette-editor';
++
++describe( 'getCanManage', () => {
++	it( 'returns false when canUser resolves to false', () => {
++		expect(
++			getCanManage( {
++				isReady: true,
++				globalStylesId: 'abc',
++				canEditGlobalStyles: false,
++			} )
++		).toBe( false );
++	} );
++
++	it( 'returns false while canUser is still resolving (undefined)', () => {
++		expect(
++			getCanManage( {
++				isReady: true,
++				globalStylesId: 'abc',
++				canEditGlobalStyles: undefined,
++			} )
++		).toBe( false );
++	} );
++
++	it( 'returns true when ready, id is present, and canUser is true', () => {
++		expect(
++			getCanManage( {
++				isReady: true,
++				globalStylesId: 'abc',
++				canEditGlobalStyles: true,
++			} )
++		).toBe( true );
++	} );
++
++	it( 'returns false when global styles id is missing', () => {
++		expect(
++			getCanManage( {
++				isReady: true,
++				globalStylesId: null,
++				canEditGlobalStyles: true,
++			} )
++		).toBe( false );
++	} );
++
++	it( 'returns false when global styles config is not ready', () => {
++		expect(
++			getCanManage( {
++				isReady: false,
++				globalStylesId: 'abc',
++				canEditGlobalStyles: true,
++			} )
++		).toBe( false );
++	} );
++} );
+diff --git a/packages/editor/src/components/global-styles/test/palette-value-helpers.js b/packages/editor/src/components/global-styles/test/palette-value-helpers.js
+new file mode 100644
+index 00000000000000..3efc0f6b6665dc
+--- /dev/null
++++ b/packages/editor/src/components/global-styles/test/palette-value-helpers.js
+@@ -0,0 +1,47 @@
++/**
++ * Internal dependencies
++ */
++import {
++	getOptimisticPaletteValue,
++	getRollbackPaletteValue,
++} from '../use-color-palette-editor';
++
++describe( 'getOptimisticPaletteValue', () => {
++	it( 'custom: returns the array when non-empty', () => {
++		const next = [ { slug: 'a', color: '#000' } ];
++		expect( getOptimisticPaletteValue( 'custom', next, [] ) ).toBe( next );
++	} );
++	it( 'custom: returns undefined when empty (removes the override)', () => {
++		expect( getOptimisticPaletteValue( 'custom', [], [] ) ).toBeUndefined();
++	} );
++	it( 'theme/default: returns undefined when equal to base (auto-reset)', () => {
++		const base = [ { slug: 'brand', color: '#000' } ];
++		const next = [ { slug: 'brand', color: '#000' } ];
++		expect(
++			getOptimisticPaletteValue( 'theme', next, base )
++		).toBeUndefined();
++	} );
++	it( 'theme/default: returns the array when it differs from base', () => {
++		const base = [ { slug: 'brand', color: '#000' } ];
++		const next = [ { slug: 'brand', color: '#fff' } ];
++		expect( getOptimisticPaletteValue( 'theme', next, base ) ).toBe( next );
++	} );
++} );
++
++describe( 'getRollbackPaletteValue', () => {
++	it( 'custom: undefined when previous was empty', () => {
++		expect( getRollbackPaletteValue( 'custom', [] ) ).toBeUndefined();
++		expect(
++			getRollbackPaletteValue( 'custom', undefined )
++		).toBeUndefined();
++	} );
++	it( 'custom: returns previous array when non-empty', () => {
++		const prev = [ { slug: 'a', color: '#000' } ];
++		expect( getRollbackPaletteValue( 'custom', prev ) ).toBe( prev );
++	} );
++	it( 'theme/default: returns previous value as-is', () => {
++		const prev = [ { slug: 'brand', color: '#000' } ];
++		expect( getRollbackPaletteValue( 'theme', prev ) ).toBe( prev );
++		expect( getRollbackPaletteValue( 'theme', undefined ) ).toBeUndefined();
++	} );
++} );
+diff --git a/packages/editor/src/components/global-styles/test/use-color-palette-editor.js b/packages/editor/src/components/global-styles/test/use-color-palette-editor.js
+new file mode 100644
+index 00000000000000..ca1a6bc033d769
+--- /dev/null
++++ b/packages/editor/src/components/global-styles/test/use-color-palette-editor.js
+@@ -0,0 +1,129 @@
++/**
++ * External dependencies
++ */
++import { renderHook } from '@testing-library/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
++
++/**
++ * Internal dependencies
++ */
++import useColorPaletteEditing from '../use-color-palette-editor';
++
++jest.mock( '@wordpress/data', () => ( {
++	useSelect: jest.fn(),
++	useDispatch: jest.fn(),
++	useRegistry: jest.fn(),
++} ) );
++
++jest.mock( '@wordpress/notices', () => ( {
++	store: 'core/notices',
++} ) );
++
++jest.mock( '@wordpress/core-data', () => ( {
++	store: 'core',
++} ) );
++
++jest.mock( '../hooks', () => ( {
++	useGlobalStyles: jest.fn(),
++} ) );
++
++const { useGlobalStyles } = require( '../hooks' );
++
++const mockCreateSuccessNotice = jest.fn();
++const mockCreateErrorNotice = jest.fn();
++const mockCanUser = jest.fn();
++
++describe( 'useColorPaletteEditing', () => {
++	beforeEach( () => {
++		jest.clearAllMocks();
++
++		useGlobalStyles.mockReturnValue( {
++			merged: {
++				settings: {
++					color: {
++						palette: {
++							theme: [ { slug: 'brand', color: '#0073aa' } ],
++						},
++					},
++				},
++			},
++			setUser: jest.fn(),
++			isReady: true,
++		} );
++
++		useDispatch.mockReturnValue( {
++			createSuccessNotice: mockCreateSuccessNotice,
++			createErrorNotice: mockCreateErrorNotice,
++		} );
++
++		useRegistry.mockReturnValue( {
++			select: () => ( {
++				canUser: mockCanUser,
++				getEditedEntityRecord: jest.fn(),
++				getEntityRecord: jest.fn(),
++				__experimentalGetCurrentThemeBaseGlobalStyles: jest.fn(
++					() => ( {} )
++				),
++			} ),
++			dispatch: () => ( {
++				saveEntityRecord: jest.fn(),
++			} ),
++		} );
++
++		useSelect.mockImplementation( ( selector ) => {
++			const select = ( store ) => {
++				if ( store === 'core' ) {
++					return {
++						__experimentalGetCurrentGlobalStylesId: () => 'gs-1',
++						canUser: mockCanUser,
++					};
++				}
++				return {};
++			};
++			return selector( select );
++		} );
++	} );
++
++	it( 'returns colorEditing with capabilities and callbacks when permitted', () => {
++		mockCanUser.mockReturnValue( true );
++
++		const { result } = renderHook( () => useColorPaletteEditing() );
++
++		expect( result.current.colorEditing ).toEqual(
++			expect.objectContaining( {
++				capabilities: expect.objectContaining( {
++					custom: 'full',
++					theme: 'value',
++				} ),
++				onAdd: expect.any( Function ),
++				onUpdate: expect.any( Function ),
++				onDelete: expect.any( Function ),
++			} )
++		);
++		expect( result.current.colorEditing ).not.toHaveProperty( 'onPreview' );
++	} );
++
++	it( 'does not call canUser with an id when global styles id is absent', () => {
++		useSelect.mockImplementation( ( selector ) => {
++			const select = ( store ) => {
++				if ( store === 'core' ) {
++					return {
++						__experimentalGetCurrentGlobalStylesId: () => null,
++						canUser: mockCanUser,
++					};
++				}
++				return {};
++			};
++			return selector( select );
++		} );
++
++		const { result } = renderHook( () => useColorPaletteEditing() );
++
++		expect( result.current.colorEditing ).toBeUndefined();
++		expect( mockCanUser ).not.toHaveBeenCalled();
++	} );
++} );
+diff --git a/packages/editor/src/components/global-styles/use-color-palette-editor.js b/packages/editor/src/components/global-styles/use-color-palette-editor.js
+new file mode 100644
+index 00000000000000..157061dc28d88f
+--- /dev/null
++++ b/packages/editor/src/components/global-styles/use-color-palette-editor.js
+@@ -0,0 +1,411 @@
++/**
++ * External dependencies
++ */
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
++
++/**
++ * WordPress dependencies
++ */
++import { useCallback, useMemo } from '@wordpress/element';
++import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
++import { store as coreStore } from '@wordpress/core-data';
++import { __, sprintf } from '@wordpress/i18n';
++import { store as noticesStore } from '@wordpress/notices';
++
++/**
++ * Internal dependencies
++ */
++import { setImmutably } from '../../utils/set-immutably';
++import { useGlobalStyles } from './hooks';
++
++const PALETTE_PATHS = {
++	custom: [ 'settings', 'color', 'palette', 'custom' ],
++	theme: [ 'settings', 'color', 'palette', 'theme' ],
++	default: [ 'settings', 'color', 'palette', 'default' ],
++};
++
++// Stable id so successive palette mutations replace the previous snackbar
++// instead of stacking up.
++const COLOR_PALETTE_NOTICE_ID = 'editor/color-palette-editor';
++
++export function getOptimisticPaletteValue(
++	paletteSlug,
++	nextPalette,
++	basePalette
++) {
++	if ( paletteSlug === 'custom' ) {
++		return nextPalette.length ? nextPalette : undefined;
++	}
++	if ( fastDeepEqual( nextPalette, basePalette ) ) {
++		return undefined;
++	}
++	return nextPalette;
++}
++
++export function getRollbackPaletteValue( paletteSlug, previousPalette ) {
++	if ( paletteSlug === 'custom' ) {
++		return previousPalette?.length ? previousPalette : undefined;
++	}
++	return previousPalette;
++}
++
++/**
++ * Whether palette editing affordances should be exposed to the color picker.
++ * Extracted for unit testing; the REST controller is the real enforcement.
++ *
++ * @param {Object}  args                     Arguments.
++ * @param {boolean} args.isReady             Global styles config is ready.
++ * @param {string=} args.globalStylesId      Current global styles entity id.
++ * @param {boolean} args.canEditGlobalStyles `canUser( 'update', … )` result.
++ * @return {boolean} Whether editing is available.
++ */
++export function getCanManage( {
++	isReady,
++	globalStylesId,
++	canEditGlobalStyles,
++} ) {
++	return isReady && !! globalStylesId && !! canEditGlobalStyles;
++}
++
++/**
++ * Provides the inspector color picker with origin-aware palette editing:
++ * full CRUD for custom colors, value-only edits for theme/default palettes.
++ *
++ * Relies on experimental core-data selectors
++ * (`__experimentalGetCurrentGlobalStylesId`,
++ * `__experimentalGetCurrentThemeBaseGlobalStyles`) for entity identity and
++ * baseline palette reads.
++ *
++ * Each callback applies an optimistic edit, persists *only* the palette
++ * slice of `settings` (so unrelated dirty global-styles edits like typography
++ * stay dirty), and surfaces a success/error snackbar.
++ *
++ * @return {Object} Object with `colorEditing` shaped for `ColorPalette`, or
++ *                  `undefined` when editing isn't available.
++ */
++export default function useColorPaletteEditing() {
++	const {
++		merged,
++		setUser: setUserGlobalStyles,
++		isReady: isGlobalStylesReady,
++	} = useGlobalStyles();
++
++	const globalStylesId = useSelect(
++		( select ) =>
++			select( coreStore ).__experimentalGetCurrentGlobalStylesId(),
++		[]
++	);
++
++	const canEditGlobalStyles = useSelect(
++		( select ) =>
++			globalStylesId
++				? select( coreStore ).canUser( 'update', {
++						kind: 'root',
++						name: 'globalStyles',
++						id: globalStylesId,
++				  } )
++				: false,
++		[ globalStylesId ]
++	);
++
++	const registry = useRegistry();
++	const { createSuccessNotice, createErrorNotice } =
++		useDispatch( noticesStore );
++
++	const canManage = getCanManage( {
++		isReady: isGlobalStylesReady,
++		globalStylesId,
++		canEditGlobalStyles,
++	} );
++
++	const themePalette = merged?.settings?.color?.palette?.theme;
++	const defaultPalette = merged?.settings?.color?.palette?.default;
++	const defaultPaletteEnabled =
++		merged?.settings?.color?.defaultPalette !== false;
++
++	const hasThemePalette = !! themePalette?.length;
++	const hasDefaultPalette =
++		defaultPaletteEnabled && !! defaultPalette?.length;
++
++	const capabilities = useMemo(
++		() => ( {
++			custom: 'full',
++			...( hasThemePalette ? { theme: 'value' } : {} ),
++			...( hasDefaultPalette ? { default: 'value' } : {} ),
++		} ),
++		[ hasThemePalette, hasDefaultPalette ]
++	);
++
++	const getBaseOriginPalette = useCallback(
++		( paletteSlug ) =>
++			registry
++				.select( coreStore )
++				.__experimentalGetCurrentThemeBaseGlobalStyles()?.settings
++				?.color?.palette?.[ paletteSlug ] ?? [],
++		[ registry ]
++	);
++
++	const getMergedOriginPalette = useCallback(
++		( paletteSlug ) => {
++			const edited = registry
++				.select( coreStore )
++				.getEditedEntityRecord(
++					'root',
++					'globalStyles',
++					globalStylesId
++				);
++			return (
++				edited?.settings?.color?.palette?.[ paletteSlug ] ??
++				getBaseOriginPalette( paletteSlug )
++			);
++		},
++		[ registry, globalStylesId, getBaseOriginPalette ]
++	);
++
++	// Persist a palette change to the server without touching any other
++	// unsaved edits the user may have on the global-styles entity. The Global
++	// Styles REST controller replaces `settings` wholesale, so we have to send
++	// a *full* settings object. Reading the settings off the saved baseline
++	// (rather than the locally edited record) keeps unrelated pending edits
++	// dirty, exactly as the user expects.
++	const persistPalette = useCallback(
++		async ( paletteSlug, nextPalette ) => {
++			if ( ! globalStylesId ) {
++				return;
++			}
++
++			const savedRecord = registry
++				.select( coreStore )
++				.getEntityRecord( 'root', 'globalStyles', globalStylesId );
++
++			if ( ! savedRecord ) {
++				return;
++			}
++
++			const palettePath = PALETTE_PATHS[ paletteSlug ];
++			let paletteValue = nextPalette;
++
++			// For custom, an empty array removes the override. For theme/default,
++			// only persist undefined when the override matches the base palette.
++			if ( paletteSlug === 'custom' ) {
++				paletteValue = nextPalette?.length ? nextPalette : undefined;
++			} else if (
++				fastDeepEqual(
++					nextPalette,
++					getBaseOriginPalette( paletteSlug )
++				)
++			) {
++				paletteValue = undefined;
++			}
++
++			const finalGlobalStyles = setImmutably(
++				savedRecord ?? {},
++				palettePath,
++				paletteValue
++			);
++
++			return registry
++				.dispatch( coreStore )
++				.saveEntityRecord( 'root', 'globalStyles', finalGlobalStyles, {
++					throwOnError: true,
++				} );
++		},
++		[ globalStylesId, registry, getBaseOriginPalette ]
++	);
++
++	const applyAndPersistPalette = useCallback(
++		async ( paletteSlug, computeNext, notices ) => {
++			if ( ! globalStylesId ) {
++				return;
++			}
++
++			const canEdit = registry.select( coreStore ).canUser( 'update', {
++				kind: 'root',
++				name: 'globalStyles',
++				id: globalStylesId,
++			} );
++			if ( ! canEdit ) {
++				return;
++			}
++
++			const palettePath = PALETTE_PATHS[ paletteSlug ];
++			const editedRecord = registry
++				.select( coreStore )
++				.getEditedEntityRecord(
++					'root',
++					'globalStyles',
++					globalStylesId
++				);
++			const previousPalette =
++				editedRecord?.settings?.color?.palette?.[ paletteSlug ];
++			const nextPalette = computeNext(
++				paletteSlug === 'custom'
++					? previousPalette ?? []
++					: previousPalette
++			);
++
++			const optimisticValue = getOptimisticPaletteValue(
++				paletteSlug,
++				nextPalette,
++				getBaseOriginPalette( paletteSlug )
++			);
++
++			setUserGlobalStyles( ( prev ) =>
++				setImmutably( prev ?? {}, palettePath, optimisticValue )
++			);
++
++			try {
++				await persistPalette( paletteSlug, nextPalette );
++				createSuccessNotice( notices.success, {
++					type: 'snackbar',
++					id: COLOR_PALETTE_NOTICE_ID,
++				} );
++			} catch {
++				setUserGlobalStyles( ( prev ) =>
++					setImmutably(
++						prev ?? {},
++						palettePath,
++						getRollbackPaletteValue( paletteSlug, previousPalette )
++					)
++				);
++				createErrorNotice( notices.error, {
++					type: 'snackbar',
++					id: COLOR_PALETTE_NOTICE_ID,
++				} );
++			}
++		},
++		[
++			globalStylesId,
++			registry,
++			setUserGlobalStyles,
++			persistPalette,
++			getBaseOriginPalette,
++			createSuccessNotice,
++			createErrorNotice,
++		]
++	);
++
++	const onAdd = useCallback(
++		( { paletteSlug, name, nextSlug, color } ) => {
++			if ( paletteSlug !== 'custom' ) {
++				return;
++			}
++			return applyAndPersistPalette(
++				'custom',
++				( current ) => [ ...current, { name, slug: nextSlug, color } ],
++				{
++					success: sprintf(
++						// translators: %s: name of the custom color, e.g. "Brand Red".
++						__( 'Custom color "%s" added.' ),
++						name
++					),
++					error: sprintf(
++						// translators: %s: name of the custom color, e.g. "Brand Red".
++						__( 'Failed to add custom color "%s".' ),
++						name
++					),
++				}
++			);
++		},
++		[ applyAndPersistPalette ]
++	);
++
++	const onUpdate = useCallback(
++		( { paletteSlug, slug, nextSlug, name, color } ) => {
++			if ( paletteSlug === 'custom' ) {
++				return applyAndPersistPalette(
++					'custom',
++					( current ) =>
++						current.map( ( entry ) =>
++							entry.slug === slug
++								? { ...entry, name, slug: nextSlug, color }
++								: entry
++						),
++					{
++						success: sprintf(
++							// translators: %s: name of the custom color, e.g. "Brand Red".
++							__( 'Custom color "%s" updated.' ),
++							name
++						),
++						error: sprintf(
++							// translators: %s: name of the custom color, e.g. "Brand Red".
++							__( 'Failed to update custom color "%s".' ),
++							name
++						),
++					}
++				);
++			}
++
++			const mergedOriginPalette = getMergedOriginPalette( paletteSlug );
++			return applyAndPersistPalette(
++				paletteSlug,
++				() =>
++					mergedOriginPalette.map( ( entry ) =>
++						entry.slug === slug ? { ...entry, color } : entry
++					),
++				{
++					success: sprintf(
++						// translators: %s: name of the color, e.g. "Brand".
++						__( 'Color "%s" updated.' ),
++						name
++					),
++					error: sprintf(
++						// translators: %s: name of the color, e.g. "Brand".
++						__( 'Failed to update color "%s".' ),
++						name
++					),
++				}
++			);
++		},
++		[ applyAndPersistPalette, getMergedOriginPalette ]
++	);
++
++	const onDelete = useCallback(
++		( { paletteSlug, slug } ) => {
++			if ( paletteSlug !== 'custom' ) {
++				return;
++			}
++
++			const editedRecord = registry
++				.select( coreStore )
++				.getEditedEntityRecord(
++					'root',
++					'globalStyles',
++					globalStylesId
++				);
++			const previousCustom =
++				editedRecord?.settings?.color?.palette?.custom ?? [];
++			const removed = previousCustom.find(
++				( entry ) => entry.slug === slug
++			);
++			const removedName = removed?.name ?? slug;
++
++			return applyAndPersistPalette(
++				'custom',
++				( current ) =>
++					current.filter( ( entry ) => entry.slug !== slug ),
++				{
++					success: sprintf(
++						// translators: %s: name of the custom color, e.g. "Brand Red".
++						__( 'Custom color "%s" deleted.' ),
++						removedName
++					),
++					error: sprintf(
++						// translators: %s: name of the custom color, e.g. "Brand Red".
++						__( 'Failed to delete custom color "%s".' ),
++						removedName
++					),
++				}
++			);
++		},
++		[ applyAndPersistPalette, globalStylesId, registry ]
++	);
++
++	const colorEditing = useMemo(
++		() =>
++			canManage ? { capabilities, onAdd, onUpdate, onDelete } : undefined,
++		[ canManage, capabilities, onAdd, onUpdate, onDelete ]
++	);
++
++	return { colorEditing };
++}
+diff --git a/packages/editor/src/components/provider/use-block-editor-settings.js b/packages/editor/src/components/provider/use-block-editor-settings.js
+index 02d65e47ccce2a..706aed31b3a943 100644
+--- a/packages/editor/src/components/provider/use-block-editor-settings.js
++++ b/packages/editor/src/components/provider/use-block-editor-settings.js
+@@ -31,6 +31,7 @@ import { default as mediaDelete } from '../../utils/media-delete';
+ import { store as editorStore } from '../../store';
+ import { unlock } from '../../lock-unlock';
+ import { useGlobalStyles } from '../global-styles';
++import useColorPaletteEditing from '../global-styles/use-color-palette-editor';
+ 
+ const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
+ 
+@@ -118,6 +119,7 @@ const {
+ 	isNavigationPostEditorKey,
+ 	mediaUploadOnSuccessKey,
+ 	openMediaEditorModalKey,
++	colorEditingSettingsKey,
+ } = unlock( privateApis );
+ 
+ /**
+@@ -241,6 +243,11 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
+ 	const globalStylesData = mergedGlobalStyles.styles ?? EMPTY_OBJECT;
+ 	const globalStylesLinksData = mergedGlobalStyles._links ?? EMPTY_OBJECT;
+ 
++	// Palette-color editing wired to `settings.color[ colorEditingSettingsKey ]`
++	// so the inspector color picker can edit palette entries across origins with
++	// immediate persistence and snackbar feedback.
++	const { colorEditing } = useColorPaletteEditing();
++
+ 	const settingsBlockPatterns =
+ 		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
+ 		settings.__experimentalBlockPatterns; // WP 5.9
+@@ -333,6 +340,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
+ 			),
+ 			[ globalStylesDataKey ]: globalStylesData,
+ 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
++			color: {
++				...( settings.color || {} ),
++				[ colorEditingSettingsKey ]: colorEditing,
++			},
+ 			allImageSizes,
+ 			bigImageSizeThreshold,
+ 			allowedBlockTypes,
+@@ -457,6 +468,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
+ 		allImageSizes,
+ 		bigImageSizeThreshold,
+ 		isNavigationOverlayContext,
++		colorEditing,
+ 	] );
+ }
+ 
+diff --git a/packages/editor/src/utils/set-immutably.js b/packages/editor/src/utils/set-immutably.js
+new file mode 100644
+index 00000000000000..b2130220c5cca5
+--- /dev/null
++++ b/packages/editor/src/utils/set-immutably.js
+@@ -0,0 +1,34 @@
++/**
++ * Immutably sets a value inside an object. Like `lodash#set`, but returning a
++ * new object. Treats nullish initial values as empty objects. Clones any
++ * nested objects. Supports arrays, too.
++ *
++ * Note: a local copy is intentionally kept here. The equivalent helpers in
++ * `@wordpress/block-editor` and `@wordpress/global-styles-engine` are not part
++ * of those packages' public exports, so they can't be imported across package
++ * boundaries without leaking new public API.
++ *
++ * @param {Object}                             object Object to set a value in.
++ * @param {number|string|Array<number|string>} path   Path in the object to modify.
++ * @param {*}                                  value  New value to set.
++ * @return {Object} Cloned object with the new value set.
++ */
++export function setImmutably( object, path, value ) {
++	// Normalize path
++	path = Array.isArray( path ) ? [ ...path ] : [ path ];
++
++	// Shallowly clone the base of the object
++	object = Array.isArray( object ) ? [ ...object ] : { ...object };
++
++	const leaf = path.pop();
++
++	// Traverse object from root to leaf, shallowly cloning at each level
++	let prev = object;
++	for ( const key of path ) {
++		const lvl = prev[ key ];
++		prev = prev[ key ] = Array.isArray( lvl ) ? [ ...lvl ] : { ...lvl };
++	}
++	prev[ leaf ] = value;
++
++	return object;
++}

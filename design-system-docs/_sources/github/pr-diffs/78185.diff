@@ -1,0 +1,403 @@
+diff --git a/.github/workflows/storybook-check.yml b/.github/workflows/storybook-check.yml
+index 191f06cd2a4b84..bbab59f1d39743 100644
+--- a/.github/workflows/storybook-check.yml
++++ b/.github/workflows/storybook-check.yml
+@@ -1,6 +1,10 @@
+ name: Storybook build and Smoke Tests
+ 
+-on: pull_request
++on:
++    pull_request:
++    push:
++        branches:
++            - trunk
+ 
+ # Cancels all previous workflow runs for pull requests that have not completed.
+ concurrency:
+@@ -37,6 +41,9 @@ jobs:
+                   NODE_ENV: test
+               run: npm run storybook:build
+ 
++            - name: Validate manifest matches design-system-mcp contract
++              run: node packages/design-system-mcp/scripts/validate-manifest.mjs
++
+             - name: Build E2E Storybook
+               env:
+                   NODE_ENV: test
+diff --git a/package-lock.json b/package-lock.json
+index 154a657fa3c985..440df02b7068c5 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -61002,7 +61002,8 @@
+ 				"design-system-mcp": "bin/design-system-mcp.mjs"
+ 			},
+ 			"devDependencies": {
+-				"@types/jest": "^29.5.14"
++				"@types/jest": "^29.5.14",
++				"storybook": "^10.2.8"
+ 			},
+ 			"engines": {
+ 				"node": ">=20.10.0",
+diff --git a/packages/design-system-mcp/CHANGELOG.md b/packages/design-system-mcp/CHANGELOG.md
+index ed0c2fd5f25e95..eec5c5540d8b25 100644
+--- a/packages/design-system-mcp/CHANGELOG.md
++++ b/packages/design-system-mcp/CHANGELOG.md
+@@ -2,8 +2,16 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `get_component_details` now optionally accepts an array of component names so multiple components can be fetched in a single call. ([#78185](https://github.com/WordPress/gutenberg/pull/78185))
++
+ ## 0.3.0 (2026-05-14)
+ 
+ ## 0.2.0 (2026-04-29)
+ 
+ -   Initial release.
++
++## 0.2.0 (2026-04-29)
++
++-   Initial release.
+diff --git a/packages/design-system-mcp/package.json b/packages/design-system-mcp/package.json
+index 3dba5ea1adef0d..018cc020a14125 100644
+--- a/packages/design-system-mcp/package.json
++++ b/packages/design-system-mcp/package.json
+@@ -46,7 +46,8 @@
+ 		"zod": "4.3.6"
+ 	},
+ 	"devDependencies": {
+-		"@types/jest": "^29.5.14"
++		"@types/jest": "^29.5.14",
++		"storybook": "^10.2.8"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/design-system-mcp/scripts/validate-manifest.mjs b/packages/design-system-mcp/scripts/validate-manifest.mjs
+new file mode 100755
+index 00000000000000..6ea1c524da4d45
+--- /dev/null
++++ b/packages/design-system-mcp/scripts/validate-manifest.mjs
+@@ -0,0 +1,23 @@
++#!/usr/bin/env node
++import { readFile } from 'node:fs/promises';
++import assert from 'node:assert';
++import {
++	parseComponents,
++	parseComponentDetail,
++} from '@wordpress/design-system-mcp';
++
++const path = process.argv[ 2 ] ?? 'storybook/build/manifests/components.json';
++const { components } = JSON.parse( await readFile( path, 'utf8' ) );
++const names = parseComponents( components ).map( ( { name } ) => name );
++
++assert(
++	names.length > 0,
++	`No components parsed from ${ path }. Manifest shape may have changed.`
++);
++
++assert(
++	names.some(
++		( name ) => parseComponentDetail( components, name )?.props.length > 0
++	),
++	`No components have parsed props. Manifest shape may have changed.`
++);
+diff --git a/packages/design-system-mcp/src/index.ts b/packages/design-system-mcp/src/index.ts
+index d7747f36e590ab..11f14636d2abb6 100644
+--- a/packages/design-system-mcp/src/index.ts
++++ b/packages/design-system-mcp/src/index.ts
+@@ -1,6 +1,8 @@
+ import { McpServer } from '@modelcontextprotocol/server';
+ import { registerTools } from './tools/index';
+ 
++export { parseComponents, parseComponentDetail } from './parse-components';
++
+ export function createServer() {
+ 	const server = new McpServer( {
+ 		name: 'WordPress Design System',
+diff --git a/packages/design-system-mcp/src/test/parse-components.ts b/packages/design-system-mcp/src/test/parse-components.ts
+index 04dcc2ada1334b..728550afc44061 100644
+--- a/packages/design-system-mcp/src/test/parse-components.ts
++++ b/packages/design-system-mcp/src/test/parse-components.ts
+@@ -153,6 +153,8 @@ function createComponents(
+ 			path:
+ 				value.path ??
+ 				`../packages/ui/src/${ key }/stories/index.story.tsx`,
++			stories: [],
++			jsDocTags: {},
+ 			...value,
+ 		};
+ 	}
+diff --git a/packages/design-system-mcp/src/tools/get-component-details.ts b/packages/design-system-mcp/src/tools/get-component-details.ts
+index 4aaa5633abb50f..d0ca75ded10e0f 100644
+--- a/packages/design-system-mcp/src/tools/get-component-details.ts
++++ b/packages/design-system-mcp/src/tools/get-component-details.ts
+@@ -3,6 +3,60 @@ import { z } from 'zod';
+ import { getComponentDetail } from '../data';
+ import { formatComponentDetail } from '../format';
+ 
++const inputSchema = z.object( {
++	name: z
++		.union( [
++			z.string().min( 1 ),
++			z.array( z.string().min( 1 ) ).min( 1 ).max( 10 ),
++		] )
++		.describe(
++			'A component name, or an array of component names to fetch in a single call (e.g. "Button" or ["Button", "Tabs"]).'
++		),
++} );
++
++export async function handler( { name }: z.infer< typeof inputSchema > ) {
++	const names = Array.isArray( name ) ? name : [ name ];
++	const sections: string[] = [];
++	const missing: string[] = [];
++
++	for ( const componentName of names ) {
++		const detail = await getComponentDetail( componentName );
++		if ( detail ) {
++			sections.push( formatComponentDetail( detail ) );
++		} else {
++			missing.push( componentName );
++		}
++	}
++
++	if ( sections.length === 0 ) {
++		const list = missing.map( ( n ) => `"${ n }"` ).join( ', ' );
++		return {
++			content: [
++				{
++					type: 'text' as const,
++					text: `No components were found for: ${ list }.`,
++				},
++			],
++			isError: true,
++		};
++	}
++
++	let text = sections.join( '\n\n---\n\n' );
++	if ( missing.length > 0 ) {
++		const list = missing.map( ( n ) => `"${ n }"` ).join( ', ' );
++		text += `\n\n---\n\n_No components were found for: ${ list }._`;
++	}
++
++	return {
++		content: [
++			{
++				type: 'text' as const,
++				text,
++			},
++		],
++	};
++}
++
+ /**
+  * Register the get_component_details tool.
+  *
+@@ -14,38 +68,12 @@ export function register( server: McpServer ): void {
+ 		{
+ 			title: 'Get Component Details',
+ 			description:
+-				'Get detailed documentation for a WordPress Design System component including props, usage examples, and import statements.',
+-			inputSchema: z.object( {
+-				name: z
+-					.string()
+-					.min( 1 )
+-					.describe( 'The component name (e.g. "Button", "Tabs")' ),
+-			} ),
++				'Get detailed documentation for one or more WordPress Design System components including props, usage examples, and import statements. Pass multiple names to fetch several components in a single call instead of making repeated calls.',
++			inputSchema,
+ 			annotations: {
+ 				readOnlyHint: true,
+ 			},
+ 		},
+-		async ( { name } ) => {
+-			const detail = await getComponentDetail( name );
+-			if ( ! detail ) {
+-				return {
+-					content: [
+-						{
+-							type: 'text',
+-							text: `No component named "${ name }" was found.`,
+-						},
+-					],
+-					isError: true,
+-				};
+-			}
+-			return {
+-				content: [
+-					{
+-						type: 'text',
+-						text: formatComponentDetail( detail ),
+-					},
+-				],
+-			};
+-		}
++		handler
+ 	);
+ }
+diff --git a/packages/design-system-mcp/src/tools/test/get-component-details.ts b/packages/design-system-mcp/src/tools/test/get-component-details.ts
+new file mode 100644
+index 00000000000000..41daa77a5d961d
+--- /dev/null
++++ b/packages/design-system-mcp/src/tools/test/get-component-details.ts
+@@ -0,0 +1,126 @@
++import { handler } from '../get-component-details';
++import { getComponentDetail } from '../../data';
++import { formatComponentDetail } from '../../format';
++import type { ComponentDetail } from '../../types';
++
++jest.mock( '../../data' );
++
++const mockGetComponentDetail = getComponentDetail as jest.MockedFunction<
++	typeof getComponentDetail
++>;
++
++function fakeDetail( name: string ): ComponentDetail {
++	return {
++		name,
++		description: `${ name } description.`,
++		packageName: '@wordpress/ui',
++		importStatement: `import { ${ name } } from '@wordpress/ui';`,
++		props: [],
++		stories: [],
++	};
++}
++
++describe( 'handler', () => {
++	beforeEach( () => {
++		mockGetComponentDetail.mockReset();
++	} );
++
++	it( 'returns a single formatted section for a string name', async () => {
++		const button = fakeDetail( 'Button' );
++		mockGetComponentDetail.mockResolvedValueOnce( button );
++
++		const result = await handler( { name: 'Button' } );
++
++		expect( mockGetComponentDetail ).toHaveBeenCalledTimes( 1 );
++		expect( mockGetComponentDetail ).toHaveBeenCalledWith( 'Button' );
++		expect( result ).toEqual( {
++			content: [
++				{ type: 'text', text: formatComponentDetail( button ) },
++			],
++		} );
++	} );
++
++	it( 'joins multiple components with the section separator', async () => {
++		const button = fakeDetail( 'Button' );
++		const tabs = fakeDetail( 'Tabs' );
++		mockGetComponentDetail
++			.mockResolvedValueOnce( button )
++			.mockResolvedValueOnce( tabs );
++
++		const result = await handler( { name: [ 'Button', 'Tabs' ] } );
++
++		expect( mockGetComponentDetail.mock.calls ).toEqual( [
++			[ 'Button' ],
++			[ 'Tabs' ],
++		] );
++		expect( result ).toEqual( {
++			content: [
++				{
++					type: 'text',
++					text: `${ formatComponentDetail(
++						button
++					) }\n\n---\n\n${ formatComponentDetail( tabs ) }`,
++				},
++			],
++		} );
++	} );
++
++	it( 'appends a missing footer when some names are not found', async () => {
++		const button = fakeDetail( 'Button' );
++		mockGetComponentDetail
++			.mockResolvedValueOnce( button )
++			.mockResolvedValueOnce( null );
++
++		const result = await handler( { name: [ 'Button', 'Nope' ] } );
++
++		expect( result ).toEqual( {
++			content: [
++				{
++					type: 'text',
++					text: `${ formatComponentDetail(
++						button
++					) }\n\n---\n\n_No components were found for: "Nope"._`,
++				},
++			],
++		} );
++	} );
++
++	it( 'quotes and comma-joins multiple missing names in the footer', async () => {
++		const button = fakeDetail( 'Button' );
++		mockGetComponentDetail
++			.mockResolvedValueOnce( button )
++			.mockResolvedValueOnce( null )
++			.mockResolvedValueOnce( null );
++
++		const result = await handler( {
++			name: [ 'Button', 'Nope', 'AlsoNope' ],
++		} );
++
++		expect( result ).toEqual( {
++			content: [
++				{
++					type: 'text',
++					text: `${ formatComponentDetail(
++						button
++					) }\n\n---\n\n_No components were found for: "Nope", "AlsoNope"._`,
++				},
++			],
++		} );
++	} );
++
++	it( 'returns isError when no components are found', async () => {
++		mockGetComponentDetail.mockResolvedValue( null );
++
++		const result = await handler( { name: [ 'Foo', 'Bar' ] } );
++
++		expect( result ).toEqual( {
++			content: [
++				{
++					type: 'text',
++					text: 'No components were found for: "Foo", "Bar".',
++				},
++			],
++			isError: true,
++		} );
++	} );
++} );
+diff --git a/packages/design-system-mcp/src/types.ts b/packages/design-system-mcp/src/types.ts
+index d89cb8bb1ba397..9f9668768f8125 100644
+--- a/packages/design-system-mcp/src/types.ts
++++ b/packages/design-system-mcp/src/types.ts
+@@ -1,13 +1,6 @@
+-export interface ManifestComponent {
+-	id: string;
+-	name: string;
+-	path: string;
+-	description?: string;
+-	stories?: Array< {
+-		name: string;
+-		snippet?: string;
+-		description?: string;
+-	} >;
++import type { ComponentManifest } from 'storybook/internal/types';
++
++export interface ManifestComponent extends ComponentManifest {
+ 	reactDocgen?: {
+ 		description?: string;
+ 		displayName?: string;
+diff --git a/storybook/main.ts b/storybook/main.ts
+index f50442c2d9e74f..ae886c7d141c41 100644
+--- a/storybook/main.ts
++++ b/storybook/main.ts
+@@ -57,7 +57,7 @@ const config: StorybookConfig = {
+ 	],
+ 	framework: '@storybook/react-vite',
+ 	features: {
+-		experimentalComponentsManifest: NODE_ENV === 'production',
++		experimentalComponentsManifest: NODE_ENV !== 'development',
+ 	},
+ 	typescript: {
+ 		reactDocgen: 'react-docgen-typescript',

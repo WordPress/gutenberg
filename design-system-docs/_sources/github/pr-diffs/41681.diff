@@ -1,0 +1,218 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f98e5fb73173f6..42eebde26cbdf1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -24,6 +24,7 @@
+ -   `FontSizePicker`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41600](https://github.com/WordPress/gutenberg/pull/41600)).
+ -   `Dropdown`: Make sure cleanup (closing the dropdown) only runs when the menu has actually been opened.
+ -   Enhance the TypeScript migration guidelines ([#41669](https://github.com/WordPress/gutenberg/pull/41669)).
++-   `ExternalLink`: Convert to TypeScript ([#41681](https://github.com/WordPress/gutenberg/pull/41681)).
+ 
+ ## 19.12.0 (2022-06-01)
+ 
+diff --git a/packages/components/src/external-link/README.md b/packages/components/src/external-link/README.md
+index 73fe8b5c3fbdd0..c0e5621154cc29 100644
+--- a/packages/components/src/external-link/README.md
++++ b/packages/components/src/external-link/README.md
+@@ -1,5 +1,7 @@
+ # ExternalLink
+ 
++Link to an external resource.
++
+ ## Usage
+ 
+ ```jsx
+@@ -9,3 +11,19 @@ const MyExternalLink = () => (
+ 	<ExternalLink href="https://wordpress.org">WordPress.org</ExternalLink>
+ );
+ ```
++
++## Props
++
++The component accepts the following props. Any other props will be passed through to the `a`.
++
++### `children`: `ReactNode`
++
++The content to be displayed within the link.
++
++-   Required: Yes
++
++### `href`: `string`
++
++The URL of the external resource.
++
++-   Required: Yes
+diff --git a/packages/components/src/external-link/index.js b/packages/components/src/external-link/index.tsx
+similarity index 57%
+rename from packages/components/src/external-link/index.js
+rename to packages/components/src/external-link/index.tsx
+index 45c2e403f14c4e..44d006a676e267 100644
+--- a/packages/components/src/external-link/index.js
++++ b/packages/components/src/external-link/index.tsx
+@@ -3,6 +3,7 @@
+  */
+ import classnames from 'classnames';
+ import { compact, uniq } from 'lodash';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,12 +17,18 @@ import { external } from '@wordpress/icons';
+  */
+ import { VisuallyHidden } from '../visually-hidden';
+ import { StyledIcon } from './styles/external-link-styles';
++import type { ExternalLinkProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+-export function ExternalLink(
+-	{ href, children, className, rel = '', ...additionalProps },
+-	ref
++function UnforwardedExternalLink(
++	props: Omit<
++		WordPressComponentProps< ExternalLinkProps, 'a', false >,
++		'target'
++	>,
++	ref: ForwardedRef< HTMLAnchorElement >
+ ) {
+-	rel = uniq(
++	const { href, children, className, rel = '', ...additionalProps } = props;
++	const optimizedRel = uniq(
+ 		compact( [ ...rel.split( ' ' ), 'external', 'noreferrer', 'noopener' ] )
+ 	).join( ' ' );
+ 	const classes = classnames( 'components-external-link', className );
+@@ -32,7 +39,7 @@ export function ExternalLink(
+ 			className={ classes }
+ 			href={ href }
+ 			target="_blank"
+-			rel={ rel }
++			rel={ optimizedRel }
+ 			ref={ ref }
+ 		>
+ 			{ children }
+@@ -51,4 +58,17 @@ export function ExternalLink(
+ 	);
+ }
+ 
+-export default forwardRef( ExternalLink );
++/**
++ * Link to an external resource.
++ *
++ * ```jsx
++ * import { ExternalLink } from '@wordpress/components';
++ *
++ * const MyExternalLink = () => (
++ *   <ExternalLink href="https://wordpress.org">WordPress.org</ExternalLink>
++ * );
++ * ```
++ */
++export const ExternalLink = forwardRef( UnforwardedExternalLink );
++
++export default ExternalLink;
+diff --git a/packages/components/src/external-link/stories/index.js b/packages/components/src/external-link/stories/index.js
+deleted file mode 100644
+index 5f69a3f1d9cc91..00000000000000
+--- a/packages/components/src/external-link/stories/index.js
++++ /dev/null
+@@ -1,23 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { text } from '@storybook/addon-knobs';
+-/**
+- * Internal dependencies
+- */
+-import ExternalLink from '../';
+-
+-export default {
+-	title: 'Components/ExternalLink',
+-	component: ExternalLink,
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-export const _default = () => {
+-	const title = text( 'children', 'WordPress' );
+-	const href = text( 'href', 'https://wordpress.org' );
+-
+-	return <ExternalLink href={ href }>{ title }</ExternalLink>;
+-};
+diff --git a/packages/components/src/external-link/stories/index.tsx b/packages/components/src/external-link/stories/index.tsx
+new file mode 100644
+index 00000000000000..f782d962f3740f
+--- /dev/null
++++ b/packages/components/src/external-link/stories/index.tsx
+@@ -0,0 +1,36 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import ExternalLink from '..';
++
++const meta: ComponentMeta< typeof ExternalLink > = {
++	component: ExternalLink,
++	title: 'Components/ExternalLink',
++	argTypes: {
++		children: { control: { type: 'text' } },
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof ExternalLink > = ( { ...args } ) => {
++	return <ExternalLink { ...args } />;
++};
++
++export const Default: ComponentStory< typeof ExternalLink > = Template.bind(
++	{}
++);
++Default.args = {
++	children: 'WordPress',
++	href: 'https://wordpress.org',
++};
+diff --git a/packages/components/src/external-link/styles/external-link-styles.js b/packages/components/src/external-link/styles/external-link-styles.ts
+similarity index 100%
+rename from packages/components/src/external-link/styles/external-link-styles.js
+rename to packages/components/src/external-link/styles/external-link-styles.ts
+diff --git a/packages/components/src/external-link/types.ts b/packages/components/src/external-link/types.ts
+new file mode 100644
+index 00000000000000..a2b5cfb8324ced
+--- /dev/null
++++ b/packages/components/src/external-link/types.ts
+@@ -0,0 +1,15 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++export type ExternalLinkProps = {
++	/**
++	 * The content to be displayed within the link.
++	 */
++	children: ReactNode;
++	/**
++	 * The URL of the external resource.
++	 */
++	href: string;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 4ed0fba2b54c98..060575f52426d7 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -54,6 +54,7 @@
+ 		"src/dropdown/**/*",
+ 		"src/dropdown-menu/**/*",
+ 		"src/elevation/**/*",
++		"src/external-link/**/*",
+ 		"src/flex/**/*",
+ 		"src/form-group/**/*",
+ 		"src/form-token-field/**/*",

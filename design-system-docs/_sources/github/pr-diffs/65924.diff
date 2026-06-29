@@ -1,0 +1,46 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f65160f6e3f427..431516e06610ef 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `Composite`: fix legacy support for the store prop ([#65821](https://github.com/WordPress/gutenberg/pull/65821)).
+ -   `Composite`: make items tabbable if active element gets removed ([#65720](https://github.com/WordPress/gutenberg/pull/65720)).
+ -   `DatePicker`: Use compact button size. ([#65653](https://github.com/WordPress/gutenberg/pull/65653)).
++-   `DropZone`: fix class names on drop ([#65798](https://github.com/WordPress/gutenberg/pull/65798)).
+ 
+ ## 28.8.0 (2024-09-19)
+ 
+diff --git a/packages/components/src/drop-zone/index.tsx b/packages/components/src/drop-zone/index.tsx
+index d0aef35b09d4d6..b1bd0199e877d8 100644
+--- a/packages/components/src/drop-zone/index.tsx
++++ b/packages/components/src/drop-zone/index.tsx
+@@ -99,6 +99,7 @@ export function DropZoneComponent( {
+ 			setType( _type );
+ 		},
+ 		onDragEnd() {
++			setIsDraggingOverElement( false );
+ 			setIsDraggingOverDocument( false );
+ 			setType( undefined );
+ 		},
+@@ -116,8 +117,6 @@ export function DropZoneComponent( {
+ 			( ( type === 'file' && onFilesDrop ) ||
+ 				( type === 'html' && onHTMLDrop ) ||
+ 				( type === 'default' && onDrop ) ),
+-		'has-dragged-out': ! isDraggingOverElement,
+-		// Keeping the following classnames for legacy purposes
+ 		'is-dragging-over-document': isDraggingOverDocument,
+ 		'is-dragging-over-element': isDraggingOverElement,
+ 		[ `is-dragging-${ type }` ]: !! type,
+diff --git a/packages/components/src/drop-zone/style.scss b/packages/components/src/drop-zone/style.scss
+index d3cd18a75b1f8f..d66eaee87b8a1f 100644
+--- a/packages/components/src/drop-zone/style.scss
++++ b/packages/components/src/drop-zone/style.scss
+@@ -42,7 +42,7 @@
+ 		transform: scale(0.9);
+ 	}
+ 
+-	&.is-active:not(.has-dragged-out) {
++	&.is-active.is-dragging-over-element {
+ 		.components-drop-zone__content {
+ 			opacity: 1;
+ 

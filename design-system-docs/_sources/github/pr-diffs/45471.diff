@@ -1,0 +1,526 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5bb9a27bc6ab68..6326459d24923f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ -   `PaletteEditListView`: Update to ignore `exhaustive-deps` eslint rule ([#45467](https://github.com/WordPress/gutenberg/pull/45467)).
+ -   `withNotices`: Update to pass `exhaustive-deps` eslint rule ([#45530](https://github.com/WordPress/gutenberg/pull/45530)).
+ -   `ItemGroup`: Update to pass `exhaustive-deps` eslint rule ([#45531](https://github.com/WordPress/gutenberg/pull/45531)).
++-   `Draggable`: Convert to TypeScript ([#45471](https://github.com/WordPress/gutenberg/pull/45471)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/draggable/README.md b/packages/components/src/draggable/README.md
+index 7eff37f5859fc1..f83ab93dd3b3c1 100644
+--- a/packages/components/src/draggable/README.md
++++ b/packages/components/src/draggable/README.md
+@@ -1,6 +1,6 @@
+ # Draggable
+ 
+-`Draggable` is a Component that provides a way to set up a cross-browser (including IE) customisable drag image and the transfer data for the drag event. It decouples the drag handle and the element to drag: use it by wrapping the component that will become the drag handle and providing the DOM ID of the element to drag.
++`Draggable` is a Component that provides a way to set up a cross-browser (including IE) customizable drag image and the transfer data for the drag event. It decouples the drag handle and the element to drag: use it by wrapping the component that will become the drag handle and providing the DOM ID of the element to drag.
+ 
+ Note that the drag handle needs to declare the `draggable="true"` property and bind the `Draggable`s `onDraggableStart` and `onDraggableEnd` event handlers to its own `onDragStart` and `onDragEnd` respectively. `Draggable` takes care of the logic to setup the drag image and the transfer data, but is not concerned with creating an actual DOM element that is draggable.
+ 
+@@ -8,44 +8,39 @@ Note that the drag handle needs to declare the `draggable="true"` property and b
+ 
+ The component accepts the following props:
+ 
+-### elementId
++### `elementId`: `string`
+ 
+ The HTML id of the element to clone on drag
+ 
+--   Type: `string`
+ -   Required: Yes
+ 
+-### transferData
++### `onDragEnd`: `( event: DragEvent ) => void`
+ 
+-Arbitrary data object attached to the drag and drop event.
+-
+--   Type: `Object`
+--   Required: Yes
+-
+-### onDragStart
+-
+-A function called when dragging starts. This callback receives the `event` object from the `dragstart` event as its first parameter.
++A function called when dragging ends. This callback receives the `event` object from the `dragend` event as its first parameter.
+ 
+--   Type: `Function`
+ -   Required: No
+ -   Default: `noop`
+ 
+-### onDragOver
++### `onDragOver`: `( event: DragEvent ) => void`
+ 
+ A function called when the element being dragged is dragged over a valid drop target. This callback receives the `event` object from the `dragover` event as its first parameter.
+ 
+--   Type: `Function`
+ -   Required: No
+ -   Default: `noop`
+ 
+-### onDragEnd
++### `onDragStart`: `( event: DragEvent ) => void`
+ 
+-A function called when dragging ends. This callback receives the `event` object from the `dragend` event as its first parameter.
++A function called when dragging starts. This callback receives the `event` object from the `dragstart` event as its first parameter.
+ 
+--   Type: `Function`
+ -   Required: No
+ -   Default: `noop`
+ 
++### `transferData`: `unknown`
++
++Arbitrary data object attached to the drag and drop event.
++
++-   Required: Yes
++
+ ## Usage
+ 
+ ```jsx
+diff --git a/packages/components/src/draggable/index.js b/packages/components/src/draggable/index.tsx
+similarity index 67%
+rename from packages/components/src/draggable/index.js
+rename to packages/components/src/draggable/index.tsx
+index 8b9b7b3b714713..3a4fb2ebdf3b31 100644
+--- a/packages/components/src/draggable/index.js
++++ b/packages/components/src/draggable/index.tsx
+@@ -1,38 +1,64 @@
++/**
++ * External dependencies
++ */
++import type { DragEvent } from 'react';
++
+ /**
+  * WordPress dependencies
+  */
+ import { throttle } from '@wordpress/compose';
+ import { useEffect, useRef } from '@wordpress/element';
+ 
++/**
++ * Internal dependencies
++ */
++import type { DraggableProps } from './types';
++
+ const dragImageClass = 'components-draggable__invisible-drag-image';
+ const cloneWrapperClass = 'components-draggable__clone';
+ const clonePadding = 0;
+ const bodyClass = 'is-dragging-components-draggable';
+ 
+ /**
+- * @typedef RenderProp
+- * @property {(event: import('react').DragEvent) => void} onDraggableStart `onDragStart` handler.
+- * @property {(event: import('react').DragEvent) => void} onDraggableEnd   `onDragEnd` handler.
++ * `Draggable` is a Component that provides a way to set up a cross-browser
++ * (including IE) customizable drag image and the transfer data for the drag
++ * event. It decouples the drag handle and the element to drag: use it by
++ * wrapping the component that will become the drag handle and providing the DOM
++ * ID of the element to drag.
++ *
++ * Note that the drag handle needs to declare the `draggable="true"` property
++ * and bind the `Draggable`s `onDraggableStart` and `onDraggableEnd` event
++ * handlers to its own `onDragStart` and `onDragEnd` respectively. `Draggable`
++ * takes care of the logic to setup the drag image and the transfer data, but is
++ * not concerned with creating an actual DOM element that is draggable.
++ *
++ * ```jsx
++ * import { Draggable, Panel, PanelBody } from '@wordpress/components';
++ * import { Icon, more } from '@wordpress/icons';
++ *
++ * const MyDraggable = () => (
++ *   <div id="draggable-panel">
++ *     <Panel header="Draggable panel">
++ *       <PanelBody>
++ *         <Draggable elementId="draggable-panel" transferData={ {} }>
++ *           { ( { onDraggableStart, onDraggableEnd } ) => (
++ *             <div
++ *               className="example-drag-handle"
++ *               draggable
++ *               onDragStart={ onDraggableStart }
++ *               onDragEnd={ onDraggableEnd }
++ *             >
++ *               <Icon icon={ more } />
++ *             </div>
++ *           ) }
++ *         </Draggable>
++ *       </PanelBody>
++ *     </Panel>
++ *   </div>
++ * );
++ * ```
+  */
+-
+-/**
+- * @typedef Props
+- * @property {(props: RenderProp) => JSX.Element | null}  children                         Children.
+- * @property {(event: import('react').DragEvent) => void} [onDragStart]                    Callback when dragging starts.
+- * @property {(event: import('react').DragEvent) => void} [onDragOver]                     Callback when dragging happens over the document.
+- * @property {(event: import('react').DragEvent) => void} [onDragEnd]                      Callback when dragging ends.
+- * @property {string}                                     [cloneClassname]                 Classname for the cloned element.
+- * @property {string}                                     [elementId]                      ID for the element.
+- * @property {any}                                        [transferData]                   Transfer data for the drag event.
+- * @property {string}                                     [__experimentalTransferDataType] The transfer data type to set.
+- * @property {import('react').ReactNode}                  __experimentalDragComponent      Component to show when dragging.
+- */
+-
+-/**
+- * @param {Props} props
+- * @return {JSX.Element} A draggable component.
+- */
+-export default function Draggable( {
++export function Draggable( {
+ 	children,
+ 	onDragStart,
+ 	onDragOver,
+@@ -42,17 +68,16 @@ export default function Draggable( {
+ 	transferData,
+ 	__experimentalTransferDataType: transferDataType = 'text',
+ 	__experimentalDragComponent: dragComponent,
+-} ) {
+-	/** @type {import('react').MutableRefObject<HTMLDivElement | null>} */
+-	const dragComponentRef = useRef( null );
++}: DraggableProps ) {
++	const dragComponentRef = useRef< HTMLDivElement >( null );
+ 	const cleanup = useRef( () => {} );
+ 
+ 	/**
+ 	 * Removes the element clone, resets cursor, and removes drag listener.
+ 	 *
+-	 * @param {import('react').DragEvent} event The non-custom DragEvent.
++	 * @param  event The non-custom DragEvent.
+ 	 */
+-	function end( event ) {
++	function end( event: DragEvent ) {
+ 		event.preventDefault();
+ 		cleanup.current();
+ 
+@@ -69,11 +94,10 @@ export default function Draggable( {
+ 	 * - Sets transfer data.
+ 	 * - Adds dragover listener.
+ 	 *
+-	 * @param {import('react').DragEvent} event The non-custom DragEvent.
++	 * @param  event The non-custom DragEvent.
+ 	 */
+-	function start( event ) {
+-		// @ts-ignore We know that ownerDocument does exist on an Element
+-		const { ownerDocument } = event.target;
++	function start( event: DragEvent ) {
++		const { ownerDocument } = event.target as HTMLElement;
+ 
+ 		event.dataTransfer.setData(
+ 			transferDataType,
+@@ -82,8 +106,8 @@ export default function Draggable( {
+ 
+ 		const cloneWrapper = ownerDocument.createElement( 'div' );
+ 		// Reset position to 0,0. Natural stacking order will position this lower, even with a transform otherwise.
+-		cloneWrapper.style.top = 0;
+-		cloneWrapper.style.left = 0;
++		cloneWrapper.style.top = '0';
++		cloneWrapper.style.left = '0';
+ 
+ 		const dragImage = ownerDocument.createElement( 'div' );
+ 
+@@ -119,19 +143,21 @@ export default function Draggable( {
+ 			// Inject the cloneWrapper into the DOM.
+ 			ownerDocument.body.appendChild( cloneWrapper );
+ 		} else {
+-			const element = ownerDocument.getElementById( elementId );
++			const element = ownerDocument.getElementById(
++				elementId
++			) as HTMLElement;
+ 
+ 			// Prepare element clone and append to element wrapper.
+ 			const elementRect = element.getBoundingClientRect();
+ 			const elementWrapper = element.parentNode;
+-			const elementTopOffset = parseInt( elementRect.top, 10 );
+-			const elementLeftOffset = parseInt( elementRect.left, 10 );
++			const elementTopOffset = elementRect.top;
++			const elementLeftOffset = elementRect.left;
+ 
+ 			cloneWrapper.style.width = `${
+ 				elementRect.width + clonePadding * 2
+ 			}px`;
+ 
+-			const clone = element.cloneNode( true );
++			const clone = element.cloneNode( true ) as HTMLElement;
+ 			clone.id = `clone-${ elementId }`;
+ 
+ 			// Position clone right over the original element (20px padding).
+@@ -140,24 +166,21 @@ export default function Draggable( {
+ 			cloneWrapper.style.transform = `translate( ${ x }px, ${ y }px )`;
+ 
+ 			// Hack: Remove iFrames as it's causing the embeds drag clone to freeze.
+-			Array.from( clone.querySelectorAll( 'iframe' ) ).forEach(
+-				( child ) => child.parentNode.removeChild( child )
+-			);
++			Array.from< HTMLIFrameElement >(
++				clone.querySelectorAll( 'iframe' )
++			).forEach( ( child ) => child.parentNode?.removeChild( child ) );
+ 
+ 			cloneWrapper.appendChild( clone );
+ 
+ 			// Inject the cloneWrapper into the DOM.
+-			elementWrapper.appendChild( cloneWrapper );
++			elementWrapper?.appendChild( cloneWrapper );
+ 		}
+ 
+ 		// Mark the current cursor coordinates.
+ 		let cursorLeft = event.clientX;
+ 		let cursorTop = event.clientY;
+ 
+-		/**
+-		 * @param {import('react').DragEvent<Element>} e
+-		 */
+-		function over( e ) {
++		function over( e: DragEvent ) {
+ 			// Skip doing any work if mouse has not moved.
+ 			if ( cursorLeft === e.clientX && cursorTop === e.clientY ) {
+ 				return;
+@@ -188,8 +211,7 @@ export default function Draggable( {
+ 		// https://reactjs.org/docs/events.html#event-pooling
+ 		event.persist();
+ 
+-		/** @type {number | undefined} */
+-		let timerId;
++		let timerId: number | undefined;
+ 
+ 		if ( onDragStart ) {
+ 			timerId = setTimeout( () => onDragStart( event ) );
+@@ -239,3 +261,5 @@ export default function Draggable( {
+ 		</>
+ 	);
+ }
++
++export default Draggable;
+diff --git a/packages/components/src/draggable/stories/index.js b/packages/components/src/draggable/stories/index.js
+deleted file mode 100644
+index 086e1d994c7024..00000000000000
+--- a/packages/components/src/draggable/stories/index.js
++++ /dev/null
+@@ -1,72 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-import { Icon, more } from '@wordpress/icons';
+-
+-/**
+- * Internal dependencies
+- */
+-import Draggable from '../';
+-
+-export default { title: 'Components/Draggable', component: Draggable };
+-
+-const Box = ( props ) => {
+-	return (
+-		<div
+-			{ ...props }
+-			style={ {
+-				alignItems: 'center',
+-				display: 'flex',
+-				justifyContent: 'center',
+-				width: 100,
+-				height: 100,
+-				background: '#ddd',
+-			} }
+-		/>
+-	);
+-};
+-
+-const DraggalbeExample = () => {
+-	const [ isDragging, setDragging ] = useState( false );
+-
+-	// Allow for the use of ID in the example.
+-	/* eslint-disable no-restricted-syntax */
+-	return (
+-		<div>
+-			<p>Is Dragging? { isDragging ? 'Yes' : 'No' }</p>
+-			<div
+-				id="draggable-example-box"
+-				style={ { display: 'inline-flex' } }
+-			>
+-				<Draggable elementId="draggable-example-box">
+-					{ ( { onDraggableStart, onDraggableEnd } ) => {
+-						const handleOnDragStart = ( event ) => {
+-							setDragging( true );
+-							onDraggableStart( event );
+-						};
+-						const handleOnDragEnd = ( event ) => {
+-							setDragging( false );
+-							onDraggableEnd( event );
+-						};
+-
+-						return (
+-							<Box
+-								onDragStart={ handleOnDragStart }
+-								onDragEnd={ handleOnDragEnd }
+-								draggable
+-							>
+-								<Icon icon={ more } />
+-							</Box>
+-						);
+-					} }
+-				</Draggable>
+-			</div>
+-		</div>
+-	);
+-	/* eslint-enable no-restricted-syntax */
+-};
+-
+-export const _default = () => {
+-	return <DraggalbeExample />;
+-};
+diff --git a/packages/components/src/draggable/stories/index.tsx b/packages/components/src/draggable/stories/index.tsx
+new file mode 100644
+index 00000000000000..0fa16f063bb8fd
+--- /dev/null
++++ b/packages/components/src/draggable/stories/index.tsx
+@@ -0,0 +1,83 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++import type { DragEvent } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++import { Icon, more } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import Draggable from '..';
++
++const meta: ComponentMeta< typeof Draggable > = {
++	component: Draggable,
++	title: 'Components/Draggable',
++	argTypes: {
++		elementId: { control: { type: null } },
++		__experimentalDragComponent: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: { source: { code: '' } },
++	},
++};
++export default meta;
++
++const DefaultTemplate: ComponentStory< typeof Draggable > = ( args ) => {
++	const [ isDragging, setDragging ] = useState( false );
++
++	// Allow for the use of ID in the example.
++	return (
++		<div>
++			<p>Is Dragging? { isDragging ? 'Yes' : 'No!' }</p>
++			<div
++				/* eslint-disable no-restricted-syntax, eslint-comments/disable-enable-pair */
++				id="draggable-example-box"
++				style={ { display: 'inline-flex' } }
++			>
++				<Draggable { ...args } elementId="draggable-example-box">
++					{ ( { onDraggableStart, onDraggableEnd } ) => {
++						const handleOnDragStart = ( event: DragEvent ) => {
++							setDragging( true );
++							onDraggableStart( event );
++						};
++						const handleOnDragEnd = ( event: DragEvent ) => {
++							setDragging( false );
++							onDraggableEnd( event );
++						};
++
++						return (
++							<div
++								onDragStart={ handleOnDragStart }
++								onDragEnd={ handleOnDragEnd }
++								draggable
++								style={ {
++									alignItems: 'center',
++									display: 'flex',
++									justifyContent: 'center',
++									width: 100,
++									height: 100,
++									background: '#ddd',
++								} }
++							>
++								<Icon icon={ more } />
++							</div>
++						);
++					} }
++				</Draggable>
++			</div>
++		</div>
++	);
++};
++
++export const Default: ComponentStory< typeof Draggable > = DefaultTemplate.bind(
++	{}
++);
++Default.args = {};
+diff --git a/packages/components/src/draggable/types.ts b/packages/components/src/draggable/types.ts
+new file mode 100644
+index 00000000000000..665378a71ea99b
+--- /dev/null
++++ b/packages/components/src/draggable/types.ts
+@@ -0,0 +1,58 @@
++/**
++ * External dependencies
++ */
++import type { DragEvent, ReactNode } from 'react';
++
++export type DraggableProps = {
++	/**
++	 * Children.
++	 */
++	children: ( props: {
++		/**
++		 * `onDragStart` handler.
++		 */
++		onDraggableStart: ( event: DragEvent ) => void;
++		/**
++		 * `onDragEnd` handler.
++		 */
++		onDraggableEnd: ( event: DragEvent ) => void;
++	} ) => JSX.Element | null;
++	/**
++	 * Classname for the cloned element.
++	 */
++	cloneClassname?: string;
++	/**
++	 * The HTML id of the element to clone on drag
++	 */
++	elementId: string;
++	/**
++	 * A function called when dragging ends. This callback receives the `event`
++	 * object from the `dragend` event as its first parameter.
++	 */
++	onDragEnd?: ( event: DragEvent ) => void;
++	/**
++	 * A function called when the element being dragged is dragged over a valid
++	 * drop target. This callback receives the `event` object from the
++	 * `dragover` event as its first parameter.
++	 */
++	onDragOver?: ( event: DragEvent ) => void;
++	/**
++	 * A function called when dragging starts. This callback receives the
++	 * `event` object from the `dragstart` event as its first parameter.
++	 */
++	onDragStart?: ( event: DragEvent ) => void;
++	/**
++	 * Arbitrary data object attached to the drag and drop event.
++	 */
++	transferData: unknown;
++	/**
++	 * The transfer data type to set.
++	 *
++	 * @default 'text'
++	 */
++	__experimentalTransferDataType?: string;
++	/**
++	 * Component to show when dragging.
++	 */
++	__experimentalDragComponent?: ReactNode;
++};

@@ -1,0 +1,71 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c39a492f840a27..1fbb88ed83f941 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `ColorPalette`, `BorderControl`: Don't hyphenate hex value in `aria-label` ([#52932](https://github.com/WordPress/gutenberg/pull/52932)).
+ -   `MenuItemsChoice`, `MenuItem`: Support a `disabled` prop on a menu item ([#52737](https://github.com/WordPress/gutenberg/pull/52737)).
+ -   `TabPanel`: Introduce a new version of `TabPanel` with updated internals and improved adherence to ARIA guidance on `tabpanel` focus behavior while maintaining the same functionality and API surface.([#52133](https://github.com/WordPress/gutenberg/pull/52133)).
++-   `Theme`: Expose via private APIs ([#53262](https://github.com/WordPress/gutenberg/pull/53262)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index b144f348143c60..6e17abde0c627e 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -23,6 +23,7 @@ import {
+ 	DropdownSubMenuTrigger as DropdownSubMenuTriggerV2,
+ } from './dropdown-menu-v2';
+ import { ComponentsContext } from './ui/context/context-system-provider';
++import Theme from './theme';
+ 
+ export const { lock, unlock } =
+ 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+@@ -47,4 +48,5 @@ lock( privateApis, {
+ 	DropdownSubMenuV2,
+ 	DropdownSubMenuTriggerV2,
+ 	ProgressBar,
++	Theme,
+ } );
+diff --git a/packages/components/src/theme/README.md b/packages/components/src/theme/README.md
+index 2cc8487dd687e1..d1bfe237c9608f 100644
+--- a/packages/components/src/theme/README.md
++++ b/packages/components/src/theme/README.md
+@@ -8,23 +8,6 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ Multiple `Theme` components can be nested in order to override specific theme variables.
+ 
+-## Usage
+-
+-```jsx
+-import { __experimentalTheme as Theme } from '@wordpress/components';
+-
+-const Example = () => {
+-	return (
+-		<Theme accent="red">
+-			<Button variant="primary">I'm red</Button>
+-			<Theme accent="blue" background="black">
+-				<Button variant="primary">I'm blue</Button>
+-			</Theme>
+-		</Theme>
+-	);
+-};
+-```
+-
+ ## Props
+ 
+ ### `accent`: `string`
+diff --git a/packages/components/src/theme/index.tsx b/packages/components/src/theme/index.tsx
+index 591da45e7c14d9..984ec32a07ce3d 100644
+--- a/packages/components/src/theme/index.tsx
++++ b/packages/components/src/theme/index.tsx
+@@ -20,8 +20,6 @@ import { useCx } from '../utils';
+  *
+  * @example
+  * ```jsx
+- * import { __experimentalTheme as Theme } from '@wordpress/components';
+- *
+  * const Example = () => {
+  *   return (
+  *     <Theme accent="red">

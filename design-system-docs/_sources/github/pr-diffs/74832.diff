@@ -1,0 +1,704 @@
+diff --git a/lib/client-assets.php b/lib/client-assets.php
+index 456b17d9c852d6..0d98ea3358c8f3 100644
+--- a/lib/client-assets.php
++++ b/lib/client-assets.php
+@@ -397,6 +397,16 @@ function gutenberg_register_packages_styles( $styles ) {
+ 	);
+ 	$styles->add_data( 'wp-block-library-theme', 'rtl', 'replace' );
+ 
++	gutenberg_override_style(
++		$styles,
++		'classic-theme-styles',
++		gutenberg_url( 'build/block-library/classic.css' ),
++		array(),
++		$version
++	);
++	$styles->add_data( 'classic-theme-styles', 'rtl', 'replace' );
++	$styles->add_data( 'classic-theme-styles', 'path', gutenberg_dir_path() . 'build/block-library/classic.css' );
++
+ 	gutenberg_override_style(
+ 		$styles,
+ 		'wp-list-reusable-blocks',
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 76fff5f0b07581..2e8f96875f10d6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `Badge`: Add max-width for text truncation ([#72653](https://github.com/WordPress/gutenberg/pull/72653)).
+ -   `Button`: Revert disabled primary button state to its previous one ([#73037](https://github.com/WordPress/gutenberg/pull/73037)).
+ -   `NumberControl`: Fix crash when min prop is string and step prop contains decimal ([#73107](https://github.com/WordPress/gutenberg/pull/73107)).
++-   `Popover`: Fix `onDialogClose` logic to only close the popover if the blur event targets the specific popover instance ([#72376](https://github.com/WordPress/gutenberg/pull/72376)).
+ 
+ ## 30.6.0 (2025-10-17)
+ 
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index ac03ae882531d7..98018e308a4225 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -268,9 +268,30 @@ const UnforwardedPopover = (
+ 		onDialogClose = ( type: string | undefined, event: SyntheticEvent ) => {
+ 			// Ideally the popover should have just a single onClose prop and
+ 			// not three props that potentially do the same thing.
+-			if ( type === 'focus-outside' && onFocusOutside ) {
+-				onFocusOutside( event );
++			if ( type === 'focus-outside' ) {
++				// Check if this blur event is actually relevant to this popover
++				const blurTarget = event?.target as Element;
++				const referenceElement = refs.reference.current;
++				const floatingElement = refs.floating.current;
++
++				// Check if blur is from this popover's reference element or its floating content
++				const isBlurFromThisPopover =
++					( referenceElement &&
++						'contains' in referenceElement &&
++						referenceElement.contains( blurTarget ) ) ||
++					floatingElement?.contains( blurTarget );
++				// Only proceed if the blur is actually from this popover
++				if ( ! isBlurFromThisPopover ) {
++					return;
++				}
++				// Call onFocusOutside if defined or call onClose.
++				if ( onFocusOutside ) {
++					onFocusOutside( event );
++				} else if ( onClose ) {
++					onClose();
++				}
+ 			} else if ( onClose ) {
++				// onClose should be called for other event types if it exists.
+ 				onClose();
+ 			}
+ 		};
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/block.json b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/block.json
+new file mode 100644
+index 00000000000000..43f82fcd037531
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/block.json
+@@ -0,0 +1,15 @@
++{
++	"$schema": "https://schemas.wp.org/trunk/block.json",
++	"apiVersion": 3,
++	"name": "test/hydration-timing-async",
++	"title": "E2E Interactivity tests - hydration timing async import",
++	"category": "text",
++	"icon": "heart",
++	"description": "",
++	"supports": {
++		"interactivity": true
++	},
++	"textdomain": "e2e-interactivity",
++	"viewScriptModule": "file:./view.js",
++	"render": "file:./render.php"
++}
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/render.php b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/render.php
+new file mode 100644
+index 00000000000000..aca58b514a177a
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/render.php
+@@ -0,0 +1,36 @@
++<?php
++/**
++ * HTML for testing hydration timing - async import block.
++ *
++ * This block's view module dynamically imports @wordpress/interactivity
++ * on DOMContentLoaded, simulating a lazy-loading scenario. The test verifies
++ * that hydration still occurs even when the library is loaded after
++ * DOMContentLoaded has fired.
++ *
++ * @package gutenberg-test-interactive-blocks
++ *
++ * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
++ */
++?>
++
++<div
++	data-wp-interactive="test/hydration-timing-async"
++	<?php echo wp_interactivity_data_wp_context( array( 'hydrated' => false ) ); ?>
++>
++	<p
++		data-wp-text="state.asyncModuleLoaded"
++		data-testid="async-module-loaded"
++	>no</p>
++
++	<p
++		data-wp-text="context.hydrated"
++		data-testid="async-hydrated"
++	>no</p>
++
++	<div
++		data-wp-init="callbacks.init"
++		data-testid="async-hydration-status"
++	>
++		Async import hydration test block
++	</div>
++</div>
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/view.asset.php b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/view.asset.php
+new file mode 100644
+index 00000000000000..2f77c98026b0a8
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/view.asset.php
+@@ -0,0 +1,8 @@
++<?php return array(
++	'dependencies' => array(
++		array(
++			'id'     => '@wordpress/interactivity',
++			'import' => 'dynamic',
++		),
++	),
++);
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/view.js b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/view.js
+new file mode 100644
+index 00000000000000..6b776581c44156
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-async/view.js
+@@ -0,0 +1,29 @@
++/**
++ * This module dynamically imports @wordpress/interactivity on DOMContentLoaded.
++ *
++ * This simulates a lazy-loading scenario where the Interactivity API is not
++ * statically imported. The test verifies that hydration still occurs even
++ * when the library is loaded after DOMContentLoaded has already fired.
++ */
++
++const initStore = async () => {
++	const { store, getContext } = await import( '@wordpress/interactivity' );
++
++	store( 'test/hydration-timing-async', {
++		state: {
++			asyncModuleLoaded: 'yes',
++		},
++		callbacks: {
++			// TODO: this could be unavailable during hydration. Fix
++			// `data-wp-init` to support that case.
++			init() {
++				const context = getContext();
++				context.hydrated = true;
++			},
++		},
++	} );
++};
++
++document.addEventListener( 'DOMContentLoaded', () =>
++	setTimeout( initStore, 1 )
++);
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/block.json b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/block.json
+new file mode 100644
+index 00000000000000..ca316cd33ec51f
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/block.json
+@@ -0,0 +1,15 @@
++{
++	"$schema": "https://schemas.wp.org/trunk/block.json",
++	"apiVersion": 3,
++	"name": "test/hydration-timing-slow",
++	"title": "E2E Interactivity tests - hydration timing slow module",
++	"category": "text",
++	"icon": "heart",
++	"description": "",
++	"supports": {
++		"interactivity": true
++	},
++	"textdomain": "e2e-interactivity",
++	"viewScriptModule": "file:./view.js",
++	"render": "file:./render.php"
++}
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/render.php b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/render.php
+new file mode 100644
+index 00000000000000..4d8ff1ff417425
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/render.php
+@@ -0,0 +1,36 @@
++<?php
++/**
++ * HTML for testing hydration timing - slow module block.
++ *
++ * This block's view module will be artificially delayed in the test
++ * to simulate a slow network connection. The test verifies that
++ * hydration waits for this module to load even when other modules
++ * that import @wordpress/interactivity have already been evaluated.
++ *
++ * @package gutenberg-test-interactive-blocks
++ *
++ * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
++ */
++?>
++
++<div
++	data-wp-interactive="test/hydration-timing"
++	<?php echo wp_interactivity_data_wp_context( array( 'slowInitialized' => false ) ); ?>
++>
++	<p
++		data-wp-text="state.slowModuleLoaded"
++		data-testid="slow-module-loaded"
++	>no</p>
++
++	<p
++		data-wp-text="context.slowInitialized"
++		data-testid="slow-context-initialized"
++	>no</p>
++
++	<div
++		data-wp-init="callbacks.slowInit"
++		data-testid="slow-hydration-status"
++	>
++		Slow module hydration test block
++	</div>
++</div>
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/view.asset.php b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/view.asset.php
+new file mode 100644
+index 00000000000000..db23afdf657a19
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/view.asset.php
+@@ -0,0 +1 @@
++<?php return array( 'dependencies' => array( '@wordpress/interactivity' ) );
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/view.js b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/view.js
+new file mode 100644
+index 00000000000000..95a174c1fc6835
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing-slow/view.js
+@@ -0,0 +1,22 @@
++/**
++ * WordPress dependencies
++ */
++import { store, getContext } from '@wordpress/interactivity';
++
++// This module will be artificially delayed in the test.
++// It also imports @wordpress/interactivity, so when it's evaluated,
++// the interactivity runtime will have already been initialized by
++// the fast module. The test verifies that hydration waits for this
++// module to finish loading before running.
++
++store( 'test/hydration-timing', {
++	state: {
++		slowModuleLoaded: 'yes',
++	},
++	callbacks: {
++		slowInit() {
++			const context = getContext();
++			context.slowInitialized = true;
++		},
++	},
++} );
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/block.json b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/block.json
+new file mode 100644
+index 00000000000000..32370018e63cfb
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/block.json
+@@ -0,0 +1,15 @@
++{
++	"$schema": "https://schemas.wp.org/trunk/block.json",
++	"apiVersion": 3,
++	"name": "test/hydration-timing",
++	"title": "E2E Interactivity tests - hydration timing",
++	"category": "text",
++	"icon": "heart",
++	"description": "",
++	"supports": {
++		"interactivity": true
++	},
++	"textdomain": "e2e-interactivity",
++	"viewScriptModule": "file:./view.js",
++	"render": "file:./render.php"
++}
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/render.php b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/render.php
+new file mode 100644
+index 00000000000000..0ffeb9ea10c413
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/render.php
+@@ -0,0 +1,31 @@
++<?php
++/**
++ * HTML for testing hydration timing with delayed module loading.
++ *
++ * @package gutenberg-test-interactive-blocks
++ *
++ * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
++ */
++?>
++
++<div
++	data-wp-interactive="test/hydration-timing"
++	<?php echo wp_interactivity_data_wp_context( array( 'initialized' => false ) ); ?>
++>
++	<p
++		data-wp-text="state.moduleLoaded"
++		data-testid="module-loaded"
++	>no</p>
++
++	<p
++		data-wp-text="context.initialized"
++		data-testid="context-initialized"
++	>no</p>
++
++	<div
++		data-wp-init="callbacks.init"
++		data-testid="hydration-status"
++	>
++		Hydration test block
++	</div>
++</div>
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/view.asset.php b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/view.asset.php
+new file mode 100644
+index 00000000000000..db23afdf657a19
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/view.asset.php
+@@ -0,0 +1 @@
++<?php return array( 'dependencies' => array( '@wordpress/interactivity' ) );
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/view.js b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/view.js
+new file mode 100644
+index 00000000000000..c48856312bb994
+--- /dev/null
++++ b/packages/e2e-tests/plugins/interactive-blocks/hydration-timing/view.js
+@@ -0,0 +1,23 @@
++/**
++ * WordPress dependencies
++ */
++import { store, getContext } from '@wordpress/interactivity';
++
++// This is the "fast" module that loads immediately. It imports
++// @wordpress/interactivity, which initializes the runtime.
++//
++// The test pairs this with a "slow" module (hydration-timing-slow) that is
++// artificially delayed. The race condition occurs when this fast module
++// triggers hydration before the slow module has finished loading.
++
++store( 'test/hydration-timing', {
++	state: {
++		moduleLoaded: 'yes',
++	},
++	callbacks: {
++		init() {
++			const context = getContext();
++			context.initialized = true;
++		},
++	},
++} );
+diff --git a/packages/editor/src/components/collab-sidebar/comments.js b/packages/editor/src/components/collab-sidebar/comments.js
+index 3984c643ea8e88..e24727fd41bf5a 100644
+--- a/packages/editor/src/components/collab-sidebar/comments.js
++++ b/packages/editor/src/components/collab-sidebar/comments.js
+@@ -69,22 +69,29 @@ export function Comments( {
+ 	const { selectBlock, toggleBlockSpotlight } = unlock(
+ 		useDispatch( blockEditorStore )
+ 	);
+-	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
+-		useSelect( ( select ) => {
+-			const {
+-				getBlockAttributes,
+-				getSelectedBlockClientId,
+-				getClientIdsWithDescendants,
+-			} = select( blockEditorStore );
+-			const clientId = getSelectedBlockClientId();
+-			return {
+-				blockCommentId: clientId
+-					? getBlockAttributes( clientId )?.metadata?.noteId
+-					: null,
+-				selectedBlockClientId: clientId,
+-				orderedBlockIds: getClientIdsWithDescendants(),
+-			};
+-		}, [] );
++
++	const {
++		blockCommentId,
++		selectedBlockClientId,
++		orderedBlockIds,
++		blockMode,
++	} = useSelect( ( select ) => {
++		const {
++			getBlockAttributes,
++			getSelectedBlockClientId,
++			getClientIdsWithDescendants,
++			getBlockMode,
++		} = select( blockEditorStore );
++		const clientId = getSelectedBlockClientId();
++		return {
++			blockCommentId: clientId
++				? getBlockAttributes( clientId )?.metadata?.noteId
++				: null,
++			selectedBlockClientId: clientId,
++			orderedBlockIds: getClientIdsWithDescendants(),
++			blockMode: clientId ? getBlockMode( clientId ) : null,
++		};
++	}, [] );
+ 
+ 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
+ 
+@@ -311,6 +318,7 @@ export function Comments( {
+ 		threads,
+ 		selectedThread,
+ 		setCanvasMinHeight,
++		blockMode,
+ 	] );
+ 
+ 	const handleThreadNavigation = ( event, thread, isSelected ) => {
+diff --git a/packages/editor/src/components/collab-sidebar/hooks.js b/packages/editor/src/components/collab-sidebar/hooks.js
+index 5eae27ad0c68e6..82e18822c826f4 100644
+--- a/packages/editor/src/components/collab-sidebar/hooks.js
++++ b/packages/editor/src/components/collab-sidebar/hooks.js
+@@ -372,6 +372,17 @@ export function useFloatingThread( {
+ 	const blockRef = useRef();
+ 	useBlockElementRef( thread.blockClientId, blockRef );
+ 
++	const blockMode = useSelect(
++		( select ) => {
++			return thread.blockClientId
++				? select( blockEditorStore ).getBlockMode(
++						thread.blockClientId
++				  )
++				: null;
++		},
++		[ thread.blockClientId ]
++	);
++
+ 	const updateHeight = useCallback(
+ 		( id, newHeight ) => {
+ 			setHeights( ( prev ) => {
+@@ -400,7 +411,7 @@ export function useFloatingThread( {
+ 		if ( blockRef.current ) {
+ 			refs.setReference( blockRef.current );
+ 		}
+-	}, [ blockRef, refs, commentLastUpdated ] );
++	}, [ blockRef, refs, commentLastUpdated, blockMode ] );
+ 
+ 	// Track thread heights.
+ 	useEffect( () => {
+diff --git a/packages/interactivity/CHANGELOG.md b/packages/interactivity/CHANGELOG.md
+index dc419bece7bd69..790c57ae78d538 100644
+--- a/packages/interactivity/CHANGELOG.md
++++ b/packages/interactivity/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   Return a deep-clone object from `getServerState` and `getServerContext` functions. ([#73437](https://github.com/WordPress/gutenberg/pull/73437))
+ -   Fix using `getServerContext` in derived state getters. ([#73518](https://github.com/WordPress/gutenberg/pull/73518))
+ -   Fix derived state closures processing on client-side navigation. ([#72725](https://github.com/WordPress/gutenberg/pull/72725))
++-   Fix and refactor runtime initialization logic. ([#71123](https://github.com/WordPress/gutenberg/pull/71123))
+ 
+ ## 6.33.0 (2025-10-17)
+ 
+@@ -34,7 +35,7 @@
+ 
+ ### Deprecations
+ 
+--   Deprecated the `"data-wp-ignore"` directive of the Interactivity API.([#70945](https://github.com/WordPress/gutenberg/pull/70945))  
++-   Deprecated the `"data-wp-ignore"` directive of the Interactivity API.([#70945](https://github.com/WordPress/gutenberg/pull/70945))
+     It is deprecated as of WordPress 6.9 and will be removed in version 7.0.
+ 
+ ### Bug Fixes
+diff --git a/packages/interactivity/src/init.ts b/packages/interactivity/src/hydration.ts
+similarity index 66%
+rename from packages/interactivity/src/init.ts
+rename to packages/interactivity/src/hydration.ts
+index 91e2ac63808e2b..c0ee553d1e105b 100644
+--- a/packages/interactivity/src/init.ts
++++ b/packages/interactivity/src/hydration.ts
+@@ -30,20 +30,9 @@ export const getRegionRootFragment = (
+ export const initialVdom = new WeakMap< Element, ComponentChild >();
+ 
+ // Initialize the router with the initial DOM.
+-export const init = async () => {
++export const hydrateRegions = async () => {
+ 	const nodes = document.querySelectorAll( `[data-wp-interactive]` );
+ 
+-	/*
+-	 * This `await` with setTimeout is required to apparently ensure that the interactive blocks have their stores
+-	 * fully initialized prior to hydrating the blocks. If this is not present, then an error occurs, for example:
+-	 * > view.js:46 Uncaught (in promise) ReferenceError: Cannot access 'state' before initialization
+-	 * This occurs when splitTask() is implemented with scheduler.yield() as opposed to setTimeout(), as with the former
+-	 * split tasks are added to the front of the task queue whereas with the latter they are added to the end of the queue.
+-	 */
+-	await new Promise( ( resolve ) => {
+-		setTimeout( resolve, 0 );
+-	} );
+-
+ 	for ( const node of nodes ) {
+ 		if ( ! hydratedIslands.has( node ) ) {
+ 			await splitTask();
+diff --git a/packages/interactivity/src/index.ts b/packages/interactivity/src/index.ts
+index bc42af1fdcdde3..d32b455d889323 100644
+--- a/packages/interactivity/src/index.ts
++++ b/packages/interactivity/src/index.ts
+@@ -8,13 +8,17 @@ import { batch } from '@preact/signals';
+  * Internal dependencies
+  */
+ import registerDirectives, { routerRegions } from './directives';
+-import { init, getRegionRootFragment, initialVdom } from './init';
++import {
++	initialVdom,
++	hydrateRegions,
++	getRegionRootFragment,
++} from './hydration';
+ import { toVdom } from './vdom';
+ import { directive } from './hooks';
+ import { getNamespace } from './namespaces';
+ import { parseServerData, populateServerData } from './store';
+ import { proxifyState } from './proxies';
+-import { deepReadOnly, navigationSignal } from './utils';
++import { deepReadOnly, navigationSignal, onDOMReady } from './utils';
+ 
+ export {
+ 	store,
+@@ -67,5 +71,15 @@ export const privateApis = (
+ 	throw new Error( 'Forbidden access.' );
+ };
+ 
++// Parses and populates the initial state and config. All the core directives
++// are registered at this point as well.
++populateServerData( parseServerData() );
+ registerDirectives();
+-init();
++
++// Hydrates all interactive regions when `DOMContentLoaded` is dispatched, or as
++// soon as the `@wordpress/interactivity` module is evaluated in the case that
++// the event was already dispatched. This ensures synchronous modules had the
++// opportunity to register their stores before hydration takes place. For
++// asynchronous modules, or modules importing this module asynchronously, this
++// cannot be guaranteed.
++onDOMReady( hydrateRegions );
+diff --git a/packages/interactivity/src/store.ts b/packages/interactivity/src/store.ts
+index f5a3885ae0babd..2ad2f66e708591 100644
+--- a/packages/interactivity/src/store.ts
++++ b/packages/interactivity/src/store.ts
+@@ -329,7 +329,3 @@ export const populateServerData = ( data?: {
+ 		);
+ 	}
+ };
+-
+-// Parse and populate the initial state and config.
+-const data = parseServerData();
+-populateServerData( data );
+diff --git a/packages/interactivity/src/utils.ts b/packages/interactivity/src/utils.ts
+index c522fdccbbe877..9c5095ffe6b29f 100644
+--- a/packages/interactivity/src/utils.ts
++++ b/packages/interactivity/src/utils.ts
+@@ -68,6 +68,27 @@ export const splitTask =
+ 					setTimeout( resolve, 0 );
+ 				} );
+ 		  };
++/**
++ * Executes the passed callback on `DOMContentLoaded`, or immediately if that
++ * event has already been triggered.
++ *
++ * This function depends on `PerformanceNavigationTiming` (see
++ * https://developer.mozilla.org/en-US/docs/Web/API/PerformanceNavigationTiming) to
++ * detect whether the event has been dispatched.
++ *
++ * @param callback Function to execute on `DOMContentLoaded`.
++ */
++export const onDOMReady = ( callback: () => void ) => {
++	const [ navigation ] = performance.getEntriesByType( 'navigation' );
++	if (
++		( navigation as PerformanceNavigationTiming )
++			.domContentLoadedEventStart > 0
++	) {
++		callback();
++	} else {
++		document.addEventListener( 'DOMContentLoaded', callback );
++	}
++};
+ 
+ /**
+  * Creates a Flusher object that can be used to flush computed values and notify listeners.
+diff --git a/test/e2e/specs/interactivity/hydration-timing.spec.ts b/test/e2e/specs/interactivity/hydration-timing.spec.ts
+new file mode 100644
+index 00000000000000..867ab0146e1f69
+--- /dev/null
++++ b/test/e2e/specs/interactivity/hydration-timing.spec.ts
+@@ -0,0 +1,100 @@
++/**
++ * Internal dependencies
++ */
++import { test, expect } from './fixtures';
++
++test.describe( 'hydration timing', () => {
++	test.beforeAll( async ( { interactivityUtils: utils } ) => {
++		await utils.activatePlugins();
++		// Create a post with both blocks using a core/group wrapper.
++		// The "fast" block's module loads immediately, while the "slow"
++		// block's module will be delayed in the test to simulate slow
++		// network conditions.
++		await utils.addPostWithBlock( 'core/group', {
++			alias: 'hydration-timing',
++			innerBlocks: [
++				[ 'test/hydration-timing' ],
++				[ 'test/hydration-timing-slow' ],
++			],
++		} );
++
++		// Create a separate post with only the async block.
++		// This block dynamically imports @wordpress/interactivity on
++		// DOMContentLoaded, so there are no static imports of the library.
++		await utils.addPostWithBlock( 'test/hydration-timing-async', {
++			alias: 'hydration-timing-async',
++		} );
++	} );
++
++	test.afterAll( async ( { interactivityUtils: utils } ) => {
++		await utils.deactivatePlugins();
++		await utils.deleteAllPosts();
++	} );
++
++	test( 'should wait for all static imports before hydrating even with delayed module loading', async ( {
++		interactivityUtils: utils,
++		page,
++	} ) => {
++		// Delay only the "slow" module to simulate slow network conditions.
++		// The "fast" module loads immediately and imports @wordpress/interactivity,
++		// which could trigger hydration before the slow module finishes loading.
++		await page.route(
++			/hydration-timing-slow\/view\.js/,
++			async ( route ) => {
++				// Add a noticeable delay to simulate slow module loading.
++				await new Promise( ( resolve ) => setTimeout( resolve, 3000 ) );
++				await route.continue();
++			}
++		);
++
++		await page.goto( utils.getLink( 'hydration-timing' ) );
++
++		// Wait for the hydration status elements to be present.
++		const fastHydrationStatus = page.getByTestId( 'hydration-status' );
++		await expect( fastHydrationStatus ).toBeVisible();
++
++		const slowHydrationStatus = page.getByTestId( 'slow-hydration-status' );
++		await expect( slowHydrationStatus ).toBeVisible();
++
++		// Ensure both modules have loaded.
++		const moduleLoaded = page.getByTestId( 'module-loaded' );
++		const slowModuleLoaded = page.getByTestId( 'slow-module-loaded' );
++		await expect( moduleLoaded ).toHaveText( 'yes' );
++		await expect( slowModuleLoaded ).toHaveText( 'yes' );
++
++		// Both init callbacks should have run during hydration.
++		const contextInitialized = page.getByTestId( 'context-initialized' );
++		const slowContextInitialized = page.getByTestId(
++			'slow-context-initialized'
++		);
++		await expect( contextInitialized ).toHaveText( 'true' );
++		await expect( slowContextInitialized ).toHaveText( 'true' );
++	} );
++
++	test( 'should hydrate when the Interactivity API is loaded asynchronously after DOMContentLoaded', async ( {
++		interactivityUtils: utils,
++		page,
++	} ) => {
++		// This test uses a block that dynamically imports @wordpress/interactivity
++		// on DOMContentLoaded. Since there are no static imports of the library
++		// on this page, the library will be loaded after DOMContentLoaded fires.
++		// This verifies that hydration is not skipped when the library is loaded
++		// after that event.
++		await page.goto( utils.getLink( 'hydration-timing-async' ) );
++
++		// Wait for the async hydration status element to be present.
++		const asyncHydrationStatus = page.getByTestId(
++			'async-hydration-status'
++		);
++		await expect( asyncHydrationStatus ).toBeVisible();
++
++		// The async module should have loaded after DOMContentLoaded.
++		const asyncModuleLoaded = page.getByTestId( 'async-module-loaded' );
++		await expect( asyncModuleLoaded ).toHaveText( 'yes' );
++
++		// Hydration should have occurred even though the library was loaded
++		// after DOMContentLoaded.
++		const asyncHydrated = page.getByTestId( 'async-hydrated' );
++		await expect( asyncHydrated ).toHaveText( 'true' );
++	} );
++} );

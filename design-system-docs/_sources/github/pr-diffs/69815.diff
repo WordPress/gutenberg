@@ -1,0 +1,57 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a54f231f2aa0e4..ec115c8b7aea34 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ 
+ -   `FormTokenField`: Add theming support ([#69638](https://github.com/WordPress/gutenberg/pull/69638)).
+ -   `ComboboxControl`: Add theming support ([#69638](https://github.com/WordPress/gutenberg/pull/69638)).
++-   `ToolsPanel`: Add theming support ([#69815](https://github.com/WordPress/gutenberg/pull/69815)).
+ 
+ ## 29.7.0 (2025-03-27)
+ 
+diff --git a/packages/components/src/panel/style.scss b/packages/components/src/panel/style.scss
+index 3aff9d24b079f5..ef68df7ab5feac 100644
+--- a/packages/components/src/panel/style.scss
++++ b/packages/components/src/panel/style.scss
+@@ -1,6 +1,6 @@
+ .components-panel {
+ 	background: $white;
+-	border: $border-width solid $gray-200;
++	border: $border-width solid $components-color-gray-200;
+ 
+ 	> .components-panel__header:first-child,
+ 	> .components-panel__body:first-child {
+diff --git a/packages/components/src/tools-panel/styles.ts b/packages/components/src/tools-panel/styles.ts
+index 11536e98a128a9..4b884b9b028bc9 100644
+--- a/packages/components/src/tools-panel/styles.ts
++++ b/packages/components/src/tools-panel/styles.ts
+@@ -35,7 +35,9 @@ export const ToolsPanel = ( columns: number ) => css`
+ 	${ toolsPanelGrid.columns( columns ) }
+ 	${ toolsPanelGrid.spacing }
+ 
+-	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 300 ] };
++	background: ${ COLORS.theme.background };
++	color: ${ COLORS.theme.foreground };
++	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.theme.gray[ 200 ] };
+ 	margin-top: -1px;
+ 	padding: ${ space( 4 ) };
+ `;
+@@ -157,14 +159,14 @@ export const ResetLabel = styled.span`
+ `;
+ 
+ export const DefaultControlsItem = css`
+-	color: ${ COLORS.gray[ 900 ] };
++	color: ${ COLORS.theme.foreground };
+ 
+ 	&&[aria-disabled='true'] {
+-		color: ${ COLORS.gray[ 700 ] };
++		color: ${ COLORS.theme.gray[ 700 ] };
+ 		opacity: 1;
+ 
+ 		&:hover {
+-			color: ${ COLORS.gray[ 700 ] };
++			color: ${ COLORS.theme.gray[ 700 ] };
+ 		}
+ 
+ 		${ ResetLabel } {

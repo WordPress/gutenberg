@@ -1,0 +1,189 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 61fba6f264b52a..afaf301d6bf964 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,11 @@
+ 
+ -   `Button`: Keep deprecated props in type definitions ([#59913](https://github.com/WordPress/gutenberg/pull/59913)).
+ 
++### Bug Fix
++-   `PaletteEdit`: Fix number incrementing of default names for new colors added in non-en-US locales ([#52212](https://github.com/WordPress/gutenberg/pull/52212)).
++
++
++
+ ## 27.1.0 (2024-03-06)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index 5dd8787eb6594a..56234ca5c86bc5 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -74,7 +74,7 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
+ }
+ 
+ /**
+- * Returns a name for a palette item in the format "Color + id".
++ * Returns a name and slug for a palette item. The name takes the format "Color + id".
+  * To ensure there are no duplicate ids, this function checks all slugs.
+  * It expects slugs to be in the format: slugPrefix + color- + number.
+  * It then sets the id component of the new name based on the incremented id of the highest existing slug id.
+@@ -82,9 +82,9 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
+  * @param elements   An array of color palette items.
+  * @param slugPrefix The slug prefix used to match the element slug.
+  *
+- * @return A unique name for a palette item.
++ * @return A name and slug for the new palette item.
+  */
+-export function getNameForPosition(
++export function getNameAndSlugForPosition(
+ 	elements: PaletteElement[],
+ 	slugPrefix: string
+ ) {
+@@ -102,11 +102,14 @@ export function getNameForPosition(
+ 		return previousValue;
+ 	}, 1 );
+ 
+-	return sprintf(
+-		/* translators: %s: is an id for a custom color */
+-		__( 'Color %s' ),
+-		position
+-	);
++	return {
++		name: sprintf(
++			/* translators: %s: is an id for a custom color */
++			__( 'Color %s' ),
++			position
++		),
++		slug: `${ slugPrefix }color-${ position }`,
++	};
+ }
+ 
+ function ColorPickerPopover< T extends Color | Gradient >( {
+@@ -434,20 +437,19 @@ export function PaletteEdit( {
+ 									: __( 'Add color' )
+ 							}
+ 							onClick={ () => {
+-								const optionName = getNameForPosition(
+-									elements,
+-									slugPrefix
+-								);
++								const { name, slug } =
++									getNameAndSlugForPosition(
++										elements,
++										slugPrefix
++									);
+ 
+ 								if ( !! gradients ) {
+ 									onChange( [
+ 										...gradients,
+ 										{
+ 											gradient: DEFAULT_GRADIENT,
+-											name: optionName,
+-											slug:
+-												slugPrefix +
+-												kebabCase( optionName ),
++											name,
++											slug,
+ 										},
+ 									] );
+ 								} else {
+@@ -455,10 +457,8 @@ export function PaletteEdit( {
+ 										...colors,
+ 										{
+ 											color: DEFAULT_COLOR,
+-											name: optionName,
+-											slug:
+-												slugPrefix +
+-												kebabCase( optionName ),
++											name,
++											slug,
+ 										},
+ 									] );
+ 								}
+diff --git a/packages/components/src/palette-edit/test/index.tsx b/packages/components/src/palette-edit/test/index.tsx
+index 36f2949b3fbd37..7ebdaa77ef0b8c 100644
+--- a/packages/components/src/palette-edit/test/index.tsx
++++ b/packages/components/src/palette-edit/test/index.tsx
+@@ -7,7 +7,7 @@ import { click, type, press } from '@ariakit/test';
+ /**
+  * Internal dependencies
+  */
+-import PaletteEdit, { getNameForPosition } from '..';
++import PaletteEdit, { getNameAndSlugForPosition } from '..';
+ import type { PaletteElement } from '../types';
+ 
+ const noop = () => {};
+@@ -21,17 +21,18 @@ async function clearInput( input: HTMLInputElement ) {
+ 	}
+ }
+ 
+-describe( 'getNameForPosition', () => {
++describe( 'getNameAndSlugForPosition', () => {
+ 	test( 'should return 1 by default', () => {
+ 		const slugPrefix = 'test-';
+ 		const elements: PaletteElement[] = [];
+ 
+-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
+-			'Color 1'
+-		);
++		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual( {
++			name: 'Color 1',
++			slug: 'test-color-1',
++		} );
+ 	} );
+ 
+-	test( 'should return a new color name with an incremented slug id', () => {
++	test( 'should return a new color name and slug with an incremented slug id', () => {
+ 		const slugPrefix = 'test-';
+ 		const elements = [
+ 			{
+@@ -41,12 +42,13 @@ describe( 'getNameForPosition', () => {
+ 			},
+ 		];
+ 
+-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
+-			'Color 2'
+-		);
++		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual( {
++			name: 'Color 2',
++			slug: 'test-color-2',
++		} );
+ 	} );
+ 
+-	test( 'should ignore user-defined color names', () => {
++	test( 'should ignore user-defined color name and slug', () => {
+ 		const slugPrefix = 'test-';
+ 		const elements = [
+ 			{
+@@ -56,12 +58,13 @@ describe( 'getNameForPosition', () => {
+ 			},
+ 		];
+ 
+-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
+-			'Color 1'
+-		);
++		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual( {
++			name: 'Color 1',
++			slug: 'test-color-1',
++		} );
+ 	} );
+ 
+-	test( 'should return a new color name with an incremented slug id one higher than the current highest', () => {
++	test( 'should return a new color name and slug with an incremented slug id one higher than the current highest', () => {
+ 		const slugPrefix = 'test-';
+ 		const elements = [
+ 			{
+@@ -86,9 +89,10 @@ describe( 'getNameForPosition', () => {
+ 			},
+ 		];
+ 
+-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
+-			'Color 151'
+-		);
++		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual( {
++			name: 'Color 151',
++			slug: 'test-color-151',
++		} );
+ 	} );
+ } );
+ 

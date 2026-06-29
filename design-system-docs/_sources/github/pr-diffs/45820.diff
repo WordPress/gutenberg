@@ -1,0 +1,495 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1860d1ff4b3827..0269df3ad4a263 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,9 @@
+ 
+ ### Internal
+ 
++-   `Panel`, `PanelHeader`, `PanelRow`: Convert to TypeScript ([#47259](https://github.com/WordPress/gutenberg/pull/47259)).
++-   `BoxControl`: Convert to TypeScript ([#47622](https://github.com/WordPress/gutenberg/pull/47622)).
++-   `AnglePickerControl`: Convert to TypeScript ([#45820](https://github.com/WordPress/gutenberg/pull/45820)).
+ -   `ResizableBox`: refactor styles to TypeScript ([47756](https://github.com/WordPress/gutenberg/pull/47756)).
+ 
+ ## 23.3.0 (2023-02-01)
+@@ -22,14 +25,12 @@
+ 
+ -   `Toolbar`: unify Storybook examples under one file, migrate from knobs to controls ([47117](https://github.com/WordPress/gutenberg/pull/47117)).
+ -   `DropdownMenu`: migrate Storybook to controls ([47149](https://github.com/WordPress/gutenberg/pull/47149)).
+--   `Panel`, `PanelHeader`, `PanelRow`: Convert to TypeScript ([#47259](https://github.com/WordPress/gutenberg/pull/47259)).
+ -   Removed deprecated `@storybook/addon-knobs` dependency from the package ([47152](https://github.com/WordPress/gutenberg/pull/47152)).
+ -   `ColorListPicker`: Convert to TypeScript ([#46358](https://github.com/WordPress/gutenberg/pull/46358)).
+ -   `KeyboardShortcuts`: Convert to TypeScript ([#47429](https://github.com/WordPress/gutenberg/pull/47429)).
+ -   `ColorPalette`, `BorderControl`, `GradientPicker`: refine types and logic around single vs multiple palettes
+  ([#47384](https://github.com/WordPress/gutenberg/pull/47384)).
+ -   `Button`: Convert to TypeScript ([#46997](https://github.com/WordPress/gutenberg/pull/46997)).
+--   `BoxControl`: Convert to TypeScript ([#47622](https://github.com/WordPress/gutenberg/pull/47622)).
+ -   `QueryControls`: Convert to TypeScript ([#46721](https://github.com/WordPress/gutenberg/pull/46721)).
+ -   `TreeGrid`: Convert to TypeScript ([#47516](https://github.com/WordPress/gutenberg/pull/47516)).
+ -   `Notice`: refactor to TypeScript ([47118](https://github.com/WordPress/gutenberg/pull/47118)).
+diff --git a/packages/components/src/angle-picker-control/README.md b/packages/components/src/angle-picker-control/README.md
+index c4b63e56ed044a..c91a24272e0f7c 100644
+--- a/packages/components/src/angle-picker-control/README.md
++++ b/packages/components/src/angle-picker-control/README.md
+@@ -1,6 +1,6 @@
+ # AnglePickerControl
+ 
+-AnglePickerControl is a React component to render a UI that allows users to pick an angle.
++`AnglePickerControl` is a React component to render a UI that allows users to pick an angle.
+ Users can choose an angle in a visual UI with the mouse by dragging an angle indicator inside a circle or by directly inserting the desired angle in a text field.
+ 
+ ## Usage
+@@ -9,9 +9,15 @@ Users can choose an angle in a visual UI with the mouse by dragging an angle ind
+ import { useState } from '@wordpress/element';
+ import { AnglePickerControl } from '@wordpress/components';
+ 
+-const MyAnglePicker = () => {
+-	const [ angle, setAngle ] = useState();
+-	return <AnglePickerControl value={ angle } onChange={ setAngle } __nextHasNoMarginBottom />;
++function Example() {
++	const [ angle, setAngle ] = useState( 0 );
++	return (
++		<AnglePickerControl
++			value={ angle }
++			onChange={ setAngle }
++			__nextHasNoMarginBottom
++		/>
++	);
+ };
+ ```
+ 
+@@ -19,31 +25,28 @@ const MyAnglePicker = () => {
+ 
+ The component accepts the following props.
+ 
+-### label
++### `label`: `string`
+ 
+-Label to use for the angle picker. If not set the a translated label "Angle" is used.
++Label to use for the angle picker.
+ 
+--   Type: `String`
+ -   Required: No
++-   Default: `__( 'Angle' )`
+ 
+-### value
++### `value`: `number | string`
+ 
+ The current value of the input. The value represents an angle in degrees and should be a value between 0 and 360.
+ 
+--   Type: `Number`
+ -   Required: Yes
+ 
+-### onChange
++### `onChange`: `( value: number ) => void`
+ 
+ A function that receives the new value of the input.
+ 
+--   Type: `function`
+ -   Required: Yes
+ 
+-### __nextHasNoMarginBottom
++### `__nextHasNoMarginBottom`: `boolean`
+ 
+ Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
+ 
+--   Type: `boolean`
+ -   Required: No
+--   Default: `false`
+\ No newline at end of file
++-   Default: `false`
+diff --git a/packages/components/src/angle-picker-control/angle-circle.js b/packages/components/src/angle-picker-control/angle-circle.tsx
+similarity index 61%
+rename from packages/components/src/angle-picker-control/angle-circle.js
+rename to packages/components/src/angle-picker-control/angle-circle.tsx
+index 750530c046d071..2b80705432c410 100644
+--- a/packages/components/src/angle-picker-control/angle-circle.js
++++ b/packages/components/src/angle-picker-control/angle-circle.tsx
+@@ -13,12 +13,29 @@ import {
+ 	CircleIndicator,
+ } from './styles/angle-picker-control-styles';
+ 
+-function AngleCircle( { value, onChange, ...props } ) {
+-	const angleCircleRef = useRef();
+-	const angleCircleCenter = useRef();
+-	const previousCursorValue = useRef();
++import type { WordPressComponentProps } from '../ui/context';
++import type { AngleCircleProps } from './types';
++
++type UseDraggingArgumentType = Parameters< typeof useDragging >[ 0 ];
++type UseDraggingCallbackEvent =
++	| Parameters< UseDraggingArgumentType[ 'onDragStart' ] >[ 0 ]
++	| Parameters< UseDraggingArgumentType[ 'onDragMove' ] >[ 0 ]
++	| Parameters< UseDraggingArgumentType[ 'onDragEnd' ] >[ 0 ];
++
++function AngleCircle( {
++	value,
++	onChange,
++	...props
++}: WordPressComponentProps< AngleCircleProps, 'div' > ) {
++	const angleCircleRef = useRef< HTMLDivElement | null >( null );
++	const angleCircleCenter = useRef< { x: number; y: number } | undefined >();
++	const previousCursorValue = useRef< CSSStyleDeclaration[ 'cursor' ] >();
+ 
+ 	const setAngleCircleCenter = () => {
++		if ( angleCircleRef.current === null ) {
++			return;
++		}
++
+ 		const rect = angleCircleRef.current.getBoundingClientRect();
+ 		angleCircleCenter.current = {
+ 			x: rect.x + rect.width / 2,
+@@ -26,14 +43,26 @@ function AngleCircle( { value, onChange, ...props } ) {
+ 		};
+ 	};
+ 
+-	const changeAngleToPosition = ( event ) => {
+-		const { x: centerX, y: centerY } = angleCircleCenter.current;
++	const changeAngleToPosition = ( event: UseDraggingCallbackEvent ) => {
++		if ( event === undefined ) {
++			return;
++		}
++
+ 		// Prevent (drag) mouse events from selecting and accidentally
+ 		// triggering actions from other elements.
+ 		event.preventDefault();
+ 		// Input control needs to lose focus and by preventDefault above, it doesn't.
+-		event.target.focus();
+-		onChange( getAngle( centerX, centerY, event.clientX, event.clientY ) );
++		( event.target as HTMLDivElement | null )?.focus();
++
++		if (
++			angleCircleCenter.current !== undefined &&
++			onChange !== undefined
++		) {
++			const { x: centerX, y: centerY } = angleCircleCenter.current;
++			onChange(
++				getAngle( centerX, centerY, event.clientX, event.clientY )
++			);
++		}
+ 	};
+ 
+ 	const { startDrag, isDragging } = useDragging( {
+@@ -52,13 +81,12 @@ function AngleCircle( { value, onChange, ...props } ) {
+ 			}
+ 			document.body.style.cursor = 'grabbing';
+ 		} else {
+-			document.body.style.cursor = previousCursorValue.current || null;
++			document.body.style.cursor = previousCursorValue.current || '';
+ 			previousCursorValue.current = undefined;
+ 		}
+ 	}, [ isDragging ] );
+ 
+ 	return (
+-		/* eslint-disable jsx-a11y/no-static-element-interactions */
+ 		<CircleRoot
+ 			ref={ angleCircleRef }
+ 			onMouseDown={ startDrag }
+@@ -76,11 +104,15 @@ function AngleCircle( { value, onChange, ...props } ) {
+ 				<CircleIndicator className="components-angle-picker-control__angle-circle-indicator" />
+ 			</CircleIndicatorWrapper>
+ 		</CircleRoot>
+-		/* eslint-enable jsx-a11y/no-static-element-interactions */
+ 	);
+ }
+ 
+-function getAngle( centerX, centerY, pointX, pointY ) {
++function getAngle(
++	centerX: number,
++	centerY: number,
++	pointX: number,
++	pointY: number
++) {
+ 	const y = pointY - centerY;
+ 	const x = pointX - centerX;
+ 
+diff --git a/packages/components/src/angle-picker-control/index.js b/packages/components/src/angle-picker-control/index.tsx
+similarity index 55%
+rename from packages/components/src/angle-picker-control/index.js
+rename to packages/components/src/angle-picker-control/index.tsx
+index 654b58b943756c..fb5c00dfe50670 100644
+--- a/packages/components/src/angle-picker-control/index.js
++++ b/packages/components/src/angle-picker-control/index.tsx
+@@ -1,12 +1,14 @@
+ /**
+  * External dependencies
+  */
++import type { ForwardedRef } from 'react';
+ import classnames from 'classnames';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import deprecated from '@wordpress/deprecated';
++import { forwardRef } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+@@ -21,14 +23,22 @@ import { Text } from '../text';
+ import { Spacer } from '../spacer';
+ import { COLORS } from '../utils/colors-values';
+ 
+-export default function AnglePickerControl( {
+-	/** Start opting into the new margin-free styles that will become the default in a future version. */
+-	__nextHasNoMarginBottom = false,
+-	className,
+-	label = __( 'Angle' ),
+-	onChange,
+-	value,
+-} ) {
++import type { WordPressComponentProps } from '../ui/context';
++import type { AnglePickerControlProps } from './types';
++
++function UnforwardedAnglePickerControl(
++	props: WordPressComponentProps< AnglePickerControlProps, 'div' >,
++	ref: ForwardedRef< any >
++) {
++	const {
++		__nextHasNoMarginBottom = false,
++		className,
++		label = __( 'Angle' ),
++		onChange,
++		value,
++		...restProps
++	} = props;
++
+ 	if ( ! __nextHasNoMarginBottom ) {
+ 		deprecated(
+ 			'Bottom margin styles for wp.components.AnglePickerControl',
+@@ -40,9 +50,15 @@ export default function AnglePickerControl( {
+ 		);
+ 	}
+ 
+-	const handleOnNumberChange = ( unprocessedValue ) => {
++	const handleOnNumberChange = ( unprocessedValue: string | undefined ) => {
++		if ( onChange === undefined ) {
++			return;
++		}
++
+ 		const inputValue =
+-			unprocessedValue !== '' ? parseInt( unprocessedValue, 10 ) : 0;
++			unprocessedValue !== undefined && unprocessedValue !== ''
++				? parseInt( unprocessedValue, 10 )
++				: 0;
+ 		onChange( inputValue );
+ 	};
+ 
+@@ -50,6 +66,8 @@ export default function AnglePickerControl( {
+ 
+ 	return (
+ 		<Root
++			{ ...restProps }
++			ref={ ref }
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 			className={ classes }
+ 			gap={ 4 }
+@@ -94,3 +112,29 @@ export default function AnglePickerControl( {
+ 		</Root>
+ 	);
+ }
++
++/**
++ * `AnglePickerControl` is a React component to render a UI that allows users to
++ * pick an angle. Users can choose an angle in a visual UI with the mouse by
++ * dragging an angle indicator inside a circle or by directly inserting the
++ * desired angle in a text field.
++ *
++ * ```jsx
++ * import { useState } from '@wordpress/element';
++ * import { AnglePickerControl } from '@wordpress/components';
++ *
++ * function Example() {
++ *   const [ angle, setAngle ] = useState( 0 );
++ *   return (
++ *     <AnglePickerControl
++ *       value={ angle }
++ *       onChange={ setAngle }
++ *       __nextHasNoMarginBottom
++ *     </>
++ *   );
++ * }
++ * ```
++ */
++export const AnglePickerControl = forwardRef( UnforwardedAnglePickerControl );
++
++export default AnglePickerControl;
+diff --git a/packages/components/src/angle-picker-control/stories/index.js b/packages/components/src/angle-picker-control/stories/index.js
+deleted file mode 100644
+index 9418b1bcd60d0c..00000000000000
+--- a/packages/components/src/angle-picker-control/stories/index.js
++++ /dev/null
+@@ -1,29 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import AnglePickerControl from '../';
+-
+-export default {
+-	title: 'Components/AnglePickerControl',
+-	component: AnglePickerControl,
+-	argTypes: {
+-		label: { control: { type: 'text' } },
+-	},
+-};
+-
+-const AnglePickerWithState = ( args ) => {
+-	const [ angle, setAngle ] = useState();
+-	return (
+-		<AnglePickerControl { ...args } value={ angle } onChange={ setAngle } />
+-	);
+-};
+-
+-export const Default = AnglePickerWithState.bind( {} );
+-Default.args = {
+-	__nextHasNoMarginBottom: true,
+-};
+diff --git a/packages/components/src/angle-picker-control/stories/index.tsx b/packages/components/src/angle-picker-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..bfa2952b697b05
+--- /dev/null
++++ b/packages/components/src/angle-picker-control/stories/index.tsx
+@@ -0,0 +1,57 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { AnglePickerControl } from '..';
++
++const meta: ComponentMeta< typeof AnglePickerControl > = {
++	title: 'Components/AnglePickerControl',
++	component: AnglePickerControl,
++	argTypes: {
++		as: { control: { type: null } },
++		value: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++
++export default meta;
++
++const AnglePickerWithState: ComponentStory< typeof AnglePickerControl > = ( {
++	onChange,
++	...args
++} ) => {
++	const [ angle, setAngle ] = useState< number >( 0 );
++
++	const handleChange = ( newValue: number ) => {
++		setAngle( newValue );
++		onChange( newValue );
++	};
++
++	return (
++		<AnglePickerControl
++			{ ...args }
++			value={ angle }
++			onChange={ handleChange }
++		/>
++	);
++};
++
++export const Default = AnglePickerWithState.bind( {} );
++Default.args = {
++	__nextHasNoMarginBottom: true,
++};
+diff --git a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.tsx
+similarity index 87%
+rename from packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
+rename to packages/components/src/angle-picker-control/styles/angle-picker-control-styles.tsx
+index 29b38850c055f4..7d97903adf5c92 100644
+--- a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
++++ b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.tsx
+@@ -12,10 +12,14 @@ import { COLORS } from '../../utils';
+ import { space } from '../../ui/utils/space';
+ import CONFIG from '../../utils/config-values';
+ 
++import type { AnglePickerControlProps } from '../types';
++
+ const CIRCLE_SIZE = 32;
+ const INNER_CIRCLE_SIZE = 3;
+ 
+-const deprecatedBottomMargin = ( { __nextHasNoMarginBottom } ) => {
++const deprecatedBottomMargin = ( {
++	__nextHasNoMarginBottom,
++}: Pick< AnglePickerControlProps, '__nextHasNoMarginBottom' > ) => {
+ 	return ! __nextHasNoMarginBottom
+ 		? css`
+ 				margin-bottom: ${ space( 2 ) };
+diff --git a/packages/components/src/angle-picker-control/types.ts b/packages/components/src/angle-picker-control/types.ts
+new file mode 100644
+index 00000000000000..1ddd26f679db6d
+--- /dev/null
++++ b/packages/components/src/angle-picker-control/types.ts
+@@ -0,0 +1,29 @@
++export type AnglePickerControlProps = {
++	/**
++	 * Start opting into the new margin-free styles that will become the default
++	 * in a future version.
++	 *
++	 * @default false
++	 */
++	__nextHasNoMarginBottom?: boolean;
++	/**
++	 * Label to use for the angle picker.
++	 *
++	 * @default __( 'Angle' )
++	 */
++	label?: string;
++	/**
++	 * A function that receives the new value of the input.
++	 */
++	onChange: ( value: number ) => void;
++	/**
++	 * The current value of the input. The value represents an angle in degrees
++	 * and should be a value between 0 and 360.
++	 */
++	value: number | string;
++};
++
++export type AngleCircleProps = Pick<
++	AnglePickerControlProps,
++	'value' | 'onChange'
++>;
+diff --git a/packages/components/src/custom-gradient-picker/index.js b/packages/components/src/custom-gradient-picker/index.js
+index cac1393fe53d49..824cc89bce1730 100644
+--- a/packages/components/src/custom-gradient-picker/index.js
++++ b/packages/components/src/custom-gradient-picker/index.js
+@@ -53,7 +53,6 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
+ 		<AnglePickerControl
+ 			__nextHasNoMarginBottom
+ 			onChange={ onAngleChange }
+-			labelPosition="top"
+ 			value={ hasGradient ? angle : '' }
+ 		/>
+ 	);
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 5c65c848174a58..c54fddc4e2a7ba 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -45,7 +45,6 @@
+ 		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
+ 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
+ 		"src/index.js",
+-		"src/angle-picker-control",
+ 		"src/autocomplete",
+ 		"src/combobox-control",
+ 		"src/custom-gradient-picker",

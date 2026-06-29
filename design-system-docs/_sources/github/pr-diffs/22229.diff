@@ -1,0 +1,23 @@
+diff --git a/packages/components/src/toolbar-item/index.native.js b/packages/components/src/toolbar-item/index.native.js
+new file mode 100644
+index 00000000000000..919b31a04096af
+--- /dev/null
++++ b/packages/components/src/toolbar-item/index.native.js
+@@ -0,0 +1,17 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++import warning from '@wordpress/warning';
++
++function ToolbarItem( { children, ...props }, ref ) {
++	if ( typeof children !== 'function' ) {
++		warning(
++			'`ToolbarItem` is a generic headless component that accepts only function children props'
++		);
++		return null;
++	}
++	return children( { ...props, ref } );
++}
++
++export default forwardRef( ToolbarItem );

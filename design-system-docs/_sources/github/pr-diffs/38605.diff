@@ -1,0 +1,60 @@
+diff --git a/packages/components/README.md b/packages/components/README.md
+index ebc5f52238bb66..64bab2c25b8244 100644
+--- a/packages/components/README.md
++++ b/packages/components/README.md
+@@ -31,8 +31,6 @@ Many components include CSS to add style, you will need to add in order to appea
+ 
+ In non-WordPress projects, link to the `build-style/style.css` file directly, it is located at `node_modules/@wordpress/components/build-style/style.css`.
+ 
+-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+-
+ ## Docs & examples
+ 
+ You can browse the components docs and examples at https://wordpress.github.io/gutenberg/
+@@ -43,6 +41,6 @@ This is an individual package that's part of the Gutenberg project. The project
+ 
+ To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+ 
+-This package also has its own [contributing information](/packages/components/CONTRIBUTING.md) where you can find additional details.
++This package also has its own [contributing information](https://github.com/WordPress/gutenberg/tree/HEAD/packages/components/CONTRIBUTING.md) where you can find additional details.
+ 
+ <br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+diff --git a/packages/docgen/README.md b/packages/docgen/README.md
+index 8787a54b089c06..f54cd6b9e5773d 100644
+--- a/packages/docgen/README.md
++++ b/packages/docgen/README.md
+@@ -254,8 +254,6 @@ console.log( result ); // Will log 3
+ `number` The result of subtracting the two numbers.
+ ````
+ 
+-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+-
+ ### TypeScript support
+ 
+ Entry point `index.ts`:
+diff --git a/packages/edit-widgets/README.md b/packages/edit-widgets/README.md
+index 3e3a651db29253..de7e28f9e1d465 100644
+--- a/packages/edit-widgets/README.md
++++ b/packages/edit-widgets/README.md
+@@ -18,8 +18,6 @@ npm install @wordpress/edit-widgets
+ 
+ _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
+ 
+-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+-
+ ## How this works
+ 
+ The new Widgets screen in WordPress admin is another block editor, just like the Post editor or the experimental site editor. Hence it will be referred often as the Widgets editor.
+diff --git a/packages/interface/README.md b/packages/interface/README.md
+index 5dceda4dadb48d..915be856af178d 100644
+--- a/packages/interface/README.md
++++ b/packages/interface/README.md
+@@ -69,8 +69,6 @@ wp.data.dispatch( 'core/interface' ).unpinItem( 'core/edit-post', 'edit-post-blo
+ wp.data.select( 'core/interface' ).isItemPinned( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' ); -> false
+ ```
+ 
+-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+-
+ ### Preferences
+ 
+ The interface package provides some helpers for implementing editor preferences.

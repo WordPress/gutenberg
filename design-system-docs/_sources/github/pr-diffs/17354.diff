@@ -1,0 +1,57 @@
+diff --git a/packages/components/src/higher-order/with-focus-return/index.js b/packages/components/src/higher-order/with-focus-return/index.js
+index 470d1f1fba7b51..2b504878bdf528 100644
+--- a/packages/components/src/higher-order/with-focus-return/index.js
++++ b/packages/components/src/higher-order/with-focus-return/index.js
+@@ -88,7 +88,7 @@ function withFocusReturn( options ) {
+ 
+ 				const stack = [
+ 					...without(
+-						this.props.focusHistory,
++						this.props.focus.focusHistory,
+ 						...ownFocusedElements
+ 					),
+ 					activeElementOnMount,
+@@ -109,7 +109,7 @@ function withFocusReturn( options ) {
+ 						onFocus={ this.setIsFocusedTrue }
+ 						onBlur={ this.setIsFocusedFalse }
+ 					>
+-						<WrappedComponent { ...this.props } />
++						<WrappedComponent { ...this.props.childProps } />
+ 					</div>
+ 				);
+ 			}
+@@ -117,7 +117,7 @@ function withFocusReturn( options ) {
+ 
+ 		return ( props ) => (
+ 			<Consumer>
+-				{ ( context ) => <FocusReturn { ...props } { ...context } /> }
++				{ ( context ) => <FocusReturn childProps={ props } focus={ context } /> }
+ 			</Consumer>
+ 		);
+ 	};
+diff --git a/packages/components/src/higher-order/with-focus-return/test/index.js b/packages/components/src/higher-order/with-focus-return/test/index.js
+index 175a118efc2850..f3e2b326b6daca 100644
+--- a/packages/components/src/higher-order/with-focus-return/test/index.js
++++ b/packages/components/src/higher-order/with-focus-return/test/index.js
+@@ -51,13 +51,20 @@ describe( 'withFocusReturn()', () => {
+ 			expect( wrappedElementShallow.children[ 0 ].type ).toBe( 'textarea' );
+ 		} );
+ 
+-		it( 'should pass additional props through to the wrapped element', () => {
++		it( 'should pass own props through to the wrapped element', () => {
+ 			const renderedComposite = renderer.create( <Composite test="test" /> );
+ 			const wrappedElement = renderedComposite.root.findByType( Test );
+ 			// Ensure that the wrapped Test element has the appropriate props.
+ 			expect( wrappedElement.props.test ).toBe( 'test' );
+ 		} );
+ 
++		it( 'should not pass any withFocusReturn context props through to the wrapped element', () => {
++			const renderedComposite = renderer.create( <Composite test="test" /> );
++			const wrappedElement = renderedComposite.root.findByType( Test );
++			// Ensure that the wrapped Test element has the appropriate props.
++			expect( wrappedElement.props.focusHistory ).toBeUndefined();
++		} );
++
+ 		it( 'should not switch focus back to the bound focus element', () => {
+ 			const mountedComposite = renderer.create( <Composite /> );
+ 

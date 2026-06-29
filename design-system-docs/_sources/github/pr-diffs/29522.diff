@@ -1,0 +1,133 @@
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index 976ec27b40cc97..339ad51194e251 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -7,7 +7,7 @@ import { clamp, isFinite, noop } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+-import { __, isRTL } from '@wordpress/i18n';
++import { __ } from '@wordpress/i18n';
+ import { useRef, useState, forwardRef } from '@wordpress/element';
+ import { useInstanceId } from '@wordpress/compose';
+ 
+@@ -18,6 +18,7 @@ import BaseControl from '../base-control';
+ import Button from '../button';
+ import Icon from '../icon';
+ import { color } from '../utils/colors';
++import { isDocumentRTL as isRTL } from '../utils/rtl';
+ import { floatClamp, useControlledRangeValue } from './utils';
+ import InputRange from './input-range';
+ import RangeRail from './rail';
+diff --git a/packages/components/src/range-control/rail.js b/packages/components/src/range-control/rail.js
+index 8f1794883e2dd5..46958f5d94ef00 100644
+--- a/packages/components/src/range-control/rail.js
++++ b/packages/components/src/range-control/rail.js
+@@ -1,13 +1,9 @@
+-/**
+- * WordPress dependencies
+- */
+-import { isRTL } from '@wordpress/i18n';
+-
+ /**
+  * Internal dependencies
+  */
+ import RangeMark from './mark';
+ import { MarksWrapper, Rail } from './styles/range-control-styles';
++import { isDocumentRTL as isRTL } from '../utils/rtl';
+ 
+ export default function RangeRail( {
+ 	disabled = false,
+diff --git a/packages/components/src/utils/rtl.js b/packages/components/src/utils/rtl.js
+index 7e46a4bf6a2725..b6529882d70060 100644
+--- a/packages/components/src/utils/rtl.js
++++ b/packages/components/src/utils/rtl.js
+@@ -4,16 +4,23 @@
+ import { css } from '@emotion/core';
+ import { mapKeys } from 'lodash';
+ 
+-/**
+- * WordPress dependencies
+- */
+-import { isRTL } from '@wordpress/i18n';
+-
+ const LOWER_LEFT_REGEXP = new RegExp( /-left/g );
+ const LOWER_RIGHT_REGEXP = new RegExp( /-right/g );
+ const UPPER_LEFT_REGEXP = new RegExp( /Left/g );
+ const UPPER_RIGHT_REGEXP = new RegExp( /Right/g );
+ 
++/**
++ * Checks the LTR/RTL direction for the window.document.
++ *
++ * @return {boolean} Whether the document is RTL.
++ */
++export function isDocumentRTL() {
++	if ( typeof window !== 'undefined' ) {
++		return !! ( window?.document?.dir === 'rtl' );
++	}
++	return false;
++}
++
+ /**
+  * Flips a CSS property from left <-> right.
+  *
+@@ -70,12 +77,14 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
+  */
+ export function rtl( ltrStyles = {}, rtlStyles ) {
+ 	return () => {
++		const isRTL = isDocumentRTL();
++
+ 		if ( rtlStyles ) {
+ 			// @ts-ignore: `css` types are wrong, it can accept an object: https://emotion.sh/docs/object-styles#with-css
+-			return isRTL() ? css( rtlStyles ) : css( ltrStyles );
++			return isRTL ? css( rtlStyles ) : css( ltrStyles );
+ 		}
+ 
+ 		// @ts-ignore: `css` types are wrong, it can accept an object: https://emotion.sh/docs/object-styles#with-css
+-		return isRTL() ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
++		return isRTL ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
+ 	};
+ }
+diff --git a/packages/components/src/utils/test/rtl.js b/packages/components/src/utils/test/rtl.js
+index 1e30162037087a..96314ae7d02c8f 100644
+--- a/packages/components/src/utils/test/rtl.js
++++ b/packages/components/src/utils/test/rtl.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { convertLTRToRTL } from '../rtl';
++import { isDocumentRTL, convertLTRToRTL } from '../rtl';
+ 
+ describe( 'convertLTRToRTL', () => {
+ 	it( 'converts (*)Left <-> (*)Right', () => {
+@@ -122,3 +122,29 @@ describe( 'convertLTRToRTL', () => {
+ 		expect( nextStyle[ 'text-combine-upright' ] ).toBe( 'none' );
+ 	} );
+ } );
++
++describe( 'isDocumentRTL', () => {
++	afterEach( () => {
++		document.dir = '';
++	} );
++
++	test( 'should return false when document has no dir setting', () => {
++		expect( isDocumentRTL() ).toBe( false );
++	} );
++
++	test( 'should return false when document is ltr', () => {
++		document.dir = 'ltr';
++		expect( isDocumentRTL() ).toBe( false );
++
++		document.documentElement.setAttribute( 'dir', 'ltr' );
++		expect( isDocumentRTL() ).toBe( false );
++	} );
++
++	test( 'should return true when document is rtl', () => {
++		document.dir = 'rtl';
++		expect( isDocumentRTL() ).toBe( true );
++
++		document.documentElement.setAttribute( 'dir', 'rtl' );
++		expect( isDocumentRTL() ).toBe( true );
++	} );
++} );

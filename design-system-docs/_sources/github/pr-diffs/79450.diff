@@ -1,0 +1,834 @@
+diff --git a/packages/components/src/flex/flex-item/hook.ts b/packages/components/src/flex/flex-item/hook.ts
+index 4de791905a4065..7bbcb6406ba428 100644
+--- a/packages/components/src/flex/flex-item/hook.ts
++++ b/packages/components/src/flex/flex-item/hook.ts
+@@ -1,8 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import type { SerializedStyles } from '@emotion/react';
+-import { css } from '@emotion/react';
++import clsx from 'clsx';
++import type { CSSProperties } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -10,9 +10,12 @@ import { css } from '@emotion/react';
+ import type { WordPressComponentProps } from '../../context';
+ import { useContextSystem } from '../../context';
+ import { useFlexContext } from '../context';
+-import * as styles from '../styles';
+-import { useCx } from '../../utils/hooks/use-cx';
+ import type { FlexItemProps } from '../types';
++import styles from '../style.module.scss';
++
++type FlexItemStyle = CSSProperties & {
++	'--wp-components-flex-item-display'?: CSSProperties[ 'display' ];
++};
+ 
+ export function useFlexItem(
+ 	props: WordPressComponentProps< FlexItemProps, 'div' >
+@@ -21,30 +24,21 @@ export function useFlexItem(
+ 		className,
+ 		display: displayProp,
+ 		isBlock = false,
++		style,
+ 		...otherProps
+ 	} = useContextSystem( props, 'FlexItem' );
+ 
+-	const sx: {
+-		Base?: SerializedStyles;
+-	} = {};
+-
+ 	const contextDisplay = useFlexContext().flexItemDisplay;
++	const display = displayProp || contextDisplay;
+ 
+-	sx.Base = css( {
+-		display: displayProp || contextDisplay,
+-	} );
+-
+-	const cx = useCx();
+-
+-	const classes = cx(
+-		styles.Item,
+-		sx.Base,
+-		isBlock && styles.block,
+-		className
+-	);
++	const itemStyle: FlexItemStyle = {
++		...( display && { '--wp-components-flex-item-display': display } ),
++		...style,
++	};
+ 
+ 	return {
+ 		...otherProps,
+-		className: classes,
++		className: clsx( styles.item, isBlock && styles.block, className ),
++		style: itemStyle,
+ 	};
+ }
+diff --git a/packages/components/src/flex/flex/hook.ts b/packages/components/src/flex/flex/hook.ts
+index f5648c187c7628..89921335b8f931 100644
+--- a/packages/components/src/flex/flex/hook.ts
++++ b/packages/components/src/flex/flex/hook.ts
+@@ -1,12 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/react';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useMemo } from '@wordpress/element';
++import clsx from 'clsx';
++import type { CSSProperties } from 'react';
+ import deprecated from '@wordpress/deprecated';
+ 
+ /**
+@@ -16,9 +12,20 @@ import type { WordPressComponentProps } from '../../context';
+ import { useContextSystem } from '../../context';
+ import { useResponsiveValue } from '../../utils/use-responsive-value';
+ import { space } from '../../utils/space';
+-import * as styles from '../styles';
+-import { useCx } from '../../utils';
+ import type { FlexProps } from '../types';
++import styles from '../style.module.scss';
++
++type FlexCustomProperty =
++	| '--wp-components-flex-align'
++	| '--wp-components-flex-direction'
++	| '--wp-components-flex-wrap'
++	| '--wp-components-flex-gap'
++	| '--wp-components-flex-justify';
++
++type FlexStyle = CSSProperties &
++	Partial<
++		Record< FlexCustomProperty, CSSProperties[ keyof CSSProperties ] >
++	>;
+ 
+ function useDeprecatedProps(
+ 	props: WordPressComponentProps< FlexProps, 'div' >
+@@ -47,6 +54,7 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
+ 		expanded = true,
+ 		gap = 2,
+ 		justify = 'space-between',
++		style,
+ 		wrap = false,
+ 		...otherProps
+ 	} = useContextSystem( useDeprecatedProps( props ), 'Flex' );
+@@ -59,36 +67,26 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
+ 	const isColumn =
+ 		typeof direction === 'string' && !! direction.includes( 'column' );
+ 
+-	const cx = useCx();
++	const flexStyle: FlexStyle = {
++		'--wp-components-flex-align':
++			align ?? ( isColumn ? 'normal' : 'center' ),
++		'--wp-components-flex-direction': direction,
++		...( wrap && { '--wp-components-flex-wrap': 'wrap' } ),
++		'--wp-components-flex-gap': space( gap ),
++		'--wp-components-flex-justify': justify,
++		...style,
++	};
+ 
+-	const classes = useMemo( () => {
+-		const base = css( {
+-			alignItems: align ?? ( isColumn ? 'normal' : 'center' ),
+-			flexDirection: direction,
+-			flexWrap: wrap ? 'wrap' : undefined,
+-			gap: space( gap ),
+-			justifyContent: justify,
+-			height: isColumn && expanded ? '100%' : undefined,
+-			width: ! isColumn && expanded ? '100%' : undefined,
+-		} );
+-
+-		return cx(
+-			styles.Flex,
+-			base,
+-			isColumn ? styles.ItemsColumn : styles.ItemsRow,
++	return {
++		...otherProps,
++		className: clsx(
++			styles.flex,
++			isColumn ? styles.itemsColumn : styles.itemsRow,
+ 			className
+-		);
+-	}, [
+-		align,
+-		className,
+-		cx,
+-		direction,
+-		expanded,
+-		gap,
++		),
++		'data-expanded': expanded ? true : undefined,
++		'data-layout': isColumn ? 'column' : 'row',
++		style: flexStyle,
+ 		isColumn,
+-		justify,
+-		wrap,
+-	] );
+-
+-	return { ...otherProps, className: classes, isColumn };
++	};
+ }
+diff --git a/packages/components/src/flex/style.module.scss b/packages/components/src/flex/style.module.scss
+new file mode 100644
+index 00000000000000..7f831f0f0156db
+--- /dev/null
++++ b/packages/components/src/flex/style.module.scss
+@@ -0,0 +1,40 @@
++.flex {
++	align-items: var(--wp-components-flex-align);
++	display: flex;
++	flex-direction: var(--wp-components-flex-direction);
++	flex-wrap: var(--wp-components-flex-wrap);
++	gap: var(--wp-components-flex-gap);
++	justify-content: var(--wp-components-flex-justify);
++
++	&[data-expanded][data-layout="column"] {
++		height: 100%;
++	}
++
++	&[data-expanded][data-layout="row"] {
++		width: 100%;
++	}
++}
++
++.item {
++	display: var(--wp-components-flex-item-display, block);
++	max-height: 100%;
++	max-width: 100%;
++	min-height: 0;
++	min-width: 0;
++}
++
++.block {
++	flex: 1;
++}
++
++.itemsColumn {
++	> * {
++		min-height: 0;
++	}
++}
++
++.itemsRow {
++	> * {
++		min-width: 0;
++	}
++}
+diff --git a/packages/components/src/flex/styles.ts b/packages/components/src/flex/styles.ts
+deleted file mode 100644
+index 2de12155210625..00000000000000
+--- a/packages/components/src/flex/styles.ts
++++ /dev/null
+@@ -1,44 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-
+-export const Flex = css`
+-	display: flex;
+-`;
+-
+-export const Item = css`
+-	display: block;
+-	max-height: 100%;
+-	max-width: 100%;
+-	min-height: 0;
+-	min-width: 0;
+-`;
+-
+-export const block = css`
+-	flex: 1;
+-`;
+-
+-/**
+- * Workaround to optimize DOM rendering.
+- * We'll enhance alignment with naive parent flex assumptions.
+- *
+- * Trade-off:
+- * Far less DOM less. However, UI rendering is not as reliable.
+- */
+-
+-/**
+- * Improves stability of width/height rendering.
+- * https://github.com/ItsJonQ/g2/pull/149
+- */
+-export const ItemsColumn = css`
+-	> * {
+-		min-height: 0;
+-	}
+-`;
+-
+-export const ItemsRow = css`
+-	> * {
+-		min-width: 0;
+-	}
+-`;
+diff --git a/packages/components/src/flex/test/__snapshots__/index.tsx.snap b/packages/components/src/flex/test/__snapshots__/index.tsx.snap
+index 55d70bb67bed96..ebe25ca192395c 100644
+--- a/packages/components/src/flex/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/flex/test/__snapshots__/index.tsx.snap
+@@ -1,121 +1,24 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`props should render + wrap non Flex children 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -1,22 +1,18 @@
+-  <div
+-    class="components-flex css-4xxgm8-PolymorphicDiv-Flex-base-ItemsRow e19lxcc00"
+--   data-testid="flex"
+-+   data-testid="base-flex"
+-    data-wp-c16t="true"
+-    data-wp-component="Flex"
+-  >
+-    <div
+-      class="components-flex-item css-11ygw1k-PolymorphicDiv-Item-sx-Base e19lxcc00"
+-      data-wp-c16t="true"
+-      data-wp-component="FlexItem"
+-    >
+-      Item
+-    </div>
+--   <div
+--     class="css-1ragr82-PolymorphicDiv e19lxcc00"
+--   />
+--   <div />
+-    <div
+-      class="components-flex-item components-flex-block css-1gfd63q-PolymorphicDiv-Item-sx-Base-block e19lxcc00"
+-      data-wp-c16t="true"
+-      data-wp-component="FlexBlock"
+-    >
+-`;
+-
+-exports[`props should render align 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-@@ -1,15 +1,15 @@
+-  Array [
+-    Object {
+--     "-ms-flex-align": "flex-start",
+-+     "-ms-flex-align": "center",
+-      "-ms-flex-direction": "row",
+--     "-webkit-align-items": "flex-start",
+--     "-webkit-box-align": "flex-start",
+-+     "-webkit-align-items": "center",
+-+     "-webkit-box-align": "center",
+-      "-webkit-box-pack": "justify",
+-      "-webkit-flex-direction": "row",
+-      "-webkit-justify-content": "space-between",
+--     "align-items": "flex-start",
+-+     "align-items": "center",
+-      "display": "flex",
+-      "flex-direction": "row",
+-      "gap": "calc(4px * 2)",
+-      "justify-content": "space-between",
+-      "width": "100%",
+-`;
+-
+ exports[`props should render correctly 1`] = `
+-.emotion-0 {
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+-  -webkit-align-items: center;
+-  -webkit-box-align: center;
+-  -ms-flex-align: center;
+-  align-items: center;
+-  -webkit-flex-direction: row;
+-  -ms-flex-direction: row;
+-  flex-direction: row;
+-  gap: calc(4px * 2);
+-  -webkit-box-pack: justify;
+-  -webkit-justify-content: space-between;
+-  justify-content: space-between;
+-  width: 100%;
+-}
+-
+-.emotion-0>* {
+-  min-width: 0;
+-}
+-
+-.emotion-2 {
+-  display: block;
+-  max-height: 100%;
+-  max-width: 100%;
+-  min-height: 0;
+-  min-width: 0;
+-}
+-
+-.emotion-4 {
+-  display: block;
+-  max-height: 100%;
+-  max-width: 100%;
+-  min-height: 0;
+-  min-width: 0;
+-  -webkit-flex: 1;
+-  -ms-flex: 1;
+-  flex: 1;
+-}
+-
+ <div
+-  class="components-flex emotion-0 emotion-1"
++  class="components-flex"
++  data-expanded="true"
++  data-layout="row"
+   data-testid="base-flex"
+   data-wp-c16t="true"
+   data-wp-component="Flex"
++  style="--wp-components-flex-align: center; --wp-components-flex-direction: row; --wp-components-flex-gap: calc(4px * 2); --wp-components-flex-justify: space-between;"
+ >
+   <div
+-    class="components-flex-item emotion-2 emotion-1"
++    class="components-flex-item"
+     data-wp-c16t="true"
+     data-wp-component="FlexItem"
+   >
+     Item
+   </div>
+   <div
+-    class="components-flex-item components-flex-block emotion-4 emotion-1"
++    class="components-flex-item components-flex-block"
+     data-wp-c16t="true"
+     data-wp-component="FlexBlock"
+   >
+@@ -123,56 +26,3 @@ exports[`props should render correctly 1`] = `
+   </div>
+ </div>
+ `;
+-
+-exports[`props should render justify 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+-      "-ms-flex-align": "center",
+-      "-ms-flex-direction": "row",
+--     "-ms-flex-pack": "start",
+-      "-webkit-align-items": "center",
+-      "-webkit-box-align": "center",
+--     "-webkit-box-pack": "start",
+-+     "-webkit-box-pack": "justify",
+-      "-webkit-flex-direction": "row",
+--     "-webkit-justify-content": "flex-start",
+-+     "-webkit-justify-content": "space-between",
+-      "align-items": "center",
+-      "display": "flex",
+-      "flex-direction": "row",
+-      "gap": "calc(4px * 2)",
+--     "justify-content": "flex-start",
+-+     "justify-content": "space-between",
+-      "width": "100%",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render spacing 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+--     "min-width": "0",
+--   },
+--   Object {
+-      "-ms-flex": "1",
+-      "-webkit-flex": "1",
+-      "display": "block",
+-      "flex": "1",
+-      "max-height": "100%",
+-      "max-width": "100%",
+-      "min-height": "0",
+-+     "min-width": "0",
+-+   },
+-+   Object {
+-      "min-width": "0",
+-    },
+-  ]
+-`;
+diff --git a/packages/components/src/flex/test/index.tsx b/packages/components/src/flex/test/index.tsx
+index c4147278b47747..9a2605fa54ea47 100644
+--- a/packages/components/src/flex/test/index.tsx
++++ b/packages/components/src/flex/test/index.tsx
+@@ -22,89 +22,73 @@ describe( 'props', () => {
+ 	} );
+ 
+ 	test( 'should render + wrap non Flex children', () => {
+-		render(
+-			<Flex data-testid="base-flex">
+-				<FlexItem>Item</FlexItem>
+-				<FlexBlock>Item</FlexBlock>
+-			</Flex>
+-		);
+-
+ 		render(
+ 			<Flex data-testid="flex">
+ 				<FlexItem>Item</FlexItem>
+-				<View />
+-				<div />
++				<View data-testid="view-child" />
++				<div data-testid="div-child" />
+ 				<FlexBlock>Item</FlexBlock>
+ 			</Flex>
+ 		);
+ 
+-		expect( screen.getByTestId( 'flex' ) ).toMatchDiffSnapshot(
+-			screen.getByTestId( 'base-flex' )
+-		);
++		expect( screen.getByTestId( 'view-child' ) ).toBeInTheDocument();
++		expect( screen.getByTestId( 'div-child' ) ).toBeInTheDocument();
+ 	} );
+ 
+ 	test( 'should render align', () => {
+-		render(
+-			<Flex data-testid="base-flex">
+-				<FlexItem>Item</FlexItem>
+-				<FlexBlock>Item</FlexBlock>
+-			</Flex>
+-		);
+-
+ 		render(
+ 			<Flex align="flex-start" data-testid="flex">
+ 				<FlexItem>Item</FlexItem>
+ 				<FlexBlock>Item</FlexBlock>
+ 			</Flex>
+ 		);
+-		expect( screen.getByTestId( 'flex' ) ).toMatchStyleDiffSnapshot(
+-			screen.getByTestId( 'base-flex' )
+-		);
++		expect( screen.getByTestId( 'flex' ) ).toHaveStyle( {
++			'--wp-components-flex-align': 'flex-start',
++		} );
+ 	} );
+ 
+ 	test( 'should render justify', () => {
+-		render(
+-			<Flex data-testid="base-flex">
+-				<FlexItem>Item</FlexItem>
+-				<FlexBlock>Item</FlexBlock>
+-			</Flex>
+-		);
+-
+ 		render(
+ 			<Flex justify="flex-start" data-testid="flex">
+ 				<FlexItem>Item</FlexItem>
+ 				<FlexBlock>Item</FlexBlock>
+ 			</Flex>
+ 		);
+-		expect( screen.getByTestId( 'flex' ) ).toMatchStyleDiffSnapshot(
+-			screen.getByTestId( 'base-flex' )
+-		);
++		expect( screen.getByTestId( 'flex' ) ).toHaveStyle( {
++			'--wp-components-flex-justify': 'flex-start',
++		} );
+ 	} );
+ 
+ 	test( 'should render spacing', () => {
+ 		render(
+-			<Flex data-testid="base-flex">
++			<Flex gap={ 5 } data-testid="flex">
+ 				<FlexItem>Item</FlexItem>
+ 				<FlexBlock>Item</FlexBlock>
+ 			</Flex>
+ 		);
+ 
++		expect( screen.getByTestId( 'flex' ) ).toHaveStyle( {
++			'--wp-components-flex-gap': 'calc(4px * 5)',
++		} );
++	} );
++
++	test( 'should render column direction', () => {
+ 		render(
+-			<>
+-				<Flex>
+-					<FlexItem>Item</FlexItem>
+-					<FlexBlock data-testid="flex-block">Item</FlexBlock>
+-				</Flex>
+-				<Flex gap={ 5 }>
+-					<FlexItem>Item</FlexItem>
+-					<FlexBlock data-testid="flex-block-with-gap">
+-						Item
+-					</FlexBlock>
+-				</Flex>
+-			</>
++			<Flex direction="column" data-testid="flex">
++				<FlexItem data-testid="flex-item">Item</FlexItem>
++			</Flex>
+ 		);
+-		expect( screen.getByTestId( 'flex-block' ) ).toMatchStyleDiffSnapshot(
+-			screen.getByTestId( 'flex-block-with-gap' )
++
++		expect( screen.getByTestId( 'flex' ) ).toHaveAttribute(
++			'data-layout',
++			'column'
+ 		);
++		expect( screen.getByTestId( 'flex' ) ).toHaveStyle( {
++			'--wp-components-flex-align': 'normal',
++			'--wp-components-flex-direction': 'column',
++		} );
++		expect( screen.getByTestId( 'flex-item' ) ).toHaveStyle( {
++			'--wp-components-flex-item-display': 'block',
++		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/utils/polymorphic-element.tsx b/packages/components/src/utils/polymorphic-element.tsx
+new file mode 100644
+index 00000000000000..0e39b3c4b616c3
+--- /dev/null
++++ b/packages/components/src/utils/polymorphic-element.tsx
+@@ -0,0 +1,40 @@
++/**
++ * External dependencies
++ */
++import type * as React from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++type PolymorphicElementProps< T extends React.ElementType > = Omit<
++	React.ComponentPropsWithoutRef< T >,
++	'as'
++> & {
++	as?: T;
++};
++
++type PolymorphicElementRef< T extends React.ElementType > =
++	React.ComponentPropsWithRef< T >[ 'ref' ];
++
++function UnforwardedPolymorphicElement< T extends React.ElementType = 'div' >(
++	{ as, ...props }: PolymorphicElementProps< T >,
++	ref: PolymorphicElementRef< T >
++) {
++	const Element = as || 'div';
++
++	return <Element ref={ ref } { ...props } />;
++}
++
++/**
++ * Internal utility for components that need Emotion-compatible `as` behavior
++ * while rendering with plain React elements.
++ */
++export const PolymorphicElement = forwardRef(
++	UnforwardedPolymorphicElement
++) as < T extends React.ElementType = 'div' >(
++	props: PolymorphicElementProps< T > & {
++		ref?: PolymorphicElementRef< T >;
++	}
++) => React.ReactElement | null;
+diff --git a/packages/components/src/view/component.tsx b/packages/components/src/view/component.tsx
+index 6742bd9f52e510..f395cf08ce8088 100644
+--- a/packages/components/src/view/component.tsx
++++ b/packages/components/src/view/component.tsx
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -12,14 +7,25 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
++import { PolymorphicElement } from '../utils/polymorphic-element';
+ 
+-const PolymorphicDiv = styled.div``;
++type ViewProps< T extends React.ElementType > = WordPressComponentProps<
++	{},
++	T
++> & {
++	/**
++	 * Legacy Emotion prop accepted by `View`. It is intentionally consumed here
++	 * so it does not leak to the rendered element after Emotion is removed.
++	 */
++	css?: unknown;
++};
+ 
+ function UnforwardedView< T extends React.ElementType = 'div' >(
+-	{ as, ...restProps }: WordPressComponentProps< {}, T >,
++	{ css: _css, ...restProps }: ViewProps< T >,
+ 	ref: React.ForwardedRef< any >
+ ) {
+-	return <PolymorphicDiv as={ as } ref={ ref } { ...restProps } />;
++	void _css;
++	return <PolymorphicElement ref={ ref } { ...restProps } />;
+ }
+ 
+ /**
+diff --git a/packages/components/src/view/test/__snapshots__/index.js.snap b/packages/components/src/view/test/__snapshots__/index.js.snap
+index f7014a5fd7b191..6a80237402112a 100644
+--- a/packages/components/src/view/test/__snapshots__/index.js.snap
++++ b/packages/components/src/view/test/__snapshots__/index.js.snap
+@@ -1,20 +1,28 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`props should render as another element 1`] = `
++exports[`props should render as a custom component 1`] = `
+ <div>
+-  <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++  <section
++    class="custom-class"
++    data-custom-component="true"
++    data-testid="custom-view"
+   >
+     <span />
++  </section>
++</div>
++`;
++
++exports[`props should render as another element 1`] = `
++<div>
++  <p>
++    <span />
+   </p>
+ </div>
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+ <div>
+-  <div
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
+-  >
++  <div>
+     <span />
+   </div>
+ </div>
+@@ -23,7 +31,7 @@ exports[`props should render correctly 1`] = `
+ exports[`props should render with custom styles (Array) 1`] = `
+ <div>
+   <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++    data-testid="custom-css-array-view"
+   >
+     <span />
+   </p>
+@@ -33,7 +41,7 @@ exports[`props should render with custom styles (Array) 1`] = `
+ exports[`props should render with custom styles (object) 1`] = `
+ <div>
+   <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++    data-testid="custom-css-object-view"
+   >
+     <span />
+   </p>
+@@ -43,7 +51,7 @@ exports[`props should render with custom styles (object) 1`] = `
+ exports[`props should render with custom styles (string) 1`] = `
+ <div>
+   <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++    data-testid="custom-css-string-view"
+   >
+     <span />
+   </p>
+diff --git a/packages/components/src/view/test/index.js b/packages/components/src/view/test/index.js
+index 56c6f7cd7a1487..456066804b15c3 100644
+--- a/packages/components/src/view/test/index.js
++++ b/packages/components/src/view/test/index.js
+@@ -1,7 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import { render } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -27,10 +32,33 @@ describe( 'props', () => {
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ 
++	test( 'should render as a custom component', () => {
++		const CustomComponent = forwardRef( ( props, ref ) => (
++			<section ref={ ref } data-custom-component { ...props } />
++		) );
++
++		const ref = jest.fn();
++		const { container } = render(
++			<View
++				as={ CustomComponent }
++				className="custom-class"
++				data-testid="custom-view"
++				ref={ ref }
++			>
++				<span />
++			</View>
++		);
++
++		const customView = screen.getByTestId( 'custom-view' );
++		expect( container ).toMatchSnapshot();
++		expect( ref ).toHaveBeenCalledWith( customView );
++	} );
++
+ 	test( 'should render with custom styles (string)', () => {
+ 		const { container } = render(
+ 			<View
+ 				as="p"
++				data-testid="custom-css-string-view"
+ 				css={ `
+ 					background: pink;
+ 				` }
+@@ -39,12 +67,16 @@ describe( 'props', () => {
+ 			</View>
+ 		);
+ 		expect( container ).toMatchSnapshot();
++		expect(
++			screen.getByTestId( 'custom-css-string-view' )
++		).not.toHaveAttribute( 'css' );
+ 	} );
+ 
+ 	test( 'should render with custom styles (object)', () => {
+ 		const { container } = render(
+ 			<View
+ 				as="p"
++				data-testid="custom-css-object-view"
+ 				css={ {
+ 					background: 'pink',
+ 				} }
+@@ -53,12 +85,16 @@ describe( 'props', () => {
+ 			</View>
+ 		);
+ 		expect( container ).toMatchSnapshot();
++		expect(
++			screen.getByTestId( 'custom-css-object-view' )
++		).not.toHaveAttribute( 'css' );
+ 	} );
+ 
+ 	test( 'should render with custom styles (Array)', () => {
+ 		const { container } = render(
+ 			<View
+ 				as="p"
++				data-testid="custom-css-array-view"
+ 				css={ [
+ 					{
+ 						background: 'pink',
+@@ -70,5 +106,8 @@ describe( 'props', () => {
+ 			</View>
+ 		);
+ 		expect( container ).toMatchSnapshot();
++		expect(
++			screen.getByTestId( 'custom-css-array-view' )
++		).not.toHaveAttribute( 'css' );
+ 	} );
+ } );

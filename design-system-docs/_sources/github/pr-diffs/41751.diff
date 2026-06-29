@@ -1,0 +1,1029 @@
+diff --git a/packages/block-editor/src/components/link-control/test/fixtures/index.js b/packages/block-editor/src/components/link-control/test/fixtures/index.js
+index 7639209c573d4d..028436b94bce18 100644
+--- a/packages/block-editor/src/components/link-control/test/fixtures/index.js
++++ b/packages/block-editor/src/components/link-control/test/fixtures/index.js
+@@ -1,7 +1,6 @@
+-/**
+- * External dependencies
+- */
+-import { uniqueId } from 'lodash';
++let uniqueIdCounter = 1;
++
++export const uniqueId = () => uniqueIdCounter++;
+ 
+ export const fauxEntitySuggestions = [
+ 	{
+diff --git a/packages/block-editor/src/components/link-control/test/index.js b/packages/block-editor/src/components/link-control/test/index.js
+index 79db7af0d5520d..7a9338514cdfeb 100644
+--- a/packages/block-editor/src/components/link-control/test/index.js
++++ b/packages/block-editor/src/components/link-control/test/index.js
+@@ -4,7 +4,7 @@
+ import { render, unmountComponentAtNode } from 'react-dom';
+ import { act, Simulate } from 'react-dom/test-utils';
+ import { queryByText, queryByRole } from '@testing-library/react';
+-import { default as lodash, first, last, nth, uniqueId } from 'lodash';
++import { default as lodash } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+@@ -18,7 +18,11 @@ import { useSelect } from '@wordpress/data';
+  * Internal dependencies
+  */
+ import LinkControl from '../';
+-import { fauxEntitySuggestions, fetchFauxEntitySuggestions } from './fixtures';
++import {
++	fauxEntitySuggestions,
++	fetchFauxEntitySuggestions,
++	uniqueId,
++} from './fixtures';
+ 
+ // Mock debounce() so that it runs instantly.
+ lodash.debounce = jest.fn( ( callback ) => {
+@@ -357,7 +361,7 @@ describe( 'Searching for a link', () => {
+ 
+ 	it( 'should display only search suggestions when current input value is not URL-like', async () => {
+ 		const searchTerm = 'Hello world';
+-		const firstFauxSuggestion = first( fauxEntitySuggestions );
++		const firstFauxSuggestion = fauxEntitySuggestions[ 0 ];
+ 
+ 		act( () => {
+ 			render( <LinkControl />, container );
+@@ -377,9 +381,9 @@ describe( 'Searching for a link', () => {
+ 
+ 		const searchResultElements = getSearchResults();
+ 
+-		const firstSearchResultItemHTML =
+-			first( searchResultElements ).innerHTML;
+-		const lastSearchResultItemHTML = last( searchResultElements ).innerHTML;
++		const firstSearchResultItemHTML = searchResultElements[ 0 ].innerHTML;
++		const lastSearchResultItemHTML =
++			searchResultElements[ searchResultElements.length - 1 ].innerHTML;
+ 
+ 		expect( searchResultElements ).toHaveLength(
+ 			fauxEntitySuggestions.length
+@@ -502,7 +506,8 @@ describe( 'Searching for a link', () => {
+ 			const searchResultElements = getSearchResults();
+ 
+ 			const lastSearchResultItemHTML =
+-				last( searchResultElements ).innerHTML;
++				searchResultElements[ searchResultElements.length - 1 ]
++					.innerHTML;
+ 			const additionalDefaultFallbackURLSuggestionLength = 1;
+ 
+ 			// We should see a search result for each of the expect search suggestions
+@@ -974,11 +979,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 				'[role="listbox"] [role="option"]'
+ 			);
+ 
+-			const createButton = first(
+-				Array.from( searchResultElements ).filter( ( result ) =>
+-					result.innerHTML.includes( 'Create:' )
+-				)
+-			);
++			const createButton = Array.from( searchResultElements ).filter(
++				( result ) => result.innerHTML.includes( 'Create:' )
++			)[ 0 ];
+ 
+ 			expect( createButton ).not.toBeNull();
+ 			expect( createButton.innerHTML ).toEqual(
+@@ -1071,11 +1074,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 			'[role="listbox"] [role="option"]'
+ 		);
+ 
+-		const createButton = first(
+-			Array.from( searchResultElements ).filter( ( result ) =>
+-				result.innerHTML.includes( 'Create:' )
+-			)
+-		);
++		const createButton = Array.from( searchResultElements ).filter(
++			( result ) => result.innerHTML.includes( 'Create:' )
++		)[ 0 ];
+ 
+ 		await act( async () => {
+ 			Simulate.click( createButton );
+@@ -1143,11 +1144,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 		const searchResultElements = container.querySelectorAll(
+ 			'[role="listbox"] [role="option"]'
+ 		);
+-		const createButton = first(
+-			Array.from( searchResultElements ).filter( ( result ) =>
+-				result.innerHTML.includes( 'Create:' )
+-			)
+-		);
++		const createButton = Array.from( searchResultElements ).filter(
++			( result ) => result.innerHTML.includes( 'Create:' )
++		)[ 0 ];
+ 
+ 		// Step down into the search results, highlighting the first result item.
+ 		act( () => {
+@@ -1210,11 +1209,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 			'[role="listbox"] [role="option"]'
+ 		);
+ 
+-		const createButton = first(
+-			Array.from( searchResultElements ).filter( ( result ) =>
+-				result.innerHTML.includes( 'Custom suggestion text' )
+-			)
+-		);
++		const createButton = Array.from( searchResultElements ).filter(
++			( result ) => result.innerHTML.includes( 'Custom suggestion text' )
++		)[ 0 ];
+ 
+ 		expect( createButton ).not.toBeNull();
+ 	} );
+@@ -1241,11 +1238,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 				const searchResultElements = container.querySelectorAll(
+ 					'[role="listbox"] [role="option"]'
+ 				);
+-				const createButton = first(
+-					Array.from( searchResultElements ).filter( ( result ) =>
+-						result.innerHTML.includes( 'Create:' )
+-					)
+-				);
++				const createButton = Array.from( searchResultElements ).filter(
++					( result ) => result.innerHTML.includes( 'Create:' )
++				)[ 0 ];
+ 
+ 				// Verify input has no value.
+ 				expect( searchInput.value ).toBe( '' );
+@@ -1275,11 +1270,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 			const searchResultElements = container.querySelectorAll(
+ 				'[role="listbox"] [role="option"]'
+ 			);
+-			const createButton = first(
+-				Array.from( searchResultElements ).filter( ( result ) =>
+-					result.innerHTML.includes( 'New page' )
+-				)
+-			);
++			const createButton = Array.from( searchResultElements ).filter(
++				( result ) => result.innerHTML.includes( 'New page' )
++			)[ 0 ];
+ 
+ 			// Verify input has no value.
+ 			expect( searchInput.value ).toBe( '' );
+@@ -1321,11 +1314,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 					'[role="listbox"] [role="option"]'
+ 				);
+ 
+-				const createButton = first(
+-					Array.from( searchResultElements ).filter( ( result ) =>
+-						result.innerHTML.includes( 'New page' )
+-					)
+-				);
++				const createButton = Array.from( searchResultElements ).filter(
++					( result ) => result.innerHTML.includes( 'New page' )
++				)[ 0 ];
+ 
+ 				expect( createButton ).toBeFalsy(); // Shouldn't exist!
+ 			}
+@@ -1366,11 +1357,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 			let searchResultElements = container.querySelectorAll(
+ 				'[role="listbox"] [role="option"]'
+ 			);
+-			let createButton = first(
+-				Array.from( searchResultElements ).filter( ( result ) =>
+-					result.innerHTML.includes( 'Create:' )
+-				)
+-			);
++			let createButton = Array.from( searchResultElements ).filter(
++				( result ) => result.innerHTML.includes( 'Create:' )
++			)[ 0 ];
+ 
+ 			await act( async () => {
+ 				Simulate.click( createButton );
+@@ -1407,18 +1396,16 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
+ 			searchResultElements = container.querySelectorAll(
+ 				'[role="listbox"] [role="option"]'
+ 			);
+-			createButton = first(
+-				Array.from( searchResultElements ).filter( ( result ) =>
+-					result.innerHTML.includes( 'New page' )
+-				)
+-			);
++			createButton = Array.from( searchResultElements ).filter(
++				( result ) => result.innerHTML.includes( 'New page' )
++			)[ 0 ];
+ 		} );
+ 	} );
+ } );
+ 
+ describe( 'Selecting links', () => {
+ 	it( 'should display a selected link corresponding to the provided "currentLink" prop', () => {
+-		const selectedLink = first( fauxEntitySuggestions );
++		const selectedLink = fauxEntitySuggestions[ 0 ];
+ 
+ 		const LinkControlConsumer = () => {
+ 			const [ link ] = useState( selectedLink );
+@@ -1447,7 +1434,7 @@ describe( 'Selecting links', () => {
+ 	} );
+ 
+ 	it( 'should hide "selected" link UI and display search UI prepopulated with previously selected link title when "Change" button is clicked', () => {
+-		const selectedLink = first( fauxEntitySuggestions );
++		const selectedLink = fauxEntitySuggestions[ 0 ];
+ 
+ 		const LinkControlConsumer = () => {
+ 			const [ link, setLink ] = useState( selectedLink );
+@@ -1484,7 +1471,7 @@ describe( 'Selecting links', () => {
+ 
+ 	describe( 'Selection using mouse click', () => {
+ 		it.each( [
+-			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // Entity search.
++			[ 'entity', 'hello world', fauxEntitySuggestions[ 0 ] ], // Entity search.
+ 			[
+ 				'url',
+ 				'https://www.wordpress.org',
+@@ -1528,7 +1515,7 @@ describe( 'Selecting links', () => {
+ 
+ 				const searchResultElements = getSearchResults();
+ 
+-				const firstSearchSuggestion = first( searchResultElements );
++				const firstSearchSuggestion = searchResultElements[ 0 ];
+ 
+ 				// Simulate selecting the first of the search suggestions.
+ 				act( () => {
+@@ -1557,7 +1544,7 @@ describe( 'Selecting links', () => {
+ 
+ 	describe( 'Selection using keyboard', () => {
+ 		it.each( [
+-			[ 'entity', 'hello world', first( fauxEntitySuggestions ) ], // Entity search.
++			[ 'entity', 'hello world', fauxEntitySuggestions[ 0 ] ], // Entity search.
+ 			[
+ 				'url',
+ 				'https://www.wordpress.org',
+@@ -1607,8 +1594,8 @@ describe( 'Selecting links', () => {
+ 
+ 				const searchResultElements = getSearchResults();
+ 
+-				const firstSearchSuggestion = first( searchResultElements );
+-				const secondSearchSuggestion = nth( searchResultElements, 1 );
++				const firstSearchSuggestion = searchResultElements[ 0 ];
++				const secondSearchSuggestion = searchResultElements[ 1 ];
+ 
+ 				let selectedSearchResultElement = container.querySelector(
+ 					'[role="option"][aria-selected="true"]'
+@@ -1711,8 +1698,8 @@ describe( 'Selecting links', () => {
+ 
+ 			const searchResultElements = getSearchResults();
+ 
+-			const firstSearchSuggestion = first( searchResultElements );
+-			const secondSearchSuggestion = nth( searchResultElements, 1 );
++			const firstSearchSuggestion = searchResultElements[ 0 ];
++			const secondSearchSuggestion = searchResultElements[ 1 ];
+ 
+ 			let selectedSearchResultElement = container.querySelector(
+ 				'[role="option"][aria-selected="true"]'
+@@ -1758,7 +1745,7 @@ describe( 'Selecting links', () => {
+ 
+ describe( 'Addition Settings UI', () => {
+ 	it( 'should display "New Tab" setting (in "off" mode) by default when a link is selected', async () => {
+-		const selectedLink = first( fauxEntitySuggestions );
++		const selectedLink = fauxEntitySuggestions[ 0 ];
+ 		const expectedSettingText = 'Open in new tab';
+ 
+ 		const LinkControlConsumer = () => {
+@@ -1791,7 +1778,7 @@ describe( 'Addition Settings UI', () => {
+ 	} );
+ 
+ 	it( 'should display a setting control with correct default state for each of the custom settings provided', async () => {
+-		const selectedLink = first( fauxEntitySuggestions );
++		const selectedLink = fauxEntitySuggestions[ 0 ];
+ 
+ 		const customSettings = [
+ 			{
+@@ -2266,7 +2253,7 @@ describe( 'Rich link previews', () => {
+ } );
+ 
+ describe( 'Controlling link title text', () => {
+-	const selectedLink = first( fauxEntitySuggestions );
++	const selectedLink = fauxEntitySuggestions[ 0 ];
+ 
+ 	it( 'should not show a means to alter the link title text by default', async () => {
+ 		act( () => {
+@@ -2285,7 +2272,7 @@ describe( 'Controlling link title text', () => {
+ 		'should not show the link title text input when the URL is `%s`',
+ 		async ( urlValue ) => {
+ 			const selectedLinkWithoutURL = {
+-				...first( fauxEntitySuggestions ),
++				...fauxEntitySuggestions[ 0 ],
+ 				url: urlValue,
+ 			};
+ 
+diff --git a/packages/block-editor/src/components/responsive-block-control/test/index.js b/packages/block-editor/src/components/responsive-block-control/test/index.js
+index 624e6585c21b3f..e47e22c3b3c616 100644
+--- a/packages/block-editor/src/components/responsive-block-control/test/index.js
++++ b/packages/block-editor/src/components/responsive-block-control/test/index.js
+@@ -3,7 +3,6 @@
+  */
+ import { render, unmountComponentAtNode } from 'react-dom';
+ import { act, Simulate } from 'react-dom/test-utils';
+-import { uniqueId } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -31,7 +30,7 @@ afterEach( () => {
+ 	container = null;
+ } );
+ 
+-const inputId = uniqueId();
++const inputId = 'input-12345678';
+ 
+ const sizeOptions = [
+ 	{
+diff --git a/packages/block-editor/src/store/test/reducer.js b/packages/block-editor/src/store/test/reducer.js
+index fb1b2356429192..428265cb2ae98c 100644
+--- a/packages/block-editor/src/store/test/reducer.js
++++ b/packages/block-editor/src/store/test/reducer.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { values, omit } from 'lodash';
++import { omit } from 'lodash';
+ import deepFreeze from 'deep-freeze';
+ 
+ /**
+@@ -666,7 +666,7 @@ describe( 'state', () => {
+ 				} );
+ 
+ 				expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
+-				expect( values( state.byClientId )[ 0 ].clientId ).toBe(
++				expect( Object.values( state.byClientId )[ 0 ].clientId ).toBe(
+ 					'bananas'
+ 				);
+ 				expect( state.order ).toEqual( {
+@@ -729,7 +729,9 @@ describe( 'state', () => {
+ 			} );
+ 
+ 			expect( Object.keys( state.byClientId ) ).toHaveLength( 2 );
+-			expect( values( state.byClientId )[ 1 ].clientId ).toBe( 'ribs' );
++			expect( Object.values( state.byClientId )[ 1 ].clientId ).toBe(
++				'ribs'
++			);
+ 			expect( state.order ).toEqual( {
+ 				'': [ 'chicken', 'ribs' ],
+ 				chicken: [],
+@@ -773,10 +775,12 @@ describe( 'state', () => {
+ 			} );
+ 
+ 			expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
+-			expect( values( state.byClientId )[ 0 ].name ).toBe(
++			expect( Object.values( state.byClientId )[ 0 ].name ).toBe(
+ 				'core/freeform'
+ 			);
+-			expect( values( state.byClientId )[ 0 ].clientId ).toBe( 'wings' );
++			expect( Object.values( state.byClientId )[ 0 ].clientId ).toBe(
++				'wings'
++			);
+ 			expect( state.order ).toEqual( {
+ 				'': [ 'wings' ],
+ 				wings: [],
+@@ -930,15 +934,15 @@ describe( 'state', () => {
+ 			} );
+ 
+ 			expect( Object.keys( replacedState.byClientId ) ).toHaveLength( 1 );
+-			expect( values( originalState.byClientId )[ 0 ].name ).toBe(
++			expect( Object.values( originalState.byClientId )[ 0 ].name ).toBe(
+ 				'core/test-block'
+ 			);
+-			expect( values( replacedState.byClientId )[ 0 ].name ).toBe(
++			expect( Object.values( replacedState.byClientId )[ 0 ].name ).toBe(
+ 				'core/freeform'
+ 			);
+-			expect( values( replacedState.byClientId )[ 0 ].clientId ).toBe(
+-				'chicken'
+-			);
++			expect(
++				Object.values( replacedState.byClientId )[ 0 ].clientId
++			).toBe( 'chicken' );
+ 			expect( replacedState.order ).toEqual( {
+ 				'': [ 'chicken' ],
+ 				chicken: [],
+diff --git a/packages/block-editor/src/store/test/selectors.js b/packages/block-editor/src/store/test/selectors.js
+index afae0fbc88f1cd..806dab9d2d7a23 100644
+--- a/packages/block-editor/src/store/test/selectors.js
++++ b/packages/block-editor/src/store/test/selectors.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { filter } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -83,7 +78,9 @@ describe( 'selectors', () => {
+ 	let cachedSelectors;
+ 
+ 	beforeAll( () => {
+-		cachedSelectors = filter( selectors, ( selector ) => selector.clear );
++		cachedSelectors = Object.entries( selectors )
++			.filter( ( [ , selector ] ) => selector.clear )
++			.map( ( [ , selector ] ) => selector );
+ 	} );
+ 
+ 	beforeEach( () => {
+diff --git a/packages/blocks/src/api/test/factory.js b/packages/blocks/src/api/test/factory.js
+index 04f1ceaf62b9da..4b3da605264938 100644
+--- a/packages/blocks/src/api/test/factory.js
++++ b/packages/blocks/src/api/test/factory.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import deepFreeze from 'deep-freeze';
+-import { times } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+@@ -1084,7 +1083,7 @@ describe( 'block factory', () => {
+ 				registerBlockType( 'core/text-block', defaultBlockSettings );
+ 				registerBlockType( 'core/image-block', defaultBlockSettings );
+ 
+-				const textBlocks = times( 4, ( index ) => {
++				const textBlocks = [ ...Array( 4 ).keys() ].map( ( index ) => {
+ 					return createBlock( 'core/text-block', {
+ 						value: `textBlock${ index + 1 }`,
+ 					} );
+@@ -1101,13 +1100,13 @@ describe( 'block factory', () => {
+ 				registerBlockType( 'core/text-block', defaultBlockSettings );
+ 				registerBlockType( 'core/image-block', defaultBlockSettings );
+ 
+-				const textBlocks = times( 2, ( index ) => {
++				const textBlocks = [ ...Array( 2 ).keys() ].map( ( index ) => {
+ 					return createBlock( 'core/text-block', {
+ 						value: `textBlock${ index + 1 }`,
+ 					} );
+ 				} );
+ 
+-				const imageBlocks = times( 2, ( index ) => {
++				const imageBlocks = [ ...Array( 2 ).keys() ].map( ( index ) => {
+ 					return createBlock( 'core/image-block', {
+ 						value: `imageBlock${ index + 1 }`,
+ 					} );
+@@ -1125,7 +1124,7 @@ describe( 'block factory', () => {
+ 			it( 'should should show wildcard "from" transformation as available for single blocks', () => {
+ 				registerBlockType( 'core/text-block', defaultBlockSettings );
+ 
+-				const blocks = times( 1, ( index ) => {
++				const blocks = [ ...Array( 1 ).keys() ].map( ( index ) => {
+ 					return createBlock( 'core/text-block', {
+ 						value: `textBlock${ index + 1 }`,
+ 					} );
+@@ -1802,11 +1801,13 @@ describe( 'block factory', () => {
+ 			registerBlockType( 'core/text-block', defaultBlockSettings );
+ 
+ 			const numOfBlocksToGroup = 4;
+-			const blocks = times( numOfBlocksToGroup, ( index ) => {
+-				return createBlock( 'core/text-block', {
+-					value: `textBlock${ index + 1 }`,
+-				} );
+-			} );
++			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
++				( index ) => {
++					return createBlock( 'core/text-block', {
++						value: `textBlock${ index + 1 }`,
++					} );
++				}
++			);
+ 
+ 			const transformedBlocks = switchToBlockType(
+ 				blocks,
+@@ -1864,14 +1865,16 @@ describe( 'block factory', () => {
+ 			registerBlockType( 'core/image-block', defaultBlockSettings );
+ 
+ 			const numOfBlocksToGroup = 4;
+-			const blocks = times( numOfBlocksToGroup, ( index ) => {
+-				return createBlock(
+-					index % 2 ? 'core/text-block' : 'core/image-block',
+-					{
+-						value: `block-value-${ index + 1 }`,
+-					}
+-				);
+-			} );
++			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
++				( index ) => {
++					return createBlock(
++						index % 2 ? 'core/text-block' : 'core/image-block',
++						{
++							value: `block-value-${ index + 1 }`,
++						}
++					);
++				}
++			);
+ 
+ 			const transformedBlocks = switchToBlockType(
+ 				blocks,
+@@ -1925,11 +1928,13 @@ describe( 'block factory', () => {
+ 			registerBlockType( 'core/image-block', defaultBlockSettings );
+ 
+ 			const numOfBlocksToGroup = 4;
+-			const blocks = times( numOfBlocksToGroup, ( index ) => {
+-				return createBlock( 'core/text-block', {
+-					value: `block-value-${ index + 1 }`,
+-				} );
+-			} );
++			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
++				( index ) => {
++					return createBlock( 'core/text-block', {
++						value: `block-value-${ index + 1 }`,
++					} );
++				}
++			);
+ 
+ 			const transformedBlocks = switchToBlockType(
+ 				blocks,
+@@ -1983,11 +1988,13 @@ describe( 'block factory', () => {
+ 			registerBlockType( 'core/image-block', defaultBlockSettings );
+ 
+ 			const numOfBlocksToGroup = 4;
+-			const blocks = times( numOfBlocksToGroup, ( index ) => {
+-				return createBlock( 'core/text-block', {
+-					value: `block-value-${ index + 1 }`,
+-				} );
+-			} );
++			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
++				( index ) => {
++					return createBlock( 'core/text-block', {
++						value: `block-value-${ index + 1 }`,
++					} );
++				}
++			);
+ 
+ 			const transformedBlocks = switchToBlockType(
+ 				blocks,
+@@ -2040,11 +2047,13 @@ describe( 'block factory', () => {
+ 			registerBlockType( 'core/text-block', defaultBlockSettings );
+ 
+ 			const numOfBlocksToGroup = 4;
+-			const blocks = times( numOfBlocksToGroup, ( index ) => {
+-				return createBlock( 'core/text-block', {
+-					value: `textBlock${ index + 1 }`,
+-				} );
+-			} );
++			const blocks = [ ...Array( numOfBlocksToGroup ).keys() ].map(
++				( index ) => {
++					return createBlock( 'core/text-block', {
++						value: `textBlock${ index + 1 }`,
++					} );
++				}
++			);
+ 
+ 			const transformedBlocks = switchToBlockType(
+ 				blocks,
+diff --git a/packages/blocks/src/api/test/registration.js b/packages/blocks/src/api/test/registration.js
+index 3da5264e353425..5abd16d877ea58 100644
+--- a/packages/blocks/src/api/test/registration.js
++++ b/packages/blocks/src/api/test/registration.js
+@@ -1,10 +1,5 @@
+ /* eslint-disable react/forbid-elements */
+ 
+-/**
+- * External dependencies
+- */
+-import { get, omit, pick } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -39,6 +34,14 @@ import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
+ import { store as blocksStore } from '../../store';
+ 
+ const noop = () => {};
++const omit = ( obj, keys ) =>
++	Object.fromEntries(
++		Object.entries( obj ).filter( ( [ key ] ) => ! keys.includes( key ) )
++	);
++const pick = ( obj, keys ) =>
++	Object.fromEntries(
++		Object.entries( obj ).filter( ( [ key ] ) => keys.includes( key ) )
++	);
+ 
+ describe( 'blocks', () => {
+ 	const defaultBlockSettings = {
+@@ -766,10 +769,7 @@ describe( 'blocks', () => {
+ 										styles: [],
+ 										variations: [],
+ 										save: () => null,
+-										...get(
+-											serverSideBlockDefinitions,
+-											name
+-										),
++										...serverSideBlockDefinitions[ name ],
+ 										...blockSettingsWithDeprecations,
+ 									},
+ 									DEPRECATED_ENTRY_KEYS
+diff --git a/packages/blocks/src/store/test/selectors.js b/packages/blocks/src/store/test/selectors.js
+index d7753b20057cb7..e8eed9958c45e4 100644
+--- a/packages/blocks/src/store/test/selectors.js
++++ b/packages/blocks/src/store/test/selectors.js
+@@ -1,8 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { keyBy, omit } from 'lodash';
+-
+ import deepFreeze from 'deep-freeze';
+ 
+ /**
+@@ -19,12 +17,18 @@ import {
+ 	getActiveBlockVariation,
+ } from '../selectors';
+ 
++const keyBlocksByName = ( blocks ) =>
++	blocks.reduce(
++		( result, block ) => ( { ...result, [ block.name ]: block } ),
++		{}
++	);
++
+ describe( 'selectors', () => {
+ 	describe( 'getBlockSupport', () => {
+ 		const blockName = 'block/name';
+ 		const getState = ( blocks ) => {
+ 			return deepFreeze( {
+-				blockTypes: keyBy( blocks, 'name' ),
++				blockTypes: keyBlocksByName( blocks ),
+ 			} );
+ 		};
+ 
+@@ -581,11 +585,25 @@ describe( 'selectors', () => {
+ 
+ 	describe( 'isMatchingSearchTerm', () => {
+ 		const name = 'core/paragraph';
+-		const blockType = {
++		const category = 'text';
++		const description = 'writing flow';
++
++		const blockTypeBase = {
+ 			title: 'Paragraph',
+-			category: 'text',
+ 			keywords: [ 'body' ],
+-			description: 'writing flow',
++		};
++		const blockType = {
++			...blockTypeBase,
++			category,
++			description,
++		};
++		const blockTypeWithoutCategory = {
++			...blockTypeBase,
++			description,
++		};
++		const blockTypeWithoutDescription = {
++			...blockTypeBase,
++			category,
+ 		};
+ 
+ 		const state = {
+@@ -597,11 +615,8 @@ describe( 'selectors', () => {
+ 		describe.each( [
+ 			[ 'name', name ],
+ 			[ 'block type', blockType ],
+-			[ 'block type without category', omit( blockType, 'category' ) ],
+-			[
+-				'block type without description',
+-				omit( blockType, 'description' ),
+-			],
++			[ 'block type without category', blockTypeWithoutCategory ],
++			[ 'block type without description', blockTypeWithoutDescription ],
+ 		] )( 'by %s', ( label, nameOrType ) => {
+ 			it( 'should return false if not match', () => {
+ 				const result = isMatchingSearchTerm(
+diff --git a/packages/components/src/dimension-control/test/index.test.js b/packages/components/src/dimension-control/test/index.test.js
+index 21c59744bfcf0e..add82c73e96d8a 100644
+--- a/packages/components/src/dimension-control/test/index.test.js
++++ b/packages/components/src/dimension-control/test/index.test.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { shallow, mount } from 'enzyme';
+-import { uniqueId } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,6 +15,7 @@ import { DimensionControl } from '../';
+ 
+ describe( 'DimensionControl', () => {
+ 	const onChangeHandler = jest.fn();
++	const instanceId = 1;
+ 
+ 	afterEach( () => {
+ 		onChangeHandler.mockClear();
+@@ -25,7 +25,7 @@ describe( 'DimensionControl', () => {
+ 		it( 'renders with defaults', () => {
+ 			const wrapper = shallow(
+ 				<DimensionControl
+-					instanceId={ uniqueId() }
++					instanceId={ instanceId }
+ 					label={ 'Padding' }
+ 				/>
+ 			);
+@@ -35,7 +35,7 @@ describe( 'DimensionControl', () => {
+ 		it( 'renders with icon and default icon label', () => {
+ 			const wrapper = shallow(
+ 				<DimensionControl
+-					instanceId={ uniqueId() }
++					instanceId={ instanceId }
+ 					label={ 'Margin' }
+ 					icon={ plus }
+ 				/>
+@@ -46,7 +46,7 @@ describe( 'DimensionControl', () => {
+ 		it( 'renders with icon and custom icon label', () => {
+ 			const wrapper = shallow(
+ 				<DimensionControl
+-					instanceId={ uniqueId() }
++					instanceId={ instanceId }
+ 					label={ 'Margin' }
+ 					icon={ plus }
+ 					iconLabel={ 'Tablet Devices' }
+@@ -76,7 +76,7 @@ describe( 'DimensionControl', () => {
+ 
+ 			const wrapper = shallow(
+ 				<DimensionControl
+-					instanceId={ uniqueId() }
++					instanceId={ instanceId }
+ 					label={ 'Custom Dimension' }
+ 					sizes={ customSizes }
+ 				/>
+@@ -89,7 +89,7 @@ describe( 'DimensionControl', () => {
+ 		it( 'should call onChange handler with correct args on size change', () => {
+ 			const wrapper = mount(
+ 				<DimensionControl
+-					instanceId={ uniqueId() }
++					instanceId={ instanceId }
+ 					label={ 'Padding' }
+ 					onChange={ onChangeHandler }
+ 				/>
+@@ -121,7 +121,7 @@ describe( 'DimensionControl', () => {
+ 		it( 'should call onChange handler with undefined value when no size is provided on change', () => {
+ 			const wrapper = mount(
+ 				<DimensionControl
+-					instanceId={ uniqueId() }
++					instanceId={ instanceId }
+ 					label={ 'Padding' }
+ 					onChange={ onChangeHandler }
+ 				/>
+diff --git a/packages/components/src/form-token-field/test/index.js b/packages/components/src/form-token-field/test/index.js
+index 2901f4a8aed2c8..3be06711fc0bdd 100644
+--- a/packages/components/src/form-token-field/test/index.js
++++ b/packages/components/src/form-token-field/test/index.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { filter, map } from 'lodash';
+ import TestUtils, { act } from 'react-dom/test-utils';
+ import ReactDOM from 'react-dom';
+ 
+@@ -56,7 +55,7 @@ describe( 'FormTokenField', () => {
+ 		const textNodes = wrapperElement().querySelectorAll(
+ 			'.components-form-token-field__token-text span[aria-hidden]'
+ 		);
+-		return map( textNodes, ( node ) => node.innerHTML );
++		return Array.from( textNodes ).map( ( node ) => node.innerHTML );
+ 	}
+ 
+ 	function getSuggestionsText( selector ) {
+@@ -64,7 +63,7 @@ describe( 'FormTokenField', () => {
+ 			selector || '.components-form-token-field__suggestion'
+ 		);
+ 
+-		return map( suggestionNodes, getSuggestionNodeText );
++		return Array.from( suggestionNodes ).map( getSuggestionNodeText );
+ 	}
+ 
+ 	function getSuggestionNodeText( node ) {
+@@ -77,13 +76,11 @@ describe( 'FormTokenField', () => {
+ 		// match).
+ 		const div = document.createElement( 'div' );
+ 		div.innerHTML = node.querySelector( 'span' ).outerHTML;
+-		return map(
+-			filter(
+-				div.firstChild.childNodes,
++		return Array.from( div.firstChild.childNodes )
++			.filter(
+ 				( childNode ) => childNode.nodeType !== childNode.COMMENT_NODE
+-			),
+-			( childNode ) => childNode.textContent
+-		);
++			)
++			.map( ( childNode ) => childNode.textContent );
+ 	}
+ 
+ 	function getSelectedSuggestion() {
+diff --git a/packages/components/src/form-token-field/test/lib/token-field-wrapper.tsx b/packages/components/src/form-token-field/test/lib/token-field-wrapper.tsx
+index a6b0d26a6dbed9..6195c7fa70c78b 100644
+--- a/packages/components/src/form-token-field/test/lib/token-field-wrapper.tsx
++++ b/packages/components/src/form-token-field/test/lib/token-field-wrapper.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { unescape } from 'lodash';
+ import type { ComponentProps } from 'react';
+ 
+ /**
+@@ -22,7 +21,8 @@ const {
+ 
+ function unescapeAndFormatSpaces( str: string ) {
+ 	const nbsp = String.fromCharCode( 160 );
+-	return unescape( str ).replace( / /g, nbsp );
++	const escaped = new DOMParser().parseFromString( str, 'text/html' );
++	return escaped.documentElement.textContent?.replace( / /g, nbsp ) ?? '';
+ }
+ 
+ class TokenFieldWrapper extends Component<
+diff --git a/packages/components/src/slot-fill/test/slot.js b/packages/components/src/slot-fill/test/slot.js
+index b0cf2a0ddd9e10..46cee87a85af17 100644
+--- a/packages/components/src/slot-fill/test/slot.js
++++ b/packages/components/src/slot-fill/test/slot.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { isEmpty } from 'lodash';
+ import { render, fireEvent } from '@testing-library/react';
+ 
+ /**
+@@ -120,9 +119,9 @@ describe( 'Slot', () => {
+ 				<div>
+ 					<Slot name="chicken">
+ 						{ ( fills ) =>
+-							! isEmpty( fills ) && (
++							[ ...fills ].length ? (
+ 								<blockquote>{ fills }</blockquote>
+-							)
++							) : null
+ 						}
+ 					</Slot>
+ 				</div>
+diff --git a/packages/core-data/src/test/reducer.js b/packages/core-data/src/test/reducer.js
+index 12f48dc9d1c9af..63caf5fb83b177 100644
+--- a/packages/core-data/src/test/reducer.js
++++ b/packages/core-data/src/test/reducer.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import deepFreeze from 'deep-freeze';
+-import { filter } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+@@ -135,9 +134,11 @@ describe( 'entities', () => {
+ 			entities: [ { kind: 'postType', name: 'posts' } ],
+ 		} );
+ 
+-		expect( filter( state.config, { kind: 'postType' } ) ).toEqual( [
+-			{ kind: 'postType', name: 'posts' },
+-		] );
++		expect(
++			Object.entries( state.config )
++				.filter( ( [ , cfg ] ) => cfg.kind === 'postType' )
++				.map( ( [ , cfg ] ) => cfg )
++		).toEqual( [ { kind: 'postType', name: 'posts' } ] );
+ 	} );
+ } );
+ 
+diff --git a/packages/data/src/test/registry.js b/packages/data/src/test/registry.js
+index f1ba6d8f4f1b80..6a26e57c618dba 100644
+--- a/packages/data/src/test/registry.js
++++ b/packages/data/src/test/registry.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { castArray, mapValues } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -30,7 +25,7 @@ describe( 'createRegistry', () => {
+ 		return unsubscribe;
+ 	}
+ 	function subscribeUntil( predicates ) {
+-		predicates = castArray( predicates );
++		predicates = Array.from( predicates );
+ 
+ 		return new Promise( ( resolve ) => {
+ 			subscribeWithUnsubscribe( () => {
+@@ -749,16 +744,18 @@ describe( 'createRegistry', () => {
+ 				// representation of the object, the latter applying its
+ 				// function proxying.
+ 				expect( _registry ).toMatchObject(
+-					mapValues( registry, ( value, key ) => {
+-						if ( key === 'stores' ) {
+-							return expect.any( Object );
+-						}
+-						// TODO: Remove this after namsespaces is removed.
+-						if ( key === 'namespaces' ) {
+-							return registry.stores;
+-						}
+-						return expect.any( Function );
+-					} )
++					Object.fromEntries(
++						Object.entries( registry ).map( ( [ key ] ) => {
++							if ( key === 'stores' ) {
++								return [ key, expect.any( Object ) ];
++							}
++							// TODO: Remove this after namsespaces is removed.
++							if ( key === 'namespaces' ) {
++								return [ key, registry.stores ];
++							}
++							return [ key, expect.any( Function ) ];
++						} )
++					)
+ 				);
+ 
+ 				actualOptions = options;
+diff --git a/packages/editor/src/store/test/selectors.js b/packages/editor/src/store/test/selectors.js
+index c95ce2d229cd7a..3d38078dedcb7c 100644
+--- a/packages/editor/src/store/test/selectors.js
++++ b/packages/editor/src/store/test/selectors.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { filter, without } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -227,7 +222,9 @@ describe( 'selectors', () => {
+ 	let cachedSelectors;
+ 
+ 	beforeAll( () => {
+-		cachedSelectors = filter( selectors, ( selector ) => selector.clear );
++		cachedSelectors = Object.entries( selectors )
++			.filter( ( [ , selector ] ) => selector.clear )
++			.map( ( [ , selector ] ) => selector );
+ 	} );
+ 
+ 	beforeEach( () => {
+@@ -1598,10 +1595,11 @@ describe( 'selectors', () => {
+ 		} );
+ 
+ 		it( 'should return true if title or excerpt have changed', () => {
+-			for ( const variantField of [ 'title', 'excerpt' ] ) {
+-				for ( const constantField of without(
+-					[ 'title', 'excerpt' ],
+-					variantField
++			const fields = [ 'title', 'excerpt' ];
++
++			for ( const variantField of fields ) {
++				for ( const constantField of fields.filter(
++					( f ) => ! f === variantField
+ 				) ) {
+ 					const state = {
+ 						editor: {
+diff --git a/packages/npm-package-json-lint-config/test/index.test.js b/packages/npm-package-json-lint-config/test/index.test.js
+index 1fb05298c60736..16dd989d61fd36 100644
+--- a/packages/npm-package-json-lint-config/test/index.test.js
++++ b/packages/npm-package-json-lint-config/test/index.test.js
+@@ -1,13 +1,17 @@
+-/**
+- * External dependencies
+- */
+-import { isPlainObject } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+ import config from '../';
+ 
++const isPlainObject = ( obj ) => {
++	return (
++		typeof obj === 'object' &&
++		obj !== null &&
++		obj.constructor === Object &&
++		Object.prototype.toString.call( obj ) === '[object Object]'
++	);
++};
++
+ describe( 'npm-package-json-lint config tests', () => {
+ 	it( 'should be an object', () => {
+ 		expect( isPlainObject( config ) ).toBeTruthy();
+diff --git a/packages/prettier-config/test/index.js b/packages/prettier-config/test/index.js
+index bebedab8802d88..991ed5d3bbe5e4 100644
+--- a/packages/prettier-config/test/index.js
++++ b/packages/prettier-config/test/index.js
+@@ -1,13 +1,17 @@
+-/**
+- * External dependencies
+- */
+-import { isPlainObject } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+ import config from '../lib/';
+ 
++const isPlainObject = ( obj ) => {
++	return (
++		typeof obj === 'object' &&
++		obj !== null &&
++		obj.constructor === Object &&
++		Object.prototype.toString.call( obj ) === '[object Object]'
++	);
++};
++
+ describe( 'prettier config tests', () => {
+ 	it( 'should be an object', () => {
+ 		expect( isPlainObject( config ) ).toBeTruthy();

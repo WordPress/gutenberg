@@ -1,0 +1,330 @@
+diff --git a/.github/workflows/overlapping-prs.yml b/.github/workflows/overlapping-prs.yml
+new file mode 100644
+index 00000000000000..712dece88927eb
+--- /dev/null
++++ b/.github/workflows/overlapping-prs.yml
+@@ -0,0 +1,290 @@
++name: Overlapping PRs
++
++on:
++    pull_request:
++        types:
++            - opened
++            - synchronize
++            - labeled
++
++# Cancels all previous workflow runs for pull requests that have not completed.
++concurrency:
++    group: ${{ github.workflow }}-${{ github.head_ref }}
++    cancel-in-progress: true
++
++# Disable permissions for all available scopes by default.
++# Any needed permissions should be configured at the job level.
++permissions: {}
++
++jobs:
++    overlapping-prs:
++        name: Find overlapping PRs
++        if: contains(github.event.pull_request.labels.*.name, 'check-overlaps')
++        runs-on: ubuntu-24.04
++        permissions:
++            pull-requests: write
++            contents: read
++        timeout-minutes: 10
++        steps:
++            - name: Find PRs touching the same lines
++              uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
++              with:
++                  retries: 2
++                  retry-exempt-status-codes: 418
++                  script: |
++                      const prNumber = context.payload.pull_request.number;
++
++                      // Files to ignore — these always overlap and conflicts are trivial.
++                      // Supported pattern syntax (intentionally minimal):
++                      //   - Exact match: 'package-lock.json' matches only that path.
++                      //   - '**/suffix': matches any file whose path ends with '/suffix'
++                      //     (e.g. '**/CHANGELOG.md' matches 'packages/foo/CHANGELOG.md').
++                      // More complex globs (e.g. '*.json', 'packages/*/src/**') are NOT
++                      // supported. If richer patterns are needed in the future, consider
++                      // pulling in a glob library like minimatch.
++                      const IGNORED_PATTERNS = [
++                        'package-lock.json',
++                        'composer.lock',
++                        '**/CHANGELOG.md',
++                      ];
++
++                      function isIgnored( filename ) {
++                        return IGNORED_PATTERNS.some( ( pattern ) => {
++                          if ( pattern.startsWith( '**/' ) ) {
++                            return filename.endsWith( pattern.slice( 2 ) );
++                          }
++                          return filename === pattern;
++                        } );
++                      }
++
++                      // Parse hunk headers from a patch string.
++                      // Returns an array of { start, end } line ranges (base side).
++                      // Note: this compares base-side line ranges, so it catches edits
++                      // to the same original lines. It may miss pure insertions at the
++                      // same point if the base-side context ranges don't overlap (e.g.
++                      // two PRs both inserting at line 100 but with ,0 count). This is
++                      // acceptable since the tool is a heads-up, not a merge-conflict detector.
++                      function parseHunks( patch ) {
++                        if ( ! patch ) {
++                          return [];
++                        }
++                        const hunks = [];
++                        const regex = /^@@ -(\d+)(?:,(\d+))? /gm;
++                        let match;
++                        while ( ( match = regex.exec( patch ) ) !== null ) {
++                          const start = parseInt( match[ 1 ], 10 );
++                          const count = match[ 2 ] !== undefined ? parseInt( match[ 2 ], 10 ) : 1;
++                          if ( count > 0 ) {
++                            hunks.push( { start, end: start + count - 1 } );
++                          }
++                        }
++                        return hunks;
++                      }
++
++                      // Check if two sets of line ranges overlap.
++                      function rangesOverlap( rangesA, rangesB ) {
++                        for ( const a of rangesA ) {
++                          for ( const b of rangesB ) {
++                            if ( a.start <= b.end && b.start <= a.end ) {
++                              return true;
++                            }
++                          }
++                        }
++                        return false;
++                      }
++
++                      // Get files changed in this PR with their patches.
++                      const changedFiles = new Map();
++                      for await ( const response of github.paginate.iterator(
++                        github.rest.pulls.listFiles,
++                        {
++                          owner: context.repo.owner,
++                          repo: context.repo.repo,
++                          pull_number: prNumber,
++                          per_page: 100,
++                        }
++                      ) ) {
++                        for ( const file of response.data ) {
++                          if ( ! isIgnored( file.filename ) ) {
++                            changedFiles.set( file.filename, parseHunks( file.patch ) );
++                          }
++                        }
++                      }
++
++                      if ( changedFiles.size === 0 ) {
++                        core.info( 'No changed files found.' );
++                        return;
++                      }
++
++                      core.info( `This PR touches ${ changedFiles.size } file(s).` );
++
++                      // Marker used to identify the bot's comment for updates/deletion.
++                      const marker = '<!-- overlapping-prs-bot -->';
++
++                      // Helper to clean up a stale bot comment when there are no overlaps.
++                      async function deleteStaleComment() {
++                        const comments = await github.paginate(
++                          github.rest.issues.listComments,
++                          {
++                            owner: context.repo.owner,
++                            repo: context.repo.repo,
++                            issue_number: prNumber,
++                            per_page: 100,
++                          }
++                        );
++                        const existing = comments.find( ( c ) => c.body && c.body.includes( marker ) );
++                        if ( existing ) {
++                          await github.rest.issues.deleteComment( {
++                            owner: context.repo.owner,
++                            repo: context.repo.repo,
++                            comment_id: existing.id,
++                          } );
++                          core.info( 'Deleted stale overlapping PRs comment.' );
++                        }
++                      }
++
++                      // Pre-filter: use the Search API to find PRs that touch the same files.
++                      // This avoids fetching patches for all 2000+ open PRs and blowing
++                      // through the API rate limit.
++                      const candidatePRs = new Map(); // PR number -> { number, title, ... }
++                      const ourFilenames = [ ...changedFiles.keys() ];
++
++                      for ( const filename of ourFilenames ) {
++                        // Search for open PRs (excluding ours) that touch this file.
++                        // The search API is much cheaper than listing files for every PR.
++                        const query = `repo:${ context.repo.owner }/${ context.repo.repo } is:pr is:open "${ filename }" -number:${ prNumber }`;
++                        try {
++                          const searchResults = await github.rest.search.issuesAndPullRequests( {
++                            q: query,
++                            per_page: 100,
++                          } );
++                          for ( const item of searchResults.data.items ) {
++                            if ( ! candidatePRs.has( item.number ) ) {
++                              candidatePRs.set( item.number, {
++                                number: item.number,
++                                title: item.title,
++                                draft: item.draft,
++                                author: item.user.login,
++                                html_url: item.html_url,
++                              } );
++                            }
++                          }
++                        } catch ( e ) {
++                          core.warning( `Search failed for file "${ filename }": ${ e.message }` );
++                        }
++                      }
++
++                      core.info( `Search found ${ candidatePRs.size } candidate PR(s) sharing filenames.` );
++
++                      if ( candidatePRs.size === 0 ) {
++                        core.info( 'No candidate PRs found — skipping patch comparison.' );
++                        await deleteStaleComment();
++                        return;
++                      }
++
++                      // Check rate limit before the expensive part.
++                      const rateLimit = await github.rest.rateLimit.get();
++                      const remaining = rateLimit.data.resources.core.remaining;
++                      core.info( `API rate limit remaining: ${ remaining }` );
++                      if ( remaining < 500 ) {
++                        core.warning( `Rate limit too low (${ remaining } remaining) — skipping patch comparison.` );
++                        return;
++                      }
++
++                      // For each candidate PR, get its changed files and check for line overlaps.
++                      const overlapping = [];
++
++                      for ( const [ , pr ] of candidatePRs ) {
++                        const prFiles = [];
++                        for await ( const response of github.paginate.iterator(
++                          github.rest.pulls.listFiles,
++                          {
++                            owner: context.repo.owner,
++                            repo: context.repo.repo,
++                            pull_number: pr.number,
++                            per_page: 100,
++                          }
++                        ) ) {
++                          for ( const file of response.data ) {
++                            prFiles.push( file );
++                          }
++                        }
++
++                        const filesWithOverlap = [];
++                        for ( const file of prFiles ) {
++                          const ourHunks = changedFiles.get( file.filename );
++                          if ( ! ourHunks ) {
++                            continue;
++                          }
++                          const theirHunks = parseHunks( file.patch );
++                          // If either side has no hunks (e.g. binary file), fall back to file-level match.
++                          if ( ourHunks.length === 0 || theirHunks.length === 0 || rangesOverlap( ourHunks, theirHunks ) ) {
++                            filesWithOverlap.push( file.filename );
++                          }
++                        }
++
++                        if ( filesWithOverlap.length > 0 ) {
++                          overlapping.push( {
++                            number: pr.number,
++                            title: pr.title,
++                            url: pr.html_url,
++                            draft: pr.draft,
++                            author: pr.author,
++                            sharedFiles: filesWithOverlap,
++                          } );
++                        }
++                      }
++
++                      // Build comment body.
++                      let body;
++
++                      if ( overlapping.length === 0 ) {
++                        core.info( 'No overlapping PRs found.' );
++                        await deleteStaleComment();
++                        return;
++                      }
++
++                      body = `${ marker }\n`;
++                      body += `## Overlapping PRs\n\n`;
++                      body += `The following open PRs modify the same lines of code as this PR:\n\n`;
++
++                      for ( const pr of overlapping ) {
++                        const draftLabel = pr.draft ? ' (draft)' : '';
++                        body += `### #${ pr.number }${ draftLabel } — ${ pr.title }\n`;
++                        body += `by @${ pr.author }\n\n`;
++                        body += `<details>\n<summary>Overlapping files (${ pr.sharedFiles.length })</summary>\n\n`;
++                        for ( const file of pr.sharedFiles ) {
++                          body += `- \`${ file }\`\n`;
++                        }
++                        body += `\n</details>\n\n`;
++                      }
++
++                      // Find existing comment or create a new one.
++                      const comments = await github.paginate(
++                        github.rest.issues.listComments,
++                        {
++                          owner: context.repo.owner,
++                          repo: context.repo.repo,
++                          issue_number: prNumber,
++                          per_page: 100,
++                        }
++                      );
++                      const existing = comments.find( ( c ) => c.body && c.body.includes( marker ) );
++
++                      if ( existing ) {
++                        await github.rest.issues.updateComment( {
++                          owner: context.repo.owner,
++                          repo: context.repo.repo,
++                          comment_id: existing.id,
++                          body,
++                        } );
++                        core.info( `Updated existing comment with ${ overlapping.length } overlapping PR(s).` );
++                      } else {
++                        await github.rest.issues.createComment( {
++                          owner: context.repo.owner,
++                          repo: context.repo.repo,
++                          issue_number: prNumber,
++                          body,
++                        } );
++                        core.info( `Created comment with ${ overlapping.length } overlapping PR(s).` );
++                      }
+diff --git a/packages/block-editor/src/components/index.js b/packages/block-editor/src/components/index.js
+index b16b5e8307cd8b..bc021cfa7fee12 100644
+--- a/packages/block-editor/src/components/index.js
++++ b/packages/block-editor/src/components/index.js
+@@ -1,5 +1,5 @@
+ /*
+- * Block Creation Components
++ * Block Creation Components (testing overlapping PRs bot)
+  */
+ 
+ export * from './colors';
+@@ -167,6 +167,7 @@ export {
+ export { default as __experimentalBlockPatternsList } from './block-patterns-list';
+ export { default as __experimentalPublishDateTimePicker } from './publish-date-time-picker';
+ export { default as __experimentalInspectorPopoverHeader } from './inspector-popover-header';
++// Testing overlapping PRs bot — this line should overlap with PR #76787
+ export { default as BlockPopover } from './block-popover';
+ export { useBlockEditingMode } from './block-editing-mode';
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ac350d1f6190e1..0c6c41d8891c7b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Testing overlapping PRs bot ([#76820](https://github.com/WordPress/gutenberg/pull/76820)).
++
+ ### Bug Fixes
+ 
+ -   `RadioControl`: Add `role="radiogroup"` to the wrapping `fieldset` element ([#76745](https://github.com/WordPress/gutenberg/pull/76745)).

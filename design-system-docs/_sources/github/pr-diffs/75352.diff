@@ -1,0 +1,178 @@
+diff --git a/package-lock.json b/package-lock.json
+index c08b6cf64c517a..f9ea3afa897d0b 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -62121,7 +62121,6 @@
+ 				"@wordpress/icons": "file:../icons",
+ 				"@wordpress/keycodes": "file:../keycodes",
+ 				"@wordpress/primitives": "file:../primitives",
+-				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/theme": "file:../theme",
+ 				"clsx": "^2.1.1"
+ 			},
+diff --git a/packages/private-apis/src/implementation.ts b/packages/private-apis/src/implementation.ts
+index cf6f3aa298853f..d46d419ffc4eb6 100644
+--- a/packages/private-apis/src/implementation.ts
++++ b/packages/private-apis/src/implementation.ts
+@@ -42,7 +42,6 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
+ 	'@wordpress/media-utils',
+ 	'@wordpress/upload-media',
+ 	'@wordpress/global-styles-ui',
+-	'@wordpress/ui',
+ ];
+ 
+ /*
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index 01d28aa17e7995..3f156433c164d9 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -53,6 +53,11 @@
+ 			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
+ 			"default": "./build/stylelint-plugins/no-setting-wpds-custom-properties.cjs"
+ 		},
++		"./theme-provider": {
++			"types": "./build-types/theme-provider.d.ts",
++			"import": "./build-module/theme-provider.mjs",
++			"default": "./build/theme-provider.cjs"
++		},
+ 		"./package.json": "./package.json"
+ 	},
+ 	"react-native": "src/index",
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 71a6018176dc78..81972273f94307 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -51,7 +51,6 @@
+ 		"@wordpress/icons": "file:../icons",
+ 		"@wordpress/keycodes": "file:../keycodes",
+ 		"@wordpress/primitives": "file:../primitives",
+-		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/theme": "file:../theme",
+ 		"clsx": "^2.1.1"
+ 	},
+diff --git a/packages/ui/src/dialog/popup.tsx b/packages/ui/src/dialog/popup.tsx
+index f657aba3bb0b77..007f6a341b4b13 100644
+--- a/packages/ui/src/dialog/popup.tsx
++++ b/packages/ui/src/dialog/popup.tsx
+@@ -1,18 +1,11 @@
+ import { Dialog as _Dialog } from '@base-ui/react/dialog';
+ import clsx from 'clsx';
+ import { forwardRef } from '@wordpress/element';
+-import {
+-	type ThemeProvider as ThemeProviderType,
+-	privateApis as themePrivateApis,
+-} from '@wordpress/theme';
+-import { unlock } from '../lock-unlock';
++import { ThemeProvider } from '@wordpress/theme/theme-provider';
+ import { DialogValidationProvider } from './context';
+ import styles from './style.module.css';
+ import type { PopupProps } from './types';
+ 
+-const ThemeProvider: typeof ThemeProviderType =
+-	unlock( themePrivateApis ).ThemeProvider;
+-
+ /**
+  * Renders the dialog popup element that contains the dialog content.
+  * Uses a portal to render outside the DOM hierarchy.
+diff --git a/packages/ui/src/form/primitives/select/popup.tsx b/packages/ui/src/form/primitives/select/popup.tsx
+index 6e8a3ad54b746a..ab88110621b5eb 100644
+--- a/packages/ui/src/form/primitives/select/popup.tsx
++++ b/packages/ui/src/form/primitives/select/popup.tsx
+@@ -1,20 +1,13 @@
+ import { Select as _Select } from '@base-ui/react/select';
+ import clsx from 'clsx';
+ import { forwardRef } from '@wordpress/element';
+-import {
+-	type ThemeProvider as ThemeProviderType,
+-	privateApis as themePrivateApis,
+-} from '@wordpress/theme';
+-import { unlock } from '../../../lock-unlock';
++import { ThemeProvider } from '@wordpress/theme/theme-provider';
+ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+ import resetStyles from '../../../utils/css/resets.module.css';
+ import styles from './style.module.css';
+ import type { SelectPopupProps } from './types';
+ import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
+ 
+-const ThemeProvider: typeof ThemeProviderType =
+-	unlock( themePrivateApis ).ThemeProvider;
+-
+ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
+ 	function Popup( { className, children, style, ...restProps }, ref ) {
+ 		return (
+diff --git a/packages/ui/src/lock-unlock.ts b/packages/ui/src/lock-unlock.ts
+deleted file mode 100644
+index 654c14703eec79..00000000000000
+--- a/packages/ui/src/lock-unlock.ts
++++ /dev/null
+@@ -1,7 +0,0 @@
+-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+-
+-export const { lock, unlock } =
+-	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+-		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
+-		'@wordpress/ui'
+-	);
+diff --git a/packages/ui/src/tooltip/popup.tsx b/packages/ui/src/tooltip/popup.tsx
+index c93053645ea5f3..31a0eb609fc8b7 100644
+--- a/packages/ui/src/tooltip/popup.tsx
++++ b/packages/ui/src/tooltip/popup.tsx
+@@ -1,18 +1,11 @@
+ import clsx from 'clsx';
+ import { Tooltip } from '@base-ui/react/tooltip';
+ import { forwardRef } from '@wordpress/element';
+-import {
+-	type ThemeProvider as ThemeProviderType,
+-	privateApis as themePrivateApis,
+-} from '@wordpress/theme';
++import { ThemeProvider } from '@wordpress/theme/theme-provider';
+ import type { PopupProps } from './types';
+-import { unlock } from '../lock-unlock';
+ import resetStyles from '../utils/css/resets.module.css';
+ import styles from './style.module.css';
+ 
+-const ThemeProvider: typeof ThemeProviderType =
+-	unlock( themePrivateApis ).ThemeProvider;
+-
+ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
+ 	{
+ 		align = 'center',
+diff --git a/storybook/decorators/with-design-system-theme.tsx b/storybook/decorators/with-design-system-theme.tsx
+index 36c7cf67aff045..634764ae04f923 100644
+--- a/storybook/decorators/with-design-system-theme.tsx
++++ b/storybook/decorators/with-design-system-theme.tsx
+@@ -1,20 +1,5 @@
+-/**
+- * External dependencies
+- */
+ import type { StoryContext } from 'storybook/internal/types';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { privateApis as themeApis } from '@wordpress/theme';
+-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+-
+-const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
+-	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
+-	'@wordpress/theme'
+-);
+-
+-const { ThemeProvider } = unlock( themeApis );
++import { ThemeProvider } from '@wordpress/theme/theme-provider';
+ 
+ /**
+  * Decorator that applies Design System theme based on toolbar selections.
+diff --git a/test/unit/jest.config.js b/test/unit/jest.config.js
+index 3ea5aa3cc83b88..526b5dca167a86 100644
+--- a/test/unit/jest.config.js
++++ b/test/unit/jest.config.js
+@@ -19,6 +19,8 @@ module.exports = {
+ 		'@wordpress/vips/worker': '<rootDir>/packages/vips/src/vips-worker.ts',
+ 		'@wordpress/theme/design-tokens.js':
+ 			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
++		'@wordpress/theme/theme-provider':
++			'<rootDir>/packages/theme/src/theme-provider.tsx',
+ 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
+ 	},
+ 	preset: '@wordpress/jest-preset-default',

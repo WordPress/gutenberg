@@ -1,0 +1,31 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index db0cb0a01ea0f7..fd0407a1f0a941 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ ### Bug Fix
+ 
+ -   `Placeholder`: set fixed right margin for label's icon ([46918](https://github.com/WordPress/gutenberg/pull/46918)).
++-   `TreeGrid`: Fix right-arrow keyboard navigation when a row contains more than two focusable elements ([46998](https://github.com/WordPress/gutenberg/pull/46998)).
+ 
+ ## 23.1.0 (2023-01-02)
+ 
+diff --git a/packages/components/src/tree-grid/index.js b/packages/components/src/tree-grid/index.js
+index 3d500b45c80237..94dda843559f8a 100644
+--- a/packages/components/src/tree-grid/index.js
++++ b/packages/components/src/tree-grid/index.js
+@@ -150,12 +150,10 @@ function TreeGrid(
+ 							event.preventDefault();
+ 							return;
+ 						}
+-						// If a row is focused, and it is expanded, focuses the rightmost cell in the row.
++						// If a row is focused, and it is expanded, focuses the next cell in the row.
+ 						const focusableItems = getRowFocusables( activeRow );
+ 						if ( focusableItems.length > 0 ) {
+-							focusableItems[
+-								focusableItems.length - 1
+-							]?.focus();
++							focusableItems[ nextIndex ]?.focus();
+ 						}
+ 					}
+ 					// Prevent key use for anything else. For example, Voiceover

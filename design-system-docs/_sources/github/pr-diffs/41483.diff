@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/date-time/date/test/index.tsx b/packages/components/src/date-time/date/test/index.tsx
+index 57e8f12335cfab..ef6c201252d17a 100644
+--- a/packages/components/src/date-time/date/test/index.tsx
++++ b/packages/components/src/date-time/date/test/index.tsx
+@@ -28,7 +28,7 @@ describe( 'DatePicker', () => {
+ 	it( "should highlight today's date when not provided a currentDate", () => {
+ 		render( <DatePicker /> );
+ 
+-		const todayDescription = moment().format( 'dddd, MMM D, YYYY' );
++		const todayDescription = moment().format( 'dddd, MMMM D, YYYY' );
+ 		expect(
+ 			screen.getByRole( 'button', { name: todayDescription } )
+ 		).toHaveClass( 'CalendarDay__selected' );

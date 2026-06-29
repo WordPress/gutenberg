@@ -1,0 +1,1518 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index c5deaa3b4b3f02..e098047958ab6c 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1001,6 +1001,18 @@
+ 		"markdown_source": "../packages/components/src/navigation/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "NavigatorBackButton",
++		"slug": "navigator-back-button",
++		"markdown_source": "../packages/components/src/navigator/navigator-back-button/README.md",
++		"parent": "components"
++	},
++	{
++		"title": "NavigatorButton",
++		"slug": "navigator-button",
++		"markdown_source": "../packages/components/src/navigator/navigator-button/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "NavigatorProvider",
+ 		"slug": "navigator-provider",
+diff --git a/package-lock.json b/package-lock.json
+index 993c0aa9878060..7640d636e6faa9 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -15881,6 +15881,7 @@
+ 				"@wordpress/deprecated": "file:packages/deprecated",
+ 				"@wordpress/dom": "file:packages/dom",
+ 				"@wordpress/element": "file:packages/element",
++				"@wordpress/escape-html": "file:packages/escape-html",
+ 				"@wordpress/hooks": "file:packages/hooks",
+ 				"@wordpress/i18n": "file:packages/i18n",
+ 				"@wordpress/icons": "file:packages/icons",
+@@ -20284,6 +20285,15 @@
+ 					"integrity": "sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==",
+ 					"dev": true
+ 				},
++				"axios": {
++					"version": "0.21.1",
++					"resolved": "https://registry.npmjs.org/axios/-/axios-0.21.1.tgz",
++					"integrity": "sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==",
++					"dev": true,
++					"requires": {
++						"follow-redirects": "^1.10.0"
++					}
++				},
+ 				"babel-runtime": {
+ 					"version": "6.26.0",
+ 					"resolved": "https://registry.npmjs.org/babel-runtime/-/babel-runtime-6.26.0.tgz",
+@@ -21332,6 +21342,12 @@
+ 					"integrity": "sha512-GRnmB5gPyJpAhTQdSZTSp9uaPSvl09KoYcMQtsB9rQoOmzs9dH6ffeccH+Z+cv6P68Hu5bC6JjRh4Ah/mHSNRw==",
+ 					"dev": true
+ 				},
++				"follow-redirects": {
++					"version": "1.14.1",
++					"resolved": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.14.1.tgz",
++					"integrity": "sha512-HWqDgT7ZEkqRzBvc2s64vSZ/hfOceEol3ac/7tKwzuvEyWx3/4UegXh5oBOIotkGsObyk3xznnSRVADBgWSQVg==",
++					"dev": true
++				},
+ 				"forever-agent": {
+ 					"version": "0.6.1",
+ 					"resolved": "https://registry.npmjs.org/forever-agent/-/forever-agent-0.6.1.tgz",
+@@ -21423,7 +21439,8 @@
+ 				"function-bind": {
+ 					"version": "1.1.1",
+ 					"resolved": "https://registry.npmjs.org/function-bind/-/function-bind-1.1.1.tgz",
+-					"integrity": "sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A=="
++					"integrity": "sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==",
++					"dev": true
+ 				},
+ 				"gauge": {
+ 					"version": "2.7.4",
+@@ -21559,6 +21576,7 @@
+ 					"version": "1.0.3",
+ 					"resolved": "https://registry.npmjs.org/has/-/has-1.0.3.tgz",
+ 					"integrity": "sha512-f2dvO0VU6Oej7RkWJGrehjbzMAjFp5/VKPp5tTpWIV4JHHZK1/BxbFRtf/siA2SWTe09caDmVtYYzWEIbBS4zw==",
++					"dev": true,
+ 					"requires": {
+ 						"function-bind": "^1.1.1"
+ 					}
+@@ -21663,7 +21681,8 @@
+ 				"immediate": {
+ 					"version": "3.0.6",
+ 					"resolved": "https://registry.npmjs.org/immediate/-/immediate-3.0.6.tgz",
+-					"integrity": "sha1-nbHb0Pr43m++D13V5Wu2BigN5ps="
++					"integrity": "sha1-nbHb0Pr43m++D13V5Wu2BigN5ps=",
++					"dev": true
+ 				},
+ 				"inflight": {
+ 					"version": "1.0.6",
+@@ -21690,7 +21709,8 @@
+ 				"interpret": {
+ 					"version": "1.4.0",
+ 					"resolved": "https://registry.npmjs.org/interpret/-/interpret-1.4.0.tgz",
+-					"integrity": "sha512-agE4QfB2Lkp9uICn7BAqoscw4SZP9kTE2hxiFI3jBPmXJfdqiahTbUuKGsMoN2GtqL9AxhYioAcVvgsb1HvRbA=="
++					"integrity": "sha512-agE4QfB2Lkp9uICn7BAqoscw4SZP9kTE2hxiFI3jBPmXJfdqiahTbUuKGsMoN2GtqL9AxhYioAcVvgsb1HvRbA==",
++					"dev": true
+ 				},
+ 				"invert-kv": {
+ 					"version": "2.0.0",
+@@ -21738,6 +21758,7 @@
+ 					"version": "2.5.0",
+ 					"resolved": "https://registry.npmjs.org/is-core-module/-/is-core-module-2.5.0.tgz",
+ 					"integrity": "sha512-TXCMSDsEHMEEZ6eCA8rwRDbLu55MRGmrctljsBX/2v1d9/GzqHOxW5c5oPSgrUt2vBFXebu9rGqckXGPWOlYpg==",
++					"dev": true,
+ 					"requires": {
+ 						"has": "^1.0.3"
+ 					}
+@@ -21913,6 +21934,35 @@
+ 						"verror": "1.10.0"
+ 					}
+ 				},
++				"jszip": {
++					"version": "3.6.0",
++					"resolved": "https://registry.npmjs.org/jszip/-/jszip-3.6.0.tgz",
++					"integrity": "sha512-jgnQoG9LKnWO3mnVNBnfhkh0QknICd1FGSrXcgrl67zioyJ4wgx25o9ZqwNtrROSflGBCGYnJfjrIyRIby1OoQ==",
++					"dev": true,
++					"requires": {
++						"lie": "~3.3.0",
++						"pako": "~1.0.2",
++						"readable-stream": "~2.3.6",
++						"set-immediate-shim": "~1.0.1"
++					},
++					"dependencies": {
++						"readable-stream": {
++							"version": "2.3.7",
++							"resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.7.tgz",
++							"integrity": "sha512-Ebho8K4jIbHAxnuxi7o42OrZgF/ZTNcsZj6nRKyUmkhLFq8CHItp/fy6hQZuZmP/n3yZ9VBUbp4zz/mX8hmYPw==",
++							"dev": true,
++							"requires": {
++								"core-util-is": "~1.0.0",
++								"inherits": "~2.0.3",
++								"isarray": "~1.0.0",
++								"process-nextick-args": "~2.0.0",
++								"safe-buffer": "~5.1.1",
++								"string_decoder": "~1.1.1",
++								"util-deprecate": "~1.0.1"
++							}
++						}
++					}
++				},
+ 				"keypather": {
+ 					"version": "1.10.2",
+ 					"resolved": "https://registry.npmjs.org/keypather/-/keypather-1.10.2.tgz",
+@@ -21985,6 +22035,7 @@
+ 					"version": "3.3.0",
+ 					"resolved": "https://registry.npmjs.org/lie/-/lie-3.3.0.tgz",
+ 					"integrity": "sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==",
++					"dev": true,
+ 					"requires": {
+ 						"immediate": "~3.0.5"
+ 					}
+@@ -22696,7 +22747,8 @@
+ 				"path-parse": {
+ 					"version": "1.0.7",
+ 					"resolved": "https://registry.npmjs.org/path-parse/-/path-parse-1.0.7.tgz",
+-					"integrity": "sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw=="
++					"integrity": "sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==",
++					"dev": true
+ 				},
+ 				"path-to-regexp": {
+ 					"version": "0.1.7",
+@@ -22988,6 +23040,7 @@
+ 					"version": "0.6.2",
+ 					"resolved": "https://registry.npmjs.org/rechoir/-/rechoir-0.6.2.tgz",
+ 					"integrity": "sha1-hSBLVNuoLVdC4oyWdW70OvUOM4Q=",
++					"dev": true,
+ 					"requires": {
+ 						"resolve": "^1.1.6"
+ 					}
+@@ -23088,6 +23141,7 @@
+ 					"version": "1.20.0",
+ 					"resolved": "https://registry.npmjs.org/resolve/-/resolve-1.20.0.tgz",
+ 					"integrity": "sha512-wENBPt4ySzg4ybFQW2TT1zMQucPK95HSh/nq2CFTZVOGut2+pQvSsgtda4d26YrYcr067wjbmzOG8byDPBX63A==",
++					"dev": true,
+ 					"requires": {
+ 						"is-core-module": "^2.2.0",
+ 						"path-parse": "^1.0.6"
+@@ -23332,7 +23386,8 @@
+ 				"set-immediate-shim": {
+ 					"version": "1.0.1",
+ 					"resolved": "https://registry.npmjs.org/set-immediate-shim/-/set-immediate-shim-1.0.1.tgz",
+-					"integrity": "sha1-SysbJ+uAip+NzEgaWOXlb1mfP2E="
++					"integrity": "sha1-SysbJ+uAip+NzEgaWOXlb1mfP2E=",
++					"dev": true
+ 				},
+ 				"setprototypeof": {
+ 					"version": "1.1.1",
+@@ -23379,6 +23434,17 @@
+ 					"integrity": "sha512-mRz/m/JVscCrkMyPqHc/bczi3OQHkLTqXHEFu0zDhK/qfv3UcOA4SVmRCLmos4bhjr9ekVQubj/R7waKapmiQg==",
+ 					"dev": true
+ 				},
++				"shelljs": {
++					"version": "0.8.4",
++					"resolved": "https://registry.npmjs.org/shelljs/-/shelljs-0.8.4.tgz",
++					"integrity": "sha512-7gk3UZ9kOfPLIAbslLzyWeGiEqx9e3rxwZM0KE6EL8GlGwjym9Mrlx5/p33bWTu9YG6vcS4MBxYZDHYr5lr8BQ==",
++					"dev": true,
++					"requires": {
++						"glob": "^7.0.0",
++						"interpret": "^1.0.0",
++						"rechoir": "^0.6.2"
++					}
++				},
+ 				"shimmer": {
+ 					"version": "1.2.1",
+ 					"resolved": "https://registry.npmjs.org/shimmer/-/shimmer-1.2.1.tgz",
+@@ -25144,15 +25210,6 @@
+ 			"integrity": "sha512-WKTW1+xAzhMS5dJsxWkliixlO/PqC4VhmO9T4juNYcaTg9jzWiJsou6m5pxWYGfigWbwzJWeFY6z47a+4neRXA==",
+ 			"dev": true
+ 		},
+-		"axios": {
+-			"version": "0.26.0",
+-			"resolved": "https://registry.npmjs.org/axios/-/axios-0.26.0.tgz",
+-			"integrity": "sha512-lKoGLMYtHvFrPVt3r+RBMp9nh34N0M8zEfCWqdWZx6phynIEhQqAdydpyBAAG211zlhX9Rgu08cOamy6XjE5Og==",
+-			"dev": true,
+-			"requires": {
+-				"follow-redirects": "^1.14.8"
+-			}
+-		},
+ 		"axobject-query": {
+ 			"version": "2.2.0",
+ 			"resolved": "https://registry.npmjs.org/axobject-query/-/axobject-query-2.2.0.tgz",
+@@ -36480,12 +36537,6 @@
+ 			"resolved": "https://registry.npmjs.org/image-size/-/image-size-0.6.3.tgz",
+ 			"integrity": "sha512-47xSUiQioGaB96nqtp5/q55m0aBQSQdyIloMOc/x+QVTDZLNmXE892IIDrJ0hM1A5vcNUDD5tDffkSP5lCaIIA=="
+ 		},
+-		"immediate": {
+-			"version": "3.0.6",
+-			"resolved": "https://registry.npmjs.org/immediate/-/immediate-3.0.6.tgz",
+-			"integrity": "sha1-nbHb0Pr43m++D13V5Wu2BigN5ps=",
+-			"dev": true
+-		},
+ 		"immer": {
+ 			"version": "8.0.1",
+ 			"resolved": "https://registry.npmjs.org/immer/-/immer-8.0.1.tgz",
+@@ -41310,18 +41361,6 @@
+ 				}
+ 			}
+ 		},
+-		"jszip": {
+-			"version": "3.7.1",
+-			"resolved": "https://registry.npmjs.org/jszip/-/jszip-3.7.1.tgz",
+-			"integrity": "sha512-ghL0tz1XG9ZEmRMcEN2vt7xabrDdqHHeykgARpmZ0BiIctWxM47Vt63ZO2dnp4QYt/xJVLLy5Zv1l/xRdh2byg==",
+-			"dev": true,
+-			"requires": {
+-				"lie": "~3.3.0",
+-				"pako": "~1.0.2",
+-				"readable-stream": "~2.3.6",
+-				"set-immediate-shim": "~1.0.1"
+-			}
+-		},
+ 		"junk": {
+ 			"version": "3.1.0",
+ 			"resolved": "https://registry.npmjs.org/junk/-/junk-3.1.0.tgz",
+@@ -41460,15 +41499,6 @@
+ 				"type-check": "~0.3.2"
+ 			}
+ 		},
+-		"lie": {
+-			"version": "3.3.0",
+-			"resolved": "https://registry.npmjs.org/lie/-/lie-3.3.0.tgz",
+-			"integrity": "sha512-UaiMJzeWRlEujzAuw5LokY1L5ecNQYZKfmyZ9L7wDHb/p5etKaxXhohBcrw0EYby+G/NA52vRSN4N39dxHAIwQ==",
+-			"dev": true,
+-			"requires": {
+-				"immediate": "~3.0.5"
+-			}
+-		},
+ 		"lilconfig": {
+ 			"version": "2.0.3",
+ 			"resolved": "https://registry.npmjs.org/lilconfig/-/lilconfig-2.0.3.tgz",
+@@ -50282,15 +50312,6 @@
+ 				}
+ 			}
+ 		},
+-		"rechoir": {
+-			"version": "0.6.2",
+-			"resolved": "https://registry.npmjs.org/rechoir/-/rechoir-0.6.2.tgz",
+-			"integrity": "sha1-hSBLVNuoLVdC4oyWdW70OvUOM4Q=",
+-			"dev": true,
+-			"requires": {
+-				"resolve": "^1.1.6"
+-			}
+-		},
+ 		"recursive-readdir": {
+ 			"version": "2.2.2",
+ 			"resolved": "https://registry.npmjs.org/recursive-readdir/-/recursive-readdir-2.2.2.tgz",
+@@ -51948,12 +51969,6 @@
+ 			"resolved": "https://registry.npmjs.org/set-blocking/-/set-blocking-2.0.0.tgz",
+ 			"integrity": "sha1-BF+XgtARrppoA93TgrJDkrPYkPc="
+ 		},
+-		"set-immediate-shim": {
+-			"version": "1.0.1",
+-			"resolved": "https://registry.npmjs.org/set-immediate-shim/-/set-immediate-shim-1.0.1.tgz",
+-			"integrity": "sha1-SysbJ+uAip+NzEgaWOXlb1mfP2E=",
+-			"dev": true
+-		},
+ 		"set-value": {
+ 			"version": "2.0.1",
+ 			"resolved": "https://registry.npmjs.org/set-value/-/set-value-2.0.1.tgz",
+@@ -52040,25 +52055,6 @@
+ 				}
+ 			}
+ 		},
+-		"shelljs": {
+-			"version": "0.8.5",
+-			"resolved": "https://registry.npmjs.org/shelljs/-/shelljs-0.8.5.tgz",
+-			"integrity": "sha512-TiwcRcrkhHvbrZbnRcFYMLl30Dfov3HKqzp5tO5b4pt6G/SezKcYhmDg15zXVBswHmctSAQKznqNW2LO5tTDow==",
+-			"dev": true,
+-			"requires": {
+-				"glob": "^7.0.0",
+-				"interpret": "^1.0.0",
+-				"rechoir": "^0.6.2"
+-			},
+-			"dependencies": {
+-				"interpret": {
+-					"version": "1.4.0",
+-					"resolved": "https://registry.npmjs.org/interpret/-/interpret-1.4.0.tgz",
+-					"integrity": "sha512-agE4QfB2Lkp9uICn7BAqoscw4SZP9kTE2hxiFI3jBPmXJfdqiahTbUuKGsMoN2GtqL9AxhYioAcVvgsb1HvRbA==",
+-					"dev": true
+-				}
+-			}
+-		},
+ 		"showdown": {
+ 			"version": "1.9.1",
+ 			"resolved": "https://registry.npmjs.org/showdown/-/showdown-1.9.1.tgz",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ed497aaa24914d..b0a6581ec5018f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -26,6 +26,7 @@
+ ### Experimental
+ 
+ -   `Navigator`: rename `push`/`pop` to `goTo`/`goBack` ([#38582](https://github.com/WordPress/gutenberg/pull/38582))
++-   `Navigator`: add `NavigatorButton` and `NavigatorBackButton` components ([#38634](https://github.com/WordPress/gutenberg/pull/38634))
+ 
+ ## 19.3.0 (2022-01-27)
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index bb87936762ed70..cb1e5aa3c579c3 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -42,6 +42,7 @@
+ 		"@wordpress/deprecated": "file:../deprecated",
+ 		"@wordpress/dom": "file:../dom",
+ 		"@wordpress/element": "file:../element",
++		"@wordpress/escape-html": "file:../escape-html",
+ 		"@wordpress/hooks": "file:../hooks",
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/icons": "file:../icons",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 7951653ca10127..f052d0b233da34 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -100,6 +100,8 @@ export { default as __experimentalNavigationMenu } from './navigation/menu';
+ export {
+ 	NavigatorProvider as __experimentalNavigatorProvider,
+ 	NavigatorScreen as __experimentalNavigatorScreen,
++	NavigatorButton as __experimentalNavigatorButton,
++	NavigatorBackButton as __experimentalNavigatorBackButton,
+ 	useNavigator as __experimentalUseNavigator,
+ } from './navigator';
+ export { default as Notice } from './notice';
+diff --git a/packages/components/src/navigator/index.ts b/packages/components/src/navigator/index.ts
+index b30e5cdf396de8..20d1fd56ce319a 100644
+--- a/packages/components/src/navigator/index.ts
++++ b/packages/components/src/navigator/index.ts
+@@ -1,3 +1,5 @@
+ export { default as NavigatorProvider } from './navigator-provider';
+ export { default as NavigatorScreen } from './navigator-screen';
++export { default as NavigatorButton } from './navigator-button';
++export { default as NavigatorBackButton } from './navigator-back-button';
+ export { default as useNavigator } from './use-navigator';
+diff --git a/packages/components/src/navigator/navigator-back-button/README.md b/packages/components/src/navigator/navigator-back-button/README.md
+new file mode 100644
+index 00000000000000..d1470276975979
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-back-button/README.md
+@@ -0,0 +1,31 @@
++# `NavigatorBackButton`
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++The `NavigatorBackButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) components (or the `useNavigator` hook).
++
++## Usage
++
++Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md#usage) for a usage example.
++
++## Props
++
++The component accepts the following props:
++
++### `onClick`: `React.MouseEventHandler< HTMLElement >`
++
++The callback called in response to a `click` event.
++
++-   Required: No
++
++### `path`: `string`
++
++The path of the screen to navigate to.
++
++-   Required: Yes
++
++### Inherited props
++
++`NavigatorBackButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`.
+diff --git a/packages/components/src/navigator/navigator-back-button/component.tsx b/packages/components/src/navigator/navigator-back-button/component.tsx
+new file mode 100644
+index 00000000000000..93523c782ee5ab
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-back-button/component.tsx
+@@ -0,0 +1,62 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
++import { View } from '../../view';
++import { useNavigatorBackButton } from './hook';
++import type { NavigatorBackButtonProps } from '../types';
++
++function NavigatorBackButton(
++	props: WordPressComponentProps< NavigatorBackButtonProps, 'button' >,
++	forwardedRef: ForwardedRef< any >
++) {
++	const navigatorBackButtonProps = useNavigatorBackButton( props );
++
++	return <View ref={ forwardedRef } { ...navigatorBackButtonProps } />;
++}
++
++/**
++ * The `NavigatorBackButton` component can be used to navigate to a screen and
++ * should be used in combination with the `NavigatorProvider`, the
++ * `NavigatorScreen` and the `NavigatorButton` components (or the `useNavigator`
++ * hook).
++ *
++ * @example
++ * ```jsx
++ * import {
++ *   __experimentalNavigatorProvider as NavigatorProvider,
++ *   __experimentalNavigatorScreen as NavigatorScreen,
++ *   __experimentalNavigatorButton as NavigatorButton,
++ *   __experimentalNavigatorBackButton as NavigatorBackButton,
++ * } from '@wordpress/components';
++ *
++ * const MyNavigation = () => (
++ *   <NavigatorProvider initialPath="/">
++ *     <NavigatorScreen path="/">
++ *       <p>This is the home screen.</p>
++ *        <NavigatorButton path="/child">
++ *          Navigate to child screen.
++ *       </NavigatorButton>
++ *     </NavigatorScreen>
++ *
++ *     <NavigatorScreen path="/child">
++ *       <p>This is the child screen.</p>
++ *       <NavigatorBackButton>
++ *         Go back
++ *       </NavigatorBackButton>
++ *     </NavigatorScreen>
++ *   </NavigatorProvider>
++ * );
++ * ```
++ */
++const ConnectedNavigatorBackButton = contextConnect(
++	NavigatorBackButton,
++	'NavigatorBackButton'
++);
++
++export default ConnectedNavigatorBackButton;
+diff --git a/packages/components/src/navigator/navigator-back-button/hook.ts b/packages/components/src/navigator/navigator-back-button/hook.ts
+new file mode 100644
+index 00000000000000..11397e82e841a5
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-back-button/hook.ts
+@@ -0,0 +1,40 @@
++/**
++ * WordPress dependencies
++ */
++import { useCallback } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++/**
++ * Internal dependencies
++ */
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
++import Button from '../../button';
++import useNavigator from '../use-navigator';
++import type { NavigatorBackButtonProps } from '../types';
++
++export function useNavigatorBackButton(
++	props: WordPressComponentProps< NavigatorBackButtonProps, 'button' >
++) {
++	const { onClick, as = Button, ...otherProps } = useContextSystem(
++		props,
++		'NavigatorBackButton'
++	);
++
++	const { goBack } = useNavigator();
++	const handleClick: React.MouseEventHandler< HTMLButtonElement > = useCallback(
++		( e ) => {
++			e.preventDefault();
++			goBack();
++			onClick?.( e );
++		},
++		[ goBack, onClick ]
++	);
++
++	return {
++		as,
++		onClick: handleClick,
++		...otherProps,
++	};
++}
+diff --git a/packages/components/src/navigator/navigator-back-button/index.ts b/packages/components/src/navigator/navigator-back-button/index.ts
+new file mode 100644
+index 00000000000000..b404d7fd44a81a
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-back-button/index.ts
+@@ -0,0 +1 @@
++export { default } from './component';
+diff --git a/packages/components/src/navigator/navigator-button/README.md b/packages/components/src/navigator/navigator-button/README.md
+new file mode 100644
+index 00000000000000..fc96c358cdb02e
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-button/README.md
+@@ -0,0 +1,38 @@
++# `NavigatorButton`
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++The `NavigatorButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
++
++## Usage
++
++Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md#usage) for a usage example.
++
++## Props
++
++The component accepts the following props:
++
++### `attributeName`: `string`
++
++The HTML attribute used to identify the `NavigatorButton`, which is used by `Navigator` to restore focus.
++
++-   Required: No
++-   Default: `id`
++
++### `onClick`: `React.MouseEventHandler< HTMLElement >`
++
++The callback called in response to a `click` event.
++
++-   Required: No
++
++### `path`: `string`
++
++The path of the screen to navigate to. The value of this prop needs to be [a valid value for an HTML attribute](https://html.spec.whatwg.org/multipage/syntax.html#attributes-2).
++
++-   Required: Yes
++
++### Inherited props
++
++`NavigatorButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`.
+diff --git a/packages/components/src/navigator/navigator-button/component.tsx b/packages/components/src/navigator/navigator-button/component.tsx
+new file mode 100644
+index 00000000000000..2f7ab0f66b8274
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-button/component.tsx
+@@ -0,0 +1,61 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
++import { View } from '../../view';
++import { useNavigatorButton } from './hook';
++import type { NavigatorButtonProps } from '../types';
++
++function NavigatorButton(
++	props: WordPressComponentProps< NavigatorButtonProps, 'button' >,
++	forwardedRef: ForwardedRef< any >
++) {
++	const navigatorButtonProps = useNavigatorButton( props );
++
++	return <View ref={ forwardedRef } { ...navigatorButtonProps } />;
++}
++
++/**
++ * The `NavigatorButton` component can be used to navigate to a screen and should
++ * be used in combination with the `NavigatorProvider`, the `NavigatorScreen`
++ * and the `NavigatorBackButton` components (or the `useNavigator` hook).
++ *
++ * @example
++ * ```jsx
++ * import {
++ *   __experimentalNavigatorProvider as NavigatorProvider,
++ *   __experimentalNavigatorScreen as NavigatorScreen,
++ *   __experimentalNavigatorButton as NavigatorButton,
++ *   __experimentalNavigatorBackButton as NavigatorBackButton,
++ * } from '@wordpress/components';
++ *
++ * const MyNavigation = () => (
++ *   <NavigatorProvider initialPath="/">
++ *     <NavigatorScreen path="/">
++ *       <p>This is the home screen.</p>
++ *        <NavigatorButton path="/child">
++ *          Navigate to child screen.
++ *       </NavigatorButton>
++ *     </NavigatorScreen>
++ *
++ *     <NavigatorScreen path="/child">
++ *       <p>This is the child screen.</p>
++ *       <NavigatorBackButton>
++ *         Go back
++ *       </NavigatorBackButton>
++ *     </NavigatorScreen>
++ *   </NavigatorProvider>
++ * );
++ * ```
++ */
++const ConnectedNavigatorButton = contextConnect(
++	NavigatorButton,
++	'NavigatorButton'
++);
++
++export default ConnectedNavigatorButton;
+diff --git a/packages/components/src/navigator/navigator-button/hook.ts b/packages/components/src/navigator/navigator-button/hook.ts
+new file mode 100644
+index 00000000000000..312c120c79988e
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-button/hook.ts
+@@ -0,0 +1,55 @@
++/**
++ * WordPress dependencies
++ */
++import { useCallback } from '@wordpress/element';
++import { escapeAttribute } from '@wordpress/escape-html';
++
++/**
++ * Internal dependencies
++ */
++/**
++ * Internal dependencies
++ */
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
++import Button from '../../button';
++import useNavigator from '../use-navigator';
++import type { NavigatorButtonProps } from '../types';
++
++const cssSelectorForAttribute = ( attrName: string, attrValue: string ) =>
++	`[${ attrName }="${ attrValue }"]`;
++
++export function useNavigatorButton(
++	props: WordPressComponentProps< NavigatorButtonProps, 'button' >
++) {
++	const {
++		path,
++		onClick,
++		as = Button,
++		attributeName = 'id',
++		...otherProps
++	} = useContextSystem( props, 'NavigatorButton' );
++
++	const escapedPath = escapeAttribute( path );
++
++	const { goTo } = useNavigator();
++	const handleClick: React.MouseEventHandler< HTMLButtonElement > = useCallback(
++		( e ) => {
++			e.preventDefault();
++			goTo( escapedPath, {
++				focusTargetSelector: cssSelectorForAttribute(
++					attributeName,
++					escapedPath
++				),
++			} );
++			onClick?.( e );
++		},
++		[ goTo, onClick ]
++	);
++
++	return {
++		as,
++		onClick: handleClick,
++		...otherProps,
++		[ attributeName ]: escapedPath,
++	};
++}
+diff --git a/packages/components/src/navigator/navigator-button/index.ts b/packages/components/src/navigator/navigator-button/index.ts
+new file mode 100644
+index 00000000000000..b404d7fd44a81a
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-button/index.ts
+@@ -0,0 +1 @@
++export { default } from './component';
+diff --git a/packages/components/src/navigator/navigator-provider/README.md b/packages/components/src/navigator/navigator-provider/README.md
+index 387e30b9ddb2dc..d552d2bb20634f 100644
+--- a/packages/components/src/navigator/navigator-provider/README.md
++++ b/packages/components/src/navigator/navigator-provider/README.md
+@@ -4,47 +4,34 @@
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-The `NavigatorProvider` component allows rendering nested panels or menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the `useNavigator` hook). The Global Styles sidebar is an example of this.
++The `NavigatorProvider` component allows rendering nested views/panels/menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) and [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components or the `useNavigator` hook). The Global Styles sidebar is an example of this.
+ 
+ ## Usage
+ 
+ ```jsx
+ import {
+-	__experimentalNavigatorProvider as NavigatorProvider,
+-	__experimentalNavigatorScreen as NavigatorScreen,
+-	__experimentalUseNavigator as useNavigator,
++  __experimentalNavigatorProvider as NavigatorProvider,
++  __experimentalNavigatorScreen as NavigatorScreen,
++  __experimentalNavigatorButton as NavigatorButton,
++  __experimentalNavigatorBackButton as NavigatorBackButton,
+ } from '@wordpress/components';
+ 
+-function NavigatorButton( { path, ...props } ) {
+-	const { goTo } = useNavigator();
+-	return (
+-		<Button
+-		 variant="primary"
+-		 onClick={ () => goTo( path ) }
+-		 { ...props }
+-	 />
+- );
+-}
+-
+-function NavigatorBackButton( props ) {
+-	const { goBack } = useNavigator();
+-	return <Button variant="secondary" onClick={ () => goBack() } { ...props } />;
+-}
+-
+ const MyNavigation = () => (
+-	<NavigatorProvider initialPath="/">
+-		<NavigatorScreen path="/">
+-			<p>This is the home screen.</p>
+-			<NavigatorButton path="/child">
+-				Navigate to child screen.
+-			</NavigatorButton>
+-		</NavigatorScreen>
+-
+-		<NavigatorScreen path="/child">
+-			<p>This is the child screen.</p>
+-			<NavigatorBackButton>Go back</NavigatorBackButton>
+-		</NavigatorScreen>
+-	</NavigatorProvider>
++  <NavigatorProvider initialPath="/">
++    <NavigatorScreen path="/">
++      <p>This is the home screen.</p>
++       <NavigatorButton path="/child">
++         Navigate to child screen.
++      </NavigatorButton>
++    </NavigatorScreen>
++
++    <NavigatorScreen path="/child">
++      <p>This is the child screen.</p>
++      <NavigatorBackButton>
++        Go back
++      </NavigatorBackButton>
++    </NavigatorScreen>
++  </NavigatorProvider>
+ );
+ ```
+ 
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index f1303931b1fbdf..dd5e4972ce7323 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ import { css } from '@emotion/react';
+ 
+ /**
+@@ -28,7 +28,7 @@ import type {
+ 
+ function NavigatorProvider(
+ 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+ 		initialPath,
+@@ -100,44 +100,34 @@ function NavigatorProvider(
+ }
+ 
+ /**
+- * The `NavigatorProvider` component allows rendering nested panels or menus (via the `NavigatorScreen` component) and navigate between these different states (via the `useNavigator` hook).
++ * The `NavigatorProvider` component allows rendering nested views/panels/menus
++ * (via the `NavigatorScreen` component and navigate between these different
++ * view (via the `NavigatorButton` and `NavigatorBackButton` components or the
++ * `useNavigator` hook).
+  *
+  * @example
+  * ```jsx
+  * import {
+  *   __experimentalNavigatorProvider as NavigatorProvider,
+  *   __experimentalNavigatorScreen as NavigatorScreen,
+- *   __experimentalUseNavigator as useNavigator,
++ *   __experimentalNavigatorButton as NavigatorButton,
++ *   __experimentalNavigatorBackButton as NavigatorBackButton,
+  * } from '@wordpress/components';
+  *
+- * function NavigatorButton( { path, ...props } ) {
+- *  const { goTo } = useNavigator();
+- *  return (
+- *    <Button
+- *      variant="primary"
+- *      onClick={ () => goTo( path ) }
+- *      { ...props }
+- *    />
+- *  );
+- * }
+- *
+- * function NavigatorBackButton( props ) {
+- *   const { goBack } = useNavigator();
+- *   return <Button variant="secondary" onClick={ () => goBack() } { ...props } />;
+- * }
+- *
+  * const MyNavigation = () => (
+  *   <NavigatorProvider initialPath="/">
+  *     <NavigatorScreen path="/">
+  *       <p>This is the home screen.</p>
+- *   	   <NavigatorButton path="/child">
++ *        <NavigatorButton path="/child">
+  *          Navigate to child screen.
+  *       </NavigatorButton>
+  *     </NavigatorScreen>
+  *
+  *     <NavigatorScreen path="/child">
+  *       <p>This is the child screen.</p>
+- *       <NavigatorBackButton>Go back</NavigatorBackButton>
++ *       <NavigatorBackButton>
++ *         Go back
++ *       </NavigatorBackButton>
+  *     </NavigatorScreen>
+  *   </NavigatorProvider>
+  * );
+diff --git a/packages/components/src/navigator/navigator-screen/README.md b/packages/components/src/navigator/navigator-screen/README.md
+index bd48b91444fb12..5ba5af44fe8c1a 100644
+--- a/packages/components/src/navigator/navigator-screen/README.md
++++ b/packages/components/src/navigator/navigator-screen/README.md
+@@ -4,7 +4,7 @@
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-The `NavigatorScreen` component represents a single view/screen/panel/menu and is supposed to be used in combination with [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md).
++The `NavigatorScreen` component represents a single view/screen/panel and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) and the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
+ 
+ ## Usage
+ 
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 5118e28158e35a..db6983dc662ec8 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -17,6 +17,7 @@ import {
+ 	usePrevious,
+ } from '@wordpress/compose';
+ import { isRTL } from '@wordpress/i18n';
++import { escapeAttribute } from '@wordpress/escape-html';
+ 
+ /**
+  * Internal dependencies
+@@ -51,7 +52,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 
+ 	const prefersReducedMotion = useReducedMotion();
+ 	const { location } = useContext( NavigatorContext );
+-	const isMatch = location.path === path;
++	const isMatch = location.path === escapeAttribute( path );
+ 	const wrapperRef = useRef< HTMLDivElement >( null );
+ 
+ 	const previousLocation = usePrevious( location );
+@@ -171,44 +172,34 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ }
+ 
+ /**
+- * The `NavigatorScreen` component represents a single view/screen/panel/menu and is supposed to be used in combination with the `NavigatorProvider` component.
++ * The `NavigatorScreen` component represents a single view/screen/panel and
++ * should be used in combination with the `NavigatorProvider`, the
++ * `NavigatorButton` and the `NavigatorBackButton` components (or the `useNavigator`
++ * hook).
+  *
+  * @example
+  * ```jsx
+  * import {
+  *   __experimentalNavigatorProvider as NavigatorProvider,
+  *   __experimentalNavigatorScreen as NavigatorScreen,
+- *   __experimentalUseNavigator as useNavigator,
++ *   __experimentalNavigatorButton as NavigatorButton,
++ *   __experimentalNavigatorBackButton as NavigatorBackButton,
+  * } from '@wordpress/components';
+  *
+- * function NavigatorButton( { path, ...props } ) {
+- *  const { goTo } = useNavigator();
+- *  return (
+- *    <Button
+- *      variant="primary"
+- *      onClick={ () => goTo( path ) }
+- *      { ...props }
+- *    />
+- *  );
+- * }
+- *
+- * function NavigatorBackButton( props ) {
+- *   const { goBack } = useNavigator();
+- *   return <Button variant="secondary" onClick={ () => goBack() } { ...props } />;
+- * }
+- *
+  * const MyNavigation = () => (
+  *   <NavigatorProvider initialPath="/">
+  *     <NavigatorScreen path="/">
+  *       <p>This is the home screen.</p>
+- *   	   <NavigatorButton path="/child">
++ *        <NavigatorButton path="/child">
+  *          Navigate to child screen.
+  *       </NavigatorButton>
+  *     </NavigatorScreen>
+  *
+  *     <NavigatorScreen path="/child">
+  *       <p>This is the child screen.</p>
+- *       <NavigatorBackButton>Go back</NavigatorBackButton>
++ *       <NavigatorBackButton>
++ *         Go back
++ *       </NavigatorBackButton>
+  *     </NavigatorScreen>
+  *   </NavigatorProvider>
+  * );
+diff --git a/packages/components/src/navigator/stories/index.js b/packages/components/src/navigator/stories/index.js
+index c2baf269f4ddac..bb6cb6bab671bc 100644
+--- a/packages/components/src/navigator/stories/index.js
++++ b/packages/components/src/navigator/stories/index.js
+@@ -11,43 +11,18 @@ import { Card, CardBody, CardFooter, CardHeader } from '../../card';
+ import { HStack } from '../../h-stack';
+ import { Flyout } from '../../flyout';
+ import { useCx } from '../../utils/hooks/use-cx';
+-import { NavigatorProvider, NavigatorScreen, useNavigator } from '../';
++import {
++	NavigatorProvider,
++	NavigatorScreen,
++	NavigatorButton,
++	NavigatorBackButton,
++} from '../';
+ 
+ export default {
+ 	title: 'Components (Experimental)/Navigator',
+ 	component: NavigatorProvider,
+ };
+ 
+-function NavigatorButton( { path, ...props } ) {
+-	const { goTo } = useNavigator();
+-	const dataAttrName = 'data-navigator-focusable-id';
+-	const dataAttrValue = path;
+-
+-	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
+-
+-	const buttonProps = {
+-		...props,
+-		[ dataAttrName ]: dataAttrValue,
+-	};
+-
+-	return (
+-		<Button
+-			variant="secondary"
+-			onClick={ () =>
+-				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
+-			}
+-			{ ...buttonProps }
+-		/>
+-	);
+-}
+-
+-function NavigatorBackButton( props ) {
+-	const { goBack } = useNavigator();
+-	return (
+-		<Button variant="secondary" onClick={ () => goBack() } { ...props } />
+-	);
+-}
+-
+ const MyNavigation = () => {
+ 	const cx = useCx();
+ 	return (
+@@ -61,15 +36,21 @@ const MyNavigation = () => {
+ 						<p>This is the home screen.</p>
+ 
+ 						<HStack justify="flex-start" wrap>
+-							<NavigatorButton path="/child">
++							<NavigatorButton variant="secondary" path="/child">
+ 								Navigate to child screen.
+ 							</NavigatorButton>
+ 
+-							<NavigatorButton path="/overflow-child">
++							<NavigatorButton
++								variant="secondary"
++								path="/overflow-child"
++							>
+ 								Navigate to screen with horizontal overflow.
+ 							</NavigatorButton>
+ 
+-							<NavigatorButton path="/stickies">
++							<NavigatorButton
++								variant="secondary"
++								path="/stickies"
++							>
+ 								Navigate to screen with sticky content.
+ 							</NavigatorButton>
+ 
+@@ -93,7 +74,9 @@ const MyNavigation = () => {
+ 				<Card>
+ 					<CardBody>
+ 						<p>This is the child screen.</p>
+-						<NavigatorBackButton>Go back</NavigatorBackButton>
++						<NavigatorBackButton variant="secondary">
++							Go back
++						</NavigatorBackButton>
+ 					</CardBody>
+ 				</Card>
+ 			</NavigatorScreen>
+@@ -101,7 +84,9 @@ const MyNavigation = () => {
+ 			<NavigatorScreen path="/overflow-child">
+ 				<Card>
+ 					<CardBody>
+-						<NavigatorBackButton>Go back</NavigatorBackButton>
++						<NavigatorBackButton variant="secondary">
++							Go back
++						</NavigatorBackButton>
+ 						<div
+ 							className={ cx(
+ 								css( `
+@@ -129,7 +114,9 @@ const MyNavigation = () => {
+ 			<NavigatorScreen path="/stickies">
+ 				<Card>
+ 					<Sticky as={ CardHeader } z="2">
+-						<NavigatorBackButton>Go back</NavigatorBackButton>
++						<NavigatorBackButton variant="secondary">
++							Go back
++						</NavigatorBackButton>
+ 					</Sticky>
+ 					<CardBody>
+ 						<Sticky top="69px" colors="papayawhip/peachpuff">
+diff --git a/packages/components/src/navigator/test/index.js b/packages/components/src/navigator/test/index.js
+index d5c5a4ddc0ccc0..27085545366fba 100644
+--- a/packages/components/src/navigator/test/index.js
++++ b/packages/components/src/navigator/test/index.js
+@@ -6,7 +6,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { NavigatorProvider, NavigatorScreen, useNavigator } from '../';
++import {
++	NavigatorProvider,
++	NavigatorScreen,
++	NavigatorButton,
++	NavigatorBackButton,
++} from '../';
+ 
+ jest.mock( 'framer-motion', () => {
+ 	const actual = jest.requireActual( 'framer-motion' );
+@@ -23,57 +28,53 @@ jest.mock( 'framer-motion', () => {
+ 	};
+ } );
+ 
++const INVALID_HTML_ATTRIBUTE = {
++	raw: ' "\'><=invalid_path',
++	escaped: " &quot;'&gt;<=invalid_path",
++};
++
+ const PATHS = {
+ 	HOME: '/',
+ 	CHILD: '/child',
+ 	NESTED: '/child/nested',
++	INVALID_HTML_ATTRIBUTE: INVALID_HTML_ATTRIBUTE.raw,
+ 	NOT_FOUND: '/not-found',
+ };
+ 
+-function NavigatorButton( { path, onClick, ...props } ) {
+-	const { goTo } = useNavigator();
++function CustomNavigatorButton( { path, onClick, ...props } ) {
+ 	return (
+-		<button
++		<NavigatorButton
+ 			onClick={ () => {
+-				goTo( path );
+ 				// Used to spy on the values passed to `navigator.goTo`
+ 				onClick?.( { type: 'goTo', path } );
+ 			} }
++			path={ path }
+ 			{ ...props }
+ 		/>
+ 	);
+ }
+ 
+-function NavigatorButtonWithFocusRestoration( { path, onClick, ...props } ) {
+-	const { goTo } = useNavigator();
+-	const dataAttrName = 'data-navigator-focusable-id';
+-	const dataAttrValue = path;
+-
+-	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
+-
+-	const buttonProps = {
+-		...props,
+-		[ dataAttrName ]: dataAttrValue,
+-	};
+-
++function CustomNavigatorButtonWithFocusRestoration( {
++	path,
++	onClick,
++	...props
++} ) {
+ 	return (
+-		<button
++		<NavigatorButton
+ 			onClick={ () => {
+-				goTo( path, { focusTargetSelector: dataAttrCssSelector } );
+ 				// Used to spy on the values passed to `navigator.goTo`
+ 				onClick?.( { type: 'goTo', path } );
+ 			} }
+-			{ ...buttonProps }
++			path={ path }
++			{ ...props }
+ 		/>
+ 	);
+ }
+ 
+-function NavigatorBackButton( { onClick, ...props } ) {
+-	const { goBack } = useNavigator();
++function CustomNavigatorBackButton( { onClick, ...props } ) {
+ 	return (
+-		<button
++		<NavigatorBackButton
+ 			onClick={ () => {
+-				goBack();
+ 				// Used to spy on the values passed to `navigator.goBack`
+ 				onClick?.( { type: 'goBack' } );
+ 			} }
+@@ -89,38 +90,51 @@ const MyNavigation = ( {
+ 	<NavigatorProvider initialPath={ initialPath }>
+ 		<NavigatorScreen path={ PATHS.HOME }>
+ 			<p>This is the home screen.</p>
+-			<NavigatorButton
++			<CustomNavigatorButton
+ 				path={ PATHS.NOT_FOUND }
+ 				onClick={ onNavigatorButtonClick }
+ 			>
+ 				Navigate to non-existing screen.
+-			</NavigatorButton>
+-			<NavigatorButtonWithFocusRestoration
++			</CustomNavigatorButton>
++			<CustomNavigatorButton
+ 				path={ PATHS.CHILD }
+ 				onClick={ onNavigatorButtonClick }
+ 			>
+ 				Navigate to child screen.
+-			</NavigatorButtonWithFocusRestoration>
++			</CustomNavigatorButton>
++			<CustomNavigatorButton
++				path={ PATHS.INVALID_HTML_ATTRIBUTE }
++				onClick={ onNavigatorButtonClick }
++			>
++				Navigate to screen with an invalid HTML value as a path.
++			</CustomNavigatorButton>
+ 		</NavigatorScreen>
+ 
+ 		<NavigatorScreen path={ PATHS.CHILD }>
+ 			<p>This is the child screen.</p>
+-			<NavigatorButtonWithFocusRestoration
++			<CustomNavigatorButtonWithFocusRestoration
+ 				path={ PATHS.NESTED }
+ 				onClick={ onNavigatorButtonClick }
+ 			>
+ 				Navigate to nested screen.
+-			</NavigatorButtonWithFocusRestoration>
+-			<NavigatorBackButton onClick={ onNavigatorButtonClick }>
++			</CustomNavigatorButtonWithFocusRestoration>
++			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
+ 				Go back
+-			</NavigatorBackButton>
++			</CustomNavigatorBackButton>
+ 		</NavigatorScreen>
+ 
+ 		<NavigatorScreen path={ PATHS.NESTED }>
+ 			<p>This is the nested screen.</p>
+-			<NavigatorBackButton onClick={ onNavigatorButtonClick }>
++			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
+ 				Go back
+-			</NavigatorBackButton>
++			</CustomNavigatorBackButton>
++		</NavigatorScreen>
++
++		<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
++			<p>This is the screen with an invalid HTML value as a path.</p>
++			<CustomNavigatorBackButton onClick={ onNavigatorButtonClick }>
++				Go back
++			</CustomNavigatorBackButton>
+ 		</NavigatorScreen>
+ 
+ 		{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included */ }
+@@ -143,6 +157,13 @@ const getNestedScreen = ( { throwIfNotFound } = {} ) =>
+ 	getNavigationScreenByText( 'This is the nested screen.', {
+ 		throwIfNotFound,
+ 	} );
++const getInvalidHTMLPathScreen = ( { throwIfNotFound } = {} ) =>
++	getNavigationScreenByText(
++		'This is the screen with an invalid HTML value as a path.',
++		{
++			throwIfNotFound,
++		}
++	);
+ 
+ const getNavigationButtonByText = ( text, { throwIfNotFound = true } = {} ) => {
+ 	const fnName = throwIfNotFound ? 'getByRole' : 'queryByRole';
+@@ -160,6 +181,13 @@ const getToNestedScreenButton = ( { throwIfNotFound } = {} ) =>
+ 	getNavigationButtonByText( 'Navigate to nested screen.', {
+ 		throwIfNotFound,
+ 	} );
++const getToInvalidHTMLPathScreenButton = ( { throwIfNotFound } = {} ) =>
++	getNavigationButtonByText(
++		'Navigate to screen with an invalid HTML value as a path.',
++		{
++			throwIfNotFound,
++		}
++	);
+ const getBackButton = ( { throwIfNotFound } = {} ) =>
+ 	getNavigationButtonByText( 'Go back', {
+ 		throwIfNotFound,
+@@ -350,4 +378,31 @@ describe( 'Navigator', () => {
+ 		expect( getHomeScreen() ).toBeInTheDocument();
+ 		expect( getToChildScreenButton() ).toHaveFocus();
+ 	} );
++
++	it( 'should escape the value of the `path` prop', () => {
++		render( <MyNavigation /> );
++
++		expect( getHomeScreen() ).toBeInTheDocument();
++		expect( getToInvalidHTMLPathScreenButton() ).toBeInTheDocument();
++
++		// The following line tests the implementation details, but it's necessary
++		// as this would be otherwise transparent to the user.
++		expect( getToInvalidHTMLPathScreenButton() ).toHaveAttribute(
++			'id',
++			INVALID_HTML_ATTRIBUTE.escaped
++		);
++
++		// Navigate to screen with an invalid HTML value for its `path`
++		fireEvent.click( getToInvalidHTMLPathScreenButton() );
++
++		expect( getInvalidHTMLPathScreen() ).toBeInTheDocument();
++		expect( getBackButton() ).toBeInTheDocument();
++
++		// Navigate back to home screen, check that the focus restoration selector
++		// worked correctly despite the escaping
++		fireEvent.click( getBackButton() );
++
++		expect( getHomeScreen() ).toBeInTheDocument();
++		expect( getToInvalidHTMLPathScreenButton() ).toHaveFocus();
++	} );
+ } );
+diff --git a/packages/components/src/navigator/types.ts b/packages/components/src/navigator/types.ts
+index 0caff5df8664c9..db2db88c1cf19f 100644
+--- a/packages/components/src/navigator/types.ts
++++ b/packages/components/src/navigator/types.ts
+@@ -43,3 +43,29 @@ export type NavigatorScreenProps = {
+ 	 */
+ 	children: ReactNode;
+ };
++
++type ButtonProps = {
++	// TODO: should also extend `Button` prop types once the `Button` component
++	// is refactored to TypeScript.
++};
++export type NavigatorBackButtonProps = Omit< ButtonProps, 'href' > & {
++	/**
++	 * The children elements.
++	 */
++	children: ReactNode;
++};
++
++export type NavigatorButtonProps = NavigatorBackButtonProps & {
++	/**
++	 * The path of the screen to navigate to. The value of this prop needs to be
++	 * a valid value for an HTML attribute.
++	 */
++	path: string;
++	/**
++	 * The HTML attribute used to identify the `NavigatorButton`, which is used
++	 * by `Navigator` to restore focus.
++	 *
++	 * @default 'id'
++	 */
++	attributeName?: string;
++};
+diff --git a/packages/edit-post/src/components/preferences-modal/index.js b/packages/edit-post/src/components/preferences-modal/index.js
+index 8fbf807c83160a..e718c048ab08c2 100644
+--- a/packages/edit-post/src/components/preferences-modal/index.js
++++ b/packages/edit-post/src/components/preferences-modal/index.js
+@@ -9,7 +9,8 @@ import { get } from 'lodash';
+ import {
+ 	__experimentalNavigatorProvider as NavigatorProvider,
+ 	__experimentalNavigatorScreen as NavigatorScreen,
+-	__experimentalUseNavigator as useNavigator,
++	__experimentalNavigatorButton as NavigatorButton,
++	__experimentalNavigatorBackButton as NavigatorBackButton,
+ 	__experimentalItemGroup as ItemGroup,
+ 	__experimentalItem as Item,
+ 	__experimentalHStack as HStack,
+@@ -18,7 +19,6 @@ import {
+ 	FlexItem,
+ 	Modal,
+ 	TabPanel,
+-	Button,
+ 	Card,
+ 	CardHeader,
+ 	CardBody,
+@@ -55,34 +55,6 @@ import BlockManager from '../block-manager';
+ const MODAL_NAME = 'edit-post/preferences';
+ const PREFERENCES_MENU = 'preferences-menu';
+ 
+-function NavigationButton( { as: Tag = Button, path, ...props } ) {
+-	const { goTo } = useNavigator();
+-
+-	const dataAttrName = 'data-navigator-focusable-id';
+-	const dataAttrValue = path;
+-
+-	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
+-
+-	const tagProps = {
+-		...props,
+-		[ dataAttrName ]: dataAttrValue,
+-	};
+-
+-	return (
+-		<Tag
+-			onClick={ () =>
+-				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
+-			}
+-			{ ...tagProps }
+-		/>
+-	);
+-}
+-
+-function NavigationBackButton( { as: Tag = Button, ...props } ) {
+-	const { goBack } = useNavigator();
+-	return <Tag onClick={ goBack } { ...props } />;
+-}
+-
+ export default function PreferencesModal() {
+ 	const isLargeViewport = useViewportMatch( 'medium' );
+ 	const { closeModal } = useDispatch( editPostStore );
+@@ -347,7 +319,7 @@ export default function PreferencesModal() {
+ 							<ItemGroup>
+ 								{ tabs.map( ( tab ) => {
+ 									return (
+-										<NavigationButton
++										<NavigatorButton
+ 											key={ tab.name }
+ 											path={ tab.name }
+ 											as={ Item }
+@@ -369,7 +341,7 @@ export default function PreferencesModal() {
+ 													/>
+ 												</FlexItem>
+ 											</HStack>
+-										</NavigationButton>
++										</NavigatorButton>
+ 									);
+ 								} ) }
+ 							</ItemGroup>
+@@ -389,7 +361,7 @@ export default function PreferencesModal() {
+ 									size="small"
+ 									gap="6"
+ 								>
+-									<NavigationBackButton
++									<NavigatorBackButton
+ 										icon={
+ 											isRTL() ? chevronRight : chevronLeft
+ 										}
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+index ce4730fed6d498..4d81822603f10c 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+@@ -52,7 +52,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
+       >
+         <CardBody>
+           <ItemGroup>
+-            <NavigationButton
++            <NavigatorButton
+               as={
+                 Object {
+                   "$$typeof": Symbol(react.forward_ref),
+@@ -90,8 +90,8 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
+                   />
+                 </FlexItem>
+               </HStack>
+-            </NavigationButton>
+-            <NavigationButton
++            </NavigatorButton>
++            <NavigatorButton
+               as={
+                 Object {
+                   "$$typeof": Symbol(react.forward_ref),
+@@ -129,8 +129,8 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
+                   />
+                 </FlexItem>
+               </HStack>
+-            </NavigationButton>
+-            <NavigationButton
++            </NavigatorButton>
++            <NavigatorButton
+               as={
+                 Object {
+                   "$$typeof": Symbol(react.forward_ref),
+@@ -168,7 +168,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
+                   />
+                 </FlexItem>
+               </HStack>
+-            </NavigationButton>
++            </NavigatorButton>
+           </ItemGroup>
+         </CardBody>
+       </Card>
+@@ -187,7 +187,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
+           justify="left"
+           size="small"
+         >
+-          <NavigationBackButton
++          <NavigatorBackButton
+             aria-label="Navigate to the previous view"
+             icon={
+               <SVG
+@@ -254,7 +254,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
+           justify="left"
+           size="small"
+         >
+-          <NavigationBackButton
++          <NavigatorBackButton
+             aria-label="Navigate to the previous view"
+             icon={
+               <SVG
+@@ -312,7 +312,7 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
+           justify="left"
+           size="small"
+         >
+-          <NavigationBackButton
++          <NavigatorBackButton
+             aria-label="Navigate to the previous view"
+             icon={
+               <SVG
+diff --git a/packages/edit-site/src/components/global-styles/navigation-button.js b/packages/edit-site/src/components/global-styles/navigation-button.js
+index 9567e1278c3e08..7530f497b0332c 100644
+--- a/packages/edit-site/src/components/global-styles/navigation-button.js
++++ b/packages/edit-site/src/components/global-styles/navigation-button.js
+@@ -2,7 +2,8 @@
+  * WordPress dependencies
+  */
+ import {
+-	__experimentalUseNavigator as useNavigator,
++	__experimentalNavigatorButton as NavigatorButton,
++	__experimentalNavigatorBackButton as NavigatorBackButton,
+ 	__experimentalItem as Item,
+ 	FlexItem,
+ 	__experimentalHStack as HStack,
+@@ -25,32 +26,12 @@ function GenericNavigationButton( { icon, children, ...props } ) {
+ 	);
+ }
+ 
+-function NavigationButton( { path, ...props } ) {
+-	const { goTo } = useNavigator();
+-
+-	const dataAttrName = 'data-navigator-focusable-id';
+-	const dataAttrValue = path;
+-
+-	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
+-
+-	const buttonProps = {
+-		...props,
+-		[ dataAttrName ]: dataAttrValue,
+-	};
+-
+-	return (
+-		<GenericNavigationButton
+-			onClick={ () =>
+-				goTo( path, { focusTargetSelector: dataAttrCssSelector } )
+-			}
+-			{ ...buttonProps }
+-		/>
+-	);
++function NavigationButton( props ) {
++	return <NavigatorButton as={ GenericNavigationButton } { ...props } />;
+ }
+ 
+-function NavigationBackButton( { ...props } ) {
+-	const { goBack } = useNavigator();
+-	return <GenericNavigationButton onClick={ goBack } { ...props } />;
++function NavigationBackButton( props ) {
++	return <NavigatorBackButton as={ GenericNavigationButton } { ...props } />;
+ }
+ 
+ export { NavigationButton, NavigationBackButton };

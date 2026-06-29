@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
+index fba3eda2fb0f29..3440c99c9dca8e 100644
+--- a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
++++ b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
+@@ -18,6 +18,7 @@ export const MediaWrapper = styled.div`
+ 	display: flex;
+ 	text-align: center;
+ 	width: 100%;
++	overflow: hidden;
+ `;
+ 
+ export const MediaContainer = styled.div`

@@ -1,0 +1,195 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2759cc629a336e..5241ec3fc9ae35 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ 
+ -   `Popover`: Allow legitimate 0 positions to update popover position ([#51320](https://github.com/WordPress/gutenberg/pull/51320)).
+ -   `Button`: Remove unnecessary margin from dashicon ([#51395](https://github.com/WordPress/gutenberg/pull/51395)).
++-   `Autocomplete`: Announce how many results are available to screen readers when suggestions list first renders ([#51018](https://github.com/WordPress/gutenberg/pull/51018)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.tsx b/packages/components/src/autocomplete/autocompleter-ui.tsx
+index e5bfe61d265bb9..663316c39b32ea 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.tsx
++++ b/packages/components/src/autocomplete/autocompleter-ui.tsx
+@@ -13,7 +13,9 @@ import {
+ 	useState,
+ } from '@wordpress/element';
+ import { useAnchor } from '@wordpress/rich-text';
+-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
++import { useDebounce, useMergeRefs, useRefEffect } from '@wordpress/compose';
++import { speak } from '@wordpress/a11y';
++import { __, _n, sprintf } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+@@ -23,7 +25,7 @@ import Button from '../button';
+ import Popover from '../popover';
+ import { VisuallyHidden } from '../visually-hidden';
+ import { createPortal } from 'react-dom';
+-import type { AutocompleterUIProps, WPCompleter } from './types';
++import type { AutocompleterUIProps, KeyedOption, WPCompleter } from './types';
+ 
+ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
+ 	const useItems = autocompleter.useItems
+@@ -69,8 +71,48 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
+ 
+ 		useOnClickOutside( popoverRef, reset );
+ 
++		const debouncedSpeak = useDebounce( speak, 500 );
++
++		function announce( options: Array< KeyedOption > ) {
++			if ( ! debouncedSpeak ) {
++				return;
++			}
++			if ( !! options.length ) {
++				if ( filterValue ) {
++					debouncedSpeak(
++						sprintf(
++							/* translators: %d: number of results. */
++							_n(
++								'%d result found, use up and down arrow keys to navigate.',
++								'%d results found, use up and down arrow keys to navigate.',
++								options.length
++							),
++							options.length
++						),
++						'assertive'
++					);
++				} else {
++					debouncedSpeak(
++						sprintf(
++							/* translators: %d: number of results. */
++							_n(
++								'Initial %d result loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
++								'Initial %d results loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
++								options.length
++							),
++							options.length
++						),
++						'assertive'
++					);
++				}
++			} else {
++				debouncedSpeak( __( 'No results.' ), 'assertive' );
++			}
++		}
++
+ 		useLayoutEffect( () => {
+ 			onChangeOptions( items );
++			announce( items );
+ 			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
+ 			// See https://github.com/WordPress/gutenberg/pull/41820
+ 			// eslint-disable-next-line react-hooks/exhaustive-deps
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index af9625d6459157..7825526fe34a5a 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -13,13 +13,8 @@ import {
+ 	useRef,
+ 	useMemo,
+ } from '@wordpress/element';
+-import { __, _n, sprintf } from '@wordpress/i18n';
+-import {
+-	useInstanceId,
+-	useDebounce,
+-	useMergeRefs,
+-	useRefEffect,
+-} from '@wordpress/compose';
++import { __, _n } from '@wordpress/i18n';
++import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
+ import {
+ 	create,
+ 	slice,
+@@ -27,7 +22,6 @@ import {
+ 	isCollapsed,
+ 	getTextContent,
+ } from '@wordpress/rich-text';
+-import { speak } from '@wordpress/a11y';
+ 
+ /**
+  * Internal dependencies
+@@ -54,7 +48,6 @@ export function useAutocomplete( {
+ 	completers,
+ 	contentRef,
+ }: UseAutocompleteProps ) {
+-	const debouncedSpeak = useDebounce( speak, 500 );
+ 	const instanceId = useInstanceId( useAutocomplete );
+ 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
+ 
+@@ -137,28 +130,6 @@ export function useAutocomplete( {
+ 		setAutocompleterUI( null );
+ 	}
+ 
+-	function announce( options: Array< KeyedOption > ) {
+-		if ( ! debouncedSpeak ) {
+-			return;
+-		}
+-		if ( !! options.length ) {
+-			debouncedSpeak(
+-				sprintf(
+-					/* translators: %d: number of results. */
+-					_n(
+-						'%d result found, use up and down arrow keys to navigate.',
+-						'%d results found, use up and down arrow keys to navigate.',
+-						options.length
+-					),
+-					options.length
+-				),
+-				'assertive'
+-			);
+-		} else {
+-			debouncedSpeak( __( 'No results.' ), 'assertive' );
+-		}
+-	}
+-
+ 	/**
+ 	 * Load options for an autocompleter.
+ 	 *
+@@ -169,7 +140,6 @@ export function useAutocomplete( {
+ 			options.length === filteredOptions.length ? selectedIndex : 0
+ 		);
+ 		setFilteredOptions( options );
+-		announce( options );
+ 	}
+ 
+ 	function handleKeyDown( event: KeyboardEvent ) {
+diff --git a/test/e2e/specs/editor/various/autocomplete-and-mentions.spec.js b/test/e2e/specs/editor/various/autocomplete-and-mentions.spec.js
+index 0176fb45982db8..53b2940fe6c755 100644
+--- a/test/e2e/specs/editor/various/autocomplete-and-mentions.spec.js
++++ b/test/e2e/specs/editor/various/autocomplete-and-mentions.spec.js
+@@ -475,4 +475,32 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
+ 			page.locator( 'role=option', { hasText: 'Frodo Baggins' } )
+ 		).not.toBeVisible();
+ 	} );
++
++	test( 'should allow speaking number of initial results', async ( {
++		page,
++		editor,
++	} ) => {
++		await editor.canvas.click( 'role=button[name="Add default block"i]' );
++		await page.keyboard.type( '/' );
++		await expect(
++			page.locator( `role=option[name="Image"i]` )
++		).toBeVisible();
++		// Get the assertive live region screen reader announcement.
++		await expect(
++			page.getByText(
++				'Initial 9 results loaded. Type to filter all available results. Use up and down arrow keys to navigate.'
++			)
++		).toBeVisible();
++
++		await page.keyboard.type( 'heading' );
++		await expect(
++			page.locator( `role=option[name="Heading"i]` )
++		).toBeVisible();
++		// Get the assertive live region screen reader announcement.
++		await expect(
++			page.getByText(
++				'2 results found, use up and down arrow keys to navigate.'
++			)
++		).toBeVisible();
++	} );
+ } );

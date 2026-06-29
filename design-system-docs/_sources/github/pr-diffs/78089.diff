@@ -1,0 +1,616 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 7353352f2ec8b8..b8d2ee1486cac4 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `Select`: `Select.Item` values that are empty strings no longer render with placeholder styling on the trigger. Use the new `placeholder` prop on `Select.Trigger`, or a `null` item value, instead ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
+ -   `Select`: `Select.Trigger` now renders a default `"Select"` placeholder when no value is selected, where it previously rendered empty ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
+ -   `Select`: `Select.Item` no longer renders its `value` as fallback item content. Pass item content explicitly as `children`. Migrate `<Select.Item value="Foo" />` to `<Select.Item value="Foo">Foo</Select.Item>` ([#77861](https://github.com/WordPress/gutenberg/pull/77861)).
++-   `Tooltip`: **`Popup` positioner API** ([#78089](https://github.com/WordPress/gutenberg/pull/78089)). Add a `Tooltip.Positioner` subcomponent and an optional `positioner` prop on `Tooltip.Popup` (when omitted, the default `Tooltip.Positioner` is used). Remove `side`, `align`, and `sideOffset` from `Tooltip.Popup`; pass `positioner={ <Tooltip.Positioner side="…" align="…" sideOffset={ … } /> }` instead. The new subcomponent exposes the full positioner surface (`alignOffset`, `anchor`, `collisionAvoidance`, `collisionBoundary`, `collisionPadding`, `sticky`, etc.) and mirrors the existing `portal` slot pattern.
+ 
+ ### New Features
+ 
+@@ -26,6 +27,7 @@
+ -   `Select`: Add a `placeholder` prop to `Select.Trigger`, and support `null` item values for clearable placeholder options ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
+ -   `Drawer`: Fade the popup elevation shadow alongside the slide ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+ -   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
++-   `IconButton`: Add a `positioner` prop, accepting a `<Tooltip.Positioner />` element, to customize how the tooltip is positioned relative to the button ([#78089](https://github.com/WordPress/gutenberg/pull/78089)).
+ 
+ ## 0.12.0 (2026-04-29)
+ 
+diff --git a/packages/ui/src/alert-dialog/popup.tsx b/packages/ui/src/alert-dialog/popup.tsx
+index 346ec90b0678b1..7a5ceca3b43884 100644
+--- a/packages/ui/src/alert-dialog/popup.tsx
++++ b/packages/ui/src/alert-dialog/popup.tsx
+@@ -8,7 +8,7 @@ import {
+ 	privateApis as themePrivateApis,
+ } from '@wordpress/theme';
+ 
+-import { renderPortalWithChildren } from '../utils/render-portal-with-children';
++import { renderSlotWithChildren } from '../utils/render-slot-with-children';
+ import { Button } from '../button';
+ import dialogStyles from '../dialog/style.module.css';
+ import focusStyles from '../utils/css/focus.module.css';
+@@ -178,7 +178,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
+ 			</>
+ 		);
+ 
+-		return renderPortalWithChildren( portal, <Portal />, portalChildren );
++		return renderSlotWithChildren( portal, <Portal />, portalChildren );
+ 	}
+ );
+ 
+diff --git a/packages/ui/src/dialog/popup.tsx b/packages/ui/src/dialog/popup.tsx
+index d8a1dcf7981148..b517c07dac9e19 100644
+--- a/packages/ui/src/dialog/popup.tsx
++++ b/packages/ui/src/dialog/popup.tsx
+@@ -9,7 +9,7 @@ import {
+ import { unlock } from '../lock-unlock';
+ import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+ import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
+-import { renderPortalWithChildren } from '../utils/render-portal-with-children';
++import { renderSlotWithChildren } from '../utils/render-slot-with-children';
+ import { DialogValidationProvider, useDialogModal } from './context';
+ import { Portal } from './portal';
+ import styles from './style.module.css';
+@@ -24,8 +24,7 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
+  * Renders the dialog popup element that contains the dialog content.
+  * Uses a portal to render outside the DOM hierarchy.
+  *
+- * When `portal` is omitted, defaults to `Dialog.Portal`. Portal merging is
+- * handled by `renderPortalWithChildren` (shared with other overlay `Popup`s).
++ * When `portal` is omitted, defaults to `Dialog.Portal`.
+  */
+ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
+ 	{
+@@ -80,7 +79,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
+ 		</>
+ 	);
+ 
+-	return renderPortalWithChildren( portal, <Portal />, portalChildren );
++	return renderSlotWithChildren( portal, <Portal />, portalChildren );
+ } );
+ 
+ export { Popup };
+diff --git a/packages/ui/src/drawer/popup.tsx b/packages/ui/src/drawer/popup.tsx
+index 11c21fb6765cb8..a151613962901c 100644
+--- a/packages/ui/src/drawer/popup.tsx
++++ b/packages/ui/src/drawer/popup.tsx
+@@ -9,7 +9,7 @@ import {
+ import { unlock } from '../lock-unlock';
+ import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+ import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
+-import { renderPortalWithChildren } from '../utils/render-portal-with-children';
++import { renderSlotWithChildren } from '../utils/render-slot-with-children';
+ import { DrawerValidationProvider, useDrawerModal } from './context';
+ import { Portal } from './portal';
+ import styles from './style.module.css';
+@@ -24,8 +24,7 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-drawer-close-icon';
+  * Renders the drawer popup element that contains the drawer content.
+  * Uses a portal to render outside the DOM hierarchy.
+  *
+- * When `portal` is omitted, defaults to `Drawer.Portal`. Portal merging is
+- * handled by `renderPortalWithChildren` (shared with other overlay `Popup`s).
++ * When `portal` is omitted, defaults to `Drawer.Portal`.
+  *
+  * The popup is a flex column; scroll ownership lives on `Drawer.Content`,
+  * which children are expected to render. Without it, long body content will
+@@ -94,7 +93,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
+ 		</>
+ 	);
+ 
+-	return renderPortalWithChildren( portal, <Portal />, portalChildren );
++	return renderSlotWithChildren( portal, <Portal />, portalChildren );
+ } );
+ 
+ export { Popup };
+diff --git a/packages/ui/src/form/primitives/autocomplete/popup.tsx b/packages/ui/src/form/primitives/autocomplete/popup.tsx
+index 9ce6bdd25ef20a..451cd72c7073c2 100644
+--- a/packages/ui/src/form/primitives/autocomplete/popup.tsx
++++ b/packages/ui/src/form/primitives/autocomplete/popup.tsx
+@@ -6,7 +6,7 @@ import {
+ 	privateApis as themePrivateApis,
+ } from '@wordpress/theme';
+ import { unlock } from '../../../lock-unlock';
+-import { renderPortalWithChildren } from '../../../utils/render-portal-with-children';
++import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
+ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+ import resetStyles from '../../../utils/css/resets.module.css';
+ import styles from './style.module.css';
+@@ -37,6 +37,6 @@ export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
+ 			</_Autocomplete.Positioner>
+ 		);
+ 
+-		return renderPortalWithChildren( portal, <Portal />, portalChildren );
++		return renderSlotWithChildren( portal, <Portal />, portalChildren );
+ 	}
+ );
+diff --git a/packages/ui/src/form/primitives/select/popup.tsx b/packages/ui/src/form/primitives/select/popup.tsx
+index bae67abb1bd1ec..c1f666b851dc6b 100644
+--- a/packages/ui/src/form/primitives/select/popup.tsx
++++ b/packages/ui/src/form/primitives/select/popup.tsx
+@@ -7,7 +7,7 @@ import {
+ } from '@wordpress/theme';
+ import { unlock } from '../../../lock-unlock';
+ import { Portal } from './portal';
+-import { renderPortalWithChildren } from '../../../utils/render-portal-with-children';
++import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
+ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+ import resetStyles from '../../../utils/css/resets.module.css';
+ import styles from './style.module.css';
+@@ -50,6 +50,6 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
+ 			</_Select.Positioner>
+ 		);
+ 
+-		return renderPortalWithChildren( portal, <Portal />, portalChildren );
++		return renderSlotWithChildren( portal, <Portal />, portalChildren );
+ 	}
+ );
+diff --git a/packages/ui/src/icon-button/icon-button.tsx b/packages/ui/src/icon-button/icon-button.tsx
+index afdfddac8f04f4..8032f765fa7b61 100644
+--- a/packages/ui/src/icon-button/icon-button.tsx
++++ b/packages/ui/src/icon-button/icon-button.tsx
+@@ -22,6 +22,7 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
+ 			icon,
+ 			size,
+ 			shortcut,
++			positioner,
+ 			...restProps
+ 		}: IconButtonProps & { children?: unknown },
+ 		ref
+@@ -52,7 +53,7 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
+ 							className={ styles.icon }
+ 						/>
+ 					</Tooltip.Trigger>
+-					<Tooltip.Popup>
++					<Tooltip.Popup positioner={ positioner }>
+ 						{ label }
+ 						{ shortcut && (
+ 							<>
+diff --git a/packages/ui/src/icon-button/stories/index.story.tsx b/packages/ui/src/icon-button/stories/index.story.tsx
+index fd3430c777fd9f..3eae2476cfc1b8 100644
+--- a/packages/ui/src/icon-button/stories/index.story.tsx
++++ b/packages/ui/src/icon-button/stories/index.story.tsx
+@@ -11,6 +11,7 @@ import {
+ } from '@wordpress/icons';
+ import { displayShortcut, ariaKeyShortcut } from '@wordpress/keycodes';
+ import { IconButton } from '../index';
++import * as Tooltip from '../../tooltip';
+ 
+ const meta: Meta< typeof IconButton > = {
+ 	title: 'Design System/Components/IconButton',
+@@ -133,3 +134,15 @@ export const WithShortcut: Story = {
+ 		shortcut: EXAMPLE_SHORTCUT_OBJECT,
+ 	},
+ };
++
++/**
++ * Customize where the tooltip appears relative to the button by passing a
++ * `<Tooltip.Positioner />` element with a `side` to the `positioner` prop.
++ */
++export const WithCustomPositioner: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		positioner: <Tooltip.Positioner side="right" />,
++	},
++};
+diff --git a/packages/ui/src/icon-button/types.ts b/packages/ui/src/icon-button/types.ts
+index 9506310fa460fb..15a09ace18458c 100644
+--- a/packages/ui/src/icon-button/types.ts
++++ b/packages/ui/src/icon-button/types.ts
+@@ -1,5 +1,6 @@
+ import { type ButtonProps } from '../button/types';
+ import { type IconProps } from '../icon/types';
++import { type PopupProps as TooltipPopupProps } from '../tooltip/types';
+ 
+ export type IconButtonProps = Omit< ButtonProps, 'children' > & {
+ 	/**
+@@ -35,4 +36,12 @@ export type IconButtonProps = Omit< ButtonProps, 'children' > & {
+ 		 */
+ 		ariaKeyShortcut: string;
+ 	};
++
++	/**
++	 * Customize how the tooltip is positioned relative to the button. Accepts
++	 * a `<Tooltip.Positioner />` element with custom positioning props
++	 * (`side`, `align`, `sideOffset`, collision settings, etc.). When omitted,
++	 * the tooltip uses the default placement.
++	 */
++	positioner?: TooltipPopupProps[ 'positioner' ];
+ };
+diff --git a/packages/ui/src/popover/popup.tsx b/packages/ui/src/popover/popup.tsx
+index 95234c7b492d61..dac8b348271ecd 100644
+--- a/packages/ui/src/popover/popup.tsx
++++ b/packages/ui/src/popover/popup.tsx
+@@ -9,7 +9,7 @@ import {
+ import { unlock } from '../lock-unlock';
+ import resetStyles from '../utils/css/resets.module.css';
+ import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+-import { renderPortalWithChildren } from '../utils/render-portal-with-children';
++import { renderSlotWithChildren } from '../utils/render-slot-with-children';
+ import { PopoverValidationProvider } from './context';
+ import { Portal } from './portal';
+ import styles from './style.module.css';
+@@ -102,7 +102,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
+ 		</>
+ 	);
+ 
+-	return renderPortalWithChildren( portal, <Portal />, portalChildren );
++	return renderSlotWithChildren( portal, <Portal />, portalChildren );
+ } );
+ 
+ export { Popup };
+diff --git a/packages/ui/src/tabs/stories/index.story.tsx b/packages/ui/src/tabs/stories/index.story.tsx
+index 59bab3da3f1851..2e1f40c203be21 100644
+--- a/packages/ui/src/tabs/stories/index.story.tsx
++++ b/packages/ui/src/tabs/stories/index.story.tsx
+@@ -288,7 +288,14 @@ export const WithTabIconsAndTooltips: StoryObj< typeof Tabs.Root > = {
+ 										} }
+ 									/>
+ 								</Tooltip.Trigger>
+-								<Tooltip.Popup align="center" side="top">
++								<Tooltip.Popup
++									positioner={
++										<Tooltip.Positioner
++											align="center"
++											side="top"
++										/>
++									}
++								>
+ 									{ label }
+ 								</Tooltip.Popup>
+ 							</Tooltip.Root>
+diff --git a/packages/ui/src/tooltip/index.ts b/packages/ui/src/tooltip/index.ts
+index 36f8e740e231ef..f703f2862d8e2d 100644
+--- a/packages/ui/src/tooltip/index.ts
++++ b/packages/ui/src/tooltip/index.ts
+@@ -1,7 +1,8 @@
+ import { Popup } from './popup';
+ import { Portal } from './portal';
++import { Positioner } from './positioner';
+ import { Trigger } from './trigger';
+ import { Root } from './root';
+ import { Provider } from './provider';
+ 
+-export { Provider, Root, Trigger, Popup, Portal };
++export { Provider, Root, Trigger, Popup, Portal, Positioner };
+diff --git a/packages/ui/src/tooltip/popup.tsx b/packages/ui/src/tooltip/popup.tsx
+index 34581f0d572a05..2db17cb38c0cad 100644
+--- a/packages/ui/src/tooltip/popup.tsx
++++ b/packages/ui/src/tooltip/popup.tsx
+@@ -8,54 +8,46 @@ import {
+ import type { PopupProps } from './types';
+ import { unlock } from '../lock-unlock';
+ import { Portal } from './portal';
+-import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+-import resetStyles from '../utils/css/resets.module.css';
++import { Positioner } from './positioner';
++import { renderSlotWithChildren } from '../utils/render-slot-with-children';
+ import styles from './style.module.css';
+ 
+ const ThemeProvider: typeof ThemeProviderType =
+ 	unlock( themePrivateApis ).ThemeProvider;
+ 
+ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
+-	{
+-		align = 'center',
+-		portal,
+-		side = 'top',
+-		sideOffset = 4,
+-		children,
+-		className,
+-		...props
+-	},
++	{ portal, positioner, children, className, ...props },
+ 	ref
+ ) {
+-	const portalChildren = (
+-		<_Tooltip.Positioner
+-			align={ align }
+-			side={ side }
+-			sideOffset={ sideOffset }
+-			className={ clsx( resetStyles[ 'box-sizing' ], styles.positioner ) }
+-		>
+-			{ /* This should ideally use whatever dark color makes sense,
+-				and not be hardcoded to #1e1e1e. The solutions would be to:
+-				  - review the design of the tooltip, in case we want to stop
+-				    hardcoding it to a dark background
+-				  - create new semantic tokens as needed (aliasing either the "inverted
+-					  bg" or "perma-dark bg" private tokens) and have Tooltip.Popup use
+-				    them;
+-				  - remove the hardcoded `bg` setting from the `ThemeProvider` below
+-					*/ }
+-			<ThemeProvider color={ { bg: '#1e1e1e' } }>
+-				<_Tooltip.Popup
+-					ref={ ref }
+-					className={ clsx( styles.popup, className ) }
+-					{ ...props }
+-				>
+-					{ children }
+-				</_Tooltip.Popup>
+-			</ThemeProvider>
+-		</_Tooltip.Positioner>
++	const popupContent = (
++		/* This should ideally use whatever dark color makes sense,
++		 * and not be hardcoded to #1e1e1e. The solutions would be to:
++		 *   - review the design of the tooltip, in case we want to stop
++		 *     hardcoding it to a dark background
++		 *   - create new semantic tokens as needed (aliasing either the
++		 *     "inverted bg" or "perma-dark bg" private tokens) and have
++		 *     Tooltip.Popup use them;
++		 *   - remove the hardcoded `bg` setting from the `ThemeProvider`
++		 *     below
++		 */
++		<ThemeProvider color={ { bg: '#1e1e1e' } }>
++			<_Tooltip.Popup
++				ref={ ref }
++				className={ clsx( styles.popup, className ) }
++				{ ...props }
++			>
++				{ children }
++			</_Tooltip.Popup>
++		</ThemeProvider>
+ 	);
+ 
+-	return renderPortalWithChildren( portal, <Portal />, portalChildren );
++	const positionedPopup = renderSlotWithChildren(
++		positioner,
++		<Positioner />,
++		popupContent
++	);
++
++	return renderSlotWithChildren( portal, <Portal />, positionedPopup );
+ } );
+ 
+ export { Popup };
+diff --git a/packages/ui/src/tooltip/positioner.tsx b/packages/ui/src/tooltip/positioner.tsx
+new file mode 100644
+index 00000000000000..e604ac5a0e3e92
+--- /dev/null
++++ b/packages/ui/src/tooltip/positioner.tsx
+@@ -0,0 +1,36 @@
++import clsx from 'clsx';
++import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
++import { forwardRef } from '@wordpress/element';
++import type { PositionerProps } from './types';
++import resetStyles from '../utils/css/resets.module.css';
++import styles from './style.module.css';
++
++/**
++ * Positions the floating tooltip content relative to the trigger. Pass to
++ * `Tooltip.Popup`'s `positioner` prop to customize `side`, `align`,
++ * `sideOffset`, collision behavior, etc. When `positioner` is omitted,
++ * `Tooltip.Popup` uses this component with default props.
++ */
++const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
++	function TooltipPositioner(
++		{ align = 'center', className, side = 'top', sideOffset = 4, ...props },
++		ref
++	) {
++		return (
++			<_Tooltip.Positioner
++				ref={ ref }
++				align={ align }
++				side={ side }
++				sideOffset={ sideOffset }
++				{ ...props }
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					styles.positioner,
++					className
++				) }
++			/>
++		);
++	}
++);
++
++export { Positioner };
+diff --git a/packages/ui/src/tooltip/stories/index.story.tsx b/packages/ui/src/tooltip/stories/index.story.tsx
+index 54305a7cbd6b1e..26fbe26997f625 100644
+--- a/packages/ui/src/tooltip/stories/index.story.tsx
++++ b/packages/ui/src/tooltip/stories/index.story.tsx
+@@ -10,6 +10,7 @@ const meta: Meta< typeof Tooltip.Root > = {
+ 		Provider: Tooltip.Provider,
+ 		Trigger: Tooltip.Trigger,
+ 		Popup: Tooltip.Popup,
++		Positioner: Tooltip.Positioner,
+ 		Portal: Tooltip.Portal,
+ 	},
+ 	parameters: {
+@@ -47,8 +48,11 @@ export const Disabled: StoryObj< typeof Tooltip.Root > = {
+ };
+ 
+ /**
+- * Use the `side` prop to control where the tooltip appears relative to the
+- * trigger element.
++ * Customize where the tooltip appears relative to the trigger by passing a
++ * `<Tooltip.Positioner />` element to `Tooltip.Popup`'s `positioner` prop.
++ * `Tooltip.Positioner` accepts `side`, `align`, `sideOffset`, and collision
++ * settings; when `positioner` is omitted, the tooltip uses the defaults
++ * (`side="top"`, `align="center"`, `sideOffset={ 4 }`).
+  */
+ export const Positioning: StoryObj< typeof Tooltip.Root > = {
+ 	render: () => (
+@@ -62,27 +66,67 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
+ 		>
+ 			<Tooltip.Root>
+ 				<Tooltip.Trigger aria-label="Up">⬆️</Tooltip.Trigger>
+-				<Tooltip.Popup side="top">Up</Tooltip.Popup>
++				<Tooltip.Popup positioner={ <Tooltip.Positioner side="top" /> }>
++					Up
++				</Tooltip.Popup>
+ 			</Tooltip.Root>
+ 
+ 			<Tooltip.Root>
+ 				<Tooltip.Trigger aria-label="Forward">➡️</Tooltip.Trigger>
+-				<Tooltip.Popup side="right">Forward</Tooltip.Popup>
++				<Tooltip.Popup
++					positioner={ <Tooltip.Positioner side="right" /> }
++				>
++					Forward
++				</Tooltip.Popup>
+ 			</Tooltip.Root>
+ 
+ 			<Tooltip.Root>
+ 				<Tooltip.Trigger aria-label="Down">⬇️</Tooltip.Trigger>
+-				<Tooltip.Popup side="bottom">Down</Tooltip.Popup>
++				<Tooltip.Popup
++					positioner={ <Tooltip.Positioner side="bottom" /> }
++				>
++					Down
++				</Tooltip.Popup>
+ 			</Tooltip.Root>
+ 
+ 			<Tooltip.Root>
+ 				<Tooltip.Trigger aria-label="Back">⬅️</Tooltip.Trigger>
+-				<Tooltip.Popup side="left">Back</Tooltip.Popup>
++				<Tooltip.Popup
++					positioner={ <Tooltip.Positioner side="left" /> }
++				>
++					Back
++				</Tooltip.Popup>
+ 			</Tooltip.Root>
+ 		</div>
+ 	),
+ };
+ 
++/**
++ * Beyond `side`, `Tooltip.Positioner` accepts the rest of the positioner
++ * surface — `align`, `alignOffset`, `sideOffset`, collision settings, and
++ * more — for fine-grained placement.
++ */
++export const WithCustomPositioner: StoryObj< typeof Tooltip.Root > = {
++	args: {
++		children: (
++			<>
++				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
++				<Tooltip.Popup
++					positioner={
++						<Tooltip.Positioner
++							side="right"
++							align="start"
++							sideOffset={ 16 }
++						/>
++					}
++				>
++					Save
++				</Tooltip.Popup>
++			</>
++		),
++	},
++};
++
+ /**
+  * Popovers in Gutenberg are managed with explicit z-index values, which can
+  * create situations where a tooltip renders below another popover when you
+diff --git a/packages/ui/src/tooltip/types.ts b/packages/ui/src/tooltip/types.ts
+index e68a6a7a0aaf31..4eb2c2dea7e2b5 100644
+--- a/packages/ui/src/tooltip/types.ts
++++ b/packages/ui/src/tooltip/types.ts
+@@ -5,6 +5,10 @@ import type { ComponentProps } from '../utils/types';
+ 
+ export type PortalProps = ComponentPropsWithoutRef< typeof _Tooltip.Portal >;
+ 
++export type PositionerProps = ComponentPropsWithoutRef<
++	typeof _Tooltip.Positioner
++>;
++
+ export type RootProps = Pick< _Tooltip.Root.Props, 'disabled' | 'children' >;
+ 
+ export type ProviderProps = Pick<
+@@ -19,9 +23,7 @@ export interface TriggerProps extends ComponentProps< 'button' > {
+ 	children?: ReactNode;
+ }
+ 
+-export interface PopupProps
+-	extends ComponentProps< 'div' >,
+-		Pick< _Tooltip.Positioner.Props, 'align' | 'side' | 'sideOffset' > {
++export interface PopupProps extends ComponentProps< 'div' > {
+ 	/**
+ 	 * The content to be rendered inside the component.
+ 	 */
+@@ -34,4 +36,13 @@ export interface PopupProps
+ 	 * be ignored.
+ 	 */
+ 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
++
++	/**
++	 * Optional positioner element, typically `<Tooltip.Positioner />` with
++	 * custom positioning props (`side`, `align`, `sideOffset`, collision
++	 * settings, etc.). When omitted, `Tooltip.Popup` uses `Tooltip.Positioner`
++	 * with default props. Do not pass `children` on the positioner element;
++	 * they would be ignored.
++	 */
++	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
+ }
+diff --git a/packages/ui/src/utils/render-portal-with-children.ts b/packages/ui/src/utils/render-portal-with-children.ts
+deleted file mode 100644
+index edc4d12863bdfc..00000000000000
+--- a/packages/ui/src/utils/render-portal-with-children.ts
++++ /dev/null
+@@ -1,27 +0,0 @@
+-import { cloneElement } from '@wordpress/element';
+-import type { ReactElement, ReactNode } from 'react';
+-
+-/**
+- * Renders overlay markup (`children`) through an optional `portal` element from
+- * `portal={ <Component.Portal … /> }`, or through the package default portal.
+- *
+- * Shared by overlay `Popup` components so portal merge behavior stays consistent.
+- *
+- * @param portal        Optional element from the `portal` prop (should have no
+- *                      `children`; callers type this via `Omit<PortalProps,'children'>`).
+- *                      When omitted, `defaultPortal` is used. Injected `children`
+- *                      replace any subtree on the portal element.
+- * @param defaultPortal Unpopulated default portal element (e.g. `<Dialog.Portal />`).
+- * @param children      Popup subtree (backdrop, positioner, etc.) to inject as the portal’s children.
+- */
+-export function renderPortalWithChildren(
+-	portal: ReactElement | undefined,
+-	defaultPortal: ReactElement,
+-	children: ReactNode
+-): ReactElement {
+-	const rootPortal = portal ?? defaultPortal;
+-
+-	return cloneElement( rootPortal, {
+-		children,
+-	} );
+-}
+diff --git a/packages/ui/src/utils/render-slot-with-children.ts b/packages/ui/src/utils/render-slot-with-children.ts
+new file mode 100644
+index 00000000000000..ee8e8114d1dea9
+--- /dev/null
++++ b/packages/ui/src/utils/render-slot-with-children.ts
+@@ -0,0 +1,31 @@
++import { cloneElement } from '@wordpress/element';
++import type { ReactElement, ReactNode } from 'react';
++
++/**
++ * Fills an optional "slot" element prop with content by cloning it and
++ * injecting the given `children`. When `slot` is undefined, the provided
++ * `defaultSlot` is used in its place.
++ *
++ * Shared by overlay `Popup` components for their slot-shaped customization
++ * props (e.g. `portal`, `positioner`), so the merge behavior — defaults,
++ * children injection — stays consistent across all of them.
++ *
++ * Callers should type the slot prop as `ReactElement<Omit<Props, 'children'>>`:
++ * any subtree passed on the slot element is overwritten by `children`.
++ *
++ * @param slot        Optional element from the slot prop (e.g. `<Tooltip.Portal … />`
++ *                    or `<Tooltip.Positioner … />`). When omitted, `defaultSlot`
++ *                    is used. Injected `children` replace any subtree the caller
++ *                    may have passed on the slot element.
++ * @param defaultSlot Unpopulated default element used when `slot` is omitted
++ *                    (e.g. `<Tooltip.Portal />`).
++ * @param children    Content to inject as the slot's children (backdrop,
++ *                    positioner, popup subtree, etc.).
++ */
++export function renderSlotWithChildren(
++	slot: ReactElement | undefined,
++	defaultSlot: ReactElement,
++	children: ReactNode
++): ReactElement {
++	return cloneElement( slot ?? defaultSlot, { children } );
++}

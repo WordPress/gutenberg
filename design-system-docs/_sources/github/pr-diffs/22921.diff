@@ -1,0 +1,142 @@
+diff --git a/packages/base-styles/_colors.scss b/packages/base-styles/_colors.scss
+index b0416284e49723..950aa826c5d169 100644
+--- a/packages/base-styles/_colors.scss
++++ b/packages/base-styles/_colors.scss
+@@ -20,7 +20,7 @@ $light-gray-placeholder: rgba($white, 0.65);
+ 
+ // Alert colors.
+ $alert-yellow: #f0b849;
+-$alert-red: #d94f4f;
++$alert-red: #cc1818;
+ $alert-green: #4ab866;
+ 
+ 
+diff --git a/packages/components/src/button/stories/index.js b/packages/components/src/button/stories/index.js
+index 86bd51dcdbd1c1..c5cc02b7922d42 100644
+--- a/packages/components/src/button/stories/index.js
++++ b/packages/components/src/button/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { text, number } from '@storybook/addon-knobs';
++import { text, number, boolean } from '@storybook/addon-knobs';
+ 
+ /**
+  * WordPress dependencies
+@@ -45,6 +45,18 @@ export const tertiary = () => {
+ 	return <Button isTertiary>{ label }</Button>;
+ };
+ 
++export const isDestructive = () => {
++	const label = text( 'Label', 'Destructive Button' );
++	const isSmall = boolean( 'isSmall', false );
++	const disabled = boolean( 'disabled', false );
++
++	return (
++		<Button isDestructive isSmall={ isSmall } disabled={ disabled }>
++			{ label }
++		</Button>
++	);
++};
++
+ export const small = () => {
+ 	const label = text( 'Label', 'Small Button' );
+ 
+@@ -93,6 +105,16 @@ export const disabledLink = () => {
+ 	);
+ };
+ 
++export const destructiveLink = () => {
++	const label = text( 'Label', 'Destructive Link' );
++
++	return (
++		<Button isDestructive isLink>
++			{ label }
++		</Button>
++	);
++};
++
+ export const icon = () => {
+ 	const usedIcon = text( 'Icon', 'ellipsis' );
+ 	const label = text( 'Label', 'More' );
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index c244753c4cc29b..9a3b3946a24dc5 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -159,6 +159,28 @@
+ 		outline: 1px dotted transparent;
+ 	}
+ 
++	/**
++	 * Destructive buttons.
++	 */
++
++	&.is-destructive {
++		color: $alert-red;
++		box-shadow: inset 0 0 0 $border-width $alert-red;
++
++		&:hover:not(:disabled) {
++			color: darken($alert-red, 20%);
++			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
++		}
++
++		&:focus:not(:disabled) {
++			color: var(--wp-admin-theme-color);
++		}
++
++		&:active:not(:disabled) {
++			background: $light-gray-600;
++		}
++	}
++
+ 	/**
+ 	 * Link buttons.
+ 	 */
+@@ -184,6 +206,7 @@
+ 		&:hover:not(:disabled),
+ 		&:active:not(:disabled) {
+ 			color: #00a0d2;
++			box-shadow: none;
+ 		}
+ 
+ 		&:focus {
+@@ -192,27 +215,20 @@
+ 				0 0 0 $border-width #5b9dd9,
+ 				0 0 $border-width-focus $border-width rgba(30, 140, 190, 0.8);
+ 		}
+-	}
+-
+-	/**
+-	 * Buttons that indicate destructive actions.
+-	 */
+-
+-	&.is-destructive {
+-		color: darken($alert-red, 15%);
+ 
+-		&.is-secondary {
+-			box-shadow: inset 0 0 0 $border-width darken($alert-red, 15%);
+-		}
++		// Link buttons that are red to indicate destructive behavior.
++		&.is-destructive {
++			color: $alert-red;
+ 
+-		&:hover:not(:disabled),
+-		&:active:not(:disabled) {
+-			color: darken($alert-red, 20%);
+-			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
+-		}
++			&:active:not(:disabled),
++			&:hover:not(:disabled) {
++				color: darken($alert-red, 20%);
++				background: none;
++			}
+ 
+-		&:focus:not(:disabled) {
+-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus darken($alert-red, 20%);
++			&:focus:not(:disabled) {
++				color: var(--wp-admin-theme-color);
++			}
+ 		}
+ 	}
+ 

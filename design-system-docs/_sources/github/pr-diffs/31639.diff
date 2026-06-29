@@ -1,0 +1,324 @@
+diff --git a/packages/block-editor/src/components/block-compare/style.scss b/packages/block-editor/src/components/block-compare/style.scss
+index 5474ad6a264162..a808d8366aed1a 100644
+--- a/packages/block-editor/src/components/block-compare/style.scss
++++ b/packages/block-editor/src/components/block-compare/style.scss
+@@ -1,15 +1,8 @@
+ /**
+  * Invalid block comparison
+  */
+-
+-// Ensure the modal fits the content, otherwise it could be too big
+ .block-editor-block-compare {
+-	overflow: auto;
+ 	height: auto;
+-
+-	@include break-small() {
+-		max-height: 70%;
+-	}
+ }
+ 
+ .block-editor-block-compare__wrapper {
+@@ -23,6 +16,7 @@
+ 		width: 50%;
+ 		padding: 0 $grid-unit-20 0 0;
+ 		min-width: 200px;
++		max-width: $break-small;
+ 
+ 		button {
+ 			float: right;
+diff --git a/packages/components/src/guide/style.scss b/packages/components/src/guide/style.scss
+index 305c339da364b9..6411426c833fef 100644
+--- a/packages/components/src/guide/style.scss
++++ b/packages/components/src/guide/style.scss
+@@ -6,12 +6,20 @@
+ 		width: 600px;
+ 	}
+ 
++	.components-modal__content {
++		padding: 0;
++		margin-top: 0;
++		border-radius: $radius-block-ui;
++
++		&::before {
++			content: none;
++		}
++	}
++
+ 	.components-modal__header {
+-		background: none;
+ 		border-bottom: none;
+-		width: 100%;
+ 		padding: 0;
+-		margin: 0;
++		position: sticky;
+ 
+ 		.components-button {
+ 			align-self: flex-start;
+@@ -76,10 +84,6 @@
+ 			margin: -6px 0;
+ 		}
+ 	}
+-
+-	.components-modal__content {
+-		padding: 0;
+-	}
+ }
+ 
+ .components-modal__frame.components-guide {
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index e25eeec49cdb57..997f07fe604244 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -7,6 +7,7 @@
+ 	left: 0;
+ 	background-color: rgba($black, 0.35);
+ 	z-index: z-index(".components-modal__screen-overlay");
++	display: flex;
+ 
+ 	// This animates the appearance of the white background.
+ 	@include edit-post__fade-in-animation();
+@@ -14,44 +15,41 @@
+ 
+ // The modal window element.
+ .components-modal__frame {
+-	// On small screens the content needs to be full width because of limited
+-	// space.
+-	position: absolute;
+-	top: 0;
+-	right: 0;
+-	bottom: 0;
+-	left: 0;
+-	box-sizing: border-box;
++	// Use the entire viewport on smaller screens.
+ 	margin: 0;
++	width: 100%;
+ 	background: $white;
+ 	box-shadow: $shadow-modal;
+ 	border-radius: $radius-block-ui;
+-	overflow: auto;
++	overflow: hidden;
++	// Have the content element fill the vertical space yet not overflow.
++	display: flex;
+ 
+ 	// Show a centered modal on bigger screens.
+ 	@include break-small() {
+-		top: 50%;
+-		right: auto;
+-		bottom: auto;
+-		left: 50%;
++		margin: auto;
++		width: auto;
+ 		min-width: $modal-min-width;
+-		max-width: calc(100% - #{ $grid-unit-20 } - #{ $grid-unit-20 });
+-		max-height: 90%;
+-		transform: translate(-50%, -50%);
++		max-width: calc(100% - #{ $grid-unit-20 * 2 });
++		max-height: calc(100% - #{ $header-height * 2 });
+ 
+ 		// Animate the modal frame/contents appearing on the page.
+ 		animation: components-modal__appear-animation 0.1s ease-out;
+ 		animation-fill-mode: forwards;
+ 		@include reduce-motion("animation");
+ 	}
++
++	@include break-large() {
++		max-height: 70%;
++	}
+ }
+ 
+ @keyframes components-modal__appear-animation {
+ 	from {
+-		margin-top: $grid-unit-40;
++		transform: translateY($grid-unit-40);
+ 	}
+ 	to {
+-		margin-top: 0;
++		transform: translateY(0);
+ 	}
+ }
+ 
+@@ -65,25 +63,13 @@
+ 	display: flex;
+ 	flex-direction: row;
+ 	justify-content: space-between;
+-	background: $white;
+ 	align-items: center;
+ 	height: $header-height;
++	width: 100%;
+ 	z-index: z-index(".components-modal__header");
+-	// For z-index to take effect, the element must be positioned. A "sticky"
+-	// element is positioned, but since this is not supported in IE11,
+-	// "relative" is used as a fallback.
+-	position: relative;
+-	position: sticky;
++	position: absolute;
+ 	top: 0;
+-	margin: 0 -#{$grid-unit-40} $grid-unit-30;
+-
+-	// Rules inside this query are only run by Microsoft Edge.
+-	// Edge has bugs around position: sticky;, so it needs a separate top rule.
+-	// See also https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/17555420/.
+-	@supports (-ms-ime-align:auto) {
+-		position: fixed;
+-		width: 100%;
+-	}
++	left: 0;
+ 
+ 	.components-modal__header-heading {
+ 		font-size: 1rem;
+@@ -121,13 +107,18 @@
+ 
+ // Modal contents.
+ .components-modal__content {
+-	box-sizing: border-box;
+-	height: 100%;
++	flex: 1;
++	margin-top: $header-height;
+ 	padding: 0 $grid-unit-40 $grid-unit-30;
++	overflow: auto;
+ 
+-	// Rules inside this query are only run by Microsoft Edge.
+-	// This is a companion top padding to the fixed rule in line 77.
+-	@supports (-ms-ime-align:auto) {
+-		padding-top: $header-height;
++	// Emulate margin-bottom for the header. Uses a pseudo-element since the
++	// absolutely positioned header’s margins wouldn’t effect siblings and
++	// padding-top on the content element would effect positioning of any
++	// sticky elements within.
++	&::before {
++		content: "";
++		display: block;
++		margin-bottom: $grid-unit-30;
+ 	}
+ }
+diff --git a/packages/edit-post/src/components/manage-blocks-modal/style.scss b/packages/edit-post/src/components/manage-blocks-modal/style.scss
+index a63bbdf26c127e..d9927955a4a3b7 100644
+--- a/packages/edit-post/src/components/manage-blocks-modal/style.scss
++++ b/packages/edit-post/src/components/manage-blocks-modal/style.scss
+@@ -1,27 +1,3 @@
+-.edit-post-manage-blocks-modal {
+-	@include break-small() {
+-		height: calc(100% - #{ $header-height } - #{ $header-height });
+-	}
+-}
+-
+-.edit-post-manage-blocks-modal .components-modal__content {
+-	padding-bottom: 0;
+-	display: flex;
+-	flex-direction: column;
+-}
+-
+-.edit-post-manage-blocks-modal .components-modal__header {
+-	flex-shrink: 0;
+-	margin-bottom: 0;
+-}
+-
+-.edit-post-manage-blocks-modal__content {
+-	display: flex;
+-	flex-direction: column;
+-	flex: 0 1 100%;
+-	min-height: 0;
+-}
+-
+ .edit-post-manage-blocks-modal__no-results {
+ 	font-style: italic;
+ 	padding: 24px 0;
+@@ -46,13 +22,14 @@
+ }
+ 
+ .edit-post-manage-blocks-modal__disabled-blocks-count {
+-	border-top: 1px solid $gray-300;
+-	margin-left: -$grid-unit-30;
+-	margin-right: -$grid-unit-30;
++	border: 1px solid $gray-300;
++	border-width: 1px 0;
++	margin-left: -$grid-unit-40;
++	margin-right: -$grid-unit-40;
+ 	padding-top: 0.6rem;
+ 	padding-bottom: 0.6rem;
+-	padding-left: $grid-unit-30;
+-	padding-right: $grid-unit-30;
++	padding-left: $grid-unit-40;
++	padding-right: $grid-unit-40;
+ 	background-color: $gray-100;
+ }
+ 
+@@ -85,14 +62,14 @@
+ 	margin-top: 0;
+ }
+ 
++.edit-post-manage-blocks-modal__category-title,
++.edit-post-manage-blocks-modal__checklist-item {
++	border-bottom: 1px solid $gray-300;
++}
++
+ .edit-post-manage-blocks-modal__checklist-item {
+ 	margin-bottom: 0;
+ 	padding-left: $grid-unit-20;
+-	border-top: 1px solid $gray-300;
+-
+-	&:last-child {
+-		border-bottom: 1px solid $gray-300;
+-	}
+ 
+ 	.components-base-control__field {
+ 		align-items: center;
+@@ -119,11 +96,10 @@
+ }
+ 
+ .edit-post-manage-blocks-modal__results {
+-	height: 100%;
+-	overflow: auto;
+-	margin-left: -$grid-unit-40;
+-	margin-right: -$grid-unit-40;
+-	padding-left: $grid-unit-40;
+-	padding-right: $grid-unit-40;
+ 	border-top: $border-width solid $gray-300;
+ }
++
++// Remove the top border from results when adjacent to the disabled block count
++.edit-post-manage-blocks-modal__disabled-blocks-count + .edit-post-manage-blocks-modal__results {
++	border-top-width: 0;
++}
+diff --git a/packages/edit-post/src/components/preferences-modal/style.scss b/packages/edit-post/src/components/preferences-modal/style.scss
+index da668997f2d1c9..2bd28bbf90edc7 100644
+--- a/packages/edit-post/src/components/preferences-modal/style.scss
++++ b/packages/edit-post/src/components/preferences-modal/style.scss
+@@ -1,14 +1,18 @@
+ .edit-post-preferences-modal {
+-	min-width: 360px;
+-
+-	// Better use the space on mobile.
+-	width: 100%;
++	// To keep modal dimensions consistent as subsections are navigated, width
++	// and height are used instead of max-(width/height).
++	@include break-small() {
++		width: calc(100% - #{ $grid-unit-20 * 2 });
++		height: calc(100% - #{ $header-height * 2 });
++	}
+ 	@include break-medium() {
+-		width: auto;
++		width: $break-medium - $grid-unit-20 * 2;
+ 	}
+-
+-	@include break-small() {
+-		height: calc(100% - #{$header-height} - #{$header-height});
++	@include break-large() {
++		height: 70%;
++	}
++	@include break-huge() {
++		height: 50%;
+ 	}
+ 
+ 	.components-navigation {
+@@ -83,6 +87,10 @@
+ 
+ 	&__section {
+ 		margin: 0 0 2.5rem 0;
++
++		&:last-child {
++			margin: 0;
++		}
+ 	}
+ 
+ 	&__section-title {

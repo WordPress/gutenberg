@@ -1,0 +1,651 @@
+diff --git a/packages/block-editor/src/components/font-sizes/font-size-picker.js b/packages/block-editor/src/components/font-sizes/font-size-picker.js
+index 477e6165bc53ef..959b2c23806ded 100644
+--- a/packages/block-editor/src/components/font-sizes/font-size-picker.js
++++ b/packages/block-editor/src/components/font-sizes/font-size-picker.js
+@@ -19,7 +19,6 @@ function FontSizePicker( props ) {
+ 			{ ...props }
+ 			fontSizes={ fontSizes }
+ 			disableCustomFontSizes={ ! customFontSize }
+-			__next40pxDefaultSize
+ 		/>
+ 	);
+ }
+diff --git a/packages/block-editor/src/components/global-styles/typography-panel.js b/packages/block-editor/src/components/global-styles/typography-panel.js
+index d9b085db2c4214..412422cd271788 100644
+--- a/packages/block-editor/src/components/global-styles/typography-panel.js
++++ b/packages/block-editor/src/components/global-styles/typography-panel.js
+@@ -625,7 +625,6 @@ export default function TypographyPanel( {
+ 						disableCustomFontSizes={ disableCustomFontSizes }
+ 						withReset={ false }
+ 						withSlider
+-						size="__unstable-large"
+ 					/>
+ 				</ToolsPanelItem>
+ 			) }
+diff --git a/packages/block-editor/src/hooks/font-size.js b/packages/block-editor/src/hooks/font-size.js
+index 6c5ab03489e107..84729f441dd741 100644
+--- a/packages/block-editor/src/hooks/font-size.js
++++ b/packages/block-editor/src/hooks/font-size.js
+@@ -131,7 +131,6 @@ export function FontSizeEdit( props ) {
+ 			valueMode={ fontSize ? 'slug' : 'literal' }
+ 			withReset={ false }
+ 			withSlider
+-			size="__unstable-large"
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 926bb7473c145e..8a90182dbea1e1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,12 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
++    -   `BorderBoxControl` ([#79420](https://github.com/WordPress/gutenberg/pull/79420))
++    -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
++
+ ### Internal
+ 
+ -   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
+@@ -10,10 +16,9 @@
+ 
+ ### Breaking Changes
+ 
+--   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79386](https://github.com/WordPress/gutenberg/pull/79386), [#79419](https://github.com/WordPress/gutenberg/pull/79419), [#79420](https://github.com/WordPress/gutenberg/pull/79420)):
+-    -   `BorderBoxControl`
+-    -   `BoxControl`
+-    -   `TextControl`
++-   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed from the following:
++    -   `BoxControl` ([#79419](https://github.com/WordPress/gutenberg/pull/79419))
++    -   `TextControl` ([#79386](https://github.com/WordPress/gutenberg/pull/79386))
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index b6e2d26917f384..6d5a3b322d7abf 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -29,7 +29,6 @@ const MyFontSizePicker = () => {
+ 
+ 	return (
+ 		<FontSizePicker
+-			__next40pxDefaultSize
+ 			fontSizes={ fontSizes }
+ 			value={ fontSize }
+ 			fallbackFontSize={ fallbackFontSize }
+@@ -81,13 +80,6 @@ If onChange is called without any parameter, it should reset the value, attendin
+ 
+ -   Required: Yes
+ 
+-### `size`: `'default' | '__unstable-large'`
+-
+-Size of the control.
+-
+--   Required: No
+--   Default: `'default'`
+-
+ ### `units`: `string[]`
+ 
+ Available units for custom font size selection.
+@@ -126,10 +118,3 @@ If `true`, a slider will be displayed alongside the input field when a custom fo
+ 
+ -   Required: no
+ -   Default: `false`
+-
+-### `__next40pxDefaultSize`: `boolean`
+-
+-Start opting into the larger default height that will become the default size in a future version.
+-
+-- Required: No
+-- Default: `false`
+diff --git a/packages/components/src/font-size-picker/font-size-picker-select.tsx b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+index ee62f80a679bbb..218033c70a87d6 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-select.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+@@ -21,14 +21,7 @@ const DEFAULT_OPTION: FontSizePickerSelectOption = {
+ };
+ 
+ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
+-	const {
+-		__next40pxDefaultSize,
+-		fontSizes,
+-		value,
+-		size,
+-		valueMode = 'literal',
+-		onChange,
+-	} = props;
++	const { fontSizes, value, valueMode = 'literal', onChange } = props;
+ 
+ 	const options: FontSizePickerSelectOption[] = [
+ 		DEFAULT_OPTION,
+@@ -67,8 +60,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
+ 
+ 	return (
+ 		<StyledCustomSelectControl
+-			__next40pxDefaultSize={ __next40pxDefaultSize }
+-			__shouldNotWarnDeprecated36pxSize
++			__next40pxDefaultSize
+ 			className="components-font-size-picker__select"
+ 			label={ __( 'Font size' ) }
+ 			hideLabelFromVision
+@@ -96,7 +88,6 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
+ 
+ 				onChange( selectedItem.value, matchingFontSize );
+ 			} }
+-			size={ size }
+ 		/>
+ 	);
+ };
+diff --git a/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx b/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
+index a9e516440fe040..fb1233b0bf6785 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
+@@ -14,14 +14,7 @@ import { T_SHIRT_ABBREVIATIONS, T_SHIRT_NAMES } from './constants';
+ import type { FontSizePickerToggleGroupProps } from './types';
+ 
+ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
+-	const {
+-		fontSizes,
+-		value,
+-		valueMode = 'literal',
+-		__next40pxDefaultSize,
+-		size,
+-		onChange,
+-	} = props;
++	const { fontSizes, value, valueMode = 'literal', onChange } = props;
+ 
+ 	// Find the current value based on valueMode
+ 	const currentValue = ( () => {
+@@ -56,8 +49,7 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
+ 
+ 	return (
+ 		<ToggleGroupControl
+-			__next40pxDefaultSize={ __next40pxDefaultSize }
+-			__shouldNotWarnDeprecated36pxSize
++			__next40pxDefaultSize
+ 			label={ __( 'Font size' ) }
+ 			hideLabelFromVision
+ 			value={ currentValue }
+@@ -78,7 +70,6 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
+ 				}
+ 			} }
+ 			isBlock
+-			size={ size }
+ 		>
+ 			{ fontSizes.map( ( fontSize, index ) => (
+ 				<ToggleGroupControlOption
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index dea913176bd87a..34675b0dfc9cc7 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -27,7 +27,6 @@ import { Container, Header, HeaderLabel, HeaderToggle } from './styles';
+ import { Spacer } from '../spacer';
+ import FontSizePickerSelect from './font-size-picker-select';
+ import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
+-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
+ 
+@@ -38,12 +37,10 @@ const UnforwardedFontSizePicker = (
+ 	ref: ForwardedRef< any >
+ ) => {
+ 	const {
+-		__next40pxDefaultSize = false,
+ 		fallbackFontSize,
+ 		fontSizes = [],
+ 		disableCustomFontSizes = false,
+ 		onChange,
+-		size = 'default',
+ 		units: unitsProp = DEFAULT_UNITS,
+ 		value,
+ 		valueMode = 'literal',
+@@ -117,12 +114,6 @@ const UnforwardedFontSizePicker = (
+ 		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
+ 	const isDisabled = value === undefined;
+ 
+-	maybeWarnDeprecated36pxSize( {
+-		componentName: 'FontSizePicker',
+-		__next40pxDefaultSize,
+-		size,
+-	} );
+-
+ 	return (
+ 		<Container
+ 			ref={ ref }
+@@ -155,12 +146,10 @@ const UnforwardedFontSizePicker = (
+ 			<div>
+ 				{ currentPickerType === 'select' && (
+ 					<FontSizePickerSelect
+-						__next40pxDefaultSize={ __next40pxDefaultSize }
+ 						fontSizes={ fontSizes }
+ 						value={ value }
+ 						valueMode={ valueMode }
+ 						disableCustomFontSizes={ disableCustomFontSizes }
+-						size={ size }
+ 						onChange={ ( newValue, selectedItem ) => {
+ 							if ( newValue === undefined ) {
+ 								onChange?.( undefined, selectedItem );
+@@ -179,8 +168,6 @@ const UnforwardedFontSizePicker = (
+ 						fontSizes={ fontSizes }
+ 						value={ value }
+ 						valueMode={ valueMode }
+-						__next40pxDefaultSize={ __next40pxDefaultSize }
+-						size={ size }
+ 						onChange={ ( newValue, selectedItem ) => {
+ 							if ( newValue === undefined ) {
+ 								onChange?.( undefined, selectedItem );
+@@ -197,8 +184,7 @@ const UnforwardedFontSizePicker = (
+ 					<Flex className="components-font-size-picker__custom-size-control">
+ 						<FlexItem isBlock>
+ 							<UnitControl
+-								__next40pxDefaultSize={ __next40pxDefaultSize }
+-								__shouldNotWarnDeprecated36pxSize
++								__next40pxDefaultSize
+ 								label={ __( 'Font size' ) }
+ 								labelPosition="top"
+ 								hideLabelFromVision
+@@ -226,7 +212,6 @@ const UnforwardedFontSizePicker = (
+ 										);
+ 									}
+ 								} }
+-								size={ size }
+ 								units={ hasUnits ? units : [] }
+ 								min={ 0 }
+ 							/>
+@@ -235,10 +220,7 @@ const UnforwardedFontSizePicker = (
+ 							<FlexItem isBlock>
+ 								<Spacer marginX={ 2 } marginBottom={ 0 }>
+ 									<RangeControl
+-										__next40pxDefaultSize={
+-											__next40pxDefaultSize
+-										}
+-										__shouldNotWarnDeprecated36pxSize
++										__next40pxDefaultSize
+ 										className="components-font-size-picker__custom-input"
+ 										label={ __( 'Font size' ) }
+ 										hideLabelFromVision
+@@ -276,12 +258,7 @@ const UnforwardedFontSizePicker = (
+ 									} }
+ 									variant="secondary"
+ 									__next40pxDefaultSize
+-									size={
+-										size === '__unstable-large' ||
+-										props.__next40pxDefaultSize
+-											? 'default'
+-											: 'small'
+-									}
++									size="default"
+ 								>
+ 									{ __( 'Reset' ) }
+ 								</Button>
+diff --git a/packages/components/src/font-size-picker/stories/e2e/index.story.tsx b/packages/components/src/font-size-picker/stories/e2e/index.story.tsx
+index 62ec7c17a6ebe1..2955513f95a510 100644
+--- a/packages/components/src/font-size-picker/stories/e2e/index.story.tsx
++++ b/packages/components/src/font-size-picker/stories/e2e/index.story.tsx
+@@ -25,7 +25,6 @@ const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
+ 	const [ fontSize, setFontSize ] = useState( value );
+ 	return (
+ 		<FontSizePicker
+-			__next40pxDefaultSize
+ 			{ ...props }
+ 			value={ fontSize }
+ 			onChange={ setFontSize }
+@@ -36,7 +35,6 @@ const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
+ export const Default: StoryFn< typeof FontSizePicker > =
+ 	FontSizePickerWithState.bind( {} );
+ Default.args = {
+-	__next40pxDefaultSize: true,
+ 	fontSizes: [
+ 		{
+ 			name: 'Small',
+diff --git a/packages/components/src/font-size-picker/stories/index.story.tsx b/packages/components/src/font-size-picker/stories/index.story.tsx
+index b4a4790fc532ad..eeab4eff7e4d73 100644
+--- a/packages/components/src/font-size-picker/stories/index.story.tsx
++++ b/packages/components/src/font-size-picker/stories/index.story.tsx
+@@ -48,7 +48,6 @@ const FontSizePickerWithState = ( {
+ 	const [ fontSize, setFontSize ] = useState( value );
+ 	return (
+ 		<FontSizePicker
+-			__next40pxDefaultSize
+ 			{ ...props }
+ 			value={ fontSize }
+ 			onChange={ ( nextValue ) => {
+@@ -80,7 +79,6 @@ const TwoFontSizePickersWithState = ( {
+ export const Default: FontSizePickerStory = {
+ 	render: FontSizePickerWithState,
+ 	args: {
+-		__next40pxDefaultSize: true,
+ 		disableCustomFontSizes: false,
+ 		fontSizes: [
+ 			{
+diff --git a/packages/components/src/font-size-picker/test/font-size-picker-select.tsx b/packages/components/src/font-size-picker/test/font-size-picker-select.tsx
+index 1ad8457984752b..06adc862733432 100644
+--- a/packages/components/src/font-size-picker/test/font-size-picker-select.tsx
++++ b/packages/components/src/font-size-picker/test/font-size-picker-select.tsx
+@@ -41,8 +41,6 @@ describe( 'FontSizePickerSelect', () => {
+ 					onChange={ onChange }
+ 					onSelectCustom={ jest.fn() }
+ 					disableCustomFontSizes={ false }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should select the medium option (16px)
+@@ -61,8 +59,6 @@ describe( 'FontSizePickerSelect', () => {
+ 					onChange={ onChange }
+ 					onSelectCustom={ jest.fn() }
+ 					disableCustomFontSizes={ false }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should select the medium option
+@@ -81,8 +77,6 @@ describe( 'FontSizePickerSelect', () => {
+ 					onChange={ onChange }
+ 					onSelectCustom={ jest.fn() }
+ 					disableCustomFontSizes={ false }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should show default option
+@@ -101,8 +95,6 @@ describe( 'FontSizePickerSelect', () => {
+ 					onChange={ onChange }
+ 					onSelectCustom={ jest.fn() }
+ 					disableCustomFontSizes={ false }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should show default option
+@@ -122,8 +114,6 @@ describe( 'FontSizePickerSelect', () => {
+ 					onChange={ onChange }
+ 					onSelectCustom={ jest.fn() }
+ 					disableCustomFontSizes={ false }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			await user.click(
+@@ -145,8 +135,6 @@ describe( 'FontSizePickerSelect', () => {
+ 					onChange={ onChange }
+ 					onSelectCustom={ jest.fn() }
+ 					disableCustomFontSizes={ false }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			await user.click(
+@@ -188,8 +176,6 @@ describe( 'FontSizePickerSelect', () => {
+ 					onChange={ onChange }
+ 					onSelectCustom={ jest.fn() }
+ 					disableCustomFontSizes={ false }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should show the first matching font size when there are multiple matches
+@@ -208,8 +194,6 @@ describe( 'FontSizePickerSelect', () => {
+ 					onChange={ onChange }
+ 					onSelectCustom={ jest.fn() }
+ 					disableCustomFontSizes={ false }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should select the specific font size by slug
+diff --git a/packages/components/src/font-size-picker/test/font-size-picker-toggle-group.tsx b/packages/components/src/font-size-picker/test/font-size-picker-toggle-group.tsx
+index 68fa18f457366b..e26211b12445dd 100644
+--- a/packages/components/src/font-size-picker/test/font-size-picker-toggle-group.tsx
++++ b/packages/components/src/font-size-picker/test/font-size-picker-toggle-group.tsx
+@@ -39,8 +39,6 @@ describe( 'FontSizePickerToggleGroup', () => {
+ 					value="16px"
+ 					valueMode="literal"
+ 					onChange={ onChange }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should select the medium option (16px)
+@@ -57,8 +55,6 @@ describe( 'FontSizePickerToggleGroup', () => {
+ 					value="medium"
+ 					valueMode="slug"
+ 					onChange={ onChange }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should select the medium option
+@@ -75,8 +71,6 @@ describe( 'FontSizePickerToggleGroup', () => {
+ 					value={ undefined }
+ 					valueMode="literal"
+ 					onChange={ onChange }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should have no selection
+@@ -93,8 +87,6 @@ describe( 'FontSizePickerToggleGroup', () => {
+ 					value=""
+ 					valueMode="literal"
+ 					onChange={ onChange }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should have no selection
+@@ -112,8 +104,6 @@ describe( 'FontSizePickerToggleGroup', () => {
+ 				<FontSizePickerToggleGroup
+ 					fontSizes={ fontSizes }
+ 					onChange={ onChange }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			await user.click( screen.getByRole( 'radio', { name: 'Small' } ) );
+@@ -128,8 +118,6 @@ describe( 'FontSizePickerToggleGroup', () => {
+ 					fontSizes={ fontSizes }
+ 					value="medium"
+ 					onChange={ onChange }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Click a different option
+@@ -165,8 +153,6 @@ describe( 'FontSizePickerToggleGroup', () => {
+ 					value="12px"
+ 					valueMode="literal"
+ 					onChange={ onChange }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should have no selection when there are multiple matches
+@@ -183,8 +169,6 @@ describe( 'FontSizePickerToggleGroup', () => {
+ 					value="small-1"
+ 					valueMode="slug"
+ 					onChange={ onChange }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should select the specific font size by slug
+@@ -226,8 +210,6 @@ describe( 'FontSizePickerToggleGroup', () => {
+ 					value="1em"
+ 					valueMode="literal"
+ 					onChange={ onChange }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should select the medium option (1em)
+@@ -244,8 +226,6 @@ describe( 'FontSizePickerToggleGroup', () => {
+ 					value="clamp(1.75rem, 3vw, 2.25rem)"
+ 					valueMode="literal"
+ 					onChange={ onChange }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should select the extra large option
+@@ -262,8 +242,6 @@ describe( 'FontSizePickerToggleGroup', () => {
+ 					value="medium"
+ 					valueMode="slug"
+ 					onChange={ onChange }
+-					__next40pxDefaultSize={ false }
+-					size="default"
+ 				/>
+ 			);
+ 			// Should select the medium option
+diff --git a/packages/components/src/font-size-picker/test/index.tsx b/packages/components/src/font-size-picker/test/index.tsx
+index 8893747c4cf758..f86f1e33569224 100644
+--- a/packages/components/src/font-size-picker/test/index.tsx
++++ b/packages/components/src/font-size-picker/test/index.tsx
+@@ -1,23 +1,9 @@
+-/**
+- * External dependencies
+- */
+ import { screen, fireEvent } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ import { render } from '@ariakit/test/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import _FontSizePicker from '../';
+-import type { FontSize } from '../types';
+-/**
+- * WordPress dependencies
+- */
+ import { useState } from '@wordpress/element';
+-
+-const FontSizePicker = (
+-	props: React.ComponentProps< typeof _FontSizePicker >
+-) => <_FontSizePicker __next40pxDefaultSize { ...props } />;
++import FontSizePicker from '../';
++import type { FontSize } from '../types';
+ 
+ const ControlledFontSizePicker = ( {
+ 	onChange,
+diff --git a/packages/components/src/font-size-picker/types.ts b/packages/components/src/font-size-picker/types.ts
+index fbefcd39a47bb4..0f3bd7d0924283 100644
+--- a/packages/components/src/font-size-picker/types.ts
++++ b/packages/components/src/font-size-picker/types.ts
+@@ -77,13 +77,15 @@ export type FontSizePickerProps = {
+ 	/**
+ 	 * Start opting into the larger default height that will become the default size in a future version.
+ 	 *
+-	 * @default false
++	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
++	 * @ignore
+ 	 */
+ 	__next40pxDefaultSize?: boolean;
+ 	/**
+ 	 * Size of the control.
+ 	 *
+-	 * @default 'default'
++	 * @deprecated This prop no longer has any effect.
++	 * @ignore
+ 	 */
+ 	size?: 'default' | '__unstable-large';
+ };
+@@ -114,7 +116,7 @@ export type FontSize = {
+ 
+ export type FontSizePickerSelectProps = Pick<
+ 	FontSizePickerProps,
+-	'value' | 'size' | 'valueMode'
++	'value' | 'valueMode'
+ > & {
+ 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
+ 	disableCustomFontSizes: NonNullable<
+@@ -125,7 +127,6 @@ export type FontSizePickerSelectProps = Pick<
+ 		selectedItem?: FontSize
+ 	) => void;
+ 	onSelectCustom: () => void;
+-	__next40pxDefaultSize: boolean;
+ };
+ 
+ export type FontSizePickerSelectOption = {
+@@ -137,7 +138,7 @@ export type FontSizePickerSelectOption = {
+ 
+ export type FontSizePickerToggleGroupProps = Pick<
+ 	FontSizePickerProps,
+-	'value' | 'size' | '__next40pxDefaultSize' | 'valueMode'
++	'value' | 'valueMode'
+ > & {
+ 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
+ 	onChange: (
+diff --git a/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md b/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
+index 201dfc817e934c..6927641716dcaf 100644
+--- a/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
++++ b/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
+@@ -14,7 +14,6 @@ The following components are checked by this rule:
+ -   CustomSelectControl
+ -   FontAppearanceControl
+ -   FontFamilyControl
+--   FontSizePicker
+ -   FormFileUpload (special case - see below)
+ -   FormTokenField
+ -   InputControl
+diff --git a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+index 25555a71311a95..ff90dc5fd9fd09 100644
+--- a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+@@ -115,7 +115,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
+ 					CustomSelectControl,
+ 					FontAppearanceControl,
+ 					FontFamilyControl,
+-					FontSizePicker,
+ 					FormTokenField,
+ 					InputControl,
+ 					LetterSpacingControl,
+@@ -132,7 +131,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
+ 					<CustomSelectControl __next40pxDefaultSize />
+ 					<FontAppearanceControl __next40pxDefaultSize />
+ 					<FontFamilyControl __next40pxDefaultSize />
+-					<FontSizePicker __next40pxDefaultSize />
+ 					<FormTokenField __next40pxDefaultSize />
+ 					<InputControl __next40pxDefaultSize />
+ 					<LetterSpacingControl __next40pxDefaultSize />
+diff --git a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+index 834da3b88e64aa..67dfcbdf05bec7 100644
+--- a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+@@ -19,7 +19,6 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
+ 	'CustomSelectControl',
+ 	'FontAppearanceControl',
+ 	'FontFamilyControl',
+-	'FontSizePicker',
+ 	'FormTokenField',
+ 	'IconButton',
+ 	'InputControl',
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index ff687266d32ae4..ac56ff94767007 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -169,12 +169,15 @@ const restrictedSyntax = [
+ 		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
+ 		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
+ 	},
+-	...[ 'BorderBoxControl', 'BoxControl', 'TextControl' ].map(
+-		( componentName ) => ( {
+-			selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
+-			message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,
+-		} )
+-	),
++	...[
++		'BorderBoxControl',
++		'BoxControl',
++		'FontSizePicker',
++		'TextControl',
++	].map( ( componentName ) => ( {
++		selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
++		message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,
++	} ) ),
+ 	{
+ 		selector:
+ 			'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',

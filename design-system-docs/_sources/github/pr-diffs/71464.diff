@@ -1,0 +1,64 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5ebdea267d252f..29aa6f4bf78f28 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `TextareaControl`: Add default resize: vertical rule ([#71736](https://github.com/WordPress/gutenberg/pull/71736)).
+ 
++### Bug Fixes
++
++-   `Button`: Fix incorrect padding with text and right icon ([#71464](https://github.com/WordPress/gutenberg/pull/71464)).
++
+ ### Internal
+ 
+ -   Expose `ValidatedFormTokenField` via private APIs [#71194](https://github.com/WordPress/gutenberg/pull/71194)
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index 0ab6b24b4dd6aa..ca4533c679108b 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -161,6 +161,7 @@ export function UnforwardedButton(
+ 		'is-destructive': isDestructive,
+ 		'has-text': !! icon && ( hasChildren || text ),
+ 		'has-icon': !! icon,
++		'has-icon-right': iconPosition === 'right',
+ 	} );
+ 
+ 	const trulyDisabled = disabled && ! accessibleWhenDisabled;
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 2d993c5942cc89..5d734cc17442e7 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -342,6 +342,10 @@
+ 			padding-right: $grid-unit-15;
+ 			padding-left: $grid-unit-10;
+ 			gap: $grid-unit-05;
++			&.has-icon-right {
++				padding-right: $grid-unit-10;
++				padding-left: $grid-unit-15;
++			}
+ 		}
+ 	}
+ 
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index 5f04209a079f12..a69ffc3550389e 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -156,7 +156,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+             class="post-publish-panel__postpublish-buttons"
+           >
+             <a
+-              class="components-button is-next-40px-default-size is-primary has-icon"
++              class="components-button is-next-40px-default-size is-primary has-icon has-icon-right"
+               href="https://wordpress.local/sample-page/"
+               target="_blank"
+             >
+@@ -383,7 +383,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+             class="post-publish-panel__postpublish-buttons"
+           >
+             <a
+-              class="components-button is-next-40px-default-size is-primary has-icon"
++              class="components-button is-next-40px-default-size is-primary has-icon has-icon-right"
+               href="https://wordpress.local/sample-page/"
+               target="_blank"
+             >

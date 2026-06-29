@@ -1,0 +1,365 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3d5b0d9dfe1f35..838f13c26e99fc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -21,7 +21,8 @@
+ 
+ -   Add type support for CSS Custom Properties ([#61872](https://github.com/WordPress/gutenberg/pull/61872)).
+ -   Remove usage of deprecated spreading of `key` prop in JSX in CustomSelectControl and FormTokenField components ([#61692](https://github.com/WordPress/gutenberg/pull/61692)).
+--   Tooltip: Fix Ariakit tooltip store usage ([#61858](https://github.com/WordPress/gutenberg/pull/61858)).
++-   `Tooltip`: Fix Ariakit tooltip store usage ([#61858](https://github.com/WordPress/gutenberg/pull/61858)).
++-   `CustomSelectControlV2`: Use `InputBase` for styling ([#60261](https://github.com/WordPress/gutenberg/pull/60261)).
+ 
+ ## 27.6.0 (2024-05-16)
+ 
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index 2bd1221f1381eb..9ae402d37f40d9 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -3,7 +3,6 @@
+  */
+ import { createContext, useMemo } from '@wordpress/element';
+ import { __, sprintf } from '@wordpress/i18n';
+-import { Icon, chevronDown } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+@@ -14,13 +13,12 @@ import type {
+ 	CustomSelectContext as CustomSelectContextType,
+ 	CustomSelectStore,
+ 	CustomSelectButtonProps,
++	CustomSelectButtonSize,
+ 	_CustomSelectProps,
+ } from './types';
+-import {
+-	contextConnectWithoutRef,
+-	useContextSystem,
+-	type WordPressComponentProps,
+-} from '../context';
++import type { WordPressComponentProps } from '../context';
++import InputBase from '../input-control/input-base';
++import SelectControlChevronDown from '../select-control/chevron-down';
+ 
+ export const CustomSelectContext =
+ 	createContext< CustomSelectContextType >( undefined );
+@@ -46,23 +44,19 @@ function defaultRenderSelectedValue(
+ 	return value;
+ }
+ 
+-const UnconnectedCustomSelectButton = (
+-	props: Omit<
+-		WordPressComponentProps<
+-			CustomSelectButtonProps & CustomSelectStore,
+-			'button',
+-			false
+-		>,
+-		'onChange'
+-	>
+-) => {
+-	const {
+-		renderSelectedValue,
+-		size = 'default',
+-		store,
+-		...restProps
+-	} = useContextSystem( props, 'CustomSelectControlButton' );
+-
++const CustomSelectButton = ( {
++	renderSelectedValue,
++	size = 'default',
++	store,
++	...restProps
++}: Omit<
++	WordPressComponentProps<
++		CustomSelectButtonProps & CustomSelectButtonSize & CustomSelectStore,
++		'button',
++		false
++	>,
++	'onChange'
++> ) => {
+ 	const { value: currentValue } = store.useState();
+ 
+ 	const computedRenderSelectedValue = useMemo(
+@@ -81,21 +75,18 @@ const UnconnectedCustomSelectButton = (
+ 			showOnKeyDown={ false }
+ 		>
+ 			<div>{ computedRenderSelectedValue( currentValue ) }</div>
+-			<Icon icon={ chevronDown } size={ 18 } />
+ 		</Styled.Select>
+ 	);
+ };
+ 
+-const CustomSelectButton = contextConnectWithoutRef(
+-	UnconnectedCustomSelectButton,
+-	'CustomSelectControlButton'
+-);
+-
+-function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
++function _CustomSelect(
++	props: _CustomSelectProps & CustomSelectStore & CustomSelectButtonSize
++) {
+ 	const {
+ 		children,
+ 		hideLabelFromVision = false,
+ 		label,
++		size,
+ 		store,
+ 		...restProps
+ 	} = props;
+@@ -109,12 +100,22 @@ function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
+ 					{ label }
+ 				</Styled.SelectLabel>
+ 			) }
+-			<CustomSelectButton { ...restProps } store={ store } />
+-			<Styled.SelectPopover gutter={ 12 } store={ store } sameWidth>
+-				<CustomSelectContext.Provider value={ { store } }>
+-					{ children }
+-				</CustomSelectContext.Provider>
+-			</Styled.SelectPopover>
++			<InputBase
++				__next40pxDefaultSize
++				size={ size }
++				suffix={ <SelectControlChevronDown /> }
++			>
++				<CustomSelectButton
++					{ ...restProps }
++					size={ size }
++					store={ store }
++				/>
++				<Styled.SelectPopover gutter={ 12 } store={ store } sameWidth>
++					<CustomSelectContext.Provider value={ { store } }>
++						{ children }
++					</CustomSelectContext.Provider>
++				</Styled.SelectPopover>
++			</InputBase>
+ 		</>
+ 	);
+ }
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+index 0472d7df327b6f..43f102e6ee0493 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+@@ -3,10 +3,7 @@
+  */
+ // eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+-/**
+- * WordPress dependencies
+- */
+-import { useMemo } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+@@ -14,12 +11,12 @@ import _CustomSelect from '../custom-select';
+ import CustomSelectItem from '../item';
+ import type { LegacyCustomSelectProps } from '../types';
+ import * as Styled from '../styles';
+-import { ContextSystemProvider } from '../../context';
+ 
+ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 	const {
+ 		__experimentalShowSelectedHint,
+ 		__next40pxDefaultSize = false,
++		describedBy,
+ 		options,
+ 		onChange,
+ 		size = 'default',
+@@ -94,39 +91,33 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 		);
+ 	};
+ 
+-	// translate legacy button sizing
+-	const contextSystemValue = useMemo( () => {
+-		let selectedSize;
+-
++	const translatedSize = ( () => {
+ 		if (
+ 			( __next40pxDefaultSize && size === 'default' ) ||
+ 			size === '__unstable-large'
+ 		) {
+-			selectedSize = 'default';
+-		} else if ( ! __next40pxDefaultSize && size === 'default' ) {
+-			selectedSize = 'compact';
+-		} else {
+-			selectedSize = size;
++			return 'default';
+ 		}
+-
+-		return {
+-			CustomSelectControlButton: { _overrides: { size: selectedSize } },
+-		};
+-	}, [ __next40pxDefaultSize, size ] );
+-
+-	const translatedProps = {
+-		'aria-describedby': props.describedBy,
+-		children,
+-		renderSelectedValue: __experimentalShowSelectedHint
+-			? renderSelectedValueHint
+-			: undefined,
+-		...restProps,
+-	};
++		if ( ! __next40pxDefaultSize && size === 'default' ) {
++			return 'compact';
++		}
++		return size;
++	} )();
+ 
+ 	return (
+-		<ContextSystemProvider value={ contextSystemValue }>
+-			<_CustomSelect { ...translatedProps } store={ store } />
+-		</ContextSystemProvider>
++		<_CustomSelect
++			aria-describedby={ describedBy }
++			renderSelectedValue={
++				__experimentalShowSelectedHint
++					? renderSelectedValueHint
++					: undefined
++			}
++			size={ translatedSize }
++			store={ store }
++			{ ...restProps }
++		>
++			{ children }
++		</_CustomSelect>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index f268b75b30c5cd..676a9c1a1ec590 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -10,7 +10,7 @@ import styled from '@emotion/styled';
+  */
+ import { COLORS, CONFIG } from '../utils';
+ import { space } from '../utils/space';
+-import type { CustomSelectButtonProps } from './types';
++import type { CustomSelectButtonSize } from './types';
+ 
+ const ITEM_PADDING = space( 2 );
+ 
+@@ -46,7 +46,7 @@ export const Select = styled( Ariakit.Select, {
+ 	size,
+ 	hasCustomRenderProp,
+ }: {
+-	size: NonNullable< CustomSelectButtonProps[ 'size' ] >;
++	size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
+ 	hasCustomRenderProp: boolean;
+ } ) => {
+ 	const heightProperty = hasCustomRenderProp ? 'minHeight' : 'height';
+@@ -79,17 +79,15 @@ export const Select = styled( Ariakit.Select, {
+ 		align-items: center;
+ 		justify-content: space-between;
+ 		background-color: ${ COLORS.theme.background };
+-		border: 1px solid ${ COLORS.ui.border };
+-		border-radius: 2px;
++		border: none;
+ 		cursor: pointer;
+ 		font-size: ${ CONFIG.fontSize };
+ 		width: 100%;
++
+ 		&[data-focus-visible] {
+-			outline-style: solid;
+-		}
+-		&[aria-expanded='true'] {
+-			outline: 1.5px solid ${ COLORS.theme.accent };
++			outline: none; // handled by InputBase component
+ 		}
++
+ 		${ getSize() }
+ 	`;
+ } );
+@@ -98,6 +96,10 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
+ 	border-radius: 2px;
+ 	background: ${ COLORS.theme.background };
+ 	border: 1px solid ${ COLORS.theme.foreground };
++
++	&[data-focus-visible] {
++		outline: none; // outline will be on the trigger, rather than the popover
++	}
+ `;
+ 
+ export const SelectItem = styled( Ariakit.SelectItem )`
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+index 313bc06dd493b6..5540a533c09d45 100644
+--- a/packages/components/src/custom-select-control-v2/types.ts
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -14,6 +14,19 @@ export type CustomSelectStore = {
+ 
+ export type CustomSelectContext = CustomSelectStore | undefined;
+ 
++type CustomSelectSize< Size = 'compact' | 'default' > = {
++	/**
++	 * The size of the control.
++	 *
++	 * @default 'default'
++	 */
++	size?: Size;
++};
++
++export type CustomSelectButtonSize = CustomSelectSize<
++	'compact' | 'default' | 'small'
++>;
++
+ export type CustomSelectButtonProps = {
+ 	/**
+ 	 * An optional default value for the control when used in uncontrolled mode.
+@@ -30,19 +43,13 @@ export type CustomSelectButtonProps = {
+ 	renderSelectedValue?: (
+ 		selectedValue: string | string[]
+ 	) => React.ReactNode;
+-	/**
+-	 * The size of the control.
+-	 *
+-	 * @default 'default'
+-	 */
+-	size?: 'compact' | 'default' | 'small';
+ 	/**
+ 	 * The value of the control when used in uncontrolled mode.
+ 	 */
+ 	value?: string | string[];
+ };
+ 
+-export type _CustomSelectProps = {
++export type _CustomSelectProps = CustomSelectButtonProps & {
+ 	/**
+ 	 * The child elements. This should be composed of `CustomSelectItem` components.
+ 	 */
+@@ -60,14 +67,8 @@ export type _CustomSelectProps = {
+ };
+ 
+ export type CustomSelectProps = _CustomSelectProps &
+-	Omit< CustomSelectButtonProps, 'size' > & {
+-		/**
+-		 * The size of the control.
+-		 *
+-		 * @default 'default'
+-		 */
+-		size?: Exclude< CustomSelectButtonProps[ 'size' ], 'small' >;
+-	};
++	CustomSelectButtonProps &
++	CustomSelectSize;
+ 
+ /**
+  * The legacy object structure for the options array.
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index 9e34139f3e54b5..58396f3ab98591 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -64,7 +64,7 @@ function getUIFlexProps( labelPosition?: LabelPosition ) {
+ 	return props;
+ }
+ 
+-export function InputBase(
++function InputBase(
+ 	props: WordPressComponentProps< InputBaseProps, 'div' >,
+ 	ref: ForwardedRef< HTMLDivElement >
+ ) {
+@@ -144,4 +144,8 @@ export function InputBase(
+ 	);
+ }
+ 
++/**
++ * `InputBase` is an internal component used to style the standard borders for an input,
++ * as well as handle the layout for prefix/suffix elements.
++ */
+ export default contextConnect( InputBase, 'InputBase' );

@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f99fd10a1737c9..97e5c9f7f2a14b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79112](https://github.com/WordPress/gutenberg/pull/79112)).
++
+ ### Bug Fixes
+ 
+ -   `SandBox`: Fix the viewport-unit (`vh`, `vw`, etc.) stripping so user-supplied HTML using these units in `width`/`height` no longer triggers a runaway resize loop in the preview ([#78677](https://github.com/WordPress/gutenberg/pull/78677)).
+diff --git a/packages/components/src/base-control/styles/base-control-styles.ts b/packages/components/src/base-control/styles/base-control-styles.ts
+index 773e83908d492d..48fb0f2b70335f 100644
+--- a/packages/components/src/base-control/styles/base-control-styles.ts
++++ b/packages/components/src/base-control/styles/base-control-styles.ts
+@@ -45,6 +45,7 @@ export const StyledHelp = styled.p`
+ 	font-size: ${ font( 'helpText.fontSize' ) };
+ 	font-style: normal;
+ 	color: ${ COLORS.gray[ 700 ] };
++	text-wrap: pretty;
+ `;
+ 
+ export const StyledVisualLabel = styled.span`

@@ -1,0 +1,100 @@
+diff --git a/packages/components/src/form-toggle/README.md b/packages/components/src/form-toggle/README.md
+index 7db5d8c412bd41..4a00a62f2e12f8 100644
+--- a/packages/components/src/form-toggle/README.md
++++ b/packages/components/src/form-toggle/README.md
+@@ -79,6 +79,13 @@ If no value is passed the toggle will be unchecked.
+ - Type: `Boolean`
+ - Required: No
+ 
++#### disabled
++
++If disabled is true the toggle will be disabled and apply the appropriate styles.
++
++- Type: `Boolean`
++- Required: No
++
+ #### onChange
+ 
+ A function that receives the checked state (boolean) as input.
+diff --git a/packages/components/src/form-toggle/index.js b/packages/components/src/form-toggle/index.js
+index 053addfe325400..4e5de8f4fdb9ed 100644
+--- a/packages/components/src/form-toggle/index.js
++++ b/packages/components/src/form-toggle/index.js
+@@ -4,9 +4,17 @@
+ import classnames from 'classnames';
+ import { noop } from 'lodash';
+ 
+-function FormToggle( { className, checked, id, onChange = noop, ...props } ) {
++function FormToggle( {
++	className,
++	checked,
++	id,
++	disabled,
++	onChange = noop,
++	...props
++} ) {
+ 	const wrapperClasses = classnames( 'components-form-toggle', className, {
+ 		'is-checked': checked,
++		'is-disabled': disabled,
+ 	} );
+ 
+ 	return (
+@@ -17,6 +25,7 @@ function FormToggle( { className, checked, id, onChange = noop, ...props } ) {
+ 				type="checkbox"
+ 				checked={ checked }
+ 				onChange={ onChange }
++				disabled={ disabled }
+ 				{ ...props }
+ 			/>
+ 			<span className="components-form-toggle__track"></span>
+diff --git a/packages/components/src/form-toggle/style.scss b/packages/components/src/form-toggle/style.scss
+index 3805880b84e82b..d4b74aaa1f4f55 100644
+--- a/packages/components/src/form-toggle/style.scss
++++ b/packages/components/src/form-toggle/style.scss
+@@ -60,6 +60,7 @@ $toggle-border-width: 1px;
+ 	}
+ 
+ 	// Disabled state:
++	&.is-disabled,
+ 	.components-disabled & {
+ 		opacity: 0.3;
+ 	}
+diff --git a/packages/components/src/toggle-control/README.md b/packages/components/src/toggle-control/README.md
+index 1413733c4628d9..8aabf698ca0ef4 100644
+--- a/packages/components/src/toggle-control/README.md
++++ b/packages/components/src/toggle-control/README.md
+@@ -48,6 +48,14 @@ If no value is passed the toggle will be unchecked.
+ - Type: `Boolean`
+ - Required: No
+ 
++### disabled
++
++If disabled is true the toggle will be disabled and apply the appropriate styles.
++
++- Type: `Boolean`
++- Required: No
++
++
+ ### onChange
+ 
+ A function that receives the checked state (boolean) as input.
+diff --git a/packages/components/src/toggle-control/index.js b/packages/components/src/toggle-control/index.js
+index 159c920b156418..16615c4fb3282c 100644
+--- a/packages/components/src/toggle-control/index.js
++++ b/packages/components/src/toggle-control/index.js
+@@ -21,6 +21,7 @@ export default function ToggleControl( {
+ 	help,
+ 	className,
+ 	onChange,
++	disabled,
+ } ) {
+ 	function onChangeToggle( event ) {
+ 		onChange( event.target.checked );
+@@ -45,6 +46,7 @@ export default function ToggleControl( {
+ 				checked={ checked }
+ 				onChange={ onChangeToggle }
+ 				aria-describedby={ describedBy }
++				disabled={ disabled }
+ 			/>
+ 			<label htmlFor={ id } className="components-toggle-control__label">
+ 				{ label }

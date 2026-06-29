@@ -1,0 +1,156 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1d44ce4a17d4a4..4c2f655533f2bb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `CustomGradientPicker`: Convert to TypeScript ([#48929](https://github.com/WordPress/gutenberg/pull/48929)).
+ 
++### Enhancements
++
++-   `CustomGradientPicker`: improve initial state UI ([#49146](https://github.com/WordPress/gutenberg/pull/49146)).
++
+ ## 23.6.0 (2023-03-15)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx b/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
+index 225a5fb75754dd..53589aa1d3efd8 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
+@@ -139,9 +139,15 @@ export default function CustomGradientBar( {
+ 			) }
+ 			onMouseEnter={ onMouseEnterAndMove }
+ 			onMouseMove={ onMouseEnterAndMove }
+-			style={ { background } }
+ 			onMouseLeave={ onMouseLeave }
+ 		>
++			<div
++				className="components-custom-gradient-picker__gradient-bar-background"
++				style={ {
++					background,
++					opacity: hasGradient ? 1 : 0.4,
++				} }
++			/>
+ 			<div
+ 				ref={ gradientMarkersContainerDomRef }
+ 				className="components-custom-gradient-picker__markers-container"
+diff --git a/packages/components/src/custom-gradient-picker/index.tsx b/packages/components/src/custom-gradient-picker/index.tsx
+index 5be6bdc8f5c125..19cfd8f740df7d 100644
+--- a/packages/components/src/custom-gradient-picker/index.tsx
++++ b/packages/components/src/custom-gradient-picker/index.tsx
+@@ -29,7 +29,6 @@ import {
+ 	DEFAULT_LINEAR_GRADIENT_ANGLE,
+ 	HORIZONTAL_GRADIENT_ORIENTATION,
+ 	GRADIENT_OPTIONS,
+-	DEFAULT_GRADIENT,
+ } from './constants';
+ import {
+ 	AccessoryWrapper,
+@@ -148,13 +147,13 @@ export function CustomGradientPicker( {
+ 	onChange,
+ 	__experimentalIsRenderedInSidebar = false,
+ }: CustomGradientPickerProps ) {
+-	const { gradientAST, gradientAstValue } =
+-		getGradientAstWithDefault( value );
++	const { gradientAST, hasGradient } = getGradientAstWithDefault( value );
++
+ 	// On radial gradients the bar should display a linear gradient.
+ 	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
+ 	// On liner gradients the bar represents the color stops from left to right independently of the angle.
+ 	const background = getLinearGradientRepresentation( gradientAST );
+-	const hasGradient = gradientAstValue !== DEFAULT_GRADIENT;
++
+ 	// Control points color option may be hex from presets, custom colors will be rgb.
+ 	// The position should always be a percentage.
+ 	const controlPoints = gradientAST.colorStops.map( ( colorStop ) => {
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index c3c236f2367058..a5ee7831296d87 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -7,14 +7,30 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ 	}
+ }
+ 
+-.components-custom-gradient-picker__gradient-bar:not(.has-gradient) {
+-	opacity: 0.4;
+-}
+-
+ .components-custom-gradient-picker__gradient-bar {
+ 	border-radius: $radius-block-ui;
+ 	width: 100%;
+ 	height: $grid-unit-60;
++	position: relative;
++	z-index: 1;
++
++	&.has-gradient {
++		// The background image creates a checkerboard pattern. Ignore rtlcss to
++		// make it work both in LTR and RTL.
++		// See https://github.com/WordPress/gutenberg/pull/42510
++		/*rtl:begin:ignore*/
++		background-image:
++			repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200),
++			repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200);
++		background-position: 0 0, 12px 12px;
++		/*rtl:end:ignore*/
++		background-size: calc(2 * 12px) calc(2 * 12px);
++	}
++
++	.components-custom-gradient-picker__gradient-bar-background {
++		position: absolute;
++		inset: 0;
++	}
+ 
+ 	.components-custom-gradient-picker__markers-container {
+ 		position: relative;
+@@ -109,3 +125,8 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ 		}
+ 	}
+ }
++
++.components-custom-gradient-picker__ui-line {
++	position: relative;
++	z-index: 0;
++}
+diff --git a/packages/components/src/custom-gradient-picker/utils.ts b/packages/components/src/custom-gradient-picker/utils.ts
+index f90420e9a222be..e52c5220a6e759 100644
+--- a/packages/components/src/custom-gradient-picker/utils.ts
++++ b/packages/components/src/custom-gradient-picker/utils.ts
+@@ -35,17 +35,22 @@ function hasUnsupportedLength( item: gradientParser.ColorStop ) {
+ export function getGradientAstWithDefault( value?: string | null ) {
+ 	// gradientAST will contain the gradient AST as parsed by gradient-parser npm module.
+ 	// More information of its structure available at https://www.npmjs.com/package/gradient-parser#ast.
+-	let gradientAST: gradientParser.GradientNode;
+-	let gradientAstValue: string | undefined;
++	let gradientAST: gradientParser.GradientNode | undefined;
++	let hasGradient = !! value;
+ 
+ 	const valueToParse = value ?? DEFAULT_GRADIENT;
+ 
+ 	try {
+ 		gradientAST = gradientParser.parse( valueToParse )[ 0 ];
+-		gradientAstValue = valueToParse;
+ 	} catch ( error ) {
++		// eslint-disable-next-line no-console
++		console.warn(
++			'wp.components.CustomGradientPicker failed to parse the gradient with error',
++			error
++		);
++
+ 		gradientAST = gradientParser.parse( DEFAULT_GRADIENT )[ 0 ];
+-		gradientAstValue = DEFAULT_GRADIENT;
++		hasGradient = false;
+ 	}
+ 
+ 	if (
+@@ -69,10 +74,9 @@ export function getGradientAstWithDefault( value?: string | null ) {
+ 				type: '%',
+ 			};
+ 		} );
+-		gradientAstValue = serializeGradient( gradientAST );
+ 	}
+ 
+-	return { gradientAST, gradientAstValue };
++	return { gradientAST, hasGradient };
+ }
+ 
+ export function getGradientAstWithControlPoints(

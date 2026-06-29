@@ -1,0 +1,668 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2d132c096efc8c..b6bc54443a6c13 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `UnitControl`: migrate unit tests to TypeScript ([#40697](https://github.com/WordPress/gutenberg/pull/40697)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40622](https://github.com/WordPress/gutenberg/pull/40622)).
+diff --git a/packages/components/src/unit-control/stories/index.tsx b/packages/components/src/unit-control/stories/index.tsx
+index 87dfd3a84c602d..5fdace14370ea6 100644
+--- a/packages/components/src/unit-control/stories/index.tsx
++++ b/packages/components/src/unit-control/stories/index.tsx
+@@ -109,10 +109,40 @@ TweakingTheNumberInput.args = {
+ /**
+  * When only one unit is available, the unit selection dropdown becomes static text.
+  */
+-export const WithSingleUnit: ComponentStory<
++export const WithSingleUnitControlled: ComponentStory<
+ 	typeof UnitControl
+-> = DefaultTemplate.bind( {} );
+-WithSingleUnit.args = {
++> = ( { onChange, ...args } ) => {
++	// Starting value is `undefined`
++	const [ value, setValue ] = useState< string | undefined >( undefined );
++
++	return (
++		<div style={ { maxWidth: '100px' } }>
++			<UnitControl
++				{ ...args }
++				value={ value }
++				onChange={ ( v, extra ) => {
++					setValue( v );
++					onChange?.( v, extra );
++				} }
++			/>
++		</div>
++	);
++};
++WithSingleUnitControlled.args = {
++	...Default.args,
++	units: CSS_UNITS.slice( 0, 1 ),
++};
++
++export const WithSingleUnitUncontrolled: ComponentStory<
++	typeof UnitControl
++> = ( args ) => {
++	return (
++		<div style={ { maxWidth: '100px' } }>
++			<UnitControl { ...args } />
++		</div>
++	);
++};
++WithSingleUnitUncontrolled.args = {
+ 	...Default.args,
+ 	units: CSS_UNITS.slice( 0, 1 ),
+ };
+diff --git a/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap b/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
+new file mode 100644
+index 00000000000000..a723bc9f257d35
+--- /dev/null
++++ b/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
+@@ -0,0 +1,33 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`UnitControl Basic rendering should render custom className 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,10 +1,10 @@
++  <div
++    class="components-unit-control-wrapper css-aa2xc3-Root e1bagdl33"
++  >
++    <div
++-     class="components-flex components-input-control components-number-control components-unit-control e1bagdl32 ep48uk90 em5sgkm7 css-18wzek1-View-Flex-sx-Base-sx-Items-ItemsColumn-Root-rootLabelPositionStyles-Input-ValueInput-arrowStyles-paddingStyles em57xhy0"
+++     class="components-flex components-input-control components-number-control components-unit-control hello e1bagdl32 ep48uk90 em5sgkm7 css-18wzek1-View-Flex-sx-Base-sx-Items-ItemsColumn-Root-rootLabelPositionStyles-Input-ValueInput-arrowStyles-paddingStyles em57xhy0"
++      data-wp-c16t="true"
++      data-wp-component="Flex"
++    >
++      <div
++        class="components-flex-item em5sgkm3 css-1fmchc6-View-Item-sx-Base-LabelWrapper em57xhy0"
++@@ -15,11 +15,11 @@
++        class="components-input-control__container css-1sy20aj-Container-containerDisabledStyles-containerMarginStyles-containerWidthStyles em5sgkm6"
++      >
++        <input
++          autocomplete="off"
++          class="components-input-control__input css-gzm6eu-Input-dragStyles-fontSizeStyles-sizeStyles em5sgkm5"
++-         id="inspector-input-control-1"
+++         id="inspector-input-control-2"
++          inputmode="numeric"
++          max="Infinity"
++          min="-Infinity"
++          step="1"
++          type="number"
++`;
+diff --git a/packages/components/src/unit-control/test/index.js b/packages/components/src/unit-control/test/index.tsx
+similarity index 75%
+rename from packages/components/src/unit-control/test/index.js
+rename to packages/components/src/unit-control/test/index.tsx
+index d595f6171076bd..541a1d5862484c 100644
+--- a/packages/components/src/unit-control/test/index.js
++++ b/packages/components/src/unit-control/test/index.tsx
+@@ -12,10 +12,11 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import UnitControl from '../';
++import UnitControl from '..';
+ import { parseQuantityAndUnitFromRawValue } from '../utils';
++import type { UnitControlOnChangeCallback } from '../types';
+ 
+-function render( jsx ) {
++function render( jsx: React.ReactElement ) {
+ 	return {
+ 		user: userEvent.setup( {
+ 			// Avoids timeout errors (https://github.com/testing-library/user-event/issues/565#issuecomment-1064579531).
+@@ -25,30 +26,44 @@ function render( jsx ) {
+ 	};
+ }
+ 
+-const getComponent = () =>
+-	document.body.querySelector( '.components-unit-control' );
+-const getInput = () =>
+-	document.body.querySelector( '.components-unit-control input' );
+-const getSelect = () =>
+-	document.body.querySelector( '.components-unit-control select' );
+-const getUnitLabel = () =>
+-	document.body.querySelector( '.components-unit-control__unit-label' );
++const getInput = ( {
++	isInputTypeText = false,
++}: {
++	isInputTypeText?: boolean;
++} = {} ) =>
++	screen.getByRole(
++		isInputTypeText ? 'textbox' : 'spinbutton'
++	) as HTMLInputElement;
++const getSelect = () => screen.getByRole( 'combobox' ) as HTMLSelectElement;
++const getSelectOptions = () =>
++	screen.getAllByRole( 'option' ) as HTMLOptionElement[];
+ 
+ const ControlledSyncUnits = () => {
+-	const [ state, setState ] = useState( { valueA: '', valueB: '' } );
++	const [ state, setState ] = useState( {
++		valueA: '',
++		valueB: '',
++	} );
+ 
+ 	// Keep the unit sync'd between the two `UnitControl` instances.
+-	const onUnitControlChange = ( fieldName, newValue ) => {
+-		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+-		const [ quantity, newUnit ] = parseQuantityAndUnitFromRawValue(
++	const onUnitControlChange = (
++		fieldName: 'valueA' | 'valueB',
++		newValue?: string | number
++	) => {
++		const parsedQuantityAndUnit = parseQuantityAndUnitFromRawValue(
+ 			newValue
+ 		);
++		const quantity = parsedQuantityAndUnit[ 0 ];
+ 
+ 		if ( ! Number.isFinite( quantity ) ) {
+ 			return;
+ 		}
+ 
+-		const nextState = { ...state, [ fieldName ]: newValue };
++		const newUnit = parsedQuantityAndUnit[ 1 ];
++
++		const nextState = {
++			...state,
++			[ fieldName ]: newValue,
++		};
+ 
+ 		Object.entries( state ).forEach( ( [ stateProp, stateValue ] ) => {
+ 			const [
+@@ -57,7 +72,9 @@ const ControlledSyncUnits = () => {
+ 			] = parseQuantityAndUnitFromRawValue( stateValue );
+ 
+ 			if ( stateProp !== fieldName && stateUnit !== newUnit ) {
+-				nextState[ stateProp ] = `${ stateQuantity }${ newUnit }`;
++				nextState[
++					stateProp as 'valueA' | 'valueB'
++				] = `${ stateQuantity }${ newUnit }`;
+ 			}
+ 		} );
+ 
+@@ -87,35 +104,46 @@ describe( 'UnitControl', () => {
+ 			const input = getInput();
+ 			const select = getSelect();
+ 
+-			expect( input ).toBeTruthy();
+-			expect( select ).toBeTruthy();
++			expect( input ).toBeInTheDocument();
++			expect( select ).toBeInTheDocument();
+ 		} );
+ 
+ 		it( 'should render custom className', () => {
+-			render( <UnitControl className="hello" /> );
++			const { container: withoutClassName } = render( <UnitControl /> );
+ 
+-			const el = getComponent();
++			const { container: withClassName } = render(
++				<UnitControl className="hello" />
++			);
+ 
+-			expect( el.classList.contains( 'hello' ) ).toBe( true );
++			expect( withoutClassName.firstChild ).toMatchDiffSnapshot(
++				withClassName.firstChild
++			);
+ 		} );
+ 
+ 		it( 'should not render select, if units are disabled', () => {
+ 			render( <UnitControl value="3em" units={ [] } /> );
+ 			const input = getInput();
+-			const select = getSelect();
++			// Using `queryByRole` instead of `getSelect` because we need to test
++			// for this element NOT to be in the document.
++			const select = screen.queryByRole( 'combobox' );
+ 
+-			expect( input ).toBeTruthy();
+-			expect( select ).toBeFalsy();
++			expect( input ).toBeInTheDocument();
++			expect( select ).not.toBeInTheDocument();
+ 		} );
+ 
+ 		it( 'should render label if single units', () => {
+-			render( <UnitControl units={ [ { value: '%', label: '%' } ] } /> );
++			render(
++				<UnitControl
++					units={ [ { value: '%', label: '%' } ] }
++					value="30%"
++				/>
++			);
+ 
+-			const select = getSelect();
+-			const label = getUnitLabel();
++			const select = screen.queryByRole( 'combobox' );
++			const label = screen.getByText( '%' );
+ 
+-			expect( select ).toBeFalsy();
+-			expect( label ).toBeTruthy();
++			expect( select ).not.toBeInTheDocument();
++			expect( label ).toBeInTheDocument();
+ 		} );
+ 	} );
+ 
+@@ -141,8 +169,9 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should increment value on UP press', async () => {
+-			let state = '50px';
+-			const setState = ( nextState ) => ( state = nextState );
++			let state: string | undefined = '50px';
++			const setState: UnitControlOnChangeCallback = ( nextState ) =>
++				( state = nextState );
+ 
+ 			const { user } = render(
+ 				<UnitControl value={ state } onChange={ setState } />
+@@ -155,8 +184,9 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should increment value on UP + SHIFT press, with step', async () => {
+-			let state = '50px';
+-			const setState = ( nextState ) => ( state = nextState );
++			let state: string | undefined = '50px';
++			const setState: UnitControlOnChangeCallback = ( nextState ) =>
++				( state = nextState );
+ 
+ 			const { user } = render(
+ 				<UnitControl value={ state } onChange={ setState } />
+@@ -169,8 +199,9 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should decrement value on DOWN press', async () => {
+-			let state = 50;
+-			const setState = ( nextState ) => ( state = nextState );
++			let state: string | number | undefined = 50;
++			const setState: UnitControlOnChangeCallback = ( nextState ) =>
++				( state = nextState );
+ 
+ 			const { user } = render(
+ 				<UnitControl value={ state } onChange={ setState } />
+@@ -183,8 +214,9 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should decrement value on DOWN + SHIFT press, with step', async () => {
+-			let state = 50;
+-			const setState = ( nextState ) => ( state = nextState );
++			let state: string | number | undefined = 50;
++			const setState: UnitControlOnChangeCallback = ( nextState ) =>
++				( state = nextState );
+ 
+ 			const { user } = render(
+ 				<UnitControl value={ state } onChange={ setState } />
+@@ -197,8 +229,9 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should cancel change when ESCAPE key is pressed', async () => {
+-			let state = 50;
+-			const setState = ( nextState ) => ( state = nextState );
++			let state: string | number | undefined = 50;
++			const setState: UnitControlOnChangeCallback = ( nextState ) =>
++				( state = nextState );
+ 
+ 			const { user } = render(
+ 				<UnitControl
+@@ -208,7 +241,8 @@ describe( 'UnitControl', () => {
+ 				/>
+ 			);
+ 
+-			const input = getInput();
++			// Input type is `text` when the `isPressEnterToChange` prop is passed
++			const input = getInput( { isInputTypeText: true } );
+ 			await user.clear( input );
+ 			await user.type( input, '300px' );
+ 
+@@ -222,10 +256,11 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should run onBlur callback when quantity input is blurred', async () => {
+-			let state = '33%';
+ 			const onChangeSpy = jest.fn();
+ 			const onBlurSpy = jest.fn();
+-			const setState = ( nextState ) => {
++
++			let state: string | undefined = '33%';
++			const setState: UnitControlOnChangeCallback = ( nextState ) => {
+ 				onChangeSpy( nextState );
+ 				state = nextState;
+ 			};
+@@ -260,12 +295,11 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should invoke onChange and onUnitChange callbacks when isPressEnterToChange is true and the component is blurred with an uncommitted value', async () => {
+-			let state = '15px';
+-
+ 			const onUnitChangeSpy = jest.fn();
+ 			const onChangeSpy = jest.fn();
+ 
+-			const setState = ( nextState ) => {
++			let state: string | undefined = '15px';
++			const setState: UnitControlOnChangeCallback = ( nextState ) => {
+ 				onChangeSpy( nextState );
+ 				state = nextState;
+ 			};
+@@ -282,7 +316,8 @@ describe( 'UnitControl', () => {
+ 				</>
+ 			);
+ 
+-			const input = getInput();
++			// Input type is `text` when the `isPressEnterToChange` prop is passed
++			const input = getInput( { isInputTypeText: true } );
+ 			await user.clear( input );
+ 			await user.type( input, '41vh' );
+ 
+@@ -309,8 +344,9 @@ describe( 'UnitControl', () => {
+ 
+ 	describe( 'Unit', () => {
+ 		it( 'should update unit value on change', async () => {
+-			let state = '14rem';
+-			const setState = ( nextState ) => ( state = nextState );
++			let state: string | undefined = '14rem';
++			const setState: UnitControlOnChangeCallback = ( nextState ) =>
++				( state = nextState );
+ 
+ 			const spy = jest.fn();
+ 
+@@ -337,8 +373,7 @@ describe( 'UnitControl', () => {
+ 
+ 			render( <UnitControl units={ units } /> );
+ 
+-			const select = getSelect();
+-			const options = select.querySelectorAll( 'option' );
++			const options = getSelectOptions();
+ 
+ 			expect( options.length ).toBe( 2 );
+ 
+@@ -349,8 +384,9 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should reset value on unit change, if unit has default value', async () => {
+-			let state = 50;
+-			const setState = ( nextState ) => ( state = nextState );
++			let state: string | number | undefined = 50;
++			const setState: UnitControlOnChangeCallback = ( nextState ) =>
++				( state = nextState );
+ 
+ 			const units = [
+ 				{ value: 'pt', label: 'pt', default: 25 },
+@@ -377,8 +413,9 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should not reset value on unit change, if disabled', async () => {
+-			let state = 50;
+-			const setState = ( nextState ) => ( state = nextState );
++			let state: string | number | undefined = 50;
++			const setState: UnitControlOnChangeCallback = ( nextState ) =>
++				( state = nextState );
+ 
+ 			const units = [
+ 				{ value: 'pt', label: 'pt', default: 25 },
+@@ -405,8 +442,9 @@ describe( 'UnitControl', () => {
+ 		} );
+ 
+ 		it( 'should set correct unit if single units', async () => {
+-			let state = '50%';
+-			const setState = ( value ) => ( state = value );
++			let state: string | undefined = '50%';
++			const setState: UnitControlOnChangeCallback = ( value ) =>
++				( state = value );
+ 
+ 			const { user } = render(
+ 				<UnitControl
+@@ -519,7 +557,8 @@ describe( 'UnitControl', () => {
+ 				/>
+ 			);
+ 
+-			const input = getInput();
++			// Input type is `text` when the `isPressEnterToChange` prop is passed
++			const input = getInput( { isInputTypeText: true } );
+ 			await user.clear( input );
+ 			await user.type( input, '55 em' );
+ 			user.keyboard( '{Enter}' );
+@@ -536,7 +575,8 @@ describe( 'UnitControl', () => {
+ 				/>
+ 			);
+ 
+-			const input = getInput();
++			// Input type is `text` when the `isPressEnterToChange` prop is passed
++			const input = getInput( { isInputTypeText: true } );
+ 			await user.clear( input );
+ 			await user.type( input, '61   PX' );
+ 			user.keyboard( '{Enter}' );
+@@ -553,7 +593,8 @@ describe( 'UnitControl', () => {
+ 				/>
+ 			);
+ 
+-			const input = getInput();
++			// Input type is `text` when the `isPressEnterToChange` prop is passed
++			const input = getInput( { isInputTypeText: true } );
+ 			await user.clear( input );
+ 			await user.type( input, '55 em' );
+ 			user.keyboard( '{Enter}' );
+@@ -570,7 +611,8 @@ describe( 'UnitControl', () => {
+ 				/>
+ 			);
+ 
+-			const input = getInput();
++			// Input type is `text` when the `isPressEnterToChange` prop is passed
++			const input = getInput( { isInputTypeText: true } );
+ 			await user.clear( input );
+ 			await user.type( input, '-10  %' );
+ 			user.keyboard( '{Enter}' );
+@@ -587,7 +629,8 @@ describe( 'UnitControl', () => {
+ 				/>
+ 			);
+ 
+-			const input = getInput();
++			// Input type is `text` when the `isPressEnterToChange` prop is passed
++			const input = getInput( { isInputTypeText: true } );
+ 			await user.clear( input );
+ 			await user.type( input, '123       rEm  ' );
+ 			user.keyboard( '{Enter}' );
+diff --git a/packages/components/src/unit-control/test/utils.js b/packages/components/src/unit-control/test/utils.ts
+similarity index 76%
+rename from packages/components/src/unit-control/test/utils.js
+rename to packages/components/src/unit-control/test/utils.ts
+index b5fe385716dedf..83d57a5b519dc3 100644
+--- a/packages/components/src/unit-control/test/utils.js
++++ b/packages/components/src/unit-control/test/utils.ts
+@@ -7,21 +7,28 @@ import {
+ 	getValidParsedQuantityAndUnit,
+ 	getUnitsWithCurrentUnit,
+ } from '../utils';
++import type { WPUnitControlUnit } from '../types';
+ 
+ describe( 'UnitControl utils', () => {
+ 	describe( 'useCustomUnits', () => {
+ 		it( 'should return filtered css units', () => {
+-			const cssUnits = [ { value: 'px' }, { value: '%' } ];
++			const cssUnits = [
++				{ value: 'px', label: 'pixel' },
++				{ value: '%', label: 'percent' },
++			];
+ 			const units = useCustomUnits( {
+ 				availableUnits: [ 'em', 'px' ],
+ 				units: cssUnits,
+ 			} );
+ 
+-			expect( units ).toEqual( [ { value: 'px' } ] );
++			expect( units ).toEqual( [ { value: 'px', label: 'pixel' } ] );
+ 		} );
+ 
+ 		it( 'should add default values to available units', () => {
+-			const cssUnits = [ { value: 'px' }, { value: '%' } ];
++			const cssUnits = [
++				{ value: 'px', label: 'pixel' },
++				{ value: '%', label: 'percent' },
++			];
+ 			const units = useCustomUnits( {
+ 				availableUnits: [ '%', 'px' ],
+ 				defaultValues: { '%': 10, px: 10 },
+@@ -29,8 +36,8 @@ describe( 'UnitControl utils', () => {
+ 			} );
+ 
+ 			expect( units ).toEqual( [
+-				{ value: 'px', default: 10 },
+-				{ value: '%', default: 10 },
++				{ value: 'px', label: 'pixel', default: 10 },
++				{ value: '%', label: 'percent', default: 10 },
+ 			] );
+ 		} );
+ 
+@@ -38,24 +45,32 @@ describe( 'UnitControl utils', () => {
+ 			// Although the public APIs of the component expect a `number` as the type of the
+ 			// default values, it's still good to test for strings (as it can happen in un-typed
+ 			// environments)
+-			const cssUnits = [ { value: 'px' }, { value: '%' } ];
++			const cssUnits = [
++				{ value: 'px', label: 'pixel' },
++				{ value: '%', label: 'percent' },
++			];
+ 			const units = useCustomUnits( {
+ 				availableUnits: [ '%', 'px' ],
+ 				defaultValues: {
++					// @ts-expect-error (passing a string instead of a number is the point of the test)
+ 					'%': '14',
++					// @ts-expect-error (passing a string instead of a number is the point of the test)
+ 					px: 'not a valid numeric quantity',
+ 				},
+ 				units: cssUnits,
+ 			} );
+ 
+ 			expect( units ).toEqual( [
+-				{ value: 'px', default: undefined },
+-				{ value: '%', default: 14 },
++				{ value: 'px', label: 'pixel', default: undefined },
++				{ value: '%', label: 'percent', default: 14 },
+ 			] );
+ 		} );
+ 
+ 		it( 'should return an empty array where availableUnits match no preferred css units', () => {
+-			const cssUnits = [ { value: 'em' }, { value: 'vh' } ];
++			const cssUnits = [
++				{ value: 'em', label: 'em' },
++				{ value: 'vh', label: 'vh' },
++			];
+ 			const units = useCustomUnits( {
+ 				availableUnits: [ '%', 'px' ],
+ 				defaultValues: { '%': 10, px: 10 },
+@@ -69,16 +84,19 @@ describe( 'UnitControl utils', () => {
+ 	describe( 'filterUnitsWithSettings', () => {
+ 		it( 'should return filtered units array', () => {
+ 			const preferredUnits = [ '%', 'px' ];
+-			const availableUnits = [ { value: 'px' }, { value: 'em' } ];
++			const availableUnits = [
++				{ value: 'px', label: 'pixel' },
++				{ value: 'em', label: 'em' },
++			];
+ 
+ 			expect(
+ 				filterUnitsWithSettings( preferredUnits, availableUnits )
+-			).toEqual( [ { value: 'px' } ] );
++			).toEqual( [ { value: 'px', label: 'pixel' } ] );
+ 		} );
+ 
+ 		it( 'should return empty array where preferred units match no available css unit', () => {
+ 			const preferredUnits = [ '%', 'px' ];
+-			const availableUnits = [ { value: 'em' } ];
++			const availableUnits = [ { value: 'em', label: 'em' } ];
+ 
+ 			expect(
+ 				filterUnitsWithSettings( preferredUnits, availableUnits )
+@@ -92,13 +110,14 @@ describe( 'UnitControl utils', () => {
+ 			const availableUnits = false;
+ 
+ 			expect(
++				// @ts-expect-error (passing `false` instead of a valid array of units is the point of the test)
+ 				filterUnitsWithSettings( preferredUnits, availableUnits )
+ 			).toEqual( [] );
+ 		} );
+ 
+ 		it( 'should return empty array where available units is set to an empty array', () => {
+ 			const preferredUnits = [ '%', 'px' ];
+-			const availableUnits = [];
++			const availableUnits: WPUnitControlUnit[] = [];
+ 
+ 			expect(
+ 				filterUnitsWithSettings( preferredUnits, availableUnits )
+@@ -127,7 +146,7 @@ describe( 'UnitControl utils', () => {
+ 
+ 		it( 'should return fallback value', () => {
+ 			const nextValue = 'thirteen';
+-			const preferredUnits = [ { value: 'em' } ];
++			const preferredUnits = [ { value: 'em', label: 'em' } ];
+ 			const fallbackValue = 13;
+ 
+ 			expect(
+@@ -155,7 +174,7 @@ describe( 'UnitControl utils', () => {
+ 
+ 		it( 'should return first unit in preferred units collection as second fallback unit', () => {
+ 			const nextValue = 101;
+-			const preferredUnits = [ { value: 'px' } ];
++			const preferredUnits = [ { value: 'px', label: 'pixel' } ];
+ 
+ 			expect(
+ 				getValidParsedQuantityAndUnit( nextValue, preferredUnits )
+@@ -185,8 +204,8 @@ describe( 'UnitControl utils', () => {
+ 			expect( result ).toHaveLength( 3 );
+ 
+ 			const currentUnit = result.shift();
+-			expect( currentUnit.value ).toBe( '%' );
+-			expect( currentUnit.label ).toBe( '%' );
++			expect( currentUnit?.value ).toBe( '%' );
++			expect( currentUnit?.label ).toBe( '%' );
+ 			expect( result ).toEqual( limitedUnits );
+ 		} );
+ 
+@@ -196,8 +215,8 @@ describe( 'UnitControl utils', () => {
+ 			expect( result ).toHaveLength( 3 );
+ 
+ 			const currentUnit = result.shift();
+-			expect( currentUnit.value ).toBe( '%' );
+-			expect( currentUnit.label ).toBe( '%' );
++			expect( currentUnit?.value ).toBe( '%' );
++			expect( currentUnit?.label ).toBe( '%' );
+ 			expect( result ).toEqual( limitedUnits );
+ 		} );
+ 
+diff --git a/packages/components/src/unit-control/utils.ts b/packages/components/src/unit-control/utils.ts
+index 87c0142ec9774c..573a6f88665109 100644
+--- a/packages/components/src/unit-control/utils.ts
++++ b/packages/components/src/unit-control/utils.ts
+@@ -155,7 +155,9 @@ export function getParsedQuantityAndUnit(
+  * @param  units List of units.
+  * @return Whether the list actually contains any units.
+  */
+-export function hasUnits( units?: WPUnitControlUnit[] ): boolean {
++export function hasUnits(
++	units?: WPUnitControlUnit[]
++): units is WPUnitControlUnit[] {
+ 	// Although the `isArray` check shouldn't be necessary (given the signature of
+ 	// this typed function), it's better to stay on the side of caution, since
+ 	// this function may be called from un-typed environments.
+@@ -218,7 +220,7 @@ export function parseQuantityAndUnitFromRawValue(
+  */
+ export function getValidParsedQuantityAndUnit(
+ 	rawValue: string | number,
+-	allowedUnits: WPUnitControlUnit[],
++	allowedUnits?: WPUnitControlUnit[],
+ 	fallbackQuantity?: number,
+ 	fallbackUnit?: string
+ ): [ number | undefined, string | undefined ] {
+@@ -295,7 +297,7 @@ export const useCustomUnits = ( {
+ }: {
+ 	units?: WPUnitControlUnit[];
+ 	availableUnits?: string[];
+-	defaultValues: Record< string, number >;
++	defaultValues?: Record< string, number >;
+ } ): WPUnitControlUnit[] => {
+ 	const customUnitsToReturn = filterUnitsWithSettings(
+ 		availableUnits,

@@ -1,0 +1,28 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 11cb50dba8beae..cded7d84cfadca 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `Modal:`: Nuance outside interactions ([#52994](https://github.com/WordPress/gutenberg/pull/52994)).
+ -   `Button`: Remove default border from the destructive button ([#53607](https://github.com/WordPress/gutenberg/pull/53607)).
+ -   Components: Move accent colors to theme context ([#53631](https://github.com/WordPress/gutenberg/pull/53631)).
++-   `ProgressBar`: Use the new theme system accent for indicator color ([#53632](https://github.com/WordPress/gutenberg/pull/53632)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/progress-bar/styles.ts b/packages/components/src/progress-bar/styles.ts
+index 8a7afc5f54fba6..293fb5e14c0739 100644
+--- a/packages/components/src/progress-bar/styles.ts
++++ b/packages/components/src/progress-bar/styles.ts
+@@ -43,10 +43,7 @@ export const Indicator = styled.div< {
+ 	top: 0;
+ 	height: 100%;
+ 	border-radius: ${ CONFIG.radiusBlockUi };
+-	background-color: var(
+-		--wp-components-color-accent,
+-		${ COLORS.theme.accent }
+-	);
++	background-color: ${ COLORS.theme.accent };
+ 
+ 	${ ( { isIndeterminate, value } ) =>
+ 		isIndeterminate

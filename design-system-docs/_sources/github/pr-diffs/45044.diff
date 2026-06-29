@@ -1,0 +1,88 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6539e5bfd1004a..54f28554c43b32 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,8 @@
+ ### Internal
+ 
+ -   `AnglePickerControl`: Set Storybook Label control type to 'text' ([#45122](https://github.com/WordPress/gutenberg/pull/45122)).
++-   `SlotFill`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44403](https://github.com/WordPress/gutenberg/pull/44403))
++-   `Context`: updated to ignore `react/exhaustive-deps` eslint rule ([#45044](https://github.com/WordPress/gutenberg/pull/45044))
+ -   `Button`: Refactor Storybook to controls and align docs ([#44105](https://github.com/WordPress/gutenberg/pull/44105)).
+ 
+ ## 21.3.0 (2022-10-19)
+@@ -39,7 +41,6 @@
+ -   `withFocusReturn`: Refactor tests to `@testing-library/react` ([#45012](https://github.com/WordPress/gutenberg/pull/45012)).
+ -   `ToolsPanel`: updated to satisfy `react/exhaustive-deps` eslint rule ([#45028](https://github.com/WordPress/gutenberg/pull/45028))
+ -   `Tooltip`: updated to ignore `react/exhaustive-deps` eslint rule ([#45043](https://github.com/WordPress/gutenberg/pull/45043))
+--   `SlotFill`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44403](https://github.com/WordPress/gutenberg/pull/44403))
+ 
+ ## 21.2.0 (2022-10-05)
+ 
+diff --git a/packages/components/src/ui/context/context-system-provider.js b/packages/components/src/ui/context/context-system-provider.js
+index d72fac51be99f6..6fe0053dbcd8c7 100644
+--- a/packages/components/src/ui/context/context-system-provider.js
++++ b/packages/components/src/ui/context/context-system-provider.js
+@@ -10,34 +10,21 @@ import {
+ 	createContext,
+ 	useContext,
+ 	useRef,
+-	useEffect,
+ 	useMemo,
+ 	memo,
+ } from '@wordpress/element';
+ import warn from '@wordpress/warning';
+ 
++/**
++ * Internal dependencies
++ */
++import { useUpdateEffect } from '../../utils';
++
+ export const ComponentsContext = createContext(
+ 	/** @type {Record<string, any>} */ ( {} )
+ );
+ export const useComponentsContext = () => useContext( ComponentsContext );
+ 
+-/**
+- * Runs an effect only on update (i.e., ignores the first render)
+- *
+- * @param {import('react').EffectCallback} effect
+- * @param {import('react').DependencyList} deps
+- */
+-function useUpdateEffect( effect, deps ) {
+-	const mounted = useRef( false );
+-	useEffect( () => {
+-		if ( mounted.current ) {
+-			return effect();
+-		}
+-		mounted.current = true;
+-		return undefined;
+-	}, deps );
+-}
+-
+ /**
+  * Consolidates incoming ContextSystem values with a (potential) parent ContextSystem value.
+  *
+diff --git a/packages/components/src/utils/hooks/use-update-effect.js b/packages/components/src/utils/hooks/use-update-effect.js
+index aaf04478b3860d..ab96caf5799756 100644
+--- a/packages/components/src/utils/hooks/use-update-effect.js
++++ b/packages/components/src/utils/hooks/use-update-effect.js
+@@ -13,13 +13,17 @@ import { useRef, useEffect } from '@wordpress/element';
+  */
+ function useUpdateEffect( effect, deps ) {
+ 	const mounted = useRef( false );
+-
+ 	useEffect( () => {
+ 		if ( mounted.current ) {
+ 			return effect();
+ 		}
+ 		mounted.current = true;
+ 		return undefined;
++		// Disable reasons:
++		// 1. This hook needs to pass a dep list that isn't an array literal
++		// 2. `effect` is missing from the array, and will need to be added carefully to avoid additional warnings
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, deps );
+ }
+ 

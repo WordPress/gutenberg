@@ -1,0 +1,125 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1ac67cd6d62a4e..1c9fb763995e99 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `CustomGradientPicker`: Convert to TypeScript ([#48929](https://github.com/WordPress/gutenberg/pull/48929)).
+ -   `ColorPicker`: Convert to TypeScript ([#49214](https://github.com/WordPress/gutenberg/pull/49214)).
+ -   `GradientPicker`: Convert to TypeScript ([#48316](https://github.com/WordPress/gutenberg/pull/48316)).
++-   `FormTokenField`: Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles ([48609](https://github.com/WordPress/gutenberg/pull/48609)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/form-token-field/README.md b/packages/components/src/form-token-field/README.md
+index 3b5bd7e46bf21e..90fe84e56f2ee6 100644
+--- a/packages/components/src/form-token-field/README.md
++++ b/packages/components/src/form-token-field/README.md
+@@ -61,6 +61,7 @@ The `value` property is handled in a manner similar to controlled form component
+ -   `__experimentalShowHowTo` - If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
+ -   `__experimentalValidateInput` - If passed, all introduced values will be validated before being added as tokens.
+ -   `__experimentalAutoSelectFirstMatch` - If true, the select the first matching suggestion when the user presses the Enter key (or space when tokenizeOnSpace is true).
++-   `__nextHasNoMarginBottom` - Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.5. (The prop can be safely removed once this happens.)
+ 
+ ## Usage
+ 
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 980376e905e782..5c87db86514b7e 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -22,7 +22,11 @@ import { TokensAndInputWrapperFlex } from './styles';
+ import SuggestionsList from './suggestions-list';
+ import type { FormTokenFieldProps, TokenItem } from './types';
+ import { FlexItem } from '../flex';
+-import { StyledLabel } from '../base-control/styles/base-control-styles';
++import {
++	StyledHelp,
++	StyledLabel,
++} from '../base-control/styles/base-control-styles';
++import { Spacer } from '../spacer';
+ 
+ const identity = ( value: string ) => value;
+ 
+@@ -67,6 +71,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		__experimentalShowHowTo = true,
+ 		__next36pxDefaultSize = false,
+ 		__experimentalAutoSelectFirstMatch = false,
++		__nextHasNoMarginBottom = false,
+ 	} = props;
+ 
+ 	const instanceId = useInstanceId( FormTokenField );
+@@ -716,17 +721,19 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 					/>
+ 				) }
+ 			</div>
++			{ ! __nextHasNoMarginBottom && <Spacer marginBottom={ 2 } /> }
+ 			{ __experimentalShowHowTo && (
+-				<p
++				<StyledHelp
+ 					id={ `components-form-token-suggestions-howto-${ instanceId }` }
+ 					className="components-form-token-field__help"
++					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 				>
+ 					{ tokenizeOnSpace
+ 						? __(
+ 								'Separate with commas, spaces, or the Enter key.'
+ 						  )
+ 						: __( 'Separate with commas or the Enter key.' ) }
+-				</p>
++				</StyledHelp>
+ 			) }
+ 		</div>
+ 	);
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index 52d118d5d99bdc..775999c1d01246 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -1,7 +1,6 @@
+ .components-form-token-field__input-container {
+ 	@include input-control();
+ 	width: 100%;
+-	margin: 0 0 $grid-unit-10 0;
+ 	padding: 0;
+ 	cursor: text;
+ 
+@@ -48,12 +47,6 @@
+ 	}
+ }
+ 
+-.components-form-token-field__help {
+-	font-size: $helptext-font-size;
+-	font-style: normal;
+-	color: $gray-700;
+-}
+-
+ // Tokens
+ .components-form-token-field__token {
+ 	font-size: $default-font-size;
+diff --git a/packages/components/src/form-token-field/test/index.tsx b/packages/components/src/form-token-field/test/index.tsx
+index a10677f3c10aa1..e62e851f1cf226 100644
+--- a/packages/components/src/form-token-field/test/index.tsx
++++ b/packages/components/src/form-token-field/test/index.tsx
+@@ -44,6 +44,7 @@ const FormTokenFieldWithState = ( {
+ 				setSelectedValue( tokens );
+ 				onChange?.( tokens );
+ 			} }
++			__nextHasNoMarginBottom
+ 		/>
+ 	);
+ };
+diff --git a/packages/components/src/form-token-field/types.ts b/packages/components/src/form-token-field/types.ts
+index bdc67d725489b4..44c11d6461859c 100644
+--- a/packages/components/src/form-token-field/types.ts
++++ b/packages/components/src/form-token-field/types.ts
+@@ -169,6 +169,12 @@ export interface FormTokenFieldProps
+ 	 * Custom renderer for suggestions.
+ 	 */
+ 	__experimentalRenderItem?: ( args: { item: string } ) => ReactNode;
++	/**
++	 * Start opting into the new margin-free styles that will become the default in a future version.
++	 *
++	 * @default false
++	 */
++	__nextHasNoMarginBottom?: boolean;
+ }
+ 
+ /**

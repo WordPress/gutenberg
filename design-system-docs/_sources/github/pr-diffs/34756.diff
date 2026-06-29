@@ -1,0 +1,19 @@
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx b/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx
+index bce2df10eff8f2..a2ec9f67a576d9 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx
+@@ -39,11 +39,13 @@ function ToggleGroupControlBackdrop( {
+ 		setLeft( offsetLeft );
+ 		setWidth( offsetWidth );
+ 
++		let requestId: number;
+ 		if ( ! canAnimate ) {
+-			window.requestAnimationFrame( () => {
++			requestId = window.requestAnimationFrame( () => {
+ 				setCanAnimate( true );
+ 			} );
+ 		}
++		return () => window.cancelAnimationFrame( requestId );
+ 	}, [ canAnimate, containerRef, containerWidth, state, isAdaptiveWidth ] );
+ 
+ 	return (

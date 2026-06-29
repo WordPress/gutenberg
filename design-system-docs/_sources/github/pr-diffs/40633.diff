@@ -1,0 +1,363 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2d132c096efc8c..c6c764d31dbae4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,10 @@
+ -   `InputControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40622](https://github.com/WordPress/gutenberg/pull/40622)).
+ -   `UnitControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40627](https://github.com/WordPress/gutenberg/pull/40627)).
+ 
++### Internal
++
++-   `TextControl`: Convert to TypeScript ([#40633](https://github.com/WordPress/gutenberg/pull/40633)).
++
+ ## 19.9.0 (2022-04-21)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/text-control/index.js b/packages/components/src/text-control/index.js
+deleted file mode 100644
+index b0b9f806f18fe6..00000000000000
+--- a/packages/components/src/text-control/index.js
++++ /dev/null
+@@ -1,72 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useInstanceId } from '@wordpress/compose';
+-import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import BaseControl from '../base-control';
+-
+-/**
+- * @typedef OwnProps
+- * @property {string}                  label                 Label for the control.
+- * @property {boolean}                 [hideLabelFromVision] Whether to accessibly hide the label.
+- * @property {string}                  value                 Value of the input.
+- * @property {string}                  [help]                Optional help text for the control.
+- * @property {string}                  [className]           Classname passed to BaseControl wrapper
+- * @property {(value: string) => void} onChange              Handle changes.
+- * @property {string}                  [type='text']         Type of the input.
+- */
+-
+-/** @typedef {OwnProps & import('react').ComponentProps<'input'>} Props */
+-
+-/**
+- *
+- * @param {Props}                                          props Props
+- * @param {import('react').ForwardedRef<HTMLInputElement>} ref
+- */
+-function TextControl(
+-	{
+-		label,
+-		hideLabelFromVision,
+-		value,
+-		help,
+-		className,
+-		onChange,
+-		type = 'text',
+-		...props
+-	},
+-	ref
+-) {
+-	const instanceId = useInstanceId( TextControl );
+-	const id = `inspector-text-control-${ instanceId }`;
+-	const onChangeValue = (
+-		/** @type {import('react').ChangeEvent<HTMLInputElement>} */
+-		event
+-	) => onChange( event.target.value );
+-
+-	return (
+-		<BaseControl
+-			label={ label }
+-			hideLabelFromVision={ hideLabelFromVision }
+-			id={ id }
+-			help={ help }
+-			className={ className }
+-		>
+-			<input
+-				className="components-text-control__input"
+-				type={ type }
+-				id={ id }
+-				value={ value }
+-				onChange={ onChangeValue }
+-				aria-describedby={ !! help ? id + '__help' : undefined }
+-				ref={ ref }
+-				{ ...props }
+-			/>
+-		</BaseControl>
+-	);
+-}
+-
+-export default forwardRef( TextControl );
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+new file mode 100644
+index 00000000000000..7634e751d19ecb
+--- /dev/null
++++ b/packages/components/src/text-control/index.tsx
+@@ -0,0 +1,84 @@
++/**
++ * External dependencies
++ */
++import type { ChangeEvent, ForwardedRef } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import BaseControl from '../base-control';
++import type { WordPressComponentProps } from '../ui/context';
++import type { TextControlProps } from './types';
++
++function UnforwardedTextControl(
++	props: WordPressComponentProps< TextControlProps, 'input', false >,
++	ref: ForwardedRef< HTMLInputElement >
++) {
++	const {
++		label,
++		hideLabelFromVision,
++		value,
++		help,
++		className,
++		onChange,
++		type = 'text',
++		...additionalProps
++	} = props;
++	const instanceId = useInstanceId( TextControl );
++	const id = `inspector-text-control-${ instanceId }`;
++	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
++		onChange( event.target.value );
++
++	return (
++		<BaseControl
++			label={ label }
++			hideLabelFromVision={ hideLabelFromVision }
++			id={ id }
++			help={ help }
++			className={ className }
++		>
++			<input
++				className="components-text-control__input"
++				type={ type }
++				id={ id }
++				value={ value }
++				onChange={ onChangeValue }
++				aria-describedby={ !! help ? id + '__help' : undefined }
++				ref={ ref }
++				{ ...additionalProps }
++			/>
++		</BaseControl>
++	);
++}
++
++/**
++ * TextControl components let users enter and edit text.
++ *
++ *
++ * @example
++ * ```jsx
++ * import { TextControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyTextControl = () => {
++ *   const [ className, setClassName ] = useState( '' );
++ *
++ *   return (
++ *     <TextControl
++ *       label="Additional CSS Class"
++ *       value={ className }
++ *       onChange={ ( value ) => setClassName( value ) }
++ *     />
++ *   );
++ * };
++ * ```
++ */
++export const TextControl = forwardRef( UnforwardedTextControl );
++
++export default TextControl;
+diff --git a/packages/components/src/text-control/stories/index.js b/packages/components/src/text-control/stories/index.js
+deleted file mode 100644
+index e381fd36be57a7..00000000000000
+--- a/packages/components/src/text-control/stories/index.js
++++ /dev/null
+@@ -1,46 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, text } from '@storybook/addon-knobs';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import TextControl from '../';
+-
+-export default {
+-	title: 'Components/TextControl',
+-	component: TextControl,
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-const TextControlWithState = ( props ) => {
+-	const [ value, setValue ] = useState();
+-
+-	return <TextControl { ...props } value={ value } onChange={ setValue } />;
+-};
+-
+-export const _default = () => {
+-	const label = text( 'Label', 'Label Text' );
+-	const hideLabelFromVision = boolean( 'Hide Label From Vision', false );
+-	const help = text( 'Help Text', 'Help text to explain the input.' );
+-	const type = text( 'Input Type', 'text' );
+-	const className = text( 'Class Name', '' );
+-
+-	return (
+-		<TextControlWithState
+-			label={ label }
+-			hideLabelFromVision={ hideLabelFromVision }
+-			help={ help }
+-			type={ type }
+-			className={ className }
+-		/>
+-	);
+-};
+diff --git a/packages/components/src/text-control/stories/index.tsx b/packages/components/src/text-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..4ff047eca45586
+--- /dev/null
++++ b/packages/components/src/text-control/stories/index.tsx
+@@ -0,0 +1,66 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import TextControl from '..';
++
++const meta: ComponentMeta< typeof TextControl > = {
++	component: TextControl,
++	title: 'Components/TextControl',
++	argTypes: {
++		onChange: {
++			action: 'onChange',
++		},
++		value: {
++			control: { type: null },
++		},
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const DefaultTemplate: ComponentStory< typeof TextControl > = ( {
++	onChange,
++	...args
++} ) => {
++	const [ value, setValue ] = useState( '' );
++
++	return (
++		<TextControl
++			{ ...args }
++			value={ value }
++			onChange={ ( v ) => {
++				setValue( v );
++				onChange( v );
++			} }
++		/>
++	);
++};
++
++export const Default: ComponentStory<
++	typeof TextControl
++> = DefaultTemplate.bind( {} );
++Default.args = {};
++
++export const WithLabelAndHelpText: ComponentStory<
++	typeof TextControl
++> = DefaultTemplate.bind( {} );
++WithLabelAndHelpText.args = {
++	...Default.args,
++	label: 'Label Text',
++	help: 'Help text to explain the input.',
++};
+diff --git a/packages/components/src/text-control/types.ts b/packages/components/src/text-control/types.ts
+new file mode 100644
+index 00000000000000..669751154c3605
+--- /dev/null
++++ b/packages/components/src/text-control/types.ts
+@@ -0,0 +1,29 @@
++/**
++ * External dependencies
++ */
++import type { HTMLInputTypeAttribute } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { BaseControlProps } from '../base-control/types';
++
++export type TextControlProps = Pick<
++	BaseControlProps,
++	'className' | 'hideLabelFromVision' | 'help' | 'label'
++> & {
++	/**
++	 * A function that receives the value of the input.
++	 */
++	onChange: ( value: string ) => void;
++	/**
++	 * The current value of the input.
++	 */
++	value: string | number;
++	/**
++	 * Type of the input element to render. Defaults to "text".
++	 *
++	 * @default 'text'
++	 */
++	type?: HTMLInputTypeAttribute;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 8f8b6c412715d0..8ed3f765309818 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -8,7 +8,7 @@
+ 			"gutenberg-test-env",
+ 			"jest",
+ 			"@testing-library/jest-dom",
+-			"snapshot-diff",
++			"snapshot-diff"
+ 		],
+ 		// Some errors in Reakit types with TypeScript 4.3
+ 		// Remove the following line when they've been addressed.
+@@ -77,6 +77,7 @@
+ 		"src/spinner/**/*",
+ 		"src/surface/**/*",
+ 		"src/text/**/*",
++		"src/text-control/**/*",
+ 		"src/tip/**/*",
+ 		"src/toggle-group-control/**/*",
+ 		"src/tools-panel/**/*",

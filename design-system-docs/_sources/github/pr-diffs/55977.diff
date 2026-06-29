@@ -1,0 +1,339 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5d05abc7026b22..212c8055dc5b19 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ -   `ToggleGroupControl`: Add opt-in prop for 40px default size ([#55789](https://github.com/WordPress/gutenberg/pull/55789)).
+ -   `TextControl`: Add opt-in prop for 40px default size ([#55471](https://github.com/WordPress/gutenberg/pull/55471)).
++-   `InputControl`: Add new `inside` label position ([#55977](https://github.com/WordPress/gutenberg/pull/55977)).
+ 
+ ## 25.11.0 (2023-11-02)
+ 
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index 3934085f035289..559b6a6a8dfbd4 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -82,10 +82,10 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+ }
+ 
+ .emotion-13 {
+-  -webkit-align-items: center;
+-  -webkit-box-align: center;
+-  -ms-flex-align: center;
+-  align-items: center;
++  -webkit-align-items: stretch;
++  -webkit-box-align: stretch;
++  -ms-flex-align: stretch;
++  align-items: stretch;
+   box-sizing: border-box;
+   border-radius: inherit;
+   display: -webkit-box;
+@@ -135,6 +135,11 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+ }
+ 
+ .emotion-17 {
++  box-sizing: border-box;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -142,11 +147,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   -webkit-align-self: stretch;
+   -ms-flex-item-align: stretch;
+   align-self: stretch;
+-  box-sizing: border-box;
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+ }
+ 
+ .emotion-20 {
+@@ -353,10 +353,10 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+ }
+ 
+ .emotion-13 {
+-  -webkit-align-items: center;
+-  -webkit-box-align: center;
+-  -ms-flex-align: center;
+-  align-items: center;
++  -webkit-align-items: stretch;
++  -webkit-box-align: stretch;
++  -ms-flex-align: stretch;
++  align-items: stretch;
+   box-sizing: border-box;
+   border-radius: inherit;
+   display: -webkit-box;
+@@ -406,6 +406,11 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+ }
+ 
+ .emotion-17 {
++  box-sizing: border-box;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -413,11 +418,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   -webkit-align-self: stretch;
+   -ms-flex-item-align: stretch;
+   align-self: stretch;
+-  box-sizing: border-box;
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+ }
+ 
+ .emotion-20 {
+@@ -634,10 +634,10 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+ }
+ 
+ .emotion-13 {
+-  -webkit-align-items: center;
+-  -webkit-box-align: center;
+-  -ms-flex-align: center;
+-  align-items: center;
++  -webkit-align-items: stretch;
++  -webkit-box-align: stretch;
++  -ms-flex-align: stretch;
++  align-items: stretch;
+   box-sizing: border-box;
+   border-radius: inherit;
+   display: -webkit-box;
+@@ -687,6 +687,11 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+ }
+ 
+ .emotion-17 {
++  box-sizing: border-box;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -694,11 +699,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   -webkit-align-self: stretch;
+   -ms-flex-item-align: stretch;
+   align-self: stretch;
+-  box-sizing: border-box;
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+ }
+ 
+ .emotion-20 {
+@@ -927,10 +927,10 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+ }
+ 
+ .emotion-13 {
+-  -webkit-align-items: center;
+-  -webkit-box-align: center;
+-  -ms-flex-align: center;
+-  align-items: center;
++  -webkit-align-items: stretch;
++  -webkit-box-align: stretch;
++  -ms-flex-align: stretch;
++  align-items: stretch;
+   box-sizing: border-box;
+   border-radius: inherit;
+   display: -webkit-box;
+@@ -980,6 +980,11 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+ }
+ 
+ .emotion-17 {
++  box-sizing: border-box;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -987,11 +992,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   -webkit-align-self: stretch;
+   -ms-flex-item-align: stretch;
+   align-self: stretch;
+-  box-sizing: border-box;
+-  display: -webkit-box;
+-  display: -webkit-flex;
+-  display: -ms-flexbox;
+-  display: flex;
+ }
+ 
+ .emotion-20 {
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index 64544971840b34..08b3b8e071285b 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -13,7 +13,7 @@ import { forwardRef, useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Backdrop from './backdrop';
+-import Label from './label';
++import { Label, InnerLabel } from './label';
+ import {
+ 	Container,
+ 	Root,
+@@ -98,6 +98,13 @@ export function InputBase(
+ 			InputControlSuffixWrapper: { paddingRight },
+ 		};
+ 	}, [ paddingLeft, paddingRight ] );
++	const labelProps = {
++		className: 'components-input-control__label',
++		htmlFor: id,
++		hideLabelFromVision,
++		labelPosition,
++	};
++	const labelInside = labelPosition === 'inside';
+ 
+ 	return (
+ 		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
+@@ -110,14 +117,9 @@ export function InputBase(
+ 			labelPosition={ labelPosition }
+ 			ref={ ref }
+ 		>
+-			<Label
+-				className="components-input-control__label"
+-				hideLabelFromVision={ hideLabelFromVision }
+-				labelPosition={ labelPosition }
+-				htmlFor={ id }
+-			>
+-				{ label }
+-			</Label>
++			{ label && ! labelInside && (
++				<Label { ...labelProps }>{ label }</Label>
++			) }
+ 			<Container
+ 				__unstableInputWidth={ __unstableInputWidth }
+ 				className="components-input-control__container"
+@@ -126,6 +128,9 @@ export function InputBase(
+ 				labelPosition={ labelPosition }
+ 			>
+ 				<ContextSystemProvider value={ prefixSuffixContextValue }>
++					{ label && labelInside && (
++						<InnerLabel { ...labelProps }>{ label }</InnerLabel>
++					) }
+ 					{ prefix && (
+ 						<Prefix className="components-input-control__prefix">
+ 							{ prefix }
+diff --git a/packages/components/src/input-control/label.tsx b/packages/components/src/input-control/label.tsx
+index 9c82d4d7902730..166bb1753bceaf 100644
+--- a/packages/components/src/input-control/label.tsx
++++ b/packages/components/src/input-control/label.tsx
+@@ -1,15 +1,17 @@
+ /**
+  * Internal dependencies
+  */
++import InputControlPrefixWrapper from './input-prefix-wrapper';
+ import { VisuallyHidden } from '../visually-hidden';
+ import {
+ 	Label as BaseLabel,
+ 	LabelWrapper,
++	InnerLabelWrapper,
+ } from './styles/input-control-styles';
+ import type { WordPressComponentProps } from '../context';
+ import type { InputControlLabelProps } from './types';
+ 
+-export default function Label( {
++export function Label( {
+ 	children,
+ 	hideLabelFromVision,
+ 	htmlFor,
+@@ -33,3 +35,15 @@ export default function Label( {
+ 		</LabelWrapper>
+ 	);
+ }
++
++export function InnerLabel( {
++	children,
++	htmlFor,
++	...props
++}: WordPressComponentProps< InputControlLabelProps, 'label', false > ) {
++	return (
++		<InnerLabelWrapper htmlFor={ htmlFor } { ...props }>
++			<InputControlPrefixWrapper>{ children }</InputControlPrefixWrapper>
++		</InnerLabelWrapper>
++	);
++}
+diff --git a/packages/components/src/input-control/stories/index.story.tsx b/packages/components/src/input-control/stories/index.story.tsx
+index edfb43950d3a8a..0dddbd5b905897 100644
+--- a/packages/components/src/input-control/stories/index.story.tsx
++++ b/packages/components/src/input-control/stories/index.story.tsx
+@@ -81,3 +81,9 @@ WithEdgeLabel.args = {
+ 	__unstableInputWidth: '20em',
+ 	labelPosition: 'edge',
+ };
++
++export const WithInsideLabel = Template.bind( {} );
++WithInsideLabel.args = {
++	...Default.args,
++	labelPosition: 'inside',
++};
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index e4f4c3664e1d9b..c5123c06acd6ca 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -68,7 +68,7 @@ const containerWidthStyles = ( {
+ };
+ 
+ export const Container = styled.div< ContainerProps >`
+-	align-items: center;
++	align-items: stretch;
+ 	box-sizing: border-box;
+ 	border-radius: inherit;
+ 	display: flex;
+@@ -259,6 +259,14 @@ export const LabelWrapper = styled( FlexItem )`
+ 	max-width: calc( 100% - 10px );
+ `;
+ 
++export const InnerLabelWrapper = styled.label`
++	${ baseLabelTypography };
++
++	display: flex;
++	align-items: center;
++	white-space: nowrap;
++`;
++
+ type BackdropProps = {
+ 	disabled?: boolean;
+ 	isFocused?: boolean;
+@@ -315,12 +323,14 @@ export const BackdropUI = styled.div< BackdropProps >`
+ 
+ export const Prefix = styled.span`
+ 	box-sizing: border-box;
+-	display: block;
++	display: flex;
++	align-items: center;
++	align-self: stretch;
+ `;
+ 
+ export const Suffix = styled.span`
+-	align-items: center;
+-	align-self: stretch;
+ 	box-sizing: border-box;
+ 	display: flex;
++	align-items: center;
++	align-self: stretch;
+ `;
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index a804efadd89d38..3a3123f6f7d989 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -17,7 +17,7 @@ import type { WordPressComponentProps } from '../context';
+ import type { FlexProps } from '../flex/types';
+ import type { BaseControlProps } from '../base-control/types';
+ 
+-export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge';
++export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge' | 'inside';
+ 
+ export type DragDirection = 'n' | 's' | 'e' | 'w';
+ 

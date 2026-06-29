@@ -1,0 +1,346 @@
+diff --git a/docs/tool/manifest.js b/docs/tool/manifest.js
+index d3ed5d61dc0bb1..b061fa5149c698 100644
+--- a/docs/tool/manifest.js
++++ b/docs/tool/manifest.js
+@@ -15,6 +15,7 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
+ 		'packages/components/src/theme/README.md',
+ 		'packages/components/src/view/README.md',
+ 		'packages/components/src/dropdown-menu-v2/README.md',
++		'packages/components/src/progress-bar/README.md',
+ 	],
+ } );
+ const packagePaths = glob( 'packages/*/package.json' )
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c903989f456288..d2bc4e93cf85af 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Feature
++
++-   Add a new `ProgressBar` component. ([#53030](https://github.com/WordPress/gutenberg/pull/53030)).
++
+ ### Enhancements
+ 
+ -   `ColorPalette`, `BorderControl`: Don't hyphenate hex value in `aria-label` ([#52932](https://github.com/WordPress/gutenberg/pull/52932)).
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 641ba5c26d40b6..b144f348143c60 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -8,6 +8,7 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/pri
+  */
+ import { default as CustomSelectControl } from './custom-select-control';
+ import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
++import { default as ProgressBar } from './progress-bar';
+ import { createPrivateSlotFill } from './slot-fill';
+ import {
+ 	DropdownMenu as DropdownMenuV2,
+@@ -45,4 +46,5 @@ lock( privateApis, {
+ 	DropdownMenuSeparatorV2,
+ 	DropdownSubMenuV2,
+ 	DropdownSubMenuTriggerV2,
++	ProgressBar,
+ } );
+diff --git a/packages/components/src/progress-bar/README.md b/packages/components/src/progress-bar/README.md
+new file mode 100644
+index 00000000000000..d0f62ce7e3be57
+--- /dev/null
++++ b/packages/components/src/progress-bar/README.md
+@@ -0,0 +1,30 @@
++# ProgressBar
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++A simple horizontal progress bar component.
++
++Supports two modes: determinate and indeterminate. A progress bar is determinate when a specific progress value has been specified (from 0 to 100), and indeterminate when a value hasn't been specified.
++
++### Props
++
++The component accepts the following props:
++
++#### `value`: `number`
++
++The progress value, a number from 0 to 100.
++If a `value` is not specified, the progress bar will be considered indeterminate.
++
++-   Required: No
++
++##### `className`: `string`
++
++A CSS class to apply to the underlying `div` element, serving as a progress bar track.
++
++- Required: No
++
++#### Inherited props
++
++Any additional props will be passed the underlying `<progress/>` element.
+diff --git a/packages/components/src/progress-bar/index.tsx b/packages/components/src/progress-bar/index.tsx
+new file mode 100644
+index 00000000000000..16f2630953840a
+--- /dev/null
++++ b/packages/components/src/progress-bar/index.tsx
+@@ -0,0 +1,45 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import * as ProgressBarStyled from './styles';
++import type { ProgressBarProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
++
++function UnforwardedProgressBar(
++	props: WordPressComponentProps< ProgressBarProps, 'progress', false >,
++	ref: ForwardedRef< HTMLProgressElement >
++) {
++	const { className, value, ...progressProps } = props;
++	const isIndeterminate = ! Number.isFinite( value );
++
++	return (
++		<ProgressBarStyled.Track className={ className }>
++			<ProgressBarStyled.Indicator
++				isIndeterminate={ isIndeterminate }
++				value={ value }
++			/>
++			<ProgressBarStyled.ProgressElement
++				max={ 100 }
++				value={ value }
++				aria-label={ __( 'Loading …' ) }
++				ref={ ref }
++				{ ...progressProps }
++			/>
++		</ProgressBarStyled.Track>
++	);
++}
++
++export const ProgressBar = forwardRef( UnforwardedProgressBar );
++
++export default ProgressBar;
+diff --git a/packages/components/src/progress-bar/stories/index.tsx b/packages/components/src/progress-bar/stories/index.tsx
+new file mode 100644
+index 00000000000000..1499d68a10bbbd
+--- /dev/null
++++ b/packages/components/src/progress-bar/stories/index.tsx
+@@ -0,0 +1,33 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { ProgressBar } from '..';
++
++const meta: ComponentMeta< typeof ProgressBar > = {
++	component: ProgressBar,
++	title: 'Components (Experimental)/ProgressBar',
++	argTypes: {
++		value: { control: { type: 'number', min: 0, max: 100, step: 1 } },
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof ProgressBar > = ( { ...args } ) => {
++	return <ProgressBar { ...args } />;
++};
++
++export const Default: ComponentStory< typeof ProgressBar > = Template.bind(
++	{}
++);
++Default.args = {};
+diff --git a/packages/components/src/progress-bar/styles.ts b/packages/components/src/progress-bar/styles.ts
+new file mode 100644
+index 00000000000000..194c88c4e901b3
+--- /dev/null
++++ b/packages/components/src/progress-bar/styles.ts
+@@ -0,0 +1,67 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css, keyframes } from '@emotion/react';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS, CONFIG } from '../utils';
++
++const animateProgressBar = keyframes( {
++	'0%': {
++		left: '-50%',
++	},
++	'100%': {
++		left: '100%',
++	},
++} );
++
++// Width of the indicator for the indeterminate progress bar
++export const INDETERMINATE_TRACK_WIDTH = 50;
++
++export const Track = styled.div`
++	position: relative;
++	overflow: hidden;
++	width: 100%;
++	max-width: 160px;
++	height: ${ CONFIG.borderWidthFocus };
++	background-color: var(
++		--wp-components-color-gray-100,
++		${ COLORS.gray[ 100 ] }
++	);
++	border-radius: ${ CONFIG.radiusBlockUi };
++`;
++
++export const Indicator = styled.div< {
++	isIndeterminate: boolean;
++	value?: number;
++} >`
++	display: inline-block;
++	position: absolute;
++	top: 0;
++	height: 100%;
++	border-radius: ${ CONFIG.radiusBlockUi };
++	background-color: ${ COLORS.ui.theme };
++
++	${ ( { isIndeterminate, value } ) =>
++		isIndeterminate
++			? css( {
++					animationDuration: '1.5s',
++					animationTimingFunction: 'ease-in-out',
++					animationIterationCount: 'infinite',
++					animationName: animateProgressBar,
++					width: `${ INDETERMINATE_TRACK_WIDTH }%`,
++			  } )
++			: css( { width: `${ value }%` } ) };
++`;
++
++export const ProgressElement = styled.progress`
++	position: absolute;
++	top: 0;
++	left: 0;
++	opacity: 0;
++	width: 100%;
++	height: 100%;
++`;
+diff --git a/packages/components/src/progress-bar/test/index.tsx b/packages/components/src/progress-bar/test/index.tsx
+new file mode 100644
+index 00000000000000..425c54ce8a3022
+--- /dev/null
++++ b/packages/components/src/progress-bar/test/index.tsx
+@@ -0,0 +1,79 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { ProgressBar } from '..';
++import { INDETERMINATE_TRACK_WIDTH } from '../styles';
++
++describe( 'ProgressBar', () => {
++	it( 'should render an indeterminate semantic progress bar element', () => {
++		render( <ProgressBar /> );
++
++		const progressBar = screen.getByRole( 'progressbar' );
++
++		expect( progressBar ).toBeInTheDocument();
++		expect( progressBar ).not.toBeVisible();
++		expect( progressBar ).not.toHaveValue();
++	} );
++
++	it( 'should render a determinate semantic progress bar element', () => {
++		render( <ProgressBar value={ 55 } /> );
++
++		const progressBar = screen.getByRole( 'progressbar' );
++
++		expect( progressBar ).toBeInTheDocument();
++		expect( progressBar ).not.toBeVisible();
++		expect( progressBar ).toHaveValue( 55 );
++	} );
++
++	it( 'should use `INDETERMINATE_TRACK_WIDTH`% as track width for indeterminate progress bar', () => {
++		const { container } = render( <ProgressBar /> );
++
++		/**
++		 * We're intentionally not using an accessible selector, because
++		 * the track is an intentionally non-interactive presentation element.
++		 */
++		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
++		const indicator = container.firstChild?.firstChild;
++
++		expect( indicator ).toHaveStyle( {
++			width: `${ INDETERMINATE_TRACK_WIDTH }%`,
++		} );
++	} );
++
++	it( 'should use `value`% as width for determinate progress bar', () => {
++		const { container } = render( <ProgressBar value={ 55 } /> );
++
++		/**
++		 * We're intentionally not using an accessible selector, because
++		 * the track is an intentionally non-interactive presentation element.
++		 */
++		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
++		const indicator = container.firstChild?.firstChild;
++
++		expect( indicator ).toHaveStyle( {
++			width: '55%',
++		} );
++	} );
++
++	it( 'should pass any additional props down to the underlying `progress` element', () => {
++		const id = 'foo-bar-123';
++		const ariaLabel = 'in progress...';
++		const style = { opacity: 1 };
++
++		render(
++			<ProgressBar id={ id } aria-label={ ariaLabel } style={ style } />
++		);
++
++		expect( screen.getByRole( 'progressbar' ) ).toHaveAttribute( 'id', id );
++		expect( screen.getByRole( 'progressbar' ) ).toHaveAttribute(
++			'aria-label',
++			ariaLabel
++		);
++		expect( screen.getByRole( 'progressbar' ) ).toHaveStyle( style );
++	} );
++} );
+diff --git a/packages/components/src/progress-bar/types.ts b/packages/components/src/progress-bar/types.ts
+new file mode 100644
+index 00000000000000..9beb28317e58aa
+--- /dev/null
++++ b/packages/components/src/progress-bar/types.ts
+@@ -0,0 +1,11 @@
++export type ProgressBarProps = {
++	/**
++	 * Value of the progress bar.
++	 */
++	value?: number;
++
++	/**
++	 * A CSS class to apply to the progress bar wrapper (track) element.
++	 */
++	className?: string;
++};

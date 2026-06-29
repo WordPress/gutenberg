@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 67a63b8b656461..a6de69d38988f5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,7 @@
+ -   `Tabs`: improved performance of the indicator animation ([#64926](https://github.com/WordPress/gutenberg/pull/64926)).
+ -   `Composite`: Remove from private APIs ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
+ -   use local copy of `use-lilius` instead of `npm` dependency ([#65097](https://github.com/WordPress/gutenberg/pull/65097)).
++-   `BoxControl`: Fix critical error when null value is passed ([#65287](https://github.com/WordPress/gutenberg/pull/65287)).
+ 
+ ## 28.7.0 (2024-09-05)
+ 
+diff --git a/packages/components/src/box-control/utils.ts b/packages/components/src/box-control/utils.ts
+index e480c9a9f4674a..73c7f4a6a46cfb 100644
+--- a/packages/components/src/box-control/utils.ts
++++ b/packages/components/src/box-control/utils.ts
+@@ -179,7 +179,7 @@ export function isValuesMixed(
+  */
+ export function isValuesDefined( values?: BoxControlValue ) {
+ 	return (
+-		values !== undefined &&
++		values &&
+ 		Object.values( values ).filter(
+ 			// Switching units when input is empty causes values only
+ 			// containing units. This gives false positive on mixed values

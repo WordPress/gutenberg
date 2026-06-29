@@ -1,0 +1,30 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 15a22ed7578ec0..38c97f5a31017f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `NumberControl`: Fix invalid HTML attributes for infinite bounds ([#69033](https://github.com/WordPress/gutenberg/pull/69033)).
++
+ ## 29.4.0 (2025-02-12)
+ 
+ -   `FontSizePicker`: Remove Custom option from dropdown to prevent unexpected context changes during keyboard navigation ([#69038](https://github.com/WordPress/gutenberg/pull/69038)).
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index 6dd1af4024af7f..e890746e275e86 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -229,8 +229,8 @@ function UnforwardedNumberControl(
+ 			hideHTMLArrows={ spinControls !== 'native' }
+ 			isDragEnabled={ isDragEnabled }
+ 			label={ label }
+-			max={ max }
+-			min={ min }
++			max={ max === Infinity ? undefined : max }
++			min={ min === -Infinity ? undefined : min }
+ 			ref={ mergedRef }
+ 			required={ required }
+ 			step={ step }

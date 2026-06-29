@@ -1,0 +1,4 @@
+diff --git a/packages/components/src/view/index.js b/packages/components/src/view/index.ts
+similarity index 100%
+rename from packages/components/src/view/index.js
+rename to packages/components/src/view/index.ts

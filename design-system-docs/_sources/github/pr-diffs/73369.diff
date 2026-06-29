@@ -1,0 +1,15 @@
+diff --git a/.github/CODEOWNERS b/.github/CODEOWNERS
+index 8ffddca521e51f..a74be80a79f9b2 100644
+--- a/.github/CODEOWNERS
++++ b/.github/CODEOWNERS
+@@ -89,7 +89,9 @@
+ /packages/base-styles
+ /packages/icons
+ /packages/primitives
+-/packages/dataviews                              @oandregal @gigitux @ntsekouras 
++/packages/dataviews                             @oandregal @gigitux @ntsekouras
++/packages/theme                                 @WordPress/gutenberg-components
++/packages/ui                                    @WordPress/gutenberg-components
+ 
+ # Utilities
+ /packages/a11y

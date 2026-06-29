@@ -1,0 +1,151 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b78fbe133eb727..4b39d87de055f6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ ### Internal
+ 
+ -   `NavigableContainer`: Convert to TypeScript ([#49377](https://github.com/WordPress/gutenberg/pull/49377)).
++-   `ToolbarItem`: Convert to TypeScript ([#49190](https://github.com/WordPress/gutenberg/pull/49190)).
+ -   Move rich-text related types to the rich-text package ([#49651](https://github.com/WordPress/gutenberg/pull/49651)).
+ -   `SlotFill`: simplified the implementation and removed unused code ([#50098](https://github.com/WordPress/gutenberg/pull/50098) and [#50133](https://github.com/WordPress/gutenberg/pull/50133))
+ 
+diff --git a/packages/components/src/toolbar/stories/index.tsx b/packages/components/src/toolbar/stories/index.tsx
+index 73064e580a24c1..fd0fb9587347de 100644
+--- a/packages/components/src/toolbar/stories/index.tsx
++++ b/packages/components/src/toolbar/stories/index.tsx
+@@ -83,30 +83,32 @@ Default.args = {
+ 			<ToolbarGroup>
+ 				<ToolbarItem>
+ 					{
+-						// @ts-expect-error TODO: Remove when ToolbarItem/DropdownMenu is typed
+-						( toggleProps ) => (
+-							<DropdownMenu
+-								hasArrowIndicator
+-								icon={ alignLeft }
+-								label="Align"
+-								controls={ [
+-									{
+-										icon: alignLeft,
+-										title: 'Align left',
+-										isActive: true,
+-									},
+-									{
+-										icon: alignCenter,
+-										title: 'Align center',
+-									},
+-									{
+-										icon: alignRight,
+-										title: 'Align right',
+-									},
+-								] }
+-								toggleProps={ toggleProps }
+-							/>
+-						)
++						// @ts-expect-error TODO: Remove when DropdownMenu is typed
++						( toggleProps ) => {
++							return (
++								<DropdownMenu
++									hasArrowIndicator
++									icon={ alignLeft }
++									label="Align"
++									controls={ [
++										{
++											icon: alignLeft,
++											title: 'Align left',
++											isActive: true,
++										},
++										{
++											icon: alignCenter,
++											title: 'Align center',
++										},
++										{
++											icon: alignRight,
++											title: 'Align right',
++										},
++									] }
++									toggleProps={ toggleProps }
++								/>
++							);
++						}
+ 					}
+ 				</ToolbarItem>
+ 			</ToolbarGroup>
+diff --git a/packages/components/src/toolbar/toolbar-button/index.tsx b/packages/components/src/toolbar/toolbar-button/index.tsx
+index 00c5c364e94ce9..578867313a4294 100644
+--- a/packages/components/src/toolbar/toolbar-button/index.tsx
++++ b/packages/components/src/toolbar/toolbar-button/index.tsx
+@@ -82,19 +82,16 @@ function UnforwardedToolbarButton(
+ 			{ ...props }
+ 			ref={ ref }
+ 		>
+-			{
+-				// @ts-expect-error
+-				( toolbarItemProps ) => (
+-					<Button
+-						label={ title }
+-						isPressed={ isActive }
+-						disabled={ isDisabled }
+-						{ ...toolbarItemProps }
+-					>
+-						{ children }
+-					</Button>
+-				)
+-			}
++			{ ( toolbarItemProps ) => (
++				<Button
++					label={ title }
++					isPressed={ isActive }
++					disabled={ isDisabled }
++					{ ...toolbarItemProps }
++				>
++					{ children }
++				</Button>
++			) }
+ 		</ToolbarItem>
+ 	);
+ }
+diff --git a/packages/components/src/toolbar/toolbar-item/index.js b/packages/components/src/toolbar/toolbar-item/index.tsx
+similarity index 80%
+rename from packages/components/src/toolbar/toolbar-item/index.js
+rename to packages/components/src/toolbar/toolbar-item/index.tsx
+index 595a14dbf32a85..6fc9bf01009672 100644
+--- a/packages/components/src/toolbar/toolbar-item/index.js
++++ b/packages/components/src/toolbar/toolbar-item/index.tsx
+@@ -1,9 +1,8 @@
+-// @ts-nocheck
+-
+ /**
+  * External dependencies
+  */
+ import { ToolbarItem as BaseToolbarItem } from 'reakit/Toolbar';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,7 +15,14 @@ import warning from '@wordpress/warning';
+  */
+ import ToolbarContext from '../toolbar-context';
+ 
+-function ToolbarItem( { children, as: Component, ...props }, ref ) {
++function ToolbarItem(
++	{
++		children,
++		as: Component,
++		...props
++	}: React.ComponentPropsWithoutRef< typeof BaseToolbarItem >,
++	ref: ForwardedRef< any >
++) {
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+ 
+ 	if ( typeof children !== 'function' && ! Component ) {
+@@ -33,6 +39,9 @@ function ToolbarItem( { children, as: Component, ...props }, ref ) {
+ 		if ( Component ) {
+ 			return <Component { ...allProps }>{ children }</Component>;
+ 		}
++		if ( typeof children !== 'function' ) {
++			return null;
++		}
+ 		return children( allProps );
+ 	}
+ 

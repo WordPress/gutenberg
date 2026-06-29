@@ -1,0 +1,3591 @@
+diff --git a/.github/workflows/create-block.yml b/.github/workflows/create-block.yml
+index 03b9e8db7b8c94..f585ecefc4c131 100644
+--- a/.github/workflows/create-block.yml
++++ b/.github/workflows/create-block.yml
+@@ -1,7 +1,13 @@
+ name: Create Block
+ 
+ on:
++  pull_request:
++    paths:
++    - 'packages/**'
++    - '!packages/**/test/**'
++    - '!packages/**/*.md'
+   push:
++    branches: [master]
+     paths:
+     - 'packages/**'
+     - '!packages/**/test/**'
+diff --git a/.github/workflows/end2end-test.yml b/.github/workflows/end2end-test.yml
+index e9f8d25e10521a..acf61575a9c025 100644
+--- a/.github/workflows/end2end-test.yml
++++ b/.github/workflows/end2end-test.yml
+@@ -1,6 +1,9 @@
+ name: End-2-End Tests
+ 
+-on: push
++on:
++  pull_request:
++  push:
++    branches: [master]
+ 
+ jobs:
+   admin-1:
+diff --git a/.github/workflows/static-checks.yml b/.github/workflows/static-checks.yml
+index 0660d81a58302e..fd447c42542095 100644
+--- a/.github/workflows/static-checks.yml
++++ b/.github/workflows/static-checks.yml
+@@ -1,6 +1,9 @@
+ name: Static Analysis (Linting, License, Type checks...)
+ 
+-on: push
++on:
++  pull_request:
++  push:
++    branches: [master]
+ 
+ jobs:
+   check:
+diff --git a/.github/workflows/unit-test.yml b/.github/workflows/unit-test.yml
+index d4f1f5f13ca705..bbcd0c59b8253b 100644
+--- a/.github/workflows/unit-test.yml
++++ b/.github/workflows/unit-test.yml
+@@ -1,6 +1,9 @@
+ name: Unit Tests
+ 
+-on: push
++on:
++  pull_request:
++  push:
++    branches: [master]
+ 
+ jobs:
+   unit-js:
+diff --git a/docs/contributors/reference.md b/docs/contributors/reference.md
+index 95c0b603323e50..e1e714f07940dc 100644
+--- a/docs/contributors/reference.md
++++ b/docs/contributors/reference.md
+@@ -14,4 +14,4 @@ Released under GPL license, made by [Cristel Rossignol](https://twitter.com/cris
+ 
+ ## Mockups
+ 
+-Mockup Sketch files are available in [the Design section](/docs/designers-developers/designers/design-resources.md)</a>.
++Mockup Sketch files are available in [the Design section](/docs/designers-developers/designers/design-resources.md).
+diff --git a/docs/designers-developers/developers/themes/theme-support.md b/docs/designers-developers/developers/themes/theme-support.md
+index 8c769a4f871c28..55e68cf01b9c5b 100644
+--- a/docs/designers-developers/developers/themes/theme-support.md
++++ b/docs/designers-developers/developers/themes/theme-support.md
+@@ -93,7 +93,7 @@ Here's the markup for a left-floated image:
+ </div>
+ ```
+ 
+-Here's an example using the above markup to achieve a responsive layout that features a sidebar, wide images, and floated elements with bounded captions: https://codepen.io/joen/pen/zLWvrW.
++Here's an example [codepen](https://codepen.io/joen/pen/zLWvrW) using the above markup to achieve a responsive layout that features a sidebar, wide images, and floated elements with bounded captions.
+ 
+ ### Block Color Palettes
+ 
+diff --git a/lib/class-wp-rest-image-editor-controller.php b/lib/class-wp-rest-image-editor-controller.php
+index 5dcc0d2ab0f85f..cdb05b498f98fa 100644
+--- a/lib/class-wp-rest-image-editor-controller.php
++++ b/lib/class-wp-rest-image-editor-controller.php
+@@ -1,7 +1,7 @@
+ <?php
+ /**
+  * Start: Include for phase 2
+- * REST API: WP_REST_Menus_Controller class
++ * REST API: WP_REST_Image_Editor_Controller class
+  *
+  * @package    WordPress
+  * @subpackage REST_API
+@@ -23,8 +23,8 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
+ 	 * @access public
+ 	 */
+ 	public function __construct() {
+-		$this->namespace = '__experimental';
+-		$this->rest_base = '/image-editor/(?P<media_id>[\d]+)';
++		$this->namespace = 'wp/v2';
++		$this->rest_base = 'media';
+ 	}
+ 
+ 	/**
+@@ -36,7 +36,7 @@ public function __construct() {
+ 	public function register_routes() {
+ 		register_rest_route(
+ 			$this->namespace,
+-			$this->rest_base . '/apply',
++			'/' . $this->rest_base . '/(?P<id>[\d]+)/edit',
+ 			array(
+ 				array(
+ 					'methods'             => WP_REST_Server::EDITABLE,
+@@ -84,11 +84,15 @@ public function register_routes() {
+ 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+ 	 */
+ 	public function permission_callback( $request ) {
+-		if ( ! current_user_can( 'edit_post', $request['media_id'] ) ) {
++		if ( ! current_user_can( 'edit_post', $request['id'] ) ) {
+ 			$error = __( 'Sorry, you are not allowed to edit images.', 'gutenberg' );
+ 			return new WP_Error( 'rest_cannot_edit_image', $error, array( 'status' => rest_authorization_required_code() ) );
+ 		}
+ 
++		if ( ! current_user_can( 'upload_files' ) ) {
++			return new WP_Error( 'rest_cannot_edit_image', __( 'Sorry, you are not allowed to upload media on this site.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
++		}
++
+ 		return true;
+ 	}
+ 
+@@ -104,8 +108,7 @@ public function permission_callback( $request ) {
+ 	public function apply_edits( $request ) {
+ 		require_once ABSPATH . 'wp-admin/includes/image.php';
+ 
+-		$params        = $request->get_params();
+-		$attachment_id = $params['media_id'];
++		$attachment_id = $request['id'];
+ 
+ 		// This also confirms the attachment is an image.
+ 		$image_file = wp_get_original_image_path( $attachment_id );
+@@ -116,16 +119,26 @@ public function apply_edits( $request ) {
+ 			return new WP_Error( 'rest_unknown_attachment', $error, array( 'status' => 404 ) );
+ 		}
+ 
++		$supported_types = array( 'image/jpeg', 'image/png', 'image/gif' );
++		$mime_type       = get_post_mime_type( $attachment_id );
++		if ( ! in_array( $mime_type, $supported_types, true ) ) {
++			return new WP_Error(
++				'rest_cannot_edit_file_type',
++				__( 'This type of file cannot be edited.', 'gutenberg' ),
++				array( 'status' => 400 )
++			);
++		}
++
+ 		// Check if we need to do anything.
+ 		$rotate = 0;
+ 		$crop   = false;
+ 
+-		if ( ! empty( $params['rotation'] ) ) {
++		if ( ! empty( $request['rotation'] ) ) {
+ 			// Rotation direction: clockwise vs. counter clockwise.
+-			$rotate = 0 - (int) $params['rotation'];
++			$rotate = 0 - (int) $request['rotation'];
+ 		}
+ 
+-		if ( isset( $params['x'], $params['y'], $params['width'], $params['height'] ) ) {
++		if ( isset( $request['x'], $request['y'], $request['width'], $request['height'] ) ) {
+ 			$crop = true;
+ 		}
+ 
+@@ -154,10 +167,10 @@ public function apply_edits( $request ) {
+ 		if ( $crop ) {
+ 			$size = $image_editor->get_size();
+ 
+-			$crop_x = round( ( $size['width'] * floatval( $params['x'] ) ) / 100.0 );
+-			$crop_y = round( ( $size['height'] * floatval( $params['y'] ) ) / 100.0 );
+-			$width  = round( ( $size['width'] * floatval( $params['width'] ) ) / 100.0 );
+-			$height = round( ( $size['height'] * floatval( $params['height'] ) ) / 100.0 );
++			$crop_x = round( ( $size['width'] * floatval( $request['x'] ) ) / 100.0 );
++			$crop_y = round( ( $size['height'] * floatval( $request['y'] ) ) / 100.0 );
++			$width  = round( ( $size['width'] * floatval( $request['width'] ) ) / 100.0 );
++			$height = round( ( $size['height'] * floatval( $request['height'] ) ) / 100.0 );
+ 
+ 			$result = $image_editor->crop( $crop_x, $crop_y, $width, $height );
+ 
+@@ -204,7 +217,7 @@ public function apply_edits( $request ) {
+ 			'post_content'   => '',
+ 		);
+ 
+-		$new_attachment_id = wp_insert_attachment( $attachment_post, $saved['path'], 0, true );
++		$new_attachment_id = wp_insert_attachment( wp_slash( $attachment_post ), $saved['path'], 0, true );
+ 
+ 		if ( is_wp_error( $new_attachment_id ) ) {
+ 			if ( 'db_update_error' === $new_attachment_id->get_error_code() ) {
+@@ -244,10 +257,23 @@ public function apply_edits( $request ) {
+ 			'file'          => _wp_relative_upload_path( $image_file ),
+ 		);
+ 
++		/**
++		 * Filters the updated attachment meta data.
++		 *
++		 * @since 5.5.0
++		 *
++		 * @param array $data              Array of updated attachment meta data.
++		 * @param int   $new_attachment_id Attachment post ID.
++		 * @param int   $attachment_id     Original Attachment post ID.
++		 */
++		$new_image_meta = apply_filters( 'wp_edited_attachment_metadata', $new_image_meta, $new_attachment_id, $attachment_id );
++
+ 		wp_update_attachment_metadata( $new_attachment_id, $new_image_meta );
+ 
+-		$path     = '/wp/v2/media/' . $new_attachment_id;
+-		$response = rest_do_request( $path );
++		$path        = '/wp/v2/media/' . $new_attachment_id;
++		$new_request = new WP_REST_Request( 'GET', $path );
++		$new_request->set_query_params( array( 'context' => 'edit' ) );
++		$response = rest_do_request( $new_request );
+ 
+ 		if ( ! $response->is_error() ) {
+ 			$response->set_status( 201 );
+diff --git a/lib/rest-api.php b/lib/rest-api.php
+index 7f1d5886c783be..72101776e80ef6 100644
+--- a/lib/rest-api.php
++++ b/lib/rest-api.php
+@@ -55,7 +55,8 @@ function gutenberg_filter_oembed_result( $response, $handler, $request ) {
+ /**
+  * Add fields required for site editing to the /themes endpoint.
+  *
+- * @todo Remove once https://core.trac.wordpress.org/ticket/49906 is fixed.
++ * @todo Remove once Gutenberg's minimum required WordPress version is v5.5.
++ * @see https://core.trac.wordpress.org/ticket/49906
+  * @see https://github.com/WordPress/wordpress-develop/pull/222
+  *
+  * @param WP_REST_Response $response The response object.
+@@ -63,26 +64,64 @@ function gutenberg_filter_oembed_result( $response, $handler, $request ) {
+  * @param WP_REST_Request  $request  Request object.
+  */
+ function gutenberg_filter_rest_prepare_theme( $response, $theme, $request ) {
+-	$data           = $response->get_data();
+-	$field_mappings = array(
++	$data   = $response->get_data();
++	$fields = array_keys( $data );
++
++	/**
++	 * The following is basically copied from Core's WP_REST_Themes_Controller::prepare_item_for_response()
++	 * (as of WP v5.5), with `rest_is_field_included()` replaced by `! in_array()`.
++	 * This makes sure that we add all the fields that are missing from Core.
++	 *
++	 * @see https://github.com/WordPress/WordPress/blob/019bc2d244c4d536338d2c634419583e928143df/wp-includes/rest-api/endpoints/class-wp-rest-themes-controller.php#L118-L167
++	 */
++	if ( ! in_array( 'stylesheet', $fields, true ) ) {
++		$data['stylesheet'] = $theme->get_stylesheet();
++	}
++
++	if ( ! in_array( 'template', $fields, true ) ) {
++		/**
++		 * Use the get_template() method, not the 'Template' header, for finding the template.
++		 * The 'Template' header is only good for what was written in the style.css, while
++		 * get_template() takes into account where WordPress actually located the theme and
++		 * whether it is actually valid.
++		 */
++		$data['template'] = $theme->get_template();
++	}
++
++	$plain_field_mappings = array(
++		'requires_php' => 'RequiresPHP',
++		'requires_wp'  => 'RequiresWP',
++		'textdomain'   => 'TextDomain',
++		'version'      => 'Version',
++	);
++
++	foreach ( $plain_field_mappings as $field => $header ) {
++		if ( ! in_array( $field, $fields, true ) ) {
++			$data[ $field ] = $theme->get( $header );
++		}
++	}
++
++	if ( ! in_array( 'screenshot', $fields, true ) ) {
++		// Using $theme->get_screenshot() with no args to get absolute URL.
++		$data['screenshot'] = $theme->get_screenshot() ? $theme->get_screenshot() : '';
++	}
++
++	$rich_field_mappings = array(
+ 		'author'      => 'Author',
+-		'author_name' => 'Author Name',
+-		'author_uri'  => 'Author URI',
++		'author_uri'  => 'AuthorURI',
+ 		'description' => 'Description',
+ 		'name'        => 'Name',
+-		'stylesheet'  => 'Stylesheet',
+-		'template'    => 'Template',
+-		'theme_uri'   => 'Theme URI',
+-		'version'     => 'Version',
++		'tags'        => 'Tags',
++		'theme_uri'   => 'ThemeURI',
+ 	);
+ 
+-	foreach ( $field_mappings as $field => $theme_field ) {
+-		$data[ $field ] = $theme[ $theme_field ];
++	foreach ( $rich_field_mappings as $field => $header ) {
++		if ( ! in_array( $field, $fields, true ) ) {
++			$data[ $field ]['raw']      = $theme->display( $header, false, true );
++			$data[ $field ]['rendered'] = $theme->display( $header );
++		}
+ 	}
+ 
+-	// Using $theme->get_screenshot() with no args to get absolute URL.
+-	$data['screenshot'] = $theme->get_screenshot();
+-
+ 	$response->set_data( $data );
+ 	return $response;
+ }
+diff --git a/lib/template-loader.php b/lib/template-loader.php
+index 9718b22313093d..3d92da499586ab 100644
+--- a/lib/template-loader.php
++++ b/lib/template-loader.php
+@@ -135,7 +135,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
+ function create_auto_draft_for_template_part_block( $block ) {
+ 	$template_part_ids = array();
+ 
+-	if ( 'core/template-part' === $block['blockName'] ) {
++	if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['slug'] ) ) {
+ 		if ( isset( $block['attrs']['postId'] ) ) {
+ 			// Template part is customized.
+ 			$template_part_id = $block['attrs']['postId'];
+diff --git a/package-lock.json b/package-lock.json
+index e4dbd8374a3ae7..4cfbfe2c250978 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -11930,6 +11930,9 @@
+ 		},
+ 		"@wordpress/react-native-aztec": {
+ 			"version": "file:packages/react-native-aztec",
++			"requires": {
++				"@wordpress/keycodes": "file:packages/keycodes"
++			},
+ 			"dependencies": {
+ 				"prop-types": {
+ 					"version": "15.6.0",
+diff --git a/packages/base-styles/CHANGELOG.md b/packages/base-styles/CHANGELOG.md
+index fab0cd143d2534..856503710f20c0 100644
+--- a/packages/base-styles/CHANGELOG.md
++++ b/packages/base-styles/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ## Breaking Changes
+ 
+ - Remove the AdminColorThemes JavaScript variables.
++- Retire numerous colors and old grays, indicate others for deprecation.
+ 
+ ## 1.2.0 (2020-01-13)
+ 
+diff --git a/packages/base-styles/_colors.scss b/packages/base-styles/_colors.scss
+index efa46eed439392..6200e9fa1c3d11 100644
+--- a/packages/base-styles/_colors.scss
++++ b/packages/base-styles/_colors.scss
+@@ -2,107 +2,51 @@
+  * Colors
+  */
+ 
+-// Hugo's new WordPress shades of gray, from http://codepen.io/hugobaeta/pen/grJjVp.
+-$black: #000;
++// WordPress colors.
++$black: #000;					// Use only when you truly need pure black. For UI, use $dark-gray-primary.
++$dark-gray-primary: #1e1e1e;
++$medium-gray-text: #757575;		// Meets 4.6:1 text contrast against white.
++$light-gray-ui: #949494;		// Meets 3:1 UI or large text contrast against white.
++$light-gray-secondary: #ccc;
++$light-gray-tertiary: #e7e8e9;
++$white: #fff;
++$blue-medium-focus-dark: $white;	// Focus color when the theme is dark.
++
++// Opacities. For use when transparency is needed.
++$dark-gray-placeholder: rgba($dark-gray-primary, 0.62);
++$medium-gray-placeholder: rgba($dark-gray-primary, 0.55);
++$light-gray-placeholder: rgba($white, 0.65);
++
++// Alert colors.
++$alert-yellow: #f0b849;
++$alert-red: #d94f4f;
++$alert-green: #4ab866;
++
++
++/**
++ * Deprecated colors.
++ * Please avoid using these.
++ */
++
+ $dark-gray-900: #191e23;
+ $dark-gray-800: #23282d;
+ $dark-gray-700: #32373c;
+ $dark-gray-600: #40464d;
+-$dark-gray-500: #555d66; // Use this most of the time for dark items.
++$dark-gray-500: #555d66;
+ $dark-gray-400: #606a73;
+-$dark-gray-300: #6c7781; // Lightest gray that can be used for AA text contrast.
++$dark-gray-300: #6c7781;
+ $dark-gray-200: #7e8993;
+-$dark-gray-150: #8d96a0; // Lightest gray that can be used for AA non-text contrast.
++$dark-gray-150: #8d96a0;
+ $dark-gray-100: #8f98a1;
++
+ $light-gray-900: #a2aab2;
+ $light-gray-800: #b5bcc2;
+ $light-gray-700: #ccd0d4;
+ $light-gray-600: #d7dade;
+-$light-gray-500: #e2e4e7; // Good for "grayed" items and borders.
+-$light-gray-400: #e8eaeb; // Good for "readonly" input fields and special text selection.
++$light-gray-500: #e2e4e7;
++$light-gray-400: #e8eaeb;
+ $light-gray-300: #edeff0;
+ $light-gray-200: #f3f4f5;
+ $light-gray-100: #f8f9f9;
+-$white: #fff;
+-
+-// G2 colors.
+-$dark-gray-primary: #1e1e1e;
+-$medium-gray-text: #757575;		// Meets 4.6:1 text contrast.
+-$light-gray-ui: #949494;		// Meets 3:1 UI contrast.
+-$light-gray-secondary: #ccc;
+-$light-gray-tertiary: #e7e8e9;
+-$blue-medium-focus-dark: $white;
+-
+-// Dark opacities, for use with light themes.
+-$dark-opacity-900: rgba(#000510, 0.9);
+-$dark-opacity-800: rgba(#00000a, 0.85);
+-$dark-opacity-700: rgba(#06060b, 0.8);
+-$dark-opacity-600: rgba(#000913, 0.75);
+-$dark-opacity-500: rgba(#0a1829, 0.7);
+-$dark-opacity-400: rgba(#0a1829, 0.65);
+-$dark-opacity-300: rgba(#0e1c2e, 0.62);
+-$dark-opacity-200: rgba(#162435, 0.55);
+-$dark-opacity-100: rgba(#223443, 0.5);
+-$dark-opacity-light-900: rgba(#304455, 0.45);
+-$dark-opacity-light-800: rgba(#425863, 0.4);
+-$dark-opacity-light-700: rgba(#667886, 0.35);
+-$dark-opacity-light-600: rgba(#7b86a2, 0.3);
+-$dark-opacity-light-500: rgba(#9197a2, 0.25);
+-$dark-opacity-light-400: rgba(#95959c, 0.2);
+-$dark-opacity-light-300: rgba(#829493, 0.15);
+-$dark-opacity-light-200: rgba(#8b8b96, 0.1);
+-$dark-opacity-light-100: rgba(#747474, 0.05);
+-$dark-opacity-background-fill: rgba($dark-gray-700, 0.7); // Similar to $dark-opacity-light-200, but more opaque.
+-
+-// Light opacities, for use with dark themes.
+-$light-opacity-900: rgba($white, 1);
+-$light-opacity-800: rgba($white, 0.9);
+-$light-opacity-700: rgba($white, 0.85);
+-$light-opacity-600: rgba($white, 0.8);
+-$light-opacity-500: rgba($white, 0.75);
+-$light-opacity-400: rgba($white, 0.7);
+-$light-opacity-300: rgba($white, 0.65);
+-$light-opacity-200: rgba($white, 0.6);
+-$light-opacity-100: rgba($white, 0.55);
+-$light-opacity-light-900: rgba($white, 0.5);
+-$light-opacity-light-800: rgba($white, 0.45);
+-$light-opacity-light-700: rgba($white, 0.4);
+-$light-opacity-light-600: rgba($white, 0.35);
+-$light-opacity-light-500: rgba($white, 0.3);
+-$light-opacity-light-400: rgba($white, 0.25);
+-$light-opacity-light-300: rgba($white, 0.2);
+-$light-opacity-light-200: rgba($white, 0.15);
+-$light-opacity-light-100: rgba($white, 0.1);
+-$light-opacity-background-fill: rgba($light-gray-300, 0.8);  // Similar to $light-opacity-light-200, but more opaque.
+-
+-// Additional colors.
+-// Some are from https://make.wordpress.org/design/handbook/foundations/colors/.
+-$blue-wordpress-700: #00669b;
+-$blue-dark-900: #0071a1;
+ 
+-$blue-medium-900: #006589;
+-$blue-medium-800: #00739c;
+-$blue-medium-700: #007fac;
+-$blue-medium-600: #008dbe;
+-$blue-medium-500: #00a0d2;
+-$blue-medium-400: #33b3db;
+-$blue-medium-300: #66c6e4;
+-$blue-medium-200: #bfe7f3;
+ $blue-medium-100: #e5f5fa;
+-$blue-medium-highlight: #b3e7fe;
+-
+-// Alert colors.
+-$alert-yellow: #f0b849;
+-$alert-red: #d94f4f;
+-$alert-green: #4ab866;
+-
+-// Navigation.
+-$light-style-sub-menu-background-color: #fff;
+-$light-style-sub-menu-border-color: #ddd;
+-$light-style-sub-menu-text-color: #111;
+-$light-style-sub-menu-text-color-hover: #333;
+-
+-$dark-style-sub-menu-background-color: #333;
+-$dark-style-sub-menu-border-color: #111;
+-$dark-style-sub-menu-text-color: #fff;
+-$dark-style-sub-menu-text-color-hover: #eee;
+diff --git a/packages/base-styles/_mixins.scss b/packages/base-styles/_mixins.scss
+index ba4e8ad8f7e575..073bc8abb36cda 100644
+--- a/packages/base-styles/_mixins.scss
++++ b/packages/base-styles/_mixins.scss
+@@ -259,30 +259,30 @@
+ 
+ 	// Use opacity to work in various editor styles.
+ 	&::-webkit-input-placeholder {
+-		color: $dark-opacity-300;
++		color: $dark-gray-placeholder;
+ 	}
+ 
+ 	&::-moz-placeholder {
+ 		opacity: 1; // Necessary because Firefox reduces this from 1.
+-		color: $dark-opacity-300;
++		color: $dark-gray-placeholder;
+ 	}
+ 
+ 	&:-ms-input-placeholder {
+-		color: $dark-opacity-300;
++		color: $dark-gray-placeholder;
+ 	}
+ 
+ 	.is-dark-theme & {
+ 		&::-webkit-input-placeholder {
+-			color: $light-opacity-300;
++			color: $light-gray-placeholder;
+ 		}
+ 
+ 		&::-moz-placeholder {
+ 			opacity: 1; // Necessary because Firefox reduces this from 1.
+-			color: $light-opacity-300;
++			color: $light-gray-placeholder;
+ 		}
+ 
+ 		&:-ms-input-placeholder {
+-			color: $light-opacity-300;
++			color: $light-gray-placeholder;
+ 		}
+ 	}
+ }
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index e272890ea49997..f1fe6a82f7f0c7 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -33,6 +33,7 @@ $z-layers: (
+ 	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block
+ 	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
+ 	".wp-block-cover__video-background": 0, // Video background inside cover block.
++	".wp-block-template-part__placeholder-preview-filter-input": 1,
+ 
+ 	// Active pill button
+ 	".components-button {:focus or .is-primary}": 1,
+diff --git a/packages/block-directory/src/components/downloadable-block-icon/index.js b/packages/block-directory/src/components/downloadable-block-icon/index.js
+index e2ca57c735977d..77913c6aa3ae13 100644
+--- a/packages/block-directory/src/components/downloadable-block-icon/index.js
++++ b/packages/block-directory/src/components/downloadable-block-icon/index.js
+@@ -7,7 +7,7 @@ import { BlockIcon } from '@wordpress/block-editor';
+ function DownloadableBlockIcon( { icon, title } ) {
+ 	return (
+ 		<div className="block-directory-downloadable-block-icon">
+-			{ icon.match( /\.(jpeg|jpg|gif|png)(?:\?.*)?$/ ) !== null ? (
++			{ icon.match( /\.(jpeg|jpg|gif|png|svg)(?:\?.*)?$/ ) !== null ? (
+ 				<img
+ 					src={ icon }
+ 					alt={ sprintf(
+diff --git a/packages/block-editor/src/components/block-draggable/index.js b/packages/block-editor/src/components/block-draggable/index.js
+index 237764b6ab0851..7be361bb048b12 100644
+--- a/packages/block-editor/src/components/block-draggable/index.js
++++ b/packages/block-editor/src/components/block-draggable/index.js
+@@ -3,14 +3,13 @@
+  */
+ import { Draggable } from '@wordpress/components';
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { useContext, useEffect, useRef } from '@wordpress/element';
++import { useEffect, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import BlockDraggableChip from './draggable-chip';
+ import useScrollWhenDragging from './use-scroll-when-dragging';
+-import { BlockNodes } from '../block-list/root-container';
+ 
+ const BlockDraggable = ( {
+ 	children,
+@@ -40,14 +39,11 @@ const BlockDraggable = ( {
+ 		[ clientIds ]
+ 	);
+ 	const isDragging = useRef( false );
+-	const [ firstClientId ] = clientIds;
+-	const blockNodes = useContext( BlockNodes );
+-	const blockElement = blockNodes ? blockNodes[ firstClientId ] : undefined;
+ 	const [
+ 		startScrolling,
+ 		scrollOnDragOver,
+ 		stopScrolling,
+-	] = useScrollWhenDragging( blockElement );
++	] = useScrollWhenDragging();
+ 
+ 	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
+ 		'core/block-editor'
+diff --git a/packages/block-editor/src/components/block-draggable/use-scroll-when-dragging.js b/packages/block-editor/src/components/block-draggable/use-scroll-when-dragging.js
+index 90ddf15240233c..e7f869b2d3b0a8 100644
+--- a/packages/block-editor/src/components/block-draggable/use-scroll-when-dragging.js
++++ b/packages/block-editor/src/components/block-draggable/use-scroll-when-dragging.js
+@@ -6,20 +6,18 @@ import { useCallback, useEffect, useRef } from '@wordpress/element';
+ 
+ const SCROLL_INACTIVE_DISTANCE_PX = 50;
+ const SCROLL_INTERVAL_MS = 25;
+-const PIXELS_PER_SECOND_PER_DISTANCE = 5;
++const PIXELS_PER_SECOND_PER_PERCENTAGE = 1000;
+ const VELOCITY_MULTIPLIER =
+-	PIXELS_PER_SECOND_PER_DISTANCE * ( SCROLL_INTERVAL_MS / 1000 );
++	PIXELS_PER_SECOND_PER_PERCENTAGE * ( SCROLL_INTERVAL_MS / 1000 );
+ 
+ /**
+  * React hook that scrolls the scroll container when a block is being dragged.
+  *
+- * @param {Element} dragElement The DOM element being dragged.
+- *
+  * @return {Function[]} `startScrolling`, `scrollOnDragOver`, `stopScrolling`
+  *                      functions to be called in `onDragStart`, `onDragOver`
+  *                      and `onDragEnd` events respectively.
+  */
+-export default function useScrollWhenDragging( dragElement ) {
++export default function useScrollWhenDragging() {
+ 	const dragStartY = useRef( null );
+ 	const velocityY = useRef( null );
+ 	const scrollParentY = useRef( null );
+@@ -36,39 +34,63 @@ export default function useScrollWhenDragging( dragElement ) {
+ 		[]
+ 	);
+ 
+-	const startScrolling = useCallback(
+-		( event ) => {
+-			dragStartY.current = event.clientY;
++	const startScrolling = useCallback( ( event ) => {
++		dragStartY.current = event.clientY;
+ 
+-			// Find nearest parent(s) to scroll.
+-			scrollParentY.current = getScrollContainer( dragElement );
++		// Find nearest parent(s) to scroll.
++		scrollParentY.current = getScrollContainer( event.target );
+ 
+-			scrollEditorInterval.current = setInterval( () => {
+-				if ( scrollParentY.current && velocityY.current ) {
+-					const newTop =
+-						scrollParentY.current.scrollTop + velocityY.current;
++		scrollEditorInterval.current = setInterval( () => {
++			if ( scrollParentY.current && velocityY.current ) {
++				const newTop =
++					scrollParentY.current.scrollTop + velocityY.current;
+ 
+-					// Setting `behavior: 'smooth'` as a scroll property seems to hurt performance.
+-					// Better to use a small scroll interval.
+-					scrollParentY.current.scroll( {
+-						top: newTop,
+-					} );
+-				}
+-			}, SCROLL_INTERVAL_MS );
+-		},
+-		[ dragElement ]
+-	);
++				// Setting `behavior: 'smooth'` as a scroll property seems to hurt performance.
++				// Better to use a small scroll interval.
++				scrollParentY.current.scroll( {
++					top: newTop,
++				} );
++			}
++		}, SCROLL_INTERVAL_MS );
++	}, [] );
+ 
+ 	const scrollOnDragOver = useCallback( ( event ) => {
+-		const distanceY = event.clientY - dragStartY.current;
+-		if ( distanceY > SCROLL_INACTIVE_DISTANCE_PX ) {
+-			velocityY.current =
+-				VELOCITY_MULTIPLIER *
+-				( distanceY - SCROLL_INACTIVE_DISTANCE_PX );
+-		} else if ( distanceY < -SCROLL_INACTIVE_DISTANCE_PX ) {
+-			velocityY.current =
+-				VELOCITY_MULTIPLIER *
+-				( distanceY + SCROLL_INACTIVE_DISTANCE_PX );
++		const scrollParentHeight = scrollParentY.current.offsetHeight;
++		const offsetDragStartPosition =
++			dragStartY.current - scrollParentY.current.offsetTop;
++		const offsetDragPosition =
++			event.clientY - scrollParentY.current.offsetTop;
++
++		if ( event.clientY > offsetDragStartPosition ) {
++			// User is dragging downwards.
++			const moveableDistance = Math.max(
++				scrollParentHeight -
++					offsetDragStartPosition -
++					SCROLL_INACTIVE_DISTANCE_PX,
++				0
++			);
++			const dragDistance = Math.max(
++				offsetDragPosition -
++					offsetDragStartPosition -
++					SCROLL_INACTIVE_DISTANCE_PX,
++				0
++			);
++			const distancePercentage = dragDistance / moveableDistance;
++			velocityY.current = VELOCITY_MULTIPLIER * distancePercentage;
++		} else if ( event.clientY < offsetDragStartPosition ) {
++			// User is dragging upwards.
++			const moveableDistance = Math.max(
++				offsetDragStartPosition - SCROLL_INACTIVE_DISTANCE_PX,
++				0
++			);
++			const dragDistance = Math.max(
++				offsetDragStartPosition -
++					offsetDragPosition -
++					SCROLL_INACTIVE_DISTANCE_PX,
++				0
++			);
++			const distancePercentage = dragDistance / moveableDistance;
++			velocityY.current = -VELOCITY_MULTIPLIER * distancePercentage;
+ 		} else {
+ 			velocityY.current = 0;
+ 		}
+diff --git a/packages/block-editor/src/components/block-mobile-toolbar/block-actions-menu.native.js b/packages/block-editor/src/components/block-mobile-toolbar/block-actions-menu.native.js
+index a15578d1e91c81..f8f5fdf34dce94 100644
+--- a/packages/block-editor/src/components/block-mobile-toolbar/block-actions-menu.native.js
++++ b/packages/block-editor/src/components/block-mobile-toolbar/block-actions-menu.native.js
+@@ -33,7 +33,7 @@ const BlockActionsMenu = ( {
+ 	anchorNodeRef,
+ } ) => {
+ 	const pickerRef = useRef();
+-	const moversOptions = { keys: [ 'icon', 'actionTitle' ], blockTitle };
++	const moversOptions = { keys: [ 'icon', 'actionTitle' ] };
+ 
+ 	const {
+ 		icon: { backward: backwardButtonIcon, forward: forwardButtonIcon },
+@@ -45,8 +45,7 @@ const BlockActionsMenu = ( {
+ 
+ 	const deleteOption = {
+ 		id: 'deleteOption',
+-		// translators: %s: block title e.g: "Paragraph".
+-		label: sprintf( __( 'Remove %s' ), blockTitle ),
++		label: __( 'Remove block' ),
+ 		value: 'deleteOption',
+ 		icon: trash,
+ 		separated: true,
+@@ -55,8 +54,7 @@ const BlockActionsMenu = ( {
+ 
+ 	const settingsOption = {
+ 		id: 'settingsOption',
+-		// translators: %s: block title e.g: "Paragraph".
+-		label: sprintf( __( '%s Settings' ), blockTitle ),
++		label: __( 'Block settings' ),
+ 		value: 'settingsOption',
+ 		icon: cog,
+ 	};
+@@ -136,6 +134,8 @@ const BlockActionsMenu = ( {
+ 				anchor={
+ 					anchorNodeRef ? findNodeHandle( anchorNodeRef ) : undefined
+ 				}
++				// translators: %s: block title e.g: "Paragraph".
++				title={ sprintf( __( '%s block options' ), blockTitle ) }
+ 			/>
+ 		</>
+ 	);
+diff --git a/packages/block-editor/src/components/block-mobile-toolbar/index.native.js b/packages/block-editor/src/components/block-mobile-toolbar/index.native.js
+index 6168f56ca098fe..0712b27688b912 100644
+--- a/packages/block-editor/src/components/block-mobile-toolbar/index.native.js
++++ b/packages/block-editor/src/components/block-mobile-toolbar/index.native.js
+@@ -8,6 +8,7 @@ import { View } from 'react-native';
+  */
+ import { withDispatch, withSelect } from '@wordpress/data';
+ import { compose } from '@wordpress/compose';
++import { useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -31,6 +32,7 @@ const BlockMobileToolbar = ( {
+ 	blockWidth,
+ 	anchorNodeRef,
+ } ) => {
++	const [ fillsLength, setFillsLength ] = useState( null );
+ 	const wrapBlockSettings = blockWidth < BREAKPOINTS.wrapSettings;
+ 	const wrapBlockMover = blockWidth <= BREAKPOINTS.wrapMover;
+ 
+@@ -45,17 +47,18 @@ const BlockMobileToolbar = ( {
+ 
+ 			<View style={ styles.spacer } />
+ 
+-			{ ! wrapBlockSettings && (
+-				<BlockSettingsButton.Slot>
+-					{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
+-					{ ( fills = [ null ] ) => fills[ 0 ] }
+-				</BlockSettingsButton.Slot>
+-			) }
++			<BlockSettingsButton.Slot>
++				{ /* Render only one settings icon even if we have more than one fill - need for hooks with controls */ }
++				{ ( fills = [ null ] ) => {
++					setFillsLength( fills.length );
++					return wrapBlockSettings ? null : fills[ 0 ];
++				} }
++			</BlockSettingsButton.Slot>
+ 
+ 			<BlockActionsMenu
+ 				clientIds={ [ clientId ] }
+ 				wrapBlockMover={ wrapBlockMover }
+-				wrapBlockSettings={ wrapBlockSettings }
++				wrapBlockSettings={ wrapBlockSettings && fillsLength }
+ 				isStackedHorizontally={ isStackedHorizontally }
+ 				onDelete={ onDelete }
+ 				anchorNodeRef={ anchorNodeRef }
+diff --git a/packages/block-editor/src/components/block-mover/mover-description.native.js b/packages/block-editor/src/components/block-mover/mover-description.native.js
+index 37412984ff39f1..6435b7d44b1003 100644
+--- a/packages/block-editor/src/components/block-mover/mover-description.native.js
++++ b/packages/block-editor/src/components/block-mover/mover-description.native.js
+@@ -13,10 +13,8 @@ const horizontalMover = {
+ 	forwardButtonIcon: arrowRight,
+ 	backwardButtonHint: __( 'Double tap to move the block to the left' ),
+ 	forwardButtonHint: __( 'Double tap to move the block to the right' ),
+-	/* translators: %s: block title e.g: "Paragraph" */
+-	firstBlockTitle: __( 'Move %s Left' ),
+-	/* translators: %s: block title e.g: "Paragraph" */
+-	lastBlockTitle: __( 'Move %s Right' ),
++	firstBlockTitle: __( 'Move block left' ),
++	lastBlockTitle: __( 'Move block right' ),
+ 	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+ 	backwardButtonTitle: __(
+ 		'Move block left from position %1$s to position %2$s'
+@@ -32,10 +30,8 @@ const verticalMover = {
+ 	forwardButtonIcon: arrowDown,
+ 	backwardButtonHint: __( 'Double tap to move the block up' ),
+ 	forwardButtonHint: __( 'Double tap to move the block down' ),
+-	/* translators: %s: block title e.g: "Paragraph" */
+-	firstBlockTitle: __( 'Move %s Up' ),
+-	/* translators: %s: block title e.g: "Paragraph" */
+-	lastBlockTitle: __( 'Move %s Down' ),
++	firstBlockTitle: __( 'Move block up' ),
++	lastBlockTitle: __( 'Move block down' ),
+ 	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+ 	backwardButtonTitle: __( 'Move block up from row %1$s to row %2$s' ),
+ 	/* translators: accessibility text. %1: current block position (number). %2: next block position (number) */
+@@ -53,14 +49,13 @@ const SETUP_GETTER = {
+ 
+ export function getMoversSetup(
+ 	isStackedHorizontally,
+-	{ firstIndex, keys = KEYS, blockTitle }
++	{ firstIndex, keys = KEYS }
+ ) {
+ 	return keys.reduce( ( setup, key ) => {
+ 		if ( KEYS.includes( key ) ) {
+ 			Object.assign( setup, {
+ 				[ key ]: getSetup( key, isStackedHorizontally, {
+ 					firstIndex,
+-					blockTitle,
+ 				} ),
+ 			} );
+ 		}
+@@ -115,7 +110,7 @@ function getArrowIcon( isStackedHorizontally ) {
+ 	};
+ }
+ 
+-function getMoverActionTitle( isStackedHorizontally, { blockTitle } ) {
++function getMoverActionTitle( isStackedHorizontally ) {
+ 	const { firstBlockTitle, lastBlockTitle } = getMoverDescription(
+ 		isStackedHorizontally
+ 	);
+@@ -126,8 +121,8 @@ function getMoverActionTitle( isStackedHorizontally, { blockTitle } ) {
+ 	const actionTitleNext = applyRTLSetup( false, args );
+ 
+ 	return {
+-		backward: sprintf( actionTitlePrev, blockTitle ),
+-		forward: sprintf( actionTitleNext, blockTitle ),
++		backward: sprintf( actionTitlePrev, firstBlockTitle ),
++		forward: sprintf( actionTitleNext, lastBlockTitle ),
+ 	};
+ }
+ 
+@@ -145,8 +140,8 @@ function getMoverButtonTitle( isStackedHorizontally, { firstIndex } ) {
+ 	);
+ 
+ 	const args = [
+-		backwardButtonTitle,
+ 		forwardButtonTitle,
++		backwardButtonTitle,
+ 		isStackedHorizontally,
+ 	];
+ 
+diff --git a/packages/block-editor/src/components/default-block-appender/style.scss b/packages/block-editor/src/components/default-block-appender/style.scss
+index fa805cad81d0d7..e6b115939b3b64 100644
+--- a/packages/block-editor/src/components/default-block-appender/style.scss
++++ b/packages/block-editor/src/components/default-block-appender/style.scss
+@@ -34,9 +34,9 @@
+ 		padding: 0 #{ $block-padding + $button-size } 0 0;
+ 
+ 		// Use opacity to work in various editor styles.
+-		color: $dark-opacity-300;
++		color: $dark-gray-placeholder;
+ 		.is-dark-theme & {
+-			color: $light-opacity-300;
++			color: $light-gray-placeholder;
+ 		}
+ 	}
+ 
+diff --git a/packages/block-editor/src/components/index.js b/packages/block-editor/src/components/index.js
+index e810619fd25323..10bd953ecc1d80 100644
+--- a/packages/block-editor/src/components/index.js
++++ b/packages/block-editor/src/components/index.js
+@@ -81,6 +81,7 @@ export { default as DefaultBlockAppender } from './default-block-appender';
+ export { default as __unstableEditorStyles } from './editor-styles';
+ export { default as Inserter } from './inserter';
+ export { default as __experimentalLibrary } from './inserter/library';
++export { default as __experimentalSearchForm } from './inserter/search-form';
+ export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';
+ export { default as MultiSelectScrollIntoView } from './multi-select-scroll-into-view';
+ export { default as NavigableToolbar } from './navigable-toolbar';
+diff --git a/packages/block-editor/src/components/inserter/search-form.js b/packages/block-editor/src/components/inserter/search-form.js
+index bae5092d95ecac..6fbe56fc28c044 100644
+--- a/packages/block-editor/src/components/inserter/search-form.js
++++ b/packages/block-editor/src/components/inserter/search-form.js
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -7,7 +12,7 @@ import { VisuallyHidden, Button } from '@wordpress/components';
+ import { Icon, search, closeSmall } from '@wordpress/icons';
+ import { useRef } from '@wordpress/element';
+ 
+-function InserterSearchForm( { onChange, value } ) {
++function InserterSearchForm( { className, onChange, value } ) {
+ 	const instanceId = useInstanceId( InserterSearchForm );
+ 	const searchInput = useRef();
+ 
+@@ -16,7 +21,12 @@ function InserterSearchForm( { onChange, value } ) {
+ 	// Popover's focusOnMount.
+ 	/* eslint-disable jsx-a11y/no-autofocus */
+ 	return (
+-		<div className="block-editor-inserter__search">
++		<div
++			className={ classnames(
++				'block-editor-inserter__search',
++				className
++			) }
++		>
+ 			<VisuallyHidden
+ 				as="label"
+ 				htmlFor={ `block-editor-inserter__search-${ instanceId }` }
+diff --git a/packages/block-library/src/button/editor.scss b/packages/block-library/src/button/editor.scss
+index b5b8a185731053..37b47c8e66f900 100644
+--- a/packages/block-library/src/button/editor.scss
++++ b/packages/block-library/src/button/editor.scss
+@@ -20,7 +20,7 @@
+ 
+ 	// Add outline to button on focus to indicate focus-state
+ 	&:focus {
+-		box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-500;
++		box-shadow: 0 0 0 1px $white, 0 0 0 3px var(--wp-admin-theme-color);
+ 
+ 		// Windows' High Contrast mode will show this outline, but not the box-shadow.
+ 		outline: 2px solid transparent;
+diff --git a/packages/block-library/src/calendar/style.scss b/packages/block-library/src/calendar/style.scss
+index fb38516c38fbfe..186cb378838e36 100644
+--- a/packages/block-library/src/calendar/style.scss
++++ b/packages/block-library/src/calendar/style.scss
+@@ -27,7 +27,7 @@
+ 	}
+ 
+ 	tfoot a {
+-		color: $blue-medium-800;
++		color: var(--wp-admin-theme-color);
+ 	}
+ 
+ 	table tbody,
+diff --git a/packages/block-library/src/classic/edit.js b/packages/block-library/src/classic/edit.js
+index f7efea69b8adea..d820517cd1bd52 100644
+--- a/packages/block-library/src/classic/edit.js
++++ b/packages/block-library/src/classic/edit.js
+@@ -1,9 +1,14 @@
++/**
++ * External dependencies
++ */
++import { debounce } from 'lodash';
++
+ /**
+  * WordPress dependencies
+  */
+ import { Component } from '@wordpress/element';
+ import { __, _x } from '@wordpress/i18n';
+-import { BACKSPACE, DELETE, F10 } from '@wordpress/keycodes';
++import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
+ 
+ const { wp } = window;
+ 
+@@ -58,8 +63,12 @@ export default class ClassicEdit extends Component {
+ 		} = this.props;
+ 
+ 		const editor = window.tinymce.get( `editor-${ clientId }` );
++		const currentContent = editor.getContent();
+ 
+-		if ( prevProps.attributes.content !== content ) {
++		if (
++			prevProps.attributes.content !== content &&
++			currentContent !== content
++		) {
+ 			editor.setContent( content || '' );
+ 		}
+ 	}
+@@ -112,7 +121,26 @@ export default class ClassicEdit extends Component {
+ 			bookmark = null;
+ 		} );
+ 
++		editor.on(
++			'Paste Change input Undo Redo',
++			debounce( () => {
++				const value = editor.getContent();
++
++				if ( value !== editor._lastChange ) {
++					editor._lastChange = value;
++					setAttributes( {
++						content: value,
++					} );
++				}
++			}, 250 )
++		);
++
+ 		editor.on( 'keydown', ( event ) => {
++			if ( isKeyboardEvent.primary( event, 'z' ) ) {
++				// Prevent the gutenberg undo kicking in so TinyMCE undo stack works as expected
++				event.stopPropagation();
++			}
++
+ 			if (
+ 				( event.keyCode === BACKSPACE || event.keyCode === DELETE ) &&
+ 				isTmceEmpty( editor )
+diff --git a/packages/block-library/src/classic/editor.scss b/packages/block-library/src/classic/editor.scss
+index 871ec4edf2a17c..e1fc6a54bad183 100644
+--- a/packages/block-library/src/classic/editor.scss
++++ b/packages/block-library/src/classic/editor.scss
+@@ -37,7 +37,7 @@
+ 	}
+ 
+ 	a {
+-		color: $blue-medium-700;
++		color: var(--wp-admin-theme-color);
+ 	}
+ 
+ 	&:focus a[data-mce-selected] {
+diff --git a/packages/block-library/src/embed/edit.js b/packages/block-library/src/embed/edit.js
+index 28330c744f8a89..7156b155ede8b6 100644
+--- a/packages/block-library/src/embed/edit.js
++++ b/packages/block-library/src/embed/edit.js
+@@ -21,7 +21,17 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { __, sprintf } from '@wordpress/i18n';
+-import { Component } from '@wordpress/element';
++import { useState, useEffect } from '@wordpress/element';
++
++function getResponsiveHelp( checked ) {
++	return checked
++		? __(
++				'This embed will preserve its aspect ratio when the browser is resized.'
++		  )
++		: __(
++				'This embed may not preserve its aspect ratio when the browser is resized.'
++		  );
++}
+ 
+ export function getEmbedEditComponent(
+ 	title,
+@@ -29,95 +39,30 @@ export function getEmbedEditComponent(
+ 	responsive = true,
+ 	previewable = true
+ ) {
+-	return class extends Component {
+-		constructor() {
+-			super( ...arguments );
+-			this.switchBackToURLInput = this.switchBackToURLInput.bind( this );
+-			this.setUrl = this.setUrl.bind( this );
+-			this.getMergedAttributes = this.getMergedAttributes.bind( this );
+-			this.setMergedAttributes = this.setMergedAttributes.bind( this );
+-			this.getResponsiveHelp = this.getResponsiveHelp.bind( this );
+-			this.toggleResponsive = this.toggleResponsive.bind( this );
+-			this.handleIncomingPreview = this.handleIncomingPreview.bind(
+-				this
+-			);
+-
+-			this.state = {
+-				editingURL: false,
+-				url: this.props.attributes.url,
+-			};
+-
+-			if ( this.props.preview ) {
+-				this.handleIncomingPreview();
+-			}
+-		}
+-
+-		handleIncomingPreview() {
+-			this.setMergedAttributes();
+-			if ( this.props.onReplace ) {
+-				const upgradedBlock = createUpgradedEmbedBlock(
+-					this.props,
+-					this.getMergedAttributes()
+-				);
+-				if ( upgradedBlock ) {
+-					this.props.onReplace( upgradedBlock );
+-				}
+-			}
+-		}
+-
+-		componentDidUpdate( prevProps ) {
+-			const hasPreview = undefined !== this.props.preview;
+-			const hadPreview = undefined !== prevProps.preview;
+-			const previewChanged =
+-				prevProps.preview &&
+-				this.props.preview &&
+-				this.props.preview.html !== prevProps.preview.html;
+-			const switchedPreview =
+-				previewChanged || ( hasPreview && ! hadPreview );
+-			const switchedURL =
+-				this.props.attributes.url !== prevProps.attributes.url;
+-
+-			if ( switchedPreview || switchedURL ) {
+-				if ( this.props.cannotEmbed ) {
+-					// We either have a new preview or a new URL, but we can't embed it.
+-					if ( ! this.props.fetching ) {
+-						// If we're not fetching the preview, then we know it can't be embedded, so try
+-						// removing any trailing slash, and resubmit.
+-						this.resubmitWithoutTrailingSlash();
+-					}
+-					return;
+-				}
+-				this.handleIncomingPreview();
+-			}
+-		}
+-
+-		resubmitWithoutTrailingSlash() {
+-			this.setState(
+-				( prevState ) => ( {
+-					url: prevState.url.replace( /\/$/, '' ),
+-				} ),
+-				this.setUrl
+-			);
+-		}
+-
+-		setUrl( event ) {
+-			if ( event ) {
+-				event.preventDefault();
+-			}
+-			const { url } = this.state;
+-			const { setAttributes } = this.props;
+-			this.setState( { editingURL: false } );
+-			setAttributes( { url } );
+-		}
+-
+-		/***
++	return function EmbedEditComponent( props ) {
++		const {
++			attributes,
++			cannotEmbed,
++			fetching,
++			isSelected,
++			onReplace,
++			preview,
++			setAttributes,
++			themeSupportsResponsive,
++			tryAgain,
++			insertBlocksAfter,
++		} = props;
++
++		const [ url, setURL ] = useState( attributes.url );
++		const [ isEditingURL, setIsEditingURL ] = useState( false );
++
++		/**
+ 		 * @return {Object} Attributes derived from the preview, merged with the current attributes.
+ 		 */
+-		getMergedAttributes() {
+-			const { preview } = this.props;
+-			const { className, allowResponsive } = this.props.attributes;
++		const getMergedAttributes = () => {
++			const { className, allowResponsive } = attributes;
+ 			return {
+-				...this.props.attributes,
++				...attributes,
+ 				...getAttributesFromPreview(
+ 					preview,
+ 					title,
+@@ -126,36 +71,28 @@ export function getEmbedEditComponent(
+ 					allowResponsive
+ 				),
+ 			};
+-		}
+-
+-		/***
+-		 * Sets block attributes based on the current attributes and preview data.
+-		 */
+-		setMergedAttributes() {
+-			const { setAttributes } = this.props;
+-			setAttributes( this.getMergedAttributes() );
+-		}
++		};
+ 
+-		switchBackToURLInput() {
+-			this.setState( { editingURL: true } );
+-		}
++		const handleIncomingPreview = () => {
++			setAttributes( getMergedAttributes() );
++			if ( onReplace ) {
++				const upgradedBlock = createUpgradedEmbedBlock(
++					props,
++					getMergedAttributes()
++				);
+ 
+-		getResponsiveHelp( checked ) {
+-			return checked
+-				? __(
+-						'This embed will preserve its aspect ratio when the browser is resized.'
+-				  )
+-				: __(
+-						'This embed may not preserve its aspect ratio when the browser is resized.'
+-				  );
+-		}
++				if ( upgradedBlock ) {
++					onReplace( upgradedBlock );
++				}
++			}
++		};
+ 
+-		toggleResponsive() {
+-			const { allowResponsive, className } = this.props.attributes;
+-			const { html } = this.props.preview;
++		const toggleResponsive = () => {
++			const { allowResponsive, className } = attributes;
++			const { html } = preview;
+ 			const newAllowResponsive = ! allowResponsive;
+ 
+-			this.props.setAttributes( {
++			setAttributes( {
+ 				allowResponsive: newAllowResponsive,
+ 				className: getClassNames(
+ 					html,
+@@ -163,89 +100,114 @@ export function getEmbedEditComponent(
+ 					responsive && newAllowResponsive
+ 				),
+ 			} );
+-		}
++		};
++
++		useEffect( () => {
++			if ( ! preview?.html ) {
++				return;
++			}
+ 
+-		render() {
+-			const { url, editingURL } = this.state;
+-			const {
+-				fetching,
+-				setAttributes,
+-				isSelected,
+-				preview,
+-				cannotEmbed,
+-				themeSupportsResponsive,
+-				tryAgain,
+-				insertBlocksAfter,
+-			} = this.props;
++			// If we can embed the url, bail early.
++			if ( ! cannotEmbed ) {
++				return;
++			}
+ 
++			// At this stage, we either have a new preview or a new URL, but we can't embed it.
++			// If we are already fetching the preview, bail early.
+ 			if ( fetching ) {
+-				return <EmbedLoading />;
++				return;
+ 			}
+ 
+-			// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
+-			const label = sprintf( __( '%s URL' ), title );
+-
+-			// No preview, or we can't embed the current URL, or we've clicked the edit button.
+-			if ( ! preview || cannotEmbed || editingURL ) {
+-				return (
+-					<EmbedPlaceholder
+-						icon={ icon }
+-						label={ label }
+-						onSubmit={ this.setUrl }
+-						value={ url }
+-						cannotEmbed={ cannotEmbed }
+-						onChange={ ( event ) =>
+-							this.setState( { url: event.target.value } )
+-						}
+-						fallback={ () => fallback( url, this.props.onReplace ) }
+-						tryAgain={ tryAgain }
+-					/>
+-				);
++			// At this stage, we're not fetching the preview, so we know it can't be embedded, so try
++			// removing any trailing slash, and resubmit.
++			const newURL = attributes.url.replace( /\/$/, '' );
++			setURL( newURL );
++			setIsEditingURL( false );
++			setAttributes( { url: newURL } );
++		}, [ preview?.html, attributes.url ] );
++
++		useEffect( () => {
++			if ( preview && ! isEditingURL ) {
++				handleIncomingPreview();
+ 			}
++		}, [ preview, isEditingURL ] );
+ 
+-			// Even though we set attributes that get derived from the preview,
+-			// we don't access them directly because for the initial render,
+-			// the `setAttributes` call will not have taken effect. If we're
+-			// rendering responsive content, setting the responsive classes
+-			// after the preview has been rendered can result in unwanted
+-			// clipping or scrollbars. The `getAttributesFromPreview` function
+-			// that `getMergedAttributes` uses is memoized so that we're not
+-			// calculating them on every render.
+-			const previewAttributes = this.getMergedAttributes();
+-			const { caption, type, allowResponsive } = previewAttributes;
+-			const className = classnames(
+-				previewAttributes.className,
+-				this.props.className
+-			);
++		if ( fetching ) {
++			return <EmbedLoading />;
++		}
++
++		// translators: %s: type of embed e.g: "YouTube", "Twitter", etc. "Embed" is used when no specific type exists
++		const label = sprintf( __( '%s URL' ), title );
+ 
++		// No preview, or we can't embed the current URL, or we've clicked the edit button.
++		if ( ! preview || cannotEmbed || isEditingURL ) {
+ 			return (
+-				<>
+-					<EmbedControls
+-						showEditButton={ preview && ! cannotEmbed }
+-						themeSupportsResponsive={ themeSupportsResponsive }
+-						blockSupportsResponsive={ responsive }
+-						allowResponsive={ allowResponsive }
+-						getResponsiveHelp={ this.getResponsiveHelp }
+-						toggleResponsive={ this.toggleResponsive }
+-						switchBackToURLInput={ this.switchBackToURLInput }
+-					/>
+-					<EmbedPreview
+-						preview={ preview }
+-						previewable={ previewable }
+-						className={ className }
+-						url={ url }
+-						type={ type }
+-						caption={ caption }
+-						onCaptionChange={ ( value ) =>
+-							setAttributes( { caption: value } )
++				<EmbedPlaceholder
++					icon={ icon }
++					label={ label }
++					onSubmit={ ( event ) => {
++						if ( event ) {
++							event.preventDefault();
+ 						}
+-						isSelected={ isSelected }
+-						icon={ icon }
+-						label={ label }
+-						insertBlocksAfter={ insertBlocksAfter }
+-					/>
+-				</>
++
++						setIsEditingURL( false );
++						setAttributes( { url } );
++					} }
++					value={ url }
++					cannotEmbed={ cannotEmbed }
++					onChange={ ( event ) => setURL( event.target.value ) }
++					fallback={ () => fallback( url, onReplace ) }
++					tryAgain={ tryAgain }
++				/>
+ 			);
+ 		}
++
++		// Even though we set attributes that get derived from the preview,
++		// we don't access them directly because for the initial render,
++		// the `setAttributes` call will not have taken effect. If we're
++		// rendering responsive content, setting the responsive classes
++		// after the preview has been rendered can result in unwanted
++		// clipping or scrollbars. The `getAttributesFromPreview` function
++		// that `getMergedAttributes` uses is memoized so that we're not
++		// calculating them on every render.
++		const previewAttributes = getMergedAttributes(
++			props,
++			title,
++			responsive
++		);
++		const { caption, type, allowResponsive } = previewAttributes;
++		const className = classnames(
++			previewAttributes.className,
++			props.className
++		);
++
++		return (
++			<>
++				<EmbedControls
++					showEditButton={ preview && ! cannotEmbed }
++					themeSupportsResponsive={ themeSupportsResponsive }
++					blockSupportsResponsive={ responsive }
++					allowResponsive={ allowResponsive }
++					getResponsiveHelp={ getResponsiveHelp }
++					toggleResponsive={ toggleResponsive }
++					switchBackToURLInput={ () => setIsEditingURL( true ) }
++				/>
++				<EmbedPreview
++					preview={ preview }
++					previewable={ previewable }
++					className={ className }
++					url={ url }
++					type={ type }
++					caption={ caption }
++					onCaptionChange={ ( value ) =>
++						setAttributes( { caption: value } )
++					}
++					isSelected={ isSelected }
++					icon={ icon }
++					label={ label }
++					insertBlocksAfter={ insertBlocksAfter }
++				/>
++			</>
++		);
+ 	};
+ }
+diff --git a/packages/block-library/src/image/image-editor.js b/packages/block-library/src/image/image-editor.js
+index 5de225f0dfad2b..f065692f227baf 100644
+--- a/packages/block-library/src/image/image-editor.js
++++ b/packages/block-library/src/image/image-editor.js
+@@ -25,7 +25,7 @@ import {
+ 	MenuGroup,
+ 	MenuItem,
+ } from '@wordpress/components';
+-import { __ } from '@wordpress/i18n';
++import { __, sprintf } from '@wordpress/i18n';
+ import { useDispatch } from '@wordpress/data';
+ import apiFetch from '@wordpress/api-fetch';
+ 
+@@ -177,7 +177,7 @@ export default function ImageEditor( {
+ 		}
+ 
+ 		apiFetch( {
+-			path: `__experimental/image-editor/${ id }/apply`,
++			path: `wp/v2/media/${ id }/edit`,
+ 			method: 'POST',
+ 			data: attrs,
+ 		} )
+@@ -188,10 +188,12 @@ export default function ImageEditor( {
+ 					height: height && width ? width / aspect : undefined,
+ 				} );
+ 			} )
+-			.catch( () => {
++			.catch( ( error ) => {
+ 				createErrorNotice(
+-					__(
+-						'Unable to perform the image modification. Please check your media storage.'
++					sprintf(
++						/* translators: 1. Error message */
++						__( 'Could not edit image. %s' ),
++						error.message
+ 					),
+ 					{
+ 						id: 'image-editing-error',
+diff --git a/packages/block-library/src/navigation/style.scss b/packages/block-library/src/navigation/style.scss
+index cbd2d810e23475..abeeba333518f9 100644
+--- a/packages/block-library/src/navigation/style.scss
++++ b/packages/block-library/src/navigation/style.scss
+@@ -141,20 +141,20 @@
+ .wp-block-navigation,
+ .wp-block-navigation.is-style-light {
+ 	.wp-block-navigation-link:not(.has-text-color) {
+-		color: $light-style-sub-menu-text-color;
++		color: $dark-gray-primary;
+ 	}
+ 	&:not(.has-background) .wp-block-navigation__container {
+-		background-color: $light-style-sub-menu-background-color;
++		background-color: $white;
+ 	}
+ }
+ 
+ // Dark styles.
+ .wp-block-navigation.is-style-dark {
+ 	.wp-block-navigation-link:not(.has-text-color) {
+-		color: $dark-style-sub-menu-text-color;
++		color: $white;
+ 	}
+ 	&:not(.has-background) .wp-block-navigation__container {
+-		background-color: $dark-style-sub-menu-background-color;
++		background-color: $dark-gray-primary;
+ 	}
+ }
+ 
+diff --git a/packages/block-library/src/search/editor.scss b/packages/block-library/src/search/editor.scss
+index db4082f9d2afa0..c28e391535b7b1 100644
+--- a/packages/block-library/src/search/editor.scss
++++ b/packages/block-library/src/search/editor.scss
+@@ -2,7 +2,7 @@
+ 	&__input {
+ 		border-radius: $radius-round-rectangle;
+ 		border: 1px solid $dark-gray-200;
+-		color: $dark-opacity-300;
++		color: $dark-gray-placeholder;
+ 		font-family: $default-font;
+ 		font-size: $default-font-size;
+ 		padding: $grid-unit-10;
+diff --git a/packages/block-library/src/shortcode/editor.scss b/packages/block-library/src/shortcode/editor.scss
+index b8077163c5d73c..ade8279e6d6101 100644
+--- a/packages/block-library/src/shortcode/editor.scss
++++ b/packages/block-library/src/shortcode/editor.scss
+@@ -2,7 +2,6 @@
+ 	display: flex;
+ 	flex-direction: column;
+ 	padding: $block-padding;
+-	background-color: $dark-opacity-light-200;
+ 	font-size: $default-font-size;
+ 	font-family: $default-font;
+ 	margin-bottom: $default-block-margin;
+diff --git a/packages/block-library/src/spacer/editor.scss b/packages/block-library/src/spacer/editor.scss
+index 2ad8039709960b..d46a62d2e8613e 100644
+--- a/packages/block-library/src/spacer/editor.scss
++++ b/packages/block-library/src/spacer/editor.scss
+@@ -2,7 +2,7 @@
+ 	background: $light-gray-200;
+ 
+ 	.is-dark-theme & {
+-		background: $light-opacity-light-200;
++		background: rgba($white, 0.15);
+ 	}
+ }
+ 
+diff --git a/packages/block-library/src/table/editor.scss b/packages/block-library/src/table/editor.scss
+index 6a9ef15b19d27e..8eb865f8105261 100644
+--- a/packages/block-library/src/table/editor.scss
++++ b/packages/block-library/src/table/editor.scss
+@@ -41,8 +41,8 @@
+ 
+ 	td.is-selected,
+ 	th.is-selected {
+-		border-color: $blue-medium-500;
+-		box-shadow: inset 0 0 0 1px $blue-medium-500;
++		border-color: var(--wp-admin-theme-color);
++		box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color);
+ 		border-style: double;
+ 	}
+ 
+diff --git a/packages/block-library/src/template-part/edit/index.js b/packages/block-library/src/template-part/edit/index.js
+index 63f44c3c5755ff..ac93f221b37e06 100644
+--- a/packages/block-library/src/template-part/edit/index.js
++++ b/packages/block-library/src/template-part/edit/index.js
+@@ -3,12 +3,12 @@
+  */
+ import { useRef, useEffect } from '@wordpress/element';
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { EntityProvider } from '@wordpress/core-data';
+ 
+ /**
+  * Internal dependencies
+  */
+ import useTemplatePartPost from './use-template-part-post';
++import TemplatePartNamePanel from './name-panel';
+ import TemplatePartInnerBlocks from './inner-blocks';
+ import TemplatePartPlaceholder from './placeholder';
+ 
+@@ -16,6 +16,7 @@ export default function TemplatePartEdit( {
+ 	attributes: { postId: _postId, slug, theme },
+ 	setAttributes,
+ 	clientId,
++	isSelected,
+ } ) {
+ 	const initialPostId = useRef( _postId );
+ 	const initialSlug = useRef( slug );
+@@ -28,8 +29,20 @@ export default function TemplatePartEdit( {
+ 	// but wait until the third inner blocks change,
+ 	// because the first 2 are just the template part
+ 	// content loading.
+-	const innerBlocks = useSelect(
+-		( select ) => select( 'core/block-editor' ).getBlocks( clientId ),
++	const { innerBlocks, hasSelectedInnerBlock } = useSelect(
++		( select ) => {
++			const {
++				getBlocks,
++				hasSelectedInnerBlock: getHasSelectedInnerBlock,
++			} = select( 'core/block-editor' );
++			return {
++				innerBlocks: getBlocks( clientId ),
++				hasSelectedInnerBlock: getHasSelectedInnerBlock(
++					clientId,
++					true
++				),
++			};
++		},
+ 		[ clientId ]
+ 	);
+ 	const { editEntityRecord } = useDispatch( 'core' );
+@@ -54,13 +67,18 @@ export default function TemplatePartEdit( {
+ 	if ( postId ) {
+ 		// Part of a template file, post ID already resolved.
+ 		return (
+-			<EntityProvider
+-				kind="postType"
+-				type="wp_template_part"
+-				id={ postId }
+-			>
+-				<TemplatePartInnerBlocks />
+-			</EntityProvider>
++			<>
++				{ ( isSelected || hasSelectedInnerBlock ) && (
++					<TemplatePartNamePanel
++						postId={ postId }
++						setAttributes={ setAttributes }
++					/>
++				) }
++				<TemplatePartInnerBlocks
++					postId={ postId }
++					hasInnerBlocks={ innerBlocks.length > 0 }
++				/>
++			</>
+ 		);
+ 	}
+ 	if ( ! initialSlug.current && ! initialTheme.current ) {
+diff --git a/packages/block-library/src/template-part/edit/inner-blocks.js b/packages/block-library/src/template-part/edit/inner-blocks.js
+index c0624c933ab174..789efb2e24689b 100644
+--- a/packages/block-library/src/template-part/edit/inner-blocks.js
++++ b/packages/block-library/src/template-part/edit/inner-blocks.js
+@@ -4,16 +4,22 @@
+ import { useEntityBlockEditor } from '@wordpress/core-data';
+ import { InnerBlocks } from '@wordpress/block-editor';
+ 
+-export default function TemplatePartInnerBlocks() {
++const renderAppender = () => <InnerBlocks.ButtonBlockAppender />;
++export default function TemplatePartInnerBlocks( {
++	postId: id,
++	hasInnerBlocks,
++} ) {
+ 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+ 		'postType',
+-		'wp_template_part'
++		'wp_template_part',
++		{ id }
+ 	);
+ 	return (
+ 		<InnerBlocks
+ 			value={ blocks }
+ 			onInput={ onInput }
+ 			onChange={ onChange }
++			renderAppender={ hasInnerBlocks ? undefined : renderAppender }
+ 		/>
+ 	);
+ }
+diff --git a/packages/block-library/src/template-part/edit/name-panel.js b/packages/block-library/src/template-part/edit/name-panel.js
+new file mode 100644
+index 00000000000000..96a881207aa833
+--- /dev/null
++++ b/packages/block-library/src/template-part/edit/name-panel.js
+@@ -0,0 +1,36 @@
++/**
++ * WordPress dependencies
++ */
++import { useEntityProp } from '@wordpress/core-data';
++import { TextControl } from '@wordpress/components';
++import { __ } from '@wordpress/i18n';
++import { cleanForSlug } from '@wordpress/url';
++
++export default function TemplatePartNamePanel( { postId, setAttributes } ) {
++	const [ title, setTitle ] = useEntityProp(
++		'postType',
++		'wp_template_part',
++		'title',
++		postId
++	);
++	const [ slug, setSlug ] = useEntityProp(
++		'postType',
++		'wp_template_part',
++		'slug',
++		postId
++	);
++	return (
++		<div className="wp-block-template-part__name-panel">
++			<TextControl
++				label={ __( 'Name' ) }
++				value={ title || slug }
++				onChange={ ( value ) => {
++					setTitle( value );
++					const newSlug = cleanForSlug( value );
++					setSlug( newSlug );
++					setAttributes( { slug: newSlug } );
++				} }
++			/>
++		</div>
++	);
++}
+diff --git a/packages/block-library/src/template-part/edit/placeholder/index.js b/packages/block-library/src/template-part/edit/placeholder/index.js
+index 1da611ae523378..d63c7d82cf40a2 100644
+--- a/packages/block-library/src/template-part/edit/placeholder/index.js
++++ b/packages/block-library/src/template-part/edit/placeholder/index.js
+@@ -7,165 +7,81 @@ import { useDispatch } from '@wordpress/data';
+ import { cleanForSlug } from '@wordpress/url';
+ import {
+ 	Placeholder,
+-	TextControl,
++	Dropdown,
++	ButtonGroup,
+ 	Button,
+-	TabPanel,
+ } from '@wordpress/components';
+-import { layout } from '@wordpress/icons';
++import { blockDefault } from '@wordpress/icons';
++import { __experimentalSearchForm as SearchForm } from '@wordpress/block-editor';
+ 
+ /**
+  * Internal dependencies
+  */
+-import useTemplatePartPost from '../use-template-part-post';
+ import TemplatePartPreviews from './template-part-previews';
+ 
+-const HELP_PHRASES = {
+-	initial: __( 'Please add a name and theme for your new Template Part.' ),
+-	unavailable: __(
+-		'Name and theme combination already in use, please try another.'
+-	),
+-	available: __( 'This name is available!' ),
+-	error: __( 'Error adding template.' ),
+-};
+-
+ export default function TemplatePartPlaceholder( { setAttributes } ) {
+-	const [ slug, _setSlug ] = useState( '' );
+-	const [ theme, _setTheme ] = useState( '' );
+-	const [ help, setHelp ] = useState( '' );
+-
+-	// Try to find an existing template part.
+-	const postId = useTemplatePartPost( null, slug, theme );
+-
+-	const setSlug = useCallback(
+-		( nextSlug ) => {
+-			_setSlug( nextSlug );
+-			if ( help ) {
+-				setHelp( '' );
+-			}
+-		},
+-		[ help ]
+-	);
+-
+-	const setTheme = useCallback(
+-		( nextTheme ) => {
+-			_setTheme( nextTheme );
+-			if ( help ) {
+-				setHelp( '' );
+-			}
+-		},
+-		[ help ]
+-	);
+-
+-	const getHelpPhrase = () => {
+-		if ( ! slug || ! theme ) {
+-			return HELP_PHRASES.initial;
+-		} else if ( postId ) {
+-			return HELP_PHRASES.unavailable;
+-		}
+-
+-		return HELP_PHRASES.available;
+-	};
+-
+ 	const { saveEntityRecord } = useDispatch( 'core' );
+ 	const onCreate = useCallback( async () => {
+-		const nextAttributes = { slug, theme };
+-		// Create a new template part.
+-		try {
+-			const cleanSlug = cleanForSlug( slug );
+-			const templatePart = await saveEntityRecord(
+-				'postType',
+-				'wp_template_part',
+-				{
+-					title: cleanSlug,
+-					status: 'publish',
+-					slug: cleanSlug,
+-					meta: { theme },
+-				}
+-			);
+-			nextAttributes.postId = templatePart.id;
+-		} catch ( err ) {
+-			setHelp( HELP_PHRASES.error );
+-		}
+-		setAttributes( nextAttributes );
+-	}, [ postId, slug, theme ] );
++		const title = 'Untitled Section';
++		const slug = cleanForSlug( title );
++		const templatePart = await saveEntityRecord(
++			'postType',
++			'wp_template_part',
++			{
++				title,
++				status: 'publish',
++				slug,
++				meta: { theme: 'custom' },
++			}
++		);
++		setAttributes( {
++			postId: templatePart.id,
++			slug: templatePart.slug,
++			theme: templatePart.meta.theme,
++		} );
++	}, [ setAttributes ] );
+ 
+ 	const [ filterValue, setFilterValue ] = useState( '' );
+-
+-	const createTab = (
+-		<>
+-			<div className="wp-block-template-part__placeholder-input-container">
+-				<TextControl
+-					label={ __( 'Name' ) }
+-					placeholder={ __( 'header' ) }
+-					value={ slug }
+-					onChange={ setSlug }
+-					className="wp-block-template-part__placeholder-input"
+-				/>
+-				<TextControl
+-					label={ __( 'Theme' ) }
+-					placeholder={ __( 'twentytwenty' ) }
+-					value={ theme }
+-					onChange={ setTheme }
+-					className="wp-block-template-part__placeholder-input"
+-				/>
+-			</div>
+-			<div className="wp-block-template-part__placeholder-help-phrase">
+-				{ help || getHelpPhrase() }
+-			</div>
+-			<Button
+-				isPrimary
+-				disabled={ ! slug || ! theme || postId }
+-				onClick={ onCreate }
+-				className="wp-block-template-part__placeholder-create-button"
+-			>
+-				{ __( 'Create' ) }
+-			</Button>
+-		</>
+-	);
+-
+-	const selectTab = (
+-		<>
+-			<TextControl
+-				label={ __( 'Search' ) }
+-				placeholder={ __( 'header' ) }
+-				value={ filterValue }
+-				onChange={ setFilterValue }
+-				className="wp-block-template-part__placeholder-preview-filter-input"
+-			/>
+-
+-			<div className="wp-block-template-part__placeholder-preview-container">
+-				<TemplatePartPreviews
+-					setAttributes={ setAttributes }
+-					filterValue={ filterValue }
+-				/>
+-			</div>
+-		</>
+-	);
+-
+ 	return (
+-		<Placeholder icon={ layout } label={ __( 'Template Part' ) }>
+-			<TabPanel
+-				className="wp-block-template-part__placeholder-tabs"
+-				tabs={ [
+-					{
+-						name: 'select',
+-						/* translators: Select tab of template part creation placeholder. */
+-						title: __( 'Select from existing' ),
+-					},
+-					{
+-						name: 'create',
+-						/* translators: Create tab of template part placeholder.  */
+-						title: __( 'Create new' ),
+-					},
+-				] }
+-			>
+-				{ ( tab ) => {
+-					if ( tab.name === 'create' ) {
+-						return createTab;
+-					}
+-					return selectTab;
+-				} }
+-			</TabPanel>
++		<Placeholder
++			icon={ blockDefault }
++			label={ __( 'Section' ) }
++			instructions={ __(
++				'Create a new section or pick one from a list of available sections.'
++			) }
++		>
++			<Dropdown
++				contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
++				position="bottom right left"
++				renderToggle={ ( { isOpen, onToggle } ) => (
++					<ButtonGroup>
++						<Button
++							isPrimary
++							onClick={ onToggle }
++							aria-expanded={ isOpen }
++						>
++							{ __( 'Choose existing' ) }
++						</Button>
++						<Button onClick={ onCreate }>
++							{ __( 'New section' ) }
++						</Button>
++					</ButtonGroup>
++				) }
++				renderContent={ () => (
++					<>
++						<SearchForm
++							onChange={ setFilterValue }
++							className="wp-block-template-part__placeholder-preview-search-form"
++						/>
++						<div className="wp-block-template-part__placeholder-preview-container">
++							<TemplatePartPreviews
++								setAttributes={ setAttributes }
++								filterValue={ filterValue }
++							/>
++						</div>
++					</>
++				) }
++			/>
+ 		</Placeholder>
+ 	);
+ }
+diff --git a/packages/block-library/src/template-part/edit/placeholder/template-part-previews.js b/packages/block-library/src/template-part/edit/placeholder/template-part-previews.js
+index 7cbe4312cf9a2b..1dd45289f5d18f 100644
+--- a/packages/block-library/src/template-part/edit/placeholder/template-part-previews.js
++++ b/packages/block-library/src/template-part/edit/placeholder/template-part-previews.js
+@@ -22,7 +22,11 @@ function PreviewPlaceholder() {
+ }
+ 
+ function TemplatePartItem( { templatePart, setAttributes } ) {
+-	const { id, slug, theme } = templatePart;
++	const {
++		id,
++		slug,
++		meta: { theme },
++	} = templatePart;
+ 	// The 'raw' property is not defined for a brief period in the save cycle.
+ 	// The fallback prevents an error in the parse function while saving.
+ 	const content = templatePart.content.raw || '';
+diff --git a/packages/block-library/src/template-part/editor.scss b/packages/block-library/src/template-part/editor.scss
+index 64fed43e2eec91..faa68de64dd0a2 100644
+--- a/packages/block-library/src/template-part/editor.scss
++++ b/packages/block-library/src/template-part/editor.scss
+@@ -1,66 +1,24 @@
+ 
+-.wp-block-template-part__placeholder-tabs {
+-	display: flex;
+-	flex-grow: 1;
+-	flex-direction: column;
+-
+-	.components-tab-panel__tabs {
+-		border-bottom: $border-width solid $light-gray-500;
+-
+-		.components-tab-panel__tabs-item {
+-			flex-grow: 1;
+-			margin-bottom: -$border-width;
+-		}
+-	}
+-
+-	.components-tab-panel__tab-content {
+-		margin-top: $grid-unit-20;
+-		display: flex;
+-		flex-grow: 1;
+-		flex-direction: column;
+-		position: relative;
+-	}
+-
+-	.wp-block-template-part__placeholder-input-container {
+-		display: flex;
+-		flex-wrap: wrap;
+-		width: 100%;
+-
+-		.wp-block-template-part__placeholder-input {
+-			margin: 5px;
+-		}
+-	}
+-
+-	.wp-block-template-part__placeholder-help-phrase {
+-		padding: 0 $grid-unit-15 $grid-unit-15;
+-	}
+-
+-	.wp-block-template-part__placeholder-create-button {
+-		align-self: flex-start;
+-	}
+-
+-	.wp-block-template-part__placeholder-preview-filter-input {
+-		width: inherit;
++.wp-block-template-part__placeholder-preview-dropdown-content {
++	.components-popover__content {
++		min-width: 320px;
++		padding: 0;
+ 	}
+ }
+ 
++.wp-block-template-part__placeholder-preview-search-form {
++	border-bottom: $border-width solid $light-gray-500;
++}
+ 
+ .wp-block-template-part__placeholder-preview-container {
+-	width: inherit;
+-	max-height: 600px;
+-	overflow-y: scroll;
+ 	background: $white;
+-	border-radius: $radius-block-ui;
+-	border: $border-width solid $light-gray-500;
+-	top: $grid-unit-20;
+-	left: calc(100% + #{$grid-unit-20});
++	padding-bottom: 16px;
+ 
+ 	.wp-block-template-part__placeholder-preview-item {
+ 		border-radius: $radius-block-ui;
+ 		cursor: pointer;
+ 		margin-top: $grid-unit-20;
+ 		transition: all 0.05s ease-in-out;
+-		position: relative;
+ 		border: $border-width solid transparent;
+ 
+ 		&:hover {
+@@ -82,12 +40,10 @@
+ 	.wp-block-template-part__placeholder-preview-item-title {
+ 		padding: $grid-unit-05;
+ 		font-size: 12px;
+-		text-align: center;
++		text-align: left;
+ 	}
+ 
+ 	.wp-block-template-part__placeholder-panel-group-header {
+-		display: inline-flex;
+-		align-items: center;
+ 		padding: $grid-unit-20 $grid-unit-20 0;
+ 	}
+ 
+@@ -100,6 +56,32 @@
+ 		text-transform: uppercase;
+ 		font-size: 11px;
+ 		font-weight: 500;
+-		margin-right: $grid-unit-10;
++	}
++}
++
++.wp-block-template-part__name-panel {
++	background-color: $white;
++	border-radius: $radius-block-ui;
++	box-shadow: 0 0 0 $border-width $dark-gray-primary;
++	outline: 1px solid transparent;
++	padding: ($grid-unit-10 - $border-width - $border-width) $grid-unit-15;
++
++	.components-base-control__field {
++		align-items: center;
++		display: flex;
++		margin-bottom: 0;
++	}
++
++	.components-base-control__label {
++		margin-bottom: 0;
++		margin-right: 8px;
++	}
++}
++
++.is-navigate-mode .is-selected .wp-block-template-part__name-panel {
++	box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
++
++	.is-dark-theme & {
++		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+ 	}
+ }
+diff --git a/packages/block-library/src/template-part/index.js b/packages/block-library/src/template-part/index.js
+index af507228b2afa3..7dffabe66e18b6 100644
+--- a/packages/block-library/src/template-part/index.js
++++ b/packages/block-library/src/template-part/index.js
+@@ -18,7 +18,7 @@ const { name } = metadata;
+ export { metadata, name };
+ 
+ export const settings = {
+-	title: __( 'Template Part' ),
++	title: __( 'Section' ),
+ 	__experimentalLabel: ( { slug } ) => startCase( slug ),
+ 	edit,
+ };
+diff --git a/packages/block-library/src/template-part/index.php b/packages/block-library/src/template-part/index.php
+index bf40670885f9d1..de8de1212ca1fe 100644
+--- a/packages/block-library/src/template-part/index.php
++++ b/packages/block-library/src/template-part/index.php
+@@ -19,7 +19,7 @@ function render_block_core_template_part( $attributes ) {
+ 		// If we have a post ID, which means this template part
+ 		// is user-customized, render the corresponding post content.
+ 		$content = get_post( $attributes['postId'] )->post_content;
+-	} elseif ( wp_get_theme()->get( 'TextDomain' ) === $attributes['theme'] ) {
++	} elseif ( isset( $attributes['theme'] ) && wp_get_theme()->get( 'TextDomain' ) === $attributes['theme'] ) {
+ 		$template_part_query = new WP_Query(
+ 			array(
+ 				'post_type'      => 'wp_template_part',
+diff --git a/packages/components/src/color-picker/style.scss b/packages/components/src/color-picker/style.scss
+index 3d59e9a324b876..f985945ab2a3d4 100644
+--- a/packages/components/src/color-picker/style.scss
++++ b/packages/components/src/color-picker/style.scss
+@@ -205,18 +205,18 @@
+ .components-color-picker__saturation-pointer:focus {
+ 	box-shadow:
+ 		0 0 0 2px #fff,
+-		0 0 0 4px $blue-medium-500,
+-		0 0 5px 0 $blue-medium-500,
++		0 0 0 4px var(--wp-admin-theme-color),
++		0 0 5px 0 var(--wp-admin-theme-color),
+ 		inset 0 0 1px 1px rgba(0, 0, 0, 0.3),
+ 		0 0 1px 2px rgba(0, 0, 0, 0.4);
+ }
+ 
+ .components-color-picker__hue-pointer:focus,
+ .components-color-picker__alpha-pointer:focus {
+-	border-color: $blue-medium-500;
++	border-color: var(--wp-admin-theme-color);
+ 	box-shadow:
+-		0 0 0 2px $blue-medium-500,
+-		0 0 3px 0 $blue-medium-500;
++		0 0 0 2px var(--wp-admin-theme-color),
++		0 0 3px 0 var(--wp-admin-theme-color);
+ 	outline: 2px solid transparent;
+ 	outline-offset: -2px;
+ }
+diff --git a/packages/components/src/combobox-control/style.scss b/packages/components/src/combobox-control/style.scss
+index 655221c2b9c2d3..0c4fe58ada0bb8 100644
+--- a/packages/components/src/combobox-control/style.scss
++++ b/packages/components/src/combobox-control/style.scss
+@@ -19,7 +19,7 @@
+ 	text-align: left;
+ 
+ 	&:focus {
+-		border-color: $blue-medium-500;
++		border-color: var(--wp-admin-theme-color);
+ 	}
+ 
+ 	&-input {
+diff --git a/packages/components/src/disabled/index.js b/packages/components/src/disabled/index.js
+index 3c93cb359f47bb..efde24e753570d 100644
+--- a/packages/components/src/disabled/index.js
++++ b/packages/components/src/disabled/index.js
+@@ -7,7 +7,12 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { createContext, Component } from '@wordpress/element';
++import {
++	createContext,
++	useCallback,
++	useLayoutEffect,
++	useRef,
++} from '@wordpress/element';
+ import { focus } from '@wordpress/dom';
+ 
+ const { Consumer, Provider } = createContext( false );
+@@ -31,40 +36,11 @@ const DISABLED_ELIGIBLE_NODE_NAMES = [
+ 	'TEXTAREA',
+ ];
+ 
+-class Disabled extends Component {
+-	constructor() {
+-		super( ...arguments );
++function Disabled( { className, children, ...props } ) {
++	const node = useRef();
+ 
+-		this.bindNode = this.bindNode.bind( this );
+-		this.disable = this.disable.bind( this );
+-
+-		// Debounce re-disable since disabling process itself will incur
+-		// additional mutations which should be ignored.
+-		this.debouncedDisable = debounce( this.disable, { leading: true } );
+-	}
+-
+-	componentDidMount() {
+-		this.disable();
+-
+-		this.observer = new window.MutationObserver( this.debouncedDisable );
+-		this.observer.observe( this.node, {
+-			childList: true,
+-			attributes: true,
+-			subtree: true,
+-		} );
+-	}
+-
+-	componentWillUnmount() {
+-		this.observer.disconnect();
+-		this.debouncedDisable.cancel();
+-	}
+-
+-	bindNode( node ) {
+-		this.node = node;
+-	}
+-
+-	disable() {
+-		focus.focusable.find( this.node ).forEach( ( focusable ) => {
++	const disable = () => {
++		focus.focusable.find( node.current ).forEach( ( focusable ) => {
+ 			if (
+ 				includes( DISABLED_ELIGIBLE_NODE_NAMES, focusable.nodeName )
+ 			) {
+@@ -79,22 +55,43 @@ class Disabled extends Component {
+ 				focusable.setAttribute( 'contenteditable', 'false' );
+ 			}
+ 		} );
+-	}
++	};
++
++	// Debounce re-disable since disabling process itself will incur
++	// additional mutations which should be ignored.
++	const debouncedDisable = useCallback(
++		debounce( disable, { leading: true } ),
++		[]
++	);
++
++	useLayoutEffect( () => {
++		disable();
++
++		const observer = new window.MutationObserver( debouncedDisable );
++		observer.observe( node.current, {
++			childList: true,
++			attributes: true,
++			subtree: true,
++		} );
+ 
+-	render() {
+-		const { className, ...props } = this.props;
+-		return (
+-			<Provider value={ true }>
+-				<div
+-					ref={ this.bindNode }
+-					className={ classnames( className, 'components-disabled' ) }
+-					{ ...props }
+-				>
+-					{ this.props.children }
+-				</div>
+-			</Provider>
+-		);
+-	}
++		return () => {
++			observer.disconnect();
++			debouncedDisable.cancel();
++		};
++	}, [] );
++
++	//Lets return
++	return (
++		<Provider value={ true }>
++			<div
++				ref={ node }
++				className={ classnames( className, 'components-disabled' ) }
++				{ ...props }
++			>
++				{ children }
++			</div>
++		</Provider>
++	);
+ }
+ 
+ Disabled.Consumer = Consumer;
+diff --git a/packages/components/src/disabled/test/index.js b/packages/components/src/disabled/test/index.js
+index 231b493e18ac21..bef7a9e9e1e6cd 100644
+--- a/packages/components/src/disabled/test/index.js
++++ b/packages/components/src/disabled/test/index.js
+@@ -65,11 +65,20 @@ describe( 'Disabled', () => {
+ 		</form>
+ 	);
+ 
++	// this is needed because TestUtils does not accept a stateless component.
++	class DisabledComponent extends Component {
++		render() {
++			const { children } = this.props;
++
++			return <Disabled>{ children }</Disabled>;
++		}
++	}
++
+ 	it( 'will disable all fields', () => {
+ 		const wrapper = TestUtils.renderIntoDocument(
+-			<Disabled>
++			<DisabledComponent>
+ 				<Form />
+-			</Disabled>
++			</DisabledComponent>
+ 		);
+ 
+ 		const input = TestUtils.findRenderedDOMComponentWithTag(
+@@ -150,9 +159,9 @@ describe( 'Disabled', () => {
+ 
+ 		test( "lets components know that they're disabled via context", () => {
+ 			const wrapper = TestUtils.renderIntoDocument(
+-				<Disabled>
++				<DisabledComponent>
+ 					<DisabledStatus />
+-				</Disabled>
++				</DisabledComponent>
+ 			);
+ 			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag(
+ 				wrapper,
+diff --git a/packages/components/src/drop-zone/style.scss b/packages/components/src/drop-zone/style.scss
+index a4307cbc6e9e0c..e037e70a6f66f7 100644
+--- a/packages/components/src/drop-zone/style.scss
++++ b/packages/components/src/drop-zone/style.scss
+@@ -9,7 +9,7 @@
+ 	opacity: 0;
+ 	transition: 0.3s opacity, 0.3s background-color, 0s visibility 0.3s;
+ 	@include reduce-motion("transition");
+-	border: 2px solid $blue-dark-900;
++	border: 2px solid var(--wp-admin-theme-color);
+ 	border-radius: 2px;
+ 
+ 	&.is-active {
+@@ -20,7 +20,7 @@
+ 	}
+ 
+ 	&.is-dragging-over-element {
+-		background-color: rgba($blue-dark-900, 0.8);
++		background-color: var(--wp-admin-theme-color);
+ 	}
+ }
+ 
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index ec50a8265fbda6..4c11dcd2df46ea 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -174,7 +174,7 @@
+ 	cursor: pointer;
+ 
+ 	&.is-selected {
+-		background: $blue-dark-900;
++		background: var(--wp-admin-theme-color);
+ 		color: $white;
+ 	}
+ }
+diff --git a/packages/components/src/higher-order/navigate-regions/style.scss b/packages/components/src/higher-order/navigate-regions/style.scss
+index bd65bfb64135c1..d57fef9bbb07fb 100644
+--- a/packages/components/src/higher-order/navigate-regions/style.scss
++++ b/packages/components/src/higher-order/navigate-regions/style.scss
+@@ -11,7 +11,7 @@
+ 		right: 0;
+ 		pointer-events: none;
+ 		outline: 4px solid transparent; // Shown in Windows High Contrast mode.
+-		box-shadow: inset 0 0 0 4px $blue-medium-400;
++		box-shadow: inset 0 0 0 4px var(--wp-admin-theme-color);
+ 	}
+ 
+ 	@supports ( outline-offset: 1px ) {
+@@ -21,7 +21,7 @@
+ 
+ 		&:focus {
+ 			outline-style: solid;
+-			outline-color: $blue-medium-400;
++			outline-color: var(--wp-admin-theme-color);
+ 			outline-width: 4px;
+ 			outline-offset: -4px;
+ 		}
+diff --git a/packages/components/src/mobile/picker/index.android.js b/packages/components/src/mobile/picker/index.android.js
+index e380309df3b27e..5a6bbfbf08ef2b 100644
+--- a/packages/components/src/mobile/picker/index.android.js
++++ b/packages/components/src/mobile/picker/index.android.js
+@@ -10,6 +10,7 @@ import { View } from 'react-native';
+ import { __ } from '@wordpress/i18n';
+ import { Component } from '@wordpress/element';
+ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
++import { PanelBody } from '@wordpress/components';
+ 
+ /**
+  * Internal dependencies
+@@ -52,7 +53,7 @@ export default class Picker extends Component {
+ 	}
+ 
+ 	render() {
+-		const { options, leftAlign, hideCancelButton } = this.props;
++		const { options, leftAlign, hideCancelButton, title } = this.props;
+ 		const { isVisible } = this.state;
+ 
+ 		return (
+@@ -62,7 +63,7 @@ export default class Picker extends Component {
+ 				style={ { paddingBottom: 20 } }
+ 				hideHeader
+ 			>
+-				<View>
++				<PanelBody title={ title } style={ styles.panelBody }>
+ 					{ options.map( ( option, index ) => (
+ 						<>
+ 							{ options.length > 1 && option.separated && (
+@@ -89,7 +90,7 @@ export default class Picker extends Component {
+ 							separatorType={ 'none' }
+ 						/>
+ 					) }
+-				</View>
++				</PanelBody>
+ 			</BottomSheet>
+ 		);
+ 	}
+diff --git a/packages/components/src/mobile/picker/styles.native.scss b/packages/components/src/mobile/picker/styles.native.scss
+index fea1095b0a471d..f2da6f50524741 100644
+--- a/packages/components/src/mobile/picker/styles.native.scss
++++ b/packages/components/src/mobile/picker/styles.native.scss
+@@ -14,3 +14,8 @@
+ .disabled {
+ 	opacity: 0.3;
+ }
++
++.panelBody {
++	padding-left: 0;
++	padding-right: 0;
++}
+diff --git a/packages/components/src/notice/style.scss b/packages/components/src/notice/style.scss
+index 3ffb738ebbe07b..79331269627962 100644
+--- a/packages/components/src/notice/style.scss
++++ b/packages/components/src/notice/style.scss
+@@ -2,8 +2,8 @@
+ 	display: flex;
+ 	font-family: $default-font;
+ 	font-size: $default-font-size;
+-	background-color: $blue-medium-100;
+-	border-left: 4px solid $blue-medium-500;
++	background-color: $white;
++	border-left: 4px solid var(--wp-admin-theme-color);
+ 	margin: 5px 15px 2px;
+ 	padding: 8px 12px;
+ 	align-items: center;
+diff --git a/packages/components/src/snackbar/style.scss b/packages/components/src/snackbar/style.scss
+index 609449d1d63c40..8018b842e9a6a8 100644
+--- a/packages/components/src/snackbar/style.scss
++++ b/packages/components/src/snackbar/style.scss
+@@ -46,7 +46,7 @@
+ 		}
+ 
+ 		&:hover {
+-			color: $blue-medium-400;
++			color: var(--wp-admin-theme-color);
+ 		}
+ 	}
+ }
+diff --git a/packages/e2e-tests/specs/experiments/multi-entity-editing.test.js b/packages/e2e-tests/specs/experiments/multi-entity-editing.test.js
+index 11de0b508a7611..427b4ee9c9955f 100644
+--- a/packages/e2e-tests/specs/experiments/multi-entity-editing.test.js
++++ b/packages/e2e-tests/specs/experiments/multi-entity-editing.test.js
+@@ -49,34 +49,32 @@ const getTemplateDropdownElement = async ( itemName ) => {
+ 
+ const createTemplatePart = async (
+ 	templatePartName = 'test-template-part',
+-	themeName = 'test-theme',
+ 	isNested = false
+ ) => {
+ 	// Create new template part.
+-	await insertBlock( 'Template Part' );
++	await insertBlock( 'Section' );
+ 	const [ createNewButton ] = await page.$x(
+-		'//button[contains(text(), "Create new")]'
++		'//button[contains(text(), "New section")]'
+ 	);
+ 	await createNewButton.click();
+-	await page.keyboard.press( 'Tab' );
+-	await page.keyboard.type( templatePartName );
+-	await page.keyboard.press( 'Tab' );
+-	await page.keyboard.type( themeName );
+-	await page.keyboard.press( 'Tab' );
+-	await page.keyboard.press( 'Enter' );
+ 	await page.waitForSelector(
+ 		isNested
+ 			? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"] .block-editor-inner-blocks'
+ 			: '.wp-block[data-type="core/template-part"] .block-editor-inner-blocks'
+ 	);
++	await page.keyboard.press( 'Tab' );
++	await page.keyboard.type( templatePartName );
+ };
+ 
+ const editTemplatePart = async ( textToAdd, isNested = false ) => {
+ 	await page.click(
+-		isNested
+-			? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"]'
+-			: '.wp-block[data-type="core/template-part"]'
++		`${
++			isNested
++				? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"]'
++				: '.wp-block[data-type="core/template-part"]'
++		} .block-editor-button-block-appender`
+ 	);
++	await page.click( '.editor-block-list-item-paragraph' );
+ 	for ( const text of textToAdd ) {
+ 		await page.keyboard.type( text );
+ 		await page.keyboard.press( 'Enter' );
+@@ -208,7 +206,7 @@ describe( 'Multi-entity editor states', () => {
+ 				'Default template part test text.',
+ 				'Second paragraph test.',
+ 			] );
+-			await createTemplatePart( nestedTPName, 'test-theme', true );
++			await createTemplatePart( nestedTPName, true );
+ 			await editTemplatePart(
+ 				[ 'Nested Template Part Text.', 'Second Nested test.' ],
+ 				true
+diff --git a/packages/e2e-tests/specs/experiments/multi-entity-saving.test.js b/packages/e2e-tests/specs/experiments/multi-entity-saving.test.js
+index 5dd1c1f14d83c8..7b7ea0e63be53c 100644
+--- a/packages/e2e-tests/specs/experiments/multi-entity-saving.test.js
++++ b/packages/e2e-tests/specs/experiments/multi-entity-saving.test.js
+@@ -24,7 +24,7 @@ describe( 'Multi-entity save flow', () => {
+ 	const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
+ 	const savePanelSelector = '.entities-saved-states__panel';
+ 	const closePanelButtonSelector = 'button[aria-label="Close panel"]';
+-	const createNewButtonSelector = '//button[contains(text(), "Create new")]';
++	const createNewButtonSelector = '//button[contains(text(), "New section")]';
+ 
+ 	// Reusable assertions across Post/Site editors.
+ 	const assertAllBoxesChecked = async () => {
+@@ -108,21 +108,18 @@ describe( 'Multi-entity save flow', () => {
+ 
+ 			it( 'Should trigger multi-entity save button once template part edited', async () => {
+ 				// Create new template part.
+-				await insertBlock( 'Template Part' );
++				await insertBlock( 'Section' );
+ 				const [ createNewButton ] = await page.$x(
+ 					createNewButtonSelector
+ 				);
+ 				await createNewButton.click();
++				await page.waitForSelector( activatedTemplatePartSelector );
+ 				await page.keyboard.press( 'Tab' );
+ 				await page.keyboard.type( 'test-template-part' );
+-				await page.keyboard.press( 'Tab' );
+-				await page.keyboard.type( 'test-theme' );
+-				await page.keyboard.press( 'Tab' );
+-				await page.keyboard.press( 'Enter' );
+ 
+ 				// Make some changes in new Template Part.
+-				await page.waitForSelector( activatedTemplatePartSelector );
+-				await page.click( templatePartSelector );
++				await page.click( '.block-editor-button-block-appender' );
++				await page.click( '.editor-block-list-item-paragraph' );
+ 				await page.keyboard.type( 'some words...' );
+ 
+ 				await assertMultiSaveEnabled();
+@@ -231,13 +228,13 @@ describe( 'Multi-entity save flow', () => {
+ 
+ 			// Ensure we are on 'front-page' demo template.
+ 			await page.click( templateDropdownSelector );
+-			const [ demoTemplateButton ] = await page.$x(
++			const demoTemplateButton = await page.waitForXPath(
+ 				demoTemplateSelector
+ 			);
+ 			await demoTemplateButton.click();
+ 
+ 			// Insert a new template part placeholder.
+-			await insertBlock( 'Template Part' );
++			await insertBlock( 'Section' );
+ 
+ 			const enabledButton = await page.waitForSelector(
+ 				activeSaveSiteSelector
+diff --git a/packages/e2e-tests/specs/experiments/template-part.test.js b/packages/e2e-tests/specs/experiments/template-part.test.js
+index de9e15cbc8dc85..5a5de4d202e0b5 100644
+--- a/packages/e2e-tests/specs/experiments/template-part.test.js
++++ b/packages/e2e-tests/specs/experiments/template-part.test.js
+@@ -80,8 +80,6 @@ describe( 'Template Part', () => {
+ 
+ 	describe( 'Template part placeholder', () => {
+ 		// Test constants for template part.
+-		const testSlug = 'test-template-part';
+-		const testTheme = 'test-theme';
+ 		const testContent = 'some words...';
+ 
+ 		// Selectors
+@@ -92,25 +90,19 @@ describe( 'Template Part', () => {
+ 		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
+ 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
+ 		const createNewButtonSelector =
+-			'//button[contains(text(), "Create new")]';
+-		const disabledButtonSelector =
+-			'.wp-block-template-part__placeholder-create-button[disabled]';
++			'//button[contains(text(), "New section")]';
++		const chooseExistingButtonSelector =
++			'//button[contains(text(), "Choose existing")]';
+ 
+ 		it( 'Should insert new template part on creation', async () => {
+ 			await createNewPost();
+ 			await disablePrePublishChecks();
+ 			// Create new template part.
+-			await insertBlock( 'Template Part' );
++			await insertBlock( 'Section' );
+ 			const [ createNewButton ] = await page.$x(
+ 				createNewButtonSelector
+ 			);
+ 			await createNewButton.click();
+-			await page.keyboard.press( 'Tab' );
+-			await page.keyboard.type( testSlug );
+-			await page.keyboard.press( 'Tab' );
+-			await page.keyboard.type( testTheme );
+-			await page.keyboard.press( 'Tab' );
+-			await page.keyboard.press( 'Enter' );
+ 
+ 			const newTemplatePart = await page.waitForSelector(
+ 				activatedTemplatePartSelector
+@@ -118,7 +110,8 @@ describe( 'Template Part', () => {
+ 			expect( newTemplatePart ).toBeTruthy();
+ 
+ 			// Finish creating template part, insert some text, and save.
+-			await page.click( templatePartSelector );
++			await page.click( '.block-editor-button-block-appender' );
++			await page.click( '.editor-block-list-item-paragraph' );
+ 			await page.keyboard.type( testContent );
+ 			await page.click( savePostSelector );
+ 			await page.click( entitiesSaveSelector );
+@@ -127,7 +120,11 @@ describe( 'Template Part', () => {
+ 		it( 'Should preview newly added template part', async () => {
+ 			await createNewPost();
+ 			// Try to insert the template part we created.
+-			await insertBlock( 'Template Part' );
++			await insertBlock( 'Section' );
++			const [ chooseExistingButton ] = await page.$x(
++				chooseExistingButtonSelector
++			);
++			await chooseExistingButton.click();
+ 			const preview = await page.waitForXPath( testContentSelector );
+ 			expect( preview ).toBeTruthy();
+ 		} );
+@@ -141,24 +138,5 @@ describe( 'Template Part', () => {
+ 			);
+ 			expect( templatePartContent ).toBeTruthy();
+ 		} );
+-
+-		it( 'Should disable create button for slug/theme combo', async () => {
+-			await createNewPost();
+-			// Create new template part.
+-			await insertBlock( 'Template Part' );
+-			const [ createNewButton ] = await page.$x(
+-				createNewButtonSelector
+-			);
+-			await createNewButton.click();
+-			await page.keyboard.press( 'Tab' );
+-			await page.keyboard.type( testSlug );
+-			await page.keyboard.press( 'Tab' );
+-			await page.keyboard.type( testTheme );
+-
+-			const disabledButton = await page.waitForSelector(
+-				disabledButtonSelector
+-			);
+-			expect( disabledButton ).toBeTruthy();
+-		} );
+ 	} );
+ } );
+diff --git a/packages/edit-navigation/src/store/actions.js b/packages/edit-navigation/src/store/actions.js
+index d17f03845b558f..d89fd3f5c80b7f 100644
+--- a/packages/edit-navigation/src/store/actions.js
++++ b/packages/edit-navigation/src/store/actions.js
+@@ -252,7 +252,10 @@ function serializeProcessing( callback ) {
+ 		};
+ 
+ 		try {
+-			yield* callback( post );
++			yield* callback(
++				// re-select the post as it could be outdated by now
++				yield getNavigationPostForMenu( post.meta.menuId )
++			);
+ 		} finally {
+ 			yield {
+ 				type: 'FINISH_PROCESSING_POST',
+@@ -266,10 +269,7 @@ function serializeProcessing( callback ) {
+ 					pendingActions[ 0 ]
+ 				);
+ 
+-				// re-fetch the post as running the callback() likely updated it
+-				yield* serializedCallback(
+-					yield getNavigationPostForMenu( post.meta.menuId )
+-				);
++				yield* serializedCallback( post );
+ 			}
+ 		}
+ 	};
+diff --git a/packages/edit-site/src/components/template-switcher/index.js b/packages/edit-site/src/components/template-switcher/index.js
+index 09fe219cad282e..e713cbaf8c1ab5 100644
+--- a/packages/edit-site/src/components/template-switcher/index.js
++++ b/packages/edit-site/src/components/template-switcher/index.js
+@@ -204,7 +204,7 @@ export default function TemplateSwitcher( {
+ 								onMouseEnter={ onMouseEnterTheme }
+ 								onMouseLeave={ onMouseLeaveTheme }
+ 							>
+-								{ currentTheme.name }
++								{ currentTheme.name.raw }
+ 							</MenuItem>
+ 						</MenuGroup>
+ 						{ !! hoveredTemplate?.id && (
+diff --git a/packages/edit-site/src/components/template-switcher/theme-preview.js b/packages/edit-site/src/components/template-switcher/theme-preview.js
+index 1bcb96fa4eb7cb..0ef8c2068f84af 100644
+--- a/packages/edit-site/src/components/template-switcher/theme-preview.js
++++ b/packages/edit-site/src/components/template-switcher/theme-preview.js
+@@ -9,20 +9,24 @@ import { truncate } from 'lodash';
+ import { __, sprintf } from '@wordpress/i18n';
+ 
+ function ThemePreview( {
+-	theme: { author_name: authorName, description, name, screenshot, version },
++	theme: { author, description, name, screenshot, version },
+ } ) {
+ 	return (
+ 		<div className="edit-site-template-switcher__theme-preview">
+-			<span className="edit-site-template-switcher__theme-preview-name">
+-				{ name }
+-			</span>{ ' ' }
++			<span
++				className="edit-site-template-switcher__theme-preview-name"
++				dangerouslySetInnerHTML={ {
++					/* name.rendered is sanitized on the server side. */
++					__html: name.rendered,
++				} }
++			/>{ ' ' }
+ 			<span className="edit-site-template-switcher__theme-preview-version">
+ 				{ 'v' + version }
+ 			</span>
+ 			<div className="edit-site-template-switcher__theme-preview-byline">
+ 				{
+ 					// translators: %s: theme author name.
+-					sprintf( __( 'By %s' ), [ authorName ] )
++					sprintf( __( 'By %s' ), [ author.raw ] )
+ 				}
+ 			</div>
+ 			<img
+@@ -31,10 +35,14 @@ function ThemePreview( {
+ 				alt={ 'Theme Preview' }
+ 			/>
+ 			<div className="edit-site-template-switcher__theme-preview-description">
+-				{ truncate( description, {
+-					length: 120,
+-					separator: /\. +/,
+-				} ) }
++				{ truncate(
++					/* Not using description.rendered here, as we might contain after an opening HTML tag. */
++					description.raw,
++					{
++						length: 120,
++						separator: /\. +/,
++					}
++				) }
+ 			</div>
+ 		</div>
+ 	);
+diff --git a/packages/editor/src/components/autocompleters/style.scss b/packages/editor/src/components/autocompleters/style.scss
+index 1d20b34eeb8709..75c9f00e264338 100644
+--- a/packages/editor/src/components/autocompleters/style.scss
++++ b/packages/editor/src/components/autocompleters/style.scss
+@@ -34,6 +34,6 @@
+ 		flex-shrink: 0;
+ 	}
+ 	&:hover .editor-autocompleters__user-slug {
+-		color: $blue-medium-300;
++		color: var(--wp-admin-theme-color);
+ 	}
+ }
+diff --git a/packages/editor/src/components/post-featured-image/style.scss b/packages/editor/src/components/post-featured-image/style.scss
+index 124b14c0fc57cb..786a0e3b5c38da 100644
+--- a/packages/editor/src/components/post-featured-image/style.scss
++++ b/packages/editor/src/components/post-featured-image/style.scss
+@@ -35,7 +35,7 @@
+ 	padding: 0;
+ 	transition: all 0.1s ease-out;
+ 	@include reduce-motion("transition");
+-	box-shadow: 0 0 0 0 $blue-medium-500;
++	box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
+ }
+ 
+ .editor-post-featured-image__preview {
+@@ -43,7 +43,7 @@
+ }
+ 
+ .editor-post-featured-image__preview:not(:disabled):not([aria-disabled="true"]):focus {
+-	box-shadow: 0 0 0 4px $blue-medium-500;
++	box-shadow: 0 0 0 4px var(--wp-admin-theme-color);
+ }
+ 
+ .editor-post-featured-image__toggle {
+diff --git a/packages/editor/src/components/post-publish-panel/index.js b/packages/editor/src/components/post-publish-panel/index.js
+index b1988e00af5d36..2ddf97e7e64368 100644
+--- a/packages/editor/src/components/post-publish-panel/index.js
++++ b/packages/editor/src/components/post-publish-panel/index.js
+@@ -17,6 +17,7 @@ import {
+ } from '@wordpress/components';
+ import { withSelect, withDispatch } from '@wordpress/data';
+ import { compose } from '@wordpress/compose';
++import { closeSmall } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+@@ -80,11 +81,9 @@ export class PostPublishPanel extends Component {
+ 					{ isPostPublish ? (
+ 						<Button
+ 							onClick={ onClose }
++							icon={ closeSmall }
+ 							label={ __( 'Close panel' ) }
+-							className="is-secondary"
+-						>
+-							{ __( 'Close' ) }
+-						</Button>
++						/>
+ 					) : (
+ 						<>
+ 							<div className="editor-post-publish-panel__header-publish-button">
+@@ -99,7 +98,7 @@ export class PostPublishPanel extends Component {
+ 								<Button
+ 									onClick={ onClose }
+ 									label={ __( 'Close panel' ) }
+-									className="is-secondary"
++									isSecondary
+ 								>
+ 									{ __( 'Cancel' ) }
+ 								</Button>
+diff --git a/packages/editor/src/components/post-publish-panel/style.scss b/packages/editor/src/components/post-publish-panel/style.scss
+index ab0f6c61b30367..4e36c41b3612fd 100644
+--- a/packages/editor/src/components/post-publish-panel/style.scss
++++ b/packages/editor/src/components/post-publish-panel/style.scss
+@@ -26,6 +26,11 @@
+ 		width: 100%;
+ 		justify-content: center;
+ 	}
++
++	.has-icon {
++		margin-left: auto;
++		width: auto;
++	}
+ }
+ 
+ .editor-post-publish-panel__header-publish-button,
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index e17acb14e06ec0..26979c69f90a0c 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -8,11 +8,18 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+     className="editor-post-publish-panel__header"
+   >
+     <ForwardRef(Button)
+-      className="is-secondary"
++      icon={
++        <SVG
++          viewBox="0 0 24 24"
++          xmlns="http://www.w3.org/2000/svg"
++        >
++          <Path
++            d="M13 11.9l3.3-3.4-1.1-1-3.2 3.3-3.2-3.3-1.1 1 3.3 3.4-3.5 3.6 1 1L12 13l3.5 3.5 1-1z"
++          />
++        </SVG>
++      }
+       label="Close panel"
+-    >
+-      Close
+-    </ForwardRef(Button)>
++    />
+   </div>
+   <div
+     className="editor-post-publish-panel__content"
+@@ -39,11 +46,18 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+     className="editor-post-publish-panel__header"
+   >
+     <ForwardRef(Button)
+-      className="is-secondary"
++      icon={
++        <SVG
++          viewBox="0 0 24 24"
++          xmlns="http://www.w3.org/2000/svg"
++        >
++          <Path
++            d="M13 11.9l3.3-3.4-1.1-1-3.2 3.3-3.2-3.3-1.1 1 3.3 3.4-3.5 3.6 1 1L12 13l3.5 3.5 1-1z"
++          />
++        </SVG>
++      }
+       label="Close panel"
+-    >
+-      Close
+-    </ForwardRef(Button)>
++    />
+   </div>
+   <div
+     className="editor-post-publish-panel__content"
+@@ -81,7 +95,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is
+       className="editor-post-publish-panel__header-cancel-button"
+     >
+       <ForwardRef(Button)
+-        className="is-secondary"
++        isSecondary={true}
+         label="Close panel"
+       >
+         Cancel
+@@ -122,7 +136,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
+       className="editor-post-publish-panel__header-cancel-button"
+     >
+       <ForwardRef(Button)
+-        className="is-secondary"
++        isSecondary={true}
+         label="Close panel"
+       >
+         Cancel
+@@ -163,7 +177,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
+       className="editor-post-publish-panel__header-cancel-button"
+     >
+       <ForwardRef(Button)
+-        className="is-secondary"
++        isSecondary={true}
+         label="Close panel"
+       >
+         Cancel
+diff --git a/packages/editor/src/components/post-title/style.scss b/packages/editor/src/components/post-title/style.scss
+index 214f68d861c1cc..b720ee9253ae5a 100644
+--- a/packages/editor/src/components/post-title/style.scss
++++ b/packages/editor/src/components/post-title/style.scss
+@@ -36,15 +36,15 @@
+ 
+ 		// Large text needs a 3:1 contrast ratio.
+ 		&::-webkit-input-placeholder {
+-			color: $dark-opacity-200;
++			color: $medium-gray-placeholder;
+ 		}
+ 
+ 		&::-moz-placeholder {
+-			color: $dark-opacity-200;
++			color: $medium-gray-placeholder;
+ 		}
+ 
+ 		&:-ms-input-placeholder {
+-			color: $dark-opacity-200;
++			color: $medium-gray-placeholder;
+ 		}
+ 
+ 		&:focus {
+diff --git a/packages/nux/src/components/dot-tip/style.scss b/packages/nux/src/components/dot-tip/style.scss
+index d1f268be54748b..7aded0dbb3e5cf 100644
+--- a/packages/nux/src/components/dot-tip/style.scss
++++ b/packages/nux/src/components/dot-tip/style.scss
+@@ -12,7 +12,8 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
+ 
+ 	&::before {
+ 		animation: nux-pulse 1.6s infinite cubic-bezier(0.17, 0.67, 0.92, 0.62);
+-		background: rgba($blue-medium-800, 0.9);
++		background: rgba(#00739c, 0.9);
++		opacity: 0.9;
+ 		height: $dot-size * $dot-scale;
+ 		left: -($dot-size * $dot-scale) / 2;
+ 		top: -($dot-size * $dot-scale) / 2;
+@@ -21,7 +22,7 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
+ 	}
+ 
+ 	&::after {
+-		background: $blue-medium-800;
++		background: #00739c;
+ 		height: $dot-size;
+ 		left: -$dot-size / 2;
+ 		top: -$dot-size / 2;
+@@ -30,7 +31,7 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
+ 
+ 	@keyframes nux-pulse {
+ 		100% {
+-			background: rgba($blue-medium-800, 0);
++			background: rgba(#00739c, 0);
+ 			transform: scale(1);
+ 		}
+ 	}
+diff --git a/packages/react-native-aztec/android/src/main/java/org/wordpress/mobile/ReactNativeAztec/AztecReactTextChangedEvent.kt b/packages/react-native-aztec/android/src/main/java/org/wordpress/mobile/ReactNativeAztec/AztecReactTextChangedEvent.kt
+new file mode 100644
+index 00000000000000..1cf6afdf7b1f3b
+--- /dev/null
++++ b/packages/react-native-aztec/android/src/main/java/org/wordpress/mobile/ReactNativeAztec/AztecReactTextChangedEvent.kt
+@@ -0,0 +1,34 @@
++package org.wordpress.mobile.ReactNativeAztec
++
++import com.facebook.react.bridge.Arguments
++import com.facebook.react.bridge.WritableMap
++import com.facebook.react.uimanager.events.Event
++import com.facebook.react.uimanager.events.RCTEventEmitter
++
++/**
++ * This event includes all data contained in [com.facebook.react.views.textinput.ReactTextChangedEvent],
++ * plus some extra info Gutenberg needs from Aztec.
++ */
++class AztecReactTextChangedEvent(
++    viewId: Int,
++    private val mText: String,
++    private val mEventCount: Int,
++    private val mMostRecentChar: Char?
++) : Event<AztecReactTextChangedEvent>(viewId) {
++
++    override fun getEventName(): String = "topAztecChange"
++
++    override fun dispatch(rctEventEmitter: RCTEventEmitter) {
++        rctEventEmitter.receiveEvent(viewTag, eventName, serializeEventData())
++    }
++
++    private fun serializeEventData(): WritableMap =
++            Arguments.createMap().apply {
++                putString("text", mText)
++                putInt("eventCount", mEventCount)
++                putInt("target", viewTag)
++                if (mMostRecentChar != null) {
++                    putInt("keyCode", mMostRecentChar.toInt())
++                }
++            }
++}
+diff --git a/packages/react-native-aztec/android/src/main/java/org/wordpress/mobile/ReactNativeAztec/ReactAztecManager.java b/packages/react-native-aztec/android/src/main/java/org/wordpress/mobile/ReactNativeAztec/ReactAztecManager.java
+index 013b9794ea54ad..7c1ca216c60a76 100644
+--- a/packages/react-native-aztec/android/src/main/java/org/wordpress/mobile/ReactNativeAztec/ReactAztecManager.java
++++ b/packages/react-native-aztec/android/src/main/java/org/wordpress/mobile/ReactNativeAztec/ReactAztecManager.java
+@@ -139,7 +139,7 @@ public Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
+                                 MapBuilder.of(
+                                         "bubbled", "onSubmitEditing", "captured", "onSubmitEditingCapture")))*/
+                 .put(
+-                        "topChange",
++                        "topAztecChange",
+                         MapBuilder.of(
+                                 "phasedRegistrationNames",
+                                 MapBuilder.of("bubbled", "onChange")))
+@@ -623,13 +623,15 @@ public void onTextChanged(CharSequence s, int start, int before, int count) {
+             // the text (minus the Enter char itself).
+             if (!mEditText.isEnterPressedUnderway()) {
+                 int currentEventCount = mEditText.incrementAndGetEventCounter();
++                boolean singleCharacterHasBeenAdded = count - before == 1;
+                 // The event that contains the event counter and updates it must be sent first.
+                 // TODO: t7936714 merge these events
+                 mEventDispatcher.dispatchEvent(
+-                        new ReactTextChangedEvent(
++                        new AztecReactTextChangedEvent(
+                                 mEditText.getId(),
+                                 mEditText.toHtml(mEditText.getText(), false),
+-                                currentEventCount));
++                                currentEventCount,
++                                singleCharacterHasBeenAdded ? s.charAt(start + before) : null));
+ 
+                 mEventDispatcher.dispatchEvent(
+                         new ReactTextInputEvent(
+@@ -657,8 +659,7 @@ public void onTextChanged(CharSequence s, int start, int before, int count) {
+         }
+ 
+         @Override
+-        public void afterTextChanged(Editable s) {
+-        }
++        public void afterTextChanged(Editable s) {}
+     }
+ 
+     private class AztecContentSizeWatcher implements com.facebook.react.views.textinput.ContentSizeWatcher {
+diff --git a/packages/react-native-aztec/ios/RNTAztecView/RCTAztecView.swift b/packages/react-native-aztec/ios/RNTAztecView/RCTAztecView.swift
+index 31910f5ff8f980..c2638f697fafba 100644
+--- a/packages/react-native-aztec/ios/RNTAztecView/RCTAztecView.swift
++++ b/packages/react-native-aztec/ios/RNTAztecView/RCTAztecView.swift
+@@ -6,6 +6,7 @@ import UIKit
+ class RCTAztecView: Aztec.TextView {
+     @objc var onBackspace: RCTBubblingEventBlock? = nil
+     @objc var onChange: RCTBubblingEventBlock? = nil
++    @objc var onKeyDown: RCTBubblingEventBlock? = nil
+     @objc var onEnter: RCTBubblingEventBlock? = nil
+     @objc var onFocus: RCTBubblingEventBlock? = nil
+     @objc var onBlur: RCTBubblingEventBlock? = nil
+@@ -14,6 +15,7 @@ class RCTAztecView: Aztec.TextView {
+     @objc var onSelectionChange: RCTBubblingEventBlock? = nil
+     @objc var minWidth: CGFloat = 0
+     @objc var maxWidth: CGFloat = 0
++    @objc var triggerKeyCodes: NSArray?
+ 
+     @objc var activeFormats: NSSet? = nil {
+         didSet {
+@@ -304,7 +306,7 @@ class RCTAztecView: Aztec.TextView {
+     // MARK: - Edits
+ 
+     open override func insertText(_ text: String) {
+-        guard !interceptEnter(text) else {
++        guard !interceptEnter(text), !interceptTriggersKeyCodes(text) else {
+             return
+         }
+ 
+@@ -342,12 +344,13 @@ class RCTAztecView: Aztec.TextView {
+         }
+ 
+         guard text == "\n",
+-            let onEnter = onEnter else {
++            let onKeyDown = onKeyDown else {
+                 return false
+         }
+ 
+-        let caretData = packCaretDataForRN()
+-        onEnter(caretData)
++        var eventData = packCaretDataForRN()
++        eventData = add(keyTrigger: "\r", to: eventData)
++        onKeyDown(eventData)
+         return true
+     }
+ 
+@@ -356,19 +359,45 @@ class RCTAztecView: Aztec.TextView {
+             || (selectedRange.location == 0 && selectedRange.length == 0)
+             || text.count == 1 // send backspace event when cleaning all characters
+             || selectedRange == NSRange(location: 0, length: textStorage.length), // send backspace event when deleting all the text
+-            let onBackspace = onBackspace else {
++            let onKeyDown = onKeyDown else {
+                 return false
+         }
+         var range = selectedRange
+         if text.count == 1 {
+             range = NSRange(location: 0, length: textStorage.length)
+         }
+-        let caretData = packCaretDataForRN(overrideRange: range)
++        var caretData = packCaretDataForRN(overrideRange: range)
+         onSelectionChange?(caretData)
+-        onBackspace(caretData)
++        let backSpaceKeyCode:UInt8 = 8
++        caretData = add(keyCode: backSpaceKeyCode, to: caretData)
++        onKeyDown(caretData)
+         return true
+     }
+ 
++    private func interceptTriggersKeyCodes(_ text: String) -> Bool {
++        guard let keyCodes = triggerKeyCodes,
++            keyCodes.count > 0,
++            let onKeyDown = onKeyDown,
++            text.count == 1
++        else {
++            return false
++        }
++        for value in keyCodes {
++            guard let keyString = value as? String,
++                let keyCode = keyString.first?.asciiValue,
++                text.contains(keyString)
++            else {
++                continue
++            }
++
++            var eventData = [AnyHashable:Any]()
++            eventData = add(keyCode: keyCode, to: eventData)
++            onKeyDown(eventData)
++            return true
++        }
++        return false;
++    }
++
+     private func isNewLineBeforeSelectionAndNotEndOfContent() -> Bool {
+         guard let currentLocation = text.indexFromLocation(selectedRange.location) else {
+             return false
+@@ -429,6 +458,19 @@ class RCTAztecView: Aztec.TextView {
+         return result
+     }
+ 
++    func add(keyTrigger: String, to pack:[AnyHashable: Any]) -> [AnyHashable: Any] {
++        guard let keyCode = keyTrigger.first?.asciiValue else {
++            return pack
++        }
++        return add(keyCode: keyCode, to: pack)
++    }
++
++    func add(keyCode: UInt8, to pack:[AnyHashable: Any]) -> [AnyHashable: Any] {
++        var result = pack
++        result["keyCode"] = keyCode
++        return result
++    }
++
+     // MARK: - RN Properties
+ 
+     @objc
+diff --git a/packages/react-native-aztec/ios/RNTAztecView/RCTAztecViewManager.m b/packages/react-native-aztec/ios/RNTAztecView/RCTAztecViewManager.m
+index 1f9d4a6a8da1ea..55a1c9f538ef6c 100644
+--- a/packages/react-native-aztec/ios/RNTAztecView/RCTAztecViewManager.m
++++ b/packages/react-native-aztec/ios/RNTAztecView/RCTAztecViewManager.m
+@@ -7,6 +7,8 @@ @interface RCT_EXTERN_MODULE(RCTAztecViewManager, NSObject)
+ RCT_EXPORT_VIEW_PROPERTY(onBackspace, RCTBubblingEventBlock)
+ RCT_EXPORT_VIEW_PROPERTY(onChange, RCTBubblingEventBlock)
+ RCT_EXPORT_VIEW_PROPERTY(onEnter, RCTBubblingEventBlock)
++RCT_EXPORT_VIEW_PROPERTY(onKeyDown, RCTBubblingEventBlock)
++RCT_EXPORT_VIEW_PROPERTY(triggerKeyCodes, NSArray)
+ RCT_EXPORT_VIEW_PROPERTY(onFocus, RCTBubblingEventBlock)
+ RCT_EXPORT_VIEW_PROPERTY(onBlur, RCTBubblingEventBlock)
+ RCT_EXPORT_VIEW_PROPERTY(onPaste, RCTBubblingEventBlock)
+diff --git a/packages/react-native-aztec/package.json b/packages/react-native-aztec/package.json
+index 09708071575ef9..9b999ac61ac4e5 100644
+--- a/packages/react-native-aztec/package.json
++++ b/packages/react-native-aztec/package.json
+@@ -18,6 +18,9 @@
+   "bugs": {
+     "url": "https://github.com/WordPress/gutenberg/issues"
+   },
++  "dependencies": {
++    "@wordpress/keycodes": "file:../keycodes"
++  },
+   "peerDependencies": {
+     "react": "*",
+     "react-native": "*"
+diff --git a/packages/react-native-aztec/src/AztecView.js b/packages/react-native-aztec/src/AztecView.js
+index ed92c4efc1132e..4fceea432c6569 100644
+--- a/packages/react-native-aztec/src/AztecView.js
++++ b/packages/react-native-aztec/src/AztecView.js
+@@ -9,6 +9,10 @@ import ReactNative, {
+ 	Platform,
+ } from 'react-native';
+ import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
++/**
++ * WordPress dependencies
++ */
++import { ENTER, BACKSPACE } from '@wordpress/keycodes';
+ 
+ const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
+ 
+@@ -18,6 +22,8 @@ class AztecView extends React.Component {
+ 		this._onContentSizeChange = this._onContentSizeChange.bind( this );
+ 		this._onEnter = this._onEnter.bind( this );
+ 		this._onBackspace = this._onBackspace.bind( this );
++		this._onKeyDown = this._onKeyDown.bind( this );
++		this._onChange = this._onChange.bind( this );
+ 		this._onHTMLContentWithCursor = this._onHTMLContentWithCursor.bind(
+ 			this
+ 		);
+@@ -57,21 +63,43 @@ class AztecView extends React.Component {
+ 			return;
+ 		}
+ 
+-		if ( ! this.props.onEnter ) {
++		if ( ! this.props.onKeyDown ) {
+ 			return;
+ 		}
+ 
+-		const { onEnter } = this.props;
+-		onEnter( event );
++		const { onKeyDown } = this.props;
++
++		const newEvent = { ...event, keyCode: ENTER };
++		onKeyDown( newEvent );
+ 	}
+ 
+ 	_onBackspace( event ) {
+-		if ( ! this.props.onBackspace ) {
++		if ( ! this.props.onKeyDown ) {
++			return;
++		}
++
++		const { onKeyDown } = this.props;
++
++		const newEvent = {
++			...event,
++			keyCode: BACKSPACE,
++			preventDefault: () => {},
++		};
++		onKeyDown( newEvent );
++	}
++
++	_onKeyDown( event ) {
++		if ( ! this.props.onKeyDown ) {
+ 			return;
+ 		}
+ 
+-		const { onBackspace } = this.props;
+-		onBackspace( event );
++		const { onKeyDown } = this.props;
++		const newEvent = {
++			...event,
++			keyCode: event.nativeEvent.keyCode,
++			preventDefault: () => {},
++		};
++		onKeyDown( newEvent );
+ 	}
+ 
+ 	_onHTMLContentWithCursor( event ) {
+@@ -107,6 +135,26 @@ class AztecView extends React.Component {
+ 		onBlur( event );
+ 	}
+ 
++	_onChange( event ) {
++		// iOS uses the the onKeyDown prop directly from native only when one of the triggerKeyCodes is entered, but
++		// Android includes the information needed for onKeyDown in the event passed to onChange.
++		if ( Platform.OS === 'android' ) {
++			const triggersIncludeEventKeyCode =
++				this.props.triggerKeyCodes &&
++				this.props.triggerKeyCodes
++					.map( ( char ) => char.charCodeAt( 0 ) )
++					.includes( event.nativeEvent.keyCode );
++			if ( triggersIncludeEventKeyCode ) {
++				this._onKeyDown( event );
++			}
++		}
++
++		const { onChange } = this.props;
++		if ( onChange ) {
++			onChange( event );
++		}
++	}
++
+ 	_onSelectionChange( event ) {
+ 		if ( this.props.onSelectionChange ) {
+ 			const { selectionStart, selectionEnd, text } = event.nativeEvent;
+@@ -182,15 +230,17 @@ class AztecView extends React.Component {
+ 					style={ style }
+ 					onContentSizeChange={ this._onContentSizeChange }
+ 					onHTMLContentWithCursor={ this._onHTMLContentWithCursor }
++					onChange={ this._onChange }
+ 					onSelectionChange={ this._onSelectionChange }
+-					onEnter={ this.props.onEnter && this._onEnter }
++					onEnter={ this.props.onKeyDown && this._onEnter }
++					onBackspace={ this.props.onKeyDown && this._onBackspace }
++					onKeyDown={ this.props.onKeyDown && this._onKeyDown }
+ 					deleteEnter={ this.props.deleteEnter }
+ 					// IMPORTANT: the onFocus events are thrown away as these are handled by onPress() in the upper level.
+ 					// It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
+ 					// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
+ 					onFocus={ this._onAztecFocus }
+ 					onBlur={ this._onBlur }
+-					onBackspace={ this._onBackspace }
+ 				/>
+ 			</TouchableWithoutFeedback>
+ 		);
+diff --git a/packages/react-native-bridge/ios/Gutenberg.swift b/packages/react-native-bridge/ios/Gutenberg.swift
+index 7a3fa9a0fca20f..d21b2dec41c32a 100644
+--- a/packages/react-native-bridge/ios/Gutenberg.swift
++++ b/packages/react-native-bridge/ios/Gutenberg.swift
+@@ -13,7 +13,9 @@ public class Gutenberg: NSObject {
+     private var extraModules: [RCTBridgeModule];
+ 
+     public lazy var rootView: UIView = {
+-        return RCTRootView(bridge: bridge, moduleName: "gutenberg", initialProperties: initialProps)
++        let view = RCTRootView(bridge: bridge, moduleName: "gutenberg", initialProperties: initialProps)
++        view.loadingView = dataSource.loadingView
++        return view
+     }()
+ 
+     public var delegate: GutenbergBridgeDelegate? {
+@@ -222,7 +224,7 @@ extension Gutenberg {
+ }
+ 
+ public extension Gutenberg.MediaSource {
+-    public init(id: String, label: String, types: [Gutenberg.MediaType]) {
++    init(id: String, label: String, types: [Gutenberg.MediaType]) {
+         self.id = id
+         self.label = label
+         self.types = Set(types)
+diff --git a/packages/react-native-bridge/ios/GutenbergBridgeDataSource.swift b/packages/react-native-bridge/ios/GutenbergBridgeDataSource.swift
+index fb61cdc4a5084f..909f90927914f2 100644
+--- a/packages/react-native-bridge/ios/GutenbergBridgeDataSource.swift
++++ b/packages/react-native-bridge/ios/GutenbergBridgeDataSource.swift
+@@ -37,13 +37,16 @@ public protocol GutenbergBridgeDataSource: class {
+     /// - Returns: Gutenberg related localization key value pairs for the current locale.
+     func gutenbergTranslations() -> [String : [String]]?
+ 
+-    /// Asks the delegate for a list of Media Sources to show on the Media Source Picker.
++    /// Asks the data source for a list of Media Sources to show on the Media Source Picker.
+     func gutenbergMediaSources() -> [Gutenberg.MediaSource]
+ 
+     func gutenbergCapabilities() -> [String: Bool]?
+ 
+-    /// Asks the delegate for a list of theme colors
++    /// Asks the data source for a list of theme colors.
+     func gutenbergEditorTheme() -> GutenbergEditorTheme?
++
++    /// Asks the data source for a view to show while the Editor is loading.
++     var loadingView: UIView? { get }
+ }
+ 
+ public extension GutenbergBridgeDataSource {
+@@ -54,6 +57,10 @@ public extension GutenbergBridgeDataSource {
+     func gutenbergPostType() -> String {
+         return "post"
+     }
++
++    var loadingView: UIView? {
++         return nil
++     }
+ }
+ 
+ public protocol GutenbergEditorTheme {
+diff --git a/packages/react-native-bridge/ios/GutenbergBridgeDelegate.swift b/packages/react-native-bridge/ios/GutenbergBridgeDelegate.swift
+index 5183d835e74480..35baa312d42ab2 100644
+--- a/packages/react-native-bridge/ios/GutenbergBridgeDelegate.swift
++++ b/packages/react-native-bridge/ios/GutenbergBridgeDelegate.swift
+@@ -80,6 +80,9 @@ extension LogLevel {
+         case .warning: self = .warn
+         case .error: self = .error
+         case .fatal: self = .fatal
++        @unknown default:
++            assertionFailure("Unknown log level: \(rnLogLevel)")
++            self = .trace
+         }
+     }
+ }
+diff --git a/packages/react-native-editor/__device-tests__/pages/editor-page.js b/packages/react-native-editor/__device-tests__/pages/editor-page.js
+index 18976667843510..6e3b93d26c02fc 100644
+--- a/packages/react-native-editor/__device-tests__/pages/editor-page.js
++++ b/packages/react-native-editor/__device-tests__/pages/editor-page.js
+@@ -300,7 +300,7 @@ export default class EditorPage {
+ 		);
+ 		await blockActionsMenuButton.click();
+ 
+-		const removeActionButtonIdentifier = `Remove ${ blockName }`;
++		const removeActionButtonIdentifier = 'Remove block';
+ 		const removeActionButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeActionButtonIdentifier }")]`;
+ 		const removeActionButton = await this.driver.elementByXPath(
+ 			removeActionButtonLocator
+diff --git a/packages/react-native-editor/ios/Podfile.lock b/packages/react-native-editor/ios/Podfile.lock
+index 3feb736566dd58..19cb2c000b158d 100644
+--- a/packages/react-native-editor/ios/Podfile.lock
++++ b/packages/react-native-editor/ios/Podfile.lock
+@@ -21,7 +21,7 @@ PODS:
+     - DoubleConversion
+     - glog
+   - glog (0.3.5)
+-  - Gutenberg (8.4.0-rc.1):
++  - Gutenberg (8.4.0):
+     - React (= 0.61.5)
+     - React-CoreModules (= 0.61.5)
+     - React-RCTImage (= 0.61.5)
+@@ -372,7 +372,7 @@ SPEC CHECKSUMS:
+   FBReactNativeSpec: 118d0d177724c2d67f08a59136eb29ef5943ec75
+   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
+   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
+-  Gutenberg: f7055103da8a673d813ecec75875d973e3d25445
++  Gutenberg: 42a3ed491af07194744d45aa7fc44b8202ea1a5b
+   RCTRequired: b153add4da6e7dbc44aebf93f3cf4fcae392ddf1
+   RCTTypeSafety: 9aa1b91d7f9310fc6eadc3cf95126ffe818af320
+   React: b6a59ef847b2b40bb6e0180a97d0ca716969ac78
+diff --git a/packages/react-native-editor/ios/gutenberg/GutenbergViewController.swift b/packages/react-native-editor/ios/gutenberg/GutenbergViewController.swift
+index 1a28d073245431..94087cf986ebda 100644
+--- a/packages/react-native-editor/ios/gutenberg/GutenbergViewController.swift
++++ b/packages/react-native-editor/ios/gutenberg/GutenbergViewController.swift
+@@ -71,7 +71,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
+         print("↳ Content changed: \(changed)")
+         print("↳ Title: \(title)")
+         print("↳ HTML: \(html)")
+-        print("↳ Content Info: \(contentInfo)")
++        print("↳ Content Info: \(String(describing: contentInfo))")
+         self.contentInfo = contentInfo
+     }
+ 
+diff --git a/packages/rich-text/src/component/index.native.js b/packages/rich-text/src/component/index.native.js
+index b3dfc7e1c482a6..887aa19647a49b 100644
+--- a/packages/rich-text/src/component/index.native.js
++++ b/packages/rich-text/src/component/index.native.js
+@@ -27,7 +27,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
+ import { withSelect } from '@wordpress/data';
+ import { childrenBlock } from '@wordpress/blocks';
+ import { decodeEntities } from '@wordpress/html-entities';
+-import { BACKSPACE } from '@wordpress/keycodes';
++import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
+ import { isURL } from '@wordpress/url';
+ import { Icon, atSymbol } from '@wordpress/icons';
+ import { __ } from '@wordpress/i18n';
+@@ -40,6 +40,7 @@ import { applyFormat } from '../apply-format';
+ import { getActiveFormat } from '../get-active-format';
+ import { getActiveFormats } from '../get-active-formats';
+ import { insert } from '../insert';
++import { getTextContent } from '../get-text-content';
+ import { isEmpty, isEmptyLine } from '../is-empty';
+ import { create } from '../create';
+ import { toHTMLString } from '../to-html-string';
+@@ -80,8 +81,10 @@ export class RichText extends Component {
+ 		this.isIOS = Platform.OS === 'ios';
+ 		this.createRecord = this.createRecord.bind( this );
+ 		this.onChange = this.onChange.bind( this );
++		this.onKeyDown = this.onKeyDown.bind( this );
+ 		this.handleEnter = this.handleEnter.bind( this );
+ 		this.handleDelete = this.handleDelete.bind( this );
++		this.handleMention = this.handleMention.bind( this );
+ 		this.onPaste = this.onPaste.bind( this );
+ 		this.onFocus = this.onFocus.bind( this );
+ 		this.onBlur = this.onBlur.bind( this );
+@@ -99,6 +102,7 @@ export class RichText extends Component {
+ 		);
+ 		this.valueToFormat = this.valueToFormat.bind( this );
+ 		this.getHtmlToRender = this.getHtmlToRender.bind( this );
++		this.showMention = this.showMention.bind( this );
+ 		this.insertString = this.insertString.bind( this );
+ 		this.state = {
+ 			activeFormats: [],
+@@ -297,7 +301,20 @@ export class RichText extends Component {
+ 		this.lastAztecEventType = 'content size change';
+ 	}
+ 
++	onKeyDown( event ) {
++		if ( event.defaultPrevented ) {
++			return;
++		}
++
++		this.handleDelete( event );
++		this.handleEnter( event );
++		this.handleMention( event );
++	}
++
+ 	handleEnter( event ) {
++		if ( event.keyCode !== ENTER ) {
++			return;
++		}
+ 		const { onEnter } = this.props;
+ 
+ 		if ( ! onEnter ) {
+@@ -313,7 +330,11 @@ export class RichText extends Component {
+ 	}
+ 
+ 	handleDelete( event ) {
+-		const keyCode = BACKSPACE; // TODO : should we differentiate BACKSPACE and DELETE?
++		const { keyCode } = event;
++
++		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
++			return;
++		}
+ 		const isReverse = keyCode === BACKSPACE;
+ 
+ 		const { onDelete, __unstableMultilineTag: multilineTag } = this.props;
+@@ -366,6 +387,35 @@ export class RichText extends Component {
+ 		this.lastAztecEventType = 'input';
+ 	}
+ 
++	handleMention( event ) {
++		const { keyCode } = event;
++
++		if ( keyCode !== '@'.charCodeAt( 0 ) ) {
++			return;
++		}
++		const record = this.getRecord();
++		const text = getTextContent( record );
++		// Only start the mention UI if the selection is on the start of text or the character before is a space
++		if (
++			text.length === 0 ||
++			record.start === 0 ||
++			text.charAt( record.start - 1 ) === ' '
++		) {
++			this.showMention();
++		} else {
++			this.insertString( record, '@' );
++		}
++	}
++
++	showMention() {
++		const record = this.getRecord();
++		addMention()
++			.then( ( mentionUserId ) => {
++				this.insertString( record, `@${ mentionUserId } ` );
++			} )
++			.catch( () => {} );
++	}
++
+ 	/**
+ 	 * Handles a paste event from the native Aztec Wrapper.
+ 	 *
+@@ -690,6 +740,7 @@ export class RichText extends Component {
+ 			parentBlockStyles,
+ 			withoutInteractiveFormatting,
+ 			capabilities,
++			disableEditingMenu = false,
+ 		} = this.props;
+ 
+ 		const record = this.getRecord();
+@@ -797,8 +848,13 @@ export class RichText extends Component {
+ 					onChange={ this.onChange }
+ 					onFocus={ this.onFocus }
+ 					onBlur={ this.onBlur }
+-					onEnter={ this.handleEnter }
+-					onBackspace={ this.handleDelete }
++					onKeyDown={ this.onKeyDown }
++					triggerKeyCodes={
++						disableEditingMenu === false &&
++						isMentionsSupported( capabilities )
++							? [ '@' ]
++							: []
++					}
+ 					onPaste={ this.onPaste }
+ 					activeFormats={ this.getActiveFormatNames( record ) }
+ 					onContentSizeChange={ this.onContentSizeChange }
+@@ -820,7 +876,7 @@ export class RichText extends Component {
+ 					}
+ 					fontWeight={ this.props.fontWeight }
+ 					fontStyle={ this.props.fontStyle }
+-					disableEditingMenu={ this.props.disableEditingMenu }
++					disableEditingMenu={ disableEditingMenu }
+ 					isMultiline={ this.isMultiline }
+ 					textAlign={ this.props.textAlign }
+ 					{ ...( this.isIOS ? { maxWidth } : {} ) }
+@@ -842,28 +898,12 @@ export class RichText extends Component {
+ 						<BlockFormatControls>
+ 							{
+ 								// eslint-disable-next-line no-undef
+-								__DEV__ && isMentionsSupported( capabilities ) && (
++								isMentionsSupported( capabilities ) && (
+ 									<Toolbar>
+ 										<ToolbarButton
+ 											title={ __( 'Insert mention' ) }
+ 											icon={ <Icon icon={ atSymbol } /> }
+-											onClick={ () => {
+-												addMention()
+-													.then(
+-														( mentionUserId ) => {
+-															let stringToInsert = `@${ mentionUserId }`;
+-															if ( this.isIOS ) {
+-																stringToInsert +=
+-																	' ';
+-															}
+-															this.insertString(
+-																record,
+-																stringToInsert
+-															);
+-														}
+-													)
+-													.catch( () => {} );
+-											} }
++											onClick={ this.showMention }
+ 										/>
+ 									</Toolbar>
+ 								)

@@ -1,0 +1,100 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0e60b4a23f27bb..769cbba6b41d25 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,10 @@
+ -   `Popover`: enable auto-updating every animation frame ([#43617](https://github.com/WordPress/gutenberg/pull/43617)).
+ -   `Popover`: improve the component's performance and reactivity to prop changes by reworking its internals ([#43335](https://github.com/WordPress/gutenberg/pull/43335)).
+ 
++### Enhancements
++
++-   `CheckboxControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43720](https://github.com/WordPress/gutenberg/pull/43720)).
++
+ ### Internal
+ 
+ -   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
+diff --git a/packages/components/src/checkbox-control/index.tsx b/packages/components/src/checkbox-control/index.tsx
+index 3ea0d7e0e7e777..0b6bd68d7ad88e 100644
+--- a/packages/components/src/checkbox-control/index.tsx
++++ b/packages/components/src/checkbox-control/index.tsx
+@@ -43,6 +43,7 @@ export function CheckboxControl(
+ 	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
+ ) {
+ 	const {
++		__nextHasNoMarginBottom,
+ 		label,
+ 		className,
+ 		heading,
+@@ -87,6 +88,7 @@ export function CheckboxControl(
+ 
+ 	return (
+ 		<BaseControl
++			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 			label={ heading }
+ 			id={ id }
+ 			help={ help }
+diff --git a/packages/components/src/checkbox-control/stories/index.tsx b/packages/components/src/checkbox-control/stories/index.tsx
+index 6241a94a78ac4c..9054e50dc2ffc3 100644
+--- a/packages/components/src/checkbox-control/stories/index.tsx
++++ b/packages/components/src/checkbox-control/stories/index.tsx
+@@ -12,6 +12,7 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import CheckboxControl from '..';
++import { VStack } from '../../v-stack';
+ 
+ const meta: ComponentMeta< typeof CheckboxControl > = {
+ 	component: CheckboxControl,
+@@ -71,7 +72,7 @@ export const Indeterminate: ComponentStory< typeof CheckboxControl > = ( {
+ 		Object.values( fruits ).some( Boolean ) && ! isAllChecked;
+ 
+ 	return (
+-		<>
++		<VStack>
+ 			<CheckboxControl
+ 				{ ...args }
+ 				checked={ isAllChecked }
+@@ -85,6 +86,7 @@ export const Indeterminate: ComponentStory< typeof CheckboxControl > = ( {
+ 				} }
+ 			/>
+ 			<CheckboxControl
++				__nextHasNoMarginBottom
+ 				label="Apple"
+ 				checked={ fruits.apple }
+ 				onChange={ ( apple ) =>
+@@ -95,6 +97,7 @@ export const Indeterminate: ComponentStory< typeof CheckboxControl > = ( {
+ 				}
+ 			/>
+ 			<CheckboxControl
++				__nextHasNoMarginBottom
+ 				label="Orange"
+ 				checked={ fruits.orange }
+ 				onChange={ ( orange ) =>
+@@ -104,9 +107,10 @@ export const Indeterminate: ComponentStory< typeof CheckboxControl > = ( {
+ 					} ) )
+ 				}
+ 			/>
+-		</>
++		</VStack>
+ 	);
+ };
+ Indeterminate.args = {
+ 	label: 'Select all',
++	__nextHasNoMarginBottom: true,
+ };
+diff --git a/packages/components/src/checkbox-control/types.ts b/packages/components/src/checkbox-control/types.ts
+index 29461471202920..07ab55493fc661 100644
+--- a/packages/components/src/checkbox-control/types.ts
++++ b/packages/components/src/checkbox-control/types.ts
+@@ -8,7 +8,10 @@ import type { ReactNode } from 'react';
+  */
+ import type { BaseControlProps } from '../base-control/types';
+ 
+-export type CheckboxControlProps = Pick< BaseControlProps, 'help' > & {
++export type CheckboxControlProps = Pick<
++	BaseControlProps,
++	'help' | '__nextHasNoMarginBottom'
++> & {
+ 	/**
+ 	 * A function that receives the checked state (boolean) as input.
+ 	 */

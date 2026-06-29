@@ -1,0 +1,175 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7255888604ed12..8e17943c2b7726 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,8 @@
+ 
+ -   `BoxControl`: Add presets support ([#67688](https://github.com/WordPress/gutenberg/pull/67688)).
+ -   `Navigation`: Upsize back buttons ([#68157](https://github.com/WordPress/gutenberg/pull/68157)).
++-   `Heading`: Fix text contrast for dark mode ([#68349](https://github.com/WordPress/gutenberg/pull/68349)).
++-   `Text`: Fix text contrast for dark mode ([#68349](https://github.com/WordPress/gutenberg/pull/68349)).
+ 
+ ### Deprecations
+ 
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index fd6cc2df3fcde7..b1adfd5d9221ab 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -63,7 +63,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+ }
+ 
+ .emotion-12 {
+-  color: #1e1e1e;
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   line-height: 1.4;
+   margin: 0;
+   text-wrap: balance;
+@@ -345,7 +345,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+ }
+ 
+ .emotion-12 {
+-  color: #1e1e1e;
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   line-height: 1.4;
+   margin: 0;
+   text-wrap: balance;
+@@ -637,7 +637,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+ }
+ 
+ .emotion-12 {
+-  color: #1e1e1e;
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   line-height: 1.4;
+   margin: 0;
+   text-wrap: balance;
+@@ -941,7 +941,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+ }
+ 
+ .emotion-12 {
+-  color: #1e1e1e;
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   line-height: 1.4;
+   margin: 0;
+   text-wrap: balance;
+diff --git a/packages/components/src/heading/hook.ts b/packages/components/src/heading/hook.ts
+index d242afe1fdb2f5..132595d69c4f76 100644
+--- a/packages/components/src/heading/hook.ts
++++ b/packages/components/src/heading/hook.ts
+@@ -14,7 +14,7 @@ export function useHeading(
+ 	const {
+ 		as: asProp,
+ 		level = 2,
+-		color = COLORS.gray[ 900 ],
++		color = COLORS.theme.foreground,
+ 		isBlock = true,
+ 		weight = CONFIG.fontWeightHeading as import('react').CSSProperties[ 'fontWeight' ],
+ 		...otherProps
+diff --git a/packages/components/src/heading/test/__snapshots__/index.tsx.snap b/packages/components/src/heading/test/__snapshots__/index.tsx.snap
+index cf863c4b2bb2ef..675810948404fe 100644
+--- a/packages/components/src/heading/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/heading/test/__snapshots__/index.tsx.snap
+@@ -2,12 +2,12 @@
+ 
+ exports[`props should render correctly 1`] = `
+ .emotion-0 {
+-  color: #1e1e1e;
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   line-height: 1.4;
+   margin: 0;
+   text-wrap: balance;
+   text-wrap: pretty;
+-  color: #1e1e1e;
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   font-size: calc(1.95 * 13px);
+   font-weight: 600;
+   display: block;
+@@ -30,7 +30,7 @@ Snapshot Diff:
+ @@ -1,10 +1,10 @@
+   Array [
+     Object {
+-      "color": "#1e1e1e",
++      "color": "var(--wp-components-color-foreground, #1e1e1e)",
+       "display": "block",
+ -     "font-size": "calc(1.25 * 13px)",
+ +     "font-size": "calc(1.95 * 13px)",
+@@ -49,7 +49,7 @@ Snapshot Diff:
+ @@ -1,10 +1,10 @@
+   Array [
+     Object {
+-      "color": "#1e1e1e",
++      "color": "var(--wp-components-color-foreground, #1e1e1e)",
+       "display": "block",
+ -     "font-size": "calc(1.25 * 13px)",
+ +     "font-size": "calc(1.95 * 13px)",
+diff --git a/packages/components/src/text/hook.ts b/packages/components/src/text/hook.ts
+index a447b2ce5133be..243b00202460eb 100644
+--- a/packages/components/src/text/hook.ts
++++ b/packages/components/src/text/hook.ts
+@@ -105,8 +105,8 @@ export default function useText(
+ 				getOptimalTextShade( optimizeReadabilityFor ) === 'dark';
+ 
+ 			sx.optimalTextColor = isOptimalTextColorDark
+-				? css( { color: COLORS.gray[ 900 ] } )
+-				: css( { color: COLORS.white } );
++				? css( { color: COLORS.theme.foreground } )
++				: css( { color: COLORS.theme.foregroundInverted } );
+ 		}
+ 
+ 		return cx(
+diff --git a/packages/components/src/text/styles.ts b/packages/components/src/text/styles.ts
+index e777ed4f0941de..7d3b70e2ab2390 100644
+--- a/packages/components/src/text/styles.ts
++++ b/packages/components/src/text/styles.ts
+@@ -9,7 +9,7 @@ import { css } from '@emotion/react';
+ import { COLORS, CONFIG } from '../utils';
+ 
+ export const Text = css`
+-	color: ${ COLORS.gray[ 900 ] };
++	color: ${ COLORS.theme.foreground };
+ 	line-height: ${ CONFIG.fontLineHeightBase };
+ 	margin: 0;
+ 	text-wrap: balance; /* Fallback for Safari. */
+diff --git a/packages/components/src/text/test/__snapshots__/index.tsx.snap b/packages/components/src/text/test/__snapshots__/index.tsx.snap
+index 1b98c0853ac549..caa876cb24dc78 100644
+--- a/packages/components/src/text/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/text/test/__snapshots__/index.tsx.snap
+@@ -6,7 +6,7 @@ Snapshot Diff:
+ + Base styles
+ 
+ @@ -3,8 +3,9 @@
+-      "color": "#1e1e1e",
++      "color": "var(--wp-components-color-foreground, #1e1e1e)",
+       "font-size": "calc((13 / 13) * 13px)",
+       "font-weight": "normal",
+       "line-height": "1.4",
+@@ -19,7 +19,7 @@ Snapshot Diff:
+ 
+ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = `
+ .emotion-0 {
+-  color: #1e1e1e;
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   line-height: 1.4;
+   margin: 0;
+   text-wrap: balance;
+@@ -52,7 +52,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] =
+ 
+ exports[`Text snapshot tests should render correctly 1`] = `
+ .emotion-0 {
+-  color: #1e1e1e;
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   line-height: 1.4;
+   margin: 0;
+   text-wrap: balance;
+diff --git a/packages/components/src/text/test/index.tsx b/packages/components/src/text/test/index.tsx
+index 5fad5582f4d46e..e6f6423b6b572d 100644
+--- a/packages/components/src/text/test/index.tsx
++++ b/packages/components/src/text/test/index.tsx
+@@ -25,7 +25,7 @@ describe( 'Text', () => {
+ 			</Text>
+ 		);
+ 		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
+-			color: COLORS.white,
++			color: 'rgb( 255, 255, 255 )',
+ 		} );
+ 	} );
+ 

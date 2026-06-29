@@ -1,0 +1,62 @@
+diff --git a/packages/components/src/responsive-wrapper/index.js b/packages/components/src/responsive-wrapper/index.js
+index 7236f5eff1dc34..4c5dfca6ec363b 100644
+--- a/packages/components/src/responsive-wrapper/index.js
++++ b/packages/components/src/responsive-wrapper/index.js
+@@ -8,20 +8,26 @@ import classnames from 'classnames';
+  */
+ import { cloneElement, Children } from '@wordpress/element';
+ 
+-function ResponsiveWrapper( { naturalWidth, naturalHeight, children } ) {
++function ResponsiveWrapper( {
++	naturalWidth,
++	naturalHeight,
++	children,
++	isInline = false,
++} ) {
+ 	if ( Children.count( children ) !== 1 ) {
+ 		return null;
+ 	}
+ 	const imageStyle = {
+ 		paddingBottom: ( naturalHeight / naturalWidth * 100 ) + '%',
+ 	};
++	const TagName = isInline ? 'span' : 'div';
+ 	return (
+-		<div className="components-responsive-wrapper">
+-			<div style={ imageStyle } />
++		<TagName className="components-responsive-wrapper">
++			<TagName style={ imageStyle } />
+ 			{ cloneElement( children, {
+ 				className: classnames( 'components-responsive-wrapper__content', children.props.className ),
+ 			} ) }
+-		</div>
++		</TagName>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/responsive-wrapper/style.scss b/packages/components/src/responsive-wrapper/style.scss
+index ec89002f9b1a42..c51288172fbcba 100644
+--- a/packages/components/src/responsive-wrapper/style.scss
++++ b/packages/components/src/responsive-wrapper/style.scss
+@@ -1,6 +1,10 @@
+ .components-responsive-wrapper {
+ 	position: relative;
+ 	max-width: 100%;
++	&,
++	& > span {
++		display: block;
++	}
+ }
+ 
+ .components-responsive-wrapper__content {
+diff --git a/packages/editor/src/components/post-featured-image/index.js b/packages/editor/src/components/post-featured-image/index.js
+index 0141bf8f40c0e5..ab8d50ff0aa774 100644
+--- a/packages/editor/src/components/post-featured-image/index.js
++++ b/packages/editor/src/components/post-featured-image/index.js
+@@ -62,6 +62,7 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
+ 									<ResponsiveWrapper
+ 										naturalWidth={ mediaWidth }
+ 										naturalHeight={ mediaHeight }
++										isInline
+ 									>
+ 										<img src={ mediaSourceUrl } alt="" />
+ 									</ResponsiveWrapper>

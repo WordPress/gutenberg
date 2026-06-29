@@ -1,0 +1,214 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 0a16fdcb2681eb..35fd7b377db4f4 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   Added PostCSS, esbuild, and Vite build plugins that inject fallback values for design system tokens (`--wpds-*`). Available as package exports: `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`, `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`, `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks` ([#75589](https://github.com/WordPress/gutenberg/pull/75589)).
+ -   Add `--wpds-cursor-control` design token for interactive non-link elements ([#75697](https://github.com/WordPress/gutenberg/pull/75697)).
++-   Add `--wpds-dimension-surface-width-*` design tokens for component width constraints.
+ 
+ ## 0.7.0 (2026-02-18)
+ 
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index d73bd9a62842fe..565e039dfae72d 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -122,23 +122,29 @@ Do not edit directly.
+ 
+ ### Dimension
+ 
+-| Variable name                  | Description            |
+-| ------------------------------ | ---------------------- |
+-| `--wpds-dimension-base`        | Base dimension unit    |
+-| `--wpds-dimension-padding-xs`  | Extra small padding    |
+-| `--wpds-dimension-padding-sm`  | Small padding          |
+-| `--wpds-dimension-padding-md`  | Medium padding         |
+-| `--wpds-dimension-padding-lg`  | Large padding          |
+-| `--wpds-dimension-padding-xl`  | Extra large padding    |
+-| `--wpds-dimension-padding-2xl` | 2x extra large padding |
+-| `--wpds-dimension-padding-3xl` | 3x extra large padding |
+-| `--wpds-dimension-gap-xs`      | Extra small gap        |
+-| `--wpds-dimension-gap-sm`      | Small gap              |
+-| `--wpds-dimension-gap-md`      | Medium gap             |
+-| `--wpds-dimension-gap-lg`      | Large gap              |
+-| `--wpds-dimension-gap-xl`      | Extra large gap        |
+-| `--wpds-dimension-gap-2xl`     | 2x extra large gap     |
+-| `--wpds-dimension-gap-3xl`     | 3x extra large gap     |
++| Variable name                        | Description                  |
++| ------------------------------------ | ---------------------------- |
++| `--wpds-dimension-base`              | Base dimension unit          |
++| `--wpds-dimension-padding-xs`        | Extra small padding          |
++| `--wpds-dimension-padding-sm`        | Small padding                |
++| `--wpds-dimension-padding-md`        | Medium padding               |
++| `--wpds-dimension-padding-lg`        | Large padding                |
++| `--wpds-dimension-padding-xl`        | Extra large padding          |
++| `--wpds-dimension-padding-2xl`       | 2x extra large padding       |
++| `--wpds-dimension-padding-3xl`       | 3x extra large padding       |
++| `--wpds-dimension-gap-xs`            | Extra small gap              |
++| `--wpds-dimension-gap-sm`            | Small gap                    |
++| `--wpds-dimension-gap-md`            | Medium gap                   |
++| `--wpds-dimension-gap-lg`            | Large gap                    |
++| `--wpds-dimension-gap-xl`            | Extra large gap              |
++| `--wpds-dimension-gap-2xl`           | 2x extra large gap           |
++| `--wpds-dimension-gap-3xl`           | 3x extra large gap           |
++| `--wpds-dimension-surface-width-xs`  | Extra small surface width    |
++| `--wpds-dimension-surface-width-sm`  | Small surface width          |
++| `--wpds-dimension-surface-width-md`  | Medium surface width         |
++| `--wpds-dimension-surface-width-lg`  | Large surface width          |
++| `--wpds-dimension-surface-width-xl`  | Extra large surface width    |
++| `--wpds-dimension-surface-width-2xl` | 2x extra large surface width |
+ 
+ ### Elevation
+ 
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 37eb443fbf35d1..47bd09af74f1f4 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -116,6 +116,12 @@
+ 	--wpds-dimension-padding-sm: 8px; /* Small padding */
+ 	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
+ 	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
++	--wpds-dimension-surface-width-2xl: 960px; /* 2x extra large surface width */
++	--wpds-dimension-surface-width-lg: 560px; /* Large surface width */
++	--wpds-dimension-surface-width-md: 400px; /* Medium surface width */
++	--wpds-dimension-surface-width-sm: 320px; /* Small surface width */
++	--wpds-dimension-surface-width-xl: 720px; /* Extra large surface width */
++	--wpds-dimension-surface-width-xs: 240px; /* Extra small surface width */
+ 	--wpds-elevation-lg: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
+ 		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005; /* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
+ 	--wpds-elevation-md: 0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a,
+@@ -195,6 +201,12 @@
+ 	--wpds-dimension-padding-sm: 8px; /* Small padding */
+ 	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
+ 	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
++	--wpds-dimension-surface-width-2xl: 960px; /* 2x extra large surface width */
++	--wpds-dimension-surface-width-lg: 560px; /* Large surface width */
++	--wpds-dimension-surface-width-md: 400px; /* Medium surface width */
++	--wpds-dimension-surface-width-sm: 320px; /* Small surface width */
++	--wpds-dimension-surface-width-xl: 720px; /* Extra large surface width */
++	--wpds-dimension-surface-width-xs: 240px; /* Extra small surface width */
+ }
+ 
+ @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {
+diff --git a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+index d3811fe1bfb7d0..a8753ab083e73d 100644
+--- a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
++++ b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+@@ -127,6 +127,12 @@ export default {
+ 	'--wpds-dimension-padding-sm': '8px',
+ 	'--wpds-dimension-padding-xl': '20px',
+ 	'--wpds-dimension-padding-xs': '4px',
++	'--wpds-dimension-surface-width-2xl': '960px',
++	'--wpds-dimension-surface-width-lg': '560px',
++	'--wpds-dimension-surface-width-md': '400px',
++	'--wpds-dimension-surface-width-sm': '320px',
++	'--wpds-dimension-surface-width-xl': '720px',
++	'--wpds-dimension-surface-width-xs': '240px',
+ 	'--wpds-elevation-lg':
+ 		'0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012, 0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005',
+ 	'--wpds-elevation-md':
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index b9bb956c1fe1a8..0f037a16be9da6 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -117,6 +117,12 @@ export default [
+ 	'--wpds-dimension-gap-xl',
+ 	'--wpds-dimension-gap-2xl',
+ 	'--wpds-dimension-gap-3xl',
++	'--wpds-dimension-surface-width-xs',
++	'--wpds-dimension-surface-width-sm',
++	'--wpds-dimension-surface-width-md',
++	'--wpds-dimension-surface-width-lg',
++	'--wpds-dimension-surface-width-xl',
++	'--wpds-dimension-surface-width-2xl',
+ 	'--wpds-elevation-xs',
+ 	'--wpds-elevation-sm',
+ 	'--wpds-elevation-md',
+diff --git a/packages/theme/src/prebuilt/ts/token-types.ts b/packages/theme/src/prebuilt/ts/token-types.ts
+index f4dba86181cc43..fdbee9ba0f1367 100644
+--- a/packages/theme/src/prebuilt/ts/token-types.ts
++++ b/packages/theme/src/prebuilt/ts/token-types.ts
+@@ -13,6 +13,11 @@ export type PaddingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+  */
+ export type GapSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+ 
++/**
++ * Size scale for surface width tokens.
++ */
++export type SurfaceWidthSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
++
+ /**
+  * Size scale for border radius tokens.
+  */
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index 284966e51f0f4c..1543d8233ad72a 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -116,6 +116,11 @@ export default defineConfig( {
+ 					description: 'Size scale for gap tokens.',
+ 					patterns: [ /^wpds-dimension\.gap\.([^.]+)$/ ],
+ 				},
++				{
++					name: 'SurfaceWidthSize',
++					description: 'Size scale for surface width tokens.',
++					patterns: [ /^wpds-dimension\.surface-width\.([^.]+)$/ ],
++				},
+ 				{
+ 					name: 'BorderRadiusSize',
+ 					description: 'Size scale for border radius tokens.',
+diff --git a/packages/theme/tokens/dimension.json b/packages/theme/tokens/dimension.json
+index 90b9c4d4d9e5f8..7ae60c92b6c2aa 100644
+--- a/packages/theme/tokens/dimension.json
++++ b/packages/theme/tokens/dimension.json
+@@ -206,6 +206,50 @@
+ 					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			}
++		},
++		"surface-width": {
++			"xs": {
++				"$value": { "value": 240, "unit": "px" },
++				"$description": "Extra small surface width",
++				"$extensions": {
++					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
++				}
++			},
++			"sm": {
++				"$value": { "value": 320, "unit": "px" },
++				"$description": "Small surface width",
++				"$extensions": {
++					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
++				}
++			},
++			"md": {
++				"$value": { "value": 400, "unit": "px" },
++				"$description": "Medium surface width",
++				"$extensions": {
++					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
++				}
++			},
++			"lg": {
++				"$value": { "value": 560, "unit": "px" },
++				"$description": "Large surface width",
++				"$extensions": {
++					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
++				}
++			},
++			"xl": {
++				"$value": { "value": 720, "unit": "px" },
++				"$description": "Extra large surface width",
++				"$extensions": {
++					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
++				}
++			},
++			"2xl": {
++				"$value": { "value": 960, "unit": "px" },
++				"$description": "2x extra large surface width",
++				"$extensions": {
++					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
++				}
++			}
+ 		}
+ 	}
+ }

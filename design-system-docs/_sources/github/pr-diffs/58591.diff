@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 94f69636b3e053..8f0a224b7c7ec0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `ConfirmDialog`: Add `__next40pxDefaultSize` to buttons ([#58421](https://github.com/WordPress/gutenberg/pull/58421)).
+ -   `SnackbarList`: Allow limiting the number of maximum visible Snackbars ([#58559](https://github.com/WordPress/gutenberg/pull/58559)).
++-   `Snackbar`: Update the warning message ([#58591](https://github.com/WordPress/gutenberg/pull/58591)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/snackbar/index.tsx b/packages/components/src/snackbar/index.tsx
+index 45f1800bb2249f..7460b481a7fed7 100644
+--- a/packages/components/src/snackbar/index.tsx
++++ b/packages/components/src/snackbar/index.tsx
+@@ -106,7 +106,7 @@ function UnforwardedSnackbar(
+ 	if ( actions && actions.length > 1 ) {
+ 		// We need to inform developers that snackbar only accepts 1 action.
+ 		warning(
+-			'Snackbar can only have 1 action, use Notice if your message require many messages'
++			'Snackbar can only have one action. Use Notice if your message requires many actions.'
+ 		);
+ 		// return first element only while keeping it inside an array
+ 		actions = [ actions[ 0 ] ];

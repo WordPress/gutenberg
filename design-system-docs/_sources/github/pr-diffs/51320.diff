@@ -1,0 +1,128 @@
+diff --git a/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap
+index 502c850838f46d..c7ecbc209a2417 100644
+--- a/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap
+@@ -5,7 +5,7 @@ exports[`URLPopover matches the snapshot in its default state 1`] = `
+   <span>
+     <div
+       class="components-popover block-editor-url-popover is-positioned"
+-      style="position: absolute; top: 0px; left: 0px; transform: translateZ(0);"
++      style="position: absolute; top: 0px; left: 0px; transform: none;"
+       tabindex="-1"
+     >
+       <div
+@@ -53,7 +53,7 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`]
+   <span>
+     <div
+       class="components-popover block-editor-url-popover is-positioned"
+-      style="position: absolute; top: 0px; left: 0px; transform: translateZ(0);"
++      style="position: absolute; top: 0px; left: 0px; transform: none;"
+       tabindex="-1"
+     >
+       <div
+@@ -108,7 +108,7 @@ exports[`URLPopover matches the snapshot when there are no settings 1`] = `
+   <span>
+     <div
+       class="components-popover block-editor-url-popover is-positioned"
+-      style="position: absolute; top: 0px; left: 0px; transform: translateZ(0);"
++      style="position: absolute; top: 0px; left: 0px; transform: none;"
+       tabindex="-1"
+     >
+       <div
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ac54f773e5ac44..5e12b3d2644a08 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `Popover`: Allow legitimate 0 positions to update popover position ([#51320](https://github.com/WordPress/gutenberg/pull/51320)).
++
+ ## 25.1.0 (2023-06-07)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 0e7fb35c5f833f..e5e7d45c9dd21e 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -52,6 +52,7 @@ import Button from '../button';
+ import ScrollLock from '../scroll-lock';
+ import { Slot, Fill, useSlot } from '../slot-fill';
+ import {
++	computePopoverPosition,
+ 	getFrameOffset,
+ 	getFrameScale,
+ 	positionToPlacement,
+@@ -499,8 +500,8 @@ const UnforwardedPopover = (
+ 							// to use `translateX` and `translateY` because those values would
+ 							// be overridden by the return value of the
+ 							// `placementToMotionAnimationProps` function in `AnimatedWrapper`
+-							x: Math.round( x ?? 0 ) || undefined,
+-							y: Math.round( y ?? 0 ) || undefined,
++							x: computePopoverPosition( x ),
++							y: computePopoverPosition( y ),
+ 					  }
+ 			}
+ 		>
+diff --git a/packages/components/src/popover/test/index.tsx b/packages/components/src/popover/test/index.tsx
+index 256b89415cfae9..7fb9e5377bf315 100644
+--- a/packages/components/src/popover/test/index.tsx
++++ b/packages/components/src/popover/test/index.tsx
+@@ -12,7 +12,11 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { positionToPlacement, placementToMotionAnimationProps } from '../utils';
++import {
++	computePopoverPosition,
++	positionToPlacement,
++	placementToMotionAnimationProps,
++} from '../utils';
+ import Popover from '..';
+ import type { PopoverProps } from '../types';
+ 
+@@ -248,4 +252,21 @@ describe( 'Popover', () => {
+ 			);
+ 		} );
+ 	} );
++
++	describe( 'computePopoverPosition', () => {
++		it.each( [
++			[ 14, 14 ], // valid integers shouldn't be changes
++			[ 14.02, 14 ], // floating numbers are parsed to integers
++			[ 0, 0 ], // zero remains zero
++			[ null, undefined ],
++			[ NaN, undefined ],
++		] )(
++			'converts `%s` to `%s`',
++			( inputCoordinate, expectedCoordinated ) => {
++				expect( computePopoverPosition( inputCoordinate ) ).toEqual(
++					expectedCoordinated
++				);
++			}
++		);
++	} );
+ } );
+diff --git a/packages/components/src/popover/utils.ts b/packages/components/src/popover/utils.ts
+index 022e7796fe37de..2112b285969828 100644
+--- a/packages/components/src/popover/utils.ts
++++ b/packages/components/src/popover/utils.ts
+@@ -318,3 +318,15 @@ export const getReferenceElement = ( {
+ 	// Convert any `undefined` value to `null`.
+ 	return referenceElement ?? null;
+ };
++
++/**
++ * Computes the final coordinate that needs to be applied to the floating
++ * element when applying transform inline styles, defaulting to `undefined`
++ * if the provided value is `null` or `NaN`.
++ *
++ * @param c input coordinate (usually as returned from floating-ui)
++ * @return The coordinate's value to be used for inline styles. An `undefined`
++ *         return value means "no style set" for this coordinate.
++ */
++export const computePopoverPosition = ( c: number | null ) =>
++	c === null || Number.isNaN( c ) ? undefined : Math.round( c );

@@ -1,0 +1,44 @@
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx
+index bce3175e658c39..4d68db6fd175ee 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo } from '@wordpress/element';
++import { useState } from '@wordpress/element';
+ import isShallowEqual from '@wordpress/is-shallow-equal';
+ import { observableMap } from '@wordpress/compose';
+ 
+@@ -98,7 +98,7 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
+ export default function SlotFillProvider( {
+ 	children,
+ }: SlotFillProviderProps ) {
+-	const registry = useMemo( createSlotRegistry, [] );
++	const [ registry ] = useState( createSlotRegistry );
+ 	return (
+ 		<SlotFillContext.Provider value={ registry }>
+ 			{ children }
+diff --git a/packages/components/src/slot-fill/provider.tsx b/packages/components/src/slot-fill/provider.tsx
+index ea32d7104b4981..6ed624bab67a3c 100644
+--- a/packages/components/src/slot-fill/provider.tsx
++++ b/packages/components/src/slot-fill/provider.tsx
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import type { Component } from '@wordpress/element';
+-import { useMemo } from '@wordpress/element';
++import { useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -118,7 +118,7 @@ function createSlotRegistry(): BaseSlotFillContext {
+ }
+ 
+ export function SlotFillProvider( { children }: SlotFillProviderProps ) {
+-	const contextValue = useMemo( createSlotRegistry, [] );
++	const [ contextValue ] = useState( createSlotRegistry );
+ 	return (
+ 		<SlotFillContext.Provider value={ contextValue }>
+ 			{ children }

@@ -1,0 +1,332 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 91370e60ceebe5..64f06b6b9f8e74 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### New Features
+ 
+ -   Add `Tabs` primitive ([#74652](https://github.com/WordPress/gutenberg/pull/74652)).
++-   Add `Textarea` primitive ([#74707](https://github.com/WordPress/gutenberg/pull/74707)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/ui/src/form/primitives/index.ts b/packages/ui/src/form/primitives/index.ts
+index c5531ce572579b..4e6973efd0b084 100644
+--- a/packages/ui/src/form/primitives/index.ts
++++ b/packages/ui/src/form/primitives/index.ts
+@@ -3,3 +3,4 @@ export * as Fieldset from './fieldset';
+ export { Input } from './input';
+ export { InputLayout } from './input-layout';
+ export * as Select from './select';
++export { Textarea } from './textarea';
+diff --git a/packages/ui/src/form/primitives/textarea/index.ts b/packages/ui/src/form/primitives/textarea/index.ts
+new file mode 100644
+index 00000000000000..0c82925ff6c0fe
+--- /dev/null
++++ b/packages/ui/src/form/primitives/textarea/index.ts
+@@ -0,0 +1 @@
++export { Textarea } from './textarea';
+diff --git a/packages/ui/src/form/primitives/textarea/stories/index.story.tsx b/packages/ui/src/form/primitives/textarea/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..24479466b4e83c
+--- /dev/null
++++ b/packages/ui/src/form/primitives/textarea/stories/index.story.tsx
+@@ -0,0 +1,40 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { Textarea } from '../index';
++
++const meta: Meta< typeof Textarea > = {
++	title: 'Design System/Components/Form/Primitives/Textarea',
++	component: Textarea,
++};
++export default meta;
++
++type Story = StoryObj< typeof Textarea >;
++
++export const Default: Story = {
++	args: {
++		placeholder: 'Placeholder',
++	},
++};
++
++export const Disabled: Story = {
++	args: {
++		...Default.args,
++		disabled: true,
++	},
++};
++
++export const WithOverflow: Story = {
++	args: {
++		...Default.args,
++		defaultValue: `Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
++	},
++};
++
++/**
++ * When `rows` is set to `1`, the textarea will have the same footprint as a default `Input`.
++ */
++export const WithOneRow: Story = {
++	args: {
++		...Default.args,
++		rows: 1,
++	},
++};
+diff --git a/packages/ui/src/form/primitives/textarea/style.module.css b/packages/ui/src/form/primitives/textarea/style.module.css
+new file mode 100644
+index 00000000000000..7447d1f290b32d
+--- /dev/null
++++ b/packages/ui/src/form/primitives/textarea/style.module.css
+@@ -0,0 +1,22 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.wrapper {
++		--wp-ui-textarea-min-height: 40px;
++	}
++
++	.textarea {
++		/* Prevents users from resizing the textarea below this height. */
++		min-height: calc(var(--wp-ui-textarea-min-height) - 2px);
++		resize: block;
++	}
++}
++
++@layer wp-ui-compositions {
++	.wrapper {
++		--wp-ui-input-padding-block: 9.9px;
++
++		height: auto;
++		line-height: 1.4; /* TODO: Use variable */
++	}
++}
+diff --git a/packages/ui/src/form/primitives/textarea/test/index.test.tsx b/packages/ui/src/form/primitives/textarea/test/index.test.tsx
+new file mode 100644
+index 00000000000000..04e194f31436f3
+--- /dev/null
++++ b/packages/ui/src/form/primitives/textarea/test/index.test.tsx
+@@ -0,0 +1,143 @@
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { createRef, useState } from '@wordpress/element';
++import { Textarea } from '../index';
++
++describe( 'Textarea', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLTextAreaElement >();
++
++		render( <Textarea ref={ ref } /> );
++
++		expect( ref.current ).toBeInstanceOf( HTMLTextAreaElement );
++	} );
++
++	describe( 'value prop', () => {
++		it( 'renders with controlled value', () => {
++			render( <Textarea value="Hello, world!" /> );
++
++			const textarea = screen.getByRole( 'textbox' );
++			expect( textarea ).toHaveValue( 'Hello, world!' );
++		} );
++	} );
++
++	describe( 'defaultValue prop', () => {
++		it( 'renders with default value', () => {
++			render( <Textarea defaultValue="Default content" /> );
++
++			const textarea = screen.getByRole( 'textbox' );
++			expect( textarea ).toHaveValue( 'Default content' );
++		} );
++
++		it( 'allows user to modify uncontrolled value', async () => {
++			const user = userEvent.setup();
++			render( <Textarea defaultValue="Default content" /> );
++
++			const textarea = screen.getByRole( 'textbox' );
++			expect( textarea ).toHaveValue( 'Default content' );
++
++			// Clear and type new content
++			await user.clear( textarea );
++			await user.type( textarea, 'New content' );
++
++			expect( textarea ).toHaveValue( 'New content' );
++		} );
++	} );
++
++	describe( 'onValueChange prop', () => {
++		it( 'calls onValueChange when user types', async () => {
++			const user = userEvent.setup();
++			const handleValueChange = jest.fn();
++
++			render(
++				<Textarea defaultValue="" onValueChange={ handleValueChange } />
++			);
++
++			const textarea = screen.getByRole( 'textbox' );
++
++			await user.type( textarea, 'Hello' );
++
++			expect( handleValueChange ).toHaveBeenLastCalledWith(
++				'Hello',
++				expect.any( Object )
++			);
++
++			await user.clear( textarea );
++
++			expect( handleValueChange ).toHaveBeenLastCalledWith(
++				'',
++				expect.any( Object )
++			);
++		} );
++
++		it( 'works with controlled component pattern', async () => {
++			const user = userEvent.setup();
++			const handleValueChange = jest.fn();
++
++			const ControlledTextarea = () => {
++				const [ value, setValue ] = useState( 'Initial' );
++
++				return (
++					<Textarea
++						value={ value }
++						onValueChange={ ( newValue ) => {
++							handleValueChange( newValue );
++							setValue( newValue );
++						} }
++					/>
++				);
++			};
++
++			render( <ControlledTextarea /> );
++
++			const textarea = screen.getByRole( 'textbox' );
++
++			await user.clear( textarea );
++			await user.type( textarea, 'Updated' );
++
++			expect( handleValueChange ).toHaveBeenLastCalledWith( 'Updated' );
++		} );
++	} );
++
++	describe( 'render prop', () => {
++		it( 'correctly merges props with custom render function', () => {
++			render(
++				<Textarea
++					render={ ( props ) => (
++						<div data-testid="my-render" { ...props } />
++					) }
++					data-my-attribute
++				/>
++			);
++
++			expect( screen.getByTestId( 'my-render' ) ).toHaveAttribute(
++				'data-my-attribute'
++			);
++		} );
++
++		it( 'correctly merges props with custom render element', () => {
++			render(
++				<Textarea
++					render={ <div data-testid="my-render" /> }
++					data-my-attribute
++				/>
++			);
++
++			expect( screen.getByTestId( 'my-render' ) ).toHaveAttribute(
++				'data-my-attribute'
++			);
++		} );
++	} );
++
++	it( 'disables the textarea when disabled prop is true', () => {
++		render( <Textarea disabled /> );
++
++		expect( screen.getByRole( 'textbox' ) ).toBeDisabled();
++	} );
++
++	it( 'applies custom rows value', () => {
++		render( <Textarea rows={ 10 } /> );
++
++		expect( screen.getByRole( 'textbox' ) ).toHaveAttribute( 'rows', '10' );
++	} );
++} );
+diff --git a/packages/ui/src/form/primitives/textarea/textarea.tsx b/packages/ui/src/form/primitives/textarea/textarea.tsx
+new file mode 100644
+index 00000000000000..af97f9d611762e
+--- /dev/null
++++ b/packages/ui/src/form/primitives/textarea/textarea.tsx
+@@ -0,0 +1,51 @@
++import { mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
++import { cloneElement, forwardRef } from '@wordpress/element';
++import styles from './style.module.css';
++import type { TextareaProps } from './types';
++import { Input } from '../input';
++
++const wrappedRender = (
++	render: NonNullable< TextareaProps[ 'render' ] >,
++	restProps: TextareaProps & { ref: React.Ref< HTMLTextAreaElement > }
++) => {
++	return function Render(
++		props: React.HTMLAttributes< HTMLTextAreaElement >
++	) {
++		return typeof render === 'function'
++			? render( mergeProps( props, restProps ) )
++			: cloneElement( render, mergeProps( props, restProps ) );
++	};
++};
++
++export const Textarea = forwardRef< HTMLTextAreaElement, TextareaProps >(
++	function Textarea(
++		{
++			className,
++			defaultValue,
++			disabled,
++			onValueChange,
++			render,
++			rows = 4,
++			style,
++			value,
++			...restProps
++		},
++		ref
++	) {
++		return (
++			<Input
++				className={ clsx( styles.wrapper, className ) }
++				style={ style }
++				render={ wrappedRender(
++					render || ( ( props ) => <textarea { ...props } /> ),
++					{ className: styles.textarea, ref, rows, ...restProps }
++				) }
++				value={ value }
++				defaultValue={ defaultValue }
++				onValueChange={ onValueChange }
++				disabled={ disabled }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/textarea/types.ts b/packages/ui/src/form/primitives/textarea/types.ts
+new file mode 100644
+index 00000000000000..92efa8b47b0dad
+--- /dev/null
++++ b/packages/ui/src/form/primitives/textarea/types.ts
+@@ -0,0 +1,18 @@
++import type { InputProps } from '../input/types';
++import type { ComponentProps } from '../../../utils/types';
++
++export type TextareaProps = Omit<
++	ComponentProps< 'textarea' >,
++	'disabled' | 'rows' | 'value' | 'defaultValue'
++> &
++	Pick<
++		InputProps,
++		'value' | 'defaultValue' | 'onValueChange' | 'disabled'
++	> & {
++		/**
++		 * The number of rows the textarea should contain.
++		 *
++		 * @default 4
++		 */
++		rows?: React.ComponentProps< 'textarea' >[ 'rows' ];
++	};

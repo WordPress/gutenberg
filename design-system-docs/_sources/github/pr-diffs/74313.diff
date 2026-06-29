@@ -1,0 +1,411 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 9f5883a6e85c3d..23a62fdd5e4f57 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -14,3 +14,4 @@
+ -   Add `Fieldset` primitives ([#74296](https://github.com/WordPress/gutenberg/pull/74296)).
+ -   Add `Icon` component ([#74311](https://github.com/WordPress/gutenberg/pull/74311)).
+ -   Add `Button` component ([#74415](https://github.com/WordPress/gutenberg/pull/74415), [#74416](https://github.com/WordPress/gutenberg/pull/74416), [#74470](https://github.com/WordPress/gutenberg/pull/74470)).
++-   Add `InputLayout` primitive ([#74313](https://github.com/WordPress/gutenberg/pull/74313)).
+diff --git a/packages/ui/src/form/primitives/index.ts b/packages/ui/src/form/primitives/index.ts
+index 639e06d04d4ff7..94bd05d3e9a651 100644
+--- a/packages/ui/src/form/primitives/index.ts
++++ b/packages/ui/src/form/primitives/index.ts
+@@ -1,2 +1,3 @@
+ export * as Field from './field';
+ export * as Fieldset from './fieldset';
++export { InputLayout } from './input-layout';
+diff --git a/packages/ui/src/form/primitives/input-layout/context.tsx b/packages/ui/src/form/primitives/input-layout/context.tsx
+new file mode 100644
+index 00000000000000..62ac9f80fca2e9
+--- /dev/null
++++ b/packages/ui/src/form/primitives/input-layout/context.tsx
+@@ -0,0 +1,36 @@
++import { Children, createContext, useContext } from '@wordpress/element';
++import type { InputLayoutSlotType } from './types';
++
++/**
++ * Context for providing slot type information to child components.
++ */
++export const InputLayoutSlotTypeContext =
++	createContext< InputLayoutSlotType | null >( null );
++
++/**
++ * Hook to access the current slot context.
++ */
++export function useInputLayoutSlotContext() {
++	return useContext( InputLayoutSlotTypeContext );
++}
++
++/**
++ * Wrapper component that provides slot type context for prefix and suffix slots.
++ */
++export function SlotContextProvider( {
++	type,
++	children,
++}: {
++	type: InputLayoutSlotType;
++	children: React.ReactNode;
++} ) {
++	if ( Children.count( children ) === 0 ) {
++		return null;
++	}
++
++	return (
++		<InputLayoutSlotTypeContext.Provider value={ type }>
++			{ children }
++		</InputLayoutSlotTypeContext.Provider>
++	);
++}
+diff --git a/packages/ui/src/form/primitives/input-layout/index.ts b/packages/ui/src/form/primitives/input-layout/index.ts
+new file mode 100644
+index 00000000000000..13d6e8be434601
+--- /dev/null
++++ b/packages/ui/src/form/primitives/input-layout/index.ts
+@@ -0,0 +1,6 @@
++import { InputLayout as _InputLayout } from './input-layout';
++import { InputLayoutSlot } from './slot';
++
++export const InputLayout = Object.assign( _InputLayout, {
++	Slot: InputLayoutSlot,
++} );
+diff --git a/packages/ui/src/form/primitives/input-layout/input-layout.tsx b/packages/ui/src/form/primitives/input-layout/input-layout.tsx
+new file mode 100644
+index 00000000000000..3c61d012e2c5ff
+--- /dev/null
++++ b/packages/ui/src/form/primitives/input-layout/input-layout.tsx
+@@ -0,0 +1,49 @@
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import resetStyles from '../../../utils/css/resets.module.css';
++import styles from './style.module.css';
++import type { InputLayoutProps } from './types';
++import { SlotContextProvider } from './context';
++
++/**
++ * A low-level component that handles the visual layout of an input-like field,
++ * including disabled states and standard prefix/suffix slots.
++ */
++export const InputLayout = forwardRef< HTMLDivElement, InputLayoutProps >(
++	function InputLayout(
++		{
++			className,
++			children,
++			visuallyDisabled,
++			size = 'default',
++			isBorderless,
++			prefix,
++			suffix,
++			...restProps
++		},
++		ref
++	) {
++		return (
++			<div
++				ref={ ref }
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					styles[ 'input-layout' ],
++					styles[ `is-size-${ size }` ],
++					visuallyDisabled && styles[ 'is-disabled' ],
++					isBorderless && styles[ 'is-borderless' ],
++					className
++				) }
++				{ ...restProps }
++			>
++				<SlotContextProvider type="prefix">
++					{ prefix }
++				</SlotContextProvider>
++				{ children }
++				<SlotContextProvider type="suffix">
++					{ suffix }
++				</SlotContextProvider>
++			</div>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/input-layout/slot.tsx b/packages/ui/src/form/primitives/input-layout/slot.tsx
+new file mode 100644
+index 00000000000000..952450bef3d95c
+--- /dev/null
++++ b/packages/ui/src/form/primitives/input-layout/slot.tsx
+@@ -0,0 +1,39 @@
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import styles from './style.module.css';
++import type { InputLayoutSlotProps } from './types';
++import { useInputLayoutSlotContext } from './context';
++
++/**
++ * A layout helper to add paddings in a prefix or suffix.
++ */
++export const InputLayoutSlot = forwardRef<
++	HTMLDivElement,
++	InputLayoutSlotProps
++>( function InputLayoutSlot(
++	{ type: typeProp, padding = 'default', ...restProps },
++	ref
++) {
++	const typeContext = useInputLayoutSlotContext();
++	const type = typeProp ?? typeContext;
++
++	if ( ! type ) {
++		throw new Error(
++			'InputLayoutSlot requires a `type` prop or must be used within an InputLayout prefix/suffix slot.'
++		);
++	}
++
++	return (
++		<div
++			ref={ ref }
++			className={ clsx(
++				styles[ 'input-layout-slot' ],
++				styles[ `is-${ type }` ],
++				styles[ `is-padding-${ padding }` ]
++			) }
++			{ ...restProps }
++		/>
++	);
++} );
++
++InputLayoutSlot.displayName = 'InputLayout.Slot';
+diff --git a/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx b/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..4413a294a3e5fa
+--- /dev/null
++++ b/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx
+@@ -0,0 +1,67 @@
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
++import { InputLayout } from '../../../..';
++
++const meta: Meta< typeof InputLayout > = {
++	title: 'Design System/Components/Form/Primitives/InputLayout',
++	component: InputLayout,
++	subcomponents: {
++		Slot: InputLayout.Slot,
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof InputLayout >;
++
++export const Default: Story = {
++	args: {},
++};
++
++/**
++ * By default, the `prefix` and `suffix` slots are rendered with no padding.
++ */
++export const WithPrefix: Story = {
++	args: {
++		prefix: (
++			<div
++				style={ {
++					display: 'flex',
++					alignItems: 'center',
++					justifyContent: 'center',
++					height: '100%',
++					aspectRatio: '1 / 1',
++					background: '#eee',
++				} }
++			>
++				$
++			</div>
++		),
++	},
++};
++
++/**
++ * The `InputLayout.Slot` component can be used to add standard padding in
++ * the `prefix` or `suffix` slot.
++ *
++ * The `padding="minimal"` setting will work best when the slot content is a button or icon.
++ */
++export const WithPaddedPrefix: Story = {
++	args: {
++		prefix: <InputLayout.Slot>https://</InputLayout.Slot>,
++	},
++};
++
++export const Compact: Story = {
++	args: {
++		size: 'compact',
++	},
++};
++
++/**
++ * The `small` size is intended only for rare cases like the trigger
++ * button of a low-profile `select` element.
++ */
++export const Small: Story = {
++	args: {
++		size: 'small',
++	},
++};
+diff --git a/packages/ui/src/form/primitives/input-layout/style.module.css b/packages/ui/src/form/primitives/input-layout/style.module.css
+new file mode 100644
+index 00000000000000..0828665dd669b4
+--- /dev/null
++++ b/packages/ui/src/form/primitives/input-layout/style.module.css
+@@ -0,0 +1,82 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.input-layout {
++		/* TODO: Use padding tokens */
++		--wp-ui-input-layout-padding-inline: calc(var(--wpds-dimension-base) * 3);
++
++		display: flex;
++		height: 40px;
++		background-color: var(--wpds-color-bg-interactive-neutral-weak);
++		border-width: var(--wpds-border-width-surface-xs);
++		border-style: solid;
++		border-color: var(--wpds-color-stroke-interactive-neutral);
++		border-radius: var(--wpds-border-radius-surface-sm);
++		font-family: var(--wpds-font-family-body);
++		font-size: max(var(--wpds-font-size-md), 16px); /* avoid mobile zoom */
++		line-height: 1;
++		color: var(--wpds-color-fg-interactive-neutral);
++
++		@media (min-width: 600px) {
++			font-size: var(--wpds-font-size-md);
++		}
++
++		&.is-size-compact {
++			/* TODO: Use padding tokens */
++			--wp-ui-input-layout-padding-inline: calc(var(--wpds-dimension-base) * 2);
++			height: 32px;
++		}
++
++		&.is-size-small {
++			/* TODO: Use padding tokens */
++			--wp-ui-input-layout-padding-inline: calc(var(--wpds-dimension-base) * 2);
++			height: 24px;
++		}
++
++		&.is-disabled {
++			background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
++			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
++			color: var(--wpds-color-fg-interactive-neutral-disabled);
++
++			@media (forced-colors: active) {
++				border-color: GrayText;
++				color: GrayText;
++			}
++		}
++
++		&.is-borderless {
++			border-color: transparent;
++		}
++
++		/* Don't show focus ring when the focus is in the prefix or suffix slots */
++		&:has(.input-layout-slot:focus-within) {
++			outline: none;
++		}
++
++		&:hover:not(.is-disabled, .is-borderless) {
++			border-color: var(--wpds-color-stroke-interactive-neutral-active);
++		}
++	}
++
++	.input-layout-slot {
++		display: flex;
++		align-items: center;
++
++		&.is-padding-minimal {
++			--wp-ui-input-layout-prefix-padding-start:
++				calc(var(--wp-ui-input-layout-padding-inline) -
++				var(--wpds-dimension-base));
++			--wp-ui-input-layout-suffix-padding-end:
++				calc(var(--wp-ui-input-layout-padding-inline) -
++				var(--wpds-dimension-base));
++		}
++
++		&.is-prefix {
++			padding-inline-start: var(--wp-ui-input-layout-prefix-padding-start, var(--wp-ui-input-layout-padding-inline));
++		}
++
++		&.is-suffix {
++			padding-inline-end: var(--wp-ui-input-layout-suffix-padding-end, var(--wp-ui-input-layout-padding-inline));
++		}
++	}
++}
+diff --git a/packages/ui/src/form/primitives/input-layout/test/index.test.tsx b/packages/ui/src/form/primitives/input-layout/test/index.test.tsx
+new file mode 100644
+index 00000000000000..e295bc6699a478
+--- /dev/null
++++ b/packages/ui/src/form/primitives/input-layout/test/index.test.tsx
+@@ -0,0 +1,23 @@
++import { render } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import { InputLayout } from '../index';
++import { InputLayoutSlot } from '../slot';
++
++describe( 'InputLayout', () => {
++	it( 'forwards ref', () => {
++		const layoutRef = createRef< HTMLDivElement >();
++		const slotRef = createRef< HTMLDivElement >();
++
++		render(
++			<InputLayout
++				ref={ layoutRef }
++				prefix={
++					<InputLayoutSlot ref={ slotRef }>Prefix</InputLayoutSlot>
++				}
++			/>
++		);
++
++		expect( layoutRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( slotRef.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++} );
+diff --git a/packages/ui/src/form/primitives/input-layout/types.ts b/packages/ui/src/form/primitives/input-layout/types.ts
+new file mode 100644
+index 00000000000000..d114b0ec5900be
+--- /dev/null
++++ b/packages/ui/src/form/primitives/input-layout/types.ts
+@@ -0,0 +1,44 @@
++export interface InputLayoutProps
++	extends Omit< React.HTMLAttributes< HTMLDivElement >, 'prefix' > {
++	/**
++	 * Whether the field should be visually styled as disabled.
++	 */
++	visuallyDisabled?: boolean;
++	/**
++	 * The size of the field.
++	 *
++	 * @default 'default'
++	 */
++	size?: 'default' | 'compact' | 'small';
++	/**
++	 * Whether the field should hide the border.
++	 */
++	isBorderless?: boolean;
++	/**
++	 * Element to render before the input.
++	 */
++	prefix?: React.ReactNode;
++	/**
++	 * Element to render after the input.
++	 */
++	suffix?: React.ReactNode;
++}
++
++export type InputLayoutSlotType = 'prefix' | 'suffix';
++
++export interface InputLayoutSlotProps
++	extends Omit< React.HTMLAttributes< HTMLDivElement >, 'type' > {
++	/**
++	 * The type of the slot.
++	 *
++	 * When not provided, the type will be automatically inferred from the
++	 * `InputLayout` context if the slot is used within a `prefix` or `suffix`.
++	 */
++	type?: InputLayoutSlotType;
++	/**
++	 * The padding of the slot.
++	 *
++	 * `minimal` will work best when the slot content is a button or icon.
++	 */
++	padding?: 'default' | 'minimal';
++}

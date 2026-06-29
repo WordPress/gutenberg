@@ -1,0 +1,241 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 992e14622eb761..bfb8d653956250 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   `InputLayout`: Remove the `type` prop from `InputLayout.Slot` ([#76011](https://github.com/WordPress/gutenberg/pull/76011)).
++
+ ### New Features
+ 
+ -   Add `Notice` primitive ([#75981](https://github.com/WordPress/gutenberg/pull/75981)).
+diff --git a/packages/ui/src/form/primitives/input-layout/context.tsx b/packages/ui/src/form/primitives/input-layout/context.tsx
+deleted file mode 100644
+index 62ac9f80fca2e9..00000000000000
+--- a/packages/ui/src/form/primitives/input-layout/context.tsx
++++ /dev/null
+@@ -1,36 +0,0 @@
+-import { Children, createContext, useContext } from '@wordpress/element';
+-import type { InputLayoutSlotType } from './types';
+-
+-/**
+- * Context for providing slot type information to child components.
+- */
+-export const InputLayoutSlotTypeContext =
+-	createContext< InputLayoutSlotType | null >( null );
+-
+-/**
+- * Hook to access the current slot context.
+- */
+-export function useInputLayoutSlotContext() {
+-	return useContext( InputLayoutSlotTypeContext );
+-}
+-
+-/**
+- * Wrapper component that provides slot type context for prefix and suffix slots.
+- */
+-export function SlotContextProvider( {
+-	type,
+-	children,
+-}: {
+-	type: InputLayoutSlotType;
+-	children: React.ReactNode;
+-} ) {
+-	if ( Children.count( children ) === 0 ) {
+-		return null;
+-	}
+-
+-	return (
+-		<InputLayoutSlotTypeContext.Provider value={ type }>
+-			{ children }
+-		</InputLayoutSlotTypeContext.Provider>
+-	);
+-}
+diff --git a/packages/ui/src/form/primitives/input-layout/input-layout.tsx b/packages/ui/src/form/primitives/input-layout/input-layout.tsx
+index 3c61d012e2c5ff..c5b24faee7c704 100644
+--- a/packages/ui/src/form/primitives/input-layout/input-layout.tsx
++++ b/packages/ui/src/form/primitives/input-layout/input-layout.tsx
+@@ -1,9 +1,8 @@
+ import clsx from 'clsx';
+-import { forwardRef } from '@wordpress/element';
++import { Children, forwardRef } from '@wordpress/element';
+ import resetStyles from '../../../utils/css/resets.module.css';
+ import styles from './style.module.css';
+ import type { InputLayoutProps } from './types';
+-import { SlotContextProvider } from './context';
+ 
+ /**
+  * A low-level component that handles the visual layout of an input-like field,
+@@ -36,13 +35,23 @@ export const InputLayout = forwardRef< HTMLDivElement, InputLayoutProps >(
+ 				) }
+ 				{ ...restProps }
+ 			>
+-				<SlotContextProvider type="prefix">
+-					{ prefix }
+-				</SlotContextProvider>
++				{ Children.count( prefix ) > 0 && (
++					<div
++						className={ styles[ 'slot-wrapper' ] }
++						data-slot-type="prefix"
++					>
++						{ prefix }
++					</div>
++				) }
+ 				{ children }
+-				<SlotContextProvider type="suffix">
+-					{ suffix }
+-				</SlotContextProvider>
++				{ Children.count( suffix ) > 0 && (
++					<div
++						className={ styles[ 'slot-wrapper' ] }
++						data-slot-type="suffix"
++					>
++						{ suffix }
++					</div>
++				) }
+ 			</div>
+ 		);
+ 	}
+diff --git a/packages/ui/src/form/primitives/input-layout/slot.tsx b/packages/ui/src/form/primitives/input-layout/slot.tsx
+index 952450bef3d95c..7440a502a31e4d 100644
+--- a/packages/ui/src/form/primitives/input-layout/slot.tsx
++++ b/packages/ui/src/form/primitives/input-layout/slot.tsx
+@@ -2,7 +2,6 @@ import clsx from 'clsx';
+ import { forwardRef } from '@wordpress/element';
+ import styles from './style.module.css';
+ import type { InputLayoutSlotProps } from './types';
+-import { useInputLayoutSlotContext } from './context';
+ 
+ /**
+  * A layout helper to add paddings in a prefix or suffix.
+@@ -10,25 +9,12 @@ import { useInputLayoutSlotContext } from './context';
+ export const InputLayoutSlot = forwardRef<
+ 	HTMLDivElement,
+ 	InputLayoutSlotProps
+->( function InputLayoutSlot(
+-	{ type: typeProp, padding = 'default', ...restProps },
+-	ref
+-) {
+-	const typeContext = useInputLayoutSlotContext();
+-	const type = typeProp ?? typeContext;
+-
+-	if ( ! type ) {
+-		throw new Error(
+-			'InputLayoutSlot requires a `type` prop or must be used within an InputLayout prefix/suffix slot.'
+-		);
+-	}
+-
++>( function InputLayoutSlot( { padding = 'default', ...restProps }, ref ) {
+ 	return (
+ 		<div
+ 			ref={ ref }
+ 			className={ clsx(
+ 				styles[ 'input-layout-slot' ],
+-				styles[ `is-${ type }` ],
+ 				styles[ `is-padding-${ padding }` ]
+ 			) }
+ 			{ ...restProps }
+diff --git a/packages/ui/src/form/primitives/input-layout/style.module.css b/packages/ui/src/form/primitives/input-layout/style.module.css
+index 075d3645d257ec..853340083f7d83 100644
+--- a/packages/ui/src/form/primitives/input-layout/style.module.css
++++ b/packages/ui/src/form/primitives/input-layout/style.module.css
+@@ -56,6 +56,10 @@
+ 		}
+ 	}
+ 
++	.slot-wrapper {
++		display: contents;
++	}
++
+ 	.input-layout-slot {
+ 		display: flex;
+ 		align-items: center;
+@@ -69,11 +73,11 @@
+ 				var(--wpds-dimension-padding-xs));
+ 		}
+ 
+-		&.is-prefix {
++		[data-slot-type="prefix"] & {
+ 			padding-inline-start: var(--wp-ui-input-layout-prefix-padding-start, var(--wp-ui-input-layout-padding-inline));
+ 		}
+ 
+-		&.is-suffix {
++		[data-slot-type="suffix"] & {
+ 			padding-inline-end: var(--wp-ui-input-layout-suffix-padding-end, var(--wp-ui-input-layout-padding-inline));
+ 		}
+ 	}
+diff --git a/packages/ui/src/form/primitives/input-layout/test/index.test.tsx b/packages/ui/src/form/primitives/input-layout/test/index.test.tsx
+index e295bc6699a478..f3c2335dce8bc1 100644
+--- a/packages/ui/src/form/primitives/input-layout/test/index.test.tsx
++++ b/packages/ui/src/form/primitives/input-layout/test/index.test.tsx
+@@ -1,4 +1,4 @@
+-import { render } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
+ import { createRef } from '@wordpress/element';
+ import { InputLayout } from '../index';
+ import { InputLayoutSlot } from '../slot';
+@@ -20,4 +20,37 @@ describe( 'InputLayout', () => {
+ 		expect( layoutRef.current ).toBeInstanceOf( HTMLDivElement );
+ 		expect( slotRef.current ).toBeInstanceOf( HTMLDivElement );
+ 	} );
++
++	// Testing the DOM contract that CSS selectors depend on.
++	it( 'wraps prefix and suffix with data-slot-type attributes', () => {
++		render(
++			<InputLayout
++				prefix={ <InputLayout.Slot>Prefix</InputLayout.Slot> }
++				suffix={ <InputLayout.Slot>Suffix</InputLayout.Slot> }
++			/>
++		);
++
++		/* eslint-disable testing-library/no-node-access */
++		const prefix = screen
++			.getByText( 'Prefix' )
++			.closest( '[data-slot-type]' );
++		expect( prefix ).toHaveAttribute( 'data-slot-type', 'prefix' );
++
++		const suffix = screen
++			.getByText( 'Suffix' )
++			.closest( '[data-slot-type]' );
++		expect( suffix ).toHaveAttribute( 'data-slot-type', 'suffix' );
++		/* eslint-enable testing-library/no-node-access */
++	} );
++
++	it( 'does not render slot wrappers when prefix/suffix are empty', () => {
++		render( <InputLayout data-testid="layout" /> );
++
++		const layout = screen.getByTestId( 'layout' );
++		/* eslint-disable testing-library/no-node-access */
++		expect(
++			layout.querySelector( '[data-slot-type]' )
++		).not.toBeInTheDocument();
++		/* eslint-enable testing-library/no-node-access */
++	} );
+ } );
+diff --git a/packages/ui/src/form/primitives/input-layout/types.ts b/packages/ui/src/form/primitives/input-layout/types.ts
+index d114b0ec5900be..c7d3024b2df48f 100644
+--- a/packages/ui/src/form/primitives/input-layout/types.ts
++++ b/packages/ui/src/form/primitives/input-layout/types.ts
+@@ -24,17 +24,8 @@ export interface InputLayoutProps
+ 	suffix?: React.ReactNode;
+ }
+ 
+-export type InputLayoutSlotType = 'prefix' | 'suffix';
+-
+ export interface InputLayoutSlotProps
+-	extends Omit< React.HTMLAttributes< HTMLDivElement >, 'type' > {
+-	/**
+-	 * The type of the slot.
+-	 *
+-	 * When not provided, the type will be automatically inferred from the
+-	 * `InputLayout` context if the slot is used within a `prefix` or `suffix`.
+-	 */
+-	type?: InputLayoutSlotType;
++	extends React.HTMLAttributes< HTMLDivElement > {
+ 	/**
+ 	 * The padding of the slot.
+ 	 *

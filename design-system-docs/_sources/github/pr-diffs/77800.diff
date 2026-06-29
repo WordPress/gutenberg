@@ -1,0 +1,260 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 5636708f72cb07..7bd9bbe2e5f5fe 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,15 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `Drawer`: Restore the slide-out animation when the popup closes ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
++
++### Enhancements
++
++-   `Drawer`: Fade the popup elevation shadow alongside the slide ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
++-   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
++
+ ## 0.12.0 (2026-04-29)
+ 
+ ### Breaking Changes
+diff --git a/packages/ui/src/drawer/content.tsx b/packages/ui/src/drawer/content.tsx
+index dc65c2d3b3b48c..1e09be2f9be7ac 100644
+--- a/packages/ui/src/drawer/content.tsx
++++ b/packages/ui/src/drawer/content.tsx
+@@ -13,16 +13,19 @@ import type { ContentProps } from './types';
+  *
+  * **Required for scrolling** — `Drawer.Content` is the element that owns
+  * the popup's overflow. Without it, body content that exceeds the popup's
+- * available space clips instead of scrolling, and Base UI's
+- * swipe-dismiss-on-scroll-edge logic will not engage on up/down drawers.
++ * available space clips instead of scrolling, and swipe-to-dismiss on
++ * scrollable vertical drawers won't gate correctly at the scroll edge.
+  * Render it once per popup and wrap any freeform body content in it.
+  *
+  * Placing `Drawer.Header` or `Drawer.Footer` *inside* `Drawer.Content`
+  * makes them scroll with the body (the "non-sticky" opt-out) rather than
+  * staying pinned to the popup's edges.
+  *
+- * Renders Base UI's `_Drawer.Content` so swipe-dismiss wiring remains
+- * wired automatically.
++ * Mouse-drag swipe-to-dismiss is preserved in the popup-edge padding
++ * gutter and on the chrome regions; mouse drag over the body itself
++ * does not dismiss the drawer, so text selection inside the body keeps
++ * working normally. Touch swipe-to-dismiss engages from anywhere in
++ * the popup (gated by the scroll edge on vertical drawers).
+  */
+ const Content = forwardRef< HTMLDivElement, ContentProps >(
+ 	function DrawerContent( { className, children, onScroll, ...props }, ref ) {
+@@ -31,7 +34,7 @@ const Content = forwardRef< HTMLDivElement, ContentProps >(
+ 		const mergedRef = useMergeRefs( [ ref, scrollStateRef ] );
+ 
+ 		return (
+-			<_Drawer.Content
++			<div
+ 				ref={ mergedRef }
+ 				className={ clsx(
+ 					styles.content,
+@@ -41,8 +44,8 @@ const Content = forwardRef< HTMLDivElement, ContentProps >(
+ 				onScroll={ scrollStateOnScroll }
+ 				{ ...props }
+ 			>
+-				{ children }
+-			</_Drawer.Content>
++				<_Drawer.Content>{ children }</_Drawer.Content>
++			</div>
+ 		);
+ 	}
+ );
+diff --git a/packages/ui/src/drawer/style.module.css b/packages/ui/src/drawer/style.module.css
+index bc8f3f3de7fcd1..0c74cef1164194 100644
+--- a/packages/ui/src/drawer/style.module.css
++++ b/packages/ui/src/drawer/style.module.css
+@@ -91,20 +91,52 @@
+ 		color: var(--wpds-color-fg-content-neutral);
+ 		touch-action: auto;
+ 
++		/*
++		 * Hint compositing while the popup is in motion (opening, swiping,
++		 * or closing). Scoping `will-change` to these states avoids
++		 * retaining a transform layer while the drawer is fully idle.
++		 *
++		 * Limited to `transform` because that's the only animated property
++		 * the compositor can take off the main thread; `box-shadow` (also
++		 * transitioned below) is repainted on the main thread regardless,
++		 * so listing it here would just bloat the layer.
++		 */
+ 		&[data-open],
+-		&[data-swiping] {
++		&[data-swiping],
++		&[data-ending-style] {
+ 			will-change: transform;
++		}
+ 
+-			@media not (prefers-reduced-motion) {
+-				transition: transform 450ms cubic-bezier(0.32, 0.72, 0, 1);
++		/*
++		 * Drop the elevation shadow while the popup is offscreen
++		 * (`[data-starting-style]` and `[data-ending-style]` translate the
++		 * popup fully past the viewport edge). The shadow's blur radius
++		 * would otherwise bleed back into the viewport at the screen edge,
++		 * appearing as a faint halo at mount/unmount instead of fading
++		 * with the slide. `box-shadow: none` interpolates against the
++		 * resolved token value as a list of zero-shadow layers.
++		 *
++		 * Kept outside the `prefers-reduced-motion` guard below so the
++		 * popup still mounts / unmounts without a stray shadow when
++		 * transitions are disabled — the value flips instantly to `none`
++		 * at the offscreen states, matching the instantaneous transform.
++		 */
++		&[data-starting-style],
++		&[data-ending-style] {
++			box-shadow: none;
++		}
++
++		@media not (prefers-reduced-motion) {
++			transition:
++				transform 450ms cubic-bezier(0.32, 0.72, 0, 1),
++				box-shadow 450ms cubic-bezier(0.32, 0.72, 0, 1);
+ 
+-				&[data-ending-style] {
+-					transition-duration: calc(var(--drawer-swipe-strength) * 400ms);
+-				}
++			&[data-ending-style] {
++				transition-duration: calc(var(--drawer-swipe-strength) * 400ms);
++			}
+ 
+-				&[data-swiping] {
+-					transition-duration: 0ms;
+-				}
++			&[data-swiping] {
++				transition-duration: 0ms;
+ 			}
+ 		}
+ 
+diff --git a/packages/ui/src/drawer/test/index.test.tsx b/packages/ui/src/drawer/test/index.test.tsx
+index 87bc3c10758377..8b82c4d5eb816e 100644
+--- a/packages/ui/src/drawer/test/index.test.tsx
++++ b/packages/ui/src/drawer/test/index.test.tsx
+@@ -810,6 +810,62 @@ describe( 'Drawer', () => {
+ 			);
+ 		} );
+ 
++		// Locks the wrapper structure that Drawer.Content relies on:
++		//
++		// - The forwarded ref / scroll listener / overlay-chrome class
++		//   must land on the visible scroll container (the outer div),
++		//   so it does NOT carry [data-drawer-content].
++		// - Base UI's [data-drawer-content] marker must sit *inside*
++		//   that scroll container so the popup-edge padding gutter
++		//   falls outside the marker and stays mouse-draggable for
++		//   swipe-dismiss (Base UI excludes mouse-drag swipe over
++		//   [data-drawer-content] to preserve text selection).
++		//
++		// Not asserted here: the marker rendering as a real block-level
++		// element rather than `display: contents` (which would neuter
++		// `useOverlayScrollStateAttributes`'s `ResizeObserver`). CSS
++		// modules resolve to empty stubs in this jsdom test environment,
++		// so a `display: contents` regression introduced via CSS would
++		// not be observable from `getComputedStyle`. Catching it
++		// requires reviewing the marker's stylesheet rules at code
++		// review time.
++		it( 'wraps a [data-drawer-content] marker as the only direct child', async () => {
++			const user = userEvent.setup();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<Drawer.Root>
++					<Drawer.Trigger>Open</Drawer.Trigger>
++					<Drawer.Popup>
++						<Drawer.Title>Title</Drawer.Title>
++						<Drawer.Content ref={ contentRef }>
++							<p>Body</p>
++						</Drawer.Content>
++					</Drawer.Popup>
++				</Drawer.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			expect( contentRef.current ).not.toHaveAttribute(
++				'data-drawer-content'
++			);
++
++			// Direct DOM access is intentional: this test locks the
++			// concrete element-level wrapping that other invariants
++			// (mouse-drag swipe-dismiss, ResizeObserver-driven scroll
++			// state) silently depend on.
++			// eslint-disable-next-line testing-library/no-node-access
++			const marker = contentRef.current?.firstElementChild;
++			expect( marker ).toBeInstanceOf( HTMLDivElement );
++			expect( marker ).toHaveAttribute( 'data-drawer-content' );
++			// eslint-disable-next-line testing-library/no-node-access
++			expect( contentRef.current?.children ).toHaveLength( 1 );
++		} );
++
+ 		it( 'sets data-wp-ui-overlay-modal on the popup when modal is true', async () => {
+ 			const user = userEvent.setup();
+ 			const popupRef = createRef< HTMLDivElement >();
+diff --git a/packages/ui/src/drawer/types.ts b/packages/ui/src/drawer/types.ts
+index 886af06bdc2f17..104df82ac665fe 100644
+--- a/packages/ui/src/drawer/types.ts
++++ b/packages/ui/src/drawer/types.ts
+@@ -101,7 +101,7 @@ export interface HeaderProps extends ComponentProps< 'header' > {
+ 
+ export interface ContentProps extends ComponentProps< 'div' > {
+ 	/**
+-	 * The body content to be rendered inside the scroll container.
++	 * The body content to be rendered inside the scroll region.
+ 	 */
+ 	children?: ReactNode;
+ 	/**
+diff --git a/packages/ui/src/utils/css/overlay-chrome.module.css b/packages/ui/src/utils/css/overlay-chrome.module.css
+index 2979a61377e5d0..a3984214981eee 100644
+--- a/packages/ui/src/utils/css/overlay-chrome.module.css
++++ b/packages/ui/src/utils/css/overlay-chrome.module.css
+@@ -160,20 +160,37 @@
+ 	 * between the chrome and any preceding / following siblings inside
+ 	 * `.content`. No border — the separator is specific to the pinned
+ 	 * case.
++	 *
++	 * Each rule is duplicated with `> [data-drawer-content] >` so it
++	 * also fires for `Drawer`, where `Drawer.Content` renders an outer
++	 * wrapper around Base UI's `_Drawer.Content` marker (so the popup-
++	 * edge gutter falls outside `[data-drawer-content]` and stays
++	 * mouse-draggable for swipe-dismiss). The marker is a transparent
++	 * one-level wrapper, so mirroring each direct-child rule one level
++	 * deeper through it preserves the same intent: chrome sitting at
++	 * the scroll body's true visual edge collapses its popup-edge
++	 * padding; chrome wrapped in arbitrary consumer-supplied
++	 * intermediate elements keeps its own padding. `Dialog` and
++	 * `AlertDialog` have no such wrapper, so the `[data-drawer-content]`
++	 * variants never match for them.
+ 	 */
+-	.content > .header {
++	.content > .header,
++	.content > [data-drawer-content] > .header {
+ 		padding-inline: 0;
+ 	}
+ 
+-	.content > .header:first-child {
++	.content > .header:first-child,
++	.content > [data-drawer-content] > .header:first-child {
+ 		padding-block-start: 0;
+ 	}
+ 
+-	.content > .footer {
++	.content > .footer,
++	.content > [data-drawer-content] > .footer {
+ 		padding-inline: 0;
+ 	}
+ 
+-	.content > .footer:last-child {
++	.content > .footer:last-child,
++	.content > [data-drawer-content] > .footer:last-child {
+ 		padding-block-end: 0;
+ 	}
+ 

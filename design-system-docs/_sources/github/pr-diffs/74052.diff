@@ -1,0 +1,880 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index a1641e852771f9..539ea604e02061 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -276,7 +276,7 @@ module.exports = {
+ 					...restrictedSyntax,
+ 					...restrictedSyntaxComponents,
+ 					// Temporary rules until we're ready to officially deprecate the bottom margins.
+-					...[ 'BaseControl', 'SearchControl', 'SelectControl' ].map(
++					...[ 'BaseControl', 'SearchControl' ].map(
+ 						( componentName ) => ( {
+ 							selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
+ 							message:
+diff --git a/packages/block-editor/src/components/dimensions-tool/aspect-ratio-tool.js b/packages/block-editor/src/components/dimensions-tool/aspect-ratio-tool.js
+index d963e71289cb0f..de357f14d6d7b4 100644
+--- a/packages/block-editor/src/components/dimensions-tool/aspect-ratio-tool.js
++++ b/packages/block-editor/src/components/dimensions-tool/aspect-ratio-tool.js
+@@ -93,7 +93,6 @@ export default function AspectRatioTool( {
+ 				options={ options ?? aspectRatioOptions }
+ 				onChange={ onChange }
+ 				size="__unstable-large"
+-				__nextHasNoMarginBottom
+ 			/>
+ 		</ToolsPanelItem>
+ 	);
+diff --git a/packages/block-editor/src/components/html-element-control/index.js b/packages/block-editor/src/components/html-element-control/index.js
+index a4ca6bcbe60512..87a34a4c5c9787 100644
+--- a/packages/block-editor/src/components/html-element-control/index.js
++++ b/packages/block-editor/src/components/html-element-control/index.js
+@@ -88,7 +88,6 @@ export default function HTMLElementControl( {
+ 	return (
+ 		<VStack spacing={ 2 } className="block-editor-html-element-control">
+ 			<SelectControl
+-				__nextHasNoMarginBottom
+ 				__next40pxDefaultSize
+ 				label={ __( 'HTML element' ) }
+ 				options={ modifiedOptions }
+diff --git a/packages/block-editor/src/components/image-size-control/index.js b/packages/block-editor/src/components/image-size-control/index.js
+index 4ec36cb413d87a..c390dbd97a9992 100644
+--- a/packages/block-editor/src/components/image-size-control/index.js
++++ b/packages/block-editor/src/components/image-size-control/index.js
+@@ -91,7 +91,6 @@ export default function ImageSizeControl( {
+ 		<VStack className="block-editor-image-size-control" spacing="4">
+ 			{ imageSizeOptions && imageSizeOptions.length > 0 && (
+ 				<SelectControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Resolution' ) }
+ 					value={ slug }
+ 					options={ imageSizeOptions }
+diff --git a/packages/block-editor/src/components/inspector-controls/README.md b/packages/block-editor/src/components/inspector-controls/README.md
+index 2b5da040b65ef9..a615d5fa7319e8 100644
+--- a/packages/block-editor/src/components/inspector-controls/README.md
++++ b/packages/block-editor/src/components/inspector-controls/README.md
+@@ -128,7 +128,6 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
+ 						/>
+ 
+ 						<SelectControl
+-							__nextHasNoMarginBottom
+ 							label="Select Control"
+ 							value={ selectField }
+ 							options={ [
+diff --git a/packages/block-editor/src/components/resolution-tool/index.js b/packages/block-editor/src/components/resolution-tool/index.js
+index b73a2d5f249723..4adb2f3c4494a8 100644
+--- a/packages/block-editor/src/components/resolution-tool/index.js
++++ b/packages/block-editor/src/components/resolution-tool/index.js
+@@ -46,7 +46,6 @@ export default function ResolutionTool( {
+ 			resetAllFilter={ resetAllFilter }
+ 		>
+ 			<SelectControl
+-				__nextHasNoMarginBottom
+ 				label={ __( 'Resolution' ) }
+ 				value={ displayValue }
+ 				options={ options }
+diff --git a/packages/block-editor/src/components/responsive-block-control/test/index.js b/packages/block-editor/src/components/responsive-block-control/test/index.js
+index ef32c60722f541..1b5e961d4e9186 100644
+--- a/packages/block-editor/src/components/responsive-block-control/test/index.js
++++ b/packages/block-editor/src/components/responsive-block-control/test/index.js
+@@ -43,7 +43,6 @@ const renderTestDefaultControlComponent = ( labelComponent, device ) => {
+ 				__next40pxDefaultSize
+ 				label={ labelComponent }
+ 				options={ sizeOptions }
+-				__nextHasNoMarginBottom
+ 			/>
+ 			<p id={ device.id }>
+ 				{ device.label } is used here for testing purposes to ensure we
+diff --git a/packages/block-library/src/archives/edit.js b/packages/block-library/src/archives/edit.js
+index fb164e2ef3f2a0..c747de2c2c3a73 100644
+--- a/packages/block-library/src/archives/edit.js
++++ b/packages/block-library/src/archives/edit.js
+@@ -106,7 +106,6 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
+ 					>
+ 						<SelectControl
+ 							__next40pxDefaultSize
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Group by' ) }
+ 							options={ [
+ 								{ label: __( 'Year' ), value: 'yearly' },
+diff --git a/packages/block-library/src/audio/edit.js b/packages/block-library/src/audio/edit.js
+index 91054ea18c4a84..5aa8aef280685f 100644
+--- a/packages/block-library/src/audio/edit.js
++++ b/packages/block-library/src/audio/edit.js
+@@ -224,7 +224,6 @@ function AudioEdit( {
+ 					>
+ 						<SelectControl
+ 							__next40pxDefaultSize
+-							__nextHasNoMarginBottom
+ 							label={ _x(
+ 								'Preload',
+ 								'noun; Audio block parameter'
+diff --git a/packages/block-library/src/categories/edit.js b/packages/block-library/src/categories/edit.js
+index 434d95caae8814..566e17175f4aaa 100644
+--- a/packages/block-library/src/categories/edit.js
++++ b/packages/block-library/src/categories/edit.js
+@@ -235,7 +235,6 @@ export default function CategoriesEdit( {
+ 							isShownByDefault
+ 						>
+ 							<SelectControl
+-								__nextHasNoMarginBottom
+ 								__next40pxDefaultSize
+ 								label={ __( 'Taxonomy' ) }
+ 								options={ taxonomies.map( ( t ) => ( {
+diff --git a/packages/block-library/src/file/inspector.js b/packages/block-library/src/file/inspector.js
+index 58fc00fc62c70e..2df826e95ef472 100644
+--- a/packages/block-library/src/file/inspector.js
++++ b/packages/block-library/src/file/inspector.js
+@@ -111,7 +111,6 @@ export default function FileBlockInspector( {
+ 					>
+ 						<SelectControl
+ 							__next40pxDefaultSize
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Link to' ) }
+ 							value={ textLinkHref }
+ 							options={ linkDestinationOptions }
+diff --git a/packages/block-library/src/form/edit.js b/packages/block-library/src/form/edit.js
+index 0d360d98ece91c..4bb8c79a9801da 100644
+--- a/packages/block-library/src/form/edit.js
++++ b/packages/block-library/src/form/edit.js
+@@ -108,7 +108,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
+ 						isShownByDefault
+ 					>
+ 						<SelectControl
+-							__nextHasNoMarginBottom
+ 							__next40pxDefaultSize
+ 							label={ __( 'Submissions method' ) }
+ 							options={ [
+@@ -176,7 +175,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
+ 				<InspectorControls group="advanced">
+ 					<SelectControl
+ 						__next40pxDefaultSize
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Method' ) }
+ 						options={ [
+ 							{ label: 'Get', value: 'get' },
+diff --git a/packages/block-library/src/gallery/edit.js b/packages/block-library/src/gallery/edit.js
+index 0732f845dd13f7..1b27c4b262d017 100644
+--- a/packages/block-library/src/gallery/edit.js
++++ b/packages/block-library/src/gallery/edit.js
+@@ -704,7 +704,6 @@ export default function GalleryEdit( props ) {
+ 								}
+ 							>
+ 								<SelectControl
+-									__nextHasNoMarginBottom
+ 									label={ __( 'Resolution' ) }
+ 									help={ __(
+ 										'Select the size of the source images.'
+@@ -770,7 +769,6 @@ export default function GalleryEdit( props ) {
+ 							>
+ 								<SelectControl
+ 									__next40pxDefaultSize
+-									__nextHasNoMarginBottom
+ 									label={ __( 'Aspect ratio' ) }
+ 									help={ __(
+ 										'Set a consistent aspect ratio for all images in the gallery.'
+@@ -803,7 +801,6 @@ export default function GalleryEdit( props ) {
+ 						) }
+ 						{ imageSizeOptions?.length > 0 && (
+ 							<SelectControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Resolution' ) }
+ 								help={ __(
+ 									'Select the size of the source images.'
+@@ -816,7 +813,6 @@ export default function GalleryEdit( props ) {
+ 							/>
+ 						) }
+ 						<SelectControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Link' ) }
+ 							value={ linkTo }
+ 							onChange={ setLinkTo }
+@@ -843,7 +839,6 @@ export default function GalleryEdit( props ) {
+ 						) }
+ 						{ aspectRatioOptions.length > 1 && (
+ 							<SelectControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Aspect Ratio' ) }
+ 								help={ __(
+ 									'Set a consistent aspect ratio for all images in the gallery.'
+diff --git a/packages/block-library/src/latest-comments/edit.js b/packages/block-library/src/latest-comments/edit.js
+index 4d6bbbbf82180a..fee4b5da6ca0ee 100644
+--- a/packages/block-library/src/latest-comments/edit.js
++++ b/packages/block-library/src/latest-comments/edit.js
+@@ -105,7 +105,6 @@ export default function LatestComments( { attributes, setAttributes } ) {
+ 						isShownByDefault
+ 					>
+ 						<SelectControl
+-							__nextHasNoMarginBottom
+ 							__next40pxDefaultSize
+ 							label={ __( 'Display content' ) }
+ 							value={ displayContent }
+diff --git a/packages/block-library/src/list/ordered-list-settings.js b/packages/block-library/src/list/ordered-list-settings.js
+index a014a7ca05ed01..1488f088573639 100644
+--- a/packages/block-library/src/list/ordered-list-settings.js
++++ b/packages/block-library/src/list/ordered-list-settings.js
+@@ -50,7 +50,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
+ 				<PanelBody title={ __( 'Settings' ) }>
+ 					<SelectControl
+ 						__next40pxDefaultSize
+-						__nextHasNoMarginBottom
+ 						label={ __( 'List style' ) }
+ 						options={ LIST_STYLE_OPTIONS }
+ 						value={ type }
+@@ -113,7 +112,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
+ 					>
+ 						<SelectControl
+ 							__next40pxDefaultSize
+-							__nextHasNoMarginBottom
+ 							label={ __( 'List style' ) }
+ 							options={ LIST_STYLE_OPTIONS }
+ 							value={ type || 'decimal' }
+diff --git a/packages/block-library/src/navigation/edit/overlay-template-part-selector.js b/packages/block-library/src/navigation/edit/overlay-template-part-selector.js
+index 11e52573270f28..1e6902aa42e4fe 100644
+--- a/packages/block-library/src/navigation/edit/overlay-template-part-selector.js
++++ b/packages/block-library/src/navigation/edit/overlay-template-part-selector.js
+@@ -194,7 +194,6 @@ export default function OverlayTemplatePartSelector( {
+ 			/>
+ 			<SelectControl
+ 				__next40pxDefaultSize
+-				__nextHasNoMarginBottom
+ 				label={ __( 'Overlay template' ) }
+ 				value={ overlay || '' }
+ 				options={ options }
+diff --git a/packages/block-library/src/post-author/edit.js b/packages/block-library/src/post-author/edit.js
+index 9f1b0da05938b6..8ee779286b5b66 100644
+--- a/packages/block-library/src/post-author/edit.js
++++ b/packages/block-library/src/post-author/edit.js
+@@ -247,7 +247,6 @@ function PostAuthorEdit( {
+ 						>
+ 							<SelectControl
+ 								__next40pxDefaultSize
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Avatar size' ) }
+ 								value={ avatarSize }
+ 								options={ avatarSizes }
+diff --git a/packages/block-library/src/post-featured-image/dimension-controls.js b/packages/block-library/src/post-featured-image/dimension-controls.js
+index 36783cc0d1c0f1..127a7003ac2b8d 100644
+--- a/packages/block-library/src/post-featured-image/dimension-controls.js
++++ b/packages/block-library/src/post-featured-image/dimension-controls.js
+@@ -117,7 +117,6 @@ const DimensionControls = ( {
+ 			>
+ 				<SelectControl
+ 					__next40pxDefaultSize
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Aspect ratio' ) }
+ 					value={ aspectRatio }
+ 					options={ aspectRatioOptions }
+diff --git a/packages/block-library/src/post-navigation-link/edit.js b/packages/block-library/src/post-navigation-link/edit.js
+index 291245147305b0..64f2a70520f1c4 100644
+--- a/packages/block-library/src/post-navigation-link/edit.js
++++ b/packages/block-library/src/post-navigation-link/edit.js
+@@ -207,7 +207,6 @@ export default function PostNavigationLinkEdit( {
+ 			<InspectorControls group="advanced">
+ 				<SelectControl
+ 					__next40pxDefaultSize
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Filter by taxonomy' ) }
+ 					value={ taxonomy }
+ 					options={ getTaxonomyOptions() }
+diff --git a/packages/block-library/src/query/edit/inspector-controls/index.js b/packages/block-library/src/query/edit/inspector-controls/index.js
+index c90baa0ee82356..67a9bfb71a926d 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/index.js
++++ b/packages/block-library/src/query/edit/inspector-controls/index.js
+@@ -269,7 +269,6 @@ export default function QueryInspectorControls( props ) {
+ 						>
+ 							{ postTypesSelectOptions.length > 2 ? (
+ 								<SelectControl
+-									__nextHasNoMarginBottom
+ 									__next40pxDefaultSize
+ 									options={ postTypesSelectOptions }
+ 									value={ postType }
+diff --git a/packages/block-library/src/query/edit/inspector-controls/order-control.js b/packages/block-library/src/query/edit/inspector-controls/order-control.js
+index d5111c4a1ebdfd..8fb7119bac6f86 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/order-control.js
++++ b/packages/block-library/src/query/edit/inspector-controls/order-control.js
+@@ -33,7 +33,6 @@ function OrderControl( {
+ } ) {
+ 	return (
+ 		<SelectControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			label={ __( 'Order by' ) }
+ 			value={ `${ orderBy }/${ order }` }
+diff --git a/packages/block-library/src/query/edit/inspector-controls/sticky-control.js b/packages/block-library/src/query/edit/inspector-controls/sticky-control.js
+index f478337998f388..e0dcf2d697ef1c 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/sticky-control.js
++++ b/packages/block-library/src/query/edit/inspector-controls/sticky-control.js
+@@ -14,7 +14,6 @@ const stickyOptions = [
+ export default function StickyControl( { value, onChange } ) {
+ 	return (
+ 		<SelectControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			label={ __( 'Sticky posts' ) }
+ 			options={ stickyOptions }
+diff --git a/packages/block-library/src/search/edit.js b/packages/block-library/src/search/edit.js
+index 9886aa8d1b4188..208a3c5c42df55 100644
+--- a/packages/block-library/src/search/edit.js
++++ b/packages/block-library/src/search/edit.js
+@@ -390,7 +390,6 @@ export default function SearchEdit( {
+ 						<SelectControl
+ 							value={ buttonPosition }
+ 							__next40pxDefaultSize
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Button position' ) }
+ 							onChange={ ( value ) => {
+ 								setAttributes( {
+@@ -490,7 +489,6 @@ export default function SearchEdit( {
+ 								} }
+ 								isBlock
+ 								__next40pxDefaultSize
+-								__nextHasNoMarginBottom
+ 							>
+ 								{ PERCENTAGE_WIDTHS.map( ( widthValue ) => {
+ 									return (
+diff --git a/packages/block-library/src/separator/edit.js b/packages/block-library/src/separator/edit.js
+index 2205f0668e01c7..c40b9dc32d1d50 100644
+--- a/packages/block-library/src/separator/edit.js
++++ b/packages/block-library/src/separator/edit.js
+@@ -40,7 +40,6 @@ const HtmlElementControl = ( { tagName, setAttributes } ) => {
+ 					  )
+ 			}
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 		/>
+ 	);
+ };
+diff --git a/packages/block-library/src/social-links/edit.js b/packages/block-library/src/social-links/edit.js
+index c0a2ee97005a35..81d11d2a6f4a44 100644
+--- a/packages/block-library/src/social-links/edit.js
++++ b/packages/block-library/src/social-links/edit.js
+@@ -182,7 +182,6 @@ export function SocialLinksEdit( props ) {
+ 					>
+ 						<SelectControl
+ 							__next40pxDefaultSize
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Icon size' ) }
+ 							onChange={ ( newSize ) => {
+ 								setAttributes( {
+diff --git a/packages/block-library/src/tab/controls.js b/packages/block-library/src/tab/controls.js
+index 5f033d414db12d..1261df330628b5 100644
+--- a/packages/block-library/src/tab/controls.js
++++ b/packages/block-library/src/tab/controls.js
+@@ -45,7 +45,6 @@ export default function Controls( {
+ 							} );
+ 						} }
+ 						__next40pxDefaultSize
+-						__nextHasNoMarginBottom
+ 					/>
+ 					<ToggleControl
+ 						label={ __( 'Default Tab' ) }
+diff --git a/packages/block-library/src/table-of-contents/edit.js b/packages/block-library/src/table-of-contents/edit.js
+index 24531dea30c92a..9e47002fd20b70 100644
+--- a/packages/block-library/src/table-of-contents/edit.js
++++ b/packages/block-library/src/table-of-contents/edit.js
+@@ -190,7 +190,6 @@ export default function TableOfContentsEdit( {
+ 					isShownByDefault
+ 				>
+ 					<SelectControl
+-						__nextHasNoMarginBottom
+ 						__next40pxDefaultSize
+ 						label={ __( 'Include headings down to level' ) }
+ 						value={ maxLevel || '' }
+diff --git a/packages/block-library/src/tabs/controls.js b/packages/block-library/src/tabs/controls.js
+index b198f342c1661b..4606c8f774bd89 100644
+--- a/packages/block-library/src/tabs/controls.js
++++ b/packages/block-library/src/tabs/controls.js
+@@ -169,7 +169,6 @@ export default function Controls( {
+ 								metadata: { ...metadata, name: value },
+ 							} );
+ 						} }
+-						__nextHasNoMarginBottom
+ 						__next40pxDefaultSize
+ 					/>
+ 				</PanelBody>
+diff --git a/packages/block-library/src/tag-cloud/edit.js b/packages/block-library/src/tag-cloud/edit.js
+index 06f6b3e33b13c2..4c699da02af3c9 100644
+--- a/packages/block-library/src/tag-cloud/edit.js
++++ b/packages/block-library/src/tag-cloud/edit.js
+@@ -146,7 +146,6 @@ function TagCloudEdit( { attributes, setAttributes } ) {
+ 					isShownByDefault
+ 				>
+ 					<SelectControl
+-						__nextHasNoMarginBottom
+ 						__next40pxDefaultSize
+ 						label={ __( 'Taxonomy' ) }
+ 						options={ getTaxonomyOptions() }
+diff --git a/packages/block-library/src/template-part/edit/advanced-controls.js b/packages/block-library/src/template-part/edit/advanced-controls.js
+index 3f5bac38b202ea..61d9955b4da574 100644
+--- a/packages/block-library/src/template-part/edit/advanced-controls.js
++++ b/packages/block-library/src/template-part/edit/advanced-controls.js
+@@ -67,7 +67,6 @@ export function TemplatePartAdvancedControls( {
+ 					/>
+ 					<SelectControl
+ 						__next40pxDefaultSize
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Area' ) }
+ 						labelPosition="top"
+ 						options={ areaOptions }
+diff --git a/packages/block-library/src/template-part/edit/import-controls.js b/packages/block-library/src/template-part/edit/import-controls.js
+index ca9708f65764b4..1f967a46d58669 100644
+--- a/packages/block-library/src/template-part/edit/import-controls.js
++++ b/packages/block-library/src/template-part/edit/import-controls.js
+@@ -148,7 +148,6 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
+ 						onChange={ ( value ) => setSelectedSidebar( value ) }
+ 						disabled={ ! options.length }
+ 						__next40pxDefaultSize
+-						__nextHasNoMarginBottom
+ 					/>
+ 				</FlexBlock>
+ 				<FlexItem
+diff --git a/packages/block-library/src/terms-query/edit/inspector-controls/order-control.js b/packages/block-library/src/terms-query/edit/inspector-controls/order-control.js
+index b429422bcdaf6a..4d5755292288ee 100644
+--- a/packages/block-library/src/terms-query/edit/inspector-controls/order-control.js
++++ b/packages/block-library/src/terms-query/edit/inspector-controls/order-control.js
+@@ -7,7 +7,6 @@ import { SelectControl } from '@wordpress/components';
+ export default function OrderControl( { orderBy, order, onChange, ...props } ) {
+ 	return (
+ 		<SelectControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			options={ [
+ 				{
+diff --git a/packages/block-library/src/terms-query/edit/inspector-controls/taxonomy-control.js b/packages/block-library/src/terms-query/edit/inspector-controls/taxonomy-control.js
+index cfdc61a7c884a5..0f69c96bbef3a3 100644
+--- a/packages/block-library/src/terms-query/edit/inspector-controls/taxonomy-control.js
++++ b/packages/block-library/src/terms-query/edit/inspector-controls/taxonomy-control.js
+@@ -17,7 +17,6 @@ export default function TaxonomyControl( { value, onChange, ...props } ) {
+ 
+ 	return (
+ 		<SelectControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			options={ taxonomyOptions }
+ 			value={ value }
+diff --git a/packages/block-library/src/video/edit-common-settings.js b/packages/block-library/src/video/edit-common-settings.js
+index acb1ba7d8816bf..00c03085145279 100644
+--- a/packages/block-library/src/video/edit-common-settings.js
++++ b/packages/block-library/src/video/edit-common-settings.js
+@@ -154,7 +154,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
+ 			>
+ 				<SelectControl
+ 					__next40pxDefaultSize
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Preload' ) }
+ 					value={ preload }
+ 					onChange={ onChangePreload }
+diff --git a/packages/block-library/src/video/tracks-editor.js b/packages/block-library/src/video/tracks-editor.js
+index fb0bb078f3b285..295b1929c65301 100644
+--- a/packages/block-library/src/video/tracks-editor.js
++++ b/packages/block-library/src/video/tracks-editor.js
+@@ -147,7 +147,6 @@ function SingleTrackEditor( {
+ 			<VStack spacing="4">
+ 				<SelectControl
+ 					__next40pxDefaultSize
+-					__nextHasNoMarginBottom
+ 					className="block-library-video-tracks-editor__single-track-editor-kind-select"
+ 					options={ KIND_OPTIONS }
+ 					value={ kind }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d07969004dc8e0..ddcb761fb29fdd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ -   `TreeSelect`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74014](https://github.com/WordPress/gutenberg/pull/74014)).
+ -   `RangeControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74033](https://github.com/WordPress/gutenberg/pull/74033)).
+ -   `ComboboxControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74034](https://github.com/WordPress/gutenberg/pull/74034)).
++-   `SelectControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74052](https://github.com/WordPress/gutenberg/pull/74052)).
+ -   `DimensionControl`: Completely remove deprecated component ([#73944](https://github.com/WordPress/gutenberg/pull/73944)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index c50a775ede1739..c38d1d34e571a1 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -135,7 +135,6 @@ const UnconnectedColorPicker = (
+ 			<AuxiliaryColorArtefactWrapper>
+ 				<AuxiliaryColorArtefactHStackHeader justify="space-between">
+ 					<SelectControl
+-						__nextHasNoMarginBottom
+ 						size="compact"
+ 						options={ options }
+ 						value={ colorType }
+diff --git a/packages/components/src/custom-gradient-picker/index.tsx b/packages/components/src/custom-gradient-picker/index.tsx
+index 8d53cd9f3d0ea2..1777f5260eb0a4 100644
+--- a/packages/components/src/custom-gradient-picker/index.tsx
++++ b/packages/components/src/custom-gradient-picker/index.tsx
+@@ -104,7 +104,6 @@ const GradientTypePicker = ( {
+ 
+ 	return (
+ 		<SelectControl
+-			__nextHasNoMarginBottom
+ 			className="components-custom-gradient-picker__type-picker"
+ 			label={ __( 'Type' ) }
+ 			labelPosition="top"
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index 90a8a901354a39..e2bba32b246722 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -164,7 +164,6 @@ export function TimePicker( {
+ 				label={ __( 'Month' ) }
+ 				hideLabelFromVision
+ 				__next40pxDefaultSize
+-				__nextHasNoMarginBottom
+ 				value={ month }
+ 				options={ monthOptions }
+ 				onChange={ ( value ) => {
+diff --git a/packages/components/src/disabled/stories/index.story.tsx b/packages/components/src/disabled/stories/index.story.tsx
+index 008ac6c2aca4c6..8ae5f730a076aa 100644
+--- a/packages/components/src/disabled/stories/index.story.tsx
++++ b/packages/components/src/disabled/stories/index.story.tsx
+@@ -52,7 +52,6 @@ const Form = () => {
+ 				onChange={ setTextAreaValue }
+ 			/>
+ 			<SelectControl
+-				__nextHasNoMarginBottom
+ 				__next40pxDefaultSize
+ 				label="Select Control"
+ 				onChange={ () => {} }
+diff --git a/packages/components/src/query-controls/index.tsx b/packages/components/src/query-controls/index.tsx
+index f345cb469d89e6..055d56442b04b4 100644
+--- a/packages/components/src/query-controls/index.tsx
++++ b/packages/components/src/query-controls/index.tsx
+@@ -103,7 +103,6 @@ export function QueryControls( {
+ 			{ [
+ 				onOrderChange && onOrderByChange && (
+ 					<SelectControl
+-						__nextHasNoMarginBottom
+ 						__next40pxDefaultSize
+ 						key="query-controls-order-select"
+ 						label={ __( 'Order by' ) }
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index d8742fce74f54e..7a870737199ddd 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -93,7 +93,6 @@ const MySelectControl = () => {
+ 			] }
+ 			onChange={ ( newSize ) => setSize( newSize ) }
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 		/>
+ 	);
+ };
+@@ -116,7 +115,6 @@ Render a user interface to select multiple users from a list.
+ 		{ value: 'c', label: 'User c' },
+ 	] }
+ 	__next40pxDefaultSize
+-	__nextHasNoMarginBottom
+ />
+ ```
+ 
+@@ -132,7 +130,6 @@ const [ item, setItem ] = useState( '' );
+     value={ item } // e.g: value = 'a'
+     onChange={ ( selection ) => { setItem( selection ) } }
+     __next40pxDefaultSize
+-    __nextHasNoMarginBottom
+ >
+ 	<optgroup label="Theropods">
+ 		<option value="Tyrannosaurus">Tyrannosaurus</option>
+@@ -240,14 +237,6 @@ Start opting into the larger default height that will become the default size in
+ -   Required: No
+ -   Default: `false`
+ 
+-### __nextHasNoMarginBottom
+-
+-Start opting into the new margin-free styles that will become the default in a future version.
+-
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
+-
+ ## Related components
+ 
+ -   To select one option from a set, and you want to show them all the available options at once, use the `Radio` component.
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 4b8fefd462c15c..f92203c5f9a1e2 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -65,7 +65,7 @@ function UnforwardedSelectControl< V extends string >(
+ 		suffix,
+ 		variant = 'default',
+ 		__next40pxDefaultSize = false,
+-		__nextHasNoMarginBottom = false,
++		__nextHasNoMarginBottom: _, // Prevent passing to internal component
+ 		__shouldNotWarnDeprecated36pxSize,
+ 		...restProps
+ 	} = useDeprecated36pxDefaultSizeProp( props );
+@@ -107,8 +107,7 @@ function UnforwardedSelectControl< V extends string >(
+ 			help={ help }
+ 			id={ id }
+ 			className={ classes }
+-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-			__associatedWPComponentName="SelectControl"
++			__nextHasNoMarginBottom
+ 		>
+ 			<StyledInputBase
+ 				disabled={ disabled }
+@@ -163,7 +162,6 @@ function UnforwardedSelectControl< V extends string >(
+  *   return (
+  *     <SelectControl
+  *       __next40pxDefaultSize
+- *       __nextHasNoMarginBottom
+  *       label="Size"
+  *       value={ size }
+  *       options={ [
+diff --git a/packages/components/src/select-control/stories/index.story.tsx b/packages/components/src/select-control/stories/index.story.tsx
+index cb283f03acdaa8..76501b72acbdcd 100644
+--- a/packages/components/src/select-control/stories/index.story.tsx
++++ b/packages/components/src/select-control/stories/index.story.tsx
+@@ -69,7 +69,6 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
+ export const Default = SelectControlWithState.bind( {} );
+ Default.args = {
+ 	__next40pxDefaultSize: true,
+-	__nextHasNoMarginBottom: true,
+ 	label: 'Label',
+ 	options: [
+ 		{ value: '', label: 'Select an Option', disabled: true },
+@@ -92,7 +91,6 @@ WithLabelAndHelpText.args = {
+ export const WithCustomChildren = SelectControlWithState.bind( {} );
+ WithCustomChildren.args = {
+ 	__next40pxDefaultSize: true,
+-	__nextHasNoMarginBottom: true,
+ 	label: 'Label',
+ 	children: (
+ 		<>
+diff --git a/packages/components/src/select-control/test/select-control.tsx b/packages/components/src/select-control/test/select-control.tsx
+index 37935d60384b15..5982ecaeaa0e6f 100644
+--- a/packages/components/src/select-control/test/select-control.tsx
++++ b/packages/components/src/select-control/test/select-control.tsx
+@@ -12,13 +12,7 @@ import _SelectControl from '..';
+ const SelectControl = (
+ 	props: React.ComponentProps< typeof _SelectControl >
+ ) => {
+-	return (
+-		<_SelectControl
+-			{ ...props }
+-			__nextHasNoMarginBottom
+-			__next40pxDefaultSize
+-		/>
+-	);
++	return <_SelectControl { ...props } __next40pxDefaultSize />;
+ };
+ 
+ describe( 'SelectControl', () => {
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+index 3d9f06385c7532..d120421c209157 100644
+--- a/packages/components/src/select-control/types.ts
++++ b/packages/components/src/select-control/types.ts
+@@ -22,7 +22,14 @@ type SelectControlBaseProps< V extends string > = Pick<
+ 	| 'size'
+ 	| 'suffix'
+ > &
+-	Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > & {
++	Pick< BaseControlProps, 'help' > & {
++		/**
++		 * Start opting into the new margin-free styles that will become the default in a future version.
++		 *
++		 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
++		 * @ignore
++		 */
++		__nextHasNoMarginBottom?: boolean;
+ 		/**
+ 		 * An array of option property objects to be rendered,
+ 		 * each with a `label` and `value` property, as well as any other
+diff --git a/packages/components/src/tree-select/index.tsx b/packages/components/src/tree-select/index.tsx
+index e858fc1e4f5c67..5b32ebfe07b26a 100644
+--- a/packages/components/src/tree-select/index.tsx
++++ b/packages/components/src/tree-select/index.tsx
+@@ -104,7 +104,6 @@ export function TreeSelect( props: TreeSelectProps ) {
+ 			{ ...{ label, options, onChange } }
+ 			value={ selectedId }
+ 			{ ...restProps }
+-			__nextHasNoMarginBottom
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/tree-select/types.ts b/packages/components/src/tree-select/types.ts
+index 89194adfcf393c..59e8e173fab02f 100644
+--- a/packages/components/src/tree-select/types.ts
++++ b/packages/components/src/tree-select/types.ts
+@@ -18,15 +18,8 @@ export interface Tree {
+ export interface TreeSelectProps
+ 	extends Omit<
+ 		SelectControlSingleSelectionProps,
+-		'value' | 'multiple' | 'onChange' | '__nextHasNoMarginBottom'
++		'value' | 'multiple' | 'onChange'
+ 	> {
+-	/**
+-	 * Start opting into the new margin-free styles that will become the default in a future version.
+-	 *
+-	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
+-	 * @ignore
+-	 */
+-	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * If this property is added, an option will be added with this label to represent empty selection.
+ 	 */
+diff --git a/packages/components/src/validated-form-controls/components/select-control.tsx b/packages/components/src/validated-form-controls/components/select-control.tsx
+index 14d5601b0ecabf..18faa1cfb996a4 100644
+--- a/packages/components/src/validated-form-controls/components/select-control.tsx
++++ b/packages/components/src/validated-form-controls/components/select-control.tsx
+@@ -19,11 +19,7 @@ const UnforwardedValidatedSelectControl = (
+ 		...restProps
+ 	}: Omit<
+ 		React.ComponentProps< typeof SelectControl >,
+-		| '__next40pxDefaultSize'
+-		| '__nextHasNoMarginBottom'
+-		| 'multiple'
+-		| 'onChange'
+-		| 'value'
++		'__next40pxDefaultSize' | 'multiple' | 'onChange' | 'value'
+ 	> & {
+ 		value?: string;
+ 		onChange: ( value: string ) => void;
+@@ -41,7 +37,6 @@ const UnforwardedValidatedSelectControl = (
+ 			getValidityTarget={ () => validityTargetRef.current }
+ 		>
+ 			<SelectControl
+-				__nextHasNoMarginBottom
+ 				__next40pxDefaultSize
+ 				ref={ mergedRefs }
+ 				{ ...restProps }
+diff --git a/packages/dataviews/src/components/dataviews-filters/filter.tsx b/packages/dataviews/src/components/dataviews-filters/filter.tsx
+index c63618bb0aa0bc..ff6891a8510242 100644
+--- a/packages/dataviews/src/components/dataviews-filters/filter.tsx
++++ b/packages/dataviews/src/components/dataviews-filters/filter.tsx
+@@ -169,7 +169,6 @@ function OperatorSelector( {
+ 					} }
+ 					size="small"
+ 					variant="minimal"
+-					__nextHasNoMarginBottom
+ 					hideLabelFromVision
+ 				/>
+ 			</HStack>
+diff --git a/packages/dataviews/src/components/dataviews-pagination/index.tsx b/packages/dataviews/src/components/dataviews-pagination/index.tsx
+index 27bee5b96e2992..fa8b8c7346a766 100644
+--- a/packages/dataviews/src/components/dataviews-pagination/index.tsx
++++ b/packages/dataviews/src/components/dataviews-pagination/index.tsx
+@@ -85,7 +85,6 @@ export function DataViewsPagination() {
+ 										} );
+ 									} }
+ 									size="small"
+-									__nextHasNoMarginBottom
+ 									variant="minimal"
+ 								/>
+ 							),
+diff --git a/packages/dataviews/src/components/dataviews-view-config/index.tsx b/packages/dataviews/src/components/dataviews-view-config/index.tsx
+index 55304010b43dea..0816571db3cf4f 100644
+--- a/packages/dataviews/src/components/dataviews-view-config/index.tsx
++++ b/packages/dataviews/src/components/dataviews-view-config/index.tsx
+@@ -128,7 +128,6 @@ function SortFieldControl() {
+ 
+ 	return (
+ 		<SelectControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			label={ __( 'Sort by' ) }
+ 			value={ view.sort?.field }
+diff --git a/packages/dataviews/src/dataform-controls/select.tsx b/packages/dataviews/src/dataform-controls/select.tsx
+index 055cb0162516a8..d4ec02b9bac339 100644
+--- a/packages/dataviews/src/dataform-controls/select.tsx
++++ b/packages/dataviews/src/dataform-controls/select.tsx
+@@ -51,7 +51,6 @@ export default function Select< Item >( {
+ 			options={ elements }
+ 			onChange={ onChangeControl }
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			multiple={ isMultiple }
+ 		/>
+diff --git a/packages/dataviews/src/dataform-controls/utils/relative-date-control.tsx b/packages/dataviews/src/dataform-controls/utils/relative-date-control.tsx
+index f2aa74c623b0d0..03a1670215a27a 100644
+--- a/packages/dataviews/src/dataform-controls/utils/relative-date-control.tsx
++++ b/packages/dataviews/src/dataform-controls/utils/relative-date-control.tsx
+@@ -106,7 +106,6 @@ export default function RelativeDateControl< Item >( {
+ 				<SelectControl
+ 					className="dataviews-controls__relative-date-unit"
+ 					__next40pxDefaultSize
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Unit' ) }
+ 					value={ unit }
+ 					options={ options }
+diff --git a/packages/editor/src/components/post-author/select.js b/packages/editor/src/components/post-author/select.js
+index e51cc288cc4530..506336799597b2 100644
+--- a/packages/editor/src/components/post-author/select.js
++++ b/packages/editor/src/components/post-author/select.js
+@@ -23,7 +23,6 @@ export default function PostAuthorSelect() {
+ 	return (
+ 		<SelectControl
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			className="post-author-selector"
+ 			label={ __( 'Author' ) }
+ 			options={ authorOptions }
+diff --git a/packages/editor/src/components/post-template/classic-theme.js b/packages/editor/src/components/post-template/classic-theme.js
+index 6cef7d1582abd2..4d1dc10a1436d8 100644
+--- a/packages/editor/src/components/post-template/classic-theme.js
++++ b/packages/editor/src/components/post-template/classic-theme.js
+@@ -160,7 +160,6 @@ function PostTemplateDropdownContent( { onClose } ) {
+ 			) : (
+ 				<SelectControl
+ 					__next40pxDefaultSize
+-					__nextHasNoMarginBottom
+ 					hideLabelFromVision
+ 					label={ __( 'Template' ) }
+ 					value={ selectedOption?.value ?? '' }
+diff --git a/packages/format-library/src/language/index.js b/packages/format-library/src/language/index.js
+index 828c9b2d337589..097ba54c7a9244 100644
+--- a/packages/format-library/src/language/index.js
++++ b/packages/format-library/src/language/index.js
+@@ -108,7 +108,6 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
+ 				/>
+ 				<SelectControl
+ 					__next40pxDefaultSize
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Text direction' ) }
+ 					value={ dir }
+ 					options={ [
+diff --git a/packages/global-styles-ui/src/font-library/font-collection.tsx b/packages/global-styles-ui/src/font-library/font-collection.tsx
+index f65bc0d692b8a1..7a9c84032b3ab4 100644
+--- a/packages/global-styles-ui/src/font-library/font-collection.tsx
++++ b/packages/global-styles-ui/src/font-library/font-collection.tsx
+@@ -315,7 +315,6 @@ function FontCollection( { slug }: { slug: string } ) {
+ 									hideLabelFromVision={ false }
+ 								/>
+ 								<SelectControl
+-									__nextHasNoMarginBottom
+ 									__next40pxDefaultSize
+ 									label={ __( 'Category' ) }
+ 									value={ filters.category }
+@@ -534,7 +533,6 @@ function FontCollection( { slug }: { slug: string } ) {
+ 													)
+ 												}
+ 												size="small"
+-												__nextHasNoMarginBottom
+ 												variant="minimal"
+ 											/>
+ 										),
+diff --git a/packages/image-cropper/src/stories/index.story.tsx b/packages/image-cropper/src/stories/index.story.tsx
+index 4611e6756950ec..42852de8e21c83 100644
+--- a/packages/image-cropper/src/stories/index.story.tsx
++++ b/packages/image-cropper/src/stories/index.story.tsx
+@@ -199,7 +199,6 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
+ 						options={ aspectRatioOptions }
+ 						onChange={ handleAspectRatioChange }
+ 						__next40pxDefaultSize
+-						__nextHasNoMarginBottom
+ 					/>
+ 				</VStack>
+ 				<HStack style={ { marginBottom: '20px' } } spacing={ 2 }>
+diff --git a/packages/widgets/src/blocks/legacy-widget/edit/widget-type-selector.js b/packages/widgets/src/blocks/legacy-widget/edit/widget-type-selector.js
+index 432588f6aea85f..30c3a7eaf9db9c 100644
+--- a/packages/widgets/src/blocks/legacy-widget/edit/widget-type-selector.js
++++ b/packages/widgets/src/blocks/legacy-widget/edit/widget-type-selector.js
+@@ -28,7 +28,6 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
+ 	return (
+ 		<SelectControl
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			label={ __( 'Legacy widget' ) }
+ 			value={ selectedId ?? '' }
+ 			options={ [

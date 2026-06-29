@@ -1,0 +1,35 @@
+diff --git a/packages/components/src/truncate/index.js b/packages/components/src/truncate/index.js
+index 6196b8a39f899e..37d691e9003a2a 100644
+--- a/packages/components/src/truncate/index.js
++++ b/packages/components/src/truncate/index.js
+@@ -1,3 +1,3 @@
+-export { default as Truncate } from './truncate';
++export { default } from './truncate';
+ 
+ export * from './use-truncate';
+diff --git a/packages/components/src/truncate/stories/index.js b/packages/components/src/truncate/stories/index.js
+index f09e4eb321206b..b0a5472f4d59f2 100644
+--- a/packages/components/src/truncate/stories/index.js
++++ b/packages/components/src/truncate/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { Truncate } from '../index';
++import Truncate from '../index';
+ 
+ export default {
+ 	component: Truncate,
+diff --git a/packages/components/src/truncate/test/truncate.js b/packages/components/src/truncate/test/truncate.js
+index cec52ae2568cf7..5ceb711a6afe42 100644
+--- a/packages/components/src/truncate/test/truncate.js
++++ b/packages/components/src/truncate/test/truncate.js
+@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { Truncate } from '../index';
++import Truncate from '..';
+ 
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {

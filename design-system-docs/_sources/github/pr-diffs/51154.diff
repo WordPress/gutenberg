@@ -1,0 +1,806 @@
+diff --git a/packages/block-editor/src/components/alignment-control/ui.js b/packages/block-editor/src/components/alignment-control/ui.js
+index 4602f875273b0c..b41cb4b0d2520e 100644
+--- a/packages/block-editor/src/components/alignment-control/ui.js
++++ b/packages/block-editor/src/components/alignment-control/ui.js
+@@ -24,8 +24,7 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
+ ];
+ 
+ const POPOVER_PROPS = {
+-	position: 'bottom right',
+-	variant: 'toolbar',
++	placement: 'bottom-start',
+ };
+ 
+ function AlignmentUI( {
+diff --git a/packages/block-editor/src/components/block-alignment-control/constants.js b/packages/block-editor/src/components/block-alignment-control/constants.js
+index 2fa133740a4cfb..44505d0475d99f 100644
+--- a/packages/block-editor/src/components/block-alignment-control/constants.js
++++ b/packages/block-editor/src/components/block-alignment-control/constants.js
+@@ -39,7 +39,3 @@ export const BLOCK_ALIGNMENTS_CONTROLS = {
+ };
+ 
+ export const DEFAULT_CONTROL = 'none';
+-
+-export const POPOVER_PROPS = {
+-	variant: 'toolbar',
+-};
+diff --git a/packages/block-editor/src/components/block-alignment-control/ui.js b/packages/block-editor/src/components/block-alignment-control/ui.js
+index 597b0beca80ffc..9356e59ef465a3 100644
+--- a/packages/block-editor/src/components/block-alignment-control/ui.js
++++ b/packages/block-editor/src/components/block-alignment-control/ui.js
+@@ -18,11 +18,7 @@ import {
+  * Internal dependencies
+  */
+ import useAvailableAlignments from './use-available-alignments';
+-import {
+-	BLOCK_ALIGNMENTS_CONTROLS,
+-	DEFAULT_CONTROL,
+-	POPOVER_PROPS,
+-} from './constants';
++import { BLOCK_ALIGNMENTS_CONTROLS, DEFAULT_CONTROL } from './constants';
+ 
+ function BlockAlignmentUI( {
+ 	value,
+@@ -69,7 +65,6 @@ function BlockAlignmentUI( {
+ 		  }
+ 		: {
+ 				toggleProps: { describedBy: __( 'Change alignment' ) },
+-				popoverProps: POPOVER_PROPS,
+ 				children: ( { onClose } ) => {
+ 					return (
+ 						<>
+diff --git a/packages/block-editor/src/components/block-alignment-matrix-control/index.js b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+index 8acb125a1ad931..53baa97421e6c1 100644
+--- a/packages/block-editor/src/components/block-alignment-matrix-control/index.js
++++ b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+@@ -23,7 +23,7 @@ function BlockAlignmentMatrixControl( props ) {
+ 
+ 	return (
+ 		<Dropdown
+-			popoverProps={ { variant: 'toolbar', placement: 'bottom-start' } }
++			popoverProps={ { placement: 'bottom-start' } }
+ 			renderToggle={ ( { onToggle, isOpen } ) => {
+ 				const openOnArrowDown = ( event ) => {
+ 					if ( ! isOpen && event.keyCode === DOWN ) {
+diff --git a/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js b/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js
+index a4087ed84cee3c..2f16210822be59 100644
+--- a/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js
++++ b/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js
+@@ -35,8 +35,7 @@ import { useShowMoversGestures } from '../block-toolbar/utils';
+ 
+ const POPOVER_PROPS = {
+ 	className: 'block-editor-block-settings-menu__popover',
+-	position: 'bottom right',
+-	variant: 'toolbar',
++	placement: 'bottom-start',
+ };
+ 
+ function CopyMenuItem( { blocks, onCopy, label } ) {
+diff --git a/packages/block-editor/src/components/block-switcher/index.js b/packages/block-editor/src/components/block-switcher/index.js
+index a4c15a9e17062a..51346e14b1003e 100644
+--- a/packages/block-editor/src/components/block-switcher/index.js
++++ b/packages/block-editor/src/components/block-switcher/index.js
+@@ -196,8 +196,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
+ 						className="block-editor-block-switcher"
+ 						label={ blockSwitcherLabel }
+ 						popoverProps={ {
+-							position: 'bottom right',
+-							variant: 'toolbar',
++							placement: 'bottom-start',
+ 							className: 'block-editor-block-switcher__popover',
+ 						} }
+ 						icon={
+diff --git a/packages/block-editor/src/components/block-vertical-alignment-control/ui.js b/packages/block-editor/src/components/block-vertical-alignment-control/ui.js
+index b25e401966180b..d1cacadf0cc49c 100644
+--- a/packages/block-editor/src/components/block-vertical-alignment-control/ui.js
++++ b/packages/block-editor/src/components/block-vertical-alignment-control/ui.js
+@@ -57,9 +57,7 @@ function BlockVerticalAlignmentUI( {
+ 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
+ 
+ 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
+-	const extraProps = isToolbar
+-		? { isCollapsed }
+-		: { popoverProps: { variant: 'toolbar' } };
++	const extraProps = isToolbar ? { isCollapsed } : {};
+ 
+ 	return (
+ 		<UIComponent
+diff --git a/packages/block-editor/src/components/duotone-control/index.js b/packages/block-editor/src/components/duotone-control/index.js
+index d27e6863fe0dfd..7682e7ee157e8d 100644
+--- a/packages/block-editor/src/components/duotone-control/index.js
++++ b/packages/block-editor/src/components/duotone-control/index.js
+@@ -36,7 +36,6 @@ function DuotoneControl( {
+ 			popoverProps={ {
+ 				className: 'block-editor-duotone-control__popover',
+ 				headerTitle: __( 'Duotone' ),
+-				variant: 'toolbar',
+ 			} }
+ 			renderToggle={ ( { isOpen, onToggle } ) => {
+ 				const openOnArrowDown = ( event ) => {
+diff --git a/packages/block-editor/src/components/image-editor/constants.js b/packages/block-editor/src/components/image-editor/constants.js
+index 92b58c628f7ae1..78ba8969a4fd5b 100644
+--- a/packages/block-editor/src/components/image-editor/constants.js
++++ b/packages/block-editor/src/components/image-editor/constants.js
+@@ -2,5 +2,4 @@ export const MIN_ZOOM = 100;
+ export const MAX_ZOOM = 300;
+ export const POPOVER_PROPS = {
+ 	placement: 'bottom-start',
+-	variant: 'toolbar',
+ };
+diff --git a/packages/block-editor/src/components/media-replace-flow/index.js b/packages/block-editor/src/components/media-replace-flow/index.js
+index ec6ef82bb53f9a..9aa36b1b88c852 100644
+--- a/packages/block-editor/src/components/media-replace-flow/index.js
++++ b/packages/block-editor/src/components/media-replace-flow/index.js
+@@ -59,9 +59,7 @@ const MediaReplaceFlow = ( {
+ 	multiple = false,
+ 	addToGallery,
+ 	handleUpload = true,
+-	popoverProps = {
+-		variant: 'toolbar',
+-	},
++	popoverProps,
+ } ) => {
+ 	const mediaUpload = useSelect( ( select ) => {
+ 		return select( blockEditorStore ).getSettings().mediaUpload;
+diff --git a/packages/block-editor/src/components/preview-options/index.js b/packages/block-editor/src/components/preview-options/index.js
+index d173542e02570a..2495d7f3ab0d5f 100644
+--- a/packages/block-editor/src/components/preview-options/index.js
++++ b/packages/block-editor/src/components/preview-options/index.js
+@@ -27,7 +27,7 @@ export default function PreviewOptions( {
+ 			className,
+ 			'block-editor-post-preview__dropdown-content'
+ 		),
+-		position: 'bottom left',
++		placement: 'bottom-end',
+ 	};
+ 	const toggleProps = {
+ 		variant: 'tertiary',
+diff --git a/packages/block-editor/src/components/rich-text/format-toolbar/index.js b/packages/block-editor/src/components/rich-text/format-toolbar/index.js
+index 445cd38b4cc1de..2a8a7a753211f8 100644
+--- a/packages/block-editor/src/components/rich-text/format-toolbar/index.js
++++ b/packages/block-editor/src/components/rich-text/format-toolbar/index.js
+@@ -16,8 +16,7 @@ import { chevronDown } from '@wordpress/icons';
+ import { orderBy } from '../../../utils/sorting';
+ 
+ const POPOVER_PROPS = {
+-	position: 'bottom right',
+-	variant: 'toolbar',
++	placement: 'bottom-start',
+ };
+ 
+ const FormatToolbar = () => {
+diff --git a/packages/block-editor/src/layouts/flex.js b/packages/block-editor/src/layouts/flex.js
+index fd6f377ea591d1..fe45cda624b1bf 100644
+--- a/packages/block-editor/src/layouts/flex.js
++++ b/packages/block-editor/src/layouts/flex.js
+@@ -258,6 +258,10 @@ function FlexLayoutVerticalAlignmentControl( {
+ 	);
+ }
+ 
++const POPOVER_PROPS = {
++	placement: 'bottom-start',
++};
++
+ function FlexLayoutJustifyContentControl( {
+ 	layout,
+ 	onChange,
+@@ -282,10 +286,7 @@ function FlexLayoutJustifyContentControl( {
+ 				allowedControls={ allowedControls }
+ 				value={ justifyContent }
+ 				onChange={ onJustificationChange }
+-				popoverProps={ {
+-					position: 'bottom right',
+-					variant: 'toolbar',
+-				} }
++				popoverProps={ POPOVER_PROPS }
+ 			/>
+ 		);
+ 	}
+diff --git a/packages/block-library/src/buttons/edit.native.js b/packages/block-library/src/buttons/edit.native.js
+index 6424626e27b712..54b0e10a631b32 100644
+--- a/packages/block-library/src/buttons/edit.native.js
++++ b/packages/block-library/src/buttons/edit.native.js
+@@ -28,6 +28,10 @@ const ALLOWED_BLOCKS = [ buttonBlockName ];
+ 
+ const layoutProp = { type: 'default', alignments: [] };
+ 
++const POPOVER_PROPS = {
++	placement: 'bottom-start',
++};
++
+ export default function ButtonsEdit( {
+ 	attributes: { layout, align },
+ 	clientId,
+@@ -137,10 +141,7 @@ export default function ButtonsEdit( {
+ 								},
+ 							} )
+ 						}
+-						popoverProps={ {
+-							position: 'bottom right',
+-							variant: 'toolbar',
+-						} }
++						popoverProps={ POPOVER_PROPS }
+ 					/>
+ 				</BlockControls>
+ 			) }
+diff --git a/packages/block-library/src/navigation/edit/leaf-more-menu.js b/packages/block-library/src/navigation/edit/leaf-more-menu.js
+index 4fe45ac5def83f..2d35754779ab94 100644
+--- a/packages/block-library/src/navigation/edit/leaf-more-menu.js
++++ b/packages/block-library/src/navigation/edit/leaf-more-menu.js
+@@ -15,8 +15,7 @@ import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
+ 
+ const POPOVER_PROPS = {
+ 	className: 'block-editor-block-settings-menu__popover',
+-	position: 'bottom right',
+-	variant: 'toolbar',
++	placement: 'bottom-start',
+ };
+ 
+ const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0b0784f496efac..76f6e596658f68 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `BorderControl`: Improve color code readability in aria-label ([#51197](https://github.com/WordPress/gutenberg/pull/51197)).
++-   `Dropdown` and `DropdownMenu`: use internal context system to automatically pick the toolbar popover variant when rendered inside the `Toolbar` component ([#51154](https://github.com/WordPress/gutenberg/pull/51154)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/circular-option-picker/types.ts b/packages/components/src/circular-option-picker/types.ts
+index cd966681c55f7b..a72ad44356dcd2 100644
+--- a/packages/components/src/circular-option-picker/types.ts
++++ b/packages/components/src/circular-option-picker/types.ts
+@@ -12,7 +12,7 @@ import type { Icon } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import type { ButtonAsButtonProps } from '../button/types';
+-import type Dropdown from '../dropdown';
++import type { DropdownProps } from '../dropdown/types';
+ import type { WordPressComponentProps } from '../ui/context';
+ 
+ export type CircularOptionPickerProps = {
+@@ -44,10 +44,7 @@ export type DropdownLinkActionProps = {
+ 		'children'
+ 	>;
+ 	linkText: string;
+-	dropdownProps: Omit<
+-		React.ComponentProps< typeof Dropdown >,
+-		'className' | 'renderToggle'
+-	>;
++	dropdownProps: Omit< DropdownProps, 'className' | 'renderToggle' >;
+ 	className?: string;
+ };
+ 
+diff --git a/packages/components/src/dropdown-menu-v2/index.tsx b/packages/components/src/dropdown-menu-v2/index.tsx
+index 28d825b8934ecd..02f8322aa6a52f 100644
+--- a/packages/components/src/dropdown-menu-v2/index.tsx
++++ b/packages/components/src/dropdown-menu-v2/index.tsx
+@@ -35,7 +35,7 @@ import type {
+ 	DropdownMenuRadioItemProps,
+ 	DropdownMenuSeparatorProps,
+ 	DropdownSubMenuTriggerProps,
+-	DropdownMenuContext,
++	DropdownMenuInternalContext,
+ 	DropdownMenuPrivateContext as DropdownMenuPrivateContextType,
+ } from './types';
+ 
+@@ -70,7 +70,7 @@ const UnconnectedDropdownMenu = ( props: DropdownMenuProps ) => {
+ 		variant,
+ 	} = useContextSystem<
+ 		// Adding `className` to the context type to avoid a TS error
+-		DropdownMenuProps & DropdownMenuContext & { className?: string }
++		DropdownMenuProps & DropdownMenuInternalContext & { className?: string }
+ 	>( props, 'DropdownMenu' );
+ 
+ 	// Render the portal in the default slot used by the legacy Popover component.
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/dropdown-menu-v2/styles.ts
+index d3ed206b5f7319..eb1aec2d8a2d72 100644
+--- a/packages/components/src/dropdown-menu-v2/styles.ts
++++ b/packages/components/src/dropdown-menu-v2/styles.ts
+@@ -11,7 +11,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+ import { COLORS, font, rtl, CONFIG } from '../utils';
+ import { space } from '../ui/utils/space';
+ import Icon from '../icon';
+-import type { DropdownMenuContext } from './types';
++import type { DropdownMenuInternalContext } from './types';
+ 
+ const ANIMATION_PARAMS = {
+ 	SLIDE_AMOUNT: '2px',
+@@ -62,7 +62,9 @@ const slideLeftAndFade = keyframes( {
+ 	'100%': { opacity: 1, transform: 'translateX(0)' },
+ } );
+ 
+-const baseContent = ( variant: DropdownMenuContext[ 'variant' ] ) => css`
++const baseContent = (
++	variant: DropdownMenuInternalContext[ 'variant' ]
++) => css`
+ 	min-width: 220px;
+ 	background-color: ${ COLORS.ui.background };
+ 	border-radius: ${ CONFIG.radiusBlockUi };
+@@ -200,12 +202,12 @@ const baseItem = css`
+ `;
+ 
+ export const Content = styled( DropdownMenu.Content )<
+-	Pick< DropdownMenuContext, 'variant' >
++	Pick< DropdownMenuInternalContext, 'variant' >
+ >`
+ 	${ ( props ) => baseContent( props.variant ) }
+ `;
+ export const SubContent = styled( DropdownMenu.SubContent )<
+-	Pick< DropdownMenuContext, 'variant' >
++	Pick< DropdownMenuInternalContext, 'variant' >
+ >`
+ 	${ ( props ) => baseContent( props.variant ) }
+ `;
+@@ -246,7 +248,7 @@ export const Label = styled( DropdownMenu.Label )`
+ `;
+ 
+ export const Separator = styled( DropdownMenu.Separator )<
+-	Pick< DropdownMenuContext, 'variant' >
++	Pick< DropdownMenuInternalContext, 'variant' >
+ >`
+ 	height: ${ CONFIG.borderWidth };
+ 	/* TODO: doesn't match border color from variables */
+diff --git a/packages/components/src/dropdown-menu-v2/types.ts b/packages/components/src/dropdown-menu-v2/types.ts
+index 4ea3543167025c..5c7d6469b656c9 100644
+--- a/packages/components/src/dropdown-menu-v2/types.ts
++++ b/packages/components/src/dropdown-menu-v2/types.ts
+@@ -249,7 +249,7 @@ export type DropdownMenuGroupProps = {
+ 
+ export type DropdownMenuSeparatorProps = {};
+ 
+-export type DropdownMenuContext = {
++export type DropdownMenuInternalContext = {
+ 	/**
+ 	 * This variant can be used to change the appearance of the component in
+ 	 * specific contexts, ie. when rendered inside the `Toolbar` component.
+@@ -258,7 +258,7 @@ export type DropdownMenuContext = {
+ };
+ 
+ export type DropdownMenuPrivateContext = Pick<
+-	DropdownMenuContext,
++	DropdownMenuInternalContext,
+ 	'variant'
+ > & {
+ 	portalContainer: HTMLElement | null;
+diff --git a/packages/components/src/dropdown-menu/index.tsx b/packages/components/src/dropdown-menu/index.tsx
+index 805bcd06611798..b5b7533e52bc40 100644
+--- a/packages/components/src/dropdown-menu/index.tsx
++++ b/packages/components/src/dropdown-menu/index.tsx
+@@ -11,10 +11,15 @@ import { menu } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
++import { contextConnectWithoutRef, useContextSystem } from '../ui/context';
+ import Button from '../button';
+ import Dropdown from '../dropdown';
+ import { NavigableMenu } from '../navigable-container';
+-import type { DropdownMenuProps, DropdownOption } from './types';
++import type {
++	DropdownMenuProps,
++	DropdownOption,
++	DropdownMenuInternalContext,
++} from './types';
+ 
+ function mergeProps<
+ 	T extends { className?: string; [ key: string ]: unknown }
+@@ -38,88 +43,7 @@ function isFunction( maybeFunc: unknown ): maybeFunc is () => void {
+ 	return typeof maybeFunc === 'function';
+ }
+ 
+-/**
+- *
+- * The DropdownMenu displays a list of actions (each contained in a MenuItem,
+- * MenuItemsChoice, or MenuGroup) in a compact way. It appears in a Popover
+- * after the user has interacted with an element (a button or icon) or when
+- * they perform a specific action.
+- *
+- * Render a Dropdown Menu with a set of controls:
+- *
+- * ```jsx
+- * import { DropdownMenu } from '@wordpress/components';
+- * import {
+- * 	more,
+- * 	arrowLeft,
+- * 	arrowRight,
+- * 	arrowUp,
+- * 	arrowDown,
+- * } from '@wordpress/icons';
+- *
+- * const MyDropdownMenu = () => (
+- * 	<DropdownMenu
+- * 		icon={ more }
+- * 		label="Select a direction"
+- * 		controls={ [
+- * 			{
+- * 				title: 'Up',
+- * 				icon: arrowUp,
+- * 				onClick: () => console.log( 'up' ),
+- * 			},
+- * 			{
+- * 				title: 'Right',
+- * 				icon: arrowRight,
+- * 				onClick: () => console.log( 'right' ),
+- * 			},
+- * 			{
+- * 				title: 'Down',
+- * 				icon: arrowDown,
+- * 				onClick: () => console.log( 'down' ),
+- * 			},
+- * 			{
+- * 				title: 'Left',
+- * 				icon: arrowLeft,
+- * 				onClick: () => console.log( 'left' ),
+- * 			},
+- * 		] }
+- * 	/>
+- * );
+- * ```
+- *
+- * Alternatively, specify a `children` function which returns elements valid for
+- * use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, or `MenuGroup`.
+- *
+- * ```jsx
+- * import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+- * import { more, arrowUp, arrowDown, trash } from '@wordpress/icons';
+- *
+- * const MyDropdownMenu = () => (
+- * 	<DropdownMenu icon={ more } label="Select a direction">
+- * 		{ ( { onClose } ) => (
+- * 			<>
+- * 				<MenuGroup>
+- * 					<MenuItem icon={ arrowUp } onClick={ onClose }>
+- * 						Move Up
+- * 					</MenuItem>
+- * 					<MenuItem icon={ arrowDown } onClick={ onClose }>
+- * 						Move Down
+- * 					</MenuItem>
+- * 				</MenuGroup>
+- * 				<MenuGroup>
+- * 					<MenuItem icon={ trash } onClick={ onClose }>
+- * 						Remove
+- * 					</MenuItem>
+- * 				</MenuGroup>
+- * 			</>
+- * 		) }
+- * 	</DropdownMenu>
+- * );
+- * ```
+- *
+- */
+-
+-function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
++function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+ 	const {
+ 		children,
+ 		className,
+@@ -132,7 +56,13 @@ function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+ 		disableOpenOnArrowDown = false,
+ 		text,
+ 		noIcons,
+-	} = dropdownMenuProps;
++
++		// Context
++		variant,
++	} = useContextSystem< DropdownMenuProps & DropdownMenuInternalContext >(
++		dropdownMenuProps,
++		'DropdownMenu'
++	);
+ 
+ 	if ( ! controls?.length && ! isFunction( children ) ) {
+ 		return null;
+@@ -154,13 +84,14 @@ function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+ 	const mergedPopoverProps = mergeProps(
+ 		{
+ 			className: 'components-dropdown-menu__popover',
++			variant,
+ 		},
+ 		popoverProps
+ 	);
+ 
+ 	return (
+ 		<Dropdown
+-			className={ classnames( 'components-dropdown-menu', className ) }
++			className={ className }
+ 			popoverProps={ mergedPopoverProps }
+ 			renderToggle={ ( { isOpen, onToggle } ) => {
+ 				const openOnArrowDown = ( event: React.KeyboardEvent ) => {
+@@ -284,4 +215,89 @@ function DropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+ 	);
+ }
+ 
++/**
++ *
++ * The DropdownMenu displays a list of actions (each contained in a MenuItem,
++ * MenuItemsChoice, or MenuGroup) in a compact way. It appears in a Popover
++ * after the user has interacted with an element (a button or icon) or when
++ * they perform a specific action.
++ *
++ * Render a Dropdown Menu with a set of controls:
++ *
++ * ```jsx
++ * import { DropdownMenu } from '@wordpress/components';
++ * import {
++ * 	more,
++ * 	arrowLeft,
++ * 	arrowRight,
++ * 	arrowUp,
++ * 	arrowDown,
++ * } from '@wordpress/icons';
++ *
++ * const MyDropdownMenu = () => (
++ * 	<DropdownMenu
++ * 		icon={ more }
++ * 		label="Select a direction"
++ * 		controls={ [
++ * 			{
++ * 				title: 'Up',
++ * 				icon: arrowUp,
++ * 				onClick: () => console.log( 'up' ),
++ * 			},
++ * 			{
++ * 				title: 'Right',
++ * 				icon: arrowRight,
++ * 				onClick: () => console.log( 'right' ),
++ * 			},
++ * 			{
++ * 				title: 'Down',
++ * 				icon: arrowDown,
++ * 				onClick: () => console.log( 'down' ),
++ * 			},
++ * 			{
++ * 				title: 'Left',
++ * 				icon: arrowLeft,
++ * 				onClick: () => console.log( 'left' ),
++ * 			},
++ * 		] }
++ * 	/>
++ * );
++ * ```
++ *
++ * Alternatively, specify a `children` function which returns elements valid for
++ * use in a DropdownMenu: `MenuItem`, `MenuItemsChoice`, or `MenuGroup`.
++ *
++ * ```jsx
++ * import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
++ * import { more, arrowUp, arrowDown, trash } from '@wordpress/icons';
++ *
++ * const MyDropdownMenu = () => (
++ * 	<DropdownMenu icon={ more } label="Select a direction">
++ * 		{ ( { onClose } ) => (
++ * 			<>
++ * 				<MenuGroup>
++ * 					<MenuItem icon={ arrowUp } onClick={ onClose }>
++ * 						Move Up
++ * 					</MenuItem>
++ * 					<MenuItem icon={ arrowDown } onClick={ onClose }>
++ * 						Move Down
++ * 					</MenuItem>
++ * 				</MenuGroup>
++ * 				<MenuGroup>
++ * 					<MenuItem icon={ trash } onClick={ onClose }>
++ * 						Remove
++ * 					</MenuItem>
++ * 				</MenuGroup>
++ * 			</>
++ * 		) }
++ * 	</DropdownMenu>
++ * );
++ * ```
++ *
++ */
++export const DropdownMenu = contextConnectWithoutRef(
++	UnconnectedDropdownMenu,
++	'DropdownMenu'
++);
++
+ export default DropdownMenu;
+diff --git a/packages/components/src/dropdown-menu/stories/index.tsx b/packages/components/src/dropdown-menu/stories/index.tsx
+index 8bc652269422e8..5e210edeb71de5 100644
+--- a/packages/components/src/dropdown-menu/stories/index.tsx
++++ b/packages/components/src/dropdown-menu/stories/index.tsx
+@@ -5,7 +5,7 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
+ /**
+  * Internal dependencies
+  */
+-import DropdownMenu from '..';
++import { DropdownMenu } from '..';
+ import MenuItem from '../../menu-item';
+ import MenuGroup from '../../menu-group';
+ 
+diff --git a/packages/components/src/dropdown-menu/types.ts b/packages/components/src/dropdown-menu/types.ts
+index badfcb54d60727..1063631c65113e 100644
+--- a/packages/components/src/dropdown-menu/types.ts
++++ b/packages/components/src/dropdown-menu/types.ts
+@@ -141,3 +141,11 @@ export type DropdownMenuProps = {
+ 	 */
+ 	controls?: DropdownOption[] | DropdownOption[][];
+ };
++
++export type DropdownMenuInternalContext = {
++	/**
++	 * This variant can be used to change the appearance of the component in
++	 * specific contexts, ie. when rendered inside the `Toolbar` component.
++	 */
++	variant?: 'toolbar';
++};
+diff --git a/packages/components/src/dropdown/index.tsx b/packages/components/src/dropdown/index.tsx
+index 06499be7f9c303..2060254fa73c11 100644
+--- a/packages/components/src/dropdown/index.tsx
++++ b/packages/components/src/dropdown/index.tsx
+@@ -7,15 +7,16 @@ import type { ForwardedRef } from 'react';
+ /**
+  * WordPress dependencies
+  */
+-import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
++import { useEffect, useRef, useState } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+ import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+  */
++import { contextConnect, useContextSystem } from '../ui/context';
+ import Popover from '../popover';
+-import type { DropdownProps } from './types';
++import type { DropdownProps, DropdownInternalContext } from './types';
+ 
+ function useObservableState(
+ 	initialState: boolean,
+@@ -33,8 +34,11 @@ function useObservableState(
+ 	] as const;
+ }
+ 
+-function UnforwardedDropdown(
+-	{
++const UnconnectedDropdown = (
++	props: DropdownProps,
++	forwardedRef: ForwardedRef< any >
++) => {
++	const {
+ 		renderContent,
+ 		renderToggle,
+ 		className,
+@@ -49,9 +53,14 @@ function UnforwardedDropdown(
+ 
+ 		// Deprecated props
+ 		position,
+-	}: DropdownProps,
+-	forwardedRef: ForwardedRef< any >
+-) {
++
++		// From context system
++		variant,
++	} = useContextSystem< DropdownProps & DropdownInternalContext >(
++		props,
++		'Dropdown'
++	);
++
+ 	if ( position !== undefined ) {
+ 		deprecated( '`position` prop in wp.components.Dropdown', {
+ 			since: '6.2',
+@@ -120,7 +129,7 @@ function UnforwardedDropdown(
+ 
+ 	return (
+ 		<div
+-			className={ classnames( 'components-dropdown', className ) }
++			className={ className }
+ 			ref={ useMergeRefs( [
+ 				containerRef,
+ 				forwardedRef,
+@@ -149,6 +158,7 @@ function UnforwardedDropdown(
+ 							? fallbackPopoverAnchor
+ 							: undefined
+ 					}
++					variant={ variant }
+ 					{ ...popoverProps }
+ 					className={ classnames(
+ 						'components-dropdown__content',
+@@ -161,7 +171,7 @@ function UnforwardedDropdown(
+ 			) }
+ 		</div>
+ 	);
+-}
++};
+ 
+ /**
+  * Renders a button that opens a floating content modal when clicked.
+@@ -188,6 +198,6 @@ function UnforwardedDropdown(
+  * );
+  * ```
+  */
+-export const Dropdown = forwardRef( UnforwardedDropdown );
++export const Dropdown = contextConnect( UnconnectedDropdown, 'Dropdown' );
+ 
+ export default Dropdown;
+diff --git a/packages/components/src/dropdown/types.ts b/packages/components/src/dropdown/types.ts
+index 4842dc7d0a362a..c95953f37b1fb1 100644
+--- a/packages/components/src/dropdown/types.ts
++++ b/packages/components/src/dropdown/types.ts
+@@ -112,3 +112,11 @@ export type DropdownProps = {
+ 	 */
+ 	position?: PopoverProps[ 'position' ];
+ };
++
++export type DropdownInternalContext = {
++	/**
++	 * This variant can be used to change the appearance of the component in
++	 * specific contexts, ie. when rendered inside the `Toolbar` component.
++	 */
++	variant?: 'toolbar';
++};
+diff --git a/packages/components/src/popover/stories/index.tsx b/packages/components/src/popover/stories/index.tsx
+index 15723becf12f37..dc916af180558c 100644
+--- a/packages/components/src/popover/stories/index.tsx
++++ b/packages/components/src/popover/stories/index.tsx
+@@ -128,19 +128,6 @@ Default.args = {
+ 	),
+ };
+ 
+-export const Toolbar: ComponentStory< typeof Popover > = Template.bind( {} );
+-Toolbar.args = {
+-	children: (
+-		<div style={ { width: '280px', whiteSpace: 'normal' } }>
+-			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+-			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+-			ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+-			aliquip ex ea commodo consequat.
+-		</div>
+-	),
+-	variant: 'toolbar',
+-};
+-
+ export const Unstyled: ComponentStory< typeof Popover > = Template.bind( {} );
+ Unstyled.args = {
+ 	children: (
+diff --git a/packages/components/src/toolbar/toolbar-dropdown-menu/index.js b/packages/components/src/toolbar/toolbar-dropdown-menu/index.js
+index 5185b61b16d86f..5a99fe00a6d507 100644
+--- a/packages/components/src/toolbar/toolbar-dropdown-menu/index.js
++++ b/packages/components/src/toolbar/toolbar-dropdown-menu/index.js
+@@ -28,7 +28,6 @@ function ToolbarDropdownMenu( props, ref ) {
+ 				<DropdownMenu
+ 					{ ...props }
+ 					popoverProps={ {
+-						variant: 'toolbar',
+ 						...props.popoverProps,
+ 					} }
+ 					toggleProps={ toolbarItemProps }
+diff --git a/packages/components/src/toolbar/toolbar/index.tsx b/packages/components/src/toolbar/toolbar/index.tsx
+index 9c837a72aa0e83..275836c9385403 100644
+--- a/packages/components/src/toolbar/toolbar/index.tsx
++++ b/packages/components/src/toolbar/toolbar/index.tsx
+@@ -21,14 +21,11 @@ import {
+ 	ContextSystemProvider,
+ } from '../../ui/context';
+ 
+-// TODO:
+-// - (optional) make the legacy `DropdownMenu` read the context variable
+-// - swap the legacy `DropdownMenu` with the new version of the component
+-//   once it's stable
+ const CONTEXT_SYSTEM_VALUE = {
+ 	DropdownMenu: {
+-		// Note: the legacy `DropdownMenu` component is not yet reactive to this
+-		// context variant. See https://github.com/WordPress/gutenberg/pull/51097.
++		variant: 'toolbar',
++	},
++	Dropdown: {
+ 		variant: 'toolbar',
+ 	},
+ };
+diff --git a/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menus/leaf-more-menu.js b/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menus/leaf-more-menu.js
+index 7b7472c8e30bf2..83921df8fae0b9 100644
+--- a/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menus/leaf-more-menu.js
++++ b/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menus/leaf-more-menu.js
+@@ -10,8 +10,7 @@ import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
+ 
+ const POPOVER_PROPS = {
+ 	className: 'block-editor-block-settings-menu__popover',
+-	position: 'bottom right',
+-	variant: 'toolbar',
++	placement: 'bottom-start',
+ };
+ 
+ export default function LeafMoreMenu( props ) {

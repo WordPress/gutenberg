@@ -1,0 +1,354 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e496176e93595c..fdd27302a07cb8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Enhancements
+ 
+ -   Wrapped `ColorIndicator` in a `forwardRef` call ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
++-   `BorderControl`: Improve TypeScript support. ([#41843](https://github.com/WordPress/gutenberg/pull/41843)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 942e8b00104da3..df135fc187e8ee 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -27,8 +27,8 @@ const BorderLabel = ( props: LabelProps ) => {
+ 	);
+ };
+ 
+-const BorderControl = (
+-	props: WordPressComponentProps< BorderControlProps, 'div' >,
++const UnconnectedBorderControl = (
++	props: WordPressComponentProps< BorderControlProps, 'div', false >,
+ 	forwardedRef: React.ForwardedRef< any >
+ ) => {
+ 	const {
+@@ -109,6 +109,43 @@ const BorderControl = (
+ 	);
+ };
+ 
+-const ConnectedBorderControl = contextConnect( BorderControl, 'BorderControl' );
++/**
++ * The `BorderControl` brings together internal sub-components which allow users to
++ * set the various properties of a border. The first sub-component, a
++ * `BorderDropdown` contains options representing border color and style. The
++ * border width is controlled via a `UnitControl` and an optional `RangeControl`.
++ *
++ * Border radius is not covered by this control as it may be desired separate to
++ * color, style, and width. For example, the border radius may be absorbed under
++ * a "shape" abstraction.
++ *
++ * ```jsx
++ * import { __experimentalBorderControl as BorderControl } from '@wordpress/components';
++ * import { __ } from '@wordpress/i18n';
++ *
++ * const colors = [
++ * 	{ name: 'Blue 20', color: '#72aee6' },
++ * 	// ...
++ * ];
++ *
++ * const MyBorderControl = () => {
++ * 	const [ border, setBorder ] = useState();
++ * 	const onChange = ( newBorder ) => setBorder( newBorder );
++ *
++ * 	return (
++ * 		<BorderControl
++ * 			colors={ colors }
++ * 			label={ __( 'Border' ) }
++ * 			onChange={ onChange }
++ * 			value={ border }
++ * 		/>
++ * 	);
++ * };
++ * ```
++ */
++export const BorderControl = contextConnect(
++	UnconnectedBorderControl,
++	'BorderControl'
++);
+ 
+-export default ConnectedBorderControl;
++export default BorderControl;
+diff --git a/packages/components/src/border-control/stories/index.js b/packages/components/src/border-control/stories/index.js
+deleted file mode 100644
+index a0bc0349300789..00000000000000
+--- a/packages/components/src/border-control/stories/index.js
++++ /dev/null
+@@ -1,119 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { BorderControl } from '../';
+-import { Provider as SlotFillProvider } from '../../slot-fill';
+-import Popover from '../../popover';
+-
+-export default {
+-	title: 'Components (Experimental)/BorderControl',
+-	component: BorderControl,
+-};
+-
+-// Available border colors.
+-const colors = [
+-	{ name: 'Gray 0', color: '#f6f7f7' },
+-	{ name: 'Gray 5', color: '#dcdcde' },
+-	{ name: 'Gray 20', color: '#a7aaad' },
+-	{ name: 'Gray 70', color: '#3c434a' },
+-	{ name: 'Gray 100', color: '#101517' },
+-	{ name: 'Blue 20', color: '#72aee6' },
+-	{ name: 'Blue 40', color: '#3582c4' },
+-	{ name: 'Blue 70', color: '#0a4b78' },
+-	{ name: 'Red 40', color: '#e65054' },
+-	{ name: 'Red 70', color: '#8a2424' },
+-	{ name: 'Green 10', color: '#68de7c' },
+-	{ name: 'Green 40', color: '#00a32a' },
+-	{ name: 'Green 60', color: '#007017' },
+-	{ name: 'Yellow 10', color: '#f2d675' },
+-	{ name: 'Yellow 40', color: '#bd8600' },
+-];
+-
+-// Multiple origin colors.
+-const multipleOriginColors = [
+-	{
+-		name: 'Default',
+-		colors: [
+-			{ name: 'Gray 0', color: '#f6f7f7' },
+-			{ name: 'Gray 5', color: '#dcdcde' },
+-			{ name: 'Gray 20', color: '#a7aaad' },
+-			{ name: 'Gray 70', color: '#3c434a' },
+-			{ name: 'Gray 100', color: '#101517' },
+-		],
+-	},
+-	{
+-		name: 'Theme',
+-		colors: [
+-			{ name: 'Blue 20', color: '#72aee6' },
+-			{ name: 'Blue 40', color: '#3582c4' },
+-			{ name: 'Blue 70', color: '#0a4b78' },
+-			{ name: 'Red 40', color: '#e65054' },
+-			{ name: 'Red 70', color: '#8a2424' },
+-		],
+-	},
+-	{
+-		name: 'User',
+-		colors: [
+-			{ name: 'Green 10', color: '#68de7c' },
+-			{ name: 'Green 40', color: '#00a32a' },
+-			{ name: 'Green 60', color: '#007017' },
+-			{ name: 'Yellow 10', color: '#f2d675' },
+-			{ name: 'Yellow 40', color: '#bd8600' },
+-		],
+-	},
+-];
+-
+-const _default = ( props ) => {
+-	const [ border, setBorder ] = useState();
+-	const onChange = ( newBorder ) => setBorder( newBorder );
+-	const { __experimentalHasMultipleOrigins } = props;
+-
+-	return (
+-		<SlotFillProvider>
+-			<WrapperView>
+-				<BorderControl
+-					{ ...props }
+-					colors={
+-						__experimentalHasMultipleOrigins
+-							? multipleOriginColors
+-							: colors
+-					}
+-					label="Border"
+-					onChange={ onChange }
+-					value={ border }
+-					width={ ! props.isCompact && props.width }
+-				/>
+-			</WrapperView>
+-			<Popover.Slot />
+-		</SlotFillProvider>
+-	);
+-};
+-
+-export const Default = _default.bind( {} );
+-Default.args = {
+-	disableCustomColors: false,
+-	enableAlpha: true,
+-	enableStyle: true,
+-	isCompact: true,
+-	shouldSanitizeBorder: true,
+-	showDropdownHeader: false,
+-	width: '110px',
+-	withSlider: true,
+-	__experimentalIsRenderedInSidebar: false,
+-	__experimentalHasMultipleOrigins: false,
+-	__next36pxDefaultSize: false,
+-};
+-
+-const WrapperView = styled.div`
+-	max-width: 280px;
+-`;
+diff --git a/packages/components/src/border-control/stories/index.tsx b/packages/components/src/border-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..a4d0c95c2b241f
+--- /dev/null
++++ b/packages/components/src/border-control/stories/index.tsx
+@@ -0,0 +1,150 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++import type { ComponentProps } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { BorderControl } from '..';
++import { Provider as SlotFillProvider } from '../../slot-fill';
++import Popover from '../../popover';
++import type { Border } from '../types';
++
++const meta: ComponentMeta< typeof BorderControl > = {
++	title: 'Components (Experimental)/BorderControl',
++	component: BorderControl,
++	argTypes: {
++		onChange: {
++			action: 'onChange',
++		},
++		width: { control: { type: 'text' } },
++		value: { control: { type: null } },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++// Available border colors.
++const colors = [
++	{ name: 'Blue', color: '#72aee6' },
++	{ name: 'Red', color: '#e65054' },
++	{ name: 'Yellow', color: '#f2d675' },
++];
++
++// Multiple origin colors.
++const multipleOriginColors = [
++	{
++		name: 'Default',
++		colors: [
++			{ name: 'Gray 20', color: '#a7aaad' },
++			{ name: 'Gray 70', color: '#3c434a' },
++		],
++	},
++	{
++		name: 'Theme',
++		colors: [
++			{ name: 'Blue 20', color: '#72aee6' },
++			{ name: 'Blue 40', color: '#3582c4' },
++			{ name: 'Blue 70', color: '#0a4b78' },
++		],
++	},
++	{
++		name: 'User',
++		colors: [
++			{ name: 'Green', color: '#00a32a' },
++			{ name: 'Yellow', color: '#f2d675' },
++		],
++	},
++];
++
++const Template: ComponentStory< typeof BorderControl > = ( {
++	onChange,
++	...props
++} ) => {
++	const [ border, setBorder ] = useState< Border >();
++	const onChangeMerged: ComponentProps<
++		typeof BorderControl
++	>[ 'onChange' ] = ( newBorder ) => {
++		setBorder( newBorder );
++		onChange( newBorder );
++	};
++
++	return (
++		<SlotFillProvider>
++			<div style={ { maxWidth: '280px' } }>
++				<BorderControl
++					onChange={ onChangeMerged }
++					value={ border }
++					{ ...props }
++				/>
++			</div>
++			{ /* @ts-expect-error Ignore until Popover is converted to TS */ }
++			<Popover.Slot />
++		</SlotFillProvider>
++	);
++};
++
++export const Default = Template.bind( {} );
++Default.args = {
++	colors,
++	label: 'Border',
++};
++
++/**
++ * Render a slider beside the control.
++ */
++export const WithSlider = Template.bind( {} );
++WithSlider.args = {
++	...Default.args,
++	withSlider: true,
++};
++
++/**
++ * When rendering with a slider, the `width` prop is useful to customize the width of the number input.
++ */
++export const WithSliderCustomWidth = Template.bind( {} );
++WithSliderCustomWidth.args = {
++	...Default.args,
++	withSlider: true,
++	width: '150px',
++};
++WithSliderCustomWidth.storyName = 'With Slider (Custom Width)';
++
++/**
++ * Restrict the width of the control and prevent it from expanding to take up additional space.
++ * When `true`, the `width` prop will be ignored.
++ */
++export const IsCompact = Template.bind( {} );
++IsCompact.args = {
++	...Default.args,
++	isCompact: true,
++};
++
++/**
++ * The `colors` object can contain multiple origins.
++ */
++export const WithMultipleOrigins = Template.bind( {} );
++WithMultipleOrigins.args = {
++	...Default.args,
++	colors: multipleOriginColors,
++	__experimentalHasMultipleOrigins: true,
++};
++
++/**
++ * Allow the alpha channel to be edited on each color.
++ */
++export const WithAlphaEnabled = Template.bind( {} );
++WithAlphaEnabled.args = {
++	...Default.args,
++	enableAlpha: true,
++};

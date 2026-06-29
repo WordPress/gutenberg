@@ -1,0 +1,473 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ecb21284e5d81d..94d7dcc8f95439 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,7 +4,8 @@
+ 
+ ### Enhancements
+ 
+-- `BorderControl` now only displays the reset button in its popover when selections have already been made. [#40917](https://github.com/WordPress/gutenberg/pull/40917)
++-   `BorderControl` now only displays the reset button in its popover when selections have already been made. [#40917](https://github.com/WordPress/gutenberg/pull/40917)
++-   `BorderControl` & `BorderBoxControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40920](https://github.com/WordPress/gutenberg/pull/40920)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts b/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts
+index 38e4e49bdfe996..58c20898884090 100644
+--- a/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts
+@@ -15,16 +15,20 @@ import type { LinkedButtonProps } from '../types';
+ export function useBorderBoxControlLinkedButton(
+ 	props: WordPressComponentProps< LinkedButtonProps, 'div' >
+ ) {
+-	const { className, ...otherProps } = useContextSystem(
+-		props,
+-		'BorderBoxControlLinkedButton'
+-	);
++	const {
++		className,
++		__next36pxDefaultSize = false,
++		...otherProps
++	} = useContextSystem( props, 'BorderBoxControlLinkedButton' );
+ 
+ 	// Generate class names.
+ 	const cx = useCx();
+ 	const classes = useMemo( () => {
+-		return cx( styles.BorderBoxControlLinkedButton, className );
+-	}, [ className ] );
++		return cx(
++			styles.BorderBoxControlLinkedButton( __next36pxDefaultSize ),
++			className
++		);
++	}, [ className, cx, __next36pxDefaultSize ] );
+ 
+ 	return { ...otherProps, className: classes };
+ }
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index f1e7e26c37f0fa..add245b0d5e949 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -29,6 +29,7 @@ const BorderBoxControlSplitControls = (
+ 		value,
+ 		__experimentalHasMultipleOrigins,
+ 		__experimentalIsRenderedInSidebar,
++		__next36pxDefaultSize,
+ 		...otherProps
+ 	} = useBorderBoxControlSplitControls( props );
+ 
+@@ -40,11 +41,15 @@ const BorderBoxControlSplitControls = (
+ 		isCompact: true,
+ 		__experimentalHasMultipleOrigins,
+ 		__experimentalIsRenderedInSidebar,
++		__next36pxDefaultSize,
+ 	};
+ 
+ 	return (
+ 		<Grid { ...otherProps } ref={ forwardedRef } gap={ 4 }>
+-			<BorderBoxControlVisualizer value={ value } />
++			<BorderBoxControlVisualizer
++				value={ value }
++				__next36pxDefaultSize={ __next36pxDefaultSize }
++			/>
+ 			<BorderControl
+ 				className={ centeredClassName }
+ 				hideLabelFromVision={ true }
+diff --git a/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts b/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts
+index cebca985db3254..f1b91f3b943b92 100644
+--- a/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control-visualizer/hook.ts
+@@ -15,16 +15,21 @@ import type { VisualizerProps } from '../types';
+ export function useBorderBoxControlVisualizer(
+ 	props: WordPressComponentProps< VisualizerProps, 'div' >
+ ) {
+-	const { className, value, ...otherProps } = useContextSystem(
+-		props,
+-		'BorderBoxControlVisualizer'
+-	);
++	const {
++		className,
++		value,
++		__next36pxDefaultSize = false,
++		...otherProps
++	} = useContextSystem( props, 'BorderBoxControlVisualizer' );
+ 
+ 	// Generate class names.
+ 	const cx = useCx();
+ 	const classes = useMemo( () => {
+-		return cx( styles.BorderBoxControlVisualizer( value ), className );
+-	}, [ className, value, rtl.watch() ] );
++		return cx(
++			styles.BorderBoxControlVisualizer( value, __next36pxDefaultSize ),
++			className
++		);
++	}, [ className, value, __next36pxDefaultSize, rtl.watch() ] );
+ 
+ 	return { ...otherProps, className: classes, value };
+ }
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index 976fdf90c798b1..c51de26a1dfddb 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -56,6 +56,7 @@ const BorderBoxControl = (
+ 		toggleLinked,
+ 		__experimentalHasMultipleOrigins,
+ 		__experimentalIsRenderedInSidebar,
++		__next36pxDefaultSize = false,
+ 		...otherProps
+ 	} = useBorderBoxControl( props );
+ 
+@@ -88,6 +89,7 @@ const BorderBoxControl = (
+ 						__experimentalIsRenderedInSidebar={
+ 							__experimentalIsRenderedInSidebar
+ 						}
++						__next36pxDefaultSize={ __next36pxDefaultSize }
+ 					/>
+ 				) : (
+ 					<BorderBoxControlSplitControls
+@@ -104,11 +106,13 @@ const BorderBoxControl = (
+ 						__experimentalIsRenderedInSidebar={
+ 							__experimentalIsRenderedInSidebar
+ 						}
++						__next36pxDefaultSize={ __next36pxDefaultSize }
+ 					/>
+ 				) }
+ 				<BorderBoxControlLinkedButton
+ 					onClick={ toggleLinked }
+ 					isLinked={ isLinked }
++					__next36pxDefaultSize={ __next36pxDefaultSize }
+ 				/>
+ 			</HStack>
+ 		</View>
+diff --git a/packages/components/src/border-box-control/stories/index.js b/packages/components/src/border-box-control/stories/index.js
+index 0aaadfbcf1af59..1f6413fa50ab08 100644
+--- a/packages/components/src/border-box-control/stories/index.js
++++ b/packages/components/src/border-box-control/stories/index.js
+@@ -84,6 +84,7 @@ Default.args = {
+ 		style: 'dashed',
+ 		width: '1px',
+ 	},
++	__next36pxDefaultSize: false,
+ };
+ 
+ const WrapperView = styled.div`
+diff --git a/packages/components/src/border-box-control/styles.ts b/packages/components/src/border-box-control/styles.ts
+index bbc571f255c3e7..eb9a141505e77c 100644
+--- a/packages/components/src/border-box-control/styles.ts
++++ b/packages/components/src/border-box-control/styles.ts
+@@ -18,11 +18,15 @@ export const LinkedBorderControl = css`
+ 	flex: 1;
+ `;
+ 
+-export const BorderBoxControlLinkedButton = css`
+-	flex: 0;
+-	flex-basis: 36px;
+-	margin-top: 7px;
+-`;
++export const BorderBoxControlLinkedButton = (
++	__next36pxDefaultSize?: boolean
++) => {
++	return css`
++		flex: 0;
++		flex-basis: 36px;
++		margin-top: ${ __next36pxDefaultSize ? '6px' : '3px' };
++	`;
++};
+ 
+ const BorderBoxStyleWithFallback = ( border?: Border ) => {
+ 	const {
+@@ -39,12 +43,15 @@ const BorderBoxStyleWithFallback = ( border?: Border ) => {
+ 	return `${ color } ${ borderStyle } ${ clampedWidth }`;
+ };
+ 
+-export const BorderBoxControlVisualizer = ( borders?: Borders ) => {
++export const BorderBoxControlVisualizer = (
++	borders?: Borders,
++	__next36pxDefaultSize?: boolean
++) => {
+ 	return css`
+ 		position: absolute;
+-		top: 20px;
++		top: ${ __next36pxDefaultSize ? '18px' : '15px' };
+ 		right: 30px;
+-		bottom: 20px;
++		bottom: ${ __next36pxDefaultSize ? '18px' : '15px' };
+ 		left: 30px;
+ 		border-top: ${ BorderBoxStyleWithFallback( borders?.top ) };
+ 		border-bottom: ${ BorderBoxStyleWithFallback( borders?.bottom ) };
+diff --git a/packages/components/src/border-box-control/types.ts b/packages/components/src/border-box-control/types.ts
+index 2a87c708f506f1..aee55f97df6379 100644
+--- a/packages/components/src/border-box-control/types.ts
++++ b/packages/components/src/border-box-control/types.ts
+@@ -47,6 +47,13 @@ export type BorderBoxControlProps = ColorProps &
+ 		 * properties but for each side; `top`, `right`, `bottom`, and `left`.
+ 		 */
+ 		value: AnyBorder;
++		/**
++		 * Start opting into the larger default height that will become the
++		 * default size in a future version.
++		 *
++		 * @default false
++		 */
++		__next36pxDefaultSize?: boolean;
+ 	};
+ 
+ export type LinkedButtonProps = {
+@@ -62,6 +69,13 @@ export type LinkedButtonProps = {
+ 	 * `BorderBoxControl`.
+ 	 */
+ 	onClick: () => void;
++	/**
++	 * Start opting into the larger default height that will become the
++	 * default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next36pxDefaultSize?: boolean;
+ };
+ 
+ export type VisualizerProps = {
+@@ -71,6 +85,13 @@ export type VisualizerProps = {
+ 	 * color, style, and width.
+ 	 */
+ 	value?: Borders;
++	/**
++	 * Start opting into the larger default height that will become the
++	 * default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next36pxDefaultSize?: boolean;
+ };
+ 
+ export type SplitControlsProps = ColorProps & {
+@@ -95,4 +116,11 @@ export type SplitControlsProps = ColorProps & {
+ 	 * color, style, and width.
+ 	 */
+ 	value?: Borders;
++	/**
++	 * Start opting into the larger default height that will become the
++	 * default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next36pxDefaultSize?: boolean;
+ };
+diff --git a/packages/components/src/border-control/border-control-dropdown/hook.ts b/packages/components/src/border-control/border-control-dropdown/hook.ts
+index 789dd7870cca50..25d86521484683 100644
+--- a/packages/components/src/border-control/border-control-dropdown/hook.ts
++++ b/packages/components/src/border-control/border-control-dropdown/hook.ts
+@@ -23,6 +23,7 @@ export function useBorderControlDropdown(
+ 		contentClassName,
+ 		onChange,
+ 		previousStyleSelection,
++		__next36pxDefaultSize,
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderControlDropdown' );
+ 
+@@ -61,8 +62,10 @@ export function useBorderControlDropdown(
+ 	}, [ cx ] );
+ 
+ 	const indicatorWrapperClassName = useMemo( () => {
+-		return cx( styles.colorIndicatorWrapper( border ) );
+-	}, [ border, cx ] );
++		return cx(
++			styles.colorIndicatorWrapper( border, __next36pxDefaultSize )
++		);
++	}, [ border, cx, __next36pxDefaultSize ] );
+ 
+ 	const popoverClassName = useMemo( () => {
+ 		return cx( styles.borderControlPopover, contentClassName );
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index cf170861ea6c85..59e6743e9e5a1f 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -54,6 +54,7 @@ const BorderControl = (
+ 		withSlider,
+ 		__experimentalHasMultipleOrigins,
+ 		__experimentalIsRenderedInSidebar,
++		__next36pxDefaultSize,
+ 		...otherProps
+ 	} = useBorderControl( props );
+ 
+@@ -81,6 +82,7 @@ const BorderControl = (
+ 						__experimentalIsRenderedInSidebar={
+ 							__experimentalIsRenderedInSidebar
+ 						}
++						__next36pxDefaultSize={ __next36pxDefaultSize }
+ 					/>
+ 					<UnitControl
+ 						className={ widthControlClassName }
+diff --git a/packages/components/src/border-control/border-control/hook.ts b/packages/components/src/border-control/border-control/hook.ts
+index 10a83e8fa437a1..53c6b2959446ba 100644
+--- a/packages/components/src/border-control/border-control/hook.ts
++++ b/packages/components/src/border-control/border-control/hook.ts
+@@ -35,6 +35,7 @@ export function useBorderControl(
+ 		shouldSanitizeBorder = true,
+ 		value: border,
+ 		width,
++		__next36pxDefaultSize = false,
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderControl' );
+ 
+@@ -116,9 +117,10 @@ export function useBorderControl(
+ 		const wrapperWidth = isCompact ? '90px' : width;
+ 		const widthStyle =
+ 			!! wrapperWidth && styles.wrapperWidth( wrapperWidth );
++		const heightStyle = styles.wrapperHeight( __next36pxDefaultSize );
+ 
+-		return cx( styles.innerWrapper(), widthStyle );
+-	}, [ isCompact, width, cx ] );
++		return cx( styles.innerWrapper(), widthStyle, heightStyle );
++	}, [ isCompact, width, cx, __next36pxDefaultSize ] );
+ 
+ 	const widthControlClassName = useMemo( () => {
+ 		return cx( styles.borderWidthControl() );
+@@ -141,5 +143,6 @@ export function useBorderControl(
+ 		widthControlClassName,
+ 		widthUnit,
+ 		widthValue,
++		__next36pxDefaultSize,
+ 	};
+ }
+diff --git a/packages/components/src/border-control/stories/index.js b/packages/components/src/border-control/stories/index.js
+index 3b14f7c3d8e212..a0bc0349300789 100644
+--- a/packages/components/src/border-control/stories/index.js
++++ b/packages/components/src/border-control/stories/index.js
+@@ -111,6 +111,7 @@ Default.args = {
+ 	withSlider: true,
+ 	__experimentalIsRenderedInSidebar: false,
+ 	__experimentalHasMultipleOrigins: false,
++	__next36pxDefaultSize: false,
+ };
+ 
+ const WrapperView = styled.div`
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index af5de6f4879558..7f16dfa5d29fbe 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -14,7 +14,10 @@ import {
+ 	StyledLabel,
+ } from '../base-control/styles/base-control-styles';
+ import { BackdropUI } from '../input-control/styles/input-control-styles';
+-import { Root as UnitControlWrapper } from '../unit-control/styles/unit-control-styles';
++import {
++	Root as UnitControlWrapper,
++	UnitSelect,
++} from '../unit-control/styles/unit-control-styles';
+ 
+ import type { Border } from './types';
+ 
+@@ -46,6 +49,12 @@ export const innerWrapper = () => css`
+ 		flex: 1;
+ 		${ rtl( { marginLeft: 0 } )() }
+ 	}
++
++	&& ${ UnitSelect } {
++		/* Prevent default styles forcing heights larger than BorderControl */
++		min-height: 0;
++		${ rtl( { marginRight: 0 } )() }
++	}
+ `;
+ 
+ export const wrapperWidth = ( width: CSSProperties[ 'width' ] ) => {
+@@ -55,6 +64,16 @@ export const wrapperWidth = ( width: CSSProperties[ 'width' ] ) => {
+ 	`;
+ };
+ 
++/*
++ * When default control height is 36px the following should be removed.
++ * See: InputControl and __next36pxDefaultSize.
++ */
++export const wrapperHeight = ( __next36pxDefaultSize?: boolean ) => {
++	return css`
++		height: ${ __next36pxDefaultSize ? '36px' : '30px' };
++	`;
++};
++
+ export const borderControlDropdown = () => css`
+ 	background: #fff;
+ 	${ rtl(
+@@ -69,7 +88,12 @@ export const borderControlDropdown = () => css`
+ 	)() }
+ 
+ 	&& > button {
+-		padding: ${ space( 1 ) };
++		/*
++		 * Override button component height and padding to fit within
++		 * BorderControl
++		 */
++		height: 100%;
++		padding: ${ space( 0.75 ) };
+ 		border-radius: inherit;
+ 	}
+ `;
+@@ -86,16 +110,19 @@ export const colorIndicatorBorder = ( border?: Border ) => {
+ 	`;
+ };
+ 
+-export const colorIndicatorWrapper = ( border?: Border ) => {
++export const colorIndicatorWrapper = (
++	border?: Border,
++	__next36pxDefaultSize?: boolean
++) => {
+ 	const { style } = border || {};
+ 
+ 	return css`
+ 		border-radius: 9999px;
+ 		border: 2px solid transparent;
+ 		${ style ? colorIndicatorBorder( border ) : undefined }
+-		width: 28px;
+-		height: 28px;
+-		padding: 2px;
++		width: ${ __next36pxDefaultSize ? '28px' : '22px' };
++		height: ${ __next36pxDefaultSize ? '28px' : '22px' };
++		padding: ${ __next36pxDefaultSize ? '2px' : '1px' };
+ 
+ 		/*
+ 		 * ColorIndicator
+@@ -104,6 +131,13 @@ export const colorIndicatorWrapper = ( border?: Border ) => {
+ 		 * over the active state of the border control dropdown's toggle button.
+ 		 */
+ 		& > span {
++			${ ! __next36pxDefaultSize
++				? css`
++						/* Dimensions fit in 30px overall control height. */
++						height: 16px;
++						width: 16px;
++				  `
++				: '' }
+ 			background: linear-gradient(
+ 				-45deg,
+ 				transparent 48%,
+diff --git a/packages/components/src/border-control/types.ts b/packages/components/src/border-control/types.ts
+index 0a5971819d91fb..049c278a5e71f2 100644
+--- a/packages/components/src/border-control/types.ts
++++ b/packages/components/src/border-control/types.ts
+@@ -114,6 +114,13 @@ export type BorderControlProps = ColorProps &
+ 		 * `RangeControl` for additional control over a border's width.
+ 		 */
+ 		withSlider?: boolean;
++		/**
++		 * Start opting into the larger default height that will become the
++		 * default size in a future version.
++		 *
++		 * @default false
++		 */
++		__next36pxDefaultSize?: boolean;
+ 	};
+ 
+ export type DropdownProps = ColorProps & {
+@@ -150,6 +157,13 @@ export type DropdownProps = ColorProps & {
+ 	 * close button.
+ 	 */
+ 	showDropdownHeader?: boolean;
++	/**
++	 * Start opting into the larger default height that will become the
++	 * default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next36pxDefaultSize?: boolean;
+ };
+ 
+ export type StylePickerProps = LabelProps & {

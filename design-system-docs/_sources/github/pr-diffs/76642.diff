@@ -1,0 +1,65 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 129da635c06b8a..09b5fac4d5ed85 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -   `Dialog`: Use `--wpds-dimension-surface-width-*` design tokens for width constraints ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
+ -   `Notice`: Improve narrow layout by letting description and actions span the icon column when a title is present ([#76202](https://github.com/WordPress/gutenberg/pull/76202)).
+ -   `Notice`: Use `Text` component for `Title` and `Description` typography ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
++-   `Card`: Use `Text` component for `Title` typography ([#76642](https://github.com/WordPress/gutenberg/pull/76642)).
+ -   `Card`, `CollapsibleCard`: update padding to match legacy `Card` component ([#76368](https://github.com/WordPress/gutenberg/pull/76368)).
+ -   `CollapsibleCard`: move trigger to the header ([#76265](https://github.com/WordPress/gutenberg/pull/76265)).
+ -   `CollapsibleCard`: add animations ([#76378](https://github.com/WordPress/gutenberg/pull/76378)).
+diff --git a/packages/ui/src/card/style.module.css b/packages/ui/src/card/style.module.css
+index 61dce405820b4d..f784e98cd9375e 100644
+--- a/packages/ui/src/card/style.module.css
++++ b/packages/ui/src/card/style.module.css
+@@ -39,10 +39,6 @@
+ 
+ 	.title {
+ 		margin: 0;
+-		font-family: var(--wpds-font-family-heading);
+-		font-size: var(--wpds-font-size-lg);
+-		font-weight: var(--wpds-font-weight-medium);
+-		line-height: var(--wpds-font-line-height-sm);
+ 		color: var(--wpds-color-fg-content-neutral);
+ 	}
+ }
+diff --git a/packages/ui/src/card/title.tsx b/packages/ui/src/card/title.tsx
+index fb6d14bd1642e7..56ab55f8c50d7d 100644
+--- a/packages/ui/src/card/title.tsx
++++ b/packages/ui/src/card/title.tsx
+@@ -1,5 +1,6 @@
+-import { mergeProps, useRender } from '@base-ui/react';
+ import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import { Text } from '../text';
+ import styles from './style.module.css';
+ import type { TitleProps } from './types';
+ 
+@@ -8,15 +9,15 @@ import type { TitleProps } from './types';
+  * prop to swap in a semantic heading element when appropriate.
+  */
+ export const Title = forwardRef< HTMLDivElement, TitleProps >(
+-	function CardTitle( { render, ...props }, ref ) {
+-		const element = useRender( {
+-			defaultTagName: 'div',
+-			render,
+-			ref,
+-			// TODO: use `Text` component instead, when ready
+-			props: mergeProps< 'div' >( { className: styles.title }, props ),
+-		} );
+-
+-		return element;
++	function CardTitle( { className, render, children, ...props }, ref ) {
++		return (
++			<Text
++				variant="heading-lg"
++				render={ render ?? <div ref={ ref } { ...props } /> }
++				className={ clsx( styles.title, className ) }
++			>
++				{ children }
++			</Text>
++		);
+ 	}
+ );

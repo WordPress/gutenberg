@@ -1,0 +1,10 @@
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index f53ae9a8b929ec..cfe0a68c7c9608 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -1,4 +1,4 @@
+-# BaseControl
++# BaseControl 
+ 
+ <!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
+ 

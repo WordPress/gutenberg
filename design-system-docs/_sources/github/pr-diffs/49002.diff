@@ -1,0 +1,49 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a9d18c4ff3040f..0301bf88e1ddec 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -26,6 +26,7 @@
+ -   `DimensionControl(Experimental)`: Convert to TypeScript ([#47351](https://github.com/WordPress/gutenberg/pull/47351)).
+ -   `PaletteEdit`: Convert to TypeScript ([#47764](https://github.com/WordPress/gutenberg/pull/47764)).
+ -   `QueryControls`: Refactor away from Lodash (`.groupBy`) ([#48779](https://github.com/WordPress/gutenberg/pull/48779)).
++-   `ToolbarContext`: Convert to TypeScript ([#49002](https://github.com/WordPress/gutenberg/pull/49002)).
+ 
+ ## 23.5.0 (2023-03-01)
+ 
+diff --git a/packages/components/src/toolbar/toolbar-context/index.js b/packages/components/src/toolbar/toolbar-context/index.js
+deleted file mode 100644
+index 1eaeef2b8e243b..00000000000000
+--- a/packages/components/src/toolbar/toolbar-context/index.js
++++ /dev/null
+@@ -1,10 +0,0 @@
+-// @ts-nocheck
+-
+-/**
+- * WordPress dependencies
+- */
+-import { createContext } from '@wordpress/element';
+-
+-const ToolbarContext = createContext();
+-
+-export default ToolbarContext;
+diff --git a/packages/components/src/toolbar/toolbar-context/index.ts b/packages/components/src/toolbar/toolbar-context/index.ts
+new file mode 100644
+index 00000000000000..17674798edc31c
+--- /dev/null
++++ b/packages/components/src/toolbar/toolbar-context/index.ts
+@@ -0,0 +1,15 @@
++/**
++ * External dependencies
++ */
++import type { ToolbarStateReturn } from 'reakit/Toolbar';
++
++/**
++ * WordPress dependencies
++ */
++import { createContext } from '@wordpress/element';
++
++const ToolbarContext = createContext< ToolbarStateReturn | undefined >(
++	undefined
++);
++
++export default ToolbarContext;

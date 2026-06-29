@@ -1,0 +1,64 @@
+diff --git a/packages/components/src/button-group/stories/index.story.tsx b/packages/components/src/button-group/stories/index.story.tsx
+index 30ce197d80da61..5bf66cef4fd474 100644
+--- a/packages/components/src/button-group/stories/index.story.tsx
++++ b/packages/components/src/button-group/stories/index.story.tsx
+@@ -16,7 +16,7 @@ import Button from '../../button';
+  * This component is deprecated. Use `ToggleGroupControl` instead.
+  */
+ const meta: Meta< typeof ButtonGroup > = {
+-	title: 'Components (Deprecated)/ButtonGroup',
++	title: 'Components/Deprecated/ButtonGroup',
+ 	id: 'components-buttongroup',
+ 	component: ButtonGroup,
+ 	argTypes: {
+diff --git a/packages/components/src/composite/legacy/stories/index.story.tsx b/packages/components/src/composite/legacy/stories/index.story.tsx
+index e4fc4ae6e6d196..6f92cbcd1d2508 100644
+--- a/packages/components/src/composite/legacy/stories/index.story.tsx
++++ b/packages/components/src/composite/legacy/stories/index.story.tsx
+@@ -15,7 +15,7 @@ import {
+ import { UseCompositeStatePlaceholder, transform } from './utils';
+ 
+ const meta: Meta< typeof UseCompositeStatePlaceholder > = {
+-	title: 'Components (Deprecated)/Composite (Unstable)',
++	title: 'Components/Deprecated/Composite (Unstable)',
+ 	id: 'components-composite-unstable',
+ 	component: UseCompositeStatePlaceholder,
+ 	subcomponents: {
+diff --git a/packages/components/src/navigation/stories/index.story.tsx b/packages/components/src/navigation/stories/index.story.tsx
+index c1e55be0fae6b2..dc56e68b14e377 100644
+--- a/packages/components/src/navigation/stories/index.story.tsx
++++ b/packages/components/src/navigation/stories/index.story.tsx
+@@ -26,7 +26,7 @@ import './style.css';
+  * This component is deprecated. Consider using `Navigator` instead.
+  */
+ const meta: Meta< typeof Navigation > = {
+-	title: 'Components (Deprecated)/Navigation',
++	title: 'Components/Deprecated/Navigation',
+ 	id: 'components-navigation',
+ 	component: Navigation,
+ 	subcomponents: {
+diff --git a/packages/components/src/radio-group/stories/index.story.tsx b/packages/components/src/radio-group/stories/index.story.tsx
+index 65cac9cb8115d3..229f3e86acd68b 100644
+--- a/packages/components/src/radio-group/stories/index.story.tsx
++++ b/packages/components/src/radio-group/stories/index.story.tsx
+@@ -16,7 +16,7 @@ import { RadioGroup } from '..';
+ import { Radio } from '../radio';
+ 
+ const meta: Meta< typeof RadioGroup > = {
+-	title: 'Components (Deprecated)/RadioGroup',
++	title: 'Components/Deprecated/RadioGroup',
+ 	id: 'components-radiogroup',
+ 	component: RadioGroup,
+ 	subcomponents: { Radio },
+diff --git a/storybook/preview.jsx b/storybook/preview.jsx
+index 0af2bddd701cc7..95209709601b76 100644
+--- a/storybook/preview.jsx
++++ b/storybook/preview.jsx
+@@ -109,6 +109,7 @@ export const parameters = {
+ 					'Selection & Input',
+ 					'Typography',
+ 					'Utilities',
++					'Deprecated',
+ 				],
+ 				'Icons',
+ 				'Design System',

@@ -1,0 +1,84 @@
+diff --git a/packages/global-styles-ui/src/preview-wrapper.tsx b/packages/global-styles-ui/src/preview-wrapper.tsx
+index 60d3cee9c6a311..5f80e658aa3fd0 100644
+--- a/packages/global-styles-ui/src/preview-wrapper.tsx
++++ b/packages/global-styles-ui/src/preview-wrapper.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import clsx from 'clsx';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -98,7 +103,9 @@ function PreviewWrapper( {
+ 			</div>
+ 			{ isReady && (
+ 				<div
+-					className="global-styles-ui-preview__wrapper"
++					className={ clsx( 'global-styles-ui-preview__wrapper', {
++						'is-hoverable': withHoverView,
++					} ) }
+ 					style={ {
+ 						height: normalizedHeight * ratio,
+ 					} }
+@@ -111,7 +118,6 @@ function PreviewWrapper( {
+ 							height: normalizedHeight * ratio,
+ 							width: '100%',
+ 							background: gradientValue ?? backgroundColor,
+-							cursor: withHoverView ? 'pointer' : undefined,
+ 						} }
+ 						initial="start"
+ 						animate={
+diff --git a/packages/global-styles-ui/src/screen-revisions/style.scss b/packages/global-styles-ui/src/screen-revisions/style.scss
+index bb1b977c3676c0..f87b0db972cc32 100644
+--- a/packages/global-styles-ui/src/screen-revisions/style.scss
++++ b/packages/global-styles-ui/src/screen-revisions/style.scss
+@@ -14,7 +14,7 @@
+ 
+ .global-styles-ui-screen-revisions__revision-item {
+ 	position: relative;
+-	cursor: pointer;
++	cursor: var(--wpds-cursor-control);
+ 	display: flex;
+ 	flex-direction: column;
+ 
+diff --git a/packages/global-styles-ui/src/style.scss b/packages/global-styles-ui/src/style.scss
+index 7eb20afc957e68..3f6ef798a70b06 100644
+--- a/packages/global-styles-ui/src/style.scss
++++ b/packages/global-styles-ui/src/style.scss
+@@ -12,15 +12,20 @@
+ 	align-items: center;
+ 	justify-content: center;
+ 	line-height: 1;
+-	cursor: pointer;
++	cursor: var(--wpds-cursor-control);
+ }
+ 
+ .global-styles-ui-preview__wrapper {
+ 	max-width: 100%;
+ 	display: block;
+ 	width: 100%;
++
++	&.is-hoverable {
++		cursor: var(--wpds-cursor-control);
++	}
+ }
+ 
++
+ .global-styles-ui-typography-preview {
+ 	display: flex;
+ 	align-items: center;
+diff --git a/packages/global-styles-ui/src/variations/style.scss b/packages/global-styles-ui/src/variations/style.scss
+index ffcca831c59baa..d5e7086010737c 100644
+--- a/packages/global-styles-ui/src/variations/style.scss
++++ b/packages/global-styles-ui/src/variations/style.scss
+@@ -4,7 +4,7 @@
+ .global-styles-ui-variations_item {
+ 	box-sizing: border-box;
+ 	// To round the outline in Windows 10 high contrast mode.
+-	cursor: pointer;
++	cursor: var(--wpds-cursor-control);
+ 
+ 	.global-styles-ui-variations_item-preview {
+ 		border-radius: $radius-small;

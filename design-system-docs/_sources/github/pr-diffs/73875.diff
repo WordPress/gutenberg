@@ -1,0 +1,420 @@
+diff --git a/packages/ui/src/badge/badge.tsx b/packages/ui/src/badge/badge.tsx
+new file mode 100644
+index 00000000000000..9efdb392bd6f8f
+--- /dev/null
++++ b/packages/ui/src/badge/badge.tsx
+@@ -0,0 +1,98 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { Box } from '../box';
++import { type BoxProps } from '../box/types';
++import { type BadgeProps } from './types';
++
++/**
++ * Default render function that renders a span element with the given props.
++ *
++ * @param props The props to apply to the HTML element.
++ */
++const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'span' > ) => (
++	<span { ...props } />
++);
++
++/**
++ * Maps intent values to Box backgroundColor and color props.
++ * Uses strong emphasis styles (as emphasis prop has been removed).
++ * @param intent
++ */
++const getIntentStyles = (
++	intent: BadgeProps[ 'intent' ]
++): Partial< BoxProps > => {
++	switch ( intent ) {
++		case 'high':
++			return {
++				backgroundColor: 'error',
++				color: 'error',
++			};
++		case 'medium':
++			return {
++				backgroundColor: 'warning',
++				color: 'warning',
++			};
++		case 'low':
++			return {
++				backgroundColor: 'caution',
++				color: 'caution',
++			};
++		case 'stable':
++			return {
++				backgroundColor: 'success',
++				color: 'success',
++			};
++		case 'informational':
++			return {
++				backgroundColor: 'info',
++				color: 'info',
++			};
++		case 'draft':
++			return {
++				backgroundColor: 'neutral-weak',
++				color: 'neutral',
++			};
++		case 'none':
++		default:
++			return {
++				backgroundColor: 'neutral',
++				color: 'neutral-weak',
++			};
++	}
++};
++
++/**
++ * A badge component for displaying labels with semantic intent.
++ * Built on the Box primitive for consistent theming and accessibility.
++ */
++export const Badge = forwardRef< HTMLDivElement, BadgeProps >( function Badge(
++	{ children, intent = 'none', render = DEFAULT_RENDER, ...props },
++	ref
++) {
++	const intentStyles = getIntentStyles( intent );
++
++	return (
++		<Box
++			{ ...intentStyles }
++			padding={ { inline: 'xs', block: '2xs' } }
++			borderRadius="lg"
++			render={ render }
++			style={ {
++				fontFamily: 'var(--wpds-font-family-body)',
++				fontSize: 'var(--wpds-font-size-small)',
++				fontWeight: '400',
++				lineHeight: 'var(--wpds-font-line-height-x-small)',
++				...props.style,
++			} }
++			ref={ ref }
++		>
++			{ children }
++		</Box>
++	);
++} );
+diff --git a/packages/ui/src/badge/index.ts b/packages/ui/src/badge/index.ts
+new file mode 100644
+index 00000000000000..3fa49d563459bc
+--- /dev/null
++++ b/packages/ui/src/badge/index.ts
+@@ -0,0 +1 @@
++export { Badge } from './badge';
+diff --git a/packages/ui/src/badge/stories/choosing-intent.mdx b/packages/ui/src/badge/stories/choosing-intent.mdx
+new file mode 100644
+index 00000000000000..09b99ec0433750
+--- /dev/null
++++ b/packages/ui/src/badge/stories/choosing-intent.mdx
+@@ -0,0 +1,112 @@
++import { Meta } from '@storybook/blocks';
++import { Badge } from '../index';
++
++<Meta title="Design System/Components/Badge/Choosing intent" />
++
++# Choosing intent
++
++<div style={ { padding: '2rem', display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap', border: '1px solid #e0e0e0', borderRadius: '0.5rem' } }>
++	<Badge intent="high">high</Badge>
++	<Badge intent="medium">medium</Badge>
++	<Badge intent="low">low</Badge>
++	<Badge intent="stable">stable</Badge>
++	<Badge intent="informational">informational</Badge>
++	<Badge intent="draft">draft</Badge>
++	<Badge intent="none">none</Badge>
++</div>
++
++It can be difficult to determine which badge intent to use because the component's properties are not tied to any specific product view. Those properties should be balanced against the requirements of the view in which the badge appears, all while keeping an eye on high-level consistency (global statuses that appear across multiple views).
++
++Here is a decision tree to help identify which badge to use.
++
++## 1. Ask first: should this draw the eye?
++
++If the user scans this screen, should their attention be drawn to this badge?
++
++-   If **no** → use `none` (or even just plain text; no badge), even if the state is positive or "stable".
++-   If **yes** → pick an intent based on how important the action or awareness is.
++
++## 2. High / Medium / Low = action priority
++
++Use when there's something for the user to act on.
++
++### `high` – Critical / top priority
++
++* Needs attention as soon as possible
++* _E.g. "Payment declined", "Security issue"_
++
++<Badge intent="high">Payment declined</Badge> <Badge intent="high">Security issue</Badge>
++
++### `medium` – Important / blocks progress
++
++* Blocks a key task, should be handled soon
++* _E.g. "Approval required", "Review needed"_
++
++<Badge intent="medium">Approval required</Badge> <Badge intent="medium">Review needed</Badge>
++
++### `low` – Worth noticing / non‑urgent
++
++* Good to be aware of; action may be optional or later
++* _E.g. "Pending", "Queued", "Minor issues", "Optional setup"_
++
++<Badge intent="low">Pending</Badge> <Badge intent="low">Queued</Badge>
++
++## 3. Informational / draft = special non-final states
++
++### `informational` – Notable, no action / fix needed
++
++* Context only; no clear action
++* _E.g. "Scheduled", "Beta", "Internal only"_
++
++<Badge intent="informational">Scheduled</Badge> <Badge intent="informational">Beta</Badge>
++
++### `draft` – Not final / work in progress
++
++* _E.g. "Draft", "Unpublished", "Work in progress"_
++
++<Badge intent="draft">Draft</Badge> <Badge intent="draft">Unpublished</Badge>
++
++## 4. Stable / none = normal states
++
++### `stable` – Positive / "healthy" state
++
++* Use when confirming success or "all good" is important in that view
++* _E.g. "Healthy", "Active", "Live"_
++
++<Badge intent="stable">Healthy</Badge> <Badge intent="stable">Active</Badge>
++
++### `none` – Default for normal / background states
++
++* Especially in dense lists where too much color creates visual noise
++* _E.g. "Inactive", "Expired"_
++
++<Badge intent="none">Inactive</Badge> <Badge intent="none">Expired</Badge>
++
++## Examples
++
++### Comment status:
++
++-   "Approved" → `none`: <Badge intent="none">Approved</Badge>
++-   "Approval required" → `medium`: <Badge intent="medium">Approval required</Badge>
++
++### Page status:
++
++-   "Published" → `none`: <Badge intent="none">Published</Badge>
++-   "Pending" → `low`: <Badge intent="low">Pending</Badge>
++-   "Draft" → `draft`: <Badge intent="draft">Draft</Badge>
++-   "Scheduled" → `informational`: <Badge intent="informational">Scheduled</Badge>
++-   "Private" → `informational`: <Badge intent="informational">Private</Badge>
++
++### Plugin status:
++
++-   "Active" → `stable`: <Badge intent="stable">Active</Badge>
++-   "Inactive" → `none`: <Badge intent="none">Inactive</Badge>
++
++## 5. When in doubt…
++
++Use the least attention‑grabbing intent that still:
++
++-   Makes it clear what needs attention,
++-   Marks what isn't final, or
++-   Confirms a key success state in that context.
++
+diff --git a/packages/ui/src/badge/stories/index.story.tsx b/packages/ui/src/badge/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..3107f91225570f
+--- /dev/null
++++ b/packages/ui/src/badge/stories/index.story.tsx
+@@ -0,0 +1,134 @@
++/**
++ * External dependencies
++ */
++import type { Meta, StoryObj } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { Fragment } from '@wordpress/element';
++import '@wordpress/theme/design-tokens.css';
++
++/**
++ * Internal dependencies
++ */
++import { Badge } from '../index';
++
++const meta: Meta< typeof Badge > = {
++	title: 'Design System/Components/Badge',
++	component: Badge,
++	tags: [ 'status-experimental' ],
++};
++export default meta;
++
++type Story = StoryObj< typeof Badge >;
++
++export const Default: Story = {
++	args: {
++		children: 'Badge',
++	},
++};
++
++export const High: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		intent: 'high',
++	},
++};
++
++export const Medium: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		intent: 'medium',
++	},
++};
++
++export const Low: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		intent: 'low',
++	},
++};
++
++export const Stable: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		intent: 'stable',
++	},
++};
++
++export const Informational: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		intent: 'informational',
++	},
++};
++
++export const Draft: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		intent: 'draft',
++	},
++};
++
++export const None: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		intent: 'none',
++	},
++};
++
++export const AllIntents: Story = {
++	...Default,
++	render: ( args ) => (
++		<div
++			style={ {
++				display: 'grid',
++				gridTemplateColumns: 'max-content min-content',
++				gap: '1rem',
++				color: 'var(--wpds-color-fg-content-neutral)',
++				backgroundColor: 'var(--wpds-color-bg-surface-neutral-strong)',
++			} }
++		>
++			{ (
++				[
++					'high',
++					'medium',
++					'low',
++					'stable',
++					'informational',
++					'draft',
++					'none',
++				] as const
++			 ).map( ( intent ) => (
++				<Fragment key={ intent }>
++					<div
++						style={ {
++							paddingInlineEnd: '1rem',
++							display: 'flex',
++							alignItems: 'center',
++						} }
++					>
++						{ intent }
++					</div>
++					<div
++						style={ {
++							padding: '0.5rem 1rem',
++							display: 'flex',
++							alignItems: 'center',
++						} }
++					>
++						<Badge { ...args } intent={ intent } />
++					</div>
++				</Fragment>
++			) ) }
++		</div>
++	),
++};
+diff --git a/packages/ui/src/badge/types.ts b/packages/ui/src/badge/types.ts
+new file mode 100644
+index 00000000000000..298dd57a9a8205
+--- /dev/null
++++ b/packages/ui/src/badge/types.ts
+@@ -0,0 +1,25 @@
++/**
++ * Internal dependencies
++ */
++import { type ComponentProps } from '../utils/types';
++
++export interface BadgeProps extends ComponentProps< 'span' > {
++	/**
++	 * The text to display in the badge.
++	 */
++	children: string;
++
++	/**
++	 * The semantic intent of the badge, communicating its meaning through color.
++	 *
++	 * @default "none"
++	 */
++	intent?:
++		| 'high'
++		| 'medium'
++		| 'low'
++		| 'stable'
++		| 'informational'
++		| 'draft'
++		| 'none';
++}
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index c0dbf28a4550db..75b81cf5cbc964 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -1,2 +1,3 @@
+ export * from './box';
++export * from './badge';
+ export * from './stack';
+diff --git a/storybook/main.js b/storybook/main.js
+index 3209ed68c344ad..a7f0740c743404 100644
+--- a/storybook/main.js
++++ b/storybook/main.js
+@@ -42,6 +42,7 @@ const stories = [
+ 	'../packages/media-fields/src/**/stories/*.story.@(js|tsx|mdx)',
+ 	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
+ 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
++	'../packages/ui/src/**/stories/*.mdx',
+ ].filter( Boolean );
+ 
+ module.exports = {

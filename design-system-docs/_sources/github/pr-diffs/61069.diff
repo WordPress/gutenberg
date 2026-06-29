@@ -1,0 +1,69 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..a222494f2f3691 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `TreeGrid`: Remove "experimental" designation ([#61069](https://github.com/WordPress/gutenberg/pull/61069)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..e89425dcdc06e7 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -175,10 +175,26 @@ export {
+ } from './tools-panel';
+ export { default as Tooltip } from './tooltip';
+ export {
++	/**
++	 * @deprecated Import `TreeGrid` instead.
++	 */
+ 	default as __experimentalTreeGrid,
++	/**
++	 * @deprecated Import `TreeGridRow` instead.
++	 */
+ 	TreeGridRow as __experimentalTreeGridRow,
++	/**
++	 * @deprecated Import `TreeGridCell` instead.
++	 */
+ 	TreeGridCell as __experimentalTreeGridCell,
++	/**
++	 * @deprecated Import `TreeGridItem` instead.
++	 */
+ 	TreeGridItem as __experimentalTreeGridItem,
++	default as TreeGrid,
++	TreeGridRow,
++	TreeGridCell,
++	TreeGridItem,
+ } from './tree-grid';
+ export { default as TreeSelect } from './tree-select';
+ export { Truncate as __experimentalTruncate } from './truncate';
+diff --git a/packages/components/src/tree-grid/stories/index.story.tsx b/packages/components/src/tree-grid/stories/index.story.tsx
+index 44af154c685b2f..4a693a2ad2f076 100644
+--- a/packages/components/src/tree-grid/stories/index.story.tsx
++++ b/packages/components/src/tree-grid/stories/index.story.tsx
+@@ -16,7 +16,7 @@ import { Button } from '../../button';
+ import InputControl from '../../input-control';
+ 
+ const meta: Meta< typeof TreeGrid > = {
+-	title: 'Components (Experimental)/TreeGrid',
++	title: 'Components/TreeGrid',
+ 	component: TreeGrid,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { TreeGridRow, TreeGridCell },
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..0ded196e418dc4 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,6 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation', 'treegrid' ];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

@@ -1,0 +1,119 @@
+diff --git a/packages/components/src/checkbox-control/index.tsx b/packages/components/src/checkbox-control/index.tsx
+index 31cea61ddcac54..e4fb8d52ed32cf 100644
+--- a/packages/components/src/checkbox-control/index.tsx
++++ b/packages/components/src/checkbox-control/index.tsx
+@@ -44,7 +44,7 @@ export function CheckboxControl(
+ 	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
+ ) {
+ 	const {
+-		// @ts-expect-error - Prevent passing this to `input`.
++		// Prevent passing this to `input`.
+ 		__nextHasNoMarginBottom: _,
+ 		label,
+ 		className,
+diff --git a/packages/components/src/checkbox-control/types.ts b/packages/components/src/checkbox-control/types.ts
+index 29461471202920..6ee80c869ea5bb 100644
+--- a/packages/components/src/checkbox-control/types.ts
++++ b/packages/components/src/checkbox-control/types.ts
+@@ -9,6 +9,15 @@ import type { ReactNode } from 'react';
+ import type { BaseControlProps } from '../base-control/types';
+ 
+ export type CheckboxControlProps = Pick< BaseControlProps, 'help' > & {
++	/**
++	 * Start opting into the new margin-free styles that will become the default in a future version.
++	 *
++	 * @deprecated Default behavior since WP 7.0. Prop can be safely removed.
++	 * @ignore
++	 *
++	 * @default false
++	 */
++	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * A function that receives the checked state (boolean) as input.
+ 	 */
+diff --git a/packages/components/src/form-token-field/types.ts b/packages/components/src/form-token-field/types.ts
+index 2178867184038f..8f2fda46c987b7 100644
+--- a/packages/components/src/form-token-field/types.ts
++++ b/packages/components/src/form-token-field/types.ts
+@@ -178,6 +178,15 @@ export interface FormTokenFieldProps
+ 	 * Custom renderer for suggestions.
+ 	 */
+ 	__experimentalRenderItem?: ( args: { item: string } ) => ReactNode;
++	/**
++	 * Start opting into the new margin-free styles that will become the default in a future version.
++	 *
++	 * @deprecated Default behavior since WP 7.0. Prop can be safely removed.
++	 * @ignore
++	 *
++	 * @default false
++	 */
++	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * If true, add any incompleteTokenValue as a new token when the field loses focus.
+ 	 *
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+index 7b749582e6116c..dbd6a5bf8a3e3a 100644
+--- a/packages/components/src/text-control/index.tsx
++++ b/packages/components/src/text-control/index.tsx
+@@ -23,7 +23,7 @@ function UnforwardedTextControl(
+ 	ref: ForwardedRef< HTMLInputElement >
+ ) {
+ 	const {
+-		// @ts-expect-error - Prevent passing this to `input`.
++		// Prevent passing this to `input`.
+ 		__nextHasNoMarginBottom: _,
+ 		__next40pxDefaultSize = false,
+ 		label,
+diff --git a/packages/components/src/text-control/types.ts b/packages/components/src/text-control/types.ts
+index 7b79394781744c..25d119293d2be2 100644
+--- a/packages/components/src/text-control/types.ts
++++ b/packages/components/src/text-control/types.ts
+@@ -7,6 +7,15 @@ export type TextControlProps = Pick<
+ 	BaseControlProps,
+ 	'className' | 'hideLabelFromVision' | 'help' | 'label'
+ > & {
++	/**
++	 * Start opting into the new margin-free styles that will become the default in a future version.
++	 *
++	 * @deprecated Default behavior since WP 7.0. Prop can be safely removed.
++	 * @ignore
++	 *
++	 * @default false
++	 */
++	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * A function that receives the value of the input.
+ 	 */
+diff --git a/packages/components/src/textarea-control/index.tsx b/packages/components/src/textarea-control/index.tsx
+index e940f6b08119ca..94998be647b661 100644
+--- a/packages/components/src/textarea-control/index.tsx
++++ b/packages/components/src/textarea-control/index.tsx
+@@ -22,7 +22,7 @@ function UnforwardedTextareaControl(
+ 	ref: React.ForwardedRef< HTMLTextAreaElement >
+ ) {
+ 	const {
+-		// @ts-expect-error - Prevent passing this to `textarea`.
++		// Prevent passing this to `textarea`.
+ 		__nextHasNoMarginBottom: _,
+ 		label,
+ 		hideLabelFromVision,
+diff --git a/packages/components/src/textarea-control/types.ts b/packages/components/src/textarea-control/types.ts
+index 9a66164577cb38..3723e418036d48 100644
+--- a/packages/components/src/textarea-control/types.ts
++++ b/packages/components/src/textarea-control/types.ts
+@@ -12,6 +12,15 @@ export type TextareaControlProps = Pick<
+ 	BaseControlProps,
+ 	'hideLabelFromVision' | 'help' | 'label'
+ > & {
++	/**
++	 * Start opting into the new margin-free styles that will become the default in a future version.
++	 *
++	 * @deprecated Default behavior since WP 7.0. Prop can be safely removed.
++	 * @ignore
++	 *
++	 * @default false
++	 */
++	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * A function that receives the new value of the textarea each time it
+ 	 * changes.

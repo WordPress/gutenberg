@@ -1,0 +1,117 @@
+diff --git a/packages/components/src/card/card/README.md b/packages/components/src/card/card/README.md
+index 5a97913c884076..26cccfdddbf447 100644
+--- a/packages/components/src/card/card/README.md
++++ b/packages/components/src/card/card/README.md
+@@ -13,7 +13,7 @@ import {
+ 	CardBody,
+ 	CardFooter,
+ 	__experimentalText as Text,
+-	__experimentalHeading as Heading,
++	Heading,
+ } from '@wordpress/components';
+ 
+ function Example() {
+diff --git a/packages/components/src/card/card/component.tsx b/packages/components/src/card/card/component.tsx
+index 8fefc33bd48027..dddcd2371e819e 100644
+--- a/packages/components/src/card/card/component.tsx
++++ b/packages/components/src/card/card/component.tsx
+@@ -86,7 +86,7 @@ function UnconnectedCard(
+  *   CardBody,
+  *   CardFooter,
+  *   __experimentalText as Text,
+- *   __experimentalHeading as Heading,
++ *   Heading,
+  * } from `@wordpress/components`;
+  *
+  * function Example() {
+diff --git a/packages/components/src/heading/README.md b/packages/components/src/heading/README.md
+index a56e6e6ccd9321..303e0ac634415b 100644
+--- a/packages/components/src/heading/README.md
++++ b/packages/components/src/heading/README.md
+@@ -1,15 +1,11 @@
+ # Heading
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `Heading` renders headings and titles using the library's typography system.
+ 
+ ## Usage
+ 
+ ```jsx
+-import { __experimentalHeading as Heading } from '@wordpress/components';
++import { Heading } from '@wordpress/components';
+ 
+ function Example() {
+ 	return <Heading>Code is Poetry</Heading>;
+diff --git a/packages/components/src/heading/component.tsx b/packages/components/src/heading/component.tsx
+index a42af8b05f471d..7d29ac232fd2aa 100644
+--- a/packages/components/src/heading/component.tsx
++++ b/packages/components/src/heading/component.tsx
+@@ -25,7 +25,7 @@ function UnconnectedHeading(
+  * `Heading` renders headings and titles using the library's typography system.
+  *
+  * ```jsx
+- * import { __experimentalHeading as Heading } from "@wordpress/components";
++ * import { Heading } from "@wordpress/components";
+  *
+  * function Example() {
+  *   return <Heading>Code is Poetry</Heading>;
+diff --git a/packages/components/src/heading/stories/index.story.tsx b/packages/components/src/heading/stories/index.story.tsx
+index d82a59f08c825b..b02fc59c59e443 100644
+--- a/packages/components/src/heading/stories/index.story.tsx
++++ b/packages/components/src/heading/stories/index.story.tsx
+@@ -10,7 +10,7 @@ import { Heading } from '..';
+ 
+ const meta: Meta< typeof Heading > = {
+ 	component: Heading,
+-	title: 'Components (Experimental)/Heading',
++	title: 'Components/Heading',
+ 	argTypes: {
+ 		as: { control: { type: 'text' } },
+ 		color: { control: { type: 'color' } },
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..9d02a72083c8cf 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -91,7 +91,13 @@ export { default as CustomGradientPicker } from './custom-gradient-picker';
+ export { Grid as __experimentalGrid } from './grid';
+ export { default as Guide } from './guide';
+ export { default as GuidePage } from './guide/page';
+-export { Heading as __experimentalHeading } from './heading';
++export {
++	/**
++	 * @deprecated Import `Heading` instead.
++	 */
++	Heading as __experimentalHeading,
++	Heading,
++} from './heading';
+ export { HStack as __experimentalHStack } from './h-stack';
+ export { default as Icon } from './icon';
+ export type { IconType } from './icon';
+diff --git a/packages/components/src/spacer/README.md b/packages/components/src/spacer/README.md
+index 16160d39b61fa0..f6ada7438923a0 100644
+--- a/packages/components/src/spacer/README.md
++++ b/packages/components/src/spacer/README.md
+@@ -13,7 +13,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ ```jsx
+ import {
+ 	__experimentalSpacer as Spacer,
+-	__experimentalHeading as Heading,
++	Heading,
+ 	__experimentalView as View,
+ } from '@wordpress/components';
+ 
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..15f455b44273ba 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,6 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation', 'heading' ];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

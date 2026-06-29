@@ -1,0 +1,184 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 18a230c301d46d..2bff5497d6afcf 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -23,6 +23,7 @@
+ -   `withFocusReturn`: Refactor tests to `@testing-library/react` ([#45012](https://github.com/WordPress/gutenberg/pull/45012)).
+ -   `ToolsPanel`: updated to satisfy `react/exhaustive-deps` eslint rule ([#45028](https://github.com/WordPress/gutenberg/pull/45028))
+ -   `Tooltip`: updated to ignore `react/exhaustive-deps` eslint rule ([#45043](https://github.com/WordPress/gutenberg/pull/45043))
++-   `SlotFill`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44403](https://github.com/WordPress/gutenberg/pull/44403))
+ 
+ ## 21.2.0 (2022-10-05)
+ 
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/fill.js b/packages/components/src/slot-fill/bubbles-virtually/fill.js
+index bbbbc1f8add8eb..0353a3179bbfe9 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/fill.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/fill.js
+@@ -28,18 +28,18 @@ function useForceUpdate() {
+ }
+ 
+ export default function Fill( { name, children } ) {
+-	const slot = useSlot( name );
++	const { registerFill, unregisterFill, ...slot } = useSlot( name );
+ 	const ref = useRef( { rerender: useForceUpdate() } );
+ 
+ 	useEffect( () => {
+ 		// We register fills so we can keep track of their existance.
+ 		// Some Slot implementations need to know if there're already fills
+ 		// registered so they can choose to render themselves or not.
+-		slot.registerFill( ref );
++		registerFill( ref );
+ 		return () => {
+-			slot.unregisterFill( ref );
++			unregisterFill( ref );
+ 		};
+-	}, [ slot.registerFill, slot.unregisterFill ] );
++	}, [ registerFill, unregisterFill ] );
+ 
+ 	if ( ! slot.ref || ! slot.ref.current ) {
+ 		return null;
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot.js b/packages/components/src/slot-fill/bubbles-virtually/slot.js
+index 1333c9cf2fd936..ef7ad56cc68bac 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot.js
+@@ -19,19 +19,21 @@ function Slot(
+ 	{ name, fillProps = {}, as: Component = 'div', ...props },
+ 	forwardedRef
+ ) {
+-	const registry = useContext( SlotFillContext );
++	const { registerSlot, unregisterSlot, ...registry } =
++		useContext( SlotFillContext );
+ 	const ref = useRef();
+ 
+ 	useLayoutEffect( () => {
+-		registry.registerSlot( name, ref, fillProps );
++		registerSlot( name, ref, fillProps );
+ 		return () => {
+-			registry.unregisterSlot( name, ref );
++			unregisterSlot( name, ref );
+ 		};
+-		// We are not including fillProps in the deps because we don't want to
+-		// unregister and register the slot whenever fillProps change, which would
+-		// cause the fill to be re-mounted. We are only considering the initial value
+-		// of fillProps.
+-	}, [ registry.registerSlot, registry.unregisterSlot, name ] );
++		// Ignore reason: We don't want to unregister and register the slot whenever
++		// `fillProps` change, which would cause the fill to be re-mounted. Instead,
++		// we can just update the slot (see hook below).
++		// For more context, see https://github.com/WordPress/gutenberg/pull/44403#discussion_r994415973
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++	}, [ registerSlot, unregisterSlot, name ] );
+ 	// fillProps may be an update that interacts with the layout, so we
+ 	// useLayoutEffect.
+ 	useLayoutEffect( () => {
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/use-slot.js b/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
+index 2d07a2c36ae079..8c5a0182ea0743 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
+@@ -15,7 +15,13 @@ import { useCallback, useContext } from '@wordpress/element';
+ import SlotFillContext from './slot-fill-context';
+ 
+ export default function useSlot( name ) {
+-	const registry = useContext( SlotFillContext );
++	const {
++		updateSlot: registryUpdateSlot,
++		unregisterSlot: registryUnregisterSlot,
++		registerFill: registryRegisterFill,
++		unregisterFill: registryUnregisterFill,
++		...registry
++	} = useContext( SlotFillContext );
+ 	const slots = useSnapshot( registry.slots, { sync: true } );
+ 	// The important bit here is that this call ensures
+ 	// the hook only causes a re-render if the slot
+@@ -24,30 +30,30 @@ export default function useSlot( name ) {
+ 
+ 	const updateSlot = useCallback(
+ 		( fillProps ) => {
+-			registry.updateSlot( name, fillProps );
++			registryUpdateSlot( name, fillProps );
+ 		},
+-		[ name, registry.updateSlot ]
++		[ name, registryUpdateSlot ]
+ 	);
+ 
+ 	const unregisterSlot = useCallback(
+ 		( slotRef ) => {
+-			registry.unregisterSlot( name, slotRef );
++			registryUnregisterSlot( name, slotRef );
+ 		},
+-		[ name, registry.unregisterSlot ]
++		[ name, registryUnregisterSlot ]
+ 	);
+ 
+ 	const registerFill = useCallback(
+ 		( fillRef ) => {
+-			registry.registerFill( name, fillRef );
++			registryRegisterFill( name, fillRef );
+ 		},
+-		[ name, registry.registerFill ]
++		[ name, registryRegisterFill ]
+ 	);
+ 
+ 	const unregisterFill = useCallback(
+ 		( fillRef ) => {
+-			registry.unregisterFill( name, fillRef );
++			registryUnregisterFill( name, fillRef );
+ 		},
+-		[ name, registry.unregisterFill ]
++		[ name, registryUnregisterFill ]
+ 	);
+ 
+ 	return {
+diff --git a/packages/components/src/slot-fill/fill.js b/packages/components/src/slot-fill/fill.js
+index 77188ab8a16144..745439a275dd1e 100644
+--- a/packages/components/src/slot-fill/fill.js
++++ b/packages/components/src/slot-fill/fill.js
+@@ -20,8 +20,12 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
+ 	} );
+ 
+ 	useLayoutEffect( () => {
+-		registerFill( name, ref.current );
+-		return () => unregisterFill( name, ref.current );
++		const refValue = ref.current;
++		registerFill( name, refValue );
++		return () => unregisterFill( name, refValue );
++		// Ignore reason: the useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
++		// We'll leave them as-is until a more detailed investigation/refactor can be performed.
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ 
+ 	useLayoutEffect( () => {
+@@ -29,6 +33,9 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
+ 		if ( slot ) {
+ 			slot.forceUpdate();
+ 		}
++		// Ignore reason: the useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
++		// We'll leave them as-is until a more detailed investigation/refactor can be performed.
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ children ] );
+ 
+ 	useLayoutEffect( () => {
+@@ -39,6 +46,9 @@ function FillComponent( { name, children, registerFill, unregisterFill } ) {
+ 		unregisterFill( ref.current.name, ref.current );
+ 		ref.current.name = name;
+ 		registerFill( name, ref.current );
++		// Ignore reason: the useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
++		// We'll leave them as-is until a more detailed investigation/refactor can be performed.
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ name ] );
+ 
+ 	if ( ! slot || ! slot.node ) {
+diff --git a/packages/components/src/slot-fill/use-slot.js b/packages/components/src/slot-fill/use-slot.js
+index 96016e267a681e..99e7138e120259 100644
+--- a/packages/components/src/slot-fill/use-slot.js
++++ b/packages/components/src/slot-fill/use-slot.js
+@@ -26,6 +26,9 @@ const useSlot = ( name ) => {
+ 		} );
+ 
+ 		return unsubscribe;
++		// Ignore reason: Modifying this dep array could introduce unexpected changes in behavior,
++		// so we'll leave it as=is until the hook can be properly refactored for exhaustive-deps.
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ name ] );
+ 
+ 	return slot;

@@ -1,0 +1,190 @@
+diff --git a/packages/components/src/ui/tooltip/component.js b/packages/components/src/ui/tooltip/component.js
+index e1219df644e947..94f5ed3ea01390 100644
+--- a/packages/components/src/ui/tooltip/component.js
++++ b/packages/components/src/ui/tooltip/component.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { contextConnect, useContextSystem } from '@wp-g2/context';
+ // eslint-disable-next-line no-restricted-imports
+ import { TooltipReference, useTooltipState } from 'reakit';
+ 
+@@ -13,12 +12,13 @@ import { useMemo, cloneElement } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
++import { contextConnect, useContextSystem } from '../context';
+ import { TooltipContext } from './context';
+ import TooltipContent from './content';
+ import { TooltipShortcut } from './styles';
+ 
+ /**
+- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function Tooltip( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/tooltip/content.js b/packages/components/src/ui/tooltip/content.js
+index 82e6b5f7de3ff6..26dd1ac6bef45b 100644
+--- a/packages/components/src/ui/tooltip/content.js
++++ b/packages/components/src/ui/tooltip/content.js
+@@ -1,14 +1,14 @@
+ /**
+  * External dependencies
+  */
+-import { contextConnect, useContextSystem } from '@wp-g2/context';
+-import { cx } from '@wp-g2/styles';
++import { cx } from 'emotion';
+ // eslint-disable-next-line no-restricted-imports
+ import { Tooltip as ReakitTooltip } from 'reakit';
+ 
+ /**
+  * Internal dependencies
+  */
++import { contextConnect, useContextSystem } from '../context';
+ import { View } from '../view';
+ import { useTooltipContext } from './context';
+ import * as styles from './styles';
+@@ -17,7 +17,7 @@ const { TooltipPopoverView } = styles;
+ 
+ /**
+  *
+- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('reakit').TooltipProps, 'div'>} props
++ * @param {import('../context').ViewOwnProps<import('reakit').TooltipProps, 'div'>} props
+  * @param {import('react').Ref<any>} forwardedRef
+  */
+ function TooltipContent( props, forwardedRef ) {
+diff --git a/packages/components/src/ui/tooltip/styles.js b/packages/components/src/ui/tooltip/styles.js
+index c079be3d3d0924..868699e8bb1622 100644
+--- a/packages/components/src/ui/tooltip/styles.js
++++ b/packages/components/src/ui/tooltip/styles.js
+@@ -1,19 +1,25 @@
+ /**
+  * External dependencies
+  */
+-import { css, styled, ui } from '@wp-g2/styles';
++import { css } from 'emotion';
++import styled from '@emotion/styled';
++
+ /**
+  * Internal dependencies
+  */
+ import { Shortcut } from '../shortcut';
++import * as ZIndex from '../../utils/z-index';
++import CONFIG from '../../utils/config-values';
++import { space } from '../utils/space';
++import { COLORS } from '../../utils/colors-values';
+ 
+ export const TooltipContent = css`
+-	${ ui.zIndex( 'Tooltip', 1000002 ) };
++	z-index: ${ ZIndex.Tooltip };
+ 	box-sizing: border-box;
+ 	opacity: 0;
+ 	outline: none;
+ 	transform-origin: top center;
+-	transition: opacity ${ ui.get( 'transitionDurationFastest' ) } ease;
++	transition: opacity ${ CONFIG.transitionDurationFastest } ease;
+ 
+ 	&[data-enter] {
+ 		opacity: 1;
+@@ -24,7 +30,7 @@ export const TooltipPopoverView = styled.div`
+ 	background: rgba( 0, 0, 0, 0.8 );
+ 	border-radius: 6px;
+ 	box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.04 );
+-	color: ${ ui.color.white };
++	color: ${ COLORS.white };
+ 	padding: 4px 8px;
+ `;
+ 
+@@ -34,5 +40,5 @@ export const noOutline = css`
+ 
+ export const TooltipShortcut = styled( Shortcut )`
+ 	display: inline-block;
+-	margin-left: ${ ui.space( 1 ) };
++	margin-left: ${ space( 1 ) };
+ `;
+diff --git a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+index 75cfbffe6229f3..606f38bce4f9cd 100644
+--- a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++.emotion-2 {
+   z-index: 1000002;
+   box-sizing: border-box;
+   opacity: 0;
+@@ -10,56 +10,31 @@ exports[`props should render correctly 1`] = `
+   -ms-transform-origin: top center;
+   transform-origin: top center;
+   -webkit-transition: opacity 100ms ease;
+-  -webkit-transition: opacity var(--wp-g2-transition-duration-fastest) ease;
+   transition: opacity 100ms ease;
+-  transition: opacity var(--wp-g2-transition-duration-fastest) ease;
+ }
+ 
+-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1[data-enter] {
++.emotion-2[data-enter] {
+   opacity: 1;
+ }
+ 
+-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-  box-sizing: border-box;
+-  -moz-osx-font-smoothing: grayscale;
+-  -webkit-font-smoothing: antialiased;
+-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+-  font-family: var(--wp-g2-font-family);
+-  font-size: 13px;
+-  font-size: var(--wp-g2-font-size);
+-  font-weight: normal;
+-  font-weight: var(--wp-g2-font-weight);
+-  margin: 0;
++.emotion-0 {
+   background: rgba( 0,0,0,0.8 );
+   border-radius: 6px;
+   box-shadow: 0 0 0 1px rgba( 255,255,255,0.04 );
+-  color: #ffffff;
+-  color: var(--wp-g2-white);
++  color: #fff;
+   padding: 4px 8px;
+ }
+ 
+-@media (prefers-reduced-motion) {
+-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-    -webkit-transition: none !important;
+-    transition: none !important;
+-  }
+-}
+-
+-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+-  -webkit-transition: none !important;
+-  transition: none !important;
+-}
+-
+ <div
+-  class="emotion-1 components-tooltip-content wp-components-tooltip-content ic-1av77e4 emotion-2 emotion-3"
+-  data-g2-c16t="true"
+-  data-g2-component="TooltipContent"
++  class="emotion-2 components-tooltip-content emotion-3 emotion-4"
++  data-wp-c16t="true"
++  data-wp-component="TooltipContent"
+   id="base-tooltip"
+   role="tooltip"
+   style="pointer-events: none;"
+ >
+   <div
+-    class="ic-otytyz ic-192yz5d emotion-0"
++    class="emotion-0 emotion-1"
+   >
+     Code is Poetry
+   </div>
+diff --git a/packages/components/src/utils/z-index.js b/packages/components/src/utils/z-index.js
+index 6faeda93e84370..fd7568a421a840 100644
+--- a/packages/components/src/utils/z-index.js
++++ b/packages/components/src/utils/z-index.js
+@@ -1 +1,2 @@
+ export const Popover = 10000;
++export const Tooltip = 1000002;

@@ -1,0 +1,250 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 21d968568374b4..9eed4f0765e1fb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### New Feature
+ 
+ -   `TabPanel`: support manual tab activation ([#46004](https://github.com/WordPress/gutenberg/pull/46004)).
++-   `TabPanel`: support disabled prop for tab buttons ([#46471](https://github.com/WordPress/gutenberg/pull/46471)).
+ -   `BaseControl`: Add `useBaseControlProps` hook to help generate id-releated props ([#46170](https://github.com/WordPress/gutenberg/pull/46170)).
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/tab-panel/README.md b/packages/components/src/tab-panel/README.md
+index 860bd9604b2d86..67b00c37679eca 100644
+--- a/packages/components/src/tab-panel/README.md
++++ b/packages/components/src/tab-panel/README.md
+@@ -121,6 +121,7 @@ An array of objects containing the following properties:
+ -   `title`:`(string)` Defines the translated text for the tab.
+ -   `className`:`(string)` Optional. Defines the class to put on the tab.
+ -   `icon`:`(ReactNode)` Optional. When set, displays the icon in place of the tab title. The title is then rendered as an aria-label and tooltip.
++-   `disabled`:`(boolean)` Optional. Determines if the tab should be disabled or selectable.
+ 
+ > > **Note:** Other fields may be added to the object and accessed from the child function if desired.
+ 
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index fce688089a55c0..ff194b76a1179c 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -20,7 +20,6 @@ import type { WordPressComponentProps } from '../ui/context';
+ 
+ const TabButton = ( {
+ 	tabId,
+-	onClick,
+ 	children,
+ 	selected,
+ 	...rest
+@@ -30,7 +29,7 @@ const TabButton = ( {
+ 		tabIndex={ selected ? null : -1 }
+ 		aria-selected={ selected }
+ 		id={ tabId }
+-		onClick={ onClick }
++		__experimentalIsFocusable
+ 		{ ...rest }
+ 	>
+ 		{ children }
+@@ -106,10 +105,24 @@ export function TabPanel( {
+ 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
+ 
+ 	useEffect( () => {
+-		if ( ! selectedTab?.name && tabs.length > 0 ) {
+-			handleTabSelection( initialTabName || tabs[ 0 ].name );
++		const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
++		const initialTab = tabs.find( ( tab ) => tab.name === initialTabName );
++		if ( ! selectedTab?.name && firstEnabledTab ) {
++			handleTabSelection(
++				initialTab && ! initialTab.disabled
++					? initialTab.name
++					: firstEnabledTab.name
++			);
++		} else if ( selectedTab?.disabled && firstEnabledTab ) {
++			handleTabSelection( firstEnabledTab.name );
+ 		}
+-	}, [ tabs, selectedTab?.name, initialTabName, handleTabSelection ] );
++	}, [
++		tabs,
++		selectedTab?.name,
++		selectedTab?.disabled,
++		initialTabName,
++		handleTabSelection,
++	] );
+ 
+ 	return (
+ 		<div className={ className }>
+@@ -135,6 +148,7 @@ export function TabPanel( {
+ 						selected={ tab.name === selected }
+ 						key={ tab.name }
+ 						onClick={ () => handleTabSelection( tab.name ) }
++						disabled={ tab.disabled }
+ 						label={ tab.icon && tab.title }
+ 						icon={ tab.icon }
+ 						showTooltip={ !! tab.icon }
+diff --git a/packages/components/src/tab-panel/stories/index.tsx b/packages/components/src/tab-panel/stories/index.tsx
+index 0088f79d7b5d65..7846fe0bdbff29 100644
+--- a/packages/components/src/tab-panel/stories/index.tsx
++++ b/packages/components/src/tab-panel/stories/index.tsx
+@@ -35,3 +35,23 @@ Default.args = {
+ 		},
+ 	],
+ };
++
++export const DisabledTab = Template.bind( {} );
++DisabledTab.args = {
++	children: ( tab ) => <p>Selected tab: { tab.title }</p>,
++	tabs: [
++		{
++			name: 'tab1',
++			title: 'Tab 1',
++			disabled: true,
++		},
++		{
++			name: 'tab2',
++			title: 'Tab 2',
++		},
++		{
++			name: 'tab3',
++			title: 'Tab 3',
++		},
++	],
++};
+diff --git a/packages/components/src/tab-panel/test/index.tsx b/packages/components/src/tab-panel/test/index.tsx
+index 0d3a30e991ea3f..a9e399de9d8a99 100644
+--- a/packages/components/src/tab-panel/test/index.tsx
++++ b/packages/components/src/tab-panel/test/index.tsx
+@@ -160,6 +160,95 @@ describe( 'TabPanel', () => {
+ 		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+ 	} );
+ 
++	it( 'should disable the tab when `disabled` is true', async () => {
++		const user = setupUser();
++		const mockOnSelect = jest.fn();
++
++		render(
++			<TabPanel
++				tabs={ [
++					...TABS,
++					{
++						name: 'delta',
++						title: 'Delta',
++						className: 'delta-class',
++						disabled: true,
++					},
++				] }
++				children={ () => undefined }
++				onSelect={ mockOnSelect }
++			/>
++		);
++
++		expect( screen.getByRole( 'tab', { name: 'Delta' } ) ).toHaveAttribute(
++			'aria-disabled',
++			'true'
++		);
++
++		// onSelect gets called on the initial render.
++		expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++
++		// onSelect should not be called since the disabled tab is highlighted, but not selected.
++		await user.keyboard( '[ArrowLeft]' );
++		expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++	} );
++
++	it( 'should select the first enabled tab when the inital tab is disabled', () => {
++		const mockOnSelect = jest.fn();
++
++		render(
++			<TabPanel
++				tabs={ [
++					{
++						name: 'alpha',
++						title: 'Alpha',
++						className: 'alpha-class',
++						disabled: true,
++					},
++					{
++						name: 'beta',
++						title: 'Beta',
++						className: 'beta-class',
++					},
++				] }
++				initialTabName="alpha"
++				children={ () => undefined }
++				onSelect={ mockOnSelect }
++			/>
++		);
++
++		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++	} );
++
++	it( 'should select the first enabled tab when the currently selected becomes disabled', () => {
++		const mockOnSelect = jest.fn();
++
++		const { rerender } = render(
++			<TabPanel
++				tabs={ TABS }
++				children={ () => undefined }
++				onSelect={ mockOnSelect }
++			/>
++		);
++
++		expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++
++		rerender(
++			<TabPanel
++				tabs={ TABS.map( ( tab ) => {
++					if ( tab.name === 'alpha' ) {
++						return { ...tab, disabled: true };
++					}
++					return tab;
++				} ) }
++				children={ () => undefined }
++				onSelect={ mockOnSelect }
++			/>
++		);
++
++		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++	} );
++
+ 	describe( 'fallbacks when new tab list invalidates current selection', () => {
+ 		it( 'should select `initialTabName` if defined', async () => {
+ 			const user = setupUser();
+diff --git a/packages/components/src/tab-panel/types.ts b/packages/components/src/tab-panel/types.ts
+index 8cadd604563482..7528ca99d05d25 100644
+--- a/packages/components/src/tab-panel/types.ts
++++ b/packages/components/src/tab-panel/types.ts
+@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
+  */
+ import type { IconType } from '../icon';
+ 
+-type Tab = {
++type Tab< IconProps = unknown > = {
+ 	/**
+ 	 * The key of the tab.
+ 	 */
+@@ -21,18 +21,24 @@ type Tab = {
+ 	 * The class name to apply to the tab button.
+ 	 */
+ 	className?: string;
++	/**
++	 * The icon used for the tab button.
++	 */
++	icon?: IconType< IconProps >;
++	/**
++	 * Determines if the tab button should be disabled.
++	 */
++	disabled?: boolean;
+ } & Record< any, any >;
+ 
+ export type TabButtonProps< IconProps = unknown > = {
+ 	children: ReactNode;
+-	className?: string;
+-	icon?: IconType< IconProps >;
+ 	label?: string;
+ 	onClick: ( event: MouseEvent ) => void;
+ 	selected: boolean;
+ 	showTooltip?: boolean;
+ 	tabId: string;
+-};
++} & Pick< Tab< IconProps >, 'className' | 'icon' | 'disabled' >;
+ 
+ export type TabPanelProps = {
+ 	/**

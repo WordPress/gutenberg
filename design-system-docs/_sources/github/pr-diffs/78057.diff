@@ -1,0 +1,122 @@
+diff --git a/package-lock.json b/package-lock.json
+index 844623c1ed4c9e..bccd93a0e5af32 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -29242,9 +29242,10 @@
+ 			}
+ 		},
+ 		"node_modules/date-fns": {
+-			"version": "3.6.0",
+-			"resolved": "https://registry.npmjs.org/date-fns/-/date-fns-3.6.0.tgz",
+-			"integrity": "sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==",
++			"version": "4.1.0",
++			"resolved": "https://registry.npmjs.org/date-fns/-/date-fns-4.1.0.tgz",
++			"integrity": "sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==",
++			"license": "MIT",
+ 			"funding": {
+ 				"type": "github",
+ 				"url": "https://github.com/sponsors/kossnocorp"
+@@ -47162,15 +47163,6 @@
+ 				"react": ">=16.8.0"
+ 			}
+ 		},
+-		"node_modules/react-day-picker/node_modules/date-fns": {
+-			"version": "4.1.0",
+-			"resolved": "https://registry.npmjs.org/date-fns/-/date-fns-4.1.0.tgz",
+-			"integrity": "sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==",
+-			"funding": {
+-				"type": "github",
+-				"url": "https://github.com/sponsors/kossnocorp"
+-			}
+-		},
+ 		"node_modules/react-devtools-core": {
+ 			"version": "4.28.5",
+ 			"resolved": "https://registry.npmjs.org/react-devtools-core/-/react-devtools-core-4.28.5.tgz",
+@@ -58259,7 +58251,7 @@
+ 				"clsx": "^2.1.1",
+ 				"colord": "^2.7.0",
+ 				"csstype": "^3.2.3",
+-				"date-fns": "^3.6.0",
++				"date-fns": "^4.1.0",
+ 				"deepmerge": "^4.3.0",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"framer-motion": "^11.15.0",
+@@ -59423,16 +59415,6 @@
+ 				"react-dom": "^18.0.0"
+ 			}
+ 		},
+-		"packages/dataviews/node_modules/date-fns": {
+-			"version": "4.1.0",
+-			"resolved": "https://registry.npmjs.org/date-fns/-/date-fns-4.1.0.tgz",
+-			"integrity": "sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==",
+-			"license": "MIT",
+-			"funding": {
+-				"type": "github",
+-				"url": "https://github.com/sponsors/kossnocorp"
+-			}
+-		},
+ 		"packages/dataviews/node_modules/storybook/node_modules/esbuild": {
+ 			"version": "0.25.12",
+ 			"resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.25.12.tgz",
+@@ -59876,7 +59858,7 @@
+ 				"client-zip": "^2.4.5",
+ 				"clsx": "^2.1.1",
+ 				"colord": "^2.7.0",
+-				"date-fns": "^3.6.0",
++				"date-fns": "^4.1.0",
+ 				"diff": "^4.0.2",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"memize": "^2.1.0",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 895d32a5b3172b..9bf19033b9606b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ ### Internal
+ 
++-   Update `date-fns` dependency to `v4.1.0` ([#78057](https://github.com/WordPress/gutenberg/pull/78057)).
+ -   Update code to comply with `eslint-plugin-react-hooks` v7 ([#69962](https://github.com/WordPress/gutenberg/pull/69962)).
+ -   `SlotFill`: Add dependencies to `updateFill` effect ([#77907](https://github.com/WordPress/gutenberg/pull/77907)).
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index dfba4cae50a80c..feb83a08084117 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -86,7 +86,7 @@
+ 		"clsx": "^2.1.1",
+ 		"colord": "^2.7.0",
+ 		"csstype": "^3.2.3",
+-		"date-fns": "^3.6.0",
++		"date-fns": "^4.1.0",
+ 		"deepmerge": "^4.3.0",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"framer-motion": "^11.15.0",
+diff --git a/packages/editor/CHANGELOG.md b/packages/editor/CHANGELOG.md
+index 9b597332bcd53d..7ae528ecc4915b 100644
+--- a/packages/editor/CHANGELOG.md
++++ b/packages/editor/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Update `date-fns` dependency to `v4.1.0` ([#78057](https://github.com/WordPress/gutenberg/pull/78057)).
++
+ ## 14.45.0 (2026-04-29)
+ 
+ ## 14.44.0 (2026-04-15)
+diff --git a/packages/editor/package.json b/packages/editor/package.json
+index 92fa821e686df9..a1a2bdba2f21f0 100644
+--- a/packages/editor/package.json
++++ b/packages/editor/package.json
+@@ -108,7 +108,7 @@
+ 		"client-zip": "^2.4.5",
+ 		"clsx": "^2.1.1",
+ 		"colord": "^2.7.0",
+-		"date-fns": "^3.6.0",
++		"date-fns": "^4.1.0",
+ 		"diff": "^4.0.2",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"memize": "^2.1.0",

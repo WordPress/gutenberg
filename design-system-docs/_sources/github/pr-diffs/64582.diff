@@ -1,0 +1,365 @@
+diff --git a/packages/block-library/src/latest-posts/edit.js b/packages/block-library/src/latest-posts/edit.js
+index 533e9621fd4f2b..b02747bb1c1d8e 100644
+--- a/packages/block-library/src/latest-posts/edit.js
++++ b/packages/block-library/src/latest-posts/edit.js
+@@ -242,6 +242,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
+ 				/>
+ 				{ displayPostContent && (
+ 					<RadioControl
++						className="wp-block-latest-posts__post-content-radio"
+ 						label={ __( 'Show:' ) }
+ 						selected={ displayPostContentRadio }
+ 						options={ [
+diff --git a/packages/block-library/src/latest-posts/editor.scss b/packages/block-library/src/latest-posts/editor.scss
+index fe901480974461..aaab74cc0ef2d6 100644
+--- a/packages/block-library/src/latest-posts/editor.scss
++++ b/packages/block-library/src/latest-posts/editor.scss
+@@ -18,3 +18,14 @@
+ 		padding-left: 0;
+ 	}
+ }
++
++// Apply the same styles that would be applied to
++// ".block-editor-block-inspector .components-base-control"
++// (see packages/block-editor/src/components/block-inspector/style.scss)
++.wp-block-latest-posts__post-content-radio {
++	margin-bottom: #{ $grid-unit-30 };
++
++	&:last-child {
++		margin-bottom: $grid-unit-10;
++	}
++}
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index da44a5837bb816..4b1095db90327d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -61,6 +61,7 @@
+ 
+ -   `RangeControl`: disable reset button when the current value is equal to the reset value ([#64579](https://github.com/WordPress/gutenberg/pull/64579)).
+ -   `RangeControl`: tweak mark and label absolute positioning ([#64487](https://github.com/WordPress/gutenberg/pull/64487)).
++-   `RadioGroup`: use fieldset and legend to group radio inputs ([#64582](https://github.com/WordPress/gutenberg/pull/64582)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/radio-control/index.tsx b/packages/components/src/radio-control/index.tsx
+index c574e5af539def..29927558c58cd4 100644
+--- a/packages/components/src/radio-control/index.tsx
++++ b/packages/components/src/radio-control/index.tsx
+@@ -16,8 +16,8 @@ import BaseControl from '../base-control';
+ import type { WordPressComponentProps } from '../context';
+ import type { RadioControlProps } from './types';
+ import { VStack } from '../v-stack';
+-import { useBaseControlProps } from '../base-control/hooks';
+ import { StyledHelp } from '../base-control/styles/base-control-styles';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ function generateOptionDescriptionId( radioGroupId: string, index: number ) {
+ 	return `${ radioGroupId }-${ index }-option-description`;
+@@ -27,6 +27,10 @@ function generateOptionId( radioGroupId: string, index: number ) {
+ 	return `${ radioGroupId }-${ index }`;
+ }
+ 
++function generateHelpId( radioGroupId: string ) {
++	return `${ radioGroupId }__help`;
++}
++
+ /**
+  * Render a user interface to select the user type using radio inputs.
+  *
+@@ -75,24 +79,24 @@ export function RadioControl(
+ 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
+ 		onChange( event.target.value );
+ 
+-	// Use `useBaseControlProps` to get the id of the help text.
+-	const {
+-		controlProps: { 'aria-describedby': helpTextId },
+-	} = useBaseControlProps( { id, help } );
+-
+ 	if ( ! options?.length ) {
+ 		return null;
+ 	}
+ 
+ 	return (
+-		<BaseControl
+-			__nextHasNoMarginBottom
+-			label={ label }
++		<fieldset
+ 			id={ id }
+-			hideLabelFromVision={ hideLabelFromVision }
+-			help={ help }
+ 			className={ clsx( className, 'components-radio-control' ) }
++			aria-describedby={ !! help ? generateHelpId( id ) : undefined }
+ 		>
++			{ hideLabelFromVision ? (
++				<VisuallyHidden as="legend">{ label }</VisuallyHidden>
++			) : (
++				<BaseControl.VisualLabel as="legend">
++					{ label }
++				</BaseControl.VisualLabel>
++			) }
++
+ 			<VStack
+ 				spacing={ 3 }
+ 				className={ clsx( 'components-radio-control__group-wrapper', {
+@@ -113,14 +117,9 @@ export function RadioControl(
+ 							onChange={ onChangeValue }
+ 							checked={ option.value === selected }
+ 							aria-describedby={
+-								clsx( [
+-									!! option.description &&
+-										generateOptionDescriptionId(
+-											id,
+-											index
+-										),
+-									helpTextId,
+-								] ) || undefined
++								!! option.description
++									? generateOptionDescriptionId( id, index )
++									: undefined
+ 							}
+ 							{ ...additionalProps }
+ 						/>
+@@ -142,7 +141,16 @@ export function RadioControl(
+ 					</div>
+ 				) ) }
+ 			</VStack>
+-		</BaseControl>
++			{ !! help && (
++				<StyledHelp
++					__nextHasNoMarginBottom
++					id={ generateHelpId( id ) }
++					className="components-base-control__help"
++				>
++					{ help }
++				</StyledHelp>
++			) }
++		</fieldset>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/radio-control/style.scss b/packages/components/src/radio-control/style.scss
+index e9732558f2901e..e3dcb8d1e58270 100644
+--- a/packages/components/src/radio-control/style.scss
++++ b/packages/components/src/radio-control/style.scss
+@@ -1,3 +1,12 @@
++.components-radio-control {
++	border: 0;
++	margin: 0;
++	padding: 0;
++
++	font-family: $default-font;
++	font-size: $default-font-size;
++}
++
+ .components-radio-control__group-wrapper.has-help {
+ 	margin-block-end: $grid-unit-15;
+ }
+@@ -57,5 +66,7 @@
+ 
+ 	// Override the top margin of the StyledHelp component from BaseControl.
+ 	// TODO: we should tweak the StyledHelp component to not have a top margin.
+-	margin-top: 0;
++	&.components-radio-control__option-description {
++		margin-top: 0;
++	}
+ }
+diff --git a/packages/components/src/radio-control/test/index.tsx b/packages/components/src/radio-control/test/index.tsx
+index 0be166513a9a4d..7e30744d96b826 100644
+--- a/packages/components/src/radio-control/test/index.tsx
++++ b/packages/components/src/radio-control/test/index.tsx
+@@ -56,6 +56,47 @@ describe.each( [
+ 	const [ , Component ] = modeAndComponent;
+ 
+ 	describe( 'semantics and labelling', () => {
++		it( 'should group all radios under a fieldset with an accessible label (legend)', () => {
++			const onChangeSpy = jest.fn();
++			render(
++				<Component { ...defaultProps } onChange={ onChangeSpy } />
++			);
++
++			expect(
++				screen.getByRole( 'group', { name: defaultProps.label } )
++			).toBeVisible();
++		} );
++
++		it( 'should group all radios under a fieldset with an accessible label even when the label is visually hidden', () => {
++			const onChangeSpy = jest.fn();
++			render(
++				<Component
++					{ ...defaultProps }
++					hideLabelFromVision
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			expect(
++				screen.getByRole( 'group', { name: defaultProps.label } )
++			).toBeVisible();
++		} );
++
++		it( 'should describe the radio group with the help text', () => {
++			const onChangeSpy = jest.fn();
++			render(
++				<Component
++					{ ...defaultProps }
++					help="Test help text"
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			expect(
++				screen.getByRole( 'group', { name: defaultProps.label } )
++			).toHaveAccessibleDescription( 'Test help text' );
++		} );
++
+ 		it( 'should render radio inputs with accessible labels', () => {
+ 			const onChangeSpy = jest.fn();
+ 			render(
+@@ -101,46 +142,7 @@ describe.each( [
+ 			).toHaveAccessibleName( defaultProps.options[ 1 ].label );
+ 		} );
+ 
+-		it( 'should use the group help text to describe individual options', () => {
+-			const onChangeSpy = jest.fn();
+-			render(
+-				<Component
+-					{ ...defaultProps }
+-					onChange={ onChangeSpy }
+-					selected={ defaultProps.options[ 1 ].value }
+-					help="Select your favorite animal."
+-				/>
+-			);
+-
+-			for ( const option of defaultProps.options ) {
+-				expect(
+-					screen.getByRole( 'radio', { name: option.label } )
+-				).toHaveAccessibleDescription( 'Select your favorite animal.' );
+-			}
+-		} );
+-
+ 		it( 'should use the option description text to describe individual options', () => {
+-			const onChangeSpy = jest.fn();
+-			render(
+-				<Component
+-					{ ...defaultPropsWithDescriptions }
+-					onChange={ onChangeSpy }
+-					selected={ defaultProps.options[ 1 ].value }
+-				/>
+-			);
+-
+-			let index = 1;
+-			for ( const option of defaultProps.options ) {
+-				expect(
+-					screen.getByRole( 'radio', { name: option.label } )
+-				).toHaveAccessibleDescription(
+-					`This is the option number ${ index }.`
+-				);
+-				index += 1;
+-			}
+-		} );
+-
+-		it( 'should use both the option description text and the group help text to describe individual options', () => {
+ 			const onChangeSpy = jest.fn();
+ 			render(
+ 				<Component
+@@ -151,12 +153,13 @@ describe.each( [
+ 				/>
+ 			);
+ 
++			// Group help text should not be used to describe individual options.
+ 			let index = 1;
+ 			for ( const option of defaultProps.options ) {
+ 				expect(
+ 					screen.getByRole( 'radio', { name: option.label } )
+ 				).toHaveAccessibleDescription(
+-					`This is the option number ${ index }. Select your favorite animal`
++					`This is the option number ${ index }.`
+ 				);
+ 				index += 1;
+ 			}
+diff --git a/packages/editor/src/components/post-discussion/style.scss b/packages/editor/src/components/post-discussion/style.scss
+index b2d65c9aa7cf3f..d5320605579e41 100644
+--- a/packages/editor/src/components/post-discussion/style.scss
++++ b/packages/editor/src/components/post-discussion/style.scss
+@@ -2,15 +2,6 @@
+ 	// sidebar width - popover padding - form margin
+ 	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
+ 	margin: $grid-unit-10;
+-
+-	.components-radio-control__option {
+-		align-items: flex-start;
+-	}
+-
+-	.components-radio-control__label .components-text {
+-		display: block;
+-		margin-top: $grid-unit-05;
+-	}
+ }
+ .editor-post-discussion__panel-toggle {
+ 
+diff --git a/packages/editor/src/components/post-format/style.scss b/packages/editor/src/components/post-format/style.scss
+index ec3a8b1626b543..9c893f36bcc16c 100644
+--- a/packages/editor/src/components/post-format/style.scss
++++ b/packages/editor/src/components/post-format/style.scss
+@@ -7,9 +7,3 @@
+ 	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
+ 	margin: $grid-unit-10;
+ }
+-
+-.editor-post-format__options {
+-	.components-base-control__field > .components-v-stack {
+-		gap: $grid-unit-15;
+-	}
+-}
+diff --git a/packages/editor/src/components/post-status/style.scss b/packages/editor/src/components/post-status/style.scss
+index bfd9de46234da3..c601d887d68c7f 100644
+--- a/packages/editor/src/components/post-status/style.scss
++++ b/packages/editor/src/components/post-status/style.scss
+@@ -18,25 +18,6 @@
+ 		padding: $grid-unit-20;
+ 	}
+ 
+-	.editor-change-status__options {
+-		.components-base-control__field > .components-v-stack {
+-			gap: $grid-unit-15;
+-		}
+-
+-		// TODO: it's not great to override component styles.. This might be resolved
+-		// by the new radio control component.
+-		.components-radio-control__option {
+-			align-items: flex-start;
+-		}
+-
+-		label {
+-			.components-text {
+-				display: block;
+-				margin-top: $grid-unit-05;
+-			}
+-		}
+-	}
+-
+ 	.editor-change-status__password-legend {
+ 		padding: 0;
+ 		margin-bottom: $grid-unit-10;
+diff --git a/packages/editor/src/components/site-discussion/style.scss b/packages/editor/src/components/site-discussion/style.scss
+index 2c54424207ea5c..dc0608f0cf3ab1 100644
+--- a/packages/editor/src/components/site-discussion/style.scss
++++ b/packages/editor/src/components/site-discussion/style.scss
+@@ -3,17 +3,3 @@
+ 	padding: $grid-unit-20;
+ }
+ 
+-.editor-site-discussion__options {
+-	// TODO: it's not great to override component styles.. This might be resolved
+-	// by the new radio control component.
+-	.components-radio-control__option {
+-		align-items: flex-start;
+-	}
+-
+-	label {
+-		.components-text {
+-			display: block;
+-			margin-top: $grid-unit-05;
+-		}
+-	}
+-}

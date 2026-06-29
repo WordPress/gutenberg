@@ -1,0 +1,352 @@
+diff --git a/package-lock.json b/package-lock.json
+index 5861648b6f55df..c2d1cb70f7e459 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -86,7 +86,7 @@
+ 			"devDependencies": {
+ 				"@actions/core": "1.9.1",
+ 				"@actions/github": "5.0.0",
+-				"@ariakit/test": "^0.3.0",
++				"@ariakit/test": "^0.3.5",
+ 				"@babel/core": "7.16.0",
+ 				"@babel/plugin-proposal-export-namespace-from": "7.18.9",
+ 				"@babel/plugin-syntax-jsx": "7.16.0",
+@@ -1628,48 +1628,13 @@
+ 				"url": "https://github.com/sponsors/sindresorhus"
+ 			}
+ 		},
+-		"node_modules/@ariakit/core": {
+-			"version": "0.3.4",
+-			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.3.4.tgz",
+-			"integrity": "sha512-mMTWYOs0SvkrBbLPy4IY15E+fgvSbZKg4XzpBwE17meBG+G7wJjnuHq8lNiIAn9VnQBIc/lsXxqH3FCD7hHaUg=="
+-		},
+-		"node_modules/@ariakit/react": {
+-			"version": "0.3.5",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.3.5.tgz",
+-			"integrity": "sha512-x7LfGP0on0lVV1NcDNO8+aEBb64sUI6YYB1akEWXkb4lTiU4uG1sHGc8YhfHVh0cFS1kwpQcqyiNPzyB8OgymA==",
+-			"dependencies": {
+-				"@ariakit/react-core": "0.3.5"
+-			},
+-			"funding": {
+-				"type": "opencollective",
+-				"url": "https://opencollective.com/ariakit"
+-			},
+-			"peerDependencies": {
+-				"react": "^17.0.0 || ^18.0.0",
+-				"react-dom": "^17.0.0 || ^18.0.0"
+-			}
+-		},
+-		"node_modules/@ariakit/react-core": {
+-			"version": "0.3.5",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.3.5.tgz",
+-			"integrity": "sha512-TdQmUj7BPJ7QWjpjlpP5M1YbANDQL/voYYvKq1Hele7uoEWk51v2nZNaNXo9DZ4He/bkG99ISDx5Tgkzi5En8Q==",
+-			"dependencies": {
+-				"@ariakit/core": "0.3.4",
+-				"@floating-ui/dom": "^1.0.0",
+-				"use-sync-external-store": "^1.2.0"
+-			},
+-			"peerDependencies": {
+-				"react": "^17.0.0 || ^18.0.0",
+-				"react-dom": "^17.0.0 || ^18.0.0"
+-			}
+-		},
+ 		"node_modules/@ariakit/test": {
+-			"version": "0.3.0",
+-			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.3.0.tgz",
+-			"integrity": "sha512-fngAzkzCl9zM4O/tzVaUf7ixWUAk779hjTegr/zcegoxaMS5SmaLhNQ7RU0AGx06LrhJse6GYGy8ZtK58HP/EQ==",
++			"version": "0.3.5",
++			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.3.5.tgz",
++			"integrity": "sha512-7UCQBnJZ88JptkEnAXT7iSgtxEZiFwqdkKtxLCXDssTOJNatbFsnq0Jow324y41jGfAE2n4Lf5qY2FsZUPf9XQ==",
+ 			"dev": true,
+ 			"dependencies": {
+-				"@ariakit/core": "0.3.3",
++				"@ariakit/core": "0.3.8",
+ 				"@testing-library/dom": "^8.0.0 || ^9.0.0"
+ 			},
+ 			"peerDependencies": {
+@@ -1686,9 +1651,9 @@
+ 			}
+ 		},
+ 		"node_modules/@ariakit/test/node_modules/@ariakit/core": {
+-			"version": "0.3.3",
+-			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.3.3.tgz",
+-			"integrity": "sha512-8x77R0aE9O9pheygg+h/z0oU9Wx/Xdlr7nfkl4klGnkJma8/nAhJ2RrchCTQCUef4WMsRnq/doCz8m/sslP6CA==",
++			"version": "0.3.8",
++			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.3.8.tgz",
++			"integrity": "sha512-LlSCwbyyozMX4ZEobpYGcv1LFqOdBTdTYPZw3lAVgLcFSNivsazi3NkKM9qNWNIu00MS+xTa0+RuIcuWAjlB2Q==",
+ 			"dev": true
+ 		},
+ 		"node_modules/@aw-web-design/x-default-browser": {
+@@ -54283,7 +54248,7 @@
+ 			"version": "25.14.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@ariakit/react": "^0.3.5",
++				"@ariakit/react": "^0.3.10",
+ 				"@babel/runtime": "^7.16.0",
+ 				"@emotion/cache": "^11.7.1",
+ 				"@emotion/css": "^11.7.1",
+@@ -54342,6 +54307,41 @@
+ 				"react-dom": "^18.0.0"
+ 			}
+ 		},
++		"packages/components/node_modules/@ariakit/core": {
++			"version": "0.3.8",
++			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.3.8.tgz",
++			"integrity": "sha512-LlSCwbyyozMX4ZEobpYGcv1LFqOdBTdTYPZw3lAVgLcFSNivsazi3NkKM9qNWNIu00MS+xTa0+RuIcuWAjlB2Q=="
++		},
++		"packages/components/node_modules/@ariakit/react": {
++			"version": "0.3.10",
++			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.3.10.tgz",
++			"integrity": "sha512-XRY69IOm8Oy+HSPoaspcVLAhLo3ToLhhJKSLK1voTAZtSzu5kUeUf4nUPxTzYFsvirKORZgOLAeNwuo1gPr61g==",
++			"dependencies": {
++				"@ariakit/react-core": "0.3.10"
++			},
++			"funding": {
++				"type": "opencollective",
++				"url": "https://opencollective.com/ariakit"
++			},
++			"peerDependencies": {
++				"react": "^17.0.0 || ^18.0.0",
++				"react-dom": "^17.0.0 || ^18.0.0"
++			}
++		},
++		"packages/components/node_modules/@ariakit/react-core": {
++			"version": "0.3.10",
++			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.3.10.tgz",
++			"integrity": "sha512-CzSffcNlOyS2xuy21UB6fgJXi5LriJ9JrTSJzcgJmE+P9/WfQlplJC3L75d8O2yKgaGPeFnQ0hhDA6ItsI98eQ==",
++			"dependencies": {
++				"@ariakit/core": "0.3.8",
++				"@floating-ui/dom": "^1.0.0",
++				"use-sync-external-store": "^1.2.0"
++			},
++			"peerDependencies": {
++				"react": "^17.0.0 || ^18.0.0",
++				"react-dom": "^17.0.0 || ^18.0.0"
++			}
++		},
+ 		"packages/components/node_modules/@floating-ui/react-dom": {
+ 			"version": "2.0.1",
+ 			"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.0.1.tgz",
+@@ -57396,43 +57396,20 @@
+ 				}
+ 			}
+ 		},
+-		"@ariakit/core": {
+-			"version": "0.3.4",
+-			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.3.4.tgz",
+-			"integrity": "sha512-mMTWYOs0SvkrBbLPy4IY15E+fgvSbZKg4XzpBwE17meBG+G7wJjnuHq8lNiIAn9VnQBIc/lsXxqH3FCD7hHaUg=="
+-		},
+-		"@ariakit/react": {
+-			"version": "0.3.5",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.3.5.tgz",
+-			"integrity": "sha512-x7LfGP0on0lVV1NcDNO8+aEBb64sUI6YYB1akEWXkb4lTiU4uG1sHGc8YhfHVh0cFS1kwpQcqyiNPzyB8OgymA==",
+-			"requires": {
+-				"@ariakit/react-core": "0.3.5"
+-			}
+-		},
+-		"@ariakit/react-core": {
+-			"version": "0.3.5",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.3.5.tgz",
+-			"integrity": "sha512-TdQmUj7BPJ7QWjpjlpP5M1YbANDQL/voYYvKq1Hele7uoEWk51v2nZNaNXo9DZ4He/bkG99ISDx5Tgkzi5En8Q==",
+-			"requires": {
+-				"@ariakit/core": "0.3.4",
+-				"@floating-ui/dom": "^1.0.0",
+-				"use-sync-external-store": "^1.2.0"
+-			}
+-		},
+ 		"@ariakit/test": {
+-			"version": "0.3.0",
+-			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.3.0.tgz",
+-			"integrity": "sha512-fngAzkzCl9zM4O/tzVaUf7ixWUAk779hjTegr/zcegoxaMS5SmaLhNQ7RU0AGx06LrhJse6GYGy8ZtK58HP/EQ==",
++			"version": "0.3.5",
++			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.3.5.tgz",
++			"integrity": "sha512-7UCQBnJZ88JptkEnAXT7iSgtxEZiFwqdkKtxLCXDssTOJNatbFsnq0Jow324y41jGfAE2n4Lf5qY2FsZUPf9XQ==",
+ 			"dev": true,
+ 			"requires": {
+-				"@ariakit/core": "0.3.3",
++				"@ariakit/core": "0.3.8",
+ 				"@testing-library/dom": "^8.0.0 || ^9.0.0"
+ 			},
+ 			"dependencies": {
+ 				"@ariakit/core": {
+-					"version": "0.3.3",
+-					"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.3.3.tgz",
+-					"integrity": "sha512-8x77R0aE9O9pheygg+h/z0oU9Wx/Xdlr7nfkl4klGnkJma8/nAhJ2RrchCTQCUef4WMsRnq/doCz8m/sslP6CA==",
++					"version": "0.3.8",
++					"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.3.8.tgz",
++					"integrity": "sha512-LlSCwbyyozMX4ZEobpYGcv1LFqOdBTdTYPZw3lAVgLcFSNivsazi3NkKM9qNWNIu00MS+xTa0+RuIcuWAjlB2Q==",
+ 					"dev": true
+ 				}
+ 			}
+@@ -69390,7 +69367,7 @@
+ 		"@wordpress/components": {
+ 			"version": "file:packages/components",
+ 			"requires": {
+-				"@ariakit/react": "^0.3.5",
++				"@ariakit/react": "^0.3.10",
+ 				"@babel/runtime": "^7.16.0",
+ 				"@emotion/cache": "^11.7.1",
+ 				"@emotion/css": "^11.7.1",
+@@ -69442,6 +69419,29 @@
+ 				"valtio": "1.7.0"
+ 			},
+ 			"dependencies": {
++				"@ariakit/core": {
++					"version": "0.3.8",
++					"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.3.8.tgz",
++					"integrity": "sha512-LlSCwbyyozMX4ZEobpYGcv1LFqOdBTdTYPZw3lAVgLcFSNivsazi3NkKM9qNWNIu00MS+xTa0+RuIcuWAjlB2Q=="
++				},
++				"@ariakit/react": {
++					"version": "0.3.10",
++					"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.3.10.tgz",
++					"integrity": "sha512-XRY69IOm8Oy+HSPoaspcVLAhLo3ToLhhJKSLK1voTAZtSzu5kUeUf4nUPxTzYFsvirKORZgOLAeNwuo1gPr61g==",
++					"requires": {
++						"@ariakit/react-core": "0.3.10"
++					}
++				},
++				"@ariakit/react-core": {
++					"version": "0.3.10",
++					"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.3.10.tgz",
++					"integrity": "sha512-CzSffcNlOyS2xuy21UB6fgJXi5LriJ9JrTSJzcgJmE+P9/WfQlplJC3L75d8O2yKgaGPeFnQ0hhDA6ItsI98eQ==",
++					"requires": {
++						"@ariakit/core": "0.3.8",
++						"@floating-ui/dom": "^1.0.0",
++						"use-sync-external-store": "^1.2.0"
++					}
++				},
+ 				"@floating-ui/react-dom": {
+ 					"version": "2.0.1",
+ 					"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.0.1.tgz",
+diff --git a/package.json b/package.json
+index 489a55cd904538..4587306d20a3b0 100644
+--- a/package.json
++++ b/package.json
+@@ -98,7 +98,7 @@
+ 	"devDependencies": {
+ 		"@actions/core": "1.9.1",
+ 		"@actions/github": "5.0.0",
+-		"@ariakit/test": "^0.3.0",
++		"@ariakit/test": "^0.3.5",
+ 		"@babel/core": "7.16.0",
+ 		"@babel/plugin-proposal-export-namespace-from": "7.18.9",
+ 		"@babel/plugin-syntax-jsx": "7.16.0",
+@@ -392,4 +392,4 @@
+ 		],
+ 		"welcome-build-command": "npm run dev"
+ 	}
+-}
++}
+\ No newline at end of file
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 3942c05ce96f11..7a04f41a29b050 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -221,7 +221,6 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                           aria-selected="true"
+                           class="components-button components-circular-option-picker__option"
+                           data-active-item=""
+-                          data-command=""
+                           id="components-circular-option-picker-0-0"
+                           role="option"
+                           style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ff03a5ba483e9f..1342b27cc2c081 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ ### Enhancements
+ 
++-   Update `ariakit` to version `0.3.10` ([#57325](https://github.com/WordPress/gutenberg/pull/57325)).
+ -   `DropdownMenuV2`: do not collapse suffix width ([#57238](https://github.com/WordPress/gutenberg/pull/57238)).
+ -   `DateTimePicker`: Adjustment of the dot position on DayButton and expansion of the button area. ([#55502](https://github.com/WordPress/gutenberg/pull/55502)).
+ -   `Modal`: Improve application of body class names ([#55430](https://github.com/WordPress/gutenberg/pull/55430)).
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 79e961dc64da43..885c1e455fea40 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -30,7 +30,7 @@
+ 	],
+ 	"types": "build-types",
+ 	"dependencies": {
+-		"@ariakit/react": "^0.3.5",
++		"@ariakit/react": "^0.3.10",
+ 		"@babel/runtime": "^7.16.0",
+ 		"@emotion/cache": "^11.7.1",
+ 		"@emotion/css": "^11.7.1",
+@@ -88,4 +88,4 @@
+ 	"publishConfig": {
+ 		"access": "public"
+ 	}
+-}
++}
+\ No newline at end of file
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 91cd85dc80e750..fab02e3b26ad17 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -249,7 +249,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+             aria-label="Uppercase"
+             class="emotion-12 components-toggle-group-control-option-base"
+             data-active-item=""
+-            data-command=""
+             data-value="uppercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -288,7 +287,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+             aria-checked="false"
+             aria-label="Lowercase"
+             class="emotion-18 components-toggle-group-control-option-base"
+-            data-command=""
+             data-value="lowercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -498,7 +496,6 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+             aria-checked="false"
+             aria-label="R"
+             class="emotion-12 components-toggle-group-control-option-base"
+-            data-command=""
+             data-value="rigas"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -521,7 +518,6 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+             aria-checked="false"
+             aria-label="J"
+             class="emotion-12 components-toggle-group-control-option-base"
+-            data-command=""
+             data-value="jack"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -798,7 +794,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+             aria-label="Uppercase"
+             class="emotion-12 components-toggle-group-control-option-base"
+             data-active-item=""
+-            data-command=""
+             data-value="uppercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -837,7 +832,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+             aria-checked="false"
+             aria-label="Lowercase"
+             class="emotion-18 components-toggle-group-control-option-base"
+-            data-command=""
+             data-value="lowercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -1041,7 +1035,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+             aria-checked="false"
+             aria-label="R"
+             class="emotion-12 components-toggle-group-control-option-base"
+-            data-command=""
+             data-value="rigas"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -1064,7 +1057,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+             aria-checked="false"
+             aria-label="J"
+             class="emotion-12 components-toggle-group-control-option-base"
+-            data-command=""
+             data-value="jack"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"

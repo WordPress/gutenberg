@@ -1,0 +1,500 @@
+diff --git a/eslint.config.mjs b/eslint.config.mjs
+index 5896b31a7fce2c..1f88a30c1658da 100644
+--- a/eslint.config.mjs
++++ b/eslint.config.mjs
+@@ -618,6 +618,17 @@ export default dedupePlugins( [
+ 		},
+ 	},
+ 
++	// Override: UI src — check local imports for unsafe render order rule.
++	{
++		files: [ 'packages/ui/src/**' ],
++		rules: {
++			'@wordpress/no-unsafe-render-order': [
++				'error',
++				{ checkLocalImports: true },
++			],
++		},
++	},
++
+ 	// Override: Components src (non-test, non-stories) — DOM globals rules.
+ 	{
+ 		files: [ 'packages/components/src/**' ],
+diff --git a/packages/eslint-plugin/CHANGELOG.md b/packages/eslint-plugin/CHANGELOG.md
+index 68235757074eab..06fe34b8bf0521 100644
+--- a/packages/eslint-plugin/CHANGELOG.md
++++ b/packages/eslint-plugin/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   Added [`no-unsafe-render-order`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-render-order.md) rule to flag unsafe render-prop composition with `VisuallyHidden` and `Link`/`Text` ([#77428](https://github.com/WordPress/gutenberg/pull/77428)).
++
+ ## 25.0.0 (2026-04-15)
+ 
+ ### Breaking Changes
+diff --git a/packages/eslint-plugin/README.md b/packages/eslint-plugin/README.md
+index a612961855cd77..e38072c59916c3 100644
+--- a/packages/eslint-plugin/README.md
++++ b/packages/eslint-plugin/README.md
+@@ -127,6 +127,7 @@ The granular rulesets will not define any environment globals. As such, if they
+ | [no-dom-globals-in-react-fc](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-react-fc.md)                       | Disallow use of DOM globals in the render cycle of a React function component.                  |             |
+ | [components-no-missing-40px-size-prop](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md)   | Disallow missing `__next40pxDefaultSize` prop on `@wordpress/components` components.            | ✓           |
+ | [components-no-unsafe-button-disabled](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/components-no-unsafe-button-disabled.md)   | Disallow using `disabled` on Button without `accessibleWhenDisabled`.                           | ✓           |
++| [no-unsafe-render-order](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-render-order.md)                                 | Prevent unsafe `render` composition orders that silently remove semantics.                       | ✓           |
+ | [no-i18n-in-save](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-i18n-in-save.md)                                             | Disallow translation functions in block save methods.                                           |             |
+ | [no-unmerged-classname](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unmerged-classname.md)                                 | Disallow unmerged `className` in components that spread rest props.                             |             |
+ | [no-unguarded-get-range-at](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)                         | Disallow the usage of unguarded `getRangeAt` calls.                                             | ✓           |
+diff --git a/packages/eslint-plugin/configs/custom.js b/packages/eslint-plugin/configs/custom.js
+index c4d3d9b9761c9c..21357dbb788002 100644
+--- a/packages/eslint-plugin/configs/custom.js
++++ b/packages/eslint-plugin/configs/custom.js
+@@ -16,6 +16,7 @@ module.exports = [
+ 			'@wordpress/no-unguarded-get-range-at': 'error',
+ 			'@wordpress/no-global-active-element': 'error',
+ 			'@wordpress/no-global-get-selection': 'error',
++			'@wordpress/no-unsafe-render-order': 'error',
+ 			'@wordpress/no-setting-ds-tokens': 'error',
+ 			'@wordpress/no-unknown-ds-tokens': 'error',
+ 			'@wordpress/no-unsafe-wp-apis': 'error',
+diff --git a/packages/eslint-plugin/docs/rules/no-unsafe-render-order.md b/packages/eslint-plugin/docs/rules/no-unsafe-render-order.md
+new file mode 100644
+index 00000000000000..89a1f53c7a2824
+--- /dev/null
++++ b/packages/eslint-plugin/docs/rules/no-unsafe-render-order.md
+@@ -0,0 +1,52 @@
++# Prevent Unsafe `render` Composition Order (`no-unsafe-render-order`)
++
++Prevents `render` prop composition patterns that silently change the final DOM element and strip useful semantics.
++
++This rule currently covers two patterns:
++
++-   No component should host `render={ <VisuallyHidden /> }`, because that replaces the host element with `VisuallyHidden`'s default `<div>`.
++-   `Link` should not host `render={ <Text /> }`, because that replaces the anchor with `Text`'s default `<span>`.
++
++## Rule details
++
++Examples of **incorrect** code for this rule:
++
++```jsx
++import { Dialog, Link, Text, VisuallyHidden } from '@wordpress/ui';
++
++<Dialog.Title render={ <VisuallyHidden /> }>Title</Dialog.Title>;
++<CustomThing render={ <VisuallyHidden /> }>Hidden content</CustomThing>;
++<Link href="#" render={ <Text /> }>
++	Read more
++</Link>;
++```
++
++Examples of **correct** code for this rule:
++
++```jsx
++import { Dialog, Link, Text, VisuallyHidden } from '@wordpress/ui';
++
++<VisuallyHidden render={ <Dialog.Title /> }>Title</VisuallyHidden>;
++<Text render={ <Link href="#" /> }>Read more</Text>;
++```
++
++## Options
++
++### `checkLocalImports`
++
++When set to `true`, the rule also checks tracked components imported from relative paths. This is useful inside packages where the components are imported locally instead of from a package entrypoint.
++
++```json
++{
++	"@wordpress/no-unsafe-render-order": [
++		"error",
++		{ "checkLocalImports": true }
++	]
++}
++```
++
++## Important notes
++
++-   By default, the rule checks `VisuallyHidden`, `Text`, and `Link` when they are imported from `@wordpress/ui`.
++-   Named import aliases such as `import { Link as UILink }` are tracked.
++-   When `checkLocalImports` is enabled, the rule also tracks local named imports for the covered patterns.
+diff --git a/packages/eslint-plugin/rules/__tests__/no-unsafe-render-order.js b/packages/eslint-plugin/rules/__tests__/no-unsafe-render-order.js
+new file mode 100644
+index 00000000000000..9751eaa32cffb2
+--- /dev/null
++++ b/packages/eslint-plugin/rules/__tests__/no-unsafe-render-order.js
+@@ -0,0 +1,136 @@
++import { RuleTester } from 'eslint';
++import rule from '../no-unsafe-render-order';
++
++const ruleTester = new RuleTester( {
++	languageOptions: {
++		sourceType: 'module',
++		ecmaVersion: 6,
++		parserOptions: {
++			ecmaFeatures: {
++				jsx: true,
++			},
++		},
++	},
++} );
++
++ruleTester.run( 'no-unsafe-render-order', rule, {
++	valid: [
++		{
++			code: `
++				import { Dialog, VisuallyHidden } from '@wordpress/ui';
++
++				<VisuallyHidden render={ <Dialog.Title /> }>
++					Title
++				</VisuallyHidden>;
++			`,
++		},
++		{
++			code: `
++				import { Text, Link } from '@wordpress/ui';
++
++				<Text render={ <Link href="#" /> }>Read more</Text>;
++			`,
++		},
++		{
++			code: `
++				import { Popover } from '@wordpress/ui';
++				import { VisuallyHidden } from 'some-other-package';
++
++				<Popover.Title render={ <VisuallyHidden /> }>
++					Title
++				</Popover.Title>;
++			`,
++		},
++		{
++			code: `
++				import { Link } from '@wordpress/ui';
++
++				<Link href="#">Read more</Link>;
++			`,
++		},
++		{
++			code: `
++				import { Link } from '@wordpress/ui';
++				import { VisuallyHidden } from 'some-other-package';
++
++				<Link href="#" render={ <VisuallyHidden /> }>
++					Read more
++				</Link>;
++			`,
++		},
++	],
++	invalid: [
++		{
++			code: `
++				import { Dialog, VisuallyHidden } from '@wordpress/ui';
++
++				<Dialog.Title render={ <VisuallyHidden /> }>
++					Title
++				</Dialog.Title>;
++			`,
++			errors: [ { messageId: 'visuallyHiddenOrder' } ],
++		},
++		{
++			code: `
++				import { Dialog as UIDialog, VisuallyHidden as Hidden } from '@wordpress/ui';
++
++				<UIDialog.Title render={ <Hidden /> }>
++					Title
++				</UIDialog.Title>;
++			`,
++			errors: [ { messageId: 'visuallyHiddenOrder' } ],
++		},
++		{
++			code: `
++				import { VisuallyHidden } from '@wordpress/ui';
++
++				<CustomThing render={ <VisuallyHidden /> }>
++					Hidden content
++				</CustomThing>;
++			`,
++			errors: [ { messageId: 'visuallyHiddenOrder' } ],
++		},
++		{
++			code: `
++				import { Link, Text } from '@wordpress/ui';
++
++				<Link href="#" render={ <Text /> }>
++					Read more
++				</Link>;
++			`,
++			errors: [ { messageId: 'linkTextOrder' } ],
++		},
++		{
++			code: `
++				import { Link as UILink, Text as UIText } from '@wordpress/ui';
++
++				<UILink href="#" render={ <UIText /> }>
++					Read more
++				</UILink>;
++			`,
++			errors: [ { messageId: 'linkTextOrder' } ],
++		},
++		{
++			code: `
++				import * as Field from '../index';
++				import { VisuallyHidden } from '../../../visually-hidden';
++
++				<Field.Label render={ <VisuallyHidden /> }>Name</Field.Label>;
++			`,
++			options: [ { checkLocalImports: true } ],
++			errors: [ { messageId: 'visuallyHiddenOrder' } ],
++		},
++		{
++			code: `
++				import { Link } from '../index';
++				import { Text } from '../../text';
++
++				<Link href="#" render={ <Text /> }>
++					Read more
++				</Link>;
++			`,
++			options: [ { checkLocalImports: true } ],
++			errors: [ { messageId: 'linkTextOrder' } ],
++		},
++	],
++} );
+diff --git a/packages/eslint-plugin/rules/no-unsafe-render-order.js b/packages/eslint-plugin/rules/no-unsafe-render-order.js
+new file mode 100644
+index 00000000000000..f4934a313be4d4
+--- /dev/null
++++ b/packages/eslint-plugin/rules/no-unsafe-render-order.js
+@@ -0,0 +1,158 @@
++/**
++ * Components tracked by this rule.
++ *
++ * @type {Set<string>}
++ */
++const TRACKED_COMPONENTS = new Set( [ 'Link', 'Text', 'VisuallyHidden' ] );
++
++/**
++ * @type {import('eslint').Rule.RuleModule}
++ */
++module.exports = {
++	meta: {
++		type: 'problem',
++		docs: {
++			description:
++				'Prevent render-prop composition orders that silently remove semantics.',
++			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-render-order.md',
++		},
++		schema: [
++			{
++				type: 'object',
++				properties: {
++					checkLocalImports: {
++						type: 'boolean',
++						description:
++							'When true, also checks tracked components imported from relative paths.',
++					},
++				},
++				additionalProperties: false,
++			},
++		],
++		messages: {
++			visuallyHiddenOrder:
++				'Do not pass `VisuallyHidden` via `render`. Make `VisuallyHidden` the outer component instead.',
++			linkTextOrder:
++				'Use `Text` as the outer component and pass `Link` via `render` so the resulting element stays an `<a>`.',
++		},
++	},
++
++	create( context ) {
++		const checkLocalImports =
++			context.options[ 0 ]?.checkLocalImports ?? false;
++		const trackedImports = new Map();
++
++		/**
++		 * @param {string} source
++		 * @return {boolean} Whether the import should be tracked.
++		 */
++		function shouldTrackImportSource( source ) {
++			if ( source === '@wordpress/ui' ) {
++				return true;
++			}
++
++			if ( checkLocalImports ) {
++				return source.startsWith( '.' ) || source.startsWith( '/' );
++			}
++
++			return false;
++		}
++
++		/**
++		 * @param {import('estree-jsx').JSXIdentifier|import('estree-jsx').JSXMemberExpression} node
++		 * @return {string|null} Tracked component name or null.
++		 */
++		function resolveTrackedJsxName( node ) {
++			if ( node.type !== 'JSXIdentifier' ) {
++				return null;
++			}
++
++			return trackedImports.get( node.name ) ?? null;
++		}
++
++		/**
++		 * @param {Array}  attributes    JSX attributes to inspect.
++		 * @param {string} attributeName Attribute name to match.
++		 * @return {import('estree-jsx').JSXAttribute|undefined} Matching attribute.
++		 */
++		function getJsxAttribute( attributes, attributeName ) {
++			return attributes.find(
++				( attribute ) =>
++					attribute.type === 'JSXAttribute' &&
++					attribute.name?.name === attributeName
++			);
++		}
++
++		/**
++		 * @param {Array} attributes
++		 * @return {string|null} Resolved JSX name inside `render={ <... /> }`.
++		 */
++		function getRenderedComponentName( attributes ) {
++			const renderAttribute = getJsxAttribute( attributes, 'render' );
++
++			if (
++				! renderAttribute?.value ||
++				renderAttribute.value.type !== 'JSXExpressionContainer' ||
++				renderAttribute.value.expression.type !== 'JSXElement'
++			) {
++				return null;
++			}
++
++			return resolveTrackedJsxName(
++				renderAttribute.value.expression.openingElement.name
++			);
++		}
++
++		return {
++			ImportDeclaration( node ) {
++				const source = node.source.value;
++
++				if (
++					typeof source !== 'string' ||
++					! shouldTrackImportSource( source )
++				) {
++					return;
++				}
++
++				node.specifiers.forEach( ( specifier ) => {
++					if ( specifier.type === 'ImportSpecifier' ) {
++						const importedName = specifier.imported.name;
++
++						if ( TRACKED_COMPONENTS.has( importedName ) ) {
++							trackedImports.set(
++								specifier.local.name,
++								importedName
++							);
++						}
++					}
++				} );
++			},
++
++			JSXOpeningElement( node ) {
++				const renderedComponentName = getRenderedComponentName(
++					node.attributes
++				);
++
++				if ( renderedComponentName === 'VisuallyHidden' ) {
++					context.report( {
++						node,
++						messageId: 'visuallyHiddenOrder',
++					} );
++					return;
++				}
++
++				const elementName = resolveTrackedJsxName( node.name );
++
++				if (
++					elementName === 'Link' &&
++					renderedComponentName === 'Text'
++				) {
++					context.report( {
++						node,
++						messageId: 'linkTextOrder',
++					} );
++				}
++			},
++		};
++	},
++};
+diff --git a/packages/ui/src/link/stories/index.story.tsx b/packages/ui/src/link/stories/index.story.tsx
+index e609b17e42ab77..a23077d28698eb 100644
+--- a/packages/ui/src/link/stories/index.story.tsx
++++ b/packages/ui/src/link/stories/index.story.tsx
+@@ -66,9 +66,8 @@ export const Inline: Story = {
+ };
+ 
+ /**
+- * When composing `Text` and `Link` via the `render` prop, the order matters:
+- * - `<Text render={ <Link /> } />` renders an `<a>` element (Link's default tag wins).
+- * - `<Link render={ <Text /> } />` renders a `<span>` element (Text's default tag wins).
++ * When composing `Text` and `Link` via the `render` prop, keep `Text` as the
++ * host and pass `Link` via `render` so the resulting element stays an `<a>`.
+  */
+ export const Standalone: Story = {
+ 	args: {
+@@ -80,13 +79,8 @@ export const Standalone: Story = {
+ 		},
+ 	},
+ 	render: ( args ) => (
+-		<Stack direction="column" gap="md">
+-			<Text variant="body-md" render={ <Link { ...args } /> }>
+-				A standalone link with body-md typography
+-			</Text>
+-			<Text variant="body-sm" render={ <Link { ...args } /> }>
+-				A standalone link with body-sm typography
+-			</Text>
+-		</Stack>
++		<Text variant="body-md" render={ <Link { ...args } /> }>
++			A standalone link with body-md typography
++		</Text>
+ 	),
+ };
+diff --git a/packages/ui/src/visually-hidden/visually-hidden.tsx b/packages/ui/src/visually-hidden/visually-hidden.tsx
+index 0ecb0a7b2f2d6f..3290de96eb4aee 100644
+--- a/packages/ui/src/visually-hidden/visually-hidden.tsx
++++ b/packages/ui/src/visually-hidden/visually-hidden.tsx
+@@ -13,12 +13,10 @@ import styles from './style.module.css';
+  * ## Composing with other components
+  *
+  * When composing with another component that uses the `render` prop
+- * pattern, there are two directions — and they produce different results.
+- *
+- * Most of the time you'll want `VisuallyHidden` as the **host** (outer
+- * component) and pass the other component via `render`. This keeps the
+- * other component's HTML element and semantics intact, while
+- * `VisuallyHidden` only adds its hiding styles:
++ * pattern, keep `VisuallyHidden` as the **host** (outer component) and
++ * pass the other component via `render`. This keeps the other
++ * component's HTML element and semantics intact, while `VisuallyHidden`
++ * only adds its hiding styles:
+  *
+  * ```jsx
+  * // OtherComponent keeps its semantic element (e.g. <h2>).
+@@ -26,20 +24,6 @@ import styles from './style.module.css';
+  *   Accessible text
+  * </VisuallyHidden>
+  * ```
+- *
+- * The opposite direction is also possible, but be aware that it replaces
+- * the other component's element with VisuallyHidden's default `<div>`:
+- *
+- * ```jsx
+- * // OtherComponent's element becomes a <div>.
+- * <OtherComponent render={ <VisuallyHidden /> }>
+- *   Accessible text
+- * </OtherComponent>
+- * ```
+- *
+- * Choose based on what you need: if the other component's semantic
+- * element matters (e.g. `<label>`, `<legend>`, `<h2>`), keep
+- * `VisuallyHidden` as the host so the element is preserved.
+  */
+ export const VisuallyHidden = forwardRef< HTMLDivElement, VisuallyHiddenProps >(
+ 	function VisuallyHidden( { render, ...restProps }, ref ) {

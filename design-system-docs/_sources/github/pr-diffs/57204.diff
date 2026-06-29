@@ -1,0 +1,155 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1342b27cc2c081..b0f7f841c0a476 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -   `DropdownMenuV2`: do not collapse suffix width ([#57238](https://github.com/WordPress/gutenberg/pull/57238)).
+ -   `DateTimePicker`: Adjustment of the dot position on DayButton and expansion of the button area. ([#55502](https://github.com/WordPress/gutenberg/pull/55502)).
+ -   `Modal`: Improve application of body class names ([#55430](https://github.com/WordPress/gutenberg/pull/55430)).
++-   `Tooltip`: add `hideOnBlur` prop ([#57204](https://github.com/WordPress/gutenberg/pull/57204)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/tooltip/README.md b/packages/components/src/tooltip/README.md
+index 9b214e8fc6b00e..343b8726e90012 100644
+--- a/packages/components/src/tooltip/README.md
++++ b/packages/components/src/tooltip/README.md
+@@ -35,6 +35,15 @@ The amount of time in milliseconds to wait before showing the tooltip.
+ -   Required: No
+ -   Default: `700`
+ 
++#### `hideOnBlur`: `boolean`
++
++By default, the tooltip will close when interacting with other elements in the same `window`. This means that the tooltip will stay open when the whole `window` loses focus — for example, this happens when the whole browser loses keyboard focus, or even when moving focus to/from an iframe.
++
++This flag, when set to `true`, will force the tooltip to always hide when the anchor is blurred.
++
++-   Required: No
++-   Default: `false`
++
+ #### `hideOnClick`: `boolean`
+ 
+ Option to hide the tooltip when the anchor is clicked.
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index 80407def54cd45..90a303330634a4 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -28,6 +28,7 @@ function Tooltip( props: TooltipProps ) {
+ 		children,
+ 		delay = TOOLTIP_DELAY,
+ 		hideOnClick = true,
++		hideOnBlur = false,
+ 		placement,
+ 		position,
+ 		shortcut,
+@@ -66,12 +67,14 @@ function Tooltip( props: TooltipProps ) {
+ 
+ 	const tooltipStore = Ariakit.useTooltipStore( {
+ 		placement: computedPlacement,
+-		timeout: delay,
++		showTimeout: delay,
++		hideTimeout: 0,
+ 	} );
+ 
+ 	return (
+ 		<>
+ 			<Ariakit.TooltipAnchor
++				onBlur={ hideOnBlur ? tooltipStore.hide : undefined }
+ 				onClick={ hideOnClick ? tooltipStore.hide : undefined }
+ 				store={ tooltipStore }
+ 				render={ isOnlyChild ? children : undefined }
+diff --git a/packages/components/src/tooltip/test/index.tsx b/packages/components/src/tooltip/test/index.tsx
+index 4d58498e278d36..4b294ac2ddf60b 100644
+--- a/packages/components/src/tooltip/test/index.tsx
++++ b/packages/components/src/tooltip/test/index.tsx
+@@ -50,28 +50,39 @@ describe( 'Tooltip', () => {
+ 		).not.toBeInTheDocument();
+ 	} );
+ 
+-	it( 'should render the tooltip when focusing on the tooltip anchor via tab', async () => {
++	it( 'should show the tooltip when the tooltip anchor receives focus, and hide it when the anchor loses focus when the hideOnBlur prop is `true`', async () => {
+ 		const user = userEvent.setup();
+ 
+-		render( <Tooltip { ...props } /> );
++		render( <Tooltip { ...props } hideOnBlur /> );
++
++		const tooltipAnchor = screen.getByRole( 'button', { name: /Button/i } );
+ 
+ 		await user.tab();
+ 
+-		expect(
+-			screen.getByRole( 'button', { name: /Button/i } )
+-		).toHaveFocus();
++		expect( tooltipAnchor ).toHaveFocus();
+ 
+ 		expect(
+ 			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
+ 		).toBeVisible();
+ 
+ 		await cleanupTooltip( user );
++
++		expect( tooltipAnchor ).not.toHaveFocus();
++
++		expect(
++			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
++		).not.toBeInTheDocument();
+ 	} );
+ 
+-	it( 'should render the tooltip when the tooltip anchor is hovered', async () => {
++	it( 'should show the tooltip when the tooltip anchor is hovered, and hide it when the anchor is not hovered anymore', async () => {
+ 		const user = userEvent.setup();
+ 
+-		render( <Tooltip { ...props } /> );
++		render(
++			<>
++				<Tooltip { ...props } />
++				<button>Hover me</button>
++			</>
++		);
+ 
+ 		await user.hover( screen.getByRole( 'button', { name: /Button/i } ) );
+ 
+@@ -79,6 +90,12 @@ describe( 'Tooltip', () => {
+ 			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
+ 		).toBeVisible();
+ 
++		await user.hover( screen.getByRole( 'button', { name: /Hover me/i } ) );
++
++		expect(
++			screen.queryByRole( 'tooltip', { name: /tooltip text/i } )
++		).not.toBeInTheDocument();
++
+ 		await cleanupTooltip( user );
+ 	} );
+ 
+@@ -263,7 +280,7 @@ describe( 'Tooltip', () => {
+ 		await cleanupTooltip( user );
+ 	} );
+ 
+-	it( 'esc should close modal even when tooltip is visible', async () => {
++	it( 'should close a parent Modal even when tooltip is visible when pressing the Escape key', async () => {
+ 		const user = userEvent.setup();
+ 		const onRequestClose = jest.fn();
+ 		render(
+diff --git a/packages/components/src/tooltip/types.ts b/packages/components/src/tooltip/types.ts
+index 8708ae7005f5b3..b9c3ce59da34c7 100644
+--- a/packages/components/src/tooltip/types.ts
++++ b/packages/components/src/tooltip/types.ts
+@@ -22,6 +22,17 @@ export type TooltipProps = {
+ 	 * @default true
+ 	 */
+ 	hideOnClick?: boolean;
++	/**
++	 * By default, the tooltip will close when interacting with other elements
++	 * in the same `window`. This means that the tooltip will stay open when the
++	 * whole `window` loses focus — for example, this happens when the whole
++	 * browser loses keyboard focus, or even when moving focus to/from an iframe.
++	 * This flag, when set to `true`, will force the tooltip to always hide when
++	 * the anchor is blurred.
++	 *
++	 * @default false
++	 */
++	hideOnBlur?: boolean;
+ 	/**
+ 	 * The amount of time in milliseconds to wait before showing the tooltip.
+ 	 *

@@ -1,0 +1,319 @@
+diff --git a/packages/components/src/border-box-control/border-box-control/README.md b/packages/components/src/border-box-control/border-box-control/README.md
+index 20352e03c8243d..5ec2263bf16741 100644
+--- a/packages/components/src/border-box-control/border-box-control/README.md
++++ b/packages/components/src/border-box-control/border-box-control/README.md
+@@ -169,3 +169,10 @@ const splitBorders = {
+ ```
+ 
+ - Required: No
++
++### `__next40pxDefaultSize`: `boolean`
++
++Start opting into the larger default height that will become the default size in a future version.
++
++- Required: No
++- Default: `false`
+diff --git a/packages/components/src/border-control/border-control/README.md b/packages/components/src/border-control/border-control/README.md
+index 51fb7172b7c553..74a212d00026bd 100644
+--- a/packages/components/src/border-control/border-control/README.md
++++ b/packages/components/src/border-control/border-control/README.md
+@@ -173,3 +173,10 @@ Flags whether this `BorderControl` should also render a `RangeControl` for
+ additional control over a border's width.
+ 
+ - Required: No
++
++### `__next40pxDefaultSize`: `boolean`
++
++Start opting into the larger default height that will become the default size in a future version.
++
++- Required: No
++- Default: `false`
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index b3a83904bc9ba6..d458771494a338 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -292,6 +292,13 @@ Specifies the button's style. The accepted values are `'primary'` (the primary b
+ 
+ -   Required: No
+ 
++#### `__next40pxDefaultSize`: `boolean`
++
++Start opting into the larger default height that will become the default size in a future version.
++
++- Required: No
++- Default: `false`
++
+ ## Related components
+ 
+ -   To group buttons together, use the [ButtonGroup](/packages/components/src/button-group/README.md) component.
+diff --git a/packages/components/src/combobox-control/README.md b/packages/components/src/combobox-control/README.md
+index 9d00804e2f30e0..61611f82fee233 100644
+--- a/packages/components/src/combobox-control/README.md
++++ b/packages/components/src/combobox-control/README.md
+@@ -118,6 +118,14 @@ Custom renderer invoked for each option in the suggestion list. The render prop
+ -   Type: `( args: { item: object } ) => ReactNode`
+ -   Required: No
+ 
++#### __next40pxDefaultSize
++
++Start opting into the larger default height that will become the default size in a future version.
++
++- Type: `Boolean`
++- Required: No
++- Default: `false`
++
+ #### __nextHasNoMarginBottom
+ 
+ Start opting into the new margin-free styles that will become the default in a future version.
+diff --git a/packages/components/src/custom-select-control/README.md b/packages/components/src/custom-select-control/README.md
+index 6804f4cf6ecd3a..a764a0df133eab 100644
+--- a/packages/components/src/custom-select-control/README.md
++++ b/packages/components/src/custom-select-control/README.md
+@@ -142,6 +142,13 @@ A handler for `blur` events on the trigger button.
+ 
+ -   Required: No
+ 
++#### `__next40pxDefaultSize`: `boolean`
++
++Start opting into the larger default height that will become the default size in a future version.
++
++- Required: No
++- Default: `false`
++
+ ## Related components
+ 
+ -   Like this component, but implemented using a native `<select>` for when custom styling is not necessary, the `SelectControl` component.
+diff --git a/packages/components/src/dimension-control/README.md b/packages/components/src/dimension-control/README.md
+index 42f4a9678c09a6..3cd0191a046068 100644
+--- a/packages/components/src/dimension-control/README.md
++++ b/packages/components/src/dimension-control/README.md
+@@ -93,10 +93,18 @@ A callback which is triggered when a spacing size value changes (is selected/cli
+ 
+ A string of classes to be added to the control component.
+ 
+-### __nextHasNoMarginBottom
++### `__next40pxDefaultSize`
+ 
+-Start opting into the new margin-free styles that will become the default in a future version.
++-   **Type:** `Boolean`
++-   **Required:** No
++-   **Default:** `false`
++
++Start opting into the larger default height that will become the default size in a future version.
++
++### `__nextHasNoMarginBottom`
+ 
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
++-   **Type:** `Boolean`
++-   **Required:** No
++-   **Default:** `false`
++
++Start opting into the new margin-free styles that will become the default in a future version.
+diff --git a/packages/components/src/focal-point-picker/README.md b/packages/components/src/focal-point-picker/README.md
+index f5db4885fdf7a4..baa6601d74dbcf 100644
+--- a/packages/components/src/focal-point-picker/README.md
++++ b/packages/components/src/focal-point-picker/README.md
+@@ -100,10 +100,18 @@ Callback which is called at the start of drag operations.
+ 
+ Function which is called before internal updates to the value state. It receives the upcoming value and may return a modified one.
+ 
+-#### __nextHasNoMarginBottom
++### `__next40pxDefaultSize`
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
+ 
+ Start opting into the new margin-free styles that will become the default in a future version.
+ 
++### `__nextHasNoMarginBottom`
++
+ -   Type: `Boolean`
+ -   Required: No
+ -   Default: `false`
++
++Start opting into the new margin-free styles that will become the default in a future version.
+\ No newline at end of file
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index 790468acc6c1fa..5d7fe2b39a7373 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -113,3 +113,10 @@ If `true`, a slider will be displayed alongside the input field when a custom fo
+ 
+ -   Required: no
+ -   Default: `false`
++
++### `__next40pxDefaultSize`: `boolean`
++
++Start opting into the larger default height that will become the default size in a future version.
++
++- Required: No
++- Default: `false`
+diff --git a/packages/components/src/form-file-upload/README.md b/packages/components/src/form-file-upload/README.md
+index f4dc4d1ef5a023..4dd8affc5f54a0 100644
+--- a/packages/components/src/form-file-upload/README.md
++++ b/packages/components/src/form-file-upload/README.md
+@@ -85,3 +85,11 @@ Optional callback function used to render the UI. If passed, the component does
+ 
+ -   Type: `Function`
+ -   Required: No
++
++### __next40pxDefaultSize
++
++Start opting into the larger default height that will become the default size in a future version.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
+diff --git a/packages/components/src/form-token-field/README.md b/packages/components/src/form-token-field/README.md
+index 3da19ba534d312..70e9bd09a61a36 100644
+--- a/packages/components/src/form-token-field/README.md
++++ b/packages/components/src/form-token-field/README.md
+@@ -61,6 +61,7 @@ The `value` property is handled in a manner similar to controlled form component
+ -   `__experimentalShowHowTo` - If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
+ -   `__experimentalValidateInput` - If passed, all introduced values will be validated before being added as tokens.
+ -   `__experimentalAutoSelectFirstMatch` - If true, the select the first matching suggestion when the user presses the Enter key (or space when tokenizeOnSpace is true).
++-   `__next40pxDefaultSize` - Start opting into the larger default height that will become the default size in a future version.
+ -   `__nextHasNoMarginBottom` - Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0. (The prop can be safely removed once this happens.)
+ -   `tokenizeOnBlur` - If true, add any incompleteTokenValue as a new token when the field loses focus.
+ 
+diff --git a/packages/components/src/input-control/README.md b/packages/components/src/input-control/README.md
+index 7af244f823516d..58a3b4a3b1a094 100644
+--- a/packages/components/src/input-control/README.md
++++ b/packages/components/src/input-control/README.md
+@@ -107,3 +107,11 @@ The current value of the input.
+ 
+ -   Type: `String`
+ -   Required: No
++
++### __next40pxDefaultSize
++
++Start opting into the larger default height that will become the default size in a future version.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
+diff --git a/packages/components/src/number-control/README.md b/packages/components/src/number-control/README.md
+index 3a54351cd29258..8421691296e90a 100644
+--- a/packages/components/src/number-control/README.md
++++ b/packages/components/src/number-control/README.md
+@@ -139,3 +139,11 @@ Amount by which the `value` is changed when incrementing/decrementing. It is als
+ -   Type: `Number | "any"`
+ -   Required: No
+ -   Default: `1`
++
++### __next40pxDefaultSize
++
++Start opting into the larger default height that will become the default size in a future version.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
+\ No newline at end of file
+diff --git a/packages/components/src/query-controls/README.md b/packages/components/src/query-controls/README.md
+index 83cae88952d407..3eb6d507c9ccd6 100644
+--- a/packages/components/src/query-controls/README.md
++++ b/packages/components/src/query-controls/README.md
+@@ -240,3 +240,10 @@ The selected category for the `categoriesList` prop.
+ 
+ -   Required: No
+ -   Platform: Web
++
++#### `__next40pxDefaultSize`: `boolean`
++
++Start opting into the larger default height that will become the default size in a future version.
++
++- Required: No
++- Default: `false`
+\ No newline at end of file
+diff --git a/packages/components/src/range-control/README.md b/packages/components/src/range-control/README.md
+index 3da335b9ecf6e8..cfa8c76740e74f 100644
+--- a/packages/components/src/range-control/README.md
++++ b/packages/components/src/range-control/README.md
+@@ -362,6 +362,13 @@ Determines if the `input` number field will render next to the RangeControl. Thi
+ -   Required: No
+ -   Platform: Web
+ 
++### `__next40pxDefaultSize`: `boolean`
++
++Start opting into the larger default height that will become the default size in a future version.
++
++-   Required: No
++-   Default: `false`
++
+ ### `__nextHasNoMarginBottom`: `boolean`
+ 
+ Start opting into the new margin-free styles that will become the default in a future version.
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index 464ee180b38639..6c3ecda886a188 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -229,6 +229,14 @@ The style variant of the control.
+ -   Required: No
+ -   Default: `'default'`
+ 
++### __next40pxDefaultSize
++
++Start opting into the larger default height that will become the default size in a future version.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
+ ### __nextHasNoMarginBottom
+ 
+ Start opting into the new margin-free styles that will become the default in a future version.
+diff --git a/packages/components/src/text-control/README.md b/packages/components/src/text-control/README.md
+index 4e2bfccb786d22..0b6e2d4ebc684e 100644
+--- a/packages/components/src/text-control/README.md
++++ b/packages/components/src/text-control/README.md
+@@ -127,6 +127,14 @@ A function that receives the value of the input.
+ -   Type: `function`
+ -   Required: Yes
+ 
++#### __next40pxDefaultSize
++
++Start opting into the larger default height that will become the default size in a future version.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
++
+ ## Related components
+ 
+ -   To offer users more constrained options for input, use SelectControl, RadioControl, CheckboxControl, or RangeControl.
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/README.md b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+index 6db7ec20544185..ca5c5d14eb6b5a 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+@@ -88,6 +88,13 @@ The value of the `ToggleGroupControl`.
+ 
+ -   Required: No
+ 
++### `__next40pxDefaultSize`: `boolean`
++
++Start opting into the larger default height that will become the default size in a future version.
++
++-   Required: No
++-   Default: `false`
++
+ ### `__nextHasNoMarginBottom`: `boolean`
+ 
+ Start opting into the new margin-free styles that will become the default in a future version.
+diff --git a/packages/components/src/unit-control/README.md b/packages/components/src/unit-control/README.md
+index b3c0496f86b800..dd54de80357d8e 100644
+--- a/packages/components/src/unit-control/README.md
++++ b/packages/components/src/unit-control/README.md
+@@ -147,3 +147,10 @@ Example:
+ ```
+ 
+ -   Required: No
++
++### `__next40pxDefaultSize`: `boolean`
++
++Start opting into the larger default height that will become the default size in a future version.
++
++-   Required: No
++-   Default: `false`

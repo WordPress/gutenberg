@@ -1,0 +1,1132 @@
+diff --git a/docs/tool/manifest.js b/docs/tool/manifest.js
+index 42f9d3898dfb0f..07cea30db41b61 100644
+--- a/docs/tool/manifest.js
++++ b/docs/tool/manifest.js
+@@ -8,7 +8,11 @@ const glob = require( 'glob' ).sync;
+ const baseRepoUrl = '..';
+ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
+ 	// Don't expose documentation for mobile only and G2 components just yet.
+-	ignore: [ '**/src/mobile/**/README.md', '**/src/ui/**/README.md' ],
++	ignore: [
++		'**/src/mobile/**/README.md',
++		'**/src/ui/**/README.md',
++		'packages/components/src/view/README.md',
++	],
+ } );
+ const packagePaths = glob( 'packages/*/package.json' ).map(
+ 	( fileName ) => fileName.split( '/' )[ 1 ]
+diff --git a/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
+index 25950cca507de7..43a6e4b0476981 100644
+--- a/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Basic rendering should render 1`] = `"<div tabindex=\\"-1\\" class=\\"block-editor-link-control\\"><div class=\\"block-editor-link-control__search-input-wrapper\\"><form><div class=\\"components-base-control block-editor-url-input block-editor-link-control__search-input css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><input required=\\"\\" class=\\"block-editor-url-input__input\\" type=\\"text\\" placeholder=\\"Search or type url\\" role=\\"combobox\\" aria-label=\\"URL\\" aria-expanded=\\"false\\" aria-autocomplete=\\"list\\" aria-owns=\\"block-editor-url-input-suggestions-0\\" value=\\"\\"></div></div><div class=\\"block-editor-link-control__search-actions\\"><button type=\\"submit\\" class=\\"components-button block-editor-link-control__search-submit has-icon\\" aria-label=\\"Submit\\"><svg width=\\"24\\" height=\\"24\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"-2 -2 24 24\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M6.734 16.106l2.176-2.38-1.093-1.028-3.846 4.158 3.846 4.157 1.093-1.027-2.176-2.38h2.811c1.125 0 2.25.03 3.374 0 1.428-.001 3.362-.25 4.963-1.277 1.66-1.065 2.868-2.906 2.868-5.859 0-2.479-1.327-4.896-3.65-5.93-1.82-.813-3.044-.8-4.806-.788l-.567.002v1.5c.184 0 .368 0 .553-.002 1.82-.007 2.704-.014 4.21.657 1.854.827 2.76 2.657 2.76 4.561 0 2.472-.973 3.824-2.178 4.596-1.258.807-2.864 1.04-4.163 1.04h-.02c-1.115.03-2.229 0-3.344 0H6.734z\\"></path></svg></button></div></form></div><fieldset class=\\"block-editor-link-control__settings\\"><legend class=\\"components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0\\">Currently selected link settings</legend><div class=\\"components-base-control components-toggle-control block-editor-link-control__setting css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><span class=\\"components-form-toggle\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Open in new tab</label></div></div></fieldset></div>"`;
++exports[`Basic rendering should render 1`] = `"<div tabindex=\\"-1\\" class=\\"block-editor-link-control\\"><div class=\\"block-editor-link-control__search-input-wrapper\\"><form><div class=\\"components-base-control block-editor-url-input block-editor-link-control__search-input css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><input required=\\"\\" class=\\"block-editor-url-input__input\\" type=\\"text\\" placeholder=\\"Search or type url\\" role=\\"combobox\\" aria-label=\\"URL\\" aria-expanded=\\"false\\" aria-autocomplete=\\"list\\" aria-owns=\\"block-editor-url-input-suggestions-0\\" value=\\"\\"></div></div><div class=\\"block-editor-link-control__search-actions\\"><button type=\\"submit\\" class=\\"components-button block-editor-link-control__search-submit has-icon\\" aria-label=\\"Submit\\"><svg width=\\"24\\" height=\\"24\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"-2 -2 24 24\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M6.734 16.106l2.176-2.38-1.093-1.028-3.846 4.158 3.846 4.157 1.093-1.027-2.176-2.38h2.811c1.125 0 2.25.03 3.374 0 1.428-.001 3.362-.25 4.963-1.277 1.66-1.065 2.868-2.906 2.868-5.859 0-2.479-1.327-4.896-3.65-5.93-1.82-.813-3.044-.8-4.806-.788l-.567.002v1.5c.184 0 .368 0 .553-.002 1.82-.007 2.704-.014 4.21.657 1.854.827 2.76 2.657 2.76 4.561 0 2.472-.973 3.824-2.178 4.596-1.258.807-2.864 1.04-4.163 1.04h-.02c-1.115.03-2.229 0-3.344 0H6.734z\\"></path></svg></button></div></form></div><fieldset class=\\"block-editor-link-control__settings\\"><legend class=\\"components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0\\">Currently selected link settings</legend><div class=\\"components-base-control components-toggle-control block-editor-link-control__setting css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><span class=\\"components-form-toggle\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Open in new tab</label></div></div></fieldset></div>"`;
+diff --git a/packages/components/src/color-picker/test/__snapshots__/index.js.snap b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+index 0f3cc97a39aca3..9076c0d0462e89 100644
+--- a/packages/components/src/color-picker/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+@@ -39,7 +39,7 @@ Snapshot Diff:
+             type="button"
+           />
+           <div
+-            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
++            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
+ -           id="color-picker-saturation-4"
+ +           id="color-picker-saturation-3"
+           >
+@@ -86,7 +86,7 @@ Snapshot Diff:
+                   tabIndex="0"
+                 />
+                 <p
+-                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
++                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
+ -                 id="components-color-picker__hue-description-4"
+ +                 id="components-color-picker__hue-description-3"
+                 >
+@@ -161,7 +161,7 @@ Snapshot Diff:
+             type="button"
+           />
+           <div
+-            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
++            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
+ -           id="color-picker-saturation-8"
+ +           id="color-picker-saturation-7"
+           >
+@@ -208,7 +208,7 @@ Snapshot Diff:
+                   tabIndex="0"
+                 />
+                 <p
+-                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
++                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
+ -                 id="components-color-picker__hue-description-8"
+ +                 id="components-color-picker__hue-description-7"
+                 >
+@@ -283,7 +283,7 @@ Snapshot Diff:
+             type="button"
+           />
+           <div
+-            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
++            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
+ -           id="color-picker-saturation-10"
+ +           id="color-picker-saturation-9"
+           >
+@@ -330,7 +330,7 @@ Snapshot Diff:
+                   tabIndex="0"
+                 />
+                 <p
+-                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
++                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
+ -                 id="components-color-picker__hue-description-10"
+ +                 id="components-color-picker__hue-description-9"
+                 >
+@@ -405,7 +405,7 @@ Snapshot Diff:
+             type="button"
+           />
+           <div
+-            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
++            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
+ -           id="color-picker-saturation-6"
+ +           id="color-picker-saturation-5"
+           >
+@@ -452,7 +452,7 @@ Snapshot Diff:
+                   tabIndex="0"
+                 />
+                 <p
+-                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
++                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
+ -                 id="components-color-picker__hue-description-6"
+ +                 id="components-color-picker__hue-description-5"
+                 >
+@@ -511,7 +511,7 @@ Snapshot Diff:
+             type="button"
+           />
+           <div
+-            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
++            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
+ -           id="color-picker-saturation-2"
+ +           id="color-picker-saturation-1"
+           >
+@@ -537,7 +537,7 @@ Snapshot Diff:
+                   tabIndex="0"
+                 />
+                 <p
+-                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
++                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
+ -                 id="components-color-picker__hue-description-2"
+ +                 id="components-color-picker__hue-description-1"
+                 >
+diff --git a/packages/components/src/flex/flex/component.js b/packages/components/src/flex/flex/component.js
+index 310b85c53369be..758b4fc98e9f1f 100644
+--- a/packages/components/src/flex/flex/component.js
++++ b/packages/components/src/flex/flex/component.js
+@@ -4,7 +4,7 @@
+ import { contextConnect } from '../../ui/context';
+ import { useFlex } from './hook';
+ import { FlexContext } from './../context';
+-import { View } from '../../ui/view';
++import { View } from '../../view';
+ 
+ /**
+  * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} props
+diff --git a/packages/components/src/flex/stories/index.js b/packages/components/src/flex/stories/index.js
+index c5860db4c3ee3c..77f1184259d9c1 100644
+--- a/packages/components/src/flex/stories/index.js
++++ b/packages/components/src/flex/stories/index.js
+@@ -2,7 +2,7 @@
+  * Internal dependencies
+  */
+ import { Flex, FlexItem } from '../';
+-import { View } from '../../ui/view';
++import { View } from '../../view';
+ 
+ export default {
+ 	component: Flex,
+@@ -17,7 +17,7 @@ export const _default = () => {
+ 				<View>Item</View>
+ 			</Flex>
+ 			<Flex direction={ [ 'column', 'row' ] } gap={ 3 }>
+-				<View css={ { width: '180px' } }>Item</View>
++				<View style={ { width: '180px' } }>Item</View>
+ 				<FlexItem isBlock>
+ 					<View>Item</View>
+ 				</FlexItem>
+diff --git a/packages/components/src/flex/test/__snapshots__/index.js.snap b/packages/components/src/flex/test/__snapshots__/index.js.snap
+index 6d30b0cc90e2c6..7a5389de420edc 100644
+--- a/packages/components/src/flex/test/__snapshots__/index.js.snap
++++ b/packages/components/src/flex/test/__snapshots__/index.js.snap
+@@ -6,16 +6,16 @@ Snapshot Diff:
+ + Second value
+ 
+ @@ -7,14 +7,10 @@
+-      class="components-flex-item css-1636tkh-Item css-1mm2cvy-View egi4jkx0"
++      class="components-flex-item css-1636tkh-Item css-1mm2cvy-View em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="FlexItem"
+     />
+     <div
+--     class="css-1mm2cvy-View egi4jkx0"
++-     class="css-1mm2cvy-View em57xhy0"
+ -   />
+ -   <div />
+ -   <div
+-      class="components-flex-item components-flex-block css-1fgvc79-Item-block css-1mm2cvy-View egi4jkx0"
++      class="components-flex-item components-flex-block css-1fgvc79-Item-block css-1mm2cvy-View em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="FlexBlock"
+     />
+diff --git a/packages/components/src/flex/test/index.js b/packages/components/src/flex/test/index.js
+index a4ce8fb8ef141a..42facc3c12ad9f 100644
+--- a/packages/components/src/flex/test/index.js
++++ b/packages/components/src/flex/test/index.js
+@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../../ui/view';
++import { View } from '../../view';
+ import { Flex, FlexBlock, FlexItem } from '../';
+ 
+ describe( 'props', () => {
+diff --git a/packages/components/src/grid/README.md b/packages/components/src/grid/README.md
+index 197bd4421d2b00..6765ff856b3d0d 100644
+--- a/packages/components/src/grid/README.md
++++ b/packages/components/src/grid/README.md
+@@ -7,14 +7,17 @@
+ ## Usage
+ 
+ ```jsx
+-import { __experimentalGrid as Grid, __experimentalView as View } from '@wordpress/components';
++import {
++	__experimentalGrid as Grid,
++	__experimentalText as Text
++} from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+ 		<Grid columns={ 3 }>
+-			<View>Code</View>
+-			<View>is</View>
+-			<View>Poetry</View>
++			<Text>Code</Text>
++			<Text>is</Text>
++			<Text>Poetry</Text>
+ 		</Grid>
+ 	);
+ }
+diff --git a/packages/components/src/grid/component.js b/packages/components/src/grid/component.js
+index ca59b817ad8258..5abe522a0d7797 100644
+--- a/packages/components/src/grid/component.js
++++ b/packages/components/src/grid/component.js
+@@ -9,14 +9,17 @@ import useGrid from './hook';
+  *
+  * @example
+  * ```jsx
+- * import { __experimentalGrid as Grid, __experimentalView as View } from `@wordpress/components`;
++ * import {
++ * 	__experimentalGrid as Grid,
++ * 	__experimentalText as Text
++ * } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return (
+  * 		<Grid columns={ 3 }>
+- * 			<View>Code</View>
+- * 			<View>is</View>
+- * 			<View>Poetry</View>
++ * 			<Text>Code</Text>
++ * 			<Text>is</Text>
++ * 			<Text>Poetry</Text>
+  * 		</Grid>
+  * 	);
+  * }
+diff --git a/packages/components/src/grid/stories/index.js b/packages/components/src/grid/stories/index.js
+index 58b0b45f153680..0d7b5c29b0563f 100644
+--- a/packages/components/src/grid/stories/index.js
++++ b/packages/components/src/grid/stories/index.js
+@@ -6,7 +6,7 @@ import { number } from '@storybook/addon-knobs';
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../../ui/view';
++import { View } from '../../view';
+ import { Grid } from '..';
+ 
+ export default {
+diff --git a/packages/components/src/grid/test/grid.js b/packages/components/src/grid/test/grid.js
+index 887a9aac4a3cf1..c7b8a6d40cc44c 100644
+--- a/packages/components/src/grid/test/grid.js
++++ b/packages/components/src/grid/test/grid.js
+@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../../ui/view';
++import { View } from '../../view';
+ import { Grid } from '..';
+ import CONFIG from '../../utils/config-values';
+ 
+diff --git a/packages/components/src/h-stack/README.md b/packages/components/src/h-stack/README.md
+index 8ced1105d6c9c0..99182bb3e7b9ae 100644
+--- a/packages/components/src/h-stack/README.md
++++ b/packages/components/src/h-stack/README.md
+@@ -12,21 +12,14 @@
+ import {
+ 	__experimentalHStack as HStack,
+ 	__experimentalText as Text,
+-	__experimentalView as View,
+ } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+ 		<HStack>
+-			<View>
+-				<Text>Code</Text>
+-			</View>
+-			<View>
+-				<Text>is</Text>
+-			</View>
+-			<View>
+-				<Text>Poetry</Text>
+-			</View>
++			<Text>Code</Text>
++			<Text>is</Text>
++			<Text>Poetry</Text>
+ 		</HStack>
+ 	);
+ }
+@@ -93,21 +86,16 @@ import {
+ 	__experimentalHStack as HStack,
+ 	__experimentalSpacer as Spacer,
+ 	__experimentalText as Text,
+-	__experimentalView as View,
+ } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+ 		<HStack>
+-			<View>
+-				<Text>Code</Text>
+-			</View>
++			<Text>Code</Text>
+ 			<Spacer>
+-				<Text>is</Text>
++			<Text>is</Text>
+ 			</Spacer>
+-			<View>
+-				<Text>Poetry</Text>
+-			</View>
++			<Text>Poetry</Text>
+ 		</HStack>
+ 	);
+ }
+@@ -120,22 +108,15 @@ import {
+ 	__experimentalHStack as HStack,
+ 	__experimentalSpacer as Spacer,
+ 	__experimentalText as Text,
+-	__experimentalView as View,
+ } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+ 		<HStack>
+-			<View>
+-				<Text>Code</Text>
+-			</View>
++			<Text>Code</Text>
+ 			<Spacer />
+-			<View>
+-				<Text>is</Text>
+-			</View>
+-			<View>
+-				<Text>Poetry</Text>
+-			</View>
++			<Text>is</Text>
++			<Text>Poetry</Text>
+ 		</HStack>
+ 	);
+ }
+diff --git a/packages/components/src/h-stack/component.js b/packages/components/src/h-stack/component.js
+index 24a5b658f9265b..c26ae1c05abc6a 100644
+--- a/packages/components/src/h-stack/component.js
++++ b/packages/components/src/h-stack/component.js
+@@ -14,21 +14,14 @@ import { useHStack } from './hook';
+  * import {
+  * 	__experimentalHStack as HStack,
+  * 	__experimentalText as Text,
+- * 	__experimentalView as View,
+  * } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return (
+  * 		<HStack>
+- * 			<View>
+- * 				<Text>Code</Text>
+- * 			</View>
+- * 			<View>
+- * 				<Text>is</Text>
+- * 			</View>
+- * 			<View>
+- * 				<Text>Poetry</Text>
+- * 			</View>
++ * 			<Text>Code</Text>
++ * 			<Text>is</Text>
++ * 			<Text>Poetry</Text>
+  * 		</HStack>
+  * 	);
+  * }
+diff --git a/packages/components/src/h-stack/stories/index.js b/packages/components/src/h-stack/stories/index.js
+index f452b76e872954..2947fe857275cf 100644
+--- a/packages/components/src/h-stack/stories/index.js
++++ b/packages/components/src/h-stack/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../../ui/view';
++import { View } from '../../view';
+ import { HStack } from '..';
+ 
+ export default {
+diff --git a/packages/components/src/h-stack/test/index.js b/packages/components/src/h-stack/test/index.js
+index f11e9f8ea0117c..56190f81db4cdd 100644
+--- a/packages/components/src/h-stack/test/index.js
++++ b/packages/components/src/h-stack/test/index.js
+@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../../ui/view';
++import { View } from '../../view';
+ import { HStack } from '..';
+ 
+ describe( 'props', () => {
+diff --git a/packages/components/src/heading/hook.ts b/packages/components/src/heading/hook.ts
+index 0e22ef94a79e8b..aa58ac90890208 100644
+--- a/packages/components/src/heading/hook.ts
++++ b/packages/components/src/heading/hook.ts
+@@ -31,18 +31,18 @@ export interface HeadingProps extends Omit< TextProps, 'size' > {
+ 	 *
+ 	 * @example
+ 	 * ```jsx
+-	 * import { Heading, View } from `@wordpress/components`
++	 * import { __experimentalHeading as Heading } from `@wordpress/components`
+ 	 *
+ 	 * function Example() {
+ 	 *   return (
+-	 *     <View>
++	 *     <div>
+ 	 *       <Heading level="1">Code is Poetry</Heading>
+ 	 *       <Heading level="2">Code is Poetry</Heading>
+ 	 *       <Heading level="3">Code is Poetry</Heading>
+ 	 *       <Heading level="4">Code is Poetry</Heading>
+ 	 *       <Heading level="5">Code is Poetry</Heading>
+ 	 *       <Heading level="6">Code is Poetry</Heading>
+-	 *     </View>
++	 *     </div>
+ 	 *   );
+ 	 * }
+ 	 * ```
+diff --git a/packages/components/src/ui/__storybook-utils/example-grid.js b/packages/components/src/ui/__storybook-utils/example-grid.js
+index 947e19c71093cd..c0693b3268b482 100644
+--- a/packages/components/src/ui/__storybook-utils/example-grid.js
++++ b/packages/components/src/ui/__storybook-utils/example-grid.js
+@@ -4,7 +4,7 @@
+ import { Grid } from '../../grid';
+ import { Surface } from '../surface';
+ import { Text } from '../../text';
+-import { View } from '../view';
++import { View } from '../../view';
+ import { VStack } from '../../v-stack';
+ 
+ const Container = ( { children } ) => (
+diff --git a/packages/components/src/ui/__storybook-utils/page.js b/packages/components/src/ui/__storybook-utils/page.js
+index 232c9502af9f2f..92950201624662 100644
+--- a/packages/components/src/ui/__storybook-utils/page.js
++++ b/packages/components/src/ui/__storybook-utils/page.js
+@@ -2,7 +2,7 @@
+  * Internal dependencies
+  */
+ import { VStack } from '../../v-stack';
+-import { View } from '../view';
++import { View } from '../../view';
+ import { Heading } from '../../heading';
+ import { Divider } from '../divider';
+ 
+diff --git a/packages/components/src/ui/card/body.js b/packages/components/src/ui/card/body.js
+index 098b29170ca66c..b0514c654f21fe 100644
+--- a/packages/components/src/ui/card/body.js
++++ b/packages/components/src/ui/card/body.js
+@@ -13,7 +13,7 @@ import { useMemo } from '@wordpress/element';
+  */
+ import { contextConnect, useContextSystem } from '../context';
+ import { Scrollable } from '../scrollable';
+-import { View } from '../view';
++import { View } from '../../view';
+ import * as styles from './styles';
+ 
+ /**
+diff --git a/packages/components/src/ui/card/component.js b/packages/components/src/ui/card/component.js
+index 4fc8a50770a493..9f169ad4df40f4 100644
+--- a/packages/components/src/ui/card/component.js
++++ b/packages/components/src/ui/card/component.js
+@@ -13,7 +13,7 @@ import { useMemo } from '@wordpress/element';
+  */
+ import { contextConnect } from '../context';
+ import { Elevation } from '../elevation';
+-import { View } from '../view';
++import { View } from '../../view';
+ import * as styles from './styles';
+ import { useCard } from './hook';
+ import CONFIG from '../../utils/config-values';
+@@ -35,7 +35,7 @@ function Card( props, forwardedRef ) {
+ 
+ 	return (
+ 		<View { ...otherProps } ref={ forwardedRef }>
+-			<View css={ styles.Content }>{ children }</View>
++			<View className={ styles.Content }>{ children }</View>
+ 			<Elevation
+ 				className={ elevationClassName }
+ 				isInteractive={ false }
+diff --git a/packages/components/src/ui/card/inner-body.js b/packages/components/src/ui/card/inner-body.js
+index 43204482c456ee..59efaf6e92567a 100644
+--- a/packages/components/src/ui/card/inner-body.js
++++ b/packages/components/src/ui/card/inner-body.js
+@@ -6,7 +6,7 @@ import { cx } from 'emotion';
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../view';
++import { View } from '../../view';
+ import { contextConnect, useContextSystem } from '../context';
+ import * as styles from './styles';
+ 
+diff --git a/packages/components/src/ui/card/test/__snapshots__/index.js.snap b/packages/components/src/ui/card/test/__snapshots__/index.js.snap
+index 294f65732019a9..0a7b8b88c77181 100644
+--- a/packages/components/src/ui/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/card/test/__snapshots__/index.js.snap
+@@ -11,8 +11,8 @@ Snapshot Diff:
+         title="WordPress.org"
+       />
+       <div
+--       class="css-yc36db-InnerBody components-card-inner-body css-1mm2cvy-View egi4jkx0"
+-+       class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View egi4jkx0"
++-       class="css-yc36db-InnerBody components-card-inner-body css-1mm2cvy-View em57xhy0"
+++       class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View em57xhy0"
+         data-wp-c16t="true"
+ -       data-wp-component="CardInnerBody"
+ +       data-wp-component="CardBody"
+@@ -20,11 +20,15 @@ Snapshot Diff:
+         Code is Poetry.
+       </div>
+       <div
+-        class="components-flex components-card-footer css-g6s6xo-Flex-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View egi4jkx0"
++        class="components-flex components-card-footer css-g6s6xo-Flex-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View em57xhy0"
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-17 {
++.emotion-9 {
++  height: 100%;
++}
++
++.emotion-18 {
+   background-color: #fff;
+   color: #000;
+   position: relative;
+@@ -166,7 +170,7 @@ exports[`props should render correctly 1`] = `
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-11 {
++.emotion-12 {
+   background: transparent;
+   display: block;
+   margin: 0 !important;
+@@ -185,7 +189,7 @@ exports[`props should render correctly 1`] = `
+   border-radius: 2px;
+ }
+ 
+-.emotion-14 {
++.emotion-15 {
+   background: transparent;
+   display: block;
+   margin: 0 !important;
+@@ -205,12 +209,12 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-surface components-card emotion-17 emotion-1 emotion-2"
++  class="components-surface components-card emotion-18 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Card"
+ >
+   <div
+-    class="emotion-1 emotion-2"
++    class="emotion-9 emotion-1 emotion-2"
+   >
+     <div
+       class="components-flex components-card-header emotion-0 emotion-1 emotion-2"
+@@ -237,13 +241,13 @@ exports[`props should render correctly 1`] = `
+   </div>
+   <div
+     aria-hidden="true"
+-    class="components-elevation emotion-11 emotion-1 emotion-2"
++    class="components-elevation emotion-12 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+   <div
+     aria-hidden="true"
+-    class="components-elevation emotion-14 emotion-1 emotion-2"
++    class="components-elevation emotion-15 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+@@ -257,19 +261,19 @@ Snapshot Diff:
+ 
+ @@ -6,16 +6,16 @@
+     <div
+-      class="css-1mm2cvy-View egi4jkx0"
++      class="css-l50fc7-Content css-1mm2cvy-View em57xhy0"
+     />
+     <div
+       aria-hidden="true"
+--     class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View egi4jkx0"
+-+     class="components-elevation css-xtff41-Elevation css-1mm2cvy-View egi4jkx0"
++-     class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View em57xhy0"
+++     class="components-elevation css-xtff41-Elevation css-1mm2cvy-View em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+     <div
+       aria-hidden="true"
+--     class="components-elevation css-1ajhhcx-Elevation css-1mm2cvy-View egi4jkx0"
+-+     class="components-elevation css-hdn3qt-Elevation css-1mm2cvy-View egi4jkx0"
++-     class="components-elevation css-1ajhhcx-Elevation css-1mm2cvy-View em57xhy0"
+++     class="components-elevation css-hdn3qt-Elevation css-1mm2cvy-View em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+diff --git a/packages/components/src/ui/elevation/stories/index.js b/packages/components/src/ui/elevation/stories/index.js
+index 5771474827689b..52b263504bb052 100644
+--- a/packages/components/src/ui/elevation/stories/index.js
++++ b/packages/components/src/ui/elevation/stories/index.js
+@@ -8,7 +8,7 @@ import { number } from '@storybook/addon-knobs';
+  */
+ import { Elevation } from '../index';
+ import { Grid } from '../../../grid';
+-import { View } from '../../view';
++import { View } from '../../../view';
+ import { HStack } from '../../../h-stack';
+ import { Divider } from '../../divider';
+ import {
+diff --git a/packages/components/src/ui/form-group/form-group.js b/packages/components/src/ui/form-group/form-group.js
+index 910be83b94f10c..0c05df1bb81110 100644
+--- a/packages/components/src/ui/form-group/form-group.js
++++ b/packages/components/src/ui/form-group/form-group.js
+@@ -3,7 +3,7 @@
+  */
+ import { contextConnect } from '../context';
+ import { Grid } from '../../grid';
+-import { View } from '../view';
++import { View } from '../../view';
+ import FormGroupContent from './form-group-content';
+ import { useFormGroup } from './use-form-group';
+ 
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index 8d41ecbba53c51..14577d74d9e2db 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -6,4 +6,3 @@ export * from './elevation';
+ export * from './form-group';
+ export * from './shortcut';
+ export * from './spinner';
+-export * from './view';
+diff --git a/packages/components/src/ui/popover/component.js b/packages/components/src/ui/popover/component.js
+index bf69f4196dd4ed..70638993796ae8 100644
+--- a/packages/components/src/ui/popover/component.js
++++ b/packages/components/src/ui/popover/component.js
+@@ -111,14 +111,12 @@ function Popover( props, forwardedRef ) {
+  *
+  * @example
+  * ```jsx
+- * import { Button, Popover, View, Text } from `@wordpress/components/ui`;
++ * import { Button, Popover, Text } from `@wordpress/components/ui`;
+  
+  * function Example() {
+  * 	return (
+  * 		<Popover trigger={ <Button>Popover</Button> }>
+- * 			<View>
+- * 				<Text>Code is Poetry</Text>
+- * 			</View>
++ *			<Text>Code is Poetry</Text>
+  * 		</Popover>
+  * 	);
+  * }
+diff --git a/packages/components/src/ui/popover/content.js b/packages/components/src/ui/popover/content.js
+index 06713ecc01bb06..0c161e248b9852 100644
+--- a/packages/components/src/ui/popover/content.js
++++ b/packages/components/src/ui/popover/content.js
+@@ -9,7 +9,7 @@ import { Popover as ReakitPopover } from 'reakit';
+  * Internal dependencies
+  */
+ import { Card } from '../card';
+-import { View } from '../view';
++import { View } from '../../view';
+ import { usePopoverContext } from './context';
+ import * as styles from './styles';
+ import { contextConnect, useContextSystem } from '../context';
+diff --git a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+index 298e64b10f00bf..4ff2c3914ec19c 100644
+--- a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+@@ -1,7 +1,11 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-11 {
++.emotion-3 {
++  height: 100%;
++}
++
++.emotion-12 {
+   background-color: #fff;
+   color: #000;
+   position: relative;
+@@ -10,7 +14,7 @@ exports[`props should render correctly 1`] = `
+   border-radius: 2px;
+ }
+ 
+-.emotion-11 .components-card-body {
++.emotion-12 .components-card-body {
+   max-height: 80vh;
+ }
+ 
+@@ -60,7 +64,7 @@ exports[`props should render correctly 1`] = `
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-5 {
++.emotion-6 {
+   background: transparent;
+   display: block;
+   margin: 0 !important;
+@@ -79,7 +83,7 @@ exports[`props should render correctly 1`] = `
+   border-radius: 2px;
+ }
+ 
+-.emotion-8 {
++.emotion-9 {
+   background: transparent;
+   display: block;
+   margin: 0 !important;
+@@ -99,12 +103,12 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ <div
+-  class="components-surface components-card emotion-11 emotion-1 emotion-2"
++  class="components-surface components-card emotion-12 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Card"
+ >
+   <div
+-    class="emotion-1 emotion-2"
++    class="emotion-3 emotion-1 emotion-2"
+   >
+     <iframe
+       aria-hidden="true"
+@@ -123,13 +127,13 @@ exports[`props should render correctly 1`] = `
+   </div>
+   <div
+     aria-hidden="true"
+-    class="components-elevation emotion-5 emotion-1 emotion-2"
++    class="components-elevation emotion-6 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+   <div
+     aria-hidden="true"
+-    class="components-elevation emotion-8 emotion-1 emotion-2"
++    class="components-elevation emotion-9 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+@@ -145,7 +149,7 @@ Snapshot Diff:
+   <div
+ -   aria-label="show"
+ +   aria-label="popover-base-popover"
+-    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View egi4jkx0"
++    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View em57xhy0"
+     data-dialog="true"
+     data-wp-c16t="true"
+     data-wp-component="Popover"
+@@ -155,7 +159,7 @@ Snapshot Diff:
+     tabindex="-1"
+   >
+     <div
+-      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View egi4jkx0"
++      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
+ `;
+ 
+ exports[`props should render without content 1`] = `
+@@ -167,7 +171,7 @@ Snapshot Diff:
+   <div
+ -   aria-label="popover-contentless-popover"
+ +   aria-label="popover-base-popover"
+-    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View egi4jkx0"
++    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View em57xhy0"
+     data-dialog="true"
+     data-wp-c16t="true"
+     data-wp-component="Popover"
+@@ -177,7 +181,7 @@ Snapshot Diff:
+     tabindex="-1"
+   >
+     <div
+-      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View egi4jkx0"
++      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
+ @@ -21,10 +21,17 @@
+           frameborder="0"
+           src="about:blank"
+@@ -185,7 +189,7 @@ Snapshot Diff:
+           tabindex="-1"
+         />
+ +       <div
+-+         class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View egi4jkx0"
+++         class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View em57xhy0"
+ +         data-wp-c16t="true"
+ +         data-wp-component="CardBody"
+ +       >
+@@ -194,6 +198,6 @@ Snapshot Diff:
+       </div>
+       <div
+         aria-hidden="true"
+-        class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View egi4jkx0"
++        class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View em57xhy0"
+         data-wp-c16t="true"
+ `;
+diff --git a/packages/components/src/ui/scrollable/component.js b/packages/components/src/ui/scrollable/component.js
+index 71aa440432a85b..842521cb6d28ef 100644
+--- a/packages/components/src/ui/scrollable/component.js
++++ b/packages/components/src/ui/scrollable/component.js
+@@ -9,12 +9,12 @@ import { useScrollable } from './hook';
+  *
+  * @example
+  * ```jsx
+- * import { Scrollable, View } from `@wordpress/components/ui`;
++ * import { Scrollable } from `@wordpress/components/ui`;
+  
+  * function Example() {
+  * 	return (
+  * 		<Scrollable style={ { maxHeight: 200 } }>
+- * 			<View style={ { height: 500 } }>...</View>
++ * 			<div style={ { height: 500 } }>...</div>
+  * 		</Scrollable>
+  * 	);
+  * }
+diff --git a/packages/components/src/ui/scrollable/stories/index.js b/packages/components/src/ui/scrollable/stories/index.js
+index 714dd728ca92a4..4c8717d2a9d423 100644
+--- a/packages/components/src/ui/scrollable/stories/index.js
++++ b/packages/components/src/ui/scrollable/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../../index';
++import { View } from '../../../index';
+ import { Scrollable } from '../index';
+ 
+ export default {
+diff --git a/packages/components/src/ui/surface/test/__snapshots__/index.js.snap b/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
+index e7511500f11d89..7f538e2616db75 100644
+--- a/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
+@@ -6,8 +6,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-1xmxoxz-Surface-primary css-1mm2cvy-View egi4jkx0"
+-+   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View egi4jkx0"
++-   class="components-surface css-1xmxoxz-Surface-primary css-1mm2cvy-View em57xhy0"
+++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -21,8 +21,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-ttbcem-Surface-primary css-1mm2cvy-View egi4jkx0"
+-+   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View egi4jkx0"
++-   class="components-surface css-ttbcem-Surface-primary css-1mm2cvy-View em57xhy0"
+++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -36,8 +36,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-xn6qe9-Surface-primary css-1mm2cvy-View egi4jkx0"
+-+   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View egi4jkx0"
++-   class="components-surface css-xn6qe9-Surface-primary css-1mm2cvy-View em57xhy0"
+++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -51,8 +51,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-1ql02am-Surface-primary css-1mm2cvy-View egi4jkx0"
+-+   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View egi4jkx0"
++-   class="components-surface css-1ql02am-Surface-primary css-1mm2cvy-View em57xhy0"
+++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -66,8 +66,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-1fc5hvl-Surface-primary css-1mm2cvy-View egi4jkx0"
+-+   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View egi4jkx0"
++-   class="components-surface css-1fc5hvl-Surface-primary css-1mm2cvy-View em57xhy0"
+++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -97,8 +97,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-1h2jxd6-Surface-secondary css-1mm2cvy-View egi4jkx0"
+-+   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View egi4jkx0"
++-   class="components-surface css-1h2jxd6-Surface-secondary css-1mm2cvy-View em57xhy0"
+++   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+diff --git a/packages/components/src/ui/tooltip/content.js b/packages/components/src/ui/tooltip/content.js
+index 26dd1ac6bef45b..370dee96a7644f 100644
+--- a/packages/components/src/ui/tooltip/content.js
++++ b/packages/components/src/ui/tooltip/content.js
+@@ -9,7 +9,7 @@ import { Tooltip as ReakitTooltip } from 'reakit';
+  * Internal dependencies
+  */
+ import { contextConnect, useContextSystem } from '../context';
+-import { View } from '../view';
++import { View } from '../../view';
+ import { useTooltipContext } from './context';
+ import * as styles from './styles';
+ 
+diff --git a/packages/components/src/ui/utils/create-component.tsx b/packages/components/src/ui/utils/create-component.tsx
+index 960a0572b9f47c..45b77424489423 100644
+--- a/packages/components/src/ui/utils/create-component.tsx
++++ b/packages/components/src/ui/utils/create-component.tsx
+@@ -16,7 +16,7 @@ import type {
+ 	ElementTypeFromViewOwnProps,
+ 	ViewOwnProps,
+ } from '../context';
+-import { View } from '../view';
++import { View } from '../../view';
+ 
+ interface Options< A extends As, P extends ViewOwnProps< {}, A > > {
+ 	as: A;
+diff --git a/packages/components/src/v-stack/README.md b/packages/components/src/v-stack/README.md
+index a1ae16ecae3237..ba2132804f78f2 100644
+--- a/packages/components/src/v-stack/README.md
++++ b/packages/components/src/v-stack/README.md
+@@ -11,22 +11,15 @@
+ ```jsx
+ import {
+ 	__experimentalText as Text,
+-	__experimentalView as View
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+ 		<VStack>
+-			<View>
+-				<Text>Code</Text>
+-			</View>
+-			<View>
+-				<Text>is</Text>
+-			</View>
+-			<View>
+-				<Text>Poetry</Text>
+-			</View>
++			<Text>Code</Text>
++			<Text>is</Text>
++			<Text>Poetry</Text>
+ 		</VStack>
+ 	);
+ }
+@@ -92,22 +85,17 @@ When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to t
+ import {
+ 	__experimentalSpacer as Spacer,
+ 	__experimentalText as Text,
+-	__experimentalView as View
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+ 		<VStack>
+-			<View>
+-				<Text>Code</Text>
+-			</View>
++			<Text>Code</Text>
+ 			<Spacer>
+-				<Text>is</Text>
++			<Text>is</Text>
+ 			</Spacer>
+-			<View>
+-				<Text>Poetry</Text>
+-			</View>
++			<Text>Poetry</Text>
+ 		</VStack>
+ 	);
+ }
+@@ -119,23 +107,16 @@ function Example() {
+ import {
+ 	__experimentalSpacer as Spacer,
+ 	__experimentalText as Text,
+-	__experimentalView as View
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+ 		<VStack>
+-			<View>
+-				<Text>Code</Text>
+-			</View>
++			<Text>Code</Text>
+ 			<Spacer />
+-			<View>
+-				<Text>is</Text>
+-			</View>
+-			<View>
+-				<Text>Poetry</Text>
+-			</View>
++			<Text>is</Text>
++			<Text>Poetry</Text>
+ 		</VStack>
+ 	);
+ }
+diff --git a/packages/components/src/v-stack/component.js b/packages/components/src/v-stack/component.js
+index 631cd0f103634c..a37186a04df172 100644
+--- a/packages/components/src/v-stack/component.js
++++ b/packages/components/src/v-stack/component.js
+@@ -13,22 +13,15 @@ import { useVStack } from './hook';
+  * ```jsx
+  * import {
+  * 	__experimentalText as Text,
+- * 	__experimentalView as View,
+  * 	__experimentalVStack as VStack,
+  * } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return (
+  * 		<VStack>
+- * 			<View>
+- * 				<Text>Code</Text>
+- * 			</View>
+- * 			<View>
+- * 				<Text>is</Text>
+- * 			</View>
+- * 			<View>
+- * 				<Text>Poetry</Text>
+- * 			</View>
++ * 			<Text>Code</Text>
++ * 			<Text>is</Text>
++ * 			<Text>Poetry</Text>
+  * 		</VStack>
+  * 	);
+  * }
+diff --git a/packages/components/src/v-stack/test/index.js b/packages/components/src/v-stack/test/index.js
+index deb49e4e2d7bdb..29cd5c5be51bb9 100644
+--- a/packages/components/src/v-stack/test/index.js
++++ b/packages/components/src/v-stack/test/index.js
+@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../../ui/view';
++import { View } from '../../view';
+ import { VStack } from '..';
+ 
+ describe( 'props', () => {
+diff --git a/packages/components/src/ui/view/README.md b/packages/components/src/view/README.md
+similarity index 79%
+rename from packages/components/src/ui/view/README.md
+rename to packages/components/src/view/README.md
+index 130578920bd75e..f991f2d95c7334 100644
+--- a/packages/components/src/ui/view/README.md
++++ b/packages/components/src/view/README.md
+@@ -1,4 +1,6 @@
+-# View (Experimental)
++# View
++
++> **Experimental!**
+ 
+ `View` is a core component that renders everything in the library. It is the principle component in the entire library.
+ 
+@@ -7,7 +9,10 @@
+ ## Usage
+ 
+ ```jsx
+-import { Text, View } from '@wordpress/components/ui';
++import {
++	__experimentalText as Text,
++	__experimentalView as View
++} from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+diff --git a/packages/components/src/ui/view/component.js b/packages/components/src/view/component.js
+similarity index 88%
+rename from packages/components/src/ui/view/component.js
+rename to packages/components/src/view/component.js
+index 49b001ef89893e..cd45ebf4d9fcbb 100644
+--- a/packages/components/src/ui/view/component.js
++++ b/packages/components/src/view/component.js
+@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
+  *
+  * @example
+  * ```jsx
+- * import { View } from `@wordpress/components/ui`;
++ * import { View } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return (
+diff --git a/packages/components/src/ui/view/index.js b/packages/components/src/view/index.js
+similarity index 100%
+rename from packages/components/src/ui/view/index.js
+rename to packages/components/src/view/index.js
+diff --git a/packages/components/src/ui/view/test/__snapshots__/index.js.snap b/packages/components/src/view/test/__snapshots__/index.js.snap
+similarity index 100%
+rename from packages/components/src/ui/view/test/__snapshots__/index.js.snap
+rename to packages/components/src/view/test/__snapshots__/index.js.snap
+diff --git a/packages/components/src/ui/view/test/index.js b/packages/components/src/view/test/index.js
+similarity index 100%
+rename from packages/components/src/ui/view/test/index.js
+rename to packages/components/src/view/test/index.js
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index c93cc82efe1bb6..ad80a95934e818 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -35,7 +35,8 @@
+ 		"src/grid/**/*",
+ 		"src/__next/**/*",
+ 		"src/h-stack/**/*",
+-		"src/v-stack/**/*"
++		"src/v-stack/**/*",
++		"src/view/**/*"
+ 	],
+ 	"exclude": [
+ 		"src/**/*.android.js",

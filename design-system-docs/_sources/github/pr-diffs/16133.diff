@@ -1,0 +1,91 @@
+diff --git a/lib/client-assets.php b/lib/client-assets.php
+index 8e6b1d688cb471..669f9597c76a16 100644
+--- a/lib/client-assets.php
++++ b/lib/client-assets.php
+@@ -275,21 +275,6 @@ function gutenberg_register_scripts_and_styles() {
+ 		)
+ 	);
+ 
+-	// Add back compatibility for calls to wp.components.ServerSideRender.
+-	wp_add_inline_script(
+-		'wp-server-side-render',
+-		implode(
+-			"\n",
+-			array(
+-				'( function() {',
+-				'	if ( wp && wp.components && wp.serverSideRender && ! wp.components.ServerSideRender ) {',
+-				'		wp.components.ServerSideRender = wp.serverSideRender;',
+-				'	};',
+-				'} )();',
+-			)
+-		)
+-	);
+-
+ 	// Editor Styles.
+ 	// This empty stylesheet is defined to ensure backward compatibility.
+ 	gutenberg_override_style( 'wp-blocks', false );
+diff --git a/package-lock.json b/package-lock.json
+index 4c8a714c7221bb..01441aa566aa81 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -5218,6 +5218,7 @@
+ 				"@wordpress/api-fetch": "file:packages/api-fetch",
+ 				"@wordpress/components": "file:packages/components",
+ 				"@wordpress/data": "file:packages/data",
++				"@wordpress/deprecated": "file:packages/deprecated",
+ 				"@wordpress/element": "file:packages/element",
+ 				"@wordpress/i18n": "file:packages/i18n",
+ 				"@wordpress/url": "file:packages/url",
+diff --git a/packages/server-side-render/package.json b/packages/server-side-render/package.json
+index e43b579d0e4df9..6e6b353ddc3a48 100644
+--- a/packages/server-side-render/package.json
++++ b/packages/server-side-render/package.json
+@@ -26,6 +26,7 @@
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/data": "file:../data",
++		"@wordpress/deprecated": "file:../deprecated",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/url": "file:../url",
+diff --git a/packages/server-side-render/src/index.js b/packages/server-side-render/src/index.js
+index 3958ee46941366..d4881bcecdd219 100644
+--- a/packages/server-side-render/src/index.js
++++ b/packages/server-side-render/src/index.js
+@@ -1,8 +1,9 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo } from '@wordpress/element';
++import { useMemo, forwardRef } from '@wordpress/element';
+ import { withSelect } from '@wordpress/data';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -14,7 +15,7 @@ import ServerSideRender from './server-side-render';
+  */
+ const EMPTY_OBJECT = {};
+ 
+-export default withSelect(
++const ExportedServerSideRender = withSelect(
+ 	( select ) => {
+ 		const coreEditorSelect = select( 'core/editor' );
+ 		if ( coreEditorSelect ) {
+@@ -44,3 +45,16 @@ export default withSelect(
+ 		);
+ 	}
+ );
++
++if ( window && window.wp && window.wp.components ) {
++	window.wp.components.ServerSideRender = forwardRef( ( props, ref ) => {
++		deprecated( 'wp.components.ServerSideRender', {
++			alternative: 'wp.serverSideRender',
++		} );
++		return (
++			<ExportedServerSideRender { ...props } ref={ ref } />
++		);
++	} );
++}
++
++export default ExportedServerSideRender;

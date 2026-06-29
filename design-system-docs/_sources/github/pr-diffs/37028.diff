@@ -1,0 +1,92 @@
+diff --git a/packages/block-editor/src/components/colors-gradients/style.scss b/packages/block-editor/src/components/colors-gradients/style.scss
+index cf72b32b43f86d..cae89427f50fa3 100644
+--- a/packages/block-editor/src/components/colors-gradients/style.scss
++++ b/packages/block-editor/src/components/colors-gradients/style.scss
+@@ -5,13 +5,14 @@
+ }
+ 
+ .block-editor-panel-color-gradient-settings {
+-	.component-color-indicator {
+-		vertical-align: text-bottom;
+-	}
++	.block-editor-panel-color-gradient-settings__panel-title {
++		display: flex;
++		gap: $grid-unit-15;
+ 
+-	&__panel-title {
+ 		.component-color-indicator {
+-			display: inline-block;
++			width: $grid-unit-15;
++			height: $grid-unit-15;
++			align-self: center;
+ 		}
+ 	}
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9b02dfe344aa9c..f80aa280cf1a04 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -27,6 +27,7 @@
+ ### Enhancements
+ 
+ -   Wrapped `Modal` in a `forwardRef` call ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
++-   Unify styles for `ColorIndicator` with how they appear in Global Styles ([#37028](https://github.com/WordPress/gutenberg/pull/37028))
+ 
+ ## 19.1.0
+ 
+diff --git a/packages/components/src/color-indicator/style.scss b/packages/components/src/color-indicator/style.scss
+index 3729291268a8ef..4dbce337b7fa9a 100644
+--- a/packages/components/src/color-indicator/style.scss
++++ b/packages/components/src/color-indicator/style.scss
+@@ -1,11 +1,8 @@
+ .component-color-indicator {
+-	width: 25px;
+-	height: 16px;
+-	margin-left: 0.8rem;
+-	border: 1px solid #dadada;
++	width: $grid-unit-50 * 0.5;
++	height: $grid-unit-50 * 0.5;
++	border-radius: 50%;
++	border: $border-width solid $gray-300;
+ 	display: inline-block;
+-
+-	& + & {
+-		margin-left: 0.5rem;
+-	}
++	padding: 0;
+ }
+diff --git a/packages/edit-site/src/components/global-styles/style.scss b/packages/edit-site/src/components/global-styles/style.scss
+index 88ba102544ab19..ba9284f18d1020 100644
+--- a/packages/edit-site/src/components/global-styles/style.scss
++++ b/packages/edit-site/src/components/global-styles/style.scss
+@@ -4,15 +4,6 @@
+ 	justify-content: center;
+ 	min-height: 152px;
+ 	line-height: 1;
+-
+-	.component-color-indicator {
+-		border-radius: 50%;
+-		border: 0;
+-		height: 36px;
+-		width: 36px;
+-		margin-left: 0;
+-		padding: 0;
+-	}
+ }
+ 
+ .edit-site-typography-panel__preview {
+@@ -43,14 +34,6 @@
+ 	margin: $grid-unit-20;
+ 
+ 	.component-color-indicator {
+-		margin-left: 0;
+-		display: block;
+-		border-radius: 50%;
+-		height: 24px;
+-		width: 24px;
+-		padding: 0;
+-		border: $border-width solid $gray-300;
+-
+ 		// Show a diagonal line (crossed out) for empty swatches.
+ 		background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+ 	}

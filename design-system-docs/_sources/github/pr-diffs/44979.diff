@@ -1,0 +1,597 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ba6e55e024dad2..1ff727b29145db 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fix
+ 
+ -   `FontSizePicker`: Ensure that fluid font size presets appear correctly in the UI controls ([#44791](https://github.com/WordPress/gutenberg/pull/44791)).
++-   `Navigator`: prevent partially hiding focus ring styles, by removing unnecessary overflow rules on `NavigatorScreen` ([#44973](https://github.com/WordPress/gutenberg/pull/44973)).
+ -   `Navigator`: restore focus only once per location  ([#44972](https://github.com/WordPress/gutenberg/pull/44972)).
+ 
+ ### Documentation
+@@ -16,6 +17,7 @@
+ -   `Modal`: Convert to TypeScript ([#42949](https://github.com/WordPress/gutenberg/pull/42949)).
+ -   `Sandbox`: Use `toString` to create observe and resize script string ([#42872](https://github.com/WordPress/gutenberg/pull/42872)).
+ -   `Navigator`: refactor unit tests to TypeScript and to `user-event` ([#44970](https://github.com/WordPress/gutenberg/pull/44970)).
++-   `Navigator`: Refactor Storybook code to TypeScript and controls ([#44979](https://github.com/WordPress/gutenberg/pull/44979)).
+ 
+ ## 21.2.0 (2022-10-05)
+ 
+diff --git a/packages/components/src/navigator/index.ts b/packages/components/src/navigator/index.ts
+index 20d1fd56ce319a..49f5655dc4b39c 100644
+--- a/packages/components/src/navigator/index.ts
++++ b/packages/components/src/navigator/index.ts
+@@ -1,5 +1,5 @@
+-export { default as NavigatorProvider } from './navigator-provider';
+-export { default as NavigatorScreen } from './navigator-screen';
+-export { default as NavigatorButton } from './navigator-button';
+-export { default as NavigatorBackButton } from './navigator-back-button';
++export { NavigatorProvider } from './navigator-provider';
++export { NavigatorScreen } from './navigator-screen';
++export { NavigatorButton } from './navigator-button';
++export { NavigatorBackButton } from './navigator-back-button';
+ export { default as useNavigator } from './use-navigator';
+diff --git a/packages/components/src/navigator/navigator-back-button/component.tsx b/packages/components/src/navigator/navigator-back-button/component.tsx
+index 93523c782ee5ab..498096edd7d465 100644
+--- a/packages/components/src/navigator/navigator-back-button/component.tsx
++++ b/packages/components/src/navigator/navigator-back-button/component.tsx
+@@ -11,7 +11,7 @@ import { View } from '../../view';
+ import { useNavigatorBackButton } from './hook';
+ import type { NavigatorBackButtonProps } from '../types';
+ 
+-function NavigatorBackButton(
++function UnconnectedNavigatorBackButton(
+ 	props: WordPressComponentProps< NavigatorBackButtonProps, 'button' >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+@@ -54,9 +54,9 @@ function NavigatorBackButton(
+  * );
+  * ```
+  */
+-const ConnectedNavigatorBackButton = contextConnect(
+-	NavigatorBackButton,
++export const NavigatorBackButton = contextConnect(
++	UnconnectedNavigatorBackButton,
+ 	'NavigatorBackButton'
+ );
+ 
+-export default ConnectedNavigatorBackButton;
++export default NavigatorBackButton;
+diff --git a/packages/components/src/navigator/navigator-back-button/index.ts b/packages/components/src/navigator/navigator-back-button/index.ts
+index b404d7fd44a81a..9046e90350e278 100644
+--- a/packages/components/src/navigator/navigator-back-button/index.ts
++++ b/packages/components/src/navigator/navigator-back-button/index.ts
+@@ -1 +1 @@
+-export { default } from './component';
++export { default as NavigatorBackButton } from './component';
+diff --git a/packages/components/src/navigator/navigator-button/component.tsx b/packages/components/src/navigator/navigator-button/component.tsx
+index 2f7ab0f66b8274..2e446dac010c09 100644
+--- a/packages/components/src/navigator/navigator-button/component.tsx
++++ b/packages/components/src/navigator/navigator-button/component.tsx
+@@ -11,7 +11,7 @@ import { View } from '../../view';
+ import { useNavigatorButton } from './hook';
+ import type { NavigatorButtonProps } from '../types';
+ 
+-function NavigatorButton(
++function UnconnectedNavigatorButton(
+ 	props: WordPressComponentProps< NavigatorButtonProps, 'button' >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+@@ -53,9 +53,9 @@ function NavigatorButton(
+  * );
+  * ```
+  */
+-const ConnectedNavigatorButton = contextConnect(
+-	NavigatorButton,
++export const NavigatorButton = contextConnect(
++	UnconnectedNavigatorButton,
+ 	'NavigatorButton'
+ );
+ 
+-export default ConnectedNavigatorButton;
++export default NavigatorButton;
+diff --git a/packages/components/src/navigator/navigator-button/index.ts b/packages/components/src/navigator/navigator-button/index.ts
+index b404d7fd44a81a..74975a5e1b0c14 100644
+--- a/packages/components/src/navigator/navigator-button/index.ts
++++ b/packages/components/src/navigator/navigator-button/index.ts
+@@ -1 +1 @@
+-export { default } from './component';
++export { default as NavigatorButton } from './component';
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index fc769f2f5736ca..57b18f6d92dba0 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -26,7 +26,7 @@ import type {
+ 	NavigatorContext as NavigatorContextType,
+ } from '../types';
+ 
+-function NavigatorProvider(
++function UnconnectedNavigatorProvider(
+ 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+@@ -131,9 +131,9 @@ function NavigatorProvider(
+  * );
+  * ```
+  */
+-const ConnectedNavigatorProvider = contextConnect(
+-	NavigatorProvider,
++export const NavigatorProvider = contextConnect(
++	UnconnectedNavigatorProvider,
+ 	'NavigatorProvider'
+ );
+ 
+-export default ConnectedNavigatorProvider;
++export default NavigatorProvider;
+diff --git a/packages/components/src/navigator/navigator-provider/index.ts b/packages/components/src/navigator/navigator-provider/index.ts
+index b404d7fd44a81a..b9a330613ac847 100644
+--- a/packages/components/src/navigator/navigator-provider/index.ts
++++ b/packages/components/src/navigator/navigator-provider/index.ts
+@@ -1 +1 @@
+-export { default } from './component';
++export { default as NavigatorProvider } from './component';
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 1ce1f22c5dcecd..00eee087bd63c5 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -42,7 +42,10 @@ type Props = Omit<
+ 	keyof MotionProps
+ >;
+ 
+-function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
++function UnconnectedNavigatorScreen(
++	props: Props,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const { children, className, path, ...otherProps } = useContextSystem(
+ 		props,
+ 		'NavigatorScreen'
+@@ -208,9 +211,9 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
+  * );
+  * ```
+  */
+-const ConnectedNavigatorScreen = contextConnect(
+-	NavigatorScreen,
++export const NavigatorScreen = contextConnect(
++	UnconnectedNavigatorScreen,
+ 	'NavigatorScreen'
+ );
+ 
+-export default ConnectedNavigatorScreen;
++export default NavigatorScreen;
+diff --git a/packages/components/src/navigator/navigator-screen/index.ts b/packages/components/src/navigator/navigator-screen/index.ts
+index b404d7fd44a81a..9c9a40d435fff3 100644
+--- a/packages/components/src/navigator/navigator-screen/index.ts
++++ b/packages/components/src/navigator/navigator-screen/index.ts
+@@ -1 +1 @@
+-export { default } from './component';
++export { default as NavigatorScreen } from './component';
+diff --git a/packages/components/src/navigator/stories/index.js b/packages/components/src/navigator/stories/index.js
+deleted file mode 100644
+index cbc710a28a5990..00000000000000
+--- a/packages/components/src/navigator/stories/index.js
++++ /dev/null
+@@ -1,194 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import Button from '../../button';
+-import { Card, CardBody, CardFooter, CardHeader } from '../../card';
+-import { HStack } from '../../h-stack';
+-import Dropdown from '../../dropdown';
+-import { useCx } from '../../utils/hooks/use-cx';
+-import {
+-	NavigatorProvider,
+-	NavigatorScreen,
+-	NavigatorButton,
+-	NavigatorBackButton,
+-} from '../';
+-
+-export default {
+-	title: 'Components (Experimental)/Navigator',
+-	component: NavigatorProvider,
+-};
+-
+-const MyNavigation = () => {
+-	const cx = useCx();
+-	return (
+-		<NavigatorProvider
+-			initialPath="/"
+-			className={ cx( css( `height: 100vh; max-height: 450px;` ) ) }
+-		>
+-			<NavigatorScreen path="/">
+-				<Card>
+-					<CardBody>
+-						<p>This is the home screen.</p>
+-
+-						<HStack justify="flex-start" wrap>
+-							<NavigatorButton variant="secondary" path="/child">
+-								Navigate to child screen.
+-							</NavigatorButton>
+-
+-							<NavigatorButton
+-								variant="secondary"
+-								path="/overflow-child"
+-							>
+-								Navigate to screen with horizontal overflow.
+-							</NavigatorButton>
+-
+-							<NavigatorButton
+-								variant="secondary"
+-								path="/stickies"
+-							>
+-								Navigate to screen with sticky content.
+-							</NavigatorButton>
+-
+-							<Dropdown
+-								renderToggle={ ( { isOpen, onToggle } ) => (
+-									<Button
+-										onClick={ onToggle }
+-										aria-expanded={ isOpen }
+-										variant="primary"
+-									>
+-										Open test dialog
+-									</Button>
+-								) }
+-								renderContent={ () => (
+-									<Card>
+-										<CardHeader>Go</CardHeader>
+-										<CardBody>Stuff</CardBody>
+-									</Card>
+-								) }
+-							/>
+-						</HStack>
+-					</CardBody>
+-				</Card>
+-			</NavigatorScreen>
+-
+-			<NavigatorScreen path="/child">
+-				<Card>
+-					<CardBody>
+-						<p>This is the child screen.</p>
+-						<NavigatorBackButton variant="secondary">
+-							Go back
+-						</NavigatorBackButton>
+-					</CardBody>
+-				</Card>
+-			</NavigatorScreen>
+-
+-			<NavigatorScreen path="/overflow-child">
+-				<Card>
+-					<CardBody>
+-						<NavigatorBackButton variant="secondary">
+-							Go back
+-						</NavigatorBackButton>
+-						<div
+-							className={ cx(
+-								css( `
+-									display: inline-block;
+-									background: papayawhip;
+-								` )
+-							) }
+-						>
+-							<span
+-								className={ cx(
+-									css( `
+-										color: palevioletred;
+-										white-space: nowrap;
+-										font-size: 42vw;
+-									` )
+-								) }
+-							>
+-								¯\_(ツ)_/¯
+-							</span>
+-						</div>
+-					</CardBody>
+-				</Card>
+-			</NavigatorScreen>
+-
+-			<NavigatorScreen path="/stickies">
+-				<Card>
+-					<Sticky as={ CardHeader } z="2">
+-						<NavigatorBackButton variant="secondary">
+-							Go back
+-						</NavigatorBackButton>
+-					</Sticky>
+-					<CardBody>
+-						<Sticky top="69px" colors="papayawhip/peachpuff">
+-							<h2>A wild sticky element appears</h2>
+-						</Sticky>
+-						<MetaphorIpsum quantity={ 3 } />
+-					</CardBody>
+-					<CardBody>
+-						<Sticky top="69px" colors="azure/paleturquoise">
+-							<h2>Another wild sticky element appears</h2>
+-						</Sticky>
+-						<MetaphorIpsum quantity={ 3 } />
+-					</CardBody>
+-					<Sticky as={ CardFooter } colors="mistyrose/pink">
+-						<Button variant="primary">Primary noop</Button>
+-					</Sticky>
+-				</Card>
+-			</NavigatorScreen>
+-		</NavigatorProvider>
+-	);
+-};
+-
+-export const _default = () => {
+-	return <MyNavigation />;
+-};
+-
+-function Sticky( {
+-	as: Tag = 'div',
+-	bottom = 0,
+-	colors = 'whitesmoke/lightgrey',
+-	top = 0,
+-	z: zIndex = 1,
+-	...props
+-} ) {
+-	const cx = useCx();
+-	const [ bgColor, dotColor ] = colors.split( '/' );
+-	const className = cx(
+-		css( {
+-			top,
+-			bottom,
+-			zIndex,
+-			display: 'flex',
+-			position: 'sticky',
+-			background: `radial-gradient(${ dotColor } 1px, ${ bgColor } 2px) 50%/1em 1em`,
+-		} ),
+-		props.className
+-	);
+-	const propsOut = { ...props, className };
+-	return <Tag { ...propsOut } />;
+-}
+-
+-function MetaphorIpsum( { quantity } ) {
+-	const cx = useCx();
+-	const list = [
+-		'A loopy clarinet’s year comes with it the thought that the fenny step-son is an ophthalmologist. The literature would have us believe that a glabrate country is not but a rhythm. A beech is a rub from the right perspective. In ancient times few can name an unglossed walrus that isn’t an unspilt trial.',
+-		'Authors often misinterpret the afterthought as a roseless mother-in-law, when in actuality it feels more like an uncapped thunderstorm. In recent years, some posit the tarry bottle to be less than acerb. They were lost without the unkissed timbale that composed their customer. A donna is a springtime breath.',
+-		'It’s an undeniable fact, really; their museum was, in this moment, a snotty beef. The swordfishes could be said to resemble prowessed lasagnas. However, the rainier authority comes from a cureless soup. Unfortunately, that is wrong; on the contrary, the cover is a powder.',
+-	];
+-	quantity = Math.min( list.length, quantity );
+-	return (
+-		<>
+-			{ list.slice( 0, quantity ).map( ( text, key ) => (
+-				<p className={ cx( css( `max-width: 20em;` ) ) } key={ key }>
+-					{ text }
+-				</p>
+-			) ) }
+-		</>
+-	);
+-}
+diff --git a/packages/components/src/navigator/stories/index.tsx b/packages/components/src/navigator/stories/index.tsx
+new file mode 100644
+index 00000000000000..a1f6e2fbf0c9a5
+--- /dev/null
++++ b/packages/components/src/navigator/stories/index.tsx
+@@ -0,0 +1,210 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../../button';
++import { Card, CardBody, CardFooter, CardHeader } from '../../card';
++import { HStack } from '../../h-stack';
++import Dropdown from '../../dropdown';
++import {
++	NavigatorProvider,
++	NavigatorScreen,
++	NavigatorButton,
++	NavigatorBackButton,
++} from '..';
++
++const meta: ComponentMeta< typeof NavigatorProvider > = {
++	component: NavigatorProvider,
++	title: 'Components (Experimental)/Navigator',
++	subcomponents: { NavigatorScreen, NavigatorButton, NavigatorBackButton },
++	argTypes: {
++		as: { control: { type: null } },
++		children: { control: { type: null } },
++		initialPath: { control: { type: null } },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof NavigatorProvider > = ( {
++	style,
++	...props
++} ) => (
++	<NavigatorProvider
++		style={ { ...style, height: '100vh', maxHeight: '450px' } }
++		{ ...props }
++	>
++		<NavigatorScreen path="/">
++			<Card>
++				<CardBody>
++					<p>This is the home screen.</p>
++
++					<HStack justify="flex-start" wrap>
++						<NavigatorButton variant="secondary" path="/child">
++							Navigate to child screen.
++						</NavigatorButton>
++
++						<NavigatorButton
++							variant="secondary"
++							path="/overflow-child"
++						>
++							Navigate to screen with horizontal overflow.
++						</NavigatorButton>
++
++						<NavigatorButton variant="secondary" path="/stickies">
++							Navigate to screen with sticky content.
++						</NavigatorButton>
++
++						<Dropdown
++							renderToggle={ ( {
++								isOpen,
++								onToggle,
++							}: {
++								// TODO: remove once `Dropdown` is refactored to TypeScript
++								isOpen: boolean;
++								onToggle: () => void;
++							} ) => (
++								<Button
++									onClick={ onToggle }
++									aria-expanded={ isOpen }
++									variant="primary"
++								>
++									Open test dialog
++								</Button>
++							) }
++							renderContent={ () => (
++								<Card>
++									<CardHeader>Go</CardHeader>
++									<CardBody>Stuff</CardBody>
++								</Card>
++							) }
++						/>
++					</HStack>
++				</CardBody>
++			</Card>
++		</NavigatorScreen>
++
++		<NavigatorScreen path="/child">
++			<Card>
++				<CardBody>
++					<p>This is the child screen.</p>
++					<NavigatorBackButton variant="secondary">
++						Go back
++					</NavigatorBackButton>
++				</CardBody>
++			</Card>
++		</NavigatorScreen>
++
++		<NavigatorScreen path="/overflow-child">
++			<Card>
++				<CardBody>
++					<NavigatorBackButton variant="secondary">
++						Go back
++					</NavigatorBackButton>
++					<div
++						style={ {
++							display: 'inline-block',
++							background: 'papayawhip',
++						} }
++					>
++						<span
++							style={ {
++								color: 'palevioletred',
++								whiteSpace: 'nowrap',
++								fontSize: '42vw',
++							} }
++						>
++							¯\_(ツ)_/¯
++						</span>
++					</div>
++				</CardBody>
++			</Card>
++		</NavigatorScreen>
++
++		<NavigatorScreen path="/stickies">
++			<Card>
++				<CardHeader style={ getStickyStyles( { zIndex: 2 } ) }>
++					<NavigatorBackButton variant="secondary">
++						Go back
++					</NavigatorBackButton>
++				</CardHeader>
++				<CardBody>
++					<div
++						style={ getStickyStyles( {
++							top: 69,
++							bgColor: 'peachpuff',
++						} ) }
++					>
++						<h2>A wild sticky element appears</h2>
++					</div>
++					<MetaphorIpsum quantity={ 3 } />
++				</CardBody>
++				<CardBody>
++					<div
++						style={ getStickyStyles( {
++							top: 69,
++							bgColor: 'paleturquoise',
++						} ) }
++					>
++						<h2>Another wild sticky element appears</h2>
++					</div>
++					<MetaphorIpsum quantity={ 3 } />
++				</CardBody>
++				<CardFooter
++					style={ getStickyStyles( {
++						bgColor: 'mistyrose',
++					} ) }
++				>
++					<Button variant="primary">Primary noop</Button>
++				</CardFooter>
++			</Card>
++		</NavigatorScreen>
++	</NavigatorProvider>
++);
++
++export const Default: ComponentStory< typeof NavigatorProvider > =
++	Template.bind( {} );
++Default.args = {
++	initialPath: '/',
++};
++
++function getStickyStyles( {
++	bottom = 0,
++	bgColor = 'whitesmoke',
++	top = 0,
++	zIndex = 1,
++} ): React.CSSProperties {
++	return {
++		display: 'flex',
++		position: 'sticky',
++		top,
++		bottom,
++		zIndex,
++		backgroundColor: bgColor,
++	};
++}
++
++function MetaphorIpsum( { quantity }: { quantity: number } ) {
++	const list = [
++		'A loopy clarinet’s year comes with it the thought that the fenny step-son is an ophthalmologist. The literature would have us believe that a glabrate country is not but a rhythm. A beech is a rub from the right perspective. In ancient times few can name an unglossed walrus that isn’t an unspilt trial.',
++		'Authors often misinterpret the afterthought as a roseless mother-in-law, when in actuality it feels more like an uncapped thunderstorm. In recent years, some posit the tarry bottle to be less than acerb. They were lost without the unkissed timbale that composed their customer. A donna is a springtime breath.',
++		'It’s an undeniable fact, really; their museum was, in this moment, a snotty beef. The swordfishes could be said to resemble prowessed lasagnas. However, the rainier authority comes from a cureless soup. Unfortunately, that is wrong; on the contrary, the cover is a powder.',
++	];
++	quantity = Math.min( list.length, quantity );
++	return (
++		<>
++			{ list.slice( 0, quantity ).map( ( text, key ) => (
++				<p style={ { maxWidth: '20em' } } key={ key }>
++					{ text }
++				</p>
++			) ) }
++		</>
++	);
++}
+diff --git a/packages/components/src/navigator/types.ts b/packages/components/src/navigator/types.ts
+index 217b9408923374..0b1a6a077ea7a0 100644
+--- a/packages/components/src/navigator/types.ts
++++ b/packages/components/src/navigator/types.ts
+@@ -48,6 +48,7 @@ export type NavigatorScreenProps = {
+ type ButtonProps = {
+ 	// TODO: should also extend `Button` prop types once the `Button` component
+ 	// is refactored to TypeScript.
++	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
+ };
+ export type NavigatorBackButtonProps = Omit< ButtonProps, 'href' > & {
+ 	/**

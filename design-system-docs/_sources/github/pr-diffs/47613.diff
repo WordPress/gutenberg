@@ -1,0 +1,88 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index adb816d615f632..11e5eb394dd399 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -140,6 +140,7 @@ const restrictedImports = [
+ 			'toString',
+ 			'trim',
+ 			'truncate',
++			'unescape',
+ 			'unionBy',
+ 			'uniq',
+ 			'uniqBy',
+diff --git a/package-lock.json b/package-lock.json
+index 8ac8dd13d11da2..4c87d707a3dd6f 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -17443,6 +17443,7 @@
+ 				"@wordpress/element": "file:packages/element",
+ 				"@wordpress/escape-html": "file:packages/escape-html",
+ 				"@wordpress/hooks": "file:packages/hooks",
++				"@wordpress/html-entities": "file:packages/html-entities",
+ 				"@wordpress/i18n": "file:packages/i18n",
+ 				"@wordpress/icons": "file:packages/icons",
+ 				"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 13716524ffafbc..bd9b0c5cdac9f9 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -46,6 +46,7 @@
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/escape-html": "file:../escape-html",
+ 		"@wordpress/hooks": "file:../hooks",
++		"@wordpress/html-entities": "file:../html-entities",
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/icons": "file:../icons",
+ 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+diff --git a/packages/components/src/tree-select/index.tsx b/packages/components/src/tree-select/index.tsx
+index b7e76cf53cc7ec..13bf82790e3bde 100644
+--- a/packages/components/src/tree-select/index.tsx
++++ b/packages/components/src/tree-select/index.tsx
+@@ -1,12 +1,9 @@
+-/**
+- * External dependencies
+- */
+-import { unescape as unescapeString } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+ import { useMemo } from '@wordpress/element';
++import { decodeEntities } from '@wordpress/html-entities';
++
+ /**
+  * Internal dependencies
+  */
+@@ -18,7 +15,7 @@ function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
+ 		{
+ 			value: treeNode.id,
+ 			label:
+-				'\u00A0'.repeat( level * 3 ) + unescapeString( treeNode.name ),
++				'\u00A0'.repeat( level * 3 ) + decodeEntities( treeNode.name ),
+ 		},
+ 		...getSelectOptions( treeNode.children || [], level + 1 ),
+ 	] );
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index e88f685fdbf42b..85525c25b6d1e9 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -24,6 +24,7 @@
+ 		{ "path": "../deprecated" },
+ 		{ "path": "../dom" },
+ 		{ "path": "../element" },
++		{ "path": "../html-entities" },
+ 		{ "path": "../hooks" },
+ 		{ "path": "../icons" },
+ 		{ "path": "../is-shallow-equal" },
+diff --git a/packages/editor/src/utils/terms.js b/packages/editor/src/utils/terms.js
+index edb0923317e0e2..e95987c02a6d17 100644
+--- a/packages/editor/src/utils/terms.js
++++ b/packages/editor/src/utils/terms.js
+@@ -50,7 +50,6 @@ export const unescapeString = ( arg ) => {
+ 
+ /**
+  * Returns a term object with name unescaped.
+- * The unescape of the name property is done using lodash unescape function.
+  *
+  * @param {Object} term The term object to unescape.
+  *

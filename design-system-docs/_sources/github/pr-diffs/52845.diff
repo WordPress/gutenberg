@@ -1,0 +1,59 @@
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index 20063b2315dd39..2e1f4fd591e787 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -82,6 +82,7 @@ const UnforwardedTabPanel = (
+ 	{
+ 		className,
+ 		children,
++		fitted = false,
+ 		tabs,
+ 		selectOnMove = true,
+ 		initialTabName,
+@@ -163,7 +164,11 @@ const UnforwardedTabPanel = (
+ 				onNavigate={
+ 					selectOnMove ? activateTabAutomatically : undefined
+ 				}
+-				className="components-tab-panel__tabs"
++				//className="components-tab-panel__tabs"
++				className={ classnames(
++					'components-tab-panel__tabs',
++					fitted ? 'is-fitted' : null
++				) }
+ 			>
+ 				{ tabs.map( ( tab ) => (
+ 					<TabButton
+diff --git a/packages/components/src/tab-panel/style.scss b/packages/components/src/tab-panel/style.scss
+index a6b6189e6c204b..6db7a858d38edb 100644
+--- a/packages/components/src/tab-panel/style.scss
++++ b/packages/components/src/tab-panel/style.scss
+@@ -5,6 +5,12 @@
+ 	&[aria-orientation="vertical"] {
+ 		flex-direction: column;
+ 	}
++	&.is-fitted {
++		.components-tab-panel__tabs-item {
++			flex: 1;
++			justify-content: center;
++		}
++	}
+ }
+ 
+ // This tab style CSS is duplicated verbatim in
+diff --git a/packages/components/src/tab-panel/types.ts b/packages/components/src/tab-panel/types.ts
+index 4bef866923ebca..abb6696365688e 100644
+--- a/packages/components/src/tab-panel/types.ts
++++ b/packages/components/src/tab-panel/types.ts
+@@ -87,4 +87,12 @@ export type TabPanelProps = {
+ 	 * @see https://www.w3.org/WAI/ARIA/apg/patterns/tabpanel/
+ 	 */
+ 	selectOnMove?: boolean;
++
++	/**
++	 * When `true` the tab panel will grow to fill its container.
++	 * .
++	 *
++	 * @default false
++	 */
++	fitted?: boolean;
+ };

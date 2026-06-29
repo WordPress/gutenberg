@@ -1,0 +1,114 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b9952120b08175..c346db1a3769ea 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   `Tabs`: Animate indicator ([#60560](https://github.com/WordPress/gutenberg/pull/60560)).
+ -   `ComboboxControl`: Introduce Combobox expandOnFocus prop ([#61705](https://github.com/WordPress/gutenberg/pull/61705)).
+ -   `ProgressBar`: Expose as public API ([#61062](https://github.com/WordPress/gutenberg/pull/61062)).
++-   `ProgressBar`: Simplify default width implementation and make it more easily overridable ([#61976](https://github.com/WordPress/gutenberg/pull/61976)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/progress-bar/README.md b/packages/components/src/progress-bar/README.md
+index 85d2fa9127b03a..07bd1d6c12071b 100644
+--- a/packages/components/src/progress-bar/README.md
++++ b/packages/components/src/progress-bar/README.md
+@@ -26,14 +26,19 @@ const MyLoadingComponent = ( { progress } ) => {
+ };
+ ```
+ 
+-You can customize its appearance by passing a custom CSS class name to `className`:
++You can customize its appearance by passing a custom CSS class name to `className`.
+ 
++```css
++.my-custom-progress-bar {
++	width: 100%;
++}
++```
+ 
+ ```jsx
+ import { ProgressBar } from '@wordpress/components';
+ 
+ const MyLoadingComponent = () => {
+-	return <ProgressBar className="my-custom-css-class" />;
++	return <ProgressBar className="my-custom-progress-bar" />;
+ };
+ ```
+ 
+@@ -52,7 +57,7 @@ If a `value` is not specified, the progress bar will be considered indeterminate
+ 
+ A CSS class to apply to the underlying `div` element, serving as a progress bar track.
+ 
+-- Required: No
++-   Required: No
+ 
+ #### Inherited props
+ 
+diff --git a/packages/components/src/progress-bar/stories/index.story.tsx b/packages/components/src/progress-bar/stories/index.story.tsx
+index 1b6bc1e36eb1e5..4396c4cc48eebb 100644
+--- a/packages/components/src/progress-bar/stories/index.story.tsx
++++ b/packages/components/src/progress-bar/stories/index.story.tsx
+@@ -29,3 +29,38 @@ const Template: StoryFn< typeof ProgressBar > = ( { ...args } ) => {
+ 
+ export const Default: StoryFn< typeof ProgressBar > = Template.bind( {} );
+ Default.args = {};
++
++const withCustomWidthCustomCSS = `
++	.custom-progress-bar {
++		width: 100%;
++	}
++`;
++
++/**
++ * A progress bar with a custom width.
++ *
++ * You can override the default `width` by passing a custom CSS class via the
++ * `className` prop.
++ *
++ * This example shows a progress bar with an overriden `width` of `100%` which
++ * makes it fit all available horizontal space of the parent element. The CSS
++ * class looks like this:
++ *
++ * ```css
++ * .custom-progress-bar {
++ *   width: 100%;
++ * }
++ * ```
++ */
++export const WithCustomWidth = Template.bind( {} );
++WithCustomWidth.args = {
++	className: 'custom-progress-bar',
++};
++WithCustomWidth.decorators = [
++	( Story ) => (
++		<>
++			<style>{ withCustomWidthCustomCSS }</style>
++			<Story />
++		</>
++	),
++];
+diff --git a/packages/components/src/progress-bar/styles.ts b/packages/components/src/progress-bar/styles.ts
+index f04002f458c0aa..0e91556b96b9d2 100644
+--- a/packages/components/src/progress-bar/styles.ts
++++ b/packages/components/src/progress-bar/styles.ts
+@@ -24,8 +24,6 @@ export const INDETERMINATE_TRACK_WIDTH = 50;
+ export const Track = styled.div`
+ 	position: relative;
+ 	overflow: hidden;
+-	width: 100%;
+-	max-width: 160px;
+ 	height: ${ CONFIG.borderWidthFocus };
+ 	/* Text color at 10% opacity */
+ 	background-color: color-mix(
+@@ -38,6 +36,10 @@ export const Track = styled.div`
+ 	// Windows high contrast mode.
+ 	outline: 2px solid transparent;
+ 	outline-offset: 2px;
++
++	:where( & ) {
++		width: 160px;
++	}
+ `;
+ 
+ export const Indicator = styled.div< {

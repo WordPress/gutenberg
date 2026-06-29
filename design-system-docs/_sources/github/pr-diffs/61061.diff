@@ -1,0 +1,81 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..180d5aa41a25df 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `NumberControl`: Remove "experimental" designation ([#61061](https://github.com/WordPress/gutenberg/pull/61061)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..bb3ab1e7b985f5 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -124,7 +124,13 @@ export {
+ 	useNavigator as __experimentalUseNavigator,
+ } from './navigator';
+ export { default as Notice } from './notice';
+-export { default as __experimentalNumberControl } from './number-control';
++export {
++	/**
++	 * @deprecated Import `NumberControl` instead.
++	 */
++	default as __experimentalNumberControl,
++	NumberControl,
++} from './number-control';
+ export { default as NoticeList } from './notice/list';
+ export { default as Panel } from './panel';
+ export { default as PanelBody } from './panel/body';
+diff --git a/packages/components/src/number-control/README.md b/packages/components/src/number-control/README.md
+index 3a54351cd29258..7994b4189330fb 100644
+--- a/packages/components/src/number-control/README.md
++++ b/packages/components/src/number-control/README.md
+@@ -1,15 +1,11 @@
+ # NumberControl
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ NumberControl is an enhanced HTML [`input[type="number]`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number) element.
+ 
+ ## Usage
+ 
+ ```jsx
+-import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
++import { NumberControl } from '@wordpress/components';
+ 
+ const Example = () => {
+ 	const [ value, setValue ] = useState( 10 );
+diff --git a/packages/components/src/number-control/stories/index.story.tsx b/packages/components/src/number-control/stories/index.story.tsx
+index 3588063f0f4bb2..de13ebd16d21fc 100644
+--- a/packages/components/src/number-control/stories/index.story.tsx
++++ b/packages/components/src/number-control/stories/index.story.tsx
+@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
+ import NumberControl from '..';
+ 
+ const meta: Meta< typeof NumberControl > = {
+-	title: 'Components (Experimental)/NumberControl',
++	title: 'Components/NumberControl',
+ 	component: NumberControl,
+ 	argTypes: {
+ 		onChange: { action: 'onChange' },
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..97548e7bacf05b 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'numbercontrol',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

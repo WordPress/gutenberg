@@ -1,0 +1,48 @@
+diff --git a/packages/ui/src/alert-dialog/stories/index.story.tsx b/packages/ui/src/alert-dialog/stories/index.story.tsx
+index c0ac43127058de..157f8734b51ac7 100644
+--- a/packages/ui/src/alert-dialog/stories/index.story.tsx
++++ b/packages/ui/src/alert-dialog/stories/index.story.tsx
+@@ -12,6 +12,7 @@ const meta: Meta< typeof AlertDialog.Root > = {
+ 	component: AlertDialog.Root,
+ 	subcomponents: {
+ 		'AlertDialog.Trigger': AlertDialog.Trigger,
++		'AlertDialog.Portal': AlertDialog.Portal,
+ 		'AlertDialog.Popup': AlertDialog.Popup,
+ 	},
+ 	argTypes: {
+diff --git a/packages/ui/src/dialog/stories/index.story.tsx b/packages/ui/src/dialog/stories/index.story.tsx
+index 928035035810c8..2766e60ff46f11 100644
+--- a/packages/ui/src/dialog/stories/index.story.tsx
++++ b/packages/ui/src/dialog/stories/index.story.tsx
+@@ -10,6 +10,7 @@ const meta: Meta< typeof Dialog.Root > = {
+ 	component: Dialog.Root,
+ 	subcomponents: {
+ 		'Dialog.Trigger': Dialog.Trigger,
++		'Dialog.Portal': Dialog.Portal,
+ 		'Dialog.Popup': Dialog.Popup,
+ 		'Dialog.Header': Dialog.Header,
+ 		'Dialog.Title': Dialog.Title,
+diff --git a/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx b/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
+index 33885311302f7c..d46d6a7c3449a5 100644
+--- a/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
+@@ -12,6 +12,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
+ 	title: 'Design System/Components/Form/Primitives/Autocomplete',
+ 	component: Autocomplete.Root,
+ 	subcomponents: {
++		Portal: Autocomplete.Portal,
+ 		Popup: Autocomplete.Popup,
+ 		Input: Autocomplete.Input,
+ 		InputGroup: Autocomplete.InputGroup,
+diff --git a/packages/ui/src/form/primitives/select/stories/index.story.tsx b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+index 438b2a615b6207..1118ad4600979a 100644
+--- a/packages/ui/src/form/primitives/select/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+@@ -6,6 +6,7 @@ const meta: Meta< typeof Select.Root > = {
+ 	component: Select.Root,
+ 	subcomponents: {
+ 		Trigger: Select.Trigger,
++		Portal: Select.Portal,
+ 		Popup: Select.Popup,
+ 		Item: Select.Item,
+ 	},

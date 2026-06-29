@@ -1,0 +1,56 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index b7ff4534aa7cc8..f54ef33881d271 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -83,6 +83,7 @@ module.exports = {
+ 							'differenceWith',
+ 							'findIndex',
+ 							'isArray',
++							'isFinite',
+ 							'isUndefined',
+ 							'memoize',
+ 							'negate',
+diff --git a/packages/block-library/src/paragraph/deprecated.js b/packages/block-library/src/paragraph/deprecated.js
+index 24896a034207d0..f785d2ec4fd018 100644
+--- a/packages/block-library/src/paragraph/deprecated.js
++++ b/packages/block-library/src/paragraph/deprecated.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { isFinite, omit } from 'lodash';
++import { omit } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -328,7 +328,7 @@ const deprecated = [
+ 			return migrateCustomColorsAndFontSizes(
+ 				omit( {
+ 					...attributes,
+-					customFontSize: isFinite( attributes.fontSize )
++					customFontSize: Number.isFinite( attributes.fontSize )
+ 						? attributes.fontSize
+ 						: undefined,
+ 					customTextColor:
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index df3182df653433..8ed2f5666feb89 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -3,7 +3,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { clamp, isFinite } from 'lodash';
++import { clamp } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -123,7 +123,7 @@ function RangeControl(
+ 
+ 	const id = useInstanceId( RangeControl, 'inspector-range-control' );
+ 	const describedBy = !! help ? `${ id }__help` : undefined;
+-	const enableTooltip = showTooltipProp !== false && isFinite( value );
++	const enableTooltip = showTooltipProp !== false && Number.isFinite( value );
+ 
+ 	const handleOnRangeChange = ( event ) => {
+ 		const nextValue = parseFloat( event.target.value );

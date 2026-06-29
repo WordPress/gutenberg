@@ -1,0 +1,114 @@
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index 14305a93611977..9c7b55e78a69cc 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -7,7 +7,6 @@ $z-layers: (
+ 	".block-editor-block-switcher__arrow": 1,
+ 	".block-editor-block-list__block {core/image aligned wide or fullwide}": 20,
+ 	".block-library-classic__toolbar": 31, // When scrolled to top this toolbar needs to sit over block-editor-block-toolbar
+-	".block-editor-block-list__layout .reusable-block-indicator": 1,
+ 	".block-editor-block-list__block-selection-button": 22,
+ 	".components-form-toggle__input": 1,
+ 	".edit-post-text-editor__toolbar": 1,
+diff --git a/packages/block-editor/src/components/block-preview/README.md b/packages/block-editor/src/components/block-preview/README.md
+index 6df2cb6773878b..0da7348817cd85 100644
+--- a/packages/block-editor/src/components/block-preview/README.md
++++ b/packages/block-editor/src/components/block-preview/README.md
+@@ -34,17 +34,3 @@ Width of the preview container in pixels. Controls at what size the blocks will
+ -   **Default** `undefined`
+ 
+ Padding for the preview container body.
+-
+-### `__experimentalLive`
+-
+--   **Type** `Boolean`
+--   **Default:** `false`
+-
+-Enables displaying previews without an iframe container.
+-
+-### `__experimentalOnClick`
+-
+--   **Type** `Function`
+--   **Default:** `undefined`
+-
+-Use this callback in combination with `__experimentalLive`. The callback is attached to the preview container element.
+diff --git a/packages/block-editor/src/components/block-preview/index.js b/packages/block-editor/src/components/block-preview/index.js
+index b01411591f098d..535a67438cad8e 100644
+--- a/packages/block-editor/src/components/block-preview/index.js
++++ b/packages/block-editor/src/components/block-preview/index.js
+@@ -14,7 +14,6 @@ import { memo, useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import BlockEditorProvider from '../provider';
+-import LiveBlockPreview from './live';
+ import AutoHeightBlockPreview from './auto';
+ import { store as blockEditorStore } from '../../store';
+ import { BlockListItems } from '../block-list';
+@@ -23,8 +22,6 @@ export function BlockPreview( {
+ 	blocks,
+ 	__experimentalPadding = 0,
+ 	viewportWidth = 1200,
+-	__experimentalLive = false,
+-	__experimentalOnClick,
+ 	__experimentalMinHeight,
+ } ) {
+ 	const originalSettings = useSelect(
+@@ -44,15 +41,11 @@ export function BlockPreview( {
+ 	}
+ 	return (
+ 		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
+-			{ __experimentalLive ? (
+-				<LiveBlockPreview onClick={ __experimentalOnClick } />
+-			) : (
+-				<AutoHeightBlockPreview
+-					viewportWidth={ viewportWidth }
+-					__experimentalPadding={ __experimentalPadding }
+-					__experimentalMinHeight={ __experimentalMinHeight }
+-				/>
+-			) }
++			<AutoHeightBlockPreview
++				viewportWidth={ viewportWidth }
++				__experimentalPadding={ __experimentalPadding }
++				__experimentalMinHeight={ __experimentalMinHeight }
++			/>
+ 		</BlockEditorProvider>
+ 	);
+ }
+diff --git a/packages/block-editor/src/components/block-preview/live.js b/packages/block-editor/src/components/block-preview/live.js
+deleted file mode 100644
+index 5015c778defe78..00000000000000
+--- a/packages/block-editor/src/components/block-preview/live.js
++++ /dev/null
+@@ -1,19 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import BlockList from '../block-list';
+-
+-export default function LiveBlockPreview( { onClick } ) {
+-	return (
+-		<div
+-			tabIndex={ 0 }
+-			role="button"
+-			onClick={ onClick }
+-			onKeyPress={ onClick }
+-		>
+-			<div inert="true">
+-				<BlockList />
+-			</div>
+-		</div>
+-	);
+-}
+diff --git a/packages/block-editor/src/components/block-preview/style.scss b/packages/block-editor/src/components/block-preview/style.scss
+index 9736d6f6784c46..54dad77698d940 100644
+--- a/packages/block-editor/src/components/block-preview/style.scss
++++ b/packages/block-editor/src/components/block-preview/style.scss
+@@ -29,8 +29,6 @@
+ 		min-height: auto;
+ 
+ 		.block-editor-block-list__insertion-point,
+-		.block-editor-block-drop-zone,
+-		.reusable-block-indicator,
+ 		.block-list-appender {
+ 			display: none;
+ 		}

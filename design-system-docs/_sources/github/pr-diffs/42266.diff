@@ -1,0 +1,58 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bff57a9941e6eb..bb2b2a04c56aad 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -   `Slot`/`Fill`: Refactor away from Lodash ([#42153](https://github.com/WordPress/gutenberg/pull/42153/)).
+ -   `ComboboxControl`: Refactor away from `_.deburr()` ([#42169](https://github.com/WordPress/gutenberg/pull/42169/)).
+ -   `FormTokenField`: Refactor away from `_.identity()` ([#42215](https://github.com/WordPress/gutenberg/pull/42215/)).
++-   `Autocomplete`: Refactor away from `_.deburr()` ([#42266](https://github.com/WordPress/gutenberg/pull/42266/)).
+ -   `MenuItem`: Refactor away from `_.isString()` ([#42268](https://github.com/WordPress/gutenberg/pull/42268/)).
+ -   `Shortcut`: Refactor away from `_.isString()` ([#42268](https://github.com/WordPress/gutenberg/pull/42268/)).
+ 
+diff --git a/packages/components/src/autocomplete/get-default-use-items.js b/packages/components/src/autocomplete/get-default-use-items.js
+index c6f70798871832..14d67f3ff45341 100644
+--- a/packages/components/src/autocomplete/get-default-use-items.js
++++ b/packages/components/src/autocomplete/get-default-use-items.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { debounce, deburr, escapeRegExp } from 'lodash';
++import { debounce, escapeRegExp } from 'lodash';
++import removeAccents from 'remove-accents';
+ 
+ /**
+  * WordPress dependencies
+@@ -20,7 +21,7 @@ function filterOptions( search, options = [], maxResults = 10 ) {
+ 		}
+ 
+ 		const isMatch = keywords.some( ( keyword ) =>
+-			search.test( deburr( keyword ) )
++			search.test( removeAccents( keyword ) )
+ 		);
+ 		if ( ! isMatch ) {
+ 			continue;
+diff --git a/packages/components/src/autocomplete/index.js b/packages/components/src/autocomplete/index.js
+index 9140b7560d732b..96cc775d30ceff 100644
+--- a/packages/components/src/autocomplete/index.js
++++ b/packages/components/src/autocomplete/index.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { escapeRegExp, find, deburr } from 'lodash';
++import { escapeRegExp, find } from 'lodash';
++import removeAccents from 'remove-accents';
+ 
+ /**
+  * WordPress dependencies
+@@ -284,7 +285,7 @@ function useAutocomplete( {
+ 			return;
+ 		}
+ 
+-		const text = deburr( textContent );
++		const text = removeAccents( textContent );
+ 		const textAfterSelection = getTextContent(
+ 			slice( record, undefined, getTextContent( record ).length )
+ 		);

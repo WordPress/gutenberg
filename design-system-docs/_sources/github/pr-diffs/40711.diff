@@ -1,0 +1,112 @@
+diff --git a/packages/components/src/panel/README.md b/packages/components/src/panel/README.md
+index 58e59a4f85a04c..d6fd4cf7992186 100644
+--- a/packages/components/src/panel/README.md
++++ b/packages/components/src/panel/README.md
+@@ -127,6 +127,22 @@ An icon to be shown next to the `PanelBody` title.
+ -   Type: `String`
+ -   Required: No
+ 
++###### iconExpanded
++
++An icon to be shown as the toggle button within the `PanelBody` title, in its expanded state. See [the `@wordpress/icons` package](https://github.com/WordPress/gutenberg/blob/trunk/packages/icons/README.md) for a list of available icons.
++
++-   Type: `React.ReactNode`
++-   Required: No
++-   Default: `chevronUp` icon from `@wordpress/icons`
++
++###### iconCollapsed
++
++An icon to be shown as the toggle button within the `PanelBody` title, in its collapsed state. See [the `@wordpress/icons` package](https://github.com/WordPress/gutenberg/blob/trunk/packages/icons/README.md) for a list of available icons.
++
++-   Type: `React.ReactNode`
++-   Required: No
++-   Default: `chevronDown` icon from `@wordpress/icons`
++
+ ###### onToggle
+ 
+ A function that is called when the user clicks on the `PanelBody` title after the open state is changed.
+diff --git a/packages/components/src/panel/body.js b/packages/components/src/panel/body.js
+index a62d72d403a95e..2aa02991ccd261 100644
+--- a/packages/components/src/panel/body.js
++++ b/packages/components/src/panel/body.js
+@@ -24,6 +24,8 @@ export function PanelBody(
+ 		children,
+ 		className,
+ 		icon,
++		iconExpanded = chevronUp,
++		iconCollapsed = chevronDown,
+ 		initialOpen,
+ 		onToggle = noop,
+ 		opened,
+@@ -79,6 +81,8 @@ export function PanelBody(
+ 		<div className={ classes } ref={ useMergeRefs( [ nodeRef, ref ] ) }>
+ 			<PanelBodyTitle
+ 				icon={ icon }
++				iconExpanded={ iconExpanded }
++				iconCollapsed={ iconCollapsed }
+ 				isOpened={ isOpened }
+ 				onClick={ handleOnToggle }
+ 				title={ title }
+@@ -92,7 +96,10 @@ export function PanelBody(
+ }
+ 
+ const PanelBodyTitle = forwardRef(
+-	( { isOpened, icon, title, ...props }, ref ) => {
++	(
++		{ isOpened, icon, title, iconExpanded, iconCollapsed, ...props },
++		ref
++	) => {
+ 		if ( ! title ) return null;
+ 
+ 		return (
+@@ -110,7 +117,7 @@ const PanelBodyTitle = forwardRef(
+ 					<span aria-hidden="true">
+ 						<Icon
+ 							className="components-panel__arrow"
+-							icon={ isOpened ? chevronUp : chevronDown }
++							icon={ isOpened ? iconExpanded : iconCollapsed }
+ 						/>
+ 					</span>
+ 					{ title }
+diff --git a/packages/components/src/panel/stories/index.js b/packages/components/src/panel/stories/index.js
+index 2afd1ae481eb98..a06774559fb526 100644
+--- a/packages/components/src/panel/stories/index.js
++++ b/packages/components/src/panel/stories/index.js
+@@ -13,7 +13,7 @@ import PanelBody from '../body';
+ /**
+  * WordPress dependencies
+  */
+-import { wordpress } from '@wordpress/icons';
++import { wordpress, plus, closeSmall } from '@wordpress/icons';
+ 
+ export default {
+ 	title: 'Components/Panel',
+@@ -84,6 +84,28 @@ export const withIcon = () => {
+ 	);
+ };
+ 
++export const CustomToggleIcons = () => {
++	const bodyTitle = text( 'Body Title', 'My Block Settings' );
++	const rowText = text( 'Row Text', 'My Panel Inputs and Labels' );
++	const iconExpanded = boolean( 'Expanded Icon', true )
++		? closeSmall
++		: undefined;
++	const iconCollapsed = boolean( 'Collapsed Icon', true ) ? plus : undefined;
++	const opened = boolean( 'Opened', true );
++	return (
++		<Panel header="My Panel">
++			<PanelBody
++				title={ bodyTitle }
++				opened={ opened }
++				iconExpanded={ iconExpanded }
++				iconCollapsed={ iconCollapsed }
++			>
++				<PanelRow>{ rowText }</PanelRow>
++			</PanelBody>
++		</Panel>
++	);
++};
++
+ function ScrollableContainer( { children } ) {
+ 	return (
+ 		<div

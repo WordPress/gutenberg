@@ -1,0 +1,19 @@
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+index d4b5320edff616..2103246a9355f9 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+@@ -99,12 +99,13 @@ const isIconStyles = ( {
+ }: Pick< ToggleGroupControlProps, 'size' > ) => {
+ 	const iconButtonSizes = {
+ 		default: '30px',
+-		'__unstable-large': '34px',
++		'__unstable-large': '32px',
+ 	};
+ 
+ 	return css`
+ 		color: ${ COLORS.gray[ 900 ] };
+ 		width: ${ iconButtonSizes[ size ] };
++		height: ${ iconButtonSizes[ size ] };
+ 		padding-left: 0;
+ 		padding-right: 0;
+ 	`;

@@ -1,0 +1,60 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6e38eb22213fc2..e5a0e7315c0626 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++-   `PreferencesModal`: Make heading and label colors consistent across the editor. ([#51246](https://github.com/WordPress/gutenberg/pull/51246)).
++
+ ### Bug Fix
+ 
+ - `Popover`: Pin `react-dropdown-menu` version to avoid breaking changes in dependency updates. ([52356](https://github.com/WordPress/gutenberg/pull/52356)).
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index d4ca7c311fcf19..31069c6f75d79d 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -92,6 +92,7 @@
+ 	h1 {
+ 		line-height: 1;
+ 		margin: 0;
++		color: $gray-900;
+ 	}
+ 
+ 	.components-button {
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+index 182531ee01c02f..300a0a919be11b 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+@@ -62,7 +62,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+ 
+ <div
+   aria-labelledby="components-modal-header-0"
+-  class="components-modal__frame interface-preferences-modal"
++  class="components-modal__frame interface-preferences-modal interface-complementary-area"
+   role="dialog"
+   tabindex="-1"
+ >
+@@ -689,7 +689,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+ 
+ <div
+   aria-labelledby="components-modal-header-1"
+-  class="components-modal__frame interface-preferences-modal"
++  class="components-modal__frame interface-preferences-modal interface-complementary-area"
+   role="dialog"
+   tabindex="-1"
+ >
+diff --git a/packages/interface/src/components/preferences-modal/index.js b/packages/interface/src/components/preferences-modal/index.js
+index 99bb9d3c25dcf4..9b16be11e2f12a 100644
+--- a/packages/interface/src/components/preferences-modal/index.js
++++ b/packages/interface/src/components/preferences-modal/index.js
+@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
+ export default function PreferencesModal( { closeModal, children } ) {
+ 	return (
+ 		<Modal
+-			className="interface-preferences-modal"
++			className="interface-preferences-modal interface-complementary-area"
+ 			title={ __( 'Preferences' ) }
+ 			onRequestClose={ closeModal }
+ 		>

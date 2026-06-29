@@ -1,0 +1,894 @@
+diff --git a/packages/grid/README.md b/packages/grid/README.md
+index c0dcdbbbddf6f2..ac1ede4745f5fe 100644
+--- a/packages/grid/README.md
++++ b/packages/grid/README.md
+@@ -110,6 +110,7 @@ interface DashboardGridLayoutItem {
+ | `editMode` | `boolean` | `false` | Enables drag-to-reorder and resize handles. |
+ | `onChangeLayout` | `( layout ) => void` | — | Fired when the user commits a drag or resize. |
+ | `onPreviewLayout` | `( layout ) => void` | — | Fired continuously during a drag or resize with the in-progress layout. Use for live feedback; `onChangeLayout` still emits the committed result. |
++| `renderResizeHandle` | `( props ) => ReactNode` | — | Override the default corner-triangle resize handle with a custom element. Receives gesture wiring (`ref`, `listeners`, `attributes`) plus `disabled`, `verticalResizable`, and `itemId`. The grid keeps ownership of the `<DndContext>` and the throttled delta loop. |
+ | `className` | `string` | — | Extra class on the grid root. |
+ 
+ `DashboardGrid` forwards refs to its root `<div>`, and standard `<div>`
+@@ -206,6 +207,62 @@ keyboard sensor:
+ 
+ Resize handles are currently pointer-only.
+ 
++## Custom resize handle
++
++The default handle is a small corner triangle on the bottom-right of
++each tile. To swap it for a custom element (icon, button, branded
++shape…), pass `renderResizeHandle`. The grid still owns the gesture
++— `<DndContext>`, throttled delta loop, step-to-grid logic — and
++passes the wiring to your render prop. Spread `listeners` and
++`attributes` and assign `ref` on the element that should receive
++pointer events.
++
++```jsx
++import { Icon } from '@wordpress/ui';
++import { resizeCornerNE } from '@wordpress/icons';
++
++<DashboardGrid
++	layout={ layout }
++	editMode
++	renderResizeHandle={ ( {
++		ref,
++		listeners,
++		attributes,
++		verticalResizable,
++	} ) => (
++		<div
++			ref={ ref }
++			{ ...listeners }
++			{ ...attributes }
++			style={ {
++				position: 'absolute',
++				bottom: 4,
++				insetInlineEnd: 4,
++				cursor: verticalResizable ? 'nwse-resize' : 'ew-resize',
++			} }
++		>
++			<Icon icon={ resizeCornerNE } size={ 16 } />
++		</div>
++	) }
++>
++	{ tiles }
++</DashboardGrid>;
++```
++
++The render prop receives:
++
++| Field | Type | Description |
++|-------|------|-------------|
++| `ref` | `( node ) => void` | dnd-kit ref; assign on the gesture-bearing element. |
++| `listeners` | `SyntheticListenerMap \| undefined` | Pointer/keyboard listeners; spread on the same element. |
++| `attributes` | `DraggableAttributes` | Accessibility/dnd-kit attributes; spread alongside `listeners`. |
++| `verticalResizable` | `boolean` | False when `rowHeight: 'auto'` — useful for adapting cursor or visual cue. |
++| `isResizing` | `boolean` | True while the user is actively dragging this handle. Use it to swap colors, icons, or transforms during the gesture. |
++| `itemId` | `string` | Owning tile's `key`. |
++
++The handle is only mounted while the grid is in edit mode (`editMode={ true }`),
++so the consumer's render prop never has to short-circuit on a disabled state.
++
+ ## Contributing to this package
+ 
+ This is an individual package that's part of the Gutenberg project.
+diff --git a/packages/grid/src/grid-item.tsx b/packages/grid/src/grid-item.tsx
+index 53707aa8596d3c..e71f01352f1a43 100644
+--- a/packages/grid/src/grid-item.tsx
++++ b/packages/grid/src/grid-item.tsx
+@@ -14,7 +14,7 @@ import { useMergeRefs } from '@wordpress/compose';
+  * Internal dependencies
+  */
+ import ResizeHandle from './resize-handle';
+-import type { DashboardGridLayoutItem } from './types';
++import type { GridItemProps, ResizeDelta } from './types';
+ import styles from './grid-item.module.css';
+ 
+ function getItemCursor(
+@@ -32,69 +32,6 @@ function getItemCursor(
+ 	return 'grab';
+ }
+ 
+-type GridItemProps = {
+-	/**
+-	 * The layout item containing grid positioning information.
+-	 */
+-	item: DashboardGridLayoutItem;
+-
+-	/**
+-	 * The maximum number of columns in the grid.
+-	 */
+-	maxColumns: number;
+-
+-	/**
+-	 * Whether drag and resize interactions are disabled.
+-	 *
+-	 * @default false
+-	 */
+-	disabled?: boolean;
+-
+-	/**
+-	 * Whether the item can be resized vertically. Disabled when the
+-	 * grid uses `rowHeight: 'auto'`, where row height is driven by
+-	 * content rather than by the user.
+-	 *
+-	 * @default true
+-	 */
+-	verticalResizable?: boolean;
+-
+-	/**
+-	 * Whether any tile in the grid is currently being dragged or
+-	 * resized. When true, the item mutes its `actionableArea` with
+-	 * `inert` so pointer hovers over buttons in other tiles do not
+-	 * steal the in-progress gesture.
+-	 *
+-	 * @default false
+-	 */
+-	interacting?: boolean;
+-
+-	/**
+-	 * The content to be displayed within the grid item.
+-	 */
+-	children: React.ReactNode;
+-
+-	/**
+-	 * Content rendered above the draggable area that stays interactive
+-	 * in edit mode — typically action buttons, menus, or links. While
+-	 * any tile in the grid is being dragged or resized, this content
+-	 * is set `inert` so hovers on other tiles can't steal the gesture.
+-	 */
+-	actionableArea?: React.ReactNode;
+-
+-	/**
+-	 * Callback fired while the item is being resized. Receives the
+-	 * item's `key` plus the cursor offset from the gesture start in
+-	 * pixels; the grid converts the offset to column/row spans.
+-	 */
+-	onResize: ( id: string, delta: { width: number; height: number } ) => void;
+-
+-	/**
+-	 * Callback fired when the resize gesture ends.
+-	 */
+-	onResizeEnd: () => void;
+-};
+-
+ export function GridItem( {
+ 	item,
+ 	maxColumns,
+@@ -105,11 +42,11 @@ export function GridItem( {
+ 	actionableArea = null,
+ 	onResize,
+ 	onResizeEnd,
++	renderResizeHandle,
+ }: GridItemProps ) {
+-	const [ previewDelta, setPreviewDelta ] = useState< {
+-		width: number;
+-		height: number;
+-	} | null >( null );
++	const [ previewDelta, setPreviewDelta ] = useState< ResizeDelta | null >(
++		null
++	);
+ 	const itemRef = useRef< HTMLDivElement >( null );
+ 	// Tile bounding rect at the first resize frame. The cursor `delta`
+ 	// from the handle is anchored to the gesture start, but the
+@@ -122,10 +59,7 @@ export function GridItem( {
+ 	// *after* React commits a width step but before paint, so the
+ 	// frame that follows a column step never renders the overlay
+ 	// at the pre-step offset.
+-	const lastResizeDeltaRef = useRef< {
+-		width: number;
+-		height: number;
+-	} | null >( null );
++	const lastResizeDeltaRef = useRef< ResizeDelta | null >( null );
+ 	const { attributes, listeners, setNodeRef, isDragging } = useSortable( {
+ 		id: item.key,
+ 		disabled,
+@@ -160,7 +94,7 @@ export function GridItem( {
+ 		isDragging && styles[ 'is-dragging' ]
+ 	);
+ 
+-	const handleResize = ( delta: { width: number; height: number } ) => {
++	const handleResize = ( delta: ResizeDelta ) => {
+ 		const clamped = {
+ 			width: delta.width,
+ 			height: verticalResizable ? delta.height : 0,
+@@ -248,13 +182,15 @@ export function GridItem( {
+ 			<div { ...listeners } style={ { height: '100%' } }>
+ 				<div className={ styles[ 'item-content' ] }>
+ 					{ children }
+-					<ResizeHandle
+-						disabled={ disabled }
+-						itemId={ item.key }
+-						verticalResizable={ verticalResizable }
+-						onResize={ handleResize }
+-						onResizeEnd={ handleResizeEnd }
+-					/>
++					{ ! disabled && (
++						<ResizeHandle
++							itemId={ item.key }
++							verticalResizable={ verticalResizable }
++							onResize={ handleResize }
++							onResizeEnd={ handleResizeEnd }
++							renderResizeHandle={ renderResizeHandle }
++						/>
++					) }
+ 				</div>
+ 				{ previewOverlay }
+ 			</div>
+diff --git a/packages/grid/src/grid.tsx b/packages/grid/src/grid.tsx
+index ea111ffe5ab1b5..28572650371f09 100644
+--- a/packages/grid/src/grid.tsx
++++ b/packages/grid/src/grid.tsx
+@@ -37,7 +37,11 @@ import {
+  */
+ import { GridItem } from './grid-item';
+ import { resolveFillWidths } from './resolve-fill-widths';
+-import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
++import type {
++	DashboardGridLayoutItem,
++	DashboardGridProps,
++	ResizeDelta,
++} from './types';
+ import styles from './grid.module.css';
+ 
+ // Reorder is driven by `temporaryLayout` + CSS Grid, not by dnd-kit
+@@ -92,6 +96,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
+ 			editMode = false,
+ 			onChangeLayout,
+ 			onPreviewLayout,
++			renderResizeHandle,
+ 			...divProps
+ 		} = props;
+ 		// Preview layout applied during drag/resize before committing.
+@@ -362,95 +367,91 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
+ 			setTemporaryLayout( undefined );
+ 		} );
+ 
+-		const handleResize = useEvent(
+-			( id: string, delta: { width: number; height: number } ) => {
+-				if ( ! editMode ) {
+-					return;
+-				}
+-
+-				if ( ! isResizing ) {
+-					setIsResizing( true );
+-				}
++		const handleResize = useEvent( ( id: string, delta: ResizeDelta ) => {
++			if ( ! editMode ) {
++				return;
++			}
+ 
+-				const relativeDelta = {
+-					width: Math.round( delta.width / ( columnWidth + gapPx ) ),
+-					height:
+-						rowHeight === 'auto'
+-							? 0
+-							: Math.round(
+-									delta.height / ( rowHeight + gapPx )
+-							  ),
+-				};
++			if ( ! isResizing ) {
++				setIsResizing( true );
++			}
+ 
+-				// Snapshot the baseline once at gesture start. The handle's
+-				// `delta` is absolute from the gesture start, so summing it
+-				// with the live (already mutated) `activeLayout` width would
+-				// compound and oscillate — and stepping back through the
+-				// zero-delta zone would never restore the original size.
+-				if ( ! resizeBaselineRef.current ) {
+-					const baseItem = activeLayout.find(
+-						( item ) => item.key === id
+-					);
+-					const resolvedItem = resolvedItemMap.get( id );
+-					// `'fill'`/`'full'` resize from the rendered span
+-					// and convert to a numeric width.
+-					let baseWidth: number;
+-					if ( baseItem?.width === 'full' ) {
+-						baseWidth = effectiveColumns;
+-					} else if ( baseItem?.width === 'fill' ) {
+-						baseWidth =
+-							typeof resolvedItem?.width === 'number'
+-								? resolvedItem.width
+-								: 1;
+-					} else {
+-						baseWidth = baseItem?.width ?? 1;
+-					}
+-					resizeBaselineRef.current = {
+-						width: baseWidth,
+-						height: baseItem?.height ?? 1,
+-					};
+-				}
+-				const baseline = resizeBaselineRef.current;
+-				const newWidth = Math.max(
+-					1,
+-					Math.min(
+-						baseline.width + relativeDelta.width,
+-						effectiveColumns
+-					)
+-				);
+-				const newHeight = Math.max(
+-					1,
+-					baseline.height + relativeDelta.height
+-				);
++			const relativeDelta = {
++				width: Math.round( delta.width / ( columnWidth + gapPx ) ),
++				height:
++					rowHeight === 'auto'
++						? 0
++						: Math.round( delta.height / ( rowHeight + gapPx ) ),
++			};
+ 
+-				// Bail when the resulting size matches the current preview.
+-				// Covers both the zero-delta start frame and the case where
+-				// the cursor returns through the zero-delta zone after a
+-				// step. A symbolic width (`'fill'`/`'full'`) on the live
+-				// item never matches a numeric `newWidth`, so the first
+-				// step still converts it to a numeric span.
+-				const currentItem = activeLayout.find(
++			// Snapshot the baseline once at gesture start. The handle's
++			// `delta` is absolute from the gesture start, so summing it
++			// with the live (already mutated) `activeLayout` width would
++			// compound and oscillate — and stepping back through the
++			// zero-delta zone would never restore the original size.
++			if ( ! resizeBaselineRef.current ) {
++				const baseItem = activeLayout.find(
+ 					( item ) => item.key === id
+ 				);
+-				if (
+-					currentItem &&
+-					currentItem.width === newWidth &&
+-					( currentItem.height ?? 1 ) === newHeight
+-				) {
+-					return;
++				const resolvedItem = resolvedItemMap.get( id );
++				// `'fill'`/`'full'` resize from the rendered span
++				// and convert to a numeric width.
++				let baseWidth: number;
++				if ( baseItem?.width === 'full' ) {
++					baseWidth = effectiveColumns;
++				} else if ( baseItem?.width === 'fill' ) {
++					baseWidth =
++						typeof resolvedItem?.width === 'number'
++							? resolvedItem.width
++							: 1;
++				} else {
++					baseWidth = baseItem?.width ?? 1;
+ 				}
++				resizeBaselineRef.current = {
++					width: baseWidth,
++					height: baseItem?.height ?? 1,
++				};
++			}
++			const baseline = resizeBaselineRef.current;
++			const newWidth = Math.max(
++				1,
++				Math.min(
++					baseline.width + relativeDelta.width,
++					effectiveColumns
++				)
++			);
++			const newHeight = Math.max(
++				1,
++				baseline.height + relativeDelta.height
++			);
+ 
+-				const updatedLayout = activeLayout.map( ( item ) =>
+-					item.key === id
+-						? { ...item, width: newWidth, height: newHeight }
+-						: item
+-				);
+-
+-				latestLayoutRef.current = updatedLayout;
+-				setTemporaryLayout( updatedLayout );
+-				onPreviewLayout?.( updatedLayout );
++			// Bail when the resulting size matches the current preview.
++			// Covers both the zero-delta start frame and the case where
++			// the cursor returns through the zero-delta zone after a
++			// step. A symbolic width (`'fill'`/`'full'`) on the live
++			// item never matches a numeric `newWidth`, so the first
++			// step still converts it to a numeric span.
++			const currentItem = activeLayout.find(
++				( item ) => item.key === id
++			);
++			if (
++				currentItem &&
++				currentItem.width === newWidth &&
++				( currentItem.height ?? 1 ) === newHeight
++			) {
++				return;
+ 			}
+-		);
++
++			const updatedLayout = activeLayout.map( ( item ) =>
++				item.key === id
++					? { ...item, width: newWidth, height: newHeight }
++					: item
++			);
++
++			latestLayoutRef.current = updatedLayout;
++			setTemporaryLayout( updatedLayout );
++			onPreviewLayout?.( updatedLayout );
++		} );
+ 
+ 		return (
+ 			<DndContext
+@@ -493,6 +494,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
+ 								onResize={ handleResize }
+ 								onResizeEnd={ persistTemporaryLayout }
+ 								actionableArea={ actionableAreaMap.get( id ) }
++								renderResizeHandle={ renderResizeHandle }
+ 							>
+ 								{ childrenMap.get( id ) }
+ 							</GridItem>
+diff --git a/packages/grid/src/index.ts b/packages/grid/src/index.ts
+index bceda5a1990e04..7c199eaf7c8ddc 100644
+--- a/packages/grid/src/index.ts
++++ b/packages/grid/src/index.ts
+@@ -1,2 +1,7 @@
+ export { DashboardGrid } from './grid';
+-export type { DashboardGridLayoutItem, DashboardGridProps } from './types';
++export type {
++	DashboardGridLayoutItem,
++	DashboardGridProps,
++	ResizeDelta,
++	ResizeHandleRenderProps,
++} from './types';
+diff --git a/packages/grid/src/resize-handle.module.css b/packages/grid/src/resize-handle.module.css
+index 5fb94ca8932803..6f0123c7816b30 100644
+--- a/packages/grid/src/resize-handle.module.css
++++ b/packages/grid/src/resize-handle.module.css
+@@ -17,7 +17,3 @@
+ .is-horizontal-only {
+ 	cursor: ew-resize;
+ }
+-
+-.is-disabled {
+-	display: none;
+-}
+diff --git a/packages/grid/src/resize-handle.tsx b/packages/grid/src/resize-handle.tsx
+index 508fa703452d58..5591bb918e4d92 100644
+--- a/packages/grid/src/resize-handle.tsx
++++ b/packages/grid/src/resize-handle.tsx
+@@ -14,49 +14,13 @@ import { useMergeRefs, useThrottle } from '@wordpress/compose';
+ /**
+  * Internal dependencies
+  */
++import type { ResizeDelta, ResizeHandleProps } from './types';
+ import styles from './resize-handle.module.css';
+ 
+-interface ResizeHandleProps {
+-	/**
+-	 * Whether the handle is inert. When true, it renders muted and
+-	 * does not respond to pointer events.
+-	 *
+-	 * @default false
+-	 */
+-	disabled?: boolean;
+-
+-	/**
+-	 * Owning grid item's `key`. Forwarded as `data.itemId` on the
+-	 * draggable so the parent can correlate the gesture with a tile
+-	 * if needed.
+-	 */
+-	itemId?: string;
+-
+-	/**
+-	 * Whether the handle should track vertical movement. When false,
+-	 * the handle still appears but only emits horizontal deltas, and
+-	 * the cursor is constrained to the column resize axis.
+-	 *
+-	 * @default true
+-	 */
+-	verticalResizable?: boolean;
+-
+-	/**
+-	 * Callback fired while the handle is being dragged. Receives the
+-	 * cursor offset from the gesture start in pixels.
+-	 */
+-	onResize?: ( delta: { width: number; height: number } ) => void;
+-
+-	/**
+-	 * Callback fired when the gesture ends.
+-	 */
+-	onResizeEnd?: () => void;
+-}
+-
+ function ResizeHandle( {
+-	disabled = false,
+ 	itemId,
+ 	verticalResizable = true,
++	renderResizeHandle,
+ }: ResizeHandleProps ) {
+ 	const { attributes, listeners, setNodeRef, isDragging } = useDraggable( {
+ 		id: 'draggable',
+@@ -87,13 +51,23 @@ function ResizeHandle( {
+ 		};
+ 	}, [ isDragging, verticalResizable ] );
+ 
++	if ( renderResizeHandle ) {
++		return renderResizeHandle( {
++			ref: mergedRef,
++			listeners,
++			attributes,
++			verticalResizable,
++			isResizing: isDragging,
++			itemId,
++		} );
++	}
++
+ 	return (
+ 		<div
+ 			ref={ mergedRef }
+ 			className={ clsx(
+ 				styles[ 'resize-handle' ],
+-				! verticalResizable && styles[ 'is-horizontal-only' ],
+-				disabled && styles[ 'is-disabled' ]
++				! verticalResizable && styles[ 'is-horizontal-only' ]
+ 			) }
+ 			{ ...listeners }
+ 			{ ...attributes }
+@@ -111,14 +85,11 @@ function ResizeHandle( {
+  */
+ export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
+ 	const throttleDelay = 16;
+-	const throttledResize = useThrottle(
+-		( delta: { width: number; height: number } ) => {
+-			if ( props.onResize ) {
+-				props.onResize( delta );
+-			}
+-		},
+-		throttleDelay
+-	);
++	const throttledResize = useThrottle( ( delta: ResizeDelta ) => {
++		if ( props.onResize ) {
++			props.onResize( delta );
++		}
++	}, throttleDelay );
+ 
+ 	// `event.delta` is the cursor offset from the gesture start —
+ 	// not from the handle's current position — so it stays stable
+diff --git a/packages/grid/src/stories/index.story.tsx b/packages/grid/src/stories/index.story.tsx
+index 8e3bb7cc3e8c3d..3750d7533be0cf 100644
+--- a/packages/grid/src/stories/index.story.tsx
++++ b/packages/grid/src/stories/index.story.tsx
+@@ -9,13 +9,16 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { useState, useMemo } from '@wordpress/element';
+ import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
+ // eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
+-import { IconButton, Stack } from '@wordpress/ui';
++import { Icon, IconButton, Stack } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { DashboardGrid } from '../grid';
+-import type { DashboardGridLayoutItem } from '../types';
++import type {
++	DashboardGridLayoutItem,
++	ResizeHandleRenderProps,
++} from '../types';
+ 
+ const meta: Meta< typeof DashboardGrid > = {
+ 	title: 'Grid/DashboardGrid',
+@@ -661,3 +664,114 @@ export const EditMode: Story = {
+ 		);
+ 	},
+ };
++
++/**
++ * Custom corner-resize glyph: a diagonal line plus a filled triangle,
++ * both leaning toward the bottom-right corner of the tile.
++ */
++const resizeCornerSE = (
++	<svg
++		xmlns="http://www.w3.org/2000/svg"
++		viewBox="0 0 24 24"
++		aria-hidden="true"
++	>
++		<path
++			d="M0 24L24 0"
++			stroke="currentColor"
++			strokeWidth="3"
++			strokeLinecap="round"
++			fill="none"
++		/>
++
++		<polygon points="24,24 10,24 24,10" fill="currentColor" />
++	</svg>
++);
++
++/**
++ * Override the default corner-triangle resize handle with a custom
++ * element via `renderResizeHandle`. The grid keeps the gesture
++ * machinery (dnd-kit context, throttled delta loop) and passes the
++ * wiring (`ref`, `listeners`, `attributes`) to the consumer — so the
++ * custom visual still drives the same resize behavior.
++ */
++function CustomResizeHandle( {
++	ref,
++	listeners,
++	attributes,
++	isResizing,
++}: ResizeHandleRenderProps ) {
++	return (
++		<div
++			ref={ ref }
++			{ ...listeners }
++			{ ...attributes }
++			style={ {
++				position: 'absolute',
++				bottom: 0,
++				insetInlineEnd: 0,
++				display: 'flex',
++				cursor: 'nwse-resize',
++				opacity: isResizing ? 0.5 : 1,
++				transition: 'opacity 120ms ease',
++			} }
++		>
++			<Icon icon={ resizeCornerSE } size={ 16 } />
++		</div>
++	);
++}
++
++export const CustomResizeHandleStory: Story = {
++	name: 'Custom Resize Handle',
++	args: {
++		columns: 6,
++		spacing: 2,
++		rowHeight: 80,
++		editMode: true,
++		layout: [
++			{ key: 'a', width: 2, height: 1 },
++			{ key: 'b', width: 4, height: 1 },
++			{ key: 'c', width: 3, height: 2 },
++			{ key: 'd', width: 3, height: 1 },
++			{ key: 'e', width: 3, height: 1 },
++		],
++	},
++	render: function CustomResizeHandleRender( args ) {
++		const [ layout, setLayout ] = useState< DashboardGridLayoutItem[] >(
++			args.layout
++		);
++
++		const tiles = useMemo(
++			() => [
++				<Tile key="a" tone="brand">
++					A
++				</Tile>,
++				<Tile key="b" tone="info">
++					B
++				</Tile>,
++				<Tile key="c" tone="success">
++					C
++				</Tile>,
++				<Tile key="d" tone="warning">
++					D
++				</Tile>,
++				<Tile key="e" tone="error">
++					E
++				</Tile>,
++			],
++			[]
++		);
++
++		return (
++			<DashboardGrid
++				{ ...args }
++				layout={ layout }
++				onChangeLayout={ setLayout }
++				renderResizeHandle={ ( props ) => (
++					<CustomResizeHandle { ...props } />
++				) }
++			>
++				{ tiles }
++			</DashboardGrid>
++		);
++	},
++};
+diff --git a/packages/grid/src/types.ts b/packages/grid/src/types.ts
+index 779073b20873ef..d4df110019eb28 100644
+--- a/packages/grid/src/types.ts
++++ b/packages/grid/src/types.ts
+@@ -1,3 +1,23 @@
++/**
++ * External dependencies
++ */
++import type { useDraggable } from '@dnd-kit/core';
++
++// `useDraggable`'s `listeners` and `attributes` types are not exported
++// from `@dnd-kit/core`'s public surface, so derive them from the hook
++// itself rather than via a deep import.
++type DraggableBindings = ReturnType< typeof useDraggable >;
++
++/**
++ * Cursor offset reported by the resize handle, in pixels relative to
++ * the gesture start. Width and height are independent so the grid can
++ * step columns and rows separately.
++ */
++export type ResizeDelta = {
++	width: number;
++	height: number;
++};
++
+ /**
+  * Dashboard grid layout item definition.
+  *
+@@ -32,6 +52,159 @@ export type DashboardGridLayoutItem = {
+ 	order?: number;
+ };
+ 
++/**
++ * Props passed to a `renderResizeHandle` callback. Spread `listeners`
++ * and `attributes` onto the element that should respond to the gesture,
++ * and assign `ref` to the same element so dnd-kit can track it.
++ */
++export interface ResizeHandleRenderProps {
++	/**
++	 * Ref callback to attach to the gesture-bearing element.
++	 */
++	ref: DraggableBindings[ 'setNodeRef' ];
++
++	/**
++	 * Pointer/keyboard event listeners that initiate the drag.
++	 */
++	listeners: DraggableBindings[ 'listeners' ];
++
++	/**
++	 * Accessibility and dnd-kit attributes (role, aria-*, tabIndex…).
++	 */
++	attributes: DraggableBindings[ 'attributes' ];
++
++	/**
++	 * Whether vertical resizing is allowed for this tile. Useful for
++	 * adapting the cursor or visual cue.
++	 */
++	verticalResizable: boolean;
++
++	/**
++	 * True while the user is actively dragging this handle. Use it to
++	 * swap colors, icons, or transforms during the gesture.
++	 */
++	isResizing: boolean;
++
++	/**
++	 * Owning grid item's `key`. Available so consumers can render
++	 * per-tile content if needed.
++	 */
++	itemId?: string;
++}
++
++/**
++ * Props for the internal `<ResizeHandle />` wrapper.
++ */
++export interface ResizeHandleProps {
++	/**
++	 * Owning grid item's `key`. Forwarded as `data.itemId` on the
++	 * draggable so the parent can correlate the gesture with a tile
++	 * if needed.
++	 */
++	itemId?: string;
++
++	/**
++	 * Whether the handle should track vertical movement. When false,
++	 * the handle still appears but only emits horizontal deltas, and
++	 * the cursor is constrained to the column resize axis.
++	 *
++	 * @default true
++	 */
++	verticalResizable?: boolean;
++
++	/**
++	 * Callback fired while the handle is being dragged. Receives the
++	 * cursor offset from the gesture start in pixels.
++	 */
++	onResize?: ( delta: ResizeDelta ) => void;
++
++	/**
++	 * Callback fired when the gesture ends.
++	 */
++	onResizeEnd?: () => void;
++
++	/**
++	 * Render prop to override the default corner triangle with a
++	 * custom element. Receives gesture wiring (`ref`, `listeners`,
++	 * `attributes`) plus context. The grid keeps ownership of the
++	 * `<DndContext>` and the throttled delta loop; consumers are only
++	 * responsible for the visual.
++	 */
++	renderResizeHandle?: ( props: ResizeHandleRenderProps ) => React.ReactNode;
++}
++
++/**
++ * Props for the internal `<GridItem />` wrapper.
++ */
++export type GridItemProps = {
++	/**
++	 * The layout item containing grid positioning information.
++	 */
++	item: DashboardGridLayoutItem;
++
++	/**
++	 * The maximum number of columns in the grid.
++	 */
++	maxColumns: number;
++
++	/**
++	 * Whether drag and resize interactions are disabled.
++	 *
++	 * @default false
++	 */
++	disabled?: boolean;
++
++	/**
++	 * Whether the item can be resized vertically. Disabled when the
++	 * grid uses `rowHeight: 'auto'`, where row height is driven by
++	 * content rather than by the user.
++	 *
++	 * @default true
++	 */
++	verticalResizable?: boolean;
++
++	/**
++	 * Whether any tile in the grid is currently being dragged or
++	 * resized. When true, the item mutes its `actionableArea` with
++	 * `inert` so pointer hovers over buttons in other tiles do not
++	 * steal the in-progress gesture.
++	 *
++	 * @default false
++	 */
++	interacting?: boolean;
++
++	/**
++	 * The content to be displayed within the grid item.
++	 */
++	children: React.ReactNode;
++
++	/**
++	 * Content rendered above the draggable area that stays interactive
++	 * in edit mode — typically action buttons, menus, or links. While
++	 * any tile in the grid is being dragged or resized, this content
++	 * is set `inert` so hovers on other tiles can't steal the gesture.
++	 */
++	actionableArea?: React.ReactNode;
++
++	/**
++	 * Callback fired while the item is being resized. Receives the
++	 * item's `key` plus the cursor offset from the gesture start in
++	 * pixels; the grid converts the offset to column/row spans.
++	 */
++	onResize: ( id: string, delta: ResizeDelta ) => void;
++
++	/**
++	 * Callback fired when the resize gesture ends.
++	 */
++	onResizeEnd: () => void;
++
++	/**
++	 * Render prop forwarded to `<ResizeHandle />` to override the
++	 * default corner triangle. See `DashboardGridProps.renderResizeHandle`.
++	 */
++	renderResizeHandle?: ( props: ResizeHandleRenderProps ) => React.ReactNode;
++};
++
+ /**
+  * Props shared by fixed and responsive DashboardGrid variants. Extends
+  * the standard div props so consumers can pass `id`, `aria-*`, `data-*`,
+@@ -103,6 +276,16 @@ interface BaseDashboardGridProps
+ 	 * committed layout is still emitted via `onChangeLayout`.
+ 	 */
+ 	onPreviewLayout?: ( previewLayout: DashboardGridLayoutItem[] ) => void;
++
++	/**
++	 * Override the default corner-triangle resize handle with a custom
++	 * element. The grid still owns the gesture (dnd-kit `<DndContext>`,
++	 * throttled delta loop) and passes the wiring to the consumer:
++	 * spread `listeners` and `attributes` and assign `ref` on the
++	 * element that should receive the gesture. Use `disabled` and
++	 * `verticalResizable` to adapt the visual to context.
++	 */
++	renderResizeHandle?: ( props: ResizeHandleRenderProps ) => React.ReactNode;
+ }
+ 
+ interface FixedDashboardGridProps extends BaseDashboardGridProps {

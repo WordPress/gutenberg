@@ -1,0 +1,942 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 654c6037674e94..35117c66d264a2 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1019,6 +1019,18 @@
+ 		"markdown_source": "../packages/components/src/isolated-event-container/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "ItemGroup",
++		"slug": "item-group",
++		"markdown_source": "../packages/components/src/item-group/item-group/README.md",
++		"parent": "components"
++	},
++	{
++		"title": "Item",
++		"slug": "item",
++		"markdown_source": "../packages/components/src/item-group/item/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "KeyboardShortcuts",
+ 		"slug": "keyboard-shortcuts",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 86d40d1db38fb9..639b4fa704af48 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -78,6 +78,10 @@ export { Heading as __experimentalHeading } from './heading';
+ export { HStack as __experimentalHStack } from './h-stack';
+ export { default as Icon } from './icon';
+ export { default as IconButton } from './button/deprecated';
++export {
++	ItemGroup as __experimentalItemGroup,
++	Item as __experimentalItem,
++} from './item-group';
+ export { default as __experimentalInputControl } from './input-control';
+ export { default as KeyboardShortcuts } from './keyboard-shortcuts';
+ export { default as MenuGroup } from './menu-group';
+diff --git a/packages/components/src/ui/item-group/context.ts b/packages/components/src/item-group/context.ts
+similarity index 100%
+rename from packages/components/src/ui/item-group/context.ts
+rename to packages/components/src/item-group/context.ts
+diff --git a/packages/components/src/ui/item-group/index.ts b/packages/components/src/item-group/index.ts
+similarity index 100%
+rename from packages/components/src/ui/item-group/index.ts
+rename to packages/components/src/item-group/index.ts
+diff --git a/packages/components/src/item-group/item-group/README.md b/packages/components/src/item-group/item-group/README.md
+new file mode 100644
+index 00000000000000..773883f3d9e49d
+--- /dev/null
++++ b/packages/components/src/item-group/item-group/README.md
+@@ -0,0 +1,78 @@
++# `ItemGroup`
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`ItemGroup` displays a list of `Item`s grouped and styled together.
++
++## Usage
++
++`ItemGroup` should be used in combination with the [`Item` sub-component](/packages/components/src/item-group/item/README.md).
++
++```jsx
++import {
++	__experimentalItemGroup as ItemGroup,
++	__experimentalItem as Item,
++} from '@wordpress/components';
++
++function Example() {
++	return (
++		<ItemGroup>
++			<Item>Code</Item>
++			<Item>is</Item>
++			<Item>Poetry</Item>
++		</ItemGroup>
++	);
++}
++```
++
++## Props
++
++### `isBordered`: `boolean`
++
++Renders borders around each items.
++
++- Required: No
++- Default: `false`
++
++### `isRounded`: `boolean`
++
++Renders with rounded corners.
++
++- Required: No
++- Default: `true`
++
++### `isSeparated`: `boolean`
++
++Renders items individually. Even if `isBordered` is `false`, a border in between each item will be still be displayed.
++
++- Required: No
++- Default: `false`
++
++### `size`: `'small' | 'medium' | 'large'`
++
++Determines the amount of padding within the component.
++When not defined, it defaults to the value from the context (which is `medium` by default).
++
++- Required: No
++- Default: `medium`
++
++### Context
++
++The [`Item` sub-component](/packages/components/src/item-group/item/README.md) is connected to `<ItemGroup />` using [Context](https://reactjs.org/docs/context.html). Therefore, `Item` receives the `size` prop from the `ItemGroup` parent component.
++
++In the following example, the `<Item />` will render with a size of `small`:
++
++```jsx
++import {
++	__experimentalItemGroup as ItemGroup,
++	__experimentalItem as Item,
++} from '@wordpress/components';
++
++const Example = () => (
++	<ItemGroup size="small">
++		<Item>Item text</Item>
++	</ItemGroup>
++);
++```
+diff --git a/packages/components/src/ui/item-group/item-group.tsx b/packages/components/src/item-group/item-group/component.tsx
+similarity index 71%
+rename from packages/components/src/ui/item-group/item-group.tsx
+rename to packages/components/src/item-group/item-group/component.tsx
+index 8e863c0a690b1c..2b77ec041e055c 100644
+--- a/packages/components/src/ui/item-group/item-group.tsx
++++ b/packages/components/src/item-group/item-group/component.tsx
+@@ -7,13 +7,11 @@ import type { Ref } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { PolymorphicComponentProps } from '../context';
+-// eslint-disable-next-line no-duplicate-imports
+-import { contextConnect } from '../context';
+-import { useItemGroup } from './use-item-group';
+-import { ItemGroupContext, useItemGroupContext } from './context';
++import { contextConnect, PolymorphicComponentProps } from '../../ui/context';
++import { useItemGroup } from './hook';
++import { ItemGroupContext, useItemGroupContext } from '../context';
+ import { View } from '../../view';
+-import type { ItemGroupProps } from './types';
++import type { ItemGroupProps } from '../types';
+ 
+ function ItemGroup(
+ 	props: PolymorphicComponentProps< ItemGroupProps, 'div' >,
+diff --git a/packages/components/src/ui/item-group/use-item-group.ts b/packages/components/src/item-group/item-group/hook.ts
+similarity index 66%
+rename from packages/components/src/ui/item-group/use-item-group.ts
+rename to packages/components/src/item-group/item-group/hook.ts
+index a8844e0af55f92..90bb63bae3959c 100644
+--- a/packages/components/src/ui/item-group/use-item-group.ts
++++ b/packages/components/src/item-group/item-group/hook.ts
+@@ -1,16 +1,14 @@
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../context';
+-// eslint-disable-next-line no-duplicate-imports
+-import type { PolymorphicComponentProps } from '../context';
++import { useContextSystem, PolymorphicComponentProps } from '../../ui/context';
+ 
+ /**
+  * Internal dependencies
+  */
+-import * as styles from './styles';
++import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+-import type { ItemGroupProps } from './types';
++import type { ItemGroupProps } from '../types';
+ 
+ export function useItemGroup(
+ 	props: PolymorphicComponentProps< ItemGroupProps, 'div' >
+@@ -28,7 +26,7 @@ export function useItemGroup(
+ 
+ 	const classes = cx(
+ 		isBordered && styles.bordered,
+-		( isBordered || isSeparated ) && styles.separated,
++		isSeparated && styles.separated,
+ 		isRounded && styles.rounded,
+ 		className
+ 	);
+diff --git a/packages/components/src/item-group/item-group/index.ts b/packages/components/src/item-group/item-group/index.ts
+new file mode 100644
+index 00000000000000..0e60158e7a6166
+--- /dev/null
++++ b/packages/components/src/item-group/item-group/index.ts
+@@ -0,0 +1,2 @@
++export { default } from './component';
++export { useItemGroup } from './hook';
+diff --git a/packages/components/src/item-group/item/README.md b/packages/components/src/item-group/item/README.md
+new file mode 100644
+index 00000000000000..dc5ac92fca4ba3
+--- /dev/null
++++ b/packages/components/src/item-group/item/README.md
+@@ -0,0 +1,63 @@
++# `Item`
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`Item` is used in combination with `ItemGroup` to display a list of items grouped and styled together.
++
++## Usage
++
++`Item` should be used in combination with the [`ItemGroup` component](/packages/components/src/item-group/item-group/README.md).
++
++```jsx
++import {
++	__experimentalItemGroup as ItemGroup,
++	__experimentalItem as Item,
++} from '@wordpress/components';
++
++function Example() {
++	return (
++		<ItemGroup>
++			<Item>Code</Item>
++			<Item>is</Item>
++			<Item>Poetry</Item>
++		</ItemGroup>
++	);
++}
++```
++
++## Props
++
++### `isAction`: `boolean`
++
++Renders the item as an interactive `button` element.
++
++- Required: No
++- Default: `false`
++
++### `size`: `'small' | 'medium' | 'large'`
++
++Determines the amount of padding within the component.
++
++- Required: No
++- Default: `medium`
++
++### Context
++
++`Item` is connected to [the `<ItemGroup />` parent component](/packages/components/src/item-group/item-group/README.md) using [Context](https://reactjs.org/docs/context.html). Therefore, `Item` receives the `size` prop from the `ItemGroup` parent component.
++
++In the following example, the `<Item />` will render with a size of `small`:
++
++```jsx
++import {
++	__experimentalItemGroup as ItemGroup,
++	__experimentalItem as Item,
++} from '@wordpress/components';
++
++const Example = () => (
++	<ItemGroup size="small">
++		<Item>...</Item>
++	</ItemGroup>
++);
++```
+diff --git a/packages/components/src/item-group/item/component.tsx b/packages/components/src/item-group/item/component.tsx
+new file mode 100644
+index 00000000000000..6a0eac90a93c98
+--- /dev/null
++++ b/packages/components/src/item-group/item/component.tsx
+@@ -0,0 +1,28 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { ItemProps } from '../types';
++import { useItem } from './hook';
++import { contextConnect, PolymorphicComponentProps } from '../../ui/context';
++import { View } from '../../view';
++
++function Item(
++	props: PolymorphicComponentProps< ItemProps, 'div' >,
++	forwardedRef: Ref< any >
++) {
++	const { role, wrapperClassName, ...otherProps } = useItem( props );
++
++	return (
++		<div role={ role } className={ wrapperClassName }>
++			<View { ...otherProps } ref={ forwardedRef } />
++		</div>
++	);
++}
++
++export default contextConnect( Item, 'Item' );
+diff --git a/packages/components/src/ui/item-group/use-item.ts b/packages/components/src/item-group/item/hook.ts
+similarity index 76%
+rename from packages/components/src/ui/item-group/use-item.ts
+rename to packages/components/src/item-group/item/hook.ts
+index 5f5fad66e6644b..ac7ad6356ceb34 100644
+--- a/packages/components/src/ui/item-group/use-item.ts
++++ b/packages/components/src/item-group/item/hook.ts
+@@ -7,13 +7,11 @@ import type { ElementType } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../context';
+-// eslint-disable-next-line no-duplicate-imports
+-import type { PolymorphicComponentProps } from '../context';
+-import * as styles from './styles';
+-import { useItemGroupContext } from './context';
++import { useContextSystem, PolymorphicComponentProps } from '../../ui/context';
++import * as styles from '../styles';
++import { useItemGroupContext } from '../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+-import type { ItemProps } from './types';
++import type { ItemProps } from '../types';
+ 
+ export function useItem(
+ 	props: PolymorphicComponentProps< ItemProps, 'div' >
+@@ -43,9 +41,12 @@ export function useItem(
+ 		className
+ 	);
+ 
++	const wrapperClassName = cx( styles.itemWrapper );
++
+ 	return {
+ 		as,
+ 		className: classes,
++		wrapperClassName,
+ 		role,
+ 		...otherProps,
+ 	};
+diff --git a/packages/components/src/item-group/item/index.ts b/packages/components/src/item-group/item/index.ts
+new file mode 100644
+index 00000000000000..146b83853e1d39
+--- /dev/null
++++ b/packages/components/src/item-group/item/index.ts
+@@ -0,0 +1,2 @@
++export { default } from './component';
++export { useItem } from './hook';
+diff --git a/packages/components/src/ui/item-group/stories/index.js b/packages/components/src/item-group/stories/index.js
+similarity index 68%
+rename from packages/components/src/ui/item-group/stories/index.js
+rename to packages/components/src/item-group/stories/index.js
+index 7eaa16ed3f4c1f..7e3ee2746d2751 100644
+--- a/packages/components/src/ui/item-group/stories/index.js
++++ b/packages/components/src/item-group/stories/index.js
+@@ -12,35 +12,52 @@ import { boolean, select } from '@storybook/addon-knobs';
+  * Internal dependencies
+  */
+ import { ItemGroup, Item } from '..';
+-import { Flyout } from '../../../flyout';
+-import Button from '../../../button';
++import { Flyout } from '../../flyout';
++import Button from '../../button';
+ 
+ export default {
+ 	component: ItemGroup,
+ 	title: 'Components (Experimental)/ItemGroup',
+ };
+ 
++// Using `unset` instead of `undefined` as Storybook seems to sometimes pass an
++// empty string instead of `undefined`, which is not ideal.
++// https://github.com/storybookjs/storybook/issues/800
++const PROP_UNSET = 'unset';
++
+ export const _default = () => {
+ 	const itemGroupProps = {
+-		isBordered: boolean( 'ItemGroup: isBordered', true ),
++		isBordered: boolean( 'ItemGroup: isBordered', false ),
++		isSeparated: boolean( 'ItemGroup: isSeparated', false ),
++		isRounded: boolean( 'ItemGroup: isRounded', true ),
+ 		size: select(
+ 			'ItemGroup: size',
+ 			[ 'small', 'medium', 'large' ],
+ 			'medium'
+ 		),
+-		isSeparated: boolean( 'ItemGroup: isSeparated', false ),
+-		isRounded: boolean( 'ItemGroup: isRounded', false ),
+ 	};
+ 
+ 	const itemProps = {
+ 		size: select(
+ 			'Item 1: size',
+-			[ 'small', 'medium', 'large' ],
+-			'medium'
++			{
++				'unset (defaults to the value set on the <ItemGroup> parent)': PROP_UNSET,
++				small: 'small',
++				medium: 'medium',
++				large: 'large',
++			},
++			PROP_UNSET
+ 		),
+ 		isAction: boolean( 'Item 1: isAction', true ),
+ 	};
+ 
++	// Do not pass the `size` prop when its value is `undefined`.
++	// This allows the `Item` component to use the values that are set on the
++	// parent `ItemGroup` component by default.
++	if ( itemProps.size === PROP_UNSET ) {
++		delete itemProps.size;
++	}
++
+ 	return (
+ 		<ItemGroup style={ { width: '350px' } } { ...itemGroupProps }>
+ 			<Item { ...itemProps } onClick={ () => alert( 'WordPress.org' ) }>
+diff --git a/packages/components/src/ui/item-group/styles.ts b/packages/components/src/item-group/styles.ts
+similarity index 89%
+rename from packages/components/src/ui/item-group/styles.ts
+rename to packages/components/src/item-group/styles.ts
+index 2f863a1d109eed..e63e0517f299f8 100644
+--- a/packages/components/src/ui/item-group/styles.ts
++++ b/packages/components/src/item-group/styles.ts
+@@ -6,8 +6,7 @@ import { css } from '@emotion/react';
+ /**
+  * Internal dependencies
+  */
+-import { CONFIG } from '../../utils';
+-import COLORS from '../../utils/colors-values';
++import { CONFIG, COLORS } from '../utils';
+ 
+ export const unstyledButton = css`
+ 	appearance: none;
+@@ -28,21 +27,23 @@ export const unstyledButton = css`
+ 	}
+ `;
+ 
+-export const item = css`
++export const itemWrapper = css`
+ 	width: 100%;
+ 	display: block;
+ `;
+ 
++export const item = itemWrapper;
++
+ export const bordered = css`
+ 	border: 1px solid ${ CONFIG.surfaceBorderColor };
+ `;
+ 
+ export const separated = css`
+-	> *:not( marquee ) {
++	> *:not( marquee ) > * {
+ 		border-bottom: 1px solid ${ CONFIG.surfaceBorderColor };
+ 	}
+ 
+-	> *:last-of-type:not( :focus ) {
++	> *:last-of-type > *:not( :focus ) {
+ 		border-bottom-color: transparent;
+ 	}
+ `;
+@@ -56,12 +57,12 @@ export const spacedAround = css`
+ export const rounded = css`
+ 	border-radius: ${ borderRadius };
+ 
+-	> *:first-of-type {
++	> *:first-of-type > * {
+ 		border-top-left-radius: ${ borderRadius };
+ 		border-top-right-radius: ${ borderRadius };
+ 	}
+ 
+-	> *:last-of-type {
++	> *:last-of-type > * {
+ 		border-bottom-left-radius: ${ borderRadius };
+ 		border-bottom-right-radius: ${ borderRadius };
+ 	}
+diff --git a/packages/components/src/item-group/test/__snapshots__/index.js.snap b/packages/components/src/item-group/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..4f96fd6f7e6504
+--- /dev/null
++++ b/packages/components/src/item-group/test/__snapshots__/index.js.snap
+@@ -0,0 +1,194 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`ItemGroup Item should read the value of the size prop from context when the prop is not defined 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -7,11 +7,11 @@
++    <div
++      class="css-dcjs67-itemWrapper"
++      role="listitem"
++    >
++      <div
++-       class="components-item css-1o1qhwe-View-medium-itemWrapper-spacedAround em57xhy0"
+++       class="components-item css-1c3a883-View-large-itemWrapper-spacedAround em57xhy0"
++        data-wp-c16t="true"
++        data-wp-component="Item"
++      >
++        Code
++      </div>
++@@ -19,11 +19,11 @@
++    <div
++      class="css-dcjs67-itemWrapper"
++      role="listitem"
++    >
++      <div
++-       class="components-item css-1o1qhwe-View-medium-itemWrapper-spacedAround em57xhy0"
+++       class="components-item css-1c3a883-View-large-itemWrapper-spacedAround em57xhy0"
++        data-wp-c16t="true"
++        data-wp-component="Item"
++      >
++        Is
++      </div>
++`;
++
++exports[`ItemGroup Item should render a button with the isAction prop is true 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++  <div
++    class="css-dcjs67-itemWrapper"
++    role="listitem"
++  >
++-   <div
++-     class="components-item css-gqguxs-View-medium-itemWrapper em57xhy0"
+++   <button
+++     class="components-item css-1t39803-View-unstyledButton-medium-itemWrapper em57xhy0"
++      data-wp-c16t="true"
++      data-wp-component="Item"
++    >
++      Code is poetry
++-   </div>
+++   </button>
++  </div>
++`;
++
++exports[`ItemGroup Item should use different amounts of padding depending on the value of the size prop 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,11 +1,11 @@
++  <div
++    class="css-dcjs67-itemWrapper"
++    role="listitem"
++  >
++    <div
++-     class="components-item css-gqguxs-View-medium-itemWrapper em57xhy0"
+++     class="components-item css-1esf9dc-View-large-itemWrapper em57xhy0"
++      data-wp-c16t="true"
++      data-wp-component="Item"
++    >
++      Code is poetry
++    </div>
++`;
++
++exports[`ItemGroup ItemGroup component should render correctly 1`] = `
++.emotion-0 {
++  border-radius: 2px;
++}
++
++.emotion-0>*:first-of-type>* {
++  border-top-left-radius: 2px;
++  border-top-right-radius: 2px;
++}
++
++.emotion-0>*:last-of-type>* {
++  border-bottom-left-radius: 2px;
++  border-bottom-right-radius: 2px;
++}
++
++.emotion-2 {
++  width: 100%;
++  display: block;
++}
++
++.emotion-3 {
++  padding: calc((36px - calc(13px * 1.2) - 2px) / 2) 12px;
++  width: 100%;
++  display: block;
++  border-radius: 2px;
++}
++
++<div
++  class="components-item-group emotion-0 emotion-1"
++  data-wp-c16t="true"
++  data-wp-component="ItemGroup"
++  role="list"
++>
++  <div
++    class="emotion-2"
++    role="listitem"
++  >
++    <div
++      class="components-item emotion-3 emotion-1"
++      data-wp-c16t="true"
++      data-wp-component="Item"
++    >
++      Code is poetry
++    </div>
++  </div>
++</div>
++`;
++
++exports[`ItemGroup ItemGroup component should render items individually when the isSeparated prop is true 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,17 +1,17 @@
++  <div
++-   class="components-item-group css-kj8mvb-View-rounded em57xhy0"
+++   class="components-item-group css-18qvw1m-View-separated-rounded em57xhy0"
++    data-wp-c16t="true"
++    data-wp-component="ItemGroup"
++    role="list"
++  >
++    <div
++      class="css-dcjs67-itemWrapper"
++      role="listitem"
++    >
++      <div
++-       class="components-item css-1o1qhwe-View-medium-itemWrapper-spacedAround em57xhy0"
+++       class="components-item css-gqguxs-View-medium-itemWrapper em57xhy0"
++        data-wp-c16t="true"
++        data-wp-component="Item"
++      >
++        Code is poetry
++      </div>
++`;
++
++exports[`ItemGroup ItemGroup component should show borders when the isBordered prop is true 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,17 +1,17 @@
++  <div
++-   class="components-item-group css-kj8mvb-View-rounded em57xhy0"
+++   class="components-item-group css-acyoj6-View-bordered-rounded em57xhy0"
++    data-wp-c16t="true"
++    data-wp-component="ItemGroup"
++    role="list"
++  >
++    <div
++      class="css-dcjs67-itemWrapper"
++      role="listitem"
++    >
++      <div
++-       class="components-item css-1o1qhwe-View-medium-itemWrapper-spacedAround em57xhy0"
+++       class="components-item css-gqguxs-View-medium-itemWrapper em57xhy0"
++        data-wp-c16t="true"
++        data-wp-component="Item"
++      >
++        Code is poetry
++      </div>
++`;
++
++exports[`ItemGroup ItemGroup component should show rounded corners when the isRounded prop is true 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,7 +1,7 @@
++  <div
++-   class="components-item-group css-kj8mvb-View-rounded em57xhy0"
+++   class="components-item-group css-1mm2cvy-View em57xhy0"
++    data-wp-c16t="true"
++    data-wp-component="ItemGroup"
++    role="list"
++  >
++    <div
++`;
+diff --git a/packages/components/src/item-group/test/index.js b/packages/components/src/item-group/test/index.js
+new file mode 100644
+index 00000000000000..3ae1eb78d4586c
+--- /dev/null
++++ b/packages/components/src/item-group/test/index.js
+@@ -0,0 +1,136 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { Item, ItemGroup } from '..';
++//  import { CONFIG } from '../../utils';
++
++describe( 'ItemGroup', () => {
++	describe( 'ItemGroup component', () => {
++		it( 'should render correctly', () => {
++			const wrapper = render(
++				<ItemGroup>
++					<Item>Code is poetry</Item>
++				</ItemGroup>
++			);
++			expect( wrapper.container.firstChild ).toMatchSnapshot();
++		} );
++
++		it( 'should show borders when the isBordered prop is true', () => {
++			// By default, `isBordered` is `false`
++			const { container: noBorders } = render(
++				<ItemGroup>
++					<Item>Code is poetry</Item>
++				</ItemGroup>
++			);
++
++			const { container: withBorders } = render(
++				<ItemGroup isBordered={ true }>
++					<Item>Code is poetry</Item>
++				</ItemGroup>
++			);
++
++			expect( noBorders.firstChild ).toMatchDiffSnapshot(
++				withBorders.firstChild
++			);
++		} );
++
++		it( 'should show rounded corners when the isRounded prop is true', () => {
++			// By default, `isRounded` is `true`
++			const { container: roundCorners } = render(
++				<ItemGroup>
++					<Item>Code is poetry</Item>
++				</ItemGroup>
++			);
++
++			const { container: squaredCorners } = render(
++				<ItemGroup isRounded={ false }>
++					<Item>Code is poetry</Item>
++				</ItemGroup>
++			);
++
++			expect( roundCorners.firstChild ).toMatchDiffSnapshot(
++				squaredCorners.firstChild
++			);
++		} );
++
++		it( 'should render items individually when the isSeparated prop is true', () => {
++			// By default, `isSeparated` is `false`
++			const { container: groupedItems } = render(
++				<ItemGroup>
++					<Item>Code is poetry</Item>
++				</ItemGroup>
++			);
++
++			const { container: seperatedItems } = render(
++				<ItemGroup isSeparated={ true }>
++					<Item>Code is poetry</Item>
++				</ItemGroup>
++			);
++
++			expect( groupedItems.firstChild ).toMatchDiffSnapshot(
++				seperatedItems.firstChild
++			);
++		} );
++	} );
++
++	describe( 'Item', () => {
++		it( 'should render a button with the isAction prop is true', () => {
++			// By default, `isAction` is `false`
++			const { container: normalItem } = render(
++				<Item>Code is poetry</Item>
++			);
++			const { container: actionItem } = render(
++				<Item isAction={ true }>Code is poetry</Item>
++			);
++
++			expect( normalItem.firstChild ).toMatchDiffSnapshot(
++				actionItem.firstChild
++			);
++		} );
++
++		it( 'should use different amounts of padding depending on the value of the size prop', () => {
++			// By default, `size` is `medium`
++			const { container: mediumSize } = render(
++				<Item>Code is poetry</Item>
++			);
++
++			const { container: largeSize } = render(
++				<Item size="large">Code is poetry</Item>
++			);
++
++			expect( mediumSize.firstChild ).toMatchDiffSnapshot(
++				largeSize.firstChild
++			);
++		} );
++
++		it( 'should read the value of the size prop from context when the prop is not defined', () => {
++			// By default, `size` is `medium`.
++			// The instances of `Item` that don't specify a `size` prop, should
++			// fallback to the value defined on `ItemGroup` via the context.
++			const { container: mediumSize } = render(
++				<ItemGroup>
++					<Item>Code</Item>
++					<Item>Is</Item>
++					<Item size="small">Poetry</Item>
++				</ItemGroup>
++			);
++
++			const { container: largeSize } = render(
++				<ItemGroup size="large">
++					<Item>Code</Item>
++					<Item>Is</Item>
++					<Item size="small">Poetry</Item>
++				</ItemGroup>
++			);
++
++			expect( mediumSize.firstChild ).toMatchDiffSnapshot(
++				largeSize.firstChild
++			);
++		} );
++	} );
++} );
+diff --git a/packages/components/src/item-group/types.ts b/packages/components/src/item-group/types.ts
+new file mode 100644
+index 00000000000000..ed07be8a133f17
+--- /dev/null
++++ b/packages/components/src/item-group/types.ts
+@@ -0,0 +1,67 @@
++type ItemSize = 'small' | 'medium' | 'large';
++
++export interface ItemGroupProps {
++	/**
++	 * Renders a border around the itemgroup.
++	 *
++	 * @default false
++	 */
++	isBordered?: boolean;
++	/**
++	 * Renders with rounded corners.
++	 *
++	 * @default true
++	 */
++	isRounded?: boolean;
++	/**
++	 * Renders a separator between each item.
++	 *
++	 * @default false
++	 */
++	isSeparated?: boolean;
++	/**
++	 * Determines the amount of padding within the component.
++	 *
++	 * @default 'medium'
++	 */
++	size?: ItemSize;
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
++}
++
++export interface ItemProps {
++	/**
++	 * Renders the item as an interactive `button` element.
++	 *
++	 * @default false
++	 */
++	isAction?: boolean;
++	/**
++	 * Determines the amount of padding within the component.
++	 *
++	 * @default 'medium'
++	 */
++	size?: ItemSize;
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
++}
++
++export type ItemGroupContext = {
++	/**
++	 * When true, each `Item` will be styled as an individual item (e.g. with rounded
++	 * borders), instead of being part of the same UI block with the rest of the items.
++	 *
++	 * @default false
++	 */
++	spacedAround: boolean;
++	/**
++	 * Determines the amount of padding within the component.
++	 *
++	 * @default 'medium'
++	 */
++	size: ItemSize;
++};
+diff --git a/packages/components/src/ui/item-group/item.ts b/packages/components/src/ui/item-group/item.ts
+deleted file mode 100644
+index 7f87fe62ebc94e..00000000000000
+--- a/packages/components/src/ui/item-group/item.ts
++++ /dev/null
+@@ -1,11 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { createComponent } from '../utils';
+-import { useItem } from './use-item';
+-
+-export default createComponent( {
+-	useHook: useItem,
+-	as: 'div',
+-	name: 'Item',
+-} );
+diff --git a/packages/components/src/ui/item-group/types.ts b/packages/components/src/ui/item-group/types.ts
+deleted file mode 100644
+index f6273259fbf099..00000000000000
+--- a/packages/components/src/ui/item-group/types.ts
++++ /dev/null
+@@ -1,18 +0,0 @@
+-type ItemSize = 'small' | 'medium' | 'large';
+-
+-export interface ItemGroupProps {
+-	isBordered?: boolean;
+-	isRounded?: boolean;
+-	isSeparated?: boolean;
+-	size?: ItemSize;
+-}
+-
+-export interface ItemProps {
+-	isAction?: boolean;
+-	size?: ItemSize;
+-}
+-
+-export type ItemGroupContext = {
+-	spacedAround: boolean;
+-	size: ItemSize;
+-};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index d01a781b3f9c91..777590326f26cb 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -35,6 +35,7 @@
+ 		"src/h-stack/**/*",
+ 		"src/heading/**/*",
+ 		"src/icon/**/*",
++		"src/item-group/**/*",
+ 		"src/scroll-lock/**/*",
+ 		"src/scrollable/**/*",
+ 		"src/segmented-control/**/*",

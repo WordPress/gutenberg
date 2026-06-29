@@ -1,0 +1,286 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 66a7bb35654cae..6e5cdd5a1879ac 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ -   `UnitControl`: Update unit select's focus styles to match input's ([#42383](https://github.com/WordPress/gutenberg/pull/42383)).
+ -   `CustomSelectControl`: Add size variants ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
+ -   `CustomSelectControl`: Add flag to opt in to unconstrained width ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
++-   `Dropdown`: Implement wrapper subcomponent for adding different padding to the dropdown content ([#42595](https://github.com/WordPress/gutenberg/pull/42595/)).
+ -   `BorderControl`: Render dropdown as prefix within its `UnitControl` ([#42212](https://github.com/WordPress/gutenberg/pull/42212/))
+ -   `UnitControl`: Update prop types to allow ReactNode as prefix ([#42212](https://github.com/WordPress/gutenberg/pull/42212/))
+ -   `ToolsPanel`: Updated README with panel layout information and more expansive usage example ([#42615](https://github.com/WordPress/gutenberg/pull/42615)).
+diff --git a/packages/components/src/dropdown/dropdown-content-wrapper.tsx b/packages/components/src/dropdown/dropdown-content-wrapper.tsx
+new file mode 100644
+index 00000000000000..48c04a33657216
+--- /dev/null
++++ b/packages/components/src/dropdown/dropdown-content-wrapper.tsx
+@@ -0,0 +1,59 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import {
++	WordPressComponentProps,
++	contextConnect,
++	useContextSystem,
++} from '../ui/context';
++import { DropdownContentWrapperDiv } from './styles';
++import type { DropdownContentWrapperProps } from './types';
++
++function UnconnectedDropdownContentWrapper(
++	props: WordPressComponentProps< DropdownContentWrapperProps, 'div', false >,
++	forwardedRef: ForwardedRef< any >
++) {
++	const { paddingSize = 'small', ...derivedProps } = useContextSystem(
++		props,
++		'DropdownContentWrapper'
++	);
++
++	return (
++		<DropdownContentWrapperDiv
++			{ ...derivedProps }
++			paddingSize={ paddingSize }
++			ref={ forwardedRef }
++		/>
++	);
++}
++
++/**
++ * A convenience wrapper for the `renderContent` when you want to apply
++ * different padding. (Default is `paddingSize="small"`).
++ *
++ * ```jsx
++ * import {
++ *   Dropdown,
++ *   __experimentalDropdownContentWrapper as DropdownContentWrapper,
++ * } from '@wordpress/components';
++ *
++ * <Dropdown
++ *   renderContent={ () => (
++ *     <DropdownContentWrapper paddingSize="medium">
++ *       My dropdown content
++ *     </DropdownContentWrapper>
++ * ) }
++ * />
++ * ```
++ */
++export const DropdownContentWrapper = contextConnect(
++	UnconnectedDropdownContentWrapper,
++	'DropdownContentWrapper'
++);
++
++export default DropdownContentWrapper;
+diff --git a/packages/components/src/dropdown/stories/index.js b/packages/components/src/dropdown/stories/index.js
+index e95387634d8a63..b58bce8b06322f 100644
+--- a/packages/components/src/dropdown/stories/index.js
++++ b/packages/components/src/dropdown/stories/index.js
+@@ -1,81 +1,72 @@
+-/**
+- * WordPress dependencies
+- */
+-import {
+-	more,
+-	arrowLeft,
+-	arrowRight,
+-	arrowUp,
+-	arrowDown,
+-} from '@wordpress/icons';
+-
+ /**
+  * Internal dependencies
+  */
+ import Dropdown from '../';
+ import Button from '../../button';
+-import MenuGroup from '../../menu-group';
+-import MenuItem from '../../menu-item';
+-import DropdownMenu from '../../dropdown-menu';
++import { DropdownContentWrapper } from '../dropdown-content-wrapper';
+ 
+-export default { title: 'Components/Dropdown', component: Dropdown };
++export default {
++	title: 'Components/Dropdown',
++	component: Dropdown,
++	subcomponents: { DropdownContentWrapper },
++	argTypes: {
++		expandOnMobile: { control: { type: 'boolean' } },
++		focusOnMount: {
++			control: {
++				type: 'radio',
++				options: [ 'firstElement', 'container', false ],
++			},
++		},
++		headerTitle: { control: { type: 'text' } },
++		renderContent: { control: { type: null } },
++		renderToggle: { control: { type: null } },
++	},
++};
+ 
+-const DropdownAndDropdownMenuExample = () => {
++const Template = ( args ) => {
+ 	return (
+-		<>
+-			<div>
+-				<p>This is a DropdownMenu component:</p>
+-				<DropdownMenu
+-					icon={ more }
+-					label="Select a direction"
+-					controls={ [
+-						{
+-							title: 'Up',
+-							icon: arrowUp,
+-						},
+-						{
+-							title: 'Right',
+-							icon: arrowRight,
+-						},
+-						{
+-							title: 'Down',
+-							icon: arrowDown,
+-						},
+-						{
+-							title: 'Left',
+-							icon: arrowLeft,
+-						},
+-					] }
+-				/>
+-			</div>
+-			<div>
+-				<p>This is an assembled Dropdown component:</p>
+-				<Dropdown
+-					className="my-container-class-name"
+-					contentClassName="my-popover-content-classname"
+-					position="bottom right"
+-					renderToggle={ ( { isOpen, onToggle } ) => (
+-						<Button
+-							icon={ more }
+-							onClick={ onToggle }
+-							aria-expanded={ isOpen }
+-							label="Select a direction"
+-						/>
+-					) }
+-					renderContent={ () => (
+-						<MenuGroup>
+-							<MenuItem icon={ arrowUp }>Up</MenuItem>
+-							<MenuItem icon={ arrowDown }>Down</MenuItem>
+-							<MenuItem icon={ arrowLeft }>Left</MenuItem>
+-							<MenuItem icon={ arrowRight }>Right</MenuItem>
+-						</MenuGroup>
+-					) }
+-				/>
+-			</div>
+-		</>
++		<div style={ { height: 150 } }>
++			<Dropdown { ...args } />
++		</div>
+ 	);
+ };
+ 
+-export const _default = () => {
+-	return <DropdownAndDropdownMenuExample />;
++export const Default = Template.bind( {} );
++Default.args = {
++	position: 'bottom right',
++	renderToggle: ( { isOpen, onToggle } ) => (
++		<Button onClick={ onToggle } aria-expanded={ isOpen } isPrimary>
++			Open dropdown
++		</Button>
++	),
++	renderContent: () => <div>This is the dropdown content.</div>,
++};
++
++/**
++ * To apply more padding to the dropdown content, use the provided `<DropdownContentWrapper>`
++ * convenience wrapper. A `paddingSize` of `"medium"` is suitable for relatively larger dropdowns (default is `"small"`).
++ */
++export const WithMorePadding = Template.bind( {} );
++WithMorePadding.args = {
++	...Default.args,
++	renderContent: () => (
++		<DropdownContentWrapper paddingSize="medium">
++			Content wrapped with <code>{ `paddingSize="medium"` }</code>.
++		</DropdownContentWrapper>
++	),
++};
++
++/**
++ * The `<DropdownContentWrapper>` convenience wrapper can also be used to remove padding entirely,
++ * with a `paddingSize` of `"none"`. This can also serve as a clean foundation to add arbitrary
++ * paddings, for example when child components already have padding on their own.
++ */
++export const WithNoPadding = Template.bind( {} );
++WithNoPadding.args = {
++	...Default.args,
++	renderContent: () => (
++		<DropdownContentWrapper paddingSize="none">
++			Content wrapped with <code>{ `paddingSize="none"` }</code>.
++		</DropdownContentWrapper>
++	),
+ };
+diff --git a/packages/components/src/dropdown/styles.ts b/packages/components/src/dropdown/styles.ts
+new file mode 100644
+index 00000000000000..11a135dd7981da
+--- /dev/null
++++ b/packages/components/src/dropdown/styles.ts
+@@ -0,0 +1,31 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import { space } from '../ui/utils/space';
++import type { DropdownContentWrapperProps } from './types';
++
++const padding = ( { paddingSize = 'small' }: DropdownContentWrapperProps ) => {
++	if ( paddingSize === 'none' ) return;
++
++	const paddingValues = {
++		small: space( 2 ),
++		medium: space( 4 ),
++	};
++
++	return css`
++		padding: ${ paddingValues[ paddingSize ] || paddingValues.small };
++	`;
++};
++
++export const DropdownContentWrapperDiv = styled.div< DropdownContentWrapperProps >`
++	// Negative margin to reset (offset) the default padding on .components-popover__content
++	margin: ${ space( -2 ) };
++
++	${ padding };
++`;
+diff --git a/packages/components/src/dropdown/types.ts b/packages/components/src/dropdown/types.ts
+new file mode 100644
+index 00000000000000..573e0b5ee7e017
+--- /dev/null
++++ b/packages/components/src/dropdown/types.ts
+@@ -0,0 +1,8 @@
++export type DropdownContentWrapperProps = {
++	/**
++	 * Amount of padding to apply on the dropdown content.
++	 *
++	 * @default 'small'
++	 */
++	paddingSize?: 'none' | 'small' | 'medium';
++};
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 1c6f140ddce779..e380338ac14ebf 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -66,6 +66,7 @@ export { default as Draggable } from './draggable';
+ export { default as DropZone } from './drop-zone';
+ export { default as DropZoneProvider } from './drop-zone/provider';
+ export { default as Dropdown } from './dropdown';
++export { default as __experimentalDropdownContentWrapper } from './dropdown/dropdown-content-wrapper';
+ export { default as DropdownMenu } from './dropdown-menu';
+ export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
+ export { Elevation as __experimentalElevation } from './elevation';

@@ -1,0 +1,198 @@
+diff --git a/packages/boot/src/components/root/index.tsx b/packages/boot/src/components/root/index.tsx
+index 82c5259beaef4b..80aa47ecf937a7 100644
+--- a/packages/boot/src/components/root/index.tsx
++++ b/packages/boot/src/components/root/index.tsx
+@@ -9,7 +9,6 @@ import clsx from 'clsx';
+ import { privateApis as routePrivateApis } from '@wordpress/route';
+ // @ts-expect-error Commands is not typed properly.
+ import { CommandMenu } from '@wordpress/commands';
+-import { privateApis as themePrivateApis } from '@wordpress/theme';
+ import { EditorSnackbars } from '@wordpress/editor';
+ import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
+ import {
+@@ -33,8 +32,8 @@ import useRouteTitle from '../app/use-route-title';
+ import { unlock } from '../../lock-unlock';
+ import type { CanvasData } from '../../store/types';
+ import './style.scss';
++import { UserThemeProvider } from '../user-theme-provider';
+ 
+-const { ThemeProvider } = unlock( themePrivateApis );
+ const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
+ 
+ export default function Root() {
+@@ -62,11 +61,8 @@ export default function Root() {
+ 
+ 	return (
+ 		<SlotFillProvider>
+-			<ThemeProvider
+-				isRoot
+-				color={ { bg: '#f8f8f8', primary: '#3858e9' } }
+-			>
+-				<ThemeProvider color={ { bg: '#1d2327', primary: '#3858e9' } }>
++			<UserThemeProvider isRoot color={ { bg: '#f8f8f8' } }>
++				<UserThemeProvider color={ { bg: '#1d2327' } }>
+ 					<div
+ 						className={ clsx( 'boot-layout', {
+ 							'has-canvas': !! canvas || canvas === null,
+@@ -146,11 +142,9 @@ export default function Root() {
+ 							</div>
+ 						) }
+ 						<div className="boot-layout__surfaces">
+-							<ThemeProvider
+-								color={ { bg: '#ffffff', primary: '#3858e9' } }
+-							>
++							<UserThemeProvider color={ { bg: '#ffffff' } }>
+ 								<Outlet />
+-							</ThemeProvider>
++							</UserThemeProvider>
+ 							{ /* Render Canvas in Root to prevent remounting on route changes */ }
+ 							{ ( canvas || canvas === null ) && (
+ 								<div
+@@ -186,8 +180,8 @@ export default function Root() {
+ 							) }
+ 						</div>
+ 					</div>
+-				</ThemeProvider>
+-			</ThemeProvider>
++				</UserThemeProvider>
++			</UserThemeProvider>
+ 		</SlotFillProvider>
+ 	);
+ }
+diff --git a/packages/boot/src/components/root/single-page.tsx b/packages/boot/src/components/root/single-page.tsx
+index 4d5b1302ad7018..992e4c7110709b 100644
+--- a/packages/boot/src/components/root/single-page.tsx
++++ b/packages/boot/src/components/root/single-page.tsx
+@@ -9,7 +9,6 @@ import clsx from 'clsx';
+ import { privateApis as routePrivateApis } from '@wordpress/route';
+ // @ts-expect-error Commands is not typed properly.
+ import { CommandMenu } from '@wordpress/commands';
+-import { privateApis as themePrivateApis } from '@wordpress/theme';
+ import { EditorSnackbars } from '@wordpress/editor';
+ 
+ /**
+@@ -21,9 +20,9 @@ import { unlock } from '../../lock-unlock';
+ import type { CanvasData } from '../../store/types';
+ import './style.scss';
+ import useRouteTitle from '../app/use-route-title';
++import { UserThemeProvider } from '../user-theme-provider';
+ 
+ const { useMatches, Outlet } = unlock( routePrivateApis );
+-const { ThemeProvider } = unlock( themePrivateApis );
+ 
+ /**
+  * Root component for single page mode (no sidebar).
+@@ -43,8 +42,8 @@ export default function RootSinglePage() {
+ 	useRouteTitle();
+ 
+ 	return (
+-		<ThemeProvider isRoot color={ { bg: '#f8f8f8', primary: '#3858e9' } }>
+-			<ThemeProvider color={ { bg: '#1d2327', primary: '#3858e9' } }>
++		<UserThemeProvider isRoot color={ { bg: '#f8f8f8' } }>
++			<UserThemeProvider color={ { bg: '#1d2327' } }>
+ 				<div
+ 					className={ clsx( 'boot-layout boot-layout--single-page', {
+ 						'has-canvas': !! canvas || canvas === null,
+@@ -55,11 +54,9 @@ export default function RootSinglePage() {
+ 					<SavePanel />
+ 					<EditorSnackbars />
+ 					<div className="boot-layout__surfaces">
+-						<ThemeProvider
+-							color={ { bg: '#ffffff', primary: '#3858e9' } }
+-						>
++						<UserThemeProvider color={ { bg: '#ffffff' } }>
+ 							<Outlet />
+-						</ThemeProvider>
++						</UserThemeProvider>
+ 						{ /* Render Canvas in Root to prevent remounting on route changes */ }
+ 						{ ( canvas || canvas === null ) && (
+ 							<div className="boot-layout__canvas">
+@@ -71,7 +68,7 @@ export default function RootSinglePage() {
+ 						) }
+ 					</div>
+ 				</div>
+-			</ThemeProvider>
+-		</ThemeProvider>
++			</UserThemeProvider>
++		</UserThemeProvider>
+ 	);
+ }
+diff --git a/packages/boot/src/components/user-theme-provider/index.tsx b/packages/boot/src/components/user-theme-provider/index.tsx
+new file mode 100644
+index 00000000000000..f7f04b05bfbfa2
+--- /dev/null
++++ b/packages/boot/src/components/user-theme-provider/index.tsx
+@@ -0,0 +1,35 @@
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
++import { unlock } from '../../lock-unlock';
++
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
++const THEME_PRIMARY_COLORS = new Map< string, string >( [
++	[ 'light', '#0085ba' ],
++	[ 'modern', '#3858e9' ],
++	[ 'blue', '#096484' ],
++	[ 'coffee', '#46403c' ],
++	[ 'ectoplasm', '#523f6d' ],
++	[ 'midnight', '#e14d43' ],
++	[ 'ocean', '#627c83' ],
++	[ 'sunrise', '#dd823b' ],
++] );
++
++export function getAdminThemePrimaryColor(): string | undefined {
++	const theme =
++		document.body.className.match( /admin-color-([a-z]+)/ )?.[ 1 ];
++
++	return theme && THEME_PRIMARY_COLORS.get( theme );
++}
++
++export function UserThemeProvider( {
++	color,
++	...restProps
++}: React.ComponentProps< typeof ThemeProvider > ) {
++	const primary = getAdminThemePrimaryColor();
++
++	return <ThemeProvider { ...restProps } color={ { primary, ...color } } />;
++}
+diff --git a/packages/boot/src/components/user-theme-provider/test/index.test.ts b/packages/boot/src/components/user-theme-provider/test/index.test.ts
+new file mode 100644
+index 00000000000000..a4d77031cfee84
+--- /dev/null
++++ b/packages/boot/src/components/user-theme-provider/test/index.test.ts
+@@ -0,0 +1,11 @@
++import { getAdminThemePrimaryColor } from '../index';
++
++describe( 'getAdminThemePrimaryColor', () => {
++	it( 'should return the primary color for the admin theme from the body class', () => {
++		document.body.className = 'foo admin-color-coffee bar';
++
++		const primaryColor = getAdminThemePrimaryColor();
++
++		expect( primaryColor ).toBe( '#46403c' );
++	} );
++} );
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+new file mode 100644
+index 00000000000000..c55184c479bcde
+--- /dev/null
++++ b/packages/theme/CHANGELOG.md
+@@ -0,0 +1,7 @@
++<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
++
++## Unreleased
++
++### New Features
++
++-   Expose `ThemeProvider` TypeScript type from package. While the component is still experimental, this makes it easier to use TypeScript typings in your code, which would otherwise be inaccessible. ([#74011](https://github.com/WordPress/gutenberg/pull/74011))
+diff --git a/packages/theme/src/index.ts b/packages/theme/src/index.ts
+index 0de667033b338c..b64e41930cc44e 100644
+--- a/packages/theme/src/index.ts
++++ b/packages/theme/src/index.ts
+@@ -1,2 +1,2 @@
+-// Private APIs.
+ export { privateApis } from './private-apis';
++export { type ThemeProvider } from './theme-provider';

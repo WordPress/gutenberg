@@ -1,0 +1,110 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 4a7815af08489f..ea91d0c54adff9 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1127,6 +1127,12 @@
+ 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/popover/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "HorizontalRule",
++		"slug": "horizontal-rule",
++		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/primitives/horizontal-rule/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "Svg",
+ 		"slug": "svg",
+diff --git a/packages/block-library/src/index.native.js b/packages/block-library/src/index.native.js
+index 1fae0fc20b54f3..c4c0449049a067 100644
+--- a/packages/block-library/src/index.native.js
++++ b/packages/block-library/src/index.native.js
+@@ -110,6 +110,7 @@ export const registerCoreBlocks = () => {
+ 		more,
+ 		image,
+ 		nextpage,
++		separator,
+ 		list,
+ 	].forEach( ( { metadata, name, settings } ) => {
+ 		registerBlockType( name, {
+diff --git a/packages/block-library/src/separator/edit.js b/packages/block-library/src/separator/edit.js
+index 9a4e8e751eb6e9..26ca8d04f2295d 100644
+--- a/packages/block-library/src/separator/edit.js
++++ b/packages/block-library/src/separator/edit.js
+@@ -1,3 +1,8 @@
++/**
++ * WordPress dependencies
++ */
++import { HorizontalRule } from '@wordpress/components';
++
+ export default function SeparatorEdit( { className } ) {
+-	return <hr className={ className } />;
++	return <HorizontalRule className={ className } />;
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b452e68d479eaa..97028d2638a19d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -1,3 +1,7 @@
++## 7.4.0 (Unreleased)
++
++- Added a new `HorizontalRule` component.
++
+ ## 7.3.0 (2019-04-16)
+ 
+ ### New Features
+diff --git a/packages/components/src/primitives/horizontal-rule/README.md b/packages/components/src/primitives/horizontal-rule/README.md
+new file mode 100644
+index 00000000000000..f568024bacd7c4
+--- /dev/null
++++ b/packages/components/src/primitives/horizontal-rule/README.md
+@@ -0,0 +1,13 @@
++# HorizontalRule
++
++A drop-in replacement for the HTML [hr](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/hr) element that works both on the web and in the mobile apps. It represents a thematic break between paragraph-level elements: for example, a change of scene in a story, or a shift of topic within a section.
++
++## Usage
++
++```jsx
++import { HorizontalRule } from '@wordpress/components';
++
++const MyHorizontalRule = () => (
++	<HorizontalRule />
++);
++```
+diff --git a/packages/components/src/primitives/horizontal-rule/index.js b/packages/components/src/primitives/horizontal-rule/index.js
+new file mode 100644
+index 00000000000000..6a3853bba99702
+--- /dev/null
++++ b/packages/components/src/primitives/horizontal-rule/index.js
+@@ -0,0 +1 @@
++export const HorizontalRule = 'hr';
+diff --git a/packages/components/src/primitives/horizontal-rule/index.native.js b/packages/components/src/primitives/horizontal-rule/index.native.js
+new file mode 100644
+index 00000000000000..7c5382762c4c5b
+--- /dev/null
++++ b/packages/components/src/primitives/horizontal-rule/index.native.js
+@@ -0,0 +1,16 @@
++/**
++ * External dependencies
++ */
++import Hr from 'react-native-hr';
++
++export const HorizontalRule = ( props ) => {
++	const lineStyle = {
++		backgroundColor: '#555d66',
++		height: 2,
++		...props.lineStyle,
++	};
++
++	return (
++		<Hr { ...props } lineStyle={ lineStyle } />
++	);
++};
+diff --git a/packages/components/src/primitives/index.js b/packages/components/src/primitives/index.js
+index e67a24942cdfb9..83d15090083940 100644
+--- a/packages/components/src/primitives/index.js
++++ b/packages/components/src/primitives/index.js
+@@ -1 +1,2 @@
+ export * from './svg';
++export * from './horizontal-rule';

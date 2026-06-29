@@ -1,0 +1,311 @@
+diff --git a/packages/components/src/form-token-field/test/index.tsx b/packages/components/src/form-token-field/test/index.tsx
+index e5ea909681f5e3..94761d420573b4 100644
+--- a/packages/components/src/form-token-field/test/index.tsx
++++ b/packages/components/src/form-token-field/test/index.tsx
+@@ -1,3 +1,5 @@
++/* eslint jest/expect-expect: ["warn", { "assertFunctionNames": ["expect", "expectTokensToBeInTheDocument", "expectTokensNotToBeInTheDocument", "expectVisibleSuggestionsToBe", "expectEscapedProperly"] }] */
++
+ /**
+  * External dependencies
+  */
+@@ -83,6 +85,17 @@ const expectTokensNotToBeInTheDocument = ( tokensText: string[] ) => {
+ 	);
+ };
+ 
++const expectEscapedProperly = ( tokenHtml: string ) => {
++	screen.getByText( ( _, node: Element | null ) => {
++		if ( node === null ) {
++			return false;
++		}
++
++		// This is hacky, but it's a way we can check exactly the output HTML
++		return node.innerHTML === tokenHtml;
++	} );
++};
++
+ const expectVisibleSuggestionsToBe = (
+ 	listElement: HTMLElement,
+ 	suggestionsText: string[]
+@@ -1233,13 +1246,29 @@ describe( 'FormTokenField', () => {
+ 			expect( screen.getByTitle( 'España' ) ).toBeVisible();
+ 		} );
+ 
+-		it( 'should be still used to filter out duplicate suggestions', () => {
++		it( 'should be still used to filter out duplicate suggestions', async () => {
++			const user = userEvent.setup();
++
+ 			render(
+ 				<FormTokenFieldWithState
+ 					__experimentalExpandOnFocus
+-					initialValue={ [ { value: 'France' }, { value: 'Spain' } ] }
++					initialValue={ [
++						{ value: 'Slovenia' },
++						{ value: 'Spain' },
++					] }
++					suggestions={ [ 'Slovenia', 'Slovakia', 'Sweden' ] }
+ 				/>
+ 			);
++
++			const input = screen.getByRole( 'combobox' );
++
++			// Typing `slov` will match both `Slovenia` and `Slovakia`.
++			await user.type( input, 'slov' );
++
++			// However, `Slovenia` is already selected.
++			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
++				'Slovakia',
++			] );
+ 		} );
+ 	} );
+ 
+@@ -1516,15 +1545,7 @@ describe( 'FormTokenField', () => {
+ 				'a&nbsp;&nbsp;&nbsp;b',
+ 				'i&nbsp;&lt;3&nbsp;tags',
+ 				'1&amp;2&amp;3&amp;4',
+-			].forEach( ( tokenHtml ) => {
+-				screen.getByText( ( _, node: Element | null ) => {
+-					if ( node === null ) {
+-						return false;
+-					}
+-
+-					return node.innerHTML === tokenHtml;
+-				} );
+-			} );
++			].forEach( ( tokenHtml ) => expectEscapedProperly( tokenHtml ) );
+ 		} );
+ 
+ 		it( 'should allow to pass a function that renders tokens with special characters correctly', async () => {
+@@ -1546,15 +1567,7 @@ describe( 'FormTokenField', () => {
+ 				'a&nbsp;&nbsp;&nbsp;b',
+ 				'i&nbsp;&lt;3&nbsp;tags',
+ 				'1&amp;2&amp;3&amp;4',
+-			].forEach( ( tokenHtml ) => {
+-				screen.getByText( ( _, node: Element | null ) => {
+-					if ( node === null ) {
+-						return false;
+-					}
+-
+-					return node.innerHTML === tokenHtml;
+-				} );
+-			} );
++			].forEach( ( tokenHtml ) => expectEscapedProperly( tokenHtml ) );
+ 		} );
+ 	} );
+ 
+diff --git a/packages/components/src/ui/context/test/context-connect.tsx b/packages/components/src/ui/context/test/context-connect.tsx
+index 21bc6a4f009c37..f6f3c8d704d150 100644
+--- a/packages/components/src/ui/context/test/context-connect.tsx
++++ b/packages/components/src/ui/context/test/context-connect.tsx
+@@ -10,6 +10,7 @@ import { contextConnect, contextConnectWithoutRef } from '../context-connect';
+ import type { WordPressComponentProps } from '../wordpress-component';
+ 
+ // Static TypeScript tests
++/* eslint-disable jest/expect-expect */
+ describe( 'ref forwarding', () => {
+ 	const ComponentWithRef = (
+ 		props: WordPressComponentProps< {}, 'div' >,
+@@ -53,3 +54,4 @@ describe( 'ref forwarding', () => {
+ 		<NoRef foo={ null } />;
+ 	} );
+ } );
++/* eslint-enable jest/expect-expect */
+diff --git a/packages/components/src/ui/context/test/wordpress-component.tsx b/packages/components/src/ui/context/test/wordpress-component.tsx
+index e648dd78fc9c75..637e5998dbebee 100644
+--- a/packages/components/src/ui/context/test/wordpress-component.tsx
++++ b/packages/components/src/ui/context/test/wordpress-component.tsx
+@@ -14,6 +14,7 @@ import { forwardRef } from '@wordpress/element';
+ import type { WordPressComponentProps } from '../wordpress-component';
+ 
+ // Static TypeScript checks
++/* eslint-disable jest/expect-expect */
+ describe( 'WordPressComponentProps', () => {
+ 	it( 'should not accept a ref', () => {
+ 		const Foo = ( props: WordPressComponentProps< {}, 'div' > ) => (
+@@ -34,3 +35,4 @@ describe( 'WordPressComponentProps', () => {
+ 		<ForwardedFoo ref={ null } />;
+ 	} );
+ } );
++/* eslint-enable jest/expect-expect */
+diff --git a/packages/custom-templated-path-webpack-plugin/test/index.js b/packages/custom-templated-path-webpack-plugin/test/index.js
+index f80d0389bd4230..72a39d215e6ed3 100644
+--- a/packages/custom-templated-path-webpack-plugin/test/index.js
++++ b/packages/custom-templated-path-webpack-plugin/test/index.js
+@@ -32,7 +32,9 @@ describe( 'CustomTemplatedPathPlugin', () => {
+ 	} );
+ 
+ 	it( 'should resolve with basename output', async () => {
+-		await webpackAsync( config );
+-		await accessAsync( outputFile );
++		expect( async () => {
++			await webpackAsync( config );
++			await accessAsync( outputFile );
++		} ).not.toThrow();
+ 	} );
+ } );
+diff --git a/packages/editor/src/components/editor-help/test/index.native.js b/packages/editor/src/components/editor-help/test/index.native.js
+index 294eb12689aff6..c300f3db8d7ba6 100644
+--- a/packages/editor/src/components/editor-help/test/index.native.js
++++ b/packages/editor/src/components/editor-help/test/index.native.js
+@@ -36,11 +36,11 @@ it( 'navigates back from help topic detail screen', async () => {
+ 	fireEvent.press( backButton[ backButton.length - 1 ] );
+ 
+ 	// Currently logs `act` warning due to https://github.com/callstack/react-native-testing-library/issues/379
+-	await waitForElementToBeRemoved( () =>
+-		screen.getByText(
+-			'Each block has its own settings. To find them, tap on a block. Its settings will appear on the toolbar at the bottom of the screen.'
+-		)
+-	);
++	const text =
++		'Each block has its own settings. To find them, tap on a block. Its settings will appear on the toolbar at the bottom of the screen.';
++	await waitForElementToBeRemoved( () => screen.getByText( text ) );
++
++	expect( screen.queryByText( text ) ).toBeNull();
+ } );
+ 
+ it( 'dismisses when close button is pressed', async () => {
+diff --git a/test/integration/full-content/full-content.test.js b/test/integration/full-content/full-content.test.js
+index 8066d3b7eb8347..0164b0193c522c 100644
+--- a/test/integration/full-content/full-content.test.js
++++ b/test/integration/full-content/full-content.test.js
+@@ -221,76 +221,80 @@ describe( 'full post content fixture', () => {
+ 	} );
+ 
+ 	it( 'should be present for each block', () => {
+-		const errors = [];
++		expect( () => {
++			const errors = [];
+ 
+-		getBlockTypes()
+-			.map( ( block ) => block.name )
+-			// We don't want tests for each oembed provider, which all have the same
+-			// `save` functions and attributes.
+-			// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
+-			.filter(
+-				( name ) => ! [ 'core/embed', 'core/template' ].includes( name )
+-			)
+-			.forEach( ( name ) => {
+-				const nameToFilename = blockNameToFixtureBasename( name );
+-				const foundFixtures = blockBasenames
+-					.filter(
+-						( basename ) =>
+-							basename === nameToFilename ||
+-							basename.startsWith( nameToFilename + '__' )
+-					)
+-					.map( ( basename ) => {
+-						const { filename: htmlFixtureFileName } =
+-							getBlockFixtureHTML( basename );
+-						const { file: jsonFixtureContent } =
+-							getBlockFixtureJSON( basename );
+-						// The parser output for this test.  For missing files,
+-						// JSON.parse( null ) === null.
+-						const parserOutput = JSON.parse( jsonFixtureContent );
+-						// The name of the first block that this fixture file
+-						// contains (if any).
+-						const firstBlock = get(
+-							parserOutput,
+-							[ '0', 'name' ],
+-							null
+-						);
+-						return {
+-							filename: htmlFixtureFileName,
+-							parserOutput,
+-							firstBlock,
+-						};
+-					} )
+-					.filter( ( fixture ) => fixture.parserOutput !== null );
+-
+-				if ( ! foundFixtures.length ) {
+-					errors.push(
+-						format(
+-							"Expected a fixture file called '%s.html' or '%s__*.html' in `test/integration/fixtures/blocks/` " +
+-								'\n\n' +
+-								'For more information on how to create test fixtures see https://github.com/WordPress/gutenberg/blob/1f75f8f6f500a20df5b9d6e317b4d72dd5af4ede/test/integration/fixtures/blocks/README.md\n\n',
+-							nameToFilename,
+-							nameToFilename
++			getBlockTypes()
++				.map( ( block ) => block.name )
++				// We don't want tests for each oembed provider, which all have the same
++				// `save` functions and attributes.
++				// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
++				.filter(
++					( name ) =>
++						! [ 'core/embed', 'core/template' ].includes( name )
++				)
++				.forEach( ( name ) => {
++					const nameToFilename = blockNameToFixtureBasename( name );
++					const foundFixtures = blockBasenames
++						.filter(
++							( basename ) =>
++								basename === nameToFilename ||
++								basename.startsWith( nameToFilename + '__' )
+ 						)
+-					);
+-				}
++						.map( ( basename ) => {
++							const { filename: htmlFixtureFileName } =
++								getBlockFixtureHTML( basename );
++							const { file: jsonFixtureContent } =
++								getBlockFixtureJSON( basename );
++							// The parser output for this test.  For missing files,
++							// JSON.parse( null ) === null.
++							const parserOutput =
++								JSON.parse( jsonFixtureContent );
++							// The name of the first block that this fixture file
++							// contains (if any).
++							const firstBlock = get(
++								parserOutput,
++								[ '0', 'name' ],
++								null
++							);
++							return {
++								filename: htmlFixtureFileName,
++								parserOutput,
++								firstBlock,
++							};
++						} )
++						.filter( ( fixture ) => fixture.parserOutput !== null );
+ 
+-				foundFixtures.forEach( ( fixture ) => {
+-					if ( name !== fixture.firstBlock ) {
++					if ( ! foundFixtures.length ) {
+ 						errors.push(
+ 							format(
+-								"Expected fixture file '%s' to test the '%s' block.",
+-								fixture.filename,
+-								name
++								"Expected a fixture file called '%s.html' or '%s__*.html' in `test/integration/fixtures/blocks/` " +
++									'\n\n' +
++									'For more information on how to create test fixtures see https://github.com/WordPress/gutenberg/blob/1f75f8f6f500a20df5b9d6e317b4d72dd5af4ede/test/integration/fixtures/blocks/README.md\n\n',
++								nameToFilename,
++								nameToFilename
+ 							)
+ 						);
+ 					}
++
++					foundFixtures.forEach( ( fixture ) => {
++						if ( name !== fixture.firstBlock ) {
++							errors.push(
++								format(
++									"Expected fixture file '%s' to test the '%s' block.",
++									fixture.filename,
++									name
++								)
++							);
++						}
++					} );
+ 				} );
+-			} );
+ 
+-		if ( errors.length ) {
+-			throw new Error(
+-				'Problem(s) with fixture files:\n\n' + errors.join( '\n' )
+-			);
+-		}
++			if ( errors.length ) {
++				throw new Error(
++					'Problem(s) with fixture files:\n\n' + errors.join( '\n' )
++				);
++			}
++		} ).not.toThrow();
+ 	} );
+ } );

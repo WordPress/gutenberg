@@ -1,0 +1,751 @@
+diff --git a/package-lock.json b/package-lock.json
+index 1772504c988ec4..66ed2c48a99404 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -7196,6 +7196,38 @@
+ 				"@babel/runtime": "^7.13.10"
+ 			}
+ 		},
++		"@radix-ui/react-collection": {
++			"version": "1.0.2",
++			"resolved": "https://registry.npmjs.org/@radix-ui/react-collection/-/react-collection-1.0.2.tgz",
++			"integrity": "sha512-s8WdQQ6wNXpaxdZ308KSr8fEWGrg4un8i4r/w7fhiS4ElRNjk5rRcl0/C6TANG2LvLOGIxtzo/jAg6Qf73TEBw==",
++			"requires": {
++				"@babel/runtime": "^7.13.10",
++				"@radix-ui/react-compose-refs": "1.0.0",
++				"@radix-ui/react-context": "1.0.0",
++				"@radix-ui/react-primitive": "1.0.2",
++				"@radix-ui/react-slot": "1.0.1"
++			},
++			"dependencies": {
++				"@radix-ui/react-primitive": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-primitive/-/react-primitive-1.0.2.tgz",
++					"integrity": "sha512-zY6G5Qq4R8diFPNwtyoLRZBxzu1Z+SXMlfYpChN7Dv8gvmx9X3qhDqiLWvKseKVJMuedFeU/Sa0Sy/Ia+t06Dw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-slot": "1.0.1"
++					}
++				},
++				"@radix-ui/react-slot": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.0.1.tgz",
++					"integrity": "sha512-avutXAFL1ehGvAXtPquu0YK5oz6ctS474iM3vNGQIkswrVhdrS52e3uoMQBzZhNRAIE0jBnUyXWNmSjGHhCFcw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-compose-refs": "1.0.0"
++					}
++				}
++			}
++		},
+ 		"@radix-ui/react-compose-refs": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/@radix-ui/react-compose-refs/-/react-compose-refs-1.0.0.tgz",
+@@ -7234,6 +7266,14 @@
+ 				"react-remove-scroll": "2.5.4"
+ 			}
+ 		},
++		"@radix-ui/react-direction": {
++			"version": "1.0.0",
++			"resolved": "https://registry.npmjs.org/@radix-ui/react-direction/-/react-direction-1.0.0.tgz",
++			"integrity": "sha512-2HV05lGUgYcA6xgLQ4BKPDmtL+QbIZYH5fCOTAOOcJ5O0QbWS3i9lKaurLzliYUDhORI2Qr3pyjhJh44lKA3rQ==",
++			"requires": {
++				"@babel/runtime": "^7.13.10"
++			}
++		},
+ 		"@radix-ui/react-dismissable-layer": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/@radix-ui/react-dismissable-layer/-/react-dismissable-layer-1.0.0.tgz",
+@@ -7303,6 +7343,43 @@
+ 				"@radix-ui/react-slot": "1.0.0"
+ 			}
+ 		},
++		"@radix-ui/react-roving-focus": {
++			"version": "1.0.3",
++			"resolved": "https://registry.npmjs.org/@radix-ui/react-roving-focus/-/react-roving-focus-1.0.3.tgz",
++			"integrity": "sha512-stjCkIoMe6h+1fWtXlA6cRfikdBzCLp3SnVk7c48cv/uy3DTGoXhN76YaOYUJuy3aEDvDIKwKR5KSmvrtPvQPQ==",
++			"requires": {
++				"@babel/runtime": "^7.13.10",
++				"@radix-ui/primitive": "1.0.0",
++				"@radix-ui/react-collection": "1.0.2",
++				"@radix-ui/react-compose-refs": "1.0.0",
++				"@radix-ui/react-context": "1.0.0",
++				"@radix-ui/react-direction": "1.0.0",
++				"@radix-ui/react-id": "1.0.0",
++				"@radix-ui/react-primitive": "1.0.2",
++				"@radix-ui/react-use-callback-ref": "1.0.0",
++				"@radix-ui/react-use-controllable-state": "1.0.0"
++			},
++			"dependencies": {
++				"@radix-ui/react-primitive": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-primitive/-/react-primitive-1.0.2.tgz",
++					"integrity": "sha512-zY6G5Qq4R8diFPNwtyoLRZBxzu1Z+SXMlfYpChN7Dv8gvmx9X3qhDqiLWvKseKVJMuedFeU/Sa0Sy/Ia+t06Dw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-slot": "1.0.1"
++					}
++				},
++				"@radix-ui/react-slot": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.0.1.tgz",
++					"integrity": "sha512-avutXAFL1ehGvAXtPquu0YK5oz6ctS474iM3vNGQIkswrVhdrS52e3uoMQBzZhNRAIE0jBnUyXWNmSjGHhCFcw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-compose-refs": "1.0.0"
++					}
++				}
++			}
++		},
+ 		"@radix-ui/react-slot": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.0.0.tgz",
+@@ -7312,6 +7389,42 @@
+ 				"@radix-ui/react-compose-refs": "1.0.0"
+ 			}
+ 		},
++		"@radix-ui/react-tabs": {
++			"version": "1.0.3",
++			"resolved": "https://registry.npmjs.org/@radix-ui/react-tabs/-/react-tabs-1.0.3.tgz",
++			"integrity": "sha512-4CkF/Rx1GcrusI/JZ1Rvyx4okGUs6wEenWA0RG/N+CwkRhTy7t54y7BLsWUXrAz/GRbBfHQg/Odfs/RoW0CiRA==",
++			"requires": {
++				"@babel/runtime": "^7.13.10",
++				"@radix-ui/primitive": "1.0.0",
++				"@radix-ui/react-context": "1.0.0",
++				"@radix-ui/react-direction": "1.0.0",
++				"@radix-ui/react-id": "1.0.0",
++				"@radix-ui/react-presence": "1.0.0",
++				"@radix-ui/react-primitive": "1.0.2",
++				"@radix-ui/react-roving-focus": "1.0.3",
++				"@radix-ui/react-use-controllable-state": "1.0.0"
++			},
++			"dependencies": {
++				"@radix-ui/react-primitive": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-primitive/-/react-primitive-1.0.2.tgz",
++					"integrity": "sha512-zY6G5Qq4R8diFPNwtyoLRZBxzu1Z+SXMlfYpChN7Dv8gvmx9X3qhDqiLWvKseKVJMuedFeU/Sa0Sy/Ia+t06Dw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-slot": "1.0.1"
++					}
++				},
++				"@radix-ui/react-slot": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.0.1.tgz",
++					"integrity": "sha512-avutXAFL1ehGvAXtPquu0YK5oz6ctS474iM3vNGQIkswrVhdrS52e3uoMQBzZhNRAIE0jBnUyXWNmSjGHhCFcw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-compose-refs": "1.0.0"
++					}
++				}
++			}
++		},
+ 		"@radix-ui/react-use-callback-ref": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/@radix-ui/react-use-callback-ref/-/react-use-callback-ref-1.0.0.tgz",
+@@ -17071,6 +17184,7 @@
+ 				"@emotion/styled": "^11.6.0",
+ 				"@emotion/utils": "^1.0.0",
+ 				"@floating-ui/react-dom": "1.0.0",
++				"@radix-ui/react-tabs": "^1.0.3",
+ 				"@use-gesture/react": "^10.2.24",
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
+@@ -28906,7 +29020,7 @@
+ 		"co": {
+ 			"version": "4.6.0",
+ 			"resolved": "https://registry.npmjs.org/co/-/co-4.6.0.tgz",
+-			"integrity": "sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==",
++			"integrity": "sha1-bqa989hTrlTMuOR7+gvz+QMfsYQ=",
+ 			"dev": true
+ 		},
+ 		"code-point-at": {
+@@ -30483,7 +30597,7 @@
+ 		"css.escape": {
+ 			"version": "1.5.1",
+ 			"resolved": "https://registry.npmjs.org/css.escape/-/css.escape-1.5.1.tgz",
+-			"integrity": "sha1-QuJ9T6BK4y+TGktNQZH6nN3ul8s=",
++			"integrity": "sha512-YUifsXXuknHlUsmlgyY0PKzgPOr7/FjCePfHNt0jxm83wHZi44VDMQ7/fGNkjY3/jV1MC+1CmZbaHzugyeRtpg==",
+ 			"dev": true
+ 		},
+ 		"cssesc": {
+@@ -41059,7 +41173,7 @@
+ 		"lz-string": {
+ 			"version": "1.4.4",
+ 			"resolved": "https://registry.npmjs.org/lz-string/-/lz-string-1.4.4.tgz",
+-			"integrity": "sha1-wNjq82BZ9wV5bh40SBHPTEmNOiY=",
++			"integrity": "sha512-0ckx7ZHRPqb0oUm8zNr+90mtf9DQB60H1wMCjBtfi62Kl3a7JbHob6gA2bC+xRvZoOL+1hzUK8jeuEIQE8svEQ==",
+ 			"dev": true
+ 		},
+ 		"macos-release": {
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 8acc2bc4dd80ce..8ddecc0459d8d3 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -38,6 +38,7 @@
+ 		"@emotion/styled": "^11.6.0",
+ 		"@emotion/utils": "^1.0.0",
+ 		"@floating-ui/react-dom": "1.0.0",
++		"@radix-ui/react-tabs": "^1.0.3",
+ 		"@use-gesture/react": "^10.2.24",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 1c19336552aba4..5053192e9daa4b 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -42,6 +42,7 @@
+ @import "./select-control/style.scss";
+ @import "./snackbar/style.scss";
+ @import "./tab-panel/style.scss";
++@import "./tabs/style.scss";
+ @import "./text-control/style.scss";
+ @import "./tip/style.scss";
+ @import "./toolbar/toolbar/style.scss";
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index b2af12b90c85f5..8deedc0435897c 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
++import * as RadixTabs from '@radix-ui/react-tabs';
+ 
+ /**
+  * WordPress dependencies
+@@ -12,32 +13,39 @@ import {
+ 	useLayoutEffect,
+ 	useCallback,
+ } from '@wordpress/element';
+-import { useInstanceId } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { NavigableMenu } from '../navigable-container';
+-import Button from '../button';
+ import type { TabButtonProps, TabPanelProps } from './types';
+-import type { WordPressComponentProps } from '../ui/context';
++import Button from '../button';
+ 
+-const TabButton = ( {
+-	tabId,
++const Tab = ( {
++	value,
++	disabled = false,
+ 	children,
+-	selected,
+ 	...rest
+ }: TabButtonProps ) => (
+-	<Button
+-		role="tab"
+-		tabIndex={ selected ? undefined : -1 }
+-		aria-selected={ selected }
+-		id={ tabId }
+-		__experimentalIsFocusable
+-		{ ...rest }
++	<RadixTabs.Trigger disabled={ disabled } value={ value } asChild>
++		<Button disabled={ disabled } __experimentalIsFocusable { ...rest }>
++			{ children }
++		</Button>
++	</RadixTabs.Trigger>
++);
++
++const TabPanel = ( {
++	value,
++	children,
++}: {
++	value: string;
++	children: React.ReactNode;
++} ) => (
++	<RadixTabs.Content
++		value={ value }
++		className="components-tab-panel__tab-content"
+ 	>
+ 		{ children }
+-	</Button>
++	</RadixTabs.Content>
+ );
+ 
+ /**
+@@ -76,7 +84,7 @@ const TabButton = ( {
+  * );
+  * ```
+  */
+-export function TabPanel( {
++export function Tabs( {
+ 	className,
+ 	children,
+ 	tabs,
+@@ -85,28 +93,18 @@ export function TabPanel( {
+ 	orientation = 'horizontal',
+ 	activeClass = 'is-active',
+ 	onSelect,
+-}: WordPressComponentProps< TabPanelProps, 'div', false > ) {
+-	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
++}: TabPanelProps ) {
+ 	const [ selected, setSelected ] = useState< string >();
+ 
+ 	const handleTabSelection = useCallback(
+-		( tabKey: string ) => {
+-			setSelected( tabKey );
+-			onSelect?.( tabKey );
++		( tabValue: string ) => {
++			setSelected( tabValue );
++			onSelect?.( tabValue );
+ 		},
+ 		[ onSelect ]
+ 	);
+ 
+-	// Simulate a click on the newly focused tab, which causes the component
+-	// to show the `tab-panel` associated with the clicked tab.
+-	const activateTabAutomatically = (
+-		_childIndex: number,
+-		child: HTMLButtonElement
+-	) => {
+-		child.click();
+-	};
+ 	const selectedTab = tabs.find( ( { name } ) => name === selected );
+-	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
+ 
+ 	// Handle selecting the initial tab.
+ 	useLayoutEffect( () => {
+@@ -134,7 +132,7 @@ export function TabPanel( {
+ 		}
+ 	}, [ tabs, selectedTab, initialTabName, handleTabSelection ] );
+ 
+-	// Handle the currently selected tab becoming disabled.
++	// // Handle the currently selected tab becoming disabled.
+ 	useEffect( () => {
+ 		// This effect only runs when the selected tab is defined and becomes disabled.
+ 		if ( ! selectedTab?.disabled ) {
+@@ -151,51 +149,40 @@ export function TabPanel( {
+ 	}, [ tabs, selectedTab?.disabled, handleTabSelection ] );
+ 
+ 	return (
+-		<div className={ className }>
+-			<NavigableMenu
+-				role="tablist"
+-				orientation={ orientation }
+-				onNavigate={
+-					selectOnMove ? activateTabAutomatically : undefined
+-				}
+-				className="components-tab-panel__tabs"
+-			>
++		<RadixTabs.Root
++			activationMode={ selectOnMove ? 'automatic' : 'manual' }
++			className={ className }
++			onValueChange={ handleTabSelection }
++			orientation={ orientation }
++			value={ selected }
++		>
++			<RadixTabs.TabsList className="components-tab-panel__tabs">
+ 				{ tabs.map( ( tab ) => (
+-					<TabButton
++					<Tab
+ 						className={ classnames(
+ 							'components-tab-panel__tabs-item',
+ 							tab.className,
+-							{
+-								[ activeClass ]: tab.name === selected,
+-							}
++							{ [ activeClass ]: tab.name === selected }
+ 						) }
+-						tabId={ `${ instanceId }-${ tab.name }` }
+-						aria-controls={ `${ instanceId }-${ tab.name }-view` }
+-						selected={ tab.name === selected }
+-						key={ tab.name }
+-						onClick={ () => handleTabSelection( tab.name ) }
+ 						disabled={ tab.disabled }
+-						label={ tab.icon && tab.title }
+ 						icon={ tab.icon }
++						key={ tab.name }
++						label={ tab.icon && tab.title }
+ 						showTooltip={ !! tab.icon }
++						value={ tab.name }
+ 					>
+ 						{ ! tab.icon && tab.title }
+-					</TabButton>
++					</Tab>
+ 				) ) }
+-			</NavigableMenu>
++			</RadixTabs.TabsList>
++
+ 			{ selectedTab && (
+-				<div
+-					key={ selectedId }
+-					aria-labelledby={ selectedId }
+-					role="tabpanel"
+-					id={ `${ selectedId }-view` }
+-					className="components-tab-panel__tab-content"
+-				>
++				<TabPanel value={ selectedTab.name }>
+ 					{ children( selectedTab ) }
+-				</div>
++				</TabPanel>
+ 			) }
+-		</div>
++		</RadixTabs.Root>
+ 	);
+ }
+ 
+-export default TabPanel;
++export default Tabs;
+diff --git a/packages/components/src/tab-panel/stories/index.tsx b/packages/components/src/tab-panel/stories/index.tsx
+index 07c076e1ce621a..2acadb358b262c 100644
+--- a/packages/components/src/tab-panel/stories/index.tsx
++++ b/packages/components/src/tab-panel/stories/index.tsx
+@@ -37,6 +37,7 @@ Default.args = {
+ 		{
+ 			name: 'tab1',
+ 			title: 'Tab 1',
++			disabled: false,
+ 		},
+ 		{
+ 			name: 'tab2',
+diff --git a/packages/components/src/tab-panel/style.scss b/packages/components/src/tab-panel/style.scss
+index a6b6189e6c204b..cecc5bc52e83b9 100644
+--- a/packages/components/src/tab-panel/style.scss
++++ b/packages/components/src/tab-panel/style.scss
+@@ -47,7 +47,7 @@
+ 	}
+ 
+ 	// Active.
+-	&.is-active::after {
++	&[data-state="active"]::after {
+ 		height: calc(1 * var(--wp-admin-border-width-focus));
+ 
+ 		// Windows high contrast mode.
+diff --git a/packages/components/src/tab-panel/types.ts b/packages/components/src/tab-panel/types.ts
+index 4bef866923ebca..76b608290545a6 100644
+--- a/packages/components/src/tab-panel/types.ts
++++ b/packages/components/src/tab-panel/types.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { MouseEvent, ReactNode } from 'react';
++import type { ReactNode } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -34,10 +34,8 @@ type Tab = {
+ export type TabButtonProps = {
+ 	children: ReactNode;
+ 	label?: string;
+-	onClick: ( event: MouseEvent ) => void;
+-	selected: boolean;
+ 	showTooltip?: boolean;
+-	tabId: string;
++	value: string;
+ } & Pick< Tab, 'className' | 'icon' | 'disabled' >;
+ 
+ export type TabPanelProps = {
+diff --git a/packages/components/src/tabs/index.tsx b/packages/components/src/tabs/index.tsx
+new file mode 100644
+index 00000000000000..d001bc8d47588b
+--- /dev/null
++++ b/packages/components/src/tabs/index.tsx
+@@ -0,0 +1,73 @@
++/**
++ * External dependencies
++ */
++import * as RadixTabs from '@radix-ui/react-tabs';
++import cx from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++
++/**
++ * Internal dependencies
++ */
++import Button from '../button';
++import type {
++	TabsProps,
++	TabProps,
++	TabsListProps,
++	TabPanelProps,
++} from './types';
++
++export const TabsList = ( { className, children }: TabsListProps ) => (
++	<RadixTabs.TabsList
++		className={ cx( 'components-tabs__tabs-list', className ) }
++	>
++		{ children }
++	</RadixTabs.TabsList>
++);
++
++export const Tab = ( {
++	value,
++	disabled = false,
++	className,
++	children,
++}: TabProps ) => (
++	<RadixTabs.Trigger
++		value={ value }
++		disabled={ disabled }
++		className={ cx( 'components-tabs__tab', className ) }
++		asChild
++	>
++		<Button disabled={ disabled } __experimentalIsFocusable>
++			{ children }
++		</Button>
++	</RadixTabs.Trigger>
++);
++
++export const TabPanel = ( { value, className, children }: TabPanelProps ) => (
++	<RadixTabs.Content className={ className } value={ value }>
++		{ children }
++	</RadixTabs.Content>
++);
++
++export function Tabs( {
++	defaultValue,
++	value,
++	onValueChange,
++	className,
++	children,
++	orientation = 'horizontal',
++}: TabsProps ) {
++	return (
++		<RadixTabs.Root
++			defaultValue={ defaultValue }
++			value={ value }
++			onValueChange={ onValueChange }
++			className={ className }
++			orientation={ orientation }
++		>
++			{ children }
++		</RadixTabs.Root>
++	);
++}
+diff --git a/packages/components/src/tabs/stories/index.tsx b/packages/components/src/tabs/stories/index.tsx
+new file mode 100644
+index 00000000000000..0f15409ec5e6eb
+--- /dev/null
++++ b/packages/components/src/tabs/stories/index.tsx
+@@ -0,0 +1,94 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { closeSmall } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import { Tabs, TabsList, Tab, TabPanel } from '..';
++import Button from '../../button';
++
++const meta: ComponentMeta< typeof Tabs > = {
++	title: 'Components/Tabs',
++	component: Tabs,
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof Tabs > = ( props ) => {
++	return <Tabs { ...props } />;
++};
++
++export const Default = Template.bind( {} );
++Default.args = {
++	defaultValue: 'tab-1',
++	children: (
++		<>
++			<TabsList>
++				<Tab value="tab-1">Tab 1</Tab>
++				<Tab value="tab-2">Tab 2</Tab>
++			</TabsList>
++			<TabPanel value="tab-1">You see the content of tab 1</TabPanel>
++			<TabPanel value="tab-2">You see the content of tab 2</TabPanel>
++		</>
++	),
++};
++
++export const DisabledTab = Template.bind( {} );
++DisabledTab.args = {
++	defaultValue: 'tab-2',
++	children: (
++		<>
++			<TabsList>
++				<Tab value="tab-1" disabled>
++					Tab 1
++				</Tab>
++				<Tab value="tab-2">Tab 2</Tab>
++				<Tab value="tab-3">Tab 3</Tab>
++			</TabsList>
++			<TabPanel value="tab-1">You see the content of tab 1</TabPanel>
++			<TabPanel value="tab-2">You see the content of tab 2</TabPanel>
++			<TabPanel value="tab-3">You see the content of tab 3</TabPanel>
++		</>
++	),
++};
++
++export const ToBeNamedStory = Template.bind( {} );
++ToBeNamedStory.args = {
++	defaultValue: 'post',
++	children: (
++		<>
++			<div style={ { display: 'flex', alignItems: 'center' } }>
++				<TabsList>
++					<Tab value="post">Post</Tab>
++					<Tab value="block">Block</Tab>
++				</TabsList>
++				<Button
++					icon={ closeSmall }
++					label="Some Action"
++					style={ { marginLeft: 'auto' } }
++				/>
++			</div>
++			<TabPanel value="post">Show post settings</TabPanel>
++			<TabPanel value="block">Show block settings</TabPanel>
++		</>
++	),
++};
++
++ToBeNamedStory.decorators = [
++	( Story ) => (
++		<div style={ { width: '280px' } }>
++			<Story />
++		</div>
++	),
++];
+diff --git a/packages/components/src/tabs/style.scss b/packages/components/src/tabs/style.scss
+new file mode 100644
+index 00000000000000..09c659e79b5fc3
+--- /dev/null
++++ b/packages/components/src/tabs/style.scss
+@@ -0,0 +1,83 @@
++.components-tabs__tabs-list {
++	display: flex;
++	align-items: stretch;
++	flex-direction: row;
++
++	&[aria-orientation="vertical"] {
++		flex-direction: column;
++	}
++}
++
++.components-tabs__tab {
++	position: relative;
++	border-radius: 0;
++	height: $grid-unit-60;
++	background: transparent;
++	border: none;
++	box-shadow: none;
++	cursor: pointer;
++	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
++	margin-left: 0;
++	font-weight: 500;
++
++	&:focus:not(:disabled) {
++		position: relative;
++		box-shadow: none;
++		outline: none;
++	}
++
++	// Tab indicator
++	&::after {
++		content: "";
++		position: absolute;
++		right: 0;
++		bottom: 0;
++		left: 0;
++		pointer-events: none;
++
++		// Draw the indicator.
++		background: $components-color-accent;
++		height: calc(0 * var(--wp-admin-border-width-focus));
++		border-radius: 0;
++
++		// Animation
++		transition: all 0.1s linear;
++		@include reduce-motion("transition");
++	}
++
++	// Active.
++	&[data-state="active"]::after {
++		height: calc(1 * var(--wp-admin-border-width-focus));
++
++		// Windows high contrast mode.
++		outline: 2px solid transparent;
++		outline-offset: -1px;
++	}
++
++	// Focus.
++	&::before {
++		content: "";
++		position: absolute;
++		top: $grid-unit-15;
++		right: $grid-unit-15;
++		bottom: $grid-unit-15;
++		left: $grid-unit-15;
++		pointer-events: none;
++
++		// Draw the indicator.
++		box-shadow: 0 0 0 0 transparent;
++		border-radius: $radius-block-ui;
++
++		// Animation
++		transition: all 0.1s linear;
++		@include reduce-motion("transition");
++	}
++
++	&:focus-visible::before {
++		box-shadow: 0 0 0 var(--wp-admin-border-width-focus)
++			$components-color-accent;
++
++		// Windows high contrast mode.
++		outline: 2px solid transparent;
++	}
++}
+diff --git a/packages/components/src/tabs/types.ts b/packages/components/src/tabs/types.ts
+new file mode 100644
+index 00000000000000..ec95789ca8d77c
+--- /dev/null
++++ b/packages/components/src/tabs/types.ts
+@@ -0,0 +1,33 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++export type TabValue = string;
++
++export type TabsListProps = {
++	className?: string;
++	children?: ReactNode;
++};
++
++export type TabProps = {
++	value: TabValue;
++	disabled?: boolean;
++	className?: string;
++	children?: ReactNode;
++};
++
++export type TabPanelProps = {
++	value: TabValue;
++	className?: string;
++	children?: ReactNode;
++};
++
++export type TabsProps = {
++	defaultValue?: TabValue;
++	value?: TabValue;
++	onValueChange: ( value: TabValue ) => void;
++	children?: ReactNode;
++	className?: string;
++	orientation?: 'horizontal' | 'vertical';
++};

@@ -1,0 +1,301 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 8dcc499f6846e4..f06b35bdae3aab 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -283,7 +283,6 @@ module.exports = {
+ 						'RangeControl',
+ 						'SearchControl',
+ 						'SelectControl',
+-						'TextareaControl',
+ 						'ToggleControl',
+ 						'ToggleGroupControl',
+ 						'TreeSelect',
+diff --git a/packages/block-editor/src/components/global-styles/advanced-panel.js b/packages/block-editor/src/components/global-styles/advanced-panel.js
+index bbb756cd78247d..cad9f20caf9319 100644
+--- a/packages/block-editor/src/components/global-styles/advanced-panel.js
++++ b/packages/block-editor/src/components/global-styles/advanced-panel.js
+@@ -70,7 +70,6 @@ export default function AdvancedPanel( {
+ 			) }
+ 			<TextareaControl
+ 				label={ __( 'Additional CSS' ) }
+-				__nextHasNoMarginBottom
+ 				value={ customCSS }
+ 				onChange={ ( newValue ) => handleOnChange( newValue ) }
+ 				onBlur={ handleOnBlur }
+diff --git a/packages/block-library/src/cover/edit/inspector-controls.js b/packages/block-library/src/cover/edit/inspector-controls.js
+index 115c1d556091ce..b8dc848fc7d226 100644
+--- a/packages/block-library/src/cover/edit/inspector-controls.js
++++ b/packages/block-library/src/cover/edit/inspector-controls.js
+@@ -297,7 +297,6 @@ export default function CoverInspectorControls( {
+ 								}
+ 							>
+ 								<TextareaControl
+-									__nextHasNoMarginBottom
+ 									label={ __( 'Alternative text' ) }
+ 									value={ alt }
+ 									onChange={ ( newAlt ) =>
+diff --git a/packages/block-library/src/image/image.js b/packages/block-library/src/image/image.js
+index 0d40357b8ca43b..92402a951984c6 100644
+--- a/packages/block-library/src/image/image.js
++++ b/packages/block-library/src/image/image.js
+@@ -200,7 +200,6 @@ function ContentOnlyControls( {
+ 									</>
+ 								)
+ 							}
+-							__nextHasNoMarginBottom
+ 						/>
+ 					</div>
+ 				</Popover>
+@@ -832,7 +831,6 @@ export default function Image( {
+ 										</>
+ 									)
+ 								}
+-								__nextHasNoMarginBottom
+ 							/>
+ 						</ToolsPanelItem>
+ 					) }
+diff --git a/packages/block-library/src/math/edit.js b/packages/block-library/src/math/edit.js
+index fe173d9bfcb5bf..3be254c7928895 100644
+--- a/packages/block-library/src/math/edit.js
++++ b/packages/block-library/src/math/edit.js
+@@ -79,7 +79,6 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
+ 					<div style={ { padding: '4px', minWidth: '300px' } }>
+ 						<VStack spacing={ 1 }>
+ 							<TextareaControl
+-								__nextHasNoMarginBottom
+ 								__next40pxDefaultSize
+ 								label={ __( 'LaTeX math syntax' ) }
+ 								hideLabelFromVision
+diff --git a/packages/block-library/src/media-text/edit.js b/packages/block-library/src/media-text/edit.js
+index 78956c878dc1cb..7e7c9a2385bb0a 100644
+--- a/packages/block-library/src/media-text/edit.js
++++ b/packages/block-library/src/media-text/edit.js
+@@ -420,7 +420,6 @@ function MediaTextEdit( {
+ 					onDeselect={ () => setAttributes( { mediaAlt: '' } ) }
+ 				>
+ 					<TextareaControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Alternative text' ) }
+ 						value={ mediaAlt }
+ 						onChange={ onMediaAltChange }
+diff --git a/packages/block-library/src/navigation-link/shared/controls.js b/packages/block-library/src/navigation-link/shared/controls.js
+index 15c512bc4b14bc..acaac386ba278e 100644
+--- a/packages/block-library/src/navigation-link/shared/controls.js
++++ b/packages/block-library/src/navigation-link/shared/controls.js
+@@ -281,7 +281,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
+ 				isShownByDefault
+ 			>
+ 				<TextareaControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Description' ) }
+ 					value={ description || '' }
+ 					onChange={ ( descriptionValue ) => {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 666da1c95d9757..125c096d6b4cb8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `FormTokenField`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73846](https://github.com/WordPress/gutenberg/pull/73846)).
+ -   `CheckboxControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73916](https://github.com/WordPress/gutenberg/pull/73916)).
+ -   `TextControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73920](https://github.com/WordPress/gutenberg/pull/73920)).
++-   `TextareaControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73970](https://github.com/WordPress/gutenberg/pull/73970)).
+ -   `DimensionControl`: Completely remove deprecated component ([#73944](https://github.com/WordPress/gutenberg/pull/73944)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/disabled/stories/index.story.tsx b/packages/components/src/disabled/stories/index.story.tsx
+index e538472ac3c0cb..008ac6c2aca4c6 100644
+--- a/packages/components/src/disabled/stories/index.story.tsx
++++ b/packages/components/src/disabled/stories/index.story.tsx
+@@ -47,7 +47,6 @@ const Form = () => {
+ 				onChange={ setTextControlValue }
+ 			/>
+ 			<TextareaControl
+-				__nextHasNoMarginBottom
+ 				label="TextArea Control"
+ 				value={ textAreaValue }
+ 				onChange={ setTextAreaValue }
+diff --git a/packages/components/src/textarea-control/README.md b/packages/components/src/textarea-control/README.md
+index c812f6c308ea46..a4d5189c065f4e 100644
+--- a/packages/components/src/textarea-control/README.md
++++ b/packages/components/src/textarea-control/README.md
+@@ -79,7 +79,6 @@ const MyTextareaControl = () => {
+ 
+ 	return (
+ 		<TextareaControl
+-		  __nextHasNoMarginBottom
+ 			label="Text"
+ 			help="Enter some text"
+ 			value={ text }
+@@ -132,13 +131,6 @@ The current value of the textarea.
+ 
+ -   Required: Yes
+ 
+-#### `__nextHasNoMarginBottom`: `Boolean`
+-
+-Start opting into the new margin-free styles that will become the default in a future version.
+-
+--   Required: No
+--   Default: `false`
+-
+ ## Related components
+ 
+ -   For a field where users only enter one line of text, use the `TextControl` component.
+diff --git a/packages/components/src/textarea-control/index.tsx b/packages/components/src/textarea-control/index.tsx
+index cf5f9ed4b52e75..e940f6b08119ca 100644
+--- a/packages/components/src/textarea-control/index.tsx
++++ b/packages/components/src/textarea-control/index.tsx
+@@ -22,7 +22,8 @@ function UnforwardedTextareaControl(
+ 	ref: React.ForwardedRef< HTMLTextAreaElement >
+ ) {
+ 	const {
+-		__nextHasNoMarginBottom,
++		// @ts-expect-error - Prevent passing this to `textarea`.
++		__nextHasNoMarginBottom: _,
+ 		label,
+ 		hideLabelFromVision,
+ 		value,
+@@ -41,8 +42,7 @@ function UnforwardedTextareaControl(
+ 
+ 	return (
+ 		<BaseControl
+-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-			__associatedWPComponentName="TextareaControl"
++			__nextHasNoMarginBottom
+ 			label={ label }
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			id={ id }
+@@ -77,7 +77,6 @@ function UnforwardedTextareaControl(
+  *
+  *   return (
+  *     <TextareaControl
+- *       __nextHasNoMarginBottom
+  *       label="Text"
+  *       help="Enter some text"
+  *       value={ text }
+diff --git a/packages/components/src/textarea-control/stories/index.story.tsx b/packages/components/src/textarea-control/stories/index.story.tsx
+index 3160e0bfe68f31..fa8147a505c9ef 100644
+--- a/packages/components/src/textarea-control/stories/index.story.tsx
++++ b/packages/components/src/textarea-control/stories/index.story.tsx
+@@ -52,7 +52,6 @@ const Template: StoryFn< typeof TextareaControl > = ( {
+ 
+ export const Default: StoryFn< typeof TextareaControl > = Template.bind( {} );
+ Default.args = {
+-	__nextHasNoMarginBottom: true,
+ 	label: 'Text',
+ 	help: 'Enter some text',
+ 	placeholder: 'Placeholder',
+diff --git a/packages/components/src/textarea-control/types.ts b/packages/components/src/textarea-control/types.ts
+index 51bf152920b498..9a66164577cb38 100644
+--- a/packages/components/src/textarea-control/types.ts
++++ b/packages/components/src/textarea-control/types.ts
+@@ -10,7 +10,7 @@ import type { BaseControlProps } from '../base-control/types';
+ 
+ export type TextareaControlProps = Pick<
+ 	BaseControlProps,
+-	'hideLabelFromVision' | 'help' | 'label' | '__nextHasNoMarginBottom'
++	'hideLabelFromVision' | 'help' | 'label'
+ > & {
+ 	/**
+ 	 * A function that receives the new value of the textarea each time it
+diff --git a/packages/components/src/validated-form-controls/components/textarea-control.tsx b/packages/components/src/validated-form-controls/components/textarea-control.tsx
+index 3c452c801cf0e2..45e218b129e5cf 100644
+--- a/packages/components/src/validated-form-controls/components/textarea-control.tsx
++++ b/packages/components/src/validated-form-controls/components/textarea-control.tsx
+@@ -17,11 +17,7 @@ const UnforwardedValidatedTextareaControl = (
+ 		customValidity,
+ 		markWhenOptional,
+ 		...restProps
+-	}: Omit<
+-		React.ComponentProps< typeof TextareaControl >,
+-		'__nextHasNoMarginBottom'
+-	> &
+-		ValidatedControlProps,
++	}: React.ComponentProps< typeof TextareaControl > & ValidatedControlProps,
+ 	forwardedRef: React.ForwardedRef< HTMLTextAreaElement >
+ ) => {
+ 	const validityTargetRef = useRef< HTMLTextAreaElement >( null );
+@@ -34,11 +30,7 @@ const UnforwardedValidatedTextareaControl = (
+ 			customValidity={ customValidity }
+ 			getValidityTarget={ () => validityTargetRef.current }
+ 		>
+-			<TextareaControl
+-				__nextHasNoMarginBottom
+-				ref={ mergedRefs }
+-				{ ...restProps }
+-			/>
++			<TextareaControl ref={ mergedRefs } { ...restProps } />
+ 		</ControlWithError>
+ 	);
+ };
+diff --git a/packages/editor/src/components/post-excerpt/index.js b/packages/editor/src/components/post-excerpt/index.js
+index 1a64bd53bab9bd..fc3fac9ccd956c 100644
+--- a/packages/editor/src/components/post-excerpt/index.js
++++ b/packages/editor/src/components/post-excerpt/index.js
+@@ -66,7 +66,6 @@ export default function PostExcerpt( {
+ 	return (
+ 		<div className="editor-post-excerpt">
+ 			<TextareaControl
+-				__nextHasNoMarginBottom
+ 				label={ label }
+ 				hideLabelFromVision={ hideLabelFromVision }
+ 				className="editor-post-excerpt__textarea"
+diff --git a/packages/editor/src/components/post-title/post-title-raw.js b/packages/editor/src/components/post-title/post-title-raw.js
+index 9beba1068f8ef7..fcd11eb96f0dbd 100644
+--- a/packages/editor/src/components/post-title/post-title-raw.js
++++ b/packages/editor/src/components/post-title/post-title-raw.js
+@@ -79,7 +79,6 @@ function PostTitleRaw( _, forwardedRef ) {
+ 			autoComplete="off"
+ 			dir="auto"
+ 			rows={ 1 }
+-			__nextHasNoMarginBottom
+ 		/>
+ 	);
+ }
+diff --git a/packages/format-library/src/image/index.js b/packages/format-library/src/image/index.js
+index 08663ad4d2ac27..1a9ca53de72e32 100644
+--- a/packages/format-library/src/image/index.js
++++ b/packages/format-library/src/image/index.js
+@@ -112,7 +112,6 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
+ 					/>
+ 					<TextareaControl
+ 						label={ __( 'Alternative text' ) }
+-						__nextHasNoMarginBottom
+ 						value={ editedAlt }
+ 						onChange={ ( newAlt ) => {
+ 							setEditedAlt( newAlt );
+diff --git a/packages/media-fields/src/alt_text/index.tsx b/packages/media-fields/src/alt_text/index.tsx
+index 6b399c797a8a5d..7d746d50d9a8bc 100644
+--- a/packages/media-fields/src/alt_text/index.tsx
++++ b/packages/media-fields/src/alt_text/index.tsx
+@@ -19,7 +19,6 @@ const altTextField: Partial< Field< Updatable< Attachment > > > = {
+ 				value={ data.alt_text || '' }
+ 				onChange={ ( value ) => onChange( { alt_text: value } ) }
+ 				rows={ 2 }
+-				__nextHasNoMarginBottom
+ 			/>
+ 		);
+ 	},
+diff --git a/packages/media-fields/src/caption/index.tsx b/packages/media-fields/src/caption/index.tsx
+index 00e93449c8a937..730c37fe62da70 100644
+--- a/packages/media-fields/src/caption/index.tsx
++++ b/packages/media-fields/src/caption/index.tsx
+@@ -24,7 +24,6 @@ const captionField: Partial< Field< Updatable< Attachment > > > = {
+ 				value={ getRawContent( data.caption ) || '' }
+ 				onChange={ ( value ) => onChange( { caption: value } ) }
+ 				rows={ 2 }
+-				__nextHasNoMarginBottom
+ 			/>
+ 		);
+ 	},
+diff --git a/packages/media-fields/src/description/index.tsx b/packages/media-fields/src/description/index.tsx
+index 3516ce027ce737..7080dd2c447e8a 100644
+--- a/packages/media-fields/src/description/index.tsx
++++ b/packages/media-fields/src/description/index.tsx
+@@ -26,7 +26,6 @@ const descriptionField: Partial< Field< Updatable< Attachment > > > = {
+ 				value={ getRawContent( data.description ) || '' }
+ 				onChange={ ( value ) => onChange( { description: value } ) }
+ 				rows={ 5 }
+-				__nextHasNoMarginBottom
+ 			/>
+ 		);
+ 	},

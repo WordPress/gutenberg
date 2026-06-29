@@ -1,0 +1,116 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2025a550d55e0f..71e51bc9741b50 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Deprecations
++
++-   `BorderBoxControl`: Deprecate 36px default size ([#65752](https://github.com/WordPress/gutenberg/pull/65752)).
++
+ ### Bug Fixes
+ 
+ -   `ColorPalette`: prevent overflow of custom color button background ([#66152](https://github.com/WordPress/gutenberg/pull/66152)).
+diff --git a/packages/components/src/border-box-control/border-box-control/README.md b/packages/components/src/border-box-control/border-box-control/README.md
+index e67a1386103c1a..9d51be2901a2a3 100644
+--- a/packages/components/src/border-box-control/border-box-control/README.md
++++ b/packages/components/src/border-box-control/border-box-control/README.md
+@@ -47,6 +47,7 @@ const MyBorderBoxControl = () => {
+ 
+ 	return (
+ 		<BorderBoxControl
++			__next40pxDefaultSize
+ 			colors={ colors }
+ 			label={ __( 'Borders' ) }
+ 			onChange={ onChange }
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index 1dd3437aa50de4..d2d77adc69eb89 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -175,6 +175,7 @@ const UnconnectedBorderBoxControl = (
+  *
+  * 	return (
+  * 		<BorderBoxControl
++ * 			__next40pxDefaultSize
+  * 			colors={ colors }
+  * 			label={ __( 'Borders' ) }
+  * 			onChange={ onChange }
+diff --git a/packages/components/src/border-box-control/border-box-control/hook.ts b/packages/components/src/border-box-control/border-box-control/hook.ts
+index 6756bd51188fb4..6ab30056665433 100644
+--- a/packages/components/src/border-box-control/border-box-control/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control/hook.ts
+@@ -19,6 +19,7 @@ import {
+ import type { WordPressComponentProps } from '../../context';
+ import { useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks/use-cx';
++import { maybeWarnDeprecated36pxSize } from '../../utils/deprecated-36px-size';
+ 
+ import type { Border } from '../../border-control/types';
+ import type { Borders, BorderSide, BorderBoxControlProps } from '../types';
+@@ -39,6 +40,12 @@ export function useBorderBoxControl(
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderBoxControl' );
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'BorderBoxControl',
++		__next40pxDefaultSize,
++		size,
++	} );
++
+ 	const computedSize =
+ 		size === 'default' && __next40pxDefaultSize ? '__unstable-large' : size;
+ 
+diff --git a/packages/components/src/border-box-control/stories/index.story.tsx b/packages/components/src/border-box-control/stories/index.story.tsx
+index 5341dacab646eb..0a961d34fb93d3 100644
+--- a/packages/components/src/border-box-control/stories/index.story.tsx
++++ b/packages/components/src/border-box-control/stories/index.story.tsx
+@@ -84,4 +84,5 @@ Default.args = {
+ 	colors,
+ 	label: 'Borders',
+ 	enableStyle: true,
++	__next40pxDefaultSize: true,
+ };
+diff --git a/packages/components/src/border-box-control/test/index.tsx b/packages/components/src/border-box-control/test/index.tsx
+index fe5f7e7a4f1fff..fb536656453f4d 100644
+--- a/packages/components/src/border-box-control/test/index.tsx
++++ b/packages/components/src/border-box-control/test/index.tsx
+@@ -44,6 +44,7 @@ const props = {
+ 		props.value = newValue;
+ 	} ),
+ 	value: undefined,
++	__next40pxDefaultSize: true,
+ };
+ 
+ const toggleLabelRegex = /Border color( and style)* picker/;
+diff --git a/packages/components/src/utils/deprecated-36px-size.ts b/packages/components/src/utils/deprecated-36px-size.ts
+new file mode 100644
+index 00000000000000..92b2cd8ddce274
+--- /dev/null
++++ b/packages/components/src/utils/deprecated-36px-size.ts
+@@ -0,0 +1,24 @@
++/**
++ * WordPress dependencies
++ */
++import deprecated from '@wordpress/deprecated';
++
++export function maybeWarnDeprecated36pxSize( {
++	componentName,
++	__next40pxDefaultSize,
++	size,
++}: {
++	componentName: string;
++	__next40pxDefaultSize: boolean | undefined;
++	size: string;
++} ) {
++	if ( __next40pxDefaultSize || size !== 'default' ) {
++		return;
++	}
++
++	deprecated( `36px default size for wp.components.${ componentName }`, {
++		since: '6.7',
++		version: '7.0',
++		hint: 'Set the `__next40pxDefaultSize` prop to true to start opting into the new default size, which will become the default in a future version.',
++	} );
++}

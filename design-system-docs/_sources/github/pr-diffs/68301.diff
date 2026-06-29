@@ -1,0 +1,1166 @@
+diff --git a/bin/api-docs/gen-components-docs/markdown/index.mjs b/bin/api-docs/gen-components-docs/markdown/index.mjs
+index 5978e7e80fe260..b66aedaa144e7f 100644
+--- a/bin/api-docs/gen-components-docs/markdown/index.mjs
++++ b/bin/api-docs/gen-components-docs/markdown/index.mjs
+@@ -9,17 +9,14 @@ import json2md from 'json2md';
+ import { generateMarkdownPropsJson } from './props.mjs';
+ 
+ /**
+- * If the string is contentful, ensure that it ends with a single newline.
+- * Otherwise normalize to `undefined`.
++ * Converter for strings that are already formatted as Markdown.
+  *
+- * @param {string} [str]
++ * @param {string} [input]
++ * @return {string} The trimmed input if it is contentful, otherwise an empty string.
+  */
+-function normalizeTrailingNewline( str ) {
+-	if ( ! str?.trim() ) {
+-		return undefined;
+-	}
+-	return str.replace( /\n*$/, '\n' );
+-}
++json2md.converters.md = ( input ) => {
++	return input?.trim() || '';
++};
+ 
+ export function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
+ 	const mainDocsJson = [
+@@ -28,7 +25,7 @@ export function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
+ 		{
+ 			p: `<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-${ typeDocs.displayName.toLowerCase() }--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>`,
+ 		},
+-		normalizeTrailingNewline( typeDocs.description ),
++		{ md: typeDocs.description },
+ 		...generateMarkdownPropsJson( typeDocs.props ),
+ 	];
+ 
+@@ -39,7 +36,7 @@ export function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
+ 					{
+ 						h3: subcomponentTypeDoc.displayName,
+ 					},
+-					normalizeTrailingNewline( subcomponentTypeDoc.description ),
++					{ md: subcomponentTypeDoc.description },
+ 					...generateMarkdownPropsJson( subcomponentTypeDoc.props, {
+ 						headingLevel: 4,
+ 					} ),
+@@ -49,5 +46,5 @@ export function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
+ 
+ 	return json2md(
+ 		[ ...mainDocsJson, ...subcomponentDocsJson ].filter( Boolean )
+-	);
++	).replace( /\n+$/gm, '\n' ); // clean unnecessary consecutive newlines
+ }
+diff --git a/bin/api-docs/gen-components-docs/markdown/props.mjs b/bin/api-docs/gen-components-docs/markdown/props.mjs
+index aaa73041217528..bacd86256f7e6a 100644
+--- a/bin/api-docs/gen-components-docs/markdown/props.mjs
++++ b/bin/api-docs/gen-components-docs/markdown/props.mjs
+@@ -33,7 +33,6 @@ export function generateMarkdownPropsJson( props, { headingLevel = 2 } = {} ) {
+ 
+ 			return [
+ 				{ [ `h${ headingLevel + 1 }` ]: `\`${ key }\`` },
+-				prop.description,
+ 				{
+ 					ul: [
+ 						`Type: \`${ renderPropType( prop.type ) }\``,
+@@ -42,6 +41,7 @@ export function generateMarkdownPropsJson( props, { headingLevel = 2 } = {} ) {
+ 							`Default: \`${ prop.defaultValue.value }\``,
+ 					].filter( Boolean ),
+ 				},
++				{ md: prop.description },
+ 			];
+ 		} )
+ 		.filter( Boolean );
+diff --git a/packages/components/src/alignment-matrix-control/README.md b/packages/components/src/alignment-matrix-control/README.md
+index 267b368454c499..8ba9f6378c1852 100644
+--- a/packages/components/src/alignment-matrix-control/README.md
++++ b/packages/components/src/alignment-matrix-control/README.md
+@@ -26,43 +26,43 @@ const Example = () => {
+ 
+ ### `defaultValue`
+ 
+-If provided, sets the default alignment value.
+-
+  - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
+  - Required: No
+  - Default: `'center center'`
+ 
+-### `label`
++If provided, sets the default alignment value.
+ 
+-Accessible label. If provided, sets the `aria-label` attribute of the
+-underlying `grid` widget.
++### `label`
+ 
+  - Type: `string`
+  - Required: No
+  - Default: `'Alignment Matrix Control'`
+ 
+-### `onChange`
++Accessible label. If provided, sets the `aria-label` attribute of the
++underlying `grid` widget.
+ 
+-A function that receives the updated alignment value.
++### `onChange`
+ 
+  - Type: `(newValue: AlignmentMatrixControlValue) => void`
+  - Required: No
+ 
+-### `value`
++A function that receives the updated alignment value.
+ 
+-The current alignment value.
++### `value`
+ 
+  - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
+  - Required: No
+ 
+-### `width`
++The current alignment value.
+ 
+-If provided, sets the width of the control.
++### `width`
+ 
+  - Type: `number`
+  - Required: No
+  - Default: `92`
+ 
++If provided, sets the width of the control.
++
+ ## Subcomponents
+ 
+ ### AlignmentMatrixControl.Icon
+@@ -71,16 +71,16 @@ If provided, sets the width of the control.
+ 
+ ##### `disablePointerEvents`
+ 
+-If `true`, disables pointer events on the icon.
+-
+  - Type: `boolean`
+  - Required: No
+  - Default: `true`
+ 
+-##### `value`
++If `true`, disables pointer events on the icon.
+ 
+-The current alignment value.
++##### `value`
+ 
+  - Type: `"center" | "top left" | "top center" | "top right" | "center left" | "center center" | "center right" | "bottom left" | "bottom center" | "bottom right"`
+  - Required: No
+  - Default: `center`
++
++The current alignment value.
+diff --git a/packages/components/src/angle-picker-control/README.md b/packages/components/src/angle-picker-control/README.md
+index 8b98ba813adde8..9908282fd9ef9a 100644
+--- a/packages/components/src/angle-picker-control/README.md
++++ b/packages/components/src/angle-picker-control/README.md
+@@ -28,30 +28,30 @@ function Example() {
+ 
+ ### `as`
+ 
+-The HTML element or React component to render the component as.
+-
+  - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+  - Required: No
+ 
+-### `label`
++The HTML element or React component to render the component as.
+ 
+-Label to use for the angle picker.
++### `label`
+ 
+  - Type: `string`
+  - Required: No
+  - Default: `__( 'Angle' )`
+ 
+-### `onChange`
++Label to use for the angle picker.
+ 
+-A function that receives the new value of the input.
++### `onChange`
+ 
+  - Type: `(value: number) => void`
+  - Required: Yes
+ 
+-### `value`
++A function that receives the new value of the input.
+ 
+-The current value of the input. The value represents an angle in degrees
+-and should be a value between 0 and 360.
++### `value`
+ 
+  - Type: `string | number`
+  - Required: Yes
++
++The current value of the input. The value represents an angle in degrees
++and should be a value between 0 and 360.
+diff --git a/packages/components/src/badge/README.md b/packages/components/src/badge/README.md
+index 0be531ca6f2df8..10767b2505039d 100644
+--- a/packages/components/src/badge/README.md
++++ b/packages/components/src/badge/README.md
+@@ -8,15 +8,15 @@
+ 
+ ### `children`
+ 
+-Text to display inside the badge.
+-
+  - Type: `string`
+  - Required: Yes
+ 
+-### `intent`
++Text to display inside the badge.
+ 
+-Badge variant.
++### `intent`
+ 
+  - Type: `"default" | "info" | "success" | "warning" | "error"`
+  - Required: No
+  - Default: `default`
++
++Badge variant.
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index 9c8920fbc06896..2a82c19845e47b 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -30,67 +30,66 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
+ 
+ ### `__nextHasNoMarginBottom`
+ 
+-Start opting into the new margin-free styles that will become the default in a future version.
+-
+  - Type: `boolean`
+  - Required: No
+  - Default: `false`
+ 
+-### `as`
++Start opting into the new margin-free styles that will become the default in a future version.
+ 
+-The HTML element or React component to render the component as.
++### `as`
+ 
+  - Type: `"symbol" | "object" | "label" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | ... 516 more ... | ("view" & FunctionComponent<...>)`
+  - Required: No
+ 
+-### `className`
++The HTML element or React component to render the component as.
+ 
++### `className`
+ 
+  - Type: `string`
+  - Required: No
+ 
+ ### `children`
+ 
+-The content to be displayed within the `BaseControl`.
+-
+  - Type: `ReactNode`
+  - Required: Yes
+ 
++The content to be displayed within the `BaseControl`.
++
+ ### `help`
+ 
++ - Type: `ReactNode`
++ - Required: No
++
+ Additional description for the control.
+ 
+ Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
+ 
+- - Type: `ReactNode`
+- - Required: No
+-
+ ### `hideLabelFromVision`
+ 
+-If true, the label will only be visible to screen readers.
+-
+  - Type: `boolean`
+  - Required: No
+  - Default: `false`
+ 
++If true, the label will only be visible to screen readers.
++
+ ### `id`
+ 
++ - Type: `string`
++ - Required: No
++
+ The HTML `id` of the control element (passed in as a child to `BaseControl`) to which labels and help text are being generated.
+ This is necessary to accessibly associate the label with that element.
+ 
+ The recommended way is to use the `useBaseControlProps` hook, which takes care of generating a unique `id` for you.
+ Otherwise, if you choose to pass an explicit `id` to this prop, you are responsible for ensuring the uniqueness of the `id`.
+ 
+- - Type: `string`
+- - Required: No
+-
+ ### `label`
+ 
+-If this property is added, a label will be generated using label property as the content.
+-
+  - Type: `ReactNode`
+  - Required: No
+ 
++If this property is added, a label will be generated using label property as the content.
++
+ ## Subcomponents
+ 
+ ### BaseControl.VisualLabel
+@@ -119,14 +118,14 @@ const MyBaseControl = () => (
+ 
+ ##### `as`
+ 
+-The HTML element or React component to render the component as.
+-
+  - Type: `"symbol" | "object" | "label" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | ...`
+  - Required: No
+ 
+-##### `children`
++The HTML element or React component to render the component as.
+ 
+-The content to be displayed within the `BaseControl.VisualLabel`.
++##### `children`
+ 
+  - Type: `ReactNode`
+  - Required: Yes
++
++The content to be displayed within the `BaseControl.VisualLabel`.
+diff --git a/packages/components/src/box-control/README.md b/packages/components/src/box-control/README.md
+index 6192cfa47367ba..4c0f100065092e 100644
+--- a/packages/components/src/box-control/README.md
++++ b/packages/components/src/box-control/README.md
+@@ -33,30 +33,28 @@ function Example() {
+ 
+ ### `__next40pxDefaultSize`
+ 
+-Start opting into the larger default height that will become the default size in a future version.
+-
+  - Type: `boolean`
+  - Required: No
+  - Default: `false`
+ 
+-### `allowReset`
++Start opting into the larger default height that will become the default size in a future version.
+ 
+-If this property is true, a button to reset the box control is rendered.
++### `allowReset`
+ 
+  - Type: `boolean`
+  - Required: No
+  - Default: `true`
+ 
+-### `id`
++If this property is true, a button to reset the box control is rendered.
+ 
+-The id to use as a base for the unique HTML id attribute of the control.
++### `id`
+ 
+  - Type: `string`
+  - Required: No
+ 
+-### `inputProps`
++The id to use as a base for the unique HTML id attribute of the control.
+ 
+-Props for the internal `UnitControl` components.
++### `inputProps`
+ 
+  - Type: `UnitControlPassthroughProps`
+  - Required: No
+@@ -64,42 +62,42 @@ Props for the internal `UnitControl` components.
+     	min: 0,
+     }`
+ 
+-### `label`
++Props for the internal `UnitControl` components.
+ 
+-Heading label for the control.
++### `label`
+ 
+  - Type: `string`
+  - Required: No
+  - Default: `__( 'Box Control' )`
+ 
+-### `onChange`
++Heading label for the control.
+ 
+-A callback function when an input value changes.
++### `onChange`
+ 
+  - Type: `(next: BoxControlValue) => void`
+  - Required: No
+  - Default: `() => {}`
+ 
+-### `presets`
++A callback function when an input value changes.
+ 
+-Available presets to pick from.
++### `presets`
+ 
+  - Type: `Preset[]`
+  - Required: No
+ 
++Available presets to pick from.
++
+ ### `presetKey`
+ 
++ - Type: `string`
++ - Required: No
++
+ The key of the preset to apply.
+ If you provide a list of presets, you must provide a preset key to use.
+ The format of preset selected values is going to be `var:preset|${ presetKey }|${ presetSlug }`
+ 
+- - Type: `string`
+- - Required: No
+-
+ ### `resetValues`
+ 
+-The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
+-
+  - Type: `BoxControlValue`
+  - Required: No
+  - Default: `{
+@@ -109,35 +107,37 @@ The `top`, `right`, `bottom`, and `left` box dimension values to use when the co
+     	left: undefined,
+     }`
+ 
++The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
++
+ ### `sides`
+ 
++ - Type: `readonly (keyof BoxControlValue | "horizontal" | "vertical")[]`
++ - Required: No
++
+ Collection of sides to allow control of. If omitted or empty, all sides will be available.
+ 
+ Allowed values are "top", "right", "bottom", "left", "vertical", and "horizontal".
+ 
+- - Type: `readonly (keyof BoxControlValue | "horizontal" | "vertical")[]`
+- - Required: No
+-
+ ### `splitOnAxis`
+ 
+-If this property is true, when the box control is unlinked, vertical and horizontal controls
+-can be used instead of updating individual sides.
+-
+  - Type: `boolean`
+  - Required: No
+  - Default: `false`
+ 
+-### `units`
++If this property is true, when the box control is unlinked, vertical and horizontal controls
++can be used instead of updating individual sides.
+ 
+-Available units to select from.
++### `units`
+ 
+  - Type: `WPUnitControlUnit[]`
+  - Required: No
+  - Default: `CSS_UNITS`
+ 
+-### `values`
++Available units to select from.
+ 
+-The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.
++### `values`
+ 
+  - Type: `BoxControlValue`
+  - Required: No
++
++The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index d63dee9007c2f0..c67c795addbf4d 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -22,15 +22,19 @@ const Mybutton = () => (
+ 
+ ### `__next40pxDefaultSize`
+ 
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
++
+ Start opting into the larger default height that will become the
+ default size in a future version.
+ 
++### `accessibleWhenDisabled`
++
+  - Type: `boolean`
+  - Required: No
+  - Default: `false`
+ 
+-### `accessibleWhenDisabled`
+-
+ Whether to keep the button focusable when disabled.
+ 
+ In most cases, it is recommended to set this to `true`. Disabling a control without maintaining focusability
+@@ -40,111 +44,111 @@ or by preventing focus from returning to a trigger element.
+ Learn more about the [focusability of disabled controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols)
+ in the WAI-ARIA Authoring Practices Guide.
+ 
+- - Type: `boolean`
+- - Required: No
+- - Default: `false`
+-
+ ### `children`
+ 
+-The button's children.
+-
+  - Type: `ReactNode`
+  - Required: No
+ 
+-### `description`
++The button's children.
+ 
+-A visually hidden accessible description for the button.
++### `description`
+ 
+  - Type: `string`
+  - Required: No
+ 
++A visually hidden accessible description for the button.
++
+ ### `disabled`
+ 
++ - Type: `boolean`
++ - Required: No
++
+ Whether the button is disabled. If `true`, this will force a `button` element
+ to be rendered, even when an `href` is given.
+ 
+ In most cases, it is recommended to also set the `accessibleWhenDisabled` prop to `true`.
+ 
+- - Type: `boolean`
+- - Required: No
+-
+ ### `href`
+ 
+-If provided, renders `a` instead of `button`.
+-
+  - Type: `string`
+  - Required: Yes
+ 
+-### `icon`
++If provided, renders `a` instead of `button`.
+ 
+-If provided, renders an Icon component inside the button.
++### `icon`
+ 
+  - Type: `IconType`
+  - Required: No
+ 
+-### `iconPosition`
++If provided, renders an Icon component inside the button.
+ 
+-If provided with `icon`, sets the position of icon relative to the `text`.
++### `iconPosition`
+ 
+  - Type: `"left" | "right"`
+  - Required: No
+  - Default: `'left'`
+ 
++If provided with `icon`, sets the position of icon relative to the `text`.
++
+ ### `iconSize`
+ 
++ - Type: `number`
++ - Required: No
++
+ If provided with `icon`, sets the icon size.
+ Please refer to the Icon component for more details regarding
+ the default value of its `size` prop.
+ 
+- - Type: `number`
+- - Required: No
+-
+ ### `isBusy`
+ 
+-Indicates activity while a action is being performed.
+-
+  - Type: `boolean`
+  - Required: No
+ 
+-### `isDestructive`
++Indicates activity while a action is being performed.
+ 
+-Renders a red text-based button style to indicate destructive behavior.
++### `isDestructive`
+ 
+  - Type: `boolean`
+  - Required: No
+ 
+-### `isPressed`
++Renders a red text-based button style to indicate destructive behavior.
+ 
+-Renders a pressed button style.
++### `isPressed`
+ 
+  - Type: `boolean`
+  - Required: No
+ 
+-### `label`
++Renders a pressed button style.
+ 
+-Sets the `aria-label` of the component, if none is provided.
+-Sets the Tooltip content if `showTooltip` is provided.
++### `label`
+ 
+  - Type: `string`
+  - Required: No
+ 
+-### `shortcut`
++Sets the `aria-label` of the component, if none is provided.
++Sets the Tooltip content if `showTooltip` is provided.
+ 
+-If provided with `showTooltip`, appends the Shortcut label to the tooltip content.
+-If an object is provided, it should contain `display` and `ariaLabel` keys.
++### `shortcut`
+ 
+  - Type: `string | { display: string; ariaLabel: string; }`
+  - Required: No
+ 
+-### `showTooltip`
++If provided with `showTooltip`, appends the Shortcut label to the tooltip content.
++If an object is provided, it should contain `display` and `ariaLabel` keys.
+ 
+-If provided, renders a Tooltip component for the button.
++### `showTooltip`
+ 
+  - Type: `boolean`
+  - Required: No
+ 
++If provided, renders a Tooltip component for the button.
++
+ ### `size`
+ 
++ - Type: `"small" | "default" | "compact"`
++ - Required: No
++ - Default: `'default'`
++
+ The size of the button.
+ 
+ - `'default'`: For normal text-label buttons, unless it is a toggle button.
+@@ -153,34 +157,33 @@ The size of the button.
+ 
+ If the deprecated `isSmall` prop is also defined, this prop will take precedence.
+ 
+- - Type: `"small" | "default" | "compact"`
+- - Required: No
+- - Default: `'default'`
+-
+ ### `text`
+ 
+-If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
+-
+  - Type: `string`
+  - Required: No
+ 
+-### `tooltipPosition`
++If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
+ 
+-If provided with `showTooltip`, sets the position of the tooltip.
+-Please refer to the Tooltip component for more details regarding the defaults.
++### `tooltipPosition`
+ 
+  - Type: `"top" | "middle" | "bottom" | "top center" | "top left" | "top right" | "middle center" | "middle left" | "middle right" | "bottom center" | ...`
+  - Required: No
+ 
+-### `target`
++If provided with `showTooltip`, sets the position of the tooltip.
++Please refer to the Tooltip component for more details regarding the defaults.
+ 
+-If provided with `href`, sets the `target` attribute to the `a`.
++### `target`
+ 
+  - Type: `string`
+  - Required: No
+ 
++If provided with `href`, sets the `target` attribute to the `a`.
++
+ ### `variant`
+ 
++ - Type: `"link" | "primary" | "secondary" | "tertiary"`
++ - Required: No
++
+ Specifies the button's style.
+ 
+ The accepted values are:
+@@ -189,6 +192,3 @@ The accepted values are:
+ 2. `'secondary'` (the default button styles)
+ 3. `'tertiary'` (the text-based button styles)
+ 4. `'link'` (the link button styles)
+-
+- - Type: `"link" | "primary" | "secondary" | "tertiary"`
+- - Required: No
+diff --git a/packages/components/src/form-file-upload/README.md b/packages/components/src/form-file-upload/README.md
+index d281b1ca639274..74e6e369383383 100644
+--- a/packages/components/src/form-file-upload/README.md
++++ b/packages/components/src/form-file-upload/README.md
+@@ -24,56 +24,59 @@ const MyFormFileUpload = () => (
+ 
+ ### `__next40pxDefaultSize`
+ 
+-Start opting into the larger default height that will become the default size in a future version.
+-
+  - Type: `boolean`
+  - Required: No
+  - Default: `false`
+ 
++Start opting into the larger default height that will become the default size in a future version.
++
+ ### `accept`
+ 
++ - Type: `string`
++ - Required: No
++
+ A string passed to the `input` element that tells the browser which
+ [file types](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#Unique_file_type_specifiers)
+ can be uploaded by the user. e.g: `image/*,video/*`.
+ 
+- - Type: `string`
+- - Required: No
+-
+ ### `children`
+ 
+-Children are passed as children of `Button`.
+-
+  - Type: `ReactNode`
+  - Required: No
+ 
++Children are passed as children of `Button`.
++
+ ### `icon`
+ 
++ - Type: `IconType`
++ - Required: No
++
+ The icon to render in the default button.
+ 
+ See the `Icon` component docs for more information.
+ 
+- - Type: `IconType`
+- - Required: No
+-
+ ### `multiple`
+ 
+-Whether to allow multiple selection of files or not.
+-
+  - Type: `boolean`
+  - Required: No
+  - Default: `false`
+ 
++Whether to allow multiple selection of files or not.
++
+ ### `onChange`
+ 
++ - Type: `ChangeEventHandler<HTMLInputElement>`
++ - Required: Yes
++
+ Callback function passed directly to the `input` file element.
+ 
+ Select files will be available in `event.currentTarget.files`.
+ 
+- - Type: `ChangeEventHandler<HTMLInputElement>`
+- - Required: Yes
+-
+ ### `onClick`
+ 
++ - Type: `MouseEventHandler<HTMLInputElement>`
++ - Required: No
++
+ Callback function passed directly to the `input` file element.
+ 
+ This can be useful when you want to force a `change` event to fire when
+@@ -90,17 +93,14 @@ an empty string in the `onClick` function.
+ </FormFileUpload>
+ ```
+ 
+- - Type: `MouseEventHandler<HTMLInputElement>`
+- - Required: No
+-
+ ### `render`
+ 
++ - Type: `(arg: { openFileDialog: () => void; }) => ReactNode`
++ - Required: No
++
+ Optional callback function used to render the UI.
+ 
+ If passed, the component does not render the default UI (a button) and
+ calls this function to render it. The function receives an object with
+ property `openFileDialog`, a function that, when called, opens the browser
+ native file upload modal window.
+-
+- - Type: `(arg: { openFileDialog: () => void; }) => ReactNode`
+- - Required: No
+diff --git a/packages/components/src/gradient-picker/README.md b/packages/components/src/gradient-picker/README.md
+index 652fcbf30ae135..275c46ec5958c9 100644
+--- a/packages/components/src/gradient-picker/README.md
++++ b/packages/components/src/gradient-picker/README.md
+@@ -48,110 +48,110 @@ const MyGradientPicker = () => {
+ 
+ ### `__experimentalIsRenderedInSidebar`
+ 
+-Whether this is rendered in the sidebar.
+-
+  - Type: `boolean`
+  - Required: No
+  - Default: `false`
+ 
+-### `asButtons`
++Whether this is rendered in the sidebar.
+ 
+-Whether the control should present as a set of buttons,
+-each with its own tab stop.
++### `asButtons`
+ 
+  - Type: `boolean`
+  - Required: No
+  - Default: `false`
+ 
+-### `aria-label`
++Whether the control should present as a set of buttons,
++each with its own tab stop.
+ 
+-A label to identify the purpose of the control.
++### `aria-label`
+ 
+  - Type: `string`
+  - Required: No
+ 
+-### `aria-labelledby`
++A label to identify the purpose of the control.
+ 
+-An ID of an element to provide a label for the control.
++### `aria-labelledby`
+ 
+  - Type: `string`
+  - Required: No
+ 
+-### `className`
++An ID of an element to provide a label for the control.
+ 
+-The class name added to the wrapper.
++### `className`
+ 
+  - Type: `string`
+  - Required: No
+ 
+-### `clearable`
++The class name added to the wrapper.
+ 
+-Whether the palette should have a clearing button or not.
++### `clearable`
+ 
+  - Type: `boolean`
+  - Required: No
+  - Default: `true`
+ 
+-### `disableCustomGradients`
++Whether the palette should have a clearing button or not.
+ 
+-If true, the gradient picker will not be displayed and only defined
+-gradients from `gradients` will be shown.
++### `disableCustomGradients`
+ 
+  - Type: `boolean`
+  - Required: No
+  - Default: `false`
+ 
+-### `enableAlpha`
++If true, the gradient picker will not be displayed and only defined
++gradients from `gradients` will be shown.
+ 
+-Whether to enable alpha transparency options in the picker.
++### `enableAlpha`
+ 
+  - Type: `boolean`
+  - Required: No
+  - Default: `true`
+ 
++Whether to enable alpha transparency options in the picker.
++
+ ### `gradients`
+ 
++ - Type: `GradientsProp`
++ - Required: No
++ - Default: `[]`
++
+ An array of objects as predefined gradients displayed above the gradient
+ selector. Alternatively, if there are multiple sets (or 'origins') of
+ gradients, you can pass an array of objects each with a `name` and a
+ `gradients` array which will in turn contain the predefined gradient objects.
+ 
+- - Type: `GradientsProp`
+- - Required: No
+- - Default: `[]`
+-
+ ### `headingLevel`
+ 
+-The heading level. Only applies in cases where gradients are provided
+-from multiple origins (i.e. when the array passed as the `gradients` prop
+-contains two or more items).
+-
+  - Type: `1 | 2 | 3 | 4 | 5 | 6 | "1" | "2" | "3" | "4" | ...`
+  - Required: No
+  - Default: `2`
+ 
+-### `loop`
++The heading level. Only applies in cases where gradients are provided
++from multiple origins (i.e. when the array passed as the `gradients` prop
++contains two or more items).
+ 
+-Prevents keyboard interaction from wrapping around.
+-Only used when `asButtons` is not true.
++### `loop`
+ 
+  - Type: `boolean`
+  - Required: No
+  - Default: `true`
+ 
+-### `onChange`
++Prevents keyboard interaction from wrapping around.
++Only used when `asButtons` is not true.
+ 
+-The function called when a new gradient has been defined. It is passed to
+-the `currentGradient` as an argument.
++### `onChange`
+ 
+  - Type: `(currentGradient: string) => void`
+  - Required: Yes
+ 
+-### `value`
++The function called when a new gradient has been defined. It is passed to
++the `currentGradient` as an argument.
+ 
+-The current value of the gradient. Pass a css gradient string (See default value for example).
+-Optionally pass in a `null` value to specify no gradient is currently selected.
++### `value`
+ 
+  - Type: `string`
+  - Required: No
+  - Default: `'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)'`
++
++The current value of the gradient. Pass a css gradient string (See default value for example).
++Optionally pass in a `null` value to specify no gradient is currently selected.
+diff --git a/packages/components/src/icon/README.md b/packages/components/src/icon/README.md
+index 29e621f80c1fd9..2c9726dbcf5418 100644
+--- a/packages/components/src/icon/README.md
++++ b/packages/components/src/icon/README.md
+@@ -16,6 +16,10 @@ import { wordpress } from '@wordpress/icons';
+ 
+ ### `icon`
+ 
++ - Type: `IconType`
++ - Required: No
++ - Default: `null`
++
+ The icon to render. In most cases, you should use an icon from
+ [the `@wordpress/icons` package](https://wordpress.github.io/gutenberg/?path=/story/icons-icon--library).
+ 
+@@ -25,16 +29,12 @@ Other supported values are: component instances, functions,
+ 
+ The `size` value, as well as any other additional props, will be passed through.
+ 
+- - Type: `IconType`
+- - Required: No
+- - Default: `null`
+-
+ ### `size`
+ 
+-The size (width and height) of the icon.
+-
+-Defaults to `20` when `icon` is a string (i.e. a Dashicon id), otherwise `24`.
+-
+  - Type: `number`
+  - Required: No
+  - Default: `'string' === typeof icon ? 20 : 24`
++
++The size (width and height) of the icon.
++
++Defaults to `20` when `icon` is a string (i.e. a Dashicon id), otherwise `24`.
+diff --git a/packages/components/src/tree-select/README.md b/packages/components/src/tree-select/README.md
+index 5f3247bdb3322b..d2f73443a2a880 100644
+--- a/packages/components/src/tree-select/README.md
++++ b/packages/components/src/tree-select/README.md
+@@ -56,93 +56,96 @@ const MyTreeSelect = () => {
+ 
+ ### `__next40pxDefaultSize`
+ 
+-Start opting into the larger default height that will become the default size in a future version.
+-
+  - Type: `boolean`
+  - Required: No
+  - Default: `false`
+ 
+-### `__nextHasNoMarginBottom`
++Start opting into the larger default height that will become the default size in a future version.
+ 
+-Start opting into the new margin-free styles that will become the default in a future version.
++### `__nextHasNoMarginBottom`
+ 
+  - Type: `boolean`
+  - Required: No
+  - Default: `false`
+ 
+-### `children`
++Start opting into the new margin-free styles that will become the default in a future version.
+ 
+-As an alternative to the `options` prop, `optgroup`s and `options` can be
+-passed in as `children` for more customizability.
++### `children`
+ 
+  - Type: `ReactNode`
+  - Required: No
+ 
+-### `disabled`
++As an alternative to the `options` prop, `optgroup`s and `options` can be
++passed in as `children` for more customizability.
+ 
+-If true, the `input` will be disabled.
++### `disabled`
+ 
+  - Type: `boolean`
+  - Required: No
+  - Default: `false`
+ 
+-### `hideLabelFromVision`
++If true, the `input` will be disabled.
+ 
+-If true, the label will only be visible to screen readers.
++### `hideLabelFromVision`
+ 
+  - Type: `boolean`
+  - Required: No
+  - Default: `false`
+ 
++If true, the label will only be visible to screen readers.
++
+ ### `help`
+ 
++ - Type: `ReactNode`
++ - Required: No
++
+ Additional description for the control.
+ 
+ Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
+ 
+- - Type: `ReactNode`
+- - Required: No
+-
+ ### `label`
+ 
+-If this property is added, a label will be generated using label property as the content.
+-
+  - Type: `ReactNode`
+  - Required: No
+ 
+-### `labelPosition`
++If this property is added, a label will be generated using label property as the content.
+ 
+-The position of the label.
++### `labelPosition`
+ 
+  - Type: `"top" | "bottom" | "side" | "edge"`
+  - Required: No
+  - Default: `'top'`
+ 
+-### `noOptionLabel`
++The position of the label.
+ 
+-If this property is added, an option will be added with this label to represent empty selection.
++### `noOptionLabel`
+ 
+  - Type: `string`
+  - Required: No
+ 
+-### `onChange`
++If this property is added, an option will be added with this label to represent empty selection.
+ 
+-A function that receives the value of the new option that is being selected as input.
++### `onChange`
+ 
+  - Type: `(value: string, extra?: { event?: ChangeEvent<HTMLSelectElement>; }) => void`
+  - Required: No
+ 
++A function that receives the value of the new option that is being selected as input.
++
+ ### `options`
+ 
++ - Type: `readonly ({ label: string; value: string; } & Omit<OptionHTMLAttributes<HTMLOptionElement>, "label" | "value">)[]`
++ - Required: No
++
+ An array of option property objects to be rendered,
+ each with a `label` and `value` property, as well as any other
+ `<option>` attributes.
+ 
+- - Type: `readonly ({ label: string; value: string; } & Omit<OptionHTMLAttributes<HTMLOptionElement>, "label" | "value">)[]`
+- - Required: No
+-
+ ### `prefix`
+ 
++ - Type: `ReactNode`
++ - Required: No
++
+ Renders an element on the left side of the input.
+ 
+ By default, the prefix is aligned with the edge of the input border, with no padding.
+@@ -160,26 +163,26 @@ import {
+ />
+ ```
+ 
+- - Type: `ReactNode`
+- - Required: No
+-
+ ### `selectedId`
+ 
+-The id of the currently selected node.
+-
+  - Type: `string`
+  - Required: No
+ 
+-### `size`
++The id of the currently selected node.
+ 
+-Adjusts the size of the input.
++### `size`
+ 
+  - Type: `"default" | "small" | "compact" | "__unstable-large"`
+  - Required: No
+  - Default: `'default'`
+ 
++Adjusts the size of the input.
++
+ ### `suffix`
+ 
++ - Type: `ReactNode`
++ - Required: No
++
+ Renders an element on the right side of the input.
+ 
+ By default, the suffix is aligned with the edge of the input border, with no padding.
+@@ -197,20 +200,17 @@ import {
+ />
+ ```
+ 
+- - Type: `ReactNode`
+- - Required: No
+-
+ ### `tree`
+ 
+-An array containing the tree objects with the possible nodes the user can select.
+-
+  - Type: `Tree[]`
+  - Required: No
+ 
+-### `variant`
++An array containing the tree objects with the possible nodes the user can select.
+ 
+-The style variant of the control.
++### `variant`
+ 
+  - Type: `"default" | "minimal"`
+  - Required: No
+  - Default: `'default'`
++
++The style variant of the control.

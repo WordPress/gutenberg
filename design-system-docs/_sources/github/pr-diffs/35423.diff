@@ -1,0 +1,197 @@
+diff --git a/packages/components/src/toggle-group-control/README.md b/packages/components/src/toggle-group-control/README.md
+index 935cc70816d923..9fb2ff0774489e 100644
+--- a/packages/components/src/toggle-group-control/README.md
++++ b/packages/components/src/toggle-group-control/README.md
+@@ -76,3 +76,19 @@ The value of the `ToggleGroupControl`.
+ -   Required: No
+ 
+ If this property is added, a help text will be generated using help property as the content.
++
++## ToggleGroupControlOption
++
++### Props
++
++#### `label`
++
++-   Type: `string`
++
++Label for the option. If needed, the `aria-label` prop can be used in addition to specify a different label for assistive technologies.
++
++#### `value`
++
++-   Type: `string | number`
++
++The value of the `ToggleGroupControlOption`.
+\ No newline at end of file
+diff --git a/packages/components/src/toggle-group-control/stories/index.js b/packages/components/src/toggle-group-control/stories/index.js
+index b481330da6eab9..3ca2b7ea602eb2 100644
+--- a/packages/components/src/toggle-group-control/stories/index.js
++++ b/packages/components/src/toggle-group-control/stories/index.js
+@@ -20,19 +20,19 @@ export default {
+ 	title: 'Components/ToggleGroupControl',
+ };
+ 
+-const aligns = [ 'Left', 'Center', 'Right', 'Justify' ];
+ const KNOBS_GROUPS = {
+ 	ToggleGroupControl: 'ToggleGroupControl',
+ 	ToggleGroupControlOption: 'ToggleGroupControlOption',
+ };
+ 
+-export const _default = () => {
+-	const [ alignState, setAlignState ] = useState( aligns[ 0 ] );
++const _default = ( { options } ) => {
++	const [ value, setValue ] = useState( options[ 0 ].value );
+ 	const label = text(
+ 		`${ KNOBS_GROUPS.ToggleGroupControl }: label`,
+ 		'Toggle Group Control',
+ 		KNOBS_GROUPS.ToggleGroupControl
+ 	);
++
+ 	const hideLabelFromVision = boolean(
+ 		`${ KNOBS_GROUPS.ToggleGroupControl }: hideLabelFromVision`,
+ 		false,
+@@ -54,13 +54,18 @@ export const _default = () => {
+ 		KNOBS_GROUPS.ToggleGroupControl
+ 	);
+ 
+-	const alignOptions = aligns.map( ( key, index ) => (
++	const controlOptions = options.map( ( opt, index ) => (
+ 		<ToggleGroupControlOption
+-			key={ key }
+-			value={ key }
++			key={ opt.value }
++			value={ opt.value }
+ 			label={ text(
+ 				`${ KNOBS_GROUPS.ToggleGroupControlOption }: label`,
+-				key,
++				opt.label,
++				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
++			) }
++			aria-label={ text(
++				`${ KNOBS_GROUPS.ToggleGroupControlOption }: aria-label`,
++				opt[ 'aria-label' ],
+ 				`${ KNOBS_GROUPS.ToggleGroupControlOption }-${ index + 1 }`
+ 			) }
+ 		/>
+@@ -69,22 +74,42 @@ export const _default = () => {
+ 	return (
+ 		<View>
+ 			<ToggleGroupControl
+-				onChange={ setAlignState }
+-				value={ alignState }
++				onChange={ setValue }
++				value={ value }
+ 				label={ label }
+ 				hideLabelFromVision={ hideLabelFromVision }
+ 				help={ help }
+ 				isBlock={ isBlock }
+ 				isAdaptiveWidth={ isAdaptiveWidth }
+ 			>
+-				{ alignOptions }
++				{ controlOptions }
+ 			</ToggleGroupControl>
+ 		</View>
+ 	);
+ };
+ 
++export const Default = _default.bind( {} );
++Default.args = {
++	options: [
++		{ value: 'left', label: 'Left' },
++		{ value: 'center', label: 'Center' },
++		{ value: 'right', label: 'Right' },
++		{ value: 'justify', label: 'Justify' },
++	],
++};
++
++export const WithAriaLabel = _default.bind( {} );
++WithAriaLabel.args = {
++	...Default.args,
++	options: [
++		{ value: 'asc', label: 'A→Z', 'aria-label': 'Ascending' },
++		{ value: 'desc', label: 'Z→A', 'aria-label': 'Descending' },
++	],
++};
++
+ export const WithReset = () => {
+ 	const [ alignState, setAlignState ] = useState();
++	const aligns = [ 'Left', 'Center', 'Right' ];
+ 	const alignOptions = aligns.map( ( key, index ) => (
+ 		<ToggleGroupControlOption
+ 			key={ key }
+diff --git a/packages/components/src/toggle-group-control/test/index.js b/packages/components/src/toggle-group-control/test/index.js
+index be0e7dcbc428d5..00cac8be301215 100644
+--- a/packages/components/src/toggle-group-control/test/index.js
++++ b/packages/components/src/toggle-group-control/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, fireEvent } from '@testing-library/react';
++import { render, fireEvent, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -25,7 +25,7 @@ describe( 'ToggleGroupControl', () => {
+ 	} );
+ 	it( 'should call onChange with proper value', () => {
+ 		const mockOnChange = jest.fn();
+-		const { getByLabelText } = render(
++		render(
+ 			<ToggleGroupControl
+ 				value="jack"
+ 				onChange={ mockOnChange }
+@@ -34,8 +34,8 @@ describe( 'ToggleGroupControl', () => {
+ 				{ options }
+ 			</ToggleGroupControl>
+ 		);
+-		const firstButton = getByLabelText( 'R' );
+-		fireEvent.click( firstButton );
++		const firstRadio = screen.getByRole( 'radio', { name: 'R' } );
++		fireEvent.click( firstRadio );
+ 		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
+ 	} );
+ } );
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-button.tsx b/packages/components/src/toggle-group-control/toggle-group-control-button.tsx
+index 8fdce889c50993..81c0d7b656ed10 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-button.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-button.tsx
+@@ -45,7 +45,7 @@ function ToggleGroupControlButton( {
+ 			<Radio
+ 				{ ...props }
+ 				as="button"
+-				aria-label={ label }
++				aria-label={ props[ 'aria-label' ] ?? label }
+ 				className={ classes }
+ 				data-value={ value }
+ 				ref={ forwardedRef }
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 801297ba064bb8..905cee7d5c0260 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -13,6 +13,10 @@ import type { FormElementProps } from '../utils/types';
+ 
+ export type ToggleGroupControlOptionProps = {
+ 	value: ReactText;
++	/**
++	 * Label for the option. If needed, the `aria-label` prop can be used in addition
++	 * to specify a different label for assistive technologies.
++	 */
+ 	label: string;
+ };
+ 
+@@ -74,12 +78,13 @@ export type ToggleGroupControlButtonProps = {
+ 	className?: string;
+ 	forwardedRef?: Ref< any >;
+ 	/**
+-	 * Renders `ToggleGroupControl` is a (CSS) block element.
++	 * Renders `ToggleGroupControl` as a (CSS) block element.
+ 	 *
+ 	 * @default false
+ 	 */
+ 	isBlock?: boolean;
+ 	label: string;
++	'aria-label'?: string;
+ 	showSeparator?: boolean;
+ 	value?: ReactText;
+ 	state?: any;

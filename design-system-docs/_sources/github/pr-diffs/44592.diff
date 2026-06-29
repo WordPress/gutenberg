@@ -1,0 +1,150 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a051a3437d9fe1..105522588f12ae 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,10 +5,12 @@
+ ### Enhancements
+ 
+ -   `FontSizePicker`: Updated to take up full width of its parent and have a 40px Reset button when `size` is `__unstable-large` ((44559)[https://github.com/WordPress/gutenberg/pull/44559]).
++-   `BorderBoxControl`: Omit unit select when width values are mixed ([#44592](https://github.com/WordPress/gutenberg/pull/44592))
++-   `BorderControl`: Add ability to disable unit selection ([#44592](https://github.com/WordPress/gutenberg/pull/44592))
+ 
+ ### Bug Fix
+ 
+--   `Popover`: fix limitShift logic by adding iframe offset correctly [#42950](https://github.com/WordPress/gutenberg/pull/42950)).
++-   `Popover`: fix limitShift logic by adding iframe offset correctly ([#42950](https://github.com/WordPress/gutenberg/pull/42950)).
+ -   `Popover`: refine position-to-placement conversion logic, add tests ([#44377](https://github.com/WordPress/gutenberg/pull/44377)).
+ -   `ToggleGroupControl`: adjust icon color when inactive, from `gray-700` to `gray-900` ([#44575](https://github.com/WordPress/gutenberg/pull/44575)).
+ -   `TokenInput`: improve logic around the `aria-activedescendant` attribute, which was causing unintended focus behavior for some screen readers ([#44526](https://github.com/WordPress/gutenberg/pull/44526)).
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index a49a2aa53d41d7..195d968eca22bd 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -46,6 +46,7 @@ const BorderBoxControl = (
+ 		className,
+ 		colors,
+ 		disableCustomColors,
++		disableUnits,
+ 		enableAlpha,
+ 		enableStyle,
+ 		hasMixedBorders,
+@@ -100,6 +101,7 @@ const BorderBoxControl = (
+ 					<BorderControl
+ 						className={ linkedControlClassName }
+ 						colors={ colors }
++						disableUnits={ disableUnits }
+ 						disableCustomColors={ disableCustomColors }
+ 						enableAlpha={ enableAlpha }
+ 						enableStyle={ enableStyle }
+diff --git a/packages/components/src/border-box-control/border-box-control/hook.ts b/packages/components/src/border-box-control/border-box-control/hook.ts
+index 67e6b98d542a6d..7a4add756ed2d9 100644
+--- a/packages/components/src/border-box-control/border-box-control/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control/hook.ts
+@@ -41,6 +41,9 @@ export function useBorderBoxControl(
+ 		? ( value as Borders )
+ 		: getSplitBorders( value as Border | undefined );
+ 
++	// If no numeric width value is set, the unit select will be disabled.
++	const hasWidthValue = ! isNaN( parseFloat( `${ linkedValue?.width }` ) );
++
+ 	const [ isLinked, setIsLinked ] = useState( ! mixedBorders );
+ 	const toggleLinked = () => setIsLinked( ! isLinked );
+ 
+@@ -107,6 +110,7 @@ export function useBorderBoxControl(
+ 	return {
+ 		...otherProps,
+ 		className: classes,
++		disableUnits: mixedBorders && ! hasWidthValue,
+ 		hasMixedBorders: mixedBorders,
+ 		isLinked,
+ 		linkedControlClassName,
+diff --git a/packages/components/src/border-box-control/test/index.js b/packages/components/src/border-box-control/test/index.js
+index f2c152f71ea870..d22ecdf37124df 100644
+--- a/packages/components/src/border-box-control/test/index.js
++++ b/packages/components/src/border-box-control/test/index.js
+@@ -120,17 +120,20 @@ describe( 'BorderBoxControl', () => {
+ 			expect( widthInput.value ).toBe( '1' );
+ 		} );
+ 
+-		it( 'should render placeholder when border values are mixed', () => {
++		it( 'should render placeholder and omit unit select when border values are mixed', () => {
+ 			renderBorderBoxControl( { value: mixedBorders } );
+ 
+ 			// First render of control with mixed values should show split view.
+ 			clickButton( 'Link sides' );
+ 
+ 			const widthInput = screen.getByRole( 'spinbutton' );
++			const unitSelect = screen.queryByRole( 'combobox' );
++
+ 			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mixed' );
++			expect( unitSelect ).not.toBeInTheDocument();
+ 		} );
+ 
+-		it( 'should render shared border width when switching to linked view', async () => {
++		it( 'should render shared border width and unit select when switching to linked view', async () => {
+ 			// Render control with mixed border values but consistent widths.
+ 			renderBorderBoxControl( {
+ 				value: {
+@@ -144,8 +147,10 @@ describe( 'BorderBoxControl', () => {
+ 			// First render of control with mixed values should show split view.
+ 			clickButton( 'Link sides' );
+ 			const linkedInput = screen.getByRole( 'spinbutton' );
++			const unitSelect = screen.getByRole( 'combobox' );
+ 
+ 			expect( linkedInput.value ).toBe( '5' );
++			expect( unitSelect ).toBeInTheDocument();
+ 		} );
+ 
+ 		it( 'should omit style options when requested', () => {
+diff --git a/packages/components/src/border-control/border-control/README.md b/packages/components/src/border-control/border-control/README.md
+index a4d0f2017f2d65..718ec3d703908d 100644
+--- a/packages/components/src/border-control/border-control/README.md
++++ b/packages/components/src/border-control/border-control/README.md
+@@ -66,6 +66,12 @@ This toggles the ability to choose custom colors.
+ 
+ - Required: No
+ 
++### `disableUnits`: `boolean`
++
++This controls whether unit selection should be disabled.
++
++- Required: No
++
+ ### `enableAlpha`: `boolean`
+ 
+ This controls whether the alpha channel will be offered when selecting
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 5e75dbb30f1067..cae27c1eefa4bd 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -39,6 +39,7 @@ const UnconnectedBorderControl = (
+ 	const {
+ 		colors,
+ 		disableCustomColors,
++		disableUnits,
+ 		enableAlpha,
+ 		enableStyle = true,
+ 		hideLabelFromVision,
+@@ -97,6 +98,7 @@ const UnconnectedBorderControl = (
+ 					onChange={ onWidthChange }
+ 					value={ border?.width || '' }
+ 					placeholder={ placeholder }
++					disableUnits={ disableUnits }
+ 					__unstableInputWidth={ inputWidth }
+ 				/>
+ 				{ withSlider && (
+diff --git a/packages/components/src/border-control/types.ts b/packages/components/src/border-control/types.ts
+index 20cef1e4f6be4f..3ff10dae8ed9b4 100644
+--- a/packages/components/src/border-control/types.ts
++++ b/packages/components/src/border-control/types.ts
+@@ -67,6 +67,10 @@ export type LabelProps = {
+ 
+ export type BorderControlProps = ColorProps &
+ 	LabelProps & {
++		/**
++		 * This controls whether unit selection should be disabled.
++		 */
++		disableUnits?: boolean;
+ 		/**
+ 		 * This controls whether to include border style options within the
+ 		 * `BorderDropdown` sub-component.

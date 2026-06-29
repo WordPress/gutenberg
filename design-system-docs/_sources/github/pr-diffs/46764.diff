@@ -1,0 +1,34 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8fd6fe51c38ab8..b542190b19912d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `Dropdown`: deprecate `position`  prop, use `popoverProps` instead ([46865](https://github.com/WordPress/gutenberg/pull/46865)).
++-   `Button`: improve padding for buttons with icon and text. ([46764](https://github.com/WordPress/gutenberg/pull/46764)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 0e29df0223c0bb..b38a13698a9d7e 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -282,14 +282,15 @@
+ 
+ 		&.has-text {
+ 			justify-content: start;
++			padding-right: 12px;
+ 		}
+ 
+ 		&.has-text svg {
+-			margin-right: 8px;
++			margin-right: $grid-unit-10;
+ 		}
+ 
+ 		&.has-text .dashicon {
+-			margin-right: 10px;
++			margin-right: $grid-unit-10 + 2px;
+ 		}
+ 	}
+ 

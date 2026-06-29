@@ -1,0 +1,333 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eb684ffe6b1aff..a5f163a623e392 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `TextControl`: Add `id` prop to allow for custom IDs in `TextControl`s ([#52028](https://github.com/WordPress/gutenberg/pull/52028)).
++-   `Navigator`: Add `replace` option to `navigator.goTo()` and `navigator.goToParent()` ([#52456](https://github.com/WordPress/gutenberg/pull/52456)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index 4c98db5b1a4d18..9bcffad6bc54bc 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -148,6 +148,7 @@ function UnconnectedNavigatorProvider(
+ 				focusTargetSelector,
+ 				isBack = false,
+ 				skipFocus = false,
++				replace = false,
+ 				...restOptions
+ 			} = options;
+ 
+@@ -172,34 +173,38 @@ function UnconnectedNavigatorProvider(
+ 					skipFocus,
+ 				};
+ 
+-				if ( prevLocationHistory.length < 1 ) {
+-					return [ newLocation ];
++				if ( prevLocationHistory.length === 0 ) {
++					return replace ? [] : [ newLocation ];
+ 				}
+ 
+-				return [
+-					...prevLocationHistory.slice(
+-						prevLocationHistory.length > MAX_HISTORY_LENGTH - 1
+-							? 1
+-							: 0,
+-						-1
+-					),
+-					// Assign `focusTargetSelector` to the previous location in history
+-					// (the one we just navigated from).
+-					{
+-						...prevLocationHistory[
+-							prevLocationHistory.length - 1
+-						],
+-						focusTargetSelector,
+-					},
+-					newLocation,
+-				];
++				const newLocationHistory = prevLocationHistory.slice(
++					prevLocationHistory.length > MAX_HISTORY_LENGTH - 1 ? 1 : 0,
++					-1
++				);
++
++				if ( ! replace ) {
++					newLocationHistory.push(
++						// Assign `focusTargetSelector` to the previous location in history
++						// (the one we just navigated from).
++						{
++							...prevLocationHistory[
++								prevLocationHistory.length - 1
++							],
++							focusTargetSelector,
++						}
++					);
++				}
++
++				newLocationHistory.push( newLocation );
++
++				return newLocationHistory;
+ 			} );
+ 		},
+ 		[ goBack ]
+ 	);
+ 
+-	const goToParent: NavigatorContextType[ 'goToParent' ] =
+-		useCallback( () => {
++	const goToParent: NavigatorContextType[ 'goToParent' ] = useCallback(
++		( options = {} ) => {
+ 			const currentPath =
+ 				currentLocationHistory.current[
+ 					currentLocationHistory.current.length - 1
+@@ -214,8 +219,10 @@ function UnconnectedNavigatorProvider(
+ 			if ( parentPath === undefined ) {
+ 				return;
+ 			}
+-			goTo( parentPath, { isBack: true } );
+-		}, [ goTo ] );
++			goTo( parentPath, { ...options, isBack: true } );
++		},
++		[ goTo ]
++	);
+ 
+ 	const navigatorContextValue: NavigatorContextType = useMemo(
+ 		() => ( {
+diff --git a/packages/components/src/navigator/types.ts b/packages/components/src/navigator/types.ts
+index e638084e8376d5..557f8074fd42e2 100644
+--- a/packages/components/src/navigator/types.ts
++++ b/packages/components/src/navigator/types.ts
+@@ -14,8 +14,11 @@ export type NavigateOptions = {
+ 	focusTargetSelector?: string;
+ 	isBack?: boolean;
+ 	skipFocus?: boolean;
++	replace?: boolean;
+ };
+ 
++export type NavigateToParentOptions = Omit< NavigateOptions, 'isBack' >;
++
+ export type NavigatorLocation = NavigateOptions & {
+ 	isInitial?: boolean;
+ 	path?: string;
+@@ -28,7 +31,7 @@ export type Navigator = {
+ 	params: MatchParams;
+ 	goTo: ( path: string, options?: NavigateOptions ) => void;
+ 	goBack: () => void;
+-	goToParent: () => void;
++	goToParent: ( options?: NavigateToParentOptions ) => void;
+ };
+ 
+ export type NavigatorContext = Navigator & {
+diff --git a/packages/edit-site/src/components/sidebar-navigation-screen/index.js b/packages/edit-site/src/components/sidebar-navigation-screen/index.js
+index 919e7e92d721d5..32367c32b71e9c 100644
+--- a/packages/edit-site/src/components/sidebar-navigation-screen/index.js
++++ b/packages/edit-site/src/components/sidebar-navigation-screen/index.js
+@@ -4,7 +4,6 @@
+ import {
+ 	__experimentalHStack as HStack,
+ 	__experimentalHeading as Heading,
+-	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+ 	__experimentalUseNavigator as useNavigator,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+@@ -41,7 +40,7 @@ export default function SidebarNavigationScreen( {
+ 		};
+ 	}, [] );
+ 	const { getTheme } = useSelect( coreStore );
+-	const { goTo } = useNavigator();
++	const navigator = useNavigator();
+ 	const theme = getTheme( currentlyPreviewingTheme() );
+ 	const icon = isRTL() ? chevronRight : chevronLeft;
+ 
+@@ -58,16 +57,24 @@ export default function SidebarNavigationScreen( {
+ 					className="edit-site-sidebar-navigation-screen__title-icon"
+ 				>
+ 					{ ! isRoot && ! backPath && (
+-						<NavigatorToParentButton
+-							as={ SidebarButton }
+-							icon={ isRTL() ? chevronRight : chevronLeft }
++						<SidebarButton
++							onClick={ () => {
++								if ( navigator.location.isInitial ) {
++									navigator.goToParent( { replace: true } );
++								} else {
++									navigator.goBack();
++								}
++							} }
++							icon={ icon }
+ 							label={ __( 'Back' ) }
+ 							showTooltip={ false }
+ 						/>
+ 					) }
+ 					{ ! isRoot && backPath && (
+ 						<SidebarButton
+-							onClick={ () => goTo( backPath, { isBack: true } ) }
++							onClick={ () =>
++								navigator.goTo( backPath, { isBack: true } )
++							}
+ 							icon={ icon }
+ 							label={ __( 'Back' ) }
+ 							showTooltip={ false }
+diff --git a/packages/edit-site/src/components/sync-state-with-url/use-sync-path-with-url.js b/packages/edit-site/src/components/sync-state-with-url/use-sync-path-with-url.js
+index 45f7eb1b044c1f..86928c1920a948 100644
+--- a/packages/edit-site/src/components/sync-state-with-url/use-sync-path-with-url.js
++++ b/packages/edit-site/src/components/sync-state-with-url/use-sync-path-with-url.js
+@@ -36,6 +36,12 @@ export function getPathFromURL( urlParams ) {
+ 	return path;
+ }
+ 
++function isSubset( subset, superset ) {
++	return Object.entries( subset ).every( ( [ key, value ] ) => {
++		return superset[ key ] === value;
++	} );
++}
++
+ export default function useSyncPathWithURL() {
+ 	const history = useHistory();
+ 	const { params: urlParams } = useLocation();
+@@ -44,76 +50,77 @@ export default function useSyncPathWithURL() {
+ 		params: navigatorParams,
+ 		goTo,
+ 	} = useNavigator();
+-	const currentUrlParams = useRef( urlParams );
+-	const currentPath = useRef( navigatorLocation.path );
+ 	const isMounting = useRef( true );
+ 
+-	useEffect( () => {
+-		// The navigatorParams are only initially filled properly when the
+-		// navigator screens mount. so we ignore the first synchronisation.
+-		if ( isMounting.current ) {
+-			isMounting.current = false;
+-			return;
+-		}
+-
+-		function updateUrlParams( newUrlParams ) {
+-			if (
+-				Object.entries( newUrlParams ).every( ( [ key, value ] ) => {
+-					return currentUrlParams.current[ key ] === value;
+-				} )
+-			) {
++	useEffect(
++		() => {
++			// The navigatorParams are only initially filled properly when the
++			// navigator screens mount. so we ignore the first synchronisation.
++			if ( isMounting.current ) {
++				isMounting.current = false;
+ 				return;
+ 			}
+-			const updatedParams = {
+-				...currentUrlParams.current,
+-				...newUrlParams,
+-			};
+-			currentUrlParams.current = updatedParams;
+-			history.push( updatedParams );
+-		}
+ 
+-		if ( navigatorParams?.postType && navigatorParams?.postId ) {
+-			updateUrlParams( {
+-				postType: navigatorParams?.postType,
+-				postId: navigatorParams?.postId,
+-				path: undefined,
+-			} );
+-		} else if (
+-			navigatorLocation.path.startsWith( '/page/' ) &&
+-			navigatorParams?.postId
+-		) {
+-			updateUrlParams( {
+-				postType: 'page',
+-				postId: navigatorParams?.postId,
+-				path: undefined,
+-			} );
+-		} else if ( navigatorLocation.path === '/patterns' ) {
+-			updateUrlParams( {
+-				postType: undefined,
+-				postId: undefined,
+-				canvas: undefined,
+-				path: navigatorLocation.path,
+-			} );
+-		} else {
+-			updateUrlParams( {
+-				postType: undefined,
+-				postId: undefined,
+-				categoryType: undefined,
+-				categoryId: undefined,
+-				path:
+-					navigatorLocation.path === '/'
+-						? undefined
+-						: navigatorLocation.path,
+-			} );
+-		}
+-	}, [ navigatorLocation?.path, navigatorParams, history ] );
++			function updateUrlParams( newUrlParams ) {
++				if ( isSubset( newUrlParams, urlParams ) ) {
++					return;
++				}
++				const updatedParams = {
++					...urlParams,
++					...newUrlParams,
++				};
++				history.push( updatedParams );
++			}
+ 
+-	useEffect( () => {
+-		currentUrlParams.current = urlParams;
+-		const path = getPathFromURL( urlParams );
+-		if ( currentPath.current !== path ) {
+-			currentPath.current = path;
+-			goTo( path );
+-		}
+-	}, [ urlParams, goTo ] );
++			if ( navigatorParams?.postType && navigatorParams?.postId ) {
++				updateUrlParams( {
++					postType: navigatorParams?.postType,
++					postId: navigatorParams?.postId,
++					path: undefined,
++				} );
++			} else if (
++				navigatorLocation.path.startsWith( '/page/' ) &&
++				navigatorParams?.postId
++			) {
++				updateUrlParams( {
++					postType: 'page',
++					postId: navigatorParams?.postId,
++					path: undefined,
++				} );
++			} else if ( navigatorLocation.path === '/patterns' ) {
++				updateUrlParams( {
++					postType: undefined,
++					postId: undefined,
++					canvas: undefined,
++					path: navigatorLocation.path,
++				} );
++			} else {
++				updateUrlParams( {
++					postType: undefined,
++					postId: undefined,
++					categoryType: undefined,
++					categoryId: undefined,
++					path:
++						navigatorLocation.path === '/'
++							? undefined
++							: navigatorLocation.path,
++				} );
++			}
++		},
++		// Trigger only when navigator changes to prevent infinite loops.
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++		[ navigatorLocation?.path, navigatorParams ]
++	);
++
++	useEffect(
++		() => {
++			const path = getPathFromURL( urlParams );
++			if ( navigatorLocation.path !== path ) {
++				goTo( path );
++			}
++		},
++		// Trigger only when URL changes to prevent infinite loops.
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++		[ urlParams ]
++	);
+ }

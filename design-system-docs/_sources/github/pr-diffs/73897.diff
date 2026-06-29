@@ -1,0 +1,241 @@
+diff --git a/packages/theme/tokens/border.json b/packages/theme/tokens/border.json
+index 77b8d1ca4e8e36..60634fd8cf2e6d 100644
+--- a/packages/theme/tokens/border.json
++++ b/packages/theme/tokens/border.json
+@@ -19,25 +19,40 @@
+ 					"$value": { "value": 8, "unit": "px" },
+ 					"$description": "Large radius for surfaces"
+ 				}
++			},
++			"$extensions": {
++				"com.figma.scopes": [ "CORNER_RADIUS" ]
+ 			}
+ 		},
+ 		"width": {
+ 			"surface": {
+ 				"xs": {
+ 					"$value": { "value": 1, "unit": "px" },
+-					"$description": "Extra small width for surfaces"
++					"$description": "Extra small width for surfaces",
++					"$extensions": {
++						"com.figma.scopes": [ "STROKE_FLOAT" ]
++					}
+ 				},
+ 				"sm": {
+ 					"$value": { "value": 2, "unit": "px" },
+-					"$description": "Small width for surfaces"
++					"$description": "Small width for surfaces",
++					"$extensions": {
++						"com.figma.scopes": [ "STROKE_FLOAT" ]
++					}
+ 				},
+ 				"md": {
+ 					"$value": { "value": 4, "unit": "px" },
+-					"$description": "Medium width for surfaces"
++					"$description": "Medium width for surfaces",
++					"$extensions": {
++						"com.figma.scopes": [ "STROKE_FLOAT" ]
++					}
+ 				},
+ 				"lg": {
+ 					"$value": { "value": 8, "unit": "px" },
+-					"$description": "Large width for surfaces"
++					"$description": "Large width for surfaces",
++					"$extensions": {
++						"com.figma.scopes": [ "STROKE_FLOAT" ]
++					}
+ 				}
+ 			},
+ 			"interactive": {
+@@ -47,7 +62,8 @@
+ 					"$extensions": {
+ 						"mode": {
+ 							"high-dpi": { "value": 1.5, "unit": "px" }
+-						}
++						},
++						"com.figma.scopes": [ "STROKE_FLOAT" ]
+ 					}
+ 				}
+ 			}
+diff --git a/packages/theme/tokens/color.json b/packages/theme/tokens/color.json
+index 5f399518fa958f..6ecc577fb4eefc 100644
+--- a/packages/theme/tokens/color.json
++++ b/packages/theme/tokens/color.json
+@@ -1319,6 +1319,9 @@
+ 					"$value": "{wpds-color.primitive.bg.stroke2}",
+ 					"$description": "Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state."
+ 				}
++			},
++			"$extensions": {
++				"com.figma.scopes": [ "FRAME_FILL", "SHAPE_FILL" ]
+ 			}
+ 		},
+ 		"fg": {
+@@ -1453,6 +1456,9 @@
+ 					"$value": "{wpds-color.primitive.bg.fgSurface3}",
+ 					"$description": "Foreground color for interactive elements with error tone and strong emphasis, in their disabled state."
+ 				}
++			},
++			"$extensions": {
++				"com.figma.scopes": [ "TEXT_FILL", "SHAPE_FILL" ]
+ 			}
+ 		},
+ 		"stroke": {
+@@ -1553,6 +1559,9 @@
+ 					"$value": "{wpds-color.primitive.primary.stroke3}",
+ 					"$description": "Accessible stroke color applied to focus rings."
+ 				}
++			},
++			"$extensions": {
++				"com.figma.scopes": [ "STROKE" ]
+ 			}
+ 		}
+ 	}
+diff --git a/packages/theme/tokens/dimension.json b/packages/theme/tokens/dimension.json
+index 19466db13636ae..22ebcf3e93e0c7 100644
+--- a/packages/theme/tokens/dimension.json
++++ b/packages/theme/tokens/dimension.json
+@@ -58,7 +58,8 @@
+ 						"mode": {
+ 							"compact": "{wpds-dimension.primitive.space.10}",
+ 							"comfortable": "{wpds-dimension.primitive.space.20}"
+-						}
++						},
++						"com.figma.scopes": [ "GAP" ]
+ 					}
+ 				},
+ 				"xs": {
+@@ -68,7 +69,8 @@
+ 						"mode": {
+ 							"compact": "{wpds-dimension.primitive.space.10}",
+ 							"comfortable": "{wpds-dimension.primitive.space.30}"
+-						}
++						},
++						"com.figma.scopes": [ "GAP" ]
+ 					}
+ 				},
+ 				"sm": {
+@@ -78,7 +80,8 @@
+ 						"mode": {
+ 							"compact": "{wpds-dimension.primitive.space.30}",
+ 							"comfortable": "{wpds-dimension.primitive.space.50}"
+-						}
++						},
++						"com.figma.scopes": [ "GAP" ]
+ 					}
+ 				},
+ 				"md": {
+@@ -88,7 +91,8 @@
+ 						"mode": {
+ 							"compact": "{wpds-dimension.primitive.space.50}",
+ 							"comfortable": "{wpds-dimension.primitive.space.70}"
+-						}
++						},
++						"com.figma.scopes": [ "GAP" ]
+ 					}
+ 				},
+ 				"lg": {
+@@ -98,7 +102,8 @@
+ 						"mode": {
+ 							"compact": "{wpds-dimension.primitive.space.60}",
+ 							"comfortable": "{wpds-dimension.primitive.space.80}"
+-						}
++						},
++						"com.figma.scopes": [ "GAP" ]
+ 					}
+ 				}
+ 			}
+@@ -111,7 +116,8 @@
+ 					"mode": {
+ 						"compact": "{wpds-dimension.primitive.space.10}",
+ 						"comfortable": "{wpds-dimension.primitive.space.20}"
+-					}
++					},
++					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+ 			"xs": {
+@@ -121,7 +127,8 @@
+ 					"mode": {
+ 						"compact": "{wpds-dimension.primitive.space.10}",
+ 						"comfortable": "{wpds-dimension.primitive.space.30}"
+-					}
++					},
++					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+ 			"sm": {
+@@ -131,7 +138,8 @@
+ 					"mode": {
+ 						"compact": "{wpds-dimension.primitive.space.20}",
+ 						"comfortable": "{wpds-dimension.primitive.space.40}"
+-					}
++					},
++					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+ 			"md": {
+@@ -141,7 +149,8 @@
+ 					"mode": {
+ 						"compact": "{wpds-dimension.primitive.space.30}",
+ 						"comfortable": "{wpds-dimension.primitive.space.50}"
+-					}
++					},
++					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+ 			"lg": {
+@@ -151,7 +160,8 @@
+ 					"mode": {
+ 						"compact": "{wpds-dimension.primitive.space.50}",
+ 						"comfortable": "{wpds-dimension.primitive.space.70}"
+-					}
++					},
++					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			},
+ 			"xl": {
+@@ -161,7 +171,8 @@
+ 					"mode": {
+ 						"compact": "{wpds-dimension.primitive.space.70}",
+ 						"comfortable": "{wpds-dimension.primitive.space.90}"
+-					}
++					},
++					"com.figma.scopes": [ "GAP" ]
+ 				}
+ 			}
+ 		}
+diff --git a/packages/theme/tokens/typography.json b/packages/theme/tokens/typography.json
+index 7713e02a7b7232..2e7bb2ebcaf5fa 100644
+--- a/packages/theme/tokens/typography.json
++++ b/packages/theme/tokens/typography.json
+@@ -60,6 +60,9 @@
+ 			"2xl": {
+ 				"$value": { "value": 32, "unit": "px" },
+ 				"$description": "2X large font size"
++			},
++			"$extensions": {
++				"com.figma.scopes": [ "FONT_SIZE" ]
+ 			}
+ 		},
+ 		"line-height": {
+@@ -87,6 +90,9 @@
+ 			"2xl": {
+ 				"$value": { "value": 40, "unit": "px" },
+ 				"$description": "2X large line height"
++			},
++			"$extensions": {
++				"com.figma.scopes": [ "LINE_HEIGHT" ]
+ 			}
+ 		},
+ 		"weight": {
+@@ -98,6 +104,9 @@
+ 			"medium": {
+ 				"$value": 499,
+ 				"$description": "Medium font weight for emphasis and headings"
++			},
++			"$extensions": {
++				"com.figma.scopes": [ "FONT_WEIGHT" ]
+ 			}
+ 		}
+ 	}

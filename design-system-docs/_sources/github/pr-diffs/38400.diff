@@ -1,0 +1,14 @@
+diff --git a/packages/components/src/resizable-box/resize-tooltip/utils.ts b/packages/components/src/resizable-box/resize-tooltip/utils.ts
+index b4ec4b19f19fcb..1aea8b1eae5e85 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/utils.ts
++++ b/packages/components/src/resizable-box/resize-tooltip/utils.ts
+@@ -9,7 +9,8 @@ import useResizeAware from 'react-resize-aware';
+  */
+ import { useEffect, useRef, useState } from '@wordpress/element';
+ 
+-const { clearTimeout, setTimeout } = window;
++const { clearTimeout = () => undefined, setTimeout = () => undefined } =
++	typeof window !== 'undefined' ? window : {};
+ 
+ export type Axis = 'x' | 'y';
+ 

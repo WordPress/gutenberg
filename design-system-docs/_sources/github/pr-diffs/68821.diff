@@ -1,0 +1,103 @@
+diff --git a/.github/workflows/unit-test.yml b/.github/workflows/unit-test.yml
+index 2a745a35973cb2..d1378f33acd557 100644
+--- a/.github/workflows/unit-test.yml
++++ b/.github/workflows/unit-test.yml
+@@ -28,7 +28,7 @@ jobs:
+         name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
+         runs-on: 'ubuntu-24.04'
+         permissions:
+-            contents: read
++              contents: read
+         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+         strategy:
+             fail-fast: false
+@@ -382,3 +382,35 @@ jobs:
+             - name: Mark the job as passed if all the checks pass
+               if: ${{ needs.test-php.result == 'success' && needs.phpcs.result == 'success' }}
+               run: exit 0
++
++    mobile-unit-js:
++        name: Mobile
++        runs-on: ubuntu-latest
++        permissions:
++            contents: read
++        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
++
++        steps:
++            - name: Checkout repository
++              uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
++              with:
++                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
++                  persist-credentials: false
++
++            - name: Determine the number of CPU cores
++              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
++              id: cpu-cores
++
++            - name: Setup Node.js and install dependencies
++              uses: ./.github/setup-node
++
++            - name: Run build scripts
++              # It's not necessary to run the full build, since Jest can interpret
++              # source files with `babel-jest`. Some packages have their own custom
++              # build tasks, however. These must be run.
++              run: npx lerna run build
++
++            - name: Running the tests
++              env:
++                  MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
++              run: npm run test:native -- --ci --maxWorkers="$MAXWORKERS" --cacheDirectory="$HOME/.jest-cache"
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index bd53b03002331b..fd226f3053a303 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -132,6 +132,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 		__experimentalRenderItem,
+ 		expandOnFocus = true,
+ 		placeholder,
++		searchField = 'label',
+ 	} = useDeprecated36pxDefaultSizeProp( props );
+ 
+ 	const [ value, setValue ] = useControlledValue( {
+@@ -157,8 +158,17 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 		const startsWithMatch: ComboboxControlOption[] = [];
+ 		const containsMatch: ComboboxControlOption[] = [];
+ 		const match = normalizeTextString( inputValue );
++
+ 		options.forEach( ( option ) => {
+-			const index = normalizeTextString( option.label ).indexOf( match );
++			if ( option[ searchField ] === undefined ) {
++				return;
++			}
++
++			const fieldValue = normalizeTextString(
++				String( option[ searchField ] )
++			);
++			const index = fieldValue.indexOf( match );
++
+ 			if ( index === 0 ) {
+ 				startsWithMatch.push( option );
+ 			} else if ( index > 0 ) {
+@@ -167,7 +177,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 		} );
+ 
+ 		return startsWithMatch.concat( containsMatch );
+-	}, [ inputValue, options ] );
++	}, [ inputValue, options, searchField ] );
+ 
+ 	const onSuggestionSelected = (
+ 		newSelectedSuggestion: ComboboxControlOption
+diff --git a/packages/components/src/combobox-control/types.ts b/packages/components/src/combobox-control/types.ts
+index 3398e9ee9a760e..67ab53559d3ec5 100644
+--- a/packages/components/src/combobox-control/types.ts
++++ b/packages/components/src/combobox-control/types.ts
+@@ -93,4 +93,9 @@ export type ComboboxControlProps = Pick<
+ 	 * @default false
+ 	 */
+ 	isLoading?: boolean;
++	/**
++	 * Specifies which property of the options to use for search comparisons.
++	 * Defaults to searching the 'label' property if not specified.
++	 */
++	searchField?: string;
+ };

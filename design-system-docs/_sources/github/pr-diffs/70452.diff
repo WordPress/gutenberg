@@ -1,0 +1,108 @@
+diff --git a/packages/components/src/dropdown/index.native.js b/packages/components/src/dropdown/index.native.js
+index 232a16b6106bcc..4cf9dc43edbcb5 100644
+--- a/packages/components/src/dropdown/index.native.js
++++ b/packages/components/src/dropdown/index.native.js
+@@ -1,59 +1,52 @@
+ /**
+  * WordPress dependencies
+  */
+-import { Component } from '@wordpress/element';
+-
+-class Dropdown extends Component {
+-	constructor() {
+-		super( ...arguments );
++import {
++	useState,
++	useEffect,
++	useCallback,
++	useMemo,
++	useRef,
++} from '@wordpress/element';
++
++const Dropdown = ( { renderContent, renderToggle, onToggle } ) => {
++	const [ isOpen, setIsOpen ] = useState( false );
++	const prevIsOpenRef = useRef( isOpen );
++
++	const toggle = useCallback( () => {
++		setIsOpen( ( prev ) => ! prev );
++	}, [] );
++
++	const close = useCallback( () => {
++		setIsOpen( false );
++	}, [] );
++
++	useEffect( () => {
++		// Only call `onToggle` when `isOpen` changes,
++		// avoiding a call on initial mount.
++		if ( prevIsOpenRef.current !== isOpen && onToggle ) {
++			onToggle( isOpen );
++		}
+ 
+-		this.toggle = this.toggle.bind( this );
+-		this.close = this.close.bind( this );
++		prevIsOpenRef.current = isOpen;
+ 
+-		this.state = {
+-			isOpen: false,
++		return () => {
++			if ( isOpen && onToggle ) {
++				onToggle( false );
++			}
+ 		};
+-	}
+-
+-	componentWillUnmount() {
+-		const { isOpen } = this.state;
+-		const { onToggle } = this.props;
+-		if ( isOpen && onToggle ) {
+-			onToggle( false );
+-		}
+-	}
+-
+-	componentDidUpdate( prevProps, prevState ) {
+-		const { isOpen } = this.state;
+-		const { onToggle } = this.props;
+-		if ( prevState.isOpen !== isOpen && onToggle ) {
+-			onToggle( isOpen );
+-		}
+-	}
+-
+-	toggle() {
+-		this.setState( ( state ) => ( {
+-			isOpen: ! state.isOpen,
+-		} ) );
+-	}
+-
+-	close() {
+-		this.setState( { isOpen: false } );
+-	}
+-
+-	render() {
+-		const { isOpen } = this.state;
+-		const { renderContent, renderToggle } = this.props;
+-
+-		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
+-
+-		return (
+-			<>
+-				{ renderToggle( args ) }
+-				{ isOpen && renderContent( args ) }
+-			</>
+-		);
+-	}
+-}
++	}, [ isOpen, onToggle ] );
++
++	const args = useMemo( () => {
++		return { isOpen, onToggle: toggle, onClose: close };
++	}, [ isOpen, toggle, close ] );
++
++	return (
++		<>
++			{ renderToggle( args ) }
++			{ isOpen && renderContent( args ) }
++		</>
++	);
++};
+ 
+ export default Dropdown;

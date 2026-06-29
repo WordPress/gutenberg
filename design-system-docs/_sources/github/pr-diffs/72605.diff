@@ -1,0 +1,12 @@
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index 9ea59abf15e36e..a7bdfa66c08fa0 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -52,6 +52,6 @@
+ 		"access": "public"
+ 	},
+ 	"scripts": {
+-		"build": "rimraf src/prebuilt docs && node bin/build-tokens.js && prettier --write tokens/color.json src/prebuilt/* docs/*"
++		"build": "rimraf src/prebuilt docs && node bin/build-tokens.js && prettier --write tokens/color.json src/prebuilt docs"
+ 	}
+ }

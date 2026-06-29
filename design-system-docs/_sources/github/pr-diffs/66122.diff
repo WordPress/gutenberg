@@ -1,0 +1,153 @@
+diff --git a/storybook/stories/tokens/components.tsx b/storybook/stories/tokens/components.tsx
+new file mode 100644
+index 00000000000000..05c2b4bde85a21
+--- /dev/null
++++ b/storybook/stories/tokens/components.tsx
+@@ -0,0 +1,53 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line @typescript-eslint/no-restricted-imports
++import React from 'react';
++
++export const ElevationTable = ( { tokens } ) => {
++	return (
++		<table>
++			<thead>
++				<tr>
++					<th>Token</th>
++					<th>Value</th>
++					<th>Example</th>
++				</tr>
++			</thead>
++			<tbody>
++				{ tokens.map( ( { name, valueShow, valueCode } ) => (
++					<tr key={ name }>
++						<td style={ { whiteSpace: 'nowrap' } }>{ name }</td>
++						<td>
++							<code
++								style={ {
++									lineHeight: 1,
++									margin: '0 2px',
++									padding: '3px 5px',
++									borderRadius: '3px',
++									fontSize: '13px',
++									border: '1px solid #ECF4F9',
++									color: 'rgba(46, 52, 56, 0.9)',
++									backgroundColor: '#F7FAFC',
++								} }
++							>
++								{ valueShow }
++							</code>
++						</td>
++						<td style={ { padding: '24px' } }>
++							<div
++								aria-label={ `An square showing an example of the '${ name }' elevation styles` }
++								style={ {
++									width: '100px',
++									height: '100px',
++									boxShadow: valueCode,
++									background: 'white',
++								} }
++							></div>
++						</td>
++					</tr>
++				) ) }
++			</tbody>
++		</table>
++	);
++};
+diff --git a/storybook/stories/tokens/elevation.mdx b/storybook/stories/tokens/elevation.mdx
+new file mode 100644
+index 00000000000000..d00de6dbde7fab
+--- /dev/null
++++ b/storybook/stories/tokens/elevation.mdx
+@@ -0,0 +1,88 @@
++import { Meta } from '@storybook/addon-docs/blocks';
++import { ElevationTable } from './components.tsx';
++
++<Meta title="Tokens/Elevation" name="page" />
++
++# Elevation tokens
++
++This document outlines the various tokens relating to elevation in the WordPress design system.
++
++## Values
++
++Tokens can be used in different ways, but regardless of which method is used, each one is meant to be used as the value of the CSS `box-shadow` property, and references the following values:
++
++<ElevationTable
++	tokens={ [
++		{
++			name: 'Extra small',
++			valueShow:
++				'0 1px 1px rgba($black, 0.03), 0 1px 2px rgba($black, 0.02), 0 3px 3px rgba($black, 0.02), 0 4px 4px rgba($black, 0.01)',
++			valueCode:
++				'0 1px 1px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02), 0 3px 3px rgba(0, 0, 0, 0.02), 0 4px 4px rgba(0, 0, 0, 0.01)',
++		},
++		{
++			name: 'Small',
++			valueShow:
++				'0 1px 2px rgba($black, 0.05), 0 2px 3px rgba($black, 0.04), 0 6px 6px rgba($black, 0.03), 0 8px 8px rgba($black, 0.02)',
++			valueCode:
++				'0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 3px rgba(0, 0, 0, 0.04), 0 6px 6px rgba(0, 0, 0, 0.03), 0 8px 8px rgba(0, 0, 0, 0.02)',
++		},
++		{
++			name: 'Medium',
++			valueShow:
++				'0 2px 3px rgba($black, 0.05), 0 4px 5px rgba($black, 0.04), 0 12px 12px rgba($black, 0.03), 0 16px 16px rgba($black, 0.02)',
++			valueCode:
++				'0 2px 3px rgba(0, 0, 0, 0.05), 0 4px 5px rgba(0, 0, 0, 0.04), 0 12px 12px rgba(0, 0, 0, 0.03), 0 16px 16px rgba(0, 0, 0, 0.02)',
++		},
++		{
++			name: 'Large',
++			valueShow:
++				'0 5px 15px rgba($black, 0.08), 0 15px 27px rgba($black, 0.07), 0 30px 36px rgba($black, 0.04), 0 50px 43px rgba($black, 0.02)',
++			valueCode:
++				'0 5px 15px rgba(0, 0, 0, 0.08), 0 15px 27px rgba(0, 0, 0, 0.07), 0 30px 36px rgba(0, 0, 0, 0.04), 0 50px 43px rgba(0, 0, 0, 0.02)',
++		},
++	] }
++/>
++
++## CSS tokens
++
++Elevation tokens are defined as SASS variables:
++
++-   `$elevation-x-small`
++-   `$elevation-small`
++-   `$elevation-medium`
++-   `$elevation-large`
++
++They can be used like so:
++
++```css
++.elevation-extra-small {
++	box-shadow: $elevation-x-small;
++}
++.elevation-small {
++	box-shadow: $elevation-small;
++}
++.elevation-medium {
++	box-shadow: $elevation-medium;
++}
++.elevation-large {
++	box-shadow: $elevation-large;
++}
++```
++
++## JS tokens
++
++When working in the `@wordpress/components` package, the elevation tokens can also be consumed as JavaScript variables via the `CONFIG` object found in the `packages/components/src/utils/index.js` file:
++
++-   `CONFIG.elevationXSmall`
++-   `CONFIG.elevationSmall`
++-   `CONFIG.elevationMedium`
++-   `CONFIG.elevationLarge`
++
++```js
++// Note: the `CONFIG` object is only available within the `@wordpress/components` package.
++import { CONFIG } from '../utils';
++
++// Later in the code:
++box-shadow: ${ CONFIG.elevationXSmall };
++```

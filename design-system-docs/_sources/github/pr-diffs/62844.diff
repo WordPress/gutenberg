@@ -1,0 +1,44 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 728151987c9ef4..70cbfe0f976af8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `CustomSelectControlV2`: add root element wrapper. ([#62803](https://github.com/WordPress/gutenberg/pull/62803))
+ -   `CustomSelectControlV2`: fix popover styles. ([#62821](https://github.com/WordPress/gutenberg/pull/62821))
+ -   `CustomSelectControlV2`: fix trigger text alignment in RTL languages ([#62869](https://github.com/WordPress/gutenberg/pull/62869)).
++-   `CustomSelectControlV2`: fix select popover content overflow. ([#62844](https://github.com/WordPress/gutenberg/pull/62844))
+ 
+ ## 28.2.0 (2024-06-26)
+ 
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index f76c7f67ea77b4..d76fa8c0330516 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -112,7 +112,12 @@ function _CustomSelect(
+ 					size={ size }
+ 					store={ store }
+ 				/>
+-				<Styled.SelectPopover gutter={ 12 } store={ store } sameWidth>
++				<Styled.SelectPopover
++					gutter={ 12 }
++					store={ store }
++					sameWidth
++					slide={ false }
++				>
+ 					<CustomSelectContext.Provider value={ { store } }>
+ 						{ children }
+ 					</CustomSelectContext.Provider>
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index c806bbee794d1a..5d6bb2c6a97cd7 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -119,6 +119,9 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
+ 	overflow: auto;
+ 	overscroll-behavior: contain;
+ 
++	// The smallest size without overflowing the container.
++	min-width: min-content;
++
+ 	&[data-focus-visible] {
+ 		outline: none; // outline will be on the trigger, rather than the popover
+ 	}

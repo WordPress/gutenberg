@@ -1,0 +1,159 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ed33677b55a82a..bff19b98590df3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,7 +13,7 @@
+ -   `FontSizePicker`: Add opt-in prop for 40px default size ([#56804](https://github.com/WordPress/gutenberg/pull/56804)).
+ 
+ ### Bug Fix
+-
++-   `PaletteEdit`: temporary custom gradient not saving ([#56896](https://github.com/WordPress/gutenberg/pull/56896)).
+ -   `ToggleGroupControl`: react correctly to external controlled updates ([#56678](https://github.com/WordPress/gutenberg/pull/56678)).
+ -   `ToolsPanel`: fix a performance issue ([#56770](https://github.com/WordPress/gutenberg/pull/56770)).
+ -   `BorderControl`: adjust `BorderControlDropdown` Button size to fix misaligned border ([#56730](https://github.com/WordPress/gutenberg/pull/56730)).
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index b3b8b626ce3b4a..40621a407f2173 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -60,7 +60,7 @@ import type {
+ 	PaletteElement,
+ } from './types';
+ 
+-const DEFAULT_COLOR = '#000';
++export const DEFAULT_COLOR = '#000';
+ 
+ function NameInput( { value, onChange, label }: NameInputProps ) {
+ 	return (
+@@ -261,16 +261,30 @@ function Option< T extends Color | Gradient >( {
+ 	);
+ }
+ 
+-function isTemporaryElement(
++/**
++ * Checks if a color or gradient is a temporary element by testing against default values.
++ */
++export function isTemporaryElement(
+ 	slugPrefix: string,
+ 	{ slug, color, gradient }: Color | Gradient
+-) {
++): Boolean {
+ 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
+-	return (
+-		regex.test( slug ) &&
+-		( ( !! color && color === DEFAULT_COLOR ) ||
+-			( !! gradient && gradient === DEFAULT_GRADIENT ) )
+-	);
++
++	// If the slug matches the temporary name regex,
++	// check if the color or gradient matches the default value.
++	if ( regex.test( slug ) ) {
++		// The order is important as gradient elements
++		// contain a color property.
++		if ( !! gradient ) {
++			return gradient === DEFAULT_GRADIENT;
++		}
++
++		if ( !! color ) {
++			return color === DEFAULT_COLOR;
++		}
++	}
++
++	return false;
+ }
+ 
+ function PaletteEditListView< T extends Color | Gradient >( {
+diff --git a/packages/components/src/palette-edit/test/index.tsx b/packages/components/src/palette-edit/test/index.tsx
+index 1bf2802709de7f..1a0b2fdaaab3fb 100644
+--- a/packages/components/src/palette-edit/test/index.tsx
++++ b/packages/components/src/palette-edit/test/index.tsx
+@@ -6,8 +6,13 @@ import { render, fireEvent, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import PaletteEdit, { getNameForPosition } from '..';
++import PaletteEdit, {
++	getNameForPosition,
++	isTemporaryElement,
++	DEFAULT_COLOR,
++} from '..';
+ import type { PaletteElement } from '../types';
++import { DEFAULT_GRADIENT } from '../../custom-gradient-picker/constants';
+ 
+ describe( 'getNameForPosition', () => {
+ 	test( 'should return 1 by default', () => {
+@@ -80,6 +85,75 @@ describe( 'getNameForPosition', () => {
+ 	} );
+ } );
+ 
++describe( 'isTemporaryElement', () => {
++	[
++		{
++			message: 'identifies temporary color',
++			slug: 'test-',
++			obj: {
++				name: '',
++				slug: 'test-color-1',
++				color: DEFAULT_COLOR,
++			},
++			expected: true,
++		},
++		{
++			message: 'identifies temporary gradient',
++			slug: 'test-',
++			obj: {
++				name: '',
++				slug: 'test-color-1',
++				gradient: DEFAULT_GRADIENT,
++			},
++			expected: true,
++		},
++		{
++			message: 'identifies custom color slug',
++			slug: 'test-',
++			obj: {
++				name: '',
++				slug: 'test-color-happy',
++				color: DEFAULT_COLOR,
++			},
++			expected: false,
++		},
++		{
++			message: 'identifies custom color value',
++			slug: 'test-',
++			obj: {
++				name: '',
++				slug: 'test-color-1',
++				color: '#ccc',
++			},
++			expected: false,
++		},
++		{
++			message: 'identifies custom gradient slug',
++			slug: 'test-',
++			obj: {
++				name: '',
++				slug: 'test-gradient-joy',
++				color: DEFAULT_GRADIENT,
++			},
++			expected: false,
++		},
++		{
++			message: 'identifies custom gradient value',
++			slug: 'test-',
++			obj: {
++				name: '',
++				slug: 'test-color-3',
++				color: 'linear-gradient(90deg, rgba(22, 22, 22, 1) 0%, rgb(155, 81, 224) 100%)',
++			},
++			expected: false,
++		},
++	].forEach( ( { message, slug, obj, expected } ) => {
++		it( `should ${ message }`, () => {
++			expect( isTemporaryElement( slug, obj ) ).toBe( expected );
++		} );
++	} );
++} );
++
+ describe( 'PaletteEdit', () => {
+ 	const defaultProps = {
+ 		colors: [ { color: '#ffffff', name: 'Base', slug: 'base' } ],

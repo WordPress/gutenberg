@@ -1,0 +1,345 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index be08c2fecd1f85..912cdd5d7d51ed 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -26,6 +26,7 @@
+ 
+ -   `Flex`, `FlexItem`, `FlexBlock`: Convert to TypeScript ([#42537](https://github.com/WordPress/gutenberg/pull/42537)).
+ -   `InputControl`: Fix incorrect `size` prop passing ([#42793](https://github.com/WordPress/gutenberg/pull/42793)).
++-   `Placeholder`: Convert to TypeScript ([#42990](https://github.com/WordPress/gutenberg/pull/42990)).
+ -   `Popover`: rewrite Storybook examples using controls [#42903](https://github.com/WordPress/gutenberg/pull/42903)).
+ 
+ ## 19.16.0 (2022-07-27)
+@@ -84,7 +85,6 @@
+ -   `Popover`: call `getAnchorRect` callback prop even if `anchorRefFallback` has no value. ([#42329](https://github.com/WordPress/gutenberg/pull/42329)).
+ -   Fix `ToolTip` position to ensure it is always positioned relative to the first child of the ToolTip. ([#41268](https://github.com/WordPress/gutenberg/pull/41268))
+ 
+-
+ ### Enhancements
+ 
+ -   `ToggleGroupControl`: Add large size variant ([#42008](https://github.com/WordPress/gutenberg/pull/42008/)).
+diff --git a/packages/components/src/placeholder/README.md b/packages/components/src/placeholder/README.md
+index 85224ca9d23523..bc59b593b463af 100644
+--- a/packages/components/src/placeholder/README.md
++++ b/packages/components/src/placeholder/README.md
+@@ -9,12 +9,52 @@ import { more } from '@wordpress/icons';
+ const MyPlaceholder = () => <Placeholder icon={ more } label="Placeholder" />;
+ ```
+ 
+-### Props
+-
+-| Name              | Type                | Default     | Description                                                       |
+-| ----------------  | ------------------- | ----------- | ----------------------------------------------------------------- |
+-| `icon`            | `string, WPElement` | `undefined` | If provided, renders an icon next to the label.                   |
+-| `label`           | `string`            | `undefined` | Renders a label for the placeholder.                              |
+-| `instructions`    | `string`            | `undefined` | Renders instruction text below label.                             |
+-| `isColumnLayout`  | `bool`              | `false`     | Changes placeholder children layout from flex-row to flex-column. |
+-| `withIllustration`| `bool`              | `false`     | Outputs a placeholder illustration.                             |
++## Props
++
++### `className`: `string`
++
++Class to set on the container div.
++
++-   Required: No
++
++### `icon`: `string|Function|WPComponent|null`
++
++If provided, renders an icon next to the label.
++
++-   Required: No
++
++### `instructions`: `string`
++
++Instructions of the placeholder.
++
++-   Required: No
++
++### `isColumnLayout`: `boolean`
++
++Changes placeholder children layout from flex-row to flex-column.
++
++-   Required: No
++
++### `label`: `string`
++
++Title of the placeholder.
++
++-   Required: Yes
++
++### `notices`: `ReactNode`
++
++A rendered notices list
++
++-   Required: No
++
++### `preview`: `ReactNode`
++
++Preview to be rendered in the placeholder.
++
++-   Required: No
++
++### `withIllustration`: `boolean`
++
++Outputs a placeholder illustration.
++
++-   Required: No
+diff --git a/packages/components/src/placeholder/index.js b/packages/components/src/placeholder/index.tsx
+similarity index 66%
+rename from packages/components/src/placeholder/index.js
+rename to packages/components/src/placeholder/index.tsx
+index a4555135f331a1..cc9f33fe4f6032 100644
+--- a/packages/components/src/placeholder/index.js
++++ b/packages/components/src/placeholder/index.tsx
+@@ -13,6 +13,8 @@ import { SVG, Path } from '@wordpress/primitives';
+  * Internal dependencies
+  */
+ import Icon from '../icon';
++import type { PlaceholderProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+ const PlaceholderIllustration = (
+ 	<SVG
+@@ -29,31 +31,33 @@ const PlaceholderIllustration = (
+ /**
+  * Renders a placeholder. Normally used by blocks to render their empty state.
+  *
+- * @param {Object}    props                  The component props.
+- * @param {WPIcon}    props.icon             An icon rendered before the label.
+- * @param {WPElement} props.children         Children to be rendered.
+- * @param {string}    props.label            Title of the placeholder.
+- * @param {string}    props.instructions     Instructions of the placeholder.
+- * @param {string}    props.className        Class to set on the container div.
+- * @param {Object}    props.notices          A rendered notices list.
+- * @param {Object}    props.preview          Preview to be rendered in the placeholder.
+- * @param {boolean}   props.isColumnLayout   Whether a column layout should be used.
+- * @param {boolean}   props.withIllustration Whether to add an illustration to the placeholder.
++ * ```jsx
++ * import { Placeholder } from '@wordpress/components';
++ * import { more } from '@wordpress/icons';
+  *
+- * @return {Object} The rendered placeholder.
++ * const MyPlaceholder = () => <Placeholder icon={ more } label="Placeholder" />;
++ * ```
+  */
+-function Placeholder( {
+-	icon,
+-	children,
+-	label,
+-	instructions,
+-	className,
+-	notices,
+-	preview,
+-	isColumnLayout,
+-	withIllustration,
+-	...additionalProps
+-} ) {
++export function Placeholder< IconProps = unknown >(
++	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
++	// ref forwarding to Placeholder.
++	props: Omit<
++		WordPressComponentProps< PlaceholderProps< IconProps >, 'div', false >,
++		'ref'
++	>
++) {
++	const {
++		icon,
++		children,
++		label,
++		instructions,
++		className,
++		notices,
++		preview,
++		isColumnLayout,
++		withIllustration,
++		...additionalProps
++	} = props;
+ 	const [ resizeListener, { width } ] = useResizeObserver();
+ 
+ 	// Since `useResizeObserver` will report a width of `null` until after the
+diff --git a/packages/components/src/placeholder/stories/index.js b/packages/components/src/placeholder/stories/index.js
+deleted file mode 100644
+index 408bc0985f2803..00000000000000
+--- a/packages/components/src/placeholder/stories/index.js
++++ /dev/null
+@@ -1,44 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, text } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-import Placeholder from '../';
+-import TextControl from '../../text-control';
+-
+-export default {
+-	title: 'Components/Placeholder',
+-	component: Placeholder,
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-export const _default = () => {
+-	const icon = text( 'Icon', 'smiley' );
+-	const instructions = text(
+-		'Instructions',
+-		'Here are instructions you should follow'
+-	);
+-	const label = text( 'Label', 'My Placeholder Label' );
+-	const isColumnLayout = boolean( 'isColumnLayout', false );
+-
+-	return (
+-		<Placeholder
+-			icon={ icon }
+-			instructions={ instructions }
+-			label={ label }
+-			isColumnLayout={ isColumnLayout }
+-		>
+-			<div>
+-				<TextControl
+-					label="Sample Field"
+-					placeholder="Enter something here"
+-				/>
+-			</div>
+-		</Placeholder>
+-	);
+-};
+diff --git a/packages/components/src/placeholder/stories/index.tsx b/packages/components/src/placeholder/stories/index.tsx
+new file mode 100644
+index 00000000000000..e501b98c4b0e67
+--- /dev/null
++++ b/packages/components/src/placeholder/stories/index.tsx
+@@ -0,0 +1,64 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { starEmpty, starFilled, styles, wordpress } from '@wordpress/icons';
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import Placeholder from '../';
++import TextControl from '../../text-control';
++
++const ICONS = { starEmpty, starFilled, styles, wordpress };
++
++const meta: ComponentMeta< typeof Placeholder > = {
++	component: Placeholder,
++	title: 'Components/Placeholder',
++	argTypes: {
++		children: { control: { type: null } },
++		notices: { control: { type: null } },
++		preview: { control: { type: null } },
++		icon: {
++			control: { type: 'select' },
++			options: Object.keys( ICONS ),
++			mapping: ICONS,
++		},
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof Placeholder > = ( args ) => {
++	const [ value, setValue ] = useState( '' );
++
++	return (
++		<Placeholder { ...args }>
++			<div>
++				<TextControl
++					label="Sample Field"
++					placeholder="Enter something here"
++					value={ value }
++					onChange={ setValue }
++				/>
++			</div>
++		</Placeholder>
++	);
++};
++
++export const Default: ComponentStory< typeof Placeholder > = Template.bind(
++	{}
++);
++Default.args = {
++	icon: 'wordpress',
++	label: 'My Placeholder Label',
++	instructions: 'Here are instructions you should follow',
++};
+diff --git a/packages/components/src/placeholder/types.ts b/packages/components/src/placeholder/types.ts
+new file mode 100644
+index 00000000000000..617cc9585edfc5
+--- /dev/null
++++ b/packages/components/src/placeholder/types.ts
+@@ -0,0 +1,48 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { IconType } from '../icon';
++
++export type PlaceholderProps< IconProps = unknown > = {
++	/**
++	 * The children elements.
++	 */
++	children?: ReactNode;
++	/**
++	 * Class to set on the container div.
++	 */
++	className?: string;
++	/**
++	 * If provided, renders an icon next to the label.
++	 */
++	icon?: IconType< IconProps >;
++	/**
++	 * Instructions of the placeholder.
++	 */
++	instructions?: string;
++	/**
++	 * Changes placeholder children layout from flex-row to flex-column.
++	 */
++	isColumnLayout?: boolean;
++	/**
++	 * Title of the placeholder.
++	 */
++	label?: string;
++	/**
++	 * A rendered notices list
++	 */
++	notices?: ReactNode;
++	/**
++	 * Preview to be rendered in the placeholder.
++	 */
++	preview?: ReactNode;
++	/**
++	 * Outputs a placeholder illustration.
++	 */
++	withIllustration?: boolean;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index cc5f7e3be2634b..0d63f0483fb495 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -72,6 +72,7 @@
+ 		"src/navigable-container/**/*",
+ 		"src/navigator/**/*",
+ 		"src/number-control/**/*",
++		"src/placeholder/**/*",
+ 		"src/popover/**/*",
+ 		"src/radio-control/**/*",
+ 		"src/range-control/**/*",

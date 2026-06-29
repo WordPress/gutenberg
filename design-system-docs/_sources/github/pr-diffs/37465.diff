@@ -1,0 +1,84 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1c97725b5bdc67..80c9884c565712 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -46,6 +46,7 @@
+ -   Normalized label line-height and spacing within the `ToolsPanel` ([36387](https://github.com/WordPress/gutenberg/pull/36387))
+ -   Remove unused `reakit-utils` from peer dependencies ([#37369](https://github.com/WordPress/gutenberg/pull/37369)).
+ -   Update all Emotion dependencies to the latest version to ensure they work correctly with React types ([#37365](https://github.com/WordPress/gutenberg/pull/37365)).
++-   `DateTimePicker`: Fix the date format associated to the `is12Hour` prop ([#37465](https://github.com/WordPress/gutenberg/pull/37465))
+ -   Allowed `ToolsPanel` to register items when `panelId` is `null` due to multiple block selection ([37216](https://github.com/WordPress/gutenberg/pull/37216)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/date-time/README.md b/packages/components/src/date-time/README.md
+index acf927d12c51d7..a3567c27198800 100644
+--- a/packages/components/src/date-time/README.md
++++ b/packages/components/src/date-time/README.md
+@@ -28,7 +28,7 @@ const MyDateTimePicker = () => {
+ 			is12Hour={ true }
+ 		/>
+ 	);
+-}
++};
+ ```
+ 
+ ## Props
+@@ -52,7 +52,7 @@ The function called when a new date or time has been selected. It is passed the
+ 
+ ### is12Hour
+ 
+-Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed and the time format is assumed to be MM-DD-YYYY.
++Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed and the time format is assumed to be `MM-DD-YYYY` (as opposed to the default format `DD-MM-YYYY`).
+ 
+ -   Type: `bool`
+ -   Required: No
+@@ -69,5 +69,5 @@ A callback function which receives a Date object representing a day as an argume
+ 
+ A callback invoked when selecting the previous/next month in the date picker. The callback receives the new month date in the ISO format as an argument.
+ 
+-- Type: `Function`
+-- Required: No
++-   Type: `Function`
++-   Required: No
+diff --git a/packages/components/src/date-time/test/time.js b/packages/components/src/date-time/test/time.js
+index 523f2447e6acf2..5d62ff73fcc02e 100644
+--- a/packages/components/src/date-time/test/time.js
++++ b/packages/components/src/date-time/test/time.js
+@@ -278,7 +278,7 @@ describe( 'TimePicker', () => {
+ 			screen.getByLabelText( 'Day' )
+ 		);
+ 
+-		expect( monthInputIndex < dayInputIndex ).toBe( true );
++		expect( monthInputIndex > dayInputIndex ).toBe( true );
+ 
+ 		rerender(
+ 			<form aria-label="form">
+@@ -299,7 +299,7 @@ describe( 'TimePicker', () => {
+ 			screen.getByLabelText( 'Day' )
+ 		);
+ 
+-		expect( monthInputIndex > dayInputIndex ).toBe( true );
++		expect( monthInputIndex < dayInputIndex ).toBe( true );
+ 	} );
+ 
+ 	it( 'Should set a time when passed a null currentTime', () => {
+diff --git a/packages/components/src/date-time/time.js b/packages/components/src/date-time/time.js
+index 098fba0d9cfabc..b3ed133416063a 100644
+--- a/packages/components/src/date-time/time.js
++++ b/packages/components/src/date-time/time.js
+@@ -196,13 +196,13 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
+ 
+ 	const dayMonthFormat = is12Hour ? (
+ 		<>
+-			{ dayFormat }
+ 			{ monthFormat }
++			{ dayFormat }
+ 		</>
+ 	) : (
+ 		<>
+-			{ monthFormat }
+ 			{ dayFormat }
++			{ monthFormat }
+ 		</>
+ 	);
+ 

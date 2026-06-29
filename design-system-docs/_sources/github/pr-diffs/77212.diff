@@ -1,0 +1,454 @@
+diff --git a/packages/block-library/src/cover/edit/index.js b/packages/block-library/src/cover/edit/index.js
+index a8aee8b4468cb4..060be347b26a5b 100644
+--- a/packages/block-library/src/cover/edit/index.js
++++ b/packages/block-library/src/cover/edit/index.js
+@@ -191,7 +191,14 @@ function CoverEdit( {
+ 			} );
+ 		} )();
+ 		// Update the block only when the featured image changes.
+-	}, [ mediaUrl ] );
++		// The other dependencies are stable references (dispatch actions / setters).
++	}, [
++		mediaUrl,
++		__unstableMarkNextChangeAsNotPersistent,
++		setAttributes,
++		setOverlayColor,
++		useFeaturedImage,
++	] );
+ 
+ 	// instead of destructuring the attributes
+ 	// we define the url and background type
+@@ -703,6 +710,7 @@ function CoverEdit( {
+ 						style={ mediaStyle }
+ 					>
+ 						<SandBox
++							allowSameOrigin
+ 							html={ embedHtml }
+ 							title="Background video"
+ 							styles={ [
+diff --git a/packages/block-library/src/embed/embed-preview.js b/packages/block-library/src/embed/embed-preview.js
+index c0c7d5942d1d78..4acad2c365fade 100644
+--- a/packages/block-library/src/embed/embed-preview.js
++++ b/packages/block-library/src/embed/embed-preview.js
+@@ -1,8 +1,3 @@
+-/**
+- * Internal dependencies
+- */
+-import { getPhotoHtml } from './util';
+-
+ /**
+  * External dependencies
+  */
+@@ -17,6 +12,11 @@ import { BlockIcon } from '@wordpress/block-editor';
+ import { useState } from '@wordpress/element';
+ import { getAuthority } from '@wordpress/url';
+ 
++/**
++ * Internal dependencies
++ */
++import { getPhotoHtml } from './util';
++
+ /**
+  * Internal dependencies
+  */
+@@ -75,6 +75,7 @@ export default function EmbedPreview( {
+ 		) : (
+ 			<div className="wp-block-embed__wrapper">
+ 				<SandBox
++					allowSameOrigin
+ 					html={ html }
+ 					scripts={ scripts }
+ 					title={ iframeTitle }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3bee0610472802..5eb8a2bf055eef 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ 
+ ### Enhancements
+ 
++-   `Sandbox`: Add `allowSameOrigin` prop to opt in to `allow-same-origin` on the iframe sandbox. The default is now `false`, removing same-origin access for user-controlled content like the Custom HTML block ([#77212](https://github.com/WordPress/gutenberg/pull/77212)).
+ -   `FormToggle`: Update disabled styles [#77208](https://github.com/WordPress/gutenberg/pull/77208).
+ -   `RadioControl`: Add support for disabled radio group [#77127](https://github.com/WordPress/gutenberg/pull/77127).
+ -   `AlignmentMatrixControl`, `Button`, `Calendar`, `CheckboxControl`, `CircularOptionPicker`, `ColorPalette`, `DropdownMenu`, `FormToggle`, `FormTokenField`, `RadioControl`, `Snackbar`, `TabPanel`, `ToggleControl`: Use `--wpds-cursor-control` for interactive cursor styling ([#76786](https://github.com/WordPress/gutenberg/pull/76786)).
+diff --git a/packages/components/src/sandbox/index.tsx b/packages/components/src/sandbox/index.tsx
+index 1cc4652a70a6c6..b5b2f55753098f 100644
+--- a/packages/components/src/sandbox/index.tsx
++++ b/packages/components/src/sandbox/index.tsx
+@@ -6,6 +6,7 @@ import {
+ 	useRef,
+ 	useState,
+ 	useEffect,
++	useMemo,
+ } from '@wordpress/element';
+ import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
+ 
+@@ -14,6 +15,8 @@ import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
+  */
+ import type { SandBoxProps } from './types';
+ 
++type SandBoxContentProps = Omit< SandBoxProps, 'allowSameOrigin' >;
++
+ const observeAndResizeJS = function () {
+ 	const { MutationObserver } = window;
+ 
+@@ -115,17 +118,176 @@ const style = `
+ `;
+ 
+ /**
+- * This component provides an isolated environment for arbitrary HTML via iframes.
++ * Builds the full HTML document string for the sandbox iframe content.
++ */
++function buildSandBoxDocument( {
++	html,
++	title,
++	type,
++	styles,
++	scripts,
++}: {
++	html: string;
++	title: string;
++	type?: string;
++	styles: string[];
++	scripts: string[];
++} ): string {
++	const htmlDoc = (
++		<html lang={ document.documentElement.lang } className={ type }>
++			<head>
++				<title>{ title }</title>
++				<style dangerouslySetInnerHTML={ { __html: style } } />
++				{ styles.map( ( rules, i ) => (
++					<style
++						key={ i }
++						dangerouslySetInnerHTML={ { __html: rules } }
++					/>
++				) ) }
++			</head>
++			<body
++				data-resizable-iframe-connected="data-resizable-iframe-connected"
++				className={ type }
++			>
++				<div dangerouslySetInnerHTML={ { __html: html } } />
++				<script
++					type="text/javascript"
++					dangerouslySetInnerHTML={ {
++						__html: `(${ observeAndResizeJS.toString() })();`,
++					} }
++				/>
++				{ scripts.map( ( src ) => (
++					<script key={ src } src={ src } />
++				) ) }
++			</body>
++		</html>
++	);
++
++	return '<!DOCTYPE html>' + renderToString( htmlDoc );
++}
++
++/**
++ * Isolated sandbox that uses the `srcdoc` attribute to render content
++ * without `allow-same-origin`. This is the default for user-controlled
++ * content (e.g., the HTML block) where same-origin access would be a
++ * security risk.
+  *
+- * ```jsx
+- * import { SandBox } from '@wordpress/components';
++ * Because `srcdoc` is a declarative attribute, the browser automatically
++ * re-renders the content when the iframe is moved in the DOM (e.g.,
++ * block reordering), so no `load` event listener is needed.
++ * The `message` listener is re-synced on every `load` so
++ * it follows the iframe if it's reparented into a different document.
++ */
++function IsolatedSandBox( {
++	html = '',
++	title = '',
++	type,
++	styles = [],
++	scripts = [],
++	onFocus,
++	tabIndex,
++}: SandBoxContentProps ) {
++	const ref = useRef< HTMLIFrameElement >( null );
++	const [ width, setWidth ] = useState( 0 );
++	const [ height, setHeight ] = useState( 0 );
++
++	const srcDoc = useMemo(
++		() => buildSandBoxDocument( { html, title, type, styles, scripts } ),
++		[ html, title, type, styles, scripts ]
++	);
++
++	useEffect( () => {
++		const iframe = ref.current;
++		if ( ! iframe ) {
++			return;
++		}
++
++		function checkMessageForResize( event: MessageEvent ) {
++			// Verify that the mounted element is the source of the message.
++			// iframe.contentWindow is accessible cross-origin as a
++			// WindowProxy reference, so this check still works without
++			// allow-same-origin.
++			if ( ! iframe || iframe.contentWindow !== event.source ) {
++				return;
++			}
++
++			// Attempt to parse the message data as JSON if passed as string.
++			let data = event.data || {};
++
++			if ( 'string' === typeof data ) {
++				try {
++					data = JSON.parse( data );
++				} catch {}
++			}
++
++			// Update the state only if the message is formatted as we expect,
++			// i.e. as an object with a 'resize' action.
++			if ( 'resize' !== data.action ) {
++				return;
++			}
++
++			setWidth( data.width );
++			setHeight( data.height );
++		}
++
++		let currentView: Window | null = null;
++		function syncListener() {
++			const view = iframe?.ownerDocument?.defaultView ?? null;
++			if ( view === currentView ) {
++				return;
++			}
++
++			currentView?.removeEventListener(
++				'message',
++				checkMessageForResize
++			);
++
++			currentView = view;
++			currentView?.addEventListener( 'message', checkMessageForResize );
++		}
++
++		syncListener();
++		iframe.addEventListener( 'load', syncListener );
++
++		return () => {
++			iframe.removeEventListener( 'load', syncListener );
++			currentView?.removeEventListener(
++				'message',
++				checkMessageForResize
++			);
++		};
++	}, [] );
++
++	return (
++		<iframe
++			ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
++			title={ title }
++			tabIndex={ tabIndex }
++			className="components-sandbox"
++			sandbox="allow-scripts allow-presentation"
++			srcDoc={ srcDoc }
++			onFocus={ onFocus }
++			width={ Math.ceil( width ) }
++			height={ Math.ceil( height ) }
++		/>
++	);
++}
++
++/**
++ * Same-origin sandbox that writes to `contentDocument` directly. This
++ * preserves the parent page's URL as the iframe's document URL, which
++ * provides a valid Referer header for nested iframes (required by
++ * providers like YouTube).
+  *
+- * const MySandBox = () => (
+- * 	<SandBox html="<p>Content</p>" title="SandBox" type="embed" />
+- * );
+- * ```
++ * Only used when `allowSameOrigin` is true — i.e., for server-fetched
++ * oEmbed previews that are not directly user-controlled.
++ *
++ * This implementation is intentionally kept close to the original
++ * pre-refactor code to preserve past bugfixes:
++ * - load listener for iframe re-initialization after DOM moves (#21916)
++ * - forceRerender guard to avoid unnecessary full rewrites (#20176)
+  */
+-function SandBox( {
++function SameOriginSandBox( {
+ 	html = '',
+ 	title = '',
+ 	type,
+@@ -133,7 +295,7 @@ function SandBox( {
+ 	scripts = [],
+ 	onFocus,
+ 	tabIndex,
+-}: SandBoxProps ) {
++}: SandBoxContentProps ) {
+ 	const ref = useRef< HTMLIFrameElement >( null );
+ 	const [ width, setWidth ] = useState( 0 );
+ 	const [ height, setHeight ] = useState( 0 );
+@@ -292,4 +454,22 @@ function SandBox( {
+ 	);
+ }
+ 
++/**
++ * This component provides an isolated environment for arbitrary HTML via iframes.
++ *
++ * ```jsx
++ * import { SandBox } from '@wordpress/components';
++ *
++ * const MySandBox = () => (
++ * 	<SandBox html="<p>Content</p>" title="SandBox" type="embed" />
++ * );
++ * ```
++ */
++function SandBox( { allowSameOrigin = false, ...contentProps }: SandBoxProps ) {
++	if ( allowSameOrigin ) {
++		return <SameOriginSandBox { ...contentProps } />;
++	}
++	return <IsolatedSandBox { ...contentProps } />;
++}
++
+ export default SandBox;
+diff --git a/packages/components/src/sandbox/test/index.tsx b/packages/components/src/sandbox/test/index.tsx
+index e1a51814ecab61..70af01fd094f2a 100644
+--- a/packages/components/src/sandbox/test/index.tsx
++++ b/packages/components/src/sandbox/test/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { fireEvent, render, screen, within } from '@testing-library/react';
++import { fireEvent, render, screen } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,10 +16,7 @@ import SandBox from '..';
+ describe( 'SandBox', () => {
+ 	const TestWrapper = () => {
+ 		const [ html, setHtml ] = useState(
+-			// MutationObserver implementation from JSDom does not work as intended
+-			// with iframes so we need to ignore it for the time being.
+-			'<script type="text/javascript">window.MutationObserver = null;</script>' +
+-				'<iframe title="Mock Iframe" src="https://super.embed"></iframe>'
++			'<iframe title="Mock Iframe" src="https://super.embed"></iframe>'
+ 		);
+ 
+ 		const updateHtml = () => {
+@@ -38,34 +35,78 @@ describe( 'SandBox', () => {
+ 		);
+ 	};
+ 
+-	it( 'should rerender with new emdeded content if html prop changes', () => {
++	it( 'should not include allow-same-origin by default', () => {
++		render( <SandBox html="<p>Hello</p>" title="Test" /> );
++
++		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Test' );
++
++		expect( iframe ).toHaveAttribute(
++			'sandbox',
++			'allow-scripts allow-presentation'
++		);
++		expect( iframe.getAttribute( 'sandbox' ) ).not.toContain(
++			'allow-same-origin'
++		);
++	} );
++
++	it( 'should set srcdoc with the provided html content', () => {
++		render( <SandBox html="<p>Hello</p>" title="Test Title" /> );
++
++		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Test Title' );
++		const srcDoc = iframe.getAttribute( 'srcdoc' ) ?? '';
++
++		expect( srcDoc ).toContain( '<p>Hello</p>' );
++		expect( srcDoc ).toContain( '<title>Test Title</title>' );
++	} );
++
++	it( 'should include custom styles in srcdoc', () => {
++		render(
++			<SandBox
++				html="<p>Styled</p>"
++				title="Styled Test"
++				styles={ [ '.custom { color: red; }' ] }
++			/>
++		);
++
++		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Styled Test' );
++		const srcDoc = iframe.getAttribute( 'srcdoc' ) ?? '';
++
++		expect( srcDoc ).toContain( '.custom { color: red; }' );
++	} );
++
++	it( 'should include script tags in srcdoc', () => {
++		render(
++			<SandBox
++				html="<p>Script</p>"
++				title="Script Test"
++				scripts={ [ 'https://example.com/embed.js' ] }
++			/>
++		);
++
++		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Script Test' );
++		const srcDoc = iframe.getAttribute( 'srcdoc' ) ?? '';
++
++		expect( srcDoc ).toContain(
++			'<script src="https://example.com/embed.js">'
++		);
++	} );
++
++	it( 'should update srcdoc when html prop changes', () => {
+ 		render( <TestWrapper /> );
+ 
+ 		const iframe =
+ 			screen.getByTitle< HTMLIFrameElement >( 'SandBox Title' );
+ 
+-		if ( ! iframe.contentWindow ) {
+-			throw new Error();
+-		}
+-
+-		let sandboxedIframe = within(
+-			iframe.contentWindow.document.body
+-		).getByTitle( 'Mock Iframe' );
+-
+-		expect( sandboxedIframe ).toHaveAttribute(
+-			'src',
+-			'https://super.embed'
++		expect( iframe ).toHaveAttribute(
++			'srcdoc',
++			expect.stringContaining( 'https://super.embed' )
+ 		);
+ 
+ 		fireEvent.click( screen.getByRole( 'button' ) );
+ 
+-		sandboxedIframe = within(
+-			iframe.contentWindow.document.body
+-		).getByTitle( 'Mock Iframe' );
+-
+-		expect( sandboxedIframe ).toHaveAttribute(
+-			'src',
+-			'https://another.super.embed'
++		expect( iframe ).toHaveAttribute(
++			'srcdoc',
++			expect.stringContaining( 'https://another.super.embed' )
+ 		);
+ 	} );
+ } );
+diff --git a/packages/components/src/sandbox/types.ts b/packages/components/src/sandbox/types.ts
+index 76f98da45c8c63..416937b296724b 100644
+--- a/packages/components/src/sandbox/types.ts
++++ b/packages/components/src/sandbox/types.ts
+@@ -1,4 +1,15 @@
+ export type SandBoxProps = {
++	/**
++	 * Whether to include `allow-same-origin` in the iframe's sandbox
++	 * attribute. When true, nested iframes (such as third-party embeds)
++	 * can access their own origin's cookies and storage.
++	 *
++	 * Only enable this for content that is NOT directly user-controlled,
++	 * such as server-fetched oEmbed previews.
++	 *
++	 * @default false
++	 */
++	allowSameOrigin?: boolean;
+ 	/**
+ 	 * The HTML to render in the body of the iframe document.
+ 	 *

@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/form-token-field/index.js b/packages/components/src/form-token-field/index.js
+index bdb8871f0a5aa3..97358ad853ced8 100644
+--- a/packages/components/src/form-token-field/index.js
++++ b/packages/components/src/form-token-field/index.js
+@@ -599,6 +599,7 @@ class FormTokenField extends Component {
+ 						/>
+ 					) }
+ 				</div>
++				{ this.props.children }
+ 				<p id={ `components-form-token-suggestions-howto-${ instanceId }` } className="components-form-token-field__help">
+ 					{ this.props.tokenizeOnSpace ?
+ 						__( 'Separate with commas, spaces, or the Enter key.' ) :

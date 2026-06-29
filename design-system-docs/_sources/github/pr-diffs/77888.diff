@@ -1,0 +1,189 @@
+diff --git a/packages/grid/README.md b/packages/grid/README.md
+index ac1ede4745f5fe..375f69601bec1c 100644
+--- a/packages/grid/README.md
++++ b/packages/grid/README.md
+@@ -110,7 +110,7 @@ interface DashboardGridLayoutItem {
+ | `editMode` | `boolean` | `false` | Enables drag-to-reorder and resize handles. |
+ | `onChangeLayout` | `( layout ) => void` | — | Fired when the user commits a drag or resize. |
+ | `onPreviewLayout` | `( layout ) => void` | — | Fired continuously during a drag or resize with the in-progress layout. Use for live feedback; `onChangeLayout` still emits the committed result. |
+-| `renderResizeHandle` | `( props ) => ReactNode` | — | Override the default corner-triangle resize handle with a custom element. Receives gesture wiring (`ref`, `listeners`, `attributes`) plus `disabled`, `verticalResizable`, and `itemId`. The grid keeps ownership of the `<DndContext>` and the throttled delta loop. |
++| `renderResizeHandle` | `ComponentType< ResizeHandleRenderProps >` | — | Override the default corner-triangle resize handle with a custom component. Receives gesture wiring (`ref`, `listeners`, `attributes`) plus `verticalResizable`, `isResizing`, and `itemId`. The grid keeps ownership of the `<DndContext>` and the throttled delta loop. |
+ | `className` | `string` | — | Extra class on the grid root. |
+ 
+ `DashboardGrid` forwards refs to its root `<div>`, and standard `<div>`
+@@ -211,9 +211,9 @@ Resize handles are currently pointer-only.
+ 
+ The default handle is a small corner triangle on the bottom-right of
+ each tile. To swap it for a custom element (icon, button, branded
+-shape…), pass `renderResizeHandle`. The grid still owns the gesture
+-— `<DndContext>`, throttled delta loop, step-to-grid logic — and
+-passes the wiring to your render prop. Spread `listeners` and
++shape…), pass a component to `renderResizeHandle`. The grid still
++owns the gesture — `<DndContext>`, throttled delta loop, step-to-grid
++logic — and passes the wiring as props. Spread `listeners` and
+ `attributes` and assign `ref` on the element that should receive
+ pointer events.
+ 
+@@ -221,15 +221,13 @@ pointer events.
+ import { Icon } from '@wordpress/ui';
+ import { resizeCornerNE } from '@wordpress/icons';
+ 
+-<DashboardGrid
+-	layout={ layout }
+-	editMode
+-	renderResizeHandle={ ( {
+-		ref,
+-		listeners,
+-		attributes,
+-		verticalResizable,
+-	} ) => (
++function CustomResizeHandle( {
++	ref,
++	listeners,
++	attributes,
++	verticalResizable,
++} ) {
++	return (
+ 		<div
+ 			ref={ ref }
+ 			{ ...listeners }
+@@ -243,16 +241,22 @@ import { resizeCornerNE } from '@wordpress/icons';
+ 		>
+ 			<Icon icon={ resizeCornerNE } size={ 16 } />
+ 		</div>
+-	) }
++	);
++}
++
++<DashboardGrid
++	layout={ layout }
++	editMode
++	renderResizeHandle={ CustomResizeHandle }
+ >
+ 	{ tiles }
+ </DashboardGrid>;
+ ```
+ 
+-The render prop receives:
++The component receives:
+ 
+-| Field | Type | Description |
+-|-------|------|-------------|
++| Prop | Type | Description |
++|------|------|-------------|
+ | `ref` | `( node ) => void` | dnd-kit ref; assign on the gesture-bearing element. |
+ | `listeners` | `SyntheticListenerMap \| undefined` | Pointer/keyboard listeners; spread on the same element. |
+ | `attributes` | `DraggableAttributes` | Accessibility/dnd-kit attributes; spread alongside `listeners`. |
+@@ -261,7 +265,7 @@ The render prop receives:
+ | `itemId` | `string` | Owning tile's `key`. |
+ 
+ The handle is only mounted while the grid is in edit mode (`editMode={ true }`),
+-so the consumer's render prop never has to short-circuit on a disabled state.
++so the custom component never has to short-circuit on a disabled state.
+ 
+ ## Contributing to this package
+ 
+diff --git a/packages/grid/src/resize-handle.tsx b/packages/grid/src/resize-handle.tsx
+index 5591bb918e4d92..795f1185f59d99 100644
+--- a/packages/grid/src/resize-handle.tsx
++++ b/packages/grid/src/resize-handle.tsx
+@@ -52,14 +52,17 @@ function ResizeHandle( {
+ 	}, [ isDragging, verticalResizable ] );
+ 
+ 	if ( renderResizeHandle ) {
+-		return renderResizeHandle( {
+-			ref: mergedRef,
+-			listeners,
+-			attributes,
+-			verticalResizable,
+-			isResizing: isDragging,
+-			itemId,
+-		} );
++		const RenderResizeHandle = renderResizeHandle;
++		return (
++			<RenderResizeHandle
++				ref={ mergedRef }
++				listeners={ listeners }
++				attributes={ attributes }
++				verticalResizable={ verticalResizable }
++				isResizing={ isDragging }
++				itemId={ itemId }
++			/>
++		);
+ 	}
+ 
+ 	return (
+diff --git a/packages/grid/src/stories/index.story.tsx b/packages/grid/src/stories/index.story.tsx
+index 3750d7533be0cf..829650208befcf 100644
+--- a/packages/grid/src/stories/index.story.tsx
++++ b/packages/grid/src/stories/index.story.tsx
+@@ -766,9 +766,7 @@ export const CustomResizeHandleStory: Story = {
+ 				{ ...args }
+ 				layout={ layout }
+ 				onChangeLayout={ setLayout }
+-				renderResizeHandle={ ( props ) => (
+-					<CustomResizeHandle { ...props } />
+-				) }
++				renderResizeHandle={ CustomResizeHandle }
+ 			>
+ 				{ tiles }
+ 			</DashboardGrid>
+diff --git a/packages/grid/src/types.ts b/packages/grid/src/types.ts
+index d4df110019eb28..073887a739b90f 100644
+--- a/packages/grid/src/types.ts
++++ b/packages/grid/src/types.ts
+@@ -53,7 +53,7 @@ export type DashboardGridLayoutItem = {
+ };
+ 
+ /**
+- * Props passed to a `renderResizeHandle` callback. Spread `listeners`
++ * Props received by a custom resize handle component. Spread `listeners`
+  * and `attributes` onto the element that should respond to the gesture,
+  * and assign `ref` to the same element so dnd-kit can track it.
+  */
+@@ -124,13 +124,13 @@ export interface ResizeHandleProps {
+ 	onResizeEnd?: () => void;
+ 
+ 	/**
+-	 * Render prop to override the default corner triangle with a
++	 * Component that overrides the default corner triangle with a
+ 	 * custom element. Receives gesture wiring (`ref`, `listeners`,
+ 	 * `attributes`) plus context. The grid keeps ownership of the
+ 	 * `<DndContext>` and the throttled delta loop; consumers are only
+ 	 * responsible for the visual.
+ 	 */
+-	renderResizeHandle?: ( props: ResizeHandleRenderProps ) => React.ReactNode;
++	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
+ }
+ 
+ /**
+@@ -199,10 +199,10 @@ export type GridItemProps = {
+ 	onResizeEnd: () => void;
+ 
+ 	/**
+-	 * Render prop forwarded to `<ResizeHandle />` to override the
+-	 * default corner triangle. See `DashboardGridProps.renderResizeHandle`.
++	 * Component forwarded to `<ResizeHandle />` to override the default
++	 * corner triangle. See `DashboardGridProps.renderResizeHandle`.
+ 	 */
+-	renderResizeHandle?: ( props: ResizeHandleRenderProps ) => React.ReactNode;
++	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
+ };
+ 
+ /**
+@@ -279,13 +279,13 @@ interface BaseDashboardGridProps
+ 
+ 	/**
+ 	 * Override the default corner-triangle resize handle with a custom
+-	 * element. The grid still owns the gesture (dnd-kit `<DndContext>`,
++	 * component. The grid still owns the gesture (dnd-kit `<DndContext>`,
+ 	 * throttled delta loop) and passes the wiring to the consumer:
+ 	 * spread `listeners` and `attributes` and assign `ref` on the
+ 	 * element that should receive the gesture. Use `disabled` and
+ 	 * `verticalResizable` to adapt the visual to context.
+ 	 */
+-	renderResizeHandle?: ( props: ResizeHandleRenderProps ) => React.ReactNode;
++	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
+ }
+ 
+ interface FixedDashboardGridProps extends BaseDashboardGridProps {

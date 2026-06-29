@@ -1,0 +1,215 @@
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index 14c40bdeebd860..7e6ac027cc8c8f 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -144,12 +144,15 @@ $z-layers: (
+ 	// Make sure block manager sticky category titles appear above the options
+ 	".edit-post-manage-blocks-modal__category-title": 1,
+ 
++	// Needs to be higher than any other element as this is an overlay to catch all events
++	".components-tooltip .event-catcher": 100002,
++
+ 	// Needs to appear bellow other color circular picker related UI elements.
+ 	".components-circular-option-picker__option-wrapper::before": -1,
+ 
+ 	".components-circular-option-picker__option.is-pressed": 1,
+ 	// Needs to be higher than .components-circular-option-picker__option.is-pressed.
+-	".components-circular-option-picker__option.is-pressed + svg": 2
++	".components-circular-option-picker__option.is-pressed + svg": 2,
+ );
+ 
+ @function z-index( $key ) {
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index adcebdab9dcd9c..294b0df6e93772 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -28,6 +28,53 @@ import { useDebounce } from '@wordpress/compose';
+  */
+ export const TOOLTIP_DELAY = 700;
+ 
++const eventCatcher = <div className="event-catcher" />;
++
++const getDisabledElement = ( { eventHandlers, child, childrenWithPopover } ) =>
++	cloneElement(
++		<span className="disabled-element-wrapper">
++			{ cloneElement( eventCatcher, eventHandlers ) }
++			{ cloneElement( child, {
++				children: childrenWithPopover,
++			} ) }
++			,
++		</span>,
++		eventHandlers
++	);
++
++const getRegularElement = ( { child, eventHandlers, childrenWithPopover } ) =>
++	cloneElement( child, {
++		...eventHandlers,
++		children: childrenWithPopover,
++	} );
++
++const addPopoverToGrandchildren = ( {
++	grandchildren,
++	isOver,
++	position,
++	text,
++	shortcut,
++} ) =>
++	concatChildren(
++		grandchildren,
++		isOver && (
++			<Popover
++				focusOnMount={ false }
++				position={ position }
++				className="components-tooltip"
++				aria-hidden="true"
++				animate={ false }
++				noArrow={ true }
++			>
++				{ text }
++				<Shortcut
++					className="components-tooltip__shortcut"
++					shortcut={ shortcut }
++				/>
++			</Popover>
++		)
++	);
++
+ const emitToChild = ( children, eventName, event ) => {
+ 	if ( Children.count( children ) !== 1 ) {
+ 		return;
+@@ -136,33 +183,36 @@ function Tooltip( { children, position, text, shortcut } ) {
+ 		return children;
+ 	}
+ 
+-	const child = Children.only( children );
+-	return cloneElement( child, {
++	const eventHandlers = {
+ 		onMouseEnter: createToggleIsOver( 'onMouseEnter', true ),
+ 		onMouseLeave: createToggleIsOver( 'onMouseLeave' ),
+ 		onClick: createToggleIsOver( 'onClick' ),
+ 		onFocus: createToggleIsOver( 'onFocus' ),
+ 		onBlur: createToggleIsOver( 'onBlur' ),
+ 		onMouseDown: createMouseEvent( 'mouseDown' ),
+-		children: concatChildren(
+-			child.props.children,
+-			isOver && (
+-				<Popover
+-					focusOnMount={ false }
+-					position={ position }
+-					className="components-tooltip"
+-					aria-hidden="true"
+-					animate={ false }
+-					noArrow={ true }
+-				>
+-					{ text }
+-					<Shortcut
+-						className="components-tooltip__shortcut"
+-						shortcut={ shortcut }
+-					/>
+-				</Popover>
+-			)
+-		),
++	};
++
++	const child = Children.only( children );
++	const { children: grandchildren, disabled } = child.props;
++	const getElementWithPopover = disabled
++		? getDisabledElement
++		: getRegularElement;
++
++	const popoverData = {
++		isOver,
++		position,
++		text,
++		shortcut,
++	};
++	const childrenWithPopover = addPopoverToGrandchildren( {
++		grandchildren,
++		...popoverData,
++	} );
++
++	return getElementWithPopover( {
++		child,
++		eventHandlers,
++		childrenWithPopover,
+ 	} );
+ }
+ 
+diff --git a/packages/components/src/tooltip/style.scss b/packages/components/src/tooltip/style.scss
+index a7f4b09a1ffa74..df3cfbcf4826a8 100644
+--- a/packages/components/src/tooltip/style.scss
++++ b/packages/components/src/tooltip/style.scss
+@@ -26,3 +26,17 @@
+ 	display: inline-block;
+ 	margin-left: $grid-unit-10;
+ }
++
++.disabled-element-wrapper {
++	position: relative;
++	.event-catcher {
++		z-index: z-index(".components-tooltip .event-catcher");
++		position: absolute;
++		width: 100%;
++		height: 100%;
++		top: 0;
++		left: 0;
++		bottom: 0;
++		right: 0;
++	}
++}
+diff --git a/packages/components/src/tooltip/test/index.js b/packages/components/src/tooltip/test/index.js
+index 919dc70e3b9b30..aebf7466220897 100644
+--- a/packages/components/src/tooltip/test/index.js
++++ b/packages/components/src/tooltip/test/index.js
+@@ -152,33 +152,29 @@ describe( 'Tooltip', () => {
+ 			}, TOOLTIP_DELAY );
+ 		} );
+ 
+-		it( 'should ignore mouseenter on disabled elements', () => {
+-			// Mount: Issues with using `setState` asynchronously with shallow-
+-			// rendered components: https://github.com/airbnb/enzyme/issues/450
+-			const originalMouseEnter = jest.fn();
++		it( 'should show tooltip when an element is disabled', () => {
+ 			const wrapper = mount(
+-				<Tooltip text="Help text">
+-					<button
+-						onMouseEnter={ originalMouseEnter }
+-						onFocus={ originalMouseEnter }
+-						disabled
+-					>
+-						<span>Hover Me!</span>
+-					</button>
++				<Tooltip text="Show helpful text here">
++					<button disabled>Click me</button>
+ 				</Tooltip>
+ 			);
+-
+-			wrapper.find( 'button' ).simulate( 'mouseenter', {
+-				// Enzyme does not accurately emulate event targets
+-				// See: https://github.com/airbnb/enzyme/issues/218
+-				currentTarget: wrapper.find( 'button' ).getDOMNode(),
+-				target: wrapper.find( 'button > span' ).getDOMNode(),
++			const button = wrapper.find( 'button[disabled]' );
++			const buttonNode = button.at( 0 ).getDOMNode();
++			const buttonRect = buttonNode.getBoundingClientRect();
++			const eventCatcher = wrapper.find( '.event-catcher' );
++			const eventCatcherNode = eventCatcher.at( 0 ).getDOMNode();
++			const eventCatcherRect = eventCatcherNode.getBoundingClientRect();
++			expect( buttonRect ).toEqual( eventCatcherRect );
++
++			eventCatcher.simulate( 'mouseenter', {
++				type: 'mouseenter',
++				currentTarget: {},
+ 			} );
+ 
+-			expect( originalMouseEnter ).not.toHaveBeenCalled();
+-
+-			const popover = wrapper.find( 'Popover' );
+-			expect( popover ).toHaveLength( 0 );
++			setTimeout( () => {
++				const popover = wrapper.find( 'Popover' );
++				expect( popover ).toHaveLength( 1 );
++			}, TOOLTIP_DELAY );
+ 		} );
+ 
+ 		it( 'should cancel pending setIsOver on mouseleave', () => {

@@ -1,0 +1,925 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4de0d44e82a248..ef02774ca7b78d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Internal
+ 
++-   `ComboboxControl`: Convert to TypeScript ([#47581](https://github.com/WordPress/gutenberg/pull/47581)).
+ -   `Panel`, `PanelHeader`, `PanelRow`: Convert to TypeScript ([#47259](https://github.com/WordPress/gutenberg/pull/47259)).
+ -   `BoxControl`: Convert to TypeScript ([#47622](https://github.com/WordPress/gutenberg/pull/47622)).
+ -   `AnglePickerControl`: Convert to TypeScript ([#45820](https://github.com/WordPress/gutenberg/pull/45820)).
+diff --git a/packages/components/src/combobox-control/README.md b/packages/components/src/combobox-control/README.md
+index f6e81d2cff3513..86b760e694a9aa 100644
+--- a/packages/components/src/combobox-control/README.md
++++ b/packages/components/src/combobox-control/README.md
+@@ -17,9 +17,6 @@ These are the same as [the ones for `SelectControl`s](/packages/components/src/s
+ ### Usage
+ 
+ ```jsx
+-/**
+- * WordPress dependencies
+- */
+ import { ComboboxControl } from '@wordpress/components';
+ import { useState } from '@wordpress/element';
+ 
+@@ -36,10 +33,6 @@ const options = [
+ 		value: 'large',
+ 		label: 'Large',
+ 	},
+-	{
+-		value: 'huge',
+-		label: 'Huge',
+-	},
+ ];
+ 
+ function MyComboboxControl() {
+@@ -92,35 +85,35 @@ If this property is added, a help text will be generated using help property as
+ 
+ The options that can be chosen from.
+ 
+--   Type: `Array<{ value: String, label: String }>`
++-   Type: `Array<{ value: string, label: string }>`
+ -   Required: Yes
+ 
+ #### onFilterValueChange
+ 
+-Function called with the control's search input value changes. The argument contains the next input value.
++Function called when the control's search input value changes. The argument contains the next input value.
+ 
+--   Type: `Function`
++-   Type: `( value: string ) => void`
+ -   Required: No
+ 
+ #### onChange
+ 
+ Function called with the selected value changes.
+ 
+--   Type: `Function`
++-   Type: `( value: string | null | undefined ) => void`
+ -   Required: No
+ 
+ #### value
+ 
+-The current value of the input.
++The current value of the control.
+ 
+--   Type: `mixed`
+--   Required: Yes
++-   Type: `string | null`
++-   Required: No
+ 
+ #### __experimentalRenderItem
+ 
+ Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
+ 
+--   Type: `Function` - `( args: { item: object } ) => ReactNode`
++-   Type: `( args: { item: object } ) => ReactNode`
+ -   Required: No
+ 
+ ## Related components
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.tsx
+similarity index 72%
+rename from packages/components/src/combobox-control/index.js
+rename to packages/components/src/combobox-control/index.tsx
+index f01eb7dd4cac2a..07bc89a5df482b 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -30,25 +30,83 @@ import { FlexBlock, FlexItem } from '../flex';
+ import withFocusOutside from '../higher-order/with-focus-outside';
+ import { useControlledValue } from '../utils/hooks';
+ import { normalizeTextString } from '../utils/strings';
++import type { ComboboxControlOption, ComboboxControlProps } from './types';
++import type { TokenInputProps } from '../form-token-field/types';
+ 
+ const noop = () => {};
+ 
+ const DetectOutside = withFocusOutside(
+ 	class extends Component {
++		// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
+ 		handleFocusOutside( event ) {
++			// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
+ 			this.props.onFocusOutside( event );
+ 		}
+ 
+ 		render() {
++			// @ts-expect-error - TODO: Should be resolved when `withFocusOutside` is refactored to TypeScript
+ 			return this.props.children;
+ 		}
+ 	}
+ );
+ 
++const getIndexOfMatchingSuggestion = (
++	selectedSuggestion: ComboboxControlOption | null,
++	matchingSuggestions: ComboboxControlOption[]
++) =>
++	selectedSuggestion === null
++		? -1
++		: matchingSuggestions.indexOf( selectedSuggestion );
++
++/**
++ * `ComboboxControl` is an enhanced version of a [`SelectControl`](../select-control/README.md) with the addition of
++ * being able to search for options using a search input.
++ *
++ * ```jsx
++ * import { ComboboxControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const options = [
++ * 	{
++ * 		value: 'small',
++ * 		label: 'Small',
++ * 	},
++ * 	{
++ * 		value: 'normal',
++ * 		label: 'Normal',
++ * 	},
++ * 	{
++ * 		value: 'large',
++ * 		label: 'Large',
++ * 	},
++ * ];
++ *
++ * function MyComboboxControl() {
++ * 	const [ fontSize, setFontSize ] = useState();
++ * 	const [ filteredOptions, setFilteredOptions ] = useState( options );
++ * 	return (
++ * 		<ComboboxControl
++ * 			label="Font Size"
++ * 			value={ fontSize }
++ * 			onChange={ setFontSize }
++ * 			options={ filteredOptions }
++ * 			onFilterValueChange={ ( inputValue ) =>
++ * 				setFilteredOptions(
++ * 					options.filter( ( option ) =>
++ * 						option.label
++ * 							.toLowerCase()
++ * 							.startsWith( inputValue.toLowerCase() )
++ * 					)
++ * 				)
++ * 			}
++ * 		/>
++ * 	);
++ * }
++ * ```
++ */
+ function ComboboxControl( {
+-	/** Start opting into the new margin-free styles that will become the default in a future version. */
+ 	__nextHasNoMarginBottom = false,
+-	__next36pxDefaultSize,
++	__next36pxDefaultSize = false,
+ 	value: valueProp,
+ 	label,
+ 	options,
+@@ -62,7 +120,7 @@ function ComboboxControl( {
+ 		selected: __( 'Item selected.' ),
+ 	},
+ 	__experimentalRenderItem,
+-} ) {
++}: ComboboxControlProps ) {
+ 	const [ value, setValue ] = useControlledValue( {
+ 		value: valueProp,
+ 		onChange: onChangeProp,
+@@ -80,11 +138,11 @@ function ComboboxControl( {
+ 	const [ isExpanded, setIsExpanded ] = useState( false );
+ 	const [ inputHasFocus, setInputHasFocus ] = useState( false );
+ 	const [ inputValue, setInputValue ] = useState( '' );
+-	const inputContainer = useRef();
++	const inputContainer = useRef< HTMLInputElement >( null );
+ 
+ 	const matchingSuggestions = useMemo( () => {
+-		const startsWithMatch = [];
+-		const containsMatch = [];
++		const startsWithMatch: ComboboxControlOption[] = [];
++		const containsMatch: ComboboxControlOption[] = [];
+ 		const match = normalizeTextString( inputValue );
+ 		options.forEach( ( option ) => {
+ 			const index = normalizeTextString( option.label ).indexOf( match );
+@@ -98,7 +156,9 @@ function ComboboxControl( {
+ 		return startsWithMatch.concat( containsMatch );
+ 	}, [ inputValue, options ] );
+ 
+-	const onSuggestionSelected = ( newSelectedSuggestion ) => {
++	const onSuggestionSelected = (
++		newSelectedSuggestion: ComboboxControlOption
++	) => {
+ 		setValue( newSelectedSuggestion.value );
+ 		speak( messages.selected, 'assertive' );
+ 		setSelectedSuggestion( newSelectedSuggestion );
+@@ -107,7 +167,10 @@ function ComboboxControl( {
+ 	};
+ 
+ 	const handleArrowNavigation = ( offset = 1 ) => {
+-		const index = matchingSuggestions.indexOf( selectedSuggestion );
++		const index = getIndexOfMatchingSuggestion(
++			selectedSuggestion,
++			matchingSuggestions
++		);
+ 		let nextIndex = index + offset;
+ 		if ( nextIndex < 0 ) {
+ 			nextIndex = matchingSuggestions.length - 1;
+@@ -118,7 +181,9 @@ function ComboboxControl( {
+ 		setIsExpanded( true );
+ 	};
+ 
+-	const onKeyDown = ( event ) => {
++	const onKeyDown: React.KeyboardEventHandler< HTMLDivElement > = (
++		event
++	) => {
+ 		let preventDefault = false;
+ 
+ 		if (
+@@ -177,7 +242,7 @@ function ComboboxControl( {
+ 		setIsExpanded( false );
+ 	};
+ 
+-	const onInputChange = ( event ) => {
++	const onInputChange: TokenInputProps[ 'onChange' ] = ( event ) => {
+ 		const text = event.value;
+ 		setInputValue( text );
+ 		onFilterValueChange( text );
+@@ -188,14 +253,17 @@ function ComboboxControl( {
+ 
+ 	const handleOnReset = () => {
+ 		setValue( null );
+-		inputContainer.current.focus();
++		inputContainer.current?.focus();
+ 	};
+ 
+ 	// Update current selections when the filter input changes.
+ 	useEffect( () => {
+ 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
+ 		const hasSelectedMatchingSuggestions =
+-			matchingSuggestions.indexOf( selectedSuggestion ) > 0;
++			getIndexOfMatchingSuggestion(
++				selectedSuggestion,
++				matchingSuggestions
++			) > 0;
+ 
+ 		if ( hasMatchingSuggestions && ! hasSelectedMatchingSuggestions ) {
+ 			// If the current selection isn't present in the list of suggestions, then automatically select the first item from the list of suggestions.
+@@ -235,7 +303,6 @@ function ComboboxControl( {
+ 					className,
+ 					'components-combobox-control'
+ 				) }
+-				tabIndex="-1"
+ 				label={ label }
+ 				id={ `components-form-token-input-${ instanceId }` }
+ 				hideLabelFromVision={ hideLabelFromVision }
+@@ -243,7 +310,7 @@ function ComboboxControl( {
+ 			>
+ 				<div
+ 					className="components-combobox-control__suggestions-container"
+-					tabIndex="-1"
++					tabIndex={ -1 }
+ 					onKeyDown={ onKeyDown }
+ 				>
+ 					<InputWrapperFlex
+@@ -258,8 +325,9 @@ function ComboboxControl( {
+ 								onFocus={ onFocus }
+ 								onBlur={ onBlur }
+ 								isExpanded={ isExpanded }
+-								selectedSuggestionIndex={ matchingSuggestions.indexOf(
+-									selectedSuggestion
++								selectedSuggestionIndex={ getIndexOfMatchingSuggestion(
++									selectedSuggestion,
++									matchingSuggestions
+ 								) }
+ 								onChange={ onInputChange }
+ 							/>
+@@ -279,13 +347,17 @@ function ComboboxControl( {
+ 					{ isExpanded && (
+ 						<SuggestionsList
+ 							instanceId={ instanceId }
+-							match={ { label: inputValue } }
++							// The empty string for `value` here is not actually used, but is
++							// just a quick way to satisfy the TypeScript requirements of SuggestionsList.
++							// See: https://github.com/WordPress/gutenberg/pull/47581/files#r1091089330
++							match={ { label: inputValue, value: '' } }
+ 							displayTransform={ ( suggestion ) =>
+ 								suggestion.label
+ 							}
+ 							suggestions={ matchingSuggestions }
+-							selectedIndex={ matchingSuggestions.indexOf(
+-								selectedSuggestion
++							selectedIndex={ getIndexOfMatchingSuggestion(
++								selectedSuggestion,
++								matchingSuggestions
+ 							) }
+ 							onHover={ setSelectedSuggestion }
+ 							onSelect={ onSuggestionSelected }
+diff --git a/packages/components/src/combobox-control/stories/index.js b/packages/components/src/combobox-control/stories/index.js
+deleted file mode 100644
+index fda098e19e364f..00000000000000
+--- a/packages/components/src/combobox-control/stories/index.js
++++ /dev/null
+@@ -1,339 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import ComboboxControl from '../';
+-
+-const countries = [
+-	{ name: 'Afghanistan', code: 'AF' },
+-	{ name: 'Åland Islands', code: 'AX' },
+-	{ name: 'Albania', code: 'AL' },
+-	{ name: 'Algeria', code: 'DZ' },
+-	{ name: 'American Samoa', code: 'AS' },
+-	{ name: 'Andorra', code: 'AD' },
+-	{ name: 'Angola', code: 'AO' },
+-	{ name: 'Anguilla', code: 'AI' },
+-	{ name: 'Antarctica', code: 'AQ' },
+-	{ name: 'Antigua and Barbuda', code: 'AG' },
+-	{ name: 'Argentina', code: 'AR' },
+-	{ name: 'Armenia', code: 'AM' },
+-	{ name: 'Aruba', code: 'AW' },
+-	{ name: 'Australia', code: 'AU' },
+-	{ name: 'Austria', code: 'AT' },
+-	{ name: 'Azerbaijan', code: 'AZ' },
+-	{ name: 'Bahamas', code: 'BS' },
+-	{ name: 'Bahrain', code: 'BH' },
+-	{ name: 'Bangladesh', code: 'BD' },
+-	{ name: 'Barbados', code: 'BB' },
+-	{ name: 'Belarus', code: 'BY' },
+-	{ name: 'Belgium', code: 'BE' },
+-	{ name: 'Belize', code: 'BZ' },
+-	{ name: 'Benin', code: 'BJ' },
+-	{ name: 'Bermuda', code: 'BM' },
+-	{ name: 'Bhutan', code: 'BT' },
+-	{ name: 'Bolivia', code: 'BO' },
+-	{ name: 'Bosnia and Herzegovina', code: 'BA' },
+-	{ name: 'Botswana', code: 'BW' },
+-	{ name: 'Bouvet Island', code: 'BV' },
+-	{ name: 'Brazil', code: 'BR' },
+-	{ name: 'British Indian Ocean Territory', code: 'IO' },
+-	{ name: 'Brunei Darussalam', code: 'BN' },
+-	{ name: 'Bulgaria', code: 'BG' },
+-	{ name: 'Burkina Faso', code: 'BF' },
+-	{ name: 'Burundi', code: 'BI' },
+-	{ name: 'Cambodia', code: 'KH' },
+-	{ name: 'Cameroon', code: 'CM' },
+-	{ name: 'Canada', code: 'CA' },
+-	{ name: 'Cape Verde', code: 'CV' },
+-	{ name: 'Cayman Islands', code: 'KY' },
+-	{ name: 'Central African Republic', code: 'CF' },
+-	{ name: 'Chad', code: 'TD' },
+-	{ name: 'Chile', code: 'CL' },
+-	{ name: 'China', code: 'CN' },
+-	{ name: 'Christmas Island', code: 'CX' },
+-	{ name: 'Cocos (Keeling) Islands', code: 'CC' },
+-	{ name: 'Colombia', code: 'CO' },
+-	{ name: 'Comoros', code: 'KM' },
+-	{ name: 'Congo', code: 'CG' },
+-	{ name: 'Congo, The Democratic Republic of the', code: 'CD' },
+-	{ name: 'Cook Islands', code: 'CK' },
+-	{ name: 'Costa Rica', code: 'CR' },
+-	{ name: "Cote D'Ivoire", code: 'CI' },
+-	{ name: 'Croatia', code: 'HR' },
+-	{ name: 'Cuba', code: 'CU' },
+-	{ name: 'Cyprus', code: 'CY' },
+-	{ name: 'Czech Republic', code: 'CZ' },
+-	{ name: 'Denmark', code: 'DK' },
+-	{ name: 'Djibouti', code: 'DJ' },
+-	{ name: 'Dominica', code: 'DM' },
+-	{ name: 'Dominican Republic', code: 'DO' },
+-	{ name: 'Ecuador', code: 'EC' },
+-	{ name: 'Egypt', code: 'EG' },
+-	{ name: 'El Salvador', code: 'SV' },
+-	{ name: 'Equatorial Guinea', code: 'GQ' },
+-	{ name: 'Eritrea', code: 'ER' },
+-	{ name: 'Estonia', code: 'EE' },
+-	{ name: 'Ethiopia', code: 'ET' },
+-	{ name: 'Falkland Islands (Malvinas)', code: 'FK' },
+-	{ name: 'Faroe Islands', code: 'FO' },
+-	{ name: 'Fiji', code: 'FJ' },
+-	{ name: 'Finland', code: 'FI' },
+-	{ name: 'France', code: 'FR' },
+-	{ name: 'French Guiana', code: 'GF' },
+-	{ name: 'French Polynesia', code: 'PF' },
+-	{ name: 'French Southern Territories', code: 'TF' },
+-	{ name: 'Gabon', code: 'GA' },
+-	{ name: 'Gambia', code: 'GM' },
+-	{ name: 'Georgia', code: 'GE' },
+-	{ name: 'Germany', code: 'DE' },
+-	{ name: 'Ghana', code: 'GH' },
+-	{ name: 'Gibraltar', code: 'GI' },
+-	{ name: 'Greece', code: 'GR' },
+-	{ name: 'Greenland', code: 'GL' },
+-	{ name: 'Grenada', code: 'GD' },
+-	{ name: 'Guadeloupe', code: 'GP' },
+-	{ name: 'Guam', code: 'GU' },
+-	{ name: 'Guatemala', code: 'GT' },
+-	{ name: 'Guernsey', code: 'GG' },
+-	{ name: 'Guinea', code: 'GN' },
+-	{ name: 'Guinea-Bissau', code: 'GW' },
+-	{ name: 'Guyana', code: 'GY' },
+-	{ name: 'Haiti', code: 'HT' },
+-	{ name: 'Heard Island and Mcdonald Islands', code: 'HM' },
+-	{ name: 'Holy See (Vatican City State)', code: 'VA' },
+-	{ name: 'Honduras', code: 'HN' },
+-	{ name: 'Hong Kong', code: 'HK' },
+-	{ name: 'Hungary', code: 'HU' },
+-	{ name: 'Iceland', code: 'IS' },
+-	{ name: 'India', code: 'IN' },
+-	{ name: 'Indonesia', code: 'ID' },
+-	{ name: 'Iran, Islamic Republic Of', code: 'IR' },
+-	{ name: 'Iraq', code: 'IQ' },
+-	{ name: 'Ireland', code: 'IE' },
+-	{ name: 'Isle of Man', code: 'IM' },
+-	{ name: 'Israel', code: 'IL' },
+-	{ name: 'Italy', code: 'IT' },
+-	{ name: 'Jamaica', code: 'JM' },
+-	{ name: 'Japan', code: 'JP' },
+-	{ name: 'Jersey', code: 'JE' },
+-	{ name: 'Jordan', code: 'JO' },
+-	{ name: 'Kazakhstan', code: 'KZ' },
+-	{ name: 'Kenya', code: 'KE' },
+-	{ name: 'Kiribati', code: 'KI' },
+-	{ name: "Korea, Democratic People'S Republic of", code: 'KP' },
+-	{ name: 'Korea, Republic of', code: 'KR' },
+-	{ name: 'Kuwait', code: 'KW' },
+-	{ name: 'Kyrgyzstan', code: 'KG' },
+-	{ name: "Lao People'S Democratic Republic", code: 'LA' },
+-	{ name: 'Latvia', code: 'LV' },
+-	{ name: 'Lebanon', code: 'LB' },
+-	{ name: 'Lesotho', code: 'LS' },
+-	{ name: 'Liberia', code: 'LR' },
+-	{ name: 'Libyan Arab Jamahiriya', code: 'LY' },
+-	{ name: 'Liechtenstein', code: 'LI' },
+-	{ name: 'Lithuania', code: 'LT' },
+-	{ name: 'Luxembourg', code: 'LU' },
+-	{ name: 'Macao', code: 'MO' },
+-	{ name: 'Macedonia, The Former Yugoslav Republic of', code: 'MK' },
+-	{ name: 'Madagascar', code: 'MG' },
+-	{ name: 'Malawi', code: 'MW' },
+-	{ name: 'Malaysia', code: 'MY' },
+-	{ name: 'Maldives', code: 'MV' },
+-	{ name: 'Mali', code: 'ML' },
+-	{ name: 'Malta', code: 'MT' },
+-	{ name: 'Marshall Islands', code: 'MH' },
+-	{ name: 'Martinique', code: 'MQ' },
+-	{ name: 'Mauritania', code: 'MR' },
+-	{ name: 'Mauritius', code: 'MU' },
+-	{ name: 'Mayotte', code: 'YT' },
+-	{ name: 'Mexico', code: 'MX' },
+-	{ name: 'Micronesia, Federated States of', code: 'FM' },
+-	{ name: 'Moldova, Republic of', code: 'MD' },
+-	{ name: 'Monaco', code: 'MC' },
+-	{ name: 'Mongolia', code: 'MN' },
+-	{ name: 'Montserrat', code: 'MS' },
+-	{ name: 'Morocco', code: 'MA' },
+-	{ name: 'Mozambique', code: 'MZ' },
+-	{ name: 'Myanmar', code: 'MM' },
+-	{ name: 'Namibia', code: 'NA' },
+-	{ name: 'Nauru', code: 'NR' },
+-	{ name: 'Nepal', code: 'NP' },
+-	{ name: 'Netherlands', code: 'NL' },
+-	{ name: 'Netherlands Antilles', code: 'AN' },
+-	{ name: 'New Caledonia', code: 'NC' },
+-	{ name: 'New Zealand', code: 'NZ' },
+-	{ name: 'Nicaragua', code: 'NI' },
+-	{ name: 'Niger', code: 'NE' },
+-	{ name: 'Nigeria', code: 'NG' },
+-	{ name: 'Niue', code: 'NU' },
+-	{ name: 'Norfolk Island', code: 'NF' },
+-	{ name: 'Northern Mariana Islands', code: 'MP' },
+-	{ name: 'Norway', code: 'NO' },
+-	{ name: 'Oman', code: 'OM' },
+-	{ name: 'Pakistan', code: 'PK' },
+-	{ name: 'Palau', code: 'PW' },
+-	{ name: 'Palestinian Territory, Occupied', code: 'PS' },
+-	{ name: 'Panama', code: 'PA' },
+-	{ name: 'Papua New Guinea', code: 'PG' },
+-	{ name: 'Paraguay', code: 'PY' },
+-	{ name: 'Peru', code: 'PE' },
+-	{ name: 'Philippines', code: 'PH' },
+-	{ name: 'Pitcairn', code: 'PN' },
+-	{ name: 'Poland', code: 'PL' },
+-	{ name: 'Portugal', code: 'PT' },
+-	{ name: 'Puerto Rico', code: 'PR' },
+-	{ name: 'Qatar', code: 'QA' },
+-	{ name: 'Reunion', code: 'RE' },
+-	{ name: 'Romania', code: 'RO' },
+-	{ name: 'Russian Federation', code: 'RU' },
+-	{ name: 'RWANDA', code: 'RW' },
+-	{ name: 'Saint Helena', code: 'SH' },
+-	{ name: 'Saint Kitts and Nevis', code: 'KN' },
+-	{ name: 'Saint Lucia', code: 'LC' },
+-	{ name: 'Saint Pierre and Miquelon', code: 'PM' },
+-	{ name: 'Saint Vincent and the Grenadines', code: 'VC' },
+-	{ name: 'Samoa', code: 'WS' },
+-	{ name: 'San Marino', code: 'SM' },
+-	{ name: 'Sao Tome and Principe', code: 'ST' },
+-	{ name: 'Saudi Arabia', code: 'SA' },
+-	{ name: 'Senegal', code: 'SN' },
+-	{ name: 'Serbia and Montenegro', code: 'CS' },
+-	{ name: 'Seychelles', code: 'SC' },
+-	{ name: 'Sierra Leone', code: 'SL' },
+-	{ name: 'Singapore', code: 'SG' },
+-	{ name: 'Slovakia', code: 'SK' },
+-	{ name: 'Slovenia', code: 'SI' },
+-	{ name: 'Solomon Islands', code: 'SB' },
+-	{ name: 'Somalia', code: 'SO' },
+-	{ name: 'South Africa', code: 'ZA' },
+-	{ name: 'South Georgia and the South Sandwich Islands', code: 'GS' },
+-	{ name: 'Spain', code: 'ES' },
+-	{ name: 'Sri Lanka', code: 'LK' },
+-	{ name: 'Sudan', code: 'SD' },
+-	{ name: 'Suriname', code: 'SR' },
+-	{ name: 'Svalbard and Jan Mayen', code: 'SJ' },
+-	{ name: 'Swaziland', code: 'SZ' },
+-	{ name: 'Sweden', code: 'SE' },
+-	{ name: 'Switzerland', code: 'CH' },
+-	{ name: 'Syrian Arab Republic', code: 'SY' },
+-	{ name: 'Taiwan, Province of China', code: 'TW' },
+-	{ name: 'Tajikistan', code: 'TJ' },
+-	{ name: 'Tanzania, United Republic of', code: 'TZ' },
+-	{ name: 'Thailand', code: 'TH' },
+-	{ name: 'Timor-Leste', code: 'TL' },
+-	{ name: 'Togo', code: 'TG' },
+-	{ name: 'Tokelau', code: 'TK' },
+-	{ name: 'Tonga', code: 'TO' },
+-	{ name: 'Trinidad and Tobago', code: 'TT' },
+-	{ name: 'Tunisia', code: 'TN' },
+-	{ name: 'Turkey', code: 'TR' },
+-	{ name: 'Turkmenistan', code: 'TM' },
+-	{ name: 'Turks and Caicos Islands', code: 'TC' },
+-	{ name: 'Tuvalu', code: 'TV' },
+-	{ name: 'Uganda', code: 'UG' },
+-	{ name: 'Ukraine', code: 'UA' },
+-	{ name: 'United Arab Emirates', code: 'AE' },
+-	{ name: 'United Kingdom', code: 'GB' },
+-	{ name: 'United States', code: 'US' },
+-	{ name: 'United States Minor Outlying Islands', code: 'UM' },
+-	{ name: 'Uruguay', code: 'UY' },
+-	{ name: 'Uzbekistan', code: 'UZ' },
+-	{ name: 'Vanuatu', code: 'VU' },
+-	{ name: 'Venezuela', code: 'VE' },
+-	{ name: 'Viet Nam', code: 'VN' },
+-	{ name: 'Virgin Islands, British', code: 'VG' },
+-	{ name: 'Virgin Islands, U.S.', code: 'VI' },
+-	{ name: 'Wallis and Futuna', code: 'WF' },
+-	{ name: 'Western Sahara', code: 'EH' },
+-	{ name: 'Yemen', code: 'YE' },
+-	{ name: 'Zambia', code: 'ZM' },
+-	{ name: 'Zimbabwe', code: 'ZW' },
+-];
+-
+-export default {
+-	title: 'Components/ComboboxControl',
+-	component: ComboboxControl,
+-	argTypes: {
+-		__nextHasNoMarginBottom: { control: { type: 'boolean' } },
+-		onChange: { action: 'onChange' },
+-	},
+-};
+-
+-const mapCountryOption = ( country ) => ( {
+-	value: country.code,
+-	label: country.name,
+-} );
+-
+-const countryOptions = countries.map( mapCountryOption );
+-
+-function Template( { onChange, ...args } ) {
+-	const [ value, setValue ] = useState( null );
+-
+-	return (
+-		<>
+-			<ComboboxControl
+-				{ ...args }
+-				value={ value }
+-				onChange={ ( ...changeArgs ) => {
+-					setValue( ...changeArgs );
+-					onChange?.( ...changeArgs );
+-				} }
+-			/>
+-		</>
+-	);
+-}
+-export const Default = Template.bind( {} );
+-Default.args = {
+-	__next36pxDefaultSize: false,
+-	allowReset: false,
+-	label: 'Select a country',
+-	options: countryOptions,
+-};
+-
+-const authorOptions = [
+-	{
+-		value: 'parsley',
+-		label: 'Parsley Montana',
+-		age: 48,
+-		country: 'Germany',
+-	},
+-	{
+-		value: 'cabbage',
+-		label: 'Cabbage New York',
+-		age: 44,
+-		country: 'France',
+-	},
+-	{
+-		value: 'jake',
+-		label: 'Jake Weary',
+-		age: 41,
+-		country: 'United Kingdom',
+-	},
+-];
+-
+-/**
+- * The rendered output of each suggestion can be customized by passing a
+- * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature
+- * and is subject to change.)
+- */
+-export const WithCustomRenderItem = Template.bind( {} );
+-WithCustomRenderItem.args = {
+-	...Default.args,
+-	label: 'Select an author',
+-	options: authorOptions,
+-	__experimentalRenderItem: ( { item } ) => {
+-		const { label, age, country } = item;
+-		return (
+-			<div>
+-				<div style={ { marginBottom: '0.2rem' } }>{ label }</div>
+-				<small>
+-					Age: { age }, Country: { country }
+-				</small>
+-			</div>
+-		);
+-	},
+-};
+diff --git a/packages/components/src/combobox-control/stories/index.tsx b/packages/components/src/combobox-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..b722d8245921de
+--- /dev/null
++++ b/packages/components/src/combobox-control/stories/index.tsx
+@@ -0,0 +1,114 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import ComboboxControl from '..';
++import type { ComboboxControlProps } from '../types';
++
++const countries = [
++	{ name: 'Afghanistan', code: 'AF' },
++	{ name: 'Åland Islands', code: 'AX' },
++	{ name: 'Albania', code: 'AL' },
++	{ name: 'Algeria', code: 'DZ' },
++	{ name: 'American Samoa', code: 'AS' },
++];
++
++const meta: ComponentMeta< typeof ComboboxControl > = {
++	title: 'Components/ComboboxControl',
++	component: ComboboxControl,
++	argTypes: {
++		value: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const mapCountryOption = ( country: typeof countries[ number ] ) => ( {
++	value: country.code,
++	label: country.name,
++} );
++
++const countryOptions = countries.map( mapCountryOption );
++
++const Template: ComponentStory< typeof ComboboxControl > = ( {
++	onChange,
++	...args
++} ) => {
++	const [ value, setValue ] =
++		useState< ComboboxControlProps[ 'value' ] >( null );
++
++	return (
++		<>
++			<ComboboxControl
++				{ ...args }
++				value={ value }
++				onChange={ ( ...changeArgs ) => {
++					setValue( ...changeArgs );
++					onChange?.( ...changeArgs );
++				} }
++			/>
++		</>
++	);
++};
++export const Default = Template.bind( {} );
++Default.args = {
++	__next36pxDefaultSize: false,
++	allowReset: false,
++	label: 'Select a country',
++	options: countryOptions,
++};
++
++/**
++ * The rendered output of each suggestion can be customized by passing a
++ * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature
++ * and is subject to change.)
++ */
++export const WithCustomRenderItem = Template.bind( {} );
++WithCustomRenderItem.args = {
++	...Default.args,
++	label: 'Select an author',
++	options: [
++		{
++			value: 'parsley',
++			label: 'Parsley Montana',
++			age: 48,
++			country: 'Germany',
++		},
++		{
++			value: 'cabbage',
++			label: 'Cabbage New York',
++			age: 44,
++			country: 'France',
++		},
++		{
++			value: 'jake',
++			label: 'Jake Weary',
++			age: 41,
++			country: 'United Kingdom',
++		},
++	],
++	__experimentalRenderItem: ( { item } ) => {
++		const { label, age, country } = item;
++		return (
++			<div>
++				<div style={ { marginBottom: '0.2rem' } }>{ label }</div>
++				<small>
++					Age: { age }, Country: { country }
++				</small>
++			</div>
++		);
++	},
++};
+diff --git a/packages/components/src/combobox-control/styles.ts b/packages/components/src/combobox-control/styles.ts
+index 6d7164b493e848..25c71788fd602c 100644
+--- a/packages/components/src/combobox-control/styles.ts
++++ b/packages/components/src/combobox-control/styles.ts
+@@ -9,8 +9,11 @@ import { css } from '@emotion/react';
+  */
+ import { Flex } from '../flex';
+ import { space } from '../ui/utils/space';
++import type { ComboboxControlProps } from './types';
+ 
+-const deprecatedDefaultSize = ( { __next36pxDefaultSize } ) =>
++const deprecatedDefaultSize = ( {
++	__next36pxDefaultSize,
++}: Pick< ComboboxControlProps, '__next36pxDefaultSize' > ) =>
+ 	! __next36pxDefaultSize &&
+ 	css`
+ 		height: 28px; // 30px - 2px vertical borders on parent container
+diff --git a/packages/components/src/combobox-control/test/index.js b/packages/components/src/combobox-control/test/index.tsx
+similarity index 94%
+rename from packages/components/src/combobox-control/test/index.js
+rename to packages/components/src/combobox-control/test/index.tsx
+index 0a017b35bd60f5..0f1a25c2513665 100644
+--- a/packages/components/src/combobox-control/test/index.js
++++ b/packages/components/src/combobox-control/test/index.tsx
+@@ -12,7 +12,8 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import ComboboxControl from '../';
++import ComboboxControl from '..';
++import type { ComboboxControlOption, ComboboxControlProps } from '../types';
+ 
+ const timezones = [
+ 	{ label: 'Greenwich Mean Time', value: 'GMT' },
+@@ -49,20 +50,21 @@ const timezones = [
+ ];
+ 
+ const defaultLabelText = 'Select a timezone';
+-const getLabel = ( labelText ) => screen.getByText( labelText );
+-const getInput = ( name ) => screen.getByRole( 'combobox', { name } );
+-const getOption = ( name ) => screen.getByRole( 'option', { name } );
++const getLabel = ( labelText: string ) => screen.getByText( labelText );
++const getInput = ( name: string ) => screen.getByRole( 'combobox', { name } );
++const getOption = ( name: string ) => screen.getByRole( 'option', { name } );
+ const getAllOptions = () => screen.getAllByRole( 'option' );
+-const getOptionSearchString = ( option ) => option.label.substring( 0, 11 );
++const getOptionSearchString = ( option: ComboboxControlOption ) =>
++	option.label.substring( 0, 11 );
+ const setupUser = () => userEvent.setup();
+ 
+ const ControlledComboboxControl = ( {
+ 	value: valueProp,
+ 	onChange,
+ 	...props
+-} ) => {
++}: ComboboxControlProps ) => {
+ 	const [ value, setValue ] = useState( valueProp );
+-	const handleOnChange = ( newValue ) => {
++	const handleOnChange: ComboboxControlProps[ 'onChange' ] = ( newValue ) => {
+ 		setValue( newValue );
+ 		onChange?.( newValue );
+ 	};
+diff --git a/packages/components/src/combobox-control/types.ts b/packages/components/src/combobox-control/types.ts
+new file mode 100644
+index 00000000000000..bcc4b8b9ed03cb
+--- /dev/null
++++ b/packages/components/src/combobox-control/types.ts
+@@ -0,0 +1,69 @@
++/**
++ * Internal dependencies
++ */
++import type { BaseControlProps } from '../base-control/types';
++
++export type ComboboxControlOption = {
++	label: string;
++	value: string;
++	[ key: string ]: any;
++};
++
++export type ComboboxControlProps = Pick<
++	BaseControlProps,
++	| '__nextHasNoMarginBottom'
++	| 'className'
++	| 'label'
++	| 'hideLabelFromVision'
++	| 'help'
++> & {
++	/**
++	 * Custom renderer invoked for each option in the suggestion list.
++	 * The render prop receives as its argument an object containing, under the `item` key,
++	 * the single option's data (directly from the array of data passed to the `options` prop).
++	 */
++	__experimentalRenderItem?: ( args: {
++		item: ComboboxControlOption;
++	} ) => React.ReactNode;
++	/**
++	 * Start opting into the larger default height that will become the default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next36pxDefaultSize?: boolean;
++	/**
++	 * Show a reset button to clear the input.
++	 *
++	 * @default true
++	 */
++	allowReset?: boolean;
++	/**
++	 * Customizable UI messages.
++	 */
++	messages?: {
++		/**
++		 * The message to announce to screen readers when a suggestion is selected.
++		 *
++		 * @default `__( 'Item selected.' )`
++		 */
++		selected: string;
++	};
++	/**
++	 * Function called with the selected value changes.
++	 */
++	onChange?: ( value: ComboboxControlProps[ 'value' ] ) => void;
++	/**
++	 * Function called when the control's search input value changes. The argument contains the next input value.
++	 *
++	 * @default noop
++	 */
++	onFilterValueChange?: ( value: string ) => void;
++	/**
++	 * The options that can be chosen from.
++	 */
++	options: ComboboxControlOption[];
++	/**
++	 * The current value of the control.
++	 */
++	value?: string | null;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index c54fddc4e2a7ba..924653cab4ec54 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -46,7 +46,6 @@
+ 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
+ 		"src/index.js",
+ 		"src/autocomplete",
+-		"src/combobox-control",
+ 		"src/custom-gradient-picker",
+ 		"src/dimension-control",
+ 		"src/duotone-picker",

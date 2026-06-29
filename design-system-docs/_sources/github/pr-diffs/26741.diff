@@ -1,0 +1,18 @@
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index ac14d653bef7c8..af1437ad2290b7 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -21,11 +21,13 @@
+ 	// Token input
+ 	input[type="text"].components-form-token-field__input {
+ 		display: inline-block;
++		flex: 1;
+ 		width: 100%;
+ 		max-width: 100%;
+ 		margin-left: 4px;
+ 		padding: 0;
+ 		min-height: 24px;
++		min-width: 50px;
+ 		background: inherit;
+ 		border: 0;
+ 		color: $gray-900;

@@ -1,0 +1,325 @@
+diff --git a/docs/manifest-devhub.json b/docs/manifest-devhub.json
+index 673f97e93c74ac..549cbf324ff15f 100644
+--- a/docs/manifest-devhub.json
++++ b/docs/manifest-devhub.json
+@@ -587,6 +587,12 @@
+ 		"markdown_source": "../packages/components/README.md",
+ 		"parent": null
+ 	},
++	{
++		"title": "AnglePickerControl",
++		"slug": "angle-picker-control",
++		"markdown_source": "../packages/components/src/angle-picker-control/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "Animate",
+ 		"slug": "animate",
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 673f97e93c74ac..549cbf324ff15f 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -587,6 +587,12 @@
+ 		"markdown_source": "../packages/components/README.md",
+ 		"parent": null
+ 	},
++	{
++		"title": "AnglePickerControl",
++		"slug": "angle-picker-control",
++		"markdown_source": "../packages/components/src/angle-picker-control/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "Animate",
+ 		"slug": "animate",
+diff --git a/package-lock.json b/package-lock.json
+index a9142e287a6aac..75d50d0d22df45 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -19511,7 +19511,7 @@
+ 				},
+ 				"node-pre-gyp": {
+ 					"version": "0.12.0",
+-					"resolved": "https://registry.npmjs.org/node-pre-gyp/-/node-pre-gyp-0.12.0.tgz",
++					"resolved": false,
+ 					"integrity": "sha512-4KghwV8vH5k+g2ylT+sLTjy5wmUOb9vPhnM8NHvRf9dHmnW/CndrFXy2aRPaPST6dugXSdHXfeaHQm77PIz/1A==",
+ 					"dev": true,
+ 					"optional": true,
+@@ -19530,7 +19530,7 @@
+ 				},
+ 				"nopt": {
+ 					"version": "4.0.1",
+-					"resolved": "https://registry.npmjs.org/nopt/-/nopt-4.0.1.tgz",
++					"resolved": false,
+ 					"integrity": "sha1-0NRoWv1UFRk8jHUFYC0NF81kR00=",
+ 					"dev": true,
+ 					"optional": true,
+diff --git a/packages/components/src/angle-picker-control/README.md b/packages/components/src/angle-picker-control/README.md
+new file mode 100644
+index 00000000000000..c5eda0ad7d89ad
+--- /dev/null
++++ b/packages/components/src/angle-picker-control/README.md
+@@ -0,0 +1,40 @@
++# AnglePickerControl
++
++AnglePickerControl is a React component to render a UI that allows users to pick an angle.
++Users can choose an angle in a visual UI with the mouse by dragging an angle indicator inside a circle or by directly inserting the desired angle in a text field.
++
++## Usage
++
++
++```jsx
++import { useState } from '@wordpress/element';
++import { AnglePickerControl } from '@wordpress/components';
++
++const MyAnglePicker = () => {
++	const [ angle, setAngle ] = useState();
++	return <AnglePickerControl value={ angle } onChange={ setAngle } />;
++};
++```
++
++## Props
++
++The component accepts the following props.
++
++### label
++
++Label to use for the angle picker. If not set the a translated label "Angle" is used.
++
++- Type: `String`
++- Required: No
++
++### value
++The current value of the input. The value represents an angle in degrees and should be a value between 0 and 360.
++
++- Type: `Number`
++- Required: Yes
++
++### onChange
++A function that receives the new value of the input.
++
++- Type: `function`
++- Required: Yes
+diff --git a/packages/components/src/angle-picker/index.js b/packages/components/src/angle-picker-control/index.js
+similarity index 82%
+rename from packages/components/src/angle-picker/index.js
+rename to packages/components/src/angle-picker-control/index.js
+index d1acd3b0ecddf4..517f67a3966364 100644
+--- a/packages/components/src/angle-picker/index.js
++++ b/packages/components/src/angle-picker-control/index.js
+@@ -55,7 +55,7 @@ const AngleCircle = ( { value, onChange, ...props } ) => {
+ 		<div
+ 			ref={ angleCircleRef }
+ 			onMouseDown={ startDrag }
+-			className="components-angle-picker__angle-circle"
++			className="components-angle-picker-control__angle-circle"
+ 			style={ isDragging ? { cursor: 'grabbing' } : undefined }
+ 			{ ...props }
+ 		>
+@@ -63,27 +63,27 @@ const AngleCircle = ( { value, onChange, ...props } ) => {
+ 				style={
+ 					value ? { transform: `rotate(${ value }deg)` } : undefined
+ 				}
+-				className="components-angle-picker__angle-circle-indicator-wrapper"
++				className="components-angle-picker-control__angle-circle-indicator-wrapper"
+ 			>
+-				<span className="components-angle-picker__angle-circle-indicator" />
++				<span className="components-angle-picker-control__angle-circle-indicator" />
+ 			</div>
+ 		</div>
+ 		/* eslint-enable jsx-a11y/no-static-element-interactions */
+ 	);
+ };
+ 
+-export default function AnglePicker( {
++export default function AnglePickerControl( {
+ 	value,
+ 	onChange,
+ 	label = __( 'Angle' ),
+ } ) {
+-	const instanceId = useInstanceId( AnglePicker );
+-	const inputId = `components-angle-picker__input-${ instanceId }`;
++	const instanceId = useInstanceId( AnglePickerControl );
++	const inputId = `components-angle-picker-control__input-${ instanceId }`;
+ 	return (
+ 		<BaseControl
+ 			label={ label }
+ 			id={ inputId }
+-			className="components-angle-picker"
++			className="components-angle-picker-control"
+ 		>
+ 			<AngleCircle
+ 				value={ value }
+@@ -91,7 +91,7 @@ export default function AnglePicker( {
+ 				aria-hidden="true"
+ 			/>
+ 			<input
+-				className="components-angle-picker__input-field"
++				className="components-angle-picker-control__input-field"
+ 				type="number"
+ 				id={ inputId }
+ 				onChange={ ( event ) => {
+diff --git a/packages/components/src/angle-picker/stories/index.js b/packages/components/src/angle-picker-control/stories/index.js
+similarity index 57%
+rename from packages/components/src/angle-picker/stories/index.js
+rename to packages/components/src/angle-picker-control/stories/index.js
+index b3ab46f11c172b..0c861f1b414d44 100644
+--- a/packages/components/src/angle-picker/stories/index.js
++++ b/packages/components/src/angle-picker-control/stories/index.js
+@@ -6,13 +6,16 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import AnglePicker from '../';
++import AnglePickerControl from '../';
+ 
+-export default { title: 'Components|AnglePicker', component: AnglePicker };
++export default {
++	title: 'Components|AnglePickerControl',
++	component: AnglePickerControl,
++};
+ 
+ const AnglePickerWithState = () => {
+ 	const [ angle, setAngle ] = useState();
+-	return <AnglePicker value={ angle } onChange={ setAngle } />;
++	return <AnglePickerControl value={ angle } onChange={ setAngle } />;
+ };
+ 
+ export const _default = () => {
+diff --git a/packages/components/src/angle-picker/style.scss b/packages/components/src/angle-picker-control/style.scss
+similarity index 73%
+rename from packages/components/src/angle-picker/style.scss
+rename to packages/components/src/angle-picker-control/style.scss
+index c1fdd0c53bc748..d80e07e167caa2 100644
+--- a/packages/components/src/angle-picker/style.scss
++++ b/packages/components/src/angle-picker-control/style.scss
+@@ -1,16 +1,16 @@
+-.components-angle-picker {
++.components-angle-picker-control {
+ 	width: 50%;
+ 	&.components-base-control .components-base-control__label {
+ 		display: block;
+ 	}
+ }
+ 
+-.components-angle-picker__input-field {
++.components-angle-picker-control__input-field {
+ 	width: calc(100% - #{$icon-button-size});
+ 	max-width: 100px;
+ }
+ 
+-.components-angle-picker__angle-circle {
++.components-angle-picker-control__angle-circle {
+ 	width: $icon-button-size - ( 2 * $grid-size-small );
+ 	height: $icon-button-size - ( 2 * $grid-size-small );
+ 	border: 2px solid $dark-gray-500;
+@@ -20,13 +20,13 @@
+ 	cursor: grab;
+ }
+ 
+-.components-angle-picker__angle-circle-indicator-wrapper {
++.components-angle-picker-control__angle-circle-indicator-wrapper {
+ 	position: relative;
+ 	width: 100%;
+ 	height: 100%;
+ }
+ 
+-.components-angle-picker__angle-circle-indicator {
++.components-angle-picker-control__angle-circle-indicator {
+ 	width: 1px;
+ 	height: 1px;
+ 	border-radius: 50%;
+diff --git a/packages/components/src/custom-gradient-picker/index.js b/packages/components/src/custom-gradient-picker/index.js
+index 37a647c2f466de..e3d4ae1e0d5e84 100644
+--- a/packages/components/src/custom-gradient-picker/index.js
++++ b/packages/components/src/custom-gradient-picker/index.js
+@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import AnglePicker from '../angle-picker';
++import AnglePickerControl from '../angle-picker-control';
+ import { LinearGradientIcon, RadialGradientIcon } from './icons';
+ import CustomGradientBar from './custom-gradient-bar';
+ import BaseControl from '../base-control';
+@@ -41,7 +41,7 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
+ 		);
+ 	};
+ 	return (
+-		<AnglePicker
++		<AnglePickerControl
+ 			value={ hasGradient ? angle : '' }
+ 			onChange={ onAngleChange }
+ 		/>
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index a086197861bcdd..5a78b26d4733ed 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -12,7 +12,7 @@ export {
+ 
+ // Components
+ export { default as Animate } from './animate';
+-export { default as __experimentalAnglePicker } from './angle-picker';
++export { default as AnglePickerControl } from './angle-picker-control';
+ export { default as Autocomplete } from './autocomplete';
+ export { default as BaseControl } from './base-control';
+ export { default as Button } from './button';
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index a4728386ed030f..6677468995c38d 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -1,5 +1,5 @@
+ @import "./animate/style.scss";
+-@import "./angle-picker/style.scss";
++@import "./angle-picker-control/style.scss";
+ @import "./autocomplete/style.scss";
+ @import "./base-control/style.scss";
+ @import "./button-group/style.scss";
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index 8eec30a50154a1..9f9f93f7355eba 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -5627,35 +5627,35 @@ Array [
+ ]
+ `;
+ 
+-exports[`Storyshots Components|AnglePicker Default 1`] = `
++exports[`Storyshots Components|AnglePickerControl Default 1`] = `
+ <div
+-  className="components-base-control components-angle-picker"
++  className="components-base-control components-angle-picker-control"
+ >
+   <div
+     className="components-base-control__field"
+   >
+     <label
+       className="components-base-control__label"
+-      htmlFor="components-angle-picker__input-0"
++      htmlFor="components-angle-picker-control__input-0"
+     >
+       Angle
+     </label>
+     <div
+       aria-hidden="true"
+-      className="components-angle-picker__angle-circle"
++      className="components-angle-picker-control__angle-circle"
+       onMouseDown={[Function]}
+     >
+       <div
+-        className="components-angle-picker__angle-circle-indicator-wrapper"
++        className="components-angle-picker-control__angle-circle-indicator-wrapper"
+       >
+         <span
+-          className="components-angle-picker__angle-circle-indicator"
++          className="components-angle-picker-control__angle-circle-indicator"
+         />
+       </div>
+     </div>
+     <input
+-      className="components-angle-picker__input-field"
+-      id="components-angle-picker__input-0"
++      className="components-angle-picker-control__input-field"
++      id="components-angle-picker-control__input-0"
+       max={360}
+       min={0}
+       onChange={[Function]}

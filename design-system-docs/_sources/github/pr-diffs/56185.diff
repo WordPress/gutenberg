@@ -1,0 +1,267 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4152b3c654bab7..ba0629eff7f37d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -37,6 +37,7 @@
+ -   `Tooltip`: no-op when nested inside other `Tooltip` components ([#57202](https://github.com/WordPress/gutenberg/pull/57202)).
+ -   `PaletteEdit`: improve unit tests ([#57645](https://github.com/WordPress/gutenberg/pull/57645)).
+ -   `ColorPalette` and `CircularOptionPicker`: improve unit tests ([#57809](https://github.com/WordPress/gutenberg/pull/57809)).
++-   `BoxControl`, `BorderControl`, `BorderBoxControl`: Add opt-in prop for 40px default size ([#56185](https://github.com/WordPress/gutenberg/pull/56185)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index 4f3517937f2046..e329ac7c647cd1 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -89,7 +89,6 @@ const UnconnectedBorderBoxControl = (
+ 		);
+ 
+ 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
+-
+ 	return (
+ 		<View className={ className } { ...otherProps } ref={ mergedRef }>
+ 			<BorderLabel
+diff --git a/packages/components/src/border-box-control/border-box-control/hook.ts b/packages/components/src/border-box-control/border-box-control/hook.ts
+index a303e7d5a39e8b..6756bd51188fb4 100644
+--- a/packages/components/src/border-box-control/border-box-control/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control/hook.ts
+@@ -35,9 +35,13 @@ export function useBorderBoxControl(
+ 		size = 'default',
+ 		value,
+ 		__experimentalIsRenderedInSidebar = false,
++		__next40pxDefaultSize,
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderBoxControl' );
+ 
++	const computedSize =
++		size === 'default' && __next40pxDefaultSize ? '__unstable-large' : size;
++
+ 	const mixedBorders = hasMixedBorders( value );
+ 	const splitBorders = hasSplitBorders( value );
+ 
+@@ -133,7 +137,7 @@ export function useBorderBoxControl(
+ 		onSplitChange,
+ 		toggleLinked,
+ 		linkedValue,
+-		size,
++		size: computedSize,
+ 		splitValue,
+ 		wrapperClassName,
+ 		__experimentalIsRenderedInSidebar,
+diff --git a/packages/components/src/border-box-control/types.ts b/packages/components/src/border-box-control/types.ts
+index 0b454d8ed09292..283faf05014a03 100644
+--- a/packages/components/src/border-box-control/types.ts
++++ b/packages/components/src/border-box-control/types.ts
+@@ -45,6 +45,12 @@ export type BorderBoxControlProps = ColorProps &
+ 		 * properties but for each side; `top`, `right`, `bottom`, and `left`.
+ 		 */
+ 		value: AnyBorder;
++		/**
++		 * Start opting into the larger default height that will become the default size in a future version.
++		 *
++		 * @default false
++		 */
++		__next40pxDefaultSize?: boolean;
+ 	};
+ 
+ export type LinkedButtonProps = Pick< BorderBoxControlProps, 'size' > & {
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 960be4bf171ea4..197067c684373a 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -38,6 +38,7 @@ const UnconnectedBorderControl = (
+ 	forwardedRef: React.ForwardedRef< any >
+ ) => {
+ 	const {
++		__next40pxDefaultSize = false,
+ 		colors,
+ 		disableCustomColors,
+ 		disableUnits,
+@@ -112,6 +113,7 @@ const UnconnectedBorderControl = (
+ 						step={ [ 'px', '%' ].includes( widthUnit ) ? 1 : 0.1 }
+ 						value={ widthValue || undefined }
+ 						withInputField={ false }
++						__next40pxDefaultSize={ __next40pxDefaultSize }
+ 					/>
+ 				) }
+ 			</HStack>
+diff --git a/packages/components/src/border-control/border-control/hook.ts b/packages/components/src/border-control/border-control/hook.ts
+index 63034527cfa1a8..8a291c4112d91d 100644
+--- a/packages/components/src/border-control/border-control/hook.ts
++++ b/packages/components/src/border-control/border-control/hook.ts
+@@ -41,9 +41,13 @@ export function useBorderControl(
+ 		value: border,
+ 		width,
+ 		__experimentalIsRenderedInSidebar = false,
++		__next40pxDefaultSize,
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderControl' );
+ 
++	const computedSize =
++		size === 'default' && __next40pxDefaultSize ? '__unstable-large' : size;
++
+ 	const [ widthValue, originalWidthUnit ] = parseQuantityAndUnitFromRawValue(
+ 		border?.width
+ 	);
+@@ -130,10 +134,10 @@ export function useBorderControl(
+ 	}
+ 	const innerWrapperClassName = useMemo( () => {
+ 		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
+-		const heightStyle = styles.wrapperHeight( size );
++		const heightStyle = styles.wrapperHeight( computedSize );
+ 
+ 		return cx( styles.innerWrapper(), widthStyle, heightStyle );
+-	}, [ wrapperWidth, cx, size ] );
++	}, [ wrapperWidth, cx, computedSize ] );
+ 
+ 	const sliderClassName = useMemo( () => {
+ 		return cx( styles.borderSlider() );
+@@ -155,7 +159,8 @@ export function useBorderControl(
+ 		value: border,
+ 		widthUnit,
+ 		widthValue,
+-		size,
++		size: computedSize,
+ 		__experimentalIsRenderedInSidebar,
++		__next40pxDefaultSize,
+ 	};
+ }
+diff --git a/packages/components/src/border-control/types.ts b/packages/components/src/border-control/types.ts
+index 470b75df7c1829..7752d9760ffe56 100644
+--- a/packages/components/src/border-control/types.ts
++++ b/packages/components/src/border-control/types.ts
+@@ -99,6 +99,12 @@ export type BorderControlProps = ColorProps &
+ 		 * `RangeControl` for additional control over a border's width.
+ 		 */
+ 		withSlider?: boolean;
++		/**
++		 * Start opting into the larger default height that will become the default size in a future version.
++		 *
++		 * @default false
++		 */
++		__next40pxDefaultSize?: boolean;
+ 	};
+ 
+ export type DropdownProps = ColorProps &
+diff --git a/packages/components/src/box-control/all-input-control.tsx b/packages/components/src/box-control/all-input-control.tsx
+index 9c18694bbd0b60..fb65014dfaf0f5 100644
+--- a/packages/components/src/box-control/all-input-control.tsx
++++ b/packages/components/src/box-control/all-input-control.tsx
+@@ -25,6 +25,7 @@ import {
+ const noop = () => {};
+ 
+ export default function AllInputControl( {
++	__next40pxDefaultSize,
+ 	onChange = noop,
+ 	onFocus = noop,
+ 	values,
+@@ -74,6 +75,7 @@ export default function AllInputControl( {
+ 		<HStack>
+ 			<StyledUnitControl
+ 				{ ...props }
++				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 				className="component-box-control__unit-control"
+ 				disableUnits={ isMixed }
+ 				id={ inputId }
+@@ -89,6 +91,7 @@ export default function AllInputControl( {
+ 
+ 			<FlexedRangeControl
+ 				__nextHasNoMarginBottom
++				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 				aria-controls={ inputId }
+ 				label={ LABELS.all }
+ 				hideLabelFromVision
+diff --git a/packages/components/src/box-control/axial-input-controls.tsx b/packages/components/src/box-control/axial-input-controls.tsx
+index 173605f68a8721..c6c0181f6c871c 100644
+--- a/packages/components/src/box-control/axial-input-controls.tsx
++++ b/packages/components/src/box-control/axial-input-controls.tsx
+@@ -20,6 +20,7 @@ const groupedSides = [ 'vertical', 'horizontal' ] as const;
+ type GroupedSide = ( typeof groupedSides )[ number ];
+ 
+ export default function AxialInputControls( {
++	__next40pxDefaultSize,
+ 	onChange,
+ 	onFocus,
+ 	values,
+@@ -105,6 +106,7 @@ export default function AxialInputControls( {
+ 						<Tooltip placement="top-end" text={ LABELS[ side ] }>
+ 							<StyledUnitControl
+ 								{ ...props }
++								__next40pxDefaultSize={ __next40pxDefaultSize }
+ 								className="component-box-control__unit-control"
+ 								id={ inputId }
+ 								isPressEnterToChange
+@@ -126,6 +128,7 @@ export default function AxialInputControls( {
+ 						</Tooltip>
+ 						<FlexedRangeControl
+ 							__nextHasNoMarginBottom
++							__next40pxDefaultSize={ __next40pxDefaultSize }
+ 							aria-controls={ inputId }
+ 							label={ LABELS[ side ] }
+ 							hideLabelFromVision
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index dcc890e8e3c510..9c3452d4ccb806 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -72,6 +72,7 @@ function useUniqueId( idProp?: string ) {
+  * ```
+  */
+ function BoxControl( {
++	__next40pxDefaultSize = false,
+ 	id: idProp,
+ 	inputProps = defaultInputProps,
+ 	onChange = noop,
+@@ -151,6 +152,7 @@ function BoxControl( {
+ 		values: inputValues,
+ 		onMouseOver,
+ 		onMouseOut,
++		__next40pxDefaultSize,
+ 	};
+ 
+ 	return (
+diff --git a/packages/components/src/box-control/input-controls.tsx b/packages/components/src/box-control/input-controls.tsx
+index c8aaeae222749c..553f547abf9b0d 100644
+--- a/packages/components/src/box-control/input-controls.tsx
++++ b/packages/components/src/box-control/input-controls.tsx
+@@ -19,6 +19,7 @@ import type { BoxControlInputControlProps, BoxControlValue } from './types';
+ const noop = () => {};
+ 
+ export default function BoxInputControls( {
++	__next40pxDefaultSize,
+ 	onChange = noop,
+ 	onFocus = noop,
+ 	values,
+@@ -107,6 +108,7 @@ export default function BoxInputControls( {
+ 						<Tooltip placement="top-end" text={ LABELS[ side ] }>
+ 							<StyledUnitControl
+ 								{ ...props }
++								__next40pxDefaultSize={ __next40pxDefaultSize }
+ 								className="component-box-control__unit-control"
+ 								id={ inputId }
+ 								isPressEnterToChange
+@@ -131,6 +133,7 @@ export default function BoxInputControls( {
+ 
+ 						<FlexedRangeControl
+ 							__nextHasNoMarginBottom
++							__next40pxDefaultSize={ __next40pxDefaultSize }
+ 							aria-controls={ inputId }
+ 							label={ LABELS[ side ] }
+ 							hideLabelFromVision
+diff --git a/packages/components/src/box-control/types.ts b/packages/components/src/box-control/types.ts
+index 12524559564ab7..eeb72df14bb9c1 100644
+--- a/packages/components/src/box-control/types.ts
++++ b/packages/components/src/box-control/types.ts
+@@ -71,6 +71,12 @@ export type BoxControlProps = Pick<
+ 	 * The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.
+ 	 */
+ 	values?: BoxControlValue;
++	/**
++	 * Start opting into the larger default height that will become the default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next40pxDefaultSize?: boolean;
+ };
+ 
+ export type BoxControlInputControlProps = UnitControlPassthroughProps & {

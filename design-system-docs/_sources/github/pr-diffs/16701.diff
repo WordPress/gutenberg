@@ -1,0 +1,120 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a2ce1b818505e4..26c1c2ecdaed68 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -3,6 +3,7 @@
+ ### New Features
+ 
+ - Added a new `popoverProps` prop to the `Dropdown` component which allows users of the `Dropdown` component to pass props directly to the `PopOver` component.
++- Added and documented `hideLabelFromVision` prop to `BaseControl` used by `SelectControl`, `TextControl`, and `TextareaControl`.
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index f451a75b6ee4fd..7b20ced34734d9 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -41,6 +41,13 @@ If this property is added, a label will be generated using label property as the
+ - Type: `String`
+ - Required: No
+ 
++### hideLabelFromVision
++
++If true, the label will only be visible to screen readers.
++
++- Type: `Boolean`
++- Required: No
++
+ ### help
+ 
+ If this property is added, a help text will be generated using help property as the content.
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index 30fcb148ba8cc6..ac58106dfd0f7b 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -127,6 +127,12 @@ If this property is added, a label will be generated using label property as the
+ - Type: `String`
+ - Required: No
+ 
++#### hideLabelFromVision
++
++If true, the label will only be visible to screen readers.
++- Type: `Boolean`
++- Required: No
++
+ #### help
+ 
+ If this property is added, a help text will be generated using help property as the content.
+diff --git a/packages/components/src/text-control/README.md b/packages/components/src/text-control/README.md
+index 2fa725b3c3e88b..91bd724923456e 100644
+--- a/packages/components/src/text-control/README.md
++++ b/packages/components/src/text-control/README.md
+@@ -80,6 +80,12 @@ If this property is added, a label will be generated using label property as the
+ - Type: `String`
+ - Required: No
+ 
++#### hideLabelFromVision
++If true, the label will only be visible to screen readers.
++
++- Type: `Boolean`
++- Required: No
++
+ #### help
+ If this property is added, a help text will be generated using help property as the content.
+ 
+diff --git a/packages/components/src/text-control/index.js b/packages/components/src/text-control/index.js
+index 1a215882d2c801..61504cc7da5cfb 100644
+--- a/packages/components/src/text-control/index.js
++++ b/packages/components/src/text-control/index.js
+@@ -8,12 +8,12 @@ import { withInstanceId } from '@wordpress/compose';
+  */
+ import BaseControl from '../base-control';
+ 
+-function TextControl( { label, value, help, className, instanceId, onChange, type = 'text', ...props } ) {
++function TextControl( { label, hideLabelFromVision, value, help, className, instanceId, onChange, type = 'text', ...props } ) {
+ 	const id = `inspector-text-control-${ instanceId }`;
+ 	const onChangeValue = ( event ) => onChange( event.target.value );
+ 
+ 	return (
+-		<BaseControl label={ label } id={ id } help={ help } className={ className }>
++		<BaseControl label={ label } hideLabelFromVision={ hideLabelFromVision } id={ id } help={ help } className={ className }>
+ 			<input className="components-text-control__input"
+ 				type={ type }
+ 				id={ id }
+diff --git a/packages/components/src/textarea-control/README.md b/packages/components/src/textarea-control/README.md
+index bf5ff5164300e0..2adfffdaf7584f 100644
+--- a/packages/components/src/textarea-control/README.md
++++ b/packages/components/src/textarea-control/README.md
+@@ -104,6 +104,13 @@ If this property is added, a label will be generated using label property as the
+ - Type: `String`
+ - Required: No
+ 
++#### hideLabelFromVision
++
++If true, the label will only be visible to screen readers.
++
++- Type: `Boolean`
++- Required: No
++
+ #### help
+ 
+ If this property is added, a help text will be generated using help property as the content.
+diff --git a/packages/components/src/textarea-control/index.js b/packages/components/src/textarea-control/index.js
+index e0f3ce6de429da..45158ca2ec7474 100644
+--- a/packages/components/src/textarea-control/index.js
++++ b/packages/components/src/textarea-control/index.js
+@@ -8,12 +8,12 @@ import { withInstanceId } from '@wordpress/compose';
+  */
+ import BaseControl from '../base-control';
+ 
+-function TextareaControl( { label, value, help, instanceId, onChange, rows = 4, className, ...props } ) {
++function TextareaControl( { label, hideLabelFromVision, value, help, instanceId, onChange, rows = 4, className, ...props } ) {
+ 	const id = `inspector-textarea-control-${ instanceId }`;
+ 	const onChangeValue = ( event ) => onChange( event.target.value );
+ 
+ 	return (
+-		<BaseControl label={ label } id={ id } help={ help } className={ className }>
++		<BaseControl label={ label } hideLabelFromVision={ hideLabelFromVision } id={ id } help={ help } className={ className }>
+ 			<textarea
+ 				className="components-textarea-control__input"
+ 				id={ id }

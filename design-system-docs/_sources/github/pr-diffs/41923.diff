@@ -1,0 +1,500 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c7621061b29ab4..20f82615679d54 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Internal
+ 
++-   `Grid`: Convert to TypeScript ([#41923](https://github.com/WordPress/gutenberg/pull/41923)).
+ -   `TextHighlight`: Convert to TypeScript ([#41698](https://github.com/WordPress/gutenberg/pull/41698)).
+ -   `TreeSelect`: Refactor away from `_.repeat()` ([#42070](https://github.com/WordPress/gutenberg/pull/42070/)).
+ 
+diff --git a/packages/components/src/grid/README.md b/packages/components/src/grid/README.md
+index 27695353d54c2a..85640de2868c40 100644
+--- a/packages/components/src/grid/README.md
++++ b/packages/components/src/grid/README.md
+@@ -27,56 +27,70 @@ function Example() {
+ 
+ ## Props
+ 
+-##### align
+-
+-**Type**: `CSS['alignItems']`
++##### `align`: `CSS['alignItems']`
+ 
+ Adjusts the block alignment of children.
+ 
+-##### alignment
++-   Required: No
+ 
+-**Type**: `GridAlignment`
++##### `alignment`: `GridAlignment`
+ 
+ Adjusts the horizontal and vertical alignment of children.
+ 
+-##### columns
++-   Required: No
++
++##### `columnGap`: `CSSProperties['gridColumnGap']`
++
++Adjusts the `grid-column-gap`.
++
++-   Required: No
+ 
+-**Type**: `number`,`(number`,`null)[]`
++##### `columns`: `number`
+ 
+ Adjusts the number of columns of the `Grid`.
+ 
+-##### gap
++-   Required: No
++-   Default: `2`
+ 
+-**Type**: `number`
++##### `gap`: `number`
+ 
+ Gap between each child.
+ 
+-##### isInline
++-   Required: No
++-   Default: `3`
+ 
+-**Type**: `boolean`
++##### `isInline`: `boolean`
+ 
+ Changes the CSS display from `grid` to `inline-grid`.
+ 
+-##### justify
++-   Required: No
+ 
+-**Type**: `CSS['justifyContent']`
++##### `justify`: `CSS['justifyContent']`
+ 
+ Adjusts the inline alignment of children.
+ 
+-##### rows
++-   Required: No
+ 
+-**Type**: `number`,`(number`,`null)[]`
++##### `rowGap`: `CSSProperties['gridRowGap']`
++
++Adjusts the `grid-row-gap`.
++
++-   Required: No
++
++##### `rows`: `number`
+ 
+ Adjusts the number of rows of the `Grid`.
+ 
+-##### templateColumns
++-   Required: No
+ 
+-**Type**: `CSS['gridTemplateColumns']`
++##### `templateColumns`: `CSS['gridTemplateColumns']`
+ 
+ Adjusts the CSS grid `template-columns`.
+ 
+-##### templateRows
++-   Required: No
+ 
+-**Type**: `CSS['gridTemplateRows']`
++##### `templateRows`: `CSS['gridTemplateRows']`
+ 
+ Adjusts the CSS grid `template-rows`.
++
++-   Required: No
+diff --git a/packages/components/src/grid/component.js b/packages/components/src/grid/component.tsx
+similarity index 60%
+rename from packages/components/src/grid/component.js
+rename to packages/components/src/grid/component.tsx
+index 7641f15b8acfe2..689e641774f726 100644
+--- a/packages/components/src/grid/component.js
++++ b/packages/components/src/grid/component.tsx
+@@ -1,15 +1,20 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect } from '../ui/context';
++import { contextConnect, WordPressComponentProps } from '../ui/context';
+ import { View } from '../view';
+ import useGrid from './hook';
++import type { GridProps } from './types';
+ 
+-/**
+- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                               forwardedRef
+- */
+-function Grid( props, forwardedRef ) {
++function UnconnectedGrid(
++	props: WordPressComponentProps< GridProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const gridProps = useGrid( props );
+ 
+ 	return <View { ...gridProps } ref={ forwardedRef } />;
+@@ -18,7 +23,6 @@ function Grid( props, forwardedRef ) {
+ /**
+  * `Grid` is a primitive layout component that can arrange content in a grid configuration.
+  *
+- * @example
+  * ```jsx
+  * import {
+  * 	__experimentalGrid as Grid,
+@@ -36,6 +40,6 @@ function Grid( props, forwardedRef ) {
+  * }
+  * ```
+  */
+-const ConnectedGrid = contextConnect( Grid, 'Grid' );
++export const Grid = contextConnect( UnconnectedGrid, 'Grid' );
+ 
+-export default ConnectedGrid;
++export default Grid;
+diff --git a/packages/components/src/grid/hook.js b/packages/components/src/grid/hook.ts
+similarity index 89%
+rename from packages/components/src/grid/hook.js
+rename to packages/components/src/grid/hook.ts
+index 7e456dec14d12d..be615a884fd1c1 100644
+--- a/packages/components/src/grid/hook.js
++++ b/packages/components/src/grid/hook.ts
+@@ -11,16 +11,16 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../ui/context';
+ import { getAlignmentProps } from './utils';
+ import { useResponsiveValue } from '../ui/utils/use-responsive-value';
+ import CONFIG from '../utils/config-values';
+ import { useCx } from '../utils/hooks/use-cx';
++import type { GridProps } from './types';
+ 
+-/**
+- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- */
+-export default function useGrid( props ) {
++export default function useGrid(
++	props: WordPressComponentProps< GridProps, 'div' >
++) {
+ 	const {
+ 		align,
+ 		alignment,
+diff --git a/packages/components/src/grid/index.js b/packages/components/src/grid/index.ts
+similarity index 100%
+rename from packages/components/src/grid/index.js
+rename to packages/components/src/grid/index.ts
+diff --git a/packages/components/src/grid/stories/index.js b/packages/components/src/grid/stories/index.js
+deleted file mode 100644
+index 8e969a11712d3d..00000000000000
+--- a/packages/components/src/grid/stories/index.js
++++ /dev/null
+@@ -1,49 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { number } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-import { View } from '../../view';
+-import { Grid } from '..';
+-
+-export default {
+-	component: Grid,
+-	title: 'Components (Experimental)/Grid',
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-const Item = ( props ) => (
+-	<View
+-		style={ {
+-			borderRadius: 8,
+-			background: '#eee',
+-			padding: 8,
+-			textAlign: 'center',
+-		} }
+-		{ ...props }
+-	/>
+-);
+-
+-export const _default = () => {
+-	const props = {
+-		columns: number( 'columns', 4 ),
+-		gap: number( 'gap', 2 ),
+-	};
+-	return (
+-		<Grid alignment="bottom" { ...props }>
+-			<Item>One</Item>
+-			<Item>Two</Item>
+-			<Item>Three</Item>
+-			<Item>Four</Item>
+-			<Item>Five</Item>
+-			<Item>Six</Item>
+-			<Item>Seven</Item>
+-			<Item>Eight</Item>
+-		</Grid>
+-	);
+-};
+diff --git a/packages/components/src/grid/stories/index.tsx b/packages/components/src/grid/stories/index.tsx
+new file mode 100644
+index 00000000000000..44451c54fd6c95
+--- /dev/null
++++ b/packages/components/src/grid/stories/index.tsx
+@@ -0,0 +1,72 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { View } from '../../view';
++import { Grid } from '..';
++
++const meta: ComponentMeta< typeof Grid > = {
++	component: Grid,
++	title: 'Components (Experimental)/Grid',
++	argTypes: {
++		as: { control: { type: 'text' } },
++		align: { control: { type: 'text' } },
++		children: { control: { type: null } },
++		columnGap: { control: { type: 'text' } },
++		columns: {
++			table: { type: { summary: 'number' } },
++			control: { type: 'number' },
++		},
++		justify: { control: { type: 'text' } },
++		rowGap: { control: { type: 'text' } },
++		rows: {
++			table: { type: { summary: 'number' } },
++			control: { type: 'number' },
++		},
++		templateColumns: { control: { type: 'text' } },
++		templateRows: { control: { type: 'text' } },
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Item = ( props: { children: string } ) => (
++	<View
++		style={ {
++			borderRadius: 8,
++			background: '#eee',
++			padding: 8,
++			textAlign: 'center',
++		} }
++		{ ...props }
++	/>
++);
++
++const Template: ComponentStory< typeof Grid > = ( props ) => (
++	<Grid { ...props }>
++		<Item>One</Item>
++		<Item>Two</Item>
++		<Item>Three</Item>
++		<Item>Four</Item>
++		<Item>Five</Item>
++		<Item>Six</Item>
++		<Item>Seven</Item>
++		<Item>Eight</Item>
++	</Grid>
++);
++
++export const Default: ComponentStory< typeof Grid > = Template.bind( {} );
++Default.args = {
++	alignment: 'bottom',
++	columns: 4,
++	gap: 2,
++};
+diff --git a/packages/components/src/grid/test/grid.js b/packages/components/src/grid/test/grid.tsx
+similarity index 96%
+rename from packages/components/src/grid/test/grid.js
+rename to packages/components/src/grid/test/grid.tsx
+index 8508fd419e5f73..791dfa4f52216c 100644
+--- a/packages/components/src/grid/test/grid.js
++++ b/packages/components/src/grid/test/grid.tsx
+@@ -28,7 +28,7 @@ describe( 'props', () => {
+ 
+ 	test( 'should render gap', () => {
+ 		const { container } = render(
+-			<Grid columns="3" gap={ 4 }>
++			<Grid columns={ 3 } gap={ 4 }>
+ 				<View />
+ 				<View />
+ 				<View />
+@@ -44,7 +44,7 @@ describe( 'props', () => {
+ 
+ 	test( 'should render custom columns', () => {
+ 		const { container } = render(
+-			<Grid columns="7">
++			<Grid columns={ 7 }>
+ 				<View />
+ 				<View />
+ 				<View />
+@@ -59,7 +59,7 @@ describe( 'props', () => {
+ 
+ 	test( 'should render custom rows', () => {
+ 		const { container } = render(
+-			<Grid rows="7">
++			<Grid rows={ 7 }>
+ 				<View />
+ 				<View />
+ 				<View />
+@@ -120,7 +120,7 @@ describe( 'props', () => {
+ 
+ 	test( 'should render isInline', () => {
+ 		const { container } = render(
+-			<Grid columns="3" isInline>
++			<Grid columns={ 3 } isInline>
+ 				<View />
+ 				<View />
+ 				<View />
+diff --git a/packages/components/src/grid/types.ts b/packages/components/src/grid/types.ts
+index 9fc109f6ea5f96..878e23f8ff5317 100644
+--- a/packages/components/src/grid/types.ts
++++ b/packages/components/src/grid/types.ts
+@@ -1,9 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import type { CSSProperties } from 'react';
++import type { CSSProperties, ReactNode } from 'react';
+ 
+-type ResponsiveCSSValue< T > = Array< T | undefined > | T;
++/**
++ * Internal dependencies
++ */
++import type { ResponsiveCSSValue } from '../ui/utils/types';
+ 
+ type GridAlignment =
+ 	| 'bottom'
+@@ -18,11 +21,7 @@ type GridAlignment =
+ 	| 'topLeft'
+ 	| 'topRight';
+ 
+-type GridColumns = ResponsiveCSSValue< number >;
+-
+-type GridRows = ResponsiveCSSValue< number >;
+-
+-export type Props = {
++export type GridProps = {
+ 	/**
+ 	 * Adjusts the block alignment of children.
+ 	 */
+@@ -31,26 +30,30 @@ export type Props = {
+ 	 * Adjusts the horizontal and vertical alignment of children.
+ 	 */
+ 	alignment?: GridAlignment;
++	/**
++	 * The children elements.
++	 */
++	children: ReactNode;
+ 	/**
+ 	 * Adjusts the number of columns of the `Grid`.
+ 	 *
+ 	 * @default 2
+ 	 */
+-	columns?: GridColumns;
++	columns?: ResponsiveCSSValue< number >;
+ 	/**
+ 	 * Adjusts the `grid-column-gap`.
+ 	 */
+ 	columnGap?: CSSProperties[ 'gridColumnGap' ];
+-	/**
+-	 * Changes the CSS display from `grid` to `inline-grid`.
+-	 */
+-	isInline?: boolean;
+ 	/**
+ 	 * Gap between each child.
+ 	 *
+ 	 * @default 3
+ 	 */
+ 	gap?: number;
++	/**
++	 * Changes the CSS display from `grid` to `inline-grid`.
++	 */
++	isInline?: boolean;
+ 	/**
+ 	 * Adjusts the inline alignment of children.
+ 	 */
+@@ -62,7 +65,7 @@ export type Props = {
+ 	/**
+ 	 * Adjusts the number of rows of the `Grid`.
+ 	 */
+-	rows?: GridRows;
++	rows?: ResponsiveCSSValue< number >;
+ 	/**
+ 	 * Adjusts the CSS grid `template-columns`.
+ 	 */
+@@ -71,8 +74,4 @@ export type Props = {
+ 	 * Adjusts the CSS grid `template-rows`.
+ 	 */
+ 	templateRows?: CSSProperties[ 'gridTemplateRows' ];
+-	/**
+-	 * The children elements.
+-	 */
+-	children: React.ReactNode;
+ };
+diff --git a/packages/components/src/grid/utils.js b/packages/components/src/grid/utils.ts
+similarity index 70%
+rename from packages/components/src/grid/utils.js
+rename to packages/components/src/grid/utils.ts
+index bff93d0f41f3b0..6c08d3e49ff867 100644
+--- a/packages/components/src/grid/utils.js
++++ b/packages/components/src/grid/utils.ts
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { CSSProperties } from 'react';
++
+ const ALIGNMENTS = {
+ 	bottom: { alignItems: 'flex-end', justifyContent: 'center' },
+ 	bottomLeft: { alignItems: 'flex-start', justifyContent: 'flex-end' },
+@@ -12,14 +17,11 @@ const ALIGNMENTS = {
+ 	topRight: { alignItems: 'flex-start', justifyContent: 'flex-end' },
+ };
+ 
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * @param {keyof typeof ALIGNMENTS | undefined} alignment
+- * @return {{ alignItems?: import('react').CSSProperties['alignItems'], justifyContent?: import('react').CSSProperties['justifyContent']}} CSS props for alignment
+- */
+-export function getAlignmentProps( alignment ) {
++export function getAlignmentProps( alignment?: keyof typeof ALIGNMENTS ): {
++	alignItems?: CSSProperties[ 'alignItems' ];
++	justifyContent?: CSSProperties[ 'justifyContent' ];
++} {
+ 	const alignmentProps = alignment ? ALIGNMENTS[ alignment ] : {};
+ 
+ 	return alignmentProps;
+ }
+-/* eslint-enable jsdoc/valid-types */
+diff --git a/packages/components/src/ui/form-group/types.ts b/packages/components/src/ui/form-group/types.ts
+index 2b03a375181a2d..288acfdba7e171 100644
+--- a/packages/components/src/ui/form-group/types.ts
++++ b/packages/components/src/ui/form-group/types.ts
+@@ -7,7 +7,7 @@ import type { CSSProperties, ReactNode, ReactText } from 'react';
+  * Internal dependencies
+  */
+ import type { Props as ControlLabelProps } from '../control-label/types';
+-import type { Props as GridProps } from '../../grid/types';
++import type { GridProps } from '../../grid/types';
+ 
+ export type FormGroupLabelProps = ControlLabelProps & {
+ 	labelHidden?: boolean;

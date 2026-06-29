@@ -1,0 +1,33 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 22f5c4bd4fd94e..ea2fac77f4589a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ -   `Modal`: Fix unexpected modal closing in IME Composition ([#46453](https://github.com/WordPress/gutenberg/pull/46453)).
+ -   `Toolbar`: Fix duplicate focus style on anchor link button ([#46759](https://github.com/WordPress/gutenberg/pull/46759)).
+ -   `useNavigateRegions`: Ensure region navigation picks the next region based on where the current user focus is located instead of starting at the beginning ([#44883](https://github.com/WordPress/gutenberg/pull/44883)).
++-   `ComboboxControl`: Fix unexpected behaviour in IME Composition ([#46827](https://github.com/WordPress/gutenberg/pull/46827)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index eae04e09d8cf71..f01eb7dd4cac2a 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -121,7 +121,15 @@ function ComboboxControl( {
+ 	const onKeyDown = ( event ) => {
+ 		let preventDefault = false;
+ 
+-		if ( event.defaultPrevented ) {
++		if (
++			event.defaultPrevented ||
++			// Ignore keydowns from IMEs
++			event.nativeEvent.isComposing ||
++			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
++			// is `isComposing=false`, even though it's technically still part of the composition.
++			// These can only be detected by keyCode.
++			event.keyCode === 229
++		) {
+ 			return;
+ 		}
+ 

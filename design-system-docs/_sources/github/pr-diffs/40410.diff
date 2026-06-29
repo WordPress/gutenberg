@@ -1,0 +1,73 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 73f297ecfb69f8..0037ca21b60eb0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,9 @@
+ 
+ -   Remove individual color object exports from the `utils/colors-values.js` file. Colors should now be used from the main `COLORS` export([#40387](https://github.com/WordPress/gutenberg/pull/40387)).
+ 
++### Bug Fix
++
++-   `InputControl`: allow user to input a value interactively in Storybook, by removing default value argument ([#40410](https://github.com/WordPress/gutenberg/pull/40410)).
+ 
+ ## 19.8.0 (2022-04-08)
+ 
+diff --git a/packages/components/src/input-control/README.md b/packages/components/src/input-control/README.md
+index 4cfc918854a130..1cde49917823ff 100644
+--- a/packages/components/src/input-control/README.md
++++ b/packages/components/src/input-control/README.md
+@@ -18,7 +18,7 @@ const Example = () => {
+ 	return (
+ 		<InputControl
+ 			value={ value }
+-			onChange={ ( nextValue ) => setValue( nextValue ) }
++			onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
+ 		/>
+ 	);
+ };
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index 8c480bd7c7dfb4..6ff965f9ab1313 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -92,7 +92,7 @@ export function UnforwardedInputControl(
+  * InputControl components let users enter and edit text. This is an experimental component
+  * intended to (in time) merge with or replace `TextControl`.
+  *
+- * @example
++ * ```jsx
+  * import { __experimentalInputControl as InputControl } from '@wordpress/components';
+  * import { useState } from '@wordpress/compose';
+  *
+@@ -102,10 +102,11 @@ export function UnforwardedInputControl(
+  *   return (
+  *  	<InputControl
+  *  		value={ value }
+- *  		onChange={ ( nextValue ) => setValue( nextValue ) }
++ *  		onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
+  *  	/>
+  *   );
+  * };
++ * ```
+  */
+ export const InputControl = forwardRef( UnforwardedInputControl );
+ 
+diff --git a/packages/components/src/input-control/stories/index.tsx b/packages/components/src/input-control/stories/index.tsx
+index 5b99a320427e58..27ddb23262a0c6 100644
+--- a/packages/components/src/input-control/stories/index.tsx
++++ b/packages/components/src/input-control/stories/index.tsx
+@@ -18,6 +18,7 @@ const meta: ComponentMeta< typeof InputControl > = {
+ 		prefix: { control: { type: null } },
+ 		suffix: { control: { type: null } },
+ 		type: { control: { type: 'text' } },
++		value: { control: { disable: true } },
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
+@@ -34,7 +35,6 @@ export const Default = Template.bind( {} );
+ Default.args = {
+ 	label: 'Value',
+ 	placeholder: 'Placeholder',
+-	value: '',
+ };
+ 
+ export const WithPrefix = Template.bind( {} );

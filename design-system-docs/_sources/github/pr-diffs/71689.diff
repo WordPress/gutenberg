@@ -1,0 +1,40 @@
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index 0ab6b24b4dd6aa..38af680468e621 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -146,7 +146,8 @@ export function UnforwardedButton(
+ 	];
+ 
+ 	const classes = clsx( 'components-button', className, {
+-		'is-next-40px-default-size': __next40pxDefaultSize,
++		'is-next-40px-default-size':
++			__next40pxDefaultSize && variant !== 'link',
+ 		'is-secondary': variant === 'secondary',
+ 		'is-primary': variant === 'primary',
+ 		'is-small': size === 'small',
+diff --git a/packages/components/src/notice/test/__snapshots__/index.tsx.snap b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+index 77abecf14264be..97a0315f14294e 100644
+--- a/packages/components/src/notice/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/notice/test/__snapshots__/index.tsx.snap
+@@ -21,7 +21,7 @@ exports[`Notice should match snapshot 1`] = `
+         class="components-notice__actions"
+       >
+         <a
+-          class="components-button components-notice__action is-next-40px-default-size is-link"
++          class="components-button components-notice__action is-link"
+           href="https://example.com"
+         >
+           More information
+diff --git a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+index a160b7f6555768..2cf6873cd295f5 100644
+--- a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
++++ b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+@@ -19,7 +19,7 @@ exports[`DotTip should render correctly 1`] = `
+     </p>
+     <p>
+       <button
+-        class="components-button is-next-40px-default-size is-link"
++        class="components-button is-link"
+         type="button"
+       >
+         Got it

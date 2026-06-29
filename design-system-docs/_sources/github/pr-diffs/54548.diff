@@ -1,0 +1,158 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7314e7ecdce49f..4bc9bce32c93ad 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `Tooltip`: Add new `hideOnClick` prop ([#54406](https://github.com/WordPress/gutenberg/pull/54406)).
+ -   `CircularOptionPicker`: Add option to use previous non-listbox behaviour, for contexts where buttons are more appropriate than a list of options ([#54290](https://github.com/WordPress/gutenberg/pull/54290)).
+ -   `DuotonePicker/ColorListPicker`: Adds appropriate labels to 'Duotone Filter' color pickers ([#54468](https://github.com/WordPress/gutenberg/pull/54468)).
++-   `SearchControl`: support new `40px` and `32px` sizes ([#54548](https://github.com/WordPress/gutenberg/pull/54548)).
+ -   `FormTokenField`: Add `tokenizeOnBlur` prop to add any incompleteTokenValue as a new token when field loses focus ([#54445](https://github.com/WordPress/gutenberg/pull/54445)).
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/search-control/README.md b/packages/components/src/search-control/README.md
+index 6f79d6cd9efd9a..31c6c21e5222a6 100644
+--- a/packages/components/src/search-control/README.md
++++ b/packages/components/src/search-control/README.md
+@@ -90,6 +90,13 @@ If true, the label will not be visible, but will be read by screen readers. Defa
+ -   Type: `Boolean`
+ -   Required: No
+ 
++#### `size`: `'default'` | `'compact'`
++
++The size of the component.
++
++-   Required: No
++-   Default: `'default'`
++
+ ## Related components
+ 
+ -   To offer users more constrained options for input, use TextControl, SelectControl, RadioControl, CheckboxControl, or RangeControl.
+diff --git a/packages/components/src/search-control/index.tsx b/packages/components/src/search-control/index.tsx
+index 528ae52b26bbc8..723d754ba78ea1 100644
+--- a/packages/components/src/search-control/index.tsx
++++ b/packages/components/src/search-control/index.tsx
+@@ -23,6 +23,7 @@ import type { ForwardedRef } from 'react';
+ function UnforwardedSearchControl(
+ 	{
+ 		__nextHasNoMarginBottom,
++		__next40pxDefaultSize = false,
+ 		className,
+ 		onChange,
+ 		onKeyDown,
+@@ -32,6 +33,7 @@ function UnforwardedSearchControl(
+ 		hideLabelFromVision = true,
+ 		help,
+ 		onClose,
++		size = 'default',
+ 		...restProps
+ 	}: WordPressComponentProps< SearchControlProps, 'input', false >,
+ 	forwardedRef: ForwardedRef< HTMLInputElement >
+@@ -44,9 +46,11 @@ function UnforwardedSearchControl(
+ 		if ( onClose ) {
+ 			return (
+ 				<Button
++					__next40pxDefaultSize={ __next40pxDefaultSize }
+ 					icon={ closeSmall }
+ 					label={ __( 'Close search' ) }
+ 					onClick={ onClose }
++					size={ size }
+ 				/>
+ 			);
+ 		}
+@@ -54,12 +58,14 @@ function UnforwardedSearchControl(
+ 		if ( !! value ) {
+ 			return (
+ 				<Button
++					__next40pxDefaultSize={ __next40pxDefaultSize }
+ 					icon={ closeSmall }
+ 					label={ __( 'Reset search' ) }
+ 					onClick={ () => {
+ 						onChange( '' );
+ 						searchRef.current?.focus();
+ 					} }
++					size={ size }
+ 				/>
+ 			);
+ 		}
+@@ -74,7 +80,10 @@ function UnforwardedSearchControl(
+ 			id={ id }
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			help={ help }
+-			className={ classnames( className, 'components-search-control' ) }
++			className={ classnames( className, 'components-search-control', {
++				'is-next-40px-default-size': __next40pxDefaultSize,
++				'is-size-compact': size === 'compact',
++			} ) }
+ 		>
+ 			<div className="components-search-control__input-wrapper">
+ 				<input
+diff --git a/packages/components/src/search-control/style.scss b/packages/components/src/search-control/style.scss
+index d396cfd915083e..d9750721cf42b6 100644
+--- a/packages/components/src/search-control/style.scss
++++ b/packages/components/src/search-control/style.scss
+@@ -4,7 +4,7 @@
+ 	input[type="search"].components-search-control__input {
+ 		@include input-control;
+ 		display: block;
+-		padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
++		padding: 0 $grid-unit-60 0 $grid-unit-20;
+ 		background: $gray-100;
+ 		border: none;
+ 		width: 100%;
+@@ -36,21 +36,28 @@
+ 			-webkit-appearance: none;
+ 		}
+ 	}
++
++	&.is-next-40px-default-size input[type="search"].components-search-control__input {
++		height: $grid-unit-50;
++	}
++
++	&.is-size-compact input[type="search"].components-search-control__input {
++		height: $grid-unit-40;
++	}
++
+ }
+ 
+ .components-search-control__icon {
+ 	position: absolute;
+-	top: 0;
+-	width: $icon-size;
+ 	right: ( $grid-unit-60 - $icon-size ) * 0.5;
+-	bottom: 0;
++	top: 50%;
++	transform: translateY(-50%);
++
+ 	display: flex;
+ 	align-items: center;
+ 	justify-content: center;
+ 
+-	> svg {
+-		margin: $grid-unit-10 0;
+-	}
++	width: $icon-size;
+ }
+ 
+ .components-search-control__input-wrapper {
+diff --git a/packages/components/src/search-control/types.ts b/packages/components/src/search-control/types.ts
+index dbaf16ad2feff0..a3ae13b6d4985a 100644
+--- a/packages/components/src/search-control/types.ts
++++ b/packages/components/src/search-control/types.ts
+@@ -40,4 +40,16 @@ export type SearchControlProps = Pick<
+ 	 * The current value of the input.
+ 	 */
+ 	value?: string;
++	/**
++	 * The size of the component
++	 *
++	 * @default 'default'
++	 */
++	size?: 'default' | 'compact';
++	/**
++	 * Start opting into the larger default height that will become the default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next40pxDefaultSize?: boolean;
+ };

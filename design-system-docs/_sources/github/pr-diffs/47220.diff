@@ -1,0 +1,29 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index fbffcbcfb2fb01..b6e8ab5aebf1df 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1229,12 +1229,6 @@
+ 		"markdown_source": "../packages/components/src/textarea-control/README.md",
+ 		"parent": "components"
+ 	},
+-	{
+-		"title": "Theme",
+-		"slug": "theme",
+-		"markdown_source": "../packages/components/src/theme/README.md",
+-		"parent": "components"
+-	},
+ 	{
+ 		"title": "ToggleControl",
+ 		"slug": "toggle-control",
+diff --git a/docs/tool/manifest.js b/docs/tool/manifest.js
+index 344eaf35521700..e407c47e7284be 100644
+--- a/docs/tool/manifest.js
++++ b/docs/tool/manifest.js
+@@ -12,6 +12,7 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
+ 	ignore: [
+ 		'**/src/mobile/**/README.md',
+ 		'**/src/ui/**/README.md',
++		'packages/components/src/theme/README.md',
+ 		'packages/components/src/view/README.md',
+ 	],
+ } );

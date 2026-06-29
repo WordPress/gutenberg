@@ -1,0 +1,207 @@
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index af679edb910642..dcba54400ab0f7 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -196,7 +196,7 @@ $z-layers: (
+ 	".edit-site-layout__sidebar": 1,
+ 	".edit-site-layout__canvas-container.is-resizing::after": 100,
+ 	// Title needs to appear above other UI the section content.
+-	".edit-site-sidebar-navigation-screen__title-icon": 1,
++	".edit-site-sidebar-navigation-screen__sticky-title-section": 1,
+ 
+ 	// Ensure modal footer actions appear above modal contents
+ 	".editor-start-template-options__modal__actions": 1,
+diff --git a/packages/block-library/src/image/block.json b/packages/block-library/src/image/block.json
+index 16e31217476026..26835df9e856cd 100644
+--- a/packages/block-library/src/image/block.json
++++ b/packages/block-library/src/image/block.json
+@@ -4,7 +4,14 @@
+ 	"name": "core/image",
+ 	"title": "Image",
+ 	"category": "media",
+-	"usesContext": [ "allowResize", "imageCrop", "fixedHeight", "postId", "postType", "queryId" ],
++	"usesContext": [
++		"allowResize",
++		"imageCrop",
++		"fixedHeight",
++		"postId",
++		"postType",
++		"queryId"
++	],
+ 	"description": "Insert an image to make a visual statement.",
+ 	"keywords": [ "img", "photo", "picture" ],
+ 	"textdomain": "default",
+diff --git a/packages/block-library/src/post-content/block.json b/packages/block-library/src/post-content/block.json
+index ed9c47154b2f8e..e5d455b97a8a3d 100644
+--- a/packages/block-library/src/post-content/block.json
++++ b/packages/block-library/src/post-content/block.json
+@@ -69,4 +69,4 @@
+ 	},
+ 	"style": "wp-block-post-content",
+ 	"editorStyle": "wp-block-post-content-editor"
+-}
+\ No newline at end of file
++}
+diff --git a/packages/edit-site/src/components/sidebar-navigation-screen/index.js b/packages/edit-site/src/components/sidebar-navigation-screen/index.js
+index c6b3742a3fd8bc..fff66334cfd18e 100644
+--- a/packages/edit-site/src/components/sidebar-navigation-screen/index.js
++++ b/packages/edit-site/src/components/sidebar-navigation-screen/index.js
+@@ -75,52 +75,63 @@ export default function SidebarNavigationScreen( {
+ 				spacing={ 0 }
+ 				justify="flex-start"
+ 			>
+-				<HStack
+-					spacing={ 3 }
++				<VStack
++					className="edit-site-sidebar-navigation-screen__sticky-title-section"
+ 					alignment="flex-start"
+-					className="edit-site-sidebar-navigation-screen__title-icon"
+ 				>
+-					{ ! isRoot && (
+-						<SidebarButton
+-							onClick={ () => {
+-								history.navigate( backPath );
+-								navigate( 'back' );
+-							} }
+-							icon={ icon }
+-							label={ __( 'Back' ) }
+-							showTooltip={ false }
+-						/>
+-					) }
+-					{ isRoot && (
+-						<SidebarButton
+-							icon={ icon }
+-							label={
+-								dashboardLinkText || __( 'Go to the Dashboard' )
+-							}
+-							href={ dashboardLink }
+-						/>
+-					) }
+-					<Heading
+-						className="edit-site-sidebar-navigation-screen__title"
+-						color={ '#e0e0e0' /* $gray-200 */ }
+-						level={ 1 }
+-						size={ 20 }
++					<HStack
++						className="edit-site-sidebar-navigation-screen__title-icon"
++						spacing={ 3 }
++						alignment="flex-start"
+ 					>
+-						{ ! isPreviewingTheme()
+-							? title
+-							: sprintf(
+-									/* translators: 1: theme name. 2: title */
+-									__( 'Previewing %1$s: %2$s' ),
+-									previewingThemeName,
+-									title
+-							  ) }
+-					</Heading>
+-					{ actions && (
+-						<div className="edit-site-sidebar-navigation-screen__actions">
+-							{ actions }
+-						</div>
++						{ ! isRoot && (
++							<SidebarButton
++								onClick={ () => {
++									history.navigate( backPath );
++									navigate( 'back' );
++								} }
++								icon={ icon }
++								label={ __( 'Back' ) }
++								showTooltip={ false }
++							/>
++						) }
++						{ isRoot && (
++							<SidebarButton
++								icon={ icon }
++								label={
++									dashboardLinkText ||
++									__( 'Go to the Dashboard' )
++								}
++								href={ dashboardLink }
++							/>
++						) }
++						<Heading
++							className="edit-site-sidebar-navigation-screen__title"
++							color={ '#e0e0e0' /* $gray-200 */ }
++							level={ 1 }
++							size={ 20 }
++						>
++							{ ! isPreviewingTheme()
++								? title
++								: sprintf(
++										/* translators: 1: theme name. 2: title */
++										__( 'Previewing %1$s: %2$s' ),
++										previewingThemeName,
++										title
++								  ) }
++						</Heading>
++						{ actions && (
++							<div className="edit-site-sidebar-navigation-screen__actions">
++								{ actions }
++							</div>
++						) }
++					</HStack>
++					{ description && (
++						<p className="edit-site-sidebar-navigation-screen__description">
++							{ description }
++						</p>
+ 					) }
+-				</HStack>
++				</VStack>
+ 				{ meta && (
+ 					<>
+ 						<div className="edit-site-sidebar-navigation-screen__meta">
+@@ -130,11 +141,6 @@ export default function SidebarNavigationScreen( {
+ 				) }
+ 
+ 				<div className="edit-site-sidebar-navigation-screen__content">
+-					{ description && (
+-						<p className="edit-site-sidebar-navigation-screen__description">
+-							{ description }
+-						</p>
+-					) }
+ 					{ content }
+ 				</div>
+ 			</VStack>
+diff --git a/packages/edit-site/src/components/sidebar-navigation-screen/style.scss b/packages/edit-site/src/components/sidebar-navigation-screen/style.scss
+index 71704653b4cd89..ba1ab389c2bf96 100644
+--- a/packages/edit-site/src/components/sidebar-navigation-screen/style.scss
++++ b/packages/edit-site/src/components/sidebar-navigation-screen/style.scss
+@@ -13,10 +13,13 @@
+ 	&.has-footer {
+ 		margin-bottom: 0;
+ 	}
++	overflow: auto;
+ }
+ 
+ .edit-site-sidebar-navigation-screen__content {
+-	padding: 0 $grid-unit-20;
++	padding: 0 $grid-unit-30;
++	overflow: auto;
++	@include custom-scrollbars-on-hover(transparent, $gray-700);
+ 
+ 	.components-text {
+ 		color: $gray-400;
+@@ -50,14 +53,17 @@
+ 	}
+ }
+ 
+-.edit-site-sidebar-navigation-screen__title-icon {
+-	position: sticky;
+-	top: 0;
++.edit-site-sidebar-navigation-screen__sticky-title-section {
+ 	background: $gray-900;
+ 	padding-top: $grid-unit-60;
+ 	margin-bottom: $grid-unit-10;
+ 	padding-bottom: $grid-unit-10;
+-	z-index: z-index(".edit-site-sidebar-navigation-screen__title-icon");
++	z-index: z-index(".edit-site-sidebar-navigation-screen__sticky-title-section");
++	min-height: 183px !important;
++}
++
++.edit-site-sidebar-navigation-screen__description {
++	padding: $grid-unit-10 $grid-unit-20;
+ }
+ 
+ .edit-site-sidebar-navigation-screen__title {

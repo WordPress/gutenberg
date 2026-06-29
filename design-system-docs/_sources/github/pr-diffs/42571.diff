@@ -1,0 +1,97 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9787549b84f31a..92faec70fb1b8f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `CustomSelectControl`: Fix font size and hover/focus style inconsistencies with `SelectControl` ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
+ -   `AnglePickerControl`: Fix gap between elements in RTL mode ([#42534](https://github.com/WordPress/gutenberg/pull/42534)).
++-   `RangeControl`: clamp initialPosition between min and max values ([#42571](https://github.com/WordPress/gutenberg/pull/42571)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/range-control/README.md b/packages/components/src/range-control/README.md
+index 774ced541200ed..121b74e93339da 100644
+--- a/packages/components/src/range-control/README.md
++++ b/packages/components/src/range-control/README.md
+@@ -184,7 +184,7 @@ An icon to be shown above the slider next to its container title.
+ 
+ ### `initialPosition`: `number`
+ 
+-If no value exists this prop contains the slider starting position.
++The slider starting position, used when no `value` is passed. The `initialPosition` will be clamped between the provided `min` and `max` prop values.
+ 
+ -   Required: No
+ -   Platform: Web | Mobile
+diff --git a/packages/components/src/range-control/test/index.tsx b/packages/components/src/range-control/test/index.tsx
+index 1d241ddbe0f333..5a9b83ab0bed82 100644
+--- a/packages/components/src/range-control/test/index.tsx
++++ b/packages/components/src/range-control/test/index.tsx
+@@ -200,6 +200,36 @@ describe( 'RangeControl', () => {
+ 
+ 			expect( rangeInput?.value ).toBe( '10' );
+ 		} );
++
++		it( 'should clamp initialPosition between min and max on first render, and on reset', () => {
++			render(
++				<RangeControl
++					initialPosition={ 200 }
++					min={ 0 }
++					max={ 100 }
++					allowReset
++				/>
++			);
++
++			const numberInput = getNumberInput();
++			const rangeInput = getRangeInput();
++			const resetButton = getResetButton();
++
++			// Value should be clamped on initial load
++			expect( numberInput?.value ).toBe( '100' );
++			expect( rangeInput?.value ).toBe( '100' );
++
++			fireChangeEvent( numberInput, '50' );
++
++			expect( numberInput?.value ).toBe( '50' );
++			expect( rangeInput?.value ).toBe( '50' );
++
++			// Value should be clamped after resetting
++			fireEvent.click( resetButton as Element );
++
++			expect( numberInput?.value ).toBe( '100' );
++			expect( rangeInput?.value ).toBe( '100' );
++		} );
+ 	} );
+ 
+ 	describe( 'input field', () => {
+diff --git a/packages/components/src/range-control/types.ts b/packages/components/src/range-control/types.ts
+index 02a5a870317fe8..67682be3fd845c 100644
+--- a/packages/components/src/range-control/types.ts
++++ b/packages/components/src/range-control/types.ts
+@@ -119,7 +119,9 @@ export type RangeControlProps< IconProps = unknown > = Pick<
+ 		 */
+ 		icon?: string;
+ 		/**
+-		 * If no value exists this prop contains the slider starting position.
++		 * The slider starting position, used when no `value` is passed.
++		 * The `initialPosition` will be clamped between the provided `min`
++		 * and `max` prop values.
+ 		 */
+ 		initialPosition?: number;
+ 		/**
+diff --git a/packages/components/src/range-control/utils.ts b/packages/components/src/range-control/utils.ts
+index 78657f9e32e7a0..39cdc7b9f6f120 100644
+--- a/packages/components/src/range-control/utils.ts
++++ b/packages/components/src/range-control/utils.ts
+@@ -50,7 +50,10 @@ export function useControlledRangeValue(
+ 	const { min, max, value: valueProp, initial } = settings;
+ 	const [ state, setInternalState ] = useControlledState(
+ 		floatClamp( valueProp, min, max ),
+-		{ initial, fallback: null }
++		{
++			initial: floatClamp( initial ?? null, min, max ),
++			fallback: null,
++		}
+ 	);
+ 
+ 	const setState = useCallback(

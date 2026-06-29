@@ -1,0 +1,493 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index caa88b1e7245b4..d4fbe60af40597 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -2,11 +2,19 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   The `color.primary` and `color.bg` props on `ThemeProvider` now require an sRGB-parseable string (hex, `rgb(...)`, or CSS named color). Other CSS color formats like `hsl(...)`, `oklch(...)`, and `lab(...)` are no longer supported ([#77653](https://github.com/WordPress/gutenberg/pull/77653)).
++
+ ### Documentation
+ 
+ -   Add ["Design System/Tokens/Introduction" page](https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs) to Storybook ([#78449](https://github.com/WordPress/gutenberg/pull/78449)).
+ -   Add "How to pick a token" and "Naming pattern" guidance to [the design system tokens reference documentation](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) ([#78438](https://github.com/WordPress/gutenberg/pull/78438)).
+ 
++### Internal
++
++-   Refactor color space registration to avoid module-level side effects ([#77653](https://github.com/WordPress/gutenberg/pull/77653)).
++
+ ## 0.13.0 (2026-05-14)
+ 
+ ### New Features
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index e5b514428f6521..b71825d776cd59 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -98,7 +98,7 @@ The `color` prop accepts an object with the following optional properties:
+ -   `primary`: The primary/accent seed color (default: `'#3858e9'`).
+ -   `bg`: The background seed color (default: `'#f8f8f8'`).
+ 
+-Both properties accept any valid CSS color value. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
++Both properties accept a hex string (e.g. `#3858e9`), an `rgb(...)` string, or a CSS color keyword (e.g. `'blue'`). The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
+ 
+ The `cursor` prop accepts an object with the following optional properties:
+ 
+diff --git a/packages/theme/bin/generate-primitive-tokens/index.ts b/packages/theme/bin/generate-primitive-tokens/index.ts
+index 7003088a3173c9..14a729e552b02e 100644
+--- a/packages/theme/bin/generate-primitive-tokens/index.ts
++++ b/packages/theme/bin/generate-primitive-tokens/index.ts
+@@ -4,12 +4,11 @@
+ import fs from 'fs';
+ import path from 'path';
+ import { fileURLToPath } from 'url';
+-import { to, sRGB, getAll } from 'colorjs.io/fn';
++import { ColorSpace, to, sRGB, getAll } from 'colorjs.io/fn';
+ 
+ /**
+  * Internal dependencies
+  */
+-import '../../src/color-ramps/lib/register-color-spaces';
+ import {
+ 	DEFAULT_SEED_COLORS,
+ 	buildBgRamp,
+@@ -30,6 +29,7 @@ const colorJsonPath = path.join( __dirname, '../../tokens/color.json' );
+ const HEX_ROUNDING_PRECISION = 3;
+ 
+ const transformColorStringToDTCGValue = ( color: string ) => {
++	ColorSpace.register( sRGB );
+ 	const parsed = to( color, sRGB );
+ 
+ 	return {
+diff --git a/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/index.ts b/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/index.ts
+index 85d8587dae281f..b03eb5697e90ea 100644
+--- a/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/index.ts
++++ b/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/index.ts
+@@ -1,8 +1,7 @@
+ import { FORMAT_ID } from '@terrazzo/plugin-css';
+ import type { Plugin } from '@terrazzo/parser';
+-import { to, get, OKLCH } from 'colorjs.io/fn';
++import { ColorSpace, to, get, OKLCH, sRGB } from 'colorjs.io/fn';
+ 
+-import '../../src/color-ramps/lib/register-color-spaces';
+ import colorTokens from '../../src/prebuilt/ts/color-tokens';
+ import { DEFAULT_RAMPS } from '../../src/color-ramps/lib/default-ramps';
+ import { DEFAULT_SEED_COLORS } from '../../src/color-ramps/lib/constants';
+@@ -22,6 +21,7 @@ function adminColorVar(): string {
+ }
+ 
+ function getOKLCHValues( hex: string ) {
++	ColorSpace.register( sRGB );
+ 	const color = to( hex, OKLCH );
+ 	const l = get( color, [ OKLCH, 'l' ] );
+ 	const c = get( color, [ OKLCH, 'c' ] );
+diff --git a/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/test/index.test.ts b/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/test/index.test.ts
+index 62f2ca72072e74..e9023b23fc00fc 100644
+--- a/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/test/index.test.ts
++++ b/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/test/index.test.ts
+@@ -1,20 +1,7 @@
+-jest.mock( '@terrazzo/plugin-css', () => ( { FORMAT_ID: 'css/value' } ) );
+-jest.mock( 'colorjs.io/fn', () => {
+-	const OKLCH = { id: 'oklch' };
+-	return {
+-		__esModule: true,
+-		OKLCH,
+-		sRGB: {},
+-		P3: {},
+-		HSL: {},
+-		ColorSpace: { register: jest.fn() },
+-		to: jest.fn( () => [ 0, 0, 0 ] ),
+-		get: jest.fn( () => 0 ),
+-	};
+-} );
+-
+ import { computeBrandFallback } from '../index';
+ 
++jest.mock( '@terrazzo/plugin-css', () => ( { FORMAT_ID: 'css/value' } ) );
++
+ describe( 'computeBrandFallback', () => {
+ 	it( 'throws on colors with alpha (8-digit hex)', () => {
+ 		expect( () => computeBrandFallback( '#3858e980' ) ).toThrow(
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index fb4aed79c6dfac..f2c10a6c98c246 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -78,11 +78,7 @@
+ 	"react-native": "src/index",
+ 	"wpScript": true,
+ 	"types": "build-types",
+-	"sideEffects": [
+-		"src/color-ramps/lib/register-color-spaces.ts",
+-		"build/color-ramps/lib/register-color-spaces.js",
+-		"build-module/color-ramps/lib/register-color-spaces.mjs"
+-	],
++	"sideEffects": false,
+ 	"dependencies": {
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/private-apis": "file:../private-apis",
+diff --git a/packages/theme/src/color-ramps/index.ts b/packages/theme/src/color-ramps/index.ts
+index 14e692f5534a47..cdce989fff9d1a 100644
+--- a/packages/theme/src/color-ramps/index.ts
++++ b/packages/theme/src/color-ramps/index.ts
+@@ -6,7 +6,6 @@ import { get, OKLCH } from 'colorjs.io/fn';
+ /**
+  * Internal dependencies
+  */
+-import './lib/register-color-spaces';
+ import { buildRamp } from './lib/index';
+ import { clampAccentScaleReferenceLightness } from './lib/utils';
+ import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs';
+diff --git a/packages/theme/src/color-ramps/lib/color-utils.ts b/packages/theme/src/color-ramps/lib/color-utils.ts
+index cbfad0c45f6473..845cf69210c178 100644
+--- a/packages/theme/src/color-ramps/lib/color-utils.ts
++++ b/packages/theme/src/color-ramps/lib/color-utils.ts
+@@ -1,46 +1,48 @@
+-/**
+- * External dependencies
+- */
+ import {
++	ColorSpace,
+ 	to,
+ 	toGamut,
+ 	serialize,
+ 	contrastWCAG21,
+ 	sRGB,
+ 	OKLCH,
+-	type ColorTypes,
++	type PlainColorObject,
+ } from 'colorjs.io/fn';
+ 
+ /**
+- * Internal dependencies
+- */
+-import './register-color-spaces';
+-
+-/**
+- * Get string representation of a color
+- * @param color Color object to stringify
++ * Get string representation of a color.
++ * @param color A `PlainColorObject`, or an sRGB-parseable string (typically a
++ *              hex value, e.g. `#3858e9`).
+  * @return String representation
+  */
+-export function getColorString( color: ColorTypes ): string {
++export function getColorString( color: string | PlainColorObject ): string {
++	ColorSpace.register( sRGB );
+ 	const rgbRounded = serialize( to( color, sRGB ) );
+ 	return serialize( rgbRounded, { format: 'hex' } );
+ }
+ 
+ /**
+- * Get contrast value between two colors
+- * @param colorA First color
+- * @param colorB Second color
++ * Get contrast value between two colors.
++ * @param colorA First color: a `PlainColorObject`, or an sRGB-parseable string.
++ * @param colorB Second color: a `PlainColorObject`, or an sRGB-parseable string.
+  * @return WCAG 2.1 contrast ratio
+  */
+-export function getContrast( colorA: ColorTypes, colorB: ColorTypes ): number {
++export function getContrast(
++	colorA: string | PlainColorObject,
++	colorB: string | PlainColorObject
++): number {
++	ColorSpace.register( sRGB );
+ 	return contrastWCAG21( colorA, colorB );
+ }
+ 
+ /**
+  * Make sure that a color is valid in the sRGB gamut and convert it to OKLCH.
+- * @param c
++ * @param c A `PlainColorObject`, or an sRGB-parseable string.
+  */
+-export function clampToGamut( c: ColorTypes ) {
+-	// map into sRGB using CSS OKLCH method
++export function clampToGamut( c: string | PlainColorObject ) {
++	ColorSpace.register( sRGB );
++	// Workaround for upstream toGamut(method:'css') bug.
++	// https://github.com/color-js/color.js/pull/734
++	ColorSpace.register( OKLCH );
+ 	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
+ }
+diff --git a/packages/theme/src/color-ramps/lib/constants.ts b/packages/theme/src/color-ramps/lib/constants.ts
+index 91f86e6ca21402..f94dd982eb38c1 100644
+--- a/packages/theme/src/color-ramps/lib/constants.ts
++++ b/packages/theme/src/color-ramps/lib/constants.ts
+@@ -1,16 +1,16 @@
+-/**
+- * External dependencies
+- */
+-import { to, OKLCH } from 'colorjs.io/fn';
+-
+-/**
+- * Internal dependencies
+- */
+-import './register-color-spaces';
++import { OKLCH, type PlainColorObject } from 'colorjs.io/fn';
+ import type { Ramp } from './types';
+ 
+-export const WHITE = to( 'white', OKLCH );
+-export const BLACK = to( 'black', OKLCH );
++export const WHITE: PlainColorObject = {
++	space: OKLCH,
++	coords: [ 1, 0, 0 ],
++	alpha: 1,
++};
++export const BLACK: PlainColorObject = {
++	space: OKLCH,
++	coords: [ 0, 0, 0 ],
++	alpha: 1,
++};
+ 
+ // Margin added to target contrasts to counter for algorithm approximations and rounding errors.
+ // - the `CONTRAST_EPSILON` value is 0.004, so the real contrast can be lower by this amount.
+diff --git a/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts b/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts
+index 349ba9393ffad3..fc5a95a45b59b2 100644
+--- a/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts
++++ b/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts
+@@ -1,12 +1,4 @@
+-/**
+- * External dependencies
+- */
+ import { get, OKLCH, type PlainColorObject } from 'colorjs.io/fn';
+-
+-/**
+- * Internal dependencies
+- */
+-import './register-color-spaces';
+ import { solveWithBisect } from './utils';
+ import { WHITE, BLACK, CONTRAST_EPSILON } from './constants';
+ import { clampToGamut, getContrast } from './color-utils';
+@@ -86,8 +78,9 @@ export function findColorMeetingRequirements(
+ 		}
+ 
+ 		return clampToGamut( {
+-			spaceId: 'oklch',
++			space: OKLCH,
+ 			coords: [ newL, newC, get( seed, [ OKLCH, 'h' ] ) ],
++			alpha: seed.alpha,
+ 		} );
+ 	}
+ 
+diff --git a/packages/theme/src/color-ramps/lib/index.ts b/packages/theme/src/color-ramps/lib/index.ts
+index b2432903b77d7c..c752685ffdbdfe 100644
+--- a/packages/theme/src/color-ramps/lib/index.ts
++++ b/packages/theme/src/color-ramps/lib/index.ts
+@@ -1,19 +1,8 @@
+-/**
+- * External dependencies
+- */
+-import {
+-	clone,
+-	get,
+-	OKLCH,
+-	set,
+-	type ColorTypes,
+-	type PlainColorObject,
+-} from 'colorjs.io/fn';
++import { clone, get, OKLCH, set, type PlainColorObject } from 'colorjs.io/fn';
+ 
+ /**
+  * Internal dependencies
+  */
+-import './register-color-spaces';
+ import { clampToGamut, getContrast, getColorString } from './color-utils';
+ import { findColorMeetingRequirements } from './find-color-with-constraints';
+ import {
+@@ -23,7 +12,6 @@ import {
+ 	stepsForStep,
+ 	solveWithBisect,
+ } from './utils';
+-
+ import type {
+ 	FollowDirection,
+ 	Ramp,
+@@ -116,7 +104,7 @@ function calculateRamp( {
+ 		}
+ 
+ 		function computeDirection(
+-			color: ColorTypes,
++			color: string | PlainColorObject,
+ 			followDirection: FollowDirection
+ 		): RampDirection {
+ 			if ( followDirection === 'main' ) {
+diff --git a/packages/theme/src/color-ramps/lib/register-color-spaces.ts b/packages/theme/src/color-ramps/lib/register-color-spaces.ts
+deleted file mode 100644
+index 0ee28fd84eaaf6..00000000000000
+--- a/packages/theme/src/color-ramps/lib/register-color-spaces.ts
++++ /dev/null
+@@ -1,13 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { ColorSpace, OKLCH, P3, sRGB, HSL } from 'colorjs.io/fn';
+-
+-// Ensures that all color spaces used in color ramps are registered globally, a
+-// requirement for using colorjs.io's procedural API.
+-//
+-// See: https://colorjs.io/docs/procedural
+-ColorSpace.register( sRGB );
+-ColorSpace.register( OKLCH );
+-ColorSpace.register( P3 );
+-ColorSpace.register( HSL );
+diff --git a/packages/theme/src/color-ramps/lib/taper-chroma.ts b/packages/theme/src/color-ramps/lib/taper-chroma.ts
+index d409eb013d708d..8c80df9d8ae06a 100644
+--- a/packages/theme/src/color-ramps/lib/taper-chroma.ts
++++ b/packages/theme/src/color-ramps/lib/taper-chroma.ts
+@@ -1,20 +1,12 @@
+-/**
+- * External dependencies
+- */
+ import {
++	ColorSpace,
+ 	get,
+ 	toGamut,
+ 	OKLCH,
+ 	sRGB,
+ 	type PlainColorObject,
+-	type ColorSpace,
+ } from 'colorjs.io/fn';
+ 
+-/**
+- * Internal dependencies
+- */
+-import './register-color-spaces';
+-
+ export interface TaperChromaOptions {
+ 	gamut?: ColorSpace; // target gamut (default `sRGB`)
+ 	alpha?: number; // base fraction of Cmax at target (default 0.62)
+@@ -44,6 +36,10 @@ export function taperChroma(
+ 	lTarget: number, // [0..1]
+ 	options: TaperChromaOptions = {}
+ ): { l: number; c: number } | PlainColorObject {
++	// Workaround for upstream toGamut(method:'css') bug.
++	// https://github.com/color-js/color.js/pull/734
++	ColorSpace.register( OKLCH );
++
+ 	const gamut = options.gamut ?? sRGB;
+ 	const alpha = options.alpha ?? 0.65; // 0.7-0.8 works well for accent surface
+ 	const carry = options.carry ?? 0.5;
+diff --git a/packages/theme/src/color-ramps/lib/utils.ts b/packages/theme/src/color-ramps/lib/utils.ts
+index ca051e9e2e7660..d8e5da98eb50e1 100644
+--- a/packages/theme/src/color-ramps/lib/utils.ts
++++ b/packages/theme/src/color-ramps/lib/utils.ts
+@@ -1,12 +1,4 @@
+-/**
+- * External dependencies
+- */
+-import { type ColorTypes } from 'colorjs.io/fn';
+-
+-/**
+- * Internal dependencies
+- */
+-import './register-color-spaces';
++import { type PlainColorObject } from 'colorjs.io/fn';
+ import {
+ 	WHITE,
+ 	BLACK,
+@@ -142,7 +134,7 @@ export function stepsForStep(
+  * ramp direction value.
+  */
+ export function computeBetterFgColorDirection(
+-	seed: ColorTypes,
++	seed: string | PlainColorObject,
+ 	preferLighter?: boolean
+ ): {
+ 	better: RampDirection;
+diff --git a/packages/theme/src/color-ramps/test/index.test.ts b/packages/theme/src/color-ramps/test/index.test.ts
+index a8412f06783cf6..33132dee9a3147 100644
+--- a/packages/theme/src/color-ramps/test/index.test.ts
++++ b/packages/theme/src/color-ramps/test/index.test.ts
+@@ -1,7 +1,4 @@
+-/**
+- * Internal dependencies
+- */
+-import '../lib/register-color-spaces';
++import { serialize, to, HSL, sRGB } from 'colorjs.io/fn';
+ import { buildRamp } from '../lib';
+ import { getColorString } from '../lib/color-utils';
+ import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
+@@ -13,9 +10,28 @@ const hStops = [ 0, 60, 120, 180, 240, 300 ];
+ 
+ describe( 'buildRamps', () => {
+ 	it( 'background ramp snapshots', () => {
+-		const allBgColors = lStops.flatMap( ( l ) =>
++		// Generate a set of HSL colors across a broad perceivable range to test
++		// support for building ramps with various combinations of lightness,
++		// saturation, and hue. Convert to a serialized string format to mirror
++		// real-world consumer usage.
++		const allBgColors: string[] = lStops.flatMap( ( l ) =>
+ 			sStops.flatMap( ( s ) =>
+-				hStops.map( ( h ) => `hsl(${ h }deg ${ s }% ${ l }%)` )
++				hStops.map( ( h ) =>
++					serialize(
++						to(
++							{
++								space: HSL,
++								coords: [ h, s, l ] as [
++									number,
++									number,
++									number,
++								],
++								alpha: 1,
++							},
++							sRGB
++						)
++					)
++				)
+ 			)
+ 		);
+ 
+diff --git a/packages/theme/src/types.ts b/packages/theme/src/types.ts
+index d6761f39c4b21d..c4dd2a27cd6a42 100644
+--- a/packages/theme/src/types.ts
++++ b/packages/theme/src/types.ts
+@@ -9,14 +9,16 @@ export interface ThemeProviderSettings {
+ 	 */
+ 	color?: {
+ 		/**
+-		 * The primary seed color to use for the theme.
++		 * The primary seed color to use for the theme. Accepts a hex string
++		 * (e.g. `#3858e9`), an `rgb(...)` string, or a CSS color keyword.
+ 		 *
+ 		 * By default, it inherits from parent `ThemeProvider`,
+ 		 * and fallbacks to statically built CSS.
+ 		 */
+ 		primary?: string;
+ 		/**
+-		 * The background seed color to use for the theme.
++		 * The background seed color to use for the theme. Accepts a hex string
++		 * (e.g. `#f8f8f8`), an `rgb(...)` string, or a CSS color keyword.
+ 		 *
+ 		 * By default, it inherits from parent `ThemeProvider`,
+ 		 * and fallbacks to statically built CSS.
+diff --git a/packages/theme/src/use-theme-provider-styles.ts b/packages/theme/src/use-theme-provider-styles.ts
+index 370cc91bee5c5d..025e23fe71512d 100644
+--- a/packages/theme/src/use-theme-provider-styles.ts
++++ b/packages/theme/src/use-theme-provider-styles.ts
+@@ -3,6 +3,7 @@
+  */
+ import type { CSSProperties } from 'react';
+ import {
++	ColorSpace,
+ 	clone,
+ 	set,
+ 	to,
+@@ -20,7 +21,6 @@ import { useMemo, useContext } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import './color-ramps/lib/register-color-spaces';
+ import { ThemeContext } from './context';
+ import colorTokens from './prebuilt/ts/color-tokens';
+ import {
+@@ -101,6 +101,7 @@ function customRgbFormat( color: PlainColorObject ): string {
+ }
+ 
+ function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
++	ColorSpace.register( sRGB );
+ 	const parsedAccent = to( accent, HSL );
+ 	const parsedL = parsedAccent.coords[ 2 ] ?? 0;
+ 

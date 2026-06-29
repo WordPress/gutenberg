@@ -1,0 +1,110 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 39ec52d6e11856..72edad0df4e10e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
+ 
++### Enhancements
++
++-   `ToggleGroupControl`: Add opt-in prop for 40px default size ([#55789](https://github.com/WordPress/gutenberg/pull/55789)).
++
+ ## 25.11.0 (2023-11-02)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 924c5ecb587466..1d48349f0ee799 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -31,6 +31,7 @@ function UnconnectedToggleGroupControl(
+ ) {
+ 	const {
+ 		__nextHasNoMarginBottom = false,
++		__next40pxDefaultSize = false,
+ 		className,
+ 		isAdaptiveWidth = false,
+ 		isBlock = false,
+@@ -52,11 +53,16 @@ function UnconnectedToggleGroupControl(
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+-				styles.toggleGroupControl( { isBlock, isDeselectable, size } ),
++				styles.toggleGroupControl( {
++					isBlock,
++					isDeselectable,
++					size,
++					__next40pxDefaultSize,
++				} ),
+ 				isBlock && styles.block,
+ 				className
+ 			),
+-		[ className, cx, isBlock, isDeselectable, size ]
++		[ className, cx, isBlock, isDeselectable, size, __next40pxDefaultSize ]
+ 	);
+ 
+ 	const MainControl = isDeselectable
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+index 5d0b90096024ce..b8a8552f98beb0 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -14,7 +14,11 @@ export const toggleGroupControl = ( {
+ 	isBlock,
+ 	isDeselectable,
+ 	size,
+-}: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
++	__next40pxDefaultSize,
++}: Pick<
++	ToggleGroupControlProps,
++	'isBlock' | 'isDeselectable' | '__next40pxDefaultSize'
++> & {
+ 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
+ } ) => css`
+ 	background: ${ COLORS.ui.background };
+@@ -25,7 +29,7 @@ export const toggleGroupControl = ( {
+ 	padding: 2px;
+ 	position: relative;
+ 
+-	${ toggleGroupControlSize( size ) }
++	${ toggleGroupControlSize( size, __next40pxDefaultSize ) }
+ 	${ ! isDeselectable && enclosingBorders( isBlock ) }
+ `;
+ 
+@@ -53,13 +57,18 @@ const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
+ };
+ 
+ export const toggleGroupControlSize = (
+-	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
++	size: NonNullable< ToggleGroupControlProps[ 'size' ] >,
++	__next40pxDefaultSize: ToggleGroupControlProps[ '__next40pxDefaultSize' ]
+ ) => {
+ 	const heights = {
+-		default: '36px',
++		default: '40px',
+ 		'__unstable-large': '40px',
+ 	};
+ 
++	if ( ! __next40pxDefaultSize ) {
++		heights.default = '36px';
++	}
++
+ 	return css`
+ 		min-height: ${ heights[ size ] };
+ 	`;
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index d170997c5b2608..d49ef3cbb77cb4 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -122,6 +122,12 @@ export type ToggleGroupControlProps = Pick<
+ 	 * @default 'default'
+ 	 */
+ 	size?: 'default' | '__unstable-large';
++	/**
++	 * Start opting into the larger default height that will become the default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next40pxDefaultSize?: boolean;
+ };
+ 
+ export type ToggleGroupControlContextProps = {

@@ -1,0 +1,253 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d7741f4caa9886..1737db1240a617 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `FontSizePicker`: Deprecate 36px default size ([#66920](https://github.com/WordPress/gutenberg/pull/66920)).
+ -   `ComboboxControl`: Deprecate 36px default size ([#66900](https://github.com/WordPress/gutenberg/pull/66900)).
+ -   `ToggleGroupControl`: Deprecate 36px default size ([#66747](https://github.com/WordPress/gutenberg/pull/66747)).
++-   `RangeControl`: Deprecate 36px default size ([#66721](https://github.com/WordPress/gutenberg/pull/66721)). 
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 31eeb166a2d60f..2ba338c2bb30cb 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -122,6 +122,7 @@ const UnconnectedBorderControl = (
+ 						value={ widthValue || undefined }
+ 						withInputField={ false }
+ 						__next40pxDefaultSize={ __next40pxDefaultSize }
++						__shouldNotWarnDeprecated36pxSize
+ 					/>
+ 				) }
+ 			</HStack>
+diff --git a/packages/components/src/box-control/all-input-control.tsx b/packages/components/src/box-control/all-input-control.tsx
+index e9166ff7f692e8..057cf3c15d8c38 100644
+--- a/packages/components/src/box-control/all-input-control.tsx
++++ b/packages/components/src/box-control/all-input-control.tsx
+@@ -91,6 +91,7 @@ export default function AllInputControl( {
+ 			<FlexedRangeControl
+ 				__nextHasNoMarginBottom
+ 				__next40pxDefaultSize={ __next40pxDefaultSize }
++				__shouldNotWarnDeprecated36pxSize
+ 				aria-controls={ inputId }
+ 				label={ LABELS.all }
+ 				hideLabelFromVision
+diff --git a/packages/components/src/box-control/axial-input-controls.tsx b/packages/components/src/box-control/axial-input-controls.tsx
+index c6c0181f6c871c..40b39840b464b5 100644
+--- a/packages/components/src/box-control/axial-input-controls.tsx
++++ b/packages/components/src/box-control/axial-input-controls.tsx
+@@ -129,6 +129,7 @@ export default function AxialInputControls( {
+ 						<FlexedRangeControl
+ 							__nextHasNoMarginBottom
+ 							__next40pxDefaultSize={ __next40pxDefaultSize }
++							__shouldNotWarnDeprecated36pxSize
+ 							aria-controls={ inputId }
+ 							label={ LABELS[ side ] }
+ 							hideLabelFromVision
+diff --git a/packages/components/src/box-control/input-controls.tsx b/packages/components/src/box-control/input-controls.tsx
+index 553f547abf9b0d..1f005f6c6c01bd 100644
+--- a/packages/components/src/box-control/input-controls.tsx
++++ b/packages/components/src/box-control/input-controls.tsx
+@@ -134,6 +134,7 @@ export default function BoxInputControls( {
+ 						<FlexedRangeControl
+ 							__nextHasNoMarginBottom
+ 							__next40pxDefaultSize={ __next40pxDefaultSize }
++							__shouldNotWarnDeprecated36pxSize
+ 							aria-controls={ inputId }
+ 							label={ LABELS[ side ] }
+ 							hideLabelFromVision
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index d4e8ea29fc6c4f..a71e60cd6719c8 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -242,6 +242,7 @@ const UnforwardedFontSizePicker = (
+ 										__next40pxDefaultSize={
+ 											__next40pxDefaultSize
+ 										}
++										__shouldNotWarnDeprecated36pxSize
+ 										className="components-font-size-picker__custom-input"
+ 										label={ __( 'Custom Size' ) }
+ 										hideLabelFromVision
+diff --git a/packages/components/src/range-control/README.md b/packages/components/src/range-control/README.md
+index cfa8c76740e74f..f21285c5f26256 100644
+--- a/packages/components/src/range-control/README.md
++++ b/packages/components/src/range-control/README.md
+@@ -88,9 +88,10 @@ import { RangeControl } from '@wordpress/components';
+ const MyRangeControl = () => {
+ 	const [ columns, setColumns ] = useState( 2 );
+ 
+-	return(
++	return (
+ 		<RangeControl
+ 			__nextHasNoMarginBottom
++			__next40pxDefaultSize
+ 			label="Columns"
+ 			value={ columns }
+ 			onChange={ ( value ) => setColumns( value ) }
+@@ -153,7 +154,6 @@ Disables the `input`, preventing new values from being applied.
+ -   Required: No
+ -   Platform: Web
+ 
+-
+ ### `help`: `string|Element`
+ 
+ If this property is added, a help text will be generated using help property as the content.
+@@ -165,7 +165,7 @@ If this property is added, a help text will be generated using help property as
+ 
+ Provides control over whether the label will only be visible to screen readers.
+ 
+-- Required: No
++-   Required: No
+ 
+ ### `icon`: `string`
+ 
+@@ -334,6 +334,7 @@ The minimum amount by which `value` changes. It is also a factor in validation a
+ 
+ -   Required: No
+ -   Platform: Web
++
+ ### `trackColor`: `CSSProperties[ 'color' ]`
+ 
+ CSS color string to customize the track element's background.
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index c9fbdc0055c855..916571c3ee0e05 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -38,6 +38,7 @@ import {
+ import type { RangeControlProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ import { space } from '../utils/space';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ const noop = () => {};
+ 
+@@ -96,6 +97,7 @@ function UnforwardedRangeControl(
+ 		trackColor,
+ 		value: valueProp,
+ 		withInputField = true,
++		__shouldNotWarnDeprecated36pxSize,
+ 		...otherProps
+ 	} = props;
+ 
+@@ -229,6 +231,14 @@ function UnforwardedRangeControl(
+ 		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
+ 	};
+ 
++	// Add default size deprecation warning.
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'RangeControl',
++		__next40pxDefaultSize,
++		size: undefined,
++		__shouldNotWarnDeprecated36pxSize,
++	} );
++
+ 	return (
+ 		<BaseControl
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+@@ -384,6 +394,7 @@ function UnforwardedRangeControl(
+  *   return (
+  *     <RangeControl
+  *       __nextHasNoMarginBottom
++ *       __next40pxDefaultSize
+  *       help="Please select how transparent you would like this."
+  *       initialPosition={50}
+  *       label="Opacity"
+diff --git a/packages/components/src/range-control/stories/index.story.tsx b/packages/components/src/range-control/stories/index.story.tsx
+index dcff3513733527..86a2609b8db649 100644
+--- a/packages/components/src/range-control/stories/index.story.tsx
++++ b/packages/components/src/range-control/stories/index.story.tsx
+@@ -72,6 +72,7 @@ const Template: StoryFn< typeof RangeControl > = ( { onChange, ...args } ) => {
+ export const Default: StoryFn< typeof RangeControl > = Template.bind( {} );
+ Default.args = {
+ 	__nextHasNoMarginBottom: true,
++	__next40pxDefaultSize: true,
+ 	help: 'Please select how transparent you would like this.',
+ 	initialPosition: 50,
+ 	label: 'Opacity',
+@@ -107,6 +108,7 @@ export const WithAnyStep: StoryFn< typeof RangeControl > = ( {
+ };
+ WithAnyStep.args = {
+ 	__nextHasNoMarginBottom: true,
++	__next40pxDefaultSize: true,
+ 	label: 'Brightness',
+ 	step: 'any',
+ };
+@@ -171,6 +173,7 @@ export const WithIntegerStepAndMarks: StoryFn< typeof RangeControl > =
+ 
+ WithIntegerStepAndMarks.args = {
+ 	__nextHasNoMarginBottom: true,
++	__next40pxDefaultSize: true,
+ 	label: 'Integer Step',
+ 	marks: marksBase,
+ 	max: 10,
+@@ -188,6 +191,7 @@ export const WithDecimalStepAndMarks: StoryFn< typeof RangeControl > =
+ 
+ WithDecimalStepAndMarks.args = {
+ 	__nextHasNoMarginBottom: true,
++	__next40pxDefaultSize: true,
+ 	marks: [
+ 		...marksBase,
+ 		{ value: 3.5, label: '3.5' },
+@@ -208,6 +212,7 @@ export const WithNegativeMinimumAndMarks: StoryFn< typeof RangeControl > =
+ 
+ WithNegativeMinimumAndMarks.args = {
+ 	__nextHasNoMarginBottom: true,
++	__next40pxDefaultSize: true,
+ 	marks: marksWithNegatives,
+ 	max: 10,
+ 	min: -10,
+@@ -224,6 +229,7 @@ export const WithNegativeRangeAndMarks: StoryFn< typeof RangeControl > =
+ 
+ WithNegativeRangeAndMarks.args = {
+ 	__nextHasNoMarginBottom: true,
++	__next40pxDefaultSize: true,
+ 	marks: marksWithNegatives,
+ 	max: -1,
+ 	min: -10,
+@@ -240,6 +246,7 @@ export const WithAnyStepAndMarks: StoryFn< typeof RangeControl > =
+ 
+ WithAnyStepAndMarks.args = {
+ 	__nextHasNoMarginBottom: true,
++	__next40pxDefaultSize: true,
+ 	marks: marksBase,
+ 	max: 10,
+ 	min: 0,
+diff --git a/packages/components/src/range-control/test/index.tsx b/packages/components/src/range-control/test/index.tsx
+index 3ce741867d0dbc..3d2db30eea186f 100644
+--- a/packages/components/src/range-control/test/index.tsx
++++ b/packages/components/src/range-control/test/index.tsx
+@@ -18,7 +18,13 @@ const fireChangeEvent = ( input: HTMLInputElement, value?: number | string ) =>
+ const RangeControl = (
+ 	props: React.ComponentProps< typeof _RangeControl >
+ ) => {
+-	return <_RangeControl { ...props } __nextHasNoMarginBottom />;
++	return (
++		<_RangeControl
++			{ ...props }
++			__nextHasNoMarginBottom
++			__next40pxDefaultSize
++		/>
++	);
+ };
+ 
+ describe( 'RangeControl', () => {
+diff --git a/packages/components/src/range-control/types.ts b/packages/components/src/range-control/types.ts
+index a427ab4f942af6..e4792296f83144 100644
+--- a/packages/components/src/range-control/types.ts
++++ b/packages/components/src/range-control/types.ts
+@@ -233,6 +233,13 @@ export type RangeControlProps = Pick<
+ 		 * @default true
+ 		 */
+ 		withInputField?: boolean;
++		/**
++		 * Do not throw a warning for the deprecated 36px default size.
++		 * For internal components of other components that already throw the warning.
++		 *
++		 * @ignore
++		 */
++		__shouldNotWarnDeprecated36pxSize?: boolean;
+ 	};
+ 
+ export type RailProps = MarksProps & {

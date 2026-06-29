@@ -1,0 +1,972 @@
+diff --git a/packages/block-editor/src/components/link-control/test/index.js b/packages/block-editor/src/components/link-control/test/index.js
+index 0d2881ebf6e893..f18f44603c5615 100644
+--- a/packages/block-editor/src/components/link-control/test/index.js
++++ b/packages/block-editor/src/components/link-control/test/index.js
+@@ -3,7 +3,7 @@
+  */
+ import {
+ 	fireEvent,
+-	render,
++	render as baseRender,
+ 	screen,
+ 	waitFor,
+ 	within,
+@@ -13,6 +13,7 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * WordPress dependencies
+  */
++import { SlotFillProvider } from '@wordpress/components';
+ import { useState, createElement } from '@wordpress/element';
+ import { useSelect } from '@wordpress/data';
+ 
+@@ -79,6 +80,10 @@ afterEach( () => {
+ 	mockFetchRichUrlData?.mockReset(); // Conditionally reset as it may NOT be a mock.
+ } );
+ 
++function render( ui ) {
++	return baseRender( ui, { wrapper: SlotFillProvider } );
++}
++
+ /**
+  * Workaround to trigger an arrow up keypress event.
+  *
+diff --git a/packages/block-editor/src/components/media-replace-flow/test/index.js b/packages/block-editor/src/components/media-replace-flow/test/index.js
+index e72b3cd5222a9b..2f5d5143e61e67 100644
+--- a/packages/block-editor/src/components/media-replace-flow/test/index.js
++++ b/packages/block-editor/src/components/media-replace-flow/test/index.js
+@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
+-
++import { SlotFillProvider } from '@wordpress/components';
+ /**
+  * Internal dependencies
+  */
+@@ -19,16 +19,18 @@ const noop = () => {};
+ function TestWrapper() {
+ 	const [ mediaURL, setMediaURL ] = useState( 'https://example.media' );
+ 	return (
+-		<MediaReplaceFlow
+-			mediaId={ 1 }
+-			mediaURL={ mediaURL }
+-			allowedTypes={ [ 'png' ] }
+-			accept="image/*"
+-			onSelect={ noop }
+-			onSelectURL={ setMediaURL }
+-			onError={ noop }
+-			onCloseModal={ noop }
+-		/>
++		<SlotFillProvider>
++			<MediaReplaceFlow
++				mediaId={ 1 }
++				mediaURL={ mediaURL }
++				allowedTypes={ [ 'png' ] }
++				accept="image/*"
++				onSelect={ noop }
++				onSelectURL={ setMediaURL }
++				onError={ noop }
++				onCloseModal={ noop }
++			/>
++		</SlotFillProvider>
+ 	);
+ }
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c79131b6b1b1eb..aea899867aaaf0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -57,6 +57,7 @@
+ -   `Menu`: Clean up popover wrappers ([#74207](https://github.com/WordPress/gutenberg/pull/74207)).
+ -   `Button`, `DateCalendar`, `DateRangeCalendar`, `CheckboxControl`, `Panel`, `Placeholder`: Remove outdated vendor prefix properties in CSS ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
+ -    Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530)).
++-   `SlotFill`: unify context providers and `Fill` implementations ([#68056](https://github.com/WordPress/gutenberg/pull/68056)).
+ 
+ ## 30.9.0 (2025-11-26)
+ 
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/fill.tsx b/packages/components/src/slot-fill/bubbles-virtually/fill.tsx
+deleted file mode 100644
+index ef7bc94ff540bd..00000000000000
+--- a/packages/components/src/slot-fill/bubbles-virtually/fill.tsx
++++ /dev/null
+@@ -1,50 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useObservableValue } from '@wordpress/compose';
+-import {
+-	useContext,
+-	useRef,
+-	useEffect,
+-	createPortal,
+-} from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import SlotFillContext from './slot-fill-context';
+-import StyleProvider from '../../style-provider';
+-import type { FillComponentProps } from '../types';
+-
+-export default function Fill( { name, children }: FillComponentProps ) {
+-	const registry = useContext( SlotFillContext );
+-	const slot = useObservableValue( registry.slots, name );
+-	const instanceRef = useRef( {} );
+-
+-	// We register fills so we can keep track of their existence.
+-	// Slots can use the `useSlotFills` hook to know if there're already fills
+-	// registered so they can choose to render themselves or not.
+-	useEffect( () => {
+-		const instance = instanceRef.current;
+-		registry.registerFill( name, instance );
+-		return () => registry.unregisterFill( name, instance );
+-	}, [ registry, name ] );
+-
+-	if ( ! slot || ! slot.ref.current ) {
+-		return null;
+-	}
+-
+-	// When using a `Fill`, the `children` will be rendered in the document of the
+-	// `Slot`. This means that we need to wrap the `children` in a `StyleProvider`
+-	// to make sure we're referencing the right document/iframe (instead of the
+-	// context of the `Fill`'s parent).
+-	const wrappedChildren = (
+-		<StyleProvider document={ slot.ref.current.ownerDocument }>
+-			{ typeof children === 'function'
+-				? children( slot.fillProps ?? {} )
+-				: children }
+-		</StyleProvider>
+-	);
+-
+-	return createPortal( wrappedChildren, slot.ref.current );
+-}
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.ts b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.ts
+deleted file mode 100644
+index d012b1d73a0fab..00000000000000
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.ts
++++ /dev/null
+@@ -1,34 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext } from '@wordpress/element';
+-import warning from '@wordpress/warning';
+-import { observableMap } from '@wordpress/compose';
+-
+-/**
+- * Internal dependencies
+- */
+-import type { SlotFillBubblesVirtuallyContext } from '../types';
+-
+-const initialContextValue: SlotFillBubblesVirtuallyContext = {
+-	slots: observableMap(),
+-	fills: observableMap(),
+-	registerSlot: () => {
+-		warning(
+-			'Components must be wrapped within `SlotFillProvider`. ' +
+-				'See https://developer.wordpress.org/block-editor/components/slot-fill/'
+-		);
+-	},
+-	updateSlot: () => {},
+-	unregisterSlot: () => {},
+-	registerFill: () => {},
+-	unregisterFill: () => {},
+-
+-	// This helps the provider know if it's using the default context value or not.
+-	isDefault: true,
+-};
+-
+-const SlotFillContext = createContext( initialContextValue );
+-SlotFillContext.displayName = 'SlotFillContext';
+-
+-export default SlotFillContext;
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx
+deleted file mode 100644
+index 98860361c01fd5..00000000000000
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.tsx
++++ /dev/null
+@@ -1,106 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-import { isShallowEqual } from '@wordpress/is-shallow-equal';
+-import { observableMap } from '@wordpress/compose';
+-
+-/**
+- * Internal dependencies
+- */
+-import SlotFillContext from './slot-fill-context';
+-import type {
+-	SlotFillProviderProps,
+-	SlotFillBubblesVirtuallyContext,
+-} from '../types';
+-
+-function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
+-	const slots: SlotFillBubblesVirtuallyContext[ 'slots' ] = observableMap();
+-	const fills: SlotFillBubblesVirtuallyContext[ 'fills' ] = observableMap();
+-
+-	const registerSlot: SlotFillBubblesVirtuallyContext[ 'registerSlot' ] = (
+-		name,
+-		ref,
+-		fillProps
+-	) => {
+-		slots.set( name, { ref, fillProps } );
+-	};
+-
+-	const unregisterSlot: SlotFillBubblesVirtuallyContext[ 'unregisterSlot' ] =
+-		( name, ref ) => {
+-			const slot = slots.get( name );
+-			if ( ! slot ) {
+-				return;
+-			}
+-
+-			// Make sure we're not unregistering a slot registered by another element
+-			// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
+-			if ( slot.ref !== ref ) {
+-				return;
+-			}
+-
+-			slots.delete( name );
+-		};
+-
+-	const updateSlot: SlotFillBubblesVirtuallyContext[ 'updateSlot' ] = (
+-		name,
+-		ref,
+-		fillProps
+-	) => {
+-		const slot = slots.get( name );
+-		if ( ! slot ) {
+-			return;
+-		}
+-
+-		if ( slot.ref !== ref ) {
+-			return;
+-		}
+-
+-		if ( isShallowEqual( slot.fillProps, fillProps ) ) {
+-			return;
+-		}
+-
+-		slots.set( name, { ref, fillProps } );
+-	};
+-
+-	const registerFill: SlotFillBubblesVirtuallyContext[ 'registerFill' ] = (
+-		name,
+-		ref
+-	) => {
+-		fills.set( name, [ ...( fills.get( name ) || [] ), ref ] );
+-	};
+-
+-	const unregisterFill: SlotFillBubblesVirtuallyContext[ 'unregisterFill' ] =
+-		( name, ref ) => {
+-			const fillsForName = fills.get( name );
+-			if ( ! fillsForName ) {
+-				return;
+-			}
+-
+-			fills.set(
+-				name,
+-				fillsForName.filter( ( fillRef ) => fillRef !== ref )
+-			);
+-		};
+-
+-	return {
+-		slots,
+-		fills,
+-		registerSlot,
+-		updateSlot,
+-		unregisterSlot,
+-		registerFill,
+-		unregisterFill,
+-	};
+-}
+-
+-export default function SlotFillProvider( {
+-	children,
+-}: SlotFillProviderProps ) {
+-	const [ registry ] = useState( createSlotRegistry );
+-	return (
+-		<SlotFillContext.Provider value={ registry }>
+-			{ children }
+-		</SlotFillContext.Provider>
+-	);
+-}
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot.tsx b/packages/components/src/slot-fill/bubbles-virtually/slot.tsx
+index e65c055c410a6b..430f98a795c9e1 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot.tsx
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot.tsx
+@@ -18,7 +18,7 @@ import { useMergeRefs } from '@wordpress/compose';
+  * Internal dependencies
+  */
+ import { View } from '../../view';
+-import SlotFillContext from './slot-fill-context';
++import SlotFillContext from '../context';
+ import type { WordPressComponentProps } from '../../context';
+ import type { SlotComponentProps } from '../types';
+ 
+@@ -40,25 +40,32 @@ function Slot(
+ 	} = props;
+ 
+ 	const registry = useContext( SlotFillContext );
+-
++	const instanceRef = useRef( {} );
+ 	const ref = useRef< HTMLElement >( null );
+ 
+-	// We don't want to unregister and register the slot whenever
+-	// `fillProps` change, which would cause the fill to be re-mounted. Instead,
+-	// we can just update the slot (see hook below).
+-	// For more context, see https://github.com/WordPress/gutenberg/pull/44403#discussion_r994415973
+ 	const fillPropsRef = useRef( fillProps );
+ 	useLayoutEffect( () => {
+ 		fillPropsRef.current = fillProps;
+ 	}, [ fillProps ] );
+ 
+ 	useLayoutEffect( () => {
+-		registry.registerSlot( name, ref, fillPropsRef.current );
+-		return () => registry.unregisterSlot( name, ref );
++		const instance = instanceRef.current;
++		registry.registerSlot( name, {
++			type: 'portal',
++			instance,
++			ref,
++			fillProps: fillPropsRef.current,
++		} );
++		return () => registry.unregisterSlot( name, instance );
+ 	}, [ registry, name ] );
+ 
+ 	useLayoutEffect( () => {
+-		registry.updateSlot( name, ref, fillPropsRef.current );
++		registry.updateSlot( name, {
++			type: 'portal',
++			instance: instanceRef.current,
++			ref,
++			fillProps: fillPropsRef.current,
++		} );
+ 	} );
+ 
+ 	return (
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/use-slot-fills.ts b/packages/components/src/slot-fill/bubbles-virtually/use-slot-fills.ts
+index 6229d20f2da513..4f16841ff02b51 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/use-slot-fills.ts
++++ b/packages/components/src/slot-fill/bubbles-virtually/use-slot-fills.ts
+@@ -1,16 +1,42 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useContext } from '@wordpress/element';
+-import { useObservableValue } from '@wordpress/compose';
++import { useContext, useMemo, useSyncExternalStore } from '@wordpress/element';
++import type { ObservableMap } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+  */
+-import SlotFillContext from './slot-fill-context';
++import SlotFillContext from '../context';
+ import type { SlotKey } from '../types';
+ 
++function useObservableValueWithSelector< K, V, S >(
++	map: ObservableMap< K, V >,
++	name: K,
++	selector: ( v: V | undefined ) => S
++) {
++	const subscribe = useMemo(
++		() => ( listener: () => void ) => map.subscribe( name, listener ),
++		[ map, name ]
++	);
++	const getValue = () => selector( map.get( name ) );
++	return useSyncExternalStore( subscribe, getValue, getValue );
++}
++
++function getLength< T >( array: T[] | undefined ) {
++	return array?.length;
++}
++
+ export default function useSlotFills( name: SlotKey ) {
+ 	const registry = useContext( SlotFillContext );
+-	return useObservableValue( registry.fills, name );
++	const length = useObservableValueWithSelector(
++		registry.fills,
++		name,
++		getLength
++	);
++	// callers expect an opaque array with length `length`, so create that array
++	const fills = useMemo( () => {
++		return length !== undefined ? Array.from( { length } ) : undefined;
++	}, [ length ] );
++	return fills;
+ }
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/use-slot.ts b/packages/components/src/slot-fill/bubbles-virtually/use-slot.ts
+index cac57a024e4ee2..68114f5e09a167 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/use-slot.ts
++++ b/packages/components/src/slot-fill/bubbles-virtually/use-slot.ts
+@@ -7,11 +7,15 @@ import { useObservableValue } from '@wordpress/compose';
+ /**
+  * Internal dependencies
+  */
+-import SlotFillContext from './slot-fill-context';
+-import type { SlotKey } from '../types';
++import SlotFillContext from '../context';
++import type { SlotKey, SlotRef } from '../types';
+ 
+ export default function useSlot( name: SlotKey ) {
+ 	const registry = useContext( SlotFillContext );
+ 	const slot = useObservableValue( registry.slots, name );
+-	return { ...slot };
++	let ref: SlotRef | undefined;
++	if ( slot && slot.type === 'portal' ) {
++		ref = slot.ref;
++	}
++	return { ref };
+ }
+diff --git a/packages/components/src/slot-fill/context.ts b/packages/components/src/slot-fill/context.ts
+index 73763ab5263cfa..427b82ceee72b4 100644
+--- a/packages/components/src/slot-fill/context.ts
++++ b/packages/components/src/slot-fill/context.ts
+@@ -3,22 +3,33 @@
+  */
+ import { observableMap } from '@wordpress/compose';
+ import { createContext } from '@wordpress/element';
++import warning from '@wordpress/warning';
+ 
+ /**
+  * Internal dependencies
+  */
+-import type { BaseSlotFillContext } from './types';
++import type { SlotFillRegistry } from './types';
+ 
+-const initialValue: BaseSlotFillContext = {
++const initialValue: SlotFillRegistry = {
+ 	slots: observableMap(),
+ 	fills: observableMap(),
+-	registerSlot: () => {},
++	registerSlot: () => {
++		warning(
++			'Components must be wrapped within `SlotFillProvider`. ' +
++				'See https://developer.wordpress.org/block-editor/components/slot-fill/'
++		);
++	},
+ 	unregisterSlot: () => {},
++	updateSlot: () => {},
+ 	registerFill: () => {},
+ 	unregisterFill: () => {},
+ 	updateFill: () => {},
++
++	// This helps the provider know if it's using the default context value or not.
++	isDefault: true,
+ };
+-export const SlotFillContext = createContext( initialValue );
++
++const SlotFillContext = createContext( initialValue );
+ SlotFillContext.displayName = 'SlotFillContext';
+ 
+ export default SlotFillContext;
+diff --git a/packages/components/src/slot-fill/fill.ts b/packages/components/src/slot-fill/fill.ts
+deleted file mode 100644
+index 0bd1aec8fa3e0e..00000000000000
+--- a/packages/components/src/slot-fill/fill.ts
++++ /dev/null
+@@ -1,32 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useContext, useLayoutEffect, useRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import SlotFillContext from './context';
+-import type { FillComponentProps } from './types';
+-
+-export default function Fill( { name, children }: FillComponentProps ) {
+-	const registry = useContext( SlotFillContext );
+-	const instanceRef = useRef( {} );
+-	const childrenRef = useRef( children );
+-
+-	useLayoutEffect( () => {
+-		childrenRef.current = children;
+-	}, [ children ] );
+-
+-	useLayoutEffect( () => {
+-		const instance = instanceRef.current;
+-		registry.registerFill( name, instance, childrenRef.current );
+-		return () => registry.unregisterFill( name, instance );
+-	}, [ registry, name ] );
+-
+-	useLayoutEffect( () => {
+-		registry.updateFill( name, instanceRef.current, childrenRef.current );
+-	} );
+-
+-	return null;
+-}
+diff --git a/packages/components/src/slot-fill/fill.tsx b/packages/components/src/slot-fill/fill.tsx
+new file mode 100644
+index 00000000000000..6de62c031deec2
+--- /dev/null
++++ b/packages/components/src/slot-fill/fill.tsx
+@@ -0,0 +1,74 @@
++/**
++ * WordPress dependencies
++ */
++import { useObservableValue } from '@wordpress/compose';
++import {
++	useContext,
++	useLayoutEffect,
++	useRef,
++	createPortal,
++} from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import SlotFillContext from './context';
++import type { FillComponentProps } from './types';
++import StyleProvider from '../style-provider';
++
++export default function Fill( { name, children }: FillComponentProps ) {
++	const registry = useContext( SlotFillContext );
++	const instanceRef = useRef( {} );
++	const childrenRef = useRef( children );
++
++	useLayoutEffect( () => {
++		childrenRef.current = children;
++	}, [ children ] );
++
++	useLayoutEffect( () => {
++		const instance = instanceRef.current;
++		registry.registerFill( name, {
++			instance,
++			children: childrenRef.current,
++		} );
++		return () => registry.unregisterFill( name, instance );
++	}, [ registry, name ] );
++
++	useLayoutEffect( () => {
++		registry.updateFill( name, {
++			instance: instanceRef.current,
++			children: childrenRef.current,
++		} );
++	} );
++
++	const slot = useObservableValue( registry.slots, name );
++
++	if ( ! slot ) {
++		return null;
++	}
++
++	if ( slot.type === 'children' ) {
++		return null;
++	}
++
++	const portalEl = slot.ref.current;
++	if ( ! portalEl ) {
++		return null;
++	}
++
++	const wrappedChildren =
++		typeof children === 'function'
++			? children( slot.fillProps ?? {} )
++			: children;
++
++	// When using a `Fill`, the `children` will be rendered in the document of the
++	// `Slot`. This means that we need to wrap the `children` in a `StyleProvider`
++	// to make sure we're referencing the right document/iframe (instead of the
++	// context of the `Fill`'s parent).
++	return createPortal(
++		<StyleProvider document={ portalEl.ownerDocument }>
++			{ wrappedChildren }
++		</StyleProvider>,
++		portalEl
++	);
++}
+diff --git a/packages/components/src/slot-fill/index.tsx b/packages/components/src/slot-fill/index.tsx
+index caf97091b67ac8..23e8fa9807457c 100644
+--- a/packages/components/src/slot-fill/index.tsx
++++ b/packages/components/src/slot-fill/index.tsx
+@@ -11,13 +11,11 @@ import { forwardRef, useContext } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import BaseFill from './fill';
++import Fill from './fill';
+ import BaseSlot from './slot';
+-import BubblesVirtuallyFill from './bubbles-virtually/fill';
+ import BubblesVirtuallySlot from './bubbles-virtually/slot';
+-import BubblesVirtuallySlotFillProvider from './bubbles-virtually/slot-fill-provider';
+ import SlotFillProvider from './provider';
+-import SlotFillContext from './bubbles-virtually/slot-fill-context';
++import SlotFillContext from './context';
+ import type { WordPressComponentProps } from '../context';
+ 
+ export { default as useSlot } from './bubbles-virtually/use-slot';
+@@ -30,30 +28,21 @@ import type {
+ 	SlotKey,
+ } from './types';
+ 
+-export function Fill( props: FillComponentProps ) {
+-	// We're adding both Fills here so they can register themselves before
+-	// their respective slot has been registered. Only the Fill that has a slot
+-	// will render. The other one will return null.
+-	return (
+-		<>
+-			<BaseFill { ...props } />
+-			<BubblesVirtuallyFill { ...props } />
+-		</>
+-	);
+-}
++export { Fill };
+ 
+-export function UnforwardedSlot(
+-	props: SlotComponentProps &
+-		Omit< WordPressComponentProps< {}, 'div' >, 'className' >,
+-	ref: ForwardedRef< any >
+-) {
+-	const { bubblesVirtually, ...restProps } = props;
+-	if ( bubblesVirtually ) {
+-		return <BubblesVirtuallySlot { ...restProps } ref={ ref } />;
++export const Slot = forwardRef(
++	(
++		props: SlotComponentProps &
++			Omit< WordPressComponentProps< {}, 'div' >, 'className' >,
++		ref: ForwardedRef< any >
++	) => {
++		const { bubblesVirtually, ...restProps } = props;
++		if ( bubblesVirtually ) {
++			return <BubblesVirtuallySlot { ...restProps } ref={ ref } />;
++		}
++		return <BaseSlot { ...restProps } />;
+ 	}
+-	return <BaseSlot { ...restProps } />;
+-}
+-export const Slot = forwardRef( UnforwardedSlot );
++);
+ 
+ export function Provider( {
+ 	children,
+@@ -63,13 +52,7 @@ export function Provider( {
+ 	if ( ! parent.isDefault && passthrough ) {
+ 		return <>{ children }</>;
+ 	}
+-	return (
+-		<SlotFillProvider>
+-			<BubblesVirtuallySlotFillProvider>
+-				{ children }
+-			</BubblesVirtuallySlotFillProvider>
+-		</SlotFillProvider>
+-	);
++	return <SlotFillProvider>{ children }</SlotFillProvider>;
+ }
+ Provider.displayName = 'SlotFillProvider';
+ 
+diff --git a/packages/components/src/slot-fill/provider.tsx b/packages/components/src/slot-fill/provider.tsx
+index e5319bc7f33e44..8fa58e96edc034 100644
+--- a/packages/components/src/slot-fill/provider.tsx
++++ b/packages/components/src/slot-fill/provider.tsx
+@@ -1,56 +1,73 @@
+ /**
+  * WordPress dependencies
+  */
++import { observableMap } from '@wordpress/compose';
+ import { useState } from '@wordpress/element';
++import { isShallowEqual } from '@wordpress/is-shallow-equal';
+ 
+ /**
+  * Internal dependencies
+  */
+ import SlotFillContext from './context';
+ import type {
+-	FillInstance,
+-	FillChildren,
+-	BaseSlotInstance,
+-	BaseSlotFillContext,
++	SlotRecord,
++	FillRecord,
++	SlotFillInstance,
++	SlotFillRegistry,
+ 	SlotFillProviderProps,
+ 	SlotKey,
+ } from './types';
+-import { observableMap } from '@wordpress/compose';
+ 
+-function createSlotRegistry(): BaseSlotFillContext {
+-	const slots = observableMap< SlotKey, BaseSlotInstance >();
+-	const fills = observableMap<
+-		SlotKey,
+-		{ instance: FillInstance; children: FillChildren }[]
+-	>();
++function createSlotRegistry(): SlotFillRegistry {
++	const slots = observableMap< SlotKey, SlotRecord >();
++	const fills = observableMap< SlotKey, FillRecord[] >();
+ 
+-	function registerSlot( name: SlotKey, instance: BaseSlotInstance ) {
+-		slots.set( name, instance );
++	function registerSlot( name: SlotKey, slot: SlotRecord ) {
++		slots.set( name, slot );
+ 	}
+ 
+-	function unregisterSlot( name: SlotKey, instance: BaseSlotInstance ) {
++	function unregisterSlot( name: SlotKey, instance: SlotFillInstance ) {
+ 		// If a previous instance of a Slot by this name unmounts, do nothing,
+ 		// as the slot and its fills should only be removed for the current
+ 		// known instance.
+-		if ( slots.get( name ) !== instance ) {
++		const currentSlot = slots.get( name );
++		if ( ! currentSlot || currentSlot.instance !== instance ) {
+ 			return;
+ 		}
+ 
+ 		slots.delete( name );
+ 	}
+ 
+-	function registerFill(
+-		name: SlotKey,
+-		instance: FillInstance,
+-		children: FillChildren
+-	) {
+-		fills.set( name, [
+-			...( fills.get( name ) || [] ),
+-			{ instance, children },
+-		] );
++	function updateSlot( name: SlotKey, slot: SlotRecord ) {
++		if ( slot.type !== 'portal' ) {
++			return;
++		}
++
++		const slotForName = slots.get( name );
++		if ( ! slotForName ) {
++			return;
++		}
++
++		if ( slotForName.type !== 'portal' ) {
++			return;
++		}
++
++		if ( slotForName.instance !== slot.instance ) {
++			return;
++		}
++
++		if ( isShallowEqual( slotForName.fillProps, slot.fillProps ) ) {
++			return;
++		}
++
++		slots.set( name, slot );
++	}
++
++	function registerFill( name: SlotKey, fill: FillRecord ) {
++		fills.set( name, [ ...( fills.get( name ) || [] ), fill ] );
+ 	}
+ 
+-	function unregisterFill( name: SlotKey, instance: FillInstance ) {
++	function unregisterFill( name: SlotKey, instance: SlotFillInstance ) {
+ 		const fillsForName = fills.get( name );
+ 		if ( ! fillsForName ) {
+ 			return;
+@@ -62,33 +79,29 @@ function createSlotRegistry(): BaseSlotFillContext {
+ 		);
+ 	}
+ 
+-	function updateFill(
+-		name: SlotKey,
+-		instance: FillInstance,
+-		children: FillChildren
+-	) {
++	function updateFill( name: SlotKey, fill: FillRecord ) {
+ 		const fillsForName = fills.get( name );
+ 		if ( ! fillsForName ) {
+ 			return;
+ 		}
+ 
+ 		const fillForInstance = fillsForName.find(
+-			( f ) => f.instance === instance
++			( f ) => f.instance === fill.instance
+ 		);
+ 		if ( ! fillForInstance ) {
+ 			return;
+ 		}
+ 
+-		if ( fillForInstance.children === children ) {
++		if ( fillForInstance.children === fill.children ) {
+ 			return;
+ 		}
+ 
+ 		fills.set(
+ 			name,
+ 			fillsForName.map( ( f ) => {
+-				if ( f.instance === instance ) {
+-					// Replace with new record with updated `children`.
+-					return { instance, children };
++				if ( f.instance === fill.instance ) {
++					// Replace with the new fill record with updated `children`.
++					return fill;
+ 				}
+ 
+ 				return f;
+@@ -101,6 +114,7 @@ function createSlotRegistry(): BaseSlotFillContext {
+ 		fills,
+ 		registerSlot,
+ 		unregisterSlot,
++		updateSlot,
+ 		registerFill,
+ 		unregisterFill,
+ 		updateFill,
+diff --git a/packages/components/src/slot-fill/slot.tsx b/packages/components/src/slot-fill/slot.tsx
+index c1182562672c0b..8d7d8d13f67cfd 100644
+--- a/packages/components/src/slot-fill/slot.tsx
++++ b/packages/components/src/slot-fill/slot.tsx
+@@ -49,14 +49,14 @@ function addKeysToChildren( children: ReactNode ) {
+ }
+ 
+ function Slot( props: Omit< SlotComponentProps, 'bubblesVirtually' > ) {
++	const { name, children, fillProps = {} } = props;
++
+ 	const registry = useContext( SlotFillContext );
+ 	const instanceRef = useRef( {} );
+ 
+-	const { name, children, fillProps = {} } = props;
+-
+ 	useLayoutEffect( () => {
+ 		const instance = instanceRef.current;
+-		registry.registerSlot( name, instance );
++		registry.registerSlot( name, { type: 'children', instance } );
+ 		return () => registry.unregisterSlot( name, instance );
+ 	}, [ registry, name ] );
+ 
+@@ -64,7 +64,7 @@ function Slot( props: Omit< SlotComponentProps, 'bubblesVirtually' > ) {
+ 	const currentSlot = useObservableValue( registry.slots, name );
+ 
+ 	// Fills should only be rendered in the currently registered instance of the slot.
+-	if ( currentSlot !== instanceRef.current ) {
++	if ( ! currentSlot || currentSlot.instance !== instanceRef.current ) {
+ 		fills = [];
+ 	}
+ 
+diff --git a/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap b/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
+index b9379eda7171a2..f8ec9303ff20cb 100644
+--- a/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
++++ b/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
+@@ -86,6 +86,20 @@ exports[`Slot bubblesVirtually true should unmount two slots with the same name
+ </div>
+ `;
+ 
++exports[`Slot should not infinite loop with useSlotFills 1`] = `
++<div>
++  <div>
++    <div>
++      fills:
++      1
++    </div>
++    <div>
++      fill content
++    </div>
++  </div>
++</div>
++`;
++
+ exports[`Slot should re-render Slot when not bubbling virtually 1`] = `
+ <div>
+   <div>
+diff --git a/packages/components/src/slot-fill/test/slot.js b/packages/components/src/slot-fill/test/slot.js
+index 99836a94463526..96f2b02170a35d 100644
+--- a/packages/components/src/slot-fill/test/slot.js
++++ b/packages/components/src/slot-fill/test/slot.js
+@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * Internal dependencies
+  */
+-import { Slot, Fill, Provider } from '../';
++import { Slot, Fill, Provider, useSlotFills } from '../';
+ 
+ /**
+  * WordPress dependencies
+@@ -381,4 +381,27 @@ describe( 'Slot', () => {
+ 			} );
+ 		}
+ 	);
++
++	it( 'should not infinite loop with useSlotFills', () => {
++		function App() {
++			// if `useSlotFills` triggers a state update every time the `Fill` is rerendered with
++			// new `children`, it will cause infinite rerender loop. This test checks we don't do that.
++			const fills = useSlotFills( 'editor' );
++			return (
++				<div>
++					<div>fills:{ fills?.length ?? 'none' }</div>
++					<Slot name="editor" />
++					<Fill name="editor">
++						<div>fill content</div>
++					</Fill>
++				</div>
++			);
++		}
++		const { container } = render(
++			<Provider>
++				<App />
++			</Provider>
++		);
++		expect( container ).toMatchSnapshot();
++	} );
+ } );
+diff --git a/packages/components/src/slot-fill/types.ts b/packages/components/src/slot-fill/types.ts
+index 758f1c8257d548..fb76fcbf53af47 100644
+--- a/packages/components/src/slot-fill/types.ts
++++ b/packages/components/src/slot-fill/types.ts
+@@ -112,42 +112,26 @@ export type SlotFillProviderProps = {
+ 	passthrough?: boolean;
+ };
+ 
++export type SlotFillInstance = {};
+ export type SlotRef = RefObject< HTMLElement >;
+-export type FillInstance = {};
+-export type BaseSlotInstance = {};
+-
+-export type SlotFillBubblesVirtuallyContext = {
+-	slots: ObservableMap< SlotKey, { ref: SlotRef; fillProps: FillProps } >;
+-	fills: ObservableMap< SlotKey, FillInstance[] >;
+-	registerSlot: ( name: SlotKey, ref: SlotRef, fillProps: FillProps ) => void;
+-	unregisterSlot: ( name: SlotKey, ref: SlotRef ) => void;
+-	updateSlot: ( name: SlotKey, ref: SlotRef, fillProps: FillProps ) => void;
+-	registerFill: ( name: SlotKey, instance: FillInstance ) => void;
+-	unregisterFill: ( name: SlotKey, instance: FillInstance ) => void;
++export type SlotRecord = { instance: SlotFillInstance } & (
++	| { type: 'children' }
++	| { type: 'portal'; ref: SlotRef; fillProps: FillProps }
++);
++export type FillRecord = { instance: SlotFillInstance; children: FillChildren };
++
++export type SlotFillRegistry = {
++	slots: ObservableMap< SlotKey, SlotRecord >;
++	fills: ObservableMap< SlotKey, FillRecord[] >;
++	registerSlot: ( name: SlotKey, slot: SlotRecord ) => void;
++	unregisterSlot: ( name: SlotKey, instance: SlotFillInstance ) => void;
++	updateSlot: ( name: SlotKey, slot: SlotRecord ) => void;
++	registerFill: ( name: SlotKey, fill: FillRecord ) => void;
++	unregisterFill: ( name: SlotKey, instance: SlotFillInstance ) => void;
++	updateFill: ( name: SlotKey, fill: FillRecord ) => void;
+ 
+ 	/**
+ 	 * This helps the provider know if it's using the default context value or not.
+ 	 */
+ 	isDefault?: boolean;
+ };
+-
+-export type BaseSlotFillContext = {
+-	slots: ObservableMap< SlotKey, BaseSlotInstance >;
+-	fills: ObservableMap<
+-		SlotKey,
+-		{ instance: FillInstance; children: FillChildren }[]
+-	>;
+-	registerSlot: ( name: SlotKey, slot: BaseSlotInstance ) => void;
+-	unregisterSlot: ( name: SlotKey, slot: BaseSlotInstance ) => void;
+-	registerFill: (
+-		name: SlotKey,
+-		instance: FillInstance,
+-		children: FillChildren
+-	) => void;
+-	unregisterFill: ( name: SlotKey, instance: FillInstance ) => void;
+-	updateFill: (
+-		name: SlotKey,
+-		instance: FillInstance,
+-		children: FillChildren
+-	) => void;
+-};

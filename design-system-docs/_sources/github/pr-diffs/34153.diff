@@ -1,0 +1,808 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 2848119e4017f8..d65006c624d049 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -773,6 +773,12 @@
+ 		"markdown_source": "../packages/components/src/combobox-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "ConfirmDialog",
++		"slug": "confirm-dialog",
++		"markdown_source": "../packages/components/src/confirm-dialog/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "CustomSelectControl",
+ 		"slug": "custom-select-control",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 44f7b5c70d0f86..8ee3398e3d3e61 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   Added support for RTL behavior for the `ZStack`'s `offset` prop ([#36769](https://github.com/WordPress/gutenberg/pull/36769))
+ -   Fixed race conditions causing conditionally displayed `ToolsPanelItem` components to be erroneously deregistered ([36588](https://github.com/WordPress/gutenberg/pull/36588)).
+ -   Added `__experimentalHideHeader` prop to `Modal` component ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
++-   Added experimental `ConfirmDialog` component ([#34153](https://github.com/WordPress/gutenberg/pull/34153)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/confirm-dialog/README.md b/packages/components/src/confirm-dialog/README.md
+new file mode 100644
+index 00000000000000..246b1bcc9638d6
+--- /dev/null
++++ b/packages/components/src/confirm-dialog/README.md
+@@ -0,0 +1,128 @@
++# `ConfirmDialog`
++
++<div class="callout callout-alert">
++This feature is still experimental. "Experimental" means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`ConfirmDialog` is built of top of [`Modal`](/packages/components/src/modal/README.md] and displays a confirmation dialog, with _confirm_ and _cancel_ buttons.
++
++The dialog is confirmed by clicking the _confirm_ button or by pressing the `Enter` key. It is cancelled (closed) by clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay).
++
++## Usage
++
++`ConfirmDialog` has two main implicit modes: controlled and uncontrolled.
++
++### Uncontrolled mode
++
++Allows the component to be used standalone, just by declaring it as part of another React's component render method:
++  * It will be automatically open (displayed) upon mounting;
++  * It will be automatically closed when when clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay);
++  * `onCancel` is not mandatory but can be passed. Even if passed, the dialog will still be able to close itself.
++
++Activating this mode is as simple as omitting the `isOpen` prop. The only mandatory prop, in this case, is the `onConfirm` callback. The message is passed as the `children`. You can pass any JSX you'd like, which allows to further format the message or include sub-component if you'd like:
++
++```jsx
++import {
++  __experimentalConfirmDialog as ConfirmDialog
++} from '@wordpress/components';
++
++function Example() {
++  return (
++    <ConfirmDialog onConfirm={ () => console.debug(' Confirmed! ') }>
++      Are you sure? <strong>This action cannot be undone!</strong>
++    </ConfirmDialog>
++  );
++}
++```
++
++### Controlled mode
++
++Let the parent component control when the dialog is open/closed. It's activated when a boolean value is passed to `isOpen`:
++  * It will not be automatically closed. You need to let it know when to open/close by updating the value of the `isOpen` prop;
++  * Both `onConfirm` and the `onCancel` callbacks are mandatory props in this mode;
++  * You'll want to update the state that controls `isOpen` by updating it from the `onCancel` and `onConfirm` callbacks.
++
++
++```jsx
++import {
++  __experimentalConfirmDialog as ConfirmDialog
++} from '@wordpress/components';
++
++function Example() {
++  const [ isOpen, setIsOpen ] = useState( true );
++
++  const handleConfirm = () => {
++    console.debug( 'Confirmed!' );
++    setIsOpen( false );
++  }
++
++  const handleCancel = () => {
++    console.debug( 'Cancelled!' );
++    setIsOpen( false );
++  }
++
++  return (
++    <ConfirmDialog
++      isOpen={ isOpen }
++      onConfirm={ handleConfirm }
++      onCancel={ handleCancel }
++    >
++      Are you sure? <strong>This action cannot be undone!</strong>
++    </ConfirmDialog>
++  );
++}
++```
++
++### Unsupported: Multiple instances
++
++Multiple `ConfirmDialog's is an edge case that's currently not officially supported by this component. At the moment, new instances will end up closing the last instance due to the way the `Modal` is implemented.
++
++## Custom Types
++
++```ts
++type DialogInputEvent =
++	| KeyboardEvent< HTMLDivElement >
++	| MouseEvent< HTMLButtonElement >
++```
++
++## Props
++
++### `title`: `string`
++
++- Required: No
++
++An optional `title` for the dialog. Setting a title will render it in a title bar at the top of the dialog, making it a bit taller. The bar will also include an `x` close button at the top-right corner.
++
++### `children`: `React.ReactNode`
++
++- Required: Yes
++
++The actual message for the dialog. It's passed as children and any valid `ReactNode` is accepted:
++
++```jsx
++<ConfirmDialog>
++ Are you sure? <strong>This action cannot be undone!</strong>
++</ConfirmDialog>
++```
++
++### `isOpen`: `boolean`
++
++- Required: No
++
++Defines if the dialog is open (displayed) or closed (not rendered/displayed). It also implicitly toggles the controlled mode if set or the uncontrolled mode if it's not set.
++
++### `onConfirm`: `( event: DialogInputEvent ) => void`
++
++- Required: Yes
++
++The callback that's called when the user confirms. A confirmation can happen when the `OK` button is clicked or when `Enter` is pressed.
++
++### `onCancel`: `( event: DialogInputEvent ) => void`
++
++- Required: Only if `isOpen` is not set
++
++The callback that's called when the user cancels. A cancellation can happen when the `Cancel` button is clicked, when the `ESC` key is pressed, or when a click outside of the dialog focus is detected (i.e. in the overlay).
++
++It's not required if `isOpen` is not set (uncontrolled mode), as the component will take care of closing itself, but you can still pass a callback if something must be done upon cancelling (the component will still close itself in this case).
++
++If `isOpen` is set (controlled mode), then it's required, and you need to set the state that defines `isOpen` to `false` as part of this callback if you want the dialog to close when the user cancels.
+diff --git a/packages/components/src/confirm-dialog/component.tsx b/packages/components/src/confirm-dialog/component.tsx
+new file mode 100644
+index 00000000000000..d33a07aa7a1536
+--- /dev/null
++++ b/packages/components/src/confirm-dialog/component.tsx
+@@ -0,0 +1,114 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import React, { useEffect, useState } from 'react';
++// eslint-disable-next-line no-restricted-imports
++import type { Ref, KeyboardEvent } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++import { useCallback } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import Modal from '../modal';
++import type { OwnProps, DialogInputEvent } from './types';
++import {
++	useContextSystem,
++	contextConnect,
++	WordPressComponentProps,
++} from '../ui/context';
++import { Flex } from '../flex';
++import Button from '../button';
++import { Text } from '../text';
++import { VStack } from '../v-stack';
++
++function ConfirmDialog(
++	props: WordPressComponentProps< OwnProps, 'div', false >,
++	forwardedRef: Ref< any >
++) {
++	const {
++		isOpen: isOpenProp,
++		onConfirm,
++		onCancel,
++		children,
++		...otherProps
++	} = useContextSystem( props, 'ConfirmDialog' );
++
++	const [ isOpen, setIsOpen ] = useState< boolean >();
++	const [ shouldSelfClose, setShouldSelfClose ] = useState< boolean >();
++
++	useEffect( () => {
++		// We only allow the dialog to close itself if `isOpenProp` is *not* set.
++		// If `isOpenProp` is set, then it (probably) means it's controlled by a
++		// parent component. In that case, `shouldSelfClose` might do more harm than
++		// good, so we disable it.
++		const isIsOpenSet = typeof isOpenProp !== 'undefined';
++		setIsOpen( isIsOpenSet ? isOpenProp : true );
++		setShouldSelfClose( ! isIsOpenSet );
++	}, [ isOpenProp ] );
++
++	const handleEvent = useCallback(
++		( callback?: ( event: DialogInputEvent ) => void ) => (
++			event: DialogInputEvent
++		) => {
++			callback?.( event );
++			if ( shouldSelfClose ) {
++				setIsOpen( false );
++			}
++		},
++		[ shouldSelfClose, setIsOpen ]
++	);
++
++	const handleEnter = useCallback(
++		( event: KeyboardEvent< HTMLDivElement > ) => {
++			if ( event.key === 'Enter' ) {
++				handleEvent( onConfirm )( event );
++			}
++		},
++		[ handleEvent, onConfirm ]
++	);
++
++	const cancelLabel = __( 'Cancel' );
++	const confirmLabel = __( 'OK' );
++
++	return (
++		<>
++			{ isOpen && (
++				<Modal
++					onRequestClose={ handleEvent( onCancel ) }
++					onKeyDown={ handleEnter }
++					closeButtonLabel={ cancelLabel }
++					isDismissible={ true }
++					ref={ forwardedRef }
++					__experimentalHideHeader
++					{ ...otherProps }
++				>
++					<VStack spacing={ 8 }>
++						<Text>{ children }</Text>
++						<Flex direction="row" justify="flex-end">
++							<Button
++								variant="tertiary"
++								onClick={ handleEvent( onCancel ) }
++							>
++								{ cancelLabel }
++							</Button>
++							<Button
++								variant="primary"
++								onClick={ handleEvent( onConfirm ) }
++							>
++								{ confirmLabel }
++							</Button>
++						</Flex>
++					</VStack>
++				</Modal>
++			) }
++		</>
++	);
++}
++
++export default contextConnect( ConfirmDialog, 'ConfirmDialog' );
+diff --git a/packages/components/src/confirm-dialog/index.tsx b/packages/components/src/confirm-dialog/index.tsx
+new file mode 100644
+index 00000000000000..c7a35aabe032fe
+--- /dev/null
++++ b/packages/components/src/confirm-dialog/index.tsx
+@@ -0,0 +1,6 @@
++/**
++ * Internal dependencies
++ */
++import ConfirmDialog from './component';
++
++export { ConfirmDialog };
+diff --git a/packages/components/src/confirm-dialog/stories/index.js b/packages/components/src/confirm-dialog/stories/index.js
+new file mode 100644
+index 00000000000000..3c067f0d178ec0
+--- /dev/null
++++ b/packages/components/src/confirm-dialog/stories/index.js
+@@ -0,0 +1,120 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import React, { useState } from 'react';
++import { text } from '@storybook/addon-knobs';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../../button';
++import { Heading } from '../../heading';
++import { ConfirmDialog } from '..';
++
++export default {
++	component: ConfirmDialog,
++	title: 'Components (Experimental)/ConfirmDialog',
++	parameters: {
++		knobs: { disabled: false },
++	},
++};
++
++const daText = () =>
++	text( 'message', 'Would you like to privately publish the post now?' );
++
++// Simplest usage: just declare the component with the required `onConfirm` prop.
++export const _default = () => {
++	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
++
++	return (
++		<>
++			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
++				{ daText() }
++			</ConfirmDialog>
++			<Heading level={ 1 }>{ confirmVal }</Heading>
++		</>
++	);
++};
++
++export const WithJSXMessage = () => {
++	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
++
++	return (
++		<>
++			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
++				<Heading level={ 2 }>{ daText() }</Heading>
++			</ConfirmDialog>
++			<Heading level={ 1 }>{ confirmVal }</Heading>
++		</>
++	);
++};
++
++export const VeeeryLongMessage = () => {
++	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
++
++	return (
++		<>
++			<ConfirmDialog onConfirm={ () => setConfirmVal( 'Confirmed!' ) }>
++				{ daText().repeat( 20 ) }
++			</ConfirmDialog>
++			<Heading level={ 1 }>{ confirmVal }</Heading>
++		</>
++	);
++};
++
++export const UncontrolledAndWithExplicitOnCancel = () => {
++	const [ confirmVal, setConfirmVal ] = useState(
++		"Hasn't confirmed or cancelled yet"
++	);
++
++	return (
++		<>
++			<ConfirmDialog
++				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
++				onCancel={ () => setConfirmVal( 'Cancelled' ) }
++			>
++				{ daText() }
++			</ConfirmDialog>
++			<Heading level={ 1 }>{ confirmVal }</Heading>
++		</>
++	);
++};
++
++// Controlled `ConfirmDialog`s require both `onConfirm` *and* `onCancel to be passed
++// It's expected that the user will then use it to hide the dialog, too (see the
++// `setIsOpen` calls below).
++export const Controlled = () => {
++	const [ isOpen, setIsOpen ] = useState( false );
++	const [ confirmVal, setConfirmVal ] = useState(
++		"Hasn't confirmed or cancelled yet"
++	);
++
++	const handleConfirm = () => {
++		setConfirmVal( 'Confirmed!' );
++		setIsOpen( false );
++	};
++
++	const handleCancel = () => {
++		setConfirmVal( 'Cancelled' );
++		setIsOpen( false );
++	};
++
++	return (
++		<>
++			<ConfirmDialog
++				isOpen={ isOpen }
++				onConfirm={ handleConfirm }
++				onCancel={ handleCancel }
++			>
++				{ daText() }
++			</ConfirmDialog>
++
++			<Heading level={ 1 }>{ confirmVal }</Heading>
++
++			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
++				Open ConfirmDialog
++			</Button>
++		</>
++	);
++};
+diff --git a/packages/components/src/confirm-dialog/test/index.js b/packages/components/src/confirm-dialog/test/index.js
+new file mode 100644
+index 00000000000000..5cff6715445eea
+--- /dev/null
++++ b/packages/components/src/confirm-dialog/test/index.js
+@@ -0,0 +1,302 @@
++/**
++ * External dependencies
++ */
++import {
++	render,
++	fireEvent,
++	waitForElementToBeRemoved,
++} from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { ConfirmDialog } from '..';
++
++const noop = () => {};
++
++describe( 'Confirm', () => {
++	describe( 'Confirm component', () => {
++		describe( 'Structure', () => {
++			it( 'should render correctly', () => {
++				const wrapper = render(
++					<ConfirmDialog onConfirm={ noop } onCancel={ noop }>
++						Are you sure?
++					</ConfirmDialog>
++				);
++
++				const dialog = wrapper.getByRole( 'dialog' );
++				const elementsTexts = [ 'Are you sure?', 'OK', 'Cancel' ];
++
++				expect( dialog ).toBeInTheDocument();
++
++				elementsTexts.forEach( ( txt ) => {
++					const el = wrapper.getByText( txt );
++					expect( el ).toBeInTheDocument();
++				} );
++			} );
++		} );
++
++		describe( 'When uncontrolled', () => {
++			it( 'should render', () => {
++				const wrapper = render(
++					<ConfirmDialog onConfirm={ noop } onCancel={ noop }>
++						Are you sure?
++					</ConfirmDialog>
++				);
++
++				const confirmDialog = wrapper.getByRole( 'dialog' );
++
++				expect( confirmDialog ).toBeInTheDocument();
++			} );
++
++			it( 'should not render if closed by clicking `OK`, and the `onConfirm` callback should be called', async () => {
++				const onConfirm = jest.fn().mockName( 'onConfirm()' );
++
++				const wrapper = render(
++					<ConfirmDialog onConfirm={ onConfirm }>
++						Are you sure?
++					</ConfirmDialog>
++				);
++
++				const confirmDialog = wrapper.getByRole( 'dialog' );
++				const button = wrapper.getByText( 'OK' );
++
++				fireEvent.click( button );
++
++				expect( confirmDialog ).not.toBeInTheDocument();
++				expect( onConfirm ).toHaveBeenCalled();
++			} );
++
++			it( 'should not render if closed by clicking `Cancel`, and the `onCancel` callback should be called', async () => {
++				const onCancel = jest.fn().mockName( 'onCancel()' );
++
++				const wrapper = render(
++					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
++						Are you sure?
++					</ConfirmDialog>
++				);
++
++				const confirmDialog = wrapper.getByRole( 'dialog' );
++				const button = wrapper.getByText( 'Cancel' );
++
++				fireEvent.click( button );
++
++				expect( confirmDialog ).not.toBeInTheDocument();
++				expect( onCancel ).toHaveBeenCalled();
++			} );
++
++			it( 'should be dismissable even if an `onCancel` callback is not provided', async () => {
++				const wrapper = render(
++					<ConfirmDialog onConfirm={ noop }>
++						Are you sure?
++					</ConfirmDialog>
++				);
++
++				const confirmDialog = wrapper.getByRole( 'dialog' );
++				const button = wrapper.getByText( 'Cancel' );
++
++				fireEvent.click( button );
++
++				expect( confirmDialog ).not.toBeInTheDocument();
++			} );
++
++			it( 'should not render if dialog is closed by clicking the overlay, and the `onCancel` callback should be called', async () => {
++				const onCancel = jest.fn().mockName( 'onCancel()' );
++
++				const wrapper = render(
++					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
++						Are you sure?
++					</ConfirmDialog>
++				);
++
++				const confirmDialog = wrapper.getByRole( 'dialog' );
++
++				//The overlay click is handled by detecting an onBlur from the modal frame.
++				fireEvent.blur( confirmDialog );
++
++				await waitForElementToBeRemoved( confirmDialog );
++
++				expect( confirmDialog ).not.toBeInTheDocument();
++				expect( onCancel ).toHaveBeenCalled();
++			} );
++
++			it( 'should not render if dialog is closed by pressing `Escape`, and the `onCancel` callback should be called', async () => {
++				const onCancel = jest.fn().mockName( 'onCancel()' );
++
++				const wrapper = render(
++					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
++						Are you sure?
++					</ConfirmDialog>
++				);
++
++				const confirmDialog = wrapper.getByRole( 'dialog' );
++
++				fireEvent.keyDown( confirmDialog, { keyCode: 27 } );
++
++				expect( confirmDialog ).not.toBeInTheDocument();
++				expect( onCancel ).toHaveBeenCalled();
++			} );
++
++			it( 'should not render if dialog is closed by pressing `Enter`, and the `onConfirm` callback should be called', async () => {
++				const onConfirm = jest.fn().mockName( 'onConfirm()' );
++
++				const wrapper = render(
++					<ConfirmDialog onConfirm={ onConfirm }>
++						Are you sure?
++					</ConfirmDialog>
++				);
++
++				const confirmDialog = wrapper.getByRole( 'dialog' );
++
++				fireEvent.keyDown( confirmDialog, { keyCode: 13 } );
++
++				expect( confirmDialog ).not.toBeInTheDocument();
++				expect( onConfirm ).toHaveBeenCalled();
++			} );
++		} );
++	} );
++
++	describe( 'When controlled (isOpen is not `undefined`)', () => {
++		it( 'should render when `isOpen` is set to `true`', async () => {
++			const wrapper = render(
++				<ConfirmDialog
++					isOpen={ true }
++					onConfirm={ noop }
++					onCancel={ noop }
++				>
++					Are you sure?
++				</ConfirmDialog>
++			);
++
++			const confirmDialog = wrapper.getByRole( 'dialog' );
++
++			expect( confirmDialog ).toBeInTheDocument();
++		} );
++
++		it( 'should not render if `isOpen` is set to false', async () => {
++			const wrapper = render(
++				<ConfirmDialog
++					isOpen={ false }
++					onConfirm={ noop }
++					onCancel={ noop }
++				>
++					Are you sure?
++				</ConfirmDialog>
++			);
++
++			// `queryByRole` needs to be used here because in this scenario the
++			// dialog is never rendered.
++			const confirmDialog = wrapper.queryByRole( 'dialog' );
++
++			expect( confirmDialog ).not.toBeInTheDocument();
++		} );
++
++		it( 'should call the `onConfirm` callback if `OK`', async () => {
++			const onConfirm = jest.fn().mockName( 'onConfirm()' );
++
++			const wrapper = render(
++				<ConfirmDialog isOpen={ true } onConfirm={ onConfirm }>
++					Are you sure?
++				</ConfirmDialog>
++			);
++
++			const button = wrapper.getByText( 'OK' );
++
++			fireEvent.click( button );
++
++			expect( onConfirm ).toHaveBeenCalled();
++		} );
++
++		it( 'should call the `onCancel` callback if `Cancel` is clicked', async () => {
++			const onCancel = jest.fn().mockName( 'onCancel()' );
++
++			const wrapper = render(
++				<ConfirmDialog
++					isOpen={ true }
++					onConfirm={ noop }
++					onCancel={ onCancel }
++				>
++					Are you sure?
++				</ConfirmDialog>
++			);
++
++			const button = wrapper.getByText( 'Cancel' );
++
++			fireEvent.click( button );
++
++			expect( onCancel ).toHaveBeenCalled();
++		} );
++
++		it( 'should call the `onCancel` callback if the overlay is clicked', async () => {
++			jest.useFakeTimers();
++
++			const onCancel = jest.fn().mockName( 'onCancel()' );
++
++			const wrapper = render(
++				<ConfirmDialog
++					isOpen={ true }
++					onConfirm={ noop }
++					onCancel={ onCancel }
++				>
++					Are you sure?
++				</ConfirmDialog>
++			);
++
++			const frame = wrapper.baseElement.querySelector(
++				'.components-modal__frame'
++			);
++
++			//The overlay click is handled by detecting an onBlur from the modal frame.
++			fireEvent.blur( frame );
++
++			// We don't wait for a DOM side effect here, so we need to fake the timers
++			// and "advance" it so that the `queueBlurCheck` in the `useFocusOutside` hook
++			// properly executes its timeout task.
++			jest.advanceTimersByTime( 0 );
++
++			expect( onCancel ).toHaveBeenCalled();
++
++			jest.useRealTimers();
++		} );
++
++		it( 'should call the `onCancel` callback if the `Escape` key is pressed', async () => {
++			const onCancel = jest.fn().mockName( 'onCancel()' );
++
++			const wrapper = render(
++				<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
++					Are you sure?
++				</ConfirmDialog>
++			);
++
++			const frame = wrapper.baseElement.querySelector(
++				'.components-modal__frame'
++			);
++
++			fireEvent.keyDown( frame, { keyCode: 27 } );
++
++			expect( onCancel ).toHaveBeenCalled();
++		} );
++
++		it( 'should call the `onConfirm` callback if the `Enter` key is pressed', async () => {
++			const onConfirm = jest.fn().mockName( 'onConfirm()' );
++
++			const wrapper = render(
++				<ConfirmDialog
++					isOpen={ true }
++					onConfirm={ onConfirm }
++					onCancel={ noop }
++				>
++					Are you sure?
++				</ConfirmDialog>
++			);
++
++			const frame = wrapper.baseElement.querySelector(
++				'.components-modal__frame'
++			);
++
++			fireEvent.keyDown( frame, { keyCode: 13 } );
++
++			expect( onConfirm ).toHaveBeenCalled();
++		} );
++	} );
++} );
+diff --git a/packages/components/src/confirm-dialog/types.ts b/packages/components/src/confirm-dialog/types.ts
+new file mode 100644
+index 00000000000000..1ff696d806892b
+--- /dev/null
++++ b/packages/components/src/confirm-dialog/types.ts
+@@ -0,0 +1,26 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { MouseEvent, KeyboardEvent, ReactNode } from 'react';
++
++export type DialogInputEvent =
++	| KeyboardEvent< HTMLDivElement >
++	| MouseEvent< HTMLButtonElement >;
++
++type BaseProps = {
++	children: ReactNode;
++	onConfirm: ( event: DialogInputEvent ) => void;
++};
++
++type ControlledProps = BaseProps & {
++	onCancel: ( event: DialogInputEvent ) => void;
++	isOpen: boolean;
++};
++
++type UncontrolledProps = BaseProps & {
++	onCancel?: ( event: DialogInputEvent ) => void;
++	isOpen?: never;
++};
++
++export type OwnProps = ControlledProps | UncontrolledProps;
+diff --git a/packages/components/src/higher-order/with-focus-outside/index.js b/packages/components/src/higher-order/with-focus-outside/index.js
+index c83de77f009060..41a7d9c9c3ea47 100644
+--- a/packages/components/src/higher-order/with-focus-outside/index.js
++++ b/packages/components/src/higher-order/with-focus-outside/index.js
+@@ -1,3 +1,5 @@
++//@ts-nocheck
++
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 5866cb5b24b950..29df91d21779cd 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -47,6 +47,7 @@ export {
+ 	CompositeItem as __unstableCompositeItem,
+ 	useCompositeState as __unstableUseCompositeState,
+ } from './composite';
++export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
+ export { default as CustomSelectControl } from './custom-select-control';
+ export { default as Dashicon } from './dashicon';
+ export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index ad15431b8dab41..29818cc95acf22 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -28,6 +28,7 @@
+ 		"src/base-field/**/*",
+ 		"src/button/**/*",
+ 		"src/card/**/*",
++		"src/confirm-dialog/**/*",
+ 		"src/dashicon/**/*",
+ 		"src/disabled/**/*",
+ 		"src/divider/**/*",
+@@ -41,9 +42,10 @@
+ 		"src/grid/**/*",
+ 		"src/h-stack/**/*",
+ 		"src/heading/**/*",
+-		"src/item-group/**/*",
+-		"src/input-control/**/*",
++		"src/higher-order/with-focus-outside/**/*",
+ 		"src/icon/**/*",
++		"src/input-control/**/*",
++		"src/item-group/**/*",
+ 		"src/menu-item/**/*",
+ 		"src/menu-group/**/*",
+ 		"src/modal/**/*",

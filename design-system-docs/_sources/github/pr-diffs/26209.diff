@@ -1,0 +1,95 @@
+diff --git a/packages/components/src/text-control/index.js b/packages/components/src/text-control/index.js
+index a172eed483e50a..ba1654ddd511e5 100644
+--- a/packages/components/src/text-control/index.js
++++ b/packages/components/src/text-control/index.js
+@@ -2,25 +2,50 @@
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import BaseControl from '../base-control';
+ 
+-export default function TextControl( {
+-	label,
+-	hideLabelFromVision,
+-	value,
+-	help,
+-	className,
+-	onChange,
+-	type = 'text',
+-	...props
+-} ) {
++/**
++ * @typedef OwnProps
++ * @property {string} label Label for the control.
++ * @property {boolean} [hideLabelFromVision] Whether to accessibly hide the label.
++ * @property {string} value Value of the input.
++ * @property {string} [help] Optional help text for the control.
++ * @property {string} [className] Classname passed to BaseControl wrapper
++ * @property {(value: string) => void} onChange Handle changes.
++ * @property {string} [type='text'] Type of the input.
++ */
++
++/** @typedef {OwnProps & import('react').ComponentProps<'input'>} Props */
++
++/**
++ *
++ * @param {Props} props Props
++ * @param {import('react').Ref<HTMLInputElement>} [ref]
++ */
++function TextControl(
++	{
++		label,
++		hideLabelFromVision,
++		value,
++		help,
++		className,
++		onChange,
++		type = 'text',
++		...props
++	},
++	ref
++) {
+ 	const instanceId = useInstanceId( TextControl );
+ 	const id = `inspector-text-control-${ instanceId }`;
+-	const onChangeValue = ( event ) => onChange( event.target.value );
++	const onChangeValue = (
++		/** @type {import('react').ChangeEvent<HTMLInputElement>} */
++		event
++	) => onChange( event.target.value );
+ 
+ 	return (
+ 		<BaseControl
+@@ -37,8 +62,11 @@ export default function TextControl( {
+ 				value={ value }
+ 				onChange={ onChangeValue }
+ 				aria-describedby={ !! help ? id + '__help' : undefined }
++				ref={ ref }
+ 				{ ...props }
+ 			/>
+ 		</BaseControl>
+ 	);
+ }
++
++export default forwardRef( TextControl );
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 020fe373a0e8dc..48094dc0565f4f 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -4,7 +4,11 @@
+ 		"rootDir": "src",
+ 		"declarationDir": "build-types"
+ 	},
+-	"references": [ { "path": "../hooks" }, { "path": "../primitives" } ],
++	"references": [
++		{ "path": "../element" },
++		{ "path": "../hooks" },
++		{ "path": "../primitives" }
++	],
+ 	"include": [
+ 		"src/base-control/**/*",
+ 		"src/dashicon/**/*",

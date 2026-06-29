@@ -1,0 +1,110 @@
+diff --git a/packages/block-editor/src/components/height-control/index.js b/packages/block-editor/src/components/height-control/index.js
+index 71753a67beb021..4f5e17381728b3 100644
+--- a/packages/block-editor/src/components/height-control/index.js
++++ b/packages/block-editor/src/components/height-control/index.js
+@@ -1,6 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
++import { useInstanceId } from '@wordpress/compose';
+ import { useMemo } from '@wordpress/element';
+ import {
+ 	BaseControl,
+@@ -68,6 +69,10 @@ export default function HeightControl( {
+ 	value,
+ } ) {
+ 	const customRangeValue = parseFloat( value );
++	const id = useInstanceId( HeightControl, 'block-editor-height-control' );
++	const labelId = `${ id }__label`;
++	const inputId = `${ id }__input`;
++	const rangeId = `${ id }__range`;
+ 
+ 	const [ availableUnits ] = useSettings( 'spacing.units' );
+ 	const units = useCustomUnits( {
+@@ -144,13 +149,14 @@ export default function HeightControl( {
+ 	};
+ 
+ 	return (
+-		<fieldset className="block-editor-height-control">
+-			<BaseControl.VisualLabel as="legend">
++		<div className="block-editor-height-control" id={ id }>
++			<BaseControl.VisualLabel as="label" for={ inputId } id={ labelId }>
+ 				{ label }
+ 			</BaseControl.VisualLabel>
+ 			<Flex>
+ 				<FlexItem isBlock>
+ 					<UnitControl
++						id={ inputId }
+ 						value={ value }
+ 						units={ units }
+ 						onChange={ onChange }
+@@ -164,6 +170,9 @@ export default function HeightControl( {
+ 				<FlexItem isBlock>
+ 					<Spacer marginX={ 2 } marginBottom={ 0 }>
+ 						<RangeControl
++							aria-controls={ inputId }
++							aria-labelledby={ labelId }
++							id={ rangeId }
+ 							value={ customRangeValue }
+ 							min={ 0 }
+ 							max={
+@@ -183,6 +192,6 @@ export default function HeightControl( {
+ 					</Spacer>
+ 				</FlexItem>
+ 			</Flex>
+-		</fieldset>
++		</div>
+ 	);
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ec1736e3adafa9..6e8250529edd81 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ -   `CustomSelectControl`: Stabilize `__experimentalShowSelectedHint` and `options[]. __experimentalHint` props ([#63248](https://github.com/WordPress/gutenberg/pull/63248)).
+ -   `SelectControl`: Add `"minimal"` variant ([#63265](https://github.com/WordPress/gutenberg/pull/63265)).
+ -   `FontSizePicker`: tidy up internal logic ([#63553](https://github.com/WordPress/gutenberg/pull/63553)).
++-   `RangeControl`: Allow external `id` prop ([#63761](https://github.com/WordPress/gutenberg/pull/63761)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index b5fff9f56b80d7..d12c1ca913612e 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -41,6 +41,15 @@ import { space } from '../utils/space';
+ 
+ const noop = () => {};
+ 
++function useUniqueId( idProp?: string ) {
++	const id = useInstanceId(
++		UnforwardedRangeControl,
++		'inspector-range-control'
++	);
++
++	return idProp || id;
++}
++
+ function UnforwardedRangeControl(
+ 	props: WordPressComponentProps< RangeControlProps, 'input', false >,
+ 	forwardedRef: ForwardedRef< HTMLInputElement >
+@@ -56,6 +65,7 @@ function UnforwardedRangeControl(
+ 		disabled = false,
+ 		help,
+ 		hideLabelFromVision = false,
++		id: idProp,
+ 		initialPosition,
+ 		isShiftStepEnabled = true,
+ 		label,
+@@ -123,10 +133,7 @@ function UnforwardedRangeControl(
+ 		!! marks && 'is-marked'
+ 	);
+ 
+-	const id = useInstanceId(
+-		UnforwardedRangeControl,
+-		'inspector-range-control'
+-	);
++	const id = useUniqueId( idProp );
+ 	const describedBy = !! help ? `${ id }__help` : undefined;
+ 	const enableTooltip = hasTooltip !== false && Number.isFinite( value );
+ 

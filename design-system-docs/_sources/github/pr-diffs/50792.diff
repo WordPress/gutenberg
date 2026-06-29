@@ -1,0 +1,33 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 83d74153ccb1cc..d3ff1ef1f73060 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,10 @@
+ 
+ -   `InputControl`: Fix focus style to support Windows High Contrast mode ([#50772](https://github.com/WordPress/gutenberg/pull/50772)).
+ 
++### Enhancements
++
++-   `Tooltip`: Update background color so tooltip boundaries are more visible in the site editor ([#50792](https://github.com/WordPress/gutenberg/pull/50792)).
++
+ ## 24.0.0 (2023-05-10)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/tooltip/style.scss b/packages/components/src/tooltip/style.scss
+index 30d480c904f81b..1a5e6c401542b1 100644
+--- a/packages/components/src/tooltip/style.scss
++++ b/packages/components/src/tooltip/style.scss
+@@ -7,11 +7,11 @@
+ }
+ 
+ .components-tooltip .components-popover__content {
+-	background: $components-color-foreground; // TODO: Discuss with designers.
++	background: $black; // TODO: Discuss with designers.
+ 	border-radius: $radius-block-ui;
+ 	border-width: 0;
+ 	outline: none;
+-	color: $components-color-foreground-inverted;
++	color: $gray-100;
+ 	white-space: nowrap;
+ 	text-align: center;
+ 	line-height: 1.4;

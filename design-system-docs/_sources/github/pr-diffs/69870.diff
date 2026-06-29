@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bee17daddc3491..dbe0ba5640bf79 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,9 +2,10 @@
+ 
+ ## Unreleased
+ 
+-### Documentation 
++### Documentation
+ 
+ -   `Popover`: Expose Popover TypeScript types for subcomponents. ([#69619](https://github.com/WordPress/gutenberg/pull/69619))
++-   `CustomSelectControlV2`: Make disabled cursor style consistent ([#69870](https://github.com/WordPress/gutenberg/pull/69870)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index 9e5e40722c5b15..0179071862fbc2 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -154,7 +154,7 @@ export const SelectItem = styled( Ariakit.SelectItem )(
+ 	}: {
+ 		size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
+ 	} ) => css`
+-		cursor: default;
++		cursor: pointer;
+ 		display: flex;
+ 		align-items: center;
+ 		justify-content: space-between;
+@@ -166,7 +166,7 @@ export const SelectItem = styled( Ariakit.SelectItem )(
+ 		user-select: none;
+ 
+ 		&[aria-disabled='true'] {
+-			cursor: not-allowed;
++			cursor: default;
+ 		}
+ 
+ 		&[data-active-item] {

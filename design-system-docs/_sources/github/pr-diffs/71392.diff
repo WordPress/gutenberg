@@ -1,0 +1,16 @@
+diff --git a/packages/components/src/validated-form-controls/control-with-error.tsx b/packages/components/src/validated-form-controls/control-with-error.tsx
+index 76cd207f0b19b2..7baa0b24e0b158 100644
+--- a/packages/components/src/validated-form-controls/control-with-error.tsx
++++ b/packages/components/src/validated-form-controls/control-with-error.tsx
+@@ -81,6 +81,11 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		getValidityTarget: () => ValidityTarget | null | undefined;
+ 		/**
+ 		 * The control component to apply validation to.
++		 *
++		 * As `children` will be cloned with additional props,
++		 * the component at the root of `children` should accept
++		 * `label`, `onChange`, and `required` props, and process them
++		 * appropriately.
+ 		 */
+ 		children: C;
+ 	},

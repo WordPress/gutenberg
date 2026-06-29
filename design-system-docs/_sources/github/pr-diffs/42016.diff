@@ -1,0 +1,385 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index cf44d92e6f17fb..76f5eed58dfb80 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Grid`: Convert to TypeScript ([#41923](https://github.com/WordPress/gutenberg/pull/41923)).
+ -   `TextHighlight`: Convert to TypeScript ([#41698](https://github.com/WordPress/gutenberg/pull/41698)).
++-   `Scrollable`: Convert to TypeScript ([#42016](https://github.com/WordPress/gutenberg/pull/42016)).
+ -   `TreeSelect`: Refactor away from `_.repeat()` ([#42070](https://github.com/WordPress/gutenberg/pull/42070/)).
+ 
+ ## 19.14.0 (2022-06-29)
+diff --git a/packages/components/src/scrollable/README.md b/packages/components/src/scrollable/README.md
+index f0876f7773ae7b..db93265340228b 100644
+--- a/packages/components/src/scrollable/README.md
++++ b/packages/components/src/scrollable/README.md
+@@ -9,7 +9,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ ## Usage
+ 
+ ```jsx
+-import {__experimentalScrollable as Scrollable } from '@wordpress/components';
++import { __experimentalScrollable as Scrollable } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+@@ -22,17 +22,23 @@ function Example() {
+ 
+ ## Props
+ 
+-### `scrollDirection`: `string`
++### `children`: `ReactNode`
++
++The children elements.
+ 
+-- Required: No
+-- Default: `y`
+-- Allowed values: `x`, `y`, `auto`
++-   Required: Yes
++
++### `scrollDirection`: `string`
+ 
+ Renders a scrollbar for a specific axis when content overflows.
+ 
+-### `smoothScroll`: `boolean`
++-   Required: No
++-   Default: `y`
++-   Allowed values: `x`, `y`, `auto`
+ 
+-- Required: No
+-- Default: `false`
++### `smoothScroll`: `boolean`
+ 
+ Enables (CSS) smooth scrolling.
++
++-   Required: No
++-   Default: `false`
+diff --git a/packages/components/src/scrollable/component.js b/packages/components/src/scrollable/component.tsx
+similarity index 57%
+rename from packages/components/src/scrollable/component.js
+rename to packages/components/src/scrollable/component.tsx
+index 2067f3057b8ea1..ffbcf8c697003a 100644
+--- a/packages/components/src/scrollable/component.js
++++ b/packages/components/src/scrollable/component.tsx
+@@ -1,15 +1,20 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect } from '../ui/context';
++import { contextConnect, WordPressComponentProps } from '../ui/context';
+ import { View } from '../view';
+ import { useScrollable } from './hook';
++import type { ScrollableProps } from './types';
+ 
+-/**
+- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                               forwardedRef
+- */
+-function Scrollable( props, forwardedRef ) {
++function UnconnectedScrollable(
++	props: WordPressComponentProps< ScrollableProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const scrollableProps = useScrollable( props );
+ 
+ 	return <View { ...scrollableProps } ref={ forwardedRef } />;
+@@ -18,7 +23,6 @@ function Scrollable( props, forwardedRef ) {
+ /**
+  * `Scrollable` is a layout component that content in a scrollable container.
+  *
+- * @example
+  * ```jsx
+  * import { __experimentalScrollable as Scrollable } from `@wordpress/components`;
+  *
+@@ -31,7 +35,6 @@ function Scrollable( props, forwardedRef ) {
+  * }
+  * ```
+  */
++export const Scrollable = contextConnect( UnconnectedScrollable, 'Scrollable' );
+ 
+-const ConnectedScrollable = contextConnect( Scrollable, 'Scrollable' );
+-
+-export default ConnectedScrollable;
++export default Scrollable;
+diff --git a/packages/components/src/scrollable/hook.js b/packages/components/src/scrollable/hook.ts
+similarity index 73%
+rename from packages/components/src/scrollable/hook.js
+rename to packages/components/src/scrollable/hook.ts
+index f4225fb26726c0..16e6074a1d196a 100644
+--- a/packages/components/src/scrollable/hook.js
++++ b/packages/components/src/scrollable/hook.ts
+@@ -6,16 +6,14 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../ui/context';
+ import * as styles from './styles';
+ import { useCx } from '../utils/hooks/use-cx';
++import type { ScrollableProps } from './types';
+ 
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- */
+-/* eslint-enable jsdoc/valid-types */
+-export function useScrollable( props ) {
++export function useScrollable(
++	props: WordPressComponentProps< ScrollableProps, 'div' >
++) {
+ 	const {
+ 		className,
+ 		scrollDirection = 'y',
+diff --git a/packages/components/src/scrollable/index.js b/packages/components/src/scrollable/index.ts
+similarity index 100%
+rename from packages/components/src/scrollable/index.js
+rename to packages/components/src/scrollable/index.ts
+diff --git a/packages/components/src/scrollable/stories/index.js b/packages/components/src/scrollable/stories/index.tsx
+similarity index 50%
+rename from packages/components/src/scrollable/stories/index.js
+rename to packages/components/src/scrollable/stories/index.tsx
+index bd1604af63e528..d460dbd8e9c8cd 100644
+--- a/packages/components/src/scrollable/stories/index.js
++++ b/packages/components/src/scrollable/stories/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { boolean, select } from '@storybook/addon-knobs';
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -12,58 +12,49 @@ import { useRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { View } from '../../view';
+-import { Scrollable } from '../';
++import { Scrollable } from '..';
+ 
+-export default {
++const meta: ComponentMeta< typeof Scrollable > = {
+ 	component: Scrollable,
+ 	title: 'Components (Experimental)/Scrollable',
++	argTypes: {
++		as: {
++			control: { type: 'text' },
++		},
++		children: {
++			control: { type: null },
++		},
++	},
+ 	parameters: {
+-		knobs: { disable: false },
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
+ 	},
+ };
++export default meta;
+ 
+-export const _default = () => {
+-	const targetRef = useRef( null );
++const Template: ComponentStory< typeof Scrollable > = ( { ...args } ) => {
++	const targetRef = useRef< HTMLInputElement >( null );
+ 
+ 	const onButtonClick = () => {
+ 		targetRef.current?.focus();
+ 	};
+ 
+-	const otherProps = {
+-		smoothScroll: boolean(
+-			'Scrollable: smoothScroll (hint: move focus in the scrollable container)',
+-			false
+-		),
+-		scrollDirection: select(
+-			'Scrollable: scrollDirection',
+-			{
+-				x: 'x',
+-				y: 'y',
+-				auto: 'auto',
+-			},
+-			'y'
+-		),
+-	};
+-
+ 	const containerWidth = 300;
+ 	const containerHeight = 400;
+ 
+ 	return (
+ 		<Scrollable
+ 			style={ { height: containerHeight, width: containerWidth } }
+-			{ ...otherProps }
++			{ ...args }
+ 		>
+ 			<View
+ 				style={ {
+ 					backgroundColor: '#eee',
+ 					height:
+-						otherProps.scrollDirection === 'x'
+-							? containerHeight
+-							: 1000,
+-					width:
+-						otherProps.scrollDirection === 'y'
+-							? containerWidth
+-							: 1000,
++						args.scrollDirection === 'x' ? containerHeight : 1000,
++					width: args.scrollDirection === 'y' ? containerWidth : 1000,
+ 					position: 'relative',
+ 				} }
+ 			>
+@@ -74,10 +65,8 @@ export const _default = () => {
+ 					ref={ targetRef }
+ 					style={ {
+ 						position: 'absolute',
+-						bottom:
+-							otherProps.scrollDirection === 'x' ? 'initial' : 0,
+-						right:
+-							otherProps.scrollDirection === 'y' ? 'initial' : 0,
++						bottom: args.scrollDirection === 'x' ? 'initial' : 0,
++						right: 0,
+ 					} }
+ 					type="text"
+ 					value="Focus me"
+@@ -86,3 +75,9 @@ export const _default = () => {
+ 		</Scrollable>
+ 	);
+ };
++
++export const Default: ComponentStory< typeof Scrollable > = Template.bind( {} );
++Default.args = {
++	smoothScroll: false,
++	scrollDirection: 'y',
++};
+diff --git a/packages/components/src/scrollable/styles.js b/packages/components/src/scrollable/styles.ts
+similarity index 100%
+rename from packages/components/src/scrollable/styles.js
+rename to packages/components/src/scrollable/styles.ts
+diff --git a/packages/components/src/scrollable/test/__snapshots__/index.js.snap b/packages/components/src/scrollable/test/__snapshots__/index.tsx.snap
+similarity index 97%
+rename from packages/components/src/scrollable/test/__snapshots__/index.js.snap
+rename to packages/components/src/scrollable/test/__snapshots__/index.tsx.snap
+index 5a1dcc83ecbb05..0c09b34f2a03d3 100644
+--- a/packages/components/src/scrollable/test/__snapshots__/index.js.snap
++++ b/packages/components/src/scrollable/test/__snapshots__/index.tsx.snap
+@@ -37,6 +37,7 @@ exports[`props should render correctly 1`] = `
+ 
+ <div
+   class="components-scrollable emotion-0 emotion-1"
++  data-testid="scrollable"
+   data-wp-c16t="true"
+   data-wp-component="Scrollable"
+ >
+diff --git a/packages/components/src/scrollable/test/index.js b/packages/components/src/scrollable/test/index.js
+deleted file mode 100644
+index 3520a25097bd3d..00000000000000
+--- a/packages/components/src/scrollable/test/index.js
++++ /dev/null
+@@ -1,31 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Scrollable } from '../index';
+-
+-describe( 'props', () => {
+-	let base;
+-
+-	beforeEach( () => {
+-		( { container: base } = render(
+-			<Scrollable>WordPress.org - Code is Poetry</Scrollable>
+-		) );
+-	} );
+-	test( 'should render correctly', () => {
+-		expect( base.firstChild ).toMatchSnapshot();
+-	} );
+-
+-	test( 'should render smoothScroll', () => {
+-		const { container } = render(
+-			<Scrollable smoothScroll>WordPress.org - Code is Poetry</Scrollable>
+-		);
+-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-			base.firstChild
+-		);
+-	} );
+-} );
+diff --git a/packages/components/src/scrollable/test/index.tsx b/packages/components/src/scrollable/test/index.tsx
+new file mode 100644
+index 00000000000000..7f5e172c4d53ca
+--- /dev/null
++++ b/packages/components/src/scrollable/test/index.tsx
+@@ -0,0 +1,34 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { Scrollable } from '../index';
++
++describe( 'props', () => {
++	beforeEach( () => {
++		render(
++			<Scrollable data-testid="scrollable">
++				WordPress.org - Code is Poetry
++			</Scrollable>
++		);
++	} );
++
++	test( 'should render correctly', () => {
++		expect( screen.getByTestId( 'scrollable' ) ).toMatchSnapshot();
++	} );
++
++	test( 'should render smoothScroll', () => {
++		render(
++			<Scrollable smoothScroll data-testid="smooth-scrollable">
++				WordPress.org - Code is Poetry
++			</Scrollable>
++		);
++		expect(
++			screen.getByTestId( 'smooth-scrollable' )
++		).toMatchStyleDiffSnapshot( screen.getByTestId( 'scrollable' ) );
++	} );
++} );
+diff --git a/packages/components/src/scrollable/types.ts b/packages/components/src/scrollable/types.ts
+index 6e93a7b6d6880e..b3fd26c14a47d9 100644
+--- a/packages/components/src/scrollable/types.ts
++++ b/packages/components/src/scrollable/types.ts
+@@ -1,6 +1,15 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
+ export type ScrollableDirection = 'x' | 'y' | 'auto';
+ 
+-export type Props = {
++export type ScrollableProps = {
++	/**
++	 * The children elements.
++	 */
++	children: ReactNode;
+ 	/**
+ 	 * Renders a scrollbar for a specific axis when content overflows.
+ 	 *
+@@ -13,8 +22,4 @@ export type Props = {
+ 	 * @default false
+ 	 */
+ 	smoothScroll?: boolean;
+-	/**
+-	 * The children elements.
+-	 */
+-	children: React.ReactNode;
+ };

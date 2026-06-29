@@ -1,0 +1,474 @@
+diff --git a/.stylelintrc.js b/.stylelintrc.js
+index e3e6d82a9ab805..9f8b07e7c822dd 100644
+--- a/.stylelintrc.js
++++ b/.stylelintrc.js
+@@ -1,7 +1,10 @@
+ /** @type {import('stylelint').Config} */
+ module.exports = {
+ 	extends: '@wordpress/stylelint-config/scss-stylistic',
+-	plugins: [ 'stylelint-plugin-logical-css' ],
++	plugins: [
++		'stylelint-plugin-logical-css',
++		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
++	],
+ 	rules: {
+ 		'at-rule-empty-line-before': null,
+ 		'at-rule-no-unknown': null,
+@@ -48,6 +51,7 @@ module.exports = {
+ 		'scss/at-else-empty-line-before': null,
+ 		'scss/at-if-closing-brace-space-after': null,
+ 		'no-invalid-position-at-import-rule': null,
++		'plugin-wpds/no-token-fallback-values': true,
+ 	},
+ 	overrides: [
+ 		{
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 5e57d7e5e6ea10..50fce00a4066bf 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   Added `no-token-fallback-values` stylelint rule that disallows manual fallback values for `--wpds-*` design tokens. Available as `@wordpress/theme/stylelint-plugins/no-token-fallback-values` ([#76415](https://github.com/WordPress/gutenberg/pull/76415)).
++
+ ## 0.8.0 (2026-03-04)
+ 
+ ### New Features
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index 08781a9fd758b6..6f1f51565f8015 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -204,11 +204,13 @@ This package provides Stylelint plugins to help enforce consistent usage of desi
+ {
+ 	"plugins": [
+ 		"@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens",
+-		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties"
++		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties",
++		"@wordpress/theme/stylelint-plugins/no-token-fallback-values"
+ 	],
+ 	"rules": {
+ 		"plugin-wpds/no-unknown-ds-tokens": true,
+-		"plugin-wpds/no-setting-wpds-custom-properties": true
++		"plugin-wpds/no-setting-wpds-custom-properties": true,
++		"plugin-wpds/no-token-fallback-values": true
+ 	}
+ }
+ ```
+@@ -250,6 +252,27 @@ This rule reports an error when a CSS declaration sets (defines) a custom proper
+ }
+ ```
+ 
++### `plugin-wpds/no-token-fallback-values`
++
++This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. Fallback values for design tokens are injected automatically at build time by the [build plugins](#build-plugins), so manual fallbacks in source are redundant and can drift out of sync with the token definitions.
++
++```css
++/* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-fg-content-neutral' */
++.example {
++	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
++}
++
++/* ✓ OK */
++.example {
++	color: var(--wpds-color-fg-content-neutral);
++}
++
++/* ✓ OK: Non-wpds custom properties are not checked */
++.example {
++	color: var(--my-custom-color, red);
++}
++```
++
+ ## Build Plugins
+ 
+ This package provides build plugins that inject fallback values into bare `var(--wpds-*)` references at build time. This ensures components render correctly even when a `ThemeProvider` or design tokens stylesheet is not present — for example, `var(--wpds-color-fg-content-neutral)` becomes `var(--wpds-color-fg-content-neutral, #1e1e1e)`.
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index c60cb142b37927..66a627bf9ffd23 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -68,6 +68,11 @@
+ 			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
+ 			"default": "./build/stylelint-plugins/no-setting-wpds-custom-properties.cjs"
+ 		},
++		"./stylelint-plugins/no-token-fallback-values": {
++			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.ts",
++			"import": "./src/stylelint-plugins/no-token-fallback-values.mjs",
++			"default": "./build/stylelint-plugins/no-token-fallback-values.cjs"
++		},
+ 		"./package.json": "./package.json"
+ 	},
+ 	"react-native": "src/index",
+diff --git a/packages/theme/src/stylelint-plugins/no-token-fallback-values.mjs b/packages/theme/src/stylelint-plugins/no-token-fallback-values.mjs
+new file mode 100644
+index 00000000000000..04d105f62f6b4c
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/no-token-fallback-values.mjs
+@@ -0,0 +1,55 @@
++import stylelint from 'stylelint';
++
++const {
++	createPlugin,
++	utils: { report, ruleMessages, validateOptions },
++} = stylelint;
++
++const ruleName = 'plugin-wpds/no-token-fallback-values';
++
++/**
++ * Matches `var(--wpds-<name>,` — the comma signals a fallback value.
++ * Captures the token name (e.g. `--wpds-color-fg-content-neutral`).
++ */
++const varWithFallbackRegex = /var\(\s*(--wpds-[\w-]+)\s*,/g;
++
++const messages = ruleMessages( ruleName, {
++	rejected: ( tokenName ) =>
++		`Do not add a fallback value for Design System token '${ tokenName }'. Fallbacks are injected automatically at build time.`,
++} );
++
++/** @type {import('stylelint').Rule} */
++const ruleFunction = ( primary ) => {
++	return ( root, result ) => {
++		const validOptions = validateOptions( result, ruleName, {
++			actual: primary,
++			possible: [ true ],
++		} );
++
++		if ( ! validOptions ) {
++			return;
++		}
++
++		root.walkDecls( ( ruleNode ) => {
++			const { value } = ruleNode;
++
++			let match;
++			varWithFallbackRegex.lastIndex = 0;
++			while ( ( match = varWithFallbackRegex.exec( value ) ) !== null ) {
++				report( {
++					message: messages.rejected( match[ 1 ] ),
++					node: ruleNode,
++					word: match[ 0 ],
++					result,
++					ruleName,
++				} );
++			}
++		} );
++	};
++};
++
++ruleFunction.ruleName = ruleName;
++ruleFunction.messages = messages;
++
++/** @type {import('stylelint').Plugin} */
++export default createPlugin( ruleName, ruleFunction );
+diff --git a/packages/theme/src/stylelint-plugins/test/.stylelintrc.json b/packages/theme/src/stylelint-plugins/test/.stylelintrc.json
+deleted file mode 100644
+index 8a19ea725e38e3..00000000000000
+--- a/packages/theme/src/stylelint-plugins/test/.stylelintrc.json
++++ /dev/null
+@@ -1,10 +0,0 @@
+-{
+-	"plugins": [
+-		"../no-unknown-ds-tokens.mjs",
+-		"../no-setting-wpds-custom-properties.mjs"
+-	],
+-	"rules": {
+-		"plugin-wpds/no-unknown-ds-tokens": true,
+-		"plugin-wpds/no-setting-wpds-custom-properties": true
+-	}
+-}
+diff --git a/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-setting-wpds-custom-properties.json b/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-setting-wpds-custom-properties.json
+new file mode 100644
+index 00000000000000..e4440c5b5bb0ad
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-setting-wpds-custom-properties.json
+@@ -0,0 +1,6 @@
++{
++	"plugins": [ "../no-setting-wpds-custom-properties.mjs" ],
++	"rules": {
++		"plugin-wpds/no-setting-wpds-custom-properties": true
++	}
++}
+diff --git a/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-token-fallback-values.json b/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-token-fallback-values.json
+new file mode 100644
+index 00000000000000..a1a38d72946d56
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-token-fallback-values.json
+@@ -0,0 +1,6 @@
++{
++	"plugins": [ "../no-token-fallback-values.mjs" ],
++	"rules": {
++		"plugin-wpds/no-token-fallback-values": true
++	}
++}
+diff --git a/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-unknown-ds-tokens.json b/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-unknown-ds-tokens.json
+new file mode 100644
+index 00000000000000..b3bf716185d82c
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/.stylelintrc.no-unknown-ds-tokens.json
+@@ -0,0 +1,6 @@
++{
++	"plugins": [ "../no-unknown-ds-tokens.mjs" ],
++	"rules": {
++		"plugin-wpds/no-unknown-ds-tokens": true
++	}
++}
+diff --git a/packages/theme/src/stylelint-plugins/test/__snapshots__/no-token-fallback-values.test.ts.snap b/packages/theme/src/stylelint-plugins/test/__snapshots__/no-token-fallback-values.test.ts.snap
+new file mode 100644
+index 00000000000000..0a1ad0156b5148
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/__snapshots__/no-token-fallback-values.test.ts.snap
+@@ -0,0 +1,60 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warnings 1`] = `
++[
++  {
++    "column": 9,
++    "endColumn": 45,
++    "endLine": 3,
++    "line": 3,
++    "rule": "plugin-wpds/no-token-fallback-values",
++    "severity": "error",
++    "text": "Do not add a fallback value for Design System token '--wpds-color-fg-content-neutral'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
++  },
++  {
++    "column": 20,
++    "endColumn": 61,
++    "endLine": 4,
++    "line": 4,
++    "rule": "plugin-wpds/no-token-fallback-values",
++    "severity": "error",
++    "text": "Do not add a fallback value for Design System token '--wpds-color-bg-surface-neutral-weak'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
++  },
++  {
++    "column": 17,
++    "endColumn": 45,
++    "endLine": 5,
++    "line": 5,
++    "rule": "plugin-wpds/no-token-fallback-values",
++    "severity": "error",
++    "text": "Do not add a fallback value for Design System token '--wpds-border-radius-sm'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
++  },
++  {
++    "column": 11,
++    "endColumn": 41,
++    "endLine": 10,
++    "line": 10,
++    "rule": "plugin-wpds/no-token-fallback-values",
++    "severity": "error",
++    "text": "Do not add a fallback value for Design System token '--wpds-border-width-focus'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
++  },
++  {
++    "column": 53,
++    "endColumn": 89,
++    "endLine": 10,
++    "line": 10,
++    "rule": "plugin-wpds/no-token-fallback-values",
++    "severity": "error",
++    "text": "Do not add a fallback value for Design System token '--wpds-color-stroke-focus-brand'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
++  },
++  {
++    "column": 32,
++    "endColumn": 68,
++    "endLine": 15,
++    "line": 15,
++    "rule": "plugin-wpds/no-token-fallback-values",
++    "severity": "error",
++    "text": "Do not add a fallback value for Design System token '--wpds-color-fg-content-neutral'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
++  },
++]
++`;
+diff --git a/packages/theme/src/stylelint-plugins/test/fixtures/no-token-fallback-values-invalid.css b/packages/theme/src/stylelint-plugins/test/fixtures/no-token-fallback-values-invalid.css
+new file mode 100644
+index 00000000000000..fdaa7a3da25f2b
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/fixtures/no-token-fallback-values-invalid.css
+@@ -0,0 +1,16 @@
++/* Invalid: Using wpds tokens with fallbacks */
++.with-fallback {
++	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
++	background-color: var(--wpds-color-bg-surface-neutral-weak, #f0f0f0);
++	border-radius: var(--wpds-border-radius-sm, 2px);
++}
++
++/* Invalid: Fallbacks in complex values */
++.complex {
++	outline: var(--wpds-border-width-focus, 2px) solid var(--wpds-color-stroke-focus-brand, #0073aa);
++}
++
++/* Invalid: A wpds token with a fallback, even when nested inside another var() */
++.nested-with-fallback {
++	color: var(--my-custom-color, var(--wpds-color-fg-content-neutral, #1e1e1e));
++}
+diff --git a/packages/theme/src/stylelint-plugins/test/fixtures/no-token-fallback-values-valid.css b/packages/theme/src/stylelint-plugins/test/fixtures/no-token-fallback-values-valid.css
+new file mode 100644
+index 00000000000000..24eff3a58fc14c
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/fixtures/no-token-fallback-values-valid.css
+@@ -0,0 +1,18 @@
++/* Valid: Using wpds tokens without fallbacks */
++.example {
++	color: var(--wpds-color-fg-content-neutral);
++	background-color: var(--wpds-color-bg-surface-neutral);
++	border-radius: var(--wpds-border-radius-sm);
++	padding: var(--wpds-dimension-padding-md);
++}
++
++/* Valid: Non-wpds custom properties with fallbacks are fine */
++.other-vars {
++	color: var(--my-custom-color, red);
++	background: var(--some-other-var, #fff);
++}
++
++/* Valid: A wpds token used as a fallback of a non-wpds var, with no comma after the wpds token */
++.nested-no-fallback {
++	color: var(--my-custom-color, var(--wpds-color-fg-content-neutral));
++}
+diff --git a/packages/theme/src/stylelint-plugins/test/no-setting-wpds-custom-properties.test.ts b/packages/theme/src/stylelint-plugins/test/no-setting-wpds-custom-properties.test.ts
+index 860a80c3517135..86d07ecbd36d31 100644
+--- a/packages/theme/src/stylelint-plugins/test/no-setting-wpds-custom-properties.test.ts
++++ b/packages/theme/src/stylelint-plugins/test/no-setting-wpds-custom-properties.test.ts
+@@ -1,11 +1,14 @@
+ import { getStylelintResult } from './utils';
+ 
++const CONFIG = './.stylelintrc.no-setting-wpds-custom-properties.json';
++
+ describe( 'flags no warnings with valid wpds custom properties css', () => {
+ 	let result: ReturnType< typeof getStylelintResult >;
+ 
+ 	beforeEach( () => {
+ 		result = getStylelintResult(
+-			'./fixtures/no-setting-wpds-custom-properties-valid.css'
++			'./fixtures/no-setting-wpds-custom-properties-valid.css',
++			CONFIG
+ 		);
+ 	} );
+ 
+@@ -25,7 +28,8 @@ describe( 'flags warnings with invalid wpds custom properties css', () => {
+ 
+ 	beforeEach( () => {
+ 		result = getStylelintResult(
+-			'./fixtures/no-setting-wpds-custom-properties-invalid.css'
++			'./fixtures/no-setting-wpds-custom-properties-invalid.css',
++			CONFIG
+ 		);
+ 	} );
+ 
+diff --git a/packages/theme/src/stylelint-plugins/test/no-token-fallback-values.test.ts b/packages/theme/src/stylelint-plugins/test/no-token-fallback-values.test.ts
+new file mode 100644
+index 00000000000000..d8b7c9938615f7
+--- /dev/null
++++ b/packages/theme/src/stylelint-plugins/test/no-token-fallback-values.test.ts
+@@ -0,0 +1,51 @@
++import { getStylelintResult } from './utils';
++
++const CONFIG = './.stylelintrc.no-token-fallback-values.json';
++
++describe( 'flags no warnings with valid css (no wpds fallbacks)', () => {
++	let result: ReturnType< typeof getStylelintResult >;
++
++	beforeEach( () => {
++		result = getStylelintResult(
++			'./fixtures/no-token-fallback-values-valid.css',
++			CONFIG
++		);
++	} );
++
++	it( 'did not error', () => {
++		return result.then( ( data ) => expect( data.errored ).toBeFalsy() );
++	} );
++
++	it( 'flags no warnings', () => {
++		return result.then( ( data ) =>
++			expect( data.results[ 0 ].warnings ).toHaveLength( 0 )
++		);
++	} );
++} );
++
++describe( 'flags warnings with invalid css (wpds fallbacks)', () => {
++	let result: ReturnType< typeof getStylelintResult >;
++
++	beforeEach( () => {
++		result = getStylelintResult(
++			'./fixtures/no-token-fallback-values-invalid.css',
++			CONFIG
++		);
++	} );
++
++	it( 'did error', () => {
++		return result.then( ( data ) => expect( data.errored ).toBeTruthy() );
++	} );
++
++	it( 'flags correct number of warnings', () => {
++		return result.then( ( data ) =>
++			expect( data.results[ 0 ].warnings ).toHaveLength( 6 )
++		);
++	} );
++
++	it( 'snapshot matches warnings', () => {
++		return result.then( ( data ) =>
++			expect( data.results[ 0 ].warnings ).toMatchSnapshot()
++		);
++	} );
++} );
+diff --git a/packages/theme/src/stylelint-plugins/test/no-unknown-ds-tokens.test.ts b/packages/theme/src/stylelint-plugins/test/no-unknown-ds-tokens.test.ts
+index ce280c3e22fe43..e8a2957eaa11fe 100644
+--- a/packages/theme/src/stylelint-plugins/test/no-unknown-ds-tokens.test.ts
++++ b/packages/theme/src/stylelint-plugins/test/no-unknown-ds-tokens.test.ts
+@@ -1,11 +1,14 @@
+ import { getStylelintResult } from './utils';
+ 
++const CONFIG = './.stylelintrc.no-unknown-ds-tokens.json';
++
+ describe( 'flags no warnings with valid wpds tokens css', () => {
+ 	let result: ReturnType< typeof getStylelintResult >;
+ 
+ 	beforeEach( () => {
+ 		result = getStylelintResult(
+-			'./fixtures/no-unknown-ds-tokens-valid.css'
++			'./fixtures/no-unknown-ds-tokens-valid.css',
++			CONFIG
+ 		);
+ 	} );
+ 
+@@ -25,7 +28,8 @@ describe( 'flags warnings with invalid wpds tokens css', () => {
+ 
+ 	beforeEach( () => {
+ 		result = getStylelintResult(
+-			'./fixtures/no-unknown-ds-tokens-invalid.css'
++			'./fixtures/no-unknown-ds-tokens-invalid.css',
++			CONFIG
+ 		);
+ 	} );
+ 
+diff --git a/packages/theme/src/stylelint-plugins/test/utils/index.ts b/packages/theme/src/stylelint-plugins/test/utils/index.ts
+index 300ce828716510..c3bb246ec85d5a 100644
+--- a/packages/theme/src/stylelint-plugins/test/utils/index.ts
++++ b/packages/theme/src/stylelint-plugins/test/utils/index.ts
+@@ -4,17 +4,20 @@ import childProcess from 'node:child_process';
+ 
+ const execute = util.promisify( childProcess.exec );
+ 
+-const generateStylelintCommand = ( filename: string ): string =>
++const generateStylelintCommand = (
++	filename: string,
++	configFile: string
++): string =>
+ 	'npx stylelint ' +
+ 	path.resolve( __dirname, '../', filename ) +
+ 	' -c ' +
+-	path.resolve( __dirname, '../', './.stylelintrc.json' ) +
++	path.resolve( __dirname, '../', configFile ) +
+ 	' --formatter json' +
+ 	' --ignore-path ' +
+ 	path.resolve( __dirname, '../', './.stylelintignore' );
+ 
+-export const getStylelintResult = ( filename: string ) =>
+-	execute( generateStylelintCommand( filename ) )
++export const getStylelintResult = ( filename: string, configFile: string ) =>
++	execute( generateStylelintCommand( filename, configFile ) )
+ 		.then( ( { stderr } ) => {
+ 			return {
+ 				errored: false,

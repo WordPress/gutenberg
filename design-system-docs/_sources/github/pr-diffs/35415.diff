@@ -1,0 +1,186 @@
+diff --git a/packages/components/src/tools-panel/stories/index.js b/packages/components/src/tools-panel/stories/index.js
+index 95a33301da56c9..5cd6cdab8cacb7 100644
+--- a/packages/components/src/tools-panel/stories/index.js
++++ b/packages/components/src/tools-panel/stories/index.js
+@@ -224,6 +224,6 @@ export const WithSlotFillItems = () => {
+ export { TypographyPanel } from './typography-panel';
+ 
+ const PanelWrapperView = styled.div`
+-	max-width: 260px;
++	max-width: 270px;
+ 	font-size: 13px;
+ `;
+diff --git a/packages/components/src/tools-panel/styles.ts b/packages/components/src/tools-panel/styles.ts
+index 220db2c5ef5838..41f538a3b6ae7d 100644
+--- a/packages/components/src/tools-panel/styles.ts
++++ b/packages/components/src/tools-panel/styles.ts
+@@ -6,6 +6,10 @@ import { css } from '@emotion/react';
+ /**
+  * Internal dependencies
+  */
++import {
++	StyledField as BaseControlField,
++	Wrapper as BaseControlWrapper,
++} from '../base-control/styles/base-control-styles';
+ import { COLORS, CONFIG } from '../utils';
+ import { space } from '../ui/utils/space';
+ 
+@@ -40,42 +44,50 @@ export const ToolsPanel = css`
+  * CSS grid display to be re-established.
+  */
+ export const ToolsPanelWithInnerWrapper = css`
+-	> div {
++	> div:not( :first-of-type ) {
+ 		${ toolsPanelGrid.container }
+ 		${ toolsPanelGrid.item.fullWidth }
+ 	}
+ `;
+ 
+ export const ToolsPanelHiddenInnerWrapper = css`
+-	> div {
++	> div:not( :first-of-type ) {
+ 		display: none;
+ 	}
+ `;
+ 
+ export const ToolsPanelHeader = css`
+-	align-items: center;
+-	display: flex;
+-	font-size: inherit;
+-	font-weight: 500;
+ 	${ toolsPanelGrid.item.fullWidth }
+-	justify-content: space-between;
+-	line-height: normal;
+-
+-	.components-tools-panel & {
+-		margin: 0;
+-	}
+-
++	gap: ${ space( 2 ) };
++
++	/**
++	 * The targeting of dropdown menu component classes here is a temporary
++	 * measure only.
++	 *
++	 * The following styles should be replaced once the DropdownMenu has been
++	 * refactored and can be targeted via component interpolation.
++	 */
+ 	.components-dropdown-menu {
+-		margin-top: ${ space( -1 ) };
+-		margin-bottom: ${ space( -1 ) };
++		margin: ${ space( -1 ) } 0;
+ 		height: ${ space( 6 ) };
++
++		.components-dropdown-menu__toggle {
++			padding: 0;
++			height: ${ space( 6 ) };
++			min-width: ${ space( 6 ) };
++			width: ${ space( 6 ) };
++		}
+ 	}
++`;
+ 
+-	.components-dropdown-menu__toggle {
+-		padding: 0;
+-		height: ${ space( 6 ) };
+-		min-width: ${ space( 6 ) };
+-		width: ${ space( 6 ) };
++export const ToolsPanelHeading = css`
++	font-size: inherit;
++	font-weight: 500;
++	line-height: normal;
++
++	/* Required to meet specificity requirements to ensure zero margin */
++	&& {
++		margin: 0;
+ 	}
+ `;
+ 
+@@ -95,10 +107,11 @@ export const ToolsPanelItem = css`
+ 		max-width: 100%;
+ 	}
+ 
+-	& > .components-base-control:last-child {
++	/* Remove BaseControl components margins and leave spacing to grid layout */
++	&& ${ BaseControlWrapper } {
+ 		margin-bottom: 0;
+ 
+-		.components-base-control__field {
++		${ BaseControlField } {
+ 			margin-bottom: 0;
+ 		}
+ 	}
+diff --git a/packages/components/src/tools-panel/tools-panel-header/component.tsx b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+index 537578c93da0c4..4091aed45e1cf4 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+@@ -16,6 +16,8 @@ import { __, _x, sprintf } from '@wordpress/i18n';
+ import DropdownMenu from '../../dropdown-menu';
+ import MenuGroup from '../../menu-group';
+ import MenuItem from '../../menu-item';
++import { HStack } from '../../h-stack';
++import { Heading } from '../../heading';
+ import { useToolsPanelHeader } from './hook';
+ import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import type {
+@@ -116,9 +118,10 @@ const ToolsPanelHeader = (
+ 	forwardedRef: Ref< any >
+ ) => {
+ 	const {
++		areAllOptionalControlsHidden,
+ 		dropdownMenuClassName,
+ 		hasMenuItems,
+-		areAllOptionalControlsHidden,
++		headingClassName,
+ 		label: labelText,
+ 		menuItems,
+ 		resetAll,
+@@ -141,8 +144,10 @@ const ToolsPanelHeader = (
+ 		: _x( 'View options', 'Button label to reveal tool panel options' );
+ 
+ 	return (
+-		<h2 { ...headerProps } ref={ forwardedRef }>
+-			{ labelText }
++		<HStack { ...headerProps } ref={ forwardedRef }>
++			<Heading level={ 2 } className={ headingClassName }>
++				{ labelText }
++			</Heading>
+ 			{ hasMenuItems && (
+ 				<DropdownMenu
+ 					icon={ dropDownMenuIcon }
+@@ -176,7 +181,7 @@ const ToolsPanelHeader = (
+ 					) }
+ 				</DropdownMenu>
+ 			) }
+-		</h2>
++		</HStack>
+ 	);
+ };
+ 
+diff --git a/packages/components/src/tools-panel/tools-panel-header/hook.ts b/packages/components/src/tools-panel/tools-panel-header/hook.ts
+index 064f324c163be3..807aef47122fef 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-header/hook.ts
+@@ -29,6 +29,10 @@ export function useToolsPanelHeader(
+ 		return cx( styles.DropdownMenu );
+ 	}, [] );
+ 
++	const headingClassName = useMemo( () => {
++		return cx( styles.ToolsPanelHeading );
++	}, [] );
++
+ 	const {
+ 		menuItems,
+ 		hasMenuItems,
+@@ -37,9 +41,10 @@ export function useToolsPanelHeader(
+ 
+ 	return {
+ 		...otherProps,
++		areAllOptionalControlsHidden,
+ 		dropdownMenuClassName,
+ 		hasMenuItems,
+-		areAllOptionalControlsHidden,
++		headingClassName,
+ 		menuItems,
+ 		className: classes,
+ 	};

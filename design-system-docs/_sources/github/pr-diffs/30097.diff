@@ -1,0 +1,378 @@
+diff --git a/packages/components/src/ui/item-group/context.ts b/packages/components/src/ui/item-group/context.ts
+new file mode 100644
+index 00000000000000..72b5f476414d74
+--- /dev/null
++++ b/packages/components/src/ui/item-group/context.ts
+@@ -0,0 +1,11 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++export const ItemGroupContext = createContext( { size: 'medium' } as {
++	spacedAround: boolean;
++	size: 'small' | 'medium' | 'large';
++} );
++
++export const useItemGroupContext = () => useContext( ItemGroupContext );
+diff --git a/packages/components/src/ui/item-group/index.ts b/packages/components/src/ui/item-group/index.ts
+new file mode 100644
+index 00000000000000..25412ed60e0f66
+--- /dev/null
++++ b/packages/components/src/ui/item-group/index.ts
+@@ -0,0 +1,2 @@
++export { default as Item } from './item';
++export { default as ItemGroup } from './item-group';
+diff --git a/packages/components/src/ui/item-group/item-group.tsx b/packages/components/src/ui/item-group/item-group.tsx
+new file mode 100644
+index 00000000000000..94849eb73cc40b
+--- /dev/null
++++ b/packages/components/src/ui/item-group/item-group.tsx
+@@ -0,0 +1,35 @@
++/**
++ * Internal dependencies
++ */
++import type { PolymorphicComponentProps } from '../context';
++// eslint-disable-next-line no-duplicate-imports
++import { contextConnect } from '../context';
++import { useItemGroup } from './use-item-group';
++// eslint-disable-next-line no-duplicate-imports
++import type { Props } from './use-item-group';
++import { ItemGroupContext, useItemGroupContext } from './context';
++import { View } from '../../view';
++
++function ItemGroup( props: PolymorphicComponentProps< Props, 'div' > ) {
++	const { bordered, separated, size: sizeProp, ...otherProps } = useItemGroup(
++		props
++	);
++
++	const { size: contextSize } = useItemGroupContext();
++
++	const spacedAround = ! bordered && ! separated;
++	const size = sizeProp || contextSize;
++
++	const contextValue = {
++		spacedAround,
++		size,
++	};
++
++	return (
++		<ItemGroupContext.Provider value={ contextValue }>
++			<View { ...otherProps } />
++		</ItemGroupContext.Provider>
++	);
++}
++
++export default contextConnect( ItemGroup, 'ItemGroup' );
+diff --git a/packages/components/src/ui/item-group/item.ts b/packages/components/src/ui/item-group/item.ts
+new file mode 100644
+index 00000000000000..7f87fe62ebc94e
+--- /dev/null
++++ b/packages/components/src/ui/item-group/item.ts
+@@ -0,0 +1,11 @@
++/**
++ * Internal dependencies
++ */
++import { createComponent } from '../utils';
++import { useItem } from './use-item';
++
++export default createComponent( {
++	useHook: useItem,
++	as: 'div',
++	name: 'Item',
++} );
+diff --git a/packages/components/src/ui/item-group/stories/index.js b/packages/components/src/ui/item-group/stories/index.js
+new file mode 100644
+index 00000000000000..db38f7489f7d5e
+--- /dev/null
++++ b/packages/components/src/ui/item-group/stories/index.js
+@@ -0,0 +1,53 @@
++/* eslint-disable no-alert */
++/* globals alert */
++/**
++ * Internal dependencies
++ */
++import { ItemGroup, Item } from '..';
++import { Popover } from '../../popover';
++import Button from '../../../button';
++
++export default {
++	component: ItemGroup,
++	title: 'Components (Experimental)/ItemGroup',
++};
++
++export const _default = () => (
++	<ItemGroup css={ { width: '350px' } } bordered>
++		<Item action onClick={ () => alert( 'WordPress.org' ) }>
++			Code is Poetry — Click me!
++		</Item>
++		<Item action onClick={ () => alert( 'WordPress.org' ) }>
++			Code is Poetry — Click me!
++		</Item>
++		<Item action onClick={ () => alert( 'WordPress.org' ) }>
++			Code is Poetry — Click me!
++		</Item>
++		<Item action onClick={ () => alert( 'WordPress.org' ) }>
++			Code is Poetry — Click me!
++		</Item>
++	</ItemGroup>
++);
++
++export const dropdown = () => (
++	<Popover
++		css={ { width: '350px' } }
++		trigger={ <Button>Open Popover</Button> }
++	>
++		<ItemGroup css={ { padding: 4 } }>
++			<Item action onClick={ () => alert( 'WordPress.org' ) }>
++				Code is Poetry — Click me!
++			</Item>
++			<Item action onClick={ () => alert( 'WordPress.org' ) }>
++				Code is Poetry — Click me!
++			</Item>
++			<Item action onClick={ () => alert( 'WordPress.org' ) }>
++				Code is Poetry — Click me!
++			</Item>
++			<Item action onClick={ () => alert( 'WordPress.org' ) }>
++				Code is Poetry — Click me!
++			</Item>
++		</ItemGroup>
++	</Popover>
++);
++/* eslint-enable no-alert */
+diff --git a/packages/components/src/ui/item-group/styles.ts b/packages/components/src/ui/item-group/styles.ts
+new file mode 100644
+index 00000000000000..a3b9a0aaf4046b
+--- /dev/null
++++ b/packages/components/src/ui/item-group/styles.ts
+@@ -0,0 +1,93 @@
++/**
++ * External dependencies
++ */
++import { css } from 'emotion';
++
++/**
++ * Internal dependencies
++ */
++import { CONFIG } from '../../utils';
++import COLORS from '../../utils/colors-values';
++
++export const unstyledButton = css`
++	appearance: none;
++	border: 1px solid transparent;
++	cursor: pointer;
++	background: none;
++	text-align: left;
++
++	&:hover {
++		color: ${ COLORS.admin.theme };
++	}
++
++	&:focus {
++		background-color: transparent;
++		color: ${ COLORS.admin.theme };
++		border-color: ${ COLORS.admin.theme };
++		outline: 3px solid transparent;
++	}
++`;
++
++export const item = css`
++	width: 100%;
++	display: block;
++`;
++
++export const bordered = css`
++	border: 1px solid ${ CONFIG.surfaceBorderColor };
++`;
++
++export const separated = css`
++	> *:not( marquee ) {
++		border-bottom: 1px solid ${ CONFIG.surfaceBorderColor };
++	}
++
++	> *:last-child:not( :focus ) {
++		border-bottom-color: transparent;
++	}
++`;
++
++const borderRadius = CONFIG.controlBorderRadius;
++
++export const spacedAround = css`
++	border-radius: ${ borderRadius };
++`;
++
++export const rounded = css`
++	border-radius: ${ borderRadius };
++
++	> *:first-child {
++		border-top-left-radius: ${ borderRadius };
++		border-top-right-radius: ${ borderRadius };
++	}
++
++	> *:last-child {
++		border-bottom-left-radius: ${ borderRadius };
++		border-bottom-right-radius: ${ borderRadius };
++	}
++`;
++
++const baseFontHeight = `calc(${ CONFIG.fontSize } * ${ CONFIG.fontLineHeightBase })`;
++
++/*
++ * Math:
++ * - Use the desired height as the base value
++ * - Subtract the computed height of (default) text
++ * - Subtract the effects of border
++ * - Divide the calculated number by 2, in order to get an individual top/bottom padding
++ */
++const paddingY = `calc((${ CONFIG.controlHeight } - ${ baseFontHeight } - 2px) / 2)`;
++const paddingYSmall = `calc((${ CONFIG.controlHeightSmall } - ${ baseFontHeight } - 2px) / 2)`;
++const paddingYLarge = `calc((${ CONFIG.controlHeightLarge } - ${ baseFontHeight } - 2px) / 2)`;
++
++export const itemSizes = {
++	small: css`
++		padding: ${ paddingYSmall }, ${ CONFIG.controlPaddingXSmall };
++	`,
++	medium: css`
++		padding: ${ paddingY }, ${ CONFIG.controlPaddingX };
++	`,
++	large: css`
++		padding: ${ paddingYLarge }, ${ CONFIG.controlPaddingXLarge };
++	`,
++};
+diff --git a/packages/components/src/ui/item-group/use-item-group.ts b/packages/components/src/ui/item-group/use-item-group.ts
+new file mode 100644
+index 00000000000000..f85b26098f20a8
+--- /dev/null
++++ b/packages/components/src/ui/item-group/use-item-group.ts
+@@ -0,0 +1,51 @@
++/**
++ * External dependencies
++ */
++import { cx } from 'emotion';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem } from '../context';
++// eslint-disable-next-line no-duplicate-imports
++import type { PolymorphicComponentProps } from '../context';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from './styles';
++
++export interface Props {
++	bordered?: boolean;
++	rounded?: boolean;
++	separated?: boolean;
++	size?: 'large' | 'medium' | 'small';
++}
++
++export function useItemGroup(
++	props: PolymorphicComponentProps< Props, 'div' >
++) {
++	const {
++		className,
++		bordered = false,
++		rounded = true,
++		separated = false,
++		role = 'list',
++		...otherProps
++	} = useContextSystem( props, 'ItemGroup' );
++
++	const classes = cx(
++		bordered && styles.bordered,
++		( bordered || separated ) && styles.separated,
++		rounded && styles.rounded,
++		className
++	);
++
++	return {
++		bordered,
++		className: classes,
++		role,
++		separated,
++		...otherProps,
++	};
++}
+diff --git a/packages/components/src/ui/item-group/use-item.ts b/packages/components/src/ui/item-group/use-item.ts
+new file mode 100644
+index 00000000000000..9b7a931ec020c8
+--- /dev/null
++++ b/packages/components/src/ui/item-group/use-item.ts
+@@ -0,0 +1,50 @@
++/**
++ * External dependencies
++ */
++import { cx } from 'emotion';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem } from '../context';
++// eslint-disable-next-line no-duplicate-imports
++import type { PolymorphicComponentProps } from '../context';
++import * as styles from './styles';
++import { useItemGroupContext } from './context';
++
++export interface Props {
++	action?: boolean;
++	size?: 'small' | 'medium' | 'large';
++}
++
++export function useItem( props: PolymorphicComponentProps< Props, 'div' > ) {
++	const {
++		action = false,
++		as: asProp,
++		className,
++		role = 'listitem',
++		size: sizeProp,
++		...otherProps
++	} = useContextSystem( props, 'Item' );
++
++	const { spacedAround, size: contextSize } = useItemGroupContext();
++
++	const size = sizeProp || contextSize;
++
++	const as = asProp || action ? 'button' : 'div';
++
++	const classes = cx(
++		action && styles.unstyledButton,
++		styles.itemSizes[ size ] || styles.itemSizes.medium,
++		styles.item,
++		spacedAround && styles.spacedAround,
++		className
++	);
++
++	return {
++		as,
++		className: classes,
++		role,
++		...otherProps,
++	};
++}
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 9275354b8987e3..5dc2245256e611 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -5,6 +5,8 @@ import { space } from '../ui/utils/space';
+ import { COLORS } from './colors-values';
+ 
+ const CONTROL_HEIGHT = '30px';
++const CONTROL_PADDING_X = '12px';
++
+ const CARD_PADDING_X = space( 3 );
+ const CARD_PADDING_Y = space( 3 );
+ 
+@@ -34,6 +36,10 @@ export default {
+ 	fontWeight: 'normal',
+ 	fontWeightHeading: '600',
+ 	gridBase: '4px',
++	controlPaddingX: CONTROL_PADDING_X,
++	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
++	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
++	controlBorderRadius: '2px',
+ 	controlHeight: CONTROL_HEIGHT,
+ 	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
+ 	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,

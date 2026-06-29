@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/angle-picker-control/index.tsx b/packages/components/src/angle-picker-control/index.tsx
+index f90394b12078f4..06178e0b401015 100644
+--- a/packages/components/src/angle-picker-control/index.tsx
++++ b/packages/components/src/angle-picker-control/index.tsx
+@@ -41,7 +41,6 @@ function UnforwardedAnglePickerControl(
+ 			'Bottom margin styles for wp.components.AnglePickerControl',
+ 			{
+ 				since: '6.1',
+-				version: '6.4',
+ 				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+ 			}
+ 		);

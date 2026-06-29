@@ -1,0 +1,2601 @@
+diff --git a/packages/theme/bin/generate-primitive-tokens/index.ts b/packages/theme/bin/generate-primitive-tokens/index.ts
+index 26116cca93266b..ffc365acd77069 100644
+--- a/packages/theme/bin/generate-primitive-tokens/index.ts
++++ b/packages/theme/bin/generate-primitive-tokens/index.ts
+@@ -4,11 +4,22 @@
+ import fs from 'fs';
+ import path from 'path';
+ import { fileURLToPath } from 'url';
+-import Color from 'colorjs.io';
++import {
++	parse,
++	to,
++	serialize,
++	OKLCH,
++	sRGB,
++	type PlainColorObject,
++	// Disable reason: ESLint resolver can't handle `exports`. Import resolver
++	// checking is redundant in TypeScript files.
++	// eslint-disable-next-line import/no-unresolved
++} from 'colorjs.io/fn';
+ 
+ /**
+  * Internal dependencies
+  */
++import '../../src/color-ramps/lib/register-color-spaces';
+ import {
+ 	DEFAULT_SEED_COLORS,
+ 	buildBgRamp,
+@@ -23,9 +34,9 @@ const colorJsonPath = path.join( __dirname, '../../tokens/color.json' );
+ 
+ const transformColorStringToDTCGValue = ( color: string ) => {
+ 	if ( /oklch|p3/.test( color ) ) {
+-		let parsed: Color;
++		let parsed: PlainColorObject;
+ 		try {
+-			parsed = new Color( color ).to( 'oklch' );
++			parsed = to( parse( color ), OKLCH );
+ 		} catch {
+ 			return color;
+ 		}
+@@ -39,7 +50,7 @@ const transformColorStringToDTCGValue = ( color: string ) => {
+ 				isNaN( coords[ 2 ] ) ? 0 : coords[ 2 ], // h
+ 			],
+ 			...( parsed.alpha < 1 ? { alpha: parsed.alpha } : undefined ),
+-			hex: parsed.to( 'srgb' ).toString( { format: 'hex' } ),
++			hex: serialize( to( parsed, sRGB ), { format: 'hex' } ),
+ 		};
+ 	}
+ 
+diff --git a/packages/theme/bin/terrazzo-plugin-figma-ds-token-manager/index.ts b/packages/theme/bin/terrazzo-plugin-figma-ds-token-manager/index.ts
+index 0a181b7b776b35..8e8e047250cf01 100644
+--- a/packages/theme/bin/terrazzo-plugin-figma-ds-token-manager/index.ts
++++ b/packages/theme/bin/terrazzo-plugin-figma-ds-token-manager/index.ts
+@@ -3,11 +3,18 @@
+  */
+ import type { Plugin, TokenNormalized } from '@terrazzo/parser';
+ import { transformCSSValue } from '@terrazzo/token-tools/css';
+-import Color from 'colorjs.io';
++import {
++	parse,
++	to,
++	serialize,
++	sRGB,
++	type ColorConstructor,
++} from 'colorjs.io/fn';
+ 
+ /**
+  * Internal dependencies
+  */
++import '../../src/color-ramps/lib/register-color-spaces';
+ import { FORMAT_JSON_ID } from './lib';
+ 
+ function titleCase( str: string ) {
+@@ -113,15 +120,15 @@ function transformColorToken(
+ 
+ 	// Always convert to hex
+ 	// (easier to convert to Figma RGB, and includes clamping)
+-	let convertedColor: Color;
++	let convertedColor: ColorConstructor;
+ 	try {
+-		convertedColor = new Color( cssColorValue );
++		convertedColor = parse( cssColorValue );
+ 	} catch {
+ 		console.warn( 'Unexpected: could not convert token value to Color' );
+ 		return;
+ 	}
+ 
+-	return convertedColor.to( 'srgb' ).toString( { format: 'hex' } );
++	return serialize( to( convertedColor, sRGB ), { format: 'hex' } );
+ }
+ 
+ export default function pluginFigmaDsTokenManager( {
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index 45f0d59148067c..59c7b60f462d66 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -37,7 +37,11 @@
+ 	"react-native": "src/index",
+ 	"wpScript": true,
+ 	"types": "build-types",
+-	"sideEffects": false,
++	"sideEffects": [
++		"src/color-ramps/lib/register-color-spaces.ts",
++		"build/color-ramps/lib/register-color-spaces.js",
++		"build-module/color-ramps/lib/register-color-spaces.js"
++	],
+ 	"dependencies": {
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/private-apis": "file:../private-apis",
+diff --git a/packages/theme/src/color-ramps/index.ts b/packages/theme/src/color-ramps/index.ts
+index 3bf079bcf19252..948f78a41fd750 100644
+--- a/packages/theme/src/color-ramps/index.ts
++++ b/packages/theme/src/color-ramps/index.ts
+@@ -1,11 +1,15 @@
+ /**
+  * External dependencies
+  */
+-import Color from 'colorjs.io';
++// Disable reason: ESLint resolver can't handle `exports`. Import resolver
++// checking is redundant in TypeScript files.
++// eslint-disable-next-line import/no-unresolved
++import { get, OKLCH, parse, serialize } from 'colorjs.io/fn';
+ 
+ /**
+  * Internal dependencies
+  */
++import './lib/register-color-spaces';
+ import { buildRamp } from './lib/index';
+ import { clampAccentScaleReferenceLightness } from './lib/utils';
+ import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from './lib/ramp-configs';
+@@ -14,7 +18,7 @@ import type {
+ 	RampDirection,
+ 	Ramp,
+ } from './lib/types';
+-import { getCachedContrast } from './lib/cache-utils';
++import { getContrast } from './lib/color-utils';
+ import { CONTRAST_COMBINATIONS } from './lib/constants';
+ export { DEFAULT_SEED_COLORS } from './lib/constants';
+ 
+@@ -43,7 +47,7 @@ function getBgRampInfo( ramp: InternalRampResult ): {
+ 		pinLightness: {
+ 			stepName: STEP_TO_PIN,
+ 			value: clampAccentScaleReferenceLightness(
+-				new Color( ramp.ramp[ STEP_TO_PIN ].color ).oklch.l,
++				get( parse( ramp.ramp[ STEP_TO_PIN ].color ), [ OKLCH, 'l' ] ),
+ 				ramp.direction
+ 			),
+ 		},
+@@ -95,14 +99,14 @@ export function checkAccessibleCombinations( {
+ 		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
+ 			for ( const bg of bgs ) {
+ 				for ( const fg of fgs ) {
+-					const bgColor = new Color( ramp.ramp[ bg ].color );
+-					const fgColor = new Color( ramp.ramp[ fg ].color );
+-					if ( getCachedContrast( bgColor, fgColor ) < target ) {
++					const bgColor = parse( ramp.ramp[ bg ].color );
++					const fgColor = parse( ramp.ramp[ fg ].color );
++					if ( getContrast( bgColor, fgColor ) < target ) {
+ 						unmetTargets.push( {
+ 							bgName: bg,
+-							bgColor: bgColor.toString(),
++							bgColor: serialize( bgColor ),
+ 							fgName: fg,
+-							fgColor: fgColor.toString(),
++							fgColor: serialize( fgColor ),
+ 							unmetContrast: target,
+ 						} );
+ 					}
+@@ -115,14 +119,14 @@ export function checkAccessibleCombinations( {
+ 		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
+ 			for ( const bg of bgs ) {
+ 				for ( const fg of fgs ) {
+-					const bgColor = new Color( bgRamp.ramp[ bg ].color );
+-					const fgColor = new Color( ramp.ramp[ fg ].color );
+-					if ( getCachedContrast( bgColor, fgColor ) < target ) {
++					const bgColor = parse( bgRamp.ramp[ bg ].color );
++					const fgColor = parse( ramp.ramp[ fg ].color );
++					if ( getContrast( bgColor, fgColor ) < target ) {
+ 						unmetTargets.push( {
+ 							bgName: bg,
+-							bgColor: bgColor.toString(),
++							bgColor: serialize( bgColor ),
+ 							fgName: fg,
+-							fgColor: fgColor.toString(),
++							fgColor: serialize( fgColor ),
+ 							unmetContrast: target,
+ 						} );
+ 					}
+diff --git a/packages/theme/src/color-ramps/lib/cache-utils.ts b/packages/theme/src/color-ramps/lib/cache-utils.ts
+deleted file mode 100644
+index d0d0e5f6d8a234..00000000000000
+--- a/packages/theme/src/color-ramps/lib/cache-utils.ts
++++ /dev/null
+@@ -1,56 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type Color from 'colorjs.io';
+-
+-/**
+- * Cache for WCAG contrast calculations
+- */
+-const contrastCache = new Map< string, number >();
+-
+-/**
+- * Cache for color string representations
+- */
+-const colorStringCache = new Map< Color, string >();
+-
+-/**
+- * Get cached string representation of a color
+- * @param color - Color object to stringify
+- * @return Cached string representation
+- */
+-export function getColorString( color: Color ): string {
+-	let str = colorStringCache.get( color );
+-	if ( str === undefined ) {
+-		str = color.to( 'srgb' ).toString( { format: 'hex', inGamut: true } );
+-		colorStringCache.set( color, str );
+-	}
+-	return str;
+-}
+-
+-/**
+- * Get cached contrast calculation between two colors
+- * @param colorA - First color
+- * @param colorB - Second color
+- * @return WCAG 2.1 contrast ratio
+- */
+-export function getCachedContrast( colorA: Color, colorB: Color ): number {
+-	const keyA = getColorString( colorA );
+-	const keyB = getColorString( colorB );
+-	const cacheKey =
+-		keyA < keyB ? `${ keyA }|${ keyB }` : `${ keyB }|${ keyA }`;
+-
+-	let contrast = contrastCache.get( cacheKey );
+-	if ( contrast === undefined ) {
+-		contrast = colorA.contrastWCAG21( colorB );
+-		contrastCache.set( cacheKey, contrast );
+-	}
+-	return contrast;
+-}
+-
+-/**
+- * Clear all caches - useful for memory management or testing
+- */
+-export function clearCaches(): void {
+-	contrastCache.clear();
+-	colorStringCache.clear();
+-}
+diff --git a/packages/theme/src/color-ramps/lib/color-utils.ts b/packages/theme/src/color-ramps/lib/color-utils.ts
+new file mode 100644
+index 00000000000000..a898ef510700d1
+--- /dev/null
++++ b/packages/theme/src/color-ramps/lib/color-utils.ts
+@@ -0,0 +1,37 @@
++/**
++ * External dependencies
++ */
++import {
++	to,
++	serialize,
++	contrastWCAG21,
++	sRGB,
++	type ColorTypes,
++	// Disable reason: ESLint resolver can't handle `exports`. Import resolver
++	// checking is redundant in TypeScript files.
++	// eslint-disable-next-line import/no-unresolved
++} from 'colorjs.io/fn';
++
++/**
++ * Internal dependencies
++ */
++import './register-color-spaces';
++
++/**
++ * Get string representation of a color
++ * @param color Color object to stringify
++ * @return String representation
++ */
++export function getColorString( color: ColorTypes ): string {
++	return serialize( to( color, sRGB ), { format: 'hex', inGamut: true } );
++}
++
++/**
++ * Get contrast value between two colors
++ * @param colorA First color
++ * @param colorB Second color
++ * @return WCAG 2.1 contrast ratio
++ */
++export function getContrast( colorA: ColorTypes, colorB: ColorTypes ): number {
++	return contrastWCAG21( colorA, colorB );
++}
+diff --git a/packages/theme/src/color-ramps/lib/constants.ts b/packages/theme/src/color-ramps/lib/constants.ts
+index 9066cdbcbf38a3..5fd71345cd19c1 100644
+--- a/packages/theme/src/color-ramps/lib/constants.ts
++++ b/packages/theme/src/color-ramps/lib/constants.ts
+@@ -1,15 +1,19 @@
+ /**
+  * External dependencies
+  */
+-import Color from 'colorjs.io';
++// Disable reason: ESLint resolver can't handle `exports`. Import resolver
++// checking is redundant in TypeScript files.
++// eslint-disable-next-line import/no-unresolved
++import { to, OKLCH } from 'colorjs.io/fn';
+ 
+ /**
+  * Internal dependencies
+  */
++import './register-color-spaces';
+ import type { Ramp } from './types';
+ 
+-export const WHITE = new Color( '#fff' ).to( 'oklch' );
+-export const BLACK = new Color( '#000' ).to( 'oklch' );
++export const WHITE = to( 'white', OKLCH );
++export const BLACK = to( 'black', OKLCH );
+ 
+ // Margin added to target contrasts to counter for algorithm approximations
+ // and rounding errors.
+@@ -32,10 +36,10 @@ export const ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS = {
+ 	darker: { min: 0.75, max: 0.98 },
+ } as const;
+ 
+-// Minimum lightness difference noticed by the algorithm.
+-export const LIGHTNESS_EPSILON = 1e-3;
++// Lightness precision we aim for. Approximately 1/256, resolution of an 8-bit number.
++export const LIGHTNESS_EPSILON = 4e-3;
+ 
+-export const MAX_BISECTION_ITERATIONS = 25;
++export const MAX_BISECTION_ITERATIONS = 10;
+ 
+ export const CONTRAST_COMBINATIONS: {
+ 	bgs: ( keyof Ramp )[];
+diff --git a/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts b/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts
+index 7f345ac50f4930..0dc5a9ed83a865 100644
+--- a/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts
++++ b/packages/theme/src/color-ramps/lib/find-color-with-constraints.ts
+@@ -1,11 +1,15 @@
+ /**
+  * External dependencies
+  */
+-import Color from 'colorjs.io';
++// Disable reason: ESLint resolver can't handle `exports`. Import resolver
++// checking is redundant in TypeScript files.
++// eslint-disable-next-line import/no-unresolved
++import { get, OKLCH, type ColorTypes } from 'colorjs.io/fn';
+ 
+ /**
+  * Internal dependencies
+  */
++import './register-color-spaces';
+ import { clampToGamut } from './utils';
+ import {
+ 	WHITE,
+@@ -13,7 +17,7 @@ import {
+ 	LIGHTNESS_EPSILON,
+ 	MAX_BISECTION_ITERATIONS,
+ } from './constants';
+-import { getCachedContrast } from './cache-utils';
++import { getContrast } from './color-utils';
+ import { type TaperChromaOptions, taperChroma } from './taper-chroma';
+ 
+ /**
+@@ -34,8 +38,8 @@ import { type TaperChromaOptions, taperChroma } from './taper-chroma';
+  * @param options.taperChromaOptions
+  */
+ export function findColorMeetingRequirements(
+-	reference: Color,
+-	seed: Color,
++	reference: ColorTypes,
++	seed: ColorTypes,
+ 	target: number,
+ 	direction: 'lighter' | 'darker',
+ 	{
+@@ -50,32 +54,41 @@ export function findColorMeetingRequirements(
+ 		taperChromaOptions?: TaperChromaOptions;
+ 		strict?: boolean;
+ 	} = {}
+-): { color: Color; reached: boolean; achieved: number } {
++): { color: ColorTypes; reached: boolean; achieved: number } {
+ 	// A target of 1 means same color.
+ 	// A target lower than 1 doesn't make sense.
+ 	if ( target <= 1 ) {
+-		return { color: seed.clone(), reached: true, achieved: 1 };
++		return { color: seed, reached: true, achieved: 1 };
+ 	}
+ 
+-	if ( lightnessConstraint ) {
+-		// Apply a specific L value.
+-		// Useful when pinning a step to a specific lightness, of to specify
+-		// min/max L values.
+-		let newL = lightnessConstraint.value;
+-		let newC = seed.oklch.c;
++	function getColorForL( l: number ): ColorTypes {
++		let newL = l;
++		let newC = get( seed, [ OKLCH, 'c' ] );
+ 
+ 		if ( taperChromaOptions ) {
+-			( { l: newL, c: newC } = taperChroma(
+-				seed,
+-				newL,
+-				taperChromaOptions
+-			) );
++			const tapered = taperChroma( seed, newL, taperChromaOptions );
++			// taperChroma returns either { l, c } or a ColorObject
++			if ( 'l' in tapered && 'c' in tapered ) {
++				newL = tapered.l;
++				newC = tapered.c;
++			} else {
++				// It's already a ColorObject, return it directly
++				return tapered;
++			}
+ 		}
+ 
+-		const colorWithExactL = clampToGamut(
+-			new Color( 'oklch', [ newL, newC, seed.oklch.h ] )
+-		);
+-		const exactLContrast = getCachedContrast( reference, colorWithExactL );
++		return clampToGamut( {
++			spaceId: 'oklch',
++			coords: [ newL, newC, get( seed, [ OKLCH, 'h' ] ) ],
++		} );
++	}
++
++	if ( lightnessConstraint ) {
++		// Apply a specific L value.
++		// Useful when pinning a step to a specific lightness, of to specify
++		// min/max L values.
++		const colorWithExactL = getColorForL( lightnessConstraint.value );
++		const exactLContrast = getContrast( reference, colorWithExactL );
+ 
+ 		// If the L constraint is of "force" type, apply it even when it doesn't
+ 		// meet the contrast target.
+@@ -94,29 +107,24 @@ export function findColorMeetingRequirements(
+ 	// Set the boundary based on the direction.
+ 	const mostContrastingL = direction === 'lighter' ? 1 : 0;
+ 	const mostContrastingColor = direction === 'lighter' ? WHITE : BLACK;
+-	const highestPossibleContrast = getCachedContrast(
+-		reference,
+-		mostContrastingColor
+-	);
++	const highestContrast = getContrast( reference, mostContrastingColor );
+ 
+ 	// If even the most contrasting color can't reach the target,
+ 	// the target is unreachable.
+-	if ( highestPossibleContrast < target ) {
++	if ( highestContrast < target ) {
+ 		if ( strict ) {
+ 			throw new Error(
+ 				`Contrast target ${ target.toFixed(
+ 					2
+-				) }:1 unreachable in ${ direction } direction against ${ mostContrastingColor.toString() }` +
+-					`(boundary achieves ${ highestPossibleContrast.toFixed(
+-						3
+-					) }:1).`
++				) }:1 unreachable in ${ direction } direction` +
++					`(boundary achieves ${ highestContrast.toFixed( 3 ) }:1).`
+ 			);
+ 		}
+ 
+ 		return {
+ 			color: mostContrastingColor,
+ 			reached: false,
+-			achieved: highestPossibleContrast,
++			achieved: highestContrast,
+ 		};
+ 	}
+ 
+@@ -124,48 +132,53 @@ export function findColorMeetingRequirements(
+ 	// Originally this was seed.oklch.l — although it's an assumption that works
+ 	// only when we know for sure the direction of the search.
+ 	// TODO: can we bring this back to seed.oklch.l ?
+-	let worseL = reference.oklch.l;
++	let worseL = get( reference, [ OKLCH, 'l' ] );
++	let worseContrast = 1;
++	let replacedWorse = false;
+ 	let betterL = mostContrastingL;
++	let betterContrast = highestContrast;
++	let replacedBetter = false;
+ 
+-	let bestContrastFound = highestPossibleContrast;
+-	let resultingColor = mostContrastingColor;
++	let bestColor: ColorTypes = mostContrastingColor;
++	let bestContrast = highestContrast;
+ 
+-	for (
+-		let i = 0;
+-		i < MAX_BISECTION_ITERATIONS &&
+-		Math.abs( betterL - worseL ) > LIGHTNESS_EPSILON;
+-		i++
+-	) {
+-		let newL = ( worseL + betterL ) / 2;
+-		let newC = seed.oklch.c;
++	for ( let i = 0; i < MAX_BISECTION_ITERATIONS; i++ ) {
++		// Linear interpolation between worse and better L values, weighted by the contrast difference.
++		const newL =
++			( worseL * ( betterContrast - target ) -
++				betterL * ( worseContrast - target ) ) /
++			( betterContrast - worseContrast );
+ 
+-		if ( taperChromaOptions ) {
+-			( { l: newL, c: newC } = taperChroma(
+-				seed,
+-				newL,
+-				taperChromaOptions
+-			) );
+-		}
++		bestColor = getColorForL( newL );
++		bestContrast = getContrast( reference, bestColor );
+ 
+-		const newColor = clampToGamut(
+-			new Color( 'oklch', [ newL, newC, seed.oklch.h ] )
+-		);
+-		const newContrast = getCachedContrast( reference, newColor );
++		if ( Math.abs( bestContrast - target ) <= LIGHTNESS_EPSILON ) {
++			break;
++		}
+ 
+-		if ( newContrast >= target ) {
++		// Update one of the boundary L values, using the Illinois method.
++		if ( bestContrast >= target ) {
+ 			betterL = newL;
+-			// Only update the resulting color when the target is met, this ensuring
+-			// at the end of the search the target is always met.
+-			bestContrastFound = newContrast;
+-			resultingColor = newColor;
++			betterContrast = bestContrast;
++			if ( replacedBetter ) {
++				worseContrast = ( worseContrast + target ) / 2;
++			}
++			replacedBetter = true;
++			replacedWorse = false;
+ 		} else {
+ 			worseL = newL;
++			worseContrast = bestContrast;
++			if ( replacedWorse ) {
++				betterContrast = ( betterContrast + target ) / 2;
++			}
++			replacedWorse = true;
++			replacedBetter = false;
+ 		}
+ 	}
+ 
+ 	return {
+-		color: resultingColor,
++		color: bestColor,
+ 		reached: true,
+-		achieved: bestContrastFound,
++		achieved: bestContrast,
+ 	};
+ }
+diff --git a/packages/theme/src/color-ramps/lib/index.ts b/packages/theme/src/color-ramps/lib/index.ts
+index cadd868dbf28ac..2946eca8ba6148 100644
+--- a/packages/theme/src/color-ramps/lib/index.ts
++++ b/packages/theme/src/color-ramps/lib/index.ts
+@@ -1,12 +1,24 @@
+ /**
+  * External dependencies
+  */
+-import Color from 'colorjs.io';
++import {
++	clone,
++	get,
++	OKLCH,
++	parse,
++	set,
++	type ColorTypes,
++	type PlainColorObject,
++	// Disable reason: ESLint resolver can't handle `exports`. Import resolver
++	// checking is redundant in TypeScript files.
++	// eslint-disable-next-line import/no-unresolved
++} from 'colorjs.io/fn';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { getCachedContrast, getColorString } from './cache-utils';
++import './register-color-spaces';
++import { getContrast, getColorString } from './color-utils';
+ import { findColorMeetingRequirements } from './find-color-with-constraints';
+ import {
+ 	clampToGamut,
+@@ -46,7 +58,7 @@ function calculateRamp( {
+ 	oppDir,
+ 	pinLightness,
+ }: {
+-	seed: Color;
++	seed: ColorTypes;
+ 	sortedSteps: ( keyof Ramp )[];
+ 	config: RampConfig;
+ 	mainDir: RampDirection;
+@@ -66,7 +78,7 @@ function calculateRamp( {
+ 
+ 	// Keep track of the calculated colors, as they are going to be useful
+ 	// when other colors reference them.
+-	const calculatedColors = new Map< keyof Ramp | 'seed', Color >();
++	const calculatedColors = new Map< keyof Ramp | 'seed', ColorTypes >();
+ 	calculatedColors.set( 'seed', seed );
+ 
+ 	for ( const stepName of sortedSteps ) {
+@@ -88,7 +100,7 @@ function calculateRamp( {
+ 		if ( sameAsIfPossible ) {
+ 			const candidateColor = calculatedColors.get( sameAsIfPossible );
+ 			if ( candidateColor ) {
+-				const candidateContrast = getCachedContrast(
++				const candidateContrast = getContrast(
+ 					referenceColor,
+ 					candidateColor
+ 				);
+@@ -108,7 +120,7 @@ function calculateRamp( {
+ 		}
+ 
+ 		function computeDirection(
+-			color: Color,
++			color: ColorTypes,
+ 			followDirection: FollowDirection
+ 		): RampDirection {
+ 			if ( followDirection === 'main' ) {
+@@ -175,7 +187,7 @@ function calculateRamp( {
+ 			// Weight the deficit by how much seed adjustment would help this constraint
+ 			// If seed has low contrast vs reference, adjusting seed has high impact
+ 			// If seed has high contrast vs reference, adjusting seed has low impact
+-			const impactWeight = 1 / getCachedContrast( seed, referenceColor );
++			const impactWeight = 1 / getContrast( seed, referenceColor );
+ 			const weightedDeficit = deficitVsTarget * impactWeight;
+ 
+ 			// Track the most impactful failure for seed optimization
+@@ -219,9 +231,9 @@ export function buildRamp(
+ 		rescaleToFitContrastTargets?: boolean;
+ 	} = {}
+ ): RampResult {
+-	let seed: Color;
++	let seed: PlainColorObject;
+ 	try {
+-		seed = clampToGamut( new Color( seedArg ) );
++		seed = clampToGamut( parse( seedArg ) );
+ 	} catch ( error ) {
+ 		throw new Error(
+ 			`Invalid seed color "${ seedArg }": ${
+@@ -267,7 +279,7 @@ export function buildRamp(
+ 		! SATISFIED_ALL_CONTRAST_REQUIREMENTS &&
+ 		rescaleToFitContrastTargets
+ 	) {
+-		let worseSeedL = seed.oklch.l;
++		let worseSeedL = get( seed, [ OKLCH, 'l' ] );
+ 		// For a scale with the "lighter" direction, the contrast can be improved
+ 		// by darkening the seed. For "darker" direction, by lightening the seed.
+ 		let betterSeedL = UNSATISFIED_DIRECTION === 'lighter' ? 0 : 1;
+@@ -281,9 +293,11 @@ export function buildRamp(
+ 			i++
+ 		) {
+ 			const newSeed = clampToGamut(
+-				seed.clone().set( {
+-					l: ( worseSeedL + betterSeedL ) / 2,
+-				} )
++				set(
++					clone( seed ),
++					[ OKLCH, 'l' ],
++					( worseSeedL + betterSeedL ) / 2
++				)
+ 			);
+ 
+ 			const iterationResults = calculateRamp( {
+@@ -296,17 +310,17 @@ export function buildRamp(
+ 			} );
+ 
+ 			if ( iterationResults.SATISFIED_ALL_CONTRAST_REQUIREMENTS ) {
+-				betterSeedL = newSeed.oklch.l;
++				betterSeedL = get( newSeed, [ OKLCH, 'l' ] );
+ 				// Only update toReturn when the ramp satisfies all constraints.
+ 				toReturn.ramp = iterationResults.rampResults;
+ 			} else if ( UNSATISFIED_DIRECTION !== mainDir ) {
+ 				// Failing constraint is in opposite direction to main ramp direction
+ 				// We've moved too far in mainDir, constrain the search
+-				betterSeedL = newSeed.oklch.l;
++				betterSeedL = get( newSeed, [ OKLCH, 'l' ] );
+ 			} else {
+ 				// Failing constraint is in same direction as main ramp direction
+ 				// We haven't moved far enough in mainDir, continue searching
+-				worseSeedL = newSeed.oklch.l;
++				worseSeedL = get( newSeed, [ OKLCH, 'l' ] );
+ 			}
+ 		}
+ 	}
+diff --git a/packages/theme/src/color-ramps/lib/register-color-spaces.ts b/packages/theme/src/color-ramps/lib/register-color-spaces.ts
+new file mode 100644
+index 00000000000000..d2636268c52973
+--- /dev/null
++++ b/packages/theme/src/color-ramps/lib/register-color-spaces.ts
+@@ -0,0 +1,16 @@
++/**
++ * External dependencies
++ */
++// Disable reason: ESLint resolver can't handle `exports`. Import resolver
++// checking is redundant in TypeScript files.
++// eslint-disable-next-line import/no-unresolved
++import { ColorSpace, OKLCH, P3, sRGB, HSL } from 'colorjs.io/fn';
++
++// Ensures that all color spaces used in color ramps are registered globally, a
++// requirement for using colorjs.io's procedural API.
++//
++// See: https://colorjs.io/docs/procedural
++ColorSpace.register( sRGB );
++ColorSpace.register( OKLCH );
++ColorSpace.register( P3 );
++ColorSpace.register( HSL );
+diff --git a/packages/theme/src/color-ramps/lib/taper-chroma.ts b/packages/theme/src/color-ramps/lib/taper-chroma.ts
+index deb00acec672b8..5930e9cd223da8 100644
+--- a/packages/theme/src/color-ramps/lib/taper-chroma.ts
++++ b/packages/theme/src/color-ramps/lib/taper-chroma.ts
+@@ -1,8 +1,23 @@
+-// npm i colorjs.io
+ /**
+  * External dependencies
+  */
+-import Color from 'colorjs.io';
++import {
++	get,
++	inGamut,
++	OKLCH,
++	P3,
++	sRGB,
++	type ColorTypes,
++	type ColorObject,
++	// Disable reason: ESLint resolver can't handle `exports`. Import resolver
++	// checking is redundant in TypeScript files.
++	// eslint-disable-next-line import/no-unresolved
++} from 'colorjs.io/fn';
++
++/**
++ * Internal dependencies
++ */
++import './register-color-spaces';
+ 
+ export interface TaperChromaOptions {
+ 	gamut?: 'p3' | 'srgb'; // target gamut (default "p3")
+@@ -29,11 +44,12 @@ export interface TaperChromaOptions {
+  * @param options
+  */
+ export function taperChroma(
+-	seed: Color, // already OKLCH
++	seed: ColorTypes, // already OKLCH
+ 	lTarget: number, // [0..1]
+ 	options: TaperChromaOptions = {}
+-): { l: number; c: number } {
++): { l: number; c: number } | ColorObject {
+ 	const gamut = options.gamut ?? 'p3';
++	const gamutSpace = gamut === 'p3' ? P3 : sRGB;
+ 	const alpha = options.alpha ?? 0.65; // 0.7-0.8 works well for accent surface
+ 	const carry = options.carry ?? 0.5;
+ 	const cUpperBound = options.cUpperBound ?? 0.45;
+@@ -43,8 +59,8 @@ export function taperChroma(
+ 	const kDark = options.kDark ?? 0.85;
+ 	const achromaEpsilon = options.achromaEpsilon ?? 0.005;
+ 
+-	const cSeed = Math.max( 0, seed.oklch.c );
+-	let hSeed = Number( seed.oklch.h );
++	const cSeed = Math.max( 0, get( seed, [ OKLCH, 'c' ] ) );
++	let hSeed = Number( get( seed, [ OKLCH, 'h' ] ) );
+ 
+ 	const chromaIsTiny = cSeed < achromaEpsilon;
+ 	const hueIsInvalid = ! Number.isFinite( hSeed );
+@@ -54,17 +70,25 @@ export function taperChroma(
+ 			hSeed = normalizeHue( options.hueFallback );
+ 		} else {
+ 			// Respect achromatic intent: grayscale at target L
+-			return new Color( 'oklch', [ clamp01( lTarget ), 0, 0 ] );
++			return {
++				spaceId: 'oklch',
++				coords: [ clamp01( lTarget ), 0, 0 ],
++			};
+ 		}
+ 	}
+ 
+ 	// Capacity at seed and target
+-	const lSeed = clamp01( seed.oklch.l );
+-	const cmaxSeed = getCachedMaxChromaAtLH( lSeed, hSeed, gamut, cUpperBound );
++	const lSeed = clamp01( get( seed, [ OKLCH, 'l' ] ) );
++	const cmaxSeed = getCachedMaxChromaAtLH(
++		lSeed,
++		hSeed,
++		gamutSpace,
++		cUpperBound
++	);
+ 	const cmaxTarget = getCachedMaxChromaAtLH(
+ 		clamp01( lTarget ),
+ 		hSeed,
+-		gamut,
++		gamutSpace,
+ 		cUpperBound
+ 	);
+ 
+@@ -89,10 +113,13 @@ export function taperChroma(
+ 
+ 	// Downward-only clamp (preserve L & H)
+ 	const lOut = clamp01( lTarget );
+-	const candidate = new Color( 'oklch', [ lOut, cPlanned, hSeed ] );
+-	if ( ! candidate.inGamut( gamut ) ) {
++	const candidate: ColorTypes = {
++		spaceId: 'oklch',
++		coords: [ lOut, cPlanned, hSeed ],
++	};
++	if ( ! inGamut( candidate, gamutSpace ) ) {
+ 		const cap = Math.min( cPlanned, cUpperBound );
+-		cPlanned = getCachedMaxChromaAtLH( lOut, hSeed, gamut, cap );
++		cPlanned = getCachedMaxChromaAtLH( lOut, hSeed, gamutSpace, cap );
+ 	}
+ 
+ 	cPlanned = Math.min( cPlanned, cSeed );
+@@ -178,16 +205,17 @@ function quantize( x: number, step: number ): number {
+ function getCachedMaxChromaAtLH(
+ 	l: number,
+ 	h: number,
+-	gamut: 'p3' | 'srgb',
++	gamutSpace: typeof P3 | typeof sRGB,
+ 	cap: number
+ ): number {
++	const gamut = gamutSpace === P3 ? 'p3' : 'srgb';
+ 	const key = keyMax( l, h, gamut, cap );
+ 	const hit = maxChromaCache.get( key );
+ 	if ( typeof hit === 'number' ) {
+ 		return hit;
+ 	}
+ 
+-	const computed = maxInGamutChromaAtLH( l, h, gamut, cap );
++	const computed = maxInGamutChromaAtLH( l, h, gamutSpace, cap );
+ 	maxChromaCache.set( key, computed );
+ 	return computed;
+ }
+@@ -196,13 +224,13 @@ function getCachedMaxChromaAtLH(
+  * Binary-search the max in-gamut chroma at fixed (L,H) in the target gamut
+  * @param l
+  * @param h
+- * @param gamut
++ * @param gamutSpace
+  * @param cap
+  */
+ function maxInGamutChromaAtLH(
+ 	l: number,
+ 	h: number,
+-	gamut: 'p3' | 'srgb',
++	gamutSpace: typeof P3 | typeof sRGB,
+ 	cap: number
+ ): number {
+ 	let lo = 0;
+@@ -214,8 +242,11 @@ function maxInGamutChromaAtLH(
+ 
+ 	for ( let i = 0; i < 18; i++ ) {
+ 		const mid = ( lo + hi ) / 2;
+-		const probe = new Color( 'oklch', [ lFixed, mid, hFixed ] );
+-		if ( probe.inGamut( gamut ) ) {
++		const probe: ColorTypes = {
++			spaceId: 'oklch',
++			coords: [ lFixed, mid, hFixed ],
++		};
++		if ( inGamut( probe, gamutSpace ) ) {
+ 			ok = mid;
+ 			lo = mid;
+ 		} else {
+diff --git a/packages/theme/src/color-ramps/lib/utils.ts b/packages/theme/src/color-ramps/lib/utils.ts
+index a0f25dfbc10470..6fe1570b1f2fc1 100644
+--- a/packages/theme/src/color-ramps/lib/utils.ts
++++ b/packages/theme/src/color-ramps/lib/utils.ts
+@@ -1,11 +1,15 @@
+ /**
+  * External dependencies
+  */
+-import type Color from 'colorjs.io';
++// Disable reason: ESLint resolver can't handle `exports`. Import resolver
++// checking is redundant in TypeScript files.
++// eslint-disable-next-line import/no-unresolved
++import { toGamut, to, P3, OKLCH, type ColorTypes } from 'colorjs.io/fn';
+ 
+ /**
+  * Internal dependencies
+  */
++import './register-color-spaces';
+ import {
+ 	WHITE,
+ 	BLACK,
+@@ -14,16 +18,14 @@ import {
+ 	ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS,
+ } from './constants';
+ import type { Ramp, RampStepConfig, RampDirection } from './types';
+-import { getCachedContrast } from './cache-utils';
++import { getContrast } from './color-utils';
+ 
+ /**
+  * Make sure that a color is valid in the p3 gamut, and converts it to oklch.
+  * @param c
+  */
+-export const clampToGamut = ( c: Color ) =>
+-	c
+-		.toGamut( { space: 'p3', method: 'css' } ) // map into Display-P3 using CSS OKLCH method
+-		.to( 'oklch' );
++export const clampToGamut = ( c: ColorTypes ) =>
++	to( toGamut( c, { space: P3, method: 'css' } ), OKLCH ); // map into Display-P3 using CSS OKLCH method
+ 
+ /**
+  * Build a dependency graph from the steps configuration
+@@ -119,14 +121,14 @@ export function sortByDependency(
+  * ramp direction value.
+  */
+ export function computeBetterFgColorDirection(
+-	seed: Color,
++	seed: ColorTypes,
+ 	preferLighter?: boolean
+ ): {
+ 	better: RampDirection;
+ 	worse: RampDirection;
+ } {
+-	const contrastAgainstBlack = getCachedContrast( seed, BLACK );
+-	const contrastAgainstWhite = getCachedContrast( seed, WHITE );
++	const contrastAgainstBlack = getContrast( seed, BLACK );
++	const contrastAgainstWhite = getContrast( seed, WHITE );
+ 
+ 	return contrastAgainstBlack >
+ 		contrastAgainstWhite +
+diff --git a/packages/theme/src/color-ramps/test/__snapshots__/index.test.ts.snap b/packages/theme/src/color-ramps/test/__snapshots__/index.test.ts.snap
+index 8a2dffd2135f0b..ef0b2a00887f9a 100644
+--- a/packages/theme/src/color-ramps/test/__snapshots__/index.test.ts.snap
++++ b/packages/theme/src/color-ramps/test/__snapshots__/index.test.ts.snap
+@@ -24,7 +24,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "bgFill2": {
+-            "color": "#456afc",
++            "color": "#4569fb",
+             "warning": false,
+           },
+           "bgFillDark": {
+@@ -56,7 +56,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "fgSurface2": {
+-            "color": "#314ede",
++            "color": "#314dde",
+             "warning": false,
+           },
+           "fgSurface3": {
+@@ -72,7 +72,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "stroke2": {
+-            "color": "#768bc3",
++            "color": "#778cc3",
+             "warning": false,
+           },
+           "stroke3": {
+@@ -100,11 +100,11 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "surface5": {
+-            "color": "#0d1949",
++            "color": "#0d1948",
+             "warning": false,
+           },
+           "surface6": {
+-            "color": "#152462",
++            "color": "#152460",
+             "warning": false,
+           },
+         },
+@@ -131,7 +131,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "bgFill2": {
+-            "color": "#456afc",
++            "color": "#4569fb",
+             "warning": false,
+           },
+           "bgFillDark": {
+@@ -139,7 +139,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "bgFillInverted1": {
+-            "color": "#d6e7ff",
++            "color": "#d7e7ff",
+             "warning": false,
+           },
+           "bgFillInverted2": {
+@@ -159,15 +159,15 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "fgSurface1": {
+-            "color": "#6c94ff",
++            "color": "#6b93ff",
+             "warning": false,
+           },
+           "fgSurface2": {
+-            "color": "#9bbbff",
++            "color": "#9abaff",
+             "warning": false,
+           },
+           "fgSurface3": {
+-            "color": "#d4e5ff",
++            "color": "#d2e4ff",
+             "warning": false,
+           },
+           "fgSurface4": {
+@@ -175,7 +175,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": true,
+           },
+           "stroke1": {
+-            "color": "#8498c9",
++            "color": "#8497c9",
+             "warning": false,
+           },
+           "stroke2": {
+@@ -183,7 +183,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "stroke3": {
+-            "color": "#d4e5ff",
++            "color": "#d2e4ff",
+             "warning": false,
+           },
+           "stroke4": {
+@@ -191,7 +191,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": true,
+           },
+           "surface1": {
+-            "color": "#3552c1",
++            "color": "#3652c1",
+             "warning": false,
+           },
+           "surface2": {
+@@ -199,11 +199,11 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "surface3": {
+-            "color": "#405ec5",
++            "color": "#405dc4",
+             "warning": false,
+           },
+           "surface4": {
+-            "color": "#3f5fd6",
++            "color": "#3f5fd5",
+             "warning": false,
+           },
+           "surface5": {
+@@ -211,7 +211,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "surface6": {
+-            "color": "#5976cd",
++            "color": "#5876cd",
+             "warning": false,
+           },
+         },
+@@ -246,7 +246,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "bgFillInverted1": {
+-            "color": "#1401a5",
++            "color": "#1401a4",
+             "warning": false,
+           },
+           "bgFillInverted2": {
+@@ -266,7 +266,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "fgSurface1": {
+-            "color": "#88acff",
++            "color": "#89adff",
+             "warning": false,
+           },
+           "fgSurface2": {
+@@ -282,11 +282,11 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "stroke1": {
+-            "color": "#93a4d0",
++            "color": "#92a4cf",
+             "warning": false,
+           },
+           "stroke2": {
+-            "color": "#7085c0",
++            "color": "#6f85c0",
+             "warning": false,
+           },
+           "stroke3": {
+@@ -347,7 +347,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "bgFill2": {
+-            "color": "#df332b",
++            "color": "#df332c",
+             "warning": false,
+           },
+           "bgFillDark": {
+@@ -355,7 +355,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "bgFillInverted1": {
+-            "color": "#ffc9bd",
++            "color": "#ffc9be",
+             "warning": false,
+           },
+           "bgFillInverted2": {
+@@ -375,11 +375,11 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "fgSurface1": {
+-            "color": "#9a0000",
++            "color": "#900",
+             "warning": false,
+           },
+           "fgSurface2": {
+-            "color": "#c2000a",
++            "color": "#c10009",
+             "warning": false,
+           },
+           "fgSurface3": {
+@@ -391,11 +391,11 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "stroke1": {
+-            "color": "#ae4d43",
++            "color": "#ad4e44",
+             "warning": false,
+           },
+           "stroke2": {
+-            "color": "#cc685d",
++            "color": "#cc695d",
+             "warning": false,
+           },
+           "stroke3": {
+@@ -403,7 +403,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "stroke4": {
+-            "color": "#ffbfb3",
++            "color": "#ffbfb2",
+             "warning": false,
+           },
+           "surface1": {
+@@ -415,15 +415,15 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "surface3": {
+-            "color": "#1c0504",
++            "color": "#1b0504",
+             "warning": false,
+           },
+           "surface4": {
+-            "color": "#280907",
++            "color": "#270907",
+             "warning": false,
+           },
+           "surface5": {
+-            "color": "#38100d",
++            "color": "#38100c",
+             "warning": false,
+           },
+           "surface6": {
+@@ -454,7 +454,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "bgFill2": {
+-            "color": "#df332b",
++            "color": "#df332c",
+             "warning": false,
+           },
+           "bgFillDark": {
+@@ -462,7 +462,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "bgFillInverted1": {
+-            "color": "#ffddd4",
++            "color": "#ffddd5",
+             "warning": false,
+           },
+           "bgFillInverted2": {
+@@ -482,15 +482,15 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "fgSurface1": {
+-            "color": "#ff5c4f",
++            "color": "#ff5b4e",
+             "warning": false,
+           },
+           "fgSurface2": {
+-            "color": "#ff9b8c",
++            "color": "#ff9b8b",
+             "warning": false,
+           },
+           "fgSurface3": {
+-            "color": "#ffd6cd",
++            "color": "#ffd5cc",
+             "warning": false,
+           },
+           "fgSurface4": {
+@@ -502,11 +502,11 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "stroke2": {
+-            "color": "#e3a89f",
++            "color": "#e3a79f",
+             "warning": false,
+           },
+           "stroke3": {
+-            "color": "#ffd6cd",
++            "color": "#ffd5cc",
+             "warning": false,
+           },
+           "stroke4": {
+@@ -514,7 +514,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": true,
+           },
+           "surface1": {
+-            "color": "#9a3b32",
++            "color": "#9b3b32",
+             "warning": false,
+           },
+           "surface2": {
+@@ -522,11 +522,11 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "surface3": {
+-            "color": "#aa4138",
++            "color": "#a94138",
+             "warning": false,
+           },
+           "surface4": {
+-            "color": "#b04339",
++            "color": "#af433a",
+             "warning": false,
+           },
+           "surface5": {
+@@ -589,7 +589,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "fgSurface1": {
+-            "color": "#ff8979",
++            "color": "#ff8a7a",
+             "warning": false,
+           },
+           "fgSurface2": {
+@@ -617,7 +617,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "stroke4": {
+-            "color": "#a30000",
++            "color": "#a40000",
+             "warning": false,
+           },
+           "surface1": {
+@@ -637,11 +637,11 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "surface5": {
+-            "color": "#f9e0dc",
++            "color": "#f9e1dd",
+             "warning": false,
+           },
+           "surface6": {
+-            "color": "#f6cdc6",
++            "color": "#f6cdc7",
+             "warning": false,
+           },
+         },
+@@ -670,7 +670,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "bgFill2": {
+-            "color": "#dcba9d",
++            "color": "#dcb99d",
+             "warning": false,
+           },
+           "bgFillDark": {
+@@ -678,7 +678,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "bgFillInverted1": {
+-            "color": "#f5d2b4",
++            "color": "#f5d2b5",
+             "warning": false,
+           },
+           "bgFillInverted2": {
+@@ -702,7 +702,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "fgSurface2": {
+-            "color": "#77593f",
++            "color": "#77583e",
+             "warning": false,
+           },
+           "fgSurface3": {
+@@ -714,7 +714,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "stroke1": {
+-            "color": "#7e6959",
++            "color": "#7e6a59",
+             "warning": false,
+           },
+           "stroke2": {
+@@ -726,7 +726,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "stroke4": {
+-            "color": "#f2ceb1",
++            "color": "#f1ceb1",
+             "warning": false,
+           },
+           "surface1": {
+@@ -738,19 +738,19 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "surface3": {
+-            "color": "#100b06",
++            "color": "#100a06",
+             "warning": false,
+           },
+           "surface4": {
+-            "color": "#1a120c",
++            "color": "#18110b",
+             "warning": false,
+           },
+           "surface5": {
+-            "color": "#251c14",
++            "color": "#251b13",
+             "warning": false,
+           },
+           "surface6": {
+-            "color": "#34271d",
++            "color": "#33271d",
+             "warning": false,
+           },
+         },
+@@ -777,7 +777,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "bgFill2": {
+-            "color": "#dcba9d",
++            "color": "#dcb99d",
+             "warning": false,
+           },
+           "bgFillDark": {
+@@ -785,7 +785,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "bgFillInverted1": {
+-            "color": "#ffdfc1",
++            "color": "#ffe0c2",
+             "warning": false,
+           },
+           "bgFillInverted2": {
+@@ -805,15 +805,15 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "fgSurface1": {
+-            "color": "#b7967a",
++            "color": "#b69579",
+             "warning": false,
+           },
+           "fgSurface2": {
+-            "color": "#dbb89b",
++            "color": "#dab79b",
+             "warning": false,
+           },
+           "fgSurface3": {
+-            "color": "#ffe0c3",
++            "color": "#ffdfc2",
+             "warning": false,
+           },
+           "fgSurface4": {
+@@ -829,7 +829,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "stroke3": {
+-            "color": "#ffe0c3",
++            "color": "#ffdfc2",
+             "warning": false,
+           },
+           "stroke4": {
+@@ -837,7 +837,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": true,
+           },
+           "surface1": {
+-            "color": "#715945",
++            "color": "#715946",
+             "warning": false,
+           },
+           "surface2": {
+@@ -845,7 +845,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "surface3": {
+-            "color": "#7c624d",
++            "color": "#7b624c",
+             "warning": false,
+           },
+           "surface4": {
+@@ -853,7 +853,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "surface5": {
+-            "color": "#896d55",
++            "color": "#886c55",
+             "warning": false,
+           },
+           "surface6": {
+@@ -892,7 +892,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "bgFillInverted1": {
+-            "color": "#452910",
++            "color": "#442910",
+             "warning": false,
+           },
+           "bgFillInverted2": {
+@@ -920,7 +920,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "fgSurface3": {
+-            "color": "#8a6b51",
++            "color": "#8a6b50",
+             "warning": false,
+           },
+           "fgSurface4": {
+@@ -928,15 +928,15 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "stroke1": {
+-            "color": "#caaa91",
++            "color": "#caaa90",
+             "warning": false,
+           },
+           "stroke2": {
+-            "color": "#a78d77",
++            "color": "#a78c77",
+             "warning": false,
+           },
+           "stroke3": {
+-            "color": "#8a6b51",
++            "color": "#8a6b50",
+             "warning": false,
+           },
+           "stroke4": {
+@@ -944,7 +944,7 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "surface1": {
+-            "color": "#fbf6f3",
++            "color": "#faf6f3",
+             "warning": false,
+           },
+           "surface2": {
+@@ -956,11 +956,11 @@ exports[`buildRamps accent ramp snapshots 1`] = `
+             "warning": false,
+           },
+           "surface4": {
+-            "color": "#f7efe9",
++            "color": "#f7f0ea",
+             "warning": false,
+           },
+           "surface5": {
+-            "color": "#f1e3d8",
++            "color": "#f1e4d9",
+             "warning": false,
+           },
+           "surface6": {
+@@ -990,7 +990,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "bgFill2": {
+-          "color": "#c8c8c8",
++          "color": "#c7c7c7",
+           "warning": false,
+         },
+         "bgFillDark": {
+@@ -998,7 +998,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "bgFillInverted1": {
+-          "color": "#d8d8d8",
++          "color": "#d9d9d9",
+           "warning": false,
+         },
+         "bgFillInverted2": {
+@@ -1026,7 +1026,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "fgSurface3": {
+-          "color": "#c3c3c3",
++          "color": "#c4c4c4",
+           "warning": false,
+         },
+         "fgSurface4": {
+@@ -1034,11 +1034,11 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "stroke1": {
+-          "color": "#636363",
++          "color": "#656565",
+           "warning": false,
+         },
+         "stroke2": {
+-          "color": "#7d7d7d",
++          "color": "#7f7f7f",
+           "warning": false,
+         },
+         "stroke3": {
+@@ -1046,7 +1046,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "stroke4": {
+-          "color": "#c7c7c7",
++          "color": "#c8c8c8",
+           "warning": false,
+         },
+         "surface1": {
+@@ -1062,7 +1062,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "surface4": {
+-          "color": "#555",
++          "color": "#545454",
+           "warning": false,
+         },
+         "surface5": {
+@@ -1070,7 +1070,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "surface6": {
+-          "color": "#656565",
++          "color": "#646464",
+           "warning": false,
+         },
+       },
+@@ -1086,7 +1086,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+       "direction": "darker",
+       "ramp": {
+         "bgFill1": {
+-          "color": "#005e00",
++          "color": "#005f00",
+           "warning": false,
+         },
+         "bgFill2": {
+@@ -1098,7 +1098,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "bgFillInverted1": {
+-          "color": "#003b00",
++          "color": "#003a00",
+           "warning": false,
+         },
+         "bgFillInverted2": {
+@@ -1118,7 +1118,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "fgSurface1": {
+-          "color": "#707a6f",
++          "color": "#707b6f",
+           "warning": false,
+         },
+         "fgSurface2": {
+@@ -1126,7 +1126,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "fgSurface3": {
+-          "color": "#3e453e",
++          "color": "#3f453e",
+           "warning": false,
+         },
+         "fgSurface4": {
+@@ -1134,11 +1134,11 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "stroke1": {
+-          "color": "#6fa46e",
++          "color": "#6ea36d",
+           "warning": false,
+         },
+         "stroke2": {
+-          "color": "#5a8558",
++          "color": "#598558",
+           "warning": false,
+         },
+         "stroke3": {
+@@ -1150,7 +1150,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "surface1": {
+-          "color": "#67c467",
++          "color": "#68c467",
+           "warning": false,
+         },
+         "surface2": {
+@@ -1162,11 +1162,11 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "surface4": {
+-          "color": "#65be65",
++          "color": "#65bf65",
+           "warning": false,
+         },
+         "surface5": {
+-          "color": "#61b561",
++          "color": "#62b561",
+           "warning": false,
+         },
+         "surface6": {
+@@ -1190,7 +1190,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "bgFill2": {
+-          "color": "#6ca1ff",
++          "color": "#6ca0ff",
+           "warning": false,
+         },
+         "bgFillDark": {
+@@ -1198,7 +1198,7 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "bgFillInverted1": {
+-          "color": "#bedaff",
++          "color": "#bfdaff",
+           "warning": false,
+         },
+         "bgFillInverted2": {
+@@ -1218,11 +1218,11 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "fgSurface1": {
+-          "color": "#515e78",
++          "color": "#505d78",
+           "warning": false,
+         },
+         "fgSurface2": {
+-          "color": "#70798b",
++          "color": "#6f788b",
+           "warning": false,
+         },
+         "fgSurface3": {
+@@ -1238,15 +1238,15 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "stroke2": {
+-          "color": "#2e55b1",
++          "color": "#2f56b1",
+           "warning": false,
+         },
+         "stroke3": {
+-          "color": "#5577c0",
++          "color": "#5477c0",
+           "warning": false,
+         },
+         "stroke4": {
+-          "color": "#7f9ad0",
++          "color": "#7f99cf",
+           "warning": false,
+         },
+         "surface1": {
+@@ -1258,11 +1258,11 @@ exports[`buildRamps background ramp snapshots 1`] = `
+           "warning": false,
+         },
+         "surface3": {
+-          "color": "#06257d",
++          "color": "#06247d",
+           "warning": false,
+         },
+         "surface4": {
+-          "color": "#072885",
++          "color": "#072886",
+           "warning": false,
+         },
+         "surface5": {
+diff --git a/packages/theme/src/color-ramps/test/index.test.ts b/packages/theme/src/color-ramps/test/index.test.ts
+index d716eaa639474a..3e35efb5b6f295 100644
+--- a/packages/theme/src/color-ramps/test/index.test.ts
++++ b/packages/theme/src/color-ramps/test/index.test.ts
+@@ -1,13 +1,15 @@
+ /**
+  * External dependencies
+  */
+-// Not sure why ESLint is erroring.
+-// eslint-disable-next-line import/no-extraneous-dependencies
+-import Color from 'colorjs.io';
++// Disable reason: ESLint resolver can't handle `exports`. Import resolver
++// checking is redundant in TypeScript files.
++// eslint-disable-next-line import/no-unresolved
++import { parse, to, serialize, sRGB } from 'colorjs.io/fn';
+ 
+ /**
+  * Internal dependencies
+  */
++import '../lib/register-color-spaces';
+ import { buildRamp } from '../lib';
+ import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';
+ import { DEFAULT_SEED_COLORS } from '../lib/constants';
+@@ -24,12 +26,17 @@ describe( 'buildRamps', () => {
+ 		expect(
+ 			allBgColors.map( ( bg ) => {
+ 				const ramp = buildRamp( bg, BG_RAMP_CONFIG );
+-				const seedOriginal = new Color( bg )
+-					.to( 'srgb' )
+-					.toString( { format: 'hex', inGamut: true } );
+-				const seedComputed = new Color( ramp.ramp.surface2.color )
+-					.to( 'srgb' )
+-					.toString( { format: 'hex', inGamut: true } );
++				const seedOriginal = serialize( to( parse( bg ), sRGB ), {
++					format: 'hex',
++					inGamut: true,
++				} );
++				const seedComputed = serialize(
++					to( parse( ramp.ramp.surface2.color ), sRGB ),
++					{
++						format: 'hex',
++						inGamut: true,
++					}
++				);
+ 
+ 				return {
+ 					input: {
+@@ -71,12 +78,20 @@ describe( 'buildRamps', () => {
+ 			allPrimaryColors.map( ( primary ) =>
+ 				options.map( ( o ) => {
+ 					const ramp = buildRamp( primary, ACCENT_RAMP_CONFIG, o );
+-					const seedOriginal = new Color( primary )
+-						.to( 'srgb' )
+-						.toString( { format: 'hex', inGamut: true } );
+-					const seedComputed = new Color( ramp.ramp.bgFill1.color )
+-						.to( 'srgb' )
+-						.toString( { format: 'hex', inGamut: true } );
++					const seedOriginal = serialize(
++						to( parse( primary ), sRGB ),
++						{
++							format: 'hex',
++							inGamut: true,
++						}
++					);
++					const seedComputed = serialize(
++						to( parse( ramp.ramp.bgFill1.color ), sRGB ),
++						{
++							format: 'hex',
++							inGamut: true,
++						}
++					);
+ 
+ 					return {
+ 						input: {
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 402fe8d78301b3..8437b8d2062290 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -205,20 +205,20 @@
+ 	--wpds-color-private-bg-fg-fill-inverted: #f0f0f0;
+ 	--wpds-color-private-bg-fg-surface1: #a9a9a9;
+ 	--wpds-color-private-bg-fg-surface2: #898989;
+-	--wpds-color-private-bg-fg-surface3: #6c6c6c;
++	--wpds-color-private-bg-fg-surface3: #6d6d6d;
+ 	--wpds-color-private-bg-fg-surface4: #1e1e1e;
+ 	--wpds-color-private-bg-stroke1: #d0d0d0;
+-	--wpds-color-private-bg-stroke2: #aeaeae;
++	--wpds-color-private-bg-stroke2: #adadad;
+ 	--wpds-color-private-bg-stroke3: #898989;
+ 	--wpds-color-private-bg-stroke4: #6a6a6a;
+-	--wpds-color-private-bg-surface1: #efefef;
++	--wpds-color-private-bg-surface1: #f0f0f0;
+ 	--wpds-color-private-bg-surface2: #f8f8f8;
+ 	--wpds-color-private-bg-surface3: #ffffff;
+ 	--wpds-color-private-bg-surface4: #eaeaea;
+ 	--wpds-color-private-bg-surface5: #dfdfdf;
+ 	--wpds-color-private-bg-surface6: #d0d0d0;
+ 	--wpds-color-private-caution-bg-fill-dark: #1f1e1b;
+-	--wpds-color-private-caution-bg-fill-inverted1: #3d2e00;
++	--wpds-color-private-caution-bg-fill-inverted1: #3d2d00;
+ 	--wpds-color-private-caution-bg-fill-inverted2: #1f1e1b;
+ 	--wpds-color-private-caution-bg-fill1: #f0d149;
+ 	--wpds-color-private-caution-bg-fill2: #dabb2b;
+@@ -230,15 +230,15 @@
+ 	--wpds-color-private-caution-fg-surface3: #866a00;
+ 	--wpds-color-private-caution-fg-surface4: #291d00;
+ 	--wpds-color-private-caution-stroke1: #b8ab76;
+-	--wpds-color-private-caution-stroke2: #988d61;
++	--wpds-color-private-caution-stroke2: #988d60;
+ 	--wpds-color-private-caution-stroke3: #866a00;
+ 	--wpds-color-private-caution-stroke4: #644e00;
+ 	--wpds-color-private-caution-surface1: #faf1cb;
+ 	--wpds-color-private-caution-surface2: #fdf9e7;
+ 	--wpds-color-private-caution-surface3: #ffffff;
+ 	--wpds-color-private-caution-surface4: #f8ebb6;
+-	--wpds-color-private-caution-surface5: #f4df8c;
+-	--wpds-color-private-caution-surface6: #e7d072;
++	--wpds-color-private-caution-surface5: #f4e08c;
++	--wpds-color-private-caution-surface6: #e7d070;
+ 	--wpds-color-private-error-bg-fill-dark: #231c1b;
+ 	--wpds-color-private-error-bg-fill-inverted1: #6d0000;
+ 	--wpds-color-private-error-bg-fill-inverted2: #231c1b;
+@@ -254,15 +254,15 @@
+ 	--wpds-color-private-error-stroke1: #dc9085;
+ 	--wpds-color-private-error-stroke2: #cd695d;
+ 	--wpds-color-private-error-stroke3: #cc1818;
+-	--wpds-color-private-error-stroke4: #a30000;
+-	--wpds-color-private-error-surface1: #fcedea;
++	--wpds-color-private-error-stroke4: #a40000;
++	--wpds-color-private-error-surface1: #fcecea;
+ 	--wpds-color-private-error-surface2: #fdf6f5;
+ 	--wpds-color-private-error-surface3: #ffffff;
+-	--wpds-color-private-error-surface4: #fae5e2;
++	--wpds-color-private-error-surface4: #fae6e2;
+ 	--wpds-color-private-error-surface5: #f8d8d3;
+-	--wpds-color-private-error-surface6: #f5c5bd;
++	--wpds-color-private-error-surface6: #f5c5be;
+ 	--wpds-color-private-info-bg-fill-dark: #1b1e23;
+-	--wpds-color-private-info-bg-fill-inverted1: #00297b;
++	--wpds-color-private-info-bg-fill-inverted1: #00297a;
+ 	--wpds-color-private-info-bg-fill-inverted2: #1b1e23;
+ 	--wpds-color-private-info-bg-fill1: #0090ff;
+ 	--wpds-color-private-info-bg-fill2: #007eec;
+@@ -270,43 +270,43 @@
+ 	--wpds-color-private-info-fg-fill-dark: #eff0f2;
+ 	--wpds-color-private-info-fg-fill-inverted: #eff0f2;
+ 	--wpds-color-private-info-fg-surface1: #4dafff;
+-	--wpds-color-private-info-fg-surface2: #008bf9;
++	--wpds-color-private-info-fg-surface2: #008bfa;
+ 	--wpds-color-private-info-fg-surface3: #006cd8;
+ 	--wpds-color-private-info-fg-surface4: #001758;
+ 	--wpds-color-private-info-stroke1: #8baed6;
+-	--wpds-color-private-info-stroke2: #5c90c9;
++	--wpds-color-private-info-stroke2: #5e90c7;
+ 	--wpds-color-private-info-stroke3: #006cd8;
+ 	--wpds-color-private-info-stroke4: #004bb5;
+ 	--wpds-color-private-info-surface1: #e9f1fa;
+ 	--wpds-color-private-info-surface2: #f5f9fd;
+ 	--wpds-color-private-info-surface3: #ffffff;
+-	--wpds-color-private-info-surface4: #e0ecf8;
+-	--wpds-color-private-info-surface5: #d0e1f5;
+-	--wpds-color-private-info-surface6: #b9d3f0;
++	--wpds-color-private-info-surface4: #e1ecf8;
++	--wpds-color-private-info-surface5: #d1e1f5;
++	--wpds-color-private-info-surface6: #bad3f0;
+ 	--wpds-color-private-primary-bg-fill-dark: #1b1e26;
+-	--wpds-color-private-primary-bg-fill-inverted1: #1401a5;
++	--wpds-color-private-primary-bg-fill-inverted1: #1401a4;
+ 	--wpds-color-private-primary-bg-fill-inverted2: #1b1e26;
+ 	--wpds-color-private-primary-bg-fill1: #3858e9;
+ 	--wpds-color-private-primary-bg-fill2: #2c47d7;
+ 	--wpds-color-private-primary-fg-fill: #eff0f2;
+ 	--wpds-color-private-primary-fg-fill-dark: #eff0f2;
+ 	--wpds-color-private-primary-fg-fill-inverted: #eff0f2;
+-	--wpds-color-private-primary-fg-surface1: #81a6ff;
+-	--wpds-color-private-primary-fg-surface2: #577fff;
++	--wpds-color-private-primary-fg-surface1: #81a7ff;
++	--wpds-color-private-primary-fg-surface2: #5780ff;
+ 	--wpds-color-private-primary-fg-surface3: #3858e9;
+ 	--wpds-color-private-primary-fg-surface4: #080071;
+-	--wpds-color-private-primary-stroke1: #93a4d0;
+-	--wpds-color-private-primary-stroke2: #7085c0;
++	--wpds-color-private-primary-stroke1: #92a4cf;
++	--wpds-color-private-primary-stroke2: #6f85c0;
+ 	--wpds-color-private-primary-stroke3: #3858e9;
+ 	--wpds-color-private-primary-stroke4: #2236c7;
+ 	--wpds-color-private-primary-surface1: #ecf0f9;
+ 	--wpds-color-private-primary-surface2: #f6f8fc;
+ 	--wpds-color-private-primary-surface3: #ffffff;
+ 	--wpds-color-private-primary-surface4: #e5eaf7;
+-	--wpds-color-private-primary-surface5: #d7dff3;
++	--wpds-color-private-primary-surface5: #d8e0f3;
+ 	--wpds-color-private-primary-surface6: #c4d0ee;
+ 	--wpds-color-private-success-bg-fill-dark: #1b1f1c;
+-	--wpds-color-private-success-bg-fill-inverted1: #003b00;
++	--wpds-color-private-success-bg-fill-inverted1: #003a00;
+ 	--wpds-color-private-success-bg-fill-inverted2: #1b1f1c;
+ 	--wpds-color-private-success-bg-fill1: #4ab866;
+ 	--wpds-color-private-success-bg-fill2: #34a554;
+@@ -317,21 +317,21 @@
+ 	--wpds-color-private-success-fg-surface2: #2a9e4d;
+ 	--wpds-color-private-success-fg-surface3: #008030;
+ 	--wpds-color-private-success-fg-surface4: #002b00;
+-	--wpds-color-private-success-stroke1: #78bb84;
+-	--wpds-color-private-success-stroke2: #629a6c;
++	--wpds-color-private-success-stroke1: #78ba84;
++	--wpds-color-private-success-stroke2: #62996c;
+ 	--wpds-color-private-success-stroke3: #008030;
+-	--wpds-color-private-success-stroke4: #006013;
+-	--wpds-color-private-success-surface1: #ddf8e1;
++	--wpds-color-private-success-stroke4: #006113;
++	--wpds-color-private-success-surface1: #ddf8e0;
+ 	--wpds-color-private-success-surface2: #f0fcf2;
+ 	--wpds-color-private-success-surface3: #ffffff;
+-	--wpds-color-private-success-surface4: #cdf5d2;
+-	--wpds-color-private-success-surface5: #abf0b7;
++	--wpds-color-private-success-surface4: #cdf5d3;
++	--wpds-color-private-success-surface5: #acf0b7;
+ 	--wpds-color-private-success-surface6: #7be792;
+ 	--wpds-color-private-warning-bg-fill-dark: #1f1e1b;
+ 	--wpds-color-private-warning-bg-fill-inverted1: #472900;
+ 	--wpds-color-private-warning-bg-fill-inverted2: #1f1e1b;
+ 	--wpds-color-private-warning-bg-fill1: #f0b849;
+-	--wpds-color-private-warning-bg-fill2: #dba32f;
++	--wpds-color-private-warning-bg-fill2: #dba430;
+ 	--wpds-color-private-warning-fg-fill: #1f1e1b;
+ 	--wpds-color-private-warning-fg-fill-dark: #f3f0e9;
+ 	--wpds-color-private-warning-fg-fill-inverted: #f3f0e9;
+@@ -339,15 +339,15 @@
+ 	--wpds-color-private-warning-fg-surface2: #b58000;
+ 	--wpds-color-private-warning-fg-surface3: #966200;
+ 	--wpds-color-private-warning-fg-surface4: #2f1800;
+-	--wpds-color-private-warning-stroke1: #c3a777;
+-	--wpds-color-private-warning-stroke2: #a18a61;
++	--wpds-color-private-warning-stroke1: #c2a777;
++	--wpds-color-private-warning-stroke2: #a08961;
+ 	--wpds-color-private-warning-stroke3: #966200;
+ 	--wpds-color-private-warning-stroke4: #724700;
+-	--wpds-color-private-warning-surface1: #faefdc;
++	--wpds-color-private-warning-surface1: #faefdb;
+ 	--wpds-color-private-warning-surface2: #fdf7ee;
+ 	--wpds-color-private-warning-surface3: #ffffff;
+-	--wpds-color-private-warning-surface4: #f8e8cd;
+-	--wpds-color-private-warning-surface5: #f5dcb2;
++	--wpds-color-private-warning-surface4: #f8e9cd;
++	--wpds-color-private-warning-surface5: #f5ddb2;
+ 	--wpds-color-private-warning-surface6: #f0cb89;
+ 	--wpds-color-stroke-focus-brand: var(
+ 		--wpds-color-private-primary-stroke3
+diff --git a/packages/theme/src/prebuilt/json/figma.json b/packages/theme/src/prebuilt/json/figma.json
+index ab123b9a4fab90..4b32664941f452 100644
+--- a/packages/theme/src/prebuilt/json/figma.json
++++ b/packages/theme/src/prebuilt/json/figma.json
+@@ -57,7 +57,7 @@
+ 	},
+ 	"Color/_Primitives/Primary/surface5": {
+ 		"value": {
+-			".": "#d7dff3"
++			".": "#d8e0f3"
+ 		}
+ 	},
+ 	"Color/_Primitives/Primary/surface4": {
+@@ -82,12 +82,12 @@
+ 	},
+ 	"Color/_Primitives/Primary/fgSurface2": {
+ 		"value": {
+-			".": "#577fff"
++			".": "#5780ff"
+ 		}
+ 	},
+ 	"Color/_Primitives/Primary/fgSurface1": {
+ 		"value": {
+-			".": "#81a6ff"
++			".": "#81a7ff"
+ 		}
+ 	},
+ 	"Color/_Primitives/Primary/stroke3": {
+@@ -102,12 +102,12 @@
+ 	},
+ 	"Color/_Primitives/Primary/stroke2": {
+ 		"value": {
+-			".": "#7085c0"
++			".": "#6f85c0"
+ 		}
+ 	},
+ 	"Color/_Primitives/Primary/stroke1": {
+ 		"value": {
+-			".": "#93a4d0"
++			".": "#92a4cf"
+ 		}
+ 	},
+ 	"Color/_Primitives/Primary/bgFillDark": {
+@@ -127,7 +127,7 @@
+ 	},
+ 	"Color/_Primitives/Primary/bgFillInverted1": {
+ 		"value": {
+-			".": "#1401a5"
++			".": "#1401a4"
+ 		}
+ 	},
+ 	"Color/_Primitives/Primary/fgFillInverted": {
+@@ -162,17 +162,17 @@
+ 	},
+ 	"Color/_Primitives/Info/surface6": {
+ 		"value": {
+-			".": "#b9d3f0"
++			".": "#bad3f0"
+ 		}
+ 	},
+ 	"Color/_Primitives/Info/surface5": {
+ 		"value": {
+-			".": "#d0e1f5"
++			".": "#d1e1f5"
+ 		}
+ 	},
+ 	"Color/_Primitives/Info/surface4": {
+ 		"value": {
+-			".": "#e0ecf8"
++			".": "#e1ecf8"
+ 		}
+ 	},
+ 	"Color/_Primitives/Info/surface3": {
+@@ -192,7 +192,7 @@
+ 	},
+ 	"Color/_Primitives/Info/fgSurface2": {
+ 		"value": {
+-			".": "#008bf9"
++			".": "#008bfa"
+ 		}
+ 	},
+ 	"Color/_Primitives/Info/fgSurface1": {
+@@ -212,7 +212,7 @@
+ 	},
+ 	"Color/_Primitives/Info/stroke2": {
+ 		"value": {
+-			".": "#5c90c9"
++			".": "#5e90c7"
+ 		}
+ 	},
+ 	"Color/_Primitives/Info/stroke1": {
+@@ -237,7 +237,7 @@
+ 	},
+ 	"Color/_Primitives/Info/bgFillInverted1": {
+ 		"value": {
+-			".": "#00297b"
++			".": "#00297a"
+ 		}
+ 	},
+ 	"Color/_Primitives/Info/fgFillInverted": {
+@@ -277,12 +277,12 @@
+ 	},
+ 	"Color/_Primitives/Success/surface5": {
+ 		"value": {
+-			".": "#abf0b7"
++			".": "#acf0b7"
+ 		}
+ 	},
+ 	"Color/_Primitives/Success/surface4": {
+ 		"value": {
+-			".": "#cdf5d2"
++			".": "#cdf5d3"
+ 		}
+ 	},
+ 	"Color/_Primitives/Success/surface3": {
+@@ -317,17 +317,17 @@
+ 	},
+ 	"Color/_Primitives/Success/stroke4": {
+ 		"value": {
+-			".": "#006013"
++			".": "#006113"
+ 		}
+ 	},
+ 	"Color/_Primitives/Success/stroke2": {
+ 		"value": {
+-			".": "#629a6c"
++			".": "#62996c"
+ 		}
+ 	},
+ 	"Color/_Primitives/Success/stroke1": {
+ 		"value": {
+-			".": "#78bb84"
++			".": "#78ba84"
+ 		}
+ 	},
+ 	"Color/_Primitives/Success/bgFillDark": {
+@@ -347,7 +347,7 @@
+ 	},
+ 	"Color/_Primitives/Success/bgFillInverted1": {
+ 		"value": {
+-			".": "#003b00"
++			".": "#003a00"
+ 		}
+ 	},
+ 	"Color/_Primitives/Success/fgFillInverted": {
+@@ -357,7 +357,7 @@
+ 	},
+ 	"Color/_Primitives/Success/surface1": {
+ 		"value": {
+-			".": "#ddf8e1"
++			".": "#ddf8e0"
+ 		}
+ 	},
+ 	"Color/_Primitives/Warning/bgFill1": {
+@@ -372,7 +372,7 @@
+ 	},
+ 	"Color/_Primitives/Warning/bgFill2": {
+ 		"value": {
+-			".": "#dba32f"
++			".": "#dba430"
+ 		}
+ 	},
+ 	"Color/_Primitives/Warning/surface2": {
+@@ -387,12 +387,12 @@
+ 	},
+ 	"Color/_Primitives/Warning/surface5": {
+ 		"value": {
+-			".": "#f5dcb2"
++			".": "#f5ddb2"
+ 		}
+ 	},
+ 	"Color/_Primitives/Warning/surface4": {
+ 		"value": {
+-			".": "#f8e8cd"
++			".": "#f8e9cd"
+ 		}
+ 	},
+ 	"Color/_Primitives/Warning/surface3": {
+@@ -432,12 +432,12 @@
+ 	},
+ 	"Color/_Primitives/Warning/stroke2": {
+ 		"value": {
+-			".": "#a18a61"
++			".": "#a08961"
+ 		}
+ 	},
+ 	"Color/_Primitives/Warning/stroke1": {
+ 		"value": {
+-			".": "#c3a777"
++			".": "#c2a777"
+ 		}
+ 	},
+ 	"Color/_Primitives/Warning/bgFillDark": {
+@@ -467,7 +467,7 @@
+ 	},
+ 	"Color/_Primitives/Warning/surface1": {
+ 		"value": {
+-			".": "#faefdc"
++			".": "#faefdb"
+ 		}
+ 	},
+ 	"Color/_Primitives/Error/bgFill1": {
+@@ -492,7 +492,7 @@
+ 	},
+ 	"Color/_Primitives/Error/surface6": {
+ 		"value": {
+-			".": "#f5c5bd"
++			".": "#f5c5be"
+ 		}
+ 	},
+ 	"Color/_Primitives/Error/surface5": {
+@@ -502,7 +502,7 @@
+ 	},
+ 	"Color/_Primitives/Error/surface4": {
+ 		"value": {
+-			".": "#fae5e2"
++			".": "#fae6e2"
+ 		}
+ 	},
+ 	"Color/_Primitives/Error/surface3": {
+@@ -537,7 +537,7 @@
+ 	},
+ 	"Color/_Primitives/Error/stroke4": {
+ 		"value": {
+-			".": "#a30000"
++			".": "#a40000"
+ 		}
+ 	},
+ 	"Color/_Primitives/Error/stroke2": {
+@@ -577,7 +577,7 @@
+ 	},
+ 	"Color/_Primitives/Error/surface1": {
+ 		"value": {
+-			".": "#fcedea"
++			".": "#fcecea"
+ 		}
+ 	},
+ 	"Color/_Primitives/Bg/surface2": {
+@@ -627,7 +627,7 @@
+ 	},
+ 	"Color/_Primitives/Bg/fgSurface3": {
+ 		"value": {
+-			".": "#6c6c6c"
++			".": "#6d6d6d"
+ 		}
+ 	},
+ 	"Color/_Primitives/Bg/fgSurface2": {
+@@ -652,7 +652,7 @@
+ 	},
+ 	"Color/_Primitives/Bg/stroke2": {
+ 		"value": {
+-			".": "#aeaeae"
++			".": "#adadad"
+ 		}
+ 	},
+ 	"Color/_Primitives/Bg/stroke1": {
+@@ -687,7 +687,7 @@
+ 	},
+ 	"Color/_Primitives/Bg/surface1": {
+ 		"value": {
+-			".": "#efefef"
++			".": "#f0f0f0"
+ 		}
+ 	},
+ 	"Color/_Primitives/Caution/bgFill1": {
+@@ -712,12 +712,12 @@
+ 	},
+ 	"Color/_Primitives/Caution/surface6": {
+ 		"value": {
+-			".": "#e7d072"
++			".": "#e7d070"
+ 		}
+ 	},
+ 	"Color/_Primitives/Caution/surface5": {
+ 		"value": {
+-			".": "#f4df8c"
++			".": "#f4e08c"
+ 		}
+ 	},
+ 	"Color/_Primitives/Caution/surface4": {
+@@ -762,7 +762,7 @@
+ 	},
+ 	"Color/_Primitives/Caution/stroke2": {
+ 		"value": {
+-			".": "#988d61"
++			".": "#988d60"
+ 		}
+ 	},
+ 	"Color/_Primitives/Caution/stroke1": {
+@@ -787,7 +787,7 @@
+ 	},
+ 	"Color/_Primitives/Caution/bgFillInverted1": {
+ 		"value": {
+-			".": "#3d2e00"
++			".": "#3d2d00"
+ 		}
+ 	},
+ 	"Color/_Primitives/Caution/fgFillInverted": {
+diff --git a/packages/theme/src/use-theme-provider-styles.ts b/packages/theme/src/use-theme-provider-styles.ts
+index c0d610f2272b1b..1a53e80f7ddb7d 100644
+--- a/packages/theme/src/use-theme-provider-styles.ts
++++ b/packages/theme/src/use-theme-provider-styles.ts
+@@ -2,7 +2,18 @@
+  * External dependencies
+  */
+ import type { CSSProperties } from 'react';
+-import Color from 'colorjs.io';
++import {
++	parse,
++	to,
++	get,
++	serialize,
++	sRGB,
++	HSL,
++	type ColorTypes,
++	// Disable reason: ESLint resolver can't handle `exports`. Import resolver
++	// checking is redundant in TypeScript files.
++	// eslint-disable-next-line import/no-unresolved
++} from 'colorjs.io/fn';
+ import memoize from 'memize';
+ 
+ /**
+@@ -13,6 +24,7 @@ import { useMemo, useContext } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
++import './color-ramps/lib/register-color-spaces';
+ import { ThemeContext } from './context';
+ import semanticVariables from './prebuilt/ts/design-tokens';
+ import {
+@@ -84,37 +96,49 @@ const legacyWpComponentsOverridesCSS: Entry[] = [
+ 	],
+ ];
+ 
+-function customRgbFormat( color: Color ) {
+-	const rgb = color.to( 'srgb' );
+-	return [ rgb.r, rgb.g, rgb.b ]
++function customRgbFormat( color: ColorTypes ) {
++	const rgb = to( color, sRGB );
++	return [ get( rgb, 'srgb.r' ), get( rgb, 'srgb.g' ), get( rgb, 'srgb.b' ) ]
+ 		.map( ( n ) => Math.round( n * 255 ) )
+ 		.join( ', ' );
+ }
+ 
+ function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
+-	const parsedAccent = new Color( accent ).to( 'hsl' );
+-
+-	const hsl = parsedAccent.coords;
+-	const darker10 = new Color( 'hsl', [
+-		hsl[ 0 ], // h
+-		hsl[ 1 ], // s
+-		Math.max( 0, Math.min( 100, hsl[ 2 ] - 5 ) ), // l (reduced by 5%)
+-	] ).to( 'srgb' );
+-	const darker20 = new Color( 'hsl', [
+-		hsl[ 0 ], // h
+-		hsl[ 1 ], // s
+-		Math.max( 0, Math.min( 100, hsl[ 2 ] - 10 ) ), // l (reduced by 10%)
+-	] ).to( 'srgb' );
++	const parsedAccent = to( parse( accent ), HSL );
++
++	const coords = parsedAccent.coords;
++	const darker10 = to(
++		{
++			space: HSL,
++			coords: [
++				coords[ 0 ], // h
++				coords[ 1 ], // s
++				Math.max( 0, Math.min( 100, coords[ 2 ] - 5 ) ), // l (reduced by 5%)
++			],
++		},
++		sRGB
++	);
++	const darker20 = to(
++		{
++			space: HSL,
++			coords: [
++				coords[ 0 ], // h
++				coords[ 1 ], // s
++				Math.max( 0, Math.min( 100, coords[ 2 ] - 10 ) ), // l (reduced by 10%)
++			],
++		},
++		sRGB
++	);
+ 
+ 	return [
+ 		[
+ 			'--wp-admin-theme-color',
+-			parsedAccent.to( 'srgb' ).toString( { format: 'hex' } ),
++			serialize( to( parsedAccent, sRGB ), { format: 'hex' } ),
+ 		],
+ 		[ '--wp-admin-theme-color--rgb', customRgbFormat( parsedAccent ) ],
+ 		[
+ 			'--wp-admin-theme-color-darker-10',
+-			darker10.toString( { format: 'hex' } ),
++			serialize( darker10, { format: 'hex' } ),
+ 		],
+ 		[
+ 			'--wp-admin-theme-color-darker-10--rgb',
+@@ -122,7 +146,7 @@ function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
+ 		],
+ 		[
+ 			'--wp-admin-theme-color-darker-20',
+-			darker20.toString( { format: 'hex' } ),
++			serialize( darker20, { format: 'hex' } ),
+ 		],
+ 		[
+ 			'--wp-admin-theme-color-darker-20--rgb',
+diff --git a/packages/theme/tokens/color.json b/packages/theme/tokens/color.json
+index 720f4de91b4422..c361d480bdd24b 100644
+--- a/packages/theme/tokens/color.json
++++ b/packages/theme/tokens/color.json
+@@ -19,7 +19,7 @@
+ 					"$value": "#c4d0ee"
+ 				},
+ 				"surface5": {
+-					"$value": "#d7dff3"
++					"$value": "#d8e0f3"
+ 				},
+ 				"surface4": {
+ 					"$value": "#e5eaf7"
+@@ -34,10 +34,10 @@
+ 					"$value": "#3858e9"
+ 				},
+ 				"fgSurface2": {
+-					"$value": "#577fff"
++					"$value": "#5780ff"
+ 				},
+ 				"fgSurface1": {
+-					"$value": "#81a6ff"
++					"$value": "#81a7ff"
+ 				},
+ 				"stroke3": {
+ 					"$value": "#3858e9"
+@@ -46,10 +46,10 @@
+ 					"$value": "#2236c7"
+ 				},
+ 				"stroke2": {
+-					"$value": "#7085c0"
++					"$value": "#6f85c0"
+ 				},
+ 				"stroke1": {
+-					"$value": "#93a4d0"
++					"$value": "#92a4cf"
+ 				},
+ 				"bgFillDark": {
+ 					"$value": "#1b1e26"
+@@ -61,7 +61,7 @@
+ 					"$value": "#1b1e26"
+ 				},
+ 				"bgFillInverted1": {
+-					"$value": "#1401a5"
++					"$value": "#1401a4"
+ 				},
+ 				"fgFillInverted": {
+ 					"$value": "#eff0f2"
+@@ -84,13 +84,13 @@
+ 					"$value": "#f5f9fd"
+ 				},
+ 				"surface6": {
+-					"$value": "#b9d3f0"
++					"$value": "#bad3f0"
+ 				},
+ 				"surface5": {
+-					"$value": "#d0e1f5"
++					"$value": "#d1e1f5"
+ 				},
+ 				"surface4": {
+-					"$value": "#e0ecf8"
++					"$value": "#e1ecf8"
+ 				},
+ 				"surface3": {
+ 					"$value": "#fff"
+@@ -102,7 +102,7 @@
+ 					"$value": "#006cd8"
+ 				},
+ 				"fgSurface2": {
+-					"$value": "#008bf9"
++					"$value": "#008bfa"
+ 				},
+ 				"fgSurface1": {
+ 					"$value": "#4dafff"
+@@ -114,7 +114,7 @@
+ 					"$value": "#004bb5"
+ 				},
+ 				"stroke2": {
+-					"$value": "#5c90c9"
++					"$value": "#5e90c7"
+ 				},
+ 				"stroke1": {
+ 					"$value": "#8baed6"
+@@ -129,7 +129,7 @@
+ 					"$value": "#1b1e23"
+ 				},
+ 				"bgFillInverted1": {
+-					"$value": "#00297b"
++					"$value": "#00297a"
+ 				},
+ 				"fgFillInverted": {
+ 					"$value": "#eff0f2"
+@@ -155,10 +155,10 @@
+ 					"$value": "#7be792"
+ 				},
+ 				"surface5": {
+-					"$value": "#abf0b7"
++					"$value": "#acf0b7"
+ 				},
+ 				"surface4": {
+-					"$value": "#cdf5d2"
++					"$value": "#cdf5d3"
+ 				},
+ 				"surface3": {
+ 					"$value": "#fff"
+@@ -179,13 +179,13 @@
+ 					"$value": "#008030"
+ 				},
+ 				"stroke4": {
+-					"$value": "#006013"
++					"$value": "#006113"
+ 				},
+ 				"stroke2": {
+-					"$value": "#629a6c"
++					"$value": "#62996c"
+ 				},
+ 				"stroke1": {
+-					"$value": "#78bb84"
++					"$value": "#78ba84"
+ 				},
+ 				"bgFillDark": {
+ 					"$value": "#1b1f1c"
+@@ -197,13 +197,13 @@
+ 					"$value": "#1b1f1c"
+ 				},
+ 				"bgFillInverted1": {
+-					"$value": "#003b00"
++					"$value": "#003a00"
+ 				},
+ 				"fgFillInverted": {
+ 					"$value": "#edf2ed"
+ 				},
+ 				"surface1": {
+-					"$value": "#ddf8e1"
++					"$value": "#ddf8e0"
+ 				}
+ 			},
+ 			"warning": {
+@@ -214,7 +214,7 @@
+ 					"$value": "#1f1e1b"
+ 				},
+ 				"bgFill2": {
+-					"$value": "#dba32f"
++					"$value": "#dba430"
+ 				},
+ 				"surface2": {
+ 					"$value": "#fdf7ee"
+@@ -223,10 +223,10 @@
+ 					"$value": "#f0cb89"
+ 				},
+ 				"surface5": {
+-					"$value": "#f5dcb2"
++					"$value": "#f5ddb2"
+ 				},
+ 				"surface4": {
+-					"$value": "#f8e8cd"
++					"$value": "#f8e9cd"
+ 				},
+ 				"surface3": {
+ 					"$value": "#fff"
+@@ -250,10 +250,10 @@
+ 					"$value": "#724700"
+ 				},
+ 				"stroke2": {
+-					"$value": "#a18a61"
++					"$value": "#a08961"
+ 				},
+ 				"stroke1": {
+-					"$value": "#c3a777"
++					"$value": "#c2a777"
+ 				},
+ 				"bgFillDark": {
+ 					"$value": "#1f1e1b"
+@@ -271,7 +271,7 @@
+ 					"$value": "#f3f0e9"
+ 				},
+ 				"surface1": {
+-					"$value": "#faefdc"
++					"$value": "#faefdb"
+ 				}
+ 			},
+ 			"error": {
+@@ -288,13 +288,13 @@
+ 					"$value": "#fdf6f5"
+ 				},
+ 				"surface6": {
+-					"$value": "#f5c5bd"
++					"$value": "#f5c5be"
+ 				},
+ 				"surface5": {
+ 					"$value": "#f8d8d3"
+ 				},
+ 				"surface4": {
+-					"$value": "#fae5e2"
++					"$value": "#fae6e2"
+ 				},
+ 				"surface3": {
+ 					"$value": "#fff"
+@@ -315,7 +315,7 @@
+ 					"$value": "#cc1818"
+ 				},
+ 				"stroke4": {
+-					"$value": "#a30000"
++					"$value": "#a40000"
+ 				},
+ 				"stroke2": {
+ 					"$value": "#cd695d"
+@@ -339,7 +339,7 @@
+ 					"$value": "#f2efef"
+ 				},
+ 				"surface1": {
+-					"$value": "#fcedea"
++					"$value": "#fcecea"
+ 				}
+ 			},
+ 			"bg": {
+@@ -371,7 +371,7 @@
+ 					"$value": "#1e1e1e"
+ 				},
+ 				"fgSurface3": {
+-					"$value": "#6c6c6c"
++					"$value": "#6d6d6d"
+ 				},
+ 				"fgSurface2": {
+ 					"$value": "#898989"
+@@ -386,7 +386,7 @@
+ 					"$value": "#6a6a6a"
+ 				},
+ 				"stroke2": {
+-					"$value": "#aeaeae"
++					"$value": "#adadad"
+ 				},
+ 				"stroke1": {
+ 					"$value": "#d0d0d0"
+@@ -407,7 +407,7 @@
+ 					"$value": "#f0f0f0"
+ 				},
+ 				"surface1": {
+-					"$value": "#efefef"
++					"$value": "#f0f0f0"
+ 				}
+ 			},
+ 			"caution": {
+@@ -424,10 +424,10 @@
+ 					"$value": "#fdf9e7"
+ 				},
+ 				"surface6": {
+-					"$value": "#e7d072"
++					"$value": "#e7d070"
+ 				},
+ 				"surface5": {
+-					"$value": "#f4df8c"
++					"$value": "#f4e08c"
+ 				},
+ 				"surface4": {
+ 					"$value": "#f8ebb6"
+@@ -454,7 +454,7 @@
+ 					"$value": "#644e00"
+ 				},
+ 				"stroke2": {
+-					"$value": "#988d61"
++					"$value": "#988d60"
+ 				},
+ 				"stroke1": {
+ 					"$value": "#b8ab76"
+@@ -469,7 +469,7 @@
+ 					"$value": "#1f1e1b"
+ 				},
+ 				"bgFillInverted1": {
+-					"$value": "#3d2e00"
++					"$value": "#3d2d00"
+ 				},
+ 				"fgFillInverted": {
+ 					"$value": "#f6f1da"

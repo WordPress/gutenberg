@@ -1,0 +1,22 @@
+diff --git a/packages/components/src/popover/test/index.tsx b/packages/components/src/popover/test/index.tsx
+index ea39dcebdeb337..5dfadd35cc0a16 100644
+--- a/packages/components/src/popover/test/index.tsx
++++ b/packages/components/src/popover/test/index.tsx
+@@ -141,11 +141,13 @@ describe( 'Popover', () => {
+ 
+ 		describe( 'focus behavior', () => {
+ 			it( 'should focus the popover by default when opened', async () => {
+-				await renderAsync( <Popover>Popover content</Popover> );
++				await renderAsync(
++					<Popover data-testid="popover-element">
++						Popover content
++					</Popover>
++				);
+ 
+-				expect(
+-					screen.getByText( 'Popover content' ).parentElement
+-				).toHaveFocus();
++				expect( screen.getByTestId( 'popover-element' ) ).toHaveFocus();
+ 			} );
+ 
+ 			it( 'should allow focus-on-open behavior to be disabled', async () => {

@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/input-control/stories/index.story.tsx b/packages/components/src/input-control/stories/index.story.tsx
+index edfb43950d3a8a..6ad01b94085277 100644
+--- a/packages/components/src/input-control/stories/index.story.tsx
++++ b/packages/components/src/input-control/stories/index.story.tsx
+@@ -25,6 +25,7 @@ const meta: Meta< typeof InputControl > = {
+ 		value: { control: { disable: true } },
+ 	},
+ 	parameters: {
++		actions: { argTypesRegex: '^on.*' },
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 	},

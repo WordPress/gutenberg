@@ -1,0 +1,774 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5ad178d855af53..eb7405e7ec9841 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   `Mobile` updated to ignore `react/exhaustive-deps` eslint rule ([#44207](https://github.com/WordPress/gutenberg/pull/44207)).
+ -   `Popover`: refactor unit tests to TypeScript and modern RTL assertions ([#44373](https://github.com/WordPress/gutenberg/pull/44373)).
+ -   `Sandbox`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44378](https://github.com/WordPress/gutenberg/pull/44378))
++-   `FontSizePicker`: Convert to TypeScript ([#44449](https://github.com/WordPress/gutenberg/pull/44449)).
+ 
+ ## 21.1.0 (2022-09-21)
+ 
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index f5916849d77fe9..73aebda5d257b2 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+@@ -15,7 +16,7 @@ import deprecated from '@wordpress/deprecated';
+ /**
+  * Internal dependencies
+  */
+-import { VisuallyHidden } from '../';
++import { VisuallyHidden } from '../visually-hidden';
+ import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
+ import SelectControlChevronDown from '../select-control/chevron-down';
+ import { InputBaseWithBackCompatMinWidth } from './styles';
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.tsx
+similarity index 81%
+rename from packages/components/src/font-size-picker/index.js
+rename to packages/components/src/font-size-picker/index.tsx
+index 1fb266bba02b2b..190ca6e1517e0d 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import classNames from 'classnames';
++import type { ReactNode, ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -34,31 +35,42 @@ import {
+ } from './utils';
+ import { VStack } from '../v-stack';
+ import { HStack } from '../h-stack';
++import type {
++	FontSizePickerProps,
++	FontSizeSelectOption,
++	FontSizeToggleGroupOption,
++} from './types';
+ 
+ // This conditional is needed to maintain the spacing before the slider in the `withSlider` case.
+-const MaybeVStack = ( { __nextHasNoMarginBottom, children } ) =>
++const MaybeVStack = ( {
++	__nextHasNoMarginBottom,
++	children,
++}: {
++	__nextHasNoMarginBottom: boolean;
++	children: ReactNode;
++} ) =>
+ 	! __nextHasNoMarginBottom ? (
+-		children
++		<>{ children }</>
+ 	) : (
+ 		<VStack spacing={ 6 } children={ children } />
+ 	);
+ 
+-function FontSizePicker(
+-	{
++const UnforwardedFontSizePicker = (
++	props: FontSizePickerProps,
++	ref: ForwardedRef< any >
++) => {
++	const {
+ 		/** Start opting into the new margin-free styles that will become the default in a future version. */
+ 		__nextHasNoMarginBottom = false,
+ 		fallbackFontSize,
+ 		fontSizes = [],
+ 		disableCustomFontSizes = false,
+ 		onChange,
+-		/** @type {'default' | '__unstable-large'} */
+ 		size = 'default',
+ 		value,
+ 		withSlider = false,
+ 		withReset = true,
+-	},
+-	ref
+-) {
++	} = props;
+ 	if ( ! __nextHasNoMarginBottom ) {
+ 		deprecated( 'Bottom margin styles for wp.components.FontSizePicker', {
+ 			since: '6.1',
+@@ -70,7 +82,7 @@ function FontSizePicker(
+ 	const hasUnits = [ typeof value, typeof fontSizes?.[ 0 ]?.size ].includes(
+ 		'string'
+ 	);
+-	const noUnitsValue = ! hasUnits ? value : parseInt( value );
++	const noUnitsValue = ! hasUnits ? value : parseInt( String( value ) );
+ 	const isPixelValue = typeof value === 'number' || value?.endsWith?.( 'px' );
+ 	const units = useCustomUnits( {
+ 		availableUnits: [ 'px', 'em', 'rem' ],
+@@ -106,10 +118,15 @@ function FontSizePicker(
+ 		// If we have a custom value that is not available in the font sizes,
+ 		// show it as a hint as long as it's a simple CSS value.
+ 		if ( isCustomValue ) {
+-			return isSimpleCssValue( value ) && `(${ value })`;
++			return (
++				value !== undefined &&
++				isSimpleCssValue( value ) &&
++				`(${ value })`
++			);
+ 		}
+ 		if ( shouldUseSelectControl ) {
+ 			return (
++				selectedOption?.size !== undefined &&
+ 				isSimpleCssValue( selectedOption?.size ) &&
+ 				`(${ selectedOption?.size })`
+ 			);
+@@ -192,13 +209,19 @@ function FontSizePicker(
+ 								label={ __( 'Font size' ) }
+ 								hideLabelFromVision
+ 								describedBy={ currentFontSizeSR }
+-								options={ options }
+-								value={ options.find(
++								options={ options as FontSizeSelectOption[] }
++								value={ (
++									options as FontSizeSelectOption[]
++								 ).find(
+ 									( option ) =>
+ 										option.key === selectedOption.slug
+ 								) }
+-								onChange={ ( { selectedItem } ) => {
+-									onChange(
++								onChange={ ( {
++									selectedItem,
++								}: {
++									selectedItem: FontSizeSelectOption;
++								} ) => {
++									onChange?.(
+ 										hasUnits
+ 											? selectedItem.size
+ 											: Number( selectedItem.size )
+@@ -219,22 +242,24 @@ function FontSizePicker(
+ 							hideLabelFromVision
+ 							value={ value }
+ 							onChange={ ( newValue ) => {
+-								onChange(
++								onChange?.(
+ 									hasUnits ? newValue : Number( newValue )
+ 								);
+ 							} }
+ 							isBlock
+ 							size={ size }
+ 						>
+-							{ options.map( ( option ) => (
+-								<ToggleGroupControlOption
+-									key={ option.key }
+-									value={ option.value }
+-									label={ option.label }
+-									aria-label={ option.name }
+-									showTooltip={ true }
+-								/>
+-							) ) }
++							{ ( options as FontSizeToggleGroupOption[] ).map(
++								( option ) => (
++									<ToggleGroupControlOption
++										key={ option.key }
++										value={ option.value }
++										label={ option.label }
++										aria-label={ option.name }
++										showTooltip={ true }
++									/>
++								)
++							) }
+ 						</ToggleGroupControl>
+ 					) }
+ 					{ ! withSlider &&
+@@ -252,12 +277,12 @@ function FontSizePicker(
+ 										value={ value }
+ 										onChange={ ( nextSize ) => {
+ 											if (
+-												0 === parseFloat( nextSize ) ||
+-												! nextSize
++												! nextSize ||
++												0 === parseFloat( nextSize )
+ 											) {
+-												onChange( undefined );
++												onChange?.( undefined );
+ 											} else {
+-												onChange(
++												onChange?.(
+ 													hasUnits
+ 														? nextSize
+ 														: parseInt(
+@@ -277,7 +302,7 @@ function FontSizePicker(
+ 											className="components-color-palette__clear"
+ 											disabled={ value === undefined }
+ 											onClick={ () => {
+-												onChange( undefined );
++												onChange?.( undefined );
+ 											} }
+ 											isSmall
+ 											variant="secondary"
+@@ -294,10 +319,14 @@ function FontSizePicker(
+ 						__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 						className={ `${ baseClassName }__custom-input` }
+ 						label={ __( 'Custom Size' ) }
+-						value={ ( isPixelValue && noUnitsValue ) || '' }
++						value={
++							isPixelValue && noUnitsValue
++								? Number( noUnitsValue )
++								: undefined
++						}
+ 						initialPosition={ fallbackFontSize }
+ 						onChange={ ( newValue ) => {
+-							onChange( hasUnits ? newValue + 'px' : newValue );
++							onChange?.( hasUnits ? newValue + 'px' : newValue );
+ 						} }
+ 						min={ 12 }
+ 						max={ 100 }
+@@ -306,6 +335,8 @@ function FontSizePicker(
+ 			</MaybeVStack>
+ 		</fieldset>
+ 	);
+-}
++};
++
++export const FontSizePicker = forwardRef( UnforwardedFontSizePicker );
+ 
+-export default forwardRef( FontSizePicker );
++export default FontSizePicker;
+diff --git a/packages/components/src/font-size-picker/stories/e2e/index.js b/packages/components/src/font-size-picker/stories/e2e/index.tsx
+similarity index 60%
+rename from packages/components/src/font-size-picker/stories/e2e/index.js
+rename to packages/components/src/font-size-picker/stories/e2e/index.tsx
+index 30c0140bcefbbd..c2a038e656b55e 100644
+--- a/packages/components/src/font-size-picker/stories/e2e/index.js
++++ b/packages/components/src/font-size-picker/stories/e2e/index.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { ComponentStory } from '@storybook/react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -13,8 +18,11 @@ export default {
+ 	component: FontSizePicker,
+ };
+ 
+-const FontSizePickerWithState = ( { initialValue, ...props } ) => {
+-	const [ fontSize, setFontSize ] = useState( initialValue );
++const FontSizePickerWithState: ComponentStory< typeof FontSizePicker > = ( {
++	value,
++	...props
++} ) => {
++	const [ fontSize, setFontSize ] = useState( value );
+ 	return (
+ 		<FontSizePicker
+ 			{ ...props }
+@@ -24,7 +32,8 @@ const FontSizePickerWithState = ( { initialValue, ...props } ) => {
+ 	);
+ };
+ 
+-export const Default = FontSizePickerWithState.bind( {} );
++export const Default: ComponentStory< typeof FontSizePicker > =
++	FontSizePickerWithState.bind( {} );
+ Default.args = {
+ 	fontSizes: [
+ 		{
+@@ -43,5 +52,5 @@ Default.args = {
+ 			size: 26,
+ 		},
+ 	],
+-	initialValue: 16,
++	value: 16,
+ };
+diff --git a/packages/components/src/font-size-picker/stories/index.js b/packages/components/src/font-size-picker/stories/index.tsx
+similarity index 62%
+rename from packages/components/src/font-size-picker/stories/index.js
+rename to packages/components/src/font-size-picker/stories/index.tsx
+index 6a2e63eb8ad71b..894a619e036868 100644
+--- a/packages/components/src/font-size-picker/stories/index.js
++++ b/packages/components/src/font-size-picker/stories/index.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -8,53 +13,48 @@ import { useState } from '@wordpress/element';
+  */
+ import FontSizePicker from '../';
+ 
+-export default {
++const meta: ComponentMeta< typeof FontSizePicker > = {
+ 	title: 'Components/FontSizePicker',
+ 	component: FontSizePicker,
+ 	argTypes: {
+-		initialValue: { table: { disable: true } }, // hide prop because it's not actually part of FontSizePicker
+-		fallbackFontSize: {
+-			description:
+-				'If no value exists, this prop defines the starting position for the font size picker slider. Only relevant if `withSlider` is `true`.',
+-		},
+-		size: {
+-			control: { type: 'radio' },
+-			options: [ 'default', '__unstable-large' ],
+-		},
+-		withReset: {
+-			description:
+-				'If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` or `withSlider` is `true`.',
+-			control: { type: 'boolean' },
+-			table: {
+-				type: 'boolean',
+-				defaultValue: { summary: true },
+-			},
+-		},
++		value: { control: { type: null } },
+ 	},
+ 	parameters: {
++		actions: { argTypesRegex: '^on.*' },
+ 		controls: { expanded: true },
+ 		docs: { source: { state: 'open' } },
+ 	},
+ };
++export default meta;
+ 
+-const FontSizePickerWithState = ( { initialValue, ...props } ) => {
+-	const [ fontSize, setFontSize ] = useState( initialValue );
++const FontSizePickerWithState: ComponentStory< typeof FontSizePicker > = ( {
++	value,
++	onChange,
++	...props
++} ) => {
++	const [ fontSize, setFontSize ] = useState( value );
+ 	return (
+ 		<FontSizePicker
+ 			{ ...props }
+ 			value={ fontSize }
+-			onChange={ setFontSize }
++			onChange={ ( nextValue ) => {
++				setFontSize( nextValue );
++				onChange?.( nextValue );
++			} }
+ 		/>
+ 	);
+ };
+ 
+-const TwoFontSizePickersWithState = ( { fontSizes, ...props } ) => {
++const TwoFontSizePickersWithState: ComponentStory< typeof FontSizePicker > = ( {
++	fontSizes,
++	...props
++} ) => {
+ 	return (
+ 		<>
+ 			<h2>Fewer font sizes</h2>
+ 			<FontSizePickerWithState
+ 				{ ...props }
+-				fontSizes={ fontSizes.slice( 0, 4 ) }
++				fontSizes={ fontSizes?.slice( 0, 4 ) }
+ 			/>
+ 
+ 			<h2>More font sizes</h2>
+@@ -63,7 +63,8 @@ const TwoFontSizePickersWithState = ( { fontSizes, ...props } ) => {
+ 	);
+ };
+ 
+-export const Default = FontSizePickerWithState.bind( {} );
++export const Default: ComponentStory< typeof FontSizePicker > =
++	FontSizePickerWithState.bind( {} );
+ Default.args = {
+ 	__nextHasNoMarginBottom: true,
+ 	disableCustomFontSizes: false,
+@@ -84,15 +85,16 @@ Default.args = {
+ 			size: 26,
+ 		},
+ 	],
+-	initialValue: 16,
++	value: 16,
+ 	withSlider: false,
+ };
+ 
+-export const WithSlider = FontSizePickerWithState.bind( {} );
++export const WithSlider: ComponentStory< typeof FontSizePicker > =
++	FontSizePickerWithState.bind( {} );
+ WithSlider.args = {
+ 	...Default.args,
+ 	fallbackFontSize: 16,
+-	initialValue: undefined,
++	value: undefined,
+ 	withSlider: true,
+ };
+ 
+@@ -100,7 +102,8 @@ WithSlider.args = {
+  * With custom font sizes disabled via the `disableCustomFontSizes` prop, the user will
+  * only be able to pick one of the predefined sizes passed in `fontSizes`.
+  */
+-export const WithCustomSizesDisabled = FontSizePickerWithState.bind( {} );
++export const WithCustomSizesDisabled: ComponentStory< typeof FontSizePicker > =
++	FontSizePickerWithState.bind( {} );
+ WithCustomSizesDisabled.args = {
+ 	...Default.args,
+ 	disableCustomFontSizes: true,
+@@ -109,7 +112,8 @@ WithCustomSizesDisabled.args = {
+ /**
+  * When there are more than 5 font size options, the UI is no longer a toggle group.
+  */
+-export const WithMoreFontSizes = FontSizePickerWithState.bind( {} );
++export const WithMoreFontSizes: ComponentStory< typeof FontSizePicker > =
++	FontSizePickerWithState.bind( {} );
+ WithMoreFontSizes.args = {
+ 	...Default.args,
+ 	fontSizes: [
+@@ -144,27 +148,29 @@ WithMoreFontSizes.args = {
+ 			size: 36,
+ 		},
+ 	],
+-	initialValue: 8,
++	value: 8,
+ };
+ 
+ /**
+  * When units like `px` are specified explicitly, it will be shown as a label hint.
+  */
+-export const WithUnits = TwoFontSizePickersWithState.bind( {} );
++export const WithUnits: ComponentStory< typeof FontSizePicker > =
++	TwoFontSizePickersWithState.bind( {} );
+ WithUnits.args = {
+ 	...WithMoreFontSizes.args,
+-	fontSizes: WithMoreFontSizes.args.fontSizes.map( ( option ) => ( {
++	fontSizes: WithMoreFontSizes.args.fontSizes?.map( ( option ) => ( {
+ 		...option,
+ 		size: `${ option.size }px`,
+ 	} ) ),
+-	initialValue: '8px',
++	value: '8px',
+ };
+ 
+ /**
+  * The label hint will not be shown if it is a complex CSS value. Some examples of complex CSS values
+  * in this context are CSS functions like `calc()`, `clamp()`, and `var()`.
+  */
+-export const WithComplexCSSValues = TwoFontSizePickersWithState.bind( {} );
++export const WithComplexCSSValues: ComponentStory< typeof FontSizePicker > =
++	TwoFontSizePickersWithState.bind( {} );
+ WithComplexCSSValues.args = {
+ 	...Default.args,
+ 	fontSizes: [
+@@ -200,5 +206,5 @@ WithComplexCSSValues.args = {
+ 			size: '2.8rem',
+ 		},
+ 	],
+-	initialValue: '1.125rem',
++	value: '1.125rem',
+ };
+diff --git a/packages/components/src/font-size-picker/test/index.js b/packages/components/src/font-size-picker/test/index.tsx
+similarity index 99%
+rename from packages/components/src/font-size-picker/test/index.js
+rename to packages/components/src/font-size-picker/test/index.tsx
+index ca6a8e1a873308..808122852e2273 100644
+--- a/packages/components/src/font-size-picker/test/index.js
++++ b/packages/components/src/font-size-picker/test/index.tsx
+@@ -13,7 +13,7 @@ const getUnitSelect = () =>
+ const getUnitLabel = () =>
+ 	document.body.querySelector( '.components-unit-control__unit-label' );
+ 
+-const toggleCustomInput = ( showCustomInput ) => {
++const toggleCustomInput = ( showCustomInput: boolean ) => {
+ 	const label = showCustomInput ? 'Set custom size' : 'Use size preset';
+ 	const toggleCustom = screen.getByLabelText( label, { selector: 'button' } );
+ 	fireEvent.click( toggleCustom );
+diff --git a/packages/components/src/font-size-picker/test/utils.js b/packages/components/src/font-size-picker/test/utils.ts
+similarity index 95%
+rename from packages/components/src/font-size-picker/test/utils.js
+rename to packages/components/src/font-size-picker/test/utils.ts
+index fc074514925ccb..656c6473cd8615 100644
+--- a/packages/components/src/font-size-picker/test/utils.js
++++ b/packages/components/src/font-size-picker/test/utils.ts
+@@ -7,7 +7,7 @@ import {
+ 	getToggleGroupOptions,
+ } from '../utils';
+ 
+-const simpleCSSCases = [
++const simpleCSSCases: [ number | string, boolean ][] = [
+ 	// Test integers and non-integers.
+ 	[ 1, true ],
+ 	[ 1.25, true ],
+@@ -41,7 +41,11 @@ describe( 'isSimpleCssValue', () => {
+ 	);
+ } );
+ 
+-const splitValuesCases = [
++const splitValuesCases: [
++	number | string,
++	string | undefined,
++	string | undefined
++][] = [
+ 	// Test integers and non-integers.
+ 	[ 1, '1', undefined ],
+ 	[ 1.25, '1.25', undefined ],
+diff --git a/packages/components/src/font-size-picker/types.ts b/packages/components/src/font-size-picker/types.ts
+new file mode 100644
+index 00000000000000..2c824125bb7e1c
+--- /dev/null
++++ b/packages/components/src/font-size-picker/types.ts
+@@ -0,0 +1,98 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++export type FontSizePickerProps = {
++	/**
++	 * If `true`, it will not be possible to choose a custom fontSize. The user
++	 * will be forced to pick one of the pre-defined sizes passed in fontSizes.
++	 *
++	 * @default false
++	 */
++	disableCustomFontSizes?: boolean;
++	/**
++	 * If no value exists, this prop defines the starting position for the font
++	 * size picker slider. Only relevant if `withSlider` is `true`.
++	 */
++	fallbackFontSize?: number;
++	/**
++	 * An array of font size objects. The object should contain properties size,
++	 * name, and slug.
++	 */
++	fontSizes?: FontSize[];
++	/**
++	 * A function that receives the new font size value.
++	 * If onChange is called without any parameter, it should reset the value,
++	 * attending to what reset means in that context, e.g., set the font size to
++	 * undefined or set the font size a starting value.
++	 */
++	onChange?: ( value: number | string | undefined ) => void;
++	/**
++	 * The current font size value.
++	 */
++	value?: number | string;
++	/**
++	 * If `true`, the UI will contain a slider, instead of a numeric text input
++	 * field. If `false`, no slider will be present.
++	 *
++	 * @default false
++	 */
++	withSlider?: boolean;
++	/**
++	 * If `true`, a reset button will be displayed alongside the input field
++	 * when a custom font size is active. Has no effect when
++	 * `disableCustomFontSizes` or `withSlider` is `true`.
++	 *
++	 * @default true
++	 */
++	withReset?: boolean;
++	/**
++	 * Start opting into the new margin-free styles that will become the default
++	 * in a future version, currently scheduled to be WordPress 6.4. (The prop
++	 * can be safely removed once this happens.)
++	 *
++	 * @default false
++	 */
++	__nextHasNoMarginBottom?: boolean;
++	/**
++	 * Size of the control.
++	 *
++	 * @default default
++	 */
++	size?: 'default' | '__unstable-large';
++};
++
++export type FontSize = {
++	/**
++	 * The property `size` contains a number with the font size value, in `px` or
++	 * a string specifying the font size CSS property that should be used eg:
++	 * "13px", "1em", or "clamp(12px, 5vw, 100px)".
++	 */
++	size: number | string;
++	/**
++	 * The `name` property includes a label for that font size e.g.: `Small`.
++	 */
++	name?: string;
++	/**
++	 * The `slug` property is a string with a unique identifier for the font
++	 * size. Used for the class generation process.
++	 */
++	slug: string;
++};
++
++export type FontSizeOption = Omit< FontSize, 'size' > &
++	Partial< Pick< FontSize, 'size' > >;
++
++export type FontSizeSelectOption = Pick< FontSizeOption, 'size' > & {
++	key: string;
++	name?: string;
++	__experimentalHint: ReactNode;
++};
++
++export type FontSizeToggleGroupOption = {
++	key: string;
++	value: number | string;
++	label: string;
++	name: string;
++};
+diff --git a/packages/components/src/font-size-picker/utils.js b/packages/components/src/font-size-picker/utils.ts
+similarity index 58%
+rename from packages/components/src/font-size-picker/utils.js
+rename to packages/components/src/font-size-picker/utils.ts
+index fff3d087cf3e64..bb3dd42d4e238f 100644
+--- a/packages/components/src/font-size-picker/utils.js
++++ b/packages/components/src/font-size-picker/utils.ts
+@@ -3,6 +3,17 @@
+  */
+ import { __ } from '@wordpress/i18n';
+ 
++/**
++ * Internal dependencies
++ */
++import type {
++	FontSize,
++	FontSizeOption,
++	FontSizeSelectOption,
++	FontSizeToggleGroupOption,
++	FontSizePickerProps,
++} from './types';
++
+ const DEFAULT_FONT_SIZE = 'default';
+ const DEFAULT_FONT_SIZE_OPTION = {
+ 	slug: DEFAULT_FONT_SIZE,
+@@ -36,13 +47,18 @@ const FONT_SIZES_ALIASES = [
+  * Helper util to split a font size to its numeric value
+  * and its `unit`, if exists.
+  *
+- * @param {string|number} size Font size.
+- * @return {[number, string]} An array with the numeric value and the unit if exists.
++ * @param  size Font size.
++ * @return An array with the numeric value and the unit if exists.
+  */
+-export function splitValueAndUnitFromSize( size ) {
+-	const [ numericValue, unit ] = `${ size }`.match( /[\d\.]+|\D+/g );
++export function splitValueAndUnitFromSize(
++	size: NonNullable< FontSizePickerProps[ 'value' ] >
++) {
++	const [ numericValue, unit ] = `${ size }`.match( /[\d\.]+|\D+/g ) ?? [];
+ 
+-	if ( ! isNaN( parseFloat( numericValue ) ) && isFinite( numericValue ) ) {
++	if (
++		! isNaN( parseFloat( numericValue ) ) &&
++		isFinite( Number( numericValue ) )
++	) {
+ 		return [ numericValue, unit ];
+ 	}
+ 
+@@ -53,28 +69,30 @@ export function splitValueAndUnitFromSize( size ) {
+  * Some themes use css vars for their font sizes, so until we
+  * have the way of calculating them don't display them.
+  *
+- * @param {string|number} value The value that is checked.
+- * @return {boolean} Whether the value is a simple css value.
++ * @param  value The value that is checked.
++ * @return Whether the value is a simple css value.
+  */
+-export function isSimpleCssValue( value ) {
++export function isSimpleCssValue(
++	value: NonNullable< FontSizePickerProps[ 'value' ] >
++) {
+ 	const sizeRegex = /^[\d\.]+(px|em|rem|vw|vh|%)?$/i;
+-	return sizeRegex.test( value );
++	return sizeRegex.test( String( value ) );
+ }
+ 
+ /**
+  * Return font size options in the proper format depending
+  * on the currently used control (select, toggle group).
+  *
+- * @param {boolean}  useSelectControl       Whether to use a select control.
+- * @param {Object[]} optionsArray           Array of available font sizes objects.
+- * @param {boolean}  disableCustomFontSizes Flag that indicates if custom font sizes are disabled.
+- * @return {Object[]|null}                  Array of font sizes in proper format for the used control.
++ * @param  useSelectControl       Whether to use a select control.
++ * @param  optionsArray           Array of available font sizes objects.
++ * @param  disableCustomFontSizes Flag that indicates if custom font sizes are disabled.
++ * @return Array of font sizes in proper format for the used control.
+  */
+ export function getFontSizeOptions(
+-	useSelectControl,
+-	optionsArray,
+-	disableCustomFontSizes
+-) {
++	useSelectControl: boolean,
++	optionsArray: FontSize[],
++	disableCustomFontSizes: boolean
++): FontSizeSelectOption[] | FontSizeToggleGroupOption[] | null {
+ 	if ( disableCustomFontSizes && ! optionsArray.length ) {
+ 		return null;
+ 	}
+@@ -83,8 +101,11 @@ export function getFontSizeOptions(
+ 		: getToggleGroupOptions( optionsArray );
+ }
+ 
+-function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+-	const options = [
++function getSelectOptions(
++	optionsArray: FontSize[],
++	disableCustomFontSizes: boolean
++): FontSizeSelectOption[] {
++	const options: FontSizeOption[] = [
+ 		DEFAULT_FONT_SIZE_OPTION,
+ 		...optionsArray,
+ 		...( disableCustomFontSizes ? [] : [ CUSTOM_FONT_SIZE_OPTION ] ),
+@@ -94,21 +115,21 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+ 		name,
+ 		size,
+ 		__experimentalHint:
+-			size && isSimpleCssValue( size ) && parseFloat( size ),
++			size && isSimpleCssValue( size ) && parseFloat( String( size ) ),
+ 	} ) );
+ }
+ 
+ /**
+  * Build options for the toggle group options.
+  *
+- * @param {Array}    optionsArray An array of font size options.
+- * @param {string[]} labelAliases An array of alternative labels.
+- * @return {Array}   Remapped optionsArray.
++ * @param  optionsArray An array of font size options.
++ * @param  labelAliases An array of alternative labels.
++ * @return Remapped optionsArray.
+  */
+ export function getToggleGroupOptions(
+-	optionsArray,
+-	labelAliases = FONT_SIZES_ALIASES
+-) {
++	optionsArray: FontSize[],
++	labelAliases: string[] = FONT_SIZES_ALIASES
++): FontSizeToggleGroupOption[] {
+ 	return optionsArray.map( ( { slug, size, name }, index ) => {
+ 		return {
+ 			key: slug,
+@@ -119,7 +140,10 @@ export function getToggleGroupOptions(
+ 	} );
+ }
+ 
+-export function getSelectedOption( fontSizes, value ) {
++export function getSelectedOption(
++	fontSizes: FontSize[],
++	value: FontSizePickerProps[ 'value' ]
++): FontSizeOption {
+ 	if ( ! value ) {
+ 		return DEFAULT_FONT_SIZE_OPTION;
+ 	}
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 67c51cc136afa3..5c103f27ead053 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -47,10 +47,8 @@
+ 		"src/color-list-picker",
+ 		"src/combobox-control",
+ 		"src/custom-gradient-picker",
+-		"src/custom-select-control",
+ 		"src/dimension-control",
+ 		"src/duotone-picker",
+-		"src/font-size-picker",
+ 		"src/gradient-picker",
+ 		"src/guide",
+ 		"src/higher-order/navigate-regions",

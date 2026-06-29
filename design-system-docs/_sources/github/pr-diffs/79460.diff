@@ -1,0 +1,217 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a493be7f1ce65e..2f64faf00d9468 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -25,6 +25,7 @@
+ ### Documentation
+ 
+ -   `Menu`: Fix `overriden` typo to `overridden` in `CheckboxItemProps` and `RadioItemProps`. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
++-   Add component documentation for `ColorPicker`, `CustomSelectControl`, `Navigator`, `NumberControl`, `ResizableBox`, and `Slot` components ([#79460](https://github.com/WordPress/gutenberg/pull/79460)).
+ 
+ ### Code Quality
+ 
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index 3a427db5bfe8c1..c3a592ddea8174 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -247,6 +247,10 @@ const UnconnectedColorPicker = (
+ 	);
+ };
+ 
++/**
++ * `ColorPicker` lets users select a color from a visual color surface, or by
++ * editing its hex, RGB, or HSL values.
++ */
+ export const ColorPicker = contextConnect(
+ 	UnconnectedColorPicker,
+ 	'ColorPicker'
+diff --git a/packages/components/src/color-picker/stories/index.story.tsx b/packages/components/src/color-picker/stories/index.story.tsx
+index 75b0e3c81bac9d..a370517cf152d8 100644
+--- a/packages/components/src/color-picker/stories/index.story.tsx
++++ b/packages/components/src/color-picker/stories/index.story.tsx
+@@ -12,6 +12,11 @@ import { ColorPicker } from '../component';
+ const meta: Meta< typeof ColorPicker > = {
+ 	tags: [ 'manifest' ],
+ 	component: ColorPicker,
++	// Temporary: Due to an upstream bug, render the root explicitly so the
++	// components manifest extractor can resolve props from the JSX.
++	//
++	// See: https://github.com/storybookjs/storybook/issues/34877
++	render: ( args ) => <ColorPicker { ...args } />,
+ 	title: 'Components/Selection & Input/Color/ColorPicker',
+ 	id: 'components-colorpicker',
+ 	argTypes: {
+diff --git a/packages/components/src/custom-select-control/index.tsx b/packages/components/src/custom-select-control/index.tsx
+index 88c5e7b68ad66e..2e85dac88ec291 100644
+--- a/packages/components/src/custom-select-control/index.tsx
++++ b/packages/components/src/custom-select-control/index.tsx
+@@ -52,6 +52,11 @@ function getDescribedBy( currentName: string, describedBy?: string ) {
+ 	return sprintf( __( 'Currently selected: %s' ), currentName );
+ }
+ 
++/**
++ * `CustomSelectControl` is a dropdown for selecting a single option from a
++ * list, with support for custom styling. Use it instead of the `SelectControl`
++ * when options need richer markup (e.g. per-option styles or hints).
++ */
+ function CustomSelectControl< T extends CustomSelectOption >(
+ 	props: CustomSelectProps< T >
+ ) {
+diff --git a/packages/components/src/navigator/stories/index.story.tsx b/packages/components/src/navigator/stories/index.story.tsx
+index 7ba89126c2daf0..c50238168da3a3 100644
+--- a/packages/components/src/navigator/stories/index.story.tsx
++++ b/packages/components/src/navigator/stories/index.story.tsx
+@@ -19,6 +19,11 @@ const meta: Meta< typeof Navigator > = {
+ 		Button: Navigator.Button,
+ 		BackButton: Navigator.BackButton,
+ 	},
++	// Temporary: Due to an upstream bug, render the root explicitly so the
++	// components manifest extractor can resolve props from the JSX.
++	//
++	// See: https://github.com/storybookjs/storybook/issues/34877
++	render: ( args ) => <Navigator { ...args } />,
+ 	title: 'Components/Navigation/Navigator',
+ 	id: 'components-navigator',
+ 	argTypes: {
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index b90130ec3e6728..361293f0a370ba 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -276,6 +276,10 @@ function UnforwardedNumberControl(
+ 	);
+ }
+ 
++/**
++ * `NumberControl` is a text input control that lets users enter and adjust a
++ * numeric value.
++ */
+ export const NumberControl = forwardRef( UnforwardedNumberControl );
+ NumberControl.displayName = 'NumberControl';
+ 
+diff --git a/packages/components/src/resizable-box/index.tsx b/packages/components/src/resizable-box/index.tsx
+index 8c5cd753ef1eb5..2a99a8fdfa61ae 100644
+--- a/packages/components/src/resizable-box/index.tsx
++++ b/packages/components/src/resizable-box/index.tsx
+@@ -132,6 +132,10 @@ function UnforwardedResizableBox(
+ 	);
+ }
+ 
++/**
++ * `ResizableBox` wraps content in a container with draggable handles, letting
++ * users interactively resize it along one or more edges or corners.
++ */
+ export const ResizableBox = forwardRef( UnforwardedResizableBox );
+ ResizableBox.displayName = 'ResizableBox';
+ 
+diff --git a/packages/components/src/slot-fill/index.tsx b/packages/components/src/slot-fill/index.tsx
+index 95920120792320..cee70efc93cf7e 100644
+--- a/packages/components/src/slot-fill/index.tsx
++++ b/packages/components/src/slot-fill/index.tsx
+@@ -30,6 +30,11 @@ import type {
+ 
+ export { Fill };
+ 
++/**
++ * `Slot` marks a location where content rendered by matching `Fill` components
++ * elsewhere will appear. Use it to allow a component to define UI areas that
++ * can be extended from other parts of the application.
++ */
+ export const Slot = forwardRef(
+ 	(
+ 		props: SlotComponentProps &
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index f819eb0312848d..622a3aa84a7e1e 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -19,7 +19,8 @@
+ 
+ ### Documentation
+ 
+-- Fix `overriden` typo to `overridden` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
++-   Fix `overriden` typo to `overridden` in README. ([#79331](https://github.com/WordPress/gutenberg/pull/79331))
++-   Add component documentation for `DataViews`, `DataViewsPicker`, and `DataForm` components ([#79460](https://github.com/WordPress/gutenberg/pull/79460)).
+ 
+ ### Internal
+ 
+diff --git a/packages/dataviews/src/dataform/index.tsx b/packages/dataviews/src/dataform/index.tsx
+index a634f43fa4b6bc..7b3d8b92d6f255 100644
+--- a/packages/dataviews/src/dataform/index.tsx
++++ b/packages/dataviews/src/dataform/index.tsx
+@@ -12,6 +12,11 @@ import { DataFormProvider } from '../components/dataform-context';
+ import { DataFormLayout } from '../components/dataform-layouts/data-form-layout';
+ import normalizeForm from '../components/dataform-layouts/normalize-form';
+ 
++/**
++ * `DataForm` renders an auto-generated form for viewing and editing the fields
++ * of a data item, driven by a fields and form layout configuration. Use it to
++ * edit items of a dataset, often alongside `DataViews`.
++ */
+ export default function DataForm< Item >( {
+ 	data,
+ 	form,
+diff --git a/packages/dataviews/src/dataviews-picker/index.tsx b/packages/dataviews/src/dataviews-picker/index.tsx
+index b1fa9bf3098cfe..862396389ad7a3 100644
+--- a/packages/dataviews/src/dataviews-picker/index.tsx
++++ b/packages/dataviews/src/dataviews-picker/index.tsx
+@@ -269,6 +269,11 @@ function DataViewsPicker< Item >( {
+ 	);
+ }
+ 
++/**
++ * `DataViewsPicker` renders a dataset allowing users to select one or multiple
++ * items. It shares the layouts, search, and filtering of `DataViews` but is
++ * geared toward choosing items rather than managing them.
++ */
+ // Populate the DataViews sub components
+ const DataViewsPickerSubComponents =
+ 	DataViewsPicker as typeof DataViewsPicker & {
+diff --git a/packages/dataviews/src/dataviews/index.tsx b/packages/dataviews/src/dataviews/index.tsx
+index 2503df2c40001f..486b94fed60ca6 100644
+--- a/packages/dataviews/src/dataviews/index.tsx
++++ b/packages/dataviews/src/dataviews/index.tsx
+@@ -310,6 +310,11 @@ function DataViews< Item >( {
+ 	);
+ }
+ 
++/**
++ * `DataViews` renders a dataset using configurable layouts (table, grid, list)
++ * with built-in search, filtering, sorting, pagination, and actions. Use it to
++ * display and manage a collection of records.
++ */
+ // Populate the DataViews sub components
+ const DataViewsSubComponents = DataViews as typeof DataViews & {
+ 	BulkActionToolbar: typeof BulkActionsFooter;
+diff --git a/packages/dataviews/src/dataviews/stories/index.story.tsx b/packages/dataviews/src/dataviews/stories/index.story.tsx
+index 6e41bbf49a0997..8a973d3ed31460 100644
+--- a/packages/dataviews/src/dataviews/stories/index.story.tsx
++++ b/packages/dataviews/src/dataviews/stories/index.story.tsx
+@@ -24,6 +24,11 @@ const meta = {
+ 	tags: [ 'manifest' ],
+ 	title: 'DataViews/DataViews',
+ 	component: DataViews,
++	// Temporary: Due to an upstream bug, render the root explicitly so the
++	// components manifest extractor can resolve props from the JSX.
++	//
++	// See: https://github.com/storybookjs/storybook/issues/34877
++	render: ( args ) => <DataViews { ...args } />,
+ 	args: {
+ 		containerHeight: 'auto',
+ 	},
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index 4c762f1c8f538b..94498d3d87547b 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -557,12 +557,7 @@ export default dedupePlugins( [
+ 	// component always receives props and returns a React element, and its
+ 	// props should be documented through its TypeScript props types.
+ 	{
+-		files: [
+-			'**/@(storybook|stories)/**',
+-			'packages/components/src/**/*.tsx',
+-			'packages/theme/src/**/*.tsx',
+-			'packages/ui/src/**/*.tsx',
+-		],
++		files: [ '**/@(storybook|stories)/**', '**/*.tsx' ],
+ 		rules: {
+ 			'jsdoc/require-param': 'off',
+ 		},

@@ -1,0 +1,73 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fcea596e15385d..3e4e32ffdf955f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Guide`: Convert to TypeScript ([#47493](https://github.com/WordPress/gutenberg/pull/47493)).
+ -   `PanelBody`: Convert to TypeScript ([#47702](https://github.com/WordPress/gutenberg/pull/47702)).
++-   `withFallbackStyles` HOC: Convert to TypeScript ([#48720](https://github.com/WordPress/gutenberg/pull/48720)).
+ -   `navigateRegions` HOC: Convert to TypeScript ([#48632](https://github.com/WordPress/gutenberg/pull/48632)).
+ 
+ ## 23.5.0 (2023-03-01)
+diff --git a/packages/components/src/higher-order/with-fallback-styles/index.js b/packages/components/src/higher-order/with-fallback-styles/index.tsx
+similarity index 77%
+rename from packages/components/src/higher-order/with-fallback-styles/index.js
+rename to packages/components/src/higher-order/with-fallback-styles/index.tsx
+index 6f16275498ca1b..b396094eadd530 100644
+--- a/packages/components/src/higher-order/with-fallback-styles/index.js
++++ b/packages/components/src/higher-order/with-fallback-styles/index.tsx
+@@ -9,11 +9,28 @@ import fastDeepEqual from 'fast-deep-equal/es6';
+ import { Component } from '@wordpress/element';
+ import { createHigherOrderComponent } from '@wordpress/compose';
+ 
+-export default ( mapNodeToProps ) =>
++type Props = {
++	node?: HTMLElement;
++	[ key: string ]: any;
++};
++
++type State = {
++	fallbackStyles?: { [ key: string ]: any };
++	grabStylesCompleted: boolean;
++};
++
++export default (
++	mapNodeToProps: (
++		node: HTMLElement,
++		props: Props
++	) => { [ key: string ]: any }
++) =>
+ 	createHigherOrderComponent( ( WrappedComponent ) => {
+-		return class extends Component {
+-			constructor() {
+-				super( ...arguments );
++		return class extends Component< Props, State > {
++			nodeRef?: HTMLElement;
++
++			constructor( props: Props ) {
++				super( props );
+ 				this.nodeRef = this.props.node;
+ 				this.state = {
+ 					fallbackStyles: undefined,
+@@ -23,7 +40,7 @@ export default ( mapNodeToProps ) =>
+ 				this.bindRef = this.bindRef.bind( this );
+ 			}
+ 
+-			bindRef( node ) {
++			bindRef( node: HTMLDivElement ) {
+ 				if ( ! node ) {
+ 					return;
+ 				}
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 9b80c6ecfe3345..b8c3c53144f005 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -49,7 +49,6 @@
+ 		"src/dimension-control",
+ 		"src/duotone-picker",
+ 		"src/gradient-picker",
+-		"src/higher-order/with-fallback-styles",
+ 		"src/higher-order/with-filters",
+ 		"src/higher-order/with-focus-return",
+ 		"src/higher-order/with-notices",

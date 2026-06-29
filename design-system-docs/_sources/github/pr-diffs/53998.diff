@@ -1,0 +1,79 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d0e758045f4817..11375fbb3a4394 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -1,6 +1,7 @@
+ <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
+ 
+ ## Unreleased
++-   `BorderControl`: Apply proper metrics and simpler text ([#53998](https://github.com/WordPress/gutenberg/pull/53998)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index 64e92ca79e32f4..4a34d6ed7ffe34 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -235,7 +235,7 @@ const BorderControlDropdown = (
+ 							onClose();
+ 						} }
+ 					>
+-						{ __( 'Reset to default' ) }
++						{ __( 'Reset' ) }
+ 					</Button>
+ 				</DropdownContentWrapper>
+ 			) }
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index 7dec1d7dde434d..3aedef1445cc6c 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -165,10 +165,10 @@ export const resetButton = css`
+ 
+ 	/* Override button component styling */
+ 	&& {
+-		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 200 ] };
++		border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 400 ] };
+ 		border-top-left-radius: 0;
+ 		border-top-right-radius: 0;
+-		height: 46px;
++		height: 40px;
+ 	}
+ `;
+ 
+@@ -180,10 +180,10 @@ export const borderControlStylePicker = css`
+ 
+ export const borderStyleButton = css`
+ 	&&&&& {
+-		min-width: 30px;
+-		width: 30px;
+-		height: 30px;
+-		padding: 3px;
++		min-width: 32px;
++		width: 32px;
++		height: 32px;
++		padding: 4px;
+ 	}
+ `;
+ 
+diff --git a/packages/components/src/border-control/test/index.js b/packages/components/src/border-control/test/index.js
+index 4ca8c1fb8bb67a..c41dce687cc522 100644
+--- a/packages/components/src/border-control/test/index.js
++++ b/packages/components/src/border-control/test/index.js
+@@ -137,7 +137,7 @@ describe( 'BorderControl', () => {
+ 			const solidButton = getButton( 'Solid' );
+ 			const dashedButton = getButton( 'Dashed' );
+ 			const dottedButton = getButton( 'Dotted' );
+-			const resetButton = getButton( 'Reset to default' );
++			const resetButton = getButton( 'Reset' );
+ 
+ 			expect( customColorPicker ).toBeInTheDocument();
+ 			expect( colorSwatchButtons.length ).toEqual( colors.length );
+@@ -359,7 +359,7 @@ describe( 'BorderControl', () => {
+ 			const props = createProps();
+ 			render( <BorderControl { ...props } /> );
+ 			await openPopover( user );
+-			await user.click( getButton( 'Reset to default' ) );
++			await user.click( getButton( 'Reset' ) );
+ 
+ 			expect( props.onChange ).toHaveBeenNthCalledWith( 1, {
+ 				color: undefined,

@@ -1,0 +1,33 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d8426b35ac264b..2744ddd198c514 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `Tooltip`: Opt in to `__unstableShift` to ensure that the Tooltip is always within the viewport. ([#41524](https://github.com/WordPress/gutenberg/pull/41524))
+ -   `FormTokenField`: Do not suggest the selected one even if `{ value: string }` is passed ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
+ -   `CustomGradientBar`: Fix insertion and control point positioning to more closely follow cursor. ([#41492](https://github.com/WordPress/gutenberg/pull/41492))
++-   `FormTokenField`: Added Padding to resolve close button overlap issue ([#41556](https://github.com/WordPress/gutenberg/pull/41556)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index 7d26cb5152eae4..4ba684a3d363d3 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -94,7 +94,7 @@
+ 
+ 	&.is-borderless {
+ 		position: relative;
+-		padding: 0 16px 0 0;
++		padding: 0 24px 0 0;
+ 
+ 		.components-form-token-field__token-text {
+ 			background: transparent;
+@@ -107,6 +107,7 @@
+ 			position: absolute;
+ 			top: 1px;
+ 			right: 0;
++			padding: 0;
+ 		}
+ 
+ 		&.is-success {

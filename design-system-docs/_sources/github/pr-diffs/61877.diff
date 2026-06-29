@@ -1,0 +1,206 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d9e21c2788d9e2..914e9e771ddff1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `ComboboxControl`: Introduce Combobox expandOnFocus prop ([#61705](https://github.com/WordPress/gutenberg/pull/61705)).
+ 
++### Bug Fixes
++
++-   `Autocomplete`: Stabilize rendering of autocomplete items ([#61877](https://github.com/WordPress/gutenberg/pull/61877)).
++
+ ### Internal
+ 
+ -   Add type support for CSS Custom Properties ([#61872](https://github.com/WordPress/gutenberg/pull/61872)).
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.tsx b/packages/components/src/autocomplete/autocompleter-ui.tsx
+index a3e3cb503c483e..a22e197decd154 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.tsx
++++ b/packages/components/src/autocomplete/autocompleter-ui.tsx
+@@ -27,10 +27,57 @@ import { VisuallyHidden } from '../visually-hidden';
+ import { createPortal } from 'react-dom';
+ import type { AutocompleterUIProps, KeyedOption, WPCompleter } from './types';
+ 
++type ListBoxProps = {
++	items: KeyedOption[];
++	onSelect: ( option: KeyedOption ) => void;
++	selectedIndex: number;
++	instanceId: number;
++	listBoxId: string | undefined;
++	className?: string;
++	Component?: React.ElementType;
++};
++
++function ListBox( {
++	items,
++	onSelect,
++	selectedIndex,
++	instanceId,
++	listBoxId,
++	className,
++	Component = 'div',
++}: ListBoxProps ) {
++	return (
++		<Component
++			id={ listBoxId }
++			role="listbox"
++			className="components-autocomplete__results"
++		>
++			{ items.map( ( option, index ) => (
++				<Button
++					key={ option.key }
++					id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
++					role="option"
++					aria-selected={ index === selectedIndex }
++					disabled={ option.isDisabled }
++					className={ clsx(
++						'components-autocomplete__result',
++						className,
++						{
++							'is-selected': index === selectedIndex,
++						}
++					) }
++					onClick={ () => onSelect( option ) }
++				>
++					{ option.label }
++				</Button>
++			) ) }
++		</Component>
++	);
++}
++
+ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
+-	const useItems = autocompleter.useItems
+-		? autocompleter.useItems
+-		: getDefaultUseItems( autocompleter );
++	const useItems =
++		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
+ 
+ 	function AutocompleterUI( {
+ 		filterValue,
+@@ -62,7 +109,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
+ 					// If the popover is rendered in a different document than
+ 					// the content, we need to duplicate the options list in the
+ 					// content document so that it's available to the screen
+-					// readers, which check the DOM ID based aira-* attributes.
++					// readers, which check the DOM ID based aria-* attributes.
+ 					setNeedsA11yCompat(
+ 						node.ownerDocument !== contentRef.current.ownerDocument
+ 					);
+@@ -124,38 +171,6 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
+ 			return null;
+ 		}
+ 
+-		const ListBox = ( {
+-			Component = 'div',
+-		}: {
+-			Component?: React.ElementType;
+-		} ) => (
+-			<Component
+-				id={ listBoxId }
+-				role="listbox"
+-				className="components-autocomplete__results"
+-			>
+-				{ items.map( ( option, index ) => (
+-					<Button
+-						key={ option.key }
+-						id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
+-						role="option"
+-						aria-selected={ index === selectedIndex }
+-						disabled={ option.isDisabled }
+-						className={ clsx(
+-							'components-autocomplete__result',
+-							className,
+-							{
+-								'is-selected': index === selectedIndex,
+-							}
+-						) }
+-						onClick={ () => onSelect( option ) }
+-					>
+-						{ option.label }
+-					</Button>
+-				) ) }
+-			</Component>
+-		);
+-
+ 		return (
+ 			<>
+ 				<Popover
+@@ -166,12 +181,27 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
+ 					anchor={ popoverAnchor }
+ 					ref={ popoverRefs }
+ 				>
+-					<ListBox />
++					<ListBox
++						items={ items }
++						onSelect={ onSelect }
++						selectedIndex={ selectedIndex }
++						instanceId={ instanceId }
++						listBoxId={ listBoxId }
++						className={ className }
++					/>
+ 				</Popover>
+ 				{ contentRef.current &&
+ 					needsA11yCompat &&
+ 					createPortal(
+-						<ListBox Component={ VisuallyHidden } />,
++						<ListBox
++							items={ items }
++							onSelect={ onSelect }
++							selectedIndex={ selectedIndex }
++							instanceId={ instanceId }
++							listBoxId={ listBoxId }
++							className={ className }
++							Component={ VisuallyHidden }
++						/>,
+ 						contentRef.current.ownerDocument.body
+ 					) }
+ 			</>
+diff --git a/test/e2e/specs/editor/various/autocomplete-and-mentions.spec.js b/test/e2e/specs/editor/various/autocomplete-and-mentions.spec.js
+index aae72f50cd25f1..059f3a73ee13d8 100644
+--- a/test/e2e/specs/editor/various/autocomplete-and-mentions.spec.js
++++ b/test/e2e/specs/editor/various/autocomplete-and-mentions.spec.js
+@@ -421,6 +421,43 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
+ 		} );
+ 	} );
+ 
++	test( `should insert mention in a table block`, async ( {
++		page,
++		editor,
++	} ) => {
++		// Insert table block.
++		await editor.insertBlock( { name: 'core/table' } );
++
++		// Create the table.
++		await editor.canvas
++			.locator( 'role=button[name="Create Table"i]' )
++			.click();
++
++		// Select the first cell.
++		await editor.canvas
++			.locator( 'role=textbox[name="Body cell text"i] >> nth=0' )
++			.click();
++
++		// Type autocomplete text.
++		await page.keyboard.type( '@j' );
++
++		// Verify that option is selected.
++		const selectedOption = page.getByRole( 'option', {
++			name: 'Jane Doe',
++			selected: true,
++		} );
++		await expect( selectedOption ).toBeVisible();
++
++		// Insert the option.
++		await selectedOption.click();
++
++		// Verify it's been inserted.
++		const snapshot = `<!-- wp:table -->
++<figure class="wp-block-table"><table class="has-fixed-layout"><tbody><tr><td>@testuser</td><td></td></tr><tr><td></td><td></td></tr></tbody></table></figure>
++<!-- /wp:table -->`;
++		await expect.poll( editor.getEditedPostContent ).toBe( snapshot );
++	} );
++
+ 	// The following test concerns an infinite loop regression (https://github.com/WordPress/gutenberg/issues/41709).
+ 	// When present, the regression will cause this test to time out.
+ 	test( 'should insert elements from multiple completers in a single block', async ( {

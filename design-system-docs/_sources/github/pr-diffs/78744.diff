@@ -1,0 +1,167 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 3a09852dad5990..4fbb80151a3ae1 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
++-   `Tooltip.Root`, `Popover.Root`, `Popover.Trigger`, `Popover.Popup`, `Dialog.Root`, `Dialog.Popup`, `Drawer.Root`, `Drawer.Popup`, `AlertDialog.Popup`: Widen the types to forward all upstream props from the equivalent `@base-ui/react` subcomponents instead of `Pick`-ing a subset (types-only change) ([#78744](https://github.com/WordPress/gutenberg/pull/78744)).
+ 
+ ## 0.14.0 (2026-05-27)
+ 
+diff --git a/packages/ui/src/alert-dialog/types.ts b/packages/ui/src/alert-dialog/types.ts
+index 1de2eb6a04a2b4..1a06382bd0ff81 100644
+--- a/packages/ui/src/alert-dialog/types.ts
++++ b/packages/ui/src/alert-dialog/types.ts
+@@ -62,8 +62,7 @@ export interface TriggerProps extends ComponentProps< 'button' > {
+ }
+ 
+ export interface PopupProps
+-	extends ComponentProps< 'div' >,
+-		Pick< _AlertDialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
++	extends ComponentProps< typeof _AlertDialog.Popup > {
+ 	/**
+ 	 * Optional portal element, typically `<AlertDialog.Portal />` with
+ 	 * custom `container`, `className`, or `style`. Overlay content is
+diff --git a/packages/ui/src/dialog/types.ts b/packages/ui/src/dialog/types.ts
+index bca28f15def848..77d89e7003f464 100644
+--- a/packages/ui/src/dialog/types.ts
++++ b/packages/ui/src/dialog/types.ts
+@@ -7,18 +7,13 @@ import type { ComponentProps } from '../utils/types';
+ 
+ export type PortalProps = ComponentProps< typeof _Dialog.Portal >;
+ 
+-export interface RootProps
+-	extends Pick<
+-		_Dialog.Root.Props,
+-		| 'open'
+-		| 'onOpenChange'
+-		| 'onOpenChangeComplete'
+-		| 'defaultOpen'
+-		| 'modal'
+-		| 'disablePointerDismissal'
+-	> {
++export interface RootProps extends Omit< _Dialog.Root.Props, 'children' > {
+ 	/**
+-	 * The content to be rendered inside the component.
++	 * The dialog sub-components (`Dialog.Trigger`, `Dialog.Popup`, etc.).
++	 *
++	 * The wrapper consumes `children` directly to set up the dialog's modal
++	 * context, so the render-function form of `children` supported by the
++	 * underlying `Dialog.Root` from `@base-ui/react` is not exposed.
+ 	 */
+ 	children?: ReactNode;
+ }
+@@ -30,9 +25,7 @@ export interface TriggerProps extends ComponentProps< 'button' > {
+ 	children?: ReactNode;
+ }
+ 
+-export interface PopupProps
+-	extends ComponentProps< 'div' >,
+-		Pick< _Dialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
++export interface PopupProps extends ComponentProps< typeof _Dialog.Popup > {
+ 	/**
+ 	 * The content to be rendered inside the component.
+ 	 */
+diff --git a/packages/ui/src/drawer/types.ts b/packages/ui/src/drawer/types.ts
+index 03722279ef3d29..aabcbc5a99d2dd 100644
+--- a/packages/ui/src/drawer/types.ts
++++ b/packages/ui/src/drawer/types.ts
+@@ -6,30 +6,13 @@ import type { ComponentProps } from '../utils/types';
+ 
+ export type PortalProps = ComponentProps< typeof _Drawer.Portal >;
+ 
+-export interface RootProps
+-	extends Pick<
+-		_Drawer.Root.Props,
+-		| 'open'
+-		| 'onOpenChange'
+-		| 'onOpenChangeComplete'
+-		| 'defaultOpen'
+-		| 'modal'
+-		| 'disablePointerDismissal'
+-	> {
++export interface RootProps extends Omit< _Drawer.Root.Props, 'children' > {
+ 	/**
+-	 * The edge the drawer slides in from, and the direction used to dismiss it
+-	 * via swipe gesture.
+-	 *
+-	 * - `'left'` / `'right'`: side drawers; swipe horizontally to dismiss.
+-	 * - `'down'`: bottom sheet; swipe down to dismiss.
+-	 * - `'up'`: top drawer; swipe up to dismiss.
++	 * The drawer sub-components (`Drawer.Trigger`, `Drawer.Popup`, etc.).
+ 	 *
+-	 * @default 'left'
+-	 */
+-	swipeDirection?: _Drawer.Root.Props[ 'swipeDirection' ];
+-
+-	/**
+-	 * The content to be rendered inside the component.
++	 * The wrapper consumes `children` directly to set up the drawer's modal
++	 * context, so the render-function form of `children` supported by the
++	 * underlying `Drawer.Root` from `@base-ui/react` is not exposed.
+ 	 */
+ 	children?: ReactNode;
+ }
+@@ -41,9 +24,7 @@ export interface TriggerProps extends ComponentProps< 'button' > {
+ 	children?: ReactNode;
+ }
+ 
+-export interface PopupProps
+-	extends ComponentProps< 'div' >,
+-		Pick< _Drawer.Popup.Props, 'initialFocus' | 'finalFocus' > {
++export interface PopupProps extends ComponentProps< typeof _Drawer.Popup > {
+ 	/**
+ 	 * The content to be rendered inside the component.
+ 	 */
+diff --git a/packages/ui/src/popover/types.ts b/packages/ui/src/popover/types.ts
+index b2d0be05aca52b..243ac50e6c3531 100644
+--- a/packages/ui/src/popover/types.ts
++++ b/packages/ui/src/popover/types.ts
+@@ -7,29 +7,17 @@ export type PortalProps = ComponentProps< typeof _Popover.Portal >;
+ 
+ export type PositionerProps = ComponentProps< typeof _Popover.Positioner >;
+ 
+-export interface RootProps
+-	extends Pick<
+-		_Popover.Root.Props,
+-		'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
+-	> {
+-	/**
+-	 * The popover sub-components (`Popover.Trigger`, `Popover.Popup`, etc.).
+-	 */
+-	children?: ReactNode;
+-}
++export type RootProps = _Popover.Root.Props;
+ 
+ export interface TriggerProps
+-	extends ComponentProps< 'button' >,
+-		Pick< _Popover.Trigger.Props, 'openOnHover' | 'delay' | 'closeDelay' > {
++	extends ComponentProps< typeof _Popover.Trigger > {
+ 	/**
+ 	 * The content to be rendered inside the component.
+ 	 */
+ 	children?: ReactNode;
+ }
+ 
+-export interface PopupProps
+-	extends ComponentProps< 'div' >,
+-		Pick< _Popover.Popup.Props, 'initialFocus' | 'finalFocus' > {
++export interface PopupProps extends ComponentProps< typeof _Popover.Popup > {
+ 	/**
+ 	 * Whether to render a backdrop overlay behind the popover.
+ 	 *
+diff --git a/packages/ui/src/tooltip/types.ts b/packages/ui/src/tooltip/types.ts
+index 4d32ee3107f653..febdbb6abbeee5 100644
+--- a/packages/ui/src/tooltip/types.ts
++++ b/packages/ui/src/tooltip/types.ts
+@@ -7,7 +7,7 @@ export type PortalProps = ComponentProps< typeof _Tooltip.Portal >;
+ 
+ export type PositionerProps = ComponentProps< typeof _Tooltip.Positioner >;
+ 
+-export type RootProps = Pick< _Tooltip.Root.Props, 'disabled' | 'children' >;
++export type RootProps = _Tooltip.Root.Props;
+ 
+ export type ProviderProps = _Tooltip.Provider.Props;
+ 

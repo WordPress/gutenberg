@@ -1,0 +1,801 @@
+diff --git a/packages/components/src/tools-panel/context.ts b/packages/components/src/tools-panel/context.ts
+index 7b13e59a92acd9..cfe2eba8836477 100644
+--- a/packages/components/src/tools-panel/context.ts
++++ b/packages/components/src/tools-panel/context.ts
+@@ -19,6 +19,8 @@ export const ToolsPanelContext = createContext< ToolsPanelContextType >( {
+ 	deregisterPanelItem: noop,
+ 	flagItemCustomization: noop,
+ 	areAllOptionalControlsHidden: true,
++	resetAll: noop,
++	toggleItem: noop,
+ } );
+ 
+ export const useToolsPanelContext = () =>
+diff --git a/packages/components/src/tools-panel/index.ts b/packages/components/src/tools-panel/index.ts
+index bd749977d256ea..fb64ff26570fa9 100644
+--- a/packages/components/src/tools-panel/index.ts
++++ b/packages/components/src/tools-panel/index.ts
+@@ -1,3 +1,4 @@
+ export { default as ToolsPanel } from './tools-panel';
+ export { default as ToolsPanelItem } from './tools-panel-item';
++export { default as ToolsPanelDropdownMenu } from './tools-panel-dropdown-menu';
+ export { ToolsPanelContext } from './context';
+diff --git a/packages/components/src/tools-panel/stories/index.js b/packages/components/src/tools-panel/stories/index.js
+index 803a01eb341d35..db1b3393e65e3a 100644
+--- a/packages/components/src/tools-panel/stories/index.js
++++ b/packages/components/src/tools-panel/stories/index.js
+@@ -10,12 +10,16 @@ import { useState } from '@wordpress/element';
+ import {
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+ 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
++	Button,
++	__experimentalHeading as Heading,
++	__experimentalHStack as HStack,
+ } from '@wordpress/components';
++import { arrowLeft } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { ToolsPanel, ToolsPanelItem } from '../';
++import { ToolsPanel, ToolsPanelItem, ToolsPanelDropdownMenu } from '../';
+ import Panel from '../../panel';
+ import UnitControl from '../../unit-control';
+ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+@@ -469,6 +473,70 @@ export const WithConditionallyRenderedControl = () => {
+ 
+ export { ToolsPanelWithItemGroupSlot } from './tools-panel-with-item-group-slot';
+ 
++export const WithCustomHeader = () => {
++	const [ height, setHeight ] = useState();
++	const [ minHeight, setMinHeight ] = useState();
++	const [ width, setWidth ] = useState();
++
++	const resetAll = () => {
++		setHeight( undefined );
++		setWidth( undefined );
++		setMinHeight( undefined );
++	};
++
++	return (
++		<PanelWrapperView>
++			<Panel>
++				<ToolsPanel resetAll={ resetAll }>
++					<CustomHeader>
++						<Button icon={ arrowLeft } label="Back" isSmall />
++						<CustomHeading level={ 2 }>
++							Tools Panel with custom header
++						</CustomHeading>
++						<ToolsPanelDropdownMenu label="Tools Panel with custom header options" />
++					</CustomHeader>
++					<SingleColumnItem
++						hasValue={ () => !! width }
++						label="Width"
++						onDeselect={ () => setWidth( undefined ) }
++						isShownByDefault={ true }
++					>
++						<UnitControl
++							label="Width"
++							value={ width }
++							onChange={ ( next ) => setWidth( next ) }
++						/>
++					</SingleColumnItem>
++					<SingleColumnItem
++						hasValue={ () => !! height }
++						label="Height"
++						onDeselect={ () => setHeight( undefined ) }
++						isShownByDefault={ true }
++					>
++						<UnitControl
++							label="Height"
++							value={ height }
++							onChange={ ( next ) => setHeight( next ) }
++						/>
++					</SingleColumnItem>
++					<ToolsPanelItem
++						hasValue={ () => !! minHeight }
++						label="Minimum height"
++						onDeselect={ () => setMinHeight( undefined ) }
++						isShownByDefault={ true }
++					>
++						<UnitControl
++							label="Minimum height"
++							value={ minHeight }
++							onChange={ ( next ) => setMinHeight( next ) }
++						/>
++					</ToolsPanelItem>
++				</ToolsPanel>
++			</Panel>
++		</PanelWrapperView>
++	);
++};
++
+ const PanelWrapperView = styled.div`
+ 	max-width: 280px;
+ 	font-size: 13px;
+@@ -485,3 +553,13 @@ const SingleColumnItem = styled( ToolsPanelItem )`
+ const IntroText = styled.div`
+ 	grid-column: span 2;
+ `;
++
++const CustomHeader = styled( HStack )`
++	grid-column: span 2;
++`;
++
++const CustomHeading = styled( Heading )`
++	font-size: inherit;
++	font-weight: 500;
++	line-height: normal;
++`;
+diff --git a/packages/components/src/tools-panel/tools-panel-dropdown-menu/component.tsx b/packages/components/src/tools-panel/tools-panel-dropdown-menu/component.tsx
+new file mode 100644
+index 00000000000000..fcfd31c1dbd6a2
+--- /dev/null
++++ b/packages/components/src/tools-panel/tools-panel-dropdown-menu/component.tsx
+@@ -0,0 +1,222 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { speak } from '@wordpress/a11y';
++import { check, reset, moreVertical, plus } from '@wordpress/icons';
++import { __, _x, sprintf } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import DropdownMenu from '../../dropdown-menu';
++import MenuGroup from '../../menu-group';
++import MenuItem from '../../menu-item';
++import { useToolsPanelDropdownMenu } from './hook';
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
++import type {
++	ToolsPanelControlsGroupProps,
++	ToolsPanelDropdownMenuProps,
++} from '../types';
++
++const DefaultControlsGroup = ( {
++	items,
++	toggleItem,
++}: ToolsPanelControlsGroupProps ) => {
++	if ( ! items.length ) {
++		return null;
++	}
++
++	return (
++		<MenuGroup>
++			{ items.map( ( [ label, hasValue ] ) => {
++				if ( hasValue ) {
++					return (
++						<MenuItem
++							key={ label }
++							role="menuitem"
++							icon={ reset }
++							label={ sprintf(
++								// translators: %s: The name of the control being reset e.g. "Padding".
++								__( 'Reset %s' ),
++								label
++							) }
++							onClick={ () => {
++								toggleItem( label );
++								speak(
++									sprintf(
++										// translators: %s: The name of the control being reset e.g. "Padding".
++										__( '%s reset to default' ),
++										label
++									),
++									'assertive'
++								);
++							} }
++						>
++							{ label }
++						</MenuItem>
++					);
++				}
++
++				return (
++					<MenuItem
++						key={ label }
++						role="menuitemcheckbox"
++						icon={ check }
++						isSelected
++						aria-disabled
++					>
++						{ label }
++					</MenuItem>
++				);
++			} ) }
++		</MenuGroup>
++	);
++};
++
++const OptionalControlsGroup = ( {
++	items,
++	toggleItem,
++}: ToolsPanelControlsGroupProps ) => {
++	if ( ! items.length ) {
++		return null;
++	}
++
++	return (
++		<MenuGroup>
++			{ items.map( ( [ label, isSelected ] ) => {
++				const itemLabel = isSelected
++					? sprintf(
++							// translators: %s: The name of the control being hidden and reset e.g. "Padding".
++							__( 'Hide and reset %s' ),
++							label
++					  )
++					: sprintf(
++							// translators: %s: The name of the control to display e.g. "Padding".
++							__( 'Show %s' ),
++							label
++					  );
++
++				return (
++					<MenuItem
++						key={ label }
++						icon={ isSelected && check }
++						isSelected={ isSelected }
++						label={ itemLabel }
++						onClick={ () => {
++							if ( isSelected ) {
++								speak(
++									sprintf(
++										// translators: %s: The name of the control being reset e.g. "Padding".
++										__( '%s hidden and reset to default' ),
++										label
++									),
++									'assertive'
++								);
++							} else {
++								speak(
++									sprintf(
++										// translators: %s: The name of the control being reset e.g. "Padding".
++										__( '%s is now visible' ),
++										label
++									),
++									'assertive'
++								);
++							}
++							toggleItem( label );
++						} }
++						role="menuitemcheckbox"
++					>
++						{ label }
++					</MenuItem>
++				);
++			} ) }
++		</MenuGroup>
++	);
++};
++
++const ToolsPanelDropdownMenu = (
++	props: WordPressComponentProps< ToolsPanelDropdownMenuProps, 'div', false >,
++	forwardedRef: ForwardedRef< any >
++) => {
++	const {
++		areAllOptionalControlsHidden,
++		dropdownMenuClassName,
++		hasMenuItems,
++		label,
++		menuItems,
++		resetAll,
++		toggleItem,
++		...dropdownMenuProps
++	} = useToolsPanelDropdownMenu( props );
++
++	if ( ! label || ! hasMenuItems ) {
++		return null;
++	}
++
++	const defaultItems = Object.entries( menuItems?.default || {} );
++	const optionalItems = Object.entries( menuItems?.optional || {} );
++	const dropDownMenuIcon = areAllOptionalControlsHidden ? plus : moreVertical;
++	const dropdownMenuDescriptionText = areAllOptionalControlsHidden
++		? __( 'All options are currently hidden' )
++		: undefined;
++
++	const canResetAll = [ ...defaultItems, ...optionalItems ].some(
++		( [ , isSelected ] ) => isSelected
++	);
++
++	return (
++		<DropdownMenu
++			ref={ forwardedRef }
++			icon={ dropDownMenuIcon }
++			label={ label }
++			menuProps={ { className: dropdownMenuClassName } }
++			toggleProps={ {
++				isSmall: true,
++				describedBy: dropdownMenuDescriptionText,
++			} }
++			{ ...dropdownMenuProps }
++		>
++			{ () => (
++				<>
++					<DefaultControlsGroup
++						items={ defaultItems }
++						toggleItem={ toggleItem }
++					/>
++					<OptionalControlsGroup
++						items={ optionalItems }
++						toggleItem={ toggleItem }
++					/>
++					<MenuGroup>
++						<MenuItem
++							aria-disabled={ ! canResetAll }
++							variant={ 'tertiary' }
++							onClick={ () => {
++								if ( canResetAll ) {
++									resetAll();
++									speak(
++										__( 'All options reset' ),
++										'assertive'
++									);
++								}
++							} }
++						>
++							{ __( 'Reset all' ) }
++						</MenuItem>
++					</MenuGroup>
++				</>
++			) }
++		</DropdownMenu>
++	);
++};
++
++const ConnectedToolsPanelDropdownMenu = contextConnect(
++	ToolsPanelDropdownMenu,
++	'ToolsPanelDropdownMenu'
++);
++
++export default ConnectedToolsPanelDropdownMenu;
+diff --git a/packages/components/src/tools-panel/tools-panel-dropdown-menu/hook.ts b/packages/components/src/tools-panel/tools-panel-dropdown-menu/hook.ts
+new file mode 100644
+index 00000000000000..d09c1178dc5bfa
+--- /dev/null
++++ b/packages/components/src/tools-panel/tools-panel-dropdown-menu/hook.ts
+@@ -0,0 +1,46 @@
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from '../styles';
++import { useToolsPanelContext } from '../context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
++import { useCx } from '../../utils/hooks/use-cx';
++import type { ToolsPanelDropdownMenuProps } from '../types';
++
++export function useToolsPanelDropdownMenu(
++	props: WordPressComponentProps< ToolsPanelDropdownMenuProps, 'div', false >
++) {
++	const { ...otherProps } = useContextSystem(
++		props,
++		'ToolsPanelDropdownMenu'
++	);
++
++	const cx = useCx();
++
++	const dropdownMenuClassName = useMemo( () => {
++		return cx( styles.DropdownMenu );
++	}, [ cx ] );
++
++	const {
++		menuItems,
++		hasMenuItems,
++		areAllOptionalControlsHidden,
++		resetAll,
++		toggleItem,
++	} = useToolsPanelContext();
++
++	return {
++		...otherProps,
++		areAllOptionalControlsHidden,
++		dropdownMenuClassName,
++		hasMenuItems,
++		menuItems,
++		resetAll,
++		toggleItem,
++	};
++}
+diff --git a/packages/components/src/tools-panel/tools-panel-dropdown-menu/index.ts b/packages/components/src/tools-panel/tools-panel-dropdown-menu/index.ts
+new file mode 100644
+index 00000000000000..b404d7fd44a81a
+--- /dev/null
++++ b/packages/components/src/tools-panel/tools-panel-dropdown-menu/index.ts
+@@ -0,0 +1 @@
++export { default } from './component';
+diff --git a/packages/components/src/tools-panel/tools-panel-header/component.tsx b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+index 62a40a966dcb7d..e1911277a1217f 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+@@ -6,223 +6,41 @@ import type { ForwardedRef } from 'react';
+ /**
+  * WordPress dependencies
+  */
+-import { speak } from '@wordpress/a11y';
+-import { check, reset, moreVertical, plus } from '@wordpress/icons';
+ import { __, _x, sprintf } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+  */
+-import DropdownMenu from '../../dropdown-menu';
+-import MenuGroup from '../../menu-group';
+-import MenuItem from '../../menu-item';
+ import { HStack } from '../../h-stack';
+ import { Heading } from '../../heading';
+ import { useToolsPanelHeader } from './hook';
+ import { contextConnect, WordPressComponentProps } from '../../ui/context';
+-import type {
+-	ToolsPanelControlsGroupProps,
+-	ToolsPanelHeaderProps,
+-} from '../types';
+-
+-const DefaultControlsGroup = ( {
+-	items,
+-	toggleItem,
+-}: ToolsPanelControlsGroupProps ) => {
+-	if ( ! items.length ) {
+-		return null;
+-	}
+-
+-	return (
+-		<MenuGroup>
+-			{ items.map( ( [ label, hasValue ] ) => {
+-				if ( hasValue ) {
+-					return (
+-						<MenuItem
+-							key={ label }
+-							role="menuitem"
+-							icon={ reset }
+-							label={ sprintf(
+-								// translators: %s: The name of the control being reset e.g. "Padding".
+-								__( 'Reset %s' ),
+-								label
+-							) }
+-							onClick={ () => {
+-								toggleItem( label );
+-								speak(
+-									sprintf(
+-										// translators: %s: The name of the control being reset e.g. "Padding".
+-										__( '%s reset to default' ),
+-										label
+-									),
+-									'assertive'
+-								);
+-							} }
+-						>
+-							{ label }
+-						</MenuItem>
+-					);
+-				}
+-
+-				return (
+-					<MenuItem
+-						key={ label }
+-						role="menuitemcheckbox"
+-						icon={ check }
+-						isSelected
+-						aria-disabled
+-					>
+-						{ label }
+-					</MenuItem>
+-				);
+-			} ) }
+-		</MenuGroup>
+-	);
+-};
+-
+-const OptionalControlsGroup = ( {
+-	items,
+-	toggleItem,
+-}: ToolsPanelControlsGroupProps ) => {
+-	if ( ! items.length ) {
+-		return null;
+-	}
+-
+-	return (
+-		<MenuGroup>
+-			{ items.map( ( [ label, isSelected ] ) => {
+-				const itemLabel = isSelected
+-					? sprintf(
+-							// translators: %s: The name of the control being hidden and reset e.g. "Padding".
+-							__( 'Hide and reset %s' ),
+-							label
+-					  )
+-					: sprintf(
+-							// translators: %s: The name of the control to display e.g. "Padding".
+-							__( 'Show %s' ),
+-							label
+-					  );
+-
+-				return (
+-					<MenuItem
+-						key={ label }
+-						icon={ isSelected && check }
+-						isSelected={ isSelected }
+-						label={ itemLabel }
+-						onClick={ () => {
+-							if ( isSelected ) {
+-								speak(
+-									sprintf(
+-										// translators: %s: The name of the control being reset e.g. "Padding".
+-										__( '%s hidden and reset to default' ),
+-										label
+-									),
+-									'assertive'
+-								);
+-							} else {
+-								speak(
+-									sprintf(
+-										// translators: %s: The name of the control being reset e.g. "Padding".
+-										__( '%s is now visible' ),
+-										label
+-									),
+-									'assertive'
+-								);
+-							}
+-							toggleItem( label );
+-						} }
+-						role="menuitemcheckbox"
+-					>
+-						{ label }
+-					</MenuItem>
+-				);
+-			} ) }
+-		</MenuGroup>
+-	);
+-};
++import type { ToolsPanelHeaderProps } from '../types';
++import ToolsPanelDropdownMenu from '../tools-panel-dropdown-menu';
+ 
+ const ToolsPanelHeader = (
+-	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >,
++	props: WordPressComponentProps< ToolsPanelHeaderProps, 'div' >,
+ 	forwardedRef: ForwardedRef< any >
+ ) => {
+-	const {
+-		areAllOptionalControlsHidden,
+-		dropdownMenuClassName,
+-		hasMenuItems,
+-		headingClassName,
+-		label: labelText,
+-		menuItems,
+-		resetAll,
+-		toggleItem,
+-		...headerProps
+-	} = useToolsPanelHeader( props );
++	const { headingClassName, label, ...headerProps } =
++		useToolsPanelHeader( props );
+ 
+-	if ( ! labelText ) {
++	if ( ! label ) {
+ 		return null;
+ 	}
+ 
+-	const defaultItems = Object.entries( menuItems?.default || {} );
+-	const optionalItems = Object.entries( menuItems?.optional || {} );
+-	const dropDownMenuIcon = areAllOptionalControlsHidden ? plus : moreVertical;
+ 	const dropDownMenuLabelText = sprintf(
+ 		// translators: %s: The name of the tool e.g. "Color" or "Typography".
+ 		_x( '%s options', 'Button label to reveal tool panel options' ),
+-		labelText
+-	);
+-	const dropdownMenuDescriptionText = areAllOptionalControlsHidden
+-		? __( 'All options are currently hidden' )
+-		: undefined;
+-
+-	const canResetAll = [ ...defaultItems, ...optionalItems ].some(
+-		( [ , isSelected ] ) => isSelected
++		label
+ 	);
+ 
+ 	return (
+ 		<HStack { ...headerProps } ref={ forwardedRef }>
+ 			<Heading level={ 2 } className={ headingClassName }>
+-				{ labelText }
++				{ label }
+ 			</Heading>
+-			{ hasMenuItems && (
+-				<DropdownMenu
+-					icon={ dropDownMenuIcon }
+-					label={ dropDownMenuLabelText }
+-					menuProps={ { className: dropdownMenuClassName } }
+-					toggleProps={ {
+-						isSmall: true,
+-						describedBy: dropdownMenuDescriptionText,
+-					} }
+-				>
+-					{ () => (
+-						<>
+-							<DefaultControlsGroup
+-								items={ defaultItems }
+-								toggleItem={ toggleItem }
+-							/>
+-							<OptionalControlsGroup
+-								items={ optionalItems }
+-								toggleItem={ toggleItem }
+-							/>
+-							<MenuGroup>
+-								<MenuItem
+-									aria-disabled={ ! canResetAll }
+-									variant={ 'tertiary' }
+-									onClick={ () => {
+-										if ( canResetAll ) {
+-											resetAll();
+-											speak(
+-												__( 'All options reset' ),
+-												'assertive'
+-											);
+-										}
+-									} }
+-								>
+-									{ __( 'Reset all' ) }
+-								</MenuItem>
+-							</MenuGroup>
+-						</>
+-					) }
+-				</DropdownMenu>
+-			) }
++			<ToolsPanelDropdownMenu label={ dropDownMenuLabelText } />
+ 		</HStack>
+ 	);
+ };
+diff --git a/packages/components/src/tools-panel/tools-panel-header/hook.ts b/packages/components/src/tools-panel/tools-panel-header/hook.ts
+index 586fd0e7c5b914..c665214073a190 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-header/hook.ts
+@@ -7,13 +7,12 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import * as styles from '../styles';
+-import { useToolsPanelContext } from '../context';
+ import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { ToolsPanelHeaderProps } from '../types';
+ 
+ export function useToolsPanelHeader(
+-	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >
++	props: WordPressComponentProps< ToolsPanelHeaderProps, 'div' >
+ ) {
+ 	const { className, ...otherProps } = useContextSystem(
+ 		props,
+@@ -25,24 +24,13 @@ export function useToolsPanelHeader(
+ 		return cx( styles.ToolsPanelHeader, className );
+ 	}, [ className, cx ] );
+ 
+-	const dropdownMenuClassName = useMemo( () => {
+-		return cx( styles.DropdownMenu );
+-	}, [ cx ] );
+-
+ 	const headingClassName = useMemo( () => {
+ 		return cx( styles.ToolsPanelHeading );
+ 	}, [ cx ] );
+ 
+-	const { menuItems, hasMenuItems, areAllOptionalControlsHidden } =
+-		useToolsPanelContext();
+-
+ 	return {
+ 		...otherProps,
+-		areAllOptionalControlsHidden,
+-		dropdownMenuClassName,
+-		hasMenuItems,
+ 		headingClassName,
+-		menuItems,
+ 		className: classes,
+ 	};
+ }
+diff --git a/packages/components/src/tools-panel/tools-panel/component.tsx b/packages/components/src/tools-panel/tools-panel/component.tsx
+index fcfa353a0210d7..0762a6c238214e 100644
+--- a/packages/components/src/tools-panel/tools-panel/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel/component.tsx
+@@ -17,23 +17,13 @@ const ToolsPanel = (
+ 	props: WordPressComponentProps< ToolsPanelProps, 'div' >,
+ 	forwardedRef: ForwardedRef< any >
+ ) => {
+-	const {
+-		children,
+-		label,
+-		panelContext,
+-		resetAllItems,
+-		toggleItem,
+-		...toolsPanelProps
+-	} = useToolsPanel( props );
++	const { children, label, panelContext, ...toolsPanelProps } =
++		useToolsPanel( props );
+ 
+ 	return (
+ 		<Grid { ...toolsPanelProps } columns={ 2 } ref={ forwardedRef }>
+ 			<ToolsPanelContext.Provider value={ panelContext }>
+-				<ToolsPanelHeader
+-					label={ label }
+-					resetAll={ resetAllItems }
+-					toggleItem={ toggleItem }
+-				/>
++				<ToolsPanelHeader label={ label } />
+ 				{ children }
+ 			</ToolsPanelContext.Provider>
+ 		</Grid>
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.ts b/packages/components/src/tools-panel/tools-panel/hook.ts
+index 7eab36f07bfed2..003de41d32d8e8 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel/hook.ts
+@@ -294,6 +294,8 @@ export function useToolsPanel(
+ 			shouldRenderPlaceholderItems,
+ 			__experimentalFirstVisibleItemClass,
+ 			__experimentalLastVisibleItemClass,
++			resetAll: resetAllItems,
++			toggleItem,
+ 		} ),
+ 		[
+ 			areAllOptionalControlsHidden,
+@@ -309,14 +311,14 @@ export function useToolsPanel(
+ 			shouldRenderPlaceholderItems,
+ 			__experimentalFirstVisibleItemClass,
+ 			__experimentalLastVisibleItemClass,
++			resetAllItems,
++			toggleItem,
+ 		]
+ 	);
+ 
+ 	return {
+ 		...otherProps,
+ 		panelContext,
+-		resetAllItems,
+-		toggleItem,
+ 		className: classes,
+ 	};
+ }
+diff --git a/packages/components/src/tools-panel/types.ts b/packages/components/src/tools-panel/types.ts
+index 3290b9fe497fc7..dc1a1852c9b9a8 100644
+--- a/packages/components/src/tools-panel/types.ts
++++ b/packages/components/src/tools-panel/types.ts
+@@ -49,26 +49,16 @@ export type ToolsPanelProps = {
+ 	__experimentalLastVisibleItemClass?: string;
+ };
+ 
+-export type ToolsPanelHeaderProps = {
++export type ToolsPanelDropdownMenuProps = {
+ 	/**
+ 	 * Text to be displayed within the panel header. It is also passed along as
+ 	 * the `label` for the panel header's `DropdownMenu`.
+ 	 */
+ 	label: string;
+-	/**
+-	 * The `resetAll` prop provides the callback to execute when the "Reset all"
+-	 * menu item is selected. Its purpose is to facilitate resetting any control
+-	 * values for items contained within this header's panel.
+-	 */
+-	resetAll: ResetAll;
+-	/**
+-	 * This is executed when an individual control's menu item is toggled. It
+-	 * will update the panel's menu item state and call the panel item's
+-	 * `onSelect` or `onDeselect` callbacks as appropriate.
+-	 */
+-	toggleItem: ( label: string ) => void;
+ };
+ 
++export type ToolsPanelHeaderProps = ToolsPanelDropdownMenuProps;
++
+ export type ToolsPanelItem = {
+ 	/**
+ 	 * This is called when building the `ToolsPanel` menu to determine the
+@@ -144,6 +134,8 @@ export type ToolsPanelContext = {
+ 	lastDisplayedItem?: string;
+ 	__experimentalFirstVisibleItemClass?: string;
+ 	__experimentalLastVisibleItemClass?: string;
++	resetAll: ResetAll;
++	toggleItem: ( label: string ) => void;
+ };
+ 
+ export type ToolsPanelControlsGroupProps = {

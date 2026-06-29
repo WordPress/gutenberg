@@ -1,0 +1,88 @@
+diff --git a/packages/block-editor/src/components/colors-gradients/style.scss b/packages/block-editor/src/components/colors-gradients/style.scss
+index 8b36f04b835526..6cade124b7fe46 100644
+--- a/packages/block-editor/src/components/colors-gradients/style.scss
++++ b/packages/block-editor/src/components/colors-gradients/style.scss
+@@ -77,14 +77,16 @@ $swatch-gap: 12px;
+ 	border-right: 1px solid $gray-300;
+ 	border-bottom: 1px solid $gray-300;
+ 
+-	&.first {
++	// Identify the first visible instance as placeholder items will not have this class.
++	&:nth-child(1 of &) {
+ 		margin-top: $grid-unit-30;
+ 		border-top-left-radius: $radius-block-ui;
+ 		border-top-right-radius: $radius-block-ui;
+ 		border-top: 1px solid $gray-300;
+ 	}
+ 
+-	&.last {
++	// Identify the last visible instance as placeholder items will not have this class.
++	&:nth-last-child(1 of &) {
+ 		border-bottom-left-radius: $radius-block-ui;
+ 		border-bottom-right-radius: $radius-block-ui;
+ 	}
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0605bda1a47e51..b3c01c4db2c70a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `Notice`: Remove margins from `Notice` component ([#54800](https://github.com/WordPress/gutenberg/pull/54800)).
++-   `ToolsPanel`: do not apply the `className` to prop to `ToolsPanelItem` components when rendered as placeholders ([#55207](https://github.com/WordPress/gutenberg/pull/55207)).
+ -   `ColorPalette`/`ToggleGroupControl/ToggleGroupControlOptionBase`: add `type="button"` attribute to native `<button>`s ([#55125](https://github.com/WordPress/gutenberg/pull/55125)).
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index 95958ae9f48608..23701afdfcfd07 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -176,18 +176,16 @@ export function useToolsPanelItem(
+ 
+ 	const cx = useCx();
+ 	const classes = useMemo( () => {
+-		const placeholderStyle =
+-			shouldRenderPlaceholder &&
+-			! isShown &&
+-			styles.ToolsPanelItemPlaceholder;
++		const shouldApplyPlaceholderStyles =
++			shouldRenderPlaceholder && ! isShown;
+ 		const firstItemStyle =
+ 			firstDisplayedItem === label && __experimentalFirstVisibleItemClass;
+ 		const lastItemStyle =
+ 			lastDisplayedItem === label && __experimentalLastVisibleItemClass;
+ 		return cx(
+ 			styles.ToolsPanelItem,
+-			placeholderStyle,
+-			className,
++			shouldApplyPlaceholderStyles && styles.ToolsPanelItemPlaceholder,
++			! shouldApplyPlaceholderStyles && className,
+ 			firstItemStyle,
+ 			lastItemStyle
+ 		);
+diff --git a/packages/components/src/tools-panel/tools-panel/README.md b/packages/components/src/tools-panel/tools-panel/README.md
+index 6802a6436875ad..0ee251592d67b1 100644
+--- a/packages/components/src/tools-panel/tools-panel/README.md
++++ b/packages/components/src/tools-panel/tools-panel/README.md
+@@ -191,5 +191,8 @@ A function to call when the `Reset all` menu option is selected. As an argument,
+ Advises the `ToolsPanel` that all of its `ToolsPanelItem` children should render
+ placeholder content (instead of `null`) when they are toggled off and hidden.
+ 
++Note that placeholder items won't apply the `className` that would be
++normally applied to a visible `ToolsPanelItem` via the `className` prop.
++
+ - Required: No
+ - Default: `false`
+diff --git a/packages/components/src/tools-panel/types.ts b/packages/components/src/tools-panel/types.ts
+index 183ed3254fe80a..3156137e580442 100644
+--- a/packages/components/src/tools-panel/types.ts
++++ b/packages/components/src/tools-panel/types.ts
+@@ -50,6 +50,8 @@ export type ToolsPanelProps = {
+ 	/**
+ 	 * Advises the `ToolsPanel` that its child `ToolsPanelItem`s should render
+ 	 * placeholder content instead of null when they are toggled off and hidden.
++	 * Note that placeholder items won't apply the `className` that would be
++	 * normally applied to a visible `ToolsPanelItem` via the `className` prop.
+ 	 *
+ 	 * @default false
+ 	 */

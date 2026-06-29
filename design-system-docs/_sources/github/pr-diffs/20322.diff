@@ -1,0 +1,102 @@
+diff --git a/packages/components/src/tooltip/README.md b/packages/components/src/tooltip/README.md
+index 3014bd9318b9fa..03282fc374050c 100644
+--- a/packages/components/src/tooltip/README.md
++++ b/packages/components/src/tooltip/README.md
+@@ -9,13 +9,13 @@ Accessibility note: the tooltip text is hidden from screen readers and assistive
+ Render a Tooltip, passing as a child the element to which it should anchor:
+ 
+ ```jsx
+-import { Tooltip, Button } from '@wordpress/components';
++import { Tooltip } from '@wordpress/components';
+ 
+ const MyTooltip = () => (
+ 	<Tooltip text="More information">
+-		<Button isSecondary>
++		<div>
+ 			Hover for more information
+-		</Button>
++		</div>
+ 	</Tooltip>
+ );
+ ```
+diff --git a/packages/components/src/tooltip/stories/index.js b/packages/components/src/tooltip/stories/index.js
+new file mode 100644
+index 00000000000000..8587aa18858a58
+--- /dev/null
++++ b/packages/components/src/tooltip/stories/index.js
+@@ -0,0 +1,42 @@
++/**
++ * External dependencies
++ */
++import { text, select } from '@storybook/addon-knobs';
++
++/**
++ * Internal dependencies
++ */
++import Tooltip from '../';
++
++export default {
++	title: 'Components/ToolTip',
++	component: Tooltip,
++};
++
++export const _default = () => {
++	const positionOptions = {
++		'top left': 'top left',
++		'top center ': 'top center',
++		'top right': 'top right',
++		'bottom left': 'bottom left',
++		'bottom center ': 'bottom center',
++		'bottom right': 'bottom right',
++	};
++	const tooltipText = text( 'Text', 'More information' );
++	const position = select( 'Position', positionOptions, 'top center' );
++	return (
++		<Tooltip text={ tooltipText } position={ position }>
++			<div
++				style={ {
++					margin: '50px auto',
++					width: '200px',
++					padding: '20px',
++					textAlign: 'center',
++					border: '1px solid #ccc',
++				} }
++			>
++				Hover for more information
++			</div>
++		</Tooltip>
++	);
++};
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index 58f8eeacc975bb..3d56ed96b60999 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -8120,6 +8120,28 @@ exports[`Storyshots Components/ToggleControl With Help Text 1`] = `
+ </div>
+ `;
+ 
++exports[`Storyshots Components/ToolTip Default 1`] = `
++<div
++  onBlur={[Function]}
++  onClick={[Function]}
++  onFocus={[Function]}
++  onMouseDown={[Function]}
++  onMouseEnter={[Function]}
++  onMouseLeave={[Function]}
++  style={
++    Object {
++      "border": "1px solid #ccc",
++      "margin": "50px auto",
++      "padding": "20px",
++      "textAlign": "center",
++      "width": "200px",
++    }
++  }
++>
++  Hover for more information
++</div>
++`;
++
+ exports[`Storyshots Components/Toolbar Default 1`] = `
+ <div
+   aria-label="Options"

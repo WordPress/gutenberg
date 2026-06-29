@@ -1,0 +1,2176 @@
+diff --git a/package-lock.json b/package-lock.json
+index 6c68f96c110a2c..d317cf3076eafd 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -25,26 +25,26 @@
+ 				"@eslint/eslintrc": "^3.0.0",
+ 				"@types/react": "^18.3.27",
+ 				"@types/react-dom": "^18.3.1",
+-				"@typescript/native-preview": "7.0.0-dev.20260423.1",
++				"@typescript/native-preview": "^7.0.0-dev.20260423.1",
+ 				"@wordpress/eslint-tools": "file:./tools/eslint",
+ 				"@wordpress/release-tools": "file:./tools/release",
+ 				"@wordpress/vips": "file:./packages/vips",
+-				"concurrently": "3.5.0",
+-				"cross-env": "7.0.3",
++				"concurrently": "^3.5.0",
++				"cross-env": "^7.0.3",
+ 				"eslint": "^10.0.0",
+-				"eslint-formatter-compact": "9.0.1",
+-				"glob": "7.1.2",
+-				"husky": "7.0.0",
+-				"lerna": "8.1.9",
+-				"lint-staged": "16.4.0",
+-				"npm-run-all": "4.1.5",
+-				"patch-package": "8.0.0",
+-				"prettier": "npm:wp-prettier@3.0.3",
+-				"react-scanner": "1.2.0",
+-				"rimraf": "5.0.10",
++				"eslint-formatter-compact": "^9.0.1",
++				"glob": "^7.1.2",
++				"husky": "^7.0.0",
++				"lerna": "^8.1.9",
++				"lint-staged": "^16.4.0",
++				"npm-run-all": "^4.1.5",
++				"patch-package": "^8.0.0",
++				"prettier": "npm:wp-prettier@^3.0.3",
++				"react-scanner": "^1.2.0",
++				"rimraf": "^5.0.10",
+ 				"stylelint-plugin-logical-css": "^1.2.3",
+-				"typescript": "6.0.2",
+-				"wait-on": "8.0.1"
++				"typescript": "^6.0.2",
++				"wait-on": "^8.0.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=20.19.0",
+@@ -69,22 +69,15 @@
+ 			}
+ 		},
+ 		"node_modules/@actions/github": {
+-			"version": "5.0.0",
+-			"resolved": "https://registry.npmjs.org/@actions/github/-/github-5.0.0.tgz",
+-			"integrity": "sha512-QvE9eAAfEsS+yOOk0cylLBIO/d6WyWIOvsxxzdrPFaud39G6BOkUwScXZn1iBzQzHyu9SBkkLSWlohDWdsasAQ==",
+-			"dependencies": {
+-				"@actions/http-client": "^1.0.11",
+-				"@octokit/core": "^3.4.0",
+-				"@octokit/plugin-paginate-rest": "^2.13.3",
+-				"@octokit/plugin-rest-endpoint-methods": "^5.1.1"
+-			}
+-		},
+-		"node_modules/@actions/github/node_modules/@actions/http-client": {
+-			"version": "1.0.11",
+-			"resolved": "https://registry.npmjs.org/@actions/http-client/-/http-client-1.0.11.tgz",
+-			"integrity": "sha512-VRYHGQV1rqnROJqdMvGUbY/Kn8vriQe/F9HR2AlYHzmKuM/p3kjNuXhmdBfcVgsvRWTz5C5XW5xvndZrVBuAYg==",
++			"version": "5.1.1",
++			"resolved": "https://registry.npmjs.org/@actions/github/-/github-5.1.1.tgz",
++			"integrity": "sha512-Nk59rMDoJaV+mHCOJPXuvB1zIbomlKS0dmSIqPGxd0enAXBnOfn4VWF+CGtRCwXZG9Epa54tZA7VIRlJDS8A6g==",
++			"license": "MIT",
+ 			"dependencies": {
+-				"tunnel": "0.0.6"
++				"@actions/http-client": "^2.0.1",
++				"@octokit/core": "^3.6.0",
++				"@octokit/plugin-paginate-rest": "^2.17.0",
++				"@octokit/plugin-rest-endpoint-methods": "^5.13.0"
+ 			}
+ 		},
+ 		"node_modules/@actions/http-client": {
+@@ -27361,6 +27354,7 @@
+ 			"version": "14.0.0",
+ 			"resolved": "https://registry.npmjs.org/globals/-/globals-14.0.0.tgz",
+ 			"integrity": "sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==",
++			"dev": true,
+ 			"license": "MIT",
+ 			"engines": {
+ 				"node": ">=18"
+@@ -30770,9 +30764,10 @@
+ 			}
+ 		},
+ 		"node_modules/json2php": {
+-			"version": "0.0.7",
+-			"resolved": "https://registry.npmjs.org/json2php/-/json2php-0.0.7.tgz",
+-			"integrity": "sha512-dnSoUiLAoVaMXxFsVi4CrPVYMKOuDBXTghXSmMINX44RZ8WM9cXlY7UqrQnlAcODCVO7FV3+8t/5nDKAjimLfg=="
++			"version": "0.0.9",
++			"resolved": "https://registry.npmjs.org/json2php/-/json2php-0.0.9.tgz",
++			"integrity": "sha512-fQMYwvPsQt8hxRnCGyg1r2JVi6yL8Um0DIIawiKiMK9yhAAkcRNj5UsBWoaFvFzPpcWbgw9L6wzj+UMYA702Mw==",
++			"license": "BSD"
+ 		},
+ 		"node_modules/json5": {
+ 			"version": "2.2.3",
+@@ -44075,12 +44070,13 @@
+ 			}
+ 		},
+ 		"node_modules/terser": {
+-			"version": "5.32.0",
+-			"resolved": "https://registry.npmjs.org/terser/-/terser-5.32.0.tgz",
+-			"integrity": "sha512-v3Gtw3IzpBJ0ugkxEX8U0W6+TnPKRRCWGh1jC/iM/e3Ki5+qvO1L1EAZ56bZasc64aXHwRHNIQEzm6//i5cemQ==",
++			"version": "5.48.0",
++			"resolved": "https://registry.npmjs.org/terser/-/terser-5.48.0.tgz",
++			"integrity": "sha512-J/9An6vs9Us6wKRriSFXBWdRZapREHqFzdNUKk0pmu804EMR6dr6winwo7e5JDxN4xahxQsuysyYFwlwj4XN/Q==",
++			"license": "BSD-2-Clause",
+ 			"dependencies": {
+ 				"@jridgewell/source-map": "^0.3.3",
+-				"acorn": "^8.8.2",
++				"acorn": "^8.15.0",
+ 				"commander": "^2.20.0",
+ 				"source-map-support": "~0.5.20"
+ 			},
+@@ -44200,9 +44196,9 @@
+ 			}
+ 		},
+ 		"node_modules/terser/node_modules/acorn": {
+-			"version": "8.13.0",
+-			"resolved": "https://registry.npmjs.org/acorn/-/acorn-8.13.0.tgz",
+-			"integrity": "sha512-8zSiw54Oxrdym50NlZ9sUusyO1Z1ZchgRLWRaK6c86XJFClyCgFKetdowBg5bKxyp/u+CDBJG4Mpp0m3HLZl9w==",
++			"version": "8.16.0",
++			"resolved": "https://registry.npmjs.org/acorn/-/acorn-8.16.0.tgz",
++			"integrity": "sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==",
+ 			"license": "MIT",
+ 			"bin": {
+ 				"acorn": "bin/acorn"
+@@ -47962,12 +47958,12 @@
+ 			"version": "6.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"deepmerge": "^4.3.0",
++				"deepmerge": "^4.3.1",
+ 				"gettext-parser": "^1.3.1",
+ 				"is-plain-object": "^5.0.0"
+ 			},
+ 			"devDependencies": {
+-				"@babel/traverse": "7.25.7"
++				"@babel/traverse": "^7.25.7"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -47982,21 +47978,21 @@
+ 			"version": "8.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@babel/core": "7.25.7",
+-				"@babel/plugin-syntax-import-attributes": "7.26.0",
+-				"@babel/plugin-transform-react-jsx": "7.25.7",
+-				"@babel/plugin-transform-runtime": "7.25.7",
+-				"@babel/preset-env": "7.25.7",
+-				"@babel/preset-typescript": "7.25.7",
++				"@babel/core": "^7.25.7",
++				"@babel/plugin-syntax-import-attributes": "^7.26.0",
++				"@babel/plugin-transform-react-jsx": "^7.25.7",
++				"@babel/plugin-transform-runtime": "^7.25.7",
++				"@babel/preset-env": "^7.25.7",
++				"@babel/preset-typescript": "^7.25.7",
+ 				"@wordpress/browserslist-config": "file:../browserslist-config",
+ 				"@wordpress/warning": "file:../warning",
+ 				"browserslist": "^4.21.10",
+ 				"core-js": "^3.31.0",
+-				"react": "^18.3.0"
++				"react": "^18.3.1"
+ 			},
+ 			"devDependencies": {
+-				"core-js-builder": "3.39.0",
+-				"terser": "5.32.0"
++				"core-js-builder": "^3.39.0",
++				"terser": "^5.37.0"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -48232,7 +48228,7 @@
+ 				"@testing-library/dom": "^10.4.1",
+ 				"@testing-library/react": "^16.3.2",
+ 				"@testing-library/user-event": "^14.6.1",
+-				"deep-freeze": "0.0.1"
++				"deep-freeze": "^0.0.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -48354,17 +48350,17 @@
+ 				"@wordpress/wordcount": "file:../wordcount",
+ 				"change-case": "^4.1.2",
+ 				"clsx": "^2.1.1",
+-				"colord": "^2.7.0",
+-				"deepmerge": "^4.3.0",
++				"colord": "^2.9.3",
++				"deepmerge": "^4.3.1",
+ 				"diff": "^8.0.3",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"memize": "^2.1.0",
+ 				"parsel-js": "^1.1.2",
+-				"postcss": "^8.4.21",
++				"postcss": "^8.4.38",
+ 				"postcss-prefix-selector": "^1.16.0",
+ 				"postcss-urlrebase": "^1.4.0",
+ 				"react-autosize-textarea": "^7.1.0",
+-				"react-easy-crop": "^5.0.6",
++				"react-easy-crop": "^5.4.2",
+ 				"remove-accents": "^0.5.0"
+ 			},
+ 			"devDependencies": {
+@@ -48372,7 +48368,7 @@
+ 				"@testing-library/dom": "^10.4.1",
+ 				"@testing-library/react": "^16.3.2",
+ 				"@testing-library/user-event": "^14.6.1",
+-				"deep-freeze": "0.0.1"
++				"deep-freeze": "^0.0.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -48480,7 +48476,7 @@
+ 			"version": "9.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@arraypress/waveform-player": "1.2.1",
++				"@arraypress/waveform-player": "^1.2.1",
+ 				"@types/react": "^18.3.27",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+@@ -48522,10 +48518,10 @@
+ 				"@wordpress/wordcount": "file:../wordcount",
+ 				"change-case": "^4.1.2",
+ 				"clsx": "^2.1.1",
+-				"colord": "^2.7.0",
++				"colord": "^2.9.3",
+ 				"fast-average-color": "^9.1.1",
+ 				"fast-deep-equal": "^3.1.3",
+-				"html-react-parser": "5.2.11",
++				"html-react-parser": "^5.2.11",
+ 				"memize": "^2.1.0",
+ 				"remove-accents": "^0.5.0",
+ 				"uuid": "^14.0.0"
+@@ -48535,7 +48531,7 @@
+ 				"@testing-library/dom": "^10.4.1",
+ 				"@testing-library/react": "^16.3.2",
+ 				"@testing-library/user-event": "^14.6.1",
+-				"deep-freeze": "0.0.1"
++				"deep-freeze": "^0.0.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -48671,7 +48667,7 @@
+ 				"@wordpress/shortcode": "file:../shortcode",
+ 				"@wordpress/warning": "file:../warning",
+ 				"change-case": "^4.1.2",
+-				"colord": "^2.7.0",
++				"colord": "^2.9.3",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"hpq": "^1.3.0",
+ 				"is-plain-object": "^5.0.0",
+@@ -48683,7 +48679,7 @@
+ 				"uuid": "^14.0.0"
+ 			},
+ 			"devDependencies": {
+-				"deep-freeze": "0.0.1"
++				"deep-freeze": "^0.0.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -48782,7 +48778,7 @@
+ 			"version": "34.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@ariakit/react": "^0.4.22",
++				"@ariakit/react": "^0.4.21",
+ 				"@date-fns/utc": "^2.1.1",
+ 				"@emotion/cache": "^11.14.0",
+ 				"@emotion/css": "^11.13.5",
+@@ -48790,9 +48786,9 @@
+ 				"@emotion/serialize": "^1.3.3",
+ 				"@emotion/styled": "^11.14.1",
+ 				"@emotion/utils": "^1.4.2",
+-				"@floating-ui/react-dom": "2.0.8",
+-				"@types/gradient-parser": "1.1.0",
+-				"@types/highlight-words-core": "1.2.1",
++				"@floating-ui/react-dom": "^2.0.8",
++				"@types/gradient-parser": "^1.1.0",
++				"@types/highlight-words-core": "^1.2.1",
+ 				"@types/react": "^18.3.27",
+ 				"@use-gesture/react": "^10.3.1",
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -48817,13 +48813,13 @@
+ 				"@wordpress/warning": "file:../warning",
+ 				"change-case": "^4.1.2",
+ 				"clsx": "^2.1.1",
+-				"colord": "^2.7.0",
++				"colord": "^2.9.3",
+ 				"csstype": "^3.2.3",
+ 				"date-fns": "^4.1.0",
+-				"deepmerge": "^4.3.0",
++				"deepmerge": "^4.3.1",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"framer-motion": "^11.15.0",
+-				"gradient-parser": "1.1.1",
++				"gradient-parser": "^1.1.1",
+ 				"highlight-words-core": "^1.2.2",
+ 				"is-plain-object": "^5.0.0",
+ 				"memize": "^2.1.0",
+@@ -49033,8 +49029,8 @@
+ 				"@testing-library/dom": "^10.4.1",
+ 				"@testing-library/react": "^16.3.2",
+ 				"@testing-library/user-event": "^14.6.1",
+-				"mock-match-media": "0.4.2",
+-				"react-dom": "^18.3.0"
++				"mock-match-media": "^0.4.2",
++				"react-dom": "^18.3.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -49224,7 +49220,7 @@
+ 				"@testing-library/react": "^16.3.2",
+ 				"@types/jest": "^29.5.14",
+ 				"@types/node": "^20.19.39",
+-				"deep-freeze": "0.0.1"
++				"deep-freeze": "^0.0.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -50017,7 +50013,7 @@
+ 			"dependencies": {
+ 				"@inquirer/prompts": "^7.2.0",
+ 				"@wordpress/lazy-import": "file:../lazy-import",
+-				"chalk": "^4.0.0",
++				"chalk": "^4.1.1",
+ 				"change-case": "^4.1.2",
+ 				"check-node-version": "^4.1.0",
+ 				"commander": "^9.2.0",
+@@ -50176,7 +50172,7 @@
+ 				"@wordpress/priority-queue": "file:../priority-queue",
+ 				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/redux-routine": "file:../redux-routine",
+-				"deepmerge": "^4.3.0",
++				"deepmerge": "^4.3.1",
+ 				"equivalent-key-map": "^0.2.2",
+ 				"is-plain-object": "^5.0.0",
+ 				"is-promise": "^4.0.0",
+@@ -50188,7 +50184,7 @@
+ 				"@testing-library/dom": "^10.4.1",
+ 				"@testing-library/react": "^16.3.2",
+ 				"@testing-library/user-event": "^14.6.1",
+-				"deep-freeze": "0.0.1"
++				"deep-freeze": "^0.0.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -50302,9 +50298,9 @@
+ 				"@wordpress/ui": "file:../ui",
+ 				"@wordpress/warning": "file:../warning",
+ 				"clsx": "^2.1.1",
+-				"colord": "^2.7.0",
++				"colord": "^2.9.3",
+ 				"date-fns": "^4.1.0",
+-				"deepmerge": "4.3.1",
++				"deepmerge": "^4.3.1",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"remove-accents": "^0.5.0"
+ 			},
+@@ -50454,7 +50450,7 @@
+ 			"version": "6.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"json2php": "^0.0.7"
++				"json2php": "^0.0.9"
+ 			},
+ 			"devDependencies": {
+ 				"atob": "^2.1.2",
+@@ -50488,9 +50484,9 @@
+ 			"version": "0.4.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@cfworker/json-schema": "4.1.1",
+-				"@modelcontextprotocol/server": "2.0.0-alpha.2",
+-				"zod": "4.3.6"
++				"@cfworker/json-schema": "^4.1.1",
++				"@modelcontextprotocol/server": "^2.0.0-alpha.2",
++				"zod": "^4.3.6"
+ 			},
+ 			"bin": {
+ 				"design-system-mcp": "bin/design-system-mcp.mjs"
+@@ -50518,13 +50514,13 @@
+ 			"version": "2.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@babel/core": "7.25.7",
++				"@babel/core": "^7.25.7",
+ 				"comment-parser": "^1.1.1",
+-				"mdast-util-inject": "1.1.0",
+-				"optionator": "0.8.2",
+-				"remark": "10.0.1",
+-				"remark-parse": "6.0.3",
+-				"unified": "7.1.0"
++				"mdast-util-inject": "^1.1.0",
++				"optionator": "^0.8.2",
++				"remark": "^10.0.1",
++				"remark-parse": "^6.0.3",
++				"unified": "^7.1.0"
+ 			},
+ 			"bin": {
+ 				"docgen": "bin/cli.js"
+@@ -50570,7 +50566,7 @@
+ 				"web-vitals": "^4.2.1"
+ 			},
+ 			"devDependencies": {
+-				"@types/mime": "2.0.3",
++				"@types/mime": "^2.0.3",
+ 				"@types/node": "^20.19.39"
+ 			},
+ 			"engines": {
+@@ -50780,7 +50776,7 @@
+ 				"@wordpress/wordcount": "file:../wordcount",
+ 				"change-case": "^4.1.2",
+ 				"clsx": "^2.1.1",
+-				"colord": "^2.9.2",
++				"colord": "^2.9.3",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"memize": "^2.1.0",
+ 				"react-autosize-textarea": "^7.1.0"
+@@ -50846,7 +50842,7 @@
+ 			"devDependencies": {
+ 				"@testing-library/dom": "^10.4.1",
+ 				"@testing-library/react": "^16.3.2",
+-				"deep-freeze": "0.0.1"
++				"deep-freeze": "^0.0.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -50975,7 +50971,7 @@
+ 				"change-case": "^4.1.2",
+ 				"client-zip": "^2.4.5",
+ 				"clsx": "^2.1.1",
+-				"colord": "^2.7.0",
++				"colord": "^2.9.3",
+ 				"date-fns": "^4.1.0",
+ 				"diff": "^8.0.3",
+ 				"fast-deep-equal": "^3.1.3",
+@@ -50988,7 +50984,7 @@
+ 				"@testing-library/dom": "^10.4.1",
+ 				"@testing-library/react": "^16.3.2",
+ 				"@testing-library/user-event": "^14.6.1",
+-				"deep-freeze": "0.0.1"
++				"deep-freeze": "^0.0.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -51084,8 +51080,8 @@
+ 				"@wordpress/escape-html": "file:../escape-html",
+ 				"change-case": "^4.1.2",
+ 				"is-plain-object": "^5.0.0",
+-				"react": "^18.3.0",
+-				"react-dom": "^18.3.0"
++				"react": "^18.3.1",
++				"react-dom": "^18.3.1"
+ 			},
+ 			"devDependencies": {
+ 				"@testing-library/dom": "^10.4.1",
+@@ -51169,7 +51165,7 @@
+ 				"@inquirer/prompts": "^7.2.0",
+ 				"@wp-playground/cli": "^3.0.48",
+ 				"adm-zip": "^0.5.9",
+-				"chalk": "^4.0.0",
++				"chalk": "^4.1.1",
+ 				"copy-dir": "^1.3.0",
+ 				"cross-spawn": "^7.0.6",
+ 				"docker-compose": "^0.24.3",
+@@ -51177,7 +51173,7 @@
+ 				"js-yaml": "^3.13.1",
+ 				"ora": "^4.0.2",
+ 				"rimraf": "^5.0.10",
+-				"simple-git": "^3.5.0",
++				"simple-git": "^3.24.0",
+ 				"yargs": "^17.3.0"
+ 			},
+ 			"bin": {
+@@ -51203,7 +51199,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@babel/eslint-parser": "^7.28.6",
+-				"@eslint-community/eslint-plugin-eslint-comments": "^4.4.0",
++				"@eslint-community/eslint-plugin-eslint-comments": "^4.7.0",
+ 				"@eslint/compat": "^2.0.0",
+ 				"@wordpress/babel-preset-default": "file:../babel-preset-default",
+ 				"@wordpress/prettier-config": "file:../prettier-config",
+@@ -51212,20 +51208,20 @@
+ 				"eslint-config-prettier": "^10.0.0",
+ 				"eslint-import-resolver-typescript": "^4.4.4",
+ 				"eslint-plugin-import": "^2.31.0",
+-				"eslint-plugin-jest": "^28.0.0",
++				"eslint-plugin-jest": "^28.11.0",
+ 				"eslint-plugin-jsdoc": "^50.0.0",
+ 				"eslint-plugin-jsx-a11y": "^6.10.0",
+ 				"eslint-plugin-playwright": "^2.1.0",
+-				"eslint-plugin-prettier": "^5.0.0",
++				"eslint-plugin-prettier": "^5.5.5",
+ 				"eslint-plugin-react": "^7.37.0",
+-				"eslint-plugin-react-hooks": "7.1.1",
++				"eslint-plugin-react-hooks": "^7.1.1",
+ 				"globals": "^16.0.0",
+ 				"requireindex": "^1.2.0",
+-				"typescript-eslint": "^8.0.0"
++				"typescript-eslint": "^8.57.1"
+ 			},
+ 			"devDependencies": {
+ 				"@types/eslint": "^9",
+-				"@types/estree": "1.0.5"
++				"@types/estree": "^1.0.5"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -51455,9 +51451,9 @@
+ 				"@wordpress/url": "file:../url",
+ 				"@wordpress/warning": "file:../warning",
+ 				"@wordpress/wordcount": "file:../wordcount",
+-				"change-case": "4.1.2",
++				"change-case": "^4.1.2",
+ 				"client-zip": "^2.4.5",
+-				"clsx": "2.1.1",
++				"clsx": "^2.1.1",
+ 				"remove-accents": "^0.5.0"
+ 			},
+ 			"engines": {
+@@ -51577,8 +51573,8 @@
+ 				"@wordpress/data": "file:../data",
+ 				"@wordpress/i18n": "file:../i18n",
+ 				"@wordpress/style-engine": "file:../style-engine",
+-				"colord": "^2.9.2",
+-				"deepmerge": "^4.3.0",
++				"colord": "^2.9.3",
++				"deepmerge": "^4.3.1",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"is-plain-object": "^5.0.0",
+ 				"memize": "^2.1.0"
+@@ -51616,8 +51612,8 @@
+ 				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/ui": "file:../ui",
+ 				"change-case": "^4.1.2",
+-				"clsx": "^2.1.0",
+-				"colord": "^2.7.0"
++				"clsx": "^2.1.1",
++				"colord": "^2.9.3"
+ 			},
+ 			"devDependencies": {
+ 				"@testing-library/dom": "^10.4.1",
+@@ -51797,7 +51793,7 @@
+ 			"version": "4.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+-				"benchmark": "2.1.4"
++				"benchmark": "^2.1.4"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -51828,7 +51824,7 @@
+ 				"pot-to-php": "tools/pot-to-php.js"
+ 			},
+ 			"devDependencies": {
+-				"benchmark": "2.1.4"
++				"benchmark": "^2.1.4"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -51843,7 +51839,7 @@
+ 				"@types/react": "^18.3.27",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/primitives": "file:../primitives",
+-				"change-case": "4.1.2"
++				"change-case": "^4.1.2"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -52008,7 +52004,7 @@
+ 			"version": "5.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+-				"benchmark": "2.1.4"
++				"benchmark": "^2.1.4"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -52041,7 +52037,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/jest-console": "file:../jest-console",
+-				"babel-jest": "29.7.0"
++				"babel-jest": "^29.7.0"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -52147,12 +52143,12 @@
+ 			"dependencies": {
+ 				"execa": "^4.0.2",
+ 				"npm-package-arg": "^8.1.5",
+-				"semver": "^7.3.5"
++				"semver": "^7.5.4"
+ 			},
+ 			"devDependencies": {
+ 				"@types/node": "^20.19.39",
+-				"@types/npm-package-arg": "6.1.1",
+-				"@types/semver": "7.3.8"
++				"@types/npm-package-arg": "^6.1.1",
++				"@types/semver": "^7.3.8"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -52307,7 +52303,7 @@
+ 				"@wordpress/primitives": "file:../primitives",
+ 				"@wordpress/ui": "file:../ui",
+ 				"@wordpress/url": "file:../url",
+-				"clsx": "2.1.1"
++				"clsx": "^2.1.1"
+ 			},
+ 			"devDependencies": {
+ 				"@testing-library/dom": "^10.4.1",
+@@ -52503,7 +52499,7 @@
+ 			"devDependencies": {
+ 				"@testing-library/dom": "^10.4.1",
+ 				"@testing-library/react": "^16.3.2",
+-				"deep-freeze": "0.0.1"
++				"deep-freeze": "^0.0.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -52720,7 +52716,7 @@
+ 				"@wordpress/hooks": "file:../hooks",
+ 				"@wordpress/icons": "file:../icons",
+ 				"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+-				"memize": "^2.0.1"
++				"memize": "^2.1.0"
+ 			},
+ 			"devDependencies": {
+ 				"@testing-library/dom": "^10.4.1",
+@@ -52807,7 +52803,7 @@
+ 			"dependencies": {
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/browserslist-config": "file:../browserslist-config",
+-				"autoprefixer": "^10.4.20",
++				"autoprefixer": "^10.4.21",
+ 				"postcss-import": "^16.1.1"
+ 			},
+ 			"engines": {
+@@ -52875,7 +52871,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+ 				"@types/node": "^20.19.39",
+-				"@types/prettier": "2.4.4"
++				"@types/prettier": "^2.4.4"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -52910,7 +52906,7 @@
+ 				"requestidlecallback": "^0.3.0"
+ 			},
+ 			"devDependencies": {
+-				"@types/requestidlecallback": "0.3.4"
++				"@types/requestidlecallback": "^0.3.4"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -52922,7 +52918,7 @@
+ 			"version": "1.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+-				"react": "^18.3.0"
++				"react": "^18.3.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -52934,12 +52930,12 @@
+ 			"version": "2.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@actions/core": "1.9.1",
+-				"@actions/github": "^5.0.0",
++				"@actions/core": "^1.9.1",
++				"@actions/github": "^5.0.1",
+ 				"@octokit/request-error": "^2.1.0",
+-				"@octokit/types": "6.34.0",
++				"@octokit/types": "^6.34.0",
+ 				"@octokit/webhooks": "^9.26.3",
+-				"@octokit/webhooks-types": "5.8.0"
++				"@octokit/webhooks-types": "^5.8.0"
+ 			},
+ 			"devDependencies": {
+ 				"@types/node": "^20.19.39"
+@@ -52981,8 +52977,8 @@
+ 			"version": "3.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+-				"mkdirp": "3.0.1",
+-				"terser-webpack-plugin": "5.3.10"
++				"mkdirp": "^3.0.1",
++				"terser-webpack-plugin": "^5.3.10"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -53014,11 +53010,11 @@
+ 			"version": "0.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@actions/core": "^1.8.0",
++				"@actions/core": "^1.9.1",
+ 				"@actions/github": "^5.0.1",
+ 				"@jest/test-result": "^29.6.2",
+-				"@octokit/types": "6.34.0",
+-				"@octokit/webhooks-types": "5.8.0",
++				"@octokit/types": "^6.34.0",
++				"@octokit/webhooks-types": "^5.8.0",
+ 				"jest-message-util": "^29.6.2"
+ 			},
+ 			"devDependencies": {
+@@ -53029,17 +53025,6 @@
+ 				"npm": ">=8.19.2"
+ 			}
+ 		},
+-		"packages/report-flaky-tests/node_modules/@actions/github": {
+-			"version": "5.1.1",
+-			"resolved": "https://registry.npmjs.org/@actions/github/-/github-5.1.1.tgz",
+-			"integrity": "sha512-Nk59rMDoJaV+mHCOJPXuvB1zIbomlKS0dmSIqPGxd0enAXBnOfn4VWF+CGtRCwXZG9Epa54tZA7VIRlJDS8A6g==",
+-			"dependencies": {
+-				"@actions/http-client": "^2.0.1",
+-				"@octokit/core": "^3.6.0",
+-				"@octokit/plugin-paginate-rest": "^2.17.0",
+-				"@octokit/plugin-rest-endpoint-methods": "^5.13.0"
+-			}
+-		},
+ 		"packages/reusable-blocks": {
+ 			"name": "@wordpress/reusable-blocks",
+ 			"version": "5.47.0",
+@@ -53083,11 +53068,11 @@
+ 				"@wordpress/i18n": "file:../i18n",
+ 				"@wordpress/keycodes": "file:../keycodes",
+ 				"@wordpress/private-apis": "file:../private-apis",
+-				"colord": "2.9.3",
++				"colord": "^2.9.3",
+ 				"memize": "^2.1.0"
+ 			},
+ 			"devDependencies": {
+-				"deep-freeze": "0.0.1"
++				"deep-freeze": "^0.0.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -53140,7 +53125,7 @@
+ 			"version": "32.3.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@babel/core": "7.25.7",
++				"@babel/core": "^7.25.7",
+ 				"@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
+ 				"@svgr/webpack": "^8.0.1",
+ 				"@wordpress/babel-preset-default": "file:../babel-preset-default",
+@@ -53154,10 +53139,10 @@
+ 				"@wordpress/prettier-config": "file:../prettier-config",
+ 				"@wordpress/stylelint-config": "file:../stylelint-config",
+ 				"adm-zip": "^0.5.9",
+-				"babel-jest": "29.7.0",
+-				"babel-loader": "9.2.1",
++				"babel-jest": "^29.7.0",
++				"babel-loader": "^9.2.1",
+ 				"browserslist": "^4.21.10",
+-				"chalk": "^4.0.0",
++				"chalk": "^4.1.1",
+ 				"check-node-version": "^4.1.0",
+ 				"copy-webpack-plugin": "^10.2.0",
+ 				"cross-spawn": "^7.0.6",
+@@ -53180,9 +53165,9 @@
+ 				"minimist": "^1.2.0",
+ 				"npm-package-json-lint": "^6.4.0",
+ 				"npm-packlist": "^3.0.0",
+-				"postcss": "^8.4.5",
++				"postcss": "^8.4.38",
+ 				"postcss-loader": "^6.2.1",
+-				"prettier": "npm:wp-prettier@3.0.3",
++				"prettier": "npm:wp-prettier@^3.0.3",
+ 				"puppeteer-core": "^23.10.1",
+ 				"react-refresh": "^0.14.0",
+ 				"read-pkg-up": "^7.0.1",
+@@ -53231,12 +53216,6 @@
+ 				"ajv": "^8.8.2"
+ 			}
+ 		},
+-		"packages/scripts/node_modules/json2php": {
+-			"version": "0.0.9",
+-			"resolved": "https://registry.npmjs.org/json2php/-/json2php-0.0.9.tgz",
+-			"integrity": "sha512-fQMYwvPsQt8hxRnCGyg1r2JVi6yL8Um0DIIawiKiMK9yhAAkcRNj5UsBWoaFvFzPpcWbgw9L6wzj+UMYA702Mw==",
+-			"license": "BSD"
+-		},
+ 		"packages/scripts/node_modules/schema-utils": {
+ 			"version": "4.2.0",
+ 			"resolved": "https://registry.npmjs.org/schema-utils/-/schema-utils-4.2.0.tgz",
+@@ -53286,7 +53265,7 @@
+ 			"version": "4.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"memize": "^2.0.1"
++				"memize": "^2.1.0"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -53443,9 +53422,9 @@
+ 				"@wordpress/undo-manager": "file:../undo-manager",
+ 				"diff": "^8.0.3",
+ 				"fast-deep-equal": "^3.1.3",
+-				"lib0": "0.2.99",
++				"lib0": "^0.2.99",
+ 				"y-protocols": "^1.0.7",
+-				"yjs": "13.6.29"
++				"yjs": "^13.6.29"
+ 			},
+ 			"devDependencies": {
+ 				"@jest/globals": "^30.2.0",
+@@ -54442,7 +54421,7 @@
+ 			"devDependencies": {
+ 				"@testing-library/dom": "^10.4.1",
+ 				"@testing-library/react": "^16.3.2",
+-				"deep-freeze": "0.0.1"
++				"deep-freeze": "^0.0.1"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -54641,21 +54620,21 @@
+ 			"version": "0.15.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@emotion/babel-plugin": "11.13.5",
++				"@emotion/babel-plugin": "^11.13.5",
+ 				"@wordpress/style-runtime": "file:../style-runtime",
+-				"autoprefixer": "10.4.21",
+-				"browserslist-to-esbuild": "2.1.1",
+-				"change-case": "4.1.2",
++				"autoprefixer": "^10.4.21",
++				"browserslist-to-esbuild": "^2.1.1",
++				"change-case": "^4.1.2",
+ 				"chokidar": "^4.0.0",
+-				"cssnano": "6.0.1",
++				"cssnano": "^6.0.1",
+ 				"esbuild": "^0.27.2",
+-				"esbuild-plugin-babel": "0.2.3",
+-				"esbuild-sass-plugin": "3.3.1",
++				"esbuild-plugin-babel": "^0.2.3",
++				"esbuild-sass-plugin": "^3.3.1",
+ 				"fast-glob": "^3.2.7",
+ 				"moment-timezone": "^0.5.40",
+-				"postcss": "8.4.38",
+-				"postcss-modules": "6.0.1",
+-				"rtlcss": "4.3.0",
++				"postcss": "^8.4.38",
++				"postcss-modules": "^6.0.1",
++				"rtlcss": "^4.3.0",
+ 				"sass-embedded": "^1.97.2"
+ 			},
+ 			"bin": {
+@@ -55267,46 +55246,7 @@
+ 				"storybook": "^10.2.8",
+ 				"storybook-addon-tag-badges": "^3.0.4",
+ 				"terser": "^5.37.0",
+-				"vite": "7.3.2"
+-			}
+-		},
+-		"storybook/node_modules/acorn": {
+-			"version": "8.15.0",
+-			"resolved": "https://registry.npmjs.org/acorn/-/acorn-8.15.0.tgz",
+-			"integrity": "sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg==",
+-			"dev": true,
+-			"license": "MIT",
+-			"bin": {
+-				"acorn": "bin/acorn"
+-			},
+-			"engines": {
+-				"node": ">=0.4.0"
+-			}
+-		},
+-		"storybook/node_modules/commander": {
+-			"version": "2.20.3",
+-			"resolved": "https://registry.npmjs.org/commander/-/commander-2.20.3.tgz",
+-			"integrity": "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==",
+-			"dev": true,
+-			"license": "MIT"
+-		},
+-		"storybook/node_modules/terser": {
+-			"version": "5.46.0",
+-			"resolved": "https://registry.npmjs.org/terser/-/terser-5.46.0.tgz",
+-			"integrity": "sha512-jTwoImyr/QbOWFFso3YoU3ik0jBBDJ6JTOQiy/J2YxVJdZCc+5u7skhNwiOR3FQIygFqVUPHl7qbbxtjW2K3Qg==",
+-			"dev": true,
+-			"license": "BSD-2-Clause",
+-			"dependencies": {
+-				"@jridgewell/source-map": "^0.3.3",
+-				"acorn": "^8.15.0",
+-				"commander": "^2.20.0",
+-				"source-map-support": "~0.5.20"
+-			},
+-			"bin": {
+-				"terser": "bin/terser"
+-			},
+-			"engines": {
+-				"node": ">=10"
++				"vite": "^7.3.2"
+ 			}
+ 		},
+ 		"test/e2e": {
+@@ -55318,7 +55258,7 @@
+ 				"@types/node": "^20.19.39",
+ 				"@wordpress/e2e-test-utils-playwright": "file:../../packages/e2e-test-utils-playwright",
+ 				"@wordpress/scripts": "file:../../packages/scripts",
+-				"@y/websocket-server": "0.1.1",
++				"@y/websocket-server": "^0.1.1",
+ 				"esbuild": "^0.27.2",
+ 				"filenamify": "^4.2.0",
+ 				"ws": "^8.18.3",
+@@ -55364,7 +55304,7 @@
+ 				"@wordpress/rich-text": "file:../../packages/rich-text",
+ 				"ajv": "^8.17.1",
+ 				"fast-glob": "^3.2.7",
+-				"react": "^18.3.0"
++				"react": "^18.3.1"
+ 			}
+ 		},
+ 		"test/performance": {
+@@ -55384,11 +55324,11 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+ 				"@playwright/test": "^1.58.2",
+-				"@storybook/react-vite": "^10.1.11",
++				"@storybook/react-vite": "^10.2.8",
+ 				"@types/node": "^20.19.39",
+ 				"@wordpress/element": "file:../../packages/element",
+ 				"@wordpress/storybook": "file:../../storybook",
+-				"storybook": "^10.1.11"
++				"storybook": "^10.2.8"
+ 			}
+ 		},
+ 		"test/unit": {
+@@ -55422,7 +55362,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@emotion/babel-plugin": "^11.13.5",
+-				"@typescript/native-preview": "7.0.0-dev.20260423.1",
++				"@typescript/native-preview": "^7.0.0-dev.20260423.1",
+ 				"@wordpress/babel-preset-default": "file:../../packages/babel-preset-default",
+ 				"@wordpress/build": "file:../../packages/wp-build",
+ 				"@wordpress/scripts": "file:../../packages/scripts",
+@@ -55431,8 +55371,8 @@
+ 				"cross-spawn": "^7.0.6",
+ 				"esbuild": "^0.27.2",
+ 				"fast-glob": "^3.2.7",
+-				"react": "^18.3.0",
+-				"react-dom": "^18.3.0",
++				"react": "^18.3.1",
++				"react-dom": "^18.3.1",
+ 				"source-map": "^0.6.1"
+ 			}
+ 		},
+@@ -55444,7 +55384,7 @@
+ 				"@apidevtools/json-schema-ref-parser": "^11.6.4",
+ 				"@babel/core": "^7.25.7",
+ 				"chalk": "^4.1.1",
+-				"change-case": "4.1.2",
++				"change-case": "^4.1.2",
+ 				"comment-parser": "^1.1.1",
+ 				"execa": "^4.0.2",
+ 				"fast-glob": "^3.2.7",
+@@ -55463,17 +55403,29 @@
+ 				"@eslint/js": "^10.0.0",
+ 				"@wordpress/eslint-plugin": "file:../../packages/eslint-plugin",
+ 				"@wordpress/scripts": "file:../../packages/scripts",
+-				"eslint-import-resolver-typescript": "4.4.4",
+-				"eslint-plugin-import": "2.31.0",
+-				"eslint-plugin-jest": "28.11.0",
+-				"eslint-plugin-jest-dom": "5.5.0",
+-				"eslint-plugin-prettier": "5.5.5",
+-				"eslint-plugin-react-hooks": "7.1.1",
+-				"eslint-plugin-storybook": "10.2.19",
+-				"eslint-plugin-testing-library": "7.16.0",
+-				"glob": "7.1.2",
+-				"globals": "14.0.0",
+-				"typescript-eslint": "8.57.1"
++				"eslint-import-resolver-typescript": "^4.4.4",
++				"eslint-plugin-import": "^2.31.0",
++				"eslint-plugin-jest": "^28.11.0",
++				"eslint-plugin-jest-dom": "^5.5.0",
++				"eslint-plugin-prettier": "^5.5.5",
++				"eslint-plugin-react-hooks": "^7.1.1",
++				"eslint-plugin-storybook": "^10.2.19",
++				"eslint-plugin-testing-library": "^7.16.0",
++				"glob": "^7.1.2",
++				"globals": "^16.0.0",
++				"typescript-eslint": "^8.57.1"
++			}
++		},
++		"tools/eslint/node_modules/globals": {
++			"version": "16.5.0",
++			"resolved": "https://registry.npmjs.org/globals/-/globals-16.5.0.tgz",
++			"integrity": "sha512-c/c15i26VrJ4IRt5Z89DnIzCGDn9EcebibhAOjw5ibqEHsE1wLUgkPn9RDmNcUKyU87GeaL633nyJ+pplFR2ZQ==",
++			"license": "MIT",
++			"engines": {
++				"node": ">=18"
++			},
++			"funding": {
++				"url": "https://github.com/sponsors/sindresorhus"
+ 			}
+ 		},
+ 		"tools/release": {
+diff --git a/package.json b/package.json
+index ca8561a632b582..3342ceebdadde5 100644
+--- a/package.json
++++ b/package.json
+@@ -65,26 +65,26 @@
+ 		"@eslint/eslintrc": "^3.0.0",
+ 		"@types/react": "^18.3.27",
+ 		"@types/react-dom": "^18.3.1",
+-		"@typescript/native-preview": "7.0.0-dev.20260423.1",
++		"@typescript/native-preview": "^7.0.0-dev.20260423.1",
+ 		"@wordpress/eslint-tools": "file:./tools/eslint",
+ 		"@wordpress/release-tools": "file:./tools/release",
+ 		"@wordpress/vips": "file:./packages/vips",
+-		"concurrently": "3.5.0",
+-		"cross-env": "7.0.3",
++		"concurrently": "^3.5.0",
++		"cross-env": "^7.0.3",
+ 		"eslint": "^10.0.0",
+-		"eslint-formatter-compact": "9.0.1",
+-		"glob": "7.1.2",
+-		"husky": "7.0.0",
+-		"lerna": "8.1.9",
+-		"lint-staged": "16.4.0",
+-		"npm-run-all": "4.1.5",
+-		"patch-package": "8.0.0",
+-		"prettier": "npm:wp-prettier@3.0.3",
+-		"react-scanner": "1.2.0",
+-		"rimraf": "5.0.10",
++		"eslint-formatter-compact": "^9.0.1",
++		"glob": "^7.1.2",
++		"husky": "^7.0.0",
++		"lerna": "^8.1.9",
++		"lint-staged": "^16.4.0",
++		"npm-run-all": "^4.1.5",
++		"patch-package": "^8.0.0",
++		"prettier": "npm:wp-prettier@^3.0.3",
++		"react-scanner": "^1.2.0",
++		"rimraf": "^5.0.10",
+ 		"stylelint-plugin-logical-css": "^1.2.3",
+-		"typescript": "6.0.2",
+-		"wait-on": "8.0.1"
++		"typescript": "^6.0.2",
++		"wait-on": "^8.0.1"
+ 	},
+ 	"overrides": {
+ 		"jsdom": "26.1.0"
+diff --git a/packages/babel-plugin-makepot/package.json b/packages/babel-plugin-makepot/package.json
+index 03ef701d4cf228..033810f28bc5fc 100644
+--- a/packages/babel-plugin-makepot/package.json
++++ b/packages/babel-plugin-makepot/package.json
+@@ -33,12 +33,12 @@
+ 		"./package.json": "./package.json"
+ 	},
+ 	"dependencies": {
+-		"deepmerge": "^4.3.0",
++		"deepmerge": "^4.3.1",
+ 		"gettext-parser": "^1.3.1",
+ 		"is-plain-object": "^5.0.0"
+ 	},
+ 	"devDependencies": {
+-		"@babel/traverse": "7.25.7"
++		"@babel/traverse": "^7.25.7"
+ 	},
+ 	"peerDependencies": {
+ 		"@babel/core": "^7.25.7"
+diff --git a/packages/babel-preset-default/package.json b/packages/babel-preset-default/package.json
+index 3adea3b29c99bf..02c3eacf7fb5a8 100644
+--- a/packages/babel-preset-default/package.json
++++ b/packages/babel-preset-default/package.json
+@@ -38,21 +38,21 @@
+ 		"./package.json": "./package.json"
+ 	},
+ 	"dependencies": {
+-		"@babel/core": "7.25.7",
+-		"@babel/plugin-syntax-import-attributes": "7.26.0",
+-		"@babel/plugin-transform-react-jsx": "7.25.7",
+-		"@babel/plugin-transform-runtime": "7.25.7",
+-		"@babel/preset-env": "7.25.7",
+-		"@babel/preset-typescript": "7.25.7",
++		"@babel/core": "^7.25.7",
++		"@babel/plugin-syntax-import-attributes": "^7.26.0",
++		"@babel/plugin-transform-react-jsx": "^7.25.7",
++		"@babel/plugin-transform-runtime": "^7.25.7",
++		"@babel/preset-env": "^7.25.7",
++		"@babel/preset-typescript": "^7.25.7",
+ 		"@wordpress/browserslist-config": "file:../browserslist-config",
+ 		"@wordpress/warning": "file:../warning",
+ 		"browserslist": "^4.21.10",
+ 		"core-js": "^3.31.0",
+-		"react": "^18.3.0"
++		"react": "^18.3.1"
+ 	},
+ 	"devDependencies": {
+-		"core-js-builder": "3.39.0",
+-		"terser": "5.32.0"
++		"core-js-builder": "^3.39.0",
++		"terser": "^5.37.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/block-directory/package.json b/packages/block-directory/package.json
+index d43adf6aecce60..21e668b81a97ae 100644
+--- a/packages/block-directory/package.json
++++ b/packages/block-directory/package.json
+@@ -68,7 +68,7 @@
+ 		"@testing-library/dom": "^10.4.1",
+ 		"@testing-library/react": "^16.3.2",
+ 		"@testing-library/user-event": "^14.6.1",
+-		"deep-freeze": "0.0.1"
++		"deep-freeze": "^0.0.1"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0",
+diff --git a/packages/block-editor/CHANGELOG.md b/packages/block-editor/CHANGELOG.md
+index d190cba33faaa0..37586a60164049 100644
+--- a/packages/block-editor/CHANGELOG.md
++++ b/packages/block-editor/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ ### Internal
+ 
+ -   `ListView`: Compute the block visibility label once in `ListViewBlock` and pass it down to `ListViewBlockSelectButton`, removing a duplicated `useSelect`/`getBlockVisibilityLabel` call and clarifying that the label is exposed to assistive technology through the row's `aria-describedby` ([#78640](https://github.com/WordPress/gutenberg/pull/78640)).
++-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+ 
+ ## 15.20.0 (2026-05-27)
+ 
+diff --git a/packages/block-editor/package.json b/packages/block-editor/package.json
+index 3ac4d5d441978d..15647729b710e8 100644
+--- a/packages/block-editor/package.json
++++ b/packages/block-editor/package.json
+@@ -100,17 +100,17 @@
+ 		"@wordpress/wordcount": "file:../wordcount",
+ 		"change-case": "^4.1.2",
+ 		"clsx": "^2.1.1",
+-		"colord": "^2.7.0",
+-		"deepmerge": "^4.3.0",
++		"colord": "^2.9.3",
++		"deepmerge": "^4.3.1",
+ 		"diff": "^8.0.3",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"memize": "^2.1.0",
+ 		"parsel-js": "^1.1.2",
+-		"postcss": "^8.4.21",
++		"postcss": "^8.4.38",
+ 		"postcss-prefix-selector": "^1.16.0",
+ 		"postcss-urlrebase": "^1.4.0",
+ 		"react-autosize-textarea": "^7.1.0",
+-		"react-easy-crop": "^5.0.6",
++		"react-easy-crop": "^5.4.2",
+ 		"remove-accents": "^0.5.0"
+ 	},
+ 	"devDependencies": {
+@@ -118,7 +118,7 @@
+ 		"@testing-library/dom": "^10.4.1",
+ 		"@testing-library/react": "^16.3.2",
+ 		"@testing-library/user-event": "^14.6.1",
+-		"deep-freeze": "0.0.1"
++		"deep-freeze": "^0.0.1"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0",
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index 84c22a1d12341d..a9571846d04692 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -93,7 +93,7 @@
+ 		"build-module/*/init.mjs"
+ 	],
+ 	"dependencies": {
+-		"@arraypress/waveform-player": "1.2.1",
++		"@arraypress/waveform-player": "^1.2.1",
+ 		"@types/react": "^18.3.27",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+@@ -135,10 +135,10 @@
+ 		"@wordpress/wordcount": "file:../wordcount",
+ 		"change-case": "^4.1.2",
+ 		"clsx": "^2.1.1",
+-		"colord": "^2.7.0",
++		"colord": "^2.9.3",
+ 		"fast-average-color": "^9.1.1",
+ 		"fast-deep-equal": "^3.1.3",
+-		"html-react-parser": "5.2.11",
++		"html-react-parser": "^5.2.11",
+ 		"memize": "^2.1.0",
+ 		"remove-accents": "^0.5.0",
+ 		"uuid": "^14.0.0"
+@@ -148,7 +148,7 @@
+ 		"@testing-library/dom": "^10.4.1",
+ 		"@testing-library/react": "^16.3.2",
+ 		"@testing-library/user-event": "^14.6.1",
+-		"deep-freeze": "0.0.1"
++		"deep-freeze": "^0.0.1"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0",
+diff --git a/packages/blocks/CHANGELOG.md b/packages/blocks/CHANGELOG.md
+index e098f22a1553b7..1ee88530f542c7 100644
+--- a/packages/blocks/CHANGELOG.md
++++ b/packages/blocks/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+ 
++### Internal
++
++-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
++
+ ## 15.20.0 (2026-05-27)
+ 
+ ### Bug Fix
+diff --git a/packages/blocks/package.json b/packages/blocks/package.json
+index 4b330f09b65c5b..1c74c7ab6ba6b3 100644
+--- a/packages/blocks/package.json
++++ b/packages/blocks/package.json
+@@ -67,7 +67,7 @@
+ 		"@wordpress/shortcode": "file:../shortcode",
+ 		"@wordpress/warning": "file:../warning",
+ 		"change-case": "^4.1.2",
+-		"colord": "^2.7.0",
++		"colord": "^2.9.3",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"hpq": "^1.3.0",
+ 		"is-plain-object": "^5.0.0",
+@@ -79,7 +79,7 @@
+ 		"uuid": "^14.0.0"
+ 	},
+ 	"devDependencies": {
+-		"deep-freeze": "0.0.1"
++		"deep-freeze": "^0.0.1"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0"
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 39a42d6d8ab130..a8a7bdcb69566f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ ### Internal
+ 
+ -   `UnitControl`: Remove dead native code branches now that `Platform.OS` is always `'web'` following the React Native removal ([#79031](https://github.com/WordPress/gutenberg/pull/79031)).
++-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+ 
+ ## 34.0.0 (2026-05-27)
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 96fb8dcb98b758..3f7ac2be95de46 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -50,7 +50,7 @@
+ 		"src/**/*.scss"
+ 	],
+ 	"dependencies": {
+-		"@ariakit/react": "^0.4.22",
++		"@ariakit/react": "^0.4.21",
+ 		"@date-fns/utc": "^2.1.1",
+ 		"@emotion/cache": "^11.14.0",
+ 		"@emotion/css": "^11.13.5",
+@@ -58,9 +58,9 @@
+ 		"@emotion/serialize": "^1.3.3",
+ 		"@emotion/styled": "^11.14.1",
+ 		"@emotion/utils": "^1.4.2",
+-		"@floating-ui/react-dom": "2.0.8",
+-		"@types/gradient-parser": "1.1.0",
+-		"@types/highlight-words-core": "1.2.1",
++		"@floating-ui/react-dom": "^2.0.8",
++		"@types/gradient-parser": "^1.1.0",
++		"@types/highlight-words-core": "^1.2.1",
+ 		"@types/react": "^18.3.27",
+ 		"@use-gesture/react": "^10.3.1",
+ 		"@wordpress/a11y": "file:../a11y",
+@@ -85,13 +85,13 @@
+ 		"@wordpress/warning": "file:../warning",
+ 		"change-case": "^4.1.2",
+ 		"clsx": "^2.1.1",
+-		"colord": "^2.7.0",
++		"colord": "^2.9.3",
+ 		"csstype": "^3.2.3",
+ 		"date-fns": "^4.1.0",
+-		"deepmerge": "^4.3.0",
++		"deepmerge": "^4.3.1",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"framer-motion": "^11.15.0",
+-		"gradient-parser": "1.1.1",
++		"gradient-parser": "^1.1.1",
+ 		"highlight-words-core": "^1.2.2",
+ 		"is-plain-object": "^5.0.0",
+ 		"memize": "^2.1.0",
+diff --git a/packages/compose/package.json b/packages/compose/package.json
+index 69596afb1a5be2..10d656c4da8a7c 100644
+--- a/packages/compose/package.json
++++ b/packages/compose/package.json
+@@ -63,8 +63,8 @@
+ 		"@testing-library/dom": "^10.4.1",
+ 		"@testing-library/react": "^16.3.2",
+ 		"@testing-library/user-event": "^14.6.1",
+-		"mock-match-media": "0.4.2",
+-		"react-dom": "^18.3.0"
++		"mock-match-media": "^0.4.2",
++		"react-dom": "^18.3.1"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0"
+diff --git a/packages/core-data/package.json b/packages/core-data/package.json
+index 6b0aa52d36ceaa..b639333129c7d5 100644
+--- a/packages/core-data/package.json
++++ b/packages/core-data/package.json
+@@ -77,7 +77,7 @@
+ 		"@testing-library/react": "^16.3.2",
+ 		"@types/jest": "^29.5.14",
+ 		"@types/node": "^20.19.39",
+-		"deep-freeze": "0.0.1"
++		"deep-freeze": "^0.0.1"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0",
+diff --git a/packages/create-block/package.json b/packages/create-block/package.json
+index 9121f8dfd8db56..51aa9afabf05ee 100644
+--- a/packages/create-block/package.json
++++ b/packages/create-block/package.json
+@@ -39,7 +39,7 @@
+ 	"dependencies": {
+ 		"@inquirer/prompts": "^7.2.0",
+ 		"@wordpress/lazy-import": "file:../lazy-import",
+-		"chalk": "^4.0.0",
++		"chalk": "^4.1.1",
+ 		"change-case": "^4.1.2",
+ 		"check-node-version": "^4.1.0",
+ 		"commander": "^9.2.0",
+diff --git a/packages/data/package.json b/packages/data/package.json
+index df05c8d73d6f41..befcd432aef24f 100644
+--- a/packages/data/package.json
++++ b/packages/data/package.json
+@@ -52,7 +52,7 @@
+ 		"@wordpress/priority-queue": "file:../priority-queue",
+ 		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/redux-routine": "file:../redux-routine",
+-		"deepmerge": "^4.3.0",
++		"deepmerge": "^4.3.1",
+ 		"equivalent-key-map": "^0.2.2",
+ 		"is-plain-object": "^5.0.0",
+ 		"is-promise": "^4.0.0",
+@@ -64,7 +64,7 @@
+ 		"@testing-library/dom": "^10.4.1",
+ 		"@testing-library/react": "^16.3.2",
+ 		"@testing-library/user-event": "^14.6.1",
+-		"deep-freeze": "0.0.1"
++		"deep-freeze": "^0.0.1"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0"
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index aed4c45a5d934a..e9af7262da130d 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -18,6 +18,10 @@
+ 
+ -   Include DataViews components in [WordPress Design System MCP Server](https://github.com/WordPress/gutenberg/tree/trunk/packages/design-system-mcp) documented components ([#78960](https://github.com/WordPress/gutenberg/pull/78960)).
+ 
++### Internal
++
++-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
++
+ ## 15.0.0 (2026-05-27)
+ 
+ ### Breaking Changes
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index a2f37030d41b71..82281ec886eb9a 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -68,9 +68,9 @@
+ 		"@wordpress/ui": "file:../ui",
+ 		"@wordpress/warning": "file:../warning",
+ 		"clsx": "^2.1.1",
+-		"colord": "^2.7.0",
++		"colord": "^2.9.3",
+ 		"date-fns": "^4.1.0",
+-		"deepmerge": "4.3.1",
++		"deepmerge": "^4.3.1",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"remove-accents": "^0.5.0"
+ 	},
+diff --git a/packages/dependency-extraction-webpack-plugin/package.json b/packages/dependency-extraction-webpack-plugin/package.json
+index e31631e9e3d1e4..5ea2af2149132e 100644
+--- a/packages/dependency-extraction-webpack-plugin/package.json
++++ b/packages/dependency-extraction-webpack-plugin/package.json
+@@ -38,7 +38,7 @@
+ 	},
+ 	"types": "lib/types.d.ts",
+ 	"dependencies": {
+-		"json2php": "^0.0.7"
++		"json2php": "^0.0.9"
+ 	},
+ 	"devDependencies": {
+ 		"atob": "^2.1.2",
+diff --git a/packages/dependency-extraction-webpack-plugin/test/__snapshots__/build.js.snap b/packages/dependency-extraction-webpack-plugin/test/__snapshots__/build.js.snap
+index f7bbddc9d80839..0ca74d8868adcb 100644
+--- a/packages/dependency-extraction-webpack-plugin/test/__snapshots__/build.js.snap
++++ b/packages/dependency-extraction-webpack-plugin/test/__snapshots__/build.js.snap
+@@ -265,17 +265,17 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`polyfill-magic-comm
+ exports[`DependencyExtractionWebpackPlugin modules Webpack \`polyfill-magic-comment-minified\` should produce expected output: External modules should match snapshot 1`] = `[]`;
+ 
+ exports[`DependencyExtractionWebpackPlugin modules Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `
+-"<?php return array('dependencies' => array('@wordpress/blob'), 'version' => 'ab7fa97b1381e41e0f70', 'type' => 'module', 'handle' => 'runtime-chunk-single-modules-a');
++"<?php return array('dependencies' => array('@wordpress/blob'), 'version' => '8a4fbb1aeaeb24991a36', 'type' => 'module', 'handle' => 'runtime-chunk-single-modules-a');
+ "
+ `;
+ 
+ exports[`DependencyExtractionWebpackPlugin modules Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'b.asset.php' should match snapshot 1`] = `
+-"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => '498fd24026d68fa84ba9', 'type' => 'module', 'handle' => 'runtime-chunk-single-modules-b');
++"<?php return array('dependencies' => array('@wordpress/blob', 'lodash'), 'version' => '977c8928c68e753edad9', 'type' => 'module', 'handle' => 'runtime-chunk-single-modules-b');
+ "
+ `;
+ 
+ exports[`DependencyExtractionWebpackPlugin modules Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'runtime.asset.php' should match snapshot 1`] = `
+-"<?php return array('dependencies' => array(), 'version' => '5ac0d6987a8e7fe809a3', 'type' => 'module', 'handle' => 'runtime-chunk-single-modules-runtime');
++"<?php return array('dependencies' => array(), 'version' => '5e629382dfc54f7deb4b', 'type' => 'module', 'handle' => 'runtime-chunk-single-modules-runtime');
+ "
+ `;
+ 
+@@ -681,7 +681,7 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`polyfill-magic-comm
+ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`polyfill-magic-comment-minified\` should produce expected output: External modules should match snapshot 1`] = `[]`;
+ 
+ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `
+-"<?php return array('dependencies' => array('wp-blob'), 'version' => 'd091f1cbbf7603d6e12c', 'handle' => 'runtime-chunk-single-scripts-a');
++"<?php return array('dependencies' => array('wp-blob'), 'version' => 'cdbe22bb74f37e307523', 'handle' => 'runtime-chunk-single-scripts-a');
+ "
+ `;
+ 
+@@ -691,7 +691,7 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-singl
+ `;
+ 
+ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'runtime.asset.php' should match snapshot 1`] = `
+-"<?php return array('dependencies' => array(), 'version' => '717eb779e609d175a7dd', 'handle' => 'runtime-chunk-single-scripts-runtime');
++"<?php return array('dependencies' => array(), 'version' => 'efde7a3c666ea9dae180', 'handle' => 'runtime-chunk-single-scripts-runtime');
+ "
+ `;
+ 
+diff --git a/packages/design-system-mcp/package.json b/packages/design-system-mcp/package.json
+index eaedb6058575d0..0e393a453deee0 100644
+--- a/packages/design-system-mcp/package.json
++++ b/packages/design-system-mcp/package.json
+@@ -41,9 +41,9 @@
+ 		"design-system-mcp": "./bin/design-system-mcp.mjs"
+ 	},
+ 	"dependencies": {
+-		"@cfworker/json-schema": "4.1.1",
+-		"@modelcontextprotocol/server": "2.0.0-alpha.2",
+-		"zod": "4.3.6"
++		"@cfworker/json-schema": "^4.1.1",
++		"@modelcontextprotocol/server": "^2.0.0-alpha.2",
++		"zod": "^4.3.6"
+ 	},
+ 	"devDependencies": {
+ 		"@types/jest": "^29.5.14",
+diff --git a/packages/docgen/package.json b/packages/docgen/package.json
+index c9c4c5bb41dc64..d3849f2a012627 100644
+--- a/packages/docgen/package.json
++++ b/packages/docgen/package.json
+@@ -34,13 +34,13 @@
+ 		"docgen": "./bin/cli.js"
+ 	},
+ 	"dependencies": {
+-		"@babel/core": "7.25.7",
++		"@babel/core": "^7.25.7",
+ 		"comment-parser": "^1.1.1",
+-		"mdast-util-inject": "1.1.0",
+-		"optionator": "0.8.2",
+-		"remark": "10.0.1",
+-		"remark-parse": "6.0.3",
+-		"unified": "7.1.0"
++		"mdast-util-inject": "^1.1.0",
++		"optionator": "^0.8.2",
++		"remark": "^10.0.1",
++		"remark-parse": "^6.0.3",
++		"unified": "^7.1.0"
+ 	},
+ 	"devDependencies": {
+ 		"@types/babel__core": "^7.20.5"
+diff --git a/packages/e2e-test-utils-playwright/package.json b/packages/e2e-test-utils-playwright/package.json
+index a35425fbb2ea1d..94f8bcded2d480 100644
+--- a/packages/e2e-test-utils-playwright/package.json
++++ b/packages/e2e-test-utils-playwright/package.json
+@@ -44,7 +44,7 @@
+ 		"web-vitals": "^4.2.1"
+ 	},
+ 	"devDependencies": {
+-		"@types/mime": "2.0.3",
++		"@types/mime": "^2.0.3",
+ 		"@types/node": "^20.19.39"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/edit-site/package.json b/packages/edit-site/package.json
+index 53d6225f50899b..ce563fc2c80b26 100644
+--- a/packages/edit-site/package.json
++++ b/packages/edit-site/package.json
+@@ -95,7 +95,7 @@
+ 		"@wordpress/wordcount": "file:../wordcount",
+ 		"change-case": "^4.1.2",
+ 		"clsx": "^2.1.1",
+-		"colord": "^2.9.2",
++		"colord": "^2.9.3",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"memize": "^2.1.0",
+ 		"react-autosize-textarea": "^7.1.0"
+diff --git a/packages/edit-widgets/package.json b/packages/edit-widgets/package.json
+index b0ece44921aa96..f96e75790d67fe 100644
+--- a/packages/edit-widgets/package.json
++++ b/packages/edit-widgets/package.json
+@@ -80,7 +80,7 @@
+ 	"devDependencies": {
+ 		"@testing-library/dom": "^10.4.1",
+ 		"@testing-library/react": "^16.3.2",
+-		"deep-freeze": "0.0.1"
++		"deep-freeze": "^0.0.1"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0",
+diff --git a/packages/editor/CHANGELOG.md b/packages/editor/CHANGELOG.md
+index 998f1aceabf566..8b1988d0e127e8 100644
+--- a/packages/editor/CHANGELOG.md
++++ b/packages/editor/CHANGELOG.md
+@@ -14,6 +14,10 @@
+ 
+ -   Fix documentation grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+ 
++### Internal
++
++-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
++
+ ## 14.47.0 (2026-05-27)
+ 
+ ### Enhancements
+diff --git a/packages/editor/package.json b/packages/editor/package.json
+index ed4bd0c1856998..220add92eb9ff3 100644
+--- a/packages/editor/package.json
++++ b/packages/editor/package.json
+@@ -107,7 +107,7 @@
+ 		"change-case": "^4.1.2",
+ 		"client-zip": "^2.4.5",
+ 		"clsx": "^2.1.1",
+-		"colord": "^2.7.0",
++		"colord": "^2.9.3",
+ 		"date-fns": "^4.1.0",
+ 		"diff": "^8.0.3",
+ 		"fast-deep-equal": "^3.1.3",
+@@ -120,7 +120,7 @@
+ 		"@testing-library/dom": "^10.4.1",
+ 		"@testing-library/react": "^16.3.2",
+ 		"@testing-library/user-event": "^14.6.1",
+-		"deep-freeze": "0.0.1"
++		"deep-freeze": "^0.0.1"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0",
+diff --git a/packages/element/package.json b/packages/element/package.json
+index fc9feae8df23ac..3b51bb00713096 100644
+--- a/packages/element/package.json
++++ b/packages/element/package.json
+@@ -51,8 +51,8 @@
+ 		"@wordpress/escape-html": "file:../escape-html",
+ 		"change-case": "^4.1.2",
+ 		"is-plain-object": "^5.0.0",
+-		"react": "^18.3.0",
+-		"react-dom": "^18.3.0"
++		"react": "^18.3.1",
++		"react-dom": "^18.3.1"
+ 	},
+ 	"devDependencies": {
+ 		"@testing-library/dom": "^10.4.1",
+diff --git a/packages/env/package.json b/packages/env/package.json
+index 152883b85de2ae..8442ac531e7b3d 100644
+--- a/packages/env/package.json
++++ b/packages/env/package.json
+@@ -46,7 +46,7 @@
+ 		"@inquirer/prompts": "^7.2.0",
+ 		"@wp-playground/cli": "^3.0.48",
+ 		"adm-zip": "^0.5.9",
+-		"chalk": "^4.0.0",
++		"chalk": "^4.1.1",
+ 		"copy-dir": "^1.3.0",
+ 		"cross-spawn": "^7.0.6",
+ 		"docker-compose": "^0.24.3",
+@@ -54,7 +54,7 @@
+ 		"js-yaml": "^3.13.1",
+ 		"ora": "^4.0.2",
+ 		"rimraf": "^5.0.10",
+-		"simple-git": "^3.5.0",
++		"simple-git": "^3.24.0",
+ 		"yargs": "^17.3.0"
+ 	},
+ 	"publishConfig": {
+diff --git a/packages/eslint-plugin/package.json b/packages/eslint-plugin/package.json
+index a6d088c62f5051..7b5965f921b79f 100644
+--- a/packages/eslint-plugin/package.json
++++ b/packages/eslint-plugin/package.json
+@@ -42,7 +42,7 @@
+ 	},
+ 	"dependencies": {
+ 		"@babel/eslint-parser": "^7.28.6",
+-		"@eslint-community/eslint-plugin-eslint-comments": "^4.4.0",
++		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.0",
+ 		"@eslint/compat": "^2.0.0",
+ 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
+ 		"@wordpress/prettier-config": "file:../prettier-config",
+@@ -51,20 +51,20 @@
+ 		"eslint-config-prettier": "^10.0.0",
+ 		"eslint-import-resolver-typescript": "^4.4.4",
+ 		"eslint-plugin-import": "^2.31.0",
+-		"eslint-plugin-jest": "^28.0.0",
++		"eslint-plugin-jest": "^28.11.0",
+ 		"eslint-plugin-jsdoc": "^50.0.0",
+ 		"eslint-plugin-jsx-a11y": "^6.10.0",
+ 		"eslint-plugin-playwright": "^2.1.0",
+-		"eslint-plugin-prettier": "^5.0.0",
++		"eslint-plugin-prettier": "^5.5.5",
+ 		"eslint-plugin-react": "^7.37.0",
+-		"eslint-plugin-react-hooks": "7.1.1",
++		"eslint-plugin-react-hooks": "^7.1.1",
+ 		"globals": "^16.0.0",
+ 		"requireindex": "^1.2.0",
+-		"typescript-eslint": "^8.0.0"
++		"typescript-eslint": "^8.57.1"
+ 	},
+ 	"devDependencies": {
+ 		"@types/eslint": "^9",
+-		"@types/estree": "1.0.5"
++		"@types/estree": "^1.0.5"
+ 	},
+ 	"peerDependencies": {
+ 		"@babel/core": ">=7",
+diff --git a/packages/fields/package.json b/packages/fields/package.json
+index a7ebba466dd1ad..94c1f031501455 100644
+--- a/packages/fields/package.json
++++ b/packages/fields/package.json
+@@ -73,9 +73,9 @@
+ 		"@wordpress/url": "file:../url",
+ 		"@wordpress/warning": "file:../warning",
+ 		"@wordpress/wordcount": "file:../wordcount",
+-		"change-case": "4.1.2",
++		"change-case": "^4.1.2",
+ 		"client-zip": "^2.4.5",
+-		"clsx": "2.1.1",
++		"clsx": "^2.1.1",
+ 		"remove-accents": "^0.5.0"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/global-styles-engine/package.json b/packages/global-styles-engine/package.json
+index 484fc3355588ec..81d3fe689e853c 100644
+--- a/packages/global-styles-engine/package.json
++++ b/packages/global-styles-engine/package.json
+@@ -46,8 +46,8 @@
+ 		"@wordpress/data": "file:../data",
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/style-engine": "file:../style-engine",
+-		"colord": "^2.9.2",
+-		"deepmerge": "^4.3.0",
++		"colord": "^2.9.3",
++		"deepmerge": "^4.3.1",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"is-plain-object": "^5.0.0",
+ 		"memize": "^2.1.0"
+diff --git a/packages/global-styles-ui/package.json b/packages/global-styles-ui/package.json
+index 86bea3f5d46ff1..a709eee66fecd5 100644
+--- a/packages/global-styles-ui/package.json
++++ b/packages/global-styles-ui/package.json
+@@ -62,8 +62,8 @@
+ 		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/ui": "file:../ui",
+ 		"change-case": "^4.1.2",
+-		"clsx": "^2.1.0",
+-		"colord": "^2.7.0"
++		"clsx": "^2.1.1",
++		"colord": "^2.9.3"
+ 	},
+ 	"devDependencies": {
+ 		"@testing-library/dom": "^10.4.1",
+diff --git a/packages/hooks/package.json b/packages/hooks/package.json
+index 0b18c12c794841..5029092cc63b50 100644
+--- a/packages/hooks/package.json
++++ b/packages/hooks/package.json
+@@ -42,7 +42,7 @@
+ 	"wpScript": true,
+ 	"types": "build-types",
+ 	"devDependencies": {
+-		"benchmark": "2.1.4"
++		"benchmark": "^2.1.4"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/i18n/package.json b/packages/i18n/package.json
+index 34fe2a11dffbe7..b7c42222539686 100644
+--- a/packages/i18n/package.json
++++ b/packages/i18n/package.json
+@@ -52,7 +52,7 @@
+ 		"tannin": "^1.2.0"
+ 	},
+ 	"devDependencies": {
+-		"benchmark": "2.1.4"
++		"benchmark": "^2.1.4"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/icons/package.json b/packages/icons/package.json
+index 327f0eb26a0a6e..83ee859c1c0978 100644
+--- a/packages/icons/package.json
++++ b/packages/icons/package.json
+@@ -46,7 +46,7 @@
+ 		"@types/react": "^18.3.27",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/primitives": "file:../primitives",
+-		"change-case": "4.1.2"
++		"change-case": "^4.1.2"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0"
+diff --git a/packages/is-shallow-equal/package.json b/packages/is-shallow-equal/package.json
+index 86fb840fb7659f..eb59c836cf3793 100644
+--- a/packages/is-shallow-equal/package.json
++++ b/packages/is-shallow-equal/package.json
+@@ -45,7 +45,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"devDependencies": {
+-		"benchmark": "2.1.4"
++		"benchmark": "^2.1.4"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/jest-preset-default/package.json b/packages/jest-preset-default/package.json
+index 68b1ff3de16607..82cc3caccf4a66 100644
+--- a/packages/jest-preset-default/package.json
++++ b/packages/jest-preset-default/package.json
+@@ -32,7 +32,7 @@
+ 	"main": "index.js",
+ 	"dependencies": {
+ 		"@wordpress/jest-console": "file:../jest-console",
+-		"babel-jest": "29.7.0"
++		"babel-jest": "^29.7.0"
+ 	},
+ 	"peerDependencies": {
+ 		"@babel/core": ">=7",
+diff --git a/packages/lazy-import/package.json b/packages/lazy-import/package.json
+index 6c5f89892f6dfa..8c9ae6e40986b9 100644
+--- a/packages/lazy-import/package.json
++++ b/packages/lazy-import/package.json
+@@ -31,12 +31,12 @@
+ 	"dependencies": {
+ 		"execa": "^4.0.2",
+ 		"npm-package-arg": "^8.1.5",
+-		"semver": "^7.3.5"
++		"semver": "^7.5.4"
+ 	},
+ 	"devDependencies": {
+ 		"@types/node": "^20.19.39",
+-		"@types/npm-package-arg": "6.1.1",
+-		"@types/semver": "7.3.8"
++		"@types/npm-package-arg": "^6.1.1",
++		"@types/semver": "^7.3.8"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/media-fields/package.json b/packages/media-fields/package.json
+index 2dd34899c3dcbc..bb9d29c63e26c0 100644
+--- a/packages/media-fields/package.json
++++ b/packages/media-fields/package.json
+@@ -62,7 +62,7 @@
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/ui": "file:../ui",
+ 		"@wordpress/url": "file:../url",
+-		"clsx": "2.1.1"
++		"clsx": "^2.1.1"
+ 	},
+ 	"devDependencies": {
+ 		"@testing-library/dom": "^10.4.1",
+diff --git a/packages/notices/package.json b/packages/notices/package.json
+index ea04721bac2c43..b45b86962cb030 100644
+--- a/packages/notices/package.json
++++ b/packages/notices/package.json
+@@ -57,7 +57,7 @@
+ 	"devDependencies": {
+ 		"@testing-library/dom": "^10.4.1",
+ 		"@testing-library/react": "^16.3.2",
+-		"deep-freeze": "0.0.1"
++		"deep-freeze": "^0.0.1"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0"
+diff --git a/packages/plugins/package.json b/packages/plugins/package.json
+index 1cd67743a03c9f..83e3884f8f60c5 100644
+--- a/packages/plugins/package.json
++++ b/packages/plugins/package.json
+@@ -50,7 +50,7 @@
+ 		"@wordpress/hooks": "file:../hooks",
+ 		"@wordpress/icons": "file:../icons",
+ 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+-		"memize": "^2.0.1"
++		"memize": "^2.1.0"
+ 	},
+ 	"devDependencies": {
+ 		"@testing-library/dom": "^10.4.1",
+diff --git a/packages/postcss-plugins-preset/package.json b/packages/postcss-plugins-preset/package.json
+index 779f708fadbb9c..7a38dccd21c630 100644
+--- a/packages/postcss-plugins-preset/package.json
++++ b/packages/postcss-plugins-preset/package.json
+@@ -36,7 +36,7 @@
+ 	"dependencies": {
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/browserslist-config": "file:../browserslist-config",
+-		"autoprefixer": "^10.4.20",
++		"autoprefixer": "^10.4.21",
+ 		"postcss-import": "^16.1.1"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/prettier-config/package.json b/packages/prettier-config/package.json
+index a7a3ca8999d088..d7be4a2cb8a34c 100644
+--- a/packages/prettier-config/package.json
++++ b/packages/prettier-config/package.json
+@@ -34,7 +34,7 @@
+ 	"types": "build-types",
+ 	"devDependencies": {
+ 		"@types/node": "^20.19.39",
+-		"@types/prettier": "2.4.4"
++		"@types/prettier": "^2.4.4"
+ 	},
+ 	"peerDependencies": {
+ 		"prettier": ">=3"
+diff --git a/packages/priority-queue/package.json b/packages/priority-queue/package.json
+index 7d0469c31a8a5a..675163d345e2af 100644
+--- a/packages/priority-queue/package.json
++++ b/packages/priority-queue/package.json
+@@ -47,7 +47,7 @@
+ 		"requestidlecallback": "^0.3.0"
+ 	},
+ 	"devDependencies": {
+-		"@types/requestidlecallback": "0.3.4"
++		"@types/requestidlecallback": "^0.3.4"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/private-apis/package.json b/packages/private-apis/package.json
+index 87ab4fdf5dc672..dd0ab020fde862 100644
+--- a/packages/private-apis/package.json
++++ b/packages/private-apis/package.json
+@@ -44,7 +44,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"devDependencies": {
+-		"react": "^18.3.0"
++		"react": "^18.3.1"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/project-management-automation/package.json b/packages/project-management-automation/package.json
+index 9cc33537002eb6..db0484db2b42a5 100644
+--- a/packages/project-management-automation/package.json
++++ b/packages/project-management-automation/package.json
+@@ -30,12 +30,12 @@
+ 	},
+ 	"types": "build-types",
+ 	"dependencies": {
+-		"@actions/core": "1.9.1",
+-		"@actions/github": "^5.0.0",
++		"@actions/core": "^1.9.1",
++		"@actions/github": "^5.0.1",
+ 		"@octokit/request-error": "^2.1.0",
+-		"@octokit/types": "6.34.0",
++		"@octokit/types": "^6.34.0",
+ 		"@octokit/webhooks": "^9.26.3",
+-		"@octokit/webhooks-types": "5.8.0"
++		"@octokit/webhooks-types": "^5.8.0"
+ 	},
+ 	"devDependencies": {
+ 		"@types/node": "^20.19.39"
+diff --git a/packages/readable-js-assets-webpack-plugin/package.json b/packages/readable-js-assets-webpack-plugin/package.json
+index 9f0a13f10ec7d0..616863a8c8b6fc 100644
+--- a/packages/readable-js-assets-webpack-plugin/package.json
++++ b/packages/readable-js-assets-webpack-plugin/package.json
+@@ -33,8 +33,8 @@
+ 		"./package.json": "./package.json"
+ 	},
+ 	"devDependencies": {
+-		"mkdirp": "3.0.1",
+-		"terser-webpack-plugin": "5.3.10"
++		"mkdirp": "^3.0.1",
++		"terser-webpack-plugin": "^5.3.10"
+ 	},
+ 	"peerDependencies": {
+ 		"webpack": "^4.8.3 || ^5.0.0"
+diff --git a/packages/report-flaky-tests/package.json b/packages/report-flaky-tests/package.json
+index 4d14cef7d0b03b..1b073deb784f60 100644
+--- a/packages/report-flaky-tests/package.json
++++ b/packages/report-flaky-tests/package.json
+@@ -33,11 +33,11 @@
+ 	},
+ 	"types": "build-types",
+ 	"dependencies": {
+-		"@actions/core": "^1.8.0",
++		"@actions/core": "^1.9.1",
+ 		"@actions/github": "^5.0.1",
+ 		"@jest/test-result": "^29.6.2",
+-		"@octokit/types": "6.34.0",
+-		"@octokit/webhooks-types": "5.8.0",
++		"@octokit/types": "^6.34.0",
++		"@octokit/webhooks-types": "^5.8.0",
+ 		"jest-message-util": "^29.6.2"
+ 	},
+ 	"devDependencies": {
+diff --git a/packages/rich-text/package.json b/packages/rich-text/package.json
+index 785f56743dac8f..b45ea20598f98d 100644
+--- a/packages/rich-text/package.json
++++ b/packages/rich-text/package.json
+@@ -62,11 +62,11 @@
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/keycodes": "file:../keycodes",
+ 		"@wordpress/private-apis": "file:../private-apis",
+-		"colord": "2.9.3",
++		"colord": "^2.9.3",
+ 		"memize": "^2.1.0"
+ 	},
+ 	"devDependencies": {
+-		"deep-freeze": "0.0.1"
++		"deep-freeze": "^0.0.1"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0"
+diff --git a/packages/scripts/package.json b/packages/scripts/package.json
+index 13693d3ab89771..4cbd32b5a54f1a 100644
+--- a/packages/scripts/package.json
++++ b/packages/scripts/package.json
+@@ -33,7 +33,7 @@
+ 		"wp-scripts": "./bin/wp-scripts.js"
+ 	},
+ 	"dependencies": {
+-		"@babel/core": "7.25.7",
++		"@babel/core": "^7.25.7",
+ 		"@pmmmwh/react-refresh-webpack-plugin": "^0.5.11",
+ 		"@svgr/webpack": "^8.0.1",
+ 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
+@@ -47,10 +47,10 @@
+ 		"@wordpress/prettier-config": "file:../prettier-config",
+ 		"@wordpress/stylelint-config": "file:../stylelint-config",
+ 		"adm-zip": "^0.5.9",
+-		"babel-jest": "29.7.0",
+-		"babel-loader": "9.2.1",
++		"babel-jest": "^29.7.0",
++		"babel-loader": "^9.2.1",
+ 		"browserslist": "^4.21.10",
+-		"chalk": "^4.0.0",
++		"chalk": "^4.1.1",
+ 		"check-node-version": "^4.1.0",
+ 		"copy-webpack-plugin": "^10.2.0",
+ 		"cross-spawn": "^7.0.6",
+@@ -73,9 +73,9 @@
+ 		"minimist": "^1.2.0",
+ 		"npm-package-json-lint": "^6.4.0",
+ 		"npm-packlist": "^3.0.0",
+-		"postcss": "^8.4.5",
++		"postcss": "^8.4.38",
+ 		"postcss-loader": "^6.2.1",
+-		"prettier": "npm:wp-prettier@3.0.3",
++		"prettier": "npm:wp-prettier@^3.0.3",
+ 		"puppeteer-core": "^23.10.1",
+ 		"react-refresh": "^0.14.0",
+ 		"read-pkg-up": "^7.0.1",
+diff --git a/packages/shortcode/package.json b/packages/shortcode/package.json
+index 01603e35d4c1ec..3e3bcaecff2f0b 100644
+--- a/packages/shortcode/package.json
++++ b/packages/shortcode/package.json
+@@ -43,7 +43,7 @@
+ 	"wpScriptDefaultExport": true,
+ 	"types": "build-types",
+ 	"dependencies": {
+-		"memize": "^2.0.1"
++		"memize": "^2.1.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/sync/package.json b/packages/sync/package.json
+index 1ca6e575dabf1f..f1788e001b17d1 100644
+--- a/packages/sync/package.json
++++ b/packages/sync/package.json
+@@ -49,9 +49,9 @@
+ 		"@wordpress/undo-manager": "file:../undo-manager",
+ 		"diff": "^8.0.3",
+ 		"fast-deep-equal": "^3.1.3",
+-		"lib0": "0.2.99",
++		"lib0": "^0.2.99",
+ 		"y-protocols": "^1.0.7",
+-		"yjs": "13.6.29"
++		"yjs": "^13.6.29"
+ 	},
+ 	"devDependencies": {
+ 		"@jest/globals": "^30.2.0",
+diff --git a/packages/viewport/package.json b/packages/viewport/package.json
+index e8119a2d0ca1ce..09a80d56e7ec53 100644
+--- a/packages/viewport/package.json
++++ b/packages/viewport/package.json
+@@ -50,7 +50,7 @@
+ 	"devDependencies": {
+ 		"@testing-library/dom": "^10.4.1",
+ 		"@testing-library/react": "^16.3.2",
+-		"deep-freeze": "0.0.1"
++		"deep-freeze": "^0.0.1"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0"
+diff --git a/packages/wp-build/package.json b/packages/wp-build/package.json
+index cc7e9ed7683cce..309447d933472d 100644
+--- a/packages/wp-build/package.json
++++ b/packages/wp-build/package.json
+@@ -35,21 +35,21 @@
+ 		"wp-build": "./lib/build.mjs"
+ 	},
+ 	"dependencies": {
+-		"@emotion/babel-plugin": "11.13.5",
++		"@emotion/babel-plugin": "^11.13.5",
+ 		"@wordpress/style-runtime": "file:../style-runtime",
+-		"autoprefixer": "10.4.21",
+-		"browserslist-to-esbuild": "2.1.1",
+-		"change-case": "4.1.2",
++		"autoprefixer": "^10.4.21",
++		"browserslist-to-esbuild": "^2.1.1",
++		"change-case": "^4.1.2",
+ 		"chokidar": "^4.0.0",
+-		"cssnano": "6.0.1",
++		"cssnano": "^6.0.1",
+ 		"esbuild": "^0.27.2",
+-		"esbuild-plugin-babel": "0.2.3",
+-		"esbuild-sass-plugin": "3.3.1",
++		"esbuild-plugin-babel": "^0.2.3",
++		"esbuild-sass-plugin": "^3.3.1",
+ 		"fast-glob": "^3.2.7",
+ 		"moment-timezone": "^0.5.40",
+-		"postcss": "8.4.38",
+-		"postcss-modules": "6.0.1",
+-		"rtlcss": "4.3.0",
++		"postcss": "^8.4.38",
++		"postcss-modules": "^6.0.1",
++		"rtlcss": "^4.3.0",
+ 		"sass-embedded": "^1.97.2"
+ 	},
+ 	"devDependencies": {
+diff --git a/storybook/package.json b/storybook/package.json
+index 05b1d09f6b3077..1d57f53fe29b69 100644
+--- a/storybook/package.json
++++ b/storybook/package.json
+@@ -44,7 +44,7 @@
+ 		"storybook": "^10.2.8",
+ 		"storybook-addon-tag-badges": "^3.0.4",
+ 		"terser": "^5.37.0",
+-		"vite": "7.3.2"
++		"vite": "^7.3.2"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/test/e2e/package.json b/test/e2e/package.json
+index e75da3e840b392..fc221f846543e5 100644
+--- a/test/e2e/package.json
++++ b/test/e2e/package.json
+@@ -25,7 +25,7 @@
+ 		"@types/node": "^20.19.39",
+ 		"@wordpress/e2e-test-utils-playwright": "file:../../packages/e2e-test-utils-playwright",
+ 		"@wordpress/scripts": "file:../../packages/scripts",
+-		"@y/websocket-server": "0.1.1",
++		"@y/websocket-server": "^0.1.1",
+ 		"esbuild": "^0.27.2",
+ 		"filenamify": "^4.2.0",
+ 		"ws": "^8.18.3",
+diff --git a/test/integration/package.json b/test/integration/package.json
+index 34378371206899..427d1150eff64c 100644
+--- a/test/integration/package.json
++++ b/test/integration/package.json
+@@ -32,7 +32,7 @@
+ 		"@wordpress/rich-text": "file:../../packages/rich-text",
+ 		"ajv": "^8.17.1",
+ 		"fast-glob": "^3.2.7",
+-		"react": "^18.3.0"
++		"react": "^18.3.1"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/test/storybook-playwright/package.json b/test/storybook-playwright/package.json
+index 7b9735b0b5b9a6..0bbd1b77341a84 100644
+--- a/test/storybook-playwright/package.json
++++ b/test/storybook-playwright/package.json
+@@ -22,11 +22,11 @@
+ 	},
+ 	"devDependencies": {
+ 		"@playwright/test": "^1.58.2",
+-		"@storybook/react-vite": "^10.1.11",
++		"@storybook/react-vite": "^10.2.8",
+ 		"@types/node": "^20.19.39",
+ 		"@wordpress/element": "file:../../packages/element",
+ 		"@wordpress/storybook": "file:../../storybook",
+-		"storybook": "^10.1.11"
++		"storybook": "^10.2.8"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/tools/build-scripts/package.json b/tools/build-scripts/package.json
+index 1ea06c2fafe413..7113e5c4cbf522 100644
+--- a/tools/build-scripts/package.json
++++ b/tools/build-scripts/package.json
+@@ -22,7 +22,7 @@
+ 	"type": "module",
+ 	"dependencies": {
+ 		"@emotion/babel-plugin": "^11.13.5",
+-		"@typescript/native-preview": "7.0.0-dev.20260423.1",
++		"@typescript/native-preview": "^7.0.0-dev.20260423.1",
+ 		"@wordpress/babel-preset-default": "file:../../packages/babel-preset-default",
+ 		"@wordpress/build": "file:../../packages/wp-build",
+ 		"@wordpress/scripts": "file:../../packages/scripts",
+@@ -31,8 +31,8 @@
+ 		"cross-spawn": "^7.0.6",
+ 		"esbuild": "^0.27.2",
+ 		"fast-glob": "^3.2.7",
+-		"react": "^18.3.0",
+-		"react-dom": "^18.3.0",
++		"react": "^18.3.1",
++		"react-dom": "^18.3.1",
+ 		"source-map": "^0.6.1"
+ 	},
+ 	"publishConfig": {
+diff --git a/tools/docs/package.json b/tools/docs/package.json
+index 668955f7622226..d06e3b3648bfc9 100644
+--- a/tools/docs/package.json
++++ b/tools/docs/package.json
+@@ -23,7 +23,7 @@
+ 		"@apidevtools/json-schema-ref-parser": "^11.6.4",
+ 		"@babel/core": "^7.25.7",
+ 		"chalk": "^4.1.1",
+-		"change-case": "4.1.2",
++		"change-case": "^4.1.2",
+ 		"comment-parser": "^1.1.1",
+ 		"execa": "^4.0.2",
+ 		"fast-glob": "^3.2.7",
+diff --git a/tools/eslint/package.json b/tools/eslint/package.json
+index ebf3e1fa666477..d46dea4b186f82 100644
+--- a/tools/eslint/package.json
++++ b/tools/eslint/package.json
+@@ -30,17 +30,17 @@
+ 		"@eslint/js": "^10.0.0",
+ 		"@wordpress/eslint-plugin": "file:../../packages/eslint-plugin",
+ 		"@wordpress/scripts": "file:../../packages/scripts",
+-		"eslint-import-resolver-typescript": "4.4.4",
+-		"eslint-plugin-import": "2.31.0",
+-		"eslint-plugin-jest": "28.11.0",
+-		"eslint-plugin-jest-dom": "5.5.0",
+-		"eslint-plugin-prettier": "5.5.5",
+-		"eslint-plugin-react-hooks": "7.1.1",
+-		"eslint-plugin-storybook": "10.2.19",
+-		"eslint-plugin-testing-library": "7.16.0",
+-		"glob": "7.1.2",
+-		"globals": "14.0.0",
+-		"typescript-eslint": "8.57.1"
++		"eslint-import-resolver-typescript": "^4.4.4",
++		"eslint-plugin-import": "^2.31.0",
++		"eslint-plugin-jest": "^28.11.0",
++		"eslint-plugin-jest-dom": "^5.5.0",
++		"eslint-plugin-prettier": "^5.5.5",
++		"eslint-plugin-react-hooks": "^7.1.1",
++		"eslint-plugin-storybook": "^10.2.19",
++		"eslint-plugin-testing-library": "^7.16.0",
++		"glob": "^7.1.2",
++		"globals": "^16.0.0",
++		"typescript-eslint": "^8.57.1"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"

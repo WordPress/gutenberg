@@ -1,0 +1,34 @@
+diff --git a/packages/components/src/shortcut/index.js b/packages/components/src/shortcut/index.js
+index 6f41d5287260a6..5528f193ae11a1 100644
+--- a/packages/components/src/shortcut/index.js
++++ b/packages/components/src/shortcut/index.js
+@@ -3,6 +3,17 @@
+  */
+ import { isString, isObject } from 'lodash';
+ 
++/** @typedef {string | { display: string, ariaLabel: string }} Shortcut */
++/**
++ * @typedef Props
++ * @property {Shortcut} shortcut Shortcut configuration
++ * @property {string} [className] Classname
++ */
++
++/**
++ * @param {Props} props Props
++ * @return {JSX.Element | null} Element
++ */
+ function Shortcut( { shortcut, className } ) {
+ 	if ( ! shortcut ) {
+ 		return null;
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 038065b0b20253..c6a77928f7d18a 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -19,6 +19,7 @@
+ 		"src/dashicon/**/*",
+ 		"src/flex/**/*",
+ 		"src/form-group/**/*",
++		"src/shortcut/**/*",
+ 		"src/spinner/**/*",
+ 		"src/tip/**/*",
+ 		"src/ui/**/*",

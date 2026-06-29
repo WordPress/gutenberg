@@ -1,0 +1,31 @@
+diff --git a/packages/components/src/mobile/badge/style.scss b/packages/components/src/mobile/badge/style.scss
+index beae07d5360d01..04a1561ec466fa 100644
+--- a/packages/components/src/mobile/badge/style.scss
++++ b/packages/components/src/mobile/badge/style.scss
+@@ -6,10 +6,10 @@
+ }
+ 
+ .badge {
+-	padding: 10px;
++	padding: 3px 6px;
+ 	margin: 8px;
+ 	color: #fff;
+ 	border-radius: 3px;
+-	background-color: $gray-70;
+-	border-color: $gray-70;
++	background-color: $gray-dark;
++	border-color: $gray-dark;
+ }
+diff --git a/packages/react-native-editor/CHANGELOG.md b/packages/react-native-editor/CHANGELOG.md
+index ce0e44ea3bdae1..bd5b9b569b6936 100644
+--- a/packages/react-native-editor/CHANGELOG.md
++++ b/packages/react-native-editor/CHANGELOG.md
+@@ -14,6 +14,8 @@ For each user feature we should also add a importance categorization label  to i
+ ## 1.55.2
+ -   [**] Fix incorrect block insertion point after blurring the post title field. [#32831]
+ 
++-   [*] Tweaks to the badge component's styling, including change of background color and reduced padding. [#32865]
++
+ ## 1.55.1
+ -   [*] Fix: RNMobile borderRadius value setting [#32717]
+ -   [*] Improve unsupported block message for reusable block [#32618]

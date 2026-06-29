@@ -1,0 +1,82 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4771e00ab349e7..47159ec62d079d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ 
+ -   `ToggleControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43717](https://github.com/WordPress/gutenberg/pull/43717)). 
+ -   `CheckboxControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43720](https://github.com/WordPress/gutenberg/pull/43720)).
++-   `TextControl`, `TextareaControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43782](https://github.com/WordPress/gutenberg/pull/43782)).
+ -   `RangeControl`: Tweak dark gray marking color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
+ -   `UnitControl`: Tweak unit dropdown color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
+ -   `CardHeader`, `CardBody`, `CardFooter`: Tweak `isShady` background colors to be consistent with the grays in `@wordpress/base-styles` ([#43719](https://github.com/WordPress/gutenberg/pull/43719)).
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+index 7634e751d19ecb..9fbe02707f58d9 100644
+--- a/packages/components/src/text-control/index.tsx
++++ b/packages/components/src/text-control/index.tsx
+@@ -21,6 +21,7 @@ function UnforwardedTextControl(
+ 	ref: ForwardedRef< HTMLInputElement >
+ ) {
+ 	const {
++		__nextHasNoMarginBottom,
+ 		label,
+ 		hideLabelFromVision,
+ 		value,
+@@ -37,6 +38,7 @@ function UnforwardedTextControl(
+ 
+ 	return (
+ 		<BaseControl
++			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 			label={ label }
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			id={ id }
+diff --git a/packages/components/src/text-control/types.ts b/packages/components/src/text-control/types.ts
+index 669751154c3605..4c900b8aa89150 100644
+--- a/packages/components/src/text-control/types.ts
++++ b/packages/components/src/text-control/types.ts
+@@ -10,7 +10,11 @@ import type { BaseControlProps } from '../base-control/types';
+ 
+ export type TextControlProps = Pick<
+ 	BaseControlProps,
+-	'className' | 'hideLabelFromVision' | 'help' | 'label'
++	| 'className'
++	| 'hideLabelFromVision'
++	| 'help'
++	| 'label'
++	| '__nextHasNoMarginBottom'
+ > & {
+ 	/**
+ 	 * A function that receives the value of the input.
+diff --git a/packages/components/src/textarea-control/index.tsx b/packages/components/src/textarea-control/index.tsx
+index 10b79f8188709e..92374d67fd5af9 100644
+--- a/packages/components/src/textarea-control/index.tsx
++++ b/packages/components/src/textarea-control/index.tsx
+@@ -43,6 +43,7 @@ export function TextareaControl(
+ 	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >
+ ) {
+ 	const {
++		__nextHasNoMarginBottom,
+ 		label,
+ 		hideLabelFromVision,
+ 		value,
+@@ -59,6 +60,7 @@ export function TextareaControl(
+ 
+ 	return (
+ 		<BaseControl
++			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 			label={ label }
+ 			hideLabelFromVision={ hideLabelFromVision }
+ 			id={ id }
+diff --git a/packages/components/src/textarea-control/types.ts b/packages/components/src/textarea-control/types.ts
+index 9a66164577cb38..51bf152920b498 100644
+--- a/packages/components/src/textarea-control/types.ts
++++ b/packages/components/src/textarea-control/types.ts
+@@ -10,7 +10,7 @@ import type { BaseControlProps } from '../base-control/types';
+ 
+ export type TextareaControlProps = Pick<
+ 	BaseControlProps,
+-	'hideLabelFromVision' | 'help' | 'label'
++	'hideLabelFromVision' | 'help' | 'label' | '__nextHasNoMarginBottom'
+ > & {
+ 	/**
+ 	 * A function that receives the new value of the textarea each time it

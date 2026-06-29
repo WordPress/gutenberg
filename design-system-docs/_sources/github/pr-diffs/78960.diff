@@ -1,0 +1,64 @@
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 017b8d77cb561a..52d6ebfdb6fbf5 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -10,6 +10,10 @@
+ 
+ -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+ 
++### Documentation
++
++-   Include DataViews components in [WordPress Design System MCP Server](https://github.com/WordPress/gutenberg/tree/trunk/packages/design-system-mcp) documented components ([#78960](https://github.com/WordPress/gutenberg/pull/78960)).
++
+ ## 15.0.0 (2026-05-27)
+ 
+ ### Breaking Changes
+diff --git a/packages/dataviews/src/dataform/stories/content.story.tsx b/packages/dataviews/src/dataform/stories/content.story.tsx
+index d819856590b54b..8e23df97f8de2a 100644
+--- a/packages/dataviews/src/dataform/stories/content.story.tsx
++++ b/packages/dataviews/src/dataform/stories/content.story.tsx
+@@ -18,7 +18,7 @@ const meta: Meta< typeof DataForm > = {
+ 	parameters: {
+ 		controls: { disable: true },
+ 	},
+-	tags: [ '!dev' /* Hide individual story pages from sidebar */ ],
++	tags: [ '!dev' /* Hide individual story pages from sidebar */, 'manifest' ],
+ };
+ export default meta;
+ 
+diff --git a/packages/dataviews/src/dataform/stories/index.story.tsx b/packages/dataviews/src/dataform/stories/index.story.tsx
+index dd094de7469c1b..0c0d7778391859 100644
+--- a/packages/dataviews/src/dataform/stories/index.story.tsx
++++ b/packages/dataviews/src/dataform/stories/index.story.tsx
+@@ -13,6 +13,7 @@ import ValidationComponent from './validation';
+ import VisibilityComponent from './visibility';
+ 
+ const meta = {
++	tags: [ 'manifest' ],
+ 	title: 'DataViews/DataForm',
+ 	component: DataForm,
+ };
+diff --git a/packages/dataviews/src/dataviews-picker/stories/index.story.tsx b/packages/dataviews/src/dataviews-picker/stories/index.story.tsx
+index 9f4236022899f5..7f264526dc5d8c 100644
+--- a/packages/dataviews/src/dataviews-picker/stories/index.story.tsx
++++ b/packages/dataviews/src/dataviews-picker/stories/index.story.tsx
+@@ -20,6 +20,7 @@ import type { ActionButton, View } from '../../types';
+ import { data, fields, type SpaceObject } from './fixtures';
+ 
+ const meta = {
++	tags: [ 'manifest' ],
+ 	title: 'DataViews/DataViewsPicker',
+ 	component: DataViewsPicker,
+ } as Meta< typeof DataViewsPicker >;
+diff --git a/packages/dataviews/src/dataviews/stories/index.story.tsx b/packages/dataviews/src/dataviews/stories/index.story.tsx
+index f24664b6bda9e0..6e41bbf49a0997 100644
+--- a/packages/dataviews/src/dataviews/stories/index.story.tsx
++++ b/packages/dataviews/src/dataviews/stories/index.story.tsx
+@@ -21,6 +21,7 @@ import EmptyComponent from './empty';
+ import './style.css';
+ 
+ const meta = {
++	tags: [ 'manifest' ],
+ 	title: 'DataViews/DataViews',
+ 	component: DataViews,
+ 	args: {

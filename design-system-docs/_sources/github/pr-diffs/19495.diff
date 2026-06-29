@@ -1,0 +1,41 @@
+diff --git a/packages/block-library/src/embed/style.scss b/packages/block-library/src/embed/style.scss
+index c82f373f9e57e9..332be56affc5ad 100644
+--- a/packages/block-library/src/embed/style.scss
++++ b/packages/block-library/src/embed/style.scss
+@@ -18,6 +18,14 @@
+ 	// The embed block is in a `figure` element, and many themes zero this out.
+ 	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
+ 	margin-bottom: 1em;
++
++	.components-placeholder__input {
++		margin-bottom: 0;
++	}
++
++	.components-placeholder__fieldset .components-button {
++		margin-bottom: 0;
++	}
+ }
+ 
+ .wp-embed-responsive {
+diff --git a/packages/components/src/placeholder/style.scss b/packages/components/src/placeholder/style.scss
+index beaac89a7c30c3..eaa031c77f5d4e 100644
+--- a/packages/components/src/placeholder/style.scss
++++ b/packages/components/src/placeholder/style.scss
+@@ -66,7 +66,8 @@
+ }
+ 
+ .components-placeholder__input {
+-	margin: 0 8px 0 0;
++	margin-top: 0;
++	margin-right: 8px;
+ 	flex: 1 1 auto;
+ }
+ 
+@@ -84,7 +85,6 @@
+ 	margin-bottom: $grid-size; // If buttons wrap we need vertical space between.
+ 
+ 	&:last-child {
+-		margin-bottom: 0;
+ 		margin-right: 0;
+ 	}
+ }

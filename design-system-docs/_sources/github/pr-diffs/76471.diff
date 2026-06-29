@@ -1,0 +1,117 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d88c350fe5fee1..d72d426977dc62 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ ### Enhancements
+ 
++-   `SandBox`: Add `allowForms` prop to optionally enable form interactions within the sandboxed iframe ([#76471](https://github.com/WordPress/gutenberg/pull/76471)).
+ -   `DateCalendar`, `DateRangeCalendar`: Add `showOutsideDays` and `fixedWeeks` props and style outside-month days ([#76199](https://github.com/WordPress/gutenberg/pull/76199)).
+ 
+ ### Internal
+diff --git a/packages/components/src/sandbox/index.tsx b/packages/components/src/sandbox/index.tsx
+index 14c57b42d566ab..3eb75520fecab9 100644
+--- a/packages/components/src/sandbox/index.tsx
++++ b/packages/components/src/sandbox/index.tsx
+@@ -133,6 +133,7 @@ function SandBox( {
+ 	scripts = [],
+ 	onFocus,
+ 	tabIndex,
++	allowForms = false,
+ }: SandBoxProps ) {
+ 	const ref = useRef< HTMLIFrameElement >( null );
+ 	const [ width, setWidth ] = useState( 0 );
+@@ -284,7 +285,9 @@ function SandBox( {
+ 			title={ title }
+ 			tabIndex={ tabIndex }
+ 			className="components-sandbox"
+-			sandbox="allow-scripts allow-same-origin allow-presentation"
++			sandbox={ `allow-scripts allow-same-origin allow-presentation ${
++				allowForms ? 'allow-forms' : ''
++			}` }
+ 			onFocus={ onFocus }
+ 			width={ Math.ceil( width ) }
+ 			height={ Math.ceil( height ) }
+diff --git a/packages/components/src/sandbox/stories/index.story.tsx b/packages/components/src/sandbox/stories/index.story.tsx
+index c33ca8a43d1cc3..b27e4c8d46e78c 100644
+--- a/packages/components/src/sandbox/stories/index.story.tsx
++++ b/packages/components/src/sandbox/stories/index.story.tsx
+@@ -35,4 +35,11 @@ const Template: StoryFn< typeof SandBox > = ( args ) => <SandBox { ...args } />;
+ export const Default = Template.bind( {} );
+ Default.args = {
+ 	html: '<p>Arbitrary HTML content</p>',
++	allowForms: false,
++};
++
++export const WithForm = Template.bind( {} );
++WithForm.args = {
++	html: '<form action="#"><label for="name">Name</label><input id="name" type="text" /><button type="submit">Submit</button></form>',
++	allowForms: true,
+ };
+diff --git a/packages/components/src/sandbox/test/index.tsx b/packages/components/src/sandbox/test/index.tsx
+index e1a51814ecab61..9c35aabb2fec31 100644
+--- a/packages/components/src/sandbox/test/index.tsx
++++ b/packages/components/src/sandbox/test/index.tsx
+@@ -14,6 +14,9 @@ import { useState } from '@wordpress/element';
+ import SandBox from '..';
+ 
+ describe( 'SandBox', () => {
++	const disableMutationObserver =
++		'<script type="text/javascript">window.MutationObserver = null;</script>';
++
+ 	const TestWrapper = () => {
+ 		const [ html, setHtml ] = useState(
+ 			// MutationObserver implementation from JSDom does not work as intended
+@@ -38,6 +41,36 @@ describe( 'SandBox', () => {
+ 		);
+ 	};
+ 
++	it( 'should not include allow-forms in sandbox attribute by default', () => {
++		render(
++			<SandBox html={ disableMutationObserver } title="Test SandBox" />
++		);
++
++		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Test SandBox' );
++
++		expect( iframe ).toHaveAttribute(
++			'sandbox',
++			expect.not.stringContaining( 'allow-forms' )
++		);
++	} );
++
++	it( 'should include allow-forms in sandbox attribute when allowForms is true', () => {
++		render(
++			<SandBox
++				html={ disableMutationObserver }
++				title="Test SandBox"
++				allowForms
++			/>
++		);
++
++		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Test SandBox' );
++
++		expect( iframe ).toHaveAttribute(
++			'sandbox',
++			expect.stringContaining( 'allow-forms' )
++		);
++	} );
++
+ 	it( 'should rerender with new emdeded content if html prop changes', () => {
+ 		render( <TestWrapper /> );
+ 
+diff --git a/packages/components/src/sandbox/types.ts b/packages/components/src/sandbox/types.ts
+index 76f98da45c8c63..adb17e76746ab8 100644
+--- a/packages/components/src/sandbox/types.ts
++++ b/packages/components/src/sandbox/types.ts
+@@ -37,4 +37,10 @@ export type SandBoxProps = {
+ 	 * @default 0
+ 	 */
+ 	tabIndex?: HTMLElement[ 'tabIndex' ];
++	/**
++	 * Whether to allow forms in the iframe.
++	 *
++	 * @default false
++	 */
++	allowForms?: boolean;
+ };

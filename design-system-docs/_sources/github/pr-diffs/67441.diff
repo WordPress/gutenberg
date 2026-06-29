@@ -1,0 +1,219 @@
+diff --git a/packages/block-editor/src/components/font-appearance-control/index.js b/packages/block-editor/src/components/font-appearance-control/index.js
+index 38cb42e394a3bd..f9e8023f93ec69 100644
+--- a/packages/block-editor/src/components/font-appearance-control/index.js
++++ b/packages/block-editor/src/components/font-appearance-control/index.js
+@@ -153,6 +153,7 @@ export default function FontAppearanceControl( props ) {
+ 				{ ...otherProps }
+ 				className="components-font-appearance-control"
+ 				__next40pxDefaultSize={ __next40pxDefaultSize }
++				__shouldNotWarnDeprecated36pxSize
+ 				label={ label }
+ 				describedBy={ getDescribedBy() }
+ 				options={ selectOptions }
+diff --git a/packages/block-editor/src/components/font-family/index.js b/packages/block-editor/src/components/font-family/index.js
+index 045d4d5c73ed30..e8d0d7ed2dd808 100644
+--- a/packages/block-editor/src/components/font-family/index.js
++++ b/packages/block-editor/src/components/font-family/index.js
+@@ -61,6 +61,7 @@ export default function FontFamilyControl( {
+ 	return (
+ 		<CustomSelectControl
+ 			__next40pxDefaultSize={ __next40pxDefaultSize }
++			__shouldNotWarnDeprecated36pxSize
+ 			label={ __( 'Font' ) }
+ 			value={ value }
+ 			onChange={ ( { selectedItem } ) => onChange( selectedItem.key ) }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 748525d6d9c15e..14825272ca78b8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `BoxControl`: Passive deprecate `onMouseOver`/`onMouseOut`. Pass to the `inputProps` prop instead ([#67332](https://github.com/WordPress/gutenberg/pull/67332)).
+ -   `BoxControl`: Deprecate 36px default size ([#66704](https://github.com/WordPress/gutenberg/pull/66704)).
++-   `CustomSelectControl`: Deprecate 36px default size ([#67441](https://github.com/WordPress/gutenberg/pull/67441)).
+ -   `NumberControl`: Deprecate 36px default size ([#66730](https://github.com/WordPress/gutenberg/pull/66730)).
+ -   `UnitControl`: Deprecate 36px default size ([#66791](https://github.com/WordPress/gutenberg/pull/66791)).
+ 
+diff --git a/packages/components/src/custom-select-control/README.md b/packages/components/src/custom-select-control/README.md
+index a764a0df133eab..6c175b1fcc5d24 100644
+--- a/packages/components/src/custom-select-control/README.md
++++ b/packages/components/src/custom-select-control/README.md
+@@ -41,6 +41,7 @@ function MyCustomSelectControl() {
+ 	const [ , setFontSize ] = useState();
+ 	return (
+ 		<CustomSelectControl
++			__next40pxDefaultSize
+ 			label="Font Size"
+ 			options={ options }
+ 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
+@@ -52,6 +53,7 @@ function MyControlledCustomSelectControl() {
+ 	const [ fontSize, setFontSize ] = useState( options[ 0 ] );
+ 	return (
+ 		<CustomSelectControl
++			__next40pxDefaultSize
+ 			label="Font Size"
+ 			options={ options }
+ 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
+diff --git a/packages/components/src/custom-select-control/index.tsx b/packages/components/src/custom-select-control/index.tsx
+index ecd9dc37a8f491..74da8a5c741060 100644
+--- a/packages/components/src/custom-select-control/index.tsx
++++ b/packages/components/src/custom-select-control/index.tsx
+@@ -18,6 +18,7 @@ import CustomSelectItem from '../custom-select-control-v2/item';
+ import * as Styled from '../custom-select-control-v2/styles';
+ import type { CustomSelectProps, CustomSelectOption } from './types';
+ import { VisuallyHidden } from '../visually-hidden';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ function useDeprecatedProps< T extends CustomSelectOption >( {
+ 	__experimentalShowSelectedHint,
+@@ -56,6 +57,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
+ ) {
+ 	const {
+ 		__next40pxDefaultSize = false,
++		__shouldNotWarnDeprecated36pxSize,
+ 		describedBy,
+ 		options,
+ 		onChange,
+@@ -66,6 +68,13 @@ function CustomSelectControl< T extends CustomSelectOption >(
+ 		...restProps
+ 	} = useDeprecatedProps( props );
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'CustomSelectControl',
++		__next40pxDefaultSize,
++		size,
++		__shouldNotWarnDeprecated36pxSize,
++	} );
++
+ 	const descriptionId = useInstanceId(
+ 		CustomSelectControl,
+ 		'custom-select-control__description'
+diff --git a/packages/components/src/custom-select-control/stories/index.story.tsx b/packages/components/src/custom-select-control/stories/index.story.tsx
+index 7c743de58d202d..9d430b639547c6 100644
+--- a/packages/components/src/custom-select-control/stories/index.story.tsx
++++ b/packages/components/src/custom-select-control/stories/index.story.tsx
+@@ -63,6 +63,7 @@ const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
+ 
+ export const Default = Template.bind( {} );
+ Default.args = {
++	__next40pxDefaultSize: true,
+ 	label: 'Label',
+ 	options: [
+ 		{
+diff --git a/packages/components/src/custom-select-control/test/index.tsx b/packages/components/src/custom-select-control/test/index.tsx
+index b2ac5c19c6ab3f..61d212c26c619e 100644
+--- a/packages/components/src/custom-select-control/test/index.tsx
++++ b/packages/components/src/custom-select-control/test/index.tsx
+@@ -13,7 +13,11 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import UncontrolledCustomSelectControl from '..';
++import _CustomSelectControl from '..';
++
++const UncontrolledCustomSelectControl = (
++	props: React.ComponentProps< typeof _CustomSelectControl >
++) => <_CustomSelectControl __next40pxDefaultSize { ...props } />;
+ 
+ const customClassName = 'amber-skies';
+ const customStyles = {
+@@ -716,7 +720,7 @@ describe( 'Type checking', () => {
+ 
+ 		const onChange = (): void => {};
+ 
+-		<UncontrolledCustomSelectControl
++		<_CustomSelectControl
+ 			label="Label"
+ 			options={ options }
+ 			value={ {
+@@ -726,7 +730,7 @@ describe( 'Type checking', () => {
+ 			onChange={ onChange }
+ 		/>;
+ 
+-		<UncontrolledCustomSelectControl
++		<_CustomSelectControl
+ 			label="Label"
+ 			options={ options }
+ 			value={ {
+@@ -736,7 +740,7 @@ describe( 'Type checking', () => {
+ 			onChange={ onChange }
+ 		/>;
+ 
+-		<UncontrolledCustomSelectControl
++		<_CustomSelectControl
+ 			label="Label"
+ 			options={ options }
+ 			value={ {
+@@ -748,7 +752,7 @@ describe( 'Type checking', () => {
+ 			onChange={ onChange }
+ 		/>;
+ 
+-		<UncontrolledCustomSelectControl
++		<_CustomSelectControl
+ 			label="Label"
+ 			options={ options }
+ 			value={ {
+@@ -764,7 +768,7 @@ describe( 'Type checking', () => {
+ 			}
+ 		/>;
+ 
+-		<UncontrolledCustomSelectControl
++		<_CustomSelectControl
+ 			label="Label"
+ 			options={ optionsReadOnly }
+ 			value={ {
+@@ -774,7 +778,7 @@ describe( 'Type checking', () => {
+ 			onChange={ onChange }
+ 		/>;
+ 
+-		<UncontrolledCustomSelectControl
++		<_CustomSelectControl
+ 			label="Label"
+ 			options={ optionsReadOnly }
+ 			value={ {
+@@ -785,7 +789,7 @@ describe( 'Type checking', () => {
+ 			onChange={ onChange }
+ 		/>;
+ 
+-		<UncontrolledCustomSelectControl
++		<_CustomSelectControl
+ 			label="Label"
+ 			options={ optionsReadOnly }
+ 			value={ {
+@@ -797,7 +801,7 @@ describe( 'Type checking', () => {
+ 			onChange={ onChange }
+ 		/>;
+ 
+-		<UncontrolledCustomSelectControl
++		<_CustomSelectControl
+ 			label="Label"
+ 			options={ optionsReadOnly }
+ 			value={ {
+diff --git a/packages/components/src/custom-select-control/types.ts b/packages/components/src/custom-select-control/types.ts
+index 0cbc2388e79638..dd3db6d3bb0f95 100644
+--- a/packages/components/src/custom-select-control/types.ts
++++ b/packages/components/src/custom-select-control/types.ts
+@@ -120,4 +120,11 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
+ 	 * @default false
+ 	 */
+ 	__next40pxDefaultSize?: boolean;
++	/**
++	 * Do not throw a warning for the deprecated 36px default size.
++	 * For internal components of other components that already throw the warning.
++	 *
++	 * @ignore
++	 */
++	__shouldNotWarnDeprecated36pxSize?: boolean;
+ };
+diff --git a/packages/components/src/font-size-picker/font-size-picker-select.tsx b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+index 19eaba1cfbecd0..b33c382f3393e4 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-select.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+@@ -69,6 +69,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
+ 	return (
+ 		<CustomSelectControl
+ 			__next40pxDefaultSize={ __next40pxDefaultSize }
++			__shouldNotWarnDeprecated36pxSize
+ 			className="components-font-size-picker__select"
+ 			label={ __( 'Font size' ) }
+ 			hideLabelFromVision

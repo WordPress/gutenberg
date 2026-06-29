@@ -1,0 +1,216 @@
+diff --git a/lib/compat/wordpress-6.1/date-settings.php b/lib/compat/wordpress-6.1/date-settings.php
+new file mode 100644
+index 00000000000000..bdc65ede58cc3e
+--- /dev/null
++++ b/lib/compat/wordpress-6.1/date-settings.php
+@@ -0,0 +1,82 @@
++<?php
++/**
++ * Updates to the settings given to @wordpress/date.
++ *
++ * @package gutenberg
++ */
++
++/**
++ * Removes the call to wp.date.setSettings() added by Core and adds our own call
++ * to wp.date.setSettings().
++ *
++ * This lets us add a new l10n.dayOfWeek setting.
++ *
++ * To merge this into Core, simply update the wp.date.setSettings() call in
++ * wp_default_packages_inline_scripts.
++ *
++ * @param WP_Scripts $scripts WP_Scripts object.
++ */
++function gutenberg_update_date_settings( $scripts ) {
++	global $wp_locale;
++
++	$inline_scripts = $scripts->get_data( 'wp-date', 'after' );
++	if ( $inline_scripts ) {
++		foreach ( $inline_scripts as $index => $inline_script ) {
++			if ( str_starts_with( $inline_script, 'wp.date.setSettings' ) ) {
++				unset( $scripts->registered['wp-date']->extra['after'][ $index ] );
++			}
++		}
++	}
++
++	// Calculate the timezone abbr (EDT, PST) if possible.
++	$timezone_string = get_option( 'timezone_string', 'UTC' );
++	$timezone_abbr   = '';
++
++	if ( ! empty( $timezone_string ) ) {
++		$timezone_date = new DateTime( 'now', new DateTimeZone( $timezone_string ) );
++		$timezone_abbr = $timezone_date->format( 'T' );
++	}
++
++	$scripts->add_inline_script(
++		'wp-date',
++		sprintf(
++			'wp.date.setSettings( %s );',
++			wp_json_encode(
++				array(
++					'l10n'     => array(
++						'locale'        => get_user_locale(),
++						'months'        => array_values( $wp_locale->month ),
++						'monthsShort'   => array_values( $wp_locale->month_abbrev ),
++						'weekdays'      => array_values( $wp_locale->weekday ),
++						'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
++						'meridiem'      => (object) $wp_locale->meridiem,
++						'relative'      => array(
++							/* translators: %s: Duration. */
++							'future' => __( '%s from now', 'gutenberg' ),
++							/* translators: %s: Duration. */
++							'past'   => __( '%s ago', 'gutenberg' ),
++						),
++						'startOfWeek'   => (int) get_option( 'start_of_week', 0 ),
++					),
++					'formats'  => array(
++						/* translators: Time format, see https://www.php.net/manual/datetime.format.php */
++						'time'                => get_option( 'time_format', __( 'g:i a', 'gutenberg' ) ),
++						/* translators: Date format, see https://www.php.net/manual/datetime.format.php */
++						'date'                => get_option( 'date_format', __( 'F j, Y', 'gutenberg' ) ),
++						/* translators: Date/Time format, see https://www.php.net/manual/datetime.format.php */
++						'datetime'            => __( 'F j, Y g:i a', 'gutenberg' ),
++						/* translators: Abbreviated date/time format, see https://www.php.net/manual/datetime.format.php */
++						'datetimeAbbreviated' => __( 'M j, Y g:i a', 'gutenberg' ),
++					),
++					'timezone' => array(
++						'offset' => get_option( 'gmt_offset', 0 ),
++						'string' => $timezone_string,
++						'abbr'   => $timezone_abbr,
++					),
++				)
++			)
++		),
++		'after'
++	);
++}
++add_action( 'wp_default_scripts', 'gutenberg_update_date_settings' );
+diff --git a/lib/load.php b/lib/load.php
+index 0791c511518fc3..f7cad4597b6928 100644
+--- a/lib/load.php
++++ b/lib/load.php
+@@ -130,6 +130,7 @@ function gutenberg_is_experiment_enabled( $name ) {
+ require __DIR__ . '/compat/wordpress-6.1/block-template-utils.php';
+ require __DIR__ . '/compat/wordpress-6.1/wp-theme-get-post-templates.php';
+ require __DIR__ . '/compat/wordpress-6.1/script-loader.php';
++require __DIR__ . '/compat/wordpress-6.1/date-settings.php';
+ 
+ // Experimental features.
+ remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WP 6.0's stopgap handler for Webfonts API.
+diff --git a/packages/block-editor/src/components/publish-date-time-picker/index.js b/packages/block-editor/src/components/publish-date-time-picker/index.js
+index 52b4e95aefb51e..1013e03f4a7908 100644
+--- a/packages/block-editor/src/components/publish-date-time-picker/index.js
++++ b/packages/block-editor/src/components/publish-date-time-picker/index.js
+@@ -4,6 +4,7 @@
+ import { DateTimePicker } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import { forwardRef } from '@wordpress/element';
++import { __experimentalGetSettings as getSettings } from '@wordpress/date';
+ 
+ /**
+  * Internal dependencies
+@@ -27,6 +28,7 @@ function PublishDateTimePicker(
+ 				onClose={ onClose }
+ 			/>
+ 			<DateTimePicker
++				startOfWeek={ getSettings().l10n.startOfWeek }
+ 				__nextRemoveHelpButton
+ 				__nextRemoveResetButton
+ 				onChange={ onChange }
+diff --git a/packages/components/src/date-time/README.md b/packages/components/src/date-time/README.md
+index 6784af6c15ceb0..e01d9074953f25 100644
+--- a/packages/components/src/date-time/README.md
++++ b/packages/components/src/date-time/README.md
+@@ -77,6 +77,13 @@ List of events to show in the date picker. Each event will appear as a dot on th
+ -   Type: `Array`
+ -   Required: No
+ 
++### `startOfWeek`: `number`
++
++The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
++
++- Required: No
++- Default: 0
++
+ ### `__nextRemoveHelpButton`: `boolean`
+ 
+ Start opting in to not displaying a Help button which will become the default in a future version.
+diff --git a/packages/components/src/date-time/date-time/index.tsx b/packages/components/src/date-time/date-time/index.tsx
+index 0f9997403c3631..d5e0726c9d3c4e 100644
+--- a/packages/components/src/date-time/date-time/index.tsx
++++ b/packages/components/src/date-time/date-time/index.tsx
+@@ -33,6 +33,7 @@ function UnforwardedDateTimePicker(
+ 		onMonthPreviewed = noop,
+ 		onChange,
+ 		events,
++		startOfWeek,
+ 		__nextRemoveHelpButton = false,
+ 		__nextRemoveResetButton = false,
+ 	}: DateTimePickerProps,
+@@ -78,6 +79,7 @@ function UnforwardedDateTimePicker(
+ 						isInvalidDate={ isInvalidDate }
+ 						events={ events }
+ 						onMonthPreviewed={ onMonthPreviewed }
++						startOfWeek={ startOfWeek }
+ 					/>
+ 				</>
+ 			) }
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index 089248fd33c6d4..e7ef8cd9892603 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -103,6 +103,7 @@ export function DatePicker( {
+ 	events,
+ 	isInvalidDate,
+ 	onMonthPreviewed,
++	startOfWeek = 0,
+ }: DatePickerProps ) {
+ 	const nodeRef = useRef< HTMLDivElement >( null );
+ 
+@@ -197,6 +198,7 @@ export function DatePicker( {
+ 				isOutsideRange={ ( date ) => {
+ 					return !! isInvalidDate && isInvalidDate( date.toDate() );
+ 				} }
++				firstDayOfWeek={ startOfWeek }
+ 				onPrevMonthClick={ onMonthPreviewedHandler }
+ 				onNextMonthClick={ onMonthPreviewedHandler }
+ 				renderDayContents={ ( day ) => (
+diff --git a/packages/components/src/date-time/types.ts b/packages/components/src/date-time/types.ts
+index 512ea0e4ea3f07..5e4f6ec5339a6a 100644
+--- a/packages/components/src/date-time/types.ts
++++ b/packages/components/src/date-time/types.ts
+@@ -76,6 +76,13 @@ export type DatePickerProps = {
+ 	 * dot on the day of the event.
+ 	 */
+ 	events?: DatePickerEvent[];
++
++	/**
++	 * The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
++	 *
++	 * @default 0
++	 */
++	startOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+ };
+ 
+ export type DateTimePickerProps = Omit< DatePickerProps, 'onChange' > &
+diff --git a/packages/date/src/index.js b/packages/date/src/index.js
+index 3c70855dec4a26..fe593d3894c07b 100644
+--- a/packages/date/src/index.js
++++ b/packages/date/src/index.js
+@@ -41,6 +41,7 @@ import 'moment-timezone/moment-timezone-utils';
+  * @property {MomentLocaleSpecification['weekdaysShort']} weekdaysShort Locale weekdays short.
+  * @property {MeridiemConfig}                             meridiem      Meridiem config.
+  * @property {MomentLocaleSpecification['relativeTime']}  relative      Relative time config.
++ * @property {0|1|2|3|4|5|6}                              startOfWeek   Day that the week starts on.
+  */
+ /* eslint-enable jsdoc/valid-types */
+ 
+@@ -118,6 +119,7 @@ let settings = {
+ 			y: 'a year',
+ 			yy: '%d years',
+ 		},
++		startOfWeek: 0,
+ 	},
+ 	formats: {
+ 		time: 'g: i a',

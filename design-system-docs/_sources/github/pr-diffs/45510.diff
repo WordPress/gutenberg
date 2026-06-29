@@ -1,0 +1,37 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 02572459bcc6b5..a9b7b625857135 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `ColorPalette`, `BorderBox`, `BorderBoxControl`: polish and DRY prop types, add default values ([#45463](https://github.com/WordPress/gutenberg/pull/45463)).
+ 
++### Bug Fix
++
++-   `Autocomplete`: Fix unexpected block insertion during IME composition ([#45510](https://github.com/WordPress/gutenberg/pull/45510)).
++
+ ## 22.0.0 (2022-11-02)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/autocomplete/index.js b/packages/components/src/autocomplete/index.js
+index ce2b0e861a0eee..862dc4225ecd1a 100644
+--- a/packages/components/src/autocomplete/index.js
++++ b/packages/components/src/autocomplete/index.js
+@@ -212,7 +212,7 @@ function useAutocomplete( {
+ 	}
+ 
+ 	function handleKeyDown( event ) {
+-		backspacing.current = event.code === 'Backspace';
++		backspacing.current = event.key === 'Backspace';
+ 
+ 		if ( ! autocompleter ) {
+ 			return;
+@@ -223,7 +223,7 @@ function useAutocomplete( {
+ 		if ( event.defaultPrevented ) {
+ 			return;
+ 		}
+-		switch ( event.code ) {
++		switch ( event.key ) {
+ 			case 'ArrowUp':
+ 				setSelectedIndex(
+ 					( selectedIndex === 0

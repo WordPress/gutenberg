@@ -1,0 +1,148 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..90b11ccb6d6317 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `ItemGroup`: Remove "experimental" designation ([#61060](https://github.com/WordPress/gutenberg/pull/61060)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..0fb4e5e198abf0 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -97,8 +97,12 @@ export { default as Icon } from './icon';
+ export type { IconType } from './icon';
+ export { default as IconButton } from './button/deprecated';
+ export {
++	/**
++	 * @deprecated Import `ItemGroup` instead.
++	 */
+ 	ItemGroup as __experimentalItemGroup,
+ 	Item as __experimentalItem,
++	ItemGroup,
+ } from './item-group';
+ export { default as __experimentalInputControl } from './input-control';
+ export { default as __experimentalInputControlPrefixWrapper } from './input-control/input-prefix-wrapper';
+diff --git a/packages/components/src/item-group/item-group/README.md b/packages/components/src/item-group/item-group/README.md
+index 773883f3d9e49d..a1daac0a2c85f8 100644
+--- a/packages/components/src/item-group/item-group/README.md
++++ b/packages/components/src/item-group/item-group/README.md
+@@ -1,9 +1,5 @@
+ # `ItemGroup`
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `ItemGroup` displays a list of `Item`s grouped and styled together.
+ 
+ ## Usage
+@@ -12,7 +8,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ ```jsx
+ import {
+-	__experimentalItemGroup as ItemGroup,
++	ItemGroup,
+ 	__experimentalItem as Item,
+ } from '@wordpress/components';
+ 
+@@ -66,7 +62,7 @@ In the following example, the `<Item />` will render with a size of `small`:
+ 
+ ```jsx
+ import {
+-	__experimentalItemGroup as ItemGroup,
++	ItemGroup,
+ 	__experimentalItem as Item,
+ } from '@wordpress/components';
+ 
+diff --git a/packages/components/src/item-group/item-group/component.tsx b/packages/components/src/item-group/item-group/component.tsx
+index 6bfae11dd4f85f..1d7b34ce5b300e 100644
+--- a/packages/components/src/item-group/item-group/component.tsx
++++ b/packages/components/src/item-group/item-group/component.tsx
+@@ -46,7 +46,7 @@ function UnconnectedItemGroup(
+  *
+  * ```jsx
+  * import {
+- *   __experimentalItemGroup as ItemGroup,
++ *   ItemGroup,
+  *   __experimentalItem as Item,
+  * } from '@wordpress/components';
+  *
+diff --git a/packages/components/src/item-group/item/README.md b/packages/components/src/item-group/item/README.md
+index 093d9fc192f6d7..cfd298f0ba7181 100644
+--- a/packages/components/src/item-group/item/README.md
++++ b/packages/components/src/item-group/item/README.md
+@@ -1,9 +1,5 @@
+ # `Item`
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `Item` is used in combination with `ItemGroup` to display a list of items grouped and styled together.
+ 
+ ## Usage
+@@ -12,7 +8,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ ```jsx
+ import {
+-	__experimentalItemGroup as ItemGroup,
++	ItemGroup,
+ 	__experimentalItem as Item,
+ } from '@wordpress/components';
+ 
+@@ -50,7 +46,7 @@ In the following example, the `<Item />` will render with a size of `small`:
+ 
+ ```jsx
+ import {
+-	__experimentalItemGroup as ItemGroup,
++	ItemGroup,
+ 	__experimentalItem as Item,
+ } from '@wordpress/components';
+ 
+diff --git a/packages/components/src/item-group/item/component.tsx b/packages/components/src/item-group/item/component.tsx
+index f3f11617312a7c..5ede51c8e88a78 100644
+--- a/packages/components/src/item-group/item/component.tsx
++++ b/packages/components/src/item-group/item/component.tsx
+@@ -31,7 +31,7 @@ function UnconnectedItem(
+  *
+  * ```jsx
+  * import {
+- *   __experimentalItemGroup as ItemGroup,
++ *   ItemGroup,
+  *   __experimentalItem as Item,
+  * } from '@wordpress/components';
+  *
+diff --git a/packages/components/src/item-group/stories/index.story.tsx b/packages/components/src/item-group/stories/index.story.tsx
+index 473cdfedbf4f12..ee68d6bd9bb0e1 100644
+--- a/packages/components/src/item-group/stories/index.story.tsx
++++ b/packages/components/src/item-group/stories/index.story.tsx
+@@ -15,7 +15,7 @@ const meta: Meta< typeof ItemGroup > = {
+ 	component: ItemGroup,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { Item },
+-	title: 'Components (Experimental)/ItemGroup',
++	title: 'Components/ItemGroup',
+ 	argTypes: {
+ 		as: { control: { type: null } },
+ 		children: { control: { type: null } },
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..19ec0e6fc2f2dc 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'itemgroup',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

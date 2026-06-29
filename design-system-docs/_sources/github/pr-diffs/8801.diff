@@ -1,0 +1,159 @@
+diff --git a/block-library/html/test/__snapshots__/index.js.snap b/block-library/html/test/__snapshots__/index.js.snap
+index 465266d93baeef..b971fb9bfc9664 100644
+--- a/block-library/html/test/__snapshots__/index.js.snap
++++ b/block-library/html/test/__snapshots__/index.js.snap
+@@ -14,7 +14,7 @@ exports[`core/html block edit matches snapshot 1`] = `
+       class="components-placeholder__fieldset"
+     >
+       <span
+-        class="spinner is-active"
++        class="components-spinner"
+       />
+     </div>
+   </div>
+diff --git a/edit-post/assets/stylesheets/_animations.scss b/edit-post/assets/stylesheets/_animations.scss
+index d6cc20a0439139..23122f7fae7b10 100644
+--- a/edit-post/assets/stylesheets/_animations.scss
++++ b/edit-post/assets/stylesheets/_animations.scss
+@@ -44,3 +44,16 @@
+ 	animation: editor_region_focus $speed ease-out;
+ 	animation-fill-mode: forwards;
+ }
++
++@keyframes rotation {
++	from {
++		transform: rotate(0deg);
++	}
++	to {
++		transform: rotate(360deg);
++	}
++}
++
++@mixin animate_rotation($speed: 1s) {
++	animation: rotation $speed infinite linear;
++}
+diff --git a/edit-post/components/meta-boxes/meta-boxes-area/style.scss b/edit-post/components/meta-boxes/meta-boxes-area/style.scss
+index c5db0e0983d8c2..f336804fa38de1 100644
+--- a/edit-post/components/meta-boxes/meta-boxes-area/style.scss
++++ b/edit-post/components/meta-boxes/meta-boxes-area/style.scss
+@@ -69,7 +69,7 @@
+ 		z-index: z-index(".edit-post-meta-boxes-area.is-loading::before");
+ 	}
+ 
+-	.spinner {
++	.components-spinner {
+ 		position: absolute;
+ 		top: 10px;
+ 		right: 20px;
+diff --git a/packages/block-library/src/gallery/editor.scss b/packages/block-library/src/gallery/editor.scss
+index 3944df925eae17..160571cada5e2f 100644
+--- a/packages/block-library/src/gallery/editor.scss
++++ b/packages/block-library/src/gallery/editor.scss
+@@ -101,7 +101,7 @@
+ 	padding: 0;
+ }
+ 
+-.blocks-gallery-item .spinner {
++.blocks-gallery-item .components-spinner {
+ 	position: absolute;
+ 	top: 50%;
+ 	left: 50%;
+diff --git a/packages/components/src/spinner/index.js b/packages/components/src/spinner/index.js
+index 4e3c00b7845c1b..274dc2df474b35 100644
+--- a/packages/components/src/spinner/index.js
++++ b/packages/components/src/spinner/index.js
+@@ -1,3 +1 @@
+-const spinner = <span className="spinner is-active" />;
+-
+-export default () => spinner;
++export default () => <span className="components-spinner" />;
+diff --git a/packages/components/src/spinner/style.scss b/packages/components/src/spinner/style.scss
+new file mode 100644
+index 00000000000000..a8b34fdba0573b
+--- /dev/null
++++ b/packages/components/src/spinner/style.scss
+@@ -0,0 +1,24 @@
++.components-spinner {
++	display: inline-block;
++	background-color: $dark-gray-200;
++	width: 18px;
++	height: 18px;
++	opacity: 0.7;
++	float: right;
++	margin: 5px 11px 0;
++	border-radius: 100%;
++	position: relative;
++
++	&::before {
++		content: "";
++		position: absolute;
++		background-color: $white;
++		top: 3px;
++		left: 3px;
++		width: 4px;
++		height: 4px;
++		border-radius: 100%;
++		transform-origin: 6px 6px;
++		@include animate_rotation;
++	}
++}
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 2440ecea574730..b73dc2bac28517 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -30,6 +30,7 @@
+ @import "./responsive-wrapper/style.scss";
+ @import "./scroll-lock/style.scss";
+ @import "./select-control/style.scss";
++@import "./spinner/style.scss";
+ @import "./text-control/style.scss";
+ @import "./textarea-control/style.scss";
+ @import "./toggle-control/style.scss";
+diff --git a/packages/editor/src/components/post-featured-image/style.scss b/packages/editor/src/components/post-featured-image/style.scss
+index 54bc23f8971ad7..48eecf10633d0f 100644
+--- a/packages/editor/src/components/post-featured-image/style.scss
++++ b/packages/editor/src/components/post-featured-image/style.scss
+@@ -1,7 +1,7 @@
+ .editor-post-featured-image {
+ 	padding: 0;
+ 
+-	.spinner {
++	.components-spinner {
+ 		margin: 0;
+ 	}
+ 
+diff --git a/packages/editor/src/components/post-publish-panel/style.scss b/packages/editor/src/components/post-publish-panel/style.scss
+index e5c7891e01b38b..884ec28d5c8cca 100644
+--- a/packages/editor/src/components/post-publish-panel/style.scss
++++ b/packages/editor/src/components/post-publish-panel/style.scss
+@@ -4,7 +4,7 @@
+ }
+ 
+ .editor-post-publish-panel__content {
+-	.spinner {
++	.components-spinner {
+ 		display: block;
+ 		float: none;
+ 		margin: 100px auto 0;
+diff --git a/packages/editor/src/components/url-input/style.scss b/packages/editor/src/components/url-input/style.scss
+index f383e32483f18d..717c95b7e9ecaf 100644
+--- a/packages/editor/src/components/url-input/style.scss
++++ b/packages/editor/src/components/url-input/style.scss
+@@ -23,7 +23,7 @@ $input-size: 230px;
+ 		}
+ 	}
+ 
+-	.spinner {
++	.components-spinner {
+ 		position: absolute;
+ 		right: 0;
+ 		top: $input-padding;
+@@ -41,7 +41,7 @@ $input-size: 230px;
+ 
+ // Hide suggestions on mobile until we @todo find a better way to show them
+ .editor-url-input__suggestions,
+-.editor-url-input .spinner {
++.editor-url-input .components-spinner {
+ 	display: none;
+ 	@include break-small() {
+ 		display: inherit;

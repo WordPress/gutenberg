@@ -1,0 +1,19 @@
+diff --git a/packages/components/src/higher-order/with-filters/test/index.js b/packages/components/src/higher-order/with-filters/test/index.js
+index 71760dc79d4cad..f933a547f58ad6 100644
+--- a/packages/components/src/higher-order/with-filters/test/index.js
++++ b/packages/components/src/higher-order/with-filters/test/index.js
+@@ -1,13 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import { render } from '@testing-library/react';
++import { act, render } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
+-import { act } from 'react-test-renderer';
+ 
+ /**
+  * Internal dependencies

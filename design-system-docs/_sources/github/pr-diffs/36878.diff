@@ -1,0 +1,115 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bdb1d8baa6da10..033cebd70932b4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fix
+ 
+ -   Replaced hardcoded blue in `ColorPicker` with UI theme color ([#36153](https://github.com/WordPress/gutenberg/pull/36153)).
++-   Fixed a bug which prevented setting `PM` hours correctly in the `DateTimePicker` ([#36878](https://github.com/WordPress/gutenberg/pull/36878)).
+ 
+ ### Enhancements
+ -   Added a `showTooltip` prop to `ToggleGroupControlOption` in order to display tooltip text (using `<Tooltip />`). ([#36726](https://github.com/WordPress/gutenberg/pull/36726)).
+diff --git a/packages/components/src/date-time/test/time.js b/packages/components/src/date-time/test/time.js
+index 7124e80e6c1b1a..523f2447e6acf2 100644
+--- a/packages/components/src/date-time/test/time.js
++++ b/packages/components/src/date-time/test/time.js
+@@ -47,13 +47,13 @@ describe( 'TimePicker', () => {
+ 		fireEvent.change( hoursInput, { target: { value: '12' } } );
+ 		fireEvent.blur( hoursInput );
+ 
+-		expect( onChangeSpy ).toHaveBeenCalledWith( '2018-12-22T12:00:00' );
++		expect( onChangeSpy ).toHaveBeenCalledWith( '2018-12-22T00:00:00' );
+ 		onChangeSpy.mockClear();
+ 
+ 		fireEvent.change( minutesInput, { target: { value: '35' } } );
+ 		fireEvent.blur( minutesInput );
+ 
+-		expect( onChangeSpy ).toHaveBeenCalledWith( '2018-12-22T12:35:00' );
++		expect( onChangeSpy ).toHaveBeenCalledWith( '2018-12-22T00:35:00' );
+ 		onChangeSpy.mockClear();
+ 	} );
+ 
+@@ -169,6 +169,36 @@ describe( 'TimePicker', () => {
+ 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T11:00:00' );
+ 	} );
+ 
++	it( 'should allow to set the time correctly when the PM period is selected', () => {
++		const onChangeSpy = jest.fn();
++
++		render(
++			<TimePicker
++				currentTime="1986-10-18T11:00:00"
++				onChange={ onChangeSpy }
++				is12Hour
++			/>
++		);
++
++		const pmButton = screen.getByText( 'PM' );
++		fireEvent.click( pmButton );
++
++		const hoursInput = screen.getByLabelText( 'Hours' );
++		fireEvent.change( hoursInput, { target: { value: '6' } } );
++		fireEvent.blur( hoursInput );
++
++		// When clicking on 'PM', we expect the time to be 11pm
++		expect( onChangeSpy ).toHaveBeenNthCalledWith(
++			1,
++			'1986-10-18T23:00:00'
++		);
++		// When changing the hours to '6', we expect the time to be 6pm
++		expect( onChangeSpy ).toHaveBeenNthCalledWith(
++			2,
++			'1986-10-18T18:00:00'
++		);
++	} );
++
+ 	it( 'should truncate at the minutes on change', () => {
+ 		const onChangeSpy = jest.fn();
+ 
+diff --git a/packages/components/src/date-time/time.js b/packages/components/src/date-time/time.js
+index 9063a6011a3357..098fba0d9cfabc 100644
+--- a/packages/components/src/date-time/time.js
++++ b/packages/components/src/date-time/time.js
+@@ -28,6 +28,10 @@ import TimeZone from './timezone';
+  */
+ const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+ 
++function from12hTo24h( hours, isPm ) {
++	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
++}
++
+ /**
+  * <UpdateOnBlurAsIntegerField>
+  * A shared component to parse, validate, and handle remounting of the underlying form field element like <input> and <select>.
+@@ -117,8 +121,16 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
+ 	}
+ 
+ 	function update( name, value ) {
++		// If the 12-hour format is being used and the 'PM' period is selected, then
++		// the incoming value (which ranges 1-12) should be increased by 12 to match
++		// the expected 24-hour format.
++		let adjustedValue = value;
++		if ( name === 'hours' && is12Hour ) {
++			adjustedValue = from12hTo24h( value, am === 'PM' );
++		}
++
+ 		// Clone the date and call the specific setter function according to `name`.
+-		const newDate = date.clone()[ name ]( value );
++		const newDate = date.clone()[ name ]( adjustedValue );
+ 		changeDate( newDate );
+ 	}
+ 
+@@ -132,11 +144,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
+ 
+ 			const newDate = date
+ 				.clone()
+-				.hours(
+-					value === 'PM'
+-						? ( ( parsedHours % 12 ) + 12 ) % 24
+-						: parsedHours % 12
+-				);
++				.hours( from12hTo24h( parsedHours, value === 'PM' ) );
+ 
+ 			changeDate( newDate );
+ 		};

@@ -1,0 +1,469 @@
+diff --git a/packages/block-editor/src/components/image-size-control/README.md b/packages/block-editor/src/components/image-size-control/README.md
+new file mode 100644
+index 00000000000000..21eb3cfa1823fb
+--- /dev/null
++++ b/packages/block-editor/src/components/image-size-control/README.md
+@@ -0,0 +1,108 @@
++# ImageSizeControl
++
++Allow users to control the width & height of an image.
++
++## Usage
++
++Render a ImageSizeControl.
++
++```jsx
++import { ImageSizeControl } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const MyImageSizeControl = withState( {
++	width: null,
++	height: null,
++} )( ( { width, height, setState } ) => {
++	// In this example, we have one image with a fixed size of 600x600.
++	const imageWidth = 600;
++	const imageHeight = 600;
++
++	return (
++		<ImageSizeControl
++			onChange={ ( value ) => setState( value ) }
++			width={ width }
++			height={ height }
++			imageWidth={ imageWidth }
++			imageHeight={ imageHeight }
++		/>
++	);
++} );
++```
++
++## Props
++
++The component accepts the following props:
++
++### slug
++
++The currently-selected image size slug (`thumbnail`, `large`, etc). This is used by the parent component to get the specific image, which is used to populate `imageHeight` & `imageWidth`. This is not required, but necessary when `imageSizeOptions` is used.
++
++- Type: `string`
++- Required: No
++
++### height
++
++The height of the image when displayed.
++
++- Type: `number`
++- Required: No
++
++### width
++
++The width of the image when displayed.
++
++- Type: `number`
++- Required: No
++
++### onChange
++
++The function called when the image size changes. It is passed an object with `{ width, height }` (potentially just one if only one dimension changed).
++
++- Type: `Function`
++- Required: Yes
++
++### onChangeImage
++
++The function called when a new image size is selected. It is passed the `slug` as an argument. This is not required, but necessary when `imageSizeOptions` is used.
++
++- Type: `Function`
++- Required: No
++
++### imageSizeOptions
++
++An array of image size slugs and labels. Should be of the format:
++
++```js
++[
++	{ value: 'thumbnail', label: 'Thumbnail' },
++	{ value: 'medium', label: 'Medium' },
++	...
++]
++```
++
++If not provided, the "Image Size" dropdown is not displayed.
++
++- Type: `array`
++- Required: No
++
++### isResizable
++
++A boolean control for showing the resize fields "Image Dimensions". Set this to false if you want images to always be the fixed size of the selected image.
++
++- Type: `boolean`
++- Required: No
++
++### imageWidth
++
++The width of the currently selected image, used for calculating the percentage sizes. This will likely be updated when the image size slug changes, but does not control the image display (that's the `width` prop).
++
++- Type: `number`
++- Required: Yes
++
++### imageHeight
++
++The height of the currently selected image, used for calculating the percentage sizes. This will likely be updated when the image size slug changes, but does not control the image display (that's the `height` prop).
++
++- Type: `number`
++- Required: Yes
+diff --git a/packages/block-editor/src/components/image-size-control/index.js b/packages/block-editor/src/components/image-size-control/index.js
+new file mode 100644
+index 00000000000000..f77227e650eb12
+--- /dev/null
++++ b/packages/block-editor/src/components/image-size-control/index.js
+@@ -0,0 +1,112 @@
++/**
++ * External dependencies
++ */
++import { isEmpty, noop } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++import { Button, ButtonGroup, SelectControl, TextControl } from '@wordpress/components';
++import { Component } from '@wordpress/element';
++
++class ImageSizeControl extends Component {
++	/**
++	 * Run additional operations during component initialization.
++	 *
++	 * @param {Object} props
++	 */
++	constructor( props ) {
++		super( props );
++
++		this.updateDimensions = this.updateDimensions.bind( this );
++	}
++
++	updateDimensions( width = undefined, height = undefined ) {
++		return () => {
++			this.props.onChange( { width, height } );
++		};
++	}
++
++	render() {
++		const {
++			imageWidth,
++			imageHeight,
++			imageSizeOptions = [],
++			isResizable = true,
++			slug,
++			width,
++			height,
++			onChange,
++			onChangeImage = noop,
++		} = this.props;
++
++		return (
++			<>
++				{ ! isEmpty( imageSizeOptions ) && (
++					<SelectControl
++						label={ __( 'Image Size' ) }
++						value={ slug }
++						options={ imageSizeOptions }
++						onChange={ onChangeImage }
++					/>
++				) }
++				{ isResizable && (
++					<div className="block-editor-image-size-control">
++						<p className="block-editor-image-size-control__row">
++							{ __( 'Image Dimensions' ) }
++						</p>
++						<div className="block-editor-image-size-control__row">
++							<TextControl
++								type="number"
++								className="block-editor-image-size-control__width"
++								label={ __( 'Width' ) }
++								value={ width || imageWidth || '' }
++								min={ 1 }
++								onChange={ ( value ) => onChange( { width: parseInt( value, 10 ) } ) }
++							/>
++							<TextControl
++								type="number"
++								className="block-editor-image-size-control__height"
++								label={ __( 'Height' ) }
++								value={ height || imageHeight || '' }
++								min={ 1 }
++								onChange={ ( value ) => onChange( { height: parseInt( value, 10 ) } ) }
++							/>
++						</div>
++						<div className="block-editor-image-size-control__row">
++							<ButtonGroup aria-label={ __( 'Image Size' ) }>
++								{ [ 25, 50, 75, 100 ].map( ( scale ) => {
++									const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
++									const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
++
++									const isCurrent = width === scaledWidth && height === scaledHeight;
++
++									return (
++										<Button
++											key={ scale }
++											isSmall
++											isPrimary={ isCurrent }
++											isPressed={ isCurrent }
++											onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
++										>
++											{ scale }%
++										</Button>
++									);
++								} ) }
++							</ButtonGroup>
++							<Button
++								isSmall
++								onClick={ this.updateDimensions() }
++							>
++								{ __( 'Reset' ) }
++							</Button>
++						</div>
++					</div>
++				) }
++			</>
++		);
++	}
++}
++
++export default ImageSizeControl;
+diff --git a/packages/block-editor/src/components/image-size-control/style.scss b/packages/block-editor/src/components/image-size-control/style.scss
+new file mode 100644
+index 00000000000000..2a0bf9fa6c3513
+--- /dev/null
++++ b/packages/block-editor/src/components/image-size-control/style.scss
+@@ -0,0 +1,26 @@
++.block-editor-image-size-control {
++	margin-bottom: 1em;
++
++	.block-editor-image-size-control__row {
++		display: flex;
++		justify-content: space-between;
++
++		.block-editor-image-size-control__width,
++		.block-editor-image-size-control__height {
++			margin-bottom: 0.5em;
++
++			// Fix the text and placeholder text being misaligned in Safari
++			input {
++				line-height: 1.25;
++			}
++		}
++
++		.block-editor-image-size-control__width {
++			margin-right: 5px;
++		}
++
++		.block-editor-image-size-control__height {
++			margin-left: 5px;
++		}
++	}
++}
+diff --git a/packages/block-editor/src/components/index.js b/packages/block-editor/src/components/index.js
+index 3a5bc7692f6408..48e8559d7990b9 100644
+--- a/packages/block-editor/src/components/index.js
++++ b/packages/block-editor/src/components/index.js
+@@ -26,6 +26,7 @@ export { default as __experimentalGradientPickerControl } from './gradient-picke
+ export { default as __experimentalGradientPickerPanel } from './gradient-picker/panel';
+ export { default as __experimentalColorGradientControl } from './colors-gradients/control';
+ export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
++export { default as __experimentalImageSizeControl } from './image-size-control';
+ export { default as InnerBlocks } from './inner-blocks';
+ export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
+ export { default as InspectorControls } from './inspector-controls';
+diff --git a/packages/block-editor/src/style.scss b/packages/block-editor/src/style.scss
+index 079002c74a5452..0ccc3c0a3df14b 100644
+--- a/packages/block-editor/src/style.scss
++++ b/packages/block-editor/src/style.scss
+@@ -21,6 +21,7 @@
+ @import "./components/contrast-checker/style.scss";
+ @import "./components/default-block-appender/style.scss";
+ @import "./components/link-control/style.scss";
++@import "./components/image-size-control/style.scss";
+ @import "./components/inner-blocks/style.scss";
+ @import "./components/inserter/style.scss";
+ @import "./components/inserter-list-item/style.scss";
+diff --git a/packages/block-library/src/image/edit.js b/packages/block-library/src/image/edit.js
+index 63771eac15ce76..ae24d7712759d5 100644
+--- a/packages/block-library/src/image/edit.js
++++ b/packages/block-library/src/image/edit.js
+@@ -4,7 +4,6 @@
+ import classnames from 'classnames';
+ import {
+ 	get,
+-	isEmpty,
+ 	filter,
+ 	map,
+ 	last,
+@@ -17,12 +16,9 @@ import {
+  */
+ import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+ import {
+-	Button,
+-	ButtonGroup,
+ 	ExternalLink,
+ 	PanelBody,
+ 	ResizableBox,
+-	SelectControl,
+ 	Spinner,
+ 	TextareaControl,
+ 	TextControl,
+@@ -40,6 +36,7 @@ import {
+ 	MediaPlaceholder,
+ 	MediaReplaceFlow,
+ 	RichText,
++	__experimentalImageSizeControl as ImageSizeControl,
+ 	__experimentalImageURLInputUI as ImageURLInputUI,
+ } from '@wordpress/block-editor';
+ import {
+@@ -104,9 +101,6 @@ export class ImageEdit extends Component {
+ 		this.onSelectImage = this.onSelectImage.bind( this );
+ 		this.onSelectURL = this.onSelectURL.bind( this );
+ 		this.updateImage = this.updateImage.bind( this );
+-		this.updateWidth = this.updateWidth.bind( this );
+-		this.updateHeight = this.updateHeight.bind( this );
+-		this.updateDimensions = this.updateDimensions.bind( this );
+ 		this.onSetHref = this.onSetHref.bind( this );
+ 		this.onSetTitle = this.onSetTitle.bind( this );
+ 		this.getFilename = this.getFilename.bind( this );
+@@ -297,20 +291,6 @@ export class ImageEdit extends Component {
+ 		} );
+ 	}
+ 
+-	updateWidth( width ) {
+-		this.props.setAttributes( { width: parseInt( width, 10 ) } );
+-	}
+-
+-	updateHeight( height ) {
+-		this.props.setAttributes( { height: parseInt( height, 10 ) } );
+-	}
+-
+-	updateDimensions( width = undefined, height = undefined ) {
+-		return () => {
+-			this.props.setAttributes( { width, height } );
+-		};
+-	}
+-
+ 	getFilename( url ) {
+ 		const path = getPath( url );
+ 		if ( path ) {
+@@ -451,67 +431,17 @@ export class ImageEdit extends Component {
+ 								</>
+ 							}
+ 						/>
+-						{ ! isEmpty( imageSizeOptions ) && (
+-							<SelectControl
+-								label={ __( 'Image Size' ) }
+-								value={ sizeSlug }
+-								options={ imageSizeOptions }
+-								onChange={ this.updateImage }
+-							/>
+-						) }
+-						{ isResizable && (
+-							<div className="block-library-image__dimensions">
+-								<p className="block-library-image__dimensions__row">
+-									{ __( 'Image Dimensions' ) }
+-								</p>
+-								<div className="block-library-image__dimensions__row">
+-									<TextControl
+-										type="number"
+-										className="block-library-image__dimensions__width"
+-										label={ __( 'Width' ) }
+-										value={ width || imageWidth || '' }
+-										min={ 1 }
+-										onChange={ this.updateWidth }
+-									/>
+-									<TextControl
+-										type="number"
+-										className="block-library-image__dimensions__height"
+-										label={ __( 'Height' ) }
+-										value={ height || imageHeight || '' }
+-										min={ 1 }
+-										onChange={ this.updateHeight }
+-									/>
+-								</div>
+-								<div className="block-library-image__dimensions__row">
+-									<ButtonGroup aria-label={ __( 'Image Size' ) }>
+-										{ [ 25, 50, 75, 100 ].map( ( scale ) => {
+-											const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
+-											const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
+-
+-											const isCurrent = width === scaledWidth && height === scaledHeight;
+-
+-											return (
+-												<Button
+-													key={ scale }
+-													isSmall
+-													isPrimary={ isCurrent }
+-													isPressed={ isCurrent }
+-													onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
+-												>
+-													{ scale }%
+-												</Button>
+-											);
+-										} ) }
+-									</ButtonGroup>
+-									<Button
+-										isSmall
+-										onClick={ this.updateDimensions() }
+-									>
+-										{ __( 'Reset' ) }
+-									</Button>
+-								</div>
+-							</div>
+-						) }
++						<ImageSizeControl
++							onChangeImage={ this.updateImage }
++							onChange={ ( value ) => setAttributes( value ) }
++							slug={ sizeSlug }
++							width={ width }
++							height={ height }
++							imageSizeOptions={ imageSizeOptions }
++							isResizable={ isResizable }
++							imageWidth={ imageWidth }
++							imageHeight={ imageHeight }
++						/>
+ 					</PanelBody>
+ 				</InspectorControls>
+ 				<InspectorAdvancedControls>
+diff --git a/packages/block-library/src/image/editor.scss b/packages/block-library/src/image/editor.scss
+index 1f66521f7e32d3..561141334ad87a 100644
+--- a/packages/block-library/src/image/editor.scss
++++ b/packages/block-library/src/image/editor.scss
+@@ -52,33 +52,6 @@
+ 	}
+ }
+ 
+-.edit-post-sidebar .block-library-image__dimensions {
+-	margin-bottom: 1em;
+-
+-	.block-library-image__dimensions__row {
+-		display: flex;
+-		justify-content: space-between;
+-
+-		.block-library-image__dimensions__width,
+-		.block-library-image__dimensions__height {
+-			margin-bottom: 0.5em;
+-
+-			// Fix the text and placeholder text being misaligned in Safari
+-			input {
+-				line-height: 1.25;
+-			}
+-		}
+-
+-		.block-library-image__dimensions__width {
+-			margin-right: 5px;
+-		}
+-
+-		.block-library-image__dimensions__height {
+-			margin-left: 5px;
+-		}
+-	}
+-}
+-
+ .block-editor-block-list__block[data-type="core/image"] .block-editor-block-toolbar .block-editor-url-input__button-modal {
+ 	position: absolute;
+ 	left: 0;

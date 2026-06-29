@@ -1,0 +1,538 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a6fc7e845a4f9f..9c3a78454d32b0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -39,6 +39,7 @@
+ 
+ ### Enhancements
+ 
++-   `Navigator`: focus screen wrapper instead of first tabbable element. ([#51816](https://github.com/WordPress/gutenberg/pull/51816)).
+ -   `SelectControl`: Added option to set hidden options. ([#51545](https://github.com/WordPress/gutenberg/pull/51545))
+ -   `RangeControl`: Add `__next40pxDefaultSize` prop to opt into the new 40px default size ([#49105](https://github.com/WordPress/gutenberg/pull/49105)).
+ -   `Button`: Introduce `size` prop with `default`, `compact`, and `small` variants ([#51842](https://github.com/WordPress/gutenberg/pull/51842)).
+diff --git a/packages/components/src/navigator/navigator-screen/README.md b/packages/components/src/navigator/navigator-screen/README.md
+index 5ba5af44fe8c1a..d0071d11f0d54f 100644
+--- a/packages/components/src/navigator/navigator-screen/README.md
++++ b/packages/components/src/navigator/navigator-screen/README.md
+@@ -19,3 +19,17 @@ The component accepts the following props:
+ The screen's path, matched against the current path stored in the navigator.
+ 
+ -   Required: Yes
++
++### `aria-label`: `string`
++
++Additional text used to label the component for assistive technology.
++
++-   Required: No
++-   Default: `"Navigator screen"`
++
++### `role`: `string`
++
++The aria-role attributed to the screen.
++
++-   Required: No
++-   Default: `"region"`
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 201f2261ed2f73..1082fe7853ce09 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -9,7 +9,6 @@ import { css } from '@emotion/react';
+ /**
+  * WordPress dependencies
+  */
+-import { focus } from '@wordpress/dom';
+ import {
+ 	useContext,
+ 	useEffect,
+@@ -18,7 +17,7 @@ import {
+ 	useId,
+ } from '@wordpress/element';
+ import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
+-import { isRTL } from '@wordpress/i18n';
++import { __, isRTL } from '@wordpress/i18n';
+ import { escapeAttribute } from '@wordpress/escape-html';
+ 
+ /**
+@@ -51,10 +50,14 @@ function UnconnectedNavigatorScreen(
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const screenId = useId();
+-	const { children, className, path, ...otherProps } = useContextSystem(
+-		props,
+-		'NavigatorScreen'
+-	);
++	const {
++		children,
++		className,
++		path,
++		'aria-label': ariaLabel = __( 'Navigator screen' ),
++		role = 'region',
++		...otherProps
++	} = useContextSystem( props, 'NavigatorScreen' );
+ 
+ 	const prefersReducedMotion = useReducedMotion();
+ 	const { location, match, addScreen, removeScreen } =
+@@ -75,12 +78,33 @@ function UnconnectedNavigatorScreen(
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+-				css( {
+-					// Ensures horizontal overflow is visually accessible.
+-					overflowX: 'auto',
+-					// In case the root has a height, it should not be exceeded.
+-					maxHeight: '100%',
+-				} ),
++				css`
++					/* Ensures horizontal overflow is visually accessible. */
++					overflow-x: auto;
++					/* In case the root has a height, it should not be exceeded. */
++					max-height: 100%;
++
++					&::after {
++						content: '';
++						position: absolute;
++						inset: 0;
++						z-index: 9999;
++						pointer-events: none;
++					}
++
++					&:focus {
++						outline: none;
++					}
++
++					&:focus::after {
++						box-shadow: inset 0 0 0
++							var( --wp-admin-border-width-focus )
++							var( --wp-admin-theme-color );
++
++						// Windows High Contrast mode will show this outline, but not the box-shadow.
++						outline: 2px solid transparent;
++					}
++				`,
+ 				className
+ 			),
+ 		[ className, cx ]
+@@ -130,12 +154,9 @@ function UnconnectedNavigatorScreen(
+ 		}
+ 
+ 		// If the previous query didn't run or find any element to focus, fallback
+-		// to the first tabbable element in the screen (or the screen itself).
++		// to the screen itself.
+ 		if ( ! elementToFocus ) {
+-			const firstTabbable = (
+-				focus.tabbable.find( wrapperRef.current ) as HTMLElement[]
+-			 )[ 0 ];
+-			elementToFocus = firstTabbable ?? wrapperRef.current;
++			elementToFocus = wrapperRef.current;
+ 		}
+ 
+ 		locationRef.current.hasRestoredFocus = true;
+@@ -211,6 +232,9 @@ function UnconnectedNavigatorScreen(
+ 		<motion.div
+ 			ref={ mergedWrapperRef }
+ 			className={ classes }
++			tabIndex={ -1 }
++			role={ role }
++			aria-label={ ariaLabel }
+ 			{ ...otherProps }
+ 			{ ...animatedProps }
+ 		>
+diff --git a/packages/components/src/navigator/stories/index.tsx b/packages/components/src/navigator/stories/index.tsx
+index fb353a354d5446..ae7d1ba0f934db 100644
+--- a/packages/components/src/navigator/stories/index.tsx
++++ b/packages/components/src/navigator/stories/index.tsx
+@@ -43,7 +43,7 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
+ 		style={ { ...style, height: '100vh', maxHeight: '450px' } }
+ 		{ ...props }
+ 	>
+-		<NavigatorScreen path="/">
++		<NavigatorScreen path="/" aria-label="Home screen">
+ 			<Card>
+ 				<CardBody>
+ 					<p>This is the home screen.</p>
+@@ -97,10 +97,11 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
+ 			</Card>
+ 		</NavigatorScreen>
+ 
+-		<NavigatorScreen path="/child">
++		<NavigatorScreen path="/child" aria-labelledby="child-screen-title">
+ 			<Card>
+ 				<CardBody>
+-					<p>This is the child screen.</p>
++					{ /* eslint-disable-next-line no-restricted-syntax */ }
++					<h1 id="child-screen-title">Child screen</h1>
+ 					<NavigatorBackButton variant="secondary">
+ 						Go back
+ 					</NavigatorBackButton>
+@@ -108,7 +109,10 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
+ 			</Card>
+ 		</NavigatorScreen>
+ 
+-		<NavigatorScreen path="/overflow-child">
++		<NavigatorScreen
++			path="/overflow-child"
++			aria-label="Child screen with overflowing content"
++		>
+ 			<Card>
+ 				<CardBody>
+ 					<NavigatorBackButton variant="secondary">
+@@ -134,7 +138,10 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
+ 			</Card>
+ 		</NavigatorScreen>
+ 
+-		<NavigatorScreen path="/stickies">
++		<NavigatorScreen
++			path="/stickies"
++			aria-label="Screen with sticky content"
++		>
+ 			<Card>
+ 				<CardHeader style={ getStickyStyles( { zIndex: 2 } ) }>
+ 					<NavigatorBackButton variant="secondary">
+@@ -173,7 +180,7 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
+ 			</Card>
+ 		</NavigatorScreen>
+ 
+-		<NavigatorScreen path="/product/:id">
++		<NavigatorScreen path="/product/:id" aria-label="Product screen">
+ 			<ProductDetails />
+ 		</NavigatorScreen>
+ 	</NavigatorProvider>
+diff --git a/packages/components/src/navigator/test/index.tsx b/packages/components/src/navigator/test/index.tsx
+index 5a711b8730224a..483fbf1ec56836 100644
+--- a/packages/components/src/navigator/test/index.tsx
++++ b/packages/components/src/navigator/test/index.tsx
+@@ -48,6 +48,14 @@ const SCREEN_TEXT = {
+ 	invalidHtmlPath: 'This is the screen with an invalid HTML value as a path.',
+ };
+ 
++const SCREEN_TITLE = {
++	home: 'Home screen.',
++	child: 'Child screen.',
++	nested: 'Nested screen.',
++	product: 'Product screen.',
++	invalidHtmlPath: 'Screen with an invalid HTML value as a path.',
++};
++
+ const BUTTON_TEXT = {
+ 	toNonExistingScreen: 'Navigate to non-existing screen.',
+ 	toChildScreen: 'Navigate to child screen.',
+@@ -173,7 +181,10 @@ const ProductScreen = ( {
+ 	const { params } = useNavigator();
+ 
+ 	return (
+-		<NavigatorScreen path={ PATHS.PRODUCT_PATTERN }>
++		<NavigatorScreen
++			path={ PATHS.PRODUCT_PATTERN }
++			aria-label={ SCREEN_TITLE.product }
++		>
+ 			<p>{ SCREEN_TEXT.product }</p>
+ 			<p>Product ID is { params.productId }</p>
+ 			<CustomNavigatorBackButton onClick={ onBackButtonClick }>
+@@ -195,7 +206,10 @@ const MyNavigation = ( {
+ 	return (
+ 		<>
+ 			<NavigatorProvider initialPath={ initialPath }>
+-				<NavigatorScreen path={ PATHS.HOME }>
++				<NavigatorScreen
++					path={ PATHS.HOME }
++					aria-label={ SCREEN_TITLE.home }
++				>
+ 					<p>{ SCREEN_TEXT.home }</p>
+ 					{ /*
+ 					 * A button useful to test focus restoration. This button is the first
+@@ -235,7 +249,10 @@ const MyNavigation = ( {
+ 					</CustomNavigatorButton>
+ 				</NavigatorScreen>
+ 
+-				<NavigatorScreen path={ PATHS.CHILD }>
++				<NavigatorScreen
++					path={ PATHS.CHILD }
++					aria-label={ SCREEN_TITLE.child }
++				>
+ 					<p>{ SCREEN_TEXT.child }</p>
+ 					{ /*
+ 					 * A button useful to test focus restoration. This button is the first
+@@ -267,7 +284,10 @@ const MyNavigation = ( {
+ 					/>
+ 				</NavigatorScreen>
+ 
+-				<NavigatorScreen path={ PATHS.NESTED }>
++				<NavigatorScreen
++					path={ PATHS.NESTED }
++					aria-label={ SCREEN_TITLE.nested }
++				>
+ 					<p>{ SCREEN_TEXT.nested }</p>
+ 					<CustomNavigatorBackButton
+ 						onClick={ onNavigatorButtonClick }
+@@ -278,7 +298,10 @@ const MyNavigation = ( {
+ 
+ 				<ProductScreen onBackButtonClick={ onNavigatorButtonClick } />
+ 
+-				<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
++				<NavigatorScreen
++					path={ PATHS.INVALID_HTML_ATTRIBUTE }
++					aria-label={ SCREEN_TITLE.invalidHtmlPath }
++				>
+ 					<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
+ 					<CustomNavigatorBackButton
+ 						onClick={ onNavigatorButtonClick }
+@@ -314,7 +337,10 @@ const MyHierarchicalNavigation = ( {
+ 	return (
+ 		<>
+ 			<NavigatorProvider initialPath={ initialPath }>
+-				<NavigatorScreen path={ PATHS.HOME }>
++				<NavigatorScreen
++					path={ PATHS.HOME }
++					aria-label={ SCREEN_TITLE.home }
++				>
+ 					<p>{ SCREEN_TEXT.home }</p>
+ 					{ /*
+ 					 * A button useful to test focus restoration. This button is the first
+@@ -330,7 +356,10 @@ const MyHierarchicalNavigation = ( {
+ 					</CustomNavigatorButton>
+ 				</NavigatorScreen>
+ 
+-				<NavigatorScreen path={ PATHS.CHILD }>
++				<NavigatorScreen
++					path={ PATHS.CHILD }
++					aria-label={ SCREEN_TITLE.child }
++				>
+ 					<p>{ SCREEN_TEXT.child }</p>
+ 					{ /*
+ 					 * A button useful to test focus restoration. This button is the first
+@@ -351,7 +380,10 @@ const MyHierarchicalNavigation = ( {
+ 					</CustomNavigatorToParentButton>
+ 				</NavigatorScreen>
+ 
+-				<NavigatorScreen path={ PATHS.NESTED }>
++				<NavigatorScreen
++					path={ PATHS.NESTED }
++					aria-label={ SCREEN_TITLE.nested }
++				>
+ 					<p>{ SCREEN_TEXT.nested }</p>
+ 					<CustomNavigatorToParentButton
+ 						onClick={ onNavigatorButtonClick }
+@@ -376,8 +408,8 @@ const MyHierarchicalNavigation = ( {
+ 	);
+ };
+ 
+-const getScreen = ( screenKey: keyof typeof SCREEN_TEXT ) =>
+-	screen.getByText( SCREEN_TEXT[ screenKey ] );
++const getScreen = ( screenKey: keyof typeof SCREEN_TITLE ) =>
++	screen.getByLabelText( SCREEN_TITLE[ screenKey ] );
+ const queryScreen = ( screenKey: keyof typeof SCREEN_TEXT ) =>
+ 	screen.queryByText( SCREEN_TEXT[ screenKey ] );
+ const getNavigationButton = ( buttonKey: keyof typeof BUTTON_TEXT ) =>
+@@ -599,18 +631,14 @@ describe( 'Navigator', () => {
+ 			// Navigate to child screen.
+ 			await user.click( getNavigationButton( 'toChildScreen' ) );
+ 
+-			// The first tabbable element receives focus.
+-			expect(
+-				screen.getByRole( 'button', {
+-					name: 'First tabbable child screen button',
+-				} )
+-			).toHaveFocus();
++			// The child screen element received focus.
++			expect( getScreen( 'child' ) ).toHaveFocus();
+ 
+ 			// Navigate to nested screen.
+ 			await user.click( getNavigationButton( 'toNestedScreen' ) );
+ 
+-			// The first tabbable element receives focus.
+-			expect( getNavigationButton( 'back' ) ).toHaveFocus();
++			// The nested screen element received focus.
++			expect( getScreen( 'nested' ) ).toHaveFocus();
+ 
+ 			// Navigate back to child screen.
+ 			await user.click( getNavigationButton( 'back' ) );
+@@ -629,8 +657,8 @@ describe( 'Navigator', () => {
+ 			// Navigate to product screen for product 2
+ 			await user.click( getNavigationButton( 'toProductScreen2' ) );
+ 
+-			// The first tabbable element receives focus.
+-			expect( getNavigationButton( 'back' ) ).toHaveFocus();
++			// The nested screen element received focus.
++			expect( getScreen( 'product' ) ).toHaveFocus();
+ 
+ 			// Navigate back to home screen.
+ 			await user.click( getNavigationButton( 'back' ) );
+@@ -648,12 +676,8 @@ describe( 'Navigator', () => {
+ 			// Navigate to child screen.
+ 			await user.click( getNavigationButton( 'toChildScreen' ) );
+ 
+-			// The first tabbable element receives focus.
+-			expect(
+-				screen.getByRole( 'button', {
+-					name: 'First tabbable child screen button',
+-				} )
+-			).toHaveFocus();
++			// The child screen element received focus.
++			expect( getScreen( 'child' ) ).toHaveFocus();
+ 
+ 			// Interact with the inner input.
+ 			// The focus should stay on the input element.
+@@ -670,12 +694,8 @@ describe( 'Navigator', () => {
+ 			// Navigate to child screen.
+ 			await user.click( getNavigationButton( 'toChildScreen' ) );
+ 
+-			// The first tabbable element receives focus.
+-			expect(
+-				screen.getByRole( 'button', {
+-					name: 'First tabbable child screen button',
+-				} )
+-			).toHaveFocus();
++			// The child screen element received focus.
++			expect( getScreen( 'child' ) ).toHaveFocus();
+ 
+ 			// Interact with the outer input.
+ 			// The focus should stay on the input element.
+@@ -761,12 +781,9 @@ describe( 'Navigator', () => {
+ 			// Navigate back to parent screen.
+ 			await user.click( getNavigationButton( 'back' ) );
+ 			expect( getScreen( 'child' ) ).toBeInTheDocument();
+-			// The first tabbable element receives focus.
+-			expect(
+-				screen.getByRole( 'button', {
+-					name: 'First tabbable child screen button',
+-				} )
+-			).toHaveFocus();
++
++			// The child screen element received focus.
++			expect( getScreen( 'child' ) ).toHaveFocus();
+ 		} );
+ 	} );
+ 
+@@ -779,6 +796,7 @@ describe( 'Navigator', () => {
+ 					<NavigatorScreen
+ 						path="/"
+ 						onAnimationStart={ onHomeAnimationStartSpy }
++						aria-label="Home screen"
+ 					>
+ 						<CustomNavigatorButton path="/child">
+ 							To child
+@@ -801,6 +819,7 @@ describe( 'Navigator', () => {
+ 					<NavigatorScreen
+ 						path="/"
+ 						onAnimationStart={ onHomeAnimationStartSpy }
++						aria-label="Home screen"
+ 					>
+ 						<CustomNavigatorButton path="/child">
+ 							To child
+@@ -809,6 +828,7 @@ describe( 'Navigator', () => {
+ 					<NavigatorScreen
+ 						path="/child"
+ 						onAnimationStart={ onChildAnimationStartSpy }
++						aria-label="Child screen"
+ 					>
+ 						<CustomNavigatorBackButton>
+ 							Back to home
+@@ -833,4 +853,62 @@ describe( 'Navigator', () => {
+ 			expect( onHomeAnimationStartSpy ).toHaveBeenCalledTimes( 1 );
+ 		} );
+ 	} );
++
++	describe( 'role and labelling', () => {
++		it( 'should assign a default aria-label to the screen, unless an explicit value is passed', async () => {
++			const { rerender } = render(
++				<NavigatorProvider initialPath="/">
++					<NavigatorScreen path="/">
++						<h1>Welcome</h1>
++					</NavigatorScreen>
++				</NavigatorProvider>
++			);
++
++			expect(
++				screen.getByRole( 'region', { name: 'Navigator screen' } )
++			).toBeInTheDocument();
++
++			rerender(
++				<NavigatorProvider initialPath="/">
++					<NavigatorScreen path="/" aria-label="Home screen">
++						<h1>Welcome</h1>
++					</NavigatorScreen>
++				</NavigatorProvider>
++			);
++
++			expect(
++				screen.getByRole( 'region', { name: 'Home screen' } )
++			).toBeInTheDocument();
++		} );
++
++		it( 'should assign a default "region" role to the screen, unless an explicit value is passed', async () => {
++			const { rerender } = render(
++				<NavigatorProvider initialPath="/">
++					<NavigatorScreen path="/" aria-label="Home screen">
++						<h1>Welcome</h1>
++					</NavigatorScreen>
++				</NavigatorProvider>
++			);
++
++			expect(
++				screen.getByRole( 'region', { name: 'Home screen' } )
++			).toBeInTheDocument();
++
++			rerender(
++				<NavigatorProvider initialPath="/">
++					<NavigatorScreen
++						path="/"
++						aria-label="Home screen"
++						role="navigation"
++					>
++						<h1>Welcome</h1>
++					</NavigatorScreen>
++				</NavigatorProvider>
++			);
++
++			expect(
++				screen.getByRole( 'navigation', { name: 'Home screen' } )
++			).toBeInTheDocument();
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/navigator/types.ts b/packages/components/src/navigator/types.ts
+index 557f8074fd42e2..5d05d70f3e7642 100644
+--- a/packages/components/src/navigator/types.ts
++++ b/packages/components/src/navigator/types.ts
+@@ -60,6 +60,18 @@ export type NavigatorScreenProps = {
+ 	 * The children elements.
+ 	 */
+ 	children: ReactNode;
++	/**
++	 * The aria-role attributed to the screen.
++	 *
++	 * @default 'region'
++	 */
++	role?: React.HTMLAttributes< Element >[ 'role' ];
++	/**
++	 * Additional text used to label the component for assistive technology.
++	 *
++	 * @default 'Navigator screen'
++	 */
++	'aria-label'?: React.HTMLAttributes< Element >[ 'aria-label' ];
+ };
+ 
+ export type NavigatorBackButtonProps = ButtonAsButtonProps;
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+index bcaed355d48adf..9d1d6ebc41ab0f 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+@@ -542,6 +542,10 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+   max-height: 100%;
+ }
+ 
++.emotion-2:focus {
++  outline: none;
++}
++
+ .emotion-3 {
+   background-color: #fff;
+   color: #1e1e1e;
+@@ -751,6 +755,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+           data-wp-c16t="true"
+           data-wp-component="NavigatorScreen"
+           style="opacity: 1; transform: none;"
++          tabindex="-1"
+         >
+           <div
+             class="components-surface components-card emotion-3 emotion-1"

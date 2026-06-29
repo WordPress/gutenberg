@@ -1,0 +1,250 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fe326e847970b4..37da311b0547a3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,10 @@
+ -   `BoxControl`: Passive deprecate `onMouseOver`/`onMouseOut`. Pass to the `inputProps` prop instead ([#67332](https://github.com/WordPress/gutenberg/pull/67332)).
+ -   `BoxControl`: Deprecate 36px default size ([#66704](https://github.com/WordPress/gutenberg/pull/66704)).
+ 
++### Experimental
++
++-   `Menu`: throw when subcomponents are not rendered inside top level `Menu` ([#67411](https://github.com/WordPress/gutenberg/pull/67411)).
++
+ ### Internal
+ 
+ -   Upgraded `@ariakit/react` (v0.4.13) and `@ariakit/test` (v0.4.5) ([#65907](https://github.com/WordPress/gutenberg/pull/65907)).
+@@ -20,7 +24,7 @@
+ -   `FontSizePicker`: Deprecate 36px default size ([#66920](https://github.com/WordPress/gutenberg/pull/66920)).
+ -   `ComboboxControl`: Deprecate 36px default size ([#66900](https://github.com/WordPress/gutenberg/pull/66900)).
+ -   `ToggleGroupControl`: Deprecate 36px default size ([#66747](https://github.com/WordPress/gutenberg/pull/66747)).
+--   `RangeControl`: Deprecate 36px default size ([#66721](https://github.com/WordPress/gutenberg/pull/66721)). 
++-   `RangeControl`: Deprecate 36px default size ([#66721](https://github.com/WordPress/gutenberg/pull/66721)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/menu/checkbox-item.tsx b/packages/components/src/menu/checkbox-item.tsx
+index 182c27dfdee305..ddb700b43324a6 100644
+--- a/packages/components/src/menu/checkbox-item.tsx
++++ b/packages/components/src/menu/checkbox-item.tsx
+@@ -26,16 +26,22 @@ export const MenuCheckboxItem = forwardRef<
+ ) {
+ 	const menuContext = useContext( MenuContext );
+ 
++	if ( ! menuContext?.store ) {
++		throw new Error(
++			'Menu.CheckboxItem can only be rendered inside a Menu component'
++		);
++	}
++
+ 	return (
+ 		<Styled.MenuCheckboxItem
+ 			ref={ ref }
+ 			{ ...props }
+ 			accessibleWhenDisabled
+ 			hideOnClick={ hideOnClick }
+-			store={ menuContext?.store }
++			store={ menuContext.store }
+ 		>
+ 			<Ariakit.MenuItemCheck
+-				store={ menuContext?.store }
++				store={ menuContext.store }
+ 				render={ <Styled.ItemPrefixWrapper /> }
+ 				// Override some ariakit inline styles
+ 				style={ { width: 'auto', height: 'auto' } }
+diff --git a/packages/components/src/menu/group-label.tsx b/packages/components/src/menu/group-label.tsx
+index 71c5c7de69941e..5bf081880cb1d7 100644
+--- a/packages/components/src/menu/group-label.tsx
++++ b/packages/components/src/menu/group-label.tsx
+@@ -17,6 +17,13 @@ export const MenuGroupLabel = forwardRef<
+ 	WordPressComponentProps< MenuGroupLabelProps, 'div', false >
+ >( function MenuGroup( props, ref ) {
+ 	const menuContext = useContext( MenuContext );
++
++	if ( ! menuContext?.store ) {
++		throw new Error(
++			'Menu.GroupLabel can only be rendered inside a Menu component'
++		);
++	}
++
+ 	return (
+ 		<Styled.MenuGroupLabel
+ 			ref={ ref }
+@@ -31,7 +38,7 @@ export const MenuGroupLabel = forwardRef<
+ 				/>
+ 			}
+ 			{ ...props }
+-			store={ menuContext?.store }
++			store={ menuContext.store }
+ 		/>
+ 	);
+ } );
+diff --git a/packages/components/src/menu/group.tsx b/packages/components/src/menu/group.tsx
+index f9a4138fe43580..834350955f3c5d 100644
+--- a/packages/components/src/menu/group.tsx
++++ b/packages/components/src/menu/group.tsx
+@@ -16,11 +16,18 @@ export const MenuGroup = forwardRef<
+ 	WordPressComponentProps< MenuGroupProps, 'div', false >
+ >( function MenuGroup( props, ref ) {
+ 	const menuContext = useContext( MenuContext );
++
++	if ( ! menuContext?.store ) {
++		throw new Error(
++			'Menu.Group can only be rendered inside a Menu component'
++		);
++	}
++
+ 	return (
+ 		<Styled.MenuGroup
+ 			ref={ ref }
+ 			{ ...props }
+-			store={ menuContext?.store }
++			store={ menuContext.store }
+ 		/>
+ 	);
+ } );
+diff --git a/packages/components/src/menu/item-help-text.tsx b/packages/components/src/menu/item-help-text.tsx
+index 0ccc8f7461a8ff..13d14c294125bd 100644
+--- a/packages/components/src/menu/item-help-text.tsx
++++ b/packages/components/src/menu/item-help-text.tsx
+@@ -1,18 +1,27 @@
+ /**
+  * WordPress dependencies
+  */
+-import { forwardRef } from '@wordpress/element';
++import { forwardRef, useContext } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
++import { MenuContext } from './context';
+ import * as Styled from './styles';
+ 
+ export const MenuItemHelpText = forwardRef<
+ 	HTMLSpanElement,
+ 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
+ >( function MenuItemHelpText( props, ref ) {
++	const menuContext = useContext( MenuContext );
++
++	if ( ! menuContext?.store ) {
++		throw new Error(
++			'Menu.ItemHelpText can only be rendered inside a Menu component'
++		);
++	}
++
+ 	return (
+ 		<Styled.MenuItemHelpText numberOfLines={ 2 } ref={ ref } { ...props } />
+ 	);
+diff --git a/packages/components/src/menu/item-label.tsx b/packages/components/src/menu/item-label.tsx
+index 458f69558eafbc..4f5f80e547861f 100644
+--- a/packages/components/src/menu/item-label.tsx
++++ b/packages/components/src/menu/item-label.tsx
+@@ -1,18 +1,27 @@
+ /**
+  * WordPress dependencies
+  */
+-import { forwardRef } from '@wordpress/element';
++import { forwardRef, useContext } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
++import { MenuContext } from './context';
+ import * as Styled from './styles';
+ 
+ export const MenuItemLabel = forwardRef<
+ 	HTMLSpanElement,
+ 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
+ >( function MenuItemLabel( props, ref ) {
++	const menuContext = useContext( MenuContext );
++
++	if ( ! menuContext?.store ) {
++		throw new Error(
++			'Menu.ItemLabel can only be rendered inside a Menu component'
++		);
++	}
++
+ 	return (
+ 		<Styled.MenuItemLabel numberOfLines={ 1 } ref={ ref } { ...props } />
+ 	);
+diff --git a/packages/components/src/menu/item.tsx b/packages/components/src/menu/item.tsx
+index 6e8c510e4c9c2a..6d09bdf3d0f591 100644
+--- a/packages/components/src/menu/item.tsx
++++ b/packages/components/src/menu/item.tsx
+@@ -20,13 +20,19 @@ export const MenuItem = forwardRef<
+ ) {
+ 	const menuContext = useContext( MenuContext );
+ 
++	if ( ! menuContext?.store ) {
++		throw new Error(
++			'Menu.Item can only be rendered inside a Menu component'
++		);
++	}
++
+ 	return (
+ 		<Styled.MenuItem
+ 			ref={ ref }
+ 			{ ...props }
+ 			accessibleWhenDisabled
+ 			hideOnClick={ hideOnClick }
+-			store={ menuContext?.store }
++			store={ menuContext.store }
+ 		>
+ 			<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
+ 
+diff --git a/packages/components/src/menu/radio-item.tsx b/packages/components/src/menu/radio-item.tsx
+index 45b0039f900e20..5534a6b7f3e10c 100644
+--- a/packages/components/src/menu/radio-item.tsx
++++ b/packages/components/src/menu/radio-item.tsx
+@@ -33,16 +33,22 @@ export const MenuRadioItem = forwardRef<
+ ) {
+ 	const menuContext = useContext( MenuContext );
+ 
++	if ( ! menuContext?.store ) {
++		throw new Error(
++			'Menu.RadioItem can only be rendered inside a Menu component'
++		);
++	}
++
+ 	return (
+ 		<Styled.MenuRadioItem
+ 			ref={ ref }
+ 			{ ...props }
+ 			accessibleWhenDisabled
+ 			hideOnClick={ hideOnClick }
+-			store={ menuContext?.store }
++			store={ menuContext.store }
+ 		>
+ 			<Ariakit.MenuItemCheck
+-				store={ menuContext?.store }
++				store={ menuContext.store }
+ 				render={ <Styled.ItemPrefixWrapper /> }
+ 				// Override some ariakit inline styles
+ 				style={ { width: 'auto', height: 'auto' } }
+diff --git a/packages/components/src/menu/separator.tsx b/packages/components/src/menu/separator.tsx
+index 5d0110016d9c4a..57cff572c287a0 100644
+--- a/packages/components/src/menu/separator.tsx
++++ b/packages/components/src/menu/separator.tsx
+@@ -16,12 +16,19 @@ export const MenuSeparator = forwardRef<
+ 	WordPressComponentProps< MenuSeparatorProps, 'hr', false >
+ >( function MenuSeparator( props, ref ) {
+ 	const menuContext = useContext( MenuContext );
++
++	if ( ! menuContext?.store ) {
++		throw new Error(
++			'Menu.Separator can only be rendered inside a Menu component'
++		);
++	}
++
+ 	return (
+ 		<Styled.MenuSeparator
+ 			ref={ ref }
+ 			{ ...props }
+-			store={ menuContext?.store }
+-			variant={ menuContext?.variant }
++			store={ menuContext.store }
++			variant={ menuContext.variant }
+ 		/>
+ 	);
+ } );

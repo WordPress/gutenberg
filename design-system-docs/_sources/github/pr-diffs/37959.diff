@@ -1,0 +1,81 @@
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index a350d7efe05a8b..4cf4600b368bd8 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -146,6 +146,9 @@ $z-layers: (
+ 	".reusable-blocks-menu-items__convert-modal": 1000001,
+ 	".edit-site-create-template-part-modal": 1000001,
+ 
++	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
++	// because it uses emotion and not sass. We need it to render on top its parent popover.
++
+ 	// ...Except for popovers immediately beneath wp-admin menu on large breakpoints
+ 	".components-popover.block-editor-inserter__popover": 99999,
+ 	".components-popover.table-of-contents__popover": 99998,
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8314ffee554caf..1c97725b5bdc67 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ -   Mark `children` prop as optional in `SelectControl` ([#37872](https://github.com/WordPress/gutenberg/pull/37872))
+ -   Add memoization of callbacks and context to prevent unnecessary rerenders of the `ToolsPanel` ([#38037](https://github.com/WordPress/gutenberg/pull/38037))
+ -   Fix space between icons and rail `RangeControl` ([#36935](https://github.com/WordPress/gutenberg/pull/36935))
++-   Increase z-index of `ConfirmDialog` to render on top of parent `Popover` components ([#37959](https://github.com/WordPress/gutenberg/pull/37959))
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/confirm-dialog/component.tsx b/packages/components/src/confirm-dialog/component.tsx
+index ec8573cdadbb96..d9c8835ca3d8c3 100644
+--- a/packages/components/src/confirm-dialog/component.tsx
++++ b/packages/components/src/confirm-dialog/component.tsx
+@@ -23,6 +23,8 @@ import { Flex } from '../flex';
+ import Button from '../button';
+ import { Text } from '../text';
+ import { VStack } from '../v-stack';
++import * as styles from './styles';
++import { useCx } from '../utils/hooks/use-cx';
+ 
+ function ConfirmDialog(
+ 	props: WordPressComponentProps< OwnProps, 'div', false >,
+@@ -36,6 +38,9 @@ function ConfirmDialog(
+ 		...otherProps
+ 	} = useContextSystem( props, 'ConfirmDialog' );
+ 
++	const cx = useCx();
++	const wrapperClassName = cx( styles.wrapper );
++
+ 	const [ isOpen, setIsOpen ] = useState< boolean >();
+ 	const [ shouldSelfClose, setShouldSelfClose ] = useState< boolean >();
+ 
+@@ -82,6 +87,7 @@ function ConfirmDialog(
+ 					closeButtonLabel={ cancelLabel }
+ 					isDismissible={ true }
+ 					ref={ forwardedRef }
++					overlayClassName={ wrapperClassName }
+ 					__experimentalHideHeader
+ 					{ ...otherProps }
+ 				>
+diff --git a/packages/components/src/confirm-dialog/styles.ts b/packages/components/src/confirm-dialog/styles.ts
+new file mode 100644
+index 00000000000000..68e2a9aa8d4067
+--- /dev/null
++++ b/packages/components/src/confirm-dialog/styles.ts
+@@ -0,0 +1,18 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++
++/**
++ * The z-index for ConfirmDialog is being set here instead of in
++ * packages/base-styles/_z-index.scss, because this component uses
++ * emotion instead of sass.
++ *
++ * ConfirmDialog needs this higher z-index to ensure it renders on top of
++ * any parent Popover component.
++ */
++export const wrapper = css`
++	&& {
++		z-index: 1000001;
++	}
++`;

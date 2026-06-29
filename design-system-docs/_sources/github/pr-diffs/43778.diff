@@ -1,0 +1,305 @@
+diff --git a/packages/components/src/menu-item/test/__snapshots__/index.js.snap b/packages/components/src/menu-item/test/__snapshots__/index.js.snap
+index a546e6078a79f4..06aaf4b620dfe0 100644
+--- a/packages/components/src/menu-item/test/__snapshots__/index.js.snap
++++ b/packages/components/src/menu-item/test/__snapshots__/index.js.snap
+@@ -1,109 +1,107 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`MenuItem should match snapshot when all props provided 1`] = `
+-<ForwardRef(Button)
+-  aria-checked={true}
+-  className="components-menu-item__button my-class"
+-  onClick={[Function]}
++<button
++  aria-checked="true"
++  class="components-button components-menu-item__button my-class"
+   role="menuitemcheckbox"
++  type="button"
+ >
+   <span
+-    className="components-menu-item__item"
++    class="components-menu-item__item"
+   >
+     My item
+   </span>
+-  <Shortcut
+-    className="components-menu-item__shortcut"
+-    shortcut="mod+shift+alt+w"
+-  />
+-  <Icon
+-    icon={
+-      <SVG
+-        className="components-menu-items__item-icon has-icon-right"
+-        viewBox="0 0 24 24"
+-        xmlns="http://www.w3.org/2000/svg"
+-      >
+-        <Path
+-          d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
+-        />
+-      </SVG>
+-    }
+-  />
+-</ForwardRef(Button)>
++  <span
++    class="components-menu-item__shortcut"
++  >
++    mod+shift+alt+w
++  </span>
++  <svg
++    aria-hidden="true"
++    class="components-menu-items__item-icon has-icon-right"
++    focusable="false"
++    height="24"
++    viewBox="0 0 24 24"
++    width="24"
++    xmlns="http://www.w3.org/2000/svg"
++  >
++    <path
++      d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
++    />
++  </svg>
++</button>
+ `;
+ 
+ exports[`MenuItem should match snapshot when info is provided 1`] = `
+-<ForwardRef(Button)
+-  className="components-menu-item__button"
++<button
++  class="components-button components-menu-item__button"
+   role="menuitem"
++  type="button"
+ >
+   <span
+-    className="components-menu-item__item"
++    class="components-menu-item__item"
+   >
+     <span
+-      className="components-menu-item__info-wrapper"
++      class="components-menu-item__info-wrapper"
+     >
+       <span
+-        className="components-menu-item__item"
++        class="components-menu-item__item"
+       >
+         My item
+       </span>
+       <span
+-        className="components-menu-item__info"
++        class="components-menu-item__info"
+       >
+         Extended description of My Item
+       </span>
+     </span>
+   </span>
+-  <Shortcut
+-    className="components-menu-item__shortcut"
+-  />
+-</ForwardRef(Button)>
++</button>
+ `;
+ 
+ exports[`MenuItem should match snapshot when isSelected and role are optionally provided 1`] = `
+-<ForwardRef(Button)
+-  className="components-menu-item__button my-class"
+-  onClick={[Function]}
++<button
++  class="components-button components-menu-item__button my-class"
+   role="menuitem"
++  type="button"
+ >
+   <span
+-    className="components-menu-item__item"
++    class="components-menu-item__item"
+   >
+     My item
+   </span>
+-  <Shortcut
+-    className="components-menu-item__shortcut"
+-    shortcut="mod+shift+alt+w"
+-  />
+-  <Icon
+-    icon={
+-      <SVG
+-        className="components-menu-items__item-icon has-icon-right"
+-        viewBox="0 0 24 24"
+-        xmlns="http://www.w3.org/2000/svg"
+-      >
+-        <Path
+-          d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
+-        />
+-      </SVG>
+-    }
+-  />
+-</ForwardRef(Button)>
++  <span
++    class="components-menu-item__shortcut"
++  >
++    mod+shift+alt+w
++  </span>
++  <svg
++    aria-hidden="true"
++    class="components-menu-items__item-icon has-icon-right"
++    focusable="false"
++    height="24"
++    viewBox="0 0 24 24"
++    width="24"
++    xmlns="http://www.w3.org/2000/svg"
++  >
++    <path
++      d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
++    />
++  </svg>
++</button>
+ `;
+ 
+ exports[`MenuItem should match snapshot when only label provided 1`] = `
+-<ForwardRef(Button)
+-  className="components-menu-item__button"
++<button
++  class="components-button components-menu-item__button"
+   role="menuitem"
++  type="button"
+ >
+   <span
+-    className="components-menu-item__item"
++    class="components-menu-item__item"
+   >
+     My item
+   </span>
+-  <Shortcut
+-    className="components-menu-item__shortcut"
+-  />
+-</ForwardRef(Button)>
++</button>
+ `;
+diff --git a/packages/components/src/menu-item/test/index.js b/packages/components/src/menu-item/test/index.js
+index 7d230b3c0264b3..aa815dd7e4bb7e 100644
+--- a/packages/components/src/menu-item/test/index.js
++++ b/packages/components/src/menu-item/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { shallow } from 'enzyme';
++import { render, screen } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -11,23 +11,23 @@ import { more } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import { MenuItem } from '../';
++import MenuItem from '../';
+ 
+ const noop = () => {};
+ 
+ describe( 'MenuItem', () => {
+ 	it( 'should match snapshot when only label provided', () => {
+-		const wrapper = shallow( <MenuItem>My item</MenuItem> );
++		render( <MenuItem>My item</MenuItem> );
+ 
+-		expect( wrapper ).toMatchSnapshot();
++		expect( screen.getByRole( 'menuitem' ) ).toMatchSnapshot();
+ 	} );
+ 
+ 	it( 'should match snapshot when all props provided', () => {
+-		const wrapper = shallow(
++		render(
+ 			<MenuItem
+ 				className="my-class"
+ 				icon={ more }
+-				isSelected={ true }
++				isSelected
+ 				role="menuitemcheckbox"
+ 				onClick={ noop }
+ 				shortcut="mod+shift+alt+w"
+@@ -36,11 +36,11 @@ describe( 'MenuItem', () => {
+ 			</MenuItem>
+ 		);
+ 
+-		expect( wrapper ).toMatchSnapshot();
++		expect( screen.getByRole( 'menuitemcheckbox' ) ).toMatchSnapshot();
+ 	} );
+ 
+ 	it( 'should match snapshot when isSelected and role are optionally provided', () => {
+-		const wrapper = shallow(
++		render(
+ 			<MenuItem
+ 				className="my-class"
+ 				icon={ more }
+@@ -51,52 +51,60 @@ describe( 'MenuItem', () => {
+ 			</MenuItem>
+ 		);
+ 
+-		expect( wrapper ).toMatchSnapshot();
++		expect( screen.getByRole( 'menuitem' ) ).toMatchSnapshot();
+ 	} );
+ 
+ 	it( 'should match snapshot when info is provided', () => {
+-		const wrapper = shallow(
++		render(
+ 			<MenuItem info="Extended description of My Item">My item</MenuItem>
+ 		);
+ 
+-		expect( wrapper ).toMatchSnapshot();
++		expect( screen.getByRole( 'menuitem' ) ).toMatchSnapshot();
+ 	} );
+ 
+ 	it( 'should avoid using aria-label if only has non-string children', () => {
+-		const wrapper = shallow(
++		render(
+ 			<MenuItem>
+ 				<div />
+ 			</MenuItem>
+ 		);
+ 
+-		expect( wrapper.prop( 'aria-label' ) ).toBeUndefined();
++		expect( screen.getByRole( 'menuitem' ) ).not.toHaveAttribute(
++			'aria-label'
++		);
+ 	} );
+ 
+ 	it( 'should avoid using aria-checked if only menuitem is set as aria-role', () => {
+-		const wrapper = shallow(
+-			<MenuItem role="menuitem" isSelected={ true }>
++		render(
++			<MenuItem role="menuitem" isSelected>
+ 				<div />
+ 			</MenuItem>
+ 		);
+ 
+-		expect( wrapper.prop( 'aria-checked' ) ).toBeUndefined();
++		const menuItem = screen.getByRole( 'menuitem' );
++		expect( menuItem ).not.toBeChecked();
++		expect( menuItem ).not.toHaveAttribute( 'aria-checked' );
+ 	} );
+ 
+ 	it( 'should use aria-checked if menuitemradio or menuitemcheckbox is set as aria-role', () => {
+-		let wrapper = shallow(
+-			<MenuItem role="menuitemradio" isSelected={ true }>
++		const { rerender } = render(
++			<MenuItem role="menuitemradio" isSelected>
+ 				<div />
+ 			</MenuItem>
+ 		);
+ 
+-		expect( wrapper.prop( 'aria-checked' ) ).toBe( true );
++		const radioMenuItem = screen.getByRole( 'menuitemradio' );
++		expect( radioMenuItem ).toBeChecked();
++		expect( radioMenuItem ).toHaveAttribute( 'aria-checked', 'true' );
+ 
+-		wrapper = shallow(
+-			<MenuItem role="menuitemcheckbox" isSelected={ true }>
++		rerender(
++			<MenuItem role="menuitemcheckbox" isSelected>
+ 				<div />
+ 			</MenuItem>
+ 		);
+ 
+-		expect( wrapper.prop( 'aria-checked' ) ).toBe( true );
++		const checkboxMenuItem = screen.getByRole( 'menuitemcheckbox' );
++		expect( checkboxMenuItem ).toBeChecked();
++		expect( checkboxMenuItem ).toHaveAttribute( 'aria-checked', 'true' );
+ 	} );
+ } );

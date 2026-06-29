@@ -1,0 +1,744 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3bee0610472802..a2f3e36a620cb0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).
+ -   `ValidatedRangeControl`: Fix `aria-label` rendered as `[object Object]` when `required` or `markWhenOptional` is set ([#77042](https://github.com/WordPress/gutenberg/pull/77042)).
+ -   `Autocomplete`: Fix matching logic to prefer longest overlapping trigger ([#77018](https://github.com/WordPress/gutenberg/pull/77018)).
++-   `Autocomplete`: Skip stale triggers from completed mentions ([#77185](https://github.com/WordPress/gutenberg/pull/77185)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/autocomplete/get-autocomplete-match.ts b/packages/components/src/autocomplete/get-autocomplete-match.ts
+index 2318ddb59e9288..db87fb26719c01 100644
+--- a/packages/components/src/autocomplete/get-autocomplete-match.ts
++++ b/packages/components/src/autocomplete/get-autocomplete-match.ts
+@@ -13,13 +13,21 @@ type AutocompleteMatch = {
+ 	filterValue: string;
+ };
+ 
++type AutocompleteMatchOptions = {
++	matchCount: number;
++	isBackspacing: boolean;
++	getTextAfterSelection: () => string;
++	lastCompletion?: { name: string; value: string } | null;
++};
++
+ export function getAutocompleteMatch(
+ 	textContent: string,
+ 	completers: WPCompleter[],
+-	filteredOptionsLength: number,
+-	isBackspacing: boolean,
+-	getTextAfterSelection: () => string
++	options: AutocompleteMatchOptions
+ ): AutocompleteMatch | null {
++	const { matchCount, isBackspacing, getTextAfterSelection, lastCompletion } =
++		options;
++
+ 	if ( ! textContent ) {
+ 		return null;
+ 	}
+@@ -58,6 +66,7 @@ export function getAutocompleteMatch(
+ 	}
+ 
+ 	const { allowContext, triggerPrefix } = completer;
++
+ 	const textWithoutTrigger = textContent.slice(
+ 		triggerIndex + triggerPrefix.length
+ 	);
+@@ -71,7 +80,7 @@ export function getAutocompleteMatch(
+ 		return null;
+ 	}
+ 
+-	const mismatch = filteredOptionsLength === 0;
++	const mismatch = matchCount === 0;
+ 	const wordsFromTrigger = textWithoutTrigger.split( /\s/ );
+ 
+ 	// Allow matching when typing a trigger + the match string or when
+@@ -108,6 +117,18 @@ export function getAutocompleteMatch(
+ 		return null;
+ 	}
+ 
++	// After a completion whose value starts with the trigger prefix
++	// (e.g. @username), the trigger remains in the text and would
++	// re-activate the autocompleter. Suppress the match when the
++	// filter value still corresponds to the recently completed text.
++	if (
++		lastCompletion &&
++		lastCompletion.name === completer.name &&
++		textWithoutTrigger.trimEnd() === lastCompletion.value
++	) {
++		return null;
++	}
++
+ 	return {
+ 		completer,
+ 		filterValue: removeAccents( textWithoutTrigger ),
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index 64382dd7b12965..f33608440a4c6f 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -108,10 +108,15 @@ export function useAutocomplete( {
+ 		state;
+ 
+ 	const backspacingRef = useRef( false );
++	const prevRecordTextRef = useRef( '' );
++	const lastCompletionRef = useRef< {
++		name: string;
++		value: string;
++	} | null >( null );
+ 
+ 	function insertCompletion( replacement: React.ReactNode ) {
+ 		if ( autocompleter === null ) {
+-			return;
++			return '';
+ 		}
+ 		const end = record.start;
+ 		const start =
+@@ -119,27 +124,48 @@ export function useAutocomplete( {
+ 		const toInsert = create( { html: renderToString( replacement ) } );
+ 
+ 		onChange( insert( record, toInsert, start, end ) );
++		return getTextContent( toInsert );
+ 	}
+ 
+ 	function select( option: KeyedOption ) {
+-		const { getOptionCompletion } = autocompleter || {};
++		if ( option.isDisabled || ! autocompleter ) {
++			return;
++		}
+ 
+-		if ( option.isDisabled ) {
++		const { getOptionCompletion } = autocompleter;
++		if ( ! getOptionCompletion ) {
++			dispatch( { type: 'RESET' } );
++			contentRef.current?.focus();
+ 			return;
+ 		}
+ 
+-		if ( getOptionCompletion ) {
+-			const completionObject = getCompletionObject(
+-				getOptionCompletion( option.value, filterValue )
+-			);
++		const completionObject = getCompletionObject(
++			getOptionCompletion( option.value, filterValue )
++		);
++
++		if ( 'replace' === completionObject.action ) {
++			onReplace( [ completionObject.value ] );
++			// When replacing, the component will unmount, so don't reset
++			// state (below) on an unmounted component.
++			return;
++		}
+ 
+-			if ( 'replace' === completionObject.action ) {
+-				onReplace( [ completionObject.value ] );
+-				// When replacing, the component will unmount, so don't reset
+-				// state (below) on an unmounted component.
+-				return;
+-			} else if ( 'insert-at-caret' === completionObject.action ) {
+-				insertCompletion( completionObject.value );
++		if ( 'insert-at-caret' === completionObject.action ) {
++			const completionText = insertCompletion( completionObject.value );
++			// When the completion value starts with the trigger prefix
++			// (e.g. @username), the trigger stays in the text and would
++			// re-activate the autocompleter. Store the completed text so
++			// the effect can suppress the stale re-match.
++			if ( completionText.startsWith( autocompleter.triggerPrefix ) ) {
++				const afterPrefix = completionText.slice(
++					autocompleter.triggerPrefix.length
++				);
++				if ( afterPrefix ) {
++					lastCompletionRef.current = {
++						name: autocompleter.name,
++						value: afterPrefix,
++					};
++				}
+ 			}
+ 		}
+ 
+@@ -222,6 +248,9 @@ export function useAutocomplete( {
+ 	}, [ record ] );
+ 
+ 	useEffect( () => {
++		const isTextChange = record.text !== prevRecordTextRef.current;
++		prevRecordTextRef.current = record.text;
++
+ 		function getTextAfterSelection() {
+ 			return textContent
+ 				? getTextContent(
+@@ -234,13 +263,12 @@ export function useAutocomplete( {
+ 				: '';
+ 		}
+ 
+-		const match = getAutocompleteMatch(
+-			textContent,
+-			completers,
+-			filteredOptions.length,
+-			backspacingRef.current,
+-			getTextAfterSelection
+-		);
++		const match = getAutocompleteMatch( textContent, completers, {
++			matchCount: filteredOptions.length,
++			isBackspacing: backspacingRef.current,
++			getTextAfterSelection,
++			lastCompletion: lastCompletionRef.current,
++		} );
+ 
+ 		if ( ! match ) {
+ 			if ( autocompleter ) {
+@@ -251,6 +279,26 @@ export function useAutocomplete( {
+ 
+ 		const { completer, filterValue: query } = match;
+ 
++		// Don't re-activate a dismissed autocompleter on cursor-only
++		// movement. `textContent` (text before cursor) changes with the
++		// caret, so the effect re-runs, but `record.text` does not.
++		// Complements the render-time `didUserInput` gate in
++		// `useAutocompleteProps` for callers using this hook directly.
++		if ( ! autocompleter && ! isTextChange ) {
++			return;
++		}
++
++		// Clear stale completion ref when the user types a new trigger
++		// for the same completer (the previous completion is no longer
++		// relevant). Must be after the cursor-only check so that mere
++		// cursor movement doesn't discard the suppression state.
++		if (
++			lastCompletionRef.current &&
++			lastCompletionRef.current.name === completer.name
++		) {
++			lastCompletionRef.current = null;
++		}
++
+ 		dispatch( { type: 'MATCH', completer, query } );
+ 		// We want to avoid introducing unexpected side effects.
+ 		// See https://github.com/WordPress/gutenberg/pull/41820
+diff --git a/packages/components/src/autocomplete/test/get-autocomplete-match.ts b/packages/components/src/autocomplete/test/get-autocomplete-match.ts
+index d8e094dcdfd431..765aff2973b24a 100644
+--- a/packages/components/src/autocomplete/test/get-autocomplete-match.ts
++++ b/packages/components/src/autocomplete/test/get-autocomplete-match.ts
+@@ -14,17 +14,23 @@ const createCompleter = (
+ 	...overrides,
+ } );
+ 
++const defaultOptions = {
++	matchCount: 1,
++	isBackspacing: false,
++	getTextAfterSelection: () => '',
++};
++
+ describe( 'getAutocompleteMatch', () => {
+ 	it( 'should return null for empty text content', () => {
+ 		const completers = [ createCompleter() ];
+ 		expect(
+-			getAutocompleteMatch( '', completers, 0, false, () => '' )
++			getAutocompleteMatch( '', completers, defaultOptions )
+ 		).toBeNull();
+ 	} );
+ 
+ 	it( 'should return null when no completers are provided', () => {
+ 		expect(
+-			getAutocompleteMatch( 'some text /', [], 0, false, () => '' )
++			getAutocompleteMatch( 'some text /', [], defaultOptions )
+ 		).toBeNull();
+ 	} );
+ 
+@@ -34,9 +40,7 @@ describe( 'getAutocompleteMatch', () => {
+ 			getAutocompleteMatch(
+ 				'no trigger here',
+ 				completers,
+-				1,
+-				false,
+-				() => ''
++				defaultOptions
+ 			)
+ 		).toBeNull();
+ 	} );
+@@ -46,9 +50,7 @@ describe( 'getAutocompleteMatch', () => {
+ 		const result = getAutocompleteMatch(
+ 			'some text /query',
+ 			completers,
+-			1,
+-			false,
+-			() => ''
++			defaultOptions
+ 		);
+ 		expect( result ).toEqual( {
+ 			completer: completers[ 0 ],
+@@ -61,9 +63,7 @@ describe( 'getAutocompleteMatch', () => {
+ 		const result = getAutocompleteMatch(
+ 			'hello @',
+ 			completers,
+-			1,
+-			false,
+-			() => ''
++			defaultOptions
+ 		);
+ 		expect( result ).toEqual( {
+ 			completer: completers[ 0 ],
+@@ -83,9 +83,7 @@ describe( 'getAutocompleteMatch', () => {
+ 		const result = getAutocompleteMatch(
+ 			'/command some text @user',
+ 			[ slashCompleter, atCompleter ],
+-			1,
+-			false,
+-			() => ''
++			defaultOptions
+ 		);
+ 		expect( result?.completer.name ).toBe( 'at' );
+ 	} );
+@@ -94,47 +92,35 @@ describe( 'getAutocompleteMatch', () => {
+ 		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
+ 		const longText = '/' + 'a'.repeat( 51 );
+ 		expect(
+-			getAutocompleteMatch( longText, completers, 1, false, () => '' )
++			getAutocompleteMatch( longText, completers, defaultOptions )
+ 		).toBeNull();
+ 	} );
+ 
+ 	it( 'should match when text after trigger is exactly 50 chars', () => {
+ 		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
+ 		const text = '/' + 'a'.repeat( 50 );
+-		const result = getAutocompleteMatch(
+-			text,
+-			completers,
+-			1,
+-			false,
+-			() => ''
+-		);
++		const result = getAutocompleteMatch( text, completers, defaultOptions );
+ 		expect( result ).not.toBeNull();
+ 		expect( result?.filterValue ).toBe( 'a'.repeat( 50 ) );
+ 	} );
+ 
+ 	it( 'should return null on mismatch with multiple words and no backspacing', () => {
+ 		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
+-		// 4 words from trigger, mismatch (filteredOptionsLength=0), not backspacing
++		// 4 words from trigger, mismatch (matchCount=0), not backspacing
+ 		expect(
+-			getAutocompleteMatch(
+-				'text @one two three four',
+-				completers,
+-				0,
+-				false,
+-				() => ''
+-			)
++			getAutocompleteMatch( 'text @one two three four', completers, {
++				...defaultOptions,
++				matchCount: 0,
++			} )
+ 		).toBeNull();
+ 	} );
+ 
+ 	it( 'should still match on mismatch when there is only one trigger word', () => {
+ 		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
+-		const result = getAutocompleteMatch(
+-			'text @xyz',
+-			completers,
+-			0,
+-			false,
+-			() => ''
+-		);
++		const result = getAutocompleteMatch( 'text @xyz', completers, {
++			...defaultOptions,
++			matchCount: 0,
++		} );
+ 		expect( result ).not.toBeNull();
+ 		expect( result?.filterValue ).toBe( 'xyz' );
+ 	} );
+@@ -144,9 +130,11 @@ describe( 'getAutocompleteMatch', () => {
+ 		const result = getAutocompleteMatch(
+ 			'text @one two three',
+ 			completers,
+-			0,
+-			true,
+-			() => ''
++			{
++				...defaultOptions,
++				matchCount: 0,
++				isBackspacing: true,
++			}
+ 		);
+ 		expect( result ).not.toBeNull();
+ 	} );
+@@ -154,27 +142,25 @@ describe( 'getAutocompleteMatch', () => {
+ 	it( 'should NOT match while backspacing if more than 3 words from trigger', () => {
+ 		const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
+ 		expect(
+-			getAutocompleteMatch(
+-				'text @one two three four',
+-				completers,
+-				0,
+-				true,
+-				() => ''
+-			)
++			getAutocompleteMatch( 'text @one two three four', completers, {
++				...defaultOptions,
++				matchCount: 0,
++				isBackspacing: true,
++			} )
+ 		).toBeNull();
+ 	} );
+ 
+ 	it( 'should return null when text after trigger starts with whitespace', () => {
+ 		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
+ 		expect(
+-			getAutocompleteMatch( '/ query', completers, 1, false, () => '' )
++			getAutocompleteMatch( '/ query', completers, defaultOptions )
+ 		).toBeNull();
+ 	} );
+ 
+ 	it( 'should return null when text after trigger ends with multiple spaces', () => {
+ 		const completers = [ createCompleter( { triggerPrefix: '/' } ) ];
+ 		expect(
+-			getAutocompleteMatch( '/query  ', completers, 1, false, () => '' )
++			getAutocompleteMatch( '/query  ', completers, defaultOptions )
+ 		).toBeNull();
+ 	} );
+ 
+@@ -186,7 +172,7 @@ describe( 'getAutocompleteMatch', () => {
+ 			} ),
+ 		];
+ 		expect(
+-			getAutocompleteMatch( 'text @user', completers, 1, false, () => '' )
++			getAutocompleteMatch( 'text @user', completers, defaultOptions )
+ 		).toBeNull();
+ 	} );
+ 
+@@ -198,13 +184,10 @@ describe( 'getAutocompleteMatch', () => {
+ 				allowContext,
+ 			} ),
+ 		];
+-		getAutocompleteMatch(
+-			'before @user',
+-			completers,
+-			1,
+-			false,
+-			() => 'after'
+-		);
++		getAutocompleteMatch( 'before @user', completers, {
++			...defaultOptions,
++			getTextAfterSelection: () => 'after',
++		} );
+ 		expect( allowContext ).toHaveBeenCalledWith( 'before ', 'after' );
+ 	} );
+ 
+@@ -213,9 +196,7 @@ describe( 'getAutocompleteMatch', () => {
+ 		const result = getAutocompleteMatch(
+ 			'text @café',
+ 			completers,
+-			1,
+-			false,
+-			() => ''
++			defaultOptions
+ 		);
+ 		expect( result ).not.toBeNull();
+ 		expect( result?.filterValue ).toBe( 'cafe' );
+@@ -233,9 +214,7 @@ describe( 'getAutocompleteMatch', () => {
+ 		const result = getAutocompleteMatch(
+ 			'@@user',
+ 			[ singleAt, doubleAt ],
+-			1,
+-			false,
+-			() => ''
++			defaultOptions
+ 		);
+ 		expect( result?.completer.name ).toBe( 'double' );
+ 		expect( result?.filterValue ).toBe( 'user' );
+@@ -253,9 +232,7 @@ describe( 'getAutocompleteMatch', () => {
+ 		const result = getAutocompleteMatch(
+ 			'hello @user',
+ 			[ singleAt, doubleAt ],
+-			1,
+-			false,
+-			() => ''
++			defaultOptions
+ 		);
+ 		expect( result?.completer.name ).toBe( 'single' );
+ 		expect( result?.filterValue ).toBe( 'user' );
+@@ -266,9 +243,7 @@ describe( 'getAutocompleteMatch', () => {
+ 		const result = getAutocompleteMatch(
+ 			'text $$query',
+ 			completers,
+-			1,
+-			false,
+-			() => ''
++			defaultOptions
+ 		);
+ 		expect( result ).not.toBeNull();
+ 		expect( result?.filterValue ).toBe( 'query' );
+@@ -279,14 +254,63 @@ describe( 'getAutocompleteMatch', () => {
+ 		const result = getAutocompleteMatch(
+ 			'/hello world',
+ 			completers,
+-			1,
+-			false,
+-			() => ''
++			defaultOptions
+ 		);
+ 		expect( result ).not.toBeNull();
+ 		expect( result?.filterValue ).toBe( 'hello world' );
+ 	} );
+ 
++	describe( 'lastCompletion suppression', () => {
++		it( 'should suppress match when text equals last completion value', () => {
++			const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
++			expect(
++				getAutocompleteMatch( '@user', completers, {
++					...defaultOptions,
++					lastCompletion: {
++						name: completers[ 0 ].name,
++						value: 'user',
++					},
++				} )
++			).toBeNull();
++		} );
++
++		it( 'should suppress match ignoring trailing whitespace', () => {
++			const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
++			expect(
++				getAutocompleteMatch( '@user ', completers, {
++					...defaultOptions,
++					lastCompletion: {
++						name: completers[ 0 ].name,
++						value: 'user',
++					},
++				} )
++			).toBeNull();
++		} );
++
++		it( 'should NOT suppress match when completer name differs', () => {
++			const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
++			const result = getAutocompleteMatch( '@user', completers, {
++				...defaultOptions,
++				lastCompletion: { name: 'other', value: 'user' },
++			} );
++			expect( result ).not.toBeNull();
++			expect( result?.filterValue ).toBe( 'user' );
++		} );
++
++		it( 'should NOT suppress match when text diverges from last completion', () => {
++			const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
++			const result = getAutocompleteMatch( '@user2', completers, {
++				...defaultOptions,
++				lastCompletion: {
++					name: completers[ 0 ].name,
++					value: 'user',
++				},
++			} );
++			expect( result ).not.toBeNull();
++			expect( result?.filterValue ).toBe( 'user2' );
++		} );
++	} );
++
+ 	it.each( [
+ 		{
+ 			text: 'café @user',
+@@ -327,9 +351,7 @@ describe( 'getAutocompleteMatch', () => {
+ 			const result = getAutocompleteMatch(
+ 				text,
+ 				completers,
+-				1,
+-				false,
+-				() => ''
++				defaultOptions
+ 			);
+ 			expect( result ).not.toBeNull();
+ 			expect( result?.filterValue ).toBe( expected );
+diff --git a/test/e2e/specs/editor/various/autocomplete-and-mentions.spec.js b/test/e2e/specs/editor/various/autocomplete-and-mentions.spec.js
+index a5e3e3a79c003d..a4ef065c85bbf0 100644
+--- a/test/e2e/specs/editor/various/autocomplete-and-mentions.spec.js
++++ b/test/e2e/specs/editor/various/autocomplete-and-mentions.spec.js
+@@ -413,10 +413,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
+ 					)
+ 				).toBeVisible();
+ 				await page.keyboard.press( 'Enter' );
+-				// Autocompleter might continue matching right after insertion,
+-				// Emulate typing speed to avoid that.
+-				// Remove after https://github.com/WordPress/gutenberg/issues/42925 is resolved.
+-				await page.keyboard.type( ' test', { delay: 100 } );
++				await page.keyboard.type( ' test' );
+ 				await page.keyboard.press( 'Enter' );
+ 			}
+ 
+@@ -575,4 +572,178 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
+ 			page.getByText( 'use up and down arrow keys to navigate.' )
+ 		).toBeVisible();
+ 	} );
++
++	// See: https://github.com/WordPress/gutenberg/issues/42925.
++	test( 'should not re-trigger autocomplete after selecting a mention option', async ( {
++		editor,
++		page,
++	} ) => {
++		await editor.canvas
++			.getByRole( 'button', { name: 'Add default block' } )
++			.click();
++		const mentionOption = page.getByRole( 'option', {
++			name: 'Bilbo Baggins thebetterhobbit',
++			selected: true,
++		} );
++
++		await page.keyboard.type( '@bi' );
++		await expect( mentionOption ).toBeVisible();
++		await page.keyboard.press( 'Enter' );
++
++		// Verify the completion was inserted.
++		await expect.poll( editor.getEditedPostContent ).toBe(
++			`<!-- wp:paragraph -->
++<p>@thebetterhobbit</p>
++<!-- /wp:paragraph -->`
++		);
++
++		// Allow time for autocomplete re-trigger effects to settle.
++		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
++		await page.waitForTimeout( 100 );
++		await expect( page.getByRole( 'listbox' ) ).toBeHidden();
++	} );
++
++	// See: https://github.com/WordPress/gutenberg/issues/77007.
++	// TODO: Fixing this requires tracking multiple completions or a fresh-trigger model.
++	test.fixme(
++		'should not re-trigger autocomplete after accepting a mention and changing text near it',
++		async ( { editor, page, pageUtils } ) => {
++			await editor.canvas
++				.getByRole( 'button', { name: 'Add default block' } )
++				.click();
++
++			await page.keyboard.type( '@bi' );
++			await expect(
++				page.getByRole( 'option', {
++					name: 'Bilbo Baggins thebetterhobbit',
++					selected: true,
++				} )
++			).toBeVisible();
++			await page.keyboard.press( 'Enter' );
++			await page.keyboard.type( '  ' );
++			await page.keyboard.type( '@ad' );
++			await expect(
++				page.getByRole( 'option', {
++					name: 'admin',
++					selected: true,
++				} )
++			).toBeVisible();
++			await page.keyboard.press( 'Enter' );
++
++			// Verify the completion was inserted.
++			await expect.poll( editor.getEditedPostContent ).toBe(
++				`<!-- wp:paragraph -->
++<p>@thebetterhobbit  @admin</p>
++<!-- /wp:paragraph -->`
++			);
++
++			// Move cursor after second mention and make an edit to trigger selection change effects.
++			await pageUtils.pressKeys( 'alt+ArrowLeft' );
++			await page.keyboard.press( 'ArrowLeft' );
++			await page.keyboard.press( 'Backspace' );
++
++			// Allow time for autocomplete re-trigger effects to settle.
++			// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
++			await page.waitForTimeout( 100 );
++			await expect( page.getByRole( 'listbox' ) ).toBeHidden();
++		}
++	);
++
++	test( 'should re-trigger autocomplete for a new mention after completing one', async ( {
++		editor,
++		page,
++	} ) => {
++		await editor.canvas
++			.getByRole( 'button', { name: 'Add default block' } )
++			.click();
++
++		await page.keyboard.type( '@bi' );
++		await expect(
++			page.getByRole( 'option', {
++				name: 'Bilbo Baggins',
++				selected: true,
++			} )
++		).toBeVisible();
++		await page.keyboard.press( 'Enter' );
++
++		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
++		await page.waitForTimeout( 100 );
++		await expect( page.getByRole( 'listbox' ) ).toBeHidden();
++
++		// Type a new trigger — autocomplete should re-activate.
++		await page.keyboard.type( ' @fr' );
++		await expect(
++			page.getByRole( 'option', {
++				name: 'Frodo Baggins',
++				selected: true,
++			} )
++		).toBeVisible();
++		await page.keyboard.press( 'Enter' );
++
++		await expect.poll( editor.getEditedPostContent ).toBe(
++			`<!-- wp:paragraph -->
++<p>@thebetterhobbit @ringbearer</p>
++<!-- /wp:paragraph -->`
++		);
++	} );
++
++	test( 'should dismiss autocomplete on Escape and not re-trigger on cursor movement', async ( {
++		editor,
++		page,
++	} ) => {
++		await editor.canvas
++			.getByRole( 'button', { name: 'Add default block' } )
++			.click();
++
++		await page.keyboard.type( 'hello @fr' );
++		await expect(
++			page.getByRole( 'option', {
++				name: 'Frodo Baggins',
++				selected: true,
++			} )
++		).toBeVisible();
++
++		// Dismiss via Escape.
++		await page.keyboard.press( 'Escape' );
++		await expect( page.getByRole( 'listbox' ) ).toBeHidden();
++
++		// Move cursor around — popup should stay hidden.
++		await page.keyboard.press( 'ArrowLeft' );
++		await page.keyboard.press( 'ArrowLeft' );
++		await page.keyboard.press( 'ArrowRight' );
++
++		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
++		await page.waitForTimeout( 100 );
++		await expect( page.getByRole( 'listbox' ) ).toBeHidden();
++	} );
++
++	test( 'should re-trigger autocomplete when backspacing into a completed mention', async ( {
++		editor,
++		page,
++	} ) => {
++		await editor.canvas
++			.getByRole( 'button', { name: 'Add default block' } )
++			.click();
++
++		await page.keyboard.type( '@fr' );
++		await expect(
++			page.getByRole( 'option', {
++				name: 'Frodo Baggins',
++				selected: true,
++			} )
++		).toBeVisible();
++		await page.keyboard.press( 'Enter' );
++
++		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
++		await page.waitForTimeout( 100 );
++		await expect( page.getByRole( 'listbox' ) ).toBeHidden();
++
++		// Backspace into the completed mention — should re-open the popup.
++		await page.keyboard.press( 'Backspace' );
++		await expect(
++			page.getByRole( 'option', {
++				name: 'Frodo Baggins',
++			} )
++		).toBeVisible();
++	} );
+ } );

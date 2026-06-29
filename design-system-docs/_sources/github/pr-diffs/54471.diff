@@ -1,0 +1,165 @@
+diff --git a/packages/base-styles/_variables.scss b/packages/base-styles/_variables.scss
+index 584c057ec1ecab..d47f6e95b6265e 100644
+--- a/packages/base-styles/_variables.scss
++++ b/packages/base-styles/_variables.scss
+@@ -58,6 +58,9 @@ $admin-sidebar-width: 160px;
+ $admin-sidebar-width-big: 190px;
+ $admin-sidebar-width-collapsed: 36px;
+ $modal-min-width: 350px;
++$modal-width-small: 384px;
++$modal-width-medium: 512px;
++$modal-width-large: 840px;
+ $spinner-size: 16px;
+ $canvas-padding: $grid-unit-30;
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 64863bd11cb191..e0a80b0295aa7b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   `DuotonePicker/ColorListPicker`: Adds appropriate label and description to 'Duotone Filter' picker ([#54473](https://github.com/WordPress/gutenberg/pull/54473)).
+ -   `Modal`: Accessibly hide/show outer modal when nested ([#54743](https://github.com/WordPress/gutenberg/pull/54743)).
+ -   `InputControl`, `NumberControl`, `UnitControl`, `SelectControl`, `CustomSelectControl`, `TreeSelect`: Add opt-in prop for next 40px default size, superseding the `__next36pxDefaultSize` prop ([#53819](https://github.com/WordPress/gutenberg/pull/53819)).
++-   `Modal`: add a new `size` prop to support preset widths, including a `fill` option to eventually replace the `isFullScreen` prop ([#54471](https://github.com/WordPress/gutenberg/pull/54471)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/modal/README.md b/packages/components/src/modal/README.md
+index 31cfdfa59c8c70..6420d07ee15b88 100644
+--- a/packages/components/src/modal/README.md
++++ b/packages/components/src/modal/README.md
+@@ -221,6 +221,14 @@ This property when set to `true` will render a full screen modal.
+ -   Required: No
+ -   Default: `false`
+ 
++#### `size`: `'small' | 'medium' | 'large' | 'fill'`
++
++If this property is added it will cause the modal to render at a preset width, or expand to fill the screen. This prop will be ignored if `isFullScreen` is set to `true`.
++
++-   Required: No
++
++Note: `Modal`'s width can also be controlled by adjusting the width of the modal's contents via CSS.
++
+ #### `onRequestClose`: ``
+ 
+ This function is called to indicate that the modal should be closed.
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 13d352f46058b1..2746c40fcaab02 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -66,6 +66,7 @@ function UnforwardedModal(
+ 		contentLabel,
+ 		onKeyDown,
+ 		isFullScreen = false,
++		size,
+ 		headerActions = null,
+ 		__experimentalHideHeader = false,
+ 	} = props;
+@@ -97,6 +98,13 @@ function UnforwardedModal(
+ 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
+ 	const [ hasScrollableContent, setHasScrollableContent ] = useState( false );
+ 
++	let sizeClass;
++	if ( isFullScreen || size === 'fill' ) {
++		sizeClass = 'is-full-screen';
++	} else if ( size ) {
++		sizeClass = `has-size-${ size }`;
++	}
++
+ 	// Determines whether the Modal content is scrollable and updates the state.
+ 	const isContentScrollable = useCallback( () => {
+ 		if ( ! contentRef.current ) {
+@@ -229,10 +237,8 @@ function UnforwardedModal(
+ 				<div
+ 					className={ classnames(
+ 						'components-modal__frame',
+-						className,
+-						{
+-							'is-full-screen': isFullScreen,
+-						}
++						sizeClass,
++						className
+ 					) }
+ 					style={ style }
+ 					ref={ useMergeRefs( [
+diff --git a/packages/components/src/modal/stories/index.story.tsx b/packages/components/src/modal/stories/index.story.tsx
+index bfe5f4560e0d88..60a53947116fac 100644
+--- a/packages/components/src/modal/stories/index.story.tsx
++++ b/packages/components/src/modal/stories/index.story.tsx
+@@ -61,11 +61,7 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
+ 				Open Modal
+ 			</Button>
+ 			{ isOpen && (
+-				<Modal
+-					onRequestClose={ closeModal }
+-					style={ { maxWidth: '600px' } }
+-					{ ...args }
+-				>
++				<Modal onRequestClose={ closeModal } { ...args }>
+ 					<p>
+ 						Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+ 						sed do eiusmod tempor incididunt ut labore et magna
+@@ -101,6 +97,12 @@ Default.parameters = {
+ 	},
+ };
+ 
++export const WithsizeSmall: StoryFn< typeof Modal > = Template.bind( {} );
++WithsizeSmall.args = {
++	size: 'small',
++};
++WithsizeSmall.storyName = 'With size: small';
++
+ const LikeButton = () => {
+ 	const [ isLiked, setIsLiked ] = useState( false );
+ 	return (
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index d4ca7c311fcf19..0933f836892f1d 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -50,6 +50,26 @@
+ 				max-width: none;
+ 			}
+ 		}
++
++		&.has-size-small,
++		&.has-size-medium,
++		&.has-size-large {
++			width: 100%;
++		}
++
++		// The following widths were selected to align with existing baselines
++		// found elsewhere in the editor.
++		// See https://github.com/WordPress/gutenberg/pull/54471#issuecomment-1723818809
++		&.has-size-small {
++			max-width: $modal-width-small;
++		}
++		&.has-size-medium {
++			max-width: $modal-width-medium;
++		}
++		&.has-size-large {
++			max-width: $modal-width-large;
++		}
++
+ 	}
+ 
+ 	@include break-large() {
+diff --git a/packages/components/src/modal/types.ts b/packages/components/src/modal/types.ts
+index a001686901d4b6..0a422718b1be14 100644
+--- a/packages/components/src/modal/types.ts
++++ b/packages/components/src/modal/types.ts
+@@ -96,6 +96,15 @@ export type ModalProps = {
+ 	 * @default false
+ 	 */
+ 	isFullScreen?: boolean;
++	/**
++	 * If this property is added it will cause the modal to render at a preset
++	 * width, or expand to fill the screen. This prop will be ignored if
++	 * `isFullScreen` is set to `true`.
++	 *
++	 * Note: `Modal`'s width can also be controlled by adjusting the width of the
++	 * modal's contents, or via CSS using the `style` prop.
++	 */
++	size?: 'small' | 'medium' | 'large' | 'fill';
+ 	/**
+ 	 *  Handle the key down on the modal frame `div`.
+ 	 */

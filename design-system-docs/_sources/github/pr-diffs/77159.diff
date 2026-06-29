@@ -1,0 +1,2615 @@
+diff --git a/.github/CODEOWNERS b/.github/CODEOWNERS
+index b9de52e0042f60..2891e78cca7cdb 100644
+--- a/.github/CODEOWNERS
++++ b/.github/CODEOWNERS
+@@ -81,6 +81,7 @@
+ # UI Components
+ /packages/components                            @ajitbohra @WordPress/gutenberg-components
+ /packages/compose                               @ajitbohra
++/packages/design-system-mcp                     @WordPress/gutenberg-components
+ /packages/element                               @ajitbohra
+ /packages/notices                               @ajitbohra
+ /packages/nux                                   @ajitbohra @peterwilsoncc
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 538ed4e4ed12f0..550dc5d19bf496 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1667,6 +1667,12 @@
+ 		"markdown_source": "../packages/deprecated/README.md",
+ 		"parent": "packages"
+ 	},
++	{
++		"title": "@wordpress/design-system-mcp",
++		"slug": "packages-design-system-mcp",
++		"markdown_source": "../packages/design-system-mcp/README.md",
++		"parent": "packages"
++	},
+ 	{
+ 		"title": "@wordpress/docgen",
+ 		"slug": "packages-docgen",
+diff --git a/eslint.config.mjs b/eslint.config.mjs
+index af1f1ef566231f..528e069af3c0b0 100644
+--- a/eslint.config.mjs
++++ b/eslint.config.mjs
+@@ -737,9 +737,10 @@ export default dedupePlugins( [
+ 		},
+ 	},
+ 
+-	// Override: UI package — disable dependency-group.
++	// Override: Packages which have eliminated dependency grouping comments
++	// and explicitly prevent new additions.
+ 	{
+-		files: [ 'packages/ui/src/**' ],
++		files: [ 'packages/ui/**', 'packages/design-system-mcp/**' ],
+ 		rules: {
+ 			'@wordpress/dependency-group': [ 'error', 'never' ],
+ 		},
+diff --git a/package-lock.json b/package-lock.json
+index c586027f57876b..3fc9d1d6b40829 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -4213,6 +4213,12 @@
+ 				"react": "*"
+ 			}
+ 		},
++		"node_modules/@cfworker/json-schema": {
++			"version": "4.1.1",
++			"resolved": "https://registry.npmjs.org/@cfworker/json-schema/-/json-schema-4.1.1.tgz",
++			"integrity": "sha512-gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og==",
++			"license": "MIT"
++		},
+ 		"node_modules/@colors/colors": {
+ 			"version": "1.5.0",
+ 			"resolved": "https://registry.npmjs.org/@colors/colors/-/colors-1.5.0.tgz",
+@@ -8028,6 +8034,35 @@
+ 				"react": ">=16"
+ 			}
+ 		},
++		"node_modules/@modelcontextprotocol/server": {
++			"version": "2.0.0-alpha.2",
++			"resolved": "https://registry.npmjs.org/@modelcontextprotocol/server/-/server-2.0.0-alpha.2.tgz",
++			"integrity": "sha512-gmLgdHzlYM8L7Aw/+VE0kxjT25WKamtUSLNhdOgrJq5CrESvqVSoAfWSJJeNPUXNTluQ+dYDGFbKVitdsJtbPA==",
++			"license": "MIT",
++			"dependencies": {
++				"zod": "^4.0"
++			},
++			"engines": {
++				"node": ">=20"
++			},
++			"peerDependencies": {
++				"@cfworker/json-schema": "^4.1.1"
++			},
++			"peerDependenciesMeta": {
++				"@cfworker/json-schema": {
++					"optional": true
++				}
++			}
++		},
++		"node_modules/@modelcontextprotocol/server/node_modules/zod": {
++			"version": "4.3.6",
++			"resolved": "https://registry.npmjs.org/zod/-/zod-4.3.6.tgz",
++			"integrity": "sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==",
++			"license": "MIT",
++			"funding": {
++				"url": "https://github.com/sponsors/colinhacks"
++			}
++		},
+ 		"node_modules/@napi-rs/wasm-runtime": {
+ 			"version": "0.2.4",
+ 			"resolved": "https://registry.npmjs.org/@napi-rs/wasm-runtime/-/wasm-runtime-0.2.4.tgz",
+@@ -20502,6 +20537,10 @@
+ 			"resolved": "packages/deprecated",
+ 			"link": true
+ 		},
++		"node_modules/@wordpress/design-system-mcp": {
++			"resolved": "packages/design-system-mcp",
++			"link": true
++		},
+ 		"node_modules/@wordpress/docgen": {
+ 			"resolved": "packages/docgen",
+ 			"link": true
+@@ -59438,6 +59477,35 @@
+ 				"npm": ">=8.19.2"
+ 			}
+ 		},
++		"packages/design-system-mcp": {
++			"name": "@wordpress/design-system-mcp",
++			"version": "0.1.0",
++			"license": "GPL-2.0-or-later",
++			"dependencies": {
++				"@cfworker/json-schema": "4.1.1",
++				"@modelcontextprotocol/server": "2.0.0-alpha.2",
++				"zod": "4.3.6"
++			},
++			"bin": {
++				"design-system-mcp": "bin/design-system-mcp.mjs"
++			},
++			"devDependencies": {
++				"@types/jest": "^29.5.14"
++			},
++			"engines": {
++				"node": ">=20.10.0",
++				"npm": ">=10.2.3"
++			}
++		},
++		"packages/design-system-mcp/node_modules/zod": {
++			"version": "4.3.6",
++			"resolved": "https://registry.npmjs.org/zod/-/zod-4.3.6.tgz",
++			"integrity": "sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==",
++			"license": "MIT",
++			"funding": {
++				"url": "https://github.com/sponsors/colinhacks"
++			}
++		},
+ 		"packages/docgen": {
+ 			"name": "@wordpress/docgen",
+ 			"version": "2.44.0",
+diff --git a/packages/components/src/base-control/stories/index.story.tsx b/packages/components/src/base-control/stories/index.story.tsx
+index 0d43b7b85f7b4c..60d3fe3b2b52da 100644
+--- a/packages/components/src/base-control/stories/index.story.tsx
++++ b/packages/components/src/base-control/stories/index.story.tsx
+@@ -10,6 +10,7 @@ import BaseControl, { useBaseControlProps } from '..';
+ import Button from '../../button';
+ 
+ const meta: Meta< typeof BaseControl > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Selection & Input/Common/BaseControl',
+ 	id: 'components-basecontrol',
+ 	component: BaseControl,
+diff --git a/packages/components/src/button/stories/index.story.tsx b/packages/components/src/button/stories/index.story.tsx
+index 5abe3fa13a647c..aa7648d0ba5bfb 100644
+--- a/packages/components/src/button/stories/index.story.tsx
++++ b/packages/components/src/button/stories/index.story.tsx
+@@ -21,6 +21,7 @@ import {
+ import Button from '..';
+ 
+ const meta: Meta< typeof Button > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Actions/Button',
+ 	id: 'components-button',
+ 	component: Button,
+diff --git a/packages/components/src/checkbox-control/stories/index.story.tsx b/packages/components/src/checkbox-control/stories/index.story.tsx
+index 69607d71cc8a96..6c267f35761f15 100644
+--- a/packages/components/src/checkbox-control/stories/index.story.tsx
++++ b/packages/components/src/checkbox-control/stories/index.story.tsx
+@@ -16,6 +16,7 @@ import { VStack } from '../../v-stack';
+ import { HStack } from '../../h-stack';
+ 
+ const meta: Meta< typeof CheckboxControl > = {
++	tags: [ 'manifest' ],
+ 	component: CheckboxControl,
+ 	title: 'Components/Selection & Input/Common/CheckboxControl',
+ 	id: 'components-checkboxcontrol',
+diff --git a/packages/components/src/color-indicator/stories/index.story.tsx b/packages/components/src/color-indicator/stories/index.story.tsx
+index 2aca2f7c7f44d4..6cde6251a66141 100644
+--- a/packages/components/src/color-indicator/stories/index.story.tsx
++++ b/packages/components/src/color-indicator/stories/index.story.tsx
+@@ -9,6 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
+ import ColorIndicator from '..';
+ 
+ const meta: Meta< typeof ColorIndicator > = {
++	tags: [ 'manifest' ],
+ 	component: ColorIndicator,
+ 	title: 'Components/Selection & Input/Color/ColorIndicator',
+ 	id: 'components-colorindicator',
+diff --git a/packages/components/src/color-palette/stories/index.story.tsx b/packages/components/src/color-palette/stories/index.story.tsx
+index 8ba54b154e3cb7..30671aba62f106 100644
+--- a/packages/components/src/color-palette/stories/index.story.tsx
++++ b/packages/components/src/color-palette/stories/index.story.tsx
+@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
+ import ColorPalette from '..';
+ 
+ const meta: Meta< typeof ColorPalette > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Selection & Input/Color/ColorPalette',
+ 	id: 'components-colorpalette',
+ 	component: ColorPalette,
+diff --git a/packages/components/src/color-picker/stories/index.story.tsx b/packages/components/src/color-picker/stories/index.story.tsx
+index b3b53ef328b42e..b4ff4690c6dbdf 100644
+--- a/packages/components/src/color-picker/stories/index.story.tsx
++++ b/packages/components/src/color-picker/stories/index.story.tsx
+@@ -10,6 +10,7 @@ import { fn } from 'storybook/test';
+ import { ColorPicker } from '../component';
+ 
+ const meta: Meta< typeof ColorPicker > = {
++	tags: [ 'manifest' ],
+ 	component: ColorPicker,
+ 	title: 'Components/Selection & Input/Color/ColorPicker',
+ 	id: 'components-colorpicker',
+diff --git a/packages/components/src/combobox-control/stories/index.story.tsx b/packages/components/src/combobox-control/stories/index.story.tsx
+index e67a8cc6534802..0aceec851dbda8 100644
+--- a/packages/components/src/combobox-control/stories/index.story.tsx
++++ b/packages/components/src/combobox-control/stories/index.story.tsx
+@@ -35,6 +35,7 @@ const countries = [
+ ];
+ 
+ const meta: Meta< typeof ComboboxControl > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Selection & Input/Common/ComboboxControl',
+ 	id: 'components-comboboxcontrol',
+ 	component: ComboboxControl,
+diff --git a/packages/components/src/composite/stories/index.story.tsx b/packages/components/src/composite/stories/index.story.tsx
+index c23558ff2889ee..cc32c9d00af27d 100644
+--- a/packages/components/src/composite/stories/index.story.tsx
++++ b/packages/components/src/composite/stories/index.story.tsx
+@@ -16,6 +16,7 @@ import { Composite } from '..';
+ import { Tooltip } from '../../tooltip';
+ 
+ const meta: Meta< typeof Composite > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Utilities/Composite',
+ 	id: 'components-composite',
+ 	component: Composite,
+diff --git a/packages/components/src/confirm-dialog/stories/index.story.tsx b/packages/components/src/confirm-dialog/stories/index.story.tsx
+index fc0d97cf9abfe2..4433e96d443e27 100644
+--- a/packages/components/src/confirm-dialog/stories/index.story.tsx
++++ b/packages/components/src/confirm-dialog/stories/index.story.tsx
+@@ -24,7 +24,7 @@ const meta: Meta< typeof ConfirmDialog > = {
+ 			control: false,
+ 		},
+ 	},
+-	tags: [ 'status-experimental' ],
++	tags: [ 'status-experimental', 'manifest' ],
+ 	args: {
+ 		onCancel: fn(),
+ 		onConfirm: fn(),
+diff --git a/packages/components/src/custom-select-control/stories/index.story.tsx b/packages/components/src/custom-select-control/stories/index.story.tsx
+index 0bfd5c06d11040..ec9544b1eb65ba 100644
+--- a/packages/components/src/custom-select-control/stories/index.story.tsx
++++ b/packages/components/src/custom-select-control/stories/index.story.tsx
+@@ -15,6 +15,7 @@ import { useState } from '@wordpress/element';
+ import CustomSelectControl from '..';
+ 
+ const meta: Meta< typeof CustomSelectControl > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Selection & Input/Common/CustomSelectControl',
+ 	component: CustomSelectControl,
+ 	id: 'components-customselectcontrol',
+diff --git a/packages/components/src/disabled/stories/index.story.tsx b/packages/components/src/disabled/stories/index.story.tsx
+index fb3fc92758fd67..21b5dacdbec3ac 100644
+--- a/packages/components/src/disabled/stories/index.story.tsx
++++ b/packages/components/src/disabled/stories/index.story.tsx
+@@ -18,6 +18,7 @@ import TextareaControl from '../../textarea-control/';
+ import { VStack } from '../../v-stack/';
+ 
+ const meta: Meta< typeof Disabled > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Utilities/Disabled',
+ 	id: 'components-disabled',
+ 	component: Disabled,
+diff --git a/packages/components/src/drop-zone/stories/index.story.tsx b/packages/components/src/drop-zone/stories/index.story.tsx
+index 4c96f56225d9f8..557bc75924d6ce 100644
+--- a/packages/components/src/drop-zone/stories/index.story.tsx
++++ b/packages/components/src/drop-zone/stories/index.story.tsx
+@@ -17,6 +17,7 @@ import DropZone from '..';
+ const ICONS = { upload, media };
+ 
+ const meta: Meta< typeof DropZone > = {
++	tags: [ 'manifest' ],
+ 	component: DropZone,
+ 	id: 'components-dropzone',
+ 	title: 'Components/Selection & Input/File Upload/DropZone',
+diff --git a/packages/components/src/dropdown/stories/index.story.tsx b/packages/components/src/dropdown/stories/index.story.tsx
+index d478bb9fe25282..b935530eb7162c 100644
+--- a/packages/components/src/dropdown/stories/index.story.tsx
++++ b/packages/components/src/dropdown/stories/index.story.tsx
+@@ -14,6 +14,7 @@ import MenuItem from '../../menu-item';
+ import { DropdownContentWrapper } from '../dropdown-content-wrapper';
+ 
+ const meta: Meta< typeof Dropdown > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Overlays/Dropdown',
+ 	id: 'components-dropdown',
+ 	component: Dropdown,
+diff --git a/packages/components/src/external-link/stories/index.story.tsx b/packages/components/src/external-link/stories/index.story.tsx
+index 75fd4e9c1a0457..18826d88042c85 100644
+--- a/packages/components/src/external-link/stories/index.story.tsx
++++ b/packages/components/src/external-link/stories/index.story.tsx
+@@ -9,6 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
+ import ExternalLink from '..';
+ 
+ const meta: Meta< typeof ExternalLink > = {
++	tags: [ 'manifest' ],
+ 	component: ExternalLink,
+ 	title: 'Components/Navigation/ExternalLink',
+ 	id: 'components-externallink',
+diff --git a/packages/components/src/form-file-upload/stories/index.story.tsx b/packages/components/src/form-file-upload/stories/index.story.tsx
+index f35b57b820a2cb..5a3600c0808a10 100644
+--- a/packages/components/src/form-file-upload/stories/index.story.tsx
++++ b/packages/components/src/form-file-upload/stories/index.story.tsx
+@@ -14,6 +14,7 @@ import { upload as uploadIcon } from '@wordpress/icons';
+ import FormFileUpload from '..';
+ 
+ const meta: Meta< typeof FormFileUpload > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Selection & Input/File Upload/FormFileUpload',
+ 	id: 'components-formfileupload',
+ 	component: FormFileUpload,
+diff --git a/packages/components/src/form-toggle/stories/index.story.tsx b/packages/components/src/form-toggle/stories/index.story.tsx
+index abb0ae5a61b103..698e48ab4c8297 100644
+--- a/packages/components/src/form-toggle/stories/index.story.tsx
++++ b/packages/components/src/form-toggle/stories/index.story.tsx
+@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
+ import FormToggle from '..';
+ 
+ const meta: Meta< typeof FormToggle > = {
++	tags: [ 'manifest' ],
+ 	component: FormToggle,
+ 	title: 'Components/FormToggle',
+ 	argTypes: {
+diff --git a/packages/components/src/form-token-field/stories/index.story.tsx b/packages/components/src/form-token-field/stories/index.story.tsx
+index c0a8d4374cc3dd..2b79675db7c6e9 100644
+--- a/packages/components/src/form-token-field/stories/index.story.tsx
++++ b/packages/components/src/form-token-field/stories/index.story.tsx
+@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
+ import FormTokenField from '../';
+ 
+ const meta: Meta< typeof FormTokenField > = {
++	tags: [ 'manifest' ],
+ 	component: FormTokenField,
+ 	title: 'Components/Selection & Input/Common/FormTokenField',
+ 	id: 'components-formtokenfield',
+diff --git a/packages/components/src/gradient-picker/stories/index.story.tsx b/packages/components/src/gradient-picker/stories/index.story.tsx
+index 576f43b02b1ec7..43162e699d7670 100644
+--- a/packages/components/src/gradient-picker/stories/index.story.tsx
++++ b/packages/components/src/gradient-picker/stories/index.story.tsx
+@@ -15,6 +15,7 @@ import { useState } from '@wordpress/element';
+ import GradientPicker from '..';
+ 
+ const meta: Meta< typeof GradientPicker > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Selection & Input/Color/GradientPicker',
+ 	id: 'components-gradientpicker',
+ 	component: GradientPicker,
+diff --git a/packages/components/src/icon/stories/index.story.tsx b/packages/components/src/icon/stories/index.story.tsx
+index 02eaa89443a9d9..4d73f4d0f3223d 100644
+--- a/packages/components/src/icon/stories/index.story.tsx
++++ b/packages/components/src/icon/stories/index.story.tsx
+@@ -16,6 +16,7 @@ import Icon from '..';
+ import { VStack } from '../../v-stack';
+ 
+ const meta: Meta< typeof Icon > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Icon',
+ 	component: Icon,
+ 	parameters: {
+diff --git a/packages/components/src/input-control/stories/index.story.tsx b/packages/components/src/input-control/stories/index.story.tsx
+index 0f05135d076f50..1c9e2dcf9c5f18 100644
+--- a/packages/components/src/input-control/stories/index.story.tsx
++++ b/packages/components/src/input-control/stories/index.story.tsx
+@@ -31,7 +31,7 @@ const meta: Meta< typeof InputControl > = {
+ 		type: { control: { type: 'text' } },
+ 		value: { control: { disable: true } },
+ 	},
+-	tags: [ 'status-experimental' ],
++	tags: [ 'status-experimental', 'manifest' ],
+ 	args: {
+ 		onChange: fn(),
+ 		onValidate: fn(),
+diff --git a/packages/components/src/item-group/stories/index.story.tsx b/packages/components/src/item-group/stories/index.story.tsx
+index 374dd292e009bf..4121cea7127f53 100644
+--- a/packages/components/src/item-group/stories/index.story.tsx
++++ b/packages/components/src/item-group/stories/index.story.tsx
+@@ -19,7 +19,7 @@ const meta: Meta< typeof ItemGroup > = {
+ 		as: { control: false },
+ 		children: { control: false },
+ 	},
+-	tags: [ 'status-experimental' ],
++	tags: [ 'status-experimental', 'manifest' ],
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+diff --git a/packages/components/src/keyboard-shortcuts/stories/index.story.tsx b/packages/components/src/keyboard-shortcuts/stories/index.story.tsx
+index 102a7264f7b0d9..fd7708633c6add 100644
+--- a/packages/components/src/keyboard-shortcuts/stories/index.story.tsx
++++ b/packages/components/src/keyboard-shortcuts/stories/index.story.tsx
+@@ -9,6 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
+ import KeyboardShortcuts from '..';
+ 
+ const meta: Meta< typeof KeyboardShortcuts > = {
++	tags: [ 'manifest' ],
+ 	component: KeyboardShortcuts,
+ 	title: 'Components/Utilities/KeyboardShortcuts',
+ 	id: 'components-keyboardshortcuts',
+diff --git a/packages/components/src/menu-group/stories/index.story.tsx b/packages/components/src/menu-group/stories/index.story.tsx
+index 989354a579ffe9..5e67930e5456d5 100644
+--- a/packages/components/src/menu-group/stories/index.story.tsx
++++ b/packages/components/src/menu-group/stories/index.story.tsx
+@@ -16,6 +16,7 @@ import MenuItem from '../../menu-item';
+ import MenuItemsChoice from '../../menu-items-choice';
+ 
+ const meta: Meta< typeof MenuGroup > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Actions/MenuGroup',
+ 	component: MenuGroup,
+ 	id: 'components-menugroup',
+diff --git a/packages/components/src/menu-item/stories/index.story.tsx b/packages/components/src/menu-item/stories/index.story.tsx
+index f1d61e58f47d93..a39417681ed336 100644
+--- a/packages/components/src/menu-item/stories/index.story.tsx
++++ b/packages/components/src/menu-item/stories/index.story.tsx
+@@ -16,6 +16,7 @@ import MenuItem from '..';
+ import Shortcut from '../../shortcut';
+ 
+ const meta: Meta< typeof MenuItem > = {
++	tags: [ 'manifest' ],
+ 	component: MenuItem,
+ 	title: 'Components/Actions/MenuItem',
+ 	id: 'components-menuitem',
+diff --git a/packages/components/src/menu-items-choice/stories/index.story.tsx b/packages/components/src/menu-items-choice/stories/index.story.tsx
+index 55d9f12450afe9..283e214488912c 100644
+--- a/packages/components/src/menu-items-choice/stories/index.story.tsx
++++ b/packages/components/src/menu-items-choice/stories/index.story.tsx
+@@ -15,6 +15,7 @@ import MenuItemsChoice from '..';
+ import MenuGroup from '../../menu-group';
+ 
+ const meta: Meta< typeof MenuItemsChoice > = {
++	tags: [ 'manifest' ],
+ 	component: MenuItemsChoice,
+ 	title: 'Components/Actions/MenuItemsChoice',
+ 	id: 'components-menuitemschoice',
+diff --git a/packages/components/src/modal/stories/index.story.tsx b/packages/components/src/modal/stories/index.story.tsx
+index 615c8fb3ebb626..fb2d1442857b03 100644
+--- a/packages/components/src/modal/stories/index.story.tsx
++++ b/packages/components/src/modal/stories/index.story.tsx
+@@ -18,6 +18,7 @@ import Modal from '../';
+ import type { ModalProps } from '../types';
+ 
+ const meta: Meta< typeof Modal > = {
++	tags: [ 'manifest' ],
+ 	component: Modal,
+ 	title: 'Components/Overlays/Modal',
+ 	id: 'components-modal',
+diff --git a/packages/components/src/navigator/stories/index.story.tsx b/packages/components/src/navigator/stories/index.story.tsx
+index 8ecdfd6a8ee1f3..370e36dc229e49 100644
+--- a/packages/components/src/navigator/stories/index.story.tsx
++++ b/packages/components/src/navigator/stories/index.story.tsx
+@@ -12,6 +12,7 @@ import { HStack } from '../../h-stack';
+ import { Navigator, useNavigator } from '../';
+ 
+ const meta: Meta< typeof Navigator > = {
++	tags: [ 'manifest' ],
+ 	component: Navigator,
+ 	subcomponents: {
+ 		Screen: Navigator.Screen,
+diff --git a/packages/components/src/notice/stories/index.story.tsx b/packages/components/src/notice/stories/index.story.tsx
+index ea401e9b447fdc..eae814f3c9cfaa 100644
+--- a/packages/components/src/notice/stories/index.story.tsx
++++ b/packages/components/src/notice/stories/index.story.tsx
+@@ -18,6 +18,7 @@ import NoticeList from '../list';
+ import type { NoticeListProps } from '../types';
+ 
+ const meta: Meta< typeof Notice > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Feedback/Notice',
+ 	id: 'components-notice',
+ 	component: Notice,
+diff --git a/packages/components/src/number-control/stories/index.story.tsx b/packages/components/src/number-control/stories/index.story.tsx
+index 50946a302dc1dc..704b26a54cd427 100644
+--- a/packages/components/src/number-control/stories/index.story.tsx
++++ b/packages/components/src/number-control/stories/index.story.tsx
+@@ -25,7 +25,7 @@ const meta: Meta< typeof NumberControl > = {
+ 		type: { control: { type: 'text' } },
+ 		value: { control: false },
+ 	},
+-	tags: [ 'status-experimental' ],
++	tags: [ 'status-experimental', 'manifest' ],
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+diff --git a/packages/components/src/panel/stories/index.story.tsx b/packages/components/src/panel/stories/index.story.tsx
+index 3fd746ab6b2c56..6df3ab0cc76746 100644
+--- a/packages/components/src/panel/stories/index.story.tsx
++++ b/packages/components/src/panel/stories/index.story.tsx
+@@ -17,6 +17,7 @@ import PanelBody from '../body';
+ import InputControl from '../../input-control';
+ 
+ const meta: Meta< typeof Panel > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Containers/Panel',
+ 	id: 'components-panel',
+ 	component: Panel,
+diff --git a/packages/components/src/popover/stories/index.story.tsx b/packages/components/src/popover/stories/index.story.tsx
+index 33e12a2fced9f9..dd1d265c27a50c 100644
+--- a/packages/components/src/popover/stories/index.story.tsx
++++ b/packages/components/src/popover/stories/index.story.tsx
+@@ -33,6 +33,7 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
+ ];
+ 
+ const meta: Meta< typeof Popover > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Overlays/Popover',
+ 	id: 'components-popover',
+ 	component: Popover,
+diff --git a/packages/components/src/progress-bar/stories/index.story.tsx b/packages/components/src/progress-bar/stories/index.story.tsx
+index c57fa4b43bae80..8deff87ef866f0 100644
+--- a/packages/components/src/progress-bar/stories/index.story.tsx
++++ b/packages/components/src/progress-bar/stories/index.story.tsx
+@@ -9,6 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
+ import { ProgressBar } from '..';
+ 
+ const meta: Meta< typeof ProgressBar > = {
++	tags: [ 'manifest' ],
+ 	component: ProgressBar,
+ 	title: 'Components/Feedback/ProgressBar',
+ 	id: 'components-progressbar',
+diff --git a/packages/components/src/radio-control/stories/index.story.tsx b/packages/components/src/radio-control/stories/index.story.tsx
+index e30c377f0b6760..7399e8fad24822 100644
+--- a/packages/components/src/radio-control/stories/index.story.tsx
++++ b/packages/components/src/radio-control/stories/index.story.tsx
+@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
+ import RadioControl from '..';
+ 
+ const meta: Meta< typeof RadioControl > = {
++	tags: [ 'manifest' ],
+ 	component: RadioControl,
+ 	title: 'Components/Selection & Input/Common/RadioControl',
+ 	id: 'components-radiocontrol',
+diff --git a/packages/components/src/range-control/stories/index.story.tsx b/packages/components/src/range-control/stories/index.story.tsx
+index e6c415e2e4237c..78b3bbe3b98d1e 100644
+--- a/packages/components/src/range-control/stories/index.story.tsx
++++ b/packages/components/src/range-control/stories/index.story.tsx
+@@ -18,6 +18,7 @@ import RangeControl from '..';
+ const ICONS = { starEmpty, starFilled, styles, wordpress };
+ 
+ const meta: Meta< typeof RangeControl > = {
++	tags: [ 'manifest' ],
+ 	component: RangeControl,
+ 	title: 'Components/Selection & Input/Common/RangeControl',
+ 	id: 'components-rangecontrol',
+diff --git a/packages/components/src/resizable-box/stories/index.story.tsx b/packages/components/src/resizable-box/stories/index.story.tsx
+index a8723b6e1509dc..33f4d52b9c2f1c 100644
+--- a/packages/components/src/resizable-box/stories/index.story.tsx
++++ b/packages/components/src/resizable-box/stories/index.story.tsx
+@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
+ import ResizableBox from '..';
+ 
+ const meta: Meta< typeof ResizableBox > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Utilities/ResizableBox',
+ 	id: 'components-resizablebox',
+ 	component: ResizableBox,
+diff --git a/packages/components/src/sandbox/stories/index.story.tsx b/packages/components/src/sandbox/stories/index.story.tsx
+index c33ca8a43d1cc3..158db36f9f0c65 100644
+--- a/packages/components/src/sandbox/stories/index.story.tsx
++++ b/packages/components/src/sandbox/stories/index.story.tsx
+@@ -10,6 +10,7 @@ import { fn } from 'storybook/test';
+ import SandBox from '..';
+ 
+ const meta: Meta< typeof SandBox > = {
++	tags: [ 'manifest' ],
+ 	component: SandBox,
+ 	title: 'Components/Utilities/SandBox',
+ 	id: 'components-sandbox',
+diff --git a/packages/components/src/scroll-lock/stories/index.story.tsx b/packages/components/src/scroll-lock/stories/index.story.tsx
+index 7176c6b9705318..a678487e249e35 100644
+--- a/packages/components/src/scroll-lock/stories/index.story.tsx
++++ b/packages/components/src/scroll-lock/stories/index.story.tsx
+@@ -16,6 +16,7 @@ import Button from '../../button';
+ import ScrollLock from '..';
+ 
+ const meta: Meta< typeof ScrollLock > = {
++	tags: [ 'manifest' ],
+ 	component: ScrollLock,
+ 	title: 'Components/Utilities/ScrollLock',
+ 	id: 'components-scrolllock',
+diff --git a/packages/components/src/search-control/stories/index.story.tsx b/packages/components/src/search-control/stories/index.story.tsx
+index e18ec6f2e74492..acb0079e88e098 100644
+--- a/packages/components/src/search-control/stories/index.story.tsx
++++ b/packages/components/src/search-control/stories/index.story.tsx
+@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
+ import SearchControl from '..';
+ 
+ const meta: Meta< typeof SearchControl > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Selection & Input/Common/SearchControl',
+ 	id: 'components-searchcontrol',
+ 	component: SearchControl,
+diff --git a/packages/components/src/select-control/stories/index.story.tsx b/packages/components/src/select-control/stories/index.story.tsx
+index 89b459be9d3021..f33c7318496715 100644
+--- a/packages/components/src/select-control/stories/index.story.tsx
++++ b/packages/components/src/select-control/stories/index.story.tsx
+@@ -16,6 +16,7 @@ import SelectControl from '../';
+ import { InputControlPrefixWrapper } from '../../input-control/input-prefix-wrapper';
+ 
+ const meta: Meta< typeof SelectControl > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Selection & Input/Common/SelectControl',
+ 	id: 'components-selectcontrol',
+ 	component: SelectControl,
+diff --git a/packages/components/src/shortcut/stories/index.story.tsx b/packages/components/src/shortcut/stories/index.story.tsx
+index 4dc8b8e551f490..198a3312736e6b 100644
+--- a/packages/components/src/shortcut/stories/index.story.tsx
++++ b/packages/components/src/shortcut/stories/index.story.tsx
+@@ -9,6 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
+ import Shortcut from '../';
+ 
+ const meta: Meta< typeof Shortcut > = {
++	tags: [ 'manifest' ],
+ 	component: Shortcut,
+ 	title: 'Components/Utilities/Shortcut',
+ 	id: 'components-shortcut',
+diff --git a/packages/components/src/slot-fill/stories/index.story.tsx b/packages/components/src/slot-fill/stories/index.story.tsx
+index c916933171fe97..5fe252ff6c60da 100644
+--- a/packages/components/src/slot-fill/stories/index.story.tsx
++++ b/packages/components/src/slot-fill/stories/index.story.tsx
+@@ -14,6 +14,7 @@ import { createContext, useContext } from '@wordpress/element';
+ import { Slot, Fill, Provider as SlotFillProvider } from '../';
+ 
+ const meta: Meta< typeof Slot > = {
++	tags: [ 'manifest' ],
+ 	component: Slot,
+ 	title: 'Components/Utilities/SlotFill',
+ 	id: 'components-slotfill',
+diff --git a/packages/components/src/snackbar/stories/index.story.tsx b/packages/components/src/snackbar/stories/index.story.tsx
+index 2c0726bfa6ce44..78839a968c33b0 100644
+--- a/packages/components/src/snackbar/stories/index.story.tsx
++++ b/packages/components/src/snackbar/stories/index.story.tsx
+@@ -15,6 +15,7 @@ import Icon from '../../icon';
+ import Snackbar from '..';
+ 
+ const meta: Meta< typeof Snackbar > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Feedback/Snackbar',
+ 	id: 'components-snackbar',
+ 	component: Snackbar,
+diff --git a/packages/components/src/spinner/stories/index.story.tsx b/packages/components/src/spinner/stories/index.story.tsx
+index 7b8fb585b157f3..a238e970076126 100644
+--- a/packages/components/src/spinner/stories/index.story.tsx
++++ b/packages/components/src/spinner/stories/index.story.tsx
+@@ -10,6 +10,7 @@ import Spinner from '../';
+ import { space } from '../../utils/space';
+ 
+ const meta: Meta< typeof Spinner > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Feedback/Spinner',
+ 	id: 'components-spinner',
+ 	component: Spinner,
+diff --git a/packages/components/src/text-control/stories/index.story.tsx b/packages/components/src/text-control/stories/index.story.tsx
+index 9ea1cd4cb6c45a..92f8a15ea410bc 100644
+--- a/packages/components/src/text-control/stories/index.story.tsx
++++ b/packages/components/src/text-control/stories/index.story.tsx
+@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
+ import TextControl from '..';
+ 
+ const meta: Meta< typeof TextControl > = {
++	tags: [ 'manifest' ],
+ 	component: TextControl,
+ 	title: 'Components/Selection & Input/Common/TextControl',
+ 	id: 'components-textcontrol',
+diff --git a/packages/components/src/text-highlight/stories/index.story.tsx b/packages/components/src/text-highlight/stories/index.story.tsx
+index d29950c6ce0822..0f282714874c01 100644
+--- a/packages/components/src/text-highlight/stories/index.story.tsx
++++ b/packages/components/src/text-highlight/stories/index.story.tsx
+@@ -9,6 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
+ import TextHighlight from '..';
+ 
+ const meta: Meta< typeof TextHighlight > = {
++	tags: [ 'manifest' ],
+ 	component: TextHighlight,
+ 	title: 'Components/Typography/TextHighlight',
+ 	id: 'components-texthighlight',
+diff --git a/packages/components/src/textarea-control/stories/index.story.tsx b/packages/components/src/textarea-control/stories/index.story.tsx
+index 7945066bec2399..fc53e11c4acc01 100644
+--- a/packages/components/src/textarea-control/stories/index.story.tsx
++++ b/packages/components/src/textarea-control/stories/index.story.tsx
+@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
+ import TextareaControl from '..';
+ 
+ const meta: Meta< typeof TextareaControl > = {
++	tags: [ 'manifest' ],
+ 	component: TextareaControl,
+ 	title: 'Components/Selection & Input/Common/TextareaControl',
+ 	id: 'components-textareacontrol',
+diff --git a/packages/components/src/toggle-control/stories/index.story.tsx b/packages/components/src/toggle-control/stories/index.story.tsx
+index b991cacf9f1053..9c7b69b844cd7d 100644
+--- a/packages/components/src/toggle-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-control/stories/index.story.tsx
+@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
+ import ToggleControl from '..';
+ 
+ const meta: Meta< typeof ToggleControl > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Selection & Input/Common/ToggleControl',
+ 	id: 'components-togglecontrol',
+ 	component: ToggleControl,
+diff --git a/packages/components/src/toggle-group-control/stories/index.story.tsx b/packages/components/src/toggle-group-control/stories/index.story.tsx
+index 50c267a9843bf4..d7c864457cbee3 100644
+--- a/packages/components/src/toggle-group-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-group-control/stories/index.story.tsx
+@@ -33,7 +33,7 @@ const meta: Meta< typeof ToggleGroupControl > = {
+ 		onChange: { action: 'onChange' },
+ 		value: { control: false },
+ 	},
+-	tags: [ 'status-experimental' ],
++	tags: [ 'status-experimental', 'manifest' ],
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+diff --git a/packages/components/src/tooltip/stories/index.story.tsx b/packages/components/src/tooltip/stories/index.story.tsx
+index 12a938dfca3177..4523e25005f741 100644
+--- a/packages/components/src/tooltip/stories/index.story.tsx
++++ b/packages/components/src/tooltip/stories/index.story.tsx
+@@ -15,6 +15,7 @@ import Tooltip from '..';
+ import Button from '../../button';
+ 
+ const meta: Meta< typeof Tooltip > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Overlays/Tooltip',
+ 	id: 'components-tooltip',
+ 	component: Tooltip,
+diff --git a/packages/components/src/tree-grid/stories/index.story.tsx b/packages/components/src/tree-grid/stories/index.story.tsx
+index 488bea8b977805..3fef0b75d3cc94 100644
+--- a/packages/components/src/tree-grid/stories/index.story.tsx
++++ b/packages/components/src/tree-grid/stories/index.story.tsx
+@@ -24,7 +24,7 @@ const meta: Meta< typeof TreeGrid > = {
+ 	argTypes: {
+ 		children: { control: false },
+ 	},
+-	tags: [ 'status-experimental' ],
++	tags: [ 'status-experimental', 'manifest' ],
+ 	args: {
+ 		onExpandRow: fn(),
+ 		onCollapseRow: fn(),
+diff --git a/packages/components/src/tree-select/stories/index.story.tsx b/packages/components/src/tree-select/stories/index.story.tsx
+index 2f7d3fb0e13922..84f14db2bf7dec 100644
+--- a/packages/components/src/tree-select/stories/index.story.tsx
++++ b/packages/components/src/tree-select/stories/index.story.tsx
+@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
+ import TreeSelect from '../';
+ 
+ const meta: Meta< typeof TreeSelect > = {
++	tags: [ 'manifest' ],
+ 	title: 'Components/Selection & Input/Common/TreeSelect',
+ 	id: 'components-treeselect',
+ 	component: TreeSelect,
+diff --git a/packages/components/src/truncate/stories/index.story.tsx b/packages/components/src/truncate/stories/index.story.tsx
+index 6dff4f2e103b33..4c86791b07f717 100644
+--- a/packages/components/src/truncate/stories/index.story.tsx
++++ b/packages/components/src/truncate/stories/index.story.tsx
+@@ -16,7 +16,7 @@ const meta: Meta< typeof Truncate > = {
+ 		children: { control: { type: 'text' } },
+ 		as: { control: { type: 'text' } },
+ 	},
+-	tags: [ 'status-experimental' ],
++	tags: [ 'status-experimental', 'manifest' ],
+ 	parameters: {
+ 		controls: {
+ 			expanded: true,
+diff --git a/packages/components/src/unit-control/stories/index.story.tsx b/packages/components/src/unit-control/stories/index.story.tsx
+index 2f02cba527e393..307327b67a5b42 100644
+--- a/packages/components/src/unit-control/stories/index.story.tsx
++++ b/packages/components/src/unit-control/stories/index.story.tsx
+@@ -27,7 +27,7 @@ const meta: Meta< typeof UnitControl > = {
+ 		prefix: { control: { type: 'text' } },
+ 		value: { control: false },
+ 	},
+-	tags: [ 'status-experimental' ],
++	tags: [ 'status-experimental', 'manifest' ],
+ 	args: {
+ 		onChange: fn(),
+ 		onUnitChange: fn(),
+diff --git a/packages/components/src/visually-hidden/stories/index.story.tsx b/packages/components/src/visually-hidden/stories/index.story.tsx
+index 3db51d786f2e87..9128f043e1528b 100644
+--- a/packages/components/src/visually-hidden/stories/index.story.tsx
++++ b/packages/components/src/visually-hidden/stories/index.story.tsx
+@@ -9,6 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
+ import { VisuallyHidden } from '..';
+ 
+ const meta: Meta< typeof VisuallyHidden > = {
++	tags: [ 'manifest' ],
+ 	component: VisuallyHidden,
+ 	title: 'Components/Typography/VisuallyHidden',
+ 	id: 'components-visuallyhidden',
+diff --git a/packages/design-system-mcp/CHANGELOG.md b/packages/design-system-mcp/CHANGELOG.md
+new file mode 100644
+index 00000000000000..fa31fea7d3d2fa
+--- /dev/null
++++ b/packages/design-system-mcp/CHANGELOG.md
+@@ -0,0 +1,5 @@
++<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
++
++## Unreleased
++
++-   Initial release.
+diff --git a/packages/design-system-mcp/README.md b/packages/design-system-mcp/README.md
+new file mode 100644
+index 00000000000000..c4748e60a3b16f
+--- /dev/null
++++ b/packages/design-system-mcp/README.md
+@@ -0,0 +1,47 @@
++# WordPress Design System MCP
++
++<div class="callout callout-alert">
++This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server for the WordPress Design System. Provides AI coding agents with component documentation, prop definitions, usage examples, and design tokens.
++
++## Setup
++
++### Claude Code
++
++```bash
++claude mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-age=2 @wordpress/design-system-mcp@latest
++```
++
++### Cursor
++
++[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=wordpress-design-system&config=eyJjb21tYW5kIjoibnB4IC15IC0taWdub3JlLXNjcmlwdHMgLS1taW4tcmVsZWFzZS1hZ2U9MiBAd29yZHByZXNzL2Rlc2lnbi1zeXN0ZW0tbWNwQGxhdGVzdCJ9)
++
++Install link: [cursor://anysphere.cursor-deeplink/mcp/install?name=wordpress-design-system&config=eyJjb21tYW5kIjoibnB4IC15IC0taWdub3JlLXNjcmlwdHMgLS1taW4tcmVsZWFzZS1hZ2U9MiBAd29yZHByZXNzL2Rlc2lnbi1zeXN0ZW0tbWNwQGxhdGVzdCJ9](cursor://anysphere.cursor-deeplink/mcp/install?name=wordpress-design-system&config=eyJjb21tYW5kIjoibnB4IC15IC0taWdub3JlLXNjcmlwdHMgLS1taW4tcmVsZWFzZS1hZ2U9MiBAd29yZHByZXNzL2Rlc2lnbi1zeXN0ZW0tbWNwQGxhdGVzdCJ9)
++
++### Other (Claude Desktop, VS Code)
++
++Add to your MCP client configuration (`mcp.json` or equivalent):
++
++```json
++{
++	"mcpServers": {
++		"wordpress-design-system": {
++			"command": "npx",
++			"args": [
++				"-y",
++				"--ignore-scripts",
++				"--min-release-age=2",
++				"@wordpress/design-system-mcp@latest"
++			]
++		}
++	}
++}
++```
++
++## Contributing to this package
++
++This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/org/wordpress) and used by [WordPress](https://make.wordpress.org/core/) as well as by the broader JavaScript ecosystem.
++
++To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+diff --git a/packages/design-system-mcp/bin/design-system-mcp.mjs b/packages/design-system-mcp/bin/design-system-mcp.mjs
+new file mode 100755
+index 00000000000000..fbca6b9e5c1445
+--- /dev/null
++++ b/packages/design-system-mcp/bin/design-system-mcp.mjs
+@@ -0,0 +1,9 @@
++#!/usr/bin/env node
++
++import { StdioServerTransport } from '@modelcontextprotocol/server';
++import { createServer } from '@wordpress/design-system-mcp';
++
++const transport = new StdioServerTransport();
++const server = createServer();
++
++await server.connect( transport );
+diff --git a/packages/design-system-mcp/package.json b/packages/design-system-mcp/package.json
+new file mode 100644
+index 00000000000000..e83fcfb2f6f950
+--- /dev/null
++++ b/packages/design-system-mcp/package.json
+@@ -0,0 +1,54 @@
++{
++	"name": "@wordpress/design-system-mcp",
++	"version": "0.1.0",
++	"description": "MCP server for the WordPress Design System.",
++	"author": "The WordPress Contributors",
++	"license": "GPL-2.0-or-later",
++	"keywords": [
++		"wordpress",
++		"gutenberg",
++		"design-system",
++		"mcp"
++	],
++	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/design-system-mcp/README.md",
++	"repository": {
++		"type": "git",
++		"url": "https://github.com/WordPress/gutenberg.git",
++		"directory": "packages/design-system-mcp"
++	},
++	"bugs": {
++		"url": "https://github.com/WordPress/gutenberg/issues"
++	},
++	"engines": {
++		"node": ">=20.10.0",
++		"npm": ">=10.2.3"
++	},
++	"files": [
++		"bin",
++		"build-module",
++		"build-types"
++	],
++	"type": "module",
++	"module": "build-module/index.mjs",
++	"exports": {
++		".": {
++			"types": "./build-types/index.d.ts",
++			"import": "./build-module/index.mjs"
++		},
++		"./package.json": "./package.json"
++	},
++	"bin": {
++		"design-system-mcp": "./bin/design-system-mcp.mjs"
++	},
++	"dependencies": {
++		"@cfworker/json-schema": "4.1.1",
++		"@modelcontextprotocol/server": "2.0.0-alpha.2",
++		"zod": "4.3.6"
++	},
++	"devDependencies": {
++		"@types/jest": "^29.5.14"
++	},
++	"publishConfig": {
++		"access": "public"
++	}
++}
+diff --git a/packages/design-system-mcp/src/data.ts b/packages/design-system-mcp/src/data.ts
+new file mode 100644
+index 00000000000000..20f03b587fb1de
+--- /dev/null
++++ b/packages/design-system-mcp/src/data.ts
+@@ -0,0 +1,104 @@
++import {
++	packageNameFromPath,
++	parseComponents,
++	parseComponentDetail,
++} from './parse-components';
++import type { Component, ComponentDetail, ManifestComponent } from './types';
++
++const COMPONENTS_MANIFEST_URL =
++	process.env.COMPONENTS_MANIFEST_URL ||
++	'https://wordpress.github.io/gutenberg/manifests/components.json';
++
++const DESIGN_TOKENS_URL =
++	process.env.DESIGN_TOKENS_URL ||
++	'https://raw.githubusercontent.com/WordPress/gutenberg/refs/heads/trunk/packages/theme/docs/tokens.md';
++
++let cachedComponents: Record< string, ManifestComponent > | null = null;
++let cachedTokens: string | null = null;
++
++/**
++ * Clear cached data. Intended for testing.
++ */
++export function resetCache(): void {
++	cachedComponents = null;
++	cachedTokens = null;
++}
++
++/**
++ * Fetch and cache the components from the Storybook manifest, filtered to only
++ * components from allowed packages.
++ *
++ * @return The filtered components record.
++ */
++async function fetchComponents(): Promise<
++	Record< string, ManifestComponent >
++> {
++	if ( cachedComponents ) {
++		return cachedComponents;
++	}
++
++	const response = await fetch( COMPONENTS_MANIFEST_URL );
++	if ( ! response.ok ) {
++		throw new Error(
++			`Failed to fetch components manifest: ${ response.status } ${ response.statusText }`
++		);
++	}
++
++	const manifest: {
++		v: number;
++		components: Record< string, ManifestComponent >;
++	} = await response.json();
++
++	const filtered: Record< string, ManifestComponent > = {};
++	for ( const [ key, component ] of Object.entries( manifest.components ) ) {
++		if ( packageNameFromPath( component.path ) ) {
++			filtered[ key ] = component;
++		}
++	}
++
++	cachedComponents = filtered;
++	return cachedComponents;
++}
++
++/**
++ * Get all components from allowed packages.
++ *
++ * @return Parsed component list.
++ */
++export async function getComponents(): Promise< Component[] > {
++	const components = await fetchComponents();
++	return parseComponents( components );
++}
++
++/**
++ * Get detailed documentation for a single component by name.
++ *
++ * @param name - The component name (case-insensitive).
++ * @return The component detail, or null if not found.
++ */
++export async function getComponentDetail(
++	name: string
++): Promise< ComponentDetail | null > {
++	const components = await fetchComponents();
++	return parseComponentDetail( components, name );
++}
++
++/**
++ * Get the design tokens reference document as markdown.
++ *
++ * @return The tokens markdown content.
++ */
++export async function getDesignTokens(): Promise< { content: string } > {
++	if ( ! cachedTokens ) {
++		const response = await fetch( DESIGN_TOKENS_URL );
++		if ( ! response.ok ) {
++			throw new Error(
++				`Failed to fetch design tokens: ${ response.status } ${ response.statusText }`
++			);
++		}
++
++		cachedTokens = await response.text();
++	}
++
++	return { content: cachedTokens };
++}
+diff --git a/packages/design-system-mcp/src/format.ts b/packages/design-system-mcp/src/format.ts
+new file mode 100644
+index 00000000000000..b3f1ce0e0710dd
+--- /dev/null
++++ b/packages/design-system-mcp/src/format.ts
+@@ -0,0 +1,91 @@
++import type { Component, ComponentDetail } from './types';
++
++/**
++ * Format a component's name, package, and description as markdown.
++ *
++ * @param component    - The component to format.
++ * @param headingLevel - The heading level for the component name.
++ * @return Markdown lines.
++ */
++function formatComponentSummary(
++	component: Component,
++	headingLevel: number
++): string[] {
++	const heading = '#'.repeat( headingLevel );
++	const lines = [ `${ heading } ${ component.name }` ];
++
++	if ( component.description ) {
++		lines.push( '', component.description );
++	}
++
++	return lines;
++}
++
++/**
++ * Format the component list as markdown.
++ *
++ * @param components - The components to format.
++ * @return Formatted markdown.
++ */
++export function formatComponents( components: Component[] ): string {
++	const lines = [ '# WordPress Design System Components' ];
++
++	for ( const component of components ) {
++		lines.push( '', ...formatComponentSummary( component, 2 ) );
++	}
++
++	return lines.join( '\n' );
++}
++
++/**
++ * Format a single component's detail as markdown documentation.
++ *
++ * @param detail - The component detail to format.
++ * @return Formatted markdown.
++ */
++export function formatComponentDetail( detail: ComponentDetail ): string {
++	const lines = formatComponentSummary( detail, 1 );
++
++	lines.push( '', `**Package:** \`${ detail.packageName }\`` );
++
++	if ( detail.importStatement ) {
++		lines.push(
++			'',
++			'## Import',
++			'',
++			'```ts',
++			detail.importStatement,
++			'```'
++		);
++	}
++
++	if ( detail.props.length > 0 ) {
++		lines.push( '', '## Props', '' );
++		for ( const prop of detail.props ) {
++			const required = prop.required ? ' **(required)**' : '';
++			const defaultNote = prop.defaultValue
++				? ` (default: \`${ prop.defaultValue }\`)`
++				: '';
++			lines.push(
++				`### \`${ prop.name }\`: \`${ prop.type }\`${ required }${ defaultNote }`,
++				''
++			);
++			if ( prop.description ) {
++				lines.push( prop.description, '' );
++			}
++		}
++	}
++
++	if ( detail.stories.length > 0 ) {
++		lines.push( '', '## Examples', '' );
++		for ( const story of detail.stories ) {
++			lines.push( `### ${ story.name }` );
++			if ( story.snippet ) {
++				lines.push( '', '```tsx', story.snippet, '```' );
++			}
++			lines.push( '' );
++		}
++	}
++
++	return lines.join( '\n' );
++}
+diff --git a/packages/design-system-mcp/src/index.ts b/packages/design-system-mcp/src/index.ts
+new file mode 100644
+index 00000000000000..d7747f36e590ab
+--- /dev/null
++++ b/packages/design-system-mcp/src/index.ts
+@@ -0,0 +1,13 @@
++import { McpServer } from '@modelcontextprotocol/server';
++import { registerTools } from './tools/index';
++
++export function createServer() {
++	const server = new McpServer( {
++		name: 'WordPress Design System',
++		version: '0.1.0',
++	} );
++
++	registerTools( server );
++
++	return server;
++}
+diff --git a/packages/design-system-mcp/src/parse-components.ts b/packages/design-system-mcp/src/parse-components.ts
+new file mode 100644
+index 00000000000000..4870af73e637d0
+--- /dev/null
++++ b/packages/design-system-mcp/src/parse-components.ts
+@@ -0,0 +1,205 @@
++import type {
++	Component,
++	ComponentDetail,
++	ComponentProp,
++	ManifestComponent,
++} from './types';
++
++/**
++ * Mapping of canonical name to actual exported identifier, keyed by
++ * `package:name`. A package's actual exported identifier may be different from
++ * the canonical name in the internal implementation that's known to Storybook.
++ *
++ * Ideally we could derive this from the package's source code, but MCP
++ * consumers aren't guaranteed to have these packages installed. Since this
++ * is a legacy convention, we expect this list will only ever shrink over time
++ * and can eventually be removed.
++ */
++const EXPORT_ALIASES: Record< string, string > = {
++	'@wordpress/components:ConfirmDialog': '__experimentalConfirmDialog',
++	'@wordpress/components:InputControl': '__experimentalInputControl',
++	'@wordpress/components:ItemGroup': '__experimentalItemGroup',
++	'@wordpress/components:ToggleGroupControl':
++		'__experimentalToggleGroupControl',
++	'@wordpress/components:TreeGrid': '__experimentalTreeGrid',
++	'@wordpress/components:Truncate': '__experimentalTruncate',
++};
++
++/**
++ * Build the import statement a consumer should use to bring a component into
++ * scope under its canonical name. For aliased components, emit an `as` rename
++ * so that subsequent code samples (which reference the canonical name) resolve
++ * against the actual export.
++ *
++ * @param name        - The canonical component name.
++ * @param packageName - The npm package name.
++ * @return The import statement as a single-line string.
++ */
++function buildImportStatement( name: string, packageName: string ): string {
++	const exported = EXPORT_ALIASES[ `${ packageName }:${ name }` ];
++	return exported
++		? `import { ${ exported } as ${ name } } from '${ packageName }';`
++		: `import { ${ name } } from '${ packageName }';`;
++}
++
++/**
++ * Derive the npm package name from the story file path.
++ *
++ * Manifest paths look like `../packages/<dir>/src/.../index.story.tsx`. We
++ * extract `<dir>` and prepend the `@wordpress/` npm namespace. Curation of
++ * which components appear in the manifest is handled upstream via Storybook
++ * tags, so this only needs to recognize package-shaped paths.
++ *
++ * @param storyPath - The story file path from the manifest.
++ * @return The npm package name, or null for paths outside `packages/*`.
++ */
++export function packageNameFromPath( storyPath: string ): string | null {
++	const match = storyPath.match( /\.\.\/packages\/([^/]+)\// );
++	return match ? `@wordpress/${ match[ 1 ] }` : null;
++}
++
++/**
++ * For components exported as a namespace (e.g. `AlertDialog`, with members
++ * `AlertDialog.Root`, `AlertDialog.Trigger`, etc.), the manifest lists the
++ * primary entry under a dotted name like `AlertDialog.Root`. The canonical
++ * name we expose is the top-level identifier a consumer actually imports,
++ * which is the portion before the first dot. For simple components (e.g.
++ * `Button`), this is a no-op.
++ *
++ * @param name - The component name from the manifest.
++ * @return The top-level importable identifier.
++ */
++function canonicalComponentName( name: string ): string {
++	return name.split( '.', 1 )[ 0 ];
++}
++
++/**
++ * Parse props from a component's reactDocgen data, filtering out
++ * deprecated and ignored props.
++ *
++ * @param rawProps - The reactDocgen props record.
++ * @return Parsed props with deprecated entries removed.
++ */
++export function parseProps(
++	rawProps: Record<
++		string,
++		{
++			required?: boolean;
++			tsType?: { name: string; raw?: string };
++			description?: string;
++			defaultValue?: { value: string };
++		}
++	>
++): ComponentProp[] {
++	return Object.entries( rawProps )
++		.filter( ( [ , propInfo ] ) => {
++			const description = ( propInfo.description || '' ).toLowerCase();
++			return (
++				! description.includes( '@deprecated' ) &&
++				! description.includes( '@ignore' )
++			);
++		} )
++		.map( ( [ propName, propInfo ] ) => ( {
++			name: propName,
++			// Prefer `raw` when present, as it carries the source-authored type
++			// expression a consumer could use directly. Primitives emit only
++			// `name`, so fall back if `raw` is not present.
++			type: propInfo.tsType?.raw || propInfo.tsType?.name || 'unknown',
++			required: propInfo.required || false,
++			description: propInfo.description || '',
++			defaultValue: propInfo.defaultValue?.value ?? null,
++		} ) );
++}
++
++/**
++ * Parse manifest components into a flat list sorted alphabetically by name.
++ * When a component is defined across multiple story files (e.g. a companion
++ * file documenting a specific aspect), it is collapsed to a single entry keyed
++ * by its canonical name and package.
++ *
++ * @param components - The manifest components record.
++ * @return Flat list of components derived from the manifest.
++ */
++export function parseComponents(
++	components: Record< string, ManifestComponent >
++): Component[] {
++	const byKey = new Map< string, Component >();
++
++	for ( const component of Object.values( components ) ) {
++		const packageName = packageNameFromPath( component.path );
++		if ( ! packageName ) {
++			continue;
++		}
++
++		const name = canonicalComponentName( component.name );
++		const key = `${ packageName }:${ name }`;
++		const existing = byKey.get( key );
++		const description = component.description || '';
++
++		if ( ! existing ) {
++			byKey.set( key, { name, description, packageName } );
++		} else {
++			// Prefer a non-empty description from a later entry over an
++			// empty one from the first.
++			existing.description ||= description;
++		}
++	}
++
++	return Array.from( byKey.values() ).sort( ( a, b ) =>
++		a.name.localeCompare( b.name )
++	);
++}
++
++/**
++ * Find a single component by name (case-insensitive) and return its full
++ * detail including props and stories. When a component is spread across
++ * multiple story files, stories from every contributing file are collected
++ * in manifest order. Descriptions and props are also authored on the component
++ * itself, so in principle they should be identical across story files; in
++ * practice one file may omit them, so we prefer any non-empty value found.
++ *
++ * @param components - The manifest components record.
++ * @param name       - The component name to look up.
++ * @return The component detail, or null if not found.
++ */
++export function parseComponentDetail(
++	components: Record< string, ManifestComponent >,
++	name: string
++): ComponentDetail | null {
++	let detail: ComponentDetail | null = null;
++
++	for ( const component of Object.values( components ) ) {
++		const canonicalName = canonicalComponentName( component.name );
++		if ( canonicalName.toLowerCase() !== name.toLowerCase() ) {
++			continue;
++		}
++
++		const pkg = packageNameFromPath( component.path );
++		if ( ! pkg ) {
++			continue;
++		}
++
++		const description = component.description || '';
++		const props = parseProps( component.reactDocgen?.props || {} );
++		const stories = component.stories || [];
++
++		if ( ! detail ) {
++			detail = {
++				name: canonicalName,
++				description,
++				packageName: pkg,
++				importStatement: buildImportStatement( canonicalName, pkg ),
++				props,
++				stories: [ ...stories ],
++			};
++		} else if ( detail.packageName === pkg ) {
++			detail.description ||= description;
++			if ( detail.props.length === 0 ) {
++				detail.props = props;
++			}
++			detail.stories.push( ...stories );
++		}
++	}
++
++	return detail;
++}
+diff --git a/packages/design-system-mcp/src/test/data.ts b/packages/design-system-mcp/src/test/data.ts
+new file mode 100644
+index 00000000000000..76d89a914365e4
+--- /dev/null
++++ b/packages/design-system-mcp/src/test/data.ts
+@@ -0,0 +1,175 @@
++import {
++	getComponents,
++	getComponentDetail,
++	getDesignTokens,
++	resetCache,
++} from '../data';
++import manifestFixture from './fixtures/manifest.json';
++
++const MANIFEST_URL =
++	'https://wordpress.github.io/gutenberg/manifests/components.json';
++const TOKENS_URL =
++	'https://raw.githubusercontent.com/WordPress/gutenberg/refs/heads/trunk/packages/theme/docs/tokens.md';
++
++const originalFetch = globalThis.fetch;
++
++function mockFetchResponses(
++	handlers: Record< string, { ok: boolean; body: unknown } >
++) {
++	globalThis.fetch = jest.fn( ( url: RequestInfo | URL ) => {
++		const urlStr = url.toString();
++		const handler = handlers[ urlStr ];
++		if ( ! handler ) {
++			return Promise.reject(
++				new Error( `Unexpected fetch: ${ urlStr }` )
++			);
++		}
++		return Promise.resolve( {
++			ok: handler.ok,
++			status: handler.ok ? 200 : 500,
++			statusText: handler.ok ? 'OK' : 'Internal Server Error',
++			json: () => Promise.resolve( handler.body ),
++			text: () => Promise.resolve( handler.body as string ),
++		} as Response );
++	} );
++}
++
++describe( 'data', () => {
++	beforeEach( () => {
++		resetCache();
++		globalThis.fetch = jest.fn();
++	} );
++
++	afterEach( () => {
++		globalThis.fetch = originalFetch;
++	} );
++
++	describe( 'getComponents', () => {
++		it( 'should fetch manifest and return parsed components', async () => {
++			mockFetchResponses( {
++				[ MANIFEST_URL ]: { ok: true, body: manifestFixture },
++			} );
++
++			const result = await getComponents();
++
++			expect( result ).toEqual( [
++				{
++					name: 'Badge',
++					description: 'A badge.',
++					packageName: '@wordpress/ui',
++				},
++				{
++					name: 'Button',
++					description: 'A button.',
++					packageName: '@wordpress/components',
++				},
++			] );
++		} );
++
++		it( 'should cache the manifest across calls', async () => {
++			mockFetchResponses( {
++				[ MANIFEST_URL ]: { ok: true, body: manifestFixture },
++			} );
++
++			await getComponents();
++			await getComponents();
++
++			expect( globalThis.fetch ).toHaveBeenCalledTimes( 1 );
++		} );
++
++		it( 'should throw on fetch failure', async () => {
++			mockFetchResponses( {
++				[ MANIFEST_URL ]: { ok: false, body: null },
++			} );
++
++			await expect( getComponents() ).rejects.toThrow(
++				'Failed to fetch components manifest'
++			);
++		} );
++	} );
++
++	describe( 'getComponentDetail', () => {
++		it( 'should return detail for a matching component', async () => {
++			mockFetchResponses( {
++				[ MANIFEST_URL ]: { ok: true, body: manifestFixture },
++			} );
++
++			const result = await getComponentDetail( 'Button' );
++
++			expect( result ).toEqual( {
++				name: 'Button',
++				description: 'A button.',
++				packageName: '@wordpress/components',
++				importStatement:
++					"import { Button } from '@wordpress/components';",
++				props: [
++					{
++						name: 'variant',
++						type: 'string',
++						required: false,
++						description: 'The variant.',
++						defaultValue: null,
++					},
++				],
++				stories: [ { name: 'Default', snippet: '<Button />' } ],
++			} );
++		} );
++
++		it( 'should return null for non-existent component', async () => {
++			mockFetchResponses( {
++				[ MANIFEST_URL ]: { ok: true, body: manifestFixture },
++			} );
++
++			expect( await getComponentDetail( 'NonExistent' ) ).toBeNull();
++		} );
++
++		it( 'should share cache with getComponents', async () => {
++			mockFetchResponses( {
++				[ MANIFEST_URL ]: { ok: true, body: manifestFixture },
++			} );
++
++			await getComponents();
++			await getComponentDetail( 'Button' );
++
++			expect( globalThis.fetch ).toHaveBeenCalledTimes( 1 );
++		} );
++	} );
++
++	describe( 'getDesignTokens', () => {
++		it( 'should fetch and return token content', async () => {
++			mockFetchResponses( {
++				[ TOKENS_URL ]: {
++					ok: true,
++					body: '# Tokens\n\n| token | value |',
++				},
++			} );
++
++			const result = await getDesignTokens();
++
++			expect( result ).toEqual( {
++				content: '# Tokens\n\n| token | value |',
++			} );
++		} );
++
++		it( 'should cache tokens across calls', async () => {
++			mockFetchResponses( {
++				[ TOKENS_URL ]: { ok: true, body: '# Tokens' },
++			} );
++
++			await getDesignTokens();
++			await getDesignTokens();
++
++			expect( globalThis.fetch ).toHaveBeenCalledTimes( 1 );
++		} );
++
++		it( 'should throw on fetch failure', async () => {
++			mockFetchResponses( {
++				[ TOKENS_URL ]: { ok: false, body: null },
++			} );
++
++			await expect( getDesignTokens() ).rejects.toThrow(
++				'Failed to fetch design tokens'
++			);
++		} );
++	} );
++} );
+diff --git a/packages/design-system-mcp/src/test/fixtures/manifest.json b/packages/design-system-mcp/src/test/fixtures/manifest.json
+new file mode 100644
+index 00000000000000..68250ce7276f6b
+--- /dev/null
++++ b/packages/design-system-mcp/src/test/fixtures/manifest.json
+@@ -0,0 +1,27 @@
++{
++	"v": 0,
++	"components": {
++		"ui-badge": {
++			"id": "ui-badge",
++			"name": "Badge",
++			"path": "../packages/ui/src/badge/stories/index.story.tsx",
++			"description": "A badge."
++		},
++		"components-button": {
++			"id": "components-button",
++			"name": "Button",
++			"path": "../packages/components/src/button/stories/index.story.tsx",
++			"description": "A button.",
++			"reactDocgen": {
++				"props": {
++					"variant": {
++						"required": false,
++						"tsType": { "name": "string" },
++						"description": "The variant."
++					}
++				}
++			},
++			"stories": [ { "name": "Default", "snippet": "<Button />" } ]
++		}
++	}
++}
+diff --git a/packages/design-system-mcp/src/test/format.ts b/packages/design-system-mcp/src/test/format.ts
+new file mode 100644
+index 00000000000000..3b93eede2e0ef9
+--- /dev/null
++++ b/packages/design-system-mcp/src/test/format.ts
+@@ -0,0 +1,187 @@
++import { formatComponents, formatComponentDetail } from '../format';
++
++describe( 'formatComponents', () => {
++	it( 'should format components as markdown sections', () => {
++		const result = formatComponents( [
++			{
++				name: 'Button',
++				description: 'A button.',
++				packageName: '@wordpress/ui',
++			},
++			{
++				name: 'Badge',
++				description: 'A badge.',
++				packageName: '@wordpress/ui',
++			},
++		] );
++
++		expect( result ).toBe(
++			`# WordPress Design System Components
++
++## Button
++
++A button.
++
++## Badge
++
++A badge.`
++		);
++	} );
++
++	it( 'should handle empty list', () => {
++		expect( formatComponents( [] ) ).toBe(
++			'# WordPress Design System Components'
++		);
++	} );
++
++	it( 'should omit description when empty', () => {
++		const result = formatComponents( [
++			{
++				name: 'Button',
++				description: '',
++				packageName: '@wordpress/ui',
++			},
++		] );
++
++		expect( result ).toBe(
++			`# WordPress Design System Components
++
++## Button`
++		);
++	} );
++} );
++
++describe( 'formatComponentDetail', () => {
++	it( 'should format name, package, and description', () => {
++		const result = formatComponentDetail( {
++			name: 'Button',
++			description: 'A button component.',
++			packageName: '@wordpress/ui',
++			importStatement: null,
++			props: [],
++			stories: [],
++		} );
++
++		expect( result ).toBe(
++			`# Button
++
++A button component.
++
++**Package:** \`@wordpress/ui\``
++		);
++	} );
++
++	it( 'should format import statement', () => {
++		const result = formatComponentDetail( {
++			name: 'Button',
++			description: '',
++			packageName: '@wordpress/ui',
++			importStatement: "import { Button } from '@wordpress/ui';",
++			props: [],
++			stories: [],
++		} );
++
++		expect( result ).toBe(
++			`# Button
++
++**Package:** \`@wordpress/ui\`
++
++## Import
++
++\`\`\`ts
++import { Button } from '@wordpress/ui';
++\`\`\``
++		);
++	} );
++
++	it( 'should format props with types and defaults', () => {
++		const result = formatComponentDetail( {
++			name: 'Button',
++			description: '',
++			packageName: '@wordpress/ui',
++			importStatement: null,
++			props: [
++				{
++					name: 'variant',
++					type: 'string',
++					required: false,
++					description: 'The button variant.',
++					defaultValue: "'solid'",
++				},
++				{
++					name: 'children',
++					type: 'ReactNode',
++					required: true,
++					description: 'Button content.',
++					defaultValue: null,
++				},
++			],
++			stories: [],
++		} );
++
++		expect( result ).toBe(
++			`# Button
++
++**Package:** \`@wordpress/ui\`
++
++## Props
++
++### \`variant\`: \`string\` (default: \`'solid'\`)
++
++The button variant.
++
++### \`children\`: \`ReactNode\` **(required)**
++
++Button content.
++`
++		);
++	} );
++
++	it( 'should format stories as code examples', () => {
++		const result = formatComponentDetail( {
++			name: 'Button',
++			description: '',
++			packageName: '@wordpress/ui',
++			importStatement: null,
++			props: [],
++			stories: [
++				{ name: 'Default', snippet: '<Button>Click</Button>' },
++				{ name: 'No Snippet' },
++			],
++		} );
++
++		expect( result ).toBe(
++			`# Button
++
++**Package:** \`@wordpress/ui\`
++
++## Examples
++
++### Default
++
++\`\`\`tsx
++<Button>Click</Button>
++\`\`\`
++
++### No Snippet
++`
++		);
++	} );
++
++	it( 'should omit sections when data is empty', () => {
++		const result = formatComponentDetail( {
++			name: 'Button',
++			description: '',
++			packageName: '@wordpress/ui',
++			importStatement: null,
++			props: [],
++			stories: [],
++		} );
++
++		expect( result ).toBe(
++			`# Button
++
++**Package:** \`@wordpress/ui\``
++		);
++	} );
++} );
+diff --git a/packages/design-system-mcp/src/test/parse-components.ts b/packages/design-system-mcp/src/test/parse-components.ts
+new file mode 100644
+index 00000000000000..04dcc2ada1334b
+--- /dev/null
++++ b/packages/design-system-mcp/src/test/parse-components.ts
+@@ -0,0 +1,525 @@
++import {
++	packageNameFromPath,
++	parseProps,
++	parseComponents,
++	parseComponentDetail,
++} from '../parse-components';
++import type { ManifestComponent } from '../types';
++
++describe( 'packageNameFromPath', () => {
++	it( 'should derive @wordpress/<package> from any packages path', () => {
++		expect(
++			packageNameFromPath(
++				'../packages/ui/src/button/stories/index.story.tsx'
++			)
++		).toBe( '@wordpress/ui' );
++		expect(
++			packageNameFromPath(
++				'../packages/components/src/button/stories/index.story.tsx'
++			)
++		).toBe( '@wordpress/components' );
++	} );
++
++	it( 'should return null for non-package paths', () => {
++		expect(
++			packageNameFromPath(
++				'./stories/design-system/theme-example-application.story.tsx'
++			)
++		).toBeNull();
++	} );
++} );
++
++describe( 'parseProps', () => {
++	it( 'should parse props with readable type expressions', () => {
++		const result = parseProps( {
++			disabled: {
++				required: false,
++				tsType: { name: 'boolean' },
++				description: 'Whether the button is disabled.',
++				defaultValue: { value: 'false' },
++			},
++			variant: {
++				required: false,
++				tsType: {
++					name: 'union',
++					raw: "'solid' | 'outline' | 'minimal' | 'unstyled'",
++				},
++				description: 'The button variant.',
++			},
++			style: {
++				required: false,
++				tsType: {
++					name: 'ReactCSSProperties',
++					raw: 'React.CSSProperties',
++				},
++				description: 'Inline styles.',
++			},
++		} );
++
++		expect( result ).toEqual( [
++			{
++				name: 'disabled',
++				type: 'boolean',
++				required: false,
++				description: 'Whether the button is disabled.',
++				defaultValue: 'false',
++			},
++			{
++				name: 'variant',
++				type: "'solid' | 'outline' | 'minimal' | 'unstyled'",
++				required: false,
++				description: 'The button variant.',
++				defaultValue: null,
++			},
++			{
++				name: 'style',
++				type: 'React.CSSProperties',
++				required: false,
++				description: 'Inline styles.',
++				defaultValue: null,
++			},
++		] );
++	} );
++
++	it( 'should filter out deprecated props', () => {
++		const result = parseProps( {
++			variant: {
++				required: false,
++				tsType: { name: 'string' },
++				description: 'The button variant.',
++			},
++			oldProp: {
++				required: false,
++				tsType: { name: 'string' },
++				description: '@deprecated Use variant instead.',
++			},
++		} );
++
++		expect( result ).toHaveLength( 1 );
++		expect( result[ 0 ].name ).toBe( 'variant' );
++	} );
++
++	it( 'should filter out ignored props', () => {
++		const result = parseProps( {
++			visible: {
++				required: true,
++				tsType: { name: 'boolean' },
++				description: 'Whether visible.',
++			},
++			internal: {
++				required: false,
++				tsType: { name: 'string' },
++				description: '@ignore Internal use only.',
++			},
++		} );
++
++		expect( result ).toHaveLength( 1 );
++		expect( result[ 0 ].name ).toBe( 'visible' );
++	} );
++
++	it( 'should default missing type to unknown', () => {
++		const result = parseProps( {
++			something: {
++				description: 'A prop without type info.',
++			},
++		} );
++
++		expect( result[ 0 ].type ).toBe( 'unknown' );
++	} );
++
++	it( 'should default missing values', () => {
++		const result = parseProps( {
++			minimal: {},
++		} );
++
++		expect( result[ 0 ] ).toEqual( {
++			name: 'minimal',
++			type: 'unknown',
++			required: false,
++			description: '',
++			defaultValue: null,
++		} );
++	} );
++} );
++
++function createComponents(
++	entries: Record< string, Partial< ManifestComponent > >
++): Record< string, ManifestComponent > {
++	const result: Record< string, ManifestComponent > = {};
++	for ( const [ key, value ] of Object.entries( entries ) ) {
++		result[ key ] = {
++			id: key,
++			name: value.name ?? key,
++			path:
++				value.path ??
++				`../packages/ui/src/${ key }/stories/index.story.tsx`,
++			...value,
++		};
++	}
++	return result;
++}
++
++describe( 'parseComponents', () => {
++	it( 'should return components from any recognized @wordpress/* package', () => {
++		const components = createComponents( {
++			'ui-badge': {
++				name: 'Badge',
++				path: '../packages/ui/src/badge/stories/index.story.tsx',
++			},
++			'components-button': {
++				name: 'Button',
++				path: '../packages/components/src/button/stories/index.story.tsx',
++			},
++		} );
++
++		expect( parseComponents( components ) ).toEqual( [
++			{
++				name: 'Badge',
++				description: '',
++				packageName: '@wordpress/ui',
++			},
++			{
++				name: 'Button',
++				description: '',
++				packageName: '@wordpress/components',
++			},
++		] );
++	} );
++
++	it( 'should exclude components with non-package paths', () => {
++		const components = createComponents( {
++			example: {
++				name: 'ThemeProvider',
++				path: './stories/design-system/theme-example-application.story.tsx',
++			},
++		} );
++
++		expect( parseComponents( components ) ).toHaveLength( 0 );
++	} );
++
++	it( 'should include description from manifest', () => {
++		const components = createComponents( {
++			badge: {
++				name: 'Badge',
++				description: 'A badge component.',
++				path: '../packages/ui/src/badge/stories/index.story.tsx',
++			},
++		} );
++
++		const result = parseComponents( components );
++		expect( result[ 0 ].description ).toBe( 'A badge component.' );
++	} );
++
++	it( 'should use the root identifier as the canonical name for compound components', () => {
++		const components = createComponents( {
++			'alert-dialog': {
++				name: 'AlertDialog.Root',
++				description: 'An alert dialog.',
++				path: '../packages/ui/src/alert-dialog/stories/index.story.tsx',
++			},
++		} );
++
++		expect( parseComponents( components ) ).toEqual( [
++			{
++				name: 'AlertDialog',
++				description: 'An alert dialog.',
++				packageName: '@wordpress/ui',
++			},
++		] );
++	} );
++
++	it( 'should return components sorted alphabetically by name', () => {
++		const components = createComponents( {
++			a: {
++				name: 'Tabs',
++				path: '../packages/components/src/tabs/stories/index.story.tsx',
++			},
++			b: {
++				name: 'Badge',
++				path: '../packages/ui/src/badge/stories/index.story.tsx',
++			},
++			c: {
++				name: 'Notice',
++				path: '../packages/components/src/notice/stories/index.story.tsx',
++			},
++		} );
++
++		const result = parseComponents( components );
++		expect( result.map( ( c ) => c.name ) ).toEqual( [
++			'Badge',
++			'Notice',
++			'Tabs',
++		] );
++	} );
++
++	it( 'should list a component only once when multiple story files contribute entries', () => {
++		const components = createComponents( {
++			'badge-index': {
++				name: 'Badge',
++				description: 'A badge component.',
++				path: '../packages/ui/src/badge/stories/index.story.tsx',
++			},
++			'badge-intent': {
++				name: 'Badge',
++				description: 'A badge component.',
++				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
++			},
++		} );
++
++		expect( parseComponents( components ) ).toEqual( [
++			{
++				name: 'Badge',
++				description: 'A badge component.',
++				packageName: '@wordpress/ui',
++			},
++		] );
++	} );
++
++	it( 'should prefer a non-empty description when merging entries', () => {
++		const components = createComponents( {
++			'badge-index': {
++				name: 'Badge',
++				// First entry has no description
++				path: '../packages/ui/src/badge/stories/index.story.tsx',
++			},
++			'badge-intent': {
++				name: 'Badge',
++				description: 'A badge component.',
++				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
++			},
++		} );
++
++		expect( parseComponents( components ) ).toEqual( [
++			{
++				name: 'Badge',
++				description: 'A badge component.',
++				packageName: '@wordpress/ui',
++			},
++		] );
++	} );
++} );
++
++describe( 'parseComponentDetail', () => {
++	it( 'should find a component by exact name', () => {
++		const components = createComponents( {
++			button: {
++				name: 'Button',
++				description: 'A button component.',
++				path: '../packages/ui/src/button/stories/index.story.tsx',
++				reactDocgen: {
++					props: {
++						variant: {
++							required: false,
++							tsType: { name: 'string' },
++							description: 'The button variant.',
++						},
++					},
++				},
++				stories: [ { name: 'Default', snippet: '<Button />' } ],
++			},
++		} );
++
++		const result = parseComponentDetail( components, 'Button' );
++		expect( result ).toEqual( {
++			name: 'Button',
++			description: 'A button component.',
++			packageName: '@wordpress/ui',
++			importStatement: "import { Button } from '@wordpress/ui';",
++			props: [
++				{
++					name: 'variant',
++					type: 'string',
++					required: false,
++					description: 'The button variant.',
++					defaultValue: null,
++				},
++			],
++			stories: [ { name: 'Default', snippet: '<Button />' } ],
++		} );
++	} );
++
++	it( 'should match case-insensitively', () => {
++		const components = createComponents( {
++			button: {
++				name: 'Button',
++				path: '../packages/ui/src/button/stories/index.story.tsx',
++			},
++		} );
++
++		expect( parseComponentDetail( components, 'button' ) ).not.toBeNull();
++		expect( parseComponentDetail( components, 'BUTTON' ) ).not.toBeNull();
++	} );
++
++	it( 'should return null for unknown components', () => {
++		expect( parseComponentDetail( {}, 'NonExistent' ) ).toBeNull();
++	} );
++
++	it( 'should return detail for a component from @wordpress/components', () => {
++		const components = createComponents( {
++			button: {
++				name: 'Button',
++				description: 'A button component.',
++				path: '../packages/components/src/button/stories/index.story.tsx',
++			},
++		} );
++
++		const result = parseComponentDetail( components, 'Button' );
++		expect( result ).toEqual(
++			expect.objectContaining( {
++				name: 'Button',
++				packageName: '@wordpress/components',
++				importStatement:
++					"import { Button } from '@wordpress/components';",
++			} )
++		);
++	} );
++
++	it( 'should emit an aliased import for a component exported with an __experimental prefix', () => {
++		const components = createComponents( {
++			truncate: {
++				name: 'Truncate',
++				path: '../packages/components/src/truncate/stories/index.story.tsx',
++			},
++		} );
++
++		const result = parseComponentDetail( components, 'Truncate' );
++		expect( result?.importStatement ).toBe(
++			"import { __experimentalTruncate as Truncate } from '@wordpress/components';"
++		);
++	} );
++
++	it( 'should filter deprecated props from detail', () => {
++		const components = createComponents( {
++			button: {
++				name: 'Button',
++				path: '../packages/ui/src/button/stories/index.story.tsx',
++				reactDocgen: {
++					props: {
++						variant: {
++							tsType: { name: 'string' },
++							description: 'Current prop.',
++						},
++						legacy: {
++							tsType: { name: 'string' },
++							description: '@deprecated Use variant.',
++						},
++					},
++				},
++			},
++		} );
++
++		const result = parseComponentDetail( components, 'Button' );
++		expect( result?.props ).toHaveLength( 1 );
++		expect( result?.props[ 0 ].name ).toBe( 'variant' );
++	} );
++
++	it( 'should not match non-package story paths', () => {
++		const components = createComponents( {
++			example: {
++				name: 'ThemeProvider',
++				path: './stories/design-system/theme-example-application.story.tsx',
++			},
++		} );
++
++		expect(
++			parseComponentDetail( components, 'ThemeProvider' )
++		).toBeNull();
++	} );
++
++	it( 'should include stories from every story file contributing to a component', () => {
++		const components = createComponents( {
++			'badge-index': {
++				name: 'Badge',
++				path: '../packages/ui/src/badge/stories/index.story.tsx',
++				stories: [
++					{ name: 'Default', snippet: '<Badge />' },
++					{ name: 'High', snippet: '<Badge intent="high" />' },
++				],
++			},
++			'badge-intent': {
++				name: 'Badge',
++				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
++				stories: [
++					{
++						name: 'High',
++						snippet: '<Badge intent="high">Contextual</Badge>',
++					},
++					{ name: 'All Intents', snippet: '<Badge />' },
++				],
++			},
++		} );
++
++		const result = parseComponentDetail( components, 'Badge' );
++		expect( result?.stories ).toEqual( [
++			{ name: 'Default', snippet: '<Badge />' },
++			{ name: 'High', snippet: '<Badge intent="high" />' },
++			{
++				name: 'High',
++				snippet: '<Badge intent="high">Contextual</Badge>',
++			},
++			{ name: 'All Intents', snippet: '<Badge />' },
++		] );
++	} );
++
++	it( 'should prefer a non-empty description when merging story files', () => {
++		const components = createComponents( {
++			'badge-index': {
++				name: 'Badge',
++				// First entry has no description
++				path: '../packages/ui/src/badge/stories/index.story.tsx',
++			},
++			'badge-intent': {
++				name: 'Badge',
++				description: 'A badge component.',
++				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
++			},
++		} );
++
++		const result = parseComponentDetail( components, 'Badge' );
++		expect( result?.description ).toBe( 'A badge component.' );
++	} );
++
++	it( 'should prefer non-empty props when merging story files', () => {
++		const components = createComponents( {
++			'badge-index': {
++				name: 'Badge',
++				// First entry has no reactDocgen props
++				path: '../packages/ui/src/badge/stories/index.story.tsx',
++			},
++			'badge-intent': {
++				name: 'Badge',
++				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
++				reactDocgen: {
++					props: {
++						intent: {
++							tsType: { name: 'string' },
++							description: 'The badge intent.',
++						},
++					},
++				},
++			},
++		} );
++
++		const result = parseComponentDetail( components, 'Badge' );
++		expect( result?.props ).toHaveLength( 1 );
++		expect( result?.props[ 0 ].name ).toBe( 'intent' );
++	} );
++
++	it( 'should return detail for a compound component by its root identifier', () => {
++		const components = createComponents( {
++			'alert-dialog': {
++				name: 'AlertDialog.Root',
++				description: 'An alert dialog.',
++				path: '../packages/ui/src/alert-dialog/stories/index.story.tsx',
++			},
++		} );
++
++		const result = parseComponentDetail( components, 'AlertDialog' );
++		expect( result ).toEqual(
++			expect.objectContaining( {
++				name: 'AlertDialog',
++				importStatement: "import { AlertDialog } from '@wordpress/ui';",
++			} )
++		);
++	} );
++} );
+diff --git a/packages/design-system-mcp/src/tools/get-component-details.ts b/packages/design-system-mcp/src/tools/get-component-details.ts
+new file mode 100644
+index 00000000000000..4aaa5633abb50f
+--- /dev/null
++++ b/packages/design-system-mcp/src/tools/get-component-details.ts
+@@ -0,0 +1,51 @@
++import type { McpServer } from '@modelcontextprotocol/server';
++import { z } from 'zod';
++import { getComponentDetail } from '../data';
++import { formatComponentDetail } from '../format';
++
++/**
++ * Register the get_component_details tool.
++ *
++ * @param server - The MCP server instance.
++ */
++export function register( server: McpServer ): void {
++	server.registerTool(
++		'get_component_details',
++		{
++			title: 'Get Component Details',
++			description:
++				'Get detailed documentation for a WordPress Design System component including props, usage examples, and import statements.',
++			inputSchema: z.object( {
++				name: z
++					.string()
++					.min( 1 )
++					.describe( 'The component name (e.g. "Button", "Tabs")' ),
++			} ),
++			annotations: {
++				readOnlyHint: true,
++			},
++		},
++		async ( { name } ) => {
++			const detail = await getComponentDetail( name );
++			if ( ! detail ) {
++				return {
++					content: [
++						{
++							type: 'text',
++							text: `No component named "${ name }" was found.`,
++						},
++					],
++					isError: true,
++				};
++			}
++			return {
++				content: [
++					{
++						type: 'text',
++						text: formatComponentDetail( detail ),
++					},
++				],
++			};
++		}
++	);
++}
+diff --git a/packages/design-system-mcp/src/tools/get-components.ts b/packages/design-system-mcp/src/tools/get-components.ts
+new file mode 100644
+index 00000000000000..21d2752a494887
+--- /dev/null
++++ b/packages/design-system-mcp/src/tools/get-components.ts
+@@ -0,0 +1,33 @@
++import type { McpServer } from '@modelcontextprotocol/server';
++import { getComponents } from '../data';
++import { formatComponents } from '../format';
++
++/**
++ * Register the get_components tool.
++ *
++ * @param server - The MCP server instance.
++ */
++export function register( server: McpServer ): void {
++	server.registerTool(
++		'get_components',
++		{
++			title: 'Get Components',
++			description:
++				'Get a list of all available WordPress Design System components with their package names and descriptions.',
++			annotations: {
++				readOnlyHint: true,
++			},
++		},
++		async () => {
++			const components = await getComponents();
++			return {
++				content: [
++					{
++						type: 'text',
++						text: formatComponents( components ),
++					},
++				],
++			};
++		}
++	);
++}
+diff --git a/packages/design-system-mcp/src/tools/get-design-tokens.ts b/packages/design-system-mcp/src/tools/get-design-tokens.ts
+new file mode 100644
+index 00000000000000..2fbf6f9cc7dca6
+--- /dev/null
++++ b/packages/design-system-mcp/src/tools/get-design-tokens.ts
+@@ -0,0 +1,32 @@
++import type { McpServer } from '@modelcontextprotocol/server';
++import { getDesignTokens } from '../data';
++
++/**
++ * Register the get_design_tokens tool.
++ *
++ * @param server - The MCP server instance.
++ */
++export function register( server: McpServer ): void {
++	server.registerTool(
++		'get_design_tokens',
++		{
++			title: 'Get Design Tokens',
++			description:
++				'Get the WordPress Design System design tokens reference (colors, spacing, typography, elevation, etc.).',
++			annotations: {
++				readOnlyHint: true,
++			},
++		},
++		async () => {
++			const tokens = await getDesignTokens();
++			return {
++				content: [
++					{
++						type: 'text',
++						text: tokens.content,
++					},
++				],
++			};
++		}
++	);
++}
+diff --git a/packages/design-system-mcp/src/tools/index.ts b/packages/design-system-mcp/src/tools/index.ts
+new file mode 100644
+index 00000000000000..18049da604b4d4
+--- /dev/null
++++ b/packages/design-system-mcp/src/tools/index.ts
+@@ -0,0 +1,15 @@
++import type { McpServer } from '@modelcontextprotocol/server';
++import { register as getComponents } from './get-components';
++import { register as getComponentDetails } from './get-component-details';
++import { register as getDesignTokens } from './get-design-tokens';
++
++/**
++ * Register all MCP tools on the server.
++ *
++ * @param server - The MCP server instance.
++ */
++export function registerTools( server: McpServer ): void {
++	getComponents( server );
++	getComponentDetails( server );
++	getDesignTokens( server );
++}
+diff --git a/packages/design-system-mcp/src/types.ts b/packages/design-system-mcp/src/types.ts
+new file mode 100644
+index 00000000000000..d89cb8bb1ba397
+--- /dev/null
++++ b/packages/design-system-mcp/src/types.ts
+@@ -0,0 +1,51 @@
++export interface ManifestComponent {
++	id: string;
++	name: string;
++	path: string;
++	description?: string;
++	stories?: Array< {
++		name: string;
++		snippet?: string;
++		description?: string;
++	} >;
++	reactDocgen?: {
++		description?: string;
++		displayName?: string;
++		props?: Record<
++			string,
++			{
++				required?: boolean;
++				tsType?: { name: string; raw?: string };
++				description?: string;
++				defaultValue?: { value: string };
++			}
++		>;
++	};
++}
++
++export interface Component {
++	name: string;
++	description: string;
++	packageName: string;
++}
++
++export interface ComponentProp {
++	name: string;
++	type: string;
++	required: boolean;
++	description: string;
++	defaultValue: string | null;
++}
++
++export interface ComponentDetail {
++	name: string;
++	description: string;
++	packageName: string;
++	importStatement: string | null;
++	props: ComponentProp[];
++	stories: Array< {
++		name: string;
++		snippet?: string;
++		description?: string;
++	} >;
++}
+diff --git a/packages/design-system-mcp/tsconfig.json b/packages/design-system-mcp/tsconfig.json
+new file mode 100644
+index 00000000000000..6ec6afb1596917
+--- /dev/null
++++ b/packages/design-system-mcp/tsconfig.json
+@@ -0,0 +1,10 @@
++{
++	"$schema": "https://json.schemastore.org/tsconfig.json",
++	"extends": "../../tsconfig.base.json",
++	"compilerOptions": {
++		"rootDir": "src",
++		"types": [ "jest" ]
++	},
++	"include": [ "src" ],
++	"exclude": []
++}
+diff --git a/packages/ui/src/badge/stories/choosing-intent.story.tsx b/packages/ui/src/badge/stories/choosing-intent.story.tsx
+index c577d7686c36eb..9a54db2e5e9611 100644
+--- a/packages/ui/src/badge/stories/choosing-intent.story.tsx
++++ b/packages/ui/src/badge/stories/choosing-intent.story.tsx
+@@ -15,7 +15,7 @@ const meta: Meta< typeof Badge > = {
+ 	parameters: {
+ 		controls: { disable: true },
+ 	},
+-	tags: [ '!dev' /* Hide individual story pages from sidebar */ ],
++	tags: [ '!dev' /* Hide individual story pages from sidebar */, 'manifest' ],
+ };
+ export default meta;
+ 
+diff --git a/packages/ui/src/badge/stories/index.story.tsx b/packages/ui/src/badge/stories/index.story.tsx
+index 35a159e9d81f1a..30139480d481e8 100644
+--- a/packages/ui/src/badge/stories/index.story.tsx
++++ b/packages/ui/src/badge/stories/index.story.tsx
+@@ -3,6 +3,7 @@ import { Fragment } from '@wordpress/element';
+ import { Badge } from '../index';
+ 
+ const meta: Meta< typeof Badge > = {
++	tags: [ 'manifest' ],
+ 	title: 'Design System/Components/Badge',
+ 	component: Badge,
+ };
+diff --git a/packages/ui/src/stack/stories/index.story.tsx b/packages/ui/src/stack/stories/index.story.tsx
+index 768aa39e4a2ba5..46b0bbf50917d0 100644
+--- a/packages/ui/src/stack/stories/index.story.tsx
++++ b/packages/ui/src/stack/stories/index.story.tsx
+@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { Stack } from '../index';
+ 
+ const meta: Meta< typeof Stack > = {
++	tags: [ 'manifest' ],
+ 	title: 'Design System/Components/Stack',
+ 	component: Stack,
+ };
+diff --git a/packages/ui/src/text/stories/index.story.tsx b/packages/ui/src/text/stories/index.story.tsx
+index 1c78ce513dc9ee..3907c96c743c07 100644
+--- a/packages/ui/src/text/stories/index.story.tsx
++++ b/packages/ui/src/text/stories/index.story.tsx
+@@ -3,6 +3,7 @@ import { Text } from '../index';
+ import { Stack } from '../../stack';
+ 
+ const meta: Meta< typeof Text > = {
++	tags: [ 'manifest' ],
+ 	title: 'Design System/Components/Text',
+ 	component: Text,
+ };
+diff --git a/storybook/preview.jsx b/storybook/preview.jsx
+index 367117897dcc0c..318e20b3138cd8 100644
+--- a/storybook/preview.jsx
++++ b/storybook/preview.jsx
+@@ -251,4 +251,4 @@ export const parameters = {
+ 	},
+ };
+ 
+-export const tags = [ 'autodocs' ];
++export const tags = [ 'autodocs', '!manifest' ];
+diff --git a/tsconfig.json b/tsconfig.json
+index 163703994d4207..c9a8bfa34ee42b 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -25,6 +25,7 @@
+ 		{ "path": "packages/dataviews" },
+ 		{ "path": "packages/date" },
+ 		{ "path": "packages/deprecated" },
++		{ "path": "packages/design-system-mcp" },
+ 		{ "path": "packages/docgen" },
+ 		{ "path": "packages/dom" },
+ 		{ "path": "packages/dom-ready" },

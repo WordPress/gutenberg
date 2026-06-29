@@ -1,0 +1,184 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 2e1eccbcf69b31..4368066b8e2085 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -178,24 +178,46 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                     type="button"
+                   />
+                   <div
+-                    class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper emotion-12 emotion-5"
+-                    data-wp-c16t="true"
+-                    data-wp-component="VStack"
++                    class="components-color-palette__custom-color-text-wrapper"
+                   >
+-                    <span
+-                      class="components-truncate components-color-palette__custom-color-name emotion-14 emotion-5"
++                    <div
++                      class="components-flex components-h-stack components-v-stack emotion-12 emotion-5"
+                       data-wp-c16t="true"
+-                      data-wp-component="Truncate"
++                      data-wp-component="VStack"
+                     >
+-                      red
+-                    </span>
+-                    <span
+-                      class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
+-                      data-wp-c16t="true"
+-                      data-wp-component="Truncate"
++                      <span
++                        class="components-truncate components-color-palette__custom-color-name emotion-14 emotion-5"
++                        data-wp-c16t="true"
++                        data-wp-component="Truncate"
++                      >
++                        red
++                      </span>
++                      <span
++                        class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
++                        data-wp-c16t="true"
++                        data-wp-component="Truncate"
++                      >
++                        #f00
++                      </span>
++                    </div>
++                    <button
++                      aria-label="Edit custom color"
++                      class="components-color-palette__custom-color-edit-button"
++                      type="button"
+                     >
+-                      #f00
+-                    </span>
++                      <svg
++                        aria-hidden="true"
++                        focusable="false"
++                        height="16"
++                        viewBox="0 0 24 24"
++                        width="16"
++                        xmlns="http://www.w3.org/2000/svg"
++                      >
++                        <path
++                          d="m19 7-3-3-8.5 8.5-1 4 4-1L19 7Zm-7 11.5H5V20h7v-1.5Z"
++                        />
++                      </svg>
++                    </button>
+                   </div>
+                 </div>
+               </div>
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index eb981e8b9acc70..1f612e6b222e66 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -13,6 +13,7 @@ import clsx from 'clsx';
+ import { useInstanceId } from '@wordpress/compose';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
++import { Icon, pencil } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+@@ -283,32 +284,39 @@ function UnforwardedColorPalette(
+ 								} }
+ 								type="button"
+ 							/>
+-							<VStack
+-								className="components-color-palette__custom-color-text-wrapper"
+-								spacing={ 0.5 }
+-							>
+-								<Truncate className="components-color-palette__custom-color-name">
+-									{ value
+-										? buttonLabelName
+-										: __( 'No color selected' ) }
+-								</Truncate>
+-								{ /*
+-								This `Truncate` is always rendered, even if
+-								there is no `displayValue`, to ensure the layout
+-								does not shift
+-								*/ }
+-								<Truncate
+-									className={ clsx(
+-										'components-color-palette__custom-color-value',
+-										{
+-											'components-color-palette__custom-color-value--is-hex':
+-												isHex,
+-										}
+-									) }
++							<div className="components-color-palette__custom-color-text-wrapper">
++								<VStack spacing={ 0.5 }>
++									<Truncate className="components-color-palette__custom-color-name">
++										{ value
++											? buttonLabelName
++											: __( 'No color selected' ) }
++									</Truncate>
++									{ /*
++									This `Truncate` is always rendered, even if
++									there is no `displayValue`, to ensure the layout
++									does not shift
++									*/ }
++									<Truncate
++										className={ clsx(
++											'components-color-palette__custom-color-value',
++											{
++												'components-color-palette__custom-color-value--is-hex':
++													isHex,
++											}
++										) }
++									>
++										{ displayValue }
++									</Truncate>
++								</VStack>
++								<button
++									className="components-color-palette__custom-color-edit-button"
++									aria-label={ __( 'Edit custom color' ) }
++									onClick={ onToggle }
++									type="button"
+ 								>
+-									{ displayValue }
+-								</Truncate>
+-							</VStack>
++									<Icon icon={ pencil } size={ 20 } />
++								</button>
++							</div>
+ 						</VStack>
+ 					) }
+ 				/>
+diff --git a/packages/components/src/color-palette/style.scss b/packages/components/src/color-palette/style.scss
+index 19d0dfc9211ed0..b379825ccde6a3 100644
+--- a/packages/components/src/color-palette/style.scss
++++ b/packages/components/src/color-palette/style.scss
+@@ -39,6 +39,9 @@ $border-as-box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
+ }
+ 
+ .components-color-palette__custom-color-text-wrapper {
++	display: flex;
++	align-items: flex-start;
++	justify-content: space-between;
+ 	padding: $grid-unit-15 $grid-unit-20;
+ 	border-radius: 0 0 $radius-medium $radius-medium;
+ 	position: relative;
+@@ -52,6 +55,27 @@ $border-as-box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
+ 		inset -1 * $border-width 0 0 0 rgba(0, 0, 0, 0.2);
+ }
+ 
++.components-color-palette__custom-color-edit-button {
++	flex-shrink: 0;
++	display: flex;
++	align-items: center;
++	justify-content: center;
++	background: none;
++	border: none;
++	padding: 0;
++	cursor: pointer;
++	border-radius: $radius-small;
++
++	&:focus {
++		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
++		outline: 2px solid transparent;
++	}
++
++	svg {
++		fill: $black;
++	}
++}
++
+ .components-color-palette__custom-color-name {
+ 	color: $components-color-foreground;
+ 	margin: 0 $border-width;

@@ -1,0 +1,204 @@
+diff --git a/packages/ui/src/button/stories/index.story.tsx b/packages/ui/src/button/stories/index.story.tsx
+index 46f4d23ce2deca..49c37adfd9f88d 100644
+--- a/packages/ui/src/button/stories/index.story.tsx
++++ b/packages/ui/src/button/stories/index.story.tsx
+@@ -62,12 +62,15 @@ export const Neutral: Story = {
+ 	},
+ };
+ 
+-export const NeutralOutline: Story = {
++/**
++ * Destructive buttons should be used for high-stakes, irreversible actions.
++ */
++export const Destructive: Story = {
+ 	...Default,
+ 	args: {
+ 		...Default.args,
+-		tone: 'neutral',
+-		variant: 'outline',
++		children: 'Permanently delete',
++		tone: 'destructive',
+ 	},
+ };
+ 
+@@ -92,57 +95,64 @@ export const AllTonesAndVariants: Story = {
+ 			<div></div>
+ 			<div style={ { textAlign: 'center' } }>Resting</div>
+ 			<div style={ { textAlign: 'center' } }>Disabled</div>
+-			{ ( [ 'brand', 'neutral' ] as const ).map( ( tone ) => (
+-				<Fragment key={ tone }>
+-					{ (
+-						[ 'solid', 'outline', 'minimal', 'unstyled' ] as const
+-					 ).map( ( variant ) => (
+-						<Fragment key={ variant }>
+-							<div
+-								style={ {
+-									paddingInlineEnd: '1rem',
+-									display: 'flex',
+-									alignItems: 'center',
+-								} }
+-							>
+-								{ variant }, { tone }
+-							</div>
+-							<div
+-								style={ {
+-									padding: '0.5rem 1rem',
+-									display: 'flex',
+-									alignItems: 'center',
+-								} }
+-							>
+-								<Button
+-									{ ...args }
+-									tone={ tone }
+-									variant={ variant }
+-								/>
+-							</div>
+-							<div
+-								style={ {
+-									padding: '0.5rem 1rem',
+-									display: 'flex',
+-									alignItems: 'center',
+-								} }
+-							>
+-								<Button
+-									{ ...args }
+-									tone={ tone }
+-									variant={ variant }
+-									// Disabling because this lint rule was meant for the
+-									// `@wordpress/components` Button, but is being applied here.
+-									// TODO: rework the lint rule so that it checks the package
+-									// where the Button comes from.
+-									// eslint-disable-next-line no-restricted-syntax
+-									disabled
+-								/>
+-							</div>
+-						</Fragment>
+-					) ) }
+-				</Fragment>
+-			) ) }
++			{ ( [ 'brand', 'neutral', 'destructive' ] as const ).map(
++				( tone ) => (
++					<Fragment key={ tone }>
++						{ (
++							[
++								'solid',
++								'outline',
++								'minimal',
++								'unstyled',
++							] as const
++						 ).map( ( variant ) => (
++							<Fragment key={ variant }>
++								<div
++									style={ {
++										paddingInlineEnd: '1rem',
++										display: 'flex',
++										alignItems: 'center',
++									} }
++								>
++									{ variant }, { tone }
++								</div>
++								<div
++									style={ {
++										padding: '0.5rem 1rem',
++										display: 'flex',
++										alignItems: 'center',
++									} }
++								>
++									<Button
++										{ ...args }
++										tone={ tone }
++										variant={ variant }
++									/>
++								</div>
++								<div
++									style={ {
++										padding: '0.5rem 1rem',
++										display: 'flex',
++										alignItems: 'center',
++									} }
++								>
++									<Button
++										{ ...args }
++										tone={ tone }
++										variant={ variant }
++										// Disabling because this lint rule was meant for the
++										// `@wordpress/components` Button, but is being applied here.
++										// TODO: rework the lint rule so that it checks the package
++										// where the Button comes from.
++										// eslint-disable-next-line no-restricted-syntax
++										disabled
++									/>
++								</div>
++							</Fragment>
++						) ) }
++					</Fragment>
++				)
++			) }
+ 		</div>
+ 	),
+ };
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+index f2ee22e715d735..b68f686b24c5eb 100644
+--- a/packages/ui/src/button/style.module.css
++++ b/packages/ui/src/button/style.module.css
+@@ -185,6 +185,39 @@
+ 		}
+ 	}
+ 
++	.is-destructive {
++		&.is-solid {
++			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-error-strong);
++			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-error-strong-active);
++			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-error-strong-disabled);
++			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-error-strong);
++			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-error-strong-active);
++			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-error-strong-disabled);
++		}
++
++		/* Outline and minimal buttons use the same foreground color */
++		&.is-outline,
++		&.is-minimal {
++			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-error);
++			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-error-active);
++			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-error-disabled);
++		}
++
++		&.is-outline {
++			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-error);
++			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-error-active);
++			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-error-disabled);
++			--wp-ui-button-border-color: var(--wpds-color-stroke-interactive-error);
++			--wp-ui-button-border-color-active: var(--wpds-color-stroke-interactive-error-active);
++		}
++
++		&.is-minimal {
++			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-error-weak);
++			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-error-weak-active);
++			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-error-weak-disabled);
++		}
++	}
++
+ 	.is-unstyled {
+ 		border: none;
+ 		background: none;
+diff --git a/packages/ui/src/button/types.ts b/packages/ui/src/button/types.ts
+index da5fbda444970d..232f1d39bfd285 100644
+--- a/packages/ui/src/button/types.ts
++++ b/packages/ui/src/button/types.ts
+@@ -13,11 +13,14 @@ export interface ButtonProps
+ 	variant?: 'solid' | 'outline' | 'minimal' | 'unstyled';
+ 
+ 	/**
+-	 * The tone of the button. Tone describes a semantic color intent.
++	 * The tone of the button:
+ 	 *
++	 * - `'brand': for the most prominent actions, using the brand colors.
++	 * - `'neutral'` for less prominent actions.
++	 * - `'destructive'`: for high-stakes, irreversible actions.
+ 	 * @default "brand"
+ 	 */
+-	tone?: 'brand' | 'neutral';
++	tone?: 'brand' | 'neutral' | 'destructive';
+ 
+ 	/**
+ 	 * The size of the button.

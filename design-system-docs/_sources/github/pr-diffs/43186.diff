@@ -1,0 +1,523 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4208345ef59548..e6bba25be6d8cd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `CustomSelectControl`: Deprecate constrained width style. Add a `__nextUnconstrainedWidth` prop to start opting into the unconstrained width that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43230](https://github.com/WordPress/gutenberg/pull/43230)).
+ 
++### Bug Fix
++
++-   `Popover`: fix and improve opening animation ([#43186](https://github.com/WordPress/gutenberg/pull/43186)).
++
+ ### Enhancements
+ 
+ -   `ToggleGroupControl`: Improve TypeScript documentation ([#43265](https://github.com/WordPress/gutenberg/pull/43265)).
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index bd59fe45181bc1..b530f2e51d4c61 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -13,6 +13,8 @@ import {
+ 	limitShift,
+ 	size,
+ } from '@floating-ui/react-dom';
++// eslint-disable-next-line no-restricted-imports
++import { motion, useReducedMotion } from 'framer-motion';
+ 
+ /**
+  * WordPress dependencies
+@@ -40,7 +42,7 @@ import { Path, SVG } from '@wordpress/primitives';
+ import Button from '../button';
+ import ScrollLock from '../scroll-lock';
+ import { Slot, Fill, useSlot } from '../slot-fill';
+-import { getAnimateClassName } from '../animate';
++import { positionToPlacement, placementToMotionAnimationProps } from './utils';
+ 
+ /**
+  * Name of slot in which popover should fill.
+@@ -73,50 +75,48 @@ const ArrowTriangle = ( props ) => (
+ 	</SVG>
+ );
+ 
+-const slotNameContext = createContext();
+-
+-const positionToPlacement = ( position ) => {
+-	const [ x, y, z ] = position.split( ' ' );
++const MaybeAnimatedWrapper = forwardRef(
++	(
++		{
++			style: receivedInlineStyles,
++			placement,
++			shouldAnimate = false,
++			...props
++		},
++		forwardedRef
++	) => {
++		const shouldReduceMotion = useReducedMotion();
++
++		const { style: motionInlineStyles, ...otherMotionProps } = useMemo(
++			() => placementToMotionAnimationProps( placement ),
++			[ placement ]
++		);
+ 
+-	if ( [ 'top', 'bottom' ].includes( x ) ) {
+-		let suffix = '';
+-		if ( ( !! z && z === 'left' ) || y === 'right' ) {
+-			suffix = '-start';
+-		} else if ( ( !! z && z === 'right' ) || y === 'left' ) {
+-			suffix = '-end';
++		if ( shouldAnimate && ! shouldReduceMotion ) {
++			return (
++				<motion.div
++					style={ {
++						...motionInlineStyles,
++						...receivedInlineStyles,
++					} }
++					{ ...otherMotionProps }
++					{ ...props }
++					ref={ forwardedRef }
++				/>
++			);
+ 		}
+-		return x + suffix;
+-	}
+-
+-	return y;
+-};
+ 
+-const placementToAnimationOrigin = ( placement ) => {
+-	const [ a, b ] = placement.split( '-' );
+-
+-	let x, y;
+-	if ( a === 'top' || a === 'bottom' ) {
+-		x = a === 'top' ? 'bottom' : 'top';
+-		y = 'middle';
+-		if ( b === 'start' ) {
+-			y = 'left';
+-		} else if ( b === 'end' ) {
+-			y = 'right';
+-		}
+-	}
+-
+-	if ( a === 'left' || a === 'right' ) {
+-		x = 'center';
+-		y = a === 'left' ? 'right' : 'left';
+-		if ( b === 'start' ) {
+-			x = 'top';
+-		} else if ( b === 'end' ) {
+-			x = 'bottom';
+-		}
++		return (
++			<div
++				style={ receivedInlineStyles }
++				{ ...props }
++				ref={ forwardedRef }
++			/>
++		);
+ 	}
++);
+ 
+-	return x + ' ' + y;
+-};
++const slotNameContext = createContext();
+ 
+ const Popover = (
+ 	{
+@@ -411,14 +411,6 @@ const Popover = (
+ 		};
+ 	}, [ ownerDocument ] );
+ 
+-	/** @type {false | string} */
+-	const animateClassName =
+-		!! animate &&
+-		getAnimateClassName( {
+-			type: 'appear',
+-			origin: placementToAnimationOrigin( computedPlacement ),
+-		} );
+-
+ 	const mergedFloatingRef = useMergeRefs( [
+ 		floating,
+ 		dialogRef,
+@@ -431,16 +423,13 @@ const Popover = (
+ 	let content = (
+ 		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+ 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+-		<div
+-			className={ classnames(
+-				'components-popover',
+-				className,
+-				animateClassName,
+-				{
+-					'is-expanded': isExpanded,
+-					'is-alternate': isAlternate,
+-				}
+-			) }
++		<MaybeAnimatedWrapper
++			shouldAnimate={ animate && ! isExpanded }
++			placement={ computedPlacement }
++			className={ classnames( 'components-popover', className, {
++				'is-expanded': isExpanded,
++				'is-alternate': isAlternate,
++			} ) }
+ 			{ ...contentProps }
+ 			ref={ mergedFloatingRef }
+ 			{ ...dialogProps }
+@@ -489,7 +478,7 @@ const Popover = (
+ 					<ArrowTriangle />
+ 				</div>
+ 			) }
+-		</div>
++		</MaybeAnimatedWrapper>
+ 	);
+ 
+ 	if ( slot.ref ) {
+diff --git a/packages/components/src/popover/stories/index.js b/packages/components/src/popover/stories/index.js
+index 32bcb6463d677e..2a9879a9f43dcb 100644
+--- a/packages/components/src/popover/stories/index.js
++++ b/packages/components/src/popover/stories/index.js
+@@ -126,7 +126,14 @@ export const Default = ( args ) => {
+ 	);
+ };
+ Default.args = {
+-	children: <>Popover&apos;s&nbsp;content</>,
++	children: (
++		<div style={ { width: '280px', whiteSpace: 'normal' } }>
++			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
++			eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
++			ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
++			aliquip ex ea commodo consequat.
++		</div>
++	),
+ };
+ 
+ /**
+@@ -166,8 +173,15 @@ AllPlacements.parameters = {
+ };
+ AllPlacements.args = {
+ 	...Default.args,
++	children: (
++		<div style={ { width: '280px', whiteSpace: 'normal' } }>
++			Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
++			eiusmod tempor incididunt ut labore et dolore magna aliqua.
++		</div>
++	),
+ 	noArrow: false,
+ 	offset: 10,
++	__unstableForcePosition: true,
+ };
+ 
+ export const DynamicHeight = ( { children, ...args } ) => {
+diff --git a/packages/components/src/popover/test/__snapshots__/index.js.snap b/packages/components/src/popover/test/__snapshots__/index.js.snap
+index d985500486625f..e3eb977180bf21 100644
+--- a/packages/components/src/popover/test/__snapshots__/index.js.snap
++++ b/packages/components/src/popover/test/__snapshots__/index.js.snap
+@@ -1,11 +1,11 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Popover should pass additional props to portaled element 1`] = `
++exports[`Popover Component should pass additional props to portaled element 1`] = `
+ <span>
+   <div
+-    class="components-popover components-animate__appear is-from-left is-from-top"
++    class="components-popover"
+     role="tooltip"
+-    style="position: absolute;"
++    style="position: absolute; opacity: 0; transform: translateY(-2em) scale(0) translateZ(0); transform-origin: 0% 0% 0;"
+     tabindex="-1"
+   >
+     <div
+@@ -17,11 +17,11 @@ exports[`Popover should pass additional props to portaled element 1`] = `
+ </span>
+ `;
+ 
+-exports[`Popover should render content 1`] = `
++exports[`Popover Component should render content 1`] = `
+ <span>
+   <div
+-    class="components-popover components-animate__appear is-from-left is-from-top"
+-    style="position: absolute;"
++    class="components-popover"
++    style="position: absolute; opacity: 0; transform: translateY(-2em) scale(0) translateZ(0); transform-origin: 0% 0% 0;"
+     tabindex="-1"
+   >
+     <div
+diff --git a/packages/components/src/popover/test/index.js b/packages/components/src/popover/test/index.js
+index 68ede81280f4b9..1551ec6586753d 100644
+--- a/packages/components/src/popover/test/index.js
++++ b/packages/components/src/popover/test/index.js
+@@ -13,57 +13,150 @@ import { useRef } from '@wordpress/element';
+  */
+ import Popover from '../';
+ 
++import { positionToPlacement, placementToMotionAnimationProps } from '../utils';
++
+ describe( 'Popover', () => {
+-	afterEach( () => {
+-		if ( document.activeElement ) {
+-			document.activeElement.blur();
+-		}
+-	} );
++	describe( 'Component', () => {
++		afterEach( () => {
++			if ( document.activeElement ) {
++				document.activeElement.blur();
++			}
++		} );
+ 
+-	it( 'should allow focus-on-open behavior to be disabled', () => {
+-		expect( document.activeElement ).toBe( document.body );
++		it( 'should allow focus-on-open behavior to be disabled', () => {
++			expect( document.activeElement ).toBe( document.body );
+ 
+-		act( () => {
+-			render( <Popover focusOnMount={ false } /> );
++			act( () => {
++				render( <Popover focusOnMount={ false } /> );
+ 
+-			jest.advanceTimersByTime( 1 );
++				jest.advanceTimersByTime( 1 );
++			} );
++
++			expect( document.activeElement ).toBe( document.body );
+ 		} );
+ 
+-		expect( document.activeElement ).toBe( document.body );
+-	} );
++		it( 'should render content', () => {
++			let result;
++			act( () => {
++				result = render( <Popover>Hello</Popover> );
++			} );
+ 
+-	it( 'should render content', () => {
+-		let result;
+-		act( () => {
+-			result = render( <Popover>Hello</Popover> );
++			expect(
++				result.container.querySelector( 'span' )
++			).toMatchSnapshot();
+ 		} );
+ 
+-		expect( result.container.querySelector( 'span' ) ).toMatchSnapshot();
+-	} );
++		it( 'should pass additional props to portaled element', () => {
++			let result;
++			act( () => {
++				result = render( <Popover role="tooltip">Hello</Popover> );
++			} );
+ 
+-	it( 'should pass additional props to portaled element', () => {
+-		let result;
+-		act( () => {
+-			result = render( <Popover role="tooltip">Hello</Popover> );
++			expect(
++				result.container.querySelector( 'span' )
++			).toMatchSnapshot();
+ 		} );
+ 
+-		expect( result.container.querySelector( 'span' ) ).toMatchSnapshot();
+-	} );
++		it( 'should render correctly when anchorRef is provided', () => {
++			const PopoverWithAnchor = ( args ) => {
++				const anchorRef = useRef( null );
+ 
+-	it( 'should render correctly when anchorRef is provided', () => {
+-		const PopoverWithAnchor = ( args ) => {
+-			const anchorRef = useRef( null );
++				return (
++					<div>
++						<p ref={ anchorRef }>Anchor</p>
++						<Popover { ...args } anchorRef={ anchorRef } />
++					</div>
++				);
++			};
+ 
+-			return (
+-				<div>
+-					<p ref={ anchorRef }>Anchor</p>
+-					<Popover { ...args } anchorRef={ anchorRef } />
+-				</div>
+-			);
+-		};
++			render( <PopoverWithAnchor>Popover content</PopoverWithAnchor> );
++
++			expect( screen.getByText( 'Popover content' ) ).toBeInTheDocument();
++		} );
++	} );
+ 
+-		render( <PopoverWithAnchor>Popover content</PopoverWithAnchor> );
++	describe( 'positionToPlacement', () => {
++		it.each( [
++			[ 'top left', 'top-end' ],
++			[ 'top center', 'top' ],
++			[ 'top right', 'top-start' ],
++			[ 'middle left', 'left' ],
++			[ 'middle center', 'center' ],
++			[ 'middle right', 'right' ],
++			[ 'bottom left', 'bottom-end' ],
++			[ 'bottom center', 'bottom' ],
++			[ 'bottom right', 'bottom-start' ],
++		] )( 'converts `%s` to `%s`', ( inputPosition, expectedPlacement ) => {
++			expect( positionToPlacement( inputPosition ) ).toEqual(
++				expectedPlacement
++			);
++		} );
++	} );
+ 
+-		expect( screen.getByText( 'Popover content' ) ).toBeInTheDocument();
++	describe( 'placementToMotionAnimationProps', () => {
++		describe( 'animation origin', () => {
++			it.each( [
++				[ 'top', 0.5, 1 ],
++				[ 'top-start', 0, 1 ],
++				[ 'top-end', 1, 1 ],
++				[ 'right', 0, 0.5 ],
++				[ 'right-start', 0, 0 ],
++				[ 'right-end', 0, 1 ],
++				[ 'bottom', 0.5, 0 ],
++				[ 'bottom-start', 0, 0 ],
++				[ 'bottom-end', 1, 0 ],
++				[ 'left', 1, 0.5 ],
++				[ 'left-start', 1, 0 ],
++				[ 'left-end', 1, 1 ],
++			] )(
++				'for the `%s` placement computes an animation origin of (%d, %d)',
++				( inputPlacement, expectedOriginX, expectedOriginY ) => {
++					expect(
++						placementToMotionAnimationProps( inputPlacement )
++					).toEqual(
++						expect.objectContaining( {
++							style: expect.objectContaining( {
++								originX: expectedOriginX,
++								originY: expectedOriginY,
++							} ),
++						} )
++					);
++				}
++			);
++		} );
++		describe( 'initial translation', () => {
++			it.each( [
++				[ 'top', 'translateY', '2em' ],
++				[ 'top-start', 'translateY', '2em' ],
++				[ 'top-end', 'translateY', '2em' ],
++				[ 'right', 'translateX', '-2em' ],
++				[ 'right-start', 'translateX', '-2em' ],
++				[ 'right-end', 'translateX', '-2em' ],
++				[ 'bottom', 'translateY', '-2em' ],
++				[ 'bottom-start', 'translateY', '-2em' ],
++				[ 'bottom-end', 'translateY', '-2em' ],
++				[ 'left', 'translateX', '2em' ],
++				[ 'left-start', 'translateX', '2em' ],
++				[ 'left-end', 'translateX', '2em' ],
++			] )(
++				'for the `%s` placement computes an initial `%s` of `%s',
++				(
++					inputPlacement,
++					expectedTranslationProp,
++					expectedTranslationValue
++				) => {
++					expect(
++						placementToMotionAnimationProps( inputPlacement )
++					).toEqual(
++						expect.objectContaining( {
++							initial: expect.objectContaining( {
++								[ expectedTranslationProp ]:
++									expectedTranslationValue,
++							} ),
++						} )
++					);
++				}
++			);
++		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/popover/utils.js b/packages/components/src/popover/utils.js
+new file mode 100644
+index 00000000000000..05bf818aa969d1
+--- /dev/null
++++ b/packages/components/src/popover/utils.js
+@@ -0,0 +1,83 @@
++/**
++ * @typedef {import('../animate').AppearOrigin} AppearOrigin
++ * @typedef {import('@floating-ui/react-dom').Placement} FloatingUIPlacement
++ * @typedef {	'top left' | 'top center' | 'top right' | 'middle left' | 'middle center' | 'middle right' | 'bottom left' | 'bottom center' | 'bottom right' | 'bottom left' | 'bottom center' | 'bottom right' } LegacyPosition
++ */
++
++/**
++ * Converts the `Popover`'s legacy "position" prop to the new "placement" prop
++ * (used by `floating-ui`).
++ *
++ * @param {LegacyPosition} position The legacy position
++ * @return {FloatingUIPlacement} The corresponding placement
++ */
++export const positionToPlacement = ( position ) => {
++	const [ x, y, z ] = position.split( ' ' );
++
++	if ( [ 'top', 'bottom' ].includes( x ) ) {
++		let suffix = '';
++		if ( ( !! z && z === 'left' ) || y === 'right' ) {
++			suffix = '-start';
++		} else if ( ( !! z && z === 'right' ) || y === 'left' ) {
++			suffix = '-end';
++		}
++
++		// @ts-expect-error More TypeScript effort would be required to reconcile `string` and `Placement` types.
++		return x + suffix;
++	}
++
++	// @ts-expect-error More TypeScript effort would be required to reconcile `string` and `Placement` types.
++	return y;
++};
++
++/**
++ * @typedef AnimationOrigin
++ * @type {Object}
++ * @property {number} originX A number between 0 and 1 (in CSS logical properties jargon, 0 is "start", 0.5 is "center", and 1 is "end")
++ * @property {number} originY A number between 0 and 1 (0 is top, 0.5 is center, and 1 is bottom)
++ */
++
++/** @type {Object.<FloatingUIPlacement, {originX: number, originY: number}>} */
++const PLACEMENT_TO_ANIMATION_ORIGIN = {
++	top: { originX: 0.5, originY: 1 }, // open from bottom, center
++	'top-start': { originX: 0, originY: 1 }, // open from bottom, left
++	'top-end': { originX: 1, originY: 1 }, // open from bottom, right
++	right: { originX: 0, originY: 0.5 }, // open from middle, left
++	'right-start': { originX: 0, originY: 0 }, // open from top, left
++	'right-end': { originX: 0, originY: 1 }, // open from bottom, left
++	bottom: { originX: 0.5, originY: 0 }, // open from top, center
++	'bottom-start': { originX: 0, originY: 0 }, // open from top, left
++	'bottom-end': { originX: 1, originY: 0 }, // open from top, right
++	left: { originX: 1, originY: 0.5 }, // open from middle, right
++	'left-start': { originX: 1, originY: 0 }, // open from top, right
++	'left-end': { originX: 1, originY: 1 }, // open from bottom, right
++};
++
++/**
++ * Given the floating-ui `placement`, compute the framer-motion props for the
++ * popover's entry animation.
++ *
++ * @param {FloatingUIPlacement} placement A placement string from floating ui
++ * @return {import('framer-motion').MotionProps} The object containing the motion props
++ */
++export const placementToMotionAnimationProps = ( placement ) => {
++	const translateProp =
++		placement.startsWith( 'top' ) || placement.startsWith( 'bottom' )
++			? 'translateY'
++			: 'translateX';
++	const translateDirection =
++		placement.startsWith( 'top' ) || placement.startsWith( 'left' )
++			? 1
++			: -1;
++
++	return {
++		style: PLACEMENT_TO_ANIMATION_ORIGIN[ placement ],
++		initial: {
++			opacity: 0,
++			scale: 0,
++			[ translateProp ]: `${ 2 * translateDirection }em`,
++		},
++		animate: { opacity: 1, scale: 1, [ translateProp ]: 0 },
++		transition: { duration: 0.1, ease: [ 0, 0, 0.2, 1 ] },
++	};
++};

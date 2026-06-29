@@ -1,0 +1,305 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 57ba69197cfa98..761e6604a127a2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Composite`: add stable version of the component ([#63564](https://github.com/WordPress/gutenberg/pull/63564)).
+ -   `Composite`: add `Hover` and `Typeahead` subcomponents ([#64399](https://github.com/WordPress/gutenberg/pull/64399)).
++-   `Composite`: export `useCompositeStore, add focus-related props to `Composite`and`Composite.Item` subcomponents ([#64450](https://github.com/WordPress/gutenberg/pull/64450)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/composite/README.md b/packages/components/src/composite/README.md
+index 7bd12d0cabfa0c..3670e31b01e9df 100644
+--- a/packages/components/src/composite/README.md
++++ b/packages/components/src/composite/README.md
+@@ -147,6 +147,55 @@ Allows the component to be rendered as a different HTML element or React compone
+ 
+ -   Required: no
+ 
++##### `focusable`: `boolean`
++
++Makes the component a focusable element. When this element gains keyboard focus, it gets a `data-focus-visible` attribute and triggers the `onFocusVisible` prop.
++
++The component supports the `disabled` prop even for those elements not supporting the native `disabled` attribute. Disabled elements may be still accessible via keyboard by using the the `accessibleWhenDisabled` prop.
++
++Non-native focusable elements will lose their focusability entirely. However, native focusable elements will retain their inherent focusability.
++
++-   Required: no
++
++##### `disabled`: `boolean`
++
++Determines if the element is disabled. This sets the `aria-disabled` attribute accordingly, enabling support for all elements, including those that don't support the native `disabled` attribute.
++
++This feature can be combined with the `accessibleWhenDisabled` prop to
++make disabled elements still accessible via keyboard.
++
++**Note**: For this prop to work, the `focusable` prop must be set to
++`true`, if it's not set by default.
++
++-   Required: no
++-   Default: `false`
++
++##### `accessibleWhenDisabled`: `boolean`
++
++Indicates whether the element should be focusable even when it is
++`disabled`.
++
++This is important when discoverability is a concern. For example:
++
++> A toolbar in an editor contains a set of special smart paste functions
++> that are disabled when the clipboard is empty or when the function is not
++> applicable to the current content of the clipboard. It could be helpful to
++> keep the disabled buttons focusable if the ability to discover their
++> functionality is primarily via their presence on the toolbar.
++
++Learn more on [Focusability of disabled
++controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols).
++
++-   Required: no
++
++##### `onFocusVisible`: `(event: SyntheticEvent<HTMLElement>) => void`
++
++Custom event handler invoked when the element gains focus through keyboard interaction or a key press occurs while the element is in focus. This is the programmatic equivalent of the `data-focus-visible` attribute.
++
++**Note**: For this prop to work, the `focusable` prop must be set to `true` if it's not set by default.
++
++-   Required: no
++
+ ##### `children`: `React.ReactNode`
+ 
+ The contents of the component.
+@@ -189,6 +238,24 @@ The contents of the component.
+ 
+ Renders a composite item.
+ 
++##### `accessibleWhenDisabled`: `boolean`
++
++Indicates whether the element should be focusable even when it is
++`disabled`.
++
++This is important when discoverability is a concern. For example:
++
++> A toolbar in an editor contains a set of special smart paste functions
++> that are disabled when the clipboard is empty or when the function is not
++> applicable to the current content of the clipboard. It could be helpful to
++> keep the disabled buttons focusable if the ability to discover their
++> functionality is primarily via their presence on the toolbar.
++
++Learn more on [Focusability of disabled
++controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols).
++
++-   Required: no
++
+ ##### `render`: `RenderProp<React.HTMLAttributes<any> & { ref?: React.Ref<any> | undefined; }> | React.ReactElement<any, string | React.JSXElementConstructor<any>>`
+ 
+ Allows the component to be rendered as a different HTML element or React component. The value can be a React element or a function that takes in the original component props and gives back a React element with the props merged.
+diff --git a/packages/components/src/composite/index.tsx b/packages/components/src/composite/index.tsx
+index 4e87b9a55fa5bb..f5d92330cada3c 100644
+--- a/packages/components/src/composite/index.tsx
++++ b/packages/components/src/composite/index.tsx
+@@ -136,8 +136,10 @@ export const Composite = Object.assign(
+ 	forwardRef<
+ 		HTMLDivElement,
+ 		WordPressComponentProps< CompositeProps, 'div', false >
+-	>( function CompositeRow( props, ref ) {
+-		return <Ariakit.Composite { ...props } ref={ ref } />;
++	>( function Composite( { disabled = false, ...props }, ref ) {
++		return (
++			<Ariakit.Composite disabled={ disabled } { ...props } ref={ ref } />
++		);
+ 	} ),
+ 	{
+ 		displayName: 'Composite',
+diff --git a/packages/components/src/composite/stories/index.story.tsx b/packages/components/src/composite/stories/index.story.tsx
+index f1be53445f79ad..405962b92a761c 100644
+--- a/packages/components/src/composite/stories/index.story.tsx
++++ b/packages/components/src/composite/stories/index.story.tsx
+@@ -74,6 +74,28 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
+ 						table: { type: { summary: 'React.ReactNode' } },
+ 					},
+ 				};
++				const accessibleWhenDisabled = {
++					name: 'accessibleWhenDisabled',
++					description: `Indicates whether the element should be focusable even when it is
++\`disabled\`.
++
++This is important when discoverability is a concern. For example:
++
++> A toolbar in an editor contains a set of special smart paste functions
++> that are disabled when the clipboard is empty or when the function is not
++> applicable to the current content of the clipboard. It could be helpful to
++> keep the disabled buttons focusable if the ability to discover their
++> functionality is primarily via their presence on the toolbar.
++
++Learn more on [Focusability of disabled
++controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols).`,
++					table: {
++						type: {
++							summary: 'boolean',
++						},
++					},
++				};
++
+ 				const argTypes = {
+ 					useCompositeStore: {
+ 						activeId: {
+@@ -226,11 +248,58 @@ This only affects the composite widget behavior. You still need to set \`dir="rt
+ 							},
+ 							type: { required: true },
+ 						},
++						focusable: {
++							name: 'focusable',
++							description: `Makes the component a focusable element. When this element gains keyboard focus, it gets a \`data-focus-visible\` attribute and triggers the \`onFocusVisible\` prop.
++
++The component supports the \`disabled\` prop even for those elements not supporting the native \`disabled\` attribute. Disabled elements may be still accessible via keyboard by using the the \`accessibleWhenDisabled\` prop.
++
++Non-native focusable elements will lose their focusability entirely. However, native focusable elements will retain their inherent focusability.`,
++							table: {
++								type: {
++									summary: 'boolean',
++								},
++							},
++						},
++						disabled: {
++							name: 'disabled',
++							description: `Determines if the element is disabled. This sets the \`aria-disabled\` attribute accordingly, enabling support for all elements, including those that don't support the native \`disabled\` attribute.
++
++This feature can be combined with the \`accessibleWhenDisabled\` prop to
++make disabled elements still accessible via keyboard.
++
++**Note**: For this prop to work, the \`focusable\` prop must be set to
++\`true\`, if it's not set by default.`,
++							table: {
++								defaultValue: {
++									summary: 'false',
++								},
++								type: {
++									summary: 'boolean',
++								},
++							},
++						},
++						accessibleWhenDisabled,
++						onFocusVisible: {
++							name: 'onFocusVisible',
++							description: `Custom event handler invoked when the element gains focus through keyboard interaction or a key press occurs while the element is in focus. This is the programmatic equivalent of the \`data-focus-visible\` attribute.
++
++**Note**: For this prop to work, the \`focusable\` prop must be set to \`true\` if it's not set by default.`,
++							table: {
++								type: {
++									summary:
++										'(event: SyntheticEvent<HTMLElement>) => void',
++								},
++							},
++						},
+ 					},
+ 					'Composite.Group': commonArgTypes,
+ 					'Composite.GroupLabel': commonArgTypes,
+ 					'Composite.Row': commonArgTypes,
+-					'Composite.Item': commonArgTypes,
++					'Composite.Item': {
++						...commonArgTypes,
++						accessibleWhenDisabled,
++					},
+ 					'Composite.Hover': commonArgTypes,
+ 					'Composite.Typeahead': commonArgTypes,
+ 				};
+diff --git a/packages/components/src/composite/types.ts b/packages/components/src/composite/types.ts
+index 8bd4b447a83aef..5afe410f7582ba 100644
+--- a/packages/components/src/composite/types.ts
++++ b/packages/components/src/composite/types.ts
+@@ -131,6 +131,57 @@ export type CompositeProps = {
+ 	 * merged.
+ 	 */
+ 	render?: Ariakit.CompositeProps[ 'render' ];
++	/**
++	 * Makes the component a focusable element. When this element gains keyboard
++	 * focus, it gets a `data-focus-visible` attribute and triggers the
++	 * `onFocusVisible` prop.
++	 * The component supports the `disabled` prop even for those elements not
++	 * supporting the native `disabled` attribute. Disabled elements may be
++	 * still accessible via keyboard by using the the `accessibleWhenDisabled`
++	 * prop.
++	 * Non-native focusable elements will lose their focusability entirely.
++	 * However, native focusable elements will retain their inherent focusability.
++	 */
++	focusable?: Ariakit.CompositeProps[ 'focusable' ];
++	/**
++	 * Determines if the element is disabled. This sets the `aria-disabled`
++	 * attribute accordingly, enabling support for all elements, including those
++	 * that don't support the native `disabled` attribute.
++	 *
++	 * This feature can be combined with the `accessibleWhenDisabled` prop to
++	 * make disabled elements still accessible via keyboard.
++	 *
++	 * **Note**: For this prop to work, the `focusable` prop must be set to
++	 * `true`, if it's not set by default.
++	 *
++	 * @default false
++	 */
++	disabled?: Ariakit.CompositeProps[ 'disabled' ];
++	/**
++	 * Indicates whether the element should be focusable even when it is
++	 * `disabled`.
++	 *
++	 * This is important when discoverability is a concern. For example:
++	 *
++	 * > A toolbar in an editor contains a set of special smart paste functions
++	 * that are disabled when the clipboard is empty or when the function is not
++	 * applicable to the current content of the clipboard. It could be helpful to
++	 * keep the disabled buttons focusable if the ability to discover their
++	 * functionality is primarily via their presence on the toolbar.
++	 *
++	 * Learn more on [Focusability of disabled
++	 * controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols).
++	 */
++	accessibleWhenDisabled?: Ariakit.CompositeProps[ 'accessibleWhenDisabled' ];
++	/**
++	 * Custom event handler invoked when the element gains focus through keyboard
++	 * interaction or a key press occurs while the element is in focus. This is
++	 * the programmatic equivalent of the `data-focus-visible` attribute.
++	 *
++	 * **Note**: For this prop to work, the `focusable` prop must be set to `true`
++	 * if it's not set by default.
++	 */
++	onFocusVisible?: Ariakit.CompositeProps[ 'onFocusVisible' ];
+ 	/**
+ 	 * The contents of the component.
+ 	 */
+@@ -177,6 +228,22 @@ export type CompositeItemProps = {
+ 	 * The contents of the component.
+ 	 */
+ 	children?: Ariakit.CompositeItemProps[ 'children' ];
++	/**
++	 * Indicates whether the element should be focusable even when it is
++	 * `disabled`.
++	 *
++	 * This is important when discoverability is a concern. For example:
++	 *
++	 * > A toolbar in an editor contains a set of special smart paste functions
++	 * that are disabled when the clipboard is empty or when the function is not
++	 * applicable to the current content of the clipboard. It could be helpful to
++	 * keep the disabled buttons focusable if the ability to discover their
++	 * functionality is primarily via their presence on the toolbar.
++	 *
++	 * Learn more on [Focusability of disabled
++	 * controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols).
++	 */
++	accessibleWhenDisabled?: Ariakit.CompositeItemProps[ 'accessibleWhenDisabled' ];
+ };
+ 
+ export type CompositeRowProps = {
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index 4c724a461e6775..cd6d2a77db9cb6 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -62,7 +62,7 @@ export {
+ 	CompositeItem as __unstableCompositeItem,
+ 	useCompositeState as __unstableUseCompositeState,
+ } from './composite/legacy';
+-export { Composite } from './composite';
++export { Composite, useCompositeStore } from './composite';
+ export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
+ export { default as CustomSelectControl } from './custom-select-control';
+ export { default as Dashicon } from './dashicon';

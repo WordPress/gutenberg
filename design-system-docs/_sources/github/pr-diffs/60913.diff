@@ -1,0 +1,188 @@
+diff --git a/packages/block-editor/src/components/block-alignment-matrix-control/index.js b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+index 53baa97421e6c1..cdec41dfc7b978 100644
+--- a/packages/block-editor/src/components/block-alignment-matrix-control/index.js
++++ b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+@@ -6,7 +6,7 @@ import { DOWN } from '@wordpress/keycodes';
+ import {
+ 	ToolbarButton,
+ 	Dropdown,
+-	__experimentalAlignmentMatrixControl as AlignmentMatrixControl,
++	AlignmentMatrixControl,
+ } from '@wordpress/components';
+ 
+ const noop = () => {};
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 80ba60c6604fe5..00204111a1efd6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   Deprecate `replace` from the options accepted by `useNavigator().goTo()` ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
+ -   Soft deprecate `size` prop on `AlignmentMatrixControl.Icon` ([#64827](https://github.com/WordPress/gutenberg/pull/64827)).
++-   `__experimentalAlignmentMatrixControl` can now be imported as a stable `AlignmentMatrixControl` ([#60913](https://github.com/WordPress/gutenberg/pull/60913)).
+ 
+ ### Enhancements
+ 
+@@ -24,6 +25,7 @@
+ -   `UnitControl`: Update unit select styles ([#64712](https://github.com/WordPress/gutenberg/pull/64712)).
+ -   `InputControl`: Add variants to prefix/suffix wrappers ([#64824](https://github.com/WordPress/gutenberg/pull/64824)).
+ -   `Navigator`: remove location history, simplify internal logic ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
++-   `AlignmentMatrixControl`: Promote to stable ([#60913](https://github.com/WordPress/gutenberg/pull/60913)).
+ -   Tighten gap between the main control and the prefix/suffix slot for the following components ([#64908](https://github.com/WordPress/gutenberg/pull/64908)).
+     -   `InputControl`
+     -   `NumberControl`
+diff --git a/packages/components/src/alignment-matrix-control/README.md b/packages/components/src/alignment-matrix-control/README.md
+index d087a177d8d414..68ecab6b7adb47 100644
+--- a/packages/components/src/alignment-matrix-control/README.md
++++ b/packages/components/src/alignment-matrix-control/README.md
+@@ -1,16 +1,12 @@
+ # AlignmentMatrixControl
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
+ 
+ ## Usage
+ 
+ ```jsx
+ import { useState } from 'react';
+-import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '@wordpress/components';
++import { AlignmentMatrixControl } from '@wordpress/components';
+ 
+ const Example = () => {
+ 	const [ alignment, setAlignment ] = useState( 'center center' );
+diff --git a/packages/components/src/alignment-matrix-control/index.tsx b/packages/components/src/alignment-matrix-control/index.tsx
+index a865cd4f57a98b..fcf8c2fd470156 100644
+--- a/packages/components/src/alignment-matrix-control/index.tsx
++++ b/packages/components/src/alignment-matrix-control/index.tsx
+@@ -21,27 +21,7 @@ import { GRID, getItemId, getItemValue } from './utils';
+ import type { WordPressComponentProps } from '../context';
+ import type { AlignmentMatrixControlProps } from './types';
+ 
+-/**
+- *
+- * AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
+- *
+- * ```jsx
+- * import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '@wordpress/components';
+- * import { useState } from '@wordpress/element';
+- *
+- * const Example = () => {
+- * 	const [ alignment, setAlignment ] = useState( 'center center' );
+- *
+- * 	return (
+- * 		<AlignmentMatrixControl
+- * 			value={ alignment }
+- * 			onChange={ setAlignment }
+- * 		/>
+- * 	);
+- * };
+- * ```
+- */
+-export function AlignmentMatrixControl( {
++function UnforwardedAlignmentMatrixControl( {
+ 	className,
+ 	id,
+ 	label = __( 'Alignment Matrix Control' ),
+@@ -52,7 +32,7 @@ export function AlignmentMatrixControl( {
+ 	...props
+ }: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
+ 	const baseId = useInstanceId(
+-		AlignmentMatrixControl,
++		UnforwardedAlignmentMatrixControl,
+ 		'alignment-matrix-control',
+ 		id
+ 	);
+@@ -100,6 +80,41 @@ export function AlignmentMatrixControl( {
+ 	);
+ }
+ 
+-AlignmentMatrixControl.Icon = AlignmentMatrixControlIcon;
++/**
++ * AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
++ *
++ * ```jsx
++ * import { AlignmentMatrixControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const Example = () => {
++ * 	const [ alignment, setAlignment ] = useState( 'center center' );
++ *
++ * 	return (
++ * 		<AlignmentMatrixControl
++ * 			value={ alignment }
++ * 			onChange={ setAlignment }
++ * 		/>
++ * 	);
++ * };
++ * ```
++ */
++export const AlignmentMatrixControl = Object.assign(
++	UnforwardedAlignmentMatrixControl,
++	{
++		/**
++		 * Render an alignment matrix as an icon.
++		 *
++		 * ```jsx
++		 * import { AlignmentMatrixControl } from '@wordpress/components';
++		 *
++		 * <Icon icon={<AlignmentMatrixControl.Icon value="top left" />} />
++		 * ```
++		 */
++		Icon: Object.assign( AlignmentMatrixControlIcon, {
++			displayName: 'AlignmentMatrixControl.Icon',
++		} ),
++	}
++);
+ 
+ export default AlignmentMatrixControl;
+diff --git a/packages/components/src/alignment-matrix-control/stories/index.story.tsx b/packages/components/src/alignment-matrix-control/stories/index.story.tsx
+index 11de17153492d8..433d7540197da2 100644
+--- a/packages/components/src/alignment-matrix-control/stories/index.story.tsx
++++ b/packages/components/src/alignment-matrix-control/stories/index.story.tsx
+@@ -17,7 +17,7 @@ import { HStack } from '../../h-stack';
+ import type { AlignmentMatrixControlProps } from '../types';
+ 
+ const meta: Meta< typeof AlignmentMatrixControl > = {
+-	title: 'Components (Experimental)/AlignmentMatrixControl',
++	title: 'Components/AlignmentMatrixControl',
+ 	component: AlignmentMatrixControl,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index 6483e34dc222a8..3ddfbd05cd6581 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -12,7 +12,11 @@ export {
+ } from '@wordpress/primitives';
+ 
+ // Components.
+-export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
++export {
++	/** @deprecated Import `AlignmentMatrixControl` instead. */
++	default as __experimentalAlignmentMatrixControl,
++	default as AlignmentMatrixControl,
++} from './alignment-matrix-control';
+ export {
+ 	default as Animate,
+ 	getAnimateClassName as __unstableGetAnimateClassName,
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index ab9c1a71010718..174433776e27c9 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,10 +1,11 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+ 		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
+-			'navigation',
++			'alignmentmatrixcontrol',
+ 			'customselectcontrol-v2',
+-			'theme',
++			'navigation',
+ 			'progressbar',
++			'theme',
+ 		];
+ 		const REDIRECTS = [
+ 			{

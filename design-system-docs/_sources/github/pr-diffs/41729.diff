@@ -1,0 +1,565 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e496176e93595c..6b25f9961189ce 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ 
+ -   `Spinner`: Convert to TypeScript and update storybook ([#41540](https://github.com/WordPress/gutenberg/pull/41540/)).
+ -   `InputControl`: Add tests and update to use `@testing-library/user-event` ([#41421](https://github.com/WordPress/gutenberg/pull/41421)).
++-   `FormToggle`: Convert to TypeScript ([#41729](https://github.com/WordPress/gutenberg/pull/41729)).
+ -   `ColorIndicator`: Convert to TypeScript ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
+ -   `AlignmentMatrixControl`: Refactor away from `_.flattenDeep()` in utils ([#41814](https://github.com/WordPress/gutenberg/pull/41814/)).
+ 
+diff --git a/packages/components/src/form-toggle/README.md b/packages/components/src/form-toggle/README.md
+index abfa4766c6011f..941e431654e50b 100644
+--- a/packages/components/src/form-toggle/README.md
++++ b/packages/components/src/form-toggle/README.md
+@@ -60,10 +60,12 @@ import { useState } from '@wordpress/element';
+ const MyFormToggle = () => {
+ 	const [ isChecked, setChecked ] = useState( true );
+ 
+-	<FormToggle
+-		checked={ isChecked }
+-		onChange={ () => setChecked( ( state ) => ! state ) }
+-	/>
++	return (
++		<FormToggle
++			checked={ isChecked }
++			onChange={ () => setChecked( ( state ) => ! state ) }
++		/>
++	);
+ };
+ ```
+ 
+@@ -71,26 +73,23 @@ const MyFormToggle = () => {
+ 
+ The component accepts the following props:
+ 
+-#### checked
++#### `checked`: `boolean`
+ 
+ If checked is true the toggle will be checked. If checked is false the toggle will be unchecked.
+ If no value is passed the toggle will be unchecked.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-#### disabled
++#### `disabled`: `boolean`
+ 
+ If disabled is true the toggle will be disabled and apply the appropriate styles.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-#### onChange
++#### `onChange`: `( event: ChangeEvent<HTMLInputElement> ) => void`
+ 
+-A function that receives the checked state (boolean) as input.
++A callback function invoked when the toggle is clicked.
+ 
+--   Type: `function`
+ -   Required: Yes
+ 
+ ## Related components
+diff --git a/packages/components/src/form-toggle/index.js b/packages/components/src/form-toggle/index.js
+deleted file mode 100644
+index 8714958ae48c4b..00000000000000
+--- a/packages/components/src/form-toggle/index.js
++++ /dev/null
+@@ -1,38 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-export const noop = () => {};
+-
+-function FormToggle( {
+-	className,
+-	checked,
+-	id,
+-	disabled,
+-	onChange = noop,
+-	...props
+-} ) {
+-	const wrapperClasses = classnames( 'components-form-toggle', className, {
+-		'is-checked': checked,
+-		'is-disabled': disabled,
+-	} );
+-
+-	return (
+-		<span className={ wrapperClasses }>
+-			<input
+-				className="components-form-toggle__input"
+-				id={ id }
+-				type="checkbox"
+-				checked={ checked }
+-				onChange={ onChange }
+-				disabled={ disabled }
+-				{ ...props }
+-			/>
+-			<span className="components-form-toggle__track"></span>
+-			<span className="components-form-toggle__thumb"></span>
+-		</span>
+-	);
+-}
+-
+-export default FormToggle;
+diff --git a/packages/components/src/form-toggle/index.tsx b/packages/components/src/form-toggle/index.tsx
+new file mode 100644
+index 00000000000000..d51a3ee571934d
+--- /dev/null
++++ b/packages/components/src/form-toggle/index.tsx
+@@ -0,0 +1,71 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import type { FormToggleProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
++
++export const noop = () => {};
++
++/**
++ * FormToggle switches a single setting on or off.
++ *
++ * ```jsx
++ * import { FormToggle } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyFormToggle = () => {
++ *   const [ isChecked, setChecked ] = useState( true );
++ *
++ *   return (
++ *     <FormToggle
++ *       checked={ isChecked }
++ *       onChange={ () => setChecked( ( state ) => ! state ) }
++ *     />
++ *   );
++ * };
++ * ```
++ */
++export function FormToggle(
++	// ref is omitted until we have `WordPressComponentPropsWithoutRef` or add
++	// ref forwarding to FormToggle.
++	props: Omit<
++		WordPressComponentProps< FormToggleProps, 'input', false >,
++		'ref'
++	>
++) {
++	const {
++		className,
++		checked,
++		id,
++		disabled,
++		onChange = noop,
++		...additionalProps
++	} = props;
++	const wrapperClasses = classnames( 'components-form-toggle', className, {
++		'is-checked': checked,
++		'is-disabled': disabled,
++	} );
++
++	return (
++		<span className={ wrapperClasses }>
++			<input
++				className="components-form-toggle__input"
++				id={ id }
++				type="checkbox"
++				checked={ checked }
++				onChange={ onChange }
++				disabled={ disabled }
++				{ ...additionalProps }
++			/>
++			<span className="components-form-toggle__track"></span>
++			<span className="components-form-toggle__thumb"></span>
++		</span>
++	);
++}
++
++export default FormToggle;
+diff --git a/packages/components/src/form-toggle/stories/index.js b/packages/components/src/form-toggle/stories/index.js
+deleted file mode 100644
+index 5f4f86a82034d6..00000000000000
+--- a/packages/components/src/form-toggle/stories/index.js
++++ /dev/null
+@@ -1,28 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import FormToggle from '../';
+-
+-export default { title: 'Components/FormToggle', component: FormToggle };
+-
+-const FormToggleWithState = ( { checked, ...props } ) => {
+-	const [ isChecked, setChecked ] = useState( checked );
+-	return (
+-		<FormToggle
+-			{ ...props }
+-			checked={ isChecked }
+-			onChange={ () => {
+-				setChecked( ! isChecked );
+-			} }
+-		/>
+-	);
+-};
+-
+-export const _default = () => {
+-	return <FormToggleWithState checked />;
+-};
+diff --git a/packages/components/src/form-toggle/stories/index.tsx b/packages/components/src/form-toggle/stories/index.tsx
+new file mode 100644
+index 00000000000000..eba2bf4c8580c8
+--- /dev/null
++++ b/packages/components/src/form-toggle/stories/index.tsx
+@@ -0,0 +1,52 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { FormToggle } from '..';
++
++const meta: ComponentMeta< typeof FormToggle > = {
++	component: FormToggle,
++	title: 'Components/FormToggle',
++	argTypes: {
++		onChange: {
++			action: 'onChange',
++		},
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof FormToggle > = ( {
++	onChange,
++	...args
++} ) => {
++	const [ isChecked, setChecked ] = useState( true );
++
++	return (
++		<FormToggle
++			{ ...args }
++			checked={ isChecked }
++			onChange={ ( e ) => {
++				setChecked( ( state ) => ! state );
++				onChange( e );
++			} }
++		/>
++	);
++};
++
++export const Default: ComponentStory< typeof FormToggle > = Template.bind( {} );
++Default.args = {};
+diff --git a/packages/components/src/form-toggle/test/__snapshots__/index.tsx.snap b/packages/components/src/form-toggle/test/__snapshots__/index.tsx.snap
+new file mode 100644
+index 00000000000000..67617127fcebde
+--- /dev/null
++++ b/packages/components/src/form-toggle/test/__snapshots__/index.tsx.snap
+@@ -0,0 +1,54 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`FormToggle basic rendering should render a span element with an unchecked checkbox 1`] = `
++<span
++  class="components-form-toggle"
++>
++  <input
++    class="components-form-toggle__input"
++    type="checkbox"
++  />
++  <span
++    class="components-form-toggle__track"
++  />
++  <span
++    class="components-form-toggle__thumb"
++  />
++</span>
++`;
++
++exports[`FormToggle basic rendering should render an id prop for the input checkbox 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -2,10 +2,11 @@
++    <span
++      class="components-form-toggle"
++    >
++      <input
++        class="components-form-toggle__input"
+++       id="test"
++        type="checkbox"
++      />
++      <span
++        class="components-form-toggle__track"
++      />
++`;
++
++exports[`FormToggle basic rendering should render with an additional className 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -1,8 +1,8 @@
++  <div>
++    <span
++-     class="components-form-toggle"
+++     class="components-form-toggle testing"
++    >
++      <input
++        class="components-form-toggle__input"
++        type="checkbox"
++      />
++`;
+diff --git a/packages/components/src/form-toggle/test/index.js b/packages/components/src/form-toggle/test/index.js
+deleted file mode 100644
+index 9f9c3b84f27644..00000000000000
+--- a/packages/components/src/form-toggle/test/index.js
++++ /dev/null
+@@ -1,74 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { shallow } from 'enzyme';
+-
+-/**
+- * Internal dependencies
+- */
+-import FormToggle, { noop } from '../';
+-
+-describe( 'FormToggle', () => {
+-	describe( 'basic rendering', () => {
+-		it( 'should render a span element with an unchecked checkbox', () => {
+-			const formToggle = shallow( <FormToggle /> );
+-			expect( formToggle.hasClass( 'components-form-toggle' ) ).toBe(
+-				true
+-			);
+-			expect( formToggle.hasClass( 'is-checked' ) ).toBe( false );
+-			expect( formToggle.type() ).toBe( 'span' );
+-		} );
+-
+-		it( 'should render a checked checkbox and change the accessibility text to On when providing checked prop', () => {
+-			const formToggle = shallow( <FormToggle checked /> );
+-			expect( formToggle.hasClass( 'is-checked' ) ).toBe( true );
+-			expect(
+-				formToggle
+-					.find( '.components-form-toggle__input' )
+-					.prop( 'checked' )
+-			).toBe( true );
+-		} );
+-
+-		it( 'should render with an additional className', () => {
+-			const formToggle = shallow( <FormToggle className="testing" /> );
+-			expect( formToggle.hasClass( 'testing' ) ).toBe( true );
+-		} );
+-
+-		it( 'should render an id prop for the input checkbox', () => {
+-			// Disabled because of our rule restricting literal IDs, preferring
+-			// `withInstanceId`. In this case, it's fine to use literal IDs.
+-			// eslint-disable-next-line no-restricted-syntax
+-			const formToggle = shallow( <FormToggle id="test" /> );
+-			expect(
+-				formToggle.find( '.components-form-toggle__input' ).prop( 'id' )
+-			).toBe( 'test' );
+-		} );
+-
+-		it( 'should render a checkbox with a noop onChange', () => {
+-			const formToggle = shallow( <FormToggle /> );
+-			const checkBox = formToggle
+-				.prop( 'children' )
+-				.find(
+-					( child ) =>
+-						'input' === child.type &&
+-						'checkbox' === child.props.type
+-				);
+-			expect( checkBox.props.onChange ).toBe( noop );
+-		} );
+-
+-		it( 'should render a checkbox with a user-provided onChange', () => {
+-			const testFunction = ( event ) => event;
+-			const formToggle = shallow(
+-				<FormToggle onChange={ testFunction } />
+-			);
+-			const checkBox = formToggle
+-				.prop( 'children' )
+-				.find(
+-					( child ) =>
+-						'input' === child.type &&
+-						'checkbox' === child.props.type
+-				);
+-			expect( checkBox.props.onChange ).toBe( testFunction );
+-		} );
+-	} );
+-} );
+diff --git a/packages/components/src/form-toggle/test/index.tsx b/packages/components/src/form-toggle/test/index.tsx
+new file mode 100644
+index 00000000000000..38b84b86c226b7
+--- /dev/null
++++ b/packages/components/src/form-toggle/test/index.tsx
+@@ -0,0 +1,102 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import FormToggle, { noop } from '..';
++import type { FormToggleProps } from '../types';
++
++const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
++
++const ControlledFormToggle = ( { onChange }: FormToggleProps ) => {
++	const [ isChecked, setChecked ] = useState( false );
++	return (
++		<FormToggle
++			checked={ isChecked }
++			onChange={ ( value ) => {
++				setChecked( ( state ) => ! state );
++				onChange( value );
++			} }
++		/>
++	);
++};
++
++describe( 'FormToggle', () => {
++	describe( 'basic rendering', () => {
++		it( 'should render a span element with an unchecked checkbox', () => {
++			const { container } = render( <FormToggle onChange={ noop } /> );
++
++			expect( getInput() ).not.toBeChecked();
++			expect( container.firstChild ).toMatchSnapshot();
++		} );
++
++		it( 'should render a checked checkbox when providing checked prop', () => {
++			render( <FormToggle onChange={ noop } checked /> );
++
++			expect( getInput() ).toBeChecked();
++		} );
++
++		it( 'should render with an additional className', () => {
++			const { container: containerDefault } = render(
++				<FormToggle onChange={ noop } />
++			);
++
++			const { container: containerWithClassName } = render(
++				<FormToggle onChange={ noop } className="testing" />
++			);
++
++			// Expect the diff snapshot to be mostly about the className.
++			expect( containerDefault ).toMatchDiffSnapshot(
++				containerWithClassName
++			);
++		} );
++
++		it( 'should render an id prop for the input checkbox', () => {
++			const { container: containerDefault } = render(
++				<FormToggle onChange={ noop } />
++			);
++
++			const { container: containerWithID } = render(
++				// Disabled because of our rule restricting literal IDs, preferring
++				// `withInstanceId`. In this case, it's fine to use literal IDs.
++				// eslint-disable-next-line no-restricted-syntax
++				<FormToggle onChange={ noop } id="test" />
++			);
++
++			// Expect the diff snapshot to be mostly about the ID.
++			expect( containerDefault ).toMatchDiffSnapshot( containerWithID );
++		} );
++	} );
++
++	describe( 'Value', () => {
++		it( 'should flip the checked property when clicked', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			const onChange = jest.fn();
++			render( <ControlledFormToggle onChange={ onChange } /> );
++
++			const input = getInput();
++
++			await user.click( input );
++			expect( onChange.mock.calls[ 0 ][ 0 ].target ).toBeInTheDocument();
++			expect( input ).toBeChecked();
++
++			await user.click( input );
++			expect( onChange.mock.calls[ 1 ][ 0 ].target ).toBeInTheDocument();
++			expect( input ).not.toBeChecked();
++
++			expect( onChange ).toHaveBeenCalledTimes( 2 );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/form-toggle/types.ts b/packages/components/src/form-toggle/types.ts
+new file mode 100644
+index 00000000000000..157d75b1b0cdd4
+--- /dev/null
++++ b/packages/components/src/form-toggle/types.ts
+@@ -0,0 +1,22 @@
++/**
++ * External dependencies
++ */
++import type { ChangeEvent } from 'react';
++
++export type FormToggleProps = {
++	/**
++	 * If checked is true the toggle will be checked. If checked is false the
++	 * toggle will be unchecked. If no value is passed the toggle will be
++	 * unchecked.
++	 */
++	checked?: boolean;
++	/**
++	 * If disabled is true the toggle will be disabled and apply the appropriate
++	 * styles.
++	 */
++	disabled?: boolean;
++	/**
++	 * A callback function invoked when the toggle is clicked.
++	 */
++	onChange: ( event: ChangeEvent< HTMLInputElement > ) => void;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 060575f52426d7..a930377e14fe6e 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -57,6 +57,7 @@
+ 		"src/external-link/**/*",
+ 		"src/flex/**/*",
+ 		"src/form-group/**/*",
++		"src/form-toggle/**/*",
+ 		"src/form-token-field/**/*",
+ 		"src/grid/**/*",
+ 		"src/h-stack/**/*",

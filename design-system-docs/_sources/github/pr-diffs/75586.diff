@@ -1,0 +1,861 @@
+diff --git a/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/index.ts b/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/index.ts
+new file mode 100644
+index 00000000000000..85d8587dae281f
+--- /dev/null
++++ b/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/index.ts
+@@ -0,0 +1,296 @@
++import { FORMAT_ID } from '@terrazzo/plugin-css';
++import type { Plugin } from '@terrazzo/parser';
++import { to, get, OKLCH } from 'colorjs.io/fn';
++
++import '../../src/color-ramps/lib/register-color-spaces';
++import colorTokens from '../../src/prebuilt/ts/color-tokens';
++import { DEFAULT_RAMPS } from '../../src/color-ramps/lib/default-ramps';
++import { DEFAULT_SEED_COLORS } from '../../src/color-ramps/lib/constants';
++
++const WP_ADMIN_THEME_COLOR_VAR = '--wp-admin-theme-color';
++const PRIMARY_SEED = DEFAULT_SEED_COLORS.primary;
++
++const PRIMARY_SEED_OKLCH = getOKLCHValues( PRIMARY_SEED );
++const PRIMARY_SEED_OKLAB = oklchToOklab(
++	PRIMARY_SEED_OKLCH.l,
++	PRIMARY_SEED_OKLCH.c,
++	PRIMARY_SEED_OKLCH.h
++);
++
++function adminColorVar(): string {
++	return `var(${ WP_ADMIN_THEME_COLOR_VAR }, ${ PRIMARY_SEED })`;
++}
++
++function getOKLCHValues( hex: string ) {
++	const color = to( hex, OKLCH );
++	const l = get( color, [ OKLCH, 'l' ] );
++	const c = get( color, [ OKLCH, 'c' ] );
++	const h = get( color, [ OKLCH, 'h' ] );
++	return {
++		l: Number.isNaN( l ) ? 0 : l,
++		c: Number.isNaN( c ) ? 0 : c,
++		h: Number.isNaN( h ) ? 0 : h,
++	};
++}
++
++/**
++ * Converts OKLCH coordinates to OKLab coordinates for deltaE comparison.
++ * @param l
++ * @param c
++ * @param h
++ */
++function oklchToOklab( l: number, c: number, h: number ) {
++	const hRad = ( h * Math.PI ) / 180;
++	return {
++		l,
++		a: c * Math.cos( hRad ),
++		b: c * Math.sin( hRad ),
++	};
++}
++
++/**
++ * Euclidean distance in OKLab (deltaE OK).
++ * @param c1
++ * @param c1.l
++ * @param c1.a
++ * @param c1.b
++ * @param c2
++ * @param c2.l
++ * @param c2.a
++ * @param c2.b
++ */
++function deltaEOK(
++	c1: { l: number; a: number; b: number },
++	c2: { l: number; a: number; b: number }
++) {
++	return Math.sqrt(
++		( c1.l - c2.l ) ** 2 + ( c1.a - c2.a ) ** 2 + ( c1.b - c2.b ) ** 2
++	);
++}
++
++// Maximum deltaE OK for a color-mix() approximation to be accepted.
++// Since fallbacks are safety nets, this is intentionally generous.
++const COLOR_MIX_DELTA_E_THRESHOLD = 0.08;
++
++/**
++ * Find the optimal color-mix() percentage that minimizes deltaE OK when
++ * mixing the seed with a given achromatic target (black or white).
++ *
++ * color-mix(in oklch, seed P%, black) produces (P*L, P*C, H) in OKLCH,
++ * which in OKLab is simply P * seed_oklab.
++ *
++ * color-mix(in oklch, seed P%, white) produces (1 + P*(L-1), P*C, H),
++ * which in OKLab is (1, 0, 0) + P * (seed_oklab - (1, 0, 0)).
++ *
++ * Both are linear in P, so minimizing squared deltaE yields a closed-form
++ * solution via dot product projection.
++ * @param seedOklab
++ * @param seedOklab.l
++ * @param seedOklab.a
++ * @param seedOklab.b
++ * @param targetOklab
++ * @param targetOklab.l
++ * @param targetOklab.a
++ * @param targetOklab.b
++ * @param mixWith
++ */
++function optimalMixPercentage(
++	seedOklab: { l: number; a: number; b: number },
++	targetOklab: { l: number; a: number; b: number },
++	mixWith: 'black' | 'white'
++): { roundedP: number; dE: number } {
++	let p: number;
++
++	if ( mixWith === 'black' ) {
++		// Mix result = P * seed. Optimal P = dot(seed, target) / dot(seed, seed).
++		const dot =
++			seedOklab.l * targetOklab.l +
++			seedOklab.a * targetOklab.a +
++			seedOklab.b * targetOklab.b;
++		const norm2 = seedOklab.l ** 2 + seedOklab.a ** 2 + seedOklab.b ** 2;
++		p = norm2 > 0 ? dot / norm2 : 0;
++	} else {
++		// Mix result = (1,0,0) + P * (seed - (1,0,0)).
++		// Let d = seed - (1,0,0), t = target - (1,0,0).
++		// Optimal P = dot(d, t) / dot(d, d).
++		const dL = seedOklab.l - 1;
++		const tL = targetOklab.l - 1;
++		const dot =
++			dL * tL + seedOklab.a * targetOklab.a + seedOklab.b * targetOklab.b;
++		const norm2 = dL ** 2 + seedOklab.a ** 2 + seedOklab.b ** 2;
++		p = norm2 > 0 ? dot / norm2 : 0;
++	}
++
++	const roundedP = Math.round( Math.max( 0, Math.min( 1, p ) ) * 100 );
++	if ( roundedP <= 0 || roundedP >= 100 ) {
++		return { roundedP, dE: Infinity };
++	}
++
++	// Simulate the rounded result and compute actual deltaE.
++	const rp = roundedP / 100;
++	const simL =
++		mixWith === 'white' ? rp * seedOklab.l + ( 1 - rp ) : rp * seedOklab.l;
++	const simA = rp * seedOklab.a;
++	const simB = rp * seedOklab.b;
++
++	const dE = deltaEOK( { l: simL, a: simA, b: simB }, targetOklab );
++	return { roundedP, dE };
++}
++
++/**
++ * Compute the fallback expression for a brand token.
++ *
++ * Returns one of:
++ * - `var(--wp-admin-theme-color, <hex>)` if the color matches the seed.
++ * - `color-mix(in oklch, var(...) N%, black/white)` for derived shades.
++ * - The plain hex value if color-mix() cannot approximate it well enough.
++ * @param stepHex
++ */
++export function computeBrandFallback( stepHex: string ): string {
++	const hexDigits = stepHex.replace( /^#/, '' );
++	if ( hexDigits.length === 8 || hexDigits.length === 4 ) {
++		throw new Error(
++			`computeBrandFallback does not support colors with alpha: ${ stepHex }. ` +
++				'The color-mix() fallback strategy does not model transparency.'
++		);
++	}
++
++	if ( stepHex.toLowerCase() === PRIMARY_SEED.toLowerCase() ) {
++		return adminColorVar();
++	}
++
++	const target = getOKLCHValues( stepHex );
++	const targetOklab = oklchToOklab( target.l, target.c, target.h );
++
++	// Try both black and white mixing and pick the closer result.
++	const withBlack = optimalMixPercentage(
++		PRIMARY_SEED_OKLAB,
++		targetOklab,
++		'black'
++	);
++	const withWhite = optimalMixPercentage(
++		PRIMARY_SEED_OKLAB,
++		targetOklab,
++		'white'
++	);
++
++	const best = withBlack.dE <= withWhite.dE ? withBlack : withWhite;
++	const mixWith = withBlack.dE <= withWhite.dE ? 'black' : 'white';
++
++	if ( best.dE > COLOR_MIX_DELTA_E_THRESHOLD ) {
++		return stepHex;
++	}
++
++	return `color-mix(in oklch, ${ adminColorVar() } ${
++		best.roundedP
++	}%, ${ mixWith })`;
++}
++
++export default function pluginDsTokenFallbacks( {
++	filename = 'js/design-token-fallbacks.mjs',
++} = {} ): Plugin {
++	return {
++		name: '@wordpress/terrazzo-plugin-ds-token-fallbacks',
++		async build( { getTransforms, outputFile } ) {
++			// Step 1: Collect all tokens and their default-mode values.
++			const tokenDefaultValues: Record< string, string > = {};
++
++			for ( const token of getTransforms( {
++				format: FORMAT_ID,
++				id: '*',
++			} ) ) {
++				if ( ! token.localID ) {
++					continue;
++				}
++				// Only use the default mode value (always a string).
++				if ( token.mode === '.' ) {
++					tokenDefaultValues[ token.localID ] =
++						typeof token.value === 'string' ? token.value : '';
++				}
++			}
++
++			// Step 2: Build a mapping from semantic token CSS variable name
++			// to the primary ramp step's hex value. Only tokens derived from
++			// the primary (brand) ramp get special fallback treatment.
++			const brandTokenStepHex: Record< string, string > = {};
++			const primaryRamp = DEFAULT_RAMPS.primary.ramp;
++
++			for ( const [ rampKey, tokenNames ] of Object.entries(
++				colorTokens
++			) ) {
++				if ( ! rampKey.startsWith( 'primary-' ) ) {
++					continue;
++				}
++
++				const stepName = rampKey.replace(
++					'primary-',
++					''
++				) as keyof typeof primaryRamp;
++				const stepHex = primaryRamp[ stepName ];
++				if ( ! stepHex ) {
++					continue;
++				}
++
++				for ( const tokenName of tokenNames ) {
++					brandTokenStepHex[ `--wpds-color-${ tokenName }` ] =
++						stepHex;
++				}
++			}
++
++			// Step 3: Compute fallback expressions for all tokens.
++			const fallbacks: Record< string, string > = {};
++
++			for ( const [ localID, value ] of Object.entries(
++				tokenDefaultValues
++			) ) {
++				const brandStepHex = brandTokenStepHex[ localID ];
++
++				if ( brandStepHex ) {
++					// Brand token — compute a dynamic fallback expression.
++					fallbacks[ localID ] = computeBrandFallback( brandStepHex );
++				} else {
++					// Non-brand token — use the literal default value.
++					fallbacks[ localID ] = value;
++				}
++			}
++
++			// Step 4: Apply hard-coded overrides for tokens that need
++			// special fallback treatment.
++			const overrides: Record< string, string > = {
++				// These foreground tokens sit on a strong brand background.
++				// White is the safest fallback regardless of admin theme color.
++				'--wpds-color-fg-interactive-brand-strong': '#fff',
++				'--wpds-color-fg-interactive-brand-strong-active': '#fff',
++				// Prefer the WP admin focus width when available.
++				'--wpds-border-width-focus':
++					'var(--wp-admin-border-width-focus, 2px)',
++			};
++
++			for ( const [ key, value ] of Object.entries( overrides ) ) {
++				if ( key in fallbacks ) {
++					fallbacks[ key ] = value;
++				}
++			}
++
++			// Sort keys for stable, readable output.
++			const sorted = Object.fromEntries(
++				Object.entries( fallbacks ).sort( ( [ a ], [ b ] ) =>
++					a.localeCompare( b )
++				)
++			);
++
++			outputFile(
++				filename,
++				[
++					'/*',
++					' * This file is generated by the @wordpress/terrazzo-plugin-ds-token-fallbacks plugin.',
++					' * Do not edit this file directly.',
++					' */',
++					'',
++					`export default ${ JSON.stringify( sorted, null, '\t' ) }`,
++					'',
++				].join( '\n' )
++			);
++		},
++	};
++}
+diff --git a/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/test/index.test.ts b/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/test/index.test.ts
+new file mode 100644
+index 00000000000000..62f2ca72072e74
+--- /dev/null
++++ b/packages/theme/bin/terrazzo-plugin-ds-token-fallbacks/test/index.test.ts
+@@ -0,0 +1,30 @@
++jest.mock( '@terrazzo/plugin-css', () => ( { FORMAT_ID: 'css/value' } ) );
++jest.mock( 'colorjs.io/fn', () => {
++	const OKLCH = { id: 'oklch' };
++	return {
++		__esModule: true,
++		OKLCH,
++		sRGB: {},
++		P3: {},
++		HSL: {},
++		ColorSpace: { register: jest.fn() },
++		to: jest.fn( () => [ 0, 0, 0 ] ),
++		get: jest.fn( () => 0 ),
++	};
++} );
++
++import { computeBrandFallback } from '../index';
++
++describe( 'computeBrandFallback', () => {
++	it( 'throws on colors with alpha (8-digit hex)', () => {
++		expect( () => computeBrandFallback( '#3858e980' ) ).toThrow(
++			/does not support colors with alpha/
++		);
++	} );
++
++	it( 'throws on colors with alpha (4-digit hex)', () => {
++		expect( () => computeBrandFallback( '#f008' ) ).toThrow(
++			/does not support colors with alpha/
++		);
++	} );
++} );
+diff --git a/packages/theme/src/color-ramps/stories/brand-fallbacks.story.tsx b/packages/theme/src/color-ramps/stories/brand-fallbacks.story.tsx
+new file mode 100644
+index 00000000000000..e0dc61a7e9f005
+--- /dev/null
++++ b/packages/theme/src/color-ramps/stories/brand-fallbacks.story.tsx
+@@ -0,0 +1,165 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import colorTokens from '../../prebuilt/ts/color-tokens';
++import _tokenFallbacks from '../../prebuilt/js/design-token-fallbacks.mjs';
++import { ThemeProvider } from '../../theme-provider';
++
++const tokenFallbacks: Record< string, string > = _tokenFallbacks;
++
++type BrandToken = {
++	cssVarName: string;
++	fallbackExpr: string;
++};
++
++function getBrandTokens(): BrandToken[] {
++	const tokens: BrandToken[] = [];
++
++	for ( const [ rampKey, tokenNames ] of Object.entries( colorTokens ) ) {
++		if ( ! rampKey.startsWith( 'primary-' ) ) {
++			continue;
++		}
++
++		for ( const tokenName of tokenNames ) {
++			const cssVarName = `--wpds-color-${ tokenName }`;
++			tokens.push( {
++				cssVarName,
++				fallbackExpr: tokenFallbacks[ cssVarName ] ?? '',
++			} );
++		}
++	}
++
++	return tokens.sort( ( a, b ) =>
++		a.cssVarName.localeCompare( b.cssVarName )
++	);
++}
++
++const brandTokens = getBrandTokens();
++
++type VerifierProps = { adminThemeColor: string };
++const Verifier: React.FC< VerifierProps > = () => null;
++
++/**
++ * Compares actual brand token values (computed by ThemeProvider using the full
++ * ramp algorithm) against their `color-mix()` fallback approximations driven
++ * by `--wp-admin-theme-color`. Use the color picker to switch admin color
++ * schemes and observe how closely the fallbacks track the real values.
++ */
++const meta: Meta< typeof Verifier > = {
++	title: 'Design System/Theme/Theme Provider/Brand Color Fallbacks',
++	component: Verifier,
++	argTypes: {
++		adminThemeColor: {
++			control: {
++				type: 'color',
++				presetColors: [
++					'#3858e9', // modern
++					'#0085ba', // light
++					'#096484', // blue
++					'#46403c', // coffee
++					'#523f6d', // ectoplasm
++					'#e14d43', // midnight
++					'#627c83', // ocean
++					'#dd823b', // sunrise
++				],
++			},
++		},
++	},
++	parameters: {
++		controls: { expanded: true },
++	},
++};
++export default meta;
++
++export const Default: StoryObj< typeof Verifier > = {
++	render: ( { adminThemeColor } ) => (
++		<div
++			style={
++				{
++					'--wp-admin-theme-color': adminThemeColor,
++					fontSize: 13,
++				} as React.CSSProperties
++			}
++		>
++			<p
++				style={ {
++					margin: '0 0 16px',
++					color: '#757575',
++					fontSize: 12,
++				} }
++			>
++				<strong>Actual:</strong> real token value from ThemeProvider
++				(ramp algorithm). <strong>Fallback:</strong> approximation via{ ' ' }
++				<code>color-mix()</code> and <code>--wp-admin-theme-color</code>
++				.
++			</p>
++			<ThemeProvider color={ { primary: adminThemeColor } }>
++				<div
++					style={ {
++						display: 'grid',
++						gridTemplateColumns: '40px 40px 1fr 1fr',
++						gap: '4px 12px',
++						alignItems: 'center',
++					} }
++				>
++					<div style={ headerStyle }>Actual</div>
++					<div style={ headerStyle }>Fallback</div>
++					<div style={ headerStyle }>Token</div>
++					<div style={ headerStyle }>Fallback expression</div>
++					{ brandTokens.map( ( { cssVarName, fallbackExpr } ) => (
++						<Row
++							key={ cssVarName }
++							cssVarName={ cssVarName }
++							fallbackExpr={ fallbackExpr }
++						/>
++					) ) }
++				</div>
++			</ThemeProvider>
++		</div>
++	),
++	args: {
++		adminThemeColor: '#3858e9',
++	},
++};
++
++const headerStyle: React.CSSProperties = {
++	fontSize: 11,
++	fontWeight: 600,
++	color: '#757575',
++	paddingBottom: 4,
++	borderBottom: '1px solid #e0e0e0',
++};
++
++function Row( { cssVarName, fallbackExpr }: BrandToken ) {
++	return (
++		<>
++			<Swatch
++				color={ `var(${ cssVarName })` }
++				title={ `${ cssVarName } (actual)` }
++			/>
++			<Swatch color={ fallbackExpr } title="Fallback (rendered)" />
++			<code style={ { fontSize: 12 } }>{ cssVarName }</code>
++			<code
++				style={ {
++					fontSize: 11,
++					color: '#555',
++					wordBreak: 'break-all',
++				} }
++			>
++				{ fallbackExpr }
++			</code>
++		</>
++	);
++}
++
++function Swatch( { color, title }: { color: string; title: string } ) {
++	return (
++		<div
++			title={ title }
++			style={ {
++				backgroundColor: color,
++				width: 40,
++				height: 28,
++				border: '1px solid rgba(0, 0, 0, 0.1)',
++			} }
++		/>
++	);
++}
+diff --git a/packages/theme/src/postcss-plugins/add-fallback-to-var.ts b/packages/theme/src/postcss-plugins/add-fallback-to-var.ts
+new file mode 100644
+index 00000000000000..c1ce9fa447bdfe
+--- /dev/null
++++ b/packages/theme/src/postcss-plugins/add-fallback-to-var.ts
+@@ -0,0 +1,29 @@
++/**
++ * Replace bare `var(--wpds-*)` references in a CSS value string with
++ * `var(--wpds-*, <fallback>)` using the provided token fallback map.
++ *
++ * Existing fallbacks (i.e. `var()` calls that already contain a comma)
++ * are left untouched, making the function safe to run multiple times
++ * (idempotent).
++ *
++ * NOTE: The regex and replacement logic here is mirrored in
++ * `ds-token-fallbacks.mjs`. If you update one, update the other to match.
++ *
++ * @param cssValue       A CSS declaration value.
++ * @param tokenFallbacks Map of CSS variable names to their fallback expressions.
++ * @return The value with fallbacks injected.
++ */
++export function addFallbackToVar(
++	cssValue: string,
++	tokenFallbacks: Record< string, string >
++): string {
++	return cssValue.replace(
++		/var\(\s*(--wpds-[\w-]+)\s*\)/g,
++		( match, tokenName: string ) => {
++			const fallback = tokenFallbacks[ tokenName ];
++			return fallback !== undefined
++				? `var(${ tokenName }, ${ fallback })`
++				: match;
++		}
++	);
++}
+diff --git a/packages/theme/src/postcss-plugins/ds-token-fallbacks.mjs b/packages/theme/src/postcss-plugins/ds-token-fallbacks.mjs
+new file mode 100644
+index 00000000000000..dd0418c64d203c
+--- /dev/null
++++ b/packages/theme/src/postcss-plugins/ds-token-fallbacks.mjs
+@@ -0,0 +1,29 @@
++import _tokenFallbacks from '../prebuilt/js/design-token-fallbacks.mjs';
++
++/** @type {Record<string, string>} */
++const tokenFallbacks = _tokenFallbacks;
++
++/**
++ * Replace bare `var(--wpds-*)` references in a CSS value string with
++ * `var(--wpds-*, <fallback>)` using the generated token fallback map.
++ *
++ * Existing fallbacks (i.e. var() calls that already contain a comma) are
++ * left untouched, making the function safe to run multiple times.
++ *
++ * NOTE: The regex and replacement logic here mirrors `add-fallback-to-var.ts`.
++ * If you update one, update the other to match.
++ *
++ * @param {string} cssValue A CSS declaration value.
++ * @return {string} The value with fallbacks injected.
++ */
++export function addFallbackToVar( cssValue ) {
++	return cssValue.replace(
++		/var\(\s*(--wpds-[\w-]+)\s*\)/g,
++		( match, tokenName ) => {
++			const fallback = tokenFallbacks[ tokenName ];
++			return fallback !== undefined
++				? `var(${ tokenName }, ${ fallback })`
++				: match;
++		}
++	);
++}
+diff --git a/packages/theme/src/postcss-plugins/test/add-fallback-to-var.test.ts b/packages/theme/src/postcss-plugins/test/add-fallback-to-var.test.ts
+new file mode 100644
+index 00000000000000..5aa3117fec6107
+--- /dev/null
++++ b/packages/theme/src/postcss-plugins/test/add-fallback-to-var.test.ts
+@@ -0,0 +1,91 @@
++import { addFallbackToVar } from '../add-fallback-to-var';
++
++const mockFallbacks: Record< string, string > = {
++	'--wpds-border-radius-sm': '2px',
++	'--wpds-dimension-gap-sm': '8px',
++	'--wpds-dimension-gap-lg': '16px',
++	'--wpds-color-bg-interactive-brand-strong':
++		'var(--wp-admin-theme-color, #3858e9)',
++	'--wpds-color-bg-interactive-brand-strong-active':
++		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 92%, black)',
++};
++
++describe( 'addFallbackToVar', () => {
++	it( 'injects a fallback for a known token', () => {
++		expect(
++			addFallbackToVar( 'var(--wpds-border-radius-sm)', mockFallbacks )
++		).toBe( 'var(--wpds-border-radius-sm, 2px)' );
++	} );
++
++	it( 'leaves unknown tokens untouched', () => {
++		expect(
++			addFallbackToVar( 'var(--wpds-nonexistent-token)', mockFallbacks )
++		).toBe( 'var(--wpds-nonexistent-token)' );
++	} );
++
++	it( 'leaves non-wpds custom properties untouched', () => {
++		expect(
++			addFallbackToVar( 'var(--my-custom-prop)', mockFallbacks )
++		).toBe( 'var(--my-custom-prop)' );
++	} );
++
++	it( 'does not double-wrap a var() that already has a fallback', () => {
++		expect(
++			addFallbackToVar(
++				'var(--wpds-border-radius-sm, 999px)',
++				mockFallbacks
++			)
++		).toBe( 'var(--wpds-border-radius-sm, 999px)' );
++	} );
++
++	it( 'handles multiple var() calls in one value', () => {
++		const input =
++			'var(--wpds-dimension-gap-sm) var(--wpds-dimension-gap-lg)';
++		const result = addFallbackToVar( input, mockFallbacks );
++		expect( result ).toBe(
++			'var(--wpds-dimension-gap-sm, 8px) var(--wpds-dimension-gap-lg, 16px)'
++		);
++	} );
++
++	it( 'injects a brand token fallback with var(--wp-admin-theme-color)', () => {
++		const result = addFallbackToVar(
++			'var(--wpds-color-bg-interactive-brand-strong)',
++			mockFallbacks
++		);
++		expect( result ).toBe(
++			'var(--wpds-color-bg-interactive-brand-strong, var(--wp-admin-theme-color, #3858e9))'
++		);
++	} );
++
++	it( 'injects a color-mix fallback for a derived brand token', () => {
++		const result = addFallbackToVar(
++			'var(--wpds-color-bg-interactive-brand-strong-active)',
++			mockFallbacks
++		);
++		expect( result ).toBe(
++			'var(--wpds-color-bg-interactive-brand-strong-active, color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 92%, black))'
++		);
++	} );
++
++	it( 'returns the original string when there are no var() calls', () => {
++		expect( addFallbackToVar( '10px solid red', mockFallbacks ) ).toBe(
++			'10px solid red'
++		);
++	} );
++
++	it( 'injects a fallback inside calc()', () => {
++		expect(
++			addFallbackToVar(
++				'calc(var(--wpds-dimension-gap-sm) * 2)',
++				mockFallbacks
++			)
++		).toBe( 'calc(var(--wpds-dimension-gap-sm, 8px) * 2)' );
++	} );
++
++	it( 'is idempotent — running twice gives the same result', () => {
++		const input = 'var(--wpds-border-radius-sm)';
++		const first = addFallbackToVar( input, mockFallbacks );
++		const second = addFallbackToVar( first, mockFallbacks );
++		expect( second ).toBe( first );
++	} );
++} );
+diff --git a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+new file mode 100644
+index 00000000000000..d3811fe1bfb7d0
+--- /dev/null
++++ b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+@@ -0,0 +1,157 @@
++/*
++ * This file is generated by the @wordpress/terrazzo-plugin-ds-token-fallbacks plugin.
++ * Do not edit this file directly.
++ */
++
++export default {
++	'--wpds-border-radius-lg': '8px',
++	'--wpds-border-radius-md': '4px',
++	'--wpds-border-radius-sm': '2px',
++	'--wpds-border-radius-xs': '1px',
++	'--wpds-border-width-focus': 'var(--wp-admin-border-width-focus, 2px)',
++	'--wpds-border-width-lg': '8px',
++	'--wpds-border-width-md': '4px',
++	'--wpds-border-width-sm': '2px',
++	'--wpds-border-width-xs': '1px',
++	'--wpds-color-bg-interactive-brand-strong':
++		'var(--wp-admin-theme-color, #3858e9)',
++	'--wpds-color-bg-interactive-brand-strong-active':
++		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 93%, black)',
++	'--wpds-color-bg-interactive-brand-weak': '#00000000',
++	'--wpds-color-bg-interactive-brand-weak-active':
++		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 12%, white)',
++	'--wpds-color-bg-interactive-error': '#00000000',
++	'--wpds-color-bg-interactive-error-active': '#fff6f4',
++	'--wpds-color-bg-interactive-error-strong': '#cc1818',
++	'--wpds-color-bg-interactive-error-strong-active': '#b90000',
++	'--wpds-color-bg-interactive-error-weak': '#00000000',
++	'--wpds-color-bg-interactive-error-weak-active': '#f6e6e3',
++	'--wpds-color-bg-interactive-neutral-strong': '#2d2d2d',
++	'--wpds-color-bg-interactive-neutral-strong-active': '#1e1e1e',
++	'--wpds-color-bg-interactive-neutral-strong-disabled': '#e2e2e2',
++	'--wpds-color-bg-interactive-neutral-weak': '#00000000',
++	'--wpds-color-bg-interactive-neutral-weak-active': '#eaeaea',
++	'--wpds-color-bg-interactive-neutral-weak-disabled': '#00000000',
++	'--wpds-color-bg-surface-brand':
++		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 9%, white)',
++	'--wpds-color-bg-surface-caution': '#fee994',
++	'--wpds-color-bg-surface-caution-weak': '#fff9c9',
++	'--wpds-color-bg-surface-error': '#f6e6e3',
++	'--wpds-color-bg-surface-error-weak': '#fff6f4',
++	'--wpds-color-bg-surface-info': '#deebfa',
++	'--wpds-color-bg-surface-info-weak': '#f2f9ff',
++	'--wpds-color-bg-surface-neutral': '#f8f8f8',
++	'--wpds-color-bg-surface-neutral-strong': '#ffffff',
++	'--wpds-color-bg-surface-neutral-weak': '#f0f0f0',
++	'--wpds-color-bg-surface-success': '#c5f7cc',
++	'--wpds-color-bg-surface-success-weak': '#eaffed',
++	'--wpds-color-bg-surface-warning': '#fde6bd',
++	'--wpds-color-bg-surface-warning-weak': '#fff7e0',
++	'--wpds-color-bg-thumb-brand': 'var(--wp-admin-theme-color, #3858e9)',
++	'--wpds-color-bg-thumb-brand-active':
++		'var(--wp-admin-theme-color, #3858e9)',
++	'--wpds-color-bg-thumb-neutral-disabled': '#d8d8d8',
++	'--wpds-color-bg-thumb-neutral-weak': '#8a8a8a',
++	'--wpds-color-bg-thumb-neutral-weak-active': '#6c6c6c',
++	'--wpds-color-bg-track-neutral': '#d8d8d8',
++	'--wpds-color-bg-track-neutral-weak': '#e0e0e0',
++	'--wpds-color-fg-content-caution': '#281d00',
++	'--wpds-color-fg-content-caution-weak': '#826a00',
++	'--wpds-color-fg-content-error': '#470000',
++	'--wpds-color-fg-content-error-weak': '#cc1818',
++	'--wpds-color-fg-content-info': '#001b4f',
++	'--wpds-color-fg-content-info-weak': '#006bd7',
++	'--wpds-color-fg-content-neutral': '#1e1e1e',
++	'--wpds-color-fg-content-neutral-weak': '#6d6d6d',
++	'--wpds-color-fg-content-success': '#002900',
++	'--wpds-color-fg-content-success-weak': '#007f30',
++	'--wpds-color-fg-content-warning': '#2e1900',
++	'--wpds-color-fg-content-warning-weak': '#926300',
++	'--wpds-color-fg-interactive-brand': 'var(--wp-admin-theme-color, #3858e9)',
++	'--wpds-color-fg-interactive-brand-active':
++		'var(--wp-admin-theme-color, #3858e9)',
++	'--wpds-color-fg-interactive-brand-strong': '#fff',
++	'--wpds-color-fg-interactive-brand-strong-active': '#fff',
++	'--wpds-color-fg-interactive-error': '#cc1818',
++	'--wpds-color-fg-interactive-error-active': '#cc1818',
++	'--wpds-color-fg-interactive-error-strong': '#f2efef',
++	'--wpds-color-fg-interactive-error-strong-active': '#f2efef',
++	'--wpds-color-fg-interactive-neutral': '#1e1e1e',
++	'--wpds-color-fg-interactive-neutral-active': '#1e1e1e',
++	'--wpds-color-fg-interactive-neutral-disabled': '#8a8a8a',
++	'--wpds-color-fg-interactive-neutral-strong': '#f0f0f0',
++	'--wpds-color-fg-interactive-neutral-strong-active': '#f0f0f0',
++	'--wpds-color-fg-interactive-neutral-strong-disabled': '#8a8a8a',
++	'--wpds-color-fg-interactive-neutral-weak': '#6d6d6d',
++	'--wpds-color-fg-interactive-neutral-weak-disabled': '#8a8a8a',
++	'--wpds-color-stroke-focus-brand': 'var(--wp-admin-theme-color, #3858e9)',
++	'--wpds-color-stroke-interactive-brand':
++		'var(--wp-admin-theme-color, #3858e9)',
++	'--wpds-color-stroke-interactive-brand-active':
++		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 85%, black)',
++	'--wpds-color-stroke-interactive-error': '#cc1818',
++	'--wpds-color-stroke-interactive-error-active': '#9d0000',
++	'--wpds-color-stroke-interactive-error-strong': '#cc1818',
++	'--wpds-color-stroke-interactive-neutral': '#8a8a8a',
++	'--wpds-color-stroke-interactive-neutral-active': '#6c6c6c',
++	'--wpds-color-stroke-interactive-neutral-disabled': '#d8d8d8',
++	'--wpds-color-stroke-interactive-neutral-strong': '#6c6c6c',
++	'--wpds-color-stroke-surface-brand':
++		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 46%, white)',
++	'--wpds-color-stroke-surface-brand-strong':
++		'var(--wp-admin-theme-color, #3858e9)',
++	'--wpds-color-stroke-surface-error': '#daa39b',
++	'--wpds-color-stroke-surface-error-strong': '#cc1818',
++	'--wpds-color-stroke-surface-info': '#9fbcdc',
++	'--wpds-color-stroke-surface-info-strong': '#006bd7',
++	'--wpds-color-stroke-surface-neutral': '#d8d8d8',
++	'--wpds-color-stroke-surface-neutral-strong': '#8a8a8a',
++	'--wpds-color-stroke-surface-neutral-weak': '#e0e0e0',
++	'--wpds-color-stroke-surface-success': '#8ac894',
++	'--wpds-color-stroke-surface-success-strong': '#007f30',
++	'--wpds-color-stroke-surface-warning': '#d0b381',
++	'--wpds-color-stroke-surface-warning-strong': '#926300',
++	'--wpds-cursor-control': 'default',
++	'--wpds-dimension-base': '4px',
++	'--wpds-dimension-gap-2xl': '32px',
++	'--wpds-dimension-gap-3xl': '40px',
++	'--wpds-dimension-gap-lg': '16px',
++	'--wpds-dimension-gap-md': '12px',
++	'--wpds-dimension-gap-sm': '8px',
++	'--wpds-dimension-gap-xl': '24px',
++	'--wpds-dimension-gap-xs': '4px',
++	'--wpds-dimension-padding-2xl': '24px',
++	'--wpds-dimension-padding-3xl': '32px',
++	'--wpds-dimension-padding-lg': '16px',
++	'--wpds-dimension-padding-md': '12px',
++	'--wpds-dimension-padding-sm': '8px',
++	'--wpds-dimension-padding-xl': '20px',
++	'--wpds-dimension-padding-xs': '4px',
++	'--wpds-elevation-lg':
++		'0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012, 0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005',
++	'--wpds-elevation-md':
++		'0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a, 0 12px 12px 0 #00000008, 0 16px 16px 0 #00000005',
++	'--wpds-elevation-sm':
++		'0 1px 2px 0 #0000000d, 0 2px 3px 0 #0000000a, 0 6px 6px 0 #00000008, 0 8px 8px 0 #00000005',
++	'--wpds-elevation-xs':
++		'0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005, 0 3px 3px 0 #00000005, 0 4px 4px 0 #00000003',
++	'--wpds-font-family-body':
++		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
++	'--wpds-font-family-heading':
++		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
++	'--wpds-font-family-mono': '"Menlo", "Consolas", monaco, monospace',
++	'--wpds-font-line-height-2xl': '40px',
++	'--wpds-font-line-height-lg': '28px',
++	'--wpds-font-line-height-md': '24px',
++	'--wpds-font-line-height-sm': '20px',
++	'--wpds-font-line-height-xl': '32px',
++	'--wpds-font-line-height-xs': '16px',
++	'--wpds-font-size-2xl': '32px',
++	'--wpds-font-size-lg': '15px',
++	'--wpds-font-size-md': '13px',
++	'--wpds-font-size-sm': '12px',
++	'--wpds-font-size-xl': '20px',
++	'--wpds-font-size-xs': '11px',
++	'--wpds-font-weight-medium': '499',
++	'--wpds-font-weight-regular': '400',
++};
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index 5b3d8b4dd2a70c..284966e51f0f4c 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -11,6 +11,7 @@ import { makeCSSVar } from '@terrazzo/token-tools/css';
+ import pluginModeOverrides from './bin/terrazzo-plugin-mode-overrides/index';
+ import pluginKnownWpdsCssVariables from './bin/terrazzo-plugin-known-wpds-css-variables/index';
+ import pluginDsTokenDocs from './bin/terrazzo-plugin-ds-tokens-docs/index';
++import pluginDsTokenFallbacks from './bin/terrazzo-plugin-ds-token-fallbacks/index';
+ import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index';
+ import typescriptTypes from './bin/terrazzo-plugin-typescript-types/index';
+ 
+@@ -96,6 +97,9 @@ export default defineConfig( {
+ 		pluginKnownWpdsCssVariables( {
+ 			filename: 'js/design-tokens.mjs',
+ 		} ),
++		pluginDsTokenFallbacks( {
++			filename: 'js/design-token-fallbacks.mjs',
++		} ),
+ 		pluginDsTokenDocs( {
+ 			filename: '../../docs/tokens.md',
+ 		} ),

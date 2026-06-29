@@ -1,0 +1,79 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e496176e93595c..55a36a6ae72d96 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ -   `InputControl`: Add tests and update to use `@testing-library/user-event` ([#41421](https://github.com/WordPress/gutenberg/pull/41421)).
+ -   `ColorIndicator`: Convert to TypeScript ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
+ -   `AlignmentMatrixControl`: Refactor away from `_.flattenDeep()` in utils ([#41814](https://github.com/WordPress/gutenberg/pull/41814/)).
++-   `AutoComplete`: Revert recent `exhaustive-deps` refactor ([#41820](https://github.com/WordPress/gutenberg/pull/41820)).
+ 
+ ## 19.13.0 (2022-06-15)
+ 
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.js b/packages/components/src/autocomplete/autocompleter-ui.js
+index ad7ebc3d0846f1..c909aa6a4a5783 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.js
++++ b/packages/components/src/autocomplete/autocompleter-ui.js
+@@ -39,7 +39,10 @@ export function getAutoCompleterUI( autocompleter ) {
+ 
+ 		useLayoutEffect( () => {
+ 			onChangeOptions( items );
+-		}, [ onChangeOptions, items ] );
++			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
++			// See https://github.com/WordPress/gutenberg/pull/41820
++			// eslint-disable-next-line react-hooks/exhaustive-deps
++		}, [ items ] );
+ 
+ 		if ( ! items.length > 0 ) {
+ 			return null;
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.native.js b/packages/components/src/autocomplete/autocompleter-ui.native.js
+index f3d15a14254a43..a8f0efa447c4fe 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.native.js
++++ b/packages/components/src/autocomplete/autocompleter-ui.native.js
+@@ -71,7 +71,10 @@ export function getAutoCompleterUI( autocompleter ) {
+ 			} else if ( isVisible && text.length === 0 ) {
+ 				startAnimation( false );
+ 			}
+-		}, [ onChangeOptions, items, isVisible, text, startAnimation ] );
++			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
++			// See https://github.com/WordPress/gutenberg/pull/41820
++			// eslint-disable-next-line react-hooks/exhaustive-deps
++		}, [ items, isVisible, text ] );
+ 
+ 		const activeItemStyles = usePreferredColorSchemeStyle(
+ 			styles[ 'components-autocomplete__item-active' ],
+@@ -111,7 +114,10 @@ export function getAutoCompleterUI( autocompleter ) {
+ 					}
+ 				} );
+ 			},
+-			[ animationValue, isVisible, reset ]
++			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
++			// See https://github.com/WordPress/gutenberg/pull/41820
++			// eslint-disable-next-line react-hooks/exhaustive-deps
++			[ isVisible ]
+ 		);
+ 
+ 		const contentStyles = {
+diff --git a/packages/components/src/autocomplete/index.js b/packages/components/src/autocomplete/index.js
+index c2fefc6af7e136..9140b7560d732b 100644
+--- a/packages/components/src/autocomplete/index.js
++++ b/packages/components/src/autocomplete/index.js
+@@ -375,14 +375,10 @@ function useAutocomplete( {
+ 				: AutocompleterUI
+ 		);
+ 		setFilterValue( query );
+-	}, [
+-		textContent,
+-		AutocompleterUI,
+-		autocompleter,
+-		completers,
+-		record,
+-		filteredOptions.length,
+-	] );
++		// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
++		// See https://github.com/WordPress/gutenberg/pull/41820
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++	}, [ textContent ] );
+ 
+ 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
+ 	const { className } = autocompleter || {};

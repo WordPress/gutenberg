@@ -1,0 +1,555 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 27aaef43b208b2..ac735f7c9e4b47 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -683,6 +683,12 @@
+ 		"markdown_source": "../packages/components/src/base-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "BaseField",
++		"slug": "base-field",
++		"markdown_source": "../packages/components/src/base-field/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "BoxControl",
+ 		"slug": "box-control",
+diff --git a/packages/components/src/base-field/README.md b/packages/components/src/base-field/README.md
+new file mode 100644
+index 00000000000000..228cd328429242
+--- /dev/null
++++ b/packages/components/src/base-field/README.md
+@@ -0,0 +1,67 @@
++# BaseField
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`BaseField` is an internal (i.e., not exported in the `index.js`) primitive component used for building more complex fields like `TextField`. It provides error handling and focus styles for field components. It does _not_ handle layout of the component aside from wrapping the field in a `Flex` wrapper.
++
++## Usage
++
++`BaseField` is primarily used as a hook rather than a component:
++
++```js
++function useExampleField( props ) {
++	const { 
++		as = 'input',
++		...baseProps,
++	} = useBaseField( props );
++
++	const inputProps = {
++		as,
++		// more cool stuff here
++	}
++
++	return { inputProps, ...baseProps };
++}
++
++function ExampleField( props, forwardRef ) {
++	const {
++		preFix,
++		affix,
++		disabled,
++		inputProps,
++		...baseProps
++	} = useExampleField( props );
++
++	return (
++		<View { ...baseProps } disabled={ disabled }>
++			{preFix}
++			<View
++				autocomplete="off"
++				{ ...inputProps }
++				disabled={ disabled }
++			/>
++			{affix}
++		</View>
++	);
++}
++```
++
++## Props
++
++### `hasError`: `boolean`
++
++Renders an error style around the component.
++
++### `disabled`: `boolean`
++
++Whether the field is disabled.
++
++### `isInline`: `boolean`
++
++Renders a component that can be inlined in some text.
++
++### `isSubtle`: `boolean`
++
++Renders a subtle variant of the component.
+diff --git a/packages/components/src/base-field/hook.js b/packages/components/src/base-field/hook.js
+new file mode 100644
+index 00000000000000..479b545509e7e0
+--- /dev/null
++++ b/packages/components/src/base-field/hook.js
+@@ -0,0 +1,64 @@
++/**
++ * External dependencies
++ */
++import { cx } from 'emotion';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem } from '../ui/context';
++import { useControlGroupContext } from '../ui/control-group';
++import { useFlex } from '../flex';
++import * as styles from './styles';
++
++/**
++ * @typedef OwnProps
++ * @property {boolean} [hasError=false] Renders an error.
++ * @property {boolean} [disabled] Whether the field is disabled.
++ * @property {boolean} [isInline=false] Renders as an inline element (layout).
++ * @property {boolean} [isSubtle=false] Renders a subtle variant.
++ */
++
++/** @typedef {import('../flex/types').FlexProps & OwnProps} Props */
++
++/**
++ * @param {import('../ui/context').PolymorphicComponentProps<Props, 'div'>} props
++ */
++export function useBaseField( props ) {
++	const {
++		className,
++		hasError = false,
++		isInline = false,
++		isSubtle = false,
++		// extract these because useFlex doesn't accept it
++		defaultValue,
++		disabled,
++		...flexProps
++	} = useContextSystem( props, 'BaseField' );
++
++	const { styles: controlGroupStyles } = useControlGroupContext();
++
++	const classes = useMemo(
++		() =>
++			cx(
++				styles.BaseField,
++				controlGroupStyles,
++				isSubtle && styles.subtle,
++				hasError && styles.error,
++				isInline && styles.inline,
++				className
++			),
++		[ className, controlGroupStyles, hasError, isInline, isSubtle ]
++	);
++
++	return {
++		...useFlex( { ...flexProps, className: classes } ),
++		disabled,
++		defaultValue,
++	};
++}
+diff --git a/packages/components/src/base-field/index.js b/packages/components/src/base-field/index.js
+new file mode 100644
+index 00000000000000..263e623dae3167
+--- /dev/null
++++ b/packages/components/src/base-field/index.js
+@@ -0,0 +1 @@
++export { useBaseField } from './hook';
+diff --git a/packages/components/src/base-field/styles.js b/packages/components/src/base-field/styles.js
+new file mode 100644
+index 00000000000000..fb9ae36ae504f4
+--- /dev/null
++++ b/packages/components/src/base-field/styles.js
+@@ -0,0 +1,86 @@
++/**
++ * External dependencies
++ */
++import { css } from 'emotion';
++
++/**
++ * Internal dependencies
++ */
++import { CONFIG, COLORS, reduceMotion } from '../utils';
++import { safariOnly } from '../utils/browsers';
++
++export const BaseField = css`
++	background: ${ CONFIG.controlBackgroundColor };
++	border-radius: ${ CONFIG.controlBorderRadius };
++	border: 1px solid;
++	border-color: ${ CONFIG.controlBorderColor };
++	box-shadow: ${ CONFIG.controlBoxShadow };
++	display: flex;
++	flex: 1;
++	font-size: ${ CONFIG.fontSize };
++	outline: none;
++	padding: 0 8px;
++	position: relative;
++	transition: border-color ${ CONFIG.transitionDurationFastest } ease;
++	${ reduceMotion( 'transition' ) }
++	width: 100%;
++
++	&[disabled] {
++		opacity: 0.6;
++	}
++
++	&:hover {
++		border-color: ${ CONFIG.controlBorderColorHover };
++	}
++
++	&:focus,
++	&[data-focused='true'] {
++		border-color: ${ COLORS.admin.theme };
++		box-shadow: ${ CONFIG.controlBoxShadowFocus };
++	}
++`;
++
++export const subtle = css`
++	background-color: transparent;
++
++	&:hover,
++	&:active,
++	&:focus,
++	&[data-focused='true'] {
++		background: ${ CONFIG.controlBackgroundColor };
++	}
++`;
++
++export const error = css`
++	border-color: ${ CONFIG.controlDestructiveBorderColor };
++
++	&:hover,
++	&:active {
++		border-color: ${ CONFIG.controlDestructiveBorderColor };
++	}
++
++	&:focus,
++	&[data-focused='true'] {
++		border-color: ${ CONFIG.controlDestructiveBorderColor };
++		box-shadow: 0 0 0, 0.5px, ${ CONFIG.controlDestructiveBorderColor };
++	}
++`;
++
++export const errorFocus = css`
++	border-color: ${ CONFIG.controlDestructiveBorderColor };
++	box-shadow: 0 0 0, 0.5px, ${ CONFIG.controlDestructiveBorderColor };
++
++	&:hover {
++		border-color: ${ CONFIG.controlDestructiveBorderColor };
++	}
++`;
++
++export const inline = css`
++	display: inline-flex;
++	vertical-align: baseline;
++	width: auto;
++
++	${ safariOnly`
++			vertical-align: middle;
++	` }
++`;
+diff --git a/packages/components/src/base-field/test/__snapshots__/index.js.snap b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..0b96ea827142ec
+--- /dev/null
++++ b/packages/components/src/base-field/test/__snapshots__/index.js.snap
+@@ -0,0 +1,143 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`base field props should render error styles 1`] = `
++Snapshot Diff:
++- Received styles
+++ Base styles
++
++@@ -12,11 +12,11 @@
++      "-webkit-justify-content": "space-between",
++      "-webkit-transition": "border-color 100ms ease",
++      "align-items": "center",
++      "background": "#fff",
++      "border": "1px solid",
++-     "border-color": "#d94f4f",
+++     "border-color": "#757575",
++      "border-radius": "2px",
++      "box-shadow": "transparent",
++      "display": "flex",
++      "flex": "1",
++      "flex-direction": "row",
++`;
++
++exports[`base field props should render inline styles 1`] = `
++Snapshot Diff:
++- Received styles
+++ Base styles
++
++@@ -15,18 +15,17 @@
++      "background": "#fff",
++      "border": "1px solid",
++      "border-color": "#757575",
++      "border-radius": "2px",
++      "box-shadow": "transparent",
++-     "display": "inline-flex",
+++     "display": "flex",
++      "flex": "1",
++      "flex-direction": "row",
++      "font-size": "13px",
++      "justify-content": "space-between",
++      "outline": "none",
++      "padding": "0 8px",
++      "position": "relative",
++      "transition": "border-color 100ms ease",
++-     "vertical-align": "baseline",
++-     "width": "auto",
+++     "width": "100%",
++    },
++  ]
++`;
++
++exports[`base field props should render subtle styles 1`] = `
++Snapshot Diff:
++- Received styles
+++ Base styles
++
++@@ -11,11 +11,10 @@
++      "-webkit-flex-direction": "row",
++      "-webkit-justify-content": "space-between",
++      "-webkit-transition": "border-color 100ms ease",
++      "align-items": "center",
++      "background": "#fff",
++-     "background-color": "transparent",
++      "border": "1px solid",
++      "border-color": "#757575",
++      "border-radius": "2px",
++      "box-shadow": "transparent",
++      "display": "flex",
++`;
++
++exports[`base field should render correctly 1`] = `
++.emotion-0 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  background: #fff;
++  border-radius: 2px;
++  border: 1px solid;
++  border-color: #757575;
++  box-shadow: transparent;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  font-size: 13px;
++  outline: none;
++  padding: 0 8px;
++  position: relative;
++  -webkit-transition: border-color 100ms ease;
++  transition: border-color 100ms ease;
++  width: 100%;
++}
++
++.emotion-0 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-0 > * {
++  min-width: 0;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-0 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-0[disabled] {
++  opacity: 0.6;
++}
++
++.emotion-0:hover {
++  border-color: #757575;
++}
++
++.emotion-0:focus,
++.emotion-0[data-focused='true'] {
++  border-color: var( --wp-admin-theme-color,#00669b);
++  box-shadow: 0 0 0,0.5px,[object Object];
++}
++
++<div
++  class="components-flex components-base-field emotion-0 emotion-1 emotion-2"
++  data-wp-c16t="true"
++  data-wp-component="BaseField"
++/>
++`;
+diff --git a/packages/components/src/base-field/test/index.js b/packages/components/src/base-field/test/index.js
+new file mode 100644
+index 00000000000000..b5ed5ef4b05fa4
+--- /dev/null
++++ b/packages/components/src/base-field/test/index.js
+@@ -0,0 +1,69 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { useBaseField } from '../index';
++import { View } from '../../view';
++
++const TestField = ( props ) => {
++	return <View { ...useBaseField( props ) } />;
++};
++
++describe( 'base field', () => {
++	let base;
++
++	beforeEach( () => {
++		base = render( <TestField /> ).container;
++	} );
++
++	it( 'should render correctly', () => {
++		expect( base.firstChild ).toMatchSnapshot();
++	} );
++
++	describe( 'props', () => {
++		it( 'should render error styles', () => {
++			const { container } = render( <TestField hasError /> );
++			expect( container.firstChild ).toMatchStyleDiffSnapshot(
++				base.firstChild
++			);
++		} );
++
++		it( 'should render inline styles', () => {
++			const { container } = render( <TestField isInline /> );
++			expect( container.firstChild ).toMatchStyleDiffSnapshot(
++				base.firstChild
++			);
++		} );
++
++		it( 'should render subtle styles', () => {
++			const { container } = render( <TestField isSubtle /> );
++			expect( container.firstChild ).toMatchStyleDiffSnapshot(
++				base.firstChild
++			);
++		} );
++	} );
++
++	describe( 'useBaseField', () => {
++		it( 'should pass through disabled and defaultValue props', () => {
++			// wrap this in a component so that `useContext` calls don't fail inside the hook
++			// assertions will still run as normal when we `render` the component :)
++			const Component = () => {
++				const disabled = Symbol.for( 'disabled' );
++				const defaultValue = Symbol.for( 'defaultValue' );
++
++				const result = useBaseField( { disabled, defaultValue } );
++
++				expect( result.disabled ).toBe( disabled );
++				expect( result.defaultValue ).toBe( defaultValue );
++
++				return null;
++			};
++
++			render( <Component /> );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/utils/browsers.js b/packages/components/src/utils/browsers.js
+new file mode 100644
+index 00000000000000..1960eccebfdf79
+--- /dev/null
++++ b/packages/components/src/utils/browsers.js
+@@ -0,0 +1,36 @@
++/**
++ * External dependencies
++ */
++import { css } from 'emotion';
++
++/* eslint-disable jsdoc/no-undefined-types */
++/**
++ * @param {TemplateStringsArray} strings
++ * @param  {import('create-emotion').Interpolation[]} interpolations
++ */
++export function firefoxOnly( strings, ...interpolations ) {
++	const interpolatedStyles = css( strings, ...interpolations );
++
++	return css`
++		@-moz-document url-prefix() {
++			${ interpolatedStyles };
++		}
++	`;
++}
++
++/**
++ * @param {TemplateStringsArray} strings
++ * @param  {import('create-emotion').Interpolation[]} interpolations
++ */
++export function safariOnly( strings, ...interpolations ) {
++	const interpolatedStyles = css( strings, ...interpolations );
++
++	return css`
++		@media not all and ( min-resolution: 0.001dpcm ) {
++			@supports ( -webkit-appearance: none ) {
++				${ interpolatedStyles }
++			}
++		}
++	`;
++}
++/* eslint-enable jsdoc/no-undefined-types */
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 5dc2245256e611..28bfb5885df69e 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -39,7 +39,13 @@ export default {
+ 	controlPaddingX: CONTROL_PADDING_X,
+ 	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
+ 	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
++	controlBackgroundColor: COLORS.white,
+ 	controlBorderRadius: '2px',
++	controlBorderColor: COLORS.gray[ 700 ],
++	controlBoxShadow: 'transparent',
++	controlBorderColorHover: COLORS.gray[ 700 ],
++	controlBoxShadowFocus: `0 0 0, 0.5px, ${ COLORS.admin }`,
++	controlDestructiveBorderColor: COLORS.alert.red,
+ 	controlHeight: CONTROL_HEIGHT,
+ 	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
+ 	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index ca00ff32d3db98..12b75796ef73d2 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -19,6 +19,7 @@
+ 	"include": [
+ 		"src/animate/**/*",
+ 		"src/base-control/**/*",
++		"src/base-field/**/*",
+ 		"src/dashicon/**/*",
+ 		"src/disabled/**/*",
+ 		"src/divider/**/*",

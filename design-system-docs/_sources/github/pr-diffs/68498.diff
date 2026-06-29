@@ -1,0 +1,127 @@
+diff --git a/packages/block-editor/src/components/spacing-sizes-control/linked-button.js b/packages/block-editor/src/components/spacing-sizes-control/linked-button.js
+index f6d56be66072ad..413dc88a52e9b9 100644
+--- a/packages/block-editor/src/components/spacing-sizes-control/linked-button.js
++++ b/packages/block-editor/src/components/spacing-sizes-control/linked-button.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { Button, Tooltip } from '@wordpress/components';
++import { Button } from '@wordpress/components';
+ import { link, linkOff } from '@wordpress/icons';
+ import { __ } from '@wordpress/i18n';
+ 
+@@ -9,14 +9,12 @@ export default function LinkedButton( { isLinked, ...props } ) {
+ 	const label = isLinked ? __( 'Unlink sides' ) : __( 'Link sides' );
+ 
+ 	return (
+-		<Tooltip text={ label }>
+-			<Button
+-				{ ...props }
+-				size="small"
+-				icon={ isLinked ? link : linkOff }
+-				iconSize={ 24 }
+-				aria-label={ label }
+-			/>
+-		</Tooltip>
++		<Button
++			{ ...props }
++			size="small"
++			icon={ isLinked ? link : linkOff }
++			iconSize={ 24 }
++			label={ label }
++		/>
+ 	);
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6adec34a18b786..bf775a152747d0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `BorderBoxControl`, `BoxControl`: Remove `Tooltip` component from linked button ([#68498](https://github.com/WordPress/gutenberg/pull/68498)).
++
+ ### Internal
+ 
+ -   `BoxControl`: Add runtime check for presets and presetKey ([#68385](https://github.com/WordPress/gutenberg/pull/68385)).
+diff --git a/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx b/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
+index 5388a381deb395..561653009a448a 100644
+--- a/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
+@@ -8,8 +8,6 @@ import { __ } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import Button from '../../button';
+-import Tooltip from '../../tooltip';
+-import { View } from '../../view';
+ import type { WordPressComponentProps } from '../../context';
+ import { contextConnect } from '../../context';
+ import { useBorderBoxControlLinkedButton } from './hook';
+@@ -25,18 +23,15 @@ const BorderBoxControlLinkedButton = (
+ 	const label = isLinked ? __( 'Unlink sides' ) : __( 'Link sides' );
+ 
+ 	return (
+-		<Tooltip text={ label }>
+-			<View className={ className }>
+-				<Button
+-					{ ...buttonProps }
+-					size="small"
+-					icon={ isLinked ? link : linkOff }
+-					iconSize={ 24 }
+-					aria-label={ label }
+-					ref={ forwardedRef }
+-				/>
+-			</View>
+-		</Tooltip>
++		<Button
++			{ ...buttonProps }
++			size="small"
++			icon={ isLinked ? link : linkOff }
++			iconSize={ 24 }
++			label={ label }
++			ref={ forwardedRef }
++			className={ className }
++		/>
+ 	);
+ };
+ 
+diff --git a/packages/components/src/box-control/linked-button.tsx b/packages/components/src/box-control/linked-button.tsx
+index 595a3c03436756..985a7745d5c157 100644
+--- a/packages/components/src/box-control/linked-button.tsx
++++ b/packages/components/src/box-control/linked-button.tsx
+@@ -8,7 +8,6 @@ import { __ } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import Button from '../button';
+-import Tooltip from '../tooltip';
+ 
+ export default function LinkedButton( {
+ 	isLinked,
+@@ -17,15 +16,13 @@ export default function LinkedButton( {
+ 	const label = isLinked ? __( 'Unlink sides' ) : __( 'Link sides' );
+ 
+ 	return (
+-		<Tooltip text={ label }>
+-			<Button
+-				{ ...props }
+-				className="component-box-control__linked-button"
+-				size="small"
+-				icon={ isLinked ? link : linkOff }
+-				iconSize={ 24 }
+-				aria-label={ label }
+-			/>
+-		</Tooltip>
++		<Button
++			{ ...props }
++			className="component-box-control__linked-button"
++			size="small"
++			icon={ isLinked ? link : linkOff }
++			iconSize={ 24 }
++			label={ label }
++		/>
+ 	);
+ }

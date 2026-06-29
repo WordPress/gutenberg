@@ -1,0 +1,35 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e4a27da9b9cc90..84b3348437a794 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `Modal`: Update the Modal Heading and Label text color value so that it matches with the text color used for other areas of the editor. ([#50448](https://github.com/WordPress/gutenberg/pull/50916)).
++
+ ### Breaking Changes
+ 
+ -   `DateTime`: Remove previously deprecated props, `__nextRemoveHelpButton` and `__nextRemoveResetButton` ([#50724](https://github.com/WordPress/gutenberg/pull/50724)).
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index acc43de8b7f902..f829bcae64f971 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -85,6 +85,7 @@
+ 	left: 0;
+ 
+ 	.components-modal__header-heading {
++		color: $gray-900;
+ 		font-size: 1.2rem;
+ 		font-weight: 600;
+ 	}
+@@ -128,6 +129,7 @@
+ 
+ // Modal contents.
+ .components-modal__content {
++	color: $gray-900;
+ 	flex: 1;
+ 	margin-top: $header-height + $grid-unit-15;
+ 	padding: 0 $grid-unit-40 $grid-unit-40;

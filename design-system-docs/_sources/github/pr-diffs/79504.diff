@@ -1,0 +1,92 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0c542322d0cedd..9a7a833a12b6bf 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ 
+ ### Internal
+ 
++-   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
+ -   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
+ -   `Truncate`: Migrate styles from Emotion to SCSS Modules ([#79446](https://github.com/WordPress/gutenberg/pull/79446)).
+ 
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index bd765613970e33..657e47f1fdd695 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Internal
+ 
++-   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
+ -   Update `@base-ui/react` from `1.5.0` to [`1.6.0`](https://github.com/mui/base-ui/releases/tag/v1.6.0) ([#79408](https://github.com/WordPress/gutenberg/pull/79408)).
+ 
+ ## 0.16.0 (2026-06-24)
+diff --git a/packages/ui/src/collapsible-card/content.tsx b/packages/ui/src/collapsible-card/content.tsx
+index 7dc4fecd66baaa..92530491a5b902 100644
+--- a/packages/ui/src/collapsible-card/content.tsx
++++ b/packages/ui/src/collapsible-card/content.tsx
+@@ -25,7 +25,7 @@ export const Content = forwardRef< HTMLDivElement, ContentProps >(
+ 						styles.content,
+ 						state.open &&
+ 							state.transitionStatus === 'idle' &&
+-							styles.overflowVisible,
++							styles[ 'overflow-visible' ],
+ 						className
+ 					)
+ 				}
+diff --git a/packages/ui/src/collapsible-card/style.module.css b/packages/ui/src/collapsible-card/style.module.css
+index a42a4956f07868..4627dbbca1b7b2 100644
+--- a/packages/ui/src/collapsible-card/style.module.css
++++ b/packages/ui/src/collapsible-card/style.module.css
+@@ -68,12 +68,12 @@
+ 			margin-block-start: var(--wp-ui-card-header-content-margin);
+ 
+ 			/* Clip while collapsed or transitioning so the panel collapses
+-			   cleanly. The `overflowVisible` class is set once the open
++			   cleanly. The `overflow-visible` class is set once the open
+ 			   transition has settled, dropping the clip so descendant
+ 			   focus rings aren't cut off. */
+ 			overflow: hidden;
+ 
+-			&.overflowVisible {
++			&.overflow-visible {
+ 				overflow: visible;
+ 			}
+ 
+diff --git a/tools/stylelint/config.js b/tools/stylelint/config.js
+index 09ffc0badc8a04..361ce9f1efa2b2 100644
+--- a/tools/stylelint/config.js
++++ b/tools/stylelint/config.js
+@@ -1,6 +1,14 @@
+ // CSS Baseline 2024 stepped-value functions not yet recognized by Stylelint.
+ const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
+ 
++const SELECTOR_CLASS_PATTERN = [
++	'^[a-z][a-z0-9]*(?:(?:__|--|-)[a-z0-9]+)*$',
++	{
++		message:
++			'Selector should use lowercase class segments separated with hyphens, double hyphens, or double underscores (selector-class-pattern)',
++	},
++];
++
+ /** @type {import('stylelint').Config} */
+ module.exports = {
+ 	extends: '@wordpress/stylelint-config/scss-stylistic',
+@@ -146,6 +154,16 @@ module.exports = {
+ 				],
+ 			},
+ 		},
++		{
++			files: [
++				'packages/components/src/**/*.module.{css,scss}',
++				'packages/theme/src/**/*.module.{css,scss}',
++				'packages/ui/src/**/*.module.{css,scss}',
++			],
++			rules: {
++				'selector-class-pattern': SELECTOR_CLASS_PATTERN,
++			},
++		},
+ 	],
+ 	reportDescriptionlessDisables: true,
+ };

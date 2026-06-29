@@ -1,0 +1,2290 @@
+diff --git a/packages/components/src/ui/create-styles/create-compiler/README.md b/packages/components/src/ui/create-styles/create-compiler/README.md
+index 76773b7a2ca1de..ac5b3acfe343dc 100644
+--- a/packages/components/src/ui/create-styles/create-compiler/README.md
++++ b/packages/components/src/ui/create-styles/create-compiler/README.md
+@@ -14,6 +14,8 @@ css({
+ 
+ This will dynamically respond to breakpoints and render the appropriate width for each `min-width`. The breakpoints are documented in the code in [`utils.js`](./utils.js).
+ 
++
++
+ ## Plugins
+ 
+ `createCompiler` supports passing certain parameters to plugins. Plugin initialization should be contained to [`plugins/index.js`](./plugins/index.js).
+diff --git a/packages/components/src/ui/create-styles/create-compiler/create-compiler.js b/packages/components/src/ui/create-styles/create-compiler/create-compiler.js
+index 9885f59678b28f..4b45c3bbdbebcc 100644
+--- a/packages/components/src/ui/create-styles/create-compiler/create-compiler.js
++++ b/packages/components/src/ui/create-styles/create-compiler/create-compiler.js
+@@ -7,7 +7,6 @@ import mitt from 'mitt';
+ /**
+  * Internal dependencies
+  */
+-import { RootStore } from '../css-custom-properties';
+ import { createCSS } from './create-css';
+ import { createPlugins } from './plugins';
+ import { breakpoints, generateInterpolationName } from './utils';
+@@ -15,7 +14,6 @@ import { breakpoints, generateInterpolationName } from './utils';
+ const defaultOptions = {
+ 	key: 'css',
+ 	specificityLevel: 1,
+-	rootStore: new RootStore(),
+ };
+ 
+ /* eslint-disable jsdoc/valid-types */
+@@ -32,7 +30,6 @@ const defaultOptions = {
+  * @typedef {import('create-emotion').Options & {
+  *	key?: string,
+  *	specificityLevel?: number,
+- *	rootStore: import('../css-custom-properties').RootStore
+  * }} CreateCompilerOptions
+  */
+ 
+@@ -40,18 +37,17 @@ const defaultOptions = {
+  * @param {CreateCompilerOptions} options
+  * @return {Compiler} The compiler.
+  */
+-export function createCompiler( options ) {
++export function createCompiler( options = {} ) {
+ 	const mergedOptions = {
+ 		...defaultOptions,
+ 		...options,
+ 	};
+ 
+-	const { key, rootStore, specificityLevel } = mergedOptions;
++	const { key, specificityLevel } = mergedOptions;
+ 
+ 	const defaultPlugins = createPlugins( {
+ 		key,
+ 		specificityLevel,
+-		rootStore,
+ 	} );
+ 
+ 	if ( options.stylisPlugins ) {
+diff --git a/packages/components/src/ui/create-styles/create-compiler/plugins/css-variables.js b/packages/components/src/ui/create-styles/create-compiler/plugins/css-variables.js
+deleted file mode 100644
+index 23771469048e7f..00000000000000
+--- a/packages/components/src/ui/create-styles/create-compiler/plugins/css-variables.js
++++ /dev/null
+@@ -1,77 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { createRootStore } from '../../css-custom-properties';
+-import { transformContent } from '../../css-custom-properties/transform-content';
+-import { hasVariable } from '../../css-custom-properties/utils';
+-import { STYLIS_CONTEXTS, STYLIS_TOKENS } from './utils';
+-
+-// Detects native CSS varialble support
+-// https://github.com/jhildenbiddle/css-vars-ponyfill/blob/master/src/index.js
+-const isNativeSupport =
+-	typeof window !== 'undefined' && window?.CSS?.supports?.( '(--a: 0)' );
+-
+-/*
+- * This plugin is for the stylis library. It's the CSS compiler used by
+- * CSS-in-JS libraries like Emotion.
+- *
+- * https://github.com/thysultan/stylis.js
+- */
+-
+-const defaultOptions = {
+-	rootStore: createRootStore(),
+-	skipSupportedBrowsers: true,
+-};
+-
+-/*
+- * Generates fallback values for CSS rule declarations that contain CSS var().
+- * This plugin parses uses specified fallback values within the var()
+- * function. If one is not provided, it will attempt to use the matching
+- * variable declared at the :root scope.
+- */
+-function stylisPluginCssVariables(
+-	/* istanbul ignore next */
+-	options = {}
+-) {
+-	const { rootStore, skipSupportedBrowsers } = {
+-		...defaultOptions,
+-		...options,
+-	};
+-
+-	const plugin = (
+-		/** @type {number} */ context,
+-		/** @type {string} */ content,
+-		/** @type {unknown} */ _,
+-		/** @type {unknown} */ __,
+-		/** @type {unknown} */ ___,
+-		/** @type {unknown} */ ____,
+-		/** @type {unknown} */ _____,
+-		/** @type {number} */ type
+-	) => {
+-		// Skip generating CSS variable fallbacks for supported browsers
+-		if ( skipSupportedBrowsers && isNativeSupport ) return;
+-
+-		// Borrowed guard implementation from:
+-		// https://github.com/Andarist/stylis-plugin-extra-scope/blob/master/src/index.js#L15
+-		/* istanbul ignore next */
+-		if (
+-			context !== STYLIS_CONTEXTS.SELECTOR_BLOCK ||
+-			type === STYLIS_TOKENS.KEYFRAME
+-		) {
+-			return;
+-		}
+-
+-		// We only need to process the content if a CSS var() is used.
+-		if ( ! hasVariable( content ) ) return;
+-
+-		// We'll parse the content to match variables to their custom properties (if possible).
+-		const nextContent = transformContent( content, rootStore );
+-
+-		// Lastly, we'll provide stylis with our enhanced CSS variable supported content.
+-		return nextContent;
+-	};
+-
+-	return plugin;
+-}
+-
+-export default stylisPluginCssVariables;
+diff --git a/packages/components/src/ui/create-styles/create-compiler/plugins/index.js b/packages/components/src/ui/create-styles/create-compiler/plugins/index.js
+index b83b8b25c7b882..1c0a5ece5d5659 100644
+--- a/packages/components/src/ui/create-styles/create-compiler/plugins/index.js
++++ b/packages/components/src/ui/create-styles/create-compiler/plugins/index.js
+@@ -6,11 +6,8 @@ import cssGridPlugin from 'styled-griddie';
+ /**
+  * Internal dependencies
+  */
+-import cssVariablesPlugin from './css-variables';
+ import specificityPlugin from './extra-specificity';
+ 
+-const isProd = process.env.NODE_ENV === 'production';
+-
+ /**
+  * A collection of custom Stylis plugins to enhance the way the compiler (Emotion)
+  * generates selectors and CSS rules.
+@@ -18,18 +15,10 @@ const isProd = process.env.NODE_ENV === 'production';
+  * @param {Object} options
+  * @param {number} [options.specificityLevel=7]
+  * @param {string} [options.key='css']
+- * @param {boolean} [options.skipSupportedBrowsers]
+- * @param {import('../../css-custom-properties').RootStore} [options.rootStore]
+  * @return {import('@emotion/stylis').Plugin[]} The list of stylis plugins.
+  */
+-export function createPlugins( {
+-	specificityLevel = 1,
+-	key = 'css',
+-	rootStore,
+-	skipSupportedBrowsers = isProd,
+-} ) {
++export function createPlugins( { specificityLevel = 1, key = 'css' } ) {
+ 	return [
+-		cssVariablesPlugin( { skipSupportedBrowsers, rootStore } ),
+ 		specificityPlugin( { level: specificityLevel, key } ),
+ 		// @ts-ignore styled-griddie imports StylisPlugin from `styled-components` which has different types from the actual one we're using here
+ 		cssGridPlugin,
+diff --git a/packages/components/src/ui/create-styles/create-style-system/constants.js b/packages/components/src/ui/create-styles/create-style-system/constants.js
+index ca84e8336118c2..73ac3a294d7ee5 100644
+--- a/packages/components/src/ui/create-styles/create-style-system/constants.js
++++ b/packages/components/src/ui/create-styles/create-style-system/constants.js
+@@ -1,21 +1,7 @@
+ /**
+  * Uses the the prefix for the CSS variables compiled by the system.
+  */
+-export const NAMESPACE = '--wp-experimental';
+-
+-export const DARK_MODE_ATTR_PROP = 'data-system-ui-mode';
+-export const HIGH_CONTRAST_MODE_ATTR_PROP = 'data-system-ui-contrast-mode';
+-export const COLOR_BLIND_MODE_ATTR_PROP = 'data-system-ui-color-blind-mode';
+-export const REDUCED_MOTION_MODE_ATTR_PROP =
+-	'data-system-ui-reduced-motion-mode';
+-
+-export const DARK_MODE_ATTR = `[${ DARK_MODE_ATTR_PROP }="dark"]`;
+-export const HIGH_CONTRAST_MODE_MODE_ATTR = `[${ HIGH_CONTRAST_MODE_ATTR_PROP }="high"]`;
+-
+-export const COLOR_BLIND_MODE_ATTR = `[${ COLOR_BLIND_MODE_ATTR_PROP }="true"]`;
+-export const REDUCED_MOTION_MODE_ATTR = `[${ REDUCED_MOTION_MODE_ATTR_PROP }="true"]`;
+-
+-export const DARK_HIGH_CONTRAST_MODE_MODE_ATTR = `${ DARK_MODE_ATTR }${ HIGH_CONTRAST_MODE_MODE_ATTR }`;
++export const NAMESPACE = '--wp-unstable';
+ 
+ export const MODE_SPECIFICITY_COMPOUND_LEVEL = 3;
+ 
+diff --git a/packages/components/src/ui/create-styles/create-style-system/create-core-element.js b/packages/components/src/ui/create-styles/create-style-system/create-core-element.js
+index 3ad94350b7bd6f..34a6784a22bfb6 100644
+--- a/packages/components/src/ui/create-styles/create-style-system/create-core-element.js
++++ b/packages/components/src/ui/create-styles/create-style-system/create-core-element.js
+@@ -8,10 +8,7 @@ import { forwardRef, createElement } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { useHydrateGlobalStyles } from '../hooks';
+-import {
+-	INTERPOLATION_CLASS_NAME,
+-	REDUCED_MOTION_MODE_ATTR,
+-} from './constants';
++import { INTERPOLATION_CLASS_NAME } from './constants';
+ import {
+ 	DEFAULT_STYLE_SYSTEM_OPTIONS,
+ 	getInterpolatedClassName,
+@@ -23,7 +20,7 @@ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
+  * @typedef CreateCoreElementOptions
+  * @property {import('create-emotion').ObjectInterpolation<any>} baseStyles The baseStyles from the Style system.
+  * @property {import('../create-compiler').Compiler} compiler The injectGlobal from the Style system's compiler.
+- * @property {import('./generate-theme').GenerateThemeResults} globalStyles The globalStyles from the Style system.
++ * @property {import('./create-css-custom-properties').CreateCSSCustomPropertiesResults} globalStyles The globalStyles from the Style system.
+  */
+ 
+ /**
+@@ -69,9 +66,6 @@ export const createCoreElement = ( tagName, options ) => {
+ 			@media ( prefers-reduced-motion ) {
+ 				transition: none !important;
+ 			}
+-			${ REDUCED_MOTION_MODE_ATTR } & {
+-				transition: none !important;
+-			}
+ 		`,
+ 	};
+ 
+diff --git a/packages/components/src/ui/create-styles/create-style-system/create-core-elements.js b/packages/components/src/ui/create-styles/create-style-system/create-core-elements.js
+index 23a27aff0975c6..d0464f230b09ef 100644
+--- a/packages/components/src/ui/create-styles/create-style-system/create-core-elements.js
++++ b/packages/components/src/ui/create-styles/create-style-system/create-core-elements.js
+@@ -8,7 +8,7 @@ import { tags } from './tags';
+  * @typedef CreateCoreElementProps
+  * @property {import('create-emotion').ObjectInterpolation<any>} baseStyles Base styles for the coreElements.
+  * @property {import('../create-compiler').Compiler} compiler The injectGlobal from the Style system's compiler.
+- * @property {import('./generate-theme').GenerateThemeResults} globalStyles Global styles for the coreElements.
++ * @property {import('./create-css-custom-properties').CreateCSSCustomPropertiesResults} globalStyles Global styles for the coreElements.
+  */
+ 
+ /**
+diff --git a/packages/components/src/ui/create-styles/create-style-system/create-css-custom-properties.js b/packages/components/src/ui/create-styles/create-style-system/create-css-custom-properties.js
+new file mode 100644
+index 00000000000000..10b296e0185ae2
+--- /dev/null
++++ b/packages/components/src/ui/create-styles/create-style-system/create-css-custom-properties.js
+@@ -0,0 +1,41 @@
++/**
++ * Internal dependencies
++ */
++import {
++	transformValuesToReferences,
++	transformValuesToVariables,
++	transformValuesToVariablesString,
++} from './utils';
++
++/**
++ * @typedef CreateCSSCustomPropertiesProps
++ * @property {import('./utils').StyleConfigValues} config Default theme config.
++ */
++
++/**
++ * @typedef CreateCSSCustomPropertiesResults
++ * @property {import('./utils').StyleConfig} theme A set of theme style references.
++ * @property {import('./utils').StyleConfig} globalVariables A set of global variables.
++ * @property {string} globalCSSVariables The compiled CSS string for global variables.
++ */
++
++/**
++ * Generates theme references and compiles CSS variables to be used by the Style System.
++ *
++ * @param {CreateCSSCustomPropertiesProps} props Props to generate a Style system theme with.
++ * @return {CreateCSSCustomPropertiesResults} A set of variables and content for the System.
++ */
++export function createCSSCustomProperties( { config = {} } ) {
++	const theme = transformValuesToReferences( config );
++	const globalVariables = transformValuesToVariables( config );
++	const globalCSSVariables = transformValuesToVariablesString(
++		':root',
++		config
++	);
++
++	return {
++		theme,
++		globalVariables,
++		globalCSSVariables,
++	};
++}
+diff --git a/packages/components/src/ui/create-styles/create-style-system/create-style-system.js b/packages/components/src/ui/create-styles/create-style-system/create-style-system.js
+index 90c21d2c2cddc0..51e47eefbdaf3d 100644
+--- a/packages/components/src/ui/create-styles/create-style-system/create-style-system.js
++++ b/packages/components/src/ui/create-styles/create-style-system/create-style-system.js
+@@ -2,22 +2,17 @@
+  * Internal dependencies
+  */
+ import { createCompiler } from '../create-compiler';
+-import { createRootStore } from '../css-custom-properties';
+ import { createCoreElement } from './create-core-element';
+ import { createCoreElements } from './create-core-elements';
+ import { createStyledComponents } from './create-styled-components';
+-import { generateTheme } from './generate-theme';
++import { createCSSCustomProperties } from './create-css-custom-properties';
+ import { createToken, DEFAULT_STYLE_SYSTEM_OPTIONS } from './utils';
+ 
+ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
+ 
+ /* eslint-disable jsdoc/valid-types */
+ /**
+- * @template {Record<string, string | number>} TConfig
+- * @template {Record<string, string | number>} TDarkConfig
+- * @template {Record<string, string | number>} THCConfig
+- * @template {Record<string, string | number>} TDarkHCConfig
+- * @template {string} TGeneratedTokens
++ * @template {Record<string, string | number> | {}} TConfig
+  * @typedef CreateStyleSystemObjects
+  * @property {import('./polymorphic-component').CoreElements} core A set of coreElements.
+  * @property {import('../create-compiler').Compiler} compiler The Style system compiler (a custom Emotion instance).
+@@ -25,24 +20,16 @@ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
+  * @property {import('../create-compiler').Compiler['css']} css A function to compile CSS styles.
+  * @property {import('../create-compiler').Compiler['cx']} cx A function to resolve + combine classNames.
+  * @property {(tokenName: string) => string} createToken A function to generate a design token (CSS variable) used by the system.
+- * @property {(value: keyof (TConfig & TDarkConfig & THCConfig & TDarkHCConfig) | TGeneratedTokens) => string} get The primary function to retrieve Style system variables.
++ * @property {(value: keyof TConfig) => string} get The primary function to retrieve Style system variables.
+  * @property {import('./polymorphic-component').CreateStyled} styled A set of styled components.
+  * @property {import('react').ComponentType} View The base <View /> component.
+- * @property {import('../css-custom-properties').RootStore} rootStore The root store.
+  */
+ 
+ /**
+- * @template {Record<string, string | number>} TConfig
+- * @template {Record<string, string | number>} TDarkConfig
+- * @template {Record<string, string | number>} THCConfig
+- * @template {Record<string, string | number>} TDarkHCConfig
+- * @template {string} TGeneratedTokens
++ * @template {Record<string, string | number> | {}} TConfig
+  * @typedef CreateStyleSystemOptions
+  * @property {import('create-emotion').ObjectInterpolation<any>} baseStyles The base styles.
+  * @property {TConfig} config The base theme config.
+- * @property {TDarkConfig} darkModeConfig The dark mode theme config.
+- * @property {THCConfig} highContrastModeConfig The high contrast mode theme config.
+- * @property {TDarkHCConfig} darkHighContrastModeConfig The dark-high contrast mode theme config.
+  * @property {import('../create-compiler').CreateCompilerOptions} [compilerOptions] The compiler options.
+  */
+ /* eslint-enable jsdoc/valid-types */
+@@ -56,44 +43,24 @@ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
+  * const blueStyleSystem = createStyleSystem({ baseStyles });
+  * ```
+  *
+- * @template {Record<string, string | number>} TConfig
+- * @template {Record<string, string | number>} TDarkConfig
+- * @template {Record<string, string | number>} THCConfig
+- * @template {Record<string, string | number>} TDarkHCConfig
+- * @template {string} TGeneratedTokens
+- * @param {CreateStyleSystemOptions<TConfig, TDarkConfig, THCConfig, TDarkHCConfig, TGeneratedTokens>} options Options to create a Style system with.
+- * @return {CreateStyleSystemObjects<TConfig, TDarkConfig, THCConfig, TDarkHCConfig, TGeneratedTokens>} A collection of functions and elements from the generated Style system.
++ * @template {Record<string, string | number> | {}} TConfig
++ * @param {CreateStyleSystemOptions<TConfig>} options Options to create a Style system with.
++ * @return {CreateStyleSystemObjects<TConfig>} A collection of functions and elements from the generated Style system.
+  */
+ export function createStyleSystem( options = defaultOptions ) {
+-	const {
+-		baseStyles,
+-		compilerOptions,
+-		config,
+-		darkHighContrastModeConfig,
+-		darkModeConfig,
+-		highContrastModeConfig,
+-	} = {
++	const { baseStyles, compilerOptions, config } = {
+ 		...defaultOptions,
+ 		...options,
+ 	};
+ 
+-	const globalStyles = generateTheme( {
++	const globalStyles = createCSSCustomProperties( {
+ 		config,
+-		darkHighContrastModeConfig,
+-		darkModeConfig,
+-		highContrastModeConfig,
+ 	} );
+ 
+-	const rootStore = createRootStore( globalStyles.globalVariables );
+-	rootStore.setState( globalStyles.globalVariables );
+-
+ 	/**
+ 	 * Compiler (Custom Emotion instance).
+ 	 */
+-	const compiler = createCompiler( {
+-		...compilerOptions,
+-		rootStore,
+-	} );
++	const compiler = createCompiler( compilerOptions );
+ 	const { css, cx } = compiler;
+ 
+ 	/**
+@@ -137,12 +104,11 @@ export function createStyleSystem( options = defaultOptions ) {
+ 		cx,
+ 		get: (
+ 			/* eslint-disable jsdoc/no-undefined-types */
+-			/** @type {keyof TConfig | keyof TDarkConfig | keyof THCConfig | keyof TDarkHCConfig | TGeneratedTokens} */ key
++			/** @type {keyof TConfig} */ key
+ 			/* eslint-enable jsdoc/no-undefined-types */
+ 		) => `var(${ createToken( key.toString() ) })`,
+ 		styled,
+ 		View,
+-		rootStore,
+ 	};
+ 
+ 	return styleSystem;
+diff --git a/packages/components/src/ui/create-styles/create-style-system/create-styled-components.js b/packages/components/src/ui/create-styles/create-style-system/create-styled-components.js
+index ed28c959ccee71..1580a35bb23a50 100644
+--- a/packages/components/src/ui/create-styles/create-style-system/create-styled-components.js
++++ b/packages/components/src/ui/create-styles/create-style-system/create-styled-components.js
+@@ -38,9 +38,9 @@ export function createStyledComponents( { compiler, core } ) {
+ 	const { css, cx, generateInterpolationName } = compiler;
+ 
+ 	/**
+-	 * That's all a <Box /> is :). A core.div.
++	 * That's all a <View /> is :). A core.div.
+ 	 */
+-	const Box = core.div;
++	const View = core.div;
+ 
+ 	/**
+ 	 *
+@@ -79,7 +79,7 @@ export function createStyledComponents( { compiler, core } ) {
+ 				);
+ 
+ 				return (
+-					<Box
++					<View
+ 						as={ baseTag }
+ 						{ ...mergedProps }
+ 						className={ classes }
+diff --git a/packages/components/src/ui/create-styles/create-style-system/generate-theme.js b/packages/components/src/ui/create-styles/create-style-system/generate-theme.js
+deleted file mode 100644
+index 177664a74b7197..00000000000000
+--- a/packages/components/src/ui/create-styles/create-style-system/generate-theme.js
++++ /dev/null
+@@ -1,84 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { repeat } from 'lodash';
+-
+-/**
+- * Internal dependencies
+- */
+-import {
+-	DARK_HIGH_CONTRAST_MODE_MODE_ATTR,
+-	DARK_MODE_ATTR,
+-	HIGH_CONTRAST_MODE_MODE_ATTR,
+-	MODE_SPECIFICITY_COMPOUND_LEVEL,
+-} from './constants';
+-import {
+-	transformValuesToReferences,
+-	transformValuesToVariables,
+-	transformValuesToVariablesString,
+-} from './utils';
+-
+-/**
+- * @typedef GenerateThemeProps
+- * @property {import('./utils').StyleConfigValues} config Default theme config.
+- * @property {import('./utils').StyleConfigValues} darkModeConfig Dark mode theme config.
+- * @property {import('./utils').StyleConfigValues} highContrastModeConfig High contrast mode theme config.
+- * @property {import('./utils').StyleConfigValues} darkHighContrastModeConfig Dark high contrast mode theme config.
+- */
+-
+-/**
+- * @typedef GenerateThemeResults
+- * @property {import('./utils').StyleConfig} theme A set of theme style references.
+- * @property {import('./utils').StyleConfig} globalVariables A set of global variables.
+- * @property {string} globalCSSVariables The compiled CSS string for global variables.
+- * @property {string} darkModeCSSVariables The compiled CSS string for global dark variables.
+- * @property {string} highContrastModeCSSVariables The compiled CSS string for global high contrast variables.
+- * @property {string} darkHighContrastModeCSSVariables The compiled CSS string for global dark high contrast variables.
+- */
+-
+-/**
+- * Generates theme references and compiles CSS variables to be used by the Style System.
+- *
+- * @param {GenerateThemeProps} props Props to generate a Style system theme with.
+- * @return {GenerateThemeResults} A set of variables and content for the System.
+- */
+-export function generateTheme( {
+-	config = {},
+-	darkModeConfig = {},
+-	highContrastModeConfig = {},
+-	darkHighContrastModeConfig = {},
+-} ) {
+-	const theme = transformValuesToReferences( config );
+-	const globalVariables = transformValuesToVariables( config );
+-	const globalCSSVariables = transformValuesToVariablesString(
+-		':root',
+-		config
+-	);
+-
+-	const darkModeCSSVariables = transformValuesToVariablesString(
+-		repeat( DARK_MODE_ATTR, MODE_SPECIFICITY_COMPOUND_LEVEL ),
+-		darkModeConfig
+-	);
+-
+-	const highContrastModeCSSVariables = transformValuesToVariablesString(
+-		repeat( HIGH_CONTRAST_MODE_MODE_ATTR, MODE_SPECIFICITY_COMPOUND_LEVEL ),
+-		highContrastModeConfig
+-	);
+-
+-	const darkHighContrastModeCSSVariables = transformValuesToVariablesString(
+-		repeat(
+-			DARK_HIGH_CONTRAST_MODE_MODE_ATTR,
+-			MODE_SPECIFICITY_COMPOUND_LEVEL
+-		),
+-		darkHighContrastModeConfig
+-	);
+-
+-	return {
+-		theme,
+-		globalVariables,
+-		globalCSSVariables,
+-		darkModeCSSVariables,
+-		highContrastModeCSSVariables,
+-		darkHighContrastModeCSSVariables,
+-	};
+-}
+diff --git a/packages/components/src/ui/create-styles/css-custom-properties/create-root-store.js b/packages/components/src/ui/create-styles/css-custom-properties/create-root-store.js
+deleted file mode 100644
+index cc3732031bc3db..00000000000000
+--- a/packages/components/src/ui/create-styles/css-custom-properties/create-root-store.js
++++ /dev/null
+@@ -1,111 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { getPropValue } from './get-prop-value';
+-import { hasVariable } from './utils';
+-
+-/**
+- * Stores CSS config variables that are expected to be added to :root.
+- * This is used for CSS variable fallback handling for IE 11.
+- */
+-export class RootStore {
+-	/**
+-	 *
+-	 * @param {Record<string, string>} initialState
+-	 */
+-	constructor( initialState = {} ) {
+-		/**
+-		 * @type {Record<string, string>}
+-		 */
+-		this.state = {};
+-		this.setState( initialState );
+-	}
+-
+-	/**
+-	 * Retrieve a value from the state.
+-	 *
+-	 * @param {string} key The key to retrieve.
+-	 * @return {string} The value.
+-	 */
+-	get( key ) {
+-		return this.state[ key ];
+-	}
+-
+-	/**
+-	 * Retrieves the current state.
+-	 *
+-	 * @return {Record<string, string>} The state.
+-	 */
+-	getState() {
+-		return this.state;
+-	}
+-
+-	/**
+-	 * Sets the state.
+-	 *
+-	 * @param {Record<string, string>} next The next state to merge into the current state.
+-	 * @return {Record<string, string>} The state.
+-	 */
+-	setState( next = {} ) {
+-		this._updateState( next );
+-		this._resolveVariablesInStateValue();
+-
+-		return this.state;
+-	}
+-
+-	/**
+-	 * Updates the state.
+-	 *
+-	 * @param {Record<string, string>} next The next state to merge into the current state.
+-	 */
+-	_updateState( next = {} ) {
+-		this.state = Object.freeze( { ...this.state, ...next } );
+-	}
+-
+-	/**
+-	 * Resolves potential CSS variables that may exist within the state's values.
+-	 */
+-	_resolveVariablesInStateValue() {
+-		/** @type {Record<string, string>} */
+-		const next = {};
+-		/**
+-		 * Filter out entries so that we only target values with CSS variables.
+-		 */
+-		const entries = Object.entries( this.state ).filter( ( [ , v ] ) =>
+-			hasVariable( v )
+-		);
+-
+-		for ( const [ k, v ] of entries ) {
+-			const [ , value ] = getPropValue( `resolve: ${ v }`, this );
+-			/**
+-			 * Set the value for the next state, if available.
+-			 */
+-			if ( value ) {
+-				next[ k ] = value;
+-			}
+-		}
+-
+-		this._updateState( next );
+-
+-		/**
+-		 * Run this function again if there are any unresolved values.
+-		 */
+-		if ( entries.length ) {
+-			this._resolveVariablesInStateValue();
+-		}
+-	}
+-}
+-
+-/**
+- * Creates a RootStore instance.
+- * This store contains a collection of CSS variables that is expected to
+- * be added to the :root {} node.
+- *
+- * @param {Record<string, string>} initialState The initial config.
+- * @return {RootStore} The RootStore instance.
+- */
+-export function createRootStore( initialState = {} ) {
+-	const store = new RootStore( initialState );
+-
+-	return store;
+-}
+diff --git a/packages/components/src/ui/create-styles/css-custom-properties/get-prop-value.js b/packages/components/src/ui/create-styles/css-custom-properties/get-prop-value.js
+deleted file mode 100644
+index 0dac5f3d87e96c..00000000000000
+--- a/packages/components/src/ui/create-styles/css-custom-properties/get-prop-value.js
++++ /dev/null
+@@ -1,71 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { sanitizeParens, VAR_REG_EXP } from './utils';
+-
+-/**
+- * Interprets and retrieves the CSS property and value of a declaration rule.
+- *
+- * @param {string} declaration A CSS declaration rule to parse.
+- * @param {import('./create-root-store').RootStore} rootStore A store for CSS root variables.
+- * @return {[string, string | undefined]} [prop, value] parsed from the declaration.
+- */
+-export function getPropValue( declaration, rootStore ) {
+-	let hasFallbackValue = false;
+-	// Start be separating (and preparing) the prop and value from the declaration.
+-	/** @type {string} */
+-	let prop;
+-	/** @type {string | undefined} */
+-	let value;
+-	[ prop, value ] = declaration.split( /:/ );
+-	prop = prop.trim();
+-
+-	// Searching for uses of var().
+-	const matches =
+-		value.match( VAR_REG_EXP ) ||
+-		/* istanbul ignore next */
+-		[];
+-
+-	for ( let match of matches ) {
+-		match = match.trim();
+-		// Splitting again allows us to traverse through nested vars().
+-		const entries = match
+-			.replace( / /g, '' )
+-			.split( 'var(' )
+-			.filter( Boolean );
+-
+-		for ( const entry of entries ) {
+-			// Removes extra parentheses
+-			const parsedValue = sanitizeParens( entry );
+-			/**
+-			 * Splits a CSS variable into it's custom property name and fallback.
+-			 *
+-			 * Before:
+-			 * '--bg, black'
+-			 *
+-			 * After:
+-			 * ['--bg', 'black']
+-			 */
+-			const [ customProp, ...fallbacks ] = parsedValue.split( ',' );
+-			const customFallback = fallbacks.join( ',' );
+-
+-			// Attempt to get the CSS variable from rootStore. Otherwise, use the provided fallback.
+-			const fallback =
+-				( rootStore && rootStore.get( customProp ) ) || customFallback;
+-
+-			if ( fallback ) {
+-				hasFallbackValue = true;
+-				/*
+-				 * If a valid fallback value is discovered, we'll replace it in
+-				 * our value.
+-				 */
+-				value = value.replace( match, fallback );
+-			}
+-		}
+-	}
+-
+-	// We only want to return a value if we're able to locate a fallback value.
+-	value = hasFallbackValue ? sanitizeParens( value ) : undefined;
+-
+-	return [ prop, value ];
+-}
+diff --git a/packages/components/src/ui/create-styles/css-custom-properties/index.js b/packages/components/src/ui/create-styles/css-custom-properties/index.js
+deleted file mode 100644
+index f201ad165ca269..00000000000000
+--- a/packages/components/src/ui/create-styles/css-custom-properties/index.js
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export * from './create-root-store';
+-export * from './get-prop-value';
+diff --git a/packages/components/src/ui/create-styles/css-custom-properties/transform-content.js b/packages/components/src/ui/create-styles/css-custom-properties/transform-content.js
+deleted file mode 100644
+index 384456446b02de..00000000000000
+--- a/packages/components/src/ui/create-styles/css-custom-properties/transform-content.js
++++ /dev/null
+@@ -1,98 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import memoize from 'memize';
+-
+-/**
+- * Internal dependencies
+- */
+-import { getPropValue } from './get-prop-value';
+-import { hasVariable, isCustomProperty } from './utils';
+-
+-/**
+- * Interprets and retrieves the CSS fallback value of a declaration rule.
+- *
+- * @param {string} declaration A CSS declaration rule to parse.
+- * @param {import('./create-root-store').RootStore} rootStore A store for CSS root variables.
+- * @return {string | undefined} A CSS declaration rule with a fallback (if applicable).
+- */
+-export function getFallbackDeclaration( declaration, rootStore ) {
+-	if ( ! hasVariable( declaration ) && ! isCustomProperty( declaration ) )
+-		return undefined;
+-
+-	const [ prop, value ] = getPropValue( declaration, rootStore );
+-
+-	return value ? [ prop, value ].join( ':' ) : undefined;
+-}
+-
+-/**
+- * Parses the incoming content from stylis to add fallback CSS values for
+- * variables.
+- *
+- * @param {string} content Stylis content to parse.
+- * @param {import('./create-root-store').RootStore} rootStore A store for CSS root variables.
+- * @return {string | undefined} The transformed content with CSS variable fallbacks.
+- */
+-export function baseTransformContent( content, rootStore ) {
+-	/*
+-	 * Attempts to deconstruct the content to retrieve prop/value
+-	 * CSS declaration pairs.
+-	 *
+-	 * Before:
+-	 * 'background-color:var(--bg, black); font-size:14px;'
+-	 *
+-	 * After:
+-	 * ['background-color:var(--bg, black)', ' font-size:14px']
+-	 */
+-	const declarations = content.split( ';' ).filter( Boolean );
+-	let didTransform = false;
+-
+-	/*
+-	 * With the declaration collection, we'll iterate over every declaration
+-	 * to provide fallbacks (if applicable.)
+-	 */
+-	const parsed = declarations.reduce( (
+-		/** @type {string[]} */ styles,
+-		/** @type {string} */ declaration
+-	) => {
+-		// If no CSS variable is used, we return the declaration untouched.
+-		if ( ! hasVariable( declaration ) ) {
+-			return [ ...styles, declaration ];
+-		}
+-		// Retrieve the fallback a CSS variable is used in this declaration.
+-		const fallback = getFallbackDeclaration( declaration, rootStore );
+-		/*
+-		 * Prepend the fallback in our styles set.
+-		 *
+-		 * Before:
+-		 * [
+-		 * 	 ...styles,
+-		 *   'background-color:var(--bg, black);'
+-		 * ]
+-		 *
+-		 * After:
+-		 * [
+-		 * 	 ...styles,
+-		 *   'background:black;',
+-		 *   'background-color:var(--bg, black);'
+-		 * ]
+-		 */
+-		if ( fallback ) {
+-			didTransform = true;
+-
+-			return [ ...styles, fallback, declaration ];
+-		}
+-		return [ ...styles, declaration ];
+-	}, [] );
+-
+-	/*
+-	 * We'll rejoin our declarations with a ; separator.
+-	 * Note: We need to add a ; at the end for stylis to interpret correctly.
+-	 */
+-	const result = parsed.join( ';' ).concat( ';' );
+-
+-	// We only want to return a value if we're able to locate a fallback value.
+-	return didTransform ? result : undefined;
+-}
+-
+-export const transformContent = memoize( baseTransformContent );
+diff --git a/packages/components/src/ui/create-styles/css-custom-properties/utils.js b/packages/components/src/ui/create-styles/css-custom-properties/utils.js
+deleted file mode 100644
+index f5a30e7921b0ae..00000000000000
+--- a/packages/components/src/ui/create-styles/css-custom-properties/utils.js
++++ /dev/null
+@@ -1,54 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { repeat } from 'lodash';
+-
+-export const VAR_REG_EXP = new RegExp( /var\(.*?\)[ ) ]*/, 'g' );
+-
+-/**
+- * Checks to see if a CSS declaration rule is a CSS variable (e.g. --font: 14px)
+- *
+- * @param {string} declaration  A CSS declaration rule.
+- * @return {boolean} Result of whether declaration is a CSS variable.
+- */
+-export function isCustomProperty( declaration ) {
+-	return declaration.indexOf( '--' ) === 0;
+-}
+-
+-/**
+- * Checks to see if a CSS declaration rule uses var().
+- *
+- * @param {string} declaration  A CSS declaration rule.
+- * @return {boolean} Result of whether declaration contains a CSS variable.
+- */
+-export function hasVariable( declaration ) {
+-	return declaration?.includes?.( 'var(' );
+-}
+-
+-/**
+- * Appends or trims parens from a value.
+- *
+- * @param {string} value Value to sanitize.
+- * @return {string} The sanitized value
+- */
+-export function sanitizeParens( value ) {
+-	const parenStartCount = value.match( /\(/g )?.length || 0;
+-	const parenEndCount = value.match( /\)/g )?.length || 0;
+-
+-	const parenAppendCound = parenStartCount - parenEndCount;
+-	const parenTrimCount = parenEndCount - parenStartCount;
+-
+-	let result;
+-
+-	if ( parenStartCount > parenEndCount ) {
+-		// We need to append ) to the end if there are any missing.
+-		const append = repeat( ')', parenAppendCound );
+-		result = `${ value }${ append }`;
+-	} else {
+-		// Otherwise, we need to trim the extra parens at the end.
+-		const trimRegExp = new RegExp( `((\\)){${ parenTrimCount }})$`, 'gi' );
+-		result = value.replace( trimRegExp, '' );
+-	}
+-
+-	return result?.trim();
+-}
+diff --git a/packages/components/src/ui/create-styles/hooks/use-hydrate-global-styles.js b/packages/components/src/ui/create-styles/hooks/use-hydrate-global-styles.js
+index 35754273063144..8a10c17b4bf1a6 100644
+--- a/packages/components/src/ui/create-styles/hooks/use-hydrate-global-styles.js
++++ b/packages/components/src/ui/create-styles/hooks/use-hydrate-global-styles.js
+@@ -6,7 +6,7 @@ const __INTERNAL_STATE__ = {
+ /**
+  * @typedef UseHydrateGlobalStylesProps
+  * @property {import('create-emotion').Emotion['injectGlobal']} injectGlobal injectGlobal function from the compiler (Emotion).
+- * @property {import('../create-style-system/generate-theme').GenerateThemeResults} globalStyles Global style values to be injected.
++ * @property {import('../create-style-system/create-css-custom-properties').CreateCSSCustomPropertiesResults} globalStyles Global style values to be injected.
+  */
+ /* eslint-enable jsdoc/valid-types */
+ 
+@@ -25,12 +25,7 @@ const __INTERNAL_STATE__ = {
+ export function useHydrateGlobalStyles( { globalStyles, injectGlobal } ) {
+ 	if ( __INTERNAL_STATE__.didInjectGlobal ) return;
+ 
+-	const {
+-		darkHighContrastModeCSSVariables,
+-		darkModeCSSVariables,
+-		globalCSSVariables,
+-		highContrastModeCSSVariables,
+-	} = globalStyles;
++	const { globalCSSVariables } = globalStyles;
+ 
+ 	/**
+ 	 * Using the compiler's (Emotion) injectGlobal function.
+@@ -39,9 +34,6 @@ export function useHydrateGlobalStyles( { globalStyles, injectGlobal } ) {
+ 		// eslint-disable-next-line no-unused-expressions
+ 		injectGlobal`
+ 			${ globalCSSVariables };
+-			${ darkModeCSSVariables };
+-			${ highContrastModeCSSVariables };
+-			${ darkHighContrastModeCSSVariables };
+ 		`;
+ 
+ 		/**
+diff --git a/packages/components/src/ui/styles/README.md b/packages/components/src/ui/styles/README.md
+new file mode 100644
+index 00000000000000..5e0ad0cbcc14f8
+--- /dev/null
++++ b/packages/components/src/ui/styles/README.md
+@@ -0,0 +1,56 @@
++# styles
++
++## The `ui` object
++
++The primary API that `styles` exposes is the `ui` object. It contains the following properties:
++
++- `get`: Retrieves a pre-defined set of CSS Custom Properties. See [Theme Configuration](#theme-configuration) below.
++- `flow`: Described below.
++- `space`: Described below.
++
++## Theme Configuration
++
++Each of the configs declares overrides for the theme variables. The overall list of available theme variables is declared in [`styles/theme/config.js`](./theme/config.js). Individual overrides can be found in [`styles/theme/dark-mode-config.js`](./theme/dark-mode-config.js), [`styles/theme/high-contrast-mode-config.js`](./theme/high-contrast-mode-config.js), and [`styles/theme/dark-high-contrast-mode-config.js`](./theme/dark-high-contrast-mode-config.js).
++
++Variables added to the overarching config should align with variables declared in the `base-styles` package.
++
++These variables are accessed via the `ui.get` helper exported from `styles` and are exposed as CSS Custom Properties.
++## Mixins
++
++Mixins are helper functions for composing and building styles.
++
++### `space`
++
++`space` is the core of the style system's spacing system. It will automatically transform a given space value into the correct spacing for the theme based off the `gridBase` variable. It can accept any number value.
++
++### `flow`
++
++Combines CSS values. Useful for complex shorthand values,  functions (e.g. calc()), and mixed string/JS values.
++
++
++```js
++const boxShadow = flow(
++	'0 1px',
++	get( 'gray900' ),
++	'2px',
++	get('gray400')
++)
++```
++
++#### Combining groups
++
++Groups (`Array<string>`) can be passed into `flow()`, which re combined and comma separated. Useful for compounded CSS values (e.g. box-shadow`).
++
++```js
++const boxShadow = flow( [
++	'0 1px',
++	get( 'gray900' ),
++	'2px',
++	get( 'gray400' )
++], [
++	'0 10px',
++	get( 'gray900' ),
++	'20px',
++	get( 'gray300' )
++] );
++```
+diff --git a/packages/components/src/ui/styles/components/README.md b/packages/components/src/ui/styles/components/README.md
+new file mode 100644
+index 00000000000000..bdd111840e65a2
+--- /dev/null
++++ b/packages/components/src/ui/styles/components/README.md
+@@ -0,0 +1,34 @@
++# Components
++
++## StyleFrameProvider
++
++This component ensures styles generated by the Style System work when components are rendered within an iFrame.
++
++### Usage
++
++Wrap any components using the Style System with the `StyleFrameProvider` when rendering within an iFrame.
++
++```jsx
++import { StyleFrameProvider } from '@wp-g2/styles';
++import { View } from '@wp-g2/components';
++import Frame from 'react-frame-component'; // Works with any iFrame component.
++
++function Example() {
++	return (
++		<Frame>
++			<StyleFrameProvider>
++				<View>...</View>
++			</StyleFrameProvider>
++		</Frame>
++	);
++}
++```
++
++### Problem
++
++By default, [CSS-in-JS](https://emotion.sh/docs/introduction) system injects styles to the `document` `<head>` of the main `window`. Under regular use-cases, this works perfectly fine, as there would ever be a single window. However, with iFrames, the styles need to inject to the iFrame's `window`.
++
++### Solution
++
++The `StyleFrameProvider` coordinates with the Style System's renderer to ensure that the styles are injected to the **correct** `window`.
++
+diff --git a/packages/components/src/ui/styles/components/box.js b/packages/components/src/ui/styles/components/box.js
+new file mode 100644
+index 00000000000000..23711b7ed2f0b2
+--- /dev/null
++++ b/packages/components/src/ui/styles/components/box.js
+@@ -0,0 +1,6 @@
++/**
++ * Internal dependencies
++ */
++import { core } from '../core';
++
++export const View = core.div;
+diff --git a/packages/components/src/ui/styles/components/index.js b/packages/components/src/ui/styles/components/index.js
+new file mode 100644
+index 00000000000000..65d68d90977702
+--- /dev/null
++++ b/packages/components/src/ui/styles/components/index.js
+@@ -0,0 +1,2 @@
++export * from './box';
++export * from './style-frame-provider';
+diff --git a/packages/components/src/ui/styles/components/style-frame-provider.js b/packages/components/src/ui/styles/components/style-frame-provider.js
+new file mode 100644
+index 00000000000000..27553a026e6bc6
+--- /dev/null
++++ b/packages/components/src/ui/styles/components/style-frame-provider.js
+@@ -0,0 +1,221 @@
++/**
++ * WordPress dependencies
++ */
++import { useEffect, useRef } from '@wordpress/element';
++import warn from '@wordpress/warning';
++
++/**
++ * Internal dependencies
++ */
++import { compiler } from '../system';
++
++const { cache } = compiler;
++
++/**
++ * @typedef StyleFrameProviderProps
++ * @property {import('react').ReactNode} children Children elements to render.
++ */
++
++/**
++ * A special Provider designed specifically for iFrame usage.
++ * Components using the style system's styled that render within will have their
++ * styles injected and rendered correctly within the iFrame out-of-the-box.
++ *
++ * No external stylesheet loading is necessary when using <StyleFrameProvider />.
++ *
++ * @example
++ * ```jsx
++ * <Frame>
++ *   <StyleFrameProvider>
++ *     <Button>Code is Poetry</Button>
++ *   </StyleFrameProvider>
++ * </Frame>
++ * ```
++ *
++ * @param {StyleFrameProviderProps} props Props for the Provider.
++ */
++export function StyleFrameProvider( { children } ) {
++	const ref = useRef( null );
++	useEmotionSheetInsert( { ref } );
++	useEmotionInitialTagSync( { ref } );
++
++	/**
++	 * Rendering the contents within a <div /> in order for React
++	 * to retrieve the correct Frame.document (via ownerDocument.)
++	 */
++	return <div ref={ ref }>{ children }</div>;
++}
++
++/**
++ * Initially syncs existing Emotion tags (from cache) into the Frame head by
++ * cloning and injecting the tags into the DOM.
++ *
++ * @param {Object} options
++ * @param {import('react').RefObject<Node>} options.ref
++ */
++function useEmotionInitialTagSync( { ref } ) {
++	useEffect( () => {
++		const ownerDocument = ref.current?.ownerDocument;
++		if ( ! ownerDocument ) return;
++
++		const head = ownerDocument.querySelector( 'head' );
++
++		try {
++			/**
++			 * Account for compiler (Emotion) isSpeedy rendering, which occurs
++			 * for production builds.
++			 */
++			// @ts-ignore isSpeedy is an unexposed property
++			if ( cache.sheet.isSpeedy ) {
++				let speedyTag = cache.sheet.tags[ 0 ];
++				/**
++				 * Locate the styleSheet instance within document.styleSheet
++				 * based on the speed (style) tag match.
++				 */
++				const speedySheet = Object.values( document.styleSheets ).find(
++					( sheet ) => sheet.ownerNode === speedyTag
++				);
++				if ( speedySheet ) {
++					/**
++					 * The compiler's speedy mode inserts the cssRule directly
++					 * into the styleSheet instance, rather than as a textNode in
++					 * a style tag. We can retrieve this via the styleSheet instance
++					 * cssRule.
++					 */
++					const initialStyles = Object.values( speedySheet.cssRules )
++						.map( ( cssRule ) => cssRule.cssText )
++						.join( '\n' );
++
++					/**
++					 * Clone the speed style tag, and append it into the target (frame)
++					 * document head.
++					 */
++					// @ts-ignore cloneNode type is weak
++					speedyTag = speedyTag.cloneNode( true );
++					speedyTag.innerHTML = initialStyles;
++
++					if ( head ) {
++						head.appendChild( speedyTag );
++					}
++				}
++			} else if ( cache.sheet.tags ) {
++				/**
++				 * Otherwise, loop through all of the cache sheet tags, and clone
++				 * them into the targeted (frame) document head.
++				 */
++				cache.sheet.tags.forEach( ( tag ) => {
++					if ( head ) {
++						head.appendChild( tag.cloneNode( true ) );
++					}
++				} );
++			}
++		} catch ( e ) {
++			warn(
++				`There was a problem syncing Style rules from window.document. ${ e }`
++			);
++		}
++	}, [ ref ] );
++}
++
++/**
++ * Inserts individual rules compiled by Emotion into the Frame's
++ * document.styleSheet object by using the same technique as Emotion's
++ * sheet class.
++ *
++ * @param {Object} props
++ * @param {import('react').RefObject<HTMLElement>} props.ref
++ */
++function useEmotionSheetInsert( { ref } ) {
++	/**
++	 * The following insert code is found in Emotion's sheet class, specifically,
++	 * the insert method. We're replicating that functionality to insert
++	 * the style rules into the Frame's container (document.head).
++	 *
++	 * https://github.com/emotion-js/emotion/blob/master/packages/sheet/src/index.js
++	 */
++	useEffect( () => {
++		const ownerDocument = ref.current?.ownerDocument;
++		if ( ! ownerDocument ) return;
++
++		const head = ownerDocument.querySelector( 'head' );
++
++		if ( ! head ) {
++			return;
++		}
++
++		const sheetForTag = () => {
++			let tag = head.querySelector( 'style[data-style-system-frame]' );
++
++			if ( ! tag ) {
++				tag = ownerDocument.createElement( 'style' );
++				tag.setAttribute( 'data-style-system-frame', 'true' );
++				head.appendChild( tag );
++			}
++
++			const sheet = /** @type {HTMLStyleElement} */ ( tag ).sheet;
++
++			if ( sheet ) {
++				return sheet;
++			}
++
++			// this weirdness brought to you by firefox
++			for ( let i = 0; i < ownerDocument.styleSheets.length; i++ ) {
++				if ( ownerDocument.styleSheets[ i ].ownerNode === tag ) {
++					return ownerDocument.styleSheets[ i ];
++				}
++			}
++
++			throw new Error( 'Unable to find sheet for tag' );
++		};
++
++		const renderStyleRule = ( /** @type {string | undefined} */ rule ) => {
++			if ( ! rule ) {
++				return;
++			}
++			try {
++				const sheet = sheetForTag();
++				// this is a really hot path
++				// we check the second character first because having "i"
++				// as the second character will happen less often than
++				// having "@" as the first character
++				const isImportRule =
++					rule.charCodeAt( 1 ) === 105 && rule.charCodeAt( 0 ) === 64;
++				// this is the ultrafast version, works across browsers
++				// the big drawback is that the css won't be editable in devtools
++				sheet.insertRule(
++					rule,
++					// we need to insert @import rules before anything else
++					// otherwise there will be an error
++					// technically this means that the @import rules will
++					// _usually_(not always since there could be multiple style tags)
++					// be the first ones in prod and generally later in dev
++					// this shouldn't really matter in the real world though
++					// @import is generally only used for font faces from google fonts and etc.
++					// so while this could be technically correct then it would be slower and larger
++					// for a tiny bit of correctness that won't matter in the real world
++					isImportRule ? 0 : sheet.cssRules.length
++				);
++			} catch ( e ) {
++				warn(
++					`There was a problem inserting the following rule: "${ rule }", ${ e }`
++				);
++			}
++		};
++
++		/**
++		 * The compiler (Emotion) has a special event emitter (pub/sub) that emits
++		 * an event whenever the compiler sheet inserts a rule.
++		 *
++		 * We're subscribing to these events in order to sync the insertion from
++		 * the primary Emotion document (window) to the Frame document.
++		 */
++		compiler.__events.on( 'sheet.insert', renderStyleRule );
++
++		return () => {
++			/**
++			 * Unsubscribe to the events.
++			 */
++			compiler.__events.off( 'sheet.insert', renderStyleRule );
++		};
++	}, [ ref ] );
++}
+diff --git a/packages/components/src/ui/styles/core.js b/packages/components/src/ui/styles/core.js
+new file mode 100644
+index 00000000000000..7f5ae8b116fc56
+--- /dev/null
++++ b/packages/components/src/ui/styles/core.js
+@@ -0,0 +1 @@
++export { core, get, createToken, createCoreElement, compiler } from './system';
+diff --git a/packages/components/src/ui/styles/css.js b/packages/components/src/ui/styles/css.js
+new file mode 100644
+index 00000000000000..8a428295b89c21
+--- /dev/null
++++ b/packages/components/src/ui/styles/css.js
+@@ -0,0 +1,134 @@
++/**
++ * External dependencies
++ */
++import { isPlainObject } from 'lodash';
++
++/**
++ * Internal dependencies
++ */
++import { INTERPOLATION_CLASS_NAME, responsive } from '../create-styles';
++import { space } from './mixins/space';
++import { compiler } from './system';
++const { css: compile } = compiler;
++
++// Inspired by:
++// https://github.com/system-ui/theme-ui/blob/master/packages/css/src/index.ts
++
++export const scales = {
++	gridGap: 'space',
++	gridColumnGap: 'space',
++	gridRowGap: 'space',
++	gap: 'space',
++	columnGap: 'space',
++	rowGap: 'space',
++};
++
++const transformFns = {
++	space,
++};
++
++/**
++ * Retrieves a scaled values from the Style system based on a style key.
++ *
++ * @param {string} key The style key to scale.
++ * @param {any} value The style value to scale.
++ * @return {any} The scaled value.
++ */
++export function getScaleValue( key, value ) {
++	const scale = scales[ /** @type {keyof scales} */ ( key ) ];
++	let next = value;
++
++	if ( scale ) {
++		const transformFn =
++			transformFns[ /** @type {keyof transformFns} */ ( scale ) ];
++		if ( transformFns ) {
++			next = transformFn( value );
++		}
++	}
++
++	return next;
++}
++
++/**
++ * Transform a style object with scaled values from the Style system.
++ *
++ * @param {import('@emotion/serialize').ObjectInterpolation<any>} styles The style object to transform.
++ * @return {import('@emotion/serialize').ObjectInterpolation<any>} The style object with scaled values.
++ */
++export function getScaleStyles( styles = {} ) {
++	/** @type {Record<string, string>} */
++	const next = {};
++
++	for ( const k in styles ) {
++		next[ k ] = getScaleValue( k, styles[ k ] );
++	}
++
++	return next;
++}
++
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param {any} value
++ * @return {value is import('@wp-g2/create-styles').PolymorphicComponent<any, any>} Whether interpolation is a PolymorphicComponent.
++ */
++function isPolymorphicComponent( value ) {
++	/* eslint-enable jsdoc/valid-types */
++	return value && typeof value[ INTERPOLATION_CLASS_NAME ] !== 'undefined';
++}
++
++/* eslint-disable jsdoc/no-undefined-types */
++/**
++ * Enhances the (create-system enhanced) CSS function to account for
++ * scale functions within the Style system.
++ *
++ * @param {TemplateStringsArray | import('create-emotion').Interpolation<undefined>} template
++ * @param {(import('create-emotion').Interpolation<undefined> | import('@wp-g2/create-styles').PolymorphicComponent<any, any>)[]} args The styles to compile.
++ * @return {ReturnType<compile>} The compiled styles.
++ */
++export function css( template, ...args ) {
++	/* eslint-enable jsdoc/no-undefined-types */
++	if ( isPlainObject( template ) ) {
++		return compile(
++			getScaleStyles(
++				responsive(
++					/** @type {ObjectInterpolation} */ ( template ),
++					getScaleValue
++				)
++			)
++		);
++	}
++
++	if ( Array.isArray( template ) ) {
++		for ( let i = 0, len = template.length; i < len; i++ ) {
++			const n = template[ i ];
++
++			if ( isPlainObject( n ) ) {
++				template[ i ] = getScaleStyles(
++					responsive(
++						/** @type {ObjectInterpolation} */ ( n ),
++						getScaleValue
++					)
++				);
++			}
++		}
++
++		const nextArgs = args.map( ( arg ) => {
++			if ( ! arg ) {
++				return arg;
++			}
++
++			if ( isPolymorphicComponent( arg ) ) {
++				return `.${ arg[ INTERPOLATION_CLASS_NAME ] }`;
++			}
++
++			return arg;
++		} );
++
++		return compile( template, ...nextArgs );
++	}
++
++	// @ts-ignore Emotion says `css` doesn't take `TemplateStringsArray` but it does!
++	return compile( template, ...args );
++}
++
++/** @typedef {import('create-emotion').ObjectInterpolation<any>} ObjectInterpolation */
+diff --git a/packages/components/src/ui/styles/hooks/README.md b/packages/components/src/ui/styles/hooks/README.md
+new file mode 100644
+index 00000000000000..9e410b1a44c7b2
+--- /dev/null
++++ b/packages/components/src/ui/styles/hooks/README.md
+@@ -0,0 +1,47 @@
++# hooks
++
++## useResponsiveValue
++
++`useResponsiveValue` is a hook that allows a component to declare a responsive API. For example, if a component wishes to provide the ability to have its `size` prop be responsive, it would delcare the type as follows:
++
++```ts
++type Size = 'small' | 'medium' | 'large';
++
++interface Props {
++	size: Size | Size[]
++}
++```
++
++Then the component itself will implement `useResponsiveValue`:
++
++```tsx
++function Component( { size: sizeProp, className }: ViewOwnProps< Props, 'div' >, forwardedRef: Ref< any > ) {
++	const ref = useRef();
++
++	const size = useResponsiveValue( ref.current, sizeProp );
++
++	const classes = cx(
++		className,
++		size && styles.sizes[ size ]
++	);
++
++	return (
++		<div
++			className={ classes }
++			ref={ mergeRefs( [ forwardedRef, ref ] ) }
++		>
++			Code is Poetry!
++		</div>
++	);
++}
++```
++
++This allows `size` to behave exactly as the "Breakpoint Values" as described by [`create-styles/create-compiler/README.md#breakpoint-values`](../../create-styles/create-compiler/README.md#breakpoint-values).
++
++That is, if a single size is passed in, it will be used. However if size is passed in as an array like so:
++
++```tsx
++<Component size={ [ 'medium', 'small', 'large' ] } />
++```
++
++Then the size corresponding to the given breakpoint will be used. See [`create-styles/create-compiler/README.md#breakpoint-values`](../../create-styles/create-compiler/README.md#breakpoint-values) for more details and examples.
+diff --git a/packages/components/src/ui/styles/hooks/index.js b/packages/components/src/ui/styles/hooks/index.js
+new file mode 100644
+index 00000000000000..2571f0e6e5e726
+--- /dev/null
++++ b/packages/components/src/ui/styles/hooks/index.js
+@@ -0,0 +1 @@
++export * from './use-responsive-value';
+diff --git a/packages/components/src/ui/styles/hooks/use-responsive-value.js b/packages/components/src/ui/styles/hooks/use-responsive-value.js
+new file mode 100644
+index 00000000000000..baa9001b0d8e78
+--- /dev/null
++++ b/packages/components/src/ui/styles/hooks/use-responsive-value.js
+@@ -0,0 +1,88 @@
++/**
++ * WordPress dependencies
++ */
++import { useEffect, useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { breakpoints } from '../style-system';
++
++/**
++ * @param {Node} node
++ * @param {Object} [options]
++ * @param {number} [options.defaultIndex=0]
++ */
++export const useBreakpointIndex = ( node, options = {} ) => {
++	const { defaultIndex = 0 } = options;
++
++	if ( typeof defaultIndex !== 'number' ) {
++		throw new TypeError(
++			`Default breakpoint index should be a number. Got: ${ defaultIndex }, ${ typeof defaultIndex }`
++		);
++	} else if ( defaultIndex < 0 || defaultIndex > breakpoints.length - 1 ) {
++		throw new RangeError(
++			`Default breakpoint index out of range. Theme has ${ breakpoints.length } breakpoints, got index ${ defaultIndex }`
++		);
++	}
++
++	const [ value, setValue ] = useState( defaultIndex );
++
++	useEffect( () => {
++		const getIndex = () =>
++			breakpoints.filter( ( bp ) => {
++				return typeof window !== 'undefined'
++					? window.matchMedia( `screen and (min-width: ${ bp })` )
++							.matches
++					: false;
++			} ).length;
++
++		const onResize = () => {
++			const newValue = getIndex();
++			if ( value !== newValue ) {
++				setValue( newValue );
++			}
++		};
++
++		onResize();
++
++		if ( node.ownerDocument ) {
++			node.ownerDocument.addEventListener( 'resize', onResize );
++		}
++		return () => {
++			if ( node.ownerDocument ) {
++				node.ownerDocument.removeEventListener( 'resize', onResize );
++			}
++		};
++	}, [ value ] );
++
++	return value;
++};
++
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @template T
++ * @param {Node} node
++ * @param {(() => (T | undefined)[]) | (T | undefined)[]} values
++ * @param {Parameters<useBreakpointIndex>[1]} options
++ * @return {T | undefined} The responsive value for the breakpoint or the default value.
++ */
++export function useResponsiveValue( node, values, options = {} ) {
++	/* eslint-enable jsdoc/valid-types */
++	const index = useBreakpointIndex( node, options );
++
++	// Allow calling the function with a "normal" value without having to check on the outside.
++	if ( ! Array.isArray( values ) && typeof values !== 'function' )
++		return values;
++
++	let array = values || [];
++	if ( typeof values === 'function' ) {
++		array = values();
++	}
++
++	/* eslint-disable jsdoc/no-undefined-types */
++	return /** @type {T[]} */ ( array )[
++		/* eslint-enable jsdoc/no-undefined-types */
++		index >= array.length ? array.length - 1 : index
++	];
++}
+diff --git a/packages/components/src/ui/styles/index.js b/packages/components/src/ui/styles/index.js
+new file mode 100644
+index 00000000000000..1117b27c4c52ad
+--- /dev/null
++++ b/packages/components/src/ui/styles/index.js
+@@ -0,0 +1,9 @@
++export { css } from './css';
++export { core } from './core';
++export { cache, cx, injectGlobal, keyframes } from './style-system';
++export { styled } from './styled';
++export { useResponsiveValue } from './hooks';
++export { ui } from './ui';
++
++/** @typedef {import('./components').StyleFrameProviderProps} StyleFrameProviderProps */
++export { StyleFrameProvider, View } from './components';
+diff --git a/packages/components/src/ui/styles/mixins/flow.js b/packages/components/src/ui/styles/mixins/flow.js
+new file mode 100644
+index 00000000000000..618d5ef79f6cec
+--- /dev/null
++++ b/packages/components/src/ui/styles/mixins/flow.js
+@@ -0,0 +1,55 @@
++/** @typedef {number | string} FlowValue */
++
++/**
++ * Combines CSS values. Useful for complex shorthand values,
++ * functions (e.g. calc()), and mixed string/JS values.
++ *
++ * @example
++ * ```
++ * const boxShadow = flow(
++ * 	'0 1px',
++ * 	get('boxShadowSpreadValue'),
++ * 	'2px',
++ * 	get('boxShadowColor')
++ * )
++ * ```
++ *
++ * ##### Combining groups
++ *
++ * Groups (Array<string>) can be passed into `flow()`, which are combined and
++ * comma separated. Useful for compounded CSS values (e.g. `box-shadow`).
++ *
++ * @example
++ * ```
++ * const boxShadow = flow([
++ * 		'0 1px',
++ * 		get('boxShadowSpreadValue'),
++ * 		'2px',
++ * 		get('boxShadowColor')
++ * 	], [
++ * 		'0 10px',
++ * 		get('boxShadowSpreadValue'),
++ * 		'20px',
++ * 		get('boxShadowColor')
++ * 	]
++ * )
++ * ```
++ *
++ * @param {(FlowValue | FlowValue[])[]} args CSS values to combine.
++ * @return {string} The combined CSS string value.
++ */
++export function flow( ...args ) {
++	/** @type {FlowValue[]} */
++	const results = [];
++
++	for ( const arg of args ) {
++		if ( typeof arg === 'number' || typeof arg === 'string' ) {
++			results.push( arg );
++		}
++		if ( Array.isArray( arg ) ) {
++			results.push( flow( ...arg ), ',' );
++		}
++	}
++
++	return results.join( ' ' ).trim().replace( /,$/, '' );
++}
+diff --git a/packages/components/src/ui/styles/mixins/index.js b/packages/components/src/ui/styles/mixins/index.js
+new file mode 100644
+index 00000000000000..a3c9a6353a2b21
+--- /dev/null
++++ b/packages/components/src/ui/styles/mixins/index.js
+@@ -0,0 +1,2 @@
++export { space } from './space';
++export { flow } from './flow';
+diff --git a/packages/components/src/ui/styles/mixins/space.js b/packages/components/src/ui/styles/mixins/space.js
+new file mode 100644
+index 00000000000000..e17900a7e15581
+--- /dev/null
++++ b/packages/components/src/ui/styles/mixins/space.js
+@@ -0,0 +1,14 @@
++/**
++ * Internal dependencies
++ */
++import { get } from '../core';
++
++/**
++ * @param {import('react').ReactText} value
++ * @return {string} Spacing.
++ */
++export function space( value ) {
++	return typeof value === 'number'
++		? `calc(${ get( 'gridBase' ) } * ${ value })`
++		: value;
++}
+diff --git a/packages/components/src/ui/styles/style-system.js b/packages/components/src/ui/styles/style-system.js
+new file mode 100644
+index 00000000000000..90bd1c79716637
+--- /dev/null
++++ b/packages/components/src/ui/styles/style-system.js
+@@ -0,0 +1,17 @@
++/**
++ * Internal dependencies
++ */
++import { compiler } from './system';
++
++export const {
++	breakpoints,
++	cache,
++	cx,
++	flush,
++	getRegisteredStyles,
++	hydrate,
++	injectGlobal,
++	keyframes,
++	merge,
++	sheet,
++} = compiler;
+diff --git a/packages/components/src/ui/styles/styled.js b/packages/components/src/ui/styles/styled.js
+new file mode 100644
+index 00000000000000..62a01418baa3d5
+--- /dev/null
++++ b/packages/components/src/ui/styles/styled.js
+@@ -0,0 +1 @@
++export { styled } from './system';
+diff --git a/packages/components/src/ui/styles/system.js b/packages/components/src/ui/styles/system.js
+new file mode 100644
+index 00000000000000..38d55b2877add3
+--- /dev/null
++++ b/packages/components/src/ui/styles/system.js
+@@ -0,0 +1,28 @@
++/**
++ * Internal dependencies
++ */
++import { createStyleSystem, get as getConfig } from '../create-styles';
++import { config } from './theme';
++
++/** @type {import('../create-styles').CreateStyleSystemOptions<typeof config>} */
++const systemConfig = {
++	baseStyles: {
++		MozOsxFontSmoothing: 'grayscale',
++		WebkitFontSmoothing: 'antialiased',
++		fontFamily: getConfig( 'fontFamily' ),
++		fontSize: getConfig( 'fontSize' ),
++		// @ts-ignore
++		fontWeight: getConfig( 'fontWeight' ),
++		margin: 0,
++	},
++	config,
++};
++
++export const {
++	compiler,
++	core,
++	createCoreElement,
++	createToken,
++	get,
++	styled,
++} = createStyleSystem( systemConfig );
+diff --git a/packages/components/src/ui/styles/test/component-interpolation.js b/packages/components/src/ui/styles/test/component-interpolation.js
+new file mode 100644
+index 00000000000000..6802156385de08
+--- /dev/null
++++ b/packages/components/src/ui/styles/test/component-interpolation.js
+@@ -0,0 +1,161 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++import { contextConnect, useContextSystem } from '@wp-g2/context';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { css, styled } from '..';
++
++describe( 'component-interpolation', () => {
++	const getLastAppliedCssRule = () => {
++		const styles = document.getElementsByTagName( 'style' );
++		const lastSheet = Array.from( styles ).slice( -1 )[ 0 ];
++		const rules = Array.from( lastSheet.sheet.cssRules );
++		return rules.slice( -1 )[ 0 ];
++	};
++
++	beforeEach( () => {
++		// clean up generated styles and elements
++		document.head.innerHTML = '';
++	} );
++
++	it( 'should interpolate styled components from core components', () => {
++		const StyledA = styled.div`
++			background-color: blue;
++		`;
++
++		const classes = css`
++			color: red;
++			${ StyledA } {
++				color: blue;
++			}
++		`;
++
++		const rule = getLastAppliedCssRule();
++
++		const { container } = render(
++			<div className={ classes }>
++				<StyledA />
++			</div>
++		);
++		const styledA = container.firstChild.firstChild;
++
++		expect( styledA.matches( rule.selectorText ) ).toBe( true );
++	} );
++
++	it( 'should interpolate styled components', () => {
++		const Component = forwardRef( ( { className }, ref ) => (
++			<div ref={ ref } className={ className } />
++		) );
++		const StyledComponent = styled( Component )``;
++
++		const classes = css`
++			color: red;
++			${ StyledComponent } {
++				color: blue;
++			}
++		`;
++
++		const rule = getLastAppliedCssRule();
++
++		const { container } = render(
++			<div className={ classes }>
++				<StyledComponent />
++			</div>
++		);
++		const styledComponent = container.firstChild.firstChild;
++		expect( styledComponent.matches( rule.selectorText ) ).toBe( true );
++	} );
++
++	it( 'should interpolate styled components inside of styled component styles', () => {
++		const StyledA = styled.div``;
++		const StyledB = styled.div`
++			${ StyledA } {
++				color: blue;
++			}
++		`;
++
++		const { container } = render(
++			<StyledB>
++				<StyledA />
++			</StyledB>
++		);
++		const rule = getLastAppliedCssRule();
++
++		const styledA = container.firstChild.firstChild;
++		expect( styledA.matches( rule.selectorText ) ).toBe( true );
++	} );
++
++	it( 'should interpolate context-connected components', () => {
++		const TestConnectedStyledComponent = ( props, forwardedRef ) => {
++			const connectedProps = useContextSystem(
++				props,
++				'TestConnectedStyledComponent'
++			);
++			return <div { ...connectedProps } ref={ forwardedRef } />;
++		};
++
++		const Connected = contextConnect(
++			TestConnectedStyledComponent,
++			'TestConnectedStyledComponent'
++		);
++
++		const classes = css`
++			color: red;
++			${ Connected } {
++				color: blue;
++			}
++		`;
++
++		const rule = getLastAppliedCssRule();
++
++		const { container } = render(
++			<div className={ classes }>
++				<Connected />
++			</div>
++		);
++
++		const connected = container.firstChild.firstChild;
++		expect( connected.matches( rule.selectorText ) ).toBe( true );
++	} );
++
++	it( 'should interpolate context-connected-components in styled', () => {
++		const TestConnectedStyledComponent = ( props, forwardedRef ) => {
++			const connectedProps = useContextSystem(
++				props,
++				'TestConnectedStyledComponent'
++			);
++			return <div { ...connectedProps } ref={ forwardedRef } />;
++		};
++
++		const Connected = contextConnect(
++			TestConnectedStyledComponent,
++			'TestConnectedStyledComponent'
++		);
++
++		const Container = styled.div`
++			color: red;
++			${ Connected } {
++				color: blue;
++			}
++		`;
++
++		const { container } = render(
++			<Container>
++				<Connected />
++			</Container>
++		);
++		const rule = getLastAppliedCssRule();
++
++		const connected = container.firstChild.firstChild;
++		expect( connected.matches( rule.selectorText ) ).toBe( true );
++	} );
++} );
+diff --git a/packages/components/src/ui/styles/test/css.js b/packages/components/src/ui/styles/test/css.js
+index 593bb40b3a91a7..858e83343d08ea 100644
+--- a/packages/components/src/ui/styles/test/css.js
++++ b/packages/components/src/ui/styles/test/css.js
+@@ -1,9 +1,13 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@wp-g2/styles';
+ import { render } from '@testing-library/react';
+ 
++/**
++ * Internal dependencies
++ */
++import { css } from '..';
++
+ describe( 'basic', () => {
+ 	test( 'should return a string', () => {
+ 		const style = css`
+@@ -82,34 +86,4 @@ describe( 'plugins', () => {
+ 
+ 		expect( container.firstChild ).toHaveStyle( `background: blue;` );
+ 	} );
+-
+-	test( 'should automatically render rtl styles', () => {
+-		// Simulate an rtl environment
+-		document.documentElement.setAttribute( 'dir', 'rtl' );
+-		// Create the style
+-		const style = css`
+-			padding-right: 55px;
+-			margin-right: 55px;
+-			right: 55px;
+-			transform: translateX( 55% );
+-		`;
+-
+-		const { container } = render( <div className={ style } /> );
+-
+-		expect( container.firstChild ).toHaveStyle( `margin-left: 55px;` );
+-		expect( container.firstChild ).toHaveStyle( `padding-left: 55px;` );
+-		expect( container.firstChild ).toHaveStyle( `left: 55px;` );
+-		expect( container.firstChild ).toHaveStyle(
+-			`transform: translateX( -55% );`
+-		);
+-
+-		expect( container.firstChild ).not.toHaveStyle( `margin-right: 55px;` );
+-		expect( container.firstChild ).not.toHaveStyle(
+-			`padding-right: 55px;`
+-		);
+-		expect( container.firstChild ).not.toHaveStyle( `right: 55px;` );
+-		expect( container.firstChild ).not.toHaveStyle(
+-			`transform: translateX( 55% );`
+-		);
+-	} );
+ } );
+diff --git a/packages/components/src/ui/styles/test/scales.js b/packages/components/src/ui/styles/test/scales.js
+new file mode 100644
+index 00000000000000..05954f9babee20
+--- /dev/null
++++ b/packages/components/src/ui/styles/test/scales.js
+@@ -0,0 +1,49 @@
++/**
++ * Internal dependencies
++ */
++import { ui } from '..';
++import { getScaleStyles } from '../css';
++
++describe( 'scales', () => {
++	test( 'should transform ui.space values', () => {
++		const numberValues = {
++			gridGap: 4,
++			gridColumnGap: 4,
++			gridRowGap: 4,
++			gap: 4,
++			columnGap: 4,
++			rowGap: 4,
++		};
++
++		for ( const key in numberValues ) {
++			const value = numberValues[ key ];
++			const assert = {};
++			const result = {};
++
++			assert[ key ] = value;
++			result[ key ] = ui.space( value );
++
++			expect( getScaleStyles( assert ) ).toEqual( result );
++		}
++
++		const stringValues = {
++			gridGap: '6px',
++			gridColumnGap: '6px',
++			gridRowGap: '6px',
++			gap: '6px',
++			columnGap: '6px',
++			rowGap: '6px',
++		};
++
++		for ( const key in stringValues ) {
++			const value = stringValues[ key ];
++			const assert = {};
++			const result = {};
++
++			assert[ key ] = value;
++			result[ key ] = ui.space( value );
++
++			expect( getScaleStyles( assert ) ).toEqual( result );
++		}
++	} );
++} );
+diff --git a/packages/components/src/ui/styles/test/styled.js b/packages/components/src/ui/styles/test/styled.js
+index 271b32ad97c1fb..9ed9feb58f73bd 100644
+--- a/packages/components/src/ui/styles/test/styled.js
++++ b/packages/components/src/ui/styles/test/styled.js
+@@ -1,9 +1,18 @@
+ /**
+  * External dependencies
+  */
+-import { css, styled } from '@wp-g2/styles';
+ import { render } from '@testing-library/react';
+ 
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { css, styled } from '..';
++
+ describe( 'basic', () => {
+ 	test( 'should create a styled component', () => {
+ 		const Component = styled.div`
+@@ -16,7 +25,9 @@ describe( 'basic', () => {
+ 	} );
+ 
+ 	test( 'should style an existing component', () => {
+-		const Previous = ( { className } ) => <div className={ className } />;
++		const Previous = forwardRef( ( { className }, ref ) => (
++			<div ref={ ref } className={ className } />
++		) );
+ 
+ 		const Component = styled( Previous )`
+ 			background: blue;
+@@ -57,34 +68,6 @@ describe( 'css', () => {
+ 		expect( container.firstChild ).toHaveStyle( { background: 'blue' } );
+ 		expect( container.firstChild ).toHaveStyle( { color: 'red' } );
+ 	} );
+-
+-	test( 'should render styles with css prop (string)', () => {
+-		const Component = styled.div`
+-			background: blue;
+-		`;
+-
+-		const { container } = render(
+-			<Component
+-				css={ `
+-					color: red;
+-				` }
+-			/>
+-		);
+-
+-		expect( container.firstChild ).toHaveStyle( { background: 'blue' } );
+-		expect( container.firstChild ).toHaveStyle( { color: 'red' } );
+-	} );
+-
+-	test( 'should render styles with css prop (object)', () => {
+-		const Component = styled.div`
+-			background: blue;
+-		`;
+-
+-		const { container } = render( <Component css={ { color: 'red' } } /> );
+-
+-		expect( container.firstChild ).toHaveStyle( { background: 'blue' } );
+-		expect( container.firstChild ).toHaveStyle( { color: 'red' } );
+-	} );
+ } );
+ 
+ describe( 'as', () => {
+diff --git a/packages/components/src/ui/styles/theme/config.js b/packages/components/src/ui/styles/theme/config.js
+new file mode 100644
+index 00000000000000..80e41093275d9a
+--- /dev/null
++++ b/packages/components/src/ui/styles/theme/config.js
+@@ -0,0 +1,86 @@
++/**
++ * Internal dependencies
++ */
++import { get } from '../../create-styles';
++import { rgba } from '../../../utils/colors';
++
++const ANIMATION_PROPS = {
++	transitionDuration: '200ms',
++	transitionDurationFast: '160ms',
++	transitionDurationFaster: '120ms',
++	transitionDurationFastest: '100ms',
++	transitionTimingFunction: 'cubic-bezier(0.08, 0.52, 0.52, 1)',
++	transitionTimingFunctionControl: 'cubic-bezier(0.12, 0.8, 0.32, 1)',
++};
++
++const GRAY_COLORS = {
++	black: '#000',
++	gray900: '#1e1e1e',
++	gray700: '#757575',
++	gray600: '#949494',
++	gray500: '#bbb',
++	gray400: '#ccc',
++	gray300: '#ddd',
++	gray200: '#e0e0e0',
++	gray100: '#f0f0f0',
++	white: '#fff',
++};
++
++const MISC_COLORS = {
++	darkThemeFocus: get( 'white' ),
++	darkGrayPlaceholder: rgba( GRAY_COLORS.gray900, 0.62 ),
++	mediumGrayPlaceholder: rgba( GRAY_COLORS.gray900, 0.55 ),
++	lightGrayPlaceholdeR: rgba( GRAY_COLORS.white, 0.65 ),
++};
++
++const ALERT_COLORS = {
++	alertYellow: '#f0b849',
++	alertRed: '#cc1818',
++	alertGreen: '#4ab866',
++};
++
++const COLOR_PROPS = {
++	...GRAY_COLORS,
++	...MISC_COLORS,
++	...ALERT_COLORS,
++	colorAdmin: '#007cba',
++	colorDestructive: '#D94F4F',
++	colorBodyBackground: get( 'white' ),
++	colorText: get( 'gray900' ),
++	colorTextInverted: get( 'white' ),
++	colorTextHeading: '#050505',
++	colorTextMuted: '#717171',
++};
++
++const FONT_PROPS = {
++	fontFamily:
++		'-apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,"Helvetica Neue", sans-serif',
++	fontFamilyMono: 'Menlo, Consolas, monaco, monospace',
++	fontSize: '13px',
++	fontSizeH1: `calc(2.44 * ${ get( 'fontSize' ) })`,
++	fontSizeH2: `calc(1.95 * ${ get( 'fontSize' ) })`,
++	fontSizeH3: `calc(1.56 * ${ get( 'fontSize' ) })`,
++	fontSizeH4: `calc(1.25 * ${ get( 'fontSize' ) })`,
++	fontSizeH5: `calc(1 * ${ get( 'fontSize' ) })`,
++	fontSizeH6: `calc(0.8 * ${ get( 'fontSize' ) })`,
++	fontSizeInputMobile: '16px',
++	fontSizeMobile: '15px',
++	fontSizeSmall: `calc(0.92 * ${ get( 'fontSize' ) })`,
++	fontSizeXSmall: `calc(0.75 * ${ get( 'fontSize' ) })`,
++	fontLineHeightBase: '1.2',
++	fontWeight: 'normal',
++	fontWeightHeading: '600',
++};
++
++const SPACING_PROPS = {
++	gridBase: '4px',
++};
++
++export const config = {
++	...COLOR_PROPS,
++	// Base
++	...FONT_PROPS,
++	...SPACING_PROPS,
++	// Animations
++	...ANIMATION_PROPS,
++};
+diff --git a/packages/components/src/ui/styles/theme/index.js b/packages/components/src/ui/styles/theme/index.js
+new file mode 100644
+index 00000000000000..7b1f54ecf901d5
+--- /dev/null
++++ b/packages/components/src/ui/styles/theme/index.js
+@@ -0,0 +1 @@
++export * from './theme';
+diff --git a/packages/components/src/ui/styles/theme/theme.js b/packages/components/src/ui/styles/theme/theme.js
+new file mode 100644
+index 00000000000000..43afe56f0183af
+--- /dev/null
++++ b/packages/components/src/ui/styles/theme/theme.js
+@@ -0,0 +1 @@
++export { config } from './config';
+diff --git a/packages/components/src/ui/styles/ui.js b/packages/components/src/ui/styles/ui.js
+new file mode 100644
+index 00000000000000..9935f0044ee338
+--- /dev/null
++++ b/packages/components/src/ui/styles/ui.js
+@@ -0,0 +1,11 @@
++/**
++ * Internal dependencies
++ */
++import { get } from './core';
++import { space, flow } from './mixins';
++
++export const ui = {
++	get,
++	space,
++	flow,
++};
+diff --git a/packages/components/src/ui/utils/colors.js b/packages/components/src/ui/utils/colors.js
+index fb9fc559f6d6ed..05195351e8bcdb 100644
+--- a/packages/components/src/ui/utils/colors.js
++++ b/packages/components/src/ui/utils/colors.js
+@@ -97,3 +97,42 @@ export function getOptimalTextShade( backgroundColor ) {
+ 
+ 	return result === '#000000' ? 'dark' : 'light';
+ }
++
++/**
++ * Retrieves the computed text color. This is useful for getting the
++ * value of a CSS variable color.
++ *
++ * @param {string | unknown} color
++ *
++ * @return {string} The computed text color.
++ */
++function __getComputedColor( color ) {
++	if ( typeof color !== 'string' ) return '';
++
++	if ( isColor( color ) ) return color;
++
++	if ( ! color.includes( 'var(' ) ) return '';
++	if ( typeof document === 'undefined' ) return '';
++
++	// Attempts to gracefully handle CSS variables color values.
++	const el = getColorComputationNode();
++	if ( ! el ) return '';
++
++	el.style.color = color;
++	// Grab the style
++	const computedColor = window?.getComputedStyle( el ).color;
++	// Reset
++	el.style.color = '';
++
++	return computedColor || '';
++}
++
++/**
++ * Retrieves the computed text color. This is useful for getting the
++ * value of a CSS variable color.
++ *
++ * @param {string | unknown} color
++ *
++ * @return {string} The computed text color.
++ */
++export const getComputedColor = memoize( __getComputedColor );
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 96bed3dde24e49..09f939a68d1264 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -15,7 +15,8 @@
+ 		{ "path": "../icons" },
+ 		{ "path": "../is-shallow-equal" },
+ 		{ "path": "../primitives" },
+-		{ "path": "../react-i18n" }
++		{ "path": "../react-i18n" },
++		{ "path": "../warning" }
+ 	],
+ 	"include": [
+ 		"src/animate/**/*",

@@ -1,0 +1,99 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 657c3b07aba919..9ca59e341f9384 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ -   `Tooltip`: Replace the existing tooltip to simplify the implementation and improve accessibility while maintaining the same behaviors and API ([#48440](https://github.com/WordPress/gutenberg/pull/48440)).
+ -   `Dropdown` and `DropdownMenu`: support controlled mode for the dropdown's open/closed state ([#54257](https://github.com/WordPress/gutenberg/pull/54257)).
+ -   `BorderControl`: Apply proper metrics and simpler text ([#53998](https://github.com/WordPress/gutenberg/pull/53998)).
++-   `Tooltip`: Add new `hideOnClick` prop ([#54406](https://github.com/WordPress/gutenberg/pull/54406)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/tooltip/README.md b/packages/components/src/tooltip/README.md
+index 483d6d4cb5d023..5b4caecf6d5c75 100644
+--- a/packages/components/src/tooltip/README.md
++++ b/packages/components/src/tooltip/README.md
+@@ -35,6 +35,13 @@ The amount of time in milliseconds to wait before showing the tooltip.
+ -   Required: No
+ -   Default: `700`
+ 
++#### `hideOnClick`: `boolean`
++
++Option to hide the tooltip when the anchor is clicked.
++
++-   Required: No
++-   Default: `true`
++
+ #### `position`: `string`
+ 
+ The direction in which the tooltip should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index 5fedfedb81cb89..f86bd5d2ade9c3 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -25,6 +25,7 @@ function Tooltip( props: TooltipProps ) {
+ 	const {
+ 		children,
+ 		delay = TOOLTIP_DELAY,
++		hideOnClick = true,
+ 		position = 'bottom',
+ 		shortcut,
+ 		text,
+@@ -55,7 +56,7 @@ function Tooltip( props: TooltipProps ) {
+ 		<>
+ 			<Ariakit.TooltipAnchor
+ 				onBlur={ tooltipStore.hide }
+-				onClick={ tooltipStore.hide }
++				onClick={ hideOnClick ? tooltipStore.hide : undefined }
+ 				store={ tooltipStore }
+ 				render={ isOnlyChild ? children : undefined }
+ 			>
+diff --git a/packages/components/src/tooltip/test/index.tsx b/packages/components/src/tooltip/test/index.tsx
+index aefc927d76840a..4d58498e278d36 100644
+--- a/packages/components/src/tooltip/test/index.tsx
++++ b/packages/components/src/tooltip/test/index.tsx
+@@ -310,4 +310,26 @@ describe( 'Tooltip', () => {
+ 			await screen.findByRole( 'button', { description: 'tooltip text' } )
+ 		).toBeInTheDocument();
+ 	} );
++
++	it( 'should not hide tooltip when the anchor is clicked if hideOnClick is false', async () => {
++		const user = userEvent.setup();
++
++		render( <Tooltip { ...props } hideOnClick={ false } /> );
++
++		const button = screen.getByRole( 'button', { name: /Button/i } );
++
++		await user.hover( button );
++
++		expect(
++			await screen.findByRole( 'tooltip', { name: /tooltip text/i } )
++		).toBeVisible();
++
++		await user.click( button );
++
++		expect(
++			screen.getByRole( 'tooltip', { name: /tooltip text/i } )
++		).toBeVisible();
++
++		await cleanupTooltip( user );
++	} );
+ } );
+diff --git a/packages/components/src/tooltip/types.ts b/packages/components/src/tooltip/types.ts
+index 59df5f2b52fc6f..1487a382ff1b8f 100644
+--- a/packages/components/src/tooltip/types.ts
++++ b/packages/components/src/tooltip/types.ts
+@@ -11,6 +11,12 @@ export type TooltipProps = {
+ 	 * **Note**: Accepts only one child element.
+ 	 */
+ 	children: React.ReactElement;
++	/**
++	 * Option to hide the tooltip when the anchor is clicked.
++	 *
++	 * @default true
++	 */
++	hideOnClick?: boolean;
+ 	/**
+ 	 * The amount of time in milliseconds to wait before showing the tooltip.
+ 	 *

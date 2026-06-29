@@ -1,0 +1,57 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 01a073567e2f22..9614494f0f0e07 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,18 +4,16 @@
+ 
+ ### Bug Fix
+ 
++-   `FontSizePicker`: Fix Reset button focus loss ([#57196](https://github.com/WordPress/gutenberg/pull/57196)).
+ -   `PaletteEdit`: Consider digits when generating kebab-cased slug ([#56713](https://github.com/WordPress/gutenberg/pull/56713)).
++-   `Button`: Fix logic of `has-text` class addition ([#56949](https://github.com/WordPress/gutenberg/pull/56949)).
++-   `FormTokenField`: Fix a regression where the suggestion list would re-open after clicking away from the input ([#57002](https://github.com/WordPress/gutenberg/pull/57002)).
+ 
+ ### Experimental
+ 
+ -   `Tabs`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
+ -   `Tabs`: make sure `Tab`s are associated to the right `TabPanel`s, regardless of the order they're rendered in ([#57033](https://github.com/WordPress/gutenberg/pull/57033)).
+ 
+-### Bug Fix
+-
+--   `Button`: Fix logic of `has-text` class addition ([#56949](https://github.com/WordPress/gutenberg/pull/56949)).
+--   `FormTokenField`: Fix a regression where the suggestion list would re-open after clicking away from the input ([#57002](https://github.com/WordPress/gutenberg/pull/57002)).
+-
+ ## 25.14.0 (2023-12-13)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index d79bc870d33588..9d977f43db9597 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -123,6 +123,7 @@ const UnforwardedFontSizePicker = (
+ 	);
+ 	const isValueUnitRelative =
+ 		!! valueUnit && [ 'em', 'rem' ].includes( valueUnit );
++	const isDisabled = value === undefined;
+ 
+ 	return (
+ 		<Container ref={ ref } className="components-font-size-picker">
+@@ -276,10 +277,14 @@ const UnforwardedFontSizePicker = (
+ 						{ withReset && (
+ 							<FlexItem>
+ 								<Button
+-									disabled={ value === undefined }
+-									onClick={ () => {
+-										onChange?.( undefined );
+-									} }
++									aria-disabled={ isDisabled }
++									onClick={
++										isDisabled
++											? undefined
++											: () => {
++													onChange?.( undefined );
++											  }
++									}
+ 									variant="secondary"
+ 									__next40pxDefaultSize
+ 									size={

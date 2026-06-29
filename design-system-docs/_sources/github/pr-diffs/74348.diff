@@ -1,0 +1,2184 @@
+diff --git a/packages/a11y/package.json b/packages/a11y/package.json
+index 1e450e9dcd0e58..c2881e353b658a 100644
+--- a/packages/a11y/package.json
++++ b/packages/a11y/package.json
+@@ -31,20 +31,19 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+ 	"react-native": "src/index",
+ 	"wpScript": true,
+-	"wpScriptModuleExports": "./build-module/module/index.js",
++	"wpScriptModuleExports": "./build-module/module/index.mjs",
+ 	"types": "build-types",
+ 	"dependencies": {
+ 		"@wordpress/dom-ready": "file:../dom-ready",
+diff --git a/packages/abilities/package.json b/packages/abilities/package.json
+index c0beb1aaddc629..99259888ba9154 100644
+--- a/packages/abilities/package.json
++++ b/packages/abilities/package.json
+@@ -30,19 +30,18 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+ 	"wpScriptModuleExports": {
+-		".": "./build-module/index.js"
++		".": "./build-module/index.mjs"
+ 	},
+ 	"types": "build-types",
+ 	"dependencies": {
+diff --git a/packages/admin-ui/package.json b/packages/admin-ui/package.json
+index 24698997615d1e..7e585efaeb6f1d 100644
+--- a/packages/admin-ui/package.json
++++ b/packages/admin-ui/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+diff --git a/packages/annotations/package.json b/packages/annotations/package.json
+index 0c448857183fd9..3edc6a705485ac 100644
+--- a/packages/annotations/package.json
++++ b/packages/annotations/package.json
+@@ -29,12 +29,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/api-fetch/package.json b/packages/api-fetch/package.json
+index d0f429969299fe..695dfcd0c9d93a 100644
+--- a/packages/api-fetch/package.json
++++ b/packages/api-fetch/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/asset-loader/package.json b/packages/asset-loader/package.json
+index 31552328e39c45..deef1245dad7f5 100644
+--- a/packages/asset-loader/package.json
++++ b/packages/asset-loader/package.json
+@@ -32,13 +32,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/autop/package.json b/packages/autop/package.json
+index bd1b858fc56436..e1291edeee42d2 100644
+--- a/packages/autop/package.json
++++ b/packages/autop/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/blob/package.json b/packages/blob/package.json
+index 3a34440e403ced..1994e44fb070a1 100644
+--- a/packages/blob/package.json
++++ b/packages/blob/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/block-directory/package.json b/packages/block-directory/package.json
+index f1d9c4599ff94e..254b1766b3dc6c 100644
+--- a/packages/block-directory/package.json
++++ b/packages/block-directory/package.json
+@@ -30,12 +30,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/block-editor/package.json b/packages/block-editor/package.json
+index 853724c4970782..4af93eb2a77fe7 100644
+--- a/packages/block-editor/package.json
++++ b/packages/block-editor/package.json
+@@ -31,12 +31,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+@@ -45,7 +44,7 @@
+ 	"react-native": "src/index",
+ 	"wpScript": true,
+ 	"wpScriptModuleExports": {
+-		"./utils/fit-text-frontend": "./build-module/utils/fit-text-frontend.js"
++		"./utils/fit-text-frontend": "./build-module/utils/fit-text-frontend.mjs"
+ 	},
+ 	"sideEffects": [
+ 		"build-style/**",
+@@ -56,8 +55,8 @@
+ 		"build/index.cjs",
+ 		"build/store/index.cjs",
+ 		"build/hooks/**",
+-		"build-module/index.js",
+-		"build-module/store/index.js",
++		"build-module/index.mjs",
++		"build-module/store/index.mjs",
+ 		"build-module/hooks/**"
+ 	],
+ 	"dependencies": {
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index e9a97bd713dba3..cdda2180d67e64 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -31,12 +31,11 @@
+ 		"*.md",
+ 		"babel-plugin.cjs"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./babel-plugin": "./babel-plugin.cjs",
+@@ -47,14 +46,14 @@
+ 	"react-native": "src/index",
+ 	"wpScript": true,
+ 	"wpScriptModuleExports": {
+-		"./accordion/view": "./build-module/accordion/view.js",
+-		"./file/view": "./build-module/file/view.js",
+-		"./form/view": "./build-module/form/view.js",
+-		"./image/view": "./build-module/image/view.js",
+-		"./navigation/view": "./build-module/navigation/view.js",
+-		"./query/view": "./build-module/query/view.js",
+-		"./search/view": "./build-module/search/view.js",
+-		"./tabs/view": "./build-module/tabs/view.js"
++		"./accordion/view": "./build-module/accordion/view.mjs",
++		"./file/view": "./build-module/file/view.mjs",
++		"./form/view": "./build-module/form/view.mjs",
++		"./image/view": "./build-module/image/view.mjs",
++		"./navigation/view": "./build-module/navigation/view.mjs",
++		"./query/view": "./build-module/query/view.mjs",
++		"./search/view": "./build-module/search/view.mjs",
++		"./tabs/view": "./build-module/tabs/view.mjs"
+ 	},
+ 	"wpStyleEntryPoints": [
+ 		"src/*.scss",
+@@ -91,7 +90,7 @@
+ 		"src/**/*.scss",
+ 		"src/*/init.js",
+ 		"build/*/init.js",
+-		"build-module/*/init.js"
++		"build-module/*/init.mjs"
+ 	],
+ 	"dependencies": {
+ 		"@wordpress/a11y": "file:../a11y",
+diff --git a/packages/block-serialization-default-parser/package.json b/packages/block-serialization-default-parser/package.json
+index e69be8430313ea..da16a91cb48657 100644
+--- a/packages/block-serialization-default-parser/package.json
++++ b/packages/block-serialization-default-parser/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/blocks/package.json b/packages/blocks/package.json
+index 974374611c11d4..107ce5a275991e 100644
+--- a/packages/blocks/package.json
++++ b/packages/blocks/package.json
+@@ -29,12 +29,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+@@ -46,8 +45,8 @@
+ 		"src/store/index.js",
+ 		"build/index.cjs",
+ 		"build/store/index.cjs",
+-		"build-module/index.js",
+-		"build-module/store/index.js"
++		"build-module/index.mjs",
++		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
+ 		"@wordpress/autop": "file:../autop",
+diff --git a/packages/boot/package.json b/packages/boot/package.json
+index 722450e0fcbf49..7dfec71e4216c9 100644
+--- a/packages/boot/package.json
++++ b/packages/boot/package.json
+@@ -29,17 +29,16 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js"
++			"import": "./build-module/index.mjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+ 	"react-native": "src/index",
+-	"wpScriptModuleExports": "./build-module/index.js",
++	"wpScriptModuleExports": "./build-module/index.mjs",
+ 	"types": "build-types",
+ 	"dependencies": {
+ 		"@wordpress/a11y": "file:../a11y",
+diff --git a/packages/commands/package.json b/packages/commands/package.json
+index 1ea5d9f9259367..40ccfb81f731f1 100644
+--- a/packages/commands/package.json
++++ b/packages/commands/package.json
+@@ -31,12 +31,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+diff --git a/packages/components/.stylelintrc.js b/packages/components/.stylelintrc.mjs
+similarity index 100%
+rename from packages/components/.stylelintrc.js
+rename to packages/components/.stylelintrc.mjs
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index df19a6de382d8d..73485907dcde9d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -32,7 +32,7 @@
+ -   `Menu`, `CustomSelectControl` (v1 & 2): Update animation ([#74111](https://github.com/WordPress/gutenberg/pull/74111)).
+ -   `Autocomplete`: Add offset to popover ([#74084](https://github.com/WordPress/gutenberg/pull/74084)).
+ -   `Button`: Hide focus style when `:active` ([#74106](https://github.com/WordPress/gutenberg/pull/74106)).
+--   Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822)).
++-   Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822) and [#74348](https://github.com/WordPress/gutenberg/pull/74348)).
+ -   `ToggleGroupControl`: Update visual design ([#74036](https://github.com/WordPress/gutenberg/pull/74036)).
+ -   `Notice`: Add `disabled` prop to action buttons. Also allow `onClick` to work alongside `url` ([#74094](https://github.com/WordPress/gutenberg/pull/74094)).
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 40eca975f11eb8..bd94e228ae22dc 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./README.md": "./README.md",
+diff --git a/packages/compose/package.json b/packages/compose/package.json
+index ff91c83c619f84..5ba9ef7d059f24 100644
+--- a/packages/compose/package.json
++++ b/packages/compose/package.json
+@@ -31,13 +31,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/core-abilities/package.json b/packages/core-abilities/package.json
+index 1579c627670908..871f13ba4855e2 100644
+--- a/packages/core-abilities/package.json
++++ b/packages/core-abilities/package.json
+@@ -30,19 +30,18 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+ 	"wpScriptModuleExports": {
+-		".": "./build-module/index.js"
++		".": "./build-module/index.mjs"
+ 	},
+ 	"types": "build-types",
+ 	"sideEffects": [
+diff --git a/packages/core-commands/package.json b/packages/core-commands/package.json
+index 7984f44439d1dc..b1b3faeb03f781 100644
+--- a/packages/core-commands/package.json
++++ b/packages/core-commands/package.json
+@@ -29,12 +29,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/core-data/package.json b/packages/core-data/package.json
+index 06b9b44f877aec..44aba24aeac75d 100644
+--- a/packages/core-data/package.json
++++ b/packages/core-data/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+@@ -47,7 +46,7 @@
+ 	"sideEffects": [
+ 		"src/index.js",
+ 		"build/index.cjs",
+-		"build-module/index.js"
++		"build-module/index.mjs"
+ 	],
+ 	"dependencies": {
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+diff --git a/packages/customize-widgets/package.json b/packages/customize-widgets/package.json
+index d322faec981322..a998454a378138 100644
+--- a/packages/customize-widgets/package.json
++++ b/packages/customize-widgets/package.json
+@@ -28,12 +28,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/data-controls/package.json b/packages/data-controls/package.json
+index 96210f8abab5de..d3199a5f83ee35 100644
+--- a/packages/data-controls/package.json
++++ b/packages/data-controls/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/data/package.json b/packages/data/package.json
+index 86d452dc161c41..09b21db25306af 100644
+--- a/packages/data/package.json
++++ b/packages/data/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index da33168ea8ddc0..0969fac2d19d89 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -34,7 +34,7 @@
+ - DataViews: Update padding to 24px for consistency. [#73334](https://github.com/WordPress/gutenberg/pull/73334)
+ - DataViews: Simplify list layout field color styles. [#73884](https://github.com/WordPress/gutenberg/pull/73884)
+ - DataViews: Add panel form layout validation. [#73700](https://github.com/WordPress/gutenberg/pull/73700)
+-- Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822))
++- Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822) and [#74348](https://github.com/WordPress/gutenberg/pull/74348))
+ 
+ ## 11.0.0 (2025-11-26)
+ 
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index 58d2526a280465..ba6b8dd5a13d39 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -31,13 +31,12 @@
+ 		"build-wp",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./wp": {
+diff --git a/packages/date/package.json b/packages/date/package.json
+index 3ca4b2ac190cde..efd83cfabaf0e9 100644
+--- a/packages/date/package.json
++++ b/packages/date/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/deprecated/package.json b/packages/deprecated/package.json
+index 7ffd634eca9e48..91bbfe7e7438c3 100644
+--- a/packages/deprecated/package.json
++++ b/packages/deprecated/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/dom-ready/package.json b/packages/dom-ready/package.json
+index fd4a4629ac4225..d2034cfb99bf09 100644
+--- a/packages/dom-ready/package.json
++++ b/packages/dom-ready/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/dom/package.json b/packages/dom/package.json
+index 0cb15d4657712e..d533569a95b80e 100644
+--- a/packages/dom/package.json
++++ b/packages/dom/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/e2e-test-utils-playwright/package.json b/packages/e2e-test-utils-playwright/package.json
+index e146c5bde84519..69b522171be08c 100644
+--- a/packages/e2e-test-utils-playwright/package.json
++++ b/packages/e2e-test-utils-playwright/package.json
+@@ -28,11 +28,11 @@
+ 		"build",
+ 		"build-types"
+ 	],
+-	"main": "./build/index.js",
++	"main": "./build/index.cjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"default": "./build/index.js"
++			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/edit-post/package.json b/packages/edit-post/package.json
+index 2918e9a84807f2..e2f6588cebf8e6 100644
+--- a/packages/edit-post/package.json
++++ b/packages/edit-post/package.json
+@@ -31,12 +31,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/edit-site-init/package.json b/packages/edit-site-init/package.json
+index 6008c45995f236..680443397bca2c 100644
+--- a/packages/edit-site-init/package.json
++++ b/packages/edit-site-init/package.json
+@@ -28,10 +28,9 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
+-	"wpScriptModuleExports": "./build-module/index.js",
++	"module": "build-module/index.mjs",
++	"wpScriptModuleExports": "./build-module/index.mjs",
+ 	"dependencies": {
+ 		"@wordpress/boot": "file:../boot",
+ 		"@wordpress/data": "file:../data",
+diff --git a/packages/edit-site/package.json b/packages/edit-site/package.json
+index 888439a61aed82..b0d5d025b8c0de 100644
+--- a/packages/edit-site/package.json
++++ b/packages/edit-site/package.json
+@@ -31,13 +31,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/edit-widgets/package.json b/packages/edit-widgets/package.json
+index 0f70dd1da8c22d..3f8bb34e547e41 100644
+--- a/packages/edit-widgets/package.json
++++ b/packages/edit-widgets/package.json
+@@ -31,12 +31,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/editor/package.json b/packages/editor/package.json
+index 78c67e4c07ed17..2fe54c3c90c7a9 100644
+--- a/packages/editor/package.json
++++ b/packages/editor/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+@@ -55,8 +54,8 @@
+ 		"build/store/index.cjs",
+ 		"build/hooks/**",
+ 		"build/bindings/**",
+-		"build-module/index.js",
+-		"build-module/store/index.js",
++		"build-module/index.mjs",
++		"build-module/store/index.mjs",
+ 		"build-module/hooks/**",
+ 		"build-module/bindings/**"
+ 	],
+diff --git a/packages/element/package.json b/packages/element/package.json
+index d314bb1f0fc0b4..a898896b7cff82 100644
+--- a/packages/element/package.json
++++ b/packages/element/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/escape-html/package.json b/packages/escape-html/package.json
+index de146661be84d3..d040a61c3a046e 100644
+--- a/packages/escape-html/package.json
++++ b/packages/escape-html/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/fields/package.json b/packages/fields/package.json
+index 2a93d3e9ec779d..57b63013c078be 100644
+--- a/packages/fields/package.json
++++ b/packages/fields/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/format-library/package.json b/packages/format-library/package.json
+index 3fa53955fa0ea3..3b6ecc7aa24de3 100644
+--- a/packages/format-library/package.json
++++ b/packages/format-library/package.json
+@@ -30,12 +30,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/global-styles-engine/package.json b/packages/global-styles-engine/package.json
+index b0985cefee4f81..3fbe4b54a94f4e 100644
+--- a/packages/global-styles-engine/package.json
++++ b/packages/global-styles-engine/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/global-styles-ui/package.json b/packages/global-styles-ui/package.json
+index 1e13938fe40399..df727aed6b87f6 100644
+--- a/packages/global-styles-ui/package.json
++++ b/packages/global-styles-ui/package.json
+@@ -31,13 +31,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+diff --git a/packages/hooks/package.json b/packages/hooks/package.json
+index 1ac1785024a48b..cda6c77c93a0c3 100644
+--- a/packages/hooks/package.json
++++ b/packages/hooks/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/html-entities/package.json b/packages/html-entities/package.json
+index b0384b786e310b..bbc0c9eff39f57 100644
+--- a/packages/html-entities/package.json
++++ b/packages/html-entities/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/i18n/package.json b/packages/i18n/package.json
+index 4f584b6d28944a..55dad7a0cc018d 100644
+--- a/packages/i18n/package.json
++++ b/packages/i18n/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/icons/package.json b/packages/icons/package.json
+index fd137a555a67bb..d2056e044c81d2 100644
+--- a/packages/icons/package.json
++++ b/packages/icons/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/image-cropper/package.json b/packages/image-cropper/package.json
+index 68fe92bf7dfed1..6e0d95d93f84a9 100644
+--- a/packages/image-cropper/package.json
++++ b/packages/image-cropper/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/interactivity-router/package.json b/packages/interactivity-router/package.json
+index 1185a21015ac31..d65e05c9367ab0 100644
+--- a/packages/interactivity-router/package.json
++++ b/packages/interactivity-router/package.json
+@@ -29,21 +29,20 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+ 	"react-native": "src/index",
+ 	"wpScriptModuleExports": {
+-		".": "./build-module/index.js",
+-		"./full-page": "./build-module/full-page.js"
++		".": "./build-module/index.mjs",
++		"./full-page": "./build-module/full-page.mjs"
+ 	},
+ 	"types": "build-types",
+ 	"dependencies": {
+diff --git a/packages/interactivity/package.json b/packages/interactivity/package.json
+index 7bb8f6ff84d44d..dda02e84f4938a 100644
+--- a/packages/interactivity/package.json
++++ b/packages/interactivity/package.json
+@@ -22,16 +22,16 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js"
++			"import": "./build-module/index.mjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+ 	"react-native": "src/index",
+-	"wpScriptModuleExports": "./build-module/index.js",
++	"wpScriptModuleExports": "./build-module/index.mjs",
+ 	"types": "build-types",
+ 	"dependencies": {
+ 		"@preact/signals": "^1.3.0",
+diff --git a/packages/interface/package.json b/packages/interface/package.json
+index 6742d1ff6eb480..ccec73f9e4ef8d 100644
+--- a/packages/interface/package.json
++++ b/packages/interface/package.json
+@@ -31,12 +31,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+@@ -50,8 +49,8 @@
+ 		"src/store/index.js",
+ 		"build/index.cjs",
+ 		"build/store/index.cjs",
+-		"build-module/index.js",
+-		"build-module/store/index.js"
++		"build-module/index.mjs",
++		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
+ 		"@wordpress/a11y": "file:../a11y",
+diff --git a/packages/is-shallow-equal/package.json b/packages/is-shallow-equal/package.json
+index 0d31b273ece972..1a69c91fa64036 100644
+--- a/packages/is-shallow-equal/package.json
++++ b/packages/is-shallow-equal/package.json
+@@ -31,13 +31,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/jest-console/package.json b/packages/jest-console/package.json
+index 643fdf0eb5e8ab..04f592a4aa2001 100644
+--- a/packages/jest-console/package.json
++++ b/packages/jest-console/package.json
+@@ -30,13 +30,12 @@
+ 		"build-module",
+ 		"build-types"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/jest-puppeteer-axe/package.json b/packages/jest-puppeteer-axe/package.json
+index 5158143aae5b28..4ce4c427a03140 100644
+--- a/packages/jest-puppeteer-axe/package.json
++++ b/packages/jest-puppeteer-axe/package.json
+@@ -30,13 +30,12 @@
+ 		"build",
+ 		"build-module"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/keyboard-shortcuts/package.json b/packages/keyboard-shortcuts/package.json
+index b8f0a48f151890..6fee4eee1d39c1 100644
+--- a/packages/keyboard-shortcuts/package.json
++++ b/packages/keyboard-shortcuts/package.json
+@@ -29,12 +29,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/keycodes/package.json b/packages/keycodes/package.json
+index b3a0f160cb1bf1..3f393611dfbf2a 100644
+--- a/packages/keycodes/package.json
++++ b/packages/keycodes/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/latex-to-mathml/package.json b/packages/latex-to-mathml/package.json
+index 71e3f275603d61..5b5b5b6a783be4 100644
+--- a/packages/latex-to-mathml/package.json
++++ b/packages/latex-to-mathml/package.json
+@@ -31,20 +31,19 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+ 	"wpScriptModuleExports": {
+-		".": "./build-module/index.js",
+-		"./loader": "./build-module/loader.js"
++		".": "./build-module/index.mjs",
++		"./loader": "./build-module/loader.mjs"
+ 	},
+ 	"types": "build-types",
+ 	"dependencies": {
+diff --git a/packages/lazy-editor/package.json b/packages/lazy-editor/package.json
+index 204ab9b1be4e51..174f0db7fb5700 100644
+--- a/packages/lazy-editor/package.json
++++ b/packages/lazy-editor/package.json
+@@ -31,19 +31,18 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+ 	"react-native": "src/index",
+-	"wpScriptModuleExports": "./build-module/index.js",
++	"wpScriptModuleExports": "./build-module/index.mjs",
+ 	"types": "build-types",
+ 	"dependencies": {
+ 		"@wordpress/asset-loader": "file:../asset-loader",
+diff --git a/packages/list-reusable-blocks/package.json b/packages/list-reusable-blocks/package.json
+index 9d20cb375d6099..f7a2b9669e2f75 100644
+--- a/packages/list-reusable-blocks/package.json
++++ b/packages/list-reusable-blocks/package.json
+@@ -31,12 +31,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+diff --git a/packages/media-fields/package.json b/packages/media-fields/package.json
+index 55d47c4e1ff5a4..3b259dc3ab7ebe 100644
+--- a/packages/media-fields/package.json
++++ b/packages/media-fields/package.json
+@@ -32,13 +32,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/media-utils/package.json b/packages/media-utils/package.json
+index 7ad233ad704589..01f648d61f5145 100644
+--- a/packages/media-utils/package.json
++++ b/packages/media-utils/package.json
+@@ -31,13 +31,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/notices/package.json b/packages/notices/package.json
+index cccf7328ed72ec..a83f1c2913dec4 100644
+--- a/packages/notices/package.json
++++ b/packages/notices/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/nux/package.json b/packages/nux/package.json
+index 00b4da061fb214..c3ed922ceb18ae 100644
+--- a/packages/nux/package.json
++++ b/packages/nux/package.json
+@@ -30,12 +30,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+@@ -50,8 +49,8 @@
+ 		"src/store/index.js",
+ 		"build/index.cjs",
+ 		"build/store/index.cjs",
+-		"build-module/index.js",
+-		"build-module/store/index.js"
++		"build-module/index.mjs",
++		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
+ 		"@wordpress/base-styles": "file:../base-styles",
+diff --git a/packages/patterns/package.json b/packages/patterns/package.json
+index 5bec03193a9038..35bf3043e42c1e 100644
+--- a/packages/patterns/package.json
++++ b/packages/patterns/package.json
+@@ -30,12 +30,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+@@ -49,8 +48,8 @@
+ 		"src/store/index.js",
+ 		"build/index.cjs",
+ 		"build/store/index.cjs",
+-		"build-module/index.js",
+-		"build-module/store/index.js"
++		"build-module/index.mjs",
++		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
+ 		"@wordpress/a11y": "file:../a11y",
+diff --git a/packages/plugins/package.json b/packages/plugins/package.json
+index d36eed2294fc54..51e8a2f6a4fa3f 100644
+--- a/packages/plugins/package.json
++++ b/packages/plugins/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/preferences-persistence/package.json b/packages/preferences-persistence/package.json
+index 1460f601ca4f3b..34121185986520 100644
+--- a/packages/preferences-persistence/package.json
++++ b/packages/preferences-persistence/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/preferences/package.json b/packages/preferences/package.json
+index cea84c30619d86..b704197439b532 100644
+--- a/packages/preferences/package.json
++++ b/packages/preferences/package.json
+@@ -32,13 +32,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+diff --git a/packages/primitives/package.json b/packages/primitives/package.json
+index 9f70f1bc8ab2fb..edd5040fea4cf4 100644
+--- a/packages/primitives/package.json
++++ b/packages/primitives/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/priority-queue/package.json b/packages/priority-queue/package.json
+index 24dbb85de1c915..6ec3b34c675678 100644
+--- a/packages/priority-queue/package.json
++++ b/packages/priority-queue/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/private-apis/package.json b/packages/private-apis/package.json
+index 7ecaeafa0236f8..b59f8c3c2c2e8d 100644
+--- a/packages/private-apis/package.json
++++ b/packages/private-apis/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/react-i18n/package.json b/packages/react-i18n/package.json
+index 781b16cc6dccd0..51004d2bd438a3 100644
+--- a/packages/react-i18n/package.json
++++ b/packages/react-i18n/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/redux-routine/package.json b/packages/redux-routine/package.json
+index 8a58a21ce75d45..3ee0ff84903c5a 100644
+--- a/packages/redux-routine/package.json
++++ b/packages/redux-routine/package.json
+@@ -31,13 +31,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/report-flaky-tests/package.json b/packages/report-flaky-tests/package.json
+index c3e9dd396bb069..ceba6aa9977bdd 100644
+--- a/packages/report-flaky-tests/package.json
++++ b/packages/report-flaky-tests/package.json
+@@ -23,11 +23,11 @@
+ 		"node": ">=18.12.0",
+ 		"npm": ">=8.19.2"
+ 	},
+-	"main": "build/index.js",
++	"main": "build/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"require": "./build/index.js"
++			"require": "./build/index.mjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+diff --git a/packages/reusable-blocks/package.json b/packages/reusable-blocks/package.json
+index 490bec11af00ad..fb0a51a2c2ca73 100644
+--- a/packages/reusable-blocks/package.json
++++ b/packages/reusable-blocks/package.json
+@@ -30,12 +30,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+@@ -47,8 +46,8 @@
+ 		"src/store/index.js",
+ 		"build/index.cjs",
+ 		"build/store/index.cjs",
+-		"build-module/index.js",
+-		"build-module/store/index.js"
++		"build-module/index.mjs",
++		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
+ 		"@wordpress/base-styles": "file:../base-styles",
+diff --git a/packages/rich-text/package.json b/packages/rich-text/package.json
+index 193cf4efd2a96b..c4e9f9d82e259d 100644
+--- a/packages/rich-text/package.json
++++ b/packages/rich-text/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+@@ -49,8 +48,8 @@
+ 		"src/store/index.js",
+ 		"build/index.cjs",
+ 		"build/store/index.cjs",
+-		"build-module/index.js",
+-		"build-module/store/index.js"
++		"build-module/index.mjs",
++		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
+ 		"@wordpress/a11y": "file:../a11y",
+diff --git a/packages/route/package.json b/packages/route/package.json
+index b58e9aebe22dcf..11a819e8140992 100644
+--- a/packages/route/package.json
++++ b/packages/route/package.json
+@@ -28,19 +28,18 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+ 	},
+ 	"react-native": "src/index",
+-	"wpScriptModuleExports": "./build-module/index.js",
++	"wpScriptModuleExports": "./build-module/index.mjs",
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+diff --git a/packages/router/package.json b/packages/router/package.json
+index a76a3c0f356537..4d4463de6892a2 100644
+--- a/packages/router/package.json
++++ b/packages/router/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/server-side-render/package.json b/packages/server-side-render/package.json
+index 4076595592c5ea..f7e3d09e9d3e9b 100644
+--- a/packages/server-side-render/package.json
++++ b/packages/server-side-render/package.json
+@@ -30,12 +30,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/shortcode/package.json b/packages/shortcode/package.json
+index 4b615fd84f253e..b35aa80eb2b8a7 100644
+--- a/packages/shortcode/package.json
++++ b/packages/shortcode/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/style-engine/package.json b/packages/style-engine/package.json
+index 078168f92f4afa..6c11beaaae758e 100644
+--- a/packages/style-engine/package.json
++++ b/packages/style-engine/package.json
+@@ -31,13 +31,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/sync/package.json b/packages/sync/package.json
+index b87f2a52049ff7..42bf659cca7fd9 100644
+--- a/packages/sync/package.json
++++ b/packages/sync/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/theme/bin/terrazzo-plugin-known-wpds-css-variables/index.ts b/packages/theme/bin/terrazzo-plugin-known-wpds-css-variables/index.ts
+index 6ca4008426c047..9f203ae1093ee2 100644
+--- a/packages/theme/bin/terrazzo-plugin-known-wpds-css-variables/index.ts
++++ b/packages/theme/bin/terrazzo-plugin-known-wpds-css-variables/index.ts
+@@ -5,7 +5,7 @@ import { FORMAT_ID } from '@terrazzo/plugin-css';
+ import type { Plugin } from '@terrazzo/parser';
+ 
+ export default function pluginKnownWpdsCssVariables( {
+-	filename = 'design-tokens.js',
++	filename = 'design-tokens.mjs',
+ } = {} ): Plugin {
+ 	return {
+ 		name: '@wordpress/terrazzo-plugin-known-wpds-css-variables',
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index 540763958ffa55..f0e930836bb859 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -29,29 +29,28 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"default": "./build/index.cjs"
+ 		},
+ 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
+ 		"./design-tokens.js": {
+ 			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
+-			"import": "./build-module/prebuilt/js/design-tokens.js",
++			"import": "./build-module/prebuilt/js/design-tokens.mjs",
+ 			"default": "./build/prebuilt/js/design-tokens.cjs"
+ 		},
+ 		"./stylelint-plugins/no-unknown-ds-tokens": {
+ 			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.ts",
+-			"import": "./src/stylelint-plugins/no-unknown-ds-tokens.js",
++			"import": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs",
+ 			"default": "./build/stylelint-plugins/no-unknown-ds-tokens.cjs"
+ 		},
+ 		"./stylelint-plugins/no-setting-wpds-custom-properties": {
+ 			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.ts",
+-			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.js",
++			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
+ 			"default": "./build/stylelint-plugins/no-setting-wpds-custom-properties.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+@@ -62,7 +61,7 @@
+ 	"sideEffects": [
+ 		"src/color-ramps/lib/register-color-spaces.ts",
+ 		"build/color-ramps/lib/register-color-spaces.js",
+-		"build-module/color-ramps/lib/register-color-spaces.js"
++		"build-module/color-ramps/lib/register-color-spaces.mjs"
+ 	],
+ 	"dependencies": {
+ 		"@wordpress/element": "file:../element",
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.js b/packages/theme/src/prebuilt/js/design-tokens.mjs
+similarity index 100%
+rename from packages/theme/src/prebuilt/js/design-tokens.js
+rename to packages/theme/src/prebuilt/js/design-tokens.mjs
+diff --git a/packages/theme/src/stylelint-plugins/no-setting-wpds-custom-properties.js b/packages/theme/src/stylelint-plugins/no-setting-wpds-custom-properties.mjs
+similarity index 100%
+rename from packages/theme/src/stylelint-plugins/no-setting-wpds-custom-properties.js
+rename to packages/theme/src/stylelint-plugins/no-setting-wpds-custom-properties.mjs
+diff --git a/packages/theme/src/stylelint-plugins/no-unknown-ds-tokens.js b/packages/theme/src/stylelint-plugins/no-unknown-ds-tokens.mjs
+similarity index 97%
+rename from packages/theme/src/stylelint-plugins/no-unknown-ds-tokens.js
+rename to packages/theme/src/stylelint-plugins/no-unknown-ds-tokens.mjs
+index 7c4748c6e61b5f..39bbabacfc05d9 100644
+--- a/packages/theme/src/stylelint-plugins/no-unknown-ds-tokens.js
++++ b/packages/theme/src/stylelint-plugins/no-unknown-ds-tokens.mjs
+@@ -1,5 +1,5 @@
+ import stylelint from 'stylelint';
+-import tokenList from '../prebuilt/js/design-tokens.js';
++import tokenList from '../prebuilt/js/design-tokens.mjs';
+ 
+ const DS_TOKEN_PREFIX = 'wpds-';
+ 
+diff --git a/packages/theme/src/stylelint-plugins/test/.stylelintrc.json b/packages/theme/src/stylelint-plugins/test/.stylelintrc.json
+index 6e9e08d6e453b6..8a19ea725e38e3 100644
+--- a/packages/theme/src/stylelint-plugins/test/.stylelintrc.json
++++ b/packages/theme/src/stylelint-plugins/test/.stylelintrc.json
+@@ -1,7 +1,7 @@
+ {
+ 	"plugins": [
+-		"../no-unknown-ds-tokens.js",
+-		"../no-setting-wpds-custom-properties.js"
++		"../no-unknown-ds-tokens.mjs",
++		"../no-setting-wpds-custom-properties.mjs"
+ 	],
+ 	"rules": {
+ 		"plugin-wpds/no-unknown-ds-tokens": true,
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index c133c7bde78027..ba51d434d65706 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -71,7 +71,7 @@ export default defineConfig( {
+ 			legacyHex: true,
+ 		} ),
+ 		pluginKnownWpdsCssVariables( {
+-			filename: 'js/design-tokens.js',
++			filename: 'js/design-tokens.mjs',
+ 		} ),
+ 		pluginDsTokenDocs( {
+ 			filename: '../../docs/ds-tokens.md',
+diff --git a/packages/token-list/package.json b/packages/token-list/package.json
+index 82d05e32387f39..b3093f524723fb 100644
+--- a/packages/token-list/package.json
++++ b/packages/token-list/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index c5ae8d2265e491..43e328920f8bfe 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/undo-manager/package.json b/packages/undo-manager/package.json
+index 16af931d8216ea..913224eeb2a349 100644
+--- a/packages/undo-manager/package.json
++++ b/packages/undo-manager/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/upload-media/package.json b/packages/upload-media/package.json
+index b81143adb67717..306b520a90bbf9 100644
+--- a/packages/upload-media/package.json
++++ b/packages/upload-media/package.json
+@@ -28,13 +28,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/url/package.json b/packages/url/package.json
+index 972092ecfbb7cf..8f80e4d61daada 100644
+--- a/packages/url/package.json
++++ b/packages/url/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/viewport/package.json b/packages/viewport/package.json
+index 2f907797f7891c..ed302326f33ce9 100644
+--- a/packages/viewport/package.json
++++ b/packages/viewport/package.json
+@@ -29,12 +29,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/views/package.json b/packages/views/package.json
+index 8d57e538731e2c..0060d62e35c2a2 100644
+--- a/packages/views/package.json
++++ b/packages/views/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/vips/package.json b/packages/vips/package.json
+index ff0e4a762a6e09..235044e9604b2c 100644
+--- a/packages/vips/package.json
++++ b/packages/vips/package.json
+@@ -30,13 +30,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"default": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/warning/package.json b/packages/warning/package.json
+index 8035eda8b5d547..425cfccdb5b5ad 100644
+--- a/packages/warning/package.json
++++ b/packages/warning/package.json
+@@ -30,13 +30,12 @@
+ 		"*.md",
+ 		"babel-plugin.cjs"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+diff --git a/packages/widgets/package.json b/packages/widgets/package.json
+index 23f4308af98d2e..0ce8b389df30b9 100644
+--- a/packages/widgets/package.json
++++ b/packages/widgets/package.json
+@@ -28,12 +28,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/wordcount/package.json b/packages/wordcount/package.json
+index 1f6e347a1a5e6b..63903d44dfdf8e 100644
+--- a/packages/wordcount/package.json
++++ b/packages/wordcount/package.json
+@@ -29,13 +29,12 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+ 			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json"
+diff --git a/packages/workflow/package.json b/packages/workflow/package.json
+index 1e5901b87b9098..2014bb30b6a8c7 100644
+--- a/packages/workflow/package.json
++++ b/packages/workflow/package.json
+@@ -32,12 +32,11 @@
+ 		"build-types",
+ 		"*.md"
+ 	],
+-	"type": "module",
+ 	"main": "build/index.cjs",
+-	"module": "build-module/index.js",
++	"module": "build-module/index.mjs",
+ 	"exports": {
+ 		".": {
+-			"import": "./build-module/index.js",
++			"import": "./build-module/index.mjs",
+ 			"require": "./build/index.cjs"
+ 		},
+ 		"./package.json": "./package.json",
+@@ -45,7 +44,7 @@
+ 	},
+ 	"react-native": "src/index",
+ 	"wpScriptModuleExports": {
+-		".": "./build-module/index.js"
++		".": "./build-module/index.mjs"
+ 	},
+ 	"dependencies": {
+ 		"@wordpress/abilities": "file:../abilities",
+diff --git a/packages/wp-build/package.json b/packages/wp-build/package.json
+index a7361497d80cb3..d9672648b4b164 100644
+--- a/packages/wp-build/package.json
++++ b/packages/wp-build/package.json
+@@ -24,7 +24,7 @@
+ 		"npm": ">=10.2.3"
+ 	},
+ 	"type": "module",
+-	"main": "./src/build.mjs",
++	"module": "./src/build.mjs",
+ 	"exports": {
+ 		".": {
+ 			"import": "./src/build.mjs"
+diff --git a/packages/wp-build/src/build.mjs b/packages/wp-build/src/build.mjs
+index 227fc498b19feb..2fa493f0bc6259 100755
+--- a/packages/wp-build/src/build.mjs
++++ b/packages/wp-build/src/build.mjs
+@@ -43,7 +43,7 @@ const ROOT_DIR = process.cwd();
+ const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
+ const BUILD_DIR = path.join( ROOT_DIR, 'build' );
+ 
+-const SOURCE_EXTENSIONS = '{js,ts,tsx}';
++const SOURCE_EXTENSIONS = '{js,mjs,ts,tsx}';
+ const ASSET_EXTENSIONS = 'json';
+ const IGNORE_PATTERNS = [
+ 	'**/benchmark/**',
+@@ -1073,9 +1073,9 @@ async function transpilePackage( packageName ) {
+ 						relativePath = './' + relativePath;
+ 					}
+ 
+-					// Replace extension: make sure that file extension is always `.js` or `.cjs`.
++					// Replace extension: make sure that file extension is always `.mjs` or `.cjs`.
+ 					const newExt =
+-						build.initialOptions.format === 'cjs' ? '.cjs' : '.js';
++						build.initialOptions.format === 'cjs' ? '.cjs' : '.mjs';
+ 					relativePath = relativePath.replace( /\.[jt]sx?$/, newExt );
+ 
+ 					return {
+@@ -1132,6 +1132,7 @@ async function transpilePackage( packageName ) {
+ 				entryPoints: srcFiles,
+ 				outdir: buildModuleDir,
+ 				outbase: srcDir,
++				outExtension: { '.js': '.mjs' },
+ 				bundle: true,
+ 				platform: 'neutral',
+ 				format: 'esm',
+diff --git a/tools/eslint/import-resolver.js b/tools/eslint/import-resolver.js
+index 3fb144e821429c..3d08282515733d 100644
+--- a/tools/eslint/import-resolver.js
++++ b/tools/eslint/import-resolver.js
+@@ -32,7 +32,9 @@ exports.resolve = function ( source, file, config ) {
+ 			const manifest = JSON.parse( readFileSync( manifestPath, 'utf8' ) );
+ 			const subpath = path.join( '.', pathParts.join( '/' ) );
+ 			const exportPath = manifest.exports?.[ subpath ]?.import;
+-			const sourcePath = exportPath.replace( 'build-module', 'src' );
++			const sourcePath = exportPath
++				.replace( 'build-module', 'src' )
++				.replace( /\.mjs$/, '.js' );
+ 
+ 			return resolve( path.join( packagePath, sourcePath ) );
+ 		} catch {

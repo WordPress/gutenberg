@@ -1,0 +1,497 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index cded7d84cfadca..350ed3d88e4b65 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -24,6 +24,7 @@
+ -   `ControlGroup`, `FormGroup`, `ControlLabel`, `Spinner`: Remove unused `ui/` components from the codebase ([#52953](https://github.com/WordPress/gutenberg/pull/52953)).
+ -   `MenuItem`: Convert to TypeScript ([#53132](https://github.com/WordPress/gutenberg/pull/53132)).
+ -   `MenuGroup`: Add Storybook stories ([#53090](https://github.com/WordPress/gutenberg/pull/53090)).
++-   Components: Remove unnecessary utils ([#53679](https://github.com/WordPress/gutenberg/pull/53679)).
+ 
+ ## 25.5.0 (2023-08-10)
+ 
+diff --git a/packages/components/src/color-palette/test/utils.ts b/packages/components/src/color-palette/test/utils.ts
+index d862d35be5f52f..65e829a58a06bd 100644
+--- a/packages/components/src/color-palette/test/utils.ts
++++ b/packages/components/src/color-palette/test/utils.ts
+@@ -3,7 +3,6 @@
+  */
+ import {
+ 	extractColorNameFromCurrentValue,
+-	showTransparentBackground,
+ 	normalizeColorValue,
+ } from '../utils';
+ 
+@@ -25,20 +24,6 @@ describe( 'ColorPalette: Utils', () => {
+ 			expect( result ).toBe( 'Blue' );
+ 		} );
+ 	} );
+-	describe( 'showTransparentBackground', () => {
+-		test( 'should return true for undefined color values', () => {
+-			expect( showTransparentBackground( undefined ) ).toBe( true );
+-		} );
+-		test( 'should return true for transparent colors', () => {
+-			expect( showTransparentBackground( 'transparent' ) ).toBe( true );
+-			expect( showTransparentBackground( '#75757500' ) ).toBe( true );
+-		} );
+-		test( 'should return false for non-transparent colors', () => {
+-			expect( showTransparentBackground( '#FFF' ) ).toBe( false );
+-			expect( showTransparentBackground( '#757575' ) ).toBe( false );
+-			expect( showTransparentBackground( '#f5f5f524' ) ).toBe( false ); // 0.14 alpha.
+-		} );
+-	} );
+ 
+ 	describe( 'normalizeColorValue', () => {
+ 		test( 'should return the value as is if the color value is not a CSS variable', () => {
+diff --git a/packages/components/src/color-palette/utils.ts b/packages/components/src/color-palette/utils.ts
+index 1ef7f308d01230..79141bf752eb73 100644
+--- a/packages/components/src/color-palette/utils.ts
++++ b/packages/components/src/color-palette/utils.ts
+@@ -52,13 +52,6 @@ export const extractColorNameFromCurrentValue = (
+ 	return __( 'Custom' );
+ };
+ 
+-export const showTransparentBackground = ( currentValue?: string ) => {
+-	if ( typeof currentValue === 'undefined' ) {
+-		return true;
+-	}
+-	return colord( currentValue ).alpha() === 0;
+-};
+-
+ // The PaletteObject type has a `colors` property (an array of ColorObject),
+ // while the ColorObject type has a `color` property (the CSS color value).
+ export const isMultiplePaletteObject = (
+diff --git a/packages/components/src/ui/context/constants.js b/packages/components/src/ui/context/constants.js
+index b5bee35a35fbae..aa98c3945dc17f 100644
+--- a/packages/components/src/ui/context/constants.js
++++ b/packages/components/src/ui/context/constants.js
+@@ -1,7 +1,5 @@
+-export const REACT_TYPEOF_KEY = '$$typeof';
+ export const COMPONENT_NAMESPACE = 'data-wp-component';
+ export const CONNECTED_NAMESPACE = 'data-wp-c16t';
+-export const CONTEXT_COMPONENT_NAMESPACE = 'data-wp-c5tc8t';
+ 
+ /**
+  * Special key where the connected namespaces are stored.
+diff --git a/packages/components/src/ui/utils/get-high-dpi.ts b/packages/components/src/ui/utils/get-high-dpi.ts
+deleted file mode 100644
+index 17e6ad2a2c0951..00000000000000
+--- a/packages/components/src/ui/utils/get-high-dpi.ts
++++ /dev/null
+@@ -1,20 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-// eslint-disable-next-line no-restricted-imports
+-import type { CSSInterpolation } from '@emotion/css';
+-
+-export function getHighDpi(
+-	strings: TemplateStringsArray,
+-	...interpolations: CSSInterpolation[]
+-) {
+-	const interpolatedStyles = css( strings, ...interpolations );
+-
+-	return css`
+-		@media ( -webkit-min-device-pixel-ratio: 1.25 ),
+-			( min-resolution: 120dpi ) {
+-			${ interpolatedStyles }
+-		}
+-	`;
+-}
+diff --git a/packages/components/src/utils/browsers.js b/packages/components/src/utils/browsers.js
+deleted file mode 100644
+index 7c852465d5f1be..00000000000000
+--- a/packages/components/src/utils/browsers.js
++++ /dev/null
+@@ -1,36 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-
+-/* eslint-disable jsdoc/no-undefined-types */
+-/**
+- * @param {TemplateStringsArray}                                      strings
+- * @param {import('@emotion/css/create-instance').CSSInterpolation[]} interpolations
+- */
+-export function firefoxOnly( strings, ...interpolations ) {
+-	const interpolatedStyles = css( strings, ...interpolations );
+-
+-	return css`
+-		@-moz-document url-prefix() {
+-			${ interpolatedStyles };
+-		}
+-	`;
+-}
+-
+-/**
+- * @param {TemplateStringsArray}                                      strings
+- * @param {import('@emotion/css/create-instance').CSSInterpolation[]} interpolations
+- */
+-export function safariOnly( strings, ...interpolations ) {
+-	const interpolatedStyles = css( strings, ...interpolations );
+-
+-	return css`
+-		@media not all and ( min-resolution: 0.001dpcm ) {
+-			@supports ( -webkit-appearance: none ) {
+-				${ interpolatedStyles }
+-			}
+-		}
+-	`;
+-}
+-/* eslint-enable jsdoc/no-undefined-types */
+diff --git a/packages/components/src/utils/events.ts b/packages/components/src/utils/events.ts
+deleted file mode 100644
+index a3153aa6cad58e..00000000000000
+--- a/packages/components/src/utils/events.ts
++++ /dev/null
+@@ -1,50 +0,0 @@
+-type EventHandler< T extends Event > = ( event: T ) => void;
+-
+-/**
+- * Merges event handlers together.
+- *
+- * @template TEvent
+- * @param    handler
+- * @param    otherHandler
+- */
+-function mergeEvent< TEvent extends Event >(
+-	handler: EventHandler< TEvent >,
+-	otherHandler: EventHandler< TEvent >
+-): EventHandler< TEvent > {
+-	return ( event: TEvent ) => {
+-		if ( typeof handler === 'function' ) {
+-			handler( event );
+-		}
+-		if ( typeof otherHandler === 'function' ) {
+-			otherHandler( event );
+-		}
+-	};
+-}
+-
+-/**
+- * Merges two sets of event handlers together.
+- *
+- * @template TEvent
+- * @param    handlers
+- * @param    extraHandlers
+- */
+-export function mergeEventHandlers<
+-	TEvent extends Event,
+-	TLeft extends Record< string, EventHandler< TEvent > >,
+-	TRight extends Record< string, EventHandler< TEvent > >
+->( handlers: TLeft, extraHandlers: TRight ): TLeft & TRight {
+-	// @ts-ignore We'll fill in all the properties below
+-	const mergedHandlers: TLeft & TRight = {
+-		...handlers,
+-	};
+-
+-	for ( const [ key, handler ] of Object.entries( extraHandlers ) ) {
+-		// @ts-ignore
+-		mergedHandlers[ key as keyof typeof mergedHandlers ] =
+-			key in mergedHandlers
+-				? mergeEvent( mergedHandlers[ key ], handler )
+-				: handler;
+-	}
+-
+-	return mergedHandlers;
+-}
+diff --git a/packages/components/src/utils/math.js b/packages/components/src/utils/math.js
+index 5bfb17e700ed39..ffaab4e3bd11ba 100644
+--- a/packages/components/src/utils/math.js
++++ b/packages/components/src/utils/math.js
+@@ -96,14 +96,3 @@ export function roundClamp(
+ 		? getNumber( clampedValue.toFixed( precision ) )
+ 		: clampedValue;
+ }
+-
+-/**
+- * Clamps a value based on a min/max range with rounding.
+- * Returns a string.
+- *
+- * @param {Parameters<typeof roundClamp>} args Arguments for roundClamp().
+- * @return {string} The rounded and clamped value.
+- */
+-export function roundClampString( ...args ) {
+-	return roundClamp( ...args ).toString();
+-}
+diff --git a/packages/components/src/utils/test/events.js b/packages/components/src/utils/test/events.js
+deleted file mode 100644
+index 75709614b9d072..00000000000000
+--- a/packages/components/src/utils/test/events.js
++++ /dev/null
+@@ -1,63 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { mergeEventHandlers } from '../events';
+-
+-describe( 'mergeEventHandlers', () => {
+-	it( 'should merge the two event handler objects', () => {
+-		const left = {
+-			onclick: jest.fn(),
+-		};
+-
+-		const right = {
+-			onclick: jest.fn(),
+-		};
+-
+-		const merged = mergeEventHandlers( left, right );
+-
+-		merged.onclick();
+-
+-		expect( left.onclick ).toHaveBeenCalled();
+-		expect( right.onclick ).toHaveBeenCalled();
+-	} );
+-
+-	it( 'should preserve all handlers from the left hand side that do not overlap with the right', () => {
+-		const left = {
+-			ArrowUp: jest.fn(),
+-			ArrowDown: jest.fn(),
+-		};
+-
+-		const right = {
+-			ArrowUp: jest.fn(),
+-		};
+-
+-		const merged = mergeEventHandlers( left, right );
+-
+-		merged.ArrowUp();
+-
+-		expect( left.ArrowUp ).toHaveBeenCalled();
+-		expect( right.ArrowUp ).toHaveBeenCalled();
+-
+-		expect( merged.ArrowDown ).toBe( left.ArrowDown );
+-	} );
+-
+-	it( 'should preserve all handlers form the right hand side that do not overlap with the left', () => {
+-		const right = {
+-			ArrowUp: jest.fn(),
+-			ArrowDown: jest.fn(),
+-		};
+-
+-		const left = {
+-			ArrowUp: jest.fn(),
+-		};
+-
+-		const merged = mergeEventHandlers( left, right );
+-
+-		merged.ArrowUp();
+-
+-		expect( left.ArrowUp ).toHaveBeenCalled();
+-		expect( right.ArrowUp ).toHaveBeenCalled();
+-
+-		expect( merged.ArrowDown ).toBe( right.ArrowDown );
+-	} );
+-} );
+diff --git a/packages/components/src/utils/test/values.js b/packages/components/src/utils/test/values.js
+deleted file mode 100644
+index 384136949beb3c..00000000000000
+--- a/packages/components/src/utils/test/values.js
++++ /dev/null
+@@ -1,101 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { isValueNumeric } from '../values';
+-
+-/**
+- * This works because Node 12 ships with `small-icu` instead of `full-icu`
+- * meaning it only supports the `en-US` locale. If we test for support of the
+- * `pt-BR` locale, we can detect when we're running in a "full-icu" environment
+- * i.e., either Node 14+ or previous versions built with the `full-icu` option.
+- *
+- * Furthermore, this is safe to run in a `jsdom` test environment because, as the
+- * issue linked below describes, `jsdom` does not implement the Intl object, instead
+- * relying on the relevant Node implementation.
+- *
+- * @see https://nodejs.org/docs/latest-v12.x/api/intl.html#intl_options_for_building_node_js
+- * @see https://nodejs.org/docs/latest-v14.x/api/intl.html#intl_options_for_building_node_js
+- * @see https://github.com/jsdom/jsdom/issues/1626
+- *
+- * @todo Remove when Node 12 is deprecated
+- * @param {() => void} testCallback
+- */
+-function scopeTestToFullICU( testCallback ) {
+-	if ( Intl.NumberFormat.supportedLocalesOf( 'pt-BR' ).length === 1 ) {
+-		testCallback();
+-	}
+-}
+-
+-describe( 'isValueNumeric', () => {
+-	it( 'should handle space separated numbers for locales with period decimal delimiters', () => {
+-		expect( isValueNumeric( '1 000.1', 'en-US' ) ).toBe( true );
+-	} );
+-
+-	it.each( [
+-		'999',
+-		'99.33',
+-		0.0003,
+-		2222,
+-		'22,222,222',
+-		-888,
+-		new Number(),
+-	] )(
+-		'should return `true` for numeric values %s for locale with comma delimiter',
+-		( x ) => {
+-			expect( isValueNumeric( x, 'en-US' ) ).toBe( true );
+-		}
+-	);
+-
+-	it.each( [ null, , 'Stringy', {}, [] ] )(
+-		'should return `false` for non-numeric value %s for locale with comma delimiter',
+-		( x ) => {
+-			expect( isValueNumeric( x, 'en-US' ) ).toBe( false );
+-		}
+-	);
+-
+-	scopeTestToFullICU( () => {
+-		it( 'should handle space separated numbers for locales with comma decimal delimiters', () => {
+-			expect( isValueNumeric( '1 000,1', 'pt-BR' ) ).toBe( true );
+-		} );
+-
+-		it.each( [
+-			'999',
+-			'99,33',
+-			0.0003,
+-			2222,
+-			'22.222.222',
+-			-888,
+-			new Number(),
+-		] )(
+-			'should return `true` for numeric values %s for locale with period delimiter',
+-			( x ) => {
+-				expect( isValueNumeric( x, 'pt-BR' ) ).toBe( true );
+-			}
+-		);
+-
+-		it.each( [ null, , 'Stringy', {}, [] ] )(
+-			'should return `false` for non-numeric value %s for locale with period delimiter',
+-			( x ) => {
+-				expect( isValueNumeric( x, 'pt-BR' ) ).toBe( false );
+-			}
+-		);
+-
+-		it( 'should handle arabic locales with western arabic numerals', () => {
+-			expect( isValueNumeric( '1.000,1', 'ar' ) ).toBe( true );
+-			expect( isValueNumeric( '1.000,1', 'fa' ) ).toBe( true );
+-			expect( isValueNumeric( '1.000,1', 'ur' ) ).toBe( true );
+-			expect( isValueNumeric( '1.000,1', 'ckb' ) ).toBe( true );
+-			expect( isValueNumeric( '1.000,1', 'ps' ) ).toBe( true );
+-			expect( isValueNumeric( '1.000,a', 'ar' ) ).toBe( false );
+-		} );
+-
+-		it( 'should handle arabic locales with eastern arabic numerals', () => {
+-			expect( isValueNumeric( '١٬٠٠٠٫١', 'ar' ) ).toBe( true );
+-			expect( isValueNumeric( '۴۵۶٫۱', 'fa' ) ).toBe( true );
+-			expect( isValueNumeric( '١٬٠٠٠٫١', 'ur' ) ).toBe( true );
+-			expect( isValueNumeric( '١٬٠٠٠٫١', 'ckb' ) ).toBe( true );
+-			expect( isValueNumeric( '١٬٠٠٠٫١', 'ps' ) ).toBe( true );
+-			expect( isValueNumeric( '١٬٠٠٠٫a', 'ar' ) ).toBe( false );
+-		} );
+-	} );
+-} );
+diff --git a/packages/components/src/utils/values.js b/packages/components/src/utils/values.js
+index dacad621cc0e68..b620ebccbdb0ca 100644
+--- a/packages/components/src/utils/values.js
++++ b/packages/components/src/utils/values.js
+@@ -39,65 +39,6 @@ export function getDefinedValue( values = [], fallbackValue ) {
+ 	return values.find( isValueDefined ) ?? fallbackValue;
+ }
+ 
+-/**
+- * @param {string} [locale]
+- * @return {[RegExp, RegExp]} The delimiter and decimal regexp
+- */
+-const getDelimiterAndDecimalRegex = ( locale ) => {
+-	const formatted = Intl.NumberFormat( locale ).format( 1000.1 );
+-	const delimiter = formatted[ 1 ];
+-	const decimal = formatted[ formatted.length - 2 ];
+-	return [
+-		new RegExp( `\\${ delimiter }`, 'g' ),
+-		new RegExp( `\\${ decimal }`, 'g' ),
+-	];
+-};
+-
+-// https://en.wikipedia.org/wiki/Decimal_separator#Current_standards
+-const INTERNATIONAL_THOUSANDS_DELIMITER = / /g;
+-
+-const ARABIC_NUMERAL_LOCALES = [ 'ar', 'fa', 'ur', 'ckb', 'ps' ];
+-
+-const EASTERN_ARABIC_NUMBERS = /([۰-۹]|[٠-٩])/g;
+-
+-/**
+- * Checks to see if a value is a numeric value (`number` or `string`).
+- *
+- * Intentionally ignores whether the thousands delimiters are only
+- * in the thousands marks.
+- *
+- * @param {any}    value
+- * @param {string} [locale]
+- * @return {boolean} Whether value is numeric.
+- */
+-export function isValueNumeric( value, locale = window.navigator.language ) {
+-	if ( ARABIC_NUMERAL_LOCALES.some( ( l ) => locale.startsWith( l ) ) ) {
+-		locale = 'en-GB';
+-		if ( EASTERN_ARABIC_NUMBERS.test( value ) ) {
+-			value = value
+-				.replace( /[٠-٩]/g, ( /** @type {string} */ d ) =>
+-					'٠١٢٣٤٥٦٧٨٩'.indexOf( d )
+-				)
+-				.replace( /[۰-۹]/g, ( /** @type {string} */ d ) =>
+-					'۰۱۲۳۴۵۶۷۸۹'.indexOf( d )
+-				)
+-				.replace( /٬/g, ',' )
+-				.replace( /٫/g, '.' );
+-		}
+-	}
+-
+-	const [ delimiterRegexp, decimalRegexp ] =
+-		getDelimiterAndDecimalRegex( locale );
+-	const valueToCheck =
+-		typeof value === 'string'
+-			? value
+-					.replace( delimiterRegexp, '' )
+-					.replace( decimalRegexp, '.' )
+-					.replace( INTERNATIONAL_THOUSANDS_DELIMITER, '' )
+-			: value;
+-	return ! isNaN( parseFloat( valueToCheck ) ) && isFinite( valueToCheck );
+-}
+-
+ /**
+  * Converts a string to a number.
+  *
+@@ -108,16 +49,6 @@ export const stringToNumber = ( value ) => {
+ 	return parseFloat( value );
+ };
+ 
+-/**
+- * Converts a number to a string.
+- *
+- * @param {number} value
+- * @return {string} Number as a string.
+- */
+-export const numberToString = ( value ) => {
+-	return `${ value }`;
+-};
+-
+ /**
+  * Regardless of the input being a string or a number, returns a number.
+  *
+@@ -129,15 +60,3 @@ export const numberToString = ( value ) => {
+ export const ensureNumber = ( value ) => {
+ 	return typeof value === 'string' ? stringToNumber( value ) : value;
+ };
+-
+-/**
+- * Regardless of the input being a string or a number, returns a number.
+- *
+- * Returns `undefined` in case the string is `undefined` or not a valid numeric value.
+- *
+- * @param {string | number} value
+- * @return {string} The converted string, or `undefined` in case the input is `undefined` or `NaN`.
+- */
+-export const ensureString = ( value ) => {
+-	return typeof value === 'string' ? value : numberToString( value );
+-};

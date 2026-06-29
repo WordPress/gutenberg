@@ -1,0 +1,95 @@
+diff --git a/packages/edit-site/src/components/style-book/index.js b/packages/edit-site/src/components/style-book/index.js
+index d3e0cb3531ae99..7ecfdc3506cf8a 100644
+--- a/packages/edit-site/src/components/style-book/index.js
++++ b/packages/edit-site/src/components/style-book/index.js
+@@ -8,7 +8,6 @@ import classnames from 'classnames';
+  */
+ import {
+ 	Disabled,
+-	TabPanel,
+ 	privateApis as componentsPrivateApis,
+ } from '@wordpress/components';
+ import { __, sprintf } from '@wordpress/i18n';
+@@ -48,6 +47,7 @@ const {
+ 	CompositeV2: Composite,
+ 	CompositeItemV2: CompositeItem,
+ 	useCompositeStoreV2: useCompositeStore,
++	Tabs,
+ } = unlock( componentsPrivateApis );
+ 
+ // The content area of the Style Book is rendered within an iframe so that global styles
+@@ -253,22 +253,37 @@ function StyleBook( {
+ 			>
+ 				{ resizeObserver }
+ 				{ showTabs ? (
+-					<TabPanel
+-						className="edit-site-style-book__tab-panel"
+-						tabs={ tabs }
+-					>
+-						{ ( tab ) => (
+-							<StyleBookBody
+-								category={ tab.name }
+-								examples={ examples }
+-								isSelected={ isSelected }
+-								onSelect={ onSelect }
+-								settings={ settings }
+-								sizes={ sizes }
+-								title={ tab.title }
+-							/>
+-						) }
+-					</TabPanel>
++					<div className="edit-site-style-book__tabs">
++						<Tabs>
++							<Tabs.TabList>
++								{ tabs.map( ( tab ) => (
++									<Tabs.Tab
++										tabId={ tab.name }
++										key={ tab.name }
++									>
++										{ tab.title }
++									</Tabs.Tab>
++								) ) }
++							</Tabs.TabList>
++							{ tabs.map( ( tab ) => (
++								<Tabs.TabPanel
++									key={ tab.name }
++									tabId={ tab.name }
++									focusable={ false }
++								>
++									<StyleBookBody
++										category={ tab.name }
++										examples={ examples }
++										isSelected={ isSelected }
++										onSelect={ onSelect }
++										settings={ settings }
++										sizes={ sizes }
++										title={ tab.title }
++									/>
++								</Tabs.TabPanel>
++							) ) }
++						</Tabs>
++					</div>
+ 				) : (
+ 					<StyleBookBody
+ 						examples={ examples }
+diff --git a/packages/edit-site/src/components/style-book/style.scss b/packages/edit-site/src/components/style-book/style.scss
+index 0ddefb055a8d8d..3b2c6ab0867dbe 100644
+--- a/packages/edit-site/src/components/style-book/style.scss
++++ b/packages/edit-site/src/components/style-book/style.scss
+@@ -17,13 +17,13 @@
+ 	}
+ }
+ 
+-.edit-site-style-book__tab-panel {
+-	.components-tab-panel__tabs {
++.edit-site-style-book__tabs {
++	[role="tablist"] {
+ 		background: $white;
+ 		color: $gray-900;
+ 	}
+ 
+-	.components-tab-panel__tab-content {
++	[role="tabpanel"] {
+ 		bottom: 0;
+ 		left: 0;
+ 		overflow: auto;

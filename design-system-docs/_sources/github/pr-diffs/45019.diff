@@ -1,0 +1,145 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e5290611a93e2c..4747336f94a479 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -27,6 +27,7 @@
+ 
+ ### Bug Fix
+ 
++-   `useNavigateRegions`: Add new keyboard shortcut alias to cover backtick and tilde keys inconsistencies across browsers ([#45019](https://github.com/WordPress/gutenberg/pull/45019)).
+ -   `Button`: Tweak the destructive button primary, link, and default variants ([#44427](https://github.com/WordPress/gutenberg/pull/44427)).
+ -   `UnitControl`: Fix `disabled` style is overridden by core `form.css` style ([#45250](https://github.com/WordPress/gutenberg/pull/45250)).
+ -   `ItemGroup`: fix RTL `Item` styles when rendered as a button ([#45280](https://github.com/WordPress/gutenberg/pull/45280)).
+diff --git a/packages/components/src/higher-order/navigate-regions/index.js b/packages/components/src/higher-order/navigate-regions/index.js
+index 8244d26d78c6e9..0e76349cf3c0af 100644
+--- a/packages/components/src/higher-order/navigate-regions/index.js
++++ b/packages/components/src/higher-order/navigate-regions/index.js
+@@ -15,6 +15,10 @@ const defaultShortcuts = {
+ 			modifier: 'ctrlShift',
+ 			character: '`',
+ 		},
++		{
++			modifier: 'ctrlShift',
++			character: '~',
++		},
+ 		{
+ 			modifier: 'access',
+ 			character: 'p',
+diff --git a/packages/edit-post/src/components/keyboard-shortcuts/index.js b/packages/edit-post/src/components/keyboard-shortcuts/index.js
+index a23757d1cb662e..df5205de1c94a7 100644
+--- a/packages/edit-post/src/components/keyboard-shortcuts/index.js
++++ b/packages/edit-post/src/components/keyboard-shortcuts/index.js
+@@ -133,6 +133,10 @@ function KeyboardShortcuts() {
+ 					modifier: 'access',
+ 					character: 'p',
+ 				},
++				{
++					modifier: 'ctrlShift',
++					character: '~',
++				},
+ 			],
+ 		} );
+ 
+diff --git a/packages/edit-site/src/components/keyboard-shortcuts/index.js b/packages/edit-site/src/components/keyboard-shortcuts/index.js
+index 3a2d82c842eaba..96255dd928c600 100644
+--- a/packages/edit-site/src/components/keyboard-shortcuts/index.js
++++ b/packages/edit-site/src/components/keyboard-shortcuts/index.js
+@@ -180,6 +180,10 @@ function KeyboardShortcutsRegister() {
+ 					modifier: 'access',
+ 					character: 'p',
+ 				},
++				{
++					modifier: 'ctrlShift',
++					character: '~',
++				},
+ 			],
+ 		} );
+ 		registerShortcut( {
+diff --git a/packages/edit-site/src/components/list/use-register-shortcuts.js b/packages/edit-site/src/components/list/use-register-shortcuts.js
+index 7fbdb02ab8c7db..f31b4a3808a22e 100644
+--- a/packages/edit-site/src/components/list/use-register-shortcuts.js
++++ b/packages/edit-site/src/components/list/use-register-shortcuts.js
+@@ -39,6 +39,10 @@ export default function useRegisterShortcuts() {
+ 					modifier: 'access',
+ 					character: 'p',
+ 				},
++				{
++					modifier: 'ctrlShift',
++					character: '~',
++				},
+ 			],
+ 		} );
+ 	}, [] );
+diff --git a/packages/edit-widgets/src/components/keyboard-shortcuts/index.js b/packages/edit-widgets/src/components/keyboard-shortcuts/index.js
+index 0670d41bc135b2..dd039295c3661e 100644
+--- a/packages/edit-widgets/src/components/keyboard-shortcuts/index.js
++++ b/packages/edit-widgets/src/components/keyboard-shortcuts/index.js
+@@ -110,6 +110,10 @@ function KeyboardShortcutsRegister() {
+ 					modifier: 'access',
+ 					character: 'p',
+ 				},
++				{
++					modifier: 'ctrlShift',
++					character: '~',
++				},
+ 			],
+ 		} );
+ 	}, [ registerShortcut ] );
+diff --git a/test/e2e/specs/editor/various/a11y-region-navigation.spec.js b/test/e2e/specs/editor/various/a11y-region-navigation.spec.js
+new file mode 100644
+index 00000000000000..7eee32af2b08eb
+--- /dev/null
++++ b/test/e2e/specs/editor/various/a11y-region-navigation.spec.js
+@@ -0,0 +1,52 @@
++/**
++ * WordPress dependencies
++ */
++const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
++
++test.describe( 'Region navigation (@firefox, @webkit)', () => {
++	test.beforeEach( async ( { admin } ) => {
++		await admin.createNewPost();
++	} );
++
++	test.afterAll( async ( { requestUtils } ) => {
++		await requestUtils.deleteAllPosts();
++	} );
++
++	test( 'navigates forward and back again', async ( {
++		editor,
++		page,
++	}, testInfo ) => {
++		// Insert a paragraph block.
++		await editor.insertBlock( {
++			name: 'core/paragraph',
++			attributes: { content: 'Dummy text' },
++		} );
++
++		// Navigate to first region and check that we made it.
++		await page.keyboard.press( 'Control+`' );
++		const editorTopBar = page.locator(
++			'role=region[name="Editor top bar"i]'
++		);
++		await expect( editorTopBar ).toBeFocused();
++
++		// Navigate to next/second region and check that we made it.
++		await page.keyboard.press( 'Control+`' );
++		const editorContent = page.locator(
++			'role=region[name="Editor content"i]'
++		);
++		await expect( editorContent ).toBeFocused();
++
++		// Navigate to previous/first region and check that we made it.
++		// Make sure navigating backwards works also with the tilde character,
++		// as browsers interpret the combination of the crtl+shift+backtick keys
++		// and assign it to event.key inconsistently.
++		// See https://github.com/WordPress/gutenberg/pull/45019
++		if ( testInfo.project.name === 'chromium' ) {
++			await page.keyboard.press( 'Control+Shift+`' );
++		} else {
++			await page.keyboard.press( 'Control+Shift+~' );
++		}
++
++		await expect( editorTopBar ).toBeFocused();
++	} );
++} );

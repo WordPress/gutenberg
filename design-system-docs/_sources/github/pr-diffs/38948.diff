@@ -1,0 +1,873 @@
+diff --git a/packages/components/CONTRIBUTING.md b/packages/components/CONTRIBUTING.md
+index bc5219d6bfd792..04a0f28bc452c0 100644
+--- a/packages/components/CONTRIBUTING.md
++++ b/packages/components/CONTRIBUTING.md
+@@ -145,7 +145,7 @@ function useExampleComponent( props: PolymorphicComponentProps< ExampleProps, 'd
+ // in `component.tsx`
+ function Example(
+ 	props: PolymorphicComponentProps< ExampleProps, 'div' >,
+-	forwardedRef: Ref< any >
++	forwardedRef: React.ForwardedRef< any >
+ ) {
+ 	const exampleProps = useExampleComponent( props );
+ 
+diff --git a/packages/components/src/card/card-body/component.js b/packages/components/src/card/card-body/component.js
+index 73e2e337b4bebb..028974cbd1e882 100644
+--- a/packages/components/src/card/card-body/component.js
++++ b/packages/components/src/card/card-body/component.js
+@@ -8,7 +8,7 @@ import { useCardBody } from './hook';
+ 
+ /**
+  * @param {import('../../ui/context').WordPressComponentProps<import('../types').BodyProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                                forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                       forwardedRef
+  */
+ function CardBody( props, forwardedRef ) {
+ 	const { isScrollable, ...otherProps } = useCardBody( props );
+diff --git a/packages/components/src/card/card-divider/component.js b/packages/components/src/card/card-divider/component.js
+index 058cc341633c2f..9696b98673db74 100644
+--- a/packages/components/src/card/card-divider/component.js
++++ b/packages/components/src/card/card-divider/component.js
+@@ -7,7 +7,7 @@ import { useCardDivider } from './hook';
+ 
+ /**
+  * @param {import('../../ui/context').WordPressComponentProps<import('../../divider').DividerProps, 'hr', false>} props
+- * @param {import('react').Ref<any>}                                                                              forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                                     forwardedRef
+  */
+ function CardDivider( props, forwardedRef ) {
+ 	const dividerProps = useCardDivider( props );
+diff --git a/packages/components/src/card/card-footer/component.js b/packages/components/src/card/card-footer/component.js
+index 0b0fa967a7d6c7..130d9141e409e6 100644
+--- a/packages/components/src/card/card-footer/component.js
++++ b/packages/components/src/card/card-footer/component.js
+@@ -7,7 +7,7 @@ import { useCardFooter } from './hook';
+ 
+ /**
+  * @param {import('../../ui/context').WordPressComponentProps<import('../types').FooterProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                                  forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                         forwardedRef
+  */
+ function CardFooter( props, forwardedRef ) {
+ 	const footerProps = useCardFooter( props );
+diff --git a/packages/components/src/card/card-header/component.js b/packages/components/src/card/card-header/component.js
+index d08a2e3438ea1c..f9fe39d03a8c8f 100644
+--- a/packages/components/src/card/card-header/component.js
++++ b/packages/components/src/card/card-header/component.js
+@@ -7,7 +7,7 @@ import { useCardHeader } from './hook';
+ 
+ /**
+  * @param {import('../../ui/context').WordPressComponentProps<import('../types').HeaderProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                                  forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                         forwardedRef
+  */
+ function CardHeader( props, forwardedRef ) {
+ 	const headerProps = useCardHeader( props );
+diff --git a/packages/components/src/card/card-media/component.js b/packages/components/src/card/card-media/component.js
+index c07f78ce52b3ae..83313b1ce4fe3d 100644
+--- a/packages/components/src/card/card-media/component.js
++++ b/packages/components/src/card/card-media/component.js
+@@ -7,7 +7,7 @@ import { useCardMedia } from './hook';
+ 
+ /**
+  * @param {import('../../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+- * @param {import('react').Ref<any>}                                                                           forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                                  forwardedRef
+  */
+ function CardMedia( props, forwardedRef ) {
+ 	const cardMediaProps = useCardMedia( props );
+diff --git a/packages/components/src/card/card/component.js b/packages/components/src/card/card/component.js
+index 0c0b7a9710cbce..c78d8d69c3b7b4 100644
+--- a/packages/components/src/card/card/component.js
++++ b/packages/components/src/card/card/component.js
+@@ -21,7 +21,7 @@ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+  * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                                            forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                   forwardedRef
+  */
+ function Card( props, forwardedRef ) {
+ 	const {
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index dc4711339aa556..b08d073cb4df0b 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ import { colord, extend, Colord } from 'colord';
+ import namesPlugin from 'colord/plugins/names';
+ 
+@@ -54,7 +54,7 @@ const options = [
+ 
+ const ColorPicker = (
+ 	props: WordPressComponentProps< ColorPickerProps, 'div', false >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) => {
+ 	const {
+ 		enableAlpha = false,
+diff --git a/packages/components/src/confirm-dialog/component.tsx b/packages/components/src/confirm-dialog/component.tsx
+index d9c8835ca3d8c3..7ba51296dd1d10 100644
+--- a/packages/components/src/confirm-dialog/component.tsx
++++ b/packages/components/src/confirm-dialog/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref, KeyboardEvent } from 'react';
++import type { ForwardedRef, KeyboardEvent } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -28,7 +28,7 @@ import { useCx } from '../utils/hooks/use-cx';
+ 
+ function ConfirmDialog(
+ 	props: WordPressComponentProps< OwnProps, 'div', false >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+ 		isOpen: isOpenProp,
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 8deac3ddef071f..5339b043c25be8 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -3,7 +3,7 @@
+  */
+ // eslint-disable-next-line no-restricted-imports
+ import { Separator } from 'reakit';
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -18,7 +18,7 @@ import type { Props } from './types';
+ 
+ function Divider(
+ 	props: WordPressComponentProps< Props, 'hr', false >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const contextProps = useContextSystem( props, 'Divider' );
+ 
+diff --git a/packages/components/src/elevation/component.js b/packages/components/src/elevation/component.js
+index 1ed01bea55c0ef..826e3ce50412b7 100644
+--- a/packages/components/src/elevation/component.js
++++ b/packages/components/src/elevation/component.js
+@@ -7,7 +7,7 @@ import { useElevation } from './hook';
+ 
+ /**
+  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                                        forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                               forwardedRef
+  */
+ function Elevation( props, forwardedRef ) {
+ 	const elevationProps = useElevation( props );
+diff --git a/packages/components/src/flex/flex-block/component.js b/packages/components/src/flex/flex-block/component.js
+index aa3352ba7b95c3..d7b03a87e43dfe 100644
+--- a/packages/components/src/flex/flex-block/component.js
++++ b/packages/components/src/flex/flex-block/component.js
+@@ -7,7 +7,7 @@ import { useFlexBlock } from './hook';
+ 
+ /**
+  * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexBlockProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                                     forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                            forwardedRef
+  */
+ function FlexBlock( props, forwardedRef ) {
+ 	const flexBlockProps = useFlexBlock( props );
+diff --git a/packages/components/src/flex/flex-item/component.js b/packages/components/src/flex/flex-item/component.js
+index 560063ef586ceb..0cc72c35a9930b 100644
+--- a/packages/components/src/flex/flex-item/component.js
++++ b/packages/components/src/flex/flex-item/component.js
+@@ -7,7 +7,7 @@ import { useFlexItem } from './hook';
+ 
+ /**
+  * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexItemProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                                    forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                           forwardedRef
+  */
+ function FlexItem( props, forwardedRef ) {
+ 	const flexItemProps = useFlexItem( props );
+diff --git a/packages/components/src/flex/flex/component.js b/packages/components/src/flex/flex/component.js
+index 31983e0bc48710..348ff9f65d0812 100644
+--- a/packages/components/src/flex/flex/component.js
++++ b/packages/components/src/flex/flex/component.js
+@@ -8,7 +8,7 @@ import { View } from '../../view';
+ 
+ /**
+  * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                                forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                       forwardedRef
+  */
+ function Flex( props, forwardedRef ) {
+ 	const { children, isColumn, ...otherProps } = useFlex( props );
+diff --git a/packages/components/src/flyout/flyout-content/component.js b/packages/components/src/flyout/flyout-content/component.js
+index 943fe0d60c81fb..e1f415e2dda1b7 100644
+--- a/packages/components/src/flyout/flyout-content/component.js
++++ b/packages/components/src/flyout/flyout-content/component.js
+@@ -8,7 +8,7 @@ import { contextConnect, useContextSystem } from '../../ui/context';
+ /**
+  *
+  * @param {import('../../ui/context').WordPressComponentProps<import('../types').ContentProps, 'div', false>} props
+- * @param {import('react').Ref<any>}                                                                          forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                                 forwardedRef forwardedRef
+  */
+ function FlyoutContent( props, forwardedRef ) {
+ 	const {
+diff --git a/packages/components/src/flyout/flyout/component.js b/packages/components/src/flyout/flyout/component.js
+index 6d9c4a46153ea0..1ad283d0ab1d67 100644
+--- a/packages/components/src/flyout/flyout/component.js
++++ b/packages/components/src/flyout/flyout/component.js
+@@ -22,7 +22,7 @@ import { useFlyout } from './hook';
+ /**
+  *
+  * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div', false>} props
+- * @param {import('react').Ref<any>}                                                                   forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                          forwardedRef
+  */
+ function Flyout( props, forwardedRef ) {
+ 	const {
+diff --git a/packages/components/src/grid/component.js b/packages/components/src/grid/component.js
+index 71eaee1e112928..7641f15b8acfe2 100644
+--- a/packages/components/src/grid/component.js
++++ b/packages/components/src/grid/component.js
+@@ -7,7 +7,7 @@ import useGrid from './hook';
+ 
+ /**
+  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                                        forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                               forwardedRef
+  */
+ function Grid( props, forwardedRef ) {
+ 	const gridProps = useGrid( props );
+diff --git a/packages/components/src/h-stack/component.js b/packages/components/src/h-stack/component.js
+index 392e00ba55f4b5..ba01bf8a02e742 100644
+--- a/packages/components/src/h-stack/component.js
++++ b/packages/components/src/h-stack/component.js
+@@ -7,7 +7,7 @@ import { useHStack } from './hook';
+ 
+ /**
+  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                                        forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                               forwardedRef
+  */
+ function HStack( props, forwardedRef ) {
+ 	const hStackProps = useHStack( props );
+diff --git a/packages/components/src/heading/component.tsx b/packages/components/src/heading/component.tsx
+index e20bc81df3a645..b16a819ba99087 100644
+--- a/packages/components/src/heading/component.tsx
++++ b/packages/components/src/heading/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -12,7 +12,7 @@ import { useHeading, HeadingProps } from './hook';
+ 
+ function Heading(
+ 	props: WordPressComponentProps< HeadingProps, 'h1' >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const headerProps = useHeading( props );
+ 
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index 20cc5abb163f02..f2bd5c6fd9b3b3 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -3,7 +3,7 @@
+  */
+ import { noop } from 'lodash';
+ import classNames from 'classnames';
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -45,7 +45,7 @@ export function InputControl(
+ 		value,
+ 		...props
+ 	}: InputControlProps,
+-	ref: Ref< HTMLInputElement >
++	ref: ForwardedRef< HTMLInputElement >
+ ) {
+ 	const [ isFocused, setIsFocused ] = useState( false );
+ 
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index fc96a9f27bcb44..46d793f12173ce 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -66,7 +66,7 @@ export function InputBase(
+ 		suffix,
+ 		...props
+ 	}: InputBaseProps,
+-	ref: Ref< HTMLDivElement >
++	ref: ForwardedRef< HTMLDivElement >
+ ) {
+ 	const id = useUniqueId( idProp );
+ 	const hideLabel = hideLabelFromVision || ! label;
+diff --git a/packages/components/src/input-control/input-field.tsx b/packages/components/src/input-control/input-field.tsx
+index 13c803aaa6b502..3b8384afddf513 100644
+--- a/packages/components/src/input-control/input-field.tsx
++++ b/packages/components/src/input-control/input-field.tsx
+@@ -9,7 +9,7 @@ import type {
+ 	KeyboardEvent,
+ 	PointerEvent,
+ 	FocusEvent,
+-	Ref,
++	ForwardedRef,
+ 	MouseEvent,
+ } from 'react';
+ 
+@@ -53,7 +53,7 @@ function InputField(
+ 		type,
+ 		...props
+ 	}: WordPressComponentProps< InputFieldProps, 'input', false >,
+-	ref: Ref< HTMLInputElement >
++	ref: ForwardedRef< HTMLInputElement >
+ ) {
+ 	const {
+ 		// State
+diff --git a/packages/components/src/item-group/item-group/component.tsx b/packages/components/src/item-group/item-group/component.tsx
+index 30af333ac306e7..3c7aa60b5bdd7c 100644
+--- a/packages/components/src/item-group/item-group/component.tsx
++++ b/packages/components/src/item-group/item-group/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -14,7 +14,7 @@ import type { ItemGroupProps } from '../types';
+ 
+ function ItemGroup(
+ 	props: WordPressComponentProps< ItemGroupProps, 'div' >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+ 		isBordered,
+diff --git a/packages/components/src/item-group/item/component.tsx b/packages/components/src/item-group/item/component.tsx
+index 7aa021ec83565f..34b58573b882e2 100644
+--- a/packages/components/src/item-group/item/component.tsx
++++ b/packages/components/src/item-group/item/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -13,7 +13,7 @@ import { View } from '../../view';
+ 
+ function Item(
+ 	props: WordPressComponentProps< ItemProps, 'div' >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const { role, wrapperClassName, ...otherProps } = useItem( props );
+ 
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index db6983dc662ec8..e943e531abf9b2 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ // eslint-disable-next-line no-restricted-imports
+ import { motion, MotionProps } from 'framer-motion';
+ import { css } from '@emotion/react';
+@@ -44,7 +44,7 @@ type Props = Omit<
+ 	keyof MotionProps
+ >;
+ 
+-function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
++function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
+ 	const { children, className, path, ...otherProps } = useContextSystem(
+ 		props,
+ 		'NavigatorScreen'
+diff --git a/packages/components/src/resizable-box/index.tsx b/packages/components/src/resizable-box/index.tsx
+index ca6da661ab92d8..19fab8eeec19cf 100644
+--- a/packages/components/src/resizable-box/index.tsx
++++ b/packages/components/src/resizable-box/index.tsx
+@@ -9,7 +9,7 @@ import { forwardRef } from '@wordpress/element';
+ import classnames from 'classnames';
+ import { Resizable } from 're-resizable';
+ import type { ResizableProps } from 're-resizable';
+-import type { ReactNode, Ref } from 'react';
++import type { ReactNode, ForwardedRef } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -104,7 +104,7 @@ function ResizableBox(
+ 		__experimentalTooltipProps: tooltipProps = {},
+ 		...props
+ 	}: ResizableBoxProps,
+-	ref: Ref< Resizable >
++	ref: ForwardedRef< Resizable >
+ ): JSX.Element {
+ 	return (
+ 		<Resizable
+diff --git a/packages/components/src/resizable-box/resize-tooltip/index.tsx b/packages/components/src/resizable-box/resize-tooltip/index.tsx
+index 7b21f3088108b8..38c4206c20e628 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/index.tsx
++++ b/packages/components/src/resizable-box/resize-tooltip/index.tsx
+@@ -3,7 +3,7 @@
+  */
+ import { noop } from 'lodash';
+ import classnames from 'classnames';
+-import type { Ref } from 'react';
++import type { Ref, ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -43,7 +43,7 @@ function ResizeTooltip(
+ 		zIndex = 1000,
+ 		...props
+ 	}: ResizeTooltipProps,
+-	ref: Ref< HTMLDivElement >
++	ref: ForwardedRef< HTMLDivElement >
+ ): JSX.Element | null {
+ 	const { label, resizeListener } = useResizeLabel( {
+ 		axis,
+diff --git a/packages/components/src/resizable-box/resize-tooltip/label.tsx b/packages/components/src/resizable-box/resize-tooltip/label.tsx
+index cab03ada487231..8d1c91f13c8b50 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/label.tsx
++++ b/packages/components/src/resizable-box/resize-tooltip/label.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -33,7 +33,7 @@ type LabelProps = React.DetailedHTMLProps<
+ 
+ function Label(
+ 	{ label, position = POSITIONS.corner, zIndex = 1000, ...props }: LabelProps,
+-	ref: Ref< HTMLDivElement >
++	ref: ForwardedRef< HTMLDivElement >
+ ): JSX.Element | null {
+ 	const showLabel = !! label;
+ 
+diff --git a/packages/components/src/scrollable/component.js b/packages/components/src/scrollable/component.js
+index 34e73e284d9ed8..2067f3057b8ea1 100644
+--- a/packages/components/src/scrollable/component.js
++++ b/packages/components/src/scrollable/component.js
+@@ -7,7 +7,7 @@ import { useScrollable } from './hook';
+ 
+ /**
+  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                                        forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                               forwardedRef
+  */
+ function Scrollable( props, forwardedRef ) {
+ 	const scrollableProps = useScrollable( props );
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index ec2afed60d7123..8ebd1aad5bfccc 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -3,8 +3,7 @@
+  */
+ import { isEmpty, noop } from 'lodash';
+ import classNames from 'classnames';
+-// eslint-disable-next-line no-restricted-imports
+-import type { ChangeEvent, FocusEvent, ReactNode, Ref } from 'react';
++import type { ChangeEvent, FocusEvent, ReactNode, ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -74,7 +73,7 @@ function SelectControl(
+ 		suffix,
+ 		...props
+ 	}: WordPressComponentProps< SelectControlProps, 'select', false >,
+-	ref: Ref< HTMLSelectElement >
++	ref: ForwardedRef< HTMLSelectElement >
+ ) {
+ 	const [ isFocused, setIsFocused ] = useState( false );
+ 	const id = useUniqueId( idProp );
+diff --git a/packages/components/src/spacer/component.tsx b/packages/components/src/spacer/component.tsx
+index be243ce0663710..05766d11f867d2 100644
+--- a/packages/components/src/spacer/component.tsx
++++ b/packages/components/src/spacer/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -13,7 +13,7 @@ import type { Props } from './types';
+ 
+ function Spacer(
+ 	props: WordPressComponentProps< Props, 'div' >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const spacerProps = useSpacer( props );
+ 
+diff --git a/packages/components/src/surface/component.js b/packages/components/src/surface/component.js
+index d875ef9cd9f876..aede1ee546876c 100644
+--- a/packages/components/src/surface/component.js
++++ b/packages/components/src/surface/component.js
+@@ -7,7 +7,7 @@ import { useSurface } from './hook';
+ 
+ /**
+  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                                        forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                               forwardedRef
+  */
+ function Surface( props, forwardedRef ) {
+ 	const surfaceProps = useSurface( props );
+diff --git a/packages/components/src/text-control/index.js b/packages/components/src/text-control/index.js
+index 394da3644ce490..b0b9f806f18fe6 100644
+--- a/packages/components/src/text-control/index.js
++++ b/packages/components/src/text-control/index.js
+@@ -24,8 +24,8 @@ import BaseControl from '../base-control';
+ 
+ /**
+  *
+- * @param {Props}                                 props Props
+- * @param {import('react').Ref<HTMLInputElement>} [ref]
++ * @param {Props}                                          props Props
++ * @param {import('react').ForwardedRef<HTMLInputElement>} ref
+  */
+ function TextControl(
+ 	{
+diff --git a/packages/components/src/text/component.js b/packages/components/src/text/component.js
+index 9108b0e96d0144..b729f73bf640e8 100644
+--- a/packages/components/src/text/component.js
++++ b/packages/components/src/text/component.js
+@@ -7,7 +7,7 @@ import useText from './hook';
+ 
+ /**
+  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
+- * @param {import('react').Ref<any>}                                                         forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                forwardedRef
+  */
+ function Text( props, forwardedRef ) {
+ 	const textProps = useText( props );
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+index c7a4d470066641..8b082b4b82eaaf 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ // eslint-disable-next-line no-restricted-imports
+ import { Radio } from 'reakit';
+ 
+@@ -39,7 +39,7 @@ const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
+ 
+ function ToggleGroupControlOption(
+ 	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'button' >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const toggleGroupControlContext = useToggleGroupControlContext();
+ 	const id = useInstanceId(
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 646233bb063af9..14c54ae198d2a5 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ // eslint-disable-next-line no-restricted-imports
+ import { RadioGroup, useRadioState } from 'reakit';
+ 
+@@ -31,7 +31,7 @@ const noop = () => {};
+ 
+ function ToggleGroupControl(
+ 	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+ 		className,
+diff --git a/packages/components/src/tools-panel/tools-panel-header/component.tsx b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+index b36dd4488ab4e0..99981a2dc4a557 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -114,7 +114,7 @@ const OptionalControlsGroup = ( {
+ 
+ const ToolsPanelHeader = (
+ 	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) => {
+ 	const {
+ 		areAllOptionalControlsHidden,
+diff --git a/packages/components/src/tools-panel/tools-panel-item/component.tsx b/packages/components/src/tools-panel/tools-panel-item/component.tsx
+index 4931686a07dd5e..b0cc12c0f19fde 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel-item/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -15,7 +15,7 @@ import type { ToolsPanelItemProps } from '../types';
+ // prevents props being applied to HTML elements that would make them invalid.
+ const ToolsPanelItem = (
+ 	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) => {
+ 	const {
+ 		children,
+diff --git a/packages/components/src/tools-panel/tools-panel/component.tsx b/packages/components/src/tools-panel/tools-panel/component.tsx
+index bd6e4bb5fa1ced..fcfa353a0210d7 100644
+--- a/packages/components/src/tools-panel/tools-panel/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -15,7 +15,7 @@ import type { ToolsPanelProps } from '../types';
+ 
+ const ToolsPanel = (
+ 	props: WordPressComponentProps< ToolsPanelProps, 'div' >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) => {
+ 	const {
+ 		children,
+diff --git a/packages/components/src/truncate/component.js b/packages/components/src/truncate/component.js
+index aa8ab965007e00..362c5d3e665325 100644
+--- a/packages/components/src/truncate/component.js
++++ b/packages/components/src/truncate/component.js
+@@ -7,7 +7,7 @@ import useTruncate from './hook';
+ 
+ /**
+  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
+- * @param {import('react').Ref<any>}                                                         forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                forwardedRef
+  */
+ function Truncate( props, forwardedRef ) {
+ 	const truncateProps = useTruncate( props );
+diff --git a/packages/components/src/ui/control-group/component.js b/packages/components/src/ui/control-group/component.js
+index d291d436c11d4b..b034f52a0c82ab 100644
+--- a/packages/components/src/ui/control-group/component.js
++++ b/packages/components/src/ui/control-group/component.js
+@@ -12,7 +12,7 @@ import { contextConnect } from '../context';
+ 
+ /**
+  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                                     forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                            forwardedRef
+  */
+ function ControlGroup( props, forwardedRef ) {
+ 	const {
+diff --git a/packages/components/src/ui/control-label/component.js b/packages/components/src/ui/control-label/component.js
+index 1f3ecc25fc8cbb..62a3e8a790c68b 100644
+--- a/packages/components/src/ui/control-label/component.js
++++ b/packages/components/src/ui/control-label/component.js
+@@ -7,7 +7,7 @@ import { useControlLabel } from './hook';
+ 
+ /**
+  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label', false>} props
+- * @param {import('react').Ref<any>}                                                              forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                     forwardedRef
+  */
+ function ControlLabel( props, forwardedRef ) {
+ 	const controlLabelProps = useControlLabel( props );
+diff --git a/packages/components/src/ui/form-group/form-group.js b/packages/components/src/ui/form-group/form-group.js
+index fc9eae01325f47..79881be46f7116 100644
+--- a/packages/components/src/ui/form-group/form-group.js
++++ b/packages/components/src/ui/form-group/form-group.js
+@@ -9,7 +9,7 @@ import { useFormGroup } from './use-form-group';
+ 
+ /**
+  * @param {import('../context').WordPressComponentProps<import('./types').FormGroupProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                              forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                     forwardedRef
+  */
+ function FormGroup( props, forwardedRef ) {
+ 	const { contentProps, horizontal, ...otherProps } = useFormGroup( props );
+diff --git a/packages/components/src/ui/shortcut/component.tsx b/packages/components/src/ui/shortcut/component.tsx
+index af4fa02a694167..b48f8d385a3147 100644
+--- a/packages/components/src/ui/shortcut/component.tsx
++++ b/packages/components/src/ui/shortcut/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -25,7 +25,7 @@ export interface Props {
+ 
+ function Shortcut(
+ 	props: WordPressComponentProps< Props, 'span' >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ): JSX.Element | null {
+ 	const {
+ 		as: asProp = 'span',
+diff --git a/packages/components/src/ui/spinner/component.js b/packages/components/src/ui/spinner/component.js
+index c5b45fccf0b8af..b5928b7ebfe232 100644
+--- a/packages/components/src/ui/spinner/component.js
++++ b/packages/components/src/ui/spinner/component.js
+@@ -17,7 +17,7 @@ import { COLORS } from '../../utils/colors-values';
+ /**
+  *
+  * @param {import('../context').WordPressComponentProps<Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                   forwardedRef
++ * @param {import('react').ForwardedRef<any>}                          forwardedRef
+  */
+ function Spinner( props, forwardedRef ) {
+ 	const {
+diff --git a/packages/components/src/ui/tooltip/component.js b/packages/components/src/ui/tooltip/component.js
+index 78ab9132407e5e..33106379140ffb 100644
+--- a/packages/components/src/ui/tooltip/component.js
++++ b/packages/components/src/ui/tooltip/component.js
+@@ -19,7 +19,7 @@ import { TooltipShortcut } from './styles';
+ 
+ /**
+  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                                     forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                            forwardedRef
+  */
+ function Tooltip( props, forwardedRef ) {
+ 	const {
+diff --git a/packages/components/src/ui/tooltip/content.js b/packages/components/src/ui/tooltip/content.js
+index b2d533f8288c0b..7bbf21b44aea8a 100644
+--- a/packages/components/src/ui/tooltip/content.js
++++ b/packages/components/src/ui/tooltip/content.js
+@@ -18,7 +18,7 @@ const { TooltipPopoverView } = styles;
+ /**
+  *
+  * @param {import('../context').WordPressComponentProps<import('./types').ContentProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                            forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                   forwardedRef
+  */
+ function TooltipContent( props, forwardedRef ) {
+ 	const { children, className, ...otherProps } = useContextSystem(
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 27c4cdb566ebca..add1a0419b1412 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -4,7 +4,7 @@
+ import type {
+ 	FocusEventHandler,
+ 	KeyboardEvent,
+-	Ref,
++	ForwardedRef,
+ 	SyntheticEvent,
+ } from 'react';
+ import { noop, omit } from 'lodash';
+@@ -55,7 +55,7 @@ function UnitControl(
+ 		value: valueProp,
+ 		...props
+ 	}: WordPressComponentProps< UnitControlProps, 'input', false >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const units = useMemo(
+ 		() => getUnitsWithCurrentUnit( valueProp, unitProp, unitsProp ),
+diff --git a/packages/components/src/v-stack/component.js b/packages/components/src/v-stack/component.js
+index aaf893a757fd6b..b0bc65fd511947 100644
+--- a/packages/components/src/v-stack/component.js
++++ b/packages/components/src/v-stack/component.js
+@@ -7,7 +7,7 @@ import { useVStack } from './hook';
+ 
+ /**
+  * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                                        forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                               forwardedRef
+  */
+ function VStack( props, forwardedRef ) {
+ 	const vStackProps = useVStack( props );
+diff --git a/packages/components/src/visually-hidden/component.js b/packages/components/src/visually-hidden/component.js
+index ba0096d3a8bd85..f0f1f7218655a7 100644
+--- a/packages/components/src/visually-hidden/component.js
++++ b/packages/components/src/visually-hidden/component.js
+@@ -7,7 +7,7 @@ import { View } from '../view';
+ 
+ /**
+  * @param {import('../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+- * @param {import('react').Ref<any>}                                                                        forwardedRef
++ * @param {import('react').ForwardedRef<any>}                                                               forwardedRef
+  */
+ function VisuallyHidden( props, forwardedRef ) {
+ 	const { style: styleProp, ...contextProps } = useContextSystem(
+diff --git a/packages/components/src/z-stack/component.tsx b/packages/components/src/z-stack/component.tsx
+index 1f365300bdc4dc..7d2d8c2cd1f281 100644
+--- a/packages/components/src/z-stack/component.tsx
++++ b/packages/components/src/z-stack/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Ref, ReactNode } from 'react';
++import type { ForwardedRef, ReactNode } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -43,7 +43,7 @@ export interface ZStackProps {
+ 
+ function ZStack(
+ 	props: WordPressComponentProps< ZStackProps, 'div' >,
+-	forwardedRef: Ref< any >
++	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
+ 		children,

@@ -1,0 +1,238 @@
+diff --git a/package-lock.json b/package-lock.json
+index 561cf9dd741e12..df2f04d9d4d151 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -13294,6 +13294,7 @@
+ 				"@babel/runtime": "^7.13.10",
+ 				"@emotion/core": "^10.1.1",
+ 				"@emotion/css": "^10.0.22",
++				"@emotion/is-prop-valid": "^1.1.0",
+ 				"@emotion/native": "^10.0.22",
+ 				"@emotion/styled": "^10.0.23",
+ 				"@wordpress/a11y": "file:packages/a11y",
+@@ -13331,6 +13332,21 @@
+ 				"rememo": "^3.0.0",
+ 				"tinycolor2": "^1.4.2",
+ 				"uuid": "^8.3.0"
++			},
++			"dependencies": {
++				"@emotion/is-prop-valid": {
++					"version": "1.1.0",
++					"resolved": "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-1.1.0.tgz",
++					"integrity": "sha512-9RkilvXAufQHsSsjQ3PIzSns+pxuX4EW8EbGeSPjZMHuMx6z/MOzb9LpqNieQX4F3mre3NWS2+X3JNRHTQztUQ==",
++					"requires": {
++						"@emotion/memoize": "^0.7.4"
++					}
++				},
++				"@emotion/memoize": {
++					"version": "0.7.5",
++					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.5.tgz",
++					"integrity": "sha512-igX9a37DR2ZPGYtV6suZ6whr8pTFtyHL3K/oLUotxpSVO2ASaprmAe2Dkq7tBo7CRY7MMDrAa9nuQP9/YG8FxQ=="
++				}
+ 			}
+ 		},
+ 		"@wordpress/compose": {
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 94a149c75f907a..12c521b0ea6e03 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -29,6 +29,7 @@
+ 		"@babel/runtime": "^7.13.10",
+ 		"@emotion/core": "^10.1.1",
+ 		"@emotion/css": "^10.0.22",
++		"@emotion/is-prop-valid": "^1.1.0",
+ 		"@emotion/native": "^10.0.22",
+ 		"@emotion/styled": "^10.0.23",
+ 		"@wordpress/a11y": "file:../a11y",
+diff --git a/packages/components/src/flex/README.md b/packages/components/src/flex/README.md
+index 8084352d06a887..379d551f25f60f 100644
+--- a/packages/components/src/flex/README.md
++++ b/packages/components/src/flex/README.md
+@@ -81,18 +81,18 @@ Determines the spacing in between children components. The `gap` value is a mult
+ -   Required: No
+ -   Default: `2`
+ 
+-### isReversed
++### justify
+ 
+-Reverses the render order of children components.
++Horizontally aligns children components using the CSS [`justify-content`](https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content) property.
+ 
+--   Type: `Boolean`
++-   Type: `String`
+ -   Required: No
+--   Default: `false`
++-   Default: `space-between`
+ 
+-### justify
++### direction
+ 
+-Horizontally aligns children components using the CSS [`justify-content`](https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content) property.
++Determines the flex direction using the CSS [`flex-direction`](https://developer.mozilla.org/en-US/docs/Web/CSS/flex-direction) property.
+ 
+ -   Type: `String`
+ -   Required: No
+--   Default: `space-between`
++-   Default: `row`
+diff --git a/packages/components/src/flex/index.js b/packages/components/src/flex/index.js
+index 4da5e5425baad6..6424cff6e3641b 100644
+--- a/packages/components/src/flex/index.js
++++ b/packages/components/src/flex/index.js
+@@ -7,6 +7,7 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { forwardRef } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -19,11 +20,13 @@ export { default as FlexItem } from './item';
+ 
+ /* eslint-disable jsdoc/valid-types */
+ /**
++ * @typedef {import('react').CSSProperties['flexDirection'] | 'row' | 'column' | 'row-reverse' | 'column-reverse'} FlexDirection
+  * @typedef OwnProps
+  * @property {import('react').CSSProperties['alignItems'] | 'top' | 'bottom'} [align='center'] Sets align-items. Top and bottom are shorthand for flex-start and flex-end respectively.
+  * @property {number} [gap=2] Determines the spacing in between children components. The `gap` value is a multiplier to the base value of `4`.
+  * @property {import('react').CSSProperties['justifyContent'] | 'left' | 'right'} [justify='space-between']          * Sets jusifty-content. Left and right are shorthand for flex-start and flex-end respectively, not the actual CSS value.
+  * @property {boolean} [isReversed=false] Reversed the flex direction.
++ * @property {FlexDirection} [direction='row'] Sets the flex-direction property.
+  */
+ /* eslint-enable jsdoc/valid-types */
+ 
+@@ -39,26 +42,45 @@ function FlexComponent(
+ 		className,
+ 		gap = 2,
+ 		justify = 'space-between',
+-		isReversed = false,
+-		...props
++		isReversed,
++		direction: directionProp,
++		...otherProps
+ 	},
+ 	ref
+ ) {
++	const direction = useDirection( { isReversed, direction: directionProp } );
+ 	const classes = classnames( 'components-flex', className );
+ 
+ 	return (
+ 		<BaseFlex
+-			{ ...props }
++			{ ...otherProps }
+ 			align={ align }
+ 			className={ classes }
+ 			ref={ ref }
+ 			gap={ gap }
+ 			justify={ justify }
+-			isReversed={ isReversed }
++			direction={ direction }
+ 		/>
+ 	);
+ }
+ 
++/**
++ * @param {Props} props
++ */
++function useDirection( { isReversed, direction = 'row' } ) {
++	if ( typeof isReversed !== 'undefined' ) {
++		deprecated( 'Flex isReversed', {
++			alternative: 'Flex direction="row-reverse"',
++		} );
++		if ( isReversed ) {
++			return 'row-reverse';
++		}
++		return 'row';
++	}
++
++	return direction;
++}
++
+ export const Flex = withNextFlex( forwardRef( FlexComponent ) );
+ 
+ export default Flex;
+diff --git a/packages/components/src/flex/next.js b/packages/components/src/flex/next.js
+index 541b01be1f41f6..d61295a8fe0fc6 100644
+--- a/packages/components/src/flex/next.js
++++ b/packages/components/src/flex/next.js
+@@ -18,10 +18,8 @@ const FlexItem =
+  * @param {import('./index').Props} props Current props.
+  * @return {import('../ui/flex/types').FlexProps} Next props.
+  */
+-const flexAdapter = ( { isReversed, ...restProps } ) => ( {
+-	// There's no equivalent for `direction` on the original component so we can just translate `isReversed` to it
+-	direction: isReversed ? 'row-reverse' : 'row',
+-	...restProps,
++const flexAdapter = ( props ) => ( {
++	...props,
+ 	// There's an HTML attribute named `wrap` that will exist in `restProps` so we need to set it to undefined so the default behavior of the next component takes over
+ 	wrap: undefined,
+ } );
+diff --git a/packages/components/src/flex/styles/flex-styles.js b/packages/components/src/flex/styles/flex-styles.js
+index 1ff2fdeb89ba53..31a19e14d9ef52 100644
+--- a/packages/components/src/flex/styles/flex-styles.js
++++ b/packages/components/src/flex/styles/flex-styles.js
+@@ -3,6 +3,7 @@
+  */
+ import { css } from '@emotion/core';
+ import styled from '@emotion/styled';
++import isPropValid from '@emotion/is-prop-valid';
+ 
+ /**
+  * @param {import('..').OwnProps} props
+@@ -48,10 +49,10 @@ const justifyStyle = ( { justify, isReversed } ) => {
+ /**
+  * @param {import('..').OwnProps} Props
+  */
+-const gapStyle = ( { gap, isReversed } ) => {
++const gapStyle = ( { gap, direction } ) => {
+ 	const base = 4;
+ 	const value = typeof gap === 'number' ? base * gap : base;
+-	const dir = isReversed ? 'left' : 'right';
++	const dir = getMarginDirection( direction );
+ 	const margin = `margin-${ dir }`;
+ 
+ 	return css`
+@@ -66,24 +67,37 @@ const gapStyle = ( { gap, isReversed } ) => {
+ };
+ 
+ /**
+- * @param {import('..').OwnProps} props
++ * @param {import('..').FlexDirection} direction
++ * @return {string} margin direction
+  */
+-const reversedStyles = ( { isReversed } ) => {
+-	if ( ! isReversed ) return '';
++function getMarginDirection( direction ) {
++	const isVertical = direction?.includes( 'column' );
++	const isReversed = direction?.includes( '-reverse' );
++	if ( isVertical ) {
++		return isReversed ? 'top' : 'bottom';
++	}
++	return isReversed ? 'left' : 'right';
++}
+ 
++/**
++ * @param {import('..').OwnProps} props
++ */
++const directionStyles = ( { direction } ) => {
+ 	return css`
+-		flex-direction: row-reverse;
++		flex-direction: ${ direction };
+ 	`;
+ };
+ 
+-export const Flex = styled.div`
++export const Flex = styled( 'div', {
++	shouldForwardProp: ( prop ) => isPropValid( prop ) && prop !== 'direction',
++} )`
+ 	box-sizing: border-box;
+ 	display: flex;
+ 	width: 100%;
+ 
+ 	${ alignStyle }
+ 	${ justifyStyle }
+-	${ reversedStyles }
++	${ directionStyles }
+ 	${ gapStyle }
+ `;
+ 

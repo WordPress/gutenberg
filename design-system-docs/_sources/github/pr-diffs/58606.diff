@@ -1,0 +1,60 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8f0a224b7c7ec0..5b57cc80b0d114 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,8 +2,10 @@
+ 
+ ## Unreleased
+ 
++
+ ### Enhancements
+ 
++-   `Button`: Update secondary variant to show the border even in a disabled state. ([#58606](https://github.com/WordPress/gutenberg/pull/58606)).
+ -   `ConfirmDialog`: Add `__next40pxDefaultSize` to buttons ([#58421](https://github.com/WordPress/gutenberg/pull/58421)).
+ -   `SnackbarList`: Allow limiting the number of maximum visible Snackbars ([#58559](https://github.com/WordPress/gutenberg/pull/58559)).
+ -   `Snackbar`: Update the warning message ([#58591](https://github.com/WordPress/gutenberg/pull/58591)).
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index aa7d9a5cc018ec..590974f7705967 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -129,11 +129,6 @@
+ 			background: transparent;
+ 			transform: none;
+ 			opacity: 1;
+-
+-			&:not(:focus) {
+-				box-shadow: none;
+-				outline: none;
+-			}
+ 		}
+ 	}
+ 
+@@ -151,6 +146,12 @@
+ 		&:hover:not(:disabled, [aria-disabled="true"]) {
+ 			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-10;
+ 		}
++
++		&:disabled:not(:focus),
++		&[aria-disabled="true"]:not(:focus),
++		&[aria-disabled="true"]:hover:not(:focus) {
++			box-shadow: inset 0 0 0 $border-width $gray-300;
++		}
+ 	}
+ 
+ 	/**
+@@ -178,6 +179,15 @@
+ 		p + & {
+ 			margin-left: -($grid-unit-15 * 0.5);
+ 		}
++
++		&:disabled,
++		&[aria-disabled="true"],
++		&[aria-disabled="true"]:hover {
++			&:not(:focus) {
++				box-shadow: none;
++				outline: none;
++			}
++		}
+ 	}
+ 
+ 	/**

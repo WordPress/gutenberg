@@ -1,0 +1,1709 @@
+diff --git a/packages/block-library/src/cover/edit.js b/packages/block-library/src/cover/edit.js
+index 4ba780ee2805af..6c905c7828d55f 100644
+--- a/packages/block-library/src/cover/edit.js
++++ b/packages/block-library/src/cover/edit.js
+@@ -272,6 +272,9 @@ function CoverEdit( {
+ 		isDarkElement
+ 	);
+ 
++	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
++	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
++
+ 	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
+ 	const { removeAllNotices, createErrorNotice } = noticeOperations;
+ 
+@@ -280,9 +283,7 @@ function CoverEdit( {
+ 		: minHeight;
+ 
+ 	const style = {
+-		...( backgroundType === IMAGE_BACKGROUND_TYPE
+-			? backgroundImageStyles( url )
+-			: {} ),
++		...( isImageBackground ? backgroundImageStyles( url ) : {} ),
+ 		backgroundColor: overlayColor.color,
+ 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
+ 	};
+@@ -291,13 +292,18 @@ function CoverEdit( {
+ 		style.background = gradientValue;
+ 	}
+ 
++	let positionValue;
++
+ 	if ( focalPoint ) {
+-		style.backgroundPosition = `${ focalPoint.x * 100 }% ${
+-			focalPoint.y * 100
+-		}%`;
++		positionValue = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
++		if ( isImageBackground ) {
++			style.backgroundPosition = positionValue;
++		}
+ 	}
+ 
+ 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
++	const showFocalPointPicker =
++		isVideoBackground || ( isImageBackground && ! hasParallax );
+ 
+ 	const controls = (
+ 		<>
+@@ -327,28 +333,24 @@ function CoverEdit( {
+ 			<InspectorControls>
+ 				{ !! url && (
+ 					<PanelBody title={ __( 'Media settings' ) }>
+-						{ IMAGE_BACKGROUND_TYPE === backgroundType && (
++						{ isImageBackground && (
+ 							<ToggleControl
+ 								label={ __( 'Fixed background' ) }
+ 								checked={ hasParallax }
+ 								onChange={ toggleParallax }
+ 							/>
+ 						) }
+-						{ IMAGE_BACKGROUND_TYPE === backgroundType &&
+-							! hasParallax && (
+-								<FocalPointPicker
+-									label={ __( 'Focal point picker' ) }
+-									url={ url }
+-									value={ focalPoint }
+-									onChange={ ( newFocalPoint ) =>
+-										setAttributes( {
+-											focalPoint: newFocalPoint,
+-										} )
+-									}
+-								/>
+-							) }
+-						{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+-							<video autoPlay muted loop src={ url } />
++						{ showFocalPointPicker && (
++							<FocalPointPicker
++								label={ __( 'Focal point picker' ) }
++								url={ url }
++								value={ focalPoint }
++								onChange={ ( newFocalPoint ) =>
++									setAttributes( {
++										focalPoint: newFocalPoint,
++									} )
++								}
++							/>
+ 						) }
+ 						<PanelRow>
+ 							<Button
+@@ -498,7 +500,7 @@ function CoverEdit( {
+ 					} }
+ 					showHandle={ isSelected }
+ 				/>
+-				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
++				{ isImageBackground && (
+ 					// Used only to programmatically check if the image is dark or not
+ 					<img
+ 						ref={ isDarkElement }
+@@ -520,7 +522,7 @@ function CoverEdit( {
+ 						style={ { background: gradientValue } }
+ 					/>
+ 				) }
+-				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
++				{ isVideoBackground && (
+ 					<video
+ 						ref={ isDarkElement }
+ 						className="wp-block-cover__video-background"
+@@ -528,6 +530,7 @@ function CoverEdit( {
+ 						muted
+ 						loop
+ 						src={ url }
++						style={ { objectPosition: positionValue } }
+ 					/>
+ 				) }
+ 				<InnerBlocks
+diff --git a/packages/block-library/src/cover/save.js b/packages/block-library/src/cover/save.js
+index b9f55c755469d9..58374ce5ed8875 100644
+--- a/packages/block-library/src/cover/save.js
++++ b/packages/block-library/src/cover/save.js
+@@ -48,23 +48,37 @@ export default function save( { attributes } ) {
+ 		? `${ minHeightProp }${ minHeightUnit }`
+ 		: minHeightProp;
+ 
+-	const style =
+-		backgroundType === IMAGE_BACKGROUND_TYPE
+-			? backgroundImageStyles( url )
+-			: {};
++	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
++	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
++
++	const style = isImageBackground ? backgroundImageStyles( url ) : {};
++	const videoStyle = {};
++
+ 	if ( ! overlayColorClass ) {
+ 		style.backgroundColor = customOverlayColor;
+ 	}
+-	if ( focalPoint && ! hasParallax ) {
+-		style.backgroundPosition = `${ Math.round(
+-			focalPoint.x * 100
+-		) }% ${ Math.round( focalPoint.y * 100 ) }%`;
+-	}
++
+ 	if ( customGradient && ! url ) {
+ 		style.background = customGradient;
+ 	}
+ 	style.minHeight = minHeight || undefined;
+ 
++	let positionValue;
++
++	if ( focalPoint ) {
++		positionValue = `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round(
++			focalPoint.y * 100
++		) }%`;
++
++		if ( isImageBackground && ! hasParallax ) {
++			style.backgroundPosition = positionValue;
++		}
++
++		if ( isVideoBackground ) {
++			videoStyle.objectPosition = positionValue;
++		}
++	}
++
+ 	const classes = classnames(
+ 		dimRatioToClass( dimRatio ),
+ 		overlayColorClass,
+@@ -96,7 +110,7 @@ export default function save( { attributes } ) {
+ 					}
+ 				/>
+ 			) }
+-			{ VIDEO_BACKGROUND_TYPE === backgroundType && url && (
++			{ isVideoBackground && url && (
+ 				<video
+ 					className="wp-block-cover__video-background"
+ 					autoPlay
+@@ -104,6 +118,7 @@ export default function save( { attributes } ) {
+ 					loop
+ 					playsInline
+ 					src={ url }
++					style={ videoStyle }
+ 				/>
+ 			) }
+ 			<div className="wp-block-cover__inner-container">
+diff --git a/packages/components/src/focal-point-picker/README.md b/packages/components/src/focal-point-picker/README.md
+index 5b325cb607ddc4..9100e4734f2119 100644
+--- a/packages/components/src/focal-point-picker/README.md
++++ b/packages/components/src/focal-point-picker/README.md
+@@ -9,35 +9,37 @@ Corresponding CSS: `background-position: 50% 10%;`
+ 
+ ```jsx
+ import { FocalPointPicker } from '@wordpress/components';
++import { useState } from '@wordpress/element';
+ 
+-const MyFocalPointPicker = withState( {
+-	focalPoint: {
++const Example = () => {
++	const [ focalPoint, setFocalPoint ] = useState( {
+ 		x: 0.5,
+-		y: 0.5
+-	},
+-} )( ( { focalPoint, setState } ) => { 
++		y: 0.5,
++	} );
++
+ 	const url = '/path/to/image';
+ 	const dimensions = {
+ 		width: 400,
+-		height: 100
++		height: 100,
+ 	};
+-	return ( 
+-		<FocalPointPicker 
+-			url={ url }
+-			dimensions={ dimensions }
+-			value={ focalPoint }
+-			onChange={ ( focalPoint ) => setState( { focalPoint } ) } 
+-		/>
+-	) 
+-} );
+-
+-/* Example function to render the CSS styles based on Focal Point Picker value */
+-const renderImageContainerWithFocalPoint = ( url, focalPoint ) => {
++
++	/* Example function to render the CSS styles based on Focal Point Picker value */
+ 	const style = {
+-		backgroundImage: `url(${ url })` ,
+-		backgroundPosition: `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`
+-	}
+-	return <div style={ style } />;
++		backgroundImage: `url(${ url })`,
++		backgroundPosition: `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`,
++	};
++
++	return (
++		<>
++			<FocalPointPicker
++				url={ url }
++				dimensions={ dimensions }
++				value={ focalPoint }
++				onChange={ ( focalPoint ) => setFocalPoint( { focalPoint } ) }
++			/>
++			<div style={ style } />
++		</>
++	);
+ };
+ ```
+ 
+@@ -45,24 +47,36 @@ const renderImageContainerWithFocalPoint = ( url, focalPoint ) => {
+ 
+ ### `url`
+ 
+-- Type: `Text`
+-- Required: Yes
+-- Description: URL of the image to be displayed
++-   Type: `Text`
++-   Required: Yes
++
++URL of the image or video to be displayed
++
++### `autoPlay`
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `true`
++
++Autoplays HTML5 video. This only applies to video sources (`url`).
+ 
+ ### `dimensions`
+ 
+-- Type: `Object`
+-- Required: Yes
+-- Description: An object describing the height and width of the image. Requires two paramaters: `height`, `width`.
++-   Type: `Object`
++-   Required: Yes
++
++An object describing the height and width of the image. Requires two paramaters: `height`, `width`.
+ 
+ ### `value`
+ 
+-- Type: `Object`
+-- Required: Yes
+-- Description: The focal point. Should be an object containing `x` and `y` params.
++-   Type: `Object`
++-   Required: Yes
++
++The focal point. Should be an object containing `x` and `y` params.
+ 
+ ### `onChange`
+ 
+-- Type: `Function`
+-- Required: Yes
+-- Description: Callback which is called when the focal point changes. 
++-   Type: `Function`
++-   Required: Yes
++
++Callback which is called when the focal point changes.
+diff --git a/packages/components/src/focal-point-picker/controls.js b/packages/components/src/focal-point-picker/controls.js
+new file mode 100644
+index 00000000000000..1f0b89c40aaf5c
+--- /dev/null
++++ b/packages/components/src/focal-point-picker/controls.js
+@@ -0,0 +1,70 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import {
++	UnitControl as BaseUnitControl,
++	ControlWrapper,
++} from './styles/focal-point-picker-style';
++import { fractionToPercentage } from './utils';
++
++const TEXTCONTROL_MIN = 0;
++const TEXTCONTROL_MAX = 100;
++
++export default function FocalPointPickerControls( {
++	onChange = noop,
++	percentages = {
++		x: 0.5,
++		y: 0.5,
++	},
++} ) {
++	const valueX = fractionToPercentage( percentages.x );
++	const valueY = fractionToPercentage( percentages.y );
++
++	const handleOnXChange = ( next ) => {
++		onChange( { ...percentages, x: parseInt( next ) / 100 } );
++	};
++	const handleOnYChange = ( next ) => {
++		onChange( { ...percentages, y: parseInt( next ) / 100 } );
++	};
++
++	return (
++		<ControlWrapper className="focal-point-picker__controls">
++			<UnitControl
++				label={ __( 'Left' ) }
++				value={ valueX }
++				onChange={ handleOnXChange }
++				dragDirection="e"
++			/>
++			<UnitControl
++				label={ __( 'Top' ) }
++				value={ valueY }
++				onChange={ handleOnYChange }
++				dragDirection="s"
++			/>
++		</ControlWrapper>
++	);
++}
++
++function UnitControl( props ) {
++	return (
++		<BaseUnitControl
++			className="focal-point-picker__controls-position-unit-control"
++			labelPosition="side"
++			max={ TEXTCONTROL_MAX }
++			min={ TEXTCONTROL_MIN }
++			unit="%"
++			units={ [ { value: '%', label: '%' } ] }
++			{ ...props }
++		/>
++	);
++}
+diff --git a/packages/components/src/focal-point-picker/focal-point.js b/packages/components/src/focal-point-picker/focal-point.js
+new file mode 100644
+index 00000000000000..119ca25f61258a
+--- /dev/null
++++ b/packages/components/src/focal-point-picker/focal-point.js
+@@ -0,0 +1,49 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import {
++	PointerIconSVG,
++	PointerIconPathFill,
++	PointerIconPathOutline,
++	FocalPointWrapper,
++} from './styles/focal-point-style';
++
++export default function FocalPoint( {
++	coordinates = { left: '50%', top: '50%' },
++	isDragging = false,
++	...props
++} ) {
++	const classes = classnames(
++		'components-focal-point-picker__icon_container',
++		isDragging && 'is-dragging'
++	);
++
++	const style = {
++		left: coordinates.left,
++		top: coordinates.top,
++	};
++
++	return (
++		<FocalPointWrapper { ...props } className={ classes } style={ style }>
++			<PointerIconSVG
++				className="components-focal-point-picker__icon"
++				xmlns="http://www.w3.org/2000/svg"
++				viewBox="0 0 30 30"
++			>
++				<PointerIconPathOutline
++					className="components-focal-point-picker__icon-outline"
++					d="M15 1C7.3 1 1 7.3 1 15s6.3 14 14 14 14-6.3 14-14S22.7 1 15 1zm0 22c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"
++				/>
++				<PointerIconPathFill
++					className="components-focal-point-picker__icon-fill"
++					d="M15 3C8.4 3 3 8.4 3 15s5.4 12 12 12 12-5.4 12-12S21.6 3 15 3zm0 22C9.5 25 5 20.5 5 15S9.5 5 15 5s10 4.5 10 10-4.5 10-10 10z"
++				/>
++			</PointerIconSVG>
++		</FocalPointWrapper>
++	);
++}
+diff --git a/packages/components/src/focal-point-picker/grid.js b/packages/components/src/focal-point-picker/grid.js
+new file mode 100644
+index 00000000000000..52fbdc3f3bff3a
+--- /dev/null
++++ b/packages/components/src/focal-point-picker/grid.js
+@@ -0,0 +1,64 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import {
++	GridView,
++	GridLineX,
++	GridLineY,
++} from './styles/focal-point-picker-style';
++import { useUpdateEffect } from '../utils/hooks';
++
++const { clearTimeout, setTimeout } = window;
++
++export default function FocalPointPickerGrid( {
++	bounds = {},
++	value,
++	...props
++} ) {
++	const animationProps = useRevealAnimation( value );
++	const style = {
++		width: bounds.width,
++		height: bounds.height,
++	};
++
++	return (
++		<GridView
++			{ ...props }
++			{ ...animationProps }
++			className="components-focal-point-picker__grid"
++			style={ style }
++		>
++			<GridLineX style={ { top: '33%' } } />
++			<GridLineX style={ { top: '66%' } } />
++			<GridLineY style={ { left: '33%' } } />
++			<GridLineY style={ { left: '66%' } } />
++		</GridView>
++	);
++}
++
++/**
++ * Custom hook that renders the "flash" animation whenever the value changes.
++ *
++ * @param {string} value Value of (box) side.
++ */
++function useRevealAnimation( value ) {
++	const [ isActive, setIsActive ] = useState( false );
++
++	useUpdateEffect( () => {
++		setIsActive( true );
++		const timeout = setTimeout( () => {
++			setIsActive( false );
++		}, 600 );
++
++		return () => clearTimeout( timeout );
++	}, [ value ] );
++
++	return {
++		isActive,
++	};
++}
+diff --git a/packages/components/src/focal-point-picker/index.js b/packages/components/src/focal-point-picker/index.js
+index 4484dbb8188de6..0452d43451d1ea 100644
+--- a/packages/components/src/focal-point-picker/index.js
++++ b/packages/components/src/focal-point-picker/index.js
+@@ -1,6 +1,7 @@
+ /**
+  * External dependencies
+  */
++import { noop } from 'lodash';
+ import classnames from 'classnames';
+ 
+ /**
+@@ -9,35 +10,48 @@ import classnames from 'classnames';
+ import { __ } from '@wordpress/i18n';
+ import { Component, createRef } from '@wordpress/element';
+ import { withInstanceId, compose } from '@wordpress/compose';
+-import { Path, SVG } from '@wordpress/primitives';
++import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+ 
+ /**
+  * Internal dependencies
+  */
+-import BaseControl from '../base-control';
+ import withFocusOutside from '../higher-order/with-focus-outside';
+-
+-const TEXTCONTROL_MIN = 0;
+-const TEXTCONTROL_MAX = 100;
++import BaseControl from '../base-control';
++import Controls from './controls';
++import FocalPoint from './focal-point';
++import Grid from './grid';
++import Media from './media';
++import {
++	MediaWrapper,
++	MediaContainer,
++} from './styles/focal-point-picker-style';
++import { roundClamp } from '../utils/math';
++import { INITIAL_BOUNDS } from './utils';
+ 
+ export class FocalPointPicker extends Component {
+ 	constructor( props ) {
+-		super( props );
+-		this.onMouseMove = this.onMouseMove.bind( this );
++		super( ...arguments );
++
+ 		this.state = {
+ 			isDragging: false,
+-			bounds: {},
++			bounds: INITIAL_BOUNDS,
+ 			percentages: props.value,
+ 		};
++
+ 		this.containerRef = createRef();
+-		this.imageRef = createRef();
+-		this.horizontalPositionChanged = this.horizontalPositionChanged.bind(
+-			this
+-		);
+-		this.verticalPositionChanged = this.verticalPositionChanged.bind(
+-			this
+-		);
+-		this.onLoad = this.onLoad.bind( this );
++		this.mediaRef = createRef();
++
++		this.handleOnClick = this.handleOnClick.bind( this );
++		this.handleOnMouseUp = this.handleOnMouseUp.bind( this );
++		this.handleOnKeyDown = this.handleOnKeyDown.bind( this );
++		this.onMouseMove = this.onMouseMove.bind( this );
++
++		this.updateBounds = this.updateBounds.bind( this );
++		this.updateValue = this.updateValue.bind( this );
++	}
++	componentDidMount() {
++		document.addEventListener( 'mouseup', this.handleOnMouseUp );
++		window.addEventListener( 'resize', this.updateBounds );
+ 	}
+ 	componentDidUpdate( prevProps ) {
+ 		if ( prevProps.url !== this.props.url ) {
+@@ -45,26 +59,37 @@ export class FocalPointPicker extends Component {
+ 				isDragging: false,
+ 			} );
+ 		}
++		/**
++		 * Handles cases where the incoming value changes.
++		 * An example is the values resetting based on an UNDO action.
++		 */
++		if (
++			this.props.value.x !== this.state.percentages.x ||
++			this.props.value.y !== this.state.percentages.y
++		) {
++			this.setState( { percentages: this.props.value } );
++		}
++	}
++	componentWillUnmount() {
++		document.removeEventListener( 'mouseup', this.handleOnMouseUp );
++		window.removeEventListener( 'resize', this.updateBounds );
+ 	}
+ 	calculateBounds() {
+-		const bounds = {
+-			top: 0,
+-			left: 0,
+-			bottom: 0,
+-			right: 0,
+-			width: 0,
+-			height: 0,
+-		};
+-		if ( ! this.imageRef.current ) {
++		const bounds = INITIAL_BOUNDS;
++
++		if ( ! this.mediaRef.current ) {
+ 			return bounds;
+ 		}
++
+ 		const dimensions = {
+-			width: this.imageRef.current.clientWidth,
+-			height: this.imageRef.current.clientHeight,
++			width: this.mediaRef.current.clientWidth,
++			height: this.mediaRef.current.clientHeight,
+ 		};
+ 		const pickerDimensions = this.pickerDimensions();
++
+ 		const widthRatio = pickerDimensions.width / dimensions.width;
+ 		const heightRatio = pickerDimensions.height / dimensions.height;
++
+ 		if ( heightRatio >= widthRatio ) {
+ 			bounds.width = bounds.right = pickerDimensions.width;
+ 			bounds.height = dimensions.height * widthRatio;
+@@ -78,96 +103,144 @@ export class FocalPointPicker extends Component {
+ 		}
+ 		return bounds;
+ 	}
+-	onLoad() {
++	updateValue( nextValue = {} ) {
++		const { onChange } = this.props;
++		const { x, y } = nextValue;
++
++		const nextPercentage = {
++			x: parseFloat( x ).toFixed( 2 ),
++			y: parseFloat( y ).toFixed( 2 ),
++		};
++
++		this.setState( { percentages: nextPercentage }, () => {
++			onChange( nextPercentage );
++		} );
++	}
++	updateBounds() {
+ 		this.setState( {
+ 			bounds: this.calculateBounds(),
+ 		} );
+ 	}
+-	onMouseMove( event ) {
+-		const { isDragging, bounds } = this.state;
+-		const { onChange } = this.props;
+-
+-		if ( isDragging ) {
+-			const pickerDimensions = this.pickerDimensions();
+-			const cursorPosition = {
+-				left: event.pageX - pickerDimensions.left,
+-				top: event.pageY - pickerDimensions.top,
+-			};
+-			const left = Math.max(
+-				bounds.left,
+-				Math.min( cursorPosition.left, bounds.right )
+-			);
+-			const top = Math.max(
+-				bounds.top,
+-				Math.min( cursorPosition.top, bounds.bottom )
+-			);
+-			const percentages = {
+-				x: (
+-					( left - bounds.left ) /
+-					( pickerDimensions.width - bounds.left * 2 )
+-				).toFixed( 2 ),
+-				y: (
+-					( top - bounds.top ) /
+-					( pickerDimensions.height - bounds.top * 2 )
+-				).toFixed( 2 ),
+-			};
+-			this.setState( { percentages }, function () {
+-				onChange( {
+-					x: this.state.percentages.x,
+-					y: this.state.percentages.y,
+-				} );
+-			} );
+-		}
+-	}
+-	fractionToPercentage( fraction ) {
+-		return Math.round( fraction * 100 );
++	handleOnClick( event ) {
++		event.persist();
++		this.setState( { isDragging: true }, () => {
++			this.onMouseMove( event );
++		} );
+ 	}
+-	horizontalPositionChanged( event ) {
+-		this.positionChangeFromTextControl( 'x', event.target.value );
++	handleOnMouseUp() {
++		this.setState( { isDragging: false } );
+ 	}
+-	verticalPositionChanged( event ) {
+-		this.positionChangeFromTextControl( 'y', event.target.value );
++	handleOnKeyDown( event ) {
++		const { keyCode, shiftKey } = event;
++		if ( ! [ UP, DOWN, LEFT, RIGHT ].includes( keyCode ) ) return;
++
++		const { x, y } = this.state.percentages;
++
++		event.preventDefault();
++
++		// Normalizing values for incrementing/decrementing based on arrow keys
++		let nextX = parseFloat( x );
++		let nextY = parseFloat( y );
++		const step = shiftKey ? 0.1 : 0.01;
++
++		switch ( event.keyCode ) {
++			case UP:
++				nextY = nextY - step;
++				break;
++			case DOWN:
++				nextY = nextY + step;
++				break;
++			case LEFT:
++				nextX = nextX - step;
++				break;
++			case RIGHT:
++				nextX = nextX + step;
++				break;
++		}
++
++		nextX = roundClamp( nextX, 0, 1, step );
++		nextY = roundClamp( nextY, 0, 1, step );
++
++		const percentages = {
++			x: nextX,
++			y: nextY,
++		};
++
++		this.updateValue( percentages );
+ 	}
+-	positionChangeFromTextControl( axis, value ) {
+-		const { onChange } = this.props;
+-		const { percentages } = this.state;
+-		const cleanValue = Math.max( Math.min( parseInt( value ), 100 ), 0 );
+-		percentages[ axis ] = ( cleanValue ? cleanValue / 100 : 0 ).toFixed(
+-			2
++	onMouseMove( event ) {
++		const { isDragging, bounds } = this.state;
++
++		if ( ! isDragging ) return;
++
++		const { shiftKey } = event;
++		const pickerDimensions = this.pickerDimensions();
++		const cursorPosition = {
++			left: event.pageX - pickerDimensions.left,
++			top: event.pageY - pickerDimensions.top,
++		};
++
++		const left = Math.max(
++			bounds.left,
++			Math.min( cursorPosition.left, bounds.right )
+ 		);
+-		this.setState( { percentages }, function () {
+-			onChange( {
+-				x: this.state.percentages.x,
+-				y: this.state.percentages.y,
+-			} );
+-		} );
++		const top = Math.max(
++			bounds.top,
++			Math.min( cursorPosition.top, bounds.bottom )
++		);
++
++		let nextX =
++			( left - bounds.left ) /
++			( pickerDimensions.width - bounds.left * 2 );
++		let nextY =
++			( top - bounds.top ) / ( pickerDimensions.height - bounds.top * 2 );
++
++		// Enables holding shift to jump values by 10%
++		const step = shiftKey ? 0.1 : 0.01;
++
++		nextX = roundClamp( nextX, 0, 1, step );
++		nextY = roundClamp( nextY, 0, 1, step );
++
++		const nextPercentage = {
++			x: nextX,
++			y: nextY,
++		};
++
++		this.updateValue( nextPercentage );
+ 	}
+ 	pickerDimensions() {
+-		if ( this.containerRef.current ) {
++		const containerNode = this.containerRef.current;
++
++		if ( ! containerNode ) {
+ 			return {
+-				width: this.containerRef.current.clientWidth,
+-				height: this.containerRef.current.clientHeight,
+-				top:
+-					this.containerRef.current.getBoundingClientRect().top +
+-					document.body.scrollTop,
+-				left: this.containerRef.current.getBoundingClientRect().left,
++				width: 0,
++				height: 0,
++				left: 0,
++				top: 0,
+ 			};
+ 		}
++
++		const { clientHeight, clientWidth } = containerNode;
++		const { top, left } = containerNode.getBoundingClientRect();
++
+ 		return {
+-			width: 0,
+-			height: 0,
+-			left: 0,
+-			top: 0,
++			width: clientWidth,
++			height: clientHeight,
++			top: top + document.body.scrollTop,
++			left,
+ 		};
+ 	}
+-	handleFocusOutside() {
+-		this.setState( {
+-			isDragging: false,
+-		} );
+-	}
+-	render() {
+-		const { instanceId, url, value, label, help, className } = this.props;
+-		const { bounds, isDragging, percentages } = this.state;
++	iconCoordinates() {
++		const { value } = this.props;
++		const { bounds } = this.state;
++
++		if ( bounds.left === undefined || bounds.top === undefined ) {
++			return {
++				left: '50%',
++				top: '50%',
++			};
++		}
++
+ 		const pickerDimensions = this.pickerDimensions();
+ 		const iconCoordinates = {
+ 			left:
+@@ -177,114 +250,98 @@ export class FocalPointPicker extends Component {
+ 				value.y * ( pickerDimensions.height - bounds.top * 2 ) +
+ 				bounds.top,
+ 		};
+-		const iconContainerStyle = {
+-			left: `${ iconCoordinates.left }px`,
+-			top: `${ iconCoordinates.top }px`,
+-		};
+-		const iconContainerClasses = classnames(
+-			'components-focal-point-picker__icon_container',
+-			isDragging ? 'is-dragging' : null
++
++		return iconCoordinates;
++	}
++	// Callback method for the withFocusOutside higher-order component
++	handleFocusOutside() {
++		this.setState( {
++			isDragging: false,
++		} );
++	}
++	render() {
++		const {
++			autoPlay,
++			className,
++			help,
++			instanceId,
++			label,
++			onDragStart,
++			onDragEnd,
++			url,
++		} = this.props;
++		const { bounds, isDragging, percentages } = this.state;
++		const iconCoordinates = this.iconCoordinates();
++
++		const classes = classnames(
++			'components-focal-point-picker-control',
++			className
+ 		);
++
+ 		const id = `inspector-focal-point-picker-control-${ instanceId }`;
+-		const horizontalPositionId = `inspector-focal-point-picker-control-horizontal-position-${ instanceId }`;
+-		const verticalPositionId = `inspector-focal-point-picker-control-vertical-position-${ instanceId }`;
++
+ 		return (
+ 			<BaseControl
+ 				label={ label }
+ 				id={ id }
+ 				help={ help }
+-				className={ className }
++				className={ classes }
+ 			>
+-				<div className="components-focal-point-picker-wrapper">
+-					<div
++				<MediaWrapper className="components-focal-point-picker-wrapper">
++					<MediaContainer
+ 						className="components-focal-point-picker"
+-						onMouseDown={ () =>
+-							this.setState( { isDragging: true } )
+-						}
+-						onDragStart={ () =>
+-							this.setState( { isDragging: true } )
+-						}
+-						onMouseUp={ () =>
+-							this.setState( { isDragging: false } )
+-						}
+-						onDrop={ () => this.setState( { isDragging: false } ) }
++						onDragStart={ ( event ) => {
++							this.setState( { isDragging: true } );
++							onDragStart( event );
++						} }
++						onDrop={ ( event ) => {
++							this.setState( { isDragging: false } );
++							onDragEnd( event );
++						} }
++						onKeyDown={ this.handleOnKeyDown }
++						onMouseDown={ this.handleOnClick }
+ 						onMouseMove={ this.onMouseMove }
++						onMouseUp={ this.handleOnMouseUp }
+ 						ref={ this.containerRef }
+ 						role="button"
+ 						tabIndex="-1"
+ 					>
+-						<img
+-							alt="Dimensions helper"
+-							onLoad={ this.onLoad }
+-							ref={ this.imageRef }
+-							src={ url }
+-							draggable="false"
++						<Grid
++							bounds={ bounds }
++							value={ percentages.x + percentages.y }
+ 						/>
+-						<div
+-							className={ iconContainerClasses }
+-							style={ iconContainerStyle }
+-						>
+-							<SVG
+-								className="components-focal-point-picker__icon"
+-								xmlns="http://www.w3.org/2000/svg"
+-								viewBox="0 0 30 30"
+-							>
+-								<Path
+-									className="components-focal-point-picker__icon-outline"
+-									d="M15 1C7.3 1 1 7.3 1 15s6.3 14 14 14 14-6.3 14-14S22.7 1 15 1zm0 22c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"
+-								/>
+-								<Path
+-									className="components-focal-point-picker__icon-fill"
+-									d="M15 3C8.4 3 3 8.4 3 15s5.4 12 12 12 12-5.4 12-12S21.6 3 15 3zm0 22C9.5 25 5 20.5 5 15S9.5 5 15 5s10 4.5 10 10-4.5 10-10 10z"
+-								/>
+-							</SVG>
+-						</div>
+-					</div>
+-				</div>
+-				<div className="components-focal-point-picker_position-display-container">
+-					<BaseControl
+-						label={ __( 'Horizontal pos.' ) }
+-						id={ horizontalPositionId }
+-					>
+-						<input
+-							className="components-text-control__input"
+-							id={ horizontalPositionId }
+-							max={ TEXTCONTROL_MAX }
+-							min={ TEXTCONTROL_MIN }
+-							onChange={ this.horizontalPositionChanged }
+-							type="number"
+-							value={ this.fractionToPercentage( percentages.x ) }
++						<Media
++							alt={ __( 'Media preview' ) }
++							autoPlay={ autoPlay }
++							mediaRef={ this.mediaRef }
++							onLoad={ this.updateBounds }
++							src={ url }
+ 						/>
+-						<span>%</span>
+-					</BaseControl>
+-					<BaseControl
+-						label={ __( 'Vertical pos.' ) }
+-						id={ verticalPositionId }
+-					>
+-						<input
+-							className="components-text-control__input"
+-							id={ verticalPositionId }
+-							max={ TEXTCONTROL_MAX }
+-							min={ TEXTCONTROL_MIN }
+-							onChange={ this.verticalPositionChanged }
+-							type="number"
+-							value={ this.fractionToPercentage( percentages.y ) }
++						<FocalPoint
++							coordinates={ iconCoordinates }
++							isDragging={ isDragging }
+ 						/>
+-						<span>%</span>
+-					</BaseControl>
+-				</div>
++					</MediaContainer>
++				</MediaWrapper>
++				<Controls
++					percentages={ percentages }
++					onChange={ this.updateValue }
++				/>
+ 			</BaseControl>
+ 		);
+ 	}
+ }
+ 
+ FocalPointPicker.defaultProps = {
+-	url: null,
++	autoPlay: true,
++	onDragStart: noop,
++	onDragEnd: noop,
++	onChange: noop,
+ 	value: {
+ 		x: 0.5,
+ 		y: 0.5,
+ 	},
+-	onChange: () => {},
++	url: null,
+ };
+ 
+ export default compose( [ withInstanceId, withFocusOutside ] )(
+diff --git a/packages/components/src/focal-point-picker/media.js b/packages/components/src/focal-point-picker/media.js
+new file mode 100644
+index 00000000000000..26639cc51c557d
+--- /dev/null
++++ b/packages/components/src/focal-point-picker/media.js
+@@ -0,0 +1,78 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { useRef, useLayoutEffect } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { MediaPlaceholder } from './styles/focal-point-picker-style';
++import { isVideoType } from './utils';
++
++export default function Media( {
++	alt,
++	autoPlay,
++	src,
++	onLoad = noop,
++	mediaRef,
++	// Exposing muted prop for test rendering purposes
++	// https://github.com/testing-library/react-testing-library/issues/470
++	muted = true,
++	...props
++} ) {
++	if ( ! src ) {
++		return (
++			<MediaPlaceholderElement
++				className="components-focal-point-picker__media components-focal-point-picker__media--placeholder"
++				onLoad={ onLoad }
++				mediaRef={ mediaRef }
++			/>
++		);
++	}
++
++	const isVideo = isVideoType( src );
++
++	return isVideo ? (
++		<video
++			{ ...props }
++			autoPlay={ autoPlay }
++			className="components-focal-point-picker__media components-focal-point-picker__media--video"
++			loop
++			muted={ muted }
++			onLoadedData={ onLoad }
++			ref={ mediaRef }
++			src={ src }
++		/>
++	) : (
++		<img
++			{ ...props }
++			alt={ alt }
++			className="components-focal-point-picker__media components-focal-point-picker__media--image"
++			onLoad={ onLoad }
++			ref={ mediaRef }
++			src={ src }
++		/>
++	);
++}
++
++function MediaPlaceholderElement( { mediaRef, onLoad = noop, ...props } ) {
++	const onLoadRef = useRef( onLoad );
++
++	/**
++	 * This async callback mimics the onLoad (img) / onLoadedData (video) callback
++	 * for media elements. It is used in the main <FocalPointPicker /> component
++	 * to calculate the dimensions + boundaries for positioning.
++	 */
++	useLayoutEffect( () => {
++		window.requestAnimationFrame( () => {
++			onLoadRef.current();
++		} );
++	}, [] );
++
++	return <MediaPlaceholder ref={ mediaRef } { ...props } />;
++}
+diff --git a/packages/components/src/focal-point-picker/stories/index.js b/packages/components/src/focal-point-picker/stories/index.js
+new file mode 100644
+index 00000000000000..2318d71ede4368
+--- /dev/null
++++ b/packages/components/src/focal-point-picker/stories/index.js
+@@ -0,0 +1,46 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import FocalPointPicker from '../';
++
++export default {
++	title: 'Components/FocalPointPicker',
++	component: FocalPointPicker,
++};
++
++const Example = ( props ) => {
++	const [ focalPoint, setFocalPoint ] = useState( {
++		x: 0.5,
++		y: 0.5,
++	} );
++
++	return (
++		<FocalPointPicker
++			value={ focalPoint }
++			onChange={ setFocalPoint }
++			{ ...props }
++		/>
++	);
++};
++
++export const _default = () => {
++	return <Example />;
++};
++
++export const image = () => {
++	const url =
++		'https://i0.wp.com/themes.svn.wordpress.org/twentytwenty/1.3/screenshot.png?w=572&strip=al';
++
++	return <Example url={ url } />;
++};
++
++export const video = () => {
++	const url =
++		'https://interactive-examples.mdn.mozilla.net/media/examples/flower.webm';
++
++	return <Example url={ url } />;
++};
+diff --git a/packages/components/src/focal-point-picker/style.scss b/packages/components/src/focal-point-picker/style.scss
+deleted file mode 100644
+index e0693185040f91..00000000000000
+--- a/packages/components/src/focal-point-picker/style.scss
++++ /dev/null
+@@ -1,75 +0,0 @@
+-.components-focal-point-picker-wrapper {
+-	background-color: transparent;
+-	border: 1px solid $gray-200;
+-	height: 200px;
+-	width: 100%;
+-	padding: 14px;
+-}
+-
+-.components-focal-point-picker {
+-	align-items: center;
+-	cursor: pointer;
+-	display: flex;
+-	height: 100%;
+-	justify-content: center;
+-	position: relative;
+-	width: 100%;
+-
+-	img {
+-		height: auto;
+-		max-height: 100%;
+-		max-width: 100%;
+-		width: auto;
+-		user-select: none;
+-	}
+-}
+-
+-.components-focal-point-picker__icon_container {
+-	background-color: transparent;
+-	cursor: grab;
+-	height: 30px;
+-	opacity: 0.8;
+-	position: absolute;
+-	will-change: transform;
+-	width: 30px;
+-	z-index: 10000;
+-
+-	&.is-dragging {
+-		cursor: grabbing;
+-	}
+-}
+-
+-.components-focal-point-picker__icon {
+-	display: block;
+-	height: 100%;
+-	left: -15px;
+-	position: absolute;
+-	top: -15px;
+-	width: 100%;
+-
+-	.components-focal-point-picker__icon-outline {
+-		fill: $white;
+-	}
+-
+-	.components-focal-point-picker__icon-fill {
+-		fill: var(--wp-admin-theme-color);
+-	}
+-}
+-
+-.components-focal-point-picker_position-display-container {
+-	margin: 1em 0;
+-	display: flex;
+-
+-	.components-base-control__field {
+-		margin: 0 1em 0 0;
+-	}
+-
+-	input[type="number"].components-text-control__input { // Needs specificity to override padding.
+-		max-width: 4em;
+-		padding: 6px 4px;
+-	}
+-
+-	span {
+-		margin: 0 0 0 0.2em;
+-	}
+-}
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js
+new file mode 100644
+index 00000000000000..a672af57f338aa
+--- /dev/null
++++ b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.js
+@@ -0,0 +1,101 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import Flex from '../../flex';
++import BaseUnitControl from '../../unit-control';
++import { color } from '../../utils/style-mixins';
++
++export const MediaWrapper = styled.div`
++	background-color: transparent;
++	box-sizing: border-box;
++	text-align: center;
++	width: 100%;
++`;
++
++export const MediaContainer = styled.div`
++	align-items: center;
++	box-sizing: border-box;
++	box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.2 );
++	cursor: pointer;
++	display: inline-flex;
++	justify-content: center;
++	margin: auto;
++	position: relative;
++	height: 100%;
++
++	img,
++	video {
++		box-sizing: border-box;
++		display: block;
++		height: auto;
++		margin: 0;
++		max-height: 100%;
++		max-width: 100%;
++		pointer-events: none;
++		user-select: none;
++		width: auto;
++	}
++`;
++
++export const MediaPlaceholder = styled.div`
++	background: ${ color( 'lightGray.300' ) };
++	box-sizing: border-box;
++	height: 170px;
++	max-width: 280px;
++	min-width: 200px;
++	width: 100%;
++`;
++
++export const UnitControl = styled( BaseUnitControl )`
++	width: 100px;
++`;
++
++export const ControlWrapper = styled( Flex )`
++	max-width: 320px;
++	padding: 1em 0;
++`;
++
++export const GridView = styled.div`
++	box-sizing: border-box;
++	left: 50%;
++	opacity: 0;
++	overflow: hidden;
++	pointer-events: none;
++	position: absolute;
++	top: 50%;
++	transform: translate3d( -50%, -50%, 0 );
++	transition: opacity 120ms linear;
++	z-index: 1;
++
++	${ ( { isActive } ) =>
++		isActive &&
++		`
++		opacity: 1;
++	` }
++`;
++
++export const GridLine = styled.div`
++	box-sizing: border-box;
++	background: white;
++	box-shadow: 0 0 2px rgba( 0, 0, 0, 0.6 );
++	position: absolute;
++	opacity: 0.4;
++	transform: translateZ( 0 );
++`;
++
++export const GridLineX = styled( GridLine )`
++	height: 1px;
++	left: 0;
++	right: 0;
++`;
++
++export const GridLineY = styled( GridLine )`
++	width: 1px;
++	top: 0;
++	bottom: 0;
++`;
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-style.js b/packages/components/src/focal-point-picker/styles/focal-point-style.js
+new file mode 100644
+index 00000000000000..3ebe8b316e74af
+--- /dev/null
++++ b/packages/components/src/focal-point-picker/styles/focal-point-style.js
+@@ -0,0 +1,49 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * WordPress dependencies
++ */
++import { Path, SVG } from '@wordpress/primitives';
++
++/**
++ * Internal dependencies
++ */
++import { color } from '../../utils/style-mixins';
++
++export const FocalPointWrapper = styled.div`
++	background-color: transparent;
++	box-sizing: border-box;
++	cursor: grab;
++	height: 30px;
++	margin: -15px 0 0 -15px;
++	opacity: 0.8;
++	position: absolute;
++	user-select: none;
++	width: 30px;
++	will-change: transform;
++	z-index: 10000;
++
++	&.is-dragging {
++		cursor: grabbing;
++	}
++`;
++
++export const PointerIconSVG = styled( SVG )`
++	display: block;
++	height: 100%;
++	left: 0;
++	position: absolute;
++	top: 0;
++	width: 100%;
++`;
++
++export const PointerIconPathOutline = styled( Path )`
++	fill: white;
++`;
++
++export const PointerIconPathFill = styled( Path )`
++	fill: ${ color( 'ui.brand' ) };
++`;
+diff --git a/packages/components/src/focal-point-picker/test/media.js b/packages/components/src/focal-point-picker/test/media.js
+new file mode 100644
+index 00000000000000..a755396f8bef42
+--- /dev/null
++++ b/packages/components/src/focal-point-picker/test/media.js
+@@ -0,0 +1,58 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import Media from '../media';
++
++const getMedia = ( container ) =>
++	container.querySelector( '.components-focal-point-picker__media' );
++
++describe( 'FocalPointPicker/Media', () => {
++	describe( 'Basic rendering', () => {
++		it( 'should render', () => {
++			const { container } = render( <Media /> );
++			const el = getMedia( container );
++
++			expect( el ).toBeTruthy();
++		} );
++	} );
++
++	describe( 'Media types', () => {
++		it( 'should render a placeholder by default', () => {
++			const { container } = render( <Media /> );
++			const el = getMedia( container );
++
++			expect( el.outerHTML ).toContain( 'placeholder' );
++		} );
++
++		it( 'should render an video if src is a video file', () => {
++			const { container, rerender } = render(
++				<Media src="file.mp4" muted={ false } />
++			);
++
++			expect( getMedia( container ).tagName ).toBe( 'VIDEO' );
++
++			rerender( <Media src="file.ogg" muted={ false } /> );
++
++			expect( getMedia( container ).tagName ).toBe( 'VIDEO' );
++
++			rerender( <Media src="file.webm" muted={ false } /> );
++
++			expect( getMedia( container ).tagName ).toBe( 'VIDEO' );
++		} );
++
++		it( 'should render an image file, if not video', () => {
++			const { container, rerender } = render( <Media src="file.gif" /> );
++
++			expect( getMedia( container ).tagName ).toBe( 'IMG' );
++
++			rerender( <Media src="file.png" muted={ false } /> );
++
++			expect( getMedia( container ).tagName ).toBe( 'IMG' );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/focal-point-picker/utils.js b/packages/components/src/focal-point-picker/utils.js
+new file mode 100644
+index 00000000000000..8366f8a7a9ebd6
+--- /dev/null
++++ b/packages/components/src/focal-point-picker/utils.js
+@@ -0,0 +1,53 @@
++export const INITIAL_BOUNDS = {
++	top: 0,
++	left: 0,
++	bottom: 0,
++	right: 0,
++	width: 0,
++	height: 0,
++};
++
++const VIDEO_EXTENSIONS = [
++	'avi',
++	'mpg',
++	'mpeg',
++	'mov',
++	'mp4',
++	'm4v',
++	'ogg',
++	'ogv',
++	'webm',
++	'wmv',
++];
++
++/**
++ * Gets the extension of a file name.
++ *
++ * @param {string} filename The file name.
++ * @return {string} The extension of the file name.
++ */
++export function getExtension( filename = '' ) {
++	const parts = filename.split( '.' );
++	return parts[ parts.length - 1 ];
++}
++
++/**
++ * Checks if a file is a video.
++ *
++ * @param {string} filename The file name.
++ * @return {boolean} Whether the file is a video.
++ */
++export function isVideoType( filename = '' ) {
++	if ( ! filename ) return false;
++	return VIDEO_EXTENSIONS.includes( getExtension( filename ) );
++}
++
++/**
++ * Transforms a fraction value to a percentage value.
++ *
++ * @param {number} fraction The fraction value.
++ * @return {number} A percentage value.
++ */
++export function fractionToPercentage( fraction ) {
++	return Math.round( fraction * 100 );
++}
+diff --git a/packages/components/src/input-control/index.js b/packages/components/src/input-control/index.js
+index d2beadb3e5b1ce..ad3b7b79eb47d4 100644
+--- a/packages/components/src/input-control/index.js
++++ b/packages/components/src/input-control/index.js
+@@ -37,6 +37,7 @@ export function InputControl(
+ 		isPressEnterToChange = false,
+ 		isFloatingLabel = false,
+ 		label,
++		labelPosition = 'top',
+ 		onBlur = noop,
+ 		onChange = noop,
+ 		onFocus = noop,
+@@ -75,8 +76,11 @@ export function InputControl(
+ 	return (
+ 		<Root
+ 			className={ classes }
++			gap={ 3 }
+ 			isFloatingLabel={ isFloatingLabelSet }
+ 			isFocused={ isFocused }
++			justify="left"
++			labelPosition={ labelPosition }
+ 		>
+ 			<Label
+ 				className="components-input-control__label"
+@@ -93,6 +97,7 @@ export function InputControl(
+ 				className="components-input-control__container"
+ 				disabled={ disabled }
+ 				isFocused={ isFocused }
++				labelPosition={ labelPosition }
+ 			>
+ 				{ prefix && (
+ 					<Prefix className="components-input-control__prefix">
+diff --git a/packages/components/src/input-control/stories/index.js b/packages/components/src/input-control/stories/index.js
+index b476a28ba12233..27f148fdfdae97 100644
+--- a/packages/components/src/input-control/stories/index.js
++++ b/packages/components/src/input-control/stories/index.js
+@@ -27,6 +27,15 @@ function Example() {
+ 		isFloatingLabel: boolean( 'isFloatingLabel', false ),
+ 		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
+ 		label: text( 'label', 'Value' ),
++		labelPosition: select(
++			'labelPosition',
++			{
++				top: 'top',
++				side: 'side',
++				bottom: 'bottom',
++			},
++			'top'
++		),
+ 		placeholder: text( 'placeholder', 'Placeholder' ),
+ 		size: select(
+ 			'size',
+diff --git a/packages/components/src/input-control/styles/input-control-styles.js b/packages/components/src/input-control/styles/input-control-styles.js
+index b97b10fd56d9dc..dd58d7f8275f24 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.js
++++ b/packages/components/src/input-control/styles/input-control-styles.js
+@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+  */
++import Flex from '../../flex';
+ import Text from '../../text';
+ import { color, rtl, reduceMotion } from '../../utils/style-mixins';
+ 
+@@ -23,16 +24,33 @@ const rootFocusedStyles = ( { isFocused } ) => {
+ 	return css( { zIndex: 1 } );
+ };
+ 
+-export const Root = styled.div`
+-	box-sizing: border-box;
++const rootLabelPositionStyles = ( { labelPosition } ) => {
++	switch ( labelPosition ) {
++		case 'top':
++			return css`
++				align-items: flex-start;
++				flex-direction: column;
++			`;
++		case 'bottom':
++			return css`
++				align-items: flex-start;
++				flex-direction: column-reverse;
++			`;
++		default:
++			return '';
++	}
++};
++
++export const Root = styled( Flex )`
+ 	position: relative;
+ 	border-radius: 2px;
+ 
+ 	${ rootFloatLabelStyles };
+ 	${ rootFocusedStyles };
++	${ rootLabelPositionStyles };
+ `;
+ 
+-const containerDisabledStyle = ( { disabled } ) => {
++const containerDisabledStyles = ( { disabled } ) => {
+ 	const backgroundColor = disabled
+ 		? color( 'ui.backgroundDisabled' )
+ 		: color( 'ui.background' );
+@@ -40,14 +58,24 @@ const containerDisabledStyle = ( { disabled } ) => {
+ 	return css( { backgroundColor } );
+ };
+ 
++const containerWidthStyles = ( { labelPosition } ) => {
++	if ( labelPosition === 'side' ) return '';
++
++	return css`
++		width: 100%;
++	`;
++};
++
+ export const Container = styled.div`
+ 	align-items: center;
+ 	box-sizing: border-box;
+ 	border-radius: inherit;
+ 	display: flex;
++	flex: 1;
+ 	position: relative;
+ 
+-	${ containerDisabledStyle };
++	${ containerDisabledStyles };
++	${ containerWidthStyles };
+ `;
+ 
+ const disabledStyles = ( { disabled } ) => {
+@@ -253,7 +281,8 @@ const BaseLabel = styled( Text )`
+ 		display: block;
+ 		margin: 0;
+ 		max-width: 100%;
+-		padding: 0;
++		padding-bottom: 0;
++		padding-top: 0;
+ 		pointer-events: none;
+ 		top: 50%;
+ 		transition: transform ${ FLOATING_LABEL_TRANSITION_SPEED } linear,
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 5fe4afbb8305ef..36c406c3c7a414 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -20,7 +20,6 @@
+ @import "./dropdown/style.scss";
+ @import "./dropdown-menu/style.scss";
+ @import "./external-link/style.scss";
+-@import "./focal-point-picker/style.scss";
+ @import "./font-size-picker/style.scss";
+ @import "./form-toggle/style.scss";
+ @import "./form-token-field/style.scss";
+diff --git a/packages/components/src/utils/hooks/index.js b/packages/components/src/utils/hooks/index.js
+index 7b4ff6167cc660..3eeca7881e2563 100644
+--- a/packages/components/src/utils/hooks/index.js
++++ b/packages/components/src/utils/hooks/index.js
+@@ -1,2 +1,3 @@
+ export { default as useControlledState } from './use-controlled-state';
+ export { default as useJumpStep } from './use-jump-step';
++export { default as useUpdateEffect } from './use-update-effect';
+diff --git a/packages/components/src/utils/hooks/use-update-effect.js b/packages/components/src/utils/hooks/use-update-effect.js
+new file mode 100644
+index 00000000000000..fa13e4f9d0d65b
+--- /dev/null
++++ b/packages/components/src/utils/hooks/use-update-effect.js
+@@ -0,0 +1,23 @@
++/**
++ * WordPress dependencies
++ */
++import { useRef, useEffect } from '@wordpress/element';
++
++/*
++ * A `React.useEffect` that will not run on the first render.
++ * Source:
++ * https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/useUpdateEffect.ts
++ */
++function useUpdateEffect( effect, deps ) {
++	const mounted = useRef( false );
++
++	useEffect( () => {
++		if ( mounted.current ) {
++			return effect();
++		}
++		mounted.current = true;
++		return undefined;
++	}, deps );
++}
++
++export default useUpdateEffect;

@@ -1,0 +1,378 @@
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index e7afcccf249dc0..213e7b9f3d1c3f 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -14,6 +14,8 @@ import {
+ 	isSameMonth,
+ 	startOfWeek,
+ 	endOfWeek,
++	setMonth,
++	set,
+ } from 'date-fns';
+ import type { KeyboardEventHandler } from 'react';
+ 
+@@ -23,7 +25,7 @@ import type { KeyboardEventHandler } from 'react';
+ import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
+ import { arrowLeft, arrowRight } from '@wordpress/icons';
+ import { dateI18n, getSettings } from '@wordpress/date';
+-import { useState, useRef, useEffect } from '@wordpress/element';
++import { useState, useRef, useEffect, useMemo } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -37,10 +39,22 @@ import {
+ 	Calendar,
+ 	DayOfWeek,
+ 	DayButton,
++	DayInput,
++	MonthSelectWrapper,
++	YearInput,
++	Fieldset,
+ } from './styles';
+-import { inputToDate } from '../utils';
++import {
++	buildPadInputStateReducer,
++	inputToDate,
++	validateInputElementTarget,
++} from '../utils';
+ import Button from '../../button';
+ import { TIMEZONELESS_FORMAT } from '../constants';
++import SelectControl from '../../select-control';
++import { VisuallyHidden } from '../../visually-hidden';
++import { HStack } from '../../h-stack';
++import type { InputChangeCallback } from '../../input-control/types';
+ 
+ /**
+  * DatePicker is a React component that renders a calendar for date selection.
+@@ -56,6 +70,7 @@ import { TIMEZONELESS_FORMAT } from '../constants';
+  *     <DatePicker
+  *       currentDate={ date }
+  *       onChange={ ( newDate ) => setDate( newDate ) }
++ *       showDateInputs
+  *     />
+  *   );
+  * };
+@@ -68,6 +83,8 @@ export function DatePicker( {
+ 	isInvalidDate,
+ 	onMonthPreviewed,
+ 	startOfWeek: weekStartsOn = 0,
++	showDateInputs = false,
++	dateOrder: dateOrderProp,
+ }: DatePickerProps ) {
+ 	const date = currentDate ? inputToDate( currentDate ) : new Date();
+ 
+@@ -104,12 +121,154 @@ export function DatePicker( {
+ 		setFocusable( startOfDay( date ) );
+ 	}
+ 
++	const [ inputDate, setInputDate ] = useState( () => date );
++
++	useEffect( () => {
++		setInputDate( date );
++	}, [ currentDate ] );
++
++	const { day, month, year } = useMemo(
++		() => ( {
++			day: format( inputDate, 'dd' ),
++			month: format( inputDate, 'MM' ),
++			year: format( inputDate, 'yyyy' ),
++		} ),
++		[ inputDate ]
++	);
++
++	const monthOptions = [
++		{ value: '01', label: __( 'January' ) },
++		{ value: '02', label: __( 'February' ) },
++		{ value: '03', label: __( 'March' ) },
++		{ value: '04', label: __( 'April' ) },
++		{ value: '05', label: __( 'May' ) },
++		{ value: '06', label: __( 'June' ) },
++		{ value: '07', label: __( 'July' ) },
++		{ value: '08', label: __( 'August' ) },
++		{ value: '09', label: __( 'September' ) },
++		{ value: '10', label: __( 'October' ) },
++		{ value: '11', label: __( 'November' ) },
++		{ value: '12', label: __( 'December' ) },
++	];
++
++	const buildNumberControlChangeCallback = ( method: 'date' | 'year' ) => {
++		const callback: InputChangeCallback = ( value, { event } ) => {
++			if ( ! validateInputElementTarget( event ) ) {
++				return;
++			}
++
++			const numberValue = Number( value );
++
++			const newDate = set( inputDate, { [ method ]: numberValue } );
++			setInputDate( newDate );
++			onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
++			setViewing( newDate );
++			setSelected( [ startOfDay( newDate ) ] );
++			setFocusable( startOfDay( newDate ) );
++		};
++
++		return callback;
++	};
++
++	const dayField = (
++		<DayInput
++			key="day"
++			className="components-datetime__date-field components-datetime__date-field-day"
++			label={ __( 'Day' ) }
++			hideLabelFromVision
++			__next40pxDefaultSize
++			value={ day }
++			step={ 1 }
++			min={ 1 }
++			max={ 31 }
++			required
++			spinControls="none"
++			isPressEnterToChange
++			isDragEnabled={ false }
++			isShiftStepEnabled={ false }
++			onChange={ buildNumberControlChangeCallback( 'date' ) }
++		/>
++	);
++
++	const monthField = (
++		<MonthSelectWrapper key="month">
++			<SelectControl
++				className="components-datetime__date-field components-datetime__date-field-month"
++				label={ __( 'Month' ) }
++				hideLabelFromVision
++				__next40pxDefaultSize
++				__nextHasNoMarginBottom
++				value={ month }
++				options={ monthOptions }
++				onChange={ ( value ) => {
++					const newDate = setMonth( inputDate, Number( value ) - 1 );
++					setInputDate( newDate );
++					onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
++					setViewing( newDate );
++					setSelected( [ startOfDay( newDate ) ] );
++					setFocusable( startOfDay( newDate ) );
++				} }
++			/>
++		</MonthSelectWrapper>
++	);
++
++	const yearField = (
++		<YearInput
++			key="year"
++			className="components-datetime__date-field components-datetime__date-field-year"
++			label={ __( 'Year' ) }
++			hideLabelFromVision
++			__next40pxDefaultSize
++			value={ year }
++			step={ 1 }
++			min={ 1 }
++			max={ 9999 }
++			required
++			spinControls="none"
++			isPressEnterToChange
++			isDragEnabled={ false }
++			isShiftStepEnabled={ false }
++			onChange={ buildNumberControlChangeCallback( 'year' ) }
++			__unstableStateReducer={ buildPadInputStateReducer( 4 ) }
++		/>
++	);
++
++	const defaultDateOrder = 'dmy';
++	const dateOrder =
++		dateOrderProp && [ 'dmy', 'mdy', 'ymd' ].includes( dateOrderProp )
++			? dateOrderProp
++			: defaultDateOrder;
++
++	const fields = dateOrder.split( '' ).map( ( field ) => {
++		switch ( field ) {
++			case 'd':
++				return dayField;
++			case 'm':
++				return monthField;
++			case 'y':
++				return yearField;
++			default:
++				return null;
++		}
++	} );
++
+ 	return (
+ 		<Wrapper
+ 			className="components-datetime__date"
+ 			role="application"
+ 			aria-label={ __( 'Calendar' ) }
+ 		>
++			{ showDateInputs && (
++				<Fieldset>
++					<VisuallyHidden as="legend">
++						{ __( 'Date' ) }
++					</VisuallyHidden>
++					<HStack className="components-datetime__date-wrapper">
++						{ fields }
++					</HStack>
++				</Fieldset>
++			) }
++
+ 			<Navigator>
+ 				<Button
+ 					icon={ isRTL() ? arrowRight : arrowLeft }
+@@ -158,43 +317,56 @@ export function DatePicker( {
+ 				onFocus={ () => setIsFocusWithinCalendar( true ) }
+ 				onBlur={ () => setIsFocusWithinCalendar( false ) }
+ 			>
+-				{ calendar[ 0 ][ 0 ].map( ( day ) => (
+-					<DayOfWeek key={ day.toString() }>
+-						{ dateI18n( 'D', day, -day.getTimezoneOffset() ) }
++				{ calendar[ 0 ][ 0 ].map( ( days ) => (
++					<DayOfWeek key={ days.toString() }>
++						{ dateI18n( 'D', days, -days.getTimezoneOffset() ) }
+ 					</DayOfWeek>
+ 				) ) }
+ 				{ calendar[ 0 ].map( ( week ) =>
+-					week.map( ( day, index ) => {
+-						if ( ! isSameMonth( day, viewing ) ) {
++					week.map( ( days, index ) => {
++						if ( ! isSameMonth( days, viewing ) ) {
+ 							return null;
+ 						}
+ 						return (
+ 							<Day
+-								key={ day.toString() }
+-								day={ day }
++								key={ days.toString() }
++								day={ days }
+ 								column={ index + 1 }
+-								isSelected={ isSelected( day ) }
+-								isFocusable={ isEqual( day, focusable ) }
++								isSelected={ isSelected( days ) }
++								isFocusable={ isEqual( days, focusable ) }
+ 								isFocusAllowed={ isFocusWithinCalendar }
+-								isToday={ isSameDay( day, new Date() ) }
++								isToday={ isSameDay( days, new Date() ) }
+ 								isInvalid={
+-									isInvalidDate ? isInvalidDate( day ) : false
++									isInvalidDate
++										? isInvalidDate( days )
++										: false
+ 								}
+ 								numEvents={
+ 									events.filter( ( event ) =>
+-										isSameDay( event.date, day )
++										isSameDay( event.date, days )
+ 									).length
+ 								}
+ 								onClick={ () => {
+-									setSelected( [ day ] );
+-									setFocusable( day );
++									setSelected( [ days ] );
++									setFocusable( days );
++									setInputDate(
++										new Date(
++											days.getFullYear(),
++											days.getMonth(),
++											days.getDate(),
++											date.getHours(),
++											date.getMinutes(),
++											date.getSeconds(),
++											date.getMilliseconds()
++										)
++									);
+ 									onChange?.(
+ 										format(
+ 											// Don't change the selected date's time fields.
+ 											new Date(
+-												day.getFullYear(),
+-												day.getMonth(),
+-												day.getDate(),
++												days.getFullYear(),
++												days.getMonth(),
++												days.getDate(),
+ 												date.getHours(),
+ 												date.getMinutes(),
+ 												date.getSeconds(),
+diff --git a/packages/components/src/date-time/date/styles.ts b/packages/components/src/date-time/date/styles.ts
+index 84405854827ec9..12d4263238250c 100644
+--- a/packages/components/src/date-time/date/styles.ts
++++ b/packages/components/src/date-time/date/styles.ts
+@@ -1,6 +1,7 @@
+ /**
+  * External dependencies
+  */
++import { css } from '@emotion/react';
+ import styled from '@emotion/styled';
+ 
+ /**
+@@ -10,6 +11,8 @@ import Button from '../../button';
+ import { boxSizingReset, COLORS, CONFIG } from '../../utils';
+ import { HStack } from '../../h-stack';
+ import { Heading } from '../../heading';
++import { Input } from '../../input-control/styles/input-control-styles';
++import NumberControl from '../../number-control';
+ import { space } from '../../utils/space';
+ 
+ export const Wrapper = styled.div`
+@@ -138,3 +141,39 @@ export const DayButton = styled( Button, {
+ 		}
+ 		` }
+ `;
++
++const baseInput = css`
++	&&& ${ Input } {
++		padding-left: ${ space( 2 ) };
++		padding-right: ${ space( 2 ) };
++		text-align: center;
++	}
++`;
++
++// Ideally we wouldn't need a wrapper, but can't otherwise target the
++// <BaseControl> in <SelectControl>
++export const MonthSelectWrapper = styled.div`
++	flex-grow: 1;
++`;
++
++export const DayInput = styled( NumberControl )`
++	${ baseInput }
++
++	width: ${ space( 9 ) };
++`;
++
++export const YearInput = styled( NumberControl )`
++	${ baseInput }
++
++	width: ${ space( 14 ) };
++`;
++
++export const Fieldset = styled.fieldset`
++	border: 0;
++	margin: 0 0 ${ space( 2 * 2 ) } 0;
++	padding: 0;
++
++	&:last-child {
++		margin-bottom: 0;
++	}
++`;
+diff --git a/packages/components/src/date-time/types.ts b/packages/components/src/date-time/types.ts
+index 1f2298d9d450b5..e2be3eb72bc9f3 100644
+--- a/packages/components/src/date-time/types.ts
++++ b/packages/components/src/date-time/types.ts
+@@ -134,6 +134,20 @@ export type DatePickerProps = {
+ 	 * @default 0
+ 	 */
+ 	startOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
++
++	/**
++	 * The boolean value to show the date inputs.
++	 *
++	 * @default false
++	 */
++	showDateInputs?: boolean;
++
++	/**
++	 * The order of day, month, and year.
++	 *
++	 * @default 'dmy'
++	 */
++	dateOrder?: 'dmy' | 'mdy' | 'ymd';
+ };
+ 
+ export type DateTimePickerProps = Omit< DatePickerProps, 'onChange' > &

@@ -1,0 +1,177 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 03ba0dd71c87c6..1ddea55ec6a4f5 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -89,6 +89,7 @@ module.exports = {
+ 							'defaults',
+ 							'defaultTo',
+ 							'delay',
++							'difference',
+ 							'differenceWith',
+ 							'dropRight',
+ 							'each',
+diff --git a/packages/block-editor/src/components/list-view/use-block-selection.js b/packages/block-editor/src/components/list-view/use-block-selection.js
+index c1aafc455f15cc..417fb436212319 100644
+--- a/packages/block-editor/src/components/list-view/use-block-selection.js
++++ b/packages/block-editor/src/components/list-view/use-block-selection.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { difference } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -126,9 +121,8 @@ export default function useBlockSelection() {
+ 				return;
+ 			}
+ 
+-			const selectionDiff = difference(
+-				selectedBlocks,
+-				updatedSelectedBlocks
++			const selectionDiff = selectedBlocks.filter(
++				( blockId ) => ! updatedSelectedBlocks.includes( blockId )
+ 			);
+ 
+ 			let label;
+diff --git a/packages/blocks/src/api/parser/fix-custom-classname.js b/packages/blocks/src/api/parser/fix-custom-classname.js
+index d05d0f9cafe614..2628f0e967e7ff 100644
+--- a/packages/blocks/src/api/parser/fix-custom-classname.js
++++ b/packages/blocks/src/api/parser/fix-custom-classname.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { difference, omit } from 'lodash';
++import { omit } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+@@ -58,7 +58,10 @@ export function fixCustomClassname( blockAttributes, blockType, innerHTML ) {
+ 		const serialized = getSaveContent( blockType, attributesSansClassName );
+ 		const defaultClasses = getHTMLRootElementClasses( serialized );
+ 		const actualClasses = getHTMLRootElementClasses( innerHTML );
+-		const customClasses = difference( actualClasses, defaultClasses );
++
++		const customClasses = actualClasses.filter(
++			( className ) => ! defaultClasses.includes( className )
++		);
+ 
+ 		if ( customClasses.length ) {
+ 			blockAttributes.className = customClasses.join( ' ' );
+diff --git a/packages/blocks/src/api/raw-handling/is-inline-content.js b/packages/blocks/src/api/raw-handling/is-inline-content.js
+index 1277c49834e4b9..4558a1aa0e3625 100644
+--- a/packages/blocks/src/api/raw-handling/is-inline-content.js
++++ b/packages/blocks/src/api/raw-handling/is-inline-content.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { difference } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -33,7 +28,9 @@ function isInline( node, contextTag ) {
+ 	];
+ 
+ 	return inlineAllowedTagGroups.some(
+-		( tagGroup ) => difference( [ tag, contextTag ], tagGroup ).length === 0
++		( tagGroup ) =>
++			[ tag, contextTag ].filter( ( t ) => ! tagGroup.includes( t ) )
++				.length === 0
+ 	);
+ }
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index af8f3c52a3fd6b..d6dddd403a69c5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `ComboboxControl`: Normalize hyphen-like characters to an ASCII hyphen ([#42942](https://github.com/WordPress/gutenberg/pull/42942)).
++-   `FormTokenField`: Refactor away from `_.difference()` ([#43224](https://github.com/WordPress/gutenberg/pull/43224/)).
+ 
+ ## 19.17.0 (2022-08-10)
+ 
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 9195f2d5ba59aa..29475ec7d4ee71 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { last, clone, uniq, map, difference, some } from 'lodash';
++import { last, clone, uniq, map, some } from 'lodash';
+ import classnames from 'classnames';
+ import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
+ 
+@@ -475,7 +475,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		} );
+ 
+ 		if ( match.length === 0 ) {
+-			_suggestions = difference( _suggestions, normalizedValue );
++			_suggestions = _suggestions.filter(
++				( suggestion ) => ! normalizedValue.includes( suggestion )
++			);
+ 		} else {
+ 			match = match.toLocaleLowerCase();
+ 
+diff --git a/packages/edit-navigation/src/store/actions.js b/packages/edit-navigation/src/store/actions.js
+index def7a7e79e40b3..4dd010391883a8 100644
+--- a/packages/edit-navigation/src/store/actions.js
++++ b/packages/edit-navigation/src/store/actions.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { difference } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -128,10 +123,15 @@ const batchSaveMenuItems =
+ 		);
+ 
+ 		// Delete menu items.
+-		const deletedIds = difference(
+-			oldMenuItems.map( ( { id } ) => id ),
+-			blocksTreeToList( navBlockAfterUpdates ).map( getRecordIdFromBlock )
+-		);
++		const deletedIds = oldMenuItems
++			.map( ( { id } ) => id )
++			.filter(
++				( id ) =>
++					! blocksTreeToList( navBlockAfterUpdates )
++						.map( getRecordIdFromBlock )
++						.includes( id )
++			);
++
+ 		await dispatch( batchDeleteMenuItems( deletedIds ) );
+ 
+ 		return navBlockAfterUpdates;
+diff --git a/packages/edit-post/src/components/block-settings-menu/plugin-block-settings-menu-item.js b/packages/edit-post/src/components/block-settings-menu/plugin-block-settings-menu-item.js
+index 77024f45a5c93d..f0390267259b66 100644
+--- a/packages/edit-post/src/components/block-settings-menu/plugin-block-settings-menu-item.js
++++ b/packages/edit-post/src/components/block-settings-menu/plugin-block-settings-menu-item.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { difference } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -11,7 +6,7 @@ import { MenuItem } from '@wordpress/components';
+ import { compose } from '@wordpress/compose';
+ 
+ const isEverySelectedBlockAllowed = ( selected, allowed ) =>
+-	difference( selected, allowed ).length === 0;
++	selected.filter( ( id ) => ! allowed.includes( id ) ).length === 0;
+ 
+ /**
+  * Plugins may want to add an item to the menu either for every block

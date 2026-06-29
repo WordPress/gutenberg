@@ -1,0 +1,127 @@
+diff --git a/package-lock.json b/package-lock.json
+index 882f66bf089a9b..089fec0a2fd9e7 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -9952,7 +9952,7 @@
+ 				"re-resizable": "^6.0.0",
+ 				"react-dates": "^17.1.1",
+ 				"react-spring": "^8.0.20",
+-				"reakit": "^1.0.0-rc.2",
++				"reakit": "^1.0.2",
+ 				"rememo": "^3.0.0",
+ 				"tinycolor2": "^1.4.1",
+ 				"uuid": "^7.0.2"
+@@ -37034,21 +37034,21 @@
+ 			}
+ 		},
+ 		"reakit": {
+-			"version": "1.0.0-rc.2",
+-			"resolved": "https://registry.npmjs.org/reakit/-/reakit-1.0.0-rc.2.tgz",
+-			"integrity": "sha512-+Snfc9Y/VMozEDXld3CJtvqgTyFCE67FXBmaDcvBuO3z2U/ZAHiAOBprF+ZN/QhsiVNMk1faj791vDBTokxS4w==",
++			"version": "1.0.2",
++			"resolved": "https://registry.npmjs.org/reakit/-/reakit-1.0.2.tgz",
++			"integrity": "sha512-l1yvXm9sjVGljsVxoPoSOWwsZWVMJZI7nWEgY+HqzPcsVH483F64oLamj21uCAbwpxfaEkQ/hS5g9RAbdfGEog==",
+ 			"requires": {
+-				"@popperjs/core": "^2.3.3",
+-				"body-scroll-lock": "^3.0.1",
+-				"reakit-system": "^0.12.0",
++				"@popperjs/core": "^2.4.0",
++				"body-scroll-lock": "^3.0.2",
++				"reakit-system": "^0.12.1",
+ 				"reakit-utils": "^0.12.0",
+ 				"reakit-warning": "^0.3.0"
+ 			}
+ 		},
+ 		"reakit-system": {
+-			"version": "0.12.0",
+-			"resolved": "https://registry.npmjs.org/reakit-system/-/reakit-system-0.12.0.tgz",
+-			"integrity": "sha512-lqesr7jmOEDEqKtPhEilCJNfYiLCeXOeU2lpPLBzO+CB2lsfF+A/NtrSpb3kuLu2mfIUSTTBxgaKdOBbfANmWA==",
++			"version": "0.12.1",
++			"resolved": "https://registry.npmjs.org/reakit-system/-/reakit-system-0.12.1.tgz",
++			"integrity": "sha512-92NRBxCHslIkME4y2Z5jPAOESiBbkOF2g0LE2FiPSzZwdJ9/geWfhP50y/WFAO1WIFChVREATSXqng1xhWGwwg==",
+ 			"requires": {
+ 				"reakit-utils": "^0.12.0"
+ 			}
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 641933d747b6c5..b3716ef94d749e 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -53,7 +53,7 @@
+ 		"re-resizable": "^6.0.0",
+ 		"react-dates": "^17.1.1",
+ 		"react-spring": "^8.0.20",
+-		"reakit": "^1.0.0-rc.2",
++		"reakit": "^1.0.2",
+ 		"rememo": "^3.0.0",
+ 		"tinycolor2": "^1.4.1",
+ 		"uuid": "^7.0.2"
+diff --git a/packages/components/src/alignment-matrix-control/index.js b/packages/components/src/alignment-matrix-control/index.js
+index 20467dd5068e4b..a7ced8b7d451b9 100644
+--- a/packages/components/src/alignment-matrix-control/index.js
++++ b/packages/components/src/alignment-matrix-control/index.js
+@@ -99,10 +99,6 @@ export default function AlignmentMatrixControl( {
+ 								key={ cell }
+ 								value={ cell }
+ 								onFocus={ () => handleOnChange( cell ) }
+-								onClick={ () =>
+-									// VoiceOver doesn't focus elements on click
+-									composite.move( cellId )
+-								}
+ 							/>
+ 						);
+ 					} ) }
+diff --git a/packages/components/src/alignment-matrix-control/test/index.js b/packages/components/src/alignment-matrix-control/test/index.js
+index 7758d77d317ae1..eaa28941048c14 100644
+--- a/packages/components/src/alignment-matrix-control/test/index.js
++++ b/packages/components/src/alignment-matrix-control/test/index.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { render, unmountComponentAtNode } from 'react-dom';
+-import { act, Simulate } from 'react-dom/test-utils';
++import { act } from 'react-dom/test-utils';
+ 
+ /**
+  * Internal dependencies
+@@ -69,15 +69,21 @@ describe( 'AlignmentMatrixControl', () => {
+ 
+ 			const cells = getCells();
+ 
+-			act( () => Simulate.click( cells[ 3 ] ) );
++			act( () => {
++				cells[ 3 ].focus();
++			} );
+ 
+ 			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( 'center left' );
+ 
+-			act( () => Simulate.click( cells[ 4 ] ) );
++			act( () => {
++				cells[ 4 ].focus();
++			} );
+ 
+ 			expect( spy.mock.calls[ 1 ][ 0 ] ).toBe( 'center center' );
+ 
+-			act( () => Simulate.click( cells[ 7 ] ) );
++			act( () => {
++				cells[ 7 ].focus();
++			} );
+ 
+ 			expect( spy.mock.calls[ 2 ][ 0 ] ).toBe( 'bottom center' );
+ 		} );
+diff --git a/packages/components/src/toolbar-item/index.js b/packages/components/src/toolbar-item/index.js
+index a475eb5e8e3c79..dcfdca4ea46bc9 100644
+--- a/packages/components/src/toolbar-item/index.js
++++ b/packages/components/src/toolbar-item/index.js
+@@ -32,11 +32,7 @@ function ToolbarItem( { children, ...props }, ref ) {
+ 
+ 	return (
+ 		<BaseToolbarItem { ...accessibleToolbarState } { ...allProps }>
+-			{ ( htmlProps ) =>
+-				// Overwriting BaseToolbarItem's onMouseDown since it disables drag
+-				// and drop
+-				children( { ...htmlProps, onMouseDown: allProps.onMouseDown } )
+-			}
++			{ children }
+ 		</BaseToolbarItem>
+ 	);
+ }

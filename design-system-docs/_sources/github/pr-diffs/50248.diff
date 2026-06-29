@@ -1,0 +1,15 @@
+diff --git a/.github/workflows/check-components-changelog.yml b/.github/workflows/check-components-changelog.yml
+index 23fbe9183ca8d4..c0cb4894009a2a 100644
+--- a/.github/workflows/check-components-changelog.yml
++++ b/.github/workflows/check-components-changelog.yml
+@@ -42,8 +42,8 @@ jobs:
+                     exit 1
+                   fi
+ 
+-                  pr_link_pattern="\(\[#${PR_NUMBER}\]\(https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}\)\)"
+-                  pr_link_grep_pattern="(\[#${PR_NUMBER}\](https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}))"
++                  pr_link_pattern="\[#${PR_NUMBER}\]\(https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}\)"
++                  pr_link_grep_pattern="\[#${PR_NUMBER}\](https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER})"
+ 
+                   unreleased_section=$(sed -n '/^## Unreleased$/,/^## /p' "${changelog_path}")
+ 

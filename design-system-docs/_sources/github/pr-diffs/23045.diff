@@ -1,0 +1,37 @@
+diff --git a/packages/components/src/custom-select-control/README.md b/packages/components/src/custom-select-control/README.md
+index 62dc6920b49a28..7c2a14fe276da6 100644
+--- a/packages/components/src/custom-select-control/README.md
++++ b/packages/components/src/custom-select-control/README.md
+@@ -93,7 +93,7 @@ The label for the control.
+ #### options
+ 
+ The options that can be chosen from.
+-- Type: `Array<{ key: String, name: String, style: ?{}, ...rest }>`
++- Type: `Array<{ key: String, name: String, style: ?{}, className: ?String, ...rest }>`
+ - Required: Yes
+ 
+ #### onChange
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index fdda79fb97aecd..a8bbf9a93549ad 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -138,6 +138,7 @@ export default function CustomSelectControl( {
+ 								index,
+ 								key: item.key,
+ 								className: classnames(
++									item.className,
+ 									'components-custom-select-control__item',
+ 									{
+ 										'is-highlighted':
+diff --git a/packages/components/src/custom-select-control/stories/index.js b/packages/components/src/custom-select-control/stories/index.js
+index dc8f82f471ac92..7b8b07a2c7d007 100644
+--- a/packages/components/src/custom-select-control/stories/index.js
++++ b/packages/components/src/custom-select-control/stories/index.js
+@@ -18,6 +18,7 @@ const defaultOptions = [
+ 		key: 'normal',
+ 		name: 'Normal',
+ 		style: { fontSize: '100%' },
++		className: 'can-apply-custom-class-to-option',
+ 	},
+ 	{
+ 		key: 'large',

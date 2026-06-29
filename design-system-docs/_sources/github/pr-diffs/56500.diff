@@ -1,0 +1,176 @@
+diff --git a/docs/reference-guides/core-blocks.md b/docs/reference-guides/core-blocks.md
+index 10f0f76d9eb0d7..bf353822dc21ee 100644
+--- a/docs/reference-guides/core-blocks.md
++++ b/docs/reference-guides/core-blocks.md
+@@ -44,6 +44,15 @@ Create and save content to reuse across your site. Update the pattern, and the c
+ -	**Supports:** ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
+ -	**Attributes:** ref
+ 
++## Bug
++
++undefined ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/bug))
++
++-	**Name:** core/bug
++-	**Category:** undefined
++-	**Supports:** 
++-	**Attributes:** testAttribute
++
+ ## Button
+ 
+ Prompt visitors to take action with a button-style link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button))
+diff --git a/packages/block-library/src/bug/block.json b/packages/block-library/src/bug/block.json
+new file mode 100644
+index 00000000000000..46b33cfb51aec1
+--- /dev/null
++++ b/packages/block-library/src/bug/block.json
+@@ -0,0 +1,12 @@
++{
++	"$schema": "https://schemas.wp.org/trunk/block.json",
++	"apiVersion": 3,
++	"name": "core/bug",
++	"title": "Bug",
++	"attributes": {
++		"testAttribute": {
++			"type": "boolean",
++			"default": false
++		}
++	}
++}
+diff --git a/packages/block-library/src/bug/edit.js b/packages/block-library/src/bug/edit.js
+new file mode 100644
+index 00000000000000..365005a2685959
+--- /dev/null
++++ b/packages/block-library/src/bug/edit.js
+@@ -0,0 +1,40 @@
++/**
++ * WordPress dependencies
++ */
++import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
++import {
++	ToggleControl,
++	__experimentalToggleGroupControl as ToggleGroupControl,
++	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
++	PanelBody,
++} from '@wordpress/components';
++
++export default function Test( { attributes, setAttributes } ) {
++	const { testAttribute } = attributes;
++	const blockProps = useBlockProps();
++	return (
++		<>
++			<InspectorControls group="list">
++				<PanelBody title={ null }>
++					<ToggleControl
++						checked={ testAttribute }
++						onChange={ ( value ) =>
++							setAttributes( { testAttribute: value } )
++						}
++					/>
++					<ToggleGroupControl
++						value={ testAttribute ? 'on' : 'off' }
++						onChange={ ( value ) =>
++							setAttributes( { testAttribute: value === 'on' } )
++						}
++					>
++						<ToggleGroupControlOption value="off" label="OFF" />
++						<ToggleGroupControlOption value="on" label="ON" />
++					</ToggleGroupControl>
++				</PanelBody>
++			</InspectorControls>
++
++			<div { ...blockProps }>Bug</div>
++		</>
++	);
++}
+diff --git a/packages/block-library/src/bug/index.js b/packages/block-library/src/bug/index.js
+new file mode 100644
+index 00000000000000..944445182569dc
+--- /dev/null
++++ b/packages/block-library/src/bug/index.js
+@@ -0,0 +1,16 @@
++/**
++ * Internal dependencies
++ */
++import initBlock from '../utils/init-block';
++import metadata from './block.json';
++import edit from './edit';
++
++const { name } = metadata;
++export { metadata, name };
++
++export const settings = {
++	edit,
++	save: () => <div>Nothing to see</div>,
++};
++
++export const init = () => initBlock( { name, metadata, settings } );
+diff --git a/packages/block-library/src/index.js b/packages/block-library/src/index.js
+index e2e0fd9e414ef3..583392e09a9c6d 100644
+--- a/packages/block-library/src/index.js
++++ b/packages/block-library/src/index.js
+@@ -20,6 +20,7 @@ import {
+ // production build to make the final bundle smaller.
+ //
+ // See https://github.com/WordPress/gutenberg/pull/40655 for more context.
++import * as bug from './bug';
+ import * as archives from './archives';
+ import * as avatar from './avatar';
+ import * as audio from './audio';
+@@ -129,6 +130,8 @@ import isBlockMetadataExperimental from './utils/is-block-metadata-experimental'
+  */
+ const getAllBlocks = () => {
+ 	const blocks = [
++		bug,
++
+ 		// Common blocks are grouped at the top to prioritize their display
+ 		// in various contexts — like the inserter and auto-complete components.
+ 		paragraph,
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/utils.ts b/packages/components/src/toggle-group-control/toggle-group-control/utils.ts
+index 1a012e6efe00d2..cb97844c08a3a2 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/utils.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/utils.ts
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { usePrevious } from '@wordpress/compose';
+-import { useEffect, useRef } from '@wordpress/element';
++import { useEffect, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -21,24 +21,28 @@ type ValueProp = ToggleGroupControlProps[ 'value' ];
+ export function useComputeControlledOrUncontrolledValue(
+ 	valueProp: ValueProp
+ ): { value: ValueProp; defaultValue: ValueProp } {
+-	const hasEverBeenUsedInControlledMode = useRef( false );
++	const [
++		hasEverBeenUsedInControlledMode,
++		setHasEverBeenUsedInControlledMode,
++	] = useState( false );
+ 	const previousValueProp = usePrevious( valueProp );
+ 
+ 	useEffect( () => {
+-		if ( ! hasEverBeenUsedInControlledMode.current ) {
++		if ( ! hasEverBeenUsedInControlledMode ) {
+ 			// Assume the component is being used in controlled mode if:
+ 			// - the `value` prop is not `undefined`
+ 			// - the `value` prop was not previously `undefined` and was given a new value
+-			hasEverBeenUsedInControlledMode.current =
++			setHasEverBeenUsedInControlledMode(
+ 				valueProp !== undefined &&
+-				previousValueProp !== undefined &&
+-				valueProp !== previousValueProp;
++					previousValueProp !== undefined &&
++					valueProp !== previousValueProp
++			);
+ 		}
+-	}, [ valueProp, previousValueProp ] );
++	}, [ valueProp, previousValueProp, hasEverBeenUsedInControlledMode ] );
+ 
+ 	let value, defaultValue;
+ 
+-	if ( hasEverBeenUsedInControlledMode.current ) {
++	if ( hasEverBeenUsedInControlledMode ) {
+ 		// When in controlled mode, use `''` instead of `undefined`
+ 		value = valueProp ?? '';
+ 	} else {

@@ -1,0 +1,1592 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eb9f715ebf04f1..f0cbb78796c7d5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ 
+ ### Internal
+ 
++-   Add `Avatar` and `AvatarGroup` components as private APIs ([#75595](https://github.com/WordPress/gutenberg/pull/75595)).
+ -   Remove `Picker` from private APIs ([#75394](https://github.com/WordPress/gutenberg/pull/75394)).
+ -   Expose `useDrag` from `@use-gesture/react` package via private API's ([#66735](https://github.com/WordPress/gutenberg/pull/66735)).
+ -   `Disabled`, `Modal`, `Popover`, `Tooltip`: Move context code to separate files to help docgen prop extraction ([#75316](https://github.com/WordPress/gutenberg/pull/75316)).
+diff --git a/packages/components/src/avatar-group/component.tsx b/packages/components/src/avatar-group/component.tsx
+new file mode 100644
+index 00000000000000..68ee994327bf32
+--- /dev/null
++++ b/packages/components/src/avatar-group/component.tsx
+@@ -0,0 +1,46 @@
++/**
++ * External dependencies
++ */
++import clsx from 'clsx';
++
++/**
++ * WordPress dependencies
++ */
++import { Children } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { AvatarGroupProps } from './types';
++import type { WordPressComponentProps } from '../context';
++
++function AvatarGroup( {
++	className,
++	max = 3,
++	children,
++	...props
++}: WordPressComponentProps< AvatarGroupProps, 'div', false > ) {
++	const childArray = Children.toArray( children );
++	const visible = childArray.slice( 0, max );
++	const overflowCount = childArray.length - max;
++
++	return (
++		<div
++			role="group"
++			className={ clsx( 'components-avatar-group', className ) }
++			{ ...props }
++		>
++			{ visible }
++			{ overflowCount > 0 && (
++				<span
++					className="components-avatar-group__overflow"
++					aria-label={ `${ overflowCount } more` }
++				>
++					{ `+${ overflowCount }` }
++				</span>
++			) }
++		</div>
++	);
++}
++
++export default AvatarGroup;
+diff --git a/packages/components/src/avatar-group/index.ts b/packages/components/src/avatar-group/index.ts
+new file mode 100644
+index 00000000000000..4626aea25a388e
+--- /dev/null
++++ b/packages/components/src/avatar-group/index.ts
+@@ -0,0 +1,2 @@
++export { default } from './component';
++export type { AvatarGroupProps } from './types';
+diff --git a/packages/components/src/avatar-group/styles.scss b/packages/components/src/avatar-group/styles.scss
+new file mode 100644
+index 00000000000000..bb2baa0ccbccb2
+--- /dev/null
++++ b/packages/components/src/avatar-group/styles.scss
+@@ -0,0 +1,32 @@
++@use "@wordpress/base-styles/colors" as *;
++@use "@wordpress/base-styles/variables" as *;
++
++.components-avatar-group {
++	display: flex;
++	align-items: center;
++
++	// Overlap subsequent avatars.
++	> .components-avatar + .components-avatar {
++		margin-inline-start: -$grid-unit-10;
++	}
++
++	// Stack earlier avatars on top of later ones so the overlap
++	// is visually correct, and elevate on hover for badge expansion.
++	> .components-avatar {
++		position: relative;
++
++		@for $i from 1 through 10 {
++			&:nth-child(#{$i}) {
++				z-index: #{11 - $i};
++			}
++		}
++	}
++}
++
++.components-avatar-group__overflow {
++	margin-inline-start: $grid-unit-05;
++	font-size: $font-size-small;
++	line-height: $font-line-height-small;
++	color: $gray-900;
++	white-space: nowrap;
++}
+diff --git a/packages/components/src/avatar-group/types.ts b/packages/components/src/avatar-group/types.ts
+new file mode 100644
+index 00000000000000..0bc028ee1a15be
+--- /dev/null
++++ b/packages/components/src/avatar-group/types.ts
+@@ -0,0 +1,13 @@
++export type AvatarGroupProps = {
++	/**
++	 * Maximum number of avatars to display before showing an
++	 * overflow indicator.
++	 *
++	 * @default 3
++	 */
++	max?: number;
++	/**
++	 * Avatar elements to display in the group.
++	 */
++	children: React.ReactNode;
++};
+diff --git a/packages/components/src/avatar/component.tsx b/packages/components/src/avatar/component.tsx
+new file mode 100644
+index 00000000000000..a6e1308a607ab9
+--- /dev/null
++++ b/packages/components/src/avatar/component.tsx
+@@ -0,0 +1,82 @@
++/**
++ * External dependencies
++ */
++import clsx from 'clsx';
++
++/**
++ * Internal dependencies
++ */
++import Icon from '../icon';
++import Tooltip from '../tooltip';
++import type { AvatarProps } from './types';
++import type { WordPressComponentProps } from '../context';
++
++function Avatar( {
++	className,
++	src,
++	name,
++	label,
++	badge = false,
++	size = 'default',
++	borderColor,
++	status,
++	statusIndicator,
++	style,
++	...props
++}: WordPressComponentProps< AvatarProps, 'div', false > ) {
++	const showBadge = badge && !! name;
++	const initials = name
++		? name
++				.split( /\s+/ )
++				.slice( 0, 2 )
++				.map( ( word ) => word[ 0 ] )
++				.join( '' )
++				.toUpperCase()
++		: undefined;
++	const customProperties = {
++		...style,
++		...( src ? { '--components-avatar-url': `url(${ src })` } : {} ),
++		...( borderColor
++			? { '--components-avatar-outline-color': borderColor }
++			: {} ),
++	} as React.CSSProperties;
++
++	const avatar = (
++		<div
++			className={ clsx( 'components-avatar', className, {
++				'has-avatar-border-color': !! borderColor,
++				'has-src': !! src,
++				'has-badge': showBadge,
++				'is-small': size === 'small',
++				'has-status': !! status,
++				[ `is-${ status }` ]: !! status,
++			} ) }
++			style={ customProperties }
++			role="img"
++			aria-label={ name }
++			{ ...props }
++		>
++			<span className="components-avatar__image">
++				{ ! src && initials }
++				{ !! status && !! statusIndicator && (
++					<span className="components-avatar__status-indicator">
++						<Icon icon={ statusIndicator } />
++					</span>
++				) }
++			</span>
++			{ showBadge && (
++				<span className="components-avatar__name">
++					{ label || name }
++				</span>
++			) }
++		</div>
++	);
++
++	if ( name && ( ! showBadge || label ) ) {
++		return <Tooltip text={ name }>{ avatar }</Tooltip>;
++	}
++
++	return avatar;
++}
++
++export default Avatar;
+diff --git a/packages/components/src/avatar/index.ts b/packages/components/src/avatar/index.ts
+new file mode 100644
+index 00000000000000..4d8da065cccb43
+--- /dev/null
++++ b/packages/components/src/avatar/index.ts
+@@ -0,0 +1,2 @@
++export { default } from './component';
++export type { AvatarProps } from './types';
+diff --git a/packages/components/src/avatar/styles.scss b/packages/components/src/avatar/styles.scss
+new file mode 100644
+index 00000000000000..85429a31432fcf
+--- /dev/null
++++ b/packages/components/src/avatar/styles.scss
+@@ -0,0 +1,152 @@
++@use "@wordpress/base-styles/colors" as *;
++@use "@wordpress/base-styles/variables" as *;
++@use "../utils/theme-variables" as *;
++
++.components-avatar {
++	display: inline-flex;
++	align-items: center;
++	border-radius: $radius-full;
++	overflow: clip;
++	flex-shrink: 0;
++	background-color: $components-color-accent;
++	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $white, $elevation-x-small;
++}
++
++.components-avatar__image {
++	box-sizing: border-box;
++	position: relative;
++	width: $button-size-compact;
++	height: $button-size-compact;
++	border-radius: $radius-full;
++	border: 0;
++	background-color: $components-color-accent;
++	overflow: clip;
++	flex-shrink: 0;
++	font-size: 0;
++	color: $white;
++
++	.is-small > & {
++		width: $button-size-small;
++		height: $button-size-small;
++	}
++
++	.has-src > & {
++		background-image: var(--components-avatar-url);
++		background-size: cover;
++		background-position: center;
++	}
++
++	.has-avatar-border-color > & {
++		border: var(--wp-admin-border-width-focus) solid var(--components-avatar-outline-color);
++		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
++		background-clip: padding-box;
++	}
++}
++
++// Initials fallback: show name characters when no image.
++.components-avatar:not(.has-src) > .components-avatar__image {
++	display: flex;
++	align-items: center;
++	justify-content: center;
++	font-size: $font-size-x-small;
++	font-weight: $font-weight-medium;
++	border: 0;
++	box-shadow: none;
++	background-clip: border-box;
++}
++
++.components-avatar:not(.has-src).has-avatar-border-color > .components-avatar__image {
++	background-color: var(--components-avatar-outline-color);
++}
++
++.components-avatar__name {
++	font-size: $font-size-medium;
++	line-height: $font-line-height-small;
++	color: $white;
++	min-width: 0;
++	padding-bottom: calc($grid-unit-05 / 2);
++	overflow: hidden;
++	opacity: 0;
++	white-space: nowrap;
++	transition: opacity 0.15s cubic-bezier(0.15, 0, 0.15, 1);
++}
++
++// Badge mode: use grid so the name column animates from 0 to natural width.
++// Spacing is on the container (column-gap + padding-inline-end) so it
++// transitions alongside grid-template-columns instead of causing a bump.
++.components-avatar.has-badge {
++	display: inline-grid;
++	grid-template-columns: min-content 0fr;
++	column-gap: 0;
++	padding-inline-end: 0;
++	transition:
++		grid-template-columns 0.3s cubic-bezier(0.15, 0, 0.15, 1),
++		column-gap 0.3s cubic-bezier(0.15, 0, 0.15, 1),
++		padding-inline-end 0.3s cubic-bezier(0.15, 0, 0.15, 1);
++
++	&:hover {
++		grid-template-columns: min-content 1fr;
++		column-gap: $grid-unit-05;
++		padding-inline-end: $grid-unit-10;
++		transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
++	}
++
++	&:hover .components-avatar__name {
++		opacity: 1;
++		transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
++	}
++}
++
++.components-avatar.has-badge.has-avatar-border-color {
++	background-color: var(--components-avatar-outline-color);
++}
++
++// Status: dim and desaturate content so the background color shows through.
++// Images: move to ::before with luminosity blend over the solid bg color.
++// Initials: reduce text opacity.
++.components-avatar.has-status.has-src > .components-avatar__image {
++	background-image: none;
++
++	&::before {
++		content: "";
++		position: absolute;
++		inset: 0;
++		border-radius: inherit;
++		background-image: var(--components-avatar-url);
++		background-size: cover;
++		background-position: center;
++		mix-blend-mode: luminosity;
++		opacity: 0.3;
++	}
++}
++
++.components-avatar.has-status:not(.has-src) > .components-avatar__image {
++	color: rgba($white, 0.3);
++}
++
++.components-avatar.has-status.has-avatar-border-color > .components-avatar__image {
++	background-color: var(--components-avatar-outline-color);
++}
++
++.components-avatar__status-indicator {
++	position: absolute;
++	inset: 0;
++	display: flex;
++	align-items: center;
++	justify-content: center;
++	z-index: 1;
++	color: $white;
++	fill: $white;
++
++	svg {
++		width: 75%;
++		height: 75%;
++	}
++}
++
++@media (prefers-reduced-motion: reduce) {
++	.components-avatar.has-badge,
++	.components-avatar__name {
++		transition: none;
++	}
++}
+diff --git a/packages/components/src/avatar/types.ts b/packages/components/src/avatar/types.ts
+new file mode 100644
+index 00000000000000..a3729ae83cc997
+--- /dev/null
++++ b/packages/components/src/avatar/types.ts
+@@ -0,0 +1,59 @@
++import type { IconType } from '../icon';
++
++export type AvatarProps = {
++	/**
++	 * URL of the avatar image.
++	 *
++	 * When not provided, initials derived from `name` are shown.
++	 */
++	src?: string;
++	/**
++	 * Name of the user. Used as an accessible label and to generate
++	 * initials when no image is provided.
++	 */
++	name?: string;
++	/**
++	 * Visible text shown in the hover badge. When not provided, `name`
++	 * is used instead. Use this to provide contextual labels like "You"
++	 * without affecting the accessible name or initials.
++	 */
++	label?: string;
++	/**
++	 * Whether to show the hover-expand badge that reveals the user's
++	 * name (or `label`) on hover. Requires `name` to be set.
++	 *
++	 * @default false
++	 */
++	badge?: boolean;
++	/**
++	 * Size of the avatar.
++	 *
++	 * - `'default'`: 32px
++	 * - `'small'`: 24px
++	 *
++	 * @default 'default'
++	 */
++	size?: 'default' | 'small';
++	/**
++	 * CSS color value for an accent border ring around the avatar.
++	 *
++	 * When not provided, no border is rendered and the hover badge
++	 * and avatar status uses the admin theme color as its background.
++	 */
++	borderColor?: string;
++	/**
++	 * A status string applied to the avatar. When set, the image is
++	 * dimmed to indicate a non-default state. A corresponding
++	 * `is-{status}` class is added for custom styling.
++	 */
++	status?: string;
++	/**
++	 * An icon or custom component rendered as a centered overlay on the
++	 * avatar image. Only visible when `status` is set.
++	 *
++	 * Accepts any value supported by the `Icon` component: an icon from
++	 * `@wordpress/icons`, a Dashicon name string, a component, or a
++	 * JSX element.
++	 */
++	statusIndicator?: IconType | null;
++};
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 43d85db9365f7a..fc5c1f7eb1fa97 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -14,6 +14,8 @@ import { Tabs } from './tabs';
+ import { kebabCase, normalizeTextString } from './utils/strings';
+ import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
+ import { lock } from './lock-unlock';
++import Avatar from './avatar';
++import AvatarGroup from './avatar-group';
+ import Badge from './badge';
+ 
+ import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
+@@ -34,6 +36,8 @@ import { ValidatedFormTokenField } from './validated-form-controls/components/fo
+ export const privateApis = {};
+ lock( privateApis, {
+ 	__experimentalPopoverLegacyPositionToPlacement,
++	Avatar,
++	AvatarGroup,
+ 	ComponentsContext,
+ 	Tabs,
+ 	Theme,
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index d316d1716f2e90..c72222871efb3d 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -1,6 +1,8 @@
+ @use "@wordpress/base-styles/mixins" as *;
+ @use "./animate/style.scss" as *;
+ @use "./autocomplete/style.scss" as *;
++@use "./avatar/styles.scss" as *;
++@use "./avatar-group/styles.scss" as *;
+ @use "./badge/styles.scss" as *;
+ @use "./button-group/style.scss" as *;
+ @use "./button/style.scss" as *;
+diff --git a/packages/core-data/src/awareness/base-awareness.ts b/packages/core-data/src/awareness/base-awareness.ts
+index 800be897190006..6f930de1009724 100644
+--- a/packages/core-data/src/awareness/base-awareness.ts
++++ b/packages/core-data/src/awareness/base-awareness.ts
+@@ -23,21 +23,8 @@ export abstract class BaseAwarenessState<
+ 	 * Set the current collaborator info in the local state.
+ 	 */
+ 	private async setCurrentCollaboratorInfo(): Promise< void > {
+-		const states = this.getStates();
+-		const otherCollaboratorColors = Array.from( states.entries() )
+-			.filter(
+-				( [ clientId, state ] ) =>
+-					state.collaboratorInfo && clientId !== this.clientID
+-			)
+-			.map( ( [ , state ] ) => state.collaboratorInfo.color )
+-			.filter( Boolean );
+-
+-		// Get current user info and set it in local state.
+ 		const currentUser = await resolveSelect( coreStore ).getCurrentUser();
+-		const collaboratorInfo = generateCollaboratorInfo(
+-			currentUser,
+-			otherCollaboratorColors
+-		);
++		const collaboratorInfo = generateCollaboratorInfo( currentUser );
+ 		this.setLocalStateField( 'collaboratorInfo', collaboratorInfo );
+ 	}
+ }
+diff --git a/packages/core-data/src/awareness/test/base-awareness.ts b/packages/core-data/src/awareness/test/base-awareness.ts
+index e4e4a6e8909d06..c005afe9d06ce5 100644
+--- a/packages/core-data/src/awareness/test/base-awareness.ts
++++ b/packages/core-data/src/awareness/test/base-awareness.ts
+@@ -164,26 +164,24 @@ describe( 'BaseAwarenessState', () => {
+ 			expect( resolveSelect ).toHaveBeenCalledWith( 'core' );
+ 		} );
+ 
+-		test( 'should exclude own color from available colors', async () => {
++		test( 'should set collaboratorInfo for other users', async () => {
+ 			// Set up another user state first
+ 			const doc2 = new Y.Doc();
+ 			const awareness = new TestBaseAwarenessState( doc );
+ 
+-			// Manually add another user's state with a specific color
++			// Manually add another user's state
+ 			awareness.setLocalStateField( 'collaboratorInfo', {
+ 				id: 2,
+ 				name: 'Other User',
+ 				slug: 'other-user',
+ 				avatar_urls: mockAvatarUrls,
+ 				browserType: 'Firefox',
+-				color: '#3858E9', // blueberry
+ 				enteredAt: 1704067200000,
+ 			} );
+ 
+ 			awareness.setUp();
+ 			await Promise.resolve();
+ 
+-			// The new user should get a different color if possible
+ 			const collaboratorInfo =
+ 				awareness.getLocalStateField( 'collaboratorInfo' );
+ 			expect( collaboratorInfo ).toBeDefined();
+@@ -221,7 +219,6 @@ describe( 'BaseAwarenessState', () => {
+ 				slug: 'custom-user',
+ 				avatar_urls: mockAvatarUrls,
+ 				browserType: 'Safari',
+-				color: '#E33184',
+ 				enteredAt: 1704067200000,
+ 			};
+ 
+@@ -243,7 +240,6 @@ describe( 'BaseAwarenessState', () => {
+ 				slug: 'custom-user',
+ 				avatar_urls: mockAvatarUrls,
+ 				browserType: 'Safari',
+-				color: '#E33184',
+ 				enteredAt: 1704067200000,
+ 			};
+ 
+diff --git a/packages/core-data/src/awareness/test/post-editor-awareness.ts b/packages/core-data/src/awareness/test/post-editor-awareness.ts
+index d16e8e2de39001..e25761da1e1c7e 100644
+--- a/packages/core-data/src/awareness/test/post-editor-awareness.ts
++++ b/packages/core-data/src/awareness/test/post-editor-awareness.ts
+@@ -491,7 +491,6 @@ describe( 'PostEditorAwareness', () => {
+ 				slug: 'test',
+ 				avatar_urls: mockAvatarUrls,
+ 				browserType: 'Chrome',
+-				color: '#3858E9',
+ 				enteredAt: 1704067200000,
+ 			};
+ 
+diff --git a/packages/core-data/src/awareness/test/utils.ts b/packages/core-data/src/awareness/test/utils.ts
+index e9cdccd1cd1e4e..7f1cfc6bc39800 100644
+--- a/packages/core-data/src/awareness/test/utils.ts
++++ b/packages/core-data/src/awareness/test/utils.ts
+@@ -31,7 +31,6 @@ describe( 'Awareness Utils', () => {
+ 			slug: 'test-user',
+ 			avatar_urls: sharedAvatarUrls,
+ 			browserType: 'Chrome',
+-			color: '#3858E9',
+ 			enteredAt: 1704067200000,
+ 			...overrides,
+ 		} );
+@@ -123,21 +122,6 @@ describe( 'Awareness Utils', () => {
+ 			).toBe( false );
+ 		} );
+ 
+-		test( 'should return false when color differs', () => {
+-			const collaboratorInfo1 = createCollaboratorInfo( {
+-				color: '#3858E9',
+-			} );
+-			const collaboratorInfo2 = createCollaboratorInfo( {
+-				color: '#B42AED',
+-			} );
+-			expect(
+-				areCollaboratorInfosEqual(
+-					collaboratorInfo1,
+-					collaboratorInfo2
+-				)
+-			).toBe( false );
+-		} );
+-
+ 		test( 'should return false when enteredAt differs', () => {
+ 			const collaboratorInfo1 = createCollaboratorInfo( {
+ 				enteredAt: 1000,
+@@ -199,7 +183,7 @@ describe( 'Awareness Utils', () => {
+ 
+ 		test( 'should generate collaboratorInfo with user properties', () => {
+ 			const user = createMockUser( { id: 42, name: 'Jane Doe' } );
+-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
++			const collaboratorInfo = generateCollaboratorInfo( user );
+ 
+ 			expect( collaboratorInfo.id ).toBe( 42 );
+ 			expect( collaboratorInfo.name ).toBe( 'Jane Doe' );
+@@ -208,7 +192,7 @@ describe( 'Awareness Utils', () => {
+ 
+ 		test( 'should include browser type', () => {
+ 			const user = createMockUser();
+-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
++			const collaboratorInfo = generateCollaboratorInfo( user );
+ 
+ 			expect( collaboratorInfo.browserType ).toBe( 'Chrome' );
+ 		} );
+@@ -218,7 +202,7 @@ describe( 'Awareness Utils', () => {
+ 				'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0'
+ 			);
+ 			const user = createMockUser();
+-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
++			const collaboratorInfo = generateCollaboratorInfo( user );
+ 
+ 			expect( collaboratorInfo.browserType ).toBe( 'Firefox' );
+ 		} );
+@@ -228,7 +212,7 @@ describe( 'Awareness Utils', () => {
+ 				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59'
+ 			);
+ 			const user = createMockUser();
+-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
++			const collaboratorInfo = generateCollaboratorInfo( user );
+ 
+ 			expect( collaboratorInfo.browserType ).toBe( 'Microsoft Edge' );
+ 		} );
+@@ -238,7 +222,7 @@ describe( 'Awareness Utils', () => {
+ 				'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15'
+ 			);
+ 			const user = createMockUser();
+-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
++			const collaboratorInfo = generateCollaboratorInfo( user );
+ 
+ 			expect( collaboratorInfo.browserType ).toBe( 'Safari' );
+ 		} );
+@@ -248,7 +232,7 @@ describe( 'Awareness Utils', () => {
+ 				'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; MSIE 10.0; rv:11.0) like Gecko'
+ 			);
+ 			const user = createMockUser();
+-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
++			const collaboratorInfo = generateCollaboratorInfo( user );
+ 
+ 			expect( collaboratorInfo.browserType ).toBe( 'Internet Explorer' );
+ 		} );
+@@ -258,7 +242,7 @@ describe( 'Awareness Utils', () => {
+ 				'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'
+ 			);
+ 			const user = createMockUser();
+-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
++			const collaboratorInfo = generateCollaboratorInfo( user );
+ 
+ 			expect( collaboratorInfo.browserType ).toBe( 'Internet Explorer' );
+ 		} );
+@@ -268,7 +252,7 @@ describe( 'Awareness Utils', () => {
+ 				'Opera/9.80 (Windows NT 6.1; WOW64) Presto/2.12.388 Version/12.18'
+ 			);
+ 			const user = createMockUser();
+-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
++			const collaboratorInfo = generateCollaboratorInfo( user );
+ 
+ 			expect( collaboratorInfo.browserType ).toBe( 'Opera' );
+ 		} );
+@@ -281,7 +265,7 @@ describe( 'Awareness Utils', () => {
+ 				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) OPR/77.0.4054.203'
+ 			);
+ 			const user = createMockUser();
+-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
++			const collaboratorInfo = generateCollaboratorInfo( user );
+ 
+ 			expect( collaboratorInfo.browserType ).toBe( 'Opera' );
+ 		} );
+@@ -289,78 +273,18 @@ describe( 'Awareness Utils', () => {
+ 		test( 'should return Unknown for unrecognized browser', () => {
+ 			mockUserAgent( 'Some Unknown Browser/1.0' );
+ 			const user = createMockUser();
+-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
++			const collaboratorInfo = generateCollaboratorInfo( user );
+ 
+ 			expect( collaboratorInfo.browserType ).toBe( 'Unknown' );
+ 		} );
+ 
+ 		test( 'should include enteredAt timestamp', () => {
+ 			const user = createMockUser();
+-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
++			const collaboratorInfo = generateCollaboratorInfo( user );
+ 
+ 			expect( collaboratorInfo.enteredAt ).toBe( 1704067200000 );
+ 		} );
+ 
+-		test( 'should assign a color from the palette when no existing colors', () => {
+-			const user = createMockUser();
+-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
+-
+-			const colorPalette = [
+-				'#3858E9',
+-				'#B42AED',
+-				'#E33184',
+-				'#F3661D',
+-				'#ECBD3A',
+-				'#97FE17',
+-				'#00FDD9',
+-				'#37C5F0',
+-			];
+-			expect( colorPalette ).toContain( collaboratorInfo.color );
+-		} );
+-
+-		test( 'should avoid existing colors when assigning', () => {
+-			const user = createMockUser();
+-			const existingColors = [
+-				'#3858E9',
+-				'#B42AED',
+-				'#E33184',
+-				'#F3661D',
+-				'#ECBD3A',
+-				'#97FE17',
+-				'#00FDD9',
+-			];
+-			const collaboratorInfo = generateCollaboratorInfo(
+-				user,
+-				existingColors
+-			);
+-
+-			// The only available color from the palette is #37C5F0 (cyan)
+-			expect( collaboratorInfo.color ).toBe( '#37C5F0' );
+-		} );
+-
+-		test( 'should generate color variation when all palette colors are in use', () => {
+-			const user = createMockUser();
+-			const existingColors = [
+-				'#3858E9',
+-				'#B42AED',
+-				'#E33184',
+-				'#F3661D',
+-				'#ECBD3A',
+-				'#97FE17',
+-				'#00FDD9',
+-				'#37C5F0',
+-			];
+-			const collaboratorInfo = generateCollaboratorInfo(
+-				user,
+-				existingColors
+-			);
+-
+-			// Should be a valid hex color
+-			expect( collaboratorInfo.color ).toMatch( /^#[0-9A-F]{6}$/i );
+-			// And should not be one of the original colors
+-			// (it's a variation so could be close but not exactly the same in most cases)
+-		} );
+-
+ 		test( 'should include avatar_urls from user', () => {
+ 			const user = createMockUser( {
+ 				avatar_urls: {
+@@ -369,7 +293,7 @@ describe( 'Awareness Utils', () => {
+ 					'96': 'https://example.com/large.png',
+ 				},
+ 			} );
+-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
++			const collaboratorInfo = generateCollaboratorInfo( user );
+ 
+ 			expect( collaboratorInfo.avatar_urls ).toEqual( {
+ 				'24': 'https://example.com/small.png',
+diff --git a/packages/core-data/src/awareness/types.ts b/packages/core-data/src/awareness/types.ts
+index 0d2fa22243e8d5..eee5a7036da3f2 100644
+--- a/packages/core-data/src/awareness/types.ts
++++ b/packages/core-data/src/awareness/types.ts
+@@ -14,7 +14,6 @@ export type CollaboratorInfo = Pick<
+ 	'id' | 'name' | 'slug' | 'avatar_urls'
+ > & {
+ 	browserType: string;
+-	color: string;
+ 	enteredAt: number;
+ };
+ 
+diff --git a/packages/core-data/src/awareness/utils.ts b/packages/core-data/src/awareness/utils.ts
+index a039b12d97055f..05c1ad56fb4ede 100644
+--- a/packages/core-data/src/awareness/utils.ts
++++ b/packages/core-data/src/awareness/utils.ts
+@@ -4,82 +4,6 @@
+ import type { User } from '../entity-types';
+ import type { CollaboratorInfo } from './types';
+ 
+-/**
+- * The color palette for the collaborator highlight.
+- */
+-const COLOR_PALETTE = [
+-	'#3858E9', // blueberry
+-	'#B42AED', // purple
+-	'#E33184', // pink
+-	'#F3661D', // orange
+-	'#ECBD3A', // yellow
+-	'#97FE17', // green
+-	'#00FDD9', // teal
+-	'#37C5F0', // cyan
+-];
+-
+-/**
+- * Generate a random integer between min and max, inclusive.
+- *
+- * @param min - The minimum value.
+- * @param max - The maximum value.
+- * @return A random integer between min and max.
+- */
+-function generateRandomInt( min: number, max: number ): number {
+-	return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
+-}
+-
+-/**
+- * Get a unique collaborator color from the palette, or generate a variation if none are available.
+- * If the previously used color is available from localStorage, use it.
+- *
+- * @param existingColors - Colors that are already in use.
+- * @return The new collaborator color, in hex format.
+- */
+-function getNewCollaboratorColor( existingColors: string[] ): string {
+-	const availableColors = COLOR_PALETTE.filter(
+-		( color ) => ! existingColors.includes( color )
+-	);
+-
+-	let hexColor: string;
+-
+-	if ( availableColors.length > 0 ) {
+-		const randomIndex = generateRandomInt( 0, availableColors.length - 1 );
+-		hexColor = availableColors[ randomIndex ];
+-	} else {
+-		// All colors are used, generate a variation of a random palette color
+-		const randomIndex = generateRandomInt( 0, COLOR_PALETTE.length - 1 );
+-		const baseColor = COLOR_PALETTE[ randomIndex ];
+-		hexColor = generateColorVariation( baseColor );
+-	}
+-
+-	return hexColor;
+-}
+-
+-/**
+- * Generate a variation of a hex color by adjusting its lightness.
+- *
+- * @param hexColor - The base hex color (e.g., '#3858E9').
+- * @return A varied hex color.
+- */
+-function generateColorVariation( hexColor: string ): string {
+-	// Parse hex to RGB
+-	const r = parseInt( hexColor.slice( 1, 3 ), 16 );
+-	const g = parseInt( hexColor.slice( 3, 5 ), 16 );
+-	const b = parseInt( hexColor.slice( 5, 7 ), 16 );
+-
+-	// Apply a random lightness shift (-30 to +30)
+-	const shift = generateRandomInt( -30, 30 );
+-	const newR = Math.min( 255, Math.max( 0, r + shift ) );
+-	const newG = Math.min( 255, Math.max( 0, g + shift ) );
+-	const newB = Math.min( 255, Math.max( 0, b + shift ) );
+-
+-	// Convert back to hex
+-	const toHex = ( n: number ) =>
+-		n.toString( 16 ).padStart( 2, '0' ).toUpperCase();
+-	return `#${ toHex( newR ) }${ toHex( newG ) }${ toHex( newB ) }`;
+-}
+-
+ /**
+  * Get the browser name from the user agent.
+  * @return The browser name.
+@@ -165,22 +89,19 @@ export function areCollaboratorInfosEqual(
+ }
+ 
+ /**
+- * Generate a collaborator info object from a current collaborator and a list of existing colors.
++ * Generate a collaborator info object from a current collaborator.
+  *
+  * @param currentCollaborator - The current collaborator.
+- * @param existingColors      - The existing colors.
+  * @return The collaborator info object.
+  */
+ export function generateCollaboratorInfo(
+-	currentCollaborator: User< 'view' >,
+-	existingColors: string[]
++	currentCollaborator: User< 'view' >
+ ): CollaboratorInfo {
+ 	// eslint-disable-next-line camelcase
+ 	const { avatar_urls, id, name, slug } = currentCollaborator;
+ 	return {
+ 		avatar_urls, // eslint-disable-line camelcase
+ 		browserType: getBrowserName(),
+-		color: getNewCollaboratorColor( existingColors ),
+ 		enteredAt: Date.now(),
+ 		id,
+ 		name,
+diff --git a/packages/core-data/src/hooks/test/use-post-editor-awareness-state.ts b/packages/core-data/src/hooks/test/use-post-editor-awareness-state.ts
+index c1ccf42e756584..0ae6997e018e03 100644
+--- a/packages/core-data/src/hooks/test/use-post-editor-awareness-state.ts
++++ b/packages/core-data/src/hooks/test/use-post-editor-awareness-state.ts
+@@ -43,7 +43,6 @@ const createMockActiveUser = (
+ 		slug: 'test-user',
+ 		avatar_urls: mockAvatarUrls,
+ 		browserType: 'Chrome',
+-		color: '#3858E9',
+ 		enteredAt: 1704067200000,
+ 	},
+ 	editorState: {
+@@ -419,7 +418,6 @@ describe( 'use-post-editor-awareness-state hooks', () => {
+ 					slug: 'user-one',
+ 					avatar_urls: mockAvatarUrls,
+ 					browserType: 'Chrome',
+-					color: '#3858E9',
+ 					enteredAt: 1704067200000,
+ 				},
+ 			} );
+@@ -432,7 +430,6 @@ describe( 'use-post-editor-awareness-state hooks', () => {
+ 					slug: 'user-two',
+ 					avatar_urls: mockAvatarUrls,
+ 					browserType: 'Firefox',
+-					color: '#E33184',
+ 					enteredAt: 1704067300000,
+ 				},
+ 			} );
+diff --git a/packages/editor/src/components/collaborators-overlay/collaborator-styles.ts b/packages/editor/src/components/collaborators-overlay/collaborator-styles.ts
+new file mode 100644
+index 00000000000000..3de89be3f0eee6
+--- /dev/null
++++ b/packages/editor/src/components/collaborators-overlay/collaborator-styles.ts
+@@ -0,0 +1,6 @@
++/**
++ * Compiled CSS value of $elevation-x-small.
++ * Keep in sync with @wordpress/base-styles/_variables.scss.
++ */
++export const ELEVATION_X_SMALL =
++	'0 1px 1px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02), 0 3px 3px rgba(0, 0, 0, 0.02), 0 4px 4px rgba(0, 0, 0, 0.01)';
+diff --git a/packages/editor/src/components/collaborators-overlay/get-avatar-url.ts b/packages/editor/src/components/collaborators-overlay/get-avatar-url.ts
+new file mode 100644
+index 00000000000000..7c230ba646a5df
+--- /dev/null
++++ b/packages/editor/src/components/collaborators-overlay/get-avatar-url.ts
+@@ -0,0 +1,13 @@
++/**
++ * Extracts the best available avatar URL from a collaborator's avatar_urls map.
++ * Prefers the 48px size, then 96px, then 24px.
++ *
++ * @param avatarUrls - The avatar_urls map from collaborator info.
++ */
++export function getAvatarUrl( avatarUrls?: {
++	'24'?: string;
++	'48'?: string;
++	'96'?: string;
++} ): string | undefined {
++	return avatarUrls?.[ '48' ] || avatarUrls?.[ '96' ] || avatarUrls?.[ '24' ];
++}
+diff --git a/packages/editor/src/components/collaborators-overlay/overlay.tsx b/packages/editor/src/components/collaborators-overlay/overlay.tsx
+index 79fb7ca2f9277f..ecdde1b6bdd6b0 100644
+--- a/packages/editor/src/components/collaborators-overlay/overlay.tsx
++++ b/packages/editor/src/components/collaborators-overlay/overlay.tsx
+@@ -1,11 +1,19 @@
+ // @ts-expect-error No exported types
+ import { useStyleOverride } from '@wordpress/block-editor';
++import { privateApis as componentsPrivateApis } from '@wordpress/components';
+ import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
+ import { useEffect, useState } from '@wordpress/element';
+ 
++import { unlock } from '../../lock-unlock';
+ import { useBlockHighlighting } from './use-block-highlighting';
+ import { useRenderCursors } from './use-render-cursors';
++import { ELEVATION_X_SMALL } from './collaborator-styles';
+ 
++const { Avatar } = unlock( componentsPrivateApis );
++
++// wp-components styles are excluded from the editor canvas iframe, so the
++// Avatar component's SCSS is not available there. We inject compiled versions
++// of the relevant rules alongside the overlay-specific positioning styles.
+ const COLLABORATORS_OVERLAY_STYLES = `
+ .block-canvas-cover {
+ 	position: absolute;
+@@ -34,22 +42,162 @@ const COLLABORATORS_OVERLAY_STYLES = `
+ .collaborators-overlay-user-cursor {
+ 	position: absolute;
+ 	width: 2px;
++	border-radius: 1px;
++	outline: 1px solid #fff;
++	box-shadow: ${ ELEVATION_X_SMALL };
+ 	animation: collaborators-overlay-cursor-blink 1s infinite;
+ }
+-.collaborators-overlay-user-label {
+-	position: absolute;
++
++/* ── Avatar component (compiled from packages/components/src/avatar/styles.scss) ── */
++.components-avatar {
++	display: inline-flex;
++	align-items: center;
++	border-radius: 9999px;
++	overflow: clip;
++	flex-shrink: 0;
++	background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++	box-shadow: 0 0 0 var(--wp-admin-border-width-focus, 2px) #fff, ${ ELEVATION_X_SMALL };
++}
++.components-avatar__image {
++	box-sizing: border-box;
++	position: relative;
++	width: 32px;
++	height: 32px;
++	border-radius: 9999px;
++	border: 0;
++	background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++	overflow: clip;
++	flex-shrink: 0;
++	font-size: 0;
++	color: #fff;
++}
++.is-small > .components-avatar__image {
++	width: 24px;
++	height: 24px;
++}
++.has-src > .components-avatar__image {
++	background-image: var(--components-avatar-url);
++	background-size: cover;
++	background-position: center;
++}
++.has-avatar-border-color > .components-avatar__image {
++	border: var(--wp-admin-border-width-focus, 2px) solid var(--components-avatar-outline-color);
++	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) #fff;
++	background-clip: padding-box;
++}
++.components-avatar:not(.has-src) > .components-avatar__image {
++	display: flex;
++	align-items: center;
++	justify-content: center;
+ 	font-size: 11px;
+-	padding: 2px 6px;
+-	border-radius: 4px;
+-	transform: translateY(-100%);
+-	margin-top: -2px;
+-	background-color: var(--wp--preset--color--black);
+-	color: var(--wp--preset--color--white);
++	font-weight: 499;
++	border: 0;
++	box-shadow: none;
++	background-clip: border-box;
++}
++.components-avatar:not(.has-src).has-avatar-border-color > .components-avatar__image {
++	background-color: var(--components-avatar-outline-color);
++}
++.components-avatar__name {
++	font-size: 13px;
++	line-height: 20px;
++	color: #fff;
++	min-width: 0;
++	padding-bottom: 2px;
++	overflow: hidden;
++	opacity: 0;
+ 	white-space: nowrap;
++	transition: opacity 0.15s cubic-bezier(0.15, 0, 0.15, 1);
++}
++.components-avatar.has-badge {
++	display: inline-grid;
++	grid-template-columns: min-content 0fr;
++	column-gap: 0;
++	padding-inline-end: 0;
++	transition:
++		grid-template-columns 0.3s cubic-bezier(0.15, 0, 0.15, 1),
++		column-gap 0.3s cubic-bezier(0.15, 0, 0.15, 1),
++		padding-inline-end 0.3s cubic-bezier(0.15, 0, 0.15, 1);
++}
++.components-avatar.has-badge:hover {
++	grid-template-columns: min-content 1fr;
++	column-gap: 4px;
++	padding-inline-end: 8px;
++	transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
++}
++.components-avatar.has-badge:hover .components-avatar__name {
++	opacity: 1;
++	transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
++}
++.components-avatar.has-badge.has-avatar-border-color {
++	background-color: var(--components-avatar-outline-color);
++}
++/* ── end Avatar ── */
++
++/* Overlay-specific positioning applied to the Avatar cursor label. */
++.collaborators-overlay-user-label.components-avatar {
++	position: absolute;
++	transform: translate(-11px, -100%);
++	margin-top: -4px;
++	pointer-events: auto;
++	overflow: visible;
++	width: max-content;
+ }
++
+ @keyframes collaborators-overlay-cursor-blink {
+-	0%, 100% { opacity: 1; }
+-	50% { opacity: 0.5; }
++	0%, 45% { opacity: 1; }
++	55%, 95% { opacity: 0; }
++	100% { opacity: 1; }
++}
++.collaborators-overlay-cursor-highlighted .collaborators-overlay-user-cursor {
++	animation: collaborators-overlay-cursor-highlight 0.6s ease-in-out 3;
++}
++.collaborators-overlay-cursor-highlighted .collaborators-overlay-user-label {
++	animation: collaborators-overlay-label-highlight 0.6s ease-in-out 3;
++}
++@keyframes collaborators-overlay-cursor-highlight {
++	0%, 100% {
++		transform: scale(1);
++		filter: drop-shadow(0 0 0 transparent);
++	}
++	50% {
++		transform: scale(1.2);
++		filter: drop-shadow(0 0 8px currentColor);
++	}
++}
++@keyframes collaborators-overlay-label-highlight {
++	0%, 100% {
++		transform: translate(-11px, -100%) scale(1);
++		filter: drop-shadow(0 0 0 transparent);
++	}
++	50% {
++		transform: translate(-11px, -100%) scale(1.1);
++		filter: drop-shadow(0 0 6px currentColor);
++	}
++}
++.block-editor-block-list__block.is-collaborator-selected:not(:focus)::after {
++	content: "";
++	position: absolute;
++	pointer-events: none;
++	top: 0;
++	right: 0;
++	bottom: 0;
++	left: 0;
++	outline-color: var(--collaborator-outline-color);
++	outline-style: solid;
++	outline-width: calc(var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
++	outline-offset: calc(-1 * var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
++	box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus, 2px) + 1px) #fff, 0 0 0 1px #fff, ${ ELEVATION_X_SMALL };
++	z-index: 1;
++}
++@media (prefers-reduced-motion: reduce) {
++	.components-avatar.has-badge,
++	.components-avatar__name,
++	.collaborators-overlay-user-label,
++	.collaborators-overlay-user-cursor {
++		transition: none;
++		animation: none;
++	}
+ }
+ `;
+ 
+@@ -126,14 +274,14 @@ export function Overlay( {
+ 							height: `${ cursor.height }px`,
+ 						} }
+ 					/>
+-					<div
++					<Avatar
+ 						className="collaborators-overlay-user-label"
+-						style={ {
+-							backgroundColor: cursor.color,
+-						} }
+-					>
+-						{ cursor.userName }
+-					</div>
++						badge
++						size="small"
++						src={ cursor.avatarUrl }
++						name={ cursor.userName }
++						borderColor={ cursor.color }
++					/>
+ 				</div>
+ 			) ) }
+ 		</div>
+diff --git a/packages/editor/src/components/collaborators-overlay/use-block-highlighting.ts b/packages/editor/src/components/collaborators-overlay/use-block-highlighting.ts
+index 96bd456ec63ae8..b88430079ce8a4 100644
+--- a/packages/editor/src/components/collaborators-overlay/use-block-highlighting.ts
++++ b/packages/editor/src/components/collaborators-overlay/use-block-highlighting.ts
+@@ -12,6 +12,7 @@ import { useEffect, useRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { unlock } from '../../lock-unlock';
++import { getAvatarBorderColor } from '../collab-sidebar/utils';
+ 
+ const { useActiveCollaborators } = unlock( coreDataPrivateApis );
+ 
+@@ -47,8 +48,10 @@ export function useBlockHighlighting(
+ 				);
+ 
+ 				if ( blockElement ) {
+-					blockElement.style.boxShadow = '';
+-					blockElement.style.borderRadius = '';
++					blockElement.classList.remove( 'is-collaborator-selected' );
++					blockElement.style.removeProperty(
++						'--collaborator-outline-color'
++					);
+ 				}
+ 
+ 				highlightedBlockIds.current.delete( blockId );
+@@ -68,7 +71,9 @@ export function useBlockHighlighting(
+ 
+ 					return {
+ 						blockId: selection.blockId,
+-						color: userState.collaboratorInfo.color,
++						color: getAvatarBorderColor(
++							userState.collaboratorInfo.id
++						),
+ 					};
+ 				}
+ 
+@@ -99,8 +104,11 @@ export function useBlockHighlighting(
+ 			}
+ 
+ 			if ( blockElement ) {
+-				blockElement.style.boxShadow = `${ color } 0 0 0 2px`;
+-				blockElement.style.borderRadius = '4px';
++				blockElement.classList.add( 'is-collaborator-selected' );
++				blockElement.style.setProperty(
++					'--collaborator-outline-color',
++					color
++				);
+ 				highlightedBlockIds.current.add( blockId );
+ 			}
+ 		} );
+diff --git a/packages/editor/src/components/collaborators-overlay/use-render-cursors.ts b/packages/editor/src/components/collaborators-overlay/use-render-cursors.ts
+index bbec716dc580d7..e54e4ca9ad4437 100644
+--- a/packages/editor/src/components/collaborators-overlay/use-render-cursors.ts
++++ b/packages/editor/src/components/collaborators-overlay/use-render-cursors.ts
+@@ -6,6 +6,8 @@ import {
+ import { useEffect, useMemo, useState } from '@wordpress/element';
+ 
+ import { unlock } from '../../lock-unlock';
++import { getAvatarUrl } from './get-avatar-url';
++import { getAvatarBorderColor } from '../collab-sidebar/utils';
+ 
+ const { useActiveCollaborators, useGetAbsolutePositionIndex } =
+ 	unlock( coreDataPrivateApis );
+@@ -14,6 +16,7 @@ export interface CursorData {
+ 	userName: string;
+ 	clientId: number;
+ 	color: string;
++	avatarUrl?: string;
+ 	x: number;
+ 	y: number;
+ 	height: number;
+@@ -66,7 +69,10 @@ export function useRenderCursors(
+ 				};
+ 				const userName = user.collaboratorInfo.name;
+ 				const clientId = user.clientId;
+-				const color = user.collaboratorInfo.color;
++				const color = getAvatarBorderColor( user.collaboratorInfo.id );
++				const avatarUrl = getAvatarUrl(
++					user.collaboratorInfo.avatar_urls
++				);
+ 
+ 				let coords: {
+ 					x: number;
+@@ -120,6 +126,7 @@ export function useRenderCursors(
+ 						userName,
+ 						clientId,
+ 						color,
++						avatarUrl,
+ 						...coords,
+ 					} );
+ 				}
+diff --git a/packages/editor/src/components/collaborators-presence/avatar.tsx b/packages/editor/src/components/collaborators-presence/avatar.tsx
+deleted file mode 100644
+index 3a5eee457a8642..00000000000000
+--- a/packages/editor/src/components/collaborators-presence/avatar.tsx
++++ /dev/null
+@@ -1,50 +0,0 @@
+-import { clsx } from 'clsx';
+-import { type PostEditorAwarenessState } from '@wordpress/core-data';
+-import './styles/avatar.scss';
+-
+-type AvatarSize = 'small' | 'medium';
+-
+-interface AvatarProps {
+-	collaboratorInfo: PostEditorAwarenessState[ 'collaboratorInfo' ];
+-	showCollaboratorColorBorder?: boolean;
+-	size?: AvatarSize;
+-}
+-
+-/**
+- * Renders a circular avatar bubble for a collaborator with an optional border.
+- *
+- * @param {Object}  props                             Component props.
+- * @param {Object}  props.collaboratorInfo            Collaborator information.
+- * @param {boolean} props.showCollaboratorColorBorder Whether to show the collaborator color border.
+- * @param {string}  props.size                        Size of the avatar.
+- */
+-export function Avatar( {
+-	collaboratorInfo,
+-	showCollaboratorColorBorder,
+-	size = 'small',
+-}: AvatarProps ) {
+-	const className = clsx(
+-		'editor-collaborators-presence__avatar',
+-		`editor-collaborators-presence__avatar--${ size }`,
+-		showCollaboratorColorBorder &&
+-			'editor-collaborators-presence__avatar--with-color-border'
+-	);
+-
+-	const avatarUrl =
+-		collaboratorInfo.avatar_urls?.[ 48 ] ||
+-		collaboratorInfo.avatar_urls?.[ 96 ] ||
+-		collaboratorInfo.avatar_urls?.[ 24 ];
+-
+-	const avatarStyles = {
+-		'--avatar-url': `url(${ avatarUrl })`,
+-		'--collaborator-color': collaboratorInfo.color,
+-	} as React.CSSProperties;
+-
+-	return (
+-		<div
+-			className={ className }
+-			style={ avatarStyles }
+-			aria-hidden="true"
+-		/>
+-	);
+-}
+diff --git a/packages/editor/src/components/collaborators-presence/index.tsx b/packages/editor/src/components/collaborators-presence/index.tsx
+index 46c0d75df6a715..9df2352030ad9c 100644
+--- a/packages/editor/src/components/collaborators-presence/index.tsx
++++ b/packages/editor/src/components/collaborators-presence/index.tsx
+@@ -1,4 +1,7 @@
+-import { Button } from '@wordpress/components';
++import {
++	Button,
++	privateApis as componentsPrivateApis,
++} from '@wordpress/components';
+ import { useState } from '@wordpress/element';
+ import {
+ 	privateApis,
+@@ -6,12 +9,16 @@ import {
+ } from '@wordpress/core-data';
+ import { __, sprintf } from '@wordpress/i18n';
+ 
+-import { Avatar } from './avatar';
+ import { CollaboratorsList } from './list';
+ import { unlock } from '../../lock-unlock';
++import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
++import { getAvatarBorderColor } from '../collab-sidebar/utils';
+ 
+ import './styles/collaborators-presence.scss';
++import { CollaboratorsOverlay } from '../collaborators-overlay';
++
+ const { useActiveCollaborators } = unlock( privateApis );
++const { Avatar, AvatarGroup } = unlock( componentsPrivateApis );
+ 
+ interface CollaboratorsPresenceProps {
+ 	postId: number | null;
+@@ -22,9 +29,9 @@ interface CollaboratorsPresenceProps {
+  * Renders a list of avatars for the active collaborators, with a maximum of 3 visible avatars.
+  * Shows a popover with all collaborators on hover.
+  *
+- * @param {Object} props          CollaboratorsPresence component props
+- * @param {number} props.postId   ID of the post
+- * @param {string} props.postType Type of the post
++ * @param props          CollaboratorsPresence component props
++ * @param props.postId   ID of the post
++ * @param props.postType Type of the post
+  */
+ export function CollaboratorsPresence( {
+ 	postId,
+@@ -52,51 +59,51 @@ export function CollaboratorsPresence( {
+ 		return null;
+ 	}
+ 
+-	const visibleCollaborators = otherActiveCollaborators.slice( 0, 3 );
+-	const remainingCollaborators = otherActiveCollaborators.slice( 3 );
+-	const remainingCollaboratorsText = remainingCollaborators
+-		.map( ( { collaboratorInfo } ) => collaboratorInfo.name )
+-		.join( ', ' );
+-
+-	return visibleCollaborators.length > 0 ? (
+-		<div className="editor-collaborators-presence">
+-			<Button
+-				__next40pxDefaultSize
+-				className="editor-collaborators-presence__button"
+-				onClick={ () => setIsPopoverVisible( ! isPopoverVisible ) }
+-				isPressed={ isPopoverVisible }
+-				ref={ setPopoverAnchor }
+-				aria-label={ sprintf(
+-					// translators: %d: number of online collaborators.
+-					__( 'Collaborators list, %d online' ),
+-					otherActiveCollaborators.length
+-				) }
+-			>
+-				{ visibleCollaborators.map( ( collaboratorState ) => (
+-					<Avatar
+-						key={ collaboratorState.clientId }
+-						collaboratorInfo={ collaboratorState.collaboratorInfo }
+-						showCollaboratorColorBorder={ false }
+-						size="small"
++	return (
++		<>
++			<div className="editor-collaborators-presence">
++				<Button
++					__next40pxDefaultSize
++					className="editor-collaborators-presence__button"
++					onClick={ () => setIsPopoverVisible( ! isPopoverVisible ) }
++					isPressed={ isPopoverVisible }
++					ref={ setPopoverAnchor }
++					aria-label={ sprintf(
++						// translators: %d: number of online collaborators.
++						__( 'Collaborators list, %d online' ),
++						otherActiveCollaborators.length
++					) }
++				>
++					<AvatarGroup max={ 3 }>
++						{ otherActiveCollaborators.map(
++							( collaboratorState ) => (
++								<Avatar
++									key={ collaboratorState.clientId }
++									src={ getAvatarUrl(
++										collaboratorState.collaboratorInfo
++											.avatar_urls
++									) }
++									name={
++										collaboratorState.collaboratorInfo.name
++									}
++									borderColor={ getAvatarBorderColor(
++										collaboratorState.collaboratorInfo.id
++									) }
++									size="small"
++								/>
++							)
++						) }
++					</AvatarGroup>
++				</Button>
++				{ isPopoverVisible && (
++					<CollaboratorsList
++						activeCollaborators={ otherActiveCollaborators }
++						popoverAnchor={ popoverAnchor }
++						setIsPopoverVisible={ setIsPopoverVisible }
+ 					/>
+-				) ) }
+-
+-				{ remainingCollaborators.length > 0 && (
+-					<div
+-						className="editor-collaborators-presence__remaining"
+-						title={ remainingCollaboratorsText }
+-					>
+-						+{ remainingCollaborators.length }
+-					</div>
+ 				) }
+-			</Button>
+-			{ isPopoverVisible && (
+-				<CollaboratorsList
+-					activeCollaborators={ otherActiveCollaborators }
+-					popoverAnchor={ popoverAnchor }
+-					setIsPopoverVisible={ setIsPopoverVisible }
+-				/>
+-			) }
+-		</div>
+-	) : null;
++			</div>
++			<CollaboratorsOverlay postId={ postId } postType={ postType } />
++		</>
++	);
+ }
+diff --git a/packages/editor/src/components/collaborators-presence/list.tsx b/packages/editor/src/components/collaborators-presence/list.tsx
+index 1f1466b4bdfc0d..e2b1e806a0f782 100644
+--- a/packages/editor/src/components/collaborators-presence/list.tsx
++++ b/packages/editor/src/components/collaborators-presence/list.tsx
+@@ -1,12 +1,20 @@
+ import { __ } from '@wordpress/i18n';
+-import { Popover, Button } from '@wordpress/components';
++import {
++	Popover,
++	Button,
++	privateApis as componentsPrivateApis,
++} from '@wordpress/components';
+ import { close } from '@wordpress/icons';
+ import { type PostEditorAwarenessState } from '@wordpress/core-data';
+ 
+-import { Avatar } from './avatar';
++import { unlock } from '../../lock-unlock';
++import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
++import { getAvatarBorderColor } from '../collab-sidebar/utils';
+ 
+ import './styles/collaborators-list.scss';
+ 
++const { Avatar } = unlock( componentsPrivateApis );
++
+ interface CollaboratorsListProps {
+ 	activeCollaborators: PostEditorAwarenessState[];
+ 	popoverAnchor?: HTMLElement | null;
+@@ -63,11 +71,14 @@ export function CollaboratorsList( {
+ 							} }
+ 						>
+ 							<Avatar
+-								collaboratorInfo={
++								src={ getAvatarUrl(
+ 									collaboratorState.collaboratorInfo
+-								}
+-								showCollaboratorColorBorder
+-								size="medium"
++										.avatar_urls
++								) }
++								name={ collaboratorState.collaboratorInfo.name }
++								borderColor={ getAvatarBorderColor(
++									collaboratorState.collaboratorInfo.id
++								) }
+ 							/>
+ 							<div className="editor-collaborators-presence__list-item-info">
+ 								<div className="editor-collaborators-presence__list-item-name">
+diff --git a/packages/editor/src/components/collaborators-presence/styles/avatar.scss b/packages/editor/src/components/collaborators-presence/styles/avatar.scss
+deleted file mode 100644
+index 8822c4b8366c1d..00000000000000
+--- a/packages/editor/src/components/collaborators-presence/styles/avatar.scss
++++ /dev/null
+@@ -1,31 +0,0 @@
+-@use "@wordpress/base-styles/colors" as *;
+-@use "@wordpress/base-styles/variables" as *;
+-
+-.editor-collaborators-presence__avatar {
+-	background-image: var(--avatar-url);
+-	background-size: cover;
+-	background-position: center;
+-	border-radius: $grid-unit-05 + 2;
+-	border-width: 1.5px;
+-	border-style: solid;
+-	border-color: $gray-300;
+-	font-size: 0;
+-
+-	&--small {
+-		width: $button-size-small;
+-		height: $button-size-small;
+-		border-radius: $grid-unit-05 + 2;
+-	}
+-
+-	&--medium {
+-		width: $button-size-compact;
+-		height: $button-size-compact;
+-		border-radius: $grid-unit-10;
+-	}
+-
+-	&--with-color-border {
+-		border-color: var(--collaborator-color);
+-		box-shadow: inset 0 0 0 1px rgba($white, 0.7);
+-		background-clip: padding-box;
+-	}
+-}
+diff --git a/packages/editor/src/components/collaborators-presence/styles/collaborators-presence.scss b/packages/editor/src/components/collaborators-presence/styles/collaborators-presence.scss
+index 5d9f7372014442..19f8aea16da028 100644
+--- a/packages/editor/src/components/collaborators-presence/styles/collaborators-presence.scss
++++ b/packages/editor/src/components/collaborators-presence/styles/collaborators-presence.scss
+@@ -46,38 +46,4 @@
+ 		outline: none;
+ 	}
+ 
+-	// Avatar remaining count
+-	.editor-collaborators-presence__remaining {
+-		margin-right: $grid-unit-05 + 2;
+-	}
+-
+-	// Avatar styles
+-	.editor-collaborators-presence__avatar {
+-		margin-left: -16px;
+-		flex-shrink: 0;
+-		border-color: $gray-100;
+-
+-		&:nth-child(1) {
+-			margin-left: 0;
+-			z-index: 3;
+-		}
+-
+-		&:nth-child(2) {
+-			z-index: 2;
+-		}
+-
+-		&:nth-child(3) {
+-			z-index: 1;
+-		}
+-	}
+-
+-	// Avatar hover state
+-	.editor-collaborators-presence:hover & .editor-collaborators-presence__avatar {
+-		border-color: $gray-300;
+-	}
+-
+-	// Avatar pressed state
+-	&.is-pressed .editor-collaborators-presence__avatar {
+-		border-color: $gray-300;
+-	}
+ }

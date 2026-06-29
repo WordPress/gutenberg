@@ -1,0 +1,1832 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index a4d8999d9dba7e..52ffa1247fc218 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -85,6 +85,7 @@ module.exports = {
+ 							'isUndefined',
+ 							'memoize',
+ 							'negate',
++							'noop',
+ 							'random',
+ 							'reverse',
+ 							'stubFalse',
+diff --git a/packages/block-directory/src/components/downloadable-blocks-list/index.js b/packages/block-directory/src/components/downloadable-blocks-list/index.js
+index 02561a087b5681..b8ea7330f2d0ee 100644
+--- a/packages/block-directory/src/components/downloadable-blocks-list/index.js
++++ b/packages/block-directory/src/components/downloadable-blocks-list/index.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -20,6 +15,8 @@ import { useDispatch } from '@wordpress/data';
+ import DownloadableBlockListItem from '../downloadable-block-list-item';
+ import { store as blockDirectoryStore } from '../../store';
+ 
++const noop = () => {};
++
+ function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
+ 	const composite = useCompositeState();
+ 	const { installBlockType } = useDispatch( blockDirectoryStore );
+diff --git a/packages/block-editor/src/autocompleters/block.js b/packages/block-editor/src/autocompleters/block.js
+index 44e88aab7bef9a..e5bcd2e78dbbf0 100644
+--- a/packages/block-editor/src/autocompleters/block.js
++++ b/packages/block-editor/src/autocompleters/block.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { noop, orderBy } from 'lodash';
++import { orderBy } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -21,6 +21,7 @@ import useBlockTypesState from '../components/inserter/hooks/use-block-types-sta
+ import BlockIcon from '../components/block-icon';
+ import { store as blockEditorStore } from '../store';
+ 
++const noop = () => {};
+ const SHOWN_BLOCK_TYPES = 9;
+ 
+ /** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
+diff --git a/packages/block-editor/src/components/block-alignment-matrix-control/index.js b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+index 1a923fe2e057f7..6e9ef0def5a5aa 100644
+--- a/packages/block-editor/src/components/block-alignment-matrix-control/index.js
++++ b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+@@ -1,7 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+@@ -13,6 +9,8 @@ import {
+ 	__experimentalAlignmentMatrixControl as AlignmentMatrixControl,
+ } from '@wordpress/components';
+ 
++const noop = () => {};
++
+ function BlockAlignmentMatrixControl( props ) {
+ 	const {
+ 		label = __( 'Change matrix alignment' ),
+diff --git a/packages/block-editor/src/components/block-compare/test/block-view.js b/packages/block-editor/src/components/block-compare/test/block-view.js
+index 755722983351b4..04b3f34ffd1fe8 100644
+--- a/packages/block-editor/src/components/block-compare/test/block-view.js
++++ b/packages/block-editor/src/components/block-compare/test/block-view.js
+@@ -2,13 +2,14 @@
+  * External dependencies
+  */
+ import { shallow } from 'enzyme';
+-import { noop } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+  */
+ import BlockView from '../block-view';
+ 
++const noop = () => {};
++
+ describe( 'BlockView', () => {
+ 	test( 'should match snapshot', () => {
+ 		const wrapper = shallow(
+diff --git a/packages/block-editor/src/components/block-edit/test/edit.js b/packages/block-editor/src/components/block-edit/test/edit.js
+index 5525bcf30aaab0..f0248509d96b0e 100644
+--- a/packages/block-editor/src/components/block-edit/test/edit.js
++++ b/packages/block-editor/src/components/block-edit/test/edit.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { shallow, mount } from 'enzyme';
+-import { noop } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -19,6 +18,8 @@ import {
+ import { Edit } from '../edit';
+ import { BlockContextProvider } from '../../block-context';
+ 
++const noop = () => {};
++
+ describe( 'Edit', () => {
+ 	afterEach( () => {
+ 		getBlockTypes().forEach( ( block ) => {
+diff --git a/packages/block-editor/src/components/block-settings-menu/block-mode-toggle.js b/packages/block-editor/src/components/block-settings-menu/block-mode-toggle.js
+index 6be9369c0ddf08..6966ece2cc4478 100644
+--- a/packages/block-editor/src/components/block-settings-menu/block-mode-toggle.js
++++ b/packages/block-editor/src/components/block-settings-menu/block-mode-toggle.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -17,6 +12,8 @@ import { compose } from '@wordpress/compose';
+  */
+ import { store as blockEditorStore } from '../../store';
+ 
++const noop = () => {};
++
+ export function BlockModeToggle( {
+ 	blockType,
+ 	mode,
+diff --git a/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js b/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js
+index 2d31b49d2ed2d6..c68426f6cc33b4 100644
+--- a/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js
++++ b/packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { castArray, flow, noop } from 'lodash';
++import { castArray, flow } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -33,6 +33,7 @@ import { store as blockEditorStore } from '../../store';
+ import useBlockDisplayTitle from '../block-title/use-block-display-title';
+ import { useShowMoversGestures } from '../block-toolbar/utils';
+ 
++const noop = () => {};
+ const POPOVER_PROPS = {
+ 	className: 'block-editor-block-settings-menu__popover',
+ 	position: 'bottom right',
+diff --git a/packages/block-editor/src/components/block-styles/index.js b/packages/block-editor/src/components/block-styles/index.js
+index 0a864330964d39..22aa36239defd9 100644
+--- a/packages/block-editor/src/components/block-styles/index.js
++++ b/packages/block-editor/src/components/block-styles/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { noop, debounce } from 'lodash';
++import { debounce } from 'lodash';
+ import classnames from 'classnames';
+ 
+ /**
+@@ -39,6 +39,8 @@ function BlockStylesPreviewPanelFill( { children, scope, ...props } ) {
+ // The value is the equivalent of the container's right position.
+ const DEFAULT_POSITION_TOP = 16;
+ 
++const noop = () => {};
++
+ // Block Styles component for the Settings Sidebar.
+ function BlockStyles( {
+ 	clientId,
+diff --git a/packages/block-editor/src/components/block-styles/menu-items.js b/packages/block-editor/src/components/block-styles/menu-items.js
+index 9f1a45502ec241..927a7f9d7a5099 100644
+--- a/packages/block-editor/src/components/block-styles/menu-items.js
++++ b/packages/block-editor/src/components/block-styles/menu-items.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -14,6 +9,8 @@ import { check } from '@wordpress/icons';
+  */
+ import useStylesForBlocks from './use-styles-for-block';
+ 
++const noop = () => {};
++
+ export default function BlockStylesMenuItems( { clientId, onSwitch = noop } ) {
+ 	const { onSelect, stylesToRender, activeStyle } = useStylesForBlocks( {
+ 		clientId,
+diff --git a/packages/block-editor/src/components/block-toolbar/utils.js b/packages/block-editor/src/components/block-toolbar/utils.js
+index d111f57ad26ad4..e56f7083fdcfd9 100644
+--- a/packages/block-editor/src/components/block-toolbar/utils.js
++++ b/packages/block-editor/src/components/block-toolbar/utils.js
+@@ -1,15 +1,10 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+ import { useState, useRef, useEffect } from '@wordpress/element';
+ 
+ const { clearTimeout, setTimeout } = window;
+-
++const noop = () => {};
+ const DEBOUNCE_TIMEOUT = 200;
+ 
+ /**
+diff --git a/packages/block-editor/src/components/color-palette/test/control.js b/packages/block-editor/src/components/color-palette/test/control.js
+index 1c203c3a143259..1f41b4318d2116 100644
+--- a/packages/block-editor/src/components/color-palette/test/control.js
++++ b/packages/block-editor/src/components/color-palette/test/control.js
+@@ -2,13 +2,14 @@
+  * External dependencies
+  */
+ import { create, act } from 'react-test-renderer';
+-import { noop } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+  */
+ import ColorPaletteControl from '../control';
+ 
++const noop = () => {};
++
+ describe( 'ColorPaletteControl', () => {
+ 	it( 'matches the snapshot', async () => {
+ 		let root;
+diff --git a/packages/block-editor/src/components/colors-gradients/test/control.js b/packages/block-editor/src/components/colors-gradients/test/control.js
+index 99478184dd0ab6..2e054df3021e9a 100644
+--- a/packages/block-editor/src/components/colors-gradients/test/control.js
++++ b/packages/block-editor/src/components/colors-gradients/test/control.js
+@@ -3,13 +3,14 @@
+  */
+ import { render, screen } from '@testing-library/react';
+ import { create, act } from 'react-test-renderer';
+-import { noop } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+  */
+ import ColorGradientControl from '../control';
+ 
++const noop = () => {};
++
+ const getButtonWithAriaLabelStartPredicate = ( ariaLabelStart ) => (
+ 	element
+ ) => {
+diff --git a/packages/block-editor/src/components/image-size-control/index.js b/packages/block-editor/src/components/image-size-control/index.js
+index c310bf1d687e50..2a31ff09ce7ba5 100644
+--- a/packages/block-editor/src/components/image-size-control/index.js
++++ b/packages/block-editor/src/components/image-size-control/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEmpty, noop } from 'lodash';
++import { isEmpty } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -20,6 +20,7 @@ import { __ } from '@wordpress/i18n';
+ import useDimensionHandler from './use-dimension-handler';
+ 
+ const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
++const noop = () => {};
+ 
+ export default function ImageSizeControl( {
+ 	imageWidth,
+diff --git a/packages/block-editor/src/components/inserter/library.js b/packages/block-editor/src/components/inserter/library.js
+index 0200189a257ccb..aba22e3e1f3fbe 100644
+--- a/packages/block-editor/src/components/inserter/library.js
++++ b/packages/block-editor/src/components/inserter/library.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -15,6 +10,8 @@ import { forwardRef } from '@wordpress/element';
+ import InserterMenu from './menu';
+ import { store as blockEditorStore } from '../../store';
+ 
++const noop = () => {};
++
+ function InserterLibrary(
+ 	{
+ 		rootClientId,
+diff --git a/packages/block-editor/src/components/link-control/index.js b/packages/block-editor/src/components/link-control/index.js
+index b5269985964788..160ea7fb3ee112 100644
+--- a/packages/block-editor/src/components/link-control/index.js
++++ b/packages/block-editor/src/components/link-control/index.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { noop } from 'lodash';
+ import classnames from 'classnames';
+ 
+ /**
+@@ -97,6 +96,8 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
+  * @property {Function}                   renderControlBottom        Optional controls to be rendered at the bottom of the component.
+  */
+ 
++const noop = () => {};
++
+ /**
+  * Renders a link control. A link control is a controlled input which maintains
+  * a value associated with a link (HTML anchor element) and relevant settings
+diff --git a/packages/block-editor/src/components/link-control/search-input.js b/packages/block-editor/src/components/link-control/search-input.js
+index 2c5b6daf43ed71..14b520c8fa1e0c 100644
+--- a/packages/block-editor/src/components/link-control/search-input.js
++++ b/packages/block-editor/src/components/link-control/search-input.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { noop, omit } from 'lodash';
++import { omit } from 'lodash';
+ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+@@ -23,6 +23,8 @@ import useSearchHandler from './use-search-handler';
+ // which will cause an unintended http request.
+ const noopSearchHandler = () => Promise.resolve( [] );
+ 
++const noop = () => {};
++
+ const LinkControlSearchInput = forwardRef(
+ 	(
+ 		{
+diff --git a/packages/block-editor/src/components/link-control/settings-drawer.js b/packages/block-editor/src/components/link-control/settings-drawer.js
+index ef1bf3e81afbbc..4b9d0d7f7419e7 100644
+--- a/packages/block-editor/src/components/link-control/settings-drawer.js
++++ b/packages/block-editor/src/components/link-control/settings-drawer.js
+@@ -1,14 +1,11 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+ import { ToggleControl, VisuallyHidden } from '@wordpress/components';
+ 
++const noop = () => {};
++
+ const LinkControlSettingsDrawer = ( { value, onChange = noop, settings } ) => {
+ 	if ( ! settings || ! settings.length ) {
+ 		return null;
+diff --git a/packages/block-editor/src/components/media-placeholder/index.js b/packages/block-editor/src/components/media-placeholder/index.js
+index cdbd4a04aa3319..e3adfa463a652b 100644
+--- a/packages/block-editor/src/components/media-placeholder/index.js
++++ b/packages/block-editor/src/components/media-placeholder/index.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { noop } from 'lodash';
+ import classnames from 'classnames';
+ 
+ /**
+@@ -27,6 +26,8 @@ import MediaUploadCheck from '../media-upload/check';
+ import URLPopover from '../url-popover';
+ import { store as blockEditorStore } from '../../store';
+ 
++const noop = () => {};
++
+ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
+ 	<URLPopover onClose={ onClose }>
+ 		<form
+diff --git a/packages/block-editor/src/components/media-replace-flow/index.js b/packages/block-editor/src/components/media-replace-flow/index.js
+index b4ec91ccf40fee..2daf61e3b703be 100644
+--- a/packages/block-editor/src/components/media-replace-flow/index.js
++++ b/packages/block-editor/src/components/media-replace-flow/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { noop, uniqueId } from 'lodash';
++import { uniqueId } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -37,6 +37,8 @@ import MediaUploadCheck from '../media-upload/check';
+ import LinkControl from '../link-control';
+ import { store as blockEditorStore } from '../../store';
+ 
++const noop = () => {};
++
+ const MediaReplaceFlow = ( {
+ 	mediaURL,
+ 	mediaId,
+diff --git a/packages/block-editor/src/components/panel-color-settings/test/index.js b/packages/block-editor/src/components/panel-color-settings/test/index.js
+index 565124f1eb81e4..ae1c6bcf09edc2 100644
+--- a/packages/block-editor/src/components/panel-color-settings/test/index.js
++++ b/packages/block-editor/src/components/panel-color-settings/test/index.js
+@@ -2,13 +2,14 @@
+  * External dependencies
+  */
+ import { render } from '@testing-library/react';
+-import { noop } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+  */
+ import PanelColorSettings from '../';
+ 
++const noop = () => {};
++
+ describe( 'PanelColorSettings', () => {
+ 	it( 'should not render anything if there are no colors to choose', async () => {
+ 		const { container } = render(
+diff --git a/packages/block-editor/src/components/provider/use-block-sync.js b/packages/block-editor/src/components/provider/use-block-sync.js
+index 22443ebbc27f30..dee0805447833b 100644
+--- a/packages/block-editor/src/components/provider/use-block-sync.js
++++ b/packages/block-editor/src/components/provider/use-block-sync.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { last, noop } from 'lodash';
++import { last } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -15,6 +15,8 @@ import { cloneBlock } from '@wordpress/blocks';
+  */
+ import { store as blockEditorStore } from '../../store';
+ 
++const noop = () => {};
++
+ /**
+  * A function to call when the block value has been updated in the block-editor
+  * store.
+diff --git a/packages/block-editor/src/components/rich-text/embed-handler-picker.native.js b/packages/block-editor/src/components/rich-text/embed-handler-picker.native.js
+index 62894addb024cd..0cdfdf49319b4d 100644
+--- a/packages/block-editor/src/components/rich-text/embed-handler-picker.native.js
++++ b/packages/block-editor/src/components/rich-text/embed-handler-picker.native.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -16,6 +11,8 @@ import {
+ import { Picker } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ 
++const noop = () => {};
++
+ const DEFAULT_PICKER_OPTIONS = [
+ 	{
+ 		id: 'createEmbed',
+diff --git a/packages/block-editor/src/components/ungroup-button/index.native.js b/packages/block-editor/src/components/ungroup-button/index.native.js
+index 65180144ba2ede..8877c5fd1d2e11 100644
+--- a/packages/block-editor/src/components/ungroup-button/index.native.js
++++ b/packages/block-editor/src/components/ungroup-button/index.native.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -18,6 +13,8 @@ import { compose } from '@wordpress/compose';
+ import UngroupIcon from './icon';
+ import { store as blockEditorStore } from '../../store';
+ 
++const noop = () => {};
++
+ export function UngroupButton( { onConvertFromGroup, isUngroupable = false } ) {
+ 	if ( ! isUngroupable ) {
+ 		return null;
+diff --git a/packages/block-editor/src/hooks/test/align.js b/packages/block-editor/src/hooks/test/align.js
+index 7d7b2fee7fb343..3677b495910c41 100644
+--- a/packages/block-editor/src/hooks/test/align.js
++++ b/packages/block-editor/src/hooks/test/align.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { noop } from 'lodash';
+ import renderer, { act } from 'react-test-renderer';
+ 
+ /**
+@@ -25,6 +24,8 @@ import {
+ 	addAssignedAlign,
+ } from '../align';
+ 
++const noop = () => {};
++
+ describe( 'align', () => {
+ 	const blockSettings = {
+ 		save: noop,
+diff --git a/packages/block-editor/src/hooks/test/generated-class-name.js b/packages/block-editor/src/hooks/test/generated-class-name.js
+index 7de89032719da5..a37ceb74c87bdc 100644
+--- a/packages/block-editor/src/hooks/test/generated-class-name.js
++++ b/packages/block-editor/src/hooks/test/generated-class-name.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -13,6 +8,8 @@ import { applyFilters } from '@wordpress/hooks';
+  */
+ import '../generated-class-name';
+ 
++const noop = () => {};
++
+ describe( 'generated className', () => {
+ 	const blockSettings = {
+ 		name: 'chicken/ribs',
+diff --git a/packages/block-editor/src/hooks/test/utils.js b/packages/block-editor/src/hooks/test/utils.js
+index 185b286efb3079..a919fad575312e 100644
+--- a/packages/block-editor/src/hooks/test/utils.js
++++ b/packages/block-editor/src/hooks/test/utils.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -13,6 +8,8 @@ import { applyFilters } from '@wordpress/hooks';
+  */
+ import '../anchor';
+ 
++const noop = () => {};
++
+ describe( 'anchor', () => {
+ 	const blockSettings = {
+ 		save: noop,
+diff --git a/packages/block-editor/src/store/test/actions.js b/packages/block-editor/src/store/test/actions.js
+index 8cd09d7a7e1d0a..3bab11ca0b3bf1 100644
+--- a/packages/block-editor/src/store/test/actions.js
++++ b/packages/block-editor/src/store/test/actions.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { noop } from 'lodash';
+ import deepFreeze from 'deep-freeze';
+ 
+ /**
+@@ -24,6 +23,8 @@ import reducer from '../reducer';
+ import * as actions from '../actions';
+ import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
+ 
++const noop = () => {};
++
+ const {
+ 	clearSelectedBlock,
+ 	hideInsertionPoint,
+diff --git a/packages/block-editor/src/store/test/reducer.js b/packages/block-editor/src/store/test/reducer.js
+index ec8f69a5d7d48a..fb1b2356429192 100644
+--- a/packages/block-editor/src/store/test/reducer.js
++++ b/packages/block-editor/src/store/test/reducer.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { values, noop, omit } from 'lodash';
++import { values, omit } from 'lodash';
+ import deepFreeze from 'deep-freeze';
+ 
+ /**
+@@ -34,6 +34,8 @@ import {
+ 	lastBlockInserted,
+ } from '../reducer';
+ 
++const noop = () => {};
++
+ describe( 'state', () => {
+ 	describe( 'hasSameKeys()', () => {
+ 		it( 'returns false if two objects do not have the same keys', () => {
+diff --git a/packages/block-library/src/media-text/deprecated.js b/packages/block-library/src/media-text/deprecated.js
+index 759fbaabef7c20..93edff406c9294 100644
+--- a/packages/block-library/src/media-text/deprecated.js
++++ b/packages/block-library/src/media-text/deprecated.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { noop, isEmpty, omit } from 'lodash';
++import { isEmpty, omit } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -15,6 +15,7 @@ import { InnerBlocks, getColorClassName } from '@wordpress/block-editor';
+ import { imageFillStyles } from './media-container';
+ 
+ const DEFAULT_MEDIA_WIDTH = 50;
++const noop = () => {};
+ 
+ const migrateCustomColors = ( attributes ) => {
+ 	if ( ! attributes.customBackgroundColor ) {
+diff --git a/packages/block-library/src/media-text/media-container.js b/packages/block-library/src/media-text/media-container.js
+index c7f4037f4734a4..f09c2d1d84e5ad 100644
+--- a/packages/block-library/src/media-text/media-container.js
++++ b/packages/block-library/src/media-text/media-container.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { noop } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -30,6 +29,7 @@ import icon from './media-container-icon';
+  * Constants
+  */
+ const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
++const noop = () => {};
+ 
+ export function imageFillStyles( url, focalPoint ) {
+ 	return url
+diff --git a/packages/block-library/src/media-text/save.js b/packages/block-library/src/media-text/save.js
+index 91a496ad580b6b..0af22d1dd07e10 100644
+--- a/packages/block-library/src/media-text/save.js
++++ b/packages/block-library/src/media-text/save.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { noop, isEmpty } from 'lodash';
++import { isEmpty } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,6 +16,7 @@ import { imageFillStyles } from './media-container';
+ import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
+ 
+ const DEFAULT_MEDIA_WIDTH = 50;
++const noop = () => {};
+ 
+ export default function save( { attributes } ) {
+ 	const {
+diff --git a/packages/blocks/src/api/test/factory.js b/packages/blocks/src/api/test/factory.js
+index bb517b5c39d1c1..590bbd3b06eef8 100644
+--- a/packages/blocks/src/api/test/factory.js
++++ b/packages/blocks/src/api/test/factory.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import deepFreeze from 'deep-freeze';
+-import { noop, times } from 'lodash';
++import { times } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+@@ -27,6 +27,8 @@ import {
+ 	setGroupingBlockName,
+ } from '../registration';
+ 
++const noop = () => {};
++
+ describe( 'block factory', () => {
+ 	const defaultBlockSettings = {
+ 		attributes: {
+diff --git a/packages/blocks/src/api/test/registration.js b/packages/blocks/src/api/test/registration.js
+index bda9e864a7ed66..3da5264e353425 100644
+--- a/packages/blocks/src/api/test/registration.js
++++ b/packages/blocks/src/api/test/registration.js
+@@ -3,7 +3,7 @@
+ /**
+  * External dependencies
+  */
+-import { noop, get, omit, pick } from 'lodash';
++import { get, omit, pick } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -38,6 +38,8 @@ import {
+ import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
+ import { store as blocksStore } from '../../store';
+ 
++const noop = () => {};
++
+ describe( 'blocks', () => {
+ 	const defaultBlockSettings = {
+ 		save: noop,
+diff --git a/packages/blocks/src/api/test/templates.js b/packages/blocks/src/api/test/templates.js
+index bd2861eded10dd..0a23505f0ac036 100644
+--- a/packages/blocks/src/api/test/templates.js
++++ b/packages/blocks/src/api/test/templates.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -17,6 +12,8 @@ import {
+ 	synchronizeBlocksWithTemplate,
+ } from '../templates';
+ 
++const noop = () => {};
++
+ describe( 'templates', () => {
+ 	beforeAll( () => {
+ 		// Initialize the block store.
+diff --git a/packages/blocks/src/api/test/utils.js b/packages/blocks/src/api/test/utils.js
+index 1d7bbc60320b9b..9bfef69c4c1428 100644
+--- a/packages/blocks/src/api/test/utils.js
++++ b/packages/blocks/src/api/test/utils.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -21,6 +16,8 @@ import {
+ 	__experimentalGetBlockAttributesNamesByRole,
+ } from '../utils';
+ 
++const noop = () => {};
++
+ describe( 'block helpers', () => {
+ 	beforeAll( () => {
+ 		// Initialize the block store.
+diff --git a/packages/components/src/alignment-matrix-control/index.js b/packages/components/src/alignment-matrix-control/index.js
+index eac1fd2e77ab3a..cd84e4e7cdb56f 100644
+--- a/packages/components/src/alignment-matrix-control/index.js
++++ b/packages/components/src/alignment-matrix-control/index.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { noop } from 'lodash';
+ import classnames from 'classnames';
+ 
+ /**
+@@ -20,6 +19,8 @@ import { Root, Row } from './styles/alignment-matrix-control-styles';
+ import AlignmentMatrixControlIcon from './icon';
+ import { GRID, getItemId } from './utils';
+ 
++const noop = () => {};
++
+ function useBaseId( id ) {
+ 	const instanceId = useInstanceId(
+ 		AlignmentMatrixControl,
+diff --git a/packages/components/src/box-control/all-input-control.js b/packages/components/src/box-control/all-input-control.js
+index 98b828603df1cf..5a1c8cbb07048e 100644
+--- a/packages/components/src/box-control/all-input-control.js
++++ b/packages/components/src/box-control/all-input-control.js
+@@ -1,7 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+ /**
+  * Internal dependencies
+  */
+@@ -14,6 +10,8 @@ import {
+ 	isValuesDefined,
+ } from './utils';
+ 
++const noop = () => {};
++
+ export default function AllInputControl( {
+ 	onChange = noop,
+ 	onFocus = noop,
+diff --git a/packages/components/src/box-control/index.js b/packages/components/src/box-control/index.js
+index cbd11e19954353..63305c7b956d6d 100644
+--- a/packages/components/src/box-control/index.js
++++ b/packages/components/src/box-control/index.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -39,6 +34,8 @@ const defaultInputProps = {
+ 	min: 0,
+ };
+ 
++const noop = () => {};
++
+ function useUniqueId( idProp ) {
+ 	const instanceId = useInstanceId( BoxControl, 'inspector-box-control' );
+ 
+diff --git a/packages/components/src/box-control/input-controls.js b/packages/components/src/box-control/input-controls.js
+index ac8f58f7b58a63..680881e98ebfcd 100644
+--- a/packages/components/src/box-control/input-controls.js
++++ b/packages/components/src/box-control/input-controls.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -11,6 +6,8 @@ import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
+ import { ALL_SIDES, LABELS } from './utils';
+ import { LayoutContainer, Layout } from './styles/box-control-styles';
+ 
++const noop = () => {};
++
+ export default function BoxInputControls( {
+ 	onChange = noop,
+ 	onFocus = noop,
+diff --git a/packages/components/src/box-control/unit-control.js b/packages/components/src/box-control/unit-control.js
+index 5466fe4dce4e64..df4fac9c98935a 100644
+--- a/packages/components/src/box-control/unit-control.js
++++ b/packages/components/src/box-control/unit-control.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { noop } from 'lodash';
+ import { useHover } from '@use-gesture/react';
+ 
+ /**
+@@ -10,6 +9,8 @@ import { useHover } from '@use-gesture/react';
+ import BaseTooltip from '../tooltip';
+ import { UnitControlWrapper, UnitControl } from './styles/box-control-styles';
+ 
++const noop = () => {};
++
+ export default function BoxUnitControl( {
+ 	isFirst,
+ 	isLast,
+diff --git a/packages/components/src/checkbox-control/test/index.tsx b/packages/components/src/checkbox-control/test/index.tsx
+index 478a0c8465f9fa..2c603105dbb70c 100644
+--- a/packages/components/src/checkbox-control/test/index.tsx
++++ b/packages/components/src/checkbox-control/test/index.tsx
+@@ -3,7 +3,6 @@
+  */
+ import { render, screen } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+-import { noop } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,6 +15,8 @@ import { useState } from '@wordpress/element';
+ import BaseCheckboxControl from '..';
+ import type { CheckboxControlProps } from '../types';
+ 
++const noop = () => {};
++
+ const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
+ 
+ const CheckboxControl = ( props: Omit< CheckboxControlProps, 'onChange' > ) => {
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index 146f423f4d30b6..ce01422b65fa87 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { noop, deburr } from 'lodash';
++import { deburr } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+@@ -29,6 +29,8 @@ import Button from '../button';
+ import { Flex, FlexBlock, FlexItem } from '../flex';
+ import withFocusOutside from '../higher-order/with-focus-outside';
+ 
++const noop = () => {};
++
+ const DetectOutside = withFocusOutside(
+ 	class extends Component {
+ 		handleFocusOutside( event ) {
+diff --git a/packages/components/src/date-time/date-time/index.tsx b/packages/components/src/date-time/date-time/index.tsx
+index 0f9997403c3631..d469ee777eb2ee 100644
+--- a/packages/components/src/date-time/date-time/index.tsx
++++ b/packages/components/src/date-time/date-time/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { noop } from 'lodash';
+ import type { ForwardedRef } from 'react';
+ 
+ /**
+@@ -25,6 +24,8 @@ import { Spacer } from '../../spacer';
+ 
+ export { DatePicker, TimePicker };
+ 
++const noop = () => {};
++
+ function UnforwardedDateTimePicker(
+ 	{
+ 		currentDate,
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index 089248fd33c6d4..fbfdd9d26c14f3 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -3,7 +3,6 @@
+  */
+ import moment from 'moment';
+ import type { Moment } from 'moment';
+-import { noop } from 'lodash';
+ // Needed to initialise the default datepicker styles.
+ // See: https://github.com/airbnb/react-dates#initialize
+ import 'react-dates/initialize';
+@@ -27,6 +26,7 @@ import { Day, NavPrevButton, NavNextButton } from './styles';
+ 
+ const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+ const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
++const noop = () => {};
+ 
+ function DatePickerDay( { day, events = [] }: DatePickerDayProps ) {
+ 	const ref = useRef< HTMLDivElement >( null );
+diff --git a/packages/components/src/focal-point-picker/controls.js b/packages/components/src/focal-point-picker/controls.js
+index 8158c9508c5cf4..c001aa866ca130 100644
+--- a/packages/components/src/focal-point-picker/controls.js
++++ b/packages/components/src/focal-point-picker/controls.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -19,6 +14,7 @@ import { fractionToPercentage } from './utils';
+ 
+ const TEXTCONTROL_MIN = 0;
+ const TEXTCONTROL_MAX = 100;
++const noop = () => {};
+ 
+ export default function FocalPointPickerControls( {
+ 	onChange = noop,
+diff --git a/packages/components/src/focal-point-picker/media.js b/packages/components/src/focal-point-picker/media.js
+index 26639cc51c557d..fb4c3748e84b16 100644
+--- a/packages/components/src/focal-point-picker/media.js
++++ b/packages/components/src/focal-point-picker/media.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -14,6 +9,8 @@ import { useRef, useLayoutEffect } from '@wordpress/element';
+ import { MediaPlaceholder } from './styles/focal-point-picker-style';
+ import { isVideoType } from './utils';
+ 
++const noop = () => {};
++
+ export default function Media( {
+ 	alt,
+ 	autoPlay,
+diff --git a/packages/components/src/form-toggle/index.js b/packages/components/src/form-toggle/index.js
+index 4e5de8f4fdb9ed..8714958ae48c4b 100644
+--- a/packages/components/src/form-toggle/index.js
++++ b/packages/components/src/form-toggle/index.js
+@@ -2,7 +2,8 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { noop } from 'lodash';
++
++export const noop = () => {};
+ 
+ function FormToggle( {
+ 	className,
+diff --git a/packages/components/src/form-toggle/test/index.js b/packages/components/src/form-toggle/test/index.js
+index 8d64abb164746d..9f9c3b84f27644 100644
+--- a/packages/components/src/form-toggle/test/index.js
++++ b/packages/components/src/form-toggle/test/index.js
+@@ -2,12 +2,11 @@
+  * External dependencies
+  */
+ import { shallow } from 'enzyme';
+-import { noop } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+  */
+-import FormToggle from '../';
++import FormToggle, { noop } from '../';
+ 
+ describe( 'FormToggle', () => {
+ 	describe( 'basic rendering', () => {
+diff --git a/packages/components/src/form-token-field/token.tsx b/packages/components/src/form-token-field/token.tsx
+index 84e5c0b4f491a9..9d2c522037d8e9 100644
+--- a/packages/components/src/form-token-field/token.tsx
++++ b/packages/components/src/form-token-field/token.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { noop } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -18,6 +17,8 @@ import Button from '../button';
+ import { VisuallyHidden } from '../visually-hidden';
+ import type { TokenProps } from './types';
+ 
++const noop = () => {};
++
+ export default function Token( {
+ 	value,
+ 	status,
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index c3f4de5396a029..ffec6a8a5a7f2b 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { noop } from 'lodash';
+ import classNames from 'classnames';
+ import type { ForwardedRef } from 'react';
+ 
+@@ -19,6 +18,8 @@ import InputField from './input-field';
+ import type { InputControlProps } from './types';
+ import { useDraft } from './utils';
+ 
++const noop = () => {};
++
+ function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( InputControl );
+ 	const id = `inspector-input-control-${ instanceId }`;
+diff --git a/packages/components/src/input-control/input-field.tsx b/packages/components/src/input-control/input-field.tsx
+index 744f7f93c79dc6..77a69aa259d207 100644
+--- a/packages/components/src/input-control/input-field.tsx
++++ b/packages/components/src/input-control/input-field.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { noop } from 'lodash';
+ import { useDrag } from '@use-gesture/react';
+ import type {
+ 	SyntheticEvent,
+@@ -26,6 +25,8 @@ import { Input } from './styles/input-control-styles';
+ import { useInputControlStateReducer } from './reducer/reducer';
+ import type { InputFieldProps } from './types';
+ 
++const noop = () => {};
++
+ function InputField(
+ 	{
+ 		disabled = false,
+diff --git a/packages/components/src/menu-item/test/index.js b/packages/components/src/menu-item/test/index.js
+index 3d1a66013f5cd9..7d230b3c0264b3 100644
+--- a/packages/components/src/menu-item/test/index.js
++++ b/packages/components/src/menu-item/test/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { shallow } from 'enzyme';
+-import { noop } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -14,6 +13,8 @@ import { more } from '@wordpress/icons';
+  */
+ import { MenuItem } from '../';
+ 
++const noop = () => {};
++
+ describe( 'MenuItem', () => {
+ 	it( 'should match snapshot when only label provided', () => {
+ 		const wrapper = shallow( <MenuItem>My item</MenuItem> );
+diff --git a/packages/components/src/menu-items-choice/index.js b/packages/components/src/menu-items-choice/index.js
+index 467ad476e3865d..33a24cfb879634 100644
+--- a/packages/components/src/menu-items-choice/index.js
++++ b/packages/components/src/menu-items-choice/index.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -13,6 +8,8 @@ import { check } from '@wordpress/icons';
+  */
+ import MenuItem from '../menu-item';
+ 
++const noop = () => {};
++
+ export default function MenuItemsChoice( {
+ 	choices = [],
+ 	onHover = noop,
+diff --git a/packages/components/src/navigable-container/container.js b/packages/components/src/navigable-container/container.js
+index 209697106af134..c74ad66ba372e2 100644
+--- a/packages/components/src/navigable-container/container.js
++++ b/packages/components/src/navigable-container/container.js
+@@ -2,7 +2,7 @@
+ /**
+  * External dependencies
+  */
+-import { omit, noop, isFunction } from 'lodash';
++import { omit, isFunction } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -10,6 +10,7 @@ import { omit, noop, isFunction } from 'lodash';
+ import { Component, forwardRef } from '@wordpress/element';
+ import { focus } from '@wordpress/dom';
+ 
++const noop = () => {};
+ const MENU_ITEM_ROLES = [ 'menuitem', 'menuitemradio', 'menuitemcheckbox' ];
+ 
+ function cycleValue( value, total, offset ) {
+diff --git a/packages/components/src/navigation/context.js b/packages/components/src/navigation/context.js
+index 5f47fd9b48d812..58fcb9712a22eb 100644
+--- a/packages/components/src/navigation/context.js
++++ b/packages/components/src/navigation/context.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -13,6 +8,8 @@ import { createContext, useContext } from '@wordpress/element';
+  */
+ import { ROOT_MENU } from './constants';
+ 
++const noop = () => {};
++
+ export const NavigationContext = createContext( {
+ 	activeItem: undefined,
+ 	activeMenu: ROOT_MENU,
+diff --git a/packages/components/src/navigation/index.js b/packages/components/src/navigation/index.js
+index 8f9f2bba506c36..c2c942b943d17e 100644
+--- a/packages/components/src/navigation/index.js
++++ b/packages/components/src/navigation/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { noop } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -19,6 +18,8 @@ import { NavigationContext } from './context';
+ import { NavigationUI } from './styles/navigation-styles';
+ import { useCreateNavigationTree } from './use-create-navigation-tree';
+ 
++const noop = () => {};
++
+ export default function Navigation( {
+ 	activeItem,
+ 	activeMenu = ROOT_MENU,
+diff --git a/packages/components/src/navigation/item/index.js b/packages/components/src/navigation/item/index.js
+index 6abfcde37fa204..7f9369b5c9e2bd 100644
+--- a/packages/components/src/navigation/item/index.js
++++ b/packages/components/src/navigation/item/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { noop } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -19,6 +18,8 @@ import { ItemUI, ItemIconUI } from '../styles/navigation-styles';
+ import NavigationItemBaseContent from './base-content';
+ import NavigationItemBase from './base';
+ 
++const noop = () => {};
++
+ export default function NavigationItem( props ) {
+ 	const {
+ 		badge,
+diff --git a/packages/components/src/notice/index.js b/packages/components/src/notice/index.js
+index f203abc126549b..df14240957d91d 100644
+--- a/packages/components/src/notice/index.js
++++ b/packages/components/src/notice/index.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { noop } from 'lodash';
+ import classnames from 'classnames';
+ 
+ /**
+@@ -19,6 +18,8 @@ import { Button } from '../';
+ 
+ /** @typedef {import('@wordpress/element').WPElement} WPElement */
+ 
++const noop = () => {};
++
+ /**
+  * Custom hook which announces the message with the given politeness, if a
+  * valid message is provided.
+diff --git a/packages/components/src/notice/list.js b/packages/components/src/notice/list.js
+index 98422a9c6316bd..d410aab6482925 100644
+--- a/packages/components/src/notice/list.js
++++ b/packages/components/src/notice/list.js
+@@ -2,13 +2,15 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { noop, omit } from 'lodash';
++import { omit } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Notice from './';
+ 
++const noop = () => {};
++
+ /**
+  * Renders a list of notices.
+  *
+diff --git a/packages/components/src/panel/body.js b/packages/components/src/panel/body.js
+index a62d72d403a95e..f47d0be42ad00f 100644
+--- a/packages/components/src/panel/body.js
++++ b/packages/components/src/panel/body.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { noop } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -18,6 +17,8 @@ import Button from '../button';
+ import Icon from '../icon';
+ import { useControlledState, useUpdateEffect } from '../utils';
+ 
++const noop = () => {};
++
+ export function PanelBody(
+ 	{
+ 		buttonProps = {},
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index fb64ec8ea9b6cc..df3182df653433 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -3,7 +3,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { clamp, isFinite, noop } from 'lodash';
++import { clamp, isFinite } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -35,6 +35,8 @@ import {
+ 	Wrapper,
+ } from './styles/range-control-styles';
+ 
++const noop = () => {};
++
+ function RangeControl(
+ 	{
+ 		afterIcon,
+diff --git a/packages/components/src/range-control/input-range.js b/packages/components/src/range-control/input-range.js
+index ddc091b60de8d3..9de136f2ca54b8 100644
+--- a/packages/components/src/range-control/input-range.js
++++ b/packages/components/src/range-control/input-range.js
+@@ -1,9 +1,4 @@
+ // @ts-nocheck
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -15,6 +10,8 @@ import { forwardRef } from '@wordpress/element';
+ import { InputRange as BaseInputRange } from './styles/range-control-styles';
+ import { useDebouncedHoverInteraction } from './utils';
+ 
++const noop = () => {};
++
+ function InputRange(
+ 	{
+ 		describedBy,
+diff --git a/packages/components/src/range-control/utils.js b/packages/components/src/range-control/utils.js
+index e2a758a6b4f1cf..dfbbdd08ab37bd 100644
+--- a/packages/components/src/range-control/utils.js
++++ b/packages/components/src/range-control/utils.js
+@@ -2,7 +2,7 @@
+ /**
+  * External dependencies
+  */
+-import { clamp, noop } from 'lodash';
++import { clamp } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -14,6 +14,8 @@ import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
+  */
+ import { useControlledState } from '../utils/hooks';
+ 
++const noop = () => {};
++
+ /**
+  * A float supported clamp function for a specific value.
+  *
+diff --git a/packages/components/src/resizable-box/resize-tooltip/index.tsx b/packages/components/src/resizable-box/resize-tooltip/index.tsx
+index 38c4206c20e628..53969a664a8635 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/index.tsx
++++ b/packages/components/src/resizable-box/resize-tooltip/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { noop } from 'lodash';
+ import classnames from 'classnames';
+ import type { Ref, ForwardedRef } from 'react';
+ 
+@@ -30,6 +29,8 @@ type ResizeTooltipProps = React.ComponentProps< typeof Root > & {
+ 	zIndex?: number;
+ };
+ 
++const noop = () => {};
++
+ function ResizeTooltip(
+ 	{
+ 		axis,
+diff --git a/packages/components/src/resizable-box/resize-tooltip/utils.ts b/packages/components/src/resizable-box/resize-tooltip/utils.ts
+index 2e75f1e831e13d..fac92b6e5f7e24 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/utils.ts
++++ b/packages/components/src/resizable-box/resize-tooltip/utils.ts
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -10,6 +5,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
+ import { useResizeObserver } from '@wordpress/compose';
+ 
+ const { clearTimeout, setTimeout } = window;
++const noop = () => {};
+ 
+ export type Axis = 'x' | 'y';
+ 
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index fc5f36c32d5bc7..3b43b66651b272 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEmpty, noop } from 'lodash';
++import { isEmpty } from 'lodash';
+ import classNames from 'classnames';
+ import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
+ 
+@@ -21,6 +21,8 @@ import { Select, DownArrowWrapper } from './styles/select-control-styles';
+ import type { WordPressComponentProps } from '../ui/context';
+ import type { SelectControlProps } from './types';
+ 
++const noop = () => {};
++
+ function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( SelectControl );
+ 	const id = `inspector-select-control-${ instanceId }`;
+diff --git a/packages/components/src/snackbar/index.js b/packages/components/src/snackbar/index.js
+index 923474f31a3088..05afc83a944d21 100644
+--- a/packages/components/src/snackbar/index.js
++++ b/packages/components/src/snackbar/index.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { noop } from 'lodash';
+ import classnames from 'classnames';
+ 
+ /**
+@@ -17,6 +16,7 @@ import warning from '@wordpress/warning';
+  */
+ import { Button } from '../';
+ 
++const noop = () => {};
+ const NOTICE_TIMEOUT = 10000;
+ 
+ /** @typedef {import('@wordpress/element').WPElement} WPElement */
+diff --git a/packages/components/src/snackbar/list.js b/packages/components/src/snackbar/list.js
+index ad809197a1823a..a3ab499a543d28 100644
+--- a/packages/components/src/snackbar/list.js
++++ b/packages/components/src/snackbar/list.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { omit, noop } from 'lodash';
++import { omit } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -19,6 +19,7 @@ import {
+ 	__unstableAnimatePresence as AnimatePresence,
+ } from '../animation';
+ 
++const noop = () => {};
+ const SNACKBAR_VARIANTS = {
+ 	init: {
+ 		height: 0,
+diff --git a/packages/components/src/tab-panel/index.js b/packages/components/src/tab-panel/index.js
+index c5423975e5ec16..d6124798c19de3 100644
+--- a/packages/components/src/tab-panel/index.js
++++ b/packages/components/src/tab-panel/index.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { partial, noop, find } from 'lodash';
++import { partial, find } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,6 +16,8 @@ import { useInstanceId } from '@wordpress/compose';
+ import { NavigableMenu } from '../navigable-container';
+ import Button from '../button';
+ 
++const noop = () => {};
++
+ const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
+ 	<Button
+ 		role="tab"
+diff --git a/packages/components/src/utils/hooks/test/use-controlled-state.js b/packages/components/src/utils/hooks/test/use-controlled-state.js
+index 2e869a4270028b..029d164c0e723c 100644
+--- a/packages/components/src/utils/hooks/test/use-controlled-state.js
++++ b/packages/components/src/utils/hooks/test/use-controlled-state.js
+@@ -2,13 +2,14 @@
+  * External dependencies
+  */
+ import { render, fireEvent, screen } from '@testing-library/react';
+-import { noop } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+  */
+ import useControlledState from '../use-controlled-state';
+ 
++const noop = () => {};
++
+ describe( 'hooks', () => {
+ 	const getInput = () => screen.getByTestId( 'input' );
+ 
+diff --git a/packages/dependency-extraction-webpack-plugin/test/__snapshots__/build.js.snap b/packages/dependency-extraction-webpack-plugin/test/__snapshots__/build.js.snap
+index c12405c10b1f69..4d7ba179f81122 100644
+--- a/packages/dependency-extraction-webpack-plugin/test/__snapshots__/build.js.snap
++++ b/packages/dependency-extraction-webpack-plugin/test/__snapshots__/build.js.snap
+@@ -32,17 +32,12 @@ Array [
+ `;
+ 
+ exports[`DependencyExtractionWebpackPlugin Webpack \`dynamic-import\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+-"<?php return array('dependencies' => array('lodash', 'wp-blob'), 'version' => '3b0a96e3e47e0db92969');
++"<?php return array('dependencies' => array('wp-blob'), 'version' => 'c8be4fceac30d1d00ca7');
+ "
+ `;
+ 
+ exports[`DependencyExtractionWebpackPlugin Webpack \`dynamic-import\` should produce expected output: External modules should match snapshot 1`] = `
+ Array [
+-  Object {
+-    "externalType": "window",
+-    "request": "lodash",
+-    "userRequest": "lodash",
+-  },
+   Object {
+     "externalType": "window",
+     "request": Array [
+diff --git a/packages/dependency-extraction-webpack-plugin/test/fixtures/dynamic-import/index.js b/packages/dependency-extraction-webpack-plugin/test/fixtures/dynamic-import/index.js
+index 419272a48cffb8..dd51b35d6603aa 100644
+--- a/packages/dependency-extraction-webpack-plugin/test/fixtures/dynamic-import/index.js
++++ b/packages/dependency-extraction-webpack-plugin/test/fixtures/dynamic-import/index.js
+@@ -1,6 +1 @@
+-/**
+- * External dependencies
+- */
+-import _ from 'lodash';
+-
+-import( './util' ).then( _.noop );
++import( './util' ).then( () => {} );
+diff --git a/packages/dom/src/dom/clean-node-list.js b/packages/dom/src/dom/clean-node-list.js
+index ac1f2d039958e6..387efcd5c5be7b 100644
+--- a/packages/dom/src/dom/clean-node-list.js
++++ b/packages/dom/src/dom/clean-node-list.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { includes, noop } from 'lodash';
++import { includes } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+@@ -13,6 +13,8 @@ import { isPhrasingContent } from '../phrasing-content';
+ import insertAfter from './insert-after';
+ import isElement from './is-element';
+ 
++const noop = () => {};
++
+ /* eslint-disable jsdoc/valid-types */
+ /**
+  * @typedef SchemaItem
+diff --git a/packages/edit-navigation/src/components/menu-switcher/index.js b/packages/edit-navigation/src/components/menu-switcher/index.js
+index a90dc3648c6570..ef13c1dcc47b5f 100644
+--- a/packages/edit-navigation/src/components/menu-switcher/index.js
++++ b/packages/edit-navigation/src/components/menu-switcher/index.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -21,6 +16,8 @@ import { decodeEntities } from '@wordpress/html-entities';
+  */
+ import AddMenu from '../add-menu';
+ 
++const noop = () => {};
++
+ export default function MenuSwitcher( {
+ 	menus,
+ 	selectedMenuId,
+diff --git a/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/index.js b/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/index.js
+index c8bc43fe9b4ec8..c98109412b8791 100644
+--- a/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/index.js
++++ b/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/index.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { noop } from 'lodash';
+ import { shallow } from 'enzyme';
+ 
+ /**
+@@ -9,6 +8,8 @@ import { shallow } from 'enzyme';
+  */
+ import { KeyboardShortcutHelpModal } from '../index';
+ 
++const noop = () => {};
++
+ describe( 'KeyboardShortcutHelpModal', () => {
+ 	it( 'should match snapshot when the modal is active', () => {
+ 		const wrapper = shallow(
+diff --git a/packages/edit-post/src/components/visual-editor/block-inspector-button.js b/packages/edit-post/src/components/visual-editor/block-inspector-button.js
+index 916abc9e35cd93..7345befd492090 100644
+--- a/packages/edit-post/src/components/visual-editor/block-inspector-button.js
++++ b/packages/edit-post/src/components/visual-editor/block-inspector-button.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -17,6 +12,8 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+  */
+ import { store as editPostStore } from '../../store';
+ 
++const noop = () => {};
++
+ export function BlockInspectorButton( { onClick = noop, small = false } ) {
+ 	const { shortcut, areAdvancedSettingsOpened } = useSelect(
+ 		( select ) => ( {
+diff --git a/packages/edit-site/src/components/global-styles/gradients-palette-panel.js b/packages/edit-site/src/components/global-styles/gradients-palette-panel.js
+index 4aa3e3b37403d3..e90837d25b91de 100644
+--- a/packages/edit-site/src/components/global-styles/gradients-palette-panel.js
++++ b/packages/edit-site/src/components/global-styles/gradients-palette-panel.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -20,6 +15,8 @@ import { __ } from '@wordpress/i18n';
+ import { useSetting } from './hooks';
+ import Subtitle from './subtitle';
+ 
++const noop = () => {};
++
+ export default function GradientPalettePanel( { name } ) {
+ 	const [ themeGradients, setThemeGradients ] = useSetting(
+ 		'color.gradients.theme',
+diff --git a/packages/editor/src/components/post-publish-button/index.js b/packages/editor/src/components/post-publish-button/index.js
+index d17cf77dd95ebd..035a03b26da3d2 100644
+--- a/packages/editor/src/components/post-publish-button/index.js
++++ b/packages/editor/src/components/post-publish-button/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { noop, get, some } from 'lodash';
++import { get, some } from 'lodash';
+ import classnames from 'classnames';
+ 
+ /**
+@@ -19,6 +19,8 @@ import { __ } from '@wordpress/i18n';
+ import PublishButtonLabel from './label';
+ import { store as editorStore } from '../../store';
+ 
++const noop = () => {};
++
+ export class PostPublishButton extends Component {
+ 	constructor( props ) {
+ 		super( props );
+diff --git a/packages/editor/src/utils/media-upload/index.js b/packages/editor/src/utils/media-upload/index.js
+index f02e7ef80312bc..036d925034bb86 100644
+--- a/packages/editor/src/utils/media-upload/index.js
++++ b/packages/editor/src/utils/media-upload/index.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -14,6 +9,8 @@ import { uploadMedia } from '@wordpress/media-utils';
+  */
+ import { store as editorStore } from '../../store';
+ 
++const noop = () => {};
++
+ /**
+  * Upload a media file when the file upload button is activated.
+  * Wrapper around mediaUpload() that injects the current post ID.
+diff --git a/packages/element/src/test/serialize.js b/packages/element/src/test/serialize.js
+index cc0f188512d953..cec9bb171a26f5 100644
+--- a/packages/element/src/test/serialize.js
++++ b/packages/element/src/test/serialize.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -24,6 +19,8 @@ import serialize, {
+ 	renderStyle,
+ } from '../serialize';
+ 
++const noop = () => {};
++
+ describe( 'serialize()', () => {
+ 	it( 'should allow only valid attribute names', () => {
+ 		const element = createElement( 'div', {
+diff --git a/packages/interface/src/components/action-item/index.js b/packages/interface/src/components/action-item/index.js
+index b19a573f1016b0..33cc6801e25975 100644
+--- a/packages/interface/src/components/action-item/index.js
++++ b/packages/interface/src/components/action-item/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEmpty, noop } from 'lodash';
++import { isEmpty } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -9,6 +9,8 @@ import { isEmpty, noop } from 'lodash';
+ import { ButtonGroup, Button, Slot, Fill } from '@wordpress/components';
+ import { Children } from '@wordpress/element';
+ 
++const noop = () => {};
++
+ function ActionItemSlot( {
+ 	name,
+ 	as: Component = ButtonGroup,
+diff --git a/packages/media-utils/src/utils/upload-media.js b/packages/media-utils/src/utils/upload-media.js
+index 1d55327bcb53ac..3232ee065c95dd 100644
+--- a/packages/media-utils/src/utils/upload-media.js
++++ b/packages/media-utils/src/utils/upload-media.js
+@@ -9,7 +9,6 @@ import {
+ 	has,
+ 	includes,
+ 	map,
+-	noop,
+ 	omit,
+ 	some,
+ 	startsWith,
+@@ -22,6 +21,8 @@ import apiFetch from '@wordpress/api-fetch';
+ import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
+ import { __, sprintf } from '@wordpress/i18n';
+ 
++const noop = () => {};
++
+ /**
+  * Browsers may use unexpected mime types, and they differ from browser to browser.
+  * This function computes a flexible array of mime types from the mime type structured provided by the server.
+diff --git a/packages/nux/src/components/dot-tip/test/index.js b/packages/nux/src/components/dot-tip/test/index.js
+index b1c6b206d5ec63..e81097ac6c4ee5 100644
+--- a/packages/nux/src/components/dot-tip/test/index.js
++++ b/packages/nux/src/components/dot-tip/test/index.js
+@@ -2,13 +2,14 @@
+  * External dependencies
+  */
+ import { shallow } from 'enzyme';
+-import { noop } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { DotTip } from '..';
+ 
++const noop = () => {};
++
+ describe( 'DotTip', () => {
+ 	it( 'should not render anything if invisible', () => {
+ 		const wrapper = shallow(
+diff --git a/packages/rich-text/src/test/get-format-type.js b/packages/rich-text/src/test/get-format-type.js
+index edbb3d719d4f7b..ad73d262656195 100644
+--- a/packages/rich-text/src/test/get-format-type.js
++++ b/packages/rich-text/src/test/get-format-type.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -11,6 +6,8 @@ import { unregisterFormatType } from '../unregister-format-type';
+ import { registerFormatType } from '../register-format-type';
+ import { getFormatTypes } from '../get-format-types';
+ 
++const noop = () => {};
++
+ describe( 'getFormatType', () => {
+ 	beforeAll( () => {
+ 		// Initialize the rich-text store.
+diff --git a/packages/rich-text/src/test/get-format-types.js b/packages/rich-text/src/test/get-format-types.js
+index 918234ceaeb3ca..9b26a19558bfa1 100644
+--- a/packages/rich-text/src/test/get-format-types.js
++++ b/packages/rich-text/src/test/get-format-types.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -10,6 +5,8 @@ import { getFormatTypes } from '../get-format-types';
+ import { unregisterFormatType } from '../unregister-format-type';
+ import { registerFormatType } from '../register-format-type';
+ 
++const noop = () => {};
++
+ describe( 'getFormatTypes', () => {
+ 	beforeAll( () => {
+ 		// Initialize the rich-text store.
+diff --git a/packages/rich-text/src/test/unregister-format-type.js b/packages/rich-text/src/test/unregister-format-type.js
+index 0da7b8c481ee32..1de27237a26855 100644
+--- a/packages/rich-text/src/test/unregister-format-type.js
++++ b/packages/rich-text/src/test/unregister-format-type.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -11,6 +6,8 @@ import { registerFormatType } from '../register-format-type';
+ import { getFormatTypes } from '../get-format-types';
+ import { getFormatType } from '../get-format-type';
+ 
++const noop = () => {};
++
+ describe( 'unregisterFormatType', () => {
+ 	const defaultFormatSettings = {
+ 		edit: noop,

@@ -1,0 +1,1298 @@
+diff --git a/packages/components/src/ui/card/README.md b/packages/components/src/ui/card/README.md
+new file mode 100644
+index 00000000000000..8d32157fd55c8c
+--- /dev/null
++++ b/packages/components/src/ui/card/README.md
+@@ -0,0 +1,100 @@
++# Card
++
++`Card` groups similar concepts and tasks together. `Card`'s background is rendered with a `Surface`.
++
++## Usage
++
++`Card` provides convenient sub-components such as `CardBody`, `CardHeader`, and `CardFooter`.
++
++```jsx live
++import {
++	Card,
++	CardHeader,
++	CardBody,
++	CardFooter,
++	Text,
++} from '@wordpress/components/ui';
++
++function Example() {
++	return (
++		<Card>
++			<CardHeader>
++				<Heading size={4}>Card Title</Heading>
++			</CardHeader>
++			<CardBody>
++				<Text>Card Content</Text>
++			</CardBody>
++			<CardFooter>
++				<Text>Card Footer</Text>
++			</CardFooter>
++		</Card>
++	);
++}
++```
++
++## Props
++
++##### backgroundSize
++
++**Type**: `number`
++
++Determines the grid size for "dotted" and "grid" variants.
++
++##### border
++
++**Type**: `boolean`
++
++Renders a border around the entire `Surface`.
++
++##### borderBottom
++
++**Type**: `boolean`
++
++Renders a bottom border.
++
++##### borderLeft
++
++**Type**: `boolean`
++
++Renders a left border.
++
++##### borderRight
++
++**Type**: `boolean`
++
++Renders a right border.
++
++##### borderTop
++
++**Type**: `boolean`
++
++Renders a top border.
++
++##### elevation
++
++**Type**: `number`
++
++Size of the elevation shadow, based on the Style system's elevation system.
++Elevating a `Card` can be done by adjusting the `elevation` prop. This may be helpful in highlighting certain content. For more information, check out `Elevation`.
++
++##### isBorderless
++
++**Type**: `boolean`
++
++Renders without a border.
++
++##### isRounded
++
++**Type**: `boolean`
++
++Renders with rounded corners.
++
++##### variant
++
++**Type**: `"grid"`,`"primary"`,`"secondary"`,`"tertiary"`,`"dotted"`
++
++Modifies the background color of `Surface`.
++
++-   `primary`: Used for almost all cases.
++-   `secondary`: Used as a secondary background for inner `Surface` components.
++-   `tertiary`: Used as the app/site wide background. Visible in **dark mode** only. Use case is rare.
+diff --git a/packages/components/src/ui/card/body.js b/packages/components/src/ui/card/body.js
+new file mode 100644
+index 00000000000000..0da8e87bcc5aa9
+--- /dev/null
++++ b/packages/components/src/ui/card/body.js
+@@ -0,0 +1,66 @@
++/**
++ * External dependencies
++ */
++import { contextConnect, useContextSystem } from '@wp-g2/context';
++import { cx } from '@wp-g2/styles';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { Scrollable } from '../scrollable';
++import { View } from '../view';
++import * as styles from './styles';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').CardBodyProps, 'div'>} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function CardBody( props, forwardedRef ) {
++	const { className, scrollable = true, ...otherProps } = useContextSystem(
++		props,
++		'CardBody'
++	);
++
++	const classes = useMemo(
++		() => cx( styles.Body, styles.borderRadius, className ),
++		[ className ]
++	);
++
++	if ( scrollable ) {
++		return (
++			<Scrollable
++				{ ...otherProps }
++				className={ classes }
++				ref={ forwardedRef }
++			/>
++		);
++	}
++
++	return (
++		<View { ...otherProps } className={ classes } ref={ forwardedRef } />
++	);
++}
++
++/**
++ * `CardBody` is a layout component, rendering the contents of a `Card`.
++ * Multiple `CardBody` components can be used within `Card` if needed.
++ *
++ * @example
++ * ```jsx
++ * import { Card, CardBody } from '@wordpress/components/ui';
++ *
++ * <Card>
++ * 	<CardBody>
++ * 		...
++ * 	</CardBody>
++ * </Card>
++ * ```
++ */
++const ConnectedCardBody = contextConnect( CardBody, 'CardBody' );
++
++export default ConnectedCardBody;
+diff --git a/packages/components/src/ui/card/component.js b/packages/components/src/ui/card/component.js
+new file mode 100644
+index 00000000000000..b6b4575c87d8ae
+--- /dev/null
++++ b/packages/components/src/ui/card/component.js
+@@ -0,0 +1,90 @@
++/**
++ * External dependencies
++ */
++import { contextConnect } from '@wp-g2/context';
++import { css, ui } from '@wp-g2/styles';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { Elevation } from '../elevation';
++import { View } from '../view';
++import * as styles from './styles';
++import { useCard } from './hook';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').CardProps, 'div'>} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function Card( props, forwardedRef ) {
++	const { children, elevation, isRounded = true, ...otherProps } = useCard(
++		props
++	);
++	const elevationBorderRadius = isRounded ? ui.get( 'cardBorderRadius' ) : 0;
++
++	const elevationClassName = useMemo(
++		() => css( { borderRadius: elevationBorderRadius } ),
++		[ elevationBorderRadius ]
++	);
++
++	return (
++		<View { ...otherProps } ref={ forwardedRef }>
++			<View { ...ui.$( 'CardContent' ) } css={ styles.Content }>
++				{ children }
++			</View>
++			<Elevation
++				className={ elevationClassName }
++				isInteractive={ false }
++				value={ elevation ? 1 : 0 }
++				{ ...ui.$( 'CardElevation' ) }
++			/>
++			<Elevation
++				className={ elevationClassName }
++				isInteractive={ false }
++				value={ elevation }
++				{ ...ui.$( 'CardElevation' ) }
++			/>
++		</View>
++	);
++}
++
++/**
++ * `Card` is a layout component, providing a flexible and extensible content container.
++ *
++ * `Card` provides convenient sub-components such as `CardBody`, `CardHeader`, and `CardFooter`.
++ *
++ * @example
++ * ```jsx
++ * import {
++ *   Card,
++ *   CardHeader,
++ *   CardBody,
++ *   CardFooter,
++ *   Text,
++ * } from `@wordpress/components/ui`
++ *
++ * function Example() {
++ *   return (
++ *     <Card>
++ *       <CardHeader>
++ *         <Heading size={ 4 }>Card Title</Heading>
++ *       </CardHeader>
++ *       <CardBody>
++ *         <Text>Card Content</Text>
++ *       </CardBody>
++ *       <CardFooter>
++ *         <Text>Card Footer</Text>
++ *       </CardFooter>
++ *     </Card>
++ *   );
++ * }
++ * ```
++ */
++const ConnectedCard = contextConnect( Card, 'Card' );
++
++export default ConnectedCard;
+diff --git a/packages/components/src/ui/card/footer.js b/packages/components/src/ui/card/footer.js
+new file mode 100644
+index 00000000000000..591d6d56aefa94
+--- /dev/null
++++ b/packages/components/src/ui/card/footer.js
+@@ -0,0 +1,66 @@
++/**
++ * External dependencies
++ */
++import { contextConnect, useContextSystem } from '@wp-g2/context';
++import { cx } from '@wp-g2/styles';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { Flex } from '../flex';
++import * as styles from './styles';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').CardFooterProps, 'div'>} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function CardFooter( props, forwardedRef ) {
++	const {
++		className,
++		justify = 'flex-end',
++		size = 'medium',
++		...otherProps
++	} = useContextSystem( props, 'CardFooter' );
++
++	const classes = useMemo(
++		() =>
++			cx(
++				styles.borderRadius,
++				styles.headerFooter,
++				styles[ size ],
++				className
++			),
++		[ className, size ]
++	);
++
++	return (
++		<Flex
++			{ ...otherProps }
++			className={ classes }
++			justify={ justify }
++			ref={ forwardedRef }
++		/>
++	);
++}
++
++/**
++ * `CardFooter` is a layout component, rendering the footer content of a `Card`.
++ *
++ * @example
++ * ```jsx
++ * import { Card, CardBody, CardFooter } from '@wordpress/components/ui';
++ *
++ * <Card>
++ * 	<CardBody>...</CardBody>
++ * 	<CardFooter>...</CardFooter>
++ * </Card>
++ * ```
++ */
++const ConnectedCardFooter = contextConnect( CardFooter, 'CardFooter' );
++
++export default ConnectedCardFooter;
+diff --git a/packages/components/src/ui/card/header.js b/packages/components/src/ui/card/header.js
+new file mode 100644
+index 00000000000000..ae4b7a0a0c0723
+--- /dev/null
++++ b/packages/components/src/ui/card/header.js
+@@ -0,0 +1,60 @@
++/**
++ * External dependencies
++ */
++import { contextConnect, useContextSystem } from '@wp-g2/context';
++import { cx } from '@wp-g2/styles';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { Flex } from '../flex';
++import * as styles from './styles';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').CardHeaderProps, 'div'>} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function CardHeader( props, forwardedRef ) {
++	const { className, size = 'medium', ...otherProps } = useContextSystem(
++		props,
++		'CardHeader'
++	);
++
++	const classes = useMemo(
++		() =>
++			cx(
++				styles.Header,
++				styles.borderRadius,
++				styles.headerFooter,
++				styles[ size ],
++				className
++			),
++		[ className, size ]
++	);
++
++	return (
++		<Flex { ...otherProps } className={ classes } ref={ forwardedRef } />
++	);
++}
++
++/**
++ * `CardHeader` is a layout component, rendering the header contents of a `Card`.
++ *
++ * @example
++ * ```jsx
++ * import { Card, CardBody, CardHeader } from '@wordpress/components/ui';
++ *
++ * <Card>
++ * 	<CardHeader>...</CardHeader>
++ * 	<CardBody>...</CardBody>
++ * </Card>
++ * ```
++ */
++const ConnectedCardHeader = contextConnect( CardHeader, 'CardHeader' );
++
++export default ConnectedCardHeader;
+diff --git a/packages/components/src/ui/card/hook.js b/packages/components/src/ui/card/hook.js
+new file mode 100644
+index 00000000000000..3a21d9365bb63b
+--- /dev/null
++++ b/packages/components/src/ui/card/hook.js
+@@ -0,0 +1,46 @@
++/**
++ * External dependencies
++ */
++import { useContextSystem } from '@wp-g2/context';
++import { cx } from '@wp-g2/styles';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useSurface } from '../surface';
++import * as styles from './styles';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').CardProps, 'div'>} props
++ */
++export function useCard( props ) {
++	const {
++		className,
++		elevation = 2,
++		isBorderless = false,
++		isRounded = true,
++		...otherProps
++	} = useContextSystem( props, 'Card' );
++
++	const classes = useMemo( () => {
++		return cx(
++			styles.Card,
++			isBorderless && styles.borderless,
++			isRounded && styles.rounded,
++			className
++		);
++	}, [ className, isBorderless, isRounded ] );
++
++	const surfaceProps = useSurface( { ...otherProps, className: classes } );
++
++	return {
++		...surfaceProps,
++		elevation,
++		isRounded,
++	};
++}
+diff --git a/packages/components/src/ui/card/index.js b/packages/components/src/ui/card/index.js
+new file mode 100644
+index 00000000000000..914c440e5e5f64
+--- /dev/null
++++ b/packages/components/src/ui/card/index.js
+@@ -0,0 +1,7 @@
++export { default as Card } from './component';
++export { default as CardBody } from './body';
++export { default as CardFooter } from './footer';
++export { default as CardHeader } from './header';
++export { default as CardInnerBody } from './inner-body';
++
++export * from './hook';
+diff --git a/packages/components/src/ui/card/inner-body.js b/packages/components/src/ui/card/inner-body.js
+new file mode 100644
+index 00000000000000..aa042be773e85f
+--- /dev/null
++++ b/packages/components/src/ui/card/inner-body.js
+@@ -0,0 +1,30 @@
++/**
++ * External dependencies
++ */
++import { contextConnect, useContextSystem } from '@wp-g2/context';
++import { cx } from '@wp-g2/styles';
++
++/**
++ * Internal dependencies
++ */
++import { View } from '../view';
++import * as styles from './styles';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<{}, 'div'>} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function CardInnerBody( props, forwardedRef ) {
++	const { className, ...otherProps } = useContextSystem(
++		props,
++		'CardInnerBody'
++	);
++
++	const classes = cx( styles.InnerBody, className );
++
++	return (
++		<View { ...otherProps } className={ classes } ref={ forwardedRef } />
++	);
++}
++
++export default contextConnect( CardInnerBody, 'CardInnerBody' );
+diff --git a/packages/components/src/ui/card/stories/index.js b/packages/components/src/ui/card/stories/index.js
+new file mode 100644
+index 00000000000000..31d40eb298802c
+--- /dev/null
++++ b/packages/components/src/ui/card/stories/index.js
+@@ -0,0 +1,66 @@
++/**
++ * External dependencies
++ */
++import { Button, Divider, Heading, Spacer } from '@wp-g2/components';
++
++/**
++ * Internal dependencies
++ */
++import { Grid } from '../../grid';
++import { Text } from '../../text';
++import { VStack } from '../../v-stack';
++import { Card, CardBody, CardFooter } from '../index';
++
++export default {
++	component: Card,
++	title: 'G2 Components (Experimental)/Card',
++};
++
++const ExampleCard = () => {
++	return (
++		<Card>
++			<VStack expanded>
++				<CardBody>
++					<VStack>
++						<Heading>WordPress.org</Heading>
++						<Text>Code is Poetry</Text>
++					</VStack>
++				</CardBody>
++				<Divider />
++				<CardBody>
++					<VStack>
++						<Heading>WordPress.org</Heading>
++						<Text>Code is Poetry</Text>
++					</VStack>
++				</CardBody>
++				<Spacer />
++				<Divider />
++				<CardFooter>
++					<Button>Action</Button>
++				</CardFooter>
++			</VStack>
++		</Card>
++	);
++};
++export const adaptiveHeight = () => {
++	return (
++		<Grid columns={ [ 1, 2, 4 ] }>
++			<ExampleCard />
++			<ExampleCard />
++			<ExampleCard />
++			<ExampleCard />
++			<ExampleCard />
++			<ExampleCard />
++			<ExampleCard />
++			<ExampleCard />
++		</Grid>
++	);
++};
++
++export const _default = () => {
++	return (
++		<Card elevation={ 5 } isBorderless>
++			<CardBody>Card</CardBody>
++		</Card>
++	);
++};
+diff --git a/packages/components/src/ui/card/styles.js b/packages/components/src/ui/card/styles.js
+new file mode 100644
+index 00000000000000..f4f753523e3583
+--- /dev/null
++++ b/packages/components/src/ui/card/styles.js
+@@ -0,0 +1,67 @@
++/**
++ * External dependencies
++ */
++import { css, ui } from '@wp-g2/styles';
++
++export const Card = css`
++	box-shadow: 0 0 0 1px ${ ui.get( 'surfaceBorderColor' ) };
++	outline: none;
++`;
++
++export const Header = css`
++	border-bottom: 1px solid;
++`;
++
++export const Content = css`
++	height: 100%;
++`;
++
++export const Body = css`
++	height: auto;
++	max-height: 100%;
++	padding: ${ ui.get( 'cardPadding' ) };
++`;
++
++export const InnerBody = css`
++	margin-left: calc( ${ ui.get( 'cardPadding' ) } * -1 );
++	margin-right: calc( ${ ui.get( 'cardPadding' ) } * -1 );
++`;
++
++export const headerFooter = css`
++	border-color: ${ ui.get( 'colorDivider' ) };
++	min-height: ${ ui.get( 'cardHeaderHeight' ) };
++	padding-bottom: ${ ui.get( 'cardHeaderFooterPaddingY' ) };
++	padding-left: ${ ui.get( 'cardPaddingX' ) };
++	padding-right: ${ ui.get( 'cardPaddingX' ) };
++	padding-top: ${ ui.get( 'cardHeaderFooterPaddingY' ) };
++`;
++
++export const borderRadius = css`
++	&:first-of-type {
++		border-top-left-radius: ${ ui.get( 'cardBorderRadius' ) };
++		border-top-right-radius: ${ ui.get( 'cardBorderRadius' ) };
++	}
++
++	&:last-of-type {
++		border-bottom-left-radius: ${ ui.get( 'cardBorderRadius' ) };
++		border-bottom-right-radius: ${ ui.get( 'cardBorderRadius' ) };
++	}
++`;
++
++export const borderless = css`
++	box-shadow: none;
++`;
++
++export const rounded = css`
++	border-radius: ${ ui.get( 'cardBorderRadius' ) };
++`;
++
++export const small = css`
++	min-height: 30px;
++`;
++
++export const medium = css``;
++
++export const xSmall = css`
++	min-height: 24px;
++`;
+diff --git a/packages/components/src/ui/card/test/__snapshots__/index.js.snap b/packages/components/src/ui/card/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..8fa1c1a188db77
+--- /dev/null
++++ b/packages/components/src/ui/card/test/__snapshots__/index.js.snap
+@@ -0,0 +1,484 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render CardInnerBody 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -12,13 +12,13 @@
++        data-g2-c16t="true"
++        data-g2-component="CardHeader"
++        title="WordPress.org"
++      />
++      <div
++-       class="components-card-inner-body wp-components-card-inner-body css-1n7epz"
+++       class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body css-1hp1ar"
++        data-g2-c16t="true"
++-       data-g2-component="CardInnerBody"
+++       data-g2-component="CardBody"
++      >
++        Code is Poetry.
++      </div>
++      <div
++        class="components-flex wp-components-flex components-card-footer wp-components-card-footer css-1qwgs3h"
++`;
++
++exports[`props should render correctly 1`] = `
++.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  background-color: #ffffff;
++  background-color: var(--wp-g2-surface-color);
++  color: #1e1e1e;
++  color: var(--wp-g2-color-text);
++  position: relative;
++  --wp-g2-surface-background-size: 12px;
++  --wp-g2-surface-background-size-dotted: 11px;
++  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
++  box-shadow: 0 0 0 1px var(--wp-g2-surface-border-color);
++  outline: none;
++  border-radius: 2px;
++  border-radius: var(--wp-g2-card-border-radius);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  height: 100%;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  --wp-g2-flex-gap: calc(4px * 2);
++  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  border-bottom: 1px solid;
++  border-color: rgba(0, 0, 0, 0.1);
++  border-color: var(--wp-g2-color-divider);
++  min-height: 44px;
++  min-height: var(--wp-g2-card-header-height);
++  padding-bottom: calc(4px * 1);
++  padding-bottom: var(--wp-g2-card-header-footer-padding-y);
++  padding-left: calc(4px * 3);
++  padding-left: var(--wp-g2-card-padding-x);
++  padding-right: calc(4px * 3);
++  padding-right: var(--wp-g2-card-padding-x);
++  padding-top: calc(4px * 1);
++  padding-top: var(--wp-g2-card-header-footer-padding-y);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++  margin-left: calc(var(--wp-g2-grid-base) * 2);
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * {
++  min-width: 0;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:first-of-type {
++  border-top-left-radius: 2px;
++  border-top-left-radius: var(--wp-g2-card-border-radius);
++  border-top-right-radius: 2px;
++  border-top-right-radius: var(--wp-g2-card-border-radius);
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:last-of-type {
++  border-bottom-left-radius: 2px;
++  border-bottom-left-radius: var(--wp-g2-card-border-radius);
++  border-bottom-right-radius: 2px;
++  border-bottom-right-radius: var(--wp-g2-card-border-radius);
++}
++
++.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  height: 100%;
++  overflow-x: hidden;
++  overflow-y: auto;
++  height: auto;
++  max-height: 100%;
++  padding: calc(4px * 3) calc(4px * 3);
++  padding: var(--wp-g2-card-padding);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++@media only screen and ( min-device-width:40em ) {
++  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar {
++    height: 12px;
++    width: 12px;
++  }
++
++  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar-track {
++    background-color: transparent;
++  }
++
++  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar-track {
++    background: rgba(0, 0, 0, 0.04);
++    background: var(--wp-g2-color-scrollbar-track);
++    border-radius: 8px;
++  }
++
++  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar-thumb {
++    background-clip: padding-box;
++    background-color: rgba(0, 0, 0, 0.2);
++    background-color: var(--wp-g2-color-scrollbar-thumb);
++    border: 2px solid rgba( 0,0,0,0 );
++    border-radius: 7px;
++  }
++
++  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1:hover::-webkit-scrollbar-thumb {
++    background-color: rgba(0, 0, 0, 0.5);
++    background-color: var(--wp-g2-color-scrollbar-thumb-hover);
++  }
++}
++
++.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1:first-of-type {
++  border-top-left-radius: 2px;
++  border-top-left-radius: var(--wp-g2-card-border-radius);
++  border-top-right-radius: 2px;
++  border-top-right-radius: var(--wp-g2-card-border-radius);
++}
++
++.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1:last-of-type {
++  border-bottom-left-radius: 2px;
++  border-bottom-left-radius: var(--wp-g2-card-border-radius);
++  border-bottom-right-radius: 2px;
++  border-bottom-right-radius: var(--wp-g2-card-border-radius);
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  --wp-g2-flex-gap: calc(4px * 2);
++  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: end;
++  -webkit-justify-content: flex-end;
++  -ms-flex-pack: end;
++  justify-content: flex-end;
++  width: 100%;
++  border-color: rgba(0, 0, 0, 0.1);
++  border-color: var(--wp-g2-color-divider);
++  min-height: 44px;
++  min-height: var(--wp-g2-card-header-height);
++  padding-bottom: calc(4px * 1);
++  padding-bottom: var(--wp-g2-card-header-footer-padding-y);
++  padding-left: calc(4px * 3);
++  padding-left: var(--wp-g2-card-padding-x);
++  padding-right: calc(4px * 3);
++  padding-right: var(--wp-g2-card-padding-x);
++  padding-top: calc(4px * 1);
++  padding-top: var(--wp-g2-card-header-footer-padding-y);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++  margin-left: calc(var(--wp-g2-grid-base) * 2);
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++  min-width: 0;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:first-of-type {
++  border-top-left-radius: 2px;
++  border-top-left-radius: var(--wp-g2-card-border-radius);
++  border-top-right-radius: 2px;
++  border-top-right-radius: var(--wp-g2-card-border-radius);
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:last-of-type {
++  border-bottom-left-radius: 2px;
++  border-bottom-left-radius: var(--wp-g2-card-border-radius);
++  border-bottom-right-radius: 2px;
++  border-bottom-right-radius: var(--wp-g2-card-border-radius);
++}
++
++.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
++  opacity: 1;
++  opacity: var(--wp-g2-elevation-intensity);
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++  border-radius: 2px;
++  border-radius: var(--wp-g2-card-border-radius);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  background: transparent;
++  display: block;
++  margin: 0 !important;
++  pointer-events: none;
++  position: absolute;
++  will-change: box-shadow;
++  border-radius: inherit;
++  bottom: 0;
++  box-shadow: 0 2px 4px 0 rgba(0 ,0,0,0.1);
++  opacity: 1;
++  opacity: var(--wp-g2-elevation-intensity);
++  left: 0;
++  right: 0;
++  top: 0;
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
++  border-radius: 2px;
++  border-radius: var(--wp-g2-card-border-radius);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<div
++  class="components-surface wp-components-surface components-card wp-components-card emotion-6"
++  data-g2-c16t="true"
++  data-g2-component="Card"
++>
++  <div
++    class="emotion-3"
++    data-g2-component="CardContent"
++  >
++    <div
++      class="components-flex wp-components-flex components-card-header wp-components-card-header emotion-0"
++      data-g2-c16t="true"
++      data-g2-component="CardHeader"
++      title="WordPress.org"
++    />
++    <div
++      class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body emotion-1"
++      data-g2-c16t="true"
++      data-g2-component="CardBody"
++    >
++      Code is Poetry.
++    </div>
++    <div
++      class="components-flex wp-components-flex components-card-footer wp-components-card-footer emotion-2"
++      data-g2-c16t="true"
++      data-g2-component="CardFooter"
++    >
++      <button>
++        Agree
++      </button>
++    </div>
++  </div>
++  <div
++    aria-hidden="true"
++    class="components-elevation wp-components-elevation emotion-4"
++    data-g2-c16t="true"
++    data-g2-component="CardElevation"
++  />
++  <div
++    aria-hidden="true"
++    class="components-elevation wp-components-elevation emotion-5"
++    data-g2-c16t="true"
++    data-g2-component="CardElevation"
++  />
++</div>
++`;
++
++exports[`props should render elevation 1`] = `
++Snapshot Diff:
++- First value
+++ Second value
++
++@@ -7,16 +7,16 @@
++      class="css-1kk7lqu"
++      data-g2-component="CardContent"
++    />
++    <div
++      aria-hidden="true"
++-     class="components-elevation wp-components-elevation css-1vg495v"
+++     class="components-elevation wp-components-elevation css-1wkolpp"
++      data-g2-c16t="true"
++      data-g2-component="CardElevation"
++    />
++    <div
++      aria-hidden="true"
++-     class="components-elevation wp-components-elevation css-dgxm8l"
+++     class="components-elevation wp-components-elevation css-1zwi7l"
++      data-g2-c16t="true"
++      data-g2-component="CardElevation"
++    />
++  </div>
++`;
+diff --git a/packages/components/src/ui/card/test/index.js b/packages/components/src/ui/card/test/index.js
+new file mode 100644
+index 00000000000000..56dfefa30e5834
+--- /dev/null
++++ b/packages/components/src/ui/card/test/index.js
+@@ -0,0 +1,60 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import {
++	Card,
++	CardBody,
++	CardFooter,
++	CardHeader,
++	CardInnerBody,
++} from '../index';
++
++describe( 'props', () => {
++	let base;
++
++	beforeEach( () => {
++		base = render(
++			<Card>
++				<CardHeader title="WordPress.org" />
++				<CardBody>Code is Poetry.</CardBody>
++				<CardFooter>
++					<button>Agree</button>
++				</CardFooter>
++			</Card>
++		);
++	} );
++
++	test( 'should render correctly', () => {
++		expect( base.container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render elevation', () => {
++		const { container } = render( <Card elevation /> );
++		const { container: withoutElevation } = render(
++			<Card elevation={ false } />
++		);
++		expect( container.firstChild ).toMatchDiffSnapshot(
++			withoutElevation.firstChild
++		);
++	} );
++
++	test( 'should render CardInnerBody', () => {
++		const { container } = render(
++			<Card>
++				<CardHeader title="WordPress.org" />
++				<CardInnerBody>Code is Poetry.</CardInnerBody>
++				<CardFooter>
++					<button>Agree</button>
++				</CardFooter>
++			</Card>
++		);
++		expect( container.firstChild ).toMatchDiffSnapshot(
++			base.container.firstChild
++		);
++	} );
++} );
+diff --git a/packages/components/src/ui/card/types.ts b/packages/components/src/ui/card/types.ts
+new file mode 100644
+index 00000000000000..c934fed5277d77
+--- /dev/null
++++ b/packages/components/src/ui/card/types.ts
+@@ -0,0 +1,69 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { CSSProperties } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { Props as SurfaceProps } from '../surface/types';
++
++export type CardProps = SurfaceProps & {
++	/**
++	 * Size of the elevation shadow, based on the Style system's elevation system.
++	 * Elevating a `Card` can be done by adjusting the `elevation` prop. This may be helpful in highlighting certain content. For more information, check out `Elevation`.
++	 *
++	 * @example
++	 * ```jsx
++	 * import { Card, CardBody, Text } from `@wordpress/components/ui`
++	 *
++	 * function Example() {
++	 *   return (
++	 *     <Card elevation={ 8 }>
++	 *       <CardBody>
++	 *         <Text>Card Content</Text>
++	 *       </CardBody>
++	 *     </Card>
++	 *   );
++	 * }
++	 *```
++	 */
++	elevation?: number;
++	/**
++	 * Renders without a border.
++	 *
++	 * @default false
++	 */
++	isBorderless?: boolean;
++	/**
++	 * Renders with rounded corners.
++	 *
++	 * @default true
++	 */
++	isRounded?: boolean;
++};
++
++export type CardBodyProps = {
++	/**
++	 * Determines if `CardBody` is scrollable.
++	 *
++	 * @default true
++	 */
++	scrollable?: boolean;
++};
++
++export type CardHeaderSize = 'medium' | 'small' | 'xSmall';
++
++export type CardHeaderProps = {
++	/**
++	 * Determines the size of `CardHeader`.
++	 *
++	 * @default 'medium'
++	 */
++	size?: CardHeaderSize;
++};
++
++export type CardFooterProps = CardHeaderProps & {
++	justify: CSSProperties[ 'justifyContent' ];
++};
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index 1614dc2e4cf9f6..78eae6ae3ac473 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -1,3 +1,4 @@
++export * from './card';
+ export * from './control-group';
+ export * from './control-label';
+ export * from './elevation';

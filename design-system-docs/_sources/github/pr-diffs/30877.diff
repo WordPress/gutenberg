@@ -1,0 +1,836 @@
+diff --git a/package-lock.json b/package-lock.json
+index eac22935047415..3a4aedd2444d17 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -13366,6 +13366,7 @@
+ 				"create-emotion": "^10.0.27",
+ 				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^6.0.15",
++				"emotion": "^10.0.23",
+ 				"gradient-parser": "^0.1.5",
+ 				"highlight-words-core": "^1.2.2",
+ 				"hoist-non-react-statics": "^3.3.2",
+@@ -13398,6 +13399,20 @@
+ 					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.4.tgz",
+ 					"integrity": "sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw=="
+ 				},
++				"emotion": {
++					"version": "10.0.27",
++					"resolved": "https://registry.npmjs.org/emotion/-/emotion-10.0.27.tgz",
++					"integrity": "sha512-2xdDzdWWzue8R8lu4G76uWX5WhyQuzATon9LmNeCy/2BHVC6dsEpfhN1a0qhELgtDVdjyEA6J8Y/VlI5ZnaH0g==",
++					"requires": {
++						"babel-plugin-emotion": "^10.0.27",
++						"create-emotion": "^10.0.27"
++					}
++				},
++				"fast-deep-equal": {
++					"version": "3.1.3",
++					"resolved": "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz",
++					"integrity": "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
++				},
+ 				"hoist-non-react-statics": {
+ 					"version": "3.3.2",
+ 					"resolved": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index eeb1985a8c435a..52c74917403882 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -54,6 +54,7 @@
+ 		"create-emotion": "^10.0.27",
+ 		"dom-scroll-into-view": "^1.2.1",
+ 		"downshift": "^6.0.15",
++		"emotion": "^10.0.23",
+ 		"gradient-parser": "^0.1.5",
+ 		"highlight-words-core": "^1.2.2",
+ 		"hoist-non-react-statics": "^3.3.2",
+diff --git a/packages/components/src/ui/context/component-system-provider.js b/packages/components/src/ui/context/component-system-provider.js
+index 1ba31238c27b6a..2d97eb3eed80c6 100644
+--- a/packages/components/src/ui/context/component-system-provider.js
++++ b/packages/components/src/ui/context/component-system-provider.js
+@@ -1,7 +1,7 @@
+ /**
+- * External dependencies
++ * Internal dependencies
+  */
+-import { ContextSystemProvider } from '@wp-g2/context';
++import { ContextSystemProvider } from './context-system-provider';
+ 
+ /**
+  * @param {Object} props
+diff --git a/packages/components/src/ui/context/constants.js b/packages/components/src/ui/context/constants.js
+new file mode 100644
+index 00000000000000..b5bee35a35fbae
+--- /dev/null
++++ b/packages/components/src/ui/context/constants.js
+@@ -0,0 +1,10 @@
++export const REACT_TYPEOF_KEY = '$$typeof';
++export const COMPONENT_NAMESPACE = 'data-wp-component';
++export const CONNECTED_NAMESPACE = 'data-wp-c16t';
++export const CONTEXT_COMPONENT_NAMESPACE = 'data-wp-c5tc8t';
++
++/**
++ * Special key where the connected namespaces are stored.
++ * This is attached to Context connected components as a static property.
++ */
++export const CONNECT_STATIC_NAMESPACE = '__contextSystemKey__';
+diff --git a/packages/components/src/ui/context/context-connect.js b/packages/components/src/ui/context/context-connect.js
+new file mode 100644
+index 00000000000000..3c77cd339d1888
+--- /dev/null
++++ b/packages/components/src/ui/context/context-connect.js
+@@ -0,0 +1,121 @@
++/**
++ * External dependencies
++ */
++import { uniq } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef, memo } from '@wordpress/element';
++import warn from '@wordpress/warning';
++
++/**
++ * Internal dependencies
++ */
++import { CONNECT_STATIC_NAMESPACE } from './constants';
++
++/* eslint-disable jsdoc/valid-types */
++/**
++ * Forwards ref (React.ForwardRef) and "Connects" (or registers) a component
++ * within the Context system under a specified namespace.
++ *
++ * This is an (experimental) evolution of the initial connect() HOC.
++ * The hope is that we can improve render performance by removing functional
++ * component wrappers.
++ *
++ * @template {import('../create-styles').ViewOwnProps<{}, any>} P
++ * @param {(props: P, ref: import('react').Ref<any>) => JSX.Element | null} Component The component to register into the Context system.
++ * @param {Array<string>|string} namespace The namespace to register the component under.
++ * @param {Object} options
++ * @param {boolean} [options.memo=true]
++ * @return {import('./polymorphic-component').PolymorphicComponent<import('./polymorphic-component').ElementTypeFromViewOwnProps<P>, import('./polymorphic-component').PropsFromViewOwnProps<P>>} The connected PolymorphicComponent
++ */
++export function contextConnect( Component, namespace, options = {} ) {
++	/* eslint-enable jsdoc/valid-types */
++	const { memo: memoProp = true } = options;
++
++	let WrappedComponent = forwardRef( Component );
++	if ( memoProp ) {
++		// @ts-ignore
++		WrappedComponent = memo( WrappedComponent );
++	}
++
++	const displayName = Array.isArray( namespace )
++		? namespace[ 0 ]
++		: namespace || WrappedComponent.name;
++
++	if ( typeof namespace === 'undefined' ) {
++		warn( 'contextConnect: Please provide a namespace' );
++	}
++
++	// @ts-ignore internal property
++	let mergedNamespace = WrappedComponent[ CONNECT_STATIC_NAMESPACE ] || [
++		displayName,
++	];
++
++	/**
++	 * Consolidate (merge) namespaces before attaching it to the WrappedComponent.
++	 */
++	if ( Array.isArray( namespace ) ) {
++		mergedNamespace = [ ...mergedNamespace, ...namespace ];
++	}
++	if ( typeof namespace === 'string' ) {
++		mergedNamespace = [ ...mergedNamespace, namespace ];
++	}
++
++	WrappedComponent.displayName = displayName;
++
++	// @ts-ignore internal property
++	WrappedComponent[ CONNECT_STATIC_NAMESPACE ] = uniq( mergedNamespace );
++
++	// @ts-ignore
++	return WrappedComponent;
++}
++
++/**
++ * Attempts to retrieve the connected namespace from a component.
++ *
++ * @param {import('react').ReactChild | undefined | {}} Component The component to retrieve a namespace from.
++ * @return {Array<string>} The connected namespaces.
++ */
++export function getConnectNamespace( Component ) {
++	if ( ! Component ) return [];
++
++	let namespaces = [];
++
++	// @ts-ignore internal property
++	if ( Component[ CONNECT_STATIC_NAMESPACE ] ) {
++		// @ts-ignore internal property
++		namespaces = Component[ CONNECT_STATIC_NAMESPACE ];
++	}
++
++	// @ts-ignore
++	if ( Component.type && Component.type[ CONNECT_STATIC_NAMESPACE ] ) {
++		// @ts-ignore
++		namespaces = Component.type[ CONNECT_STATIC_NAMESPACE ];
++	}
++
++	return namespaces;
++}
++
++/**
++ * Checks to see if a component is connected within the Context system.
++ *
++ * @param {import('react').ReactNode} Component The component to retrieve a namespace from.
++ * @param {Array<string>|string} match The namespace to check.
++ * @return {boolean} The result.
++ */
++export function hasConnectNamespace( Component, match ) {
++	if ( ! Component ) return false;
++
++	if ( typeof match === 'string' ) {
++		return getConnectNamespace( Component ).includes( match );
++	}
++	if ( Array.isArray( match ) ) {
++		return match.some( ( result ) =>
++			getConnectNamespace( Component ).includes( result )
++		);
++	}
++
++	return false;
++}
+diff --git a/packages/components/src/ui/context/context-system-provider.js b/packages/components/src/ui/context/context-system-provider.js
+new file mode 100644
+index 00000000000000..299d1fe29192c7
+--- /dev/null
++++ b/packages/components/src/ui/context/context-system-provider.js
+@@ -0,0 +1,90 @@
++/**
++ * External dependencies
++ */
++import { isEqual, merge } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import {
++	createContext,
++	useContext,
++	useRef,
++	useState,
++	memo,
++} from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useIsomorphicLayoutEffect } from '../utils';
++
++export const ComponentsContext = createContext(
++	/** @type {Record<string, any>} */ ( {} )
++);
++export const useComponentsContext = () => useContext( ComponentsContext );
++
++/**
++ * Consolidates incoming ContextSystem values with a (potential) parent ContextSystem value.
++ *
++ * @param {Object} props
++ * @param {Record<string, any>} props.value
++ * @return {Record<string, any>} The consolidated value.
++ */
++function useContextSystemBridge( { value } ) {
++	const parentContext = useComponentsContext();
++	const parentContextRef = useRef( parentContext );
++	const valueRef = useRef( merge( parentContext, value ) );
++
++	const [ config, setConfig ] = useState( valueRef.current );
++
++	useIsomorphicLayoutEffect( () => {
++		let hasChange = false;
++
++		if ( ! isEqual( value, valueRef.current ) ) {
++			valueRef.current = value;
++			hasChange = true;
++		}
++
++		if ( ! isEqual( parentContext, parentContextRef.current ) ) {
++			valueRef.current = merge( parentContext, valueRef.current );
++			parentContextRef.current = parentContext;
++			hasChange = true;
++		}
++
++		if ( hasChange ) {
++			setConfig( ( prev ) => ( { ...prev, ...valueRef.current } ) );
++		}
++	}, [ value, parentContext ] );
++
++	return config;
++}
++
++/**
++ * A Provider component that can modify props for connected components within
++ * the Context system.
++ *
++ * @example
++ * ```jsx
++ * <ContextSystemProvider value={{ Button: { size: 'small' }}}>
++ *   <Button>...</Button>
++ * </ContextSystemProvider>
++ * ```
++ *
++ * @template {Record<string, any>} T
++ * @param {Object} options
++ * @param {import('react').ReactNode} options.children Children to render.
++ * @param {T} options.value Props to render into connected components.
++ * @return {JSX.Element} A Provider wrapped component.
++ */
++const BaseContextSystemProvider = ( { children, value } ) => {
++	const contextValue = useContextSystemBridge( { value } );
++
++	return (
++		<ComponentsContext.Provider value={ contextValue }>
++			{ children }
++		</ComponentsContext.Provider>
++	);
++};
++
++export const ContextSystemProvider = memo( BaseContextSystemProvider );
+diff --git a/packages/components/src/ui/context/index.js b/packages/components/src/ui/context/index.js
+index ef7f9470413c01..502d0ca2769c75 100644
+--- a/packages/components/src/ui/context/index.js
++++ b/packages/components/src/ui/context/index.js
+@@ -1,2 +1,8 @@
+ export { ComponentSystemProvider } from './component-system-provider';
+ export { withNext } from './with-next';
++export {
++	ContextSystemProvider,
++	useComponentsContext,
++} from './context-system-provider';
++export { contextConnect } from './context-connect';
++export { useContextSystem } from './use-context-system';
+diff --git a/packages/components/src/ui/context/polymorphic-component.ts b/packages/components/src/ui/context/polymorphic-component.ts
+new file mode 100644
+index 00000000000000..2511de54a9189d
+--- /dev/null
++++ b/packages/components/src/ui/context/polymorphic-component.ts
+@@ -0,0 +1,62 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type * as React from 'react';
++import type { As, RenderProp, ExtractHTMLAttributes } from 'reakit-utils/types';
++import type { Interpolation, ObjectInterpolation } from 'create-emotion';
++
++/**
++ * Based on https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/types.ts
++ */
++export type ViewOwnProps< P, T extends As > = P &
++	Omit< React.ComponentPropsWithRef< T >, 'as' | 'css' | keyof P > & {
++		as?: T | keyof JSX.IntrinsicElements;
++		children?: React.ReactNode | RenderProp< ExtractHTMLAttributes< any > >;
++		css?: ObjectInterpolation< undefined > | string;
++	};
++
++export type ElementTypeFromViewOwnProps< P > = P extends ViewOwnProps<
++	unknown,
++	infer T
++>
++	? T
++	: never;
++
++export type PropsFromViewOwnProps< P > = P extends ViewOwnProps< infer PP, any >
++	? PP
++	: never;
++
++export type PolymorphicComponent< T extends As, O > = {
++	< TT extends As >(
++		props: ViewOwnProps< O, TT > & { as: TT }
++	): JSX.Element | null;
++	( props: ViewOwnProps< O, T > ): JSX.Element | null;
++	displayName?: string;
++	__interpolationClassName__: string;
++};
++
++export type CreatePolymorphicComponent< T extends As, P > = (
++	template: TemplateStringsArray,
++	...styles: (
++		| Interpolation< undefined >
++		| PolymorphicComponent< any, any >
++	 )[]
++) => PolymorphicComponent< T, P >;
++
++export type ForwardedRef< TElement extends HTMLElement > =
++	| ( ( instance: TElement | null ) => void )
++	| React.MutableRefObject< TElement | null >
++	| null;
++
++export type CoreElements = {
++	[ P in keyof JSX.IntrinsicElements ]: PolymorphicComponent< P, {} >;
++};
++
++type CreateStyledComponents = {
++	[ P in keyof JSX.IntrinsicElements ]: CreatePolymorphicComponent< P, {} >;
++};
++
++export type CreateStyled = CreateStyledComponents & {
++	< T extends As >( component: T ): CreatePolymorphicComponent< T, {} >;
++};
+diff --git a/packages/components/src/ui/context/stories/ComponentsProvider.stories.js b/packages/components/src/ui/context/stories/ComponentsProvider.stories.js
+new file mode 100644
+index 00000000000000..a660d0591dce27
+--- /dev/null
++++ b/packages/components/src/ui/context/stories/ComponentsProvider.stories.js
+@@ -0,0 +1,87 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext, memo, useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { Card, CardBody, Text, View } from '../../';
++import { ContextSystemProvider } from '../index';
++
++const SomeContext = createContext();
++const useSomeContext = () => useContext( SomeContext );
++
++export default {
++	component: ContextSystemProvider,
++	title: 'G2 Components (Experimental)/ContextSystemProvider',
++};
++
++const innerContext = {
++	Card: {
++		css: {
++			background: 'white',
++		},
++	},
++};
++
++const InnerContent = memo( () => {
++	const state = useSomeContext();
++	const isEven = state % 2 === 0;
++	return (
++		<View css={ { background: isEven ? 'red' : 'initial' } }>
++			{ state }
++		</View>
++	);
++} );
++
++const InnerCard = memo( () => {
++	return (
++		<View style={ { padding: 40 } }>
++			<Card>
++				<CardBody style={ { border: '3px solid green' } }>
++					<InnerContent />
++				</CardBody>
++			</Card>
++		</View>
++	);
++} );
++
++export const Default = () => {
++	const [ state, update ] = useState( 0 );
++	const forceUpdate = () => update( ( prev ) => prev + 1 );
++
++	const value = {
++		Card: {
++			isRounded: false,
++			elevation: 100,
++		},
++		CardBody: {
++			as: 'a',
++			href: 'https://wordpress.org',
++		},
++	};
++
++	return (
++		<>
++			<SomeContext.Provider value={ state }>
++				<button onClick={ forceUpdate }>Force Update</button>
++				<ContextSystemProvider value={ value }>
++					<Card>
++						<CardBody>
++							<Text optimizeReadabilityFor="blue">Card</Text>
++							<ContextSystemProvider value={ innerContext }>
++								<InnerCard />
++							</ContextSystemProvider>
++						</CardBody>
++					</Card>
++				</ContextSystemProvider>
++				<Card>
++					<CardBody>
++						<Text>Card</Text>
++					</CardBody>
++				</Card>
++			</SomeContext.Provider>
++		</>
++	);
++};
+diff --git a/packages/components/src/ui/context/test/__snapshots__/context-system-provider.js.snap b/packages/components/src/ui/context/test/__snapshots__/context-system-provider.js.snap
+new file mode 100644
+index 00000000000000..fa1cc67118bfd4
+--- /dev/null
++++ b/packages/components/src/ui/context/test/__snapshots__/context-system-provider.js.snap
+@@ -0,0 +1,29 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render _override props 1`] = `
++<div
++  class="components-component wp-components-component test-component emotion-0 emotion-1"
++  data-wp-c16t="true"
++  data-wp-component="Component"
++>
++  Code is Poetry
++</div>
++`;
++
++exports[`props should render context props 1`] = `
++<div
++  class="components-component wp-components-component emotion-0 emotion-1"
++  data-wp-c16t="true"
++  data-wp-component="Component"
++>
++  Code is Poetry
++</div>
++`;
++
++exports[`props should render correctly 1`] = `
++<div
++  class="components-component wp-components-component emotion-0 emotion-1"
++  data-wp-c16t="true"
++  data-wp-component="Component"
++/>
++`;
+diff --git a/packages/components/src/ui/context/test/context-system-provider.js b/packages/components/src/ui/context/test/context-system-provider.js
+new file mode 100644
+index 00000000000000..777a3bdf2dba6c
+--- /dev/null
++++ b/packages/components/src/ui/context/test/context-system-provider.js
+@@ -0,0 +1,103 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import { contextConnect } from '../context-connect';
++import { ContextSystemProvider } from '../context-system-provider';
++import { useContextSystem } from '../use-context-system';
++
++const View = styled.div``;
++
++describe( 'props', () => {
++	test( 'should render correctly', () => {
++		const Component = ( props, ref ) => (
++			<View { ...useContextSystem( props, 'Component' ) } ref={ ref } />
++		);
++		const ConnectedComponent = contextConnect( Component, 'Component' );
++		const { container } = render(
++			<ContextSystemProvider>
++				<ConnectedComponent />
++			</ContextSystemProvider>
++		);
++
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render context props', () => {
++		const Component = ( props, ref ) => {
++			const { quote, ...otherProps } = useContextSystem(
++				props,
++				'Component'
++			);
++			return (
++				<View { ...otherProps } ref={ ref }>
++					{ quote }
++				</View>
++			);
++		};
++
++		const ConnectedComponent = contextConnect( Component, 'Component' );
++
++		const contextValue = {
++			Component: {
++				quote: 'Code is Poetry',
++			},
++		};
++
++		const { container } = render(
++			<ContextSystemProvider value={ contextValue }>
++				<ConnectedComponent />
++			</ContextSystemProvider>
++		);
++
++		expect( container.firstChild ).toMatchSnapshot();
++		expect( container.firstChild.innerHTML ).toContain( 'Code is Poetry' );
++	} );
++
++	test( 'should render _override props', () => {
++		const Component = ( props, ref ) => {
++			const { quote, ...otherProps } = useContextSystem(
++				props,
++				'Component'
++			);
++			return (
++				<View { ...otherProps } ref={ ref }>
++					{ quote }
++				</View>
++			);
++		};
++
++		const ConnectedComponent = contextConnect( Component, 'Component' );
++
++		const contextValue = {
++			Component: {
++				_overrides: {
++					quote: 'Code is Poetry',
++				},
++			},
++		};
++
++		const { container } = render(
++			<>
++				<ContextSystemProvider value={ contextValue }>
++					<ConnectedComponent
++						className="test-component"
++						quote="WordPress.org"
++					/>
++				</ContextSystemProvider>
++			</>
++		);
++
++		expect( container.firstChild ).toMatchSnapshot();
++
++		const el = container.querySelector( '.test-component' );
++
++		expect( el.innerHTML ).toContain( 'Code is Poetry' );
++		expect( el.innerHTML ).not.toContain( 'WordPress.org' );
++	} );
++} );
+diff --git a/packages/components/src/ui/context/types.ts b/packages/components/src/ui/context/types.ts
+new file mode 100644
+index 00000000000000..396c8e0f0fec17
+--- /dev/null
++++ b/packages/components/src/ui/context/types.ts
+@@ -0,0 +1,20 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type {
++	ForwardRefExoticComponent,
++	ElementType,
++	PropsWithoutRef,
++	RefAttributes,
++	MemoExoticComponent,
++} from 'react';
++
++type ForwardedRefComponent<
++	T extends ElementType,
++	P
++> = ForwardRefExoticComponent< PropsWithoutRef< P > & RefAttributes< T > >;
++
++export type MaybeMemoizedForwardedRefComponent< T extends ElementType, P > =
++	| MemoExoticComponent< ForwardedRefComponent< T, P > >
++	| ForwardedRefComponent< T, P >;
+diff --git a/packages/components/src/ui/context/use-context-system.js b/packages/components/src/ui/context/use-context-system.js
+new file mode 100644
+index 00000000000000..1d86bb4b5c59fb
+--- /dev/null
++++ b/packages/components/src/ui/context/use-context-system.js
+@@ -0,0 +1,118 @@
++/**
++ * External dependencies
++ */
++import memoize from 'memize';
++import { kebabCase, uniq } from 'lodash';
++import { cx } from 'emotion';
++
++/**
++ * WordPress dependencies
++ */
++import warn from '@wordpress/warning';
++
++/**
++ * Internal dependencies
++ */
++import { useComponentsContext } from './context-system-provider';
++import { getNamespace, getConnectedNamespace } from './utils';
++
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @template TProps
++ * @typedef {TProps & { className: string; children?: import('react').ReactNode }} ConnectedProps
++ */
++/* eslint-enable jsdoc/valid-types */
++
++/**
++ * Custom hook that derives registered props from the Context system.
++ * These derived props are then consolidated with incoming component props.
++ *
++ * @template {{ className?: string }} P
++ * @param {P} props Incoming props from the component.
++ * @param {string} namespace The namespace to register and to derive context props from.
++ * @return {ConnectedProps<P>} The connected props.
++ */
++export function useContextSystem( props, namespace ) {
++	const contextSystemProps = useComponentsContext();
++	if ( typeof namespace === 'undefined' ) {
++		warn( 'useContextSystem: Please provide a namespace' );
++	}
++	const displayName = Array.isArray( namespace ) ? namespace[ 0 ] : namespace;
++
++	const contextProps = contextSystemProps?.[ displayName ] || {};
++
++	/* eslint-disable jsdoc/no-undefined-types */
++	/** @type {ConnectedProps<P>} */
++	// @ts-ignore We fill in the missing properties below
++	const finalComponentProps = {
++		...getConnectedNamespace(),
++		...getNamespace( displayName ),
++	};
++	/* eslint-enable jsdoc/no-undefined-types */
++
++	const { _overrides: overrideProps, ...otherContextProps } = contextProps;
++
++	const initialMergedProps = Object.entries( otherContextProps ).length
++		? Object.assign( {}, otherContextProps, props )
++		: props;
++
++	const classes = cx(
++		memoizedGetStyledClassNameFromKey( displayName ),
++		props.className
++	);
++
++	// Provides the ability to customize the render of the component.
++	const rendered =
++		typeof initialMergedProps.renderChildren === 'function'
++			? initialMergedProps.renderChildren( initialMergedProps )
++			: initialMergedProps.children;
++
++	for ( const key in initialMergedProps ) {
++		// @ts-ignore filling in missing props
++		finalComponentProps[ key ] = initialMergedProps[ key ];
++	}
++
++	for ( const key in overrideProps ) {
++		// @ts-ignore filling in missing props
++		finalComponentProps[ key ] = overrideProps[ key ];
++	}
++
++	finalComponentProps.children = rendered;
++	finalComponentProps.className = classes;
++
++	return finalComponentProps;
++}
++
++/**
++ * Generates the connected component CSS className based on the namespace.
++ *
++ * @param {string} displayName The name of the connected component.
++ * @return {string} The generated CSS className.
++ */
++function getStyledClassName( displayName ) {
++	if ( ! displayName || typeof displayName !== 'string' ) return '';
++
++	const kebab = kebabCase( displayName );
++	return `components-${ kebab } wp-components-${ kebab }`;
++}
++
++/**
++ * Generates the connected component CSS className based on the namespace.
++ *
++ * @param {string} key The name of the connected component.
++ * @return {string} The generated CSS className.
++ */
++function getStyledClassNameFromKey( key ) {
++	if ( ! key ) return '';
++
++	if ( Array.isArray( key ) ) {
++		return cx( uniq( key ).map( getStyledClassName ) );
++	}
++	if ( typeof key === 'string' ) {
++		return getStyledClassName( key );
++	}
++
++	return '';
++}
++
++const memoizedGetStyledClassNameFromKey = memoize( getStyledClassNameFromKey );
+diff --git a/packages/components/src/ui/context/utils.js b/packages/components/src/ui/context/utils.js
+new file mode 100644
+index 00000000000000..a1aa9b059d0ac6
+--- /dev/null
++++ b/packages/components/src/ui/context/utils.js
+@@ -0,0 +1,35 @@
++/**
++ * Internal dependencies
++ */
++import { CONNECTED_NAMESPACE, COMPONENT_NAMESPACE } from './constants';
++
++/**
++ * Creates a dedicated context namespace HTML attribute for components.
++ * ns is short for "namespace"
++ *
++ * @example
++ * ```jsx
++ * <div {...ns('Container')} />
++ * ```
++ *
++ * @param {string} componentName The name for the component.
++ * @return {Record<string, any>} A props object with the namespaced HTML attribute.
++ */
++export function getNamespace( componentName ) {
++	return { [ COMPONENT_NAMESPACE ]: componentName };
++}
++
++/**
++ * Creates a dedicated connected context namespace HTML attribute for components.
++ * ns is short for "namespace"
++ *
++ * @example
++ * ```jsx
++ * <div {...cns()} />
++ * ```
++ *
++ * @return {Record<string, any>} A props object with the namespaced HTML attribute.
++ */
++export function getConnectedNamespace() {
++	return { [ CONNECTED_NAMESPACE ]: true };
++}
+diff --git a/packages/components/src/ui/context/with-next.js b/packages/components/src/ui/context/with-next.js
+index 88701c4480943e..8b3ba55e29b3fa 100644
+--- a/packages/components/src/ui/context/with-next.js
++++ b/packages/components/src/ui/context/with-next.js
+@@ -1,7 +1,8 @@
+ /**
+- * External dependencies
++ * Internal dependencies
+  */
+-import { contextConnect, useContextSystem } from '@wp-g2/context';
++import { contextConnect } from './context-connect';
++import { useContextSystem } from './use-context-system';
+ 
+ /**
+  * @template {{}} TCurrentProps
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 96bed3dde24e49..09f939a68d1264 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -15,7 +15,8 @@
+ 		{ "path": "../icons" },
+ 		{ "path": "../is-shallow-equal" },
+ 		{ "path": "../primitives" },
+-		{ "path": "../react-i18n" }
++		{ "path": "../react-i18n" },
++		{ "path": "../warning" }
+ 	],
+ 	"include": [
+ 		"src/animate/**/*",

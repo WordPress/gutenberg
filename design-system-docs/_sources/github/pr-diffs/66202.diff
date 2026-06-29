@@ -1,0 +1,32 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9c36c6600ac701..475bf272cc1bb8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Tabs`: fix indicator animation ([#66198](https://github.com/WordPress/gutenberg/pull/66198)).
+ -   `ColorPalette`: prevent overflow of custom color button background ([#66152](https://github.com/WordPress/gutenberg/pull/66152)).
++-   `RadioGroup`: Fix arrow key navigation in RTL ([#66202](https://github.com/WordPress/gutenberg/pull/66202)).
+ -   `Tabs` and `TabPanel`: Fix arrow key navigation in RTL ([#66201](https://github.com/WordPress/gutenberg/pull/66201)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/radio-group/index.tsx b/packages/components/src/radio-group/index.tsx
+index ac66c79e904e4b..e59775c00a8023 100644
+--- a/packages/components/src/radio-group/index.tsx
++++ b/packages/components/src/radio-group/index.tsx
+@@ -7,6 +7,7 @@ import * as Ariakit from '@ariakit/react';
+  * WordPress dependencies
+  */
+ import { useMemo, forwardRef } from '@wordpress/element';
++import { isRTL } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+@@ -34,6 +35,7 @@ function UnforwardedRadioGroup(
+ 		setValue: ( newValue ) => {
+ 			onChange?.( newValue ?? undefined );
+ 		},
++		rtl: isRTL(),
+ 	} );
+ 
+ 	const contextValue = useMemo(

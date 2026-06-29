@@ -1,0 +1,137 @@
+diff --git a/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx b/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
+index 416b6a8a4e22d4..f7c01eac45925c 100644
+--- a/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
+@@ -12,17 +12,17 @@ const meta: Meta< typeof Autocomplete.Root > = {
+ 	title: 'Design System/Components/Form/Primitives/Autocomplete',
+ 	component: Autocomplete.Root,
+ 	subcomponents: {
+-		Portal: Autocomplete.Portal,
+-		Popup: Autocomplete.Popup,
+-		Input: Autocomplete.Input,
+-		InputGroup: Autocomplete.InputGroup,
+-		List: Autocomplete.List,
+-		ListBody: Autocomplete.ListBody,
+-		Collection: Autocomplete.Collection,
+-		Item: Autocomplete.Item,
+-		Value: Autocomplete.Value,
+-		Empty: Autocomplete.Empty,
+-		Clear: Autocomplete.Clear,
++		'Autocomplete.Portal': Autocomplete.Portal,
++		'Autocomplete.Popup': Autocomplete.Popup,
++		'Autocomplete.Input': Autocomplete.Input,
++		'Autocomplete.InputGroup': Autocomplete.InputGroup,
++		'Autocomplete.List': Autocomplete.List,
++		'Autocomplete.ListBody': Autocomplete.ListBody,
++		'Autocomplete.Collection': Autocomplete.Collection,
++		'Autocomplete.Item': Autocomplete.Item,
++		'Autocomplete.Value': Autocomplete.Value,
++		'Autocomplete.Empty': Autocomplete.Empty,
++		'Autocomplete.Clear': Autocomplete.Clear,
+ 	},
+ 	parameters: {
+ 		componentStatus: {
+diff --git a/packages/ui/src/form/primitives/field/stories/index.story.tsx b/packages/ui/src/form/primitives/field/stories/index.story.tsx
+index a6f603fb09d2cb..22d278501b12e9 100644
+--- a/packages/ui/src/form/primitives/field/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/field/stories/index.story.tsx
+@@ -7,11 +7,11 @@ const meta: Meta< typeof Field.Root > = {
+ 	title: 'Design System/Components/Form/Primitives/Field',
+ 	component: Field.Root,
+ 	subcomponents: {
+-		Item: Field.Item,
+-		Label: Field.Label,
+-		Control: Field.Control,
+-		Description: Field.Description,
+-		Details: Field.Details,
++		'Field.Item': Field.Item,
++		'Field.Label': Field.Label,
++		'Field.Control': Field.Control,
++		'Field.Description': Field.Description,
++		'Field.Details': Field.Details,
+ 	},
+ 	parameters: {
+ 		componentStatus: {
+diff --git a/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx b/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
+index cf734045806ac6..3ca119c6e69fcb 100644
+--- a/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
+@@ -6,9 +6,9 @@ const meta: Meta< typeof Fieldset.Root > = {
+ 	title: 'Design System/Components/Form/Primitives/Fieldset',
+ 	component: Fieldset.Root,
+ 	subcomponents: {
+-		Legend: Fieldset.Legend,
+-		Description: Fieldset.Description,
+-		Details: Fieldset.Details,
++		'Fieldset.Legend': Fieldset.Legend,
++		'Fieldset.Description': Fieldset.Description,
++		'Fieldset.Details': Fieldset.Details,
+ 	},
+ 	parameters: {
+ 		componentStatus: {
+diff --git a/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx b/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx
+index b8ac8f3565b277..b7dd1a964a9add 100644
+--- a/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx
+@@ -7,7 +7,7 @@ const meta: Meta< typeof InputLayout > = {
+ 	title: 'Design System/Components/Form/Primitives/InputLayout',
+ 	component: InputLayout,
+ 	subcomponents: {
+-		Slot: InputLayout.Slot,
++		'InputLayout.Slot': InputLayout.Slot,
+ 	},
+ 	parameters: {
+ 		componentStatus: {
+diff --git a/packages/ui/src/form/primitives/select/stories/index.story.tsx b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+index 9422224887780f..0c7a02ef700e9d 100644
+--- a/packages/ui/src/form/primitives/select/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+@@ -5,10 +5,10 @@ const meta: Meta< typeof Select.Root > = {
+ 	title: 'Design System/Components/Form/Primitives/Select',
+ 	component: Select.Root,
+ 	subcomponents: {
+-		Trigger: Select.Trigger,
+-		Portal: Select.Portal,
+-		Popup: Select.Popup,
+-		Item: Select.Item,
++		'Select.Trigger': Select.Trigger,
++		'Select.Portal': Select.Portal,
++		'Select.Popup': Select.Popup,
++		'Select.Item': Select.Item,
+ 	},
+ 	parameters: {
+ 		componentStatus: {
+diff --git a/packages/ui/src/form/select-control/stories/index.story.tsx b/packages/ui/src/form/select-control/stories/index.story.tsx
+index 652a769b0a4c07..93a3f0dccaebde 100644
+--- a/packages/ui/src/form/select-control/stories/index.story.tsx
++++ b/packages/ui/src/form/select-control/stories/index.story.tsx
+@@ -9,7 +9,7 @@ const meta: Meta< typeof SelectControl > = {
+ 	title: 'Design System/Components/Form/SelectControl',
+ 	component: SelectControl,
+ 	subcomponents: {
+-		Item: SelectControl.Item,
++		'SelectControl.Item': SelectControl.Item,
+ 	},
+ 	argTypes: {
+ 		onValueChange: { action: 'onValueChange' },
+diff --git a/packages/ui/src/tooltip/stories/index.story.tsx b/packages/ui/src/tooltip/stories/index.story.tsx
+index 26fbe26997f625..c73ffa4dd8f4b1 100644
+--- a/packages/ui/src/tooltip/stories/index.story.tsx
++++ b/packages/ui/src/tooltip/stories/index.story.tsx
+@@ -7,11 +7,11 @@ const meta: Meta< typeof Tooltip.Root > = {
+ 	title: 'Design System/Components/Tooltip',
+ 	component: Tooltip.Root,
+ 	subcomponents: {
+-		Provider: Tooltip.Provider,
+-		Trigger: Tooltip.Trigger,
+-		Popup: Tooltip.Popup,
+-		Positioner: Tooltip.Positioner,
+-		Portal: Tooltip.Portal,
++		'Tooltip.Provider': Tooltip.Provider,
++		'Tooltip.Trigger': Tooltip.Trigger,
++		'Tooltip.Popup': Tooltip.Popup,
++		'Tooltip.Positioner': Tooltip.Positioner,
++		'Tooltip.Portal': Tooltip.Portal,
+ 	},
+ 	parameters: {
+ 		componentStatus: {

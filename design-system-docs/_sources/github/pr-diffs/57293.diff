@@ -1,0 +1,240 @@
+diff --git a/package-lock.json b/package-lock.json
+index 25144ad2de9782..b5af2577f57a0e 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -55216,6 +55216,7 @@
+ 				"@wordpress/icons": "file:../icons",
+ 				"@wordpress/plugins": "file:../plugins",
+ 				"@wordpress/preferences": "file:../preferences",
++				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/viewport": "file:../viewport",
+ 				"classnames": "^2.3.1"
+ 			},
+@@ -70031,6 +70032,7 @@
+ 				"@wordpress/icons": "file:../icons",
+ 				"@wordpress/plugins": "file:../plugins",
+ 				"@wordpress/preferences": "file:../preferences",
++				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/viewport": "file:../viewport",
+ 				"classnames": "^2.3.1"
+ 			}
+diff --git a/packages/interface/lock-unlock.js b/packages/interface/lock-unlock.js
+new file mode 100644
+index 00000000000000..b6e29bb71c7c02
+--- /dev/null
++++ b/packages/interface/lock-unlock.js
+@@ -0,0 +1,10 @@
++/**
++ * WordPress dependencies
++ */
++import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
++
++export const { lock, unlock } =
++	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
++		'I know using unstable features means my theme or plugin will inevitably break in the next version of WordPress.',
++		'@wordpress/interface'
++	);
+diff --git a/packages/interface/package.json b/packages/interface/package.json
+index df3d53990e0f59..7356a7b52d1d45 100644
+--- a/packages/interface/package.json
++++ b/packages/interface/package.json
+@@ -42,6 +42,7 @@
+ 		"@wordpress/icons": "file:../icons",
+ 		"@wordpress/plugins": "file:../plugins",
+ 		"@wordpress/preferences": "file:../preferences",
++		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/viewport": "file:../viewport",
+ 		"classnames": "^2.3.1"
+ 	},
+diff --git a/packages/interface/src/components/preferences-modal-tabs/index.js b/packages/interface/src/components/preferences-modal-tabs/index.js
+index bc8f7358b834d4..985d963227257f 100644
+--- a/packages/interface/src/components/preferences-modal-tabs/index.js
++++ b/packages/interface/src/components/preferences-modal-tabs/index.js
+@@ -13,15 +13,22 @@ import {
+ 	__experimentalText as Text,
+ 	__experimentalTruncate as Truncate,
+ 	FlexItem,
+-	TabPanel,
+ 	Card,
+ 	CardHeader,
+ 	CardBody,
++	privateApis as componentsPrivateApis,
+ } from '@wordpress/components';
+-import { useMemo, useCallback, useState } from '@wordpress/element';
++import { useMemo, useState } from '@wordpress/element';
+ import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
+ import { isRTL, __ } from '@wordpress/i18n';
+ 
++/**
++ * Internal dependencies
++ */
++import { unlock } from '../../../lock-unlock';
++
++const { Tabs } = unlock( componentsPrivateApis );
++
+ const PREFERENCES_MENU = 'preferences-menu';
+ 
+ export default function PreferencesModalTabs( { sections } ) {
+@@ -32,7 +39,7 @@ export default function PreferencesModalTabs( { sections } ) {
+ 	const [ activeMenu, setActiveMenu ] = useState( PREFERENCES_MENU );
+ 	/**
+ 	 * Create helper objects from `sections` for easier data handling.
+-	 * `tabs` is used for creating the `TabPanel` and `sectionsContentMap`
++	 * `tabs` is used for creating the `Tabs` and `sectionsContentMap`
+ 	 * is used for easier access to active tab's content.
+ 	 */
+ 	const { tabs, sectionsContentMap } = useMemo( () => {
+@@ -53,26 +60,41 @@ export default function PreferencesModalTabs( { sections } ) {
+ 		return mappedTabs;
+ 	}, [ sections ] );
+ 
+-	const getCurrentTab = useCallback(
+-		( tab ) => sectionsContentMap[ tab.name ] || null,
+-		[ sectionsContentMap ]
+-	);
+-
+ 	let modalContent;
+ 	// We render different components based on the viewport size.
+ 	if ( isLargeViewport ) {
+ 		modalContent = (
+-			<TabPanel
+-				className="interface-preferences__tabs"
+-				tabs={ tabs }
+-				initialTabName={
+-					activeMenu !== PREFERENCES_MENU ? activeMenu : undefined
+-				}
+-				onSelect={ setActiveMenu }
+-				orientation="vertical"
+-			>
+-				{ getCurrentTab }
+-			</TabPanel>
++			<div className="interface-preferences__tabs">
++				<Tabs
++					initialTabId={
++						activeMenu !== PREFERENCES_MENU ? activeMenu : undefined
++					}
++					onSelect={ setActiveMenu }
++					orientation="vertical"
++				>
++					<Tabs.TabList className="interface-preferences__tabs-tablist">
++						{ tabs.map( ( tab ) => (
++							<Tabs.Tab
++								tabId={ tab.name }
++								key={ tab.name }
++								className="interface-preferences__tabs-tab"
++							>
++								{ tab.title }
++							</Tabs.Tab>
++						) ) }
++					</Tabs.TabList>
++					{ tabs.map( ( tab ) => (
++						<Tabs.TabPanel
++							tabId={ tab.name }
++							key={ tab.name }
++							className="interface-preferences__tabs-tabpanel"
++							focusable={ false }
++						>
++							{ sectionsContentMap[ tab.name ] || null }
++						</Tabs.TabPanel>
++					) ) }
++				</Tabs>
++			</div>
+ 		);
+ 	} else {
+ 		modalContent = (
+diff --git a/packages/interface/src/components/preferences-modal-tabs/style.scss b/packages/interface/src/components/preferences-modal-tabs/style.scss
+index 04b71f0a773a20..f598545d69c250 100644
+--- a/packages/interface/src/components/preferences-modal-tabs/style.scss
++++ b/packages/interface/src/components/preferences-modal-tabs/style.scss
+@@ -1,45 +1,44 @@
+ $vertical-tabs-width: 160px;
+ 
+-.interface-preferences__tabs {
+-	.components-tab-panel__tabs {
+-		position: absolute;
+-		top: $header-height + $grid-unit-30;
+-		// Aligns button text instead of button box.
+-		left: $grid-unit-20;
+-		width: $vertical-tabs-width;
+-
+-		.components-tab-panel__tabs-item {
+-			border-radius: $radius-block-ui;
+-			font-weight: 400;
+-
+-			&.is-active {
+-				background: $gray-100;
+-				box-shadow: none;
+-				font-weight: 500;
+-			}
+-
+-			&.is-active::after {
+-				content: none;
+-			}
+-
+-			&:focus:not(:disabled) {
+-				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+-				// Windows high contrast mode.
+-				outline: 2px solid transparent;
+-			}
+-
+-			&:focus-visible::before {
+-				content: none;
+-			}
+-		}
++.interface-preferences__tabs-tablist {
++	position: absolute;
++	top: $header-height + $grid-unit-30;
++	// Aligns button text instead of button box.
++	left: $grid-unit-20;
++	width: $vertical-tabs-width;
++
++}
++
++.interface-preferences__tabs-tab {
++	border-radius: $radius-block-ui;
++	font-weight: 400;
++
++	&[aria-selected="true"] {
++		background: $gray-100;
++		box-shadow: none;
++		font-weight: 500;
++	}
++
++	&[aria-selected="true"]::after {
++		content: none;
++	}
++
++	&[role="tab"]:focus:not(:disabled) {
++		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
++		// Windows high contrast mode.
++		outline: 2px solid transparent;
+ 	}
+ 
+-	.components-tab-panel__tab-content {
+-		padding-left: $grid-unit-30;
+-		margin-left: $vertical-tabs-width;
++	&:focus-visible::before {
++		content: none;
+ 	}
+ }
+ 
++.interface-preferences__tabs-tabpanel {
++	padding-left: $grid-unit-30;
++	margin-left: $vertical-tabs-width;
++}
++
+ @media (max-width: #{ ($break-medium - 1) }) {
+ 	// Keep the navigator component from overflowing the modal content area
+ 	// to ensure that sticky position elements stick where intended.
+diff --git a/packages/private-apis/src/implementation.js b/packages/private-apis/src/implementation.js
+index 619478cf76386d..4195991381d02c 100644
+--- a/packages/private-apis/src/implementation.js
++++ b/packages/private-apis/src/implementation.js
+@@ -25,6 +25,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
+ 	'@wordpress/edit-widgets',
+ 	'@wordpress/editor',
+ 	'@wordpress/format-library',
++	'@wordpress/interface',
+ 	'@wordpress/patterns',
+ 	'@wordpress/reusable-blocks',
+ 	'@wordpress/router',

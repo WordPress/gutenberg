@@ -1,0 +1,77 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eb7405e7ec9841..fe62222e11ecd7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ 
+ -   `Mobile` updated to ignore `react/exhaustive-deps` eslint rule ([#44207](https://github.com/WordPress/gutenberg/pull/44207)).
+ -   `Popover`: refactor unit tests to TypeScript and modern RTL assertions ([#44373](https://github.com/WordPress/gutenberg/pull/44373)).
++-   `ResizableBox` updated to pass the `react/exhaustive-deps` eslint rule ([#44370](https://github.com/WordPress/gutenberg/pull/44370)).
+ -   `Sandbox`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44378](https://github.com/WordPress/gutenberg/pull/44378))
+ -   `FontSizePicker`: Convert to TypeScript ([#44449](https://github.com/WordPress/gutenberg/pull/44449)).
+ 
+@@ -37,6 +38,7 @@
+ -   `UnitControl` updated to pass the `react/exhaustive-deps` eslint rule ([#44161](https://github.com/WordPress/gutenberg/pull/44161)).
+ -   `Notice`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44157](https://github.com/WordPress/gutenberg/pull/44157))
+ 
++
+ ## 21.0.0 (2022-09-13)
+ 
+ ### Deprecations
+diff --git a/packages/components/src/resizable-box/resize-tooltip/utils.ts b/packages/components/src/resizable-box/resize-tooltip/utils.ts
+index 54d96a1e6d1d60..7c122c2ebd85ab 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/utils.ts
++++ b/packages/components/src/resizable-box/resize-tooltip/utils.ts
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useEffect, useRef, useState } from '@wordpress/element';
++import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+ import { useResizeObserver } from '@wordpress/compose';
+ 
+ const noop = () => {};
+@@ -84,23 +84,23 @@ export function useResizeLabel( {
+ 	 */
+ 	const moveTimeoutRef = useRef< number >();
+ 
+-	const unsetMoveXY = () => {
+-		/*
+-		 * If axis is controlled, we will avoid resetting the moveX and moveY values.
+-		 * This will allow for the preferred axis values to persist in the label.
+-		 */
+-		if ( isAxisControlled ) return;
+-		setMoveX( false );
+-		setMoveY( false );
+-	};
++	const debounceUnsetMoveXY = useCallback( () => {
++		const unsetMoveXY = () => {
++			/*
++			 * If axis is controlled, we will avoid resetting the moveX and moveY values.
++			 * This will allow for the preferred axis values to persist in the label.
++			 */
++			if ( isAxisControlled ) return;
++			setMoveX( false );
++			setMoveY( false );
++		};
+ 
+-	const debounceUnsetMoveXY = () => {
+ 		if ( moveTimeoutRef.current ) {
+ 			window.clearTimeout( moveTimeoutRef.current );
+ 		}
+ 
+ 		moveTimeoutRef.current = window.setTimeout( unsetMoveXY, fadeTimeout );
+-	};
++	}, [ fadeTimeout, isAxisControlled ] );
+ 
+ 	useEffect( () => {
+ 		/*
+@@ -143,7 +143,7 @@ export function useResizeLabel( {
+ 
+ 		onResize( { width, height } );
+ 		debounceUnsetMoveXY();
+-	}, [ width, height ] );
++	}, [ width, height, onResize, debounceUnsetMoveXY ] );
+ 
+ 	const label = getSizeLabel( {
+ 		axis,

@@ -1,0 +1,5444 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index d4f51348ad2141..830c08c0108469 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -725,6 +725,18 @@
+ 		"markdown_source": "../packages/components/src/button/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "DateCalendar",
++		"slug": "date-calendar",
++		"markdown_source": "../packages/components/src/calendar/date-calendar/README.md",
++		"parent": "components"
++	},
++	{
++		"title": "DateRangeCalendar",
++		"slug": "date-range-calendar",
++		"markdown_source": "../packages/components/src/calendar/date-range-calendar/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "CardBody",
+ 		"slug": "card-body",
+diff --git a/package-lock.json b/package-lock.json
+index c9372724565f38..b8124478c19c63 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -4316,6 +4316,11 @@
+ 				"kuler": "^2.0.0"
+ 			}
+ 		},
++		"node_modules/@date-fns/tz": {
++			"version": "1.2.0",
++			"resolved": "https://registry.npmjs.org/@date-fns/tz/-/tz-1.2.0.tgz",
++			"integrity": "sha512-LBrd7MiJZ9McsOgxqWX7AaxrDjcFVjWH/tIKJd7pnR7McaslGYOP1QmmiBXdJH/H/yLCT+rcQ7FaPBUxRGUtrg=="
++		},
+ 		"node_modules/@discoveryjs/json-ext": {
+ 			"version": "0.5.7",
+ 			"resolved": "https://registry.npmjs.org/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz",
+@@ -21744,6 +21749,11 @@
+ 				"url": "https://github.com/sponsors/kossnocorp"
+ 			}
+ 		},
++		"node_modules/date-fns-jalali": {
++			"version": "4.1.0-0",
++			"resolved": "https://registry.npmjs.org/date-fns-jalali/-/date-fns-jalali-4.1.0-0.tgz",
++			"integrity": "sha512-hTIP/z+t+qKwBDcmmsnmjWTduxCg+5KfdqWQvb2X/8C9+knYY6epN/pfxdDuyVlSVeFz0sM5eEfwIUQ70U4ckg=="
++		},
+ 		"node_modules/dateformat": {
+ 			"version": "3.0.3",
+ 			"resolved": "https://registry.npmjs.org/dateformat/-/dateformat-3.0.3.tgz",
+@@ -39481,6 +39491,35 @@
+ 				"react-dom": ">=16.8.0"
+ 			}
+ 		},
++		"node_modules/react-day-picker": {
++			"version": "9.7.0",
++			"resolved": "https://registry.npmjs.org/react-day-picker/-/react-day-picker-9.7.0.tgz",
++			"integrity": "sha512-urlK4C9XJZVpQ81tmVgd2O7lZ0VQldZeHzNejbwLWZSkzHH498KnArT0EHNfKBOWwKc935iMLGZdxXPRISzUxQ==",
++			"dependencies": {
++				"@date-fns/tz": "1.2.0",
++				"date-fns": "4.1.0",
++				"date-fns-jalali": "4.1.0-0"
++			},
++			"engines": {
++				"node": ">=18"
++			},
++			"funding": {
++				"type": "individual",
++				"url": "https://github.com/sponsors/gpbl"
++			},
++			"peerDependencies": {
++				"react": ">=16.8.0"
++			}
++		},
++		"node_modules/react-day-picker/node_modules/date-fns": {
++			"version": "4.1.0",
++			"resolved": "https://registry.npmjs.org/date-fns/-/date-fns-4.1.0.tgz",
++			"integrity": "sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==",
++			"funding": {
++				"type": "github",
++				"url": "https://github.com/sponsors/kossnocorp"
++			}
++		},
+ 		"node_modules/react-devtools-core": {
+ 			"version": "4.28.5",
+ 			"resolved": "https://registry.npmjs.org/react-devtools-core/-/react-devtools-core-4.28.5.tgz",
+@@ -50468,6 +50507,7 @@
+ 				"path-to-regexp": "^6.2.1",
+ 				"re-resizable": "^6.4.0",
+ 				"react-colorful": "^5.3.1",
++				"react-day-picker": "^9.7.0",
+ 				"remove-accents": "^0.5.0",
+ 				"uuid": "^9.0.1"
+ 			},
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 641a0f8934821a..8ff4e71fea3f18 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   Add new `DateCalendar` and `DateRangeCalendar` components ([#70578](https://github.com/WordPress/gutenberg/pull/70578)).
++
+ ### Bug Fixes
+ 
+ -   `FormTokenField`: Fix focus lost on tab when `__experimentalExpandOnFocus` is set ([#70591](https://github.com/WordPress/gutenberg/pull/70591)).
+diff --git a/packages/components/package.json b/packages/components/package.json
+index a139c1c7621a94..620c9e95994d10 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -75,6 +75,7 @@
+ 		"path-to-regexp": "^6.2.1",
+ 		"re-resizable": "^6.4.0",
+ 		"react-colorful": "^5.3.1",
++		"react-day-picker": "^9.7.0",
+ 		"remove-accents": "^0.5.0",
+ 		"uuid": "^9.0.1"
+ 	},
+diff --git a/packages/components/src/calendar/date-calendar/README.md b/packages/components/src/calendar/date-calendar/README.md
+new file mode 100644
+index 00000000000000..9e0da6d6e507cf
+--- /dev/null
++++ b/packages/components/src/calendar/date-calendar/README.md
+@@ -0,0 +1,250 @@
++# `DateCalendar`
++
++`DateCalendar` is a React component that provides a customizable calendar interface for **single date** selection.
++
++The component is built with accessibility in mind and follows ARIA best practices for calendar widgets. It provides keyboard navigation, screen reader support, and customizable labels for internationalization.
++
++## Usage example
++
++```tsx
++import { DateCalendar } from '@automattic/components';
++
++function MyComponent() {
++	const [ selected, setSelected ] = useState< Date >( new Date() );
++
++	return <DateCalendar selected={ selected } onSelect={ setSelected } />;
++}
++```
++
++## Props
++
++These props are shared between both single date and date range calendar modes.
++
++### `required`
++
++- Type: `boolean`
++- Required: No
++- Default: `false`
++
++Whether the selection is required. When `true`, there always needs to be a date selected.
++
++### `selected`
++
++- Type: `Date | undefined | null`
++- Required: No
++
++The selected date.
++
++### `onSelect`
++
++- Type: `(selected: Date | undefined, triggerDate: Date, modifiers: Modifiers, e: React.MouseEvent | React.KeyboardEvent) => void`
++- Required: No
++
++Event handler when a day is selected.
++
++### `defaultSelected`
++
++- Type: `Date`
++- Required: No
++
++The default selected date (for uncontrolled usage).
++
++### `defaultMonth`
++
++- Type: `Date`
++- Required: No
++- Default: Current month
++
++The initial month to show in the calendar view (uncontrolled).
++
++### `month`
++
++- Type: `Date`
++- Required: No
++
++The month displayed in the calendar view (controlled). Use together with `onMonthChange` to change the month programmatically.
++
++### `numberOfMonths`
++
++- Type: `number`
++- Required: No
++- Default: `1`
++
++The number of months displayed at once.
++
++### `startMonth`
++
++- Type: `Date`
++- Required: No
++
++The earliest month to start the month navigation.
++
++### `endMonth`
++
++- Type: `Date`
++- Required: No
++
++The latest month to end the month navigation.
++
++### `autoFocus`
++
++- Type: `boolean`
++- Required: No
++
++Focus the first selected day (if set) or today's date (if not disabled). Use this prop when you need to focus the calendar after a user action (e.g. opening the dialog with the calendar).
++
++### `disabled`
++
++- Type: `Matcher | Matcher[] | undefined`
++- Required: No
++
++Specify which days are disabled. Using `true` will disable all dates. See the [Matcher Types](#matcher-types) section for more details.
++
++### `disableNavigation`
++
++- Type: `boolean`
++- Required: No
++
++Disable the navigation buttons.
++
++### `labels`
++
++- Type: `object`
++- Required: No
++
++Use custom labels for internationalization. All labels are optional and have sensible defaults:
++
++```typescript
++{
++  labelNav?: () => string; // Navigation toolbar label
++  labelGrid?: (date: Date) => string; // Month grid label (default: "LLLL y")
++  labelGridcell?: (date: Date, modifiers?: Modifiers) => string; // Grid cell label
++  labelNext?: (month: Date | undefined) => string; // Next month button label
++  labelPrevious?: (month: Date | undefined) => string; // Previous month button label
++  labelDayButton?: (date: Date, modifiers?: Modifiers) => string; // Day button label
++  labelWeekday?: (date: Date) => string; // Weekday label
++}
++```
++
++**Important: For a correct localized experience, consumers should make sure the locale used for the translated labels and `locale` prop are consistent.**
++
++### `locale`
++
++- Type: `Locale`
++- Required: No
++- Default: `enUS` from `@date-fns/locale`
++
++The locale object used to localize dates. Pass a locale from `@date-fns/locale` to localize the calendar.
++
++**Important: For a correct localized experience, consumers should make sure the locale used for the translated labels and `locale` prop are consistent.**
++
++### `weekStartsOn`
++
++- Type: `0 | 1 | 2 | 3 | 4 | 5 | 6 | undefined`
++- Required: No
++- Default: Based on the `locale` prop
++
++The index of the first day of the week (0 - Sunday). Overrides the locale's setting.
++
++### `onMonthChange`
++
++- Type: `(month: Date) => void`
++- Required: No
++
++Event fired when the user navigates between months.
++
++### `timeZone`
++
++- Type: `string`
++- Required: No
++
++The time zone (IANA or UTC offset) to use in the calendar. See [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for possible values.
++
++When working with time zones, use the `TZDate` object exported by this package instead of the native `Date` object.
++
++```tsx
++import { DateCalendar, TZDate } from '@automattic/components';
++
++export function WithTimeZone() {
++	const timeZone = 'America/New_York';
++	const [ selected, setSelected ] = useState< Date | undefined >(
++		new TZDate( 2024, 12, 10, timeZone ) // Use `TZDate` instead of `Date`
++	);
++	return <DateCalendar timeZone={ timeZone } selected={ selected } onSelect={ setSelected } />;
++}
++```
++
++### `role`
++
++- Type: `'application' | 'dialog' | undefined`
++- Required: No
++- Default: `'application'`
++
++The role attribute to add to the container element.
++
++## Matcher Types
++
++The calendar component uses a flexible matching system to determine which days should be disabled or have specific modifiers. Here are the available matcher types:
++
++### Boolean Matcher
++
++```typescript
++const booleanMatcher: Matcher = true; // Will always match the day
++```
++
++### Date Matcher
++
++```typescript
++const dateMatcher: Matcher = new Date(); // Will match today's date
++```
++
++### Array Matcher
++
++```typescript
++const arrayMatcher: Matcher = [ new Date( 2019, 1, 2 ), new Date( 2019, 1, 4 ) ]; // Will match the days in the array
++```
++
++### Date After Matcher
++
++```typescript
++const afterMatcher: DateAfter = { after: new Date( 2019, 1, 2 ) }; // Will match days after the 2nd of February 2019
++```
++
++### Date Before Matcher
++
++```typescript
++const beforeMatcher: DateBefore = { before: new Date( 2019, 1, 2 ) }; // Will match days before the 2nd of February 2019
++```
++
++### Date Interval Matcher
++
++```typescript
++const intervalMatcher: DateInterval = {
++	after: new Date( 2019, 1, 2 ),
++	before: new Date( 2019, 1, 5 ),
++}; // Will match the days between the 2nd and the 5th of February 2019 (exclusive)
++```
++
++### Date Range Matcher
++
++```typescript
++const rangeMatcher: DateRange = {
++	from: new Date( 2019, 1, 2 ),
++	to: new Date( 2019, 1, 5 ),
++}; // Will match the days between the 2nd and the 5th of February 2019 (inclusive)
++```
++
++### Day of Week Matcher
++
++```typescript
++const dayOfWeekMatcher: DayOfWeek = { dayOfWeek: 0 }; // Will match Sundays
++const weekendMatcher: DayOfWeek = { dayOfWeek: [ 0, 6 ] }; // Will match weekends
++```
++
++### Function Matcher
++
++```typescript
++const functionMatcher: Matcher = ( day: Date ) => {
++	return day.getMonth() === 2; // Will match when month is March
++};
++```
+diff --git a/packages/components/src/calendar/date-calendar/index.tsx b/packages/components/src/calendar/date-calendar/index.tsx
+new file mode 100644
+index 00000000000000..5de09771803955
+--- /dev/null
++++ b/packages/components/src/calendar/date-calendar/index.tsx
+@@ -0,0 +1,55 @@
++/**
++ * External dependencies
++ */
++import { DayPicker } from 'react-day-picker';
++import { enUS } from 'react-day-picker/locale';
++/**
++ * Internal dependencies
++ */
++import { COMMON_PROPS } from '../utils/constants';
++import { clampNumberOfMonths } from '../utils/misc';
++import { useControlledValue } from '../utils/use-controlled-value';
++import { useLocalizationProps } from '../utils/use-localization-props';
++import type { DateCalendarProps } from '../types';
++
++/**
++ * `DateCalendar` is a React component that provides a customizable calendar
++ * interface for **single date** selection.
++ *
++ * The component is built with accessibility in mind and follows ARIA best
++ * practices for calendar widgets. It provides keyboard navigation, screen reader
++ * support, and customizable labels for internationalization.
++ */
++export const DateCalendar = ( {
++	defaultSelected,
++	selected: selectedProp,
++	onSelect,
++	numberOfMonths = 1,
++	locale = enUS,
++	timeZone,
++	...props
++}: DateCalendarProps ) => {
++	const localizationProps = useLocalizationProps( {
++		locale,
++		timeZone,
++		mode: 'single',
++	} );
++
++	const [ selected, setSelected ] = useControlledValue< Date | undefined >( {
++		defaultValue: defaultSelected,
++		value: selectedProp,
++		onChange: onSelect,
++	} );
++
++	return (
++		<DayPicker
++			{ ...COMMON_PROPS }
++			{ ...localizationProps }
++			{ ...props }
++			mode="single"
++			numberOfMonths={ clampNumberOfMonths( numberOfMonths ) }
++			selected={ selected }
++			onSelect={ setSelected }
++		/>
++	);
++};
+diff --git a/packages/components/src/calendar/date-range-calendar/README.md b/packages/components/src/calendar/date-range-calendar/README.md
+new file mode 100644
+index 00000000000000..21c92fbef3b6c9
+--- /dev/null
++++ b/packages/components/src/calendar/date-range-calendar/README.md
+@@ -0,0 +1,287 @@
++# `DateRangeCalendar`
++
++`DateRangeCalendar` is a React component that provides a customizable calendar interface for **date range** selection.
++
++The component is built with accessibility in mind and follows ARIA best practices for calendar widgets. It provides keyboard navigation, screen reader support, and customizable labels for internationalization.
++
++## Usage example
++
++```tsx
++import { DateRangeCalendar } from '@automattic/components';
++
++type DateRange = {
++	from: Date | undefined;
++	to?: Date | undefined;
++};
++
++function MyComponent() {
++	const [ selected, setSelected ] = useState< DateRange >( {
++		from: new Date( date.getFullYear(), date.getMonth(), 1 ),
++		to: new Date(),
++	} );
++
++	return <DateRangeCalendar selected={ selected } onSelect={ setSelected } />;
++}
++```
++
++## Props
++
++These props are shared between both single date and date range calendar modes.
++
++### `required`
++
++- Type: `boolean`
++- Required: No
++- Default: `false`
++
++Whether the selection is required. When `true`, there always needs to be a date selected.
++
++### `selected`
++
++- Type: `DateRange | undefined | null`
++- Required: No
++
++The selected date range. A `DateRange` object has the following shape:
++
++```typescript
++{
++  from: Date | undefined;
++  to?: Date | undefined;
++}
++```
++
++### `onSelect`
++
++- Type: `(selected: DateRange | undefined, triggerDate: Date, modifiers: Modifiers, e: React.MouseEvent | React.KeyboardEvent) => void`
++- Required: No
++
++Event handler when the selection changes. The `selected` parameter will contain the new date range.
++
++### `defaultSelected`
++
++- Type: `DateRange`
++- Required: No
++
++The default selected range (for uncontrolled usage).
++
++### `excludeDisabled`
++
++- Type: `boolean`
++- Required: No
++
++When `true`, the range will reset when including a disabled day. This is useful to prevent users from selecting ranges that include unavailable dates.
++
++### `min`
++
++- Type: `number`
++- Required: No
++
++The minimum number of days to include in the range. If a user tries to select a range shorter than this, the selection will be adjusted to meet the minimum requirement.
++
++### `max`
++
++- Type: `number`
++- Required: No
++
++The maximum number of days to include in the range. If a user tries to select a range longer than this, the selection will be adjusted to meet the maximum requirement.
++
++### `defaultMonth`
++
++- Type: `Date`
++- Required: No
++- Default: Current month
++
++The initial month to show in the calendar view (uncontrolled).
++
++### `month`
++
++- Type: `Date`
++- Required: No
++
++The month displayed in the calendar view (controlled). Use together with `onMonthChange` to change the month programmatically.
++
++### `numberOfMonths`
++
++- Type: `number`
++- Required: No
++- Default: `1`
++
++The number of months displayed at once.
++
++### `startMonth`
++
++- Type: `Date`
++- Required: No
++
++The earliest month to start the month navigation.
++
++### `endMonth`
++
++- Type: `Date`
++- Required: No
++
++The latest month to end the month navigation.
++
++### `autoFocus`
++
++- Type: `boolean`
++- Required: No
++
++Focus the first selected day (if set) or today's date (if not disabled). Use this prop when you need to focus the calendar after a user action (e.g. opening the dialog with the calendar).
++
++### `disabled`
++
++- Type: `Matcher | Matcher[] | undefined`
++- Required: No
++
++Specify which days are disabled. Using `true` will disable all dates. See the [Matcher Types](#matcher-types) section for more details.
++
++### `disableNavigation`
++
++- Type: `boolean`
++- Required: No
++
++Disable the navigation buttons.
++
++### `labels`
++
++- Type: `object`
++- Required: No
++
++Use custom labels for internationalization. All labels are optional and have sensible defaults:
++
++```typescript
++{
++  labelNav?: () => string; // Navigation toolbar label
++  labelGrid?: (date: Date) => string; // Month grid label (default: "LLLL y")
++  labelGridcell?: (date: Date, modifiers?: Modifiers) => string; // Grid cell label
++  labelNext?: (month: Date | undefined) => string; // Next month button label
++  labelPrevious?: (month: Date | undefined) => string; // Previous month button label
++  labelDayButton?: (date: Date, modifiers?: Modifiers) => string; // Day button label
++  labelWeekday?: (date: Date) => string; // Weekday label
++}
++```
++
++**Important: For a correct localized experience, consumers should make sure the locale used for the translated labels and `locale` prop are consistent.**
++
++### `locale`
++
++- Type: `Locale`
++- Required: No
++- Default: `enUS` from `@date-fns/locale`
++
++The locale object used to localize dates. Pass a locale from `@date-fns/locale` to localize the calendar.
++
++**Important: For a correct localized experience, consumers should make sure the locale used for the translated labels and `locale` prop are consistent.**
++
++### `weekStartsOn`
++
++- Type: `0 | 1 | 2 | 3 | 4 | 5 | 6 | undefined`
++- Required: No
++- Default: Based on the `locale` prop
++
++The index of the first day of the week (0 - Sunday). Overrides the locale's setting.
++
++### `onMonthChange`
++
++- Type: `(month: Date) => void`
++- Required: No
++
++Event fired when the user navigates between months.
++
++### `timeZone`
++
++- Type: `string`
++- Required: No
++
++The time zone (IANA or UTC offset) to use in the calendar. See [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for possible values.
++
++When working with time zones, use the `TZDate` object exported by this package instead of the native `Date` object.
++
++```tsx
++import { DateRangeCalendar, TZDate } from '@automattic/components';
++
++export function WithTimeZone() {
++	const timeZone = 'America/New_York';
++	const [ selected, setSelected ] = useState< Date | undefined >( {
++		from: new TZDate( 2024, 12, 10, timeZone ), // Use `TZDate` instead of `Date`
++		to: new TZDate( 2024, 12, 8, timeZone ), // Use `TZDate` instead of `Date`
++	} );
++	return <DateRangeCalendar timeZone={ timeZone } selected={ selected } onSelect={ setSelected } />;
++}
++```
++
++### `role`
++
++- Type: `'application' | 'dialog' | undefined`
++- Required: No
++- Default: `'application'`
++
++The role attribute to add to the container element.
++
++## Matcher Types
++
++The calendar component uses a flexible matching system to determine which days should be disabled or have specific modifiers. Here are the available matcher types:
++
++### Boolean Matcher
++
++```typescript
++const booleanMatcher: Matcher = true; // Will always match the day
++```
++
++### Date Matcher
++
++```typescript
++const dateMatcher: Matcher = new Date(); // Will match today's date
++```
++
++### Array Matcher
++
++```typescript
++const arrayMatcher: Matcher = [ new Date( 2019, 1, 2 ), new Date( 2019, 1, 4 ) ]; // Will match the days in the array
++```
++
++### Date After Matcher
++
++```typescript
++const afterMatcher: DateAfter = { after: new Date( 2019, 1, 2 ) }; // Will match days after the 2nd of February 2019
++```
++
++### Date Before Matcher
++
++```typescript
++const beforeMatcher: DateBefore = { before: new Date( 2019, 1, 2 ) }; // Will match days before the 2nd of February 2019
++```
++
++### Date Interval Matcher
++
++```typescript
++const intervalMatcher: DateInterval = {
++	after: new Date( 2019, 1, 2 ),
++	before: new Date( 2019, 1, 5 ),
++}; // Will match the days between the 2nd and the 5th of February 2019 (exclusive)
++```
++
++### Date Range Matcher
++
++```typescript
++const rangeMatcher: DateRange = {
++	from: new Date( 2019, 1, 2 ),
++	to: new Date( 2019, 1, 5 ),
++}; // Will match the days between the 2nd and the 5th of February 2019 (inclusive)
++```
++
++### Day of Week Matcher
++
++```typescript
++const dayOfWeekMatcher: DayOfWeek = { dayOfWeek: 0 }; // Will match Sundays
++const weekendMatcher: DayOfWeek = { dayOfWeek: [ 0, 6 ] }; // Will match weekends
++```
++
++### Function Matcher
++
++```typescript
++const functionMatcher: Matcher = ( day: Date ) => {
++	return day.getMonth() === 2; // Will match when month is March
++};
++```
+diff --git a/packages/components/src/calendar/date-range-calendar/index.tsx b/packages/components/src/calendar/date-range-calendar/index.tsx
+new file mode 100644
+index 00000000000000..6d28c4c49f6ce3
+--- /dev/null
++++ b/packages/components/src/calendar/date-range-calendar/index.tsx
+@@ -0,0 +1,203 @@
++/**
++ * External dependencies
++ */
++import { differenceInCalendarDays } from 'date-fns';
++import { DayPicker, rangeContainsModifiers } from 'react-day-picker';
++import { enUS } from 'react-day-picker/locale';
++/**
++ * WordPress dependencies
++ */
++import { useMemo, useState } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import { COMMON_PROPS, MODIFIER_CLASSNAMES } from '../utils/constants';
++import { clampNumberOfMonths } from '../utils/misc';
++import { useControlledValue } from '../utils/use-controlled-value';
++import { useLocalizationProps } from '../utils/use-localization-props';
++import type { DateRangeCalendarProps, DateRange } from '../types';
++
++export function usePreviewRange( {
++	selected,
++	hoveredDate,
++	excludeDisabled,
++	min,
++	max,
++	disabled,
++}: Pick<
++	DateRangeCalendarProps,
++	'selected' | 'excludeDisabled' | 'min' | 'max' | 'disabled'
++> & {
++	hoveredDate: Date | undefined;
++} ) {
++	return useMemo( () => {
++		if ( ! hoveredDate || ! selected?.from ) {
++			return;
++		}
++
++		let previewHighlight: DateRange | undefined;
++		let potentialNewRange: { from: Date; to: Date } | undefined;
++
++		// Hovering on a date before the start of the selected range
++		if ( hoveredDate < selected.from ) {
++			previewHighlight = {
++				from: hoveredDate,
++				to: selected.from,
++			};
++
++			potentialNewRange = {
++				from: hoveredDate,
++				to: selected.to ?? selected.from,
++			};
++		} else if (
++			selected.to &&
++			hoveredDate > selected.from &&
++			hoveredDate < selected.to
++		) {
++			// Hovering on a date between the start and end of the selected range
++			previewHighlight = {
++				from: selected.from,
++				to: hoveredDate,
++			};
++
++			potentialNewRange = {
++				from: selected.from,
++				to: hoveredDate,
++			};
++		} else if ( hoveredDate > selected.from ) {
++			// Hovering on a date after the end of the selected range (either
++			// because it's greater than selected.to, or because it's not defined)
++			previewHighlight = {
++				from: selected.to ?? selected.from,
++				to: hoveredDate,
++			};
++
++			potentialNewRange = {
++				from: selected.from,
++				to: hoveredDate,
++			};
++		}
++
++		if (
++			min !== undefined &&
++			min > 0 &&
++			potentialNewRange &&
++			differenceInCalendarDays(
++				potentialNewRange.to,
++				potentialNewRange.from
++			) < min
++		) {
++			previewHighlight = {
++				from: hoveredDate,
++				to: hoveredDate,
++			};
++		}
++
++		if (
++			max !== undefined &&
++			max > 0 &&
++			potentialNewRange &&
++			differenceInCalendarDays(
++				potentialNewRange.to,
++				potentialNewRange.from
++			) > max
++		) {
++			previewHighlight = {
++				from: hoveredDate,
++				to: hoveredDate,
++			};
++		}
++
++		if (
++			excludeDisabled &&
++			disabled &&
++			potentialNewRange &&
++			rangeContainsModifiers( potentialNewRange, disabled )
++		) {
++			previewHighlight = {
++				from: hoveredDate,
++				to: hoveredDate,
++			};
++		}
++
++		return previewHighlight;
++	}, [ selected, hoveredDate, excludeDisabled, min, max, disabled ] );
++}
++
++/**
++ * `DateRangeCalendar` is a React component that provides a customizable calendar
++ * interface for **date range** selection.
++ *
++ * The component is built with accessibility in mind and follows ARIA best
++ * practices for calendar widgets. It provides keyboard navigation, screen reader
++ * support, and customizable labels for internationalization.
++ */
++export const DateRangeCalendar = ( {
++	defaultSelected,
++	selected: selectedProp,
++	onSelect,
++	numberOfMonths = 1,
++	excludeDisabled,
++	min,
++	max,
++	disabled,
++	locale = enUS,
++	timeZone,
++	...props
++}: DateRangeCalendarProps ) => {
++	const localizationProps = useLocalizationProps( {
++		locale,
++		timeZone,
++		mode: 'range',
++	} );
++
++	const [ selected, setSelected ] = useControlledValue<
++		DateRange | undefined
++	>( {
++		defaultValue: defaultSelected,
++		value: selectedProp,
++		onChange: onSelect,
++	} );
++
++	const [ hoveredDate, setHoveredDate ] = useState< Date | undefined >(
++		undefined
++	);
++
++	// Compute the preview range for hover effect
++	const previewRange = usePreviewRange( {
++		selected,
++		hoveredDate,
++		excludeDisabled,
++		min,
++		max,
++		disabled,
++	} );
++
++	const modifiers = useMemo( () => {
++		return {
++			preview: previewRange,
++			preview_start: previewRange?.from,
++			preview_end: previewRange?.to,
++		};
++	}, [ previewRange ] );
++
++	return (
++		<DayPicker
++			{ ...COMMON_PROPS }
++			{ ...localizationProps }
++			{ ...props }
++			mode="range"
++			numberOfMonths={ clampNumberOfMonths( numberOfMonths ) }
++			disabled={ disabled }
++			excludeDisabled={ excludeDisabled }
++			min={ min }
++			max={ max }
++			selected={ selected }
++			onSelect={ setSelected }
++			onDayMouseEnter={ ( date ) => setHoveredDate( date ) }
++			onDayMouseLeave={ () => setHoveredDate( undefined ) }
++			modifiers={ modifiers }
++			modifiersClassNames={ MODIFIER_CLASSNAMES }
++		/>
++	);
++};
+diff --git a/packages/components/src/calendar/index.tsx b/packages/components/src/calendar/index.tsx
+new file mode 100644
+index 00000000000000..dca0d755ec9ce8
+--- /dev/null
++++ b/packages/components/src/calendar/index.tsx
+@@ -0,0 +1,3 @@
++export { TZDate } from 'react-day-picker';
++export { DateCalendar } from './date-calendar';
++export { DateRangeCalendar } from './date-range-calendar';
+diff --git a/packages/components/src/calendar/stories/date-calendar.story.tsx b/packages/components/src/calendar/stories/date-calendar.story.tsx
+new file mode 100644
+index 00000000000000..a3570f9aa2909d
+--- /dev/null
++++ b/packages/components/src/calendar/stories/date-calendar.story.tsx
+@@ -0,0 +1,221 @@
++/**
++ * External dependencies
++ */
++import { fn } from '@storybook/test';
++import {
++	enUS,
++	fr,
++	es,
++	de,
++	it,
++	he,
++	ru,
++	ja,
++	ptBR,
++	nl,
++	ko,
++	tr,
++	id,
++	zhCN,
++	zhTW,
++	ar,
++	sv,
++} from 'date-fns/locale';
++import type { Meta, StoryObj } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState, useEffect } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import { DateCalendar, TZDate } from '..';
++
++const meta: Meta< typeof DateCalendar > = {
++	title: 'Components/Selection & Input/Time & Date/DateCalendar',
++	component: DateCalendar,
++	argTypes: {
++		locale: {
++			options: [
++				'English (US)',
++				'French',
++				'Spanish',
++				'German',
++				'Italian',
++				'Hebrew',
++				'Russian',
++				'Japanese',
++				'Portuguese (Brazil)',
++				'Dutch',
++				'Korean',
++				'Turkish',
++				'Indonesian',
++				'Chinese (Simplified)',
++				'Chinese (Traditional)',
++				'Arabic',
++				'Swedish',
++			],
++			mapping: {
++				'English (US)': enUS,
++				French: fr,
++				Spanish: es,
++				German: de,
++				Italian: it,
++				Hebrew: he,
++				Russian: ru,
++				Japanese: ja,
++				'Portuguese (Brazil)': ptBR,
++				Dutch: nl,
++				Korean: ko,
++				Turkish: tr,
++				Indonesian: id,
++				'Chinese (Simplified)': zhCN,
++				'Chinese (Traditional)': zhTW,
++				Arabic: ar,
++				Swedish: sv,
++			},
++			control: 'select',
++		},
++		timeZone: {
++			options: [
++				'Pacific/Honolulu',
++				'America/New_York',
++				'Europe/London',
++				'Asia/Tokyo',
++				'Pacific/Auckland',
++			],
++			control: 'select',
++		},
++		labels: {
++			control: false,
++		},
++		defaultSelected: { control: 'date' },
++		selected: { control: 'date' },
++		onSelect: {
++			control: false,
++		},
++		defaultMonth: { control: 'date' },
++		month: { control: 'date' },
++		onMonthChange: {
++			control: false,
++		},
++		endMonth: { control: 'date' },
++		startMonth: { control: 'date' },
++	},
++	args: {
++		onMonthChange: fn(),
++		onSelect: fn(),
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof DateCalendar >;
++
++export const Default: Story = {};
++
++export const DisabledDates: Story = {
++	args: {
++		disabled: [
++			// Disable tomorrow (single date)
++			new Date( new Date().setDate( new Date().getDate() + 1 ) ),
++			// Disable all dates after Feb 1st of next year
++			{ after: new Date( new Date().getFullYear() + 1, 1, 1 ) },
++			// Disable all dates before Dec 1st of last year
++			{ before: new Date( new Date().getFullYear() - 1, 11, 1 ) },
++			// Disable all dates between 12th and 14th of August of this year
++			{
++				after: new Date( new Date().getFullYear(), 7, 11 ),
++				before: new Date( new Date().getFullYear(), 7, 15 ),
++			},
++			// Disable all dates between 21st and 26th of October of this year
++			{
++				from: new Date( new Date().getFullYear(), 9, 21 ),
++				to: new Date( new Date().getFullYear(), 9, 26 ),
++			},
++			// Disable all Wednesdays
++			{ dayOfWeek: 3 },
++			// Disable all prime day numbers
++			function isPrimeDate( date: Date ) {
++				return [ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31 ].includes(
++					date.getDate()
++				);
++			},
++		],
++	},
++};
++
++const nextMonth = new Date().getMonth() === 11 ? 0 : new Date().getMonth() + 1;
++const nextMonthYear =
++	new Date().getMonth() === 11
++		? new Date().getFullYear() + 1
++		: new Date().getFullYear();
++const firstDayOfNextMonth = new Date( nextMonthYear, nextMonth, 1 );
++export const WithSelectedDateAndMonth: Story = {
++	args: {
++		defaultSelected: firstDayOfNextMonth,
++		defaultMonth: firstDayOfNextMonth,
++	},
++};
++
++/**
++ * When working with time zones, use the `TZDate` object exported by this package instead of the native `Date` object.
++ */
++export const WithTimeZone: Story = {
++	render: function DateCalendarWithTimeZone( args ) {
++		const [ selected, setSelected ] = useState< TZDate | null >( null );
++
++		useEffect( () => {
++			setSelected(
++				// Select one week from today every time the time zone changes.
++				new TZDate(
++					new Date().setDate( new Date().getDate() + 7 ),
++					args.timeZone
++				)
++			);
++		}, [ args.timeZone ] );
++
++		return (
++			<>
++				<DateCalendar
++					{ ...args }
++					selected={ selected }
++					onSelect={ ( selectedDate, ...rest ) => {
++						setSelected(
++							selectedDate
++								? new TZDate( selectedDate, args.timeZone )
++								: null
++						);
++						args.onSelect?.( selectedDate, ...rest );
++					} }
++					disabled={ [
++						{
++							// Disable any date before today
++							before: new TZDate( new Date(), args.timeZone ),
++						},
++					] }
++				/>
++
++				<p>
++					Calendar set to { args.timeZone ?? 'current' } timezone,
++					disabling selection for all dates before today, and starting
++					with a default date of 1 week from today.
++				</p>
++			</>
++		);
++	},
++	args: {
++		timeZone: 'Pacific/Auckland',
++	},
++	argTypes: {
++		selected: {
++			control: false,
++		},
++		defaultSelected: {
++			control: false,
++		},
++		disabled: {
++			control: false,
++		},
++	},
++};
+diff --git a/packages/components/src/calendar/stories/date-range-calendar.story.tsx b/packages/components/src/calendar/stories/date-range-calendar.story.tsx
+new file mode 100644
+index 00000000000000..529a9d368ce5eb
+--- /dev/null
++++ b/packages/components/src/calendar/stories/date-range-calendar.story.tsx
+@@ -0,0 +1,230 @@
++/**
++ * External dependencies
++ */
++import { fn } from '@storybook/test';
++import {
++	enUS,
++	fr,
++	es,
++	de,
++	it,
++	he,
++	ru,
++	ja,
++	ptBR,
++	nl,
++	ko,
++	tr,
++	id,
++	zhCN,
++	zhTW,
++	ar,
++	sv,
++} from 'date-fns/locale';
++import type { Meta, StoryObj } from '@storybook/react';
++/**
++ * WordPress dependencies
++ */
++import { useState, useEffect } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import { DateRangeCalendar, TZDate } from '..';
++
++const meta: Meta< typeof DateRangeCalendar > = {
++	title: 'Components/Selection & Input/Time & Date/DateRangeCalendar',
++	component: DateRangeCalendar,
++	argTypes: {
++		locale: {
++			options: [
++				'English (US)',
++				'French',
++				'Spanish',
++				'German',
++				'Italian',
++				'Hebrew',
++				'Russian',
++				'Japanese',
++				'Portuguese (Brazil)',
++				'Dutch',
++				'Korean',
++				'Turkish',
++				'Indonesian',
++				'Chinese (Simplified)',
++				'Chinese (Traditional)',
++				'Arabic',
++				'Swedish',
++			],
++			mapping: {
++				'English (US)': enUS,
++				French: fr,
++				Spanish: es,
++				German: de,
++				Italian: it,
++				Hebrew: he,
++				Russian: ru,
++				Japanese: ja,
++				'Portuguese (Brazil)': ptBR,
++				Dutch: nl,
++				Korean: ko,
++				Turkish: tr,
++				Indonesian: id,
++				'Chinese (Simplified)': zhCN,
++				'Chinese (Traditional)': zhTW,
++				Arabic: ar,
++				Swedish: sv,
++			},
++			control: 'select',
++		},
++		timeZone: {
++			options: [
++				'Pacific/Honolulu',
++				'America/New_York',
++				'Europe/London',
++				'Asia/Tokyo',
++				'Pacific/Auckland',
++			],
++			control: 'select',
++		},
++		labels: {
++			control: false,
++		},
++		defaultSelected: { control: false },
++		selected: { control: false },
++		onSelect: {
++			control: false,
++		},
++		defaultMonth: { control: 'date' },
++		month: { control: 'date' },
++		onMonthChange: {
++			control: false,
++		},
++		endMonth: { control: 'date' },
++		startMonth: { control: 'date' },
++	},
++	args: {
++		onMonthChange: fn(),
++		onSelect: fn(),
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof DateRangeCalendar >;
++
++export const Default: Story = {};
++
++export const DisabledDates: Story = {
++	args: {
++		disabled: [
++			// Disable tomorrow (single date)
++			new Date( new Date().setDate( new Date().getDate() + 1 ) ),
++			// Disable all dates after Feb 1st of next year
++			{ after: new Date( new Date().getFullYear() + 1, 1, 1 ) },
++			// Disable all dates before Dec 1st of last year
++			{ before: new Date( new Date().getFullYear() - 1, 11, 1 ) },
++			// Disable all dates between 12th and 14th of August of this year
++			{
++				after: new Date( new Date().getFullYear(), 7, 11 ),
++				before: new Date( new Date().getFullYear(), 7, 15 ),
++			},
++			// Disable all dates between 21st and 26th of October of this year
++			{
++				from: new Date( new Date().getFullYear(), 9, 21 ),
++				to: new Date( new Date().getFullYear(), 9, 26 ),
++			},
++			// Disable all Wednesdays
++			{ dayOfWeek: 3 },
++			// Disable all prime day numbers
++			function isPrimeDate( date: Date ) {
++				return [ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31 ].includes(
++					date.getDate()
++				);
++			},
++		],
++	},
++};
++
++const nextMonth = new Date().getMonth() === 11 ? 0 : new Date().getMonth() + 1;
++const nextMonthYear =
++	new Date().getMonth() === 11
++		? new Date().getFullYear() + 1
++		: new Date().getFullYear();
++const firstDayOfNextMonth = new Date( nextMonthYear, nextMonth, 1 );
++const fourthDayOfNextMonth = new Date( nextMonthYear, nextMonth, 4 );
++export const WithSelectedRangeAndMonth: Story = {
++	args: {
++		defaultSelected: {
++			from: firstDayOfNextMonth,
++			to: fourthDayOfNextMonth,
++		},
++		defaultMonth: firstDayOfNextMonth,
++	},
++};
++
++/**
++ * When working with time zones, use the `TZDate` object exported by this package instead of the native `Date` object.
++ */
++export const WithTimeZone: Story = {
++	render: function DateCalendarWithTimeZone( args ) {
++		const [ range, setRange ] = useState< typeof args.selected | null >(
++			null
++		);
++
++		useEffect( () => {
++			setRange(
++				// Select from one week from today to two weeks from today
++				// every time the timezone changes.
++				{
++					from: new TZDate(
++						new Date().setDate( new Date().getDate() + 7 ),
++						args.timeZone
++					),
++					to: new TZDate(
++						new Date().setDate( new Date().getDate() + 14 ),
++						args.timeZone
++					),
++				}
++			);
++		}, [ args.timeZone ] );
++
++		return (
++			<>
++				<DateRangeCalendar
++					{ ...args }
++					selected={ range }
++					onSelect={ ( selectedDate, ...rest ) => {
++						setRange(
++							// Set controlled state to null if there's no selection
++							! selectedDate ||
++								( selectedDate.from === undefined &&
++									selectedDate.to === undefined )
++								? null
++								: selectedDate
++						);
++						args.onSelect?.( selectedDate, ...rest );
++					} }
++					disabled={ [
++						{
++							// Disable any date before today
++							before: new TZDate( new Date(), args.timeZone ),
++						},
++					] }
++				/>
++				<p>
++					Calendar set to { args.timeZone ?? 'current' } timezone,
++					disabling selection for all dates before today, and starting
++					with a default date range of 1 week from today to 2 weeks
++					from today.
++				</p>
++			</>
++		);
++	},
++	args: {
++		timeZone: 'Pacific/Auckland',
++	},
++	argTypes: {
++		disabled: {
++			control: false,
++		},
++	},
++};
+diff --git a/packages/components/src/calendar/style.scss b/packages/components/src/calendar/style.scss
+new file mode 100644
+index 00000000000000..1fa28cdde4f91b
+--- /dev/null
++++ b/packages/components/src/calendar/style.scss
+@@ -0,0 +1,431 @@
++/* Root of the component. */
++// Internal variables
++$wp-components-calendar-outline-focus: var(--wp-admin-border-width-focus) solid $components-color-accent;
++$wp-components-calendar-button-height: 2rem;
++$wp-components-calendar-button-width: 2rem;
++$wp-components-calendar-nav-height: 2rem;
++$wp-components-calendar-range-middle-background-color: color-mix(in srgb, $components-color-accent 4%, transparent);
++$wp-components-calendar-preview-border-color: color-mix(in srgb, $components-color-accent 16%, transparent);
++
++.components-calendar {
++	// TODO: add font family rule when Theme is ready
++
++	position: relative; /* Required to position the navigation toolbar. */
++	box-sizing: border-box;
++	display: inline flow-root;
++	color: $gray-900;
++	background-color: $white;
++	font-size: 13px;
++	font-weight: 400;
++	z-index: 0; // Create a stacking context and render on top of the background.
++
++	*,
++	*::before,
++	*::after {
++		box-sizing: border-box;
++	}
++}
++
++.components-calendar__day {
++	padding: 0;
++	position: relative;
++
++	// Setting text color on the day container instead of directly on the
++	// day button to ensure that the color of the dot used to indicate today's
++	// date follows the same color as the button's text, since the button
++	// inherits its text color.
++	&:has(.components-calendar__day-button:disabled) {
++		color: $gray-600;
++	}
++	&:has(.components-calendar__day-button:hover:not(:disabled)),
++	&:has(.components-calendar__day-button:focus-visible) {
++		color: $components-color-accent;
++	}
++}
++
++.components-calendar__day-button {
++	background: none;
++	padding: 0;
++	margin: 0;
++	cursor: pointer;
++	justify-content: center;
++	align-items: center;
++	display: flex;
++	position: relative;
++
++	width: $wp-components-calendar-button-width;
++	height: $wp-components-calendar-button-height;
++
++	border: none;
++	border-radius: 2px;
++
++	font: inherit;
++	font-variant-numeric: tabular-nums;
++	color: inherit;
++
++	// Use the button's ::before to render date's background, which keeps the
++	// border-radius of the button intact. This technique allows the focus ring
++	// to have rounded corners even when the background needs square corners
++	// (eg. in the middle of a date range).
++	&::before {
++		content: "";
++		position: absolute;
++		z-index: -1;
++		inset: 0;
++		border: none; // No default border to avoid polluting high-contrast mode.
++		border-radius: 2px;
++	}
++
++	// Use the button's ::after to show the selection preview.
++	&::after {
++		content: "";
++		position: absolute;
++		z-index: 1;
++		inset: 0;
++		pointer-events: none;
++	}
++
++	&:disabled {
++		cursor: revert;
++
++		@media ( forced-colors: active ) {
++			// As an extra visual cue, show a line-through on disabled days
++			// in forced-colors (high-contrast) mode.
++			text-decoration: line-through;
++		}
++	}
++
++	&:focus-visible {
++		outline: $wp-components-calendar-outline-focus;
++		outline-offset: 1px;
++	}
++}
++
++.components-calendar__caption-label {
++	z-index: 1;
++
++	position: relative;
++	display: inline-flex;
++	align-items: center;
++
++	white-space: nowrap;
++	border: 0;
++
++	text-transform: capitalize;
++}
++
++.components-calendar__button-next,
++.components-calendar__button-previous {
++	border: none;
++	border-radius: 2px;
++	background: none;
++	padding: 0;
++	margin: 0;
++	cursor: pointer;
++	-moz-appearance: none;
++	-webkit-appearance: none;
++	display: inline-flex;
++	align-items: center;
++	justify-content: center;
++	position: relative;
++	appearance: none;
++
++	width: $wp-components-calendar-button-width;
++	height: $wp-components-calendar-button-height;
++
++	color: inherit;
++
++	&:disabled,
++	&[aria-disabled="true"] {
++		cursor: revert;
++
++		color: $gray-600;
++	}
++
++	&:focus-visible {
++		outline: $wp-components-calendar-outline-focus;
++	}
++}
++
++.components-calendar__chevron {
++	display: inline-block;
++	fill: currentColor;
++	width: 16px;
++	height: 16px;
++}
++
++.components-calendar[dir="rtl"]
++.components-calendar__nav
++.components-calendar__chevron {
++	transform: rotate(180deg);
++	transform-origin: 50%;
++}
++
++.components-calendar__month-caption {
++	display: flex;
++	justify-content: center;
++	align-content: center;
++
++	height: $wp-components-calendar-nav-height;
++	margin-bottom: 12px;
++}
++
++.components-calendar__months {
++	position: relative;
++	display: flex;
++	justify-content: center;
++	flex-wrap: wrap;
++	gap: 1rem;
++	max-width: fit-content;
++}
++
++.components-calendar__month-grid {
++	border-collapse: separate;
++	border-spacing: 0 4px;
++}
++
++.components-calendar__nav {
++	position: absolute;
++	inset-block-start: 0;
++	inset-inline-start: 0;
++	inset-inline-end: 0;
++
++	display: flex;
++	align-items: center;
++	justify-content: space-between;
++
++	height: $wp-components-calendar-nav-height;
++}
++
++.components-calendar__weekday {
++	width: $wp-components-calendar-button-width;
++	height: $wp-components-calendar-button-height;
++	padding: 0;
++
++	color: $gray-700;
++	text-align: center;
++	text-transform: uppercase;
++}
++
++/* DAY MODIFIERS */
++// Today's date: show a dot in the top-right corner of the button
++.components-calendar__day--today::after {
++	content: "";
++	position: absolute;
++	z-index: 1;
++	inset-block-start: 2px;
++	inset-inline-end: 2px;
++	width: 0;
++	height: 0;
++	border-radius: 50%;
++	border: 2px solid currentColor;
++}
++
++// Selected date button (individual date, range start, and range end)
++.components-calendar__day--selected:not(.components-calendar__range-middle) {
++	&:has(
++	.components-calendar__day-button,
++	.components-calendar__day-button:hover:not(:disabled)
++) {
++		color: $white;
++	}
++
++	.components-calendar__day-button {
++		&::before {
++			background-color: $gray-900;
++			// Render a transparent border to highlight the selected day in
++			// forced-colors (high-contrast) mode, since the background is not
++			// visible.
++			border: 1px solid transparent;
++		}
++
++		&:disabled::before {
++			background-color: $gray-600;
++		}
++
++		&:hover:not(:disabled)::before {
++			background-color: $gray-800;
++		}
++	}
++}
++
++// Hidden button (ie. outside current month but still rendered)
++.components-calendar__day--hidden {
++	visibility: hidden;
++}
++
++// Range start button, but not when start and end are the same day.
++.components-calendar__range-start:not(.components-calendar__range-end)
++.components-calendar__day-button {
++	// Apply border-radius changes to the button itself too, so that the focus
++	// ring follows the same shape as the button's background.
++	&,
++	&::before {
++		border-start-end-radius: 0;
++		border-end-end-radius: 0;
++	}
++}
++
++// Middle of date range
++.components-calendar__range-middle .components-calendar__day-button {
++	&::before {
++		background-color: $wp-components-calendar-range-middle-background-color;
++		border-radius: 0;
++
++		// Render a top and bottom transparent border to highlight the selected
++		// day in forced-colors (high-contrast) mode, since the background is not
++		// visible.
++		border-width: 1px 0;
++		border-color: transparent;
++		border-style: solid;
++	}
++}
++
++// Range end button, but not when start and end are the same day.
++.components-calendar__range-end:not(.components-calendar__range-start)
++.components-calendar__day-button {
++	// Apply border-radius changes to the button itself too, so that the focus
++	// ring follows the same shape as the button's background.
++	&,
++	&::before {
++		border-start-start-radius: 0;
++		border-end-start-radius: 0;
++	}
++}
++
++/*
++ * RANGE PREVIEW (range calendar only)
++ *
++ * The preview is rendered in the button's ::after pseudo-element, so that it
++ * can be rendered over the button's contents.
++ * The selection preview is shown with a dashed border. In order to have
++ * control over the dash pattern (especially the seams between days), the
++ * dashed borders are rendered as SVGs via the url() CSS function.
++ * Since SVGs rendered in the url() function don't seem to be able to access
++ * CSS variables, we're using the SVGs as masks, and using `background-color`
++ * to consume the accent color variable.
++ */
++.components-calendar__day--preview svg {
++	position: absolute;
++	inset: 0;
++	pointer-events: none;
++	color: $wp-components-calendar-preview-border-color;
++
++	@media ( forced-colors: active ) {
++		color: inherit;
++	}
++
++	.components-calendar[dir="rtl"] & {
++		transform: scaleX(-1);
++	}
++}
++
++.components-calendar__day--preview.components-calendar__range-middle
++.components-calendar__day-button::before {
++	// Remove the transparent border shown on the middle of the range
++	// in forced-colors (high-contrast) mode, to allow for the dashed border
++	// to be visible.
++	border: none;
++}
++
++/* ANIMATIONS */
++@keyframes slide-in-left {
++	0% {
++		transform: translateX(-100%);
++	}
++	100% {
++		transform: translateX(0);
++	}
++}
++
++@keyframes slide-in-right {
++	0% {
++		transform: translateX(100%);
++	}
++	100% {
++		transform: translateX(0);
++	}
++}
++
++@keyframes slide-out-left {
++	0% {
++		transform: translateX(0);
++	}
++	100% {
++		transform: translateX(-100%);
++	}
++}
++
++@keyframes slide-out-right {
++	0% {
++		transform: translateX(0);
++	}
++	100% {
++		transform: translateX(100%);
++	}
++}
++
++@keyframes fade-in {
++	from {
++		opacity: 0;
++	}
++	to {
++		opacity: 1;
++	}
++}
++
++@keyframes fade-out {
++	from {
++		opacity: 1;
++	}
++	to {
++		opacity: 0;
++	}
++}
++
++.components-calendar__weeks-before-enter,
++.components-calendar__weeks-before-exit,
++.components-calendar__weeks-after-enter,
++.components-calendar__weeks-after-exit,
++.components-calendar__caption-after-enter,
++.components-calendar__caption-after-exit,
++.components-calendar__caption-before-enter,
++.components-calendar__caption-before-exit {
++	animation-duration: 0s;
++	animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
++	animation-fill-mode: forwards;
++
++	@media not ( prefers-reduced-motion ) {
++		animation-duration: 0.3s;
++	}
++}
++
++.components-calendar__weeks-before-enter,
++.components-calendar[dir="rtl"] .components-calendar__weeks-after-enter {
++	animation-name: slide-in-left;
++}
++.components-calendar__weeks-before-exit,
++.components-calendar[dir="rtl"] .components-calendar__weeks-after-exit {
++	animation-name: slide-out-left;
++}
++.components-calendar__weeks-after-enter,
++.components-calendar[dir="rtl"] .components-calendar__weeks-before-enter {
++	animation-name: slide-in-right;
++}
++.components-calendar__weeks-after-exit,
++.components-calendar[dir="rtl"] .components-calendar__weeks-before-exit {
++	animation-name: slide-out-right;
++}
++
++.components-calendar__caption-after-enter {
++	animation-name: fade-in;
++}
++.components-calendar__caption-after-exit {
++	animation-name: fade-out;
++}
++.components-calendar__caption-before-enter {
++	animation-name: fade-in;
++}
++.components-calendar__caption-before-exit {
++	animation-name: fade-out;
++}
+diff --git a/packages/components/src/calendar/test/__utils__/index.ts b/packages/components/src/calendar/test/__utils__/index.ts
+new file mode 100644
+index 00000000000000..9e4e9ba7dbed10
+--- /dev/null
++++ b/packages/components/src/calendar/test/__utils__/index.ts
+@@ -0,0 +1,56 @@
++/**
++ * External dependencies
++ */
++import { screen } from '@testing-library/react';
++
++export const monthNameFormatter = ( localeCode: string, timeZone?: string ) =>
++	new Intl.DateTimeFormat( localeCode, {
++		year: 'numeric',
++		month: 'long',
++		timeZone,
++	} );
++
++const fullDateFormatter = ( localeCode: string, timeZone?: string ) =>
++	new Intl.DateTimeFormat( localeCode, {
++		weekday: 'long',
++		year: 'numeric',
++		month: 'long',
++		day: 'numeric',
++		timeZone,
++	} );
++
++export const dateNumberFormatter = ( localeCode: string, timeZone?: string ) =>
++	new Intl.DateTimeFormat( localeCode, {
++		day: 'numeric',
++		timeZone,
++	} );
++
++export const getDateButton = (
++	date: Date,
++	options?: Parameters< typeof screen.getByRole >[ 1 ],
++	locale = 'en-US'
++) =>
++	screen.getByRole( 'button', {
++		name: new RegExp( fullDateFormatter( locale ).format( date ) ),
++		...options,
++	} );
++
++export const getDateCell = (
++	date: Date,
++	options?: Parameters< typeof screen.getByRole >[ 1 ],
++	locale = 'en-US'
++) =>
++	screen.getByRole( 'gridcell', {
++		name: dateNumberFormatter( locale ).format( date ),
++		...options,
++	} );
++
++export const queryDateCell = (
++	date: Date,
++	options?: Parameters< typeof screen.getByRole >[ 1 ],
++	locale = 'en-US'
++) =>
++	screen.queryByRole( 'gridcell', {
++		name: dateNumberFormatter( locale ).format( date ),
++		...options,
++	} );
+diff --git a/packages/components/src/calendar/test/date-calendar.tsx b/packages/components/src/calendar/test/date-calendar.tsx
+new file mode 100644
+index 00000000000000..afa33875a1a2b8
+--- /dev/null
++++ b/packages/components/src/calendar/test/date-calendar.tsx
+@@ -0,0 +1,975 @@
++/**
++ * External dependencies
++ */
++import { render, screen, within } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import {
++	startOfDay,
++	startOfWeek,
++	startOfMonth,
++	endOfWeek,
++	addDays,
++	subDays,
++	addWeeks,
++	addMonths,
++	subMonths,
++	subYears,
++	addHours,
++} from 'date-fns';
++import { ar } from 'date-fns/locale';
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import { DateCalendar, TZDate } from '..';
++import {
++	getDateButton,
++	getDateCell,
++	queryDateCell,
++	monthNameFormatter,
++} from './__utils__';
++import type { DateCalendarProps } from '../types';
++
++const UncontrolledDateCalendar = (
++	props: DateCalendarProps & {
++		initialSelected?: Date | undefined | null;
++		initialMonth?: Date | undefined;
++	}
++) => {
++	return (
++		<DateCalendar
++			{ ...props }
++			defaultSelected={ props.initialSelected ?? undefined }
++			defaultMonth={ props.initialMonth }
++		/>
++	);
++};
++
++const ControlledDateCalendar = (
++	props: DateCalendarProps & {
++		initialSelected?: Date | undefined | null;
++		initialMonth?: Date | undefined;
++	}
++) => {
++	const [ selected, setSelected ] = useState< Date | undefined | null >(
++		props.initialSelected
++	);
++	const [ month, setMonth ] = useState< Date | undefined >(
++		props.initialMonth
++	);
++	return (
++		<DateCalendar
++			{ ...props }
++			selected={ selected ?? null }
++			onSelect={ ( ...args ) => {
++				setSelected( args[ 0 ] );
++				props.onSelect?.( ...args );
++			} }
++			month={ month }
++			onMonthChange={ ( newMonth ) => {
++				setMonth( newMonth );
++				props.onMonthChange?.( newMonth );
++			} }
++		/>
++	);
++};
++
++function setupUserEvent() {
++	// The `advanceTimersByTime` is needed since we're using jest
++	// fake timers to simulate a fixed date for tests.
++	const user = userEvent.setup( { advanceTimers: jest.advanceTimersByTime } );
++	return user;
++}
++
++describe( 'DateCalendar', () => {
++	let today: Date;
++	let tomorrow: Date;
++	let yesterday: Date;
++	let currentMonth: Date;
++	let nextMonth: Date;
++	let nextNextMonth: Date;
++	let prevMonth: Date;
++	let prevPrevMonth: Date;
++
++	beforeAll( () => {
++		jest.useFakeTimers();
++		// For consistent tests, set the system time to a fixed date:
++		// Thursday, May 15, 2025, 20:00 UTC
++		jest.setSystemTime( 1747339200000 );
++		today = startOfDay( new Date() );
++		tomorrow = startOfDay( addDays( today, 1 ) );
++		yesterday = startOfDay( subDays( today, 1 ) );
++		currentMonth = startOfMonth( today );
++		nextMonth = startOfMonth( addMonths( today, 1 ) );
++		nextNextMonth = startOfMonth( addMonths( today, 2 ) );
++		prevMonth = startOfMonth( subMonths( today, 1 ) );
++		prevPrevMonth = startOfMonth( subMonths( today, 2 ) );
++	} );
++
++	afterAll( () => {
++		jest.useRealTimers();
++	} );
++
++	describe( 'Semantics and basic behavior', () => {
++		it( 'should apply the correct roles, semantics and attributes', async () => {
++			render( <DateCalendar /> );
++
++			expect(
++				screen.getByRole( 'application', { name: 'Date calendar' } )
++			).toBeVisible();
++
++			const tableGrid = screen.getByRole( 'grid', {
++				name: monthNameFormatter( 'en-US' ).format( today ),
++			} );
++			expect( tableGrid ).toBeVisible();
++			expect( tableGrid ).toHaveAttribute(
++				'aria-multiselectable',
++				'false'
++			);
++
++			const todayButton = getDateButton( today );
++			expect( todayButton ).toBeVisible();
++			expect( todayButton ).toHaveAccessibleName( /today/i );
++		} );
++
++		it( 'should show multiple months at once via the `numberOfMonths` prop', () => {
++			render( <DateCalendar numberOfMonths={ 2 } /> );
++
++			const grids = screen.getAllByRole( 'grid' );
++			expect( grids ).toHaveLength( 2 );
++			expect( grids[ 0 ] ).toHaveAccessibleName(
++				monthNameFormatter( 'en-US' ).format( today )
++			);
++			expect( grids[ 1 ] ).toHaveAccessibleName(
++				monthNameFormatter( 'en-US' ).format( nextMonth )
++			);
++		} );
++	} );
++
++	describe( 'Date selection', () => {
++		it( 'should select an initial date in uncontrolled mode via the `defaultSelected` prop', () => {
++			render( <DateCalendar defaultSelected={ today } /> );
++
++			expect( getDateCell( today, { selected: true } ) ).toBeVisible();
++
++			const todayButton = getDateButton( today );
++			expect( todayButton ).toBeVisible();
++			expect( todayButton ).toHaveAccessibleName( /selected/i );
++		} );
++
++		it( 'should select an initial date in controlled mode via the `selected` prop', () => {
++			// Note: the `defaultSelected` prop is ignored when the `selected` prop is set.
++			render(
++				<DateCalendar defaultSelected={ tomorrow } selected={ today } />
++			);
++
++			expect( getDateCell( today, { selected: true } ) ).toBeVisible();
++
++			const todayButton = getDateButton( today );
++			expect( todayButton ).toBeVisible();
++			expect( todayButton ).toHaveAccessibleName( /selected/i );
++		} );
++
++		it( 'should have no date selected in uncontrolled mode when the `selected` and `defaultSelected` props are set to `undefined`', () => {
++			render( <DateCalendar /> );
++
++			expect(
++				screen.queryByRole( 'gridcell', { selected: true } )
++			).not.toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'button', { name: /selected/i } )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'should have no date selected in controlled mode when the `selected` prop is set to `null`', () => {
++			// Note: the `defaultSelected` prop is ignored when the `selected` prop is set.
++			render(
++				<DateCalendar defaultSelected={ tomorrow } selected={ null } />
++			);
++
++			expect(
++				screen.queryByRole( 'gridcell', { selected: true } )
++			).not.toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'button', { name: /selected/i } )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'should select a date in uncontrolled mode via the `defaultSelected` prop even if the date is disabled`', () => {
++			render(
++				<DateCalendar
++					defaultSelected={ tomorrow }
++					disabled={ tomorrow }
++				/>
++			);
++
++			expect( getDateCell( tomorrow, { selected: true } ) ).toBeVisible();
++
++			const tomorrowButton = getDateButton( tomorrow );
++			expect( tomorrowButton ).toBeVisible();
++			expect( tomorrowButton ).toHaveAccessibleName( /selected/i );
++			expect( tomorrowButton ).toBeDisabled();
++		} );
++
++		it( 'should select a date in controlled mode via the `selected` prop even if the date is disabled`', () => {
++			render(
++				<DateCalendar selected={ tomorrow } disabled={ tomorrow } />
++			);
++
++			expect( getDateCell( tomorrow, { selected: true } ) ).toBeVisible();
++
++			const tomorrowButton = getDateButton( tomorrow );
++			expect( tomorrowButton ).toBeVisible();
++			expect( tomorrowButton ).toHaveAccessibleName( /selected/i );
++			expect( tomorrowButton ).toBeDisabled();
++		} );
++
++		describe.each( [
++			[ 'Uncontrolled', UncontrolledDateCalendar ],
++			[ 'Controlled', ControlledDateCalendar ],
++		] )( '[`%s`]', ( _mode, Component ) => {
++			it( 'should select a date when a date button is clicked', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render( <Component onSelect={ onSelect } /> );
++
++				const todayButton = getDateButton( today );
++				await user.click( todayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenCalledWith(
++					today,
++					today,
++					expect.objectContaining( { today: true } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: todayButton,
++					} )
++				);
++
++				expect(
++					getDateCell( today, { selected: true } )
++				).toBeVisible();
++			} );
++
++			it( 'should not select a disabled date when a date button is clicked', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render(
++					<Component onSelect={ onSelect } disabled={ tomorrow } />
++				);
++
++				await user.click( getDateButton( tomorrow ) );
++
++				expect( onSelect ).not.toHaveBeenCalled();
++				expect(
++					screen.queryByRole( 'button', { name: /selected/i } )
++				).not.toBeInTheDocument();
++			} );
++
++			it( 'should select a new date when a different date button is clicked', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render(
++					<Component
++						initialSelected={ today }
++						onSelect={ onSelect }
++					/>
++				);
++
++				const tomorrowButton = getDateButton( tomorrow );
++				await user.click( tomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenCalledWith(
++					tomorrow,
++					tomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: tomorrowButton,
++					} )
++				);
++
++				expect(
++					getDateCell( tomorrow, { selected: true } )
++				).toBeVisible();
++			} );
++
++			it( 'should de-select the selected date when the selected date button is clicked', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render(
++					<Component
++						initialSelected={ today }
++						onSelect={ onSelect }
++					/>
++				);
++
++				const todayButton = getDateButton( today );
++				await user.click( todayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenCalledWith(
++					undefined,
++					today,
++					expect.objectContaining( { today: true, selected: true } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: todayButton,
++					} )
++				);
++
++				expect(
++					queryDateCell( today, { selected: true } )
++				).not.toBeInTheDocument();
++			} );
++
++			it( 'should not de-select the selected date when the selected date button is clicked if the `required` prop is set to `true`', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render(
++					<Component
++						initialSelected={ today }
++						onSelect={ onSelect }
++						required
++					/>
++				);
++
++				const todayButton = getDateButton( today );
++				await user.click( todayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenCalledWith(
++					today,
++					today,
++					expect.objectContaining( { today: true, selected: true } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: todayButton,
++					} )
++				);
++				expect(
++					queryDateCell( today, { selected: true } )
++				).toBeVisible();
++			} );
++		} );
++	} );
++
++	describe( 'Month navigation', () => {
++		it( 'should select an initial month in uncontrolled mode via the `defaultMonth` prop', () => {
++			render( <DateCalendar defaultMonth={ nextMonth } /> );
++
++			expect(
++				screen.getByRole( 'grid', {
++					name: monthNameFormatter( 'en-US' ).format( nextMonth ),
++				} )
++			).toBeVisible();
++			expect( getDateCell( nextMonth ) ).toBeVisible();
++			expect( getDateButton( nextMonth ) ).toBeVisible();
++		} );
++
++		it( 'should select an initial month in controlled mode via the `month` prop', () => {
++			render( <DateCalendar month={ nextMonth } /> );
++
++			expect(
++				screen.getByRole( 'grid', {
++					name: monthNameFormatter( 'en-US' ).format( nextMonth ),
++				} )
++			).toBeVisible();
++			expect( getDateCell( nextMonth ) ).toBeVisible();
++			expect( getDateButton( nextMonth ) ).toBeVisible();
++		} );
++
++		describe.each( [
++			[ 'Uncontrolled', UncontrolledDateCalendar ],
++			[ 'Controlled', ControlledDateCalendar ],
++		] )( '[`%s`]', ( _mode, Component ) => {
++			it( 'should navigate to the previous and next months when the previous and next month buttons are clicked', async () => {
++				const user = setupUserEvent();
++				const onMonthChange = jest.fn();
++
++				render( <Component onMonthChange={ onMonthChange } /> );
++
++				const prevButton = screen.getByRole( 'button', {
++					name: /previous month/i,
++				} );
++				const nextButton = screen.getByRole( 'button', {
++					name: /next month/i,
++				} );
++				await user.click( prevButton );
++
++				expect( onMonthChange ).toHaveBeenCalledTimes( 1 );
++				expect( onMonthChange ).toHaveBeenCalledWith( prevMonth );
++
++				expect(
++					screen.getByRole( 'grid', {
++						name: monthNameFormatter( 'en-US' ).format( prevMonth ),
++					} )
++				).toBeVisible();
++				expect( getDateCell( prevMonth ) ).toBeVisible();
++				expect( getDateButton( prevMonth ) ).toBeVisible();
++
++				await user.click( nextButton );
++
++				expect( onMonthChange ).toHaveBeenCalledTimes( 2 );
++				expect( onMonthChange ).toHaveBeenCalledWith( currentMonth );
++
++				expect(
++					screen.getByRole( 'grid', {
++						name: monthNameFormatter( 'en-US' ).format(
++							currentMonth
++						),
++					} )
++				).toBeVisible();
++				expect( getDateCell( currentMonth ) ).toBeVisible();
++				expect( getDateButton( currentMonth ) ).toBeVisible();
++
++				await user.click( nextButton );
++
++				expect( onMonthChange ).toHaveBeenCalledTimes( 3 );
++				expect( onMonthChange ).toHaveBeenCalledWith( nextMonth );
++
++				expect(
++					screen.getByRole( 'grid', {
++						name: monthNameFormatter( 'en-US' ).format( nextMonth ),
++					} )
++				).toBeVisible();
++				expect( getDateCell( nextMonth ) ).toBeVisible();
++				expect( getDateButton( nextMonth ) ).toBeVisible();
++			} );
++
++			it( 'should not navigate to a month that is before the `startMonth` prop', async () => {
++				const user = setupUserEvent();
++				const onMonthChange = jest.fn();
++
++				render(
++					<Component
++						startMonth={ nextMonth }
++						onMonthChange={ onMonthChange }
++					/>
++				);
++
++				const prevButton = screen.getByRole( 'button', {
++					name: /previous month/i,
++				} );
++				const nextButton = screen.getByRole( 'button', {
++					name: /next month/i,
++				} );
++
++				expect(
++					screen.getByRole( 'grid', {
++						name: monthNameFormatter( 'en-US' ).format( nextMonth ),
++					} )
++				).toBeVisible();
++				expect( getDateCell( nextMonth ) ).toBeVisible();
++				expect( getDateButton( nextMonth ) ).toBeVisible();
++
++				expect( prevButton ).toHaveAttribute( 'aria-disabled', 'true' );
++
++				await user.click( prevButton );
++
++				expect( onMonthChange ).not.toHaveBeenCalled();
++
++				await user.click( nextButton );
++
++				expect( onMonthChange ).toHaveBeenCalledTimes( 1 );
++				expect( onMonthChange ).toHaveBeenCalledWith( nextNextMonth );
++
++				expect(
++					screen.getByRole( 'grid', {
++						name: monthNameFormatter( 'en-US' ).format(
++							nextNextMonth
++						),
++					} )
++				).toBeVisible();
++				expect( getDateCell( nextNextMonth ) ).toBeVisible();
++				expect( getDateButton( nextNextMonth ) ).toBeVisible();
++
++				expect( prevButton ).not.toHaveAttribute( 'aria-disabled' );
++			} );
++
++			it( 'should not navigate to a month that is after the `endMonth` prop', async () => {
++				const user = setupUserEvent();
++				const onMonthChange = jest.fn();
++
++				render(
++					<Component
++						endMonth={ prevMonth }
++						onMonthChange={ onMonthChange }
++					/>
++				);
++
++				const prevButton = screen.getByRole( 'button', {
++					name: /previous month/i,
++				} );
++				const nextButton = screen.getByRole( 'button', {
++					name: /next month/i,
++				} );
++
++				expect(
++					screen.getByRole( 'grid', {
++						name: monthNameFormatter( 'en-US' ).format( prevMonth ),
++					} )
++				).toBeVisible();
++				expect( getDateCell( prevMonth ) ).toBeVisible();
++				expect( getDateButton( prevMonth ) ).toBeVisible();
++
++				expect( nextButton ).toHaveAttribute( 'aria-disabled', 'true' );
++
++				await user.click( nextButton );
++
++				expect( onMonthChange ).not.toHaveBeenCalled();
++
++				await user.click( prevButton );
++
++				expect( onMonthChange ).toHaveBeenCalledTimes( 1 );
++				expect( onMonthChange ).toHaveBeenCalledWith( prevPrevMonth );
++
++				expect(
++					screen.getByRole( 'grid', {
++						name: monthNameFormatter( 'en-US' ).format(
++							prevPrevMonth
++						),
++					} )
++				).toBeVisible();
++				expect( getDateCell( prevPrevMonth ) ).toBeVisible();
++				expect( getDateButton( prevPrevMonth ) ).toBeVisible();
++
++				expect( nextButton ).not.toHaveAttribute( 'aria-disabled' );
++			} );
++		} );
++	} );
++
++	describe( 'Keyboard focus and navigation', () => {
++		it( 'should auto-focus the selected day when the `autoFocus` prop is set to `true`', async () => {
++			// eslint-disable-next-line jsx-a11y/no-autofocus
++			render( <DateCalendar autoFocus defaultSelected={ tomorrow } /> );
++			expect( getDateButton( tomorrow ) ).toHaveFocus();
++		} );
++
++		it( "should auto-focus today's date if there is not selected date when the `autoFocus` prop is set to `true`", async () => {
++			// eslint-disable-next-line jsx-a11y/no-autofocus
++			render( <DateCalendar autoFocus /> );
++			expect( getDateButton( today ) ).toHaveFocus();
++		} );
++
++		it( 'should focus each arrow as a tab stop, but treat the grid as a 2d composite widget', async () => {
++			const user = setupUserEvent();
++			render( <DateCalendar /> );
++
++			// Focus previous month button
++			await user.tab();
++			expect(
++				screen.getByRole( 'button', { name: /previous month/i } )
++			).toHaveFocus();
++
++			// Focus next month button
++			await user.tab();
++			expect(
++				screen.getByRole( 'button', { name: /next month/i } )
++			).toHaveFocus();
++
++			// Focus today button
++			await user.tab();
++			expect( getDateButton( today ) ).toHaveFocus();
++
++			// Focus next day
++			await user.keyboard( '{ArrowRight}' );
++			expect( getDateButton( addDays( today, 1 ) ) ).toHaveFocus();
++
++			// Focus to next week
++			await user.keyboard( '{ArrowDown}' );
++			expect( getDateButton( addDays( today, 8 ) ) ).toHaveFocus();
++
++			// Focus previous day
++			await user.keyboard( '{ArrowLeft}' );
++			expect( getDateButton( addDays( today, 7 ) ) ).toHaveFocus();
++
++			// Focus previous week
++			await user.keyboard( '{ArrowUp}' );
++			expect( getDateButton( today ) ).toHaveFocus();
++
++			// Focus first day of week
++			await user.keyboard( '{Home}' );
++			expect( getDateButton( startOfWeek( today ) ) ).toHaveFocus();
++
++			// Focus last day of week
++			await user.keyboard( '{End}' );
++			expect( getDateButton( endOfWeek( today ) ) ).toHaveFocus();
++
++			// Focus previous month
++			await user.keyboard( '{PageUp}' );
++			expect(
++				getDateButton( subMonths( endOfWeek( today ), 1 ) )
++			).toHaveFocus();
++
++			expect(
++				screen.getByRole( 'grid', {
++					name: monthNameFormatter( 'en-US' ).format(
++						subMonths( endOfWeek( today ), 1 )
++					),
++				} )
++			).toBeVisible();
++
++			// Navigate to next month
++			await user.keyboard( '{PageDown}' );
++			expect( getDateButton( endOfWeek( today ) ) ).toHaveFocus();
++			expect(
++				screen.getByRole( 'grid', {
++					name: monthNameFormatter( 'en-US' ).format(
++						endOfWeek( today )
++					),
++				} )
++			).toBeVisible();
++
++			// Focus previous year
++			await user.keyboard( '{Shift>}{PageUp}{/Shift}' );
++			expect(
++				getDateButton( subYears( endOfWeek( today ), 1 ) )
++			).toHaveFocus();
++
++			expect(
++				screen.getByRole( 'grid', {
++					name: monthNameFormatter( 'en-US' ).format(
++						subYears( endOfWeek( today ), 1 )
++					),
++				} )
++			).toBeVisible();
++
++			// Focus next year
++			await user.keyboard( '{Shift>}{PageDown}{/Shift}' );
++			expect( getDateButton( endOfWeek( today ) ) ).toHaveFocus();
++
++			expect(
++				screen.getByRole( 'grid', {
++					name: monthNameFormatter( 'en-US' ).format(
++						endOfWeek( today )
++					),
++				} )
++			).toBeVisible();
++		} );
++
++		// Note: the following test is not testing advanced keyboard interactions
++		// (pageUp, pageDown, shift+pageUp, shift+pageDown, home, end)
++		it( 'should not focus disabled dates and skip over them when navigating using arrow keys', async () => {
++			const user = setupUserEvent();
++
++			render(
++				<DateCalendar
++					disabled={ [
++						tomorrow,
++						addWeeks( addDays( tomorrow, 1 ), 1 ),
++						addWeeks( today, 2 ),
++						addWeeks( tomorrow, 2 ),
++					] }
++				/>
++			);
++
++			await user.tab();
++			await user.tab();
++			await user.tab();
++			expect( getDateButton( today ) ).toHaveFocus();
++
++			await user.keyboard( '{ArrowRight}' );
++			expect( getDateButton( addDays( tomorrow, 1 ) ) ).toHaveFocus();
++
++			await user.keyboard( '{ArrowDown}' );
++			expect(
++				getDateButton( addWeeks( addDays( tomorrow, 1 ), 2 ) )
++			).toHaveFocus();
++
++			await user.keyboard( '{ArrowLeft}' );
++			expect( getDateButton( addWeeks( yesterday, 2 ) ) ).toHaveFocus();
++
++			await user.keyboard( '{ArrowUp}' );
++			expect( getDateButton( addWeeks( yesterday, 1 ) ) ).toHaveFocus();
++		} );
++
++		it( 'should focus the selected date when tabbing into the calendar', async () => {
++			const user = setupUserEvent();
++			render( <DateCalendar selected={ tomorrow } /> );
++
++			// Tab to the calendar grid
++			await user.tab();
++			await user.tab();
++			await user.tab();
++
++			expect( getDateButton( tomorrow ) ).toHaveFocus();
++		} );
++	} );
++
++	describe( 'Disabled states', () => {
++		it( 'should support disabling all dates via the `disabled` prop', async () => {
++			const user = setupUserEvent();
++
++			render( <DateCalendar disabled /> );
++
++			within( screen.getByRole( 'grid' ) )
++				.getAllByRole( 'button' )
++				.forEach( ( button ) => {
++					expect( button ).toBeDisabled();
++				} );
++
++			await user.click(
++				screen.getByRole( 'button', { name: /previous/i } )
++			);
++
++			within( screen.getByRole( 'grid' ) )
++				.getAllByRole( 'button' )
++				.forEach( ( button ) => {
++					expect( button ).toBeDisabled();
++				} );
++
++			await user.click( screen.getByRole( 'button', { name: /next/i } ) );
++			await user.click( screen.getByRole( 'button', { name: /next/i } ) );
++
++			within( screen.getByRole( 'grid' ) )
++				.getAllByRole( 'button' )
++				.forEach( ( button ) => {
++					expect( button ).toBeDisabled();
++				} );
++		} );
++
++		it( 'should support disabling single dates via the `disabled` prop', async () => {
++			render( <DateCalendar disabled={ tomorrow } /> );
++
++			expect( getDateButton( tomorrow ) ).toBeDisabled();
++		} );
++
++		it( 'should support passing a custom function via the `disabled` prop', async () => {
++			const primeNumbers = [ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31 ];
++			render(
++				<DateCalendar
++					disabled={ ( date ) =>
++						primeNumbers.includes( date.getDate() )
++					}
++				/>
++			);
++
++			for ( const date of primeNumbers ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeDisabled();
++			}
++		} );
++
++		it( 'should support disabling all dates before a certain date via the `disabled` prop', async () => {
++			render( <DateCalendar disabled={ { before: today } } /> );
++
++			for ( let date = 1; date < today.getDate(); date++ ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeDisabled();
++			}
++			expect( getDateButton( today ) ).toBeEnabled();
++		} );
++
++		it( 'should support disabling all dates after a certain date via the `disabled` prop', async () => {
++			render( <DateCalendar disabled={ { after: today } } /> );
++
++			for ( let date = today.getDate() + 1; date < 32; date++ ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeDisabled();
++			}
++			expect( getDateButton( today ) ).toBeEnabled();
++		} );
++
++		it( 'should support disabling all dates before a certain date and after a certain date via the `disabled` prop', async () => {
++			render(
++				<DateCalendar
++					disabled={ {
++						before: yesterday,
++						after: addDays( today, 1 ),
++					} }
++				/>
++			);
++
++			let date;
++
++			for ( date = 1; date < today.getDate() - 1; date++ ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeDisabled();
++			}
++			expect( getDateButton( yesterday ) ).toBeEnabled();
++			expect( getDateButton( today ) ).toBeEnabled();
++			expect( getDateButton( addDays( today, 1 ) ) ).toBeEnabled();
++
++			for ( date = today.getDate() + 2; date < 32; date++ ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeDisabled();
++			}
++		} );
++
++		it( 'should support disabling all dates within a certain date range via the `disabled` prop', async () => {
++			render(
++				<DateCalendar
++					disabled={ { from: yesterday, to: addDays( today, 1 ) } }
++				/>
++			);
++
++			let date;
++
++			for ( date = 1; date < today.getDate() - 1; date++ ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeEnabled();
++			}
++			expect( getDateButton( yesterday ) ).toBeDisabled();
++			expect( getDateButton( today ) ).toBeDisabled();
++			expect( getDateButton( addDays( today, 1 ) ) ).toBeDisabled();
++
++			for ( date = today.getDate() + 2; date < 32; date++ ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeEnabled();
++			}
++		} );
++
++		it( 'should support disabling specific days of the week via the `disabled` prop', async () => {
++			const weekendsInMay = [ 3, 4, 10, 11, 17, 18, 24, 25, 31 ];
++			render( <DateCalendar disabled={ { dayOfWeek: [ 0, 6 ] } } /> );
++
++			for ( const date of weekendsInMay ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeDisabled();
++			}
++		} );
++
++		it( 'should disable the previous and next months buttons if the `disableNavigation` is set to `true`', async () => {
++			const user = setupUserEvent();
++
++			render( <DateCalendar disableNavigation /> );
++
++			expect(
++				screen.getByRole( 'button', { name: /previous month/i } )
++			).toHaveAttribute( 'aria-disabled', 'true' );
++			expect(
++				screen.getByRole( 'button', { name: /next month/i } )
++			).toHaveAttribute( 'aria-disabled', 'true' );
++
++			await user.tab();
++			expect(
++				screen.getByRole( 'button', { name: /today/i } )
++			).toHaveFocus();
++		} );
++	} );
++
++	// Note: we're not testing localization of strings. We're only testing
++	// that the date formatting, computed dir, and calendar format are correct.
++	describe( 'Localization', () => {
++		it( 'should localize the calendar based on the `locale` prop', async () => {
++			const user = setupUserEvent();
++
++			render( <DateCalendar locale={ ar } /> );
++
++			// Check computed writing direction
++			expect(
++				screen.getByRole( 'application', { name: 'Date calendar' } )
++			).toHaveAttribute( 'dir', 'rtl' );
++
++			// Check month name
++			const grid = screen.getByRole( 'grid', {
++				name: monthNameFormatter( 'ar' ).format( today ),
++			} );
++			expect( grid ).toBeVisible();
++
++			// Check today button
++			expect( getDateButton( today, {}, 'ar' ) ).toHaveAccessibleName(
++				/today/i
++			);
++
++			await user.tab();
++			await user.tab();
++			await user.tab();
++			expect( getDateButton( today, {}, 'ar' ) ).toHaveFocus();
++
++			await user.keyboard( '{Home}' );
++			expect(
++				getDateButton( startOfWeek( today, { locale: ar } ), {}, 'ar' )
++			).toHaveFocus();
++		} );
++
++		it( 'should support timezones according to the `timeZone` prop', async () => {
++			const user = setupUserEvent();
++			const onSelect = jest.fn();
++
++			render(
++				<DateCalendar timeZone="Asia/Tokyo" onSelect={ onSelect } />
++			);
++
++			// For someone in Tokyo, the current time simulated in the test
++			// (ie. 20:00 UTC) is the next day.
++			expect( getDateButton( tomorrow ) ).toHaveAccessibleName(
++				/today/i
++			);
++
++			// Select tomorrow's button (which is today in Tokyo)
++			const tomorrowButton = getDateButton( tomorrow );
++			await user.click( tomorrowButton );
++
++			const tomorrowFromTokyoTimezone = addHours(
++				tomorrow,
++				new TZDate( tomorrow, 'Asia/Tokyo' ).getTimezoneOffset() / 60
++			);
++
++			expect( onSelect ).toHaveBeenCalledWith(
++				tomorrowFromTokyoTimezone,
++				tomorrowFromTokyoTimezone,
++				expect.objectContaining( { today: true } ),
++				expect.objectContaining( {
++					type: 'click',
++					target: tomorrowButton,
++				} )
++			);
++		} );
++
++		it( 'should handle timezoned dates and convert them to the calendar timezone', async () => {
++			// Still the same time from UTC's POV, just expressed in Tokyo time.
++			const tomorrowAtMidnightInTokyo = new TZDate(
++				tomorrow,
++				'Asia/Tokyo'
++			);
++
++			render(
++				<DateCalendar
++					defaultSelected={ tomorrowAtMidnightInTokyo }
++					// Note: using "Etc/GMT+2" instead of "-02:00" because support for raw offsets was introduced in Node v22 (while currently the repository still targets Node v20).
++					timeZone="Etc/GMT+2"
++				/>
++			);
++
++			// Changing the calendar timezone to UTC-2 makes the dates become
++			// earlier by 1 day (from midnight to 10pm the previous day).
++			expect( getDateCell( today, { selected: true } ) ).toBeVisible();
++		} );
++	} );
++} );
+diff --git a/packages/components/src/calendar/test/date-range-calendar.tsx b/packages/components/src/calendar/test/date-range-calendar.tsx
+new file mode 100644
+index 00000000000000..8bcbaf77389449
+--- /dev/null
++++ b/packages/components/src/calendar/test/date-range-calendar.tsx
+@@ -0,0 +1,1701 @@
++/**
++ * External dependencies
++ */
++import { render, screen, within, renderHook } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import {
++	startOfDay,
++	startOfWeek,
++	startOfMonth,
++	endOfWeek,
++	addDays,
++	subDays,
++	addWeeks,
++	addMonths,
++	subMonths,
++	subYears,
++	addHours,
++} from 'date-fns';
++import { ar } from 'date-fns/locale';
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import { usePreviewRange, DateRangeCalendar } from '../date-range-calendar';
++import { TZDate } from '../';
++import { getDateButton, getDateCell, monthNameFormatter } from './__utils__';
++import type { DateRange, DateRangeCalendarProps } from '../types';
++
++const UncontrolledDateRangeCalendar = (
++	props: DateRangeCalendarProps & {
++		initialSelected?: DateRange | undefined | null;
++		initialMonth?: Date | undefined;
++	}
++) => {
++	return (
++		<DateRangeCalendar
++			{ ...props }
++			defaultSelected={ props.initialSelected ?? undefined }
++			defaultMonth={ props.initialMonth }
++		/>
++	);
++};
++
++const ControlledDateRangeCalendar = (
++	props: DateRangeCalendarProps & {
++		initialSelected?: DateRange | undefined | null;
++		initialMonth?: Date | undefined;
++	}
++) => {
++	const [ selected, setSelected ] = useState< DateRange | undefined | null >(
++		props.initialSelected
++	);
++	const [ month, setMonth ] = useState< Date | undefined >(
++		props.initialMonth
++	);
++	return (
++		<DateRangeCalendar
++			{ ...props }
++			selected={ selected ?? null }
++			onSelect={ ( ...args ) => {
++				setSelected( args[ 0 ] );
++				props.onSelect?.( ...args );
++			} }
++			month={ month }
++			onMonthChange={ ( newMonth ) => {
++				setMonth( newMonth );
++				props.onMonthChange?.( newMonth );
++			} }
++		/>
++	);
++};
++
++function setupUserEvent() {
++	// The `advanceTimersByTime` is needed since we're using jest
++	// fake timers to simulate a fixed date for tests.
++	const user = userEvent.setup( { advanceTimers: jest.advanceTimersByTime } );
++	return user;
++}
++
++describe( 'DateRangeCalendar', () => {
++	let today: Date;
++	let tomorrow: Date;
++	let yesterday: Date;
++	let currentMonth: Date;
++	let nextMonth: Date;
++	let nextNextMonth: Date;
++	let prevMonth: Date;
++	let prevPrevMonth: Date;
++
++	beforeAll( () => {
++		jest.useFakeTimers();
++		// For consistent tests, set the system time to a fixed date:
++		// Thursday, May 15, 2025, 20:00 UTC
++		jest.setSystemTime( 1747339200000 );
++
++		today = startOfDay( new Date() );
++		tomorrow = addDays( today, 1 );
++		yesterday = subDays( today, 1 );
++		currentMonth = startOfMonth( today );
++		nextMonth = startOfMonth( addMonths( today, 1 ) );
++		nextNextMonth = startOfMonth( addMonths( today, 2 ) );
++		prevMonth = startOfMonth( subMonths( today, 1 ) );
++		prevPrevMonth = startOfMonth( subMonths( today, 2 ) );
++	} );
++
++	afterAll( () => {
++		jest.useRealTimers();
++	} );
++
++	describe( 'Semantics and basic behavior', () => {
++		it( 'should apply the correct roles, semantics and attributes', async () => {
++			render( <DateRangeCalendar /> );
++
++			expect(
++				screen.getByRole( 'application', {
++					name: 'Date range calendar',
++				} )
++			).toBeVisible();
++
++			const tableGrid = screen.getByRole( 'grid', {
++				name: monthNameFormatter( 'en-US' ).format( today ),
++			} );
++			expect( tableGrid ).toBeVisible();
++			expect( tableGrid ).toHaveAttribute(
++				'aria-multiselectable',
++				'true'
++			);
++
++			const todayButton = getDateButton( today );
++			expect( todayButton ).toBeVisible();
++			expect( todayButton ).toHaveAccessibleName( /today/i );
++		} );
++
++		it( 'should show multiple months at once via the `numberOfMonths` prop', () => {
++			render( <DateRangeCalendar numberOfMonths={ 2 } /> );
++
++			const grids = screen.getAllByRole( 'grid' );
++			expect( grids ).toHaveLength( 2 );
++			expect( grids[ 0 ] ).toHaveAccessibleName(
++				monthNameFormatter( 'en-US' ).format( today )
++			);
++			expect( grids[ 1 ] ).toHaveAccessibleName(
++				monthNameFormatter( 'en-US' ).format( nextMonth )
++			);
++		} );
++	} );
++
++	describe( 'Date selection', () => {
++		it( 'should select an initial date range in uncontrolled mode via the `defaultSelected` prop', () => {
++			const dateRange = { from: today, to: tomorrow };
++			render( <DateRangeCalendar defaultSelected={ dateRange } /> );
++
++			expect( getDateCell( today, { selected: true } ) ).toBeVisible();
++			expect( getDateCell( tomorrow, { selected: true } ) ).toBeVisible();
++
++			const todayButton = getDateButton( today );
++			const tomorrowButton = getDateButton( tomorrow );
++			expect( todayButton ).toBeVisible();
++			expect( todayButton ).toHaveAccessibleName( /selected/i );
++			expect( tomorrowButton ).toBeVisible();
++			expect( tomorrowButton ).toHaveAccessibleName( /selected/i );
++		} );
++
++		it( 'should select an initial date range in controlled mode via the `selected` prop', () => {
++			const defaultRange = { from: yesterday, to: today };
++			const controlledRange = { from: today, to: tomorrow };
++
++			// Note: the `defaultSelected` prop is ignored when the `selected` prop is set.
++			render(
++				<DateRangeCalendar
++					defaultSelected={ defaultRange }
++					selected={ controlledRange }
++				/>
++			);
++
++			expect( getDateCell( today, { selected: true } ) ).toBeVisible();
++			expect( getDateCell( tomorrow, { selected: true } ) ).toBeVisible();
++
++			const todayButton = getDateButton( today );
++			const tomorrowButton = getDateButton( tomorrow );
++			expect( todayButton ).toBeVisible();
++			expect( todayButton ).toHaveAccessibleName( /selected/i );
++			expect( tomorrowButton ).toBeVisible();
++			expect( tomorrowButton ).toHaveAccessibleName( /selected/i );
++		} );
++
++		it( 'should have no date selected in uncontrolled mode when the `selected` prop is set to `undefined`', () => {
++			render( <DateRangeCalendar /> );
++
++			expect(
++				screen.queryByRole( 'gridcell', { selected: true } )
++			).not.toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'button', { name: /selected/i } )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'should have no date selected in controlled mode when the `selected` prop is set to `null`', () => {
++			const defaultRange = { from: today, to: tomorrow };
++
++			// Note: the `defaultSelected` prop is ignored when the `selected` prop is set.
++			render(
++				<DateRangeCalendar
++					defaultSelected={ defaultRange }
++					selected={ null }
++				/>
++			);
++
++			expect(
++				screen.queryByRole( 'gridcell', { selected: true } )
++			).not.toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'button', { name: /selected/i } )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'should select a date in uncontrolled mode via the `defaultSelected` prop even if the date is disabled`', () => {
++			const defaultRange = { from: today, to: tomorrow };
++
++			render(
++				<DateRangeCalendar
++					defaultSelected={ defaultRange }
++					disabled={ defaultRange }
++				/>
++			);
++
++			expect( getDateCell( today, { selected: true } ) ).toBeVisible();
++			expect( getDateCell( tomorrow, { selected: true } ) ).toBeVisible();
++
++			const todayButton = getDateButton( today );
++			const tomorrowButton = getDateButton( tomorrow );
++			expect( todayButton ).toBeVisible();
++			expect( todayButton ).toBeDisabled();
++			expect( todayButton ).toHaveAccessibleName( /selected/i );
++			expect( tomorrowButton ).toBeVisible();
++			expect( tomorrowButton ).toHaveAccessibleName( /selected/i );
++			expect( tomorrowButton ).toBeDisabled();
++		} );
++
++		it( 'should select a date in controlled mode via the `selected` prop even if the date is disabled`', () => {
++			const defaultRange = { from: today, to: tomorrow };
++
++			render(
++				<DateRangeCalendar
++					selected={ defaultRange }
++					disabled={ defaultRange }
++				/>
++			);
++
++			expect( getDateCell( today, { selected: true } ) ).toBeVisible();
++			expect( getDateCell( tomorrow, { selected: true } ) ).toBeVisible();
++
++			const todayButton = getDateButton( today );
++			const tomorrowButton = getDateButton( tomorrow );
++			expect( todayButton ).toBeVisible();
++			expect( todayButton ).toBeDisabled();
++			expect( todayButton ).toHaveAccessibleName( /selected/i );
++			expect( tomorrowButton ).toBeVisible();
++			expect( tomorrowButton ).toHaveAccessibleName( /selected/i );
++			expect( tomorrowButton ).toBeDisabled();
++		} );
++
++		describe.each( [
++			[ 'Uncontrolled', UncontrolledDateRangeCalendar ],
++			[ 'Controlled', ControlledDateRangeCalendar ],
++		] )( '[`%s`]', ( _mode, Component ) => {
++			it( 'should start selecting a range when a date button is clicked', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render( <Component onSelect={ onSelect } /> );
++
++				const todayButton = getDateButton( today );
++				await user.click( todayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenCalledWith(
++					{ from: today, to: today },
++					today,
++					expect.objectContaining( { today: true } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: todayButton,
++					} )
++				);
++
++				expect(
++					getDateCell( today, { selected: true } )
++				).toBeVisible();
++			} );
++
++			it( 'should complete a range selection when a second date button is clicked', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render( <Component onSelect={ onSelect } /> );
++
++				const todayButton = getDateButton( today );
++				const tomorrowButton = getDateButton( tomorrow );
++
++				// First click - start range
++				await user.click( todayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenLastCalledWith(
++					{ from: today, to: today },
++					today,
++					expect.objectContaining( { today: true } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: todayButton,
++					} )
++				);
++
++				// Second click - complete range
++				await user.click( tomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 2 );
++				expect( onSelect ).toHaveBeenLastCalledWith(
++					{ from: today, to: tomorrow },
++					tomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: tomorrowButton,
++					} )
++				);
++
++				expect(
++					getDateCell( today, { selected: true } )
++				).toBeVisible();
++				expect(
++					getDateCell( tomorrow, { selected: true } )
++				).toBeVisible();
++			} );
++
++			it( 'should handle selecting dates in reverse order (end date first)', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render( <Component onSelect={ onSelect } /> );
++
++				// First click on tomorrow
++				const tomorrowButton = getDateButton( tomorrow );
++				await user.click( tomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenCalledWith(
++					{ from: tomorrow, to: tomorrow },
++					tomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: tomorrowButton,
++					} )
++				);
++
++				// Second click on today (earlier date)
++				const todayButton = getDateButton( today );
++				await user.click( todayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 2 );
++				expect( onSelect ).toHaveBeenNthCalledWith(
++					2,
++					{ from: today, to: tomorrow },
++					today,
++					expect.objectContaining( { today: true } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: todayButton,
++					} )
++				);
++
++				expect(
++					getDateCell( today, { selected: true } )
++				).toBeVisible();
++				expect(
++					getDateCell( tomorrow, { selected: true } )
++				).toBeVisible();
++			} );
++
++			it( 'should expand the current range when clicking a third date after the existing range end', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render( <Component onSelect={ onSelect } /> );
++
++				// First click - start range
++				const todayButton = getDateButton( today );
++				await user.click( todayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenCalledWith(
++					{ from: today, to: today },
++					today,
++					expect.objectContaining( { today: true } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: todayButton,
++					} )
++				);
++
++				// Second click - complete range
++				const tomorrowButton = getDateButton( tomorrow );
++				await user.click( tomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 2 );
++				expect( onSelect ).toHaveBeenNthCalledWith(
++					2,
++					{ from: today, to: tomorrow },
++					tomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: tomorrowButton,
++					} )
++				);
++
++				// Third click - expand range end
++				const dayAfterTomorrow = addDays( today, 2 );
++				const dayAfterTomorrowButton =
++					getDateButton( dayAfterTomorrow );
++				await user.click( dayAfterTomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 3 );
++				expect( onSelect ).toHaveBeenNthCalledWith(
++					3,
++					{ from: today, to: dayAfterTomorrow },
++					dayAfterTomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: dayAfterTomorrowButton,
++					} )
++				);
++			} );
++
++			it( 'should update the current range when clicking a third date in between the existing range start and end', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render( <Component onSelect={ onSelect } /> );
++
++				// First click - start range
++				const yesterdayButton = getDateButton( yesterday );
++				await user.click( yesterdayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenCalledWith(
++					{ from: yesterday, to: yesterday },
++					yesterday,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: yesterdayButton,
++					} )
++				);
++
++				// Second click - complete range
++				const dayAfterTomorrow = addDays( today, 2 );
++				const dayAfterTomorrowButton =
++					getDateButton( dayAfterTomorrow );
++				await user.click( dayAfterTomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 2 );
++				expect( onSelect ).toHaveBeenNthCalledWith(
++					2,
++					{ from: yesterday, to: dayAfterTomorrow },
++					dayAfterTomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: dayAfterTomorrowButton,
++					} )
++				);
++
++				// Third click - change range end
++				const todayButton = getDateButton( today );
++				await user.click( todayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 3 );
++				expect( onSelect ).toHaveBeenNthCalledWith(
++					3,
++					{ from: yesterday, to: today },
++					today,
++					expect.objectContaining( { today: true } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: todayButton,
++					} )
++				);
++			} );
++
++			it( 'should expand the current range when clicking a third date before the existing range start', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render( <Component onSelect={ onSelect } /> );
++
++				// First click - start range
++				const todayButton = getDateButton( today );
++				await user.click( todayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenCalledWith(
++					{ from: today, to: today },
++					today,
++					expect.objectContaining( { today: true } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: todayButton,
++					} )
++				);
++
++				// Second click - complete range
++				const tomorrowButton = getDateButton( tomorrow );
++				await user.click( tomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 2 );
++				expect( onSelect ).toHaveBeenNthCalledWith(
++					2,
++					{ from: today, to: tomorrow },
++					tomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: tomorrowButton,
++					} )
++				);
++
++				// Third click - expand range start
++				const yesterdayButton = getDateButton( yesterday );
++				await user.click( yesterdayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 3 );
++				expect( onSelect ).toHaveBeenNthCalledWith(
++					3,
++					{ from: yesterday, to: tomorrow },
++					yesterday,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: yesterdayButton,
++					} )
++				);
++			} );
++
++			it( 'should not select a disabled date when a date button is clicked', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render(
++					<Component onSelect={ onSelect } disabled={ tomorrow } />
++				);
++
++				const tomorrowButton = getDateButton( tomorrow );
++				await user.click( tomorrowButton );
++
++				expect( onSelect ).not.toHaveBeenCalled();
++				expect(
++					screen.queryByRole( 'button', { name: /selected/i } )
++				).not.toBeInTheDocument();
++			} );
++
++			it( 'should clear the range when defining a one-day range and clicking on the same date again', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				const dayAfterTomorrow = addDays( today, 2 );
++
++				render(
++					<Component
++						onSelect={ onSelect }
++						initialSelected={ {
++							from: yesterday,
++							to: dayAfterTomorrow,
++						} }
++					/>
++				);
++
++				// Third click - change range to have start and end on the same date
++				const dayAfterTomorrowButton =
++					getDateButton( dayAfterTomorrow );
++				await user.click( dayAfterTomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenNthCalledWith(
++					1,
++					{ from: dayAfterTomorrow, to: dayAfterTomorrow },
++					dayAfterTomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: dayAfterTomorrowButton,
++					} )
++				);
++
++				// Fourth click - remove date range
++				await user.click( dayAfterTomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 2 );
++				expect( onSelect ).toHaveBeenNthCalledWith(
++					2,
++					undefined,
++					dayAfterTomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: dayAfterTomorrowButton,
++					} )
++				);
++			} );
++
++			it( 'should not clear the range when clicking a selected date if the `required` prop is set to `true`', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				const dayAfterTomorrow = addDays( today, 2 );
++
++				render(
++					<Component
++						onSelect={ onSelect }
++						initialSelected={ {
++							from: yesterday,
++							to: dayAfterTomorrow,
++						} }
++						required
++					/>
++				);
++
++				// Third click - change range to have start and end on the same date
++				const dayAfterTomorrowButton =
++					getDateButton( dayAfterTomorrow );
++				await user.click( dayAfterTomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenNthCalledWith(
++					1,
++					{ from: dayAfterTomorrow, to: dayAfterTomorrow },
++					dayAfterTomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: dayAfterTomorrowButton,
++					} )
++				);
++
++				// Fourth click - doesn't remove date range
++				await user.click( dayAfterTomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 2 );
++				expect( onSelect ).toHaveBeenNthCalledWith(
++					2,
++					{ from: dayAfterTomorrow, to: dayAfterTomorrow },
++					dayAfterTomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: dayAfterTomorrowButton,
++					} )
++				);
++			} );
++
++			it( 'should complete a range selection even if there are disabled dates in the range', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render(
++					<Component onSelect={ onSelect } disabled={ tomorrow } />
++				);
++
++				const todayButton = getDateButton( today );
++
++				// First click - start range
++				await user.click( todayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenLastCalledWith(
++					{ from: today, to: today },
++					today,
++					expect.objectContaining( { today: true } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: todayButton,
++					} )
++				);
++
++				// Second click - range "restarts" from newly clicked date, since
++				// there was a disabled date in between
++				const dayAfterTomorrow = addDays( today, 2 );
++				const dayAfterTomorrowButton =
++					getDateButton( dayAfterTomorrow );
++				await user.click( dayAfterTomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 2 );
++				expect( onSelect ).toHaveBeenLastCalledWith(
++					{ from: today, to: dayAfterTomorrow },
++					dayAfterTomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: dayAfterTomorrowButton,
++					} )
++				);
++			} );
++
++			it( 'should not complete a range selection if the `excludeDisabled` prop is set to `true` and there is at least one disabled date in the range', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render(
++					<Component
++						onSelect={ onSelect }
++						disabled={ tomorrow }
++						excludeDisabled
++					/>
++				);
++
++				const todayButton = getDateButton( today );
++
++				// First click - start range
++				await user.click( todayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenLastCalledWith(
++					{ from: today, to: today },
++					today,
++					expect.objectContaining( { today: true } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: todayButton,
++					} )
++				);
++
++				// Second click - range "restarts" from newly clicked date, since
++				// there was a disabled date in between
++				const dayAfterTomorrow = addDays( today, 2 );
++				const dayAfterTomorrowButton =
++					getDateButton( dayAfterTomorrow );
++				await user.click( dayAfterTomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 2 );
++				expect( onSelect ).toHaveBeenLastCalledWith(
++					{ from: dayAfterTomorrow, to: undefined },
++					dayAfterTomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: dayAfterTomorrowButton,
++					} )
++				);
++			} );
++
++			it( 'should not complete a range selection if the range has a duration of less than the value of the `min` prop', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render( <Component onSelect={ onSelect } min={ 3 } /> );
++
++				const todayButton = getDateButton( today );
++
++				// First click - start range
++				await user.click( todayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenLastCalledWith(
++					{ from: today, to: undefined },
++					today,
++					expect.objectContaining( { today: true } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: todayButton,
++					} )
++				);
++
++				// Second click - range "restarts" from newly clicked date, since
++				// it was not long enough compared to the `min` prop
++				const dayAfterTomorrow = addDays( today, 2 );
++				const dayAfterTomorrowButton =
++					getDateButton( dayAfterTomorrow );
++				await user.click( dayAfterTomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 2 );
++				expect( onSelect ).toHaveBeenLastCalledWith(
++					{ from: dayAfterTomorrow, to: undefined },
++					dayAfterTomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: dayAfterTomorrowButton,
++					} )
++				);
++
++				// Third click - range is correctly set, since it includes
++				// at least 3 days
++				const yesterdayButton = getDateButton( yesterday );
++				await user.click( yesterdayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 3 );
++				expect( onSelect ).toHaveBeenLastCalledWith(
++					{ from: yesterday, to: dayAfterTomorrow },
++					yesterday,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: yesterdayButton,
++					} )
++				);
++			} );
++
++			it( 'should not complete a range selection if the range has a duration of more than the value of the `max` prop', async () => {
++				const user = setupUserEvent();
++				const onSelect = jest.fn();
++
++				render( <Component onSelect={ onSelect } max={ 2 } /> );
++
++				// First click - start range
++				const yesterdayButton = getDateButton( yesterday );
++				await user.click( yesterdayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 1 );
++				expect( onSelect ).toHaveBeenLastCalledWith(
++					{ from: yesterday, to: yesterday },
++					yesterday,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: yesterdayButton,
++					} )
++				);
++
++				// Second click - range "restarts" from newly clicked date, since
++				// it was too long compared to the `max` prop
++				const dayAfterTomorrow = addDays( today, 2 );
++				const dayAfterTomorrowButton =
++					getDateButton( dayAfterTomorrow );
++				await user.click( dayAfterTomorrowButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 2 );
++				expect( onSelect ).toHaveBeenLastCalledWith(
++					{ from: dayAfterTomorrow, to: undefined },
++					dayAfterTomorrow,
++					expect.objectContaining( { today: false } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: dayAfterTomorrowButton,
++					} )
++				);
++
++				// Third click - range is correctly set, since it includes
++				// at most 2 days
++				const todayButton = getDateButton( today );
++				await user.click( todayButton );
++
++				expect( onSelect ).toHaveBeenCalledTimes( 3 );
++				expect( onSelect ).toHaveBeenLastCalledWith(
++					{ from: today, to: dayAfterTomorrow },
++					today,
++					expect.objectContaining( { today: true } ),
++					expect.objectContaining( {
++						type: 'click',
++						target: todayButton,
++					} )
++				);
++			} );
++		} );
++	} );
++
++	describe( 'Month navigation', () => {
++		it( 'should select an initial month in uncontrolled mode via the `defaultMonth` prop', () => {
++			render( <DateRangeCalendar defaultMonth={ nextMonth } /> );
++
++			expect(
++				screen.getByRole( 'grid', {
++					name: monthNameFormatter( 'en-US' ).format( nextMonth ),
++				} )
++			).toBeVisible();
++			expect( getDateCell( nextMonth ) ).toBeVisible();
++			expect( getDateButton( nextMonth ) ).toBeVisible();
++		} );
++
++		it( 'should select an initial month in controlled mode via the `month` prop', () => {
++			render( <DateRangeCalendar month={ nextMonth } /> );
++
++			expect(
++				screen.getByRole( 'grid', {
++					name: monthNameFormatter( 'en-US' ).format( nextMonth ),
++				} )
++			).toBeVisible();
++			expect( getDateCell( nextMonth ) ).toBeVisible();
++			expect( getDateButton( nextMonth ) ).toBeVisible();
++		} );
++
++		describe.each( [
++			[ 'Uncontrolled', UncontrolledDateRangeCalendar ],
++			[ 'Controlled', ControlledDateRangeCalendar ],
++		] )( '[`%s`]', ( _mode, Component ) => {
++			it( 'should navigate to the previous and next months when the previous and next month buttons are clicked', async () => {
++				const user = setupUserEvent();
++				const onMonthChange = jest.fn();
++
++				render( <Component onMonthChange={ onMonthChange } /> );
++
++				const prevButton = screen.getByRole( 'button', {
++					name: /previous month/i,
++				} );
++				const nextButton = screen.getByRole( 'button', {
++					name: /next month/i,
++				} );
++				await user.click( prevButton );
++
++				expect( onMonthChange ).toHaveBeenCalledTimes( 1 );
++				expect( onMonthChange ).toHaveBeenCalledWith( prevMonth );
++
++				expect(
++					screen.getByRole( 'grid', {
++						name: monthNameFormatter( 'en-US' ).format( prevMonth ),
++					} )
++				).toBeVisible();
++				expect( getDateCell( prevMonth ) ).toBeVisible();
++				expect( getDateButton( prevMonth ) ).toBeVisible();
++
++				await user.click( nextButton );
++
++				expect( onMonthChange ).toHaveBeenCalledTimes( 2 );
++				expect( onMonthChange ).toHaveBeenCalledWith( currentMonth );
++
++				expect(
++					screen.getByRole( 'grid', {
++						name: monthNameFormatter( 'en-US' ).format(
++							currentMonth
++						),
++					} )
++				).toBeVisible();
++				expect( getDateCell( currentMonth ) ).toBeVisible();
++				expect( getDateButton( currentMonth ) ).toBeVisible();
++
++				await user.click( nextButton );
++
++				expect( onMonthChange ).toHaveBeenCalledTimes( 3 );
++				expect( onMonthChange ).toHaveBeenCalledWith( nextMonth );
++
++				expect(
++					screen.getByRole( 'grid', {
++						name: monthNameFormatter( 'en-US' ).format( nextMonth ),
++					} )
++				).toBeVisible();
++				expect( getDateCell( nextMonth ) ).toBeVisible();
++				expect( getDateButton( nextMonth ) ).toBeVisible();
++			} );
++
++			it( 'should not navigate to a month that is before the `startMonth` prop', async () => {
++				const user = setupUserEvent();
++				const onMonthChange = jest.fn();
++
++				render(
++					<Component
++						startMonth={ nextMonth }
++						onMonthChange={ onMonthChange }
++					/>
++				);
++
++				const prevButton = screen.getByRole( 'button', {
++					name: /previous month/i,
++				} );
++				const nextButton = screen.getByRole( 'button', {
++					name: /next month/i,
++				} );
++
++				expect(
++					screen.getByRole( 'grid', {
++						name: monthNameFormatter( 'en-US' ).format( nextMonth ),
++					} )
++				).toBeVisible();
++				expect( getDateCell( nextMonth ) ).toBeVisible();
++				expect( getDateButton( nextMonth ) ).toBeVisible();
++
++				expect( prevButton ).toHaveAttribute( 'aria-disabled', 'true' );
++
++				await user.click( prevButton );
++
++				expect( onMonthChange ).not.toHaveBeenCalled();
++
++				await user.click( nextButton );
++
++				expect( onMonthChange ).toHaveBeenCalledTimes( 1 );
++				expect( onMonthChange ).toHaveBeenCalledWith( nextNextMonth );
++
++				expect(
++					screen.getByRole( 'grid', {
++						name: monthNameFormatter( 'en-US' ).format(
++							nextNextMonth
++						),
++					} )
++				).toBeVisible();
++				expect( getDateCell( nextNextMonth ) ).toBeVisible();
++				expect( getDateButton( nextNextMonth ) ).toBeVisible();
++
++				expect( prevButton ).not.toHaveAttribute( 'aria-disabled' );
++			} );
++
++			it( 'should not navigate to a month that is after the `endMonth` prop', async () => {
++				const user = setupUserEvent();
++				const onMonthChange = jest.fn();
++
++				render(
++					<Component
++						endMonth={ prevMonth }
++						onMonthChange={ onMonthChange }
++					/>
++				);
++
++				const prevButton = screen.getByRole( 'button', {
++					name: /previous month/i,
++				} );
++				const nextButton = screen.getByRole( 'button', {
++					name: /next month/i,
++				} );
++
++				expect(
++					screen.getByRole( 'grid', {
++						name: monthNameFormatter( 'en-US' ).format( prevMonth ),
++					} )
++				).toBeVisible();
++				expect( getDateCell( prevMonth ) ).toBeVisible();
++				expect( getDateButton( prevMonth ) ).toBeVisible();
++
++				expect( nextButton ).toHaveAttribute( 'aria-disabled', 'true' );
++
++				await user.click( nextButton );
++
++				expect( onMonthChange ).not.toHaveBeenCalled();
++
++				await user.click( prevButton );
++
++				expect( onMonthChange ).toHaveBeenCalledTimes( 1 );
++				expect( onMonthChange ).toHaveBeenCalledWith( prevPrevMonth );
++
++				expect(
++					screen.getByRole( 'grid', {
++						name: monthNameFormatter( 'en-US' ).format(
++							prevPrevMonth
++						),
++					} )
++				).toBeVisible();
++				expect( getDateCell( prevPrevMonth ) ).toBeVisible();
++				expect( getDateButton( prevPrevMonth ) ).toBeVisible();
++
++				expect( nextButton ).not.toHaveAttribute( 'aria-disabled' );
++			} );
++		} );
++	} );
++
++	describe( 'Keyboard focus and navigation', () => {
++		it( 'should auto-focus the selected day when the `autoFocus` prop is set to `true`', async () => {
++			render(
++				<DateRangeCalendar
++					// eslint-disable-next-line jsx-a11y/no-autofocus
++					autoFocus
++					defaultSelected={ { from: today, to: tomorrow } }
++				/>
++			);
++			expect( getDateButton( today ) ).toHaveFocus();
++		} );
++
++		it( "should auto-focus today's date if there is not selected date when the `autoFocus` prop is set to `true`", async () => {
++			// eslint-disable-next-line jsx-a11y/no-autofocus
++			render( <DateRangeCalendar autoFocus /> );
++			expect( getDateButton( today ) ).toHaveFocus();
++		} );
++
++		it( 'should focus each arrow as a tab stop, but treat the grid as a 2d composite widget', async () => {
++			const user = setupUserEvent();
++			render( <DateRangeCalendar /> );
++
++			// Focus previous month button
++			await user.tab();
++			expect(
++				screen.getByRole( 'button', { name: /previous month/i } )
++			).toHaveFocus();
++
++			// Focus next month button
++			await user.tab();
++			expect(
++				screen.getByRole( 'button', { name: /next month/i } )
++			).toHaveFocus();
++
++			// Focus today button
++			await user.tab();
++			expect( getDateButton( today ) ).toHaveFocus();
++
++			// Focus next day
++			await user.keyboard( '{ArrowRight}' );
++			expect( getDateButton( addDays( today, 1 ) ) ).toHaveFocus();
++
++			// Focus to next week
++			await user.keyboard( '{ArrowDown}' );
++			expect( getDateButton( addDays( today, 8 ) ) ).toHaveFocus();
++
++			// Focus previous day
++			await user.keyboard( '{ArrowLeft}' );
++			expect( getDateButton( addDays( today, 7 ) ) ).toHaveFocus();
++
++			// Focus previous week
++			await user.keyboard( '{ArrowUp}' );
++			expect( getDateButton( today ) ).toHaveFocus();
++
++			// Focus first day of week
++			await user.keyboard( '{Home}' );
++			expect( getDateButton( startOfWeek( today ) ) ).toHaveFocus();
++
++			// Focus last day of week
++			await user.keyboard( '{End}' );
++			expect( getDateButton( endOfWeek( today ) ) ).toHaveFocus();
++
++			// Focus previous month
++			await user.keyboard( '{PageUp}' );
++			expect(
++				getDateButton( subMonths( endOfWeek( today ), 1 ) )
++			).toHaveFocus();
++
++			expect(
++				screen.getByRole( 'grid', {
++					name: monthNameFormatter( 'en-US' ).format(
++						subMonths( endOfWeek( today ), 1 )
++					),
++				} )
++			).toBeVisible();
++
++			// Navigate to next month
++			await user.keyboard( '{PageDown}' );
++			expect( getDateButton( endOfWeek( today ) ) ).toHaveFocus();
++			expect(
++				screen.getByRole( 'grid', {
++					name: monthNameFormatter( 'en-US' ).format(
++						endOfWeek( today )
++					),
++				} )
++			).toBeVisible();
++
++			// Focus previous year
++			await user.keyboard( '{Shift>}{PageUp}{/Shift}' );
++			expect(
++				getDateButton( subYears( endOfWeek( today ), 1 ) )
++			).toHaveFocus();
++
++			expect(
++				screen.getByRole( 'grid', {
++					name: monthNameFormatter( 'en-US' ).format(
++						subYears( endOfWeek( today ), 1 )
++					),
++				} )
++			).toBeVisible();
++
++			// Focus next year
++			await user.keyboard( '{Shift>}{PageDown}{/Shift}' );
++			expect( getDateButton( endOfWeek( today ) ) ).toHaveFocus();
++
++			expect(
++				screen.getByRole( 'grid', {
++					name: monthNameFormatter( 'en-US' ).format(
++						endOfWeek( today )
++					),
++				} )
++			).toBeVisible();
++		} );
++
++		// Note: the following test is not testing advanced keyboard interactions
++		// (pageUp, pageDown, shift+pageUp, shift+pageDown, home, end)
++		it( 'should not focus disabled dates and skip over them when navigating using arrow keys', async () => {
++			const user = setupUserEvent();
++
++			render(
++				<DateRangeCalendar
++					disabled={ [
++						tomorrow,
++						addWeeks( addDays( tomorrow, 1 ), 1 ),
++						addWeeks( today, 2 ),
++						addWeeks( tomorrow, 2 ),
++					] }
++				/>
++			);
++
++			await user.tab();
++			await user.tab();
++			await user.tab();
++			expect( getDateButton( today ) ).toHaveFocus();
++
++			await user.keyboard( '{ArrowRight}' );
++			expect( getDateButton( addDays( tomorrow, 1 ) ) ).toHaveFocus();
++
++			await user.keyboard( '{ArrowDown}' );
++			expect(
++				getDateButton( addWeeks( addDays( tomorrow, 1 ), 2 ) )
++			).toHaveFocus();
++
++			await user.keyboard( '{ArrowLeft}' );
++			expect( getDateButton( addWeeks( yesterday, 2 ) ) ).toHaveFocus();
++
++			await user.keyboard( '{ArrowUp}' );
++			expect( getDateButton( addWeeks( yesterday, 1 ) ) ).toHaveFocus();
++		} );
++
++		it( 'should focus the selected date when tabbing into the calendar', async () => {
++			const user = setupUserEvent();
++			render(
++				<DateRangeCalendar selected={ { from: today, to: tomorrow } } />
++			);
++
++			// Tab to the calendar grid
++			await user.tab();
++			await user.tab();
++			await user.tab();
++
++			expect( getDateButton( today ) ).toHaveFocus();
++		} );
++	} );
++
++	describe( 'Disabled states', () => {
++		it( 'should support disabling all dates via the `disabled` prop', async () => {
++			const user = setupUserEvent();
++
++			render( <DateRangeCalendar disabled /> );
++
++			within( screen.getByRole( 'grid' ) )
++				.getAllByRole( 'button' )
++				.forEach( ( button ) => {
++					expect( button ).toBeDisabled();
++				} );
++
++			await user.click(
++				screen.getByRole( 'button', { name: /previous/i } )
++			);
++
++			within( screen.getByRole( 'grid' ) )
++				.getAllByRole( 'button' )
++				.forEach( ( button ) => {
++					expect( button ).toBeDisabled();
++				} );
++
++			await user.click( screen.getByRole( 'button', { name: /next/i } ) );
++			await user.click( screen.getByRole( 'button', { name: /next/i } ) );
++
++			within( screen.getByRole( 'grid' ) )
++				.getAllByRole( 'button' )
++				.forEach( ( button ) => {
++					expect( button ).toBeDisabled();
++				} );
++		} );
++
++		it( 'should support disabling single dates via the `disabled` prop', async () => {
++			render( <DateRangeCalendar disabled={ tomorrow } /> );
++
++			expect( getDateButton( tomorrow ) ).toBeDisabled();
++		} );
++
++		it( 'should support passing a custom function via the `disabled` prop', async () => {
++			const primeNumbers = [ 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31 ];
++			render(
++				<DateRangeCalendar
++					disabled={ ( date ) =>
++						primeNumbers.includes( date.getDate() )
++					}
++				/>
++			);
++
++			for ( const date of primeNumbers ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeDisabled();
++			}
++		} );
++
++		it( 'should support disabling all dates before a certain date via the `disabled` prop', async () => {
++			render( <DateRangeCalendar disabled={ { before: today } } /> );
++
++			for ( let date = 1; date < today.getDate(); date++ ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeDisabled();
++			}
++			expect( getDateButton( today ) ).toBeEnabled();
++		} );
++
++		it( 'should support disabling all dates after a certain date via the `disabled` prop', async () => {
++			render( <DateRangeCalendar disabled={ { after: today } } /> );
++
++			for ( let date = today.getDate() + 1; date < 32; date++ ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeDisabled();
++			}
++			expect( getDateButton( today ) ).toBeEnabled();
++		} );
++
++		it( 'should support disabling all dates before a certain date and after a certain date via the `disabled` prop', async () => {
++			render(
++				<DateRangeCalendar
++					disabled={ {
++						before: yesterday,
++						after: addDays( today, 1 ),
++					} }
++				/>
++			);
++
++			let date;
++
++			for ( date = 1; date < today.getDate() - 1; date++ ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeDisabled();
++			}
++			expect( getDateButton( yesterday ) ).toBeEnabled();
++			expect( getDateButton( today ) ).toBeEnabled();
++			expect( getDateButton( addDays( today, 1 ) ) ).toBeEnabled();
++
++			for ( date = today.getDate() + 2; date < 32; date++ ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeDisabled();
++			}
++		} );
++
++		it( 'should support disabling all dates within a certain date range via the `disabled` prop', async () => {
++			render(
++				<DateRangeCalendar
++					disabled={ { from: yesterday, to: addDays( today, 1 ) } }
++				/>
++			);
++
++			let date;
++
++			for ( date = 1; date < today.getDate() - 1; date++ ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeEnabled();
++			}
++			expect( getDateButton( yesterday ) ).toBeDisabled();
++			expect( getDateButton( today ) ).toBeDisabled();
++			expect( getDateButton( addDays( today, 1 ) ) ).toBeDisabled();
++
++			for ( date = today.getDate() + 2; date < 32; date++ ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeEnabled();
++			}
++		} );
++
++		it( 'should support disabling specific days of the week via the `disabled` prop', async () => {
++			const weekendsInMay = [ 3, 4, 10, 11, 17, 18, 24, 25, 31 ];
++			render(
++				<DateRangeCalendar disabled={ { dayOfWeek: [ 0, 6 ] } } />
++			);
++
++			for ( const date of weekendsInMay ) {
++				expect(
++					getDateButton(
++						new Date( today.getFullYear(), today.getMonth(), date )
++					)
++				).toBeDisabled();
++			}
++		} );
++
++		it( 'should disable the previous and next months buttons if the `disableNavigation` is set to `true`', async () => {
++			const user = setupUserEvent();
++
++			render( <DateRangeCalendar disableNavigation /> );
++
++			expect(
++				screen.getByRole( 'button', { name: /previous month/i } )
++			).toHaveAttribute( 'aria-disabled', 'true' );
++			expect(
++				screen.getByRole( 'button', { name: /next month/i } )
++			).toHaveAttribute( 'aria-disabled', 'true' );
++
++			await user.tab();
++			expect(
++				screen.getByRole( 'button', { name: /today/i } )
++			).toHaveFocus();
++		} );
++	} );
++
++	// Note: we're not testing localization of strings. We're only testing
++	// that the date formatting, computed dir, and calendar format are correct.
++	describe( 'Localization', () => {
++		it( 'should localize the calendar based on the `locale` prop', async () => {
++			const user = setupUserEvent();
++
++			render( <DateRangeCalendar locale={ ar } /> );
++
++			// Check computed writing direction
++			expect(
++				screen.getByRole( 'application', {
++					name: 'Date range calendar',
++				} )
++			).toHaveAttribute( 'dir', 'rtl' );
++
++			// Check month name
++			const grid = screen.getByRole( 'grid', {
++				name: monthNameFormatter( 'ar' ).format( today ),
++			} );
++			expect( grid ).toBeVisible();
++
++			// Check today button
++			expect( getDateButton( today, {}, 'ar' ) ).toHaveAccessibleName(
++				/today/i
++			);
++
++			await user.tab();
++			await user.tab();
++			await user.tab();
++			expect( getDateButton( today, {}, 'ar' ) ).toHaveFocus();
++
++			await user.keyboard( '{Home}' );
++			expect(
++				getDateButton( startOfWeek( today, { locale: ar } ), {}, 'ar' )
++			).toHaveFocus();
++		} );
++
++		it( 'should support timezones according to the `timeZone` prop', async () => {
++			const user = setupUserEvent();
++			const onSelect = jest.fn();
++
++			render(
++				<DateRangeCalendar
++					timeZone="Asia/Tokyo"
++					onSelect={ onSelect }
++				/>
++			);
++
++			// For someone in Tokyo, the current time simulated in the test
++			// (ie. 20:00 UTC) is the next day.
++			expect( getDateButton( tomorrow ) ).toHaveAccessibleName(
++				/today/i
++			);
++
++			// Select tomorrow's button (which is today in Tokyo)
++			const tomorrowButton = getDateButton( tomorrow );
++			await user.click( tomorrowButton );
++
++			const tomorrowFromTokyoTimezone = addHours(
++				tomorrow,
++				new TZDate( tomorrow, 'Asia/Tokyo' ).getTimezoneOffset() / 60
++			);
++
++			expect( onSelect ).toHaveBeenCalledTimes( 1 );
++			expect( onSelect ).toHaveBeenCalledWith(
++				{
++					from: tomorrowFromTokyoTimezone,
++					to: tomorrowFromTokyoTimezone,
++				},
++				tomorrowFromTokyoTimezone,
++				expect.objectContaining( { today: true } ),
++				expect.objectContaining( {
++					type: 'click',
++					target: tomorrowButton,
++				} )
++			);
++		} );
++
++		it( 'should handle timezoned dates and convert them to the calendar timezone', async () => {
++			// Still the same time from UTC's POV, just expressed in Tokyo time.
++			const tomorrowAtMidnightInTokyoTZ = new TZDate(
++				tomorrow,
++				'Asia/Tokyo'
++			);
++			const dayAfterTomorrowInTokyoTZ = new TZDate(
++				addDays( tomorrow, 1 ),
++				'Asia/Tokyo'
++			);
++			const timezoneRange = {
++				from: tomorrowAtMidnightInTokyoTZ,
++				to: dayAfterTomorrowInTokyoTZ,
++			};
++
++			render(
++				<DateRangeCalendar
++					defaultSelected={ timezoneRange }
++					// Note: using "Etc/GMT+2" instead of "-02:00" because support for raw offsets was introduced in Node v22 (while currently the repository still targets Node v20).
++					timeZone="Etc/GMT+2"
++				/>
++			);
++
++			// Changing the calendar timezone to UTC-2 makes the dates become
++			// earlier by 1 day (from midnight to 10pm the previous day).
++			expect( getDateCell( today, { selected: true } ) ).toBeVisible();
++			expect( getDateCell( tomorrow, { selected: true } ) ).toBeVisible();
++		} );
++	} );
++
++	describe( 'usePreviewRange', () => {
++		const previewToday = new Date( '2024-03-15' );
++		const previewTomorrow = addDays( previewToday, 1 );
++		const previewYesterday = subDays( previewToday, 1 );
++		const previewNextWeek = addDays( previewToday, 7 );
++
++		it( 'should return undefined when there is no hovered date', () => {
++			const { result } = renderHook( () =>
++				usePreviewRange( {
++					selected: { from: previewToday, to: previewTomorrow },
++					hoveredDate: undefined,
++				} )
++			);
++
++			expect( result.current ).toBeUndefined();
++		} );
++
++		it( 'should return undefined when there is no selected date', () => {
++			const { result } = renderHook( () =>
++				usePreviewRange( {
++					selected: undefined,
++					hoveredDate: previewToday,
++				} )
++			);
++
++			expect( result.current ).toBeUndefined();
++		} );
++
++		it( 'should return undefined when there is no selected start date', () => {
++			const { result } = renderHook( () =>
++				usePreviewRange( {
++					selected: { from: undefined, to: previewTomorrow },
++					hoveredDate: previewToday,
++				} )
++			);
++
++			expect( result.current ).toBeUndefined();
++		} );
++
++		it( 'should show preview when hovering before selected range', () => {
++			const { result } = renderHook( () =>
++				usePreviewRange( {
++					selected: { from: previewToday, to: previewTomorrow },
++					hoveredDate: previewYesterday,
++				} )
++			);
++
++			expect( result.current ).toEqual( {
++				from: previewYesterday,
++				to: previewToday,
++			} );
++		} );
++
++		it( 'should show preview when hovering between selected range dates', () => {
++			const { result } = renderHook( () =>
++				usePreviewRange( {
++					selected: { from: previewYesterday, to: previewTomorrow },
++					hoveredDate: previewToday,
++				} )
++			);
++
++			expect( result.current ).toEqual( {
++				from: previewYesterday,
++				to: previewToday,
++			} );
++		} );
++
++		it( 'should show preview when hovering after selected range', () => {
++			const { result } = renderHook( () =>
++				usePreviewRange( {
++					selected: { from: previewYesterday, to: previewToday },
++					hoveredDate: previewTomorrow,
++				} )
++			);
++
++			expect( result.current ).toEqual( {
++				from: previewToday,
++				to: previewTomorrow,
++			} );
++		} );
++
++		it( 'should show preview when hovering after selected range with no end date', () => {
++			const { result } = renderHook( () =>
++				usePreviewRange( {
++					selected: { from: previewToday },
++					hoveredDate: previewTomorrow,
++				} )
++			);
++
++			expect( result.current ).toEqual( {
++				from: previewToday,
++				to: previewTomorrow,
++			} );
++		} );
++
++		describe( 'min range constraint', () => {
++			it( 'should collapse preview to single date when range is less than min', () => {
++				const { result } = renderHook( () =>
++					usePreviewRange( {
++						selected: { from: previewToday },
++						hoveredDate: previewTomorrow,
++						min: 3,
++					} )
++				);
++
++				expect( result.current ).toEqual( {
++					from: previewTomorrow,
++					to: previewTomorrow,
++				} );
++			} );
++
++			it( 'should allow preview when range meets min requirement', () => {
++				const { result } = renderHook( () =>
++					usePreviewRange( {
++						selected: { from: previewToday },
++						hoveredDate: previewNextWeek,
++						min: 3,
++					} )
++				);
++
++				expect( result.current ).toEqual( {
++					from: previewToday,
++					to: previewNextWeek,
++				} );
++			} );
++		} );
++
++		describe( 'max range constraint', () => {
++			it( 'should collapse preview to single date when range exceeds max', () => {
++				const { result } = renderHook( () =>
++					usePreviewRange( {
++						selected: { from: previewToday },
++						hoveredDate: previewNextWeek,
++						max: 3,
++					} )
++				);
++
++				expect( result.current ).toEqual( {
++					from: previewNextWeek,
++					to: previewNextWeek,
++				} );
++			} );
++
++			it( 'should allow preview when range meets max requirement', () => {
++				const { result } = renderHook( () =>
++					usePreviewRange( {
++						selected: { from: previewToday },
++						hoveredDate: previewTomorrow,
++						max: 3,
++					} )
++				);
++
++				expect( result.current ).toEqual( {
++					from: previewToday,
++					to: previewTomorrow,
++				} );
++			} );
++		} );
++
++		describe( 'disabled dates', () => {
++			it( 'should collapse preview to single date when range contains disabled dates and excludeDisabled is true', () => {
++				const { result } = renderHook( () =>
++					usePreviewRange( {
++						selected: { from: previewToday },
++						hoveredDate: previewNextWeek,
++						disabled: [ previewTomorrow ],
++						excludeDisabled: true,
++					} )
++				);
++
++				expect( result.current ).toEqual( {
++					from: previewNextWeek,
++					to: previewNextWeek,
++				} );
++			} );
++
++			it( 'should allow preview when range contains disabled dates but excludeDisabled is false', () => {
++				const { result } = renderHook( () =>
++					usePreviewRange( {
++						selected: { from: previewToday },
++						hoveredDate: previewNextWeek,
++						disabled: [ previewTomorrow ],
++						excludeDisabled: false,
++					} )
++				);
++
++				expect( result.current ).toEqual( {
++					from: previewToday,
++					to: previewNextWeek,
++				} );
++			} );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/calendar/types.ts b/packages/components/src/calendar/types.ts
+new file mode 100644
+index 00000000000000..dc4bb72d5bf7af
+--- /dev/null
++++ b/packages/components/src/calendar/types.ts
+@@ -0,0 +1,342 @@
++/**
++ * External dependencies
++ */
++import type { Locale } from 'date-fns';
++import type * as React from 'react';
++
++/**
++ * Represents the modifiers that match a specific day in the calendar.
++ * @example
++ *   const modifiers: Modifiers = {
++ *   today: false, // the day is not today
++ *   selected: true, // the day is selected
++ *   disabled: false, // the day is not disabled
++ *   outside: false, // the day is not outside the month
++ *   focused: false, // the day is not focused
++ *
++ *   weekend: false // custom modifier example for matching a weekend
++ *   booked: true // custom modifier example for matching a booked day
++ *   available: false // custom modifier example for matching an available day
++ *   };
++ */
++export type Modifiers = Record< string, boolean >;
++
++/**
++ * A value or a function that matches a specific day.
++ * @example
++ *   // will always match the day
++ *   const booleanMatcher: Matcher = true;
++ *
++ *   // will match the today's date
++ *   const dateMatcher: Matcher = new Date();
++ *
++ *   // will match the days in the array
++ *   const arrayMatcher: Matcher = [
++ *     new Date(2019, 1, 2),
++ *     new Date(2019, 1, 4)
++ *   ];
++ *
++ *   // will match days after the 2nd of February 2019
++ *   const afterMatcher: DateAfter = { after: new Date(2019, 1, 2) };
++ *
++ *   // will match days before the 2nd of February 2019 }
++ *   const beforeMatcher: DateBefore = { before: new Date(2019, 1, 2) };
++ *
++ *   // will match Sundays
++ *   const dayOfWeekMatcher: DayOfWeek = {
++ *     dayOfWeek: 0
++ *   };
++ *
++ *   // will match the included days, except the two dates
++ *   const intervalMatcher: DateInterval = {
++ *     after: new Date(2019, 1, 2),
++ *     before: new Date(2019, 1, 5)
++ *   };
++ *
++ *   // will match the included days, including the two dates
++ *   const rangeMatcher: DateRange = {
++ *     from: new Date(2019, 1, 2),
++ *     to: new Date(2019, 1, 5)
++ *   };
++ *
++ *   // will match when the function return true
++ *   const functionMatcher: Matcher = (day: Date) => {
++ *     return day.getMonth() === 2; // match when month is March
++ *   };
++ */
++type Matcher =
++	| boolean
++	| ( ( date: Date ) => boolean )
++	| Date
++	| Date[]
++	| DateRange
++	| DateBefore
++	| DateAfter
++	| DateInterval
++	| DayOfWeek;
++/**
++ * Match a day falling after the specified date, with the date not included.
++ * @example
++ *   // Match days after the 2nd of February 2019
++ *   const matcher: DateAfter = { after: new Date(2019, 1, 2) };
++ */
++type DateAfter = {
++	after: Date;
++};
++/**
++ * Match a day falling before the specified date, with the date not included.
++ * @example
++ *   // Match days before the 2nd of February 2019
++ *   const matcher: DateBefore = { before: new Date(2019, 1, 2) };
++ */
++type DateBefore = {
++	before: Date;
++};
++/**
++ * An interval of dates. Differently from `DateRange`, the range ends here
++ * are not included.
++ * @example
++ *   // Match the days between the 2nd and the 5th of February 2019
++ *   const matcher: DateInterval = {
++ *     after: new Date(2019, 1, 2),
++ *     before: new Date(2019, 1, 5)
++ *   };
++ */
++type DateInterval = {
++	before: Date;
++	after: Date;
++};
++/**
++ * A range of dates. The range can be open. Differently from
++ * `DateInterval`, the range ends here are included.
++ * @example
++ *   // Match the days between the 2nd and the 5th of February 2019
++ *   const matcher: DateRange = {
++ *     from: new Date(2019, 1, 2),
++ *     to: new Date(2019, 1, 5)
++ *   };
++ */
++export type DateRange = {
++	from: Date | undefined;
++	to?: Date | undefined;
++};
++/**
++ * Match dates being one of the specified days of the week (`0-6`, where `0` is
++ * Sunday).
++ * @example
++ *   // Match Sundays
++ *   const matcher: DayOfWeek = { dayOfWeek: 0 };
++ *   // Match weekends
++ *   const matcher: DayOfWeek = { dayOfWeek: [0, 6] };
++ */
++type DayOfWeek = {
++	dayOfWeek: number | number[];
++};
++
++/**
++ * Shared handler type for `onSelect` callback when a selection mode is set.
++ * @example
++ *   const handleSelect: OnSelectHandler<Date> = (
++ *     selected,
++ *     triggerDate,
++ *     modifiers,
++ *     e
++ *   ) => {
++ *     console.log( "Selected:", selected );
++ *     console.log( "Triggered by:", triggerDate );
++ *   };
++ * @template T - The type of the selected item.
++ * @callback OnSelectHandler
++ * @param {T}                                      selected    - The selected item after the event.
++ * @param {Date}                                   triggerDate - The date when the event was triggered. This is
++ *                                                             typically the day clicked or interacted with.
++ * @param {Modifiers}                              modifiers   - The modifiers associated with the event.
++ * @param {React.MouseEvent | React.KeyboardEvent} e           - The event object.
++ */
++type OnSelectHandler< T > = (
++	selected: T,
++	triggerDate: Date,
++	modifiers: Modifiers,
++	e: React.MouseEvent | React.KeyboardEvent
++) => void;
++
++export interface BaseProps
++	extends Omit<
++		React.HTMLAttributes< HTMLDivElement >,
++		'onSelect' | 'defaultValue'
++	> {
++	/**
++	 * Whether the selection is required.
++	 * When `true`, there always needs to be a date selected.
++	 * @default false
++	 */
++	required?: boolean;
++
++	/**
++	 * The initial month to show in the calendar view (uncontrolled).
++	 * @default The current month
++	 */
++	defaultMonth?: Date;
++	/**
++	 * The month displayed in the calendar view (controlled). Use together with
++	 * `onMonthChange` to change the month programmatically.
++	 */
++	month?: Date;
++	/**
++	 * The number of months displayed at once.
++	 * @default 1
++	 */
++	numberOfMonths?: number;
++	/**
++	 * The earliest month to start the month navigation.
++	 */
++	startMonth?: Date;
++	/**
++	 * The latest month to end the month navigation.
++	 */
++	endMonth?: Date;
++	/**
++	 * Focus the first selected day (if set) or today's date (if not disabled).
++	 *
++	 * Use this prop when you need to focus the calendar after a user action
++	 * (e.g. opening the dialog with the calendar).
++	 */
++	autoFocus?: boolean;
++	/**
++	 * Specify which days are disabled. Using `true` will disable all dates.
++	 */
++	disabled?: Matcher | Matcher[] | undefined;
++	/**
++	 * Disable the navigation buttons.
++	 */
++	disableNavigation?: boolean;
++	/**
++	 * Use custom labels, useful for translating the component.
++	 *
++	 * For a correct localized experience, consumers should make sure the locale
++	 * used for the translated labels and `locale` prop are consistent.
++	 */
++	labels?: {
++		/**
++		 * The label for the navigation toolbar.
++		 * @default ""
++		 */
++		labelNav?: () => string;
++		/**
++		 * The label for the month grid.
++		 * @default "LLLL y" (e.g. "November 2022")
++		 */
++		labelGrid?: ( date: Date ) => string;
++		/**
++		 * The label for the gridcell, when the calendar is not interactive.
++		 * @default The formatted date.
++		 */
++		labelGridcell?: ( date: Date, modifiers?: Modifiers ) => string;
++		/**
++		 * The label for the "next month" button.
++		 * @default "Go to the Next Month"
++		 */
++		labelNext?: ( month: Date | undefined ) => string;
++		/**
++		 * The label for the "previous month" button.
++		 * @default "Go to the Previous Month"
++		 */
++		labelPrevious?: ( month: Date | undefined ) => string;
++		/**
++		 * The label for the day button.
++		 * @default The formatted date.
++		 */
++		labelDayButton?: ( date: Date, modifiers?: Modifiers ) => string;
++		/**
++		 * The label for the weekday.
++		 * @default ( date: Date ) => "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday"
++		 */
++		labelWeekday?: ( date: Date ) => string;
++	};
++
++	/**
++	 * The locale object used to localize dates. Pass a locale from
++	 * `@date-fns/locale` to localize the calendar.
++	 *
++	 * For a correct localized experience, consumers should make sure the locale
++	 * used for the translated labels and `locale` prop are consistent.
++	 * @see https://github.com/date-fns/date-fns/tree/main/src/locale for a list of the supported locales
++	 * @default The `enUS` locale from `@date-fns/locale`
++	 */
++	locale?: Locale;
++	/**
++	 * The index of the first day of the week (0 - Sunday). Overrides the locale's
++	 * one.
++	 * @default Based on the `locale` prop
++	 */
++	weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | undefined;
++	/**
++	 * Event fired when the user navigates between months.
++	 */
++	onMonthChange?: ( month: Date ) => void;
++	/**
++	 * The time zone (IANA or UTC offset) to use in the calendar.
++	 *
++	 * See
++	 * [Wikipedia](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
++	 * for the possible values.
++	 *
++	 * When working with time zones, use the `TZDate` object exported by this
++	 * package instead of the native `Date` object.
++	 * @example
++	 *   import { DateCalendar, TZDate } from "@automattic/components";
++	 *
++	 *   export function WithTimeZone() {
++	 *     const timeZone = "America/New_York";
++	 *     const [ selected, setSelected ] = useState< Date | undefined >(
++	 *       new TZDate( 2024, 12, 10, timeZone ) // Use `TZDate` instead of `Date`
++	 *     );
++	 *     return (
++	 *       <DateCalendar
++	 *         timeZone={ timeZone }
++	 *         selected={ selected }
++	 *         onSelect={ setSelected }
++	 *     />
++	 *   );
++	 * }
++	 */
++	timeZone?: string;
++	/**
++	 * The role attribute to add to the container element.
++	 * @default 'application'
++	 */
++	role?: 'application' | 'dialog' | undefined;
++}
++
++interface SingleProps {
++	/** The selected date. */
++	selected?: Date | undefined | null;
++	/** Event handler when a day is selected. */
++	onSelect?: OnSelectHandler< Date | undefined >;
++	/** The default selected date (for uncontrolled usage). */
++	defaultSelected?: Date;
++}
++
++interface RangeProps {
++	/**
++	 * When `true`, the range will reset when including a disabled day.
++	 */
++	excludeDisabled?: boolean;
++	/**
++	 * The minimum number of nights to include in the range.
++	 */
++	min?: number;
++	/**
++	 * The maximum number of nights to include in the range.
++	 */
++	max?: number;
++	/** The selected range. */
++	selected?: DateRange | undefined | null;
++	/** Event handler when the selection changes. */
++	onSelect?: OnSelectHandler< DateRange | undefined >;
++	/** The default selected range (for uncontrolled usage). */
++	defaultSelected?: DateRange;
++}
++
++export type DateCalendarProps = BaseProps & SingleProps;
++export type DateRangeCalendarProps = BaseProps & RangeProps;
+diff --git a/packages/components/src/calendar/utils/constants.ts b/packages/components/src/calendar/utils/constants.ts
+new file mode 100644
+index 00000000000000..10ab9149f6d632
+--- /dev/null
++++ b/packages/components/src/calendar/utils/constants.ts
+@@ -0,0 +1,62 @@
++/**
++ * Internal dependencies
++ */
++import { Day } from './day-cell';
++
++const CLASSNAMES = {
++	root: 'components-calendar',
++	day: 'components-calendar__day',
++	day_button: 'components-calendar__day-button',
++	caption_label: 'components-calendar__caption-label',
++	button_next: 'components-calendar__button-next',
++	button_previous: 'components-calendar__button-previous',
++	chevron: 'components-calendar__chevron',
++	nav: 'components-calendar__nav',
++	month_caption: 'components-calendar__month-caption',
++	months: 'components-calendar__months',
++	month_grid: 'components-calendar__month-grid',
++	weekday: 'components-calendar__weekday',
++	today: 'components-calendar__day--today',
++	selected: 'components-calendar__day--selected',
++	disabled: 'components-calendar__day--disabled',
++	hidden: 'components-calendar__day--hidden',
++	range_start: 'components-calendar__range-start',
++	range_end: 'components-calendar__range-end',
++	range_middle: 'components-calendar__range-middle',
++	weeks_before_enter: 'components-calendar__weeks-before-enter',
++	weeks_before_exit: 'components-calendar__weeks-before-exit',
++	weeks_after_enter: 'components-calendar__weeks-after-enter',
++	weeks_after_exit: 'components-calendar__weeks-after-exit',
++	caption_after_enter: 'components-calendar__caption-after-enter',
++	caption_after_exit: 'components-calendar__caption-after-exit',
++	caption_before_enter: 'components-calendar__caption-before-enter',
++	caption_before_exit: 'components-calendar__caption-before-exit',
++};
++export const MODIFIER_CLASSNAMES = {
++	preview: 'components-calendar__day--preview',
++	preview_start: 'components-calendar__day--preview-start',
++	preview_end: 'components-calendar__day--preview-end',
++};
++
++export const COMMON_PROPS = {
++	animate: true,
++	// Only show days in the current month
++	showOutsideDays: false,
++	// Hide week number column
++	showWeekNumber: false,
++	// Show weekdays row
++	hideWeekdays: false,
++	// Month and year caption are not interactive
++	captionLayout: 'label',
++	// Show a variable number of weeks depending on the month
++	fixedWeeks: false,
++	// Show navigation buttons
++	hideNavigation: false,
++	// Class names
++	classNames: CLASSNAMES,
++	// Default role
++	role: 'application',
++	components: {
++		Day,
++	},
++} as const;
+diff --git a/packages/components/src/calendar/utils/day-cell.tsx b/packages/components/src/calendar/utils/day-cell.tsx
+new file mode 100644
+index 00000000000000..fc0e9ead7083d5
+--- /dev/null
++++ b/packages/components/src/calendar/utils/day-cell.tsx
+@@ -0,0 +1,133 @@
++/**
++ * External dependencies
++ */
++import type { CalendarDay } from 'react-day-picker';
++/**
++ * Internal dependencies
++ */
++import type { Modifiers } from '../types';
++
++/**
++ * The dash array and offset are calculated by:
++ * - measuring the path length (eg 92,28384)
++ * - establishing how many segments should the path be split into (eg. 24)
++ * - dividing the path length by the number of segments (eg. 92,28384 / 24 = 3,84516)
++ * - playing with the dash offset to make sure the dashes look good on rounded corners
++ */
++
++/**
++ * Dashed rectangle. The dash array and offset are chosen to make sure dashes
++ * look good on rounded corners and have similar metrics to the other dash
++ * preview shapes.
++ */
++const PreviewDashStartAndEnd = () => {
++	return (
++		<svg
++			viewBox="0 0 32 32"
++			xmlns="http://www.w3.org/2000/svg"
++			fill="none"
++			stroke="currentColor"
++			strokeDasharray="3.7677"
++			strokeDashoffset="3.2"
++			strokeWidth="1"
++		>
++			<path d="M29.5,0.5 h-27 a2,2 0 0 0 -2,2 v27 a2,2 0 0 0 2,2 h27 a2,2 0 0 0 2,-2 v-27 a2,2 0 0 0 -2,-2" />
++		</svg>
++	);
++};
++
++/**
++ * Dashed top, left, and bottom sides, with rounded corners. The dash array and
++ * offset are chosen to make sure that multiple days in a row show a seamless
++ * dashed border, and the dashes look good on rounded corners.
++ */
++const PreviewDashStart = () => {
++	return (
++		<svg
++			viewBox="0 0 32 32"
++			xmlns="http://www.w3.org/2000/svg"
++			fill="none"
++			stroke="currentColor"
++			strokeDasharray="3.84516"
++			strokeDashoffset="1.9226"
++			strokeWidth="1"
++		>
++			<path d="M32,0.5 h-29.5 a2,2 0 0 0 -2,2 v27 a2,2 0 0 0 2,2 h30" />
++		</svg>
++	);
++};
++/**
++ * Dashed top and bottom sides. The dash array and offset are chosen
++ * to make sure that multiple days in a row show a seamless dashed border.
++ */
++const PreviewDashMiddle = () => {
++	return (
++		<svg
++			viewBox="0 0 32 32"
++			xmlns="http://www.w3.org/2000/svg"
++			fill="none"
++			stroke="currentColor"
++			strokeDasharray="3.9 4"
++			strokeDashoffset="2"
++			strokeWidth="1"
++		>
++			<line x1="0" y1="0.5" x2="100" y2="0.5" />
++			<line x1="0" y1="31.5" x2="100" y2="31.5" />
++		</svg>
++	);
++};
++/**
++ * Dashed top, right, and bottom sides, with rounded corners. The dash array and
++ * offset are chosen to make sure that multiple days in a row show a seamless
++ * dashed border, and the dashes look good on rounded corners.
++ */
++const PreviewDashEnd = () => {
++	return (
++		<svg
++			viewBox="0 0 32 32"
++			xmlns="http://www.w3.org/2000/svg"
++			fill="none"
++			stroke="currentColor"
++			strokeDasharray="3.84516"
++			strokeDashoffset="1.9226"
++			strokeWidth="1"
++		>
++			<path d="M0,0.5 h29.5 a2,2 0 0 1 2,2 v27 a2,2 0 0 1 -2,2 h-29.5" />
++		</svg>
++	);
++};
++
++/**
++ * Render a grid cell for a specific day in the calendar.
++ *
++ * Handles interaction and focus for the day.
++ * @see https://daypicker.dev/guides/custom-components
++ */
++export function Day(
++	props: {
++		/** The day to render. */
++		day: CalendarDay;
++		/** The modifiers to apply to the day. */
++		modifiers: Modifiers;
++	} & React.HTMLAttributes< HTMLDivElement >
++) {
++	const { day, modifiers, children, ...tdProps } = props;
++
++	let PreviewDash;
++	if ( modifiers.preview_start && modifiers.preview_end ) {
++		PreviewDash = PreviewDashStartAndEnd;
++	} else if ( modifiers.preview_start ) {
++		PreviewDash = PreviewDashStart;
++	} else if ( modifiers.preview_end ) {
++		PreviewDash = PreviewDashEnd;
++	} else if ( modifiers.preview ) {
++		PreviewDash = PreviewDashMiddle;
++	}
++
++	return (
++		<td { ...tdProps }>
++			{ PreviewDash && <PreviewDash /> }
++			{ children }
++		</td>
++	);
++}
+diff --git a/packages/components/src/calendar/utils/misc.ts b/packages/components/src/calendar/utils/misc.ts
+new file mode 100644
+index 00000000000000..8ec94b129af672
+--- /dev/null
++++ b/packages/components/src/calendar/utils/misc.ts
+@@ -0,0 +1,3 @@
++export function clampNumberOfMonths( numberOfMonths: number ) {
++	return Math.min( 3, Math.max( 1, numberOfMonths ) );
++}
+diff --git a/packages/components/src/calendar/utils/use-controlled-value.ts b/packages/components/src/calendar/utils/use-controlled-value.ts
+new file mode 100644
+index 00000000000000..7dbb4643a5c2a5
+--- /dev/null
++++ b/packages/components/src/calendar/utils/use-controlled-value.ts
+@@ -0,0 +1,61 @@
++/**
++ * WordPress dependencies
++ */
++import { useState, useCallback } from '@wordpress/element';
++
++type Props< T > = {
++	defaultValue?: T;
++	value?: T | null | undefined;
++	onChange?: ( newValue: T, ...args: any[] ) => void;
++};
++
++/**
++ * Handles controlled and uncontrolled state for the selected calendar value.
++ * It is assumed that the `value` prop is controlled when it's not undefined:
++ * - initial date selected, uncontrolled: use a non-undefined`defaultValue`
++ * - initial date selected, controlled: use a non-undefined `value`
++ * - no date selected, controlled: set `value` to `null`
++ *
++ * The `onChange` prop will return `undefined` when no date is selected,
++ * regardless of controlled / uncontrolled. It is expected that the consumer
++ * of the component will handle setting the value to `null` to indicate no date
++ * selected in controlled mode.
++ *
++ * @param props              - The props object.
++ * @param props.defaultValue - The default value.
++ * @param props.onChange     - The onChange callback.
++ * @param props.value        - The value.
++ *
++ * @return The value and the setValue function.
++ */
++export function useControlledValue< T >( {
++	defaultValue,
++	onChange,
++	value: valueProp,
++}: Props< T > ) {
++	const hasValue = typeof valueProp !== 'undefined';
++	const initialValue = hasValue ? valueProp : defaultValue;
++	const [ state, setState ] = useState( initialValue );
++	const value = ( hasValue ? valueProp : state ) ?? undefined;
++
++	let setValue: typeof onChange;
++	const uncontrolledSetValue: NonNullable< typeof onChange > = useCallback(
++		( nextValue, ...args ) => {
++			setState( nextValue );
++			onChange?.( nextValue, ...args );
++		},
++		[ setState, onChange ]
++	);
++	if ( hasValue && typeof onChange === 'function' ) {
++		// Controlled mode.
++		setValue = onChange;
++	} else if ( ! hasValue && typeof onChange === 'function' ) {
++		// Uncontrolled mode, plus forwarding to the onChange prop.
++		setValue = uncontrolledSetValue;
++	} else {
++		// Uncontrolled mode, only update internal state.
++		setValue = setState;
++	}
++
++	return [ value, setValue ] as const;
++}
+diff --git a/packages/components/src/calendar/utils/use-localization-props.ts b/packages/components/src/calendar/utils/use-localization-props.ts
+new file mode 100644
+index 00000000000000..f6780beb613895
+--- /dev/null
++++ b/packages/components/src/calendar/utils/use-localization-props.ts
+@@ -0,0 +1,169 @@
++/**
++ * WordPress dependencies
++ */
++import { __, sprintf } from '@wordpress/i18n';
++import { useMemo } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import type { Modifiers, BaseProps } from '../types';
++
++function isLocaleRTL( localeCode: string ) {
++	const localeObj = new Intl.Locale( localeCode );
++	if ( 'getTextInfo' in localeObj ) {
++		// @ts-expect-error - getTextInfo is not typed yet
++		// see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/getTextInfo
++		return localeObj.getTextInfo().direction === 'rtl';
++	}
++	return [
++		'ar', // Arabic
++		'he', // Hebrew
++		'fa', // Persian (Farsi)
++		'ur', // Urdu
++		'ps', // Pashto
++		'syr', // Syriac
++		'dv', // Divehi
++		'ku', // Kurdish (Sorani)
++		'yi', // Yiddish
++	].includes( localeObj.language );
++}
++
++/**
++ * Returns localization props for the calendar components.
++ *
++ * Notes:
++ * - the following props should be intended as defaults, and should
++ *   be overridden by consumer props if listed as public props.
++ * - It is possible for the translated strings to use a different locale
++ *   than the formatted dates and the computed `dir`. This is because the
++ *   translation function doesn't expose the locale used for the translated
++ *   strings, meaning that the dates are formatted using the `locale` prop.
++ *   For a correct localized experience, consumers should make sure that
++ *   translation context and `locale` prop are consistent.
++ * @param props
++ * @param props.locale
++ * @param props.timeZone
++ * @param props.mode
++ */
++export const useLocalizationProps = ( {
++	locale,
++	timeZone,
++	mode,
++}: {
++	locale: NonNullable< BaseProps[ 'locale' ] >;
++	timeZone: BaseProps[ 'timeZone' ];
++	mode: 'single' | 'range';
++} ) => {
++	return useMemo( () => {
++		// ie. April 2025
++		const monthNameFormatter = new Intl.DateTimeFormat( locale.code, {
++			year: 'numeric',
++			month: 'long',
++			timeZone,
++		} );
++		// ie. M, T, W, T, F, S, S
++		const weekdayNarrowFormatter = new Intl.DateTimeFormat( locale.code, {
++			weekday: 'narrow',
++			timeZone,
++		} );
++		// ie. Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
++		const weekdayLongFormatter = new Intl.DateTimeFormat( locale.code, {
++			weekday: 'long',
++			timeZone,
++		} );
++		// ie. Monday, April 29, 2025
++		const fullDateFormatter = new Intl.DateTimeFormat( locale.code, {
++			weekday: 'long',
++			year: 'numeric',
++			month: 'long',
++			day: 'numeric',
++			timeZone,
++		} );
++
++		// Note: the following props should be intended as defaults, and should
++		// be overridden by consumer props if listed as public props.
++		return {
++			'aria-label':
++				mode === 'single'
++					? __( 'Date calendar' )
++					: __( 'Date range calendar' ),
++			labels: {
++				/**
++				 * The label for the month grid.
++				 * @param date
++				 */
++				labelGrid: ( date: Date ) => monthNameFormatter.format( date ),
++				/**
++				 * The label for the gridcell, when the calendar is not interactive.
++				 * @param date
++				 * @param modifiers
++				 */
++				labelGridcell: (
++					date: Date,
++					/** The modifiers for the day. */
++					modifiers?: Modifiers
++				) => {
++					const formattedDate = fullDateFormatter.format( date );
++					let label = formattedDate;
++					if ( modifiers?.today ) {
++						label = sprintf(
++							// translators: %s is the full date (e.g. "Monday, April 29, 2025")
++							__( 'Today, %s' ),
++							formattedDate
++						);
++					}
++					return label;
++				},
++				/** The label for the "next month" button. */
++				labelNext: () => __( 'Go to the Next Month' ),
++				/** The label for the "previous month" button. */
++				labelPrevious: () => __( 'Go to the Previous Month' ),
++				/**
++				 * The label for the day button.
++				 * @param date
++				 * @param modifiers
++				 */
++				labelDayButton: (
++					date: Date,
++					/** The modifiers for the day. */
++					modifiers?: Modifiers
++				) => {
++					const formattedDate = fullDateFormatter.format( date );
++					let label = formattedDate;
++					if ( modifiers?.today ) {
++						label = sprintf(
++							// translators: %s is the full date (e.g. "Monday, April 29, 2025")
++							__( 'Today, %s' ),
++							formattedDate
++						);
++					}
++					if ( modifiers?.selected ) {
++						label = sprintf(
++							// translators: %s is the full date (e.g. "Monday, April 29, 2025")
++							__( '%s, selected' ),
++							formattedDate
++						);
++					}
++					return label;
++				},
++				/**
++				 * The label for the weekday.
++				 * @param date
++				 */
++				labelWeekday: ( date: Date ) =>
++					weekdayLongFormatter.format( date ),
++			},
++			locale,
++			dir: isLocaleRTL( locale.code ) ? 'rtl' : 'ltr',
++			formatters: {
++				formatWeekdayName: ( date: Date ) => {
++					return weekdayNarrowFormatter.format( date );
++				},
++				formatCaption: ( date: Date ) => {
++					return monthNameFormatter.format( date );
++				},
++			},
++			timeZone,
++		} as const;
++	}, [ locale, timeZone, mode ] );
++};
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index 2acd609992d6ad..0b1168a5306aa8 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -57,6 +57,7 @@ export {
+ 	CardHeader,
+ 	CardMedia,
+ } from './card';
++export { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
+ export { default as CheckboxControl } from './checkbox-control';
+ export { default as ClipboardButton } from './clipboard-button';
+ export { default as __experimentalPaletteEdit } from './palette-edit';
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 368dec0f5e253d..c782190c1eaaa6 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -13,6 +13,7 @@
+ @import "./badge/styles.scss";
+ @import "./button-group/style.scss";
+ @import "./button/style.scss";
++@import "./calendar/style.scss";
+ @import "./checkbox-control/style.scss";
+ @import "./circular-option-picker/style.scss";
+ @import "./palette-edit/style.scss";
+diff --git a/test/unit/jest.config.js b/test/unit/jest.config.js
+index 8d363cc46e9157..23a594e52f1d0e 100644
+--- a/test/unit/jest.config.js
++++ b/test/unit/jest.config.js
+@@ -8,6 +8,9 @@ const transpiledPackageNames = glob( 'packages/*/src/index.{js,ts,tsx}' ).map(
+ 	( fileName ) => fileName.split( '/' )[ 1 ]
+ );
+ 
++// Make sure the tests run in UTC timezone, regardless of the system timezone.
++process.env.TZ = 'UTC';
++
+ module.exports = {
+ 	rootDir: '../../',
+ 	moduleNameMapper: {

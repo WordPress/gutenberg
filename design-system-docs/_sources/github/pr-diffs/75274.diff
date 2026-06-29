@@ -1,0 +1,92 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9a8aa39e9f06ce..5a97900c775ab4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
+ -   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
+ -   `ToggleControl`: Prevent `__nextHasNoMarginBottom` from logging a console warning ([#75296](https://github.com/WordPress/gutenberg/pull/75296)).
++-   `createSlotFill`: fix ref forwarding ([#75274](https://github.com/WordPress/gutenberg/pull/75274)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/slot-fill/index.tsx b/packages/components/src/slot-fill/index.tsx
+index 7038a424029315..95920120792320 100644
+--- a/packages/components/src/slot-fill/index.tsx
++++ b/packages/components/src/slot-fill/index.tsx
+@@ -64,9 +64,18 @@ export function createSlotFill( key: SlotKey ) {
+ 	);
+ 	FillComponent.displayName = `${ baseName }Fill`;
+ 
+-	const SlotComponent = (
+-		props: DistributiveOmit< SlotComponentProps, 'name' >
+-	) => <Slot name={ key } { ...props } />;
++	// Wrap SlotComponent with forwardRef to support ref forwarding
++	const SlotComponent = forwardRef(
++		(
++			props: DistributiveOmit< SlotComponentProps, 'name' >,
++			ref: ForwardedRef< any >
++		) => <Slot name={ key } ref={ ref } { ...props } />
++	) as React.ForwardRefExoticComponent<
++		DistributiveOmit< SlotComponentProps, 'name' > &
++			React.RefAttributes< any >
++	> & {
++		__unstableName: SlotKey;
++	};
+ 	SlotComponent.displayName = `${ baseName }Slot`;
+ 	/**
+ 	 * @deprecated 6.8.0
+diff --git a/packages/components/src/slot-fill/test/index.js b/packages/components/src/slot-fill/test/index.js
+index d269cb4e036412..19ebe20b35fc25 100644
+--- a/packages/components/src/slot-fill/test/index.js
++++ b/packages/components/src/slot-fill/test/index.js
+@@ -3,6 +3,11 @@
+  */
+ import { render, screen, within } from '@testing-library/react';
+ 
++/**
++ * WordPress dependencies
++ */
++import { createRef } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+@@ -82,4 +87,37 @@ describe( 'createSlotFill', () => {
+ 			within( pageSidebar ).queryByText( 'Post Section' )
+ 		).not.toBeInTheDocument();
+ 	} );
++
++	test( 'should forward ref to the slot when using bubblesVirtually', () => {
++		const TestSlotFill = createSlotFill( 'TestRefSlot' );
++		const ref = createRef();
++
++		render(
++			<SlotFillProvider>
++				<TestSlotFill.Fill>
++					<p>Content</p>
++				</TestSlotFill.Fill>
++				<TestSlotFill.Slot bubblesVirtually ref={ ref } />
++			</SlotFillProvider>
++		);
++
++		expect( ref.current ).not.toBeNull();
++		expect( ref.current.tagName ).toBe( 'DIV' );
++	} );
++
++	test( 'should forward ref without bubblesVirtually (ref stays null for fragment-based slot)', () => {
++		const TestSlotFill = createSlotFill( 'TestRefSlotBase' );
++		const ref = createRef();
++
++		render(
++			<SlotFillProvider>
++				<TestSlotFill.Fill>
++					<p>Content</p>
++				</TestSlotFill.Fill>
++				<TestSlotFill.Slot ref={ ref } />
++			</SlotFillProvider>
++		);
++
++		expect( ref.current ).toBeNull();
++	} );
+ } );

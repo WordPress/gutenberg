@@ -1,0 +1,16 @@
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index 78be906b64d1f4..c212458dc14cc9 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -110,7 +110,10 @@ export function useAutocomplete( {
+ 				? completion
+ 				: ( {
+ 						action: 'insert-at-caret',
+-						value: completion,
++						value:
++							autocompleter?.triggerPrefix === '@'
++								? completion + '\u00A0'
++								: completion,
+ 				  } as InsertOption );
+ 
+ 			if ( 'replace' === completionObject.action ) {

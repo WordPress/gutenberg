@@ -1,0 +1,4178 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index ef37c643699f25..8c7d8b14af6a67 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1193,6 +1193,12 @@
+ 		"markdown_source": "../packages/components/src/text-highlight/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "TextInput",
++		"slug": "text-input",
++		"markdown_source": "../packages/components/src/text-input/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "Text",
+ 		"slug": "text",
+diff --git a/package-lock.json b/package-lock.json
+index dffe10eb527e88..12cddc7f316803 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -13701,7 +13701,9 @@
+ 				"memize": "^1.1.0",
+ 				"moment": "^2.22.1",
+ 				"re-resizable": "^6.4.0",
++				"react-autosize-textarea": "^7.1.0",
+ 				"react-dates": "^17.1.1",
++				"react-number-format": "^4.6.0",
+ 				"react-resize-aware": "^3.1.0",
+ 				"react-spring": "^8.0.20",
+ 				"react-use-gesture": "^9.0.0",
+@@ -50533,6 +50535,14 @@
+ 				"prop-types": "^15.5.10"
+ 			}
+ 		},
++		"react-number-format": {
++			"version": "4.6.0",
++			"resolved": "https://registry.npmjs.org/react-number-format/-/react-number-format-4.6.0.tgz",
++			"integrity": "sha512-0Td7QM3FGFVOw+DzYooLae50d6r67hZcinbDy5TQRQJB9+/p1caX+NQQ6PW408H+nZTKgykknQHv6L6PPoRO2w==",
++			"requires": {
++				"prop-types": "^15.7.2"
++			}
++		},
+ 		"react-outside-click-handler": {
+ 			"version": "1.3.0",
+ 			"resolved": "https://registry.npmjs.org/react-outside-click-handler/-/react-outside-click-handler-1.3.0.tgz",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 1b3da9b3fa8cf8..7259aa1427bbb1 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -58,7 +58,9 @@
+ 		"memize": "^1.1.0",
+ 		"moment": "^2.22.1",
+ 		"re-resizable": "^6.4.0",
++		"react-autosize-textarea": "^7.1.0",
+ 		"react-dates": "^17.1.1",
++		"react-number-format": "^4.6.0",
+ 		"react-resize-aware": "^3.1.0",
+ 		"react-spring": "^8.0.20",
+ 		"react-use-gesture": "^9.0.0",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 6a6097486e6307..4f8ea3bc34bc42 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -119,6 +119,7 @@ export { Text as __experimentalText } from './text';
+ export { default as TextControl } from './text-control';
+ export { default as TextareaControl } from './textarea-control';
+ export { default as TextHighlight } from './text-highlight';
++export { TextInput as __experimentalTextInput } from './text-input';
+ export { default as Tip } from './tip';
+ export { default as ToggleControl } from './toggle-control';
+ export { default as Toolbar } from './toolbar';
+diff --git a/packages/components/src/text-input/README.md b/packages/components/src/text-input/README.md
+new file mode 100644
+index 00000000000000..eac19befb42379
+--- /dev/null
++++ b/packages/components/src/text-input/README.md
+@@ -0,0 +1,215 @@
++# TextInput
++
++`TextInput` is a form component that users can enter content into.
++
++## Table of contents
++
++## Usage
++
++```jsx live
++import { __experimentalTextInput as TextInput } from '@wordpress/components';
++
++function Example() {
++	return <TextInput placeholder="First name" />;
++}
++```
++
++## Props
++
++##### \_\_\_debugger
++
++**Type**: `Function`
++
++For development only. Callback when a reducer action is dispatched.
++
++##### align
++
++**Type**: `CSS['alignItems']`
++
++Aligns children using CSS Flexbox `align-items`. Vertically aligns content if the `direction` is `row`, or horizontally aligns content if the `direction` is `column`.
++
++In the example below, `flex-start` will align the children content to the top.
++
++##### arrow
++
++**Type**: `boolean`,`"stepper"`
++
++Renders specified incrementer/decrementer arrows.
++
++##### defaultValue
++
++**Type**: `boolean`
++
++The default (initial) state to use if `value` is undefined.
++
++##### direction
++
++**Type**: `FlexDirection`
++
++The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
++
++##### disabled
++
++**Type**: `boolean`
++
++Determines if element is disabled.
++
++##### error
++
++**Type**: `boolean`
++
++Renders an error state.
++
++##### expanded
++
++**Type**: `boolean`
++
++Expands to the maximum available width (if horizontal) or height (if vertical).
++
++##### format
++
++**Type**: `"number"`,`"type"`
++
++Modifies how `value` can be adjusted.
++
++##### gap
++
++**Type**: `number`
++
++Spacing in between each child can be adjusted by using `gap`. The value of `gap` works as a multiplier to the library's grid system (base of `4px`).
++
++##### isClickable
++
++**Type**: `boolean`
++
++Renders a `cursor: pointer` on hover.
++
++##### isCommitOnBlurOrEnter
++
++**Type**: `boolean`
++
++Fires the `onChange` callback after pressing `ENTER` or focusing away.
++
++##### isFocused
++
++**Type**: `boolean`
++
++Renders focus styles.
++
++##### isInline
++
++**Type**: `boolean`
++
++Renders as an inline element (layout).
++
++##### isResizable
++
++**Type**: `boolean`
++
++Allows for the a multiline `TextInput` to tbe resizable by dragging.
++
++##### isRounded
++
++**Type**: `boolean`
++
++Renders with rounded corners.
++
++##### isShiftStepEnabled
++
++**Type**: `boolean`
++
++Enables larger `step` increment/decrement values when holding down `Shift`.
++
++##### isSubtle
++
++**Type**: `boolean`
++
++Renders a subtle `TextInput`.
++
++##### justify
++
++**Type**: `CSS['justifyContent']`
++
++Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
++In the example below, `flex-start` will align the children content to the left.
++
++##### label
++
++**Type**: `string`
++
++Label for the form element.
++
++##### maxRows
++
++**Type**: `number`
++
++Maximum number of rows to show for a multiline `TextInput`.
++
++##### minRows
++
++**Type**: `number`
++
++Alias for `rows`.
++
++##### multiline
++
++**Type**: `boolean`
++
++Renders `TextInput` to allow for multiline lines (`textarea`).
++
++##### onChange
++
++**Type**: `Function`
++
++Callback function when the `value` is committed.
++
++##### onHeightChange
++
++**Type**: `Function`
++
++Callback function when the height changes with a multiline `TextInput`.
++
++##### prefix
++
++**Type**: `React.ReactElement`
++
++Renders prefix content within `TextInput`.
++
++##### size
++
++**Type**: `"large"`,`"medium"`,`"small"`
++
++Determines the size of `TextInput`.
++
++##### suffix
++
++**Type**: `React.ReactElement`
++
++Renders prefix content within `TextInput`.
++
++##### validate
++
++**Type**: `Function`
++
++Determines if the next `value` should be committed.
++
++##### value
++
++**Type**: `any`
++
++Value for the form element.
++
++##### wrap
++
++**Type**: `boolean`
++
++Determines if children should wrap.
++
++<!-- /Automatically Generated -->
++<!-- /props -->
++
++## See Also
++
++-   [Button](../button/)
++-   [Select](../select/)
++-   [UnitInput](../unitinput/)
+diff --git a/packages/components/src/text-input/hooks/use-text-input-state-utils.js b/packages/components/src/text-input/hooks/use-text-input-state-utils.js
+new file mode 100644
+index 00000000000000..1f674f7f6e5bb7
+--- /dev/null
++++ b/packages/components/src/text-input/hooks/use-text-input-state-utils.js
+@@ -0,0 +1,113 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++import { useDrag } from 'react-use-gesture';
++
++/**
++ * WordPress dependencies
++ */
++import { useCallback, useEffect, useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++
++import { clearSelection } from '../../utils/clear-selection';
++
++import * as styles from '../styles';
++
++/**
++ * @typedef Props
++ * @property {(int: number|undefined) => void} [increment] Increment text input number value callback.
++ * @property {(int: number|undefined) => void} [decrement] Decrement text input number value callback.
++ * @property {boolean} [isTypeNumeric] Whether the type is numeric.
++ * @property {string} [dragAxis] The drag axis, e.g., `x` or `y`.
++ */
++
++/**
++ * @param {Props} props
++ */
++export function useBaseDragHandlers( {
++	decrement = noop,
++	dragAxis,
++	increment = noop,
++	isTypeNumeric = true,
++} ) {
++	const [ dragState, setDragState ] = useState(
++		/** @type {undefined | 'x' | 'y'} */ ( undefined )
++	);
++	const threshold = 10;
++
++	useEffect( () => {
++		if ( dragState ) {
++			clearSelection();
++
++			if ( dragState === 'x' ) {
++				document.documentElement.classList.add(
++					styles.globalDraggableX
++				);
++				document.documentElement.classList.remove(
++					styles.globalDraggableY
++				);
++			} else {
++				document.documentElement.classList.remove(
++					styles.globalDraggableX
++				);
++				document.documentElement.classList.add(
++					styles.globalDraggableY
++				);
++			}
++		} else {
++			document.documentElement.classList.remove(
++				styles.globalDraggableX
++			);
++			document.documentElement.classList.remove(
++				styles.globalDraggableY
++			);
++		}
++	}, [ dragState ] );
++
++	const dragGestures = useDrag(
++		( state ) => {
++			const [ x, y ] = state.delta;
++			setDragState( state.dragging ? state.axis : undefined );
++
++			const isMovementY = state.axis === 'y';
++			const movement = isMovementY ? y * -1 : x;
++
++			if ( Math.abs( movement ) === 0 ) return;
++
++			const shouldIncrement = movement > 0;
++
++			let boost = movement === threshold ? 0 : movement;
++			boost = shouldIncrement ? boost : boost * -1;
++			boost = boost - 1;
++
++			if ( shouldIncrement ) {
++				increment( boost );
++			} else {
++				decrement( boost );
++			}
++		},
++		{ axis: dragAxis, threshold }
++	);
++
++	const handleOnMouseUp = useCallback( () => setDragState( undefined ), [] );
++
++	const baseGestures = isTypeNumeric
++		? dragGestures()
++		: {
++				onPointerDown: noop,
++				onPointerMove: noop,
++				onPointerUp: noop,
++				onPointerCancel: noop,
++		  };
++
++	const gestures = {
++		...baseGestures,
++		onMouseUp: handleOnMouseUp,
++	};
++
++	return gestures;
++}
+diff --git a/packages/components/src/text-input/hooks/use-text-input-state.js b/packages/components/src/text-input/hooks/use-text-input-state.js
+new file mode 100644
+index 00000000000000..ba9b6a379867e0
+--- /dev/null
++++ b/packages/components/src/text-input/hooks/use-text-input-state.js
+@@ -0,0 +1,535 @@
++/**
++ * External dependencies
++ */
++import { isNil, noop } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import {
++	useCallback,
++	useEffect,
++	useMemo,
++	useRef,
++	useState,
++} from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useBaseDragHandlers } from './use-text-input-state-utils';
++import { isValueNumeric } from '../../utils/values';
++import { add, roundClampString, subtract } from '../../utils/math';
++import { mergeEventHandlers } from '../../utils/events';
++import { normalizeArrowKey } from '../../utils/keyboard';
++import { useControlledValue, usePropRef } from '../../utils';
++
++/**
++ * @template T
++ * @param {Object} props
++ * @param {T} [props.value]
++ * @return {[T | null, (value: any) => void, () => void]} The controlled value and the value setter.
++ */
++function useCommitValue( { value } ) {
++	const [ commitValue, setCommitValue ] = useState( null );
++	const resetCommitValue = useCallback( () => setCommitValue( null ), [] );
++
++	useEffect( resetCommitValue, [ value ] );
++
++	return [ commitValue, setCommitValue, resetCommitValue ];
++}
++
++/**
++ * @param {Object} props
++ * @param {boolean} [props.isShiftStepEnabled]
++ * @param {number} [props.shiftStep]
++ * @return {number} The shift step value.
++ */
++function useShiftStep( { isShiftStepEnabled = true, shiftStep = 10 } ) {
++	const [ on, setOn ] = useState( false );
++	useEffect( () => {
++		const handleOnKeyDown = ( /** @type {KeyboardEvent}} */ event ) => {
++			if ( ! isShiftStepEnabled ) {
++				return;
++			}
++			if ( event.shiftKey ) {
++				setOn( true );
++			}
++		};
++		const handleOnKeyUp = ( /** @type {KeyboardEvent}} */ event ) => {
++			if ( ! isShiftStepEnabled ) {
++				return;
++			}
++			if ( event.shiftKey ) {
++				setOn( false );
++			}
++		};
++
++		window.addEventListener( 'keydown', handleOnKeyDown );
++		window.addEventListener( 'keyup', handleOnKeyUp );
++
++		return () => {
++			window.removeEventListener( 'keydown', handleOnKeyDown );
++			window.removeEventListener( 'keyup', handleOnKeyUp );
++		};
++	}, [ isShiftStepEnabled ] );
++
++	return isShiftStepEnabled && on ? shiftStep : 1;
++}
++
++/**
++ * @param {Object} useFocusedStateProps
++ * @param {boolean} useFocusedStateProps.isFocused
++ * @return {[boolean, (value: boolean) => void]} A collection of change handlers.
++ */
++function useFocusedState( { isFocused: isFocusedProp = false } ) {
++	const [ isFocused, setFocused ] = useState( isFocusedProp );
++
++	useEffect( () => {
++		setFocused( isFocusedProp );
++	}, [ isFocusedProp ] );
++
++	return [ isFocused, setFocused ];
++}
++
++/**
++ * @param {Object} useChangeHandlersProps
++ * @param {(value: string) => void} useChangeHandlersProps.onChange
++ */
++function useChangeHandlers( { onChange } ) {
++	const handleOnChange = useCallback(
++		( event ) => {
++			onChange( event.target.value );
++		},
++		[ onChange ]
++	);
++
++	return {
++		onChange: handleOnChange,
++	};
++}
++
++/**
++ * @param {Object} [useFocusHandlersProps]
++ * @param {(value: string) => void} [useFocusHandlersProps.onChange]
++ * @param {(value: boolean) => void} [useFocusHandlersProps.setFocused]
++ */
++function useFocusHandlers( { onChange = noop, setFocused = noop } ) {
++	const handleOnBlur = useCallback(
++		( event ) => {
++			onChange( event.target.value );
++			setFocused( false );
++		},
++		[ onChange, setFocused ]
++	);
++
++	const handleOnFocus = useCallback( () => {
++		setFocused( true );
++	}, [ setFocused ] );
++
++	return {
++		onBlur: handleOnBlur,
++		onFocus: handleOnFocus,
++	};
++}
++
++/**
++ * @param {Object} [useKeyboardHandlersProps]
++ * @param {(value: string) => void} [useKeyboardHandlersProps.onChange]
++ */
++function useKeyboardHandlers( { onChange = noop } ) {
++	/** @type {Record<string, (event: import('react').KeyboardEvent<HTMLInputElement>) => void>} */
++	const keyboardHandlers = useMemo(
++		() => ( {
++			Enter(
++				/** @type {import('react').KeyboardEvent<HTMLInputElement>} */ event
++			) {
++				if ( event.isDefaultPrevented() ) {
++					return;
++				}
++				onChange( event.currentTarget.value );
++			},
++		} ),
++		[ onChange ]
++	);
++
++	const handleOnKeyDown = useCallback(
++		(
++			/** @type {import('react').KeyboardEvent<HTMLInputElement>}} */ event
++		) => {
++			const key = normalizeArrowKey( event );
++			if ( key && keyboardHandlers[ key ] ) {
++				keyboardHandlers[ key ]( event );
++			}
++		},
++		[ keyboardHandlers ]
++	);
++
++	return {
++		onKeyDown: handleOnKeyDown,
++	};
++}
++
++/**
++ * @typedef Props
++ * @property {number|string|undefined|null} [value] On change callback.
++ * @property {Function} [onChange] On change callback.
++ * @property {string} [type] Value type.
++ * @property {string | number | undefined} [max] Max value.
++ * @property {string | number | undefined} [min] Min value.
++ * @property {number} [shiftStep] Shift step value.
++ * @property {number} [step] Step value.
++ * @property {boolean} [isShiftStepEnabled] Is shift step enabled?
++ * @property {boolean} [incrementFromNonNumericValue] Increment from non-numeric value.
++ */
++
++/**
++ * @param {Props} props
++ */
++function useNumberActions( {
++	incrementFromNonNumericValue,
++	isShiftStepEnabled,
++	max,
++	min,
++	onChange,
++	shiftStep: shiftStepProp = 10,
++	step = 1,
++	type,
++	value,
++} ) {
++	const stepMultiplier =
++		useShiftStep( {
++			isShiftStepEnabled,
++			shiftStep: shiftStepProp,
++		} ) || step;
++	const shiftStep = stepMultiplier * step;
++
++	const isInputTypeNumeric = type === 'number';
++	const isNumeric = isValueNumeric( value );
++
++	const skipAction =
++		! isInputTypeNumeric && ! isNumeric && ! incrementFromNonNumericValue;
++
++	/**
++	 * Create (synced) references to avoid recreating increment and decrement
++	 * callbacks.
++	 */
++	const propRefs = usePropRef( {
++		min,
++		max,
++		value,
++		shiftStep,
++		onChange,
++	} );
++
++	const increment = useCallback(
++		( /** @type {number|undefined} */ jumpStep = 0 ) => {
++			if ( skipAction ) return;
++			/* eslint-disable no-shadow */
++			// @ts-ignore Declaring type here doesn't seem to work, e.g., /** @type {{[key:string]:any}|undefined} */
++			const { max, min, onChange, shiftStep, value } = propRefs.current;
++			/* eslint-enable no-shadow */
++			const baseValue = isValueNumeric( value ) ? value : 0;
++			const nextValue = add( jumpStep * step, shiftStep );
++			const next = roundClampString(
++				add( baseValue, nextValue ),
++				min,
++				max,
++				shiftStep
++			);
++
++			onChange( next );
++		},
++		[ skipAction, propRefs, step ]
++	);
++
++	const decrement = useCallback(
++		( /** @type {number|undefined} */ jumpStep = 0 ) => {
++			if ( skipAction ) return;
++			/* eslint-disable no-shadow */
++			// @ts-ignore Declaring type here doesn't seem to work, e.g., /** @type {{[key:string]:any}|undefined} */
++			const { max, min, onChange, shiftStep, value } = propRefs.current;
++			/* eslint-enable no-shadow */
++			const baseValue = isValueNumeric( value ) ? value : 0;
++			const nextValue = add( jumpStep * step, shiftStep );
++			const next = roundClampString(
++				subtract( baseValue, nextValue ),
++				min,
++				max,
++				shiftStep
++			);
++
++			onChange( next );
++		},
++		[ skipAction, propRefs, step ]
++	);
++
++	return { increment, decrement };
++}
++
++/**
++ * @typedef UseNumberKeyboardHandlersProps
++ * @property {boolean} [isTypeNumeric] Whether the type is numeric.
++ * @property {boolean} [stopIfEventDefaultPrevented] Stop if event default prevented.
++ * @property {() => void} [increment] Increment text input number value callback.
++ * @property {() => void} [decrement] Decrement text input number value callback.
++ */
++
++/**
++ *
++ * @param {UseNumberKeyboardHandlersProps} props
++ */
++function useNumberKeyboardHandlers( {
++	decrement = noop,
++	increment = noop,
++	isTypeNumeric,
++	stopIfEventDefaultPrevented = true,
++} ) {
++	/** @type {Record<string, (event: import('react').KeyboardEvent<HTMLInputElement>) => void>} */
++	const keyboardHandlers = useMemo(
++		() => ( {
++			ArrowUp(
++				/** @type {import('react').KeyboardEvent<HTMLInputElement>}} */ event
++			) {
++				if ( ! isTypeNumeric ) return;
++
++				if ( stopIfEventDefaultPrevented && event.isDefaultPrevented() )
++					return;
++
++				event.preventDefault();
++
++				increment();
++			},
++			ArrowDown(
++				/** @type {import('react').KeyboardEvent<HTMLInputElement>}} */ event
++			) {
++				if ( ! isTypeNumeric ) return;
++
++				if ( stopIfEventDefaultPrevented && event.isDefaultPrevented() )
++					return;
++
++				event.preventDefault();
++
++				decrement();
++			},
++		} ),
++		[ decrement, increment, isTypeNumeric, stopIfEventDefaultPrevented ]
++	);
++
++	const handleOnKeyDown = useCallback(
++		(
++			/** @type {import('react').KeyboardEvent<HTMLInputElement>}} */ event
++		) => {
++			const key = normalizeArrowKey( event );
++			if ( key && keyboardHandlers[ key ] ) {
++				keyboardHandlers[ key ]( event );
++			}
++		},
++		[ keyboardHandlers ]
++	);
++
++	return {
++		onKeyDown: handleOnKeyDown,
++	};
++}
++
++/**
++ * @typedef UseScrollHandlersProps
++ * @property {boolean} [isTypeNumeric] Whether the type is numeric.
++ * @property {boolean} [isFocused] Is the field focussed.
++ * @property {() => void} [increment] Increment text input number value callback.
++ * @property {() => void} [decrement] Decrement text input number value callback.
++ */
++
++/**
++ *
++ * @param {UseScrollHandlersProps} props
++ */
++const useScrollHandlers = ( {
++	decrement = noop,
++	increment = noop,
++	isFocused,
++	isTypeNumeric,
++} ) => {
++	const handleOnWheel = useCallback(
++		( event ) => {
++			if ( ! isTypeNumeric ) return;
++			if ( ! isFocused ) return;
++			if ( event?.deltaY === 0 ) return;
++
++			const isScrollUp = event?.deltaY < 0;
++
++			if ( isScrollUp ) {
++				increment();
++			} else {
++				decrement();
++			}
++
++			return false;
++		},
++		[ decrement, increment, isFocused, isTypeNumeric ]
++	);
++
++	return {
++		onWheel: handleOnWheel,
++	};
++};
++
++/**
++ * @typedef UseTextInputStateProps
++ * @property {string} [defaultValue] A default value.
++ * @property {string} [dragAxis]  The drag axis.
++ * @property {boolean} [incrementFromNonNumericValue] Should increment from non-numeric value.
++ * @property {boolean} [isCommitOnBlurOrEnter] If commit value is to be set onBlur or Enter.
++ * @property {boolean} [isFocused] Is the field focussed.
++ * @property {(value: string) => void} [onChange] Text input onChange callback.
++ * @property {string} [value] Field value.
++ * @property {number | string | undefined} [max] Max value.
++ * @property {number | string | undefined} [min] Min value.
++ * @property {number} [step] Step value.
++ * @property {( currentValue: string ) => boolean} [validate] Is the field focussed.
++ * @property {boolean} [isShiftStepEnabled] Is shift step enabled?
++ * @property {number} [shiftStep] Shift step value.
++ * @property {string} [type] Input type.
++ * @property {string} [format] Input format.
++ * @property {Record<string, (event: Event) => void>} [scrollHandlers] Input format.
++ */
++
++/**
++ *
++ * @param {UseTextInputStateProps} props
++ */
++export function useTextInputState( props ) {
++	const {
++		defaultValue,
++		dragAxis = 'y',
++		incrementFromNonNumericValue = false,
++		isCommitOnBlurOrEnter = false,
++		isFocused: isFocusedProp = false,
++		onChange: onChangeProp = noop,
++		value: valueProp,
++		min,
++		max,
++		step = 1,
++		validate,
++		isShiftStepEnabled = true,
++		shiftStep = 10,
++		type,
++		format,
++		...otherProps
++	} = props;
++
++	const inputRef = useRef();
++
++	const [ value, onChange ] = useControlledValue( {
++		value: valueProp,
++		onChange: onChangeProp,
++		defaultValue,
++	} );
++
++	const isInputTypeNumeric = type === 'number';
++	const isTypeNumeric = format === 'number' || isInputTypeNumeric;
++
++	const [ commitValue, setCommitValue, resetCommitValue ] = useCommitValue( {
++		value,
++	} );
++	const inputValue = isNil( commitValue ) ? value : commitValue;
++
++	const [ isFocused, setFocused ] = useFocusedState( {
++		isFocused: isFocusedProp,
++	} );
++
++	const handleOnCommit = useCallback(
++		( next ) => {
++			let isValid = true;
++			const hasValidation = typeof validate === 'function';
++
++			if ( hasValidation ) {
++				// @ts-ignore We checked `validate` above for `hasValidation`
++				isValid = validate( next, value ) !== false;
++			}
++
++			if ( isValid ) {
++				onChange( next );
++			}
++			resetCommitValue();
++		},
++		[ onChange, resetCommitValue, validate, value ]
++	);
++
++	const { decrement, increment } = useNumberActions( {
++		incrementFromNonNumericValue,
++		isShiftStepEnabled,
++		max,
++		min,
++		onChange,
++		shiftStep,
++		step,
++		type,
++		value,
++	} );
++
++	const changeHandlers = useChangeHandlers( {
++		onChange: isCommitOnBlurOrEnter ? setCommitValue : onChange,
++	} );
++
++	const focusHandlers = useFocusHandlers( {
++		onChange: isCommitOnBlurOrEnter ? handleOnCommit : noop,
++		setFocused,
++	} );
++
++	const dragHandlers = useBaseDragHandlers( {
++		increment,
++		decrement,
++		isTypeNumeric,
++		dragAxis,
++	} );
++
++	const dragHandlersRef = usePropRef( dragHandlers );
++
++	const baseKeyboardHandlers = useKeyboardHandlers( {
++		onChange: isCommitOnBlurOrEnter ? handleOnCommit : noop,
++	} );
++
++	const numberKeyboardHandlers = useNumberKeyboardHandlers( {
++		increment,
++		decrement,
++		isTypeNumeric,
++	} );
++
++	const keyboardHandlers = usePropRef(
++		mergeEventHandlers( baseKeyboardHandlers, numberKeyboardHandlers )
++	).current;
++
++	const scrollHandlers = useScrollHandlers( {
++		decrement,
++		increment,
++		isFocused,
++		isTypeNumeric,
++	} );
++
++	const handlers = {
++		...changeHandlers,
++		...dragHandlers,
++		...focusHandlers,
++		...keyboardHandlers,
++		...scrollHandlers,
++	};
++
++	return {
++		...handlers,
++		...otherProps,
++		decrement,
++		dragHandlersRef,
++		increment,
++		inputRef,
++		isFocused,
++		isInputTypeNumeric,
++		isTypeNumeric,
++		max,
++		min,
++		step,
++		type,
++		value: inputValue,
++	};
++}
+diff --git a/packages/components/src/text-input/hooks/use-text-input.js b/packages/components/src/text-input/hooks/use-text-input.js
+new file mode 100644
+index 00000000000000..ba34231669f32c
+--- /dev/null
++++ b/packages/components/src/text-input/hooks/use-text-input.js
+@@ -0,0 +1,200 @@
++/**
++ * External dependencies
++ */
++import { cx } from 'emotion';
++import TextareaAutosize from 'react-autosize-textarea';
++
++/**
++ * WordPress dependencies
++ */
++import { useCallback, useEffect, useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem } from '../../ui/context';
++import { useBaseField } from '../../base-field';
++import { useFormGroupContextId } from '../../ui/form-group';
++import * as styles from '../styles';
++import { useTextInputState } from './use-text-input-state';
++
++/**
++ * @typedef Props
++ * @property {import('react').MutableRefObject<any>} [dragHandlersRef] Drag handlers ref.
++ * @property {import('react').MutableRefObject<undefined | HTMLElement>} [inputRef] The input element ref.
++ * @property {boolean} [isFocused] Renders focus styles.
++ * @property {boolean} [isTypeNumeric] Whether the type is numeric.
++ */
++
++/**
++ * @param {Props} props
++ */
++const useRootEventHandlers = ( {
++	dragHandlersRef,
++	inputRef,
++	isFocused,
++	isTypeNumeric,
++} ) => {
++	const canScroll = isTypeNumeric && isFocused;
++	const dragHandlers = dragHandlersRef?.current;
++
++	useEffect( () => {
++		const handleOnWheel = () => {};
++		if ( inputRef?.current?.addEventListener ) {
++			inputRef?.current.addEventListener( 'wheel', handleOnWheel, {
++				passive: false,
++			} );
++		}
++	}, [ inputRef, canScroll ] );
++
++	const handleOnClick = useCallback( () => {
++		inputRef?.current?.focus();
++	}, [ inputRef ] );
++
++	const handleOnTouchStart = useCallback( () => {
++		inputRef?.current?.focus();
++	}, [ inputRef ] );
++
++	return {
++		...dragHandlers,
++		onClick: handleOnClick,
++		onTouchStart: handleOnTouchStart,
++	};
++};
++
++/**
++ *
++ * @param  {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'input'>} props
++ */
++export function useTextInput( props ) {
++	const {
++		arrows = true,
++		className,
++		defaultValue = '',
++		disabled,
++		dragAxis,
++		error = false,
++		format,
++		id: idProp,
++		incrementFromNonNumericValue = false,
++		isCommitOnBlurOrEnter = false,
++		isFocused: isFocusedProp,
++		isInline = false,
++		isResizable = false,
++		isShiftStepEnabled = true,
++		max,
++		min,
++		multiline = false,
++		prefix,
++		shiftStep = 10,
++		size = 'medium',
++		step = 1,
++		suffix,
++		type = 'text',
++		validate,
++		value: valueProp,
++		...otherProps
++	} = useContextSystem( props, 'TextInput' );
++
++	const id = useFormGroupContextId( idProp );
++
++	const {
++		decrement,
++		dragHandlersRef,
++		increment,
++		inputRef,
++		isFocused,
++		isInputTypeNumeric,
++		isTypeNumeric,
++		scrollHandlers,
++		value,
++		...textInputState
++	} = useTextInputState( {
++		...otherProps,
++		format,
++		defaultValue,
++		incrementFromNonNumericValue,
++		isCommitOnBlurOrEnter,
++		isFocused: isFocusedProp,
++		isShiftStepEnabled,
++		max,
++		min,
++		shiftStep,
++		step,
++		value: valueProp,
++		validate,
++		type,
++	} );
++
++	const rootEventHandlers = useRootEventHandlers( {
++		inputRef,
++		dragHandlersRef,
++		isTypeNumeric,
++		isFocused,
++	} );
++
++	// @ts-ignore To check: incompatible with PolymorphicComponentProps and missing children
++	const baseFieldProps = useBaseField( {
++		disabled,
++		hasError: error,
++		isInline,
++	} );
++
++	const InputComponent = multiline ? TextareaAutosize : 'input';
++
++	const classes = useMemo(
++		() =>
++			cx(
++				baseFieldProps.className,
++				multiline && styles.multiline,
++				className
++			),
++		[ baseFieldProps.className, className, multiline ]
++	);
++
++	const inputClasses = useMemo(
++		() =>
++			cx(
++				styles.Input,
++				styles[ size ],
++				multiline && styles.inputMultiline,
++				isResizable && styles.resizable,
++				multiline && styles.scrollableScrollbar
++			),
++		[ isResizable, multiline, size ]
++	);
++
++	const inputProps = {
++		as: InputComponent,
++		...otherProps,
++		...textInputState,
++		className: inputClasses,
++		id,
++		min,
++		max,
++		step,
++		type,
++		value,
++	};
++
++	return {
++		...baseFieldProps,
++		...rootEventHandlers,
++		arrows,
++		className: classes,
++		decrement,
++		disabled,
++		dragAxis,
++		dragHandlersRef,
++		format,
++		increment,
++		inputProps,
++		inputRef,
++		isTypeNumeric,
++		isInputTypeNumeric,
++		prefix,
++		// @ts-ignore This method might need typing: useScrollHandlers packages/components/src/text-input/hooks/use-text-input-state.js
++		scrollHandlers,
++		suffix,
++	};
++}
+diff --git a/packages/components/src/text-input/index.js b/packages/components/src/text-input/index.js
+new file mode 100644
+index 00000000000000..76cb03e40bb468
+--- /dev/null
++++ b/packages/components/src/text-input/index.js
+@@ -0,0 +1,2 @@
++export { default as TextInput } from './text-input';
++export { default as TextInputArrows } from './text-input-arrows';
+diff --git a/packages/components/src/text-input/stories/index.js b/packages/components/src/text-input/stories/index.js
+new file mode 100644
+index 00000000000000..d4f757516eb351
+--- /dev/null
++++ b/packages/components/src/text-input/stories/index.js
+@@ -0,0 +1,143 @@
++/**
++ * External dependencies
++ */
++import NumberFormat from 'react-number-format';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import {
++	__experimentalText as Text,
++	__experimentalVStack as VStack,
++} from '../../';
++import { TextInput } from '../';
++import { View } from '../../view';
++
++export default {
++	component: TextInput,
++	title: 'G2 Components (Experimental)/TextInput',
++};
++
++export const _default = () => {
++	return <TextInput placeholder="Code is Poetry" />;
++};
++
++export const Number = () => {
++	const [ value, setValue ] = useState( 0 );
++
++	return (
++		<View
++			css={ `
++				margin-top: 20vh;
++			` }
++			width={ 480 }
++		>
++			<TextInput
++				max={ 100 }
++				min={ 0 }
++				onChange={ setValue }
++				type="number"
++				value={ value }
++			/>
++		</View>
++	);
++};
++
++export const NumberWithExternalChange = () => {
++	const [ value, setValue ] = useState();
++	return (
++		<div>
++			<div>Value: { value }</div>
++			<button onClick={ () => setValue( 10 ) }>Make ten</button>
++			<TextInput onChange={ setValue } type="number" value={ value } />
++		</div>
++	);
++};
++
++export const numberStepper = () => {
++	return (
++		<View
++			style={ `
++				margin-top: 20vh;
++			` }
++			width={ 480 }
++		>
++			<TextInput arrows="stepper" type="number" value="1" />
++		</View>
++	);
++};
++
++export const multiline = () => {
++	return <TextInput maxRows={ 6 } minRows={ 3 } multiline />;
++};
++
++export const custom = () => {
++	return (
++		<VStack>
++			<Text>
++				Rendered using <code>react-number-format</code>
++			</Text>
++			<TextInput
++				as={ NumberFormat }
++				prefix={ '$' }
++				thousandSeparator={ true }
++			/>
++		</VStack>
++	);
++};
++
++export const inlineRendering = () => {
++	return (
++		<VStack
++			css={ `
++				margin: auto;
++				width: 320px;
++			` }
++		>
++			<Text adjustLineHeightForInnerControls>
++				My site name is <TextInput isInline />
++			</Text>
++		</VStack>
++	);
++};
++
++const MadLib = ( { type } ) => <TextInput isInline placeholder={ type } />;
++const Adjective = () => <MadLib type="Adjective" />;
++const Noun = () => <MadLib type="Noun" />;
++const PluralNoun = () => <MadLib isInline type="Plural noun" />;
++const Gerund = () => <MadLib isInline type="Gerund" />;
++
++/**
++ * Adapted from https://www.madlibs.com/printables/
++ */
++export const madLibs = () => (
++	<VStack
++		css={ `
++			margin: auto;
++			text-align: justify;
++		` }
++	>
++		<Text adjustLineHeightForInnerControls>
++			A vacation is when you take a trip to some <Adjective /> place with
++			your <Adjective /> family. Usually you go to some place that is near
++			a/an <Noun /> or up on a/an <Noun />. A good vacation place is one
++			where you can ride <PluralNoun /> or play <MadLib type="Game" /> or
++			go birding for <MadLib type="Bird species" />. I like to spend my
++			time <Gerund /> or <Gerund />. When parents go on a vacation, they
++			spend their time eating three <PluralNoun /> a day. Last summer, my
++			little sibling fell in a/an <Noun /> and got poison{ ' ' }
++			<MadLib type="Plant" /> all over their{ ' ' }
++			<MadLib type="Part of the body" />. My family is going to go to
++			(the) <MadLib type="Place" />, and I will practice <Gerund />.
++			Parents need vacations more than kids because parents are always
++			very <Adjective /> and because they have to work{ ' ' }
++			<MadLib type="Number" /> hours every day all year making enough{ ' ' }
++			<PluralNoun /> to pay for the vacation.
++		</Text>
++	</VStack>
++);
+diff --git a/packages/components/src/text-input/styles.js b/packages/components/src/text-input/styles.js
+new file mode 100644
+index 00000000000000..4743cfe846dea1
+--- /dev/null
++++ b/packages/components/src/text-input/styles.js
+@@ -0,0 +1,178 @@
++/**
++ * External dependencies
++ */
++import { css } from 'emotion';
++
++/**
++ * Internal dependencies
++ */
++import CONFIG from '../utils/config-values';
++import COLORS from '../utils/colors-values';
++
++export { scrollableScrollbar } from '../ui/scrollable/styles';
++
++export const focus = css`
++	border-color: ${ COLORS.blue };
++`;
++
++export const multiline = css`
++	padding-left: 0;
++	padding-right: 0;
++`;
++
++export const inputMultiline = css`
++	padding-left: 8px;
++	padding-right: 8px;
++`;
++
++export const inputFontSize = css`
++	font-size: ${ CONFIG.fontSizeInputMobile };
++	@media ( min-width: 36em ) {
++		font-size: ${ CONFIG.fontSize };
++	}
++`;
++
++export const Input = css`
++	appearance: none;
++	background: transparent;
++	border: none;
++	border-radius: ${ CONFIG.controlBorderRadius };
++	box-shadow: none;
++	box-sizing: border-box;
++	color: ${ CONFIG.controlTextColor };
++	display: block;
++	flex: 1;
++	line-height: 18px;
++	min-height: calc( ${ CONFIG.controlHeight } - 2px );
++	outline: none;
++	padding: 0;
++	padding-bottom: calc( ( ${ CONFIG.controlHeight } - 2px - 18px ) / 2 );
++	padding-top: calc( ( ${ CONFIG.controlHeight } - 2px - 18px ) / 2 );
++	resize: none;
++	text-align: left;
++	width: 100%;
++
++	${ inputFontSize };
++
++	&::-webkit-outer-spin-button,
++	&::-webkit-inner-spin-button {
++		-webkit-appearance: none;
++		margin: 0;
++	}
++
++	/* Firefox */
++	&[type='number'] {
++		-moz-appearance: textfield;
++	}
++`;
++
++export const large = css`
++	min-height: calc( ${ CONFIG.controlHeightLarge } - 2px );
++	padding-bottom: calc( ( ${ CONFIG.controlHeightLarge } - 2px - 18px ) / 2 );
++	padding-top: calc( ( ${ CONFIG.controlHeightLarge } - 2px - 18px ) / 2 );
++`;
++
++export const medium = css`
++	min-height: calc( ${ CONFIG.controlHeightMedium } - 2px );
++	padding-bottom: calc(
++		( ${ CONFIG.controlHeightMedium } - 2px - 18px ) / 2
++	);
++	padding-top: calc( ( ${ CONFIG.controlHeightMedium } - 2px - 18px ) / 2 );
++`;
++
++export const small = css`
++	min-height: calc( ${ CONFIG.controlHeightSmall } - 2px );
++	padding-bottom: calc( ( ${ CONFIG.controlHeightSmall } - 2px - 18px ) / 2 );
++	padding-top: calc( ( ${ CONFIG.controlHeightSmall } - 2px - 18px ) / 2 );
++`;
++
++export const resizable = css`
++	resize: vertical;
++`;
++
++export const SpinnerWrapper = css`
++	align-items: center;
++	display: flex;
++	height: 100%;
++	justify-content: center;
++	margin: 0 !important;
++	min-height: 0;
++`;
++
++export const Spinner = css`
++	height: 24px;
++	margin: 0 -6px 0 0 !important;
++	opacity: 0.6;
++	user-select: none;
++`;
++
++export const SpinnerArrow = css`
++	background-color: transparent;
++	border-radius: ${ CONFIG.controlBorderRadius };
++	color: ${ COLORS.darkGray };
++	cursor: pointer;
++	padding: 0 2px;
++
++	&:hover:active {
++		background-color: ${ CONFIG.controlBackgroundColorHover };
++	}
++`;
++
++export const SpinnerArrowUp = css`
++	${ SpinnerArrow };
++	margin-bottom: -1px;
++`;
++
++export const SpinnerArrowDown = css`
++	${ SpinnerArrow };
++	margin-top: -1px;
++`;
++
++export const Steppers = css`
++	${ Spinner };
++	margin: 0 -2px 0 0 !important;
++	opacity: 1;
++`;
++
++export const StepperButton = css`
++	${ SpinnerArrow };
++	border: 1px solid transparent;
++	color: ${ CONFIG.controlInnerControlTextColor };
++	cursor: pointer;
++	display: block;
++	outline: none;
++	padding: 3px;
++
++	&:hover {
++		background-color: ${ CONFIG.controlBackgroundColorHover };
++	}
++
++	&:focus {
++		background-color: ${ CONFIG.controlBackgroundColorHover };
++		border-color: ${ COLORS.blue };
++	}
++
++	&[disabled] {
++		pointer-events: none;
++	}
++`;
++
++export const SteppersUp = css`
++	${ StepperButton };
++`;
++
++export const SteppersDown = css`
++	${ StepperButton };
++`;
++
++export const globalDraggableX = css`
++	* {
++		cursor: ew-resize;
++	}
++`;
++
++export const globalDraggableY = css`
++	* {
++		cursor: ns-resize;
++	}
++`;
+diff --git a/packages/components/src/text-input/test/__snapshots__/index.js.snap b/packages/components/src/text-input/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..6570f704715a60
+--- /dev/null
++++ b/packages/components/src/text-input/test/__snapshots__/index.js.snap
+@@ -0,0 +1,1714 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render align 1`] = `
++.emotion-3 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  background: #fff;
++  border-radius: 2px;
++  border: 1px solid;
++  border-color: #757575;
++  box-shadow: transparent;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  font-size: 13px;
++  outline: none;
++  padding: 0 8px;
++  position: relative;
++  -webkit-transition: border-color 100ms ease;
++  transition: border-color 100ms ease;
++  width: 100%;
++}
++
++.emotion-3 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-3 > * {
++  min-width: 0;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-3 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-3[disabled] {
++  opacity: 0.6;
++}
++
++.emotion-3:hover {
++  border-color: #757575;
++}
++
++.emotion-3:focus,
++.emotion-3[data-focused='true'] {
++  border-color: var( --wp-admin-theme-color,#00669b);
++  box-shadow: 0 0 0,0.5px,[object Object];
++}
++
++.emotion-0 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  appearance: none;
++  background: transparent;
++  border: none;
++  border-radius: 2px;
++  box-shadow: none;
++  box-sizing: border-box;
++  color: 100:#8f98a1;
++  150: #8d96a0;
++  200: #7e8993;
++  300: #6c7781;
++  400: #606a73;
++  500: #555d66;
++  600: #40464d;
++  700: #32373c;
++  800: #23282d;
++  900: #191e23;
++  placeholder: rgba(30,30,30,0.62);
++  primary: #1e1e1e;
++  heading: #050505;
++  display: block;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  line-height: 18px;
++  min-height: calc( 30px - 2px );
++  outline: none;
++  padding: 0;
++  padding-bottom: calc( ( 30px - 2px - 18px ) / 2 );
++  padding-top: calc( ( 30px - 2px - 18px ) / 2 );
++  resize: none;
++  text-align: left;
++  width: 100%;
++  font-size: 16px;
++  min-height: calc( calc( 30px * 0.1 ) - 2px );
++  padding-bottom: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++  padding-top: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++}
++
++@media ( min-width:36em ) {
++  .emotion-0 {
++    font-size: 13px;
++  }
++}
++
++.emotion-0::-webkit-outer-spin-button,
++.emotion-0::-webkit-inner-spin-button {
++  -webkit-appearance: none;
++  margin: 0;
++}
++
++.emotion-0[type='number'] {
++  -moz-appearance: textfield;
++}
++
++<div
++  class="components-flex components-base-field emotion-3 components-text-input emotion-1 emotion-2"
++  data-wp-c16t="true"
++  data-wp-component="BaseField"
++>
++  <input
++    autocomplete="off"
++    class="emotion-0 emotion-1 emotion-2"
++    data-wp-c16t="true"
++    data-wp-component="TextInput"
++    spellcheck="false"
++    type="text"
++    value=""
++  />
++</div>
++`;
++
++exports[`props should render correctly 1`] = `
++.emotion-3 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  background: #fff;
++  border-radius: 2px;
++  border: 1px solid;
++  border-color: #757575;
++  box-shadow: transparent;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  font-size: 13px;
++  outline: none;
++  padding: 0 8px;
++  position: relative;
++  -webkit-transition: border-color 100ms ease;
++  transition: border-color 100ms ease;
++  width: 100%;
++}
++
++.emotion-3 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-3 > * {
++  min-width: 0;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-3 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-3[disabled] {
++  opacity: 0.6;
++}
++
++.emotion-3:hover {
++  border-color: #757575;
++}
++
++.emotion-3:focus,
++.emotion-3[data-focused='true'] {
++  border-color: var( --wp-admin-theme-color,#00669b);
++  box-shadow: 0 0 0,0.5px,[object Object];
++}
++
++.emotion-0 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  appearance: none;
++  background: transparent;
++  border: none;
++  border-radius: 2px;
++  box-shadow: none;
++  box-sizing: border-box;
++  color: 100:#8f98a1;
++  150: #8d96a0;
++  200: #7e8993;
++  300: #6c7781;
++  400: #606a73;
++  500: #555d66;
++  600: #40464d;
++  700: #32373c;
++  800: #23282d;
++  900: #191e23;
++  placeholder: rgba(30,30,30,0.62);
++  primary: #1e1e1e;
++  heading: #050505;
++  display: block;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  line-height: 18px;
++  min-height: calc( 30px - 2px );
++  outline: none;
++  padding: 0;
++  padding-bottom: calc( ( 30px - 2px - 18px ) / 2 );
++  padding-top: calc( ( 30px - 2px - 18px ) / 2 );
++  resize: none;
++  text-align: left;
++  width: 100%;
++  font-size: 16px;
++  min-height: calc( calc( 30px * 0.1 ) - 2px );
++  padding-bottom: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++  padding-top: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++}
++
++@media ( min-width:36em ) {
++  .emotion-0 {
++    font-size: 13px;
++  }
++}
++
++.emotion-0::-webkit-outer-spin-button,
++.emotion-0::-webkit-inner-spin-button {
++  -webkit-appearance: none;
++  margin: 0;
++}
++
++.emotion-0[type='number'] {
++  -moz-appearance: textfield;
++}
++
++<div
++  class="components-flex components-base-field emotion-3 components-text-input emotion-1 emotion-2"
++  data-wp-c16t="true"
++  data-wp-component="BaseField"
++>
++  <input
++    autocomplete="off"
++    class="emotion-0 emotion-1 emotion-2"
++    data-wp-c16t="true"
++    data-wp-component="TextInput"
++    spellcheck="false"
++    type="text"
++    value=""
++  />
++</div>
++`;
++
++exports[`props should render defaultValue 1`] = `
++.emotion-3 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  background: #fff;
++  border-radius: 2px;
++  border: 1px solid;
++  border-color: #757575;
++  box-shadow: transparent;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  font-size: 13px;
++  outline: none;
++  padding: 0 8px;
++  position: relative;
++  -webkit-transition: border-color 100ms ease;
++  transition: border-color 100ms ease;
++  width: 100%;
++}
++
++.emotion-3 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-3 > * {
++  min-width: 0;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-3 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-3[disabled] {
++  opacity: 0.6;
++}
++
++.emotion-3:hover {
++  border-color: #757575;
++}
++
++.emotion-3:focus,
++.emotion-3[data-focused='true'] {
++  border-color: var( --wp-admin-theme-color,#00669b);
++  box-shadow: 0 0 0,0.5px,[object Object];
++}
++
++.emotion-0 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  appearance: none;
++  background: transparent;
++  border: none;
++  border-radius: 2px;
++  box-shadow: none;
++  box-sizing: border-box;
++  color: 100:#8f98a1;
++  150: #8d96a0;
++  200: #7e8993;
++  300: #6c7781;
++  400: #606a73;
++  500: #555d66;
++  600: #40464d;
++  700: #32373c;
++  800: #23282d;
++  900: #191e23;
++  placeholder: rgba(30,30,30,0.62);
++  primary: #1e1e1e;
++  heading: #050505;
++  display: block;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  line-height: 18px;
++  min-height: calc( 30px - 2px );
++  outline: none;
++  padding: 0;
++  padding-bottom: calc( ( 30px - 2px - 18px ) / 2 );
++  padding-top: calc( ( 30px - 2px - 18px ) / 2 );
++  resize: none;
++  text-align: left;
++  width: 100%;
++  font-size: 16px;
++  min-height: calc( calc( 30px * 0.1 ) - 2px );
++  padding-bottom: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++  padding-top: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++}
++
++@media ( min-width:36em ) {
++  .emotion-0 {
++    font-size: 13px;
++  }
++}
++
++.emotion-0::-webkit-outer-spin-button,
++.emotion-0::-webkit-inner-spin-button {
++  -webkit-appearance: none;
++  margin: 0;
++}
++
++.emotion-0[type='number'] {
++  -moz-appearance: textfield;
++}
++
++<div
++  class="components-flex components-base-field emotion-3 components-text-input emotion-1 emotion-2"
++  data-wp-c16t="true"
++  data-wp-component="BaseField"
++>
++  <input
++    autocomplete="off"
++    class="emotion-0 emotion-1 emotion-2"
++    data-wp-c16t="true"
++    data-wp-component="TextInput"
++    spellcheck="false"
++    type="text"
++    value="Olaf"
++  />
++</div>
++`;
++
++exports[`props should render disabled 1`] = `
++.emotion-3 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  background: #fff;
++  border-radius: 2px;
++  border: 1px solid;
++  border-color: #757575;
++  box-shadow: transparent;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  font-size: 13px;
++  outline: none;
++  padding: 0 8px;
++  position: relative;
++  -webkit-transition: border-color 100ms ease;
++  transition: border-color 100ms ease;
++  width: 100%;
++}
++
++.emotion-3 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-3 > * {
++  min-width: 0;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-3 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-3[disabled] {
++  opacity: 0.6;
++}
++
++.emotion-3:hover {
++  border-color: #757575;
++}
++
++.emotion-3:focus,
++.emotion-3[data-focused='true'] {
++  border-color: var( --wp-admin-theme-color,#00669b);
++  box-shadow: 0 0 0,0.5px,[object Object];
++}
++
++.emotion-0 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  appearance: none;
++  background: transparent;
++  border: none;
++  border-radius: 2px;
++  box-shadow: none;
++  box-sizing: border-box;
++  color: 100:#8f98a1;
++  150: #8d96a0;
++  200: #7e8993;
++  300: #6c7781;
++  400: #606a73;
++  500: #555d66;
++  600: #40464d;
++  700: #32373c;
++  800: #23282d;
++  900: #191e23;
++  placeholder: rgba(30,30,30,0.62);
++  primary: #1e1e1e;
++  heading: #050505;
++  display: block;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  line-height: 18px;
++  min-height: calc( 30px - 2px );
++  outline: none;
++  padding: 0;
++  padding-bottom: calc( ( 30px - 2px - 18px ) / 2 );
++  padding-top: calc( ( 30px - 2px - 18px ) / 2 );
++  resize: none;
++  text-align: left;
++  width: 100%;
++  font-size: 16px;
++  min-height: calc( calc( 30px * 0.1 ) - 2px );
++  padding-bottom: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++  padding-top: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++}
++
++@media ( min-width:36em ) {
++  .emotion-0 {
++    font-size: 13px;
++  }
++}
++
++.emotion-0::-webkit-outer-spin-button,
++.emotion-0::-webkit-inner-spin-button {
++  -webkit-appearance: none;
++  margin: 0;
++}
++
++.emotion-0[type='number'] {
++  -moz-appearance: textfield;
++}
++
++<div
++  class="components-flex components-base-field emotion-3 components-text-input emotion-1 emotion-2"
++  data-wp-c16t="true"
++  data-wp-component="BaseField"
++  disabled=""
++>
++  <input
++    autocomplete="off"
++    class="emotion-0 emotion-1 emotion-2"
++    data-wp-c16t="true"
++    data-wp-component="TextInput"
++    disabled=""
++    spellcheck="false"
++    type="text"
++    value=""
++  />
++</div>
++`;
++
++exports[`props should render gap 1`] = `
++.emotion-3 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  background: #fff;
++  border-radius: 2px;
++  border: 1px solid;
++  border-color: #757575;
++  box-shadow: transparent;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  font-size: 13px;
++  outline: none;
++  padding: 0 8px;
++  position: relative;
++  -webkit-transition: border-color 100ms ease;
++  transition: border-color 100ms ease;
++  width: 100%;
++}
++
++.emotion-3 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-3 > * {
++  min-width: 0;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-3 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-3[disabled] {
++  opacity: 0.6;
++}
++
++.emotion-3:hover {
++  border-color: #757575;
++}
++
++.emotion-3:focus,
++.emotion-3[data-focused='true'] {
++  border-color: var( --wp-admin-theme-color,#00669b);
++  box-shadow: 0 0 0,0.5px,[object Object];
++}
++
++.emotion-0 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  appearance: none;
++  background: transparent;
++  border: none;
++  border-radius: 2px;
++  box-shadow: none;
++  box-sizing: border-box;
++  color: 100:#8f98a1;
++  150: #8d96a0;
++  200: #7e8993;
++  300: #6c7781;
++  400: #606a73;
++  500: #555d66;
++  600: #40464d;
++  700: #32373c;
++  800: #23282d;
++  900: #191e23;
++  placeholder: rgba(30,30,30,0.62);
++  primary: #1e1e1e;
++  heading: #050505;
++  display: block;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  line-height: 18px;
++  min-height: calc( 30px - 2px );
++  outline: none;
++  padding: 0;
++  padding-bottom: calc( ( 30px - 2px - 18px ) / 2 );
++  padding-top: calc( ( 30px - 2px - 18px ) / 2 );
++  resize: none;
++  text-align: left;
++  width: 100%;
++  font-size: 16px;
++  min-height: calc( calc( 30px * 0.1 ) - 2px );
++  padding-bottom: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++  padding-top: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++}
++
++@media ( min-width:36em ) {
++  .emotion-0 {
++    font-size: 13px;
++  }
++}
++
++.emotion-0::-webkit-outer-spin-button,
++.emotion-0::-webkit-inner-spin-button {
++  -webkit-appearance: none;
++  margin: 0;
++}
++
++.emotion-0[type='number'] {
++  -moz-appearance: textfield;
++}
++
++<div
++  class="components-flex components-base-field emotion-3 components-text-input emotion-1 emotion-2"
++  data-wp-c16t="true"
++  data-wp-component="BaseField"
++>
++  <input
++    autocomplete="off"
++    class="emotion-0 emotion-1 emotion-2"
++    data-wp-c16t="true"
++    data-wp-component="TextInput"
++    spellcheck="false"
++    type="text"
++    value=""
++  />
++</div>
++`;
++
++exports[`props should render isRounded 1`] = `
++.emotion-3 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  background: #fff;
++  border-radius: 2px;
++  border: 1px solid;
++  border-color: #757575;
++  box-shadow: transparent;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  font-size: 13px;
++  outline: none;
++  padding: 0 8px;
++  position: relative;
++  -webkit-transition: border-color 100ms ease;
++  transition: border-color 100ms ease;
++  width: 100%;
++}
++
++.emotion-3 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-3 > * {
++  min-width: 0;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-3 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-3[disabled] {
++  opacity: 0.6;
++}
++
++.emotion-3:hover {
++  border-color: #757575;
++}
++
++.emotion-3:focus,
++.emotion-3[data-focused='true'] {
++  border-color: var( --wp-admin-theme-color,#00669b);
++  box-shadow: 0 0 0,0.5px,[object Object];
++}
++
++.emotion-0 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  appearance: none;
++  background: transparent;
++  border: none;
++  border-radius: 2px;
++  box-shadow: none;
++  box-sizing: border-box;
++  color: 100:#8f98a1;
++  150: #8d96a0;
++  200: #7e8993;
++  300: #6c7781;
++  400: #606a73;
++  500: #555d66;
++  600: #40464d;
++  700: #32373c;
++  800: #23282d;
++  900: #191e23;
++  placeholder: rgba(30,30,30,0.62);
++  primary: #1e1e1e;
++  heading: #050505;
++  display: block;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  line-height: 18px;
++  min-height: calc( 30px - 2px );
++  outline: none;
++  padding: 0;
++  padding-bottom: calc( ( 30px - 2px - 18px ) / 2 );
++  padding-top: calc( ( 30px - 2px - 18px ) / 2 );
++  resize: none;
++  text-align: left;
++  width: 100%;
++  font-size: 16px;
++  min-height: calc( calc( 30px * 0.1 ) - 2px );
++  padding-bottom: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++  padding-top: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++}
++
++@media ( min-width:36em ) {
++  .emotion-0 {
++    font-size: 13px;
++  }
++}
++
++.emotion-0::-webkit-outer-spin-button,
++.emotion-0::-webkit-inner-spin-button {
++  -webkit-appearance: none;
++  margin: 0;
++}
++
++.emotion-0[type='number'] {
++  -moz-appearance: textfield;
++}
++
++<div
++  class="components-flex components-base-field emotion-3 components-text-input emotion-1 emotion-2"
++  data-wp-c16t="true"
++  data-wp-component="BaseField"
++>
++  <input
++    autocomplete="off"
++    class="emotion-0 emotion-1 emotion-2"
++    data-wp-c16t="true"
++    data-wp-component="TextInput"
++    spellcheck="false"
++    type="text"
++    value=""
++  />
++</div>
++`;
++
++exports[`props should render justify 1`] = `
++.emotion-3 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  background: #fff;
++  border-radius: 2px;
++  border: 1px solid;
++  border-color: #757575;
++  box-shadow: transparent;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  font-size: 13px;
++  outline: none;
++  padding: 0 8px;
++  position: relative;
++  -webkit-transition: border-color 100ms ease;
++  transition: border-color 100ms ease;
++  width: 100%;
++}
++
++.emotion-3 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-3 > * {
++  min-width: 0;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-3 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-3[disabled] {
++  opacity: 0.6;
++}
++
++.emotion-3:hover {
++  border-color: #757575;
++}
++
++.emotion-3:focus,
++.emotion-3[data-focused='true'] {
++  border-color: var( --wp-admin-theme-color,#00669b);
++  box-shadow: 0 0 0,0.5px,[object Object];
++}
++
++.emotion-0 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  appearance: none;
++  background: transparent;
++  border: none;
++  border-radius: 2px;
++  box-shadow: none;
++  box-sizing: border-box;
++  color: 100:#8f98a1;
++  150: #8d96a0;
++  200: #7e8993;
++  300: #6c7781;
++  400: #606a73;
++  500: #555d66;
++  600: #40464d;
++  700: #32373c;
++  800: #23282d;
++  900: #191e23;
++  placeholder: rgba(30,30,30,0.62);
++  primary: #1e1e1e;
++  heading: #050505;
++  display: block;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  line-height: 18px;
++  min-height: calc( 30px - 2px );
++  outline: none;
++  padding: 0;
++  padding-bottom: calc( ( 30px - 2px - 18px ) / 2 );
++  padding-top: calc( ( 30px - 2px - 18px ) / 2 );
++  resize: none;
++  text-align: left;
++  width: 100%;
++  font-size: 16px;
++  min-height: calc( calc( 30px * 0.1 ) - 2px );
++  padding-bottom: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++  padding-top: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++}
++
++@media ( min-width:36em ) {
++  .emotion-0 {
++    font-size: 13px;
++  }
++}
++
++.emotion-0::-webkit-outer-spin-button,
++.emotion-0::-webkit-inner-spin-button {
++  -webkit-appearance: none;
++  margin: 0;
++}
++
++.emotion-0[type='number'] {
++  -moz-appearance: textfield;
++}
++
++<div
++  class="components-flex components-base-field emotion-3 components-text-input emotion-1 emotion-2"
++  data-wp-c16t="true"
++  data-wp-component="BaseField"
++>
++  <input
++    autocomplete="off"
++    class="emotion-0 emotion-1 emotion-2"
++    data-wp-c16t="true"
++    data-wp-component="TextInput"
++    spellcheck="false"
++    type="text"
++    value=""
++  />
++</div>
++`;
++
++exports[`props should render prefix 1`] = `
++.emotion-3 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  background: #fff;
++  border-radius: 2px;
++  border: 1px solid;
++  border-color: #757575;
++  box-shadow: transparent;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  font-size: 13px;
++  outline: none;
++  padding: 0 8px;
++  position: relative;
++  -webkit-transition: border-color 100ms ease;
++  transition: border-color 100ms ease;
++  width: 100%;
++}
++
++.emotion-3 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-3 > * {
++  min-width: 0;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-3 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-3[disabled] {
++  opacity: 0.6;
++}
++
++.emotion-3:hover {
++  border-color: #757575;
++}
++
++.emotion-3:focus,
++.emotion-3[data-focused='true'] {
++  border-color: var( --wp-admin-theme-color,#00669b);
++  box-shadow: 0 0 0,0.5px,[object Object];
++}
++
++.emotion-0 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  appearance: none;
++  background: transparent;
++  border: none;
++  border-radius: 2px;
++  box-shadow: none;
++  box-sizing: border-box;
++  color: 100:#8f98a1;
++  150: #8d96a0;
++  200: #7e8993;
++  300: #6c7781;
++  400: #606a73;
++  500: #555d66;
++  600: #40464d;
++  700: #32373c;
++  800: #23282d;
++  900: #191e23;
++  placeholder: rgba(30,30,30,0.62);
++  primary: #1e1e1e;
++  heading: #050505;
++  display: block;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  line-height: 18px;
++  min-height: calc( 30px - 2px );
++  outline: none;
++  padding: 0;
++  padding-bottom: calc( ( 30px - 2px - 18px ) / 2 );
++  padding-top: calc( ( 30px - 2px - 18px ) / 2 );
++  resize: none;
++  text-align: left;
++  width: 100%;
++  font-size: 16px;
++  min-height: calc( calc( 30px * 0.1 ) - 2px );
++  padding-bottom: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++  padding-top: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++}
++
++@media ( min-width:36em ) {
++  .emotion-0 {
++    font-size: 13px;
++  }
++}
++
++.emotion-0::-webkit-outer-spin-button,
++.emotion-0::-webkit-inner-spin-button {
++  -webkit-appearance: none;
++  margin: 0;
++}
++
++.emotion-0[type='number'] {
++  -moz-appearance: textfield;
++}
++
++<div
++  class="components-flex components-base-field emotion-3 components-text-input emotion-1 emotion-2"
++  data-wp-c16t="true"
++  data-wp-component="BaseField"
++>
++  <span>
++    prefix
++  </span>
++  <input
++    autocomplete="off"
++    class="emotion-0 emotion-1 emotion-2"
++    data-wp-c16t="true"
++    data-wp-component="TextInput"
++    spellcheck="false"
++    type="text"
++    value=""
++  />
++</div>
++`;
++
++exports[`props should render seamless 1`] = `
++.emotion-3 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  background: #fff;
++  border-radius: 2px;
++  border: 1px solid;
++  border-color: #757575;
++  box-shadow: transparent;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  font-size: 13px;
++  outline: none;
++  padding: 0 8px;
++  position: relative;
++  -webkit-transition: border-color 100ms ease;
++  transition: border-color 100ms ease;
++  width: 100%;
++}
++
++.emotion-3 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-3 > * {
++  min-width: 0;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-3 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-3[disabled] {
++  opacity: 0.6;
++}
++
++.emotion-3:hover {
++  border-color: #757575;
++}
++
++.emotion-3:focus,
++.emotion-3[data-focused='true'] {
++  border-color: var( --wp-admin-theme-color,#00669b);
++  box-shadow: 0 0 0,0.5px,[object Object];
++}
++
++.emotion-0 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  appearance: none;
++  background: transparent;
++  border: none;
++  border-radius: 2px;
++  box-shadow: none;
++  box-sizing: border-box;
++  color: 100:#8f98a1;
++  150: #8d96a0;
++  200: #7e8993;
++  300: #6c7781;
++  400: #606a73;
++  500: #555d66;
++  600: #40464d;
++  700: #32373c;
++  800: #23282d;
++  900: #191e23;
++  placeholder: rgba(30,30,30,0.62);
++  primary: #1e1e1e;
++  heading: #050505;
++  display: block;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  line-height: 18px;
++  min-height: calc( 30px - 2px );
++  outline: none;
++  padding: 0;
++  padding-bottom: calc( ( 30px - 2px - 18px ) / 2 );
++  padding-top: calc( ( 30px - 2px - 18px ) / 2 );
++  resize: none;
++  text-align: left;
++  width: 100%;
++  font-size: 16px;
++  min-height: calc( calc( 30px * 0.1 ) - 2px );
++  padding-bottom: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++  padding-top: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++}
++
++@media ( min-width:36em ) {
++  .emotion-0 {
++    font-size: 13px;
++  }
++}
++
++.emotion-0::-webkit-outer-spin-button,
++.emotion-0::-webkit-inner-spin-button {
++  -webkit-appearance: none;
++  margin: 0;
++}
++
++.emotion-0[type='number'] {
++  -moz-appearance: textfield;
++}
++
++<div
++  class="components-flex components-base-field emotion-3 components-text-input emotion-1 emotion-2"
++  data-wp-c16t="true"
++  data-wp-component="BaseField"
++>
++  <input
++    autocomplete="off"
++    class="emotion-0 emotion-1 emotion-2"
++    data-wp-c16t="true"
++    data-wp-component="TextInput"
++    seamless=""
++    spellcheck="false"
++    type="text"
++    value=""
++  />
++</div>
++`;
++
++exports[`props should render size 1`] = `
++.emotion-3 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  background: #fff;
++  border-radius: 2px;
++  border: 1px solid;
++  border-color: #757575;
++  box-shadow: transparent;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  font-size: 13px;
++  outline: none;
++  padding: 0 8px;
++  position: relative;
++  -webkit-transition: border-color 100ms ease;
++  transition: border-color 100ms ease;
++  width: 100%;
++}
++
++.emotion-3 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-3 > * {
++  min-width: 0;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-3 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-3[disabled] {
++  opacity: 0.6;
++}
++
++.emotion-3:hover {
++  border-color: #757575;
++}
++
++.emotion-3:focus,
++.emotion-3[data-focused='true'] {
++  border-color: var( --wp-admin-theme-color,#00669b);
++  box-shadow: 0 0 0,0.5px,[object Object];
++}
++
++.emotion-0 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  appearance: none;
++  background: transparent;
++  border: none;
++  border-radius: 2px;
++  box-shadow: none;
++  box-sizing: border-box;
++  color: 100:#8f98a1;
++  150: #8d96a0;
++  200: #7e8993;
++  300: #6c7781;
++  400: #606a73;
++  500: #555d66;
++  600: #40464d;
++  700: #32373c;
++  800: #23282d;
++  900: #191e23;
++  placeholder: rgba(30,30,30,0.62);
++  primary: #1e1e1e;
++  heading: #050505;
++  display: block;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  line-height: 18px;
++  min-height: calc( 30px - 2px );
++  outline: none;
++  padding: 0;
++  padding-bottom: calc( ( 30px - 2px - 18px ) / 2 );
++  padding-top: calc( ( 30px - 2px - 18px ) / 2 );
++  resize: none;
++  text-align: left;
++  width: 100%;
++  font-size: 16px;
++  min-height: calc( calc( 30px * 0.8 ) - 2px );
++  padding-bottom: calc( ( calc( 30px * 0.8 ) - 2px - 18px ) / 2 );
++  padding-top: calc( ( calc( 30px * 0.8 ) - 2px - 18px ) / 2 );
++}
++
++@media ( min-width:36em ) {
++  .emotion-0 {
++    font-size: 13px;
++  }
++}
++
++.emotion-0::-webkit-outer-spin-button,
++.emotion-0::-webkit-inner-spin-button {
++  -webkit-appearance: none;
++  margin: 0;
++}
++
++.emotion-0[type='number'] {
++  -moz-appearance: textfield;
++}
++
++<div
++  class="components-flex components-base-field emotion-3 components-text-input emotion-1 emotion-2"
++  data-wp-c16t="true"
++  data-wp-component="BaseField"
++>
++  <input
++    autocomplete="off"
++    class="emotion-0 emotion-1 emotion-2"
++    data-wp-c16t="true"
++    data-wp-component="TextInput"
++    spellcheck="false"
++    type="text"
++    value=""
++  />
++</div>
++`;
++
++exports[`props should render suffix 1`] = `
++.emotion-3 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  background: #fff;
++  border-radius: 2px;
++  border: 1px solid;
++  border-color: #757575;
++  box-shadow: transparent;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  font-size: 13px;
++  outline: none;
++  padding: 0 8px;
++  position: relative;
++  -webkit-transition: border-color 100ms ease;
++  transition: border-color 100ms ease;
++  width: 100%;
++}
++
++.emotion-3 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-3 > * {
++  min-width: 0;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-3 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-3[disabled] {
++  opacity: 0.6;
++}
++
++.emotion-3:hover {
++  border-color: #757575;
++}
++
++.emotion-3:focus,
++.emotion-3[data-focused='true'] {
++  border-color: var( --wp-admin-theme-color,#00669b);
++  box-shadow: 0 0 0,0.5px,[object Object];
++}
++
++.emotion-0 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  appearance: none;
++  background: transparent;
++  border: none;
++  border-radius: 2px;
++  box-shadow: none;
++  box-sizing: border-box;
++  color: 100:#8f98a1;
++  150: #8d96a0;
++  200: #7e8993;
++  300: #6c7781;
++  400: #606a73;
++  500: #555d66;
++  600: #40464d;
++  700: #32373c;
++  800: #23282d;
++  900: #191e23;
++  placeholder: rgba(30,30,30,0.62);
++  primary: #1e1e1e;
++  heading: #050505;
++  display: block;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  line-height: 18px;
++  min-height: calc( 30px - 2px );
++  outline: none;
++  padding: 0;
++  padding-bottom: calc( ( 30px - 2px - 18px ) / 2 );
++  padding-top: calc( ( 30px - 2px - 18px ) / 2 );
++  resize: none;
++  text-align: left;
++  width: 100%;
++  font-size: 16px;
++  min-height: calc( calc( 30px * 0.1 ) - 2px );
++  padding-bottom: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++  padding-top: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++}
++
++@media ( min-width:36em ) {
++  .emotion-0 {
++    font-size: 13px;
++  }
++}
++
++.emotion-0::-webkit-outer-spin-button,
++.emotion-0::-webkit-inner-spin-button {
++  -webkit-appearance: none;
++  margin: 0;
++}
++
++.emotion-0[type='number'] {
++  -moz-appearance: textfield;
++}
++
++<div
++  class="components-flex components-base-field emotion-3 components-text-input emotion-1 emotion-2"
++  data-wp-c16t="true"
++  data-wp-component="BaseField"
++>
++  <input
++    autocomplete="off"
++    class="emotion-0 emotion-1 emotion-2"
++    data-wp-c16t="true"
++    data-wp-component="TextInput"
++    spellcheck="false"
++    type="text"
++    value=""
++  />
++  <span>
++    suffix
++  </span>
++</div>
++`;
++
++exports[`props should render value 1`] = `
++.emotion-3 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  background: #fff;
++  border-radius: 2px;
++  border: 1px solid;
++  border-color: #757575;
++  box-shadow: transparent;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  font-size: 13px;
++  outline: none;
++  padding: 0 8px;
++  position: relative;
++  -webkit-transition: border-color 100ms ease;
++  transition: border-color 100ms ease;
++  width: 100%;
++}
++
++.emotion-3 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++}
++
++.emotion-3 > * {
++  min-width: 0;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-3 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-3[disabled] {
++  opacity: 0.6;
++}
++
++.emotion-3:hover {
++  border-color: #757575;
++}
++
++.emotion-3:focus,
++.emotion-3[data-focused='true'] {
++  border-color: var( --wp-admin-theme-color,#00669b);
++  box-shadow: 0 0 0,0.5px,[object Object];
++}
++
++.emotion-0 {
++  -webkit-appearance: none;
++  -moz-appearance: none;
++  appearance: none;
++  background: transparent;
++  border: none;
++  border-radius: 2px;
++  box-shadow: none;
++  box-sizing: border-box;
++  color: 100:#8f98a1;
++  150: #8d96a0;
++  200: #7e8993;
++  300: #6c7781;
++  400: #606a73;
++  500: #555d66;
++  600: #40464d;
++  700: #32373c;
++  800: #23282d;
++  900: #191e23;
++  placeholder: rgba(30,30,30,0.62);
++  primary: #1e1e1e;
++  heading: #050505;
++  display: block;
++  -webkit-flex: 1;
++  -ms-flex: 1;
++  flex: 1;
++  line-height: 18px;
++  min-height: calc( 30px - 2px );
++  outline: none;
++  padding: 0;
++  padding-bottom: calc( ( 30px - 2px - 18px ) / 2 );
++  padding-top: calc( ( 30px - 2px - 18px ) / 2 );
++  resize: none;
++  text-align: left;
++  width: 100%;
++  font-size: 16px;
++  min-height: calc( calc( 30px * 0.1 ) - 2px );
++  padding-bottom: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++  padding-top: calc( ( calc( 30px * 0.1 ) - 2px - 18px ) / 2 );
++}
++
++@media ( min-width:36em ) {
++  .emotion-0 {
++    font-size: 13px;
++  }
++}
++
++.emotion-0::-webkit-outer-spin-button,
++.emotion-0::-webkit-inner-spin-button {
++  -webkit-appearance: none;
++  margin: 0;
++}
++
++.emotion-0[type='number'] {
++  -moz-appearance: textfield;
++}
++
++<div
++  class="components-flex components-base-field emotion-3 components-text-input emotion-1 emotion-2"
++  data-wp-c16t="true"
++  data-wp-component="BaseField"
++>
++  <input
++    autocomplete="off"
++    class="emotion-0 emotion-1 emotion-2"
++    data-wp-c16t="true"
++    data-wp-component="TextInput"
++    spellcheck="false"
++    type="text"
++    value="Olaf"
++  />
++</div>
++`;
+diff --git a/packages/components/src/text-input/test/index.js b/packages/components/src/text-input/test/index.js
+new file mode 100644
+index 00000000000000..e73c671b02d4bd
+--- /dev/null
++++ b/packages/components/src/text-input/test/index.js
+@@ -0,0 +1,81 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { TextInput } from '../index';
++
++describe( 'props', () => {
++	test( 'should render correctly', () => {
++		const { container } = render( <TextInput /> );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render align', () => {
++		const { container } = render( <TextInput align="flex-start" /> );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render disabled', () => {
++		const { container } = render( <TextInput disabled /> );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render defaultValue', () => {
++		const { container } = render( <TextInput defaultValue="Olaf" /> );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render gap', () => {
++		const { container } = render( <TextInput gap={ 4 } /> );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render isRounded', () => {
++		const { container } = render( <TextInput isRounded /> );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render seamless', () => {
++		const { container } = render( <TextInput seamless /> );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render justify', () => {
++		const { container } = render( <TextInput justify="space-around" /> );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	// TODO: TextareaAutosizeClass is creating invalid attributes.
++	test.skip( 'should render multiline', () => {
++		const { container } = render( <TextInput isResizable multiline /> );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render prefix', () => {
++		const { container } = render(
++			<TextInput prefix={ <span>prefix</span> } />
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render size', () => {
++		const { container } = render( <TextInput size="small" /> );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render suffix', () => {
++		const { container } = render(
++			<TextInput suffix={ <span>suffix</span> } />
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render value', () => {
++		const { container } = render( <TextInput value="Olaf" /> );
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++} );
+diff --git a/packages/components/src/text-input/text-input-arrows.js b/packages/components/src/text-input/text-input-arrows.js
+new file mode 100644
+index 00000000000000..242deda4e374be
+--- /dev/null
++++ b/packages/components/src/text-input/text-input-arrows.js
+@@ -0,0 +1,145 @@
++/**
++ * External dependencies
++ */
++import { clamp, noop } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { chevronDown, chevronUp } from '@wordpress/icons';
++import {
++	useCallback,
++	useEffect,
++	memo,
++	forwardRef,
++	useRef,
++} from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import Icon from '../icon';
++import { View } from '../view';
++import { VStack } from '../v-stack';
++import * as styles from './styles';
++
++/**
++ * @typedef Props
++ * @property {import('react').MutableRefObject<null | HTMLElement>} [dragHandlersRef] Drag handler React ref.
++ * @property {() => void} [increment] Increment text input number value callback.
++ * @property {() => void} [decrement] Decrement text input number value callback.
++ */
++
++/**
++ *
++ * @param {Props} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function TextInputArrows( props, forwardedRef ) {
++	const { decrement, dragHandlersRef, increment } = props;
++	const dragHandlers = dragHandlersRef?.current;
++
++	return (
++		<View className={ styles.SpinnerWrapper }>
++			{ /* @ts-ignore Check PolymorphicComponent. No overload matches this call. */ }
++			<VStack
++				{ ...dragHandlers }
++				className={ styles.Spinner }
++				expanded={ true }
++				spacing={ 0 }
++				ref={ forwardedRef }
++			>
++				<UpDownArrows
++					onDecrement={ decrement }
++					onIncrement={ increment }
++				/>
++			</VStack>
++		</View>
++	);
++}
++
++const _UpDownArrows = ( { onIncrement = noop, onDecrement = noop } ) => {
++	/** @type {import('react').MutableRefObject<number | undefined>} */
++	const timeoutRef = useRef();
++	const timeoutDurationStart = 500;
++	const timeoutDurationEnd = 20;
++	const timeoutDurationRef = useRef( timeoutDurationStart );
++
++	const handleOnClearTimers = useCallback( () => {
++		if ( timeoutRef.current ) {
++			clearTimeout( timeoutRef.current );
++		}
++		timeoutDurationRef.current = timeoutDurationStart;
++	}, [] );
++
++	const handleOnMouseDownIncrement = useCallback(
++		( event ) => {
++			if ( event ) {
++				event.preventDefault();
++			}
++			timeoutRef.current = setTimeout( () => {
++				onIncrement();
++				timeoutDurationRef.current = clamp(
++					timeoutDurationRef.current / 2,
++					timeoutDurationEnd,
++					timeoutDurationStart
++				);
++				handleOnMouseDownIncrement();
++			}, timeoutDurationRef.current );
++		},
++		[ onIncrement ]
++	);
++
++	const handleOnMouseDownDecrement = useCallback(
++		( event ) => {
++			if ( event ) {
++				event.preventDefault();
++			}
++			timeoutRef.current = setTimeout( () => {
++				onDecrement();
++				timeoutDurationRef.current = clamp(
++					timeoutDurationRef.current / 2,
++					timeoutDurationEnd,
++					timeoutDurationStart
++				);
++				handleOnMouseDownDecrement();
++			}, timeoutDurationRef.current );
++		},
++		[ onDecrement ]
++	);
++
++	useEffect( () => {
++		return () => handleOnClearTimers();
++	}, [ handleOnClearTimers ] );
++
++	return (
++		<>
++			<Icon
++				className={ styles.SpinnerArrowUp }
++				onClick={ onIncrement }
++				onMouseDown={ handleOnMouseDownIncrement }
++				onMouseLeave={ handleOnClearTimers }
++				onMouseUp={ handleOnClearTimers }
++				tabIndex={ -1 }
++				icon={ chevronUp }
++				size={ 12 }
++				width={ 16 }
++			/>
++			<Icon
++				className={ styles.SpinnerArrowDown }
++				onClick={ onDecrement }
++				onMouseDown={ handleOnMouseDownDecrement }
++				onMouseLeave={ handleOnClearTimers }
++				onMouseUp={ handleOnClearTimers }
++				tabIndex={ -1 }
++				icon={ chevronDown }
++				size={ 12 }
++				width={ 16 }
++			/>
++		</>
++	);
++};
++
++const UpDownArrows = memo( _UpDownArrows );
++
++export default memo( forwardRef( TextInputArrows ) );
+diff --git a/packages/components/src/text-input/text-input-steppers.js b/packages/components/src/text-input/text-input-steppers.js
+new file mode 100644
+index 00000000000000..a0da7942a53818
+--- /dev/null
++++ b/packages/components/src/text-input/text-input-steppers.js
+@@ -0,0 +1,187 @@
++/**
++ * External dependencies
++ */
++import { clamp, noop } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import {
++	forwardRef,
++	memo,
++	useCallback,
++	useEffect,
++	useRef,
++} from '@wordpress/element';
++import { minus, plus } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import Icon from '../icon';
++import { HStack } from '../h-stack';
++import { View } from '../view';
++import * as styles from './styles';
++
++/**
++ * @typedef Props
++ * @property {boolean} [disabled] Whether the stepper controls are disabled.
++ * @property {import('react').MutableRefObject<null | HTMLElement>} [dragHandlersRef] Drag handler React ref.
++ * @property {() => void} [increment] Increment text input number value callback.
++ * @property {() => void} [decrement] Decrement text input number value callback.
++ */
++
++/**
++ *
++ * @param {Props} props
++ * @param {import('react').Ref<any>} forwardedRef
++ * @return {import('react').ReactElement} The text input stepper component.
++ */
++function TextInputSteppers( props, forwardedRef ) {
++	const { decrement, disabled, dragHandlersRef, increment } = props;
++	const dragHandlers = dragHandlersRef?.current;
++
++	return (
++		<View className={ styles.SpinnerWrapper }>
++			{ /* @ts-ignore Check PolymorphicComponent. No overload matches this call. */ }
++			<HStack
++				{ ...dragHandlers }
++				className={ styles.Steppers }
++				expanded={ true }
++				spacing={ 0 }
++				ref={ forwardedRef }
++			>
++				<UpDownArrows
++					disabled={ disabled }
++					onDecrement={ decrement }
++					onIncrement={ increment }
++				/>
++			</HStack>
++		</View>
++	);
++}
++
++/**
++ *
++ * @typedef UpDownArrowsProps
++ * @property {boolean | undefined} disabled Whether the controls are disabled.
++ * @property {() => void} [onIncrement] Increment text input number value callback.
++ * @property {() => void} [onDecrement] Decrement text input number value callback.
++ */
++
++/**
++ *
++ * @param {UpDownArrowsProps} props
++ * @return {import('react').ReactElement} The _UpDownArrows component.
++ */
++const _UpDownArrows = ( {
++	disabled,
++	onIncrement = noop,
++	onDecrement = noop,
++} ) => {
++	/** @type {import('react').MutableRefObject<number | undefined>} */
++	const timeoutRef = useRef();
++	const timeoutDurationStart = 500;
++	const timeoutDurationEnd = 20;
++	const timeoutDurationRef = useRef( timeoutDurationStart );
++
++	const handleOnClearTimers = useCallback( () => {
++		if ( timeoutRef.current ) {
++			clearTimeout( timeoutRef.current );
++		}
++		timeoutDurationRef.current = timeoutDurationStart;
++	}, [] );
++
++	const handleOnMouseDownIncrement = useCallback(
++		( event ) => {
++			if ( event ) {
++				event.preventDefault();
++			}
++			timeoutRef.current = setTimeout( () => {
++				onIncrement();
++				timeoutDurationRef.current = clamp(
++					timeoutDurationRef.current / 2,
++					timeoutDurationEnd,
++					timeoutDurationStart
++				);
++				handleOnMouseDownIncrement();
++			}, timeoutDurationRef.current );
++		},
++		[ onIncrement ]
++	);
++
++	const handleOnMouseDownDecrement = useCallback(
++		( event ) => {
++			if ( event ) {
++				event.preventDefault();
++			}
++			timeoutRef.current = setTimeout( () => {
++				onDecrement();
++				timeoutDurationRef.current = clamp(
++					timeoutDurationRef.current / 2,
++					timeoutDurationEnd,
++					timeoutDurationStart
++				);
++				handleOnMouseDownDecrement();
++			}, timeoutDurationRef.current );
++		},
++		[ onDecrement ]
++	);
++
++	const handleOnIncrement = useCallback(
++		( event ) => {
++			event.stopPropagation();
++			onIncrement();
++		},
++		[ onIncrement ]
++	);
++
++	const handleOnDecrement = useCallback(
++		( event ) => {
++			event.stopPropagation();
++			onDecrement();
++		},
++		[ onDecrement ]
++	);
++
++	useEffect( () => {
++		return () => handleOnClearTimers();
++	}, [ handleOnClearTimers ] );
++
++	return (
++		<>
++			<Icon
++				as="button"
++				className={ styles.SteppersUp }
++				disabled={ disabled }
++				onClick={ handleOnIncrement }
++				onMouseDown={ handleOnMouseDownIncrement }
++				onMouseLeave={ handleOnClearTimers }
++				onMouseUp={ handleOnClearTimers }
++				type="button"
++				height={ `calc(100% - 4px)` }
++				icon={ plus }
++				size={ 12 }
++				width={ 20 }
++			/>
++			<Icon
++				as="button"
++				className={ styles.SteppersDown }
++				disabled={ disabled }
++				onClick={ handleOnDecrement }
++				onMouseDown={ handleOnMouseDownDecrement }
++				onMouseLeave={ handleOnClearTimers }
++				onMouseUp={ handleOnClearTimers }
++				type="button"
++				height={ `calc(100% - 4px)` }
++				icon={ minus }
++				size={ 12 }
++				width={ 20 }
++			/>
++		</>
++	);
++};
++
++const UpDownArrows = memo( _UpDownArrows );
++
++export default memo( forwardRef( TextInputSteppers ) );
+diff --git a/packages/components/src/text-input/text-input.js b/packages/components/src/text-input/text-input.js
+new file mode 100644
+index 00000000000000..264b8ebfad43ad
+--- /dev/null
++++ b/packages/components/src/text-input/text-input.js
+@@ -0,0 +1,86 @@
++/**
++ * WordPress dependencies
++ */
++import { useMergeRefs } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import { contextConnect } from '../ui/context';
++import { View } from '../view';
++import TextInputArrows from './text-input-arrows';
++import TextInputSteppers from './text-input-steppers';
++import { useTextInput } from './hooks/use-text-input';
++import * as styles from './styles';
++
++/**
++ *
++ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'input'>} props
++ * @param {import('react').Ref<any>} forwardedRef
++ */
++function TextInput( props, forwardedRef ) {
++	const {
++		arrows,
++		decrement,
++		disabled,
++		dragHandlersRef,
++		increment,
++		inputProps,
++		inputRef,
++		isTypeNumeric,
++		prefix,
++		suffix,
++		...otherProps
++	} = useTextInput( props );
++
++	const showTextInputArrows = arrows === true && isTypeNumeric;
++	const showTextInputSteppers = arrows === 'stepper' && isTypeNumeric;
++	const mergedRefs = useMergeRefs( [ inputRef, forwardedRef ] );
++
++	return (
++		// @ts-ignore Will we have to update View types?
++		<View { ...otherProps } disabled={ disabled }>
++			{ prefix }
++			<View
++				{ ...styles.Input }
++				autoComplete="off"
++				spellCheck={ false }
++				{ ...inputProps }
++				disabled={ disabled }
++				ref={ mergedRefs }
++			/>
++			{ suffix }
++			{ showTextInputArrows && (
++				<TextInputArrows
++					decrement={ decrement }
++					dragHandlersRef={ dragHandlersRef }
++					increment={ increment }
++				/>
++			) }
++			{ showTextInputSteppers && (
++				<TextInputSteppers
++					decrement={ decrement }
++					disabled={ !! disabled }
++					dragHandlersRef={ dragHandlersRef }
++					increment={ increment }
++				/>
++			) }
++		</View>
++	);
++}
++
++/**
++ * `TextInput` is a form component that users can enter content into.
++ *
++ * @example
++ * ```jsx
++ * import { TextInput } from `@wordpress/components`
++ *
++ * function Example() {
++ *   return <TextInput placeholder="First name" />
++ * }
++ * ```
++ */
++const ConnectedTextInput = contextConnect( TextInput, 'TextInput' );
++
++export default ConnectedTextInput;
+diff --git a/packages/components/src/text-input/types.ts b/packages/components/src/text-input/types.ts
+new file mode 100644
+index 00000000000000..4d8a667572af85
+--- /dev/null
++++ b/packages/components/src/text-input/types.ts
+@@ -0,0 +1,133 @@
++/**
++ * Internal dependencies
++ */
++import type { Props as BaseFieldProps } from '../base-field/hook';
++import type { FormElementProps, SizeRangeReduced } from '../utils/types';
++
++export type TextInputArrow = 'stepper' | boolean;
++type TextInputFormat = 'number' | 'type';
++
++export type Props = Omit< BaseFieldProps, 'isClickable' | 'isSubtle' > &
++	FormElementProps< string > & {
++		/**
++		 * Renders specified incrementer/decrementer arrows.
++		 *
++		 * @default true
++		 */
++		arrows?: TextInputArrow;
++		/**
++		 * The axis along which to drag a number input's value.
++		 */
++		dragAxis?: 'x' | 'y';
++		/**
++		 * Renders an error state.
++		 *
++		 * @default false
++		 */
++		error?: boolean;
++		/**
++		 * Modifies how `value` can be adjusted.
++		 *
++		 * @default 'text'
++		 */
++		format?: TextInputFormat;
++		/**
++		 * The amount of space between each child element.
++		 *
++		 * @default 2.5
++		 */
++		gap?: number;
++		/**
++		 * Enables incrementing/decrementing from non-numeric values, such as `auto`.
++		 *
++		 * @default false
++		 */
++		incrementFromNonNumericValue?: boolean;
++		/**
++		 * Renders a `cursor: pointer` on hover.
++		 *
++		 * @default false
++		 */
++		isClickable?: boolean;
++		/**
++		 * Fires the `onChange` callback after pressing `ENTER` or focusing away.
++		 *
++		 * @default false
++		 */
++		isCommitOnBlurOrEnter?: boolean;
++		/**
++		 * Renders focus styles.
++		 *
++		 * @default false
++		 */
++		isFocused?: boolean;
++		/**
++		 * Renders with rounded corners.
++		 *
++		 * @default false
++		 */
++		isRounded?: boolean;
++		/**
++		 * Enables larger `step` increment/decrement values when holding down `Shift`.
++		 *
++		 * @default true
++		 */
++		isShiftStepEnabled?: boolean;
++		/**
++		 * Allows for the a multiline `TextInput` to tbe resizable by dragging.
++		 *
++		 * @default false
++		 */
++		isResizable?: boolean;
++		/**
++		 * Renders a subtle `TextInput`.
++		 *
++		 * @default false
++		 */
++		isSubtle?: boolean;
++		/**
++		 * Maximum number of rows to show for a multiline `TextInput`.
++		 */
++		maxRows?: number;
++		/**
++		 * Alias for `rows`.
++		 */
++		minRows?: number;
++		/**
++		 * Renders `TextInput` to allow for multiline lines (`textarea`).
++		 *
++		 * @default false
++		 */
++		multiline?: boolean;
++		/**
++		 * Callback function when the `value` is committed.
++		 */
++		onChange?: ( value: string ) => void;
++		/**
++		 * Callback function when the height changes with a multiline `TextInput`.
++		 */
++		onHeightChange?: ( height: number ) => void;
++		/**
++		 * Renders prefix content within `TextInput`.
++		 */
++		prefix?: React.ReactElement;
++		/**
++		 * Step size when holding shift.
++		 *
++		 * @default 10
++		 */
++		shiftStep?: number;
++		/**
++		 * Determines the size of `TextInput`.
++		 */
++		size?: SizeRangeReduced;
++		/**
++		 * Renders prefix content within `TextInput`.
++		 */
++		suffix?: React.ReactElement;
++		/**
++		 * Determines if the next `value` should be committed.
++		 */
++		validate?: ( currentValue: string ) => boolean;
++		value?: string;
++	};
+diff --git a/packages/components/src/utils/clear-selection.js b/packages/components/src/utils/clear-selection.js
+new file mode 100644
+index 00000000000000..1fcc4b7883f2b9
+--- /dev/null
++++ b/packages/components/src/utils/clear-selection.js
+@@ -0,0 +1,24 @@
++/**
++ * Clears the text selection on screen.
++ */
++export function clearSelection() {
++	if ( window?.getSelection ) {
++		// eslint-disable-next-line @wordpress/no-global-get-selection
++		const selection = window?.getSelection();
++		if ( ! selection ) {
++			return;
++		}
++
++		if ( selection.empty ) {
++			// Chrome.
++			selection.empty();
++		} else if ( selection.removeAllRanges ) {
++			// Firefox.
++			selection.removeAllRanges();
++		}
++		// @ts-ignore IE specific property.
++	} else if ( document.selection ) {
++		// @ts-ignore IE specific property.
++		document.selection.empty();
++	}
++}
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 28bfb5885df69e..d74d9be8b32edb 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -40,6 +40,7 @@ export default {
+ 	controlPaddingXLarge: `calc(${ CONTROL_PADDING_X } * 1.3334)`,
+ 	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
+ 	controlBackgroundColor: COLORS.white,
++	controlBackgroundColorHover: 'rgba(0, 0, 0, 0.5)',
+ 	controlBorderRadius: '2px',
+ 	controlBorderColor: COLORS.gray[ 700 ],
+ 	controlBoxShadow: 'transparent',
+@@ -48,8 +49,11 @@ export default {
+ 	controlDestructiveBorderColor: COLORS.alert.red,
+ 	controlHeight: CONTROL_HEIGHT,
+ 	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
++	controlHeightMedium: `calc( ${ CONTROL_HEIGHT } * 0.1 )`,
+ 	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
+ 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
++	controlInnerControlTextColor: COLORS.darkGray,
++	controlTextColor: COLORS.darkGray,
+ 	cardBorderRadius: '2px',
+ 	cardPaddingX: CARD_PADDING_X,
+ 	cardPaddingY: CARD_PADDING_Y,
+diff --git a/packages/components/src/utils/events.js b/packages/components/src/utils/events.js
+new file mode 100644
+index 00000000000000..bda1f2b656c464
+--- /dev/null
++++ b/packages/components/src/utils/events.js
+@@ -0,0 +1,41 @@
++/**
++ * Merges event handlers together.
++ *
++ * @template TEvent
++ * @param {(event: TEvent) => void} handler
++ * @param {(event: TEvent) => void} otherHandler
++ */
++export function mergeEvent( handler, otherHandler ) {
++	return (
++		/* eslint-disable jsdoc/no-undefined-types */
++		/** @type {TEvent} */
++		/* eslint-enable jsdoc/no-undefined-types */
++		event
++	) => {
++		if ( typeof handler === 'function' ) {
++			handler( event );
++		}
++		if ( typeof otherHandler === 'function' ) {
++			otherHandler( event );
++		}
++	};
++}
++
++/**
++ * Merges a set of event handlers together.
++ *
++ * @template TEvent
++ * @param {Record<string, (event: TEvent) => void>} handlers
++ * @param {Record<string, (event: TEvent) => void>} extraHandlers
++ */
++export function mergeEventHandlers( handlers = {}, extraHandlers = {} ) {
++	const mergedHandlers = { ...handlers };
++
++	for ( const [ key, handler ] of Object.entries( mergedHandlers ) ) {
++		if ( typeof extraHandlers[ key ] === 'function' ) {
++			mergedHandlers[ key ] = mergeEvent( handler, extraHandlers[ key ] );
++		}
++	}
++
++	return mergedHandlers;
++}
+diff --git a/packages/components/src/utils/hooks/index.js b/packages/components/src/utils/hooks/index.js
+index 3eeca7881e2563..906fc0ce39f1f6 100644
+--- a/packages/components/src/utils/hooks/index.js
++++ b/packages/components/src/utils/hooks/index.js
+@@ -1,3 +1,5 @@
+ export { default as useControlledState } from './use-controlled-state';
+ export { default as useJumpStep } from './use-jump-step';
+ export { default as useUpdateEffect } from './use-update-effect';
++export { default as useControlledValue } from './use-controlled-value';
++export { default as usePropRef } from './use-prop-ref';
+diff --git a/packages/components/src/utils/hooks/use-controlled-value.js b/packages/components/src/utils/hooks/use-controlled-value.js
+new file mode 100644
+index 00000000000000..948612cac5683a
+--- /dev/null
++++ b/packages/components/src/utils/hooks/use-controlled-value.js
+@@ -0,0 +1,35 @@
++/**
++ * External dependencies
++ */
++import { isNil } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Simplified and improved implementation of useControlledState.
++ *
++ * @template T
++ * @param {Object} props
++ * @param {T} [props.defaultValue]
++ * @param {T} [props.value]
++ * @param {(value: T) => void} [props.onChange]
++ * @return {[T|undefined, (value: T) => void]} The controlled value and the value setter.
++ */
++export function useControlledValue( {
++	defaultValue,
++	onChange,
++	value: valueProp,
++} ) {
++	const hasValue = ! isNil( valueProp );
++	const initialValue = hasValue ? valueProp : defaultValue;
++	const [ state, setState ] = useState( initialValue );
++	const value = hasValue ? valueProp : state;
++	const setValue = hasValue && ! isNil( onChange ) ? onChange : setState;
++
++	return [ value, setValue ];
++}
++
++export default useControlledValue;
+diff --git a/packages/components/src/utils/hooks/use-prop-ref.js b/packages/components/src/utils/hooks/use-prop-ref.js
+new file mode 100644
+index 00000000000000..286a13263b9982
+--- /dev/null
++++ b/packages/components/src/utils/hooks/use-prop-ref.js
+@@ -0,0 +1,49 @@
++/**
++ * WordPress dependencies
++ */
++import { useEffect, useRef } from '@wordpress/element';
++
++/**
++ * Creates a reference for a prop. This is useful for preserving dependency
++ * memoization for hooks like useCallback.
++ *
++ * @example
++ * ```js
++ * // Referencing a simple prop, used in a useCallback function.
++ * const valueRef = usePropRef(value)
++ *
++ * const increment = useCallback(() => {
++ *   const value = valueRef.current
++ *   onChange(value + 1)
++ * }, [onChange, valueRef])
++ * ```
++ *
++ * ---
++ *
++ * Multiple props can be passed in using in `object`.
++ *
++ * @example
++ * ```js
++ * const propRefs = usePropRef({ value, step })
++ *
++ * const increment = useCallback(() => {
++ *   const { value, step } = propRefs.current
++ *   onChange(value + step)
++ * }, [onChange, propRefs])
++ * ```
++ *
++ * @template T
++ * @param {T} prop
++ * @return {{current: T|undefined}} The prop reference.
++ */
++export function usePropRef( prop ) {
++	const propRef = useRef( prop );
++
++	useEffect( () => {
++		propRef.current = prop;
++	}, [ prop ] );
++
++	return propRef;
++}
++
++export default usePropRef;
+diff --git a/packages/components/src/utils/keyboard.js b/packages/components/src/utils/keyboard.js
+new file mode 100644
+index 00000000000000..14e0729b2de456
+--- /dev/null
++++ b/packages/components/src/utils/keyboard.js
+@@ -0,0 +1,18 @@
++/**
++ * Normalizes the 'key' property of a KeyboardEvent in IE/Edge
++ *
++ * Source:
++ * https://github.com/downshift-js/downshift/blob/a71005bd879d05d7dcb892d1e0dc5c6ca74e9d39/src/utils.js#L279
++ *
++ * @param {import('react').KeyboardEvent} event A keyboardEvent object
++ *
++ * @return {string} The keyboard key
++ */
++export function normalizeArrowKey( event ) {
++	const { key, keyCode } = event;
++	/* istanbul ignore next (ie) */
++	if ( keyCode >= 37 && keyCode <= 40 && key.indexOf( 'Arrow' ) !== 0 ) {
++		return `Arrow${ key }`;
++	}
++	return key;
++}
+diff --git a/packages/components/src/utils/test/values.js b/packages/components/src/utils/test/values.js
+new file mode 100644
+index 00000000000000..e16adff0875db8
+--- /dev/null
++++ b/packages/components/src/utils/test/values.js
+@@ -0,0 +1,24 @@
++/**
++ * Internal dependencies
++ */
++import { isValueNumeric } from '../values';
++
++describe( 'isValueNumeric', () => {
++	it( 'should return `true` for numeric values from various input types', () => {
++		expect( isValueNumeric( '999' ) ).toBe( true );
++		expect( isValueNumeric( '99.33' ) ).toBe( true );
++		expect( isValueNumeric( 0.0003 ) ).toBe( true );
++		expect( isValueNumeric( 2222 ) ).toBe( true );
++		expect( isValueNumeric( '22,222,222' ) ).toBe( true );
++		expect( isValueNumeric( -888 ) ).toBe( true );
++		expect( isValueNumeric( new Number() ) ).toBe( true );
++	} );
++
++	it( 'should return `false` for non-numeric values from various input types', () => {
++		expect( isValueNumeric( null ) ).toBe( false );
++		expect( isValueNumeric() ).toBe( false );
++		expect( isValueNumeric( 'Stringy' ) ).toBe( false );
++		expect( isValueNumeric( {} ) ).toBe( false );
++		expect( isValueNumeric( [] ) ).toBe( false );
++	} );
++} );
+diff --git a/packages/components/src/utils/values.js b/packages/components/src/utils/values.js
+index 8a609a3df7161a..df602e433ba8c7 100644
+--- a/packages/components/src/utils/values.js
++++ b/packages/components/src/utils/values.js
+@@ -40,3 +40,16 @@ export function isValueEmpty( value ) {
+ export function getDefinedValue( values = [], fallbackValue ) {
+ 	return values.find( isValueDefined ) ?? fallbackValue;
+ }
++
++/**
++ * Checks to see if a value is a numeric value (`number` or `string`).
++ *
++ * @param {any} value
++ *
++ * @return {boolean} Whether value is numeric.
++ */
++export function isValueNumeric( value ) {
++	const valueToCheck =
++		typeof value === 'string' ? value.replace( /,/g, '' ) : value;
++	return ! isNaN( parseFloat( valueToCheck ) ) && isFinite( valueToCheck );
++}
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 4b831d54dbaa29..6f72b8d33b558a 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -41,7 +41,9 @@
+ 		"src/spinner/**/*",
+ 		"src/surface/**/*",
+ 		"src/text/**/*",
++		"src/text-input/**/*",
+ 		"src/tip/**/*",
++		"src/text-input/**/*",
+ 		"src/truncate/**/*",
+ 		"src/ui/**/*",
+ 		"src/utils/**/*",

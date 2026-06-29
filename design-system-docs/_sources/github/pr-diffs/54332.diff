@@ -1,0 +1,245 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ecce61cb91509c..093dea189bdf7b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   `FormTokenField`: Fix a regression where the suggestion list would re-open after clicking away from the input ([#57002](https://github.com/WordPress/gutenberg/pull/57002)).
+ -   `Snackbar`: Remove erroneous `__unstableHTML` prop from TypeScript definitions ([#57218](https://github.com/WordPress/gutenberg/pull/57218)).
+ -   `Truncate`: improve handling of non-string `children` ([#57261](https://github.com/WordPress/gutenberg/pull/57261)).
++-   `PaletteEdit`: Don't discard colors with default name and slug ([#54332](https://github.com/WordPress/gutenberg/pull/54332)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index ceadceca1a239d..87df1894dc36fc 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -60,7 +60,7 @@ import type {
+ 	PaletteElement,
+ } from './types';
+ 
+-export const DEFAULT_COLOR = '#000';
++const DEFAULT_COLOR = '#000';
+ 
+ function NameInput( { value, onChange, label }: NameInputProps ) {
+ 	return (
+@@ -74,8 +74,8 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
+ }
+ 
+ /**
+- * Returns a temporary name for a palette item in the format "Color + id".
+- * To ensure there are no duplicate ids, this function checks all slugs for temporary names.
++ * Returns a name for a palette item in the format "Color + id".
++ * To ensure there are no duplicate ids, this function checks all slugs.
+  * It expects slugs to be in the format: slugPrefix + color- + number.
+  * It then sets the id component of the new name based on the incremented id of the highest existing slug id.
+  *
+@@ -88,10 +88,10 @@ export function getNameForPosition(
+ 	elements: PaletteElement[],
+ 	slugPrefix: string
+ ) {
+-	const temporaryNameRegex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
++	const nameRegex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
+ 	const position = elements.reduce( ( previousValue, currentValue ) => {
+ 		if ( typeof currentValue?.slug === 'string' ) {
+-			const matches = currentValue?.slug.match( temporaryNameRegex );
++			const matches = currentValue?.slug.match( nameRegex );
+ 			if ( matches ) {
+ 				const id = parseInt( matches[ 1 ], 10 );
+ 				if ( id >= previousValue ) {
+@@ -103,7 +103,7 @@ export function getNameForPosition(
+ 	}, 1 );
+ 
+ 	return sprintf(
+-		/* translators: %s: is a temporary id for a custom color */
++		/* translators: %s: is an id for a custom color */
+ 		__( 'Color %s' ),
+ 		position
+ 	);
+@@ -261,32 +261,6 @@ function Option< T extends Color | Gradient >( {
+ 	);
+ }
+ 
+-/**
+- * Checks if a color or gradient is a temporary element by testing against default values.
+- */
+-export function isTemporaryElement(
+-	slugPrefix: string,
+-	{ slug, color, gradient }: Color | Gradient
+-): Boolean {
+-	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
+-
+-	// If the slug matches the temporary name regex,
+-	// check if the color or gradient matches the default value.
+-	if ( regex.test( slug ) ) {
+-		// The order is important as gradient elements
+-		// contain a color property.
+-		if ( !! gradient ) {
+-			return gradient === DEFAULT_GRADIENT;
+-		}
+-
+-		if ( !! color ) {
+-			return color === DEFAULT_COLOR;
+-		}
+-	}
+-
+-	return false;
+-}
+-
+ function PaletteEditListView< T extends Color | Gradient >( {
+ 	elements,
+ 	onChange,
+@@ -302,23 +276,6 @@ function PaletteEditListView< T extends Color | Gradient >( {
+ 	useEffect( () => {
+ 		elementsReference.current = elements;
+ 	}, [ elements ] );
+-	useEffect( () => {
+-		return () => {
+-			if (
+-				elementsReference.current?.some( ( element ) =>
+-					isTemporaryElement( slugPrefix, element )
+-				)
+-			) {
+-				const newElements = elementsReference.current.filter(
+-					( element ) => ! isTemporaryElement( slugPrefix, element )
+-				);
+-				onChange( newElements.length ? newElements : undefined );
+-			}
+-		};
+-		// Disable reason: adding the missing dependency here would cause breaking changes that will require
+-		// a heavier refactor to avoid. See https://github.com/WordPress/gutenberg/pull/43911
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+-	}, [] );
+ 
+ 	const debounceOnChange = useDebounce( onChange, 100 );
+ 
+@@ -474,7 +431,7 @@ export function PaletteEdit( {
+ 									: __( 'Add color' )
+ 							}
+ 							onClick={ () => {
+-								const tempOptionName = getNameForPosition(
++								const optionName = getNameForPosition(
+ 									elements,
+ 									slugPrefix
+ 								);
+@@ -484,10 +441,10 @@ export function PaletteEdit( {
+ 										...gradients,
+ 										{
+ 											gradient: DEFAULT_GRADIENT,
+-											name: tempOptionName,
++											name: optionName,
+ 											slug:
+ 												slugPrefix +
+-												kebabCase( tempOptionName ),
++												kebabCase( optionName ),
+ 										},
+ 									] );
+ 								} else {
+@@ -495,10 +452,10 @@ export function PaletteEdit( {
+ 										...colors,
+ 										{
+ 											color: DEFAULT_COLOR,
+-											name: tempOptionName,
++											name: optionName,
+ 											slug:
+ 												slugPrefix +
+-												kebabCase( tempOptionName ),
++												kebabCase( optionName ),
+ 										},
+ 									] );
+ 								}
+diff --git a/packages/components/src/palette-edit/test/index.tsx b/packages/components/src/palette-edit/test/index.tsx
+index 1a0b2fdaaab3fb..1bf2802709de7f 100644
+--- a/packages/components/src/palette-edit/test/index.tsx
++++ b/packages/components/src/palette-edit/test/index.tsx
+@@ -6,13 +6,8 @@ import { render, fireEvent, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import PaletteEdit, {
+-	getNameForPosition,
+-	isTemporaryElement,
+-	DEFAULT_COLOR,
+-} from '..';
++import PaletteEdit, { getNameForPosition } from '..';
+ import type { PaletteElement } from '../types';
+-import { DEFAULT_GRADIENT } from '../../custom-gradient-picker/constants';
+ 
+ describe( 'getNameForPosition', () => {
+ 	test( 'should return 1 by default', () => {
+@@ -85,75 +80,6 @@ describe( 'getNameForPosition', () => {
+ 	} );
+ } );
+ 
+-describe( 'isTemporaryElement', () => {
+-	[
+-		{
+-			message: 'identifies temporary color',
+-			slug: 'test-',
+-			obj: {
+-				name: '',
+-				slug: 'test-color-1',
+-				color: DEFAULT_COLOR,
+-			},
+-			expected: true,
+-		},
+-		{
+-			message: 'identifies temporary gradient',
+-			slug: 'test-',
+-			obj: {
+-				name: '',
+-				slug: 'test-color-1',
+-				gradient: DEFAULT_GRADIENT,
+-			},
+-			expected: true,
+-		},
+-		{
+-			message: 'identifies custom color slug',
+-			slug: 'test-',
+-			obj: {
+-				name: '',
+-				slug: 'test-color-happy',
+-				color: DEFAULT_COLOR,
+-			},
+-			expected: false,
+-		},
+-		{
+-			message: 'identifies custom color value',
+-			slug: 'test-',
+-			obj: {
+-				name: '',
+-				slug: 'test-color-1',
+-				color: '#ccc',
+-			},
+-			expected: false,
+-		},
+-		{
+-			message: 'identifies custom gradient slug',
+-			slug: 'test-',
+-			obj: {
+-				name: '',
+-				slug: 'test-gradient-joy',
+-				color: DEFAULT_GRADIENT,
+-			},
+-			expected: false,
+-		},
+-		{
+-			message: 'identifies custom gradient value',
+-			slug: 'test-',
+-			obj: {
+-				name: '',
+-				slug: 'test-color-3',
+-				color: 'linear-gradient(90deg, rgba(22, 22, 22, 1) 0%, rgb(155, 81, 224) 100%)',
+-			},
+-			expected: false,
+-		},
+-	].forEach( ( { message, slug, obj, expected } ) => {
+-		it( `should ${ message }`, () => {
+-			expect( isTemporaryElement( slug, obj ) ).toBe( expected );
+-		} );
+-	} );
+-} );
+-
+ describe( 'PaletteEdit', () => {
+ 	const defaultProps = {
+ 		colors: [ { color: '#ffffff', name: 'Base', slug: 'base' } ],

@@ -1,0 +1,123 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index cb132fbb3d7aba..e7072fe26e14f2 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -292,6 +292,7 @@ module.exports = {
+ 					...[
+ 						'CheckboxControl',
+ 						'ComboboxControl',
++						'DimensionControl',
+ 						'FocalPointPicker',
+ 						'RangeControl',
+ 						'SearchControl',
+diff --git a/packages/block-editor/src/components/responsive-block-control/README.md b/packages/block-editor/src/components/responsive-block-control/README.md
+index 1d99caa024a419..379e245f03ff37 100644
+--- a/packages/block-editor/src/components/responsive-block-control/README.md
++++ b/packages/block-editor/src/components/responsive-block-control/README.md
+@@ -64,6 +64,7 @@ registerBlockType( 'my-plugin/my-block', {
+ 		const paddingControl = ( labelComponent, viewport ) => {
+ 			return (
+ 				<DimensionControl
++					__nextHasNoMarginBottom
+ 					label={ viewport.label }
+ 					onChange={ // handle update to padding value here  }
+ 					value={ paddingSize }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 837fe973d1022a..b70a28818b83ac 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -   `SelectControl`: Infer `value` type from `options` ([#64069](https://github.com/WordPress/gutenberg/pull/64069)).
+ -   `Guide`: Add `__next40pxDefaultSize` to buttons ([#64181](https://github.com/WordPress/gutenberg/pull/64181)).
+ -   `SelectControl`: Pass through `options` props ([#64211](https://github.com/WordPress/gutenberg/pull/64211)).
++-   `DimensionControl`: Add `__nextHasNoMarginBottom` prop to remove bottom margin ([#64346](https://github.com/WordPress/gutenberg/pull/64346)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/dimension-control/README.md b/packages/components/src/dimension-control/README.md
+index 498322931b7ab6..42f4a9678c09a6 100644
+--- a/packages/components/src/dimension-control/README.md
++++ b/packages/components/src/dimension-control/README.md
+@@ -17,6 +17,7 @@ export default function MyCustomDimensionControl() {
+ 
+ 	return (
+ 		<DimensionControl
++			__nextHasNoMarginBottom
+ 			label={ 'Padding' }
+ 			icon={ 'desktop' }
+ 			onChange={ ( value ) => setPaddingSize( value ) }
+@@ -91,3 +92,11 @@ A callback which is triggered when a spacing size value changes (is selected/cli
+ -   **Required:** No
+ 
+ A string of classes to be added to the control component.
++
++### __nextHasNoMarginBottom
++
++Start opting into the new margin-free styles that will become the default in a future version.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
+diff --git a/packages/components/src/dimension-control/index.tsx b/packages/components/src/dimension-control/index.tsx
+index 8ba0de0ce0599c..114ebe987dd35d 100644
+--- a/packages/components/src/dimension-control/index.tsx
++++ b/packages/components/src/dimension-control/index.tsx
+@@ -31,6 +31,7 @@ import type { SelectControlSingleSelectionProps } from '../select-control/types'
+  *
+  * 	return (
+  * 		<DimensionControl
++ * 			__nextHasNoMarginBottom
+  * 			label={ 'Padding' }
+  * 			icon={ 'desktop' }
+  * 			onChange={ ( value ) => setPaddingSize( value ) }
+@@ -43,6 +44,7 @@ import type { SelectControlSingleSelectionProps } from '../select-control/types'
+ export function DimensionControl( props: DimensionControlProps ) {
+ 	const {
+ 		__next40pxDefaultSize = false,
++		__nextHasNoMarginBottom = false,
+ 		label,
+ 		value,
+ 		sizes = sizesTable,
+@@ -87,6 +89,7 @@ export function DimensionControl( props: DimensionControlProps ) {
+ 	return (
+ 		<SelectControl
+ 			__next40pxDefaultSize={ __next40pxDefaultSize }
++			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 			className={ clsx( className, 'block-editor-dimension-control' ) }
+ 			label={ selectLabel }
+ 			hideLabelFromVision={ false }
+diff --git a/packages/components/src/dimension-control/types.ts b/packages/components/src/dimension-control/types.ts
+index 671454f18c8a9b..03a4edf29153b7 100644
+--- a/packages/components/src/dimension-control/types.ts
++++ b/packages/components/src/dimension-control/types.ts
+@@ -2,6 +2,7 @@
+  * Internal dependencies
+  */
+ import type { IconType } from '../icon';
++import type { SelectControlProps } from '../select-control/types';
+ 
+ export type Size = {
+ 	/**
+@@ -14,7 +15,10 @@ export type Size = {
+ 	slug: string;
+ };
+ 
+-export type DimensionControlProps = {
++export type DimensionControlProps = Pick<
++	SelectControlProps,
++	'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
++> & {
+ 	/**
+ 	 * Label for the control.
+ 	 */
+@@ -45,10 +49,4 @@ export type DimensionControlProps = {
+ 	 * @default ''
+ 	 */
+ 	className?: string;
+-	/**
+-	 * Start opting into the larger default height that will become the default size in a future version.
+-	 *
+-	 * @default false
+-	 */
+-	__next40pxDefaultSize?: boolean;
+ };

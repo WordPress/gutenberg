@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 36da0a170273b9..4c101980238fb1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ ### Bug Fixes
+ 
+ -   `ToggleGroupControl`: Fix active background for empty string value ([#69969](https://github.com/WordPress/gutenberg/pull/69969)).
++-   `ItemGroup`: Fix double border in `ItemGroup` when last item is focused ([#70021](https://github.com/WordPress/gutenberg/pull/70021)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/item-group/styles.ts b/packages/components/src/item-group/styles.ts
+index a2d73c8dcfc592..e40598d383baf7 100644
+--- a/packages/components/src/item-group/styles.ts
++++ b/packages/components/src/item-group/styles.ts
+@@ -65,7 +65,7 @@ export const separated = css`
+ 		border-bottom: 1px solid ${ CONFIG.surfaceBorderColor };
+ 	}
+ 
+-	> *:last-of-type > *:not( :focus ) {
++	> *:last-of-type > * {
+ 		border-bottom-color: transparent;
+ 	}
+ `;
+diff --git a/packages/components/src/item-group/test/__snapshots__/index.js.snap b/packages/components/src/item-group/test/__snapshots__/index.js.snap
+index 4104a4bf5140c1..f1224e7096a244 100644
+--- a/packages/components/src/item-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/item-group/test/__snapshots__/index.js.snap
+@@ -115,7 +115,7 @@ Snapshot Diff:
+   <div>
+     <div
+ -     class="components-item-group css-1iattls-PolymorphicDiv-rounded e19lxcc00"
+-+     class="components-item-group css-zgfros-PolymorphicDiv-separated-rounded e19lxcc00"
+++     class="components-item-group css-1hvp0tq-PolymorphicDiv-separated-rounded e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="ItemGroup"
+       role="list"

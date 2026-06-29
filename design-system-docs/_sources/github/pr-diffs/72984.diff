@@ -1,0 +1,1204 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index b40f03889c70ee..680dc37623b282 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -2015,6 +2015,12 @@
+ 		"markdown_source": "../packages/token-list/README.md",
+ 		"parent": "packages"
+ 	},
++	{
++		"title": "@wordpress/ui",
++		"slug": "packages-ui",
++		"markdown_source": "../packages/ui/README.md",
++		"parent": "packages"
++	},
+ 	{
+ 		"title": "@wordpress/undo-manager",
+ 		"slug": "packages-undo-manager",
+diff --git a/package-lock.json b/package-lock.json
+index 725fd8d26c97b8..c58003e1c2ce10 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -17629,6 +17629,10 @@
+ 			"resolved": "packages/token-list",
+ 			"link": true
+ 		},
++		"node_modules/@wordpress/ui": {
++			"resolved": "packages/ui",
++			"link": true
++		},
+ 		"node_modules/@wordpress/undo-manager": {
+ 			"resolved": "packages/undo-manager",
+ 			"link": true
+@@ -55085,6 +55089,26 @@
+ 				"npm": ">=8.19.2"
+ 			}
+ 		},
++		"packages/ui": {
++			"name": "@wordpress/ui",
++			"version": "0.1.0",
++			"license": "GPL-2.0-or-later",
++			"dependencies": {
++				"@wordpress/element": "file:../element",
++				"@wordpress/private-apis": "file:../private-apis"
++			},
++			"devDependencies": {
++				"@wordpress/theme": "file:../theme"
++			},
++			"engines": {
++				"node": ">=20.10.0",
++				"npm": ">=10.2.3"
++			},
++			"peerDependencies": {
++				"react": "^18.0.0",
++				"react-dom": "^18.0.0"
++			}
++		},
+ 		"packages/undo-manager": {
+ 			"name": "@wordpress/undo-manager",
+ 			"version": "1.34.0",
+diff --git a/packages/theme/docs/ds-tokens.md b/packages/theme/docs/ds-tokens.md
+index 56abd82f8af33a..e925354333465e 100644
+--- a/packages/theme/docs/ds-tokens.md
++++ b/packages/theme/docs/ds-tokens.md
+@@ -109,6 +109,16 @@ Do not edit directly.
+ | `--wpds-color-stroke-interactive-error-strong`        | Accessible stroke color used for interactive error-toned elements with strong emphasis.                                                     |
+ | `--wpds-color-stroke-focus-brand`                     | Accessible stroke color applied to focus rings.                                                                                             |
+ 
++### Dimension
++
++| Variable name                              | Description                      |
++| ------------------------------------------ | -------------------------------- |
++| `--wpds-dimension-base`                    | Base dimension unit              |
++| `--wpds-dimension-padding-surface-x-small` | Extra small spacing for surfaces |
++| `--wpds-dimension-padding-surface-small`   | Small spacing for surfaces       |
++| `--wpds-dimension-padding-surface-medium`  | Medium spacing for surfaces      |
++| `--wpds-dimension-padding-surface-large`   | Large spacing for surfaces       |
++
+ ### Elevation
+ 
+ | Variable name              | Description                                                                                                                       |
+@@ -118,21 +128,6 @@ Do not edit directly.
+ | `--wpds-elevation-medium`  | For components that offer additional actions. Example: Menus, Command Palette                                                     |
+ | `--wpds-elevation-large`   | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
+ 
+-### Spacing
+-
+-| Variable name       | Description         |
+-| ------------------- | ------------------- |
+-| `--wpds-spacing-05` | Extra small spacing |
+-| `--wpds-spacing-10` | Small spacing       |
+-| `--wpds-spacing-15` | Medium spacing      |
+-| `--wpds-spacing-20` | Large spacing       |
+-| `--wpds-spacing-30` | Extra large spacing |
+-| `--wpds-spacing-40` | 2X large spacing    |
+-| `--wpds-spacing-50` | 3X large spacing    |
+-| `--wpds-spacing-60` | 4X large spacing    |
+-| `--wpds-spacing-70` | 5X large spacing    |
+-| `--wpds-spacing-80` | 6X large spacing    |
+-
+ ### Typography
+ 
+ | Variable name                      | Description             |
+@@ -315,3 +310,18 @@ Do not edit directly.
+ | `--wpds-color-private-caution-bg-fill-inverted1` | N/A         |
+ | `--wpds-color-private-caution-fg-fill-inverted`  | N/A         |
+ | `--wpds-color-private-caution-surface1`          | N/A         |
++
++### Dimension (private)
++
++| Variable name                       | Description      |
++| ----------------------------------- | ---------------- |
++| `--wpds-dimension-private-space-0`  | Empty space      |
++| `--wpds-dimension-private-space-10` | 1x base spacing  |
++| `--wpds-dimension-private-space-20` | 2x base spacing  |
++| `--wpds-dimension-private-space-30` | 3x base spacing  |
++| `--wpds-dimension-private-space-40` | 4x base spacing  |
++| `--wpds-dimension-private-space-50` | 5x base spacing  |
++| `--wpds-dimension-private-space-60` | 6x base spacing  |
++| `--wpds-dimension-private-space-70` | 8x base spacing  |
++| `--wpds-dimension-private-space-80` | 10x base spacing |
++| `--wpds-dimension-private-space-90` | 12x base spacing |
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 21eecd8b8e3dc4..0c630367d0d09f 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -415,6 +415,31 @@
+ 	--wpds-color-stroke-surface-warning-strong: var(
+ 		--wpds-color-private-warning-stroke3
+ 	); /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
++	--wpds-dimension-base: var(
++		--wpds-dimension-private-space-10
++	); /* Base dimension unit */
++	--wpds-dimension-padding-surface-large: var(
++		--wpds-dimension-private-space-60
++	); /* Large spacing for surfaces */
++	--wpds-dimension-padding-surface-medium: var(
++		--wpds-dimension-private-space-40
++	); /* Medium spacing for surfaces */
++	--wpds-dimension-padding-surface-small: var(
++		--wpds-dimension-private-space-30
++	); /* Small spacing for surfaces */
++	--wpds-dimension-padding-surface-x-small: var(
++		--wpds-dimension-private-space-20
++	); /* Extra small spacing for surfaces */
++	--wpds-dimension-private-space-0: 0; /* Empty space */
++	--wpds-dimension-private-space-10: 4px; /* 1x base spacing */
++	--wpds-dimension-private-space-20: 8px; /* 2x base spacing */
++	--wpds-dimension-private-space-30: 12px; /* 3x base spacing */
++	--wpds-dimension-private-space-40: 16px; /* 4x base spacing */
++	--wpds-dimension-private-space-50: 20px; /* 5x base spacing */
++	--wpds-dimension-private-space-60: 24px; /* 6x base spacing */
++	--wpds-dimension-private-space-70: 32px; /* 8x base spacing */
++	--wpds-dimension-private-space-80: 40px; /* 10x base spacing */
++	--wpds-dimension-private-space-90: 48px; /* 12x base spacing */
+ 	--wpds-elevation-large: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
+ 		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005; /* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
+ 	--wpds-elevation-medium: 0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a,
+@@ -440,16 +465,6 @@
+ 	--wpds-font-size-small: 12px; /* Small font size */
+ 	--wpds-font-size-x-large: 20px; /* Extra large font size */
+ 	--wpds-font-size-x-small: 11px; /* Extra small font size */
+-	--wpds-spacing-05: 4px; /* Extra small spacing */
+-	--wpds-spacing-10: 8px; /* Small spacing */
+-	--wpds-spacing-15: 12px; /* Medium spacing */
+-	--wpds-spacing-20: 16px; /* Large spacing */
+-	--wpds-spacing-30: 24px; /* Extra large spacing */
+-	--wpds-spacing-40: 32px; /* 2X large spacing */
+-	--wpds-spacing-50: 40px; /* 3X large spacing */
+-	--wpds-spacing-60: 48px; /* 4X large spacing */
+-	--wpds-spacing-70: 56px; /* 5X large spacing */
+-	--wpds-spacing-80: 64px; /* 6X large spacing */
+ }
+ 
+ @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.js b/packages/theme/src/prebuilt/js/design-tokens.js
+index 36b846676ef985..8cf736c9760a6c 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.js
++++ b/packages/theme/src/prebuilt/js/design-tokens.js
+@@ -96,20 +96,15 @@ export default [
+ 	'--wpds-color-stroke-interactive-brand-disabled',
+ 	'--wpds-color-stroke-interactive-error-strong',
+ 	'--wpds-color-stroke-focus-brand',
++	'--wpds-dimension-base',
++	'--wpds-dimension-padding-surface-x-small',
++	'--wpds-dimension-padding-surface-small',
++	'--wpds-dimension-padding-surface-medium',
++	'--wpds-dimension-padding-surface-large',
+ 	'--wpds-elevation-x-small',
+ 	'--wpds-elevation-small',
+ 	'--wpds-elevation-medium',
+ 	'--wpds-elevation-large',
+-	'--wpds-spacing-05',
+-	'--wpds-spacing-10',
+-	'--wpds-spacing-15',
+-	'--wpds-spacing-20',
+-	'--wpds-spacing-30',
+-	'--wpds-spacing-40',
+-	'--wpds-spacing-50',
+-	'--wpds-spacing-60',
+-	'--wpds-spacing-70',
+-	'--wpds-spacing-80',
+ 	'--wpds-font-family-heading',
+ 	'--wpds-font-family-body',
+ 	'--wpds-font-family-mono',
+diff --git a/packages/theme/src/prebuilt/json/figma.json b/packages/theme/src/prebuilt/json/figma.json
+index d4ae0a7c44d25c..98eb147925d880 100644
+--- a/packages/theme/src/prebuilt/json/figma.json
++++ b/packages/theme/src/prebuilt/json/figma.json
+@@ -1322,89 +1322,119 @@
+ 		},
+ 		"description": "Accessible stroke color applied to focus rings."
+ 	},
+-	"Elevation/x-small": {
++	"Dimension/_Primitives/space-0": {
+ 		"value": {
+-			".": "0 1px 1px 0 color(srgb 0 0 0 / 0.03), 0 1px 2px 0 color(srgb 0 0 0 / 0.02), 0 3px 3px 0 color(srgb 0 0 0 / 0.02), 0 4px 4px 0 color(srgb 0 0 0 / 0.01)"
++			".": "0"
+ 		},
+-		"description": "For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame."
++		"description": "Empty space"
+ 	},
+-	"Elevation/small": {
++	"Dimension/_Primitives/space-10": {
+ 		"value": {
+-			".": "0 1px 2px 0 color(srgb 0 0 0 / 0.05), 0 2px 3px 0 color(srgb 0 0 0 / 0.04), 0 6px 6px 0 color(srgb 0 0 0 / 0.03), 0 8px 8px 0 color(srgb 0 0 0 / 0.02)"
++			".": "4px"
+ 		},
+-		"description": "For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar."
++		"description": "1x base spacing"
+ 	},
+-	"Elevation/medium": {
++	"Dimension/_Primitives/space-20": {
+ 		"value": {
+-			".": "0 2px 3px 0 color(srgb 0 0 0 / 0.05), 0 4px 5px 0 color(srgb 0 0 0 / 0.04), 0 12px 12px 0 color(srgb 0 0 0 / 0.03), 0 16px 16px 0 color(srgb 0 0 0 / 0.02)"
++			".": "8px"
+ 		},
+-		"description": "For components that offer additional actions. Example: Menus, Command Palette"
++		"description": "2x base spacing"
+ 	},
+-	"Elevation/large": {
++	"Dimension/_Primitives/space-30": {
+ 		"value": {
+-			".": "0 5px 15px 0 color(srgb 0 0 0 / 0.08), 0 15px 27px 0 color(srgb 0 0 0 / 0.07), 0 30px 36px 0 color(srgb 0 0 0 / 0.04), 0 50px 43px 0 color(srgb 0 0 0 / 0.02)"
++			".": "12px"
+ 		},
+-		"description": "For components that confirm decisions or handle necessary interruptions. Example: Modals."
++		"description": "3x base spacing"
+ 	},
+-	"Spacing/05": {
++	"Dimension/_Primitives/space-40": {
+ 		"value": {
+-			".": "4px"
++			".": "16px"
+ 		},
+-		"description": "Extra small spacing"
++		"description": "4x base spacing"
+ 	},
+-	"Spacing/10": {
++	"Dimension/_Primitives/space-50": {
+ 		"value": {
+-			".": "8px"
++			".": "20px"
+ 		},
+-		"description": "Small spacing"
++		"description": "5x base spacing"
+ 	},
+-	"Spacing/15": {
++	"Dimension/_Primitives/space-60": {
+ 		"value": {
+-			".": "12px"
++			".": "24px"
+ 		},
+-		"description": "Medium spacing"
++		"description": "6x base spacing"
+ 	},
+-	"Spacing/20": {
++	"Dimension/_Primitives/space-70": {
+ 		"value": {
+-			".": "16px"
++			".": "32px"
+ 		},
+-		"description": "Large spacing"
++		"description": "8x base spacing"
+ 	},
+-	"Spacing/30": {
++	"Dimension/_Primitives/space-80": {
+ 		"value": {
+-			".": "24px"
++			".": "40px"
+ 		},
+-		"description": "Extra large spacing"
++		"description": "10x base spacing"
+ 	},
+-	"Spacing/40": {
++	"Dimension/_Primitives/space-90": {
+ 		"value": {
+-			".": "32px"
++			".": "48px"
+ 		},
+-		"description": "2X large spacing"
++		"description": "12x base spacing"
+ 	},
+-	"Spacing/50": {
++	"Dimension/Semantic/base": {
+ 		"value": {
+-			".": "40px"
++			".": "{Dimension/_Primitives/space-10}"
+ 		},
+-		"description": "3X large spacing"
++		"description": "Base dimension unit"
+ 	},
+-	"Spacing/60": {
++	"Dimension/Semantic/padding-surface-x-small": {
+ 		"value": {
+-			".": "48px"
++			".": "{Dimension/_Primitives/space-20}"
++		},
++		"description": "Extra small spacing for surfaces"
++	},
++	"Dimension/Semantic/padding-surface-small": {
++		"value": {
++			".": "{Dimension/_Primitives/space-30}"
++		},
++		"description": "Small spacing for surfaces"
++	},
++	"Dimension/Semantic/padding-surface-medium": {
++		"value": {
++			".": "{Dimension/_Primitives/space-40}"
++		},
++		"description": "Medium spacing for surfaces"
++	},
++	"Dimension/Semantic/padding-surface-large": {
++		"value": {
++			".": "{Dimension/_Primitives/space-60}"
++		},
++		"description": "Large spacing for surfaces"
++	},
++	"Elevation/x-small": {
++		"value": {
++			".": "0 1px 1px 0 color(srgb 0 0 0 / 0.03), 0 1px 2px 0 color(srgb 0 0 0 / 0.02), 0 3px 3px 0 color(srgb 0 0 0 / 0.02), 0 4px 4px 0 color(srgb 0 0 0 / 0.01)"
++		},
++		"description": "For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame."
++	},
++	"Elevation/small": {
++		"value": {
++			".": "0 1px 2px 0 color(srgb 0 0 0 / 0.05), 0 2px 3px 0 color(srgb 0 0 0 / 0.04), 0 6px 6px 0 color(srgb 0 0 0 / 0.03), 0 8px 8px 0 color(srgb 0 0 0 / 0.02)"
+ 		},
+-		"description": "4X large spacing"
++		"description": "For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar."
+ 	},
+-	"Spacing/70": {
++	"Elevation/medium": {
+ 		"value": {
+-			".": "56px"
++			".": "0 2px 3px 0 color(srgb 0 0 0 / 0.05), 0 4px 5px 0 color(srgb 0 0 0 / 0.04), 0 12px 12px 0 color(srgb 0 0 0 / 0.03), 0 16px 16px 0 color(srgb 0 0 0 / 0.02)"
+ 		},
+-		"description": "5X large spacing"
++		"description": "For components that offer additional actions. Example: Menus, Command Palette"
+ 	},
+-	"Spacing/80": {
++	"Elevation/large": {
+ 		"value": {
+-			".": "64px"
++			".": "0 5px 15px 0 color(srgb 0 0 0 / 0.08), 0 15px 27px 0 color(srgb 0 0 0 / 0.07), 0 30px 36px 0 color(srgb 0 0 0 / 0.04), 0 50px 43px 0 color(srgb 0 0 0 / 0.02)"
+ 		},
+-		"description": "6X large spacing"
++		"description": "For components that confirm decisions or handle necessary interruptions. Example: Modals."
+ 	},
+ 	"Font/family-heading": {
+ 		"value": {
+diff --git a/packages/theme/src/prebuilt/ts/design-tokens.ts b/packages/theme/src/prebuilt/ts/design-tokens.ts
+index ba5eb6def00f5a..9ac3a429bbef0a 100644
+--- a/packages/theme/src/prebuilt/ts/design-tokens.ts
++++ b/packages/theme/src/prebuilt/ts/design-tokens.ts
+@@ -281,6 +281,21 @@ export default {
+ 	'--wpds-color-stroke-focus-brand': {
+ 		'.': 'var(--wpds-color-private-primary-stroke3)',
+ 	},
++	'--wpds-dimension-base': {
++		'.': 'var(--wpds-dimension-private-space-10)',
++	},
++	'--wpds-dimension-padding-surface-x-small': {
++		'.': 'var(--wpds-dimension-private-space-20)',
++	},
++	'--wpds-dimension-padding-surface-small': {
++		'.': 'var(--wpds-dimension-private-space-30)',
++	},
++	'--wpds-dimension-padding-surface-medium': {
++		'.': 'var(--wpds-dimension-private-space-40)',
++	},
++	'--wpds-dimension-padding-surface-large': {
++		'.': 'var(--wpds-dimension-private-space-60)',
++	},
+ 	'--wpds-elevation-x-small': {
+ 		'.': '0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005, 0 3px 3px 0 #00000005, 0 4px 4px 0 #00000003',
+ 	},
+@@ -293,36 +308,6 @@ export default {
+ 	'--wpds-elevation-large': {
+ 		'.': '0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012, 0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005',
+ 	},
+-	'--wpds-spacing-05': {
+-		'.': '4px',
+-	},
+-	'--wpds-spacing-10': {
+-		'.': '8px',
+-	},
+-	'--wpds-spacing-15': {
+-		'.': '12px',
+-	},
+-	'--wpds-spacing-20': {
+-		'.': '16px',
+-	},
+-	'--wpds-spacing-30': {
+-		'.': '24px',
+-	},
+-	'--wpds-spacing-40': {
+-		'.': '32px',
+-	},
+-	'--wpds-spacing-50': {
+-		'.': '40px',
+-	},
+-	'--wpds-spacing-60': {
+-		'.': '48px',
+-	},
+-	'--wpds-spacing-70': {
+-		'.': '56px',
+-	},
+-	'--wpds-spacing-80': {
+-		'.': '64px',
+-	},
+ 	'--wpds-font-family-heading': {
+ 		'.': '-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
+ 	},
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index f2b6759ea2fcb9..1c43cf1c5becba 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -15,8 +15,8 @@ export default defineConfig( {
+ 	tokens: [
+ 		'./tokens/border.json',
+ 		'./tokens/color.json',
++		'./tokens/dimension.json',
+ 		'./tokens/elevation.json',
+-		'./tokens/spacing.json',
+ 		'./tokens/typography.json',
+ 	],
+ 	outDir: './src/prebuilt',
+diff --git a/packages/theme/tokens/dimension.json b/packages/theme/tokens/dimension.json
+new file mode 100644
+index 00000000000000..3a1f5edc1897af
+--- /dev/null
++++ b/packages/theme/tokens/dimension.json
+@@ -0,0 +1,75 @@
++{
++	"dimension": {
++		"$type": "dimension",
++		"primitive": {
++			"space": {
++				"0": {
++					"$value": { "value": 0, "unit": "px" },
++					"$description": "Empty space"
++				},
++				"10": {
++					"$value": { "value": 4, "unit": "px" },
++					"$description": "1x base spacing"
++				},
++				"20": {
++					"$value": { "value": 8, "unit": "px" },
++					"$description": "2x base spacing"
++				},
++				"30": {
++					"$value": { "value": 12, "unit": "px" },
++					"$description": "3x base spacing"
++				},
++				"40": {
++					"$value": { "value": 16, "unit": "px" },
++					"$description": "4x base spacing"
++				},
++				"50": {
++					"$value": { "value": 20, "unit": "px" },
++					"$description": "5x base spacing"
++				},
++				"60": {
++					"$value": { "value": 24, "unit": "px" },
++					"$description": "6x base spacing"
++				},
++				"70": {
++					"$value": { "value": 32, "unit": "px" },
++					"$description": "8x base spacing"
++				},
++				"80": {
++					"$value": { "value": 40, "unit": "px" },
++					"$description": "10x base spacing"
++				},
++				"90": {
++					"$value": { "value": 48, "unit": "px" },
++					"$description": "12x base spacing"
++				}
++			}
++		},
++		"semantic": {
++			"base": {
++				"$value": "{dimension.primitive.space.10}",
++				"$description": "Base dimension unit"
++			},
++			"padding": {
++				"surface": {
++					"x-small": {
++						"$value": "{dimension.primitive.space.20}",
++						"$description": "Extra small spacing for surfaces"
++					},
++					"small": {
++						"$value": "{dimension.primitive.space.30}",
++						"$description": "Small spacing for surfaces"
++					},
++					"medium": {
++						"$value": "{dimension.primitive.space.40}",
++						"$description": "Medium spacing for surfaces"
++					},
++					"large": {
++						"$value": "{dimension.primitive.space.60}",
++						"$description": "Large spacing for surfaces"
++					}
++				}
++			}
++		}
++	}
++}
+diff --git a/packages/theme/tokens/spacing.json b/packages/theme/tokens/spacing.json
+deleted file mode 100644
+index 55198fe2257385..00000000000000
+--- a/packages/theme/tokens/spacing.json
++++ /dev/null
+@@ -1,45 +0,0 @@
+-{
+-	"spacing": {
+-		"$type": "dimension",
+-		"05": {
+-			"$value": { "value": 4, "unit": "px" },
+-			"$description": "Extra small spacing"
+-		},
+-		"10": {
+-			"$value": { "value": 8, "unit": "px" },
+-			"$description": "Small spacing"
+-		},
+-		"15": {
+-			"$value": { "value": 12, "unit": "px" },
+-			"$description": "Medium spacing"
+-		},
+-		"20": {
+-			"$value": { "value": 16, "unit": "px" },
+-			"$description": "Large spacing"
+-		},
+-		"30": {
+-			"$value": { "value": 24, "unit": "px" },
+-			"$description": "Extra large spacing"
+-		},
+-		"40": {
+-			"$value": { "value": 32, "unit": "px" },
+-			"$description": "2X large spacing"
+-		},
+-		"50": {
+-			"$value": { "value": 40, "unit": "px" },
+-			"$description": "3X large spacing"
+-		},
+-		"60": {
+-			"$value": { "value": 48, "unit": "px" },
+-			"$description": "4X large spacing"
+-		},
+-		"70": {
+-			"$value": { "value": 56, "unit": "px" },
+-			"$description": "5X large spacing"
+-		},
+-		"80": {
+-			"$value": { "value": 64, "unit": "px" },
+-			"$description": "6X large spacing"
+-		}
+-	}
+-}
+diff --git a/packages/ui/CONTRIBUTING.md b/packages/ui/CONTRIBUTING.md
+new file mode 100644
+index 00000000000000..1454c0d0225cbc
+--- /dev/null
++++ b/packages/ui/CONTRIBUTING.md
+@@ -0,0 +1,27 @@
++# Contributing
++
++The following guidance builds upon the existing [contribution guidelines for `@wordpress/components`](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/CONTRIBUTING.md), which should serve as a starting point for contribution. The documentation included here encodes decisions and technical approaches which are unique to this package.
++
++## Folder Structure
++
++Each component should be organized within its own folder under `src/` following this pattern:
++
++```text
++src/
++└── component-name/
++    ├── index.ts            // Contains only exported public API
++    ├── component-name.tsx  // Main component matching the folder name (when applicable)
++    ├── other-component.tsx // Any other ancillary / compound components
++    ├── types.ts            // TypeScript type definitions for all components in this folder
++    ├── style.module.css    // Styles for all components in this folder
++    ├── stories/
++    │   ├── *.mdx           // Storybook documentation files (optional)
++    │   └── index.story.tsx // Storybook stories for all components in this folder
++    └── test/
++        └── component-name.test.tsx // Tests for base component and all compound components
++```
++
++### Folder Structure Guidelines
++
++-   The folder name should match the primary component name
++-   The `index.ts` file should contain only the public API exports for the component(s)
+diff --git a/packages/ui/README.md b/packages/ui/README.md
+new file mode 100644
+index 00000000000000..c47de27f852440
+--- /dev/null
++++ b/packages/ui/README.md
+@@ -0,0 +1,82 @@
++# (Experimental) UI
++
++A package that provides React UI components for the WordPress Design System, built on themeable design tokens.
++
++While similar in scope to `@wordpress/components`, there are a few key differences:
++
++-   `@wordpress/components` grew organically as a collection of unrelated UI elements for WordPress screens. In contrast, this package is an implementation of a design system that guarantees user- and developer-facing cohesion between components.
++-   Unlike `@wordpress/components`, this package is not bundled as a WordPress script available on the `window.wp` global and is instead distributed as an npm package that follows [semantic versioning](https://semver.org/) for release changes.
++
++This is a companion to the `@wordpress/theme` package that provides:
++
++-   **Design Tokens**: A comprehensive system of design tokens for colors, spacing, typography, and more
++-   **Theme System**: A flexible theming provider for consistent theming across applications
++
++## Usage
++
++### Basic Component Usage
++
++```tsx
++import { Box } from '@wordpress/ui';
++
++function MyComponent() {
++	return (
++		<Box background="neutral" padding="small">
++			Hello World
++		</Box>
++	);
++}
++```
++
++## Core Design Principles
++
++All components in the design system follow consistent patterns for maximum flexibility and developer experience:
++
++### Custom Rendering
++
++Every component supports the `render` prop for complete control over the underlying HTML element:
++
++```tsx
++import { Box } from '@wordpress/ui';
++
++function MyComponent() {
++	// Render Box as a <span /> instead of the default <div />
++	return <Box render={ <span /> }>{ /* ... */ }</Box>;
++}
++```
++
++### Ref Forwarding
++
++All components forward refs to their underlying DOM elements:
++
++```tsx
++import { useRef } from '@wordpress/element';
++import { Box } from '@wordpress/ui';
++
++function MyComponent() {
++	const boxRef = useRef< HTMLDivElement >( null );
++
++	return <Box ref={ boxRef }>{ /* ... */ }</Box>;
++}
++```
++
++### Automatic `className` Merging
++
++Components merge provided `className` props with their internal styles:
++
++```tsx
++import { Box } from '@wordpress/ui';
++
++function MyComponent() {
++	// Your custom CSS className is merged with component styles
++	return <Box className="my-custom-class">{ /* ... */ }</Box>;
++}
++```
++
++## Contributing to this package
++
++This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
++
++To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
++
++<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+new file mode 100644
+index 00000000000000..a92adbe5b5a741
+--- /dev/null
++++ b/packages/ui/package.json
+@@ -0,0 +1,49 @@
++{
++	"name": "@wordpress/ui",
++	"version": "0.1.0",
++	"description": "Themeable React UI components for the WordPress Design System.",
++	"author": "The WordPress Contributors",
++	"license": "GPL-2.0-or-later",
++	"keywords": [
++		"wordpress",
++		"gutenberg",
++		"components"
++	],
++	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/ui/README.md",
++	"repository": {
++		"type": "git",
++		"url": "git+https://github.com/WordPress/gutenberg.git",
++		"directory": "packages/ui"
++	},
++	"bugs": {
++		"url": "https://github.com/WordPress/gutenberg/issues"
++	},
++	"engines": {
++		"node": ">=20.10.0",
++		"npm": ">=10.2.3"
++	},
++	"exports": {
++		".": {
++			"types": "./build-types/index.d.ts",
++			"import": "./build-module/index.js",
++			"default": "./build/index.js"
++		},
++		"./package.json": "./package.json"
++	},
++	"wpScript": false,
++	"sideEffects": false,
++	"dependencies": {
++		"@wordpress/element": "file:../element",
++		"@wordpress/private-apis": "file:../private-apis"
++	},
++	"devDependencies": {
++		"@wordpress/theme": "file:../theme"
++	},
++	"peerDependencies": {
++		"react": "^18.0.0",
++		"react-dom": "^18.0.0"
++	},
++	"publishConfig": {
++		"access": "public"
++	}
++}
+diff --git a/packages/ui/src/box/box.tsx b/packages/ui/src/box/box.tsx
+new file mode 100644
+index 00000000000000..c1a139baae90f9
+--- /dev/null
++++ b/packages/ui/src/box/box.tsx
+@@ -0,0 +1,113 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { type BoxProps } from './types';
++import { renderElement } from '../utils/element';
++
++/**
++ * Default render function that renders a div element with the given props.
++ *
++ * @param props The props to apply to the HTML element.
++ */
++const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'div' > ) => (
++	<div { ...props } />
++);
++
++/**
++ * Capitalizes the first character of a string.
++ *
++ * @param str The string to capitalize.
++ * @return The capitalized string.
++ */
++const capitalize = ( str: string ): string =>
++	str.charAt( 0 ).toUpperCase() + str.slice( 1 );
++
++/**
++ * Converts a size value to a CSS design token property reference (with
++ * fallback) or a calculated value based on the base unit.
++ *
++ * @param property The CSS property name.
++ * @param target   The design system token target.
++ * @param value    The size value, either a number (multiplier of base unit) or a string (token name).
++ * @return A CSS value string with variable references.
++ */
++const getSpacingValue = (
++	property: string,
++	target: string,
++	value: number | string
++): string =>
++	typeof value === 'number'
++		? `calc(var(--wpds-dimension-base) * ${ value })`
++		: `var(--wpds-dimension-${ property }-${ target }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
++
++/**
++ * Generates CSS styles for properties with optionally directional values,
++ * normalizing single values and objects with directional keys for logical
++ * properties.
++ *
++ * @param property The CSS property name from BoxProps.
++ * @param target   The design system token target.
++ * @param value    The property value (single or object with directional keys).
++ * @return A CSSProperties object with the computed styles.
++ */
++const getDimensionVariantStyles = < T extends keyof BoxProps >(
++	property: T,
++	target: string,
++	value: NonNullable< BoxProps[ T ] >
++): React.CSSProperties =>
++	typeof value !== 'object'
++		? { [ property ]: getSpacingValue( property, target, value ) }
++		: Object.keys( value ).reduce(
++				( result, key ) => ( {
++					...result,
++					[ property + capitalize( key ) ]: getSpacingValue(
++						property,
++						target,
++						value[ key ]
++					),
++				} ),
++				{} as Record< string, string >
++		  );
++
++/**
++ * A low-level visual primitive that provides an interface for applying design
++ * token-based customization for background, text, padding, and more.
++ */
++export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
++	{
++		target = 'surface',
++		backgroundColor,
++		color,
++		padding,
++		bg = backgroundColor,
++		fg = color,
++		p = padding,
++		render = DEFAULT_RENDER,
++		...props
++	},
++	ref
++) {
++	const style: React.CSSProperties = {};
++
++	if ( bg ) {
++		style.backgroundColor = `var(--wpds-color-bg-${ target }-${ bg }, var(--wpds-color-bg-surface-${ bg }))`;
++	}
++
++	if ( fg ) {
++		style.color = `var(--wpds-color-fg-${ target }-${ fg }, var(--wpds-color-fg-content-${ fg }))`;
++	}
++
++	if ( p ) {
++		Object.assign(
++			style,
++			getDimensionVariantStyles( 'padding', target, p )
++		);
++	}
++
++	return renderElement< 'div' >( render, { style, ...props }, ref );
++} );
+diff --git a/packages/ui/src/box/index.ts b/packages/ui/src/box/index.ts
+new file mode 100644
+index 00000000000000..aae32603581ca3
+--- /dev/null
++++ b/packages/ui/src/box/index.ts
+@@ -0,0 +1 @@
++export { Box } from './box';
+diff --git a/packages/ui/src/box/stories/index.story.tsx b/packages/ui/src/box/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..fbfcb421be2469
+--- /dev/null
++++ b/packages/ui/src/box/stories/index.story.tsx
+@@ -0,0 +1,66 @@
++/**
++ * External dependencies
++ */
++import { type Meta, type StoryObj } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { privateApis } from '@wordpress/theme';
++import '@wordpress/theme/design-tokens.css'; // eslint-disable-line no-restricted-syntax
++
++/**
++ * Internal dependencies
++ */
++import { Box } from '../box';
++import { unlock } from '../../lock-unlock';
++
++const { ThemeProvider } = unlock( privateApis );
++
++const meta: Meta< typeof Box > = {
++	title: 'Design System/Components/Box',
++	component: Box,
++	decorators: [
++		( Story ) => (
++			<ThemeProvider>
++				<Story />
++			</ThemeProvider>
++		),
++	],
++	tags: [ 'status-experimental' ],
++};
++export default meta;
++
++type Story = StoryObj< typeof Box >;
++
++export const Default: Story = {
++	args: {
++		children: 'Box',
++		backgroundColor: 'info',
++		color: 'info',
++		padding: 4,
++	},
++	argTypes: {
++		p: {
++			control: 'select',
++			options: [ 'x-small', 'small', 'medium', 'large', 1, 2, 3, 4 ],
++		},
++		padding: {
++			control: 'select',
++			options: [ 'x-small', 'small', 'medium', 'large', 1, 2, 3, 4 ],
++		},
++	},
++};
++
++export const DirectionalPadding: Story = {
++	args: {
++		children: 'Box',
++		backgroundColor: 'info',
++		color: 'info',
++		padding: {
++			blockStart: 'small',
++			inline: 'medium',
++			blockEnd: 'large',
++		},
++	},
++};
+diff --git a/packages/ui/src/box/types.ts b/packages/ui/src/box/types.ts
+new file mode 100644
+index 00000000000000..96716a8330119d
+--- /dev/null
++++ b/packages/ui/src/box/types.ts
+@@ -0,0 +1,95 @@
++/**
++ * Internal dependencies
++ */
++import { type ComponentProps } from '../utils/types';
++
++type SizeToken = 'x-small' | 'small' | 'medium' | 'large';
++
++type Size = number | SizeToken;
++
++type BackgroundColor =
++	| 'neutral'
++	| 'neutral-strong'
++	| 'neutral-weak'
++	| 'brand'
++	| 'success'
++	| 'success-weak'
++	| 'info'
++	| 'info-weak'
++	| 'warning'
++	| 'warning-weak'
++	| 'caution'
++	| 'caution-weak'
++	| 'error'
++	| 'error-weak';
++
++type ForegroundColor =
++	| 'neutral'
++	| 'neutral-weak'
++	| 'success'
++	| 'success-weak'
++	| 'info'
++	| 'info-weak'
++	| 'warning'
++	| 'warning-weak'
++	| 'caution'
++	| 'caution-weak'
++	| 'error'
++	| 'error-weak';
++
++type DimensionVariant< T > = {
++	block?: T;
++	blockStart?: T;
++	blockEnd?: T;
++	inline?: T;
++	inlineStart?: T;
++	inlineEnd?: T;
++};
++
++export interface BoxProps extends ComponentProps< 'div' > {
++	/**
++	 * The target rendering element design token grouping to use for the box.
++	 */
++	target?: string;
++
++	/**
++	 * The surface background design token for box background color.
++	 *
++	 * Shorthand for `backgroundColor`.
++	 */
++	bg?: BackgroundColor;
++
++	/**
++	 * The surface background design token for box background color.
++	 */
++	backgroundColor?: BackgroundColor;
++
++	/**
++	 * The surface foreground design token for box text color.
++	 *
++	 * Shorthand for `color`.
++	 */
++	fg?: ForegroundColor;
++
++	/**
++	 * The surface foreground design token for box text color.
++	 */
++	color?: ForegroundColor;
++
++	/**
++	 * The surface spacing design token or base unit multiplier for box padding.
++	 *
++	 * Shorthand for `padding`.
++	 */
++	p?: Size | DimensionVariant< Size >;
++
++	/**
++	 * The surface spacing design token or base unit multiplier for box padding.
++	 */
++	padding?: Size | DimensionVariant< Size >;
++
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: React.ReactNode;
++}
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+new file mode 100644
+index 00000000000000..bbe978994125f0
+--- /dev/null
++++ b/packages/ui/src/index.ts
+@@ -0,0 +1 @@
++export * from './box';
+diff --git a/packages/ui/src/lock-unlock.ts b/packages/ui/src/lock-unlock.ts
+new file mode 100644
+index 00000000000000..d1533da413cfc3
+--- /dev/null
++++ b/packages/ui/src/lock-unlock.ts
+@@ -0,0 +1,10 @@
++/**
++ * WordPress dependencies
++ */
++import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
++
++export const { lock, unlock } =
++	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
++		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
++		'@wordpress/dataviews'
++	);
+diff --git a/packages/ui/src/utils/element.ts b/packages/ui/src/utils/element.ts
+new file mode 100644
+index 00000000000000..8b31d0e17711ce
+--- /dev/null
++++ b/packages/ui/src/utils/element.ts
+@@ -0,0 +1,38 @@
++/**
++ * WordPress dependencies
++ */
++import { cloneElement } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { ComponentProps } from './types';
++
++type RenderProp< E extends React.ElementType > = NonNullable<
++	ComponentProps< E >[ 'render' ]
++>;
++
++/**
++ * Renders an element from a render prop (a component or an element), with
++ * merged props and ref.
++ *
++ * @param render The render prop (component or element).
++ * @param props  Props to pass to or merge with the element.
++ * @param ref    Optional ref to attach to the element.
++ * @return The rendered element.
++ */
++export const renderElement = < E extends React.ElementType >(
++	render: RenderProp< E >,
++	props: Omit< ComponentProps< E >, 'render' >,
++	ref?: React.Ref<
++		E extends keyof HTMLElementTagNameMap
++			? HTMLElementTagNameMap[ E ]
++			: Element
++	>
++): React.ReactElement => {
++	const propsWithRef = ref ? { ...props, ref } : props;
++
++	return typeof render === 'function'
++		? render( propsWithRef )
++		: cloneElement( render, propsWithRef );
++};
+diff --git a/packages/ui/src/utils/types.ts b/packages/ui/src/utils/types.ts
+new file mode 100644
+index 00000000000000..de56f759e53fa5
+--- /dev/null
++++ b/packages/ui/src/utils/types.ts
+@@ -0,0 +1,34 @@
++/**
++ * External dependencies
++ */
++import {
++	type ElementType,
++	type ComponentPropsWithoutRef,
++	type HTMLAttributes,
++	type Ref,
++} from 'react';
++
++type HTMLAttributesWithRef< T extends ElementType = any > =
++	HTMLAttributes< T > & { ref?: Ref< T > | undefined };
++
++type ComponentRenderFn< Props > = (
++	props: Props
++) => React.ReactElement< unknown >;
++
++export type ComponentProps< E extends ElementType > = Omit<
++	ComponentPropsWithoutRef< E >,
++	'className' | 'children' | 'render'
++> & {
++	/**
++	 * CSS class name to apply to the component.
++	 */
++	className?: string;
++
++	/**
++	 * Replaces the component's default HTML element using a given React
++	 * element, or a function that returns a React element.
++	 */
++	render?:
++		| ComponentRenderFn< HTMLAttributesWithRef >
++		| React.ReactElement< Record< string, unknown > >;
++};
+diff --git a/packages/ui/tsconfig.json b/packages/ui/tsconfig.json
+new file mode 100644
+index 00000000000000..8f9aeb01820304
+--- /dev/null
++++ b/packages/ui/tsconfig.json
+@@ -0,0 +1,13 @@
++{
++	"$schema": "https://json.schemastore.org/tsconfig.json",
++	"extends": "../../tsconfig.base.json",
++	"compilerOptions": {
++		"types": [ "node" ]
++	},
++	"references": [
++		{ "path": "../element" },
++		{ "path": "../private-apis" },
++		{ "path": "../theme" }
++	],
++	"exclude": []
++}
+diff --git a/storybook/main.js b/storybook/main.js
+index ce6d8cc5c0dbad..e9468c0799a627 100644
+--- a/storybook/main.js
++++ b/storybook/main.js
+@@ -39,6 +39,7 @@ const stories = [
+ 	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
+ 	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
+ 	'../packages/theme/src/**/stories/*.story.@(tsx|mdx)',
++	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
+ ].filter( Boolean );
+ 
+ module.exports = {
+diff --git a/tsconfig.json b/tsconfig.json
+index 546e0a7fa9690e..7472a4d8024318 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -62,6 +62,7 @@
+ 		{ "path": "packages/style-engine" },
+ 		{ "path": "packages/sync" },
+ 		{ "path": "packages/theme" },
++		{ "path": "packages/ui" },
+ 		{ "path": "packages/token-list" },
+ 		{ "path": "packages/undo-manager" },
+ 		{ "path": "packages/upload-media" },

@@ -1,0 +1,731 @@
+diff --git a/edit-post/assets/stylesheets/_animations.scss b/edit-post/assets/stylesheets/_animations.scss
+index 298c47be00308d..058e6336b53fdd 100644
+--- a/edit-post/assets/stylesheets/_animations.scss
++++ b/edit-post/assets/stylesheets/_animations.scss
+@@ -57,3 +57,9 @@
+ @mixin animate_rotation($speed: 1s) {
+ 	animation: rotation $speed infinite linear;
+ }
++
++@keyframes appearance-button-busy-animation {
++	0% {
++		background-position: 200px 0;
++	}
++}
+diff --git a/edit-post/assets/stylesheets/_mixins.scss b/edit-post/assets/stylesheets/_mixins.scss
+index ee17b9b3c45e3b..e50d761c88b259 100644
+--- a/edit-post/assets/stylesheets/_mixins.scss
++++ b/edit-post/assets/stylesheets/_mixins.scss
+@@ -105,6 +105,210 @@
+  * Button states and focus styles
+  */
+ 
++@mixin appearance-button {
++	display: inline-flex;
++	text-decoration: none;
++	padding: 5px 10px;
++	margin: 0;
++	border: 0;
++	cursor: pointer;
++	-webkit-appearance: none;
++	white-space: nowrap;
++	border-radius: $radius-round-rectangle;
++	border: 1px solid #ccc;
++	background: #f7f7f7;
++	box-shadow: inset 0 -1px 0 #ccc;
++	color: #555;
++
++	&:hover {
++		background: #fafafa;
++		border-color: #999;
++		box-shadow: inset 0 -1px 0 #999;
++		color: #23282d;
++	}
++
++	&:focus:not(:disabled):not([aria-disabled="true"]) {
++		background: #fafafa;
++		color: #23282d;
++		border-color: #999;
++		box-shadow:
++			inset 0 -1px 0 #999,
++			0 0 0 2px $blue-medium-200;
++	}
++
++	&:active {
++		color: currentColor;
++
++		&:not(:disabled):not([aria-disabled="true"]) {
++			background: #eee;
++			border-color: #999;
++			box-shadow: inset 0 1px 0 #999;
++		}
++	}
++
++	&:disabled,
++	&[disabled] {
++		color: #a0a5aa;
++		border-color: #ddd;
++		background: #f7f7f7;
++		box-shadow: none;
++		text-shadow: 0 1px 0 #fff;
++		cursor: default;
++		opacity: 0.3;
++	}
++
++	&.is-unstyled {
++		padding: 0;
++		border-radius: 0;
++		border: none;
++		background: none;
++		color: inherit;
++
++		&:hover,
++		&:active,
++		&:focus:not(:disabled):not([aria-disabled="true"]),
++		&:active:not(:disabled):not([aria-disabled="true"]),
++		&:disabled,
++		&[disabled] {
++			background: none;
++			color: inherit;
++			text-shadow: none;
++			opacity: 1;
++		}
++	}
++
++	&.is-borderless {
++		color: inherit;
++		border-color: none;
++		background: none;
++		box-shadow: none;
++
++		&:not(:disabled):not([aria-disabled="true"]) {
++			&:focus {
++				@include button-style__focus-active;
++			}
++
++			&:hover {
++				@include button-style__hover;
++			}
++
++			&:active {
++				@include button-style__active;
++			}
++		}
++	}
++
++	&.is-primary {
++		background: color(theme(button));
++		border-color: color(theme(button) shade(20%)) color(theme(button) shade(25%)) color(theme(button) shade(25%));
++		box-shadow: inset 0 -1px 0 color(theme(button) shade(25%));
++		color: $white;
++		text-decoration: none;
++		text-shadow:
++			0 -1px 1px color(theme(button) shade(30%)),
++			1px 0 1px color(theme(button) shade(30%)),
++			0 1px 1px color(theme(button) shade(30%)),
++			-1px 0 1px color(theme(button) shade(30%));
++
++		&:hover,
++		&:focus:not(:disabled):not([aria-disabled="true"]) {
++			background: color(theme(button) shade(5%));
++			border-color: color(theme(button) shade(50%));
++			box-shadow: inset 0 -1px 0 color(theme(button) shade(50%));
++			color: $white;
++		}
++
++		&:focus:not(:disabled):not([aria-disabled="true"]) {
++			box-shadow:
++				inset 0 -1px 0 color(theme(button) shade(50%)),
++				0 0 0 2px $blue-medium-200;
++		}
++
++		&:active:not(:disabled):not([aria-disabled="true"]) {
++			background: color(theme(button) shade(20%));
++			border-color: color(theme(button) shade(50%));
++			box-shadow: inset 0 1px 0 color(theme(button) shade(50%));
++			vertical-align: top;
++		}
++
++		&:disabled,
++		&[disabled] {
++			color: color(theme(button) tint(30%));
++			background: color(theme(button) shade(30%));
++			border-color: color(theme(button) shade(20%));
++			box-shadow: none;
++			text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1);
++		}
++
++		&.is-busy,
++		&.is-primary.is-busy[disabled] {
++			color: $white;
++			background-size: 100px 100%;
++			// Disable reason: This function call looks nicer when each argument is on its own line.
++			/* stylelint-disable */
++			background-image: linear-gradient(
++				-45deg,
++				theme(primary) 28%,
++				color(theme(primary) shade(30%)) 28%,
++				color(theme(primary) shade(30%)) 72%,
++				theme(primary) 72%
++			);
++			/* stylelint-enable */
++			border-color: color(theme(primary) shade(50%));
++		}
++	}
++
++	&.is-busy,
++	&.is-busy[disabled] {
++		animation: appearance-button-busy-animation 2500ms infinite linear;
++		background-size: 100px 100%;
++		background-image: repeating-linear-gradient(-45deg, $light-gray-500, $white 11px, $white 10px, $light-gray-500 20px);
++		opacity: 1;
++	}
++
++	&.is-large {
++		height: 30px;
++		line-height: 28px;
++		padding: 0 12px 2px;
++	}
++
++	&.is-small {
++		height: 24px;
++		line-height: 22px;
++		padding: 0 8px 1px;
++		font-size: 11px;
++	}
++}
++
++@mixin appearance-link {
++	margin: 0;
++	padding: 0;
++	box-shadow: none;
++	border: 0;
++	border-radius: 0;
++	background: none;
++	outline: none;
++	text-align: left;
++	/* Mimics the default link style in common.css */
++	color: #0073aa;
++	text-decoration: underline;
++	transition-property: border, background, color;
++	transition-duration: 0.05s;
++	transition-timing-function: ease-in-out;
++
++	&:hover,
++	&:active {
++		color: #00a0d2;
++	}
++
++	&:focus {
++		color: #124964;
++		box-shadow:
++			0 0 0 1px #5b9dd9,
++			0 0 2px 1px rgba(30, 140, 190, 0.8);
++	}
++}
++
+ // Buttons with rounded corners.
+ @mixin button-style__disabled {
+ 	opacity: 0.6;
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index cd68b438d3eeee..0faca4be4d1bae 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -2,8 +2,6 @@
+ 
+ Buttons express what action will occur when the user clicks or taps it. Buttons are used to trigger an action, and they can be used for any type of action, including navigation.
+ 
+-The presence of a `href` prop determines whether an `anchor` element is rendered instead of a `button`.
+-
+ ## Usage
+ 
+ Renders a button with default style.
+@@ -32,6 +30,9 @@ Name | Type | Default | Description
+ `isLink` | `bool` | `false` | Renders a button with an anchor style.
+ `focus` | `bool` | `false` | Whether the button is focused.
+ 
++## Buttons vs. Links
++
++
+ ## Related components
+ 
+ * To group buttons together, use the `ButtonGroup` component.
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.js
+index c04a9aa5276dd5..e30e023bfdeeb0 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.js
+@@ -2,50 +2,96 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
++import { omit } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { createElement, forwardRef } from '@wordpress/element';
++import { forwardRef } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
++
++/**
++ * Internal dependencies
++ */
++import Link from '../link';
+ 
+ export function Button( props, ref ) {
+ 	const {
+-		href,
+-		target,
+ 		isPrimary,
+ 		isLarge,
+ 		isSmall,
+ 		isToggled,
+ 		isBusy,
+-		isDefault,
+-		isLink,
++		isUnstyled,
++		hasLinkAppearance,
+ 		isDestructive,
+ 		className,
+-		disabled,
+ 		...additionalProps
+ 	} = props;
+ 
++	if ( props.hasOwnProperty( 'isLink' ) ) {
++		deprecated( 'Button isLink prop', {
++			alternative: 'hasLinkAppearance prop',
++			plugin: 'Gutenberg',
++			version: '4.1',
++			hint: (
++				'This prop is being renamed to reflect that link appearance ' +
++				'is cosmetic and should not be mistaken for semantics of a ' +
++				'link, which are otherwise represented by the Link component.'
++			),
++		} );
++
++		props = {
++			...omit( props, 'isLink' ),
++			hasLinkAppearance: props.isLink,
++		};
++	}
++
++	if ( props.hasOwnProperty( 'href' ) ) {
++		deprecated( 'Button href prop', {
++			alternative: 'Link component',
++			plugin: 'Gutenberg',
++			version: '4.1',
++		} );
++
++		return <Link { ...props } />;
++	}
++
++	let { isBorderless } = props;
++	if ( props.hasOwnProperty( 'isDefault' ) ) {
++		deprecated( 'Button isDefault prop', {
++			plugin: 'Gutenberg',
++			version: '4.1',
++			hint: (
++				'It is no longer necessary to pass this prop because the ' +
++				'default appearance is now the default. The prior default, ' +
++				'a borderless style, is now effected via the isBorderless prop'
++			),
++		} );
++
++		isBorderless = isBorderless || ! props.isDefault;
++	}
++
+ 	const classes = classnames( 'components-button', className, {
+-		'is-button': isDefault || isPrimary || isLarge || isSmall,
+-		'is-default': isDefault || isLarge || isSmall,
++		'is-unstyled': isUnstyled,
++		'is-borderless': isBorderless,
+ 		'is-primary': isPrimary,
+ 		'is-large': isLarge,
+ 		'is-small': isSmall,
+ 		'is-toggled': isToggled,
+ 		'is-busy': isBusy,
+-		'is-link': isLink,
++		'has-link-appearance': hasLinkAppearance,
+ 		'is-destructive': isDestructive,
+ 	} );
+ 
+-	const tag = href !== undefined && ! disabled ? 'a' : 'button';
+-	const tagProps = tag === 'a' ? { href, target } : { type: 'button', disabled };
+-
+-	return createElement( tag, {
+-		...tagProps,
+-		...additionalProps,
+-		className: classes,
+-		ref,
+-	} );
++	return (
++		<button
++			ref={ ref }
++			type="button"
++			{ ...additionalProps }
++			className={ classes }
++		/>
++	);
+ }
+ 
+ export default forwardRef( Button );
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index f10575fb3e3818..d36de4507997ca 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -1,198 +1,23 @@
+ .components-button {
+-	display: inline-flex;
+-	text-decoration: none;
+-	font-size: $default-font-size;
+-	margin: 0;
+-	border: 0;
+-	cursor: pointer;
+-	-webkit-appearance: none;
+-	background: none;
++	@include appearance-button;
+ 
+-	&.is-button {
+-		padding: 0 10px 1px;
+-		line-height: 26px;
+-		height: 28px;
+-		border-radius: 3px;
+-		white-space: nowrap;
+-		border-width: 1px;
+-		border-style: solid;
+-	}
+-
+-	// Default button style
+-	&.is-default {
+-		color: #555;
+-		border-color: #ccc;
+-		background: #f7f7f7;
+-		box-shadow: inset 0 -1px 0 #ccc;
+-		vertical-align: top;
+-
+-		&:hover {
+-			background: #fafafa;
+-			border-color: #999;
+-			box-shadow: inset 0 -1px 0 #999;
+-			color: #23282d;
+-		}
+-
+-		&:focus:not(:disabled):not([aria-disabled="true"]) {
+-			background: #fafafa;
+-			color: #23282d;
+-			border-color: #999;
+-			box-shadow:
+-				inset 0 -1px 0 #999,
+-				0 0 0 2px $blue-medium-200;
+-		}
+-
+-		&:active:not(:disabled):not([aria-disabled="true"]) {
+-			background: #eee;
+-			border-color: #999;
+-			box-shadow: inset 0 1px 0 #999,;
+-		}
+-
+-		&:disabled,
+-		&[disabled] {
+-			color: #a0a5aa !important;
+-			border-color: #ddd !important;
+-			background: #f7f7f7 !important;
+-			box-shadow: none !important;
+-			text-shadow: 0 1px 0 #fff !important;
+-			-webkit-transform: none !important;
+-			transform: none !important;
+-		}
+-	}
+-
+-	&.is-primary {
+-		background: color(theme(button));
+-		border-color: color(theme(button) shade(20%)) color(theme(button) shade(25%)) color(theme(button) shade(25%));
+-		box-shadow: inset 0 -1px 0 color(theme(button) shade(25%));
+-		color: $white;
+-		text-decoration: none;
+-		text-shadow:
+-			0 -1px 1px color(theme(button) shade(30%)),
+-			1px 0 1px color(theme(button) shade(30%)),
+-			0 1px 1px color(theme(button) shade(30%)),
+-			-1px 0 1px color(theme(button) shade(30%));
+-
+-		&:hover,
+-		&:focus:not(:disabled):not([aria-disabled="true"]) {
+-			background: color(theme(button) shade(5%));
+-			border-color: color(theme(button) shade(50%));
+-			box-shadow: inset 0 -1px 0 color(theme(button) shade(50%));
+-			color: $white;
+-		}
+-
+-		&:focus:not(:disabled):not([aria-disabled="true"]) {
+-			box-shadow:
+-				inset 0 -1px 0 color(theme(button) shade(50%)),
+-				0 0 0 2px $blue-medium-200;
+-		}
+-
+-		&:active:not(:disabled):not([aria-disabled="true"]) {
+-			background: color(theme(button) shade(20%));
+-			border-color: color(theme(button) shade(50%));
+-			box-shadow: inset 0 1px 0 color(theme(button) shade(50%));
+-			vertical-align: top;
+-		}
+-
+-		&:disabled,
+-		&[disabled] {
+-			color: color(theme(button) tint(30%)) !important;
+-			background: color(theme(button) shade(30%)) !important;
+-			border-color: color(theme(button) shade(20%)) !important;
+-			box-shadow: none !important;
+-			text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1) !important;
+-		}
+-
+-		&.is-busy,
+-		&.is-primary.is-busy[disabled] {
+-			color: $white !important;
+-			background-size: 100px 100% !important;
+-			// Disable reason: This function call looks nicer when each argument is on its own line.
+-			/* stylelint-disable */
+-			background-image: linear-gradient(
+-				-45deg,
+-				theme(primary) 28%,
+-				color(theme(primary) shade(30%)) 28%,
+-				color(theme(primary) shade(30%)) 72%,
+-				theme(primary) 72%
+-			) !important;
+-			/* stylelint-enable */
+-			border-color: color(theme(primary) shade(50%)) !important;
+-		}
++	&.is-unstyled {
++		padding: 0;
++		line-height: $default-line-height;
++		height: auto;
++		border-radius: none;
++		white-space: normal;
++		border-width: 0;
++		border-style: none;
+ 	}
+ 
+ 	/* Buttons that look like links, for a cross of good semantics with the visual */
+-	&.is-link {
+-		margin: 0;
+-		padding: 0;
+-		box-shadow: none;
+-		border: 0;
+-		border-radius: 0;
+-		background: none;
+-		outline: none;
+-		text-align: left;
+-		/* Mimics the default link style in common.css */
+-		color: #0073aa;
+-		text-decoration: underline;
+-		transition-property: border, background, color;
+-		transition-duration: 0.05s;
+-		transition-timing-function: ease-in-out;
+-
+-		&:hover,
+-		&:active {
+-			color: #00a0d2;
+-		}
+-
+-		&:focus {
+-			color: #124964;
+-			box-shadow:
+-				0 0 0 1px #5b9dd9,
+-				0 0 2px 1px rgba(30, 140, 190, 0.8);
+-		}
++	&.has-link-appearance {
++		@include appearance-link;
+ 	}
+ 
+ 	/* Link buttons that are red to indicate destructive behavior. */
+-	&.is-link.is-destructive {
++	&.has-link-appearance.is-destructive {
+ 		color: $alert-red;
+ 	}
+-
+-	&:active {
+-		color: currentColor;
+-	}
+-
+-	&:disabled,
+-	&[disabled] {
+-		cursor: default;
+-		opacity: 0.3;
+-	}
+-
+-	&:not(:disabled):not([aria-disabled="true"]):focus {
+-		@include button-style__focus-active;
+-	}
+-
+-	&.is-busy,
+-	&.is-busy[disabled] {
+-		animation: components-button__busy-animation 2500ms infinite linear;
+-		background-size: 100px 100% !important;
+-		background-image: repeating-linear-gradient(-45deg, $light-gray-500, $white 11px, $white 10px, $light-gray-500 20px) !important;
+-		opacity: 1;
+-	}
+-
+-	&.is-large {
+-		height: 30px;
+-		line-height: 28px;
+-		padding: 0 12px 2px;
+-	}
+-
+-	&.is-small {
+-		height: 24px;
+-		line-height: 22px;
+-		padding: 0 8px 1px;
+-		font-size: 11px;
+-	}
+-}
+-
+-@keyframes components-button__busy-animation {
+-	0% {
+-		background-position: 200px 0;
+-	}
+ }
+diff --git a/packages/components/src/dropdown-menu/index.js b/packages/components/src/dropdown-menu/index.js
+index 0ec348097c7db2..c337c6c79486e5 100644
+--- a/packages/components/src/dropdown-menu/index.js
++++ b/packages/components/src/dropdown-menu/index.js
+@@ -81,6 +81,7 @@ function DropdownMenu( {
+ 								icon={ control.icon }
+ 								role="menuitem"
+ 								disabled={ control.isDisabled }
++								isUnstyled
+ 							>
+ 								{ control.title }
+ 							</IconButton>
+diff --git a/packages/components/src/icon-button/index.js b/packages/components/src/icon-button/index.js
+index b6521f790fbfa8..1346b1e4912164 100644
+--- a/packages/components/src/icon-button/index.js
++++ b/packages/components/src/icon-button/index.js
+@@ -41,7 +41,7 @@ class IconButton extends Component {
+ 		);
+ 
+ 		let element = (
+-			<Button { ...additionalProps } aria-label={ label } className={ classes }>
++			<Button isBorderless { ...additionalProps } aria-label={ label } className={ classes }>
+ 				{ isString( icon ) ? <Dashicon icon={ icon } /> : icon }
+ 				{ children }
+ 			</Button>
+diff --git a/packages/components/src/icon-button/style.scss b/packages/components/src/icon-button/style.scss
+index c25c9c820345c5..63c4e232a9cd6d 100644
+--- a/packages/components/src/icon-button/style.scss
++++ b/packages/components/src/icon-button/style.scss
+@@ -9,7 +9,6 @@
+ 	position: relative;
+ 	overflow: hidden;
+ 	text-indent: 4px;
+-	border-radius: $radius-round-rectangle;
+ 
+ 	.dashicon {
+ 		display: inline-block;
+@@ -22,14 +21,6 @@
+ 		outline: none;
+ 	}
+ 
+-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+-		@include button-style__hover;
+-	}
+-
+-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active {
+-		@include button-style__active;
+-	}
+-
+ 	&[aria-disabled="true"]:focus,
+ 	&:disabled:focus {
+ 		box-shadow: none;
+diff --git a/packages/components/src/link/index.js b/packages/components/src/link/index.js
+new file mode 100644
+index 00000000000000..bf3c58c0d912eb
+--- /dev/null
++++ b/packages/components/src/link/index.js
+@@ -0,0 +1,50 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++export function Link( props, ref ) {
++	const {
++		hasButtonAppearance,
++		isPrimary,
++		isLarge,
++		isSmall,
++		isToggled,
++		isBusy,
++		isBorderless,
++		isDestructive,
++		className,
++		...additionalProps
++	} = props;
++
++	const classes = classnames( 'components-link', className, {
++		'has-button-appearance': hasButtonAppearance,
++		'is-borderless': isBorderless,
++		'is-primary': isPrimary,
++		'is-large': isLarge,
++		'is-small': isSmall,
++		'is-toggled': isToggled,
++		'is-busy': isBusy,
++		'is-destructive': isDestructive,
++	} );
++
++	// Disable reason: The anchor has content. It's not detected by jsx-a11y
++	// because the `children` prop is included in the spread of `props`.
++
++	/* eslint-disable jsx-a11y/anchor-has-content */
++	return (
++		<a
++			ref={ ref }
++			{ ...additionalProps }
++			className={ classes }
++		/>
++	);
++	/* eslint-enable jsx-a11y/anchor-has-content */
++}
++
++export default forwardRef( Link );
+diff --git a/packages/components/src/link/style.scss b/packages/components/src/link/style.scss
+new file mode 100644
+index 00000000000000..302ef78d8602c2
+--- /dev/null
++++ b/packages/components/src/link/style.scss
+@@ -0,0 +1,7 @@
++.components-link {
++	@include appearance-link;
++
++	.has-button-appearance {
++		@include appearance-button;
++	}
++}
+diff --git a/packages/components/src/menu-item/index.js b/packages/components/src/menu-item/index.js
+index 27460ce0e0f1ec..d42009c37182ec 100644
+--- a/packages/components/src/menu-item/index.js
++++ b/packages/components/src/menu-item/index.js
+@@ -56,6 +56,7 @@ function MenuItem( { children, className, icon, onClick, shortcut, isSelected, r
+ 			onClick={ onClick }
+ 			aria-checked={ isSelected }
+ 			role={ role }
++			isBorderless
+ 			{ ...props }
+ 		>
+ 			{ children }
+diff --git a/packages/components/src/panel/body.js b/packages/components/src/panel/body.js
+index 5cfb8fc5d314fa..a2e967d12662b6 100644
+--- a/packages/components/src/panel/body.js
++++ b/packages/components/src/panel/body.js
+@@ -50,6 +50,7 @@ class PanelBody extends Component {
+ 							className="components-panel__body-toggle"
+ 							onClick={ this.toggle }
+ 							aria-expanded={ isOpened }
++							isUnstyled
+ 						>
+ 							{ isOpened ?
+ 								<AccessibleSVG className="components-panel__arrow" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

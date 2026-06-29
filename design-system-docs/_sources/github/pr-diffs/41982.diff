@@ -1,0 +1,42 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index c33f0b2701ff71..b12dde5a59d844 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -99,6 +99,7 @@ module.exports = {
+ 							'isObjectLike',
+ 							'isUndefined',
+ 							'keys',
++							'lowerCase',
+ 							'memoize',
+ 							'negate',
+ 							'noop',
+diff --git a/packages/components/src/mobile/link-picker/index.native.js b/packages/components/src/mobile/link-picker/index.native.js
+index 7e42881a72faf7..bf61bcddaa6154 100644
+--- a/packages/components/src/mobile/link-picker/index.native.js
++++ b/packages/components/src/mobile/link-picker/index.native.js
+@@ -3,7 +3,6 @@
+  */
+ import { SafeAreaView, TouchableOpacity, View } from 'react-native';
+ import Clipboard from '@react-native-clipboard/clipboard';
+-import { lowerCase, startsWith } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -26,7 +25,7 @@ import styles from './styles.scss';
+ export const createDirectEntry = ( value ) => {
+ 	let type = 'URL';
+ 
+-	const protocol = lowerCase( getProtocol( value ) ) || '';
++	const protocol = getProtocol( value )?.toLowerCase() || '';
+ 
+ 	if ( protocol.includes( 'mailto' ) ) {
+ 		type = 'mailto';
+@@ -36,7 +35,7 @@ export const createDirectEntry = ( value ) => {
+ 		type = 'tel';
+ 	}
+ 
+-	if ( startsWith( value, '#' ) ) {
++	if ( value?.startsWith( '#' ) ) {
+ 		type = 'internal';
+ 	}
+ 

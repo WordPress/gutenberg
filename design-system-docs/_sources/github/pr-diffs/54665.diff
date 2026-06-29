@@ -1,0 +1,160 @@
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index a199c1bb350cd7..6de116150d860d 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -141,12 +141,49 @@ export function UnforwardedButton(
+ 
+ 	const trulyDisabled = disabled && ! isFocusable;
+ 	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
++
++	const { role = 'button' } = additionalProps;
++	let ariaPropName:
++		| 'aria-pressed'
++		| 'aria-checked'
++		| 'aria-selected'
++		| undefined;
++
++	switch ( role ) {
++		case 'button':
++			ariaPropName = 'aria-pressed';
++			break;
++		case 'checkbox':
++		case 'menuitemcheckbox':
++		case 'menuitemradio':
++		case 'radio':
++		case 'switch':
++			ariaPropName = 'aria-checked';
++			break;
++		case 'gridcell':
++		case 'option':
++		case 'row':
++		case 'tab':
++			ariaPropName = 'aria-selected';
++			break;
++		default:
++		// no-op
++	}
++	const ariaProp = ariaPropName
++		? {
++				[ ariaPropName ]:
++					ariaPropName in additionalProps
++						? additionalProps[ ariaPropName ]
++						: isPressed,
++		  }
++		: {};
++
+ 	const buttonProps: ComponentPropsWithoutRef< 'button' > =
+ 		Tag === 'button'
+ 			? {
+ 					type: 'button',
+ 					disabled: trulyDisabled,
+-					'aria-pressed': isPressed,
++					...ariaProp,
+ 			  }
+ 			: {};
+ 	const anchorProps: ComponentPropsWithoutRef< 'a' > =
+diff --git a/packages/components/src/button/test/index.tsx b/packages/components/src/button/test/index.tsx
+index d70b8b075aa1eb..781e05da377194 100644
+--- a/packages/components/src/button/test/index.tsx
++++ b/packages/components/src/button/test/index.tsx
+@@ -220,6 +220,100 @@ describe( 'Button', () => {
+ 			).toBeVisible();
+ 		} );
+ 
++		describe( 'when isPressed is set', () => {
++			it( 'should set aria-pressed', () => {
++				render( <Button isPressed /> );
++
++				expect( screen.getByRole( 'button' ) ).toHaveAttribute(
++					'aria-pressed',
++					'true'
++				);
++			} );
++
++			it( 'should use given aria-pressed value if provided', () => {
++				render( <Button isPressed aria-pressed={ false } /> );
++
++				expect( screen.getByRole( 'button' ) ).toHaveAttribute(
++					'aria-pressed',
++					'false'
++				);
++			} );
++
++			it( 'should use given aria-checked value if provided', () => {
++				render(
++					<Button isPressed role="checkbox" aria-checked={ false } />
++				);
++
++				expect( screen.getByRole( 'checkbox' ) ).not.toBeChecked();
++			} );
++
++			it( 'should use given aria-selected value if provided', () => {
++				render(
++					<Button isPressed role="option" aria-selected={ false } />
++				);
++
++				expect( screen.getByRole( 'option' ) ).toHaveAttribute(
++					'aria-selected',
++					'false'
++				);
++			} );
++
++			it( 'should not set aria-pressed if explicitly unset', () => {
++				render( <Button isPressed aria-pressed={ undefined } /> );
++
++				expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
++					'aria-pressed'
++				);
++			} );
++
++			it( 'should not set aria-pressed when role is not button', () => {
++				render(
++					<>
++						<Button isPressed role="checkbox" />
++						<Button isPressed role="option" />
++					</>
++				);
++
++				expect( screen.getByRole( 'checkbox' ) ).not.toHaveAttribute(
++					'aria-pressed'
++				);
++
++				expect( screen.getByRole( 'option' ) ).not.toHaveAttribute(
++					'aria-pressed'
++				);
++			} );
++		} );
++
++		describe.each( [ true, false ] )(
++			'when isPressed is set to %s',
++			( isPressed ) => {
++				it.each( [
++					[ undefined, 'aria-pressed' ],
++					[ 'button', 'aria-pressed' ],
++					[ 'checkbox', 'aria-checked' ],
++					[ 'radio', 'aria-checked' ],
++					[ 'menuitemcheckbox', 'aria-checked' ],
++					[ 'menuitemradio', 'aria-checked' ],
++					[ 'switch', 'aria-checked' ],
++					[ 'gridcell', 'aria-selected' ],
++					[ 'option', 'aria-selected' ],
++					[ 'row', 'aria-selected' ],
++					[ 'tab', 'aria-selected' ],
++				] )(
++					'when role is %s it should set %s',
++					( role, attribute ) => {
++						render(
++							<Button isPressed={ isPressed } role={ role } />
++						);
++
++						expect(
++							screen.getByRole( role ?? 'button' )
++						).toHaveAttribute( attribute, `${ isPressed }` );
++					}
++				);
++			}
++		);
++
+ 		it( 'should populate tooltip with label content for buttons without visible labels (no children)', async () => {
+ 			const user = userEvent.setup();
+ 

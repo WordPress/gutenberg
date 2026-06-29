@@ -1,0 +1,68 @@
+diff --git a/packages/components/src/unit-control/index.js b/packages/components/src/unit-control/index.js
+index 9b0b0c42d645c0..adee0b8de04f8c 100644
+--- a/packages/components/src/unit-control/index.js
++++ b/packages/components/src/unit-control/index.js
+@@ -158,6 +158,17 @@ function UnitControl(
+ 		/>
+ 	) : null;
+ 
++	let step = props.step;
++
++	/*
++	 * If no step prop has been passed, lookup the active unit and
++	 * try to get step from `units`, or default to a value of `1`
++	 */
++	if ( ! step && units ) {
++		const activeUnit = units.find( ( option ) => option.value === unit );
++		step = activeUnit?.step ?? 1;
++	}
++
+ 	return (
+ 		<Root className="components-unit-control-wrapper" style={ style }>
+ 			<ValueInput
+@@ -177,6 +188,7 @@ function UnitControl(
+ 				size={ size }
+ 				suffix={ inputSuffix }
+ 				value={ value }
++				step={ step }
+ 				__unstableStateReducer={ composeStateReducers(
+ 					unitControlStateReducer,
+ 					stateReducer
+diff --git a/packages/components/src/unit-control/index.native.js b/packages/components/src/unit-control/index.native.js
+index 7bd020e26e5a69..c8a918627237e3 100644
+--- a/packages/components/src/unit-control/index.native.js
++++ b/packages/components/src/unit-control/index.native.js
+@@ -123,6 +123,17 @@ function UnitControl( {
+ 		);
+ 	}, [ pickerRef, units, onUnitChange, getAnchor ] );
+ 
++	let step = props.step;
++
++	/*
++	 * If no step prop has been passed, lookup the active unit and
++	 * try to get step from `units`, or default to a value of `1`
++	 */
++	if ( ! step && units ) {
++		const activeUnit = units.find( ( option ) => option.value === unit );
++		step = activeUnit?.step ?? 1;
++	}
++
+ 	return (
+ 		<>
+ 			{ unit !== '%' ? (
+@@ -133,6 +144,7 @@ function UnitControl( {
+ 					onChange={ onChange }
+ 					separatorType={ separatorType }
+ 					value={ value }
++					step={ step }
+ 					defaultValue={ initialControlValue }
+ 					shouldDisplayTextInput
+ 					decimalNum={ unit === 'px' ? 0 : decimalNum }
+@@ -149,6 +161,7 @@ function UnitControl( {
+ 					minimumValue={ min }
+ 					maximumValue={ max }
+ 					value={ value }
++					step={ step }
+ 					unit={ unit }
+ 					defaultValue={ initialControlValue }
+ 					separatorType={ separatorType }

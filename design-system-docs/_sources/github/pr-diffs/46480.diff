@@ -1,0 +1,189 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 197376af428718..8d9a1b2938729d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
+ -   `ColorPicker` & `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom` ([#46448](https://github.com/WordPress/gutenberg/pull/46448)).
++-   `ResponsiveWrapper`: Convert to TypeScript ([#46480](https://github.com/WordPress/gutenberg/pull/46480)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/responsive-wrapper/README.md b/packages/components/src/responsive-wrapper/README.md
+index 990161de2a99d6..5ccfc16c1b84d3 100644
+--- a/packages/components/src/responsive-wrapper/README.md
++++ b/packages/components/src/responsive-wrapper/README.md
+@@ -1,5 +1,7 @@
+ # ResponsiveWrapper
+ 
++A wrapper component that maintains its aspect ratio when resized.
++
+ ## Usage
+ 
+ ```jsx
+@@ -14,3 +16,30 @@ const MyResponsiveWrapper = () => (
+ 	</ResponsiveWrapper>
+ );
+ ```
++
++## Props
++
++### `children`: `React.ReactElement`
++
++The element to wrap.
++
++-   Required: Yes
++
++### `isInline`: `boolean`
++
++If true, the wrapper will be `span` instead of `div`.
++
++-   Required: No
++-   Default: `false`
++
++### `naturalHeight`: `number`
++
++The intrinsic height of the element to wrap. Will be used to determine the aspect ratio.
++
++-   Required: Yes
++
++### `naturalWidth`: `number`
++
++The intrinsic width of the element to wrap. Will be used to determine the aspect ratio.
++
++-   Required: Yes
+\ No newline at end of file
+diff --git a/packages/components/src/responsive-wrapper/index.js b/packages/components/src/responsive-wrapper/index.tsx
+similarity index 62%
+rename from packages/components/src/responsive-wrapper/index.js
+rename to packages/components/src/responsive-wrapper/index.tsx
+index 6f3de4bacd8be3..b59731539f3a44 100644
+--- a/packages/components/src/responsive-wrapper/index.js
++++ b/packages/components/src/responsive-wrapper/index.tsx
+@@ -9,12 +9,33 @@ import classnames from 'classnames';
+ import { cloneElement, Children } from '@wordpress/element';
+ import { useResizeObserver } from '@wordpress/compose';
+ 
++/**
++ * Internal dependencies
++ */
++import type { ResponsiveWrapperProps } from './types';
++
++/**
++ * A wrapper component that maintains its aspect ratio when resized.
++ *
++ * ```jsx
++ * import { ResponsiveWrapper } from '@wordpress/components';
++ *
++ * const MyResponsiveWrapper = () => (
++ * 	<ResponsiveWrapper naturalWidth={ 2000 } naturalHeight={ 680 }>
++ * 		<img
++ * 			src="https://s.w.org/style/images/about/WordPress-logotype-standard.png"
++ * 			alt="WordPress"
++ * 		/>
++ * 	</ResponsiveWrapper>
++ * );
++ * ```
++ */
+ function ResponsiveWrapper( {
+ 	naturalWidth,
+ 	naturalHeight,
+ 	children,
+ 	isInline = false,
+-} ) {
++}: ResponsiveWrapperProps ) {
+ 	const [ containerResizeListener, { width: containerWidth } ] =
+ 		useResizeObserver();
+ 	if ( Children.count( children ) !== 1 ) {
+@@ -22,7 +43,7 @@ function ResponsiveWrapper( {
+ 	}
+ 	const imageStyle = {
+ 		paddingBottom:
+-			naturalWidth < containerWidth
++			naturalWidth < ( containerWidth ?? 0 )
+ 				? naturalHeight
+ 				: ( naturalHeight / naturalWidth ) * 100 + '%',
+ 	};
+diff --git a/packages/components/src/responsive-wrapper/stories/index.tsx b/packages/components/src/responsive-wrapper/stories/index.tsx
+new file mode 100644
+index 00000000000000..5f48b91d279b2d
+--- /dev/null
++++ b/packages/components/src/responsive-wrapper/stories/index.tsx
+@@ -0,0 +1,38 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import ResponsiveWrapper from '..';
++
++const meta: ComponentMeta< typeof ResponsiveWrapper > = {
++	component: ResponsiveWrapper,
++	title: 'Components/ResponsiveWrapper',
++	argTypes: {
++		children: { control: { type: null } },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof ResponsiveWrapper > = ( args ) => (
++	<ResponsiveWrapper { ...args } />
++);
++
++export const Default = Template.bind( {} );
++Default.args = {
++	naturalWidth: 2000,
++	naturalHeight: 680,
++	children: (
++		<img
++			src="https://s.w.org/style/images/about/WordPress-logotype-standard.png"
++			alt="WordPress"
++		/>
++	),
++};
+diff --git a/packages/components/src/responsive-wrapper/types.ts b/packages/components/src/responsive-wrapper/types.ts
+new file mode 100644
+index 00000000000000..2f1e4a53aafbf7
+--- /dev/null
++++ b/packages/components/src/responsive-wrapper/types.ts
+@@ -0,0 +1,20 @@
++export type ResponsiveWrapperProps = {
++	/**
++	 * The intrinsic width of the element to wrap. Will be used to determine the aspect ratio.
++	 */
++	naturalWidth: number;
++	/**
++	 * The intrinsic height of the element to wrap. Will be used to determine the aspect ratio.
++	 */
++	naturalHeight: number;
++	/**
++	 * The element to wrap.
++	 */
++	children: React.ReactElement;
++	/**
++	 * If true, the wrapper will be `span` instead of `div`.
++	 *
++	 * @default false
++	 */
++	isInline?: boolean;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 6d7cfacb6a6abb..2497449242c850 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -62,7 +62,6 @@
+ 		"src/palette-edit",
+ 		"src/panel",
+ 		"src/query-controls",
+-		"src/responsive-wrapper",
+ 		"src/sandbox",
+ 		"src/toolbar",
+ 		"src/toolbar-button",

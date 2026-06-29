@@ -1,0 +1,147 @@
+diff --git a/.stylelintrc.js b/.stylelintrc.js
+index 7557cd8abb4b43..fc6f4c2f64f02a 100644
+--- a/.stylelintrc.js
++++ b/.stylelintrc.js
+@@ -60,7 +60,11 @@ module.exports = {
+ 	},
+ 	overrides: [
+ 		{
+-			files: [ '**/*.module.{css,scss}' ],
++			files: [
++				'**/*.module.{css,scss}',
++				// Can be removed when all `routes/` stylesheets are converted to CSS modules.
++				'routes/**/*.{css,scss}',
++			],
+ 			rules: {
+ 				'function-no-unknown': [
+ 					true,
+diff --git a/routes/guidelines/components/block-guidelines.scss b/routes/guidelines/components/block-guidelines.scss
+index 569774f282e3a5..52b3bbceef2333 100644
+--- a/routes/guidelines/components/block-guidelines.scss
++++ b/routes/guidelines/components/block-guidelines.scss
+@@ -15,13 +15,11 @@
+ 	}
+ 
+ 	.dataviews-wrapper {
+-		margin-right: -$grid-unit-30;
+-		margin-left: -$grid-unit-30;
++		margin-inline: -$grid-unit-30;
+ 	}
+ 
+ 	.dataviews-search {
+-		margin-right: $grid-unit-30;
+-		margin-left: $grid-unit-30;
++		margin-inline: $grid-unit-30;
+ 	}
+ }
+ 
+diff --git a/routes/guidelines/components/guideline-actions-section.scss b/routes/guidelines/components/guideline-actions-section.scss
+index da300aa4a040d5..f7d03748132f99 100644
+--- a/routes/guidelines/components/guideline-actions-section.scss
++++ b/routes/guidelines/components/guideline-actions-section.scss
+@@ -25,8 +25,7 @@
+ 		content: "";
+ 		position: absolute;
+ 		top: 0;
+-		left: $grid-unit-30;
+-		right: $grid-unit-30;
++		inset-inline: $grid-unit-30;
+ 		height: 1px;
+ 		background-color: $gray-100;
+ 	}
+diff --git a/routes/guidelines/style.scss b/routes/guidelines/style.scss
+index 97206b84d6aed8..f763af28fd8b3e 100644
+--- a/routes/guidelines/style.scss
++++ b/routes/guidelines/style.scss
+@@ -36,13 +36,13 @@
+ 	gap: $grid-unit-20;
+ 
+ 	.dataviews-wrapper {
+-		margin-right: -$grid-unit-30;
+-		margin-left: -$grid-unit-30;
++		margin-inline: -$grid-unit-30;
+ 	}
+ }
+ 
+ .guidelines__revision-history-back {
+ 	align-self: flex-start;
++	// stylelint-disable-next-line plugin/use-logical-properties-and-values -- TODO: Please fix
+ 	margin-left: -$grid-unit-20;
+ 	font-weight: 500;
+ 	color: $gray-900;
+@@ -54,6 +54,7 @@
+ }
+ 
+ .guidelines__revision-description {
++	// stylelint-disable-next-line plugin/use-logical-properties-and-values -- TODO: Please fix
+ 	padding-left: $grid-unit-10;
+ }
+ 
+diff --git a/routes/post-list/style.scss b/routes/post-list/style.scss
+index e0aef36c41aeec..69068acdda0d9f 100644
+--- a/routes/post-list/style.scss
++++ b/routes/post-list/style.scss
+@@ -12,6 +12,7 @@
+ 	align-items: stretch;
+ 
+ 	.components-modal__frame {
++		// stylelint-disable-next-line declaration-property-max-values -- TODO: Please fix
+ 		margin: $grid-unit-20 $grid-unit-20 $grid-unit-20 0;
+ 		height: calc(100% - #{$grid-unit-20 * 2});
+ 		max-height: calc(100% - #{$grid-unit-20 * 2});
+diff --git a/routes/styles/style.scss b/routes/styles/style.scss
+index ce885d82a05db7..45a325ac2cb3ec 100644
+--- a/routes/styles/style.scss
++++ b/routes/styles/style.scss
+@@ -13,8 +13,7 @@
+ 			border-top: none;
+ 		}
+ 		overflow-y: auto;
+-		padding-left: 0;
+-		padding-right: 0;
++		padding-inline: 0;
+ 	}
+ }
+ 
+diff --git a/routes/template-list/add-new-template/style.scss b/routes/template-list/add-new-template/style.scss
+index 505472b9349ba8..2be518f4710211 100644
+--- a/routes/template-list/add-new-template/style.scss
++++ b/routes/template-list/add-new-template/style.scss
+@@ -12,8 +12,7 @@
+ 		}
+ 
+ 		&__suggestions_list {
+-			margin-left: - $grid-unit-15;
+-			margin-right: - $grid-unit-15;
++			margin-inline: - $grid-unit-15;
+ 			width: calc(100% + #{$grid-unit-15 * 2});
+ 		}
+ 	}
+@@ -38,6 +37,7 @@
+ 		&__list-item {
+ 			display: block;
+ 			width: 100%;
++			// stylelint-disable-next-line plugin/use-logical-properties-and-values -- TODO: Please fix
+ 			text-align: left;
+ 			white-space: pre-wrap;
+ 			overflow-wrap: break-word;
+diff --git a/routes/template-list/style.scss b/routes/template-list/style.scss
+index 52a4ce09d89d80..930b62b012a648 100644
+--- a/routes/template-list/style.scss
++++ b/routes/template-list/style.scss
+@@ -12,6 +12,7 @@
+ 	height: 24px;
+ 	border-radius: 50%;
+ 	overflow: hidden;
++	// stylelint-disable-next-line plugin/use-logical-properties-and-values -- TODO: Please fix
+ 	margin-right: 8px;
+ 	opacity: 0;
+ 	transition: opacity 0.1s ease-in;
+@@ -33,6 +34,7 @@
+ 	display: flex;
+ 	align-items: center;
+ 	justify-content: center;
++	// stylelint-disable-next-line plugin/use-logical-properties-and-values -- TODO: Please fix
+ 	margin-right: 8px;
+ 	color: $gray-700;
+ }

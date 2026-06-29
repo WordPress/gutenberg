@@ -1,0 +1,284 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8195ff9000af8b..18fc8b72cd9c6f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ ### Internal
+ 
+ -   Add new private `DateCalendar` and `DateRangeCalendar` components ([#70578](https://github.com/WordPress/gutenberg/pull/70578), [#70681](https://github.com/WordPress/gutenberg/pull/70681)).
++-   `useControlledValue`: Enhanced hook to support additional arguments in onChange callbacks and improved performance with useCallback optimization ([#70655](https://github.com/WordPress/gutenberg/pull/70655)).
+ 
+ ## 29.12.0 (2025-06-25)
+ 
+diff --git a/packages/components/src/calendar/date-calendar/index.tsx b/packages/components/src/calendar/date-calendar/index.tsx
+index 5de09771803955..f70807d4d38457 100644
+--- a/packages/components/src/calendar/date-calendar/index.tsx
++++ b/packages/components/src/calendar/date-calendar/index.tsx
+@@ -3,14 +3,18 @@
+  */
+ import { DayPicker } from 'react-day-picker';
+ import { enUS } from 'react-day-picker/locale';
++/**
++ * WordPress dependencies
++ */
++import { useCallback } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+ import { COMMON_PROPS } from '../utils/constants';
+ import { clampNumberOfMonths } from '../utils/misc';
+-import { useControlledValue } from '../utils/use-controlled-value';
++import { useControlledValue } from '../../utils/hooks';
+ import { useLocalizationProps } from '../utils/use-localization-props';
+-import type { DateCalendarProps } from '../types';
++import type { DateCalendarProps, OnSelectHandler } from '../types';
+ 
+ /**
+  * `DateCalendar` is a React component that provides a customizable calendar
+@@ -35,11 +39,21 @@ export const DateCalendar = ( {
+ 		mode: 'single',
+ 	} );
+ 
+-	const [ selected, setSelected ] = useControlledValue< Date | undefined >( {
+-		defaultValue: defaultSelected,
+-		value: selectedProp,
+-		onChange: onSelect,
+-	} );
++	const onChange: OnSelectHandler< typeof selectedProp > = useCallback(
++		( selected, triggerDate, modifiers, e ) => {
++			// Convert internal `null` to `undefined` for the public event handler.
++			onSelect?.( selected ?? undefined, triggerDate, modifiers, e );
++		},
++		[ onSelect ]
++	);
++
++	const [ selected, setSelected ] = useControlledValue< typeof selectedProp >(
++		{
++			defaultValue: defaultSelected,
++			value: selectedProp,
++			onChange,
++		}
++	);
+ 
+ 	return (
+ 		<DayPicker
+@@ -48,7 +62,7 @@ export const DateCalendar = ( {
+ 			{ ...props }
+ 			mode="single"
+ 			numberOfMonths={ clampNumberOfMonths( numberOfMonths ) }
+-			selected={ selected }
++			selected={ selected ?? undefined }
+ 			onSelect={ setSelected }
+ 		/>
+ 	);
+diff --git a/packages/components/src/calendar/date-range-calendar/index.tsx b/packages/components/src/calendar/date-range-calendar/index.tsx
+index 6d28c4c49f6ce3..c67c50aadd784f 100644
+--- a/packages/components/src/calendar/date-range-calendar/index.tsx
++++ b/packages/components/src/calendar/date-range-calendar/index.tsx
+@@ -7,15 +7,19 @@ import { enUS } from 'react-day-picker/locale';
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo, useState } from '@wordpress/element';
++import { useMemo, useState, useCallback } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+ import { COMMON_PROPS, MODIFIER_CLASSNAMES } from '../utils/constants';
+ import { clampNumberOfMonths } from '../utils/misc';
+-import { useControlledValue } from '../utils/use-controlled-value';
++import { useControlledValue } from '../../utils/hooks';
+ import { useLocalizationProps } from '../utils/use-localization-props';
+-import type { DateRangeCalendarProps, DateRange } from '../types';
++import type {
++	DateRangeCalendarProps,
++	DateRange,
++	OnSelectHandler,
++} from '../types';
+ 
+ export function usePreviewRange( {
+ 	selected,
+@@ -151,13 +155,21 @@ export const DateRangeCalendar = ( {
+ 		mode: 'range',
+ 	} );
+ 
+-	const [ selected, setSelected ] = useControlledValue<
+-		DateRange | undefined
+-	>( {
+-		defaultValue: defaultSelected,
+-		value: selectedProp,
+-		onChange: onSelect,
+-	} );
++	const onChange: OnSelectHandler< typeof selectedProp > = useCallback(
++		( selected, triggerDate, modifiers, e ) => {
++			// Convert internal `null` to `undefined` for the public event handler.
++			onSelect?.( selected ?? undefined, triggerDate, modifiers, e );
++		},
++		[ onSelect ]
++	);
++
++	const [ selected, setSelected ] = useControlledValue< typeof selectedProp >(
++		{
++			defaultValue: defaultSelected,
++			value: selectedProp,
++			onChange,
++		}
++	);
+ 
+ 	const [ hoveredDate, setHoveredDate ] = useState< Date | undefined >(
+ 		undefined
+@@ -192,7 +204,7 @@ export const DateRangeCalendar = ( {
+ 			excludeDisabled={ excludeDisabled }
+ 			min={ min }
+ 			max={ max }
+-			selected={ selected }
++			selected={ selected ?? undefined }
+ 			onSelect={ setSelected }
+ 			onDayMouseEnter={ ( date ) => setHoveredDate( date ) }
+ 			onDayMouseLeave={ () => setHoveredDate( undefined ) }
+diff --git a/packages/components/src/calendar/types.ts b/packages/components/src/calendar/types.ts
+index d77e59e8f32166..d347b12800534c 100644
+--- a/packages/components/src/calendar/types.ts
++++ b/packages/components/src/calendar/types.ts
+@@ -153,7 +153,7 @@ type DayOfWeek = {
+  * @param {Modifiers}                              modifiers   - The modifiers associated with the event.
+  * @param {React.MouseEvent | React.KeyboardEvent} e           - The event object.
+  */
+-type OnSelectHandler< T > = (
++export type OnSelectHandler< T > = (
+ 	selected: T,
+ 	triggerDate: Date,
+ 	modifiers: Modifiers,
+diff --git a/packages/components/src/calendar/utils/use-controlled-value.ts b/packages/components/src/calendar/utils/use-controlled-value.ts
+deleted file mode 100644
+index 7dbb4643a5c2a5..00000000000000
+--- a/packages/components/src/calendar/utils/use-controlled-value.ts
++++ /dev/null
+@@ -1,61 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState, useCallback } from '@wordpress/element';
+-
+-type Props< T > = {
+-	defaultValue?: T;
+-	value?: T | null | undefined;
+-	onChange?: ( newValue: T, ...args: any[] ) => void;
+-};
+-
+-/**
+- * Handles controlled and uncontrolled state for the selected calendar value.
+- * It is assumed that the `value` prop is controlled when it's not undefined:
+- * - initial date selected, uncontrolled: use a non-undefined`defaultValue`
+- * - initial date selected, controlled: use a non-undefined `value`
+- * - no date selected, controlled: set `value` to `null`
+- *
+- * The `onChange` prop will return `undefined` when no date is selected,
+- * regardless of controlled / uncontrolled. It is expected that the consumer
+- * of the component will handle setting the value to `null` to indicate no date
+- * selected in controlled mode.
+- *
+- * @param props              - The props object.
+- * @param props.defaultValue - The default value.
+- * @param props.onChange     - The onChange callback.
+- * @param props.value        - The value.
+- *
+- * @return The value and the setValue function.
+- */
+-export function useControlledValue< T >( {
+-	defaultValue,
+-	onChange,
+-	value: valueProp,
+-}: Props< T > ) {
+-	const hasValue = typeof valueProp !== 'undefined';
+-	const initialValue = hasValue ? valueProp : defaultValue;
+-	const [ state, setState ] = useState( initialValue );
+-	const value = ( hasValue ? valueProp : state ) ?? undefined;
+-
+-	let setValue: typeof onChange;
+-	const uncontrolledSetValue: NonNullable< typeof onChange > = useCallback(
+-		( nextValue, ...args ) => {
+-			setState( nextValue );
+-			onChange?.( nextValue, ...args );
+-		},
+-		[ setState, onChange ]
+-	);
+-	if ( hasValue && typeof onChange === 'function' ) {
+-		// Controlled mode.
+-		setValue = onChange;
+-	} else if ( ! hasValue && typeof onChange === 'function' ) {
+-		// Uncontrolled mode, plus forwarding to the onChange prop.
+-		setValue = uncontrolledSetValue;
+-	} else {
+-		// Uncontrolled mode, only update internal state.
+-		setValue = setState;
+-	}
+-
+-	return [ value, setValue ] as const;
+-}
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
+index 7ce762b6e71df2..743c67ba215f1d 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
+@@ -48,7 +48,9 @@ function UnforwardedToggleGroupControlAsButtonGroup(
+ 	const { value, defaultValue } =
+ 		useComputeControlledOrUncontrolledValue( valueProp );
+ 
+-	const [ selectedValue, setSelectedValue ] = useControlledValue( {
++	const [ selectedValue, setSelectedValue ] = useControlledValue<
++		typeof value
++	>( {
+ 		defaultValue,
+ 		value,
+ 		onChange,
+diff --git a/packages/components/src/utils/hooks/use-controlled-value.ts b/packages/components/src/utils/hooks/use-controlled-value.ts
+index 4b172801cf9528..725283736f5026 100644
+--- a/packages/components/src/utils/hooks/use-controlled-value.ts
++++ b/packages/components/src/utils/hooks/use-controlled-value.ts
+@@ -1,12 +1,12 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useState } from '@wordpress/element';
++import { useCallback, useState } from '@wordpress/element';
+ 
+ type Props< T > = {
+ 	defaultValue?: T;
+ 	value?: T;
+-	onChange?: ( value: T ) => void;
++	onChange?: ( value: T, ...args: any[] ) => void;
+ };
+ 
+ /**
+@@ -28,17 +28,25 @@ export function useControlledValue< T >( {
+ 	const [ state, setState ] = useState( initialValue );
+ 	const value = hasValue ? valueProp : state;
+ 
+-	let setValue: ( nextValue: T ) => void;
++	const uncontrolledSetValue = useCallback(
++		( nextValue: T, ...args: any[] ) => {
++			setState( nextValue );
++			onChange?.( nextValue, ...args );
++		},
++		[ onChange ]
++	);
++
++	let setValue: typeof onChange;
+ 	if ( hasValue && typeof onChange === 'function' ) {
++		// Controlled mode.
+ 		setValue = onChange;
+ 	} else if ( ! hasValue && typeof onChange === 'function' ) {
+-		setValue = ( nextValue ) => {
+-			onChange( nextValue );
+-			setState( nextValue );
+-		};
++		// Uncontrolled mode, plus forwarding to the onChange prop.
++		setValue = uncontrolledSetValue;
+ 	} else {
++		// Uncontrolled mode, only update internal state.
+ 		setValue = setState;
+ 	}
+ 
+-	return [ value, setValue as typeof setState ] as const;
++	return [ value, setValue ] as const;
+ }

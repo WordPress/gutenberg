@@ -1,0 +1,78 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 90d083445fab2d..4d943b62a9d921 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   Fixed RTL styles in `Flex` component ([#33729](https://github.com/WordPress/gutenberg/pull/33729)).
+ -   Fixed unit test errors caused by `CSS.supports` being called in a non-browser environment ([#34572](https://github.com/WordPress/gutenberg/pull/34572)).
++-   Fixed `ToggleGroupControl`'s backdrop not updating when changing the `isAdaptiveWidth` property ([#34595](https://github.com/WordPress/gutenberg/pull/34595)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/component.tsx
+index 1f6758b8e0f7c8..07d635bbba0605 100644
+--- a/packages/components/src/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/component.tsx
+@@ -20,13 +20,13 @@ import {
+ 	useContextSystem,
+ 	WordPressComponentProps,
+ } from '../ui/context';
++import { useUpdateEffect, useCx } from '../utils/hooks';
+ import { View } from '../view';
+ import BaseControl from '../base-control';
+-import * as styles from './styles';
+-import { useUpdateEffect, useCx } from '../utils/hooks';
+-import Backdrop from './toggle-group-control-backdrop';
++import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
+ import type { ToggleGroupControlProps } from './types';
+ import ToggleGroupControlContext from './toggle-group-control-context';
++import * as styles from './styles';
+ 
+ const noop = () => {};
+ 
+@@ -101,10 +101,11 @@ function ToggleGroupControl(
+ 					ref={ useMergeRefs( [ containerRef, forwardedRef ] ) }
+ 				>
+ 					{ resizeListener }
+-					<Backdrop
++					<ToggleGroupControlBackdrop
+ 						{ ...radio }
+ 						containerRef={ containerRef }
+ 						containerWidth={ sizes.width }
++						isAdaptiveWidth={ isAdaptiveWidth }
+ 					/>
+ 					{ children }
+ 				</RadioGroup>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx b/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx
+index bd444d245bc9f8..bce2df10eff8f2 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx
+@@ -12,6 +12,7 @@ import { BackdropView } from './styles';
+ function ToggleGroupControlBackdrop( {
+ 	containerRef,
+ 	containerWidth,
++	isAdaptiveWidth,
+ 	state,
+ }: ToggleGroupControlBackdropProps ) {
+ 	const [ left, setLeft ] = useState( 0 );
+@@ -43,7 +44,7 @@ function ToggleGroupControlBackdrop( {
+ 				setCanAnimate( true );
+ 			} );
+ 		}
+-	}, [ canAnimate, containerRef, containerWidth, state ] );
++	}, [ canAnimate, containerRef, containerWidth, state, isAdaptiveWidth ] );
+ 
+ 	return (
+ 		<BackdropView
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 81ee891b285af8..801297ba064bb8 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -88,5 +88,6 @@ export type ToggleGroupControlButtonProps = {
+ export type ToggleGroupControlBackdropProps = {
+ 	containerRef: MutableRefObject< HTMLElement | undefined >;
+ 	containerWidth?: number | null;
++	isAdaptiveWidth?: boolean;
+ 	state?: any;
+ };

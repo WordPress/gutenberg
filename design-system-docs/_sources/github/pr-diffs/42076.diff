@@ -1,0 +1,62 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a49dcd8b275150..28c3bbfa781f27 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `TextHighlight`: Convert to TypeScript ([#41698](https://github.com/WordPress/gutenberg/pull/41698)).
+ 
++### Bug Fix
++
++-   `Popover`: pass missing anchor ref to the `getAnchorRect` callback prop. ([#42076](https://github.com/WordPress/gutenberg/pull/42076))
++
+ ## 19.14.0 (2022-06-29)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 8ed523cb5e57e5..4b9a6945c80399 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -128,6 +128,7 @@ const Popover = (
+ 	}
+ 
+ 	const arrowRef = useRef( null );
++	const anchorRefFallback = useRef( null );
+ 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+ 	const isExpanded = expandOnMobile && isMobileViewport;
+ 	const hasArrow = ! isExpanded && ! noArrow;
+@@ -147,8 +148,11 @@ const Popover = (
+ 			return anchorRef.ownerDocument;
+ 		} else if ( anchorRect && anchorRect?.ownerDocument ) {
+ 			return anchorRect.ownerDocument;
+-		} else if ( getAnchorRect ) {
+-			return getAnchorRect()?.ownerDocument ?? document;
++		} else if ( getAnchorRect && anchorRefFallback.current ) {
++			return (
++				getAnchorRect( anchorRefFallback.current )?.ownerDocument ??
++				document
++			);
+ 		}
+ 
+ 		return document;
+@@ -203,7 +207,6 @@ const Popover = (
+ 			: undefined,
+ 		hasArrow ? arrow( { element: arrowRef } ) : undefined,
+ 	].filter( ( m ) => !! m );
+-	const anchorRefFallback = useRef( null );
+ 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
+ 	const slot = useSlot( slotName );
+ 
+@@ -272,10 +275,10 @@ const Popover = (
+ 					return anchorRect;
+ 				},
+ 			};
+-		} else if ( getAnchorRect ) {
++		} else if ( getAnchorRect && anchorRefFallback.current ) {
+ 			usedRef = {
+ 				getBoundingClientRect() {
+-					const rect = getAnchorRect();
++					const rect = getAnchorRect( anchorRefFallback.current );
+ 					return new window.DOMRect(
+ 						rect.x ?? rect.left,
+ 						rect.y ?? rect.top,

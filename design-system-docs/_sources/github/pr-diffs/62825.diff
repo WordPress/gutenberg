@@ -1,0 +1,41 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6de5150404f227..490994b230738b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ ### Internal
+ 
+ -   `CustomSelectControlV2`: prevent keyboard event propagation in legacy wrapper. ([#62907](https://github.com/WordPress/gutenberg/pull/62907))
++-   `CustomSelectControlV2`: fix item styles ([#62825](https://github.com/WordPress/gutenberg/pull/62825))
+ -   `CustomSelectControlV2`: add root element wrapper. ([#62803](https://github.com/WordPress/gutenberg/pull/62803))
+ -   `CustomSelectControlV2`: fix popover styles. ([#62821](https://github.com/WordPress/gutenberg/pull/62821))
+ -   `CustomSelectControlV2`: fix trigger text alignment in RTL languages ([#62869](https://github.com/WordPress/gutenberg/pull/62869)).
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index 5d6bb2c6a97cd7..f4356c13af528d 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -93,6 +93,7 @@ export const Select = styled( Ariakit.Select, {
+ 		font-family: inherit;
+ 		font-size: ${ CONFIG.fontSize };
+ 		text-align: start;
++		user-select: none;
+ 		width: 100%;
+ 
+ 		&[data-focus-visible] {
+@@ -133,7 +134,15 @@ export const SelectItem = styled( Ariakit.SelectItem )`
+ 	justify-content: space-between;
+ 	padding: ${ ITEM_PADDING };
+ 	font-size: ${ CONFIG.fontSize };
+-	line-height: 2.15rem; // TODO: Remove this in default but keep for back-compat in legacy
++	// TODO: reassess line-height for non-legacy v2
++	line-height: 28px;
++	scroll-margin: ${ space( 1 ) };
++	user-select: none;
++
++	&[aria-disabled='true'] {
++		cursor: not-allowed;
++	}
++
+ 	&[data-active-item] {
+ 		background-color: ${ COLORS.theme.gray[ 300 ] };
+ 	}

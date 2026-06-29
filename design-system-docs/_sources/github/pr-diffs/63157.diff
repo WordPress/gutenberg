@@ -1,0 +1,85 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 21cf827da05deb..0e14d8021c22c3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Enhancements
+ 
++-   `Tooltip`: Add support for `className` prop ([#63157](https://github.com/WordPress/gutenberg/pull/63157)).
+ -   `Toolbar`: Add support for `vertical` orientation ([#60123](https://github.com/WordPress/gutenberg/pull/60123)).
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index 37d393edc31c1b..1b6285a4ac09c4 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import * as Ariakit from '@ariakit/react';
++import clsx from 'clsx';
+ 
+ /**
+  * WordPress dependencies
+@@ -44,6 +45,7 @@ function UnforwardedTooltip(
+ ) {
+ 	const {
+ 		children,
++		className,
+ 		delay = TOOLTIP_DELAY,
+ 		hideOnClick = true,
+ 		placement,
+@@ -112,7 +114,7 @@ function UnforwardedTooltip(
+ 			{ isOnlyChild && ( text || shortcut ) && (
+ 				<Ariakit.Tooltip
+ 					{ ...restProps }
+-					className="components-tooltip"
++					className={ clsx( 'components-tooltip', className ) }
+ 					unmountOnHide
+ 					gutter={ 4 }
+ 					id={ describedById }
+diff --git a/packages/components/src/tooltip/test/index.tsx b/packages/components/src/tooltip/test/index.tsx
+index 50dc83af4b9112..e406ff997c7295 100644
+--- a/packages/components/src/tooltip/test/index.tsx
++++ b/packages/components/src/tooltip/test/index.tsx
+@@ -105,6 +105,24 @@ describe( 'Tooltip', () => {
+ 				screen.getByRole( 'button', { name: 'Anchor' } )
+ 			).not.toHaveAttribute( 'data-foo' );
+ 		} );
++
++		it( 'should add default and custom class names to the tooltip', async () => {
++			render( <Tooltip { ...props } className="foo" /> );
++
++			// Hover over the anchor, tooltip should show
++			await hover(
++				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
++			);
++
++			// Check default and custom classnames
++			await waitFor( () =>
++				expect(
++					screen.getByRole( 'tooltip', {
++						name: 'tooltip text',
++					} )
++				).toHaveClass( 'components-tooltip', 'foo' )
++			);
++		} );
+ 	} );
+ 
+ 	describe( 'keyboard focus', () => {
+diff --git a/packages/components/src/tooltip/types.ts b/packages/components/src/tooltip/types.ts
+index 11268683bc2ced..3d42b02428de07 100644
+--- a/packages/components/src/tooltip/types.ts
++++ b/packages/components/src/tooltip/types.ts
+@@ -16,6 +16,10 @@ export type TooltipProps = {
+ 	 * **Note**: Accepts only one child element.
+ 	 */
+ 	children: React.ReactElement;
++	/**
++	 * Custom class name for the tooltip.
++	 */
++	className?: string;
+ 	/**
+ 	 * Option to hide the tooltip when the anchor is clicked.
+ 	 *

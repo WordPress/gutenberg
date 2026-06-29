@@ -1,0 +1,197 @@
+diff --git a/packages/components/src/menu-item/index.js b/packages/components/src/menu-item/index.js
+index 54a3176801f9bd..ccd02dbe8af020 100644
+--- a/packages/components/src/menu-item/index.js
++++ b/packages/components/src/menu-item/index.js
+@@ -18,7 +18,15 @@ import Button from '../button';
+ /**
+  * Renders a generic menu item for use inside the more menu.
+  *
+- * @param {Object} ref Ref
++ * @param {Object}        props                   Component props.
++ * @param {WPElement}     props.children          Element to render as child of button.
++ * @param {string}        props.info              Text to use as description for button text.
++ * @param {string}        props.className         Class to set on the container.
++ * @param {WPIcon}        props.icon              Button's `icon` prop.
++ * @param {string|Object} props.shortcut          Shortcut's `shortcut` prop.
++ * @param {boolean}       props.isSelected        Whether or not the menu item is currently selected.
++ * @param {string}        [props.role="menuitem"] ARIA role of the menu item.
++ * @param {Object}        ref                     React Element ref.
+  *
+  * @return {WPComponent} The component to be rendered.
+  */
+diff --git a/packages/components/src/placeholder/index.js b/packages/components/src/placeholder/index.js
+index d37b3566f24300..6be8b286ef13a6 100644
+--- a/packages/components/src/placeholder/index.js
++++ b/packages/components/src/placeholder/index.js
+@@ -16,7 +16,16 @@ import Icon from '../icon';
+ /**
+  * Renders a placeholder. Normally used by blocks to render their empty state.
+  *
+- * @param  {Object} props The component props.
++ * @param {Object}    props                The component props.
++ * @param {WPIcon}    props.icon           An icon rendered before the label.
++ * @param {WPElement} props.children       Children to be rendered.
++ * @param {string}    props.label          Title of the placeholder.
++ * @param {string}    props.instructions   Instructions of the placeholder.
++ * @param {string}    props.className      Class to set on the container div.
++ * @param {Object}    props.notices        A rendered notices list.
++ * @param {Object}    props.preview        Preview to be rendered in the placeholder.
++ * @param {boolean}   props.isColumnLayout Whether a column layout should be used.
++ *
+  * @return {Object}       The rendered placeholder.
+  */
+ function Placeholder( {
+diff --git a/packages/components/src/range-control/utils.js b/packages/components/src/range-control/utils.js
+index 4c091a8b0f1ac6..667dfcc9532d2f 100644
+--- a/packages/components/src/range-control/utils.js
++++ b/packages/components/src/range-control/utils.js
+@@ -16,9 +16,9 @@ import { useControlledState } from '../utils/hooks';
+ /**
+  * A float supported clamp function for a specific value.
+  *
+- * @param {number|null} value The value to clamp
+- * @param {number} min The minimum value
+- * @param {number} max The maxinum value
++ * @param {number|null} value The value to clamp.
++ * @param {number}      min   The minimum value.
++ * @param {number}      max   The maximum value.
+  *
+  * @return {number} A (float) number
+  */
+@@ -32,6 +32,11 @@ export function floatClamp( value, min, max ) {
+ 
+ /**
+  * Hook to store a clamped value, derived from props.
++ *
++ * @param {Object} settings       Hook settings.
++ * @param {number} settings.min   The minimum value.
++ * @param {number} settings.max   The maximum value.
++ * @param {number} settings.value The current value.
+  */
+ export function useControlledRangeValue( { min, max, value: valueProp } ) {
+ 	const [ value, setValue ] = useControlledState(
+@@ -55,6 +60,13 @@ export function useControlledRangeValue( { min, max, value: valueProp } ) {
+ /**
+  * Hook to encapsulate the debouncing "hover" to better handle the showing
+  * and hiding of the Tooltip.
++ *
++ * @param {Object}   settings                     Hook settings.
++ * @param {Function} [settings.onShow=noop]       A callback function invoked when the element is shown.
++ * @param {Function} [settings.onHide=noop]       A callback function invoked when the element is hidden.
++ * @param {Function} [settings.onMouseMove=noop]  A callback function invoked when the mouse is moved.
++ * @param {Function} [settings.onMouseLeave=noop] A callback function invoked when the mouse is moved out of the element.
++ * @param {number}   [settings.timeout=300]       Timeout before the element is shown or hidden.
+  */
+ export function useDebouncedHoverInteraction( {
+ 	onShow = noop,
+diff --git a/packages/components/src/toolbar-group/index.js b/packages/components/src/toolbar-group/index.js
+index 50d69ccbf89eb4..86639e9e62823a 100644
+--- a/packages/components/src/toolbar-group/index.js
++++ b/packages/components/src/toolbar-group/index.js
+@@ -40,13 +40,12 @@ import ToolbarContext from '../toolbar-context';
+  * Either `controls` or `children` is required, otherwise this components
+  * renders nothing.
+  *
+- * @param {Object}                props               Component props.
+- * @param {Array}                 [props.controls]    The controls to render in this toolbar.
+- * @param {WPElement}             [props.children]    Any other things to render inside the toolbar besides the controls.
+- * @param {string}                [props.className]   Class to set on the container div.
+- * @param {boolean}               [props.isCollapsed] Turns ToolbarGroup into a dropdown menu.
+- * @param {WPBlockTypeIconRender} [props.icon]        The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
+- * @param {string}                [props.label]       The menu item text.
++ * @param {Object}    props               Component props.
++ * @param {Array}     [props.controls]    The controls to render in this toolbar.
++ * @param {WPElement} [props.children]    Any other things to render inside the toolbar besides the controls.
++ * @param {string}    [props.className]   Class to set on the container div.
++ * @param {boolean}   [props.isCollapsed] Turns ToolbarGroup into a dropdown menu.
++ * @param {string}    [props.title]       ARIA label for dropdown menu if is collapsed.
+  */
+ function ToolbarGroup( {
+ 	controls = [],
+diff --git a/packages/components/src/toolbar/index.js b/packages/components/src/toolbar/index.js
+index 228f73a7e5e453..ebf8e3482bf63a 100644
+--- a/packages/components/src/toolbar/index.js
++++ b/packages/components/src/toolbar/index.js
+@@ -19,9 +19,10 @@ import ToolbarContainer from './toolbar-container';
+  *
+  * To add controls, simply pass `ToolbarButton` components as children.
+  *
+- * @param {Object} props             Component props.
+- * @param {string} [props.className] Class to set on the container div.
+- * @param {Object} ref               React Element ref.
++ * @param {Object} props                                    Component props.
++ * @param {string} [props.className]                        Class to set on the container div.
++ * @param {string} [props.__experimentalAccessibilityLabel] ARIA label for toolbar container.
++ * @param {Object} ref                                      React Element ref.
+  */
+ function Toolbar(
+ 	{ className, __experimentalAccessibilityLabel, ...props },
+diff --git a/packages/components/src/tree-grid/index.js b/packages/components/src/tree-grid/index.js
+index e9e4feb57dacb8..19d05a42bb5275 100644
+--- a/packages/components/src/tree-grid/index.js
++++ b/packages/components/src/tree-grid/index.js
+@@ -36,7 +36,12 @@ function getRowFocusables( rowElement ) {
+ }
+ 
+ /**
++ * Renders both a table and tbody element, used to create a tree hierarchy.
++ *
+  * @see https://github.com/WordPress/gutenberg/blob/master/packages/components/src/tree-grid/README.md
++ *
++ * @param {Object}    props          Component props.
++ * @param {WPElement} props.children Children to be rendered
+  */
+ export default function TreeGrid( { children, ...props } ) {
+ 	const onKeyDown = useCallback( ( event ) => {
+diff --git a/packages/components/src/tree-grid/roving-tab-index.js b/packages/components/src/tree-grid/roving-tab-index.js
+index 7a517b5e66cca0..c5ed0ef9b9b0f1 100644
+--- a/packages/components/src/tree-grid/roving-tab-index.js
++++ b/packages/components/src/tree-grid/roving-tab-index.js
+@@ -9,7 +9,12 @@ import { useState, useMemo } from '@wordpress/element';
+ import { RovingTabIndexProvider } from './roving-tab-index-context';
+ 
+ /**
+- * @see https://github.com/WordPress/gutenberg/blob/master/packages/components/src/roving-tab-index/README.md
++ * Provider for adding roving tab index behaviors to tree grid structures.
++ *
++ * @see https://github.com/WordPress/gutenberg/blob/master/packages/components/src/tree-grid/README.md
++ *
++ * @param {Object}    props          Component props.
++ * @param {WPElement} props.children Children to be rendered
+  */
+ export default function RovingTabIndex( { children } ) {
+ 	const [ lastFocusedElement, setLastFocusedElement ] = useState();
+diff --git a/packages/components/src/unit-control/unit-select-control.js b/packages/components/src/unit-control/unit-select-control.js
+index a0dc2211e53c78..fcaabada99ec0b 100644
+--- a/packages/components/src/unit-control/unit-select-control.js
++++ b/packages/components/src/unit-control/unit-select-control.js
+@@ -13,6 +13,14 @@ import { CSS_UNITS, hasUnits } from './utils';
+ /**
+  * Renders a `select` if there are multiple units.
+  * Otherwise, renders a non-selectable label.
++ *
++ * @param {Object}   props                     Component props.
++ * @param {string}   [props.className]         Class to set on the `select` element.
++ * @param {boolean}  [props.isTabbable=true]   Whether the control can be focused via keyboard navigation.
++ * @param {Array}    [props.options=CSS_UNITS] Available units to select from.
++ * @param {Function} [props.onChange=noop]     A callback function invoked when the value is changed.
++ * @param {string}   [props.size="default"]    Size of the control option. Supports "default" and "small".
++ * @param {string}   [props.value="px"]        Current unit.
+  */
+ export default function UnitSelectControl( {
+ 	className,
+diff --git a/packages/components/src/visually-hidden/index.js b/packages/components/src/visually-hidden/index.js
+index 9824ab5106b9be..727e958787c2da 100644
+--- a/packages/components/src/visually-hidden/index.js
++++ b/packages/components/src/visually-hidden/index.js
+@@ -11,6 +11,10 @@ import { renderAsRenderProps } from './utils';
+ /**
+  * VisuallyHidden component to render text out non-visually
+  * for use in devices such as a screen reader.
++ *
++ * @param {Object}             props             Component props.
++ * @param {string|WPComponent} [props.as="div"]  A tag or component to render.
++ * @param {string}             [props.className] Class to set on the container.
+  */
+ function VisuallyHidden( { as = 'div', className, ...props } ) {
+ 	return renderAsRenderProps( {

@@ -1,0 +1,32 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2e971718ba2c46..8f446c0034a0b6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,9 +7,13 @@
+ -   `Guide`: Make next and previous button text customizable ([#69907](https://github.com/WordPress/gutenberg/pull/69907)).
+ -   `Popover`: Introduce a virtual padding of `8px` to prevent it from hitting the viewport edge ([#69555](https://github.com/WordPress/gutenberg/pull/69555)).
+ 
++### Bug Fixes
++
++-   `ToggleGroupControl`: Fix active background for empty string value ([#69969](https://github.com/WordPress/gutenberg/pull/69969)).
++
+ ## 29.8.0 (2025-04-11)
+ 
+-### Documentation 
++### Documentation
+ 
+ -   `Popover`: Expose Popover TypeScript types for subcomponents. ([#69619](https://github.com/WordPress/gutenberg/pull/69619))
+ 
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 9f3427e95a6017..3391c929fffbe1 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -54,7 +54,7 @@ function UnconnectedToggleGroupControl(
+ 	const [ controlElement, setControlElement ] = useState< HTMLElement >();
+ 	const refs = useMergeRefs( [ setControlElement, forwardedRef ] );
+ 	const selectedRect = useTrackElementOffsetRect(
+-		value || value === 0 ? selectedElement : undefined
++		value !== null && value !== undefined ? selectedElement : undefined
+ 	);
+ 	useAnimatedOffsetRect( controlElement, selectedRect, {
+ 		prefix: 'selected',

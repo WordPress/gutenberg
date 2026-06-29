@@ -1,0 +1,504 @@
+diff --git a/bin/test-create-block.sh b/bin/test-create-block.sh
+index 7653d8f9306c5e..40a31e8f9572b9 100755
+--- a/bin/test-create-block.sh
++++ b/bin/test-create-block.sh
+@@ -92,6 +92,10 @@ fi
+ status "Linting CSS files..."
+ ../node_modules/.bin/wp-scripts lint-style
+ 
++# Ensure monorepo prelint:js scripts have run (e.g., to build design tokens for ESLint).
++status "Running prelint:js..."
++( cd .. && npm run prelint:js )
++
+ status "Linting JavaScript files..."
+ ../node_modules/.bin/wp-scripts lint-js
+ 
+diff --git a/package-lock.json b/package-lock.json
+index 6c33efb2ac80c0..dbff291ff9a1d4 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -53862,6 +53862,7 @@
+ 				"@typescript-eslint/parser": "^6.4.1",
+ 				"@wordpress/babel-preset-default": "file:../babel-preset-default",
+ 				"@wordpress/prettier-config": "file:../prettier-config",
++				"@wordpress/theme": "file:../theme",
+ 				"cosmiconfig": "^7.0.0",
+ 				"eslint-config-prettier": "^8.3.0",
+ 				"eslint-import-resolver-typescript": "^4.4.4",
+@@ -55459,6 +55460,7 @@
+ 				"@testing-library/jest-dom": "^6.6.3",
+ 				"@types/jest": "^29.5.14",
+ 				"@types/node": "^20.17.10",
++				"esbuild": "^0.27.2",
+ 				"esbuild-esm-loader": "^0.3.3",
+ 				"storybook": "^9.1.17"
+ 			},
+diff --git a/package.json b/package.json
+index 1750f5abef3e3f..3db5c029b6463e 100644
+--- a/package.json
++++ b/package.json
+@@ -156,7 +156,7 @@
+ 		"format": "wp-scripts format",
+ 		"preformat:php": "npm run other:update-packages:php",
+ 		"format:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script format",
+-		"prelint": "npm run --if-present --workspaces prelint",
++		"prelint:js": "npm run --if-present --workspaces prelint:js",
+ 		"lint": "concurrently \"npm run lint:lockfile\" \"npm run lint:tsconfig\" \"npm run lint:js\" \"npm run lint:pkg-json\" \"npm run lint:css\"",
+ 		"lint:css": "wp-scripts lint-style \"**/*.scss\" \"**/*.module.css\"",
+ 		"lint:css:fix": "npm run lint:css -- --fix",
+@@ -224,7 +224,7 @@
+ 			"wp-scripts format"
+ 		],
+ 		"**/*.{js,ts,tsx,jsx}": [
+-			"npm run prelint",
++			"npm run prelint:js",
+ 			"wp-scripts lint-js --config .eslintrc.strict.js"
+ 		],
+ 		"*.scss": [
+diff --git a/packages/eslint-plugin/CHANGELOG.md b/packages/eslint-plugin/CHANGELOG.md
+index ddc5484f0dd7b0..77fb4d81e0ffad 100644
+--- a/packages/eslint-plugin/CHANGELOG.md
++++ b/packages/eslint-plugin/CHANGELOG.md
+@@ -7,6 +7,11 @@
+ -   Updated recommended ruleset to enforce [`import/no-unresolved`](https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-unresolved.md) for `@wordpress/` packages. These packages were previously exempted from the rule. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))
+ -   Removed default configuration of [`import/internal-regex`](https://github.com/import-js/eslint-plugin-import/tree/main?tab=readme-ov-file#importinternal-regex) to classify `@wordpress/` packages as internal. From the perspective of an external consumer of this package, `@wordpress/` packages should be considered external. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))
+ 
++### New Features
++
++-   Added [`no-setting-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-setting-ds-tokens.md) rule to disallow setting Design System token CSS custom properties (`--wpds-*`). ([#74325](https://github.com/WordPress/gutenberg/pull/74325))
++-   Added [`no-unknown-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unknown-ds-tokens.md) rule to disallow unknown Design System tokens. ([#74325](https://github.com/WordPress/gutenberg/pull/74325))
++
+ ### Enhancements
+ 
+ - The `dependency-group` rule is not recommended anymore. ([#73616](https://github.com/WordPress/gutenberg/pull/73616))
+diff --git a/packages/eslint-plugin/configs/custom.js b/packages/eslint-plugin/configs/custom.js
+index d3e3a4519a343f..06179ae7da2424 100644
+--- a/packages/eslint-plugin/configs/custom.js
++++ b/packages/eslint-plugin/configs/custom.js
+@@ -6,6 +6,8 @@ module.exports = {
+ 		'@wordpress/no-unguarded-get-range-at': 'error',
+ 		'@wordpress/no-global-active-element': 'error',
+ 		'@wordpress/no-global-get-selection': 'error',
++		'@wordpress/no-setting-ds-tokens': 'error',
++		'@wordpress/no-unknown-ds-tokens': 'error',
+ 		'@wordpress/no-unsafe-wp-apis': 'error',
+ 		'@wordpress/no-wp-process-env': 'error',
+ 	},
+diff --git a/packages/eslint-plugin/docs/rules/no-setting-ds-tokens.md b/packages/eslint-plugin/docs/rules/no-setting-ds-tokens.md
+new file mode 100644
+index 00000000000000..71c37c97b0825a
+--- /dev/null
++++ b/packages/eslint-plugin/docs/rules/no-setting-ds-tokens.md
+@@ -0,0 +1,32 @@
++# Disallow setting Design System token CSS custom properties (no-setting-ds-tokens)
++
++Design System tokens (CSS custom properties beginning with `--wpds-`) are meant to be consumed, not set. Setting these properties in inline styles can lead to unexpected behavior and breaks the Design System's theming capabilities.
++
++This rule lints JSX inline styles. For CSS files, use the [corresponding Stylelint rule](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-theme/#stylelint-plugins) from the `@wordpress/theme` package.
++
++## Rule details
++
++Examples of **incorrect** code for this rule:
++
++```jsx
++<div style={ { '--wpds-color-fg-content-neutral': 'red' } } />
++```
++
++```jsx
++<div style={ { '--wpds-font-size-md': '10px', color: 'blue' } } />
++```
++
++Examples of **correct** code for this rule:
++
++```jsx
++<div style={ { color: 'var(--wpds-color-fg-content-neutral)' } } />
++```
++
++```jsx
++<div style={ { '--my-custom-prop': 'value' } } />
++```
++
++```jsx
++<div style={ { margin: '10px' } } />
++```
++
+diff --git a/packages/eslint-plugin/docs/rules/no-unknown-ds-tokens.md b/packages/eslint-plugin/docs/rules/no-unknown-ds-tokens.md
+new file mode 100644
+index 00000000000000..f3b1486d65c9e4
+--- /dev/null
++++ b/packages/eslint-plugin/docs/rules/no-unknown-ds-tokens.md
+@@ -0,0 +1,32 @@
++# Disallow unknown Design System tokens (no-unknown-ds-tokens)
++
++When using Design System tokens (CSS custom properties beginning with `--wpds-`), only valid public tokens should be used. Using non-existent tokens will result in broken styles since the CSS variable won't resolve to any value.
++
++This rule lints JSX inline styles. For CSS files, use the [corresponding Stylelint rule](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-theme/#stylelint-plugins) from the `@wordpress/theme` package.
++
++## Rule details
++
++Examples of **incorrect** code for this rule:
++
++```jsx
++<div style={ { color: 'var(--wpds-nonexistent-token)' } } />
++```
++
++```jsx
++<div style={ { color: 'var(--wpds-fake-color, var(--wpds-also-fake))' } } />
++```
++
++Examples of **correct** code for this rule:
++
++```jsx
++<div style={ { color: 'var(--wpds-color-fg-content-neutral)' } } />
++```
++
++```jsx
++<div style={ { color: 'var(--my-custom-prop)' } } />
++```
++
++```jsx
++<div style={ { color: 'blue' } } />
++```
++
+diff --git a/packages/eslint-plugin/package.json b/packages/eslint-plugin/package.json
+index 5003c5d5711ff4..67378fc7fac42e 100644
+--- a/packages/eslint-plugin/package.json
++++ b/packages/eslint-plugin/package.json
+@@ -42,6 +42,7 @@
+ 		"@typescript-eslint/parser": "^6.4.1",
+ 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
+ 		"@wordpress/prettier-config": "file:../prettier-config",
++		"@wordpress/theme": "file:../theme",
+ 		"cosmiconfig": "^7.0.0",
+ 		"eslint-config-prettier": "^8.3.0",
+ 		"eslint-import-resolver-typescript": "^4.4.4",
+diff --git a/packages/eslint-plugin/rules/__tests__/no-setting-ds-tokens.js b/packages/eslint-plugin/rules/__tests__/no-setting-ds-tokens.js
+new file mode 100644
+index 00000000000000..ab2f22dd5d0401
+--- /dev/null
++++ b/packages/eslint-plugin/rules/__tests__/no-setting-ds-tokens.js
+@@ -0,0 +1,46 @@
++import { RuleTester } from 'eslint';
++import rule from '../no-setting-ds-tokens';
++
++const ruleTester = new RuleTester( {
++	parserOptions: {
++		ecmaVersion: 6,
++		ecmaFeatures: {
++			jsx: true,
++		},
++	},
++} );
++
++ruleTester.run( 'no-setting-ds-tokens', rule, {
++	valid: [
++		{
++			code: `<div style={ { '--my-custom-prop': 'value' } } />`,
++		},
++		{
++			code: `<div style={ { color: 'var(--wpds-color-fg-content-neutral)' } } />`,
++		},
++		{
++			code: `<div style={ { '--other-prefix-token': '10px' } } />`,
++		},
++		{
++			code: `<div style={ { margin: '10px' } } />`,
++		},
++	],
++	invalid: [
++		{
++			code: `<div style={ { '--wpds-color-fg-content-neutral': 'red' } } />`,
++			errors: [
++				{
++					messageId: 'disallowedSet',
++				},
++			],
++		},
++		{
++			code: `<div style={ { '--wpds-font-size-md': '10px', color: 'blue' } } />`,
++			errors: [
++				{
++					messageId: 'disallowedSet',
++				},
++			],
++		},
++	],
++} );
+diff --git a/packages/eslint-plugin/rules/__tests__/no-unknown-ds-tokens.js b/packages/eslint-plugin/rules/__tests__/no-unknown-ds-tokens.js
+new file mode 100644
+index 00000000000000..2688ac9382ddf9
+--- /dev/null
++++ b/packages/eslint-plugin/rules/__tests__/no-unknown-ds-tokens.js
+@@ -0,0 +1,60 @@
++import { RuleTester } from 'eslint';
++import rule from '../no-unknown-ds-tokens';
++
++const ruleTester = new RuleTester( {
++	parserOptions: {
++		ecmaVersion: 6,
++		ecmaFeatures: {
++			jsx: true,
++		},
++	},
++} );
++
++ruleTester.run( 'no-unknown-ds-tokens', rule, {
++	valid: [
++		{
++			code: `<div style={ { color: 'var(--my-custom-prop)' } } />`,
++		},
++		{
++			code: `<div style={ { color: 'blue' } } />`,
++		},
++		{
++			code: `<div style={ { color: 'var(--other-prefix-token)' } } />`,
++		},
++		{
++			code: `<div style={ { color: 'var(--wpds-color-fg-content-neutral)' } } />`,
++		},
++		{
++			code: '<div style={ { color: `var(--wpds-color-fg-content-neutral)` } } />',
++		},
++	],
++	invalid: [
++		{
++			code: `<div style={ { color: 'var(--wpds-nonexistent-token)' } } />`,
++			errors: [
++				{
++					messageId: 'onlyKnownTokens',
++				},
++			],
++		},
++		{
++			code: `<div style={ { color: 'var(--wpds-fake-color, var(--wpds-also-fake))' } } />`,
++			errors: [
++				{
++					messageId: 'onlyKnownTokens',
++					data: {
++						tokenNames: "'--wpds-fake-color', '--wpds-also-fake'",
++					},
++				},
++			],
++		},
++		{
++			code: '<div style={ { color: `var(--wpds-nonexistent)` } } />',
++			errors: [
++				{
++					messageId: 'onlyKnownTokens',
++				},
++			],
++		},
++	],
++} );
+diff --git a/packages/eslint-plugin/rules/no-setting-ds-tokens.js b/packages/eslint-plugin/rules/no-setting-ds-tokens.js
+new file mode 100644
+index 00000000000000..402ecf5c1e4c5d
+--- /dev/null
++++ b/packages/eslint-plugin/rules/no-setting-ds-tokens.js
+@@ -0,0 +1,27 @@
++module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
++	meta: {
++		type: 'problem',
++		docs: {
++			description:
++				'Disallow setting any CSS custom property beginning with --wpds- in inline styles',
++		},
++		schema: [],
++		messages: {
++			disallowedSet:
++				'Do not set CSS custom properties using the Design System tokens namespace (i.e. beginning with --wpds-*).',
++		},
++	},
++	create( context ) {
++		return {
++			/** @param {import('estree').Property} node */
++			'JSXAttribute[name.name="style"] ObjectExpression > Property[key.value=/^--wpds-/]'(
++				node
++			) {
++				context.report( {
++					node: node.key,
++					messageId: 'disallowedSet',
++				} );
++			},
++		};
++	},
++} );
+diff --git a/packages/eslint-plugin/rules/no-unknown-ds-tokens.js b/packages/eslint-plugin/rules/no-unknown-ds-tokens.js
+new file mode 100644
+index 00000000000000..e13402087a6300
+--- /dev/null
++++ b/packages/eslint-plugin/rules/no-unknown-ds-tokens.js
+@@ -0,0 +1,101 @@
++const tokenListModule = require( '@wordpress/theme/design-tokens.js' );
++const tokenList = tokenListModule.default || tokenListModule;
++
++const DS_TOKEN_PREFIX = 'wpds-';
++
++/**
++ * Extracts all unique CSS custom properties (variables) from a given CSS value string,
++ * including those in fallback positions, optionally filtering by a specific prefix.
++ *
++ * @param {string} value       - The CSS value string to search for variables.
++ * @param {string} [prefix=''] - Optional prefix to filter variables (e.g., 'wpds-').
++ * @return {Set<string>} A Set of unique matched CSS variable names (e.g., Set { '--wpds-token' }).
++ *
++ * @example
++ * extractCSSVariables(
++ *   'border: 1px solid var(--wpds-border-color, var(--wpds-border-fallback)); ' +
++ *   'color: var(--wpds-color-fg, black); ' +
++ *   'background: var(--unrelated-bg);',
++ *   'wpds'
++ * );
++ * // → Set { '--wpds-border-color', '--wpds-border-fallback', '--wpds-color-fg' }
++ */
++function extractCSSVariables( value, prefix = '' ) {
++	const regex = /--[\w-]+/g;
++	const variables = new Set();
++
++	let match;
++	while ( ( match = regex.exec( value ) ) !== null ) {
++		const variableName = match[ 0 ];
++		if ( variableName.startsWith( `--${ prefix }` ) ) {
++			variables.add( variableName );
++		}
++	}
++
++	return variables;
++}
++
++const knownTokens = new Set( tokenList );
++const wpdsTokensRegex = new RegExp( `[^\\w]--${ DS_TOKEN_PREFIX }`, 'i' );
++
++module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
++	meta: {
++		type: 'problem',
++		docs: {
++			description: 'Prevent use of non-existing --wpds-* variables',
++		},
++		schema: [],
++		messages: {
++			onlyKnownTokens:
++				'The following CSS variables are not valid Design System tokens: {{ tokenNames }}',
++		},
++	},
++	create( context ) {
++		const disallowedTokensAST = `JSXAttribute[name.name="style"] :matches(Literal[value=${ wpdsTokensRegex }], TemplateLiteral TemplateElement[value.raw=${ wpdsTokensRegex }])`;
++		return {
++			/** @param {import('estree').Literal | import('estree').TemplateElement} node */
++			[ disallowedTokensAST ]( node ) {
++				let computedValue;
++
++				if ( ! node.value ) {
++					return;
++				}
++
++				if ( typeof node.value === 'string' ) {
++					// Get the node's value when it's a "string"
++					computedValue = node.value;
++				} else if (
++					typeof node.value === 'object' &&
++					'raw' in node.value
++				) {
++					// Get the node's value when it's a `template literal`
++					computedValue = node.value.cooked ?? node.value.raw;
++				}
++
++				if ( ! computedValue ) {
++					return;
++				}
++
++				const usedTokens = extractCSSVariables(
++					computedValue,
++					DS_TOKEN_PREFIX
++				);
++				const unknownTokens = [ ...usedTokens ].filter(
++					( token ) => ! knownTokens.has( token )
++				);
++
++				if ( unknownTokens.length > 0 ) {
++					context.report( {
++						node,
++						messageId: 'onlyKnownTokens',
++						data: {
++							tokenNames: unknownTokens
++								.map( ( token ) => `'${ token }'` )
++								.join( ', ' ),
++						},
++					} );
++				}
++			},
++		};
++	},
++} );
+diff --git a/packages/eslint-plugin/tsconfig.json b/packages/eslint-plugin/tsconfig.json
+index 05bbe687390e50..7b6ad023b158a5 100644
+--- a/packages/eslint-plugin/tsconfig.json
++++ b/packages/eslint-plugin/tsconfig.json
+@@ -4,7 +4,7 @@
+ 	"compilerOptions": {
+ 		"rootDir": "rules"
+ 	},
+-	"references": [ { "path": "../prettier-config" } ],
++	"references": [ { "path": "../prettier-config" }, { "path": "../theme" } ],
+ 	// NOTE: This package is being progressively typed. You are encouraged to
+ 	// expand this array with files which can be type-checked. At some point in
+ 	// the future, this can be simplified to an `includes` of `src/**/*`.
+diff --git a/packages/icons/package.json b/packages/icons/package.json
+index f89dc40b231928..3f9264bac8533f 100644
+--- a/packages/icons/package.json
++++ b/packages/icons/package.json
+@@ -54,7 +54,7 @@
+ 		"access": "public"
+ 	},
+ 	"scripts": {
+-		"prelint": "npm run build",
++		"prelint:js": "npm run build",
+ 		"prepare": "npm run build",
+ 		"build": "node lib/generate-library.cjs"
+ 	}
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index 584fb0690ff3c1..f9a538ffcf0dc6 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -76,6 +76,7 @@
+ 		"@testing-library/jest-dom": "^6.6.3",
+ 		"@types/jest": "^29.5.14",
+ 		"@types/node": "^20.17.10",
++		"esbuild": "^0.27.2",
+ 		"esbuild-esm-loader": "^0.3.3",
+ 		"storybook": "^9.1.17"
+ 	},
+@@ -93,9 +94,10 @@
+ 		"access": "public"
+ 	},
+ 	"scripts": {
++		"prelint:js": "npx esbuild src/prebuilt/js/design-tokens.mjs --format=cjs --outfile=build/prebuilt/js/design-tokens.cjs && node -e \"\"",
+ 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
+ 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && cross-env NODE_OPTIONS=--import=esbuild-esm-loader/register tz build --config terrazzo.config.ts",
+-		"build": "npm run build:tokens && npm run build:default-ramps",
++		"build": "npm run build:tokens && npm run build:default-ramps && npm run prelint:js",
+ 		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs"
+ 	}
+ }
+diff --git a/test/unit/jest.config.js b/test/unit/jest.config.js
+index 154e5880b1efbc..a1056334091961 100644
+--- a/test/unit/jest.config.js
++++ b/test/unit/jest.config.js
+@@ -16,6 +16,8 @@ module.exports = {
+ 	moduleNameMapper: {
+ 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
+ 			'packages/$1/src',
++		'@wordpress/theme/design-tokens.js':
++			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
+ 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
+ 	},
+ 	preset: '@wordpress/jest-preset-default',
+@@ -45,7 +47,7 @@ module.exports = {
+ 	],
+ 	resolver: '<rootDir>/test/unit/scripts/resolver.js',
+ 	transform: {
+-		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
++		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
+ 	},
+ 	transformIgnorePatterns: [
+ 		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js)/)',

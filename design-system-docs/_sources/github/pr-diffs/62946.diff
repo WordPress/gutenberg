@@ -1,0 +1,559 @@
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index dd78efd51b36b3..4906e0088417b7 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -7,14 +7,7 @@ import * as Ariakit from '@ariakit/react';
+  * WordPress dependencies
+  */
+ import warning from '@wordpress/warning';
+-import {
+-	forwardRef,
+-	useCallback,
+-	useEffect,
+-	useInsertionEffect,
+-	useRef,
+-	useState,
+-} from '@wordpress/element';
++import { forwardRef, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -24,241 +17,8 @@ import { useTabsContext } from './context';
+ import { TabListWrapper } from './styles';
+ import type { WordPressComponentProps } from '../context';
+ import clsx from 'clsx';
+-
+-// TODO: move these into a separate utility file, for use in other components
+-// such as ToggleGroupControl.
+-
+-/**
+- * Any function.
+- */
+-type AnyFunction = ( ...args: any ) => any;
+-
+-/**
+- * Creates a stable callback function that has access to the latest state and
+- * can be used within event handlers and effect callbacks. Throws when used in
+- * the render phase.
+- *
+- * @example
+- *
+- * ```tsx
+- * function Component(props) {
+- *   const onClick = useEvent(props.onClick);
+- *   React.useEffect(() => {}, [onClick]);
+- * }
+- * ```
+- */
+-function useEvent< T extends AnyFunction >( callback?: T ) {
+-	const ref = useRef< AnyFunction | undefined >( () => {
+-		throw new Error( 'Cannot call an event handler while rendering.' );
+-	} );
+-	useInsertionEffect( () => {
+-		ref.current = callback;
+-	} );
+-	return useCallback< AnyFunction >(
+-		( ...args ) => ref.current?.( ...args ),
+-		[]
+-	) as T;
+-}
+-
+-/**
+- * `useResizeObserver` options.
+- */
+-type UseResizeObserverOptions = {
+-	/**
+-	 * Whether to trigger the callback when an element's ResizeObserver is
+-	 * first set up.
+-	 *
+-	 * @default true
+-	 */
+-	fireOnObserve?: boolean;
+-};
+-
+-/**
+- * Fires `onResize` when the target element is resized.
+- *
+- * **The element must not be stored in a ref**, else it won't be observed
+- * or updated. Instead, it should be stored in a React state or equivalent.
+- *
+- * It sets up a `ResizeObserver` that tracks the element under the hood. The
+- * target element can be changed dynamically, and the observer will be
+- * updated accordingly.
+- *
+- * By default, `onResize` is called when the observer is set up, in addition
+- * to when the element is resized. This behavior can be disabled with the
+- * `fireOnObserve` option.
+- *
+- * @example
+- *
+- * ```tsx
+- * const [ targetElement, setTargetElement ] = useState< HTMLElement | null >();
+- *
+- * useResizeObserver( targetElement, ( element ) => {
+- *   console.log( 'Element resized:', element );
+- * } );
+- *
+- * <div ref={ setTargetElement } />;
+- * ```
+- */
+-function useResizeObserver(
+-	/**
+-	 * The target element to observe. It can be changed dynamically.
+-	 */
+-	targetElement: HTMLElement | undefined | null,
+-
+-	/**
+-	 * Callback to fire when the element is resized. It will also be
+-	 * called when the observer is set up, unless `fireOnObserve` is
+-	 * set to `false`.
+-	 */
+-	onResize: ( element: HTMLElement ) => void,
+-	{ fireOnObserve = true }: UseResizeObserverOptions = {}
+-) {
+-	const onResizeEvent = useEvent( onResize );
+-
+-	const observedElementRef = useRef< HTMLElement | null >();
+-	const resizeObserverRef = useRef< ResizeObserver >();
+-
+-	useEffect( () => {
+-		if ( targetElement === observedElementRef.current ) {
+-			return;
+-		}
+-
+-		observedElementRef.current = targetElement;
+-
+-		// Set up a ResizeObserver.
+-		if ( ! resizeObserverRef.current ) {
+-			resizeObserverRef.current = new ResizeObserver( () => {
+-				if ( observedElementRef.current ) {
+-					onResizeEvent( observedElementRef.current );
+-				}
+-			} );
+-		}
+-		const { current: resizeObserver } = resizeObserverRef;
+-
+-		// Observe new element.
+-		if ( targetElement ) {
+-			if ( fireOnObserve ) {
+-				onResizeEvent( targetElement );
+-			}
+-			resizeObserver.observe( targetElement );
+-		}
+-
+-		return () => {
+-			// Unobserve previous element.
+-			if ( observedElementRef.current ) {
+-				resizeObserver.unobserve( observedElementRef.current );
+-			}
+-		};
+-	}, [ fireOnObserve, onResizeEvent, targetElement ] );
+-}
+-
+-/**
+- * The position and dimensions of an element, relative to its offset parent.
+- */
+-type ElementOffsetRect = {
+-	/**
+-	 * The distance from the left edge of the offset parent to the left edge of
+-	 * the element.
+-	 */
+-	left: number;
+-	/**
+-	 * The distance from the top edge of the offset parent to the top edge of
+-	 * the element.
+-	 */
+-	top: number;
+-	/**
+-	 * The width of the element.
+-	 */
+-	width: number;
+-	/**
+-	 * The height of the element.
+-	 */
+-	height: number;
+-};
+-
+-/**
+- * An `ElementOffsetRect` object with all values set to zero.
+- */
+-const NULL_ELEMENT_OFFSET_RECT = {
+-	left: 0,
+-	top: 0,
+-	width: 0,
+-	height: 0,
+-} satisfies ElementOffsetRect;
+-
+-/**
+- * Returns the position and dimensions of an element, relative to its offset
+- * parent. This is useful in contexts where `getBoundingClientRect` is not
+- * suitable, such as when the element is transformed.
+- *
+- * **Note:** the `left` and `right` values are adjusted due to a limitation
+- * in the way the browser calculates the offset position of the element,
+- * which can cause unwanted scrollbars to appear. This adjustment makes the
+- * values potentially inaccurate within a range of 1 pixel.
+- */
+-function getElementOffsetRect( element: HTMLElement ): ElementOffsetRect {
+-	return {
+-		// The adjustments mentioned in the documentation above are necessary
+-		// because `offsetLeft` and `offsetTop` are rounded to the nearest pixel,
+-		// which can result in a position mismatch that causes unwanted overflow.
+-		// For context, see: https://github.com/WordPress/gutenberg/pull/61979
+-		left: Math.max( element.offsetLeft - 1, 0 ),
+-		top: Math.max( element.offsetTop - 1, 0 ),
+-		// This is a workaround to obtain these values with a sub-pixel precision,
+-		// since `offsetWidth` and `offsetHeight` are rounded to the nearest pixel.
+-		width: parseFloat( getComputedStyle( element ).width ),
+-		height: parseFloat( getComputedStyle( element ).height ),
+-	};
+-}
+-
+-/**
+- * Tracks the position and dimensions of an element, relative to its offset
+- * parent. The element can be changed dynamically.
+- */
+-function useTrackElementOffsetRect(
+-	targetElement: HTMLElement | undefined | null
+-) {
+-	const [ indicatorPosition, setIndicatorPosition ] =
+-		useState< ElementOffsetRect >( NULL_ELEMENT_OFFSET_RECT );
+-
+-	useResizeObserver( targetElement, ( element ) =>
+-		setIndicatorPosition( getElementOffsetRect( element ) )
+-	);
+-
+-	return indicatorPosition;
+-}
+-
+-/**
+- * Context object for the `onUpdate` callback of `useOnValueUpdate`.
+- */
+-type ValueUpdateContext< T > = {
+-	previousValue: T;
+-};
+-
+-/**
+- * Calls the `onUpdate` callback when the `value` changes.
+- */
+-function useOnValueUpdate< T >(
+-	/**
+-	 * The value to watch for changes.
+-	 */
+-	value: T,
+-	/**
+-	 * Callback to fire when the value changes.
+-	 */
+-	onUpdate: ( context: ValueUpdateContext< T > ) => void
+-) {
+-	const previousValueRef = useRef( value );
+-	const updateCallbackEvent = useEvent( onUpdate );
+-	useEffect( () => {
+-		if ( previousValueRef.current !== value ) {
+-			updateCallbackEvent( {
+-				previousValue: previousValueRef.current,
+-			} );
+-			previousValueRef.current = value;
+-		}
+-	}, [ updateCallbackEvent, value ] );
+-}
++import { useTrackElementOffsetRect } from '../utils/element-rect';
++import { useOnValueUpdate } from '../utils/hooks/use-on-value-update';
+ 
+ export const TabList = forwardRef<
+ 	HTMLDivElement,
+diff --git a/packages/components/src/utils/element-rect.ts b/packages/components/src/utils/element-rect.ts
+new file mode 100644
+index 00000000000000..9f6eb120b32fc5
+--- /dev/null
++++ b/packages/components/src/utils/element-rect.ts
+@@ -0,0 +1,197 @@
++/* eslint-disable jsdoc/require-param */
++/**
++ * WordPress dependencies
++ */
++import { useRef, useEffect, useState } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import { useEvent } from './hooks/use-event';
++
++/**
++ * `useTrackElementRectUpdates` options.
++ */
++export type UseTrackElementRectUpdatesOptions = {
++	/**
++	 * Whether to trigger the callback when an element's ResizeObserver is
++	 * first set up, including when the target element changes.
++	 *
++	 * @default true
++	 */
++	fireOnElementInit?: boolean;
++};
++
++/**
++ * Tracks an element's "rect" (size and position) and fires `onRect` for all
++ * of its discrete values. The element can be changed dynamically and **it
++ * must not be stored in a ref**. Instead, it should be stored in a React
++ * state or equivalent.
++ *
++ * By default, `onRect` is called initially for the target element (including
++ * when the target element changes), not only on size or position updates.
++ * This allows consumers of the hook to always be in sync with all rect values
++ * of the target element throughout its lifetime. This behavior can be
++ * disabled by setting the `fireOnElementInit` option to `false`.
++ *
++ * Under the hood, it sets up a `ResizeObserver` that tracks the element. The
++ * target element can be changed dynamically, and the observer will be
++ * updated accordingly.
++ *
++ * @example
++ *
++ * ```tsx
++ * const [ targetElement, setTargetElement ] = useState< HTMLElement | null >();
++ *
++ * useTrackElementRectUpdates( targetElement, ( element ) => {
++ *   console.log( 'Element resized:', element );
++ * } );
++ *
++ * <div ref={ setTargetElement } />;
++ * ```
++ */
++export function useTrackElementRectUpdates(
++	/**
++	 * The target element to observe. It can be changed dynamically.
++	 */
++	targetElement: HTMLElement | undefined | null,
++	/**
++	 * Callback to fire when the element is resized. It will also be
++	 * called when the observer is set up, unless `fireOnElementInit` is
++	 * set to `false`.
++	 */
++	onRect: (
++		/**
++		 * The element being tracked at the time of this update.
++		 */
++		element: HTMLElement,
++		/**
++		 * The list of
++		 * [`ResizeObserverEntry`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry)
++		 * objects passed to the `ResizeObserver.observe` callback. This list
++		 * won't be available when the observer is set up, and only on updates.
++		 */
++		resizeObserverEntries?: ResizeObserverEntry[]
++	) => void,
++	{ fireOnElementInit = true }: UseTrackElementRectUpdatesOptions = {}
++) {
++	const onRectEvent = useEvent( onRect );
++
++	const observedElementRef = useRef< HTMLElement | null >();
++	const resizeObserverRef = useRef< ResizeObserver >();
++
++	// TODO: could this be a layout effect?
++	useEffect( () => {
++		if ( targetElement === observedElementRef.current ) {
++			return;
++		}
++
++		observedElementRef.current = targetElement;
++
++		// Set up a ResizeObserver.
++		if ( ! resizeObserverRef.current ) {
++			resizeObserverRef.current = new ResizeObserver( ( entries ) => {
++				if ( observedElementRef.current ) {
++					onRectEvent( observedElementRef.current, entries );
++				}
++			} );
++		}
++		const { current: resizeObserver } = resizeObserverRef;
++
++		// Observe new element.
++		if ( targetElement ) {
++			if ( fireOnElementInit ) {
++				// TODO: investigate if this can be removed,
++				// see: https://stackoverflow.com/a/60026394
++				onRectEvent( targetElement );
++			}
++			resizeObserver.observe( targetElement );
++		}
++
++		return () => {
++			// Unobserve previous element.
++			if ( observedElementRef.current ) {
++				resizeObserver.unobserve( observedElementRef.current );
++			}
++		};
++	}, [ fireOnElementInit, onRectEvent, targetElement ] );
++}
++
++/**
++ * The position and dimensions of an element, relative to its offset parent.
++ */
++export type ElementOffsetRect = {
++	/**
++	 * The distance from the left edge of the offset parent to the left edge of
++	 * the element.
++	 */
++	left: number;
++	/**
++	 * The distance from the top edge of the offset parent to the top edge of
++	 * the element.
++	 */
++	top: number;
++	/**
++	 * The width of the element.
++	 */
++	width: number;
++	/**
++	 * The height of the element.
++	 */
++	height: number;
++};
++
++/**
++ * An `ElementOffsetRect` object with all values set to zero.
++ */
++export const NULL_ELEMENT_OFFSET_RECT = {
++	left: 0,
++	top: 0,
++	width: 0,
++	height: 0,
++} satisfies ElementOffsetRect;
++
++/**
++ * Returns the position and dimensions of an element, relative to its offset
++ * parent. This is useful in contexts where `getBoundingClientRect` is not
++ * suitable, such as when the element is transformed.
++ *
++ * **Note:** the `left` and `right` values are adjusted due to a limitation
++ * in the way the browser calculates the offset position of the element,
++ * which can cause unwanted scrollbars to appear. This adjustment makes the
++ * values potentially inaccurate within a range of 1 pixel.
++ */
++export function getElementOffsetRect(
++	element: HTMLElement
++): ElementOffsetRect {
++	return {
++		// The adjustments mentioned in the documentation above are necessary
++		// because `offsetLeft` and `offsetTop` are rounded to the nearest pixel,
++		// which can result in a position mismatch that causes unwanted overflow.
++		// For context, see: https://github.com/WordPress/gutenberg/pull/61979
++		left: Math.max( element.offsetLeft - 1, 0 ),
++		top: Math.max( element.offsetTop - 1, 0 ),
++		// This is a workaround to obtain these values with a sub-pixel precision,
++		// since `offsetWidth` and `offsetHeight` are rounded to the nearest pixel.
++		width: parseFloat( getComputedStyle( element ).width ),
++		height: parseFloat( getComputedStyle( element ).height ),
++	};
++}
++
++/**
++ * Tracks the position and dimensions of an element, relative to its offset
++ * parent. The element can be changed dynamically.
++ */
++export function useTrackElementOffsetRect(
++	targetElement: HTMLElement | undefined | null
++) {
++	const [ indicatorPosition, setIndicatorPosition ] =
++		useState< ElementOffsetRect >( NULL_ELEMENT_OFFSET_RECT );
++
++	useTrackElementRectUpdates( targetElement, ( element ) =>
++		setIndicatorPosition( getElementOffsetRect( element ) )
++	);
++
++	return indicatorPosition;
++}
++
++/* eslint-enable jsdoc/require-param */
+diff --git a/packages/components/src/utils/hooks/use-event.ts b/packages/components/src/utils/hooks/use-event.ts
+new file mode 100644
+index 00000000000000..eefac9478a8b4f
+--- /dev/null
++++ b/packages/components/src/utils/hooks/use-event.ts
+@@ -0,0 +1,38 @@
++/* eslint-disable jsdoc/require-param */
++/**
++ * WordPress dependencies
++ */
++import { useRef, useInsertionEffect, useCallback } from '@wordpress/element';
++
++/**
++ * Any function.
++ */
++export type AnyFunction = ( ...args: any ) => any;
++
++/**
++ * Creates a stable callback function that has access to the latest state and
++ * can be used within event handlers and effect callbacks. Throws when used in
++ * the render phase.
++ *
++ * @example
++ *
++ * ```tsx
++ * function Component(props) {
++ *   const onClick = useEvent(props.onClick);
++ *   React.useEffect(() => {}, [onClick]);
++ * }
++ * ```
++ */
++export function useEvent< T extends AnyFunction >( callback?: T ) {
++	const ref = useRef< AnyFunction | undefined >( () => {
++		throw new Error( 'Cannot call an event handler while rendering.' );
++	} );
++	useInsertionEffect( () => {
++		ref.current = callback;
++	} );
++	return useCallback< AnyFunction >(
++		( ...args ) => ref.current?.( ...args ),
++		[]
++	) as T;
++}
++/* eslint-enable jsdoc/require-param */
+diff --git a/packages/components/src/utils/hooks/use-on-value-update.ts b/packages/components/src/utils/hooks/use-on-value-update.ts
+new file mode 100644
+index 00000000000000..5726f3977daf04
+--- /dev/null
++++ b/packages/components/src/utils/hooks/use-on-value-update.ts
+@@ -0,0 +1,42 @@
++/* eslint-disable jsdoc/require-param */
++/**
++ * WordPress dependencies
++ */
++import { useRef, useEffect } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import { useEvent } from './use-event';
++
++/**
++ * Context object for the `onUpdate` callback of `useOnValueUpdate`.
++ */
++export type ValueUpdateContext< T > = {
++	previousValue: T;
++};
++
++/**
++ * Calls the `onUpdate` callback when the `value` changes.
++ */
++export function useOnValueUpdate< T >(
++	/**
++	 * The value to watch for changes.
++	 */
++	value: T,
++	/**
++	 * Callback to fire when the value changes.
++	 */
++	onUpdate: ( context: ValueUpdateContext< T > ) => void
++) {
++	const previousValueRef = useRef( value );
++	const updateCallbackEvent = useEvent( onUpdate );
++	useEffect( () => {
++		if ( previousValueRef.current !== value ) {
++			updateCallbackEvent( {
++				previousValue: previousValueRef.current,
++			} );
++			previousValueRef.current = value;
++		}
++	}, [ updateCallbackEvent, value ] );
++}
++/* eslint-enable jsdoc/require-param */

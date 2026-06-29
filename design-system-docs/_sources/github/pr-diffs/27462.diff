@@ -1,0 +1,974 @@
+diff --git a/docs/designers-developers/developers/slotfills/README.md b/docs/designers-developers/developers/slotfills/README.md
+index 2ed99cf47b3e15..4b460c70ff7499 100644
+--- a/docs/designers-developers/developers/slotfills/README.md
++++ b/docs/designers-developers/developers/slotfills/README.md
+@@ -43,7 +43,8 @@ SlotFills are created using `createSlotFill`. This creates two components, `Slot
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill, PanelRow } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
++import { PanelRow } from '@wordpress/components';
+ 
+ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
+ 
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 5f856ce44bef88..ab08745df04fc7 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1175,12 +1175,6 @@
+ 		"markdown_source": "../packages/components/src/select-control/README.md",
+ 		"parent": "components"
+ 	},
+-	{
+-		"title": "SlotFill",
+-		"slug": "slot-fill",
+-		"markdown_source": "../packages/components/src/slot-fill/README.md",
+-		"parent": "components"
+-	},
+ 	{
+ 		"title": "Snackbar",
+ 		"slug": "snackbar",
+@@ -1799,6 +1793,12 @@
+ 		"markdown_source": "../packages/shortcode/README.md",
+ 		"parent": "packages"
+ 	},
++	{
++		"title": "@wordpress/slot-fill",
++		"slug": "packages-slot-fill",
++		"markdown_source": "../packages/slot-fill/README.md",
++		"parent": "packages"
++	},
+ 	{
+ 		"title": "@wordpress/token-list",
+ 		"slug": "packages-token-list",
+diff --git a/package-lock.json b/package-lock.json
+index c72b80eeba28e5..6dba49da5b899d 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -17328,6 +17328,7 @@
+ 				"@wordpress/notices": "file:packages/notices",
+ 				"@wordpress/rich-text": "file:packages/rich-text",
+ 				"@wordpress/shortcode": "file:packages/shortcode",
++				"@wordpress/slot-fill": "file:packages/slot-fill",
+ 				"@wordpress/token-list": "file:packages/token-list",
+ 				"@wordpress/url": "file:packages/url",
+ 				"@wordpress/wordcount": "file:packages/wordcount",
+@@ -17455,6 +17456,7 @@
+ 				"@wordpress/keycodes": "file:packages/keycodes",
+ 				"@wordpress/primitives": "file:packages/primitives",
+ 				"@wordpress/rich-text": "file:packages/rich-text",
++				"@wordpress/slot-fill": "file:packages/slot-fill",
+ 				"@wordpress/warning": "file:packages/warning",
+ 				"classnames": "^2.2.5",
+ 				"dom-scroll-into-view": "^1.2.1",
+@@ -17674,6 +17676,7 @@
+ 				"@wordpress/keyboard-shortcuts": "file:packages/keyboard-shortcuts",
+ 				"@wordpress/media-utils": "file:packages/media-utils",
+ 				"@wordpress/notices": "file:packages/notices",
++				"@wordpress/slot-fill": "file:packages/slot-fill",
+ 				"@wordpress/url": "file:packages/url",
+ 				"classnames": "^2.2.5",
+ 				"lodash": "^4.17.19",
+@@ -17707,6 +17710,7 @@
+ 				"@wordpress/notices": "file:packages/notices",
+ 				"@wordpress/plugins": "file:packages/plugins",
+ 				"@wordpress/primitives": "file:packages/primitives",
++				"@wordpress/slot-fill": "file:packages/slot-fill",
+ 				"@wordpress/url": "file:packages/url",
+ 				"@wordpress/viewport": "file:packages/viewport",
+ 				"@wordpress/warning": "file:packages/warning",
+@@ -17742,6 +17746,7 @@
+ 				"@wordpress/notices": "file:packages/notices",
+ 				"@wordpress/plugins": "file:packages/plugins",
+ 				"@wordpress/primitives": "file:packages/primitives",
++				"@wordpress/slot-fill": "file:packages/slot-fill",
+ 				"@wordpress/url": "file:packages/url",
+ 				"classnames": "^2.2.5",
+ 				"downloadjs": "^1.4.7",
+@@ -17941,6 +17946,7 @@
+ 				"@wordpress/i18n": "file:packages/i18n",
+ 				"@wordpress/icons": "file:packages/icons",
+ 				"@wordpress/plugins": "file:packages/plugins",
++				"@wordpress/slot-fill": "file:packages/slot-fill",
+ 				"@wordpress/viewport": "file:packages/viewport",
+ 				"classnames": "^2.2.5",
+ 				"lodash": "^4.17.19"
+@@ -18320,6 +18326,16 @@
+ 				"memize": "^1.1.0"
+ 			}
+ 		},
++		"@wordpress/slot-fill": {
++			"version": "file:packages/slot-fill",
++			"requires": {
++				"@babel/runtime": "^7.11.2",
++				"@wordpress/element": "file:packages/element",
++				"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
++				"@wordpress/warning": "file:packages/warning",
++				"lodash": "^4.17.19"
++			}
++		},
+ 		"@wordpress/token-list": {
+ 			"version": "file:packages/token-list",
+ 			"requires": {
+diff --git a/packages/block-editor/README.md b/packages/block-editor/README.md
+index cfadf407b3b655..f981874a266402 100644
+--- a/packages/block-editor/README.md
++++ b/packages/block-editor/README.md
+@@ -21,7 +21,8 @@ import {
+ 	WritingFlow,
+ 	ObserveTyping
+ } from '@wordpress/block-editor';
+-import { SlotFillProvider, Popover } from '@wordpress/components';
++import { Popover } from '@wordpress/components';
++import { SlotFillProvider } from '@wordpress/slot-fill';
+ import { useState } from '@wordpress/element';
+ 
+ function MyEditorComponent () {
+diff --git a/packages/block-editor/package.json b/packages/block-editor/package.json
+index 398e79d7286dff..c8c9cc4f428f1c 100644
+--- a/packages/block-editor/package.json
++++ b/packages/block-editor/package.json
+@@ -48,6 +48,7 @@
+ 		"@wordpress/notices": "file:../notices",
+ 		"@wordpress/rich-text": "file:../rich-text",
+ 		"@wordpress/shortcode": "file:../shortcode",
++		"@wordpress/slot-fill": "file:../slot-fill",
+ 		"@wordpress/token-list": "file:../token-list",
+ 		"@wordpress/url": "file:../url",
+ 		"@wordpress/wordcount": "file:../wordcount",
+diff --git a/packages/block-editor/src/components/block-controls/index.js b/packages/block-editor/src/components/block-controls/index.js
+index 297d3839df4aa9..4ab984d3311170 100644
+--- a/packages/block-editor/src/components/block-controls/index.js
++++ b/packages/block-editor/src/components/block-controls/index.js
+@@ -9,9 +9,9 @@ import { isEmpty } from 'lodash';
+ import { useContext } from '@wordpress/element';
+ import {
+ 	__experimentalToolbarContext as ToolbarContext,
+-	createSlotFill,
+ 	ToolbarGroup,
+ } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/block-editor/src/components/block-format-controls/index.js b/packages/block-editor/src/components/block-format-controls/index.js
+index 73628e3415fc32..e6c98ad962b744 100644
+--- a/packages/block-editor/src/components/block-format-controls/index.js
++++ b/packages/block-editor/src/components/block-format-controls/index.js
+@@ -7,10 +7,8 @@ import { isEmpty } from 'lodash';
+  * WordPress dependencies
+  */
+ import { useContext } from '@wordpress/element';
+-import {
+-	__experimentalToolbarContext as ToolbarContext,
+-	createSlotFill,
+-} from '@wordpress/components';
++import { __experimentalToolbarContext as ToolbarContext } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/block-editor/src/components/block-inspector/index.js b/packages/block-editor/src/components/block-inspector/index.js
+index be2433edbe39da..bade27debe312e 100644
+--- a/packages/block-editor/src/components/block-inspector/index.js
++++ b/packages/block-editor/src/components/block-inspector/index.js
+@@ -8,10 +8,8 @@ import {
+ 	hasBlockSupport,
+ 	store as blocksStore,
+ } from '@wordpress/blocks';
+-import {
+-	PanelBody,
+-	__experimentalUseSlot as useSlot,
+-} from '@wordpress/components';
++import { PanelBody } from '@wordpress/components';
++import { __experimentalUseSlot as useSlot } from '@wordpress/slot-fill';
+ import { withSelect } from '@wordpress/data';
+ 
+ /**
+diff --git a/packages/block-editor/src/components/block-navigation/block-slot.js b/packages/block-editor/src/components/block-navigation/block-slot.js
+index 9be9795317e6c7..bc5eb0deee7f7f 100644
+--- a/packages/block-editor/src/components/block-navigation/block-slot.js
++++ b/packages/block-editor/src/components/block-navigation/block-slot.js
+@@ -7,7 +7,8 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { getBlockType } from '@wordpress/blocks';
+-import { Fill, Slot, VisuallyHidden } from '@wordpress/components';
++import { VisuallyHidden } from '@wordpress/components';
++import { Fill, Slot } from '@wordpress/slot-fill';
+ import { useInstanceId } from '@wordpress/compose';
+ import {
+ 	Children,
+diff --git a/packages/block-editor/src/components/block-settings-menu-controls/index.js b/packages/block-editor/src/components/block-settings-menu-controls/index.js
+index 2509c794c978a1..8ca59212db1e26 100644
+--- a/packages/block-editor/src/components/block-settings-menu-controls/index.js
++++ b/packages/block-editor/src/components/block-settings-menu-controls/index.js
+@@ -6,8 +6,9 @@ import { compact, isEmpty, map } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill, MenuGroup } from '@wordpress/components';
++import { MenuGroup } from '@wordpress/components';
+ import { useSelect } from '@wordpress/data';
++import { createSlotFill } from '@wordpress/slot-fill';
+ 
+ const { Fill: BlockSettingsMenuControls, Slot } = createSlotFill(
+ 	'BlockSettingsMenuControls'
+diff --git a/packages/block-editor/src/components/block-settings-menu/block-settings-menu-first-item.js b/packages/block-editor/src/components/block-settings-menu/block-settings-menu-first-item.js
+index 43f83d136abe78..e40cdfc1a44592 100644
+--- a/packages/block-editor/src/components/block-settings-menu/block-settings-menu-first-item.js
++++ b/packages/block-editor/src/components/block-settings-menu/block-settings-menu-first-item.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ 
+ const { Fill: __experimentalBlockSettingsMenuFirstItem, Slot } = createSlotFill(
+ 	'__experimentalBlockSettingsMenuFirstItem'
+diff --git a/packages/block-editor/src/components/block-settings/button.native.js b/packages/block-editor/src/components/block-settings/button.native.js
+index 9fa1a037494294..b5a9891dfe374c 100644
+--- a/packages/block-editor/src/components/block-settings/button.native.js
++++ b/packages/block-editor/src/components/block-settings/button.native.js
+@@ -1,10 +1,11 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill, ToolbarButton } from '@wordpress/components';
++import { ToolbarButton } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import { withDispatch } from '@wordpress/data';
+ import { cog } from '@wordpress/icons';
++import { createSlotFill } from '@wordpress/slot-fill';
+ 
+ const { Fill, Slot } = createSlotFill( 'SettingsToolbarButton' );
+ 
+diff --git a/packages/block-editor/src/components/inserter-menu-extension/index.js b/packages/block-editor/src/components/inserter-menu-extension/index.js
+index c93b6fda2850b9..54fd3d04785485 100644
+--- a/packages/block-editor/src/components/inserter-menu-extension/index.js
++++ b/packages/block-editor/src/components/inserter-menu-extension/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ 
+ const { Fill: __experimentalInserterMenuExtension, Slot } = createSlotFill(
+ 	'__experimentalInserterMenuExtension'
+diff --git a/packages/block-editor/src/components/inspector-advanced-controls/index.js b/packages/block-editor/src/components/inspector-advanced-controls/index.js
+index b11a2f61583b29..aaefc7dbafae70 100644
+--- a/packages/block-editor/src/components/inspector-advanced-controls/index.js
++++ b/packages/block-editor/src/components/inspector-advanced-controls/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/block-editor/src/components/inspector-controls/index.js b/packages/block-editor/src/components/inspector-controls/index.js
+index d7b25e72212c19..5dea1b0e1b62d6 100644
+--- a/packages/block-editor/src/components/inspector-controls/index.js
++++ b/packages/block-editor/src/components/inspector-controls/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/block-editor/src/components/inspector-controls/index.native.js b/packages/block-editor/src/components/inspector-controls/index.native.js
+index 6c3e2026ddb805..f1be4e9a8f300d 100644
+--- a/packages/block-editor/src/components/inspector-controls/index.native.js
++++ b/packages/block-editor/src/components/inspector-controls/index.native.js
+@@ -6,7 +6,9 @@ import { View } from 'react-native';
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill, BottomSheetConsumer } from '@wordpress/components';
++import { BottomSheetConsumer } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
++
+ /**
+  * Internal dependencies
+  */
+diff --git a/packages/block-editor/src/components/link-control/viewer-slot.js b/packages/block-editor/src/components/link-control/viewer-slot.js
+index 482eaab2d0db20..f4e2651fa4a2d6 100644
+--- a/packages/block-editor/src/components/link-control/viewer-slot.js
++++ b/packages/block-editor/src/components/link-control/viewer-slot.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ 
+ const { Slot: ViewerSlot, Fill: ViewerFill } = createSlotFill(
+ 	'BlockEditorLinkControlViewer'
+diff --git a/packages/block-editor/src/components/rich-text/format-toolbar/index.native.js b/packages/block-editor/src/components/rich-text/format-toolbar/index.native.js
+index e7be93d4b43100..05837696c0ca72 100644
+--- a/packages/block-editor/src/components/rich-text/format-toolbar/index.native.js
++++ b/packages/block-editor/src/components/rich-text/format-toolbar/index.native.js
+@@ -1,8 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
+-
+-import { Toolbar, Slot } from '@wordpress/components';
++import { Toolbar } from '@wordpress/components';
++import { Slot } from '@wordpress/slot-fill';
+ 
+ const FormatToolbar = () => {
+ 	return (
+diff --git a/packages/block-editor/src/components/rich-text/toolbar-button.js b/packages/block-editor/src/components/rich-text/toolbar-button.js
+index e7ff63189fd92e..66d9004e2def3f 100644
+--- a/packages/block-editor/src/components/rich-text/toolbar-button.js
++++ b/packages/block-editor/src/components/rich-text/toolbar-button.js
+@@ -1,7 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import { Fill, ToolbarButton } from '@wordpress/components';
++import { ToolbarButton } from '@wordpress/components';
++import { Fill } from '@wordpress/slot-fill';
+ import { displayShortcut } from '@wordpress/keycodes';
+ 
+ export function RichTextToolbarButton( {
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 9dbbc7eecaf51b..ebe3804178e682 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -44,6 +44,7 @@
+ 		"@wordpress/keycodes": "file:../keycodes",
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/rich-text": "file:../rich-text",
++		"@wordpress/slot-fill": "file:../slot-fill",
+ 		"@wordpress/warning": "file:../warning",
+ 		"classnames": "^2.2.5",
+ 		"dom-scroll-into-view": "^1.2.1",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index a0295efca72e64..d90e89e5ddfc76 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -9,6 +9,13 @@ export {
+ 	HorizontalRule,
+ 	BlockQuotation,
+ } from '@wordpress/primitives';
++export {
++	createSlotFill,
++	Slot,
++	Fill,
++	SlotFillProvider,
++	__experimentalUseSlot,
++} from '@wordpress/slot-fill';
+ 
+ // Components
+ export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
+@@ -121,13 +128,6 @@ export { default as TreeSelect } from './tree-select';
+ export { default as __experimentalUnitControl } from './unit-control';
+ export { default as VisuallyHidden } from './visually-hidden';
+ export { default as IsolatedEventContainer } from './isolated-event-container';
+-export {
+-	createSlotFill,
+-	Slot,
+-	Fill,
+-	Provider as SlotFillProvider,
+-	useSlot as __experimentalUseSlot,
+-} from './slot-fill';
+ 
+ // Higher-Order Components
+ export {
+diff --git a/packages/components/src/index.native.js b/packages/components/src/index.native.js
+index ccfdaf84e17be1..7688f913e41665 100644
+--- a/packages/components/src/index.native.js
++++ b/packages/components/src/index.native.js
+@@ -8,6 +8,12 @@ export {
+ 	HorizontalRule,
+ 	BlockQuotation,
+ } from '@wordpress/primitives';
++export {
++	createSlotFill,
++	Slot,
++	Fill,
++	SlotFillProvider,
++} from '@wordpress/slot-fill';
+ export { default as ColorIndicator } from './color-indicator';
+ export { default as ColorPalette } from './color-palette';
+ export { default as ColorPicker } from './color-picker';
+@@ -21,12 +27,6 @@ export { default as ToolbarGroup } from './toolbar-group';
+ export { default as ToolbarItem } from './toolbar-item';
+ export { default as Icon } from './icon';
+ export { default as Spinner } from './spinner';
+-export {
+-	createSlotFill,
+-	Slot,
+-	Fill,
+-	Provider as SlotFillProvider,
+-} from './slot-fill';
+ export { default as BaseControl } from './base-control';
+ export { default as TextareaControl } from './textarea-control';
+ export { default as PanelBody } from './panel/body';
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index f2051a7d839e7e..c7f00a82a07036 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -17,6 +17,11 @@ import { ESCAPE } from '@wordpress/keycodes';
+ import deprecated from '@wordpress/deprecated';
+ import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
+ import { close } from '@wordpress/icons';
++import {
++	Slot,
++	Fill,
++	__experimentalUseSlot as useSlot,
++} from '@wordpress/slot-fill';
+ 
+ /**
+  * Internal dependencies
+@@ -28,7 +33,6 @@ import PopoverDetectOutside from './detect-outside';
+ import Button from '../button';
+ import ScrollLock from '../scroll-lock';
+ import IsolatedEventContainer from '../isolated-event-container';
+-import { Slot, Fill, useSlot } from '../slot-fill';
+ import { getAnimateClassName } from '../animate';
+ 
+ const FocusManaged = withConstrainedTabbing(
+diff --git a/packages/e2e-tests/specs/editor/various/is-typing.test.js b/packages/e2e-tests/specs/editor/various/is-typing.test.js
+index 27d253b27128ba..94e0cefc3fc855 100644
+--- a/packages/e2e-tests/specs/editor/various/is-typing.test.js
++++ b/packages/e2e-tests/specs/editor/various/is-typing.test.js
+@@ -42,7 +42,8 @@ describe( 'isTyping', () => {
+ 	it( 'should not close the dropdown when typing in it', async () => {
+ 		// Adds a Dropdown with an input to all blocks
+ 		await page.evaluate( () => {
+-			const { Dropdown, ToolbarButton, Fill } = wp.components;
++			const { Dropdown, ToolbarButton } = wp.components;
++			const { Fill } = wp.slotFill;
+ 			const { createElement: el, Fragment } = wp.element;
+ 			function AddDropdown( BlockListBlock ) {
+ 				return ( props ) => {
+diff --git a/packages/edit-navigation/package.json b/packages/edit-navigation/package.json
+index b13756af49b2e2..556571b6070051 100644
+--- a/packages/edit-navigation/package.json
++++ b/packages/edit-navigation/package.json
+@@ -43,6 +43,7 @@
+ 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
+ 		"@wordpress/media-utils": "file:../media-utils",
+ 		"@wordpress/notices": "file:../notices",
++		"@wordpress/slot-fill": "file:../slot-fill",
+ 		"@wordpress/url": "file:../url",
+ 		"classnames": "^2.2.5",
+ 		"lodash": "^4.17.19",
+diff --git a/packages/edit-navigation/src/components/layout/index.js b/packages/edit-navigation/src/components/layout/index.js
+index e8b1b56a843904..a964f810414514 100644
+--- a/packages/edit-navigation/src/components/layout/index.js
++++ b/packages/edit-navigation/src/components/layout/index.js
+@@ -5,8 +5,8 @@ import {
+ 	DropZoneProvider,
+ 	FocusReturnProvider,
+ 	Popover,
+-	SlotFillProvider,
+ } from '@wordpress/components';
++import { SlotFillProvider } from '@wordpress/slot-fill';
+ import {
+ 	BlockEditorKeyboardShortcuts,
+ 	BlockEditorProvider,
+diff --git a/packages/edit-post/package.json b/packages/edit-post/package.json
+index 2a8f8ff983e33f..0b5b80724f31be 100644
+--- a/packages/edit-post/package.json
++++ b/packages/edit-post/package.json
+@@ -46,6 +46,7 @@
+ 		"@wordpress/notices": "file:../notices",
+ 		"@wordpress/plugins": "file:../plugins",
+ 		"@wordpress/primitives": "file:../primitives",
++		"@wordpress/slot-fill": "file:../slot-fill",
+ 		"@wordpress/url": "file:../url",
+ 		"@wordpress/viewport": "file:../viewport",
+ 		"@wordpress/warning": "file:../warning",
+diff --git a/packages/edit-post/src/components/header/main-dashboard-button/index.js b/packages/edit-post/src/components/header/main-dashboard-button/index.js
+index efc3bfaad19e87..64bc6a3965109a 100644
+--- a/packages/edit-post/src/components/header/main-dashboard-button/index.js
++++ b/packages/edit-post/src/components/header/main-dashboard-button/index.js
+@@ -4,7 +4,7 @@
+ import {
+ 	__experimentalUseSlot as useSlot,
+ 	createSlotFill,
+-} from '@wordpress/components';
++} from '@wordpress/slot-fill';
+ 
+ const slotName = '__experimentalMainDashboardButton';
+ 
+diff --git a/packages/edit-post/src/components/header/tools-more-menu-group/index.js b/packages/edit-post/src/components/header/tools-more-menu-group/index.js
+index d49db11a0b4afb..3c004feb54c04c 100644
+--- a/packages/edit-post/src/components/header/tools-more-menu-group/index.js
++++ b/packages/edit-post/src/components/header/tools-more-menu-group/index.js
+@@ -6,7 +6,8 @@ import { isEmpty } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill, MenuGroup } from '@wordpress/components';
++import { MenuGroup } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ import { __ } from '@wordpress/i18n';
+ 
+ const { Fill: ToolsMoreMenuGroup, Slot } = createSlotFill(
+diff --git a/packages/edit-post/src/components/preferences-modal/options/enable-plugin-document-setting-panel.js b/packages/edit-post/src/components/preferences-modal/options/enable-plugin-document-setting-panel.js
+index b18b0436579bcb..03b94e143dcaa6 100644
+--- a/packages/edit-post/src/components/preferences-modal/options/enable-plugin-document-setting-panel.js
++++ b/packages/edit-post/src/components/preferences-modal/options/enable-plugin-document-setting-panel.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/edit-post/src/components/sidebar/plugin-document-setting-panel/index.js b/packages/edit-post/src/components/sidebar/plugin-document-setting-panel/index.js
+index 681897d5f26716..043703ce8c8280 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-document-setting-panel/index.js
++++ b/packages/edit-post/src/components/sidebar/plugin-document-setting-panel/index.js
+@@ -5,7 +5,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill, PanelBody } from '@wordpress/components';
++import { PanelBody } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ import { compose } from '@wordpress/compose';
+ import { withPluginContext } from '@wordpress/plugins';
+ import { withDispatch, withSelect } from '@wordpress/data';
+diff --git a/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/index.js b/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/index.js
+index 5a54525cf5ca20..5833c380a81d24 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/index.js
++++ b/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/index.js
+@@ -3,7 +3,8 @@
+  */
+ import { compose } from '@wordpress/compose';
+ import { withPluginContext } from '@wordpress/plugins';
+-import { createSlotFill, PanelBody } from '@wordpress/components';
++import { PanelBody } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ 
+ const { Fill, Slot } = createSlotFill( 'PluginPostPublishPanel' );
+ 
+diff --git a/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/index.js b/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/index.js
+index d140251917559f..9b2ab6dc526305 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/index.js
++++ b/packages/edit-post/src/components/sidebar/plugin-post-publish-panel/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { SlotFillProvider } from '@wordpress/components';
++import { SlotFillProvider } from '@wordpress/slot-fill';
+ import { render } from '@wordpress/element';
+ 
+ /**
+diff --git a/packages/edit-post/src/components/sidebar/plugin-post-status-info/index.js b/packages/edit-post/src/components/sidebar/plugin-post-status-info/index.js
+index 18208485ddea24..8477cfc2f6df33 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-post-status-info/index.js
++++ b/packages/edit-post/src/components/sidebar/plugin-post-status-info/index.js
+@@ -5,7 +5,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill, PanelRow } from '@wordpress/components';
++import { PanelRow } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ 
+ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
+ 
+diff --git a/packages/edit-post/src/components/sidebar/plugin-post-status-info/test/index.js b/packages/edit-post/src/components/sidebar/plugin-post-status-info/test/index.js
+index 033f9fad709bf9..581832d51ae093 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-post-status-info/test/index.js
++++ b/packages/edit-post/src/components/sidebar/plugin-post-status-info/test/index.js
+@@ -6,7 +6,7 @@ import ReactTestRenderer from 'react-test-renderer';
+ /**
+  * WordPress dependencies
+  */
+-import { SlotFillProvider } from '@wordpress/components';
++import { SlotFillProvider } from '@wordpress/slot-fill';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/index.js b/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/index.js
+index 7eedb60103ba40..43c75626acd2fe 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/index.js
++++ b/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/index.js
+@@ -1,9 +1,11 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill, PanelBody } from '@wordpress/components';
++import { PanelBody } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ import { compose } from '@wordpress/compose';
+ import { withPluginContext } from '@wordpress/plugins';
++
+ const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
+ 
+ const PluginPrePublishPanelFill = ( {
+diff --git a/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/index.js b/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/index.js
+index 9c011e1cbc2a09..a1d0be53a38219 100644
+--- a/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/index.js
++++ b/packages/edit-post/src/components/sidebar/plugin-pre-publish-panel/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { SlotFillProvider } from '@wordpress/components';
++import { SlotFillProvider } from '@wordpress/slot-fill';
+ import { render } from '@wordpress/element';
+ 
+ /**
+diff --git a/packages/edit-post/src/editor.js b/packages/edit-post/src/editor.js
+index 6694ffdfb34dcd..537b23685ae123 100644
+--- a/packages/edit-post/src/editor.js
++++ b/packages/edit-post/src/editor.js
+@@ -15,11 +15,8 @@ import {
+ 	PostLockedModal,
+ } from '@wordpress/editor';
+ import { StrictMode, Component } from '@wordpress/element';
+-import {
+-	KeyboardShortcuts,
+-	SlotFillProvider,
+-	DropZoneProvider,
+-} from '@wordpress/components';
++import { KeyboardShortcuts, DropZoneProvider } from '@wordpress/components';
++import { SlotFillProvider } from '@wordpress/slot-fill';
+ import { compose } from '@wordpress/compose';
+ 
+ /**
+diff --git a/packages/edit-post/src/editor.native.js b/packages/edit-post/src/editor.native.js
+index 2e7c227aa321f4..ee343a6b87ec21 100644
+--- a/packages/edit-post/src/editor.native.js
++++ b/packages/edit-post/src/editor.native.js
+@@ -19,7 +19,7 @@ import {
+ import { withDispatch, withSelect } from '@wordpress/data';
+ import { compose } from '@wordpress/compose';
+ import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
+-import { SlotFillProvider } from '@wordpress/components';
++import { SlotFillProvider } from '@wordpress/slot-fill';
+ import { Preview } from '@wordpress/block-editor';
+ 
+ /**
+diff --git a/packages/edit-site/package.json b/packages/edit-site/package.json
+index ec95e0781c3bdc..ec0e289fecef13 100644
+--- a/packages/edit-site/package.json
++++ b/packages/edit-site/package.json
+@@ -46,6 +46,7 @@
+ 		"@wordpress/notices": "file:../notices",
+ 		"@wordpress/plugins": "file:../plugins",
+ 		"@wordpress/primitives": "file:../primitives",
++		"@wordpress/slot-fill": "file:../slot-fill",
+ 		"@wordpress/url": "file:../url",
+ 		"classnames": "^2.2.5",
+ 		"downloadjs": "^1.4.7",
+diff --git a/packages/edit-site/src/components/editor/index.js b/packages/edit-site/src/components/editor/index.js
+index db7cf89b71ad36..25eaab53f3d177 100644
+--- a/packages/edit-site/src/components/editor/index.js
++++ b/packages/edit-site/src/components/editor/index.js
+@@ -10,12 +10,12 @@ import {
+ } from '@wordpress/element';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import {
+-	SlotFillProvider,
+ 	DropZoneProvider,
+ 	Popover,
+ 	FocusReturnProvider,
+ 	Button,
+ } from '@wordpress/components';
++import { SlotFillProvider } from '@wordpress/slot-fill';
+ import { EntityProvider } from '@wordpress/core-data';
+ import {
+ 	BlockContextProvider,
+diff --git a/packages/edit-site/src/components/header/tools-more-menu-group/index.js b/packages/edit-site/src/components/header/tools-more-menu-group/index.js
+index d49db11a0b4afb..3c004feb54c04c 100644
+--- a/packages/edit-site/src/components/header/tools-more-menu-group/index.js
++++ b/packages/edit-site/src/components/header/tools-more-menu-group/index.js
+@@ -6,7 +6,8 @@ import { isEmpty } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill, MenuGroup } from '@wordpress/components';
++import { MenuGroup } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ import { __ } from '@wordpress/i18n';
+ 
+ const { Fill: ToolsMoreMenuGroup, Slot } = createSlotFill(
+diff --git a/packages/edit-site/src/components/main-dashboard-button/index.js b/packages/edit-site/src/components/main-dashboard-button/index.js
+index efc3bfaad19e87..64bc6a3965109a 100644
+--- a/packages/edit-site/src/components/main-dashboard-button/index.js
++++ b/packages/edit-site/src/components/main-dashboard-button/index.js
+@@ -4,7 +4,7 @@
+ import {
+ 	__experimentalUseSlot as useSlot,
+ 	createSlotFill,
+-} from '@wordpress/components';
++} from '@wordpress/slot-fill';
+ 
+ const slotName = '__experimentalMainDashboardButton';
+ 
+diff --git a/packages/edit-site/src/components/navigation-sidebar/index.js b/packages/edit-site/src/components/navigation-sidebar/index.js
+index 28432f5e056772..4b176d80a7543f 100644
+--- a/packages/edit-site/src/components/navigation-sidebar/index.js
++++ b/packages/edit-site/src/components/navigation-sidebar/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ import { useSelect } from '@wordpress/data';
+ 
+ /**
+diff --git a/packages/edit-site/src/components/sidebar/index.js b/packages/edit-site/src/components/sidebar/index.js
+index ce5776f6404a61..0a7f5005c20f62 100644
+--- a/packages/edit-site/src/components/sidebar/index.js
++++ b/packages/edit-site/src/components/sidebar/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { createSlotFill } from '@wordpress/components';
++import { createSlotFill } from '@wordpress/slot-fill';
+ import { __ } from '@wordpress/i18n';
+ import { cog, typography } from '@wordpress/icons';
+ 
+diff --git a/packages/edit-widgets/src/components/widget-areas-block-editor-provider/index.js b/packages/edit-widgets/src/components/widget-areas-block-editor-provider/index.js
+index 220a558e7fa14d..ea3d6ecb4ef765 100644
+--- a/packages/edit-widgets/src/components/widget-areas-block-editor-provider/index.js
++++ b/packages/edit-widgets/src/components/widget-areas-block-editor-provider/index.js
+@@ -6,11 +6,8 @@ import { defaultTo } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	DropZoneProvider,
+-	SlotFillProvider,
+-	FocusReturnProvider,
+-} from '@wordpress/components';
++import { DropZoneProvider, FocusReturnProvider } from '@wordpress/components';
++import { SlotFillProvider } from '@wordpress/slot-fill';
+ import { uploadMedia } from '@wordpress/media-utils';
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import { useMemo } from '@wordpress/element';
+diff --git a/packages/interface/package.json b/packages/interface/package.json
+index 6da4dde00c79e0..dcec673670ac15 100644
+--- a/packages/interface/package.json
++++ b/packages/interface/package.json
+@@ -36,6 +36,7 @@
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/icons": "file:../icons",
+ 		"@wordpress/plugins": "file:../plugins",
++		"@wordpress/slot-fill": "file:../slot-fill",
+ 		"@wordpress/viewport": "file:../viewport",
+ 		"classnames": "^2.2.5",
+ 		"lodash": "^4.17.19"
+diff --git a/packages/interface/src/components/action-item/index.js b/packages/interface/src/components/action-item/index.js
+index f4c32e166463a7..5bd704d4f16e50 100644
+--- a/packages/interface/src/components/action-item/index.js
++++ b/packages/interface/src/components/action-item/index.js
+@@ -6,7 +6,8 @@ import { isEmpty, noop } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+-import { ButtonGroup, Button, Slot, Fill } from '@wordpress/components';
++import { ButtonGroup, Button } from '@wordpress/components';
++import { Slot, Fill } from '@wordpress/slot-fill';
+ 
+ function ActionItemSlot( {
+ 	name,
+diff --git a/packages/interface/src/components/complementary-area/index.js b/packages/interface/src/components/complementary-area/index.js
+index f35fcf9d14bc17..f8883fb6c92013 100644
+--- a/packages/interface/src/components/complementary-area/index.js
++++ b/packages/interface/src/components/complementary-area/index.js
+@@ -6,7 +6,8 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { Button, Panel, Slot, Fill } from '@wordpress/components';
++import { Button, Panel } from '@wordpress/components';
++import { Slot, Fill } from '@wordpress/slot-fill';
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import { __ } from '@wordpress/i18n';
+ import { check, starEmpty, starFilled } from '@wordpress/icons';
+diff --git a/packages/interface/src/components/pinned-items/index.js b/packages/interface/src/components/pinned-items/index.js
+index 59fc70003095bb..8deed46f534b52 100644
+--- a/packages/interface/src/components/pinned-items/index.js
++++ b/packages/interface/src/components/pinned-items/index.js
+@@ -7,7 +7,7 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { Slot, Fill } from '@wordpress/components';
++import { Slot, Fill } from '@wordpress/slot-fill';
+ 
+ function PinnedItems( { scope, ...props } ) {
+ 	return <Fill name={ `PinnedItems/${ scope }` } { ...props } />;
+diff --git a/packages/slot-fill/CHANGELOG.md b/packages/slot-fill/CHANGELOG.md
+new file mode 100644
+index 00000000000000..5a66e3f0926c67
+--- /dev/null
++++ b/packages/slot-fill/CHANGELOG.md
+@@ -0,0 +1,3 @@
++## Unreleased
++
++- Initial release of a standalone package extracted from `@wordpress/components`
+diff --git a/packages/components/src/slot-fill/README.md b/packages/slot-fill/README.md
+similarity index 95%
+rename from packages/components/src/slot-fill/README.md
+rename to packages/slot-fill/README.md
+index 20cd6d708bea6d..5d275e777f999a 100644
+--- a/packages/components/src/slot-fill/README.md
++++ b/packages/slot-fill/README.md
+@@ -15,7 +15,8 @@ Any Fill will automatically occupy this Slot space, even if rendered elsewhere i
+ You can either use the Fill component directly, or a wrapper component type as in the below example to abstract the slot name from consumer awareness.
+ 
+ ```jsx
+-import { SlotFillProvider, Slot, Fill, Panel, PanelBody } from '@wordpress/components';
++import { Panel, PanelBody } from '@wordpress/components';
++import { SlotFillProvider, Slot, Fill } from '@wordpress/slot-fill';
+ 
+ const MySlotFillProvider = () => {
+ 	const MyPanelSlot = () => (
+diff --git a/packages/slot-fill/package.json b/packages/slot-fill/package.json
+new file mode 100644
+index 00000000000000..e426988c85a19b
+--- /dev/null
++++ b/packages/slot-fill/package.json
+@@ -0,0 +1,34 @@
++{
++	"name": "@wordpress/slot-fill",
++	"version": "1.0.0",
++	"description": "Library and registry with React slots and fills for WordPress.",
++	"author": "The WordPress Contributors",
++	"license": "GPL-2.0-or-later",
++	"keywords": [
++		"wordpress",
++		"gutenberg",
++		"components"
++	],
++	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/slot-fill/README.md",
++	"repository": {
++		"type": "git",
++		"url": "https://github.com/WordPress/gutenberg.git",
++		"directory": "packages/slot-fill"
++	},
++	"bugs": {
++		"url": "https://github.com/WordPress/gutenberg/issues"
++	},
++	"main": "build/index.js",
++	"module": "build-module/index.js",
++	"react-native": "src/index",
++	"dependencies": {
++		"@babel/runtime": "^7.11.2",
++		"@wordpress/element": "file:../element",
++		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
++		"@wordpress/warning": "file:../warning",
++		"lodash": "^4.17.19"
++	},
++	"publishConfig": {
++		"access": "public"
++	}
++}
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/fill.js b/packages/slot-fill/src/bubbles-virtually/fill.js
+similarity index 100%
+rename from packages/components/src/slot-fill/bubbles-virtually/fill.js
+rename to packages/slot-fill/src/bubbles-virtually/fill.js
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js b/packages/slot-fill/src/bubbles-virtually/slot-fill-context.js
+similarity index 100%
+rename from packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
+rename to packages/slot-fill/src/bubbles-virtually/slot-fill-context.js
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js b/packages/slot-fill/src/bubbles-virtually/slot-fill-provider.js
+similarity index 100%
+rename from packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+rename to packages/slot-fill/src/bubbles-virtually/slot-fill-provider.js
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot.js b/packages/slot-fill/src/bubbles-virtually/slot.js
+similarity index 100%
+rename from packages/components/src/slot-fill/bubbles-virtually/slot.js
+rename to packages/slot-fill/src/bubbles-virtually/slot.js
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/use-slot.js b/packages/slot-fill/src/bubbles-virtually/use-slot.js
+similarity index 100%
+rename from packages/components/src/slot-fill/bubbles-virtually/use-slot.js
+rename to packages/slot-fill/src/bubbles-virtually/use-slot.js
+diff --git a/packages/components/src/slot-fill/context.js b/packages/slot-fill/src/context.js
+similarity index 100%
+rename from packages/components/src/slot-fill/context.js
+rename to packages/slot-fill/src/context.js
+diff --git a/packages/components/src/slot-fill/fill.js b/packages/slot-fill/src/fill.js
+similarity index 100%
+rename from packages/components/src/slot-fill/fill.js
+rename to packages/slot-fill/src/fill.js
+diff --git a/packages/components/src/slot-fill/index.js b/packages/slot-fill/src/index.js
+similarity index 86%
+rename from packages/components/src/slot-fill/index.js
+rename to packages/slot-fill/src/index.js
+index f24ff8134dd15b..6a7f57949ad9f7 100644
+--- a/packages/components/src/slot-fill/index.js
++++ b/packages/slot-fill/src/index.js
+@@ -3,10 +3,10 @@
+  */
+ import BaseSlot from './slot';
+ import BaseFill from './fill';
+-import Provider from './context';
++import SlotFillProvider from './context';
+ import BubblesVirtuallySlot from './bubbles-virtually/slot';
+ import BubblesVirtuallyFill from './bubbles-virtually/fill';
+-import useSlot from './bubbles-virtually/use-slot';
++import __experimentalUseSlot from './bubbles-virtually/use-slot';
+ 
+ export function Slot( { bubblesVirtually, ...props } ) {
+ 	if ( bubblesVirtually ) {
+@@ -40,4 +40,4 @@ export function createSlotFill( name ) {
+ 	};
+ }
+ 
+-export { useSlot, Provider };
++export { __experimentalUseSlot, SlotFillProvider };
+diff --git a/packages/components/src/slot-fill/slot.js b/packages/slot-fill/src/slot.js
+similarity index 100%
+rename from packages/components/src/slot-fill/slot.js
+rename to packages/slot-fill/src/slot.js
+diff --git a/packages/components/src/slot-fill/stories/index.js b/packages/slot-fill/src/stories/index.js
+similarity index 100%
+rename from packages/components/src/slot-fill/stories/index.js
+rename to packages/slot-fill/src/stories/index.js
+diff --git a/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap b/packages/slot-fill/src/test/__snapshots__/slot.js.snap
+similarity index 100%
+rename from packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
+rename to packages/slot-fill/src/test/__snapshots__/slot.js.snap
+diff --git a/packages/components/src/slot-fill/test/index.js b/packages/slot-fill/src/test/index.js
+similarity index 100%
+rename from packages/components/src/slot-fill/test/index.js
+rename to packages/slot-fill/src/test/index.js
+diff --git a/packages/components/src/slot-fill/test/slot.js b/packages/slot-fill/src/test/slot.js
+similarity index 100%
+rename from packages/components/src/slot-fill/test/slot.js
+rename to packages/slot-fill/src/test/slot.js
+diff --git a/storybook/stories/playground/index.js b/storybook/stories/playground/index.js
+index 93c1d8c0183c52..8e8fd2ef0f89b4 100644
+--- a/storybook/stories/playground/index.js
++++ b/storybook/stories/playground/index.js
+@@ -10,11 +10,8 @@ import {
+ 	WritingFlow,
+ 	ObserveTyping,
+ } from '@wordpress/block-editor';
+-import {
+-	Popover,
+-	SlotFillProvider,
+-	DropZoneProvider,
+-} from '@wordpress/components';
++import { Popover, DropZoneProvider } from '@wordpress/components';
++import { SlotFillProvider } from '@wordpress/slot-fill';
+ import { registerCoreBlocks } from '@wordpress/block-library';
+ import '@wordpress/format-library';
+ 

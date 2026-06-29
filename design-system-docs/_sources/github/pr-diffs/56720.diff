@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ed33677b55a82a..d7a838344f5cd5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,10 @@
+ -   `ToolsPanel`: fix a performance issue ([#56770](https://github.com/WordPress/gutenberg/pull/56770)).
+ -   `BorderControl`: adjust `BorderControlDropdown` Button size to fix misaligned border ([#56730](https://github.com/WordPress/gutenberg/pull/56730)).
+ 
++### Internal
++
++-   `DropdownMenuV2Ariakit`: prevent prefix collapsing if all radios or checkboxes are unselected ([#56720](https://github.com/WordPress/gutenberg/pull/56720)).
++
+ ## 25.13.0 (2023-11-29)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/styles.ts b/packages/components/src/dropdown-menu-v2-ariakit/styles.ts
+index 465bdb1aebb30e..eaa249ae86b78c 100644
+--- a/packages/components/src/dropdown-menu-v2-ariakit/styles.ts
++++ b/packages/components/src/dropdown-menu-v2-ariakit/styles.ts
+@@ -212,6 +212,18 @@ export const ItemPrefixWrapper = styled.span`
+ 	/* Always occupy the first column, even when auto-collapsing */
+ 	grid-column: 1;
+ 
++	/*
++	 * Even when the item is not checked, occupy the same screen space to avoid
++	 * the space collapside when no items are checked.
++	 */
++	${ DropdownMenuCheckboxItem } > &,
++	${ DropdownMenuRadioItem } > & {
++		/* Same width as the check icons */
++		min-width: ${ space( 6 ) };
++	}
++
++	${ DropdownMenuCheckboxItem } > &,
++	${ DropdownMenuRadioItem } > &,
+ 	&:not( :empty ) {
+ 		margin-inline-end: ${ space( 2 ) };
+ 	}

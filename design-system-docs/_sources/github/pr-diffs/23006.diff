@@ -1,0 +1,2351 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 84301f8bb027c8..757bdc58e29d03 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Change
++
++- `NumberControl` no longer automatically transforms values when rendering `value` into a `<input />` HTML element.
++
+ ## 9.6.0 (2020-05-14)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/box-control/index.js b/packages/components/src/box-control/index.js
+index 89235162c745d9..d001997d24d2de 100644
+--- a/packages/components/src/box-control/index.js
++++ b/packages/components/src/box-control/index.js
+@@ -39,10 +39,9 @@ const defaultInputProps = {
+ };
+ 
+ function useUniqueId( idProp ) {
+-	const instanceId = useInstanceId( BoxControl );
+-	const id = `inspector-box-control-${ instanceId }`;
++	const instanceId = useInstanceId( BoxControl, 'inspector-box-control' );
+ 
+-	return idProp || id;
++	return idProp || instanceId;
+ }
+ export default function BoxControl( {
+ 	id: idProp,
+diff --git a/packages/components/src/input-control/index.js b/packages/components/src/input-control/index.js
+index e15128c4c99e70..8486cbadac37ef 100644
+--- a/packages/components/src/input-control/index.js
++++ b/packages/components/src/input-control/index.js
+@@ -17,7 +17,7 @@ import Backdrop from './backdrop';
+ import InputField from './input-field';
+ import Label from './label';
+ import { Container, Root, Suffix } from './styles/input-control-styles';
+-import { isValueEmpty } from './utils';
++import { isValueEmpty } from '../utils/values';
+ 
+ function useUniqueId( idProp ) {
+ 	const instanceId = useInstanceId( InputControl );
+diff --git a/packages/components/src/input-control/input-field.js b/packages/components/src/input-control/input-field.js
+index f7bbf4f5fa51e6..783e7d031fe17a 100644
+--- a/packages/components/src/input-control/input-field.js
++++ b/packages/components/src/input-control/input-field.js
+@@ -12,9 +12,10 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+ /**
+  * Internal dependencies
+  */
+-import { useDragCursor, isValueEmpty } from './utils';
++import { useDragCursor } from './utils';
+ import { Input } from './styles/input-control-styles';
+ import { useInputControlStateReducer } from './state';
++import { isValueEmpty } from '../utils/values';
+ 
+ function InputField(
+ 	{
+diff --git a/packages/components/src/input-control/utils.js b/packages/components/src/input-control/utils.js
+index ee2c897580e9bf..cb1049f56f0600 100644
+--- a/packages/components/src/input-control/utils.js
++++ b/packages/components/src/input-control/utils.js
+@@ -3,11 +3,6 @@
+  */
+ import { useEffect } from '@wordpress/element';
+ 
+-/**
+- * Internal dependencies
+- */
+-import { getRTL } from '../utils/style-mixins';
+-
+ /**
+  * Gets a CSS cursor value based on a drag direction.
+  *
+@@ -15,21 +10,17 @@ import { getRTL } from '../utils/style-mixins';
+  * @return {string} The CSS cursor value.
+  */
+ export function getDragCursor( dragDirection ) {
+-	const isRtl = getRTL();
+-	let dragCursor = 'n-resize';
++	let dragCursor = 'ns-resize';
+ 
+ 	switch ( dragDirection ) {
+ 		case 'n':
+-			dragCursor = 'n-resize';
+-			break;
+-		case 'e':
+-			dragCursor = isRtl ? 'w-resize' : 'e-resize';
+-			break;
+ 		case 's':
+-			dragCursor = 's-resize';
++			dragCursor = 'ns-resize';
+ 			break;
++
++		case 'e':
+ 		case 'w':
+-			dragCursor = isRtl ? 'e-resize' : 'w-resize';
++			dragCursor = 'ew-resize';
+ 			break;
+ 	}
+ 
+@@ -59,16 +50,3 @@ export function useDragCursor( isDragging, dragDirection ) {
+ 
+ 	return dragCursor;
+ }
+-
+-/**
+- * Determines if a value is empty, null, or undefined.
+- *
+- * @param {any} value The value to check.
+- * @return {boolean} Whether value is empty.
+- */
+-export function isValueEmpty( value ) {
+-	const isNullish = typeof value === 'undefined' || value === null;
+-	const isEmptyString = value === '';
+-
+-	return isNullish || isEmptyString;
+-}
+diff --git a/packages/components/src/number-control/README.md b/packages/components/src/number-control/README.md
+index 744e69ea12e230..1d225590bbadcf 100644
+--- a/packages/components/src/number-control/README.md
++++ b/packages/components/src/number-control/README.md
+@@ -65,7 +65,7 @@ If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment the v
+ 
+ ### shiftStep
+ 
+-Amount to increment by when the `SHIFT` key is held down.
++Amount to increment by when the `SHIFT` key is held down. This shift value is a multiplier to the `step` value. For example, if the `step` value is `5`, and `shiftStep` is `10`, each jump would increment/decrement by `50`.
+ 
+ -   Type: `Number`
+ -   Required: No
+diff --git a/packages/components/src/number-control/index.js b/packages/components/src/number-control/index.js
+index 8efdc52c7ce63a..15adad91b628a2 100644
+--- a/packages/components/src/number-control/index.js
++++ b/packages/components/src/number-control/index.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { clamp } from 'lodash';
+ import classNames from 'classnames';
+ 
+ /**
+@@ -13,13 +12,14 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { Input } from './styles/number-control-styles';
+-import { add, getValue, roundClamp, subtract } from './utils';
+-import { isValueEmpty } from '../input-control/utils';
+ import {
+ 	inputControlActionTypes,
+ 	composeStateReducers,
+ } from '../input-control/state';
+ import { useRTL } from '../utils/style-mixins';
++import { add, subtract, roundClamp } from '../utils/math';
++import { useJumpStep } from '../utils/hooks';
++import { isValueEmpty } from '../utils/values';
+ 
+ export function NumberControl(
+ 	{
+@@ -40,9 +40,14 @@ export function NumberControl(
+ 	},
+ 	ref
+ ) {
+-	const initialValue = getValue( valueProp, min, max );
+-	const baseValue = clamp( 0, min, max );
+ 	const isRtl = useRTL();
++	const baseValue = roundClamp( 0, min, max, step );
++
++	const jumpStep = useJumpStep( {
++		step,
++		shiftStep,
++		isShiftStepEnabled,
++	} );
+ 
+ 	const autoComplete = typeProp === 'number' ? 'off' : null;
+ 	const classes = classNames( 'components-number-control', className );
+@@ -59,7 +64,6 @@ export function NumberControl(
+ 	const numberControlStateReducer = ( state, action ) => {
+ 		const { type, payload } = action;
+ 		const event = payload?.event;
+-
+ 		const currentValue = state.value;
+ 
+ 		/**
+@@ -72,7 +76,7 @@ export function NumberControl(
+ 			const enableShift = event.shiftKey && isShiftStepEnabled;
+ 
+ 			const incrementalValue = enableShift
+-				? parseFloat( shiftStep )
++				? parseFloat( shiftStep ) * parseFloat( step )
+ 				: parseFloat( step );
+ 			let nextValue = isValueEmpty( currentValue )
+ 				? baseValue
+@@ -101,7 +105,9 @@ export function NumberControl(
+ 		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
+ 			const { delta, shiftKey } = payload;
+ 			const [ x, y ] = delta;
+-			const modifier = shiftKey ? shiftStep : 1;
++			const modifier = shiftKey
++				? parseFloat( shiftStep ) * parseFloat( step )
++				: parseFloat( step );
+ 
+ 			let directionModifier;
+ 			let directionBaseValue;
+@@ -169,8 +175,9 @@ export function NumberControl(
+ 			max={ max }
+ 			min={ min }
+ 			ref={ ref }
++			step={ jumpStep }
+ 			type={ typeProp }
+-			value={ initialValue }
++			value={ valueProp }
+ 			__unstableStateReducer={ composeStateReducers(
+ 				numberControlStateReducer,
+ 				stateReducer
+diff --git a/packages/components/src/range-control/README.md b/packages/components/src/range-control/README.md
+index 8a703b3e3db6c8..c42614583dc2e1 100644
+--- a/packages/components/src/range-control/README.md
++++ b/packages/components/src/range-control/README.md
+@@ -40,12 +40,12 @@ Possible selections may be organized through the use of tick marks, which a thum
+ 
+ ### Behavior
+ 
+-- **Click and drag**: The slider is controlled by clicking the thumb and dragging it.
+-- **Click jump**: The slider is controlled by clicking the track.
+-- **Click and arrow**: The slider is controlled by clicking the thumb, then using arrow keys to move it.
+-- **Tab and arrow**: The slider is controlled by using the tab key to select the thumb of the desired slider, then using arrow keys to move it.
+-- **Value entry field**: Discrete sliders have value entry fields. After a text entry is made, the slider position automatically updates to reflect the new value.
+-- **Tick marks** (Optional) Discrete sliders can use evenly spaced tick marks along the slider track, and the thumb will snap to them. Each tick mark should change the setting in increments that are discernible to the user.
++-   **Click and drag**: The slider is controlled by clicking the thumb and dragging it.
++-   **Click jump**: The slider is controlled by clicking the track.
++-   **Click and arrow**: The slider is controlled by clicking the thumb, then using arrow keys to move it.
++-   **Tab and arrow**: The slider is controlled by using the tab key to select the thumb of the desired slider, then using arrow keys to move it.
++-   **Value entry field**: Discrete sliders have value entry fields. After a text entry is made, the slider position automatically updates to reflect the new value.
++-   **Tick marks** (Optional) Discrete sliders can use evenly spaced tick marks along the slider track, and the thumb will snap to them. Each tick mark should change the setting in increments that are discernible to the user.
+ 
+ ### Usage
+ 
+@@ -95,15 +95,15 @@ import { RangeControl } from '@wordpress/components';
+ import { withState } from '@wordpress/compose';
+ 
+ const MyRangeControl = withState( {
+-        columns: 2,
++	columns: 2,
+ } )( ( { columns, setState } ) => (
+-    <RangeControl
+-        label="Columns"
+-        value={ columns }
+-        onChange={ ( columns ) => setState( { columns } ) }
+-        min={ 2 }
+-        max={ 10 }
+-    />
++	<RangeControl
++		label="Columns"
++		value={ columns }
++		onChange={ ( columns ) => setState( { columns } ) }
++		min={ 2 }
++		max={ 10 }
++	/>
+ ) );
+ ```
+ 
+@@ -116,58 +116,65 @@ Props not included in this set will be applied to the input elements.
+ 
+ If this property is added, a label will be generated using label property as the content.
+ 
+-- Type: `String`
+-- Required: No
+-- Platform: Web | Mobile
++-   Type: `String`
++-   Required: No
++-   Platform: Web | Mobile
+ 
+ #### help
+ 
+ If this property is added, a help text will be generated using help property as the content.
+ 
+-- Type: `String|WPElement`
+-- Required: No
+-- Platform: Web
++-   Type: `String|WPElement`
++-   Required: No
++-   Platform: Web
+ 
+ #### beforeIcon
+ 
+ If this property is added, a DashIcon component will be rendered before the slider with the icon equal to beforeIcon
+ 
+-- Type: `String`
+-- Required: No
+-- Platform: Web
++-   Type: `String`
++-   Required: No
++-   Platform: Web
+ 
+ #### afterIcon
+ 
+ If this property is added, a DashIcon component will be rendered after the slider with the icon equal to afterIcon
+ 
+-- Type: `String`
+-- Required: No
+-- Platform: Web
++-   Type: `String`
++-   Required: No
++-   Platform: Web
+ 
+ #### allowReset
+ 
+ If this property is true, a button to reset the the slider is rendered.
+ 
+-- Type: `Boolean`
+-- Required: No
+-- Platform: Web | Mobile
++-   Type: `Boolean`
++-   Required: No
++-   Platform: Web | Mobile
+ 
+ #### disabled
+ 
+ Disables the `input`, preventing new values from being applied.
+ 
+-- Type: `Boolean`
+-- Required: No
+-- Platform: Web
++-   Type: `Boolean`
++-   Required: No
++-   Platform: Web
+ 
+ #### initialPosition
+ 
+ If no value exists this prop contains the slider starting position.
+ 
+-- Type: `Number`
+-- Required: No
+-- Platform: Web | Mobile
++-   Type: `Number`
++-   Required: No
++-   Platform: Web | Mobile
+ 
++### isShiftStepEnabled
++
++If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment the value by the `shiftStep` value.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `true`
+ 
+ #### marks
+ 
+@@ -200,34 +207,42 @@ const MyRangeControl() {
+ }
+ ```
+ 
+-- Type: `Array|Boolean`
+-- Required: No
+-- Platform: Web
++-   Type: `Array|Boolean`
++-   Required: No
++-   Platform: Web
+ 
+ #### onChange
+ 
+ A function that receives the new value.
+ If allowReset is true, when onChange is called without any parameter passed it should reset the value.
+ 
+-- Type: `function`
+-- Required: Yes
+-- Platform: Web | Mobile
++-   Type: `function`
++-   Required: Yes
++-   Platform: Web | Mobile
+ 
+ #### min
+ 
+ The minimum value accepted. If smaller values are inserted onChange will not be called and the value gets reverted when blur event fires.
+ 
+-- Type: `Number`
+-- Required: No
+-- Platform: Web | Mobile
++-   Type: `Number`
++-   Required: No
++-   Platform: Web | Mobile
+ 
+ #### max
+ 
++#### railColor
++
++Customizes the (background) color of the rail element.
++
++-   Type: `String`
++-   Required: No
++-   Platform: Web
++
+ The maximum value accepted. If higher values are inserted onChange will not be called and the value gets reverted when blur event fires.
+ 
+-- Type: `Number`
+-- Required: No
+-- Platform: Web | Mobile
++-   Type: `Number`
++-   Required: No
++-   Platform: Web | Mobile
+ 
+ #### renderTooltipContent
+ 
+@@ -241,75 +256,83 @@ const MyRangeControl() {
+ }
+ ```
+ 
+-- Type: `Function`
+-- Required: No
+-- Platform: Web
++-   Type: `Function`
++-   Required: No
++-   Platform: Web
+ 
+ #### resetFallbackValue
+ 
+ The value to revert to if the Reset button is clicked (enabled by `allowReset`)
+ 
+-- Type: `Number`
+-- Required: No
+-- Platform: Web
++-   Type: `Number`
++-   Required: No
++-   Platform: Web
+ 
+ #### showTooltip
+ 
+ Forcing the Tooltip UI to show or hide.
+ 
+-- Type: `Boolean`
+-- Required: No
+-- Platform: Web
++-   Type: `Boolean`
++-   Required: No
++-   Platform: Web
+ 
+ #### step
+ 
+ The stepping interval between `min` and `max` values. Step is used both for user interface and validation purposes.
+ 
+-- Type: `Number`
+-- Required: No
+-- Platform: Web
++-   Type: `Number`
++-   Required: No
++-   Platform: Web
++
++#### trackColor
++
++Customizes the (background) color of the track element.
++
++-   Type: `String`
++-   Required: No
++-   Platform: Web
+ 
+ #### value
+ 
+ The current value of the range slider.
+ 
+-- Type: `Number`
+-- Required: Yes
+-- Platform: Web | Mobile
++-   Type: `Number`
++-   Required: Yes
++-   Platform: Web | Mobile
+ 
+ #### withInputField
+ 
+ Determines if the `input` number field will render next to the RangeControl.
+ 
+-- Type: `Boolean`
+-- Required: No
+-- Platform: Web
++-   Type: `Boolean`
++-   Required: No
++-   Platform: Web
+ 
+ #### icon
+ 
+ An icon to be shown above the slider next to it's container title.
+ 
+-- Type: `String`
+-- Required: No
+-- Platform: Mobile
++-   Type: `String`
++-   Required: No
++-   Platform: Mobile
+ 
+ #### separatorType
+ 
+ Define if separator line under/above control row should be disabled or full width. By default it is placed below excluding underline the control icon.
+ 
+-- Type: `String Enum`
+-- Values: `none` | `fullWidth` | `topFullWidth`
+-- Required: No
+-- Platform: Mobile
++-   Type: `String Enum`
++-   Values: `none` | `fullWidth` | `topFullWidth`
++-   Required: No
++-   Platform: Mobile
+ 
+ #### type
+ 
+-Define if the value selection should present a stepper control or a slider control in the bottom sheet on mobile. To use the stepper set the type value as  `stepper`. Defaults to slider if no option is provided.
++Define if the value selection should present a stepper control or a slider control in the bottom sheet on mobile. To use the stepper set the type value as `stepper`. Defaults to slider if no option is provided.
+ 
+-- Type: `String`
+-- Required: No
+-- Platform: Mobile
++-   Type: `String`
++-   Required: No
++-   Platform: Mobile
+ 
+ ## Related components
+ 
+-- To collect a numerical input in a text field, use the `TextControl` component.
++-   To collect a numerical input in a text field, use the `TextControl` component.
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index 7622ba461913e0..34c8c16a43f97a 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -9,7 +9,7 @@ import { clamp, isFinite, noop } from 'lodash';
+  */
+ import { __ } from '@wordpress/i18n';
+ import { useRef, useState, forwardRef } from '@wordpress/element';
+-import { compose, withInstanceId } from '@wordpress/compose';
++import { useInstanceId } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -18,18 +18,14 @@ import BaseControl from '../base-control';
+ import Button from '../button';
+ import Icon from '../icon';
+ import { color } from '../utils/colors';
+-import {
+-	floatClamp,
+-	useControlledRangeValue,
+-	useDebouncedHoverInteraction,
+-} from './utils';
++import { floatClamp, useControlledRangeValue } from './utils';
++import InputRange from './input-range';
+ import RangeRail from './rail';
+ import SimpleTooltip from './tooltip';
+ import {
+ 	ActionRightWrapper,
+ 	AfterIconWrapper,
+ 	BeforeIconWrapper,
+-	InputRange,
+ 	Root,
+ 	Track,
+ 	ThumbWrapper,
+@@ -39,263 +35,258 @@ import {
+ import InputField from './input-field';
+ import { useRTL } from '../utils/rtl';
+ 
+-const BaseRangeControl = forwardRef(
+-	(
+-		{
+-			afterIcon,
+-			allowReset = false,
+-			beforeIcon,
+-			className,
+-			currentInput,
+-			color: colorProp = color( 'blue.wordpress.700' ),
+-			disabled = false,
+-			help,
+-			instanceId,
+-			initialPosition,
+-			label,
+-			marks = false,
+-			max = 100,
+-			min = 0,
+-			onBlur = noop,
+-			onChange = noop,
+-			onFocus = noop,
+-			onMouseMove = noop,
+-			onMouseLeave = noop,
+-			resetFallbackValue,
+-			renderTooltipContent = ( v ) => v,
+-			showTooltip: showTooltipProp,
+-			step = 1,
+-			value: valueProp,
+-			withInputField = true,
+-			...props
+-		},
+-		ref
+-	) => {
+-		const isRTL = useRTL();
+-
+-		const sliderValue =
+-			valueProp !== undefined ? valueProp : initialPosition;
+-
+-		const [ value, setValue ] = useControlledRangeValue( {
+-			min,
+-			max,
+-			value: sliderValue,
+-		} );
+-		const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
+-		const [ isFocused, setIsFocused ] = useState( false );
+-
+-		const inputRef = useRef();
+-
+-		const setRef = ( nodeRef ) => {
+-			inputRef.current = nodeRef;
+-
+-			if ( ref ) {
+-				ref( nodeRef );
+-			}
+-		};
+-
+-		const isCurrentlyFocused = inputRef.current?.matches( ':focus' );
+-		const isThumbFocused = ! disabled && isFocused;
+-
+-		const isValueReset = value === null;
+-		const currentValue = value !== undefined ? value : currentInput;
+-
+-		const inputSliderValue = isValueReset ? '' : currentValue;
+-
+-		const rangeFillValue = isValueReset
+-			? floatClamp( max / 2, min, max )
+-			: value;
+-
+-		const calculatedFillValue = ( ( value - min ) / ( max - min ) ) * 100;
+-		const fillValue = isValueReset ? 50 : calculatedFillValue;
+-		const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
+-
+-		const classes = classnames( 'components-range-control', className );
+-
+-		const wrapperClasses = classnames(
+-			'components-range-control__wrapper',
+-			!! marks && 'is-marked'
+-		);
+-
+-		const id = `inspector-range-control-${ instanceId }`;
+-
+-		const describedBy = !! help ? `${ id }__help` : undefined;
+-		const enableTooltip = showTooltipProp !== false && isFinite( value );
+-
+-		const handleOnChange = ( event ) => {
+-			const nextValue = parseFloat( event.target.value );
+-
+-			if ( isNaN( nextValue ) ) {
+-				handleOnReset();
+-				return;
+-			}
+-
+-			setValue( nextValue );
+-			onChange( nextValue );
+-		};
+-
+-		const handleOnReset = () => {
+-			let resetValue = parseFloat( resetFallbackValue );
+-			let onChangeResetValue = resetValue;
+-
+-			if ( isNaN( resetValue ) ) {
+-				resetValue = null;
+-				onChangeResetValue = undefined;
+-			}
+-
+-			setValue( resetValue );
+-
+-			/**
+-			 * Previously, this callback would always receive undefined as
+-			 * an argument. This behavior is unexpected, specifically
+-			 * when resetFallbackValue is defined.
+-			 *
+-			 * The value of undefined is not ideal. Passing it through
+-			 * to internal <input /> elements would change it from a
+-			 * controlled component to an uncontrolled component.
+-			 *
+-			 * For now, to minimize unexpected regressions, we're going to
+-			 * preserve the undefined callback argument, except when a
+-			 * resetFallbackValue is defined.
+-			 */
+-			onChange( onChangeResetValue );
+-		};
+-
+-		const handleShowTooltip = () => setShowTooltip( true );
+-		const handleHideTooltip = () => setShowTooltip( false );
+-
+-		const handleOnBlur = ( event ) => {
+-			onBlur( event );
+-			setIsFocused( false );
+-			handleHideTooltip();
+-		};
+-
+-		const handleOnFocus = ( event ) => {
+-			onFocus( event );
+-			setIsFocused( true );
+-			handleShowTooltip();
+-		};
+-
+-		const hoverInteractions = useDebouncedHoverInteraction( {
+-			onShow: handleShowTooltip,
+-			onHide: handleHideTooltip,
+-			onMouseMove,
+-			onMouseLeave,
+-		} );
+-
+-		const offsetStyle = {
+-			[ isRTL ? 'right' : 'left' ]: fillValueOffset,
+-		};
+-
+-		return (
+-			<BaseControl
+-				className={ classes }
+-				label={ label }
+-				id={ id }
+-				help={ help }
+-			>
+-				<Root
+-					className="components-range-control__root"
+-					isRTL={ isRTL }
++function RangeControl(
++	{
++		afterIcon,
++		allowReset = false,
++		beforeIcon,
++		className,
++		currentInput,
++		color: colorProp = color( 'ui.brand' ),
++		disabled = false,
++		help,
++		initialPosition,
++		isShiftStepEnabled = true,
++		label,
++		marks = false,
++		max = 100,
++		min = 0,
++		onBlur = noop,
++		onChange = noop,
++		onFocus = noop,
++		onMouseMove = noop,
++		onMouseLeave = noop,
++		railColor,
++		resetFallbackValue,
++		renderTooltipContent = ( v ) => v,
++		showTooltip: showTooltipProp,
++		shiftStep = 10,
++		step = 1,
++		trackColor,
++		value: valueProp,
++		withInputField = true,
++		...props
++	},
++	ref
++) {
++	const isRTL = useRTL();
++
++	const [ value, setValue ] = useControlledRangeValue( {
++		min,
++		max,
++		value: valueProp,
++		initial: initialPosition,
++	} );
++	const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
++	const [ isFocused, setIsFocused ] = useState( false );
++
++	const inputRef = useRef();
++
++	const setRef = ( nodeRef ) => {
++		inputRef.current = nodeRef;
++
++		if ( ref ) {
++			ref( nodeRef );
++		}
++	};
++
++	const isCurrentlyFocused = inputRef.current?.matches( ':focus' );
++	const isThumbFocused = ! disabled && isFocused;
++
++	const isValueReset = value === null;
++	const currentValue = value !== undefined ? value : currentInput;
++
++	const inputSliderValue = isValueReset ? '' : currentValue;
++
++	const rangeFillValue = isValueReset
++		? floatClamp( max / 2, min, max )
++		: value;
++
++	const calculatedFillValue = ( ( value - min ) / ( max - min ) ) * 100;
++	const fillValue = isValueReset ? 50 : calculatedFillValue;
++	const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
++
++	const classes = classnames( 'components-range-control', className );
++
++	const wrapperClasses = classnames(
++		'components-range-control__wrapper',
++		!! marks && 'is-marked'
++	);
++
++	const id = useInstanceId( RangeControl, 'inspector-range-control' );
++	const describedBy = !! help ? `${ id }__help` : undefined;
++	const enableTooltip = showTooltipProp !== false && isFinite( value );
++
++	const handleOnRangeChange = ( event ) => {
++		const nextValue = parseFloat( event.target.value );
++		handleOnChange( nextValue );
++	};
++
++	const handleOnChange = ( nextValue ) => {
++		if ( isNaN( nextValue ) ) {
++			handleOnReset();
++			return;
++		}
++
++		setValue( nextValue );
++		onChange( nextValue );
++	};
++
++	const handleOnReset = () => {
++		let resetValue = parseFloat( resetFallbackValue );
++		let onChangeResetValue = resetValue;
++
++		if ( isNaN( resetValue ) ) {
++			resetValue = null;
++			onChangeResetValue = undefined;
++		}
++
++		setValue( resetValue );
++
++		/**
++		 * Previously, this callback would always receive undefined as
++		 * an argument. This behavior is unexpected, specifically
++		 * when resetFallbackValue is defined.
++		 *
++		 * The value of undefined is not ideal. Passing it through
++		 * to internal <input /> elements would change it from a
++		 * controlled component to an uncontrolled component.
++		 *
++		 * For now, to minimize unexpected regressions, we're going to
++		 * preserve the undefined callback argument, except when a
++		 * resetFallbackValue is defined.
++		 */
++		onChange( onChangeResetValue );
++	};
++
++	const handleShowTooltip = () => setShowTooltip( true );
++	const handleHideTooltip = () => setShowTooltip( false );
++
++	const handleOnBlur = ( event ) => {
++		onBlur( event );
++		setIsFocused( false );
++		handleHideTooltip();
++	};
++
++	const handleOnFocus = ( event ) => {
++		onFocus( event );
++		setIsFocused( true );
++		handleShowTooltip();
++	};
++
++	const offsetStyle = {
++		[ isRTL ? 'right' : 'left' ]: fillValueOffset,
++	};
++
++	return (
++		<BaseControl
++			className={ classes }
++			label={ label }
++			id={ id }
++			help={ help }
++		>
++			<Root className="components-range-control__root" isRTL={ isRTL }>
++				{ beforeIcon && (
++					<BeforeIconWrapper>
++						<Icon icon={ beforeIcon } />
++					</BeforeIconWrapper>
++				) }
++				<Wrapper
++					className={ wrapperClasses }
++					color={ colorProp }
++					marks={ !! marks }
+ 				>
+-					{ beforeIcon && (
+-						<BeforeIconWrapper>
+-							<Icon icon={ beforeIcon } />
+-						</BeforeIconWrapper>
+-					) }
+-					<Wrapper
+-						className={ wrapperClasses }
+-						color={ colorProp }
+-						marks={ !! marks }
+-					>
+-						<InputRange
+-							{ ...props }
+-							{ ...hoverInteractions }
+-							aria-describedby={ describedBy }
+-							aria-label={ label }
+-							aria-hidden={ false }
+-							className="components-range-control__slider"
+-							disabled={ disabled }
+-							id={ id }
+-							max={ max }
+-							min={ min }
+-							onBlur={ handleOnBlur }
+-							onChange={ handleOnChange }
+-							onFocus={ handleOnFocus }
+-							ref={ setRef }
+-							step={ step }
+-							tabIndex={ 0 }
+-							type="range"
+-							value={ inputSliderValue }
+-						/>
+-						<RangeRail
++					<InputRange
++						{ ...props }
++						className="components-range-control__slider"
++						describedBy={ describedBy }
++						disabled={ disabled }
++						id={ id }
++						isShiftStepEnabled={ isShiftStepEnabled }
++						label={ label }
++						max={ max }
++						min={ min }
++						onBlur={ handleOnBlur }
++						onChange={ handleOnRangeChange }
++						onFocus={ handleOnFocus }
++						onMouseMove={ onMouseMove }
++						onMouseLeave={ onMouseLeave }
++						ref={ setRef }
++						shiftStep={ shiftStep }
++						step={ step }
++						value={ inputSliderValue }
++					/>
++					<RangeRail
++						aria-hidden={ true }
++						disabled={ disabled }
++						marks={ marks }
++						max={ max }
++						min={ min }
++						railColor={ railColor }
++						step={ step }
++						value={ rangeFillValue }
++					/>
++					<Track
++						aria-hidden={ true }
++						className="components-range-control__track"
++						disabled={ disabled }
++						style={ { width: fillValueOffset } }
++						trackColor={ trackColor }
++					/>
++					<ThumbWrapper style={ offsetStyle }>
++						<Thumb
+ 							aria-hidden={ true }
+-							disabled={ disabled }
+-							marks={ marks }
+-							max={ max }
+-							min={ min }
+-							step={ step }
+-							value={ rangeFillValue }
++							isFocused={ isThumbFocused }
+ 						/>
+-						<Track
+-							aria-hidden={ true }
+-							className="components-range-control__track"
+-							disabled={ disabled }
+-							style={ { width: fillValueOffset } }
++					</ThumbWrapper>
++					{ enableTooltip && (
++						<SimpleTooltip
++							className="components-range-control__tooltip"
++							inputRef={ inputRef }
++							renderTooltipContent={ renderTooltipContent }
++							show={ isCurrentlyFocused || showTooltip }
++							style={ offsetStyle }
++							value={ value }
+ 						/>
+-						<ThumbWrapper style={ offsetStyle }>
+-							<Thumb
+-								aria-hidden={ true }
+-								isFocused={ isThumbFocused }
+-							/>
+-						</ThumbWrapper>
+-						{ enableTooltip && (
+-							<SimpleTooltip
+-								className="components-range-control__tooltip"
+-								inputRef={ inputRef }
+-								renderTooltipContent={ renderTooltipContent }
+-								show={ isCurrentlyFocused || showTooltip }
+-								style={ offsetStyle }
+-								value={ value }
+-							/>
+-						) }
+-					</Wrapper>
+-					{ afterIcon && (
+-						<AfterIconWrapper>
+-							<Icon icon={ afterIcon } />
+-						</AfterIconWrapper>
+ 					) }
+-					{ withInputField && (
+-						<InputField
+-							disabled={ disabled }
+-							label={ label }
+-							max={ max }
+-							min={ min }
+-							onChange={ handleOnChange }
+-							onReset={ handleOnReset }
+-							step={ step }
+-							value={ inputSliderValue }
+-						/>
+-					) }
+-					{ allowReset && (
+-						<ActionRightWrapper>
+-							<Button
+-								className="components-range-control__reset"
+-								disabled={ disabled || value === undefined }
+-								isSecondary
+-								isSmall
+-								onClick={ handleOnReset }
+-							>
+-								{ __( 'Reset' ) }
+-							</Button>
+-						</ActionRightWrapper>
+-					) }
+-				</Root>
+-			</BaseControl>
+-		);
+-	}
+-);
+-
+-export const RangeControlNext = compose( withInstanceId )( BaseRangeControl );
+-
+-export default RangeControlNext;
++				</Wrapper>
++				{ afterIcon && (
++					<AfterIconWrapper>
++						<Icon icon={ afterIcon } />
++					</AfterIconWrapper>
++				) }
++				{ withInputField && (
++					<InputField
++						disabled={ disabled }
++						isShiftStepEnabled={ isShiftStepEnabled }
++						label={ label }
++						max={ max }
++						min={ min }
++						onChange={ handleOnChange }
++						onReset={ handleOnReset }
++						shiftStep={ shiftStep }
++						step={ step }
++						value={ inputSliderValue }
++					/>
++				) }
++				{ allowReset && (
++					<ActionRightWrapper>
++						<Button
++							className="components-range-control__reset"
++							disabled={ disabled || value === undefined }
++							isSecondary
++							isSmall
++							onClick={ handleOnReset }
++						>
++							{ __( 'Reset' ) }
++						</Button>
++					</ActionRightWrapper>
++				) }
++			</Root>
++		</BaseControl>
++	);
++}
++
++const ForwardedComponent = forwardRef( RangeControl );
++
++export default ForwardedComponent;
+diff --git a/packages/components/src/range-control/input-field.js b/packages/components/src/range-control/input-field.js
+index 9a908f98fc592a..b71351b2c4973f 100644
+--- a/packages/components/src/range-control/input-field.js
++++ b/packages/components/src/range-control/input-field.js
+@@ -47,13 +47,8 @@ export default function InputField( {
+ 			return;
+ 		}
+ 
+-		// Only propagate the event if the value is valid.
+-		if ( event.target.checkValidity && ! event.target.checkValidity() ) {
+-			// Otherwise... reset to initial value
+-			setValue( valueProp );
+-			return;
+-		}
+-		onChange( event );
++		setValue( nextValue );
++		onChange( nextValue );
+ 	};
+ 
+ 	const handleOnBlur = ( event ) => {
+@@ -61,22 +56,8 @@ export default function InputField( {
+ 		handleOnCommit( event );
+ 	};
+ 
+-	const handleOnChange = ( event ) => {
+-		setValue( event.target.value );
+-
+-		/**
+-		 * Prevent submitting if changes are invalid.
+-		 * This only applies to values being entered via KEY_DOWN.
+-		 *
+-		 * Pressing the up/down arrows of the HTML input also triggers a
+-		 * change event. However, those values will be (pre)validated by the
+-		 * HTML input.
+-		 */
+-		if ( event.target.checkValidity && ! event.target.checkValidity() ) {
+-			return;
+-		}
+-
+-		handleOnCommit( event );
++	const handleOnChange = ( next ) => {
++		handleOnCommit( { target: { value: next } } );
+ 	};
+ 
+ 	const handleOnKeyDown = ( event ) => {
+diff --git a/packages/components/src/range-control/input-range.js b/packages/components/src/range-control/input-range.js
+new file mode 100644
+index 00000000000000..5fa4235a68974b
+--- /dev/null
++++ b/packages/components/src/range-control/input-range.js
+@@ -0,0 +1,71 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { InputRange as BaseInputRange } from './styles/range-control-styles';
++import { useDebouncedHoverInteraction } from './utils';
++import { useJumpStep } from '../utils/hooks';
++
++function InputRange(
++	{
++		describedBy,
++		isShiftStepEnabled = true,
++		label,
++		onHideTooltip = noop,
++		onMouseLeave = noop,
++		step = 1,
++		onBlur = noop,
++		onChange = noop,
++		onFocus = noop,
++		onMouseMove = noop,
++		onShowTooltip = noop,
++		shiftStep = 10,
++		value,
++		...props
++	},
++	ref
++) {
++	const jumpStep = useJumpStep( {
++		step,
++		shiftStep,
++		isShiftStepEnabled,
++	} );
++
++	const hoverInteractions = useDebouncedHoverInteraction( {
++		onHide: onHideTooltip,
++		onMouseLeave,
++		onMouseMove,
++		onShow: onShowTooltip,
++	} );
++
++	return (
++		<BaseInputRange
++			{ ...props }
++			{ ...hoverInteractions }
++			aria-describedby={ describedBy }
++			aria-label={ label }
++			aria-hidden={ false }
++			onBlur={ onBlur }
++			onChange={ onChange }
++			onFocus={ onFocus }
++			ref={ ref }
++			step={ jumpStep }
++			tabIndex={ 0 }
++			type="range"
++			value={ value }
++		/>
++	);
++}
++
++const ForwardedComponent = forwardRef( InputRange );
++
++export default ForwardedComponent;
+diff --git a/packages/components/src/range-control/stories/index.js b/packages/components/src/range-control/stories/index.js
+index c0e4877610c7a5..daba7c7555398d 100644
+--- a/packages/components/src/range-control/stories/index.js
++++ b/packages/components/src/range-control/stories/index.js
+@@ -13,6 +13,7 @@ import { useEffect, useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import RangeControl from '../index';
++import { color } from '../../utils/colors';
+ 
+ export default { title: 'Components/RangeControl', component: RangeControl };
+ 
+@@ -28,17 +29,20 @@ const DefaultExample = () => {
+ 	const [ value, setValue ] = useState( undefined );
+ 
+ 	const props = {
++		afterIcon: text( 'afterIcon', '' ),
+ 		allowReset: boolean( 'allowReset', false ),
++		beforeIcon: text( 'beforeIcon', '' ),
++		color: text( 'color', color( 'ui.brand' ) ),
+ 		disabled: boolean( 'disabled', false ),
+-		label: text( 'label', 'Range Label' ),
+ 		help: text( 'help', '' ),
+-		min: number( 'min', 0 ),
+-		max: number( 'max', 10 ),
+-		step: number( 'step', 1 ),
++		label: text( 'label', 'Range Label' ),
+ 		marks: boolean( 'marks', false ),
++		max: number( 'max', 100 ),
++		min: number( 'min', 0 ),
+ 		showTooltip: boolean( 'showTooltip', false ),
+-		beforeIcon: text( 'beforeIcon', '' ),
+-		afterIcon: text( 'afterIcon', '' ),
++		step: number( 'step', 1 ),
++		railColor: text( 'railColor', null ),
++		trackColor: text( 'trackColor', null ),
+ 		withInputField: boolean( 'withInputField', true ),
+ 		value,
+ 		onChange: setValue,
+diff --git a/packages/components/src/range-control/styles/range-control-styles.js b/packages/components/src/range-control/styles/range-control-styles.js
+index f96c44d8fdf30a..f820c3e2dbf053 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.js
++++ b/packages/components/src/range-control/styles/range-control-styles.js
+@@ -7,7 +7,8 @@ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+  */
+-import { color, reduceMotion, rtl } from '../../utils/style-mixins';
++import NumberControl from '../../number-control';
++import { color, reduceMotion, rtl, space } from '../../utils/style-mixins';
+ 
+ const rangeHeight = () => css( { height: 30, minHeight: 30 } );
+ 
+@@ -24,17 +25,21 @@ export const Root = styled.span`
+ 	width: 100%;
+ `;
+ 
++const wrapperColor = ( { color: colorProp = color( 'ui.borderFocus' ) } ) => {
++	return css( { color: colorProp } );
++};
+ const wrapperMargin = ( { marks } ) =>
+ 	css( { marginBottom: marks ? 16 : null } );
+ 
+ export const Wrapper = styled.span`
+ 	box-sizing: border-box;
+-	color: ${ color( 'blue.medium.focus' ) };
+ 	display: block;
++	flex: 1;
+ 	padding-top: 15px;
+ 	position: relative;
+ 	width: 100%;
+ 
++	${ wrapperColor };
+ 	${ rangeHeight };
+ 	${ wrapperMargin };
+ 
+@@ -53,10 +58,15 @@ export const AfterIconWrapper = styled.span`
+ 	${ rtl( { marginLeft: 16 } ) }
+ `;
+ 
+-const disabledRailBackgroundColor = ( { disabled } ) => {
+-	if ( ! disabled ) return '';
++const railBackgroundColor = ( { disabled, railColor } ) => {
++	let background = railColor || null;
++
++	if ( disabled ) {
++		background = color( 'lightGray.400' );
++	}
++
+ 	return css( {
+-		backgroundColor: color( 'lightGray.400' ),
++		background,
+ 	} );
+ };
+ 
+@@ -72,13 +82,18 @@ export const Rail = styled.span`
+ 	margin-top: 14px;
+ 	top: 0;
+ 
+-	${ disabledRailBackgroundColor };
++	${ railBackgroundColor };
+ `;
+ 
+-const disabledBackgroundColor = ( { disabled } ) => {
+-	if ( ! disabled ) return '';
++const trackBackgroundColor = ( { disabled, trackColor } ) => {
++	let background = trackColor || 'currentColor';
++
++	if ( disabled ) {
++		background = color( 'lightGray.800' );
++	}
++
+ 	return css( {
+-		backgroundColor: color( 'lightGray.800' ),
++		background,
+ 	} );
+ };
+ 
+@@ -93,7 +108,7 @@ export const Track = styled.span`
+ 	margin-top: 14px;
+ 	top: 0;
+ 
+-	${ disabledBackgroundColor };
++	${ trackBackgroundColor };
+ `;
+ 
+ export const MarksWrapper = styled.span`
+@@ -104,9 +119,15 @@ export const MarksWrapper = styled.span`
+ 	user-select: none;
+ `;
+ 
+-const markFill = ( { isFilled } ) => {
++const markFill = ( { disabled, isFilled } ) => {
++	let backgroundColor = isFilled ? 'currentColor' : color( 'lightGray.600' );
++
++	if ( disabled ) {
++		backgroundColor = color( 'lightGray.800' );
++	}
++
+ 	return css( {
+-		backgroundColor: isFilled ? 'currentColor' : color( 'lightGray.600' ),
++		backgroundColor,
+ 	} );
+ };
+ 
+@@ -119,7 +140,6 @@ export const Mark = styled.span`
+ 	width: 1px;
+ 
+ 	${ markFill };
+-	${ disabledBackgroundColor };
+ `;
+ 
+ const markLabelFill = ( { isFilled } ) => {
+@@ -161,11 +181,11 @@ export const ThumbWrapper = styled.span`
+ const thumbFocus = ( { isFocused } ) => {
+ 	return css( {
+ 		borderColor: isFocused
+-			? color( 'blue.medium.focus' )
++			? color( 'ui.borderFocus' )
+ 			: color( 'darkGray.200' ),
+ 		boxShadow: isFocused
+ 			? `
+-				0 0 0 1px ${ color( 'blue.medium.focus' ) }
++				0 0 0 1px ${ color( 'ui.borderFocus' ) }
+ 			`
+ 			: `
+ 				0 0 0 rgba(0, 0, 0, 0)
+@@ -250,19 +270,18 @@ export const Tooltip = styled.span`
+ 	) }
+ `;
+ 
+-export const InputNumber = styled.input`
++export const InputNumber = styled( NumberControl )`
+ 	box-sizing: border-box;
+ 	display: inline-block;
+-	margin-top: 0;
+-	min-width: 60px;
+-	max-width: 120px;
+ 	font-size: 13px;
++	margin-top: 0;
++	width: ${ space( 8 ) };
+ 
+ 	input[type='number']& {
+ 		${ rangeHeight };
+ 	}
+ 
+-	${ rtl( { marginLeft: 16 } ) }
++	${ rtl( { marginLeft: space( 2 ) } ) }
+ `;
+ 
+ export const ActionRightWrapper = styled.span`
+diff --git a/packages/components/src/range-control/test/index.js b/packages/components/src/range-control/test/index.js
+index e0441f3b48845d..369598cf02d52d 100644
+--- a/packages/components/src/range-control/test/index.js
++++ b/packages/components/src/range-control/test/index.js
+@@ -70,11 +70,8 @@ describe( 'RangeControl', () => {
+ 	} );
+ 
+ 	describe( 'validation', () => {
+-		it( 'should not call onChange if the new value is lower than minimum', () => {
+-			const onChange = jest.fn();
+-			const { container } = render(
+-				<RangeControl onChange={ onChange } min={ 11 } value={ 20 } />
+-			);
++		it( 'should not apply new value is lower than minimum', () => {
++			const { container } = render( <RangeControl min={ 11 } /> );
+ 
+ 			const rangeInput = getRangeInput( container );
+ 			const numberInput = getNumberInput( container );
+@@ -82,15 +79,11 @@ describe( 'RangeControl', () => {
+ 			fireEvent.change( numberInput, { target: { value: '10' } } );
+ 			fireEvent.blur( numberInput );
+ 
+-			expect( onChange ).not.toHaveBeenCalled();
+-			expect( rangeInput.value ).toBe( '20' );
++			expect( rangeInput.value ).not.toBe( '10' );
+ 		} );
+ 
+-		it( 'should not call onChange if the new value is greater than maximum', () => {
+-			const onChange = jest.fn();
+-			const { container } = render(
+-				<RangeControl onChange={ onChange } max={ 20 } value={ 10 } />
+-			);
++		it( 'should not apply new value is greater than maximum', () => {
++			const { container } = render( <RangeControl max={ 20 } /> );
+ 
+ 			const rangeInput = getRangeInput( container );
+ 			const numberInput = getNumberInput( container );
+@@ -98,19 +91,13 @@ describe( 'RangeControl', () => {
+ 			fireEvent.change( numberInput, { target: { value: '21' } } );
+ 			fireEvent.blur( numberInput );
+ 
+-			expect( onChange ).not.toHaveBeenCalled();
+-			expect( rangeInput.value ).toBe( '10' );
++			expect( rangeInput.value ).not.toBe( '21' );
+ 		} );
+ 
+ 		it( 'should call onChange if new value is valid', () => {
+ 			const onChange = jest.fn();
+ 			const { container } = render(
+-				<RangeControl
+-					onChange={ onChange }
+-					min={ 10 }
+-					max={ 20 }
+-					value={ 10 }
+-				/>
++				<RangeControl onChange={ onChange } min={ 10 } max={ 20 } />
+ 			);
+ 
+ 			const rangeInput = getRangeInput( container );
+@@ -124,14 +111,8 @@ describe( 'RangeControl', () => {
+ 		} );
+ 
+ 		it( 'should validate when provided a max or min of zero', () => {
+-			const onChange = jest.fn();
+ 			const { container } = render(
+-				<RangeControl
+-					onChange={ onChange }
+-					min={ -100 }
+-					max={ 0 }
+-					value={ 0 }
+-				/>
++				<RangeControl min={ -100 } max={ 0 } />
+ 			);
+ 
+ 			const rangeInput = getRangeInput( container );
+@@ -140,19 +121,12 @@ describe( 'RangeControl', () => {
+ 			fireEvent.change( numberInput, { target: { value: '1' } } );
+ 			fireEvent.blur( numberInput );
+ 
+-			expect( onChange ).not.toHaveBeenCalled();
+ 			expect( rangeInput.value ).toBe( '0' );
+ 		} );
+ 
+ 		it( 'should validate when min and max are negative', () => {
+-			const onChange = jest.fn();
+ 			const { container } = render(
+-				<RangeControl
+-					onChange={ onChange }
+-					min={ -100 }
+-					max={ -50 }
+-					value={ -60 }
+-				/>
++				<RangeControl min={ -100 } max={ -50 } />
+ 			);
+ 
+ 			const rangeInput = getRangeInput( container );
+@@ -161,19 +135,16 @@ describe( 'RangeControl', () => {
+ 			fireEvent.change( numberInput, { target: { value: '-101' } } );
+ 			fireEvent.blur( numberInput );
+ 
+-			expect( onChange ).not.toHaveBeenCalled();
+-			expect( rangeInput.value ).toBe( '-60' );
++			expect( rangeInput.value ).toBe( '-100' );
+ 
+ 			fireEvent.change( numberInput, { target: { value: '-49' } } );
+ 			fireEvent.blur( numberInput );
+ 
+-			expect( onChange ).not.toHaveBeenCalled();
+-			expect( rangeInput.value ).toBe( '-60' );
++			expect( rangeInput.value ).toBe( '-50' );
+ 
+ 			fireEvent.change( numberInput, { target: { value: '-50' } } );
+ 			fireEvent.blur( numberInput );
+ 
+-			expect( onChange ).toHaveBeenCalledWith( -50 );
+ 			expect( rangeInput.value ).toBe( '-50' );
+ 		} );
+ 
+@@ -184,7 +155,6 @@ describe( 'RangeControl', () => {
+ 					onChange={ onChange }
+ 					min={ 0.1 }
+ 					step={ 0.125 }
+-					value={ 0.1 }
+ 				/>
+ 			);
+ 
+@@ -194,8 +164,8 @@ describe( 'RangeControl', () => {
+ 			fireEvent.change( numberInput, { target: { value: '0.125' } } );
+ 			fireEvent.blur( numberInput );
+ 
+-			expect( onChange ).not.toHaveBeenCalled();
+-			expect( rangeInput.value ).toBe( '0.1' );
++			expect( onChange ).toHaveBeenCalledWith( 0.125 );
++			expect( rangeInput.value ).toBe( '0.125' );
+ 
+ 			fireEvent.change( numberInput, { target: { value: '0.225' } } );
+ 			fireEvent.blur( numberInput );
+@@ -267,7 +237,7 @@ describe( 'RangeControl', () => {
+ 		} );
+ 
+ 		it( 'should update both field and range on change', () => {
+-			const { container } = render( <RangeControl value={ 0 } /> );
++			const { container } = render( <RangeControl /> );
+ 
+ 			const rangeInput = getRangeInput( container );
+ 			const numberInput = getNumberInput( container );
+@@ -285,14 +255,11 @@ describe( 'RangeControl', () => {
+ 		} );
+ 
+ 		it( 'should reset input values if next value is removed', () => {
+-			const { container } = render( <RangeControl value={ 13 } /> );
++			const { container } = render( <RangeControl /> );
+ 
+ 			const rangeInput = getRangeInput( container );
+ 			const numberInput = getNumberInput( container );
+ 
+-			expect( rangeInput.value ).toBe( '13' );
+-			expect( numberInput.value ).toBe( '13' );
+-
+ 			fireEvent.change( numberInput, { target: { value: '' } } );
+ 			fireEvent.blur( numberInput );
+ 
+@@ -308,8 +275,7 @@ describe( 'RangeControl', () => {
+ 			const spy = jest.fn();
+ 			const { container } = render(
+ 				<RangeControl
+-					initialPosition={ 50 }
+-					value={ 10 }
++					initialPosition={ 10 }
+ 					allowReset={ true }
+ 					onChange={ spy }
+ 					resetFallbackValue={ 33 }
+@@ -328,15 +294,12 @@ describe( 'RangeControl', () => {
+ 		} );
+ 
+ 		it( 'should reset to a 50% of min/max value, of no initialPosition or value is defined', () => {
+-			const spy = jest.fn();
+ 			const { container } = render(
+ 				<RangeControl
+ 					initialPosition={ undefined }
+-					value={ 10 }
+ 					min={ 0 }
+ 					max={ 100 }
+ 					allowReset={ true }
+-					onChange={ spy }
+ 					resetFallbackValue={ undefined }
+ 				/>
+ 			);
+@@ -349,7 +312,6 @@ describe( 'RangeControl', () => {
+ 
+ 			expect( rangeInput.value ).toBe( '50' );
+ 			expect( numberInput.value ).toBe( '' );
+-			expect( spy ).toHaveBeenCalledWith( undefined );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/range-control/utils.js b/packages/components/src/range-control/utils.js
+index 667dfcc9532d2f..5422bce3a62859 100644
+--- a/packages/components/src/range-control/utils.js
++++ b/packages/components/src/range-control/utils.js
+@@ -33,28 +33,37 @@ export function floatClamp( value, min, max ) {
+ /**
+  * Hook to store a clamped value, derived from props.
+  *
+- * @param {Object} settings       Hook settings.
+- * @param {number} settings.min   The minimum value.
+- * @param {number} settings.max   The maximum value.
+- * @param {number} settings.value The current value.
++ * @param {Object} settings         Hook settings.
++ * @param {number} settings.min     The minimum value.
++ * @param {number} settings.max     The maximum value.
++ * @param {number} settings.value  	The current value.
++ * @param {any}    settings.initial The initial value.
++ *
++ * @return {[*, Function]} The controlled value and the value setter.
+  */
+-export function useControlledRangeValue( { min, max, value: valueProp } ) {
+-	const [ value, setValue ] = useControlledState(
+-		floatClamp( valueProp, min, max )
++export function useControlledRangeValue( {
++	min,
++	max,
++	value: valueProp,
++	initial,
++} ) {
++	const [ state, setInternalState ] = useControlledState(
++		floatClamp( valueProp, min, max ),
++		{ initial, fallback: null }
+ 	);
+ 
+-	const setClampValue = useCallback(
++	const setState = useCallback(
+ 		( nextValue ) => {
+ 			if ( nextValue === null ) {
+-				setValue( null );
++				setInternalState( null );
+ 			} else {
+-				setValue( floatClamp( nextValue, min, max ) );
++				setInternalState( floatClamp( nextValue, min, max ) );
+ 			}
+ 		},
+ 		[ min, max ]
+ 	);
+ 
+-	return [ value, setClampValue ];
++	return [ state, setState ];
+ }
+ 
+ /**
+@@ -67,12 +76,14 @@ export function useControlledRangeValue( { min, max, value: valueProp } ) {
+  * @param {Function} [settings.onMouseMove=noop]  A callback function invoked when the mouse is moved.
+  * @param {Function} [settings.onMouseLeave=noop] A callback function invoked when the mouse is moved out of the element.
+  * @param {number}   [settings.timeout=300]       Timeout before the element is shown or hidden.
++ *
++ * @return {Object} Bound properties for use on a React.Node.
+  */
+ export function useDebouncedHoverInteraction( {
+-	onShow = noop,
+ 	onHide = noop,
+-	onMouseMove = noop,
+ 	onMouseLeave = noop,
++	onMouseMove = noop,
++	onShow = noop,
+ 	timeout = 300,
+ } ) {
+ 	const [ show, setShow ] = useState( false );
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.js b/packages/components/src/unit-control/styles/unit-control-styles.js
+index 78201af14e1495..3c38a49685f1b8 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.js
++++ b/packages/components/src/unit-control/styles/unit-control-styles.js
+@@ -54,14 +54,16 @@ export const ValueInput = styled( NumberControl )`
+ const unitSizeStyles = ( { size } ) => {
+ 	const sizes = {
+ 		default: {
+-			top: 1,
+ 			height: 28,
++			lineHeight: '24px',
+ 			minHeight: 28,
++			top: 1,
+ 		},
+ 		small: {
+-			top: 1,
+ 			height: 22,
++			lineHeight: '18px',
+ 			minHeight: 22,
++			top: 1,
+ 		},
+ 	};
+ 
+@@ -93,21 +95,11 @@ const baseUnitLabelStyles = ( props ) => {
+ 	`;
+ };
+ 
+-const unitLabelPaddingStyles = ( { size } ) => {
+-	const sizes = {
+-		default: '6px 2px',
+-		small: '4px 2px',
+-	};
+-
+-	return css( { padding: sizes[ size ] } );
+-};
+-
+ export const UnitLabel = styled.div`
+ 	&&& {
+ 		pointer-events: none;
+ 
+ 		${ baseUnitLabelStyles };
+-		${ unitLabelPaddingStyles };
+ 	}
+ `;
+ 
+diff --git a/packages/components/src/utils/colors.js b/packages/components/src/utils/colors.js
+index 1de39eed4d2eb8..43518ce29de140 100644
+--- a/packages/components/src/utils/colors.js
++++ b/packages/components/src/utils/colors.js
+@@ -3,6 +3,7 @@
+  */
+ import { get } from 'lodash';
+ import tinycolor from 'tinycolor2';
++
+ /**
+  * Internal dependencies
+  */
+diff --git a/packages/components/src/utils/hooks.js b/packages/components/src/utils/hooks.js
+deleted file mode 100644
+index 00c173219819dd..00000000000000
+--- a/packages/components/src/utils/hooks.js
++++ /dev/null
+@@ -1,38 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useEffect, useRef, useState } from '@wordpress/element';
+-
+-/**
+- * Custom hooks for "controlled" components to track and consolidate internal
+- * state and incoming values. This is useful for components that render
+- * `input`, `textarea`, or `select` HTML elements.
+- *
+- * https://reactjs.org/docs/forms.html#controlled-components
+- *
+- * At first, a component using useControlledState receives an initial prop
+- * value, which is used as initial internal state.
+- *
+- * This internal state can be maintained and updated without
+- * relying on new incoming prop values.
+- *
+- * Unlike the basic useState hook, useControlledState's state can
+- * be updated if a new incoming prop value is changed.
+- *
+- * @param {any} initialState The initial state value.
+- * @return {[*, Function]} The controlled value and the value setter.
+- */
+-export function useControlledState( initialState ) {
+-	const [ state, setState ] = useState( initialState );
+-	const lastInitialStateRef = useRef( initialState );
+-
+-	useEffect( () => {
+-		// Update the internal state if the incoming value changes.
+-		if ( initialState !== lastInitialStateRef.current ) {
+-			setState( initialState );
+-			lastInitialStateRef.current = initialState;
+-		}
+-	}, [ initialState ] );
+-
+-	return [ state, setState ];
+-}
+diff --git a/packages/components/src/utils/hooks/index.js b/packages/components/src/utils/hooks/index.js
+new file mode 100644
+index 00000000000000..7b4ff6167cc660
+--- /dev/null
++++ b/packages/components/src/utils/hooks/index.js
+@@ -0,0 +1,2 @@
++export { default as useControlledState } from './use-controlled-state';
++export { default as useJumpStep } from './use-jump-step';
+diff --git a/packages/components/src/utils/test/hooks.js b/packages/components/src/utils/hooks/test/use-controlled-state.js
+similarity index 75%
+rename from packages/components/src/utils/test/hooks.js
+rename to packages/components/src/utils/hooks/test/use-controlled-state.js
+index 32013c4f62d947..6876382710cd76 100644
+--- a/packages/components/src/utils/test/hooks.js
++++ b/packages/components/src/utils/hooks/test/use-controlled-state.js
+@@ -7,14 +7,16 @@ import { noop } from 'lodash';
+ /**
+  * Internal dependencies
+  */
+-import { useControlledState } from '../hooks';
++import useControlledState from '../use-controlled-state';
+ 
+ describe( 'hooks', () => {
+ 	const getInput = () => screen.getByTestId( 'input' );
+ 
+ 	describe( 'useControlledState', () => {
+-		const Example = ( { value: valueProp, onChange = noop } ) => {
+-			const [ state, setState ] = useControlledState( valueProp );
++		const Example = ( { initial, value: valueProp, onChange = noop } ) => {
++			const [ state, setState ] = useControlledState( valueProp, {
++				initial,
++			} );
+ 
+ 			const handleOnChange = ( event ) => {
+ 				const nextValue = event.target.value;
+@@ -44,7 +46,7 @@ describe( 'hooks', () => {
+ 
+ 		it( 'should update rendered value onChange', () => {
+ 			const spy = jest.fn();
+-			render( <Example value="Hello" onChange={ spy } /> );
++			render( <Example onChange={ spy } /> );
+ 
+ 			const input = getInput();
+ 
+@@ -78,9 +80,7 @@ describe( 'hooks', () => {
+ 			 * from props. The prop being rendered is the state provided by
+ 			 * useControlledState, rather than the value prop directly.
+ 			 */
+-			const { rerender } = render(
+-				<Example value="Hello" onChange={ spy } />
+-			);
++			const { rerender } = render( <Example onChange={ spy } /> );
+ 
+ 			const input = getInput();
+ 
+@@ -102,23 +102,33 @@ describe( 'hooks', () => {
+ 			expect( spy ).toHaveBeenCalledTimes( 1 );
+ 		} );
+ 
+-		it( 'should new incoming prop value with new change value', () => {
++		it( 'should render with initial value and be controllable', () => {
+ 			const spy = jest.fn();
++			// Input starts off as being uncontrolled / self-managed.
+ 			const { rerender } = render(
+-				<Example value="Hello" onChange={ spy } />
++				<Example onChange={ spy } initial="Hello" />
+ 			);
+ 			const input = getInput();
+ 
++			expect( input.value ).toBe( 'Hello' );
++
+ 			fireEvent.change( input, { target: { value: 'There' } } );
+ 
++			expect( input.value ).toBe( 'There' );
++			expect( spy ).toHaveBeenCalledWith( 'There' );
++
++			// Input is now controlled
+ 			rerender( <Example value="New Value" /> );
++			expect( input.value ).toBe( 'New Value' );
+ 
+ 			fireEvent.change( input, {
+ 				target: { value: 'New Change Value' },
+ 			} );
+ 
+-			expect( input.value ).toBe( 'New Change Value' );
+-			expect( spy ).toHaveBeenCalledTimes( 1 );
++			// Since the Input is being controlled by a parent element,
++			// the internal state is no longer used. Instead, the incoming
++			// prop value will be used.
++			expect( input.value ).toBe( 'New Value' );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/utils/hooks/test/use-jump-step.js b/packages/components/src/utils/hooks/test/use-jump-step.js
+new file mode 100644
+index 00000000000000..0a09d7096ca392
+--- /dev/null
++++ b/packages/components/src/utils/hooks/test/use-jump-step.js
+@@ -0,0 +1,127 @@
++/**
++ * External dependencies
++ */
++import { render, fireEvent, screen } from '@testing-library/react';
++import { noop } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++import { SHIFT } from '@wordpress/keycodes';
++
++/**
++ * Internal dependencies
++ */
++import useJumpStep from '../use-jump-step';
++
++const getInput = () => screen.getByTestId( 'input' );
++
++describe( 'hooks', () => {
++	describe( 'useJumpStep', () => {
++		const Example = ( {
++			value: valueProp,
++			onChange = noop,
++			step = 1,
++			shiftStep = 10,
++			isShiftStepEnabled = true,
++		} ) => {
++			const [ state, setState ] = useState( valueProp );
++			const jumpStep = useJumpStep( {
++				step,
++				shiftStep,
++				isShiftStepEnabled,
++			} );
++
++			const handleOnChange = ( event ) => {
++				const nextValue = event.target.value;
++				setState( nextValue );
++				onChange( nextValue );
++			};
++
++			return (
++				<input
++					data-testid="input"
++					type="number"
++					value={ state }
++					onChange={ handleOnChange }
++					step={ jumpStep }
++				/>
++			);
++		};
++
++		it( 'should use initial step value', () => {
++			render( <Example value={ 10 } step={ 66 } /> );
++			const input = getInput();
++
++			expect( input.getAttribute( 'step' ) ).toBe( '66' );
++		} );
++
++		it( 'should modify step value on shift key down/up press', () => {
++			render( <Example value={ 10 } /> );
++			const input = getInput();
++
++			expect( input.getAttribute( 'step' ) ).toBe( '1' );
++
++			fireEvent.keyDown( window, { keyCode: SHIFT, shiftKey: true } );
++
++			expect( input.getAttribute( 'step' ) ).toBe( '10' );
++
++			fireEvent.keyUp( window, { keyCode: SHIFT, shiftKey: false } );
++
++			expect( input.getAttribute( 'step' ) ).toBe( '1' );
++		} );
++
++		it( 'should not jump step if disabled', () => {
++			render(
++				<Example
++					value={ 10 }
++					isShiftStepEnabled={ false }
++					step={ 1 }
++					shiftStep={ 15 }
++				/>
++			);
++			const input = getInput();
++
++			expect( input.getAttribute( 'step' ) ).toBe( '1' );
++
++			fireEvent.keyDown( window, { keyCode: SHIFT, shiftKey: true } );
++
++			expect( input.getAttribute( 'step' ) ).toBe( '1' );
++
++			fireEvent.keyUp( window, { keyCode: SHIFT, shiftKey: false } );
++
++			expect( input.getAttribute( 'step' ) ).toBe( '1' );
++		} );
++
++		it( 'should calculate jumpStep value, using step as a multiplier to shiftStep', () => {
++			render( <Example value={ 10 } step={ 0.5 } shiftStep={ 10 } /> );
++			const input = getInput();
++
++			expect( input.getAttribute( 'step' ) ).toBe( '0.5' );
++
++			fireEvent.keyDown( window, { keyCode: SHIFT, shiftKey: true } );
++
++			expect( input.getAttribute( 'step' ) ).toBe( '5' );
++
++			fireEvent.keyUp( window, { keyCode: SHIFT, shiftKey: false } );
++
++			expect( input.getAttribute( 'step' ) ).toBe( '0.5' );
++		} );
++
++		it( 'should allow for float values in step and shiftStep', () => {
++			render( <Example value={ 10 } step={ 0.001 } shiftStep={ 10 } /> );
++			const input = getInput();
++
++			expect( input.getAttribute( 'step' ) ).toBe( '0.001' );
++
++			fireEvent.keyDown( window, { keyCode: SHIFT, shiftKey: true } );
++
++			expect( input.getAttribute( 'step' ) ).toBe( '0.01' );
++
++			fireEvent.keyUp( window, { keyCode: SHIFT, shiftKey: false } );
++
++			expect( input.getAttribute( 'step' ) ).toBe( '0.001' );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/utils/hooks/use-controlled-state.js b/packages/components/src/utils/hooks/use-controlled-state.js
+new file mode 100644
+index 00000000000000..cf3de908dd459e
+--- /dev/null
++++ b/packages/components/src/utils/hooks/use-controlled-state.js
+@@ -0,0 +1,63 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { isValueDefined, getDefinedValue } from '../values';
++
++const defaultOptions = {
++	initial: undefined,
++	/**
++	 * Defaults to empty string, as that is preferred for usage with
++	 * <input />, <textarea />, and <select /> form elements.
++	 */
++	fallback: '',
++};
++
++/**
++ * Custom hooks for "controlled" components to track and consolidate internal
++ * state and incoming values. This is useful for components that render
++ * `input`, `textarea`, or `select` HTML elements.
++ *
++ * https://reactjs.org/docs/forms.html#controlled-components
++ *
++ * At first, a component using useControlledState receives an initial prop
++ * value, which is used as initial internal state.
++ *
++ * This internal state can be maintained and updated without
++ * relying on new incoming prop values.
++ *
++ * Unlike the basic useState hook, useControlledState's state can
++ * be updated if a new incoming prop value is changed.
++ *
++ * @param {any} currentState The current value.
++ * @param {Object} options Additional options for the hook.
++ * @param {any} options.initial The initial state.
++ * @param {any} options.fallback The state to use when no state is defined.
++ *
++ * @return {[*, Function]} The controlled value and the value setter.
++ */
++function useControlledState( currentState, options = defaultOptions ) {
++	const { initial, fallback } = { ...defaultOptions, ...options };
++
++	const [ internalState, setInternalState ] = useState( currentState );
++	const hasCurrentState = isValueDefined( currentState );
++
++	const state = getDefinedValue(
++		[ currentState, internalState, initial ],
++		fallback
++	);
++
++	const setState = ( nextState ) => {
++		if ( ! hasCurrentState ) {
++			setInternalState( nextState );
++		}
++	};
++
++	return [ state, setState ];
++}
++
++export default useControlledState;
+diff --git a/packages/components/src/utils/hooks/use-jump-step.js b/packages/components/src/utils/hooks/use-jump-step.js
+new file mode 100644
+index 00000000000000..f3ac123f6c8cfb
+--- /dev/null
++++ b/packages/components/src/utils/hooks/use-jump-step.js
+@@ -0,0 +1,50 @@
++/**
++ * WordPress dependencies
++ */
++import { useEffect, useState } from '@wordpress/element';
++
++/**
++ * A custom hook that calculates a step value (used by elements like input
++ * [type="number"]). This value can be modified based on whether the Shift
++ * key is being held down.
++ *
++ * For example, a shiftStep of 10, and a step of 1...
++ * Starting from 10, the next incremented value will be 11.
++ *
++ * Holding down shift...
++ * Starting from 10, the next incremented value will be 20.
++ *
++ * @param {Object} props Properties for the hook.
++ * @param {boolean} [props.isShiftStepEnabled=true] Determines if jumping values with shift is enabled
++ * @param {number} [props.shiftStep=10] Multiplier to jump by, when holding shift key.
++ * @param {number} [props.step=1] Multiplier to jump by, when not-holding shift key.
++ *
++ * @return {number} The jump step value.
++ */
++function useJumpStep( {
++	isShiftStepEnabled = true,
++	shiftStep = 10,
++	step = 1,
++} ) {
++	const [ isShiftKey, setIsShiftKey ] = useState( false );
++
++	useEffect( () => {
++		const handleShiftKeyToggle = ( event ) => {
++			setIsShiftKey( event.shiftKey );
++		};
++
++		window.addEventListener( 'keydown', handleShiftKeyToggle );
++		window.addEventListener( 'keyup', handleShiftKeyToggle );
++
++		return () => {
++			window.removeEventListener( 'keydown', handleShiftKeyToggle );
++			window.removeEventListener( 'keyup', handleShiftKeyToggle );
++		};
++	}, [] );
++
++	const isEnabled = isShiftStepEnabled && isShiftKey;
++
++	return isEnabled ? shiftStep * step : step;
++}
++
++export default useJumpStep;
+diff --git a/packages/components/src/number-control/utils.js b/packages/components/src/utils/math.js
+similarity index 58%
+rename from packages/components/src/number-control/utils.js
+rename to packages/components/src/utils/math.js
+index 5c736ea37ca03b..dad8c508a21671 100644
+--- a/packages/components/src/number-control/utils.js
++++ b/packages/components/src/utils/math.js
+@@ -7,46 +7,50 @@ import { clamp } from 'lodash';
+  * Parses and retrieves a number value.
+  *
+  * @param {any} value The incoming value.
++ *
+  * @return {number} The parsed number value.
+  */
+-function getNumberValue( value ) {
++export function getNumber( value ) {
+ 	const number = Number( value );
+ 
+ 	return isNaN( number ) ? 0 : number;
+ }
+ 
+ /**
+- * Parses a value to safely store value state.
++ * Safely adds 2 values.
+  *
+- * @param {any} value The incoming value.
+- * @return {number} The parsed number value.
++ * @param {number|string} args Values to add together.
++ *
++ * @return {number} The sum of values.
+  */
+-export function getValue( value ) {
+-	const parsedValue = parseFloat( value );
+-
+-	return isNaN( parsedValue ) ? value : parsedValue;
++export function add( ...args ) {
++	return args.reduce( ( sum, arg ) => sum + getNumber( arg ), 0 );
+ }
+ 
+ /**
+- * Safely adds 2 values.
++ * Safely subtracts 2 values.
+  *
+- * @param {any} a First value.
+- * @param {any} b Second value.
+- * @return {number} The sum of the 2 values.
++ * @param {number|string} args Values to subtract together.
++ *
++ * @return {number} The difference of the 2 values.
+  */
+-export function add( a, b ) {
+-	return getNumberValue( a ) + getNumberValue( b );
++export function subtract( ...args ) {
++	return args.reduce( ( diff, arg, index ) => {
++		const value = getNumber( arg );
++		return index === 0 ? value : diff - value;
++	} );
+ }
+ 
+ /**
+- * Safely subtracts 2 values.
++ * Determines the decimal position of a number value.
+  *
+- * @param {any} a First value.
+- * @param {any} b Second value.
+- * @return {number} The difference of the 2 values.
++ * @param {number} value The number to evaluate.
++ *
++ * @return {number} The number of decimal places.
+  */
+-export function subtract( a, b ) {
+-	return getNumberValue( a ) - getNumberValue( b );
++function getPrecision( value ) {
++	const split = ( value + '' ).split( '.' );
++	return split[ 1 ] !== undefined ? split[ 1 ].length : 0;
+ }
+ 
+ /**
+@@ -56,6 +60,7 @@ export function subtract( a, b ) {
+  * @param {number} min The minimum range.
+  * @param {number} max The maximum range.
+  * @param {number} step A multiplier for the value.
++ *
+  * @return {number} The rounded and clamped value.
+  */
+ export function roundClamp(
+@@ -64,12 +69,15 @@ export function roundClamp(
+ 	max = Infinity,
+ 	step = 1
+ ) {
+-	const baseValue = getNumberValue( value );
+-	const stepValue = getNumberValue( step );
++	const baseValue = getNumber( value );
++	const stepValue = getNumber( step );
++	const precision = getPrecision( step );
+ 	const rounded = Math.round( baseValue / stepValue ) * stepValue;
+ 	const clampedValue = clamp( rounded, min, max );
+ 
+-	return clampedValue;
++	return precision
++		? getNumber( clampedValue.toFixed( precision ) )
++		: clampedValue;
+ }
+ 
+ /**
+@@ -81,6 +89,7 @@ export function roundClamp(
+  * @property {number} min The minimum range.
+  * @property {number} max The maximum range.
+  * @property {number} step A multiplier for the value.
++ *
+  * @return {string} The rounded and clamped value.
+  */
+ export function roundClampString( ...args ) {
+diff --git a/packages/components/src/utils/test/math.js b/packages/components/src/utils/test/math.js
+new file mode 100644
+index 00000000000000..42d4bd5abc56e7
+--- /dev/null
++++ b/packages/components/src/utils/test/math.js
+@@ -0,0 +1,80 @@
++/**
++ * Internal dependencies
++ */
++import { add, subtract, roundClamp } from '../math';
++
++describe( 'add', () => {
++	it( 'should add string and number values', () => {
++		expect( add( '105', '30' ) ).toBe( 135 );
++		expect( add( 105, 30 ) ).toBe( 135 );
++		expect( add( '105', 30 ) ).toBe( 135 );
++		expect( add( 105, '30' ) ).toBe( 135 );
++
++		// Negative values
++		expect( add( 100, '-30' ) ).toBe( 70 );
++		expect( add( -100, '-30' ) ).toBe( -130 );
++	} );
++
++	it( 'should add multiple arguments', () => {
++		expect( add( '105', '30', 10, 5 ) ).toBe( 150 );
++	} );
++} );
++
++describe( 'subtract', () => {
++	it( 'should subtract string and number values', () => {
++		expect( subtract( '105', '30' ) ).toBe( 75 );
++		expect( subtract( 105, 30 ) ).toBe( 75 );
++		expect( subtract( '105', 30 ) ).toBe( 75 );
++		expect( subtract( 105, '30' ) ).toBe( 75 );
++
++		// Negative values
++		expect( subtract( 100, '-30' ) ).toBe( 130 );
++		expect( subtract( -100, '-30' ) ).toBe( -70 );
++	} );
++
++	it( 'should subtract multiple arguments', () => {
++		expect( subtract( '105', '30', 10, 5 ) ).toBe( 60 );
++	} );
++} );
++
++describe( 'roundClamp', () => {
++	it( 'should clamp a value between min and max', () => {
++		expect( roundClamp( 10, 1, 10 ) ).toBe( 10 );
++		expect( roundClamp( 1, 1, 10 ) ).toBe( 1 );
++		expect( roundClamp( 0, 1, 10 ) ).toBe( 1 );
++
++		expect( roundClamp( 50, 1, 10 ) ).toBe( 10 );
++		expect( roundClamp( 50, -10, 10 ) ).toBe( 10 );
++		expect( roundClamp( -50, -10, 10 ) ).toBe( -10 );
++
++		expect( roundClamp( '50', 1, 10 ) ).toBe( 10 );
++		expect( roundClamp( '50', -10, 10 ) ).toBe( 10 );
++		expect( roundClamp( -50, -10, '10' ) ).toBe( -10 );
++	} );
++
++	it( 'should clamp number or string values', () => {
++		expect( roundClamp( '50', 1, 10 ) ).toBe( 10 );
++		expect( roundClamp( '50', -10, 10 ) ).toBe( 10 );
++		expect( roundClamp( -50, -10, '10' ) ).toBe( -10 );
++	} );
++
++	it( 'should clamp with step', () => {
++		expect( roundClamp( 40, 1, 100, 10 ) ).toBe( 40 );
++		expect( roundClamp( 42, 1, 100, 10 ) ).toBe( 40 );
++		expect( roundClamp( 45, 1, 100, 10 ) ).toBe( 50 );
++		expect( roundClamp( 49, 1, 100, 10 ) ).toBe( 50 );
++		expect( roundClamp( 50, 1, 100, 10 ) ).toBe( 50 );
++
++		expect( roundClamp( 50, 1, 100, 15 ) ).toBe( 45 );
++		expect( roundClamp( 50, 1, 100, '15' ) ).toBe( 45 );
++		expect( roundClamp( 50, 1, 100, 11 ) ).toBe( 55 );
++	} );
++
++	it( 'should clamp with float in step', () => {
++		expect( roundClamp( 40, 1, 100, 1 ) ).toBe( 40 );
++		expect( roundClamp( 40.5, 1, 100, 0.1 ) ).toBe( 40.5 );
++		expect( roundClamp( 40.05, 1, 100, 0.01 ) ).toBe( 40.05 );
++		expect( roundClamp( 40.06, 1, 100, 0.1 ) ).toBe( 40.1 );
++		expect( roundClamp( 40.123005, 1, 100, 0.001 ) ).toBe( 40.123 );
++	} );
++} );
+diff --git a/packages/components/src/utils/values.js b/packages/components/src/utils/values.js
+new file mode 100644
+index 00000000000000..d8d63750290276
+--- /dev/null
++++ b/packages/components/src/utils/values.js
+@@ -0,0 +1,32 @@
++/**
++ * Determines if a value is null or undefined.
++ *
++ * @param {any} value The value to check.
++ * @return {boolean} Whether value is null or undefined.
++ */
++export function isValueDefined( value ) {
++	return value !== undefined && value !== null;
++}
++
++/**
++ * Determines if a value is empty, null, or undefined.
++ *
++ * @param {any} value The value to check.
++ * @return {boolean} Whether value is empty.
++ */
++export function isValueEmpty( value ) {
++	const isEmptyString = value === '';
++
++	return ! isValueDefined( value ) || isEmptyString;
++}
++
++/**
++ * Attempts to get a defined/non-null value from a collection of arguments.
++ *
++ * @param {Array<any>} values Values to derive from.
++ * @param {any} fallbackValue Fallback value if there are no defined values.
++ * @return {any} A defined value or the fallback value.
++ */
++export function getDefinedValue( values = [], fallbackValue ) {
++	return values.find( isValueDefined ) ?? fallbackValue;
++}
+diff --git a/packages/e2e-tests/specs/editor/various/block-hierarchy-navigation.test.js b/packages/e2e-tests/specs/editor/various/block-hierarchy-navigation.test.js
+index fe4ad65d21c786..ab6986a41b287c 100644
+--- a/packages/e2e-tests/specs/editor/various/block-hierarchy-navigation.test.js
++++ b/packages/e2e-tests/specs/editor/various/block-hierarchy-navigation.test.js
+@@ -46,7 +46,7 @@ describe( 'Navigating the block hierarchy', () => {
+ 		// Tweak the columns count.
+ 		await openDocumentSettingsSidebar();
+ 		await page.focus(
+-			'.block-editor-block-inspector .components-range-control__number[aria-label="Columns"]'
++			'.block-editor-block-inspector [aria-label="Columns"][type="number"]'
+ 		);
+ 		await page.keyboard.down( 'Shift' );
+ 		await page.keyboard.press( 'ArrowLeft' );

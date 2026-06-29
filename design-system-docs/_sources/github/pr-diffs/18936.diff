@@ -1,0 +1,406 @@
+diff --git a/packages/block-editor/src/components/block-switcher/style.scss b/packages/block-editor/src/components/block-switcher/style.scss
+index c6acd359abd2fb..8a2d6cfccdfe2d 100644
+--- a/packages/block-editor/src/components/block-switcher/style.scss
++++ b/packages/block-editor/src/components/block-switcher/style.scss
+@@ -89,7 +89,7 @@
+ 	}
+ }
+ // We double the max-width for it to fit both the preview & content but we keep the min width the same for the border to work.
+-.components-popover:not(.is-mobile).block-editor-block-switcher__popover .components-popover__content {
++.components-popover.block-editor-block-switcher__popover .components-popover__content {
+ 	min-width: 300px;
+ 	max-width: calc(340px * 2);
+ 	display: flex;
+diff --git a/packages/block-editor/src/components/inserter/style.scss b/packages/block-editor/src/components/inserter/style.scss
+index 275091342cf4d4..528c46adb87d75 100644
+--- a/packages/block-editor/src/components/inserter/style.scss
++++ b/packages/block-editor/src/components/inserter/style.scss
+@@ -16,7 +16,7 @@ $block-inserter-search-height: 38px;
+ 	}
+ }
+ 
+-.block-editor-inserter__popover:not(.is-mobile) > .components-popover__content {
++.block-editor-inserter__popover > .components-popover__content {
+ 	@include break-medium {
+ 		overflow-y: visible;
+ 		height: $block-inserter-content-height + $block-inserter-tabs-height + $block-inserter-search-height;
+diff --git a/packages/block-library/src/navigation-link/editor.scss b/packages/block-library/src/navigation-link/editor.scss
+index 879b231452043c..d1ed945a92ff5c 100644
+--- a/packages/block-library/src/navigation-link/editor.scss
++++ b/packages/block-library/src/navigation-link/editor.scss
+@@ -94,7 +94,7 @@
+ }
+ 
+ // Popover styles
+-.components-popover:not(.is-mobile).wp-block-navigation-link__dropdown-content {
++.components-popover.wp-block-navigation-link__dropdown-content {
+ 	margin-top: -1px;
+ 	margin-left: -4px;
+ }
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 1b96d18430796f..a0562ad1f0263b 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -167,6 +167,55 @@ function useFocusContentOnMount( focusOnMount, contentRef ) {
+ 	}, [] );
+ }
+ 
++/**
++ * Sets or removes an element attribute.
++ *
++ * @param {Element} element The element to modify.
++ * @param {string}  name    The attribute name to set or remove.
++ * @param {?string} value   The value to set. A falsy value will remove the
++ *                          attribute.
++ */
++function setAttribute( element, name, value ) {
++	if ( ! value ) {
++		if ( element.hasAttribute( name ) ) {
++			element.removeAttribute( name );
++		}
++	} else if ( element.getAttribute( name ) !== value ) {
++		element.setAttribute( name, value );
++	}
++}
++
++/**
++ * Sets or removes an element style property.
++ *
++ * @param {Element} element  The element to modify.
++ * @param {string}  property The property to set or remove.
++ * @param {?string} value    The value to set. A falsy value will remove the
++ *                           property.
++ */
++function setStyle( element, property, value = '' ) {
++	if ( element.style[ property ] !== value ) {
++		element.style[ property ] = value;
++	}
++}
++
++/**
++ * Sets or removes an element class.
++ *
++ * @param {Element} element The element to modify.
++ * @param {string}  name    The class to set or remove.
++ * @param {boolean} toggle  True to set the class, false to remove.
++ */
++function setClass( element, name, toggle ) {
++	if ( toggle ) {
++		if ( ! element.classList.contains( name ) ) {
++			element.classList.add( name );
++		}
++	} else if ( element.classList.contains( name ) ) {
++		element.classList.remove( name );
++	}
++}
++
+ const Popover = ( {
+ 	headerTitle,
+ 	onClose,
+@@ -198,9 +247,22 @@ const Popover = ( {
+ 	const containerRef = useRef();
+ 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+ 	const [ animateOrigin, setAnimateOrigin ] = useState();
++	const isExpanded = expandOnMobile && isMobileViewport;
++
++	noArrow = isExpanded || noArrow;
+ 
+ 	useEffect( () => {
+-		if ( isMobileViewport && expandOnMobile ) {
++		const containerEl = containerRef.current;
++		const contentEl = contentRef.current;
++
++		if ( isExpanded ) {
++			setClass( containerEl, 'is-without-arrow', noArrow );
++			setAttribute( containerEl, 'data-x-axis' );
++			setAttribute( containerEl, 'data-y-axis' );
++			setStyle( containerEl, 'top' );
++			setStyle( containerEl, 'left' );
++			setStyle( contentEl, 'maxHeight' );
++			setStyle( contentEl, 'maxWidth' );
+ 			return;
+ 		}
+ 
+@@ -224,8 +286,8 @@ const Popover = ( {
+ 			);
+ 
+ 			const contentSize = {
+-				height: contentRef.current.scrollHeight,
+-				width: contentRef.current.scrollWidth,
++				height: contentEl.scrollHeight,
++				width: contentEl.scrollWidth,
+ 			};
+ 			const {
+ 				popoverTop,
+@@ -236,6 +298,14 @@ const Popover = ( {
+ 				contentWidth,
+ 			} = computePopoverPosition( anchor, contentSize, position );
+ 
++			setClass( containerEl, 'is-without-arrow', noArrow || ( xAxis === 'center' && yAxis === 'middle' ) );
++			setAttribute( containerEl, 'data-x-axis', xAxis );
++			setAttribute( containerEl, 'data-y-axis', yAxis );
++			setStyle( containerEl, 'top', typeof popoverTop === 'number' ? popoverTop + 'px' : '' );
++			setStyle( containerEl, 'left', typeof popoverLeft === 'number' ? popoverLeft + 'px' : '' );
++			setStyle( contentEl, 'maxHeight', typeof contentHeight === 'number' ? contentHeight + 'px' : '' );
++			setStyle( contentEl, 'maxWidth', typeof contentWidth === 'number' ? contentWidth + 'px' : '' );
++
+ 			// Compute the animation position
+ 			const yAxisMapping = {
+ 				top: 'bottom',
+@@ -248,19 +318,6 @@ const Popover = ( {
+ 			const animateYAxis = yAxisMapping[ yAxis ] || 'middle';
+ 			const animateXAxis = xAxisMapping[ xAxis ] || 'center';
+ 
+-			containerRef.current.setAttribute( 'data-x-axis', xAxis );
+-			containerRef.current.setAttribute( 'data-y-axis', yAxis );
+-			containerRef.current.style.top = popoverTop + 'px';
+-			containerRef.current.style.left = popoverLeft + 'px';
+-			contentRef.current.style.maxHeight = contentHeight ? contentHeight + 'px' : '';
+-			contentRef.current.style.maxWidth = contentWidth ? contentWidth + 'px' : '';
+-
+-			if ( xAxis === 'center' && yAxis === 'middle' ) {
+-				contentRef.current.classList.add( 'is-without-arrow' );
+-			} else {
+-				contentRef.current.classList.remove( 'is-without-arrow' );
+-			}
+-
+ 			setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
+ 		};
+ 
+@@ -283,8 +340,7 @@ const Popover = ( {
+ 			window.removeEventListener( 'scroll', refresh, true );
+ 		};
+ 	}, [
+-		isMobileViewport,
+-		expandOnMobile,
++		isExpanded,
+ 		anchorRect,
+ 		getAnchorRect,
+ 		anchorRef,
+@@ -367,7 +423,7 @@ const Popover = ( {
+ 							className,
+ 							animateClassName,
+ 							{
+-								'is-mobile': isMobileViewport && expandOnMobile,
++								'is-expanded': isExpanded,
+ 								'is-without-arrow': noArrow,
+ 							}
+ 						) }
+@@ -375,7 +431,7 @@ const Popover = ( {
+ 						onKeyDown={ maybeClose }
+ 						ref={ containerRef }
+ 					>
+-						{ isMobileViewport && expandOnMobile && (
++						{ isExpanded && (
+ 							<div className="components-popover__header">
+ 								<span className="components-popover__header-title">
+ 									{ headerTitle }
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index 2da4d0f988ba41..106fbf59f74f82 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -6,14 +6,25 @@ $arrow-size: 8px;
+ 	z-index: z-index(".components-popover");
+ 	left: 50%;
+ 
+-	&.is-mobile {
++	// Hide the popover element until the position has been calculated. The position
++	// cannot be calculated until the popover element is rendered because the
++	// position depends on the size of the popover.
++	opacity: 0;
++
++	&.is-expanded,
++	&[data-x-axis][data-y-axis] {
++		opacity: 1;
++	}
++
++	&.is-expanded {
+ 		top: 0;
+ 		left: 0;
+ 		right: 0;
+ 		bottom: 0;
++		z-index: z-index(".components-popover") !important;
+ 	}
+ 
+-	&:not(.is-without-arrow):not(.is-mobile) {
++	&:not(.is-without-arrow) {
+ 		margin-left: 2px;
+ 
+ 		&::before {
+@@ -116,19 +127,17 @@ $arrow-size: 8px;
+ 		}
+ 	}
+ 
+-	&:not(.is-mobile) {
+-		&[data-y-axis="top"] {
+-			bottom: 100%;
+-		}
++	&[data-y-axis="top"] {
++		bottom: 100%;
++	}
+ 
+-		&[data-y-axis="bottom"] {
+-			top: 100%;
+-		}
++	&[data-y-axis="bottom"] {
++		top: 100%;
++	}
+ 
+-		&[data-y-axis="middle"] {
+-			align-items: center;
+-			display: flex;
+-		}
++	&[data-y-axis="middle"] {
++		align-items: center;
++		display: flex;
+ 	}
+ }
+ 
+@@ -138,42 +147,46 @@ $arrow-size: 8px;
+ 	background: $white;
+ 	height: 100%;
+ 
+-	.components-popover.is-mobile & {
+-		height: calc(100% - #{ $panel-header-height });
+-		border-top: 0;
+-	}
+-
+-	.components-popover:not(.is-mobile) & {
++	.components-popover & {
+ 		position: absolute;
+ 		height: auto;
+ 		overflow-y: auto;
+ 		min-width: 260px;
+ 	}
+ 
+-	.components-popover:not(.is-mobile)[data-y-axis="top"] & {
++	.components-popover.is-expanded & {
++		position: static;
++		height: calc(100% - #{ $panel-header-height });
++		overflow-y: visible;
++		min-width: auto;
++		border: none;
++		border-top: $border-width solid $light-gray-500;
++	}
++
++	.components-popover[data-y-axis="top"] & {
+ 		bottom: 100%;
+ 	}
+ 
+-	.components-popover:not(.is-mobile)[data-x-axis="center"] & {
++	.components-popover[data-x-axis="center"] & {
+ 		left: 50%;
+ 		transform: translateX(-50%);
+ 	}
+ 
+-	.components-popover:not(.is-mobile)[data-x-axis="right"] & {
++	.components-popover[data-x-axis="right"] & {
+ 		position: absolute;
+ 		left: 100%;
+ 	}
+ 
+-	.components-popover:not(.is-mobile):not([data-y-axis="middle"])[data-x-axis="right"] & {
++	.components-popover:not([data-y-axis="middle"])[data-x-axis="right"] & {
+ 		margin-left: -24px;
+ 	}
+ 
+-	.components-popover:not(.is-mobile)[data-x-axis="left"] & {
++	.components-popover[data-x-axis="left"] & {
+ 		position: absolute;
+ 		right: 100%;
+ 	}
+ 
+-	.components-popover:not(.is-mobile):not([data-y-axis="middle"])[data-x-axis="left"] & {
++	.components-popover:not([data-y-axis="middle"])[data-x-axis="left"] & {
+ 		margin-right: -24px;
+ 	}
+ }
+@@ -183,21 +196,9 @@ $arrow-size: 8px;
+ 	height: 100%;
+ }
+ 
+-// Hide the popover element until the position has been calculated. The position
+-// cannot be calculated until the popover element is rendered because the
+-// position depends on the size of the popover.
+-.components-popover {
+-	opacity: 0;
+-}
+-
+-.components-popover[data-x-axis][data-y-axis] {
+-	opacity: 1;
+-}
+-
+ .components-popover__header {
+ 	align-items: center;
+ 	background: $white;
+-	border: $border-width solid $light-gray-500;
+ 	display: flex;
+ 	height: $panel-header-height;
+ 	justify-content: space-between;
+diff --git a/packages/components/src/tooltip/style.scss b/packages/components/src/tooltip/style.scss
+index eeb7382e4c0212..8fc6ccb6e73fef 100644
+--- a/packages/components/src/tooltip/style.scss
++++ b/packages/components/src/tooltip/style.scss
+@@ -13,7 +13,7 @@
+ 		border-bottom-color: $dark-gray-900;
+ 	}
+ 
+-	&:not(.is-mobile) .components-popover__content {
++	.components-popover__content {
+ 		min-width: 0;
+ 	}
+ }
+diff --git a/packages/editor/src/components/table-of-contents/style.scss b/packages/editor/src/components/table-of-contents/style.scss
+index 3678621237fa46..0454e513dfdd23 100644
+--- a/packages/editor/src/components/table-of-contents/style.scss
++++ b/packages/editor/src/components/table-of-contents/style.scss
+@@ -1,4 +1,4 @@
+-.table-of-contents__popover.components-popover:not(.is-mobile) .components-popover__content {
++.table-of-contents__popover.components-popover .components-popover__content {
+ 	min-width: 380px;
+ }
+ 
+diff --git a/packages/nux/src/components/dot-tip/style.scss b/packages/nux/src/components/dot-tip/style.scss
+index c3b2a01448a89d..cd75537de3a98b 100644
+--- a/packages/nux/src/components/dot-tip/style.scss
++++ b/packages/nux/src/components/dot-tip/style.scss
+@@ -79,9 +79,9 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
+ 	}
+ 
+ 	// Extra specificity so that we can override the styles in .component-popover
+-	&:not(.is-mobile)[data-y-axis="left"],
+-	&:not(.is-mobile)[data-y-axis="center"],
+-	&:not(.is-mobile)[data-y-axis="right"] {
++	&[data-y-axis="left"],
++	&[data-y-axis="center"],
++	&[data-y-axis="right"] {
+ 		// Position tips above popovers
+ 		z-index: z-index(".nux-dot-tip");
+ 
+@@ -99,22 +99,22 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
+ 		}
+ 	}
+ 
+-	&.components-popover:not(.is-mobile):not([data-y-axis="middle"])[data-y-axis="right"] .components-popover__content {
++	&.components-popover:not([data-y-axis="middle"])[data-y-axis="right"] .components-popover__content {
+ 		/*!rtl:ignore*/
+ 		margin-left: 0;
+ 	}
+ 
+-	&.components-popover:not(.is-mobile):not([data-y-axis="middle"])[data-y-axis="left"] .components-popover__content {
++	&.components-popover:not([data-y-axis="middle"])[data-y-axis="left"] .components-popover__content {
+ 		/*!rtl:ignore*/
+ 		margin-right: 0;
+ 	}
+ 
+-	&.components-popover.edit-post-more-menu__content:not(.is-mobile):not([data-y-axis="middle"])[data-y-axis="right"] .components-popover__content {
++	&.components-popover.edit-post-more-menu__content:not([data-y-axis="middle"])[data-y-axis="right"] .components-popover__content {
+ 		/*!rtl:ignore*/
+ 		margin-left: -12px;
+ 	}
+ 
+-	&.components-popover.edit-post-more-menu__content:not(.is-mobile):not([data-y-axis="middle"])[data-y-axis="left"] .components-popover__content {
++	&.components-popover.edit-post-more-menu__content:not([data-y-axis="middle"])[data-y-axis="left"] .components-popover__content {
+ 		/*!rtl:ignore*/
+ 		margin-right: -12px;
+ 	}

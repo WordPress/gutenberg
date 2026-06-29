@@ -1,0 +1,55 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index addb5a4d9ec327..137e436257aea6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Enhancements
+ 
++-   `ProgressBar`: use text color to ensure enough contrast against background ([#55285](https://github.com/WordPress/gutenberg/pull/55285)).
+ -   `Notice`: Remove margins from `Notice` component ([#54800](https://github.com/WordPress/gutenberg/pull/54800)).
+ -   Allow using CSS level 4 viewport-relative units ([54415](https://github.com/WordPress/gutenberg/pull/54415))
+ -   `ToolsPanel`: do not apply the `className` to prop to `ToolsPanelItem` components when rendered as placeholders ([#55207](https://github.com/WordPress/gutenberg/pull/55207)).
+diff --git a/packages/components/src/progress-bar/styles.ts b/packages/components/src/progress-bar/styles.ts
+index e983797d3d92bc..041b2402f0324e 100644
+--- a/packages/components/src/progress-bar/styles.ts
++++ b/packages/components/src/progress-bar/styles.ts
+@@ -27,11 +27,17 @@ export const Track = styled.div`
+ 	width: 100%;
+ 	max-width: 160px;
+ 	height: ${ CONFIG.borderWidthFocus };
+-	background-color: var(
+-		--wp-components-color-gray-300,
+-		${ COLORS.gray[ 300 ] }
++	/* Text color at 10% opacity */
++	background-color: color-mix(
++		in srgb,
++		var( --wp-components-color-foreground, ${ COLORS.gray[ 900 ] } ),
++		transparent 90%
+ 	);
+ 	border-radius: ${ CONFIG.radiusBlockUi };
++
++	// Windows high contrast mode.
++	outline: 2px solid transparent;
++	outline-offset: 2px;
+ `;
+ 
+ export const Indicator = styled.div< {
+@@ -43,7 +49,16 @@ export const Indicator = styled.div< {
+ 	top: 0;
+ 	height: 100%;
+ 	border-radius: ${ CONFIG.radiusBlockUi };
+-	background-color: ${ COLORS.theme.accent };
++	/* Text color at 90% opacity */
++	background-color: color-mix(
++		in srgb,
++		var( --wp-components-color-foreground, ${ COLORS.gray[ 900 ] } ),
++		transparent 10%
++	);
++
++	// Windows high contrast mode.
++	outline: 2px solid transparent;
++	outline-offset: -2px;
+ 
+ 	${ ( { isIndeterminate, value } ) =>
+ 		isIndeterminate

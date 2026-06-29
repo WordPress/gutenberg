@@ -1,0 +1,93 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 8e18ba48a5732f..78366619dfd1e6 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -22,6 +22,7 @@
+ -   `Card`, `CollapsibleCard`: update padding to match legacy `Card` component ([#76368](https://github.com/WordPress/gutenberg/pull/76368)).
+ -   `CollapsibleCard`: move trigger to the header ([#76265](https://github.com/WordPress/gutenberg/pull/76265)).
+ -   `CollapsibleCard`: add animations ([#76378](https://github.com/WordPress/gutenberg/pull/76378)).
++-   `CollapsibleCard`: allows the browser page search to find and expand the panel contents via the `hiddenUntilFound` prop. ([#76498](https://github.com/WordPress/gutenberg/pull/76498)).
+ 
+ ## 0.8.0 (2026-03-04)
+ 
+diff --git a/packages/ui/src/collapsible-card/content.tsx b/packages/ui/src/collapsible-card/content.tsx
+index cff163eeef6534..ac25fd74f2a2f5 100644
+--- a/packages/ui/src/collapsible-card/content.tsx
++++ b/packages/ui/src/collapsible-card/content.tsx
+@@ -11,13 +11,14 @@ import type { ContentProps } from './types';
+  */
+ export const Content = forwardRef< HTMLDivElement, ContentProps >(
+ 	function CollapsibleCardContent(
+-		{ className, render, children, ...restProps },
++		{ className, render, children, hiddenUntilFound = true, ...restProps },
+ 		ref
+ 	) {
+ 		return (
+ 			<Collapsible.Panel
+ 				ref={ ref }
+ 				className={ clsx( styles.content, className ) }
++				hiddenUntilFound={ hiddenUntilFound }
+ 				{ ...restProps }
+ 			>
+ 				<Card.Content
+diff --git a/packages/ui/src/collapsible-card/test/index.test.tsx b/packages/ui/src/collapsible-card/test/index.test.tsx
+index 445f7e2da5da6e..1d23797d399303 100644
+--- a/packages/ui/src/collapsible-card/test/index.test.tsx
++++ b/packages/ui/src/collapsible-card/test/index.test.tsx
+@@ -53,9 +53,7 @@ describe( 'CollapsibleCard', () => {
+ 				</CollapsibleCard.Root>
+ 			);
+ 
+-			expect(
+-				screen.queryByText( 'Hidden content' )
+-			).not.toBeInTheDocument();
++			expect( screen.getByText( 'Hidden content' ) ).not.toBeVisible();
+ 		} );
+ 
+ 		it( 'shows content when defaultOpen is true', () => {
+@@ -87,9 +85,7 @@ describe( 'CollapsibleCard', () => {
+ 				</CollapsibleCard.Root>
+ 			);
+ 
+-			expect(
+-				screen.queryByText( 'Toggle content' )
+-			).not.toBeInTheDocument();
++			expect( screen.getByText( 'Toggle content' ) ).not.toBeVisible();
+ 
+ 			await user.click(
+ 				screen.getByRole( 'button', {
+@@ -107,9 +103,7 @@ describe( 'CollapsibleCard', () => {
+ 				} )
+ 			);
+ 
+-			expect(
+-				screen.queryByText( 'Toggle content' )
+-			).not.toBeInTheDocument();
++			expect( screen.getByText( 'Toggle content' ) ).not.toBeVisible();
+ 		} );
+ 
+ 		it( 'calls onOpenChange when toggled', async () => {
+diff --git a/packages/ui/src/collapsible-card/types.ts b/packages/ui/src/collapsible-card/types.ts
+index 2cb5a0eb1cc3fe..f76986ef1a49b5 100644
+--- a/packages/ui/src/collapsible-card/types.ts
++++ b/packages/ui/src/collapsible-card/types.ts
+@@ -1,4 +1,5 @@
+ import type { ReactNode } from 'react';
++import type { PanelProps } from '../collapsible/types';
+ import type { ComponentProps } from '../utils/types';
+ 
+ export interface RootProps extends ComponentProps< 'div' > {
+@@ -41,4 +42,13 @@ export interface ContentProps extends ComponentProps< 'div' > {
+ 	 * The content to be rendered inside the collapsible content area.
+ 	 */
+ 	children?: ReactNode;
++	/**
++	 * Allows the browser’s built-in page search to find and expand the panel contents.
++	 *
++	 * Overrides the `keepMounted` prop and uses `hidden="until-found"`
++	 * to hide the element without removing it from the DOM.
++	 *
++	 * @default true
++	 */
++	hiddenUntilFound?: PanelProps[ 'hiddenUntilFound' ];
+ }

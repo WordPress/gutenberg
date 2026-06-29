@@ -1,0 +1,320 @@
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 2dbb68b273148c..9f5be5f6e78610 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -67,6 +67,7 @@
+ 		"react-dates": "^17.1.1",
+ 		"react-resize-aware": "^3.1.0",
+ 		"reakit": "^1.3.8",
++		"runes": "^0.4.3",
+ 		"uuid": "^8.3.0"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index 146f423f4d30b6..183d7e885dfd9c 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -3,6 +3,8 @@
+  */
+ import classnames from 'classnames';
+ import { noop, deburr } from 'lodash';
++import runes from 'runes';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -54,6 +56,7 @@ function ComboboxControl( {
+ 	messages = {
+ 		selected: __( 'Item selected.' ),
+ 	},
++	fuzzyMatch = false,
+ } ) {
+ 	const currentOption = options.find( ( option ) => option.value === value );
+ 	const currentLabel = currentOption?.label ?? '';
+@@ -67,6 +70,12 @@ function ComboboxControl( {
+ 	const inputContainer = useRef();
+ 
+ 	const matchingSuggestions = useMemo( () => {
++		if ( fuzzyMatch ) {
++			return options.filter( ( option ) =>
++				isFuzzyMatch( inputValue, option.label )
++			);
++		}
++
+ 		const startsWithMatch = [];
+ 		const containsMatch = [];
+ 		const match = deburr( inputValue.toLocaleLowerCase() );
+@@ -82,7 +91,7 @@ function ComboboxControl( {
+ 		} );
+ 
+ 		return startsWithMatch.concat( containsMatch );
+-	}, [ inputValue, options, value ] );
++	}, [ inputValue, options, value, fuzzyMatch ] );
+ 
+ 	const onSuggestionSelected = ( newSelectedSuggestion ) => {
+ 		onChange( newSelectedSuggestion.value );
+@@ -260,6 +269,7 @@ function ComboboxControl( {
+ 						<SuggestionsList
+ 							instanceId={ instanceId }
+ 							match={ { label: inputValue } }
++							fuzzyMatch={ fuzzyMatch }
+ 							displayTransform={ ( suggestion ) =>
+ 								suggestion.label
+ 							}
+@@ -280,3 +290,34 @@ function ComboboxControl( {
+ }
+ 
+ export default ComboboxControl;
++
++function isFuzzyMatch( needle, haystack ) {
++	const nrunes = runes( needle.toLocaleLowerCase() ).map( deburr );
++	const nlen = nrunes.length;
++	const hrunes = runes( haystack.toLocaleLowerCase() ).map( deburr );
++	const hlen = hrunes.length;
++
++	if ( nlen > hlen ) {
++		return false;
++	}
++
++	if ( nlen === hlen ) {
++		return nrunes.join( '' ) === hrunes.join( '' );
++	}
++
++	outer: for ( let n = 0, h = 0; n < nlen; n++ ) {
++		if ( nrunes[ n ] === ' ' ) {
++			continue;
++		}
++
++		while ( h < hlen ) {
++			if ( hrunes[ h++ ].indexOf( nrunes[ n ] ) >= 0 ) {
++				continue outer;
++			}
++		}
++
++		return false;
++	}
++
++	return true;
++}
+diff --git a/packages/components/src/combobox-control/stories/index.js b/packages/components/src/combobox-control/stories/index.js
+index a852004ac3046d..c88194ea3948f7 100644
+--- a/packages/components/src/combobox-control/stories/index.js
++++ b/packages/components/src/combobox-control/stories/index.js
+@@ -266,7 +266,7 @@ const mapCountryOption = ( country ) => ( {
+ 
+ const countryOptions = countries.map( mapCountryOption );
+ 
+-function CountryCodeComboboxControl( { allowReset } ) {
++function CountryCodeComboboxControl( { allowReset, fuzzyMatch } ) {
+ 	const [ value, setValue ] = useState( null );
+ 
+ 	return (
+@@ -277,12 +277,50 @@ function CountryCodeComboboxControl( { allowReset } ) {
+ 				label="Select a country"
+ 				options={ countryOptions }
+ 				allowReset={ allowReset }
++				fuzzyMatch={ fuzzyMatch }
+ 			/>
+ 			<p>Value: { value }</p>
+ 		</>
+ 	);
+ }
+-export const _default = CountryCodeComboboxControl.bind( {} );
++const runeOptions = [
++	{ value: 'arabic', label: 'ځڂڃڄڅچڇڈ' },
++	{ value: 'chinese', label: '𨭎 𩷶' },
++	{ value: 'grapheme clusters', label: 'ม้าลายหกตั' },
++	{ value: 'grapheme clusters 2', label: 'நகரத்தில்' },
++	{ value: 'diacritics', label: 'abco͝oņęą̈' },
++	{ value: 'skin tones', label: '🎅🏻🎅🏼🎅🏽🎅🏾🎅🏿' },
++	{ value: 'zero width joins', label: '🧑‍🦳abc👨‍👩‍👧mno👨‍👨‍👧‍👧xyz🧑‍🦱' },
++	{ value: 'flags', label: '🇦🇸🏳️‍🌈' },
++];
++
++function RuneFilledComboboxControl( { allowReset, fuzzyMatch } ) {
++	const [ value, setValue ] = useState( null );
++
++	return (
++		<>
++			<ComboboxControl
++				value={ value }
++				onChange={ setValue }
++				label="Select a rune"
++				options={ runeOptions }
++				allowReset={ allowReset }
++				fuzzyMatch={ fuzzyMatch }
++			/>
++			<p>Value: { value }</p>
++		</>
++	);
++}
++
++export const _default = ( props ) => (
++	<>
++		<CountryCodeComboboxControl { ...props } />
++		<RuneFilledComboboxControl { ...props } />
++	</>
++);
+ _default.args = {
+ 	allowReset: false,
++	fuzzyMatch: false,
+ };
++
++// export const _default = CountryCodeComboboxControl.bind( {} );
+diff --git a/packages/components/src/form-token-field/suggestions-list.js b/packages/components/src/form-token-field/suggestions-list.js
+index a7a2333344866c..3e71a49652737d 100644
+--- a/packages/components/src/form-token-field/suggestions-list.js
++++ b/packages/components/src/form-token-field/suggestions-list.js
+@@ -1,9 +1,10 @@
+ /**
+  * External dependencies
+  */
+-import { map } from 'lodash';
++import { map, deburr } from 'lodash';
+ import scrollView from 'dom-scroll-into-view';
+ import classnames from 'classnames';
++import runes from 'runes';
+ 
+ /**
+  * WordPress dependencies
+@@ -28,6 +29,7 @@ function SuggestionsList( {
+ 	displayTransform,
+ 	instanceId,
+ 	setTimeout,
++	fuzzyMatch = false,
+ } ) {
+ 	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
+ 
+@@ -66,7 +68,14 @@ function SuggestionsList( {
+ 		};
+ 	};
+ 
+-	const computeSuggestionMatch = ( suggestion ) => {
++	const renderMatchText = ( suggestion ) => {
++		if ( fuzzyMatch ) {
++			return renderFuzzyMatchText(
++				displayTransform( match || '' ),
++				displayTransform( suggestion )
++			);
++		}
++
+ 		const matchText = displayTransform( match || '' ).toLocaleLowerCase();
+ 		if ( matchText.length === 0 ) {
+ 			return null;
+@@ -77,16 +86,18 @@ function SuggestionsList( {
+ 			.toLocaleLowerCase()
+ 			.indexOf( matchText );
+ 
+-		return {
+-			suggestionBeforeMatch: suggestion.substring( 0, indexOfMatch ),
+-			suggestionMatch: suggestion.substring(
+-				indexOfMatch,
+-				indexOfMatch + matchText.length
+-			),
+-			suggestionAfterMatch: suggestion.substring(
+-				indexOfMatch + matchText.length
+-			),
+-		};
++		return (
++			<>
++				{ suggestion.substring( 0, indexOfMatch ) }
++				<strong className="components-form-token-field__suggestion-match">
++					{ suggestion.substring(
++						indexOfMatch,
++						indexOfMatch + matchText.length
++					) }
++				</strong>
++				{ suggestion.substring( indexOfMatch + matchText.length ) }
++			</>
++		);
+ 	};
+ 
+ 	// We set `tabIndex` here because otherwise Firefox sets focus on this
+@@ -101,7 +112,8 @@ function SuggestionsList( {
+ 			role="listbox"
+ 		>
+ 			{ map( suggestions, ( suggestion, index ) => {
+-				const matchText = computeSuggestionMatch( suggestion );
++				const suggestionText = displayTransform( suggestion );
++				const matchText = renderMatchText( suggestion );
+ 				const className = classnames(
+ 					'components-form-token-field__suggestion',
+ 					{
+@@ -118,7 +130,7 @@ function SuggestionsList( {
+ 						key={
+ 							suggestion?.value
+ 								? suggestion.value
+-								: displayTransform( suggestion )
++								: suggestionText
+ 						}
+ 						onMouseDown={ handleMouseDown }
+ 						onClick={ handleClick( suggestion ) }
+@@ -126,15 +138,11 @@ function SuggestionsList( {
+ 						aria-selected={ index === selectedIndex }
+ 					>
+ 						{ matchText ? (
+-							<span aria-label={ displayTransform( suggestion ) }>
+-								{ matchText.suggestionBeforeMatch }
+-								<strong className="components-form-token-field__suggestion-match">
+-									{ matchText.suggestionMatch }
+-								</strong>
+-								{ matchText.suggestionAfterMatch }
++							<span aria-label={ suggestionText }>
++								{ matchText }
+ 							</span>
+ 						) : (
+-							displayTransform( suggestion )
++							suggestionText
+ 						) }
+ 					</li>
+ 				);
+@@ -144,4 +152,49 @@ function SuggestionsList( {
+ 	);
+ }
+ 
++function renderFuzzyMatchText( needle = '', haystack = '' ) {
++	const nrunes = runes( needle.toLocaleLowerCase() ).map( deburr );
++	const nlen = nrunes.length;
++
++	if ( nlen === 0 ) {
++		return haystack;
++	}
++
++	const hrunes = runes( haystack.toLocaleLowerCase() ).map( deburr );
++	const hlen = hrunes.length;
++
++	if ( nlen === hlen && nrunes.join( '' ) === hrunes.join( '' ) ) {
++		return <u>{ haystack }</u>;
++	}
++
++	const hrunesRaw = runes( haystack );
++
++	const result = [];
++	let h = 0;
++	outer: for ( let n = 0; n < nlen; n++ ) {
++		const nrune = nrunes[ n ];
++
++		if ( nrune === ' ' ) {
++			continue;
++		}
++
++		while ( h < hlen ) {
++			const hruneRaw = hrunesRaw[ h ];
++			const hrune = hrunes[ h ];
++			h++;
++			if ( hrune.indexOf( nrune ) >= 0 ) {
++				result.push( <u key={ `${ n }:${ h }` }>{ hruneRaw }</u> );
++				continue outer;
++			}
++			result.push( hruneRaw );
++		}
++	}
++
++	if ( h < hlen ) {
++		result.push( hrunesRaw.slice( h ) );
++	}
++
++	return result;
++}
++
+ export default withSafeTimeout( SuggestionsList );

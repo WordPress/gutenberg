@@ -1,0 +1,64 @@
+diff --git a/packages/components/src/unit-control/index.js b/packages/components/src/unit-control/index.js
+index 39137c6c132a7a..06f3f9a84d5c6d 100644
+--- a/packages/components/src/unit-control/index.js
++++ b/packages/components/src/unit-control/index.js
+@@ -7,7 +7,7 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { useState, forwardRef } from '@wordpress/element';
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -19,6 +19,7 @@ import {
+ import { Root, ValueInput } from './styles/unit-control-styles';
+ import UnitSelectControl from './unit-select-control';
+ import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
++import { useControlledState } from '../utils/hooks';
+ 
+ function UnitControl(
+ 	{
+@@ -43,7 +44,9 @@ function UnitControl(
+ 	ref
+ ) {
+ 	const [ value, initialUnit ] = getParsedValue( valueProp, unitProp, units );
+-	const [ unit, setUnit ] = useState( initialUnit );
++	const [ unit, setUnit ] = useControlledState( unitProp, {
++		initial: initialUnit,
++	} );
+ 
+ 	const classes = classnames( 'components-unit-control', className );
+ 
+diff --git a/packages/components/src/unit-control/test/index.js b/packages/components/src/unit-control/test/index.js
+index c6b0431c968474..f78abf47781c62 100644
+--- a/packages/components/src/unit-control/test/index.js
++++ b/packages/components/src/unit-control/test/index.js
+@@ -3,6 +3,7 @@
+  */
+ import { render, unmountComponentAtNode } from 'react-dom';
+ import { act, Simulate } from 'react-dom/test-utils';
++import { render as testRender } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -372,5 +373,19 @@ describe( 'UnitControl', () => {
+ 
+ 			expect( state ).toBe( '123rem' );
+ 		} );
++
++		it( 'should update unit after initial render and with new unit prop', () => {
++			const { container: testContainer, rerender } = testRender(
++				<UnitControl value={ '10%' } />
++			);
++
++			const select = testContainer.querySelector( 'select' );
++
++			expect( select.value ).toBe( '%' );
++
++			rerender( <UnitControl value={ state } unit="em" /> );
++
++			expect( select.value ).toBe( 'em' );
++		} );
+ 	} );
+ } );

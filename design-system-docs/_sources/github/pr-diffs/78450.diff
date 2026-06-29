@@ -1,0 +1,35 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 407b23e46fae5c..af2974abc25560 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Autocomplete`: Fix the TypeScript prop types for the `Root` and `Value` primitives ([#78450](https://github.com/WordPress/gutenberg/pull/78450)).
+ -   Apply shared item popup typography to inline lists and empty states ([#78403](https://github.com/WordPress/gutenberg/pull/78403)).
+ 
+ ## 0.13.0 (2026-05-14)
+diff --git a/packages/ui/src/form/primitives/autocomplete/types.ts b/packages/ui/src/form/primitives/autocomplete/types.ts
+index 251b46201ba0a3..fe23a2ef35c2a5 100644
+--- a/packages/ui/src/form/primitives/autocomplete/types.ts
++++ b/packages/ui/src/form/primitives/autocomplete/types.ts
+@@ -68,15 +68,7 @@ export type AutocompletePopupProps = ComponentProps<
+ 	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
+ };
+ 
+-export type AutocompleteRootProps = ComponentProps<
+-	typeof _Autocomplete.Root
+-> & {
+-	children?: React.ReactNode;
+-};
++export type AutocompleteRootProps< Value = unknown > =
++	_Autocomplete.Root.Props< Value >;
+ 
+-export type AutocompleteValueProps = {
+-	/**
+-	 * Can be used to override the current value of the autocomplete.
+-	 */
+-	children?: _Autocomplete.Value.Props[ 'children' ];
+-};
++export type AutocompleteValueProps = _Autocomplete.Value.Props;

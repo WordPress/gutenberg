@@ -1,0 +1,468 @@
+diff --git a/edit-post/assets/stylesheets/_mixins.scss b/edit-post/assets/stylesheets/_mixins.scss
+index 5018da99fc5096..9e14930dad1c49 100644
+--- a/edit-post/assets/stylesheets/_mixins.scss
++++ b/edit-post/assets/stylesheets/_mixins.scss
+@@ -326,29 +326,3 @@
+ 	// icon standards.
+ 	margin-right: 2px;
+ }
+-
+-
+-/**
+- * Styles for resize handles
+- */
+-
+-@mixin resize-handler__container() {
+-	display: none;
+-
+-	// The handle itself is a pseudo element, and will sit inside this larger
+-	// container size.
+-	width: $resize-handler-container-size;
+-	height: $resize-handler-container-size;
+-	padding: $grid-size-small;
+-}
+-
+-@mixin resize-handler__visible-handle() {
+-	display: block;
+-	content: "";
+-	width: $resize-handler-size;
+-	height: $resize-handler-size;
+-	border: 2px solid $white;
+-	border-radius: 50%;
+-	background: theme(primary);
+-	cursor: inherit;
+-}
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index e5bdacddb267f9..044c490565d70f 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -41,7 +41,6 @@
+ 		"moment": "^2.22.1",
+ 		"querystring": "^0.2.0",
+ 		"querystringify": "^1.0.0",
+-		"re-resizable": "^4.7.1",
+ 		"url": "^0.11.0"
+ 	},
+ 	"devDependencies": {
+diff --git a/packages/block-library/src/image/edit.js b/packages/block-library/src/image/edit.js
+index 87db1d3ab08469..be1764d5f5c8c9 100644
+--- a/packages/block-library/src/image/edit.js
++++ b/packages/block-library/src/image/edit.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import ResizableBox from 're-resizable';
+ import {
+ 	get,
+ 	isEmpty,
+@@ -22,6 +21,7 @@ import {
+ 	ButtonGroup,
+ 	IconButton,
+ 	PanelBody,
++	ResizableBox,
+ 	SelectControl,
+ 	TextControl,
+ 	TextareaControl,
+@@ -446,21 +446,10 @@ class ImageEdit extends Component {
+ 							}
+ 							/* eslint-enable no-lonely-if */
+ 
+-							// Removes the inline styles in the drag handles.
+-							const handleStylesOverrides = {
+-								width: null,
+-								height: null,
+-								top: null,
+-								right: null,
+-								bottom: null,
+-								left: null,
+-							};
+-
+ 							return (
+ 								<Fragment>
+ 									{ getInspectorControls( imageWidth, imageHeight ) }
+ 									<ResizableBox
+-										className="block-library-image__resizer"
+ 										size={
+ 											width && height ? {
+ 												width,
+@@ -472,16 +461,6 @@ class ImageEdit extends Component {
+ 										minHeight={ minHeight }
+ 										maxHeight={ maxWidth / ratio }
+ 										lockAspectRatio
+-										handleClasses={ {
+-											right: 'block-library-image__resize-handler-right',
+-											bottom: 'block-library-image__resize-handler-bottom',
+-											left: 'block-library-image__resize-handler-left',
+-										} }
+-										handleStyles={ {
+-											right: handleStylesOverrides,
+-											bottom: handleStylesOverrides,
+-											left: handleStylesOverrides,
+-										} }
+ 										enable={ {
+ 											top: false,
+ 											right: showRightHandle,
+diff --git a/packages/block-library/src/image/editor.scss b/packages/block-library/src/image/editor.scss
+index b56c213ffc51f6..5e0135fe3ebd60 100644
+--- a/packages/block-library/src/image/editor.scss
++++ b/packages/block-library/src/image/editor.scss
+@@ -11,51 +11,20 @@
+ }
+ 
+ // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
+-.wp-block-image {
+-	.block-library-image__resizer {
+-		display: inline-block;
++.wp-block-image .components-resizable-box__container {
++	display: inline-block;
+ 
+-		img {
+-			display: block;
+-			width: 100%;
+-		}
+-	}
+-}
+-
+-.block-library-image__resize-handler-right,
+-.block-library-image__resize-handler-bottom,
+-.block-library-image__resize-handler-left {
+-	@include resize-handler__container();
+-
+-	.wp-block-image.is-focused & {
++	img {
+ 		display: block;
+-		z-index: z-index(".block-library-image__resize-handlers");
++		width: 100%;
+ 	}
+ }
+ 
+-// Draw the visible handle
+-.block-library-image__resize-handler-right::before,
+-.block-library-image__resize-handler-bottom::before,
+-.block-library-image__resize-handler-left::before {
+-	@include resize-handler__visible-handle();
+-}
+-
+-/*!rtl:begin:ignore*/
+-.block-library-image__resize-handler-right {
+-	top: calc(50% - #{$resize-handler-container-size / 2});
+-	right: calc(#{$resize-handler-container-size / 2} * -1);
+-}
+-
+-.block-library-image__resize-handler-left {
+-	top: calc(50% - #{$resize-handler-container-size / 2});
+-	left: calc(#{$resize-handler-container-size / 2} * -1);
+-}
+-
+-.block-library-image__resize-handler-bottom {
+-	bottom: calc(#{$resize-handler-container-size / 2} * -1);
+-	left: calc(50% - #{$resize-handler-container-size / 2});
++// Ensure the resize handles are visible when the image is focused.
++.wp-block-image.is-focused .components-resizable-box__handle {
++	display: block;
++	z-index: z-index(".block-library-image__resize-handlers");
+ }
+-/*!rtl:end:ignore*/
+ 
+ .editor-block-list__block[data-type="core/image"][data-align="center"] {
+ 	.wp-block-image {
+diff --git a/packages/block-library/src/spacer/editor.scss b/packages/block-library/src/spacer/editor.scss
+index 4a09c07b863799..ad8a55cea34994 100644
+--- a/packages/block-library/src/spacer/editor.scss
++++ b/packages/block-library/src/spacer/editor.scss
+@@ -1,22 +1,3 @@
+-.block-library-spacer__resize-container.is-selected {
+-	.block-library-spacer__resize-handler-bottom {
+-		display: block;
+-	}
+-}
+-
+ .block-library-spacer__resize-container.is-selected {
+ 	background: $light-gray-200;
+ }
+-
+-.block-library-spacer__resize-handler-bottom {
+-	@include resize-handler__container();
+-
+-	// Offset the handle container's position.
+-	position: absolute;
+-	bottom: calc(#{$resize-handler-container-size / 2} * -1);
+-	left: calc(50% - #{$resize-handler-container-size / 2});
+-}
+-
+-.block-library-spacer__resize-handler-bottom::before {
+-	@include resize-handler__visible-handle();
+-}
+diff --git a/packages/block-library/src/spacer/index.js b/packages/block-library/src/spacer/index.js
+index 211b0116c4f34c..464e2906dc171d 100644
+--- a/packages/block-library/src/spacer/index.js
++++ b/packages/block-library/src/spacer/index.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import ResizableBox from 're-resizable';
+ import classnames from 'classnames';
+ 
+ /**
+@@ -10,7 +9,7 @@ import classnames from 'classnames';
+ import { Fragment } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import { InspectorControls } from '@wordpress/editor';
+-import { BaseControl, PanelBody } from '@wordpress/components';
++import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
+ import { withInstanceId } from '@wordpress/compose';
+ 
+ export const name = 'core/spacer';
+@@ -36,16 +35,6 @@ export const settings = {
+ 			const { height } = attributes;
+ 			const id = `block-spacer-height-input-${ instanceId }`;
+ 
+-			// Removes the inline styles in the drag handles.
+-			const handleStylesOverrides = {
+-				width: null,
+-				height: null,
+-				top: null,
+-				right: null,
+-				bottom: null,
+-				left: null,
+-			};
+-
+ 			return (
+ 				<Fragment>
+ 					<ResizableBox
+@@ -57,12 +46,6 @@ export const settings = {
+ 							height,
+ 						} }
+ 						minHeight="20"
+-						handleClasses={ {
+-							bottom: 'block-library-spacer__resize-handler-bottom',
+-						} }
+-						handleStyles={ {
+-							bottom: handleStylesOverrides,
+-						} }
+ 						enable={ {
+ 							top: false,
+ 							right: false,
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9876d4558da8ca..c4c91002edd058 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -1,3 +1,9 @@
++## 4.1.0 (Unreleased)
++
++### New Feature
++
++- Added a new `ResizableBox` component.
++
+ ## 4.0.0 (2018-09-30)
+ 
+ ### Breaking Change
+diff --git a/packages/components/package.json b/packages/components/package.json
+index a9bc9a4dec6bfe..5eedeae13bcc95 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -40,6 +40,7 @@
+ 		"memize": "^1.0.5",
+ 		"moment": "^2.22.1",
+ 		"mousetrap": "^1.6.2",
++		"re-resizable": "^4.7.1",
+ 		"react-click-outside": "^2.3.1",
+ 		"react-color": "^2.13.4",
+ 		"react-datepicker": "^1.4.1",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 6a3578f58dfb27..2668702a355561 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -43,6 +43,7 @@ export { default as Popover } from './popover';
+ export { default as QueryControls } from './query-controls';
+ export { default as RadioControl } from './radio-control';
+ export { default as RangeControl } from './range-control';
++export { default as ResizableBox } from './resizable-box';
+ export { default as ResponsiveWrapper } from './responsive-wrapper';
+ export { default as SandBox } from './sandbox';
+ export { default as SelectControl } from './select-control';
+diff --git a/packages/components/src/resizable-box/README.md b/packages/components/src/resizable-box/README.md
+new file mode 100644
+index 00000000000000..42302f93b08b06
+--- /dev/null
++++ b/packages/components/src/resizable-box/README.md
+@@ -0,0 +1,55 @@
++# ResizableBox
++
++ResizableBox is a wrapper around the [re-resizable package](https://github.com/bokuweb/re-resizable) with pre-defined classes and styles.
++
++## Usage
++
++Most options are passed directly through to [re-resizable](https://github.com/bokuweb/re-resizable) so you may wish to refer to their documentation. The primary differences in this component are that we set `handleClasses` (to use custom class names) and pass some null values to `handleStyles` (to unset some inline styles).
++
++The example below shows how you might use `ResizableBox` to set a width and height inside a block's `edit` component.
++
++```jsx
++import { ResizableBox } from '@wordpress/components';
++
++const Edit = ( props ) => {
++	const {
++		attributes: {
++			height,
++			width,
++		},
++		setAttributes,
++		toggleSelection,
++	} = props;
++
++	return (
++		<ResizableBox
++			size={ {
++				height,
++				width,
++			} }
++			minHeight="50"
++			minWidth="50"
++			enable={ {
++				top: false,
++				right: true,
++				bottom: true,
++				left: false,
++				topRight: false,
++				bottomRight: true,
++				bottomLeft: false,
++				topLeft: false,
++			} }
++			onResizeStop={ ( event, direction, elt, delta ) => {
++				setAttributes( {
++					height: parseInt( height + delta.height, 10 ),
++					width: parseInt( width + delta.width, 10 ),
++				} );
++				toggleSelection( true );
++			} }
++			onResizeStart={ () => {
++				toggleSelection( false );
++			} }
++		/>
++	);
++}
++```
+diff --git a/packages/components/src/resizable-box/index.js b/packages/components/src/resizable-box/index.js
+new file mode 100644
+index 00000000000000..c13129207645c8
+--- /dev/null
++++ b/packages/components/src/resizable-box/index.js
+@@ -0,0 +1,55 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++import ReResizableBox from 're-resizable';
++
++function ResizableBox( { className, ...props } ) {
++	// Removes the inline styles in the drag handles.
++	const handleStylesOverrides = {
++		width: null,
++		height: null,
++		top: null,
++		right: null,
++		bottom: null,
++		left: null,
++	};
++
++	const handleClassName = 'components-resizable-box__handle';
++
++	return (
++		<ReResizableBox
++			className={ classnames(
++				'components-resizable-box__container',
++				className,
++			) }
++			handleClasses={ {
++				top: classnames(
++					handleClassName,
++					'components-resizable-box__handle-top',
++				),
++				right: classnames(
++					handleClassName,
++					'components-resizable-box__handle-right',
++				),
++				bottom: classnames(
++					handleClassName,
++					'components-resizable-box__handle-bottom',
++				),
++				left: classnames(
++					handleClassName,
++					'components-resizable-box__handle-left',
++				),
++			} }
++			handleStyles={ {
++				top: handleStylesOverrides,
++				right: handleStylesOverrides,
++				bottom: handleStylesOverrides,
++				left: handleStylesOverrides,
++			} }
++			{ ...props }
++		/>
++	);
++}
++
++export default ResizableBox;
+diff --git a/packages/components/src/resizable-box/style.scss b/packages/components/src/resizable-box/style.scss
+new file mode 100644
+index 00000000000000..5032d78dc1efbd
+--- /dev/null
++++ b/packages/components/src/resizable-box/style.scss
+@@ -0,0 +1,43 @@
++.components-resizable-box__handle {
++	display: none;
++
++	// Show the resize handle when selected.
++	.components-resizable-box__container.is-selected & {
++		display: block;
++	}
++
++	// The handle is a pseudo-element and will sit inside this larger
++	// container size.
++	width: $resize-handler-container-size;
++	height: $resize-handler-container-size;
++	padding: $grid-size-small;
++}
++
++// This is the "visible" resize handle.
++.components-resizable-box__handle::before {
++	display: block;
++	content: "";
++	width: $resize-handler-size;
++	height: $resize-handler-size;
++	border: 2px solid $white;
++	border-radius: 50%;
++	background: theme(primary);
++	cursor: inherit;
++}
++
++/*!rtl:begin:ignore*/
++.components-resizable-box__handle-right {
++	top: calc(50% - #{$resize-handler-container-size / 2});
++	right: calc(#{$resize-handler-container-size / 2} * -1);
++}
++
++.components-resizable-box__handle-bottom {
++	bottom: calc(#{$resize-handler-container-size / 2} * -1);
++	left: calc(50% - #{$resize-handler-container-size / 2});
++}
++
++.components-resizable-box__handle-left {
++	top: calc(50% - #{$resize-handler-container-size / 2});
++	left: calc(#{$resize-handler-container-size / 2} * -1);
++}
++/*!rtl:end:ignore*/
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 37c379d3819221..3a2bb018ac41c2 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -27,6 +27,7 @@
+ @import "./popover/style.scss";
+ @import "./radio-control/style.scss";
+ @import "./range-control/style.scss";
++@import "./resizable-box/style.scss";
+ @import "./responsive-wrapper/style.scss";
+ @import "./sandbox/style.scss";
+ @import "./scroll-lock/style.scss";

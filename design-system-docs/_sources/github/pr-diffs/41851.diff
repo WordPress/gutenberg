@@ -1,0 +1,183 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index cfe26ca3949606..ee4a254f9d7dc1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ -   `VStack`: Convert to TypeScript ([#41850](https://github.com/WordPress/gutenberg/pull/41587)).
+ -   `AlignmentMatrixControl`: Refactor away from `_.flattenDeep()` in utils ([#41814](https://github.com/WordPress/gutenberg/pull/41814/)).
+ -   `AutoComplete`: Revert recent `exhaustive-deps` refactor ([#41820](https://github.com/WordPress/gutenberg/pull/41820)).
++-   `Spacer`: Convert knobs to controls in Storybook ([#41851](https://github.com/WordPress/gutenberg/pull/41851)).
+ 
+ ## 19.13.0 (2022-06-15)
+ 
+diff --git a/packages/components/src/spacer/component.tsx b/packages/components/src/spacer/component.tsx
+index 05766d11f867d2..d9ef0a09491e1e 100644
+--- a/packages/components/src/spacer/component.tsx
++++ b/packages/components/src/spacer/component.tsx
+@@ -11,7 +11,7 @@ import { View } from '../view';
+ import { useSpacer } from './hook';
+ import type { Props } from './types';
+ 
+-function Spacer(
++function UnconnectedSpacer(
+ 	props: WordPressComponentProps< Props, 'div' >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+@@ -25,7 +25,6 @@ function Spacer(
+  *
+  * `Spacer` comes with a bunch of shorthand props to adjust `margin` and `padding`. The values of these props work as a multiplier to the library's grid system (base of `4px`).
+  *
+- * @example
+  * ```jsx
+  * import { Spacer } from `@wordpress/components`
+  *
+@@ -43,6 +42,6 @@ function Spacer(
+  * }
+  * ```
+  */
+-const ConnectedSpacer = contextConnect( Spacer, 'Spacer' );
++export const Spacer = contextConnect( UnconnectedSpacer, 'Spacer' );
+ 
+-export default ConnectedSpacer;
++export default Spacer;
+diff --git a/packages/components/src/spacer/stories/index.js b/packages/components/src/spacer/stories/index.js
+deleted file mode 100644
+index 86d71e1cd25bdb..00000000000000
+--- a/packages/components/src/spacer/stories/index.js
++++ /dev/null
+@@ -1,59 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { number } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-/**
+- * Internal dependencies
+- */
+-import { Spacer } from '..';
+-
+-export default {
+-	component: Spacer,
+-	title: 'Components (Experimental)/Spacer',
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-const PROPS = [
+-	'margin',
+-	'marginY',
+-	'marginX',
+-	'marginTop',
+-	'marginBottom',
+-	'marginLeft',
+-	'marginRight',
+-
+-	'padding',
+-	'paddingY',
+-	'paddingX',
+-	'paddingTop',
+-	'paddingBottom',
+-	'paddingLeft',
+-	'paddingRight',
+-];
+-
+-const BlackBox = () => (
+-	<div
+-		style={ { backgroundColor: 'black', width: '100px', height: '100px' } }
+-	/>
+-);
+-
+-export const _default = () => {
+-	const props = PROPS.reduce(
+-		( acc, prop ) => ( { ...acc, [ prop ]: number( prop, undefined ) } ),
+-		{}
+-	);
+-
+-	return (
+-		<>
+-			<BlackBox />
+-			<Spacer { ...props }>This is the spacer</Spacer>
+-			<BlackBox />
+-		</>
+-	);
+-};
+diff --git a/packages/components/src/spacer/stories/index.tsx b/packages/components/src/spacer/stories/index.tsx
+new file mode 100644
+index 00000000000000..46520e2069bce5
+--- /dev/null
++++ b/packages/components/src/spacer/stories/index.tsx
+@@ -0,0 +1,70 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { Spacer } from '..';
++
++const controls = [
++	'margin',
++	'marginY',
++	'marginX',
++	'marginTop',
++	'marginBottom',
++	'marginLeft',
++	'marginRight',
++
++	'padding',
++	'paddingY',
++	'paddingX',
++	'paddingTop',
++	'paddingBottom',
++	'paddingLeft',
++	'paddingRight',
++].reduce(
++	( acc, prop ) => ( { ...acc, [ prop ]: { control: { type: 'text' } } } ),
++	{}
++);
++
++const meta: ComponentMeta< typeof Spacer > = {
++	component: Spacer,
++	title: 'Components (Experimental)/Spacer',
++	argTypes: {
++		as: { control: { type: 'text' } },
++		children: {
++			control: { type: 'text' },
++		},
++		...controls,
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const BlackBox = () => (
++	<div
++		style={ { backgroundColor: 'black', width: '100px', height: '100px' } }
++	/>
++);
++
++const Template: ComponentStory< typeof Spacer > = ( { onChange, ...args } ) => {
++	return (
++		<>
++			<BlackBox />
++			<Spacer { ...args } />
++			<BlackBox />
++		</>
++	);
++};
++
++export const Default: ComponentStory< typeof Spacer > = Template.bind( {} );
++Default.args = {
++	children: 'This is the spacer',
++};

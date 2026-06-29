@@ -1,0 +1,87 @@
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+index d68ee7502e1f63..4e650af6bbbabc 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+@@ -77,7 +77,7 @@ function ControlPointButton( {
+ 			/>
+ 			<VisuallyHidden id={ descriptionId }>
+ 				{ __(
+-					'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'
++					'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point. You can also press backspace to delete the selected control point.'
+ 				) }
+ 			</VisuallyHidden>
+ 		</>
+@@ -147,6 +147,15 @@ function ControlPoints( {
+ 		const { initialPosition, index, significantMoveHappened } =
+ 			controlPointMoveStateRef.current;
+ 
++		if (
++			( relativePosition >= 99 || relativePosition <= 0 ) &&
++			controlPoints.length > 2
++		) {
++			onChange( removeControlPoint( controlPoints, index ) );
++			cleanEventListeners();
++			return;
++		}
++
+ 		if (
+ 			! significantMoveHappened &&
+ 			Math.abs( initialPosition - relativePosition ) >=
+@@ -269,6 +278,26 @@ function ControlPoints( {
+ 													)
+ 												)
+ 											);
++										} else if (
++											// Add backspace/delete key support
++											( event.code === 'Backspace' ||
++												event.code === 'Delete' ) &&
++											! disableRemove &&
++											controlPoints.length > 2
++										) {
++											// Stop propagation
++											event.stopPropagation();
++											onChange(
++												removeControlPoint(
++													controlPoints,
++													index
++												)
++											);
++											// Close the picker if open
++											if ( isOpen ) {
++												onToggle();
++												onStopControlPointChange();
++											}
+ 										}
+ 									} }
+ 									isOpen={ isOpen }
+@@ -277,7 +306,29 @@ function ControlPoints( {
+ 								/>
+ 							) }
+ 							renderContent={ ( { onClose } ) => (
+-								<DropdownContentWrapper paddingSize="none">
++								<DropdownContentWrapper
++									paddingSize="none"
++									onKeyDown={ (
++										event: React.KeyboardEvent< HTMLButtonElement >
++									) => {
++										if (
++											( event.code === 'Backspace' ||
++												event.code === 'Delete' ) &&
++											! disableRemove &&
++											controlPoints.length > 2
++										) {
++											event.stopPropagation();
++											onChange(
++												removeControlPoint(
++													controlPoints,
++													index
++												)
++											);
++
++											onClose();
++										}
++									} }
++								>
+ 									<ColorPicker
+ 										enableAlpha={ ! disableAlpha }
+ 										color={ point.color }

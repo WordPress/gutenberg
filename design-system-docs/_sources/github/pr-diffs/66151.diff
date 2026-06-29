@@ -1,0 +1,96 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 48113f874af3a2..64e5eeb1776523 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ -   `Tabs`: fix skipping indication animation glitch ([#65878](https://github.com/WordPress/gutenberg/pull/65878)).
+ -   `ToggleGroupControl`: Don't autoselect option on first group focus ([#65892](https://github.com/WordPress/gutenberg/pull/65892)).
+ -   `Button`: fix `box-shadow` transition for secondary variation ([#66045](https://github.com/WordPress/gutenberg/pull/66045)).
++-   `ToggleGroupControl`: Don't set value on focus after a reset ([#66151](https://github.com/WordPress/gutenberg/pull/66151)).
+ 
+ ### Deprecations
+ 
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index d7b4824fce4de8..168e8f498958b5 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -175,6 +175,32 @@ describe.each( [
+ 		expect( radio ).not.toBeChecked();
+ 	} );
+ 
++	if ( mode === 'controlled' ) {
++		it( 'should not set a value on focus, after the value is reset', async () => {
++			render(
++				<Component label="Test Toggle Group Control" value="jack">
++					{ options }
++				</Component>
++			);
++
++			expect( screen.getByRole( 'radio', { name: 'J' } ) ).toBeChecked();
++
++			await click( screen.getByRole( 'button', { name: 'Reset' } ) );
++
++			expect(
++				screen.getByRole( 'radio', { name: 'J' } )
++			).not.toBeChecked();
++
++			await press.ShiftTab();
++			expect(
++				screen.getByRole( 'radio', { name: 'R' } )
++			).not.toBeChecked();
++			expect(
++				screen.getByRole( 'radio', { name: 'J' } )
++			).not.toBeChecked();
++		} );
++	}
++
+ 	it( 'should render tooltip where `showTooltip` === `true`', async () => {
+ 		render(
+ 			<Component label="Test Toggle Group Control">
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index b33f53dd706b53..041af1adf5e5b5 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -141,10 +141,14 @@ function ToggleGroupControlOptionBase(
+ 					<Ariakit.Radio
+ 						disabled={ disabled }
+ 						onFocusVisible={ () => {
++							const selectedValueIsEmpty =
++								toggleGroupControlContext.value === null ||
++								toggleGroupControlContext.value === '';
++
+ 							// Conditions ensure that the first visible focus to a radio group
+ 							// without a selected option will not automatically select the option.
+ 							if (
+-								toggleGroupControlContext.value !== null ||
++								! selectedValueIsEmpty ||
+ 								toggleGroupControlContext.activeItemIsNotFirstItem?.()
+ 							) {
+ 								toggleGroupControlContext.setValue( value );
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+index 4481fc9f6138d8..0166728dbafba4 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+@@ -9,7 +9,7 @@ import { useStoreState } from '@ariakit/react';
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { forwardRef, useMemo } from '@wordpress/element';
++import { forwardRef, useEffect, useMemo } from '@wordpress/element';
+ import { isRTL } from '@wordpress/i18n';
+ 
+ /**
+@@ -73,6 +73,13 @@ function UnforwardedToggleGroupControlAsRadioGroup(
+ 	const selectedValue = useStoreState( radio, 'value' );
+ 	const setValue = radio.setValue;
+ 
++	// Ensures that the active id is also reset after the value is "reset" by the consumer.
++	useEffect( () => {
++		if ( selectedValue === '' ) {
++			radio.setActiveId( undefined );
++		}
++	}, [ radio, selectedValue ] );
++
+ 	const groupContextValue = useMemo(
+ 		(): ToggleGroupControlContextProps => ( {
+ 			activeItemIsNotFirstItem: () =>

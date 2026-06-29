@@ -1,0 +1,603 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index bd765613970e33..3e5dafd5308841 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   Add `LinkButton` component ([#78944](https://github.com/WordPress/gutenberg/pull/78944)).
++
+ ### Bug Fixes
+ 
+ -   `IconButton`: Restore the default tooltip delay on hover ([#79505](https://github.com/WordPress/gutenberg/pull/79505)).
+diff --git a/packages/ui/src/button/button.tsx b/packages/ui/src/button/button.tsx
+index 9962c5b9d56502..8106861e6fc157 100644
+--- a/packages/ui/src/button/button.tsx
++++ b/packages/ui/src/button/button.tsx
+@@ -11,6 +11,9 @@ import defenseStyles from '../utils/css/global-css-defense.module.css';
+ 
+ /**
+  * A versatile button component with multiple variants, tones, and sizes.
++ *
++ * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
++ * for when to use `Button`, `Link`, or `LinkButton`.
+  */
+ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
+ 	function Button(
+diff --git a/packages/ui/src/button/index.ts b/packages/ui/src/button/index.ts
+index 0ece992c826e2a..ab9025afcb48d4 100644
+--- a/packages/ui/src/button/index.ts
++++ b/packages/ui/src/button/index.ts
+@@ -5,6 +5,9 @@ ButtonIcon.displayName = 'Button.Icon';
+ 
+ /**
+  * A versatile button component with multiple variants, tones, and sizes.
++ *
++ * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
++ * for when to use `Button`, `Link`, or `LinkButton`.
+  */
+ export const Button = Object.assign( _Button, {
+ 	/**
+diff --git a/packages/ui/src/button/stories/usage-guidelines.mdx b/packages/ui/src/button/stories/usage-guidelines.mdx
+new file mode 100644
+index 00000000000000..b4e8b6a56e48a1
+--- /dev/null
++++ b/packages/ui/src/button/stories/usage-guidelines.mdx
+@@ -0,0 +1,74 @@
++import { Canvas, Markdown, Meta } from '@storybook/addon-docs/blocks';
++import * as UsageGuidelinesStories from './usage-guidelines.story';
++
++<Meta of={ UsageGuidelinesStories } />
++
++# Button, Link, and LinkButton
++
++Choose the component based on **what happens when the user activates it**, not only on how it should look.
++
++## Quick reference
++
++<Markdown>{ `
++| Goal | Component | Element | Examples |
++| --- | --- | --- | --- |
++| Performs an action on the current page. | [Button](?path=/docs/design-system-components-button--docs) | \`<button>\` | Save, Delete, Submit, Open dialog, Toggle |
++| Navigate to another page or URL | [Link](?path=/docs/design-system-components-link--docs) | \`<a>\` | "Learn more", docs links, external references |
++| Navigate with button styling | [LinkButton](?path=/docs/design-system-components-linkbutton--docs) | \`<a>\` | Standalone CTAs, card actions |
++` }</Markdown>
++
++## Use `Button` for actions
++
++Use `Button` when activation should **not** navigate away as a link would:
++
++-   Submitting or resetting a form (`type="submit"` / `type="reset"`)
++-   Opening overlays ([Dialog](?path=/docs/design-system-components-dialog--docs), [Popover](?path=/docs/design-system-components-popover--docs), etc.)
++-   Running JavaScript on the current page (`onClick` without a meaningful `href`)
++-   Toggle controls (`aria-pressed` on neutral minimal buttons)
++-   Showing a **loading** state while an async action completes
++
++`Button` uses button semantics from Base UI. Do not use it as a stand-in for navigation when a real URL is the primary outcome.
++
++<Canvas of={ UsageGuidelinesStories.UseButtonForActions } />
++
++See [Button](?path=/docs/design-system-components-button--docs) for API details and examples.
++
++## Use `Link` for navigation
++
++Use `Link` when activation should take the user to another page or URL. This is the default choice for navigation — not just inline references in running text, but any case where the outcome is “go somewhere else.”
++
++`Link` styling communicates navigation more clearly than a button-shaped control. Users can see at a glance that they are following a link, not triggering an action on the current page.
++
++Typical uses:
++
++-   Inline references inside [Text](?path=/docs/design-system-components-text--docs) or paragraphs
++-   Standalone “Learn more”, “View documentation”, or “Open site” actions
++-   External destinations with `openInNewTab` (adds `target="_blank"` and an accessible new-tab indicator)
++
++Prefer composing `Text` as the host and `Link` via `render` when you need typography from `Text` on a standalone link.
++
++<Canvas of={ UsageGuidelinesStories.UseLinkForInlineNavigation } />
++
++See [Link](?path=/docs/design-system-components-link--docs) for API details and examples.
++
++## Use `LinkButton` for navigation with button styling
++
++Use `LinkButton` when the destination is a **URL** and the control should **look like a `Button`** — for example, standalone calls to action, card footers, or notice actions where button weight fits the layout.
++
++`LinkButton` shares `Button` visual props (`variant`, `tone`, `size`) but renders an `<a>` like `Link`. It does **not** support `disabled`, `loading`, `focusableWhenDisabled`, `nativeButton`, or toggle `aria-pressed`.
++
++Do **not** use `LinkButton` for form submit, dialogs, or other non-navigation actions — use `Button` instead.
++
++Do **not** use `Button` with `render={ <a href="…" /> }` and `nativeButton={ false }` for new code when `LinkButton` fits; `LinkButton` is the supported pattern for button-styled links.
++
++<Canvas of={ UsageGuidelinesStories.UseLinkButtonForNavigation } />
++
++> **Note:** Prefer `Link` for navigation when possible. Its underline and link styling communicate where the user is going more clearly than a button-shaped control. Reach for `LinkButton` only when you have considered `Button` and `Link` and still need button prominence.
++
++See [LinkButton](?path=/docs/design-system-components-linkbutton--docs) for API details and examples.
++
++## Common mistakes
++
++-   **`Button` + `onClick` for navigation** — Prefer `Link` with a real `href` so keyboard, assistive technology, and browser link affordances stay correct.
++-   **`LinkButton` when `Link` would work** — Default to `Link` for navigation; button styling can obscure that the control goes elsewhere.
++-   **`LinkButton` for submit or toggle actions** — Use `Button`; only `Button` supports loading and pressed toggle styling.
+diff --git a/packages/ui/src/button/stories/usage-guidelines.story.tsx b/packages/ui/src/button/stories/usage-guidelines.story.tsx
+new file mode 100644
+index 00000000000000..26b1a0d6c74d31
+--- /dev/null
++++ b/packages/ui/src/button/stories/usage-guidelines.story.tsx
+@@ -0,0 +1,100 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { createInterpolateElement } from '@wordpress/element';
++import { Button } from '../index';
++import { Link } from '../../link';
++import { LinkButton } from '../../link-button';
++import { Stack } from '../../stack';
++import { Text } from '../../text';
++
++const meta: Meta = {
++	title: 'Design System/Components/Button/Usage Guidelines',
++	parameters: {
++		controls: { disable: true },
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and text overflow behavior. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
++		},
++	},
++	tags: [ '!dev' ],
++};
++export default meta;
++
++type Story = StoryObj;
++
++/**
++ * Use `Button` for actions on the current view: submitting a form, opening a
++ * dialog, toggling UI, or running JavaScript. It renders a `<button>` and
++ * supports loading and pressed states.
++ */
++export const UseButtonForActions: Story = {
++	render: () => (
++		<Stack direction="row" gap="sm" wrap="wrap">
++			<Button type="submit">Save changes</Button>
++			<Button variant="outline" onClick={ () => {} }>
++				Open settings
++			</Button>
++		</Stack>
++	),
++};
++
++/**
++ * Use `Link` for navigation. Its underline and link styling communicate where
++ * the user is going more clearly than a button-shaped control.
++ */
++export const UseLinkForInlineNavigation: Story = {
++	render: () => (
++		<Text variant="body-md" render={ <p /> }>
++			{ createInterpolateElement(
++				'Read the <DocumentationLink /> for more details, or <ExternalLink />.',
++				{
++					DocumentationLink: (
++						<Link href="https://wordpress.org/documentation/">
++							documentation
++						</Link>
++					),
++					ExternalLink: (
++						<Link href="https://make.wordpress.org/" openInNewTab>
++							open an external reference
++						</Link>
++					),
++				}
++			) }
++		</Text>
++	),
++};
++
++/**
++ * Use `LinkButton` when navigation should look like a `Button`, such as
++ * standalone calls to action that require an `href`.
++ *
++ * Note: Prefer `Link` for navigation when possible. Its underline and link
++ * styling set clearer expectations than a button-shaped control.
++ */
++export const UseLinkButtonForNavigation: Story = {
++	render: () => (
++		<Stack direction="column" gap="md">
++			<Text variant="body-md" render={ <p /> }>
++				Standalone navigation calls to action can use `LinkButton` when
++				button styling matches the surrounding UI.
++			</Text>
++			<div>
++				<LinkButton href="https://make.wordpress.org/">
++					Get started
++				</LinkButton>
++			</div>
++			<Text variant="body-md" render={ <p /> }>
++				{ createInterpolateElement(
++					'Note: Prefer <LinkComponent /> for navigation when possible — its underline and link styling communicate where the user is going more clearly than a button-shaped control.',
++					{
++						LinkComponent: (
++							<Link href="https://wordpress.org/documentation/">
++								Link
++							</Link>
++						),
++					}
++				) }
++			</Text>
++		</Stack>
++	),
++};
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 1333f3564d2b65..c18af0969c1ea4 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -11,6 +11,7 @@ export * from './form';
+ export * from './icon';
+ export * from './icon-button';
+ export * from './link';
++export * from './link-button';
+ export * as Notice from './notice';
+ export * as Popover from './popover';
+ export * from './stack';
+diff --git a/packages/ui/src/link-button/icon.tsx b/packages/ui/src/link-button/icon.tsx
+new file mode 100644
+index 00000000000000..89bbc1a2bd0997
+--- /dev/null
++++ b/packages/ui/src/link-button/icon.tsx
+@@ -0,0 +1,9 @@
++import { forwardRef } from '@wordpress/element';
++import { ButtonIcon } from '../button/icon';
++import { type LinkButtonIconProps } from './types';
++
++export const LinkButtonIcon = forwardRef< SVGSVGElement, LinkButtonIconProps >(
++	function LinkButtonIcon( props, ref ) {
++		return <ButtonIcon ref={ ref } { ...props } />;
++	}
++);
+diff --git a/packages/ui/src/link-button/index.ts b/packages/ui/src/link-button/index.ts
+new file mode 100644
+index 00000000000000..d2578eb0114299
+--- /dev/null
++++ b/packages/ui/src/link-button/index.ts
+@@ -0,0 +1,21 @@
++import { LinkButton as _LinkButton } from './link-button';
++import { LinkButtonIcon } from './icon';
++
++export type { LinkButtonProps, LinkButtonIconProps } from './types';
++
++LinkButtonIcon.displayName = 'LinkButton.Icon';
++
++/**
++ * A link that looks like a `Button`. Prefer `Link` for navigation unless
++ * button prominence is intentional.
++ *
++ * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
++ * for when to use `Button`, `Link`, or `LinkButton`.
++ */
++export const LinkButton = Object.assign( _LinkButton, {
++	/**
++	 * An icon component specifically designed to work well when rendered inside
++	 * a `LinkButton` component.
++	 */
++	Icon: LinkButtonIcon,
++} );
+diff --git a/packages/ui/src/link-button/link-button.tsx b/packages/ui/src/link-button/link-button.tsx
+new file mode 100644
+index 00000000000000..dabe42bc4b9351
+--- /dev/null
++++ b/packages/ui/src/link-button/link-button.tsx
+@@ -0,0 +1,55 @@
++import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { type LinkButtonProps } from './types';
++import buttonStyles from '../button/style.module.css';
++import resetStyles from '../utils/css/resets.module.css';
++import focusStyles from '../utils/css/focus.module.css';
++import defenseStyles from '../utils/css/global-css-defense.module.css';
++import styles from './style.module.css';
++
++/**
++ * A link that looks like a `Button`. Prefer `Link` for navigation unless
++ * button prominence is intentional.
++ *
++ * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
++ * for when to use `Button`, `Link`, or `LinkButton`.
++ */
++export const LinkButton = forwardRef< HTMLAnchorElement, LinkButtonProps >(
++	function LinkButton(
++		{
++			tone = 'brand',
++			variant = 'solid',
++			size = 'default',
++			className,
++			children,
++			render,
++			...props
++		},
++		ref
++	) {
++		const mergedClassName = clsx(
++			defenseStyles.a,
++			styles[ 'link-button' ],
++			resetStyles[ 'box-sizing' ],
++			focusStyles[ 'outset-ring--focus-except-active' ],
++			variant !== 'unstyled' && buttonStyles.button,
++			buttonStyles[ `is-${ tone }` ],
++			buttonStyles[ `is-${ variant }` ],
++			buttonStyles[ `is-${ size }` ],
++			className
++		);
++
++		const element = useRender( {
++			render,
++			defaultTagName: 'a',
++			ref,
++			props: mergeProps< 'a' >( props, {
++				className: mergedClassName,
++				children,
++			} ),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/link-button/stories/index.story.tsx b/packages/ui/src/link-button/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..a9b6ce50ac3a4c
+--- /dev/null
++++ b/packages/ui/src/link-button/stories/index.story.tsx
+@@ -0,0 +1,147 @@
++import { Fragment } from '@wordpress/element';
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { wordpress } from '@wordpress/icons';
++import { LinkButton } from '../index';
++
++const meta: Meta< typeof LinkButton > = {
++	title: 'Design System/Components/LinkButton',
++	component: LinkButton,
++	subcomponents: {
++		'LinkButton.Icon': LinkButton.Icon,
++	},
++	parameters: {
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and text overflow behavior. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
++		},
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof LinkButton >;
++
++export const Default: Story = {
++	args: {
++		children: 'Link button',
++		href: '#',
++	},
++};
++
++export const Outline: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		variant: 'outline',
++	},
++};
++
++export const Minimal: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		variant: 'minimal',
++	},
++};
++
++export const Compact: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		size: 'compact',
++	},
++};
++
++export const Small: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		size: 'small',
++	},
++};
++
++export const Neutral: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		tone: 'neutral',
++	},
++};
++
++export const NeutralOutline: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		tone: 'neutral',
++		variant: 'outline',
++	},
++};
++
++export const Unstyled: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		variant: 'unstyled',
++	},
++};
++
++export const AllTonesAndVariants: Story = {
++	...Default,
++	render: ( args ) => (
++		<div
++			style={ {
++				display: 'grid',
++				gridTemplateColumns: 'max-content max-content',
++				color: 'var(--wpds-color-foreground-content-neutral)',
++			} }
++		>
++			<div></div>
++			<div style={ { textAlign: 'center' } }>Resting</div>
++			{ ( [ 'brand', 'neutral' ] as const ).map( ( tone ) => (
++				<Fragment key={ tone }>
++					{ (
++						[ 'solid', 'outline', 'minimal', 'unstyled' ] as const
++					 ).map( ( variant ) => (
++						<Fragment key={ variant }>
++							<div
++								style={ {
++									paddingInlineEnd: '1rem',
++									display: 'flex',
++									alignItems: 'center',
++								} }
++							>
++								{ variant }, { tone }
++							</div>
++							<div
++								style={ {
++									padding: '0.5rem 1rem',
++									display: 'flex',
++									alignItems: 'center',
++								} }
++							>
++								<LinkButton
++									{ ...args }
++									tone={ tone }
++									variant={ variant }
++								/>
++							</div>
++						</Fragment>
++					) ) }
++				</Fragment>
++			) ) }
++		</div>
++	),
++};
++
++export const WithIcon: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		children: (
++			<>
++				<LinkButton.Icon icon={ wordpress } />
++				Link button
++			</>
++		),
++	},
++};
+diff --git a/packages/ui/src/link-button/style.module.css b/packages/ui/src/link-button/style.module.css
+new file mode 100644
+index 00000000000000..33351286e9db93
+--- /dev/null
++++ b/packages/ui/src/link-button/style.module.css
+@@ -0,0 +1,18 @@
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
++
++	@layer components {
++		.link-button {
++			/* Bridge `Button` foreground tokens into the unlayered `.a` global CSS defense. */
++			--_gcd-a-color: var(--wp-ui-button-foreground-color);
++
++			&:visited {
++				--_gcd-a-color: var(--wp-ui-button-foreground-color);
++			}
++
++			&:is(:hover, :active, :focus) {
++				--_gcd-a-color: var(--wp-ui-button-foreground-color-active);
++			}
++		}
++	}
++}
+diff --git a/packages/ui/src/link-button/test/link-button.test.tsx b/packages/ui/src/link-button/test/link-button.test.tsx
+new file mode 100644
+index 00000000000000..9b28895fdbc9e9
+--- /dev/null
++++ b/packages/ui/src/link-button/test/link-button.test.tsx
+@@ -0,0 +1,38 @@
++import { createRef } from '@wordpress/element';
++import { screen, render } from '@testing-library/react';
++import { LinkButton } from '../index';
++
++describe( 'LinkButton', () => {
++	it( 'renders a link element by default', () => {
++		render( <LinkButton href="/example">Go to example</LinkButton> );
++
++		const link = screen.getByRole( 'link', { name: 'Go to example' } );
++
++		expect( link ).toBeVisible();
++		expect( link ).toHaveAttribute( 'href', '/example' );
++	} );
++
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLAnchorElement >();
++
++		render(
++			<LinkButton ref={ ref } href="/example">
++				Go to example
++			</LinkButton>
++		);
++
++		expect( ref.current ).toBeInstanceOf( HTMLAnchorElement );
++	} );
++
++	it( 'merges custom className with built-in classes', () => {
++		const customClass = 'my-link-button';
++		render(
++			<LinkButton href="/example" className={ customClass }>
++				Go to example
++			</LinkButton>
++		);
++		expect(
++			screen.getByRole( 'link', { name: 'Go to example' } )
++		).toHaveClass( customClass );
++	} );
++} );
+diff --git a/packages/ui/src/link-button/types.ts b/packages/ui/src/link-button/types.ts
+new file mode 100644
+index 00000000000000..71a548566df4df
+--- /dev/null
++++ b/packages/ui/src/link-button/types.ts
+@@ -0,0 +1,18 @@
++import { type ButtonIconProps, type ButtonProps } from '../button/types';
++import { type ComponentProps } from '../utils/types';
++
++type LinkButtonVisualProps = Pick<
++	ButtonProps,
++	'variant' | 'tone' | 'size' | 'children'
++>;
++
++export interface LinkButtonProps
++	extends Omit< ComponentProps< 'a' >, keyof LinkButtonVisualProps >,
++		LinkButtonVisualProps {
++	/**
++	 * The URL to navigate to.
++	 */
++	href: NonNullable< ComponentProps< 'a' >[ 'href' ] >;
++}
++
++export type { ButtonIconProps as LinkButtonIconProps };
+diff --git a/packages/ui/src/link/link.tsx b/packages/ui/src/link/link.tsx
+index 540c961dba7dfd..cd9efaa64e8183 100644
+--- a/packages/ui/src/link/link.tsx
++++ b/packages/ui/src/link/link.tsx
+@@ -11,6 +11,9 @@ import defenseStyles from '../utils/css/global-css-defense.module.css';
+ /**
+  * A styled anchor element with support for semantic color tones and an
+  * unstyled escape hatch.
++ *
++ * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
++ * for when to use `Button`, `Link`, or `LinkButton`.
+  */
+ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
+ 	{

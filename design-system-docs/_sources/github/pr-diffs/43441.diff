@@ -1,0 +1,220 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d33e0c7bb25cc4..ec6de0c9b3d04d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -38,6 +38,7 @@
+ -   `ColorPalette`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
+ -   `Guide`: Refactor away from `_.times()` ([#43374](https://github.com/WordPress/gutenberg/pull/43374/)).
+ -   `Modal`: use `KeyboardEvent.code` instead of deprecated `KeyboardEvent.keyCode`. improve unit tests ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
++-   `FocalPointPicker`: use `KeyboardEvent.code`, partially refactor tests to modern RTL and `user-event` ([#43441](https://github.com/WordPress/gutenberg/pull/43441/)).
+ 
+ ### Experimental
+ -   `FormTokenField`: add `__experimentalAutoSelectFirstMatch` prop to auto select the first matching suggestion on typing ([#42527](https://github.com/WordPress/gutenberg/pull/42527/)).
+diff --git a/packages/components/src/focal-point-picker/index.js b/packages/components/src/focal-point-picker/index.js
+index c200b28ebff811..021c2481841cb4 100644
+--- a/packages/components/src/focal-point-picker/index.js
++++ b/packages/components/src/focal-point-picker/index.js
+@@ -9,7 +9,6 @@ import classnames from 'classnames';
+ import { __ } from '@wordpress/i18n';
+ import { Component, createRef } from '@wordpress/element';
+ import { withInstanceId } from '@wordpress/compose';
+-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+ 
+ /**
+  * Internal dependencies
+@@ -171,15 +170,21 @@ export class FocalPointPicker extends Component {
+ 		this.props.onDragEnd?.( event );
+ 	}
+ 	onKeyDown( event ) {
+-		const { keyCode, shiftKey } = event;
+-		if ( ! [ UP, DOWN, LEFT, RIGHT ].includes( keyCode ) ) return;
++		const { code, shiftKey } = event;
++		if (
++			! [ 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight' ].includes(
++				code
++			)
++		)
++			return;
+ 
+ 		event.preventDefault();
+ 
+ 		const next = { ...this.state.percentages };
+ 		const step = shiftKey ? 0.1 : 0.01;
+-		const delta = keyCode === UP || keyCode === LEFT ? -1 * step : step;
+-		const axis = keyCode === UP || keyCode === DOWN ? 'y' : 'x';
++		const delta =
++			code === 'ArrowUp' || code === 'ArrowLeft' ? -1 * step : step;
++		const axis = code === 'ArrowUp' || code === 'ArrowDown' ? 'y' : 'x';
+ 		const value = parseFloat( next[ axis ] ) + delta;
+ 
+ 		next[ axis ] = roundClamp( value, 0, 1, step );
+diff --git a/packages/components/src/focal-point-picker/test/index.js b/packages/components/src/focal-point-picker/test/index.js
+index 874b9f139b7dd8..6999af637e2fde 100644
+--- a/packages/components/src/focal-point-picker/test/index.js
++++ b/packages/components/src/focal-point-picker/test/index.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { act, fireEvent, render, screen } from '@testing-library/react';
++import { fireEvent, render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
+ 
+ /**
+  * Internal dependencies
+@@ -10,31 +11,49 @@ import Picker from '../index.js';
+ 
+ describe( 'FocalPointPicker', () => {
+ 	describe( 'focus and blur', () => {
+-		let firedDragEnd;
+-		let firedDrag;
+-		const { unmount } = render(
+-			<Picker
+-				onChange={ () => {} }
+-				onDragEnd={ () => ( firedDragEnd = true ) }
+-				onDrag={ () => ( firedDrag = true ) }
+-			/>
+-		);
+-		const dragArea = screen.getByRole( 'button' );
+-		fireEvent.mouseDown( dragArea );
+-		const gainedFocus = dragArea.ownerDocument.activeElement === dragArea;
+-
+-		fireEvent.blur( dragArea );
+-		fireEvent.mouseMove( dragArea );
+-
+-		// cleans up as it's not automated for renders outside of test blocks
+-		unmount();
+-
+-		it( 'should focus the draggable area', () => {
+-			expect( gainedFocus ).toBe( true );
++		it( 'clicking the draggable area should focus it', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
++			const mockOnChange = jest.fn();
++
++			render( <Picker onChange={ mockOnChange } /> );
++
++			const draggableArea = screen.getByRole( 'button' );
++
++			await user.click( draggableArea );
++
++			expect( draggableArea ).toHaveFocus();
+ 		} );
+ 
+ 		it( 'should stop a drag operation when focus is lost', () => {
+-			expect( firedDragEnd && ! firedDrag ).toBe( true );
++			const mockOnDrag = jest.fn();
++			const mockOnDragEnd = jest.fn();
++			const mockOnChange = jest.fn();
++
++			render(
++				<Picker
++					onChange={ mockOnChange }
++					onDrag={ mockOnDrag }
++					onDragEnd={ mockOnDragEnd }
++				/>
++			);
++
++			const draggableArea = screen.getByRole( 'button' );
++
++			// `user-event` is not capable of testing drag interactions properly.
++			// we could consider using playwright instead.
++			fireEvent.mouseDown( draggableArea );
++
++			expect( mockOnDrag ).not.toHaveBeenCalled();
++			expect( mockOnDragEnd ).not.toHaveBeenCalled();
++
++			fireEvent.blur( draggableArea );
++			fireEvent.mouseMove( draggableArea );
++
++			expect( mockOnDrag ).not.toHaveBeenCalled();
++			expect( mockOnDragEnd ).toHaveBeenCalledTimes( 1 );
+ 		} );
+ 	} );
+ 
+@@ -47,13 +66,17 @@ describe( 'FocalPointPicker', () => {
+ 			events.forEach( ( name ) => {
+ 				handlers[ name ] = ( ...all ) => eventLogger( name, all );
+ 			} );
++
+ 			render( <Picker { ...handlers } /> );
++
+ 			const dragArea = screen.getByRole( 'button' );
+-			act( () => {
+-				fireEvent.mouseDown( dragArea );
+-				fireEvent.mouseMove( dragArea );
+-				fireEvent.mouseUp( dragArea );
+-			} );
++
++			// `user-event` is not capable of testing drag interactions properly.
++			// we could consider using playwright instead.
++			fireEvent.mouseDown( dragArea );
++			fireEvent.mouseMove( dragArea );
++			fireEvent.mouseUp( dragArea );
++
+ 			expect(
+ 				events.reduce( ( last, eventName, index ) => {
+ 					return last && logs[ index ].name === eventName;
+@@ -64,8 +87,13 @@ describe( 'FocalPointPicker', () => {
+ 
+ 	describe( 'resolvePoint handling', () => {
+ 		it( 'should allow value altering', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
+ 			const spyChange = jest.fn();
+ 			const spy = jest.fn();
++
+ 			render(
+ 				<Picker
+ 					value={ { x: 0.25, y: 0.25 } }
+@@ -76,12 +104,13 @@ describe( 'FocalPointPicker', () => {
+ 					} }
+ 				/>
+ 			);
++
+ 			// Click and press arrow up
+ 			const dragArea = screen.getByRole( 'button' );
+-			act( () => {
+-				fireEvent.mouseDown( dragArea );
+-				fireEvent.keyDown( dragArea, { charCode: 0, keyCode: 38 } );
+-			} );
++
++			await user.click( dragArea );
++			await user.keyboard( '[ArrowUp]' );
++
+ 			expect( spy ).toHaveBeenCalled();
+ 			expect( spyChange ).toHaveBeenCalledWith( {
+ 				x: '0.91',
+@@ -100,19 +129,23 @@ describe( 'FocalPointPicker', () => {
+ 			expect( xInput.value ).toBe( '93' );
+ 		} );
+ 		it( 'call onChange with the expected values', async () => {
++			const user = userEvent.setup( {
++				advanceTimers: jest.advanceTimersByTime,
++			} );
++
+ 			const spyChange = jest.fn();
+ 			render(
+ 				<Picker value={ { x: 0.14, y: 0.62 } } onChange={ spyChange } />
+ 			);
+ 			// Click and press arrow up
+ 			const dragArea = screen.getByRole( 'button' );
+-			act( () => {
+-				fireEvent.mouseDown( dragArea );
+-				fireEvent.keyDown( dragArea, { charCode: 0, keyCode: 38 } );
+-			} );
++
++			await user.click( dragArea );
++			await user.keyboard( '[ArrowDown]' );
++
+ 			expect( spyChange ).toHaveBeenCalledWith( {
+ 				x: '0.14',
+-				y: '0.61',
++				y: '0.63',
+ 			} );
+ 		} );
+ 	} );

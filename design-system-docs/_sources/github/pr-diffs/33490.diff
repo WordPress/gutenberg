@@ -1,0 +1,320 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 85e0a4aff77db5..615e5f57bfe53d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   `isPrimary`, `isSecondary`, `isTertiary` and `isLink` props in `Button` have been deprecated. Use `variant` instead ([#31713](https://github.com/WordPress/gutenberg/pull/31713)).
+ -   `isElevated` prop in `Card` has been deprecated. Use `elevation` instead ([#32566](https://github.com/WordPress/gutenberg/pull/32566)).
++-   `isScrollable` prop in `CardBody` default value changed from `true` to `false` ([#33490](https://github.com/WordPress/gutenberg/pull/33490))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/card/card-body/README.md b/packages/components/src/card/card-body/README.md
+index 014720bcc52c03..451b4dc8526cf7 100644
+--- a/packages/components/src/card/card-body/README.md
++++ b/packages/components/src/card/card-body/README.md
+@@ -23,7 +23,7 @@ Note: This component is connected to [`Card`'s Context](/packages/components/src
+ Determines if the component is scrollable.
+ 
+ -   Required: No
+--   Default: `true`
++-   Default: `false`
+ 
+ ### `isShady`: `boolean`
+ 
+diff --git a/packages/components/src/card/card-body/hook.js b/packages/components/src/card/card-body/hook.js
+index 1aca7b8fd16b19..f7fdab10a0304b 100644
+--- a/packages/components/src/card/card-body/hook.js
++++ b/packages/components/src/card/card-body/hook.js
+@@ -16,7 +16,7 @@ import { useCx } from '../../utils/hooks/use-cx';
+ export function useCardBody( props ) {
+ 	const {
+ 		className,
+-		isScrollable = true,
++		isScrollable = false,
+ 		isShady = false,
+ 		size = 'medium',
+ 		...otherProps
+diff --git a/packages/components/src/card/test/__snapshots__/index.js.snap b/packages/components/src/card/test/__snapshots__/index.js.snap
+index 0b8089ab3a73b1..1e9d8487435b0e 100644
+--- a/packages/components/src/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/card/test/__snapshots__/index.js.snap
+@@ -25,8 +25,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-scrollable components-card__body components-card-body css-q3qn5w-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium em57xhy0"
+-+     class="components-scrollable components-card__body components-card-body css-172aszr-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium-shady em57xhy0"
++-     class="components-card__body components-card-body css-1fyyxcx-View-Body-borderRadius-medium em57xhy0"
+++     class="components-card__body components-card-body css-whouzc-View-Body-borderRadius-medium-shady em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -104,8 +104,8 @@ Snapshot Diff:
+         Header
+       </div>
+       <div
+--       class="components-scrollable components-card__body components-card-body css-q3qn5w-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium em57xhy0"
+-+       class="components-scrollable components-card__body components-card-body css-1507ng6-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-large em57xhy0"
++-       class="components-card__body components-card-body css-1fyyxcx-View-Body-borderRadius-medium em57xhy0"
+++       class="components-card__body components-card-body css-35zzqj-View-Body-borderRadius-large em57xhy0"
+         data-wp-c16t="true"
+         data-wp-component="CardBody"
+       >
+@@ -132,8 +132,8 @@ Snapshot Diff:
+           Header
+         </div>
+         <div
+--         class="components-scrollable components-card__body components-card-body css-1507ng6-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-large em57xhy0"
+-+         class="components-scrollable components-card__body components-card-body css-q3qn5w-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium em57xhy0"
++-         class="components-card__body components-card-body css-35zzqj-View-Body-borderRadius-large em57xhy0"
+++         class="components-card__body components-card-body css-1fyyxcx-View-Body-borderRadius-medium em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+@@ -174,8 +174,8 @@ Snapshot Diff:
+           Header
+         </div>
+         <div
+--         class="components-scrollable components-card__body components-card-body css-1507ng6-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-large em57xhy0"
+-+         class="components-scrollable components-card__body components-card-body css-1vtoa4y-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-small em57xhy0"
++-         class="components-card__body components-card-body css-35zzqj-View-Body-borderRadius-large em57xhy0"
+++         class="components-card__body components-card-body css-1bp82cr-View-Body-borderRadius-small em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+@@ -251,42 +251,11 @@ Object {
+ }
+ 
+ .emotion-6 {
+-  height: 100%;
+-  overflow-x: hidden;
+-  overflow-y: auto;
+   height: auto;
+   max-height: 100%;
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-@media only screen and ( min-device-width: 40em ) {
+-  .emotion-6::-webkit-scrollbar {
+-    height: 12px;
+-    width: 12px;
+-  }
+-
+-  .emotion-6::-webkit-scrollbar-track {
+-    background-color: transparent;
+-  }
+-
+-  .emotion-6::-webkit-scrollbar-track {
+-    background: rgba(0, 0, 0, 0.04);
+-    border-radius: 8px;
+-  }
+-
+-  .emotion-6::-webkit-scrollbar-thumb {
+-    -webkit-background-clip: padding-box;
+-    background-clip: padding-box;
+-    background-color: rgba(0, 0, 0, 0.2);
+-    border: 2px solid rgba( 0, 0, 0, 0 );
+-    border-radius: 7px;
+-  }
+-
+-  .emotion-6:hover::-webkit-scrollbar-thumb {
+-    background-color: rgba(0, 0, 0, 0.5);
+-  }
+-}
+-
+ .emotion-6:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+@@ -412,14 +381,14 @@ Object {
+             Card Header
+           </div>
+           <div
+-            class="components-scrollable components-card__body components-card-body emotion-6 emotion-1"
++            class="components-card__body components-card-body emotion-6 emotion-1"
+             data-wp-c16t="true"
+             data-wp-component="CardBody"
+           >
+             Card Body 1
+           </div>
+           <div
+-            class="components-scrollable components-card__body components-card-body emotion-6 emotion-1"
++            class="components-card__body components-card-body emotion-6 emotion-1"
+             data-wp-c16t="true"
+             data-wp-component="CardBody"
+           >
+@@ -433,7 +402,7 @@ Object {
+             role="separator"
+           />
+           <div
+-            class="components-scrollable components-card__body components-card-body emotion-6 emotion-1"
++            class="components-card__body components-card-body emotion-6 emotion-1"
+             data-wp-c16t="true"
+             data-wp-component="CardBody"
+           >
+@@ -529,42 +498,11 @@ Object {
+ }
+ 
+ .emotion-6 {
+-  height: 100%;
+-  overflow-x: hidden;
+-  overflow-y: auto;
+   height: auto;
+   max-height: 100%;
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-@media only screen and ( min-device-width: 40em ) {
+-  .emotion-6::-webkit-scrollbar {
+-    height: 12px;
+-    width: 12px;
+-  }
+-
+-  .emotion-6::-webkit-scrollbar-track {
+-    background-color: transparent;
+-  }
+-
+-  .emotion-6::-webkit-scrollbar-track {
+-    background: rgba(0, 0, 0, 0.04);
+-    border-radius: 8px;
+-  }
+-
+-  .emotion-6::-webkit-scrollbar-thumb {
+-    -webkit-background-clip: padding-box;
+-    background-clip: padding-box;
+-    background-color: rgba(0, 0, 0, 0.2);
+-    border: 2px solid rgba( 0, 0, 0, 0 );
+-    border-radius: 7px;
+-  }
+-
+-  .emotion-6:hover::-webkit-scrollbar-thumb {
+-    background-color: rgba(0, 0, 0, 0.5);
+-  }
+-}
+-
+ .emotion-6:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+@@ -689,14 +627,14 @@ Object {
+           Card Header
+         </div>
+         <div
+-          class="components-scrollable components-card__body components-card-body emotion-6 emotion-1"
++          class="components-card__body components-card-body emotion-6 emotion-1"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+           Card Body 1
+         </div>
+         <div
+-          class="components-scrollable components-card__body components-card-body emotion-6 emotion-1"
++          class="components-card__body components-card-body emotion-6 emotion-1"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+@@ -710,7 +648,7 @@ Object {
+           role="separator"
+         />
+         <div
+-          class="components-scrollable components-card__body components-card-body emotion-6 emotion-1"
++          class="components-card__body components-card-body emotion-6 emotion-1"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+diff --git a/packages/components/src/card/test/index.js b/packages/components/src/card/test/index.js
+index 170e758ae2f49e..bc794ce9418b9d 100644
+--- a/packages/components/src/card/test/index.js
++++ b/packages/components/src/card/test/index.js
+@@ -182,11 +182,9 @@ describe( 'Card', () => {
+ 
+ 			it( 'should allow scrolling content with the scrollable prop is true', () => {
+ 				const { container: containerScrollable } = render(
+-					<CardBody>Body</CardBody>
+-				);
+-				const { container } = render(
+-					<CardBody isScrollable={ false }>Body</CardBody>
++					<CardBody isScrollable={ true }>Body</CardBody>
+ 				);
++				const { container } = render( <CardBody>Body</CardBody> );
+ 				expect( container ).toMatchDiffSnapshot( containerScrollable );
+ 			} );
+ 		} );
+diff --git a/packages/components/src/card/types.ts b/packages/components/src/card/types.ts
+index eed2958c90d07c..576683558b8cfe 100644
+--- a/packages/components/src/card/types.ts
++++ b/packages/components/src/card/types.ts
+@@ -69,7 +69,7 @@ export type BodyProps = BaseSubComponentProps & {
+ 	/**
+ 	 * Determines if the component is scrollable.
+ 	 *
+-	 * @default true
++	 * @default false
+ 	 */
+ 	isScrollable?: boolean;
+ };
+diff --git a/packages/components/src/flyout/test/__snapshots__/index.js.snap b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+index eb1c35d15233ef..93a028475c7bdc 100644
+--- a/packages/components/src/flyout/test/__snapshots__/index.js.snap
++++ b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+@@ -19,42 +19,11 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ .emotion-5 {
+-  height: 100%;
+-  overflow-x: hidden;
+-  overflow-y: auto;
+   height: auto;
+   max-height: 100%;
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+ 
+-@media only screen and ( min-device-width: 40em ) {
+-  .emotion-5::-webkit-scrollbar {
+-    height: 12px;
+-    width: 12px;
+-  }
+-
+-  .emotion-5::-webkit-scrollbar-track {
+-    background-color: transparent;
+-  }
+-
+-  .emotion-5::-webkit-scrollbar-track {
+-    background: rgba(0, 0, 0, 0.04);
+-    border-radius: 8px;
+-  }
+-
+-  .emotion-5::-webkit-scrollbar-thumb {
+-    -webkit-background-clip: padding-box;
+-    background-clip: padding-box;
+-    background-color: rgba(0, 0, 0, 0.2);
+-    border: 2px solid rgba( 0, 0, 0, 0 );
+-    border-radius: 7px;
+-  }
+-
+-  .emotion-5:hover::-webkit-scrollbar-thumb {
+-    background-color: rgba(0, 0, 0, 0.5);
+-  }
+-}
+-
+ .emotion-5:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+@@ -119,7 +88,7 @@ exports[`props should render correctly 1`] = `
+       tabindex="-1"
+     />
+     <div
+-      class="components-scrollable components-card__body components-card-body emotion-5 emotion-2"
++      class="components-card__body components-card-body emotion-5 emotion-2"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -190,7 +159,7 @@ Snapshot Diff:
+           tabindex="-1"
+         />
+ +       <div
+-+         class="components-scrollable components-card__body components-card-body css-q3qn5w-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium em57xhy0"
+++         class="components-card__body components-card-body css-1fyyxcx-View-Body-borderRadius-medium em57xhy0"
+ +         data-wp-c16t="true"
+ +         data-wp-component="CardBody"
+ +       >

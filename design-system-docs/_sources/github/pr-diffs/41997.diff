@@ -1,0 +1,24 @@
+diff --git a/packages/components/src/number-control/stories/index.js b/packages/components/src/number-control/stories/index.js
+index fd969ce0f7ecfd..ab8a86281ebb5e 100644
+--- a/packages/components/src/number-control/stories/index.js
++++ b/packages/components/src/number-control/stories/index.js
+@@ -12,6 +12,12 @@ export default {
+ 	title: 'Components (Experimental)/NumberControl',
+ 	component: NumberControl,
+ 	argTypes: {
++		size: {
++			control: {
++				type: 'select',
++				options: [ 'default', 'small', '__unstable-large' ],
++			},
++		},
+ 		onChange: { action: 'onChange' },
+ 	},
+ };
+@@ -48,5 +54,6 @@ Default.args = {
+ 	placeholder: '0',
+ 	required: false,
+ 	shiftStep: 10,
++	size: 'default',
+ 	step: '1',
+ };

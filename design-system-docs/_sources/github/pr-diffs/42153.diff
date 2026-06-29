@@ -1,0 +1,130 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c0295cfd63bac9..bb87cf0cd3a3c9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ -   `TreeSelect`: Refactor away from `_.repeat()` ([#42070](https://github.com/WordPress/gutenberg/pull/42070/)).
+ -   `FocalPointPicker` updated to satisfy `react/exhuastive-deps` eslint rule ([#41520](https://github.com/WordPress/gutenberg/pull/41520)).
+ -   `ColorPicker` updated to satisfy `react/exhuastive-deps` eslint rule ([#41294](https://github.com/WordPress/gutenberg/pull/41294)).
++-   `Slot`/`Fill`: Refactor away from Lodash ([#42153](https://github.com/WordPress/gutenberg/pull/42153/)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/slot-fill/index.native.js b/packages/components/src/slot-fill/index.native.js
+index 59eb155e22289c..15fd556df34e02 100644
+--- a/packages/components/src/slot-fill/index.native.js
++++ b/packages/components/src/slot-fill/index.native.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { omit } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -12,8 +7,8 @@ import Provider from './provider';
+ 
+ export { Fill, Provider };
+ 
+-export function Slot( props ) {
+-	return <BaseSlot { ...omit( props, 'bubblesVirtually' ) } />;
++export function Slot( { bubblesVirtually, ...restProps } ) {
++	return <BaseSlot { ...restProps } />;
+ }
+ 
+ export function createSlotFill( name ) {
+diff --git a/packages/components/src/slot-fill/provider.js b/packages/components/src/slot-fill/provider.js
+index e44c95c5201f89..37b4560140516c 100644
+--- a/packages/components/src/slot-fill/provider.js
++++ b/packages/components/src/slot-fill/provider.js
+@@ -1,9 +1,4 @@
+ // @ts-nocheck
+-/**
+- * External dependencies
+- */
+-import { without } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -78,7 +73,8 @@ export default class SlotFillProvider extends Component {
+ 	}
+ 
+ 	unregisterFill( name, instance ) {
+-		this.fills[ name ] = without( this.fills[ name ], instance );
++		this.fills[ name ] =
++			this.fills[ name ]?.filter( ( fill ) => fill !== instance ) ?? [];
+ 		this.forceUpdateSlot( name );
+ 	}
+ 
+@@ -115,7 +111,7 @@ export default class SlotFillProvider extends Component {
+ 		this.listeners.push( listener );
+ 
+ 		return () => {
+-			this.listeners = without( this.listeners, listener );
++			this.listeners = this.listeners.filter( ( l ) => l !== listener );
+ 		};
+ 	}
+ 
+diff --git a/packages/components/src/slot-fill/slot.js b/packages/components/src/slot-fill/slot.js
+index 1227b0fed1fc7b..50ff143bf227e5 100644
+--- a/packages/components/src/slot-fill/slot.js
++++ b/packages/components/src/slot-fill/slot.js
+@@ -1,9 +1,4 @@
+ // @ts-nocheck
+-/**
+- * External dependencies
+- */
+-import { isString, map } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -72,25 +67,27 @@ class SlotComponent extends Component {
+ 	render() {
+ 		const { children, name, fillProps = {}, getFills } = this.props;
+ 
+-		const fills = map( getFills( name, this ), ( fill ) => {
+-			const fillChildren = isFunction( fill.children )
+-				? fill.children( fillProps )
+-				: fill.children;
+-
+-			return Children.map( fillChildren, ( child, childIndex ) => {
+-				if ( ! child || isString( child ) ) {
+-					return child;
+-				}
+-
+-				const childKey = child.key || childIndex;
+-				return cloneElement( child, { key: childKey } );
+-			} );
+-		} ).filter(
+-			// In some cases fills are rendered only when some conditions apply.
+-			// This ensures that we only use non-empty fills when rendering, i.e.,
+-			// it allows us to render wrappers only when the fills are actually present.
+-			( element ) => ! isEmptyElement( element )
+-		);
++		const fills = ( getFills( name, this ) ?? [] )
++			.map( ( fill ) => {
++				const fillChildren = isFunction( fill.children )
++					? fill.children( fillProps )
++					: fill.children;
++
++				return Children.map( fillChildren, ( child, childIndex ) => {
++					if ( ! child || typeof child === 'string' ) {
++						return child;
++					}
++
++					const childKey = child.key || childIndex;
++					return cloneElement( child, { key: childKey } );
++				} );
++			} )
++			.filter(
++				// In some cases fills are rendered only when some conditions apply.
++				// This ensures that we only use non-empty fills when rendering, i.e.,
++				// it allows us to render wrappers only when the fills are actually present.
++				( element ) => ! isEmptyElement( element )
++			);
+ 
+ 		return <>{ isFunction( children ) ? children( fills ) : fills }</>;
+ 	}

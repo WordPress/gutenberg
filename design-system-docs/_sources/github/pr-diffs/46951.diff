@@ -1,0 +1,484 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index a06df18c6c44b9..fbffcbcfb2fb01 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1268,31 +1268,31 @@
+ 	{
+ 		"title": "ToolbarButton",
+ 		"slug": "toolbar-button",
+-		"markdown_source": "../packages/components/src/toolbar-button/README.md",
++		"markdown_source": "../packages/components/src/toolbar/toolbar-button/README.md",
+ 		"parent": "components"
+ 	},
+ 	{
+ 		"title": "ToolbarDropdownMenu",
+ 		"slug": "toolbar-dropdown-menu",
+-		"markdown_source": "../packages/components/src/toolbar-dropdown-menu/README.md",
++		"markdown_source": "../packages/components/src/toolbar/toolbar-dropdown-menu/README.md",
+ 		"parent": "components"
+ 	},
+ 	{
+ 		"title": "ToolbarGroup",
+ 		"slug": "toolbar-group",
+-		"markdown_source": "../packages/components/src/toolbar-group/README.md",
++		"markdown_source": "../packages/components/src/toolbar/toolbar-group/README.md",
+ 		"parent": "components"
+ 	},
+ 	{
+ 		"title": "ToolbarItem",
+ 		"slug": "toolbar-item",
+-		"markdown_source": "../packages/components/src/toolbar-item/README.md",
++		"markdown_source": "../packages/components/src/toolbar/toolbar-item/README.md",
+ 		"parent": "components"
+ 	},
+ 	{
+ 		"title": "Toolbar",
+ 		"slug": "toolbar",
+-		"markdown_source": "../packages/components/src/toolbar/README.md",
++		"markdown_source": "../packages/components/src/toolbar/toolbar/README.md",
+ 		"parent": "components"
+ 	},
+ 	{
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index da2cd8c80056a3..4bff05bdba2d79 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Internal
+ 
++-   `Toolbar`: move all subcomponents under the same folder ([46951](https://github.com/WordPress/gutenberg/pull/46951)).
+ -   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
+ -   `ColorPicker` & `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom` ([#46448](https://github.com/WordPress/gutenberg/pull/46448)).
+ -   `SandBox`: Convert to TypeScript ([#46478](https://github.com/WordPress/gutenberg/pull/46478)).
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 96b2caf328f088..ee20e323a363e9 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -155,12 +155,14 @@ export {
+ 	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
+ 	ToggleGroupControlOptionIcon as __experimentalToggleGroupControlOptionIcon,
+ } from './toggle-group-control';
+-export { default as Toolbar } from './toolbar';
+-export { default as ToolbarButton } from './toolbar-button';
+-export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
+-export { default as __experimentalToolbarContext } from './toolbar-context';
+-export { default as ToolbarGroup } from './toolbar-group';
+-export { default as ToolbarItem } from './toolbar-item';
++export {
++	Toolbar,
++	ToolbarButton,
++	ToolbarContext as __experimentalToolbarContext,
++	ToolbarDropdownMenu,
++	ToolbarGroup,
++	ToolbarItem,
++} from './toolbar';
+ export {
+ 	ToolsPanel as __experimentalToolsPanel,
+ 	ToolsPanelItem as __experimentalToolsPanelItem,
+diff --git a/packages/components/src/index.native.js b/packages/components/src/index.native.js
+index 140ad940ace6eb..36ddedb60cf4ac 100644
+--- a/packages/components/src/index.native.js
++++ b/packages/components/src/index.native.js
+@@ -15,12 +15,14 @@ export { default as Dashicon } from './dashicon';
+ export { default as Dropdown } from './dropdown';
+ export { default as DropdownMenu } from './dropdown-menu';
+ export { default as FocalPointPicker } from './focal-point-picker';
+-export { default as Toolbar } from './toolbar';
+-export { default as ToolbarButton } from './toolbar-button';
+-export { default as __experimentalToolbarContext } from './toolbar-context';
+-export { default as ToolbarGroup } from './toolbar-group';
+-export { default as ToolbarItem } from './toolbar-item';
+-export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
++export {
++	Toolbar,
++	ToolbarButton,
++	ToolbarContext as __experimentalToolbarContext,
++	ToolbarDropdownMenu,
++	ToolbarGroup,
++	ToolbarItem,
++} from './toolbar';
+ export { default as Tooltip } from './tooltip';
+ export { default as Icon } from './icon';
+ export { default as Spinner } from './spinner';
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 80dc3dbb682669..1cb363cb6d50c2 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -44,7 +44,7 @@
+ @import "./tab-panel/style.scss";
+ @import "./text-control/style.scss";
+ @import "./tip/style.scss";
+-@import "./toolbar/style.scss";
+-@import "./toolbar-button/style.scss";
+-@import "./toolbar-group/style.scss";
++@import "./toolbar/toolbar/style.scss";
++@import "./toolbar/toolbar-button/style.scss";
++@import "./toolbar/toolbar-group/style.scss";
+ @import "./tooltip/style.scss";
+diff --git a/packages/components/src/toolbar/index.js b/packages/components/src/toolbar/index.js
+index f798e3c3776a9f..a337fd3af4d216 100644
+--- a/packages/components/src/toolbar/index.js
++++ b/packages/components/src/toolbar/index.js
+@@ -1,52 +1,6 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-import deprecated from '@wordpress/deprecated';
+-
+-/**
+- * Internal dependencies
+- */
+-import ToolbarGroup from '../toolbar-group';
+-import ToolbarContainer from './toolbar-container';
+-
+-/**
+- * Renders a toolbar.
+- *
+- * To add controls, simply pass `ToolbarButton` components as children.
+- *
+- * @param {Object} props             Component props.
+- * @param {string} [props.className] Class to set on the container div.
+- * @param {string} [props.label]     ARIA label for toolbar container.
+- * @param {Object} ref               React Element ref.
+- */
+-function Toolbar( { className, label, ...props }, ref ) {
+-	if ( ! label ) {
+-		deprecated( 'Using Toolbar without label prop', {
+-			since: '5.6',
+-			alternative: 'ToolbarGroup component',
+-			link: 'https://developer.wordpress.org/block-editor/components/toolbar/',
+-		} );
+-		return <ToolbarGroup { ...props } className={ className } />;
+-	}
+-	// `ToolbarGroup` already uses components-toolbar for compatibility reasons.
+-	const finalClassName = classnames(
+-		'components-accessible-toolbar',
+-		className
+-	);
+-	return (
+-		<ToolbarContainer
+-			className={ finalClassName }
+-			label={ label }
+-			ref={ ref }
+-			{ ...props }
+-		/>
+-	);
+-}
+-
+-export default forwardRef( Toolbar );
++export { default as Toolbar } from './toolbar';
++export { default as ToolbarButton } from './toolbar-button';
++export { default as ToolbarContext } from './toolbar-context';
++export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
++export { default as ToolbarGroup } from './toolbar-group';
++export { default as ToolbarItem } from './toolbar-item';
+diff --git a/packages/components/src/toolbar/stories/index.js b/packages/components/src/toolbar/stories/index.js
+index 298cd97a8674ab..a186c1c0de50ed 100644
+--- a/packages/components/src/toolbar/stories/index.js
++++ b/packages/components/src/toolbar/stories/index.js
+@@ -17,15 +17,8 @@ import {
+ /**
+  * Internal dependencies
+  */
+-import Toolbar from '../';
+-import {
+-	SVG,
+-	Path,
+-	ToolbarButton,
+-	ToolbarGroup,
+-	ToolbarItem,
+-	DropdownMenu,
+-} from '../../';
++import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarItem } from '..';
++import { SVG, Path, DropdownMenu } from '../../..';
+ 
+ export default { title: 'Components/Toolbar', component: Toolbar };
+ 
+diff --git a/packages/components/src/toolbar-button/stories/index.js b/packages/components/src/toolbar/stories/toolbar-button.js
+similarity index 89%
+rename from packages/components/src/toolbar-button/stories/index.js
+rename to packages/components/src/toolbar/stories/toolbar-button.js
+index 2a90172a793bd0..3740ed8b2bc10f 100644
+--- a/packages/components/src/toolbar-button/stories/index.js
++++ b/packages/components/src/toolbar/stories/toolbar-button.js
+@@ -11,8 +11,7 @@ import { wordpress } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import { Toolbar } from '../../';
+-import ToolbarButton from '../';
++import { Toolbar, ToolbarButton } from '..';
+ 
+ export default {
+ 	title: 'Components/ToolbarButton',
+diff --git a/packages/components/src/toolbar-group/stories/index.js b/packages/components/src/toolbar/stories/toolbar-group.js
+similarity index 92%
+rename from packages/components/src/toolbar-group/stories/index.js
+rename to packages/components/src/toolbar/stories/toolbar-group.js
+index c24447be9dfab4..d967fc72a63e43 100644
+--- a/packages/components/src/toolbar-group/stories/index.js
++++ b/packages/components/src/toolbar/stories/toolbar-group.js
+@@ -6,7 +6,7 @@ import { formatBold, formatItalic, link } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import { ToolbarButton, ToolbarGroup } from '../../';
++import { ToolbarButton, ToolbarGroup } from '..';
+ 
+ export default { title: 'Components/ToolbarGroup', component: ToolbarGroup };
+ 
+diff --git a/packages/components/src/toolbar/test/index.js b/packages/components/src/toolbar/test/index.js
+index 1b48415d28ca9e..c9e58edc8a80e8 100644
+--- a/packages/components/src/toolbar/test/index.js
++++ b/packages/components/src/toolbar/test/index.js
+@@ -6,8 +6,7 @@ import { render, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import Toolbar from '../';
+-import ToolbarButton from '../../toolbar-button';
++import { Toolbar, ToolbarButton } from '..';
+ 
+ describe( 'Toolbar', () => {
+ 	describe( 'basic rendering', () => {
+diff --git a/packages/components/src/toolbar-group/test/index.js b/packages/components/src/toolbar/test/toolbar-group.js
+similarity index 98%
+rename from packages/components/src/toolbar-group/test/index.js
+rename to packages/components/src/toolbar/test/toolbar-group.js
+index 4e521f6f8c4950..1b4c2613c4474c 100644
+--- a/packages/components/src/toolbar-group/test/index.js
++++ b/packages/components/src/toolbar/test/toolbar-group.js
+@@ -6,7 +6,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import ToolbarGroup from '../';
++import { ToolbarGroup } from '..';
+ 
+ describe( 'ToolbarGroup', () => {
+ 	describe( 'basic rendering', () => {
+diff --git a/packages/components/src/toolbar-button/README.md b/packages/components/src/toolbar/toolbar-button/README.md
+similarity index 100%
+rename from packages/components/src/toolbar-button/README.md
+rename to packages/components/src/toolbar/toolbar-button/README.md
+diff --git a/packages/components/src/toolbar-button/index.js b/packages/components/src/toolbar/toolbar-button/index.js
+similarity index 98%
+rename from packages/components/src/toolbar-button/index.js
+rename to packages/components/src/toolbar/toolbar-button/index.js
+index d053ea2b52cf6e..51300c304fdc7c 100644
+--- a/packages/components/src/toolbar-button/index.js
++++ b/packages/components/src/toolbar/toolbar-button/index.js
+@@ -9,7 +9,7 @@ import { useContext, forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import Button from '../button';
++import Button from '../../button';
+ import ToolbarItem from '../toolbar-item';
+ import ToolbarContext from '../toolbar-context';
+ import ToolbarButtonContainer from './toolbar-button-container';
+diff --git a/packages/components/src/toolbar-button/style.scss b/packages/components/src/toolbar/toolbar-button/style.scss
+similarity index 100%
+rename from packages/components/src/toolbar-button/style.scss
+rename to packages/components/src/toolbar/toolbar-button/style.scss
+diff --git a/packages/components/src/toolbar-button/toolbar-button-container.js b/packages/components/src/toolbar/toolbar-button/toolbar-button-container.js
+similarity index 100%
+rename from packages/components/src/toolbar-button/toolbar-button-container.js
+rename to packages/components/src/toolbar/toolbar-button/toolbar-button-container.js
+diff --git a/packages/components/src/toolbar-button/toolbar-button-container.native.js b/packages/components/src/toolbar/toolbar-button/toolbar-button-container.native.js
+similarity index 100%
+rename from packages/components/src/toolbar-button/toolbar-button-container.native.js
+rename to packages/components/src/toolbar/toolbar-button/toolbar-button-container.native.js
+diff --git a/packages/components/src/toolbar-context/index.js b/packages/components/src/toolbar/toolbar-context/index.js
+similarity index 100%
+rename from packages/components/src/toolbar-context/index.js
+rename to packages/components/src/toolbar/toolbar-context/index.js
+diff --git a/packages/components/src/toolbar-dropdown-menu/README.md b/packages/components/src/toolbar/toolbar-dropdown-menu/README.md
+similarity index 100%
+rename from packages/components/src/toolbar-dropdown-menu/README.md
+rename to packages/components/src/toolbar/toolbar-dropdown-menu/README.md
+diff --git a/packages/components/src/toolbar-dropdown-menu/index.js b/packages/components/src/toolbar/toolbar-dropdown-menu/index.js
+similarity index 95%
+rename from packages/components/src/toolbar-dropdown-menu/index.js
+rename to packages/components/src/toolbar/toolbar-dropdown-menu/index.js
+index 10b73757057bd2..5fcfe51313631c 100644
+--- a/packages/components/src/toolbar-dropdown-menu/index.js
++++ b/packages/components/src/toolbar/toolbar-dropdown-menu/index.js
+@@ -8,7 +8,7 @@ import { forwardRef, useContext } from '@wordpress/element';
+  */
+ import ToolbarItem from '../toolbar-item';
+ import ToolbarContext from '../toolbar-context';
+-import DropdownMenu from '../dropdown-menu';
++import DropdownMenu from '../../dropdown-menu';
+ 
+ function ToolbarDropdownMenu( props, ref ) {
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+diff --git a/packages/components/src/toolbar-group/README.md b/packages/components/src/toolbar/toolbar-group/README.md
+similarity index 100%
+rename from packages/components/src/toolbar-group/README.md
+rename to packages/components/src/toolbar/toolbar-group/README.md
+diff --git a/packages/components/src/toolbar-group/index.js b/packages/components/src/toolbar/toolbar-group/index.js
+similarity index 100%
+rename from packages/components/src/toolbar-group/index.js
+rename to packages/components/src/toolbar/toolbar-group/index.js
+diff --git a/packages/components/src/toolbar-group/style.native.scss b/packages/components/src/toolbar/toolbar-group/style.native.scss
+similarity index 100%
+rename from packages/components/src/toolbar-group/style.native.scss
+rename to packages/components/src/toolbar/toolbar-group/style.native.scss
+diff --git a/packages/components/src/toolbar-group/style.scss b/packages/components/src/toolbar/toolbar-group/style.scss
+similarity index 100%
+rename from packages/components/src/toolbar-group/style.scss
+rename to packages/components/src/toolbar/toolbar-group/style.scss
+diff --git a/packages/components/src/toolbar-group/toolbar-group-collapsed.js b/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.js
+similarity index 94%
+rename from packages/components/src/toolbar-group/toolbar-group-collapsed.js
+rename to packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.js
+index c671a4dd00f99f..371f4b9e5f6561 100644
+--- a/packages/components/src/toolbar-group/toolbar-group-collapsed.js
++++ b/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.js
+@@ -6,7 +6,7 @@ import { useContext } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import DropdownMenu from '../dropdown-menu';
++import DropdownMenu from '../../dropdown-menu';
+ import ToolbarContext from '../toolbar-context';
+ import ToolbarItem from '../toolbar-item';
+ 
+diff --git a/packages/components/src/toolbar-group/toolbar-group-collapsed.native.js b/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.native.js
+similarity index 92%
+rename from packages/components/src/toolbar-group/toolbar-group-collapsed.native.js
+rename to packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.native.js
+index 411a4e6edbd604..6fa7b6f6bc13be 100644
+--- a/packages/components/src/toolbar-group/toolbar-group-collapsed.native.js
++++ b/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.native.js
+@@ -9,7 +9,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
+ /**
+  * Internal dependencies
+  */
+-import DropdownMenu from '../dropdown-menu';
++import DropdownMenu from '../../dropdown-menu';
+ import styles from './style.scss';
+ 
+ function ToolbarGroupCollapsed( {
+diff --git a/packages/components/src/toolbar-group/toolbar-group-container.js b/packages/components/src/toolbar/toolbar-group/toolbar-group-container.js
+similarity index 100%
+rename from packages/components/src/toolbar-group/toolbar-group-container.js
+rename to packages/components/src/toolbar/toolbar-group/toolbar-group-container.js
+diff --git a/packages/components/src/toolbar-group/toolbar-group-container.native.js b/packages/components/src/toolbar/toolbar-group/toolbar-group-container.native.js
+similarity index 100%
+rename from packages/components/src/toolbar-group/toolbar-group-container.native.js
+rename to packages/components/src/toolbar/toolbar-group/toolbar-group-container.native.js
+diff --git a/packages/components/src/toolbar-item/README.md b/packages/components/src/toolbar/toolbar-item/README.md
+similarity index 100%
+rename from packages/components/src/toolbar-item/README.md
+rename to packages/components/src/toolbar/toolbar-item/README.md
+diff --git a/packages/components/src/toolbar-item/index.js b/packages/components/src/toolbar/toolbar-item/index.js
+similarity index 100%
+rename from packages/components/src/toolbar-item/index.js
+rename to packages/components/src/toolbar/toolbar-item/index.js
+diff --git a/packages/components/src/toolbar-item/index.native.js b/packages/components/src/toolbar/toolbar-item/index.native.js
+similarity index 100%
+rename from packages/components/src/toolbar-item/index.native.js
+rename to packages/components/src/toolbar/toolbar-item/index.native.js
+diff --git a/packages/components/src/toolbar/README.md b/packages/components/src/toolbar/toolbar/README.md
+similarity index 100%
+rename from packages/components/src/toolbar/README.md
+rename to packages/components/src/toolbar/toolbar/README.md
+diff --git a/packages/components/src/toolbar/toolbar/index.js b/packages/components/src/toolbar/toolbar/index.js
+new file mode 100644
+index 00000000000000..f798e3c3776a9f
+--- /dev/null
++++ b/packages/components/src/toolbar/toolbar/index.js
+@@ -0,0 +1,52 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
++
++/**
++ * Internal dependencies
++ */
++import ToolbarGroup from '../toolbar-group';
++import ToolbarContainer from './toolbar-container';
++
++/**
++ * Renders a toolbar.
++ *
++ * To add controls, simply pass `ToolbarButton` components as children.
++ *
++ * @param {Object} props             Component props.
++ * @param {string} [props.className] Class to set on the container div.
++ * @param {string} [props.label]     ARIA label for toolbar container.
++ * @param {Object} ref               React Element ref.
++ */
++function Toolbar( { className, label, ...props }, ref ) {
++	if ( ! label ) {
++		deprecated( 'Using Toolbar without label prop', {
++			since: '5.6',
++			alternative: 'ToolbarGroup component',
++			link: 'https://developer.wordpress.org/block-editor/components/toolbar/',
++		} );
++		return <ToolbarGroup { ...props } className={ className } />;
++	}
++	// `ToolbarGroup` already uses components-toolbar for compatibility reasons.
++	const finalClassName = classnames(
++		'components-accessible-toolbar',
++		className
++	);
++	return (
++		<ToolbarContainer
++			className={ finalClassName }
++			label={ label }
++			ref={ ref }
++			{ ...props }
++		/>
++	);
++}
++
++export default forwardRef( Toolbar );
+diff --git a/packages/components/src/toolbar/style.native.scss b/packages/components/src/toolbar/toolbar/style.native.scss
+similarity index 100%
+rename from packages/components/src/toolbar/style.native.scss
+rename to packages/components/src/toolbar/toolbar/style.native.scss
+diff --git a/packages/components/src/toolbar/style.scss b/packages/components/src/toolbar/toolbar/style.scss
+similarity index 100%
+rename from packages/components/src/toolbar/style.scss
+rename to packages/components/src/toolbar/toolbar/style.scss
+diff --git a/packages/components/src/toolbar/toolbar-container.js b/packages/components/src/toolbar/toolbar/toolbar-container.js
+similarity index 100%
+rename from packages/components/src/toolbar/toolbar-container.js
+rename to packages/components/src/toolbar/toolbar/toolbar-container.js
+diff --git a/packages/components/src/toolbar/toolbar-container.native.js b/packages/components/src/toolbar/toolbar/toolbar-container.native.js
+similarity index 100%
+rename from packages/components/src/toolbar/toolbar-container.native.js
+rename to packages/components/src/toolbar/toolbar/toolbar-container.native.js
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index ad419a2af4ec75..a116639b9df341 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -63,11 +63,6 @@
+ 		"src/panel",
+ 		"src/query-controls",
+ 		"src/toolbar",
+-		"src/toolbar-button",
+-		"src/toolbar-context",
+-		"src/toolbar-dropdown-menu",
+-		"src/toolbar-group",
+-		"src/toolbar-item",
+ 		"src/tree-grid"
+ 	]
+ }

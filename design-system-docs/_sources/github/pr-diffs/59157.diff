@@ -1,0 +1,457 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d4dfaac153f010..c65ecc55717428 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `Tooltip`: Explicitly set system font to avoid CSS bleed ([#59307](https://github.com/WordPress/gutenberg/pull/59307)).
+ 
++### Internal
++
++-   `SnackbarList`, `Snackbar`: add unit tests ([#59157](https://github.com/WordPress/gutenberg/pull/59157)).
++
+ ## 27.0.0 (2024-02-21)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/snackbar/index.tsx b/packages/components/src/snackbar/index.tsx
+index 48eb8ed4873801..c7a5a046a5e924 100644
+--- a/packages/components/src/snackbar/index.tsx
++++ b/packages/components/src/snackbar/index.tsx
+@@ -138,9 +138,12 @@ function UnforwardedSnackbar(
+ 			className={ classes }
+ 			onClick={ ! explicitDismiss ? dismissMe : undefined }
+ 			tabIndex={ 0 }
+-			role={ ! explicitDismiss ? 'button' : '' }
++			role={ ! explicitDismiss ? 'button' : undefined }
+ 			onKeyPress={ ! explicitDismiss ? dismissMe : undefined }
+-			aria-label={ ! explicitDismiss ? __( 'Dismiss this notice' ) : '' }
++			aria-label={
++				! explicitDismiss ? __( 'Dismiss this notice' ) : undefined
++			}
++			data-testid="snackbar"
+ 		>
+ 			<div className={ snackbarContentClassnames }>
+ 				{ icon && (
+diff --git a/packages/components/src/snackbar/list.tsx b/packages/components/src/snackbar/list.tsx
+index e423cf6c3a7f7e..13772f1f396f20 100644
+--- a/packages/components/src/snackbar/list.tsx
++++ b/packages/components/src/snackbar/list.tsx
+@@ -73,7 +73,12 @@ export function SnackbarList( {
+ 		( notice: SnackbarListProps[ 'notices' ][ number ] ) => () =>
+ 			onRemove?.( notice.id );
+ 	return (
+-		<div className={ className } tabIndex={ -1 } ref={ listRef }>
++		<div
++			className={ className }
++			tabIndex={ -1 }
++			ref={ listRef }
++			data-testid="snackbar-list"
++		>
+ 			{ children }
+ 			<AnimatePresence>
+ 				{ notices.map( ( notice ) => {
+diff --git a/packages/components/src/snackbar/stories/list.story.tsx b/packages/components/src/snackbar/stories/list.story.tsx
+index 5a759ddc661bfa..8548ffba1e1f09 100644
+--- a/packages/components/src/snackbar/stories/list.story.tsx
++++ b/packages/components/src/snackbar/stories/list.story.tsx
+@@ -70,7 +70,6 @@ Default.args = {
+ 				},
+ 			],
+ 			content: 'Post published.',
+-			isDismissible: true,
+ 			explicitDismiss: false,
+ 		},
+ 		{
+@@ -83,7 +82,6 @@ Default.args = {
+ 				},
+ 			],
+ 			content: 'Post updated.',
+-			isDismissible: true,
+ 			explicitDismiss: false,
+ 		},
+ 		{
+@@ -91,7 +89,6 @@ Default.args = {
+ 			spokenMessage: 'All content copied.',
+ 			actions: [],
+ 			content: 'All content copied.',
+-			isDismissible: true,
+ 			explicitDismiss: false,
+ 		},
+ 	],
+diff --git a/packages/components/src/snackbar/test/index.tsx b/packages/components/src/snackbar/test/index.tsx
+new file mode 100644
+index 00000000000000..6be4e58c928123
+--- /dev/null
++++ b/packages/components/src/snackbar/test/index.tsx
+@@ -0,0 +1,267 @@
++/**
++ * External dependencies
++ */
++import { render, screen, within } from '@testing-library/react';
++import { click } from '@ariakit/test';
++
++/**
++ * WordPress dependencies
++ */
++import { speak } from '@wordpress/a11y';
++import { SVG, Path } from '@wordpress/primitives';
++
++/**
++ * Internal dependencies
++ */
++import Snackbar from '../index';
++
++jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
++const mockedSpeak = jest.mocked( speak );
++
++describe( 'Snackbar', () => {
++	const testId = 'snackbar';
++
++	beforeEach( () => {
++		mockedSpeak.mockReset();
++	} );
++
++	it( 'should render correctly', () => {
++		render( <Snackbar>Message</Snackbar> );
++
++		const snackbar = screen.getByTestId( testId );
++
++		expect( snackbar ).toBeVisible();
++		expect( snackbar ).toHaveTextContent( 'Message' );
++	} );
++
++	it( 'should render with an additional className', () => {
++		render( <Snackbar className="gutenberg">Message</Snackbar> );
++
++		expect( screen.getByTestId( testId ) ).toHaveClass( 'gutenberg' );
++	} );
++
++	it( 'should render with an icon', () => {
++		const testIcon = (
++			<SVG data-testid="icon">
++				<Path />
++			</SVG>
++		);
++
++		render( <Snackbar icon={ testIcon }>Message</Snackbar> );
++
++		const snackbar = screen.getByTestId( testId );
++		const icon = within( snackbar ).getByTestId( 'icon' );
++
++		expect( icon ).toBeVisible();
++	} );
++
++	it( 'should be dismissible by clicking the snackbar', async () => {
++		const onRemove = jest.fn();
++		const onDismiss = jest.fn();
++
++		render(
++			<Snackbar onRemove={ onRemove } onDismiss={ onDismiss }>
++				Message
++			</Snackbar>
++		);
++
++		const snackbar = screen.getByTestId( testId );
++
++		expect( snackbar ).toHaveAttribute( 'role', 'button' );
++		expect( snackbar ).toHaveAttribute(
++			'aria-label',
++			'Dismiss this notice'
++		);
++
++		await click( snackbar );
++
++		expect( onRemove ).toHaveBeenCalledTimes( 1 );
++		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
++	} );
++
++	it( 'should not be dismissible by clicking the snackbar when the `explicitDismiss` prop is set to `true`', async () => {
++		const onRemove = jest.fn();
++		const onDismiss = jest.fn();
++
++		render(
++			<Snackbar
++				explicitDismiss
++				onRemove={ onRemove }
++				onDismiss={ onDismiss }
++			>
++				Message
++			</Snackbar>
++		);
++
++		const snackbar = screen.getByTestId( testId );
++
++		expect( snackbar ).not.toHaveAttribute( 'role', 'button' );
++		expect( snackbar ).not.toHaveAttribute(
++			'aria-label',
++			'Dismiss this notice'
++		);
++		expect( snackbar ).toHaveClass(
++			'components-snackbar-explicit-dismiss'
++		);
++
++		await click( snackbar );
++
++		expect( onRemove ).not.toHaveBeenCalled();
++		expect( onDismiss ).not.toHaveBeenCalled();
++	} );
++
++	it( 'should be dismissible by clicking the close button when the `explicitDismiss` prop is set to `true`', async () => {
++		const onRemove = jest.fn();
++		const onDismiss = jest.fn();
++
++		render(
++			<Snackbar
++				explicitDismiss
++				onRemove={ onRemove }
++				onDismiss={ onDismiss }
++			>
++				Message
++			</Snackbar>
++		);
++
++		const snackbar = screen.getByTestId( testId );
++		const closeButton = within( snackbar ).getByRole( 'button', {
++			name: 'Dismiss this notice',
++		} );
++
++		await click( closeButton );
++
++		expect( onRemove ).toHaveBeenCalledTimes( 1 );
++		expect( onDismiss ).toHaveBeenCalledTimes( 1 );
++	} );
++
++	describe( 'actions', () => {
++		it( 'should render only the first action with a warning when multiple actions are passed', () => {
++			render(
++				<Snackbar
++					actions={ [
++						{ label: 'One', url: 'https://example.com' },
++						{ label: 'Two', url: 'https://example.com' },
++						{ label: 'Three', url: 'https://example.com' },
++					] }
++				>
++					Message
++				</Snackbar>
++			);
++
++			expect( console ).toHaveWarnedWith(
++				'Snackbar can only have one action. Use Notice if your message requires many actions.'
++			);
++
++			const snackbar = screen.getByTestId( testId );
++			const action = within( snackbar ).getByRole( 'link' );
++
++			expect( action ).toBeVisible();
++			expect( action ).toHaveTextContent( 'One' );
++		} );
++
++		it( 'should be rendered as a link when the `url` prop is set', () => {
++			render(
++				<Snackbar
++					actions={ [
++						{ label: 'View post', url: 'https://example.com' },
++					] }
++				>
++					Post updated.
++				</Snackbar>
++			);
++
++			const snackbar = screen.getByTestId( testId );
++			const link = within( snackbar ).getByRole( 'link', {
++				name: 'View post',
++			} );
++
++			expect( link ).toHaveAttribute( 'href', 'https://example.com' );
++		} );
++
++		it( 'should be rendered as a button and call `onClick` when the `onClick` prop is set', async () => {
++			const onClick = jest.fn();
++
++			render(
++				<Snackbar actions={ [ { label: 'View post', onClick } ] }>
++					Post updated.
++				</Snackbar>
++			);
++
++			const snackbar = screen.getByTestId( testId );
++			const button = within( snackbar ).getByRole( 'button', {
++				name: 'View post',
++			} );
++
++			await click( button );
++
++			expect( onClick ).toHaveBeenCalledTimes( 1 );
++		} );
++
++		it( 'should be rendered as a link when the `url` prop and the `onClick` are set', () => {
++			render(
++				<Snackbar
++					actions={ [
++						{
++							label: 'View post',
++							url: 'https://example.com',
++							onClick: () => {},
++						},
++					] }
++				>
++					Post updated.
++				</Snackbar>
++			);
++
++			const snackbar = screen.getByTestId( testId );
++			const link = within( snackbar ).getByRole( 'link', {
++				name: 'View post',
++			} );
++			expect( link ).toBeVisible();
++		} );
++	} );
++
++	describe( 'useSpokenMessage', () => {
++		it( 'should speak the given message', () => {
++			render( <Snackbar>FYI</Snackbar> );
++
++			expect( speak ).toHaveBeenCalledWith( 'FYI', 'polite' );
++		} );
++
++		it( 'should speak the given message by explicit politeness', () => {
++			render( <Snackbar politeness="assertive">Uh oh!</Snackbar> );
++
++			expect( speak ).toHaveBeenCalledWith( 'Uh oh!', 'assertive' );
++		} );
++
++		it( 'should coerce a message to a string', () => {
++			// This test assumes that `@wordpress/a11y` is capable of handling
++			// markup strings appropriately.
++			render(
++				<Snackbar>
++					With <em>emphasis</em> this time.
++				</Snackbar>
++			);
++
++			expect( speak ).toHaveBeenCalledWith(
++				'With <em>emphasis</em> this time.',
++				'polite'
++			);
++		} );
++
++		it( 'should not re-speak an effectively equivalent element message', () => {
++			const { rerender } = render(
++				<Snackbar>
++					With <em>emphasis</em> this time.
++				</Snackbar>
++			);
++			rerender(
++				<Snackbar>
++					With <em>emphasis</em> this time.
++				</Snackbar>
++			);
++
++			expect( speak ).toHaveBeenCalledTimes( 1 );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/snackbar/test/list.tsx b/packages/components/src/snackbar/test/list.tsx
+new file mode 100644
+index 00000000000000..1b3749d42c61ef
+--- /dev/null
++++ b/packages/components/src/snackbar/test/list.tsx
+@@ -0,0 +1,46 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++import { click } from '@ariakit/test';
++
++/**
++ * Internal dependencies
++ */
++import SnackbarList from '../list';
++
++window.scrollTo = jest.fn();
++
++describe( 'SnackbarList', () => {
++	afterEach( () => {
++		jest.resetAllMocks();
++	} );
++
++	it( 'should get focus after a snackbar is dismissed', async () => {
++		render(
++			<SnackbarList
++				notices={ [
++					{
++						id: 'ID_1',
++						content: 'Post published.',
++						explicitDismiss: true,
++					},
++					{
++						id: 'ID_2',
++						content: 'Post updated.',
++						explicitDismiss: true,
++					},
++				] }
++				onRemove={ () => {} }
++			/>
++		);
++
++		await click(
++			screen.getAllByRole( 'button', {
++				name: 'Dismiss this notice',
++			} )[ 0 ]
++		);
++
++		expect( screen.getByTestId( 'snackbar-list' ) ).toHaveFocus();
++	} );
++} );
+diff --git a/packages/components/src/snackbar/types.ts b/packages/components/src/snackbar/types.ts
+index 539c4c3ebdf65e..13ed98ade8aa7a 100644
+--- a/packages/components/src/snackbar/types.ts
++++ b/packages/components/src/snackbar/types.ts
+@@ -6,7 +6,11 @@ import type { MutableRefObject, ReactNode } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { NoticeProps, NoticeChildren } from '../notice/types';
++import type {
++	NoticeProps,
++	NoticeChildren,
++	NoticeAction,
++} from '../notice/types';
+ 
+ type SnackbarOnlyProps = {
+ 	/**
+@@ -28,8 +32,32 @@ type SnackbarOnlyProps = {
+ 	listRef?: MutableRefObject< HTMLDivElement | null >;
+ };
+ 
+-export type SnackbarProps = Omit< NoticeProps, '__unstableHTML' > &
+-	SnackbarOnlyProps;
++export type SnackbarProps = Pick<
++	NoticeProps,
++	| 'className'
++	| 'children'
++	| 'spokenMessage'
++	| 'onRemove'
++	| 'politeness'
++	| 'onDismiss'
++> &
++	SnackbarOnlyProps & {
++		/**
++		 * An array of action objects. Each member object should contain:
++		 *
++		 * - `label`: `string` containing the text of the button/link
++		 * - `url`: `string` OR `onClick`: `( event: SyntheticEvent ) => void` to specify
++		 *    what the action does.
++		 *
++		 * The default appearance of an action button is inferred based on whether
++		 * `url` or `onClick` are provided, rendering the button as a link if
++		 * appropriate. If both props are provided, `url` takes precedence, and the
++		 * action button will render as an anchor tag.
++		 *
++		 * @default []
++		 */
++		actions?: Pick< NoticeAction, 'label' | 'url' | 'onClick' >[];
++	};
+ 
+ export type SnackbarListProps = {
+ 	notices: Array<

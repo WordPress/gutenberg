@@ -1,0 +1,39 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9614494f0f0e07..6b38ba0bd885aa 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,10 @@
+ -   `Button`: Fix logic of `has-text` class addition ([#56949](https://github.com/WordPress/gutenberg/pull/56949)).
+ -   `FormTokenField`: Fix a regression where the suggestion list would re-open after clicking away from the input ([#57002](https://github.com/WordPress/gutenberg/pull/57002)).
+ 
++### Enhancements
++
++-   `DateTimePicker`: Adjustment of the dot position on DayButton and expansion of the button area. ([#55502](https://github.com/WordPress/gutenberg/pull/55502)).
++
+ ### Experimental
+ 
+ -   `Tabs`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
+diff --git a/packages/components/src/date-time/date/styles.ts b/packages/components/src/date-time/date/styles.ts
+index 5500206abd40a2..992dab34544cea 100644
+--- a/packages/components/src/date-time/date/styles.ts
++++ b/packages/components/src/date-time/date/styles.ts
+@@ -84,8 +84,8 @@ export const DayButton = styled( Button, {
+ 
+ 	&&& {
+ 		border-radius: 100%;
+-		height: ${ space( 7 ) };
+-		width: ${ space( 7 ) };
++		height: ${ space( 8 ) };
++		width: ${ space( 8 ) };
+ 
+ 		${ ( props ) =>
+ 			props.isSelected &&
+@@ -108,7 +108,7 @@ export const DayButton = styled( Button, {
+ 		::before {
+ 			background: ${ props.isSelected ? COLORS.white : COLORS.theme.accent };
+ 			border-radius: 2px;
+-			bottom: 0;
++			bottom: 2px;
+ 			content: " ";
+ 			height: 4px;
+ 			left: 50%;

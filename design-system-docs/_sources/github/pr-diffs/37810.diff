@@ -1,0 +1,433 @@
+diff --git a/package-lock.json b/package-lock.json
+index 39b1b228d5aba0..0ef6009874ef56 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -15988,7 +15988,6 @@
+ 				"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
+ 				"@wordpress/keycodes": "file:packages/keycodes",
+ 				"@wordpress/priority-queue": "file:packages/priority-queue",
+-				"clipboard": "^2.0.8",
+ 				"lodash": "^4.17.21",
+ 				"mousetrap": "^1.6.5",
+ 				"react-resize-aware": "^3.1.0",
+@@ -27864,16 +27863,6 @@
+ 			"integrity": "sha1-/xnt6Kml5XkyQUewwR8PvLq+1jk=",
+ 			"dev": true
+ 		},
+-		"clipboard": {
+-			"version": "2.0.8",
+-			"resolved": "https://registry.npmjs.org/clipboard/-/clipboard-2.0.8.tgz",
+-			"integrity": "sha512-Y6WO0unAIQp5bLmk1zdThRhgJt/x3ks6f30s3oE3H1mgIEU33XyQjEf8gsf6DxC7NPX8Y1SsNWjUjL/ywLnnbQ==",
+-			"requires": {
+-				"good-listener": "^1.2.2",
+-				"select": "^1.1.2",
+-				"tiny-emitter": "^2.0.0"
+-			}
+-		},
+ 		"cliui": {
+ 			"version": "6.0.0",
+ 			"resolved": "https://registry.npmjs.org/cliui/-/cliui-6.0.0.tgz",
+@@ -30269,11 +30258,6 @@
+ 			"integrity": "sha1-3zrhmayt+31ECqrgsp4icrJOxhk=",
+ 			"dev": true
+ 		},
+-		"delegate": {
+-			"version": "3.2.0",
+-			"resolved": "https://registry.npmjs.org/delegate/-/delegate-3.2.0.tgz",
+-			"integrity": "sha512-IofjkYBZaZivn0V8nnsMJGBr4jVLxHDheKSW88PyxS5QC4Vo9ZbZVvhzlSxY87fVq3STR6r+4cGepyHkcWOQSw=="
+-		},
+ 		"delegates": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/delegates/-/delegates-1.0.0.tgz",
+@@ -35611,14 +35595,6 @@
+ 			"integrity": "sha1-L0SUrIkZ43Z8XLtpHp9GMyQoXUM=",
+ 			"dev": true
+ 		},
+-		"good-listener": {
+-			"version": "1.2.2",
+-			"resolved": "https://registry.npmjs.org/good-listener/-/good-listener-1.2.2.tgz",
+-			"integrity": "sha1-1TswzfkxPf+33JoNR3CWqm0UXFA=",
+-			"requires": {
+-				"delegate": "^3.1.2"
+-			}
+-		},
+ 		"got": {
+ 			"version": "10.7.0",
+ 			"resolved": "https://registry.npmjs.org/got/-/got-10.7.0.tgz",
+@@ -51908,11 +51884,6 @@
+ 				}
+ 			}
+ 		},
+-		"select": {
+-			"version": "1.1.2",
+-			"resolved": "https://registry.npmjs.org/select/-/select-1.1.2.tgz",
+-			"integrity": "sha1-DnNQrN7ICxEIUoeG7B1EGNEbOW0="
+-		},
+ 		"select-hose": {
+ 			"version": "2.0.0",
+ 			"resolved": "https://registry.npmjs.org/select-hose/-/select-hose-2.0.0.tgz",
+@@ -55885,11 +55856,6 @@
+ 			"integrity": "sha1-QFQRqOfmM5/mTbmiNN4R3DHgK9Q=",
+ 			"dev": true
+ 		},
+-		"tiny-emitter": {
+-			"version": "2.1.0",
+-			"resolved": "https://registry.npmjs.org/tiny-emitter/-/tiny-emitter-2.1.0.tgz",
+-			"integrity": "sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q=="
+-		},
+ 		"tinycolor2": {
+ 			"version": "1.4.2",
+ 			"resolved": "https://registry.npmjs.org/tinycolor2/-/tinycolor2-1.4.2.tgz",
+diff --git a/packages/compose/CHANGELOG.md b/packages/compose/CHANGELOG.md
+index 437fe56f1f13df..e7c68c609e0c55 100644
+--- a/packages/compose/CHANGELOG.md
++++ b/packages/compose/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   Refactored `useCopyToClipboard` and (deprecated) `useCopyOnClick` hooks to use native Clipboard API instead of third-party dependency `clipboard.js`, removing it from the repo ([#37713](https://github.com/WordPress/gutenberg/pull/37713)).
++
+ ## 5.0.0 (2021-07-29)
+ 
+ ### Breaking Change
+diff --git a/packages/compose/package.json b/packages/compose/package.json
+index 4e715c56d899ca..7a405765188ccf 100644
+--- a/packages/compose/package.json
++++ b/packages/compose/package.json
+@@ -38,7 +38,6 @@
+ 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+ 		"@wordpress/keycodes": "file:../keycodes",
+ 		"@wordpress/priority-queue": "file:../priority-queue",
+-		"clipboard": "^2.0.8",
+ 		"lodash": "^4.17.21",
+ 		"mousetrap": "^1.6.5",
+ 		"react-resize-aware": "^3.1.0",
+diff --git a/packages/compose/src/hooks/use-copy-on-click/index.js b/packages/compose/src/hooks/use-copy-on-click/index.js
+index 383be2b957342c..3340cbb50d1153 100644
+--- a/packages/compose/src/hooks/use-copy-on-click/index.js
++++ b/packages/compose/src/hooks/use-copy-on-click/index.js
+@@ -1,12 +1,7 @@
+-/**
+- * External dependencies
+- */
+-import Clipboard from 'clipboard';
+-
+ /**
+  * WordPress dependencies
+  */
+-import { useRef, useEffect, useState } from '@wordpress/element';
++import { useEffect, useState } from '@wordpress/element';
+ import deprecated from '@wordpress/deprecated';
+ 
+ /* eslint-disable jsdoc/no-undefined-types */
+@@ -30,45 +25,60 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
+ 		alternative: 'wp.compose.useCopyToClipboard',
+ 	} );
+ 
+-	/** @type {import('react').MutableRefObject<Clipboard | undefined>} */
+-	const clipboard = useRef();
+ 	const [ hasCopied, setHasCopied ] = useState( false );
+ 
+ 	useEffect( () => {
+ 		/** @type {number | undefined} */
+ 		let timeoutId;
++		/** @type Array<Element>) */
++		let triggers = [];
+ 
+ 		if ( ! ref.current ) {
+ 			return;
+ 		}
+ 
+-		// Clipboard listens to click events.
+-		clipboard.current = new Clipboard( ref.current, {
+-			text: () => ( typeof text === 'function' ? text() : text ),
+-		} );
++		// `triggers` is always an array, regardless of the value of the `ref` param.
++		if ( typeof ref.current === 'string' ) {
++			// expect `ref` to be a DOM selector
++			triggers = Array.from( document.querySelectorAll( ref.current ) );
++		} else if ( 'length' in ref.current ) {
++			// Expect `ref` to be a `NodeList`
++			triggers = Array.from( ref.current );
++		} else {
++			// Expect `ref` to be a single `Element`
++			triggers = [ ref.current ];
++		}
+ 
+-		clipboard.current.on( 'success', ( { clearSelection, trigger } ) => {
+-			// Clearing selection will move focus back to the triggering button,
+-			// ensuring that it is not reset to the body, and further that it is
+-			// kept within the rendered node.
+-			clearSelection();
++		/**
++		 * @param {Event} e
++		 */
++		const copyTextToClipboard = ( e ) => {
++			const trigger = /** @type {HTMLElement | null} */ ( e.target );
++			const currentWindow = trigger?.ownerDocument.defaultView || window;
++			const textToCopy = typeof text === 'function' ? text() : text || '';
+ 
+-			// Handle ClipboardJS focus bug, see https://github.com/zenorocha/clipboard.js/issues/680
+-			if ( trigger ) {
+-				/** @type {HTMLElement} */ ( trigger ).focus();
+-			}
++			currentWindow?.navigator?.clipboard
++				?.writeText( textToCopy )
++				.then( () => {
++					if ( timeout ) {
++						setHasCopied( true );
++						clearTimeout( timeoutId );
++						timeoutId = setTimeout(
++							() => setHasCopied( false ),
++							timeout
++						);
++					}
++				} );
++		};
+ 
+-			if ( timeout ) {
+-				setHasCopied( true );
+-				clearTimeout( timeoutId );
+-				timeoutId = setTimeout( () => setHasCopied( false ), timeout );
+-			}
+-		} );
++		triggers.forEach( ( t ) =>
++			t.addEventListener( 'click', copyTextToClipboard )
++		);
+ 
+ 		return () => {
+-			if ( clipboard.current ) {
+-				clipboard.current.destroy();
+-			}
++			triggers.forEach( ( t ) =>
++				t.removeEventListener( 'click', copyTextToClipboard )
++			);
+ 			clearTimeout( timeoutId );
+ 		};
+ 	}, [ text, timeout, setHasCopied ] );
+diff --git a/packages/compose/src/hooks/use-copy-on-click/test/index.js b/packages/compose/src/hooks/use-copy-on-click/test/index.js
+new file mode 100644
+index 00000000000000..9898197facc3ba
+--- /dev/null
++++ b/packages/compose/src/hooks/use-copy-on-click/test/index.js
+@@ -0,0 +1,82 @@
++/**
++ * External dependencies
++ */
++import {
++	act,
++	render,
++	screen,
++	fireEvent,
++	waitFor,
++} from '@testing-library/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import useCopyOnClick from '../';
++
++const ExampleComponent = ( { text, ...props } ) => {
++	const ref = useRef();
++
++	const hasCopied = useCopyOnClick( ref, text, 1000 );
++
++	return (
++		<button ref={ ref } { ...props }>
++			{ hasCopied ? 'Copied' : 'Click to copy' }
++		</button>
++	);
++};
++
++let clipboardValue;
++
++const originalClipboard = global.navigator.clipboard;
++const mockClipboard = {
++	writeText: jest.fn().mockImplementation( ( text ) => {
++		return new Promise( ( resolve ) => {
++			clipboardValue = text;
++			resolve();
++		} );
++	} ),
++};
++
++describe( 'useCopyOnClick', () => {
++	beforeAll( () => {
++		global.navigator.clipboard = mockClipboard;
++	} );
++
++	beforeEach( () => {
++		clipboardValue = undefined;
++	} );
++
++	afterAll( () => {
++		global.navigator.clipboard = originalClipboard;
++	} );
++
++	it( 'should copy the text to the clipboard and display a warning notice', async () => {
++		const textToBeCopied = 'mango';
++		render( <ExampleComponent text={ textToBeCopied } /> );
++
++		expect( console ).toHaveWarned();
++
++		const triggerButton = screen.getByText( 'Click to copy' );
++		fireEvent.click( triggerButton );
++
++		await waitFor( () =>
++			expect( clipboardValue ).toEqual( textToBeCopied )
++		);
++
++		// Check that the displayed text changes as a way of testing
++		// the `hasCopied` logic
++		expect( screen.getByText( 'Copied' ) ).toBeInTheDocument();
++
++		act( () => {
++			jest.runAllTimers();
++		} );
++
++		expect( screen.getByText( 'Click to copy' ) ).toBeInTheDocument();
++	} );
++} );
+diff --git a/packages/compose/src/hooks/use-copy-to-clipboard/index.js b/packages/compose/src/hooks/use-copy-to-clipboard/index.js
+index a7c40199f16d72..99b849c83afc66 100644
+--- a/packages/compose/src/hooks/use-copy-to-clipboard/index.js
++++ b/packages/compose/src/hooks/use-copy-to-clipboard/index.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import Clipboard from 'clipboard';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -39,32 +34,30 @@ export default function useCopyToClipboard( text, onSuccess ) {
+ 	// fresh when the callback is called.
+ 	const textRef = useUpdatedRef( text );
+ 	const onSuccessRef = useUpdatedRef( onSuccess );
+-	return useRefEffect( ( node ) => {
+-		// Clipboard listens to click events.
+-		const clipboard = new Clipboard( node, {
+-			text() {
+-				return typeof textRef.current === 'function'
++	return useRefEffect( ( trigger ) => {
++		if ( ! trigger ) {
++			return;
++		}
++
++		const copyTextToClipboard = () => {
++			const currentWindow = trigger.ownerDocument.defaultView || window;
++			const textToCopy =
++				typeof textRef.current === 'function'
+ 					? textRef.current()
+ 					: textRef.current || '';
+-			},
+-		} );
+ 
+-		clipboard.on( 'success', ( { clearSelection } ) => {
+-			// Clearing selection will move focus back to the triggering
+-			// button, ensuring that it is not reset to the body, and
+-			// further that it is kept within the rendered node.
+-			clearSelection();
+-			// Handle ClipboardJS focus bug, see
+-			// https://github.com/zenorocha/clipboard.js/issues/680
+-			node.focus();
++			currentWindow?.navigator?.clipboard
++				?.writeText( textToCopy )
++				.then( () => {
++					// Invoke callback
++					onSuccessRef?.current?.();
++				} );
++		};
+ 
+-			if ( onSuccessRef.current ) {
+-				onSuccessRef.current();
+-			}
+-		} );
++		trigger.addEventListener( 'click', copyTextToClipboard );
+ 
+ 		return () => {
+-			clipboard.destroy();
++			trigger.removeEventListener( 'click', copyTextToClipboard );
+ 		};
+ 	}, [] );
+ }
+diff --git a/packages/compose/src/hooks/use-copy-to-clipboard/test/index.js b/packages/compose/src/hooks/use-copy-to-clipboard/test/index.js
+new file mode 100644
+index 00000000000000..169e49ffc558ed
+--- /dev/null
++++ b/packages/compose/src/hooks/use-copy-to-clipboard/test/index.js
+@@ -0,0 +1,65 @@
++/**
++ * External dependencies
++ */
++import { render, screen, fireEvent, waitFor } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import useCopyToClipboard from '../';
++
++const ExampleComponent = ( { onSuccess, text, ...props } ) => {
++	const ref = useCopyToClipboard( text, onSuccess );
++
++	return (
++		<button ref={ ref } { ...props }>
++			Click to copy
++		</button>
++	);
++};
++
++let clipboardValue;
++
++const originalClipboard = global.navigator.clipboard;
++const mockClipboard = {
++	writeText: jest.fn().mockImplementation( ( text ) => {
++		return new Promise( ( resolve ) => {
++			clipboardValue = text;
++			resolve();
++		} );
++	} ),
++};
++
++describe( 'useCopyToClipboard', () => {
++	beforeAll( () => {
++		global.navigator.clipboard = mockClipboard;
++	} );
++
++	beforeEach( () => {
++		clipboardValue = undefined;
++	} );
++
++	afterAll( () => {
++		global.navigator.clipboard = originalClipboard;
++	} );
++
++	it( 'should copy the text to the clipboard', async () => {
++		const successCallback = jest.fn();
++		const textToBeCopied = 'papaya';
++
++		render(
++			<ExampleComponent
++				onSuccess={ successCallback }
++				text={ textToBeCopied }
++			/>
++		);
++
++		const triggerButton = screen.getByText( 'Click to copy' );
++		fireEvent.click( triggerButton );
++
++		await waitFor( () =>
++			expect( clipboardValue ).toEqual( textToBeCopied )
++		);
++		expect( successCallback ).toHaveBeenCalled();
++	} );
++} );

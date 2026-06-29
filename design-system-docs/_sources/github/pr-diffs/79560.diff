@@ -1,0 +1,1559 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 657e47f1fdd695..6a6688b9473bd8 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   Add a `Menu` component. ([#79560](https://github.com/WordPress/gutenberg/pull/79560))
++
+ ### Bug Fixes
+ 
+ -   `IconButton`: Restore the default tooltip delay on hover ([#79505](https://github.com/WordPress/gutenberg/pull/79505)).
+diff --git a/packages/ui/src/form/primitives/constants.ts b/packages/ui/src/form/primitives/constants.ts
+index 18bf509a05d119..fcfc7af6b5cd6e 100644
+--- a/packages/ui/src/form/primitives/constants.ts
++++ b/packages/ui/src/form/primitives/constants.ts
+@@ -1,5 +1,6 @@
+ /**
+- * Shared positioning defaults for item-list popups, e.g. Select or Combobox.
++ * Shared positioning defaults for item-list popups, e.g. Select, Combobox,
++ * Autocomplete, or Menu.
+  */
+ export const ITEM_POPUP_POSITIONER_PROPS = {
+ 	align: 'start',
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 1333f3564d2b65..2473f25b1c568f 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -11,6 +11,7 @@ export * from './form';
+ export * from './icon';
+ export * from './icon-button';
+ export * from './link';
++export * as Menu from './menu';
+ export * as Notice from './notice';
+ export * as Popover from './popover';
+ export * from './stack';
+diff --git a/packages/ui/src/menu/checkbox-item.tsx b/packages/ui/src/menu/checkbox-item.tsx
+new file mode 100644
+index 00000000000000..12aa26f47731bf
+--- /dev/null
++++ b/packages/ui/src/menu/checkbox-item.tsx
+@@ -0,0 +1,57 @@
++import { Menu as _Menu } from '@base-ui/react/menu';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { check } from '@wordpress/icons';
++import { Icon } from '../icon';
++import itemPopupStyles from '../utils/css/item-popup.module.css';
++import resetStyles from '../utils/css/resets.module.css';
++import styles from './style.module.css';
++import { ItemContent } from './item';
++import type { CheckboxItemProps } from './types';
++
++/**
++ * Renders a menu item that toggles a setting on or off.
++ */
++const CheckboxItem = forwardRef< HTMLDivElement, CheckboxItemProps >(
++	function MenuCheckboxItem(
++		{ children, className, prefix, suffix, ...props },
++		ref
++	) {
++		return (
++			<_Menu.CheckboxItem
++				ref={ ref }
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					itemPopupStyles.item,
++					styles.item,
++					styles[ 'has-indicator' ],
++					className
++				) }
++				{ ...props }
++			>
++				<ItemContent
++					prefix={
++						<>
++							<_Menu.CheckboxItemIndicator
++								keepMounted
++								className={ styles[ 'item-indicator' ] }
++							>
++								<Icon
++									icon={ check }
++									size={ 24 }
++									aria-hidden="true"
++								/>
++							</_Menu.CheckboxItemIndicator>
++							{ prefix }
++						</>
++					}
++					suffix={ suffix }
++				>
++					{ children }
++				</ItemContent>
++			</_Menu.CheckboxItem>
++		);
++	}
++);
++
++export { CheckboxItem };
+diff --git a/packages/ui/src/menu/group-label.tsx b/packages/ui/src/menu/group-label.tsx
+new file mode 100644
+index 00000000000000..6da50b5345f950
+--- /dev/null
++++ b/packages/ui/src/menu/group-label.tsx
+@@ -0,0 +1,22 @@
++import { Menu as _Menu } from '@base-ui/react/menu';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import styles from './style.module.css';
++import type { GroupLabelProps } from './types';
++
++/**
++ * Renders an accessible label for a menu group.
++ */
++const GroupLabel = forwardRef< HTMLDivElement, GroupLabelProps >(
++	function MenuGroupLabel( { className, ...props }, ref ) {
++		return (
++			<_Menu.GroupLabel
++				ref={ ref }
++				className={ clsx( styles[ 'group-label' ], className ) }
++				{ ...props }
++			/>
++		);
++	}
++);
++
++export { GroupLabel };
+diff --git a/packages/ui/src/menu/group.tsx b/packages/ui/src/menu/group.tsx
+new file mode 100644
+index 00000000000000..d9e87837a53d7c
+--- /dev/null
++++ b/packages/ui/src/menu/group.tsx
+@@ -0,0 +1,23 @@
++import { Menu as _Menu } from '@base-ui/react/menu';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import styles from './style.module.css';
++import type { GroupProps } from './types';
++
++/**
++ * Groups related menu items with a corresponding label.
++ */
++const Group = forwardRef< HTMLDivElement, GroupProps >( function MenuGroup(
++	{ className, ...props },
++	ref
++) {
++	return (
++		<_Menu.Group
++			ref={ ref }
++			className={ clsx( styles.group, className ) }
++			{ ...props }
++		/>
++	);
++} );
++
++export { Group };
+diff --git a/packages/ui/src/menu/index.ts b/packages/ui/src/menu/index.ts
+new file mode 100644
+index 00000000000000..f1922d28ef9489
+--- /dev/null
++++ b/packages/ui/src/menu/index.ts
+@@ -0,0 +1,37 @@
++import { CheckboxItem } from './checkbox-item';
++import { Group } from './group';
++import { GroupLabel } from './group-label';
++import { Item } from './item';
++import { ItemDescription } from './item-description';
++import { ItemLabel } from './item-label';
++import { LinkItem } from './link-item';
++import { Popup } from './popup';
++import { Portal } from './portal';
++import { Positioner } from './positioner';
++import { RadioGroup } from './radio-group';
++import { RadioItem } from './radio-item';
++import { Root } from './root';
++import { Separator } from './separator';
++import { SubmenuRoot } from './submenu-root';
++import { SubmenuTrigger } from './submenu-trigger';
++import { Trigger } from './trigger';
++
++export {
++	CheckboxItem,
++	Group,
++	GroupLabel,
++	Item,
++	ItemDescription,
++	ItemLabel,
++	LinkItem,
++	Popup,
++	Portal,
++	Positioner,
++	RadioGroup,
++	RadioItem,
++	Root,
++	Separator,
++	SubmenuRoot,
++	SubmenuTrigger,
++	Trigger,
++};
+diff --git a/packages/ui/src/menu/item-description.tsx b/packages/ui/src/menu/item-description.tsx
+new file mode 100644
+index 00000000000000..72e7e5f9cd26cb
+--- /dev/null
++++ b/packages/ui/src/menu/item-description.tsx
+@@ -0,0 +1,23 @@
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { Text } from '../text';
++import styles from './style.module.css';
++import type { ItemDescriptionProps } from './types';
++
++/**
++ * Renders supplementary text below a menu item label.
++ */
++const ItemDescription = forwardRef< HTMLSpanElement, ItemDescriptionProps >(
++	function MenuItemDescription( { className, ...props }, ref ) {
++		return (
++			<Text
++				ref={ ref }
++				variant="body-sm"
++				className={ clsx( styles[ 'item-description' ], className ) }
++				{ ...props }
++			/>
++		);
++	}
++);
++
++export { ItemDescription };
+diff --git a/packages/ui/src/menu/item-label.tsx b/packages/ui/src/menu/item-label.tsx
+new file mode 100644
+index 00000000000000..3cd5066f06fc0c
+--- /dev/null
++++ b/packages/ui/src/menu/item-label.tsx
+@@ -0,0 +1,23 @@
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { Text } from '../text';
++import styles from './style.module.css';
++import type { ItemLabelProps } from './types';
++
++/**
++ * Renders the primary label within a menu item.
++ */
++const ItemLabel = forwardRef< HTMLSpanElement, ItemLabelProps >(
++	function MenuItemLabel( { className, ...props }, ref ) {
++		return (
++			<Text
++				ref={ ref }
++				variant="body-md"
++				className={ clsx( styles[ 'item-label' ], className ) }
++				{ ...props }
++			/>
++		);
++	}
++);
++
++export { ItemLabel };
+diff --git a/packages/ui/src/menu/item.tsx b/packages/ui/src/menu/item.tsx
+new file mode 100644
+index 00000000000000..cd3f6cf3c38236
+--- /dev/null
++++ b/packages/ui/src/menu/item.tsx
+@@ -0,0 +1,72 @@
++import { Menu as _Menu } from '@base-ui/react/menu';
++import clsx from 'clsx';
++import { Children, forwardRef, isValidElement } from '@wordpress/element';
++import itemPopupStyles from '../utils/css/item-popup.module.css';
++import resetStyles from '../utils/css/resets.module.css';
++import styles from './style.module.css';
++import { ItemDescription } from './item-description';
++import { ItemLabel } from './item-label';
++import type { ItemProps } from './types';
++
++function hasStructuredItemContent( children: ItemProps[ 'children' ] ) {
++	return Children.toArray( children ).some(
++		( child ) =>
++			isValidElement( child ) &&
++			( child.type === ItemLabel || child.type === ItemDescription )
++	);
++}
++
++function ItemContent( {
++	children,
++	prefix,
++	suffix,
++}: Pick< ItemProps, 'children' | 'prefix' | 'suffix' > ) {
++	const itemChildren = hasStructuredItemContent( children ) ? (
++		children
++	) : (
++		<ItemLabel>{ children }</ItemLabel>
++	);
++
++	return (
++		<>
++			<span className={ styles[ 'item-prefix' ] }>{ prefix }</span>
++			<span className={ styles[ 'item-content' ] }>
++				<span className={ styles[ 'item-children' ] }>
++					{ itemChildren }
++				</span>
++				{ suffix && (
++					<span className={ styles[ 'item-suffix' ] }>
++						{ suffix }
++					</span>
++				) }
++			</span>
++		</>
++	);
++}
++
++/**
++ * Renders an individual menu item.
++ */
++const Item = forwardRef< HTMLDivElement, ItemProps >( function MenuItem(
++	{ children, className, prefix, suffix, ...props },
++	ref
++) {
++	return (
++		<_Menu.Item
++			ref={ ref }
++			className={ clsx(
++				resetStyles[ 'box-sizing' ],
++				itemPopupStyles.item,
++				styles.item,
++				className
++			) }
++			{ ...props }
++		>
++			<ItemContent prefix={ prefix } suffix={ suffix }>
++				{ children }
++			</ItemContent>
++		</_Menu.Item>
++	);
++} );
++
++export { Item, ItemContent };
+diff --git a/packages/ui/src/menu/link-item.tsx b/packages/ui/src/menu/link-item.tsx
+new file mode 100644
+index 00000000000000..0cb9cadd9ea53e
+--- /dev/null
++++ b/packages/ui/src/menu/link-item.tsx
+@@ -0,0 +1,37 @@
++import { Menu as _Menu } from '@base-ui/react/menu';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import itemPopupStyles from '../utils/css/item-popup.module.css';
++import defenseStyles from '../utils/css/global-css-defense.module.css';
++import resetStyles from '../utils/css/resets.module.css';
++import styles from './style.module.css';
++import { ItemContent } from './item';
++import type { LinkItemProps } from './types';
++
++/**
++ * Renders a menu item that navigates to a link target.
++ */
++const LinkItem = forwardRef< Element, LinkItemProps >( function MenuLinkItem(
++	{ children, className, prefix, suffix, ...props },
++	ref
++) {
++	return (
++		<_Menu.LinkItem
++			ref={ ref }
++			className={ clsx(
++				defenseStyles.a,
++				resetStyles[ 'box-sizing' ],
++				itemPopupStyles.item,
++				styles.item,
++				className
++			) }
++			{ ...props }
++		>
++			<ItemContent prefix={ prefix } suffix={ suffix }>
++				{ children }
++			</ItemContent>
++		</_Menu.LinkItem>
++	);
++} );
++
++export { LinkItem };
+diff --git a/packages/ui/src/menu/popup.tsx b/packages/ui/src/menu/popup.tsx
+new file mode 100644
+index 00000000000000..b6a13e768bd96d
+--- /dev/null
++++ b/packages/ui/src/menu/popup.tsx
+@@ -0,0 +1,54 @@
++import { Menu as _Menu } from '@base-ui/react/menu';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { ThemeProvider } from '@wordpress/theme';
++import { renderSlotWithChildren } from '../utils/render-slot-with-children';
++import itemPopupStyles from '../utils/css/item-popup.module.css';
++import styles from './style.module.css';
++import { Portal } from './portal';
++import { Positioner } from './positioner';
++import type { PopupProps } from './types';
++
++/**
++ * Renders the floating menu popup.
++ */
++const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
++	{ children, className, portal, positioner, ...props },
++	ref
++) {
++	const popupContent = (
++		<ThemeProvider>
++			<_Menu.Popup
++				ref={ ref }
++				className={ clsx(
++					itemPopupStyles.popup,
++					styles.popup,
++					className
++				) }
++				{ ...props }
++			>
++				<div
++					/*
++					 * `styles.list` flattens this wrapper so menu items can
++					 * participate in the popup's shared grid. Keep
++					 * `itemPopupStyles.list` for inherited typography only;
++					 * scroll behavior lives on the popup.
++					 */
++					className={ clsx( itemPopupStyles.list, styles.list ) }
++				>
++					{ children }
++				</div>
++			</_Menu.Popup>
++		</ThemeProvider>
++	);
++
++	const positionedPopup = renderSlotWithChildren(
++		positioner,
++		<Positioner />,
++		popupContent
++	);
++
++	return renderSlotWithChildren( portal, <Portal />, positionedPopup );
++} );
++
++export { Popup };
+diff --git a/packages/ui/src/menu/portal.tsx b/packages/ui/src/menu/portal.tsx
+new file mode 100644
+index 00000000000000..400637d6b8cbb2
+--- /dev/null
++++ b/packages/ui/src/menu/portal.tsx
+@@ -0,0 +1,22 @@
++import { Menu as _Menu } from '@base-ui/react/menu';
++import { forwardRef } from '@wordpress/element';
++import { getWpCompatOverlaySlot } from '../utils/wp-compat-overlay-slot';
++import type { PortalProps } from './types';
++
++/**
++ * Portals the menu popup to the document body by default.
++ */
++const Portal = forwardRef< HTMLDivElement, PortalProps >( function MenuPortal(
++	{ container, ...props },
++	ref
++) {
++	return (
++		<_Menu.Portal
++			ref={ ref }
++			container={ container ?? getWpCompatOverlaySlot() }
++			{ ...props }
++		/>
++	);
++} );
++
++export { Portal };
+diff --git a/packages/ui/src/menu/positioner.tsx b/packages/ui/src/menu/positioner.tsx
+new file mode 100644
+index 00000000000000..38eba02e11353b
+--- /dev/null
++++ b/packages/ui/src/menu/positioner.tsx
+@@ -0,0 +1,38 @@
++import clsx from 'clsx';
++import { Menu as _Menu } from '@base-ui/react/menu';
++import { forwardRef } from '@wordpress/element';
++import { ITEM_POPUP_POSITIONER_PROPS } from '../form/primitives/constants';
++import resetStyles from '../utils/css/resets.module.css';
++import styles from './style.module.css';
++import type { PositionerProps } from './types';
++
++/**
++ * Used to apply custom positioning to `Menu`'s floating content.
++ */
++const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
++	function MenuPositioner(
++		{
++			className,
++			sideOffset = ITEM_POPUP_POSITIONER_PROPS.sideOffset,
++			collisionPadding = ITEM_POPUP_POSITIONER_PROPS.collisionPadding,
++			...props
++		},
++		ref
++	) {
++		return (
++			<_Menu.Positioner
++				sideOffset={ sideOffset }
++				collisionPadding={ collisionPadding }
++				{ ...props }
++				ref={ ref }
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					styles.positioner,
++					className
++				) }
++			/>
++		);
++	}
++);
++
++export { Positioner };
+diff --git a/packages/ui/src/menu/radio-group.tsx b/packages/ui/src/menu/radio-group.tsx
+new file mode 100644
+index 00000000000000..6c98ae445131b3
+--- /dev/null
++++ b/packages/ui/src/menu/radio-group.tsx
+@@ -0,0 +1,22 @@
++import { Menu as _Menu } from '@base-ui/react/menu';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import styles from './style.module.css';
++import type { RadioGroupProps } from './types';
++
++/**
++ * Groups related radio menu items.
++ */
++const RadioGroup = forwardRef< HTMLDivElement, RadioGroupProps >(
++	function MenuRadioGroup( { className, ...props }, ref ) {
++		return (
++			<_Menu.RadioGroup
++				ref={ ref }
++				className={ clsx( styles.group, className ) }
++				{ ...props }
++			/>
++		);
++	}
++);
++
++export { RadioGroup };
+diff --git a/packages/ui/src/menu/radio-item.tsx b/packages/ui/src/menu/radio-item.tsx
+new file mode 100644
+index 00000000000000..424acdc112ec8e
+--- /dev/null
++++ b/packages/ui/src/menu/radio-item.tsx
+@@ -0,0 +1,54 @@
++import { Menu as _Menu } from '@base-ui/react/menu';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import itemPopupStyles from '../utils/css/item-popup.module.css';
++import resetStyles from '../utils/css/resets.module.css';
++import styles from './style.module.css';
++import { ItemContent } from './item';
++import type { RadioItemProps } from './types';
++
++/**
++ * Renders a menu item that works like a radio button in a group.
++ */
++const RadioItem = forwardRef< HTMLDivElement, RadioItemProps >(
++	function MenuRadioItem(
++		{ children, className, prefix, suffix, ...props },
++		ref
++	) {
++		return (
++			<_Menu.RadioItem
++				ref={ ref }
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					itemPopupStyles.item,
++					styles.item,
++					styles[ 'has-indicator' ],
++					className
++				) }
++				{ ...props }
++			>
++				<ItemContent
++					prefix={
++						<>
++							<_Menu.RadioItemIndicator
++								keepMounted
++								className={ styles[ 'item-indicator' ] }
++							>
++								<span
++									className={ styles[ 'radio-indicator' ] }
++									aria-hidden="true"
++								/>
++							</_Menu.RadioItemIndicator>
++							{ prefix }
++						</>
++					}
++					suffix={ suffix }
++				>
++					{ children }
++				</ItemContent>
++			</_Menu.RadioItem>
++		);
++	}
++);
++
++export { RadioItem };
+diff --git a/packages/ui/src/menu/root.tsx b/packages/ui/src/menu/root.tsx
+new file mode 100644
+index 00000000000000..f87f9b6b5cfd62
+--- /dev/null
++++ b/packages/ui/src/menu/root.tsx
+@@ -0,0 +1,25 @@
++import { Menu as _Menu } from '@base-ui/react/menu';
++import type { RootProps } from './types';
++
++/**
++ * Groups all parts of a menu.
++ *
++ * `Menu.Root` manages the open state and provides context for menu triggers,
++ * popups, and items. Compose it with `Menu.Trigger` and `Menu.Popup` to build
++ * a menu button, and with `Menu.SubmenuRoot` / `Menu.SubmenuTrigger` to build
++ * nested menus.
++ *
++ * ```jsx
++ * <Menu.Root>
++ *   <Menu.Trigger>Open menu</Menu.Trigger>
++ *   <Menu.Popup>
++ *     <Menu.Item>Action</Menu.Item>
++ *   </Menu.Popup>
++ * </Menu.Root>
++ * ```
++ */
++function Root< Payload = unknown >( props: RootProps< Payload > ) {
++	return <_Menu.Root< Payload > { ...props } />;
++}
++
++export { Root };
+diff --git a/packages/ui/src/menu/separator.tsx b/packages/ui/src/menu/separator.tsx
+new file mode 100644
+index 00000000000000..47de8c393f8011
+--- /dev/null
++++ b/packages/ui/src/menu/separator.tsx
+@@ -0,0 +1,22 @@
++import { Menu as _Menu } from '@base-ui/react/menu';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import styles from './style.module.css';
++import type { SeparatorProps } from './types';
++
++/**
++ * Renders a visual and semantic separator between menu items.
++ */
++const Separator = forwardRef< HTMLDivElement, SeparatorProps >(
++	function MenuSeparator( { className, ...props }, ref ) {
++		return (
++			<_Menu.Separator
++				ref={ ref }
++				className={ clsx( styles.separator, className ) }
++				{ ...props }
++			/>
++		);
++	}
++);
++
++export { Separator };
+diff --git a/packages/ui/src/menu/stories/index.story.tsx b/packages/ui/src/menu/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..0b6aa8f787f194
+--- /dev/null
++++ b/packages/ui/src/menu/stories/index.story.tsx
+@@ -0,0 +1,245 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { useState } from '@wordpress/element';
++import { archive } from '@wordpress/icons';
++import { Icon } from '../../icon';
++import * as Menu from '../';
++
++const meta: Meta< typeof Menu.Root > = {
++	title: 'Design System/Components/Menu',
++	component: Menu.Root,
++	subcomponents: {
++		'Menu.Trigger': Menu.Trigger,
++		'Menu.Portal': Menu.Portal,
++		'Menu.Positioner': Menu.Positioner,
++		'Menu.Popup': Menu.Popup,
++		'Menu.Item': Menu.Item,
++		'Menu.ItemLabel': Menu.ItemLabel,
++		'Menu.ItemDescription': Menu.ItemDescription,
++		'Menu.LinkItem': Menu.LinkItem,
++		'Menu.CheckboxItem': Menu.CheckboxItem,
++		'Menu.RadioGroup': Menu.RadioGroup,
++		'Menu.RadioItem': Menu.RadioItem,
++		'Menu.Group': Menu.Group,
++		'Menu.GroupLabel': Menu.GroupLabel,
++		'Menu.Separator': Menu.Separator,
++		'Menu.SubmenuRoot': Menu.SubmenuRoot,
++		'Menu.SubmenuTrigger': Menu.SubmenuTrigger,
++	},
++	argTypes: {
++		children: { control: false },
++	},
++	parameters: {
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
++		},
++	},
++};
++
++export default meta;
++
++type Story = StoryObj< typeof Menu.Root >;
++
++export const Default: Story = {
++	args: {
++		children: (
++			<>
++				<Menu.Trigger>Open menu</Menu.Trigger>
++				<Menu.Popup>
++					<Menu.Item>Add to library</Menu.Item>
++					<Menu.Item
++						prefix={
++							<Icon icon={ archive } size={ 24 } aria-hidden />
++						}
++					>
++						Archive
++					</Menu.Item>
++					<Menu.Item suffix="⌘S">Save</Menu.Item>
++					<Menu.Separator />
++					<Menu.Group>
++						<Menu.GroupLabel>Playback</Menu.GroupLabel>
++						<Menu.Item>Play next</Menu.Item>
++						<Menu.Item>Play last</Menu.Item>
++					</Menu.Group>
++					<Menu.Separator />
++					<Menu.LinkItem href="https://wordpress.org">
++						WordPress.org
++					</Menu.LinkItem>
++					<Menu.Item disabled>Unavailable action</Menu.Item>
++				</Menu.Popup>
++			</>
++		),
++	},
++};
++
++export const RichItems: Story = {
++	args: {
++		children: (
++			<>
++				<Menu.Trigger>Open menu</Menu.Trigger>
++				<Menu.Popup>
++					<Menu.Item>
++						<Menu.ItemLabel>Label</Menu.ItemLabel>
++						<Menu.ItemDescription>Help text</Menu.ItemDescription>
++					</Menu.Item>
++					<Menu.Item>
++						<Menu.ItemLabel>
++							Label with a long description
++						</Menu.ItemLabel>
++						<Menu.ItemDescription>
++							The menu item description wraps within the popup
++							instead of creating extra grid columns.
++						</Menu.ItemDescription>
++					</Menu.Item>
++					<Menu.Item
++						prefix={
++							<Icon icon={ archive } size={ 24 } aria-hidden />
++						}
++						suffix="⌘S"
++					>
++						<Menu.ItemLabel>With prefix and suffix</Menu.ItemLabel>
++						<Menu.ItemDescription>
++							Description text keeps the same highlighted area.
++						</Menu.ItemDescription>
++					</Menu.Item>
++					<Menu.Item disabled suffix="⌘D">
++						<Menu.ItemLabel>Disabled item</Menu.ItemLabel>
++						<Menu.ItemDescription>
++							Disabled foreground treatment applies to all item
++							content.
++						</Menu.ItemDescription>
++					</Menu.Item>
++				</Menu.Popup>
++			</>
++		),
++	},
++};
++
++export const Submenu: Story = {
++	args: {
++		children: (
++			<>
++				<Menu.Trigger>Open menu</Menu.Trigger>
++				<Menu.Popup>
++					<Menu.Item>Rename</Menu.Item>
++					<Menu.SubmenuRoot>
++						<Menu.SubmenuTrigger suffix="⌘M">
++							<Menu.ItemLabel>
++								Move to another collection
++							</Menu.ItemLabel>
++						</Menu.SubmenuTrigger>
++						<Menu.Popup>
++							<Menu.Item>Archive</Menu.Item>
++							<Menu.Item>Favorites</Menu.Item>
++							<Menu.SubmenuRoot>
++								<Menu.SubmenuTrigger>
++									<Menu.ItemLabel>
++										More destinations
++									</Menu.ItemLabel>
++								</Menu.SubmenuTrigger>
++								<Menu.Popup>
++									<Menu.Item>Reviewed</Menu.Item>
++									<Menu.Item>Shared</Menu.Item>
++								</Menu.Popup>
++							</Menu.SubmenuRoot>
++						</Menu.Popup>
++					</Menu.SubmenuRoot>
++					<Menu.Item>Delete</Menu.Item>
++				</Menu.Popup>
++			</>
++		),
++	},
++};
++
++export const CheckboxItems: Story = {
++	render: function Render() {
++		const [ bookmarks, setBookmarks ] = useState( true );
++		const [ downloads, setDownloads ] = useState( false );
++
++		return (
++			<Menu.Root>
++				<Menu.Trigger>Columns</Menu.Trigger>
++				<Menu.Popup>
++					<Menu.Group>
++						<Menu.GroupLabel>Visible columns</Menu.GroupLabel>
++						<Menu.CheckboxItem
++							checked={ bookmarks }
++							onCheckedChange={ setBookmarks }
++						>
++							<Menu.ItemLabel>Bookmarks</Menu.ItemLabel>
++							<Menu.ItemDescription>
++								Show saved pages in the table.
++							</Menu.ItemDescription>
++						</Menu.CheckboxItem>
++						<Menu.CheckboxItem
++							checked={ downloads }
++							onCheckedChange={ setDownloads }
++							suffix="⌘D"
++						>
++							<Menu.ItemLabel>Downloads</Menu.ItemLabel>
++							<Menu.ItemDescription>
++								Show downloaded files in the table.
++							</Menu.ItemDescription>
++						</Menu.CheckboxItem>
++					</Menu.Group>
++				</Menu.Popup>
++			</Menu.Root>
++		);
++	},
++};
++
++export const RadioItems: Story = {
++	render: function Render() {
++		const [ value, setValue ] = useState( 'name' );
++
++		return (
++			<Menu.Root>
++				<Menu.Trigger>Sort</Menu.Trigger>
++				<Menu.Popup>
++					<Menu.RadioGroup value={ value } onValueChange={ setValue }>
++						<Menu.Group>
++							<Menu.GroupLabel>Sort by</Menu.GroupLabel>
++							<Menu.RadioItem value="name">
++								<Menu.ItemLabel>Name</Menu.ItemLabel>
++								<Menu.ItemDescription>
++									Sort alphabetically.
++								</Menu.ItemDescription>
++							</Menu.RadioItem>
++							<Menu.RadioItem value="date">
++								<Menu.ItemLabel>Date</Menu.ItemLabel>
++								<Menu.ItemDescription>
++									Sort by most recent activity.
++								</Menu.ItemDescription>
++							</Menu.RadioItem>
++							<Menu.RadioItem value="manual">
++								<Menu.ItemLabel>Manual</Menu.ItemLabel>
++								<Menu.ItemDescription>
++									Keep the current custom order.
++								</Menu.ItemDescription>
++							</Menu.RadioItem>
++						</Menu.Group>
++					</Menu.RadioGroup>
++				</Menu.Popup>
++			</Menu.Root>
++		);
++	},
++};
++
++export const Positioning: Story = {
++	args: {
++		children: (
++			<>
++				<Menu.Trigger>Open menu</Menu.Trigger>
++				<Menu.Popup
++					positioner={
++						<Menu.Positioner side="right" align="start" />
++					}
++				>
++					<Menu.Item>Duplicate</Menu.Item>
++					<Menu.Item>Move</Menu.Item>
++				</Menu.Popup>
++			</>
++		),
++	},
++};
+diff --git a/packages/ui/src/menu/style.module.css b/packages/ui/src/menu/style.module.css
+new file mode 100644
+index 00000000000000..1baa63dd1e5441
+--- /dev/null
++++ b/packages/ui/src/menu/style.module.css
+@@ -0,0 +1,154 @@
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
++
++	@layer components {
++		.positioner {
++			z-index: var(--wp-ui-menu-z-index, initial);
++		}
++
++		.popup {
++			--wp-ui-menu-min-width: calc(var(--wpds-dimension-size-lg) * 4);
++			--wp-ui-menu-max-width: calc(var(--wpds-dimension-size-lg) * 8);
++
++			display: grid;
++			grid-template-areas: none;
++			grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
++			grid-template-rows: auto;
++			min-width: max(var(--anchor-width, 0px), var(--wp-ui-menu-min-width));
++			max-width: min(var(--available-width), var(--wp-ui-menu-max-width));
++			overflow-block: auto;
++			overscroll-behavior: contain;
++			padding-block: var(--wp-ui-popup-padding);
++			scroll-padding-block: var(--wp-ui-popup-padding);
++		}
++
++		.list {
++			display: contents;
++		}
++
++		.group {
++			display: contents;
++		}
++
++		.group-label {
++			display: flex;
++			grid-column: 1 / -1;
++			align-items: center;
++			min-height: var(--wpds-dimension-size-md);
++			padding-block: var(--wpds-dimension-padding-xs);
++			padding-inline: var(--wpds-dimension-padding-md);
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wpds-typography-font-size-xs);
++			font-weight: var(--wpds-typography-font-weight-medium);
++			line-height: var(--wpds-typography-line-height-sm);
++			color: var(--wpds-color-foreground-content-neutral-weak);
++			text-transform: uppercase;
++		}
++
++		.separator {
++			grid-column: 1 / -1;
++			height: var(--wpds-border-width-xs);
++			margin-block: var(--wpds-dimension-gap-xs);
++			margin-inline: var(--wpds-dimension-padding-md);
++			background-color: var(--wpds-color-stroke-surface-neutral-weak);
++
++			@media ( forced-colors: active ) {
++				background-color: CanvasText;
++			}
++		}
++
++		.item {
++			display: grid;
++			grid-column: 1 / -1;
++			grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
++			text-decoration: none;
++
++			@supports ( grid-template-columns: subgrid ) {
++				grid-template-columns: subgrid;
++			}
++		}
++
++		.item-prefix {
++			grid-column: 1;
++			display: flex;
++			align-items: center;
++			justify-content: center;
++			gap: var(--wpds-dimension-gap-xs);
++			color: var(--wpds-color-foreground-content-neutral-weak);
++		}
++
++		.has-indicator > .item-prefix,
++		.item-prefix:not(:empty) {
++			margin-inline-end: var(--wpds-dimension-gap-sm);
++		}
++
++		.has-indicator > .item-prefix {
++			min-width: var(--wpds-dimension-size-sm);
++		}
++
++		.item-content {
++			grid-column: 2;
++			display: flex;
++			align-items: center;
++			justify-content: space-between;
++			gap: var(--wpds-dimension-gap-md);
++			min-width: 0;
++			/* Keep clicks on presentational labels and suffixes routed to the menu item. */
++			pointer-events: none;
++		}
++
++		.item-children {
++			flex: 1 1 auto;
++			display: inline-flex;
++			flex-direction: column;
++			gap: var(--wpds-dimension-gap-xs);
++			min-width: 0;
++		}
++
++		.item-label {
++			min-width: 0;
++			overflow: hidden;
++			text-overflow: ellipsis;
++			white-space: nowrap;
++		}
++
++		.item-description {
++			color: var(--wpds-color-foreground-content-neutral-weak);
++			overflow-wrap: anywhere;
++		}
++
++		.item-suffix {
++			flex-shrink: 0;
++			display: flex;
++			align-items: center;
++			gap: var(--wpds-dimension-gap-xs);
++			color: var(--wpds-color-foreground-content-neutral-weak);
++		}
++
++		.item[data-highlighted]:not([aria-disabled="true"]) .item-prefix,
++		.item[data-highlighted]:not([aria-disabled="true"]) .item-suffix,
++		.item[data-highlighted]:not([aria-disabled="true"]) .item-description,
++		.item[aria-disabled="true"] .item-prefix,
++		.item[aria-disabled="true"] .item-suffix,
++		.item[aria-disabled="true"] .item-description {
++			color: inherit;
++		}
++
++		.item-indicator {
++			display: flex;
++			align-items: center;
++			justify-content: center;
++
++			&[data-unchecked] {
++				opacity: 0;
++			}
++		}
++
++		.radio-indicator {
++			width: var(--wpds-dimension-size-4xs);
++			height: var(--wpds-dimension-size-4xs);
++			border-radius: 50%;
++			background-color: currentColor;
++		}
++	}
++}
+diff --git a/packages/ui/src/menu/submenu-root.tsx b/packages/ui/src/menu/submenu-root.tsx
+new file mode 100644
+index 00000000000000..338b4a639fcdea
+--- /dev/null
++++ b/packages/ui/src/menu/submenu-root.tsx
+@@ -0,0 +1,11 @@
++import { Menu as _Menu } from '@base-ui/react/menu';
++import type { SubmenuRootProps } from './types';
++
++/**
++ * Groups all parts of a nested submenu.
++ */
++function SubmenuRoot( props: SubmenuRootProps ) {
++	return <_Menu.SubmenuRoot { ...props } />;
++}
++
++export { SubmenuRoot };
+diff --git a/packages/ui/src/menu/submenu-trigger.tsx b/packages/ui/src/menu/submenu-trigger.tsx
+new file mode 100644
+index 00000000000000..28aabe795d2dd9
+--- /dev/null
++++ b/packages/ui/src/menu/submenu-trigger.tsx
+@@ -0,0 +1,51 @@
++import { Menu as _Menu } from '@base-ui/react/menu';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { chevronRightSmall } from '@wordpress/icons';
++import { Icon } from '../icon';
++import itemPopupStyles from '../utils/css/item-popup.module.css';
++import resetStyles from '../utils/css/resets.module.css';
++import styles from './style.module.css';
++import { ItemContent } from './item';
++import type { SubmenuTriggerProps } from './types';
++
++/**
++ * Renders a menu item that opens a submenu.
++ */
++const SubmenuTrigger = forwardRef< HTMLDivElement, SubmenuTriggerProps >(
++	function MenuSubmenuTrigger(
++		{ children, className, prefix, suffix, ...props },
++		ref
++	) {
++		return (
++			<_Menu.SubmenuTrigger
++				ref={ ref }
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					itemPopupStyles.item,
++					styles.item,
++					className
++				) }
++				{ ...props }
++			>
++				<ItemContent
++					prefix={ prefix }
++					suffix={
++						<>
++							{ suffix }
++							<Icon
++								icon={ chevronRightSmall }
++								size={ 24 }
++								aria-hidden="true"
++							/>
++						</>
++					}
++				>
++					{ children }
++				</ItemContent>
++			</_Menu.SubmenuTrigger>
++		);
++	}
++);
++
++export { SubmenuTrigger };
+diff --git a/packages/ui/src/menu/test/index.test.tsx b/packages/ui/src/menu/test/index.test.tsx
+new file mode 100644
+index 00000000000000..7301ebc173f07b
+--- /dev/null
++++ b/packages/ui/src/menu/test/index.test.tsx
+@@ -0,0 +1,220 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { createRef } from '@wordpress/element';
++import * as Menu from '../index';
++
++describe( 'Menu', () => {
++	it( 'opens from the trigger and exposes menu semantics', async () => {
++		const user = userEvent.setup();
++
++		render(
++			<Menu.Root>
++				<Menu.Trigger>Actions</Menu.Trigger>
++				<Menu.Popup>
++					<Menu.Item>Duplicate</Menu.Item>
++					<Menu.Separator />
++					<Menu.LinkItem href="https://wordpress.org">
++						WordPress.org
++					</Menu.LinkItem>
++					<Menu.Item>Delete</Menu.Item>
++				</Menu.Popup>
++			</Menu.Root>
++		);
++
++		const trigger = screen.getByRole( 'button', { name: 'Actions' } );
++		expect( trigger ).toHaveAttribute( 'aria-haspopup', 'menu' );
++		expect( trigger ).toHaveAttribute( 'aria-expanded', 'false' );
++
++		await user.click( trigger );
++
++		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
++		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
++		expect(
++			screen.getByRole( 'menuitem', { name: 'Duplicate' } )
++		).toBeVisible();
++		expect(
++			screen.getByRole( 'menuitem', { name: 'WordPress.org' } )
++		).toHaveAttribute( 'href', 'https://wordpress.org' );
++		expect( screen.getByRole( 'separator' ) ).toBeVisible();
++	} );
++
++	it( 'closes when Escape is pressed', async () => {
++		const user = userEvent.setup();
++
++		render(
++			<Menu.Root>
++				<Menu.Trigger>Actions</Menu.Trigger>
++				<Menu.Popup>
++					<Menu.Item>Duplicate</Menu.Item>
++				</Menu.Popup>
++			</Menu.Root>
++		);
++
++		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
++		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
++
++		await user.keyboard( '{Escape}' );
++
++		await waitFor( () => {
++			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
++		} );
++		expect(
++			screen.getByRole( 'button', { name: 'Actions' } )
++		).toHaveFocus();
++	} );
++
++	it( 'renders checkbox and radio item roles', async () => {
++		const user = userEvent.setup();
++		const onCheckedChange = jest.fn();
++		const onValueChange = jest.fn();
++
++		render(
++			<Menu.Root>
++				<Menu.Trigger>View</Menu.Trigger>
++				<Menu.Popup>
++					<Menu.CheckboxItem
++						checked
++						onCheckedChange={ onCheckedChange }
++					>
++						Show sidebar
++					</Menu.CheckboxItem>
++					<Menu.RadioGroup
++						value="comfortable"
++						onValueChange={ onValueChange }
++					>
++						<Menu.RadioItem value="compact">Compact</Menu.RadioItem>
++						<Menu.RadioItem value="comfortable">
++							Comfortable
++						</Menu.RadioItem>
++					</Menu.RadioGroup>
++				</Menu.Popup>
++			</Menu.Root>
++		);
++
++		await user.click( screen.getByRole( 'button', { name: 'View' } ) );
++
++		const checkbox = await screen.findByRole( 'menuitemcheckbox', {
++			name: 'Show sidebar',
++		} );
++		const radio = screen.getByRole( 'menuitemradio', {
++			name: 'Comfortable',
++		} );
++
++		expect( checkbox ).toBeChecked();
++		expect( radio ).toBeChecked();
++
++		await user.click( checkbox );
++		expect( onCheckedChange ).toHaveBeenCalledWith(
++			false,
++			expect.objectContaining( { reason: expect.any( String ) } )
++		);
++	} );
++
++	it( 'supports custom portal and positioner elements', async () => {
++		const user = userEvent.setup();
++		const containerRef = createRef< HTMLDivElement >();
++
++		render(
++			<div data-testid="wrapper">
++				<Menu.Root>
++					<Menu.Trigger>Actions</Menu.Trigger>
++					<div ref={ containerRef } data-testid="custom-container" />
++					<Menu.Popup
++						portal={ <Menu.Portal container={ containerRef } /> }
++						positioner={
++							<Menu.Positioner data-testid="custom-positioner" />
++						}
++					>
++						<Menu.Item>Duplicate</Menu.Item>
++					</Menu.Popup>
++				</Menu.Root>
++			</div>
++		);
++
++		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
++
++		const menu = await screen.findByRole( 'menu' );
++		expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
++			menu
++		);
++		expect( screen.getByTestId( 'custom-positioner' ) ).toContainElement(
++			menu
++		);
++	} );
++
++	it( 'preserves Base UI nested menu placement defaults', async () => {
++		const user = userEvent.setup();
++
++		render(
++			<Menu.Root>
++				<Menu.Trigger>Actions</Menu.Trigger>
++				<Menu.Popup>
++					<Menu.Item>Duplicate</Menu.Item>
++					<Menu.SubmenuRoot>
++						<Menu.SubmenuTrigger openOnHover={ false }>
++							Move to
++						</Menu.SubmenuTrigger>
++						<Menu.Popup
++							positioner={
++								<Menu.Positioner data-testid="submenu-positioner" />
++							}
++						>
++							<Menu.Item>Archive</Menu.Item>
++						</Menu.Popup>
++					</Menu.SubmenuRoot>
++				</Menu.Popup>
++			</Menu.Root>
++		);
++
++		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
++		await user.click(
++			await screen.findByRole( 'menuitem', { name: 'Move to' } )
++		);
++
++		expect(
++			await screen.findByRole( 'menuitem', { name: 'Archive' } )
++		).toBeVisible();
++		expect( screen.getByTestId( 'submenu-positioner' ) ).toHaveAttribute(
++			'data-side',
++			expect.stringMatching( /^inline-/ )
++		);
++	} );
++
++	it( 'forwards refs', async () => {
++		const user = userEvent.setup();
++		const triggerRef = createRef< HTMLButtonElement >();
++		const popupRef = createRef< HTMLDivElement >();
++		const itemRef = createRef< HTMLDivElement >();
++		const itemLabelRef = createRef< HTMLSpanElement >();
++		const itemDescriptionRef = createRef< HTMLSpanElement >();
++
++		render(
++			<Menu.Root>
++				<Menu.Trigger ref={ triggerRef }>Actions</Menu.Trigger>
++				<Menu.Popup ref={ popupRef }>
++					<Menu.Item ref={ itemRef }>
++						<Menu.ItemLabel ref={ itemLabelRef }>
++							Duplicate
++						</Menu.ItemLabel>
++						<Menu.ItemDescription ref={ itemDescriptionRef }>
++							Create a copy.
++						</Menu.ItemDescription>
++					</Menu.Item>
++				</Menu.Popup>
++			</Menu.Root>
++		);
++
++		expect( triggerRef.current ).toBeInstanceOf( HTMLButtonElement );
++
++		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
++
++		await waitFor( () => {
++			expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++			expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
++			expect( itemLabelRef.current ).toBeInstanceOf( HTMLSpanElement );
++			expect( itemDescriptionRef.current ).toBeInstanceOf(
++				HTMLSpanElement
++			);
++		} );
++	} );
++} );
+diff --git a/packages/ui/src/menu/trigger.tsx b/packages/ui/src/menu/trigger.tsx
+new file mode 100644
+index 00000000000000..d090c87e1514f9
+--- /dev/null
++++ b/packages/ui/src/menu/trigger.tsx
+@@ -0,0 +1,14 @@
++import { Menu as _Menu } from '@base-ui/react/menu';
++import { forwardRef } from '@wordpress/element';
++import type { TriggerProps } from './types';
++
++/**
++ * Renders the button that opens the menu.
++ */
++const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
++	function MenuTrigger( props, ref ) {
++		return <_Menu.Trigger ref={ ref } { ...props } />;
++	}
++);
++
++export { Trigger };
+diff --git a/packages/ui/src/menu/types.ts b/packages/ui/src/menu/types.ts
+new file mode 100644
+index 00000000000000..c7fb80197655d7
+--- /dev/null
++++ b/packages/ui/src/menu/types.ts
+@@ -0,0 +1,131 @@
++import type { Menu as _Menu } from '@base-ui/react/menu';
++import type { ElementType, ReactElement, ReactNode } from 'react';
++
++import type { ComponentProps } from '../utils/types';
++
++export type PortalProps = ComponentProps< typeof _Menu.Portal >;
++
++export type PositionerProps = ComponentProps< typeof _Menu.Positioner >;
++
++export type RootProps< Payload = unknown > = _Menu.Root.Props< Payload >;
++
++export type TriggerProps< Payload = unknown > = _Menu.Trigger.Props< Payload >;
++
++export type SubmenuRootProps = _Menu.SubmenuRoot.Props;
++
++export type RadioGroupProps = _Menu.RadioGroup.Props;
++
++export type GroupProps = ComponentProps< typeof _Menu.Group > & {
++	/**
++	 * The content to be rendered inside the group.
++	 */
++	children?: ReactNode;
++};
++
++export type GroupLabelProps = ComponentProps< typeof _Menu.GroupLabel > & {
++	/**
++	 * The content to be rendered inside the group label.
++	 */
++	children?: ReactNode;
++};
++
++export type SeparatorProps = ComponentProps< typeof _Menu.Separator >;
++
++export interface PopupProps extends ComponentProps< typeof _Menu.Popup > {
++	/**
++	 * The content to be rendered inside the menu popup.
++	 */
++	children?: ReactNode;
++
++	/**
++	 * Optional portal element, typically `<Menu.Portal />` with custom
++	 * `container`. When omitted, `Menu.Popup` uses `Menu.Portal` with default
++	 * props. Do not pass `children` on the portal element; they would be
++	 * ignored.
++	 */
++	portal?: ReactElement< Omit< PortalProps, 'children' > >;
++
++	/**
++	 * Optional positioner element, typically `<Menu.Positioner />` with custom
++	 * positioning props (`side`, `align`, `sideOffset`, collision settings,
++	 * etc.). When omitted, `Menu.Popup` uses `Menu.Positioner` with default
++	 * props. Do not pass `children` on the positioner element; they would be
++	 * ignored.
++	 */
++	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
++}
++
++export interface MenuItemLayoutProps {
++	/**
++	 * Presentational content displayed before the item label.
++	 */
++	prefix?: ReactNode;
++
++	/**
++	 * Presentational content displayed after the item label.
++	 */
++	suffix?: ReactNode;
++}
++
++export interface ItemLabelProps extends ComponentProps< 'span' > {
++	/**
++	 * The primary label for a menu item.
++	 */
++	children?: ReactNode;
++}
++
++export interface ItemDescriptionProps extends ComponentProps< 'span' > {
++	/**
++	 * Supplementary text displayed below a menu item label.
++	 */
++	children?: ReactNode;
++}
++
++type MenuItemComponentProps< T extends ElementType > = Omit<
++	ComponentProps< T >,
++	keyof MenuItemLayoutProps
++>;
++
++export type ItemProps = MenuItemComponentProps< typeof _Menu.Item > &
++	MenuItemLayoutProps & {
++		/**
++		 * The content to be rendered inside the menu item.
++		 */
++		children?: ReactNode;
++	};
++
++export type LinkItemProps = MenuItemComponentProps< typeof _Menu.LinkItem > &
++	MenuItemLayoutProps & {
++		/**
++		 * The content to be rendered inside the link menu item.
++		 */
++		children?: ReactNode;
++	};
++
++export type CheckboxItemProps = MenuItemComponentProps<
++	typeof _Menu.CheckboxItem
++> &
++	MenuItemLayoutProps & {
++		/**
++		 * The content to be rendered inside the checkbox menu item.
++		 */
++		children?: ReactNode;
++	};
++
++export type RadioItemProps = MenuItemComponentProps< typeof _Menu.RadioItem > &
++	MenuItemLayoutProps & {
++		/**
++		 * The content to be rendered inside the radio menu item.
++		 */
++		children?: ReactNode;
++	};
++
++export type SubmenuTriggerProps = MenuItemComponentProps<
++	typeof _Menu.SubmenuTrigger
++> &
++	MenuItemLayoutProps & {
++		/**
++		 * The content to be rendered inside the submenu trigger item.
++		 */
++		children?: ReactNode;
++	};
+diff --git a/packages/ui/src/utils/css/dropdown-motion.module.css b/packages/ui/src/utils/css/dropdown-motion.module.css
+index 677f8180456d4b..c86686d907c772 100644
+--- a/packages/ui/src/utils/css/dropdown-motion.module.css
++++ b/packages/ui/src/utils/css/dropdown-motion.module.css
+@@ -56,6 +56,26 @@
+ 			&[data-side="right"][data-ending-style] {
+ 				transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
+ 			}
++
++			&[data-side="inline-start"][data-starting-style],
++			&[data-side="inline-start"][data-ending-style] {
++				transform: translateX(var(--wp-ui-dropdown-slide-distance));
++			}
++
++			&[data-side="inline-end"][data-starting-style],
++			&[data-side="inline-end"][data-ending-style] {
++				transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
++			}
++
++			&:dir(rtl)[data-side="inline-start"][data-starting-style],
++			&:dir(rtl)[data-side="inline-start"][data-ending-style] {
++				transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
++			}
++
++			&:dir(rtl)[data-side="inline-end"][data-starting-style],
++			&:dir(rtl)[data-side="inline-end"][data-ending-style] {
++				transform: translateX(var(--wp-ui-dropdown-slide-distance));
++			}
+ 		}
+ 	}
+ }

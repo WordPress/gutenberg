@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7d84ff872be224..728151987c9ef4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `CustomSelectControlV2`: add root element wrapper. ([#62803](https://github.com/WordPress/gutenberg/pull/62803))
+ -   `CustomSelectControlV2`: fix popover styles. ([#62821](https://github.com/WordPress/gutenberg/pull/62821))
++-   `CustomSelectControlV2`: fix trigger text alignment in RTL languages ([#62869](https://github.com/WordPress/gutenberg/pull/62869)).
+ 
+ ## 28.2.0 (2024-06-26)
+ 
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index 683bb1d157994d..c806bbee794d1a 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -92,7 +92,7 @@ export const Select = styled( Ariakit.Select, {
+ 		cursor: pointer;
+ 		font-family: inherit;
+ 		font-size: ${ CONFIG.fontSize };
+-		text-align: left;
++		text-align: start;
+ 		width: 100%;
+ 
+ 		&[data-focus-visible] {

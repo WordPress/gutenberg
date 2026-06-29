@@ -1,0 +1,22 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f5e9fea45f264f..1860d1ff4b3827 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `ResizableBox`: refactor styles to TypeScript ([47756](https://github.com/WordPress/gutenberg/pull/47756)).
++
+ ## 23.3.0 (2023-02-01)
+ 
+ ### Deprecations
+diff --git a/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts
+similarity index 100%
+rename from packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js
+rename to packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts
+diff --git a/packages/components/src/resizable-box/styles/resizable-box.styles.js b/packages/components/src/resizable-box/styles/resizable-box.styles.js
+deleted file mode 100644
+index e69de29bb2d1d6..00000000000000

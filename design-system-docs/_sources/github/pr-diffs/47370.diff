@@ -1,0 +1,28 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 118e3b8cbaa221..ca892e36bdea26 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Deprecations
++
++-   `NumberControl`: Clarify deprecation message about `hideHTMLArrows` prop ([#47370](https://github.com/WordPress/gutenberg/pull/47370)).
++
+ ### Enhancements
+ 
+ -   `Dropdown`: deprecate `position`  prop, use `popoverProps` instead ([46865](https://github.com/WordPress/gutenberg/pull/46865)).
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index 40cbf51bee2d3a..1e8aaf878760a2 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -52,7 +52,7 @@ function UnforwardedNumberControl(
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	if ( hideHTMLArrows ) {
+-		deprecated( 'hideHTMLArrows', {
++		deprecated( 'wp.components.NumberControl hideHTMLArrows prop ', {
+ 			alternative: 'spinControls="none"',
+ 			since: '6.2',
+ 			version: '6.3',

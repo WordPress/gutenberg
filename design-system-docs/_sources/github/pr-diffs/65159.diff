@@ -1,0 +1,163 @@
+diff --git a/packages/base-styles/_variables.scss b/packages/base-styles/_variables.scss
+index 0f0c9e6d019ba3..35092033c552bd 100644
+--- a/packages/base-styles/_variables.scss
++++ b/packages/base-styles/_variables.scss
+@@ -55,16 +55,16 @@ $radius-round: 50%;     // For circles and ovals.
+  */
+ 
+ // For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame.
+-$elevation-x-small: 0 0.7px 1px rgba($black, 0.1), 0 1.2px 1.7px -0.2px rgba($black, 0.1), 0 2.3px 3.3px -0.5px rgba($black, 0.1);
++$elevation-x-small: 0 1px 1px rgba($black, 0.03), 0 1px 2px rgba($black, 0.02), 0 3px 3px rgba($black, 0.02), 0 4px 4px rgba($black, 0.01);
+ 
+ // For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar.
+-$elevation-small: 0 0.7px 1px 0 rgba(0, 0, 0, 0.12), 0 2.2px 3.7px -0.2px rgba(0, 0, 0, 0.12), 0 5.3px 7.3px -0.5px rgba(0, 0, 0, 0.12);
++$elevation-small: 0 1px 2px rgba($black, 0.05), 0 2px 3px rgba($black, 0.04), 0 6px 6px rgba($black, 0.03), 0 8px 8px rgba($black, 0.02);
+ 
+ // For components that offer additional actions. Example: Menus, Command Palette
+-$elevation-medium: 0 0.7px 1px 0 rgba(0, 0, 0, 0.14), 0 4.2px 5.7px -0.2px rgba(0, 0, 0, 0.14), 0 7.3px 9.3px -0.5px rgba(0, 0, 0, 0.14);
++$elevation-medium: 0 2px 3px rgba($black, 0.05), 0 4px 5px rgba($black, 0.04), 0 12px 12px rgba($black, 0.03), 0 16px 16px rgba($black, 0.02);
+ 
+ // For components that confirm decisions or handle necessary interruptions. Example: Modals.
+-$elevation-large: 0 0.7px 1px rgba($black, 0.15), 0 2.7px 3.8px -0.2px rgba($black, 0.15), 0 5.5px 7.8px -0.3px rgba($black, 0.15), 0.1px 11.5px 16.4px -0.5px rgba($black, 0.15);
++$elevation-large: 0 5px 15px rgba($black, 0.08), 0 15px 27px rgba($black, 0.07), 0 30px 36px rgba($black, 0.04), 0 50px 43px rgba($black, 0.02);
+ 
+ /**
+  * Dimensions.
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1473cf5f5df40e..d166e3f80fe79b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,14 @@
+ 
+ -   `Navigator`: warn if a screen's `path` doesn't follow a URL-like scheme ([#65231](https://github.com/WordPress/gutenberg/pull/65231)).
+ -   `Modal`: Decrease close button size and remove horizontal offset ([#65131](https://github.com/WordPress/gutenberg/pull/65131)).
++-   `CustomSelectControl V2`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
++-   `DropdownMenu V2`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
++-   `FormToggle`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
++-   `Popover`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
++-   `RangeControl`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
++-   `ResizeableBox`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
++-   `Snackbar`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
++-   `Tooltip`: Adopt elevation scale ([#65159](https://github.com/WordPress/gutenberg/pull/65159)).
+ -   `Card`: Adopt radius scale ([#65053](https://github.com/WordPress/gutenberg/pull/65053)).
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index c82d6eba2e1a76..2b8bdb9946b7c9 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -120,6 +120,7 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
+ 	background-color: ${ COLORS.theme.background };
+ 	border-radius: ${ CONFIG.radiusSmall };
+ 	border: 1px solid ${ COLORS.theme.foreground };
++	box-shadow: ${ CONFIG.elevationMedium };
+ 
+ 	/* z-index(".components-popover") */
+ 	z-index: 1000000;
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/dropdown-menu-v2/styles.ts
+index 55020fbcd41354..b25613e9feb52b 100644
+--- a/packages/components/src/dropdown-menu-v2/styles.ts
++++ b/packages/components/src/dropdown-menu-v2/styles.ts
+@@ -37,7 +37,7 @@ const DIVIDER_COLOR = COLORS.theme.gray[ 200 ];
+ const LIGHTER_TEXT_COLOR = COLORS.theme.gray[ 700 ];
+ const LIGHT_BACKGROUND_COLOR = COLORS.theme.gray[ 100 ];
+ const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.theme.foreground;
+-const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.elevationXSmall }`;
++const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.elevationMedium }`;
+ const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
+ 
+ const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
+diff --git a/packages/components/src/form-toggle/style.scss b/packages/components/src/form-toggle/style.scss
+index dd7888403b34d4..900874b59004b8 100644
+--- a/packages/components/src/form-toggle/style.scss
++++ b/packages/components/src/form-toggle/style.scss
+@@ -60,6 +60,7 @@ $transition-duration: 0.2s;
+ 			$transition-duration background-color ease-out;
+ 		@include reduce-motion("transition");
+ 		background-color: $gray-900;
++		box-shadow: $elevation-x-small;
+ 
+ 		// Transparent border acts as a fill in Windows High Contrast Mode.
+ 		border: math.div($toggle-thumb-size, 2) solid transparent;
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index bfab8978864b34..601e9ebb7675f5 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -22,7 +22,7 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
+ 
+ .components-popover__content {
+ 	background: $white;
+-	box-shadow: $shadow-popover-border-default, $elevation-x-small;
++	box-shadow: $shadow-popover-border-default, $elevation-medium;
+ 	border-radius: $radius-medium;
+ 	box-sizing: border-box;
+ 	width: min-content;
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index e2b651bd317da5..dae1d0de3ddb66 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -239,6 +239,7 @@ export const Thumb = styled.span< ThumbProps >`
+ 	position: absolute;
+ 	user-select: none;
+ 	width: 100%;
++	box-shadow: ${ CONFIG.elevationXSmall };
+ 
+ 	${ thumbColor };
+ 	${ thumbFocus };
+diff --git a/packages/components/src/resizable-box/style.scss b/packages/components/src/resizable-box/style.scss
+index 2e709a5bbb382d..3c9efd27136460 100644
+--- a/packages/components/src/resizable-box/style.scss
++++ b/packages/components/src/resizable-box/style.scss
+@@ -35,7 +35,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
+ 	top: calc(50% - #{ceil($resize-handler-size * 0.5)});
+ 	right: calc(50% - #{ceil($resize-handler-size * 0.5)});
+ 
+-	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
++	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent, $elevation-x-small;
+ 	// Only visible in Windows High Contrast mode.
+ 	outline: 2px solid transparent;
+ }
+diff --git a/packages/components/src/snackbar/style.scss b/packages/components/src/snackbar/style.scss
+index e7f29267d6f6db..1e76a1666411e7 100644
+--- a/packages/components/src/snackbar/style.scss
++++ b/packages/components/src/snackbar/style.scss
+@@ -4,7 +4,7 @@
+ 	background: rgba($black, 0.85); // Emulates #1e1e1e closely.
+ 	backdrop-filter: blur($grid-unit-20) saturate(180%);
+ 	border-radius: $radius-medium;
+-	box-shadow: $elevation-x-small;
++	box-shadow: $elevation-small;
+ 	color: $white;
+ 	padding: $grid-unit-15 ($grid-unit-05 * 5);
+ 	width: 100%;
+diff --git a/packages/components/src/tooltip/style.scss b/packages/components/src/tooltip/style.scss
+index eaac8b3ad1c7f6..e84946e4a9176c 100644
+--- a/packages/components/src/tooltip/style.scss
++++ b/packages/components/src/tooltip/style.scss
+@@ -8,6 +8,7 @@
+ 	font-size: 12px;
+ 	padding: $grid-unit-05 $grid-unit-10;
+ 	z-index: z-index(".components-tooltip");
++	box-shadow: $elevation-small;
+ }
+ 
+ .components-tooltip__shortcut {
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 4d7ed859e89edd..2040f479a231c2 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -72,10 +72,10 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
+ 	cardPaddingSmall: `${ space( 4 ) }`,
+ 	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,
+ 	cardPaddingLarge: `${ space( 6 ) } ${ space( 8 ) }`,
+-	elevationXSmall: `0 0.7px 1px rgba(0, 0, 0, 0.1), 0 1.2px 1.7px -0.2px rgba(0, 0, 0, 0.1), 0 2.3px 3.3px -0.5px rgba(0, 0, 0, 0.1)`,
+-	elevationSmall: `0 0.7px 1px 0 rgba(0, 0, 0, 0.12), 0 2.2px 3.7px -0.2px rgba(0, 0, 0, 0.12), 0 5.3px 7.3px -0.5px rgba(0, 0, 0, 0.12)`,
+-	elevationMedium: `0 0.7px 1px 0 rgba(0, 0, 0, 0.14), 0 4.2px 5.7px -0.2px rgba(0, 0, 0, 0.14), 0 7.3px 9.3px -0.5px rgba(0, 0, 0, 0.14)`,
+-	elevationLarge: `0 0.7px 1px rgba(0, 0, 0, 0.15), 0 2.7px 3.8px -0.2px rgba(0, 0, 0, 0.15), 0 5.5px 7.8px -0.3px rgba(0, 0, 0, 0.15), 0.1px 11.5px 16.4px -0.5px rgba(0, 0, 0, 0.15)`,
++	elevationXSmall: `0 1px 1px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02), 0 3px 3px rgba(0, 0, 0, 0.02), 0 4px 4px rgba(0, 0, 0, 0.01)`,
++	elevationSmall: `0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 3px rgba(0, 0, 0, 0.04), 0 6px 6px rgba(0, 0, 0, 0.03), 0 8px 8px rgba(0, 0, 0, 0.02)`,
++	elevationMedium: `0 2px 3px rgba(0, 0, 0, 0.05), 0 4px 5px rgba(0, 0, 0, 0.04), 0 12px 12px rgba(0, 0, 0, 0.03), 0 16px 16px rgba(0, 0, 0, 0.02)`,
++	elevationLarge: `0 5px 15px rgba(0, 0, 0, 0.08), 0 15px 27px rgba(0, 0, 0, 0.07), 0 30px 36px rgba(0, 0, 0, 0.04), 0 50px 43px rgba(0, 0, 0, 0.02)`,
+ 	surfaceBackgroundColor: COLORS.white,
+ 	surfaceBackgroundSubtleColor: '#F3F3F3',
+ 	surfaceBackgroundTintColor: '#F5F5F5',

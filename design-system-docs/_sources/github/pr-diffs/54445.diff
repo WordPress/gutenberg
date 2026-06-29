@@ -1,0 +1,132 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0aefc8941fe159..7314e7ecdce49f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `Tooltip`: Add new `hideOnClick` prop ([#54406](https://github.com/WordPress/gutenberg/pull/54406)).
+ -   `CircularOptionPicker`: Add option to use previous non-listbox behaviour, for contexts where buttons are more appropriate than a list of options ([#54290](https://github.com/WordPress/gutenberg/pull/54290)).
+ -   `DuotonePicker/ColorListPicker`: Adds appropriate labels to 'Duotone Filter' color pickers ([#54468](https://github.com/WordPress/gutenberg/pull/54468)).
++-   `FormTokenField`: Add `tokenizeOnBlur` prop to add any incompleteTokenValue as a new token when field loses focus ([#54445](https://github.com/WordPress/gutenberg/pull/54445)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/form-token-field/README.md b/packages/components/src/form-token-field/README.md
+index 90fe84e56f2ee6..3a4ce2a143624a 100644
+--- a/packages/components/src/form-token-field/README.md
++++ b/packages/components/src/form-token-field/README.md
+@@ -62,6 +62,7 @@ The `value` property is handled in a manner similar to controlled form component
+ -   `__experimentalValidateInput` - If passed, all introduced values will be validated before being added as tokens.
+ -   `__experimentalAutoSelectFirstMatch` - If true, the select the first matching suggestion when the user presses the Enter key (or space when tokenizeOnSpace is true).
+ -   `__nextHasNoMarginBottom` - Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.5. (The prop can be safely removed once this happens.)
++-   `tokenizeOnBlur` - If true, add any incompleteTokenValue as a new token when the field loses focus.
+ 
+ ## Usage
+ 
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index e3781880370628..b3a5c5a53d4c0a 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -73,6 +73,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		__next40pxDefaultSize = false,
+ 		__experimentalAutoSelectFirstMatch = false,
+ 		__nextHasNoMarginBottom = false,
++		tokenizeOnBlur = false,
+ 	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >(
+ 		props,
+ 		'wp.components.FormTokenField'
+@@ -167,6 +168,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 			__experimentalValidateInput( incompleteTokenValue )
+ 		) {
+ 			setIsActive( false );
++			if ( tokenizeOnBlur && inputHasValidValue() ) {
++				addNewToken( incompleteTokenValue );
++			}
+ 		} else {
+ 			// Reset to initial state
+ 			setIncompleteTokenValue( '' );
+@@ -451,7 +455,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		setSelectedSuggestionScroll( false );
+ 		setIsExpanded( ! __experimentalExpandOnFocus );
+ 
+-		if ( isActive ) {
++		if ( isActive && ! tokenizeOnBlur ) {
+ 			focus();
+ 		}
+ 	}
+diff --git a/packages/components/src/form-token-field/test/index.tsx b/packages/components/src/form-token-field/test/index.tsx
+index e62e851f1cf226..76e308d5993beb 100644
+--- a/packages/components/src/form-token-field/test/index.tsx
++++ b/packages/components/src/form-token-field/test/index.tsx
+@@ -205,7 +205,42 @@ describe( 'FormTokenField', () => {
+ 			] );
+ 		} );
+ 
+-		it( "should not add a token with the input's value when pressing the tab key", async () => {
++		it( 'should add a token with the input value with onBlur when `tokenizeOnBlur` prop is `true`', async () => {
++			const user = userEvent.setup();
++
++			const onChangeSpy = jest.fn();
++
++			const { rerender } = render(
++				<FormTokenFieldWithState onChange={ onChangeSpy } />
++			);
++
++			const input = screen.getByRole( 'combobox' );
++
++			// Add 'grapefruit' token by typing it and check blur of field does not tokenize it.
++			await user.type( input, 'grapefruit' );
++			await user.click( document.body );
++			expect( onChangeSpy ).toHaveBeenCalledTimes( 0 );
++			expectTokensNotToBeInTheDocument( [ 'grapefruit' ] );
++
++			rerender(
++				<FormTokenFieldWithState
++					onChange={ onChangeSpy }
++					tokenizeOnBlur
++				/>
++			);
++			await user.clear( input );
++
++			// Add 'grapefruit' token by typing it and check blur of field tokenizes it.
++			await user.type( input, 'grapefruit' );
++
++			await user.click( document.body );
++			expect( onChangeSpy ).toHaveBeenNthCalledWith( 1, [
++				'grapefruit',
++			] );
++			expectTokensToBeInTheDocument( [ 'grapefruit' ] );
++		} );
++
++		it( "should not add a token with the input's value when tokenizeOnBlur is not set and pressing the tab key", async () => {
+ 			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+diff --git a/packages/components/src/form-token-field/types.ts b/packages/components/src/form-token-field/types.ts
+index fe466ffbe59f84..e343601106f411 100644
+--- a/packages/components/src/form-token-field/types.ts
++++ b/packages/components/src/form-token-field/types.ts
+@@ -182,6 +182,12 @@ export interface FormTokenFieldProps
+ 	 * @default false
+ 	 */
+ 	__nextHasNoMarginBottom?: boolean;
++	/**
++	 * If true, add any incompleteTokenValue as a new token when the field loses focus.
++	 *
++	 * @default false
++	 */
++	tokenizeOnBlur?: boolean;
+ }
+ 
+ /**
+diff --git a/packages/patterns/src/components/category-selector.js b/packages/patterns/src/components/category-selector.js
+index f8295af2a79dc9..c9305806c7e13f 100644
+--- a/packages/patterns/src/components/category-selector.js
++++ b/packages/patterns/src/components/category-selector.js
+@@ -111,6 +111,7 @@ export default function CategorySelector( { onCategorySelection } ) {
+ 				onInputChange={ debouncedSearch }
+ 				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
+ 				label={ __( 'Categories' ) }
++				tokenizeOnBlur={ true }
+ 			/>
+ 		</>
+ 	);

@@ -1,0 +1,15 @@
+diff --git a/packages/primitives/src/svg/index.js b/packages/primitives/src/svg/index.js
+index 470ee1af88b86a..c656b57a0f567a 100644
+--- a/packages/primitives/src/svg/index.js
++++ b/packages/primitives/src/svg/index.js
+@@ -26,7 +26,9 @@ export const SVG = ( { className, isPressed, ...props } ) => {
+ 		className:
+ 			classnames( className, { 'is-pressed': isPressed } ) || undefined,
+ 		role: 'img',
+-		'aria-hidden': 'true',
++		'aria-hidden': props.hasOwnProperty( 'aria-hidden' )
++			? props[ 'aria-hidden' ]
++			: 'true',
+ 		focusable: 'false',
+ 	};
+ 

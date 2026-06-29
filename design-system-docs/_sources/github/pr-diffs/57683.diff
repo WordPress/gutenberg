@@ -1,0 +1,22 @@
+diff --git a/packages/block-editor/src/components/height-control/index.js b/packages/block-editor/src/components/height-control/index.js
+index e1797522497447..23738378b69983 100644
+--- a/packages/block-editor/src/components/height-control/index.js
++++ b/packages/block-editor/src/components/height-control/index.js
+@@ -157,6 +157,8 @@ export default function HeightControl( {
+ 						onUnitChange={ handleUnitChange }
+ 						min={ 0 }
+ 						size={ '__unstable-large' }
++						label={ label }
++						hideLabelFromVision
+ 					/>
+ 				</FlexItem>
+ 				<FlexItem isBlock>
+@@ -175,6 +177,8 @@ export default function HeightControl( {
+ 							withInputField={ false }
+ 							onChange={ handleSliderChange }
+ 							__nextHasNoMarginBottom
++							label={ label }
++							hideLabelFromVision
+ 						/>
+ 					</Spacer>
+ 				</FlexItem>

@@ -1,0 +1,871 @@
+diff --git a/packages/grid/src/dashboard-grid/grid.module.css b/packages/grid/src/dashboard-grid/grid.module.css
+index 95eeb97982e7a6..1e6e77a84fc4ad 100644
+--- a/packages/grid/src/dashboard-grid/grid.module.css
++++ b/packages/grid/src/dashboard-grid/grid.module.css
+@@ -1,5 +1,6 @@
+ .grid {
+ 	display: grid;
++	position: relative;
+ }
+ 
+ /*
+diff --git a/packages/grid/src/dashboard-grid/index.tsx b/packages/grid/src/dashboard-grid/index.tsx
+index e50679384319f3..2c225a00c02497 100644
+--- a/packages/grid/src/dashboard-grid/index.tsx
++++ b/packages/grid/src/dashboard-grid/index.tsx
+@@ -36,6 +36,7 @@ import {
+  * Internal dependencies
+  */
+ import { GridItem } from './grid-item';
++import { GridOverlay } from '../shared/grid-overlay';
+ import { resolveFillWidths } from './resolve-fill-widths';
+ import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
+ import type { ResizeDelta } from '../shared/types';
+@@ -96,6 +97,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
+ 			onPreviewLayout,
+ 			renderResizeHandle,
+ 			renderDragPreview,
++			renderGridOverlay,
+ 			...divProps
+ 		} = props;
+ 		// Preview layout applied during drag/resize before committing.
+@@ -473,6 +475,31 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
+ 				</div>
+ 			) : null;
+ 
++		// Edit-mode background visual. Default paints diagonal stripes
++		// and dashed track guides; a consumer can replace it via
++		// `renderGridOverlay` while reusing the resolved column count,
++		// gap, and row height. `'auto'` collapses to `undefined` for
++		// the overlay so it falls back to columns-only (row dividers
++		// have no anchor when the row height is content-driven).
++		// Rendered unconditionally so the overlay can cross-fade on
++		// edit-mode toggles; `isActive` drives the opacity transition
++		// inside the overlay. Memoized so drag/resize re-renders skip
++		// reconciliation while inputs are stable.
++		const Overlay = renderGridOverlay ?? GridOverlay;
++		const overlayRowHeight =
++			typeof rowHeight === 'number' ? rowHeight : undefined;
++		const gridOverlay = useMemo(
++			() => (
++				<Overlay
++					columns={ effectiveColumns }
++					gapPx={ gapPx }
++					rowHeight={ overlayRowHeight }
++					isActive={ editMode }
++				/>
++			),
++			[ Overlay, editMode, effectiveColumns, gapPx, overlayRowHeight ]
++		);
++
+ 		return (
+ 			<DndContext
+ 				sensors={ sensors }
+@@ -499,6 +526,7 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
+ 							gap: gapPx,
+ 						} }
+ 					>
++						{ gridOverlay }
+ 						{ items.map( ( id ) => (
+ 							<GridItem
+ 								key={ id }
+diff --git a/packages/grid/src/dashboard-grid/stories/index.story.tsx b/packages/grid/src/dashboard-grid/stories/index.story.tsx
+index c9f7f9d55518b7..faa2d61ebd4cae 100644
+--- a/packages/grid/src/dashboard-grid/stories/index.story.tsx
++++ b/packages/grid/src/dashboard-grid/stories/index.story.tsx
+@@ -18,6 +18,7 @@ import { DashboardGrid } from '..';
+ import type { DashboardGridLayoutItem } from '../types';
+ import type {
+ 	DragPreviewRenderProps,
++	GridOverlayRenderProps,
+ 	ResizeHandleRenderProps,
+ } from '../../shared/types';
+ 
+@@ -85,7 +86,9 @@ const bgTokens: Record< Tone, string > = {
+ };
+ 
+ const fgTokens: Record< Tone, string > = {
+-	brand: 'var(--wpds-color-fg-content-info)',
++	// `brand` has no dedicated fg-content token in the design system,
++	// so neutral content reads safely against the brand surface tint.
++	brand: 'var(--wpds-color-fg-content-neutral)',
+ 	info: 'var(--wpds-color-fg-content-info)',
+ 	success: 'var(--wpds-color-fg-content-success)',
+ 	warning: 'var(--wpds-color-fg-content-warning)',
+@@ -436,72 +439,24 @@ export const RowHeight: Story = {
+ };
+ 
+ /**
+- * Visualizes the grid's column tracks and gaps as a Chrome
+- * DevTools-style overlay. Renders a sibling grid behind
+- * `DashboardGrid` with the same template, so the column tracks
+- * line up exactly with the live layout.
+- */
+-function GridVisualizer( {
+-	columns,
+-	spacing,
+-}: {
+-	columns: number;
+-	spacing: number;
+-} ) {
+-	const gapPx = spacing * 4;
+-	return (
+-		<div
+-			aria-hidden
+-			style={ {
+-				position: 'absolute',
+-				top: 24,
+-				right: 0,
+-				bottom: 0,
+-				left: 0,
+-				background: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-bg-surface-warning) 28%, transparent) 0 6px, transparent 6px 12px)`,
+-				display: 'grid',
+-				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
+-				gap: gapPx,
+-				pointerEvents: 'none',
+-				zIndex: 0,
+-			} }
+-		>
+-			{ Array.from( { length: columns } ).map( ( _, i ) => (
+-				<div
+-					key={ i }
+-					style={ {
+-						outline:
+-							'1px dashed var(--wpds-color-stroke-surface-warning)',
+-						position: 'relative',
+-					} }
+-				>
+-					<span
+-						style={ {
+-							position: 'absolute',
+-							top: -18,
+-							left: 0,
+-							fontSize: 10,
+-							padding: '1px 4px',
+-							borderRadius: 2,
+-							background: 'var(--wpds-color-bg-surface-warning)',
+-							color: 'var(--wpds-color-fg-content-warning)',
+-							fontFamily:
+-								'var(--wpds-typography-font-family-mono)',
+-						} }
+-					>
+-						{ i + 1 }
+-					</span>
+-				</div>
+-			) ) }
+-		</div>
+-	);
+-}
+-
+-/**
+- * Edit mode with drag, resize, and all width modes. A state panel
+- * shows the raw layout JSON. Drag items to reorder; resize from the
+- * bottom-right handle. Keyboard sensor is enabled: use Tab to focus
+- * an item, Space to grab, arrow keys to move, Space to drop.
++ * Edit mode with drag, resize, and all width modes. While `editMode`
++ * is on, `<DashboardGrid />` paints its default overlay behind the
++ * tiles to visualize the underlying template: diagonal stripes, a
++ * dashed outline on each column track, a subtle column fill that
++ * marks the drop zones against the gaps, and a 1px row divider when
++ * `rowHeight` is numeric. The overlay disappears when `editMode`
++ * flips back to `false`.
++ *
++ * Theme the default look in place via CSS custom properties exposed
++ * by the package (`--wp-grid-overlay-stripe-color`,
++ * `--wp-grid-overlay-track-color`, `--wp-grid-overlay-column-fill`),
++ * or replace the visual wholesale by passing `renderGridOverlay`.
++ * See the `Custom Grid Overlay` story for a full override example.
++ *
++ * A state panel shows the raw layout JSON. Drag items to reorder;
++ * resize from the bottom-right handle. Keyboard sensor is enabled:
++ * use Tab to focus an item, Space to grab, arrow keys to move, Space
++ * to drop.
+  */
+ export const EditMode: Story = {
+ 	args: {
+@@ -643,17 +598,7 @@ export const EditMode: Story = {
+ 
+ 		return (
+ 			<Stack direction="row" gap="lg" align="flex-start">
+-				<div
+-					style={ {
+-						width: '800px',
+-						position: 'relative',
+-						paddingTop: 24,
+-					} }
+-				>
+-					<GridVisualizer
+-						columns={ args.columns ?? 12 }
+-						spacing={ args.spacing ?? 4 }
+-					/>
++				<div style={ { width: '800px' } }>
+ 					<DashboardGrid
+ 						{ ...args }
+ 						layout={ layout }
+@@ -826,3 +771,141 @@ export const Customization: Story = {
+ 		);
+ 	},
+ };
++
++/**
++ * Example custom overlay supplied to `<DashboardGrid />` through the
++ * `renderGridOverlay` prop. Receives the grid's resolved column
++ * count, gap, row height, and `isActive` flag; this implementation
++ * drops the row dividers, swaps to an info tone, labels each column
++ * track with its index, and fades in/out on `isActive` toggles. The
++ * grid always mounts the overlay; the consumer owns the visual and
++ * its transition.
++ *
++ * @param props          Render props supplied by the grid.
++ * @param props.columns  Number of column tracks to mirror.
++ * @param props.gapPx    Gap between tracks in pixels.
++ * @param props.isActive Whether the overlay should be visible.
++ */
++function NumberedOverlay( {
++	columns,
++	gapPx,
++	isActive,
++}: GridOverlayRenderProps ) {
++	return (
++		<div
++			aria-hidden
++			style={ {
++				position: 'absolute',
++				inset: 0,
++				display: 'grid',
++				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
++				gap: gapPx,
++				pointerEvents: 'none',
++				opacity: isActive ? 1 : 0,
++				visibility: isActive ? 'visible' : 'hidden',
++				transition: isActive
++					? 'opacity 200ms ease, visibility 0s linear 0s'
++					: 'opacity 200ms ease, visibility 0s linear 200ms',
++				backgroundImage: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-bg-surface-info) 24%, transparent) 0 6px, transparent 6px 12px)`,
++			} }
++		>
++			{ Array.from( { length: columns } ).map( ( _, i ) => (
++				<div
++					key={ i }
++					style={ {
++						outline:
++							'1px dashed var(--wpds-color-stroke-surface-info)',
++						backgroundColor:
++							'color-mix(in srgb, var(--wpds-color-bg-surface-info) 10%, transparent)',
++						position: 'relative',
++					} }
++				>
++					<span
++						style={ {
++							position: 'absolute',
++							top: 4,
++							insetInlineStart: 4,
++							fontSize: 10,
++							padding: '1px 6px',
++							borderRadius: 2,
++							background: 'var(--wpds-color-bg-surface-info)',
++							color: 'var(--wpds-color-fg-content-info)',
++							fontFamily:
++								'var(--wpds-typography-font-family-mono)',
++						} }
++					>
++						{ i + 1 }
++					</span>
++				</div>
++			) ) }
++		</div>
++	);
++}
++
++/**
++ * Replaces the package's default edit-mode overlay with a custom
++ * visual through the `renderGridOverlay` prop. The grid mounts the
++ * supplied component as a sibling behind the tiles whenever
++ * `editMode` is on, passing the resolved `{ columns, gapPx,
++ * rowHeight }` so the override can reproduce the column and row
++ * tracks pixel-accurately without re-deriving them.
++ *
++ * Here the override (see `NumberedOverlay` above) swaps the warning
++ * tone for info, drops the row dividers, and labels each column
++ * track with its index. Pass `renderGridOverlay={ () => null }` to
++ * suppress the overlay entirely while keeping `editMode` interactions
++ * on.
++ */
++export const CustomGridOverlayStory: Story = {
++	name: 'Custom Grid Overlay',
++	args: {
++		columns: 12,
++		spacing: 4,
++		rowHeight: 80,
++		editMode: true,
++		layout: [
++			{ key: 'a', width: 3, height: 1 },
++			{ key: 'b', width: 5, height: 1 },
++			{ key: 'c', width: 4, height: 1 },
++			{ key: 'd', width: 2, height: 2 },
++			{ key: 'e', width: 6, height: 1 },
++		],
++	},
++	render: function CustomGridOverlayRender( args ) {
++		const [ layout, setLayout ] = useState< DashboardGridLayoutItem[] >(
++			args.layout
++		);
++
++		const tiles = useMemo(
++			() => [
++				<Tile key="a" tone="brand">
++					A
++				</Tile>,
++				<Tile key="b" tone="info">
++					B
++				</Tile>,
++				<Tile key="c" tone="success">
++					C
++				</Tile>,
++				<Tile key="d" tone="warning">
++					D
++				</Tile>,
++				<Tile key="e" tone="error">
++					E
++				</Tile>,
++			],
++			[]
++		);
++
++		return (
++			<DashboardGrid
++				{ ...args }
++				layout={ layout }
++				onChangeLayout={ setLayout }
++				renderGridOverlay={ NumberedOverlay }
++			>
++				{ tiles }
++			</DashboardGrid>
++		);
++	},
++};
+diff --git a/packages/grid/src/dashboard-grid/types.ts b/packages/grid/src/dashboard-grid/types.ts
+index 360505873d6976..b23c09c583b35c 100644
+--- a/packages/grid/src/dashboard-grid/types.ts
++++ b/packages/grid/src/dashboard-grid/types.ts
+@@ -3,6 +3,7 @@
+  */
+ import type {
+ 	DragPreviewRenderProps,
++	GridOverlayRenderProps,
+ 	ResizeDelta,
+ 	ResizeHandleRenderProps,
+ } from '../shared/types';
+@@ -209,6 +210,17 @@ interface BaseDashboardGridProps
+ 	 * properties documented in the README.
+ 	 */
+ 	renderDragPreview?: React.ComponentType< DragPreviewRenderProps >;
++
++	/**
++	 * Override the default edit-mode overlay (diagonal stripes plus
++	 * dashed column and row tracks) with a custom component. The grid
++	 * supplies the resolved column count, gap, and row height; the
++	 * consumer is responsible for the visual.
++	 *
++	 * The overlay only renders when `editMode` is true. When omitted,
++	 * the package's default visual is used.
++	 */
++	renderGridOverlay?: React.ComponentType< GridOverlayRenderProps >;
+ }
+ 
+ interface FixedDashboardGridProps extends BaseDashboardGridProps {
+diff --git a/packages/grid/src/dashboard-lanes/index.tsx b/packages/grid/src/dashboard-lanes/index.tsx
+index 033f65cd658a25..1339b124d6ef3e 100644
+--- a/packages/grid/src/dashboard-lanes/index.tsx
++++ b/packages/grid/src/dashboard-lanes/index.tsx
+@@ -37,6 +37,7 @@ import {
+  */
+ import { LanesItem } from './lanes-item';
+ import { useLanePlacement } from './use-lane-placement';
++import { GridOverlay } from '../shared/grid-overlay';
+ import type { DashboardLanesLayoutItem, DashboardLanesProps } from './types';
+ import type { ResizeDelta } from '../shared/types';
+ import styles from './lanes.module.css';
+@@ -97,6 +98,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
+ 			onPreviewLayout,
+ 			renderResizeHandle,
+ 			renderDragPreview,
++			renderGridOverlay,
+ 			...divProps
+ 		} = props;
+ 
+@@ -421,6 +423,25 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
+ 				</div>
+ 			) : null;
+ 
++		// Edit-mode background visual. Lanes are content-driven
++		// vertically, so the overlay only mirrors columns; the default
++		// can be replaced wholesale via `renderGridOverlay`. Rendered
++		// unconditionally so the overlay can cross-fade on edit-mode
++		// toggles; `isActive` drives the opacity transition inside the
++		// overlay. Memoized so drag/resize re-renders skip
++		// reconciliation while inputs are stable.
++		const Overlay = renderGridOverlay ?? GridOverlay;
++		const gridOverlay = useMemo(
++			() => (
++				<Overlay
++					columns={ effectiveColumns }
++					gapPx={ gapPx }
++					isActive={ editMode }
++				/>
++			),
++			[ Overlay, editMode, effectiveColumns, gapPx ]
++		);
++
+ 		return (
+ 			<DndContext
+ 				sensors={ sensors }
+@@ -458,6 +479,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
+ 							} as React.CSSProperties
+ 						}
+ 					>
++						{ gridOverlay }
+ 						{ items.map( ( id ) => {
+ 							const child = childrenMap.get( id );
+ 							if ( ! child ) {
+diff --git a/packages/grid/src/dashboard-lanes/lanes.module.css b/packages/grid/src/dashboard-lanes/lanes.module.css
+index 3505fc09d8933c..bddf4d73817637 100644
+--- a/packages/grid/src/dashboard-lanes/lanes.module.css
++++ b/packages/grid/src/dashboard-lanes/lanes.module.css
+@@ -2,6 +2,7 @@
+ 	display: grid-lanes;
+ 	column-gap: var(--wp-grid-lane-gap, 0);
+ 	row-gap: var(--wp-grid-lane-gap, 0);
++	position: relative;
+ }
+ 
+ /*
+diff --git a/packages/grid/src/dashboard-lanes/stories/index.story.tsx b/packages/grid/src/dashboard-lanes/stories/index.story.tsx
+index 6d40158d4739b0..2b181409b62730 100644
+--- a/packages/grid/src/dashboard-lanes/stories/index.story.tsx
++++ b/packages/grid/src/dashboard-lanes/stories/index.story.tsx
+@@ -13,6 +13,7 @@ import { useState, useMemo } from '@wordpress/element';
+  */
+ import { DashboardLanes } from '..';
+ import type { DashboardLanesLayoutItem } from '../types';
++import type { GridOverlayRenderProps } from '../../shared/types';
+ 
+ const meta: Meta< typeof DashboardLanes > = {
+ 	title: 'Grid/DashboardLanes',
+@@ -81,7 +82,9 @@ const bgTokens: Record< Tone, string > = {
+ };
+ 
+ const fgTokens: Record< Tone, string > = {
+-	brand: 'var(--wpds-color-fg-content-info)',
++	// `brand` has no dedicated fg-content token in the design system,
++	// so neutral content reads safely against the brand surface tint.
++	brand: 'var(--wpds-color-fg-content-neutral)',
+ 	info: 'var(--wpds-color-fg-content-info)',
+ 	success: 'var(--wpds-color-fg-content-success)',
+ 	warning: 'var(--wpds-color-fg-content-warning)',
+@@ -258,6 +261,18 @@ export const Spanning: Story = {
+  * Edit mode: drag to reorder, resize from the bottom-right corner
+  * (horizontal only — heights are content-driven). Drop commits the
+  * new layout via `onChangeLayout`.
++ *
++ * While `editMode` is on, `<DashboardLanes />` paints its default
++ * overlay behind the tiles to mark the lane tracks: diagonal stripes
++ * plus a dashed outline and subtle fill on each column. Lanes paint
++ * columns only — there are no row dividers because heights are
++ * content-driven.
++ *
++ * Theme the default look in place via CSS custom properties
++ * (`--wp-grid-overlay-stripe-color`, `--wp-grid-overlay-track-color`,
++ * `--wp-grid-overlay-column-fill`), or replace the visual wholesale
++ * by passing `renderGridOverlay`. See the `Custom Grid Overlay`
++ * story below for a full override example.
+  */
+ export const EditMode: Story = {
+ 	args: {
+@@ -332,3 +347,156 @@ export const EditMode: Story = {
+ 		);
+ 	},
+ };
++
++/**
++ * Example custom overlay supplied to `<DashboardLanes />` through the
++ * `renderGridOverlay` prop. Receives `{ columns, gapPx, isActive }`
++ * from the surface (no `rowHeight` because lane heights are
++ * content-driven). The custom must honor `isActive` for the same
++ * cross-fade behavior as the default; the surface always mounts the
++ * overlay.
++ *
++ * @param props          Render props supplied by the surface.
++ * @param props.columns  Number of lane tracks to mirror.
++ * @param props.gapPx    Gap between lanes in pixels.
++ * @param props.isActive Whether the overlay should be visible.
++ */
++function NumberedLanesOverlay( {
++	columns,
++	gapPx,
++	isActive,
++}: GridOverlayRenderProps ) {
++	return (
++		<div
++			aria-hidden
++			style={ {
++				position: 'absolute',
++				inset: 0,
++				display: 'grid',
++				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
++				gap: gapPx,
++				pointerEvents: 'none',
++				opacity: isActive ? 1 : 0,
++				visibility: isActive ? 'visible' : 'hidden',
++				transition: isActive
++					? 'opacity 200ms ease, visibility 0s linear 0s'
++					: 'opacity 200ms ease, visibility 0s linear 200ms',
++				backgroundImage: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-bg-surface-info) 24%, transparent) 0 6px, transparent 6px 12px)`,
++			} }
++		>
++			{ Array.from( { length: columns } ).map( ( _, i ) => (
++				<div
++					key={ i }
++					style={ {
++						outline:
++							'1px dashed var(--wpds-color-stroke-surface-info)',
++						backgroundColor:
++							'color-mix(in srgb, var(--wpds-color-bg-surface-info) 10%, transparent)',
++						position: 'relative',
++					} }
++				>
++					<span
++						style={ {
++							position: 'absolute',
++							top: 4,
++							insetInlineStart: 4,
++							fontSize: 10,
++							padding: '1px 6px',
++							borderRadius: 2,
++							background: 'var(--wpds-color-bg-surface-info)',
++							color: 'var(--wpds-color-fg-content-info)',
++							fontFamily:
++								'var(--wpds-typography-font-family-mono)',
++						} }
++					>
++						{ i + 1 }
++					</span>
++				</div>
++			) ) }
++		</div>
++	);
++}
++
++/**
++ * Replaces the surface's default edit-mode overlay with a custom
++ * visual through the `renderGridOverlay` prop. The same contract as
++ * `<DashboardGrid />`'s override path, with `rowHeight` omitted from
++ * the render props because lanes are content-driven vertically.
++ *
++ * Pass `renderGridOverlay={ () => null }` to suppress the overlay
++ * entirely while keeping `editMode` interactions on.
++ */
++export const CustomGridOverlayStory: Story = {
++	name: 'Custom Grid Overlay',
++	args: {
++		columns: 4,
++		spacing: 2,
++		editMode: true,
++	},
++	render: function CustomGridOverlayRender( args ) {
++		const initial: ( DashboardLanesLayoutItem & {
++			tone: Tone;
++			height: number;
++			label: string;
++		} )[] = [
++			{ key: 'a', tone: 'brand', height: 140, label: '140px' },
++			{ key: 'b', tone: 'info', height: 200, label: '200px' },
++			{
++				key: 'wide',
++				width: 2,
++				tone: 'success',
++				height: 120,
++				label: 'span 2',
++			},
++			{ key: 'c', tone: 'warning', height: 180, label: '180px' },
++			{ key: 'd', tone: 'error', height: 100, label: '100px' },
++			{ key: 'e', tone: 'neutral', height: 220, label: '220px' },
++		];
++
++		const [ tiles, setTiles ] = useState( initial );
++
++		const layout: DashboardLanesLayoutItem[] = tiles.map(
++			( { tone: _tone, height: _height, label: _label, ...item } ) => item
++		);
++
++		const onChangeLayout = ( next: DashboardLanesLayoutItem[] ) => {
++			setTiles(
++				next.map( ( item ) => {
++					const existing = tiles.find( ( t ) => t.key === item.key );
++					return {
++						...item,
++						tone: existing?.tone ?? 'neutral',
++						height: existing?.height ?? 100,
++						label: existing?.label ?? item.key,
++					};
++				} )
++			);
++		};
++
++		const tileElements = useMemo(
++			() =>
++				tiles.map( ( tile, i ) => (
++					<Tile
++						key={ tile.key }
++						tone={ tile.tone }
++						height={ tile.height }
++						index={ i + 1 }
++					>
++						{ tile.label }
++					</Tile>
++				) ),
++			[ tiles ]
++		);
++
++		return (
++			<DashboardLanes
++				{ ...args }
++				layout={ layout }
++				onChangeLayout={ onChangeLayout }
++				renderGridOverlay={ NumberedLanesOverlay }
++			>
++				{ tileElements }
++			</DashboardLanes>
++		);
++	},
++};
+diff --git a/packages/grid/src/dashboard-lanes/types.ts b/packages/grid/src/dashboard-lanes/types.ts
+index 9a39e591ac7481..9c03b5d2816494 100644
+--- a/packages/grid/src/dashboard-lanes/types.ts
++++ b/packages/grid/src/dashboard-lanes/types.ts
+@@ -3,6 +3,7 @@
+  */
+ import type {
+ 	DragPreviewRenderProps,
++	GridOverlayRenderProps,
+ 	ResizeHandleRenderProps,
+ } from '../shared/types';
+ 
+@@ -145,6 +146,17 @@ interface BaseDashboardLanesProps
+ 	 * properties documented in the README.
+ 	 */
+ 	renderDragPreview?: React.ComponentType< DragPreviewRenderProps >;
++
++	/**
++	 * Override the default edit-mode overlay (diagonal stripes plus
++	 * dashed column track guides) with a custom component. Lanes are
++	 * content-driven vertically, so no `rowHeight` is supplied and the
++	 * default visual paints columns only.
++	 *
++	 * The overlay only renders when `editMode` is true. When omitted,
++	 * the package's default visual is used.
++	 */
++	renderGridOverlay?: React.ComponentType< GridOverlayRenderProps >;
+ }
+ 
+ interface FixedDashboardLanesProps extends BaseDashboardLanesProps {
+diff --git a/packages/grid/src/index.ts b/packages/grid/src/index.ts
+index 8f34edde04dfdd..290bb83fdbfb17 100644
+--- a/packages/grid/src/index.ts
++++ b/packages/grid/src/index.ts
+@@ -11,6 +11,7 @@ export type {
+ } from './dashboard-lanes/types';
+ export type {
+ 	DragPreviewRenderProps,
++	GridOverlayRenderProps,
+ 	ResizeDelta,
+ 	ResizeHandleRenderProps,
+ } from './shared/types';
+diff --git a/packages/grid/src/shared/grid-overlay.module.css b/packages/grid/src/shared/grid-overlay.module.css
+new file mode 100644
+index 00000000000000..b9f65d9b0c46c3
+--- /dev/null
++++ b/packages/grid/src/shared/grid-overlay.module.css
+@@ -0,0 +1,55 @@
++.overlay {
++	position: absolute;
++	inset: 0;
++	display: grid;
++	pointer-events: none;
++	opacity: 0;
++	visibility: hidden;
++	transition:
++		opacity 200ms ease,
++		visibility 0s linear 200ms;
++	background-image:
++		repeating-linear-gradient(135deg, var(--wp-grid-overlay-stripe-color, color-mix(in srgb, var(--wpds-color-bg-surface-info) 15%, transparent))
++		0 6px, transparent 6px 12px);
++}
++
++.overlay.is-active {
++	opacity: 1;
++	visibility: visible;
++	transition:
++		opacity 200ms ease,
++		visibility 0s linear 0s;
++}
++
++@media (prefers-reduced-motion: reduce) {
++	.overlay {
++		transition: none;
++	}
++}
++
++.column {
++	outline:
++		1px dashed
++		var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral));
++	background-color: var(--wp-grid-overlay-column-fill, color-mix(in srgb, var(--wpds-color-bg-surface-info) 10%, transparent));
++	position: relative;
++}
++
++/*
++ * Dashed row dividers framing every row. A `::after` pseudo-element
++ * tiles two 1px strokes per row (top of the row area and bottom of
++ * the row area, leaving the gap clear between them) and is masked
++ * with a horizontal dash pattern so the strokes render dashed instead
++ * of solid.
++ */
++.has-rows .column::after {
++	content: "";
++	position: absolute;
++	inset: 0;
++	pointer-events: none;
++	background-image: linear-gradient(to bottom, var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) 0, var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) 1px, transparent 1px, transparent calc(var(--wp-grid-overlay-row-height) - 1px), var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) calc(var(--wp-grid-overlay-row-height) - 1px), var(--wp-grid-overlay-track-color, var(--wpds-color-stroke-surface-neutral)) var(--wp-grid-overlay-row-height), transparent var(--wp-grid-overlay-row-height), transparent var(--wp-grid-overlay-row-tile));
++	background-size: 100% var(--wp-grid-overlay-row-tile);
++	background-repeat: repeat;
++	mask-image: repeating-linear-gradient(to right, #000 0 4px, transparent 4px 8px);
++	-webkit-mask-image: repeating-linear-gradient(to right, #000 0 4px, transparent 4px 8px);
++}
+diff --git a/packages/grid/src/shared/grid-overlay.tsx b/packages/grid/src/shared/grid-overlay.tsx
+new file mode 100644
+index 00000000000000..0c639d53e1c756
+--- /dev/null
++++ b/packages/grid/src/shared/grid-overlay.tsx
+@@ -0,0 +1,70 @@
++/**
++ * External dependencies
++ */
++import clsx from 'clsx';
++
++/**
++ * Internal dependencies
++ */
++import type { GridOverlayRenderProps } from './types';
++import styles from './grid-overlay.module.css';
++
++/**
++ * Default edit-mode overlay. Paints diagonal stripes behind the tiles
++ * to mark the dashboard surface, plus dashed outlines on each column
++ * track and (when `rowHeight` is supplied) repeating dividers for the
++ * row tracks.
++ *
++ * Used by both `DashboardGrid` and `DashboardLanes`. Replaced wholesale
++ * by passing a `renderGridOverlay` to either surface; themed in place
++ * via the CSS custom properties documented in the package README.
++ *
++ * Cross-fades in and out on `isActive` toggles via a CSS opacity
++ * transition; while inactive, `visibility: hidden` releases paint cost.
++ *
++ * @param props           Render props supplied by the surface.
++ * @param props.columns   Number of column tracks to mirror.
++ * @param props.gapPx     Gap between tracks in pixels.
++ * @param props.rowHeight Row height in pixels for surfaces with uniform
++ *                        rows. Omitted on lane surfaces or auto-sized
++ *                        grids; in that case row dividers are skipped.
++ * @param props.isActive  When `false`, the overlay fades out and stops
++ *                        consuming paint cost.
++ */
++export function GridOverlay( {
++	columns,
++	gapPx,
++	rowHeight,
++	isActive,
++}: GridOverlayRenderProps ) {
++	const showRows = typeof rowHeight === 'number';
++	// `--wp-grid-overlay-row-height` and `--wp-grid-overlay-row-tile`
++	// drive the row-divider stops so the CSS file stays static while
++	// the values come from the live grid.
++	const style: React.CSSProperties = {
++		gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
++		gap: `${ gapPx }px`,
++		...( showRows
++			? ( {
++					'--wp-grid-overlay-row-height': `${ rowHeight }px`,
++					'--wp-grid-overlay-row-tile': `${ rowHeight + gapPx }px`,
++			  } as React.CSSProperties )
++			: {} ),
++	};
++
++	return (
++		<div
++			aria-hidden
++			className={ clsx(
++				styles.overlay,
++				isActive && styles[ 'is-active' ],
++				showRows && styles[ 'has-rows' ]
++			) }
++			style={ style }
++		>
++			{ Array.from( { length: columns } ).map( ( _, i ) => (
++				<div key={ i } className={ styles.column } />
++			) ) }
++		</div>
++	);
++}
+diff --git a/packages/grid/src/shared/types.ts b/packages/grid/src/shared/types.ts
+index ff97c0da2c5ed2..a1eab5e4b5d85f 100644
+--- a/packages/grid/src/shared/types.ts
++++ b/packages/grid/src/shared/types.ts
+@@ -81,6 +81,46 @@ export interface DragPreviewRenderProps {
+ 	itemId: string;
+ }
+ 
++/**
++ * Props received by a custom grid overlay component. The overlay
++ * paints behind the tiles in edit mode to visualize the column tracks
++ * and (when `rowHeight` is defined) the row tracks. Receives a
++ * snapshot of the surface's resolved layout parameters so the visual
++ * can reproduce the tracks pixel-accurately without re-deriving them.
++ *
++ * Reused by both `DashboardGrid` and `DashboardLanes`: lanes pass no
++ * `rowHeight` because heights are content-driven.
++ */
++export interface GridOverlayRenderProps {
++	/**
++	 * Number of column tracks in the active surface. In responsive
++	 * mode (`minColumnWidth`), this is the count derived from the
++	 * container width, not the prop value.
++	 */
++	columns: number;
++
++	/**
++	 * Gap between tracks in pixels (`spacing * 4`).
++	 */
++	gapPx: number;
++
++	/**
++	 * Row height in pixels for surfaces with uniform rows. Omitted on
++	 * surfaces with content-driven heights (lanes) or when row height
++	 * is `'auto'`; in those cases the overlay paints columns only.
++	 */
++	rowHeight?: number;
++
++	/**
++	 * Whether the overlay should be visible. Surfaces render the
++	 * overlay even when `false` so the implementation can transition
++	 * opacity in and out; while `false`, the overlay must hide itself
++	 * (and ideally release paint cost via `visibility: hidden` or an
++	 * equivalent).
++	 */
++	isActive: boolean;
++}
++
+ /**
+  * Props for the internal `<ResizeHandle />` wrapper.
+  */

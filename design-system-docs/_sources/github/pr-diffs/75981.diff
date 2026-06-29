@@ -1,0 +1,1022 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 50ad0f459e47ea..992e14622eb761 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   Add `Notice` primitive ([#75981](https://github.com/WordPress/gutenberg/pull/75981)).
++
+ ### Enhancements
+ 
+ -   `Dialog`: Add `--wp-ui-dialog-z-index` CSS custom property for legacy z-index compatibility ([#75874](https://github.com/WordPress/gutenberg/pull/75874)).
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 6a6f1e12018fae..77f9b56c39885b 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -4,6 +4,7 @@ export * as Dialog from './dialog';
+ export * from './form/primitives';
+ export * from './icon';
+ export * from './icon-button';
++export * as Notice from './notice';
+ export * from './stack';
+ export * as Tabs from './tabs';
+ export * as Tooltip from './tooltip';
+diff --git a/packages/ui/src/notice/action-button.tsx b/packages/ui/src/notice/action-button.tsx
+new file mode 100644
+index 00000000000000..2ac90a138d271a
+--- /dev/null
++++ b/packages/ui/src/notice/action-button.tsx
+@@ -0,0 +1,36 @@
++import { forwardRef } from '@wordpress/element';
++import clsx from 'clsx';
++import { Button } from '../button';
++import type { ActionButtonProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * An action button for use within Notice.Actions.
++ */
++export const ActionButton = forwardRef< HTMLButtonElement, ActionButtonProps >(
++	function NoticeActionButton(
++		{ className, loading, loadingAnnouncement, variant, ...props },
++		ref
++	) {
++		const loadingProps =
++			loading !== undefined
++				? { loading, loadingAnnouncement: loadingAnnouncement ?? '' }
++				: {};
++
++		return (
++			<Button
++				{ ...props }
++				{ ...loadingProps }
++				ref={ ref }
++				size="compact"
++				tone="neutral"
++				variant={ variant }
++				className={ clsx(
++					styles[ 'action-button' ],
++					styles[ `is-action-button-${ variant }` ],
++					className
++				) }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/notice/action-link.tsx b/packages/ui/src/notice/action-link.tsx
+new file mode 100644
+index 00000000000000..2be24d14f5ca74
+--- /dev/null
++++ b/packages/ui/src/notice/action-link.tsx
+@@ -0,0 +1,28 @@
++import { forwardRef } from '@wordpress/element';
++import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
++import type { ActionLinkProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * An action link for use within Notice.Actions.
++ *
++ * TODO: This should use a shared Link component.
++ */
++export const ActionLink = forwardRef< HTMLAnchorElement, ActionLinkProps >(
++	function NoticeActionLink( { className, render, ...props }, ref ) {
++		const element = useRender( {
++			defaultTagName: 'a',
++			render,
++			ref,
++			props: mergeProps< 'a' >(
++				{
++					className: clsx( styles[ 'action-link' ], className ),
++				},
++				props
++			),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/notice/actions.tsx b/packages/ui/src/notice/actions.tsx
+new file mode 100644
+index 00000000000000..ad9002468506a6
+--- /dev/null
++++ b/packages/ui/src/notice/actions.tsx
+@@ -0,0 +1,25 @@
++import { forwardRef } from '@wordpress/element';
++import { useRender, mergeProps } from '@base-ui/react';
++import type { ActionsProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * A container for Notice.ActionButton and Notice.ActionLink.
++ */
++export const Actions = forwardRef< HTMLDivElement, ActionsProps >(
++	function NoticeActions( { render, ...props }, ref ) {
++		const element = useRender( {
++			defaultTagName: 'div',
++			render,
++			ref,
++			props: mergeProps< 'div' >(
++				{
++					className: styles.actions,
++				},
++				props
++			),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/notice/close-icon.tsx b/packages/ui/src/notice/close-icon.tsx
+new file mode 100644
+index 00000000000000..ec58ef574e6ff1
+--- /dev/null
++++ b/packages/ui/src/notice/close-icon.tsx
+@@ -0,0 +1,30 @@
++import { forwardRef } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
++import { closeSmall } from '@wordpress/icons';
++import clsx from 'clsx';
++import { IconButton } from '../icon-button';
++import type { CloseIconProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * The close button for a notice. Renders an icon button with a close icon.
++ */
++export const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
++	function NoticeCloseIcon(
++		{ className, icon = closeSmall, label = __( 'Dismiss' ), ...props },
++		ref
++	) {
++		return (
++			<IconButton
++				{ ...props }
++				ref={ ref }
++				className={ clsx( styles[ 'close-icon' ], className ) }
++				variant="minimal"
++				size="small"
++				tone="neutral"
++				icon={ icon }
++				label={ label }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/notice/description.tsx b/packages/ui/src/notice/description.tsx
+new file mode 100644
+index 00000000000000..0613f7a0daeffd
+--- /dev/null
++++ b/packages/ui/src/notice/description.tsx
+@@ -0,0 +1,23 @@
++import { forwardRef } from '@wordpress/element';
++import { useRender, mergeProps } from '@base-ui/react';
++import type { DescriptionProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * The description text for a notice.
++ */
++export const Description = forwardRef< HTMLDivElement, DescriptionProps >(
++	function NoticeDescription( { render, ...props }, ref ) {
++		const element = useRender( {
++			defaultTagName: 'div',
++			render,
++			ref,
++			props: mergeProps< 'div' >(
++				{ className: styles.description },
++				props
++			),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/notice/index.ts b/packages/ui/src/notice/index.ts
+new file mode 100644
+index 00000000000000..6652eb92a328b3
+--- /dev/null
++++ b/packages/ui/src/notice/index.ts
+@@ -0,0 +1,19 @@
++import { Root } from './root';
++import { Title } from './title';
++import { Description } from './description';
++import { Actions } from './actions';
++import { CloseIcon } from './close-icon';
++import { ActionButton } from './action-button';
++import { ActionLink } from './action-link';
++
++export {
++	Root,
++	Title,
++	Description,
++	Actions,
++	CloseIcon,
++	ActionButton,
++	ActionLink,
++};
++
++export type { NoticeIntent } from './types';
+diff --git a/packages/ui/src/notice/root.tsx b/packages/ui/src/notice/root.tsx
+new file mode 100644
+index 00000000000000..58596da17de9e8
+--- /dev/null
++++ b/packages/ui/src/notice/root.tsx
+@@ -0,0 +1,132 @@
++import { speak } from '@wordpress/a11y';
++import { forwardRef, renderToString, useEffect } from '@wordpress/element';
++import { info, published, error, caution } from '@wordpress/icons';
++import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
++import { Icon } from '../icon';
++import resetStyles from '../utils/css/resets.module.css';
++import type { NoticeIntent, RootProps } from './types';
++import type { IconProps } from '../icon/types';
++import styles from './style.module.css';
++
++const icons: { [ key in NoticeIntent ]: IconProps[ 'icon' ] | null } = {
++	neutral: null,
++	info,
++	warning: caution,
++	success: published,
++	error,
++};
++
++/**
++ * Returns the default politeness level based on the notice intent.
++ * Error uses 'assertive' for urgent announcements, others use 'polite'.
++ */
++function getDefaultPoliteness( intent: NoticeIntent ): 'polite' | 'assertive' {
++	return intent === 'error' ? 'assertive' : 'polite';
++}
++
++/**
++ * Safely converts a message to a string for screen reader announcement.
++ * Returns undefined if the message can't be safely serialized.
++ */
++function safeRenderToString( message: RootProps[ 'spokenMessage' ] ) {
++	if ( ! message ) {
++		return undefined;
++	}
++	if ( typeof message === 'string' ) {
++		return message;
++	}
++	try {
++		return renderToString( message );
++	} catch {
++		// If renderToString fails (e.g., due to complex components like Tooltip),
++		// return undefined and skip the announcement
++		return undefined;
++	}
++}
++
++/**
++ * Custom hook which announces the message with the given politeness.
++ */
++function useSpokenMessage(
++	message: RootProps[ 'spokenMessage' ],
++	politeness: 'polite' | 'assertive'
++) {
++	const spokenMessage = safeRenderToString( message );
++
++	useEffect( () => {
++		if ( spokenMessage ) {
++			speak( spokenMessage, politeness );
++		}
++	}, [ spokenMessage, politeness ] );
++}
++
++/**
++ * A notice component that communicates system status and provides actions.
++ *
++ * ```jsx
++ * import { Notice } from '@wordpress/ui';
++ *
++ * function MyComponent() {
++ * 	return (
++ * 		<Notice.Root intent="info">
++ * 			<Notice.Title>Heading</Notice.Title>
++ * 			<Notice.Description>Body text</Notice.Description>
++ * 			<Notice.Actions>
++ * 				<Notice.ActionButton>Action</Notice.ActionButton>
++ * 			</Notice.Actions>
++ * 			<Notice.CloseIcon onClick={() => {}} />
++ * 		</Notice.Root>
++ * 	);
++ * }
++ * ```
++ */
++export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
++	{
++		intent = 'neutral',
++		children,
++		icon,
++		spokenMessage = children,
++		politeness = getDefaultPoliteness( intent ),
++		render,
++		...restProps
++	},
++	ref
++) {
++	// Announce to screen readers via speak() API - no role attribute needed
++	// as it would cause double announcements
++	useSpokenMessage( spokenMessage, politeness );
++
++	const iconElement = icon === null ? null : icon ?? icons[ intent ];
++
++	const mergedClassName = clsx(
++		styles.notice,
++		styles[ `is-${ intent }` ],
++		resetStyles[ 'box-sizing' ]
++	);
++
++	const element = useRender( {
++		defaultTagName: 'div',
++		render,
++		ref,
++		props: mergeProps< 'div' >(
++			{
++				className: mergedClassName,
++				children: (
++					<>
++						{ children }
++						{ iconElement && (
++							<Icon
++								className={ styles.icon }
++								icon={ iconElement }
++							/>
++						) }
++					</>
++				),
++			},
++			restProps
++		),
++	} );
++
++	return element;
++} );
+diff --git a/packages/ui/src/notice/stories/index.story.tsx b/packages/ui/src/notice/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..cf1b7ed36b92ed
+--- /dev/null
++++ b/packages/ui/src/notice/stories/index.story.tsx
+@@ -0,0 +1,157 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import * as Notice from '../index';
++
++const meta: Meta< typeof Notice.Root > = {
++	title: 'Design System/Components/Notice',
++	component: Notice.Root,
++	subcomponents: {
++		'Notice.Title': Notice.Title,
++		'Notice.Description': Notice.Description,
++		'Notice.Actions': Notice.Actions,
++		'Notice.CloseIcon': Notice.CloseIcon,
++		'Notice.ActionButton': Notice.ActionButton,
++		'Notice.ActionLink': Notice.ActionLink,
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof Notice.Root >;
++
++export const Default: Story = {
++	args: {
++		children: (
++			<>
++				<Notice.Title>Notice Title</Notice.Title>
++				<Notice.Description>
++					Description text with details about this notification.
++				</Notice.Description>
++				<Notice.Actions>
++					<Notice.ActionButton>Primary button</Notice.ActionButton>
++					<Notice.ActionButton variant="outline">
++						Secondary button
++					</Notice.ActionButton>
++					<Notice.ActionLink href="#">Link</Notice.ActionLink>
++				</Notice.Actions>
++				<Notice.CloseIcon />
++			</>
++		),
++	},
++};
++
++export const Info: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		intent: 'info',
++	},
++};
++
++export const Warning: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		intent: 'warning',
++	},
++};
++
++export const Success: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		intent: 'success',
++	},
++};
++
++export const Error: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		intent: 'error',
++	},
++};
++
++/**
++ * Omit Notice.CloseIcon to make the notice non-dismissable.
++ */
++export const NonDismissible: Story = {
++	args: {
++		intent: 'warning',
++		children: (
++			<>
++				<Notice.Title>Action Required</Notice.Title>
++				<Notice.Description>
++					This notice cannot be dismissed by the user.
++				</Notice.Description>
++				<Notice.Actions>
++					<Notice.ActionButton>Take Action</Notice.ActionButton>
++					<Notice.ActionLink href="#">Visit link</Notice.ActionLink>
++				</Notice.Actions>
++			</>
++		),
++	},
++};
++
++/**
++ * Pass `icon={ null }` to hide the default decorative icon.
++ */
++export const WithoutIcon: Story = {
++	args: {
++		intent: 'info',
++		icon: null,
++		children: (
++			<>
++				<Notice.Title>No Icon</Notice.Title>
++				<Notice.Description>
++					This notice has no decorative icon displayed.
++				</Notice.Description>
++				<Notice.CloseIcon />
++			</>
++		),
++	},
++};
++
++export const WithoutActions: Story = {
++	args: {
++		intent: 'info',
++		children: (
++			<>
++				<Notice.Title>Simple Notice</Notice.Title>
++				<Notice.Description>
++					A dismissable notice without any action buttons or links.
++				</Notice.Description>
++				<Notice.CloseIcon />
++			</>
++		),
++	},
++};
++
++/**
++ * Title only, no description or actions.
++ */
++export const TitleOnly: Story = {
++	args: {
++		children: (
++			<>
++				<Notice.Title>Just a title</Notice.Title>
++				<Notice.CloseIcon />
++			</>
++		),
++	},
++};
++
++/**
++ * Description only, no title or actions.
++ */
++export const DescriptionOnly: Story = {
++	args: {
++		intent: 'info',
++		children: (
++			<>
++				<Notice.Description>
++					Just a description without title or actions.
++				</Notice.Description>
++				<Notice.CloseIcon />
++			</>
++		),
++	},
++};
+diff --git a/packages/ui/src/notice/style.module.css b/packages/ui/src/notice/style.module.css
+new file mode 100644
+index 00000000000000..4da592c3512b40
+--- /dev/null
++++ b/packages/ui/src/notice/style.module.css
+@@ -0,0 +1,147 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.notice {
++		--icon-height: 24px;
++		--text-vertical-padding: calc((var(--icon-height) - var(--wpds-font-line-height-sm)) / 2);
++
++		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-neutral-weak);
++		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-neutral);
++		--wp-ui-notice-text-color: var(--wpds-color-fg-content-neutral);
++		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-neutral);
++
++		display: grid;
++		align-items: start;
++		grid-template-columns: auto 1fr auto;
++		padding: var(--wpds-dimension-padding-md);
++		border: 1px solid var(--wp-ui-notice-border-color);
++		border-radius: var(--wpds-border-radius-lg);
++		background-color: var(--wp-ui-notice-background-color);
++	}
++
++	.icon {
++		grid-row: 1;
++		grid-column: 1;
++		margin-inline-end: var(--wpds-dimension-gap-xs);
++		color: var(--wp-ui-notice-decorative-icon-color);
++	}
++
++	.title {
++		grid-column: 2;
++
++		padding-block: var(--text-vertical-padding);
++
++		font-family: var(--wpds-font-family-heading);
++		font-size: var(--wpds-font-size-md);
++		font-weight: var(--wpds-font-weight-medium);
++		line-height: var(--wpds-font-line-height-sm);
++		color: var(--wp-ui-notice-text-color);
++	}
++
++	.description {
++		grid-column: 2;
++
++		padding-block: var(--text-vertical-padding);
++
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wpds-font-size-md);
++		font-weight: var(--wpds-font-weight-regular);
++		line-height: var(--wpds-font-line-height-sm);
++		text-wrap: pretty;
++		color: var(--wp-ui-notice-text-color);
++	}
++
++	.actions {
++		grid-column: 2;
++
++		display: flex;
++		gap: var(--wpds-dimension-gap-md);
++		flex-wrap: wrap;
++	}
++
++	/* If .actions is not the only content, add top margin to match design specs */
++	.notice:has(.title) .actions,
++	.notice:has(.description) .actions {
++		margin-block-start: var(--wpds-dimension-gap-sm);
++	}
++
++	.action-button {
++		flex-shrink: 0;
++	}
++
++	.action-link {
++		flex-shrink: 0;
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wpds-font-size-md);
++		font-weight: var(--wpds-font-weight-regular);
++		line-height: var(--wpds-font-line-height-sm);
++		margin-block: auto;
++		text-underline-offset: 0.2em;
++		text-decoration-thickness: 0.5px;
++		color: var(--wpds-color-fg-interactive-neutral);
++		text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
++
++		&:visited {
++			color: var(--wpds-color-fg-interactive-neutral);
++			text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
++		}
++
++		&:hover,
++		&:active {
++			color: var(--wpds-color-fg-interactive-neutral-active);
++		}
++
++		/* Add more horizontal space when following another action link/button */
++		&:not(:first-child) {
++			margin-inline-start: var(--wpds-dimension-gap-xs);
++		}
++
++		/* Add more horizontal space when followed by another action link/button */
++		&:not(:last-child) {
++			margin-inline-end: var(--wpds-dimension-gap-xs);
++		}
++	}
++
++	.close-icon {
++		grid-column: 3;
++		grid-row: 1;
++		margin-inline-start: var(--wpds-dimension-gap-xs);
++	}
++
++	.is-info {
++		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-info-weak);
++		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-info);
++		--wp-ui-notice-text-color: var(--wpds-color-fg-content-info);
++		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-info-weak);
++	}
++
++	.is-warning {
++		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-warning-weak);
++		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-warning);
++		--wp-ui-notice-text-color: var(--wpds-color-fg-content-warning);
++		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-warning-weak);
++	}
++
++	.is-success {
++		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-success-weak);
++		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-success);
++		--wp-ui-notice-text-color: var(--wpds-color-fg-content-success);
++		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-success-weak);
++	}
++
++	.is-error {
++		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-error-weak);
++		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-error);
++		--wp-ui-notice-text-color: var(--wpds-color-fg-content-error);
++		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-error-weak);
++	}
++}
++
++@layer wp-ui-compositions {
++	/* Add partial transparency to CloseIcon and outline/minimal ActionButton
++	 * for a better look over tinted backgrounds */
++	.close-icon,
++	.action-button:is(.is-action-button-outline, .is-action-button-minimal) {
++		--wp-ui-button-background-color-active: color-mix(in srgb, transparent 50%, var(--wpds-color-bg-interactive-neutral-weak-active));
++	}
++}
+diff --git a/packages/ui/src/notice/test/index.test.tsx b/packages/ui/src/notice/test/index.test.tsx
+new file mode 100644
+index 00000000000000..08257be8d78605
+--- /dev/null
++++ b/packages/ui/src/notice/test/index.test.tsx
+@@ -0,0 +1,206 @@
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { createRef } from '@wordpress/element';
++import * as Notice from '../index';
++
++describe( 'Notice', () => {
++	describe( 'basic behaviour', () => {
++		it( 'forwards ref', () => {
++			const rootRef = createRef< HTMLDivElement >();
++			const titleRef = createRef< HTMLSpanElement >();
++			const descriptionRef = createRef< HTMLDivElement >();
++			const actionsRef = createRef< HTMLDivElement >();
++			const actionButtonRef = createRef< HTMLButtonElement >();
++			const actionLinkRef = createRef< HTMLAnchorElement >();
++			const closeIconRef = createRef< HTMLButtonElement >();
++
++			render(
++				<Notice.Root ref={ rootRef }>
++					<Notice.Title ref={ titleRef }>Title</Notice.Title>
++					<Notice.Description ref={ descriptionRef }>
++						Test
++					</Notice.Description>
++					<Notice.Actions ref={ actionsRef }>
++						<Notice.ActionButton ref={ actionButtonRef }>
++							Action Button
++						</Notice.ActionButton>
++						<Notice.ActionLink
++							ref={ actionLinkRef }
++							href="/example"
++						>
++							Action Link
++						</Notice.ActionLink>
++					</Notice.Actions>
++					<Notice.CloseIcon ref={ closeIconRef } />
++				</Notice.Root>
++			);
++			expect( rootRef.current ).toBeInstanceOf( HTMLDivElement );
++			expect( titleRef.current ).toBeInstanceOf( HTMLSpanElement );
++			expect( descriptionRef.current ).toBeInstanceOf( HTMLDivElement );
++			expect( actionsRef.current ).toBeInstanceOf( HTMLDivElement );
++			expect( actionButtonRef.current ).toBeInstanceOf(
++				HTMLButtonElement
++			);
++			expect( actionLinkRef.current ).toBeInstanceOf( HTMLAnchorElement );
++			expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
++		} );
++
++		it( 'renders content', () => {
++			render(
++				<Notice.Root>
++					<Notice.Title>Update Available</Notice.Title>
++					<Notice.Description>
++						A new version is ready to install.
++					</Notice.Description>
++				</Notice.Root>
++			);
++
++			expect( screen.getByText( 'Update Available' ) ).toBeVisible();
++			expect(
++				screen.getByText( 'A new version is ready to install.' )
++			).toBeVisible();
++		} );
++	} );
++
++	describe( 'dismissing via CloseIcon', () => {
++		it( 'renders dismiss button when CloseIcon included', async () => {
++			const user = userEvent.setup();
++			const handleDismiss = jest.fn();
++
++			render(
++				<Notice.Root>
++					<Notice.Description>Dismissible</Notice.Description>
++					<Notice.CloseIcon onClick={ handleDismiss } />
++				</Notice.Root>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Dismiss' } )
++			);
++			expect( handleDismiss ).toHaveBeenCalledTimes( 1 );
++		} );
++
++		it( 'does not render dismiss button when CloseIcon omitted', () => {
++			render(
++				<Notice.Root>
++					<Notice.Description>Non-dismissible</Notice.Description>
++				</Notice.Root>
++			);
++
++			expect(
++				screen.queryByRole( 'button', { name: 'Dismiss' } )
++			).not.toBeInTheDocument();
++		} );
++
++		it( 'supports custom CloseIcon label', () => {
++			render(
++				<Notice.Root>
++					<Notice.Description>Test</Notice.Description>
++					<Notice.CloseIcon
++						label="Close notification"
++						onClick={ jest.fn() }
++					/>
++				</Notice.Root>
++			);
++			expect(
++				screen.getByRole( 'button', { name: 'Close notification' } )
++			).toBeVisible();
++		} );
++	} );
++
++	describe( 'decorative icon', () => {
++		it( 'renders icon for non-neutral intents', () => {
++			const { container } = render(
++				<Notice.Root intent="info">
++					<Notice.Description>Info message</Notice.Description>
++				</Notice.Root>
++			);
++			// Disable reason: The decorative SVG has aria-hidden and no role,
++			// so there is no Testing Library query that can target it.
++			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
++			const icon = container.querySelector( 'svg' );
++			expect( icon ).toBeVisible();
++			expect( icon ).toHaveAttribute( 'aria-hidden', 'true' );
++		} );
++
++		it( 'does not render icon for neutral intent', () => {
++			const { container } = render(
++				<Notice.Root intent="neutral">
++					<Notice.Description>Neutral message</Notice.Description>
++				</Notice.Root>
++			);
++			// Disable reason: The decorative SVG has aria-hidden and no role,
++			// so there is no Testing Library query that can target it.
++			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
++			expect( container.querySelector( 'svg' ) ).not.toBeInTheDocument();
++		} );
++
++		it( 'hides icon when icon prop is null', () => {
++			const { container } = render(
++				<Notice.Root intent="info" icon={ null }>
++					<Notice.Description>No icon</Notice.Description>
++				</Notice.Root>
++			);
++			// Disable reason: The decorative SVG has aria-hidden and no role,
++			// so there is no Testing Library query that can target it.
++			// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
++			expect( container.querySelector( 'svg' ) ).not.toBeInTheDocument();
++		} );
++	} );
++
++	describe( 'actions', () => {
++		it( 'renders ActionButton and ActionLink', async () => {
++			const user = userEvent.setup();
++			const handleClick = jest.fn();
++
++			render(
++				<Notice.Root>
++					<Notice.Description>Notice with actions</Notice.Description>
++					<Notice.Actions>
++						<Notice.ActionButton onClick={ handleClick }>
++							Retry
++						</Notice.ActionButton>
++						<Notice.ActionLink href="/docs">
++							Learn more
++						</Notice.ActionLink>
++					</Notice.Actions>
++				</Notice.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Retry' } ) );
++			expect( handleClick ).toHaveBeenCalledTimes( 1 );
++
++			expect(
++				screen.getByRole( 'link', { name: 'Learn more' } )
++			).toHaveAttribute( 'href', '/docs' );
++		} );
++	} );
++
++	describe( 'announcing to screen readers', () => {
++		it( 'creates a polite live region for non-error intents', () => {
++			render(
++				<Notice.Root intent="info">
++					<Notice.Description>Update available.</Notice.Description>
++				</Notice.Root>
++			);
++			expect(
++				screen.getByText( 'Update available.', {
++					selector: '[aria-live="polite"]',
++				} )
++			).toBeInTheDocument();
++		} );
++
++		it( 'creates an assertive live region for error intent', () => {
++			render(
++				<Notice.Root intent="error">
++					<Notice.Description>Something failed.</Notice.Description>
++				</Notice.Root>
++			);
++			expect(
++				screen.getByText( 'Something failed.', {
++					selector: '[aria-live="assertive"]',
++				} )
++			).toBeInTheDocument();
++		} );
++	} );
++} );
+diff --git a/packages/ui/src/notice/title.tsx b/packages/ui/src/notice/title.tsx
+new file mode 100644
+index 00000000000000..ed1fe2edc74358
+--- /dev/null
++++ b/packages/ui/src/notice/title.tsx
+@@ -0,0 +1,20 @@
++import { forwardRef } from '@wordpress/element';
++import { useRender, mergeProps } from '@base-ui/react';
++import type { TitleProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * A short heading that communicates the main message of the notice.
++ */
++export const Title = forwardRef< HTMLSpanElement, TitleProps >(
++	function NoticeTitle( { render, ...props }, ref ) {
++		const element = useRender( {
++			defaultTagName: 'span',
++			render,
++			ref,
++			props: mergeProps< 'span' >( { className: styles.title }, props ),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/notice/types.ts b/packages/ui/src/notice/types.ts
+new file mode 100644
+index 00000000000000..39f7aaad31e37b
+--- /dev/null
++++ b/packages/ui/src/notice/types.ts
+@@ -0,0 +1,100 @@
++import type { ReactNode } from 'react';
++import type { ComponentProps } from '../utils/types';
++import type { IconProps } from '../icon/types';
++import type { ButtonProps } from '../button/types';
++import type { IconButtonProps } from '../icon-button/types';
++
++export type NoticeIntent = 'warning' | 'success' | 'error' | 'info' | 'neutral';
++
++export interface RootProps extends Omit< ComponentProps< 'div' >, 'title' > {
++	/**
++	 * The semantic intent of the notice, communicating its meaning through color.
++	 * Available intents: neutral, info, warning, success, and error.
++	 *
++	 * @default 'neutral'
++	 */
++	intent?: NoticeIntent;
++
++	/**
++	 * Custom icon to override the default intent icon. Pass `null` to hide the icon.
++	 * Default icons by intent: neutral (none), info (info), warning (caution),
++	 * success (published), error (error).
++	 */
++	icon?: IconProps[ 'icon' ] | null;
++
++	/**
++	 * The content to be rendered inside the notice.
++	 */
++	children?: ReactNode;
++
++	/**
++	 * The message to be announced to screen readers. Defaults to the children content.
++	 * Used by the `speak()` function from `@wordpress/a11y`.
++	 */
++	spokenMessage?: ReactNode;
++
++	/**
++	 * The politeness level for screen reader announcements.
++	 * Defaults to 'assertive' for error intent, 'polite' for others.
++	 */
++	politeness?: 'polite' | 'assertive';
++}
++
++export interface TitleProps extends ComponentProps< 'span' > {
++	/**
++	 * The title text of the notice.
++	 */
++	children?: ReactNode;
++}
++
++export interface DescriptionProps extends ComponentProps< 'div' > {
++	/**
++	 * The description text of the notice.
++	 */
++	children?: ReactNode;
++}
++
++export interface ActionsProps extends ComponentProps< 'div' > {
++	/**
++	 * The action buttons for the notice.
++	 */
++	children?: ReactNode;
++}
++
++export interface CloseIconProps
++	extends Omit<
++		IconButtonProps,
++		| 'loading'
++		| 'loadingAnnouncement'
++		| 'variant'
++		| 'size'
++		| 'tone'
++		| 'label'
++		| 'icon'
++	> {
++	/**
++	 * A label describing the button's action, shown as a tooltip and to
++	 * assistive technology.
++	 */
++	label?: IconButtonProps[ 'label' ];
++
++	/**
++	 * The icon to display in the button.
++	 */
++	icon?: IconButtonProps[ 'icon' ];
++}
++
++export interface ActionButtonProps
++	extends Omit< ButtonProps, 'size' | 'tone' > {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++}
++
++export interface ActionLinkProps extends ComponentProps< 'a' > {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++}

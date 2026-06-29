@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 97c4fa39e4bd8b..d7ecd0e72c5f3c 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -144,7 +144,6 @@ function FontSizePicker(
+ 									? __( 'Use size preset' )
+ 									: __( 'Set custom size' )
+ 							}
+-							showTooltip={ false }
+ 							icon={ settings }
+ 							onClick={ () => {
+ 								setShowCustomValueControl(

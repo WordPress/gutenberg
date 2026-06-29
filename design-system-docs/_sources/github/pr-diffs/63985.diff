@@ -1,0 +1,112 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6413a2fb4d7b44..e2c09f5fe59c40 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ ### Internal
+ 
+ -   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).
++-   `CustomSelectControl`: Support generic props type ([#63985](https://github.com/WordPress/gutenberg/pull/63985)).
+ 
+ ## 28.4.0 (2024-07-24)
+ 
+diff --git a/packages/components/src/custom-select-control/index.tsx b/packages/components/src/custom-select-control/index.tsx
+index 8735b8d320991e..ecd9dc37a8f491 100644
+--- a/packages/components/src/custom-select-control/index.tsx
++++ b/packages/components/src/custom-select-control/index.tsx
+@@ -16,13 +16,13 @@ import { __, sprintf } from '@wordpress/i18n';
+ import _CustomSelect from '../custom-select-control-v2/custom-select';
+ import CustomSelectItem from '../custom-select-control-v2/item';
+ import * as Styled from '../custom-select-control-v2/styles';
+-import type { CustomSelectProps } from './types';
++import type { CustomSelectProps, CustomSelectOption } from './types';
+ import { VisuallyHidden } from '../visually-hidden';
+ 
+-function useDeprecatedProps( {
++function useDeprecatedProps< T extends CustomSelectOption >( {
+ 	__experimentalShowSelectedHint,
+ 	...otherProps
+-}: CustomSelectProps ) {
++}: CustomSelectProps< T > ) {
+ 	return {
+ 		showSelectedHint: __experimentalShowSelectedHint,
+ 		...otherProps,
+@@ -35,7 +35,7 @@ function useDeprecatedProps( {
+ function applyOptionDeprecations( {
+ 	__experimentalHint,
+ 	...rest
+-}: CustomSelectProps[ 'options' ][ number ] ) {
++}: CustomSelectOption ) {
+ 	return {
+ 		hint: __experimentalHint,
+ 		...rest,
+@@ -51,7 +51,9 @@ function getDescribedBy( currentValue: string, describedBy?: string ) {
+ 	return sprintf( __( 'Currently selected: %s' ), currentValue );
+ }
+ 
+-function CustomSelectControl( props: CustomSelectProps ) {
++function CustomSelectControl< T extends CustomSelectOption >(
++	props: CustomSelectProps< T >
++) {
+ 	const {
+ 		__next40pxDefaultSize = false,
+ 		describedBy,
+diff --git a/packages/components/src/custom-select-control/types.ts b/packages/components/src/custom-select-control/types.ts
+index 98e9633b02f1a8..e37ba349a2b843 100644
+--- a/packages/components/src/custom-select-control/types.ts
++++ b/packages/components/src/custom-select-control/types.ts
+@@ -6,7 +6,7 @@ import type { FocusEventHandler, MouseEventHandler } from 'react';
+ /**
+  * The object structure for the options array.
+  */
+-type Option = {
++export type CustomSelectOption = {
+ 	key: string;
+ 	name: string;
+ 	style?: React.CSSProperties;
+@@ -24,15 +24,15 @@ type Option = {
+ /**
+  * The object returned from the onChange event.
+  */
+-type ChangeObject = {
++type CustomSelectChangeObject< T extends CustomSelectOption > = {
+ 	highlightedIndex?: number;
+ 	inputValue?: string;
+ 	isOpen?: boolean;
+ 	type?: string;
+-	selectedItem: Option;
++	selectedItem: T;
+ };
+ 
+-export type CustomSelectProps = {
++export type CustomSelectProps< T extends CustomSelectOption > = {
+ 	/**
+ 	 * Optional classname for the component.
+ 	 */
+@@ -55,7 +55,7 @@ export type CustomSelectProps = {
+ 	 * Function called with the control's internal state changes. The `selectedItem`
+ 	 * property contains the next selected item.
+ 	 */
+-	onChange?: ( newValue: ChangeObject ) => void;
++	onChange?: ( newValue: CustomSelectChangeObject< T > ) => void;
+ 	/**
+ 	 * A handler for `blur` events on the trigger button.
+ 	 *
+@@ -83,7 +83,7 @@ export type CustomSelectProps = {
+ 	/**
+ 	 * The list of options that can be chosen from.
+ 	 */
+-	options: Array< Option >;
++	options: Array< T >;
+ 	/**
+ 	 * The size of the control.
+ 	 *
+@@ -93,7 +93,7 @@ export type CustomSelectProps = {
+ 	/**
+ 	 * Can be used to externally control the value of the control.
+ 	 */
+-	value?: Option;
++	value?: T;
+ 	/**
+ 	 * Use the `showSelectedHint` property instead.
+ 	 * @deprecated

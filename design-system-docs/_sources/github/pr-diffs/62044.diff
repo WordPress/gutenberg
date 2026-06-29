@@ -1,0 +1,247 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 37745fd3ddd747..fcd9c8a330ee08 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,12 +2,16 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   DropZone: rewrite animation without depending on framer-motion. ([#62044](https://github.com/WordPress/gutenberg/pull/62044))
++
+ ## 28.1.0 (2024-06-15)
+ 
+ ### Enhancements
+ 
+-- Add `text-wrap: balance` fallback to all instances of `text-wrap: pretty` for greater cross browser compatibility. ([#62233](https://github.com/WordPress/gutenberg/pull/62233))
+-- Updates the space between input + label to `8px` in CheckboxControl and RadioControl. Also increased the space between RadioControl components to `12px` to make it consistent with CheckboxControl. ([#61696](https://github.com/WordPress/gutenberg/pull/61696))
++-   Add `text-wrap: balance` fallback to all instances of `text-wrap: pretty` for greater cross browser compatibility. ([#62233](https://github.com/WordPress/gutenberg/pull/62233))
++-   Updates the space between input + label to `8px` in CheckboxControl and RadioControl. Also increased the space between RadioControl components to `12px` to make it consistent with CheckboxControl. ([#61696](https://github.com/WordPress/gutenberg/pull/61696))
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/drop-zone/index.tsx b/packages/components/src/drop-zone/index.tsx
+index abe8a2c0263da0..d0aef35b09d4d6 100644
+--- a/packages/components/src/drop-zone/index.tsx
++++ b/packages/components/src/drop-zone/index.tsx
+@@ -10,86 +10,14 @@ import { __ } from '@wordpress/i18n';
+ import { useState } from '@wordpress/element';
+ import { upload, Icon } from '@wordpress/icons';
+ import { getFilesFromDataTransfer } from '@wordpress/dom';
+-import {
+-	__experimentalUseDropZone as useDropZone,
+-	useReducedMotion,
+-} from '@wordpress/compose';
++import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+  */
+-import {
+-	__unstableMotion as motion,
+-	__unstableAnimatePresence as AnimatePresence,
+-} from '../animation';
+ import type { DropType, DropZoneProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
+-const backdrop = {
+-	hidden: { opacity: 0 },
+-	show: {
+-		opacity: 1,
+-		transition: {
+-			type: 'tween',
+-			duration: 0.2,
+-			delay: 0,
+-			delayChildren: 0.1,
+-		},
+-	},
+-	exit: {
+-		opacity: 0,
+-		transition: {
+-			duration: 0.2,
+-			delayChildren: 0,
+-		},
+-	},
+-};
+-
+-const foreground = {
+-	hidden: { opacity: 0, scale: 0.9 },
+-	show: {
+-		opacity: 1,
+-		scale: 1,
+-		transition: {
+-			duration: 0.1,
+-		},
+-	},
+-	exit: { opacity: 0, scale: 0.9 },
+-};
+-
+-function DropIndicator( { label }: { label?: string } ) {
+-	const disableMotion = useReducedMotion();
+-	const children = (
+-		<motion.div
+-			variants={ backdrop }
+-			initial={ disableMotion ? 'show' : 'hidden' }
+-			animate="show"
+-			exit={ disableMotion ? 'show' : 'exit' }
+-			className="components-drop-zone__content"
+-			// Without this, when this div is shown,
+-			// Safari calls a onDropZoneLeave causing a loop because of this bug
+-			// https://bugs.webkit.org/show_bug.cgi?id=66547
+-			style={ { pointerEvents: 'none' } }
+-		>
+-			<motion.div variants={ foreground }>
+-				<Icon
+-					icon={ upload }
+-					className="components-drop-zone__content-icon"
+-				/>
+-				<span className="components-drop-zone__content-text">
+-					{ label ? label : __( 'Drop files to upload' ) }
+-				</span>
+-			</motion.div>
+-		</motion.div>
+-	);
+-
+-	if ( disableMotion ) {
+-		return children;
+-	}
+-
+-	return <AnimatePresence>{ children }</AnimatePresence>;
+-}
+-
+ /**
+  * `DropZone` is a component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event.
+  *
+@@ -135,7 +63,7 @@ export function DropZoneComponent( {
+ 
+ 			/**
+ 			 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
+-			 * The order of the checks is important to recognise the HTML drop.
++			 * The order of the checks is important to recognize the HTML drop.
+ 			 */
+ 			if ( html && onHTMLDrop ) {
+ 				onHTMLDrop( html );
+@@ -152,7 +80,7 @@ export function DropZoneComponent( {
+ 
+ 			/**
+ 			 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
+-			 * The order of the checks is important to recognise the HTML drop.
++			 * The order of the checks is important to recognize the HTML drop.
+ 			 */
+ 			if ( event.dataTransfer?.types.includes( 'text/html' ) ) {
+ 				_type = 'html';
+@@ -181,12 +109,15 @@ export function DropZoneComponent( {
+ 			setIsDraggingOverElement( false );
+ 		},
+ 	} );
++
+ 	const classes = clsx( 'components-drop-zone', className, {
+ 		'is-active':
+ 			( isDraggingOverDocument || isDraggingOverElement ) &&
+ 			( ( type === 'file' && onFilesDrop ) ||
+ 				( type === 'html' && onHTMLDrop ) ||
+ 				( type === 'default' && onDrop ) ),
++		'has-dragged-out': ! isDraggingOverElement,
++		// Keeping the following classnames for legacy purposes
+ 		'is-dragging-over-document': isDraggingOverDocument,
+ 		'is-dragging-over-element': isDraggingOverElement,
+ 		[ `is-dragging-${ type }` ]: !! type,
+@@ -194,7 +125,17 @@ export function DropZoneComponent( {
+ 
+ 	return (
+ 		<div { ...restProps } ref={ ref } className={ classes }>
+-			{ isDraggingOverElement && <DropIndicator label={ label } /> }
++			<div className="components-drop-zone__content">
++				<div className="components-drop-zone__content-inner">
++					<Icon
++						icon={ upload }
++						className="components-drop-zone__content-icon"
++					/>
++					<span className="components-drop-zone__content-text">
++						{ label ? label : __( 'Drop files to upload' ) }
++					</span>
++				</div>
++			</div>
+ 		</div>
+ 	);
+ }
+diff --git a/packages/components/src/drop-zone/style.scss b/packages/components/src/drop-zone/style.scss
+index 164ff5cd9db251..2793dc708cf03f 100644
+--- a/packages/components/src/drop-zone/style.scss
++++ b/packages/components/src/drop-zone/style.scss
+@@ -13,23 +13,58 @@
+ 		opacity: 1;
+ 		visibility: visible;
+ 	}
+-}
+ 
+-.components-drop-zone__content {
+-	position: absolute;
+-	top: 0;
+-	bottom: 0;
+-	left: 0;
+-	right: 0;
+-	height: 100%;
+-	width: 100%;
+-	display: flex;
+-	background-color: $components-color-accent;
+-	align-items: center;
+-	justify-content: center;
+-	z-index: z-index(".components-drop-zone__content");
+-	text-align: center;
+-	color: $white;
++	.components-drop-zone__content {
++		position: absolute;
++		top: 0;
++		bottom: 0;
++		left: 0;
++		right: 0;
++		height: 100%;
++		width: 100%;
++		display: flex;
++		background-color: $components-color-accent;
++		align-items: center;
++		justify-content: center;
++		z-index: z-index(".components-drop-zone__content");
++		text-align: center;
++		color: $white;
++		opacity: 0;
++
++		// Without this, when this div is shown,
++		// Safari calls a onDropZoneLeave causing a loop because of this bug
++		// https://bugs.webkit.org/show_bug.cgi?id=66547
++		pointer-events: none;
++	}
++
++	.components-drop-zone__content-inner {
++		opacity: 0;
++		transform: scale(0.9);
++	}
++
++	&.is-active:not(.has-dragged-out) {
++		.components-drop-zone__content {
++			opacity: 1;
++
++			transition: opacity 0.2s ease-in-out;
++			@media (prefers-reduced-motion) {
++				transition: none;
++			}
++		}
++
++		.components-drop-zone__content-inner {
++			opacity: 1;
++			transform: scale(1);
++
++			transition:
++				opacity 0.1s ease-in-out 0.1s,
++				transform 0.1s ease-in-out 0.1s;
++
++			@media (prefers-reduced-motion) {
++				transition: none;
++			}
++		}
++	}
+ }
+ 
+ .components-drop-zone__content-icon,

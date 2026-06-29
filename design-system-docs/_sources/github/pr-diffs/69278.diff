@@ -1,0 +1,89 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a42abccf3874e9..c34898928bdd00 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancement
+ 
+ -   `ComboboxControl`: Handle Unicode characters when matching values ([#70180](https://github.com/WordPress/gutenberg/pull/70180)).
++-   `Toolbar`: Adjust colors for dark mode support ([#69278](https://github.com/WordPress/gutenberg/pull/69278)).
+ 
+ ## 29.10.0 (2025-05-22)
+ 
+diff --git a/packages/components/src/toolbar/toolbar-group/style.scss b/packages/components/src/toolbar/toolbar-group/style.scss
+index 668968d40babbe..5271f8d9225d6e 100644
+--- a/packages/components/src/toolbar/toolbar-group/style.scss
++++ b/packages/components/src/toolbar/toolbar-group/style.scss
+@@ -1,7 +1,7 @@
+ .components-toolbar-group {
+ 	min-height: $block-toolbar-height;
+-	border-right: $border-width solid $gray-900;
+-	background-color: $white;
++	border-right: $border-width solid $components-color-foreground;
++	background-color: $components-color-background;
+ 	display: inline-flex;
+ 	flex-shrink: 0;
+ 	flex-wrap: wrap;
+@@ -41,8 +41,8 @@
+ .components-toolbar {
+ 	min-height: $block-toolbar-height;
+ 	margin: 0;
+-	border: $border-width solid $gray-900;
+-	background-color: $white;
++	border: $border-width solid $components-color-foreground;
++	background-color: $components-color-background;
+ 	display: inline-flex;
+ 	flex-shrink: 0;
+ 	flex-wrap: wrap;
+diff --git a/packages/components/src/toolbar/toolbar/style.scss b/packages/components/src/toolbar/toolbar/style.scss
+index b53df6303e0fbf..2da8219146fd5a 100644
+--- a/packages/components/src/toolbar/toolbar/style.scss
++++ b/packages/components/src/toolbar/toolbar/style.scss
+@@ -1,6 +1,6 @@
+ .components-accessible-toolbar {
+ 	display: inline-flex;
+-	border: $border-width solid $gray-900;
++	border: $border-width solid $components-color-foreground;
+ 	border-radius: $radius-small;
+ 	flex-shrink: 0;
+ 
+@@ -14,13 +14,11 @@
+ 		& > .components-toolbar-group {
+ 			border-right: none;
+ 		}
+-
+ 	}
+ }
+ 
+ .components-accessible-toolbar,
+ .components-toolbar {
+-
+ 	&[aria-orientation="vertical"] {
+ 		display: flex;
+ 		flex-direction: column;
+@@ -56,7 +54,7 @@
+ 			z-index: -1;
+ 
+ 			// Animate in.
+-			@media not (prefers-reduced-motion) {
++			@media not ( prefers-reduced-motion ) {
+ 				animation: components-button__appear-animation 0.1s ease;
+ 				animation-fill-mode: forwards;
+ 			}
+@@ -79,7 +77,7 @@
+ 			}
+ 
+ 			&::before {
+-				background: $gray-900;
++				background: $components-color-foreground;
+ 			}
+ 		}
+ 
+@@ -99,7 +97,6 @@
+ 	}
+ }
+ 
+-
+ @keyframes components-button__appear-animation {
+ 	from {
+ 		transform: scaleY(0);

@@ -1,0 +1,1341 @@
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index 0c40f485594e75..5fa74367aa7d45 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -14,7 +14,7 @@ import { __, sprintf } from '@wordpress/i18n';
+  */
+ import { Button, VisuallyHidden } from '../';
+ 
+-const itemToString = ( item ) => item && item.name;
++const itemToString = ( item ) => item?.name;
+ // This is needed so that in Windows, where
+ // the menu does not necessarily open on
+ // key up/down, you can still switch between
+@@ -98,14 +98,9 @@ export default function CustomSelectControl( {
+ 		className: 'components-custom-select-control__menu',
+ 		'aria-hidden': ! isOpen,
+ 	} );
+-	// We need this here, because the null active descendant is not
+-	// fully ARIA compliant.
++	// We need this here, because the null active descendant is not fully ARIA compliant.
+ 	if (
+-		menuProps[ 'aria-activedescendant' ] &&
+-		menuProps[ 'aria-activedescendant' ].slice(
+-			0,
+-			'downshift-null'.length
+-		) === 'downshift-null'
++		menuProps[ 'aria-activedescendant' ]?.startsWith( 'downshift-null' )
+ 	) {
+ 		delete menuProps[ 'aria-activedescendant' ];
+ 	}
+@@ -161,12 +156,18 @@ export default function CustomSelectControl( {
+ 									{
+ 										'is-highlighted':
+ 											index === highlightedIndex,
++										'has-hint': !! item.hint,
+ 									}
+ 								),
+ 								style: item.style,
+ 							} ) }
+ 						>
+ 							{ item.name }
++							{ item.hint && (
++								<span className="components-custom-select-control__item-hint">
++									{ item.hint }
++								</span>
++							) }
+ 							{ item === selectedItem && (
+ 								<Icon
+ 									icon={ check }
+diff --git a/packages/components/src/custom-select-control/style.scss b/packages/components/src/custom-select-control/style.scss
+index d71e8581d0e1d3..f3175331336bfd 100644
+--- a/packages/components/src/custom-select-control/style.scss
++++ b/packages/components/src/custom-select-control/style.scss
+@@ -58,19 +58,25 @@
+ 
+ .components-custom-select-control__item {
+ 	align-items: center;
+-	display: flex;
++	display: grid;
++	grid-template-columns: auto auto;
+ 	list-style-type: none;
+ 	padding: $grid-unit-10;
+ 	cursor: default;
+ 	line-height: $icon-size + $grid-unit-05;
+ 
+-
++	&.has-hint {
++		grid-template-columns: auto auto 30px;
++	}
+ 	&.is-highlighted {
+ 		background: $gray-300;
+ 	}
+-
++	.components-custom-select-control__item-hint {
++		color: $gray-700;
++		text-align: right;
++		padding-right: $grid-unit-05;
++	}
+ 	.components-custom-select-control__item-icon {
+-		margin-right: 0;
+ 		margin-left: auto;
+ 	}
+ 
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index 0b9f050394cf87..5e95dfa51580ce 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -97,3 +97,12 @@ If `true`, the UI will contain a slider, instead of a numeric text input field.
+ -   Type: `Boolean`
+ -   Required: no
+ -   Default: `false`
++
++### withReset
++
++If `true`, a reset button will be displayed alongside the predefined and custom
++font size fields.
++
++-   Type: `Boolean`
++-   Required: no
++-   Default: `true`
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 65a85f31f58464..548eb2265f508f 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -1,56 +1,30 @@
+-/**
+- * External dependencies
+- */
+-import { isNumber, isString } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+ import { __, sprintf } from '@wordpress/i18n';
+-import { textColor } from '@wordpress/icons';
+-import { useMemo, forwardRef } from '@wordpress/element';
++import { settings } from '@wordpress/icons';
++import { useState, useMemo, forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Button from '../button';
+ import RangeControl from '../range-control';
++import { Flex, FlexItem } from '../flex';
+ import { default as UnitControl, useCustomUnits } from '../unit-control';
+ import CustomSelectControl from '../custom-select-control';
+ import { VisuallyHidden } from '../visually-hidden';
+-
+-const DEFAULT_FONT_SIZE = 'default';
+-const CUSTOM_FONT_SIZE = 'custom';
+-const MAX_FONT_SIZE_DISPLAY = '25px';
+-
+-function getSelectValueFromFontSize( fontSizes, value ) {
+-	if ( value ) {
+-		const fontSizeValue = fontSizes.find( ( font ) => font.size === value );
+-		return fontSizeValue ? fontSizeValue.slug : CUSTOM_FONT_SIZE;
+-	}
+-	return DEFAULT_FONT_SIZE;
+-}
+-
+-function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+-	if ( disableCustomFontSizes && ! optionsArray.length ) {
+-		return null;
+-	}
+-	optionsArray = [
+-		{ slug: DEFAULT_FONT_SIZE, name: __( 'Default' ) },
+-		...optionsArray,
+-		...( disableCustomFontSizes
+-			? []
+-			: [ { slug: CUSTOM_FONT_SIZE, name: __( 'Custom' ) } ] ),
+-	];
+-	return optionsArray.map( ( option ) => ( {
+-		key: option.slug,
+-		name: option.name,
+-		size: option.size,
+-		style: {
+-			fontSize: `min( ${ option.size }, ${ MAX_FONT_SIZE_DISPLAY } )`,
+-		},
+-	} ) );
+-}
++import {
++	ToggleGroupControl,
++	ToggleGroupControlOption,
++} from '../toggle-group-control';
++import {
++	getFontSizeOptions,
++	getSelectedOption,
++	splitValueAndUnitFromSize,
++	isSimpleCssValue,
++	CUSTOM_FONT_SIZE,
++} from './utils';
+ 
+ function FontSizePicker(
+ 	{
+@@ -60,104 +34,213 @@ function FontSizePicker(
+ 		onChange,
+ 		value,
+ 		withSlider = false,
++		withReset = true,
+ 	},
+ 	ref
+ ) {
+-	const hasUnits =
+-		isString( value ) ||
+-		( fontSizes[ 0 ] && isString( fontSizes[ 0 ].size ) );
+-
+-	let noUnitsValue;
+-	if ( ! hasUnits ) {
+-		noUnitsValue = value;
+-	} else {
+-		noUnitsValue = parseInt( value );
+-	}
+-
+-	const isPixelValue =
+-		isNumber( value ) || ( isString( value ) && value.endsWith( 'px' ) );
+-
++	const hasUnits = [ typeof value, typeof fontSizes?.[ 0 ]?.size ].includes(
++		'string'
++	);
++	const noUnitsValue = ! hasUnits ? value : parseInt( value );
++	const isPixelValue = typeof value === 'number' || value?.endsWith?.( 'px' );
+ 	const units = useCustomUnits( {
+ 		availableUnits: [ 'px', 'em', 'rem' ],
+ 	} );
+ 
++	// The main font size UI displays a toggle group when the presets are less
++	// than six and a select control when they are more.
++	//
++	// A select control is also used when the value of a preset cannot be
++	// immediately computed (eg. 'calc', 'var').
++	const shouldUseSelectControl =
++		fontSizes.length > 5 ||
++		fontSizes.some( ( { size } ) => ! isSimpleCssValue( size ) );
++
+ 	const options = useMemo(
+-		() => getSelectOptions( fontSizes, disableCustomFontSizes ),
+-		[ fontSizes, disableCustomFontSizes ]
++		() =>
++			getFontSizeOptions(
++				shouldUseSelectControl,
++				fontSizes,
++				disableCustomFontSizes
++			),
++		[ shouldUseSelectControl, fontSizes, disableCustomFontSizes ]
+ 	);
++	const selectedOption = getSelectedOption( fontSizes, value );
++	const isCustomValue = selectedOption.slug === CUSTOM_FONT_SIZE;
++	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
++		! disableCustomFontSizes && isCustomValue
++	);
++	const headerHint = useMemo( () => {
++		if ( showCustomValueControl ) {
++			return `(${ __( 'Custom' ) })`;
++		}
++
++		// If we have a custom value that is not available in the font sizes,
++		// show it as a hint as long as it's a simple CSS value.
++		if ( isCustomValue ) {
++			return isSimpleCssValue( value ) && `(${ value })`;
++		}
++		if ( shouldUseSelectControl ) {
++			return (
++				isSimpleCssValue( selectedOption?.size ) &&
++				`(${ selectedOption?.size })`
++			);
++		}
++		// Calculate the `hint` for toggle group control.
++		let hint = selectedOption.name;
++		if ( typeof selectedOption.size === 'string' ) {
++			const [ , unit ] = splitValueAndUnitFromSize( selectedOption.size );
++			hint += `(${ unit })`;
++		}
++		return hint;
++	}, [ showCustomValueControl, selectedOption?.slug, value, isCustomValue ] );
+ 
+ 	if ( ! options ) {
+ 		return null;
+ 	}
+ 
+-	const selectedFontSizeSlug = getSelectValueFromFontSize( fontSizes, value );
+-
++	// This is used for select control only. We need to add support
++	// for ToggleGroupControl.
+ 	const currentFontSizeSR = sprintf(
+ 		// translators: %s: Currently selected font size.
+ 		__( 'Currently selected font size: %s' ),
+-		options.find( ( option ) => option.key === selectedFontSizeSlug ).name
++		selectedOption.name
+ 	);
+-
++	const baseClassName = 'components-font-size-picker';
+ 	return (
+-		<fieldset
+-			className="components-font-size-picker"
+-			{ ...( ref ? {} : { ref } ) }
+-		>
++		<fieldset className={ baseClassName } { ...( ref ? {} : { ref } ) }>
+ 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
+-			<div className="components-font-size-picker__controls">
+-				{ fontSizes.length > 0 && (
+-					<CustomSelectControl
+-						className={ 'components-font-size-picker__select' }
+-						label={ __( 'Font size' ) }
+-						describedBy={ currentFontSizeSR }
+-						options={ options }
+-						value={ options.find(
+-							( option ) => option.key === selectedFontSizeSlug
+-						) }
+-						onChange={ ( { selectedItem } ) => {
+-							if ( hasUnits ) {
+-								onChange( selectedItem.size );
+-							} else {
+-								onChange( Number( selectedItem.size ) );
++			<Flex
++				justify="space-between"
++				className={ `${ baseClassName }__header` }
++			>
++				<FlexItem>
++					{ __( 'Size' ) }
++					{ headerHint && (
++						<span className={ `${ baseClassName }__header__hint` }>
++							{ headerHint }
++						</span>
++					) }
++				</FlexItem>
++				{ ! disableCustomFontSizes && (
++					<FlexItem>
++						<Button
++							label={
++								showCustomValueControl
++									? __( 'Use size preset' )
++									: __( 'Set custom size' )
+ 							}
+-						} }
+-					/>
++							showTooltip={ false }
++							icon={ settings }
++							onClick={ () => {
++								setShowCustomValueControl(
++									! showCustomValueControl
++								);
++							} }
++							isPressed={ showCustomValueControl }
++							isSmall
++						/>
++					</FlexItem>
+ 				) }
+-				{ ! withSlider && ! disableCustomFontSizes && (
+-					<UnitControl
+-						label={ __( 'Custom' ) }
+-						labelPosition="top"
+-						__unstableInputWidth="60px"
+-						value={ value }
+-						onChange={ ( nextSize ) => {
+-							if ( 0 === parseFloat( nextSize ) || ! nextSize ) {
+-								onChange( undefined );
+-							} else {
++			</Flex>
++			<div className={ `${ baseClassName }__controls` }>
++				{ !! fontSizes.length &&
++					shouldUseSelectControl &&
++					! showCustomValueControl && (
++						<CustomSelectControl
++							className={ `${ baseClassName }__select` }
++							label={ __( 'Font size' ) }
++							hideLabelFromVision
++							describedBy={ currentFontSizeSR }
++							options={ options }
++							value={ options.find(
++								( option ) => option.key === selectedOption.slug
++							) }
++							onChange={ ( { selectedItem } ) => {
+ 								onChange(
+ 									hasUnits
+-										? nextSize
+-										: parseInt( nextSize, 10 )
++										? selectedItem.size
++										: Number( selectedItem.size )
+ 								);
+-							}
++								if ( selectedItem.key === CUSTOM_FONT_SIZE ) {
++									setShowCustomValueControl( true );
++								}
++							} }
++						/>
++					) }
++				{ ! shouldUseSelectControl && ! showCustomValueControl && (
++					<ToggleGroupControl
++						label={ __( 'Font size' ) }
++						hideLabelFromVision
++						value={ value }
++						onChange={ ( newValue ) => {
++							onChange(
++								hasUnits ? newValue : Number( newValue )
++							);
+ 						} }
+-						units={ hasUnits ? units : false }
+-					/>
++						isBlock
++					>
++						{ options.map( ( option ) => (
++							<ToggleGroupControlOption
++								key={ option.key }
++								value={ option.value }
++								label={ option.label }
++								aria-label={ option.name }
++							/>
++						) ) }
++					</ToggleGroupControl>
+ 				) }
+-				<Button
+-					className="components-color-palette__clear"
+-					disabled={ value === undefined }
+-					onClick={ () => {
+-						onChange( undefined );
+-					} }
+-					isSmall
+-					variant="secondary"
+-				>
+-					{ __( 'Reset' ) }
+-				</Button>
++				{ ! withSlider &&
++					! disableCustomFontSizes &&
++					showCustomValueControl && (
++						<Flex
++							justify="space-between"
++							className={ `${ baseClassName }__custom-size-control` }
++						>
++							<FlexItem isBlock>
++								<UnitControl
++									label={ __( 'Custom' ) }
++									labelPosition="top"
++									hideLabelFromVision
++									value={ value }
++									onChange={ ( nextSize ) => {
++										if (
++											0 === parseFloat( nextSize ) ||
++											! nextSize
++										) {
++											onChange( undefined );
++										} else {
++											onChange(
++												hasUnits
++													? nextSize
++													: parseInt( nextSize, 10 )
++											);
++										}
++									} }
++									units={ hasUnits ? units : false }
++								/>
++							</FlexItem>
++							{ withReset && (
++								<FlexItem isBlock>
++									<Button
++										className="components-color-palette__clear"
++										disabled={ value === undefined }
++										onClick={ () => {
++											onChange( undefined );
++										} }
++										isSmall
++										variant="secondary"
++									>
++										{ __( 'Reset' ) }
++									</Button>
++								</FlexItem>
++							) }
++						</Flex>
++					) }
+ 			</div>
+ 			{ withSlider && (
+ 				<RangeControl
+-					className="components-font-size-picker__custom-input"
++					className={ `${ baseClassName }__custom-input` }
+ 					label={ __( 'Custom Size' ) }
+ 					value={ ( isPixelValue && noUnitsValue ) || '' }
+ 					initialPosition={ fallbackFontSize }
+@@ -166,8 +249,6 @@ function FontSizePicker(
+ 					} }
+ 					min={ 12 }
+ 					max={ 100 }
+-					beforeIcon={ textColor }
+-					afterIcon={ textColor }
+ 				/>
+ 			) }
+ 		</fieldset>
+diff --git a/packages/components/src/font-size-picker/stories/index.js b/packages/components/src/font-size-picker/stories/index.js
+index b90fc69a0b1520..050ea47aa851de 100644
+--- a/packages/components/src/font-size-picker/stories/index.js
++++ b/packages/components/src/font-size-picker/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { number, object } from '@storybook/addon-knobs';
++import { number, object, boolean } from '@storybook/addon-knobs';
+ 
+ /**
+  * WordPress dependencies
+@@ -18,8 +18,8 @@ export default {
+ 	component: FontSizePicker,
+ };
+ 
+-const FontSizePickerWithState = ( { ...props } ) => {
+-	const [ fontSize, setFontSize ] = useState( 16 );
++const FontSizePickerWithState = ( { initialValue, ...props } ) => {
++	const [ fontSize, setFontSize ] = useState( initialValue || 16 );
+ 
+ 	return (
+ 		<FontSizePicker
+@@ -104,3 +104,52 @@ export const withoutCustomSizes = () => {
+ 		/>
+ 	);
+ };
++
++export const differentControlBySize = () => {
++	const options = [
++		{
++			name: 'Tiny',
++			slug: 'tiny',
++			size: 8,
++		},
++		{
++			name: 'Small',
++			slug: 'small',
++			size: 12,
++		},
++		{
++			name: 'Normal',
++			slug: 'normal',
++			size: 16,
++		},
++		{
++			name: 'Big',
++			slug: 'big',
++			size: 26,
++		},
++		{
++			name: 'Bigger',
++			slug: 'bigger',
++			size: 30,
++		},
++		{
++			name: 'Huge',
++			slug: 'huge',
++			size: 36,
++		},
++	];
++	const optionsWithUnits = options.map( ( option ) => ( {
++		...option,
++		size: `${ option.size }px`,
++	} ) );
++	const showMoreFontSizes = boolean( 'Add more font sizes', false );
++	const addUnitsToSizes = boolean( 'Add units to font sizes', false );
++	const _options = addUnitsToSizes ? optionsWithUnits : options;
++	const fontSizes = _options.slice(
++		0,
++		showMoreFontSizes ? _options.length : 4
++	);
++	return (
++		<FontSizePickerWithState fontSizes={ fontSizes } initialValue={ 8 } />
++	);
++};
+diff --git a/packages/components/src/font-size-picker/style.scss b/packages/components/src/font-size-picker/style.scss
+index 690942858c9d37..bf3965ab304cd3 100644
+--- a/packages/components/src/font-size-picker/style.scss
++++ b/packages/components/src/font-size-picker/style.scss
+@@ -1,13 +1,24 @@
++.components-font-size-picker__header {
++	&__hint {
++		margin-left: $grid-unit-05;
++		color: $gray-700;
++	}
++
++	// This button is inheriting padding and min-width.
++	// @todo: we should refactor it to not need to unset this.
++	.components-button.is-small.has-icon:not(.has-text) {
++		min-width: $icon-size;
++		padding: 0;
++	}
++}
++
+ .components-font-size-picker__controls {
+ 	max-width: $sidebar-width - ( 2 * $grid-unit-20 );
+-	display: flex;
+-	flex-wrap: wrap;
+ 	align-items: center;
++	margin-top: $grid-unit-10;
+ 	margin-bottom: $grid-unit-30;
+ 
+ 	.components-unit-control-wrapper {
+-		margin-right: $grid-unit-10;
+-
+ 		.components-input-control__label {
+ 			font-weight: 300;
+ 			padding-bottom: 0 !important;
+@@ -16,7 +27,7 @@
+ 	}
+ 
+ 	.components-custom-select-control__button {
+-		min-width: 120px;
++		width: 100%;
+ 	}
+ 
+ 	// Apply the same height as the isSmall Reset button.
+@@ -44,14 +55,8 @@
+ 		}
+ 	}
+ 
+-	// Allow the font-size picker dropdown to grow in width.
+-	.components-font-size-picker__select {
+-		margin-right: $grid-unit-10;
+-	}
+-
+ 	.components-color-palette__clear {
+ 		height: 30px;
+-		margin-top: 26px;
+ 	}
+ }
+ 
+diff --git a/packages/components/src/font-size-picker/test/index.js b/packages/components/src/font-size-picker/test/index.js
+index f26d6144f930c9..2742da0d774395 100644
+--- a/packages/components/src/font-size-picker/test/index.js
++++ b/packages/components/src/font-size-picker/test/index.js
+@@ -13,6 +13,12 @@ const getUnitSelect = () =>
+ const getUnitLabel = () =>
+ 	document.body.querySelector( '.components-unit-control__unit-label' );
+ 
++const toggleCustomInput = ( showCustomInput ) => {
++	const label = showCustomInput ? 'Set custom size' : 'Use size preset';
++	const toggleCustom = screen.getByLabelText( label, { selector: 'button' } );
++	fireEvent.click( toggleCustom );
++};
++
+ describe( 'FontSizePicker', () => {
+ 	describe( 'onChange values', () => {
+ 		it( 'should not use units when the initial value is a number', () => {
+@@ -84,6 +90,7 @@ describe( 'FontSizePicker', () => {
+ 				/>
+ 			);
+ 
++			toggleCustomInput( true );
+ 			const unitSelect = getUnitSelect();
+ 			const unitLabel = getUnitLabel();
+ 			const input = screen.getByLabelText( 'Custom', {
+@@ -119,6 +126,7 @@ describe( 'FontSizePicker', () => {
+ 				/>
+ 			);
+ 
++			toggleCustomInput( true );
+ 			const unitSelect = getUnitSelect();
+ 			const unitLabel = getUnitLabel();
+ 			const input = screen.getByLabelText( 'Custom', {
+diff --git a/packages/components/src/font-size-picker/utils.js b/packages/components/src/font-size-picker/utils.js
+new file mode 100644
+index 00000000000000..3310257de1ff75
+--- /dev/null
++++ b/packages/components/src/font-size-picker/utils.js
+@@ -0,0 +1,100 @@
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++
++const DEFAULT_FONT_SIZE = 'default';
++const DEFAULT_FONT_SIZE_OPTION = {
++	slug: DEFAULT_FONT_SIZE,
++	name: __( 'Default' ),
++};
++export const CUSTOM_FONT_SIZE = 'custom';
++const CUSTOM_FONT_SIZE_OPTION = {
++	slug: CUSTOM_FONT_SIZE,
++	name: __( 'Custom' ),
++};
++
++/**
++ * Helper util to split a font size to its numeric value
++ * and its `unit`, if exists.
++ *
++ * @param {string|number} size Font size.
++ * @return {[number, string]} An array with the numeric value and the unit if exists.
++ */
++export function splitValueAndUnitFromSize( size ) {
++	/**
++	 * The first matched result is ignored as it's the left
++	 * hand side of the capturing group in the regex.
++	 */
++	const [ , numericValue, unit ] = size.split( /(\d+)/ );
++	return [ numericValue, unit ];
++}
++
++/**
++ * Some themes use css vars for their font sizes, so until we
++ * have the way of calculating them don't display them.
++ *
++ * @param {string|number} value The value that is checked.
++ * @return {boolean} Whether the value is a simple css value.
++ */
++export function isSimpleCssValue( value ) {
++	const sizeRegex = /^(?!0)\d+(px|em|rem|vw|vh|%)?$/i;
++	return sizeRegex.test( value );
++}
++
++/**
++ * Return font size options in the proper format depending
++ * on the currently used control (select, toggle group).
++ *
++ * @param {boolean}  useSelectControl       Whether to use a select control.
++ * @param {Object[]} optionsArray           Array of available font sizes objects.
++ * @param {*}        disableCustomFontSizes Flag that indicates if custom font sizes are disabled.
++ * @return {Object[]|null} Array of font sizes in proper format for the used control.
++ */
++export function getFontSizeOptions(
++	useSelectControl,
++	optionsArray,
++	disableCustomFontSizes
++) {
++	if ( disableCustomFontSizes && ! optionsArray.length ) {
++		return null;
++	}
++	return useSelectControl
++		? getSelectOptions( optionsArray, disableCustomFontSizes )
++		: getToggleGroupOptions( optionsArray );
++}
++
++function getSelectOptions( optionsArray, disableCustomFontSizes ) {
++	const options = [
++		DEFAULT_FONT_SIZE_OPTION,
++		...optionsArray,
++		...( disableCustomFontSizes ? [] : [ CUSTOM_FONT_SIZE_OPTION ] ),
++	];
++	return options.map( ( { slug, name, size } ) => ( {
++		key: slug,
++		name,
++		size,
++		hint: size && isSimpleCssValue( size ) && parseInt( size ),
++	} ) );
++}
++
++function getToggleGroupOptions( optionsArray ) {
++	return optionsArray.map( ( { slug, size, name } ) => {
++		let label = size;
++		if ( typeof size === 'string' ) {
++			const [ numericValue ] = splitValueAndUnitFromSize( size );
++			label = numericValue;
++		}
++		return { key: slug, value: size, label, name };
++	} );
++}
++
++export function getSelectedOption( fontSizes, value ) {
++	if ( ! value ) {
++		return DEFAULT_FONT_SIZE_OPTION;
++	}
++	return (
++		fontSizes.find( ( font ) => font.size === value ) ||
++		CUSTOM_FONT_SIZE_OPTION
++	);
++}
+diff --git a/packages/e2e-tests/specs/editor/various/__snapshots__/editor-modes.test.js.snap b/packages/e2e-tests/specs/editor/various/__snapshots__/editor-modes.test.js.snap
+deleted file mode 100644
+index 8b5044aeff308a..00000000000000
+--- a/packages/e2e-tests/specs/editor/various/__snapshots__/editor-modes.test.js.snap
++++ /dev/null
+@@ -1,7 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`Editing modes (visual/HTML) saves content when using the shortcut in the Code Editor 1`] = `
+-"<!-- wp:paragraph -->
+-<p>Hi world!</p>
+-<!-- /wp:paragraph -->"
+-`;
+diff --git a/packages/e2e-tests/specs/editor/various/__snapshots__/font-size-picker.test.js.snap b/packages/e2e-tests/specs/editor/various/__snapshots__/font-size-picker.test.js.snap
+deleted file mode 100644
+index 3bf9468e2a0f14..00000000000000
+--- a/packages/e2e-tests/specs/editor/various/__snapshots__/font-size-picker.test.js.snap
++++ /dev/null
+@@ -1,37 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`Font Size Picker should apply a custom font size using the font size input 1`] = `
+-"<!-- wp:paragraph {\\"style\\":{\\"typography\\":{\\"fontSize\\":\\"23px\\"}}} -->
+-<p style=\\"font-size:23px\\">Paragraph to be made \\"small\\"</p>
+-<!-- /wp:paragraph -->"
+-`;
+-
+-exports[`Font Size Picker should apply a named font size using the font size buttons 1`] = `
+-"<!-- wp:paragraph {\\"fontSize\\":\\"large\\"} -->
+-<p class=\\"has-large-font-size\\">Paragraph to be made \\"large\\"</p>
+-<!-- /wp:paragraph -->"
+-`;
+-
+-exports[`Font Size Picker should apply a named font size using the font size input 1`] = `
+-"<!-- wp:paragraph {\\"fontSize\\":\\"small\\"} -->
+-<p class=\\"has-small-font-size\\">Paragraph to be made \\"small\\"</p>
+-<!-- /wp:paragraph -->"
+-`;
+-
+-exports[`Font Size Picker should reset a custom font size using input field 1`] = `
+-"<!-- wp:paragraph -->
+-<p>Paragraph to be made \\"small\\"</p>
+-<!-- /wp:paragraph -->"
+-`;
+-
+-exports[`Font Size Picker should reset a named font size using input field 1`] = `
+-"<!-- wp:paragraph -->
+-<p>Paragraph with font size reset using input field</p>
+-<!-- /wp:paragraph -->"
+-`;
+-
+-exports[`Font Size Picker should reset a named font size using the reset button 1`] = `
+-"<!-- wp:paragraph -->
+-<p>Paragraph with font size reset using button</p>
+-<!-- /wp:paragraph -->"
+-`;
+diff --git a/packages/e2e-tests/specs/editor/various/change-detection.test.js b/packages/e2e-tests/specs/editor/various/change-detection.test.js
+index d3694734d2db5e..0d92f96e1f0fe3 100644
+--- a/packages/e2e-tests/specs/editor/various/change-detection.test.js
++++ b/packages/e2e-tests/specs/editor/various/change-detection.test.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { first } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -15,7 +10,6 @@ import {
+ 	saveDraft,
+ 	openDocumentSettingsSidebar,
+ 	isCurrentURL,
+-	pressKeyTimes,
+ } from '@wordpress/e2e-test-utils';
+ 
+ describe( 'Change detection', () => {
+@@ -371,8 +365,6 @@ describe( 'Change detection', () => {
+ 	} );
+ 
+ 	it( 'consecutive edits to the same attribute should mark the post as dirty after a save', async () => {
+-		const FONT_SIZE_LABEL_SELECTOR =
+-			"//label[contains(text(), 'Font size')]";
+ 		// Open the sidebar block settings.
+ 		await openDocumentSettingsSidebar();
+ 		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
+@@ -387,11 +379,12 @@ describe( 'Change detection', () => {
+ 			pressKeyWithModifier( 'primary', 'S' ),
+ 		] );
+ 
+-		// Increase the paragraph's font size.
++		// Change the paragraph's `drop cap`.
+ 		await page.click( '[data-type="core/paragraph"]' );
+-		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
+-		await pressKeyTimes( 'ArrowDown', 2 );
+-		await page.keyboard.press( 'Enter' );
++		const [ dropCapToggle ] = await page.$x(
++			"//label[contains(text(), 'Drop cap')]"
++		);
++		await dropCapToggle.click();
+ 		await page.click( '[data-type="core/paragraph"]' );
+ 
+ 		// Check that the post is dirty.
+@@ -403,12 +396,9 @@ describe( 'Change detection', () => {
+ 			pressKeyWithModifier( 'primary', 'S' ),
+ 		] );
+ 
+-		// Increase the paragraph's font size again.
+-		await page.click( '[data-type="core/paragraph"]' );
+-		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
+-		await pressKeyTimes( 'ArrowDown', 3 );
+-		await page.keyboard.press( 'Enter' );
++		// Change the paragraph's `drop cap` again.
+ 		await page.click( '[data-type="core/paragraph"]' );
++		await dropCapToggle.click();
+ 
+ 		// Check that the post is dirty.
+ 		await page.waitForSelector( '.editor-post-save-draft' );
+diff --git a/packages/e2e-tests/specs/editor/various/editor-modes.test.js b/packages/e2e-tests/specs/editor/various/editor-modes.test.js
+index 01d6137ae89055..e8817f0566817c 100644
+--- a/packages/e2e-tests/specs/editor/various/editor-modes.test.js
++++ b/packages/e2e-tests/specs/editor/various/editor-modes.test.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { first } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -57,12 +52,13 @@ describe( 'Editing modes (visual/HTML)', () => {
+ 		await clickBlockToolbarButton( 'Options' );
+ 		await clickMenuItem( 'Edit as HTML' );
+ 
+-		// The font size picker for the paragraph block should appear, even in
++		// The `drop cap` toggle for the paragraph block should appear, even in
+ 		// HTML editing mode.
+-		const fontSizePicker = await page.$x(
+-			"//label[contains(text(), 'Font size')]"
++		const dropCapToggle = await page.$x(
++			"//label[contains(text(), 'Drop cap')]"
+ 		);
+-		expect( fontSizePicker ).toHaveLength( 1 );
++
++		expect( dropCapToggle ).toHaveLength( 1 );
+ 	} );
+ 
+ 	it( 'should update HTML in HTML mode when sidebar is used', async () => {
+@@ -77,12 +73,11 @@ describe( 'Editing modes (visual/HTML)', () => {
+ 		);
+ 		expect( htmlBlockContent ).toEqual( '<p>Hello world!</p>' );
+ 
+-		// Change the font size using the sidebar.
+-		await first(
+-			await page.$x( "//label[contains(text(), 'Font size')]" )
+-		).click();
+-		await pressKeyTimes( 'ArrowDown', 4 );
+-		await page.keyboard.press( 'Enter' );
++		// Change the `drop cap` using the sidebar.
++		const [ dropCapToggle ] = await page.$x(
++			"//label[contains(text(), 'Drop cap')]"
++		);
++		await dropCapToggle.click();
+ 
+ 		// Make sure the HTML content updated.
+ 		htmlBlockContent = await page.$eval(
+@@ -90,7 +85,7 @@ describe( 'Editing modes (visual/HTML)', () => {
+ 			( node ) => node.textContent
+ 		);
+ 		expect( htmlBlockContent ).toEqual(
+-			'<p class="has-large-font-size">Hello world!</p>'
++			'<p class="has-drop-cap">Hello world!</p>'
+ 		);
+ 	} );
+ 
+@@ -152,6 +147,10 @@ describe( 'Editing modes (visual/HTML)', () => {
+ 
+ 		await switchEditorModeTo( 'Visual' );
+ 
+-		expect( await getCurrentPostContent() ).toMatchSnapshot();
++		expect( await getCurrentPostContent() ).toMatchInlineSnapshot( `
++		"<!-- wp:paragraph -->
++		<p>Hi world!</p>
++		<!-- /wp:paragraph -->"
++	` );
+ 	} );
+ } );
+diff --git a/packages/e2e-tests/specs/editor/various/font-size-picker.test.js b/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
+index c8bf9a1b5063b8..c2e9bceed1de26 100644
+--- a/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
++++ b/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { first } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -10,142 +5,261 @@ import {
+ 	clickBlockAppender,
+ 	getEditedPostContent,
+ 	createNewPost,
++	pressKeyWithModifier,
+ 	pressKeyTimes,
++	activateTheme,
+ } from '@wordpress/e2e-test-utils';
+ 
++const openFontSizeSelectControl = async () => {
++	const selectControlSelector =
++		"//div[contains(@class, 'components-font-size-picker__controls')]//button[contains(@class, 'components-custom-select-control__button')]";
++	const selectControl = await page.waitForXPath( selectControlSelector );
++	return selectControl.click();
++};
++
++const FONT_SIZE_TOGGLE_GROUP_SELECTOR =
++	"//div[contains(@class, 'components-font-size-picker__controls')]//div[contains(@class, 'components-toggle-group-control')]";
++
++// Click a button by its label - applies when ToggleGroupControl is used.
++const clickFontSizeButtonByLabel = async ( label ) => {
++	const buttonSelector = `${ FONT_SIZE_TOGGLE_GROUP_SELECTOR }//button[@aria-label='${ label }']`;
++	const button = await page.waitForXPath( buttonSelector );
++	return button.click();
++};
++
++// Clicks the button to toggle between custom size input and the control for the presets.
++const toggleCustomInput = async ( showCustomInput ) => {
++	const label = showCustomInput ? 'Set custom size' : 'Use size preset';
++	const toggleButton = await page.waitForXPath(
++		`//button[@aria-label='${ label }']`
++	);
++	return toggleButton.click();
++};
++
++const clickCustomInput = async () => {
++	const customInput = await page.waitForXPath(
++		"//input[@aria-label='Custom']"
++	);
++	return customInput.click();
++};
++
+ describe( 'Font Size Picker', () => {
+-	const FONT_SIZE_LABEL_SELECTOR = "//label[contains(text(), 'Font size')]";
+-	const CUSTOM_FONT_SIZE_LABEL_SELECTOR =
+-		"//fieldset[legend[contains(text(),'Font size')]]//label[contains(text(), 'Custom')]";
+ 	beforeEach( async () => {
+ 		await createNewPost();
+ 	} );
++	describe( 'Common', () => {
++		it( 'should apply a named font size using the font size input', async () => {
++			// Create a paragraph block with some content.
++			await clickBlockAppender();
++			await page.keyboard.type( 'Paragraph to be made "small"' );
+ 
+-	it( 'should apply a named font size using the font size buttons', async () => {
+-		// Create a paragraph block with some content.
+-		await clickBlockAppender();
+-		await page.keyboard.type( 'Paragraph to be made "large"' );
+-		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
+-		await pressKeyTimes( 'ArrowDown', 4 );
+-		await page.keyboard.press( 'Enter' );
+-		const selectedFontSize = await page.evaluate(
+-			( selector ) =>
+-				document
+-					.evaluate(
+-						selector,
+-						document,
+-						null,
+-						XPathResult.ANY_TYPE,
+-						null
+-					)
+-					.iterateNext().control.textContent,
+-			FONT_SIZE_LABEL_SELECTOR
+-		);
+-
+-		expect( selectedFontSize ).toBe( 'Large' );
+-
+-		// Ensure content matches snapshot.
+-		const content = await getEditedPostContent();
+-		expect( content ).toMatchSnapshot();
+-	} );
++			await toggleCustomInput( true );
++			await clickCustomInput();
++			// This should be the "small" font-size of the editor defaults.
++			await page.keyboard.type( '13' );
++			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++			"<!-- wp:paragraph {\\"fontSize\\":\\"small\\"} -->
++			<p class=\\"has-small-font-size\\">Paragraph to be made \\"small\\"</p>
++			<!-- /wp:paragraph -->"
++		` );
++		} );
++		it( 'should apply a custom font size using the font size input', async () => {
++			// Create a paragraph block with some content.
++			await clickBlockAppender();
++			await page.keyboard.type( 'Paragraph to be made "small"' );
+ 
+-	it( 'should apply a named font size using the font size input', async () => {
+-		// Create a paragraph block with some content.
+-		await clickBlockAppender();
+-		await page.keyboard.type( 'Paragraph to be made "small"' );
++			await toggleCustomInput( true );
++			await clickCustomInput();
++			await page.keyboard.type( '23' );
++			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++			"<!-- wp:paragraph {\\"style\\":{\\"typography\\":{\\"fontSize\\":\\"23px\\"}}} -->
++			<p style=\\"font-size:23px\\">Paragraph to be made \\"small\\"</p>
++			<!-- /wp:paragraph -->"
++		` );
++		} );
++		it( 'should reset a custom font size using input field', async () => {
++			// Create a paragraph block with some content.
++			await clickBlockAppender();
++			await page.keyboard.type( 'Paragraph reset - custom size' );
+ 
+-		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
+-		// This should be the "small" font-size of the editor defaults.
+-		await page.keyboard.type( '13' );
+-		await page.keyboard.press( 'Enter' );
++			await toggleCustomInput( true );
++			await clickCustomInput();
++			await page.keyboard.type( '23' );
++			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++			"<!-- wp:paragraph {\\"style\\":{\\"typography\\":{\\"fontSize\\":\\"23px\\"}}} -->
++			<p style=\\"font-size:23px\\">Paragraph reset - custom size</p>
++			<!-- /wp:paragraph -->"
++		` );
+ 
+-		// Ensure content matches snapshot.
+-		const content = await getEditedPostContent();
+-		expect( content ).toMatchSnapshot();
++			await pressKeyTimes( 'Backspace', 2 );
++			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++			"<!-- wp:paragraph -->
++			<p>Paragraph reset - custom size</p>
++			<!-- /wp:paragraph -->"
++		` );
++		} );
+ 	} );
++	// A different control is rendered based on the available font sizes number.
++	describe( 'More font sizes', () => {
++		beforeAll( async () => {
++			await activateTheme( 'tt1-blocks' );
++		} );
++		afterAll( async () => {
++			await activateTheme( 'twentytwentyone' );
++		} );
++		it( 'should apply a named font size using the font size buttons', async () => {
++			// Create a paragraph block with some content.
++			await clickBlockAppender();
++			await page.keyboard.type( 'Paragraph to be made "large"' );
+ 
+-	it( 'should apply a custom font size using the font size input', async () => {
+-		// Create a paragraph block with some content.
+-		await clickBlockAppender();
+-		await page.keyboard.type( 'Paragraph to be made "small"' );
++			await openFontSizeSelectControl();
++			await pressKeyTimes( 'ArrowDown', 4 );
++			await page.keyboard.press( 'Enter' );
+ 
+-		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
+-		await page.keyboard.type( '23' );
+-		await page.keyboard.press( 'Enter' );
++			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++			"<!-- wp:paragraph {\\"fontSize\\":\\"large\\"} -->
++			<p class=\\"has-large-font-size\\">Paragraph to be made \\"large\\"</p>
++			<!-- /wp:paragraph -->"
++		` );
++		} );
++		it( 'should reset a named font size using the reset button', async () => {
++			// Create a paragraph block with some content.
++			await clickBlockAppender();
++			await page.keyboard.type(
++				'Paragraph with font size reset using button'
++			);
+ 
+-		// Ensure content matches snapshot.
+-		const content = await getEditedPostContent();
+-		expect( content ).toMatchSnapshot();
+-	} );
++			await openFontSizeSelectControl();
++			await pressKeyTimes( 'ArrowDown', 3 );
++			await page.keyboard.press( 'Enter' );
++			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++			"<!-- wp:paragraph {\\"fontSize\\":\\"normal\\"} -->
++			<p class=\\"has-normal-font-size\\">Paragraph with font size reset using button</p>
++			<!-- /wp:paragraph -->"
++		` );
+ 
+-	it( 'should reset a named font size using the reset button', async () => {
+-		// Create a paragraph block with some content.
+-		await clickBlockAppender();
+-		await page.keyboard.type(
+-			'Paragraph with font size reset using button'
+-		);
++			await toggleCustomInput( true );
++			await page.keyboard.press( 'Tab' );
++			await page.keyboard.press( 'Tab' );
++			await page.keyboard.press( 'Tab' );
+ 
+-		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
++			await page.keyboard.press( 'Enter' );
++			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++			"<!-- wp:paragraph -->
++			<p>Paragraph with font size reset using button</p>
++			<!-- /wp:paragraph -->"
++		` );
++		} );
+ 
+-		// Disable reason: Wait for changes to apply.
+-		// eslint-disable-next-line no-restricted-syntax
+-		await page.waitForTimeout( 100 );
++		it( 'should reset a named font size using input field', async () => {
++			// Create a paragraph block with some content.
++			await clickBlockAppender();
++			await page.keyboard.type(
++				'Paragraph with font size reset using input field'
++			);
+ 
+-		await pressKeyTimes( 'ArrowDown', 2 );
+-		await page.keyboard.press( 'Enter' );
++			await openFontSizeSelectControl();
++			await pressKeyTimes( 'ArrowDown', 2 );
++			await page.keyboard.press( 'Enter' );
++			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++			"<!-- wp:paragraph {\\"fontSize\\":\\"small\\"} -->
++			<p class=\\"has-small-font-size\\">Paragraph with font size reset using input field</p>
++			<!-- /wp:paragraph -->"
++		` );
+ 
+-		await page.keyboard.press( 'Tab' );
+-		await page.keyboard.press( 'Tab' );
+-		await page.keyboard.press( 'Tab' );
++			await toggleCustomInput( true );
++			await clickCustomInput();
++			await pressKeyWithModifier( 'primary', 'A' );
++			await page.keyboard.press( 'Backspace' );
+ 
+-		await page.keyboard.press( 'Enter' );
++			// Disable reason: Wait for changes to apply.
++			// eslint-disable-next-line no-restricted-syntax
++			await page.waitForTimeout( 1000 );
+ 
+-		// Ensure content matches snapshot.
+-		const content = await getEditedPostContent();
+-		expect( content ).toMatchSnapshot();
++			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++			"<!-- wp:paragraph -->
++			<p>Paragraph with font size reset using input field</p>
++			<!-- /wp:paragraph -->"
++		` );
++		} );
+ 	} );
++	describe( 'Few font sizes', () => {
++		it( 'should apply a named font size using the font size buttons', async () => {
++			// Create a paragraph block with some content.
++			await clickBlockAppender();
++			await page.keyboard.type( 'Paragraph to be made "large"' );
+ 
+-	it( 'should reset a named font size using input field', async () => {
+-		// Create a paragraph block with some content.
+-		await clickBlockAppender();
+-		await page.keyboard.type(
+-			'Paragraph with font size reset using input field'
+-		);
+-
+-		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
+-		await pressKeyTimes( 'ArrowDown', 2 );
+-		await page.keyboard.press( 'Enter' );
+-
+-		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
+-		await pressKeyTimes( 'ArrowRight', 5 );
+-		await pressKeyTimes( 'Backspace', 5 );
+-		await page.keyboard.press( 'Enter' );
+-
+-		// Disable reason: Wait for changes to apply.
+-		// eslint-disable-next-line no-restricted-syntax
+-		await page.waitForTimeout( 1000 );
+-
+-		// Ensure content matches snapshot.
+-		const content = await getEditedPostContent();
+-		expect( content ).toMatchSnapshot();
+-	} );
++			await clickFontSizeButtonByLabel( 'Large' );
++			const buttonSelector = `${ FONT_SIZE_TOGGLE_GROUP_SELECTOR }//div[@data-active='true']//button`;
++			const [ activeButton ] = await page.$x( buttonSelector );
++			const activeLabel = await page.evaluate(
++				( element ) => element?.getAttribute( 'aria-label' ),
++				activeButton
++			);
++			expect( activeLabel ).toEqual( 'Large' );
++
++			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++			"<!-- wp:paragraph {\\"fontSize\\":\\"large\\"} -->
++			<p class=\\"has-large-font-size\\">Paragraph to be made \\"large\\"</p>
++			<!-- /wp:paragraph -->"
++		` );
++		} );
++
++		it( 'should reset a named font size using the reset button', async () => {
++			// Create a paragraph block with some content.
++			await clickBlockAppender();
++			await page.keyboard.type(
++				'Paragraph with font size reset using button'
++			);
++
++			await clickFontSizeButtonByLabel( 'Small' );
++			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++			"<!-- wp:paragraph {\\"fontSize\\":\\"small\\"} -->
++			<p class=\\"has-small-font-size\\">Paragraph with font size reset using button</p>
++			<!-- /wp:paragraph -->"
++		` );
++
++			await toggleCustomInput( true );
++			await page.keyboard.press( 'Tab' );
++			await page.keyboard.press( 'Tab' );
++			await page.keyboard.press( 'Tab' );
++
++			await page.keyboard.press( 'Enter' );
++			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++			"<!-- wp:paragraph -->
++			<p>Paragraph with font size reset using button</p>
++			<!-- /wp:paragraph -->"
++		` );
++		} );
++
++		it( 'should reset a named font size using input field', async () => {
++			// Create a paragraph block with some content.
++			await clickBlockAppender();
++			await page.keyboard.type(
++				'Paragraph with font size reset using input field'
++			);
+ 
+-	it( 'should reset a custom font size using input field', async () => {
+-		// Create a paragraph block with some content.
+-		await clickBlockAppender();
+-		await page.keyboard.type( 'Paragraph to be made "small"' );
++			await clickFontSizeButtonByLabel( 'Small' );
++			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++			"<!-- wp:paragraph {\\"fontSize\\":\\"small\\"} -->
++			<p class=\\"has-small-font-size\\">Paragraph with font size reset using input field</p>
++			<!-- /wp:paragraph -->"
++		` );
+ 
+-		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
+-		await page.keyboard.type( '23' );
+-		await page.keyboard.press( 'Enter' );
++			await toggleCustomInput( true );
++			await clickCustomInput();
++			await pressKeyWithModifier( 'primary', 'A' );
++			await page.keyboard.press( 'Backspace' );
+ 
+-		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
+-		await page.keyboard.press( 'Backspace' );
+-		await page.keyboard.press( 'Backspace' );
+-		await page.keyboard.press( 'Enter' );
++			// Disable reason: Wait for changes to apply.
++			// eslint-disable-next-line no-restricted-syntax
++			await page.waitForTimeout( 1000 );
+ 
+-		// Ensure content matches snapshot.
+-		const content = await getEditedPostContent();
+-		expect( content ).toMatchSnapshot();
++			expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++			"<!-- wp:paragraph -->
++			<p>Paragraph with font size reset using input field</p>
++			<!-- /wp:paragraph -->"
++		` );
++		} );
+ 	} );
+ } );
+diff --git a/packages/e2e-tests/specs/widgets/customizing-widgets.test.js b/packages/e2e-tests/specs/widgets/customizing-widgets.test.js
+index b999e28baa1fef..c9bb9635ad6a3e 100644
+--- a/packages/e2e-tests/specs/widgets/customizing-widgets.test.js
++++ b/packages/e2e-tests/specs/widgets/customizing-widgets.test.js
+@@ -17,7 +17,6 @@ import {
+  */
+ // eslint-disable-next-line no-restricted-imports
+ import { find, findAll } from 'puppeteer-testing-library';
+-import { first } from 'lodash';
+ 
+ const twentyTwentyError = `Stylesheet twentytwenty-block-editor-styles-css was not properly added.
+ For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
+@@ -831,12 +830,11 @@ describe( 'Widgets Customizer', () => {
+ 		} );
+ 		await showMoreSettingsButton.click();
+ 
+-		// Change font size (Any change made in this section is sufficient; not required to be font size)
+-		const CUSTOM_FONT_SIZE_LABEL_SELECTOR =
+-			"//fieldset[legend[contains(text(),'Font size')]]//label[contains(text(), 'Custom')]";
+-		await first( await page.$x( CUSTOM_FONT_SIZE_LABEL_SELECTOR ) ).click();
+-		await page.keyboard.type( '23' );
+-		await page.keyboard.press( 'Enter' );
++		// Change `drop cap` (Any change made in this section is sufficient; not required to be `drop cap`).
++		const [ dropCapToggle ] = await page.$x(
++			"//label[contains(text(), 'Drop cap')]"
++		);
++		await dropCapToggle.click();
+ 
+ 		// Now that we've made a change:
+ 		// (1) Publish button should be active

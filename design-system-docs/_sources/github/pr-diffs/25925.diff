@@ -1,0 +1,597 @@
+diff --git a/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
+index abb82e4ce4c1a5..b226144356ed78 100644
+--- a/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Basic rendering should render 1`] = `"<div tabindex=\\"-1\\" class=\\"block-editor-link-control\\"><div class=\\"block-editor-link-control__search-input-wrapper\\"><form><div class=\\"components-base-control block-editor-url-input block-editor-link-control__search-input css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><input required=\\"\\" class=\\"block-editor-url-input__input\\" type=\\"text\\" placeholder=\\"Search or type url\\" role=\\"combobox\\" aria-label=\\"URL\\" aria-expanded=\\"false\\" aria-autocomplete=\\"list\\" aria-owns=\\"block-editor-url-input-suggestions-0\\" value=\\"\\"></div></div><div class=\\"block-editor-link-control__search-actions\\"><button type=\\"submit\\" class=\\"components-button block-editor-link-control__search-submit has-icon\\" aria-label=\\"Submit\\"><svg width=\\"24\\" height=\\"24\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"-2 -2 24 24\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M16 4h2v9H7v3l-5-4 5-4v3h9V4z\\"></path></svg></button></div></form></div><fieldset class=\\"block-editor-link-control__settings\\"><legend class=\\"components-visually-hidden\\">Currently selected link settings</legend><div class=\\"components-base-control components-toggle-control block-editor-link-control__setting css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><span class=\\"components-form-toggle\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Open in new tab</label></div></div></fieldset></div>"`;
++exports[`Basic rendering should render 1`] = `"<div tabindex=\\"-1\\" class=\\"block-editor-link-control\\"><div class=\\"block-editor-link-control__search-input-wrapper\\"><form><div class=\\"components-base-control block-editor-url-input block-editor-link-control__search-input css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><input required=\\"\\" class=\\"block-editor-url-input__input\\" type=\\"text\\" placeholder=\\"Search or type url\\" role=\\"combobox\\" aria-label=\\"URL\\" aria-expanded=\\"false\\" aria-autocomplete=\\"list\\" aria-owns=\\"block-editor-url-input-suggestions-0\\" value=\\"\\"></div></div><div class=\\"block-editor-link-control__search-actions\\"><button type=\\"submit\\" class=\\"components-button block-editor-link-control__search-submit has-icon\\" aria-label=\\"Submit\\"><svg width=\\"24\\" height=\\"24\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"-2 -2 24 24\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M16 4h2v9H7v3l-5-4 5-4v3h9V4z\\"></path></svg></button></div></form></div><fieldset class=\\"block-editor-link-control__settings\\"><legend class=\\"components-visually-hidden\\">Currently selected link settings</legend><div class=\\"components-base-control components-toggle-control block-editor-link-control__setting css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><span class=\\"components-form-toggle css-ewt5l-StyledFormToggle e1oqr7ni3\\"><input class=\\"components-form-toggle__input css-atoo2-StyledToggleInput e1oqr7ni2\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\"><span class=\\"components-form-toggle__track css-1i28y2c-StyledToggleTrack e1oqr7ni0\\"></span><span class=\\"components-form-toggle__thumb css-vv1d1r-StyledToggleThumb e1oqr7ni1\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Open in new tab</label></div></div></fieldset></div>"`;
+diff --git a/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
+index 027e4ad5973ede..fec7e11e669157 100644
+--- a/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/responsive-block-control/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Basic rendering should render with required props 1`] = `"<fieldset class=\\"block-editor-responsive-block-control\\"><legend class=\\"block-editor-responsive-block-control__title\\">Padding</legend><div class=\\"block-editor-responsive-block-control__inner\\"><div class=\\"components-base-control components-toggle-control block-editor-responsive-block-control__toggle css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><span class=\\"components-form-toggle is-checked\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\" aria-describedby=\\"inspector-toggle-control-0__help\\" checked=\\"\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Use the same padding on all screensizes.</label></div><p id=\\"inspector-toggle-control-0__help\\" class=\\"components-base-control__help css-1wm1a55-StyledHelp e1puf3u3\\">Toggle between using the same value for all screen sizes or using a unique value per screen size.</p></div><div class=\\"block-editor-responsive-block-control__group\\"><div class=\\"components-base-control css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><div class=\\"components-flex components-select-control e1cr7zh10 css-xnuudl-Flex-Root eboqfv50\\"><div class=\\"components-flex__item e1cr7zh14 css-d373l0-Item-LabelWrapper eboqfv51\\"><label for=\\"inspector-select-control-0\\" class=\\"components-input-control__label css-za86g6-Text-BaseLabel e1cr7zh13\\"><span aria-describedby=\\"rbc-desc-0\\">All</span><span class=\\"components-visually-hidden\\" id=\\"rbc-desc-0\\">Controls the padding property for All viewports.</span></label></div><div class=\\"components-input-control__container css-nj8rmx-Container e1cr7zh11\\"><select class=\\"components-select-control__input css-hwcz8s-Select e12x0a390\\" id=\\"inspector-select-control-0\\"><option value=\\"\\">Please select</option><option value=\\"small\\">Small</option><option value=\\"medium\\">Medium</option><option value=\\"large\\">Large</option></select><span class=\\"components-input-control__suffix css-1lym30p-Suffix e1cr7zh17\\"><div class=\\"css-s55r1c-DownArrowWrapper e12x0a391\\"><svg viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"18\\" height=\\"18\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z\\"></path></svg></div></span><div aria-hidden=\\"true\\" class=\\"components-input-control__backdrop css-1s1n1to-BackdropUI e1cr7zh15\\"></div></div></div></div></div><p id=\\"all\\">All is used here for testing purposes to ensure we have access to details about the device.</p></div></div></fieldset>"`;
++exports[`Basic rendering should render with required props 1`] = `"<fieldset class=\\"block-editor-responsive-block-control\\"><legend class=\\"block-editor-responsive-block-control__title\\">Padding</legend><div class=\\"block-editor-responsive-block-control__inner\\"><div class=\\"components-base-control components-toggle-control block-editor-responsive-block-control__toggle css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><span class=\\"components-form-toggle is-checked css-1wkv8lz-StyledFormToggle-checkedStyles e1oqr7ni3\\"><input class=\\"components-form-toggle__input css-atoo2-StyledToggleInput e1oqr7ni2\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\" aria-describedby=\\"inspector-toggle-control-0__help\\" checked=\\"\\"><span class=\\"components-form-toggle__track css-1i28y2c-StyledToggleTrack e1oqr7ni0\\"></span><span class=\\"components-form-toggle__thumb css-vv1d1r-StyledToggleThumb e1oqr7ni1\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Use the same padding on all screensizes.</label></div><p id=\\"inspector-toggle-control-0__help\\" class=\\"components-base-control__help css-1wm1a55-StyledHelp e1puf3u3\\">Toggle between using the same value for all screen sizes or using a unique value per screen size.</p></div><div class=\\"block-editor-responsive-block-control__group\\"><div class=\\"components-base-control css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><div class=\\"components-flex components-select-control e1cr7zh10 css-xnuudl-Flex-Root eboqfv50\\"><div class=\\"components-flex__item e1cr7zh14 css-d373l0-Item-LabelWrapper eboqfv51\\"><label for=\\"inspector-select-control-0\\" class=\\"components-input-control__label css-za86g6-Text-BaseLabel e1cr7zh13\\"><span aria-describedby=\\"rbc-desc-0\\">All</span><span class=\\"components-visually-hidden\\" id=\\"rbc-desc-0\\">Controls the padding property for All viewports.</span></label></div><div class=\\"components-input-control__container css-nj8rmx-Container e1cr7zh11\\"><select class=\\"components-select-control__input css-hwcz8s-Select e12x0a390\\" id=\\"inspector-select-control-0\\"><option value=\\"\\">Please select</option><option value=\\"small\\">Small</option><option value=\\"medium\\">Medium</option><option value=\\"large\\">Large</option></select><span class=\\"components-input-control__suffix css-1lym30p-Suffix e1cr7zh17\\"><div class=\\"css-s55r1c-DownArrowWrapper e12x0a391\\"><svg viewBox=\\"0 0 24 24\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"18\\" height=\\"18\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z\\"></path></svg></div></span><div aria-hidden=\\"true\\" class=\\"components-input-control__backdrop css-1s1n1to-BackdropUI e1cr7zh15\\"></div></div></div></div></div><p id=\\"all\\">All is used here for testing purposes to ensure we have access to details about the device.</p></div></div></fieldset>"`;
+diff --git a/packages/components/src/form-toggle/index.js b/packages/components/src/form-toggle/index.js
+index 053addfe325400..2cc8aea259df44 100644
+--- a/packages/components/src/form-toggle/index.js
++++ b/packages/components/src/form-toggle/index.js
+@@ -4,14 +4,24 @@
+ import classnames from 'classnames';
+ import { noop } from 'lodash';
+ 
++/**
++ * Internal dependencies
++ */
++import {
++	StyledFormToggle,
++	StyledToggleTrack,
++	StyledToggleInput,
++	StyledToggleThumb,
++} from './styles/form-toggle-styles';
++
+ function FormToggle( { className, checked, id, onChange = noop, ...props } ) {
+ 	const wrapperClasses = classnames( 'components-form-toggle', className, {
+ 		'is-checked': checked,
+ 	} );
+ 
+ 	return (
+-		<span className={ wrapperClasses }>
+-			<input
++		<StyledFormToggle className={ wrapperClasses } isChecked={ checked }>
++			<StyledToggleInput
+ 				className="components-form-toggle__input"
+ 				id={ id }
+ 				type="checkbox"
+@@ -19,9 +29,9 @@ function FormToggle( { className, checked, id, onChange = noop, ...props } ) {
+ 				onChange={ onChange }
+ 				{ ...props }
+ 			/>
+-			<span className="components-form-toggle__track"></span>
+-			<span className="components-form-toggle__thumb"></span>
+-		</span>
++			<StyledToggleTrack className="components-form-toggle__track" />
++			<StyledToggleThumb className="components-form-toggle__thumb" />
++		</StyledFormToggle>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/form-toggle/style.scss b/packages/components/src/form-toggle/style.scss
+deleted file mode 100644
+index 3805880b84e82b..00000000000000
+--- a/packages/components/src/form-toggle/style.scss
++++ /dev/null
+@@ -1,90 +0,0 @@
+-$toggle-width: 36px;
+-$toggle-height: 18px;
+-$toggle-border-width: 1px;
+-
+-.components-form-toggle {
+-	position: relative;
+-	display: inline-block;
+-
+-	// Unchecked state.
+-	.components-form-toggle__track {
+-		content: "";
+-		display: inline-block;
+-		box-sizing: border-box;
+-		vertical-align: top;
+-		background-color: $white;
+-		border: $toggle-border-width solid $gray-900;
+-		width: $toggle-width;
+-		height: $toggle-height;
+-		border-radius: $toggle-height / 2;
+-		transition: 0.2s background ease;
+-		@include reduce-motion("transition");
+-	}
+-
+-	.components-form-toggle__thumb {
+-		display: block;
+-		position: absolute;
+-		box-sizing: border-box;
+-		top: $toggle-border-width * 3;
+-		left: $toggle-border-width * 3;
+-		width: $toggle-height - ($toggle-border-width * 6);
+-		height: $toggle-height - ($toggle-border-width * 6);
+-		border-radius: 50%;
+-		transition: 0.1s transform ease;
+-		@include reduce-motion("transition");
+-		background-color: $gray-900;
+-		border: 5px solid $gray-900; // Has explicit border to act as a fill in Windows High Contrast Mode.
+-	}
+-
+-	// Checked state.
+-	&.is-checked .components-form-toggle__track {
+-		background-color: var(--wp-admin-theme-color);
+-		border: $toggle-border-width solid var(--wp-admin-theme-color);
+-		border: #{ $toggle-height / 2 } solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
+-	}
+-
+-	.components-form-toggle__input:focus + .components-form-toggle__track {
+-		box-shadow: 0 0 0 2px $white, 0 0 0 (2px + $border-width-focus) var(--wp-admin-theme-color);
+-
+-		// Windows High Contrast mode will show this outline, but not the box-shadow.
+-		outline: 2px solid transparent;
+-		outline-offset: 2px;
+-	}
+-
+-	&.is-checked {
+-		.components-form-toggle__thumb {
+-			background-color: $white;
+-			border-width: 0; // Zero out the border color to make the thumb invisible in Windows High Contrast Mode.
+-			transform: translateX($toggle-width - ($toggle-border-width * 4) - ($toggle-height - ($toggle-border-width * 4)));
+-		}
+-	}
+-
+-	// Disabled state:
+-	.components-disabled & {
+-		opacity: 0.3;
+-	}
+-}
+-
+-// This needs specificity to override inherited checkbox styles.
+-.components-form-toggle input.components-form-toggle__input[type="checkbox"] {
+-	position: absolute;
+-	top: 0;
+-	left: 0;
+-	width: 100%;
+-	height: 100%;
+-	opacity: 0;
+-	margin: 0;
+-	padding: 0;
+-	z-index: z-index(".components-form-toggle__input");
+-
+-	// This overrides a border style that is inherited from parent checkbox styles.
+-	border: none;
+-	&:checked {
+-		background: none;
+-	}
+-
+-	// Don't show custom checkbox checkmark.
+-	&::before {
+-		content: "";
+-	}
+-}
+diff --git a/packages/components/src/form-toggle/styles/form-toggle-styles.js b/packages/components/src/form-toggle/styles/form-toggle-styles.js
+new file mode 100644
+index 00000000000000..6e88f49d644487
+--- /dev/null
++++ b/packages/components/src/form-toggle/styles/form-toggle-styles.js
+@@ -0,0 +1,109 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css } from '@emotion/core';
++
++/**
++ * Internal dependencies
++ */
++import { color, reduceMotion, rtl, zIndex, config } from '../../utils';
++import {
++	toggleBorderWidth,
++	toggleWidth,
++	toggleHeight,
++	appearTransform,
++} from './utils';
++
++export const StyledToggleTrack = styled.span`
++	content: '';
++	display: inline-block;
++	box-sizing: border-box;
++	vertical-align: top;
++	background-color: ${ color( 'white' ) };
++	border: ${ toggleBorderWidth }px solid ${ color( 'darkGray.primary' ) };
++	width: ${ toggleWidth }px;
++	height: ${ toggleHeight }px;
++	border-radius: ${ toggleHeight / 2 }px;
++	transition: 0.2s background ease;
++	${ reduceMotion( 'transition' ) }
++`;
++
++export const StyledToggleThumb = styled.span`
++	display: block;
++	position: absolute;
++	box-sizing: border-box;
++	top: ${ toggleBorderWidth * 3 }px;
++	${ rtl( { left: `${ toggleBorderWidth * 3 }px` } ) };
++	width: ${ toggleHeight - toggleBorderWidth * 6 }px;
++	height: ${ toggleHeight - toggleBorderWidth * 6 }px;
++	border-radius: 50%;
++	transition: 0.1s transform ease;
++	${ reduceMotion( 'transition' ) }
++	background-color: ${ color( 'darkGray.primary' ) };
++	border: 5px solid ${ color(
++		'darkGray.primary'
++	) }; // Has explicit border to act as a fill in Windows High Contrast Mode.
++`;
++
++export const StyledToggleInput = styled.input`
++	&,
++	&[type='checkbox'] {
++		position: absolute;
++		top: 0;
++		${ rtl( { left: 0 } ) };
++		width: 100%;
++		height: 100%;
++		opacity: 0;
++		margin: 0;
++		padding: 0;
++		${ zIndex( 'StyledToggleInput' ) };
++
++		// This overrides a border style that is inherited from parent checkbox styles.
++		border: none;
++		&:checked {
++			background: none;
++		}
++
++		// Don't show custom checkbox checkmark.
++		&::before {
++			content: '';
++		}
++	}
++`;
++
++const checkedStyles = css`
++	${ StyledToggleTrack } {
++		background-color: var( --wp-admin-theme-color );
++		border: ${ toggleBorderWidth }px solid var( --wp-admin-theme-color );
++		border: ${ toggleHeight / 2 }px solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
++	}
++
++	${ StyledToggleThumb } {
++		background-color: ${ color( 'white' ) };
++		border-width: 0; // Zero out the border color to make the thumb invisible in Windows High Contrast Mode.
++		${ appearTransform() }
++	}
++`;
++
++export const StyledFormToggle = styled.span`
++	position: relative;
++	display: inline-block;
++
++	${ ( props ) => ( props.isChecked ? checkedStyles : '' ) }
++
++	${ StyledToggleInput }:focus + ${ StyledToggleTrack } {
++		box-shadow: 0 0 0 2px ${ color( 'white' ) },
++			0 0 0 calc( 2px + ${ config(
++				'borderWidthFocus'
++			) } )) var( --wp-admin-theme-color );
++
++		// Windows High Contrast mode will show this outline, but not the box-shadow.
++		outline: 2px solid transparent;
++		outline-offset: 2px;
++	}
++
++	.components-disabled & {
++		opacity: 0.3;
++	}
++`;
+diff --git a/packages/components/src/form-toggle/styles/utils.js b/packages/components/src/form-toggle/styles/utils.js
+new file mode 100644
+index 00000000000000..7e1a6c03aa648c
+--- /dev/null
++++ b/packages/components/src/form-toggle/styles/utils.js
+@@ -0,0 +1,30 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/core';
++
++/**
++ * Internal dependencies
++ */
++import { getRTL } from '../../utils';
++
++export const toggleWidth = 36;
++export const toggleHeight = 18;
++export const toggleBorderWidth = 1;
++
++export const appearTransform = () => {
++	const value =
++		toggleWidth -
++		toggleBorderWidth * 4 -
++		( toggleHeight - toggleBorderWidth * 4 );
++
++	if ( getRTL() ) {
++		return css`
++			transform: translateX( -${ value }px );
++		`;
++	}
++
++	return css`
++		transform: translateX( ${ value }px );
++	`;
++};
+diff --git a/packages/components/src/form-toggle/test/__snapshots__/index.js.snap b/packages/components/src/form-toggle/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..ffe85ee743fcb4
+--- /dev/null
++++ b/packages/components/src/form-toggle/test/__snapshots__/index.js.snap
+@@ -0,0 +1,137 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`FormToggle basic rendering should render a checkbox with a noop onChange 1`] = `
++<StyledFormToggle
++  className="components-form-toggle"
++>
++  <StyledToggleInput
++    className="components-form-toggle__input"
++    onChange={[Function]}
++    type="checkbox"
++  />
++  <StyledToggleTrack
++    className="components-form-toggle__track"
++  />
++  <StyledToggleThumb
++    className="components-form-toggle__thumb"
++  />
++</StyledFormToggle>
++`;
++
++exports[`FormToggle basic rendering should render a checkbox with a user-provided onChange 1`] = `
++<StyledFormToggle
++  className="components-form-toggle"
++>
++  <StyledToggleInput
++    className="components-form-toggle__input"
++    onChange={[Function]}
++    type="checkbox"
++  />
++  <StyledToggleTrack
++    className="components-form-toggle__track"
++  />
++  <StyledToggleThumb
++    className="components-form-toggle__thumb"
++  />
++</StyledFormToggle>
++`;
++
++exports[`FormToggle basic rendering should render a span element with an unchecked checkbox 1`] = `
++.emotion-6 {
++  position: relative;
++  display: inline-block;
++}
++
++.emotion-6 .emotion-1:focus + .emotion-3 {
++  box-shadow: 0 0 0 2px #fff,0 0 0 calc( 2px + 1.5px )) var( --wp-admin-theme-color );
++  outline: 2px solid transparent;
++  outline-offset: 2px;
++}
++
++.components-disabled .emotion-6 {
++  opacity: 0.3;
++}
++
++.emotion-0,
++.emotion-0[type='checkbox'] {
++  position: absolute;
++  top: 0;
++  left: 0;
++  width: 100%;
++  height: 100%;
++  opacity: 0;
++  margin: 0;
++  padding: 0;
++  z-index: 1;
++  border: none;
++}
++
++.emotion-0:checked,
++.emotion-0[type='checkbox']:checked {
++  background: none;
++}
++
++.emotion-0::before,
++.emotion-0[type='checkbox']::before {
++  content: '';
++}
++
++.emotion-2 {
++  content: '';
++  display: inline-block;
++  box-sizing: border-box;
++  vertical-align: top;
++  background-color: #fff;
++  border: 1px solid #1e1e1e;
++  width: 36px;
++  height: 18px;
++  border-radius: 9px;
++  -webkit-transition: 0.2s background ease;
++  transition: 0.2s background ease;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-2 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-4 {
++  display: block;
++  position: absolute;
++  box-sizing: border-box;
++  top: 3px;
++  left: 3px;
++  width: 12px;
++  height: 12px;
++  border-radius: 50%;
++  -webkit-transition: 0.1s -webkit-transform ease;
++  -webkit-transition: 0.1s transform ease;
++  transition: 0.1s transform ease;
++  background-color: #1e1e1e;
++  border: 5px solid #1e1e1e;
++}
++
++@media ( prefers-reduced-motion:reduce ) {
++  .emotion-4 {
++    -webkit-transition-duration: 0ms;
++    transition-duration: 0ms;
++  }
++}
++
++<span
++  class="components-form-toggle emotion-6 emotion-7"
++>
++  <input
++    class="components-form-toggle__input emotion-0 emotion-1"
++    type="checkbox"
++  />
++  <span
++    class="components-form-toggle__track emotion-2 emotion-3"
++  />
++  <span
++    class="components-form-toggle__thumb emotion-4 emotion-5"
++  />
++</span>
++`;
+diff --git a/packages/components/src/form-toggle/test/index.js b/packages/components/src/form-toggle/test/index.js
+index 8d64abb164746d..987cf36f85cb3b 100644
+--- a/packages/components/src/form-toggle/test/index.js
++++ b/packages/components/src/form-toggle/test/index.js
+@@ -1,32 +1,27 @@
+ /**
+  * External dependencies
+  */
+-import { shallow } from 'enzyme';
++import { shallow, render } from 'enzyme';
+ import { noop } from 'lodash';
+ 
+ /**
+  * Internal dependencies
+  */
+ import FormToggle from '../';
++import { StyledToggleInput } from '../styles/form-toggle-styles';
+ 
+ describe( 'FormToggle', () => {
+ 	describe( 'basic rendering', () => {
+ 		it( 'should render a span element with an unchecked checkbox', () => {
+-			const formToggle = shallow( <FormToggle /> );
+-			expect( formToggle.hasClass( 'components-form-toggle' ) ).toBe(
+-				true
+-			);
+-			expect( formToggle.hasClass( 'is-checked' ) ).toBe( false );
+-			expect( formToggle.type() ).toBe( 'span' );
++			const formToggle = render( <FormToggle /> );
++			expect( formToggle ).toMatchSnapshot();
+ 		} );
+ 
+ 		it( 'should render a checked checkbox and change the accessibility text to On when providing checked prop', () => {
+ 			const formToggle = shallow( <FormToggle checked /> );
+ 			expect( formToggle.hasClass( 'is-checked' ) ).toBe( true );
+ 			expect(
+-				formToggle
+-					.find( '.components-form-toggle__input' )
+-					.prop( 'checked' )
++				formToggle.find( StyledToggleInput ).prop( 'checked' )
+ 			).toBe( true );
+ 		} );
+ 
+@@ -40,21 +35,18 @@ describe( 'FormToggle', () => {
+ 			// `withInstanceId`. In this case, it's fine to use literal IDs.
+ 			// eslint-disable-next-line no-restricted-syntax
+ 			const formToggle = shallow( <FormToggle id="test" /> );
+-			expect(
+-				formToggle.find( '.components-form-toggle__input' ).prop( 'id' )
+-			).toBe( 'test' );
++			expect( formToggle.find( StyledToggleInput ).prop( 'id' ) ).toBe(
++				'test'
++			);
+ 		} );
+ 
+ 		it( 'should render a checkbox with a noop onChange', () => {
+ 			const formToggle = shallow( <FormToggle /> );
+-			const checkBox = formToggle
+-				.prop( 'children' )
+-				.find(
+-					( child ) =>
+-						'input' === child.type &&
+-						'checkbox' === child.props.type
+-				);
+-			expect( checkBox.props.onChange ).toBe( noop );
++			expect( formToggle ).toMatchSnapshot();
++
++			expect(
++				formToggle.find( StyledToggleInput ).prop( 'onChange' )
++			).toBe( noop );
+ 		} );
+ 
+ 		it( 'should render a checkbox with a user-provided onChange', () => {
+@@ -62,14 +54,11 @@ describe( 'FormToggle', () => {
+ 			const formToggle = shallow(
+ 				<FormToggle onChange={ testFunction } />
+ 			);
+-			const checkBox = formToggle
+-				.prop( 'children' )
+-				.find(
+-					( child ) =>
+-						'input' === child.type &&
+-						'checkbox' === child.props.type
+-				);
+-			expect( checkBox.props.onChange ).toBe( testFunction );
++			expect( formToggle ).toMatchSnapshot();
++
++			expect(
++				formToggle.find( StyledToggleInput ).prop( 'onChange' )
++			).toBe( testFunction );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index a7b92c1192b13d..7fe77f7f1d41da 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -17,7 +17,6 @@
+ @import "./dropdown/style.scss";
+ @import "./dropdown-menu/style.scss";
+ @import "./font-size-picker/style.scss";
+-@import "./form-toggle/style.scss";
+ @import "./form-token-field/style.scss";
+ @import "./guide/style.scss";
+ @import "./higher-order/navigate-regions/style.scss";
+diff --git a/packages/components/src/utils/style-mixins.js b/packages/components/src/utils/style-mixins.js
+index 74c9074a6c826f..015c839870a851 100644
+--- a/packages/components/src/utils/style-mixins.js
++++ b/packages/components/src/utils/style-mixins.js
+@@ -5,3 +5,4 @@ export { space } from './space';
+ export { font } from './font';
+ export { breakpoint } from './breakpoint';
+ export { config } from './config';
++export { zIndex } from './z-index';
+diff --git a/packages/components/src/utils/z-index-values.js b/packages/components/src/utils/z-index-values.js
+new file mode 100644
+index 00000000000000..3dd9bd64e08994
+--- /dev/null
++++ b/packages/components/src/utils/z-index-values.js
+@@ -0,0 +1,5 @@
++export default {
++	// Renders the form-toggle input above the track allowing all clicks
++	// to register on the input rather than on the track or thumb
++	StyledToggleInput: 1,
++};
+diff --git a/packages/components/src/utils/z-index.js b/packages/components/src/utils/z-index.js
+new file mode 100644
+index 00000000000000..1853935fdd1899
+--- /dev/null
++++ b/packages/components/src/utils/z-index.js
+@@ -0,0 +1,15 @@
++/**
++ * External dependencies
++ */
++import { get } from 'lodash';
++import { css } from '@emotion/core';
++
++/**
++ * Internal dependencies
++ */
++import Z_INDEX from './z-index-values';
++
++export const zIndex = ( key ) =>
++	css`
++		z-index: ${ get( Z_INDEX, key, 0 ) };
++	`;

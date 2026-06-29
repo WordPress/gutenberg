@@ -1,0 +1,94 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f8db1ef6d263a5..6981e56edcd374 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `InputControl`/`SelectControl`: update `height`/`min-height` to `32px` instead of `30px` to align with modern sizing scale ([#55490](https://github.com/WordPress/gutenberg/pull/55490)).
++
+ ### Bug Fix
+ 
+ -   `Autocomplete`: Add `aria-live` announcements for Mac and IOS Voiceover to fix lack of support for `aria-owns` ([#54902](https://github.com/WordPress/gutenberg/pull/54902)).
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index 8edf2a4875e52a..3934085f035289 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -119,8 +119,8 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   font-size: 16px;
+-  height: 30px;
+-  min-height: 30px;
++  height: 32px;
++  min-height: 32px;
+   padding-top: 0;
+   padding-bottom: 0;
+   padding-left: 8px;
+@@ -390,8 +390,8 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   font-size: 16px;
+-  height: 30px;
+-  min-height: 30px;
++  height: 32px;
++  min-height: 32px;
+   padding-top: 0;
+   padding-bottom: 0;
+   padding-left: 8px;
+@@ -671,8 +671,8 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   font-size: 16px;
+-  height: 30px;
+-  min-height: 30px;
++  height: 32px;
++  min-height: 32px;
+   padding-top: 0;
+   padding-bottom: 0;
+   padding-left: 8px;
+@@ -964,8 +964,8 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   font-size: 16px;
+-  height: 30px;
+-  min-height: 30px;
++  height: 32px;
++  min-height: 32px;
+   padding-top: 0;
+   padding-bottom: 0;
+   padding-left: 8px;
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 85331d85cd20ed..e4f4c3664e1d9b 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -149,9 +149,9 @@ export const getSizeConfig = ( {
+ 
+ 	if ( ! __next40pxDefaultSize ) {
+ 		sizes.default = {
+-			height: 30,
++			height: 32,
+ 			lineHeight: 1,
+-			minHeight: 30,
++			minHeight: 32,
+ 			paddingLeft: space( 2 ),
+ 			paddingRight: space( 2 ),
+ 		};
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index 7d0ddb502abd74..d23c689e2901ee 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -85,8 +85,8 @@ const sizeStyles = ( {
+ 
+ 	if ( ! __next40pxDefaultSize ) {
+ 		sizes.default = {
+-			height: 30,
+-			minHeight: 30,
++			height: 32,
++			minHeight: 32,
+ 			paddingTop: 0,
+ 			paddingBottom: 0,
+ 		};

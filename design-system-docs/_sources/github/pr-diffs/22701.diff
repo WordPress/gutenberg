@@ -1,0 +1,164 @@
+diff --git a/packages/components/src/query-controls/index.js b/packages/components/src/query-controls/index.js
+index a1a1a2bc4a4cf9..1276a71c7f7b7b 100644
+--- a/packages/components/src/query-controls/index.js
++++ b/packages/components/src/query-controls/index.js
+@@ -24,6 +24,7 @@ export default function QueryControls( {
+ 	onNumberOfItemsChange,
+ 	onOrderChange,
+ 	onOrderByChange,
++	disabled,
+ } ) {
+ 	return [
+ 		onOrderChange && onOrderByChange && (
+@@ -60,6 +61,7 @@ export default function QueryControls( {
+ 						onOrderByChange( newOrderBy );
+ 					}
+ 				} }
++				disabled={ disabled }
+ 			/>
+ 		),
+ 		onCategoryChange && (
+@@ -75,6 +77,7 @@ export default function QueryControls( {
+ 				suggestions={ Object.keys( categorySuggestions ) }
+ 				onChange={ onCategoryChange }
+ 				maxSuggestions={ MAX_CATEGORIES_SUGGESTIONS }
++				disabled={ disabled }
+ 			/>
+ 		),
+ 
+@@ -87,6 +90,7 @@ export default function QueryControls( {
+ 				min={ minItems }
+ 				max={ maxItems }
+ 				required
++				disabled={ disabled }
+ 			/>
+ 		),
+ 	];
+diff --git a/packages/components/src/toggle-control/index.js b/packages/components/src/toggle-control/index.js
+index 785174a22811fd..5943154c23e6fa 100644
+--- a/packages/components/src/toggle-control/index.js
++++ b/packages/components/src/toggle-control/index.js
+@@ -30,7 +30,14 @@ class ToggleControl extends Component {
+ 	}
+ 
+ 	render() {
+-		const { label, checked, help, instanceId, className } = this.props;
++		const {
++			label,
++			checked,
++			help,
++			instanceId,
++			className,
++			disabled,
++		} = this.props;
+ 		const id = `inspector-toggle-control-${ instanceId }`;
+ 
+ 		let describedBy, helpLabel;
+@@ -45,6 +52,9 @@ class ToggleControl extends Component {
+ 				help={ helpLabel }
+ 				className={ classnames(
+ 					'components-toggle-control',
++					{
++						'is-disabled': disabled,
++					},
+ 					className
+ 				) }
+ 			>
+@@ -53,6 +63,7 @@ class ToggleControl extends Component {
+ 					checked={ checked }
+ 					onChange={ this.onChange }
+ 					aria-describedby={ describedBy }
++					disabled={ disabled }
+ 				/>
+ 				<label
+ 					htmlFor={ id }
+diff --git a/packages/components/src/toggle-control/stories/index.js b/packages/components/src/toggle-control/stories/index.js
+index e006b68bc1a38c..9f8d8a3c1c1700 100644
+--- a/packages/components/src/toggle-control/stories/index.js
++++ b/packages/components/src/toggle-control/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { text } from '@storybook/addon-knobs';
++import { text, boolean } from '@storybook/addon-knobs';
+ 
+ /**
+  * WordPress dependencies
+@@ -18,6 +18,7 @@ export default { title: 'Components/ToggleControl', component: ToggleControl };
+ const ToggleControlWithState = ( {
+ 	helpTextChecked,
+ 	helpTextUnchecked,
++	forceChecked,
+ 	...props
+ } ) => {
+ 	const [ hasFixedBackground, setHasFixedBackground ] = useState( true );
+@@ -25,7 +26,9 @@ const ToggleControlWithState = ( {
+ 		<ToggleControl
+ 			{ ...props }
+ 			help={ hasFixedBackground ? helpTextChecked : helpTextUnchecked }
+-			checked={ hasFixedBackground }
++			checked={
++				forceChecked === undefined ? hasFixedBackground : forceChecked
++			}
+ 			onChange={ setHasFixedBackground }
+ 		/>
+ 	);
+@@ -56,3 +59,16 @@ export const withHelpText = () => {
+ 		/>
+ 	);
+ };
++
++export const disabled = () => {
++	const label = text( 'Label', 'Does this have a fixed background?' );
++	const forceChecked = boolean( 'Checked', true );
++
++	return (
++		<ToggleControlWithState
++			disabled
++			forceChecked={ forceChecked }
++			label={ label }
++		/>
++	);
++};
+diff --git a/packages/components/src/toggle-control/style.scss b/packages/components/src/toggle-control/style.scss
+index e376aba9eee786..fea6674cf07b9b 100644
+--- a/packages/components/src/toggle-control/style.scss
++++ b/packages/components/src/toggle-control/style.scss
+@@ -1,14 +1,26 @@
+-.components-toggle-control .components-base-control__field {
+-	display: flex;
+-	margin-bottom: $grid-unit-05 * 3;
+-	line-height: initial;
+-	align-items: center;
+-
+-	.components-form-toggle {
+-		margin-right: $grid-unit-20;
++.components-toggle-control {
++	&.is-disabled {
++		.components-form-toggle__thumb,
++		.components-form-toggle .components-form-toggle__track {
++			background: $light-gray-500;
++			border-color: $light-gray-900;
++		}
++		svg {
++			color: $light-gray-900;
++		}
+ 	}
++	.components-base-control__field {
++		display: flex;
++		margin-bottom: $grid-unit-05 * 3;
++		line-height: initial;
++		align-items: center;
++
++		.components-form-toggle {
++			margin-right: $grid-unit-20;
++		}
+ 
+-	.components-toggle-control__label {
+-		display: block;
++		.components-toggle-control__label {
++			display: block;
++		}
+ 	}
+ }

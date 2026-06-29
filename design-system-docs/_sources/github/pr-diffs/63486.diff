@@ -1,0 +1,312 @@
+diff --git a/packages/block-editor/src/components/alignment-control/ui.js b/packages/block-editor/src/components/alignment-control/ui.js
+index 9eb47533c5b7a1..6b423a79aa9e06 100644
+--- a/packages/block-editor/src/components/alignment-control/ui.js
++++ b/packages/block-editor/src/components/alignment-control/ui.js
+@@ -32,7 +32,7 @@ function AlignmentUI( {
+ 	onChange,
+ 	alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
+ 	label = __( 'Align text' ),
+-	describedBy = __( 'Change text alignment' ),
++	description = __( 'Change text alignment' ),
+ 	isCollapsed = true,
+ 	isToolbar,
+ } ) {
+@@ -56,7 +56,7 @@ function AlignmentUI( {
+ 		? { isCollapsed }
+ 		: {
+ 				toggleProps: {
+-					describedBy,
++					description,
+ 				},
+ 				popoverProps: POPOVER_PROPS,
+ 		  };
+diff --git a/packages/block-editor/src/components/block-alignment-control/ui.js b/packages/block-editor/src/components/block-alignment-control/ui.js
+index b1762547bb8156..87c5c7b0275a22 100644
+--- a/packages/block-editor/src/components/block-alignment-control/ui.js
++++ b/packages/block-editor/src/components/block-alignment-control/ui.js
+@@ -64,7 +64,7 @@ function BlockAlignmentUI( {
+ 				} ),
+ 		  }
+ 		: {
+-				toggleProps: { describedBy: __( 'Change alignment' ) },
++				toggleProps: { description: __( 'Change alignment' ) },
+ 				children: ( { onClose } ) => {
+ 					return (
+ 						<>
+diff --git a/packages/block-editor/src/components/block-alignment-control/ui.native.js b/packages/block-editor/src/components/block-alignment-control/ui.native.js
+index 8faa8fe3e0d596..9234f50ccccb62 100644
+--- a/packages/block-editor/src/components/block-alignment-control/ui.native.js
++++ b/packages/block-editor/src/components/block-alignment-control/ui.native.js
+@@ -77,7 +77,7 @@ function BlockAlignmentUI( {
+ 					};
+ 				} ),
+ 				popoverProps: POPOVER_PROPS,
+-				toggleProps: { describedBy: __( 'Change alignment' ) },
++				toggleProps: { description: __( 'Change alignment' ) },
+ 		  };
+ 
+ 	return <UIComponent { ...commonProps } { ...extraProps } />;
+diff --git a/packages/block-editor/src/components/block-switcher/index.js b/packages/block-editor/src/components/block-switcher/index.js
+index f7f75dd8fa2ccb..f28d0e49333817 100644
+--- a/packages/block-editor/src/components/block-switcher/index.js
++++ b/packages/block-editor/src/components/block-switcher/index.js
+@@ -306,7 +306,7 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
+ 							</>
+ 						}
+ 						toggleProps={ {
+-							describedBy: blockSwitcherDescription,
++							description: blockSwitcherDescription,
+ 							...toggleProps,
+ 						} }
+ 						menuProps={ { orientation: 'both' } }
+diff --git a/packages/block-editor/src/components/rich-text/format-toolbar/index.js b/packages/block-editor/src/components/rich-text/format-toolbar/index.js
+index 22202d2d78d104..811164b0751c5f 100644
+--- a/packages/block-editor/src/components/rich-text/format-toolbar/index.js
++++ b/packages/block-editor/src/components/rich-text/format-toolbar/index.js
+@@ -52,7 +52,7 @@ const FormatToolbar = () => {
+ 											toggleProps.className,
+ 											{ 'is-pressed': hasActive }
+ 										),
+-										describedBy: __(
++										description: __(
+ 											'Displays more block tools'
+ 										),
+ 									} }
+diff --git a/packages/block-library/src/list-item/edit.js b/packages/block-library/src/list-item/edit.js
+index 71be31c03c0f8f..8c5fa7bdc7bf6a 100644
+--- a/packages/block-library/src/list-item/edit.js
++++ b/packages/block-library/src/list-item/edit.js
+@@ -53,14 +53,14 @@ export function IndentUI( { clientId } ) {
+ 			<ToolbarButton
+ 				icon={ isRTL() ? formatOutdentRTL : formatOutdent }
+ 				title={ __( 'Outdent' ) }
+-				describedBy={ __( 'Outdent list item' ) }
++				description={ __( 'Outdent list item' ) }
+ 				disabled={ ! canOutdent }
+ 				onClick={ () => outdentListItem() }
+ 			/>
+ 			<ToolbarButton
+ 				icon={ isRTL() ? formatIndentRTL : formatIndent }
+ 				title={ __( 'Indent' ) }
+-				describedBy={ __( 'Indent list item' ) }
++				description={ __( 'Indent list item' ) }
+ 				disabled={ ! canIndent }
+ 				onClick={ () => indentListItem() }
+ 			/>
+diff --git a/packages/block-library/src/list/edit.js b/packages/block-library/src/list/edit.js
+index 94a7a0945d6294..73551cd9cdee80 100644
+--- a/packages/block-library/src/list/edit.js
++++ b/packages/block-library/src/list/edit.js
+@@ -110,7 +110,7 @@ function IndentUI( { clientId } ) {
+ 			<ToolbarButton
+ 				icon={ isRTL() ? formatOutdentRTL : formatOutdent }
+ 				title={ __( 'Outdent' ) }
+-				describedBy={ __( 'Outdent list item' ) }
++				description={ __( 'Outdent list item' ) }
+ 				disabled={ ! canOutdent }
+ 				onClick={ outdentList }
+ 			/>
+@@ -147,7 +147,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
+ 			<ToolbarButton
+ 				icon={ isRTL() ? formatListBulletsRTL : formatListBullets }
+ 				title={ __( 'Unordered' ) }
+-				describedBy={ __( 'Convert to unordered list' ) }
++				description={ __( 'Convert to unordered list' ) }
+ 				isActive={ ordered === false }
+ 				onClick={ () => {
+ 					setAttributes( { ordered: false } );
+@@ -156,7 +156,7 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
+ 			<ToolbarButton
+ 				icon={ isRTL() ? formatListNumberedRTL : formatListNumbered }
+ 				title={ __( 'Ordered' ) }
+-				describedBy={ __( 'Convert to ordered list' ) }
++				description={ __( 'Convert to ordered list' ) }
+ 				isActive={ ordered === true }
+ 				onClick={ () => {
+ 					setAttributes( { ordered: true } );
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3a6ce15c62a7a9..ed1469de74e5eb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -21,6 +21,7 @@
+ 
+ ### Enhancements
+ 
++-   `Button`: Rename Button describedBy prop to description and deprecate old name. ([#63486](https://github.com/WordPress/gutenberg/pull/63486))
+ -   `ToggleGroupControl`: support disabled options ([#63450](https://github.com/WordPress/gutenberg/pull/63450)).
+ -   `CustomSelectControl`: Stabilize `__experimentalShowSelectedHint` and `options[]. __experimentalHint` props ([#63248](https://github.com/WordPress/gutenberg/pull/63248)).
+ 
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index e8b0e7ea697083..b3a83904bc9ba6 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -138,7 +138,7 @@ An optional additional class name to apply to the rendered button.
+ 
+ -   Required: No
+ 
+-#### `describedBy`: `string`
++#### `description`: `string`
+ 
+ An accessible description for the button.
+ 
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index f49baff60233f6..0ab6b24b4dd6aa 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -39,6 +39,7 @@ function useDeprecatedProps( {
+ 	isSmall,
+ 	size,
+ 	variant,
++	describedBy,
+ 	...otherProps
+ }: ButtonProps & DeprecatedButtonProps ): ButtonProps {
+ 	let computedSize = size;
+@@ -48,6 +49,7 @@ function useDeprecatedProps( {
+ 		accessibleWhenDisabled: __experimentalIsFocusable,
+ 		// @todo Mark `isPressed` as deprecated
+ 		'aria-pressed': isPressed,
++		description: describedBy,
+ 	};
+ 
+ 	if ( isSmall ) {
+@@ -109,7 +111,7 @@ export function UnforwardedButton(
+ 		size = 'default',
+ 		text,
+ 		variant,
+-		describedBy,
++		description,
+ 		...buttonOrAnchorProps
+ 	} = useDeprecatedProps( props );
+ 
+@@ -208,7 +210,7 @@ export function UnforwardedButton(
+ 				// The tooltip is not explicitly disabled.
+ 				false !== showTooltip ) );
+ 
+-	const descriptionId = describedBy ? instanceId : undefined;
++	const descriptionId = description ? instanceId : undefined;
+ 
+ 	const describedById =
+ 		additionalProps[ 'aria-describedby' ] || descriptionId;
+@@ -262,8 +264,8 @@ export function UnforwardedButton(
+ 		? {
+ 				text:
+ 					( children as string | ReactElement[] )?.length &&
+-					describedBy
+-						? describedBy
++					description
++						? description
+ 						: label,
+ 				shortcut,
+ 				placement:
+@@ -276,9 +278,9 @@ export function UnforwardedButton(
+ 	return (
+ 		<>
+ 			<Tooltip { ...tooltipProps }>{ element }</Tooltip>
+-			{ describedBy && (
++			{ description && (
+ 				<VisuallyHidden>
+-					<span id={ descriptionId }>{ describedBy }</span>
++					<span id={ descriptionId }>{ description }</span>
+ 				</VisuallyHidden>
+ 			) }
+ 		</>
+diff --git a/packages/components/src/button/test/index.tsx b/packages/components/src/button/test/index.tsx
+index df359eff7cced8..c5bf32e683ff1a 100644
+--- a/packages/components/src/button/test/index.tsx
++++ b/packages/components/src/button/test/index.tsx
+@@ -329,7 +329,7 @@ describe( 'Button', () => {
+ 		} );
+ 
+ 		it( 'should support adding aria-describedby text', () => {
+-			render( <Button describedBy="Description text" /> );
++			render( <Button description="Description text" /> );
+ 			expect(
+ 				screen.getByRole( 'button', {
+ 					description: 'Description text',
+@@ -342,7 +342,7 @@ describe( 'Button', () => {
+ 
+ 			render(
+ 				<Button
+-					describedBy="Description text"
++					description="Description text"
+ 					label="Label"
+ 					icon={ plusCircle }
+ 				/>
+@@ -364,7 +364,7 @@ describe( 'Button', () => {
+ 			render(
+ 				<Button
+ 					label="Label"
+-					describedBy="Description text"
++					description="Description text"
+ 					icon={ plusCircle }
+ 					showTooltip
+ 				>
+diff --git a/packages/components/src/button/types.ts b/packages/components/src/button/types.ts
+index cba06ade2d02ca..7d67b721a5036d 100644
+--- a/packages/components/src/button/types.ts
++++ b/packages/components/src/button/types.ts
+@@ -43,9 +43,9 @@ type BaseButtonProps = {
+ 	 */
+ 	children?: ReactNode;
+ 	/**
+-	 * An accessible description for the button.
++	 * A visually hidden accessible description for the button.
+ 	 */
+-	describedBy?: string;
++	description?: string;
+ 	/**
+ 	 * If provided, renders an Icon component inside the button.
+ 	 */
+@@ -199,6 +199,13 @@ export type DeprecatedButtonProps = {
+ 	 * @ignore
+ 	 */
+ 	isSmall?: boolean;
++	/**
++	 * A visually hidden accessible description for the button.
++	 *
++	 * @deprecated Use the `description` prop instead.
++	 * @ignore
++	 */
++	describedBy?: string;
+ };
+ 
+ export type DeprecatedIconButtonProps = {
+diff --git a/packages/components/src/tools-panel/tools-panel-header/component.tsx b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+index a30a8aa1c2f4b4..5caf9ce82d64f2 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+@@ -200,7 +200,7 @@ const ToolsPanelHeader = (
+ 					menuProps={ { className: dropdownMenuClassName } }
+ 					toggleProps={ {
+ 						size: 'small',
+-						describedBy: dropdownMenuDescriptionText,
++						description: dropdownMenuDescriptionText,
+ 					} }
+ 				>
+ 					{ () => (
+diff --git a/packages/edit-site/src/components/page-patterns/header.js b/packages/edit-site/src/components/page-patterns/header.js
+index fe8802f98e8037..641dc577cb7fe0 100644
+--- a/packages/edit-site/src/components/page-patterns/header.js
++++ b/packages/edit-site/src/components/page-patterns/header.js
+@@ -80,7 +80,7 @@ export default function PatternsHeader( {
+ 							label={ __( 'Actions' ) }
+ 							toggleProps={ {
+ 								className: 'edit-site-patterns__button',
+-								describedBy: sprintf(
++								description: sprintf(
+ 									/* translators: %s: pattern category name */
+ 									__( 'Action menu for %s pattern category' ),
+ 									title
+diff --git a/packages/patterns/src/components/pattern-overrides-block-controls.js b/packages/patterns/src/components/pattern-overrides-block-controls.js
+index ae8ef5e1bb7da9..5a62a5b1993f75 100644
+--- a/packages/patterns/src/components/pattern-overrides-block-controls.js
++++ b/packages/patterns/src/components/pattern-overrides-block-controls.js
+@@ -98,7 +98,7 @@ function PatternOverridesToolbarIndicator( { clientIds } ) {
+ 						</>
+ 					}
+ 					toggleProps={ {
+-						describedBy: blockDescription,
++						description: blockDescription,
+ 						...toggleProps,
+ 					} }
+ 					menuProps={ {

@@ -1,0 +1,30 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 974ad5fe669ac5..1b0dcd2a6fdacb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `Button`, `Icon`: Fix `iconSize` prop doesn't work with some icons ([#43821](https://github.com/WordPress/gutenberg/pull/43821)).
+ -   `Popover`: enable auto-updating every animation frame ([#43617](https://github.com/WordPress/gutenberg/pull/43617)).
+ -   `Popover`: improve the component's performance and reactivity to prop changes by reworking its internals ([#43335](https://github.com/WordPress/gutenberg/pull/43335)).
++-   `NavigatorScreen`: updated to satisfy `react/exhaustive-deps` eslint rule ([#43876](https://github.com/WordPress/gutenberg/pull/43876))
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index c864349d67af77..94b7bfee306e97 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -104,7 +104,12 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
+ 		}
+ 
+ 		elementToFocus.focus();
+-	}, [ isInitialLocation, isMatch ] );
++	}, [
++		isInitialLocation,
++		isMatch,
++		location.isBack,
++		previousLocation?.focusTargetSelector,
++	] );
+ 
+ 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
+ 

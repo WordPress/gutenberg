@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 99ce7661125ca5..b154c67525de5c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `Button`: Update font weight to `500` ([#70787](https://github.com/WordPress/gutenberg/pull/70787)).
++-   `TabPanel`: Update tab font weight ([#72455](https://github.com/WordPress/gutenberg/pull/72455)).
+ 
+ ## 30.6.0 (2025-10-17)
+ 
+diff --git a/packages/components/src/tab-panel/style.scss b/packages/components/src/tab-panel/style.scss
+index 902713531ec6b0..367b53065e1f53 100644
+--- a/packages/components/src/tab-panel/style.scss
++++ b/packages/components/src/tab-panel/style.scss
+@@ -21,7 +21,7 @@
+ 	cursor: pointer;
+ 	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+ 	margin-left: 0;
+-	font-weight: 500;
++	font-weight: $font-weight-regular;
+ 
+ 	&:focus:not(:disabled) {
+ 		position: relative;

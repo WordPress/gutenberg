@@ -1,0 +1,271 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 01f8a506addc7a..67671070aa2a71 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -46,11 +46,6 @@ const restrictedImports = [
+ 		name: 'lodash',
+ 		message: 'Please use native functionality instead.',
+ 	},
+-	{
+-		name: 'reakit',
+-		message:
+-			'Please use Reakit API through `@wordpress/components` instead.',
+-	},
+ 	{
+ 		name: '@ariakit/react',
+ 		message:
+diff --git a/package-lock.json b/package-lock.json
+index e79fd2b4534086..f05d14282cc36c 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -7334,15 +7334,6 @@
+ 			"integrity": "sha512-C16M+IYz0rgRhWZdCmK+h58JMv8vijAA61gmz2rspCSwKwzBebpdcsiUmwrtJRdphuY30i6BSLEOP8ppbNLyLg==",
+ 			"dev": true
+ 		},
+-		"node_modules/@popperjs/core": {
+-			"version": "2.11.7",
+-			"resolved": "https://registry.npmjs.org/@popperjs/core/-/core-2.11.7.tgz",
+-			"integrity": "sha512-Cr4OjIkipTtcXKjAsm8agyleBuDHvxzeBoa1v543lbv1YaIwQjESsVcmjiWiPEbC1FIeHOG/Op9kdCmAmiS3Kw==",
+-			"funding": {
+-				"type": "opencollective",
+-				"url": "https://opencollective.com/popperjs"
+-			}
+-		},
+ 		"node_modules/@preact/signals-core": {
+ 			"version": "1.4.0",
+ 			"resolved": "https://registry.npmjs.org/@preact/signals-core/-/signals-core-1.4.0.tgz",
+@@ -20640,11 +20631,6 @@
+ 				"node": ">= 0.8"
+ 			}
+ 		},
+-		"node_modules/body-scroll-lock": {
+-			"version": "3.1.5",
+-			"resolved": "https://registry.npmjs.org/body-scroll-lock/-/body-scroll-lock-3.1.5.tgz",
+-			"integrity": "sha512-Yi1Xaml0EvNA0OYWxXiYNqY24AfWkbA6w5vxE7GWxtKfzIbZM+Qw+aSmkgsbWzbHiy/RCSkUZBplVxTA+E4jJg=="
+-		},
+ 		"node_modules/bonjour-service": {
+ 			"version": "1.1.1",
+ 			"resolved": "https://registry.npmjs.org/bonjour-service/-/bonjour-service-1.1.1.tgz",
+@@ -45465,58 +45451,6 @@
+ 			"resolved": "https://registry.npmjs.org/readline/-/readline-1.3.0.tgz",
+ 			"integrity": "sha512-k2d6ACCkiNYz222Fs/iNze30rRJ1iIicW7JuX/7/cozvih6YCkFZH+J6mAFDVgv0dRBaAyr4jDqC95R2y4IADg=="
+ 		},
+-		"node_modules/reakit": {
+-			"version": "1.3.11",
+-			"resolved": "https://registry.npmjs.org/reakit/-/reakit-1.3.11.tgz",
+-			"integrity": "sha512-mYxw2z0fsJNOQKAEn5FJCPTU3rcrY33YZ/HzoWqZX0G7FwySp1wkCYW79WhuYMNIUFQ8s3Baob1RtsEywmZSig==",
+-			"dependencies": {
+-				"@popperjs/core": "^2.5.4",
+-				"body-scroll-lock": "^3.1.5",
+-				"reakit-system": "^0.15.2",
+-				"reakit-utils": "^0.15.2",
+-				"reakit-warning": "^0.6.2"
+-			},
+-			"funding": {
+-				"type": "opencollective",
+-				"url": "https://opencollective.com/ariakit"
+-			},
+-			"peerDependencies": {
+-				"react": "^16.8.0 || ^17.0.0",
+-				"react-dom": "^16.8.0 || ^17.0.0"
+-			}
+-		},
+-		"node_modules/reakit-system": {
+-			"version": "0.15.2",
+-			"resolved": "https://registry.npmjs.org/reakit-system/-/reakit-system-0.15.2.tgz",
+-			"integrity": "sha512-TvRthEz0DmD0rcJkGamMYx+bATwnGNWJpe/lc8UV2Js8nnPvkaxrHk5fX9cVASFrWbaIyegZHCWUBfxr30bmmA==",
+-			"dependencies": {
+-				"reakit-utils": "^0.15.2"
+-			},
+-			"peerDependencies": {
+-				"react": "^16.8.0 || ^17.0.0",
+-				"react-dom": "^16.8.0 || ^17.0.0"
+-			}
+-		},
+-		"node_modules/reakit-utils": {
+-			"version": "0.15.2",
+-			"resolved": "https://registry.npmjs.org/reakit-utils/-/reakit-utils-0.15.2.tgz",
+-			"integrity": "sha512-i/RYkq+W6hvfFmXw5QW7zvfJJT/K8a4qZ0hjA79T61JAFPGt23DsfxwyBbyK91GZrJ9HMrXFVXWMovsKBc1qEQ==",
+-			"peerDependencies": {
+-				"react": "^16.8.0 || ^17.0.0",
+-				"react-dom": "^16.8.0 || ^17.0.0"
+-			}
+-		},
+-		"node_modules/reakit-warning": {
+-			"version": "0.6.2",
+-			"resolved": "https://registry.npmjs.org/reakit-warning/-/reakit-warning-0.6.2.tgz",
+-			"integrity": "sha512-z/3fvuc46DJyD3nJAUOto6inz2EbSQTjvI/KBQDqxwB0y02HDyeP8IWOJxvkuAUGkWpeSx+H3QWQFSNiPcHtmw==",
+-			"dependencies": {
+-				"reakit-utils": "^0.15.2"
+-			},
+-			"peerDependencies": {
+-				"react": "^16.8.0 || ^17.0.0"
+-			}
+-		},
+ 		"node_modules/reassure": {
+ 			"version": "0.7.1",
+ 			"resolved": "https://registry.npmjs.org/reassure/-/reassure-0.7.1.tgz",
+@@ -54097,7 +54031,6 @@
+ 				"path-to-regexp": "^6.2.1",
+ 				"re-resizable": "^6.4.0",
+ 				"react-colorful": "^5.3.1",
+-				"reakit": "^1.3.11",
+ 				"remove-accents": "^0.5.0",
+ 				"use-lilius": "^2.0.1",
+ 				"uuid": "^9.0.1",
+@@ -61276,11 +61209,6 @@
+ 			"integrity": "sha512-C16M+IYz0rgRhWZdCmK+h58JMv8vijAA61gmz2rspCSwKwzBebpdcsiUmwrtJRdphuY30i6BSLEOP8ppbNLyLg==",
+ 			"dev": true
+ 		},
+-		"@popperjs/core": {
+-			"version": "2.11.7",
+-			"resolved": "https://registry.npmjs.org/@popperjs/core/-/core-2.11.7.tgz",
+-			"integrity": "sha512-Cr4OjIkipTtcXKjAsm8agyleBuDHvxzeBoa1v543lbv1YaIwQjESsVcmjiWiPEbC1FIeHOG/Op9kdCmAmiS3Kw=="
+-		},
+ 		"@preact/signals-core": {
+ 			"version": "1.4.0",
+ 			"resolved": "https://registry.npmjs.org/@preact/signals-core/-/signals-core-1.4.0.tgz",
+@@ -69207,7 +69135,6 @@
+ 				"path-to-regexp": "^6.2.1",
+ 				"re-resizable": "^6.4.0",
+ 				"react-colorful": "^5.3.1",
+-				"reakit": "^1.3.11",
+ 				"remove-accents": "^0.5.0",
+ 				"use-lilius": "^2.0.1",
+ 				"uuid": "^9.0.1",
+@@ -72555,11 +72482,6 @@
+ 				}
+ 			}
+ 		},
+-		"body-scroll-lock": {
+-			"version": "3.1.5",
+-			"resolved": "https://registry.npmjs.org/body-scroll-lock/-/body-scroll-lock-3.1.5.tgz",
+-			"integrity": "sha512-Yi1Xaml0EvNA0OYWxXiYNqY24AfWkbA6w5vxE7GWxtKfzIbZM+Qw+aSmkgsbWzbHiy/RCSkUZBplVxTA+E4jJg=="
+-		},
+ 		"bonjour-service": {
+ 			"version": "1.1.1",
+ 			"resolved": "https://registry.npmjs.org/bonjour-service/-/bonjour-service-1.1.1.tgz",
+@@ -91554,39 +91476,6 @@
+ 			"resolved": "https://registry.npmjs.org/readline/-/readline-1.3.0.tgz",
+ 			"integrity": "sha512-k2d6ACCkiNYz222Fs/iNze30rRJ1iIicW7JuX/7/cozvih6YCkFZH+J6mAFDVgv0dRBaAyr4jDqC95R2y4IADg=="
+ 		},
+-		"reakit": {
+-			"version": "1.3.11",
+-			"resolved": "https://registry.npmjs.org/reakit/-/reakit-1.3.11.tgz",
+-			"integrity": "sha512-mYxw2z0fsJNOQKAEn5FJCPTU3rcrY33YZ/HzoWqZX0G7FwySp1wkCYW79WhuYMNIUFQ8s3Baob1RtsEywmZSig==",
+-			"requires": {
+-				"@popperjs/core": "^2.5.4",
+-				"body-scroll-lock": "^3.1.5",
+-				"reakit-system": "^0.15.2",
+-				"reakit-utils": "^0.15.2",
+-				"reakit-warning": "^0.6.2"
+-			}
+-		},
+-		"reakit-system": {
+-			"version": "0.15.2",
+-			"resolved": "https://registry.npmjs.org/reakit-system/-/reakit-system-0.15.2.tgz",
+-			"integrity": "sha512-TvRthEz0DmD0rcJkGamMYx+bATwnGNWJpe/lc8UV2Js8nnPvkaxrHk5fX9cVASFrWbaIyegZHCWUBfxr30bmmA==",
+-			"requires": {
+-				"reakit-utils": "^0.15.2"
+-			}
+-		},
+-		"reakit-utils": {
+-			"version": "0.15.2",
+-			"resolved": "https://registry.npmjs.org/reakit-utils/-/reakit-utils-0.15.2.tgz",
+-			"integrity": "sha512-i/RYkq+W6hvfFmXw5QW7zvfJJT/K8a4qZ0hjA79T61JAFPGt23DsfxwyBbyK91GZrJ9HMrXFVXWMovsKBc1qEQ=="
+-		},
+-		"reakit-warning": {
+-			"version": "0.6.2",
+-			"resolved": "https://registry.npmjs.org/reakit-warning/-/reakit-warning-0.6.2.tgz",
+-			"integrity": "sha512-z/3fvuc46DJyD3nJAUOto6inz2EbSQTjvI/KBQDqxwB0y02HDyeP8IWOJxvkuAUGkWpeSx+H3QWQFSNiPcHtmw==",
+-			"requires": {
+-				"reakit-utils": "^0.15.2"
+-			}
+-		},
+ 		"reassure": {
+ 			"version": "0.7.1",
+ 			"resolved": "https://registry.npmjs.org/reassure/-/reassure-0.7.1.tgz",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 049863f7bee050..34efddf6daa5d3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -31,6 +31,7 @@
+ ### Internal
+ 
+ -   `Composite`: Removing Reakit `Composite` implementation ([#58620](https://github.com/WordPress/gutenberg/pull/58620)).
++-   Removing Reakit as a dependency of the components package ([#58631](https://github.com/WordPress/gutenberg/pull/58631)).
+ 
+ ## 25.16.0 (2024-01-24)
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 071fa44727b1d1..eb8574e56a46f1 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -75,7 +75,6 @@
+ 		"path-to-regexp": "^6.2.1",
+ 		"re-resizable": "^6.4.0",
+ 		"react-colorful": "^5.3.1",
+-		"reakit": "^1.3.11",
+ 		"remove-accents": "^0.5.0",
+ 		"use-lilius": "^2.0.1",
+ 		"uuid": "^9.0.1",
+diff --git a/packages/components/src/composite/v2.ts b/packages/components/src/composite/v2.ts
+index 5e3e8c13fd05e7..38d3f628d368b6 100644
+--- a/packages/components/src/composite/v2.ts
++++ b/packages/components/src/composite/v2.ts
+@@ -1,4 +1,4 @@
+-// Until we migrate away from Reakit, the 'current'
+-// Ariakit implementation is considered a v2.
++// Although we have migrated away from Reakit, the 'current'
++// Ariakit implementation is still considered a v2.
+ 
+ export * from './current';
+diff --git a/packages/components/src/context/wordpress-component.ts b/packages/components/src/context/wordpress-component.ts
+index 03c796bbbc3e40..6e88ed4efb094e 100644
+--- a/packages/components/src/context/wordpress-component.ts
++++ b/packages/components/src/context/wordpress-component.ts
+@@ -3,7 +3,7 @@
+  */
+ import type * as React from 'react';
+ 
+-// Based on https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/types.ts
++// Based on https://github.com/ariakit/ariakit/blob/reakit/packages/reakit-utils/src/types.ts
+ export type WordPressComponentProps<
+ 	/** Prop types. */
+ 	P,
+diff --git a/packages/components/src/divider/README.md b/packages/components/src/divider/README.md
+index c28b6b6b060a04..c81026b7b55871 100644
+--- a/packages/components/src/divider/README.md
++++ b/packages/components/src/divider/README.md
+@@ -55,4 +55,4 @@ Divider's orientation. When using inside a flex container, you may need to make
+ 
+ ### Inherited props
+ 
+-`Divider` also inherits all of the [`Separator` props](https://reakit.io/docs/separator/).
++`Divider` also inherits all of the [`Separator` props](https://ariakit.org/reference/separator#optional-props).
+diff --git a/packages/components/src/utils/hooks/use-update-effect.js b/packages/components/src/utils/hooks/use-update-effect.js
+index ab96caf5799756..361bce5c9c2889 100644
+--- a/packages/components/src/utils/hooks/use-update-effect.js
++++ b/packages/components/src/utils/hooks/use-update-effect.js
+@@ -6,7 +6,7 @@ import { useRef, useEffect } from '@wordpress/element';
+ /**
+  * A `React.useEffect` that will not run on the first render.
+  * Source:
+- * https://github.com/reakit/reakit/blob/HEAD/packages/reakit-utils/src/useUpdateEffect.ts
++ * https://github.com/ariakit/ariakit/blob/reakit/packages/reakit-utils/src/useUpdateEffect.ts
+  *
+  * @param {import('react').EffectCallback} effect
+  * @param {import('react').DependencyList} deps
+diff --git a/packages/edit-site/src/components/page-patterns/grid-item.js b/packages/edit-site/src/components/page-patterns/grid-item.js
+index 8d2cbaf7806b4d..0c1b162dac99d4 100644
+--- a/packages/edit-site/src/components/page-patterns/grid-item.js
++++ b/packages/edit-site/src/components/page-patterns/grid-item.js
+@@ -171,8 +171,6 @@ function GridItem( { categoryId, item, ...props } ) {
+ 		<li className={ patternClassNames }>
+ 			<button
+ 				className={ previewClassNames }
+-				// Even though still incomplete, passing ids helps performance.
+-				// @see https://reakit.io/docs/composite/#performance.
+ 				id={ `edit-site-patterns-${ item.name }` }
+ 				type="button"
+ 				{ ...props }

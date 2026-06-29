@@ -1,0 +1,436 @@
+diff --git a/packages/components/src/confirm-dialog/test/index.js b/packages/components/src/confirm-dialog/test/index.js
+index 4aecd43f570861..cbcdf032eb95d4 100644
+--- a/packages/components/src/confirm-dialog/test/index.js
++++ b/packages/components/src/confirm-dialog/test/index.js
+@@ -4,7 +4,6 @@
+ import {
+ 	render,
+ 	screen,
+-	fireEvent,
+ 	waitForElementToBeRemoved,
+ 	waitFor,
+ } from '@testing-library/react';
+@@ -18,6 +17,18 @@ import { ConfirmDialog } from '..';
+ const noop = () => {};
+ 
+ describe( 'Confirm', () => {
++	let mockedDocumentHasFocus;
++
++	beforeEach( () => {
++		mockedDocumentHasFocus = jest
++			.spyOn( document, 'hasFocus' )
++			.mockImplementation( () => true );
++	} );
++
++	afterEach( () => {
++		mockedDocumentHasFocus.mockRestore();
++	} );
++
+ 	describe( 'Confirm component', () => {
+ 		describe( 'Structure', () => {
+ 			it( 'should render correctly', () => {
+@@ -137,24 +148,27 @@ describe( 'Confirm', () => {
+ 			} );
+ 
+ 			it( 'should not render if dialog is closed by clicking the overlay, and the `onCancel` callback should be called', async () => {
++				const user = userEvent.setup();
+ 				const onCancel = jest.fn().mockName( 'onCancel()' );
+ 
+ 				render(
+-					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
+-						Are you sure?
+-					</ConfirmDialog>
++					<div aria-label="Under the overlay">
++						<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
++							Are you sure?
++						</ConfirmDialog>
++					</div>
+ 				);
+ 
+ 				const confirmDialog = screen.getByRole( 'dialog' );
+ 
+-				//The overlay click is handled by detecting an onBlur from the modal frame.
+-				// TODO: replace with `@testing-library/user-event`
+-				fireEvent.blur( confirmDialog );
++				await user.click(
++					screen.getByLabelText( 'Under the overlay' )
++				);
+ 
+ 				await waitForElementToBeRemoved( confirmDialog );
+ 
+ 				expect( confirmDialog ).not.toBeInTheDocument();
+-				expect( onCancel ).toHaveBeenCalled();
++				await waitFor( () => expect( onCancel ).toHaveBeenCalled() );
+ 			} );
+ 
+ 			it( 'should not render if dialog is closed by pressing `Escape`, and the `onCancel` callback should be called', async () => {
+@@ -315,23 +329,22 @@ describe( 'Confirm', () => {
+ 		} );
+ 
+ 		it( 'should call the `onCancel` callback if the overlay is clicked', async () => {
++			const user = userEvent.setup();
+ 			const onCancel = jest.fn().mockName( 'onCancel()' );
+ 
+ 			render(
+-				<ConfirmDialog
+-					isOpen={ true }
+-					onConfirm={ noop }
+-					onCancel={ onCancel }
+-				>
+-					Are you sure?
+-				</ConfirmDialog>
++				<div aria-label="Under the overlay">
++					<ConfirmDialog
++						isOpen={ true }
++						onConfirm={ noop }
++						onCancel={ onCancel }
++					>
++						Are you sure?
++					</ConfirmDialog>
++				</div>
+ 			);
+ 
+-			const confirmDialog = screen.getByRole( 'dialog' );
+-
+-			//The overlay click is handled by detecting an onBlur from the modal frame.
+-			// TODO: replace with `@testing-library/user-event`
+-			fireEvent.blur( confirmDialog );
++			await user.click( screen.getByLabelText( 'Under the overlay' ) );
+ 
+ 			// Wait for a DOM side effect here, so that the `queueBlurCheck` in the
+ 			// `useFocusOutside` hook properly executes its timeout task.
+diff --git a/packages/components/src/modal/stories/index.tsx b/packages/components/src/modal/stories/index.tsx
+index 7f414d47c2d11c..89ac8c7e126bbd 100644
+--- a/packages/components/src/modal/stories/index.tsx
++++ b/packages/components/src/modal/stories/index.tsx
+@@ -78,6 +78,15 @@ const Template: ComponentStory< typeof Modal > = ( {
+ 
+ 					<InputControl style={ { marginBottom: '20px' } } />
+ 
++					<button>Button outside iframe</button>
++
++					<iframe
++						title="Example 1"
++						width="300"
++						height="200"
++						src="https://www.openstreetmap.org/export/embed.html?bbox=-0.004017949104309083%2C51.47612752641776%2C0.00030577182769775396%2C51.478569861898606&layer=mapnik"
++					/>
++
+ 					<Button variant="secondary" onClick={ closeModal }>
+ 						Close Modal
+ 					</Button>
+diff --git a/packages/compose/src/hooks/use-focus-outside/index.ts b/packages/compose/src/hooks/use-focus-outside/index.ts
+index 8d50a078ad70b5..5a852934ff9e0d 100644
+--- a/packages/compose/src/hooks/use-focus-outside/index.ts
++++ b/packages/compose/src/hooks/use-focus-outside/index.ts
+@@ -1,20 +1,7 @@
+-/**
+- * External dependencies
+- */
+-import type {
+-	FocusEventHandler,
+-	EventHandler,
+-	MouseEventHandler,
+-	TouchEventHandler,
+-	FocusEvent,
+-	MouseEvent,
+-	TouchEvent,
+-} from 'react';
+-
+ /**
+  * WordPress dependencies
+  */
+-import { useCallback, useEffect, useRef } from '@wordpress/element';
++import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+ 
+ /**
+  * Input types which are classified as button types, for use in considering
+@@ -63,14 +50,18 @@ function isFocusNormalizedButton(
+ }
+ 
+ type UseFocusOutsideReturn = {
+-	onFocus: FocusEventHandler;
+-	onMouseDown: MouseEventHandler;
+-	onMouseUp: MouseEventHandler;
+-	onTouchStart: TouchEventHandler;
+-	onTouchEnd: TouchEventHandler;
+-	onBlur: FocusEventHandler;
++	onFocus: React.FocusEventHandler;
++	onMouseDown: React.MouseEventHandler;
++	onMouseUp: React.MouseEventHandler;
++	onTouchStart: React.TouchEventHandler;
++	onTouchEnd: React.TouchEventHandler;
++	onBlur: React.FocusEventHandler;
+ };
+ 
++function isIframe( element?: Element | null ): element is HTMLIFrameElement {
++	return element?.tagName === 'IFRAME';
++}
++
+ /**
+  * A react hook that can be used to check whether focus has moved outside the
+  * element the event handlers are bound to.
+@@ -82,7 +73,7 @@ type UseFocusOutsideReturn = {
+  * wrapping element element to capture when focus moves outside that element.
+  */
+ export default function useFocusOutside(
+-	onFocusOutside: ( event: FocusEvent ) => void
++	onFocusOutside: ( event: React.FocusEvent ) => void
+ ): UseFocusOutsideReturn {
+ 	const currentOnFocusOutside = useRef( onFocusOutside );
+ 	useEffect( () => {
+@@ -93,6 +84,50 @@ export default function useFocusOutside(
+ 
+ 	const blurCheckTimeoutId = useRef< number | undefined >();
+ 
++	const [ pollingData, setPollingData ] = useState< {
++		event: React.FocusEvent< Element >;
++		wrapperEl: Element;
++	} | null >( null );
++	const pollingIntervalId = useRef< number | undefined >();
++
++	// Sometimes the blur event is not reliable, for example when focus moves
++	// to an iframe inside the wrapper. In these scenarios, we resort to polling,
++	// and we explicitly check if focus has indeed moved outside the wrapper.
++	useEffect( () => {
++		if ( pollingData ) {
++			const { wrapperEl, event } = pollingData;
++
++			pollingIntervalId.current = window.setInterval( () => {
++				const focusedElement = wrapperEl.ownerDocument.activeElement;
++
++				if (
++					! wrapperEl.contains( focusedElement ) &&
++					wrapperEl.ownerDocument.hasFocus()
++				) {
++					// If focus is not inside the wrapper (but the document is in focus),
++					// we can fire the `onFocusOutside` callback and stop polling.
++					currentOnFocusOutside.current( event );
++					setPollingData( null );
++				} else if ( ! isIframe( focusedElement ) ) {
++					// If focus is still inside the wrapper, but an iframe is not the
++					// element currently focused, we can stop polling, because the regular
++					// blur events will fire as expected.
++					setPollingData( null );
++				}
++			}, 50 );
++		} else if ( pollingIntervalId.current ) {
++			window.clearInterval( pollingIntervalId.current );
++			pollingIntervalId.current = undefined;
++		}
++
++		return () => {
++			if ( pollingIntervalId.current ) {
++				window.clearInterval( pollingIntervalId.current );
++				pollingIntervalId.current = undefined;
++			}
++		};
++	}, [ pollingData ] );
++
+ 	/**
+ 	 * Cancel a blur check timeout.
+ 	 */
+@@ -103,7 +138,7 @@ export default function useFocusOutside(
+ 	// Cancel blur checks on unmount.
+ 	useEffect( () => {
+ 		return () => cancelBlurCheck();
+-	}, [] );
++	}, [ cancelBlurCheck ] );
+ 
+ 	// Cancel a blur check if the callback or ref is no longer provided.
+ 	useEffect( () => {
+@@ -122,17 +157,18 @@ export default function useFocusOutside(
+ 	 * @param event
+ 	 * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+ 	 */
+-	const normalizeButtonFocus: EventHandler< MouseEvent | TouchEvent > =
+-		useCallback( ( event ) => {
+-			const { type, target } = event;
+-			const isInteractionEnd = [ 'mouseup', 'touchend' ].includes( type );
+-
+-			if ( isInteractionEnd ) {
+-				preventBlurCheck.current = false;
+-			} else if ( isFocusNormalizedButton( target ) ) {
+-				preventBlurCheck.current = true;
+-			}
+-		}, [] );
++	const normalizeButtonFocus: React.EventHandler<
++		React.MouseEvent | React.TouchEvent
++	> = useCallback( ( event ) => {
++		const { type, target } = event;
++		const isInteractionEnd = [ 'mouseup', 'touchend' ].includes( type );
++
++		if ( isInteractionEnd ) {
++			preventBlurCheck.current = false;
++		} else if ( isFocusNormalizedButton( target ) ) {
++			preventBlurCheck.current = true;
++		}
++	}, [] );
+ 
+ 	/**
+ 	 * A callback triggered when a blur event occurs on the element the handler
+@@ -141,11 +177,15 @@ export default function useFocusOutside(
+ 	 * Calls the `onFocusOutside` callback in an immediate timeout if focus has
+ 	 * move outside the bound element and is still within the document.
+ 	 */
+-	const queueBlurCheck: FocusEventHandler = useCallback( ( event ) => {
++	const queueBlurCheck: React.FocusEventHandler = useCallback( ( event ) => {
+ 		// React does not allow using an event reference asynchronously
+ 		// due to recycling behavior, except when explicitly persisted.
+ 		event.persist();
+ 
++		// Grab currentTarget immediately,
++		// otherwise it will change as the event bubbles up.
++		const wrapperEl = event.currentTarget;
++
+ 		// Skip blur check if clicking button. See `normalizeButtonFocus`.
+ 		if ( preventBlurCheck.current ) {
+ 			return;
+@@ -169,19 +209,36 @@ export default function useFocusOutside(
+ 		}
+ 
+ 		blurCheckTimeoutId.current = setTimeout( () => {
+-			// If document is not focused then focus should remain
+-			// inside the wrapped component and therefore we cancel
+-			// this blur event thereby leaving focus in place.
+-			// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
+-			if ( ! document.hasFocus() ) {
++			const activeElement = wrapperEl.ownerDocument.activeElement;
++
++			// On blur events, the onFocusOutside prop should not be called:
++			// 1. If document is not focused
++			//    https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
++			// 2. If the focus was moved to an element inside the wrapper component
++			//    (this would be the case, for example, of an iframe)
++			if (
++				! wrapperEl.ownerDocument.hasFocus() ||
++				( activeElement && wrapperEl.contains( activeElement ) )
++			) {
+ 				event.preventDefault();
++
++				// If focus is moved to an iframe inside the wrapper, start manually
++				// polling to check for correct focus outside events. See the useEffect
++				// above for more information.
++				if ( isIframe( activeElement ) ) {
++					setPollingData( { wrapperEl, event } );
++				}
++
+ 				return;
+ 			}
+ 
+ 			if ( 'function' === typeof currentOnFocusOutside.current ) {
+ 				currentOnFocusOutside.current( event );
+ 			}
+-		}, 0 );
++			// the timeout delay is necessary to wait for browser's focus event to
++			// fire after the blur event, and therefore for this callback to be able
++			// to retrieve the correct document.activeElement.
++		}, 50 );
+ 	}, [] );
+ 
+ 	return {
+diff --git a/packages/compose/src/hooks/use-focus-outside/test/index.js b/packages/compose/src/hooks/use-focus-outside/test/index.js
+index e809689b226e20..46dcf63c23f3a8 100644
+--- a/packages/compose/src/hooks/use-focus-outside/test/index.js
++++ b/packages/compose/src/hooks/use-focus-outside/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen } from '@testing-library/react';
++import { render, screen, waitFor } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+ /**
+@@ -9,22 +9,38 @@ import userEvent from '@testing-library/user-event';
+  */
+ import useFocusOutside from '../';
+ 
+-const FocusOutsideComponent = ( { onFocusOutside: callback } ) => (
+-	<div>
+-		{ /* Wrapper */ }
+-		<div { ...useFocusOutside( callback ) }>
+-			<input type="text" />
+-			<button>Button inside the wrapper</button>
+-			<iframe title="test-iframe">
+-				<button>Inside the iframe</button>
+-			</iframe>
++const FocusOutsideComponent = ( { onFocusOutside: callback } ) => {
++	const focusOutsideProps = useFocusOutside( callback );
++
++	return (
++		<div>
++			{ /* Wrapper */ }
++			<div { ...focusOutsideProps }>
++				<input type="text" />
++				<button>Button inside the wrapper</button>
++				<iframe title="test-iframe">
++					<button>Inside the iframe</button>
++				</iframe>
++			</div>
++
++			<button>Button outside the wrapper</button>
+ 		</div>
+-
+-		<button>Button outside the wrapper</button>
+-	</div>
+-);
++	);
++};
+ 
+ describe( 'useFocusOutside', () => {
++	let mockedDocumentHasFocus;
++
++	beforeEach( () => {
++		mockedDocumentHasFocus = jest
++			.spyOn( document, 'hasFocus' )
++			.mockImplementation( () => true );
++	} );
++
++	afterEach( () => {
++		mockedDocumentHasFocus.mockRestore();
++	} );
++
+ 	it( 'should not call handler if focus shifts to element within component', async () => {
+ 		const mockOnFocusOutside = jest.fn();
+ 		const user = userEvent.setup();
+@@ -72,24 +88,30 @@ describe( 'useFocusOutside', () => {
+ 		);
+ 
+ 		// Click and focus button inside the wrapper
+-		await user.click(
+-			screen.getByRole( 'button', { name: 'Button inside the wrapper' } )
+-		);
++		const buttonInside = screen.getByRole( 'button', {
++			name: 'Button inside the wrapper',
++		} );
++		await user.click( buttonInside );
+ 
+-		expect( mockOnFocusOutside ).not.toHaveBeenCalled();
++		// TODO: find a way to guarantee that the callback does not fire
++		await new Promise( ( r ) => setTimeout( r, 200 ) );
+ 
++		expect( mockOnFocusOutside ).not.toHaveBeenCalled();
+ 		// Click and focus button outside the wrapper
+-		await user.click(
+-			screen.getByRole( 'button', { name: 'Button outside the wrapper' } )
+-		);
++		const buttonOutside = screen.getByRole( 'button', {
++			name: 'Button outside the wrapper',
++		} );
++		await user.click( buttonOutside );
+ 
+-		expect( mockOnFocusOutside ).toHaveBeenCalled();
++		await waitFor( () =>
++			expect( mockOnFocusOutside ).toHaveBeenCalledTimes( 1 )
++		);
+ 	} );
+ 
+ 	it( 'should not call handler if focus shifts outside the component when the document does not have focus', async () => {
+ 		// Force document.hasFocus() to return false to simulate the window/document losing focus
+ 		// See https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
+-		const mockedDocumentHasFocus = jest
++		mockedDocumentHasFocus = jest
+ 			.spyOn( document, 'hasFocus' )
+ 			.mockImplementation( () => false );
+ 		const mockOnFocusOutside = jest.fn();

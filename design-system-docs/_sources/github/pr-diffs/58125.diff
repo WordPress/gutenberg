@@ -1,0 +1,33 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8dda4d475e6b2b..950d902a9502f7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ 
+ -   `ToggleGroupControl`: Improve controlled value detection ([#57770](https://github.com/WordPress/gutenberg/pull/57770)).
+ -   `Tooltip`: Improve props forwarding to children of nested `Tooltip` components ([#57878](https://github.com/WordPress/gutenberg/pull/57878)).
++-   `Tooltip`: revert prop types to only accept component-specific props ([#58125](https://github.com/WordPress/gutenberg/pull/58125)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index f71182b85edb2c..87c7506a9c5f7d 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -25,7 +25,6 @@ import type {
+ } from './types';
+ import Shortcut from '../shortcut';
+ import { positionToPlacement } from '../popover/utils';
+-import type { WordPressComponentProps } from '../context';
+ 
+ const TooltipInternalContext = createContext< TooltipInternalContextType >( {
+ 	isNestedInTooltip: false,
+@@ -41,7 +40,7 @@ const CONTEXT_VALUE = {
+ };
+ 
+ function UnforwardedTooltip(
+-	props: WordPressComponentProps< TooltipProps, 'div', false >,
++	props: TooltipProps,
+ 	ref: React.ForwardedRef< any >
+ ) {
+ 	const {

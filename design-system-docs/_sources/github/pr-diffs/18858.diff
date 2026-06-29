@@ -1,0 +1,13 @@
+diff --git a/packages/edit-post/src/components/layout/style.scss b/packages/edit-post/src/components/layout/style.scss
+index 2fa7cd7e886a74..cdab72c4bed4c3 100644
+--- a/packages/edit-post/src/components/layout/style.scss
++++ b/packages/edit-post/src/components/layout/style.scss
+@@ -15,7 +15,7 @@
+ .edit-post-layout .components-editor-notices__snackbar {
+ 	position: fixed;
+ 	right: 0;
+-	bottom: 20px;
++	bottom: 40px;
+ 	padding-left: 16px;
+ 	padding-right: 16px;
+ }

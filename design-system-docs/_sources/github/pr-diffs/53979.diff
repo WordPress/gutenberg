@@ -1,0 +1,54 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 362e2d26a3d7be..75b1b8077f1fbb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ 
+ -   `Composite`: Convert to TypeScript ([#54028](https://github.com/WordPress/gutenberg/pull/54028)).
+ -   `BorderControl`: Refactor unit tests to use `userEvent` ([#54155](https://github.com/WordPress/gutenberg/pull/54155))
++-   `FocusableIframe`: Convert to TypeScript ([#53979](https://github.com/WordPress/gutenberg/pull/53979)).
+ 
+ ## 25.7.0 (2023-08-31)
+ 
+diff --git a/packages/components/src/focusable-iframe/index.js b/packages/components/src/focusable-iframe/index.tsx
+similarity index 76%
+rename from packages/components/src/focusable-iframe/index.js
+rename to packages/components/src/focusable-iframe/index.tsx
+index 5c7e6b8edd799d..ba1fae45c2928a 100644
+--- a/packages/components/src/focusable-iframe/index.js
++++ b/packages/components/src/focusable-iframe/index.tsx
+@@ -3,12 +3,15 @@
+  */
+ import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
+ import deprecated from '@wordpress/deprecated';
+-
+ /**
+- * @param {Object}                                 props
+- * @param {import('react').Ref<HTMLIFrameElement>} props.iframeRef
++ * Internal dependencies
+  */
+-export default function FocusableIframe( { iframeRef, ...props } ) {
++import type { FocusableIframeProps } from './types';
++
++export default function FocusableIframe( {
++	iframeRef,
++	...props
++}: FocusableIframeProps ) {
+ 	const ref = useMergeRefs( [ iframeRef, useFocusableIframe() ] );
+ 	deprecated( 'wp.components.FocusableIframe', {
+ 		since: '5.9',
+diff --git a/packages/components/src/focusable-iframe/types.ts b/packages/components/src/focusable-iframe/types.ts
+new file mode 100644
+index 00000000000000..456408cb7c1702
+--- /dev/null
++++ b/packages/components/src/focusable-iframe/types.ts
+@@ -0,0 +1,9 @@
++/**
++ * External dependencies
++ */
++import type { ComponentPropsWithoutRef } from 'react';
++
++export interface FocusableIframeProps
++	extends ComponentPropsWithoutRef< 'iframe' > {
++	iframeRef: React.Ref< HTMLIFrameElement >;
++}

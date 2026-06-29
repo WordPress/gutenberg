@@ -1,0 +1,401 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 392d11fdd6673e..326d2876e65c6f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ -   `ToggleGroupControl`: support disabled options ([#63450](https://github.com/WordPress/gutenberg/pull/63450)).
+ -   `CustomSelectControl`: Stabilize `__experimentalShowSelectedHint` and `options[]. __experimentalHint` props ([#63248](https://github.com/WordPress/gutenberg/pull/63248)).
+ -   `SelectControl`: Add `"minimal"` variant ([#63265](https://github.com/WordPress/gutenberg/pull/63265)).
++-   `FontSizePicker`: tidy up internal logic ([#63553](https://github.com/WordPress/gutenberg/pull/63553)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index e4de2f6f6f5cf9..f93a09440a0688 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -38,6 +38,8 @@ import { T_SHIRT_NAMES } from './constants';
+ 
+ const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
+ 
++const MAX_TOGGLE_GROUP_SIZES = 5;
++
+ const UnforwardedFontSizePicker = (
+ 	props: FontSizePickerProps,
+ 	ref: ForwardedRef< any >
+@@ -59,43 +61,49 @@ const UnforwardedFontSizePicker = (
+ 		availableUnits: unitsProp,
+ 	} );
+ 
+-	const shouldUseSelectControl = fontSizes.length > 5;
+ 	const selectedFontSize = fontSizes.find(
+ 		( fontSize ) => fontSize.size === value
+ 	);
+ 	const isCustomValue = !! value && ! selectedFontSize;
+ 
+-	const [ showCustomValueControl, setShowCustomValueControl ] = useState(
+-		! disableCustomFontSizes && isCustomValue
+-	);
+-
+-	const headerHint = useMemo( () => {
+-		if ( showCustomValueControl ) {
+-			return __( 'Custom' );
+-		}
++	// Initially request a custom picker if the value is not from the predef list.
++	const [ userRequestedCustom, setUserRequestedCustom ] =
++		useState( isCustomValue );
+ 
+-		if ( ! shouldUseSelectControl ) {
+-			if ( selectedFontSize ) {
+-				return (
+-					selectedFontSize.name ||
+-					T_SHIRT_NAMES[ fontSizes.indexOf( selectedFontSize ) ]
+-				);
+-			}
+-			return '';
+-		}
++	let currentPickerType;
++	if ( ! disableCustomFontSizes && userRequestedCustom ) {
++		// While showing the custom value picker, switch back to predef only if
++		// `disableCustomFontSizes` is set to `true`.
++		currentPickerType = 'custom' as const;
++	} else {
++		currentPickerType =
++			fontSizes.length > MAX_TOGGLE_GROUP_SIZES
++				? ( 'select' as const )
++				: ( 'togglegroup' as const );
++	}
+ 
+-		const commonUnit = getCommonSizeUnit( fontSizes );
+-		if ( commonUnit ) {
+-			return `(${ commonUnit })`;
++	const headerHint = useMemo( () => {
++		switch ( currentPickerType ) {
++			case 'custom':
++				return __( 'Custom' );
++			case 'togglegroup':
++				if ( selectedFontSize ) {
++					return (
++						selectedFontSize.name ||
++						T_SHIRT_NAMES[ fontSizes.indexOf( selectedFontSize ) ]
++					);
++				}
++				break;
++			case 'select':
++				const commonUnit = getCommonSizeUnit( fontSizes );
++				if ( commonUnit ) {
++					return `(${ commonUnit })`;
++				}
++				break;
+ 		}
+ 
+ 		return '';
+-	}, [
+-		showCustomValueControl,
+-		shouldUseSelectControl,
+-		selectedFontSize,
+-		fontSizes,
+-	] );
++	}, [ currentPickerType, selectedFontSize, fontSizes ] );
+ 
+ 	if ( fontSizes.length === 0 && disableCustomFontSizes ) {
+ 		return null;
+@@ -133,53 +141,45 @@ const UnforwardedFontSizePicker = (
+ 					{ ! disableCustomFontSizes && (
+ 						<HeaderToggle
+ 							label={
+-								showCustomValueControl
++								currentPickerType === 'custom'
+ 									? __( 'Use size preset' )
+ 									: __( 'Set custom size' )
+ 							}
+ 							icon={ settings }
+-							onClick={ () => {
+-								setShowCustomValueControl(
+-									! showCustomValueControl
+-								);
+-							} }
+-							isPressed={ showCustomValueControl }
++							onClick={ () =>
++								setUserRequestedCustom( ! userRequestedCustom )
++							}
++							isPressed={ currentPickerType === 'custom' }
+ 							size="small"
+ 						/>
+ 					) }
+ 				</Header>
+ 			</Spacer>
+ 			<div>
+-				{ !! fontSizes.length &&
+-					shouldUseSelectControl &&
+-					! showCustomValueControl && (
+-						<FontSizePickerSelect
+-							__next40pxDefaultSize={ __next40pxDefaultSize }
+-							fontSizes={ fontSizes }
+-							value={ value }
+-							disableCustomFontSizes={ disableCustomFontSizes }
+-							size={ size }
+-							onChange={ ( newValue ) => {
+-								if ( newValue === undefined ) {
+-									onChange?.( undefined );
+-								} else {
+-									onChange?.(
+-										hasUnits
+-											? newValue
+-											: Number( newValue ),
+-										fontSizes.find(
+-											( fontSize ) =>
+-												fontSize.size === newValue
+-										)
+-									);
+-								}
+-							} }
+-							onSelectCustom={ () =>
+-								setShowCustomValueControl( true )
++				{ currentPickerType === 'select' && (
++					<FontSizePickerSelect
++						__next40pxDefaultSize={ __next40pxDefaultSize }
++						fontSizes={ fontSizes }
++						value={ value }
++						disableCustomFontSizes={ disableCustomFontSizes }
++						size={ size }
++						onChange={ ( newValue ) => {
++							if ( newValue === undefined ) {
++								onChange?.( undefined );
++							} else {
++								onChange?.(
++									hasUnits ? newValue : Number( newValue ),
++									fontSizes.find(
++										( fontSize ) =>
++											fontSize.size === newValue
++									)
++								);
+ 							}
+-						/>
+-					) }
+-				{ ! shouldUseSelectControl && ! showCustomValueControl && (
++						} }
++						onSelectCustom={ () => setUserRequestedCustom( true ) }
++					/>
++				) }
++				{ currentPickerType === 'togglegroup' && (
+ 					<FontSizePickerToggleGroup
+ 						fontSizes={ fontSizes }
+ 						value={ value }
+@@ -200,7 +200,7 @@ const UnforwardedFontSizePicker = (
+ 						} }
+ 					/>
+ 				) }
+-				{ ! disableCustomFontSizes && showCustomValueControl && (
++				{ currentPickerType === 'custom' && (
+ 					<Flex className="components-font-size-picker__custom-size-control">
+ 						<FlexItem isBlock>
+ 							<UnitControl
+@@ -210,6 +210,8 @@ const UnforwardedFontSizePicker = (
+ 								hideLabelFromVision
+ 								value={ value }
+ 								onChange={ ( newValue ) => {
++									setUserRequestedCustom( true );
++
+ 									if ( newValue === undefined ) {
+ 										onChange?.( undefined );
+ 									} else {
+@@ -240,6 +242,8 @@ const UnforwardedFontSizePicker = (
+ 										initialPosition={ fallbackFontSize }
+ 										withInputField={ false }
+ 										onChange={ ( newValue ) => {
++											setUserRequestedCustom( true );
++
+ 											if ( newValue === undefined ) {
+ 												onChange?.( undefined );
+ 											} else if ( hasUnits ) {
+diff --git a/packages/components/src/font-size-picker/test/index.tsx b/packages/components/src/font-size-picker/test/index.tsx
+index 620d782e3abceb..f91c12e352bf80 100644
+--- a/packages/components/src/font-size-picker/test/index.tsx
++++ b/packages/components/src/font-size-picker/test/index.tsx
+@@ -9,6 +9,29 @@ import userEvent from '@testing-library/user-event';
+  */
+ import FontSizePicker from '../';
+ import type { FontSize } from '../types';
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++const ControlledFontSizePicker = ( {
++	onChange,
++	...props
++}: React.ComponentProps< typeof FontSizePicker > ) => {
++	const [ fontSize, setFontSize ] =
++		useState< typeof props.value >( undefined );
++
++	return (
++		<FontSizePicker
++			{ ...props }
++			value={ fontSize }
++			onChange={ ( newFontSize ) => {
++				setFontSize( newFontSize );
++				onChange?.( newFontSize );
++			} }
++		/>
++	);
++};
+ 
+ describe( 'FontSizePicker', () => {
+ 	test.each( [
+@@ -118,9 +141,7 @@ describe( 'FontSizePicker', () => {
+ 				render(
+ 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
+ 				);
+-				expect(
+-					screen.getByLabelText( expectedLabel )
+-				).toBeInTheDocument();
++				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
+ 			}
+ 		);
+ 
+@@ -243,9 +264,7 @@ describe( 'FontSizePicker', () => {
+ 				render(
+ 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
+ 				);
+-				expect(
+-					screen.getByLabelText( expectedLabel )
+-				).toBeInTheDocument();
++				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
+ 			}
+ 		);
+ 
+@@ -360,9 +379,7 @@ describe( 'FontSizePicker', () => {
+ 				render(
+ 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
+ 				);
+-				expect(
+-					screen.getByLabelText( expectedLabel )
+-				).toBeInTheDocument();
++				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
+ 			}
+ 		);
+ 
+@@ -434,9 +451,7 @@ describe( 'FontSizePicker', () => {
+ 				render(
+ 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
+ 				);
+-				expect(
+-					screen.getByLabelText( expectedLabel )
+-				).toBeInTheDocument();
++				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
+ 			}
+ 		);
+ 
+@@ -493,7 +508,7 @@ describe( 'FontSizePicker', () => {
+ 				render(
+ 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
+ 				);
+-				expect( screen.getByRole( 'radiogroup' ) ).toBeInTheDocument();
++				expect( screen.getByRole( 'radiogroup' ) ).toBeVisible();
+ 				expect(
+ 					screen.queryByRole( 'radio', { checked: true } )
+ 				).not.toBeInTheDocument();
+@@ -514,7 +529,7 @@ describe( 'FontSizePicker', () => {
+ 			await user.click(
+ 				screen.getByRole( 'option', { name: 'Custom' } )
+ 			);
+-			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
++			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
+ 			expect( onChange ).not.toHaveBeenCalled();
+ 		} );
+ 	}
+@@ -522,7 +537,40 @@ describe( 'FontSizePicker', () => {
+ 	function commonTests( fontSizes: FontSize[] ) {
+ 		it( 'shows custom input when value is unknown', () => {
+ 			render( <FontSizePicker fontSizes={ fontSizes } value="3px" /> );
+-			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
++			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
++		} );
++
++		it( 'hides custom input when disableCustomFontSizes is set to `true` with a custom font size', () => {
++			const { rerender } = render(
++				<FontSizePicker fontSizes={ fontSizes } value="3px" />
++			);
++			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
++
++			rerender(
++				<FontSizePicker
++					disableCustomFontSizes
++					fontSizes={ fontSizes }
++					value="3px"
++				/>
++			);
++			expect(
++				screen.queryByLabelText( 'Custom' )
++			).not.toBeInTheDocument();
++		} );
++
++		it( "doesn't hide custom input when the selected font size is a predef", () => {
++			const { rerender } = render(
++				<FontSizePicker fontSizes={ fontSizes } value="3px" />
++			);
++			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
++
++			rerender(
++				<FontSizePicker
++					fontSizes={ fontSizes }
++					value={ fontSizes[ 0 ].size }
++				/>
++			);
++			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
+ 		} );
+ 
+ 		it( 'allows custom values by default', async () => {
+@@ -539,6 +587,26 @@ describe( 'FontSizePicker', () => {
+ 			expect( onChange ).toHaveBeenCalledWith( '80px' );
+ 		} );
+ 
++		it( 'allows switching between custom and predef inputs when pressing the dedicated toggle', async () => {
++			const user = userEvent.setup();
++
++			render( <ControlledFontSizePicker fontSizes={ fontSizes } /> );
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Set custom size' } )
++			);
++
++			await user.type( screen.getByLabelText( 'Custom' ), '80' );
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Use size preset' } )
++			);
++
++			expect(
++				screen.queryByLabelText( 'Custom' )
++			).not.toBeInTheDocument();
++		} );
++
+ 		it( 'does not allow custom values when disableCustomFontSizes is set', () => {
+ 			render(
+ 				<FontSizePicker
+diff --git a/packages/components/src/font-size-picker/types.ts b/packages/components/src/font-size-picker/types.ts
+index 39016849fd9f95..2296e968567882 100644
+--- a/packages/components/src/font-size-picker/types.ts
++++ b/packages/components/src/font-size-picker/types.ts
+@@ -37,8 +37,9 @@ export type FontSizePickerProps = {
+ 	 */
+ 	value?: number | string;
+ 	/**
+-	 * If `true`, the UI will contain a slider, instead of a numeric text input
+-	 * field. If `false`, no slider will be present.
++	 * If `true`, a slider will be displayed alongside the input field when a
++	 * custom font size is active. Has no effect when `disableCustomFontSizes`
++	 * is `true`.
+ 	 *
+ 	 * @default false
+ 	 */
+@@ -46,7 +47,7 @@ export type FontSizePickerProps = {
+ 	/**
+ 	 * If `true`, a reset button will be displayed alongside the input field
+ 	 * when a custom font size is active. Has no effect when
+-	 * `disableCustomFontSizes` or `withSlider` is `true`.
++	 * `disableCustomFontSizes` is `true`.
+ 	 *
+ 	 * @default true
+ 	 */

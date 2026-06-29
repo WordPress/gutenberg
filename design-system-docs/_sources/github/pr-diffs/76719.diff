@@ -1,0 +1,43 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fdeea311958938..8f6b4493ad9c44 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fixes
+ 
+ -   `CustomGradientPicker`: Add state persistence when switching between Linear and Radial Gradient ([#76595](https://github.com/WordPress/gutenberg/pull/76595)).
++-   `Button`: fix focus styles in High Contrast (forced colors) mode ([#76719](https://github.com/WordPress/gutenberg/pull/76719)).
+ 
+ ## 32.4.0 (2026-03-18)
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 38e328eed82c04..6c00d8b4709f4d 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -48,11 +48,6 @@
+ 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 	}
+ 
+-	// Windows High Contrast mode will show this outline, but not the box-shadow.
+-	&:focus {
+-		outline: 3px solid transparent;
+-	}
+-
+ 	/**
+ 	 * Primary button style.
+ 	 */
+@@ -276,6 +271,14 @@
+ 		}
+ 	}
+ 
++	// Windows High Contrast mode will show this outline, but not the box-shadow.
++	// This rule is placed after variant outline declarations (e.g. is-primary,
++	// is-secondary, is-tertiary) to ensure it wins by source order at the same
++	// specificity, while not using `:not(:active)` to avoid outline flicker.
++	&:focus {
++		outline: 3px solid transparent;
++	}
++
+ 	&:not(:disabled, [aria-disabled="true"]):active {
+ 		color: $components-color-foreground;
+ 	}

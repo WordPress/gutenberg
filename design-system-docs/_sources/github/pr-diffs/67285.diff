@@ -1,0 +1,73 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 3c4cef664a3103..14196a221304bc 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -219,7 +219,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                         <button
+                           aria-label="Color: red"
+                           aria-selected="true"
+-                          class="components-button components-circular-option-picker__option"
++                          class="components-button components-circular-option-picker__option is-next-40px-default-size"
+                           data-active-item="true"
+                           id="components-circular-option-picker-0-0"
+                           role="option"
+@@ -247,7 +247,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                   class="components-circular-option-picker__custom-clear-wrapper"
+                 >
+                   <button
+-                    class="components-button components-circular-option-picker__clear is-tertiary"
++                    class="components-button components-circular-option-picker__clear is-next-40px-default-size is-tertiary"
+                     type="button"
+                   >
+                     Clear
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9f547859fa5a99..b08b22443c2023 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,7 @@
+ 
+ -   `ColorPicker`: Update sizes of color format select and copy button ([#67093](https://github.com/WordPress/gutenberg/pull/67093)).
+ -   `Autocomplete`: Increase option height ([#67214](https://github.com/WordPress/gutenberg/pull/67214)).
++-   `CircularOptionPicker`: Update `Button` sizes to be ready for 40px default size ([#67285](https://github.com/WordPress/gutenberg/pull/67285)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-actions.tsx b/packages/components/src/circular-option-picker/circular-option-picker-actions.tsx
+index 4cf4d6f95da383..339c614e4ca45d 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker-actions.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker-actions.tsx
+@@ -47,6 +47,7 @@ export function ButtonAction( {
+ }: WordPressComponentProps< ButtonAsButtonProps, 'button', false > ) {
+ 	return (
+ 		<Button
++			__next40pxDefaultSize
+ 			className={ clsx(
+ 				'components-circular-option-picker__clear',
+ 				className
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+index 276ab7549781ed..c5b2edb260d159 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+@@ -94,6 +94,7 @@ export function Option( {
+ 	const commonProps = {
+ 		id,
+ 		className: 'components-circular-option-picker__option',
++		__next40pxDefaultSize: true,
+ 		...additionalProps,
+ 	};
+ 
+diff --git a/packages/components/src/circular-option-picker/style.scss b/packages/components/src/circular-option-picker/style.scss
+index 24b67eb7e7021e..e47764a3a60d7f 100644
+--- a/packages/components/src/circular-option-picker/style.scss
++++ b/packages/components/src/circular-option-picker/style.scss
+@@ -67,8 +67,8 @@ $color-palette-circle-spacing: 12px;
+ .components-circular-option-picker__option {
+ 	display: inline-block;
+ 	vertical-align: top;
+-	height: 100%;
+-	width: 100%;
++	height: 100% !important;
++	aspect-ratio: 1;
+ 	border: none;
+ 	border-radius: $radius-round;
+ 	background: transparent;

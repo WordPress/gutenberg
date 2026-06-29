@@ -1,0 +1,916 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a68a1d7d39480a..fe2afb4caa4b5e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ 
+ ### Internal
+ 
++-   `Flex`, `FlexItem`, `FlexBlock`: Convert to TypeScript ([#42537](https://github.com/WordPress/gutenberg/pull/42537)).
+ -   `InputControl`: Fix incorrect `size` prop passing ([#42793](https://github.com/WordPress/gutenberg/pull/42793)).
+ 
+ ## 19.16.0 (2022-07-27)
+diff --git a/packages/components/src/flex/flex-block/README.md b/packages/components/src/flex/flex-block/README.md
+index 0ae21c9c0c7e78..1b4ca70e7cd8e9 100644
+--- a/packages/components/src/flex/flex-block/README.md
++++ b/packages/components/src/flex/flex-block/README.md
+@@ -8,8 +8,8 @@ See [`flex/README.md#usage`](/packages/components/src/flex/README.md#usage) for
+ 
+ ## Props
+ 
+-### display
+-
+-**Type**: `[CSSProperties['display']]`
++### `display`: `CSSProperties['display']`
+ 
+ The CSS display property of `FlexBlock`.
++
++-   Required: No
+diff --git a/packages/components/src/flex/flex-block/component.js b/packages/components/src/flex/flex-block/component.tsx
+similarity index 50%
+rename from packages/components/src/flex/flex-block/component.js
+rename to packages/components/src/flex/flex-block/component.tsx
+index 2b395128b6effe..f732bbe64896cf 100644
+--- a/packages/components/src/flex/flex-block/component.js
++++ b/packages/components/src/flex/flex-block/component.tsx
+@@ -1,24 +1,29 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect } from '../../ui/context';
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import { View } from '../../view';
++import type { FlexBlockProps } from '../types';
+ import { useFlexBlock } from './hook';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexBlockProps, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                                            forwardedRef
+- */
+-function FlexBlock( props, forwardedRef ) {
++function UnconnectedFlexBlock(
++	props: WordPressComponentProps< FlexBlockProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const flexBlockProps = useFlexBlock( props );
+ 
+ 	return <View { ...flexBlockProps } ref={ forwardedRef } />;
+ }
+ 
+ /**
+- * `FlexBlock` is a primitive layout component that adaptively resizes content within layout containers like `Flex`.
++ * `FlexBlock` is a primitive layout component that adaptively resizes content
++ * within layout containers like `Flex`.
+  *
+- * @example
+  * ```jsx
+  * import { Flex, FlexBlock } from '@wordpress/components';
+  *
+@@ -31,6 +36,6 @@ function FlexBlock( props, forwardedRef ) {
+  * }
+  * ```
+  */
+-const ConnectedFlexBlock = contextConnect( FlexBlock, 'FlexBlock' );
++export const FlexBlock = contextConnect( UnconnectedFlexBlock, 'FlexBlock' );
+ 
+-export default ConnectedFlexBlock;
++export default FlexBlock;
+diff --git a/packages/components/src/flex/flex-block/hook.js b/packages/components/src/flex/flex-block/hook.ts
+similarity index 52%
+rename from packages/components/src/flex/flex-block/hook.js
+rename to packages/components/src/flex/flex-block/hook.ts
+index deed81d8f28f7c..b9026e64f7c46b 100644
+--- a/packages/components/src/flex/flex-block/hook.js
++++ b/packages/components/src/flex/flex-block/hook.ts
+@@ -1,13 +1,13 @@
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import { useFlexItem } from '../flex-item';
++import type { FlexBlockProps } from '../types';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexBlockProps, 'div'>} props
+- */
+-export function useFlexBlock( props ) {
++export function useFlexBlock(
++	props: WordPressComponentProps< FlexBlockProps, 'div' >
++) {
+ 	const otherProps = useContextSystem( props, 'FlexBlock' );
+ 	const flexItemProps = useFlexItem( { isBlock: true, ...otherProps } );
+ 
+diff --git a/packages/components/src/flex/flex-block/index.js b/packages/components/src/flex/flex-block/index.ts
+similarity index 100%
+rename from packages/components/src/flex/flex-block/index.js
+rename to packages/components/src/flex/flex-block/index.ts
+diff --git a/packages/components/src/flex/flex-item/README.md b/packages/components/src/flex/flex-item/README.md
+index 5a96af724fece4..1ae3ddbc870f18 100644
+--- a/packages/components/src/flex/flex-item/README.md
++++ b/packages/components/src/flex/flex-item/README.md
+@@ -8,14 +8,15 @@ See [`flex/README.md#usage`](/packages/components/src/flex/flex/README.md#usage)
+ 
+ ## Props
+ 
+-### display
+-
+-**Type**: `[CSSProperties['display']]`
++### `display`: `CSSProperties['display']`
+ 
+ The CSS display property of `FlexItem`.
+ 
+-### isBlock
++-   Required: No
+ 
+-**Type**: `[boolean]`
++### `isBlock`: `boolean`
+ 
+ Determins if `FlexItem` should render as an adaptive full-width block.
++
++-   Required: No
++-   Default: `false`
+diff --git a/packages/components/src/flex/flex-item/component.js b/packages/components/src/flex/flex-item/component.tsx
+similarity index 51%
+rename from packages/components/src/flex/flex-item/component.js
+rename to packages/components/src/flex/flex-item/component.tsx
+index 882bb1fc6cc90e..e4073a4b400f40 100644
+--- a/packages/components/src/flex/flex-item/component.js
++++ b/packages/components/src/flex/flex-item/component.tsx
+@@ -1,24 +1,29 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect } from '../../ui/context';
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import { View } from '../../view';
+ import { useFlexItem } from './hook';
++import type { FlexItemProps } from '../types';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexItemProps, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                                           forwardedRef
+- */
+-function FlexItem( props, forwardedRef ) {
++function UnconnectedFlexItem(
++	props: WordPressComponentProps< FlexItemProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const flexItemProps = useFlexItem( props );
+ 
+ 	return <View { ...flexItemProps } ref={ forwardedRef } />;
+ }
+ 
+ /**
+- * `FlexItem` is a primitive layout component that aligns content within layout containers like `Flex`.
++ * `FlexItem` is a primitive layout component that aligns content within layout
++ * containers like `Flex`.
+  *
+- * @example
+  * ```jsx
+  * import { Flex, FlexItem } from '@wordpress/components';
+  *
+@@ -31,6 +36,6 @@ function FlexItem( props, forwardedRef ) {
+  * }
+  * ```
+  */
+-const ConnectedFlexItem = contextConnect( FlexItem, 'FlexItem' );
++export const FlexItem = contextConnect( UnconnectedFlexItem, 'FlexItem' );
+ 
+-export default ConnectedFlexItem;
++export default FlexItem;
+diff --git a/packages/components/src/flex/flex-item/hook.js b/packages/components/src/flex/flex-item/hook.ts
+similarity index 65%
+rename from packages/components/src/flex/flex-item/hook.js
+rename to packages/components/src/flex/flex-item/hook.ts
+index 2c38e550db32cb..6a7b259560d1f3 100644
+--- a/packages/components/src/flex/flex-item/hook.js
++++ b/packages/components/src/flex/flex-item/hook.ts
+@@ -1,27 +1,30 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/react';
++import { css, SerializedStyles } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import { useFlexContext } from '../context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
++import type { FlexItemProps } from '../types';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexItemProps, 'div'>} props
+- */
+-export function useFlexItem( props ) {
++export function useFlexItem(
++	props: WordPressComponentProps< FlexItemProps, 'div' >
++) {
+ 	const {
+ 		className,
+ 		display: displayProp,
+ 		isBlock = false,
+ 		...otherProps
+ 	} = useContextSystem( props, 'FlexItem' );
+-	const sx = {};
++
++	const sx: {
++		Base?: SerializedStyles;
++	} = {};
+ 
+ 	const contextDisplay = useFlexContext().flexItemDisplay;
+ 
+diff --git a/packages/components/src/flex/flex-item/index.js b/packages/components/src/flex/flex-item/index.ts
+similarity index 100%
+rename from packages/components/src/flex/flex-item/index.js
+rename to packages/components/src/flex/flex-item/index.ts
+diff --git a/packages/components/src/flex/flex/README.md b/packages/components/src/flex/flex/README.md
+index f540877d9ecd7a..b72a9b19424f77 100644
+--- a/packages/components/src/flex/flex/README.md
++++ b/packages/components/src/flex/flex/README.md
+@@ -25,38 +25,44 @@ function Example() {
+ 
+ ## Props
+ 
+-##### align
+-
+-**Type**: `CSSProperties['alignItems']`
++### `align`: `CSSProperties['alignItems']`
+ 
+ Aligns children using CSS Flexbox `align-items`. Vertically aligns content if the `direction` is `row`, or horizontally aligns content if the `direction` is `column`.
+ 
+-##### direction
++-   Required: No
++-   Default: `center`
+ 
+-**Type**: `[ResponsiveCSSValue<CSSProperties['flexDirection']>]`
++### `direction`: `ResponsiveCSSValue<CSSProperties['flexDirection']>`
+ 
+ The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
+ 
+-##### expanded
++-   Required: No
++-   Default: `row`
+ 
+-**Type**: `[boolean]`
++### `expanded`: `boolean`
+ 
+ Expands to the maximum available width (if horizontal) or height (if vertical).
+ 
+-##### gap
++-   Required: No
++-   Default: `true`
+ 
+-**Type**: `[number | string]`
++### `gap`: `number`
+ 
+ Spacing in between each child can be adjusted by using `gap`. The value of `gap` works as a multiplier to the library's grid system (base of `4px`).
+ 
+-##### justify
++-   Required: No
++-   Default: `2`
+ 
+-**Type**: `[CSSProperties['justifyContent']]`
++##### `justify`: `CSSProperties['justifyContent']`
+ 
+ Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
+ 
+-##### wrap
++-   Required: No
++-   Default: `space-between`
+ 
+-**Type**: `[boolean]`
++##### `wrap`: `boolean`
+ 
+ Determines if children should wrap.
++
++-   Required: No
++-   Default: `false`
+diff --git a/packages/components/src/flex/flex/component.js b/packages/components/src/flex/flex/component.tsx
+similarity index 65%
+rename from packages/components/src/flex/flex/component.js
+rename to packages/components/src/flex/flex/component.tsx
+index 421bec4a0d81ac..4302e9b16c7ada 100644
+--- a/packages/components/src/flex/flex/component.js
++++ b/packages/components/src/flex/flex/component.tsx
+@@ -1,16 +1,21 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect } from '../../ui/context';
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import { useFlex } from './hook';
+ import { FlexContext } from './../context';
+ import { View } from '../../view';
++import type { FlexProps } from '../types';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                                       forwardedRef
+- */
+-function Flex( props, forwardedRef ) {
++function UnconnectedFlex(
++	props: WordPressComponentProps< FlexProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const { children, isColumn, ...otherProps } = useFlex( props );
+ 
+ 	return (
+@@ -29,9 +34,9 @@ function Flex( props, forwardedRef ) {
+  * horizontally or vertically. `Flex` powers components like `HStack` and
+  * `VStack`.
+  *
+- * `Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
++ * `Flex` is used with any of its two sub-components, `FlexItem` and
++ * `FlexBlock`.
+  *
+- * @example
+  * ```jsx
+  * import { Flex, FlexBlock, FlexItem } from '@wordpress/components';
+  *
+@@ -49,6 +54,6 @@ function Flex( props, forwardedRef ) {
+  * }
+  * ```
+  */
+-const ConnectedFlex = contextConnect( Flex, 'Flex' );
++export const Flex = contextConnect( UnconnectedFlex, 'Flex' );
+ 
+-export default ConnectedFlex;
++export default Flex;
+diff --git a/packages/components/src/flex/flex/hook.js b/packages/components/src/flex/flex/hook.ts
+similarity index 84%
+rename from packages/components/src/flex/flex/hook.js
+rename to packages/components/src/flex/flex/hook.ts
+index 950ae160813076..0e12f41ef4f90c 100644
+--- a/packages/components/src/flex/flex/hook.js
++++ b/packages/components/src/flex/flex/hook.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/react';
++import { css, SerializedStyles } from '@emotion/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -12,18 +12,18 @@ import deprecated from '@wordpress/deprecated';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import { useResponsiveValue } from '../../ui/utils/use-responsive-value';
+ import { space } from '../../ui/utils/space';
+ import * as styles from '../styles';
+ import { useCx, rtl } from '../../utils';
++import type { FlexProps } from '../types';
++
++function useDeprecatedProps(
++	props: WordPressComponentProps< FlexProps, 'div' >
++): WordPressComponentProps< FlexProps, 'div' > {
++	const { isReversed, ...otherProps } = props;
+ 
+-/**
+- *
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
+- * @return {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} Props with the deprecated props removed.
+- */
+-function useDeprecatedProps( { isReversed, ...otherProps } ) {
+ 	if ( typeof isReversed !== 'undefined' ) {
+ 		deprecated( 'Flex isReversed', {
+ 			alternative: 'Flex direction="row-reverse" or "column-reverse"',
+@@ -38,10 +38,7 @@ function useDeprecatedProps( { isReversed, ...otherProps } ) {
+ 	return otherProps;
+ }
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
+- */
+-export function useFlex( props ) {
++export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
+ 	const {
+ 		align = 'center',
+ 		className,
+@@ -67,7 +64,11 @@ export function useFlex( props ) {
+ 	const rtlWatchResult = rtl.watch();
+ 
+ 	const classes = useMemo( () => {
+-		const sx = {};
++		const sx: {
++			Base?: SerializedStyles;
++			Items?: SerializedStyles;
++			WrapItems?: SerializedStyles;
++		} = {};
+ 
+ 		sx.Base = css( {
+ 			alignItems: isColumn ? 'normal' : align,
+diff --git a/packages/components/src/flex/flex/index.js b/packages/components/src/flex/flex/index.ts
+similarity index 100%
+rename from packages/components/src/flex/flex/index.js
+rename to packages/components/src/flex/flex/index.ts
+diff --git a/packages/components/src/flex/index.js b/packages/components/src/flex/index.ts
+similarity index 100%
+rename from packages/components/src/flex/index.js
+rename to packages/components/src/flex/index.ts
+diff --git a/packages/components/src/flex/stories/index.js b/packages/components/src/flex/stories/index.js
+deleted file mode 100644
+index 19534fbe43604d..00000000000000
+--- a/packages/components/src/flex/stories/index.js
++++ /dev/null
+@@ -1,29 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { Flex, FlexItem } from '../';
+-import { View } from '../../view';
+-
+-export default {
+-	component: Flex,
+-	title: 'Components/Flex',
+-};
+-
+-export const _default = () => {
+-	return (
+-		<>
+-			<Flex gap={ 3 }>
+-				<View>Item</View>
+-				<View>Item</View>
+-			</Flex>
+-			<Flex direction={ [ 'column', 'row' ] } gap={ 3 }>
+-				<View style={ { width: '180px' } }>Item</View>
+-				<FlexItem isBlock>
+-					<View>Item</View>
+-				</FlexItem>
+-				<View>Item</View>
+-				<View>Item</View>
+-			</Flex>
+-		</>
+-	);
+-};
+diff --git a/packages/components/src/flex/stories/index.tsx b/packages/components/src/flex/stories/index.tsx
+new file mode 100644
+index 00000000000000..0b74ac783a68eb
+--- /dev/null
++++ b/packages/components/src/flex/stories/index.tsx
+@@ -0,0 +1,81 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { Flex, FlexItem, FlexBlock } from '../';
++import { View } from '../../view';
++
++const meta: ComponentMeta< typeof Flex > = {
++	component: Flex,
++	title: 'Components/Flex',
++	subcomponents: { FlexBlock, FlexItem },
++	argTypes: {
++		align: { control: { type: 'text' } },
++		as: { control: { type: 'text' } },
++		children: { control: { type: null } },
++		gap: { control: { type: 'text' } },
++		justify: { control: { type: 'text' } },
++		// Disabled isReversed because it's deprecated.
++		isReversed: {
++			table: {
++				disable: true,
++			},
++		},
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const GrayBox = ( { children }: { children: string } ) => (
++	<View style={ { backgroundColor: '#eee', padding: 10 } }>{ children }</View>
++);
++
++export const Default: ComponentStory< typeof Flex > = ( { ...args } ) => {
++	return (
++		<Flex { ...args }>
++			<FlexItem>
++				<GrayBox>Item 1</GrayBox>
++			</FlexItem>
++			<FlexItem>
++				<GrayBox>Item 2</GrayBox>
++			</FlexItem>
++			<FlexItem>
++				<GrayBox>Item 3</GrayBox>
++			</FlexItem>
++		</Flex>
++	);
++};
++Default.args = {};
++
++export const ResponsiveDirection: ComponentStory< typeof Flex > = ( {
++	...args
++} ) => {
++	return (
++		<Flex { ...args }>
++			<FlexItem>
++				<GrayBox>Item 1</GrayBox>
++			</FlexItem>
++			<FlexBlock>
++				<GrayBox>Item 2</GrayBox>
++			</FlexBlock>
++			<FlexItem>
++				<GrayBox>Item 3</GrayBox>
++			</FlexItem>
++			<FlexItem>
++				<GrayBox>Item 4</GrayBox>
++			</FlexItem>
++		</Flex>
++	);
++};
++ResponsiveDirection.args = {
++	direction: [ 'column', 'row' ],
++};
+diff --git a/packages/components/src/flex/styles.js b/packages/components/src/flex/styles.ts
+similarity index 100%
+rename from packages/components/src/flex/styles.js
+rename to packages/components/src/flex/styles.ts
+diff --git a/packages/components/src/flex/test/__snapshots__/index.js.snap b/packages/components/src/flex/test/__snapshots__/index.tsx.snap
+similarity index 80%
+rename from packages/components/src/flex/test/__snapshots__/index.js.snap
+rename to packages/components/src/flex/test/__snapshots__/index.tsx.snap
+index d6045ac7f5ca04..bf25fd33670ea5 100644
+--- a/packages/components/src/flex/test/__snapshots__/index.js.snap
++++ b/packages/components/src/flex/test/__snapshots__/index.tsx.snap
+@@ -5,21 +5,30 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -7,14 +7,10 @@
++@@ -1,22 +1,18 @@
++  <div
++    class="components-flex css-1giw1wa-View-Flex-sx-Base-sx-Items-ItemsRow em57xhy0"
++-   data-testid="flex"
+++   data-testid="base-flex"
++    data-wp-c16t="true"
++    data-wp-component="Flex"
++  >
++    <div
+       class="components-flex-item css-mw3lhz-View-Item-sx-Base em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="FlexItem"
+-    />
+-    <div
++    >
++      Item
++    </div>
++-   <div
+ -     class="css-1mm2cvy-View em57xhy0"
+ -   />
+ -   <div />
+--   <div
++    <div
+       class="components-flex-item components-flex-block css-14wzr73-View-Item-sx-Base-block em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="FlexBlock"
+-    />
+-  </div>
++    >
+ `;
+ 
+ exports[`props should render align 1`] = `
+@@ -97,6 +106,7 @@ exports[`props should render correctly 1`] = `
+ 
+ <div
+   class="components-flex emotion-0 emotion-1"
++  data-testid="base-flex"
+   data-wp-c16t="true"
+   data-wp-component="Flex"
+ >
+@@ -104,12 +114,16 @@ exports[`props should render correctly 1`] = `
+     class="components-flex-item emotion-2 emotion-1"
+     data-wp-c16t="true"
+     data-wp-component="FlexItem"
+-  />
++  >
++    Item
++  </div>
+   <div
+     class="components-flex-item components-flex-block emotion-4 emotion-1"
+     data-wp-c16t="true"
+     data-wp-component="FlexBlock"
+-  />
++  >
++    Item
++  </div>
+ </div>
+ `;
+ 
+@@ -142,5 +156,31 @@ Snapshot Diff:
+ 
+ exports[`props should render spacing 1`] = `
+ Snapshot Diff:
+-Compared values have no visual difference.
++- Received styles
+++ Base styles
++
++  Array [
++    Object {
++-     "margin-left": "calc(4px * 2)",
++-   },
++-   Object {
++-     "min-width": "0",
++-   },
++-   Object {
++      "-ms-flex": "1",
++      "-webkit-flex": "1",
++      "display": "block",
++      "flex": "1",
++      "max-height": "100%",
++      "max-width": "100%",
++      "min-height": "0",
+++     "min-width": "0",
+++   },
+++   Object {
+++     "margin-left": "calc(4px * 5)",
+++   },
+++   Object {
++      "min-width": "0",
++    },
++  ]
+ `;
+diff --git a/packages/components/src/flex/test/index.js b/packages/components/src/flex/test/index.js
+deleted file mode 100644
+index 42facc3c12ad9f..00000000000000
+--- a/packages/components/src/flex/test/index.js
++++ /dev/null
+@@ -1,77 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { View } from '../../view';
+-import { Flex, FlexBlock, FlexItem } from '../';
+-
+-describe( 'props', () => {
+-	let base;
+-	beforeEach( () => {
+-		base = render(
+-			<Flex>
+-				<FlexItem />
+-				<FlexBlock />
+-			</Flex>
+-		);
+-	} );
+-
+-	test( 'should render correctly', () => {
+-		expect( base.container.firstChild ).toMatchSnapshot();
+-	} );
+-
+-	test( 'should render + wrap non Flex children', () => {
+-		const { container } = render(
+-			<Flex>
+-				<FlexItem />
+-				<View />
+-				<div />
+-				<FlexBlock />
+-			</Flex>
+-		);
+-
+-		expect( container.firstChild ).toMatchDiffSnapshot(
+-			base.container.firstChild
+-		);
+-	} );
+-
+-	test( 'should render align', () => {
+-		const { container } = render(
+-			<Flex align="flex-start">
+-				<FlexItem />
+-				<FlexBlock />
+-			</Flex>
+-		);
+-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-			base.container.firstChild
+-		);
+-	} );
+-
+-	test( 'should render justify', () => {
+-		const { container } = render(
+-			<Flex justify="flex-start">
+-				<FlexItem />
+-				<FlexBlock />
+-			</Flex>
+-		);
+-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-			base.container.firstChild
+-		);
+-	} );
+-
+-	test( 'should render spacing', () => {
+-		const { container } = render(
+-			<Flex gap={ 5 }>
+-				<View />
+-				<View />
+-			</Flex>
+-		);
+-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-			base.container.firstChild
+-		);
+-	} );
+-} );
+diff --git a/packages/components/src/flex/test/index.tsx b/packages/components/src/flex/test/index.tsx
+new file mode 100644
+index 00000000000000..417b73f07a5d46
+--- /dev/null
++++ b/packages/components/src/flex/test/index.tsx
+@@ -0,0 +1,84 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { View } from '../../view';
++import { Flex, FlexBlock, FlexItem } from '../';
++
++describe( 'props', () => {
++	beforeEach( () => {
++		render(
++			<Flex data-testid="base-flex">
++				<FlexItem>Item</FlexItem>
++				<FlexBlock>Item</FlexBlock>
++			</Flex>
++		);
++	} );
++
++	test( 'should render correctly', () => {
++		expect( screen.getByTestId( 'base-flex' ) ).toMatchSnapshot();
++	} );
++
++	test( 'should render + wrap non Flex children', () => {
++		render(
++			<Flex data-testid="flex">
++				<FlexItem>Item</FlexItem>
++				<View />
++				<div />
++				<FlexBlock>Item</FlexBlock>
++			</Flex>
++		);
++
++		expect( screen.getByTestId( 'flex' ) ).toMatchDiffSnapshot(
++			screen.getByTestId( 'base-flex' )
++		);
++	} );
++
++	test( 'should render align', () => {
++		render(
++			<Flex align="flex-start" data-testid="flex">
++				<FlexItem>Item</FlexItem>
++				<FlexBlock>Item</FlexBlock>
++			</Flex>
++		);
++		expect( screen.getByTestId( 'flex' ) ).toMatchStyleDiffSnapshot(
++			screen.getByTestId( 'base-flex' )
++		);
++	} );
++
++	test( 'should render justify', () => {
++		render(
++			<Flex justify="flex-start" data-testid="flex">
++				<FlexItem>Item</FlexItem>
++				<FlexBlock>Item</FlexBlock>
++			</Flex>
++		);
++		expect( screen.getByTestId( 'flex' ) ).toMatchStyleDiffSnapshot(
++			screen.getByTestId( 'base-flex' )
++		);
++	} );
++
++	test( 'should render spacing', () => {
++		render(
++			<>
++				<Flex>
++					<FlexItem>Item</FlexItem>
++					<FlexBlock data-testid="flex-block">Item</FlexBlock>
++				</Flex>
++				<Flex gap={ 5 }>
++					<FlexItem>Item</FlexItem>
++					<FlexBlock data-testid="flex-block-with-gap">
++						Item
++					</FlexBlock>
++				</Flex>
++			</>
++		);
++		expect( screen.getByTestId( 'flex-block' ) ).toMatchStyleDiffSnapshot(
++			screen.getByTestId( 'flex-block-with-gap' )
++		);
++	} );
++} );
+diff --git a/packages/components/src/flex/types.ts b/packages/components/src/flex/types.ts
+index 3556577a25fc86..e36a906392b8d9 100644
+--- a/packages/components/src/flex/types.ts
++++ b/packages/components/src/flex/types.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { CSSProperties } from 'react';
++import type { CSSProperties, ReactNode } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -15,21 +15,24 @@ export type FlexDirection = ResponsiveCSSValue<
+ 
+ export type FlexProps = {
+ 	/**
+-	 * Aligns children using CSS Flexbox `align-items`. Vertically aligns content if the `direction` is `row`, or horizontally aligns content if the `direction` is `column`.
+-	 *
+-	 * In the example below, `flex-start` will align the children content to the top.
++	 * Aligns children using CSS Flexbox `align-items`. Vertically aligns
++	 * content if the `direction` is `row`, or horizontally aligns content if
++	 * the `direction` is `column`.
+ 	 *
+ 	 * @default 'center'
+ 	 */
+ 	align?: CSSProperties[ 'alignItems' ];
+ 	/**
+-	 * The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
++	 * The direction flow of the children content can be adjusted with
++	 * `direction`. `column` will align children vertically and `row` will align
++	 * children horizontally.
+ 	 *
+ 	 * @default 'row'
+ 	 */
+ 	direction?: FlexDirection;
+ 	/**
+-	 * Expands to the maximum available width (if horizontal) or height (if vertical).
++	 * Expands to the maximum available width (if horizontal) or height (if
++	 * vertical).
+ 	 *
+ 	 * @default true
+ 	 */
+@@ -37,14 +40,15 @@ export type FlexProps = {
+ 	/**
+ 	 * Spacing in between each child can be adjusted by using `gap`.
+ 	 *
+-	 * Can either be a number (which will act as a multiplier to the library's grid system base of 4px),
+-	 * or a literal CSS value string.
++	 * Can either be a number (which will act as a multiplier to the library's
++	 * grid system base of 4px), or a literal CSS value string.
+ 	 *
+ 	 * @default 2
+ 	 */
+ 	gap?: SpaceInput;
+ 	/**
+-	 * Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
++	 * Horizontally aligns content if the `direction` is `row`, or vertically
++	 * aligns content if the `direction` is `column`.
+ 	 *
+ 	 * @default 'space-between'
+ 	 */
+@@ -58,7 +62,7 @@ export type FlexProps = {
+ 	/**
+ 	 * The children elements.
+ 	 */
+-	children: React.ReactNode;
++	children: ReactNode;
+ 	/**
+ 	 * @deprecated
+ 	 */
+@@ -79,7 +83,7 @@ export type FlexItemProps = {
+ 	/**
+ 	 * The children elements.
+ 	 */
+-	children: React.ReactNode;
++	children?: ReactNode;
+ };
+ 
+ export type FlexBlockProps = Omit< FlexItemProps, 'isBlock' >;

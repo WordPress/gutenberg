@@ -1,0 +1,112 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b1c41b9a05f53f..025d342073aac8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,7 +8,8 @@
+ 
+ ### Experimental
+ 
+--   `TabPanel`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
++-   `Tabs`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
++-   `Tabs`: make sure `Tab`s are associated to the right `TabPanel`s, regardless of the order they're rendered in ([#57033](https://github.com/WordPress/gutenberg/pull/57033)).
+ 
+ ### Bug Fix
+ 
+@@ -28,6 +29,7 @@
+ -   `FontSizePicker`: Add opt-in prop for 40px default size ([#56804](https://github.com/WordPress/gutenberg/pull/56804)).
+ 
+ ### Bug Fix
++
+ -   `PaletteEdit`: temporary custom gradient not saving ([#56896](https://github.com/WordPress/gutenberg/pull/56896)).
+ -   `ToggleGroupControl`: react correctly to external controlled updates ([#56678](https://github.com/WordPress/gutenberg/pull/56678)).
+ -   `ToolsPanel`: fix a performance issue ([#56770](https://github.com/WordPress/gutenberg/pull/56770)).
+diff --git a/packages/components/src/tabs/tabpanel.tsx b/packages/components/src/tabs/tabpanel.tsx
+index 6762c123cce817..439671a39ff9b7 100644
+--- a/packages/components/src/tabs/tabpanel.tsx
++++ b/packages/components/src/tabs/tabpanel.tsx
+@@ -1,7 +1,3 @@
+-/**
+- * External dependencies
+- */
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -38,7 +34,11 @@ export const TabPanel = forwardRef<
+ 		<StyledTabPanel
+ 			ref={ ref }
+ 			store={ store }
+-			id={ instancedTabId }
++			// For TabPanel, the id passed here is the id attribute of the DOM
++			// element.
++			// `tabId` is the id of the tab that controls this panel.
++			id={ `${ instancedTabId }-view` }
++			tabId={ instancedTabId }
+ 			focusable={ focusable }
+ 			{ ...otherProps }
+ 		>
+diff --git a/packages/components/src/tabs/test/index.tsx b/packages/components/src/tabs/test/index.tsx
+index 70ad3c1c18ae54..24b7e75b6e72b7 100644
+--- a/packages/components/src/tabs/test/index.tsx
++++ b/packages/components/src/tabs/test/index.tsx
+@@ -1278,4 +1278,60 @@ describe( 'Tabs', () => {
+ 			} );
+ 		} );
+ 	} );
++	it( 'should associate each `Tab` with the correct `TabPanel`, even if they are not rendered in the same order', async () => {
++		const TABS_WITH_DELTA_REVERSED = [ ...TABS_WITH_DELTA ].reverse();
++
++		render(
++			<Tabs>
++				<Tabs.TabList>
++					{ TABS_WITH_DELTA.map( ( tabObj ) => (
++						<Tabs.Tab
++							key={ tabObj.tabId }
++							tabId={ tabObj.tabId }
++							className={ tabObj.tab.className }
++							disabled={ tabObj.tab.disabled }
++						>
++							{ tabObj.title }
++						</Tabs.Tab>
++					) ) }
++				</Tabs.TabList>
++				{ TABS_WITH_DELTA_REVERSED.map( ( tabObj ) => (
++					<Tabs.TabPanel
++						key={ tabObj.tabId }
++						tabId={ tabObj.tabId }
++						focusable={ tabObj.tabpanel?.focusable }
++					>
++						{ tabObj.content }
++					</Tabs.TabPanel>
++				) ) }
++			</Tabs>
++		);
++
++		// Alpha is the initially selected tab,and should render the correct tabpanel
++		expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
++		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
++			'Selected tab: Alpha'
++		);
++
++		// Select Beta, make sure the correct tabpanel is rendered
++		await click( screen.getByRole( 'tab', { name: 'Beta' } ) );
++		expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
++		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
++			'Selected tab: Beta'
++		);
++
++		// Select Gamma, make sure the correct tabpanel is rendered
++		await click( screen.getByRole( 'tab', { name: 'Gamma' } ) );
++		expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
++		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
++			'Selected tab: Gamma'
++		);
++
++		// Select Delta, make sure the correct tabpanel is rendered
++		await click( screen.getByRole( 'tab', { name: 'Delta' } ) );
++		expect( await getSelectedTab() ).toHaveTextContent( 'Delta' );
++		expect( screen.getByRole( 'tabpanel' ) ).toHaveTextContent(
++			'Selected tab: Delta'
++		);
++	} );
+ } );

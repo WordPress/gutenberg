@@ -1,0 +1,71 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1b969a8d0869fc..48132ff8faae65 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,8 @@
+ -   `Card`, `CardHeader`, `CardBody` and `CardFooter`: Add support for directional padding through object-based size prop, allowing independent control of padding for each side ([#72511](https://github.com/WordPress/gutenberg/pull/72511)).
+ -   `CustomSelectControl`: Fix the options with the same name are shown as the selected option ([#72189](https://github.com/WordPress/gutenberg/pull/72189)).
+ -   `NumberControl`: Fix crash when min prop is string and step prop contains decimal ([#73107](https://github.com/WordPress/gutenberg/pull/73107)).
++-   `Modal`: Fix full-screen modal height to allow contents to scroll properly ([#73150](https://github.com/WordPress/gutenberg/pull/73150)).
++
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index c6395f091a0b3c..c67122090fcd6a 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -106,6 +106,20 @@
+ 	@include break-large() {
+ 		max-height: 70%;
+ 	}
++
++	&.is-full-screen {
++		// When full screen, make sure the children container is full height.
++		.components-modal__content {
++			display: flex;
++			// If this container is scrollable, bottom padding won't apply so we use margin instead.
++			margin-bottom: $grid-unit-40;
++			padding-bottom: 0;
++
++			> :last-child {
++				flex: 1;
++			}
++		}
++	}
+ }
+ 
+ @keyframes components-modal__appear-animation {
+diff --git a/packages/dataviews/src/stories/dataviews-picker.story.tsx b/packages/dataviews/src/stories/dataviews-picker.story.tsx
+index 99b8ff67192911..a115c3ac2f8c80 100644
+--- a/packages/dataviews/src/stories/dataviews-picker.story.tsx
++++ b/packages/dataviews/src/stories/dataviews-picker.story.tsx
+@@ -266,18 +266,16 @@ export const WithModal = ( {
+ 					isFullScreen={ false }
+ 					size="fill"
+ 				>
+-					<div style={ { padding: '16px' } }>
+-						<DataViewsPickerContent
+-							perPageSizes={ perPageSizes }
+-							isMultiselectable={ isMultiselectable }
+-							isGrouped={ isGrouped }
+-							infiniteScrollEnabled={ infiniteScrollEnabled }
+-							actions={ modalActions }
+-							selection={ selectedItems.map( ( item ) =>
+-								String( item.id )
+-							) }
+-						/>
+-					</div>
++					<DataViewsPickerContent
++						perPageSizes={ perPageSizes }
++						isMultiselectable={ isMultiselectable }
++						isGrouped={ isGrouped }
++						infiniteScrollEnabled={ infiniteScrollEnabled }
++						actions={ modalActions }
++						selection={ selectedItems.map( ( item ) =>
++							String( item.id )
++						) }
++					/>
+ 				</Modal>
+ 			) }
+ 		</>

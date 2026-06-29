@@ -1,0 +1,1082 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6177779d7feaec..d76ae7ddbbb84c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,12 @@
+ 
+ ### Bug Fixes
+ 
++-   `ControlWithError`: Connect validation error messages to controls via `aria-describedby` ([#76742](https://github.com/WordPress/gutenberg/pull/76742)).
++
++## 32.4.0 (2026-03-18)
++
++### Bug Fixes
++
+ -   Revert `word-break: break-word` addition ([#76230](https://github.com/WordPress/gutenberg/pull/76230)).
+ -   `VisuallyHidden`: Add `word-break: normal` to prevent text wrapping issues in screen reader content ([#75539](https://github.com/WordPress/gutenberg/pull/75539)).
+ -   `DateTimePicker`: Fix error that occurs when selecting a day outside the valid days for a month (e.g. February 30) ([#76400](https://github.com/WordPress/gutenberg/pull/76400)).
+diff --git a/packages/components/src/validated-form-controls/control-with-error.tsx b/packages/components/src/validated-form-controls/control-with-error.tsx
+index 448bbb94827f1c..bbac0b40be01b9 100644
+--- a/packages/components/src/validated-form-controls/control-with-error.tsx
++++ b/packages/components/src/validated-form-controls/control-with-error.tsx
+@@ -6,6 +6,7 @@ import {
+ 	cloneElement,
+ 	forwardRef,
+ 	useEffect,
++	useId,
+ 	useState,
+ } from '@wordpress/element';
+ 
+@@ -238,22 +239,61 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		}
+ 	};
+ 
+-	const message = () => {
++	const messageId = useId();
++
++	const message = ( () => {
+ 		if ( errorMessage ) {
+ 			return (
+-				<ValidityIndicator type="invalid" message={ errorMessage } />
++				<ValidityIndicator
++					id={ messageId }
++					type="invalid"
++					message={ errorMessage }
++				/>
+ 			);
+ 		}
+ 		if ( statusMessage?.type ) {
+ 			return (
+ 				<ValidityIndicator
++					id={ messageId }
+ 					type={ statusMessage.type }
+ 					message={ statusMessage.message }
+ 				/>
+ 			);
+ 		}
+ 		return null;
+-	};
++	} )();
++
++	const visibleMessage = showMessage ? message : null;
++
++	// Imperatively manage `aria-describedby` on the validity target so we
++	// merge with any value the child control sets internally (e.g. from a
++	// `help` prop), rather than competing with it at the props level.
++	useEffect( () => {
++		const target = getValidityTarget();
++		if ( ! target ) {
++			return;
++		}
++
++		function setDescribedBy( el: Element, shouldAdd: boolean ) {
++			const ids = ( el.getAttribute( 'aria-describedby' ) ?? '' )
++				.split( ' ' )
++				.filter( ( id ) => id && id !== messageId );
++
++			if ( shouldAdd ) {
++				ids.push( messageId );
++			}
++
++			if ( ids.length ) {
++				el.setAttribute( 'aria-describedby', ids.join( ' ' ) );
++			} else {
++				el.removeAttribute( 'aria-describedby' );
++			}
++		}
++
++		setDescribedBy( target, !! visibleMessage );
++
++		return () => setDescribedBy( target, false );
++	}, [ visibleMessage, messageId, getValidityTarget ] );
+ 
+ 	return (
+ 		<div className={ className } ref={ forwardedRef } onBlur={ onBlur }>
+@@ -265,7 +305,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 				),
+ 				required,
+ 			} ) }
+-			<div aria-live="polite">{ showMessage && message() }</div>
++			<div aria-live="polite">{ visibleMessage }</div>
+ 		</div>
+ 	);
+ }
+diff --git a/packages/components/src/validated-form-controls/test/checkbox-control.tsx b/packages/components/src/validated-form-controls/test/checkbox-control.tsx
+new file mode 100644
+index 00000000000000..f003b8c7ada753
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/test/checkbox-control.tsx
+@@ -0,0 +1,49 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { ValidatedCheckboxControl } from '../components';
++
++describe( 'ValidatedCheckboxControl', () => {
++	it( 'should preserve the help description', () => {
++		render(
++			<ValidatedCheckboxControl
++				label="Agree"
++				help="You must agree to continue."
++				onChange={ () => {} }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'checkbox', { name: 'Agree' } )
++		).toHaveAccessibleDescription( 'You must agree to continue.' );
++	} );
++
++	it( 'should append the validation error alongside the help description', async () => {
++		const user = userEvent.setup();
++		render(
++			<form>
++				<ValidatedCheckboxControl
++					label="Agree"
++					help="You must agree to continue."
++					onChange={ () => {} }
++					required
++				/>
++				<button type="submit">Submit</button>
++			</form>
++		);
++
++		const checkbox = screen.getByRole( 'checkbox', {
++			name: /^Agree/,
++		} );
++
++		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
++
++		await waitFor( () => {
++			expect( checkbox ).toHaveAccessibleDescription(
++				expect.stringContaining( 'Constraints not satisfied' )
++			);
++		} );
++		expect( checkbox ).toHaveAccessibleDescription(
++			expect.stringContaining( 'You must agree to continue.' )
++		);
++	} );
++} );
+diff --git a/packages/components/src/validated-form-controls/test/combobox-control.tsx b/packages/components/src/validated-form-controls/test/combobox-control.tsx
+new file mode 100644
+index 00000000000000..4d34be44bac6a7
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/test/combobox-control.tsx
+@@ -0,0 +1,61 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { ValidatedComboboxControl } from '../components';
++
++// The `help` prop is rendered visually by BaseControl but is not
++// programmatically associated with the combobox input via aria-describedby.
++// This is a pre-existing bug in ComboboxControl, not caused by ControlWithError.
++describe( 'ValidatedComboboxControl', () => {
++	const options = [
++		{ label: 'Apple', value: 'apple' },
++		{ label: 'Banana', value: 'banana' },
++	];
++
++	// eslint-disable-next-line jest/no-disabled-tests
++	it.skip( 'should preserve the help description', () => {
++		render(
++			<ValidatedComboboxControl
++				label="Fruit"
++				help="Pick a fruit."
++				options={ options }
++				onChange={ () => {} }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'combobox', { name: 'Fruit' } )
++		).toHaveAccessibleDescription( 'Pick a fruit.' );
++	} );
++
++	// eslint-disable-next-line jest/no-disabled-tests
++	it.skip( 'should append the validation error alongside the help description', async () => {
++		const user = userEvent.setup();
++		render(
++			<form>
++				<ValidatedComboboxControl
++					label="Fruit"
++					help="Pick a fruit."
++					options={ options }
++					onChange={ () => {} }
++					required
++				/>
++				<button type="submit">Submit</button>
++			</form>
++		);
++
++		const combobox = screen.getByRole( 'combobox', {
++			name: /^Fruit/,
++		} );
++
++		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
++
++		await waitFor( () => {
++			expect( combobox ).toHaveAccessibleDescription(
++				expect.stringContaining( 'Constraints not satisfied' )
++			);
++		} );
++		expect( combobox ).toHaveAccessibleDescription(
++			expect.stringContaining( 'Pick a fruit.' )
++		);
++	} );
++} );
+diff --git a/packages/components/src/validated-form-controls/test/control-with-error.tsx b/packages/components/src/validated-form-controls/test/control-with-error.tsx
+index 580907f0fd4f07..1fbd9325061388 100644
+--- a/packages/components/src/validated-form-controls/test/control-with-error.tsx
++++ b/packages/components/src/validated-form-controls/test/control-with-error.tsx
+@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * WordPress dependencies
+  */
+-import { useState, useCallback, useRef } from '@wordpress/element';
++import { useState, useCallback, useId, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -283,6 +283,187 @@ describe( 'ControlWithError', () => {
+ 		} );
+ 	} );
+ 
++	describe( 'aria-describedby', () => {
++		it( 'should connect the error message to the input via aria-describedby', async () => {
++			const user = userEvent.setup();
++			render(
++				<form>
++					<ValidatedInputControl label="URL" required />
++					<button type="submit">Submit</button>
++				</form>
++			);
++
++			const input = screen.getByRole( 'textbox', { name: /^URL/ } );
++
++			expect( input ).not.toHaveAttribute( 'aria-describedby' );
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Submit' } )
++			);
++
++			await waitFor( () => {
++				expect( input ).toHaveAccessibleDescription(
++					expect.stringContaining( 'Constraints not satisfied' )
++				);
++			} );
++		} );
++
++		it( 'should preserve existing aria-describedby values', async () => {
++			const user = userEvent.setup();
++
++			function TestComponent() {
++				const hintId = useId();
++				return (
++					<form>
++						<ValidatedInputControl
++							label="URL"
++							required
++							aria-describedby={ hintId }
++						/>
++						<p id={ hintId }>Enter a full URL.</p>
++						<button type="submit">Submit</button>
++					</form>
++				);
++			}
++
++			render( <TestComponent /> );
++
++			const input = screen.getByRole( 'textbox', { name: /^URL/ } );
++
++			expect( input ).toHaveAccessibleDescription( 'Enter a full URL.' );
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Submit' } )
++			);
++
++			await waitFor( () => {
++				expect( input ).toHaveAccessibleDescription(
++					expect.stringContaining( 'Constraints not satisfied' )
++				);
++			} );
++			expect( input ).toHaveAccessibleDescription(
++				expect.stringContaining( 'Enter a full URL.' )
++			);
++		} );
++
++		it( 'should connect a custom validity error to the input via aria-describedby', async () => {
++			const user = userEvent.setup();
++
++			function TestComponent() {
++				const [ customValidity, setCustomValidity ] =
++					useState<
++						React.ComponentProps<
++							typeof ValidatedInputControl
++						>[ 'customValidity' ]
++					>( undefined );
++				const inputRef = useRef< HTMLInputElement >( null );
++
++				return (
++					<>
++						<ValidatedInputControl
++							ref={ inputRef }
++							label="URL"
++							customValidity={ customValidity }
++						/>
++						<button
++							type="button"
++							onClick={ () => {
++								setCustomValidity( {
++									type: 'invalid',
++									message: 'Please enter a valid URL.',
++								} );
++								requestAnimationFrame(
++									() => inputRef.current?.reportValidity()
++								);
++							} }
++						>
++							Validate
++						</button>
++					</>
++				);
++			}
++
++			render( <TestComponent /> );
++
++			const input = screen.getByRole( 'textbox', { name: 'URL' } );
++			expect( input ).not.toHaveAttribute( 'aria-describedby' );
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Validate' } )
++			);
++
++			await waitFor( () => {
++				expect( input ).toHaveAccessibleDescription(
++					expect.stringContaining( 'Please enter a valid URL.' )
++				);
++			} );
++		} );
++
++		it( 'should remove aria-describedby when the error is resolved', async () => {
++			const user = userEvent.setup();
++
++			function TestComponent() {
++				const [ customValidity, setCustomValidity ] =
++					useState<
++						React.ComponentProps<
++							typeof ValidatedInputControl
++						>[ 'customValidity' ]
++					>( undefined );
++				const inputRef = useRef< HTMLInputElement >( null );
++
++				return (
++					<>
++						<ValidatedInputControl
++							ref={ inputRef }
++							label="URL"
++							customValidity={ customValidity }
++						/>
++						<button
++							type="button"
++							onClick={ () => {
++								setCustomValidity( {
++									type: 'invalid',
++									message: 'Please enter a valid URL.',
++								} );
++								requestAnimationFrame(
++									() => inputRef.current?.reportValidity()
++								);
++							} }
++						>
++							Validate
++						</button>
++						<button
++							type="button"
++							onClick={ () => setCustomValidity( undefined ) }
++						>
++							Clear
++						</button>
++					</>
++				);
++			}
++
++			render( <TestComponent /> );
++
++			const input = screen.getByRole( 'textbox', { name: 'URL' } );
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Validate' } )
++			);
++
++			await waitFor( () => {
++				expect( input ).toHaveAccessibleDescription(
++					expect.stringContaining( 'Please enter a valid URL.' )
++				);
++			} );
++
++			await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
++
++			await waitFor( () => {
++				expect( input ).not.toHaveAttribute( 'aria-describedby' );
++			} );
++		} );
++	} );
++
+ 	describe( 'Focus behavior', () => {
+ 		it( 'should focus the first error in the form', async () => {
+ 			const user = userEvent.setup();
+diff --git a/packages/components/src/validated-form-controls/test/custom-select-control.tsx b/packages/components/src/validated-form-controls/test/custom-select-control.tsx
+new file mode 100644
+index 00000000000000..05c9f221f29081
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/test/custom-select-control.tsx
+@@ -0,0 +1,60 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { ValidatedCustomSelectControl } from '../components';
++
++describe( 'ValidatedCustomSelectControl', () => {
++	const options = [
++		{ key: 'small', name: 'Small' },
++		{ key: 'large', name: 'Large' },
++	];
++
++	it( 'should preserve the built-in "Currently selected" description', async () => {
++		render(
++			<ValidatedCustomSelectControl
++				label="Font Size"
++				options={ options }
++				value={ options[ 0 ] }
++				onChange={ () => {} }
++			/>
++		);
++
++		await waitFor( () => {
++			expect(
++				screen.getByRole( 'combobox', { name: 'Font Size' } )
++			).toHaveAccessibleDescription( 'Currently selected: Small' );
++		} );
++	} );
++
++	it( 'should preserve the built-in description when validation is active', async () => {
++		const user = userEvent.setup();
++		render(
++			<form onSubmit={ ( e ) => e.preventDefault() }>
++				<ValidatedCustomSelectControl
++					label="Font Size"
++					options={ options }
++					value={ options[ 0 ] }
++					onChange={ () => {} }
++					required
++				/>
++				<button type="submit">Submit</button>
++			</form>
++		);
++
++		const combobox = await waitFor( () => {
++			return screen.getByRole( 'combobox', {
++				name: /^Font Size/,
++			} );
++		} );
++
++		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
++
++		// The validation error targets the hidden delegate <select>, not
++		// the interactive combobox. The combobox's built-in description
++		// should be unaffected.
++		await waitFor( () => {
++			expect( combobox ).toHaveAccessibleDescription(
++				'Currently selected: Small'
++			);
++		} );
++	} );
++} );
+diff --git a/packages/components/src/validated-form-controls/test/form-token-field.tsx b/packages/components/src/validated-form-controls/test/form-token-field.tsx
+new file mode 100644
+index 00000000000000..fa5ee961e61518
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/test/form-token-field.tsx
+@@ -0,0 +1,52 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { ValidatedFormTokenField } from '../components';
++
++describe( 'ValidatedFormTokenField', () => {
++	it( 'should preserve the built-in howto description', () => {
++		render(
++			<ValidatedFormTokenField
++				label="Tags"
++				value={ [] }
++				onChange={ () => {} }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'combobox', { name: 'Tags' } )
++		).toHaveAccessibleDescription(
++			expect.stringContaining( 'Separate with commas or the Enter key.' )
++		);
++	} );
++
++	it( 'should preserve the built-in howto description when validation is active', async () => {
++		const user = userEvent.setup();
++		render(
++			<form>
++				<ValidatedFormTokenField
++					label="Tags"
++					value={ [] }
++					onChange={ () => {} }
++					required
++				/>
++				<button type="submit">Submit</button>
++			</form>
++		);
++
++		const input = screen.getByRole( 'combobox', { name: /^Tags/ } );
++
++		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
++
++		// The validation error targets the hidden delegate input, not the
++		// interactive combobox. The combobox's built-in description should
++		// be unaffected.
++		await waitFor( () => {
++			expect(
++				screen.getByText( 'Constraints not satisfied' )
++			).toBeVisible();
++		} );
++		expect( input ).toHaveAccessibleDescription(
++			expect.stringContaining( 'Separate with commas or the Enter key.' )
++		);
++	} );
++} );
+diff --git a/packages/components/src/validated-form-controls/test/input-control.tsx b/packages/components/src/validated-form-controls/test/input-control.tsx
+new file mode 100644
+index 00000000000000..a8af9025ab3a6f
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/test/input-control.tsx
+@@ -0,0 +1,42 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { ValidatedInputControl } from '../components';
++
++describe( 'ValidatedInputControl', () => {
++	it( 'should preserve the help description', () => {
++		render(
++			<ValidatedInputControl label="URL" help="Enter a full URL." />
++		);
++
++		expect(
++			screen.getByRole( 'textbox', { name: 'URL' } )
++		).toHaveAccessibleDescription( 'Enter a full URL.' );
++	} );
++
++	it( 'should append the validation error alongside the help description', async () => {
++		const user = userEvent.setup();
++		render(
++			<form>
++				<ValidatedInputControl
++					label="URL"
++					help="Enter a full URL."
++					required
++				/>
++				<button type="submit">Submit</button>
++			</form>
++		);
++
++		const input = screen.getByRole( 'textbox', { name: /^URL/ } );
++
++		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
++
++		await waitFor( () => {
++			expect( input ).toHaveAccessibleDescription(
++				expect.stringContaining( 'Constraints not satisfied' )
++			);
++		} );
++		expect( input ).toHaveAccessibleDescription(
++			expect.stringContaining( 'Enter a full URL.' )
++		);
++	} );
++} );
+diff --git a/packages/components/src/validated-form-controls/test/number-control.tsx b/packages/components/src/validated-form-controls/test/number-control.tsx
+new file mode 100644
+index 00000000000000..37c03e13e5308a
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/test/number-control.tsx
+@@ -0,0 +1,44 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { ValidatedNumberControl } from '../components';
++
++describe( 'ValidatedNumberControl', () => {
++	it( 'should preserve the help description', () => {
++		render(
++			<ValidatedNumberControl label="Quantity" help="Enter a quantity." />
++		);
++
++		expect(
++			screen.getByRole( 'spinbutton', { name: 'Quantity' } )
++		).toHaveAccessibleDescription( 'Enter a quantity.' );
++	} );
++
++	it( 'should append the validation error alongside the help description', async () => {
++		const user = userEvent.setup();
++		render(
++			<form>
++				<ValidatedNumberControl
++					label="Quantity"
++					help="Enter a quantity."
++					required
++				/>
++				<button type="submit">Submit</button>
++			</form>
++		);
++
++		const input = screen.getByRole( 'spinbutton', {
++			name: /^Quantity/,
++		} );
++
++		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
++
++		await waitFor( () => {
++			expect( input ).toHaveAccessibleDescription(
++				expect.stringContaining( 'Constraints not satisfied' )
++			);
++		} );
++		expect( input ).toHaveAccessibleDescription(
++			expect.stringContaining( 'Enter a quantity.' )
++		);
++	} );
++} );
+diff --git a/packages/components/src/validated-form-controls/test/radio-control.tsx b/packages/components/src/validated-form-controls/test/radio-control.tsx
+new file mode 100644
+index 00000000000000..6ce58e3d6f0712
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/test/radio-control.tsx
+@@ -0,0 +1,61 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { ValidatedRadioControl } from '../components';
++
++describe( 'ValidatedRadioControl', () => {
++	const options = [
++		{ label: 'Small', value: 'small' },
++		{ label: 'Medium', value: 'medium' },
++		{ label: 'Large', value: 'large' },
++	];
++
++	it( 'should preserve the help description on the radio group', () => {
++		render(
++			<ValidatedRadioControl
++				label="Size"
++				help="Choose a size."
++				options={ options }
++				onChange={ () => {} }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'group', { name: 'Size' } )
++		).toHaveAccessibleDescription( 'Choose a size.' );
++	} );
++
++	it( 'should append the validation error to the first radio input', async () => {
++		const user = userEvent.setup();
++		render(
++			<form>
++				<ValidatedRadioControl
++					label="Size"
++					help="Choose a size."
++					options={ options }
++					onChange={ () => {} }
++					required
++				/>
++				<button type="submit">Submit</button>
++			</form>
++		);
++
++		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
++
++		// The validation error targets the first radio input (the validity
++		// target), while the help description stays on the group.
++		const firstRadio = screen.getByRole( 'radio', {
++			name: 'Small',
++		} );
++		await waitFor( () => {
++			expect( firstRadio ).toHaveAccessibleDescription(
++				expect.stringContaining( 'Constraints not satisfied' )
++			);
++		} );
++
++		expect(
++			screen.getByRole( 'group', { name: /^Size/ } )
++		).toHaveAccessibleDescription(
++			expect.stringContaining( 'Choose a size.' )
++		);
++	} );
++} );
+diff --git a/packages/components/src/validated-form-controls/test/range-control.tsx b/packages/components/src/validated-form-controls/test/range-control.tsx
+new file mode 100644
+index 00000000000000..0b8f358097df93
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/test/range-control.tsx
+@@ -0,0 +1,73 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { useState, useRef } from '@wordpress/element';
++import { ValidatedRangeControl } from '../components';
++
++describe( 'ValidatedRangeControl', () => {
++	it( 'should preserve the help description', () => {
++		render(
++			<ValidatedRangeControl label="Opacity" help="Set the opacity." />
++		);
++
++		expect(
++			screen.getByRole( 'slider', { name: 'Opacity' } )
++		).toHaveAccessibleDescription( 'Set the opacity.' );
++	} );
++
++	// Range inputs always have a value, so `required` never fails constraint
++	// validation. Use `customValidity` to trigger the validation error.
++	it( 'should append the validation error alongside the help description', async () => {
++		const user = userEvent.setup();
++
++		function TestComponent() {
++			const [ customValidity, setCustomValidity ] =
++				useState<
++					React.ComponentProps<
++						typeof ValidatedRangeControl
++					>[ 'customValidity' ]
++				>( undefined );
++			const ref = useRef< HTMLInputElement >( null );
++
++			return (
++				<>
++					<ValidatedRangeControl
++						ref={ ref }
++						label="Opacity"
++						help="Set the opacity."
++						customValidity={ customValidity }
++					/>
++					<button
++						type="button"
++						onClick={ () => {
++							setCustomValidity( {
++								type: 'invalid',
++								message: 'Value out of range.',
++							} );
++							requestAnimationFrame(
++								() => ref.current?.reportValidity()
++							);
++						} }
++					>
++						Validate
++					</button>
++				</>
++			);
++		}
++
++		render( <TestComponent /> );
++
++		const slider = screen.getByRole( 'slider', { name: 'Opacity' } );
++		expect( slider ).toHaveAccessibleDescription( 'Set the opacity.' );
++
++		await user.click( screen.getByRole( 'button', { name: 'Validate' } ) );
++
++		await waitFor( () => {
++			expect( slider ).toHaveAccessibleDescription(
++				expect.stringContaining( 'Value out of range.' )
++			);
++		} );
++		expect( slider ).toHaveAccessibleDescription(
++			expect.stringContaining( 'Set the opacity.' )
++		);
++	} );
++} );
+diff --git a/packages/components/src/validated-form-controls/test/select-control.tsx b/packages/components/src/validated-form-controls/test/select-control.tsx
+new file mode 100644
+index 00000000000000..0a42b642224d70
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/test/select-control.tsx
+@@ -0,0 +1,57 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { ValidatedSelectControl } from '../components';
++
++describe( 'ValidatedSelectControl', () => {
++	const options = [
++		{ label: 'Select a color...', value: '' },
++		{ label: 'Red', value: 'red' },
++		{ label: 'Blue', value: 'blue' },
++	];
++
++	it( 'should preserve the help description', () => {
++		render(
++			<ValidatedSelectControl
++				label="Color"
++				help="Pick a color."
++				options={ options }
++				onChange={ () => {} }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'combobox', { name: 'Color' } )
++		).toHaveAccessibleDescription( 'Pick a color.' );
++	} );
++
++	it( 'should append the validation error alongside the help description', async () => {
++		const user = userEvent.setup();
++		render(
++			<form>
++				<ValidatedSelectControl
++					label="Color"
++					help="Pick a color."
++					options={ options }
++					onChange={ () => {} }
++					required
++				/>
++				<button type="submit">Submit</button>
++			</form>
++		);
++
++		const select = screen.getByRole( 'combobox', {
++			name: /^Color/,
++		} );
++
++		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
++
++		await waitFor( () => {
++			expect( select ).toHaveAccessibleDescription(
++				expect.stringContaining( 'Constraints not satisfied' )
++			);
++		} );
++		expect( select ).toHaveAccessibleDescription(
++			expect.stringContaining( 'Pick a color.' )
++		);
++	} );
++} );
+diff --git a/packages/components/src/validated-form-controls/test/text-control.tsx b/packages/components/src/validated-form-controls/test/text-control.tsx
+new file mode 100644
+index 00000000000000..0b48120fb342cc
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/test/text-control.tsx
+@@ -0,0 +1,49 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { ValidatedTextControl } from '../components';
++
++describe( 'ValidatedTextControl', () => {
++	it( 'should preserve the help description', () => {
++		render(
++			<ValidatedTextControl
++				label="Name"
++				help="Enter your full name."
++				onChange={ () => {} }
++				value=""
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'textbox', { name: 'Name' } )
++		).toHaveAccessibleDescription( 'Enter your full name.' );
++	} );
++
++	it( 'should append the validation error alongside the help description', async () => {
++		const user = userEvent.setup();
++		render(
++			<form>
++				<ValidatedTextControl
++					label="Name"
++					help="Enter your full name."
++					onChange={ () => {} }
++					value=""
++					required
++				/>
++				<button type="submit">Submit</button>
++			</form>
++		);
++
++		const input = screen.getByRole( 'textbox', { name: /^Name/ } );
++
++		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
++
++		await waitFor( () => {
++			expect( input ).toHaveAccessibleDescription(
++				expect.stringContaining( 'Constraints not satisfied' )
++			);
++		} );
++		expect( input ).toHaveAccessibleDescription(
++			expect.stringContaining( 'Enter your full name.' )
++		);
++	} );
++} );
+diff --git a/packages/components/src/validated-form-controls/test/textarea-control.tsx b/packages/components/src/validated-form-controls/test/textarea-control.tsx
+new file mode 100644
+index 00000000000000..f05968a6da20db
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/test/textarea-control.tsx
+@@ -0,0 +1,51 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { ValidatedTextareaControl } from '../components';
++
++describe( 'ValidatedTextareaControl', () => {
++	it( 'should preserve the help description', () => {
++		render(
++			<ValidatedTextareaControl
++				label="Bio"
++				help="A short bio."
++				onChange={ () => {} }
++				value=""
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'textbox', { name: 'Bio' } )
++		).toHaveAccessibleDescription( 'A short bio.' );
++	} );
++
++	it( 'should append the validation error alongside the help description', async () => {
++		const user = userEvent.setup();
++		render(
++			<form>
++				<ValidatedTextareaControl
++					label="Bio"
++					help="A short bio."
++					onChange={ () => {} }
++					value=""
++					required
++				/>
++				<button type="submit">Submit</button>
++			</form>
++		);
++
++		const textarea = screen.getByRole( 'textbox', {
++			name: /^Bio/,
++		} );
++
++		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
++
++		await waitFor( () => {
++			expect( textarea ).toHaveAccessibleDescription(
++				expect.stringContaining( 'Constraints not satisfied' )
++			);
++		} );
++		expect( textarea ).toHaveAccessibleDescription(
++			expect.stringContaining( 'A short bio.' )
++		);
++	} );
++} );
+diff --git a/packages/components/src/validated-form-controls/test/toggle-control.tsx b/packages/components/src/validated-form-controls/test/toggle-control.tsx
+new file mode 100644
+index 00000000000000..e8300f67dc5153
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/test/toggle-control.tsx
+@@ -0,0 +1,49 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { ValidatedToggleControl } from '../components';
++
++describe( 'ValidatedToggleControl', () => {
++	it( 'should preserve the help description', () => {
++		render(
++			<ValidatedToggleControl
++				label="Dark mode"
++				help="Enable dark mode."
++				onChange={ () => {} }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'checkbox', { name: 'Dark mode' } )
++		).toHaveAccessibleDescription( 'Enable dark mode.' );
++	} );
++
++	it( 'should append the validation error alongside the help description', async () => {
++		const user = userEvent.setup();
++		render(
++			<form>
++				<ValidatedToggleControl
++					label="Dark mode"
++					help="Enable dark mode."
++					onChange={ () => {} }
++					required
++				/>
++				<button type="submit">Submit</button>
++			</form>
++		);
++
++		const toggle = screen.getByRole( 'checkbox', {
++			name: /^Dark mode/,
++		} );
++
++		await user.click( screen.getByRole( 'button', { name: 'Submit' } ) );
++
++		await waitFor( () => {
++			expect( toggle ).toHaveAccessibleDescription(
++				expect.stringContaining( 'Constraints not satisfied' )
++			);
++		} );
++		expect( toggle ).toHaveAccessibleDescription(
++			expect.stringContaining( 'Enable dark mode.' )
++		);
++	} );
++} );
+diff --git a/packages/components/src/validated-form-controls/test/toggle-group-control.tsx b/packages/components/src/validated-form-controls/test/toggle-group-control.tsx
+new file mode 100644
+index 00000000000000..90438c4a31ecf9
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/test/toggle-group-control.tsx
+@@ -0,0 +1,28 @@
++import { render, screen } from '@testing-library/react';
++import { ValidatedToggleGroupControl } from '../components';
++import { ToggleGroupControlOption } from '../../toggle-group-control';
++
++// The `help` prop is rendered visually by BaseControl but is not
++// programmatically associated with the toggle group via aria-describedby.
++// Additionally, the validity target is a hidden delegate radio input, not the
++// toggle group itself. These are pre-existing bugs, not caused by ControlWithError.
++describe( 'ValidatedToggleGroupControl', () => {
++	// eslint-disable-next-line jest/no-disabled-tests
++	it.skip( 'should preserve the help description', () => {
++		render(
++			<ValidatedToggleGroupControl
++				label="Alignment"
++				help="Choose text alignment."
++				value="left"
++				onChange={ () => {} }
++			>
++				<ToggleGroupControlOption label="Left" value="left" />
++				<ToggleGroupControlOption label="Center" value="center" />
++			</ValidatedToggleGroupControl>
++		);
++
++		expect(
++			screen.getByRole( 'radiogroup', { name: 'Alignment' } )
++		).toHaveAccessibleDescription( 'Choose text alignment.' );
++	} );
++} );
+diff --git a/packages/components/src/validated-form-controls/validity-indicator.tsx b/packages/components/src/validated-form-controls/validity-indicator.tsx
+index 39fcad129814a7..5429ebca216308 100644
+--- a/packages/components/src/validated-form-controls/validity-indicator.tsx
++++ b/packages/components/src/validated-form-controls/validity-indicator.tsx
+@@ -15,9 +15,11 @@ import Icon from '../icon';
+ import Spinner from '../spinner';
+ 
+ export function ValidityIndicator( {
++	id,
+ 	type,
+ 	message,
+ }: {
++	id?: string;
+ 	type: 'validating' | 'valid' | 'invalid';
+ 	message?: string;
+ } ) {
+@@ -27,6 +29,7 @@ export function ValidityIndicator( {
+ 	};
+ 	return (
+ 		<p
++			id={ id }
+ 			className={ clsx(
+ 				'components-validated-control__indicator',
+ 				`is-${ type }`

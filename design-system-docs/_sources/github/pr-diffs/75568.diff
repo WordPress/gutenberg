@@ -1,0 +1,69 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index abf2f00cb86dd6..e3c829453c9926 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ ### Bug Fixes
+ 
+ -   `Field`: Fix default gap spacing ([#75446](https://github.com/WordPress/gutenberg/pull/75446)).
++-   `Button`: Fix disabled styles while `focusableWhenDisabled={false}` ([#75568](https://github.com/WordPress/gutenberg/pull/75568)).
+ 
+ ### Enhancements
+ 
+@@ -23,6 +24,7 @@
+ ### Internal
+ 
+ -   `Button`, `InputLayout`, `Tabs`: use semantic dimension tokens ([#74557](https://github.com/WordPress/gutenberg/pull/74557)).
++-   `Button`: Fix overriding of internal CSS variables ([#75568](https://github.com/WordPress/gutenberg/pull/75568)).
+ 
+ ## 0.6.0 (2026-01-29)
+ 
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+index 9e5811b5350097..eb2b10291a2e44 100644
+--- a/packages/ui/src/button/style.module.css
++++ b/packages/ui/src/button/style.module.css
+@@ -70,20 +70,22 @@
+ 			text-decoration: inherit;
+ 		}
+ 
+-		/* States */
+-		&:not([aria-disabled="true"]):is(:hover, :active, :focus) {
++		/* States — use property declarations (not variable reassignment) so that
++		   higher CSS layers can safely override the custom property values without
++		   breaking state handling. */
++		&:not([data-disabled]):is(:hover, :active, :focus) {
+ 			/* hover/active/focus states apply when the button is not disabled. A non
+ 			disabled, loading button will have hover/active/focus styles */
+-			--wp-ui-button-background-color: var(--wp-ui-button-background-color-active);
+-			--wp-ui-button-foreground-color: var(--wp-ui-button-foreground-color-active);
+-			--wp-ui-button-border-color: var(--wp-ui-button-border-color-active);
++			background-color: var(--wp-ui-button-background-color-active);
++			color: var(--wp-ui-button-foreground-color-active);
++			border-color: var(--wp-ui-button-border-color-active);
+ 		}
+ 
+-		&[aria-disabled="true"]:not(.is-loading) {
++		&[data-disabled]:not(.is-loading) {
+ 			/* A loading button, even when disabled, won't "look" disabled */
+-			--wp-ui-button-background-color: var(--wp-ui-button-background-color-disabled);
+-			--wp-ui-button-foreground-color: var(--wp-ui-button-foreground-color-disabled);
+-			--wp-ui-button-border-color: var(--wp-ui-button-border-color-disabled);
++			background-color: var(--wp-ui-button-background-color-disabled);
++			color: var(--wp-ui-button-foreground-color-disabled);
++			border-color: var(--wp-ui-button-border-color-disabled);
+ 
+ 			@media ( forced-colors: active ) {
+ 				border-color: GrayText;
+@@ -202,6 +204,12 @@
+ 	.is-loading {
+ 		color: transparent;
+ 
++		/* Keep text transparent when a loading button is hovered — needed because
++		 the hover state now sets `color` as a property declaration. */
++		&:not([data-disabled]):is(:hover, :active, :focus) {
++			color: transparent;
++		}
++
+ 		* {
+ 			opacity: 0;
+ 		}

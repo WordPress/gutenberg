@@ -1,0 +1,41 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 26cc8e9ae4e07e..b1544099686548 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,8 @@
+ 
+ -   `Guide`: Make next and previous button text customizable ([#69907](https://github.com/WordPress/gutenberg/pull/69907)).
+ -   `Popover`: Introduce a virtual padding of `8px` to prevent it from hitting the viewport edge ([#69555](https://github.com/WordPress/gutenberg/pull/69555)).
++-   `TextControl`: Add theming support ([#69640](https://github.com/WordPress/gutenberg/pull/69640)).
++-   `TextareaControl`: Add theming support ([#69640](https://github.com/WordPress/gutenberg/pull/69640)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/text-control/style.scss b/packages/components/src/text-control/style.scss
+index 3e59c47532a617..476a85afb990d8 100644
+--- a/packages/components/src/text-control/style.scss
++++ b/packages/components/src/text-control/style.scss
+@@ -16,7 +16,9 @@
+ 	height: $grid-unit-40;
+ 	// Override input style margin in WP forms.css.
+ 	margin: 0;
+-	@include input-control;
++	background: $components-color-background;
++	color: $components-color-foreground;
++	@include input-control( $components-color-accent);
+ 
+ 	&.is-next-40px-default-size {
+ 		height: $grid-unit-50;
+diff --git a/packages/components/src/textarea-control/styles/textarea-control-styles.ts b/packages/components/src/textarea-control/styles/textarea-control-styles.ts
+index 84dd2da0e53c03..3e76b2ef5d4c3f 100644
+--- a/packages/components/src/textarea-control/styles/textarea-control-styles.ts
++++ b/packages/components/src/textarea-control/styles/textarea-control-styles.ts
+@@ -37,6 +37,8 @@ export const StyledTextarea = styled.textarea`
+ 	display: block;
+ 	font-family: ${ font( 'default.fontFamily' ) };
+ 	line-height: 20px;
++	background: ${ COLORS.theme.background };
++	color: ${ COLORS.theme.foreground };
+ 
+ 	// Vertical padding is to match the standard 40px control height when rows=1,
+ 	// in conjunction with the 20px line-height.

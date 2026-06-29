@@ -1,0 +1,251 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 8454aa294683bf..0588be8eb76136 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -833,6 +833,12 @@
+ 		"markdown_source": "../packages/components/src/form-token-field/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "Grid",
++		"slug": "grid",
++		"markdown_source": "../packages/components/src/grid/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "Guide",
+ 		"slug": "guide",
+diff --git a/packages/components/src/ui/grid/README.md b/packages/components/src/grid/README.md
+similarity index 89%
+rename from packages/components/src/ui/grid/README.md
+rename to packages/components/src/grid/README.md
+index 4678b902bfa784..197bd4421d2b00 100644
+--- a/packages/components/src/ui/grid/README.md
++++ b/packages/components/src/grid/README.md
+@@ -1,11 +1,13 @@
+-# Grid (Experimental)
++# Grid
++
++> **Experimental!**
+ 
+ `Grid` is a primitive layout component that can arrange content in a grid configuration.
+ 
+ ## Usage
+ 
+ ```jsx
+-import { Grid, View } from '@wordpress/components/ui';
++import { __experimentalGrid as Grid, __experimentalView as View } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+diff --git a/packages/components/src/ui/grid/component.js b/packages/components/src/grid/component.js
+similarity index 76%
+rename from packages/components/src/ui/grid/component.js
+rename to packages/components/src/grid/component.js
+index 98b3cd7f09b601..ca59b817ad8258 100644
+--- a/packages/components/src/ui/grid/component.js
++++ b/packages/components/src/grid/component.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../utils';
++import { createComponent } from '../ui/utils';
+ import useGrid from './hook';
+ 
+ /**
+@@ -9,7 +9,7 @@ import useGrid from './hook';
+  *
+  * @example
+  * ```jsx
+- * import { Grid, View } from `@wordpress/components/ui`;
++ * import { __experimentalGrid as Grid, __experimentalView as View } from `@wordpress/components`;
+  *
+  * function Example() {
+  * 	return (
+diff --git a/packages/components/src/ui/grid/hook.js b/packages/components/src/grid/hook.js
+similarity index 86%
+rename from packages/components/src/ui/grid/hook.js
+rename to packages/components/src/grid/hook.js
+index 5683a8c50a340e..6b44bae25e3feb 100644
+--- a/packages/components/src/ui/grid/hook.js
++++ b/packages/components/src/grid/hook.js
+@@ -11,13 +11,13 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../context';
++import { useContextSystem } from '../ui/context';
+ import { getAlignmentProps } from './utils';
+-import { useResponsiveValue } from '../utils/use-responsive-value';
+-import CONFIG from '../../utils/config-values';
++import { useResponsiveValue } from '../ui/utils/use-responsive-value';
++import CONFIG from '../utils/config-values';
+ 
+ /**
+- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'div'>} props
+  */
+ export default function useGrid( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/grid/index.js b/packages/components/src/grid/index.js
+similarity index 100%
+rename from packages/components/src/ui/grid/index.js
+rename to packages/components/src/grid/index.js
+diff --git a/packages/components/src/ui/grid/stories/index.js b/packages/components/src/grid/stories/index.js
+similarity index 88%
+rename from packages/components/src/ui/grid/stories/index.js
+rename to packages/components/src/grid/stories/index.js
+index 8df6c7162ee485..58b0b45f153680 100644
+--- a/packages/components/src/ui/grid/stories/index.js
++++ b/packages/components/src/grid/stories/index.js
+@@ -6,17 +6,17 @@ import { number } from '@storybook/addon-knobs';
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../../view';
++import { View } from '../../ui/view';
+ import { Grid } from '..';
+ 
+ export default {
+ 	component: Grid,
+-	title: 'G2 Components (Experimental)/Grid',
++	title: 'Components (Experimental)/Grid',
+ };
+ 
+ const Item = ( props ) => (
+ 	<View
+-		css={ {
++		style={ {
+ 			borderRadius: 8,
+ 			background: '#eee',
+ 			padding: 8,
+diff --git a/packages/components/src/ui/grid/test/grid.js b/packages/components/src/grid/test/grid.js
+similarity index 97%
+rename from packages/components/src/ui/grid/test/grid.js
+rename to packages/components/src/grid/test/grid.js
+index 3d1aa3ad7e560b..887a9aac4a3cf1 100644
+--- a/packages/components/src/ui/grid/test/grid.js
++++ b/packages/components/src/grid/test/grid.js
+@@ -6,9 +6,9 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../../view';
++import { View } from '../../ui/view';
+ import { Grid } from '..';
+-import CONFIG from '../../../utils/config-values';
++import CONFIG from '../../utils/config-values';
+ 
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {
+diff --git a/packages/components/src/ui/grid/types.ts b/packages/components/src/grid/types.ts
+similarity index 100%
+rename from packages/components/src/ui/grid/types.ts
+rename to packages/components/src/grid/types.ts
+diff --git a/packages/components/src/ui/grid/utils.js b/packages/components/src/grid/utils.js
+similarity index 100%
+rename from packages/components/src/ui/grid/utils.js
+rename to packages/components/src/grid/utils.js
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index afbb7e37db8ae2..b5b5f7c4b87965 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -63,6 +63,7 @@ export { default as FormToggle } from './form-toggle';
+ export { default as FormTokenField } from './form-token-field';
+ export { default as __experimentalGradientPicker } from './gradient-picker';
+ export { default as __experimentalCustomGradientPicker } from './custom-gradient-picker';
++export { Grid as __experimentalGrid } from './grid';
+ export { default as Guide } from './guide';
+ export { default as GuidePage } from './guide/page';
+ export { Heading as __experimentalHeading } from './heading';
+diff --git a/packages/components/src/ui/__storybook-utils/example-grid.js b/packages/components/src/ui/__storybook-utils/example-grid.js
+index 7f648fa1c80fa2..947e19c71093cd 100644
+--- a/packages/components/src/ui/__storybook-utils/example-grid.js
++++ b/packages/components/src/ui/__storybook-utils/example-grid.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { Grid } from '../grid';
++import { Grid } from '../../grid';
+ import { Surface } from '../surface';
+ import { Text } from '../../text';
+ import { View } from '../view';
+diff --git a/packages/components/src/ui/card/stories/index.js b/packages/components/src/ui/card/stories/index.js
+index a48e680e8feb01..f9271a6f4c01b1 100644
+--- a/packages/components/src/ui/card/stories/index.js
++++ b/packages/components/src/ui/card/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { Grid } from '../../grid';
++import { Grid } from '../../../grid';
+ import { Text } from '../../../text';
+ import { VStack } from '../../../v-stack';
+ import { Card, CardBody, CardFooter } from '../index';
+diff --git a/packages/components/src/ui/control-group/component.js b/packages/components/src/ui/control-group/component.js
+index 1e6060dca6dd27..7cab290d17a871 100644
+--- a/packages/components/src/ui/control-group/component.js
++++ b/packages/components/src/ui/control-group/component.js
+@@ -6,7 +6,7 @@
+  * Internal dependencies
+  */
+ import { Flex } from '../../flex';
+-import { Grid } from '../grid';
++import { Grid } from '../../grid';
+ import { useControlGroup } from './hook';
+ import { contextConnect } from '../context';
+ 
+diff --git a/packages/components/src/ui/elevation/stories/index.js b/packages/components/src/ui/elevation/stories/index.js
+index 21fc446766b7b3..5771474827689b 100644
+--- a/packages/components/src/ui/elevation/stories/index.js
++++ b/packages/components/src/ui/elevation/stories/index.js
+@@ -7,7 +7,7 @@ import { number } from '@storybook/addon-knobs';
+  * Internal dependencies
+  */
+ import { Elevation } from '../index';
+-import { Grid } from '../../grid';
++import { Grid } from '../../../grid';
+ import { View } from '../../view';
+ import { HStack } from '../../../h-stack';
+ import { Divider } from '../../divider';
+diff --git a/packages/components/src/ui/form-group/form-group.js b/packages/components/src/ui/form-group/form-group.js
+index c16ea4421665cc..910be83b94f10c 100644
+--- a/packages/components/src/ui/form-group/form-group.js
++++ b/packages/components/src/ui/form-group/form-group.js
+@@ -2,7 +2,7 @@
+  * Internal dependencies
+  */
+ import { contextConnect } from '../context';
+-import { Grid } from '../grid';
++import { Grid } from '../../grid';
+ import { View } from '../view';
+ import FormGroupContent from './form-group-content';
+ import { useFormGroup } from './use-form-group';
+diff --git a/packages/components/src/ui/form-group/types.ts b/packages/components/src/ui/form-group/types.ts
+index 097992206f2848..a02fa343b459f0 100644
+--- a/packages/components/src/ui/form-group/types.ts
++++ b/packages/components/src/ui/form-group/types.ts
+@@ -8,7 +8,7 @@ import type { CSSProperties, ReactNode, ReactText } from 'react';
+  * Internal dependencies
+  */
+ import type { Props as ControlLabelProps } from '../control-label/types';
+-import type { Props as GridProps } from '../grid/types';
++import type { Props as GridProps } from '../../grid/types';
+ 
+ export type FormGroupLabelProps = ControlLabelProps & {
+ 	labelHidden?: boolean;
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index 7c6c4741c401aa..8d41ecbba53c51 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -4,7 +4,6 @@ export * from './control-label';
+ export * from './divider';
+ export * from './elevation';
+ export * from './form-group';
+-export * from './grid';
+ export * from './shortcut';
+ export * from './spinner';
+ export * from './view';

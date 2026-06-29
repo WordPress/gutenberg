@@ -1,0 +1,2885 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index f7ce095edeaaf3..c502acc39f5473 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -11,9 +11,9 @@
+     -   `AlertDialog.Popup`: removed `loading` prop (async flows are now handled internally via `Promise`-returning `onConfirm`);
+     -   `AlertDialog.Popup`: made `children` optional in favor of a new `description` prop, which describes the alert dialog semantically.
+ 
+-### Internal
++### New Features
+ 
+--   `AlertDialog`: Rewrite internals to use Base UI's `AlertDialog` primitives directly instead of `Dialog` wrappers. Introduces an internal state machine for async confirm flows ([#76937](https://github.com/WordPress/gutenberg/pull/76937)).
++-   Add `Popover` primitive ([#76438](https://github.com/WordPress/gutenberg/pull/76438)).
+ 
+ ### Bug Fixes
+ 
+@@ -23,6 +23,10 @@
+ 
+ -   Add defensive styles against global WordPress stylesheets like common.css and forms.css ([#76783](https://github.com/WordPress/gutenberg/pull/76783)).
+ 
++### Internal
++
++-   `AlertDialog`: Rewrite internals to use Base UI's `AlertDialog` primitives directly instead of `Dialog` wrappers. Introduces an internal state machine for async confirm flows ([#76937](https://github.com/WordPress/gutenberg/pull/76937)).
++
+ ## 0.10.0 (2026-04-01)
+ 
+ ### New Features
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index b3cbb03c72067f..800fb880628e5e 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -11,6 +11,7 @@ export * from './icon';
+ export * from './icon-button';
+ export * from './link';
+ export * as Notice from './notice';
++export * as Popover from './popover';
+ export * from './stack';
+ export * as Tabs from './tabs';
+ export * from './text';
+diff --git a/packages/ui/src/popover/arrow.tsx b/packages/ui/src/popover/arrow.tsx
+new file mode 100644
+index 00000000000000..f052da7d1c80f3
+--- /dev/null
++++ b/packages/ui/src/popover/arrow.tsx
+@@ -0,0 +1,49 @@
++import { Popover as _Popover } from '@base-ui/react/popover';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import styles from './style.module.css';
++import type { ArrowProps } from './types';
++
++function DefaultArrowSvg( props: React.ComponentProps< 'svg' > ) {
++	return (
++		<svg
++			width="20"
++			height="10"
++			viewBox="0 0 20 10"
++			fill="none"
++			{ ...props }
++		>
++			<path
++				d="M20 10H0V8h1.465a4 4 0 0 0 2.676-1.027l5.19-4.388c.378-.341.96-.341 1.338 0l5.19 4.388A4 4 0 0 0 18.535 8H20z"
++				className={ styles[ 'arrow-fill' ] }
++			/>
++			<path
++				d="M10 3.097 4.81 7.486A5 5 0 0 1 1.465 8.77H0V8h1.465a4 4 0 0 0 2.676-1.027l5.19-4.388c.378-.341.96-.341 1.338 0l5.19 4.388A4 4 0 0 0 18.535 8H20v.77h-1.465a5 5 0 0 1-3.345-1.284z"
++				className={ styles[ 'arrow-stroke' ] }
++			/>
++		</svg>
++	);
++}
++
++/**
++ * Renders an optional arrow element that points toward the anchor.
++ *
++ * Must be placed inside `Popover.Popup`. The arrow automatically rotates
++ * to match the current placement side.
++ */
++const Arrow = forwardRef< HTMLDivElement, ArrowProps >( function PopoverArrow(
++	{ children, className, ...props },
++	ref
++) {
++	return (
++		<_Popover.Arrow
++			ref={ ref }
++			className={ clsx( styles.arrow, className ) }
++			{ ...props }
++		>
++			{ children ?? <DefaultArrowSvg /> }
++		</_Popover.Arrow>
++	);
++} );
++
++export { Arrow };
+diff --git a/packages/ui/src/popover/close.tsx b/packages/ui/src/popover/close.tsx
+new file mode 100644
+index 00000000000000..3240fb06fbd9e6
+--- /dev/null
++++ b/packages/ui/src/popover/close.tsx
+@@ -0,0 +1,24 @@
++import { Popover as _Popover } from '@base-ui/react/popover';
++import { forwardRef } from '@wordpress/element';
++import type { CloseProps } from './types';
++
++/**
++ * Renders a button that closes the popover when clicked.
++ *
++ * When the popover opens, initial focus skips this button in favor of
++ * the first interactive element inside the popup (unless `initialFocus`
++ * on `Popover.Popup` overrides this behavior).
++ */
++const Close = forwardRef< HTMLButtonElement, CloseProps >(
++	function PopoverClose( props, ref ) {
++		return (
++			<_Popover.Close
++				ref={ ref }
++				data-wp-ui-popover-close=""
++				{ ...props }
++			/>
++		);
++	}
++);
++
++export { Close };
+diff --git a/packages/ui/src/popover/context.tsx b/packages/ui/src/popover/context.tsx
+new file mode 100644
+index 00000000000000..33c22637df2e11
+--- /dev/null
++++ b/packages/ui/src/popover/context.tsx
+@@ -0,0 +1,100 @@
++import {
++	createContext,
++	useCallback,
++	useContext,
++	useEffect,
++	useMemo,
++	useRef,
++} from '@wordpress/element';
++
++/**
++ * Whether validation is enabled. This is a build-time constant that allows
++ * bundlers to tree-shake all validation code in production builds.
++ */
++const VALIDATION_ENABLED = process.env.NODE_ENV !== 'production';
++
++type PopoverValidationContextType = {
++	registerTitle: ( element: HTMLElement | null ) => void;
++};
++
++const PopoverValidationContext = VALIDATION_ENABLED
++	? createContext< PopoverValidationContextType | null >( null )
++	: ( null as unknown as React.Context< PopoverValidationContextType | null > );
++
++function usePopoverValidationContextDev() {
++	return useContext( PopoverValidationContext );
++}
++
++function usePopoverValidationContextProd() {
++	return null;
++}
++
++/**
++ * Hook to access the popover validation context.
++ * Returns null in production or if not within a Popover.Popup.
++ */
++export const usePopoverValidationContext = VALIDATION_ENABLED
++	? usePopoverValidationContextDev
++	: usePopoverValidationContextProd;
++
++/**
++ * Development-only provider that tracks whether Popover.Title is rendered.
++ */
++function PopoverValidationProviderDev( {
++	children,
++}: {
++	children: React.ReactNode;
++} ) {
++	const titleElementRef = useRef< HTMLElement | null >( null );
++
++	const registerTitle = useCallback( ( element: HTMLElement | null ) => {
++		titleElementRef.current = element;
++	}, [] );
++
++	const contextValue = useMemo(
++		() => ( { registerTitle } ),
++		[ registerTitle ]
++	);
++
++	useEffect( () => {
++		const titleElement = titleElementRef.current;
++
++		if ( ! titleElement ) {
++			throw new Error(
++				'Popover: Missing <Popover.Title>. ' +
++					'For accessibility, every popover requires a title. ' +
++					'If needed, the title can be visually hidden but must not be omitted.'
++			);
++		}
++
++		const textContent = titleElement.textContent?.trim();
++		if ( ! textContent ) {
++			throw new Error(
++				'Popover: <Popover.Title> cannot be empty. ' +
++					'Provide meaningful text content for the popover title.'
++			);
++		}
++	}, [] );
++
++	return (
++		<PopoverValidationContext.Provider value={ contextValue }>
++			{ children }
++		</PopoverValidationContext.Provider>
++	);
++}
++
++function PopoverValidationProviderProd( {
++	children,
++}: {
++	children: React.ReactNode;
++} ) {
++	return <>{ children }</>;
++}
++
++/**
++ * Provider component that validates Popover.Title presence in development mode.
++ * In production, this component is a no-op and just renders children.
++ */
++export const PopoverValidationProvider = VALIDATION_ENABLED
++	? PopoverValidationProviderDev
++	: PopoverValidationProviderProd;
+diff --git a/packages/ui/src/popover/description.tsx b/packages/ui/src/popover/description.tsx
+new file mode 100644
+index 00000000000000..ce8394ea9c5b8a
+--- /dev/null
++++ b/packages/ui/src/popover/description.tsx
+@@ -0,0 +1,34 @@
++import { Popover as _Popover } from '@base-ui/react/popover';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { Text } from '../text';
++import styles from './style.module.css';
++import type { DescriptionProps } from './types';
++
++/**
++ * Renders an optional paragraph that describes the popover content.
++ *
++ * The rendered element is linked to the popup via `aria-describedby`.
++ * Uses the `body-md` text variant by default.
++ */
++const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
++	function PopoverDescription(
++		{ className, children, render, ...props },
++		ref
++	) {
++		return (
++			<Text
++				ref={ ref }
++				variant="body-md"
++				render={
++					<_Popover.Description render={ render } { ...props } />
++				}
++				className={ clsx( styles.description, className ) }
++			>
++				{ children }
++			</Text>
++		);
++	}
++);
++
++export { Description };
+diff --git a/packages/ui/src/popover/index.ts b/packages/ui/src/popover/index.ts
+new file mode 100644
+index 00000000000000..472a9f1a681240
+--- /dev/null
++++ b/packages/ui/src/popover/index.ts
+@@ -0,0 +1,9 @@
++import { Arrow } from './arrow';
++import { Close } from './close';
++import { Description } from './description';
++import { Popup } from './popup';
++import { Root } from './root';
++import { Title } from './title';
++import { Trigger } from './trigger';
++
++export { Arrow, Close, Description, Popup, Root, Title, Trigger };
+diff --git a/packages/ui/src/popover/popup.tsx b/packages/ui/src/popover/popup.tsx
+new file mode 100644
+index 00000000000000..4dabf05b2c1beb
+--- /dev/null
++++ b/packages/ui/src/popover/popup.tsx
+@@ -0,0 +1,106 @@
++import { Popover as _Popover } from '@base-ui/react/popover';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
++import { unlock } from '../lock-unlock';
++import resetStyles from '../utils/css/resets.module.css';
++import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
++import { PopoverValidationProvider } from './context';
++import styles from './style.module.css';
++import type { PopupProps } from './types';
++
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
++const CLOSE_ATTR = 'data-wp-ui-popover-close';
++
++/**
++ * Renders the floating popup container for the popover content.
++ *
++ * Handles portal rendering, positioning relative to the anchor, collision
++ * avoidance, focus management, and optional backdrop. Supply a `container`
++ * element for cross-document scenarios such as iframes.
++ */
++const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
++	{
++		align = 'center',
++		alignOffset,
++		anchor,
++		// Matches the popup's border-radius (--wpds-border-radius-md).
++		arrowPadding = 8,
++		backdrop = false,
++		children,
++		className,
++		collisionAvoidance,
++		collisionBoundary,
++		collisionPadding,
++		container,
++		finalFocus,
++		initialFocus,
++		side = 'bottom',
++		sideOffset = 8,
++		sticky,
++		style,
++		variant = 'default',
++		...props
++	},
++	ref
++) {
++	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
++		initialFocus,
++		deprioritizedAttribute: CLOSE_ATTR,
++	} );
++	const mergedPopupRef = useMergeRefs( [ ref, popupRef ] );
++
++	const backdropElement = backdrop ? (
++		<_Popover.Backdrop className={ styles.backdrop } />
++	) : null;
++
++	const positioner = (
++		<_Popover.Positioner
++			align={ align }
++			alignOffset={ alignOffset }
++			anchor={ anchor }
++			arrowPadding={ arrowPadding }
++			collisionAvoidance={ collisionAvoidance }
++			collisionBoundary={ collisionBoundary }
++			collisionPadding={ collisionPadding }
++			side={ side }
++			sideOffset={ sideOffset }
++			sticky={ sticky }
++			style={ style }
++			className={ clsx(
++				resetStyles[ 'box-sizing' ],
++				styles.positioner,
++				className
++			) }
++		>
++			<ThemeProvider>
++				<_Popover.Popup
++					ref={ mergedPopupRef }
++					initialFocus={ resolvedInitialFocus }
++					finalFocus={ finalFocus }
++					className={ clsx( variant !== 'unstyled' && styles.popup ) }
++					{ ...props }
++				>
++					<PopoverValidationProvider>
++						{ children }
++					</PopoverValidationProvider>
++				</_Popover.Popup>
++			</ThemeProvider>
++		</_Popover.Positioner>
++	);
++
++	return (
++		<_Popover.Portal container={ container }>
++			{ backdropElement }
++			{ positioner }
++		</_Popover.Portal>
++	);
++} );
++
++export { Popup };
+diff --git a/packages/ui/src/popover/root.tsx b/packages/ui/src/popover/root.tsx
+new file mode 100644
+index 00000000000000..118bafca0d31da
+--- /dev/null
++++ b/packages/ui/src/popover/root.tsx
+@@ -0,0 +1,41 @@
++import { Popover as _Popover } from '@base-ui/react/popover';
++import type { RootProps } from './types';
++
++/**
++ * An accessible popup anchored to a trigger element.
++ *
++ * Popover renders ARIA-compliant floating content that appears next to its
++ * trigger. It can contain interactive content such as form controls, menus,
++ * and rich descriptions.
++ *
++ * Compose the compound components to build a popover:
++ *
++ * - `Popover.Root` — provides open state and context to all sub-components.
++ * - `Popover.Trigger` — the button that toggles the popup.
++ * - `Popover.Popup` — the floating container (portal, positioning, collision
++ *   avoidance).
++ * - `Popover.Arrow` — an optional arrow pointing toward the anchor.
++ * - `Popover.Title` — **required** heading that labels the popover for
++ *   accessibility (can be visually hidden).
++ * - `Popover.Description` — optional paragraph linked via `aria-describedby`.
++ * - `Popover.Close` — a button that closes the popover when clicked.
++ *   **Required** when `modal` is `true` or `'trap-focus'` so that focus
++ *   can cycle correctly and the user can dismiss the popover.
++ *
++ * ```jsx
++ * <Popover.Root>
++ *   <Popover.Trigger>Open</Popover.Trigger>
++ *   <Popover.Popup>
++ *     <Popover.Arrow />
++ *     <Popover.Title>Popover title</Popover.Title>
++ *     <Popover.Description>Popover description</Popover.Description>
++ *     <Popover.Close>Close</Popover.Close>
++ *   </Popover.Popup>
++ * </Popover.Root>
++ * ```
++ */
++function Root( props: RootProps ) {
++	return <_Popover.Root { ...props } />;
++}
++
++export { Root };
+diff --git a/packages/ui/src/popover/stories/index.story.tsx b/packages/ui/src/popover/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..a6849b089b0714
+--- /dev/null
++++ b/packages/ui/src/popover/stories/index.story.tsx
+@@ -0,0 +1,1315 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { useId, useRef, useState } from '@wordpress/element';
++import { SlotFillProvider, Slot } from '@wordpress/components';
++import { close, info } from '@wordpress/icons';
++import { Popover, VisuallyHidden } from '../..';
++import { Icon } from '../../icon';
++import { IconButton } from '../../icon-button';
++import { GenericIframe, useMeasure } from './utils';
++
++const meta: Meta< typeof Popover.Root > = {
++	title: 'Design System/Components/Popover',
++	component: Popover.Root,
++	subcomponents: {
++		'Popover.Trigger': Popover.Trigger,
++		'Popover.Popup': Popover.Popup,
++		'Popover.Arrow': Popover.Arrow,
++		'Popover.Title': Popover.Title,
++		'Popover.Description': Popover.Description,
++		'Popover.Close': Popover.Close,
++	},
++	argTypes: {
++		children: { control: false },
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof Popover.Root >;
++
++export const Default: Story = {
++	argTypes: {
++		children: { control: { type: 'text' } },
++	},
++	args: {
++		children: (
++			<>
++				<Popover.Trigger>Open Popover</Popover.Trigger>
++				<Popover.Popup>
++					<Popover.Arrow />
++					<Popover.Title
++						style={ {
++							marginBottom: 'var(--wpds-dimension-gap-xs)',
++						} }
++					>
++						Popover title
++					</Popover.Title>
++					<Popover.Description>
++						Popover description
++					</Popover.Description>
++				</Popover.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * A popover without the arrow sub-component. Omit `Popover.Arrow`
++ * from the popup content when an arrow indicator is not desired.
++ */
++export const NoArrow: Story = {
++	args: {
++		children: (
++			<>
++				<Popover.Trigger>Open Popover</Popover.Trigger>
++				<Popover.Popup>
++					<Popover.Title
++						style={ {
++							marginBottom: 'var(--wpds-dimension-gap-xs)',
++						} }
++					>
++						Popover title
++					</Popover.Title>
++					<Popover.Description>
++						Popover description
++					</Popover.Description>
++				</Popover.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * All combinations of `side` and `align` props on `Popover.Popup`.
++ *
++ * Each row shows a side (`top`, `right`, `bottom`, `left`), and each column
++ * shows an alignment (`start`, `center`, `end`).
++ */
++export const Positioning: Story = {
++	parameters: { controls: { disable: true } },
++	render: function Render() {
++		const sides = [ 'top', 'right', 'bottom', 'left' ] as const;
++		const aligns = [ 'start', 'center', 'end' ] as const;
++
++		return (
++			<div
++				style={ {
++					display: 'grid',
++					gridTemplateColumns: 'repeat(3, 1fr)',
++					gap: '6rem',
++					padding: '6rem 4rem',
++					justifyItems: 'center',
++				} }
++			>
++				{ sides.flatMap( ( side ) =>
++					aligns.map( ( align ) => (
++						<Popover.Root key={ `${ side }-${ align }` } open>
++							<Popover.Trigger>
++								{ side } / { align }
++							</Popover.Trigger>
++							<Popover.Popup
++								side={ side }
++								align={ align }
++								collisionAvoidance={ {
++									side: 'none',
++									align: 'none',
++								} }
++							>
++								<VisuallyHidden render={ <Popover.Title /> }>
++									{ side } / { align }
++								</VisuallyHidden>
++								<Popover.Arrow />
++								<Popover.Description>
++									{ side } side / { align } align
++								</Popover.Description>
++							</Popover.Popup>
++						</Popover.Root>
++					) )
++				) }
++			</div>
++		);
++	},
++};
++
++/**
++ * A popover with a close icon button, title, and description. The
++ * `Popover.Close` component renders a button that closes the popover when
++ * clicked. Here it wraps an `IconButton` for a properly sized, accessible
++ * close action — matching the Dialog close-icon pattern.
++ */
++export const WithCloseButton: Story = {
++	args: {
++		children: (
++			<>
++				<Popover.Trigger>Settings</Popover.Trigger>
++				<Popover.Popup>
++					<Popover.Arrow />
++					<div
++						style={ {
++							display: 'flex',
++							justifyContent: 'space-between',
++							alignItems: 'center',
++							marginBottom: 'var(--wpds-dimension-gap-sm)',
++						} }
++					>
++						<Popover.Title>Settings</Popover.Title>
++						<Popover.Close
++							render={
++								<IconButton
++									variant="minimal"
++									size="compact"
++									tone="neutral"
++									icon={ close }
++									label="Close"
++								/>
++							}
++						/>
++					</div>
++					<Popover.Description>
++						Configure your notification preferences and display
++						settings.
++					</Popover.Description>
++				</Popover.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * Use the `open` and `onOpenChange` props on `Popover.Root` to control the
++ * popover's visibility programmatically.
++ *
++ * The checkbox drives the popover state externally. The popover's trigger
++ * and click-outside dismiss both sync back to the same state via
++ * `onOpenChange`, keeping everything in sync.
++ */
++export const Controlled: Story = {
++	argTypes: {
++		open: { control: false },
++		onOpenChange: { control: false },
++		defaultOpen: { control: false },
++	},
++	args: {
++		children: (
++			<>
++				<Popover.Trigger>Toggle Popover</Popover.Trigger>
++				<Popover.Popup>
++					<Popover.Arrow />
++					<Popover.Title
++						style={ {
++							marginBottom: 'var(--wpds-dimension-gap-xs)',
++						} }
++					>
++						Controlled Popover
++					</Popover.Title>
++					<Popover.Description>
++						This popover is controlled by external state.
++					</Popover.Description>
++				</Popover.Popup>
++			</>
++		),
++	},
++	render: function Render( args ) {
++		const [ isOpen, setIsOpen ] = useState( false );
++		const checkboxId = useId();
++		const checkboxRef = useRef< HTMLInputElement >( null );
++		const labelRef = useRef< HTMLLabelElement >( null );
++
++		return (
++			<div
++				style={ {
++					display: 'flex',
++					gap: '1rem',
++					alignItems: 'center',
++				} }
++			>
++				<Popover.Root
++					{ ...args }
++					open={ isOpen }
++					onOpenChange={ ( nextOpen, eventDetails ) => {
++						if (
++							[ 'outside-press', 'focus-out' ].includes(
++								eventDetails.reason
++							) &&
++							!! eventDetails.event.target &&
++							(
++								[
++									checkboxRef.current,
++									labelRef.current,
++								].filter( Boolean ) as EventTarget[]
++							 ).includes( eventDetails.event.target )
++						) {
++							return;
++						}
++
++						setIsOpen( nextOpen );
++					} }
++				/>
++
++				<label htmlFor={ checkboxId } ref={ labelRef }>
++					<input
++						ref={ checkboxRef }
++						id={ checkboxId }
++						type="checkbox"
++						checked={ isOpen }
++						onChange={ ( e ) => setIsOpen( e.target.checked ) }
++					/>
++					Open
++				</label>
++			</div>
++		);
++	},
++};
++
++/**
++ * Set `modal` to `true` to trap focus inside the popover when it is open.
++ * This is useful for complex popover content that requires user interaction,
++ * such as forms. Try tabbing through the fields — focus stays inside the
++ * popover until it is dismissed.
++ *
++ * **Note:** focus trapping requires a `Popover.Close` part inside the popup
++ * so that screen readers always have an escape route. It can be visually
++ * hidden if needed.
++ *
++ * Pass `backdrop` to `Popover.Popup` to display a semi-transparent overlay
++ * beneath the popover, signalling that the page is blocked.
++ */
++export const Modal: Story = {
++	argTypes: { modal: { control: false } },
++	args: {
++		modal: true,
++		children: (
++			<>
++				<Popover.Trigger>Edit Settings</Popover.Trigger>
++				<Popover.Popup backdrop>
++					<Popover.Arrow />
++					<Popover.Title
++						style={ {
++							marginBottom: 'var(--wpds-dimension-gap-xs)',
++						} }
++					>
++						Settings
++					</Popover.Title>
++					<form
++						style={ {
++							display: 'flex',
++							flexDirection: 'column',
++							gap: 'var(--wpds-dimension-gap-sm)',
++							marginTop: 'var(--wpds-dimension-gap-sm)',
++						} }
++						onSubmit={ ( e ) => e.preventDefault() }
++					>
++						<label
++							htmlFor="popover-test-name-id"
++							style={ {
++								display: 'flex',
++								flexDirection: 'column',
++								gap: 'var(--wpds-dimension-gap-xs)',
++								fontSize: 'inherit',
++							} }
++						>
++							Name
++							<input
++								// eslint-disable-next-line no-restricted-syntax
++								id="popover-test-name-id"
++								type="text"
++								placeholder="Enter your name"
++							/>
++						</label>
++						<label
++							htmlFor="popover-test-email-id"
++							style={ {
++								display: 'flex',
++								flexDirection: 'column',
++								gap: 'var(--wpds-dimension-gap-xs)',
++								fontSize: 'inherit',
++							} }
++						>
++							Email
++							<input
++								// eslint-disable-next-line no-restricted-syntax
++								id="popover-test-email-id"
++								type="email"
++								placeholder="Enter your email"
++							/>
++						</label>
++						<div
++							style={ {
++								display: 'flex',
++								justifyContent: 'flex-end',
++								gap: 'var(--wpds-dimension-gap-sm)',
++								marginTop: 'var(--wpds-dimension-gap-xs)',
++							} }
++						>
++							<Popover.Close
++								style={ {
++									all: 'unset',
++									cursor: 'pointer',
++								} }
++							>
++								Cancel
++							</Popover.Close>
++							<button type="submit">Save</button>
++						</div>
++					</form>
++				</Popover.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * The `variant="unstyled"` option strips all visual styling from the popup,
++ * making it a blank positioning container for fully custom content.
++ */
++export const Unstyled: Story = {
++	args: {
++		children: (
++			<>
++				<Popover.Trigger>Open Unstyled</Popover.Trigger>
++				<Popover.Popup variant="unstyled">
++					<Popover.Title
++						style={ {
++							marginBottom: 'var(--wpds-dimension-gap-xs)',
++						} }
++					>
++						Custom Styled
++					</Popover.Title>
++					<Popover.Description>
++						This popup has no default styling — the consumer
++						controls all visual appearance.
++					</Popover.Description>
++				</Popover.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * Overlay placement positions the popover centered on top of its trigger,
++ * effectively covering it. This is achieved by computing a negative
++ * `sideOffset` based on the measured sizes of the trigger and popup.
++ *
++ * This technique is useful when you want the popover to visually replace
++ * the trigger element in place.
++ */
++export const OverlayPlacement: Story = {
++	args: { defaultOpen: true },
++	argTypes: { defaultOpen: { control: false } },
++	render: function Render( { children: _children, ...args } ) {
++		const [ popupRef, popupSize ] = useMeasure< HTMLDivElement >();
++		const [ triggerRef, triggerSize ] = useMeasure< HTMLButtonElement >();
++
++		return (
++			<div style={ { padding: '4rem', textAlign: 'center' } }>
++				<Popover.Root { ...args }>
++					<Popover.Trigger ref={ triggerRef }>
++						Trigger (covered by popover)
++					</Popover.Trigger>
++					<Popover.Popup
++						ref={ popupRef }
++						side="bottom"
++						align="center"
++						sideOffset={
++							-1 *
++							( popupSize.height / 2 + triggerSize.height / 2 )
++						}
++						collisionAvoidance={ {
++							side: 'none',
++							align: 'none',
++						} }
++					>
++						<Popover.Title
++							style={ {
++								marginBottom: 'var(--wpds-dimension-gap-xs)',
++							} }
++						>
++							Overlay
++						</Popover.Title>
++						<Popover.Description>
++							This popover is centered over its trigger using a
++							negative sideOffset.
++							<br />
++							The trigger is currently hidden under the popover.
++							<br />
++							Try resizing the browser — collision avoidance is
++							disabled so the popover stays overlaid.
++						</Popover.Description>
++					</Popover.Popup>
++				</Popover.Root>
++			</div>
++		);
++	},
++};
++
++/**
++ * To render the popup inline (without a portal), create a local ref to a
++ * `<span>` with `display: contents` and pass it as the `container` prop.
++ * The popup will render inside the span rather than being portaled to
++ * `document.body`, while retaining all positioning behavior.
++ *
++ * **Note:** `backdrop` will not cover the full viewport in this mode.
++ */
++export const Inline: Story = {
++	parameters: { controls: { disable: true } },
++	render: function Render() {
++		const inlineContainerRef = useRef< HTMLSpanElement >( null );
++
++		return (
++			<div data-testid="inline-wrapper">
++				<Popover.Root>
++					<Popover.Trigger>Open Inline</Popover.Trigger>
++					<span
++						ref={ inlineContainerRef }
++						style={ { display: 'contents' } }
++					/>
++					<Popover.Popup container={ inlineContainerRef }>
++						<Popover.Arrow />
++						<Popover.Title
++							style={ {
++								marginBottom: 'var(--wpds-dimension-gap-xs)',
++							} }
++						>
++							Inline Popover
++						</Popover.Title>
++						<Popover.Description>
++							This popup is rendered in place — no portal is used.
++							Inspect the DOM to see it lives inside its parent.
++						</Popover.Description>
++					</Popover.Popup>
++				</Popover.Root>
++			</div>
++		);
++	},
++};
++
++/**
++ * Use the `collisionAvoidance` prop to control how the popover behaves when
++ * it collides with the edges of its collision boundary.
++ *
++ * Because the popup renders via a portal (outside the scrollable container),
++ * the container must be passed as `collisionBoundary` so Floating UI treats
++ * it as the clipping edge.
++ *
++ * - `side: 'flip'` flips to the opposite side (default).
++ * - `side: 'none'` disables collision handling.
++ *
++ * Scroll the container to see collision avoidance in action.
++ */
++export const CollisionAvoidance: Story = {
++	parameters: { controls: { disable: true } },
++	render: function Render() {
++		const [ boundary, setBoundary ] = useState< HTMLElement | null >(
++			null
++		);
++
++		return (
++			<div
++				ref={ setBoundary }
++				style={ {
++					height: 300,
++					overflow: 'auto',
++					border: '1px solid #ccc',
++					padding: '200px 2rem',
++				} }
++			>
++				<div
++					style={ {
++						display: 'flex',
++						gap: '2rem',
++						justifyContent: 'center',
++					} }
++				>
++					<Popover.Root defaultOpen>
++						<Popover.Trigger>Flip (default)</Popover.Trigger>
++						<Popover.Popup
++							side="top"
++							collisionBoundary={ boundary ?? undefined }
++						>
++							<Popover.Title
++								style={ {
++									marginBottom:
++										'var(--wpds-dimension-gap-xs)',
++								} }
++							>
++								Flip
++							</Popover.Title>
++							<Popover.Description>
++								Flips to bottom when clipped
++							</Popover.Description>
++						</Popover.Popup>
++					</Popover.Root>
++
++					<Popover.Root defaultOpen>
++						<Popover.Trigger>No collision</Popover.Trigger>
++						<Popover.Popup
++							side="top"
++							collisionBoundary={ boundary ?? undefined }
++							collisionAvoidance={ {
++								side: 'none',
++								align: 'none',
++							} }
++						>
++							<Popover.Title
++								style={ {
++									marginBottom:
++										'var(--wpds-dimension-gap-xs)',
++								} }
++							>
++								None
++							</Popover.Title>
++							<Popover.Description>
++								Stays on top even when clipped
++							</Popover.Description>
++						</Popover.Popup>
++					</Popover.Root>
++				</div>
++				<div style={ { height: 600 } } />
++			</div>
++		);
++	},
++};
++
++/**
++ * When the popover's trigger lives inside an iframe but the popover should
++ * render in the parent document, pass a parent-document element to the
++ * `container` prop on `Popover.Popup`.
++ *
++ * This technique is used in Gutenberg where the block editor canvas is an
++ * iframe but toolbars and menus must appear outside it.
++ *
++ * Scroll inside the iframe to verify that the popover tracks the trigger
++ * position across document boundaries.
++ */
++export const CrossIframe: Story = {
++	args: { defaultOpen: true },
++	argTypes: { defaultOpen: { control: false } },
++	render: function Render( { children: _children, ...args } ) {
++		const portalContainerRef = useRef< HTMLDivElement >( null );
++		const [ iframeBoundary, setIframeBoundary ] =
++			useState< HTMLIFrameElement | null >( null );
++
++		return (
++			<div>
++				<div ref={ portalContainerRef } />
++				<GenericIframe
++					ref={ setIframeBoundary }
++					style={ {
++						width: '100%',
++						height: 400,
++						border: 0,
++						outline: '1px solid purple',
++					} }
++				>
++					<div
++						style={ {
++							height: '200vh',
++							paddingTop: '10vh',
++						} }
++					>
++						<div
++							style={ {
++								maxWidth: 200,
++								marginTop: 100,
++								marginInline: 'auto',
++							} }
++						>
++							<Popover.Root { ...args }>
++								<Popover.Trigger
++									style={ {
++										padding: 8,
++										background: 'salmon',
++									} }
++								>
++									Popover&apos;s anchor (inside iframe)
++								</Popover.Trigger>
++								<Popover.Popup
++									container={
++										portalContainerRef as React.RefObject< HTMLElement >
++									}
++									collisionBoundary={
++										iframeBoundary ?? undefined
++									}
++								>
++									<Popover.Arrow />
++									<Popover.Title
++										style={ {
++											marginBottom:
++												'var(--wpds-dimension-gap-xs)',
++										} }
++									>
++										Cross-Iframe Popover
++									</Popover.Title>
++									<Popover.Description>
++										This popup is rendered in the parent
++										document, not inside the iframe. Scroll
++										the iframe to see the popover track the
++										trigger.
++									</Popover.Description>
++								</Popover.Popup>
++							</Popover.Root>
++						</div>
++					</div>
++				</GenericIframe>
++			</div>
++		);
++	},
++};
++
++/**
++ * Same cross-iframe scenario, but using `SlotFillProvider` and `Slot` from
++ * `@wordpress/components` as the render target.
++ *
++ * The `Slot` renders a `div` in the parent document, and its forwarded ref
++ * is passed to `Popover.Popup`'s `container` prop so the popup portals into
++ * the slot element. This mirrors the legacy Popover's `WithSlotOutsideIframe`
++ * pattern.
++ */
++export const CrossIframeWithSlotFill: Story = {
++	name: 'Cross-Iframe (SlotFill)',
++	args: { defaultOpen: true },
++	argTypes: { defaultOpen: { control: false } },
++	render: function Render( { children: _children, ...args } ) {
++		const slotRef = useRef< HTMLDivElement >( null );
++		const [ iframeBoundary, setIframeBoundary ] =
++			useState< HTMLIFrameElement | null >( null );
++
++		return (
++			<SlotFillProvider>
++				<Slot
++					name="popover-container"
++					bubblesVirtually
++					ref={ slotRef }
++				/>
++				<GenericIframe
++					ref={ setIframeBoundary }
++					style={ {
++						width: '100%',
++						height: 400,
++						border: 0,
++						outline: '1px solid purple',
++					} }
++				>
++					<div
++						style={ {
++							height: '200vh',
++							paddingTop: '10vh',
++						} }
++					>
++						<div
++							style={ {
++								maxWidth: 200,
++								marginTop: 100,
++								marginInline: 'auto',
++							} }
++						>
++							<Popover.Root { ...args }>
++								<Popover.Trigger
++									style={ {
++										padding: 8,
++										background: 'salmon',
++									} }
++								>
++									Popover&apos;s anchor (inside iframe)
++								</Popover.Trigger>
++								<Popover.Popup
++									container={
++										slotRef as React.RefObject< HTMLElement >
++									}
++									collisionBoundary={
++										iframeBoundary ?? undefined
++									}
++								>
++									<Popover.Arrow />
++									<Popover.Title
++										style={ {
++											marginBottom:
++												'var(--wpds-dimension-gap-xs)',
++										} }
++									>
++										Cross-Iframe (SlotFill)
++									</Popover.Title>
++									<Popover.Description>
++										This popup renders in the parent
++										document via a `Slot` from
++										`@wordpress/components`.
++									</Popover.Description>
++								</Popover.Popup>
++							</Popover.Root>
++						</div>
++					</div>
++				</GenericIframe>
++			</SlotFillProvider>
++		);
++	},
++};
++
++/**
++ * Popovers in Gutenberg are managed with explicit z-index values, which can
++ * create situations where a popover renders below another popover, when you
++ * want it to be rendered above.
++ *
++ * The `--wp-ui-popover-z-index` CSS variable, available on the
++ * `Popover.Popup` component, is an escape hatch that can be used to override
++ * the z-index of a given popover on a case-by-case basis.
++ */
++export const WithCustomZIndex: Story = {
++	name: 'With Custom z-index',
++	args: {
++		children: (
++			<>
++				<Popover.Trigger>Open Popover</Popover.Trigger>
++				<Popover.Popup style={ { '--wp-ui-popover-z-index': '9999' } }>
++					<Popover.Arrow />
++					<Popover.Title
++						style={ {
++							marginBottom: 'var(--wpds-dimension-gap-xs)',
++						} }
++					>
++						Custom z-index
++					</Popover.Title>
++					<Popover.Description>
++						This popover&apos;s positioner has z-index: 9999 via the
++						`--wp-ui-popover-z-index` CSS custom property.
++					</Popover.Description>
++				</Popover.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * Use the `anchor` prop on `Popover.Popup` to position the popover against an
++ * arbitrary element instead of the built-in trigger. Base UI accepts four
++ * anchor types:
++ *
++ * 1. **Element** — a direct DOM element reference.
++ * 2. **VirtualElement** — an object with a `getBoundingClientRect()` method.
++ * 3. **RefObject** — a `React.RefObject` pointing to an element.
++ * 4. **Callback** — a function returning an Element or VirtualElement.
++ *
++ * This is the most-used pattern in Gutenberg: block popovers anchor to
++ * selected block elements, the link popover anchors to the text selection, and
++ * data views anchor to right-click positions.
++ */
++export const Anchor: Story = {
++	parameters: { controls: { disable: true } },
++	render: function Render() {
++		const [ elementAnchor, setElementAnchor ] =
++			useState< HTMLElement | null >( null );
++		const refAnchor = useRef< HTMLDivElement >( null );
++		const virtualAnchorLabel = useRef< HTMLDivElement >( null );
++		const callbackTarget = useRef< HTMLDivElement >( null );
++
++		const virtualAnchor = {
++			getBoundingClientRect: () =>
++				virtualAnchorLabel.current?.getBoundingClientRect() ??
++				new DOMRect(),
++		};
++
++		const anchorBoxStyle = {
++			padding: '8px 12px',
++			border: '2px dashed currentcolor',
++			borderRadius: 4,
++			fontSize: 12,
++			textAlign: 'center' as const,
++		};
++
++		const popupProps = {
++			collisionAvoidance: {
++				side: 'none' as const,
++				align: 'none' as const,
++			},
++		};
++
++		return (
++			<div
++				style={ {
++					display: 'grid',
++					gridTemplateColumns: '1fr 1fr',
++					gap: '4rem',
++					padding: '4rem 2rem',
++				} }
++			>
++				{ /* 1. Element anchor */ }
++				<div>
++					<div ref={ setElementAnchor } style={ anchorBoxStyle }>
++						Element anchor
++					</div>
++					<Popover.Root open>
++						<Popover.Popup
++							anchor={ elementAnchor ?? undefined }
++							{ ...popupProps }
++						>
++							<VisuallyHidden render={ <Popover.Title /> }>
++								Element anchor
++							</VisuallyHidden>
++							<Popover.Arrow />
++							<Popover.Description>
++								Anchored to a DOM element
++							</Popover.Description>
++						</Popover.Popup>
++					</Popover.Root>
++				</div>
++
++				{ /* 2. VirtualElement anchor */ }
++				<div>
++					<div ref={ virtualAnchorLabel } style={ anchorBoxStyle }>
++						VirtualElement anchor
++					</div>
++					<Popover.Root open>
++						<Popover.Popup
++							anchor={ virtualAnchor }
++							{ ...popupProps }
++						>
++							<VisuallyHidden render={ <Popover.Title /> }>
++								Virtual anchor
++							</VisuallyHidden>
++							<Popover.Arrow />
++							<Popover.Description>
++								Anchored to a virtual element
++							</Popover.Description>
++						</Popover.Popup>
++					</Popover.Root>
++				</div>
++
++				{ /* 3. RefObject anchor */ }
++				<div>
++					<div ref={ refAnchor } style={ anchorBoxStyle }>
++						RefObject anchor
++					</div>
++					<Popover.Root open>
++						<Popover.Popup anchor={ refAnchor } { ...popupProps }>
++							<VisuallyHidden render={ <Popover.Title /> }>
++								Ref anchor
++							</VisuallyHidden>
++							<Popover.Arrow />
++							<Popover.Description>
++								Anchored via useRef
++							</Popover.Description>
++						</Popover.Popup>
++					</Popover.Root>
++				</div>
++
++				{ /* 4. Callback anchor */ }
++				<div>
++					<div ref={ callbackTarget } style={ anchorBoxStyle }>
++						Callback anchor
++					</div>
++					<Popover.Root open>
++						<Popover.Popup
++							anchor={ () => callbackTarget.current }
++							{ ...popupProps }
++						>
++							<VisuallyHidden render={ <Popover.Title /> }>
++								Callback anchor
++							</VisuallyHidden>
++							<Popover.Arrow />
++							<Popover.Description>
++								Anchored via callback function
++							</Popover.Description>
++						</Popover.Popup>
++					</Popover.Root>
++				</div>
++			</div>
++		);
++	},
++};
++
++/**
++ * Use `variant="unstyled"` and custom inline styles to replicate a toolbar-like
++ * appearance: high-contrast border, no shadow, and a smaller border radius.
++ *
++ * A first-class `variant="toolbar"` may be added in the future if this pattern
++ * becomes widespread.
++ */
++export const ToolbarVariant: Story = {
++	args: {
++		children: (
++			<>
++				<Popover.Trigger>Open Toolbar</Popover.Trigger>
++				<Popover.Popup
++					variant="unstyled"
++					style={ {
++						display: 'flex',
++						gap: 'var(--wpds-dimension-gap-xs)',
++						padding: '4px 8px',
++						border: '1px solid #1e1e1e',
++						borderRadius: 2,
++						background: '#fff',
++						fontSize: 13,
++					} }
++				>
++					<VisuallyHidden render={ <Popover.Title /> }>
++						Formatting
++					</VisuallyHidden>
++					<button type="button">B</button>
++					<button type="button">I</button>
++					<button type="button">U</button>
++					<button type="button">Link</button>
++				</Popover.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * Base UI's Positioner exposes `--available-height` and
++ * `--available-width` CSS variables representing the space
++ * between the anchor and the viewport edge. Apply them as `max-height` /
++ * `max-width` via the `style` prop (which targets the positioner) to
++ * constrain the popup size. Then add `overflow: auto` on an inner wrapper
++ * so scrolling happens inside the popup content area — this replaces the
++ * legacy Popover's `resize` prop.
++ *
++ * Open the popover and resize or scroll the container to see the popup shrink
++ * to fit.
++ */
++export const ViewportConstrainedSize: Story = {
++	name: 'Viewport-Constrained Size',
++	args: { defaultOpen: true },
++	argTypes: { defaultOpen: { control: false } },
++	render: function Render( { children: _children, ...args } ) {
++		return (
++			<div
++				style={ {
++					height: 250,
++					overflow: 'auto',
++					border: '1px solid #ccc',
++					padding: '60px 2rem',
++				} }
++			>
++				<Popover.Root { ...args }>
++					<Popover.Trigger>Show Content</Popover.Trigger>
++					<Popover.Popup
++						side="bottom"
++						style={ {
++							maxHeight: 'var(--available-height, 300px)',
++							maxWidth: 'var(--available-width, 300px)',
++						} }
++					>
++						<div style={ { overflow: 'auto', height: '100%' } }>
++							<Popover.Title
++								style={ {
++									marginBottom:
++										'var(--wpds-dimension-gap-xs)',
++								} }
++							>
++								Constrained
++							</Popover.Title>
++							<Popover.Description>
++								This popup constrains its size using the
++								`--available-height` and `--available-width` CSS
++								variables exposed by the positioner.
++							</Popover.Description>
++							<div style={ { height: 400 } }>
++								<p>
++									Scroll inside this popup — its max-height is
++									capped to the available viewport space.
++								</p>
++							</div>
++						</div>
++					</Popover.Popup>
++				</Popover.Root>
++				<div style={ { height: 600 } } />
++			</div>
++		);
++	},
++};
++
++/**
++ * The `onOpenChange` callback on `Popover.Root` receives an `eventDetails`
++ * object with a `reason` field that describes why the popover is
++ * opening/closing. This replaces the legacy Popover's separate `onClose` and
++ * `onFocusOutside` callbacks:
++ *
++ * - `reason === 'escape-key'` — user pressed Escape (was `onClose`)
++ * - `reason === 'outside-press'` — user clicked outside (was `onClose`)
++ * - `reason === 'focus-out'` — focus moved outside (was `onFocusOutside`)
++ *
++ * Open the popover, then dismiss it in different ways to see the logged reason.
++ */
++export const OnOpenChangeDetails: Story = {
++	name: 'onOpenChange Details',
++	parameters: { controls: { disable: true } },
++	render: function Render() {
++		const [ log, setLog ] = useState< string[] >( [] );
++
++		return (
++			<div style={ { display: 'flex', gap: '2rem' } }>
++				<Popover.Root
++					onOpenChange={ ( nextOpen, eventDetails ) => {
++						setLog( ( prev ) => [
++							...prev.slice( -9 ),
++							`open=${ nextOpen } reason=${ eventDetails.reason }`,
++						] );
++					} }
++				>
++					<Popover.Trigger>Toggle</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Arrow />
++						<Popover.Title
++							style={ {
++								marginBottom: 'var(--wpds-dimension-gap-xs)',
++							} }
++						>
++							Event Log
++						</Popover.Title>
++						<Popover.Description>
++							Dismiss this popover via Escape, click-outside, or
++							moving focus away.
++						</Popover.Description>
++					</Popover.Popup>
++				</Popover.Root>
++
++				<pre
++					style={ {
++						flex: 1,
++						padding: 8,
++						fontSize: 12,
++						lineHeight: 1.5,
++						background: '#f5f5f5',
++						borderRadius: 4,
++						minHeight: 100,
++						margin: 0,
++					} }
++				>
++					{ log.length
++						? log.join( '\n' )
++						: 'Interact with the popover to see events…' }
++				</pre>
++			</div>
++		);
++	},
++};
++
++/**
++ * Pass a ref to `initialFocus` on `Popover.Popup` to focus a specific element
++ * when the popover opens. This replaces the legacy Popover's `focusOnMount`
++ * prop.
++ *
++ * In this example, the Email field receives focus instead of the first
++ * focusable element (Name).
++ */
++export const InitialFocus: Story = {
++	parameters: { controls: { disable: true } },
++	render: function Render() {
++		const emailRef = useRef< HTMLInputElement >( null );
++		const nameId = useId();
++		const emailId = useId();
++
++		return (
++			<Popover.Root>
++				<Popover.Trigger>Open Form</Popover.Trigger>
++				<Popover.Popup initialFocus={ emailRef }>
++					<Popover.Arrow />
++					<Popover.Title
++						style={ {
++							marginBottom: 'var(--wpds-dimension-gap-xs)',
++						} }
++					>
++						Contact
++					</Popover.Title>
++					<form
++						style={ {
++							display: 'flex',
++							flexDirection: 'column',
++							gap: 'var(--wpds-dimension-gap-sm)',
++						} }
++						onSubmit={ ( e ) => e.preventDefault() }
++					>
++						<label
++							htmlFor={ nameId }
++							style={ {
++								display: 'flex',
++								flexDirection: 'column',
++								gap: 'var(--wpds-dimension-gap-xs)',
++								fontSize: 'inherit',
++							} }
++						>
++							Name
++						</label>
++						<input
++							id={ nameId }
++							type="text"
++							placeholder="Enter name"
++						/>
++						<label
++							htmlFor={ emailId }
++							style={ {
++								display: 'flex',
++								flexDirection: 'column',
++								gap: 'var(--wpds-dimension-gap-xs)',
++								fontSize: 'inherit',
++							} }
++						>
++							Email (auto-focused)
++						</label>
++						<input
++							id={ emailId }
++							ref={ emailRef }
++							type="email"
++							placeholder="Enter email"
++						/>
++					</form>
++				</Popover.Popup>
++			</Popover.Root>
++		);
++	},
++};
++
++/**
++ * Set `modal="trap-focus"` on `Popover.Root` to trap keyboard focus inside the
++ * popover without making it fully modal. Unlike `modal={true}`, this mode:
++ *
++ * - Traps Tab/Shift+Tab cycling within the popover
++ * - Does **not** lock page scroll
++ * - Does **not** block pointer interaction outside
++ *
++ * A `Popover.Close` part must be rendered inside the popup so that screen
++ * readers can escape. It can be visually hidden if not needed visually.
++ *
++ * This replaces the legacy Popover's `constrainTabbing` prop. Try tabbing
++ * through the fields — focus stays inside — then click the button outside
++ * to verify that pointer interaction still works.
++ */
++export const TrapFocus: Story = {
++	argTypes: { modal: { control: false } },
++	args: {
++		modal: 'trap-focus' as const,
++	},
++	render: function Render( args ) {
++		return (
++			<div style={ { display: 'flex', gap: '2rem' } }>
++				<Popover.Root { ...args }>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Arrow />
++						<Popover.Title
++							style={ {
++								marginBottom: 'var(--wpds-dimension-gap-xs)',
++							} }
++						>
++							Trap Focus
++						</Popover.Title>
++						<Popover.Description>
++							Tab cycles within this popover, but clicking outside
++							still works.
++						</Popover.Description>
++						<div
++							style={ {
++								display: 'flex',
++								gap: 'var(--wpds-dimension-gap-sm)',
++								marginTop: 'var(--wpds-dimension-gap-sm)',
++							} }
++						>
++							<input placeholder="Field A" />
++							<input placeholder="Field B" />
++							<Popover.Close>Close</Popover.Close>
++						</div>
++					</Popover.Popup>
++				</Popover.Root>
++
++				<button
++					type="button"
++					onClick={ () =>
++						// eslint-disable-next-line no-alert
++						window.alert( 'Outside button clicked!' )
++					}
++				>
++					Outside button
++				</button>
++			</div>
++		);
++	},
++};
++
++/**
++ * Set `openOnHover` on `Popover.Trigger` to open the popover when the trigger
++ * is hovered. The `delay` and `closeDelay` props control the timing (in ms).
++ *
++ * This is a capability the legacy Popover does not have natively — consumers
++ * would need to wire up `mouseenter`/`mouseleave` handlers manually.
++ */
++export const HoverTrigger: Story = {
++	parameters: { controls: { disable: true } },
++	render: function Render( args ) {
++		return (
++			<Popover.Root { ...args }>
++				<Popover.Trigger openOnHover delay={ 200 } closeDelay={ 150 }>
++					Hover me
++				</Popover.Trigger>
++				<Popover.Popup>
++					<Popover.Arrow />
++					<Popover.Title
++						style={ {
++							marginBottom: 'var(--wpds-dimension-gap-xs)',
++						} }
++					>
++						Hover Popover
++					</Popover.Title>
++					<Popover.Description>
++						This popover opens on hover with a 200ms delay and
++						closes 150ms after the pointer leaves.
++					</Popover.Description>
++				</Popover.Popup>
++			</Popover.Root>
++		);
++	},
++};
++
++/**
++ * Popups that open when hovering an info icon should use Popover with the
++ * `openOnHover` prop on the trigger instead of a tooltip. This way, touch
++ * users and screen reader users can access the content.
++ *
++ * To know when to reach for a popover instead of a tooltip, consider the
++ * purpose of the trigger element: If the trigger's purpose is to open the
++ * popup itself, it's a popover. If the trigger's purpose is unrelated to
++ * opening the popup, it's a tooltip.
++ */
++export const InfoTip: Story = {
++	parameters: { controls: { disable: true } },
++	render: function Render( args ) {
++		return (
++			<div
++				style={ {
++					display: 'flex',
++					alignItems: 'center',
++					gap: 'var(--wpds-dimension-gap-xs)',
++				} }
++			>
++				<span>Label</span>
++				<Popover.Root { ...args }>
++					<Popover.Trigger
++						openOnHover
++						delay={ 200 }
++						closeDelay={ 200 }
++						aria-label="More information"
++						style={ {
++							background: 'none',
++							border: 'none',
++							padding: 0,
++							cursor: 'var(--wpds-cursor-control)',
++							display: 'inline-flex',
++							alignItems: 'center',
++							borderRadius: 'var(--wpds-border-radius-sm)',
++						} }
++					>
++						<Icon icon={ info } size={ 20 } />
++					</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Arrow />
++						<VisuallyHidden render={ <Popover.Title /> }>
++							More information
++						</VisuallyHidden>
++						<Popover.Description>
++							This is additional context about the label. Unlike
++							tooltips, this content is accessible to touch and
++							screen reader users.
++						</Popover.Description>
++					</Popover.Popup>
++				</Popover.Root>
++			</div>
++		);
++	},
++};
+diff --git a/packages/ui/src/popover/stories/utils.tsx b/packages/ui/src/popover/stories/utils.tsx
+new file mode 100644
+index 00000000000000..74ce43b01db24d
+--- /dev/null
++++ b/packages/ui/src/popover/stories/utils.tsx
+@@ -0,0 +1,91 @@
++import {
++	createPortal,
++	forwardRef,
++	useCallback,
++	useLayoutEffect,
++	useRef,
++	useState,
++} from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
++import type { RefCallback } from 'react';
++
++/**
++ * Tracks the dimensions of a DOM element via ResizeObserver.
++ * Returns a ref callback to attach to the element and its current size.
++ *
++ * The ref callback performs a synchronous `getBoundingClientRect` read so
++ * the first render already has accurate dimensions (avoids a 0×0 flash).
++ */
++export function useMeasure< TRef extends HTMLElement >() {
++	const [ element, setElement ] = useState< TRef | null >( null );
++	const [ elementSize, setElementSize ] = useState( {
++		width: 0,
++		height: 0,
++	} );
++
++	useLayoutEffect( () => {
++		if ( ! element ) {
++			return;
++		}
++
++		const resizeObserver = new ResizeObserver( () => {
++			const bcr = element.getBoundingClientRect();
++			setElementSize( { width: bcr.width, height: bcr.height } );
++		} );
++		resizeObserver.observe( element );
++
++		return () => {
++			resizeObserver.disconnect();
++		};
++	}, [ element ] );
++
++	const elementRef: RefCallback< TRef > = useCallback( ( node ) => {
++		if ( node ) {
++			const bcr = node.getBoundingClientRect();
++			setElementSize( { width: bcr.width, height: bcr.height } );
++		}
++		setElement( node );
++	}, [] );
++
++	return [ elementRef, elementSize ] as const;
++}
++
++/**
++ * Renders an iframe and portals its `children` into the iframe's body.
++ * Forwards a ref to the underlying `<iframe>` element.
++ *
++ * Waits for the iframe's `load` event before portaling to ensure
++ * compatibility with Firefox.
++ * See https://github.com/facebook/react/issues/22847#issuecomment-991394558
++ */
++export const GenericIframe = forwardRef<
++	HTMLIFrameElement,
++	GenericIframeProps
++>( function GenericIframe( { children, ...props }, ref ) {
++	const [ containerNode, setContainerNode ] = useState< HTMLElement | null >(
++		null
++	);
++	const iframeRef = useRef< HTMLIFrameElement >( null );
++	const mergedRef = useMergeRefs( [ ref, iframeRef ] );
++
++	return (
++		<iframe
++			title="Iframe"
++			{ ...props }
++			ref={ mergedRef }
++			srcDoc="<!doctype html><html><body></body></html>"
++			onLoad={ ( event ) => {
++				const doc = event.currentTarget.contentDocument;
++				if ( doc ) {
++					setContainerNode( doc.body );
++				}
++			} }
++		>
++			{ containerNode && createPortal( children, containerNode ) }
++		</iframe>
++	);
++} );
++
++export type GenericIframeProps = React.ComponentProps< 'iframe' > & {
++	children: React.ReactNode;
++};
+diff --git a/packages/ui/src/popover/style.module.css b/packages/ui/src/popover/style.module.css
+new file mode 100644
+index 00000000000000..d46f66a1f1bfde
+--- /dev/null
++++ b/packages/ui/src/popover/style.module.css
+@@ -0,0 +1,64 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.positioner {
++		z-index: var(--wp-ui-popover-z-index, initial);
++	}
++
++	.popup {
++		background-color: var(--wpds-color-bg-surface-neutral-strong);
++		padding: var(--wpds-dimension-padding-lg);
++		border-radius: var(--wpds-border-radius-md);
++		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
++		box-shadow: var(--wpds-elevation-md);
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wpds-font-size-md);
++		line-height: var(--wpds-font-line-height-md);
++		color: var(--wpds-color-fg-content-neutral);
++		outline: 0;
++	}
++
++	.arrow {
++		display: flex;
++
++		&[data-side="top"] {
++			bottom: -8px;
++			rotate: 180deg;
++		}
++
++		&[data-side="bottom"] {
++			top: -8px;
++			rotate: 0deg;
++		}
++
++		&[data-side="left"] {
++			inset-inline-end: -13px;
++			rotate: 90deg;
++		}
++
++		&[data-side="right"] {
++			inset-inline-start: -13px;
++			rotate: -90deg;
++		}
++	}
++
++	.arrow-fill {
++		fill: var(--wpds-color-bg-surface-neutral-strong);
++	}
++
++	.arrow-stroke {
++		fill: var(--wpds-color-stroke-surface-neutral-weak);
++	}
++
++	.description {
++		color: var(--wpds-color-fg-content-neutral-weak);
++	}
++
++	.backdrop {
++		position: fixed;
++		inset: 0;
++		z-index: var(--wp-ui-popover-z-index, initial);
++		/* TODO: Replace with a WPDS overlay/scrim token when one exists. */
++		background-color: rgba(0, 0, 0, 0.15);
++	}
++}
+diff --git a/packages/ui/src/popover/test/index.test.tsx b/packages/ui/src/popover/test/index.test.tsx
+new file mode 100644
+index 00000000000000..bef3e5358ec723
+--- /dev/null
++++ b/packages/ui/src/popover/test/index.test.tsx
+@@ -0,0 +1,727 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { Component, createRef, useState } from '@wordpress/element';
++import * as Popover from '../index';
++
++describe( 'Popover', () => {
++	describe( 'forwards ref', () => {
++		it( 'should forward ref on Trigger', () => {
++			const ref = createRef< HTMLButtonElement >();
++			render(
++				<Popover.Root>
++					<Popover.Trigger ref={ ref }>Open</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Title>Title</Popover.Title>
++					</Popover.Popup>
++				</Popover.Root>
++			);
++			expect( ref.current ).toBeInstanceOf( HTMLButtonElement );
++		} );
++
++		it( 'should forward ref on Popup', async () => {
++			const user = userEvent.setup();
++			const ref = createRef< HTMLDivElement >();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup ref={ ref }>
++						<Popover.Title>Title</Popover.Title>
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			await waitFor( () => {
++				expect( ref.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++		} );
++
++		it( 'should forward ref on Arrow', async () => {
++			const user = userEvent.setup();
++			const ref = createRef< HTMLDivElement >();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Title>Title</Popover.Title>
++						<Popover.Arrow ref={ ref } />
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			await waitFor( () => {
++				expect( ref.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++		} );
++
++		it( 'should forward ref on Title', async () => {
++			const user = userEvent.setup();
++			const ref = createRef< HTMLHeadingElement >();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Title ref={ ref }>Title</Popover.Title>
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			await waitFor( () => {
++				expect( ref.current ).toBeInstanceOf( HTMLHeadingElement );
++			} );
++		} );
++
++		it( 'should forward ref on Description', async () => {
++			const user = userEvent.setup();
++			const ref = createRef< HTMLParagraphElement >();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Title>Title</Popover.Title>
++						<Popover.Description ref={ ref }>
++							Description
++						</Popover.Description>
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			await waitFor( () => {
++				expect( ref.current ).toBeInstanceOf( HTMLParagraphElement );
++			} );
++		} );
++
++		it( 'should forward ref on Close', async () => {
++			const user = userEvent.setup();
++			const ref = createRef< HTMLButtonElement >();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Title>Title</Popover.Title>
++						<Popover.Close ref={ ref }>Close</Popover.Close>
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			await waitFor( () => {
++				expect( ref.current ).toBeInstanceOf( HTMLButtonElement );
++			} );
++		} );
++	} );
++
++	describe( 'open and close behavior', () => {
++		it( 'should open the popover when the trigger is clicked', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Title>Title</Popover.Title>
++						Popover content
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			expect(
++				screen.queryByText( 'Popover content' )
++			).not.toBeInTheDocument();
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			expect(
++				await screen.findByText( 'Popover content' )
++			).toBeVisible();
++		} );
++
++		it( 'should close the popover when clicking the trigger again', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Toggle</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Title>Title</Popover.Title>
++						Popover content
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			const trigger = screen.getByRole( 'button', {
++				name: 'Toggle',
++			} );
++
++			await user.click( trigger );
++			expect(
++				await screen.findByText( 'Popover content' )
++			).toBeVisible();
++
++			await user.click( trigger );
++			await waitFor( () => {
++				expect(
++					screen.queryByText( 'Popover content' )
++				).not.toBeInTheDocument();
++			} );
++		} );
++
++		it( 'should close the popover when Escape is pressed', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Title>Title</Popover.Title>
++						Popover content
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			expect(
++				await screen.findByText( 'Popover content' )
++			).toBeVisible();
++
++			await user.keyboard( '{Escape}' );
++
++			await waitFor( () => {
++				expect(
++					screen.queryByText( 'Popover content' )
++				).not.toBeInTheDocument();
++			} );
++		} );
++
++		it( 'should close the popover when the Close button is clicked', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Title>Title</Popover.Title>
++						Popover content
++						<Popover.Close>Close</Popover.Close>
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			expect(
++				await screen.findByText( 'Popover content' )
++			).toBeVisible();
++
++			await user.click( screen.getByRole( 'button', { name: 'Close' } ) );
++
++			await waitFor( () => {
++				expect(
++					screen.queryByText( 'Popover content' )
++				).not.toBeInTheDocument();
++			} );
++		} );
++	} );
++
++	describe( 'controlled mode', () => {
++		function ControlledPopover() {
++			const [ open, setOpen ] = useState( false );
++			return (
++				<>
++					<button onClick={ () => setOpen( true ) }>
++						External open
++					</button>
++					<Popover.Root open={ open } onOpenChange={ setOpen }>
++						<Popover.Trigger>Trigger</Popover.Trigger>
++						<Popover.Popup>
++							<Popover.Title>Title</Popover.Title>
++							Controlled content
++						</Popover.Popup>
++					</Popover.Root>
++				</>
++			);
++		}
++
++		it( 'should open via external state', async () => {
++			const user = userEvent.setup();
++
++			render( <ControlledPopover /> );
++
++			expect(
++				screen.queryByText( 'Controlled content' )
++			).not.toBeInTheDocument();
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'External open' } )
++			);
++
++			expect(
++				await screen.findByText( 'Controlled content' )
++			).toBeVisible();
++		} );
++	} );
++
++	describe( 'defaultOpen', () => {
++		it( 'should render open initially when defaultOpen is true', async () => {
++			render(
++				<Popover.Root defaultOpen>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Title>Title</Popover.Title>
++						Default open content
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			expect(
++				await screen.findByText( 'Default open content' )
++			).toBeVisible();
++		} );
++	} );
++
++	describe( 'onOpenChange callback', () => {
++		it( 'should call onOpenChange when the popover opens and closes', async () => {
++			const user = userEvent.setup();
++			const onOpenChange = jest.fn();
++
++			render(
++				<Popover.Root onOpenChange={ onOpenChange }>
++					<Popover.Trigger>Toggle</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Title>Title</Popover.Title>
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Toggle' } )
++			);
++
++			await waitFor( () => {
++				expect( onOpenChange ).toHaveBeenCalledWith(
++					true,
++					expect.anything()
++				);
++			} );
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Toggle' } )
++			);
++
++			await waitFor( () => {
++				expect( onOpenChange ).toHaveBeenCalledWith(
++					false,
++					expect.anything()
++				);
++			} );
++		} );
++	} );
++
++	describe( 'accessibility', () => {
++		it( 'should associate title with the popup via aria-labelledby', async () => {
++			const user = userEvent.setup();
++			const ref = createRef< HTMLDivElement >();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup ref={ ref }>
++						<Popover.Title>My Title</Popover.Title>
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			await waitFor( () => {
++				expect( ref.current ).toHaveAccessibleName( 'My Title' );
++			} );
++		} );
++
++		it( 'should associate description with the popup via aria-describedby', async () => {
++			const user = userEvent.setup();
++			const ref = createRef< HTMLDivElement >();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup ref={ ref }>
++						<Popover.Title>Title</Popover.Title>
++						<Popover.Description>
++							My Description
++						</Popover.Description>
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			await waitFor( () => {
++				expect( ref.current ).toHaveAccessibleDescription(
++					'My Description'
++				);
++			} );
++		} );
++	} );
++
++	describe( 'variant', () => {
++		it( 'should not apply popup styles when variant is unstyled', async () => {
++			const user = userEvent.setup();
++			const unstyledRef = createRef< HTMLDivElement >();
++
++			render(
++				<>
++					<Popover.Root>
++						<Popover.Trigger>Open unstyled</Popover.Trigger>
++						<Popover.Popup ref={ unstyledRef } variant="unstyled">
++							<Popover.Title>Title</Popover.Title>
++							Unstyled content
++						</Popover.Popup>
++					</Popover.Root>
++					<Popover.Root>
++						<Popover.Trigger>Open styled</Popover.Trigger>
++						<Popover.Popup data-testid="styled-popup">
++							<Popover.Title>Title</Popover.Title>
++							Styled content
++						</Popover.Popup>
++					</Popover.Root>
++				</>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open unstyled' } )
++			);
++			expect(
++				await screen.findByText( 'Unstyled content' )
++			).toBeVisible();
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open styled' } )
++			);
++			const styledPopup = await screen.findByTestId( 'styled-popup' );
++
++			const styledClasses = Array.from( styledPopup.classList );
++			for ( const cls of styledClasses ) {
++				expect( unstyledRef.current! ).not.toHaveClass( cls );
++			}
++		} );
++	} );
++
++	describe( 'inline (via container)', () => {
++		function InlinePopover() {
++			const containerRef = createRef< HTMLSpanElement >();
++			return (
++				<div data-testid="inline-wrapper">
++					<Popover.Root>
++						<Popover.Trigger>Open</Popover.Trigger>
++						<span
++							ref={ containerRef }
++							style={ { display: 'contents' } }
++						/>
++						<Popover.Popup container={ containerRef }>
++							<Popover.Title>Title</Popover.Title>
++							Inline content
++						</Popover.Popup>
++					</Popover.Root>
++				</div>
++			);
++		}
++
++		it( 'should render inside the container when a local ref is used', async () => {
++			const user = userEvent.setup();
++
++			render( <InlinePopover /> );
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			const content = await screen.findByText( 'Inline content' );
++			expect( content ).toBeVisible();
++
++			expect( screen.getByTestId( 'inline-wrapper' ) ).toContainElement(
++				content
++			);
++		} );
++
++		it( 'should render with a portal by default', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<div data-testid="portal-wrapper">
++					<Popover.Root>
++						<Popover.Trigger>Open</Popover.Trigger>
++						<Popover.Popup>
++							<Popover.Title>Title</Popover.Title>
++							Portal content
++						</Popover.Popup>
++					</Popover.Root>
++				</div>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			const content = await screen.findByText( 'Portal content' );
++			expect( content ).toBeVisible();
++
++			expect(
++				screen.getByTestId( 'portal-wrapper' )
++			).not.toContainElement( content );
++		} );
++	} );
++
++	describe( 'anchor', () => {
++		it( 'should render the popup when an anchor element is provided without a trigger', async () => {
++			function AnchorTest() {
++				const [ anchorEl, setAnchorEl ] =
++					useState< HTMLDivElement | null >( null );
++				return (
++					<>
++						<div ref={ setAnchorEl } data-testid="anchor">
++							Anchor element
++						</div>
++						<Popover.Root defaultOpen>
++							<Popover.Popup anchor={ anchorEl ?? undefined }>
++								<Popover.Title>Title</Popover.Title>
++								Anchored content
++							</Popover.Popup>
++						</Popover.Root>
++					</>
++				);
++			}
++
++			render( <AnchorTest /> );
++
++			expect(
++				await screen.findByText( 'Anchored content' )
++			).toBeVisible();
++		} );
++	} );
++
++	describe( 'initialFocus', () => {
++		it( 'should focus the first content element, skipping the close button', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Title>Title</Popover.Title>
++						<Popover.Close>Close</Popover.Close>
++						<button>Content Button</button>
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			await waitFor( () => {
++				expect(
++					screen.getByRole( 'button', {
++						name: 'Content Button',
++					} )
++				).toHaveFocus();
++			} );
++		} );
++
++		it( 'should fall back to the close button when it is the only tabbable element', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup>
++						<Popover.Title>Title</Popover.Title>
++						<Popover.Close>Close</Popover.Close>
++						<p>No tabbable content here</p>
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			await waitFor( () => {
++				expect(
++					screen.getByRole( 'button', { name: 'Close' } )
++				).toHaveFocus();
++			} );
++		} );
++
++		it( 'should not move focus when initialFocus is false', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup initialFocus={ false }>
++						<Popover.Title>Title</Popover.Title>
++						<Popover.Close>Close</Popover.Close>
++						<button>Content Button</button>
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			const contentButton = await screen.findByRole( 'button', {
++				name: 'Content Button',
++			} );
++			expect( contentButton ).toBeVisible();
++			expect( contentButton ).not.toHaveFocus();
++			expect(
++				screen.getByRole( 'button', { name: 'Close' } )
++			).not.toHaveFocus();
++		} );
++
++		it( 'should use a custom initialFocus callback as-is', async () => {
++			const user = userEvent.setup();
++			const customFocus = jest.fn( () => false as const );
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup initialFocus={ customFocus }>
++						<Popover.Title>Title</Popover.Title>
++						<Popover.Close>Close</Popover.Close>
++						<button>Content Button</button>
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			expect(
++				await screen.findByRole( 'button', {
++					name: 'Content Button',
++				} )
++			).toBeVisible();
++
++			expect( customFocus ).toHaveBeenCalled();
++		} );
++	} );
++
++	describe( 'title validation', () => {
++		it( 'should throw when Popover.Title is missing', async () => {
++			const user = userEvent.setup();
++			const onError = jest.fn();
++
++			// Suppress console.error from React error boundary
++			const spy = jest
++				.spyOn( console, 'error' )
++				.mockImplementation( () => {} );
++
++			render(
++				<ErrorBoundary onError={ onError }>
++					<Popover.Root>
++						<Popover.Trigger>Open</Popover.Trigger>
++						<Popover.Popup>No title here</Popover.Popup>
++					</Popover.Root>
++				</ErrorBoundary>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			await waitFor( () => {
++				expect( onError ).toHaveBeenCalledWith(
++					expect.objectContaining( {
++						message: expect.stringContaining(
++							'Missing <Popover.Title>'
++						),
++					} )
++				);
++			} );
++
++			spy.mockRestore();
++		} );
++
++		it( 'should throw when Popover.Title is empty', async () => {
++			const user = userEvent.setup();
++			const onError = jest.fn();
++
++			const spy = jest
++				.spyOn( console, 'error' )
++				.mockImplementation( () => {} );
++
++			render(
++				<ErrorBoundary onError={ onError }>
++					<Popover.Root>
++						<Popover.Trigger>Open</Popover.Trigger>
++						<Popover.Popup>
++							<Popover.Title />
++						</Popover.Popup>
++					</Popover.Root>
++				</ErrorBoundary>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			await waitFor( () => {
++				expect( onError ).toHaveBeenCalledWith(
++					expect.objectContaining( {
++						message: expect.stringContaining( 'cannot be empty' ),
++					} )
++				);
++			} );
++
++			spy.mockRestore();
++		} );
++
++		it( 'should not throw when Popover.Title is present', async () => {
++			const user = userEvent.setup();
++			const onError = jest.fn();
++
++			render(
++				<ErrorBoundary onError={ onError }>
++					<Popover.Root>
++						<Popover.Trigger>Open</Popover.Trigger>
++						<Popover.Popup>
++							<Popover.Title>Valid Title</Popover.Title>
++						</Popover.Popup>
++					</Popover.Root>
++				</ErrorBoundary>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			await waitFor( () => {
++				expect( screen.getByText( 'Valid Title' ) ).toBeVisible();
++			} );
++
++			expect( onError ).not.toHaveBeenCalled();
++		} );
++	} );
++} );
++
++class ErrorBoundary extends Component<
++	{ children: React.ReactNode; onError: ( error: Error ) => void },
++	{ hasError: boolean }
++> {
++	state = { hasError: false };
++
++	static getDerivedStateFromError() {
++		return { hasError: true };
++	}
++
++	componentDidCatch( error: Error ) {
++		this.props.onError( error );
++	}
++
++	render() {
++		if ( this.state.hasError ) {
++			return null;
++		}
++		return this.props.children;
++	}
++}
+diff --git a/packages/ui/src/popover/title.tsx b/packages/ui/src/popover/title.tsx
+new file mode 100644
+index 00000000000000..51199f8a910044
+--- /dev/null
++++ b/packages/ui/src/popover/title.tsx
+@@ -0,0 +1,50 @@
++import { Popover as _Popover } from '@base-ui/react/popover';
++import { useMergeRefs } from '@wordpress/compose';
++import { forwardRef, useLayoutEffect, useRef } from '@wordpress/element';
++import { Text } from '../text';
++import { usePopoverValidationContext } from './context';
++import type { TitleProps } from './types';
++
++/**
++ * Renders a heading that labels the popover for accessibility.
++ *
++ * **Required** — every popover must include a `Popover.Title`, even if
++ * visually hidden. The rendered element is linked to the popup via
++ * `aria-labelledby`. Uses the `heading-xl` text variant, matching Dialog.
++ *
++ * To visually hide the title while keeping it accessible, wrap it with
++ * `VisuallyHidden` using the `render` prop:
++ *
++ * ```jsx
++ * <VisuallyHidden render={ <Popover.Title /> }>
++ *   Accessible title text
++ * </VisuallyHidden>
++ * ```
++ */
++const Title = forwardRef< HTMLHeadingElement, TitleProps >(
++	function PopoverTitle(
++		{ className, children, render, ...props },
++		forwardedRef
++	) {
++		const validationContext = usePopoverValidationContext();
++		const internalRef = useRef< HTMLHeadingElement >( null );
++		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
++
++		useLayoutEffect( () => {
++			validationContext?.registerTitle( internalRef.current );
++		}, [ validationContext ] );
++
++		return (
++			<Text
++				ref={ mergedRef }
++				variant="heading-xl"
++				render={ <_Popover.Title render={ render } { ...props } /> }
++				className={ className }
++			>
++				{ children }
++			</Text>
++		);
++	}
++);
++
++export { Title };
+diff --git a/packages/ui/src/popover/trigger.tsx b/packages/ui/src/popover/trigger.tsx
+new file mode 100644
+index 00000000000000..dda283281e4385
+--- /dev/null
++++ b/packages/ui/src/popover/trigger.tsx
+@@ -0,0 +1,17 @@
++import { Popover as _Popover } from '@base-ui/react/popover';
++import { forwardRef } from '@wordpress/element';
++import type { TriggerProps } from './types';
++
++/**
++ * Renders a button that toggles the popover popup when clicked.
++ *
++ * Renders as a `<button>` by default. Also supports hover-triggered
++ * popovers via the `openOnHover`, `delay`, and `closeDelay` props.
++ */
++const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
++	function PopoverTrigger( props, ref ) {
++		return <_Popover.Trigger ref={ ref } { ...props } />;
++	}
++);
++
++export { Trigger };
+diff --git a/packages/ui/src/popover/types.ts b/packages/ui/src/popover/types.ts
+new file mode 100644
+index 00000000000000..353bf278b6a349
+--- /dev/null
++++ b/packages/ui/src/popover/types.ts
+@@ -0,0 +1,113 @@
++import type { ReactNode } from 'react';
++import type { Popover as _Popover } from '@base-ui/react/popover';
++import type { ComponentProps } from '../utils/types';
++
++export interface RootProps
++	extends Pick<
++		_Popover.Root.Props,
++		'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
++	> {
++	/**
++	 * The popover sub-components (`Popover.Trigger`, `Popover.Popup`, etc.).
++	 */
++	children?: ReactNode;
++}
++
++export interface TriggerProps
++	extends ComponentProps< 'button' >,
++		Pick< _Popover.Trigger.Props, 'openOnHover' | 'delay' | 'closeDelay' > {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++}
++
++/**
++ * `Popover.Popup` maps to two Base UI elements internally: the
++ * **Positioner** (outer, handles fixed positioning and z-index) and the
++ * **Popup** (inner, holds content and visual styles).
++ *
++ * `style` and `className` are forwarded to the **Positioner** so that
++ * z-index overrides (`--wp-ui-popover-z-index`) and Base UI CSS variables
++ * (`--available-height`, `--available-width`) work correctly. All other
++ * HTML attributes are forwarded to the inner **Popup** element.
++ */
++export interface PopupProps
++	extends ComponentProps< 'div' >,
++		Pick<
++			_Popover.Positioner.Props,
++			| 'align'
++			| 'alignOffset'
++			| 'anchor'
++			| 'arrowPadding'
++			| 'collisionAvoidance'
++			| 'collisionBoundary'
++			| 'collisionPadding'
++			| 'side'
++			| 'sideOffset'
++			| 'sticky'
++		>,
++		Pick< _Popover.Popup.Props, 'initialFocus' | 'finalFocus' > {
++	/**
++	 * Whether to render a backdrop overlay behind the popover.
++	 *
++	 * Typically used with `modal` to signal that interaction with the rest
++	 * of the page is blocked. The backdrop is a semi-transparent dark overlay.
++	 *
++	 * @default false
++	 */
++	backdrop?: boolean;
++
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++
++	/**
++	 * A parent element to render the portal into.
++	 *
++	 * Useful for cross-document rendering, such as rendering a popover
++	 * in a parent document when the trigger is inside an iframe.
++	 */
++	container?: _Popover.Portal.Props[ 'container' ];
++
++	/**
++	 * The visual style variant of the popup.
++	 *
++	 * - `'default'` — standard surface styling with background, padding,
++	 *    border radius, and shadow.
++	 * - `'unstyled'` — no visual treatment; useful as a blank positioning
++	 *    container for fully custom content.
++	 *
++	 * @default 'default'
++	 */
++	variant?: 'default' | 'unstyled';
++}
++
++export interface ArrowProps extends ComponentProps< 'div' > {
++	/**
++	 * Custom arrow visuals to render inside the positioned container.
++	 */
++	children?: ReactNode;
++}
++
++export interface TitleProps extends ComponentProps< 'h2' > {
++	/**
++	 * The title content to be rendered.
++	 */
++	children?: ReactNode;
++}
++
++export interface DescriptionProps extends ComponentProps< 'p' > {
++	/**
++	 * The description content to be rendered.
++	 */
++	children?: ReactNode;
++}
++
++export interface CloseProps extends ComponentProps< 'button' > {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++}
+diff --git a/packages/ui/src/utils/use-deprioritized-initial-focus.ts b/packages/ui/src/utils/use-deprioritized-initial-focus.ts
+index 6a925d7ecdc34d..ac1dbe97ddc6bb 100644
+--- a/packages/ui/src/utils/use-deprioritized-initial-focus.ts
++++ b/packages/ui/src/utils/use-deprioritized-initial-focus.ts
+@@ -1,12 +1,13 @@
+-import type { Dialog as _Dialog } from '@base-ui/react/dialog';
++import type { Popover as _Popover } from '@base-ui/react/popover';
+ import { useMemo, useRef } from '@wordpress/element';
+ import { tabbable } from 'tabbable';
+ 
+ /**
+- * Derived from Base UI's `Dialog.Popup.Props['initialFocus']`.
+- * The same type is shared by all Base UI overlay popups (Dialog, Popover, etc.).
++ * The `initialFocus` type shared by Base UI overlay popups (Dialog, Popover,
++ * AlertDialog, etc.). We derive it from `Popover.Popup.Props` here, but it
++ * is identical across all overlay components.
+  */
+-type InitialFocus = _Dialog.Popup.Props[ 'initialFocus' ];
++type InitialFocus = _Popover.Popup.Props[ 'initialFocus' ];
+ 
+ /**
+  * Options matching Base UI's internal tabbable configuration.

@@ -1,0 +1,86 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 21d968568374b4..7ed9fc6779bbae 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ -   `ColorPalette`: show "Clear" button even when colors array is empty ([#46001](https://github.com/WordPress/gutenberg/pull/46001)).
+ -   `InputControl`: Fix internal `Flex` wrapper usage that could add an unintended `height: 100%` ([#46213](https://github.com/WordPress/gutenberg/pull/46213)).
+ -   `Navigator`: Allow calling `goTo` and `goBack` twice in one render cycle ([#46391](https://github.com/WordPress/gutenberg/pull/46391)).
++-   `Modal`: Fix unexpected modal closing in IME Composition ([#46453](https://github.com/WordPress/gutenberg/pull/46453)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 8c4f3a8535704d..10316b56993c40 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -98,6 +98,17 @@ function UnforwardedModal(
+ 	}, [ bodyOpenClassName ] );
+ 
+ 	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
++		if (
++			// Ignore keydowns from IMEs
++			event.nativeEvent.isComposing ||
++			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
++			// is `isComposing=false`, even though it's technically still part of the composition.
++			// These can only be detected by keyCode.
++			event.keyCode === 229
++		) {
++			return;
++		}
++
+ 		if (
+ 			shouldCloseOnEsc &&
+ 			event.code === 'Escape' &&
+diff --git a/packages/components/src/modal/stories/index.tsx b/packages/components/src/modal/stories/index.tsx
+index 42b7874b1eeaab..7f414d47c2d11c 100644
+--- a/packages/components/src/modal/stories/index.tsx
++++ b/packages/components/src/modal/stories/index.tsx
+@@ -12,6 +12,7 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Button from '../../button';
++import InputControl from '../../input-control';
+ import Modal from '../';
+ import type { ModalProps } from '../types';
+ 
+@@ -75,6 +76,8 @@ const Template: ComponentStory< typeof Modal > = ( {
+ 						anim id est laborum.
+ 					</p>
+ 
++					<InputControl style={ { marginBottom: '20px' } } />
++
+ 					<Button variant="secondary" onClick={ closeModal }>
+ 						Close Modal
+ 					</Button>
+diff --git a/packages/components/src/modal/test/index.tsx b/packages/components/src/modal/test/index.tsx
+index a0778bfb8aab8b..310dc3d6e63a9f 100644
+--- a/packages/components/src/modal/test/index.tsx
++++ b/packages/components/src/modal/test/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import { render, screen, within } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
+ 
+ /**
+  * Internal dependencies
+@@ -69,4 +70,18 @@ describe( 'Modal', () => {
+ 		const title = within( dialog ).queryByText( 'Test Title' );
+ 		expect( title ).not.toBeInTheDocument();
+ 	} );
++
++	it( 'should call onRequestClose when the escape key is pressed', async () => {
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
++		const onRequestClose = jest.fn();
++		render(
++			<Modal onRequestClose={ onRequestClose }>
++				<p>Modal content</p>
++			</Modal>
++		);
++		await user.keyboard( '[Escape]' );
++		expect( onRequestClose ).toHaveBeenCalled();
++	} );
+ } );

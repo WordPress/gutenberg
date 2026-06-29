@@ -1,0 +1,184 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a9416b25c5ff05..29e14218cc56a5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `ComboboxControl`: Fix ComboboxControl reset button when using the keyboard. ([#63410](https://github.com/WordPress/gutenberg/pull/63410))
+ -   `Button`: Never apply `aria-disabled` to anchor ([#63376](https://github.com/WordPress/gutenberg/pull/63376)).
+ 
+ ### Internal
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index d22bbba2a9d24a..a39a5dc1fc541a 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -267,6 +267,15 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 		inputContainer.current?.focus();
+ 	};
+ 
++	// Stop propagation of the keydown event when pressing Enter on the Reset
++	// button to prevent calling the onKeydown callback on the container div
++	// element which actually sets the selected suggestion.
++	const handleResetStopPropagation: React.KeyboardEventHandler<
++		HTMLButtonElement
++	> = ( event ) => {
++		event.stopPropagation();
++	};
++
+ 	// Update current selections when the filter input changes.
+ 	useEffect( () => {
+ 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
+@@ -350,6 +359,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 									// eslint-disable-next-line no-restricted-syntax
+ 									disabled={ ! value }
+ 									onClick={ handleOnReset }
++									onKeyDown={ handleResetStopPropagation }
+ 									label={ __( 'Reset' ) }
+ 								/>
+ 							</FlexItem>
+diff --git a/packages/components/src/combobox-control/test/index.tsx b/packages/components/src/combobox-control/test/index.tsx
+index 37802e4669c244..76ce9cc4724c54 100644
+--- a/packages/components/src/combobox-control/test/index.tsx
++++ b/packages/components/src/combobox-control/test/index.tsx
+@@ -89,7 +89,6 @@ describe.each( [
+ 			<Component options={ timezones } label={ defaultLabelText } />
+ 		);
+ 		const label = getLabel( defaultLabelText );
+-		expect( label ).toBeInTheDocument();
+ 		expect( label ).toBeVisible();
+ 	} );
+ 
+@@ -306,4 +305,131 @@ describe.each( [
+ 		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
+ 		expect( input ).toHaveValue( targetOption.label );
+ 	} );
++
++	it( 'should render with Reset button disabled', () => {
++		render(
++			<Component
++				options={ timezones }
++				label={ defaultLabelText }
++				allowReset
++			/>
++		);
++
++		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
++
++		expect( resetButton ).toBeVisible();
++		expect( resetButton ).toBeDisabled();
++	} );
++
++	it( 'should reset input when clicking the Reset button', async () => {
++		const user = await userEvent.setup();
++		const targetOption = timezones[ 13 ];
++
++		render(
++			<Component
++				options={ timezones }
++				label={ defaultLabelText }
++				allowReset
++			/>
++		);
++
++		// Pressing tab selects the input and shows the options.
++		await user.tab();
++		// Type enough characters to ensure a predictable search result.
++		await user.keyboard( getOptionSearchString( targetOption ) );
++		// Pressing Enter/Return selects the currently focused option.
++		await user.keyboard( '{Enter}' );
++
++		const input = getInput( defaultLabelText );
++
++		expect( input ).toHaveValue( targetOption.label );
++
++		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
++
++		expect( resetButton ).toBeEnabled();
++
++		await user.click( resetButton );
++
++		expect( input ).toHaveValue( '' );
++		expect( resetButton ).toBeDisabled();
++		expect( input ).toHaveFocus();
++	} );
++
++	it( 'should reset input when pressing the Reset button with the Enter key', async () => {
++		const user = await userEvent.setup();
++		const targetOption = timezones[ 13 ];
++
++		render(
++			<Component
++				options={ timezones }
++				label={ defaultLabelText }
++				allowReset
++			/>
++		);
++
++		// Pressing tab selects the input and shows the options.
++		await user.tab();
++		// Type enough characters to ensure a predictable search result.
++		await user.keyboard( getOptionSearchString( targetOption ) );
++		// Pressing Enter/Return selects the currently focused option.
++		await user.keyboard( '{Enter}' );
++
++		const input = getInput( defaultLabelText );
++
++		expect( input ).toHaveValue( targetOption.label );
++
++		// Pressing tab moves focus to the Reset buttons
++		await user.tab();
++
++		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
++
++		// If the button has focus that implies it is enabled.
++		expect( resetButton ).toHaveFocus();
++
++		// Pressing Enter/Return resets the input.
++		await user.keyboard( '{Enter}' );
++
++		expect( input ).toHaveValue( '' );
++		expect( resetButton ).toBeDisabled();
++		expect( input ).toHaveFocus();
++	} );
++
++	it( 'should reset input when pressing the Reset button with the Spacebar key', async () => {
++		const user = await userEvent.setup();
++		const targetOption = timezones[ 13 ];
++
++		render(
++			<Component
++				options={ timezones }
++				label={ defaultLabelText }
++				allowReset
++			/>
++		);
++
++		// Pressing tab selects the input and shows the options.
++		await user.tab();
++		// Type enough characters to ensure a predictable search result.
++		await user.keyboard( getOptionSearchString( targetOption ) );
++		// Pressing Enter/Return selects the currently focused option.
++		await user.keyboard( '{Enter}' );
++
++		const input = getInput( defaultLabelText );
++
++		expect( input ).toHaveValue( targetOption.label );
++
++		// Pressing tab moves focus to the Reset buttons.
++		await user.tab();
++
++		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
++
++		// If the button has focus that implies it is enabled.
++		expect( resetButton ).toHaveFocus();
++
++		// Pressing Spacebar resets the input.
++		await user.keyboard( '[Space]' );
++
++		expect( input ).toHaveValue( '' );
++		expect( resetButton ).toBeDisabled();
++		expect( input ).toHaveFocus();
++	} );
+ } );

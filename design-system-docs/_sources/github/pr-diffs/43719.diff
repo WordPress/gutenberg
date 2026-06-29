@@ -1,0 +1,98 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5eb01848efc9bb..28d31aee885713 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,11 @@
+ -   `ToggleControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43717](https://github.com/WordPress/gutenberg/pull/43717)). 
+ -   `CheckboxControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43720](https://github.com/WordPress/gutenberg/pull/43720)).
+ 
++### Enhancements
++
++-   `CardHeader`, `CardBody`, `CardFooter`: Tweak `isShady` background colors to be consistent with the grays in `@wordpress/base-styles` ([#43719](https://github.com/WordPress/gutenberg/pull/43719)).
++-   `InputControl`, `SelectControl`: Tweak `disabled` colors to be consistent with the grays in `@wordpress/base-styles` ([#43719](https://github.com/WordPress/gutenberg/pull/43719)).
++
+ ### Internal
+ 
+ -   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
+diff --git a/packages/components/src/card/styles.ts b/packages/components/src/card/styles.ts
+index ad08bf2690e8fa..fa70b19054e2fc 100644
+--- a/packages/components/src/card/styles.ts
++++ b/packages/components/src/card/styles.ts
+@@ -115,5 +115,5 @@ export const cardPaddings = {
+ };
+ 
+ export const shady = css`
+-	background-color: ${ COLORS.lightGray[ 200 ] };
++	background-color: ${ COLORS.ui.backgroundDisabled };
+ `;
+diff --git a/packages/components/src/card/test/__snapshots__/index.tsx.snap b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+index 8004af489ee7ce..c7329fb8c111df 100644
+--- a/packages/components/src/card/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+@@ -26,7 +26,7 @@ Snapshot Diff:
+   <div>
+     <div
+ -     class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium e19lxcc00"
+-+     class="components-card__body components-card-body css-kqnlb3-View-Body-borderRadius-medium-shady e19lxcc00"
+++     class="components-card__body components-card-body css-1nhkags-View-Body-borderRadius-medium-shady e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -43,7 +43,7 @@ Snapshot Diff:
+   <div>
+     <div
+ -     class="components-flex components-card__footer components-card-footer css-p1v47q-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__footer components-card-footer css-1xx98hc-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
+++     class="components-flex components-card__footer components-card-footer css-skr34d-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -77,7 +77,7 @@ Snapshot Diff:
+   <div>
+     <div
+ -     class="components-flex components-card__header components-card-header css-1g5oj2q-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__header components-card-header css-121pfkj-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
+++     class="components-flex components-card__header components-card-header css-1gv9wvv-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardHeader"
+     >
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index 00bfe83d65c3c1..83c3a6381f0f38 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -22,18 +22,18 @@ const GRAY = {
+ 	100: '#f0f0f0',
+ };
+ 
++// TODO: Replace usages of these with the equivalents in `GRAY`
+ const DARK_GRAY = {
+ 	500: '#555d66', // Use this most of the time for dark items.
+ 	300: '#6c7781', // Lightest gray that can be used for AA text contrast.
+-	150: '#8d96a0', // Lightest gray that can be used for AA non-text contrast.
+ };
+ 
++// TODO: Replace usages of these with the equivalents in `GRAY`
+ const LIGHT_GRAY = {
+ 	800: '#b5bcc2',
+ 	600: '#d7dade',
+ 	400: '#e8eaeb', // Good for "readonly" input fields and special text selection.
+ 	300: '#edeff0',
+-	200: '#f3f4f5',
+ };
+ 
+ // Matches @wordpress/base-styles
+@@ -52,12 +52,12 @@ const ADMIN = {
+ const UI = {
+ 	theme: ADMIN.theme,
+ 	background: white,
+-	backgroundDisabled: LIGHT_GRAY[ 200 ], // TODO: Replace with WordPress gray
++	backgroundDisabled: GRAY[ 100 ],
+ 	border: GRAY[ 700 ],
+ 	borderHover: GRAY[ 700 ],
+ 	borderFocus: ADMIN.themeDark10,
+ 	borderDisabled: GRAY[ 400 ],
+-	textDisabled: DARK_GRAY[ 150 ], // TODO: Replace with WordPress gray
++	textDisabled: GRAY[ 600 ],
+ 	textDark: white,
+ 
+ 	// Matches @wordpress/base-styles

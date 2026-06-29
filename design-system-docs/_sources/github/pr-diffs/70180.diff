@@ -1,0 +1,75 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 089a5c139a7323..a42abccf3874e9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancement
++
++-   `ComboboxControl`: Handle Unicode characters when matching values ([#70180](https://github.com/WordPress/gutenberg/pull/70180)).
++
+ ## 29.10.0 (2025-05-22)
+ 
+ ### Enhancement
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 987c75d769b727..42a45063eeb80d 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -516,7 +516,10 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 			match = match.toLocaleLowerCase();
+ 
+ 			_suggestions.forEach( ( suggestion ) => {
+-				const index = suggestion.toLocaleLowerCase().indexOf( match );
++				const index = suggestion
++					.normalize( 'NFKC' )
++					.toLocaleLowerCase()
++					.indexOf( match );
+ 				if ( normalizedValue.indexOf( suggestion ) === -1 ) {
+ 					if ( index === 0 ) {
+ 						startsWithMatch.push( suggestion );
+diff --git a/packages/components/src/form-token-field/suggestions-list.tsx b/packages/components/src/form-token-field/suggestions-list.tsx
+index 1339e0cc189e38..23be6b7b5b2431 100644
+--- a/packages/components/src/form-token-field/suggestions-list.tsx
++++ b/packages/components/src/form-token-field/suggestions-list.tsx
+@@ -79,6 +79,7 @@ export function SuggestionsList<
+ 
+ 		const transformedSuggestion = displayTransform( suggestion );
+ 		const indexOfMatch = transformedSuggestion
++			.normalize( 'NFKC' )
+ 			.toLocaleLowerCase()
+ 			.indexOf( matchText );
+ 
+diff --git a/packages/components/src/utils/strings.ts b/packages/components/src/utils/strings.ts
+index e15886da61f5a6..580303c2f9e9d4 100644
+--- a/packages/components/src/utils/strings.ts
++++ b/packages/components/src/utils/strings.ts
+@@ -20,6 +20,7 @@ const ALL_UNICODE_DASH_CHARACTERS = new RegExp(
+ 
+ export const normalizeTextString = ( value: string ): string => {
+ 	return removeAccents( value )
++		.normalize( 'NFKC' )
+ 		.toLocaleLowerCase()
+ 		.replace( ALL_UNICODE_DASH_CHARACTERS, '-' );
+ };
+diff --git a/packages/components/src/utils/test/strings.js b/packages/components/src/utils/test/strings.js
+index 7d03075897318f..eafeb2101904ff 100644
+--- a/packages/components/src/utils/test/strings.js
++++ b/packages/components/src/utils/test/strings.js
+@@ -169,4 +169,15 @@ describe( 'normalizeTextString', () => {
+ 			'-'.repeat( dashCharacters.length )
+ 		);
+ 	} );
++
++	it( 'should normalize unicode to standard characters', () => {
++		expect( normalizeTextString( '①' ) ).toBe( '1' );
++		expect( normalizeTextString( 'Ⅸ' ) ).toBe( 'ix' );
++		expect( normalizeTextString( 'MC²' ) ).toBe( 'mc2' );
++		expect( normalizeTextString( 'ＰｌａｙＳｔａｔｉｏｎ　２' ) ).toBe(
++			'playstation 2'
++		);
++		expect( normalizeTextString( 'ＡＢＣ' ) ).toBe( 'abc' );
++		expect( normalizeTextString( 'Amélie' ) ).toBe( 'amelie' );
++	} );
+ } );

@@ -1,0 +1,1688 @@
+diff --git a/packages/block-editor/src/components/background-image-control/index.js b/packages/block-editor/src/components/background-image-control/index.js
+index 20cdd4d02cb44a..3b765302100ecc 100644
+--- a/packages/block-editor/src/components/background-image-control/index.js
++++ b/packages/block-editor/src/components/background-image-control/index.js
+@@ -9,7 +9,6 @@ import clsx from 'clsx';
+ import {
+ 	ToggleControl,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ 	__experimentalUnitControl as UnitControl,
+ 	__experimentalVStack as VStack,
+ 	DropZone,
+@@ -580,7 +579,7 @@ function BackgroundSizeControls( {
+ 					sizeValue || defaultValues?.backgroundSize
+ 				) }
+ 			>
+-				<ToggleGroupControlOption
++				<ToggleGroupControl.Option
+ 					key="cover"
+ 					value="cover"
+ 					label={ _x(
+@@ -588,7 +587,7 @@ function BackgroundSizeControls( {
+ 						'Size option for background image control'
+ 					) }
+ 				/>
+-				<ToggleGroupControlOption
++				<ToggleGroupControl.Option
+ 					key="contain"
+ 					value="contain"
+ 					label={ _x(
+@@ -596,7 +595,7 @@ function BackgroundSizeControls( {
+ 						'Size option for background image control'
+ 					) }
+ 				/>
+-				<ToggleGroupControlOption
++				<ToggleGroupControl.Option
+ 					key="tile"
+ 					value="auto"
+ 					label={ _x(
+diff --git a/packages/block-editor/src/components/block-variation-transforms/index.js b/packages/block-editor/src/components/block-variation-transforms/index.js
+index 42b6f626af5a10..8dd50fd48c49c4 100644
+--- a/packages/block-editor/src/components/block-variation-transforms/index.js
++++ b/packages/block-editor/src/components/block-variation-transforms/index.js
+@@ -9,7 +9,6 @@ import {
+ 	MenuGroup,
+ 	MenuItemsChoice,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+ 	VisuallyHidden,
+ } from '@wordpress/components';
+ import { useSelect, useDispatch } from '@wordpress/data';
+@@ -115,7 +114,7 @@ function VariationsToggleGroupControl( {
+ 				__nextHasNoMarginBottom
+ 			>
+ 				{ variations.map( ( variation ) => (
+-					<ToggleGroupControlOptionIcon
++					<ToggleGroupControl.OptionIcon
+ 						key={ variation.name }
+ 						icon={
+ 							<BlockIcon icon={ variation.icon } showColors />
+diff --git a/packages/block-editor/src/components/child-layout-control/index.js b/packages/block-editor/src/components/child-layout-control/index.js
+index 7f3c7c16188ede..6a166a963a5f62 100644
+--- a/packages/block-editor/src/components/child-layout-control/index.js
++++ b/packages/block-editor/src/components/child-layout-control/index.js
+@@ -3,7 +3,6 @@
+  */
+ import {
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ 	__experimentalUnitControl as UnitControl,
+ 	__experimentalInputControl as InputControl,
+ 	__experimentalHStack as HStack,
+@@ -152,7 +151,7 @@ function FlexControls( {
+ 				} }
+ 				isBlock
+ 			>
+-				<ToggleGroupControlOption
++				<ToggleGroupControl.Option
+ 					key="fit"
+ 					value="fit"
+ 					label={ _x(
+@@ -160,7 +159,7 @@ function FlexControls( {
+ 						'Intrinsic block width in flex layout'
+ 					) }
+ 				/>
+-				<ToggleGroupControlOption
++				<ToggleGroupControl.Option
+ 					key="fill"
+ 					value="fill"
+ 					label={ _x(
+@@ -168,7 +167,7 @@ function FlexControls( {
+ 						'Block with expanding width in flex layout'
+ 					) }
+ 				/>
+-				<ToggleGroupControlOption
++				<ToggleGroupControl.Option
+ 					key="fixed"
+ 					value="fixed"
+ 					label={ _x(
+diff --git a/packages/block-editor/src/components/dimensions-tool/scale-tool.js b/packages/block-editor/src/components/dimensions-tool/scale-tool.js
+index a23fad586d4705..77731b6f5833f5 100644
+--- a/packages/block-editor/src/components/dimensions-tool/scale-tool.js
++++ b/packages/block-editor/src/components/dimensions-tool/scale-tool.js
+@@ -4,7 +4,6 @@
+ import {
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ } from '@wordpress/components';
+ import { useMemo } from '@wordpress/element';
+ import { __, _x } from '@wordpress/i18n';
+@@ -114,7 +113,7 @@ export default function ScaleTool( {
+ 				size="__unstable-large"
+ 			>
+ 				{ options.map( ( option ) => (
+-					<ToggleGroupControlOption
++					<ToggleGroupControl.Option
+ 						key={ option.value }
+ 						{ ...option }
+ 					/>
+diff --git a/packages/block-editor/src/components/image-size-control/index.js b/packages/block-editor/src/components/image-size-control/index.js
+index 1cd2b51054e7ee..d62bbe17532959 100644
+--- a/packages/block-editor/src/components/image-size-control/index.js
++++ b/packages/block-editor/src/components/image-size-control/index.js
+@@ -6,7 +6,6 @@ import {
+ 	__experimentalNumberControl as NumberControl,
+ 	__experimentalHStack as HStack,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ } from '@wordpress/components';
+ import { __, sprintf } from '@wordpress/i18n';
+ 
+@@ -134,7 +133,7 @@ export default function ImageSizeControl( {
+ 					>
+ 						{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
+ 							return (
+-								<ToggleGroupControlOption
++								<ToggleGroupControl.Option
+ 									key={ scale }
+ 									value={ scale }
+ 									label={ sprintf(
+diff --git a/packages/block-editor/src/components/text-alignment-control/index.js b/packages/block-editor/src/components/text-alignment-control/index.js
+index 6eeaad784db0f0..bc6a2bc985f47c 100644
+--- a/packages/block-editor/src/components/text-alignment-control/index.js
++++ b/packages/block-editor/src/components/text-alignment-control/index.js
+@@ -14,10 +14,7 @@ import {
+ 	alignJustify,
+ } from '@wordpress/icons';
+ import { useMemo } from '@wordpress/element';
+-import {
+-	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+-} from '@wordpress/components';
++import { __experimentalToggleGroupControl as ToggleGroupControl } from '@wordpress/components';
+ 
+ const TEXT_ALIGNMENT_OPTIONS = [
+ 	{
+@@ -90,7 +87,7 @@ export default function TextAlignmentControl( {
+ 		>
+ 			{ validOptions.map( ( option ) => {
+ 				return (
+-					<ToggleGroupControlOptionIcon
++					<ToggleGroupControl.OptionIcon
+ 						key={ option.value }
+ 						value={ option.value }
+ 						icon={ option.icon }
+diff --git a/packages/block-editor/src/components/text-decoration-control/index.js b/packages/block-editor/src/components/text-decoration-control/index.js
+index 720f3d2d9558eb..ce45d4cfb610ca 100644
+--- a/packages/block-editor/src/components/text-decoration-control/index.js
++++ b/packages/block-editor/src/components/text-decoration-control/index.js
+@@ -8,10 +8,7 @@ import clsx from 'clsx';
+  */
+ import { reset, formatStrikethrough, formatUnderline } from '@wordpress/icons';
+ import { __ } from '@wordpress/i18n';
+-import {
+-	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+-} from '@wordpress/components';
++import { __experimentalToggleGroupControl as ToggleGroupControl } from '@wordpress/components';
+ 
+ const TEXT_DECORATIONS = [
+ 	{
+@@ -63,7 +60,7 @@ export default function TextDecorationControl( {
+ 		>
+ 			{ TEXT_DECORATIONS.map( ( option ) => {
+ 				return (
+-					<ToggleGroupControlOptionIcon
++					<ToggleGroupControl.OptionIcon
+ 						key={ option.value }
+ 						value={ option.value }
+ 						icon={ option.icon }
+diff --git a/packages/block-editor/src/components/text-transform-control/index.js b/packages/block-editor/src/components/text-transform-control/index.js
+index a3183e630c328a..9b5b3461dc20f8 100644
+--- a/packages/block-editor/src/components/text-transform-control/index.js
++++ b/packages/block-editor/src/components/text-transform-control/index.js
+@@ -13,10 +13,7 @@ import {
+ 	formatLowercase,
+ 	formatUppercase,
+ } from '@wordpress/icons';
+-import {
+-	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+-} from '@wordpress/components';
++import { __experimentalToggleGroupControl as ToggleGroupControl } from '@wordpress/components';
+ 
+ const TEXT_TRANSFORMS = [
+ 	{
+@@ -69,7 +66,7 @@ export default function TextTransformControl( { className, value, onChange } ) {
+ 		>
+ 			{ TEXT_TRANSFORMS.map( ( option ) => {
+ 				return (
+-					<ToggleGroupControlOptionIcon
++					<ToggleGroupControl.OptionIcon
+ 						key={ option.value }
+ 						value={ option.value }
+ 						icon={ option.icon }
+diff --git a/packages/block-editor/src/components/writing-mode-control/index.js b/packages/block-editor/src/components/writing-mode-control/index.js
+index bffccfd579c6b0..702617c7d6e621 100644
+--- a/packages/block-editor/src/components/writing-mode-control/index.js
++++ b/packages/block-editor/src/components/writing-mode-control/index.js
+@@ -8,10 +8,7 @@ import clsx from 'clsx';
+  */
+ import { __, isRTL } from '@wordpress/i18n';
+ import { textHorizontal, textVertical } from '@wordpress/icons';
+-import {
+-	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+-} from '@wordpress/components';
++import { __experimentalToggleGroupControl as ToggleGroupControl } from '@wordpress/components';
+ 
+ const WRITING_MODES = [
+ 	{
+@@ -51,7 +48,7 @@ export default function WritingModeControl( { className, value, onChange } ) {
+ 		>
+ 			{ WRITING_MODES.map( ( option ) => {
+ 				return (
+-					<ToggleGroupControlOptionIcon
++					<ToggleGroupControl.OptionIcon
+ 						key={ option.value }
+ 						value={ option.value }
+ 						icon={ option.icon }
+diff --git a/packages/block-editor/src/hooks/layout.js b/packages/block-editor/src/hooks/layout.js
+index 003a680940b977..e49b26795eda22 100644
+--- a/packages/block-editor/src/hooks/layout.js
++++ b/packages/block-editor/src/hooks/layout.js
+@@ -12,7 +12,6 @@ import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+ import { useSelect } from '@wordpress/data';
+ import {
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ 	ToggleControl,
+ 	PanelBody,
+ 	privateApis as componentsPrivateApis,
+@@ -327,7 +326,7 @@ function LayoutTypeSwitcher( { type, onChange } ) {
+ 		>
+ 			{ getLayoutTypes().map( ( { name, label } ) => {
+ 				return (
+-					<ToggleGroupControlOption
++					<ToggleGroupControl.Option
+ 						key={ name }
+ 						value={ name }
+ 						label={ label }
+diff --git a/packages/block-editor/src/layouts/constrained.js b/packages/block-editor/src/layouts/constrained.js
+index 7bf6badf008709..b605280a1b9b1d 100644
+--- a/packages/block-editor/src/layouts/constrained.js
++++ b/packages/block-editor/src/layouts/constrained.js
+@@ -5,7 +5,6 @@ import {
+ 	__experimentalUseCustomUnits as useCustomUnits,
+ 	__experimentalUnitControl as UnitControl,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+ 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+@@ -139,7 +138,7 @@ export default {
+ 						{ justificationOptions.map(
+ 							( { value, icon, label } ) => {
+ 								return (
+-									<ToggleGroupControlOptionIcon
++									<ToggleGroupControl.OptionIcon
+ 										key={ value }
+ 										value={ value }
+ 										icon={ icon }
+diff --git a/packages/block-editor/src/layouts/flex.js b/packages/block-editor/src/layouts/flex.js
+index f57ccbde466169..48c71695507ddb 100644
+--- a/packages/block-editor/src/layouts/flex.js
++++ b/packages/block-editor/src/layouts/flex.js
+@@ -16,7 +16,6 @@ import {
+ 	Flex,
+ 	FlexItem,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+ } from '@wordpress/components';
+ 
+ /**
+@@ -301,7 +300,7 @@ function FlexLayoutJustifyContentControl( {
+ 		>
+ 			{ justificationOptions.map( ( { value, icon, label } ) => {
+ 				return (
+-					<ToggleGroupControlOptionIcon
++					<ToggleGroupControl.OptionIcon
+ 						key={ value }
+ 						value={ value }
+ 						icon={ icon }
+@@ -370,12 +369,12 @@ function OrientationControl( { layout, onChange } ) {
+ 				} );
+ 			} }
+ 		>
+-			<ToggleGroupControlOptionIcon
++			<ToggleGroupControl.OptionIcon
+ 				icon={ arrowRight }
+ 				value="horizontal"
+ 				label={ __( 'Horizontal' ) }
+ 			/>
+-			<ToggleGroupControlOptionIcon
++			<ToggleGroupControl.OptionIcon
+ 				icon={ arrowDown }
+ 				value="vertical"
+ 				label={ __( 'Vertical' ) }
+diff --git a/packages/block-editor/src/layouts/grid.js b/packages/block-editor/src/layouts/grid.js
+index f1573b5c949603..0a4814a4bff9d2 100644
+--- a/packages/block-editor/src/layouts/grid.js
++++ b/packages/block-editor/src/layouts/grid.js
+@@ -10,7 +10,6 @@ import {
+ 	RangeControl,
+ 	__experimentalNumberControl as NumberControl,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ 	__experimentalUnitControl as UnitControl,
+ 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+ 	__experimentalVStack as VStack,
+@@ -470,12 +469,12 @@ function GridLayoutTypeControl( { layout, onChange } ) {
+ 					: undefined
+ 			}
+ 		>
+-			<ToggleGroupControlOption
++			<ToggleGroupControl.Option
+ 				key="auto"
+ 				value="auto"
+ 				label={ __( 'Auto' ) }
+ 			/>
+-			<ToggleGroupControlOption
++			<ToggleGroupControl.Option
+ 				key="manual"
+ 				value="manual"
+ 				label={ __( 'Manual' ) }
+diff --git a/packages/block-library/src/button/edit.js b/packages/block-library/src/button/edit.js
+index b5782681ab70bb..8dc313c2e2df13 100644
+--- a/packages/block-library/src/button/edit.js
++++ b/packages/block-library/src/button/edit.js
+@@ -29,7 +29,6 @@ import {
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ } from '@wordpress/components';
+ import {
+ 	AlignmentControl,
+@@ -151,7 +150,7 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
+ 				>
+ 					{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
+ 						return (
+-							<ToggleGroupControlOption
++							<ToggleGroupControl.Option
+ 								key={ widthValue }
+ 								value={ widthValue }
+ 								label={ sprintf(
+diff --git a/packages/block-library/src/comments-pagination/comments-pagination-arrow-controls.js b/packages/block-library/src/comments-pagination/comments-pagination-arrow-controls.js
+index c3a2d1dae648a5..1cea9d12533746 100644
+--- a/packages/block-library/src/comments-pagination/comments-pagination-arrow-controls.js
++++ b/packages/block-library/src/comments-pagination/comments-pagination-arrow-controls.js
+@@ -2,10 +2,7 @@
+  * WordPress dependencies
+  */
+ import { __, _x } from '@wordpress/i18n';
+-import {
+-	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+-} from '@wordpress/components';
++import { __experimentalToggleGroupControl as ToggleGroupControl } from '@wordpress/components';
+ 
+ export function CommentsPaginationArrowControls( { value, onChange } ) {
+ 	return (
+@@ -20,21 +17,21 @@ export function CommentsPaginationArrowControls( { value, onChange } ) {
+ 			) }
+ 			isBlock
+ 		>
+-			<ToggleGroupControlOption
++			<ToggleGroupControl.Option
+ 				value="none"
+ 				label={ _x(
+ 					'None',
+ 					'Arrow option for Comments Pagination Next/Previous blocks'
+ 				) }
+ 			/>
+-			<ToggleGroupControlOption
++			<ToggleGroupControl.Option
+ 				value="arrow"
+ 				label={ _x(
+ 					'Arrow',
+ 					'Arrow option for Comments Pagination Next/Previous blocks'
+ 				) }
+ 			/>
+-			<ToggleGroupControlOption
++			<ToggleGroupControl.Option
+ 				value="chevron"
+ 				label={ _x(
+ 					'Chevron',
+diff --git a/packages/block-library/src/latest-posts/edit.js b/packages/block-library/src/latest-posts/edit.js
+index 4bc975794ab224..5a8c17fc53bd08 100644
+--- a/packages/block-library/src/latest-posts/edit.js
++++ b/packages/block-library/src/latest-posts/edit.js
+@@ -16,7 +16,6 @@ import {
+ 	ToggleControl,
+ 	ToolbarGroup,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ } from '@wordpress/components';
+@@ -385,7 +384,7 @@ function Controls( { attributes, setAttributes, postCount } ) {
+ 							{ imageAlignmentOptions.map(
+ 								( { value, icon, label } ) => {
+ 									return (
+-										<ToggleGroupControlOptionIcon
++										<ToggleGroupControl.OptionIcon
+ 											key={ value }
+ 											value={ value }
+ 											icon={ icon }
+diff --git a/packages/block-library/src/navigation/edit/index.js b/packages/block-library/src/navigation/edit/index.js
+index d8616957318191..8608bf096714fe 100644
+--- a/packages/block-library/src/navigation/edit/index.js
++++ b/packages/block-library/src/navigation/edit/index.js
+@@ -34,7 +34,6 @@ import {
+ 	PanelBody,
+ 	ToggleControl,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ 	Button,
+ 	Spinner,
+ 	Notice,
+@@ -649,15 +648,15 @@ function Navigation( {
+ 							}
+ 							isBlock
+ 						>
+-							<ToggleGroupControlOption
++							<ToggleGroupControl.Option
+ 								value="never"
+ 								label={ __( 'Off' ) }
+ 							/>
+-							<ToggleGroupControlOption
++							<ToggleGroupControl.Option
+ 								value="mobile"
+ 								label={ __( 'Mobile' ) }
+ 							/>
+-							<ToggleGroupControlOption
++							<ToggleGroupControl.Option
+ 								value="always"
+ 								label={ __( 'Always' ) }
+ 							/>
+diff --git a/packages/block-library/src/navigation/edit/overlay-menu-preview.js b/packages/block-library/src/navigation/edit/overlay-menu-preview.js
+index cdd4d6e3263c98..7bf84a0e1592c8 100644
+--- a/packages/block-library/src/navigation/edit/overlay-menu-preview.js
++++ b/packages/block-library/src/navigation/edit/overlay-menu-preview.js
+@@ -4,7 +4,6 @@
+ import {
+ 	ToggleControl,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ 
+@@ -35,12 +34,12 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
+ 				onChange={ ( value ) => setAttributes( { icon: value } ) }
+ 				isBlock
+ 			>
+-				<ToggleGroupControlOption
++				<ToggleGroupControl.Option
+ 					value="handle"
+ 					aria-label={ __( 'handle' ) }
+ 					label={ <OverlayMenuIcon icon="handle" /> }
+ 				/>
+-				<ToggleGroupControlOption
++				<ToggleGroupControl.Option
+ 					value="menu"
+ 					aria-label={ __( 'menu' ) }
+ 					label={ <OverlayMenuIcon icon="menu" /> }
+diff --git a/packages/block-library/src/post-featured-image/dimension-controls.js b/packages/block-library/src/post-featured-image/dimension-controls.js
+index 4bc343635f2f93..acf1cca32224b8 100644
+--- a/packages/block-library/src/post-featured-image/dimension-controls.js
++++ b/packages/block-library/src/post-featured-image/dimension-controls.js
+@@ -6,7 +6,6 @@ import {
+ 	SelectControl,
+ 	__experimentalUnitControl as UnitControl,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ 	__experimentalUseCustomUnits as useCustomUnits,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ } from '@wordpress/components';
+@@ -14,18 +13,18 @@ import { useSettings } from '@wordpress/block-editor';
+ 
+ const SCALE_OPTIONS = (
+ 	<>
+-		<ToggleGroupControlOption
++		<ToggleGroupControl.Option
+ 			value="cover"
+ 			label={ _x( 'Cover', 'Scale option for Image dimension control' ) }
+ 		/>
+-		<ToggleGroupControlOption
++		<ToggleGroupControl.Option
+ 			value="contain"
+ 			label={ _x(
+ 				'Contain',
+ 				'Scale option for Image dimension control'
+ 			) }
+ 		/>
+-		<ToggleGroupControlOption
++		<ToggleGroupControl.Option
+ 			value="fill"
+ 			label={ _x( 'Fill', 'Scale option for Image dimension control' ) }
+ 		/>
+diff --git a/packages/block-library/src/post-navigation-link/edit.js b/packages/block-library/src/post-navigation-link/edit.js
+index bbdacfeb773978..5a6ef1fbda153e 100644
+--- a/packages/block-library/src/post-navigation-link/edit.js
++++ b/packages/block-library/src/post-navigation-link/edit.js
+@@ -8,7 +8,6 @@ import clsx from 'clsx';
+  */
+ import {
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ 	ToggleControl,
+ 	SelectControl,
+ 	PanelBody,
+@@ -135,21 +134,21 @@ export default function PostNavigationLinkEdit( {
+ 						) }
+ 						isBlock
+ 					>
+-						<ToggleGroupControlOption
++						<ToggleGroupControl.Option
+ 							value="none"
+ 							label={ _x(
+ 								'None',
+ 								'Arrow option for Next/Previous link'
+ 							) }
+ 						/>
+-						<ToggleGroupControlOption
++						<ToggleGroupControl.Option
+ 							value="arrow"
+ 							label={ _x(
+ 								'Arrow',
+ 								'Arrow option for Next/Previous link'
+ 							) }
+ 						/>
+-						<ToggleGroupControlOption
++						<ToggleGroupControl.Option
+ 							value="chevron"
+ 							label={ _x(
+ 								'Chevron',
+diff --git a/packages/block-library/src/query-pagination/query-pagination-arrow-controls.js b/packages/block-library/src/query-pagination/query-pagination-arrow-controls.js
+index 0f2e9c1788bf7b..3c2fedd3c04192 100644
+--- a/packages/block-library/src/query-pagination/query-pagination-arrow-controls.js
++++ b/packages/block-library/src/query-pagination/query-pagination-arrow-controls.js
+@@ -2,10 +2,7 @@
+  * WordPress dependencies
+  */
+ import { __, _x } from '@wordpress/i18n';
+-import {
+-	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+-} from '@wordpress/components';
++import { __experimentalToggleGroupControl as ToggleGroupControl } from '@wordpress/components';
+ 
+ export function QueryPaginationArrowControls( { value, onChange } ) {
+ 	return (
+@@ -20,21 +17,21 @@ export function QueryPaginationArrowControls( { value, onChange } ) {
+ 			) }
+ 			isBlock
+ 		>
+-			<ToggleGroupControlOption
++			<ToggleGroupControl.Option
+ 				value="none"
+ 				label={ _x(
+ 					'None',
+ 					'Arrow option for Query Pagination Next/Previous blocks'
+ 				) }
+ 			/>
+-			<ToggleGroupControlOption
++			<ToggleGroupControl.Option
+ 				value="arrow"
+ 				label={ _x(
+ 					'Arrow',
+ 					'Arrow option for Query Pagination Next/Previous blocks'
+ 				) }
+ 			/>
+-			<ToggleGroupControlOption
++			<ToggleGroupControl.Option
+ 				value="chevron"
+ 				label={ _x(
+ 					'Chevron',
+diff --git a/packages/block-library/src/query/edit/inspector-controls/index.js b/packages/block-library/src/query/edit/inspector-controls/index.js
+index 3c82827d84ab68..78ca7efb2b0c45 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/index.js
++++ b/packages/block-library/src/query/edit/inspector-controls/index.js
+@@ -9,7 +9,6 @@ import {
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ } from '@wordpress/components';
+ import { useSelect } from '@wordpress/data';
+ import { store as coreStore } from '@wordpress/core-data';
+@@ -224,11 +223,11 @@ export default function QueryInspectorControls( props ) {
+ 									}
+ 									value={ !! inherit ? 'default' : 'custom' }
+ 								>
+-									<ToggleGroupControlOption
++									<ToggleGroupControl.Option
+ 										value="default"
+ 										label={ __( 'Default' ) }
+ 									/>
+-									<ToggleGroupControlOption
++									<ToggleGroupControl.Option
+ 										value="custom"
+ 										label={ __( 'Custom' ) }
+ 									/>
+@@ -276,7 +275,7 @@ export default function QueryInspectorControls( props ) {
+ 								>
+ 									{ postTypesSelectOptions.map(
+ 										( option ) => (
+-											<ToggleGroupControlOption
++											<ToggleGroupControl.Option
+ 												key={ option.value }
+ 												value={ option.value }
+ 												label={ option.label }
+diff --git a/packages/block-library/src/search/edit.js b/packages/block-library/src/search/edit.js
+index 16eb62daa6abbf..1765727d92716a 100644
+--- a/packages/block-library/src/search/edit.js
++++ b/packages/block-library/src/search/edit.js
+@@ -28,7 +28,6 @@ import {
+ 	__experimentalUseCustomUnits as useCustomUnits,
+ 	__experimentalUnitControl as UnitControl,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ 	__experimentalVStack as VStack,
+@@ -491,7 +490,7 @@ export default function SearchEdit( {
+ 							>
+ 								{ PERCENTAGE_WIDTHS.map( ( widthValue ) => {
+ 									return (
+-										<ToggleGroupControlOption
++										<ToggleGroupControl.Option
+ 											key={ widthValue }
+ 											value={ widthValue }
+ 											label={ sprintf(
+diff --git a/packages/components/src/border-control/border-control-style-picker/component.tsx b/packages/components/src/border-control/border-control-style-picker/component.tsx
+index c0a0fe82111cec..02ab22990a940a 100644
+--- a/packages/components/src/border-control/border-control-style-picker/component.tsx
++++ b/packages/components/src/border-control/border-control-style-picker/component.tsx
+@@ -9,10 +9,7 @@ import { __ } from '@wordpress/i18n';
+  */
+ import { contextConnect } from '../../context';
+ import type { StylePickerProps } from '../types';
+-import {
+-	ToggleGroupControl,
+-	ToggleGroupControlOptionIcon,
+-} from '../../toggle-group-control';
++import { ToggleGroupControl } from '../../toggle-group-control';
+ 
+ const BORDER_STYLES = [
+ 	{ label: __( 'Solid' ), icon: lineSolid, value: 'solid' },
+@@ -36,7 +33,7 @@ function UnconnectedBorderControlStylePicker(
+ 			{ ...restProps }
+ 		>
+ 			{ BORDER_STYLES.map( ( borderStyle ) => (
+-				<ToggleGroupControlOptionIcon
++				<ToggleGroupControl.OptionIcon
+ 					key={ borderStyle.value }
+ 					value={ borderStyle.value }
+ 					icon={ borderStyle.icon }
+diff --git a/packages/components/src/date-time/time/time-input/index.tsx b/packages/components/src/date-time/time/time-input/index.tsx
+index e2628fdb7a2b46..25aa14f2c6ea9e 100644
+--- a/packages/components/src/date-time/time/time-input/index.tsx
++++ b/packages/components/src/date-time/time/time-input/index.tsx
+@@ -30,10 +30,7 @@ import type { TimeInputProps } from '../../types';
+ import type { InputChangeCallback } from '../../../input-control/types';
+ import { useControlledValue } from '../../../utils';
+ import BaseControl from '../../../base-control';
+-import {
+-	ToggleGroupControl,
+-	ToggleGroupControlOption,
+-} from '../../../toggle-group-control';
++import { ToggleGroupControl } from '../../../toggle-group-control';
+ 
+ export function TimeInput( {
+ 	value: valueProp,
+@@ -179,11 +176,11 @@ export function TimeInput( {
+ 							)();
+ 						} }
+ 					>
+-						<ToggleGroupControlOption
++						<ToggleGroupControl.Option
+ 							value="AM"
+ 							label={ __( 'AM' ) }
+ 						/>
+-						<ToggleGroupControlOption
++						<ToggleGroupControl.Option
+ 							value="PM"
+ 							label={ __( 'PM' ) }
+ 						/>
+diff --git a/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx b/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
+index 1b3619c800e453..5b4eef33c12539 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
+@@ -6,10 +6,7 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import {
+-	ToggleGroupControl,
+-	ToggleGroupControlOption,
+-} from '../toggle-group-control';
++import { ToggleGroupControl } from '../toggle-group-control';
+ import { T_SHIRT_ABBREVIATIONS, T_SHIRT_NAMES } from './constants';
+ import type { FontSizePickerToggleGroupProps } from './types';
+ 
+@@ -28,7 +25,7 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
+ 			size={ size }
+ 		>
+ 			{ fontSizes.map( ( fontSize, index ) => (
+-				<ToggleGroupControlOption
++				<ToggleGroupControl.Option
+ 					key={ fontSize.slug }
+ 					value={ fontSize.size }
+ 					label={ T_SHIRT_ABBREVIATIONS[ index ] }
+diff --git a/packages/components/src/form-file-upload/index.tsx b/packages/components/src/form-file-upload/index.tsx
+index 378dc144c6fe8c..d89d6f6f7037d3 100644
+--- a/packages/components/src/form-file-upload/index.tsx
++++ b/packages/components/src/form-file-upload/index.tsx
+@@ -54,7 +54,7 @@ export function FormFileUpload( {
+ 	const ui = render ? (
+ 		render( { openFileDialog } )
+ 	) : (
+-		<Button onClick={ openFileDialog } { ...props }>
++		<Button role="button" onClick={ openFileDialog } { ...props }>
+ 			{ children }
+ 		</Button>
+ 	);
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index 2acd609992d6ad..bd85b61ae6ece7 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -175,11 +175,7 @@ export { default as TextareaControl } from './textarea-control';
+ export { default as TextHighlight } from './text-highlight';
+ export { default as Tip } from './tip';
+ export { default as ToggleControl } from './toggle-control';
+-export {
+-	ToggleGroupControl as __experimentalToggleGroupControl,
+-	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
+-	ToggleGroupControlOptionIcon as __experimentalToggleGroupControlOptionIcon,
+-} from './toggle-group-control';
++export { ToggleGroupControl as __experimentalToggleGroupControl } from './toggle-group-control';
+ export {
+ 	Toolbar,
+ 	ToolbarButton,
+diff --git a/packages/components/src/toggle-group-control/README.md b/packages/components/src/toggle-group-control/README.md
+new file mode 100644
+index 00000000000000..e3fea28bd36191
+--- /dev/null
++++ b/packages/components/src/toggle-group-control/README.md
+@@ -0,0 +1,158 @@
++# ToggleGroupControl
++
++<!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
++
++<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-togglegroupcontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
++
++ToggleGroupControl is a form component that lets users choose options
++from a group of toggle buttons. It provides a single-selection interface
++with a consistent visual design.
++
++## Props
++
++### `__nextHasNoMarginBottom`
++
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
++
++Start opting into the new margin-free styles that will become the default in a future version.
++
++### `__next40pxDefaultSize`
++
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
++
++Start opting into the larger default height that will become the default size in a future version.
++
++### `children`
++
++ - Type: `ReactNode`
++ - Required: Yes
++
++The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
++`ToggleGroupControlOptionIcon` components.
++
++### `help`
++
++ - Type: `ReactNode`
++ - Required: No
++
++Additional description for the control.
++
++Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
++
++### `hideLabelFromVision`
++
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
++
++If true, the label will only be visible to screen readers.
++
++### `isAdaptiveWidth`
++
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
++
++Determines if segments should be rendered with equal widths.
++
++### `isBlock`
++
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
++
++Renders `ToggleGroupControl` as a (CSS) block element, spanning the entire width of
++the available space. This is the recommended style when the options are text-based and not icons.
++
++### `isDeselectable`
++
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
++
++Whether an option can be deselected by clicking it again.
++
++### `label`
++
++ - Type: `string`
++ - Required: Yes
++
++Label for the control.
++
++### `onChange`
++
++ - Type: `(value: string | number) => void`
++ - Required: No
++
++Callback when a segment is selected.
++
++### `size`
++
++ - Type: `"default" | "__unstable-large"`
++ - Required: No
++ - Default: `'default'`
++
++The size variant of the control.
++
++### `value`
++
++ - Type: `string | number`
++ - Required: No
++
++The selected value.
++
++## Subcomponents
++
++### ToggleGroupControl.Option
++
++#### Props
++
++##### `label`
++
++ - Type: `string`
++ - Required: Yes
++
++Label for the option. If needed, the `aria-label` prop can be used in addition
++to specify a different label for assistive technologies.
++
++##### `showTooltip`
++
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
++
++Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
++show the aria-label or the label prop text.
++
++##### `value`
++
++ - Type: `string | number`
++ - Required: Yes
++
++### ToggleGroupControl.OptionIcon
++
++#### Props
++
++##### `icon`
++
++ - Type: `Element`
++ - Required: Yes
++
++Icon displayed as the content of the option. Usually one of the icons from
++the `@wordpress/icons` package, or a custom React `<svg>` icon.
++
++##### `label`
++
++ - Type: `string`
++ - Required: Yes
++
++The text to accessibly label the icon option. Will also be shown in a tooltip.
++
++##### `value`
++
++ - Type: `string | number`
++ - Required: Yes
+diff --git a/packages/components/src/toggle-group-control/docs-manifest.json b/packages/components/src/toggle-group-control/docs-manifest.json
+new file mode 100644
+index 00000000000000..c9ddf10ccca309
+--- /dev/null
++++ b/packages/components/src/toggle-group-control/docs-manifest.json
+@@ -0,0 +1,17 @@
++{
++	"$schema": "../../schemas/docs-manifest.json",
++	"displayName": "ToggleGroupControl",
++	"filePath": "./index.ts",
++	"subcomponents": [
++		{
++			"displayName": "ToggleGroupControlOption",
++			"preferredDisplayName": "ToggleGroupControl.Option",
++			"filePath": "./toggle-group-control-option/index.ts"
++		},
++		{
++			"displayName": "ToggleGroupControlOptionIcon",
++			"preferredDisplayName": "ToggleGroupControl.OptionIcon",
++			"filePath": "./toggle-group-control-option-icon/index.ts"
++		}
++	]
++}
+diff --git a/packages/components/src/toggle-group-control/index.ts b/packages/components/src/toggle-group-control/index.ts
+index e5e40497d9220e..85cd8696d157f4 100644
+--- a/packages/components/src/toggle-group-control/index.ts
++++ b/packages/components/src/toggle-group-control/index.ts
+@@ -1,3 +1,30 @@
+-export { ToggleGroupControl } from './toggle-group-control';
+-export { ToggleGroupControlOption } from './toggle-group-control-option';
+-export { ToggleGroupControlOptionIcon } from './toggle-group-control-option-icon';
++/**
++ * Internal dependencies
++ */
++import { ToggleGroupControl as BaseToggleGroupControl } from './toggle-group-control';
++import { ToggleGroupControlOption } from './toggle-group-control-option';
++import { ToggleGroupControlOptionIcon } from './toggle-group-control-option-icon';
++
++/**
++ * ToggleGroupControl is a form component that lets users choose options
++ * from a group of toggle buttons. It provides a single-selection interface
++ * with a consistent visual design.
++ */
++export const ToggleGroupControl = Object.assign( BaseToggleGroupControl, {
++	/**
++	 * Renders a standard toggle option button within a ToggleGroupControl.
++	 * Used for text-based toggle options.
++	 */
++	Option: Object.assign( ToggleGroupControlOption, {
++		displayName: 'ToggleGroupControl.Option',
++	} ),
++	/**
++	 * Renders an icon toggle option button within a ToggleGroupControl.
++	 * Used for icon-based toggle options.
++	 */
++	OptionIcon: Object.assign( ToggleGroupControlOptionIcon, {
++		displayName: 'ToggleGroupControl.OptionIcon',
++	} ),
++} );
++
++export default ToggleGroupControl;
+diff --git a/packages/components/src/toggle-group-control/stories/best-practices.mdx b/packages/components/src/toggle-group-control/stories/best-practices.mdx
+new file mode 100644
+index 00000000000000..18b715a25ccbc3
+--- /dev/null
++++ b/packages/components/src/toggle-group-control/stories/best-practices.mdx
+@@ -0,0 +1,33 @@
++# `ToggleGroupControl`
++
++<div class="callout callout-alert">
++	This feature is still experimental. “Experimental” means this is an early
++	implementation subject to drastic and breaking changes.
++</div>
++
++`ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use [`ToggleGroupControlOption`](/packages/components/src/toggle-group-control/toggle-group-control-option/README.md) component.
++
++This component is intended for selecting a single persistent value from a set of options, similar to a how a radio button group would work. If you simply want a toggle to switch between views, use a [`TabPanel`](/packages/components/src/tab-panel/README.md) instead.
++
++Only use this control when you know for sure the labels of items inside won't wrap. For items with longer labels, you can consider a [`SelectControl`](/packages/components/src/select-control/README.md) or a [`CustomSelectControl`](/packages/components/src/custom-select-control/README.md) component instead.
++
++## Usage
++
++```js
++import { __experimentalToggleGroupControl as ToggleGroupControl } from '@wordpress/components';
++
++function Example() {
++	return (
++		<ToggleGroupControl
++			label="my label"
++			value="vertical"
++			isBlock
++			__nextHasNoMarginBottom
++			__next40pxDefaultSize
++		>
++			<ToggleGroupControl.Option value="horizontal" label="Horizontal" />
++			<ToggleGroupControl.Option value="vertical" label="Vertical" />
++		</ToggleGroupControl>
++	);
++}
++```
+diff --git a/packages/components/src/toggle-group-control/stories/index.story.tsx b/packages/components/src/toggle-group-control/stories/index.story.tsx
+index 0f3c0a299617af..457a2453ff0646 100644
+--- a/packages/components/src/toggle-group-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-group-control/stories/index.story.tsx
+@@ -12,11 +12,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import {
+-	ToggleGroupControl,
+-	ToggleGroupControlOption,
+-	ToggleGroupControlOptionIcon,
+-} from '../index';
++import { ToggleGroupControl } from '../index';
+ import type {
+ 	ToggleGroupControlOptionProps,
+ 	ToggleGroupControlOptionIconProps,
+@@ -25,8 +21,12 @@ import type {
+ 
+ const meta: Meta< typeof ToggleGroupControl > = {
+ 	component: ToggleGroupControl,
+-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
++	subcomponents: {
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Option: ToggleGroupControl.Option,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		OptionIcon: ToggleGroupControl.OptionIcon,
++	},
+ 	title: 'Components (Experimental)/Selection & Input/ToggleGroupControl',
+ 	id: 'components-experimental-togglegroupcontrol',
+ 	argTypes: {
+@@ -66,14 +66,14 @@ const mapPropsToOptionComponent = ( {
+ 	value,
+ 	...props
+ }: ToggleGroupControlOptionProps ) => (
+-	<ToggleGroupControlOption value={ value } key={ value } { ...props } />
++	<ToggleGroupControl.Option value={ value } key={ value } { ...props } />
+ );
+ 
+ const mapPropsToOptionIconComponent = ( {
+ 	value,
+ 	...props
+ }: ToggleGroupControlOptionIconProps ) => (
+-	<ToggleGroupControlOptionIcon value={ value } key={ value } { ...props } />
++	<ToggleGroupControl.OptionIcon value={ value } key={ value } { ...props } />
+ );
+ 
+ export const Default: StoryFn< typeof ToggleGroupControl > = Template.bind(
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index 28928a9735a378..7d2bcb11c9e14e 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -14,11 +14,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import Button from '../../button';
+-import {
+-	ToggleGroupControl as _ToggleGroupControl,
+-	ToggleGroupControlOption,
+-	ToggleGroupControlOptionIcon,
+-} from '../index';
++import { ToggleGroupControl as _ToggleGroupControl } from '../index';
+ import { TOOLTIP_DELAY } from '../../tooltip';
+ import type { ToggleGroupControlProps } from '../types';
+ 
+@@ -77,19 +73,19 @@ const ControlledToggleGroupControl = ( {
+ };
+ const options = (
+ 	<>
+-		<ToggleGroupControlOption value="rigas" label="R" />
+-		<ToggleGroupControlOption value="jack" label="J" />
++		<_ToggleGroupControl.Option value="rigas" label="R" />
++		<_ToggleGroupControl.Option value="jack" label="J" />
+ 	</>
+ );
+ const optionsWithTooltip = (
+ 	<>
+-		<ToggleGroupControlOption
++		<_ToggleGroupControl.Option
+ 			value="gnocchi"
+ 			label="Delicious Gnocchi"
+ 			aria-label="Click for Delicious Gnocchi"
+ 			showTooltip
+ 		/>
+-		<ToggleGroupControlOption
++		<_ToggleGroupControl.Option
+ 			value="caponata"
+ 			label="Sumptuous Caponata"
+ 			aria-label="Click for Sumptuous Caponata"
+@@ -98,9 +94,9 @@ const optionsWithTooltip = (
+ );
+ const optionsWithDisabledOption = (
+ 	<>
+-		<ToggleGroupControlOption value="pizza" label="Pizza" />
+-		<ToggleGroupControlOption value="rice" label="Rice" disabled />
+-		<ToggleGroupControlOption value="pasta" label="Pasta" />
++		<_ToggleGroupControl.Option value="pizza" label="Pizza" />
++		<_ToggleGroupControl.Option value="rice" label="Rice" disabled />
++		<_ToggleGroupControl.Option value="pasta" label="Pasta" />
+ 	</>
+ );
+ 
+@@ -124,12 +120,12 @@ describe.each( [
+ 		it( 'with icons', () => {
+ 			const { container } = render(
+ 				<Component value="uppercase" label="Test Toggle Group Control">
+-					<ToggleGroupControlOptionIcon
++					<_ToggleGroupControl.OptionIcon
+ 						value="uppercase"
+ 						icon={ formatUppercase }
+ 						label="Uppercase"
+ 					/>
+-					<ToggleGroupControlOptionIcon
++					<_ToggleGroupControl.OptionIcon
+ 						value="lowercase"
+ 						icon={ formatLowercase }
+ 						label="Lowercase"
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index 041af1adf5e5b5..7bdfd465e11755 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -179,8 +179,8 @@ function ToggleGroupControlOptionBase(
+  * function Example() {
+  *   return (
+  *     <ToggleGroupControl label="my label" value="vertical" isBlock>
+- *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
+- *       <ToggleGroupControlOption value="vertical" label="Vertical" />
++ *       <ToggleGroupControl.Option value="horizontal" label="Horizontal" />
++ *       <ToggleGroupControl.Option value="vertical" label="Vertical" />
+  *     </ToggleGroupControl>
+  *   );
+  * }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+index 1ee82b26a91998..6114d64a3fd35b 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+@@ -4,26 +4,23 @@
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-`ToggleGroupControlOptionIcon` is a form component which is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md) and displays an icon.
++`ToggleGroupControl.OptionIcon` is a form component which is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md) and displays an icon.
+ 
+ ## Usage
+ 
+ ```js
+-import {
+-	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+-} from '@wordpress/components';
++import { __experimentalToggleGroupControl as ToggleGroupControl } from '@wordpress/components';
+ import { formatLowercase, formatUppercase } from '@wordpress/icons';
+ 
+ function Example() {
+ 	return (
+ 		<ToggleGroupControl __nextHasNoMarginBottom __next40pxDefaultSize>
+-			<ToggleGroupControlOptionIcon
++			<ToggleGroupControl.OptionIcon
+ 				value="uppercase"
+ 				icon={ formatUppercase }
+ 				label="Uppercase"
+ 			/>
+-			<ToggleGroupControlOptionIcon
++			<ToggleGroupControl.OptionIcon
+ 				value="lowercase"
+ 				icon={ formatLowercase }
+ 				label="Lowercase"
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+index d1840cba5595d9..cc483928e7d478 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+@@ -39,26 +39,25 @@ function UnforwardedToggleGroupControlOptionIcon(
+ }
+ 
+ /**
+- * `ToggleGroupControlOptionIcon` is a form component which is meant to be used as a
++ * `ToggleGroupControl.OptionIcon` is a form component which is meant to be used as a
+  * child of `ToggleGroupControl` and displays an icon.
+  *
+  * ```jsx
+  *
+  * import {
+  *	__experimentalToggleGroupControl as ToggleGroupControl,
+- *	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+  * from '@wordpress/components';
+  * import { formatLowercase, formatUppercase } from '@wordpress/icons';
+  *
+  * function Example() {
+  *  return (
+  *    <ToggleGroupControl __nextHasNoMarginBottom __next40pxDefaultSize>
+- *      <ToggleGroupControlOptionIcon
++ *      <ToggleGroupControl.OptionIcon
+  *        value="uppercase"
+  *        label="Uppercase"
+  *        icon={ formatUppercase }
+  *      />
+- *      <ToggleGroupControlOptionIcon
++ *      <ToggleGroupControl.OptionIcon
+  *        value="lowercase"
+  *        label="Lowercase"
+  *        icon={ formatLowercase }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+index 411857d260a311..9ffa590b20772d 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+@@ -4,15 +4,12 @@
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-`ToggleGroupControlOption` is a form component and is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md).
++`ToggleGroupControl.Option` is a form component and is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md).
+ 
+ ## Usage
+ 
+ ```js
+-import {
+-	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+-} from '@wordpress/components';
++import { __experimentalToggleGroupControl as ToggleGroupControl } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+@@ -23,12 +20,12 @@ function Example() {
+ 			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 		>
+-			<ToggleGroupControlOption
++			<ToggleGroupControl.Option
+ 				value="horizontal"
+ 				label="Horizontal"
+ 				showTooltip={ true }
+ 			/>
+-			<ToggleGroupControlOption value="vertical" label="Vertical" />
++			<ToggleGroupControl.Option value="vertical" label="Vertical" />
+ 		</ToggleGroupControl>
+ 	);
+ }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+index 8632d92fc00578..74238e15657f89 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+@@ -37,13 +37,12 @@ function UnforwardedToggleGroupControlOption(
+ }
+ 
+ /**
+- * `ToggleGroupControlOption` is a form component and is meant to be used as a
++ * `ToggleGroupControl.Option` is a form component and is meant to be used as a
+  * child of `ToggleGroupControl`.
+  *
+  * ```jsx
+  * import {
+  *   __experimentalToggleGroupControl as ToggleGroupControl,
+- *   __experimentalToggleGroupControlOption as ToggleGroupControlOption,
+  * } from '@wordpress/components';
+  *
+  * function Example() {
+@@ -55,8 +54,8 @@ function UnforwardedToggleGroupControlOption(
+  *       __nextHasNoMarginBottom
+  *       __next40pxDefaultSize
+  *     >
+- *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
+- *       <ToggleGroupControlOption value="vertical" label="Vertical" />
++ *       <ToggleGroupControl.Option value="horizontal" label="Horizontal" />
++ *       <ToggleGroupControl.Option value="vertical" label="Vertical" />
+  *     </ToggleGroupControl>
+  *   );
+  * }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/README.md b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+deleted file mode 100644
+index 841d474c148d45..00000000000000
+--- a/packages/components/src/toggle-group-control/toggle-group-control/README.md
++++ /dev/null
+@@ -1,104 +0,0 @@
+-# `ToggleGroupControl`
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-`ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use [`ToggleGroupControlOption`](/packages/components/src/toggle-group-control/toggle-group-control-option/README.md) component.
+-
+-This component is intended for selecting a single persistent value from a set of options, similar to a how a radio button group would work. If you simply want a toggle to switch between views, use a [`TabPanel`](/packages/components/src/tab-panel/README.md) instead.
+-
+-Only use this control when you know for sure the labels of items inside won't wrap. For items with longer labels, you can consider a [`SelectControl`](/packages/components/src/select-control/README.md) or a [`CustomSelectControl`](/packages/components/src/custom-select-control/README.md) component instead.
+-
+-## Usage
+-
+-```js
+-import {
+-	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+-} from '@wordpress/components';
+-
+-function Example() {
+-	return (
+-		<ToggleGroupControl
+-			label="my label"
+-			value="vertical"
+-			isBlock
+-			__nextHasNoMarginBottom
+-			__next40pxDefaultSize
+-		>
+-			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
+-			<ToggleGroupControlOption value="vertical" label="Vertical" />
+-		</ToggleGroupControl>
+-	);
+-}
+-```
+-
+-## Props
+-
+-### `help`: `ReactNode`
+-
+-If this property is added, a help text will be generated using help property as the content.
+-
+--   Required: No
+-
+-### `hideLabelFromVision`: `boolean`
+-
+-If true, the label will only be visible to screen readers.
+-
+--   Required: No
+--   Default: `false`
+-
+-### `isAdaptiveWidth`: `boolean`
+-
+-Determines if segments should be rendered with equal widths.
+-
+--   Required: No
+--   Default: `false`
+-
+-### `isDeselectable`: `boolean`
+-
+-Whether an option can be deselected by clicking it again.
+-
+--   Required: No
+--   Default: `false`
+-
+-### `isBlock`: `boolean`
+-
+-Renders `ToggleGroupControl` as a (CSS) block element, spanning the entire width of the available space. This is the recommended style when the options are text-based and not icons.
+-
+--   Required: No
+--   Default: `false`
+-
+-### `label`: `string`
+-
+-Label for the form element.
+-
+--   Required: Yes
+-
+-### `onChange`: `( value?: string | number ) => void`
+-
+-Callback when a segment is selected.
+-
+--   Required: No
+--   Default: `() => {}`
+-
+-### `value`: `string | number`
+-
+-The value of the `ToggleGroupControl`.
+-
+--   Required: No
+-
+-### `__next40pxDefaultSize`: `boolean`
+-
+-Start opting into the larger default height that will become the default size in a future version.
+-
+--   Required: No
+--   Default: `false`
+-
+-### `__nextHasNoMarginBottom`: `boolean`
+-
+-Start opting into the new margin-free styles that will become the default in a future version.
+-
+--   Required: No
+--   Default: `false`
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 9f3427e95a6017..ae90e8cd5224a3 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -121,7 +121,7 @@ function UnconnectedToggleGroupControl(
+ /**
+  * `ToggleGroupControl` is a form component that lets users choose options
+  * represented in horizontal segments. To render options for this control use
+- * `ToggleGroupControlOption` component.
++ * `ToggleGroupControl.Option` component.
+  *
+  * This component is intended for selecting a single persistent value from a set of options,
+  * similar to a how a radio button group would work. If you simply want a toggle to switch between views,
+@@ -134,7 +134,6 @@ function UnconnectedToggleGroupControl(
+  * ```jsx
+  * import {
+  *   __experimentalToggleGroupControl as ToggleGroupControl,
+- *   __experimentalToggleGroupControlOption as ToggleGroupControlOption,
+  * } from '@wordpress/components';
+  *
+  * function Example() {
+@@ -146,8 +145,8 @@ function UnconnectedToggleGroupControl(
+  *       __nextHasNoMarginBottom
+  *       __next40pxDefaultSize
+  *     >
+- *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
+- *       <ToggleGroupControlOption value="vertical" label="Vertical" />
++ *       <ToggleGroupControl.Option value="horizontal" label="Horizontal" />
++ *       <ToggleGroupControl.Option value="vertical" label="Vertical" />
+  *     </ToggleGroupControl>
+  *   );
+  * }
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index cfa9d00080467c..e6f926ba3c6ee3 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -112,8 +112,8 @@ export type ToggleGroupControlProps = Pick<
+ 	 */
+ 	value?: string | number;
+ 	/**
+-	 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControlOption` or
+-	 * `ToggleGroupControlOptionIcon` components.
++	 * The options to render in the `ToggleGroupControl`, using either the `ToggleGroupControl.Option` or
++	 * `ToggleGroupControl.OptionIcon` components.
+ 	 */
+ 	children: ReactNode;
+ 	/**
+diff --git a/packages/components/src/tools-panel/stories/index.story.tsx b/packages/components/src/tools-panel/stories/index.story.tsx
+index 76735c845c3ea6..0a30feb1695027 100644
+--- a/packages/components/src/tools-panel/stories/index.story.tsx
++++ b/packages/components/src/tools-panel/stories/index.story.tsx
+@@ -12,10 +12,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import {
+-	ToggleGroupControl,
+-	ToggleGroupControlOption,
+-} from '../../toggle-group-control';
++import { ToggleGroupControl } from '../../toggle-group-control';
+ 
+ /**
+  * Internal dependencies
+@@ -119,15 +116,15 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
+ 							onChange={ ( next ) => setScale( next ) }
+ 							isBlock
+ 						>
+-							<ToggleGroupControlOption
++							<ToggleGroupControl.Option
+ 								value="cover"
+ 								label="Cover"
+ 							/>
+-							<ToggleGroupControlOption
++							<ToggleGroupControl.Option
+ 								value="contain"
+ 								label="Contain"
+ 							/>
+-							<ToggleGroupControlOption
++							<ToggleGroupControl.Option
+ 								value="fill"
+ 								label="Fill"
+ 							/>
+@@ -477,12 +474,15 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
+ 						}
+ 						isBlock
+ 					>
+-						<ToggleGroupControlOption value="cover" label="Cover" />
+-						<ToggleGroupControlOption
++						<ToggleGroupControl.Option
++							value="cover"
++							label="Cover"
++						/>
++						<ToggleGroupControl.Option
+ 							value="contain"
+ 							label="Contain"
+ 						/>
+-						<ToggleGroupControlOption value="fill" label="Fill" />
++						<ToggleGroupControl.Option value="fill" label="Fill" />
+ 					</ToggleGroupControl>
+ 				</ToolsPanelItem>
+ 			</ToolsPanelItems>
+@@ -581,15 +581,15 @@ export const WithConditionallyRenderedControl: StoryFn<
+ 							}
+ 							isBlock
+ 						>
+-							<ToggleGroupControlOption
++							<ToggleGroupControl.Option
+ 								value="cover"
+ 								label="Cover"
+ 							/>
+-							<ToggleGroupControlOption
++							<ToggleGroupControl.Option
+ 								value="contain"
+ 								label="Contain"
+ 							/>
+-							<ToggleGroupControlOption
++							<ToggleGroupControl.Option
+ 								value="fill"
+ 								label="Fill"
+ 							/>
+diff --git a/packages/dataviews/src/components/dataviews-view-config/index.tsx b/packages/dataviews/src/components/dataviews-view-config/index.tsx
+index c80591caee255e..786a50616fa46b 100644
+--- a/packages/dataviews/src/components/dataviews-view-config/index.tsx
++++ b/packages/dataviews/src/components/dataviews-view-config/index.tsx
+@@ -12,8 +12,6 @@ import {
+ 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+ 	Dropdown,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+ 	SelectControl,
+ 	__experimentalItemGroup as ItemGroup,
+ 	__experimentalItem as Item,
+@@ -206,7 +204,7 @@ function SortDirectionControl() {
+ 		>
+ 			{ SORTING_DIRECTIONS.map( ( direction ) => {
+ 				return (
+-					<ToggleGroupControlOptionIcon
++					<ToggleGroupControl.OptionIcon
+ 						key={ direction }
+ 						value={ direction }
+ 						icon={ sortIcons[ direction ] }
+@@ -244,7 +242,7 @@ function ItemsPerPageControl() {
+ 		>
+ 			{ PAGE_SIZE_VALUES.map( ( value ) => {
+ 				return (
+-					<ToggleGroupControlOption
++					<ToggleGroupControl.Option
+ 						key={ value }
+ 						value={ value }
+ 						label={ value.toString() }
+diff --git a/packages/dataviews/src/dataviews-layouts/table/density-picker.tsx b/packages/dataviews/src/dataviews-layouts/table/density-picker.tsx
+index 6d3d31aeb7345e..3c5a80b157dadd 100644
+--- a/packages/dataviews/src/dataviews-layouts/table/density-picker.tsx
++++ b/packages/dataviews/src/dataviews-layouts/table/density-picker.tsx
+@@ -1,10 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+-} from '@wordpress/components';
++import { __experimentalToggleGroupControl as ToggleGroupControl } from '@wordpress/components';
+ import { __, _x } from '@wordpress/i18n';
+ import { useContext } from '@wordpress/element';
+ 
+@@ -34,7 +31,7 @@ export default function DensityPicker() {
+ 			} }
+ 			isBlock
+ 		>
+-			<ToggleGroupControlOption
++			<ToggleGroupControl.Option
+ 				key="comfortable"
+ 				value="comfortable"
+ 				label={ _x(
+@@ -42,12 +39,12 @@ export default function DensityPicker() {
+ 					'Density option for DataView layout'
+ 				) }
+ 			/>
+-			<ToggleGroupControlOption
++			<ToggleGroupControl.Option
+ 				key="balanced"
+ 				value="balanced"
+ 				label={ _x( 'Balanced', 'Density option for DataView layout' ) }
+ 			/>
+-			<ToggleGroupControlOption
++			<ToggleGroupControl.Option
+ 				key="compact"
+ 				value="compact"
+ 				label={ _x( 'Compact', 'Density option for DataView layout' ) }
+diff --git a/packages/edit-site/src/components/global-styles/screen-typography-element.js b/packages/edit-site/src/components/global-styles/screen-typography-element.js
+index 8a8150e1578719..4afe00102418ca 100644
+--- a/packages/edit-site/src/components/global-styles/screen-typography-element.js
++++ b/packages/edit-site/src/components/global-styles/screen-typography-element.js
+@@ -4,7 +4,6 @@
+ import { __, _x } from '@wordpress/i18n';
+ import {
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ 	__experimentalSpacer as Spacer,
+ } from '@wordpress/components';
+ import { useState } from '@wordpress/element';
+@@ -65,43 +64,43 @@ function ScreenTypographyElement( { element } ) {
+ 						size="__unstable-large"
+ 						__nextHasNoMarginBottom
+ 					>
+-						<ToggleGroupControlOption
++						<ToggleGroupControl.Option
+ 							value="heading"
+ 							showTooltip
+ 							aria-label={ __( 'All headings' ) }
+ 							label={ _x( 'All', 'heading levels' ) }
+ 						/>
+-						<ToggleGroupControlOption
++						<ToggleGroupControl.Option
+ 							value="h1"
+ 							showTooltip
+ 							aria-label={ __( 'Heading 1' ) }
+ 							label={ __( 'H1' ) }
+ 						/>
+-						<ToggleGroupControlOption
++						<ToggleGroupControl.Option
+ 							value="h2"
+ 							showTooltip
+ 							aria-label={ __( 'Heading 2' ) }
+ 							label={ __( 'H2' ) }
+ 						/>
+-						<ToggleGroupControlOption
++						<ToggleGroupControl.Option
+ 							value="h3"
+ 							showTooltip
+ 							aria-label={ __( 'Heading 3' ) }
+ 							label={ __( 'H3' ) }
+ 						/>
+-						<ToggleGroupControlOption
++						<ToggleGroupControl.Option
+ 							value="h4"
+ 							showTooltip
+ 							aria-label={ __( 'Heading 4' ) }
+ 							label={ __( 'H4' ) }
+ 						/>
+-						<ToggleGroupControlOption
++						<ToggleGroupControl.Option
+ 							value="h5"
+ 							showTooltip
+ 							aria-label={ __( 'Heading 5' ) }
+ 							label={ __( 'H5' ) }
+ 						/>
+-						<ToggleGroupControlOption
++						<ToggleGroupControl.Option
+ 							value="h6"
+ 							showTooltip
+ 							aria-label={ __( 'Heading 6' ) }
+diff --git a/packages/edit-site/src/components/global-styles/shadows-edit-panel.js b/packages/edit-site/src/components/global-styles/shadows-edit-panel.js
+index 93c6fe5751327e..4b5f388c743aa5 100644
+--- a/packages/edit-site/src/components/global-styles/shadows-edit-panel.js
++++ b/packages/edit-site/src/components/global-styles/shadows-edit-panel.js
+@@ -17,7 +17,6 @@ import {
+ 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+ 	useNavigator,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ 	__experimentalConfirmDialog as ConfirmDialog,
+ 	Dropdown,
+ 	Button,
+@@ -477,11 +476,11 @@ function ShadowPopover( { shadowObj, onChange } ) {
+ 				hideLabelFromVision
+ 				__next40pxDefaultSize
+ 			>
+-				<ToggleGroupControlOption
++				<ToggleGroupControl.Option
+ 					value="outset"
+ 					label={ __( 'Outset' ) }
+ 				/>
+-				<ToggleGroupControlOption
++				<ToggleGroupControl.Option
+ 					value="inset"
+ 					label={ __( 'Inset' ) }
+ 				/>

@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e0a80b0295aa7b..6cb0048c36ceb9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ -   `SlotFill`: Pass `Component` instance to unregisterSlot ([#54765](https://github.com/WordPress/gutenberg/pull/54765)).
+ -   `Button`: Remove `aria-selected` CSS selector from styling 'active' buttons ([#54931](https://github.com/WordPress/gutenberg/pull/54931)).
+ -   `Popover`: Apply the CSS in JS styles properly for components used within popovers. ([#54912](https://github.com/WordPress/gutenberg/pull/54912))
++-   `Button`: Remove hover styles when `aria-disabled` is set to `true` for the secondary variant. ([#54978](https://github.com/WordPress/gutenberg/pull/54978))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 0487d19db99df4..e3b8c55f074e8d 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -145,7 +145,7 @@
+ 		color: $components-color-accent;
+ 		background: transparent;
+ 
+-		&:hover:not(:disabled) {
++		&:hover:not(:disabled, [aria-disabled="true"]) {
+ 			box-shadow: inset 0 0 0 $border-width $components-color-accent-darker-10;
+ 		}
+ 	}

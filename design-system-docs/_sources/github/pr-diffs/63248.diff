@@ -1,0 +1,310 @@
+diff --git a/packages/block-editor/src/components/date-format-picker/index.js b/packages/block-editor/src/components/date-format-picker/index.js
+index 72e6d4831efa93..cf9af5eb33f122 100644
+--- a/packages/block-editor/src/components/date-format-picker/index.js
++++ b/packages/block-editor/src/components/date-format-picker/index.js
+@@ -126,7 +126,7 @@ function NonDefaultControls( { format, onChange } ) {
+ 		name: __( 'Custom' ),
+ 		className:
+ 			'block-editor-date-format-picker__custom-format-select-control__custom-option',
+-		__experimentalHint: __( 'Enter your own date format' ),
++		hint: __( 'Enter your own date format' ),
+ 	};
+ 
+ 	const [ isCustom, setIsCustom ] = useState(
+diff --git a/packages/block-editor/src/hooks/position.js b/packages/block-editor/src/hooks/position.js
+index 11fddf72896925..a5fae3d8d3a7c2 100644
+--- a/packages/block-editor/src/hooks/position.js
++++ b/packages/block-editor/src/hooks/position.js
+@@ -42,7 +42,7 @@ const STICKY_OPTION = {
+ 	key: 'sticky',
+ 	value: 'sticky',
+ 	name: _x( 'Sticky', 'Name for the value of the CSS position property' ),
+-	__experimentalHint: __(
++	hint: __(
+ 		'The block will stick to the top of the window instead of scrolling.'
+ 	),
+ };
+@@ -51,9 +51,7 @@ const FIXED_OPTION = {
+ 	key: 'fixed',
+ 	value: 'fixed',
+ 	name: _x( 'Fixed', 'Name for the value of the CSS position property' ),
+-	__experimentalHint: __(
+-		'The block will not move when the page is scrolled.'
+-	),
++	hint: __( 'The block will not move when the page is scrolled.' ),
+ };
+ 
+ const POSITION_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 401d92d06afe19..3699162feb5109 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `CustomSelectControlV2`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
+ 
++### Enhancements
++
++-   `CustomSelectControl`: Stabilize `__experimentalShowSelectedHint` and `options[]. __experimentalHint` props ([#63248](https://github.com/WordPress/gutenberg/pull/63248)).
++
+ ## 28.3.0 (2024-07-10)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+index a4c437be97e405..7dcdec9b7bdc60 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+@@ -12,9 +12,31 @@ import CustomSelectItem from '../item';
+ import type { LegacyCustomSelectProps } from '../types';
+ import * as Styled from '../styles';
+ 
++function useDeprecatedProps( {
++	__experimentalShowSelectedHint,
++	...otherProps
++}: LegacyCustomSelectProps ) {
++	return {
++		showSelectedHint: __experimentalShowSelectedHint,
++		...otherProps,
++	};
++}
++
++// The removal of `__experimentalHint` in favour of `hint` doesn't happen in
++// the `useDeprecatedProps` hook in order not to break consumers that rely
++// on object identity (see https://github.com/WordPress/gutenberg/pull/63248#discussion_r1672213131)
++function applyOptionDeprecations( {
++	__experimentalHint,
++	...rest
++}: LegacyCustomSelectProps[ 'options' ][ number ] ) {
++	return {
++		hint: __experimentalHint,
++		...rest,
++	};
++}
++
+ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 	const {
+-		__experimentalShowSelectedHint = false,
+ 		__next40pxDefaultSize = false,
+ 		describedBy,
+ 		options,
+@@ -22,8 +44,9 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 		size = 'default',
+ 		value,
+ 		className: classNameProp,
++		showSelectedHint = false,
+ 		...restProps
+-	} = props;
++	} = useDeprecatedProps( props );
+ 
+ 	// Forward props + store from v2 implementation
+ 	const store = Ariakit.useSelectStore( {
+@@ -60,8 +83,9 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 		defaultValue: options[ 0 ]?.name,
+ 	} );
+ 
+-	const children = options.map(
+-		( { name, key, __experimentalHint, style, className } ) => {
++	const children = options
++		.map( applyOptionDeprecations )
++		.map( ( { name, key, hint, style, className } ) => {
+ 			const withHint = (
+ 				<Styled.WithHintItemWrapper>
+ 					<span>{ name }</span>
+@@ -69,7 +93,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 					// TODO: Legacy classname. Add V1 styles are removed from the codebase
+ 					// className="components-custom-select-control__item-hint"
+ 					>
+-						{ __experimentalHint }
++						{ hint }
+ 					</Styled.WithHintItemHint>
+ 				</Styled.WithHintItemWrapper>
+ 			);
+@@ -78,7 +102,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 				<CustomSelectItem
+ 					key={ key }
+ 					value={ name }
+-					children={ __experimentalHint ? withHint : name }
++					children={ hint ? withHint : name }
+ 					style={ style }
+ 					className={ clsx(
+ 						// TODO: Legacy classname. Add V1 styles are removed from the codebase
+@@ -86,30 +110,31 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 						className
+ 						// TODO: Legacy classname. Add V1 styles are removed from the codebase
+ 						// {
+-						// 	'has-hint': __experimentalHint,
++						// 	'has-hint': hint,
+ 						// }
+ 					) }
+ 				/>
+ 			);
+-		}
+-	);
++		} );
+ 
+ 	const renderSelectedValueHint = () => {
+ 		const { value: currentValue } = store.getState();
+ 
+-		const currentHint = options?.find(
+-			( { name } ) => currentValue === name
+-		);
++		const selectedOptionHint = options
++			?.map( applyOptionDeprecations )
++			?.find( ( { name } ) => currentValue === name )?.hint;
+ 
+ 		return (
+ 			<Styled.SelectedExperimentalHintWrapper>
+ 				{ currentValue }
+-				<Styled.SelectedExperimentalHintItem
+-				// TODO: Legacy classname. Add V1 styles are removed from the codebase
+-				// className="components-custom-select-control__hint"
+-				>
+-					{ currentHint?.__experimentalHint }
+-				</Styled.SelectedExperimentalHintItem>
++				{ selectedOptionHint && (
++					<Styled.SelectedExperimentalHintItem
++					// TODO: Legacy classname. Add V1 styles are removed from the codebase
++					// className="components-custom-select-control__hint"
++					>
++						{ selectedOptionHint }
++					</Styled.SelectedExperimentalHintItem>
++				) }
+ 			</Styled.SelectedExperimentalHintWrapper>
+ 		);
+ 	};
+@@ -131,9 +156,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 		<_CustomSelect
+ 			aria-describedby={ describedBy }
+ 			renderSelectedValue={
+-				__experimentalShowSelectedHint
+-					? renderSelectedValueHint
+-					: undefined
++				showSelectedHint ? renderSelectedValueHint : undefined
+ 			}
+ 			size={ translatedSize }
+ 			store={ store }
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+index 1e361236aafd9a..496b42572d82f6 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+@@ -297,7 +297,7 @@ describe.each( [
+ 					{
+ 						key: 'one',
+ 						name: 'One',
+-						__experimentalHint: 'Hint',
++						hint: 'Hint',
+ 					},
+ 				] }
+ 			/>
+@@ -309,7 +309,7 @@ describe.each( [
+ 		);
+ 	} );
+ 
+-	it( 'shows selected hint when __experimentalShowSelectedHint is set', async () => {
++	it( 'shows selected hint when showSelectedHint is set', async () => {
+ 		render(
+ 			<Component
+ 				{ ...legacyProps }
+@@ -318,10 +318,10 @@ describe.each( [
+ 					{
+ 						key: 'one',
+ 						name: 'One',
+-						__experimentalHint: 'Hint',
++						hint: 'Hint',
+ 					},
+ 				] }
+-				__experimentalShowSelectedHint
++				showSelectedHint
+ 			/>
+ 		);
+ 
+@@ -334,7 +334,7 @@ describe.each( [
+ 		);
+ 	} );
+ 
+-	it( 'shows selected hint in list of options when added, regardless of __experimentalShowSelectedHint prop', async () => {
++	it( 'shows selected hint in list of options when added, regardless of showSelectedHint prop', async () => {
+ 		render(
+ 			<Component
+ 				{ ...legacyProps }
+@@ -343,7 +343,7 @@ describe.each( [
+ 					{
+ 						key: 'one',
+ 						name: 'One',
+-						__experimentalHint: 'Hint',
++						hint: 'Hint',
+ 					},
+ 				] }
+ 			/>
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+index b663f1892ceebc..95a78c501839d6 100644
+--- a/packages/components/src/custom-select-control-v2/types.ts
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -90,6 +90,12 @@ type LegacyOption = {
+ 	name: string;
+ 	style?: React.CSSProperties;
+ 	className?: string;
++	hint?: string;
++	/**
++	 * Use the `hint` property instead
++	 * @deprecated
++	 * @ignore
++	 */
+ 	__experimentalHint?: string;
+ 	[ key: string ]: any;
+ };
+@@ -169,11 +175,17 @@ export type LegacyCustomSelectProps = {
+ 	 */
+ 	value?: LegacyOption;
+ 	/**
+-	 * Legacy way to add additional text to the right of each option.
++	 * Use the `showSelectedHint` property instead.
++	 * @deprecated
++	 * @ignore
++	 */
++	__experimentalShowSelectedHint?: boolean;
++	/**
++	 * Show the hint of the selected item in the trigger button.
+ 	 *
+ 	 * @default false
+ 	 */
+-	__experimentalShowSelectedHint?: boolean;
++	showSelectedHint?: boolean;
+ 	/**
+ 	 * Opt-in prop for an unconstrained width style which became the default in
+ 	 * WordPress 6.5. The prop is no longer needed and can be safely removed.
+diff --git a/packages/components/src/font-size-picker/font-size-picker-select.tsx b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+index 3f0b7a0e54074a..4dd80b45b0ac70 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-select.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+@@ -56,7 +56,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
+ 				key: fontSize.slug,
+ 				name: fontSize.name || fontSize.slug,
+ 				value: fontSize.size,
+-				__experimentalHint: hint,
++				hint,
+ 			};
+ 		} ),
+ 		...( disableCustomFontSizes ? [] : [ CUSTOM_OPTION ] ),
+@@ -79,7 +79,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
+ 			) }
+ 			options={ options }
+ 			value={ selectedOption }
+-			__experimentalShowSelectedHint
++			showSelectedHint
+ 			onChange={ ( {
+ 				selectedItem,
+ 			}: {
+diff --git a/packages/components/src/font-size-picker/types.ts b/packages/components/src/font-size-picker/types.ts
+index 6b4ed4b7ee75a5..0072c47df6f052 100644
+--- a/packages/components/src/font-size-picker/types.ts
++++ b/packages/components/src/font-size-picker/types.ts
+@@ -110,7 +110,7 @@ export type FontSizePickerSelectOption = {
+ 	key: string;
+ 	name: string;
+ 	value?: FontSize[ 'size' ];
+-	__experimentalHint?: string;
++	hint?: string;
+ };
+ 
+ export type FontSizePickerToggleGroupProps = Pick<

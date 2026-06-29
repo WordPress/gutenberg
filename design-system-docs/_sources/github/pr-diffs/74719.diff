@@ -1,0 +1,510 @@
+diff --git a/packages/ui/src/empty-state/actions.tsx b/packages/ui/src/empty-state/actions.tsx
+new file mode 100644
+index 00000000000000..402ae5712ae767
+--- /dev/null
++++ b/packages/ui/src/empty-state/actions.tsx
+@@ -0,0 +1,24 @@
++import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import type { EmptyStateActionsProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * A container for action buttons in an empty state. Actions are optional, and
++ * can include a primary and optional secondary action button.
++ */
++export const Actions = forwardRef< HTMLDivElement, EmptyStateActionsProps >(
++	function EmptyStateActions( { render, ...props }, ref ) {
++		const className = clsx( styles.actions );
++
++		const element = useRender( {
++			defaultTagName: 'div',
++			render,
++			ref,
++			props: mergeProps< 'div' >( { className }, props ),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/empty-state/description.tsx b/packages/ui/src/empty-state/description.tsx
+new file mode 100644
+index 00000000000000..affed8b2cae35e
+--- /dev/null
++++ b/packages/ui/src/empty-state/description.tsx
+@@ -0,0 +1,27 @@
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { Text } from '../text';
++import type { EmptyStateDescriptionProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * The description text for an empty state, providing additional context and
++ * guidance on what the user should do next.
++ */
++export const Description = forwardRef<
++	HTMLParagraphElement,
++	EmptyStateDescriptionProps
++>( function EmptyStateDescription(
++	{ render, className, children, ...props },
++	ref
++) {
++	return (
++		<Text
++			variant="body-md"
++			render={ render ?? <p ref={ ref } { ...props } /> }
++			className={ clsx( styles.description, className ) }
++		>
++			{ children }
++		</Text>
++	);
++} );
+diff --git a/packages/ui/src/empty-state/icon.tsx b/packages/ui/src/empty-state/icon.tsx
+new file mode 100644
+index 00000000000000..acd89cb50ded47
+--- /dev/null
++++ b/packages/ui/src/empty-state/icon.tsx
+@@ -0,0 +1,24 @@
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { Icon as _Icon } from '../icon';
++import { Visual } from './visual';
++import type { EmptyStateIconProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * An icon visual for empty states. Renders an icon with styling treatment for
++ * empty states.
++ */
++export const Icon = forwardRef< HTMLDivElement, EmptyStateIconProps >(
++	function EmptyStateIcon( { icon, className, ...restProps }, ref ) {
++		return (
++			<Visual
++				ref={ ref }
++				className={ clsx( styles.icon, className ) }
++				{ ...restProps }
++			>
++				<_Icon icon={ icon } />
++			</Visual>
++		);
++	}
++);
+diff --git a/packages/ui/src/empty-state/index.ts b/packages/ui/src/empty-state/index.ts
+new file mode 100644
+index 00000000000000..a7ecb11adeb074
+--- /dev/null
++++ b/packages/ui/src/empty-state/index.ts
+@@ -0,0 +1,8 @@
++import { Root } from './root';
++import { Visual } from './visual';
++import { Icon } from './icon';
++import { Title } from './title';
++import { Description } from './description';
++import { Actions } from './actions';
++
++export { Root, Visual, Icon, Title, Description, Actions };
+diff --git a/packages/ui/src/empty-state/root.tsx b/packages/ui/src/empty-state/root.tsx
+new file mode 100644
+index 00000000000000..e59bdac9f3759b
+--- /dev/null
++++ b/packages/ui/src/empty-state/root.tsx
+@@ -0,0 +1,23 @@
++import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import type { EmptyStateRootProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * The root container for an empty state component.
++ */
++export const Root = forwardRef< HTMLDivElement, EmptyStateRootProps >(
++	function EmptyStateRoot( { render, ...props }, ref ) {
++		const className = clsx( styles.root );
++
++		const element = useRender( {
++			defaultTagName: 'div',
++			render,
++			ref,
++			props: mergeProps< 'div' >( { className }, props ),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/empty-state/stories/index.story.tsx b/packages/ui/src/empty-state/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..af9ebed23ea03e
+--- /dev/null
++++ b/packages/ui/src/empty-state/stories/index.story.tsx
+@@ -0,0 +1,64 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { search } from '@wordpress/icons';
++import { Button, EmptyState } from '../..';
++
++const meta: Meta< typeof EmptyState.Root > = {
++	title: 'Design System/Components/EmptyState',
++	component: EmptyState.Root,
++	subcomponents: {
++		'EmptyState.Visual': EmptyState.Visual,
++		'EmptyState.Icon': EmptyState.Icon,
++		'EmptyState.Title': EmptyState.Title,
++		'EmptyState.Description': EmptyState.Description,
++		'EmptyState.Actions': EmptyState.Actions,
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof EmptyState.Root >;
++
++export const Default: Story = {
++	args: {
++		children: (
++			<>
++				<EmptyState.Icon icon={ search } />
++				<EmptyState.Title>No results found</EmptyState.Title>
++				<EmptyState.Description>
++					Try adjusting your search or filter to find what you&apos;re
++					looking for.
++				</EmptyState.Description>
++				<EmptyState.Actions>
++					<Button variant="outline">Clear filters</Button>
++					<Button>Add item</Button>
++				</EmptyState.Actions>
++			</>
++		),
++	},
++};
++
++export const WithCustomVisual: Story = {
++	args: {
++		children: (
++			<>
++				<EmptyState.Visual>
++					<svg
++						width="50"
++						height="50"
++						viewBox="0 0 50 50"
++						fill="none"
++						xmlns="http://www.w3.org/2000/svg"
++					>
++						<circle cx="25" cy="25" r="25" fill="currentColor" />
++					</svg>
++				</EmptyState.Visual>
++				<EmptyState.Title>All caught up!</EmptyState.Title>
++				<EmptyState.Description>
++					You&apos;ve completed all your tasks. Great work!
++				</EmptyState.Description>
++				<EmptyState.Actions>
++					<Button>Create new task</Button>
++				</EmptyState.Actions>
++			</>
++		),
++	},
++};
+diff --git a/packages/ui/src/empty-state/style.module.css b/packages/ui/src/empty-state/style.module.css
+new file mode 100644
+index 00000000000000..bc7dfd4a2e70a0
+--- /dev/null
++++ b/packages/ui/src/empty-state/style.module.css
+@@ -0,0 +1,53 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.root {
++		display: flex;
++		flex-direction: column;
++		align-items: center;
++		text-align: center;
++		max-width: var(--wpds-dimension-surface-width-sm);
++		gap: var(--wpds-dimension-gap-xs);
++		font-family: var(--wpds-font-family-body);
++		color: var(--wpds-color-fg-content-neutral);
++		text-wrap: balance;
++	}
++
++	.visual {
++		display: flex;
++		margin-block-end: var(--wpds-dimension-gap-xs);
++		align-items: center;
++		justify-content: center;
++		color: var(--wpds-color-fg-content-neutral-weak);
++		line-height: 1;
++	}
++
++	.icon {
++		padding: var(--wpds-dimension-padding-xs);
++		border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
++		border-radius: 50%;
++		background-color: var(--wpds-color-bg-surface-neutral-weak);
++	}
++
++	.title {
++		margin: 0;
++	}
++
++	.description {
++		margin: 0;
++		color: var(--wpds-color-fg-content-neutral-weak);
++	}
++
++	.actions {
++		display: flex;
++		margin-block-start: var(--wpds-dimension-gap-md);
++		flex-direction: column;
++		gap: var(--wpds-dimension-gap-xs);
++		align-items: center;
++
++		@media (min-width: 480px) {
++			flex-direction: row;
++			justify-content: center;
++		}
++	}
++}
+diff --git a/packages/ui/src/empty-state/test/actions.test.tsx b/packages/ui/src/empty-state/test/actions.test.tsx
+new file mode 100644
+index 00000000000000..1c3f0c9ee28d28
+--- /dev/null
++++ b/packages/ui/src/empty-state/test/actions.test.tsx
+@@ -0,0 +1,18 @@
++import { render } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import { Actions } from '../index';
++import { Button } from '../../button';
++
++describe( 'EmptyState.Actions', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLDivElement >();
++
++		render(
++			<Actions ref={ ref }>
++				<Button>Action</Button>
++			</Actions>
++		);
++
++		expect( ref.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++} );
+diff --git a/packages/ui/src/empty-state/test/description.test.tsx b/packages/ui/src/empty-state/test/description.test.tsx
+new file mode 100644
+index 00000000000000..f446c55286d228
+--- /dev/null
++++ b/packages/ui/src/empty-state/test/description.test.tsx
+@@ -0,0 +1,13 @@
++import { render } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import { Description } from '../index';
++
++describe( 'EmptyState.Description', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLParagraphElement >();
++
++		render( <Description ref={ ref }>Description text</Description> );
++
++		expect( ref.current ).toBeInstanceOf( HTMLParagraphElement );
++	} );
++} );
+diff --git a/packages/ui/src/empty-state/test/icon.test.tsx b/packages/ui/src/empty-state/test/icon.test.tsx
+new file mode 100644
+index 00000000000000..7f8a110f069a05
+--- /dev/null
++++ b/packages/ui/src/empty-state/test/icon.test.tsx
+@@ -0,0 +1,13 @@
++import { render } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import { Icon } from '../index';
++
++describe( 'EmptyState.Icon', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLDivElement >();
++
++		render( <Icon ref={ ref } icon={ <svg /> } /> );
++
++		expect( ref.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++} );
+diff --git a/packages/ui/src/empty-state/test/root.test.tsx b/packages/ui/src/empty-state/test/root.test.tsx
+new file mode 100644
+index 00000000000000..43c3d19379f2be
+--- /dev/null
++++ b/packages/ui/src/empty-state/test/root.test.tsx
+@@ -0,0 +1,13 @@
++import { render } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import { Root } from '../index';
++
++describe( 'EmptyState.Root', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLDivElement >();
++
++		render( <Root ref={ ref }>Empty state content</Root> );
++
++		expect( ref.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++} );
+diff --git a/packages/ui/src/empty-state/test/title.test.tsx b/packages/ui/src/empty-state/test/title.test.tsx
+new file mode 100644
+index 00000000000000..73dbff4abdedfb
+--- /dev/null
++++ b/packages/ui/src/empty-state/test/title.test.tsx
+@@ -0,0 +1,13 @@
++import { render } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import { Title } from '../index';
++
++describe( 'EmptyState.Title', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLHeadingElement >();
++
++		render( <Title ref={ ref }>No results found</Title> );
++
++		expect( ref.current ).toBeInstanceOf( HTMLHeadingElement );
++	} );
++} );
+diff --git a/packages/ui/src/empty-state/test/visual.test.tsx b/packages/ui/src/empty-state/test/visual.test.tsx
+new file mode 100644
+index 00000000000000..3fa8a89b938630
+--- /dev/null
++++ b/packages/ui/src/empty-state/test/visual.test.tsx
+@@ -0,0 +1,17 @@
++import { render } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import { Visual } from '../index';
++
++describe( 'EmptyState.Visual', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLDivElement >();
++
++		render(
++			<Visual ref={ ref }>
++				<svg />
++			</Visual>
++		);
++
++		expect( ref.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++} );
+diff --git a/packages/ui/src/empty-state/title.tsx b/packages/ui/src/empty-state/title.tsx
+new file mode 100644
+index 00000000000000..c7b86b7cd3c92f
+--- /dev/null
++++ b/packages/ui/src/empty-state/title.tsx
+@@ -0,0 +1,23 @@
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { Text } from '../text';
++import type { EmptyStateTitleProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * The title is a short heading that communicates the empty state.
++ */
++export const Title = forwardRef< HTMLHeadingElement, EmptyStateTitleProps >(
++	function EmptyStateTitle( { render, className, children, ...props }, ref ) {
++		return (
++			<Text
++				variant="heading-lg"
++				// eslint-disable-next-line jsx-a11y/heading-has-content -- content provided via render prop
++				render={ render ?? <h2 ref={ ref } { ...props } /> }
++				className={ clsx( styles.title, className ) }
++			>
++				{ children }
++			</Text>
++		);
++	}
++);
+diff --git a/packages/ui/src/empty-state/types.ts b/packages/ui/src/empty-state/types.ts
+new file mode 100644
+index 00000000000000..2661f55db8dbbc
+--- /dev/null
++++ b/packages/ui/src/empty-state/types.ts
+@@ -0,0 +1,45 @@
++import type { ReactNode } from 'react';
++import type { ComponentProps } from '../utils/types';
++import type { IconProps } from '../icon/types';
++
++export interface EmptyStateRootProps extends ComponentProps< 'div' > {
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++}
++
++export interface EmptyStateVisualProps extends ComponentProps< 'div' > {
++	/**
++	 * The visual content of the empty state (e.g., icon, illustration).
++	 */
++	children?: ReactNode;
++}
++
++export interface EmptyStateIconProps extends ComponentProps< 'div' > {
++	/**
++	 * The icon to render.
++	 */
++	icon: IconProps[ 'icon' ];
++}
++
++export interface EmptyStateTitleProps extends ComponentProps< 'h2' > {
++	/**
++	 * The title text of the empty state.
++	 */
++	children?: ReactNode;
++}
++
++export interface EmptyStateDescriptionProps extends ComponentProps< 'p' > {
++	/**
++	 * The description text of the empty state.
++	 */
++	children?: ReactNode;
++}
++
++export interface EmptyStateActionsProps extends ComponentProps< 'div' > {
++	/**
++	 * The action buttons for the empty state.
++	 */
++	children?: ReactNode;
++}
+diff --git a/packages/ui/src/empty-state/visual.tsx b/packages/ui/src/empty-state/visual.tsx
+new file mode 100644
+index 00000000000000..c5c2a85eeb7ff1
+--- /dev/null
++++ b/packages/ui/src/empty-state/visual.tsx
+@@ -0,0 +1,24 @@
++import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import type { EmptyStateVisualProps } from './types';
++import styles from './style.module.css';
++
++/**
++ * A container for visual content in an empty state (e.g., icons, illustrations).
++ * Provides appropriate spacing and alignment for visual elements.
++ */
++export const Visual = forwardRef< HTMLDivElement, EmptyStateVisualProps >(
++	function EmptyStateVisual( { render, ...props }, ref ) {
++		const className = clsx( styles.visual );
++
++		const element = useRender( {
++			defaultTagName: 'div',
++			render,
++			ref,
++			props: mergeProps< 'div' >( { className }, props ),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 5f682a4103899d..3908b6d34b9c13 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -4,6 +4,7 @@ export * as Card from './card';
+ export * as Collapsible from './collapsible';
+ export * as CollapsibleCard from './collapsible-card';
+ export * as Dialog from './dialog';
++export * as EmptyState from './empty-state';
+ export * from './form';
+ export * from './icon';
+ export * from './icon-button';

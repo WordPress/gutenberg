@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c3709134f187eb..dd6b93cfd66db1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -3,12 +3,14 @@
+ ## Unreleased
+ 
+ -   `CheckboxControl`, `CustomGradientPicker`, `FormToggle`, : Refactor and correct the focus style for consistency ([#50127](https://github.com/WordPress/gutenberg/pull/50127)).
++-   `Button`, update spacing values in `has-text has-icon` buttons. ([#50277](https://github.com/WordPress/gutenberg/pull/50277)).
+ -   `Button`, remove custom padding applied to `tertiary` variant. ([#50276](https://github.com/WordPress/gutenberg/pull/50276)).
+ 
+ ### Breaking Changes
+ 
+ -   `onDragStart` in `<Draggable>` is now a synchronous function to allow setting additional data for `event.dataTransfer` ([#49673](https://github.com/WordPress/gutenberg/pull/49673)).
+ 
++
+ ### Internal
+ 
+ -   `NavigableContainer`: Convert to TypeScript ([#49377](https://github.com/WordPress/gutenberg/pull/49377)).
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index d7fe58d03775f9..f59d5d8d7bd207 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -292,11 +292,9 @@
+ 
+ 		&.has-text {
+ 			justify-content: start;
+-			padding-right: 12px;
+-		}
+-
+-		&.has-text svg {
+-			margin-right: $grid-unit-10;
++			padding-right: $grid-unit-15;
++			padding-left: $grid-unit-10;
++			gap: $grid-unit-05;
+ 		}
+ 
+ 		&.has-text .dashicon {

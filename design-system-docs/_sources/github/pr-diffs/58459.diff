@@ -1,0 +1,161 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e86b4079fdffd6..9054627403ea10 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,12 +10,12 @@
+ -   `AnglePickerControl`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#58700](https://github.com/WordPress/gutenberg/pull/58700)).
+ 
+ ### Enhancements
+-
+ -   `Button`: Update secondary variant to show the border even in a disabled state. ([#58606](https://github.com/WordPress/gutenberg/pull/58606)).
+ -   `ConfirmDialog`: Add `__next40pxDefaultSize` to buttons ([#58421](https://github.com/WordPress/gutenberg/pull/58421)).
+ -   `Snackbar`: Update the warning message ([#58591](https://github.com/WordPress/gutenberg/pull/58591)).
+ -   `Composite`: Implementing `useCompositeState` with Ariakit ([#57304](https://github.com/WordPress/gutenberg/pull/57304))
+ -   `CheckboxControl`: Remove ability for label prop to be false ([#58339](https://github.com/WordPress/gutenberg/pull/58339)).
++-   `FocalPointPicker`: Apply modern styling ([#58459](https://github.com/WordPress/gutenberg/pull/58459)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
+index 3df6d1bc6eafbe..3ff8223e05e05c 100644
+--- a/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
++++ b/packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts
+@@ -9,19 +9,20 @@ import styled from '@emotion/styled';
+  */
+ import { Flex } from '../../flex';
+ import UnitControl from '../../unit-control';
+-import { COLORS } from '../../utils';
++import { COLORS, CONFIG, reduceMotion } from '../../utils';
+ import type { FocalPointPickerControlsProps } from '../types';
+ import { INITIAL_BOUNDS } from '../utils';
+ 
+ export const MediaWrapper = styled.div`
+ 	background-color: transparent;
++	display: flex;
+ 	text-align: center;
+ 	width: 100%;
+ `;
+ 
+ export const MediaContainer = styled.div`
+ 	align-items: center;
+-	box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.2 );
++	border-radius: ${ CONFIG.radiusBlockUi };
+ 	cursor: pointer;
+ 	display: inline-flex;
+ 	justify-content: center;
+@@ -29,8 +30,21 @@ export const MediaContainer = styled.div`
+ 	position: relative;
+ 	height: 100%;
+ 
++	&:after {
++		border-radius: inherit;
++		bottom: 0;
++		box-shadow: inset 0 0 0 1px rgba( 0, 0, 0, 0.1 );
++		content: '';
++		left: 0;
++		pointer-events: none;
++		position: absolute;
++		right: 0;
++		top: 0;
++	}
++
+ 	img,
+ 	video {
++		border-radius: inherit;
+ 		box-sizing: border-box;
+ 		display: block;
+ 		height: auto;
+@@ -45,6 +59,7 @@ export const MediaContainer = styled.div`
+ 
+ export const MediaPlaceholder = styled.div`
+ 	background: ${ COLORS.gray[ 100 ] };
++	border-radius: inherit;
+ 	box-sizing: border-box;
+ 	height: ${ INITIAL_BOUNDS.height }px;
+ 	max-width: 280px;
+@@ -91,29 +106,30 @@ export const GridView = styled.div`
+ 	position: absolute;
+ 	top: 50%;
+ 	transform: translate3d( -50%, -50%, 0 );
+-	transition: opacity 120ms linear;
++	transition: opacity 100ms linear;
+ 	z-index: 1;
+ 
++	${ reduceMotion( 'transition' ) }
++
+ 	opacity: ${ ( { showOverlay }: { showOverlay?: boolean } ) =>
+ 		showOverlay ? 1 : 0 };
+ `;
+ 
+ export const GridLine = styled.div`
+-	background: white;
+-	box-shadow: 0 0 2px rgba( 0, 0, 0, 0.6 );
++	background: rgba( 255, 255, 255, 0.4 );
++	backdrop-filter: blur( 16px ) saturate( 180% );
+ 	position: absolute;
+-	opacity: 0.4;
+ 	transform: translateZ( 0 );
+ `;
+ 
+ export const GridLineX = styled( GridLine )`
+ 	height: 1px;
+-	left: 0;
+-	right: 0;
++	left: 1px;
++	right: 1px;
+ `;
+ 
+ export const GridLineY = styled( GridLine )`
+ 	width: 1px;
+-	top: 0;
+-	bottom: 0;
++	top: 1px;
++	bottom: 1px;
+ `;
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-style.ts b/packages/components/src/focal-point-picker/styles/focal-point-style.ts
+index 201924ec6f6c6e..5ee0c01c42dd62 100644
+--- a/packages/components/src/focal-point-picker/styles/focal-point-style.ts
++++ b/packages/components/src/focal-point-picker/styles/focal-point-style.ts
+@@ -3,21 +3,35 @@
+  */
+ import styled from '@emotion/styled';
+ 
++/**
++ * Internal dependencies
++ */
++import { reduceMotion } from '../../utils';
++
+ export const PointerCircle = styled.div`
+ 	background-color: transparent;
+ 	cursor: grab;
+-	height: 48px;
+-	margin: -24px 0 0 -24px;
++	height: 40px;
++	margin: -20px 0 0 -20px;
+ 	position: absolute;
+ 	user-select: none;
+-	width: 48px;
++	width: 40px;
+ 	will-change: transform;
+ 	z-index: 10000;
+-	background: rgba( 255, 255, 255, 0.6 );
++	background: rgba( 255, 255, 255, 0.4 );
++	border: 1px solid rgba( 255, 255, 255, 0.4 );
+ 	border-radius: 50%;
+-	backdrop-filter: blur( 4px );
+-	box-shadow: rgb( 0 0 0 / 20% ) 0px 0px 10px;
++	backdrop-filter: blur( 16px ) saturate( 180% );
++	box-shadow: rgb( 0 0 0 / 10% ) 0px 0px 8px;
++	transition: transform 100ms linear;
++
++	${ reduceMotion( 'transition' ) }
+ 
+ 	${ ( { isDragging }: { isDragging: boolean } ) =>
+-		isDragging && 'cursor: grabbing;' }
++		isDragging &&
++		`
++			box-shadow: rgb( 0 0 0 / 12% ) 0px 0px 10px;
++			transform: scale( 1.1 );
++			cursor: grabbing;
++			` }
+ `;

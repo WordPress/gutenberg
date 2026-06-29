@@ -1,0 +1,247 @@
+diff --git a/packages/block-editor/src/components/block-inspector/style.scss b/packages/block-editor/src/components/block-inspector/style.scss
+index 8e114089ad31f9..07701f2e4b91de 100644
+--- a/packages/block-editor/src/components/block-inspector/style.scss
++++ b/packages/block-editor/src/components/block-inspector/style.scss
+@@ -18,10 +18,12 @@
+ 		}
+ 	}
+ 
+-	// Reset unexpected margin-bottom from being applied to the `BaseControl`
+-	// component of the `FocalPointPicker` component.
+-	.components-focal-point-picker-control .components-base-control {
+-		margin-bottom: 0;
++	// Reset unwanted margin-bottom from being applied to BaseControls within certain components.
++	.components-focal-point-picker-control,
++	.components-query-controls {
++		.components-base-control {
++			margin-bottom: 0;
++		}
+ 	}
+ 
+ 	.components-panel__body {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e15099e32b7608..725156f85dd713 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,18 +13,19 @@
+ -   `ColorPicker`: Convert to TypeScript ([#49214](https://github.com/WordPress/gutenberg/pull/49214)).
+ -   `GradientPicker`: Convert to TypeScript ([#48316](https://github.com/WordPress/gutenberg/pull/48316)).
+ -   `FormTokenField`: Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles ([48609](https://github.com/WordPress/gutenberg/pull/48609)).
++-   `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom`([47515](https://github.com/WordPress/gutenberg/pull/47515)).
+ 
+ ### Enhancements
+ 
+ -   `CustomGradientPicker`: improve initial state UI ([#49146](https://github.com/WordPress/gutenberg/pull/49146)).
+--	`AnglePickerControl`: Style to better fit in narrow contexts and improve RTL layout ([#49046](https://github.com/WordPress/gutenberg/pull/49046)).
++-   `AnglePickerControl`: Style to better fit in narrow contexts and improve RTL layout ([#49046](https://github.com/WordPress/gutenberg/pull/49046)).
+ -   `ImageSizeControl`: Use large 40px sizes ([#49113](https://github.com/WordPress/gutenberg/pull/49113)).
+ 
+ ### Bug Fix
+ 
+--  `CircularOptionPicker`: force swatches to visually render on top of the rest of the component's content ([#49245](https://github.com/WordPress/gutenberg/pull/49245)).
+--  `InputControl`: Fix misaligned textarea input control ([#49116](https://github.com/WordPress/gutenberg/pull/49116)).
+--  `ToolsPanel`: Ensure consistency in menu item order ([#49222](https://github.com/WordPress/gutenberg/pull/49222)).
++-   `CircularOptionPicker`: force swatches to visually render on top of the rest of the component's content ([#49245](https://github.com/WordPress/gutenberg/pull/49245)).
++-   `InputControl`: Fix misaligned textarea input control ([#49116](https://github.com/WordPress/gutenberg/pull/49116)).
++-   `ToolsPanel`: Ensure consistency in menu item order ([#49222](https://github.com/WordPress/gutenberg/pull/49222)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/query-controls/author-select.tsx b/packages/components/src/query-controls/author-select.tsx
+index cd4c6fd816c4cc..fb5f575108230d 100644
+--- a/packages/components/src/query-controls/author-select.tsx
++++ b/packages/components/src/query-controls/author-select.tsx
+@@ -27,6 +27,7 @@ export default function AuthorSelect( {
+ 					? String( selectedAuthorId )
+ 					: undefined
+ 			}
++			__nextHasNoMarginBottom
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/query-controls/category-select.tsx b/packages/components/src/query-controls/category-select.tsx
+index fe12423946f82e..9f9c1b3a0f07c8 100644
+--- a/packages/components/src/query-controls/category-select.tsx
++++ b/packages/components/src/query-controls/category-select.tsx
+@@ -36,6 +36,7 @@ export default function CategorySelect( {
+ 					: undefined
+ 			}
+ 			{ ...props }
++			__nextHasNoMarginBottom
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/query-controls/index.tsx b/packages/components/src/query-controls/index.tsx
+index 91769410b4fa92..f325347d10c393 100644
+--- a/packages/components/src/query-controls/index.tsx
++++ b/packages/components/src/query-controls/index.tsx
+@@ -11,6 +11,7 @@ import CategorySelect from './category-select';
+ import FormTokenField from '../form-token-field';
+ import RangeControl from '../range-control';
+ import SelectControl from '../select-control';
++import { VStack } from '../v-stack';
+ import type {
+ 	QueryControlsProps,
+ 	QueryControlsWithMultipleCategorySelectionProps,
+@@ -75,7 +76,7 @@ export function QueryControls( {
+ 	...props
+ }: QueryControlsProps ) {
+ 	return (
+-		<>
++		<VStack spacing="4" className="components-query-controls">
+ 			{ [
+ 				onOrderChange && onOrderByChange && (
+ 					<SelectControl
+@@ -142,6 +143,7 @@ export function QueryControls( {
+ 					props.categorySuggestions &&
+ 					props.onCategoryChange && (
+ 						<FormTokenField
++							__nextHasNoMarginBottom
+ 							key="query-controls-categories-select"
+ 							label={ __( 'Categories' ) }
+ 							value={
+@@ -185,7 +187,7 @@ export function QueryControls( {
+ 					/>
+ 				),
+ 			] }
+-		</>
++		</VStack>
+ 	);
+ }
+ 
+diff --git a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+index 125cdf9b98c5d9..01fbade7d872b5 100644
+--- a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
++++ b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+@@ -9,7 +9,8 @@ import {
+ 	TextControl,
+ 	TreeSelect,
+ 	withFilters,
+-	__experimentalVStack as VStack,
++	Flex,
++	FlexItem,
+ } from '@wordpress/components';
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import { useDebounce } from '@wordpress/compose';
+@@ -392,11 +393,10 @@ export function HierarchicalTermSelector( { slug } ) {
+ 	const showFilter = availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER;
+ 
+ 	return (
+-		<>
++		<Flex direction="column" gap="4">
+ 			{ showFilter && (
+ 				<TextControl
+ 					__nextHasNoMarginBottom
+-					className="editor-post-taxonomies__hierarchical-terms-filter"
+ 					label={ filterLabel }
+ 					value={ filterValue }
+ 					onChange={ setFilter }
+@@ -413,18 +413,20 @@ export function HierarchicalTermSelector( { slug } ) {
+ 				) }
+ 			</div>
+ 			{ ! loading && hasCreateAction && (
+-				<Button
+-					onClick={ onToggleForm }
+-					className="editor-post-taxonomies__hierarchical-terms-add"
+-					aria-expanded={ showForm }
+-					variant="link"
+-				>
+-					{ newTermButtonLabel }
+-				</Button>
++				<FlexItem>
++					<Button
++						onClick={ onToggleForm }
++						className="editor-post-taxonomies__hierarchical-terms-add"
++						aria-expanded={ showForm }
++						variant="link"
++					>
++						{ newTermButtonLabel }
++					</Button>
++				</FlexItem>
+ 			) }
+ 			{ showForm && (
+ 				<form onSubmit={ onAddTerm }>
+-					<VStack>
++					<Flex direction="column" gap="4">
+ 						<TextControl
+ 							__nextHasNoMarginBottom
+ 							className="editor-post-taxonomies__hierarchical-terms-input"
+@@ -435,6 +437,7 @@ export function HierarchicalTermSelector( { slug } ) {
+ 						/>
+ 						{ !! availableTerms.length && (
+ 							<TreeSelect
++								__nextHasNoMarginBottom
+ 								label={ parentSelectLabel }
+ 								noOptionLabel={ noParentOption }
+ 								onChange={ onChangeFormParent }
+@@ -442,17 +445,19 @@ export function HierarchicalTermSelector( { slug } ) {
+ 								tree={ availableTermsTree }
+ 							/>
+ 						) }
+-					</VStack>
+-					<Button
+-						variant="secondary"
+-						type="submit"
+-						className="editor-post-taxonomies__hierarchical-terms-submit"
+-					>
+-						{ newTermSubmitLabel }
+-					</Button>
++						<FlexItem>
++							<Button
++								variant="secondary"
++								type="submit"
++								className="editor-post-taxonomies__hierarchical-terms-submit"
++							>
++								{ newTermSubmitLabel }
++							</Button>
++						</FlexItem>
++					</Flex>
+ 				</form>
+ 			) }
+-		</>
++		</Flex>
+ 	);
+ }
+ 
+diff --git a/packages/editor/src/components/post-taxonomies/style.scss b/packages/editor/src/components/post-taxonomies/style.scss
+index 2d9defe96a6e49..87bdef2ef75488 100644
+--- a/packages/editor/src/components/post-taxonomies/style.scss
++++ b/packages/editor/src/components/post-taxonomies/style.scss
+@@ -10,32 +10,17 @@
+ }
+ 
+ .editor-post-taxonomies__hierarchical-terms-choice {
+-	margin-bottom: 8px;
++	margin-bottom: $grid-unit-10;
++	&:last-child {
++		margin-bottom: $grid-unit-05;
++	}
+ }
+ 
+ .editor-post-taxonomies__hierarchical-terms-subchoices {
+-	margin-top: 8px;
++	margin-top: $grid-unit-10;
+ 	margin-left: $grid-unit-20;
+ }
+ 
+-.components-button.editor-post-taxonomies__hierarchical-terms-submit,
+-.components-button.editor-post-taxonomies__hierarchical-terms-add {
+-	margin-top: 12px;
+-}
+-
+-.editor-post-taxonomies__hierarchical-terms-label {
+-	display: inline-block;
+-	margin-top: 12px;
+-}
+-
+-.editor-post-taxonomies__hierarchical-terms-input {
+-	margin-top: 8px;
+-}
+-.editor-post-taxonomies__hierarchical-terms-filter {
+-	margin-bottom: 8px;
+-	width: 100%;
+-}
+-
+ .editor-post-taxonomies__flat-term-most-used {
+ 	.editor-post-taxonomies__flat-term-most-used-label {
+ 		margin-bottom: $grid-unit-05;

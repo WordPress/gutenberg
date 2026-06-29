@@ -1,0 +1,383 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5190af098b75e4..4c76388c3e4b24 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,8 @@
+ -   `DropdownMenu`: migrate Storybook to controls ([47149](https://github.com/WordPress/gutenberg/pull/47149)).
+ -   Removed deprecated `@storybook/addon-knobs` dependency from the package ([47152](https://github.com/WordPress/gutenberg/pull/47152)).
+ -   `ColorListPicker`: Convert to TypeScript ([#46358](https://github.com/WordPress/gutenberg/pull/46358)).
++-   `ColorPalette`, `BorderControl`, `GradientPicker`: refine types and logic around single vs multiple palettes
++ ([#47384](https://github.com/WordPress/gutenberg/pull/47384)).
+ -   `Button`: Convert to TypeScript ([#46997](https://github.com/WordPress/gutenberg/pull/46997)).
+ 
+ ### Bug Fix
+@@ -39,6 +41,10 @@
+ 
+ ## 23.1.0 (2023-01-02)
+ 
++### Breaking Changes
++
++-   `ColorPalette`: The experimental `__experimentalHasMultipleOrigins` prop has been removed ([#46315](https://github.com/WordPress/gutenberg/pull/46315)).
++
+ ## 23.0.0 (2022-12-14)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index 3ec28331ffc425..2b44b3d813a972 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -24,7 +24,8 @@ import { useBorderControlDropdown } from './hook';
+ import { StyledLabel } from '../../base-control/styles/base-control-styles';
+ import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
+ 
+-import type { ColorObject, PaletteObject } from '../../color-palette/types';
++import type { ColorObject } from '../../color-palette/types';
++import { isMultiplePaletteArray } from '../../color-palette/utils';
+ import type { DropdownProps as DropdownComponentProps } from '../../dropdown/types';
+ import type { ColorProps, DropdownProps } from '../types';
+ 
+@@ -32,14 +33,15 @@ const getColorObject = (
+ 	colorValue: CSSProperties[ 'borderColor' ],
+ 	colors: ColorProps[ 'colors' ] | undefined
+ ) => {
+-	if ( ! colorValue || ! colors || colors.length === 0 ) {
++	if ( ! colorValue || ! colors ) {
+ 		return;
+ 	}
+ 
+-	if ( ( colors as PaletteObject[] )[ 0 ].colors !== undefined ) {
++	if ( isMultiplePaletteArray( colors ) ) {
++		// Multiple origins
+ 		let matchedColor;
+ 
+-		( colors as PaletteObject[] ).some( ( origin ) =>
++		colors.some( ( origin ) =>
+ 			origin.colors.some( ( color ) => {
+ 				if ( color.color === colorValue ) {
+ 					matchedColor = color;
+@@ -53,9 +55,8 @@ const getColorObject = (
+ 		return matchedColor;
+ 	}
+ 
+-	return ( colors as ColorObject[] ).find(
+-		( color ) => color.color === colorValue
+-	);
++	// Single origin
++	return colors.find( ( color ) => color.color === colorValue );
+ };
+ 
+ const getToggleAriaLabel = (
+diff --git a/packages/components/src/color-palette/README.md b/packages/components/src/color-palette/README.md
+index f5689cb0af0364..870a5ef2d52f14 100644
+--- a/packages/components/src/color-palette/README.md
++++ b/packages/components/src/color-palette/README.md
+@@ -43,7 +43,7 @@ Whether the palette should have a clearing button.
+ -   Required: No
+ -   Default: `true`
+ 
+-### `colors`: `( PaletteObject | ColorObject )[]`
++### `colors`: `PaletteObject[] | ColorObject[]`
+ 
+ Array with the colors to be shown. When displaying multiple color palettes to choose from, the format of the array changes from an array of colors objects, to an array of color palettes.
+ 
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index ca61884d5f7085..c967703141ea34 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { ForwardedRef, RefObject } from 'react';
++import type { ForwardedRef } from 'react';
+ import { colord, extend } from 'colord';
+ import namesPlugin from 'colord/plugins/names';
+ import a11yPlugin from 'colord/plugins/a11y';
+@@ -33,6 +33,12 @@ import type {
+ } from './types';
+ import type { WordPressComponentProps } from '../ui/context';
+ import type { DropdownProps } from '../dropdown/types';
++import {
++	extractColorNameFromCurrentValue,
++	isMultiplePaletteArray,
++	normalizeColorValue,
++	showTransparentBackground,
++} from './utils';
+ 
+ extend( [ namesPlugin, a11yPlugin ] );
+ 
+@@ -164,77 +170,6 @@ export function CustomColorPickerDropdown( {
+ 	);
+ }
+ 
+-export const extractColorNameFromCurrentValue = (
+-	currentValue?: ColorPaletteProps[ 'value' ],
+-	colors: ColorPaletteProps[ 'colors' ] = [],
+-	showMultiplePalettes: boolean = false
+-) => {
+-	if ( ! currentValue ) {
+-		return '';
+-	}
+-
+-	const currentValueIsCssVariable = /^var\(/.test( currentValue );
+-	const normalizedCurrentValue = currentValueIsCssVariable
+-		? currentValue
+-		: colord( currentValue ).toHex();
+-
+-	// Normalize format of `colors` to simplify the following loop
+-	type normalizedPaletteObject = { colors: ColorObject[] };
+-	const colorPalettes: normalizedPaletteObject[] = showMultiplePalettes
+-		? ( colors as PaletteObject[] )
+-		: [ { colors: colors as ColorObject[] } ];
+-	for ( const { colors: paletteColors } of colorPalettes ) {
+-		for ( const { name: colorName, color: colorValue } of paletteColors ) {
+-			const normalizedColorValue = currentValueIsCssVariable
+-				? colorValue
+-				: colord( colorValue ).toHex();
+-
+-			if ( normalizedCurrentValue === normalizedColorValue ) {
+-				return colorName;
+-			}
+-		}
+-	}
+-
+-	// translators: shown when the user has picked a custom color (i.e not in the palette of colors).
+-	return __( 'Custom' );
+-};
+-
+-export const showTransparentBackground = ( currentValue?: string ) => {
+-	if ( typeof currentValue === 'undefined' ) {
+-		return true;
+-	}
+-	return colord( currentValue ).alpha() === 0;
+-};
+-
+-const areColorsMultiplePalette = (
+-	colors: NonNullable< ColorPaletteProps[ 'colors' ] >
+-): colors is PaletteObject[] => {
+-	return colors.every( ( colorObj ) =>
+-		Array.isArray( ( colorObj as PaletteObject ).colors )
+-	);
+-};
+-
+-const normalizeColorValue = (
+-	value: string | undefined,
+-	ref: RefObject< HTMLElement > | null
+-) => {
+-	const currentValueIsCssVariable = /^var\(/.test( value ?? '' );
+-
+-	if ( ! currentValueIsCssVariable || ! ref?.current ) {
+-		return value;
+-	}
+-
+-	const { ownerDocument } = ref.current;
+-	const { defaultView } = ownerDocument;
+-	const computedBackgroundColor = defaultView?.getComputedStyle(
+-		ref.current
+-	).backgroundColor;
+-
+-	return computedBackgroundColor
+-		? colord( computedBackgroundColor ).toHex()
+-		: value;
+-};
+-
+ function UnforwardedColorPalette(
+ 	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
+ 	forwardedRef: ForwardedRef< any >
+@@ -252,9 +187,7 @@ function UnforwardedColorPalette(
+ 	} = props;
+ 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
+ 
+-	const hasMultipleColorOrigins =
+-		colors.length > 0 &&
+-		( colors as PaletteObject[] )[ 0 ].colors !== undefined;
++	const hasMultipleColorOrigins = isMultiplePaletteArray( colors );
+ 	const buttonLabelName = useMemo(
+ 		() =>
+ 			extractColorNameFromCurrentValue(
+@@ -265,18 +198,6 @@ function UnforwardedColorPalette(
+ 		[ value, colors, hasMultipleColorOrigins ]
+ 	);
+ 
+-	// Make sure that the `colors` array has a valid format.
+-	if (
+-		colors.length > 0 &&
+-		hasMultipleColorOrigins !== areColorsMultiplePalette( colors )
+-	) {
+-		// eslint-disable-next-line no-console
+-		console.warn(
+-			'wp.components.ColorPalette: please specify a valid format for the `colors` prop. '
+-		);
+-		return null;
+-	}
+-
+ 	const renderCustomColorPicker = () => (
+ 		<DropdownContentWrapper paddingSize="none">
+ 			<ColorPicker
+diff --git a/packages/components/src/color-palette/test/utils.ts b/packages/components/src/color-palette/test/utils.ts
+index bbb0d82c6e91d7..c65b52739f996f 100644
+--- a/packages/components/src/color-palette/test/utils.ts
++++ b/packages/components/src/color-palette/test/utils.ts
+@@ -4,7 +4,7 @@
+ import {
+ 	extractColorNameFromCurrentValue,
+ 	showTransparentBackground,
+-} from '../';
++} from '../utils';
+ 
+ describe( 'ColorPalette: Utils', () => {
+ 	describe( 'extractColorNameFromCurrentValue', () => {
+diff --git a/packages/components/src/color-palette/types.ts b/packages/components/src/color-palette/types.ts
+index 1f9c66c0fb604d..58f55ad8f758f4 100644
+--- a/packages/components/src/color-palette/types.ts
++++ b/packages/components/src/color-palette/types.ts
+@@ -55,7 +55,7 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
+ 	 *
+ 	 * @default []
+ 	 */
+-	colors?: ( PaletteObject | ColorObject )[];
++	colors?: PaletteObject[] | ColorObject[];
+ 	/**
+ 	 * Whether to allow the user to pick a custom color on top of the predefined
+ 	 * choices (defined via the `colors` prop).
+diff --git a/packages/components/src/color-palette/utils.ts b/packages/components/src/color-palette/utils.ts
+new file mode 100644
+index 00000000000000..8a70d25a701e99
+--- /dev/null
++++ b/packages/components/src/color-palette/utils.ts
+@@ -0,0 +1,98 @@
++/**
++ * External dependencies
++ */
++import type { RefObject } from 'react';
++import { colord, extend } from 'colord';
++import namesPlugin from 'colord/plugins/names';
++import a11yPlugin from 'colord/plugins/a11y';
++
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import type { ColorObject, ColorPaletteProps, PaletteObject } from './types';
++
++extend( [ namesPlugin, a11yPlugin ] );
++
++export const extractColorNameFromCurrentValue = (
++	currentValue?: ColorPaletteProps[ 'value' ],
++	colors: ColorPaletteProps[ 'colors' ] = [],
++	showMultiplePalettes: boolean = false
++) => {
++	if ( ! currentValue ) {
++		return '';
++	}
++
++	const currentValueIsCssVariable = /^var\(/.test( currentValue );
++	const normalizedCurrentValue = currentValueIsCssVariable
++		? currentValue
++		: colord( currentValue ).toHex();
++
++	// Normalize format of `colors` to simplify the following loop
++	type normalizedPaletteObject = { colors: ColorObject[] };
++	const colorPalettes: normalizedPaletteObject[] = showMultiplePalettes
++		? ( colors as PaletteObject[] )
++		: [ { colors: colors as ColorObject[] } ];
++	for ( const { colors: paletteColors } of colorPalettes ) {
++		for ( const { name: colorName, color: colorValue } of paletteColors ) {
++			const normalizedColorValue = currentValueIsCssVariable
++				? colorValue
++				: colord( colorValue ).toHex();
++
++			if ( normalizedCurrentValue === normalizedColorValue ) {
++				return colorName;
++			}
++		}
++	}
++
++	// translators: shown when the user has picked a custom color (i.e not in the palette of colors).
++	return __( 'Custom' );
++};
++
++export const showTransparentBackground = ( currentValue?: string ) => {
++	if ( typeof currentValue === 'undefined' ) {
++		return true;
++	}
++	return colord( currentValue ).alpha() === 0;
++};
++
++// The PaletteObject type has a `colors` property (an array of ColorObject),
++// while the ColorObject type has a `color` property (the CSS color value).
++export const isMultiplePaletteObject = (
++	obj: PaletteObject | ColorObject
++): obj is PaletteObject =>
++	Array.isArray( ( obj as PaletteObject ).colors ) && ! ( 'color' in obj );
++
++export const isMultiplePaletteArray = (
++	arr: ( PaletteObject | ColorObject )[]
++): arr is PaletteObject[] => {
++	return (
++		arr.length > 0 &&
++		arr.every( ( colorObj ) => isMultiplePaletteObject( colorObj ) )
++	);
++};
++
++export const normalizeColorValue = (
++	value: string | undefined,
++	ref: RefObject< HTMLElement > | null
++) => {
++	const currentValueIsCssVariable = /^var\(/.test( value ?? '' );
++
++	if ( ! currentValueIsCssVariable || ! ref?.current ) {
++		return value;
++	}
++
++	const { ownerDocument } = ref.current;
++	const { defaultView } = ownerDocument;
++	const computedBackgroundColor = defaultView?.getComputedStyle(
++		ref.current
++	).backgroundColor;
++
++	return computedBackgroundColor
++		? colord( computedBackgroundColor ).toHex()
++		: value;
++};
+diff --git a/packages/components/src/gradient-picker/index.js b/packages/components/src/gradient-picker/index.js
+index 8a16f0d79e640f..1a5338e4591656 100644
+--- a/packages/components/src/gradient-picker/index.js
++++ b/packages/components/src/gradient-picker/index.js
+@@ -14,6 +14,18 @@ import { VStack } from '../v-stack';
+ import { ColorHeading } from '../color-palette/styles';
+ import { Spacer } from '../spacer';
+ 
++// The Multiple Origin Gradients have a `gradients` property (an array of
++// gradient objects), while Single Origin ones have a `gradient` property.
++const isMultipleOriginObject = ( obj ) =>
++	Array.isArray( obj.gradients ) && ! ( 'gradient' in obj );
++
++const isMultipleOriginArray = ( arr ) => {
++	return (
++		arr.length > 0 &&
++		arr.every( ( gradientObj ) => isMultipleOriginObject( gradientObj ) )
++	);
++};
++
+ function SingleOrigin( {
+ 	className,
+ 	clearGradient,
+@@ -105,10 +117,9 @@ export default function GradientPicker( {
+ 		() => onChange( undefined ),
+ 		[ onChange ]
+ 	);
+-	const Component =
+-		gradients?.length && gradients[ 0 ].gradients
+-			? MultipleOrigin
+-			: SingleOrigin;
++	const Component = isMultipleOriginArray( gradients )
++		? MultipleOrigin
++		: SingleOrigin;
+ 
+ 	if ( ! __nextHasNoMargin ) {
+ 		deprecated( 'Outer margin styles for wp.components.GradientPicker', {

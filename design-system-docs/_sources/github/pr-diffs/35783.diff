@@ -1,0 +1,804 @@
+diff --git a/packages/components/src/color-edit/index.js b/packages/components/src/color-edit/index.js
+index b8c38b35bba650..cbec3d56792dde 100644
+--- a/packages/components/src/color-edit/index.js
++++ b/packages/components/src/color-edit/index.js
+@@ -1,326 +1,301 @@
+ /**
+  * External dependencies
+  */
+-import classnames from 'classnames';
+-import { isEmpty, kebabCase } from 'lodash';
++import kebabCase from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { __, sprintf } from '@wordpress/i18n';
+-import { useEffect, useState } from '@wordpress/element';
+-import { edit, close, chevronDown, chevronUp, plus } from '@wordpress/icons';
++import { useState, useRef, useEffect } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
++import { lineSolid, moreVertical, plus } from '@wordpress/icons';
++import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+  */
+-import Dropdown from '../dropdown';
+-import CircularOptionPicker from '../circular-option-picker';
+-import { ColorPicker } from '../color-picker';
+ import Button from '../button';
+-import TextControl from '../text-control';
+-import BaseControl from '../base-control';
++import { ColorPicker } from '../color-picker';
++import { FlexItem } from '../flex';
++import { HStack } from '../h-stack';
++import { ItemGroup } from '../item-group';
++import { MenuGroup } from '../menu-group';
++import { MenuItem } from '../menu-item';
++import { VStack } from '../v-stack';
++import ColorPalette from '../color-palette';
++import DropdownMenu from '../dropdown-menu';
++import Popover from '../popover';
++import {
++	ColorActionsContainer,
++	ColorEditStyles,
++	ColorHeading,
++	ColorHStackHeader,
++	ColorIndicatorStyled,
++	ColorItem,
++	ColorNameContainer,
++	ColorNameInputControl,
++	DoneButton,
++	RemoveButton,
++} from './styles';
+ 
+-function DropdownOpenOnMount( { shouldOpen, isOpen, onToggle } ) {
+-	useEffect( () => {
+-		if ( shouldOpen && ! isOpen ) {
+-			onToggle();
+-		}
+-	}, [] );
+-	return null;
++function ColorNameInput( { value, onChange } ) {
++	return (
++		<ColorNameInputControl
++			label={ __( 'Color name' ) }
++			hideLabelFromVision
++			value={ value }
++			onChange={ onChange }
++		/>
++	);
+ }
+ 
+ function ColorOption( {
+ 	color,
+-	name,
+-	slug,
+ 	onChange,
++	isEditing,
++	onStartEditing,
+ 	onRemove,
+-	onConfirm,
+-	confirmLabel = __( 'OK' ),
+-	isEditingNameOnMount = false,
+-	isEditingColorOnMount = false,
+-	onCancel,
+-	immutableColorSlugs = [],
++	onStopEditing,
+ } ) {
+-	const [ isHover, setIsHover ] = useState( false );
+-	const [ isFocused, setIsFocused ] = useState( false );
+-	const [ isEditingName, setIsEditingName ] = useState(
+-		isEditingNameOnMount
+-	);
+-	const [ isShowingAdvancedPanel, setIsShowingAdvancedPanel ] = useState(
+-		false
+-	);
+-
+-	const isShowingControls =
+-		( isHover || isFocused || isEditingName || isShowingAdvancedPanel ) &&
+-		! immutableColorSlugs.includes( slug );
+-
++	const focusOutsideProps = useFocusOutside( onStopEditing );
+ 	return (
+-		<div
+-			tabIndex={ 0 }
+-			className={ classnames( 'components-color-edit__color-option', {
+-				'is-hover':
+-					isHover && ! isEditingName && ! isShowingAdvancedPanel,
+-			} ) }
+-			onMouseEnter={ () => setIsHover( true ) }
+-			onMouseLeave={ () => setIsHover( false ) }
+-			onFocus={ () => setIsFocused( true ) }
+-			onBlur={ () => setIsFocused( false ) }
+-			aria-label={
+-				name
+-					? // translators: %s: The name of the color e.g: "vivid red".
+-					  sprintf( __( 'Color: %s' ), name )
+-					: // translators: %s: color hex code e.g: "#f00".
+-					  sprintf( __( 'Color code: %s' ), color )
+-			}
++		<ColorItem
++			as="div"
++			onClick={ onStartEditing }
++			{ ...( isEditing ? focusOutsideProps : {} ) }
+ 		>
+-			<div className="components-color-edit__color-option-main-area">
+-				<Dropdown
+-					renderToggle={ ( { isOpen, onToggle } ) => (
+-						<>
+-							<DropdownOpenOnMount
+-								shouldOpen={ isEditingColorOnMount }
+-								isOpen={ isOpen }
+-								onToggle={ onToggle }
+-							/>
+-							<CircularOptionPicker.Option
+-								style={ { backgroundColor: color, color } }
+-								aria-expanded={ isOpen }
+-								aria-haspopup="true"
+-								onClick={ onToggle }
+-								aria-label={ __( 'Edit color value' ) }
+-							/>
+-						</>
+-					) }
+-					renderContent={ () => (
+-						<ColorPicker
+-							color={ color }
+-							onChange={ ( newColor ) =>
++			<HStack justify="flex-start">
++				<FlexItem>
++					<ColorIndicatorStyled colorValue={ color.color } />
++				</FlexItem>
++				<FlexItem>
++					{ isEditing ? (
++						<ColorNameInput
++							value={ color.name }
++							onChange={ ( nextName ) =>
+ 								onChange( {
+-									color: newColor,
+-									slug,
+-									name,
++									...color,
++									name: nextName,
++									slug: kebabCase( nextName ),
+ 								} )
+ 							}
+ 						/>
++					) : (
++						<ColorNameContainer>{ color.name }</ColorNameContainer>
+ 					) }
+-				/>
+-				{ ! isEditingName && (
+-					<div className="components-color-edit__color-option-color-name">
+-						{ name }
+-					</div>
+-				) }
+-				{ isEditingName && (
+-					<>
+-						<TextControl
+-							className="components-color-edit__color-option-color-name-input"
+-							hideLabelFromVision
+-							onChange={ ( newColorName ) =>
+-								onChange( {
+-									color,
+-									slug: kebabCase( newColorName ),
+-									name: newColorName,
+-								} )
+-							}
+-							label={ __( 'Color name' ) }
+-							placeholder={ __( 'Name' ) }
+-							value={ name }
+-						/>
+-						<Button
+-							onClick={ () => {
+-								setIsEditingName( false );
+-								setIsFocused( false );
+-								if ( onConfirm ) {
+-									onConfirm();
+-								}
+-							} }
+-							variant="primary"
+-						>
+-							{ confirmLabel }
+-						</Button>
+-					</>
+-				) }
+-				{ ! isEditingName && (
+-					<>
+-						<Button
+-							className={ classnames( {
+-								'components-color-edit__hidden-control': ! isShowingControls,
+-							} ) }
+-							icon={ edit }
+-							label={ __( 'Edit color name' ) }
+-							onClick={ () => setIsEditingName( true ) }
+-						/>
+-						<Button
+-							className={ classnames( {
+-								'components-color-edit__hidden-control': ! isShowingControls,
+-							} ) }
+-							icon={ close }
++				</FlexItem>
++				{ isEditing && (
++					<FlexItem>
++						<RemoveButton
++							isSmall
++							icon={ lineSolid }
+ 							label={ __( 'Remove color' ) }
+ 							onClick={ onRemove }
+ 						/>
+-					</>
++					</FlexItem>
+ 				) }
+-				<Button
+-					className={ classnames( {
+-						'components-color-edit__hidden-control': ! isShowingControls,
+-					} ) }
+-					icon={ isShowingAdvancedPanel ? chevronUp : chevronDown }
+-					label={ __( 'Additional color settings' ) }
+-					onClick={ () => {
+-						if ( isShowingAdvancedPanel ) {
+-							setIsFocused( false );
+-						}
+-						setIsShowingAdvancedPanel( ! isShowingAdvancedPanel );
+-					} }
+-					aria-expanded={ isShowingAdvancedPanel }
+-				/>
+-			</div>
+-			{ onCancel && (
+-				<Button
+-					className="components-color-edit__cancel-button"
+-					onClick={ onCancel }
++			</HStack>
++			{ isEditing && (
++				<Popover
++					position="bottom left"
++					className="components-color-edit__color-popover"
+ 				>
+-					{ __( 'Cancel' ) }
+-				</Button>
+-			) }
+-			{ isShowingAdvancedPanel && (
+-				<TextControl
+-					className="components-color-edit__slug-input"
+-					onChange={ ( newSlug ) =>
+-						onChange( {
+-							color,
+-							slug: newSlug,
+-							name,
+-						} )
+-					}
+-					label={ __( 'Slug' ) }
+-					value={ slug }
+-				/>
++					<ColorPicker
++						color={ color.color }
++						onChange={ ( newColor ) =>
++							onChange( {
++								...color,
++								color: newColor,
++							} )
++						}
++					/>
++				</Popover>
+ 			) }
+-		</div>
++		</ColorItem>
+ 	);
+ }
+ 
+-function ColorInserter( { onInsert, onCancel } ) {
+-	const [ color, setColor ] = useState( {
+-		color: '#fff',
+-		name: '',
+-		slug: '',
+-	} );
++function ColorPaletteEditListView( {
++	colors,
++	onChange,
++	editingColor,
++	setEditingColor,
++} ) {
++	// When unmounting the component if there are empty colors (the user did not complete the insertion) clean them.
++	const colorReference = useRef();
++	useEffect( () => {
++		colorReference.current = colors;
++	}, [ colors ] );
++	useEffect( () => {
++		return () => {
++			if ( colorReference.current.some( ( { slug } ) => ! slug ) ) {
++				const newColors = colorReference.current.filter(
++					( { slug } ) => slug
++				);
++				onChange( newColors.length ? newColors : undefined );
++			}
++		};
++	}, [] );
+ 	return (
+-		<ColorOption
+-			color={ color.color }
+-			name={ color.name }
+-			slug={ color.slug }
+-			onChange={ setColor }
+-			confirmLabel={ __( 'Save' ) }
+-			onConfirm={ () => onInsert( color ) }
+-			isEditingNameOnMount
+-			isEditingColorOnMount
+-			onCancel={ onCancel }
+-		/>
++		<VStack spacing={ 3 }>
++			<ItemGroup isBordered isSeparated>
++				{ colors.map( ( color, index ) => (
++					<ColorOption
++						key={ index }
++						color={ color }
++						onStartEditing={ () => {
++							if ( editingColor !== index ) {
++								setEditingColor( index );
++							}
++						} }
++						onChange={ ( newColor ) => {
++							onChange(
++								colors.map( ( currentColor, currentIndex ) => {
++									if ( currentIndex === index ) {
++										return newColor;
++									}
++									return currentColor;
++								} )
++							);
++						} }
++						onRemove={ () => {
++							setEditingColor( null );
++							const newColors = colors.filter(
++								( _currentColor, currentIndex ) => {
++									if ( currentIndex === index ) {
++										return false;
++									}
++									return true;
++								}
++							);
++							onChange(
++								newColors.length ? newColors : undefined
++							);
++						} }
++						isEditing={ index === editingColor }
++						onStopEditing={ () => {
++							if ( index === editingColor ) {
++								setEditingColor( null );
++							}
++						} }
++					/>
++				) ) }
++			</ItemGroup>
++		</VStack>
+ 	);
+ }
+ 
+-export default function ColorEdit( {
+-	colors,
+-	onChange,
+-	emptyUI,
+-	immutableColorSlugs,
+-	canReset = true,
+-} ) {
+-	const [ isInsertingColor, setIsInsertingColor ] = useState( false );
++const EMPTY_ARRAY = [];
++
++export default function ColorEdit( { colors = EMPTY_ARRAY, onChange } ) {
++	const [ isEditing, setIsEditing ] = useState( false );
++	const [ editingColor, setEditingColor ] = useState( null );
++	const isAdding =
++		isEditing &&
++		editingColor &&
++		colors[ editingColor ] &&
++		! colors[ editingColor ].slug;
++
++	const hasColors = colors.length > 0;
++
+ 	return (
+-		<BaseControl>
+-			<fieldset>
+-				<div className="components-color-edit__label-and-insert-container">
+-					<legend>
+-						<div>
+-							<BaseControl.VisualLabel>
+-								{ __( 'Color palette' ) }
+-							</BaseControl.VisualLabel>
+-						</div>
+-					</legend>
+-					{ ! isInsertingColor && (
++		<ColorEditStyles>
++			<ColorHStackHeader>
++				<ColorHeading>{ __( 'Custom' ) }</ColorHeading>
++				<ColorActionsContainer>
++					{ isEditing && (
++						<DoneButton
++							isSmall
++							onClick={ () => {
++								setIsEditing( false );
++								setEditingColor( null );
++							} }
++						>
++							{ __( 'Done' ) }
++						</DoneButton>
++					) }
++					<Button
++						isSmall
++						isPressed={ isAdding }
++						icon={ plus }
++						label={ __( 'Add custom color' ) }
++						onClick={ () => {
++							onChange( [
++								...colors,
++								{
++									color: '#000',
++									name: '',
++									slug: '',
++								},
++							] );
++							setIsEditing( true );
++							setEditingColor( colors.length );
++						} }
++					/>
++					{ ! isEditing && (
+ 						<Button
++							disabled={ ! hasColors }
++							isSmall
++							icon={ moreVertical }
++							label={ __( 'Edit colors' ) }
+ 							onClick={ () => {
+-								setIsInsertingColor( true );
++								setIsEditing( true );
+ 							} }
+-							className="components-color-edit__insert-button"
+-							icon={ plus }
+ 						/>
+ 					) }
+-				</div>
+-				<div>
+-					{ ! isEmpty( colors ) &&
+-						colors.map( ( color, index ) => {
+-							return (
+-								<ColorOption
+-									key={ index }
+-									color={ color.color }
+-									name={ color.name }
+-									slug={ color.slug }
+-									immutableColorSlugs={ immutableColorSlugs }
+-									onChange={ ( newColor ) => {
+-										onChange(
+-											colors.map(
+-												(
+-													currentColor,
+-													currentIndex
+-												) => {
+-													if (
+-														currentIndex === index
+-													) {
+-														return newColor;
+-													}
+-													return currentColor;
+-												}
+-											)
+-										);
+-									} }
+-									onRemove={ () => {
+-										onChange(
+-											colors.filter(
+-												(
+-													_currentColor,
+-													currentIndex
+-												) => {
+-													if (
+-														currentIndex === index
+-													) {
+-														return false;
+-													}
+-													return true;
+-												}
+-											)
+-										);
+-									} }
+-								/>
+-							);
+-						} ) }
+-					{ isInsertingColor && (
+-						<ColorInserter
+-							onInsert={ ( newColor ) => {
+-								setIsInsertingColor( false );
+-								onChange( [ ...( colors || [] ), newColor ] );
++					{ isEditing && (
++						<DropdownMenu
++							icon={ moreVertical }
++							label={ __( 'Custom color options' ) }
++							toggleProps={ {
++								isSmall: true,
+ 							} }
+-							onCancel={ () => setIsInsertingColor( false ) }
++						>
++							{ ( { onClose = () => {} } ) => (
++								<>
++									<MenuGroup>
++										<MenuItem
++											variant={ 'tertiary' }
++											onClick={ () => {
++												setEditingColor( null );
++												setIsEditing( false );
++												onChange();
++												onClose();
++											} }
++										>
++											{ __( 'Remove all custom colors' ) }
++										</MenuItem>
++									</MenuGroup>
++								</>
++							) }
++						</DropdownMenu>
++					) }
++				</ColorActionsContainer>
++			</ColorHStackHeader>
++			{ hasColors && (
++				<>
++					{ isEditing && (
++						<ColorPaletteEditListView
++							colors={ colors }
++							onChange={ onChange }
++							editingColor={ editingColor }
++							setEditingColor={ setEditingColor }
+ 						/>
+ 					) }
+-					{ ! isInsertingColor && isEmpty( colors ) && emptyUI }
+-				</div>
+-				{ !! canReset && (
+-					<Button
+-						isSmall
+-						variant="secondary"
+-						className="components-color-edit__reset-button"
+-						onClick={ () => onChange() }
+-					>
+-						{ __( 'Reset' ) }
+-					</Button>
++					{ ! isEditing && (
++						<ColorPalette
++							colors={ colors }
++							onChange={ () => {} }
++							clearable={ false }
++							disableCustomColors={ true }
++						/>
++					) }
++				</>
++			) }
++			{ ! hasColors &&
++				__(
++					'Custom colors are empty! Add some colors to create your own color palette.'
+ 				) }
+-			</fieldset>
+-		</BaseControl>
++		</ColorEditStyles>
+ 	);
+ }
+diff --git a/packages/components/src/color-edit/style.scss b/packages/components/src/color-edit/style.scss
+index ef050b1a6fa4a7..186a2f05c782cc 100644
+--- a/packages/components/src/color-edit/style.scss
++++ b/packages/components/src/color-edit/style.scss
+@@ -1,47 +1,6 @@
+-.components-color-edit__color-option-main-area {
+-	display: flex;
+-	align-items: center;
+-	div.components-circular-option-picker__option-wrapper {
+-		display: block;
+-		margin: $grid-unit-10;
++@include break-medium() {
++	.components-color-edit__color-popover.components-popover .components-popover__content.components-popover__content.components-popover__content {
++		margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 };
++		margin-top: #{ -($grid-unit-60 + $border-width) };
+ 	}
+ }
+-
+-.components-color-edit__color-option.is-hover {
+-	background: $gray-200;
+-}
+-
+-.components-color-edit__cancel-button {
+-	float: right;
+-}
+-
+-.components-color-edit__color-option-color-name {
+-	width: 100%;
+-}
+-.components-color-edit__label-and-insert-container {
+-	display: flex;
+-	align-items: center;
+-	justify-content: space-between;
+-}
+-
+-.components-color-edit__insert-button {
+-	margin-top: -$grid-unit-10;
+-}
+-
+-.components-color-edit__hidden-control {
+-	position: relative;
+-	left: -9999px;
+-}
+-
+-.components-color-edit__color-option-color-name-input .components-base-control__field {
+-	margin-bottom: 0;
+-	margin-right: $grid-unit-10;
+-}
+-
+-.components-color-edit__slug-input {
+-	margin-left: $grid-unit-10;
+-}
+-
+-.components-color-edit__reset-button {
+-	float: right;
+-}
+diff --git a/packages/components/src/color-edit/styles.js b/packages/components/src/color-edit/styles.js
+new file mode 100644
+index 00000000000000..6b9e417466e53f
+--- /dev/null
++++ b/packages/components/src/color-edit/styles.js
+@@ -0,0 +1,97 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../button';
++import { Heading } from '../heading';
++import { HStack } from '../h-stack';
++import { space } from '../ui/utils/space';
++import { COLORS, CONFIG } from '../utils';
++import { View } from '../view';
++import ColorIndicator from '../color-indicator';
++import InputControl from '../input-control';
++import Item from '../item-group/item';
++import {
++	Container as InputControlContainer,
++	Input,
++	BackdropUI as InputBackdropUI,
++} from '../input-control/styles/input-control-styles';
++
++export const ColorIndicatorStyled = styled( ColorIndicator )`
++	&& {
++		display: block;
++		border-radius: 50%;
++		border: 0;
++		height: ${ space( 6 ) };
++		width: ${ space( 6 ) };
++		margin-left: 0;
++		padding: 0;
++	}
++`;
++
++export const ColorNameInputControl = styled( InputControl )`
++	${ InputControlContainer } {
++		background: ${ COLORS.gray[ 100 ] };
++		border-radius: 2px;
++		${ Input }${ Input }${ Input }${ Input } {
++			height: ${ space( 8 ) };
++		}
++		${ InputBackdropUI }${ InputBackdropUI }${ InputBackdropUI } {
++			border-color: transparent;
++			box-shadow: none;
++		}
++	}
++`;
++
++export const ColorItem = styled( Item )`
++	padding: 3px 0 3px ${ space( 3 ) };
++	height: calc( 40px - ${ CONFIG.borderWidth } );
++`;
++
++export const ColorNameContainer = styled.span`
++	line-height: ${ space( 8 ) };
++	margin-left: ${ space( 2 ) };
++`;
++
++export const ColorHeading = styled( Heading )`
++	text-transform: uppercase;
++	line-height: ${ space( 6 ) };
++	font-weight: 500;
++	&&& {
++		font-size: 11px;
++		margin-bottom: 0;
++	}
++`;
++
++export const ColorActionsContainer = styled( View )`
++	height: ${ space( 6 ) };
++	display: flex;
++`;
++
++export const ColorHStackHeader = styled( HStack )`
++	margin-bottom: ${ space( 2 ) };
++`;
++
++export const ColorEditStyles = styled( View )`
++	&&& {
++		.components-button.has-icon {
++		min-width: 0;
++		padding: 0;
++	}
++`;
++
++export const DoneButton = styled( Button )`
++	&& {
++		color: ${ COLORS.ui.theme };
++	}
++`;
++
++export const RemoveButton = styled( Button )`
++	&& {
++		margin-top: ${ space( 1 ) };
++	}
++`;
+diff --git a/packages/edit-site/src/components/global-styles/color-palette-panel.js b/packages/edit-site/src/components/global-styles/color-palette-panel.js
+index 76a9a951b35951..b069738de3fa07 100644
+--- a/packages/edit-site/src/components/global-styles/color-palette-panel.js
++++ b/packages/edit-site/src/components/global-styles/color-palette-panel.js
+@@ -2,57 +2,21 @@
+  * WordPress dependencies
+  */
+ import { __experimentalColorEdit as ColorEdit } from '@wordpress/components';
+-import { __ } from '@wordpress/i18n';
+-import { useMemo } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { useSetting } from './hooks';
+ 
+-/**
+- * Shared reference to an empty array for cases where it is important to avoid
+- * returning a new array reference on every invocation, as in a connected or
+- * other pure component which performs `shouldComponentUpdate` check on props.
+- * This should be used as a last resort, since the normalized data should be
+- * maintained by the reducer result in state.
+- *
+- * @type {Array}
+- */
+-const EMPTY_ARRAY = [];
+-
+ export default function ColorPalettePanel( { name } ) {
+-	const [ colors, setColors ] = useSetting( 'color.palette', name );
+-	const [ userColors ] = useSetting( 'color.palette', name, 'user' );
+-	const [ baseGlobalPalette ] = useSetting(
+-		'color.palette',
+-		undefined,
+-		'base'
+-	);
+-	const [ baseContextualPalette ] = useSetting(
++	const [ userColors, setColors ] = useSetting(
+ 		'color.palette',
+ 		name,
+-		'base'
++		'user'
+ 	);
+-	const immutableColorSlugs = useMemo( () => {
+-		const basePalette = baseContextualPalette ?? baseGlobalPalette;
+-		if ( ! basePalette ) {
+-			return EMPTY_ARRAY;
+-		}
+-		return basePalette.map( ( { slug } ) => slug );
+-	}, [ baseContextualPalette, baseGlobalPalette ] );
+-
+ 	return (
+ 		<div className="edit-site-global-styles-color-palette-panel">
+-			<ColorEdit
+-				immutableColorSlugs={ immutableColorSlugs }
+-				colors={ colors }
+-				onChange={ setColors }
+-				emptyUI={ __(
+-					'Colors are empty! Add some colors to create your own color palette.'
+-				) }
+-				canReset={ colors === userColors }
+-			/>
++			<ColorEdit colors={ userColors } onChange={ setColors } />
+ 		</div>
+ 	);
+ }

@@ -1,0 +1,120 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index db1778ee625b18..6adec34a18b786 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `BoxControl`: Add runtime check for presets and presetKey ([#68385](https://github.com/WordPress/gutenberg/pull/68385)).
++
+ ## 29.2.0 (2025-01-15)
+ 
+ ### Internal
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index d4d4b03f893036..c5bf28a13de3ad 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -4,6 +4,7 @@
+ import { useInstanceId } from '@wordpress/compose';
+ import { useState } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
++import warning from '@wordpress/warning';
+ 
+ /**
+  * Internal dependencies
+@@ -166,6 +167,14 @@ function BoxControl( {
+ 	} );
+ 	const sidesToRender = getAllowedSides( sides );
+ 
++	if ( ( presets && ! presetKey ) || ( ! presets && presetKey ) ) {
++		const definedProp = presets ? 'presets' : 'presetKey';
++		const missingProp = presets ? 'presetKey' : 'presets';
++		warning(
++			`wp.components.BoxControl: the '${ missingProp }' prop is required when the '${ definedProp }' prop is defined.`
++		);
++	}
++
+ 	return (
+ 		<Grid
+ 			id={ id }
+diff --git a/packages/components/src/box-control/test/index.tsx b/packages/components/src/box-control/test/index.tsx
+index 185a18b258951f..a7d17b0289e92c 100644
+--- a/packages/components/src/box-control/test/index.tsx
++++ b/packages/components/src/box-control/test/index.tsx
+@@ -15,8 +15,15 @@ import { useState } from '@wordpress/element';
+ import BoxControl from '..';
+ import type { BoxControlProps, BoxControlValue } from '../types';
+ 
++// Since `BoxControlProps` is a the result of type unions, we need to use
++// a distributive version of the standard `Omit` utility.
++// See https://stackoverflow.com/a/57103940
++type DistributiveOmit< T, K extends keyof any > = T extends any
++	? Omit< T, K >
++	: never;
++
+ const ControlledBoxControl = (
+-	extraProps: Omit< BoxControlProps, 'onChange' >
++	extraProps: DistributiveOmit< BoxControlProps, 'onChange' >
+ ) => {
+ 	const [ state, setState ] = useState< BoxControlValue >();
+ 
+@@ -33,7 +40,7 @@ const ControlledBoxControl = (
+ const UncontrolledBoxControl = ( {
+ 	onChange = () => {},
+ 	...props
+-}: Omit< BoxControlProps, 'onChange' > & {
++}: DistributiveOmit< BoxControlProps, 'onChange' > & {
+ 	onChange?: BoxControlProps[ 'onChange' ];
+ } ) => <BoxControl __next40pxDefaultSize onChange={ onChange } { ...props } />;
+ 
+diff --git a/packages/components/src/box-control/types.ts b/packages/components/src/box-control/types.ts
+index 43629e09258a58..8c763f6ccb4d7c 100644
+--- a/packages/components/src/box-control/types.ts
++++ b/packages/components/src/box-control/types.ts
+@@ -100,17 +100,32 @@ export type BoxControlProps = Pick< UnitControlProps, 'units' > &
+ 		 * @default false
+ 		 */
+ 		__next40pxDefaultSize?: boolean;
+-		/**
+-		 * Available presets to pick from.
+-		 */
+-		presets?: Preset[];
+-		/**
+-		 * The key of the preset to apply.
+-		 * If you provide a list of presets, you must provide a preset key to use.
+-		 * The format of preset selected values is going to be `var:preset|${ presetKey }|${ presetSlug }`
+-		 */
+-		presetKey?: string;
+-	};
++	} & (
++		| {
++				/**
++				 * Available presets to pick from.
++				 */
++				presets?: never;
++				/**
++				 * The key of the preset to apply.
++				 * If you provide a list of presets, you must provide a preset key to use.
++				 * The format of preset selected values is going to be `var:preset|${ presetKey }|${ presetSlug }`
++				 */
++				presetKey?: never;
++		  }
++		| {
++				/**
++				 * Available presets to pick from.
++				 */
++				presets: Preset[];
++				/**
++				 * The key of the preset to apply.
++				 * If you provide a list of presets, you must provide a preset key to use.
++				 * The format of preset selected values is going to be `var:preset|${ presetKey }|${ presetSlug }`
++				 */
++				presetKey: string;
++		  }
++	);
+ 
+ export type BoxControlInputControlProps = UnitControlPassthroughProps & {
+ 	onChange?: ( nextValues: BoxControlValue ) => void;

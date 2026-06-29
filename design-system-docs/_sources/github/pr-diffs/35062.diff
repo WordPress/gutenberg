@@ -1,0 +1,571 @@
+diff --git a/packages/components/src/resizable-box/index.js b/packages/components/src/resizable-box/index.js
+deleted file mode 100644
+index 3acae66719cfc6..00000000000000
+--- a/packages/components/src/resizable-box/index.js
++++ /dev/null
+@@ -1,114 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-import { Resizable } from 're-resizable';
+-
+-/**
+- * Internal dependencies
+- */
+-import ResizeTooltip from './resize-tooltip';
+-
+-function ResizableBox(
+-	{
+-		className,
+-		children,
+-		showHandle = true,
+-		__experimentalShowTooltip: showTooltip = false,
+-		__experimentalTooltipProps: tooltipProps = {},
+-		...props
+-	},
+-	ref
+-) {
+-	// Removes the inline styles in the drag handles.
+-	const handleStylesOverrides = {
+-		width: null,
+-		height: null,
+-		top: null,
+-		right: null,
+-		bottom: null,
+-		left: null,
+-	};
+-
+-	const handleClassName = 'components-resizable-box__handle';
+-	const sideHandleClassName = 'components-resizable-box__side-handle';
+-	const cornerHandleClassName = 'components-resizable-box__corner-handle';
+-
+-	return (
+-		<Resizable
+-			className={ classnames(
+-				'components-resizable-box__container',
+-				showHandle && 'has-show-handle',
+-				className
+-			) }
+-			handleClasses={ {
+-				top: classnames(
+-					handleClassName,
+-					sideHandleClassName,
+-					'components-resizable-box__handle-top'
+-				),
+-				right: classnames(
+-					handleClassName,
+-					sideHandleClassName,
+-					'components-resizable-box__handle-right'
+-				),
+-				bottom: classnames(
+-					handleClassName,
+-					sideHandleClassName,
+-					'components-resizable-box__handle-bottom'
+-				),
+-				left: classnames(
+-					handleClassName,
+-					sideHandleClassName,
+-					'components-resizable-box__handle-left'
+-				),
+-				topLeft: classnames(
+-					handleClassName,
+-					cornerHandleClassName,
+-					'components-resizable-box__handle-top',
+-					'components-resizable-box__handle-left'
+-				),
+-				topRight: classnames(
+-					handleClassName,
+-					cornerHandleClassName,
+-					'components-resizable-box__handle-top',
+-					'components-resizable-box__handle-right'
+-				),
+-				bottomRight: classnames(
+-					handleClassName,
+-					cornerHandleClassName,
+-					'components-resizable-box__handle-bottom',
+-					'components-resizable-box__handle-right'
+-				),
+-				bottomLeft: classnames(
+-					handleClassName,
+-					cornerHandleClassName,
+-					'components-resizable-box__handle-bottom',
+-					'components-resizable-box__handle-left'
+-				),
+-			} }
+-			handleStyles={ {
+-				top: handleStylesOverrides,
+-				right: handleStylesOverrides,
+-				bottom: handleStylesOverrides,
+-				left: handleStylesOverrides,
+-				topLeft: handleStylesOverrides,
+-				topRight: handleStylesOverrides,
+-				bottomRight: handleStylesOverrides,
+-				bottomLeft: handleStylesOverrides,
+-			} }
+-			ref={ ref }
+-			{ ...props }
+-		>
+-			{ children }
+-			{ showTooltip && <ResizeTooltip { ...tooltipProps } /> }
+-		</Resizable>
+-	);
+-}
+-
+-export default forwardRef( ResizableBox );
+diff --git a/packages/components/src/resizable-box/index.tsx b/packages/components/src/resizable-box/index.tsx
+new file mode 100644
+index 00000000000000..f1572b69f74b76
+--- /dev/null
++++ b/packages/components/src/resizable-box/index.tsx
+@@ -0,0 +1,128 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++import { Resizable } from 're-resizable';
++import type { ResizableProps } from 're-resizable';
++// eslint-disable-next-line no-restricted-imports
++import type { ReactNode, Ref } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import ResizeTooltip from './resize-tooltip';
++
++const HANDLE_CLASS_NAME = 'components-resizable-box__handle';
++const SIDE_HANDLE_CLASS_NAME = 'components-resizable-box__side-handle';
++const CORNER_HANDLE_CLASS_NAME = 'components-resizable-box__corner-handle';
++
++const HANDLE_CLASSES = {
++	top: classnames(
++		HANDLE_CLASS_NAME,
++		SIDE_HANDLE_CLASS_NAME,
++		'components-resizable-box__handle-top'
++	),
++	right: classnames(
++		HANDLE_CLASS_NAME,
++		SIDE_HANDLE_CLASS_NAME,
++		'components-resizable-box__handle-right'
++	),
++	bottom: classnames(
++		HANDLE_CLASS_NAME,
++		SIDE_HANDLE_CLASS_NAME,
++		'components-resizable-box__handle-bottom'
++	),
++	left: classnames(
++		HANDLE_CLASS_NAME,
++		SIDE_HANDLE_CLASS_NAME,
++		'components-resizable-box__handle-left'
++	),
++	topLeft: classnames(
++		HANDLE_CLASS_NAME,
++		CORNER_HANDLE_CLASS_NAME,
++		'components-resizable-box__handle-top',
++		'components-resizable-box__handle-left'
++	),
++	topRight: classnames(
++		HANDLE_CLASS_NAME,
++		CORNER_HANDLE_CLASS_NAME,
++		'components-resizable-box__handle-top',
++		'components-resizable-box__handle-right'
++	),
++	bottomRight: classnames(
++		HANDLE_CLASS_NAME,
++		CORNER_HANDLE_CLASS_NAME,
++		'components-resizable-box__handle-bottom',
++		'components-resizable-box__handle-right'
++	),
++	bottomLeft: classnames(
++		HANDLE_CLASS_NAME,
++		CORNER_HANDLE_CLASS_NAME,
++		'components-resizable-box__handle-bottom',
++		'components-resizable-box__handle-left'
++	),
++};
++
++// Removes the inline styles in the drag handles.
++const HANDLE_STYLES_OVERRIDES = {
++	width: undefined,
++	height: undefined,
++	top: undefined,
++	right: undefined,
++	bottom: undefined,
++	left: undefined,
++};
++const HANDLE_STYLES = {
++	top: HANDLE_STYLES_OVERRIDES,
++	right: HANDLE_STYLES_OVERRIDES,
++	bottom: HANDLE_STYLES_OVERRIDES,
++	left: HANDLE_STYLES_OVERRIDES,
++	topLeft: HANDLE_STYLES_OVERRIDES,
++	topRight: HANDLE_STYLES_OVERRIDES,
++	bottomRight: HANDLE_STYLES_OVERRIDES,
++	bottomLeft: HANDLE_STYLES_OVERRIDES,
++};
++
++type ResizableBoxProps = ResizableProps & {
++	className: string;
++	children: ReactNode;
++	showHandle: boolean;
++	__experimentalShowTooltip: boolean;
++	__experimentalTooltipProps: Parameters< typeof ResizeTooltip >[ 0 ];
++};
++
++function ResizableBox(
++	{
++		className,
++		children,
++		showHandle = true,
++		__experimentalShowTooltip: showTooltip = false,
++		__experimentalTooltipProps: tooltipProps = {},
++		...props
++	}: ResizableBoxProps,
++	ref: Ref< Resizable >
++): JSX.Element {
++	return (
++		<Resizable
++			className={ classnames(
++				'components-resizable-box__container',
++				showHandle && 'has-show-handle',
++				className
++			) }
++			handleClasses={ HANDLE_CLASSES }
++			handleStyles={ HANDLE_STYLES }
++			ref={ ref }
++			{ ...props }
++		>
++			{ children }
++			{ showTooltip && <ResizeTooltip { ...tooltipProps } /> }
++		</Resizable>
++	);
++}
++
++export default forwardRef( ResizableBox );
+diff --git a/packages/components/src/resizable-box/resize-tooltip/index.js b/packages/components/src/resizable-box/resize-tooltip/index.tsx
+similarity index 65%
+rename from packages/components/src/resizable-box/resize-tooltip/index.js
+rename to packages/components/src/resizable-box/resize-tooltip/index.tsx
+index 0188d847eacfac..386992ea0cd808 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/index.js
++++ b/packages/components/src/resizable-box/resize-tooltip/index.tsx
+@@ -8,14 +8,29 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { forwardRef } from '@wordpress/element';
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Label from './label';
+-import { useResizeLabel, POSITIONS } from './utils';
++import { useResizeLabel, Axis, Position, POSITIONS } from './utils';
+ import { Root } from './styles/resize-tooltip.styles';
+ 
++type ResizeTooltipProps = React.ComponentProps< typeof Root > & {
++	'aria-hidden'?: boolean;
++	axis?: Axis;
++	className?: string;
++	fadeTimeout?: number;
++	isVisible?: boolean;
++	labelRef?: Ref< HTMLDivElement >;
++	onResize?: Parameters< typeof useResizeLabel >[ 0 ][ 'onResize' ];
++	position?: Position;
++	showPx?: boolean;
++	zIndex?: number;
++};
++
+ function ResizeTooltip(
+ 	{
+ 		axis,
+@@ -28,9 +43,9 @@ function ResizeTooltip(
+ 		showPx = true,
+ 		zIndex = 1000,
+ 		...props
+-	},
+-	ref
+-) {
++	}: ResizeTooltipProps,
++	ref: Ref< HTMLDivElement >
++): JSX.Element | null {
+ 	const { label, resizeListener } = useResizeLabel( {
+ 		axis,
+ 		fadeTimeout,
+@@ -48,8 +63,6 @@ function ResizeTooltip(
+ 			{ resizeListener }
+ 			<Label
+ 				aria-hidden={ props[ 'aria-hidden' ] }
+-				fadeTimeout={ fadeTimeout }
+-				isVisible={ isVisible }
+ 				label={ label }
+ 				position={ position }
+ 				ref={ labelRef }
+diff --git a/packages/components/src/resizable-box/resize-tooltip/label.js b/packages/components/src/resizable-box/resize-tooltip/label.tsx
+similarity index 70%
+rename from packages/components/src/resizable-box/resize-tooltip/label.js
+rename to packages/components/src/resizable-box/resize-tooltip/label.tsx
+index d95c73f335daff..0b30e6d04dfa02 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/label.js
++++ b/packages/components/src/resizable-box/resize-tooltip/label.tsx
+@@ -1,3 +1,9 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -7,7 +13,7 @@ import { isRTL } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import { POSITIONS } from './utils';
++import { Position, POSITIONS } from './utils';
+ import {
+ 	TooltipWrapper,
+ 	Tooltip,
+@@ -17,10 +23,19 @@ import {
+ const CORNER_OFFSET = 4;
+ const CURSOR_OFFSET_TOP = CORNER_OFFSET * 2.5;
+ 
++type LabelProps = React.DetailedHTMLProps<
++	React.HTMLAttributes< HTMLDivElement >,
++	HTMLDivElement
++> & {
++	label?: string;
++	position: Position;
++	zIndex: number;
++};
++
+ function Label(
+-	{ label, position = POSITIONS.corner, zIndex = 1000, ...props },
+-	ref
+-) {
++	{ label, position = POSITIONS.corner, zIndex = 1000, ...props }: LabelProps,
++	ref: Ref< HTMLDivElement >
++): JSX.Element | null {
+ 	const showLabel = !! label;
+ 
+ 	const isBottom = position === POSITIONS.bottom;
+@@ -28,8 +43,8 @@ function Label(
+ 
+ 	if ( ! showLabel ) return null;
+ 
+-	let style = {
+-		opacity: showLabel ? 1 : null,
++	let style: React.CSSProperties = {
++		opacity: showLabel ? 1 : undefined,
+ 		zIndex,
+ 	};
+ 
+@@ -54,8 +69,8 @@ function Label(
+ 			...style,
+ 			position: 'absolute',
+ 			top: CORNER_OFFSET,
+-			right: isRTL() ? null : CORNER_OFFSET,
+-			left: isRTL() ? CORNER_OFFSET : null,
++			right: isRTL() ? undefined : CORNER_OFFSET,
++			left: isRTL() ? CORNER_OFFSET : undefined,
+ 		};
+ 	}
+ 
+@@ -63,7 +78,6 @@ function Label(
+ 		<TooltipWrapper
+ 			aria-hidden="true"
+ 			className="components-resizable-tooltip__tooltip-wrapper"
+-			isActive={ showLabel }
+ 			ref={ ref }
+ 			style={ style }
+ 			{ ...props }
+diff --git a/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js
+index a1c91b86e3ca44..87aded4b133674 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js
++++ b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js
+@@ -44,7 +44,7 @@ export const Tooltip = styled.div`
+ 
+ export const LabelText = styled( Text )`
+ 	&&& {
+-		color: white;
++		color: ${ COLORS.ui.textDark };
+ 		display: block;
+ 		font-size: 13px;
+ 		line-height: 1.4;
+diff --git a/packages/components/src/resizable-box/resize-tooltip/utils.js b/packages/components/src/resizable-box/resize-tooltip/utils.ts
+similarity index 72%
+rename from packages/components/src/resizable-box/resize-tooltip/utils.js
+rename to packages/components/src/resizable-box/resize-tooltip/utils.ts
+index beb31ecc85655c..b4ec4b19f19fcb 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/utils.js
++++ b/packages/components/src/resizable-box/resize-tooltip/utils.ts
+@@ -9,33 +9,44 @@ import useResizeAware from 'react-resize-aware';
+  */
+ import { useEffect, useRef, useState } from '@wordpress/element';
+ 
+-const { clearTimeout, setTimeout } =
+-	typeof window !== 'undefined' ? window : {};
++const { clearTimeout, setTimeout } = window;
++
++export type Axis = 'x' | 'y';
+ 
+ export const POSITIONS = {
+ 	bottom: 'bottom',
+ 	corner: 'corner',
+-};
++} as const;
+ 
+-/**
+- * @typedef {Object} UseResizeLabelProps
+- *
+- * @property {undefined|string} label          The label value.
+- * @property {Function}         resizeListener Element to be rendered for resize listening events.
+- */
++export type Position = typeof POSITIONS[ keyof typeof POSITIONS ];
++
++interface UseResizeLabelProps {
++	/** The label value. */
++	label?: string;
++	/** Element to be rendered for resize listening events. */
++	resizeListener: JSX.Element;
++}
++
++interface UseResizeLabelArgs {
++	axis?: Axis;
++	fadeTimeout: number;
++	onResize( data: { width: number | null; height: number | null } ): void;
++	position: Position;
++	showPx: boolean;
++}
+ 
+ /**
+  * Custom hook that manages resize listener events. It also provides a label
+  * based on current resize width x height values.
+  *
+- * @param {Object}  props
+- * @param {string}  props.axis        Only shows the label corresponding to the axis.
+- * @param {number}  props.fadeTimeout Duration (ms) before deactivating the resize label.
+- * @param {boolean} props.onResize    Callback when a resize occurs. Provides { width, height } callback.
+- * @param {string}  props.position    Adjusts label value.
+- * @param {boolean} props.showPx      Whether to add `PX` to the label.
++ * @param  props
++ * @param  props.axis        Only shows the label corresponding to the axis.
++ * @param  props.fadeTimeout Duration (ms) before deactivating the resize label.
++ * @param  props.onResize    Callback when a resize occurs. Provides { width, height } callback.
++ * @param  props.position    Adjusts label value.
++ * @param  props.showPx      Whether to add `PX` to the label.
+  *
+- * @return {UseResizeLabelProps} Properties for hook.
++ * @return Properties for hook.
+  */
+ export function useResizeLabel( {
+ 	axis,
+@@ -43,7 +54,7 @@ export function useResizeLabel( {
+ 	onResize = noop,
+ 	position = POSITIONS.bottom,
+ 	showPx = false,
+-} ) {
++}: UseResizeLabelArgs ): UseResizeLabelProps {
+ 	/*
+ 	 * The width/height values derive from this special useResizeAware hook.
+ 	 * This custom hook uses injects an iFrame into the element, allowing it
+@@ -77,7 +88,7 @@ export function useResizeLabel( {
+ 	 * This timeout is used with setMoveX and setMoveY to determine of
+ 	 * both width and height values have changed at (roughly) the same time.
+ 	 */
+-	const moveTimeoutRef = useRef();
++	const moveTimeoutRef = useRef< number >();
+ 
+ 	const unsetMoveXY = () => {
+ 		/*
+@@ -156,19 +167,29 @@ export function useResizeLabel( {
+ 	};
+ }
+ 
++interface GetSizeLabelArgs {
++	axis?: Axis;
++	height: number | null;
++	moveX: boolean;
++	moveY: boolean;
++	position: Position;
++	showPx: boolean;
++	width: number | null;
++}
++
+ /**
+  * Gets the resize label based on width and height values (as well as recent changes).
+  *
+- * @param {Object}  props
+- * @param {string}  props.axis     Only shows the label corresponding to the axis.
+- * @param {number}  props.height   Height value.
+- * @param {boolean} props.moveX    Recent width (x axis) changes.
+- * @param {boolean} props.moveY    Recent width (y axis) changes.
+- * @param {string}  props.position Adjusts label value.
+- * @param {boolean} props.showPx   Whether to add `PX` to the label.
+- * @param {number}  props.width    Width value.
++ * @param  props
++ * @param  props.axis     Only shows the label corresponding to the axis.
++ * @param  props.height   Height value.
++ * @param  props.moveX    Recent width (x axis) changes.
++ * @param  props.moveY    Recent width (y axis) changes.
++ * @param  props.position Adjusts label value.
++ * @param  props.showPx   Whether to add `PX` to the label.
++ * @param  props.width    Width value.
+  *
+- * @return {undefined | string} The rendered label.
++ * @return The rendered label.
+  */
+ function getSizeLabel( {
+ 	axis,
+@@ -178,8 +199,8 @@ function getSizeLabel( {
+ 	position = POSITIONS.bottom,
+ 	showPx = false,
+ 	width,
+-} ) {
+-	if ( ! moveX && ! moveY ) return null;
++}: GetSizeLabelArgs ): string | undefined {
++	if ( ! moveX && ! moveY ) return undefined;
+ 
+ 	/*
+ 	 * Corner position...
+@@ -218,5 +239,5 @@ function getSizeLabel( {
+ 		return `${ height }${ labelUnit }`;
+ 	}
+ 
+-	return null;
++	return undefined;
+ }
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 3af6745f4be320..34626d4c2c624d 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -6,7 +6,8 @@
+ 		"types": [ "gutenberg-env" ],
+ 		// Some errors in Reakit types with TypeScript 4.3
+ 		// Remove the following line when they've been addressed.
+-		"skipLibCheck": true
++		"skipLibCheck": true,
++		"strictNullChecks": true
+ 	},
+ 	"references": [
+ 		{ "path": "../compose" },
+@@ -50,6 +51,7 @@
+ 		"src/number-control/**/*",
+ 		"src/popover/**/*",
+ 		"src/range-control/**/*",
++		"src/resizable-box/**/*",
+ 		"src/scroll-lock/**/*",
+ 		"src/scrollable/**/*",
+ 		"src/select-control/**/*",

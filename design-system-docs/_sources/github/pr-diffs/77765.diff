@@ -1,0 +1,12 @@
+diff --git a/packages/eslint-plugin/rules/use-recommended-components.js b/packages/eslint-plugin/rules/use-recommended-components.js
+index d58b2197bda541..784d00c10ed1e2 100644
+--- a/packages/eslint-plugin/rules/use-recommended-components.js
++++ b/packages/eslint-plugin/rules/use-recommended-components.js
+@@ -13,6 +13,7 @@ const ALLOWLIST = {
+ 			'Card',
+ 			'Collapsible',
+ 			'CollapsibleCard',
++			'EmptyState',
+ 			'Link',
+ 			'Stack',
+ 			'Text',

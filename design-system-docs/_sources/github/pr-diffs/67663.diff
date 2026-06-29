@@ -1,0 +1,13 @@
+diff --git a/packages/block-editor/src/components/spacing-sizes-control/input-controls/spacing-input-control.js b/packages/block-editor/src/components/spacing-sizes-control/input-controls/spacing-input-control.js
+index f03af41bfbc00d..1946a7ac4de7b4 100644
+--- a/packages/block-editor/src/components/spacing-sizes-control/input-controls/spacing-input-control.js
++++ b/packages/block-editor/src/components/spacing-sizes-control/input-controls/spacing-input-control.js
+@@ -212,7 +212,7 @@ export default function SpacingInputControl( {
+ 				<Icon
+ 					className="spacing-sizes-control__icon"
+ 					icon={ icon }
+-					size={ 24 }
++					size={ 32 }
+ 				/>
+ 			) }
+ 			{ showCustomValueControl && (

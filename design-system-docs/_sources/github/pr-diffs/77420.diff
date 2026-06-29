@@ -1,0 +1,130 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 893bc2e8c48642..079c87126f9c08 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Link`: Fix text decoration on the `unstyled` variant when `openInNewTab` is enabled, and simplify new-tab icon markup ([#77420](https://github.com/WordPress/gutenberg/pull/77420)).
+ -   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: Fix broken focus-trap caused by ThemeProvider's `display: contents` and Base UI's `checkVisibility()` ([#77381](https://github.com/WordPress/gutenberg/pull/77381)).
+ 
+ ### Enhancements
+diff --git a/packages/ui/src/link/link.tsx b/packages/ui/src/link/link.tsx
+index e5ee5a6b672eb1..9521891c4473a8 100644
+--- a/packages/ui/src/link/link.tsx
++++ b/packages/ui/src/link/link.tsx
+@@ -46,27 +46,24 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
+ 				variant !== 'unstyled' && styles.link,
+ 				variant !== 'unstyled' && styles[ `is-${ tone }` ],
+ 				variant === 'unstyled' && styles[ 'is-unstyled' ],
+-				openInNewTab && styles[ 'has-link-icon' ],
+ 				className
+ 			),
+ 			onClick: handleClick,
+ 			target: openInNewTab ? '_blank' : undefined,
+-			children: openInNewTab ? (
++			children: (
+ 				<>
+-					<span className={ styles[ 'link-contents' ] }>
+-						{ children }
+-					</span>
+-					<span
+-						className={ styles[ 'link-icon' ] }
+-						role="img"
+-						aria-label={
+-							/* translators: accessibility text appended to link text */
+-							__( '(opens in a new tab)' )
+-						}
+-					/>
++					{ children }
++					{ openInNewTab && (
++						<span
++							className={ styles[ 'link-icon' ] }
++							role="img"
++							aria-label={
++								/* translators: accessibility text appended to link text */
++								__( '(opens in a new tab)' )
++							}
++						/>
++					) }
+ 				</>
+-			) : (
+-				children
+ 			),
+ 		} ),
+ 	} );
+diff --git a/packages/ui/src/link/style.module.css b/packages/ui/src/link/style.module.css
+index 78d14f5d34ebdf..aaeb8976ecf77b 100644
+--- a/packages/ui/src/link/style.module.css
++++ b/packages/ui/src/link/style.module.css
+@@ -46,26 +46,14 @@
+ 	}
+ 
+ 	/* Link icon pattern — arrow rendered via ::after pseudo-element to avoid
+-	 * Twemoji replacement and text-selection issues. Root <a> gets
+-	 * text-decoration:none; the link-contents span re-applies it.
+-	 * text-underline-offset is inherited and propagates from .link
+-	 * automatically. text-decoration-thickness and text-decoration-color
+-	 * are NOT inherited, so they are explicitly redeclared on
+-	 * .link-contents (the latter via `inherit` to carry the neutral
+-	 * tone's custom color token through). */
+-	.has-link-icon {
+-		text-decoration: none;
+-	}
+-
+-	.link-contents {
+-		text-decoration: underline;
+-		text-decoration-color: inherit;
+-		text-decoration-thickness: 0.5px;
+-	}
++	 * Twemoji replacement and text-selection issues. The icon is an
++	 * inline-block so the link underline stays scoped to the text. */
+ 
+ 	.link-icon {
++		display: inline-block;
+ 		margin-inline-start: var(--wpds-dimension-padding-xs);
+ 		font-weight: var(--wpds-typography-font-weight-regular);
++		text-decoration: none;
+ 	}
+ 
+ 	.link-icon::after {
+diff --git a/packages/ui/src/link/test/index.test.tsx b/packages/ui/src/link/test/index.test.tsx
+index ede6bb158d71c3..08c63036b052b8 100644
+--- a/packages/ui/src/link/test/index.test.tsx
++++ b/packages/ui/src/link/test/index.test.tsx
+@@ -47,7 +47,33 @@ describe( 'Link', () => {
+ 
+ 			expect(
+ 				screen.getByLabelText( '(opens in a new tab)' )
+-			).toBeInTheDocument();
++			).toBeVisible();
++		} );
++
++		it( 'keeps the link text on the anchor element', () => {
++			render(
++				<Link href="https://example.com" openInNewTab>
++					External
++				</Link>
++			);
++
++			expect( screen.getByText( 'External' ) ).toBe(
++				screen.getByRole( 'link' )
++			);
++		} );
++
++		it( 'includes the new tab notice in the link name', () => {
++			render(
++				<Link href="https://example.com" openInNewTab>
++					External
++				</Link>
++			);
++
++			expect(
++				screen.getByRole( 'link', {
++					name: 'External (opens in a new tab)',
++				} )
++			).toBeVisible();
+ 		} );
+ 
+ 		it( 'prevents default for internal anchor links', async () => {

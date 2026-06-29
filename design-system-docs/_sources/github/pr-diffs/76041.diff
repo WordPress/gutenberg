@@ -1,0 +1,109 @@
+diff --git a/package-lock.json b/package-lock.json
+index 4be2af30f7daae..fd52001374cd9f 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -58584,7 +58584,7 @@
+ 			"version": "32.2.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@ariakit/react": "^0.4.21",
++				"@ariakit/react": "^0.4.22",
+ 				"@date-fns/utc": "^2.1.1",
+ 				"@emotion/cache": "^11.14.0",
+ 				"@emotion/css": "^11.13.5",
+@@ -58654,6 +58654,38 @@
+ 				"react-dom": "^18.0.0"
+ 			}
+ 		},
++		"packages/components/node_modules/@ariakit/react": {
++			"version": "0.4.22",
++			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.22.tgz",
++			"integrity": "sha512-NKVBwMIGGfgMr2AoxvmUWmAeE/g6X/pDozR1S0yInF5tyem2DZQm+Td/9mKmZPu5e0x0hbEX1AQrb8SvL4VoBg==",
++			"license": "MIT",
++			"dependencies": {
++				"@ariakit/react-core": "0.4.22"
++			},
++			"funding": {
++				"type": "opencollective",
++				"url": "https://opencollective.com/ariakit"
++			},
++			"peerDependencies": {
++				"react": "^17.0.0 || ^18.0.0 || ^19.0.0",
++				"react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
++			}
++		},
++		"packages/components/node_modules/@ariakit/react-core": {
++			"version": "0.4.22",
++			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.22.tgz",
++			"integrity": "sha512-fWzQjMDhMCPGXDJ0/MkYF9vktclwF9XPxKm2fCwYfJMFtAha3ZKXnme2t+IAxguBLtklzW+5xTAEjKV4xn9s7A==",
++			"license": "MIT",
++			"dependencies": {
++				"@ariakit/core": "0.4.18",
++				"@floating-ui/dom": "^1.0.0",
++				"use-sync-external-store": "^1.2.0"
++			},
++			"peerDependencies": {
++				"react": "^17.0.0 || ^18.0.0 || ^19.0.0",
++				"react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
++			}
++		},
+ 		"packages/components/node_modules/@emotion/css": {
+ 			"version": "11.13.5",
+ 			"resolved": "https://registry.npmjs.org/@emotion/css/-/css-11.13.5.tgz",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 71b04e65004b5b..fe30daf9434099 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Menu`: Fix controlled checked state for radio items ([#76041](https://github.com/WordPress/gutenberg/pull/76041)).
+ -   `ColorPicker`: Preserve hue and saturation when the selected color becomes achromatic ([#75493](https://github.com/WordPress/gutenberg/pull/75493)).
+ -   `SnackbarList`: Fix scaling distortion when a snackbar's content is updated in place via a shared notice ID ([#75709](https://github.com/WordPress/gutenberg/pull/75709)).
+ -   `ToggleGroupControl`: Fix hover styles on disabled items ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
+diff --git a/packages/components/package.json b/packages/components/package.json
+index cedd04f3bef818..f87051521a2703 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -51,7 +51,7 @@
+ 		"src/**/*.scss"
+ 	],
+ 	"dependencies": {
+-		"@ariakit/react": "^0.4.21",
++		"@ariakit/react": "^0.4.22",
+ 		"@date-fns/utc": "^2.1.1",
+ 		"@emotion/cache": "^11.14.0",
+ 		"@emotion/css": "^11.13.5",
+diff --git a/packages/components/src/menu/radio-item.tsx b/packages/components/src/menu/radio-item.tsx
+index 1da6d573c26852..8b7acbece92b68 100644
+--- a/packages/components/src/menu/radio-item.tsx
++++ b/packages/components/src/menu/radio-item.tsx
+@@ -8,6 +8,7 @@ import * as Ariakit from '@ariakit/react';
+  */
+ import { forwardRef, useContext } from '@wordpress/element';
+ import { Icon } from '@wordpress/icons';
++import { SVG, Circle } from '@wordpress/primitives';
+ 
+ /**
+  * Internal dependencies
+@@ -16,7 +17,6 @@ import type { WordPressComponentProps } from '../context';
+ import { Context } from './context';
+ import type { RadioItemProps } from './types';
+ import * as Styled from './styles';
+-import { SVG, Circle } from '@wordpress/primitives';
+ 
+ const radioCheck = (
+ 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 439298b951200d..593d9158880765 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Bug Fixes
+ 
++- DataViews: Fix sort indicator not resetting across column menus. [#76041](https://github.com/WordPress/gutenberg/pull/76041)
+ - DataForm: Fix label color of array control. [#75730](https://github.com/WordPress/gutenberg/pull/75730)
+ - DataViews: Fix focus transfer while searching in `list` layout. [#75999](https://github.com/WordPress/gutenberg/pull/75999)
+ - DataForm: Fix focus loss when collapsing in Card view. [#75689](https://github.com/WordPress/gutenberg/pull/75689)

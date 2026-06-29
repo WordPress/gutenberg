@@ -1,0 +1,142 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0c1195083e30dd..dd3dce8eadf841 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -35,6 +35,7 @@
+ -   `CustomSelectControlV2`: fix select popover content overflow. ([#62844](https://github.com/WordPress/gutenberg/pull/62844))
+ -   `CustomSelectControlV2`: keep legacy arrow down behavior only for legacy wrapper. ([#62919](https://github.com/WordPress/gutenberg/pull/62919))
+ -   `CustomSelectControlV2`: fix trigger button font size. ([#63131](https://github.com/WordPress/gutenberg/pull/63131))
++-   `CustomSelectControlV2`: fix labelling with a visually hidden label. ([#63137](https://github.com/WordPress/gutenberg/pull/63137))
+ -   Extract `TimeInput` component from `TimePicker` ([#60613](https://github.com/WordPress/gutenberg/pull/60613)).
+ -   `TimeInput`: Add `label` prop ([#63106](https://github.com/WordPress/gutenberg/pull/63106)).
+ -   Method style type signatures have been changed to function style ([#62718](https://github.com/WordPress/gutenberg/pull/62718)).
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index 548153506b1424..42fada7d7554aa 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -1,8 +1,7 @@
+ /**
+  * External dependencies
+  */
+-// eslint-disable-next-line no-restricted-imports
+-import type * as Ariakit from '@ariakit/react';
++import * as Ariakit from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -25,6 +24,7 @@ import type {
+ } from './types';
+ import InputBase from '../input-control/input-base';
+ import SelectControlChevronDown from '../select-control/chevron-down';
++import BaseControl from '../base-control';
+ 
+ export const CustomSelectContext =
+ 	createContext< CustomSelectContextType >( undefined );
+@@ -113,13 +113,20 @@ function _CustomSelect(
+ 	return (
+ 		// Where should `restProps` be forwarded to?
+ 		<div className={ className }>
+-			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
+-				<VisuallyHidden as="label">{ label }</VisuallyHidden>
+-			) : (
+-				<Styled.SelectLabel store={ store }>
+-					{ label }
+-				</Styled.SelectLabel>
+-			) }
++			<Ariakit.SelectLabel
++				store={ store }
++				render={
++					hideLabelFromVision ? (
++						// @ts-expect-error `children` are passed via the render prop
++						<VisuallyHidden />
++					) : (
++						// @ts-expect-error `children` are passed via the render prop
++						<BaseControl.VisualLabel as="div" />
++					)
++				}
++			>
++				{ label }
++			</Ariakit.SelectLabel>
+ 			<InputBase
+ 				__next40pxDefaultSize
+ 				size={ size }
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+index 238b73ea96933c..1e361236aafd9a 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+@@ -453,6 +453,16 @@ describe.each( [
+ 		);
+ 	} );
+ 
++	it( 'Should label the component correctly even when the label is not visible', () => {
++		render( <Component { ...legacyProps } hideLabelFromVision /> );
++
++		expect(
++			screen.getByRole( 'combobox', {
++				name: legacyProps.label,
++			} )
++		).toBeVisible();
++	} );
++
+ 	describe( 'Keyboard behavior and accessibility', () => {
+ 		it( 'Captures the keypress event and does not let it propagate', async () => {
+ 			const onKeyDown = jest.fn();
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index 273f581ae3847a..22ebd6ffdf92a2 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -67,14 +67,6 @@ const getSelectItemSize = (
+ 	return sizes[ size ] || sizes.default;
+ };
+ 
+-export const SelectLabel = styled( Ariakit.SelectLabel )`
+-	font-size: 11px;
+-	font-weight: 500;
+-	line-height: ${ CONFIG.fontLineHeightBase };
+-	text-transform: uppercase;
+-	margin-bottom: ${ space( 2 ) };
+-`;
+-
+ export const Select = styled( Ariakit.Select, {
+ 	// Do not forward `hasCustomRenderProp` to the underlying Ariakit.Select component
+ 	shouldForwardProp: ( prop ) => prop !== 'hasCustomRenderProp',
+diff --git a/packages/components/src/custom-select-control-v2/test/index.tsx b/packages/components/src/custom-select-control-v2/test/index.tsx
+index c697539ab12085..3ff384852be04f 100644
+--- a/packages/components/src/custom-select-control-v2/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/test/index.tsx
+@@ -436,4 +436,14 @@ describe.each( [
+ 			} )
+ 		).toBeVisible();
+ 	} );
++
++	it( 'Should label the component correctly even when the label is not visible', () => {
++		render( <Component { ...defaultProps } hideLabelFromVision /> );
++
++		expect(
++			screen.getByRole( 'combobox', {
++				name: defaultProps.label,
++			} )
++		).toBeVisible();
++	} );
+ } );
+diff --git a/packages/components/src/custom-select-control/test/index.js b/packages/components/src/custom-select-control/test/index.js
+index 165973b09a809a..9b17c4894de400 100644
+--- a/packages/components/src/custom-select-control/test/index.js
++++ b/packages/components/src/custom-select-control/test/index.js
+@@ -440,6 +440,16 @@ describe.each( [
+ 		);
+ 	} );
+ 
++	it( 'Should label the component correctly even when the label is not visible', () => {
++		render( <Component { ...props } hideLabelFromVision /> );
++
++		expect(
++			screen.getByRole( 'button', {
++				name: props.label,
++			} )
++		).toBeVisible();
++	} );
++
+ 	describe( 'Keyboard behavior and accessibility', () => {
+ 		it( 'Captures the keypress event and does not let it propagate', async () => {
+ 			const user = userEvent.setup();

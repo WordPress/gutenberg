@@ -1,0 +1,654 @@
+diff --git a/.npmpackagejsonlintrc.json b/.npmpackagejsonlintrc.json
+index 43c2e4552edbc8..8b73a416e81559 100644
+--- a/.npmpackagejsonlintrc.json
++++ b/.npmpackagejsonlintrc.json
+@@ -8,7 +8,6 @@
+ 				"requireEndingPeriod": true
+ 			}
+ 		],
+-		"prefer-no-devDependencies": "error",
+ 		"require-publishConfig": "error",
+ 		"require-repository-directory": "error",
+ 		"valid-values-author": [ "error", [ "The WordPress Contributors" ] ],
+@@ -26,16 +25,14 @@
+ 			"patterns": [ "./package.json" ],
+ 			"rules": {
+ 				"require-publishConfig": "off",
+-				"require-repository-directory": "off",
+-				"prefer-no-devDependencies": "off"
++				"require-repository-directory": "off"
+ 			}
+ 		},
+ 		{
+ 			"patterns": [ "./platform-docs/package.json" ],
+ 			"rules": {
+ 				"require-publishConfig": "off",
+-				"require-repository-directory": "off",
+-				"prefer-no-devDependencies": "off"
++				"require-repository-directory": "off"
+ 			}
+ 		}
+ 	]
+diff --git a/bin/validate-tsconfig.mjs b/bin/validate-tsconfig.mjs
+index 47d6a320d7290e..ed23892431cadc 100755
+--- a/bin/validate-tsconfig.mjs
++++ b/bin/validate-tsconfig.mjs
+@@ -3,10 +3,9 @@
+ /**
+  * External dependencies
+  */
+-// @ts-ignore
+ import glob from 'glob';
+ import { dirname, basename } from 'path';
+-import stripJsonComments from 'strip-json-comments';
++import JSONC from 'jsonc-parser';
+ import { readFileSync } from 'fs';
+ 
+ let hasErrors = false;
+@@ -40,22 +39,12 @@ for ( const packageName of packagesWithTypes ) {
+ 		);
+ 		throw e;
+ 	}
+-	let tsconfigJson;
+-	try {
+-		tsconfigJson = JSON.parse(
+-			stripJsonComments(
+-				readFileSync(
+-					`packages/${ packageName }/tsconfig.json`,
+-					'utf8'
+-				)
+-			)
+-		);
+-	} catch ( e ) {
+-		console.error(
+-			`Error parsing tsconfig.json for package ${ packageName }`
+-		);
+-		throw e;
+-	}
++
++	const tsconfigs = glob.sync( `packages/${ packageName }/tsconfig*.json` );
++	const references = tsconfigs.flatMap(
++		( path ) => JSONC.parse( readFileSync( path, 'utf8' ) ).references ?? []
++	);
++
+ 	if ( packageJson.dependencies ) {
+ 		for ( const dependency of Object.keys( packageJson.dependencies ) ) {
+ 			if ( dependency.startsWith( '@wordpress/' ) ) {
+@@ -64,7 +53,7 @@ for ( const packageName of packagesWithTypes ) {
+ 				);
+ 				if (
+ 					packagesWithTypes.includes( dependencyPackageName ) &&
+-					! tsconfigJson.references?.some(
++					! references.some(
+ 						( reference ) =>
+ 							reference.path === `../${ dependencyPackageName }`
+ 					)
+diff --git a/package-lock.json b/package-lock.json
+index e73afc0a6867d3..78ef0e9f6ff9af 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -118,6 +118,7 @@
+ 				"jest-message-util": "29.6.2",
+ 				"jest-watch-typeahead": "2.2.2",
+ 				"json2md": "2.0.1",
++				"jsonc-parser": "3.3.1",
+ 				"lerna": "8.1.9",
+ 				"lint-staged": "10.0.2",
+ 				"make-dir": "3.0.0",
+@@ -154,7 +155,6 @@
+ 				"sprintf-js": "1.1.1",
+ 				"storybook": "8.4.7",
+ 				"storybook-source-link": "2.0.9",
+-				"strip-json-comments": "5.0.0",
+ 				"style-loader": "3.2.1",
+ 				"stylelint-plugin-logical-css": "^1.2.3",
+ 				"terser": "5.32.0",
+@@ -24695,6 +24695,22 @@
+ 				"@esbuild/win32-x64": "0.25.10"
+ 			}
+ 		},
++		"node_modules/esbuild-esm-loader": {
++			"version": "0.3.3",
++			"resolved": "https://registry.npmjs.org/esbuild-esm-loader/-/esbuild-esm-loader-0.3.3.tgz",
++			"integrity": "sha512-txJYxTdvMN6kkANPfn/YyP5Y2wIW8R6DzYMmuN+1RBY9pyRvIwhjSdESGL80PJONCUrNJKVmUHiMtFKXiOoDFQ==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"resolve-file-extension": "^1.0.1"
++			},
++			"engines": {
++				"node": ">=16.17.0"
++			},
++			"peerDependencies": {
++				"esbuild": "*"
++			}
++		},
+ 		"node_modules/esbuild-plugin-babel": {
+ 			"version": "0.2.3",
+ 			"resolved": "https://registry.npmjs.org/esbuild-plugin-babel/-/esbuild-plugin-babel-0.2.3.tgz",
+@@ -31448,6 +31464,7 @@
+ 			"version": "2.2.3",
+ 			"resolved": "https://registry.npmjs.org/json5/-/json5-2.2.3.tgz",
+ 			"integrity": "sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==",
++			"license": "MIT",
+ 			"bin": {
+ 				"json5": "lib/cli.js"
+ 			},
+@@ -31456,9 +31473,10 @@
+ 			}
+ 		},
+ 		"node_modules/jsonc-parser": {
+-			"version": "3.0.0",
+-			"resolved": "https://registry.npmjs.org/jsonc-parser/-/jsonc-parser-3.0.0.tgz",
+-			"integrity": "sha512-fQzRfAbIBnR0IQvftw9FJveWiHp72Fg20giDrHz6TdfB12UH/uue0D3hm57UB5KgAVuniLMCaS8P1IMj9NR7cA=="
++			"version": "3.3.1",
++			"resolved": "https://registry.npmjs.org/jsonc-parser/-/jsonc-parser-3.3.1.tgz",
++			"integrity": "sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==",
++			"license": "MIT"
+ 		},
+ 		"node_modules/jsonfile": {
+ 			"version": "4.0.0",
+@@ -34629,6 +34647,12 @@
+ 				"js-yaml": "bin/js-yaml.js"
+ 			}
+ 		},
++		"node_modules/markdownlint-cli/node_modules/jsonc-parser": {
++			"version": "3.0.0",
++			"resolved": "https://registry.npmjs.org/jsonc-parser/-/jsonc-parser-3.0.0.tgz",
++			"integrity": "sha512-fQzRfAbIBnR0IQvftw9FJveWiHp72Fg20giDrHz6TdfB12UH/uue0D3hm57UB5KgAVuniLMCaS8P1IMj9NR7cA==",
++			"license": "MIT"
++		},
+ 		"node_modules/markdownlint-cli/node_modules/minimatch": {
+ 			"version": "3.0.8",
+ 			"resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.0.8.tgz",
+@@ -36803,12 +36827,6 @@
+ 				"js-yaml": "bin/js-yaml.js"
+ 			}
+ 		},
+-		"node_modules/npm-package-json-lint/node_modules/jsonc-parser": {
+-			"version": "3.3.1",
+-			"resolved": "https://registry.npmjs.org/jsonc-parser/-/jsonc-parser-3.3.1.tgz",
+-			"integrity": "sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==",
+-			"license": "MIT"
+-		},
+ 		"node_modules/npm-package-json-lint/node_modules/meow": {
+ 			"version": "9.0.0",
+ 			"resolved": "https://registry.npmjs.org/meow/-/meow-9.0.0.tgz",
+@@ -42467,6 +42485,16 @@
+ 				"node": ">=0.10.0"
+ 			}
+ 		},
++		"node_modules/resolve-file-extension": {
++			"version": "1.0.1",
++			"resolved": "https://registry.npmjs.org/resolve-file-extension/-/resolve-file-extension-1.0.1.tgz",
++			"integrity": "sha512-kPdiRMUkit/vBoMqLQ1RWe4VttH8/h7sLcpB//G4pTyuQ8Gjcxw9cs6ry0KaJpDbbhfhFpDZEgRn/wgNvqvSlA==",
++			"dev": true,
++			"license": "MIT",
++			"engines": {
++				"node": ">= 12"
++			}
++		},
+ 		"node_modules/resolve-from": {
+ 			"version": "3.0.0",
+ 			"resolved": "https://registry.npmjs.org/resolve-from/-/resolve-from-3.0.0.tgz",
+@@ -44112,13 +44140,6 @@
+ 				"vscode-textmate": "^8.0.0"
+ 			}
+ 		},
+-		"node_modules/shiki/node_modules/jsonc-parser": {
+-			"version": "3.3.1",
+-			"resolved": "https://registry.npmjs.org/jsonc-parser/-/jsonc-parser-3.3.1.tgz",
+-			"integrity": "sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==",
+-			"dev": true,
+-			"license": "MIT"
+-		},
+ 		"node_modules/showdown": {
+ 			"version": "1.9.1",
+ 			"resolved": "https://registry.npmjs.org/showdown/-/showdown-1.9.1.tgz",
+@@ -45495,18 +45516,6 @@
+ 				"node": ">=8"
+ 			}
+ 		},
+-		"node_modules/strip-json-comments": {
+-			"version": "5.0.0",
+-			"resolved": "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-5.0.0.tgz",
+-			"integrity": "sha512-V1LGY4UUo0jgwC+ELQ2BNWfPa17TIuwBLg+j1AA/9RPzKINl1lhxVEu2r+ZTTO8aetIsUzE5Qj6LMSBkoGYKKw==",
+-			"dev": true,
+-			"engines": {
+-				"node": ">=14.16"
+-			},
+-			"funding": {
+-				"url": "https://github.com/sponsors/sindresorhus"
+-			}
+-		},
+ 		"node_modules/strip-outer": {
+ 			"version": "1.0.1",
+ 			"resolved": "https://registry.npmjs.org/strip-outer/-/strip-outer-1.0.1.tgz",
+@@ -54430,6 +54439,9 @@
+ 				"colorjs.io": "^0.5.2",
+ 				"memize": "^2.1.0"
+ 			},
++			"devDependencies": {
++				"esbuild-esm-loader": "0.3.3"
++			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+ 				"npm": ">=8.19.2"
+diff --git a/package.json b/package.json
+index 1f54f01a02b1ff..f8e0ae2103f8c8 100644
+--- a/package.json
++++ b/package.json
+@@ -132,6 +132,7 @@
+ 		"jest-message-util": "29.6.2",
+ 		"jest-watch-typeahead": "2.2.2",
+ 		"json2md": "2.0.1",
++		"jsonc-parser": "3.3.1",
+ 		"lerna": "8.1.9",
+ 		"lint-staged": "10.0.2",
+ 		"make-dir": "3.0.0",
+@@ -168,7 +169,6 @@
+ 		"sprintf-js": "1.1.1",
+ 		"storybook": "8.4.7",
+ 		"storybook-source-link": "2.0.9",
+-		"strip-json-comments": "5.0.0",
+ 		"style-loader": "3.2.1",
+ 		"stylelint-plugin-logical-css": "^1.2.3",
+ 		"terser": "5.32.0",
+diff --git a/packages/theme/bin/build-tokens.js b/packages/theme/bin/build-tokens.js
+deleted file mode 100755
+index 0503c197039772..00000000000000
+--- a/packages/theme/bin/build-tokens.js
++++ /dev/null
+@@ -1,83 +0,0 @@
+-/**
+- * External dependencies
+- */
+-const { execSync } = require( 'child_process' );
+-const fs = require( 'fs' );
+-const path = require( 'path' );
+-
+-/**
+- * Build script for design tokens.
+- *
+- * This script:
+- * 1. Compiles and runs the primitive token generator
+- * 2. Compiles the terrazzo config and runs the Terrazzo build
+- * 3. Cleans up temporary files
+- */
+-
+-const TEMP_FILES = [
+-	'bin/generate-primitive-tokens/index.mjs',
+-	'terrazzo.config.mjs',
+-];
+-
+-function cleanup() {
+-	TEMP_FILES.forEach( ( file ) => {
+-		const filePath = path.join( process.cwd(), file );
+-		if ( fs.existsSync( filePath ) ) {
+-			fs.unlinkSync( filePath );
+-		}
+-	} );
+-}
+-
+-// Ensure cleanup happens even if the process exits unexpectedly
+-process.on( 'exit', cleanup );
+-process.on( 'SIGINT', () => {
+-	cleanup();
+-	process.exit( 130 );
+-} );
+-process.on( 'SIGTERM', () => {
+-	cleanup();
+-	process.exit( 143 );
+-} );
+-
+-try {
+-	// Step 1: Compile the primitive token generator
+-	console.log( '🔨 Compiling primitive token generator...' );
+-	execSync(
+-		'npx esbuild bin/generate-primitive-tokens/index.ts --bundle --platform=node --format=esm --packages=external --outfile=bin/generate-primitive-tokens/index.mjs',
+-		{
+-			stdio: 'inherit',
+-			cwd: process.cwd(),
+-		}
+-	);
+-
+-	// Step 2: Run the primitive token generator
+-	console.log( '🎨 Generating primitive tokens...' );
+-	execSync( 'node bin/generate-primitive-tokens/index.mjs', {
+-		stdio: 'inherit',
+-		cwd: process.cwd(),
+-	} );
+-
+-	// Step 3: Compile the terrazzo config
+-	console.log( '🔨 Compiling terrazzo config...' );
+-	execSync(
+-		'npx esbuild terrazzo.config.ts --bundle --platform=node --format=esm --packages=external --outfile=terrazzo.config.mjs',
+-		{
+-			stdio: 'inherit',
+-			cwd: process.cwd(),
+-		}
+-	);
+-
+-	// Step 4: Run terrazzo build
+-	console.log( '🏗️  Running terrazzo build...' );
+-	execSync( 'npx tz build --config terrazzo.config.mjs', {
+-		stdio: 'inherit',
+-		cwd: process.cwd(),
+-	} );
+-
+-	console.log( '✅ Token build complete!' );
+-} catch ( error ) {
+-	console.error( '❌ Build failed:', error.message );
+-	process.exit( 1 );
+-} finally {
+-	cleanup();
+-}
+diff --git a/packages/theme/bin/generate-default-ramps/index.ts b/packages/theme/bin/generate-default-ramps/index.ts
+new file mode 100644
+index 00000000000000..dca5349ddd8258
+--- /dev/null
++++ b/packages/theme/bin/generate-default-ramps/index.ts
+@@ -0,0 +1,46 @@
++/**
++ * External dependencies
++ */
++import { writeFile } from 'node:fs/promises';
++import { join } from 'node:path';
++
++/**
++ * Internal dependencies
++ */
++import {
++	DEFAULT_SEED_COLORS,
++	buildBgRamp,
++	buildAccentRamp,
++} from '../../src/color-ramps/index.ts';
++
++const bgRamp = buildBgRamp( DEFAULT_SEED_COLORS.bg );
++const accentRamps = Object.fromEntries(
++	[ ...Object.entries( DEFAULT_SEED_COLORS ) ]
++		.filter( ( [ scaleName ] ) => scaleName !== 'bg' )
++		.map( ( [ scaleName, seed ] ) => [
++			scaleName,
++			buildAccentRamp( seed, bgRamp ),
++		] )
++);
++
++const ramps = { bg: bgRamp, ...accentRamps };
++
++const outputPath = join(
++	import.meta.dirname,
++	'../../src/color-ramps/lib/default-ramps.ts'
++);
++
++const content = `
++/**
++ * Internal dependencies
++ */
++import type { RampResult } from './types';
++import type { DEFAULT_SEED_COLORS } from './constants';
++
++export const DEFAULT_RAMPS: Record<
++	keyof typeof DEFAULT_SEED_COLORS,
++	RampResult
++> = ${ JSON.stringify( ramps ) };
++`;
++
++await writeFile( outputPath, content );
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index 45f0d59148067c..b147264504ef65 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -44,6 +44,9 @@
+ 		"colorjs.io": "^0.5.2",
+ 		"memize": "^2.1.0"
+ 	},
++	"devDependencies": {
++		"esbuild-esm-loader": "0.3.3"
++	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0",
+ 		"react-dom": "^18.0.0"
+@@ -52,6 +55,9 @@
+ 		"access": "public"
+ 	},
+ 	"scripts": {
+-		"build": "rimraf src/prebuilt docs && node bin/build-tokens.js && prettier --write tokens/color.json src/prebuilt docs"
++		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
++		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && NODE_OPTIONS=--import=esbuild-esm-loader/register tz build --config terrazzo.config.ts",
++		"build": "npm run build:tokens && npm run build:default-ramps",
++		"postbuild": "prettier --write tokens/color.json src/prebuilt src/color-ramps/lib/default-ramps.ts docs"
+ 	}
+ }
+diff --git a/packages/theme/src/color-ramps/lib/default-ramps.ts b/packages/theme/src/color-ramps/lib/default-ramps.ts
+new file mode 100644
+index 00000000000000..027dffccfdf0bf
+--- /dev/null
++++ b/packages/theme/src/color-ramps/lib/default-ramps.ts
+@@ -0,0 +1,173 @@
++/**
++ * Internal dependencies
++ */
++import type { RampResult } from './types';
++import type { DEFAULT_SEED_COLORS } from './constants';
++
++export const DEFAULT_RAMPS: Record<
++	keyof typeof DEFAULT_SEED_COLORS,
++	RampResult
++> = {
++	bg: {
++		ramp: {
++			surface2: { color: '#f8f8f8', warning: false },
++			bgFill1: { color: '#555', warning: false },
++			fgFill: { color: '#f0f0f0', warning: false },
++			bgFill2: { color: '#474747', warning: false },
++			surface6: { color: '#d0d0d0', warning: false },
++			surface5: { color: '#dfdfdf', warning: false },
++			surface4: { color: '#eaeaea', warning: false },
++			surface3: { color: '#fff', warning: false },
++			fgSurface4: { color: '#1e1e1e', warning: false },
++			fgSurface3: { color: '#6c6c6c', warning: false },
++			fgSurface2: { color: '#898989', warning: false },
++			fgSurface1: { color: '#a9a9a9', warning: false },
++			stroke3: { color: '#898989', warning: false },
++			stroke4: { color: '#6a6a6a', warning: false },
++			stroke2: { color: '#aeaeae', warning: false },
++			stroke1: { color: '#d0d0d0', warning: false },
++			bgFillDark: { color: '#1e1e1e', warning: false },
++			fgFillDark: { color: '#f0f0f0', warning: false },
++			bgFillInverted2: { color: '#1e1e1e', warning: false },
++			bgFillInverted1: { color: '#2f2f2f', warning: false },
++			fgFillInverted: { color: '#f0f0f0', warning: false },
++			surface1: { color: '#efefef', warning: false },
++		},
++		direction: 'darker',
++	},
++	primary: {
++		ramp: {
++			bgFill1: { color: '#3858e9', warning: false },
++			fgFill: { color: '#eff0f2', warning: false },
++			bgFill2: { color: '#2c47d7', warning: false },
++			surface2: { color: '#f6f8fc', warning: false },
++			surface6: { color: '#c4d0ee', warning: false },
++			surface5: { color: '#d7dff3', warning: false },
++			surface4: { color: '#e5eaf7', warning: false },
++			surface3: { color: '#fff', warning: false },
++			fgSurface4: { color: '#080071', warning: false },
++			fgSurface3: { color: '#3858e9', warning: false },
++			fgSurface2: { color: '#577fff', warning: false },
++			fgSurface1: { color: '#81a6ff', warning: false },
++			stroke3: { color: '#3858e9', warning: false },
++			stroke4: { color: '#2236c7', warning: false },
++			stroke2: { color: '#7085c0', warning: false },
++			stroke1: { color: '#93a4d0', warning: false },
++			bgFillDark: { color: '#1b1e26', warning: false },
++			fgFillDark: { color: '#eff0f2', warning: false },
++			bgFillInverted2: { color: '#1b1e26', warning: false },
++			bgFillInverted1: { color: '#1401a5', warning: false },
++			fgFillInverted: { color: '#eff0f2', warning: false },
++			surface1: { color: '#ecf0f9', warning: false },
++		},
++		direction: 'darker',
++	},
++	info: {
++		ramp: {
++			bgFill1: { color: '#0090ff', warning: false },
++			fgFill: { color: '#1b1e23', warning: false },
++			bgFill2: { color: '#007eec', warning: false },
++			surface2: { color: '#f5f9fd', warning: false },
++			surface6: { color: '#b9d3f0', warning: false },
++			surface5: { color: '#d0e1f5', warning: false },
++			surface4: { color: '#e0ecf8', warning: false },
++			surface3: { color: '#fff', warning: false },
++			fgSurface4: { color: '#001758', warning: false },
++			fgSurface3: { color: '#006cd8', warning: false },
++			fgSurface2: { color: '#008bf9', warning: false },
++			fgSurface1: { color: '#4dafff', warning: false },
++			stroke3: { color: '#006cd8', warning: false },
++			stroke4: { color: '#004bb5', warning: false },
++			stroke2: { color: '#5c90c9', warning: false },
++			stroke1: { color: '#8baed6', warning: false },
++			bgFillDark: { color: '#1b1e23', warning: false },
++			fgFillDark: { color: '#eff0f2', warning: false },
++			bgFillInverted2: { color: '#1b1e23', warning: false },
++			bgFillInverted1: { color: '#00297b', warning: false },
++			fgFillInverted: { color: '#eff0f2', warning: false },
++			surface1: { color: '#e9f1fa', warning: false },
++		},
++		direction: 'darker',
++	},
++	success: {
++		ramp: {
++			bgFill1: { color: '#4ab866', warning: false },
++			fgFill: { color: '#1b1f1c', warning: false },
++			bgFill2: { color: '#34a554', warning: false },
++			surface2: { color: '#f0fcf2', warning: false },
++			surface6: { color: '#7be792', warning: false },
++			surface5: { color: '#abf0b7', warning: false },
++			surface4: { color: '#cdf5d2', warning: false },
++			surface3: { color: '#fff', warning: false },
++			fgSurface4: { color: '#002b00', warning: false },
++			fgSurface3: { color: '#008030', warning: false },
++			fgSurface2: { color: '#2a9e4d', warning: false },
++			fgSurface1: { color: '#52bf6d', warning: false },
++			stroke3: { color: '#008030', warning: false },
++			stroke4: { color: '#006013', warning: false },
++			stroke2: { color: '#629a6c', warning: false },
++			stroke1: { color: '#78bb84', warning: false },
++			bgFillDark: { color: '#1b1f1c', warning: false },
++			fgFillDark: { color: '#edf2ed', warning: false },
++			bgFillInverted2: { color: '#1b1f1c', warning: false },
++			bgFillInverted1: { color: '#003b00', warning: false },
++			fgFillInverted: { color: '#edf2ed', warning: false },
++			surface1: { color: '#ddf8e1', warning: false },
++		},
++		direction: 'darker',
++	},
++	warning: {
++		ramp: {
++			bgFill1: { color: '#f0b849', warning: false },
++			fgFill: { color: '#1f1e1b', warning: false },
++			bgFill2: { color: '#dba32f', warning: false },
++			surface2: { color: '#fdf7ee', warning: false },
++			surface6: { color: '#f0cb89', warning: false },
++			surface5: { color: '#f5dcb2', warning: false },
++			surface4: { color: '#f8e8cd', warning: false },
++			surface3: { color: '#fff', warning: false },
++			fgSurface4: { color: '#2f1800', warning: false },
++			fgSurface3: { color: '#966200', warning: false },
++			fgSurface2: { color: '#b58000', warning: false },
++			fgSurface1: { color: '#d7a02b', warning: false },
++			stroke3: { color: '#966200', warning: false },
++			stroke4: { color: '#724700', warning: false },
++			stroke2: { color: '#a18a61', warning: false },
++			stroke1: { color: '#c3a777', warning: false },
++			bgFillDark: { color: '#1f1e1b', warning: false },
++			fgFillDark: { color: '#f3f0e9', warning: false },
++			bgFillInverted2: { color: '#1f1e1b', warning: false },
++			bgFillInverted1: { color: '#472900', warning: false },
++			fgFillInverted: { color: '#f3f0e9', warning: false },
++			surface1: { color: '#faefdc', warning: false },
++		},
++		direction: 'darker',
++	},
++	error: {
++		ramp: {
++			bgFill1: { color: '#cc1818', warning: false },
++			fgFill: { color: '#f2efef', warning: false },
++			bgFill2: { color: '#b90000', warning: false },
++			surface2: { color: '#fdf6f5', warning: false },
++			surface6: { color: '#f5c5bd', warning: false },
++			surface5: { color: '#f8d8d3', warning: false },
++			surface4: { color: '#fae5e2', warning: false },
++			surface3: { color: '#fff', warning: false },
++			fgSurface4: { color: '#4a0000', warning: false },
++			fgSurface3: { color: '#cc1818', warning: false },
++			fgSurface2: { color: '#f64b40', warning: false },
++			fgSurface1: { color: '#ff8070', warning: false },
++			stroke3: { color: '#cc1818', warning: false },
++			stroke4: { color: '#a30000', warning: false },
++			stroke2: { color: '#cd695d', warning: false },
++			stroke1: { color: '#dc9085', warning: false },
++			bgFillDark: { color: '#231c1b', warning: false },
++			fgFillDark: { color: '#f2efef', warning: false },
++			bgFillInverted2: { color: '#231c1b', warning: false },
++			bgFillInverted1: { color: '#6d0000', warning: false },
++			fgFillInverted: { color: '#f2efef', warning: false },
++			surface1: { color: '#fcedea', warning: false },
++		},
++		direction: 'darker',
++	},
++};
+diff --git a/packages/theme/tsconfig.bin.json b/packages/theme/tsconfig.bin.json
+new file mode 100644
+index 00000000000000..7ca351764da273
+--- /dev/null
++++ b/packages/theme/tsconfig.bin.json
+@@ -0,0 +1,13 @@
++{
++	"$schema": "https://json.schemastore.org/tsconfig.json",
++	"extends": "./tsconfig.src.json",
++	"compilerOptions": {
++		"composite": true,
++		"rootDir": "bin",
++		"noEmit": true,
++		"allowImportingTsExtensions": true
++	},
++	"include": [ "bin" ],
++	"exclude": [],
++	"references": [ { "path": "./tsconfig.src.json" } ]
++}
+diff --git a/packages/theme/tsconfig.json b/packages/theme/tsconfig.json
+index 2238d7767fe70e..b410a122946dcb 100644
+--- a/packages/theme/tsconfig.json
++++ b/packages/theme/tsconfig.json
+@@ -1,9 +1,8 @@
+ {
+ 	"$schema": "https://json.schemastore.org/tsconfig.json",
+-	"extends": "../../tsconfig.base.json",
+-	"compilerOptions": {
+-		"moduleResolution": "bundler",
+-		"types": [ "jest", "@testing-library/jest-dom" ]
+-	},
+-	"references": [ { "path": "../element" }, { "path": "../private-apis" } ]
++	"files": [],
++	"references": [
++		{ "path": "./tsconfig.src.json" },
++		{ "path": "./tsconfig.bin.json" }
++	]
+ }
+diff --git a/packages/theme/tsconfig.src.json b/packages/theme/tsconfig.src.json
+new file mode 100644
+index 00000000000000..2238d7767fe70e
+--- /dev/null
++++ b/packages/theme/tsconfig.src.json
+@@ -0,0 +1,9 @@
++{
++	"$schema": "https://json.schemastore.org/tsconfig.json",
++	"extends": "../../tsconfig.base.json",
++	"compilerOptions": {
++		"moduleResolution": "bundler",
++		"types": [ "jest", "@testing-library/jest-dom" ]
++	},
++	"references": [ { "path": "../element" }, { "path": "../private-apis" } ]
++}

@@ -1,0 +1,36 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index aaee63a66ba53a..3b0679e60cdb24 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
+ 
++### Bug Fix
++
++-   `Placeholder`: set fixed right margin for label's icon ([46918](https://github.com/WordPress/gutenberg/pull/46918)).
++
+ ## 23.1.0 (2023-01-02)
+ 
+ ## 23.0.0 (2022-12-14)
+@@ -76,6 +80,7 @@
+ -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
+ 
+ ### Internal
++
+ -   `AnglePickerControl`: remove `:focus-visible' outline on `CircleOutlineWrapper` ([#45758](https://github.com/WordPress/gutenberg/pull/45758))
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/placeholder/style.scss b/packages/components/src/placeholder/style.scss
+index 9f5db03711dc7e..7fd9977e4645dc 100644
+--- a/packages/components/src/placeholder/style.scss
++++ b/packages/components/src/placeholder/style.scss
+@@ -45,7 +45,7 @@
+ 	> svg,
+ 	.dashicon,
+ 	.block-editor-block-icon {
+-		margin-right: 1ch;
++		margin-right: $grid-unit-15;
+ 		fill: currentColor;
+ 		// Optimizate for high contrast modes.
+ 		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.

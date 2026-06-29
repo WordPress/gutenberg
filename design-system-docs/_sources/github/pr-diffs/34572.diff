@@ -1,0 +1,26 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9b6ae2d6cc5dd7..90d083445fab2d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Bug Fix
+ 
+ -   Fixed RTL styles in `Flex` component ([#33729](https://github.com/WordPress/gutenberg/pull/33729)).
++-   Fixed unit test errors caused by `CSS.supports` being called in a non-browser environment ([#34572](https://github.com/WordPress/gutenberg/pull/34572)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/ui/utils/space.ts b/packages/components/src/ui/utils/space.ts
+index d6a3748a5a0eca..b3f2c0a8b3e873 100644
+--- a/packages/components/src/ui/utils/space.ts
++++ b/packages/components/src/ui/utils/space.ts
+@@ -30,7 +30,8 @@ export function space( value?: SpaceInput ): string | undefined {
+ 
+ 	// test if the input has a unit, was NaN, or was one of the named CSS values (like `auto`), in which case just use that value
+ 	if (
+-		CSS.supports?.( 'margin', value.toString() ) ||
++		( typeof window !== 'undefined' &&
++			window.CSS?.supports?.( 'margin', value.toString() ) ) ||
+ 		Number.isNaN( asInt )
+ 	) {
+ 		return value.toString();

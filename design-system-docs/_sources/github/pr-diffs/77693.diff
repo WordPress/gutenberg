@@ -1,0 +1,138 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index ba9b97ca6e8855..31bf823f626ea2 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Breaking Changes
+ 
+ -   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: **`Popup` portal API** ([#77452](https://github.com/WordPress/gutenberg/pull/77452)). Add `Portal` subcomponents and an optional `portal` prop on `Popup` (when omitted, the default `Portal` is used). Remove `container` from every `Popup` and `portalClassName` from `Dialog.Popup` / `AlertDialog.Popup`; pass `portal={ <Matching.Portal … /> }` for `container`, `className`, `style`, and other portal options.
++-   `Popover`, `Tooltip`, `Select`: `style` and `className` on `Popup` are now forwarded to the inner Base UI `Popup` element instead of the outer `Positioner`. To override the per-instance z-index, pass `portal={ <Overlay.Portal style={ { '--wp-ui-<overlay>-z-index': '9999' } } /> }` (or set the variable globally on a wrapping element); inline `style={ { zIndex: … } }` on `Popup` no longer reaches the positioned element.
+ 
+ ### New Features
+ 
+diff --git a/packages/ui/src/form/primitives/select/popup.tsx b/packages/ui/src/form/primitives/select/popup.tsx
+index 8bd56eca3b51b6..bae67abb1bd1ec 100644
+--- a/packages/ui/src/form/primitives/select/popup.tsx
++++ b/packages/ui/src/form/primitives/select/popup.tsx
+@@ -18,25 +18,20 @@ const ThemeProvider: typeof ThemeProviderType =
+ 	unlock( themePrivateApis ).ThemeProvider;
+ 
+ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
+-	function Popup(
+-		{ className, portal, children, style, ...restProps },
+-		ref
+-	) {
++	function Popup( { className, portal, children, ...restProps }, ref ) {
+ 		const portalChildren = (
+ 			<_Select.Positioner
+ 				{ ...ITEM_POPUP_POSITIONER_PROPS }
+ 				alignItemWithTrigger={ false }
+-				style={ style }
+ 				className={ clsx(
+ 					resetStyles[ 'box-sizing' ],
+-					styles.positioner,
+-					className
++					styles.positioner
+ 				) }
+ 			>
+ 				<ThemeProvider>
+ 					<_Select.Popup
+ 						ref={ ref }
+-						className={ itemPopupStyles.popup }
++						className={ clsx( itemPopupStyles.popup, className ) }
+ 						{ ...restProps }
+ 					>
+ 						<_Select.List className={ itemPopupStyles.list }>
+diff --git a/packages/ui/src/popover/popup.tsx b/packages/ui/src/popover/popup.tsx
+index 3c105bff1d45ff..52eb7c6e6494f0 100644
+--- a/packages/ui/src/popover/popup.tsx
++++ b/packages/ui/src/popover/popup.tsx
+@@ -47,7 +47,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
+ 		side = 'bottom',
+ 		sideOffset = 8,
+ 		sticky,
+-		style,
+ 		variant = 'default',
+ 		...props
+ 	},
+@@ -75,19 +74,17 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
+ 			side={ side }
+ 			sideOffset={ sideOffset }
+ 			sticky={ sticky }
+-			style={ style }
+-			className={ clsx(
+-				resetStyles[ 'box-sizing' ],
+-				styles.positioner,
+-				className
+-			) }
++			className={ clsx( resetStyles[ 'box-sizing' ], styles.positioner ) }
+ 		>
+ 			<ThemeProvider>
+ 				<_Popover.Popup
+ 					ref={ mergedPopupRef }
+ 					initialFocus={ resolvedInitialFocus }
+ 					finalFocus={ finalFocus }
+-					className={ clsx( variant !== 'unstyled' && styles.popup ) }
++					className={ clsx(
++						variant !== 'unstyled' && styles.popup,
++						className
++					) }
+ 					{ ...props }
+ 				>
+ 					<PopoverValidationProvider>
+diff --git a/packages/ui/src/popover/types.ts b/packages/ui/src/popover/types.ts
+index 914504fcbf4ea7..fb5315f4f12e1c 100644
+--- a/packages/ui/src/popover/types.ts
++++ b/packages/ui/src/popover/types.ts
+@@ -25,16 +25,6 @@ export interface TriggerProps
+ 	children?: ReactNode;
+ }
+ 
+-/**
+- * `Popover.Popup` maps to two Base UI elements internally: the
+- * **Positioner** (outer, handles fixed positioning and z-index) and the
+- * **Popup** (inner, holds content and visual styles).
+- *
+- * `style` and `className` are forwarded to the **Positioner** so that
+- * z-index overrides (`--wp-ui-popover-z-index`) and Base UI CSS variables
+- * (`--available-height`, `--available-width`) work correctly. All other
+- * HTML attributes are forwarded to the inner **Popup** element.
+- */
+ export interface PopupProps
+ 	extends ComponentProps< 'div' >,
+ 		Pick<
+diff --git a/packages/ui/src/tooltip/popup.tsx b/packages/ui/src/tooltip/popup.tsx
+index ddc31efba1a9b4..34581f0d572a05 100644
+--- a/packages/ui/src/tooltip/popup.tsx
++++ b/packages/ui/src/tooltip/popup.tsx
+@@ -23,7 +23,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
+ 		sideOffset = 4,
+ 		children,
+ 		className,
+-		style,
+ 		...props
+ 	},
+ 	ref
+@@ -33,12 +32,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
+ 			align={ align }
+ 			side={ side }
+ 			sideOffset={ sideOffset }
+-			style={ style }
+-			className={ clsx(
+-				resetStyles[ 'box-sizing' ],
+-				className,
+-				styles.positioner
+-			) }
++			className={ clsx( resetStyles[ 'box-sizing' ], styles.positioner ) }
+ 		>
+ 			{ /* This should ideally use whatever dark color makes sense,
+ 				and not be hardcoded to #1e1e1e. The solutions would be to:
+@@ -52,7 +46,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
+ 			<ThemeProvider color={ { bg: '#1e1e1e' } }>
+ 				<_Tooltip.Popup
+ 					ref={ ref }
+-					className={ styles.popup }
++					className={ clsx( styles.popup, className ) }
+ 					{ ...props }
+ 				>
+ 					{ children }

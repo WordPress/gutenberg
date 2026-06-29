@@ -1,0 +1,141 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 28212ff5cae664..b5f4ea17116a8d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `ColorPicker`: Remove horizontal scrollbar when using HSL or RGB color input types. ([#41646](https://github.com/WordPress/gutenberg/pull/41646))
++
+ ### Internal
+ 
+ -   `InputControl`: Add tests and update to use `@testing-library/user-event` ([#41421](https://github.com/WordPress/gutenberg/pull/41421)).
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index d56cec90f565e0..9e4777aec3eecb 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -20,12 +20,12 @@ import {
+ 	contextConnect,
+ 	WordPressComponentProps,
+ } from '../ui/context';
+-import { HStack } from '../h-stack';
+-import { Spacer } from '../spacer';
+ import {
+ 	ColorfulWrapper,
+ 	SelectControl,
+ 	AuxiliaryColorArtefactWrapper,
++	AuxiliaryColorArtefactHStackHeader,
++	ColorInputWrapper,
+ } from './styles';
+ import { ColorCopyButton } from './color-copy-button';
+ import { ColorInput } from './color-input';
+@@ -95,7 +95,7 @@ const ColorPicker = (
+ 				enableAlpha={ enableAlpha }
+ 			/>
+ 			<AuxiliaryColorArtefactWrapper>
+-				<HStack justify="space-between">
++				<AuxiliaryColorArtefactHStackHeader justify="space-between">
+ 					<SelectControl
+ 						options={ options }
+ 						value={ colorType }
+@@ -109,14 +109,15 @@ const ColorPicker = (
+ 						color={ safeColordColor }
+ 						colorType={ copyFormat || colorType }
+ 					/>
+-				</HStack>
+-				<Spacer margin={ 4 } />
+-				<ColorInput
+-					colorType={ colorType }
+-					color={ safeColordColor }
+-					onChange={ handleChange }
+-					enableAlpha={ enableAlpha }
+-				/>
++				</AuxiliaryColorArtefactHStackHeader>
++				<ColorInputWrapper direction="column" gap={ 2 }>
++					<ColorInput
++						colorType={ colorType }
++						color={ safeColordColor }
++						onChange={ handleChange }
++						enableAlpha={ enableAlpha }
++					/>
++				</ColorInputWrapper>
+ 			</AuxiliaryColorArtefactWrapper>
+ 		</ColorfulWrapper>
+ 	);
+diff --git a/packages/components/src/color-picker/input-with-slider.tsx b/packages/components/src/color-picker/input-with-slider.tsx
+index fb45238ec5016d..8b7831f185f5f2 100644
+--- a/packages/components/src/color-picker/input-with-slider.tsx
++++ b/packages/components/src/color-picker/input-with-slider.tsx
+@@ -26,7 +26,7 @@ export const InputWithSlider = ( {
+ 	value,
+ }: InputWithSliderProps ) => {
+ 	return (
+-		<Spacer as={ HStack } spacing={ 4 }>
++		<HStack spacing={ 4 }>
+ 			<NumberControlWrapper
+ 				min={ min }
+ 				max={ max }
+@@ -55,6 +55,6 @@ export const InputWithSlider = ( {
+ 				onChange={ onChange }
+ 				withInputField={ false }
+ 			/>
+-		</Spacer>
++		</HStack>
+ 	);
+ };
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index 378e165ed74ba6..4ff9e7fd61e528 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -12,6 +12,8 @@ import InnerRangeControl from '../range-control';
+ import { StyledField } from '../base-control/styles/base-control-styles';
+ import { space } from '../ui/utils/space';
+ import Button from '../button';
++import { Flex } from '../flex';
++import { HStack } from '../h-stack';
+ import {
+ 	BackdropUI,
+ 	Container as InputControlContainer,
+@@ -36,6 +38,7 @@ export const SelectControl = styled( InnerSelectControl )`
+ 
+ export const RangeControl = styled( InnerRangeControl )`
+ 	flex: 1;
++	margin-right: ${ space( 2 ) };
+ 
+ 	${ StyledField } {
+ 		margin-bottom: 0;
+@@ -58,7 +61,22 @@ const interactiveHueStyles = `
+ }`;
+ 
+ export const AuxiliaryColorArtefactWrapper = styled.div`
+-	padding: ${ space( 2 ) } ${ space( 4 ) };
++	padding-top: ${ space( 2 ) };
++	padding-right: 0;
++	padding-left: 0;
++	padding-bottom: 0;
++`;
++
++export const AuxiliaryColorArtefactHStackHeader = styled( HStack )`
++	padding-left: ${ space( 4 ) };
++	padding-right: ${ space( 4 ) };
++`;
++
++export const ColorInputWrapper = styled( Flex )`
++	padding-top: ${ space( 4 ) };
++	padding-left: ${ space( 4 ) };
++	padding-right: ${ space( 3 ) };
++	padding-bottom: ${ space( 5 ) };
+ `;
+ 
+ export const ColorfulWrapper = styled.div`
+@@ -70,6 +88,7 @@ export const ColorfulWrapper = styled.div`
+ 		align-items: center;
+ 		width: 216px;
+ 		height: auto;
++		overflow: hidden;
+ 	}
+ 
+ 	.react-colorful__saturation {

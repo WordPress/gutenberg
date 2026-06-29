@@ -1,0 +1,195 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f36121a38e232c..41d6a706b9dfba 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `FormTokenField`: Use `color-mix` for disabled option selection background ([#69621](https://github.com/WordPress/gutenberg/pull/69621)).
+ -   `CustomSelectControl`: Fix check icon color to adapt with dark theme ([#69626](https://github.com/WordPress/gutenberg/pull/69626)).
+ -   `Autocomplete`: Extracts `getNodeText` function into a separate file and adds unit tests ([#69135](https://github.com/WordPress/gutenberg/pull/69135)).
++-   `NumberControl`: update stepping to match HTML number input stepping ([#34566](https://github.com/WordPress/gutenberg/pull/34566)).
+ 
+ ## 29.6.0 (2025-03-13)
+ 
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index e890746e275e86..2302d10e2d45bd 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -18,7 +18,7 @@ import deprecated from '@wordpress/deprecated';
+  */
+ import { Input, SpinButton, styles } from './styles/number-control-styles';
+ import * as inputControlActionTypes from '../input-control/reducer/actions';
+-import { add, subtract, roundClamp } from '../utils/math';
++import { add, subtract, clamp, ensureValidStep } from '../utils/math';
+ import { ensureNumber, isValueEmpty } from '../utils/values';
+ import type { WordPressComponentProps } from '../context/wordpress-component';
+ import type { NumberControlProps } from './types';
+@@ -78,17 +78,18 @@ function UnforwardedNumberControl(
+ 	const isStepAny = step === 'any';
+ 	const baseStep = isStepAny ? 1 : ensureNumber( step );
+ 	const baseSpin = ensureNumber( spinFactor ) * baseStep;
+-	const baseValue = roundClamp( 0, min, max, baseStep );
+ 	const constrainValue = (
+ 		value: number | string,
+ 		stepOverride?: number
+ 	) => {
+-		// When step is "any" clamp the value, otherwise round and clamp it.
+-		// Use '' + to convert to string for use in input value attribute.
+-		return isStepAny
+-			? '' + Math.min( max, Math.max( min, ensureNumber( value ) ) )
+-			: '' + roundClamp( value, min, max, stepOverride ?? baseStep );
++		// When step is not "any" the value must be a valid step.
++		if ( ! isStepAny ) {
++			value = ensureValidStep( value, min, stepOverride ?? baseStep );
++		}
++
++		return `${ clamp( value, min, max ) }`;
+ 	};
++	const baseValue = constrainValue( 0 );
+ 
+ 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
+ 	const classes = clsx( 'components-number-control', className );
+diff --git a/packages/components/src/utils/math.js b/packages/components/src/utils/math.js
+index ffaab4e3bd11ba..ae913a630fc848 100644
+--- a/packages/components/src/utils/math.js
++++ b/packages/components/src/utils/math.js
+@@ -59,9 +59,9 @@ function getPrecision( value ) {
+ /**
+  * Clamps a value based on a min/max range.
+  *
+- * @param {number} value The value.
+- * @param {number} min   The minimum range.
+- * @param {number} max   The maximum range.
++ * @param {number|string} value The value.
++ * @param {number}        min   The minimum range.
++ * @param {number}        max   The maximum range.
+  *
+  * @return {number} The clamped value.
+  */
+@@ -71,28 +71,23 @@ export function clamp( value, min, max ) {
+ }
+ 
+ /**
+- * Clamps a value based on a min/max range with rounding
++ * Rounds a value to the nearest step offset by a minimum.
+  *
+- * @param {number | string} value The value.
+- * @param {number}          min   The minimum range.
+- * @param {number}          max   The maximum range.
+- * @param {number}          step  A multiplier for the value.
++ * @param {number|string} value The value.
++ * @param {number}        min   The minimum range.
++ * @param {number}        step  The increment for the value.
+  *
+- * @return {number} The rounded and clamped value.
++ * @return {number} The value as a valid step.
+  */
+-export function roundClamp(
+-	value = 0,
+-	min = Infinity,
+-	max = Infinity,
+-	step = 1
+-) {
++export function ensureValidStep( value, min, step ) {
+ 	const baseValue = getNumber( value );
+ 	const stepValue = getNumber( step );
+-	const precision = getPrecision( step );
+-	const rounded = Math.round( baseValue / stepValue ) * stepValue;
+-	const clampedValue = clamp( rounded, min, max );
+-
+-	return precision
+-		? getNumber( clampedValue.toFixed( precision ) )
+-		: clampedValue;
++	const precision = Math.max( getPrecision( step ), getPrecision( min ) );
++	const realMin = Math.abs( min ) === Infinity ? 0 : min;
++	// If the step is not a factor of the minimum then the step must be
++	// offset by the minimum.
++	const tare = realMin % stepValue ? realMin : 0;
++	const rounded = Math.round( ( baseValue - tare ) / stepValue ) * stepValue;
++	const fromMin = rounded + tare;
++	return precision ? getNumber( fromMin.toFixed( precision ) ) : fromMin;
+ }
+diff --git a/packages/components/src/utils/test/math.js b/packages/components/src/utils/test/math.js
+index 6f8467ce7931b6..368970533dbb71 100644
+--- a/packages/components/src/utils/test/math.js
++++ b/packages/components/src/utils/test/math.js
+@@ -1,7 +1,8 @@
+ /**
+  * Internal dependencies
+  */
+-import { add, clamp, subtract, roundClamp } from '../math';
++
++import { add, subtract, clamp, ensureValidStep } from '../math';
+ 
+ describe( 'add', () => {
+ 	it( 'should add string and number values', () => {
+@@ -58,44 +59,39 @@ describe( 'clamp', () => {
+ 	} );
+ } );
+ 
+-describe( 'roundClamp', () => {
+-	it( 'should clamp a value between min and max', () => {
+-		expect( roundClamp( 10, 1, 10 ) ).toBe( 10 );
+-		expect( roundClamp( 1, 1, 10 ) ).toBe( 1 );
+-		expect( roundClamp( 0, 1, 10 ) ).toBe( 1 );
++describe( 'ensureValidStep', () => {
++	it( 'should work with number or string values', () => {
++		expect( ensureValidStep( '49', 0, 10 ) ).toBe( 50 );
++		expect( ensureValidStep( 49, '0', 10 ) ).toBe( 50 );
++		expect( ensureValidStep( 49, 0, '10' ) ).toBe( 50 );
++	} );
+ 
+-		expect( roundClamp( 50, 1, 10 ) ).toBe( 10 );
+-		expect( roundClamp( 50, -10, 10 ) ).toBe( 10 );
+-		expect( roundClamp( -50, -10, 10 ) ).toBe( -10 );
++	it( 'should round to step', () => {
++		expect( ensureValidStep( 40, 0, 10 ) ).toBe( 40 );
++		expect( ensureValidStep( 42, 0, 10 ) ).toBe( 40 );
++		expect( ensureValidStep( 45, 0, 10 ) ).toBe( 50 );
++		expect( ensureValidStep( 49, 0, 10 ) ).toBe( 50 );
+ 
+-		expect( roundClamp( '50', 1, 10 ) ).toBe( 10 );
+-		expect( roundClamp( '50', -10, 10 ) ).toBe( 10 );
+-		expect( roundClamp( -50, -10, '10' ) ).toBe( -10 );
++		expect( ensureValidStep( 50, 0, 15 ) ).toBe( 45 );
++		expect( ensureValidStep( 50, 0, 11 ) ).toBe( 55 );
+ 	} );
+ 
+-	it( 'should clamp number or string values', () => {
+-		expect( roundClamp( '50', 1, 10 ) ).toBe( 10 );
+-		expect( roundClamp( '50', -10, 10 ) ).toBe( 10 );
+-		expect( roundClamp( -50, -10, '10' ) ).toBe( -10 );
++	it( 'should round with float in step', () => {
++		expect( ensureValidStep( 40.5, 1, 0.1 ) ).toBe( 40.5 );
++		expect( ensureValidStep( 40.05, 1, 0.01 ) ).toBe( 40.05 );
++		expect( ensureValidStep( 40.06, 1, 0.1 ) ).toBe( 40.1 );
++		expect( ensureValidStep( 40.123005, 1, 0.001 ) ).toBe( 40.123 );
+ 	} );
+ 
+-	it( 'should clamp with step', () => {
+-		expect( roundClamp( 40, 1, 100, 10 ) ).toBe( 40 );
+-		expect( roundClamp( 42, 1, 100, 10 ) ).toBe( 40 );
+-		expect( roundClamp( 45, 1, 100, 10 ) ).toBe( 50 );
+-		expect( roundClamp( 49, 1, 100, 10 ) ).toBe( 50 );
+-		expect( roundClamp( 50, 1, 100, 10 ) ).toBe( 50 );
+-
+-		expect( roundClamp( 50, 1, 100, 15 ) ).toBe( 45 );
+-		expect( roundClamp( 50, 1, 100, '15' ) ).toBe( 45 );
+-		expect( roundClamp( 50, 1, 100, 11 ) ).toBe( 55 );
++	it( 'should round to steps starting from min', () => {
++		expect( ensureValidStep( 10, 0.25, 1 ) ).toBe( 10.25 );
++		expect( ensureValidStep( 10, -20.25, 1 ) ).toBe( 9.75 );
++		expect( ensureValidStep( 10.5, 0.05, 0.1 ) ).toBe( 10.45 );
++		expect( ensureValidStep( 10.51, 0.05, 0.1 ) ).toBe( 10.55 );
+ 	} );
+ 
+-	it( 'should clamp with float in step', () => {
+-		expect( roundClamp( 40, 1, 100, 1 ) ).toBe( 40 );
+-		expect( roundClamp( 40.5, 1, 100, 0.1 ) ).toBe( 40.5 );
+-		expect( roundClamp( 40.05, 1, 100, 0.01 ) ).toBe( 40.05 );
+-		expect( roundClamp( 40.06, 1, 100, 0.1 ) ).toBe( 40.1 );
+-		expect( roundClamp( 40.123005, 1, 100, 0.001 ) ).toBe( 40.123 );
++	it( 'should round with a precision that’s the greater of min and step', () => {
++		expect( ensureValidStep( 10.061, 0.01, 0.1 ) ).toBe( 10.11 );
++		expect( ensureValidStep( 10.105, 0.1, 0.01 ) ).toBe( 10.11 );
+ 	} );
+ } );

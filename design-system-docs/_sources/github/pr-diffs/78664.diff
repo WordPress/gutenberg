@@ -1,0 +1,865 @@
+diff --git a/lib/client-assets.php b/lib/client-assets.php
+index 33a434222288ae..2dd6b206b114f6 100644
+--- a/lib/client-assets.php
++++ b/lib/client-assets.php
+@@ -143,12 +143,27 @@ function gutenberg_register_packages_styles( $styles ) {
+ 	// wp-customize-widgets: add wp-edit-blocks (custom handle not auto-inferred)
+ 	$styles->query( 'wp-customize-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
+ 
++	// Register wp-theme (Design System tokens from @wordpress/theme) as a
++	// dependency of wp-base-styles so its `:root` token block loads
++	// everywhere wp-base-styles does, including the editor iframe via
++	// $wp_edit_blocks_dependencies below.
++	gutenberg_override_style(
++		$styles,
++		'wp-theme',
++		gutenberg_url( 'build/styles/theme/design-tokens' . $suffix . '.css' ),
++		array(),
++		$version
++	);
++	$styles->add_data( 'wp-theme', 'rtl', 'replace' );
++	$styles->add_data( 'wp-theme', 'suffix', $suffix );
++	$styles->add_data( 'wp-theme', 'path', gutenberg_dir_path() . 'build/styles/theme/design-tokens' . $suffix . '.css' );
++
+ 	// Register wp-base-styles and add it to the already registered wp-admin stylesheet
+ 	gutenberg_override_style(
+ 		$styles,
+ 		'wp-base-styles',
+ 		gutenberg_url( 'build/styles/base-styles/admin-schemes' . $suffix . '.css' ),
+-		array(),
++		array( 'wp-theme' ),
+ 		$version
+ 	);
+ 	$styles->add_data( 'wp-base-styles', 'rtl', 'replace' );
+@@ -180,6 +195,10 @@ function gutenberg_register_packages_styles( $styles ) {
+ 
+ 	// Only add CONTENT styles here that should be enqueued in the iframe!
+ 	$wp_edit_blocks_dependencies = array(
++		// Design System tokens load first so the `:root` CSS custom
++		// properties are defined before any consuming stylesheet reads
++		// them inside the editor iframe.
++		'wp-theme',
+ 		'wp-components',
+ 		// This need to be added before the block library styles,
+ 		// The block library styles override the "reset" styles.
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 49db4ee9b6cb97..83cd6f39648f7c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ ### Internal
+ 
+ -   Adopt `--wpds-dimension-size-*` design tokens [#79093](https://github.com/WordPress/gutenberg/pull/79093).
++-   Point the legacy `--wp-components-*` color fallbacks at the design system tokens (`--wpds-*` / `--wp-admin-theme-color*`), so component styles get sensible defaults from the prebuilt token stylesheet without a runtime `<ThemeProvider>` ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
+ 
+ ### Code Quality
+ 
+diff --git a/packages/components/src/card/test/__snapshots__/index.tsx.snap b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+index 1030cbd9a708ee..e824c78901d58e 100644
+--- a/packages/components/src/card/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+@@ -26,7 +26,7 @@ Snapshot Diff:
+   <div>
+     <div
+ -     class="components-card__body components-card-body css-1gg1viu-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
+-+     class="components-card__body components-card-body css-p7byxx-PolymorphicDiv-Body-borderRadius-medium-shady e19lxcc00"
+++     class="components-card__body components-card-body css-1jxruy0-PolymorphicDiv-Body-borderRadius-medium-shady e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -43,7 +43,7 @@ Snapshot Diff:
+   <div>
+     <div
+ -     class="components-flex components-card__footer components-card-footer css-1s5uzde-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__footer components-card-footer css-12kx59h-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
+++     class="components-flex components-card__footer components-card-footer css-1nz7z3h-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -77,7 +77,7 @@ Snapshot Diff:
+   <div>
+     <div
+ -     class="components-flex components-card__header components-card-header css-1hlwlpa-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__header components-card-header css-lljjlu-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
+++     class="components-flex components-card__header components-card-header css-zom6gv-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardHeader"
+     >
+diff --git a/packages/components/src/heading/test/__snapshots__/index.tsx.snap b/packages/components/src/heading/test/__snapshots__/index.tsx.snap
+index be05f770421c76..73bfcaed4ee161 100644
+--- a/packages/components/src/heading/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/heading/test/__snapshots__/index.tsx.snap
+@@ -2,11 +2,11 @@
+ 
+ exports[`props should render correctly 1`] = `
+ .emotion-0 {
+-  color: var(--wp-components-color-foreground, #1e1e1e);
++  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+   line-height: 1.4;
+   margin: 0;
+   text-wrap: pretty;
+-  color: var(--wp-components-color-foreground, #1e1e1e);
++  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+   font-size: calc(1.95 * 13px);
+   font-weight: 600;
+   display: block;
+@@ -29,7 +29,7 @@ Snapshot Diff:
+ @@ -1,10 +1,10 @@
+   Array [
+     Object {
+-      "color": "var(--wp-components-color-foreground, #1e1e1e)",
++      "color": "var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e))",
+       "display": "block",
+ -     "font-size": "calc(1.25 * 13px)",
+ +     "font-size": "calc(1.95 * 13px)",
+@@ -48,7 +48,7 @@ Snapshot Diff:
+ @@ -1,10 +1,10 @@
+   Array [
+     Object {
+-      "color": "var(--wp-components-color-foreground, #1e1e1e)",
++      "color": "var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e))",
+       "display": "block",
+ -     "font-size": "calc(1.25 * 13px)",
+ +     "font-size": "calc(1.95 * 13px)",
+diff --git a/packages/components/src/text/test/__snapshots__/index.tsx.snap b/packages/components/src/text/test/__snapshots__/index.tsx.snap
+index fdc612548fe276..b2c65e3128b5be 100644
+--- a/packages/components/src/text/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/text/test/__snapshots__/index.tsx.snap
+@@ -6,7 +6,7 @@ Snapshot Diff:
+ + Base styles
+ 
+ @@ -3,8 +3,9 @@
+-      "color": "var(--wp-components-color-foreground, #1e1e1e)",
++      "color": "var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e))",
+       "font-size": "calc((13 / 13) * 13px)",
+       "font-weight": "normal",
+       "line-height": "1.4",
+@@ -19,7 +19,7 @@ Snapshot Diff:
+ 
+ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = `
+ .emotion-0 {
+-  color: var(--wp-components-color-foreground, #1e1e1e);
++  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+   line-height: 1.4;
+   margin: 0;
+   text-wrap: pretty;
+@@ -51,7 +51,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] =
+ 
+ exports[`Text snapshot tests should render correctly 1`] = `
+ .emotion-0 {
+-  color: var(--wp-components-color-foreground, #1e1e1e);
++  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+   line-height: 1.4;
+   margin: 0;
+   text-wrap: pretty;
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 2e4342655e5b4c..ed41dec4d03234 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -28,7 +28,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+ }
+ 
+ .emotion-6 {
+-  background: var(--wp-components-color-background, #fff);
++  background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff));
+   border: 1px solid transparent;
+   border-radius: 2px;
+   display: -webkit-inline-box;
+@@ -62,8 +62,8 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   content: '';
+   position: absolute;
+   pointer-events: none;
+-  background: var(--wp-components-color-gray-100, #f0f0f0);
+-  border: 1px solid var(--wp-components-color-gray-700, #757575);
++  background: var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral, #fcfcfc));
++  border: 1px solid var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
+   outline: 2px solid transparent;
+   outline-offset: -3px;
+   border-radius: 2px;
+@@ -106,7 +106,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   background: transparent;
+   border: none;
+   border-radius: 1px;
+-  color: var(--wp-components-color-gray-700, #757575);
++  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
+   fill: currentColor;
+   cursor: pointer;
+   display: -webkit-box;
+@@ -134,7 +134,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   aspect-ratio: 1;
+   padding-left: 0;
+   padding-right: 0;
+-  color: var(--wp-components-color-foreground, #1e1e1e);
++  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+   font-weight: 499;
+ }
+ 
+@@ -156,7 +156,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+ }
+ 
+ .emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+-  color: var(--wp-components-color-foreground, #1e1e1e);
++  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+ }
+ 
+ .emotion-11 {
+@@ -180,7 +180,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   background: transparent;
+   border: none;
+   border-radius: 1px;
+-  color: var(--wp-components-color-gray-700, #757575);
++  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
+   fill: currentColor;
+   cursor: pointer;
+   display: -webkit-box;
+@@ -228,7 +228,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+ }
+ 
+ .emotion-15:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+-  color: var(--wp-components-color-foreground, #1e1e1e);
++  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+ }
+ 
+ <div>
+@@ -361,7 +361,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+ }
+ 
+ .emotion-6 {
+-  background: var(--wp-components-color-background, #fff);
++  background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff));
+   border: 1px solid transparent;
+   border-radius: 2px;
+   display: -webkit-inline-box;
+@@ -395,8 +395,8 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+   content: '';
+   position: absolute;
+   pointer-events: none;
+-  background: var(--wp-components-color-gray-100, #f0f0f0);
+-  border: 1px solid var(--wp-components-color-gray-700, #757575);
++  background: var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral, #fcfcfc));
++  border: 1px solid var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
+   outline: 2px solid transparent;
+   outline-offset: -3px;
+   border-radius: 2px;
+@@ -439,7 +439,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+   background: transparent;
+   border: none;
+   border-radius: 1px;
+-  color: var(--wp-components-color-gray-700, #757575);
++  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
+   fill: currentColor;
+   cursor: pointer;
+   display: -webkit-box;
+@@ -483,7 +483,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+ }
+ 
+ .emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+-  color: var(--wp-components-color-foreground, #1e1e1e);
++  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+ }
+ 
+ .emotion-11 {
+@@ -602,7 +602,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+ }
+ 
+ .emotion-6 {
+-  background: var(--wp-components-color-background, #fff);
++  background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff));
+   border: 1px solid transparent;
+   border-radius: 2px;
+   display: -webkit-inline-box;
+@@ -636,8 +636,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   content: '';
+   position: absolute;
+   pointer-events: none;
+-  background: var(--wp-components-color-gray-100, #f0f0f0);
+-  border: 1px solid var(--wp-components-color-gray-700, #757575);
++  background: var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral, #fcfcfc));
++  border: 1px solid var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
+   outline: 2px solid transparent;
+   outline-offset: -3px;
+   border-radius: 2px;
+@@ -680,7 +680,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   background: transparent;
+   border: none;
+   border-radius: 1px;
+-  color: var(--wp-components-color-gray-700, #757575);
++  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
+   fill: currentColor;
+   cursor: pointer;
+   display: -webkit-box;
+@@ -708,7 +708,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   aspect-ratio: 1;
+   padding-left: 0;
+   padding-right: 0;
+-  color: var(--wp-components-color-foreground, #1e1e1e);
++  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+   font-weight: 499;
+ }
+ 
+@@ -730,7 +730,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+ }
+ 
+ .emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+-  color: var(--wp-components-color-foreground, #1e1e1e);
++  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+ }
+ 
+ .emotion-11 {
+@@ -754,7 +754,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   background: transparent;
+   border: none;
+   border-radius: 1px;
+-  color: var(--wp-components-color-gray-700, #757575);
++  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
+   fill: currentColor;
+   cursor: pointer;
+   display: -webkit-box;
+@@ -802,7 +802,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+ }
+ 
+ .emotion-15:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+-  color: var(--wp-components-color-foreground, #1e1e1e);
++  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+ }
+ 
+ <div>
+@@ -929,7 +929,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+ }
+ 
+ .emotion-6 {
+-  background: var(--wp-components-color-background, #fff);
++  background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff));
+   border: 1px solid transparent;
+   border-radius: 2px;
+   display: -webkit-inline-box;
+@@ -963,8 +963,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+   content: '';
+   position: absolute;
+   pointer-events: none;
+-  background: var(--wp-components-color-gray-100, #f0f0f0);
+-  border: 1px solid var(--wp-components-color-gray-700, #757575);
++  background: var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral, #fcfcfc));
++  border: 1px solid var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
+   outline: 2px solid transparent;
+   outline-offset: -3px;
+   border-radius: 2px;
+@@ -1007,7 +1007,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+   background: transparent;
+   border: none;
+   border-radius: 1px;
+-  color: var(--wp-components-color-gray-700, #757575);
++  color: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070));
+   fill: currentColor;
+   cursor: pointer;
+   display: -webkit-box;
+@@ -1051,7 +1051,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+ }
+ 
+ .emotion-10:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
+-  color: var(--wp-components-color-foreground, #1e1e1e);
++  color: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e));
+ }
+ 
+ .emotion-11 {
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index 439d464f1460b1..053e788e2727a2 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -1,6 +1,18 @@
+-/**
+- * Internal dependencies
+- */
++/* eslint-disable @wordpress/no-ds-tokens -- This file is the JS counterpart of
++   theme-variables.scss and the package's single mapping to the design system.
++   The rule guards against bare `--wpds-*` references, which the build can't
++   inject fallbacks into for Emotion/JS files; here every reference carries an
++   explicit fallback, so that concern doesn't apply.
++
++   IMPORTANT: because this file's source contains `--wpds-` text, the
++   design-system fallback build plugin claims it (it matches any file whose
++   source includes `--wpds-`, comments included) and, in doing so, displaces
++   the Emotion transform for this file. That is harmless ONLY because this file
++   holds plain value constants and no Emotion `css`/styled component selectors.
++   Do not add any here: a co-located component selector would silently fail to
++   compile and break the build, with no lint signal (see #79245). Keep this
++   file selector-free — define styles elsewhere and consume these constants. */
++
+ const white = '#fff';
+ 
+ // Matches the grays in @wordpress/base-styles
+@@ -27,33 +39,41 @@ const ALERT = {
+ 	green: '#4ab866',
+ };
+ 
+-// Should match packages/components/src/utils/theme-variables.scss
++// Should match packages/components/src/utils/theme-variables.scss.
++//
++// Mirrors the Sass structure: each non-accent value resolves through a design
++// system (`--wpds-*`) token, then a hardcoded fallback. The hardcoded values
++// match what the design-system fallback plugin injects into the Sass version,
++// so JS behaves consistently with the Sass variables. Keep both the token
++// references and the fallbacks in sync with the Sass version.
+ const THEME = {
+ 	accent: `var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))`,
+ 	accentDarker10: `var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6))`,
+ 	accentDarker20: `var(--wp-components-color-accent-darker-20, var(--wp-admin-theme-color-darker-20, #183ad6))`,
+ 	/** Used when placing text on the accent color. */
+-	accentInverted: `var(--wp-components-color-accent-inverted, ${ white })`,
++	accentInverted: `var(--wp-components-color-accent-inverted, var(--wpds-color-foreground-interactive-brand-strong, #fff))`,
+ 
+-	background: `var(--wp-components-color-background, ${ white })`,
++	background: `var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong, #fff))`,
+ 
+-	foreground: `var(--wp-components-color-foreground, ${ GRAY[ 900 ] })`,
++	foreground: `var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e))`,
+ 	/** Used when placing text on the foreground color. */
+-	foregroundInverted: `var(--wp-components-color-foreground-inverted, ${ white })`,
++	foregroundInverted: `var(--wp-components-color-foreground-inverted, var(--wpds-color-background-surface-neutral, #fcfcfc))`,
+ 
+ 	gray: {
+ 		/** @deprecated Use `COLORS.theme.foreground` instead. */
+-		900: `var(--wp-components-color-foreground, ${ GRAY[ 900 ] })`,
+-		800: `var(--wp-components-color-gray-800, ${ GRAY[ 800 ] })`,
+-		700: `var(--wp-components-color-gray-700, ${ GRAY[ 700 ] })`,
+-		600: `var(--wp-components-color-gray-600, ${ GRAY[ 600 ] })`,
+-		400: `var(--wp-components-color-gray-400, ${ GRAY[ 400 ] })`,
+-		300: `var(--wp-components-color-gray-300, ${ GRAY[ 300 ] })`,
+-		200: `var(--wp-components-color-gray-200, ${ GRAY[ 200 ] })`,
+-		100: `var(--wp-components-color-gray-100, ${ GRAY[ 100 ] })`,
++		900: `var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral, #1e1e1e))`,
++		800: `var(--wp-components-color-gray-800, var(--wpds-color-foreground-content-neutral, #1e1e1e))`,
++		700: `var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak, #707070))`,
++		600: `var(--wp-components-color-gray-600, var(--wpds-color-stroke-interactive-neutral, #8d8d8d))`,
++		400: `var(--wp-components-color-gray-400, var(--wpds-color-stroke-interactive-neutral, #8d8d8d))`,
++		300: `var(--wp-components-color-gray-300, var(--wpds-color-stroke-surface-neutral, #dbdbdb))`,
++		200: `var(--wp-components-color-gray-200, var(--wpds-color-stroke-surface-neutral, #dbdbdb))`,
++		100: `var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral, #fcfcfc))`,
+ 	},
+ };
+ 
++/* eslint-enable @wordpress/no-ds-tokens */
++
+ const UI = {
+ 	background: THEME.background,
+ 	backgroundDisabled: THEME.gray[ 100 ],
+diff --git a/packages/components/src/utils/theme-variables.scss b/packages/components/src/utils/theme-variables.scss
+index 0590b5698ca266..3c0781e59658e1 100644
+--- a/packages/components/src/utils/theme-variables.scss
++++ b/packages/components/src/utils/theme-variables.scss
+@@ -1,5 +1,3 @@
+-@use "@wordpress/base-styles/colors" as *;
+-
+ // Accent color
+ //
+ // If the `--wp-components-color-accent` variable is not defined, fallback to
+@@ -9,22 +7,29 @@ $components-color-accent: var(--wp-components-color-accent, var(--wp-admin-theme
+ $components-color-accent-darker-10: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+ $components-color-accent-darker-20: var(--wp-components-color-accent-darker-20, var(--wp-admin-theme-color-darker-20, #183ad6));
+ 
++// The non-accent values fall back to the design system (`--wpds-*`) tokens.
++// Those are defined at `:root` by the prebuilt `@wordpress/theme` stylesheet
++// when it is loaded (always the case inside WordPress). The references here
++// intentionally omit a hardcoded fallback — the build plugin injects the
++// design system default value, so component styles stay correct even when
++// neither the prebuilt stylesheet nor a runtime `<ThemeProvider>` is present.
++
+ // Used when placing text on the accent color.
+-$components-color-accent-inverted: var(--wp-components-color-accent-inverted, $white);
++$components-color-accent-inverted: var(--wp-components-color-accent-inverted, var(--wpds-color-foreground-interactive-brand-strong));
+ 
+-$components-color-background: var(--wp-components-color-background, $white);
+-$components-color-foreground: var(--wp-components-color-foreground, $gray-900);
++$components-color-background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong));
++$components-color-foreground: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral));
+ 
+ // Used when placing text on the foreground color.
+-$components-color-foreground-inverted: var(--wp-components-color-foreground-inverted, $white);
++$components-color-foreground-inverted: var(--wp-components-color-foreground-inverted, var(--wpds-color-background-surface-neutral));
+ 
+-$components-color-gray-100: var(--wp-components-color-gray-100, $gray-100);
+-$components-color-gray-200: var(--wp-components-color-gray-200, $gray-200);
+-$components-color-gray-300: var(--wp-components-color-gray-300, $gray-300);
+-$components-color-gray-400: var(--wp-components-color-gray-400, $gray-400);
+-$components-color-gray-600: var(--wp-components-color-gray-600, $gray-600);
+-$components-color-gray-700: var(--wp-components-color-gray-700, $gray-700);
+-$components-color-gray-800: var(--wp-components-color-gray-800, $gray-800);
++$components-color-gray-100: var(--wp-components-color-gray-100, var(--wpds-color-background-surface-neutral));
++$components-color-gray-200: var(--wp-components-color-gray-200, var(--wpds-color-stroke-surface-neutral));
++$components-color-gray-300: var(--wp-components-color-gray-300, var(--wpds-color-stroke-surface-neutral));
++$components-color-gray-400: var(--wp-components-color-gray-400, var(--wpds-color-stroke-interactive-neutral));
++$components-color-gray-600: var(--wp-components-color-gray-600, var(--wpds-color-stroke-interactive-neutral));
++$components-color-gray-700: var(--wp-components-color-gray-700, var(--wpds-color-foreground-content-neutral-weak));
++$components-color-gray-800: var(--wp-components-color-gray-800, var(--wpds-color-foreground-content-neutral));
+ 
+ $components-color-dark-gray-placeholder: color-mix(in srgb, $components-color-foreground, transparent 38%);
+ $components-color-light-gray-placeholder: color-mix(in srgb, $components-color-background, transparent 35%);
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 2a5a96d6eeb4e7..1ce2bb869ff1e1 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -26,6 +26,10 @@
+ 
+ -   Add unit tests for `ThemeProvider` and `useThemeProviderStyles` ([#79126](https://github.com/WordPress/gutenberg/pull/79126)).
+ 
++### Documentation
++
++-   Document the static-stylesheet + `<ThemeProvider>` delivery model, the `isRoot` prop, and the canonical pattern for using `<ThemeProvider>` across documents (iframes and other portals) ([#78664](https://github.com/WordPress/gutenberg/pull/78664)).
++
+ ### Code Quality
+ 
+ -   Declare `postcss`, `esbuild`, and `vite` as optional peer dependencies for the bundler plugins, and move `@types/react` from `dependencies` to an optional peer dependency ([#79095](https://github.com/WordPress/gutenberg/pull/79095)).
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index f107a3e6587c73..77b4150938d001 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -19,9 +19,16 @@ Design tokens are delivered as CSS custom properties (e.g. `var(--wpds-color-for
+ 
+ The [`ThemeProvider`](#theme-provider) component can be used to customize token values like colors for a specific part of your application.
+ 
++#### Delivery model
++
++The design system splits token delivery into two complementary layers:
++
++-   **Static stylesheet (`design-tokens.css`)** — defines the default value for every `--wpds-*` custom property at the document `:root`. Loaded once per document (the main page, _and_ each iframe you render React into). Provides a working baseline even before any JavaScript runs.
++-   **Runtime `<ThemeProvider>`** — applies per-instance overrides for a subtree, on top of the static defaults. Use it to override individual settings (e.g. `color.primary`, `cursor.control`).
++
+ #### Within WordPress
+ 
+-Stylesheets are managed on your behalf in a WordPress context, so you don't need to worry about loading them yourself.
++Stylesheets are managed on your behalf in a WordPress context, so you don't need to worry about loading them yourself. The design tokens stylesheet is enqueued automatically on every admin page and inside the block editor's content iframe.
+ 
+ #### Outside WordPress
+ 
+@@ -37,6 +44,8 @@ import '@wordpress/theme/design-tokens.css';
+ 
+ This stylesheet is universal and does not have a separate RTL version.
+ 
++If your application renders React content into additional documents (an iframe, a popup window, etc.), each of those documents needs the same stylesheet loaded in its own `<head>`. See [Across documents (iframes and other portals)](#across-documents-iframes-and-other-portals).
++
+ ### Developer Tools
+ 
+ For the best development experience, we recommend configuring the [build plugins](#build-plugins) and [Stylelint rules](#stylelint-plugins) provided by this package. The build plugins automatically inject fallback values into `var(--wpds-*)` references so components render correctly even when the tokens stylesheet is not yet loaded, and will raise an error if a reference does not match a known token. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
+@@ -127,6 +136,53 @@ The provider can be used recursively to override or modify the theme for a speci
+ 
+ The `ThemeProvider` redefines some of the design system tokens. Components consuming semantic design system tokens will automatically follow the chosen theme. Note that the tokens are defined and inherited using the CSS cascade, and therefore the DOM tree, not the React tree. This is very important when using React portals.
+ 
++### `isRoot` and the containing document
++
++By default, the styles a `<ThemeProvider>` emits are scoped to the provider's wrapper `<div>`, so overrides apply only to its subtree.
++
++Setting `isRoot` additionally hoists those overrides to the containing document's `:root`, so anything rendered into that document — including overlays portalled outside the provider's React tree — picks them up.
++
++```tsx
++<ThemeProvider color={ { primary: '#a00' } } isRoot>
++	{ /* …app… */ }
++</ThemeProvider>
++```
++
++Use `isRoot` on the top-level provider for an application or page. It's also the recommended pattern for the topmost provider rendered into a separate document (iframe, popup window). The static design-tokens stylesheet still provides the default values; `isRoot` is only needed when you want a `<ThemeProvider>`'s overrides to reach the whole document.
++
++### Across documents (iframes and other portals)
++
++When you render React content into a different document (typically an iframe), two things must be true for design tokens to work correctly in that document:
++
++1.  **The design-tokens stylesheet is present in the document's `<head>`.** This is the static `:root` block that defines every `--wpds-*` custom property.
++
++    Inside WordPress, this is enqueued automatically for both the admin page and the block editor's content iframe.
++
++    For custom iframes, the consumer is responsible for loading it — either by importing `@wordpress/theme/design-tokens.css` from a stylesheet that the iframe already loads, or by injecting the CSS string directly.
++
++2.  **Dynamically injected component styles are routed to the iframe document.** Some `@wordpress/components` styles are injected into the document at runtime rather than shipped as static CSS — for example Emotion-based styles, and styles from CSS modules built with `@wordpress/build`. `StyleProvider` tells that machinery which document's `<head>` to inject into. Wrap the iframe subtree in `<StyleProvider document={ iframeDocument }>`.
++
++The canonical pattern combines both with a `<ThemeProvider isRoot>` to apply any overrides to the iframe's `:root`:
++
++```tsx
++import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
++import { ThemeProvider } from '@wordpress/theme';
++import { createPortal } from 'react-dom';
++
++function IframeContent( { iframeDocument, children } ) {
++	return createPortal(
++		<StyleProvider document={ iframeDocument }>
++			<ThemeProvider isRoot color={ { primary: '#a00' } }>
++				{ children }
++			</ThemeProvider>
++		</StyleProvider>,
++		iframeDocument.body
++	);
++}
++```
++
++The static stylesheet inside the iframe provides every default; `<ThemeProvider isRoot>` adds (or omits) overrides on top, exactly like in the main document.
++
+ ### Building
+ 
+ This package is built in two steps. When `npm run build` is run at the root of the repo, it will first run the "prebuild" step of this package, which is defined in the `build` script of this package's package.json.
+diff --git a/packages/theme/src/design-tokens.scss b/packages/theme/src/design-tokens.scss
+new file mode 100644
+index 00000000000000..ccb2e21204c865
+--- /dev/null
++++ b/packages/theme/src/design-tokens.scss
+@@ -0,0 +1,4 @@
++// Re-exports the prebuilt design-tokens CSS so the project's SCSS pipeline
++// produces a build artifact for it. The single source of truth is the
++// prebuilt CSS file, generated by `npm run build:tokens`.
++@use "./prebuilt/css/design-tokens.css";
+diff --git a/packages/theme/src/stories/index.story.tsx b/packages/theme/src/stories/index.story.tsx
+index bd79bc7c3183c2..141b9f48877a10 100644
+--- a/packages/theme/src/stories/index.story.tsx
++++ b/packages/theme/src/stories/index.story.tsx
+@@ -1,12 +1,11 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+-import {
+-	useEffect,
+-	useState,
+-	useRef,
+-	useId,
+-	createPortal,
+-} from '@wordpress/element';
++import { useState, useId } from '@wordpress/element';
+ import { ThemeProvider } from '../theme-provider';
++import wpdsTokens from '../prebuilt/js/design-tokens.mjs';
++
++const wpdsColorTokens = wpdsTokens.filter( ( name ) =>
++	name.startsWith( '--wpds-color' )
++);
+ 
+ const meta: Meta< typeof ThemeProvider > = {
+ 	title: 'Design System/Theme/Theme Provider',
+@@ -27,48 +26,7 @@ const meta: Meta< typeof ThemeProvider > = {
+ };
+ export default meta;
+ 
+-function getCSSCustomPropsFromStylesheets() {
+-	const semanticProps: Record< string, string > = {};
+-	const legacyProps: Record< string, string > = {};
+-
+-	for ( const sheet of document.styleSheets ) {
+-		try {
+-			for ( const rule of sheet.cssRules || [] ) {
+-				const ruleStyle = ( rule as CSSStyleRule ).style;
+-				if ( ruleStyle ) {
+-					for ( const name of ruleStyle ) {
+-						if (
+-							name.startsWith( '--wp-admin-theme' ) ||
+-							name.startsWith( '--wp-components-color' )
+-						) {
+-							legacyProps[ name ] = ruleStyle
+-								.getPropertyValue( name )
+-								.trim();
+-						}
+-						if ( name.startsWith( '--wpds-color' ) ) {
+-							semanticProps[ name ] = ruleStyle
+-								.getPropertyValue( name )
+-								.trim();
+-						}
+-					}
+-				}
+-			}
+-		} catch ( e ) {
+-			// Avoid security errors from cross-origin stylesheets
+-			// eslint-disable-next-line no-console
+-			console.error( e );
+-			continue;
+-		}
+-	}
+-
+-	return { semanticProps, legacyProps };
+-}
+-
+-const ColorTokenTable = ( {
+-	tokens,
+-}: {
+-	tokens: Record< string, string >;
+-} ) => {
++const ColorTokenTable = ( { tokens }: { tokens: string[] } ) => {
+ 	return (
+ 		<ul
+ 			style={ {
+@@ -78,7 +36,7 @@ const ColorTokenTable = ( {
+ 				gap: '0.5rem',
+ 			} }
+ 		>
+-			{ Object.entries( tokens ).map( ( [ name ] ) => (
++			{ tokens.map( ( name ) => (
+ 				<li
+ 					key={ name }
+ 					style={ {
+@@ -106,18 +64,6 @@ const ColorTokenTable = ( {
+ };
+ 
+ const DSTokensList = () => {
+-	const [ props, setProps ] = useState< {
+-		semanticProps: Record< string, string >;
+-		legacyProps: Record< string, string >;
+-	} >( {
+-		semanticProps: {},
+-		legacyProps: {},
+-	} );
+-
+-	useEffect( () => {
+-		setProps( getCSSCustomPropsFromStylesheets() );
+-	}, [] );
+-
+ 	return (
+ 		<div
+ 			style={ {
+@@ -125,13 +71,7 @@ const DSTokensList = () => {
+ 			} }
+ 		>
+ 			<h1>Design System Color tokens</h1>
+-			<h2>Semantic tokens (can be consumed directly)</h2>
+-			<ColorTokenTable tokens={ props.semanticProps } />
+-			<h2>Legacy tokens (should not be consumed directly)</h2>
+-			<details>
+-				<summary>Click to expand</summary>
+-				<ColorTokenTable tokens={ props.legacyProps } />
+-			</details>
++			<ColorTokenTable tokens={ wpdsColorTokens } />
+ 		</div>
+ 	);
+ };
+@@ -292,126 +232,3 @@ export const NestingAndInheriting: StoryObj< typeof ThemeProvider > = {
+ 		);
+ 	},
+ };
+-
+-function IframeWithClonedTokenStyles( {
+-	children,
+-}: {
+-	children: React.ReactNode;
+-} ) {
+-	const iframeRef = useRef< HTMLIFrameElement >( null );
+-	const [ iframeLoaded, setIframeLoaded ] = useState( false );
+-
+-	// Copy the stylesheet where the DS tokens are defined to the iframe.
+-	// While this technique is a bit hacky, it works well enough for the purpose
+-	// of this demo.
+-	// Consumers of the DS could instead reference the stylesheet directly.
+-	useEffect( () => {
+-		const iframe = iframeRef.current;
+-		if ( ! iframe || ! iframe.contentDocument ) {
+-			return;
+-		}
+-
+-		const head = iframe.contentDocument.head;
+-
+-		// Filter styles associated with a theme provider
+-		const allStyles = Array.from(
+-			document.head.querySelectorAll( 'style, link[rel="stylesheet"]' )
+-		);
+-
+-		allStyles.forEach( ( node ) => {
+-			if ( node.tagName === 'STYLE' ) {
+-				const text = node.textContent || '';
+-				if ( text.includes( 'data-wpds-theme-provider-id' ) ) {
+-					head.appendChild( node.cloneNode( true ) );
+-				}
+-			} else if ( node.tagName === 'LINK' ) {
+-				// Fetch and inspect the stylesheet content
+-				const href = ( node as HTMLLinkElement ).href;
+-				fetch( href )
+-					.then( ( res ) => res.text() )
+-					.then( ( css ) => {
+-						if ( css.includes( 'data-wpds-theme-provider-id' ) ) {
+-							const linkClone = node.cloneNode( true );
+-							head.appendChild( linkClone );
+-						}
+-					} )
+-					.catch( ( err ) => {
+-						// eslint-disable-next-line no-console
+-						console.warn( 'Failed to load stylesheet:', href, err );
+-					} );
+-			}
+-		} );
+-
+-		setIframeLoaded( true );
+-	}, [] );
+-
+-	return (
+-		<iframe
+-			ref={ iframeRef }
+-			style={ {
+-				width: '100%',
+-				height: '400px',
+-				border: '1px solid #ccc',
+-			} }
+-			title="demo"
+-		>
+-			{ iframeLoaded &&
+-				iframeRef.current?.contentDocument?.body &&
+-				createPortal(
+-					children,
+-					iframeRef.current.contentDocument.body
+-				) }
+-		</iframe>
+-	);
+-}
+-
+-export const AcrossIframes: StoryObj< typeof ThemeProvider > = {
+-	render: ( args ) => {
+-		return (
+-			<ThemeProvider { ...args }>
+-				{ args.children }
+-
+-				<IframeWithClonedTokenStyles>
+-					<div
+-						style={ {
+-							color: 'var(--wpds-color-foreground-content-neutral)',
+-						} }
+-					>
+-						In the iframe, but outside of `ThemeProvider`
+-					</div>
+-					<ThemeProvider
+-						{ ...args }
+-						// Note: the isRoot prop is necessary to apply the DS tokens to any
+-						// UI rendered outside of the ThemeProvider (including overlays, etc)
+-						isRoot
+-					>
+-						{ args.children }
+-					</ThemeProvider>
+-				</IframeWithClonedTokenStyles>
+-			</ThemeProvider>
+-		);
+-	},
+-	args: {
+-		children: (
+-			<div
+-				style={ {
+-					color: 'var(--wpds-color-foreground-content-neutral)',
+-				} }
+-			>
+-				Code is poetry.{ ' ' }
+-				<span
+-					style={ {
+-						display: 'inline-block',
+-						padding: 'var(--wpds-dimension-padding-sm)',
+-						borderRadius: '0.25rem',
+-						backgroundColor:
+-							'var(--wpds-color-background-interactive-brand-strong)',
+-						color: 'var(--wpds-color-foreground-interactive-brand-strong)',
+-					} }
+-				>
+-					primary
+-				</span>
+-			</div>
+-		),
+-	},
+-};
+diff --git a/tools/eslint/suppressions.json b/tools/eslint/suppressions.json
+index e5b42e58b551a2..a4d06957e0b9cf 100644
+--- a/tools/eslint/suppressions.json
++++ b/tools/eslint/suppressions.json
+@@ -1572,11 +1572,6 @@
+ 			"count": 12
+ 		}
+ 	},
+-	"packages/theme/src/stories/index.story.tsx": {
+-		"react-hooks/refs": {
+-			"count": 5
+-		}
+-	},
+ 	"packages/ui/src/alert-dialog/root.tsx": {
+ 		"react-hooks/refs": {
+ 			"count": 2

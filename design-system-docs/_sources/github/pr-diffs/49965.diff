@@ -1,0 +1,152 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b4beed6a39a165..5f57b1f2889470 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ ### Documentation
+ 
+ -   `Autocomplete`: Add heading and fix type for `onReplace` in README. ([#49798](https://github.com/WordPress/gutenberg/pull/49798)).
++-   `Autocomplete`: Update `Usage` section in README. ([#49965](https://github.com/WordPress/gutenberg/pull/49965)).
+ 
+ ## 23.8.0 (2023-04-12)
+ 
+diff --git a/packages/components/src/autocomplete/README.md b/packages/components/src/autocomplete/README.md
+index 2b9c9209dbed5a..42cadcbb06921c 100644
+--- a/packages/components/src/autocomplete/README.md
++++ b/packages/components/src/autocomplete/README.md
+@@ -152,57 +152,83 @@ Whether to apply debouncing for the autocompleter. Set to true to enable debounc
+ 
+ ## Usage
+ 
+-The following is a contrived completer for fresh fruit.
+-
+-```jsx
+-import { Autocomplete } from '@wordpress/components';
+-
+-const MyAutocomplete = () => {
+-	const autocompleters = [
+-		{
+-			name: 'fruit',
+-			// The prefix that triggers this completer
+-			triggerPrefix: '~',
+-			// The option data
+-			options: [
+-				{ visual: '🍎', name: 'Apple', id: 1 },
+-				{ visual: '🍊', name: 'Orange', id: 2 },
+-				{ visual: '🍇', name: 'Grapes', id: 3 },
+-			],
+-			// Returns a label for an option like "🍊 Orange"
+-			getOptionLabel: ( option ) => (
+-				<span>
+-					<span className="icon">{ option.visual }</span>
+-					{ option.name }
+-				</span>
+-			),
+-			// Declares that options should be matched by their name
+-			getOptionKeywords: ( option ) => [ option.name ],
+-			// Declares that the Grapes option is disabled
+-			isOptionDisabled: ( option ) => option.name === 'Grapes',
+-			// Declares completions should be inserted as abbreviations
+-			getOptionCompletion: ( option ) => (
+-				<abbr title={ option.name }>{ option.visual }</abbr>
+-			),
+-		},
+-	];
+-
+-	return (
+-		<div>
+-			<Autocomplete completers={ autocompleters }>
+-				{ ( { isExpanded, listBoxId, activeId } ) => (
+-					<div
+-						contentEditable
+-						suppressContentEditableWarning
+-						aria-autocomplete="list"
+-						aria-expanded={ isExpanded }
+-						aria-owns={ listBoxId }
+-						aria-activedescendant={ activeId }
+-					></div>
+-				) }
+-			</Autocomplete>
+-			<p>Type ~ for triggering the autocomplete.</p>
+-		</div>
++The `Autocomplete` component is not currently intended to be used as a standalone component. It is used by other packages to provide autocompletion support for the block editor.
++
++The block editor provides a separate, wrapped version of `Autocomplete` that supports the addition of custom completers via a filter.
++
++To implement your own completer in the block editor you will:
++1. Define the completer
++2. Write a callback that will add your completer to the list of existing completers
++3. Add a filter to the `editor.Autocomplete.completers` hook that will call your callback
++
++The following example will add a contrived "fruits" autocompleter to the block editor. Note that in the callback it's possible to limit this new completer to a specific block type. In this case, our "fruits" completer will only be available from the "core/paragraph" block type.
++
++```js
++( function () {
++	// Define the completer
++	const fruits = {
++		name: 'fruit',
++		// The prefix that triggers this completer
++		triggerPrefix: '~',
++		// The option data
++		options: [
++			{ visual: '🍎', name: 'Apple', id: 1 },
++			{ visual: '🍊', name: 'Orange', id: 2 },
++			{ visual: '🍇', name: 'Grapes', id: 3 },
++			{ visual: '🥭', name: 'Mango', id: 4 },
++			{ visual: '🍓', name: 'Strawberry', id: 5 },
++			{ visual: '🫐', name: 'Blueberry', id: 6 },
++			{ visual: '🍒', name: 'Cherry', id: 7 },
++		],
++		// Returns a label for an option like "🍊 Orange"
++		getOptionLabel: ( option ) => `${ option.visual } ${ option.name }`,
++		// Declares that options should be matched by their name
++		getOptionKeywords: ( option ) => [ option.name ],
++		// Declares that the Grapes option is disabled
++		isOptionDisabled: ( option ) => option.name === 'Grapes',
++		// Declares completions should be inserted as abbreviations
++		getOptionCompletion: ( option ) => option.visual,
++	};
++
++	// Define a callback that will add the custom completer to the list of completers
++	function appendTestCompleters( completers, blockName ) {
++		return blockName === 'core/paragraph'
++			? [ ...completers, fruits ]
++			: completers;
++	}
++
++	// Trigger our callback on the `editor.Autocomplete.completers` hook
++	wp.hooks.addFilter(
++		'editor.Autocomplete.completers',
++		'fruit-test/fruits',
++		appendTestCompleters,
++		11
+ 	);
+-};
++} )();
++```
++
++Finally, enqueue your JavaScript file as you would any other, as in the following plugin example:
++
++```php
++<?php
++/**
++ * Plugin Name: Fruit Autocompleter
++ * Plugin URI: https://github.com/WordPress/gutenberg
++ * Author: Gutenberg Team
++ */
++
++/**
++ * Registers a custom script for the plugin.
++ */
++function enqueue_fruit_autocompleter_plugin_script() {
++	wp_enqueue_script(
++		'fruit-autocompleter',
++		plugins_url( '/index.js', __FILE__ ),
++		array(
++			'wp-hooks',
++		),
++	);
++}
++
++add_action( 'init', 'enqueue_fruit_autocompleter_plugin_script' );
+ ```

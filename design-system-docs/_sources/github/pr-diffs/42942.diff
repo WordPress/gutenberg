@@ -1,0 +1,148 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eb4fb727c2a208..ac2e8c767a0d86 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `ComboboxControl`: Normalize hyphen-like characters to an ASCII hyphen ([#42942](https://github.com/WordPress/gutenberg/pull/42942)).
++
+ ## 19.17.0 (2022-08-10)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index 5ede9201c4718e..c63e7c182917a9 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import removeAccents from 'remove-accents';
+ 
+ /**
+  * WordPress dependencies
+@@ -30,6 +29,7 @@ import Button from '../button';
+ import { FlexBlock, FlexItem } from '../flex';
+ import withFocusOutside from '../higher-order/with-focus-outside';
+ import { useControlledValue } from '../utils/hooks';
++import { normalizeTextString } from '../utils/strings';
+ 
+ const noop = () => {};
+ 
+@@ -83,11 +83,9 @@ function ComboboxControl( {
+ 	const matchingSuggestions = useMemo( () => {
+ 		const startsWithMatch = [];
+ 		const containsMatch = [];
+-		const match = removeAccents( inputValue.toLocaleLowerCase() );
++		const match = normalizeTextString( inputValue );
+ 		options.forEach( ( option ) => {
+-			const index = removeAccents( option.label )
+-				.toLocaleLowerCase()
+-				.indexOf( match );
++			const index = normalizeTextString( option.label ).indexOf( match );
+ 			if ( index === 0 ) {
+ 				startsWithMatch.push( option );
+ 			} else if ( index > 0 ) {
+diff --git a/packages/components/src/utils/strings.ts b/packages/components/src/utils/strings.ts
+new file mode 100644
+index 00000000000000..7807836b96c01e
+--- /dev/null
++++ b/packages/components/src/utils/strings.ts
+@@ -0,0 +1,72 @@
++/**
++ * External dependencies
++ */
++import removeAccents from 'remove-accents';
++
++const ALL_UNICODE_DASH_CHARACTERS = new RegExp(
++	`[${ [
++		// - (hyphen-minus)
++		'\u002d',
++		// ~ (tilde)
++		'\u007e',
++		// ­ (soft hyphen)
++		'\u00ad',
++		// ֊ (armenian hyphen)
++		'\u058a',
++		// ־ (hebrew punctuation maqaf)
++		'\u05be',
++		// ᐀ (canadian syllabics hyphen)
++		'\u1400',
++		// ᠆ (mongolian todo soft hyphen)
++		'\u1806',
++		// ‐ (hyphen)
++		'\u2010',
++		// non-breaking hyphen)
++		'\u2011',
++		// ‒ (figure dash)
++		'\u2012',
++		// – (en dash)
++		'\u2013',
++		// — (em dash)
++		'\u2014',
++		// ― (horizontal bar)
++		'\u2015',
++		// ⁓ (swung dash)
++		'\u2053',
++		// superscript minus)
++		'\u207b',
++		// subscript minus)
++		'\u208b',
++		// − (minus sign)
++		'\u2212',
++		// ⸗ (double oblique hyphen)
++		'\u2e17',
++		// ⸺ (two-em dash)
++		'\u2e3a',
++		// ⸻ (three-em dash)
++		'\u2e3b',
++		// 〜 (wave dash)
++		'\u301c',
++		// 〰 (wavy dash)
++		'\u3030',
++		// ゠ (katakana-hiragana double hyphen)
++		'\u30a0',
++		// ︱ (presentation form for vertical em dash)
++		'\ufe31',
++		// ︲ (presentation form for vertical en dash)
++		'\ufe32',
++		// ﹘ (small em dash)
++		'\ufe58',
++		// ﹣ (small hyphen-minus)
++		'\ufe63',
++		// － (fullwidth hyphen-minus)
++		'\uff0d',
++	].join( '' ) }]`,
++	'g'
++);
++
++export const normalizeTextString = ( value: string ): string => {
++	return removeAccents( value )
++		.toLocaleLowerCase()
++		.replace( ALL_UNICODE_DASH_CHARACTERS, '-' );
++};
+diff --git a/packages/components/src/utils/test/strings.js b/packages/components/src/utils/test/strings.js
+new file mode 100644
+index 00000000000000..43682a0e2853f3
+--- /dev/null
++++ b/packages/components/src/utils/test/strings.js
+@@ -0,0 +1,15 @@
++/**
++ * Internal dependencies
++ */
++import { normalizeTextString } from '../strings';
++
++describe( 'normalizeTextString', () => {
++	it( 'should normalize hyphen-like characters to hyphens', () => {
++		expect( normalizeTextString( 'foo~bar' ) ).toBe( 'foo-bar' );
++		expect( normalizeTextString( 'foo־bar' ) ).toBe( 'foo-bar' );
++		expect( normalizeTextString( 'foo‐bar' ) ).toBe( 'foo-bar' );
++		expect( normalizeTextString( 'foo⸻bar' ) ).toBe( 'foo-bar' );
++		expect( normalizeTextString( 'foo゠bar' ) ).toBe( 'foo-bar' );
++		expect( normalizeTextString( 'foo－bar' ) ).toBe( 'foo-bar' );
++	} );
++} );

@@ -1,0 +1,151 @@
+diff --git a/docs/reference-guides/slotfills/README.md b/docs/reference-guides/slotfills/README.md
+index 0255886fdf8693..37d9dfcf0f4403 100644
+--- a/docs/reference-guides/slotfills/README.md
++++ b/docs/reference-guides/slotfills/README.md
+@@ -314,19 +314,19 @@ export default function PostSummary( { onActionPerformed } ) {
+ 			<PluginPostStatusInfo.Slot>
+ 				{ ( fills ) => (
+ 					<>
+-						<VStack spacing={ 4 }>
++						<Stack direction="column" gap="lg">
+ 							<PostCardPanel
+ 								onActionPerformed={ onActionPerformed }
+ 							/>
+ 							<PostFeaturedImagePanel withPanelBody={ false } />
+ 							<PostExcerptPanel />
+-							<VStack spacing={ 1 }>
++							<Stack direction="column" gap="xs">
+ 								<PostContentInformation />
+ 								<PostLastEditedPanel />
+-							</VStack>
++							</Stack>
+ 							{ ! isRemovedPostStatusPanel && (
+-								<VStack spacing={ 2 }>
+-									<VStack spacing={ 1 }>
++								<Stack direction="column" gap="sm">
++									<Stack direction="column" gap="xs">
+ 										<PostStatusPanel />
+ 										<PostSchedulePanel />
+ 										<PostURLPanel />
+@@ -340,12 +340,12 @@ export default function PostSummary( { onActionPerformed } ) {
+ 										<SiteDiscussion />
+ 										<PostFormatPanel />
+ 										<PostStickyPanel />
+-									</VStack>
++									</Stack>
+ 									<TemplateAreas />
+ 									{ fills }
+-								</VStack>
++								</Stack>
+ 							) }
+-						</VStack>
++						</Stack>
+ 					</>
+ 				) }
+ 			</PluginPostStatusInfo.Slot>
+diff --git a/packages/block-editor/src/components/link-control/README.md b/packages/block-editor/src/components/link-control/README.md
+index 29cc918031e443..49ea92e841c9b8 100644
+--- a/packages/block-editor/src/components/link-control/README.md
++++ b/packages/block-editor/src/components/link-control/README.md
+@@ -275,14 +275,14 @@ If passed, children are rendered after the input.
+ 
+ ```jsx
+ <LinkControlSearchInput>
+-	<HStack justify="right">
++	<Stack justify="flex-end">
+ 		<Button
+ 			type="submit"
+ 			label={ __( 'Submit' ) }
+ 			icon={ keyboardReturn }
+ 			className="block-editor-link-control__search-submit"
+ 		/>
+-	</HStack>
++	</Stack>
+ </LinkControlSearchInput>
+ ```
+ 
+diff --git a/packages/components/AGENTS.md b/packages/components/AGENTS.md
+index 5382aea390969f..ff2cad80eca2d4 100644
+--- a/packages/components/AGENTS.md
++++ b/packages/components/AGENTS.md
+@@ -2,9 +2,9 @@
+ 
+ This package contains UI components that are intended to be used anywhere in a general way (global), or specifically in the block editor.
+ 
+-We are currently in the process of rewriting the global components to be in the new `@wordpress/ui` package. However, this is a work in progress and `@wordpress/components` should continue to be used until further notice.
++We are currently in the process of rewriting the global components to be in the new `@wordpress/ui` package. Refer to the [`use-recommended-components` ESLint rule](../eslint-plugin/rules/use-recommended-components.js) for guidance on which components to use.
+ 
+-Due to the nature of the transition, some components may be deprecated or removed in the future. Check the component status documentation in each Storybook file for up-to-date usage guidance on each component. The component status given in the Storybook file should be considered the most accurate signal, above the `experimental` tag or component prefix.
++For components not explicitly listed in the `use-recommended-components` rule, check the component status documentation in each Storybook file for up-to-date usage guidance on each component. The component status given in the Storybook file should be considered the most accurate signal, above the `experimental` tag or component prefix.
+ 
+ ## Forms
+ 
+diff --git a/packages/components/src/divider/README.md b/packages/components/src/divider/README.md
+index c81026b7b55871..8b314be13b4d6a 100644
+--- a/packages/components/src/divider/README.md
++++ b/packages/components/src/divider/README.md
+@@ -12,16 +12,16 @@ This feature is still experimental. “Experimental” means this is an early im
+ import {
+ 	__experimentalDivider as Divider,
+ 	__experimentalText as Text,
+-	__experimentalVStack as VStack,
+ } from `@wordpress/components`;
++import { Stack } from '@wordpress/ui';
+ 
+ function Example() {
+ 	return (
+-		<VStack spacing={4}>
++		<Stack direction="column" gap="lg">
+ 			<Text>Some text here</Text>
+ 			<Divider />
+ 			<Text>Some more text here</Text>
+-		</VStack>
++		</Stack>
+ 	);
+ }
+ ```
+diff --git a/packages/components/src/flex/stories/index.story.tsx b/packages/components/src/flex/stories/index.story.tsx
+index c76d269834b97b..aa8d9b9c1b99f0 100644
+--- a/packages/components/src/flex/stories/index.story.tsx
++++ b/packages/components/src/flex/stories/index.story.tsx
+@@ -34,7 +34,7 @@ const meta: Meta< typeof Flex > = {
+ 		componentStatus: {
+ 			status: 'not-recommended',
+ 			whereUsed: 'global',
+-			notes: 'Planned for deprecation. For use cases not covered by `HStack` and `VStack`, write your own CSS.',
++			notes: 'Planned for deprecation. For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS.',
+ 		},
+ 	},
+ };
+diff --git a/packages/components/src/h-stack/stories/index.story.tsx b/packages/components/src/h-stack/stories/index.story.tsx
+index 6f64e4af096a4d..ffd92927c4eee2 100644
+--- a/packages/components/src/h-stack/stories/index.story.tsx
++++ b/packages/components/src/h-stack/stories/index.story.tsx
+@@ -75,9 +75,9 @@ const meta: Meta< typeof HStack > = {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 		componentStatus: {
+-			status: 'stable',
++			status: 'not-recommended',
+ 			whereUsed: 'global',
+-			notes: 'Will be superseded by `Stack` in `@wordpress/ui`, but continue using for now.',
++			notes: 'Use `Stack` from `@wordpress/ui` instead.',
+ 		},
+ 	},
+ };
+diff --git a/packages/components/src/v-stack/stories/index.story.tsx b/packages/components/src/v-stack/stories/index.story.tsx
+index 8fcf045d8870a9..e39d17d4cd5468 100644
+--- a/packages/components/src/v-stack/stories/index.story.tsx
++++ b/packages/components/src/v-stack/stories/index.story.tsx
+@@ -43,9 +43,9 @@ const meta: Meta< typeof VStack > = {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 		componentStatus: {
+-			status: 'stable',
++			status: 'not-recommended',
+ 			whereUsed: 'global',
+-			notes: 'Will be superseded by `Stack` in `@wordpress/ui`, but continue using for now.',
++			notes: 'Use `Stack` from `@wordpress/ui` instead.',
+ 		},
+ 	},
+ };

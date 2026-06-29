@@ -1,0 +1,2466 @@
+diff --git a/package-lock.json b/package-lock.json
+index 12fd4d2c44d286..15cae4c9961a41 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -22482,11 +22482,6 @@
+ 				"ms": "2.0.0"
+ 			}
+ 		},
+-		"node_modules/compute-scroll-into-view": {
+-			"version": "1.0.16",
+-			"resolved": "https://registry.npmjs.org/compute-scroll-into-view/-/compute-scroll-into-view-1.0.16.tgz",
+-			"integrity": "sha512-a85LHKY81oQnikatZYA90pufpZ6sQx++BoCxOEMsjpZx+ZnaKGQnCyCehTRr/1p9GBIAHTjcU9k71kSYWloLiQ=="
+-		},
+ 		"node_modules/computed-style": {
+ 			"version": "0.1.4",
+ 			"resolved": "https://registry.npmjs.org/computed-style/-/computed-style-0.1.4.tgz",
+@@ -25484,25 +25479,6 @@
+ 				"node": ">=12"
+ 			}
+ 		},
+-		"node_modules/downshift": {
+-			"version": "6.1.0",
+-			"resolved": "https://registry.npmjs.org/downshift/-/downshift-6.1.0.tgz",
+-			"integrity": "sha512-MnEJERij+1pTVAsOPsH3q9MJGNIZuu2sT90uxOCEOZYH6sEzkVGtUcTBVDRQkE8y96zpB7uEbRn24aE9VpHnZg==",
+-			"dependencies": {
+-				"@babel/runtime": "^7.12.5",
+-				"compute-scroll-into-view": "^1.0.16",
+-				"prop-types": "^15.7.2",
+-				"react-is": "^17.0.1"
+-			},
+-			"peerDependencies": {
+-				"react": ">=16.12.0"
+-			}
+-		},
+-		"node_modules/downshift/node_modules/react-is": {
+-			"version": "17.0.2",
+-			"resolved": "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz",
+-			"integrity": "sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w=="
+-		},
+ 		"node_modules/duplexer": {
+ 			"version": "0.1.2",
+ 			"resolved": "https://registry.npmjs.org/duplexer/-/duplexer-0.1.2.tgz",
+@@ -53672,7 +53648,6 @@
+ 				"colord": "^2.7.0",
+ 				"date-fns": "^3.6.0",
+ 				"deepmerge": "^4.3.0",
+-				"downshift": "^6.0.15",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"framer-motion": "^11.1.9",
+ 				"gradient-parser": "^0.1.5",
+@@ -69015,7 +68990,6 @@
+ 				"colord": "^2.7.0",
+ 				"date-fns": "^3.6.0",
+ 				"deepmerge": "^4.3.0",
+-				"downshift": "^6.0.15",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"framer-motion": "^11.1.9",
+ 				"gradient-parser": "^0.1.5",
+@@ -73783,11 +73757,6 @@
+ 				}
+ 			}
+ 		},
+-		"compute-scroll-into-view": {
+-			"version": "1.0.16",
+-			"resolved": "https://registry.npmjs.org/compute-scroll-into-view/-/compute-scroll-into-view-1.0.16.tgz",
+-			"integrity": "sha512-a85LHKY81oQnikatZYA90pufpZ6sQx++BoCxOEMsjpZx+ZnaKGQnCyCehTRr/1p9GBIAHTjcU9k71kSYWloLiQ=="
+-		},
+ 		"computed-style": {
+ 			"version": "0.1.4",
+ 			"resolved": "https://registry.npmjs.org/computed-style/-/computed-style-0.1.4.tgz",
+@@ -76063,24 +76032,6 @@
+ 			"integrity": "sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==",
+ 			"dev": true
+ 		},
+-		"downshift": {
+-			"version": "6.1.0",
+-			"resolved": "https://registry.npmjs.org/downshift/-/downshift-6.1.0.tgz",
+-			"integrity": "sha512-MnEJERij+1pTVAsOPsH3q9MJGNIZuu2sT90uxOCEOZYH6sEzkVGtUcTBVDRQkE8y96zpB7uEbRn24aE9VpHnZg==",
+-			"requires": {
+-				"@babel/runtime": "^7.12.5",
+-				"compute-scroll-into-view": "^1.0.16",
+-				"prop-types": "^15.7.2",
+-				"react-is": "^17.0.1"
+-			},
+-			"dependencies": {
+-				"react-is": {
+-					"version": "17.0.2",
+-					"resolved": "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz",
+-					"integrity": "sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w=="
+-				}
+-			}
+-		},
+ 		"duplexer": {
+ 			"version": "0.1.2",
+ 			"resolved": "https://registry.npmjs.org/duplexer/-/duplexer-0.1.2.tgz",
+diff --git a/packages/block-editor/src/components/date-format-picker/index.js b/packages/block-editor/src/components/date-format-picker/index.js
+index cf9af5eb33f122..15beec4ac6ed54 100644
+--- a/packages/block-editor/src/components/date-format-picker/index.js
++++ b/packages/block-editor/src/components/date-format-picker/index.js
+@@ -10,18 +10,9 @@ import {
+ 	VisuallyHidden,
+ 	ToggleControl,
+ 	__experimentalVStack as VStack,
+-	privateApis as componentsPrivateApis,
++	CustomSelectControl,
+ } from '@wordpress/components';
+ 
+-/**
+- * Internal dependencies
+- */
+-import { unlock } from '../../lock-unlock';
+-
+-const { CustomSelectControlV2Legacy: CustomSelectControl } = unlock(
+-	componentsPrivateApis
+-);
+-
+ // So that we illustrate the different formats in the dropdown properly, show a date that is
+ // somwhat recent, has a day greater than 12, and a month with more than three letters.
+ const exampleDate = new Date();
+diff --git a/packages/block-editor/src/components/font-appearance-control/index.js b/packages/block-editor/src/components/font-appearance-control/index.js
+index 023a4519d485d9..418d43e322ac89 100644
+--- a/packages/block-editor/src/components/font-appearance-control/index.js
++++ b/packages/block-editor/src/components/font-appearance-control/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { privateApis as componentsPrivateApis } from '@wordpress/components';
++import { CustomSelectControl } from '@wordpress/components';
+ import { useMemo } from '@wordpress/element';
+ import { __, sprintf } from '@wordpress/i18n';
+ 
+@@ -9,11 +9,7 @@ import { __, sprintf } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
+-import { unlock } from '../../lock-unlock';
+ 
+-const { CustomSelectControlV2Legacy: CustomSelectControl } = unlock(
+-	componentsPrivateApis
+-);
+ /**
+  * Adjusts font appearance field label in case either font styles or weights
+  * are disabled.
+diff --git a/packages/block-editor/src/components/spacing-sizes-control/input-controls/spacing-input-control.js b/packages/block-editor/src/components/spacing-sizes-control/input-controls/spacing-input-control.js
+index 4ba87647dc3ed4..bec589f2ed9aa8 100644
+--- a/packages/block-editor/src/components/spacing-sizes-control/input-controls/spacing-input-control.js
++++ b/packages/block-editor/src/components/spacing-sizes-control/input-controls/spacing-input-control.js
+@@ -303,9 +303,11 @@ export default function SpacingInputControl( {
+ 				<CustomSelectControl
+ 					className="spacing-sizes-control__custom-select-control"
+ 					value={
++						// passing empty string as a fallback to continue using the
++						// component in controlled mode
+ 						options.find(
+ 							( option ) => option.key === currentValue
+-						) || '' // passing undefined here causes a downshift controlled/uncontrolled warning
++						) || ''
+ 					}
+ 					onChange={ ( selection ) => {
+ 						onChange(
+diff --git a/packages/block-editor/src/hooks/position.js b/packages/block-editor/src/hooks/position.js
+index a5fae3d8d3a7c2..95a9c2198e4c71 100644
+--- a/packages/block-editor/src/hooks/position.js
++++ b/packages/block-editor/src/hooks/position.js
+@@ -8,10 +8,7 @@ import clsx from 'clsx';
+  */
+ import { __, _x, sprintf } from '@wordpress/i18n';
+ import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+-import {
+-	BaseControl,
+-	privateApis as componentsPrivateApis,
+-} from '@wordpress/components';
++import { BaseControl, CustomSelectControl } from '@wordpress/components';
+ import { useInstanceId } from '@wordpress/compose';
+ import { useSelect } from '@wordpress/data';
+ import { useMemo, Platform } from '@wordpress/element';
+@@ -23,13 +20,8 @@ import { useSettings } from '../components/use-settings';
+ import InspectorControls from '../components/inspector-controls';
+ import useBlockDisplayInformation from '../components/use-block-display-information';
+ import { cleanEmptyObject, useStyleOverride } from './utils';
+-import { unlock } from '../lock-unlock';
+ import { store as blockEditorStore } from '../store';
+ 
+-const { CustomSelectControlV2Legacy: CustomSelectControl } = unlock(
+-	componentsPrivateApis
+-);
+-
+ const POSITION_SUPPORT_KEY = 'position';
+ 
+ const DEFAULT_OPTION = {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3699162feb5109..7b0c17a67bc40e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,7 +4,8 @@
+ 
+ ### Internal
+ 
+--   `CustomSelectControlV2`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
++-   `CustomSelectControl`: switch to ariakit-based implementation ([#63258](https://github.com/WordPress/gutenberg/pull/63258)).
++-   `CustomSelectControl`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index e14bf953bdb66a..626b80d6ff7ac4 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -65,7 +65,6 @@
+ 		"colord": "^2.7.0",
+ 		"date-fns": "^3.6.0",
+ 		"deepmerge": "^4.3.0",
+-		"downshift": "^6.0.15",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"framer-motion": "^11.1.9",
+ 		"gradient-parser": "^0.1.5",
+diff --git a/packages/components/src/custom-select-control-v2/default-component/index.tsx b/packages/components/src/custom-select-control-v2/default-component/index.tsx
+deleted file mode 100644
+index 89ff14097e8caf..00000000000000
+--- a/packages/components/src/custom-select-control-v2/default-component/index.tsx
++++ /dev/null
+@@ -1,29 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import * as Ariakit from '@ariakit/react';
+-/**
+- * Internal dependencies
+- */
+-import _CustomSelect from '../custom-select';
+-import type { CustomSelectProps } from '../types';
+-import type { WordPressComponentProps } from '../../context';
+-import Item from '../item';
+-
+-function CustomSelectControlV2(
+-	props: WordPressComponentProps< CustomSelectProps, 'button', false >
+-) {
+-	const { defaultValue, onChange, value, ...restProps } = props;
+-	// Forward props + store from v2 implementation
+-	const store = Ariakit.useSelectStore( {
+-		setValue: ( nextValue ) => onChange?.( nextValue ),
+-		defaultValue,
+-		value,
+-	} );
+-
+-	return <_CustomSelect { ...restProps } store={ store } />;
+-}
+-
+-CustomSelectControlV2.Item = Item;
+-
+-export default CustomSelectControlV2;
+diff --git a/packages/components/src/custom-select-control-v2/index.tsx b/packages/components/src/custom-select-control-v2/index.tsx
+index f07e8f6f9f3115..07d073caf920f9 100644
+--- a/packages/components/src/custom-select-control-v2/index.tsx
++++ b/packages/components/src/custom-select-control-v2/index.tsx
+@@ -1,4 +1,29 @@
++/**
++ * External dependencies
++ */
++import * as Ariakit from '@ariakit/react';
+ /**
+  * Internal dependencies
+  */
+-export { default } from './default-component';
++import _CustomSelect from './custom-select';
++import type { CustomSelectProps } from './types';
++import type { WordPressComponentProps } from '../context';
++import Item from './item';
++
++function CustomSelectControlV2(
++	props: WordPressComponentProps< CustomSelectProps, 'button', false >
++) {
++	const { defaultValue, onChange, value, ...restProps } = props;
++	// Forward props + store from v2 implementation
++	const store = Ariakit.useSelectStore( {
++		setValue: ( nextValue ) => onChange?.( nextValue ),
++		defaultValue,
++		value,
++	} );
++
++	return <_CustomSelect { ...restProps } store={ store } />;
++}
++
++CustomSelectControlV2.Item = Item;
++
++export default CustomSelectControlV2;
+diff --git a/packages/components/src/custom-select-control-v2/stories/default.story.tsx b/packages/components/src/custom-select-control-v2/stories/index.story.tsx
+similarity index 98%
+rename from packages/components/src/custom-select-control-v2/stories/default.story.tsx
+rename to packages/components/src/custom-select-control-v2/stories/index.story.tsx
+index 5b715b2af9c097..a3324a5fa03a47 100644
+--- a/packages/components/src/custom-select-control-v2/stories/default.story.tsx
++++ b/packages/components/src/custom-select-control-v2/stories/index.story.tsx
+@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
+ import CustomSelectControlV2 from '..';
+ 
+ const meta: Meta< typeof CustomSelectControlV2 > = {
+-	title: 'Components/CustomSelectControl v2/Default',
++	title: 'Components/CustomSelectControl v2',
+ 	component: CustomSelectControlV2,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+diff --git a/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx b/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx
+deleted file mode 100644
+index e8835d1897db9d..00000000000000
+--- a/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx
++++ /dev/null
+@@ -1,72 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { Meta, StoryFn } from '@storybook/react';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import CustomSelectControl from '../legacy-component';
+-import * as V1Story from '../../custom-select-control/stories/index.story';
+-
+-const meta: Meta< typeof CustomSelectControl > = {
+-	title: 'Components/CustomSelectControl v2/Legacy',
+-	component: CustomSelectControl,
+-	argTypes: {
+-		onChange: { control: { type: null } },
+-		value: { control: { type: null } },
+-	},
+-	tags: [ 'status-wip' ],
+-	parameters: {
+-		actions: { argTypesRegex: '^on.*' },
+-		controls: { expanded: true },
+-		docs: {
+-			source: { excludeDecorators: true },
+-		},
+-	},
+-	decorators: [
+-		( Story ) => (
+-			<div
+-				style={ {
+-					minHeight: '150px',
+-				} }
+-			>
+-				<Story />
+-			</div>
+-		),
+-	],
+-};
+-export default meta;
+-
+-const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
+-	const [ value, setValue ] = useState( props.options[ 0 ] );
+-
+-	const onChange: React.ComponentProps<
+-		typeof CustomSelectControl
+-	>[ 'onChange' ] = ( changeObject ) => {
+-		setValue( changeObject.selectedItem );
+-		props.onChange?.( changeObject );
+-	};
+-
+-	return (
+-		<CustomSelectControl
+-			{ ...props }
+-			onChange={ onChange }
+-			value={ value }
+-		/>
+-	);
+-};
+-
+-export const Default = Template.bind( {} );
+-Default.args = V1Story.Default.args;
+-
+-export const WithLongLabels = Template.bind( {} );
+-WithLongLabels.args = V1Story.WithLongLabels.args;
+-
+-export const WithHints = Template.bind( {} );
+-WithHints.args = V1Story.WithHints.args;
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+index 95a78c501839d6..a31598c1db3ead 100644
+--- a/packages/components/src/custom-select-control-v2/types.ts
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import type * as Ariakit from '@ariakit/react';
+-import type { FocusEventHandler, MouseEventHandler } from 'react';
+ 
+ export type CustomSelectStore = {
+ 	/**
+@@ -82,126 +81,6 @@ export type _CustomSelectProps = CustomSelectButtonProps & {
+ 
+ export type CustomSelectProps = _CustomSelectProps & CustomSelectSize;
+ 
+-/**
+- * The legacy object structure for the options array.
+- */
+-type LegacyOption = {
+-	key: string;
+-	name: string;
+-	style?: React.CSSProperties;
+-	className?: string;
+-	hint?: string;
+-	/**
+-	 * Use the `hint` property instead
+-	 * @deprecated
+-	 * @ignore
+-	 */
+-	__experimentalHint?: string;
+-	[ key: string ]: any;
+-};
+-
+-/**
+- * The legacy object returned from the onChange event.
+- */
+-type LegacyOnChangeObject = {
+-	highlightedIndex?: number;
+-	inputValue?: string;
+-	isOpen?: boolean;
+-	type?: string;
+-	selectedItem: LegacyOption;
+-};
+-
+-export type LegacyCustomSelectProps = {
+-	/**
+-	 * Optional classname for the component.
+-	 */
+-	className?: string;
+-	/**
+-	 * Used to visually hide the label. It will always be visible to screen readers.
+-	 *
+-	 */
+-	hideLabelFromVision?: boolean;
+-	/**
+-	 * Pass in a description that will be shown to screen readers associated with the
+-	 * select trigger button. If no value is passed, the text "Currently selected:
+-	 * selectedItem.name" will be used fully translated.
+-	 */
+-	describedBy?: string;
+-	/**
+-	 * Label for the control.
+-	 */
+-	label: string;
+-	/**
+-	 * Function called with the control's internal state changes. The `selectedItem`
+-	 * property contains the next selected item.
+-	 */
+-	onChange?: ( newValue: LegacyOnChangeObject ) => void;
+-	/**
+-	 * A handler for `onBlur` events.
+-	 *
+-	 * @ignore
+-	 */
+-	onBlur?: FocusEventHandler< HTMLButtonElement >;
+-	/**
+-	 * A handler for `onFocus` events.
+-	 *
+-	 * @ignore
+-	 */
+-	onFocus?: FocusEventHandler< HTMLButtonElement >;
+-	/**
+-	 * A handler for `onMouseOver` events.
+-	 *
+-	 * @ignore
+-	 */
+-	onMouseOut?: MouseEventHandler< HTMLButtonElement >;
+-	/**
+-	 * A handler for `onMouseOut` events.
+-	 *
+-	 * @ignore
+-	 */
+-	onMouseOver?: MouseEventHandler< HTMLButtonElement >;
+-	/**
+-	 * The options that can be chosen from.
+-	 */
+-	options: Array< LegacyOption >;
+-	/**
+-	 * The size of the control.
+-	 *
+-	 * @default 'default'
+-	 */
+-	size?: 'default' | 'small' | '__unstable-large';
+-	/**
+-	 * Can be used to externally control the value of the control.
+-	 */
+-	value?: LegacyOption;
+-	/**
+-	 * Use the `showSelectedHint` property instead.
+-	 * @deprecated
+-	 * @ignore
+-	 */
+-	__experimentalShowSelectedHint?: boolean;
+-	/**
+-	 * Show the hint of the selected item in the trigger button.
+-	 *
+-	 * @default false
+-	 */
+-	showSelectedHint?: boolean;
+-	/**
+-	 * Opt-in prop for an unconstrained width style which became the default in
+-	 * WordPress 6.5. The prop is no longer needed and can be safely removed.
+-	 *
+-	 * @deprecated
+-	 * @ignore
+-	 */
+-	__nextUnconstrainedWidth?: boolean;
+-	/**
+-	 * Start opting into the larger default height that will become the default size in a future version.
+-	 *
+-	 * @default false
+-	 */
+-	__next40pxDefaultSize?: boolean;
+-};
+-
+ export type CustomSelectItemProps = {
+ 	/**
+ 	 * The value of the select item. This will be used as the children if
+diff --git a/packages/components/src/custom-select-control/README.md b/packages/components/src/custom-select-control/README.md
+index ff890c606af467..6804f4cf6ecd3a 100644
+--- a/packages/components/src/custom-select-control/README.md
++++ b/packages/components/src/custom-select-control/README.md
+@@ -63,81 +63,83 @@ function MyControlledCustomSelectControl() {
+ 
+ ### Props
+ 
+-#### className
++#### `className`: `string`
+ 
+-A custom class name to append to the outer `<div>`.
++Optional classname for the component.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-#### hideLabelFromVision
++#### `hideLabelFromVision`: `boolean`
+ 
+-Used to visually hide the label. It will always be visible to screen readers.
++Hide the label visually, while keeping available to assistive technology.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-#### label
++#### `describedBy`: `string`
+ 
+-The label for the control.
++Description for the select trigger button used by assistive technology. If no value is passed, the text "Currently selected: selectedItem.name" will be used fully translated.
++
++-   Required: No
++
++#### `label`: `string`
++
++Label for the control.
+ 
+--   Type: `String`
+ -   Required: Yes
+ 
+-#### describedBy
++#### `onChange`: `( newValue: ChangeObject ) => void`
+ 
+-Pass in a description that will be shown to screen readers associated with the select trigger button. If no value is passed, the text "Currently selected: selectedItem.name" will be used fully translated.
++Function called with the control's internal state changes. The `selectedItem` property contains the next selected item.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-#### options
++#### `options`: `Array< Option >`
+ 
+-The options that can be chosen from.
++The list of options that can be chosen from.
+ 
+--   Type: `Array<{ key: String, name: String, style: ?{}, className: ?String, ...rest }>`
+ -   Required: Yes
+ 
+-#### onChange
++#### `size`: `'default' | 'small' | '\_\_unstable-large'`
+ 
+-Function called with the control's internal state changes. The `selectedItem` property contains the next selected item.
++The size of the control.
++
++-   Default: `'default'`
++-   Required: No
++
++#### `showSelectedHint`: `boolean`
++
++Show the hint of the selected item in the trigger button.
+ 
+--   Type: `Function`
+ -   Required: No
+ 
+-#### value
++#### `value`: `Option`
+ 
+ Can be used to externally control the value of the control, like in the `MyControlledCustomSelectControl` example above.
+ 
+--   Type: `Object`
+ -   Required: No
+ 
+-#### onMouseOver
++#### `onMouseOver`: `MouseEventHandler< HTMLButtonElement >`
+ 
+-A handler for onMouseOver events.
++A handler for `mouseover` events on the trigger button.
+ 
+--   Type: `Function`
+ -   Required: No
+ 
+-#### onMouseOut
++#### `onMouseOut`: `MouseEventHandler< HTMLButtonElement >`
+ 
+-A handler for onMouseOut events.
++A handler for `mouseout` events on the trigger button.
+ 
+--   Type: `Function`
+ -   Required: No
+ 
+-#### onFocus
++#### `onFocus`: `FocusEventHandler< HTMLButtonElement >`
+ 
+-A handler for onFocus events.
++A handler for `focus` events on the trigger button.
+ 
+--   Type: `Function`
+ -   Required: No
+ 
+-#### onBlur
++#### `onBlur`: `FocusEventHandler< HTMLButtonElement >`
+ 
+-A handler for onBlur events.
++A handler for `blur` events on the trigger button.
+ 
+--   Type: `Function`
+ -   Required: No
+ 
+ ## Related components
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+deleted file mode 100644
+index 58ca5a961a138c..00000000000000
+--- a/packages/components/src/custom-select-control/index.js
++++ /dev/null
+@@ -1,240 +0,0 @@
+-// @ts-nocheck
+-/**
+- * External dependencies
+- */
+-import { useSelect } from 'downshift';
+-import clsx from 'clsx';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { Icon, check } from '@wordpress/icons';
+-import { __, sprintf } from '@wordpress/i18n';
+-import { useCallback } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { VisuallyHidden } from '../visually-hidden';
+-import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
+-import SelectControlChevronDown from '../select-control/chevron-down';
+-import { StyledLabel } from '../base-control/styles/base-control-styles';
+-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+-import InputBase from '../input-control/input-base';
+-
+-const itemToString = ( item ) => item?.name;
+-// This is needed so that in Windows, where
+-// the menu does not necessarily open on
+-// key up/down, you can still switch between
+-// options with the menu closed.
+-const stateReducer = (
+-	{ selectedItem },
+-	{ type, changes, props: { items } }
+-) => {
+-	switch ( type ) {
+-		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowDown:
+-			// If we already have a selected item, try to select the next one,
+-			// without circular navigation. Otherwise, select the first item.
+-			return {
+-				selectedItem:
+-					items[
+-						selectedItem
+-							? Math.min(
+-									items.indexOf( selectedItem ) + 1,
+-									items.length - 1
+-							  )
+-							: 0
+-					],
+-			};
+-		case useSelect.stateChangeTypes.ToggleButtonKeyDownArrowUp:
+-			// If we already have a selected item, try to select the previous one,
+-			// without circular navigation. Otherwise, select the last item.
+-			return {
+-				selectedItem:
+-					items[
+-						selectedItem
+-							? Math.max( items.indexOf( selectedItem ) - 1, 0 )
+-							: items.length - 1
+-					],
+-			};
+-		default:
+-			return changes;
+-	}
+-};
+-
+-export default function CustomSelectControl( props ) {
+-	const {
+-		/** Start opting into the larger default height that will become the default size in a future version. */
+-		__next40pxDefaultSize = false,
+-		className,
+-		hideLabelFromVision,
+-		label,
+-		describedBy,
+-		options: items,
+-		onChange: onSelectedItemChange,
+-		/** @type {import('../select-control/types').SelectControlProps.size} */
+-		size = 'default',
+-		value: _selectedItem,
+-		onMouseOver,
+-		onMouseOut,
+-		onFocus,
+-		onBlur,
+-		__experimentalShowSelectedHint = false,
+-	} = useDeprecated36pxDefaultSizeProp( props );
+-
+-	const {
+-		getLabelProps,
+-		getToggleButtonProps,
+-		getMenuProps,
+-		getItemProps,
+-		isOpen,
+-		highlightedIndex,
+-		selectedItem,
+-	} = useSelect( {
+-		initialSelectedItem: items[ 0 ],
+-		items,
+-		itemToString,
+-		onSelectedItemChange,
+-		...( typeof _selectedItem !== 'undefined' && _selectedItem !== null
+-			? { selectedItem: _selectedItem }
+-			: undefined ),
+-		stateReducer,
+-	} );
+-
+-	function getDescribedBy() {
+-		if ( describedBy ) {
+-			return describedBy;
+-		}
+-
+-		if ( ! selectedItem ) {
+-			return __( 'No selection' );
+-		}
+-
+-		// translators: %s: The selected option.
+-		return sprintf( __( 'Currently selected: %s' ), selectedItem.name );
+-	}
+-
+-	let menuProps = getMenuProps( {
+-		className: 'components-custom-select-control__menu',
+-		'aria-hidden': ! isOpen,
+-	} );
+-
+-	const onKeyDownHandler = useCallback(
+-		( e ) => {
+-			e.stopPropagation();
+-			menuProps?.onKeyDown?.( e );
+-		},
+-		[ menuProps ]
+-	);
+-
+-	// We need this here, because the null active descendant is not fully ARIA compliant.
+-	if (
+-		menuProps[ 'aria-activedescendant' ]?.startsWith( 'downshift-null' )
+-	) {
+-		const {
+-			'aria-activedescendant': ariaActivedescendant,
+-			...restMenuProps
+-		} = menuProps;
+-		menuProps = restMenuProps;
+-	}
+-	return (
+-		<div
+-			className={ clsx( 'components-custom-select-control', className ) }
+-		>
+-			{ hideLabelFromVision ? (
+-				<VisuallyHidden as="label" { ...getLabelProps() }>
+-					{ label }
+-				</VisuallyHidden>
+-			) : (
+-				/* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */
+-				<StyledLabel
+-					{ ...getLabelProps( {
+-						className: 'components-custom-select-control__label',
+-					} ) }
+-				>
+-					{ label }
+-				</StyledLabel>
+-			) }
+-			<InputBase
+-				__next40pxDefaultSize={ __next40pxDefaultSize }
+-				size={ size }
+-				suffix={ <SelectControlChevronDown /> }
+-			>
+-				<SelectControlSelect
+-					onMouseOver={ onMouseOver }
+-					onMouseOut={ onMouseOut }
+-					as="button"
+-					onFocus={ onFocus }
+-					onBlur={ onBlur }
+-					selectSize={ size }
+-					__next40pxDefaultSize={ __next40pxDefaultSize }
+-					{ ...getToggleButtonProps( {
+-						// This is needed because some speech recognition software don't support `aria-labelledby`.
+-						'aria-label': label,
+-						'aria-labelledby': undefined,
+-						className: 'components-custom-select-control__button',
+-						describedBy: getDescribedBy(),
+-					} ) }
+-				>
+-					{ itemToString( selectedItem ) }
+-					{ __experimentalShowSelectedHint &&
+-						selectedItem.__experimentalHint && (
+-							<span className="components-custom-select-control__hint">
+-								{ selectedItem.__experimentalHint }
+-							</span>
+-						) }
+-				</SelectControlSelect>
+-				<div className="components-custom-select-control__menu-wrapper">
+-					{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+-					<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
+-						{ isOpen &&
+-							items.map( ( item, index ) => (
+-								<li
+-									key={ item.key }
+-									{ ...getItemProps( {
+-										item,
+-										index,
+-										className: clsx(
+-											item.className,
+-											'components-custom-select-control__item',
+-											{
+-												'is-highlighted':
+-													index === highlightedIndex,
+-												'has-hint':
+-													!! item.__experimentalHint,
+-												'is-next-40px-default-size':
+-													__next40pxDefaultSize,
+-											}
+-										),
+-										style: item.style,
+-									} ) }
+-								>
+-									{ item.name }
+-									{ item.__experimentalHint && (
+-										<span className="components-custom-select-control__item-hint">
+-											{ item.__experimentalHint }
+-										</span>
+-									) }
+-									{ item === selectedItem && (
+-										<Icon
+-											icon={ check }
+-											className="components-custom-select-control__item-icon"
+-										/>
+-									) }
+-								</li>
+-							) ) }
+-					</ul>
+-				</div>
+-			</InputBase>
+-		</div>
+-	);
+-}
+-
+-export function StableCustomSelectControl( props ) {
+-	return (
+-		<CustomSelectControl
+-			{ ...props }
+-			__experimentalShowSelectedHint={ false }
+-		/>
+-	);
+-}
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx b/packages/components/src/custom-select-control/index.tsx
+similarity index 76%
+rename from packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+rename to packages/components/src/custom-select-control/index.tsx
+index 7dcdec9b7bdc60..5bce6afc4d92b6 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
++++ b/packages/components/src/custom-select-control/index.tsx
+@@ -7,15 +7,15 @@ import clsx from 'clsx';
+ /**
+  * Internal dependencies
+  */
+-import _CustomSelect from '../custom-select';
+-import CustomSelectItem from '../item';
+-import type { LegacyCustomSelectProps } from '../types';
+-import * as Styled from '../styles';
++import _CustomSelect from '../custom-select-control-v2/custom-select';
++import CustomSelectItem from '../custom-select-control-v2/item';
++import * as Styled from '../custom-select-control-v2/styles';
++import type { CustomSelectProps } from './types';
+ 
+ function useDeprecatedProps( {
+ 	__experimentalShowSelectedHint,
+ 	...otherProps
+-}: LegacyCustomSelectProps ) {
++}: CustomSelectProps ) {
+ 	return {
+ 		showSelectedHint: __experimentalShowSelectedHint,
+ 		...otherProps,
+@@ -28,14 +28,14 @@ function useDeprecatedProps( {
+ function applyOptionDeprecations( {
+ 	__experimentalHint,
+ 	...rest
+-}: LegacyCustomSelectProps[ 'options' ][ number ] ) {
++}: CustomSelectProps[ 'options' ][ number ] ) {
+ 	return {
+ 		hint: __experimentalHint,
+ 		...rest,
+ 	};
+ }
+ 
+-function CustomSelectControl( props: LegacyCustomSelectProps ) {
++function CustomSelectControl( props: CustomSelectProps ) {
+ 	const {
+ 		__next40pxDefaultSize = false,
+ 		describedBy,
+@@ -60,7 +60,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 			}
+ 
+ 			// Executes the logic in a microtask after the popup is closed.
+-			// This is simply to ensure the isOpen state matches that in Downshift.
++			// This is simply to ensure the isOpen state matches the one from the
++			// previous legacy implementation.
+ 			await Promise.resolve();
+ 			const state = store.getState();
+ 
+@@ -90,8 +91,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 				<Styled.WithHintItemWrapper>
+ 					<span>{ name }</span>
+ 					<Styled.WithHintItemHint
+-					// TODO: Legacy classname. Add V1 styles are removed from the codebase
+-					// className="components-custom-select-control__item-hint"
++						// Keeping the classname for legacy reasons
++						className="components-custom-select-control__item-hint"
+ 					>
+ 						{ hint }
+ 					</Styled.WithHintItemHint>
+@@ -105,13 +106,12 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 					children={ hint ? withHint : name }
+ 					style={ style }
+ 					className={ clsx(
+-						// TODO: Legacy classname. Add V1 styles are removed from the codebase
+-						// 'components-custom-select-control__item',
+-						className
+-						// TODO: Legacy classname. Add V1 styles are removed from the codebase
+-						// {
+-						// 	'has-hint': hint,
+-						// }
++						className,
++						// Keeping the classnames for legacy reasons
++						'components-custom-select-control__item',
++						{
++							'has-hint': hint,
++						}
+ 					) }
+ 				/>
+ 			);
+@@ -129,8 +129,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 				{ currentValue }
+ 				{ selectedOptionHint && (
+ 					<Styled.SelectedExperimentalHintItem
+-					// TODO: Legacy classname. Add V1 styles are removed from the codebase
+-					// className="components-custom-select-control__hint"
++						// Keeping the classname for legacy reasons
++						className="components-custom-select-control__hint"
+ 					>
+ 						{ selectedOptionHint }
+ 					</Styled.SelectedExperimentalHintItem>
+@@ -161,8 +161,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 			size={ translatedSize }
+ 			store={ store }
+ 			className={ clsx(
+-				// TODO: Legacy classname. Add V1 styles are removed from the codebase
+-				// 'components-custom-select-control',
++				// Keeping the classname for legacy reasons
++				'components-custom-select-control',
+ 				classNameProp
+ 			) }
+ 			isLegacy
+diff --git a/packages/components/src/custom-select-control/stories/index.story.tsx b/packages/components/src/custom-select-control/stories/index.story.tsx
+index 8ff9a023c5821b..836fc540c6d1ed 100644
+--- a/packages/components/src/custom-select-control/stories/index.story.tsx
++++ b/packages/components/src/custom-select-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -13,32 +13,40 @@ import { useState } from '@wordpress/element';
+  */
+ import CustomSelectControl from '..';
+ 
+-export default {
++const meta: Meta< typeof CustomSelectControl > = {
+ 	title: 'Components/CustomSelectControl',
+ 	component: CustomSelectControl,
+ 	argTypes: {
+-		__next40pxDefaultSize: { control: { type: 'boolean' } },
+-		__experimentalShowSelectedHint: { control: { type: 'boolean' } },
+-		size: {
+-			options: [ 'small', 'default', '__unstable-large' ],
+-			control: {
+-				type: 'radio',
+-			},
+-		},
+ 		onChange: { control: { type: null } },
+ 		value: { control: { type: null } },
+ 	},
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: {
++			source: { excludeDecorators: true },
++		},
+ 	},
++	decorators: [
++		( Story ) => (
++			<div
++				style={ {
++					minHeight: '150px',
++				} }
++			>
++				<Story />
++			</div>
++		),
++	],
+ };
++export default meta;
+ 
+ const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
+ 	const [ value, setValue ] = useState( props.options[ 0 ] );
+ 
+ 	const onChange: React.ComponentProps<
+ 		typeof CustomSelectControl
+-	>[ 'onChange' ] = ( changeObject: { selectedItem: any } ) => {
++	>[ 'onChange' ] = ( changeObject ) => {
+ 		setValue( changeObject.selectedItem );
+ 		props.onChange?.( changeObject );
+ 	};
+@@ -52,7 +60,7 @@ const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
+ 	);
+ };
+ 
+-export const Default: StoryFn = Template.bind( {} );
++export const Default = Template.bind( {} );
+ Default.args = {
+ 	label: 'Label',
+ 	options: [
+@@ -80,7 +88,7 @@ Default.args = {
+ 	],
+ };
+ 
+-export const WithLongLabels: StoryFn = Template.bind( {} );
++export const WithLongLabels = Template.bind( {} );
+ WithLongLabels.args = {
+ 	...Default.args,
+ 	options: [
+@@ -99,29 +107,29 @@ WithLongLabels.args = {
+ 	],
+ };
+ 
+-export const WithHints: StoryFn = Template.bind( {} );
++export const WithHints = Template.bind( {} );
+ WithHints.args = {
+ 	...Default.args,
+ 	options: [
+ 		{
+ 			key: 'thumbnail',
+ 			name: 'Thumbnail',
+-			__experimentalHint: '150x150',
++			hint: '150x150',
+ 		},
+ 		{
+ 			key: 'medium',
+ 			name: 'Medium',
+-			__experimentalHint: '250x250',
++			hint: '250x250',
+ 		},
+ 		{
+ 			key: 'large',
+ 			name: 'Large',
+-			__experimentalHint: '1024x1024',
++			hint: '1024x1024',
+ 		},
+ 		{
+ 			key: 'full',
+ 			name: 'Full Size',
+-			__experimentalHint: '1600x1600',
++			hint: '1600x1600',
+ 		},
+ 	],
+ };
+diff --git a/packages/components/src/custom-select-control/style.scss b/packages/components/src/custom-select-control/style.scss
+deleted file mode 100644
+index 8fcfe8e5ce2f0c..00000000000000
+--- a/packages/components/src/custom-select-control/style.scss
++++ /dev/null
+@@ -1,75 +0,0 @@
+-.components-custom-select-control {
+-	position: relative;
+-	font-size: $default-font-size;
+-}
+-
+-.components-custom-select-control__button {
+-	position: relative;
+-	text-align: left;
+-	outline: 0; // focus ring is handled elsewhere
+-}
+-
+-.components-custom-select-control__hint {
+-	color: $gray-600;
+-	margin-left: 10px;
+-}
+-
+-.components-custom-select-control__menu-wrapper {
+-	position: absolute;
+-	min-width: 100%;
+-	bottom: 0;
+-}
+-
+-.components-custom-select-control__menu {
+-	// Hide when collapsed.
+-	&[aria-hidden="true"] {
+-		display: none;
+-	}
+-
+-	// Block UI appearance.
+-	border: $border-width solid $gray-900;
+-	background-color: $white;
+-	border-radius: $radius-block-ui;
+-	outline: none;
+-	transition: none;
+-
+-	max-height: 400px;
+-	min-width: 100%;
+-	overflow: auto;
+-	padding: 0;
+-	position: absolute;
+-	z-index: z-index(".components-popover");
+-}
+-
+-.components-custom-select-control__item {
+-	align-items: center;
+-	display: grid;
+-	grid-template-columns: auto auto;
+-	list-style-type: none;
+-	padding: $grid-unit-10 $grid-unit-20;
+-	cursor: default;
+-	line-height: $icon-size + $grid-unit-05;
+-
+-	&:not(.is-next-40px-default-size) {
+-		padding: $grid-unit-10;
+-	}
+-
+-	&.has-hint {
+-		grid-template-columns: auto auto 30px;
+-	}
+-	&.is-highlighted {
+-		background: $gray-300;
+-	}
+-	.components-custom-select-control__item-hint {
+-		color: $gray-600;
+-		text-align: right;
+-		padding-right: $grid-unit-05;
+-	}
+-	.components-custom-select-control__item-icon {
+-		margin-left: auto;
+-	}
+-
+-	&:last-child {
+-		margin-bottom: 0;
+-	}
+-}
+diff --git a/packages/components/src/custom-select-control/test/index.js b/packages/components/src/custom-select-control/test/index.js
+deleted file mode 100644
+index 9b17c4894de400..00000000000000
+--- a/packages/components/src/custom-select-control/test/index.js
++++ /dev/null
+@@ -1,665 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, screen } from '@testing-library/react';
+-import userEvent from '@testing-library/user-event';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import UncontrolledCustomSelectControl from '..';
+-
+-const customClassName = 'amber-skies';
+-const customStyles = {
+-	backgroundColor: 'rgb(127, 255, 212)',
+-	rotate: '13deg',
+-};
+-
+-const props = {
+-	label: 'label!',
+-	options: [
+-		{
+-			key: 'flower1',
+-			name: 'violets',
+-		},
+-		{
+-			key: 'flower2',
+-			name: 'crimson clover',
+-			className: customClassName,
+-		},
+-		{
+-			key: 'flower3',
+-			name: 'poppy',
+-		},
+-		{
+-			key: 'color1',
+-			name: 'amber',
+-			className: customClassName,
+-		},
+-		{
+-			key: 'color2',
+-			name: 'aquamarine',
+-			style: customStyles,
+-		},
+-		{
+-			key: 'color3',
+-			name: 'tomato (with custom props)',
+-			className: customClassName,
+-			style: customStyles,
+-			// try passing a valid HTML attribute
+-			'aria-label': 'test label',
+-			// try adding a custom prop
+-			customPropFoo: 'foo',
+-		},
+-	],
+-};
+-
+-const ControlledCustomSelectControl = ( {
+-	options,
+-	onChange: onChangeProp,
+-	...restProps
+-} ) => {
+-	const [ value, setValue ] = useState( restProps.value ?? options[ 0 ] );
+-
+-	const onChange = ( changeObject ) => {
+-		onChangeProp?.( changeObject );
+-		setValue( changeObject.selectedItem );
+-	};
+-
+-	return (
+-		<UncontrolledCustomSelectControl
+-			{ ...restProps }
+-			options={ options }
+-			onChange={ onChange }
+-			value={ options.find( ( option ) => option.key === value.key ) }
+-		/>
+-	);
+-};
+-
+-it( 'Should apply external controlled updates', async () => {
+-	const mockOnChange = jest.fn();
+-	const { rerender } = render(
+-		<UncontrolledCustomSelectControl
+-			{ ...props }
+-			value={ props.options[ 0 ] }
+-			onChange={ mockOnChange }
+-		/>
+-	);
+-
+-	const currentSelectedItem = screen.getByRole( 'button', {
+-		expanded: false,
+-	} );
+-
+-	expect( currentSelectedItem ).toHaveTextContent( props.options[ 0 ].name );
+-
+-	rerender(
+-		<UncontrolledCustomSelectControl
+-			{ ...props }
+-			value={ props.options[ 1 ] }
+-		/>
+-	);
+-
+-	expect( currentSelectedItem ).toHaveTextContent( props.options[ 1 ].name );
+-
+-	expect( mockOnChange ).not.toHaveBeenCalled();
+-} );
+-
+-describe.each( [
+-	[ 'Uncontrolled', UncontrolledCustomSelectControl ],
+-	[ 'Controlled', ControlledCustomSelectControl ],
+-] )( 'CustomSelectControl %s', ( ...modeAndComponent ) => {
+-	const [ , Component ] = modeAndComponent;
+-
+-	it( 'Should select the first option when no explicit initial value is passed without firing onChange', () => {
+-		const mockOnChange = jest.fn();
+-		render( <Component { ...props } onChange={ mockOnChange } /> );
+-
+-		expect(
+-			screen.getByRole( 'button', {
+-				expanded: false,
+-			} )
+-		).toHaveTextContent( props.options[ 0 ].name );
+-
+-		expect( mockOnChange ).not.toHaveBeenCalled();
+-	} );
+-
+-	it( 'Should pick the initially selected option if the value prop is passed without firing onChange', async () => {
+-		const mockOnChange = jest.fn();
+-		render(
+-			<Component
+-				{ ...props }
+-				onChange={ mockOnChange }
+-				value={ props.options[ 3 ] }
+-			/>
+-		);
+-
+-		expect(
+-			screen.getByRole( 'button', {
+-				expanded: false,
+-			} )
+-		).toHaveTextContent( props.options[ 3 ].name );
+-
+-		expect( mockOnChange ).not.toHaveBeenCalled();
+-	} );
+-
+-	it( 'Should replace the initial selection when a new item is selected', async () => {
+-		const user = userEvent.setup();
+-
+-		render( <Component { ...props } /> );
+-
+-		const currentSelectedItem = screen.getByRole( 'button', {
+-			expanded: false,
+-		} );
+-
+-		await user.click( currentSelectedItem );
+-
+-		await user.click(
+-			screen.getByRole( 'option', {
+-				name: 'crimson clover',
+-			} )
+-		);
+-
+-		expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+-
+-		await user.click( currentSelectedItem );
+-
+-		await user.click(
+-			screen.getByRole( 'option', {
+-				name: 'poppy',
+-			} )
+-		);
+-
+-		expect( currentSelectedItem ).toHaveTextContent( 'poppy' );
+-	} );
+-
+-	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
+-		const user = userEvent.setup();
+-
+-		render( <Component { ...props } /> );
+-
+-		const currentSelectedItem = screen.getByRole( 'button', {
+-			expanded: false,
+-		} );
+-
+-		await user.tab();
+-		await user.keyboard( '{enter}' );
+-		expect(
+-			screen.getByRole( 'listbox', {
+-				name: props.label,
+-			} )
+-		).toBeVisible();
+-
+-		await user.keyboard( '{escape}' );
+-		expect(
+-			screen.queryByRole( 'listbox', {
+-				name: props.label,
+-			} )
+-		).not.toBeInTheDocument();
+-
+-		expect( currentSelectedItem ).toHaveTextContent(
+-			props.options[ 0 ].name
+-		);
+-	} );
+-
+-	it( 'Should apply class only to options that have a className defined', async () => {
+-		const user = userEvent.setup();
+-
+-		render( <Component { ...props } /> );
+-
+-		await user.click(
+-			screen.getByRole( 'button', {
+-				expanded: false,
+-			} )
+-		);
+-
+-		// return an array of items _with_ a className added
+-		const itemsWithClass = props.options.filter(
+-			( option ) => option.className !== undefined
+-		);
+-
+-		// assert against filtered array
+-		itemsWithClass.map( ( { name } ) =>
+-			expect( screen.getByRole( 'option', { name } ) ).toHaveClass(
+-				customClassName
+-			)
+-		);
+-
+-		// return an array of items _without_ a className added
+-		const itemsWithoutClass = props.options.filter(
+-			( option ) => option.className === undefined
+-		);
+-
+-		// assert against filtered array
+-		itemsWithoutClass.map( ( { name } ) =>
+-			expect( screen.getByRole( 'option', { name } ) ).not.toHaveClass(
+-				customClassName
+-			)
+-		);
+-	} );
+-
+-	it( 'Should apply styles only to options that have styles defined', async () => {
+-		const user = userEvent.setup();
+-
+-		render( <Component { ...props } /> );
+-
+-		await user.click(
+-			screen.getByRole( 'button', {
+-				expanded: false,
+-			} )
+-		);
+-
+-		// return an array of items _with_ styles added
+-		const styledItems = props.options.filter(
+-			( option ) => option.style !== undefined
+-		);
+-
+-		// assert against filtered array
+-		styledItems.map( ( { name } ) =>
+-			expect( screen.getByRole( 'option', { name } ) ).toHaveStyle(
+-				customStyles
+-			)
+-		);
+-
+-		// return an array of items _without_ styles added
+-		const unstyledItems = props.options.filter(
+-			( option ) => option.style === undefined
+-		);
+-
+-		// assert against filtered array
+-		unstyledItems.map( ( { name } ) =>
+-			expect( screen.getByRole( 'option', { name } ) ).not.toHaveStyle(
+-				customStyles
+-			)
+-		);
+-	} );
+-
+-	it( 'does not show selected hint by default', () => {
+-		render(
+-			<Component
+-				{ ...props }
+-				label="Custom select"
+-				options={ [
+-					{
+-						key: 'one',
+-						name: 'One',
+-						__experimentalHint: 'Hint',
+-					},
+-				] }
+-			/>
+-		);
+-		expect(
+-			screen.getByRole( 'button', { name: 'Custom select' } )
+-		).not.toHaveTextContent( 'Hint' );
+-	} );
+-
+-	it( 'shows selected hint when __experimentalShowSelectedHint is set', () => {
+-		render(
+-			<Component
+-				{ ...props }
+-				label="Custom select"
+-				options={ [
+-					{
+-						key: 'one',
+-						name: 'One',
+-						__experimentalHint: 'Hint',
+-					},
+-				] }
+-				__experimentalShowSelectedHint
+-			/>
+-		);
+-		expect(
+-			screen.getByRole( 'button', { name: 'Custom select' } )
+-		).toHaveTextContent( 'Hint' );
+-	} );
+-
+-	it( 'shows selected hint in list of options when added, regardless of __experimentalShowSelectedHint prop', async () => {
+-		const user = userEvent.setup();
+-
+-		render(
+-			<Component
+-				{ ...props }
+-				label="Custom select"
+-				options={ [
+-					{
+-						key: 'one',
+-						name: 'One',
+-						__experimentalHint: 'Hint',
+-					},
+-				] }
+-			/>
+-		);
+-
+-		await user.click(
+-			screen.getByRole( 'button', { name: 'Custom select' } )
+-		);
+-
+-		expect( screen.getByRole( 'option', { name: /hint/i } ) ).toBeVisible();
+-	} );
+-
+-	it( 'Should return object onChange', async () => {
+-		const user = userEvent.setup();
+-		const mockOnChange = jest.fn();
+-
+-		render( <Component { ...props } onChange={ mockOnChange } /> );
+-
+-		await user.click(
+-			screen.getByRole( 'button', {
+-				expanded: false,
+-			} )
+-		);
+-
+-		await user.click(
+-			screen.getByRole( 'option', {
+-				name: 'aquamarine',
+-			} )
+-		);
+-
+-		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+-		expect( mockOnChange ).toHaveBeenLastCalledWith(
+-			expect.objectContaining( {
+-				inputValue: '',
+-				isOpen: false,
+-				selectedItem: expect.objectContaining( {
+-					name: 'aquamarine',
+-				} ),
+-				type: expect.any( String ),
+-			} )
+-		);
+-	} );
+-
+-	it( 'Should return selectedItem object when specified onChange', async () => {
+-		const user = userEvent.setup();
+-		const mockOnChange = jest.fn();
+-
+-		render( <Component { ...props } onChange={ mockOnChange } /> );
+-
+-		await user.tab();
+-		expect(
+-			screen.getByRole( 'button', {
+-				expanded: false,
+-			} )
+-		).toHaveFocus();
+-
+-		await user.keyboard( 'p' );
+-		await user.keyboard( '{enter}' );
+-
+-		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+-		expect( mockOnChange ).toHaveBeenLastCalledWith(
+-			expect.objectContaining( {
+-				selectedItem: expect.objectContaining( {
+-					key: 'flower3',
+-					name: 'poppy',
+-				} ),
+-			} )
+-		);
+-	} );
+-
+-	it( "Should pass arbitrary props to onChange's selectedItem, but apply only style and className to DOM elements", async () => {
+-		const user = userEvent.setup();
+-		const onChangeMock = jest.fn();
+-
+-		render( <Component { ...props } onChange={ onChangeMock } /> );
+-
+-		const currentSelectedItem = screen.getByRole( 'button', {
+-			expanded: false,
+-		} );
+-
+-		await user.click( currentSelectedItem );
+-
+-		const optionWithCustomAttributes = screen.getByRole( 'option', {
+-			name: 'tomato (with custom props)',
+-		} );
+-
+-		// Assert that the option element does not have the custom attributes
+-		expect( optionWithCustomAttributes ).not.toHaveAttribute(
+-			'customPropFoo'
+-		);
+-		expect( optionWithCustomAttributes ).not.toHaveAttribute(
+-			'aria-label'
+-		);
+-
+-		await user.click( optionWithCustomAttributes );
+-
+-		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
+-		expect( onChangeMock ).toHaveBeenCalledWith(
+-			expect.objectContaining( {
+-				selectedItem: expect.objectContaining( {
+-					key: 'color3',
+-					name: 'tomato (with custom props)',
+-					className: customClassName,
+-					style: customStyles,
+-					'aria-label': 'test label',
+-					customPropFoo: 'foo',
+-				} ),
+-			} )
+-		);
+-	} );
+-
+-	it( 'Should label the component correctly even when the label is not visible', () => {
+-		render( <Component { ...props } hideLabelFromVision /> );
+-
+-		expect(
+-			screen.getByRole( 'button', {
+-				name: props.label,
+-			} )
+-		).toBeVisible();
+-	} );
+-
+-	describe( 'Keyboard behavior and accessibility', () => {
+-		it( 'Captures the keypress event and does not let it propagate', async () => {
+-			const user = userEvent.setup();
+-			const onKeyDown = jest.fn();
+-
+-			render(
+-				<div
+-					// This role="none" is required to prevent an eslint warning about accessibility.
+-					role="none"
+-					onKeyDown={ onKeyDown }
+-				>
+-					<Component { ...props } />
+-				</div>
+-			);
+-			const currentSelectedItem = screen.getByRole( 'button', {
+-				expanded: false,
+-			} );
+-			await user.click( currentSelectedItem );
+-
+-			const customSelect = screen.getByRole( 'listbox', {
+-				name: props.label,
+-			} );
+-			await user.type( customSelect, '{enter}' );
+-
+-			expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
+-		} );
+-
+-		it( 'Should be able to change selection using keyboard', async () => {
+-			const user = userEvent.setup();
+-
+-			render( <Component { ...props } /> );
+-
+-			const currentSelectedItem = screen.getByRole( 'button', {
+-				expanded: false,
+-			} );
+-
+-			await user.tab();
+-			expect( currentSelectedItem ).toHaveFocus();
+-
+-			await user.keyboard( '{enter}' );
+-			expect(
+-				screen.getByRole( 'listbox', {
+-					name: props.label,
+-				} )
+-			).toHaveFocus();
+-
+-			await user.keyboard( '{arrowdown}' );
+-			await user.keyboard( '{enter}' );
+-
+-			expect( currentSelectedItem ).toHaveTextContent(
+-				props.options[ 1 ].name
+-			);
+-		} );
+-
+-		it( 'Should be able to type characters to select matching options', async () => {
+-			const user = userEvent.setup();
+-
+-			render( <Component { ...props } /> );
+-
+-			const currentSelectedItem = screen.getByRole( 'button', {
+-				expanded: false,
+-			} );
+-
+-			await user.tab();
+-			await user.keyboard( '{enter}' );
+-			expect(
+-				screen.getByRole( 'listbox', {
+-					name: props.label,
+-				} )
+-			).toHaveFocus();
+-
+-			await user.keyboard( '{a}' );
+-			await user.keyboard( '{enter}' );
+-			expect( currentSelectedItem ).toHaveTextContent( 'amber' );
+-		} );
+-
+-		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
+-			const user = userEvent.setup();
+-
+-			render( <Component { ...props } /> );
+-
+-			const currentSelectedItem = screen.getByRole( 'button', {
+-				expanded: false,
+-			} );
+-
+-			await user.tab();
+-			expect( currentSelectedItem ).toHaveFocus();
+-
+-			await user.keyboard( '{a}' );
+-			await user.keyboard( '{q}' );
+-
+-			expect(
+-				screen.queryByRole( 'listbox', {
+-					name: props.label,
+-					hidden: true,
+-				} )
+-			).not.toBeInTheDocument();
+-
+-			await user.keyboard( '{enter}' );
+-			expect( currentSelectedItem ).toHaveTextContent( 'aquamarine' );
+-		} );
+-
+-		it( 'Can change selection with a focused input and closed dropdown while pressing arrow keys', async () => {
+-			const user = userEvent.setup();
+-
+-			render( <Component { ...props } /> );
+-
+-			const currentSelectedItem = screen.getByRole( 'button', {
+-				expanded: false,
+-			} );
+-
+-			await user.tab();
+-			expect( currentSelectedItem ).toHaveFocus();
+-			expect( currentSelectedItem ).toHaveTextContent(
+-				props.options[ 0 ].name
+-			);
+-
+-			await user.keyboard( '{arrowdown}' );
+-			await user.keyboard( '{arrowdown}' );
+-			expect(
+-				screen.queryByRole( 'listbox', { name: props.label } )
+-			).not.toBeInTheDocument();
+-
+-			expect( currentSelectedItem ).toHaveTextContent(
+-				props.options[ 2 ].name
+-			);
+-		} );
+-
+-		it( 'Should have correct aria-selected value for selections', async () => {
+-			const user = userEvent.setup();
+-
+-			render( <Component { ...props } /> );
+-
+-			const currentSelectedItem = screen.getByRole( 'button', {
+-				expanded: false,
+-			} );
+-
+-			await user.click( currentSelectedItem );
+-
+-			// get all items except for first option
+-			const unselectedItems = props.options.filter(
+-				( { name } ) => name !== props.options[ 0 ].name
+-			);
+-
+-			// assert that all other items have aria-selected="false"
+-			unselectedItems.map( ( { name } ) =>
+-				expect(
+-					screen.getByRole( 'option', { name, selected: false } )
+-				).toBeVisible()
+-			);
+-
+-			// assert that first item has aria-selected="true"
+-			expect(
+-				screen.getByRole( 'option', {
+-					name: props.options[ 0 ].name,
+-					selected: true,
+-				} )
+-			).toBeVisible();
+-
+-			// change the current selection
+-			await user.click( screen.getByRole( 'option', { name: 'poppy' } ) );
+-
+-			// click button to mount listbox with options again
+-			await user.click( currentSelectedItem );
+-
+-			// check that first item is has aria-selected="false" after new selection
+-			expect(
+-				screen.getByRole( 'option', {
+-					name: props.options[ 0 ].name,
+-					selected: false,
+-				} )
+-			).toBeVisible();
+-
+-			// check that new selected item now has aria-selected="true"
+-			expect(
+-				screen.getByRole( 'option', {
+-					name: 'poppy',
+-					selected: true,
+-				} )
+-			).toBeVisible();
+-		} );
+-
+-		it( 'Should call custom event handlers', async () => {
+-			const user = userEvent.setup();
+-			const onFocusMock = jest.fn();
+-			const onBlurMock = jest.fn();
+-
+-			render(
+-				<>
+-					<Component
+-						{ ...props }
+-						onFocus={ onFocusMock }
+-						onBlur={ onBlurMock }
+-					/>
+-					<button>Focus stop</button>
+-				</>
+-			);
+-
+-			const currentSelectedItem = screen.getByRole( 'button', {
+-				expanded: false,
+-			} );
+-
+-			await user.tab();
+-
+-			expect( currentSelectedItem ).toHaveFocus();
+-			expect( onFocusMock ).toHaveBeenCalledTimes( 1 );
+-
+-			await user.tab();
+-			expect( currentSelectedItem ).not.toHaveFocus();
+-			expect( onBlurMock ).toHaveBeenCalledTimes( 1 );
+-		} );
+-	} );
+-} );
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx b/packages/components/src/custom-select-control/test/index.tsx
+similarity index 86%
+rename from packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+rename to packages/components/src/custom-select-control/test/index.tsx
+index 496b42572d82f6..73dcb039df3f1b 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
++++ b/packages/components/src/custom-select-control/test/index.tsx
+@@ -20,7 +20,7 @@ const customStyles = {
+ 	rotate: '13deg',
+ };
+ 
+-const legacyProps = {
++const props = {
+ 	label: 'label!',
+ 	options: [
+ 		{
+@@ -87,8 +87,8 @@ it( 'Should apply external controlled updates', async () => {
+ 	const mockOnChange = jest.fn();
+ 	const { rerender } = render(
+ 		<UncontrolledCustomSelectControl
+-			{ ...legacyProps }
+-			value={ legacyProps.options[ 0 ] }
++			{ ...props }
++			value={ props.options[ 0 ] }
+ 			onChange={ mockOnChange }
+ 		/>
+ 	);
+@@ -97,22 +97,18 @@ it( 'Should apply external controlled updates', async () => {
+ 		expanded: false,
+ 	} );
+ 
+-	expect( currentSelectedItem ).toHaveTextContent(
+-		legacyProps.options[ 0 ].name
+-	);
++	expect( currentSelectedItem ).toHaveTextContent( props.options[ 0 ].name );
+ 
+ 	expect( mockOnChange ).not.toHaveBeenCalled();
+ 
+ 	rerender(
+ 		<UncontrolledCustomSelectControl
+-			{ ...legacyProps }
+-			value={ legacyProps.options[ 1 ] }
++			{ ...props }
++			value={ props.options[ 1 ] }
+ 		/>
+ 	);
+ 
+-	expect( currentSelectedItem ).toHaveTextContent(
+-		legacyProps.options[ 1 ].name
+-	);
++	expect( currentSelectedItem ).toHaveTextContent( props.options[ 1 ].name );
+ 
+ 	// Necessary to wait for onChange to potentially fire
+ 	await sleep();
+@@ -128,13 +124,13 @@ describe.each( [
+ 
+ 	it( 'Should select the first option when no explicit initial value is passed without firing onChange', async () => {
+ 		const mockOnChange = jest.fn();
+-		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
++		render( <Component { ...props } onChange={ mockOnChange } /> );
+ 
+ 		expect(
+ 			screen.getByRole( 'combobox', {
+ 				expanded: false,
+ 			} )
+-		).toHaveTextContent( legacyProps.options[ 0 ].name );
++		).toHaveTextContent( props.options[ 0 ].name );
+ 
+ 		// Necessary to wait for onChange to potentially fire
+ 		await sleep();
+@@ -146,9 +142,9 @@ describe.each( [
+ 		const mockOnChange = jest.fn();
+ 		render(
+ 			<Component
+-				{ ...legacyProps }
++				{ ...props }
+ 				onChange={ mockOnChange }
+-				value={ legacyProps.options[ 3 ] }
++				value={ props.options[ 3 ] }
+ 			/>
+ 		);
+ 
+@@ -156,7 +152,7 @@ describe.each( [
+ 			screen.getByRole( 'combobox', {
+ 				expanded: false,
+ 			} )
+-		).toHaveTextContent( legacyProps.options[ 3 ].name );
++		).toHaveTextContent( props.options[ 3 ].name );
+ 
+ 		// Necessary to wait for onChange to potentially fire
+ 		await sleep();
+@@ -165,7 +161,7 @@ describe.each( [
+ 	} );
+ 
+ 	it( 'Should replace the initial selection when a new item is selected', async () => {
+-		render( <Component { ...legacyProps } /> );
++		render( <Component { ...props } /> );
+ 
+ 		const currentSelectedItem = screen.getByRole( 'combobox', {
+ 			expanded: false,
+@@ -193,7 +189,7 @@ describe.each( [
+ 	} );
+ 
+ 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
+-		render( <Component { ...legacyProps } /> );
++		render( <Component { ...props } /> );
+ 
+ 		const currentSelectedItem = screen.getByRole( 'combobox', {
+ 			expanded: false,
+@@ -204,24 +200,24 @@ describe.each( [
+ 		await press.Enter();
+ 		expect(
+ 			screen.getByRole( 'listbox', {
+-				name: legacyProps.label,
++				name: props.label,
+ 			} )
+ 		).toBeVisible();
+ 
+ 		await press.Escape();
+ 		expect(
+ 			screen.queryByRole( 'listbox', {
+-				name: legacyProps.label,
++				name: props.label,
+ 			} )
+ 		).not.toBeInTheDocument();
+ 
+ 		expect( currentSelectedItem ).toHaveTextContent(
+-			legacyProps.options[ 0 ].name
++			props.options[ 0 ].name
+ 		);
+ 	} );
+ 
+ 	it( 'Should apply class only to options that have a className defined', async () => {
+-		render( <Component { ...legacyProps } /> );
++		render( <Component { ...props } /> );
+ 
+ 		await click(
+ 			screen.getByRole( 'combobox', {
+@@ -230,7 +226,7 @@ describe.each( [
+ 		);
+ 
+ 		// return an array of items _with_ a className added
+-		const itemsWithClass = legacyProps.options.filter(
++		const itemsWithClass = props.options.filter(
+ 			( option ) => option.className !== undefined
+ 		);
+ 
+@@ -242,7 +238,7 @@ describe.each( [
+ 		);
+ 
+ 		// return an array of items _without_ a className added
+-		const itemsWithoutClass = legacyProps.options.filter(
++		const itemsWithoutClass = props.options.filter(
+ 			( option ) => option.className === undefined
+ 		);
+ 
+@@ -255,7 +251,7 @@ describe.each( [
+ 	} );
+ 
+ 	it( 'Should apply styles only to options that have styles defined', async () => {
+-		render( <Component { ...legacyProps } /> );
++		render( <Component { ...props } /> );
+ 
+ 		await click(
+ 			screen.getByRole( 'combobox', {
+@@ -264,7 +260,7 @@ describe.each( [
+ 		);
+ 
+ 		// return an array of items _with_ styles added
+-		const styledItems = legacyProps.options.filter(
++		const styledItems = props.options.filter(
+ 			( option ) => option.style !== undefined
+ 		);
+ 
+@@ -276,7 +272,7 @@ describe.each( [
+ 		);
+ 
+ 		// return an array of items _without_ styles added
+-		const unstyledItems = legacyProps.options.filter(
++		const unstyledItems = props.options.filter(
+ 			( option ) => option.style === undefined
+ 		);
+ 
+@@ -291,7 +287,7 @@ describe.each( [
+ 	it( 'does not show selected hint by default', async () => {
+ 		render(
+ 			<Component
+-				{ ...legacyProps }
++				{ ...props }
+ 				label="Custom select"
+ 				options={ [
+ 					{
+@@ -312,7 +308,7 @@ describe.each( [
+ 	it( 'shows selected hint when showSelectedHint is set', async () => {
+ 		render(
+ 			<Component
+-				{ ...legacyProps }
++				{ ...props }
+ 				label="Custom select"
+ 				options={ [
+ 					{
+@@ -337,7 +333,7 @@ describe.each( [
+ 	it( 'shows selected hint in list of options when added, regardless of showSelectedHint prop', async () => {
+ 		render(
+ 			<Component
+-				{ ...legacyProps }
++				{ ...props }
+ 				label="Custom select"
+ 				options={ [
+ 					{
+@@ -359,7 +355,7 @@ describe.each( [
+ 	it( 'Should return object onChange', async () => {
+ 		const mockOnChange = jest.fn();
+ 
+-		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
++		render( <Component { ...props } onChange={ mockOnChange } /> );
+ 
+ 		await click(
+ 			screen.getByRole( 'combobox', {
+@@ -389,7 +385,7 @@ describe.each( [
+ 	it( 'Should return selectedItem object when specified onChange', async () => {
+ 		const mockOnChange = jest.fn();
+ 
+-		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
++		render( <Component { ...props } onChange={ mockOnChange } /> );
+ 
+ 		await sleep();
+ 		await press.Tab();
+@@ -416,7 +412,7 @@ describe.each( [
+ 	it( "Should pass arbitrary props to onChange's selectedItem, but apply only style and className to DOM elements", async () => {
+ 		const onChangeMock = jest.fn();
+ 
+-		render( <Component { ...legacyProps } onChange={ onChangeMock } /> );
++		render( <Component { ...props } onChange={ onChangeMock } /> );
+ 
+ 		const currentSelectedItem = screen.getByRole( 'combobox', {
+ 			expanded: false,
+@@ -454,11 +450,11 @@ describe.each( [
+ 	} );
+ 
+ 	it( 'Should label the component correctly even when the label is not visible', () => {
+-		render( <Component { ...legacyProps } hideLabelFromVision /> );
++		render( <Component { ...props } hideLabelFromVision /> );
+ 
+ 		expect(
+ 			screen.getByRole( 'combobox', {
+-				name: legacyProps.label,
++				name: props.label,
+ 			} )
+ 		).toBeVisible();
+ 	} );
+@@ -473,7 +469,7 @@ describe.each( [
+ 					role="none"
+ 					onKeyDown={ onKeyDown }
+ 				>
+-					<Component { ...legacyProps } />
++					<Component { ...props } />
+ 				</div>
+ 			);
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+@@ -482,7 +478,7 @@ describe.each( [
+ 			await click( currentSelectedItem );
+ 
+ 			const customSelect = screen.getByRole( 'listbox', {
+-				name: legacyProps.label,
++				name: props.label,
+ 			} );
+ 			expect( customSelect ).toHaveFocus();
+ 			await press.Enter();
+@@ -491,7 +487,7 @@ describe.each( [
+ 		} );
+ 
+ 		it( 'Should be able to change selection using keyboard', async () => {
+-			render( <Component { ...legacyProps } /> );
++			render( <Component { ...props } /> );
+ 
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+ 				expanded: false,
+@@ -504,7 +500,7 @@ describe.each( [
+ 			await press.Enter();
+ 			expect(
+ 				screen.getByRole( 'listbox', {
+-					name: legacyProps.label,
++					name: props.label,
+ 				} )
+ 			).toHaveFocus();
+ 
+@@ -512,12 +508,12 @@ describe.each( [
+ 			await press.Enter();
+ 
+ 			expect( currentSelectedItem ).toHaveTextContent(
+-				legacyProps.options[ 1 ].name
++				props.options[ 1 ].name
+ 			);
+ 		} );
+ 
+ 		it( 'Should be able to type characters to select matching options', async () => {
+-			render( <Component { ...legacyProps } /> );
++			render( <Component { ...props } /> );
+ 
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+ 				expanded: false,
+@@ -528,7 +524,7 @@ describe.each( [
+ 			await press.Enter();
+ 			expect(
+ 				screen.getByRole( 'listbox', {
+-					name: legacyProps.label,
++					name: props.label,
+ 				} )
+ 			).toHaveFocus();
+ 
+@@ -538,7 +534,7 @@ describe.each( [
+ 		} );
+ 
+ 		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
+-			render( <Component { ...legacyProps } /> );
++			render( <Component { ...props } /> );
+ 
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+ 				expanded: false,
+@@ -548,7 +544,7 @@ describe.each( [
+ 			await press.Tab();
+ 			expect( currentSelectedItem ).toHaveFocus();
+ 			expect( currentSelectedItem ).toHaveTextContent(
+-				legacyProps.options[ 0 ].name
++				props.options[ 0 ].name
+ 			);
+ 
+ 			// Ideally we would test a multi-character typeahead, but anything more than a single character is flaky
+@@ -556,7 +552,7 @@ describe.each( [
+ 
+ 			expect(
+ 				screen.queryByRole( 'listbox', {
+-					name: legacyProps.label,
++					name: props.label,
+ 					hidden: true,
+ 				} )
+ 			).not.toBeInTheDocument();
+@@ -568,7 +564,7 @@ describe.each( [
+ 		} );
+ 
+ 		it( 'Can change selection with a focused input and closed dropdown while pressing arrow keys', async () => {
+-			render( <Component { ...legacyProps } /> );
++			render( <Component { ...props } /> );
+ 
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+ 				expanded: false,
+@@ -578,24 +574,24 @@ describe.each( [
+ 			await press.Tab();
+ 			expect( currentSelectedItem ).toHaveFocus();
+ 			expect( currentSelectedItem ).toHaveTextContent(
+-				legacyProps.options[ 0 ].name
++				props.options[ 0 ].name
+ 			);
+ 
+ 			await press.ArrowDown();
+ 			await press.ArrowDown();
+ 			expect(
+ 				screen.queryByRole( 'listbox', {
+-					name: legacyProps.label,
++					name: props.label,
+ 				} )
+ 			).not.toBeInTheDocument();
+ 
+ 			expect( currentSelectedItem ).toHaveTextContent(
+-				legacyProps.options[ 2 ].name
++				props.options[ 2 ].name
+ 			);
+ 		} );
+ 
+ 		it( 'Should have correct aria-selected value for selections', async () => {
+-			render( <Component { ...legacyProps } /> );
++			render( <Component { ...props } /> );
+ 
+ 			const currentSelectedItem = screen.getByRole( 'combobox', {
+ 				expanded: false,
+@@ -604,8 +600,8 @@ describe.each( [
+ 			await click( currentSelectedItem );
+ 
+ 			// get all items except for first option
+-			const unselectedItems = legacyProps.options.filter(
+-				( { name } ) => name !== legacyProps.options[ 0 ].name
++			const unselectedItems = props.options.filter(
++				( { name } ) => name !== props.options[ 0 ].name
+ 			);
+ 
+ 			// assert that all other items have aria-selected="false"
+@@ -618,7 +614,7 @@ describe.each( [
+ 			// assert that first item has aria-selected="true"
+ 			expect(
+ 				screen.getByRole( 'option', {
+-					name: legacyProps.options[ 0 ].name,
++					name: props.options[ 0 ].name,
+ 					selected: true,
+ 				} )
+ 			).toBeVisible();
+@@ -632,7 +628,7 @@ describe.each( [
+ 			// check that first item is has aria-selected="false" after new selection
+ 			expect(
+ 				screen.getByRole( 'option', {
+-					name: legacyProps.options[ 0 ].name,
++					name: props.options[ 0 ].name,
+ 					selected: false,
+ 				} )
+ 			).toBeVisible();
+@@ -653,7 +649,7 @@ describe.each( [
+ 			render(
+ 				<>
+ 					<Component
+-						{ ...legacyProps }
++						{ ...props }
+ 						onFocus={ onFocusMock }
+ 						onBlur={ onBlurMock }
+ 					/>
+diff --git a/packages/components/src/custom-select-control/types.ts b/packages/components/src/custom-select-control/types.ts
+new file mode 100644
+index 00000000000000..98e9633b02f1a8
+--- /dev/null
++++ b/packages/components/src/custom-select-control/types.ts
+@@ -0,0 +1,123 @@
++/**
++ * External dependencies
++ */
++import type { FocusEventHandler, MouseEventHandler } from 'react';
++
++/**
++ * The object structure for the options array.
++ */
++type Option = {
++	key: string;
++	name: string;
++	style?: React.CSSProperties;
++	className?: string;
++	hint?: string;
++	/**
++	 * Use the `hint` property instead
++	 * @deprecated
++	 * @ignore
++	 */
++	__experimentalHint?: string;
++	[ key: string ]: any;
++};
++
++/**
++ * The object returned from the onChange event.
++ */
++type ChangeObject = {
++	highlightedIndex?: number;
++	inputValue?: string;
++	isOpen?: boolean;
++	type?: string;
++	selectedItem: Option;
++};
++
++export type CustomSelectProps = {
++	/**
++	 * Optional classname for the component.
++	 */
++	className?: string;
++	/**
++	 * Hide the label visually, while keeping available to assistive technology.
++	 */
++	hideLabelFromVision?: boolean;
++	/**
++	 * Description for the select trigger button used by assistive technology.
++	 * If no value is passed, the text "Currently selected: selectedItem.name"
++	 * will be used fully translated.
++	 */
++	describedBy?: string;
++	/**
++	 * Label for the control.
++	 */
++	label: string;
++	/**
++	 * Function called with the control's internal state changes. The `selectedItem`
++	 * property contains the next selected item.
++	 */
++	onChange?: ( newValue: ChangeObject ) => void;
++	/**
++	 * A handler for `blur` events on the trigger button.
++	 *
++	 * @ignore
++	 */
++	onBlur?: FocusEventHandler< HTMLButtonElement >;
++	/**
++	 * A handler for `focus` events on the trigger button.
++	 *
++	 * @ignore
++	 */
++	onFocus?: FocusEventHandler< HTMLButtonElement >;
++	/**
++	 * A handler for `mouseout` events on the trigger button.
++	 *
++	 * @ignore
++	 */
++	onMouseOut?: MouseEventHandler< HTMLButtonElement >;
++	/**
++	 * A handler for `mouseover` events on the trigger button.
++	 *
++	 * @ignore
++	 */
++	onMouseOver?: MouseEventHandler< HTMLButtonElement >;
++	/**
++	 * The list of options that can be chosen from.
++	 */
++	options: Array< Option >;
++	/**
++	 * The size of the control.
++	 *
++	 * @default 'default'
++	 */
++	size?: 'default' | 'small' | '__unstable-large';
++	/**
++	 * Can be used to externally control the value of the control.
++	 */
++	value?: Option;
++	/**
++	 * Use the `showSelectedHint` property instead.
++	 * @deprecated
++	 * @ignore
++	 */
++	__experimentalShowSelectedHint?: boolean;
++	/**
++	 * Show the hint of the selected item in the trigger button.
++	 *
++	 * @default false
++	 */
++	showSelectedHint?: boolean;
++	/**
++	 * Opt-in prop for an unconstrained width style which became the default in
++	 * WordPress 6.5. The prop is no longer needed and can be safely removed.
++	 *
++	 * @deprecated
++	 * @ignore
++	 */
++	__nextUnconstrainedWidth?: boolean;
++	/**
++	 * Start opting into the larger default height that will become the default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next40pxDefaultSize?: boolean;
++};
+diff --git a/packages/components/src/font-size-picker/font-size-picker-select.tsx b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+index 4dd80b45b0ac70..19eaba1cfbecd0 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-select.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+@@ -6,7 +6,7 @@ import { __, sprintf } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import CustomSelectControl from '../custom-select-control-v2/legacy-component';
++import CustomSelectControl from '../custom-select-control';
+ import { parseQuantityAndUnitFromRawValue } from '../unit-control';
+ import type {
+ 	FontSizePickerSelectProps,
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index f3643a1499a02c..f0ea4a4b7e86b8 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -63,7 +63,7 @@ export {
+ 	useCompositeState as __unstableUseCompositeState,
+ } from './composite';
+ export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
+-export { StableCustomSelectControl as CustomSelectControl } from './custom-select-control';
++export { default as CustomSelectControl } from './custom-select-control';
+ export { default as Dashicon } from './dashicon';
+ export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
+ export { default as __experimentalDimensionControl } from './dimension-control';
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 19c8778a1fbda8..5ff39ba364a041 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -8,8 +8,6 @@ import {
+ 	CompositeRow as CompositeRowV2,
+ 	useCompositeStore as useCompositeStoreV2,
+ } from './composite/v2';
+-import { default as CustomSelectControl } from './custom-select-control';
+-import { default as CustomSelectControlV2Legacy } from './custom-select-control-v2/legacy-component';
+ import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
+ import { createPrivateSlotFill } from './slot-fill';
+ import {
+@@ -35,8 +33,6 @@ lock( privateApis, {
+ 	CompositeItemV2,
+ 	CompositeRowV2,
+ 	useCompositeStoreV2,
+-	CustomSelectControlV2Legacy,
+-	CustomSelectControl,
+ 	__experimentalPopoverLegacyPositionToPlacement,
+ 	createPrivateSlotFill,
+ 	ComponentsContext,
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 3858fdb0376afe..c73ee1cb639eed 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -19,7 +19,6 @@
+ @import "./combobox-control/style.scss";
+ @import "./color-palette/style.scss";
+ @import "./custom-gradient-picker/style.scss";
+-@import "./custom-select-control/style.scss";
+ @import "./dimension-control/style.scss";
+ @import "./draggable/style.scss";
+ @import "./drop-zone/style.scss";

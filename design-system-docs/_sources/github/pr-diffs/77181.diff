@@ -1,0 +1,373 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 995286728f0c66..196836627186af 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
+ -   `ColorPicker`: Fix issue where clearing the hex input entirely doesn't reset the selected color to black ([#77912](https://github.com/WordPress/gutenberg/pull/77912)).
+ -   `ExternalLink`: Fix focus outline rendered in wp-admin ([#77935](https://github.com/WordPress/gutenberg/pull/77935)).
++-   `FormTokenField`: Correct `preventDefault` handling for `__experimentalValidateInput` and validate pasted delimiter-separated tokens ([#77181](https://github.com/WordPress/gutenberg/pull/77181)).
+ -   `ColorPalette`: Fix duplicate-key warnings and incorrect selected swatch behavior when multiple palette entries share the same color value ([#78004](https://github.com/WordPress/gutenberg/pull/78004)).
+ 
+ ### Internal
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 25275cdc782dd6..437c006749251a 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -253,7 +253,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 				break;
+ 			case 'Space':
+ 				if ( tokenizeOnSpace ) {
+-					preventDefault = addCurrentToken();
++					preventDefault = addCurrentToken( {
++						preventDefaultOnFailedValidation: false,
++					} );
+ 				}
+ 				break;
+ 			case 'Escape':
+@@ -320,7 +322,65 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		const tokenValue = items[ items.length - 1 ] || '';
+ 
+ 		if ( items.length > 1 ) {
+-			addNewTokens( items.slice( 0, -1 ) );
++			const tokensToProcess = items.slice( 0, -1 );
++
++			// Pre-check: would any segment be rejected by
++			// `__experimentalValidateInput`? Empties and duplicates of the
++			// current selection are intentional skips, not failures.
++			const willFailValidation = ( segment: string ) => {
++				const transformed = saveTransform( segment );
++				return (
++					!! transformed &&
++					! valueContainsToken( transformed ) &&
++					! __experimentalValidateInput( transformed )
++				);
++			};
++			const hasFailures = tokensToProcess.some( willFailValidation );
++
++			// When there are failures, also commit the trailing in-progress
++			// segment so the user is left with only the items that need
++			// fixing, instead of mixing the trailing segment with the failed
++			// ones (which would block tokenization on Enter or comma).
++			const addedTokens = addNewTokens(
++				hasFailures ? items : tokensToProcess
++			);
++
++			if ( hasFailures ) {
++				// Derive rejected segments from `addedTokens` so this stays
++				// in sync with `addNewTokens`'s filter chain.
++				const rejected = items.filter( ( token ) => {
++					const transformed = saveTransform( token );
++					if ( ! transformed ) {
++						return false;
++					}
++					if ( addedTokens.has( transformed ) ) {
++						return false;
++					}
++					if ( valueContainsToken( transformed ) ) {
++						return false;
++					}
++					return ! __experimentalValidateInput( transformed );
++				} );
++
++				// Reuse the separator the user actually used (the last one
++				// in `text`) so we don't rewrite their input: comma-separated
++				// paste under `tokenizeOnSpace` stays comma-separated, and
++				// typed space under `tokenizeOnSpace` stays a space. Falls
++				// back to the mode-appropriate separator only when no
++				// separator characters are present in `text`.
++				const usedSeparators = text.match( /[ ,\t]/g );
++				const separatorChar =
++					usedSeparators?.[ usedSeparators.length - 1 ] ??
++					( tokenizeOnSpace ? ' ' : ',' );
++				// Preserve a trailing separator when the input ended with
++				// one, so the user can keep typing past a failed-validation
++				// space without their separator disappearing.
++				const trailing = tokenValue === '' ? separatorChar : '';
++				const remaining = rejected.join( separatorChar ) + trailing;
++				setIncompleteTokenValue( remaining );
++				onInputChange( remaining );
++				return;
++			}
+ 		}
+ 		setIncompleteTokenValue( tokenValue );
+ 		onInputChange( tokenValue );
+@@ -417,7 +477,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 			addNewToken( incompleteTokenValue );
+ 		}
+ 
+-		return true; // PreventDefault.
++		// Comma is always a separator (typed in onKeyPress, never as input).
++		// Pasted commas go through onInputChangeHandler, which validates.
++		return true;
+ 	}
+ 
+ 	function moveInputToIndex( index: number ) {
+@@ -454,7 +516,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		}
+ 	}
+ 
+-	function addCurrentToken() {
++	function addCurrentToken( {
++		preventDefaultOnFailedValidation = true,
++	} = {} ) {
+ 		let preventDefault = false;
+ 		const selectedSuggestion = getSelectedSuggestion();
+ 
+@@ -462,20 +526,22 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 			addNewToken( selectedSuggestion );
+ 			preventDefault = true;
+ 		} else if ( inputHasValidValue() ) {
+-			addNewToken( incompleteTokenValue );
+-			preventDefault = true;
++			const passedValidation = addNewToken( incompleteTokenValue );
++			preventDefault =
++				passedValidation || preventDefaultOnFailedValidation;
+ 		}
+ 
+ 		return preventDefault;
+ 	}
+ 
+-	function addNewTokens( tokens: string[] ) {
++	function addNewTokens( tokens: string[] ): Set< string > {
+ 		const tokensToAdd = [
+ 			...new Set(
+ 				tokens
+ 					.map( saveTransform )
+ 					.filter( Boolean )
+ 					.filter( ( token ) => ! valueContainsToken( token ) )
++					.filter( ( token ) => __experimentalValidateInput( token ) )
+ 			),
+ 		];
+ 
+@@ -484,12 +550,20 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 			newValue.splice( getIndexOfInput(), 0, ...tokensToAdd );
+ 			onChange( newValue );
+ 		}
++
++		return new Set( tokensToAdd );
+ 	}
+ 
++	/**
++	 * Validates and adds `token`. Returns `true` if validation passed,
++	 * `false` if it was rejected by `__experimentalValidateInput`. A `true`
++	 * return does not guarantee the token was added: `addNewTokens` may
++	 * still drop it as a duplicate or after `saveTransform` returns empty.
++	 */
+ 	function addNewToken( token: string ) {
+ 		if ( ! __experimentalValidateInput( token ) ) {
+ 			speak( messages.__experimentalInvalid, 'assertive' );
+-			return;
++			return false;
+ 		}
+ 		addNewTokens( [ token ] );
+ 		speak( messages.added, 'assertive' );
+@@ -502,6 +576,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		if ( isActive && ! tokenizeOnBlur ) {
+ 			focus();
+ 		}
++
++		return true;
+ 	}
+ 
+ 	function deleteToken( token: string | TokenItem ) {
+diff --git a/packages/components/src/form-token-field/test/index.tsx b/packages/components/src/form-token-field/test/index.tsx
+index eb5e9189f007fd..89cc2ab97385b9 100644
+--- a/packages/components/src/form-token-field/test/index.tsx
++++ b/packages/components/src/form-token-field/test/index.tsx
+@@ -1929,6 +1929,195 @@ describe( 'FormTokenField', () => {
+ 			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
+ 			expectTokensToBeInTheDocument( [ 'cherry', 'Cranberry' ] );
+ 		} );
++
++		it( 'should still preventDefault on Enter when validation rejects the value', async () => {
++			const user = userEvent.setup();
++
++			const onChangeSpy = jest.fn();
++			const onSubmitSpy = jest.fn( ( e: React.FormEvent ) =>
++				e.preventDefault()
++			);
++			const startsWithCapitalLetter = ( tokenText: string ) =>
++				/^[A-Z]/.test( tokenText );
++
++			render(
++				<form onSubmit={ onSubmitSpy }>
++					<FormTokenFieldWithState
++						onChange={ onChangeSpy }
++						__experimentalValidateInput={ startsWithCapitalLetter }
++					/>
++				</form>
++			);
++
++			const input = screen.getByRole( 'combobox' );
++
++			// Type 'hello' — lowercase, fails validation.
++			// Press Enter — should NOT submit the parent form.
++			await user.type( input, 'hello[Enter]' );
++			expect( onChangeSpy ).not.toHaveBeenCalled();
++			expect( onSubmitSpy ).not.toHaveBeenCalled();
++			expect( input ).toHaveValue( 'hello' );
++		} );
++
++		it( 'should not preventDefault on space when validation fails and `tokenizeOnSpace` is true', async () => {
++			const user = userEvent.setup();
++
++			const onChangeSpy = jest.fn();
++			const startsWithCapitalLetter = ( tokenText: string ) =>
++				/^[A-Z]/.test( tokenText );
++
++			render(
++				<FormTokenFieldWithState
++					onChange={ onChangeSpy }
++					tokenizeOnSpace
++					__experimentalValidateInput={ startsWithCapitalLetter }
++				/>
++			);
++
++			const input = screen.getByRole( 'combobox' );
++
++			// Type 'hello ', lowercase, fails validation.
++			// The space should be typed into the input (not prevented), and
++			// the trailing space should be preserved by the rejoin so the
++			// user can keep typing past the failed-validation space.
++			await user.type( input, 'hello ' );
++			expect( onChangeSpy ).not.toHaveBeenCalled();
++			expect( input ).toHaveValue( 'hello ' );
++
++			// User can keep typing past the failed-validation space.
++			await user.type( input, 'w' );
++			expect( input ).toHaveValue( 'hello w' );
++
++			// Clear and type 'Hello ', capital letter, passes validation.
++			// The space should be prevented, and a token should be created.
++			await user.clear( input );
++			await user.type( input, 'Hello ' );
++			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
++			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Hello' ] );
++			expectTokensToBeInTheDocument( [ 'Hello' ] );
++		} );
++
++		it( 'should filter out invalid tokens when pasting with separators', async () => {
++			const user = userEvent.setup();
++
++			const onChangeSpy = jest.fn();
++			const startsWithCapitalLetter = ( tokenText: string ) =>
++				/^[A-Z]/.test( tokenText );
++
++			render(
++				<FormTokenFieldWithState
++					onChange={ onChangeSpy }
++					__experimentalValidateInput={ startsWithCapitalLetter }
++				/>
++			);
++
++			const input = screen.getByRole( 'combobox' );
++
++			// Paste values separated by comma, only valid ones should be added.
++			// Uses paste (not type) because comma keystrokes go through
++			// handleCommaKey, while pasted text goes through
++			// onInputChangeHandler which splits by separator.
++			await user.click( input );
++			await user.paste( 'Apple,banana,Cherry,' );
++			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
++			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
++			expectTokensNotToBeInTheDocument( [ 'banana' ] );
++			expect( input ).toHaveValue( 'banana,' );
++		} );
++
++		it( 'should leave all segments in the input when none pass validation on paste', async () => {
++			const user = userEvent.setup();
++
++			const onChangeSpy = jest.fn();
++			const startsWithCapitalLetter = ( tokenText: string ) =>
++				/^[A-Z]/.test( tokenText );
++
++			render(
++				<FormTokenFieldWithState
++					onChange={ onChangeSpy }
++					__experimentalValidateInput={ startsWithCapitalLetter }
++				/>
++			);
++
++			const input = screen.getByRole( 'combobox' );
++
++			await user.click( input );
++			await user.paste( 'apple,banana,cherry,' );
++
++			expect( onChangeSpy ).not.toHaveBeenCalled();
++			expect( input ).toHaveValue( 'apple,banana,cherry,' );
++		} );
++
++		it( 'should commit a trailing valid segment and leave only failed segments in the input when pasting without a trailing separator', async () => {
++			const user = userEvent.setup();
++
++			const onChangeSpy = jest.fn();
++			const startsWithCapitalLetter = ( tokenText: string ) =>
++				/^[A-Z]/.test( tokenText );
++
++			render(
++				<FormTokenFieldWithState
++					onChange={ onChangeSpy }
++					__experimentalValidateInput={ startsWithCapitalLetter }
++				/>
++			);
++
++			const input = screen.getByRole( 'combobox' );
++
++			await user.click( input );
++			await user.paste( 'Apple,banana,Cherry' );
++
++			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
++			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
++			expect( input ).toHaveValue( 'banana' );
++		} );
++
++		it( 'should not leave a duplicate of an existing token in the input when pasting comma-separated values', async () => {
++			const user = userEvent.setup();
++
++			const onChangeSpy = jest.fn();
++
++			render(
++				<FormTokenFieldWithState
++					onChange={ onChangeSpy }
++					initialValue={ [ 'Apple' ] }
++				/>
++			);
++
++			const input = screen.getByRole( 'combobox' );
++
++			await user.click( input );
++			await user.paste( 'Apple,Cherry,' );
++
++			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
++			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
++			expect( input ).toHaveValue( '' );
++		} );
++
++		it( 'should not leave a duplicate of an existing token in the input when pasting comma-separated values with `__experimentalValidateInput`', async () => {
++			const user = userEvent.setup();
++
++			const onChangeSpy = jest.fn();
++			const startsWithCapitalLetter = ( tokenText: string ) =>
++				/^[A-Z]/.test( tokenText );
++
++			render(
++				<FormTokenFieldWithState
++					onChange={ onChangeSpy }
++					initialValue={ [ 'Apple' ] }
++					__experimentalValidateInput={ startsWithCapitalLetter }
++				/>
++			);
++
++			const input = screen.getByRole( 'combobox' );
++
++			await user.click( input );
++			await user.paste( 'Apple,Cherry,' );
++
++			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
++			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
++			expect( input ).toHaveValue( '' );
++		} );
+ 	} );
+ 
+ 	describe( 'maxLength', () => {

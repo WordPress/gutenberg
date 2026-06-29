@@ -1,0 +1,68 @@
+diff --git a/packages/block-library/CHANGELOG.md b/packages/block-library/CHANGELOG.md
+index c76eacd5a4bee5..cd14c01884fe1e 100644
+--- a/packages/block-library/CHANGELOG.md
++++ b/packages/block-library/CHANGELOG.md
+@@ -1,3 +1,10 @@
++## Master
++
++### Bug Fixes
++
++- Fixes a regression published in version 2.9.2 that would prevent some build tools from including
++  styles provided in the packages build-styles directory.
++
+ ## 2.7.0 (2019-08-05)
+ 
+ ### Enhancements
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index 24548f9ac74dbe..2febb3b766bae8 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -20,7 +20,9 @@
+ 	"main": "build/index.js",
+ 	"module": "build-module/index.js",
+ 	"react-native": "src/index",
+-	"sideEffects": false,
++	"sideEffects": [
++		"build-style/**"
++	],
+ 	"dependencies": {
+ 		"@babel/runtime": "^7.4.4",
+ 		"@wordpress/a11y": "file:../a11y",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 53da8b20317efa..060a33a9e8c17c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,12 +4,17 @@
+ 
+ - Added a new `Guide` component which allows developers to easily present a user guide.
+ 
+-### Breaking Change
++### Breaking Changes
+ 
+ - `is-button` classname has been removed from the Button component.
+ - The `is-default` classname is not applied automatically anymore.
+ - By default Button components come with a fixed height and hover styles.
+ 
++### Bug Fixes
++
++- Fixes a regression published in version 8.5.0 that would prevent some build tools from including
++  styles provided in the packages build-styles directory.
++
+ ### Deprecations
+ 
+ - `isDefault` prop in `Button` has been deprecated. Consider using `isSecondary` instead. 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 534e93af5cf2c0..5dc8d5fa39443d 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -20,7 +20,9 @@
+ 	"main": "build/index.js",
+ 	"module": "build-module/index.js",
+ 	"react-native": "src/index",
+-	"sideEffects": false,
++	"sideEffects": [
++		"build-style/**"
++	],
+ 	"dependencies": {
+ 		"@babel/runtime": "^7.4.4",
+ 		"@emotion/core": "^10.0.22",

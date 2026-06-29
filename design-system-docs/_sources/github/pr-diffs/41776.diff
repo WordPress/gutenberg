@@ -1,0 +1,125 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 463f5a693785c0..04c6202ca446a2 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -90,6 +90,7 @@ module.exports = {
+ 							'isArray',
+ 							'isFinite',
+ 							'isFunction',
++							'isNumber',
+ 							'isObjectLike',
+ 							'isUndefined',
+ 							'keys',
+diff --git a/packages/annotations/src/store/reducer.js b/packages/annotations/src/store/reducer.js
+index d8e3c4e7451d9b..9209fa6f2230d8 100644
+--- a/packages/annotations/src/store/reducer.js
++++ b/packages/annotations/src/store/reducer.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isNumber, mapValues } from 'lodash';
++import { mapValues } from 'lodash';
+ 
+ /**
+  * Filters an array based on the predicate, but keeps the reference the same if
+@@ -28,8 +28,8 @@ function filterWithReference( collection, predicate ) {
+  */
+ function isValidAnnotationRange( annotation ) {
+ 	return (
+-		isNumber( annotation.start ) &&
+-		isNumber( annotation.end ) &&
++		typeof annotation.start === 'number' &&
++		typeof annotation.end === 'number' &&
+ 		annotation.start <= annotation.end
+ 	);
+ }
+diff --git a/packages/components/src/box-control/utils.js b/packages/components/src/box-control/utils.js
+index c3178174027cf4..689df3d67d9851 100644
+--- a/packages/components/src/box-control/utils.js
++++ b/packages/components/src/box-control/utils.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEmpty, isNumber } from 'lodash';
++import { isEmpty } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -82,16 +82,16 @@ export function getAllValue(
+ 		: '';
+ 
+ 	/**
+-	 * The isNumber check is important. On reset actions, the incoming value
++	 * The typeof === 'number' check is important. On reset actions, the incoming value
+ 	 * may be null or an empty string.
+ 	 *
+ 	 * Also, the value may also be zero (0), which is considered a valid unit value.
+ 	 *
+-	 * isNumber() is more specific for these cases, rather than relying on a
++	 * typeof === 'number' is more specific for these cases, rather than relying on a
+ 	 * simple truthy check.
+ 	 */
+ 	let commonUnit;
+-	if ( isNumber( commonQuantity ) ) {
++	if ( typeof commonQuantity === 'number' ) {
+ 		commonUnit = mode( allParsedUnits );
+ 	} else {
+ 		// Set meaningful unit selection if no commonQuantity and user has previously
+diff --git a/packages/element/src/utils.js b/packages/element/src/utils.js
+index d3a9d10251af34..a7f0393ec97f9a 100644
+--- a/packages/element/src/utils.js
++++ b/packages/element/src/utils.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isNumber, isString } from 'lodash';
++import { isString } from 'lodash';
+ 
+ /**
+  * Checks if the provided WP element is empty.
+@@ -10,7 +10,7 @@ import { isNumber, isString } from 'lodash';
+  * @return {boolean} True when an element is considered empty.
+  */
+ export const isEmptyElement = ( element ) => {
+-	if ( isNumber( element ) ) {
++	if ( typeof element === 'number' ) {
+ 		return false;
+ 	}
+ 
+diff --git a/packages/shortcode/src/index.js b/packages/shortcode/src/index.js
+index 14df449f5fa9ec..b03067b5311dd4 100644
+--- a/packages/shortcode/src/index.js
++++ b/packages/shortcode/src/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { extend, pick, isString, isEqual, forEach, isNumber } from 'lodash';
++import { extend, pick, isString, isEqual, forEach } from 'lodash';
+ import memize from 'memize';
+ 
+ /**
+@@ -316,7 +316,9 @@ extend( shortcode.prototype, {
+ 	 * @return {string} Attribute value.
+ 	 */
+ 	get( attr ) {
+-		return this.attrs[ isNumber( attr ) ? 'numeric' : 'named' ][ attr ];
++		return this.attrs[ typeof attr === 'number' ? 'numeric' : 'named' ][
++			attr
++		];
+ 	},
+ 
+ 	/**
+@@ -331,7 +333,8 @@ extend( shortcode.prototype, {
+ 	 * @return {WPShortcode} Shortcode instance.
+ 	 */
+ 	set( attr, value ) {
+-		this.attrs[ isNumber( attr ) ? 'numeric' : 'named' ][ attr ] = value;
++		this.attrs[ typeof attr === 'number' ? 'numeric' : 'named' ][ attr ] =
++			value;
+ 		return this;
+ 	},
+ 

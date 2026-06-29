@@ -1,0 +1,72 @@
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index 8df96260c80664..ff8df073a5a08a 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -109,8 +109,8 @@ $z-layers: (
+ 	// Above the block list and the header.
+ 	".block-editor-block-popover": 31,
+ 
+-	// Show snackbars above everything (similar to popovers)
+-	".components-snackbar-list": 100000,
++	// Show snackbars above everything, including modals (similar to popovers)
++	".components-snackbar-list": 100001,
+ 
+ 	// Show modal under the wp-admin menus and the popover
+ 	".components-modal__screen-overlay": 100000,
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fee3c9b8bf44a7..92ec6d1c5eea55 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Bug Fix
+ 
+ -   `PaletteEdit`: Fix padding in RTL languages ([#54034](https://github.com/WordPress/gutenberg/pull/54034)).
++-   `Snackbar`: Re-position Snackbar above Modals ([#54153](https://github.com/WordPress/gutenberg/pull/54153)).
+ 
+ ## 25.7.0 (2023-08-31)
+ 
+diff --git a/packages/components/src/snackbar/list.tsx b/packages/components/src/snackbar/list.tsx
+index 631cf48d953a23..da089e37868eed 100644
+--- a/packages/components/src/snackbar/list.tsx
++++ b/packages/components/src/snackbar/list.tsx
+@@ -7,7 +7,7 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { useReducedMotion } from '@wordpress/compose';
+-import { useRef } from '@wordpress/element';
++import { createPortal, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -72,7 +72,7 @@ export function SnackbarList( {
+ 	const removeNotice =
+ 		( notice: SnackbarListProps[ 'notices' ][ number ] ) => () =>
+ 			onRemove?.( notice.id );
+-	return (
++	return createPortal(
+ 		<div className={ className } tabIndex={ -1 } ref={ listRef }>
+ 			{ children }
+ 			<AnimatePresence>
+@@ -103,7 +103,8 @@ export function SnackbarList( {
+ 					);
+ 				} ) }
+ 			</AnimatePresence>
+-		</div>
++		</div>,
++		document.body
+ 	);
+ }
+ 
+diff --git a/packages/components/src/snackbar/style.scss b/packages/components/src/snackbar/style.scss
+index 3cae9c8ef65d49..bc443f56036af0 100644
+--- a/packages/components/src/snackbar/style.scss
++++ b/packages/components/src/snackbar/style.scss
+@@ -78,6 +78,8 @@
+ 
+ .components-snackbar-list {
+ 	position: absolute;
++	bottom: $grid-unit-50;
++	left: $grid-unit-20;
+ 	z-index: z-index(".components-snackbar-list");
+ 	width: 100%;
+ 	box-sizing: border-box;

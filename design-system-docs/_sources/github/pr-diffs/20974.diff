@@ -1,0 +1,29 @@
+diff --git a/packages/components/src/toolbar-button/stories/index.js b/packages/components/src/toolbar-button/stories/index.js
+new file mode 100644
+index 00000000000000..1bb0475003e161
+--- /dev/null
++++ b/packages/components/src/toolbar-button/stories/index.js
+@@ -0,0 +1,23 @@
++/**
++ * External dependencies
++ */
++import { text } from '@storybook/addon-knobs';
++
++/**
++ * Internal dependencies
++ */
++import { Toolbar } from '../../';
++import ToolbarButton from '../';
++
++export default { title: 'Components/ToolbarButton', component: ToolbarButton };
++
++export const _default = () => {
++	const label = text( 'Label', 'This is an example label.' );
++	const icon = text( 'Icon', 'wordpress' );
++
++	return (
++		<Toolbar __experimentalAccessibilityLabel="Example Toolbar">
++			<ToolbarButton icon={ icon } label={ label } />
++		</Toolbar>
++	);
++};

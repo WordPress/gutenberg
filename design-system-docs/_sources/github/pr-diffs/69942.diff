@@ -1,0 +1,15 @@
+diff --git a/packages/components/src/dropdown-menu/style.scss b/packages/components/src/dropdown-menu/style.scss
+index 29fd6db18ba283..06510dc89eea1b 100644
+--- a/packages/components/src/dropdown-menu/style.scss
++++ b/packages/components/src/dropdown-menu/style.scss
+@@ -34,6 +34,10 @@
+ 			height: 1px;
+ 		}
+ 
++		svg {
++			min-width: $icon-size;
++		}
++
+ 		&.is-active {
+ 			svg,
+ 			.dashicon {

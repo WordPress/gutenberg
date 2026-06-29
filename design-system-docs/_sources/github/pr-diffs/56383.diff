@@ -1,0 +1,33 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eb6e595e304ecf..eafd53a3dc1a73 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements 
++
++-   `Button`: Add focus rings to focusable disabled buttons ([#56383](https://github.com/WordPress/gutenberg/pull/56383)).
++
+ ### Experimental
+ 
+ -   `Tabs`: Memoize and expose the component context ([#56224](https://github.com/WordPress/gutenberg/pull/56224)).
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 03273056cfa179..4b11d9169a0905 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -129,8 +129,11 @@
+ 			background: transparent;
+ 			transform: none;
+ 			opacity: 1;
+-			box-shadow: none;
+-			outline: none;
++
++			&:not(:focus) {
++				box-shadow: none;
++				outline: none;
++			}
+ 		}
+ 	}
+ 

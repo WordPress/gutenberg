@@ -1,0 +1,307 @@
+diff --git a/packages/block-editor/src/components/block-info-slot-fill/index.js b/packages/block-editor/src/components/block-info-slot-fill/index.js
+new file mode 100644
+index 00000000000000..bba49bc7cc6375
+--- /dev/null
++++ b/packages/block-editor/src/components/block-info-slot-fill/index.js
+@@ -0,0 +1,17 @@
++/**
++ * WordPress dependencies
++ */
++import { privateApis as componentsPrivateApis } from '@wordpress/components';
++
++/**
++ * Internal dependencies
++ */
++import { unlock } from '../../lock-unlock';
++
++const { createPrivateSlotFill } = unlock( componentsPrivateApis );
++const { Fill, Slot } = createPrivateSlotFill( 'BlockInformation' );
++
++const BlockInfo = ( props ) => <Fill { ...props } />;
++BlockInfo.Slot = ( props ) => <Slot { ...props } />;
++
++export default BlockInfo;
+diff --git a/packages/block-editor/src/components/block-inspector/index.js b/packages/block-editor/src/components/block-inspector/index.js
+index b2fd086a2a29c7..199f4f4628b4bf 100644
+--- a/packages/block-editor/src/components/block-inspector/index.js
++++ b/packages/block-editor/src/components/block-inspector/index.js
+@@ -37,6 +37,7 @@ import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-c
+ import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
+ import PositionControls from '../inspector-controls-tabs/position-controls-panel';
+ import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
++import BlockInfo from '../block-info-slot-fill';
+ 
+ function useContentBlocks( blockTypes, block ) {
+ 	const contentBlocksObjectAux = useMemo( () => {
+@@ -115,6 +116,7 @@ function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
+ 				className={ blockInformation.isSynced && 'is-synced' }
+ 			/>
+ 			<BlockVariationTransforms blockClientId={ topLevelLockedBlock } />
++			<BlockInfo.Slot />
+ 			<VStack
+ 				spacing={ 1 }
+ 				padding={ 4 }
+@@ -326,6 +328,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
+ 				className={ blockInformation.isSynced && 'is-synced' }
+ 			/>
+ 			<BlockVariationTransforms blockClientId={ clientId } />
++			<BlockInfo.Slot />
+ 			{ showTabs && (
+ 				<InspectorControlsTabs
+ 					hasBlockStyles={ hasBlockStyles }
+diff --git a/packages/block-editor/src/private-apis.js b/packages/block-editor/src/private-apis.js
+index ceb6bcd0e31c02..81fb256c1f2833 100644
+--- a/packages/block-editor/src/private-apis.js
++++ b/packages/block-editor/src/private-apis.js
+@@ -9,6 +9,7 @@ import LeafMoreMenu from './components/off-canvas-editor/leaf-more-menu';
+ import ResizableBoxPopover from './components/resizable-box-popover';
+ import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
+ import { PrivateListView } from './components/list-view';
++import BlockInfo from './components/block-info-slot-fill';
+ 
+ /**
+  * Private @wordpress/block-editor APIs.
+@@ -22,4 +23,5 @@ lock( privateApis, {
+ 	PrivateInserter,
+ 	PrivateListView,
+ 	ResizableBoxPopover,
++	BlockInfo,
+ } );
+diff --git a/packages/block-library/src/query/edit/inspector-controls/create-new-post-link.js b/packages/block-library/src/query/edit/inspector-controls/create-new-post-link.js
+new file mode 100644
+index 00000000000000..ac9904f0f2d514
+--- /dev/null
++++ b/packages/block-library/src/query/edit/inspector-controls/create-new-post-link.js
+@@ -0,0 +1,26 @@
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++import { createInterpolateElement } from '@wordpress/element';
++import { addQueryArgs } from '@wordpress/url';
++
++const CreateNewPostLink = ( {
++	attributes: { query: { postType } = {} } = {},
++} ) => {
++	if ( ! postType ) return null;
++	const newPostUrl = addQueryArgs( 'post-new.php', {
++		post_type: postType,
++	} );
++	return (
++		<div className="wp-block-query__create-new-link">
++			{ createInterpolateElement(
++				__( '<a>Add new post</a>' ),
++				// eslint-disable-next-line jsx-a11y/anchor-has-content
++				{ a: <a href={ newPostUrl } /> }
++			) }
++		</div>
++	);
++};
++
++export default CreateNewPostLink;
+diff --git a/packages/block-library/src/query/edit/inspector-controls/index.js b/packages/block-library/src/query/edit/inspector-controls/index.js
+index 95ccb43e58452a..2222f7d2d1eff3 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/index.js
++++ b/packages/block-library/src/query/edit/inspector-controls/index.js
+@@ -12,7 +12,10 @@ import {
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+-import { InspectorControls } from '@wordpress/block-editor';
++import {
++	InspectorControls,
++	privateApis as blockEditorPrivateApis,
++} from '@wordpress/block-editor';
+ import { debounce } from '@wordpress/compose';
+ import { useEffect, useState, useCallback } from '@wordpress/element';
+ 
+@@ -24,6 +27,8 @@ import AuthorControl from './author-control';
+ import ParentControl from './parent-control';
+ import { TaxonomyControls } from './taxonomy-controls';
+ import StickyControl from './sticky-control';
++import CreateNewPostLink from './create-new-post-link';
++import { unlock } from '../../../private-apis';
+ import {
+ 	usePostTypes,
+ 	useIsPostTypeHierarchical,
+@@ -32,11 +37,10 @@ import {
+ 	useTaxonomies,
+ } from '../../utils';
+ 
+-export default function QueryInspectorControls( {
+-	attributes,
+-	setQuery,
+-	setDisplayLayout,
+-} ) {
++const { BlockInfo } = unlock( blockEditorPrivateApis );
++
++export default function QueryInspectorControls( props ) {
++	const { attributes, setQuery, setDisplayLayout } = props;
+ 	const { query, displayLayout } = attributes;
+ 	const {
+ 		order,
+@@ -127,6 +131,9 @@ export default function QueryInspectorControls( {
+ 
+ 	return (
+ 		<>
++			<BlockInfo>
++				<CreateNewPostLink { ...props } />
++			</BlockInfo>
+ 			{ showSettingsPanel && (
+ 				<InspectorControls>
+ 					<PanelBody title={ __( 'Settings' ) }>
+diff --git a/packages/block-library/src/query/hooks.js b/packages/block-library/src/query/hooks.js
+index b2bb32a7be7b4e..1f367e13d019f3 100644
+--- a/packages/block-library/src/query/hooks.js
++++ b/packages/block-library/src/query/hooks.js
+@@ -5,8 +5,14 @@ import { __ } from '@wordpress/i18n';
+ import { createInterpolateElement } from '@wordpress/element';
+ import { addQueryArgs } from '@wordpress/url';
+ import { createHigherOrderComponent } from '@wordpress/compose';
+-import { InspectorControls } from '@wordpress/block-editor';
++import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+ 
++/**
++ * Internal dependencies
++ */
++import { unlock } from '../private-apis';
++
++const { BlockInfo } = unlock( blockEditorPrivateApis );
+ const CreateNewPostLink = ( {
+ 	attributes: { query: { postType } = {} } = {},
+ } ) => {
+@@ -17,7 +23,7 @@ const CreateNewPostLink = ( {
+ 	return (
+ 		<div className="wp-block-query__create-new-link">
+ 			{ createInterpolateElement(
+-				__( '<a>Create a new post</a> for this feed.' ),
++				__( '<a>Add new post</a>' ),
+ 				// eslint-disable-next-line jsx-a11y/anchor-has-content
+ 				{ a: <a href={ newPostUrl } /> }
+ 			) }
+@@ -31,7 +37,7 @@ const CreateNewPostLink = ( {
+  * @param {Function} BlockEdit Original component
+  * @return {Function}           Wrapped component
+  */
+-const queryTopInspectorControls = createHigherOrderComponent(
++const queryTopBlockInfo = createHigherOrderComponent(
+ 	( BlockEdit ) => ( props ) => {
+ 		const { name, isSelected } = props;
+ 		if ( name !== 'core/query' || ! isSelected ) {
+@@ -40,14 +46,14 @@ const queryTopInspectorControls = createHigherOrderComponent(
+ 
+ 		return (
+ 			<>
+-				<InspectorControls>
++				<BlockInfo>
+ 					<CreateNewPostLink { ...props } />
+-				</InspectorControls>
++				</BlockInfo>
+ 				<BlockEdit key="edit" { ...props } />
+ 			</>
+ 		);
+ 	},
+-	'withInspectorControls'
++	'withBlockInfo'
+ );
+ 
+-export default queryTopInspectorControls;
++export default queryTopBlockInfo;
+diff --git a/packages/block-library/src/query/index.js b/packages/block-library/src/query/index.js
+index baf58470b76ac0..8d82391923603e 100644
+--- a/packages/block-library/src/query/index.js
++++ b/packages/block-library/src/query/index.js
+@@ -2,7 +2,6 @@
+  * WordPress dependencies
+  */
+ import { loop as icon } from '@wordpress/icons';
+-import { addFilter } from '@wordpress/hooks';
+ 
+ /**
+  * Internal dependencies
+@@ -13,7 +12,6 @@ import edit from './edit';
+ import save from './save';
+ import variations from './variations';
+ import deprecated from './deprecated';
+-import queryInspectorControls from './hooks';
+ 
+ const { name } = metadata;
+ export { metadata, name };
+@@ -26,8 +24,4 @@ export const settings = {
+ 	deprecated,
+ };
+ 
+-export const init = () => {
+-	addFilter( 'editor.BlockEdit', 'core/query', queryInspectorControls );
+-
+-	return initBlock( { name, metadata, settings } );
+-};
++export const init = () => initBlock( { name, metadata, settings } );
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2566d6c4dc2c78..c92b198dff8f3c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,7 +7,7 @@
+ -   `TreeGrid`: Modify keyboard navigation code to use a data-expanded attribute if aria-expanded is to be controlled outside of the TreeGrid component ([#48461](https://github.com/WordPress/gutenberg/pull/48461)).
+ -   `Modal`: Equalize internal spacing ([#49890](https://github.com/WordPress/gutenberg/pull/49890)).
+ -   `Modal`: Increased border radius ([#49870](https://github.com/WordPress/gutenberg/pull/49870)).
+-
++-   `SlotFill`: Added util for creating private SlotFills and supporting Symbol keys ([#49819](https://github.com/WordPress/gutenberg/pull/49819)).
+ 
+ ### Documentation
+ 
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 07efc6f6a039b5..e114559e5088c2 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -8,6 +8,7 @@ import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/pri
+  */
+ import { default as CustomSelectControl } from './custom-select-control';
+ import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
++import { createPrivateSlotFill } from './slot-fill';
+ 
+ export const { lock, unlock } =
+ 	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+@@ -19,4 +20,5 @@ export const privateApis = {};
+ lock( privateApis, {
+ 	CustomSelectControl,
+ 	__experimentalPopoverLegacyPositionToPlacement,
++	createPrivateSlotFill,
+ } );
+diff --git a/packages/components/src/slot-fill/index.js b/packages/components/src/slot-fill/index.js
+index 18aea104677012..24e68aa8877044 100644
+--- a/packages/components/src/slot-fill/index.js
++++ b/packages/components/src/slot-fill/index.js
+@@ -44,13 +44,14 @@ export function Provider( { children, ...props } ) {
+ 	);
+ }
+ 
+-export function createSlotFill( name ) {
+-	const FillComponent = ( props ) => <Fill name={ name } { ...props } />;
+-	FillComponent.displayName = name + 'Fill';
++export function createSlotFill( key ) {
++	const baseName = typeof key === 'symbol' ? key.description : key;
++	const FillComponent = ( props ) => <Fill name={ key } { ...props } />;
++	FillComponent.displayName = `${ baseName }Fill`;
+ 
+-	const SlotComponent = ( props ) => <Slot name={ name } { ...props } />;
+-	SlotComponent.displayName = name + 'Slot';
+-	SlotComponent.__unstableName = name;
++	const SlotComponent = ( props ) => <Slot name={ key } { ...props } />;
++	SlotComponent.displayName = `${ baseName }Slot`;
++	SlotComponent.__unstableName = key;
+ 
+ 	return {
+ 		Fill: FillComponent,
+@@ -58,4 +59,11 @@ export function createSlotFill( name ) {
+ 	};
+ }
+ 
++export const createPrivateSlotFill = ( name ) => {
++	const privateKey = Symbol( name );
++	const privateSlotFill = createSlotFill( privateKey );
++
++	return { privateKey, ...privateSlotFill };
++};
++
+ export { useSlot };

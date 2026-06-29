@@ -1,0 +1,158 @@
+diff --git a/packages/block-library/src/template-part/editor.scss b/packages/block-library/src/template-part/editor.scss
+index c60f93c1874b5b..37384a08574b15 100644
+--- a/packages/block-library/src/template-part/editor.scss
++++ b/packages/block-library/src/template-part/editor.scss
+@@ -17,9 +17,10 @@
+ 
+ .block-library-template-part__selection-search {
+ 	background: $white;
++	box-shadow: 0 -$grid-unit-10 0 6px $white; // Fill in the space around the search.
+ 	position: sticky;
+ 	top: 0;
+-	padding: $grid-unit-20 0;
++	padding: $grid-unit-10 0;
+ 	z-index: z-index(".block-library-template-part__selection-search");
+ }
+ 
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index 0933f836892f1d..1a3d67e43c312c 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -5,7 +5,7 @@
+ 	right: 0;
+ 	bottom: 0;
+ 	left: 0;
+-	background-color: rgba($black, 0.35);
++	background-color: rgba($black, 0.4);
+ 	z-index: z-index(".components-modal__screen-overlay");
+ 	display: flex;
+ 	// backdrop-filter: blur($grid-unit);
+@@ -45,8 +45,8 @@
+ 				max-height: none;
+ 			}
+ 			@include break-medium() {
+-				width: calc(100% - #{ $grid-unit-50 * 2 });
+-				height: calc(100% - #{ $grid-unit-50 * 2 });
++				width: calc(100% - #{ $header-height * 2 + $border-width });
++				height: calc(100% - #{ $header-height * 2 + $border-width });
+ 				max-width: none;
+ 			}
+ 		}
+@@ -91,13 +91,12 @@
+ // modal screen).
+ .components-modal__header {
+ 	box-sizing: border-box;
+-	border-bottom: $border-width solid transparent;
+-	padding: $grid-unit-30 $grid-unit-40 $grid-unit-10;
++	padding: 0 $grid-unit-40;
+ 	display: flex;
+ 	flex-direction: row;
+ 	justify-content: space-between;
+ 	align-items: center;
+-	height: $header-height + $grid-unit-15;
++	height: $header-height + $grid-unit-10;
+ 	width: 100%;
+ 	z-index: z-index(".components-modal__header");
+ 	position: absolute;
+@@ -120,7 +119,7 @@
+ 	}
+ 
+ 	.components-modal__content.has-scrolled-content:not(.hide-header) & {
+-		border-bottom-color: $gray-300;
++		box-shadow: 0 0 0 1px rgba($black, 0.13);
+ 	}
+ 
+ 	& + p {
+@@ -149,9 +148,9 @@
+ // Modal contents.
+ .components-modal__content {
+ 	flex: 1;
+-	margin-top: $header-height + $grid-unit-15;
++	margin-top: $header-height + $grid-unit-10;
+ 	// Small top padding required to avoid cutting off the visible outline when the first child element is focusable.
+-	padding: $grid-unit-05 $grid-unit-40 $grid-unit-40;
++	padding: $grid-unit-05 * 0.5 $grid-unit-40 $grid-unit-40;
+ 	overflow: auto;
+ 
+ 	&.hide-header {
+diff --git a/packages/edit-post/src/components/start-page-options/style.scss b/packages/edit-post/src/components/start-page-options/style.scss
+index 52f3f5ff9a8889..1328f3b7bfa6e4 100644
+--- a/packages/edit-post/src/components/start-page-options/style.scss
++++ b/packages/edit-post/src/components/start-page-options/style.scss
+@@ -1,20 +1,27 @@
+-// 2 column masonry layout.
+ .edit-post-start-page-options__modal-content .block-editor-block-patterns-list {
+-	column-count: 2;
+-	column-gap: $grid-unit-30;
+ 
+-	@include break-medium() {
+-		column-count: 3;
++	@include break-small() {
++		column-count: 2;
++		column-gap: $grid-unit-30;
+ 	}
+ 
+ 	@include break-wide() {
+-		column-count: 4;
++		column-count: 3;
++		column-gap: $grid-unit-40;
+ 	}
+ 
+ 	.block-editor-block-patterns-list__list-item {
+ 		break-inside: avoid-column;
+ 		margin-bottom: $grid-unit-30;
+ 
++		@include break-small() {
++			margin-bottom: $grid-unit-40;
++		}
++
++		.block-editor-block-patterns-list__item-title {
++			display: none;
++		}
++
+ 		.block-editor-block-preview__container {
+ 			min-height: 100px;
+ 		}
+diff --git a/packages/edit-site/src/components/start-template-options/style.scss b/packages/edit-site/src/components/start-template-options/style.scss
+index 53cd38a8c9bfad..06fe0bcddf1012 100644
+--- a/packages/edit-site/src/components/start-template-options/style.scss
++++ b/packages/edit-site/src/components/start-template-options/style.scss
+@@ -27,18 +27,19 @@ $actions-height: 92px;
+ 
+ .edit-site-start-template-options__modal-content .block-editor-block-patterns-list {
+ 	column-count: 2;
+-	column-gap: $grid-unit-30;
+-
+-	@include break-medium() {
+-		column-count: 3;
+-	}
++	column-gap: $grid-unit-40;
+ 
+ 	@include break-wide() {
+-		column-count: 4;
++		column-count: 3;
+ 	}
+ 
+ 	.block-editor-block-patterns-list__list-item {
+ 		break-inside: avoid-column;
++		margin-bottom: $grid-unit-30;
++
++		@include break-small() {
++			margin-bottom: $grid-unit-40;
++		}
+ 
+ 		.block-editor-block-patterns-list__item-title {
+ 			display: none;
+diff --git a/packages/interface/src/components/preferences-modal-tabs/style.scss b/packages/interface/src/components/preferences-modal-tabs/style.scss
+index 04b71f0a773a20..bcde94c53b56c3 100644
+--- a/packages/interface/src/components/preferences-modal-tabs/style.scss
++++ b/packages/interface/src/components/preferences-modal-tabs/style.scss
+@@ -3,7 +3,7 @@ $vertical-tabs-width: 160px;
+ .interface-preferences__tabs {
+ 	.components-tab-panel__tabs {
+ 		position: absolute;
+-		top: $header-height + $grid-unit-30;
++		top: $header-height + $grid-unit-10;
+ 		// Aligns button text instead of button box.
+ 		left: $grid-unit-20;
+ 		width: $vertical-tabs-width;

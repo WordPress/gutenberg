@@ -1,0 +1,33 @@
+diff --git a/packages/block-editor/src/hooks/duotone.js b/packages/block-editor/src/hooks/duotone.js
+index 246e4fde7d8ba8..b6a1989870daf2 100644
+--- a/packages/block-editor/src/hooks/duotone.js
++++ b/packages/block-editor/src/hooks/duotone.js
+@@ -124,9 +124,10 @@ function DuotonePanelPure( { style, setAttributes, name } ) {
+ 		return null;
+ 	}
+ 
+-	const duotonePresetOrColors = ! Array.isArray( duotoneStyle )
+-		? getColorsFromDuotonePreset( duotoneStyle, duotonePalette )
+-		: duotoneStyle;
++	const duotonePresetOrColors =
++		duotoneStyle === 'unset' || Array.isArray( duotoneStyle )
++			? duotoneStyle
++			: getColorsFromDuotonePreset( duotoneStyle, duotonePalette );
+ 
+ 	return (
+ 		<>
+diff --git a/packages/components/src/duotone-picker/style.scss b/packages/components/src/duotone-picker/style.scss
+index 93bf5e90be45de..cebeb157cd5efb 100644
+--- a/packages/components/src/duotone-picker/style.scss
++++ b/packages/components/src/duotone-picker/style.scss
+@@ -13,6 +13,10 @@
+ 		color: transparent;
+ 	}
+ 
++	&:hover:not(:disabled):not([aria-disabled="true"]) {
++		color: transparent;
++	}
++
+ 	&:not([aria-disabled="true"]):active {
+ 		color: transparent;
+ 	}

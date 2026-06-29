@@ -1,0 +1,254 @@
+diff --git a/packages/block-editor/src/components/global-styles/dimensions-panel.js b/packages/block-editor/src/components/global-styles/dimensions-panel.js
+index c19788ebfcb580..385f28b668eda2 100644
+--- a/packages/block-editor/src/components/global-styles/dimensions-panel.js
++++ b/packages/block-editor/src/components/global-styles/dimensions-panel.js
+@@ -444,17 +444,6 @@ export default function DimensionsPanel( {
+ 
+ 	const onMouseLeaveControls = () => onVisualize( false );
+ 
+-	const inputProps = {
+-		min: minMarginValue,
+-		onDragStart: () => {
+-			//Reset to 0 in case the value was negative.
+-			setMinMarginValue( 0 );
+-		},
+-		onDragEnd: () => {
+-			setMinMarginValue( minimumMargin );
+-		},
+-	};
+-
+ 	return (
+ 		<Wrapper
+ 			resetAllFilter={ resetAllFilter }
+@@ -545,8 +534,10 @@ export default function DimensionsPanel( {
+ 							units={ units }
+ 							allowReset={ false }
+ 							splitOnAxis={ isAxialPadding }
+-							onMouseOver={ onMouseOverPadding }
+-							onMouseOut={ onMouseLeaveControls }
++							inputProps={ {
++								onMouseOver: onMouseOverPadding,
++								onMouseOut: onMouseLeaveControls,
++							} }
+ 						/>
+ 					) }
+ 					{ showSpacingPresetsControl && (
+@@ -581,14 +572,23 @@ export default function DimensionsPanel( {
+ 							__next40pxDefaultSize
+ 							values={ marginValues }
+ 							onChange={ setMarginValues }
+-							inputProps={ inputProps }
++							inputProps={ {
++								min: minMarginValue,
++								onDragStart: () => {
++									// Reset to 0 in case the value was negative.
++									setMinMarginValue( 0 );
++								},
++								onDragEnd: () => {
++									setMinMarginValue( minimumMargin );
++								},
++								onMouseOver: onMouseOverMargin,
++								onMouseOut: onMouseLeaveControls,
++							} }
+ 							label={ __( 'Margin' ) }
+ 							sides={ marginSides }
+ 							units={ units }
+ 							allowReset={ false }
+ 							splitOnAxis={ isAxialMargin }
+-							onMouseOver={ onMouseOverMargin }
+-							onMouseOut={ onMouseLeaveControls }
+ 						/>
+ 					) }
+ 					{ showSpacingPresetsControl && (
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 937027ecdd1ea3..acb59c743c81e8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Deprecations
++
++-   `BoxControl`: Passive deprecate `onMouseOver`/`onMouseOut`. Pass to the `inputProps` prop instead ([#67332](https://github.com/WordPress/gutenberg/pull/67332)).
++
+ ### Internal
+ 
+ -   Upgraded `@ariakit/react` (v0.4.13) and `@ariakit/test` (v0.4.5) ([#65907](https://github.com/WordPress/gutenberg/pull/65907)).
+@@ -15,7 +19,7 @@
+ -   `FontSizePicker`: Deprecate 36px default size ([#66920](https://github.com/WordPress/gutenberg/pull/66920)).
+ -   `ComboboxControl`: Deprecate 36px default size ([#66900](https://github.com/WordPress/gutenberg/pull/66900)).
+ -   `ToggleGroupControl`: Deprecate 36px default size ([#66747](https://github.com/WordPress/gutenberg/pull/66747)).
+--   `RangeControl`: Deprecate 36px default size ([#66721](https://github.com/WordPress/gutenberg/pull/66721)).
++-   `RangeControl`: Deprecate 36px default size ([#66721](https://github.com/WordPress/gutenberg/pull/66721)). 
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index 7f822f5f70e124..7418fa19d74a0a 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -141,6 +141,8 @@ function BoxControl( {
+ 	};
+ 
+ 	const inputControlProps = {
++		onMouseOver,
++		onMouseOut,
+ 		...inputProps,
+ 		onChange: handleOnChange,
+ 		onFocus: handleOnFocus,
+@@ -150,8 +152,6 @@ function BoxControl( {
+ 		setSelectedUnits,
+ 		sides,
+ 		values: inputValues,
+-		onMouseOver,
+-		onMouseOut,
+ 		__next40pxDefaultSize,
+ 	};
+ 
+diff --git a/packages/components/src/box-control/types.ts b/packages/components/src/box-control/types.ts
+index 2a47abbf11001e..16b69dfe70a64a 100644
+--- a/packages/components/src/box-control/types.ts
++++ b/packages/components/src/box-control/types.ts
+@@ -17,70 +17,85 @@ export type CustomValueUnits = {
+ 
+ type UnitControlPassthroughProps = Omit<
+ 	UnitControlProps,
+-	'label' | 'onChange' | 'onFocus' | 'onMouseOver' | 'onMouseOut' | 'units'
++	'label' | 'onChange' | 'onFocus' | 'units'
+ >;
+ 
+-export type BoxControlProps = Pick<
+-	UnitControlProps,
+-	'onMouseOver' | 'onMouseOut' | 'units'
+-> & {
+-	/**
+-	 * If this property is true, a button to reset the box control is rendered.
+-	 *
+-	 * @default true
+-	 */
+-	allowReset?: boolean;
+-	/**
+-	 * The id to use as a base for the unique HTML id attribute of the control.
+-	 */
+-	id?: string;
+-	/**
+-	 * Props for the internal `UnitControl` components.
+-	 *
+-	 * @default { min: 0 }
+-	 */
+-	inputProps?: UnitControlPassthroughProps;
+-	/**
+-	 * Heading label for the control.
+-	 *
+-	 * @default __( 'Box Control' )
+-	 */
+-	label?: string;
++type DeprecatedBoxControlProps = {
+ 	/**
+-	 * A callback function when an input value changes.
++	 * @deprecated Pass to the `inputProps` prop instead.
++	 * @ignore
+ 	 */
+-	onChange: ( next: BoxControlValue ) => void;
++	onMouseOver?: UnitControlProps[ 'onMouseOver' ];
+ 	/**
+-	 * The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
+-	 *
+-	 * @default { top: undefined, right: undefined, bottom: undefined, left: undefined }
++	 * @deprecated Pass to the `inputProps` prop instead.
++	 * @ignore
+ 	 */
+-	resetValues?: BoxControlValue;
+-	/**
+-	 * Collection of sides to allow control of. If omitted or empty, all sides will be available.
+-	 *
+-	 * Allowed values are "top", "right", "bottom", "left", "vertical", and "horizontal".
+-	 */
+-	sides?: readonly ( keyof BoxControlValue | 'horizontal' | 'vertical' )[];
+-	/**
+-	 * If this property is true, when the box control is unlinked, vertical and horizontal controls
+-	 * can be used instead of updating individual sides.
+-	 *
+-	 * @default false
+-	 */
+-	splitOnAxis?: boolean;
+-	/**
+-	 * The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.
+-	 */
+-	values?: BoxControlValue;
+-	/**
+-	 * Start opting into the larger default height that will become the default size in a future version.
+-	 *
+-	 * @default false
+-	 */
+-	__next40pxDefaultSize?: boolean;
++	onMouseOut?: UnitControlProps[ 'onMouseOut' ];
+ };
+ 
++export type BoxControlProps = Pick< UnitControlProps, 'units' > &
++	DeprecatedBoxControlProps & {
++		/**
++		 * If this property is true, a button to reset the box control is rendered.
++		 *
++		 * @default true
++		 */
++		allowReset?: boolean;
++		/**
++		 * The id to use as a base for the unique HTML id attribute of the control.
++		 */
++		id?: string;
++		/**
++		 * Props for the internal `UnitControl` components.
++		 *
++		 * @default { min: 0 }
++		 */
++		inputProps?: UnitControlPassthroughProps;
++		/**
++		 * Heading label for the control.
++		 *
++		 * @default __( 'Box Control' )
++		 */
++		label?: string;
++		/**
++		 * A callback function when an input value changes.
++		 */
++		onChange: ( next: BoxControlValue ) => void;
++		/**
++		 * The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
++		 *
++		 * @default { top: undefined, right: undefined, bottom: undefined, left: undefined }
++		 */
++		resetValues?: BoxControlValue;
++		/**
++		 * Collection of sides to allow control of. If omitted or empty, all sides will be available.
++		 *
++		 * Allowed values are "top", "right", "bottom", "left", "vertical", and "horizontal".
++		 */
++		sides?: readonly (
++			| keyof BoxControlValue
++			| 'horizontal'
++			| 'vertical'
++		)[];
++		/**
++		 * If this property is true, when the box control is unlinked, vertical and horizontal controls
++		 * can be used instead of updating individual sides.
++		 *
++		 * @default false
++		 */
++		splitOnAxis?: boolean;
++		/**
++		 * The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.
++		 */
++		values?: BoxControlValue;
++		/**
++		 * Start opting into the larger default height that will become the default size in a future version.
++		 *
++		 * @default false
++		 */
++		__next40pxDefaultSize?: boolean;
++	};
++
+ export type BoxControlInputControlProps = UnitControlPassthroughProps & {
+ 	onChange?: ( nextValues: BoxControlValue ) => void;
+ 	onFocus?: (

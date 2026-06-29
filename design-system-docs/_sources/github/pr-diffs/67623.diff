@@ -1,0 +1,42 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1045b23bfe14f6..1fd87cc958352f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   Removed the unused `__unstableMotionContext` export ([#67623](https://github.com/WordPress/gutenberg/pull/67623)).
++
+ ### Enhancements
+ 
+ -   `GradientPicker`: Add `enableAlpha` prop ([#66974](https://github.com/WordPress/gutenberg/pull/66974))
+diff --git a/packages/components/src/animation/index.tsx b/packages/components/src/animation/index.tsx
+index 6620f8d5d4ecae..1b6796cd61ee9b 100644
+--- a/packages/components/src/animation/index.tsx
++++ b/packages/components/src/animation/index.tsx
+@@ -9,5 +9,4 @@
+ export {
+ 	motion as __unstableMotion,
+ 	AnimatePresence as __unstableAnimatePresence,
+-	MotionContext as __unstableMotionContext,
+ } from 'framer-motion';
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index e82d6da70279e8..2acd609992d6ad 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -21,11 +21,7 @@ export {
+ 	default as Animate,
+ 	getAnimateClassName as __unstableGetAnimateClassName,
+ } from './animate';
+-export {
+-	__unstableMotion,
+-	__unstableAnimatePresence,
+-	__unstableMotionContext,
+-} from './animation';
++export { __unstableMotion, __unstableAnimatePresence } from './animation';
+ export { default as AnglePickerControl } from './angle-picker-control';
+ export {
+ 	default as Autocomplete,

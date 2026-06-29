@@ -1,0 +1,440 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f147e9015da4bc..2ab20f9c39889a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   Fixed typing errors for `ColorPicker` ([#38430](https://github.com/WordPress/gutenberg/pull/38430)).
+ -   Updated destructuring of `Dropdown` props to be TypeScript friendly ([#38431](https://github.com/WordPress/gutenberg/pull/38431)).
+ -   Added `ts-nocheck` to `ColorIndicator` so it can be used in typed components ([#38433](https://github.com/WordPress/gutenberg/pull/38433)).
++-   Added `cx` as a dependency of `useMemo` across the whole package, in order to recalculate the classnames correctly when a component is rendered across more than one `StyleProvider` ([#38541](https://github.com/WordPress/gutenberg/pull/38541)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/base-field/hook.js b/packages/components/src/base-field/hook.js
+index e0eaf01dc5c9ca..0b3bb07f3ca3c1 100644
+--- a/packages/components/src/base-field/hook.js
++++ b/packages/components/src/base-field/hook.js
+@@ -50,7 +50,7 @@ export function useBaseField( props ) {
+ 				isInline && styles.inline,
+ 				className
+ 			),
+-		[ className, controlGroupStyles, hasError, isInline, isSubtle ]
++		[ className, controlGroupStyles, cx, hasError, isInline, isSubtle ]
+ 	);
+ 
+ 	return {
+diff --git a/packages/components/src/card/card-body/hook.js b/packages/components/src/card/card-body/hook.js
+index 2e62181b609848..5333a77bbbd2e9 100644
+--- a/packages/components/src/card/card-body/hook.js
++++ b/packages/components/src/card/card-body/hook.js
+@@ -35,7 +35,7 @@ export function useCardBody( props ) {
+ 				'components-card__body',
+ 				className
+ 			),
+-		[ className, isShady, size ]
++		[ className, cx, isShady, size ]
+ 	);
+ 
+ 	return {
+diff --git a/packages/components/src/card/card-divider/hook.js b/packages/components/src/card/card-divider/hook.js
+index 091f99a12d079f..1007033c10987b 100644
+--- a/packages/components/src/card/card-divider/hook.js
++++ b/packages/components/src/card/card-divider/hook.js
+@@ -30,7 +30,7 @@ export function useCardDivider( props ) {
+ 				'components-card__divider',
+ 				className
+ 			),
+-		[ className ]
++		[ className, cx ]
+ 	);
+ 
+ 	return {
+diff --git a/packages/components/src/card/card-footer/hook.js b/packages/components/src/card/card-footer/hook.js
+index 9c5ba8da75532b..99d1317945e9a4 100644
+--- a/packages/components/src/card/card-footer/hook.js
++++ b/packages/components/src/card/card-footer/hook.js
+@@ -38,7 +38,7 @@ export function useCardFooter( props ) {
+ 				'components-card__footer',
+ 				className
+ 			),
+-		[ className, isBorderless, isShady, size ]
++		[ className, cx, isBorderless, isShady, size ]
+ 	);
+ 
+ 	return {
+diff --git a/packages/components/src/card/card-header/hook.js b/packages/components/src/card/card-header/hook.js
+index 3c72511d6bff44..5318e4ef1a2f30 100644
+--- a/packages/components/src/card/card-header/hook.js
++++ b/packages/components/src/card/card-header/hook.js
+@@ -37,7 +37,7 @@ export function useCardHeader( props ) {
+ 				'components-card__header',
+ 				className
+ 			),
+-		[ className, isBorderless, isShady, size ]
++		[ className, cx, isBorderless, isShady, size ]
+ 	);
+ 
+ 	return {
+diff --git a/packages/components/src/card/card-media/hook.js b/packages/components/src/card/card-media/hook.js
+index ec42aabc09155c..30f6c13c7cf397 100644
+--- a/packages/components/src/card/card-media/hook.js
++++ b/packages/components/src/card/card-media/hook.js
+@@ -27,7 +27,7 @@ export function useCardMedia( props ) {
+ 				'components-card__media',
+ 				className
+ 			),
+-		[ className ]
++		[ className, cx ]
+ 	);
+ 
+ 	return {
+diff --git a/packages/components/src/card/card/component.js b/packages/components/src/card/card/component.js
+index 45afbc28de136f..0c0b7a9710cbce 100644
+--- a/packages/components/src/card/card/component.js
++++ b/packages/components/src/card/card/component.js
+@@ -38,7 +38,7 @@ function Card( props, forwardedRef ) {
+ 
+ 	const elevationClassName = useMemo(
+ 		() => cx( css( { borderRadius: elevationBorderRadius } ) ),
+-		[ elevationBorderRadius ]
++		[ cx, elevationBorderRadius ]
+ 	);
+ 
+ 	const contextProviderValue = useMemo( () => {
+diff --git a/packages/components/src/card/card/hook.js b/packages/components/src/card/card/hook.js
+index ad3f4dc99f5bb5..b11d22aeccfd91 100644
+--- a/packages/components/src/card/card/hook.js
++++ b/packages/components/src/card/card/hook.js
+@@ -61,7 +61,7 @@ export function useCard( props ) {
+ 			isRounded && styles.rounded,
+ 			className
+ 		);
+-	}, [ className, isBorderless, isRounded ] );
++	}, [ className, cx, isBorderless, isRounded ] );
+ 
+ 	const surfaceProps = useSurface( { ...otherProps, className: classes } );
+ 
+diff --git a/packages/components/src/elevation/hook.js b/packages/components/src/elevation/hook.js
+index 9256a2b2d99ba6..c676f2859d26ba 100644
+--- a/packages/components/src/elevation/hook.js
++++ b/packages/components/src/elevation/hook.js
+@@ -112,6 +112,7 @@ export function useElevation( props ) {
+ 		active,
+ 		borderRadius,
+ 		className,
++		cx,
+ 		focus,
+ 		hover,
+ 		isInteractive,
+diff --git a/packages/components/src/flex/flex/hook.js b/packages/components/src/flex/flex/hook.js
+index d0826099ec1125..409a6e3d0c3124 100644
+--- a/packages/components/src/flex/flex/hook.js
++++ b/packages/components/src/flex/flex/hook.js
+@@ -126,6 +126,7 @@ export function useFlex( props ) {
+ 	}, [
+ 		align,
+ 		className,
++		cx,
+ 		direction,
+ 		expanded,
+ 		gap,
+diff --git a/packages/components/src/grid/hook.js b/packages/components/src/grid/hook.js
+index b38b609f99b481..7e456dec14d12d 100644
+--- a/packages/components/src/grid/hook.js
++++ b/packages/components/src/grid/hook.js
+@@ -71,6 +71,7 @@ export default function useGrid( props ) {
+ 		alignment,
+ 		className,
+ 		columnGap,
++		cx,
+ 		gap,
+ 		gridTemplateColumns,
+ 		gridTemplateRows,
+diff --git a/packages/components/src/item-group/item/hook.ts b/packages/components/src/item-group/item/hook.ts
+index 37bca0272f80a2..bd3be96c618b89 100644
+--- a/packages/components/src/item-group/item/hook.ts
++++ b/packages/components/src/item-group/item/hook.ts
+@@ -48,7 +48,7 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
+ 				spacedAround && styles.spacedAround,
+ 				className
+ 			),
+-		[ as, className, size, spacedAround ]
++		[ as, className, cx, size, spacedAround ]
+ 	);
+ 
+ 	const wrapperClassName = cx( styles.itemWrapper );
+diff --git a/packages/components/src/item-group/stories/index.js b/packages/components/src/item-group/stories/index.js
+index 309e529a68b730..724a0c0f2c0bc4 100644
+--- a/packages/components/src/item-group/stories/index.js
++++ b/packages/components/src/item-group/stories/index.js
+@@ -145,7 +145,7 @@ const ItemWithChevron = ( {
+ 
+ 	const itemClassName = useMemo(
+ 		() => cx( ! alwaysVisible && appearingChevron, className ),
+-		[ alwaysVisible, className ]
++		[ alwaysVisible, className, cx ]
+ 	);
+ 
+ 	const chevronIconClassName = useMemo(
+@@ -155,7 +155,7 @@ const ItemWithChevron = ( {
+ 				fill: currentColor;
+ 				transform: ${ isRtlLayout ? 'scaleX( -100% )' : 'none' };
+ 			` ),
+-		[ isRtlLayout ]
++		[ cx, isRtlLayout ]
+ 	);
+ 
+ 	return (
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index fc1e9c31d01fb5..efacc1adb44a5d 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -96,7 +96,7 @@ function NavigatorProvider(
+ 	const classes = useMemo(
+ 		// Prevents horizontal overflow while animating screen transitions
+ 		() => cx( css( { overflowX: 'hidden' } ), className ),
+-		[ className ]
++		[ className, cx ]
+ 	);
+ 
+ 	return (
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 033c1884ea9b2f..e2ce5f47c0422f 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -61,7 +61,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 				} ),
+ 				className
+ 			),
+-		[ className ]
++		[ className, cx ]
+ 	);
+ 
+ 	// This flag is used to only apply the focus on mount when the actual path changes.
+diff --git a/packages/components/src/scrollable/hook.js b/packages/components/src/scrollable/hook.js
+index ce8b01e14724d3..f4225fb26726c0 100644
+--- a/packages/components/src/scrollable/hook.js
++++ b/packages/components/src/scrollable/hook.js
+@@ -36,7 +36,7 @@ export function useScrollable( props ) {
+ 				scrollDirection === 'auto' && styles.scrollAuto,
+ 				className
+ 			),
+-		[ className, scrollDirection, smoothScroll ]
++		[ className, cx, scrollDirection, smoothScroll ]
+ 	);
+ 
+ 	return { ...otherProps, className: classes };
+diff --git a/packages/components/src/surface/hook.js b/packages/components/src/surface/hook.js
+index 65d5937a47b927..7a5902b5b9197d 100644
+--- a/packages/components/src/surface/hook.js
++++ b/packages/components/src/surface/hook.js
+@@ -54,6 +54,7 @@ export function useSurface( props ) {
+ 		borderRight,
+ 		borderTop,
+ 		className,
++		cx,
+ 		variant,
+ 	] );
+ 
+diff --git a/packages/components/src/text/hook.js b/packages/components/src/text/hook.js
+index 70ccee41f629af..a10e3db49168b9 100644
+--- a/packages/components/src/text/hook.js
++++ b/packages/components/src/text/hook.js
+@@ -126,6 +126,7 @@ export default function useText( props ) {
+ 		align,
+ 		className,
+ 		color,
++		cx,
+ 		display,
+ 		isBlock,
+ 		isCaption,
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 45848242e098e6..646233bb063af9 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -81,7 +81,7 @@ function ToggleGroupControl(
+ 				'medium',
+ 				className
+ 			),
+-		[ className, isBlock ]
++		[ className, cx, isBlock ]
+ 	);
+ 	return (
+ 		<BaseControl help={ help }>
+diff --git a/packages/components/src/tools-panel/tools-panel-header/hook.ts b/packages/components/src/tools-panel/tools-panel-header/hook.ts
+index 807aef47122fef..96ced7ec76da62 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-header/hook.ts
+@@ -23,15 +23,15 @@ export function useToolsPanelHeader(
+ 	const cx = useCx();
+ 	const classes = useMemo( () => {
+ 		return cx( styles.ToolsPanelHeader, className );
+-	}, [ className ] );
++	}, [ className, cx ] );
+ 
+ 	const dropdownMenuClassName = useMemo( () => {
+ 		return cx( styles.DropdownMenu );
+-	}, [] );
++	}, [ cx ] );
+ 
+ 	const headingClassName = useMemo( () => {
+ 		return cx( styles.ToolsPanelHeading );
+-	}, [] );
++	}, [ cx ] );
+ 
+ 	const {
+ 		menuItems,
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index 69f44d320e5f79..39bed6310547b8 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -148,6 +148,7 @@ export function useToolsPanelItem(
+ 		isShown,
+ 		shouldRenderPlaceholder,
+ 		className,
++		cx,
+ 		firstDisplayedItem,
+ 		lastDisplayedItem,
+ 		__experimentalFirstVisibleItemClass,
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.ts b/packages/components/src/tools-panel/tools-panel/hook.ts
+index 3ef134d00c85c4..670bb08c17d284 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel/hook.ts
+@@ -196,6 +196,7 @@ export function useToolsPanel(
+ 	}, [
+ 		areAllOptionalControlsHidden,
+ 		className,
++		cx,
+ 		hasInnerWrapper,
+ 		menuItems,
+ 	] );
+diff --git a/packages/components/src/truncate/hook.js b/packages/components/src/truncate/hook.js
+index 64e45c1bed5ea7..eb95f27a099458 100644
+--- a/packages/components/src/truncate/hook.js
++++ b/packages/components/src/truncate/hook.js
+@@ -59,7 +59,7 @@ export default function useTruncate( props ) {
+ 			shouldTruncate && !! numberOfLines && sx.numberOfLines,
+ 			className
+ 		);
+-	}, [ className, numberOfLines, shouldTruncate ] );
++	}, [ className, cx, numberOfLines, shouldTruncate ] );
+ 
+ 	return { ...otherProps, className: classes, children: truncatedContent };
+ }
+diff --git a/packages/components/src/utils/hooks/stories/use-cx.js b/packages/components/src/utils/hooks/stories/use-cx.js
+index a9610d4850001b..8bb0e2526c6779 100644
+--- a/packages/components/src/utils/hooks/stories/use-cx.js
++++ b/packages/components/src/utils/hooks/stories/use-cx.js
+@@ -7,6 +7,7 @@ import { css } from '@emotion/react';
+  * WordPress dependencies
+  */
+ import { __unstableIframe as Iframe } from '@wordpress/block-editor';
++import { useMemo } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -22,9 +23,29 @@ export default {
+ 	title: 'Components (Experimental)/useCx',
+ };
+ 
+-const Example = ( { args, children } ) => {
++const Example = ( { serializedStyles, children } ) => {
+ 	const cx = useCx();
+-	const classes = cx( ...args );
++	const classes = cx( serializedStyles );
++	return <span className={ classes }>{ children }</span>;
++};
++
++const ExampleWithUseMemoWrong = ( { serializedStyles, children } ) => {
++	const cx = useCx();
++	// Wrong: using 'useMemo' without adding 'cx' to the dependency list.
++	// eslint-disable-next-line react-hooks/exhaustive-deps
++	const classes = useMemo( () => cx( serializedStyles ), [
++		serializedStyles,
++	] );
++	return <span className={ classes }>{ children }</span>;
++};
++
++const ExampleWithUseMemoRight = ( { serializedStyles, children } ) => {
++	const cx = useCx();
++	// Right: using 'useMemo' with 'cx' listed as a dependency.
++	const classes = useMemo( () => cx( serializedStyles ), [
++		cx,
++		serializedStyles,
++	] );
+ 	return <span className={ classes }>{ children }</span>;
+ };
+ 
+@@ -46,17 +67,17 @@ export const _slotFill = () => {
+ 			<StyleProvider document={ document }>
+ 				<Iframe>
+ 					<Iframe>
+-						<Example args={ [ redText ] }>
++						<Example serializedStyles={ redText }>
+ 							This text is inside an iframe and should be red
+ 						</Example>
+ 						<Fill name="test-slot">
+-							<Example args={ [ blueText ] }>
++							<Example serializedStyles={ blueText }>
+ 								This text is also inside the iframe, but is
+ 								relocated by a slot/fill and should be blue
+ 							</Example>
+ 						</Fill>
+ 						<Fill name="outside-frame">
+-							<Example args={ [ greenText ] }>
++							<Example serializedStyles={ greenText }>
+ 								This text is also inside the iframe, but is
+ 								relocated by a slot/fill and should be green
+ 							</Example>
+@@ -83,7 +104,7 @@ export const _slotFillSimple = () => {
+ 		<SlotFillProvider>
+ 			<Iframe>
+ 				<Fill name="test-slot">
+-					<Example args={ [ redText ] }>
++					<Example serializedStyles={ redText }>
+ 						This text should be red
+ 					</Example>
+ 				</Fill>
+@@ -93,13 +114,41 @@ export const _slotFillSimple = () => {
+ 	);
+ };
+ 
++export const _useMemoBadPractices = () => {
++	const redText = css`
++		color: red;
++	`;
++	const blueText = css`
++		color: blue;
++	`;
++
++	return (
++		<>
++			<Example serializedStyles={ redText }>
++				This text should be red
++			</Example>
++			<ExampleWithUseMemoRight serializedStyles={ blueText }>
++				This text should be blue
++			</ExampleWithUseMemoRight>
++			<Iframe>
++				<Example serializedStyles={ redText }>
++					This text should be red
++				</Example>
++				<ExampleWithUseMemoWrong serializedStyles={ blueText }>
++					This text should be blue but it&apos;s not!
++				</ExampleWithUseMemoWrong>
++			</Iframe>
++		</>
++	);
++};
++
+ export const _default = () => {
+ 	const redText = css`
+ 		color: red;
+ 	`;
+ 	return (
+ 		<Iframe>
+-			<Example args={ [ redText ] }>
++			<Example serializedStyles={ redText }>
+ 				This text is inside an iframe and is red!
+ 			</Example>
+ 		</Iframe>

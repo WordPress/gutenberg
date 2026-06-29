@@ -1,0 +1,106 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d6cf16d4d5e81a..ce9b55fd95f999 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `BorderControl`: Improve labelling, tooltips and DOM structure ([#42348](https://github.com/WordPress/gutenberg/pull/42348/)).
+ -   `BaseControl`: Set zero padding on `StyledLabel` to ensure cross-browser styling ([#42348](https://github.com/WordPress/gutenberg/pull/42348/)).
++-   `SelectControl`: Add flag for larger default size ([#42456](https://github.com/WordPress/gutenberg/pull/42456/)).
+ -   `UnitControl`: Update unit select's focus styles to match input's ([#42383](https://github.com/WordPress/gutenberg/pull/42383)).
+ 
+ ### Internal
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index 85a09417b5bde6..b1ea3215f87922 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -10,7 +10,8 @@ import styled from '@emotion/styled';
+ import { COLORS, rtl } from '../../utils';
+ import type { SelectControlProps } from '../types';
+ 
+-interface SelectProps extends Pick< SelectControlProps, 'disabled' > {
++interface SelectProps
++	extends Pick< SelectControlProps, '__next36pxDefaultSize' | 'disabled' > {
+ 	// Using `selectSize` instead of `size` to avoid a type conflict with the
+ 	// `size` HTML attribute of the `select` element.
+ 	selectSize?: SelectControlProps[ 'size' ];
+@@ -45,11 +46,14 @@ const fontSizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
+ 	`;
+ };
+ 
+-const sizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
++const sizeStyles = ( {
++	__next36pxDefaultSize,
++	selectSize = 'default',
++}: SelectProps ) => {
+ 	const sizes = {
+ 		default: {
+-			height: 30,
+-			minHeight: 30,
++			height: 36,
++			minHeight: 36,
+ 			paddingTop: 0,
+ 			paddingBottom: 0,
+ 		},
+@@ -67,16 +71,28 @@ const sizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
+ 		},
+ 	};
+ 
+-	const style = sizes[ selectSize ];
++	if ( ! __next36pxDefaultSize ) {
++		sizes.default = {
++			height: 30,
++			minHeight: 30,
++			paddingTop: 0,
++			paddingBottom: 0,
++		};
++	}
++
++	const style = sizes[ selectSize ] || sizes.default;
+ 
+ 	return css( style );
+ };
+ 
+-const sizePaddings = ( { selectSize = 'default' }: SelectProps ) => {
++const sizePaddings = ( {
++	__next36pxDefaultSize,
++	selectSize = 'default',
++}: SelectProps ) => {
+ 	const sizes = {
+ 		default: {
+-			paddingLeft: 8,
+-			paddingRight: 24,
++			paddingLeft: 16,
++			paddingRight: 32,
+ 		},
+ 		small: {
+ 			paddingLeft: 8,
+@@ -87,7 +103,15 @@ const sizePaddings = ( { selectSize = 'default' }: SelectProps ) => {
+ 			paddingRight: 32,
+ 		},
+ 	};
+-	return rtl( sizes[ selectSize ] );
++
++	if ( ! __next36pxDefaultSize ) {
++		sizes.default = {
++			paddingLeft: 8,
++			paddingRight: 24,
++		};
++	}
++
++	return rtl( sizes[ selectSize ] || sizes.default );
+ };
+ 
+ // TODO: Resolve need to use &&& to increase specificity
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+index 6c1e273c259a54..6126ba5043d6c4 100644
+--- a/packages/components/src/select-control/types.ts
++++ b/packages/components/src/select-control/types.ts
+@@ -12,6 +12,7 @@ import type { BaseControlProps } from '../base-control/types';
+ export interface SelectControlProps
+ 	extends Pick<
+ 			InputBaseProps,
++			| '__next36pxDefaultSize'
+ 			| 'disabled'
+ 			| 'hideLabelFromVision'
+ 			| 'label'

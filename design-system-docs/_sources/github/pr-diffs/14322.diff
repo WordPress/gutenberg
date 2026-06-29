@@ -1,0 +1,362 @@
+diff --git a/packages/block-library/src/columns/index.js b/packages/block-library/src/columns/index.js
+index 7d28794e8a7760..eabd06e0e5ae29 100644
+--- a/packages/block-library/src/columns/index.js
++++ b/packages/block-library/src/columns/index.js
+@@ -172,6 +172,7 @@ export const settings = {
+ 							} }
+ 							min={ 2 }
+ 							max={ 6 }
++							required
+ 						/>
+ 					</PanelBody>
+ 				</InspectorControls>
+diff --git a/packages/block-library/src/cover/edit.js b/packages/block-library/src/cover/edit.js
+index 398e842d9eafbd..bdf85c0874a757 100644
+--- a/packages/block-library/src/cover/edit.js
++++ b/packages/block-library/src/cover/edit.js
+@@ -214,6 +214,7 @@ class CoverEdit extends Component {
+ 									min={ 0 }
+ 									max={ 100 }
+ 									step={ 10 }
++									required
+ 								/>
+ 							</PanelColorSettings>
+ 						</PanelBody>
+diff --git a/packages/block-library/src/gallery/edit.js b/packages/block-library/src/gallery/edit.js
+index 868a6a083723d3..ade7ba978264ba 100644
+--- a/packages/block-library/src/gallery/edit.js
++++ b/packages/block-library/src/gallery/edit.js
+@@ -250,6 +250,7 @@ class GalleryEdit extends Component {
+ 							onChange={ this.setColumnsNumber }
+ 							min={ 1 }
+ 							max={ Math.min( MAX_COLUMNS, images.length ) }
++							required
+ 						/> }
+ 						<ToggleControl
+ 							label={ __( 'Crop Images' ) }
+diff --git a/packages/block-library/src/latest-comments/edit.js b/packages/block-library/src/latest-comments/edit.js
+index 1bc21e552939e0..b87aecdabd7d12 100644
+--- a/packages/block-library/src/latest-comments/edit.js
++++ b/packages/block-library/src/latest-comments/edit.js
+@@ -85,6 +85,7 @@ class LatestComments extends Component {
+ 							onChange={ this.setCommentsToShow }
+ 							min={ MIN_COMMENTS }
+ 							max={ MAX_COMMENTS }
++							required
+ 						/>
+ 					</PanelBody>
+ 				</InspectorControls>
+diff --git a/packages/block-library/src/latest-posts/edit.js b/packages/block-library/src/latest-posts/edit.js
+index 2e0f00e32eea30..d9790466b492e4 100644
+--- a/packages/block-library/src/latest-posts/edit.js
++++ b/packages/block-library/src/latest-posts/edit.js
+@@ -109,6 +109,7 @@ class LatestPostsEdit extends Component {
+ 							onChange={ ( value ) => setAttributes( { columns: value } ) }
+ 							min={ 2 }
+ 							max={ ! hasPosts ? MAX_POSTS_COLUMNS : Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
++							required
+ 						/>
+ 					}
+ 				</PanelBody>
+diff --git a/packages/block-library/src/rss/edit.js b/packages/block-library/src/rss/edit.js
+index e7262e11b2bc16..9b98eaea537819 100644
+--- a/packages/block-library/src/rss/edit.js
++++ b/packages/block-library/src/rss/edit.js
+@@ -119,6 +119,7 @@ class RSSEdit extends Component {
+ 							onChange={ ( value ) => setAttributes( { itemsToShow: value } ) }
+ 							min={ DEFAULT_MIN_ITEMS }
+ 							max={ DEFAULT_MAX_ITEMS }
++							required
+ 						/>
+ 						<ToggleControl
+ 							label={ __( 'Display author' ) }
+@@ -142,6 +143,7 @@ class RSSEdit extends Component {
+ 								onChange={ ( value ) => setAttributes( { excerptLength: value } ) }
+ 								min={ 10 }
+ 								max={ 100 }
++								required
+ 							/>
+ 						}
+ 						{ blockLayout === 'grid' &&
+@@ -151,6 +153,7 @@ class RSSEdit extends Component {
+ 								onChange={ ( value ) => setAttributes( { columns: value } ) }
+ 								min={ 2 }
+ 								max={ 6 }
++								required
+ 							/>
+ 						}
+ 					</PanelBody>
+diff --git a/packages/block-library/src/text-columns/index.js b/packages/block-library/src/text-columns/index.js
+index 5bcf5cc3b6a790..f14b3b8153baa8 100644
+--- a/packages/block-library/src/text-columns/index.js
++++ b/packages/block-library/src/text-columns/index.js
+@@ -114,6 +114,7 @@ export const settings = {
+ 							onChange={ ( value ) => setAttributes( { columns: value } ) }
+ 							min={ 2 }
+ 							max={ 4 }
++							required
+ 						/>
+ 					</PanelBody>
+ 				</InspectorControls>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b596c09199849c..8bba28618e50db 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -1,3 +1,13 @@
++## 7.2.0 (Unreleased)
++
++### Improvements
++
++- Make `RangeControl` validation rely on the `checkValidity` provided by the browsers instead of using our own validation.
++
++### Bug Fixes
++
++- Fix a problem that made `RangeControl` not work as expected with float values.
++
+ ## 7.1.0 (2019-03-06)
+ 
+ ### New Features
+diff --git a/packages/components/src/query-controls/index.js b/packages/components/src/query-controls/index.js
+index 4ed57e468eb691..f3cbf47998325c 100644
+--- a/packages/components/src/query-controls/index.js
++++ b/packages/components/src/query-controls/index.js
+@@ -79,6 +79,7 @@ export default function QueryControls( {
+ 				onChange={ onNumberOfItemsChange }
+ 				min={ minItems }
+ 				max={ maxItems }
++				required
+ 			/>
+ 		),
+ 	];
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index 1503813def5cbf..2fd28d31bcae13 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -48,14 +48,9 @@ function RangeControl( {
+ 
+ 	const onChangeValue = ( event ) => {
+ 		const newValue = event.target.value;
+-		const newNumericValue = parseInt( newValue, 10 );
+ 		// If the input value is invalid temporarily save it to the state,
+ 		// without calling on change.
+-		if (
+-			isNaN( newNumericValue ) ||
+-			( min !== undefined && newNumericValue < min ) ||
+-			( max !== undefined && newNumericValue > max )
+-		) {
++		if ( ! event.target.checkValidity() ) {
+ 			setState( {
+ 				currentInput: newValue,
+ 			} );
+@@ -64,9 +59,12 @@ function RangeControl( {
+ 		// The input is valid, reset the local state property used to temporaly save the value,
+ 		// and call onChange with the new value as a number.
+ 		resetCurrentInput();
+-		onChange( newNumericValue );
++		onChange( ( newValue === '' ) ?
++			undefined :
++			parseFloat( newValue )
++		);
+ 	};
+-	const initialSliderValue = isFinite( value ) ?
++	const initialSliderValue = isFinite( currentInputValue ) ?
+ 		currentInputValue :
+ 		initialPosition || '';
+ 
+diff --git a/packages/components/src/range-control/test/index.js b/packages/components/src/range-control/test/index.js
+index 5f8e0bccb8aa84..e1308c06363e4c 100644
+--- a/packages/components/src/range-control/test/index.js
++++ b/packages/components/src/range-control/test/index.js
+@@ -42,13 +42,23 @@ describe( 'RangeControl', () => {
+ 			TestUtils.Simulate.change(
+ 				rangeInputElement(),
+ 				{
+-					target: { value: '5' },
++					target: {
++						value: '5',
++						checkValidity() {
++							return true;
++						},
++					},
+ 				}
+ 			);
+ 			TestUtils.Simulate.change(
+ 				numberInputElement(),
+ 				{
+-					target: { value: '10' },
++					target: {
++						value: '10',
++						checkValidity() {
++							return true;
++						},
++					},
+ 				}
+ 			);
+ 
+@@ -96,7 +106,12 @@ describe( 'RangeControl', () => {
+ 			TestUtils.Simulate.change(
+ 				numberInputElement(),
+ 				{
+-					target: { value: '10' },
++					target: {
++						value: '10',
++						checkValidity() {
++							return false;
++						},
++					},
+ 				}
+ 			);
+ 
+@@ -116,7 +131,12 @@ describe( 'RangeControl', () => {
+ 			TestUtils.Simulate.change(
+ 				numberInputElement(),
+ 				{
+-					target: { value: '21' },
++					target: {
++						value: '21',
++						checkValidity() {
++							return false;
++						},
++					},
+ 				}
+ 			);
+ 
+@@ -136,14 +156,24 @@ describe( 'RangeControl', () => {
+ 			TestUtils.Simulate.change(
+ 				numberInputElement(),
+ 				{
+-					target: { value: '10' },
++					target: {
++						value: '10',
++						checkValidity() {
++							return false;
++						},
++					},
+ 				}
+ 			);
+ 
+ 			TestUtils.Simulate.change(
+ 				numberInputElement(),
+ 				{
+-					target: { value: '21' },
++					target: {
++						value: '21',
++						checkValidity() {
++							return false;
++						},
++					},
+ 				}
+ 			);
+ 
+@@ -152,7 +182,12 @@ describe( 'RangeControl', () => {
+ 			TestUtils.Simulate.change(
+ 				numberInputElement(),
+ 				{
+-					target: { value: '14' },
++					target: {
++						value: '14',
++						checkValidity() {
++							return true;
++						},
++					},
+ 				}
+ 			);
+ 
+@@ -171,7 +206,12 @@ describe( 'RangeControl', () => {
+ 			TestUtils.Simulate.change(
+ 				numberInputElement(),
+ 				{
+-					target: { value: '1' },
++					target: {
++						value: '1',
++						checkValidity() {
++							return false;
++						},
++					},
+ 				}
+ 			);
+ 
+@@ -190,7 +230,12 @@ describe( 'RangeControl', () => {
+ 			TestUtils.Simulate.change(
+ 				numberInputElement(),
+ 				{
+-					target: { value: '-101' },
++					target: {
++						value: '-101',
++						checkValidity() {
++							return false;
++						},
++					},
+ 				}
+ 			);
+ 
+@@ -199,7 +244,12 @@ describe( 'RangeControl', () => {
+ 			TestUtils.Simulate.change(
+ 				numberInputElement(),
+ 				{
+-					target: { value: '-49' },
++					target: {
++						value: '-49',
++						checkValidity() {
++							return false;
++						},
++					},
+ 				}
+ 			);
+ 
+@@ -208,11 +258,53 @@ describe( 'RangeControl', () => {
+ 			TestUtils.Simulate.change(
+ 				numberInputElement(),
+ 				{
+-					target: { value: '-50' },
++					target: {
++						value: '-50',
++						checkValidity() {
++							return true;
++						},
++					},
+ 				}
+ 			);
+ 
+-			expect( onChange ).toHaveBeenCalled();
++			expect( onChange ).toHaveBeenCalledWith( -50 );
++		} );
++		it( 'takes into account the step starting from min', () => {
++			const onChange = jest.fn();
++			const wrapper = getWrapper( { onChange, min: 0.1, step: 0.125, value: 0.1 } );
++
++			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
++				wrapper,
++				'components-range-control__number'
++			);
++
++			TestUtils.Simulate.change(
++				numberInputElement(),
++				{
++					target: {
++						value: '0.125',
++						checkValidity() {
++							return false;
++						},
++					},
++				}
++			);
++
++			expect( onChange ).not.toHaveBeenCalled();
++
++			TestUtils.Simulate.change(
++				numberInputElement(),
++				{
++					target: {
++						value: '0.225',
++						checkValidity() {
++							return true;
++						},
++					},
++				}
++			);
++
++			expect( onChange ).toHaveBeenCalledWith( 0.225 );
+ 		} );
+ 	} );
+ } );

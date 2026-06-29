@@ -1,0 +1,180 @@
+diff --git a/packages/components/src/color-picker/inputs.js b/packages/components/src/color-picker/inputs.js
+index 3eb0cdd0fbab71..7e8302833aea9e 100644
+--- a/packages/components/src/color-picker/inputs.js
++++ b/packages/components/src/color-picker/inputs.js
+@@ -286,8 +286,9 @@ export class Inputs extends Component {
+ 		return (
+ 			<div className="components-color-picker__inputs-wrapper">
+ 				{ this.renderFields() }
+-				<div className="components-color-picker__inputs-toggle">
++				<div className="components-color-picker__inputs-toggle-wrapper">
+ 					<PureButton
++						className="components-color-picker__inputs-toggle"
+ 						icon="arrow-down-alt2"
+ 						label={ __( 'Change color format' ) }
+ 						onClick={ this.toggleViews }
+diff --git a/packages/components/src/color-picker/style.scss b/packages/components/src/color-picker/style.scss
+index cf5c3c388522ea..989988252a8cac 100644
+--- a/packages/components/src/color-picker/style.scss
++++ b/packages/components/src/color-picker/style.scss
+@@ -32,10 +32,6 @@
+ 	* {
+ 		box-sizing: border-box;
+ 	}
+-
+-	.components-button {
+-		padding: 6px;
+-	}
+ }
+ 
+ .components-color-picker__saturation {
+@@ -121,8 +117,9 @@
+ }
+ 
+ .components-color-picker__saturation-pointer {
+-	width: 8px;
+-	height: 8px;
++	width: 14px;
++	height: 14px;
++	padding: 0;
+ 	box-shadow:
+ 		0 0 0 1.5px #fff,
+ 		inset 0 0 1px 1px rgba(0, 0, 0, 0.3),
+@@ -244,6 +241,7 @@
+ 	/*rtl:ignore*/
+ 	direction: ltr;
+ 	flex-grow: 1;
++	margin-right: 4px;
+ 
+ 	.components-base-control + .components-base-control {
+ 		margin-bottom: 0;
+@@ -253,3 +251,9 @@
+ 		margin: 0 4px;
+ 	}
+ }
++
++
++.components-color-picker__inputs-toggle {
++	height: 30px;
++	padding: 0 5px;
++}
+diff --git a/packages/components/src/color-picker/test/__snapshots__/index.js.snap b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+index 48825b6b0344e6..602cb30406427f 100644
+--- a/packages/components/src/color-picker/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+@@ -141,11 +141,11 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
+         </div>
+       </div>
+       <div
+-        className="components-color-picker__inputs-toggle"
++        className="components-color-picker__inputs-toggle-wrapper"
+       >
+         <button
+           aria-label="Change color format"
+-          className="components-button has-icon"
++          className="components-button components-color-picker__inputs-toggle has-icon"
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
+@@ -316,11 +316,11 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] =
+         </div>
+       </div>
+       <div
+-        className="components-color-picker__inputs-toggle"
++        className="components-color-picker__inputs-toggle-wrapper"
+       >
+         <button
+           aria-label="Change color format"
+-          className="components-button has-icon"
++          className="components-button components-color-picker__inputs-toggle has-icon"
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
+@@ -491,11 +491,11 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
+         </div>
+       </div>
+       <div
+-        className="components-color-picker__inputs-toggle"
++        className="components-color-picker__inputs-toggle-wrapper"
+       >
+         <button
+           aria-label="Change color format"
+-          className="components-button has-icon"
++          className="components-button components-color-picker__inputs-toggle has-icon"
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
+@@ -666,11 +666,11 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
+         </div>
+       </div>
+       <div
+-        className="components-color-picker__inputs-toggle"
++        className="components-color-picker__inputs-toggle-wrapper"
+       >
+         <button
+           aria-label="Change color format"
+-          className="components-button has-icon"
++          className="components-button components-color-picker__inputs-toggle has-icon"
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
+@@ -841,11 +841,11 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
+         </div>
+       </div>
+       <div
+-        className="components-color-picker__inputs-toggle"
++        className="components-color-picker__inputs-toggle-wrapper"
+       >
+         <button
+           aria-label="Change color format"
+-          className="components-button has-icon"
++          className="components-button components-color-picker__inputs-toggle has-icon"
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
+@@ -1016,11 +1016,11 @@ exports[`ColorPicker should render color picker 1`] = `
+         </div>
+       </div>
+       <div
+-        className="components-color-picker__inputs-toggle"
++        className="components-color-picker__inputs-toggle-wrapper"
+       >
+         <button
+           aria-label="Change color format"
+-          className="components-button has-icon"
++          className="components-button components-color-picker__inputs-toggle has-icon"
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index 83dd6d936e870c..9851b0057b20e2 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -2286,11 +2286,11 @@ exports[`Storyshots Components|ColorPicker Alpha Enabled 1`] = `
+         </div>
+       </div>
+       <div
+-        className="components-color-picker__inputs-toggle"
++        className="components-color-picker__inputs-toggle-wrapper"
+       >
+         <button
+           aria-label="Change color format"
+-          className="components-button has-icon"
++          className="components-button components-color-picker__inputs-toggle has-icon"
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}
+@@ -2461,11 +2461,11 @@ exports[`Storyshots Components|ColorPicker Default 1`] = `
+         </div>
+       </div>
+       <div
+-        className="components-color-picker__inputs-toggle"
++        className="components-color-picker__inputs-toggle-wrapper"
+       >
+         <button
+           aria-label="Change color format"
+-          className="components-button has-icon"
++          className="components-button components-color-picker__inputs-toggle has-icon"
+           onBlur={[Function]}
+           onClick={[Function]}
+           onFocus={[Function]}

@@ -1,0 +1,311 @@
+diff --git a/packages/base-styles/_variables.scss b/packages/base-styles/_variables.scss
+index dda9168fc25f66..a600f2c1da0d0b 100644
+--- a/packages/base-styles/_variables.scss
++++ b/packages/base-styles/_variables.scss
+@@ -55,7 +55,7 @@ $admin-sidebar-width: 160px;
+ $admin-sidebar-width-big: 190px;
+ $admin-sidebar-width-collapsed: 36px;
+ $modal-min-width: 360px;
+-$spinner-size: 18px;
++$spinner-size: 16px;
+ 
+ 
+ /**
+diff --git a/packages/block-editor/src/components/link-control/style.scss b/packages/block-editor/src/components/link-control/style.scss
+index dc916dad5b5474..dadcc2ffc2f1f2 100644
+--- a/packages/block-editor/src/components/link-control/style.scss
++++ b/packages/block-editor/src/components/link-control/style.scss
+@@ -483,16 +483,10 @@ $preview-image-height: 140px;
+ 		 * Position spinner to the left of the actions.
+ 		 *
+ 		 * Compensate for:
+-		 *  - Input margin ($grid-unit-20)
+-		 *  - Border (1px)
+-		 *  - Vertically, for the difference in height between the input (40px)
+-		 *    and the spinner.
+-		 *  - Horizontally, adjust for the width occupied by the icon buttons,
+-		 *    then artificially create spacing that mimics as if the spinner
+-		 *    were center-padded to the same width as an icon button.
++		 *  - Input padding right ($button-size)
+ 		 */
+-		top: $grid-unit-20 + 1px + ( ( 40px - $spinner-size ) * 0.5 );
+-		right: $grid-unit-20 + 1px + ( $button-size * $block-editor-link-control-number-of-actions ) + ( ( $button-size - $spinner-size ) * 0.5 );
++		top: calc(50% - #{$spinner-size} / 2);
++		right: $button-size;
+ 	}
+ }
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7396665b133fcc..fd8dfa66446176 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   Components: Fix `Slot`/`Fill` Emotion `StyleProvider` ([#38237](https://github.com/WordPress/gutenberg/pull/38237))
+ 
++### Enhancements
++
++-   Update the visual design of the `Spinner` component. ([#37551](https://github.com/WordPress/gutenberg/pull/37551))
++
+ ## 19.3.0 (2022-01-27)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/spinner/README.md b/packages/components/src/spinner/README.md
+index d36e1932d985f5..474e6ebcb0a81a 100644
+--- a/packages/components/src/spinner/README.md
++++ b/packages/components/src/spinner/README.md
+@@ -1,19 +1,19 @@
+ # Spinner
+ 
+-Spinners notify users that their action is being processed.
+-
+-![Spinner component](https://wordpress.org/gutenberg/files/2019/07/spinner.png)
+-
+-## Best practices
+-
+-The spinner component should:
+-
+--   Signal to users that the processing of their request is underway and will soon complete.
++`Spinner` is a component used to notify users that their action is being processed.
+ 
+ ## Usage
+ 
+ ```jsx
+ import { Spinner } from '@wordpress/components';
+ 
+-const MySpinner = () => <Spinner />;
++function Example() {
++	return <Spinner />;
++}
+ ```
++
++## Best practices
++
++The spinner component should:
++
++-   Signal to users that the processing of their request is underway and will soon complete.
+diff --git a/packages/components/src/spinner/index.js b/packages/components/src/spinner/index.js
+index 0491e08903069d..e8612a076affc4 100644
+--- a/packages/components/src/spinner/index.js
++++ b/packages/components/src/spinner/index.js
+@@ -1,8 +1,47 @@
++/**
++ * External dependencies
++ */
++import classNames from 'classnames';
++
+ /**
+  * Internal dependencies
+  */
+-import { StyledSpinner } from './styles/spinner-styles';
++import { StyledSpinner, SpinnerTrack, SpinnerIndicator } from './styles';
++
++/**
++ * @typedef OwnProps
++ *
++ * @property {string} [className] Class name
++ */
++/** @typedef {import('react').ComponentPropsWithoutRef<'svg'> & OwnProps} Props */
++
++/**
++ * @param {Props} props
++ * @return {JSX.Element} Element
++ */
++export default function Spinner( { className, ...props } ) {
++	return (
++		<StyledSpinner
++			className={ classNames( 'components-spinner', className ) }
++			viewBox="0 0 100 100"
++			xmlns="http://www.w3.org/2000/svg"
++			role="presentation"
++			focusable="false"
++			{ ...props }
++		>
++			{ /* Gray circular background */ }
++			<SpinnerTrack
++				cx="50"
++				cy="50"
++				r="50"
++				vectorEffect="non-scaling-stroke"
++			/>
+ 
+-export default function Spinner() {
+-	return <StyledSpinner className="components-spinner" />;
++			{ /* Theme-colored arc */ }
++			<SpinnerIndicator
++				d="m 50 0 a 50 50 0 0 1 50 50"
++				vectorEffect="non-scaling-stroke"
++			/>
++		</StyledSpinner>
++	);
+ }
+diff --git a/packages/components/src/spinner/stories/index.js b/packages/components/src/spinner/stories/index.js
+index 12b60f457bc73d..8fd0716d2ade08 100644
+--- a/packages/components/src/spinner/stories/index.js
++++ b/packages/components/src/spinner/stories/index.js
+@@ -1,10 +1,43 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++
+ /**
+  * Internal dependencies
+  */
++import { useCx } from '../../utils';
++import { space } from '../../ui/utils/space';
+ import Spinner from '../';
+ 
+-export default { title: 'Components/Spinner', component: Spinner };
++const sizes = {
++	default: undefined,
++	medium: space( 20 ),
++	large: space( 40 ),
++};
++
++export default {
++	title: 'Components/Spinner',
++	component: Spinner,
++	argTypes: {
++		size: {
++			options: Object.keys( sizes ),
++			mapping: sizes,
++			control: { type: 'select' },
++		},
++	},
++};
++
++const Template = ( { size } ) => {
++	const cx = useCx();
++	const spinnerClassname = cx( css`
++		width: ${ size };
++		height: ${ size };
++	` );
++	return <Spinner className={ spinnerClassname } />;
++};
+ 
+-export const _default = () => {
+-	return <Spinner />;
++export const Default = Template.bind( {} );
++Default.args = {
++	size: 'default',
+ };
+diff --git a/packages/components/src/spinner/styles.js b/packages/components/src/spinner/styles.js
+new file mode 100644
+index 00000000000000..2f1101e1254c88
+--- /dev/null
++++ b/packages/components/src/spinner/styles.js
+@@ -0,0 +1,47 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css, keyframes } from '@emotion/react';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS, CONFIG } from '../utils';
++
++const spinAnimation = keyframes`
++	from {
++		transform: rotate(0deg);
++	}
++	to {
++		transform: rotate(360deg);
++	}
++ `;
++
++export const StyledSpinner = styled.svg`
++	width: ${ CONFIG.spinnerSize }px;
++	height: ${ CONFIG.spinnerSize }px;
++	display: inline-block;
++	margin: 5px 11px 0;
++	position: relative;
++	color: var( --wp-admin-theme-color );
++	overflow: visible;
++`;
++
++const commonPathProps = css`
++	fill: transparent;
++	stroke-width: 1.5px;
++`;
++
++export const SpinnerTrack = styled.circle`
++	${ commonPathProps };
++	stroke: ${ COLORS.gray[ 300 ] };
++`;
++
++export const SpinnerIndicator = styled.path`
++	${ commonPathProps };
++	stroke: currentColor;
++	stroke-linecap: round;
++	transform-origin: 50% 50%;
++	animation: 1.4s linear infinite both ${ spinAnimation };
++`;
+diff --git a/packages/components/src/spinner/styles/spinner-styles.js b/packages/components/src/spinner/styles/spinner-styles.js
+deleted file mode 100644
+index 9b73bae394c5a7..00000000000000
+--- a/packages/components/src/spinner/styles/spinner-styles.js
++++ /dev/null
+@@ -1,47 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-import { keyframes } from '@emotion/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { COLORS, CONFIG } from '../../utils';
+-
+-const spinAnimation = keyframes`
+-	from {
+-		transform: rotate(0deg);
+-	}
+-
+-	to {
+-		transform: rotate(360deg);
+-	}
+-`;
+-
+-const topLeft = `calc( ( ${ CONFIG.spinnerSize } - ${ CONFIG.spinnerSize } * ( 2 / 3 ) ) / 2 )`;
+-
+-export const StyledSpinner = styled.span`
+-	display: inline-block;
+-	background-color: ${ COLORS.gray[ 600 ] };
+-	width: ${ CONFIG.spinnerSize };
+-	height: ${ CONFIG.spinnerSize };
+-	opacity: 0.7;
+-	margin: 5px 11px 0;
+-	border-radius: 100%;
+-	position: relative;
+-
+-	&::before {
+-		content: '';
+-		position: absolute;
+-		background-color: ${ COLORS.white };
+-		top: ${ topLeft };
+-		left: ${ topLeft };
+-		width: calc( ${ CONFIG.spinnerSize } / 4.5 );
+-		height: calc( ${ CONFIG.spinnerSize } / 4.5 );
+-		border-radius: 100%;
+-		transform-origin: calc( ${ CONFIG.spinnerSize } / 3 )
+-			calc( ${ CONFIG.spinnerSize } / 3 );
+-		animation: ${ spinAnimation } 1s infinite linear;
+-	}
+-`;
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 493636aa87c045..b1e624b4e8931e 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -44,7 +44,7 @@ export default {
+ 	borderWidth: '1px',
+ 	borderWidthFocus: '1.5px',
+ 	borderWidthTab: '4px',
+-	spinnerSize: '18px',
++	spinnerSize: 16,
+ 	fontSize: '13px',
+ 	fontSizeH1: 'calc(2.44 * 13px)',
+ 	fontSizeH2: 'calc(1.95 * 13px)',

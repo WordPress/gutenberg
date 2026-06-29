@@ -1,0 +1,390 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9a595827ffb0c8..57599320404e4b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,7 +9,8 @@
+ ### Internal
+ 
+ -   `CustomSelectControl`: align unit tests for v1 and legacy v2 versions. ([#62706](https://github.com/WordPress/gutenberg/pull/62706))
+--   `CustomSelectControl`: fix handling of extra option attributes in the `onChange` callbacks and when forwarding them to the option DOM elements. ([#62255](https://github.com/WordPress/gutenberg/pull/62255))
++-   `CustomSelectControlV2`: fix handling of extra option attributes in the `onChange` callbacks and when forwarding them to the option DOM elements. ([#62255](https://github.com/WordPress/gutenberg/pull/62255))
++-   `CustomSelectControlV2`: fix setting initial value and reacting to external controlled updates. ([#62733](https://github.com/WordPress/gutenberg/pull/62733))
+ 
+ ## 28.1.0 (2024-06-15)
+ 
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+index 089d55c9a0a06c..41be4f58d9147f 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+@@ -51,6 +51,12 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 			};
+ 			onChange( changeObject );
+ 		},
++		value: value?.name,
++		// Setting the first option as a default value when no value is provided
++		// is already done natively by the underlying Ariakit component,
++		// but doing this explicitly avoids the `onChange` callback from firing
++		// on initial render, thus making this implementation closer to the v1.
++		defaultValue: options[ 0 ]?.name,
+ 	} );
+ 
+ 	const children = options.map(
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+index 06af287a142367..f0b699617cd03c 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+@@ -64,7 +64,7 @@ const ControlledCustomSelectControl = ( {
+ 	onChange: onChangeProp,
+ 	...restProps
+ }: React.ComponentProps< typeof UncontrolledCustomSelectControl > ) => {
+-	const [ value, setValue ] = useState( options[ 0 ] );
++	const [ value, setValue ] = useState( restProps.value ?? options[ 0 ] );
+ 
+ 	const onChange: typeof onChangeProp = ( changeObject ) => {
+ 		onChangeProp?.( changeObject );
+@@ -83,12 +83,87 @@ const ControlledCustomSelectControl = ( {
+ 	);
+ };
+ 
++it( 'Should apply external controlled updates', async () => {
++	const mockOnChange = jest.fn();
++	const { rerender } = render(
++		<UncontrolledCustomSelectControl
++			{ ...legacyProps }
++			value={ legacyProps.options[ 0 ] }
++			onChange={ mockOnChange }
++		/>
++	);
++
++	const currentSelectedItem = screen.getByRole( 'combobox', {
++		expanded: false,
++	} );
++
++	expect( currentSelectedItem ).toHaveTextContent(
++		legacyProps.options[ 0 ].name
++	);
++
++	expect( mockOnChange ).not.toHaveBeenCalled();
++
++	rerender(
++		<UncontrolledCustomSelectControl
++			{ ...legacyProps }
++			value={ legacyProps.options[ 1 ] }
++		/>
++	);
++
++	expect( currentSelectedItem ).toHaveTextContent(
++		legacyProps.options[ 1 ].name
++	);
++
++	// Necessary to wait for onChange to potentially fire
++	await sleep();
++
++	expect( mockOnChange ).not.toHaveBeenCalled();
++} );
++
+ describe.each( [
+ 	[ 'Uncontrolled', UncontrolledCustomSelectControl ],
+ 	[ 'Controlled', ControlledCustomSelectControl ],
+ ] )( 'CustomSelectControl (%s)', ( ...modeAndComponent ) => {
+ 	const [ , Component ] = modeAndComponent;
+ 
++	it( 'Should select the first option when no explicit initial value is passed without firing onChange', async () => {
++		const mockOnChange = jest.fn();
++		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
++
++		expect(
++			screen.getByRole( 'combobox', {
++				expanded: false,
++			} )
++		).toHaveTextContent( legacyProps.options[ 0 ].name );
++
++		// Necessary to wait for onChange to potentially fire
++		await sleep();
++
++		expect( mockOnChange ).not.toHaveBeenCalled();
++	} );
++
++	it( 'Should pick the initially selected option if the value prop is passed without firing onChange', async () => {
++		const mockOnChange = jest.fn();
++		render(
++			<Component
++				{ ...legacyProps }
++				onChange={ mockOnChange }
++				value={ legacyProps.options[ 3 ] }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'combobox', {
++				expanded: false,
++			} )
++		).toHaveTextContent( legacyProps.options[ 3 ].name );
++
++		// Necessary to wait for onChange to potentially fire
++		await sleep();
++
++		expect( mockOnChange ).not.toHaveBeenCalled();
++	} );
++
+ 	it( 'Should replace the initial selection when a new item is selected', async () => {
+ 		render( <Component { ...legacyProps } /> );
+ 
+@@ -292,33 +367,21 @@ describe.each( [
+ 			} )
+ 		);
+ 
+-		// NOTE: legacy CustomSelectControl doesn't fire onChange
+-		// at this point in time.
+-		expect( mockOnChange ).toHaveBeenNthCalledWith(
+-			1,
+-			expect.objectContaining( {
+-				inputValue: '',
+-				isOpen: false,
+-				selectedItem: { key: 'flower1', name: 'violets' },
+-				type: '',
+-			} )
+-		);
+-
+ 		await click(
+ 			screen.getByRole( 'option', {
+ 				name: 'aquamarine',
+ 			} )
+ 		);
+ 
+-		expect( mockOnChange ).toHaveBeenNthCalledWith(
+-			2,
++		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
++		expect( mockOnChange ).toHaveBeenLastCalledWith(
+ 			expect.objectContaining( {
+ 				inputValue: '',
+ 				isOpen: false,
+ 				selectedItem: expect.objectContaining( {
+ 					name: 'aquamarine',
+ 				} ),
+-				type: '',
++				type: expect.any( String ),
+ 			} )
+ 		);
+ 	} );
+@@ -336,23 +399,11 @@ describe.each( [
+ 			} )
+ 		).toHaveFocus();
+ 
+-		// NOTE: legacy CustomSelectControl doesn't fire onChange
+-		// at this point in time.
+-		expect( mockOnChange ).toHaveBeenNthCalledWith(
+-			1,
+-			expect.objectContaining( {
+-				selectedItem: expect.objectContaining( {
+-					key: 'flower1',
+-					name: 'violets',
+-				} ),
+-			} )
+-		);
+-
+ 		await type( 'p' );
+ 		await press.Enter();
+ 
+-		expect( mockOnChange ).toHaveBeenNthCalledWith(
+-			2,
++		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
++		expect( mockOnChange ).toHaveBeenLastCalledWith(
+ 			expect.objectContaining( {
+ 				selectedItem: expect.objectContaining( {
+ 					key: 'flower3',
+@@ -387,10 +438,7 @@ describe.each( [
+ 
+ 		await click( optionWithCustomAttributes );
+ 
+-		// NOTE: legacy CustomSelectControl doesn't fire onChange
+-		// on first render, and so at this point in time `onChangeMock`
+-		// would be called only once.
+-		expect( onChangeMock ).toHaveBeenCalledTimes( 2 );
++		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
+ 		expect( onChangeMock ).toHaveBeenCalledWith(
+ 			expect.objectContaining( {
+ 				selectedItem: expect.objectContaining( {
+@@ -454,7 +502,9 @@ describe.each( [
+ 			await press.ArrowDown();
+ 			await press.Enter();
+ 
+-			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
++			expect( currentSelectedItem ).toHaveTextContent(
++				legacyProps.options[ 1 ].name
++			);
+ 		} );
+ 
+ 		it( 'Should be able to type characters to select matching options', async () => {
+@@ -488,7 +538,9 @@ describe.each( [
+ 			await sleep();
+ 			await press.Tab();
+ 			expect( currentSelectedItem ).toHaveFocus();
+-			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
++			expect( currentSelectedItem ).toHaveTextContent(
++				legacyProps.options[ 0 ].name
++			);
+ 
+ 			// Ideally we would test a multi-character typeahead, but anything more than a single character is flaky
+ 			await type( 'a' );
+diff --git a/packages/components/src/custom-select-control/test/index.js b/packages/components/src/custom-select-control/test/index.js
+index 2eb855c15b51f9..4a19449ac80730 100644
+--- a/packages/components/src/custom-select-control/test/index.js
++++ b/packages/components/src/custom-select-control/test/index.js
+@@ -64,7 +64,7 @@ const ControlledCustomSelectControl = ( {
+ 	onChange: onChangeProp,
+ 	...restProps
+ } ) => {
+-	const [ value, setValue ] = useState( options[ 0 ] );
++	const [ value, setValue ] = useState( restProps.value ?? options[ 0 ] );
+ 
+ 	const onChange = ( changeObject ) => {
+ 		onChangeProp?.( changeObject );
+@@ -81,12 +81,72 @@ const ControlledCustomSelectControl = ( {
+ 	);
+ };
+ 
++it( 'Should apply external controlled updates', async () => {
++	const mockOnChange = jest.fn();
++	const { rerender } = render(
++		<UncontrolledCustomSelectControl
++			{ ...props }
++			value={ props.options[ 0 ] }
++			onChange={ mockOnChange }
++		/>
++	);
++
++	const currentSelectedItem = screen.getByRole( 'button', {
++		expanded: false,
++	} );
++
++	expect( currentSelectedItem ).toHaveTextContent( props.options[ 0 ].name );
++
++	rerender(
++		<UncontrolledCustomSelectControl
++			{ ...props }
++			value={ props.options[ 1 ] }
++		/>
++	);
++
++	expect( currentSelectedItem ).toHaveTextContent( props.options[ 1 ].name );
++
++	expect( mockOnChange ).not.toHaveBeenCalled();
++} );
++
+ describe.each( [
+-	[ 'uncontrolled', UncontrolledCustomSelectControl ],
+-	[ 'controlled', ControlledCustomSelectControl ],
++	[ 'Uncontrolled', UncontrolledCustomSelectControl ],
++	[ 'Controlled', ControlledCustomSelectControl ],
+ ] )( 'CustomSelectControl %s', ( ...modeAndComponent ) => {
+ 	const [ , Component ] = modeAndComponent;
+ 
++	it( 'Should select the first option when no explicit initial value is passed without firing onChange', () => {
++		const mockOnChange = jest.fn();
++		render( <Component { ...props } onChange={ mockOnChange } /> );
++
++		expect(
++			screen.getByRole( 'button', {
++				expanded: false,
++			} )
++		).toHaveTextContent( props.options[ 0 ].name );
++
++		expect( mockOnChange ).not.toHaveBeenCalled();
++	} );
++
++	it( 'Should pick the initially selected option if the value prop is passed without firing onChange', async () => {
++		const mockOnChange = jest.fn();
++		render(
++			<Component
++				{ ...props }
++				onChange={ mockOnChange }
++				value={ props.options[ 3 ] }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'button', {
++				expanded: false,
++			} )
++		).toHaveTextContent( props.options[ 3 ].name );
++
++		expect( mockOnChange ).not.toHaveBeenCalled();
++	} );
++
+ 	it( 'Should replace the initial selection when a new item is selected', async () => {
+ 		const user = userEvent.setup();
+ 
+@@ -285,13 +345,7 @@ describe.each( [
+ 		const user = userEvent.setup();
+ 		const mockOnChange = jest.fn();
+ 
+-		render(
+-			<Component
+-				{ ...props }
+-				value={ props.options[ 0 ] }
+-				onChange={ mockOnChange }
+-			/>
+-		);
++		render( <Component { ...props } onChange={ mockOnChange } /> );
+ 
+ 		await user.click(
+ 			screen.getByRole( 'button', {
+@@ -299,32 +353,21 @@ describe.each( [
+ 			} )
+ 		);
+ 
+-		// DIFFERENCE WITH V2: NOT CALLED
+-		// expect( mockOnChange ).toHaveBeenNthCalledWith(
+-		// 	1,
+-		// 	expect.objectContaining( {
+-		// 		inputValue: '',
+-		// 		isOpen: false,
+-		// 		selectedItem: { key: 'flower1', name: 'violets' },
+-		// 		type: '',
+-		// 	} )
+-		// );
+-
+ 		await user.click(
+ 			screen.getByRole( 'option', {
+ 				name: 'aquamarine',
+ 			} )
+ 		);
+ 
+-		expect( mockOnChange ).toHaveBeenNthCalledWith(
+-			1,
++		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
++		expect( mockOnChange ).toHaveBeenLastCalledWith(
+ 			expect.objectContaining( {
+ 				inputValue: '',
+ 				isOpen: false,
+ 				selectedItem: expect.objectContaining( {
+ 					name: 'aquamarine',
+ 				} ),
+-				type: '__item_click__',
++				type: expect.any( String ),
+ 			} )
+ 		);
+ 	} );
+@@ -345,8 +388,8 @@ describe.each( [
+ 		await user.keyboard( 'p' );
+ 		await user.keyboard( '{enter}' );
+ 
+-		expect( mockOnChange ).toHaveBeenNthCalledWith(
+-			1,
++		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
++		expect( mockOnChange ).toHaveBeenLastCalledWith(
+ 			expect.objectContaining( {
+ 				selectedItem: expect.objectContaining( {
+ 					key: 'flower3',
+@@ -446,7 +489,9 @@ describe.each( [
+ 			await user.keyboard( '{arrowdown}' );
+ 			await user.keyboard( '{enter}' );
+ 
+-			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
++			expect( currentSelectedItem ).toHaveTextContent(
++				props.options[ 1 ].name
++			);
+ 		} );
+ 
+ 		it( 'Should be able to type characters to select matching options', async () => {

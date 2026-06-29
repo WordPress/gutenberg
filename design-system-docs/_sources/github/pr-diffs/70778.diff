@@ -1,0 +1,22 @@
+diff --git a/packages/components/src/icon/index.tsx b/packages/components/src/icon/index.tsx
+index 07ec786da7a9a0..58a0232ff44083 100644
+--- a/packages/components/src/icon/index.tsx
++++ b/packages/components/src/icon/index.tsx
+@@ -92,7 +92,7 @@ function Icon( {
+ 		} );
+ 	}
+ 
+-	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
++	if ( icon && ( icon.type === 'svg' || icon.type?.displayName === 'SVG' ) ) {
+ 		const appliedProps = {
+ 			...icon.props,
+ 			width: size,
+@@ -107,8 +107,6 @@ function Icon( {
+ 		return cloneElement( icon, {
+ 			// @ts-ignore Just forwarding the size prop along
+ 			size,
+-			width: size,
+-			height: size,
+ 			...additionalProps,
+ 		} );
+ 	}

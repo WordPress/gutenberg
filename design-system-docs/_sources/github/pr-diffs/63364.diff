@@ -1,0 +1,782 @@
+diff --git a/packages/block-directory/src/components/downloadable-block-list-item/index.js b/packages/block-directory/src/components/downloadable-block-list-item/index.js
+index b1ef34ccdba596..af144a8c324e1f 100644
+--- a/packages/block-directory/src/components/downloadable-block-list-item/index.js
++++ b/packages/block-directory/src/components/downloadable-block-list-item/index.js
+@@ -6,7 +6,7 @@ import {
+ 	Button,
+ 	Spinner,
+ 	VisuallyHidden,
+-	privateApis as componentsPrivateApis,
++	CompositeItem,
+ } from '@wordpress/components';
+ import { createInterpolateElement } from '@wordpress/element';
+ import { decodeEntities } from '@wordpress/html-entities';
+@@ -20,9 +20,6 @@ import BlockRatings from '../block-ratings';
+ import DownloadableBlockIcon from '../downloadable-block-icon';
+ import DownloadableBlockNotice from '../downloadable-block-notice';
+ import { store as blockDirectoryStore } from '../../store';
+-import { unlock } from '../../lock-unlock';
+-
+-const { CompositeItemV2: CompositeItem } = unlock( componentsPrivateApis );
+ 
+ // Return the appropriate block item label, given the block data and status.
+ function getDownloadableBlockLabel(
+diff --git a/packages/block-directory/src/components/downloadable-blocks-list/index.js b/packages/block-directory/src/components/downloadable-blocks-list/index.js
+index 09f509c4ed49c9..942a5fd3e2b1e8 100644
+--- a/packages/block-directory/src/components/downloadable-blocks-list/index.js
++++ b/packages/block-directory/src/components/downloadable-blocks-list/index.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { privateApis as componentsPrivateApis } from '@wordpress/components';
++import { Composite, useCompositeStore } from '@wordpress/components';
+ import { getBlockType } from '@wordpress/blocks';
+ import { useDispatch } from '@wordpress/data';
+ 
+@@ -11,10 +11,7 @@ import { useDispatch } from '@wordpress/data';
+  */
+ import DownloadableBlockListItem from '../downloadable-block-list-item';
+ import { store as blockDirectoryStore } from '../../store';
+-import { unlock } from '../../lock-unlock';
+ 
+-const { CompositeV2: Composite, useCompositeStoreV2: useCompositeStore } =
+-	unlock( componentsPrivateApis );
+ const noop = () => {};
+ 
+ function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
+diff --git a/packages/block-editor/src/components/block-pattern-setup/index.js b/packages/block-editor/src/components/block-pattern-setup/index.js
+index edd55e90dc3e27..8776a11ee6b343 100644
+--- a/packages/block-editor/src/components/block-pattern-setup/index.js
++++ b/packages/block-editor/src/components/block-pattern-setup/index.js
+@@ -5,7 +5,9 @@ import { useDispatch } from '@wordpress/data';
+ import { cloneBlock } from '@wordpress/blocks';
+ import {
+ 	VisuallyHidden,
+-	privateApis as componentsPrivateApis,
++	Composite,
++	CompositeItem,
++	useCompositeStore,
+ } from '@wordpress/components';
+ 
+ import { useState } from '@wordpress/element';
+@@ -20,13 +22,6 @@ import BlockPreview from '../block-preview';
+ import SetupToolbar from './setup-toolbar';
+ import usePatternsSetup from './use-patterns-setup';
+ import { VIEWMODES } from './constants';
+-import { unlock } from '../../lock-unlock';
+-
+-const {
+-	CompositeV2: Composite,
+-	CompositeItemV2: CompositeItem,
+-	useCompositeStoreV2: useCompositeStore,
+-} = unlock( componentsPrivateApis );
+ 
+ const SetupContent = ( {
+ 	viewMode,
+diff --git a/packages/block-editor/src/components/block-patterns-list/index.js b/packages/block-editor/src/components/block-patterns-list/index.js
+index b2af3456be7b0c..1abb2d6ae1eac5 100644
+--- a/packages/block-editor/src/components/block-patterns-list/index.js
++++ b/packages/block-editor/src/components/block-patterns-list/index.js
+@@ -11,7 +11,9 @@ import { useEffect, useState, forwardRef, useMemo } from '@wordpress/element';
+ import {
+ 	VisuallyHidden,
+ 	Tooltip,
+-	privateApis as componentsPrivateApis,
++	Composite,
++	CompositeItem,
++	useCompositeStore,
+ 	__experimentalHStack as HStack,
+ } from '@wordpress/components';
+ import { useInstanceId } from '@wordpress/compose';
+@@ -21,18 +23,11 @@ import { Icon, symbol } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import { unlock } from '../../lock-unlock';
+ import BlockPreview from '../block-preview';
+ import InserterDraggableBlocks from '../inserter-draggable-blocks';
+ import BlockPatternsPaging from '../block-patterns-paging';
+ import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
+ 
+-const {
+-	CompositeV2: Composite,
+-	CompositeItemV2: CompositeItem,
+-	useCompositeStoreV2: useCompositeStore,
+-} = unlock( componentsPrivateApis );
+-
+ const WithToolTip = ( { showTooltip, title, children } ) => {
+ 	if ( showTooltip ) {
+ 		return <Tooltip text={ title }>{ children }</Tooltip>;
+diff --git a/packages/block-editor/src/components/block-switcher/pattern-transformations-menu.js b/packages/block-editor/src/components/block-switcher/pattern-transformations-menu.js
+index 792f6d0bb20121..e557f8c407a445 100644
+--- a/packages/block-editor/src/components/block-switcher/pattern-transformations-menu.js
++++ b/packages/block-editor/src/components/block-switcher/pattern-transformations-menu.js
+@@ -11,7 +11,9 @@ import {
+ 	MenuItem,
+ 	Popover,
+ 	VisuallyHidden,
+-	privateApis as componentsPrivateApis,
++	Composite,
++	CompositeItem,
++	useCompositeStore,
+ } from '@wordpress/components';
+ 
+ /**
+@@ -19,13 +21,6 @@ import {
+  */
+ import BlockPreview from '../block-preview';
+ import useTransformedPatterns from './use-transformed-patterns';
+-import { unlock } from '../../lock-unlock';
+-
+-const {
+-	CompositeV2: Composite,
+-	CompositeItemV2: CompositeItem,
+-	useCompositeStoreV2: useCompositeStore,
+-} = unlock( componentsPrivateApis );
+ 
+ function PatternTransformationsMenu( {
+ 	blocks,
+diff --git a/packages/block-editor/src/components/global-styles/shadow-panel-components.js b/packages/block-editor/src/components/global-styles/shadow-panel-components.js
+index a30e209027a2bf..64e35a7120946c 100644
+--- a/packages/block-editor/src/components/global-styles/shadow-panel-components.js
++++ b/packages/block-editor/src/components/global-styles/shadow-panel-components.js
+@@ -10,7 +10,9 @@ import {
+ 	Button,
+ 	FlexItem,
+ 	Dropdown,
+-	privateApis as componentsPrivateApis,
++	CompositeItem,
++	Composite,
++	useCompositeStore,
+ } from '@wordpress/components';
+ import { useMemo } from '@wordpress/element';
+ import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
+@@ -20,11 +22,6 @@ import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
+  */
+ import clsx from 'clsx';
+ 
+-/**
+- * Internal dependencies
+- */
+-import { unlock } from '../../lock-unlock';
+-
+ /**
+  * Shared reference to an empty array for cases where it is important to avoid
+  * returning a new array reference on every invocation.
+@@ -32,11 +29,6 @@ import { unlock } from '../../lock-unlock';
+  * @type {Array}
+  */
+ const EMPTY_ARRAY = [];
+-const {
+-	CompositeItemV2: CompositeItem,
+-	CompositeV2: Composite,
+-	useCompositeStoreV2: useCompositeStore,
+-} = unlock( componentsPrivateApis );
+ 
+ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
+ 	const shadows = useShadowPresets( settings );
+diff --git a/packages/block-editor/src/components/inserter-listbox/index.js b/packages/block-editor/src/components/inserter-listbox/index.js
+index 6af26a1d746bfb..832e4ebac2f802 100644
+--- a/packages/block-editor/src/components/inserter-listbox/index.js
++++ b/packages/block-editor/src/components/inserter-listbox/index.js
+@@ -1,20 +1,12 @@
+ /**
+  * WordPress dependencies
+  */
+-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+-
+-/**
+- * Internal dependencies
+- */
+-import { unlock } from '../../lock-unlock';
++import { Composite, useCompositeStore } from '@wordpress/components';
+ 
+ export { default as InserterListboxGroup } from './group';
+ export { default as InserterListboxRow } from './row';
+ export { default as InserterListboxItem } from './item';
+ 
+-const { CompositeV2: Composite, useCompositeStoreV2: useCompositeStore } =
+-	unlock( componentsPrivateApis );
+-
+ function InserterListbox( { children } ) {
+ 	const store = useCompositeStore( {
+ 		focusShift: true,
+diff --git a/packages/block-editor/src/components/inserter-listbox/item.js b/packages/block-editor/src/components/inserter-listbox/item.js
+index 951eb86223ce8f..c1495623ca7862 100644
+--- a/packages/block-editor/src/components/inserter-listbox/item.js
++++ b/packages/block-editor/src/components/inserter-listbox/item.js
+@@ -1,19 +1,9 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	Button,
+-	privateApis as componentsPrivateApis,
+-} from '@wordpress/components';
++import { Button, CompositeItem } from '@wordpress/components';
+ import { forwardRef } from '@wordpress/element';
+ 
+-/**
+- * Internal dependencies
+- */
+-import { unlock } from '../../lock-unlock';
+-
+-const { CompositeItemV2: CompositeItem } = unlock( componentsPrivateApis );
+-
+ function InserterListboxItem(
+ 	{ isFirst, as: Component, children, ...props },
+ 	ref
+diff --git a/packages/block-editor/src/components/inserter-listbox/row.js b/packages/block-editor/src/components/inserter-listbox/row.js
+index f9827f08b3fa39..c6d0741f984769 100644
+--- a/packages/block-editor/src/components/inserter-listbox/row.js
++++ b/packages/block-editor/src/components/inserter-listbox/row.js
+@@ -2,14 +2,7 @@
+  * WordPress dependencies
+  */
+ import { forwardRef } from '@wordpress/element';
+-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+-
+-/**
+- * Internal dependencies
+- */
+-import { unlock } from '../../lock-unlock';
+-
+-const { CompositeGroupV2: CompositeGroup } = unlock( componentsPrivateApis );
++import { CompositeGroup } from '@wordpress/components';
+ 
+ function InserterListboxRow( props, ref ) {
+ 	return <CompositeGroup role="presentation" ref={ ref } { ...props } />;
+diff --git a/packages/block-editor/src/components/inserter/media-tab/media-list.js b/packages/block-editor/src/components/inserter/media-tab/media-list.js
+index bfc858bc8c4de7..feb2a5f1a0a9bd 100644
+--- a/packages/block-editor/src/components/inserter/media-tab/media-list.js
++++ b/packages/block-editor/src/components/inserter/media-tab/media-list.js
+@@ -1,17 +1,13 @@
+ /**
+  * WordPress dependencies
+  */
+-import { privateApis as componentsPrivateApis } from '@wordpress/components';
++import { Composite, useCompositeStore } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { MediaPreview } from './media-preview';
+-import { unlock } from '../../../lock-unlock';
+-
+-const { CompositeV2: Composite, useCompositeStoreV2: useCompositeStore } =
+-	unlock( componentsPrivateApis );
+ 
+ function MediaList( {
+ 	mediaList,
+diff --git a/packages/block-editor/src/components/inserter/media-tab/media-preview.js b/packages/block-editor/src/components/inserter/media-tab/media-preview.js
+index 816cc9373ea08d..fd1f6b37f38a33 100644
+--- a/packages/block-editor/src/components/inserter/media-tab/media-preview.js
++++ b/packages/block-editor/src/components/inserter/media-tab/media-preview.js
+@@ -16,7 +16,7 @@ import {
+ 	Flex,
+ 	FlexItem,
+ 	Button,
+-	privateApis as componentsPrivateApis,
++	CompositeItem,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+ import { __, sprintf } from '@wordpress/i18n';
+@@ -33,7 +33,6 @@ import { isBlobURL } from '@wordpress/blob';
+ import InserterDraggableBlocks from '../../inserter-draggable-blocks';
+ import { getBlockAndPreviewFromMedia } from './utils';
+ import { store as blockEditorStore } from '../../../store';
+-import { unlock } from '../../../lock-unlock';
+ 
+ const ALLOWED_MEDIA_TYPES = [ 'image' ];
+ const MAXIMUM_TITLE_LENGTH = 25;
+@@ -43,8 +42,6 @@ const MEDIA_OPTIONS_POPOVER_PROPS = {
+ 		'block-editor-inserter__media-list__item-preview-options__popover',
+ };
+ 
+-const { CompositeItemV2: CompositeItem } = unlock( componentsPrivateApis );
+-
+ function MediaPreviewOptions( { category, media } ) {
+ 	if ( ! category.getReportUrl ) {
+ 		return null;
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7b0c17a67bc40e..3aaf87be2b570f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   `Composite`: export new stable version, deprecate unstable version. ([#63364](https://github.com/WordPress/gutenberg/pull/63364))
++
+ ### Internal
+ 
+ -   `CustomSelectControl`: switch to ariakit-based implementation ([#63258](https://github.com/WordPress/gutenberg/pull/63258)).
+diff --git a/packages/components/src/alignment-matrix-control/cell.tsx b/packages/components/src/alignment-matrix-control/cell.tsx
+index 162ca879f1a7e5..ffd2c24684e817 100644
+--- a/packages/components/src/alignment-matrix-control/cell.tsx
++++ b/packages/components/src/alignment-matrix-control/cell.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { CompositeItem } from '../composite/v2';
++import { CompositeItem } from '../composite';
+ import Tooltip from '../tooltip';
+ import { VisuallyHidden } from '../visually-hidden';
+ 
+diff --git a/packages/components/src/alignment-matrix-control/index.tsx b/packages/components/src/alignment-matrix-control/index.tsx
+index eaec8a285b0c57..d8e22699ceb0c2 100644
+--- a/packages/components/src/alignment-matrix-control/index.tsx
++++ b/packages/components/src/alignment-matrix-control/index.tsx
+@@ -13,7 +13,7 @@ import { useInstanceId } from '@wordpress/compose';
+  * Internal dependencies
+  */
+ import Cell from './cell';
+-import { Composite, CompositeRow, useCompositeStore } from '../composite/v2';
++import { Composite, CompositeRow, useCompositeStore } from '../composite';
+ import { Root, Row } from './styles/alignment-matrix-control-styles';
+ import AlignmentMatrixControlIcon from './icon';
+ import { GRID, getItemId, getItemValue } from './utils';
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+index 6c00a0e5d0bf1a..c41961404cd843 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+@@ -16,7 +16,7 @@ import { Icon, check } from '@wordpress/icons';
+  */
+ import { CircularOptionPickerContext } from './circular-option-picker-context';
+ import Button from '../button';
+-import { CompositeItem } from '../composite/v2';
++import { CompositeItem } from '../composite';
+ import Tooltip from '../tooltip';
+ import type { OptionProps, CircularOptionPickerCompositeStore } from './types';
+ 
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker.tsx b/packages/components/src/circular-option-picker/circular-option-picker.tsx
+index cd2ddcf90d7ce0..c1e719f2d4f665 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker.tsx
+@@ -13,7 +13,7 @@ import { isRTL } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import { CircularOptionPickerContext } from './circular-option-picker-context';
+-import { Composite, useCompositeStore } from '../composite/v2';
++import { Composite, useCompositeStore } from '../composite';
+ import type {
+ 	CircularOptionPickerProps,
+ 	ListboxCircularOptionPickerProps,
+diff --git a/packages/components/src/circular-option-picker/types.ts b/packages/components/src/circular-option-picker/types.ts
+index 519d81d5905107..e44fa678682881 100644
+--- a/packages/components/src/circular-option-picker/types.ts
++++ b/packages/components/src/circular-option-picker/types.ts
+@@ -14,7 +14,7 @@ import type { Icon } from '@wordpress/icons';
+ import type { ButtonAsButtonProps } from '../button/types';
+ import type { DropdownProps } from '../dropdown/types';
+ import type { WordPressComponentProps } from '../context';
+-import type { CompositeStore } from '../composite/v2';
++import type { CompositeStore } from '../composite';
+ 
+ type CommonCircularOptionPickerProps = {
+ 	/**
+diff --git a/packages/components/src/composite/current/stories/index.story.tsx b/packages/components/src/composite/current/stories/index.story.tsx
+index 335ebc3244c918..1091a5d9eb4093 100644
+--- a/packages/components/src/composite/current/stories/index.story.tsx
++++ b/packages/components/src/composite/current/stories/index.story.tsx
+@@ -21,7 +21,8 @@ import {
+ import { UseCompositeStorePlaceholder, transform } from './utils';
+ 
+ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
+-	title: 'Components/Composite (V2)',
++	// TODO: do we need a redirect from the previous path?
++	title: 'Components/Composite',
+ 	component: UseCompositeStorePlaceholder,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+@@ -33,7 +34,6 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 		CompositeItem,
+ 	},
+-	tags: [ 'status-private' ],
+ 	parameters: {
+ 		docs: {
+ 			canvas: { sourceState: 'shown' },
+diff --git a/packages/components/src/composite/index.ts b/packages/components/src/composite/index.ts
+index aa06a6adf36ef2..f77be7eb0c88de 100644
+--- a/packages/components/src/composite/index.ts
++++ b/packages/components/src/composite/index.ts
+@@ -1,7 +1 @@
+-// Originally this pointed at a Reakit implementation of
+-// `Composite`, but we are removing Reakit entirely from the
+-// codebase. We will continue to support the Reakit API
+-// through the 'legacy' version, which uses Ariakit under
+-// the hood.
+-
+-export * from './legacy';
++export * from './current';
+diff --git a/packages/components/src/composite/legacy/index.tsx b/packages/components/src/composite/legacy/index.tsx
+index 5c5c674b5086b8..4be0d4c79da26e 100644
+--- a/packages/components/src/composite/legacy/index.tsx
++++ b/packages/components/src/composite/legacy/index.tsx
+@@ -5,6 +5,11 @@
+  * tab stop for the whole Composite element. This means that it can behave as
+  * a roving tabindex or aria-activedescendant container.
+  *
++ * This file aims at providing component that are as close as possible to the
++ * original `reakit`-based implementation (which was removed from the codebase),
++ * although it is recommended that consumers of the package switch to the stable,
++ * un-prefixed, ariakit-based version of `Composite`.
++ *
+  * @see https://ariakit.org/components/composite
+  */
+ 
+@@ -12,12 +17,13 @@
+  * WordPress dependencies
+  */
+ import { forwardRef } from '@wordpress/element';
++import { useInstanceId } from '@wordpress/compose';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+  */
+ import * as Current from '../current';
+-import { useInstanceId } from '@wordpress/compose';
+ 
+ type Orientation = 'horizontal' | 'vertical';
+ 
+@@ -118,7 +124,13 @@ function proxyComposite< C extends Component >(
+ 	propMap: Record< string, string > = {}
+ ): CompositeComponent< C > {
+ 	const displayName = ProxiedComponent.displayName;
++
+ 	const Component = ( legacyProps: CompositeStateProps ) => {
++		deprecated( `wp.components.__unstable${ displayName }`, {
++			since: '6.7',
++			alternative: `the unprefixed, stable version of the ${ displayName } component`,
++		} );
++
+ 		const { store, ...rest } =
+ 			mapLegacyStatePropsToComponentProps( legacyProps );
+ 		const props = rest as ComponentProps< C >;
+@@ -155,15 +167,40 @@ const unproxiedCompositeGroup = forwardRef<
+ } );
+ unproxiedCompositeGroup.displayName = 'CompositeGroup';
+ 
++/**
++ * _Note: please use the stable `Composite` component instead._
++ *
++ * @deprecated
++ */
+ export const Composite = proxyComposite( Current.Composite, { baseId: 'id' } );
++/**
++ * _Note: please use the stable `CompositeGroup` component instead._
++ *
++ * @deprecated
++ */
+ export const CompositeGroup = proxyComposite( unproxiedCompositeGroup );
++/**
++ * _Note: please use the stable `CompositeItem` component instead._
++ *
++ * @deprecated
++ */
+ export const CompositeItem = proxyComposite( Current.CompositeItem, {
+ 	focusable: 'accessibleWhenDisabled',
+ } );
+ 
++/**
++ * _Note: please use the stable `useCompositeStore` hook instead._
++ *
++ * @deprecated
++ */
+ export function useCompositeState(
+ 	legacyStateOptions: LegacyStateOptions = {}
+ ): CompositeState {
++	deprecated( `wp.components.__unstableUseCompositeState`, {
++		since: '6.7',
++		alternative: `the useCompositeStore hook`,
++	} );
++
+ 	const {
+ 		baseId,
+ 		currentId: defaultActiveId,
+diff --git a/packages/components/src/composite/legacy/stories/index.story.tsx b/packages/components/src/composite/legacy/stories/index.story.tsx
+index e46d656a16810e..cb6ad200213432 100644
+--- a/packages/components/src/composite/legacy/stories/index.story.tsx
++++ b/packages/components/src/composite/legacy/stories/index.story.tsx
+@@ -15,7 +15,9 @@ import {
+ import { UseCompositeStatePlaceholder, transform } from './utils';
+ 
+ const meta: Meta< typeof UseCompositeStatePlaceholder > = {
+-	title: 'Components/Composite',
++	// TODO: should we keep this story around? If so, how should we call it?
++	// Should we add a `status-deprecated` tag with associated badge?
++	title: 'Components/Composite/Legacy',
+ 	component: UseCompositeStatePlaceholder,
+ 	subcomponents: {
+ 		Composite,
+diff --git a/packages/components/src/composite/legacy/test/index.tsx b/packages/components/src/composite/legacy/test/index.tsx
+index 315532a8b50869..2882c5cd045ead 100644
+--- a/packages/components/src/composite/legacy/test/index.tsx
++++ b/packages/components/src/composite/legacy/test/index.tsx
+@@ -1,7 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import { queryByAttribute, render, screen } from '@testing-library/react';
++import {
++	queryByAttribute,
++	render,
++	screen,
++	renderHook,
++} from '@testing-library/react';
+ import { press, sleep, waitFor } from '@ariakit/test';
+ 
+ /**
+@@ -156,6 +161,57 @@ function getShiftTestItems() {
+ 	};
+ }
+ 
++// Checking for deprecation warnings before other tests because the `deprecated`
++// utility only fires a console.warn the first time a component is rendered.
++describe( 'Shows a deprecation warning', () => {
++	it( 'useCompositeState', () => {
++		renderHook( () => useCompositeState() );
++		expect( console ).toHaveWarnedWith(
++			'wp.components.__unstableUseCompositeState is deprecated since version 6.7. Please use the useCompositeStore hook instead.'
++		);
++	} );
++	it( 'Composite', () => {
++		const Test = () => {
++			const props = useCompositeState();
++			return <Composite { ...props } />;
++		};
++		render( <Test /> );
++		expect( console ).toHaveWarnedWith(
++			'wp.components.__unstableComposite is deprecated since version 6.7. Please use the unprefixed, stable version of the Composite component instead.'
++		);
++	} );
++	it( 'CompositeItem', () => {
++		const Test = () => {
++			const props = useCompositeState();
++			return (
++				<Composite { ...props }>
++					<CompositeItem { ...props } />
++				</Composite>
++			);
++		};
++		render( <Test /> );
++		expect( console ).toHaveWarnedWith(
++			'wp.components.__unstableCompositeItem is deprecated since version 6.7. Please use the unprefixed, stable version of the CompositeItem component instead.'
++		);
++	} );
++	it( 'CompositeGroup', () => {
++		const Test = () => {
++			const props = useCompositeState();
++			return (
++				<Composite { ...props }>
++					<CompositeGroup { ...props }>
++						<CompositeItem { ...props } />
++					</CompositeGroup>
++				</Composite>
++			);
++		};
++		render( <Test /> );
++		expect( console ).toHaveWarnedWith(
++			'wp.components.__unstableCompositeGroup is deprecated since version 6.7. Please use the unprefixed, stable version of the CompositeGroup component instead.'
++		);
++	} );
++} );
++
+ describe.each( [
+ 	[
+ 		'With "spread" state',
+diff --git a/packages/components/src/composite/v2.ts b/packages/components/src/composite/v2.ts
+deleted file mode 100644
+index 38d3f628d368b6..00000000000000
+--- a/packages/components/src/composite/v2.ts
++++ /dev/null
+@@ -1,4 +0,0 @@
+-// Although we have migrated away from Reakit, the 'current'
+-// Ariakit implementation is still considered a v2.
+-
+-export * from './current';
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index f0ea4a4b7e86b8..ccc5d694138af2 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -61,6 +61,14 @@ export {
+ 	CompositeGroup as __unstableCompositeGroup,
+ 	CompositeItem as __unstableCompositeItem,
+ 	useCompositeState as __unstableUseCompositeState,
++} from './composite/legacy';
++export {
++	Composite,
++	CompositeGroup,
++	CompositeGroupLabel,
++	CompositeItem,
++	CompositeRow,
++	useCompositeStore,
+ } from './composite';
+ export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
+ export { default as CustomSelectControl } from './custom-select-control';
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 5ff39ba364a041..8e588bb417c4ea 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -1,13 +1,6 @@
+ /**
+  * Internal dependencies
+  */
+-import {
+-	Composite as CompositeV2,
+-	CompositeGroup as CompositeGroupV2,
+-	CompositeItem as CompositeItemV2,
+-	CompositeRow as CompositeRowV2,
+-	useCompositeStore as useCompositeStoreV2,
+-} from './composite/v2';
+ import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
+ import { createPrivateSlotFill } from './slot-fill';
+ import {
+@@ -28,11 +21,6 @@ import { lock } from './lock-unlock';
+ 
+ export const privateApis = {};
+ lock( privateApis, {
+-	CompositeV2,
+-	CompositeGroupV2,
+-	CompositeItemV2,
+-	CompositeRowV2,
+-	useCompositeStoreV2,
+ 	__experimentalPopoverLegacyPositionToPlacement,
+ 	createPrivateSlotFill,
+ 	ComponentsContext,
+diff --git a/packages/dataviews/src/search-widget.tsx b/packages/dataviews/src/search-widget.tsx
+index d65d58635405a3..3c539c89d28844 100644
+--- a/packages/dataviews/src/search-widget.tsx
++++ b/packages/dataviews/src/search-widget.tsx
+@@ -13,7 +13,9 @@ import { useState, useMemo, useDeferredValue } from '@wordpress/element';
+ import {
+ 	VisuallyHidden,
+ 	Icon,
+-	privateApis as componentsPrivateApis,
++	Composite,
++	CompositeItem,
++	useCompositeStore,
+ } from '@wordpress/components';
+ import { search, check } from '@wordpress/icons';
+ import { SVG, Circle } from '@wordpress/primitives';
+@@ -21,15 +23,8 @@ import { SVG, Circle } from '@wordpress/primitives';
+ /**
+  * Internal dependencies
+  */
+-import { unlock } from './lock-unlock';
+ import type { Filter, NormalizedFilter, View } from './types';
+ 
+-const {
+-	CompositeV2: Composite,
+-	CompositeItemV2: CompositeItem,
+-	useCompositeStoreV2: useCompositeStore,
+-} = unlock( componentsPrivateApis );
+-
+ interface SearchWidgetProps {
+ 	view: View;
+ 	filter: NormalizedFilter;
+diff --git a/packages/dataviews/src/view-list.tsx b/packages/dataviews/src/view-list.tsx
+index b094e9a74c0834..fafb9fc2b2aa20 100644
+--- a/packages/dataviews/src/view-list.tsx
++++ b/packages/dataviews/src/view-list.tsx
+@@ -14,6 +14,10 @@ import {
+ 	__experimentalHStack as HStack,
+ 	__experimentalVStack as VStack,
+ 	Button,
++	Composite,
++	CompositeItem,
++	CompositeRow,
++	useCompositeStore,
+ 	privateApis as componentsPrivateApis,
+ 	Spinner,
+ 	VisuallyHidden,
+@@ -49,13 +53,7 @@ interface ListViewItemProps< Item > {
+ 	visibleFields: NormalizedField< Item >[];
+ }
+ 
+-const {
+-	useCompositeStoreV2: useCompositeStore,
+-	CompositeV2: Composite,
+-	CompositeItemV2: CompositeItem,
+-	CompositeRowV2: CompositeRow,
+-	DropdownMenuV2: DropdownMenu,
+-} = unlock( componentsPrivateApis );
++const { DropdownMenuV2: DropdownMenu } = unlock( componentsPrivateApis );
+ 
+ function ListItem< Item >( {
+ 	actions,
+@@ -69,7 +67,7 @@ function ListItem< Item >( {
+ 	visibleFields,
+ }: ListViewItemProps< Item > ) {
+ 	const registry = useRegistry();
+-	const itemRef = useRef< HTMLElement >( null );
++	const itemRef = useRef< HTMLDivElement >( null );
+ 	const labelId = `${ id }-label`;
+ 	const descriptionId = `${ id }-description`;
+ 
+diff --git a/packages/edit-site/src/components/add-new-template/add-custom-template-modal-content.js b/packages/edit-site/src/components/add-new-template/add-custom-template-modal-content.js
+index 10f3c7c54521f4..4cd09464ab9a6a 100644
+--- a/packages/edit-site/src/components/add-new-template/add-custom-template-modal-content.js
++++ b/packages/edit-site/src/components/add-new-template/add-custom-template-modal-content.js
+@@ -9,7 +9,9 @@ import {
+ 	FlexItem,
+ 	SearchControl,
+ 	TextHighlight,
+-	privateApis as componentsPrivateApis,
++	Composite,
++	CompositeItem,
++	useCompositeStore,
+ 	__experimentalText as Text,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+@@ -20,15 +22,8 @@ import { useDebouncedInput } from '@wordpress/compose';
+ /**
+  * Internal dependencies
+  */
+-import { unlock } from '../../lock-unlock';
+ import { mapToIHasNameAndId } from './utils';
+ 
+-const {
+-	CompositeV2: Composite,
+-	CompositeItemV2: CompositeItem,
+-	useCompositeStoreV2: useCompositeStore,
+-} = unlock( componentsPrivateApis );
+-
+ const EMPTY_ARRAY = [];
+ 
+ function SuggestionListItem( {
+diff --git a/packages/edit-site/src/components/style-book/index.js b/packages/edit-site/src/components/style-book/index.js
+index 0d699544613209..f6624842939eb6 100644
+--- a/packages/edit-site/src/components/style-book/index.js
++++ b/packages/edit-site/src/components/style-book/index.js
+@@ -8,6 +8,9 @@ import clsx from 'clsx';
+  */
+ import {
+ 	Disabled,
++	Composite,
++	CompositeItem,
++	useCompositeStore,
+ 	privateApis as componentsPrivateApis,
+ } from '@wordpress/components';
+ import { __, sprintf } from '@wordpress/i18n';
+@@ -44,12 +47,7 @@ const {
+ } = unlock( blockEditorPrivateApis );
+ const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
+ 
+-const {
+-	CompositeV2: Composite,
+-	CompositeItemV2: CompositeItem,
+-	useCompositeStoreV2: useCompositeStore,
+-	Tabs,
+-} = unlock( componentsPrivateApis );
++const { Tabs } = unlock( componentsPrivateApis );
+ 
+ // The content area of the Style Book is rendered within an iframe so that global styles
+ // are applied to elements within the entire content area. To support elements that are

@@ -1,0 +1,524 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index b77ba5718f95b4..113a532082cff2 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   Add `InputControl` component ([#76653](https://github.com/WordPress/gutenberg/pull/76653)).
++
+ ### Bug Fixes
+ 
+ -   `Card`: Add `overflow: clip` to `Card.Root` to prevent child content from overflowing rounded corners ([#76678](https://github.com/WordPress/gutenberg/pull/76678)).
+diff --git a/packages/ui/src/form/index.ts b/packages/ui/src/form/index.ts
+new file mode 100644
+index 00000000000000..419ec6230db808
+--- /dev/null
++++ b/packages/ui/src/form/index.ts
+@@ -0,0 +1,3 @@
++export * from './primitives';
++
++export * from './input-control';
+diff --git a/packages/ui/src/form/input-control/index.ts b/packages/ui/src/form/input-control/index.ts
+new file mode 100644
+index 00000000000000..611b7010b0d83a
+--- /dev/null
++++ b/packages/ui/src/form/input-control/index.ts
+@@ -0,0 +1 @@
++export { InputControl } from './input-control';
+diff --git a/packages/ui/src/form/input-control/input-control.tsx b/packages/ui/src/form/input-control/input-control.tsx
+new file mode 100644
+index 00000000000000..dedd82aa64bdfb
+--- /dev/null
++++ b/packages/ui/src/form/input-control/input-control.tsx
+@@ -0,0 +1,33 @@
++import { forwardRef } from '@wordpress/element';
++import { Input, Field } from '../primitives';
++import type { InputControlProps } from './types';
++
++/**
++ * A complete input field with integrated label and description.
++ */
++export const InputControl = forwardRef< HTMLInputElement, InputControlProps >(
++	function InputControl(
++		{
++			className,
++			label,
++			description,
++			details,
++			hideLabelFromVision,
++			...restProps
++		},
++		ref
++	) {
++		return (
++			<Field.Root className={ className }>
++				<Field.Label hideFromVision={ hideLabelFromVision }>
++					{ label }
++				</Field.Label>
++				<Input ref={ ref } { ...restProps } />
++				{ description && (
++					<Field.Description>{ description }</Field.Description>
++				) }
++				{ details && <Field.Details>{ details }</Field.Details> }
++			</Field.Root>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/input-control/stories/index.story.tsx b/packages/ui/src/form/input-control/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..dc7c1d1313f660
+--- /dev/null
++++ b/packages/ui/src/form/input-control/stories/index.story.tsx
+@@ -0,0 +1,163 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { useState } from '@wordpress/element';
++import { plus, reset, seen, unseen } from '@wordpress/icons';
++import { IconButton, InputControl, InputLayout, Stack } from '../../..';
++import {
++	WithPrefix,
++	WithSuffixControl,
++} from '../../primitives/input/stories/index.story';
++import {
++	WITH_DETAILS_DESCRIPTION,
++	DETAILS_EXAMPLE,
++} from '../../stories/shared';
++
++const meta: Meta< typeof InputControl > = {
++	title: 'Design System/Components/Form/InputControl',
++	component: InputControl,
++	argTypes: {
++		defaultValue: { control: false },
++		onValueChange: { action: 'onValueChange' },
++		value: { control: false },
++		type: { control: 'text' },
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof InputControl >;
++
++export const Default: Story = {
++	args: {
++		label: 'Label',
++		description: 'This is the description.',
++		placeholder: 'Placeholder',
++	},
++};
++
++export const VisuallyHiddenLabel: Story = {
++	args: {
++		...Default.args,
++		hideLabelFromVision: true,
++	},
++};
++
++export const WithDetails: Story = {
++	parameters: {
++		docs: { description: { story: WITH_DETAILS_DESCRIPTION } },
++	},
++	args: {
++		...Default.args,
++		description: undefined,
++		details: DETAILS_EXAMPLE,
++	},
++};
++
++WithPrefix.args = {
++	...WithPrefix.args,
++	...Default.args,
++};
++WithSuffixControl.args = {
++	...WithSuffixControl.args,
++	...Default.args,
++};
++export { WithPrefix, WithSuffixControl };
++
++export const Password: Story = {
++	render: function Template( args ) {
++		const [ show, setShow ] = useState( false );
++
++		return (
++			<InputControl
++				{ ...args }
++				type={ show ? 'text' : 'password' }
++				suffix={
++					<InputLayout.Slot padding="minimal">
++						<IconButton
++							label={ show ? 'Hide password' : 'Show password' }
++							onClick={ () => setShow( ! show ) }
++							icon={ show ? unseen : seen }
++							size="small"
++							variant="minimal"
++						/>
++					</InputLayout.Slot>
++				}
++			/>
++		);
++	},
++	args: {
++		...Default.args,
++		defaultValue: 'password',
++	},
++};
++
++export const Date: Story = {
++	args: {
++		...Default.args,
++		type: 'date',
++	},
++};
++
++export const Number: Story = {
++	args: {
++		...Default.args,
++		placeholder: '0',
++		type: 'number',
++	},
++};
++
++export const NumberWithSteppers: Story = {
++	render: function Template( args ) {
++		const [ value, setValue ] = useState( 0 );
++
++		return (
++			<>
++				<style>
++					{ `
++					  .my-number-with-steppers input[type='number'] {
++							-moz-appearance: textfield;
++					  }
++						.my-number-with-steppers ::-webkit-inner-spin-button {
++							appearance: none;
++						}
++					` }
++				</style>
++				<InputControl
++					{ ...args }
++					value={ value }
++					onValueChange={ ( v ) => setValue( parseInt( v, 10 ) ) }
++					className="my-number-with-steppers"
++					suffix={
++						<InputLayout.Slot padding="minimal">
++							<Stack direction="row" gap="xs">
++								<IconButton
++									label="Increment"
++									icon={ plus }
++									onClick={ () => setValue( value + 1 ) }
++									size="small"
++									variant="minimal"
++								/>
++								<IconButton
++									label="Decrement"
++									icon={ reset }
++									onClick={ () => setValue( value - 1 ) }
++									size="small"
++									variant="minimal"
++								/>
++							</Stack>
++						</InputLayout.Slot>
++					}
++				/>
++			</>
++		);
++	},
++	args: {
++		...Number.args,
++		type: 'number',
++	},
++};
++
++export const Disabled: Story = {
++	args: {
++		...Default.args,
++		disabled: true,
++	},
++};
+diff --git a/packages/ui/src/form/input-control/test/index.test.tsx b/packages/ui/src/form/input-control/test/index.test.tsx
+new file mode 100644
+index 00000000000000..56b68ca2c59139
+--- /dev/null
++++ b/packages/ui/src/form/input-control/test/index.test.tsx
+@@ -0,0 +1,53 @@
++import { render, screen } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import { InputControl } from '../index';
++
++describe( 'InputControl', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLInputElement >();
++
++		render( <InputControl ref={ ref } label="Username" /> );
++
++		expect( ref.current ).toBeInstanceOf( HTMLInputElement );
++	} );
++
++	it( 'renders with a visible label', () => {
++		render( <InputControl label="Email" /> );
++
++		expect(
++			screen.getByRole( 'textbox', { name: 'Email' } )
++		).toBeVisible();
++		expect( screen.getByText( 'Email' ) ).toBeVisible();
++	} );
++
++	it( 'renders with a visually hidden label', () => {
++		render( <InputControl label="Search" hideLabelFromVision /> );
++
++		expect(
++			screen.getByRole( 'textbox', { name: 'Search' } )
++		).toBeVisible();
++	} );
++
++	it( 'renders with a description', () => {
++		render(
++			<InputControl label="Name" description="Enter your full name." />
++		);
++
++		expect( screen.getByText( 'Enter your full name.' ) ).toBeVisible();
++	} );
++
++	it( 'renders with details', () => {
++		render(
++			<InputControl
++				label="Website"
++				details={
++					<span>
++						Must start with <code>https://</code>
++					</span>
++				}
++			/>
++		);
++
++		expect( screen.getByText( /Must start with/ ) ).toBeVisible();
++	} );
++} );
+diff --git a/packages/ui/src/form/input-control/types.ts b/packages/ui/src/form/input-control/types.ts
+new file mode 100644
+index 00000000000000..b0e11117c39e95
+--- /dev/null
++++ b/packages/ui/src/form/input-control/types.ts
+@@ -0,0 +1,5 @@
++import type { Input } from '../primitives';
++import type { ControlProps } from '../types';
++
++export type InputControlProps = React.ComponentProps< typeof Input > &
++	ControlProps;
+diff --git a/packages/ui/src/form/primitives/field/stories/index.story.tsx b/packages/ui/src/form/primitives/field/stories/index.story.tsx
+index b59a77e7e7bbbb..b6e17e9a087407 100644
+--- a/packages/ui/src/form/primitives/field/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/field/stories/index.story.tsx
+@@ -1,6 +1,7 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { useId } from '@wordpress/element';
+ import { Field } from '../../../..';
++import { DETAILS_EXAMPLE } from '../../../stories/shared';
+ 
+ const meta: Meta< typeof Field.Root > = {
+ 	title: 'Design System/Components/Form/Primitives/Field',
+@@ -135,13 +136,7 @@ export const WithDetails: StoryObj< typeof Field.Root > = {
+ 				<Field.Control
+ 					render={ <input type="text" placeholder="Placeholder" /> }
+ 				/>
+-				<Field.Details>
+-					Details can include{ '	' }
+-					<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
+-						links to more information
+-					</a>{ ' ' }
+-					and other semantic elements.
+-				</Field.Details>
++				<Field.Details>{ DETAILS_EXAMPLE }</Field.Details>
+ 			</>
+ 		),
+ 	},
+diff --git a/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx b/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
+index 4c7b2815704adf..2648987fb3609f 100644
+--- a/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
+@@ -1,5 +1,6 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { Fieldset } from '../../../..';
++import { DETAILS_EXAMPLE } from '../../../stories/shared';
+ 
+ const meta: Meta< typeof Fieldset.Root > = {
+ 	title: 'Design System/Components/Form/Primitives/Fieldset',
+@@ -74,13 +75,7 @@ export const WithDetails: Story = {
+ 						<input type="checkbox" /> { fruit }
+ 					</label>
+ 				) ) }
+-				<Fieldset.Details>
+-					Details can include{ ' ' }
+-					<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
+-						links to more information
+-					</a>{ ' ' }
+-					and other semantic elements.
+-				</Fieldset.Details>
++				<Fieldset.Details>{ DETAILS_EXAMPLE }</Fieldset.Details>
+ 			</>
+ 		),
+ 	},
+diff --git a/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx b/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx
+index 17a33f822b158f..a391ec1fd84e58 100644
+--- a/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx
+@@ -1,5 +1,6 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+-import { InputLayout } from '../../../..';
++import { copy } from '@wordpress/icons';
++import { IconButton, InputLayout } from '../../../..';
+ 
+ const meta: Meta< typeof InputLayout > = {
+ 	title: 'Design System/Components/Form/Primitives/InputLayout',
+@@ -50,6 +51,26 @@ export const WithPaddedPrefix: Story = {
+ 	},
+ };
+ 
++/**
++ * The `padding="minimal"` setting on `InputLayout.Slot` will work best when
++ * the slot content is a button or icon.
++ */
++export const WithSuffixControl: Story = {
++	args: {
++		children: <div style={ { flex: 1 } } />,
++		suffix: (
++			<InputLayout.Slot padding="minimal">
++				<IconButton
++					size="small"
++					variant="minimal"
++					icon={ copy }
++					label="Copy"
++				/>
++			</InputLayout.Slot>
++		),
++	},
++};
++
+ export const Compact: Story = {
+ 	args: {
+ 		size: 'compact',
+diff --git a/packages/ui/src/form/primitives/input/stories/index.story.tsx b/packages/ui/src/form/primitives/input/stories/index.story.tsx
+index 0bae94c4286def..eb81e6d95ad3d2 100644
+--- a/packages/ui/src/form/primitives/input/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/input/stories/index.story.tsx
+@@ -1,5 +1,6 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { Input, InputLayout } from '../../../..';
++import { WithSuffixControl } from '../../input-layout/stories/index.story';
+ 
+ const meta: Meta< typeof Input > = {
+ 	title: 'Design System/Components/Form/Primitives/Input',
+@@ -32,6 +33,12 @@ export const WithPrefix: Story = {
+ 	},
+ };
+ 
++WithSuffixControl.args = {
++	...WithSuffixControl.args,
++	children: undefined,
++};
++export { WithSuffixControl };
++
+ export const Disabled: Story = {
+ 	args: {
+ 		...Default.args,
+diff --git a/packages/ui/src/form/primitives/stories/overview.mdx b/packages/ui/src/form/primitives/stories/overview.mdx
+new file mode 100644
+index 00000000000000..79544ba96b13dc
+--- /dev/null
++++ b/packages/ui/src/form/primitives/stories/overview.mdx
+@@ -0,0 +1,15 @@
++import { Meta } from '@storybook/addon-docs/blocks';
++
++# Form Primitives
++
++<Meta title="Design System/Components/Form/Primitives" name="Overview" />
++
++These form primitives are the low-level building blocks for form-related components. Outside of rare, special use cases, a normal developer should not need to use these primitives directly.
++
++## When to use these primitives
++
++1. First check if there is a higher-level `*Control` component that meets your needs, either in this package, or if not, in [`@wordpress/components`](https://wordpress.github.io/gutenberg/?path=/docs/components-introduction--docs). Also consider using [`DataForm`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dataviews/#dataform), an even higher-level abstraction.
++2. If not, discuss with your designer whether the design can be altered to not require these primitives.
++3. If not, then these primitives are the next best option. Keep in mind that you are responsible for ensuring that your implementation is accessible, and adheres to Design System guidelines.
++
++Feel free to reach out to the `#design-system` channel on the [Make WordPress Slack](https://make.wordpress.org/chat/) for guidance.
+diff --git a/packages/ui/src/form/stories/shared.tsx b/packages/ui/src/form/stories/shared.tsx
+new file mode 100644
+index 00000000000000..8cdbf527d3a7be
+--- /dev/null
++++ b/packages/ui/src/form/stories/shared.tsx
+@@ -0,0 +1,19 @@
++export const WITH_DETAILS_DESCRIPTION = `\
++To add rich content (such as links) to the description, use the \`details\` prop.
++
++Although this content is not associated with the field using direct semantics,
++it is made discoverable to screen reader users via a visually hidden description,
++alerting them to the presence of additional information below.
++
++**Important:** If the content only includes plain text, use \`description\` instead,
++so the readout is not unnecessarily verbose for screen reader users.`;
++
++export const DETAILS_EXAMPLE = (
++	<>
++		Details can include{ ' ' }
++		<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
++			links to more information
++		</a>{ ' ' }
++		and other semantic elements.
++	</>
++);
+diff --git a/packages/ui/src/form/types.ts b/packages/ui/src/form/types.ts
+new file mode 100644
+index 00000000000000..3920a6088eb015
+--- /dev/null
++++ b/packages/ui/src/form/types.ts
+@@ -0,0 +1,34 @@
++import type { Field } from './primitives';
++
++export type ControlProps = {
++	/**
++	 * The accessible label. All controls must be labeled.
++	 */
++	label: React.ComponentProps< typeof Field.Label >[ 'children' ];
++	/**
++	 * The accessible description, associated using `aria-describedby`.
++	 *
++	 * For screen reader accessibility, this should only contain plain text,
++	 * and no semantics such as links.
++	 */
++	description?: React.ComponentProps<
++		typeof Field.Description
++	>[ 'children' ];
++	/**
++	 * Additional information about the field, which unlike a normal description,
++	 * can include links and other semantic elements.
++	 *
++	 * Do not use this prop when the content is only plain text;
++	 * use `description` instead.
++	 */
++	details?: React.ComponentProps< typeof Field.Details >[ 'children' ];
++	/**
++	 * Whether to visually hide the label while keeping it accessible
++	 * to screen readers.
++	 *
++	 * @default false
++	 */
++	hideLabelFromVision?: React.ComponentProps<
++		typeof Field.Label
++	>[ 'hideFromVision' ];
++};
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 6f9a138744e15d..5f682a4103899d 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -4,7 +4,7 @@ export * as Card from './card';
+ export * as Collapsible from './collapsible';
+ export * as CollapsibleCard from './collapsible-card';
+ export * as Dialog from './dialog';
+-export * from './form/primitives';
++export * from './form';
+ export * from './icon';
+ export * from './icon-button';
+ export * from './link';

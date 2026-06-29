@@ -1,0 +1,34 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d52010acc6e9a9..b0da2cba56b3f9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `ExternalLink`: Fix arrow direction for RTL languages. The external link arrow now correctly points to the top-left (↖) instead of top-right (↗) in RTL layouts. ([#73400](https://github.com/WordPress/gutenberg/pull/73400))
+ -   Fixed an issue where the `Guide` component’s close button became invisible on hover when used on light backgrounds. The component's close button now relies on the default button hover effect, and the custom hover color is applied only within `welcome-guide` implementations to maintain consistency. ([#73220](https://github.com/WordPress/gutenberg/pull/73220))
+ 
+ ## 30.8.0 (2025-11-12)
+diff --git a/packages/components/src/external-link/index.tsx b/packages/components/src/external-link/index.tsx
+index 0927effb3ae672..e8e3f080d4bf2b 100644
+--- a/packages/components/src/external-link/index.tsx
++++ b/packages/components/src/external-link/index.tsx
+@@ -7,7 +7,7 @@ import type { ForwardedRef } from 'react';
+ /**
+  * WordPress dependencies
+  */
+-import { __ } from '@wordpress/i18n';
++import { __, isRTL } from '@wordpress/i18n';
+ import { forwardRef } from '@wordpress/element';
+ 
+ /**
+@@ -73,7 +73,7 @@ function UnforwardedExternalLink(
+ 					__( '(opens in a new tab)' )
+ 				}
+ 			>
+-				&#8599;
++				{ isRTL() ? '\u2196' : '\u2197' }
+ 			</span>
+ 		</a>
+ 		/* eslint-enable react/jsx-no-target-blank */

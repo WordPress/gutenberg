@@ -1,0 +1,62 @@
+diff --git a/packages/components/src/h-stack/stories/index.story.tsx b/packages/components/src/h-stack/stories/index.story.tsx
+index 88aebb7682e476..025c3384bddceb 100644
+--- a/packages/components/src/h-stack/stories/index.story.tsx
++++ b/packages/components/src/h-stack/stories/index.story.tsx
+@@ -42,7 +42,8 @@ const JUSTIFICATIONS = {
+ 
+ const meta: Meta< typeof HStack > = {
+ 	component: HStack,
+-	title: 'Components (Experimental)/HStack',
++	title: 'Components (Experimental)/Layout/HStack',
++	id: 'components-experimental-hstack',
+ 	argTypes: {
+ 		as: {
+ 			control: { type: null },
+diff --git a/packages/components/src/responsive-wrapper/stories/index.story.tsx b/packages/components/src/responsive-wrapper/stories/index.story.tsx
+index cf676c3bcec801..d684a00c870028 100644
+--- a/packages/components/src/responsive-wrapper/stories/index.story.tsx
++++ b/packages/components/src/responsive-wrapper/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import ResponsiveWrapper from '..';
+ 
+ const meta: Meta< typeof ResponsiveWrapper > = {
+ 	component: ResponsiveWrapper,
+-	title: 'Components/ResponsiveWrapper',
++	title: 'Components/Layout/ResponsiveWrapper',
++	id: 'components-responsivewrapper',
+ 	argTypes: {
+ 		children: { control: { type: null } },
+ 	},
+diff --git a/packages/components/src/v-stack/stories/index.story.tsx b/packages/components/src/v-stack/stories/index.story.tsx
+index 781c1bce6676cc..11d6d579abc81e 100644
+--- a/packages/components/src/v-stack/stories/index.story.tsx
++++ b/packages/components/src/v-stack/stories/index.story.tsx
+@@ -25,7 +25,8 @@ const ALIGNMENTS = {
+ 
+ const meta: Meta< typeof VStack > = {
+ 	component: VStack,
+-	title: 'Components (Experimental)/VStack',
++	title: 'Components (Experimental)/Layout/VStack',
++	id: 'components-experimental-vstack',
+ 	argTypes: {
+ 		alignment: {
+ 			control: { type: 'select' },
+diff --git a/storybook/preview.js b/storybook/preview.js
+index a045b0c3303d39..435fa4dbc43264 100644
+--- a/storybook/preview.js
++++ b/storybook/preview.js
+@@ -133,13 +133,14 @@ export const parameters = {
+ 					'Actions',
+ 					'Containers',
+ 					'Feedback',
++					'Layout',
+ 					'Navigation',
+ 					'Overlays',
+ 					'Typography',
+ 					'Utilities',
+ 				],
+ 				'Components (Experimental)',
+-				[ 'Navigation', 'Overlays', 'Typography' ],
++				[ 'Layout', 'Navigation', 'Overlays', 'Typography' ],
+ 				'Icons',
+ 			],
+ 		},

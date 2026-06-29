@@ -1,0 +1,36 @@
+diff --git a/packages/block-editor/src/components/link-control/search-input.js b/packages/block-editor/src/components/link-control/search-input.js
+index 7cf7477b4fb942..addf781d378ed6 100644
+--- a/packages/block-editor/src/components/link-control/search-input.js
++++ b/packages/block-editor/src/components/link-control/search-input.js
+@@ -129,8 +129,15 @@ const LinkControlSearchInput = forwardRef(
+ 				: __( 'Link' );
+ 
+ 		return (
+-			<div className="block-editor-link-control__search-input-container">
++				<div
++					className="block-editor-link-control__search-input-container"
++					aria-label={ __( 'Search links' ) }
++				>
++				<h2 id="link-dialog-title" className="screen-reader-text">
++					{ __( 'Insert Link' ) }
++				</h2>
+ 				<URLInput
++					aria-label={ __( 'Link URL' ) }
+ 					disableSuggestions={ currentLink?.url === value }
+ 					label={ label }
+ 					hideLabelFromVision={ hideLabelFromVision }
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 75c73ea9609ad2..ed4693ee6bb1f7 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -301,7 +301,9 @@ function UnforwardedModal(
+ 							'is-scrollable': hasScrollableContent,
+ 							'has-scrolled-content': hasScrolledContent,
+ 						} ) }
+-						role="document"
++						role="dialog"
++						aria-labelledby="link-dialog-title"
++						aria-modal="true"
+ 						onScroll={ onContentContainerScroll }
+ 						ref={ contentRef }
+ 						aria-label={

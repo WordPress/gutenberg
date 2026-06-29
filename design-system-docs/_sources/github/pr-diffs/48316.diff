@@ -1,0 +1,444 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 272a92d3b8e60a..a6d5f8b224fa94 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Animate`: Convert to TypeScript ([#49243](https://github.com/WordPress/gutenberg/pull/49243)).
+ -   `CustomGradientPicker`: Convert to TypeScript ([#48929](https://github.com/WordPress/gutenberg/pull/48929)).
++-   `GradientPicker`: Convert to TypeScript ([#48316](https://github.com/WordPress/gutenberg/pull/48316)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/gradient-picker/README.md b/packages/components/src/gradient-picker/README.md
+index 33cb159b89056b..0901d14043eab8 100644
+--- a/packages/components/src/gradient-picker/README.md
++++ b/packages/components/src/gradient-picker/README.md
+@@ -49,63 +49,56 @@ const myGradientPicker = () => {
+ 
+ The component accepts the following props:
+ 
+-### value
++### `className`: `string`
++
++The class name added to the wrapper.
++
++-   Required: No
++
++### `value`: `string`
+ 
+ The current value of the gradient. Pass a css gradient like `linear-gradient(90deg, rgb(6, 147, 227) 0%, rgb(155, 81, 224) 100%)`. Optionally pass in a `null` value to specify no gradient is currently selected.
+ 
+--   Type: `string`
+ -   Required: No
+ -   Default: `linear-gradient(90deg, rgb(6, 147, 227) 0%, rgb(155, 81, 224) 100%)`
+ 
+-### onChange
++### `onChange`: `( currentGradient: string | undefined ) => void`
+ 
+ The function called when a new gradient has been defined. It is passed the `currentGradient` as an argument.
+ 
+--   Type: `Function`
+ -   Required: Yes
+ 
+-### gradients
++### `gradients`: `GradientsProp[]`
+ 
+-An array of objects of predefined gradients which show up as `CircularOptionPicker` above the gradient selector.
++An array of objects of predefined gradients displayed above the gradient selector.
+ 
+--   Type: `array`
+ -   Required: No
++-   Default: `[]`
+ 
+-### clearable
++### `clearable`: `boolean`
+ 
+ Whether the palette should have a clearing button or not.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ -   Default: true
+ 
+-### clearGradient
+-
+-Called when a new gradient has been defined. It is passed the `currentGradient` as an argument.
+-
+--   Type: `Function`
+--   Required: No
+-
+-### disableCustomGradients
++### `disableCustomGradients`: `boolean`
+ 
+ If true, the gradient picker will not be displayed and only defined gradients from `gradients` are available.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ -   Default: false
+ 
+-### __nextHasNoMargin
++### `__nextHasNoMargin`: `boolean`
+ 
+ Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
+ 
+--   Type: `Boolean`
+ -   Required: No
+ -   Default: `false`
+ 
+-### headingLevel
++### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
+ 
+-The heading level.
++The heading level. Only applies in cases where gradients are provided from multiple origins (ie. when the array passed as the `gradients` prop contains two or more items).
+ 
+--   Type: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
+ -   Required: No
+ -   Default: `2`
+diff --git a/packages/components/src/gradient-picker/index.js b/packages/components/src/gradient-picker/index.tsx
+similarity index 70%
+rename from packages/components/src/gradient-picker/index.js
+rename to packages/components/src/gradient-picker/index.tsx
+index 626c8d0667e5b3..70ff9fcf4802a9 100644
+--- a/packages/components/src/gradient-picker/index.js
++++ b/packages/components/src/gradient-picker/index.tsx
+@@ -1,5 +1,3 @@
+-// @ts-nocheck
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -15,13 +13,21 @@ import CustomGradientPicker from '../custom-gradient-picker';
+ import { VStack } from '../v-stack';
+ import { ColorHeading } from '../color-palette/styles';
+ import { Spacer } from '../spacer';
++import type {
++	GradientPickerComponentProps,
++	PickerProps,
++	OriginObject,
++	GradientObject,
++} from './types';
+ 
+ // The Multiple Origin Gradients have a `gradients` property (an array of
+ // gradient objects), while Single Origin ones have a `gradient` property.
+-const isMultipleOriginObject = ( obj ) =>
++const isMultipleOriginObject = (
++	obj: Record< string, any >
++): obj is OriginObject =>
+ 	Array.isArray( obj.gradients ) && ! ( 'gradient' in obj );
+ 
+-const isMultipleOriginArray = ( arr ) => {
++const isMultipleOriginArray = ( arr: any[] ): arr is OriginObject[] => {
+ 	return (
+ 		arr.length > 0 &&
+ 		arr.every( ( gradientObj ) => isMultipleOriginObject( gradientObj ) )
+@@ -35,7 +41,7 @@ function SingleOrigin( {
+ 	onChange,
+ 	value,
+ 	actions,
+-} ) {
++}: PickerProps< GradientObject > ) {
+ 	const gradientOptions = useMemo( () => {
+ 		return gradients.map( ( { gradient, name }, index ) => (
+ 			<CircularOptionPicker.Option
+@@ -80,7 +86,7 @@ function MultipleOrigin( {
+ 	value,
+ 	actions,
+ 	headingLevel,
+-} ) {
++}: PickerProps< OriginObject > ) {
+ 	return (
+ 		<VStack spacing={ 3 } className={ className }>
+ 			{ gradients.map( ( { name, gradients: gradientSet }, index ) => {
+@@ -107,25 +113,72 @@ function MultipleOrigin( {
+ 	);
+ }
+ 
+-export default function GradientPicker( {
++function Component( props: PickerProps< any > ) {
++	if ( isMultipleOriginArray( props.gradients ) ) {
++		return <MultipleOrigin { ...props } />;
++	}
++	return <SingleOrigin { ...props } />;
++}
++
++/**
++ *  GradientPicker is a React component that renders a color gradient picker to
++ * define a multi step gradient. There's either a _linear_ or a _radial_ type
++ * available.
++ *
++ * ```jsx
++ *import { GradientPicker } from '@wordpress/components';
++ *import { useState } from '@wordpress/element';
++ *
++ *const myGradientPicker = () => {
++ *	const [ gradient, setGradient ] = useState( null );
++ *
++ *	return (
++ *		<GradientPicker
++ *			__nextHasNoMargin
++ *			value={ gradient }
++ *			onChange={ ( currentGradient ) => setGradient( currentGradient ) }
++ *			gradients={ [
++ *				{
++ *					name: 'JShine',
++ *					gradient:
++ *						'linear-gradient(135deg,#12c2e9 0%,#c471ed 50%,#f64f59 100%)',
++ *					slug: 'jshine',
++ *				},
++ *				{
++ *					name: 'Moonlit Asteroid',
++ *					gradient:
++ *						'linear-gradient(135deg,#0F2027 0%, #203A43 0%, #2c5364 100%)',
++ *					slug: 'moonlit-asteroid',
++ *				},
++ *				{
++ *					name: 'Rastafarie',
++ *					gradient:
++ *						'linear-gradient(135deg,#1E9600 0%, #FFF200 0%, #FF0000 100%)',
++ *					slug: 'rastafari',
++ *				},
++ *			] }
++ *		/>
++ *	);
++ *};
++ *```
++ *
++ */
++export function GradientPicker( {
+ 	/** Start opting into the new margin-free styles that will become the default in a future version. */
+ 	__nextHasNoMargin = false,
+ 	className,
+-	gradients,
++	gradients = [],
+ 	onChange,
+ 	value,
+ 	clearable = true,
+ 	disableCustomGradients = false,
+ 	__experimentalIsRenderedInSidebar,
+ 	headingLevel = 2,
+-} ) {
++}: GradientPickerComponentProps ) {
+ 	const clearGradient = useCallback(
+ 		() => onChange( undefined ),
+ 		[ onChange ]
+ 	);
+-	const Component = isMultipleOriginArray( gradients )
+-		? MultipleOrigin
+-		: SingleOrigin;
+ 
+ 	if ( ! __nextHasNoMargin ) {
+ 		deprecated( 'Outer margin styles for wp.components.GradientPicker', {
+@@ -137,7 +190,7 @@ export default function GradientPicker( {
+ 
+ 	const deprecatedMarginSpacerProps = ! __nextHasNoMargin
+ 		? {
+-				marginTop: ! gradients?.length ? 3 : undefined,
++				marginTop: ! gradients.length ? 3 : undefined,
+ 				marginBottom: ! clearable ? 6 : 0,
+ 		  }
+ 		: {};
+@@ -145,7 +198,7 @@ export default function GradientPicker( {
+ 	return (
+ 		// Outmost Spacer wrapper can be removed when deprecation period is over
+ 		<Spacer marginBottom={ 0 } { ...deprecatedMarginSpacerProps }>
+-			<VStack spacing={ gradients?.length ? 4 : 0 }>
++			<VStack spacing={ gradients.length ? 4 : 0 }>
+ 				{ ! disableCustomGradients && (
+ 					<CustomGradientPicker
+ 						__nextHasNoMargin
+@@ -156,10 +209,9 @@ export default function GradientPicker( {
+ 						onChange={ onChange }
+ 					/>
+ 				) }
+-				{ ( gradients?.length || clearable ) && (
++				{ ( gradients.length || clearable ) && (
+ 					<Component
+ 						className={ className }
+-						clearable={ clearable }
+ 						clearGradient={ clearGradient }
+ 						gradients={ gradients }
+ 						onChange={ onChange }
+@@ -181,3 +233,5 @@ export default function GradientPicker( {
+ 		</Spacer>
+ 	);
+ }
++
++export default GradientPicker;
+diff --git a/packages/components/src/gradient-picker/stories/index.js b/packages/components/src/gradient-picker/stories/index.tsx
+similarity index 78%
+rename from packages/components/src/gradient-picker/stories/index.js
+rename to packages/components/src/gradient-picker/stories/index.tsx
+index c365e4741b6cdc..0f34d65d5eb621 100644
+--- a/packages/components/src/gradient-picker/stories/index.js
++++ b/packages/components/src/gradient-picker/stories/index.tsx
+@@ -1,3 +1,7 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
+ /**
+  * WordPress dependencies
+  */
+@@ -6,18 +10,21 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import GradientPicker from '../';
++import GradientPicker from '..';
+ 
+-export default {
++const meta: ComponentMeta< typeof GradientPicker > = {
+ 	title: 'Components/GradientPicker',
+ 	component: GradientPicker,
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++		actions: { argTypesRegex: '^on.*' },
++	},
+ 	argTypes: {
+-		__nextHasNoMargin: { control: { type: 'boolean' } },
+-		clearable: { control: { type: 'boolean' } },
+-		disableCustomGradients: { control: { type: 'boolean' } },
+-		onChange: { action: 'onChange' },
++		value: { control: { type: null } },
+ 	},
+ };
++export default meta;
+ 
+ const GRADIENTS = [
+ 	{
+@@ -58,8 +65,12 @@ const GRADIENTS = [
+ 	},
+ ];
+ 
+-const Template = ( { onChange, ...props } ) => {
+-	const [ gradient, setGradient ] = useState();
++const Template: ComponentStory< typeof GradientPicker > = ( {
++	onChange,
++	...props
++} ) => {
++	const [ gradient, setGradient ] =
++		useState< ( typeof props )[ 'value' ] >( null );
+ 	return (
+ 		<GradientPicker
+ 			{ ...props }
+diff --git a/packages/components/src/gradient-picker/types.ts b/packages/components/src/gradient-picker/types.ts
+new file mode 100644
+index 00000000000000..ad38f152abbfd7
+--- /dev/null
++++ b/packages/components/src/gradient-picker/types.ts
+@@ -0,0 +1,89 @@
++/**
++ * Internal dependencies
++ */
++import type { HeadingSize } from '../heading/types';
++
++export type GradientObject = {
++	gradient: string;
++	name: string;
++	slug: string;
++};
++export type OriginObject = { name: string; gradients: GradientObject[] };
++export type GradientsProp = GradientObject[] | OriginObject[];
++
++type GradientPickerBaseProps = {
++	/**
++	 * The class name added to the wrapper.
++	 */
++	className?: string;
++	/**
++	 * The function called when a new gradient has been defined. It is passed to
++	 * the `currentGradient` as an argument.
++	 */
++	onChange: ( currentGradient: string | undefined ) => void;
++	/**
++	 * The current value of the gradient. Pass a css gradient string (See default value for example).
++	 * Optionally pass in a `null` value to specify no gradient is currently selected.
++	 *
++	 * @default 'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)'
++	 */
++	value?: GradientObject[ 'gradient' ] | null;
++	/**
++	 * Whether the palette should have a clearing button or not.
++	 *
++	 * @default true
++	 */
++	clearable?: boolean;
++	/**
++	 * The heading level. Only applies in cases where gradients are provided
++	 * from multiple origins (ie. when the array passed as the `gradients` prop
++	 * contains two or more items).
++	 *
++	 * @default 2
++	 */
++	headingLevel?: HeadingSize;
++};
++
++export type GradientPickerComponentProps = GradientPickerBaseProps & {
++	/**
++	 * An array of objects as predefined gradients displayed above the gradient
++	 * selector. Alternatively, if there are multiple sets (or 'origins') of
++	 * gradients, you can pass an array of objects each with a `name` and a
++	 * `gradients` array which will in turn contain the predefined gradient objects.
++	 *
++	 * @default []
++	 */
++	gradients?: GradientsProp;
++	/**
++	 * Start opting in to the new margin-free styles that will become the default
++	 * in a future version, currently scheduled to be WordPress 6.4. (The prop
++	 * can be safely removed once this happens.)
++	 *
++	 * @default false
++	 */
++	__nextHasNoMargin?: boolean;
++	/**
++	 * If true, the gradient picker will not be displayed and only defined
++	 * gradients from `gradients` will be shown.
++	 *
++	 * @default false
++	 */
++	disableCustomGradients?: boolean;
++	/**
++	 * Whether this is rendered in the sidebar.
++	 *
++	 * @default false
++	 */
++	__experimentalIsRenderedInSidebar?: boolean;
++};
++
++export type PickerProps< TOriginType extends GradientObject | OriginObject > =
++	GradientPickerBaseProps & {
++		clearGradient: () => void;
++		onChange: (
++			currentGradient: string | undefined,
++			index: number
++		) => void;
++		actions?: React.ReactNode;
++		gradients: TOriginType[];
++	};
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index 315b726d0354b3..bd9818d5d8db2f 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -572,7 +572,6 @@ export function PaletteEdit( {
+ 					) }
+ 					{ ! isEditing &&
+ 						( isGradient ? (
+-							// @ts-expect-error TODO: Remove when GradientPicker is typed.
+ 							<GradientPicker
+ 								__nextHasNoMargin
+ 								gradients={ gradients }
+diff --git a/packages/components/src/palette-edit/types.ts b/packages/components/src/palette-edit/types.ts
+index d5e0384c324c45..5513b945537784 100644
+--- a/packages/components/src/palette-edit/types.ts
++++ b/packages/components/src/palette-edit/types.ts
+@@ -16,7 +16,7 @@ export type Color = {
+ };
+ 
+ export type Gradient = {
+-	gradient?: string;
++	gradient: string;
+ 	name: string;
+ 	slug: string;
+ 	color?: never;

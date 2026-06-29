@@ -1,0 +1,320 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c79f5100a81833..71891385040fb1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,7 @@
+ -   Wrapped `Modal` in a `forwardRef` call ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
+ -   Unify styles for `ColorIndicator` with how they appear in Global Styles ([#37028](https://github.com/WordPress/gutenberg/pull/37028))
+ -   Add support for rendering the `ColorPalette` in a `Dropdown` when opened in the sidebar ([#37067](https://github.com/WordPress/gutenberg/pull/37067))
++-   Show an incremental sequence of numbers (1/2/3/4/5) as a label of the font size, when we have at most five font sizes, where at least one the them contains a complex css value(clamp, var, etc..). We do this because complex css values cannot be calculated properly and the incremental sequence of numbers as labels can help the user better mentally map the different available font sizes. ([#37038](https://github.com/WordPress/gutenberg/pull/37038))
+ 
+ ## 19.1.4 (2021-12-13)
+ 
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index ccb3e62fcab4b2..97c4fa39e4bd8b 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -47,23 +47,28 @@ function FontSizePicker(
+ 		availableUnits: [ 'px', 'em', 'rem' ],
+ 	} );
+ 
+-	// The main font size UI displays a toggle group when the presets are less
+-	// than six and a select control when they are more.
+-	//
+-	// A select control is also used when the value of a preset cannot be
+-	// immediately computed (eg. 'calc', 'var').
+-	const shouldUseSelectControl =
+-		fontSizes.length > 5 ||
+-		fontSizes.some( ( { size } ) => ! isSimpleCssValue( size ) );
+-
++	/**
++	 * The main font size UI displays a toggle group when the presets are less
++	 * than six and a select control when they are more.
++	 */
++	const fontSizesContainComplexValues = fontSizes.some(
++		( { size } ) => ! isSimpleCssValue( size )
++	);
++	const shouldUseSelectControl = fontSizes.length > 5;
+ 	const options = useMemo(
+ 		() =>
+ 			getFontSizeOptions(
+ 				shouldUseSelectControl,
+ 				fontSizes,
+-				disableCustomFontSizes
++				disableCustomFontSizes,
++				fontSizesContainComplexValues
+ 			),
+-		[ shouldUseSelectControl, fontSizes, disableCustomFontSizes ]
++		[
++			shouldUseSelectControl,
++			fontSizes,
++			disableCustomFontSizes,
++			fontSizesContainComplexValues,
++		]
+ 	);
+ 	const selectedOption = getSelectedOption( fontSizes, value );
+ 	const isCustomValue = selectedOption.slug === CUSTOM_FONT_SIZE;
+@@ -88,12 +93,21 @@ function FontSizePicker(
+ 		}
+ 		// Calculate the `hint` for toggle group control.
+ 		let hint = selectedOption.name;
+-		if ( typeof selectedOption.size === 'string' ) {
++		if (
++			! fontSizesContainComplexValues &&
++			typeof selectedOption.size === 'string'
++		) {
+ 			const [ , unit ] = splitValueAndUnitFromSize( selectedOption.size );
+ 			hint += `(${ unit })`;
+ 		}
+ 		return hint;
+-	}, [ showCustomValueControl, selectedOption?.slug, value, isCustomValue ] );
++	}, [
++		showCustomValueControl,
++		selectedOption?.slug,
++		value,
++		isCustomValue,
++		fontSizesContainComplexValues,
++	] );
+ 
+ 	if ( ! options ) {
+ 		return null;
+diff --git a/packages/components/src/font-size-picker/stories/index.js b/packages/components/src/font-size-picker/stories/index.js
+index 9e812ff488aef2..a1ee37c036df53 100644
+--- a/packages/components/src/font-size-picker/stories/index.js
++++ b/packages/components/src/font-size-picker/stories/index.js
+@@ -158,38 +158,62 @@ export const differentControlBySize = () => {
+ };
+ 
+ export const withComplexCSSValues = () => {
+-	const fontSizes = object( 'Font Sizes', [
++	const options = [
+ 		{
+ 			name: 'Small',
+ 			slug: 'small',
+-			size: '0.75rem',
++			size: '0.65rem',
+ 		},
+ 		{
+-			name: 'Normal',
+-			slug: 'normal',
+-			size: '1rem',
++			name: 'Medium',
++			slug: 'medium',
++			size: '1.125rem',
+ 		},
+ 		{
+ 			name: 'Large',
+ 			slug: 'large',
+-			size: '2.5rem',
++			size: '1.7rem',
+ 		},
+ 		{
+ 			name: 'Extra Large',
+ 			slug: 'extra-large',
+-			size: '3.5rem',
++			size: '1.95rem',
++		},
++		{
++			name: 'Extra Extra Large',
++			slug: 'extra-extra-large',
++			size: '2.5rem',
+ 		},
+ 		{
+ 			name: 'Huge',
+ 			slug: 'huge',
+-			size: 'clamp(2.5rem, 4vw, 3rem)',
++			size: '2.8rem',
+ 		},
+-	] );
++	];
++	const showMoreFontSizes = boolean( 'Add more font sizes', false );
++	const addComplexCssValues = boolean(
++		'Add some complex css values(calc, var, etc..)',
++		true
++	);
++
++	const _options = options.map( ( option, index ) => {
++		const _option = { ...option };
++		// Adding just one complex css value is enough (first element);
++		if ( addComplexCssValues && ! index ) {
++			_option.size = 'clamp(1.75rem, 3vw, 2.25rem)';
++		}
++		return _option;
++	} );
++
++	const fontSizes = _options.slice(
++		0,
++		showMoreFontSizes ? _options.length : 5
++	);
+ 	return (
+ 		<div style={ { maxWidth: '248px' } }>
+ 			<FontSizePickerWithState
+ 				fontSizes={ fontSizes }
+-				initialValue={ '1rem' }
++				initialValue={ '1.125rem' }
+ 			/>
+ 		</div>
+ 	);
+diff --git a/packages/components/src/font-size-picker/test/index.js b/packages/components/src/font-size-picker/test/index.js
+index 2742da0d774395..a1158f50e26f25 100644
+--- a/packages/components/src/font-size-picker/test/index.js
++++ b/packages/components/src/font-size-picker/test/index.js
+@@ -141,4 +141,91 @@ describe( 'FontSizePicker', () => {
+ 			expect( fontSize ).toBe( '16px' );
+ 		} );
+ 	} );
++	describe( 'renders different control', () => {
++		const options = [
++			{
++				name: 'Small',
++				slug: 'small',
++				size: '0.65rem',
++			},
++			{
++				name: 'Medium',
++				slug: 'medium',
++				size: '1.125rem',
++			},
++			{
++				name: 'Large',
++				slug: 'large',
++				size: '1.7rem',
++			},
++		];
++		it( 'should render select control when we have more than five font sizes', () => {
++			const extraOptions = [
++				{
++					name: 'Extra Large',
++					slug: 'extra-large',
++					size: '1.95rem',
++				},
++				{
++					name: 'Extra Extra Large',
++					slug: 'extra-extra-large',
++					size: '2.5rem',
++				},
++				{
++					name: 'Huge',
++					slug: 'huge',
++					size: '2.8rem',
++				},
++			];
++			const fontSizes = [ ...options, ...extraOptions ];
++			render(
++				<FontSizePicker
++					fontSizes={ fontSizes }
++					value={ fontSizes[ 0 ].size }
++				/>
++			);
++			// Trigger click to open the select menu and take into account
++			// the two extra options (default, custom);
++			fireEvent.click(
++				screen.getByLabelText( 'Font size', { selector: 'button' } )
++			);
++			const element = screen.getAllByRole( 'option' );
++			expect( element ).toHaveLength( fontSizes.length + 2 );
++		} );
++		describe( 'segmented control', () => {
++			it( 'should use numeric labels for simple css values', () => {
++				const fontSizes = [ ...options ];
++				render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						value={ fontSizes[ 0 ].size }
++					/>
++				);
++				const element = screen.getByLabelText( 'Large' );
++				expect( element ).toBeInTheDocument();
++				expect( element.children ).toHaveLength( 2 );
++				expect( element.children[ 0 ].textContent ).toBe( '1.7' );
++			} );
++			it( 'should use incremental sequence of numbers as labels if we have complex css', () => {
++				const fontSizes = [
++					...options,
++					{
++						name: 'Extra Large',
++						slug: 'extra-large',
++						size: 'clamp(1.75rem, 3vw, 2.25rem)',
++					},
++				];
++				render(
++					<FontSizePicker
++						fontSizes={ fontSizes }
++						value={ fontSizes[ 0 ].size }
++					/>
++				);
++				const element = screen.getByLabelText( 'Large' );
++				expect( element ).toBeInTheDocument();
++				expect( element.children ).toHaveLength( 2 );
++				expect( element.children[ 0 ].textContent ).toBe( '3' );
++			} );
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/font-size-picker/utils.js b/packages/components/src/font-size-picker/utils.js
+index 507706b4440987..cc5be4f91821e9 100644
+--- a/packages/components/src/font-size-picker/utils.js
++++ b/packages/components/src/font-size-picker/utils.js
+@@ -14,6 +14,15 @@ const CUSTOM_FONT_SIZE_OPTION = {
+ 	name: __( 'Custom' ),
+ };
+ 
++/**
++ * In case we have at most five font sizes, where at least one the them
++ * contain a complex css value(clamp, var, etc..) show a incremental sequence
++ * of numbers as a label of the font size. We do this because complex css values
++ * cannot be caluclated properly and the incremental sequence of numbers as labels
++ * can help the user better mentally map the different available font sizes.
++ */
++const FONT_SIZES_ALIASES = [ '1', '2', '3', '4', '5' ];
++
+ /**
+  * Helper util to split a font size to its numeric value
+  * and its `unit`, if exists.
+@@ -47,22 +56,24 @@ export function isSimpleCssValue( value ) {
+  * Return font size options in the proper format depending
+  * on the currently used control (select, toggle group).
+  *
+- * @param {boolean}  useSelectControl       Whether to use a select control.
+- * @param {Object[]} optionsArray           Array of available font sizes objects.
+- * @param {*}        disableCustomFontSizes Flag that indicates if custom font sizes are disabled.
++ * @param {boolean}  useSelectControl               Whether to use a select control.
++ * @param {Object[]} optionsArray                   Array of available font sizes objects.
++ * @param {*}        disableCustomFontSizes         Flag that indicates if custom font sizes are disabled.
++ * @param {boolean}  optionsContainComplexCssValues Whether font sizes contain at least one complex css value(clamp, var, etc..).
+  * @return {Object[]|null} Array of font sizes in proper format for the used control.
+  */
+ export function getFontSizeOptions(
+ 	useSelectControl,
+ 	optionsArray,
+-	disableCustomFontSizes
++	disableCustomFontSizes,
++	optionsContainComplexCssValues
+ ) {
+ 	if ( disableCustomFontSizes && ! optionsArray.length ) {
+ 		return null;
+ 	}
+ 	return useSelectControl
+ 		? getSelectOptions( optionsArray, disableCustomFontSizes )
+-		: getToggleGroupOptions( optionsArray );
++		: getToggleGroupOptions( optionsArray, optionsContainComplexCssValues );
+ }
+ 
+ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+@@ -80,10 +91,12 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+ 	} ) );
+ }
+ 
+-function getToggleGroupOptions( optionsArray ) {
+-	return optionsArray.map( ( { slug, size, name } ) => {
+-		let label = size;
+-		if ( typeof size === 'string' ) {
++function getToggleGroupOptions( optionsArray, optionsContainComplexCssValues ) {
++	return optionsArray.map( ( { slug, size, name }, index ) => {
++		let label = optionsContainComplexCssValues
++			? FONT_SIZES_ALIASES[ index ]
++			: size;
++		if ( ! optionsContainComplexCssValues && typeof size === 'string' ) {
+ 			const [ numericValue ] = splitValueAndUnitFromSize( size );
+ 			label = numericValue;
+ 		}

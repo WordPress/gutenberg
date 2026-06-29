@@ -1,0 +1,46 @@
+diff --git a/package-lock.json b/package-lock.json
+index 3e03a08e4e2b30..a65035568ca77d 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -3037,7 +3037,7 @@
+ 			"version": "file:packages/components",
+ 			"requires": {
+ 				"@wordpress/a11y": "file:packages/a11y",
+-				"@wordpress/api-request": "file:packages/api-request",
++				"@wordpress/api-fetch": "file:packages/api-fetch",
+ 				"@wordpress/compose": "file:packages/compose",
+ 				"@wordpress/deprecated": "file:packages/deprecated",
+ 				"@wordpress/dom": "file:packages/dom",
+@@ -3074,19 +3074,6 @@
+ 						}
+ 					}
+ 				},
+-				"@wordpress/api-request": {
+-					"version": "file:packages/api-request",
+-					"bundled": true,
+-					"requires": {
+-						"jquery": "^3.3.1"
+-					},
+-					"dependencies": {
+-						"jquery": {
+-							"version": "3.3.1",
+-							"bundled": true
+-						}
+-					}
+-				},
+ 				"@wordpress/deprecated": {
+ 					"version": "file:packages/deprecated",
+ 					"bundled": true
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 17f91079159174..18ccf996bbb8c8 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -25,7 +25,7 @@
+ 	"module": "build-module/index.js",
+ 	"dependencies": {
+ 		"@wordpress/a11y": "file:../a11y",
+-		"@wordpress/api-request": "file:../api-request",
++		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/deprecated": "file:../deprecated",
+ 		"@wordpress/dom": "file:../dom",

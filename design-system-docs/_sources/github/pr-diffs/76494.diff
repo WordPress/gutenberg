@@ -1,0 +1,258 @@
+diff --git a/packages/base-styles/CHANGELOG.md b/packages/base-styles/CHANGELOG.md
+index 75c2a2410bdef2..da781f0651ed42 100644
+--- a/packages/base-styles/CHANGELOG.md
++++ b/packages/base-styles/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Deprecations
++
++-   Deprecate `$modal-min-width`, `$modal-width-small`, `$modal-width-medium`, and `$modal-width-large` SCSS variables in favor of `--wpds-dimension-surface-width-*` design tokens. Variable values have been updated to align with the token scale ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
++
+ ## 6.17.0 (2026-03-04)
+ 
+ ## 6.16.0 (2026-02-18)
+diff --git a/packages/base-styles/_variables.scss b/packages/base-styles/_variables.scss
+index 6e618b77ba2f1e..1981970bb1d4c7 100644
+--- a/packages/base-styles/_variables.scss
++++ b/packages/base-styles/_variables.scss
+@@ -105,14 +105,16 @@ $admin-bar-height-big: 46px;
+ $admin-sidebar-width: 160px;
+ $admin-sidebar-width-big: 190px;
+ $admin-sidebar-width-collapsed: 36px;
+-$modal-min-width: 350px;
+-$modal-width-small: 384px;
+-$modal-width-medium: 512px;
+-$modal-width-large: 840px;
+ $spinner-size: 16px;
+ $canvas-padding: $grid-unit-20;
+ $palette-max-height: 368px;
+ 
++// Deprecated, please use --wpds-dimension-surface-width-* design tokens instead.
++$modal-min-width: 320px;
++$modal-width-small: 400px;
++$modal-width-medium: 560px;
++$modal-width-large: 960px;
++
+ /**
+  * Mobile specific styles
+  */
+diff --git a/packages/block-editor/src/components/link-control/style.scss b/packages/block-editor/src/components/link-control/style.scss
+index c8a1f2312140ce..061ac588c3d774 100644
+--- a/packages/block-editor/src/components/link-control/style.scss
++++ b/packages/block-editor/src/components/link-control/style.scss
+@@ -18,12 +18,14 @@ $block-editor-link-control-number-of-actions: 1;
+ 
+ .block-editor-link-control {
+ 	position: relative;
+-	min-width: $modal-min-width;
++	// TODO: Replace with a --wpds-dimension-surface-width-* token.
++	min-width: 350px;
+ 
+ 	.components-popover__content & {
+ 		min-width: auto;
+ 		width: 90vw;
+-		max-width: $modal-min-width;
++		// TODO: Replace with a --wpds-dimension-surface-width-* token.
++		max-width: 350px;
+ 	}
+ 
+ 	.show-icon-labels & {
+diff --git a/packages/block-editor/src/components/url-popover/style.scss b/packages/block-editor/src/components/url-popover/style.scss
+index 6c988dd9bfc825..33a3da90ead24e 100644
+--- a/packages/block-editor/src/components/url-popover/style.scss
++++ b/packages/block-editor/src/components/url-popover/style.scss
+@@ -65,7 +65,8 @@
+ 	min-width: 150px;
+ 	// Avoids the popover from growing too wide when the URL is long.
+ 	// See https://github.com/WordPress/gutenberg/issues/58599
+-	max-width: $modal-min-width;
++	// TODO: Replace with a --wpds-dimension-surface-width-* token.
++	max-width: 350px;
+ 
+ 	&.has-invalid-link {
+ 		color: $alert-red;
+@@ -75,7 +76,8 @@
+ .block-editor-url-popover__expand-on-click {
+ 	display: flex;
+ 	align-items: center;
+-	min-width: $modal-min-width;
++	// TODO: Replace with a --wpds-dimension-surface-width-* token.
++	min-width: 350px;
+ 	white-space: nowrap;
+ 
+ 	.text {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d88c350fe5fee1..b4b65453440792 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ ### Enhancements
+ 
+ -   `DateCalendar`, `DateRangeCalendar`: Add `showOutsideDays` and `fixedWeeks` props and style outside-month days ([#76199](https://github.com/WordPress/gutenberg/pull/76199)).
++-   `Modal`: Use `--wpds-dimension-surface-width-*` design tokens for width constraints ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/guide/style.scss b/packages/components/src/guide/style.scss
+index e6663de5dec83a..6b929b572ce7d6 100644
+--- a/packages/components/src/guide/style.scss
++++ b/packages/components/src/guide/style.scss
+@@ -6,9 +6,11 @@
+ 
+ .components-guide {
+ 	$image-height: 300px;
++	// TODO: Replace with a --wpds-dimension-surface-width-* token.
+ 	$image-width: 320px;
+ 
+ 	@include break-small() {
++		// TODO: Replace with a --wpds-dimension-surface-width-* token.
+ 		width: 600px;
+ 	}
+ 
+@@ -86,6 +88,7 @@
+ 
+ .components-modal__frame.components-guide {
+ 	border: none;
++	// TODO: Replace with a --wpds-dimension-surface-width-* token.
+ 	min-width: 312px;
+ 	max-height: 575px;
+ 
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index b8e69f632bdef2..f84e55958ef3f1 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -65,7 +65,7 @@
+ 		border-radius: $radius-large;
+ 		margin: auto;
+ 		width: auto;
+-		min-width: $modal-min-width;
++		min-width: var(--wpds-dimension-surface-width-sm);
+ 		max-width: calc(100% - #{$grid-unit-20 * 2});
+ 		max-height: calc(100% - #{$header-height * 2});
+ 
+@@ -88,17 +88,14 @@
+ 			width: 100%;
+ 		}
+ 
+-		// The following widths were selected to align with existing baselines
+-		// found elsewhere in the editor.
+-		// See https://github.com/WordPress/gutenberg/pull/54471#issuecomment-1723818809
+ 		&.has-size-small {
+-			max-width: $modal-width-small;
++			max-width: var(--wpds-dimension-surface-width-md);
+ 		}
+ 		&.has-size-medium {
+-			max-width: $modal-width-medium;
++			max-width: var(--wpds-dimension-surface-width-lg);
+ 		}
+ 		&.has-size-large {
+-			max-width: $modal-width-large;
++			max-width: var(--wpds-dimension-surface-width-2xl);
+ 		}
+ 
+ 	}
+diff --git a/packages/components/src/snackbar/style.scss b/packages/components/src/snackbar/style.scss
+index df9ec8362ce473..d899538fe25c25 100644
+--- a/packages/components/src/snackbar/style.scss
++++ b/packages/components/src/snackbar/style.scss
+@@ -14,6 +14,7 @@
+ 	color: $white;
+ 	padding: $grid-unit-15 ($grid-unit-05 * 5);
+ 	width: 100%;
++	// TODO: Replace with a --wpds-dimension-surface-width-* token.
+ 	max-width: 600px;
+ 	box-sizing: border-box;
+ 	cursor: pointer;
+diff --git a/packages/edit-site/src/components/page-patterns/style.scss b/packages/edit-site/src/components/page-patterns/style.scss
+index 773a003c141fbe..db7d25ef910145 100644
+--- a/packages/edit-site/src/components/page-patterns/style.scss
++++ b/packages/edit-site/src/components/page-patterns/style.scss
+@@ -3,6 +3,7 @@
+ @use "@wordpress/base-styles/variables" as *;
+ 
+ .edit-site-patterns__delete-modal {
++	// TODO: Replace with a --wpds-dimension-surface-width-* token.
+ 	width: $modal-width-small;
+ }
+ 
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 8e18ba48a5732f..59553e43764f09 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ ### Enhancements
+ 
+ -   `Badge`: Add border, update text color, and apply `neutral-strong` background to `none` intent for better contrast against neutral surfaces ([#76356](https://github.com/WordPress/gutenberg/pull/76356)).
++-   `Dialog`: Use `--wpds-dimension-surface-width-*` design tokens for width constraints ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
+ -   `Notice`: Improve narrow layout by letting description and actions span the icon column when a title is present ([#76202](https://github.com/WordPress/gutenberg/pull/76202)).
+ -   `Notice`: Use `Text` component for `Title` and `Description` typography ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
+ -   `Card`, `CollapsibleCard`: update padding to match legacy `Card` component ([#76368](https://github.com/WordPress/gutenberg/pull/76368)).
+diff --git a/packages/ui/src/dialog/style.module.css b/packages/ui/src/dialog/style.module.css
+index c8de96078d8d69..c2dff0b2fd8d11 100644
+--- a/packages/ui/src/dialog/style.module.css
++++ b/packages/ui/src/dialog/style.module.css
+@@ -29,7 +29,7 @@
+ 		z-index: var(--wp-ui-dialog-z-index, initial);
+ 		transform: translate(-50%, -50%);
+ 		box-sizing: border-box;
+-		min-width: 320px;
++		min-width: var(--wpds-dimension-surface-width-sm);
+ 		width: calc(100vw - 2 * var(--wpds-dimension-padding-2xl));
+ 		max-height: calc(100vh - 2 * var(--wpds-dimension-padding-2xl));
+ 		padding: var(--wpds-dimension-padding-2xl);
+@@ -61,19 +61,19 @@
+ 		}
+ 
+ 		@media (min-width: 480px) {
+-			min-width: 384px;
++			min-width: var(--wpds-dimension-surface-width-md);
+ 		}
+ 
+ 		&.is-small {
+-			max-width: 384px;
++			max-width: var(--wpds-dimension-surface-width-md);
+ 		}
+ 
+ 		&.is-medium {
+-			max-width: 512px;
++			max-width: var(--wpds-dimension-surface-width-lg);
+ 		}
+ 
+ 		&.is-large {
+-			max-width: 840px;
++			max-width: var(--wpds-dimension-surface-width-2xl);
+ 		}
+ 
+ 		&.is-stretch {
+diff --git a/packages/ui/src/dialog/types.ts b/packages/ui/src/dialog/types.ts
+index 7d5bb547794be2..e55ee6ea15e5be 100644
+--- a/packages/ui/src/dialog/types.ts
++++ b/packages/ui/src/dialog/types.ts
+@@ -32,9 +32,9 @@ export interface PopupProps extends ComponentProps< 'div' > {
+ 	 * Renders the dialog at a preset width (excluding additional padding from
+ 	 * the viewport edges).
+ 	 *
+-	 * - `'small'` — max-width of 384px.
+-	 * - `'medium'` — max-width of 512px.
+-	 * - `'large'` — max-width of 840px.
++	 * - `'small'` — narrow max-width.
++	 * - `'medium'` — moderate max-width.
++	 * - `'large'` — wide max-width.
+ 	 * - `'stretch'` — no max-width, stretches to fill available space.
+ 	 * - `'full'` — stretches to fill available width and height.
+ 	 *
+diff --git a/packages/ui/src/notice/style.module.css b/packages/ui/src/notice/style.module.css
+index 9e5b3d95d34dad..abeeced6f5a9a1 100644
+--- a/packages/ui/src/notice/style.module.css
++++ b/packages/ui/src/notice/style.module.css
+@@ -115,7 +115,7 @@
+ 		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-error-weak);
+ 	}
+ 
+-	/* TODO: Replace 320px with a measure token from the Theme package. */
++	/* Matches --wpds-dimension-surface-width-sm (container queries don't support custom properties). */
+ 	@container (max-width: 320px) {
+ 		.notice:has(.title) .description,
+ 		.notice:has(.title) .actions {

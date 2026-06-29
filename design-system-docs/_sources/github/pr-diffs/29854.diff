@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/custom-select-control/README.md b/packages/components/src/custom-select-control/README.md
+index 8826701604277f..893bb2fc369cf2 100644
+--- a/packages/components/src/custom-select-control/README.md
++++ b/packages/components/src/custom-select-control/README.md
+@@ -21,7 +21,7 @@ These are the same as [the ones for `SelectControl`s](/packages/components/src/s
+  * WordPress dependencies
+  */
+ import { CustomSelectControl } from '@wordpress/components';
+-import { useState } from '@wordpress/compose';
++import { useState } from '@wordpress/element';
+ 
+ const options = [
+ 	{

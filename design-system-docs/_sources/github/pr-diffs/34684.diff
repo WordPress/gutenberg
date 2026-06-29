@@ -1,0 +1,41 @@
+diff --git a/packages/compose/src/hooks/use-constrained-tabbing/index.js b/packages/compose/src/hooks/use-constrained-tabbing/index.js
+index b20b85376e0940..9c0eb356794d18 100644
+--- a/packages/compose/src/hooks/use-constrained-tabbing/index.js
++++ b/packages/compose/src/hooks/use-constrained-tabbing/index.js
+@@ -46,20 +46,29 @@ function useConstrainedTabbing() {
+ 			}
+ 			const firstTabbable = tabbables[ 0 ];
+ 			const lastTabbable = tabbables[ tabbables.length - 1 ];
++			const focusables = focus.focusable.find( node );
++			const firstFocusable = focusables[ 0 ];
++			const lastFocusable = focusables[ focusables.length - 1 ];
+ 
+-			if ( event.shiftKey && event.target === firstTabbable ) {
++			if (
++				event.shiftKey &&
++				( event.target === firstTabbable ||
++					event.target === firstFocusable )
++			) {
+ 				event.preventDefault();
+ 				/** @type {HTMLElement} */ ( lastTabbable ).focus();
+-			} else if ( ! event.shiftKey && event.target === lastTabbable ) {
++			} else if (
++				! event.shiftKey &&
++				( event.target === lastTabbable ||
++					event.target === lastFocusable )
++			) {
+ 				event.preventDefault();
+ 				/** @type {HTMLElement} */ ( firstTabbable ).focus();
+ 				/*
+-				 * When pressing Tab and none of the tabbables has focus, the keydown
+-				 * event happens on the wrapper div: move focus on the first tabbable.
++				 * When pressing Tab and the target element is the wrapper node,
++				 * move focus on the first tabbable.
+ 				 */
+-			} else if (
+-				! tabbables.includes( /** @type {Element} */ ( event.target ) )
+-			) {
++			} else if ( node === event.target ) {
+ 				event.preventDefault();
+ 				/** @type {HTMLElement} */ ( firstTabbable ).focus();
+ 			}

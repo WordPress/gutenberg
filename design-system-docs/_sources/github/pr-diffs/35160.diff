@@ -1,0 +1,319 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 7886fe11ea0628..02ac6098ef9679 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1068,9 +1068,15 @@
+ 		"parent": "components"
+ 	},
+ 	{
+-		"title": "Navigator",
+-		"slug": "navigator",
+-		"markdown_source": "../packages/components/src/navigator/README.md",
++		"title": "NavigatorProvider",
++		"slug": "navigator-provider",
++		"markdown_source": "../packages/components/src/navigator/navigator-provider/README.md",
++		"parent": "components"
++	},
++	{
++		"title": "NavigatorScreen",
++		"slug": "navigator-screen",
++		"markdown_source": "../packages/components/src/navigator/navigator-screen/README.md",
+ 		"parent": "components"
+ 	},
+ 	{
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 4e3560104e3b31..28f8e245941e81 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -97,7 +97,7 @@ export { default as __experimentalNavigationGroup } from './navigation/group';
+ export { default as __experimentalNavigationItem } from './navigation/item';
+ export { default as __experimentalNavigationMenu } from './navigation/menu';
+ export {
+-	Navigator as __experimentalNavigator,
++	NavigatorProvider as __experimentalNavigatorProvider,
+ 	NavigatorScreen as __experimentalNavigatorScreen,
+ 	useNavigator as __experimentalUseNavigator,
+ } from './navigator';
+diff --git a/packages/components/src/navigator/index.js b/packages/components/src/navigator/index.js
+index c00a6a12043366..b30e5cdf396de8 100644
+--- a/packages/components/src/navigator/index.js
++++ b/packages/components/src/navigator/index.js
+@@ -1,3 +1,3 @@
+-export { default as Navigator } from './navigator';
+-export { default as NavigatorScreen } from './screen';
++export { default as NavigatorProvider } from './navigator-provider';
++export { default as NavigatorScreen } from './navigator-screen';
+ export { default as useNavigator } from './use-navigator';
+diff --git a/packages/components/src/navigator/README.md b/packages/components/src/navigator/navigator-provider/README.md
+similarity index 58%
+rename from packages/components/src/navigator/README.md
+rename to packages/components/src/navigator/navigator-provider/README.md
+index 99eb5e78413f43..dead39a0bb7f6d 100644
+--- a/packages/components/src/navigator/README.md
++++ b/packages/components/src/navigator/navigator-provider/README.md
+@@ -1,18 +1,18 @@
+-# Navigator
++# `NavigatorProvider`
+ 
+ <div class="callout callout-alert">
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-The Navigator components allows rendering nested panels or menus (also called screens) and navigate between these different states. The Global Styles sidebar is an example of this.
++The `NavigatorProvider` component allows rendering nested panels or menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the `useNavigator` hook). The Global Styles sidebar is an example of this.
+ 
+-The components is not opinionated in terms of UI, it lets compose any UI components to navigate between the nested screens.
++The `Navigator*` family of components is _not_ opinionated in terms of UI, and can be composed with any UI components to navigate between the nested screens.
+ 
+ ## Usage
+ 
+ ```jsx
+ import {
+-	__experimentalNavigator as Navigator,
++	__experimentalNavigatorProvider as NavigatorProvider,
+ 	__experimentalNavigatorScreen as NavigatorScreen,
+ 	__experimentalUseNavigator as useNavigator,
+ } from '@wordpress/components';
+@@ -32,7 +32,7 @@ function NavigatorButton( {
+ }
+ 
+ const MyNavigation = () => (
+-	<Navigator initialPath="/">
++	<NavigatorProvider initialPath="/">
+ 		<NavigatorScreen path="/">
+ 			<p>This is the home screen.</p>
+ 			<NavigatorButton isPrimary path="/child">
+@@ -46,43 +46,31 @@ const MyNavigation = () => (
+ 				Go back
+ 			</NavigatorButton>
+ 		</NavigatorScreen>
+-	</Navigator>
++	</NavigatorProvider>
+ );
+ ```
+ 
+-## Navigator Props
++## Props
+ 
+-`Navigator` supports the following props.
++The component accepts the following props:
+ 
+-### `initialPath`
+-
+--   Type: `string`
+--   Required: No
++### `initialPath`: `string`
+ 
+ The initial active path.
+ 
+-## NavigatorScreen Props
+-
+-`NavigatorScreen` supports the following props.
+-
+-### `path`
+-
+--   Type: `string`
+--   Required: Yes
++-   Required: No
+ 
+-The path of the current screen.
+ 
+-## The navigator object.
++## The navigator object
+ 
+ You can retrieve a `navigator` instance by using the `useNavigator` hook.
+-The navigator offers the following methods:
+ 
+-### `push`
++The hook offers the following methods:
+ 
+--   Type: `( path: string, options ) => void`
++### `push`: `( path: string, options ) => void`
+ 
+ The `push` function allows you to navigate to a given path. The second argument can augment the navigation operations with different options.
+ 
+ The available options are:
+ 
+- - `isBack` (`boolean): A boolean flag indicating that we're moving back to a previous state.
++- `isBack` (`boolean): A boolean flag indicating that we're moving back to a previous state. -->
+diff --git a/packages/components/src/navigator/navigator.js b/packages/components/src/navigator/navigator-provider/component.js
+similarity index 68%
+rename from packages/components/src/navigator/navigator.js
+rename to packages/components/src/navigator/navigator-provider/component.js
+index 2073374771921c..a49553ac5377c4 100644
+--- a/packages/components/src/navigator/navigator.js
++++ b/packages/components/src/navigator/navigator-provider/component.js
+@@ -6,9 +6,9 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { NavigatorContext } from './context';
++import { NavigatorContext } from '../context';
+ 
+-function Navigator( { initialPath, children } ) {
++function NavigatorProvider( { initialPath, children } ) {
+ 	const [ path, setPath ] = useState( { path: initialPath } );
+ 
+ 	return (
+@@ -18,4 +18,4 @@ function Navigator( { initialPath, children } ) {
+ 	);
+ }
+ 
+-export default Navigator;
++export default NavigatorProvider;
+diff --git a/packages/components/src/navigator/navigator-provider/index.js b/packages/components/src/navigator/navigator-provider/index.js
+new file mode 100644
+index 00000000000000..b404d7fd44a81a
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-provider/index.js
+@@ -0,0 +1 @@
++export { default } from './component';
+diff --git a/packages/components/src/navigator/navigator-screen/README.md b/packages/components/src/navigator/navigator-screen/README.md
+new file mode 100644
+index 00000000000000..65957155b04881
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-screen/README.md
+@@ -0,0 +1,22 @@
++# `NavigatorScreen`
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++The `NavigatorScreen` component represents a single view/screen/panel/menu and is supposed to be used in combination with [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md).
++
++## Usage
++
++Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md#usage) for a usage example.
++
++## Props
++
++The component accepts the following props:
++
++### `path`
++
++-   Type: `string`
++-   Required: Yes
++
++The path of the current screen.
+diff --git a/packages/components/src/navigator/screen.js b/packages/components/src/navigator/navigator-screen/component.js
+similarity index 97%
+rename from packages/components/src/navigator/screen.js
+rename to packages/components/src/navigator/navigator-screen/component.js
+index 1d27e413a093f8..3a5e33605a0b3e 100644
+--- a/packages/components/src/navigator/screen.js
++++ b/packages/components/src/navigator/navigator-screen/component.js
+@@ -14,7 +14,7 @@ import { isRTL } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import { NavigatorContext } from './context';
++import { NavigatorContext } from '../context';
+ 
+ const animationEnterDelay = 0;
+ const animationEnterDuration = 0.14;
+diff --git a/packages/components/src/navigator/navigator-screen/index.js b/packages/components/src/navigator/navigator-screen/index.js
+new file mode 100644
+index 00000000000000..b404d7fd44a81a
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-screen/index.js
+@@ -0,0 +1 @@
++export { default } from './component';
+diff --git a/packages/components/src/navigator/stories/index.js b/packages/components/src/navigator/stories/index.js
+index 7a1352c30ffe3a..42a5a639e6e671 100644
+--- a/packages/components/src/navigator/stories/index.js
++++ b/packages/components/src/navigator/stories/index.js
+@@ -2,11 +2,11 @@
+  * Internal dependencies
+  */
+ import Button from '../../button';
+-import { Navigator, NavigatorScreen, useNavigator } from '../';
++import { NavigatorProvider, NavigatorScreen, useNavigator } from '../';
+ 
+ export default {
+ 	title: 'Components (Experimental)/Navigator',
+-	component: Navigator,
++	component: NavigatorProvider,
+ };
+ 
+ function NavigatorButton( { path, isBack = false, ...props } ) {
+@@ -20,7 +20,7 @@ function NavigatorButton( { path, isBack = false, ...props } ) {
+ }
+ 
+ const MyNavigation = () => (
+-	<Navigator initialPath="/">
++	<NavigatorProvider initialPath="/">
+ 		<NavigatorScreen path="/">
+ 			<p>This is the home screen.</p>
+ 			<NavigatorButton isPrimary path="/child">
+@@ -34,7 +34,7 @@ const MyNavigation = () => (
+ 				Go back
+ 			</NavigatorButton>
+ 		</NavigatorScreen>
+-	</Navigator>
++	</NavigatorProvider>
+ );
+ 
+ export const _default = () => {
+diff --git a/packages/components/src/navigator/test/index.js b/packages/components/src/navigator/test/index.js
+index 3aa2840d0972fc..31e8305e2a1dd7 100644
+--- a/packages/components/src/navigator/test/index.js
++++ b/packages/components/src/navigator/test/index.js
+@@ -6,7 +6,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { Navigator, NavigatorScreen, useNavigator } from '../';
++import { NavigatorProvider, NavigatorScreen, useNavigator } from '../';
+ 
+ jest.mock( 'framer-motion', () => {
+ 	const actual = jest.requireActual( 'framer-motion' );
+@@ -47,7 +47,7 @@ const MyNavigation = ( {
+ 	initialPath = PATHS.HOME,
+ 	onNavigatorButtonClick,
+ } ) => (
+-	<Navigator initialPath={ initialPath }>
++	<NavigatorProvider initialPath={ initialPath }>
+ 		<NavigatorScreen path={ PATHS.HOME }>
+ 			<p>This is the home screen.</p>
+ 			<NavigatorButton
+@@ -76,7 +76,7 @@ const MyNavigation = ( {
+ 		</NavigatorScreen>
+ 
+ 		{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included */ }
+-	</Navigator>
++	</NavigatorProvider>
+ );
+ 
+ const getNavigationScreenByText = ( text, { throwIfNotFound = true } = {} ) => {
+diff --git a/packages/edit-site/src/components/sidebar/global-styles-sidebar.js b/packages/edit-site/src/components/sidebar/global-styles-sidebar.js
+index 2d740ec9a8f3e2..46b465cc492b57 100644
+--- a/packages/edit-site/src/components/sidebar/global-styles-sidebar.js
++++ b/packages/edit-site/src/components/sidebar/global-styles-sidebar.js
+@@ -8,7 +8,7 @@ import { map } from 'lodash';
+  */
+ import {
+ 	Button,
+-	__experimentalNavigator as Navigator,
++	__experimentalNavigatorProvider as NavigatorProvider,
+ 	__experimentalNavigatorScreen as NavigatorScreen,
+ 	__experimentalUseNavigator as useNavigator,
+ 	__experimentalItemGroup as ItemGroup,
+@@ -257,7 +257,7 @@ export default function GlobalStylesSidebar() {
+ 				</>
+ 			}
+ 		>
+-			<Navigator initialPath="/">
++			<NavigatorProvider initialPath="/">
+ 				<NavigatorScreen path="/">
+ 					<StylePreview />
+ 
+@@ -324,7 +324,7 @@ export default function GlobalStylesSidebar() {
+ 						setSetting={ setSetting }
+ 					/>
+ 				) ) }
+-			</Navigator>
++			</NavigatorProvider>
+ 		</DefaultSidebar>
+ 	);
+ }

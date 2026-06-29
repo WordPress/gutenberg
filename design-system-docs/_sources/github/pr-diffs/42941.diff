@@ -1,0 +1,983 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4cf7bc546c49dd..3b799f9459f3d0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -45,6 +45,7 @@
+ -   `Modal`: use `KeyboardEvent.code` instead of deprecated `KeyboardEvent.keyCode`. improve unit tests ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
+ -   `FocalPointPicker`: use `KeyboardEvent.code`, partially refactor tests to modern RTL and `user-event` ([#43441](https://github.com/WordPress/gutenberg/pull/43441/)).
+ -   `CustomGradientPicker`: use `KeyboardEvent.code` instead of `KeyboardEvent.keyCode` ([#43437](https://github.com/WordPress/gutenberg/pull/43437/)).
++-   `Card`: Convert to TypeScript ([#42941](https://github.com/WordPress/gutenberg/pull/42941)).
+ -   `NavigableContainer`: Refactor away from `_.omit()` ([#43474](https://github.com/WordPress/gutenberg/pull/43474/)).
+ -   `Notice`: Refactor away from `_.omit()` ([#43474](https://github.com/WordPress/gutenberg/pull/43474/)).
+ -   `Snackbar`: Refactor away from `_.omit()` ([#43474](https://github.com/WordPress/gutenberg/pull/43474/)).
+@@ -52,6 +53,7 @@
+ -   `BottomSheet`: Refactor away from `_.omit()` ([#43474](https://github.com/WordPress/gutenberg/pull/43474/)).
+ 
+ ### Experimental
++
+ -   `FormTokenField`: add `__experimentalAutoSelectFirstMatch` prop to auto select the first matching suggestion on typing ([#42527](https://github.com/WordPress/gutenberg/pull/42527/)).
+ 
+ ## 19.17.0 (2022-08-10)
+diff --git a/packages/components/CONTRIBUTING.md b/packages/components/CONTRIBUTING.md
+index 0b866036905938..ca8f948b7ee853 100644
+--- a/packages/components/CONTRIBUTING.md
++++ b/packages/components/CONTRIBUTING.md
+@@ -156,8 +156,8 @@ function Example(
+ 
+ A couple of good examples of how hooks are used for composition are:
+ 
+-- the `Card` component, which builds on top of the `Surface` component by [calling the `useSurface` hook inside its own hook](/packages/components/src/card/card/hook.js);
+-- the `HStack` component, which builds on top of the `Flex` component and [calls the `useFlex` hook inside its own hook](/packages/components/src/h-stack/hook.js).
++- the `Card` component, which builds on top of the `Surface` component by [calling the `useSurface` hook inside its own hook](/packages/components/src/card/card/hook.ts);
++- the `HStack` component, which builds on top of the `Flex` component and [calls the `useFlex` hook inside its own hook](/packages/components/src/h-stack/hook.tsx).
+ 
+ <!-- ## API Consinstency
+ 
+@@ -262,7 +262,7 @@ An example of how this is used can be found in the [`Card` component family](/pa
+ 
+ ```jsx
+ //=========================================================================
+-// Simplified snippet from `packages/components/src/card/card/hook.js`
++// Simplified snippet from `packages/components/src/card/card/hook.ts`
+ //=========================================================================
+ import { useContextSystem } from '../../ui/context';
+ 
+@@ -276,7 +276,7 @@ export function useCard( props ) {
+ }
+ 
+ //=========================================================================
+-// Simplified snippet from `packages/components/src/card/card/component.js`
++// Simplified snippet from `packages/components/src/card/card/component.ts`
+ //=========================================================================
+ import { contextConnect, ContextSystemProvider } from '../../ui/context';
+ 
+@@ -301,7 +301,7 @@ function Card( props, forwardedRef ) {
+ 	}, [ isBorderless, size ] );
+ 
+ 	return (
+-		{ /* Write additional values to the Context System */ }
++		/* Write additional values to the Context System */
+ 		<ContextSystemProvider value={ contextProviderValue }>
+ 			{ /* [...] */ }
+ 		</ContextSystemProvider>
+@@ -313,7 +313,7 @@ const ConnectedCard = contextConnect( Card, 'Card' );
+ export default ConnectedCard;
+ 
+ //=========================================================================
+-// Simplified snippet from `packages/components/src/card/card-body/hook.js`
++// Simplified snippet from `packages/components/src/card/card-body/hook.ts`
+ //=========================================================================
+ import { useContextSystem } from '../../ui/context';
+ 
+@@ -364,7 +364,7 @@ Primary.args = {
+ 
+ A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code. Avoid using [Knobs](https://storybook.js.org/addons/@storybook/addon-knobs) for new stories, as this addon is deprecated.
+ 
+-The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.js)).
++The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](/packages/components/src/card/stories/index.tsx)).
+ 
+ Storybook can be started on a local machine by running `npm run storybook:dev`. Alternatively, the components' catalogue (up to date with the latest code on `trunk`) can be found at [wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/).
+ 
+@@ -516,7 +516,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
+ 	5. Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package.
+ 	6. If the component forwards its `...restProps` to an underlying element/component, you should use the `WordPressComponentProps` type for the component's props:
+ 
+-		```jsx
++		```tsx
+ 		import type { WordPressComponentProps } from '../ui/context';
+ 		import type { ComponentOwnProps } from './types';
+ 
+@@ -533,7 +533,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
+ 
+ 	7. If the component doesn't forwards its ref yet, wrap the component in a `forwardRed` call. Alternatively, if you want to take advantage of the [Context system](#context-system), you can use the `contextConnect` utility function (which also takes care of adding ref forwarding)
+ 
+-		```jsx
++		```tsx
+ 		// With `forwardRef`
+ 		import type { ForwardedRef } from 'react';
+ 		import { forwardRef } from '@wordpress/element';
+@@ -554,7 +554,7 @@ Given a component folder (e.g. `packages/components/src/unit-control`):
+ 		export default MyComponent;
+ 		```
+ 
+-		```jsx
++		```tsx
+ 		// With `contextConnect`
+ 		import type { ForwardedRef } from 'react';
+ 		import {
+diff --git a/packages/components/src/card/card-body/component.js b/packages/components/src/card/card-body/component.tsx
+similarity index 60%
+rename from packages/components/src/card/card-body/component.js
+rename to packages/components/src/card/card-body/component.tsx
+index 028974cbd1e882..cab52cf02ad25d 100644
+--- a/packages/components/src/card/card-body/component.js
++++ b/packages/components/src/card/card-body/component.tsx
+@@ -1,16 +1,21 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect } from '../../ui/context';
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import { Scrollable } from '../../scrollable';
+ import { View } from '../../view';
+ import { useCardBody } from './hook';
++import type { BodyProps } from '../types';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').BodyProps, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                                       forwardedRef
+- */
+-function CardBody( props, forwardedRef ) {
++function UnconnectedCardBody(
++	props: WordPressComponentProps< BodyProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const { isScrollable, ...otherProps } = useCardBody( props );
+ 
+ 	if ( isScrollable ) {
+@@ -24,7 +29,6 @@ function CardBody( props, forwardedRef ) {
+  * `CardBody` renders an optional content area for a `Card`.
+  * Multiple `CardBody` components can be used within `Card` if needed.
+  *
+- * @example
+  * ```jsx
+  * import { Card, CardBody } from `@wordpress/components`;
+  *
+@@ -35,6 +39,6 @@ function CardBody( props, forwardedRef ) {
+  * </Card>
+  * ```
+  */
+-const ConnectedCardBody = contextConnect( CardBody, 'CardBody' );
++export const CardBody = contextConnect( UnconnectedCardBody, 'CardBody' );
+ 
+-export default ConnectedCardBody;
++export default CardBody;
+diff --git a/packages/components/src/card/card-body/hook.js b/packages/components/src/card/card-body/hook.ts
+similarity index 78%
+rename from packages/components/src/card/card-body/hook.js
+rename to packages/components/src/card/card-body/hook.ts
+index 5333a77bbbd2e9..a02a6981b54e3d 100644
+--- a/packages/components/src/card/card-body/hook.js
++++ b/packages/components/src/card/card-body/hook.ts
+@@ -6,14 +6,14 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
++import type { BodyProps } from '../types';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').BodyProps, 'div'>} props
+- */
+-export function useCardBody( props ) {
++export function useCardBody(
++	props: WordPressComponentProps< BodyProps, 'div' >
++) {
+ 	const {
+ 		className,
+ 		isScrollable = false,
+diff --git a/packages/components/src/card/card-body/index.js b/packages/components/src/card/card-body/index.ts
+similarity index 100%
+rename from packages/components/src/card/card-body/index.js
+rename to packages/components/src/card/card-body/index.ts
+diff --git a/packages/components/src/card/card-divider/component.js b/packages/components/src/card/card-divider/component.tsx
+similarity index 51%
+rename from packages/components/src/card/card-divider/component.js
+rename to packages/components/src/card/card-divider/component.tsx
+index 9696b98673db74..cdd52bffd5c99f 100644
+--- a/packages/components/src/card/card-divider/component.js
++++ b/packages/components/src/card/card-divider/component.tsx
+@@ -1,15 +1,19 @@
+ /**
+- * Internal dependencies
++ * External dependencies
+  */
+-import { contextConnect } from '../../ui/context';
+-import { Divider } from '../../divider';
+-import { useCardDivider } from './hook';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../../divider').DividerProps, 'hr', false>} props
+- * @param {import('react').ForwardedRef<any>}                                                                     forwardedRef
++ * Internal dependencies
+  */
+-function CardDivider( props, forwardedRef ) {
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
++import { Divider, DividerProps } from '../../divider';
++import { useCardDivider } from './hook';
++
++function UnconnectedCardDivider(
++	props: WordPressComponentProps< DividerProps, 'hr', false >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const dividerProps = useCardDivider( props );
+ 
+ 	return <Divider { ...dividerProps } ref={ forwardedRef } />;
+@@ -19,7 +23,6 @@ function CardDivider( props, forwardedRef ) {
+  * `CardDivider` renders an optional divider within a `Card`.
+  * It is typically used to divide multiple `CardBody` components from each other.
+  *
+- * @example
+  * ```jsx
+  * import { Card, CardBody, CardDivider } from `@wordpress/components`;
+  *
+@@ -30,6 +33,9 @@ function CardDivider( props, forwardedRef ) {
+  * </Card>
+  * ```
+  */
+-const ConnectedCardDivider = contextConnect( CardDivider, 'CardDivider' );
++export const CardDivider = contextConnect(
++	UnconnectedCardDivider,
++	'CardDivider'
++);
+ 
+-export default ConnectedCardDivider;
++export default CardDivider;
+diff --git a/packages/components/src/card/card-divider/hook.js b/packages/components/src/card/card-divider/hook.ts
+similarity index 72%
+rename from packages/components/src/card/card-divider/hook.js
+rename to packages/components/src/card/card-divider/hook.ts
+index 1007033c10987b..aa5fdbe08eecbb 100644
+--- a/packages/components/src/card/card-divider/hook.js
++++ b/packages/components/src/card/card-divider/hook.ts
+@@ -6,14 +6,14 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
++import type { DividerProps } from '../../divider';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../../divider').DividerProps, 'hr', false>} props
+- */
+-export function useCardDivider( props ) {
++export function useCardDivider(
++	props: WordPressComponentProps< DividerProps, 'hr', false >
++) {
+ 	const { className, ...otherProps } = useContextSystem(
+ 		props,
+ 		'CardDivider'
+diff --git a/packages/components/src/card/card-divider/index.js b/packages/components/src/card/card-divider/index.ts
+similarity index 100%
+rename from packages/components/src/card/card-divider/index.js
+rename to packages/components/src/card/card-divider/index.ts
+diff --git a/packages/components/src/card/card-footer/component.js b/packages/components/src/card/card-footer/component.tsx
+similarity index 51%
+rename from packages/components/src/card/card-footer/component.js
+rename to packages/components/src/card/card-footer/component.tsx
+index 130d9141e409e6..576807444c3069 100644
+--- a/packages/components/src/card/card-footer/component.js
++++ b/packages/components/src/card/card-footer/component.tsx
+@@ -1,15 +1,20 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect } from '../../ui/context';
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import { Flex } from '../../flex';
+ import { useCardFooter } from './hook';
++import type { FooterProps } from '../types';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FooterProps, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                                         forwardedRef
+- */
+-function CardFooter( props, forwardedRef ) {
++function UnconnectedCardFooter(
++	props: WordPressComponentProps< FooterProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const footerProps = useCardFooter( props );
+ 
+ 	return <Flex { ...footerProps } ref={ forwardedRef } />;
+@@ -18,7 +23,6 @@ function CardFooter( props, forwardedRef ) {
+ /**
+  * `CardFooter` renders an optional footer within a `Card`.
+  *
+- * @example
+  * ```jsx
+  * import { Card, CardBody, CardFooter } from `@wordpress/components`;
+  *
+@@ -28,6 +32,6 @@ function CardFooter( props, forwardedRef ) {
+  * </Card>
+  * ```
+  */
+-const ConnectedCardFooter = contextConnect( CardFooter, 'CardFooter' );
++export const CardFooter = contextConnect( UnconnectedCardFooter, 'CardFooter' );
+ 
+-export default ConnectedCardFooter;
++export default CardFooter;
+diff --git a/packages/components/src/card/card-footer/hook.js b/packages/components/src/card/card-footer/hook.ts
+similarity index 79%
+rename from packages/components/src/card/card-footer/hook.js
+rename to packages/components/src/card/card-footer/hook.ts
+index 99d1317945e9a4..831a9c7773f778 100644
+--- a/packages/components/src/card/card-footer/hook.js
++++ b/packages/components/src/card/card-footer/hook.ts
+@@ -6,14 +6,14 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
++import type { FooterProps } from '../types';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').FooterProps, 'div'>} props
+- */
+-export function useCardFooter( props ) {
++export function useCardFooter(
++	props: WordPressComponentProps< FooterProps, 'div' >
++) {
+ 	const {
+ 		className,
+ 		justify,
+diff --git a/packages/components/src/card/card-footer/index.js b/packages/components/src/card/card-footer/index.ts
+similarity index 100%
+rename from packages/components/src/card/card-footer/index.js
+rename to packages/components/src/card/card-footer/index.ts
+diff --git a/packages/components/src/card/card-header/component.js b/packages/components/src/card/card-header/component.tsx
+similarity index 51%
+rename from packages/components/src/card/card-header/component.js
+rename to packages/components/src/card/card-header/component.tsx
+index f9fe39d03a8c8f..a055cf0966f52e 100644
+--- a/packages/components/src/card/card-header/component.js
++++ b/packages/components/src/card/card-header/component.tsx
+@@ -1,15 +1,20 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect } from '../../ui/context';
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import { Flex } from '../../flex';
+ import { useCardHeader } from './hook';
++import type { HeaderProps } from '../types';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').HeaderProps, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                                         forwardedRef
+- */
+-function CardHeader( props, forwardedRef ) {
++function UnconnectedCardHeader(
++	props: WordPressComponentProps< HeaderProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const headerProps = useCardHeader( props );
+ 
+ 	return <Flex { ...headerProps } ref={ forwardedRef } />;
+@@ -18,7 +23,6 @@ function CardHeader( props, forwardedRef ) {
+ /**
+  * `CardHeader` renders an optional header within a `Card`.
+  *
+- * @example
+  * ```jsx
+  * import { Card, CardBody, CardHeader } from `@wordpress/components`;
+  *
+@@ -28,6 +32,6 @@ function CardHeader( props, forwardedRef ) {
+  * </Card>
+  * ```
+  */
+-const ConnectedCardHeader = contextConnect( CardHeader, 'CardHeader' );
++export const CardHeader = contextConnect( UnconnectedCardHeader, 'CardHeader' );
+ 
+-export default ConnectedCardHeader;
++export default CardHeader;
+diff --git a/packages/components/src/card/card-header/hook.js b/packages/components/src/card/card-header/hook.ts
+similarity index 79%
+rename from packages/components/src/card/card-header/hook.js
+rename to packages/components/src/card/card-header/hook.ts
+index 5318e4ef1a2f30..9cf9387b62a265 100644
+--- a/packages/components/src/card/card-header/hook.js
++++ b/packages/components/src/card/card-header/hook.ts
+@@ -6,14 +6,14 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
++import type { HeaderProps } from '../types';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').HeaderProps, 'div'>} props
+- */
+-export function useCardHeader( props ) {
++export function useCardHeader(
++	props: WordPressComponentProps< HeaderProps, 'div' >
++) {
+ 	const {
+ 		className,
+ 		isBorderless = false,
+diff --git a/packages/components/src/card/card-header/index.js b/packages/components/src/card/card-header/index.ts
+similarity index 100%
+rename from packages/components/src/card/card-header/index.js
+rename to packages/components/src/card/card-header/index.ts
+diff --git a/packages/components/src/card/card-media/component.js b/packages/components/src/card/card-media/component.tsx
+similarity index 56%
+rename from packages/components/src/card/card-media/component.js
+rename to packages/components/src/card/card-media/component.tsx
+index 83313b1ce4fe3d..29e6990d5fe092 100644
+--- a/packages/components/src/card/card-media/component.js
++++ b/packages/components/src/card/card-media/component.tsx
+@@ -1,15 +1,20 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect } from '../../ui/context';
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import { View } from '../../view';
+ import { useCardMedia } from './hook';
++import type { MediaProps } from '../types';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                                                  forwardedRef
+- */
+-function CardMedia( props, forwardedRef ) {
++function UnconnectedCardMedia(
++	props: WordPressComponentProps< MediaProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const cardMediaProps = useCardMedia( props );
+ 
+ 	return <View { ...cardMediaProps } ref={ forwardedRef } />;
+@@ -32,6 +37,6 @@ function CardMedia( props, forwardedRef ) {
+  * );
+  * ```
+  */
+-const ConnectedCardMedia = contextConnect( CardMedia, 'CardMedia' );
++export const CardMedia = contextConnect( UnconnectedCardMedia, 'CardMedia' );
+ 
+-export default ConnectedCardMedia;
++export default CardMedia;
+diff --git a/packages/components/src/card/card-media/hook.js b/packages/components/src/card/card-media/hook.ts
+similarity index 72%
+rename from packages/components/src/card/card-media/hook.js
+rename to packages/components/src/card/card-media/hook.ts
+index 30f6c13c7cf397..edbedb986a4901 100644
+--- a/packages/components/src/card/card-media/hook.js
++++ b/packages/components/src/card/card-media/hook.ts
+@@ -6,14 +6,14 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
++import type { MediaProps } from '../types';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+- */
+-export function useCardMedia( props ) {
++export function useCardMedia(
++	props: WordPressComponentProps< MediaProps, 'div' >
++) {
+ 	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
+ 
+ 	const cx = useCx();
+diff --git a/packages/components/src/card/card-media/index.js b/packages/components/src/card/card-media/index.ts
+similarity index 100%
+rename from packages/components/src/card/card-media/index.js
+rename to packages/components/src/card/card-media/index.ts
+diff --git a/packages/components/src/card/card/component.js b/packages/components/src/card/card/component.tsx
+similarity index 83%
+rename from packages/components/src/card/card/component.js
+rename to packages/components/src/card/card/component.tsx
+index c78d8d69c3b7b4..57f9c6430c0c08 100644
+--- a/packages/components/src/card/card/component.js
++++ b/packages/components/src/card/card/component.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import { css } from '@emotion/react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -11,19 +12,23 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect, ContextSystemProvider } from '../../ui/context';
++import {
++	contextConnect,
++	ContextSystemProvider,
++	WordPressComponentProps,
++} from '../../ui/context';
+ import { Elevation } from '../../elevation';
+ import { View } from '../../view';
+ import * as styles from '../styles';
+ import { useCard } from './hook';
+ import CONFIG from '../../utils/config-values';
+ import { useCx } from '../../utils/hooks/use-cx';
++import type { Props } from '../types';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                                   forwardedRef
+- */
+-function Card( props, forwardedRef ) {
++function UnconnectedCard(
++	props: WordPressComponentProps< Props, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const {
+ 		children,
+ 		elevation,
+@@ -77,7 +82,6 @@ function Card( props, forwardedRef ) {
+  * `Card` also provides a convenient set of sub-components such as `CardBody`,
+  * `CardHeader`, `CardFooter`, and more.
+  *
+- * @example
+  * ```jsx
+  * import {
+  *   Card,
+@@ -105,6 +109,6 @@ function Card( props, forwardedRef ) {
+  * }
+  * ```
+  */
+-const ConnectedCard = contextConnect( Card, 'Card' );
++export const Card = contextConnect( UnconnectedCard, 'Card' );
+ 
+-export default ConnectedCard;
++export default Card;
+diff --git a/packages/components/src/card/card/hook.js b/packages/components/src/card/card/hook.ts
+similarity index 72%
+rename from packages/components/src/card/card/hook.js
+rename to packages/components/src/card/card/hook.ts
+index b11d22aeccfd91..57e928cb7f8592 100644
+--- a/packages/components/src/card/card/hook.js
++++ b/packages/components/src/card/card/hook.ts
+@@ -7,17 +7,20 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import { useSurface } from '../../surface';
+ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
++import type { Props } from '../types';
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
+- */
+-function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
+-	/**@type {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} */
+-	const propsToReturn = {
++type CardProps = WordPressComponentProps< Props, 'div' >;
++
++function useDeprecatedProps( {
++	elevation,
++	isElevated,
++	...otherProps
++}: CardProps ) {
++	const propsToReturn: Omit< CardProps, 'isElevated' > = {
+ 		...otherProps,
+ 	};
+ 	let computedElevation = elevation;
+@@ -39,10 +42,7 @@ function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
+ 	return propsToReturn;
+ }
+ 
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
+- */
+-export function useCard( props ) {
++export function useCard( props: CardProps ) {
+ 	const {
+ 		className,
+ 		elevation = 0,
+diff --git a/packages/components/src/card/card/index.js b/packages/components/src/card/card/index.ts
+similarity index 100%
+rename from packages/components/src/card/card/index.js
+rename to packages/components/src/card/card/index.ts
+diff --git a/packages/components/src/card/context.js b/packages/components/src/card/context.ts
+similarity index 100%
+rename from packages/components/src/card/context.js
+rename to packages/components/src/card/context.ts
+diff --git a/packages/components/src/card/index.js b/packages/components/src/card/index.ts
+similarity index 100%
+rename from packages/components/src/card/index.js
+rename to packages/components/src/card/index.ts
+diff --git a/packages/components/src/card/stories/index.js b/packages/components/src/card/stories/index.js
+deleted file mode 100644
+index 5cc7d95ae25318..00000000000000
+--- a/packages/components/src/card/stories/index.js
++++ /dev/null
+@@ -1,209 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, select, number } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-import {
+-	Card,
+-	CardHeader,
+-	CardBody,
+-	CardDivider,
+-	CardMedia,
+-	CardFooter,
+-} from '../index';
+-import { Text } from '../../text';
+-import { Heading } from '../../heading';
+-import Button from '../../button';
+-
+-export default {
+-	component: Card,
+-	title: 'Components/Card',
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-const KNOBS_GROUPS = {
+-	Card: 'Card',
+-	CardBody: 'CardBody',
+-	CardHeader: 'CardHeader',
+-	CardFooter: 'CardFooter',
+-};
+-
+-// Using `unset` instead of `undefined` as Storybook seems to sometimes pass an
+-// empty string instead of `undefined`, which is not ideal.
+-// https://github.com/storybookjs/storybook/issues/800
+-const PROP_UNSET = 'unset';
+-
+-export const _default = () => {
+-	const cardProps = {
+-		isBorderless: boolean( 'Card: isBorderless', false, KNOBS_GROUPS.Card ),
+-		isRounded: boolean( 'Card: isRounded', true, KNOBS_GROUPS.Card ),
+-		elevation: number( 'Card: elevation', 0, {}, KNOBS_GROUPS.Card ),
+-		size: select(
+-			'Card: size',
+-			{
+-				large: 'large',
+-				medium: 'medium',
+-				small: 'small',
+-				xSmall: 'xSmall',
+-			},
+-			'medium',
+-			KNOBS_GROUPS.Card
+-		),
+-		style: {
+-			width: select(
+-				'Card: width (via inline styles)',
+-				{
+-					'640px': 640,
+-					'360px': 360,
+-					'240px': 240,
+-					'50%': '50%',
+-					'100%': '100%',
+-				},
+-				360,
+-				KNOBS_GROUPS.Card
+-			),
+-		},
+-	};
+-
+-	const cardHeaderProps = {
+-		isBorderless: select(
+-			'CardHeader: isBorderless',
+-			{
+-				'unset (defaults to the value set on the <Card> parent)':
+-					PROP_UNSET,
+-				true: true,
+-				false: false,
+-			},
+-			PROP_UNSET,
+-			KNOBS_GROUPS.CardHeader
+-		),
+-		isShady: boolean(
+-			'CardHeader: isShady',
+-			false,
+-			KNOBS_GROUPS.CardHeader
+-		),
+-		size: select(
+-			'CardHeader: size',
+-			{
+-				'unset (defaults to the value set on the <Card> parent)':
+-					PROP_UNSET,
+-				large: 'large',
+-				medium: 'medium',
+-				small: 'small',
+-				xSmall: 'xSmall',
+-			},
+-			PROP_UNSET,
+-			KNOBS_GROUPS.CardHeader
+-		),
+-	};
+-
+-	const cardBodyProps = {
+-		isShady: boolean( 'CardBody: isShady', false, KNOBS_GROUPS.CardBody ),
+-		size: select(
+-			'CardBody: size',
+-			{
+-				'unset (defaults to the value set on the <Card> parent)':
+-					PROP_UNSET,
+-				large: 'large',
+-				medium: 'medium',
+-				small: 'small',
+-				xSmall: 'xSmall',
+-			},
+-			PROP_UNSET,
+-			KNOBS_GROUPS.CardBody
+-		),
+-	};
+-
+-	const cardFooterProps = {
+-		isBorderless: select(
+-			'CardFooter: isBorderless',
+-			{
+-				'unset (defaults to the value set on the <Card> parent)':
+-					PROP_UNSET,
+-				true: true,
+-				false: false,
+-			},
+-			PROP_UNSET,
+-			KNOBS_GROUPS.CardFooter
+-		),
+-		isShady: boolean(
+-			'CardFooter: isShady',
+-			false,
+-			KNOBS_GROUPS.CardFooter
+-		),
+-		justify: select(
+-			'CardFooter: justify',
+-			{
+-				flexStart: 'flex-start',
+-				flexEnd: 'flex-end',
+-				center: 'center',
+-				spaceAround: 'space-around',
+-				spaceBetween: 'space-between',
+-				spaceEvenly: 'space-evenly',
+-			},
+-			'space-between',
+-			KNOBS_GROUPS.CardFooter
+-		),
+-		size: select(
+-			'CardFooter: size',
+-			{
+-				'unset (defaults to the value set on the <Card> parent)':
+-					PROP_UNSET,
+-				large: 'large',
+-				medium: 'medium',
+-				small: 'small',
+-				xSmall: 'xSmall',
+-			},
+-			PROP_UNSET,
+-			KNOBS_GROUPS.CardFooter
+-		),
+-	};
+-
+-	// Do not pass the `size` and `isBorderless` props when their value is `undefined`.
+-	// This allows the `CardHeader`, `CardBody` and `CardFooter` components to use
+-	// the values that are set on the parent `Card` component by default.
+-	for ( const componentProps of [
+-		cardHeaderProps,
+-		cardFooterProps,
+-		cardBodyProps,
+-	] ) {
+-		for ( const prop of [ 'isBorderless', 'size' ] ) {
+-			if ( componentProps[ prop ] === PROP_UNSET ) {
+-				delete componentProps[ prop ];
+-			}
+-		}
+-	}
+-
+-	return (
+-		<Card { ...cardProps }>
+-			<CardHeader { ...cardHeaderProps }>
+-				<Heading>CardHeader</Heading>
+-			</CardHeader>
+-			<CardBody { ...cardBodyProps }>
+-				<Text>CardBody</Text>
+-			</CardBody>
+-			<CardBody { ...cardBodyProps }>
+-				<Text>CardBody (before CardDivider)</Text>
+-			</CardBody>
+-			<CardDivider />
+-			<CardBody { ...cardBodyProps }>
+-				<Text>CardBody (after CardDivider)</Text>
+-			</CardBody>
+-			<CardMedia>
+-				<img
+-					alt="Card Media"
+-					src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
+-				/>
+-			</CardMedia>
+-			<CardFooter { ...cardFooterProps }>
+-				<Text>CardFooter</Text>
+-				<Button variant="secondary">Action Button</Button>
+-			</CardFooter>
+-		</Card>
+-	);
+-};
+diff --git a/packages/components/src/card/stories/index.tsx b/packages/components/src/card/stories/index.tsx
+new file mode 100644
+index 00000000000000..c771dc62cdbfe9
+--- /dev/null
++++ b/packages/components/src/card/stories/index.tsx
+@@ -0,0 +1,75 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import {
++	Card,
++	CardHeader,
++	CardBody,
++	CardDivider,
++	CardMedia,
++	CardFooter,
++} from '..';
++import { Text } from '../../text';
++import { Heading } from '../../heading';
++import Button from '../../button';
++
++const meta: ComponentMeta< typeof Card > = {
++	component: Card,
++	title: 'Components/Card',
++	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
++	argTypes: {
++		as: {
++			control: { type: null },
++		},
++		children: {
++			control: { type: null },
++		},
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++
++export default meta;
++
++const Template: ComponentStory< typeof Card > = ( args ) => {
++	return (
++		<div style={ { maxWidth: '280px' } }>
++			<Card { ...args }>
++				<CardHeader>
++					<Heading>CardHeader</Heading>
++				</CardHeader>
++				<CardBody>
++					<Text>CardBody</Text>
++				</CardBody>
++				<CardBody>
++					<Text>CardBody (before CardDivider)</Text>
++				</CardBody>
++				<CardDivider />
++				<CardBody>
++					<Text>CardBody (after CardDivider)</Text>
++				</CardBody>
++				<CardMedia>
++					<img
++						alt="Card Media"
++						src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
++					/>
++				</CardMedia>
++				<CardFooter>
++					<Text>CardFooter</Text>
++					<Button variant="secondary">Action Button</Button>
++				</CardFooter>
++			</Card>
++		</div>
++	);
++};
++
++export const Default: ComponentStory< typeof Card > = Template.bind( {} );
+diff --git a/packages/components/src/card/styles.js b/packages/components/src/card/styles.ts
+similarity index 100%
+rename from packages/components/src/card/styles.js
+rename to packages/components/src/card/styles.ts
+diff --git a/packages/components/src/card/test/__snapshots__/index.js.snap b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+similarity index 100%
+rename from packages/components/src/card/test/__snapshots__/index.js.snap
+rename to packages/components/src/card/test/__snapshots__/index.tsx.snap
+diff --git a/packages/components/src/card/test/index.js b/packages/components/src/card/test/index.tsx
+similarity index 98%
+rename from packages/components/src/card/test/index.js
+rename to packages/components/src/card/test/index.tsx
+index 613de06c24ad8e..d04559606047e3 100644
+--- a/packages/components/src/card/test/index.js
++++ b/packages/components/src/card/test/index.tsx
+@@ -56,9 +56,9 @@ describe( 'Card', () => {
+ 			const { container: containerSquared } = render(
+ 				<Card isRounded={ false }>Code is Poetry</Card>
+ 			);
+-			expect( containerRounded.firstChild ).toMatchStyleDiffSnapshot(
+-				containerSquared.firstChild
+-			);
++			expect(
++				containerRounded.firstElementChild
++			).toMatchStyleDiffSnapshot( containerSquared.firstElementChild );
+ 		} );
+ 
+ 		it( 'should show a box shadow when the elevation prop is greater than 0', () => {
+diff --git a/packages/components/src/card/types.ts b/packages/components/src/card/types.ts
+index f95b45d3647507..143e1947255b8d 100644
+--- a/packages/components/src/card/types.ts
++++ b/packages/components/src/card/types.ts
+@@ -74,6 +74,13 @@ export type BodyProps = BaseSubComponentProps & {
+ 	isScrollable?: boolean;
+ };
+ 
++export type MediaProps = {
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
++};
++
+ type MarginalSubComponentProps = BaseSubComponentProps & {
+ 	/**
+ 	 * Renders without a border.
+@@ -86,5 +93,5 @@ type MarginalSubComponentProps = BaseSubComponentProps & {
+ export type HeaderProps = MarginalSubComponentProps;
+ 
+ export type FooterProps = MarginalSubComponentProps & {
+-	justify: CSSProperties[ 'justifyContent' ];
++	justify?: CSSProperties[ 'justifyContent' ];
+ };

@@ -1,0 +1,57 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b185e94266aa14..0124a2dbe2a617 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ ### Bug Fix
+ 
+ -   `NumberControl`: commit (and constrain) value on `blur` event ([#39186](https://github.com/WordPress/gutenberg/pull/39186)).
++-   Fix `UnitControl`'s reset of unit when the quantity value is cleared. ([#39531](https://github.com/WordPress/gutenberg/pull/39531/)).
+ 
+ ## 19.6.0 (2022-03-11)
+ 
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 956cbdbd087e1c..dd4334910385c1 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -80,7 +80,9 @@ function UnforwardedUnitControl(
+ 	);
+ 
+ 	useEffect( () => {
+-		setUnit( parsedUnit );
++		if ( parsedUnit !== undefined ) {
++			setUnit( parsedUnit );
++		}
+ 	}, [ parsedUnit ] );
+ 
+ 	// Stores parsed value for hand-off in state reducer.
+diff --git a/packages/components/src/unit-control/test/index.js b/packages/components/src/unit-control/test/index.js
+index e3fd4c79199bf4..a8b67ea24e6a8e 100644
+--- a/packages/components/src/unit-control/test/index.js
++++ b/packages/components/src/unit-control/test/index.js
+@@ -359,6 +359,25 @@ describe( 'UnitControl', () => {
+ 			await waitFor( () => expect( selectA ).toHaveValue( 'vw' ) );
+ 			expect( selectB ).toHaveValue( 'vw' );
+ 		} );
++
++		it( 'should maintain the chosen non-default unit when value is cleared', async () => {
++			const units = [
++				{ value: 'pt', label: 'pt' },
++				{ value: 'vmax', label: 'vmax' },
++			];
++
++			const { user } = render(
++				<UnitControl units={ units } value="5" />
++			);
++
++			const select = getSelect();
++			await user.selectOptions( select, [ 'vmax' ] );
++
++			const input = getInput();
++			await user.clear( input );
++
++			expect( select ).toHaveValue( 'vmax' );
++		} );
+ 	} );
+ 
+ 	describe( 'Unit Parser', () => {

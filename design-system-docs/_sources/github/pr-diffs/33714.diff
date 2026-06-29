@@ -1,0 +1,1413 @@
+diff --git a/package-lock.json b/package-lock.json
+index 1775b6de376930..5cf2904b08a48a 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -14688,6 +14688,7 @@
+ 				"memize": "^1.1.0",
+ 				"moment": "^2.22.1",
+ 				"re-resizable": "^6.4.0",
++				"react-colorful": "^5.3.0",
+ 				"react-dates": "^17.1.1",
+ 				"react-resize-aware": "^3.1.0",
+ 				"react-use-gesture": "^9.0.0",
+@@ -14695,6 +14696,13 @@
+ 				"rememo": "^3.0.0",
+ 				"tinycolor2": "^1.4.2",
+ 				"uuid": "^8.3.0"
++			},
++			"dependencies": {
++				"react-colorful": {
++					"version": "5.3.0",
++					"resolved": "https://registry.npmjs.org/react-colorful/-/react-colorful-5.3.0.tgz",
++					"integrity": "sha512-zWE5E88zmjPXFhv6mGnRZqKin9s5vip1O3IIGynY9EhZxN8MATUxZkT3e/9OwTEm4DjQBXc6PFWP6AetY+Px+A=="
++				}
+ 			}
+ 		},
+ 		"@wordpress/compose": {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 83bb14bde931fc..d305068a9a31c9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,10 @@
+ 
+ -	Updated the visual styles of the RangeControl component ([#33824](https://github.com/WordPress/gutenberg/pull/33824))
+ 
++### New Feature
++
++-	Add `hideLabelFromVision` prop to `RangeControl` ([#33714](https://github.com/WordPress/gutenberg/pull/33714))
++
+ ## 15.0.0 (2021-07-29)
+ 
+ ### Breaking Change
+diff --git a/packages/components/package.json b/packages/components/package.json
+index c131e5b6ea52a3..a19c1c3986aed1 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -59,6 +59,7 @@
+ 		"memize": "^1.1.0",
+ 		"moment": "^2.22.1",
+ 		"re-resizable": "^6.4.0",
++		"react-colorful": "^5.3.0",
+ 		"react-dates": "^17.1.1",
+ 		"react-resize-aware": "^3.1.0",
+ 		"react-use-gesture": "^9.0.0",
+diff --git a/packages/components/src/button/deprecated.js b/packages/components/src/button/deprecated.js
+index 34e99bd71f54a5..86c1ac8547d40c 100644
+--- a/packages/components/src/button/deprecated.js
++++ b/packages/components/src/button/deprecated.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.js
+index d610436edd39e3..3d36f400af3c5c 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/input-control/input-field.tsx b/packages/components/src/input-control/input-field.tsx
+index 099c72890fcfe7..02455733de03c3 100644
+--- a/packages/components/src/input-control/input-field.tsx
++++ b/packages/components/src/input-control/input-field.tsx
+@@ -105,7 +105,7 @@ function InputField(
+ 
+ 	const handleOnBlur = ( event: FocusEvent< HTMLInputElement > ) => {
+ 		onBlur( event );
+-		setIsFocused( false );
++		setIsFocused?.( false );
+ 
+ 		/**
+ 		 * If isPressEnterToChange is set, this commits the value to
+@@ -123,7 +123,7 @@ function InputField(
+ 
+ 	const handleOnFocus = ( event: FocusEvent< HTMLInputElement > ) => {
+ 		onFocus( event );
+-		setIsFocused( true );
++		setIsFocused?.( true );
+ 	};
+ 
+ 	const handleOnChange = ( event: ChangeEvent< HTMLInputElement > ) => {
+@@ -135,7 +135,7 @@ function InputField(
+ 		const nextValue = event.currentTarget.value;
+ 
+ 		try {
+-			onValidate( nextValue, event );
++			onValidate( nextValue );
+ 			commit( nextValue, event );
+ 		} catch ( err ) {
+ 			invalidate( err, event );
+diff --git a/packages/components/src/input-control/reducer/reducer.ts b/packages/components/src/input-control/reducer/reducer.ts
+index 2499096a843384..1aad3f8d3e6725 100644
+--- a/packages/components/src/input-control/reducer/reducer.ts
++++ b/packages/components/src/input-control/reducer/reducer.ts
+@@ -36,7 +36,7 @@ function mergeInitialState(
+ 		...initialInputControlState,
+ 		...initialState,
+ 		initialValue: value,
+-	};
++	} as InputState;
+ }
+ 
+ /**
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index bb22b704005655..e166ffd6219ba3 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -63,17 +63,20 @@ export interface InputBaseProps extends BaseProps, FlexProps {
+ }
+ 
+ export interface InputControlProps
+-	extends Omit< InputBaseProps, 'children' >,
++	extends Omit< InputBaseProps, 'children' | 'isFocused' >,
+ 		/**
+ 		 * The `prefix` prop in `PolymorphicComponentProps< InputFieldProps, 'input', false >` comes from the
+ 		 * `HTMLInputAttributes` and clashes with the one from `InputBaseProps`. So we have to omit it from
+ 		 * `PolymorphicComponentProps< InputFieldProps, 'input', false >` in order that `InputBaseProps[ 'prefix' ]`
+ 		 * be the only prefix prop. Otherwise it tries to do a union of the two prefix properties and you end up
+ 		 * with an unresolvable type.
++		 *
++		 * `isFocused` and `setIsFocused` are managed internally by the InputControl, but the rest of the props
++		 * for InputField are passed through.
+ 		 */
+ 		Omit<
+ 			PolymorphicComponentProps< InputFieldProps, 'input', false >,
+-			'stateReducer' | 'prefix'
++			'stateReducer' | 'prefix' | 'isFocused' | 'setIsFocused'
+ 		> {
+ 	__unstableStateReducer?: InputFieldProps[ 'stateReducer' ];
+ }
+diff --git a/packages/components/src/number-control/index.js b/packages/components/src/number-control/index.js
+index 2df94561f8ecb5..4aa29e17cee79a 100644
+--- a/packages/components/src/number-control/index.js
++++ b/packages/components/src/number-control/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/number-control/styles/number-control-styles.js b/packages/components/src/number-control/styles/number-control-styles.js
+index ec57602ac3ce9a..a27784497b018d 100644
+--- a/packages/components/src/number-control/styles/number-control-styles.js
++++ b/packages/components/src/number-control/styles/number-control-styles.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+@@ -12,11 +13,15 @@ const htmlArrowStyles = ( { hideHTMLArrows } ) => {
+ 	if ( ! hideHTMLArrows ) return ``;
+ 
+ 	return css`
+-		&::-webkit-outer-spin-button,
+-		&::-webkit-inner-spin-button {
++		input[type='number']::-webkit-outer-spin-button,
++		input[type='number']::-webkit-inner-spin-button {
+ 			-webkit-appearance: none !important;
+ 			margin: 0 !important;
+ 		}
++
++		input[type='number'] {
++			-moz-appearance: textfield;
++		}
+ 	`;
+ };
+ 
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 2948c879b8fa9f..a30dfe4fb19faa 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/popover/utils.js b/packages/components/src/popover/utils.js
+index 25af0b82455074..697a3fceeb6dde 100644
+--- a/packages/components/src/popover/utils.js
++++ b/packages/components/src/popover/utils.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index 0ce9f4e5fa4d76..6c3094c8b71756 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+@@ -47,6 +48,7 @@ function RangeControl(
+ 		initialPosition,
+ 		isShiftStepEnabled = true,
+ 		label,
++		hideLabelFromVision = false,
+ 		marks = false,
+ 		max = 100,
+ 		min = 0,
+@@ -194,6 +196,7 @@ function RangeControl(
+ 		<BaseControl
+ 			className={ classes }
+ 			label={ label }
++			hideLabelFromVision={ hideLabelFromVision }
+ 			id={ id }
+ 			help={ help }
+ 		>
+diff --git a/packages/components/src/range-control/input-range.js b/packages/components/src/range-control/input-range.js
+index 5fa4235a68974b..6a0f57bd8e0ff2 100644
+--- a/packages/components/src/range-control/input-range.js
++++ b/packages/components/src/range-control/input-range.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/range-control/mark.js b/packages/components/src/range-control/mark.js
+index 38794ca96793b4..a6362b0ee903d6 100644
+--- a/packages/components/src/range-control/mark.js
++++ b/packages/components/src/range-control/mark.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/range-control/rail.js b/packages/components/src/range-control/rail.js
+index 8f1794883e2dd5..cc8fdc33062e7f 100644
+--- a/packages/components/src/range-control/rail.js
++++ b/packages/components/src/range-control/rail.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/range-control/styles/range-control-styles.js b/packages/components/src/range-control/styles/range-control-styles.js
+index 658d369fcdb95d..8ec40ad9b82e02 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.js
++++ b/packages/components/src/range-control/styles/range-control-styles.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/range-control/tooltip.js b/packages/components/src/range-control/tooltip.js
+index ae9a7791c9e4a3..8d350c31ceb7b0 100644
+--- a/packages/components/src/range-control/tooltip.js
++++ b/packages/components/src/range-control/tooltip.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/range-control/utils.js b/packages/components/src/range-control/utils.js
+index 81e03015e44c40..e2a758a6b4f1cf 100644
+--- a/packages/components/src/range-control/utils.js
++++ b/packages/components/src/range-control/utils.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 7a036f5ce9234e..db0f7917c33d76 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -30,7 +30,8 @@ function useUniqueId( idProp?: string ) {
+ 	return idProp || id;
+ }
+ 
+-export interface SelectControlProps extends Omit< InputBaseProps, 'children' > {
++export interface SelectControlProps
++	extends Omit< InputBaseProps, 'children' | 'isFocused' > {
+ 	help?: string;
+ 	hideLabelFromVision?: boolean;
+ 	multiple?: boolean;
+@@ -92,7 +93,7 @@ function SelectControl(
+ 
+ 	const handleOnChange = ( event: ChangeEvent< HTMLSelectElement > ) => {
+ 		if ( multiple ) {
+-			const selectedOptions = [ ...event.target.options ].filter(
++			const selectedOptions = Array.from( event.target.options ).filter(
+ 				( { selected } ) => selected
+ 			);
+ 			const newValues = selectedOptions.map( ( { value } ) => value );
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index 2bcb0c24d51825..63b242fd58cabb 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -29,7 +29,7 @@ const fontSizeStyles = ( { selectSize }: SelectProps ) => {
+ 		small: '11px',
+ 	};
+ 
+-	const fontSize = sizes[ selectSize ];
++	const fontSize = sizes[ selectSize as Size ];
+ 	const fontSizeMobile = '16px';
+ 
+ 	if ( ! fontSize ) return '';
+@@ -57,7 +57,7 @@ const sizeStyles = ( { selectSize }: SelectProps ) => {
+ 		},
+ 	};
+ 
+-	const style = sizes[ selectSize ] || sizes.default;
++	const style = sizes[ selectSize as Size ] || sizes.default;
+ 
+ 	return css( style );
+ };
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/fill.js b/packages/components/src/slot-fill/bubbles-virtually/fill.js
+index 51a141ca2e2dc0..0989e34edbeed3 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/fill.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/fill.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
+index dda3be6b82693e..8ea7d2cc55b9a5 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+index c90f7b72810ada..155265613e7843 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot.js b/packages/components/src/slot-fill/bubbles-virtually/slot.js
+index 5075677c3e173b..cce8a473345f1e 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/use-slot.js b/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
+index bf6fb960294672..c954ad2c7573fe 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/slot-fill/context.js b/packages/components/src/slot-fill/context.js
+index b0856cb55ff218..0f7961a8ffd3b6 100644
+--- a/packages/components/src/slot-fill/context.js
++++ b/packages/components/src/slot-fill/context.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/slot-fill/fill.js b/packages/components/src/slot-fill/fill.js
+index 5c3669e67bf235..860059921a1ae5 100644
+--- a/packages/components/src/slot-fill/fill.js
++++ b/packages/components/src/slot-fill/fill.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/slot-fill/index.js b/packages/components/src/slot-fill/index.js
+index f91461a3385274..4bb323c28fad61 100644
+--- a/packages/components/src/slot-fill/index.js
++++ b/packages/components/src/slot-fill/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/slot-fill/provider.js b/packages/components/src/slot-fill/provider.js
+index 850c0dfb8a3a03..4ea7e7a8255412 100644
+--- a/packages/components/src/slot-fill/provider.js
++++ b/packages/components/src/slot-fill/provider.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/slot-fill/slot.js b/packages/components/src/slot-fill/slot.js
+index 6d31767bee245e..60a32b63dba3bb 100644
+--- a/packages/components/src/slot-fill/slot.js
++++ b/packages/components/src/slot-fill/slot.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/slot-fill/use-slot.js b/packages/components/src/slot-fill/use-slot.js
+index e77ca92d4a2164..96016e267a681e 100644
+--- a/packages/components/src/slot-fill/use-slot.js
++++ b/packages/components/src/slot-fill/use-slot.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index ca19890f8cbc66..6ae8b56c95c200 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/ui/color-picker/README.md b/packages/components/src/ui/color-picker/README.md
+new file mode 100644
+index 00000000000000..53c2ba6292a328
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/README.md
+@@ -0,0 +1,57 @@
++# ColorPicker
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++`ColorPicker` is a color picking component based on `react-colorful`. It lets you pick a color visually or by manipulating the individual RGB(A), HSL(A) and Hex(8) color values.
++
++## Usage
++
++```jsx
++import { ColorPicker } from '@wordpress/components/ui';
++
++function Example() {
++	const [color, setColor] = useState();
++	return (
++		<ColorPicker
++			color={color}
++			onChange={setColor}
++			enableAlpha
++			defaultValue="#000"
++		/>
++	);
++}
++```
++
++## Props
++
++### `color`
++
++**Type**: `string`
++
++The current color value to display in the picker. Must be a hex or hex8 string.
++
++### `onChange`
++
++**Type**: `(hex8Color: string) => void`
++
++Fired when the color changes. Always passes a hex8 color string.
++
++### `enableAlpha`
++
++**Type**: `boolean`
++
++Defaults to `false`. When `true` the color picker will display the alpha channel both in the bottom inputs as well as in the color picker itself.
++
++### `defaultValue`
++
++**Type**: `string | undefined`
++
++An optional default value to use for the color picker.
++
++### `copyFormat`
++
++**Type**: `'hex' | 'hsl' | 'rgb' | undefined`
++
++The format to copy when clicking the displayed color format.
+diff --git a/packages/components/src/ui/color-picker/color-display.tsx b/packages/components/src/ui/color-picker/color-display.tsx
+new file mode 100644
+index 00000000000000..fca50030c0a67e
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/color-display.tsx
+@@ -0,0 +1,154 @@
++/**
++ * External dependencies
++ */
++import colorize, { ColorFormats } from 'tinycolor2';
++
++/**
++ * WordPress dependencies
++ */
++import { useCopyToClipboard } from '@wordpress/compose';
++import { useState } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import { Text } from '../../text';
++import { Flex, FlexItem } from '../../flex';
++import { Tooltip } from '../tooltip';
++import type { ColorType } from './types';
++import { space } from '../utils/space';
++
++interface ColorDisplayProps {
++	color: ColorFormats.HSLA;
++	colorType: ColorType;
++	enableAlpha: boolean;
++}
++
++interface DisplayProps {
++	color: ColorFormats.HSLA;
++	enableAlpha: boolean;
++}
++
++type Values = [ number, string ][];
++
++interface ValueDisplayProps {
++	values: Values;
++}
++
++const ValueDisplay = ( { values }: ValueDisplayProps ) => (
++	<>
++		{ values.map( ( [ value, abbreviation ] ) => {
++			return (
++				<FlexItem key={ abbreviation } isBlock display="flex">
++					<Text color="blue">{ abbreviation }</Text>
++					<Text>{ value }</Text>
++				</FlexItem>
++			);
++		} ) }
++	</>
++);
++
++const HslDisplay = ( { color, enableAlpha }: DisplayProps ) => {
++	const { h, s, l, a } = colorize( color ).toHsl();
++
++	const values: Values = [
++		[ Math.floor( h ), 'H' ],
++		[ Math.round( s * 100 ), 'S' ],
++		[ Math.round( l * 100 ), 'L' ],
++	];
++	if ( enableAlpha ) {
++		values.push( [ Math.round( a * 100 ), 'A' ] );
++	}
++
++	return <ValueDisplay values={ values } />;
++};
++
++const RgbDisplay = ( { color, enableAlpha }: DisplayProps ) => {
++	const { r, g, b, a } = colorize( color ).toRgb();
++
++	const values: Values = [
++		[ r, 'R' ],
++		[ g, 'G' ],
++		[ b, 'B' ],
++	];
++
++	if ( enableAlpha ) {
++		values.push( [ Math.round( a * 100 ), 'A' ] );
++	}
++
++	return <ValueDisplay values={ values } />;
++};
++
++const HexDisplay = ( { color, enableAlpha }: DisplayProps ) => {
++	const colorized = colorize( color );
++	const colorWithoutHash = ( enableAlpha
++		? colorized.toHex8String()
++		: colorized.toHexString()
++	)
++		.slice( 1 )
++		.toUpperCase();
++	return (
++		<FlexItem>
++			<Text color="blue">#</Text>
++			<Text>{ colorWithoutHash }</Text>
++		</FlexItem>
++	);
++};
++
++const getComponent = ( colorType: ColorType ) => {
++	switch ( colorType ) {
++		case 'hsl':
++			return HslDisplay;
++		case 'rgb':
++			return RgbDisplay;
++		default:
++		case 'hex':
++			return HexDisplay;
++	}
++};
++
++export const ColorDisplay = ( {
++	color,
++	colorType,
++	enableAlpha,
++}: ColorDisplayProps ) => {
++	const [ copiedColor, setCopiedColor ] = useState< string | null >( null );
++	const props = { color, enableAlpha };
++	const Component = getComponent( colorType );
++	const copyRef = useCopyToClipboard< HTMLDivElement >(
++		() => {
++			switch ( colorType ) {
++				case 'hsl': {
++					return colorize( color ).toHslString();
++				}
++				case 'rgb': {
++					return colorize( color ).toRgbString();
++				}
++				default:
++				case 'hex': {
++					const colorized = colorize( color );
++					return enableAlpha
++						? colorized.toHex8String()
++						: colorized.toHexString();
++				}
++			}
++		},
++		() => setCopiedColor( colorize( color ).toHex8String() )
++	);
++	return (
++		<Tooltip
++			content={
++				<Text color="white">
++					{ copiedColor === colorize( color ).toHex8String()
++						? __( 'Copied!' )
++						: __( 'Copy' ) }
++				</Text>
++			}
++		>
++			<Flex justify="flex-start" gap={ space( 1 ) } ref={ copyRef }>
++				<Component { ...props } />
++			</Flex>
++		</Tooltip>
++	);
++};
+diff --git a/packages/components/src/ui/color-picker/color-input.tsx b/packages/components/src/ui/color-picker/color-input.tsx
+new file mode 100644
+index 00000000000000..8caa5fe3a7a5f6
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/color-input.tsx
+@@ -0,0 +1,36 @@
++/**
++ * External dependencies
++ */
++import type { ColorFormats } from 'tinycolor2';
++
++/**
++ * Internal dependencies
++ */
++import { RgbInput } from './rgb-input';
++import { HslInput } from './hsl-input';
++import { HexInput } from './hex-input';
++
++interface ColorInputProps {
++	colorType: 'hsl' | 'hex' | 'rgb';
++	color: ColorFormats.HSLA;
++	onChange: ( value: ColorFormats.HSLA ) => void;
++	enableAlpha: boolean;
++}
++
++export const ColorInput = ( {
++	colorType,
++	color,
++	onChange,
++	enableAlpha,
++}: ColorInputProps ) => {
++	const props = { color, onChange, enableAlpha };
++	switch ( colorType ) {
++		case 'hsl':
++			return <HslInput { ...props } />;
++		case 'rgb':
++			return <RgbInput { ...props } />;
++		default:
++		case 'hex':
++			return <HexInput { ...props } />;
++	}
++};
+diff --git a/packages/components/src/ui/color-picker/component.tsx b/packages/components/src/ui/color-picker/component.tsx
+new file mode 100644
+index 00000000000000..15a034ed5c4449
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/component.tsx
+@@ -0,0 +1,141 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++import type { ColorFormats } from 'tinycolor2';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++import { moreVertical } from '@wordpress/icons';
++import { useDebounce } from '@wordpress/compose';
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import {
++	useContextSystem,
++	contextConnect,
++	PolymorphicComponentProps,
++} from '../context';
++import { HStack } from '../../h-stack';
++import Button from '../../button';
++import { Spacer } from '../../spacer';
++import { ColorfulWrapper, SelectControl } from './styles';
++import { ColorDisplay } from './color-display';
++import { ColorInput } from './color-input';
++import { Picker } from './picker';
++import { useControlledValue } from '../../utils/hooks';
++
++import type { ColorType } from './types';
++
++interface ColorPickerProps {
++	enableAlpha?: boolean;
++	color?: ColorFormats.HSL | ColorFormats.HSLA;
++	onChange?: ( color: ColorFormats.HSL | ColorFormats.HSLA ) => void;
++	defaultValue?: ColorFormats.HSL | ColorFormats.HSLA;
++	copyFormat?: ColorType;
++}
++
++const options = [
++	{ label: 'RGB', value: 'rgb' as const },
++	{ label: 'HSL', value: 'hsl' as const },
++	{ label: 'Hex', value: 'hex' as const },
++];
++
++const getSafeColor = (
++	color: ColorFormats.HSL | ColorFormats.HSLA | undefined
++): ColorFormats.HSLA => {
++	return color ? { a: 1, ...color } : { h: 0, s: 0, l: 100, a: 1 };
++};
++
++const ColorPicker = (
++	props: PolymorphicComponentProps< ColorPickerProps, 'div', false >,
++	forwardedRef: Ref< any >
++) => {
++	const {
++		enableAlpha = false,
++		color: colorProp,
++		onChange,
++		defaultValue,
++		copyFormat,
++	} = useContextSystem( props, 'ColorPicker' );
++
++	const [ color, setColor ] = useControlledValue( {
++		onChange,
++		value: colorProp,
++		defaultValue,
++	} );
++
++	// Debounce to prevent rapid changes from conflicting with one another.
++	const debouncedSetColor = useDebounce( setColor );
++
++	const handleChange = (
++		nextValue: ColorFormats.HSLA | ColorFormats.HSL
++	) => {
++		debouncedSetColor( nextValue );
++	};
++
++	// Use a safe default value for the color and remove the possibility of `undefined`.
++	const safeColor = getSafeColor( color );
++
++	const [ showInputs, setShowInputs ] = useState< boolean >( false );
++	const [ colorType, setColorType ] = useState< ColorType >(
++		copyFormat || 'hex'
++	);
++
++	return (
++		<ColorfulWrapper ref={ forwardedRef }>
++			<Picker
++				onChange={ handleChange }
++				color={ safeColor }
++				enableAlpha={ enableAlpha }
++			/>
++			<HStack justify="space-between">
++				{ showInputs ? (
++					<SelectControl
++						options={ options }
++						value={ colorType }
++						onChange={ ( nextColorType ) =>
++							setColorType( nextColorType as ColorType )
++						}
++						label={ __( 'Color format' ) }
++						hideLabelFromVision
++					/>
++				) : (
++					<ColorDisplay
++						color={ safeColor }
++						colorType={ copyFormat || colorType }
++						enableAlpha={ enableAlpha }
++					/>
++				) }
++				<Button
++					onClick={ () => setShowInputs( ! showInputs ) }
++					icon={ moreVertical }
++					isPressed={ showInputs }
++					label={
++						showInputs
++							? __( 'Hide detailed inputs' )
++							: __( 'Show detailed inputs' )
++					}
++				/>
++			</HStack>
++			<Spacer />
++			{ showInputs && (
++				<ColorInput
++					colorType={ colorType }
++					color={ safeColor }
++					onChange={ handleChange }
++					enableAlpha={ enableAlpha }
++				/>
++			) }
++		</ColorfulWrapper>
++	);
++};
++
++const ConnectedColorPicker = contextConnect( ColorPicker, 'ColorPicker' );
++
++export default ConnectedColorPicker;
+diff --git a/packages/components/src/ui/color-picker/hex-input.tsx b/packages/components/src/ui/color-picker/hex-input.tsx
+new file mode 100644
+index 00000000000000..7a58cbdbd1f200
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/hex-input.tsx
+@@ -0,0 +1,55 @@
++/**
++ * External dependencies
++ */
++import colorize, { ColorFormats } from 'tinycolor2';
++
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import { Text } from '../../text';
++import { Spacer } from '../../spacer';
++import InputControl from '../../input-control';
++import { space } from '../utils/space';
++
++interface HexInputProps {
++	color: ColorFormats.HSLA;
++	onChange: ( value: ColorFormats.HSLA ) => void;
++	enableAlpha: boolean;
++}
++
++export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
++	const handleValidate = ( value: string ) => {
++		if ( ! colorize( value ).isValid() ) {
++			throw new Error( 'Invalid hex color input' );
++		}
++	};
++
++	const colorized = colorize( color );
++	const value = enableAlpha
++		? colorized.toHex8String()
++		: colorized.toHexString();
++
++	return (
++		<InputControl
++			__unstableInputWidth="8em"
++			prefix={
++				<Spacer as={ Text } marginLeft={ space( 2 ) } color="blue">
++					#
++				</Spacer>
++			}
++			value={ value.slice( 1 ).toUpperCase() }
++			onChange={ ( nextValue ) =>
++				onChange( colorize( nextValue ).toHsl() )
++			}
++			onValidate={ handleValidate }
++			maxLength={ enableAlpha ? 8 : 6 }
++			label={ __( 'Hex color' ) }
++			hideLabelFromVision
++		/>
++	);
++};
+diff --git a/packages/components/src/ui/color-picker/hsl-input.tsx b/packages/components/src/ui/color-picker/hsl-input.tsx
+new file mode 100644
+index 00000000000000..d41cc4cf884ae4
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/hsl-input.tsx
+@@ -0,0 +1,71 @@
++/**
++ * External dependencies
++ */
++import type { ColorFormats } from 'tinycolor2';
++
++/**
++ * Internal dependencies
++ */
++import { InputWithSlider } from './input-with-slider';
++
++interface HslInputProps {
++	color: ColorFormats.HSLA;
++	onChange: ( color: ColorFormats.HSLA ) => void;
++	enableAlpha: boolean;
++}
++
++export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
++	const { h, s, l, a } = color;
++
++	return (
++		<>
++			<InputWithSlider
++				min={ 1 }
++				max={ 360 }
++				label="Hue"
++				abbreviation="H"
++				value={ Math.trunc( h ) }
++				onChange={ ( nextH: number ) =>
++					onChange( { h: nextH, s, l, a } )
++				}
++			/>
++			<InputWithSlider
++				min={ 0 }
++				max={ 100 }
++				label="Saturation"
++				abbreviation="S"
++				value={ s <= 1 ? Math.trunc( 100 * s ) : s }
++				onChange={ ( nextS: number ) =>
++					onChange( { h, s: nextS / 100, l, a } )
++				}
++			/>
++			<InputWithSlider
++				min={ 0 }
++				max={ 100 }
++				label="Lightness"
++				abbreviation="L"
++				value={ l <= 1 ? Math.trunc( 100 * l ) : l }
++				onChange={ ( nextL: number ) =>
++					onChange( { h, s, l: nextL / 100, a } )
++				}
++			/>
++			{ enableAlpha && (
++				<InputWithSlider
++					min={ 0 }
++					max={ 100 }
++					label="Alpha"
++					abbreviation="A"
++					value={ Math.trunc( 100 * a ) }
++					onChange={ ( nextA: number ) =>
++						onChange( {
++							h,
++							s,
++							l,
++							a: nextA / 100,
++						} )
++					}
++				/>
++			) }
++		</>
++	);
++};
+diff --git a/packages/components/src/ui/color-picker/index.ts b/packages/components/src/ui/color-picker/index.ts
+new file mode 100644
+index 00000000000000..24afc1ddb18cec
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/index.ts
+@@ -0,0 +1 @@
++export { default as ColorPicker } from './component';
+diff --git a/packages/components/src/ui/color-picker/input-with-slider.tsx b/packages/components/src/ui/color-picker/input-with-slider.tsx
+new file mode 100644
+index 00000000000000..0a1b8d50e63005
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/input-with-slider.tsx
+@@ -0,0 +1,56 @@
++/**
++ * Internal dependencies
++ */
++import NumberControl from '../../number-control';
++import { HStack } from '../../h-stack';
++import { Text } from '../../text';
++import { Spacer } from '../../spacer';
++import { space } from '../utils/space';
++import { RangeControl } from './styles';
++
++interface InputWithSliderProps {
++	min: number;
++	max: number;
++	value: number;
++	label: string;
++	abbreviation: string;
++	onChange: ( value: number ) => void;
++}
++
++export const InputWithSlider = ( {
++	min,
++	max,
++	label,
++	abbreviation,
++	onChange,
++	value,
++}: InputWithSliderProps ) => {
++	return (
++		<Spacer as={ HStack }>
++			<NumberControl
++				__unstableInputWidth="5em"
++				min={ min }
++				max={ max }
++				label={ label }
++				hideLabelFromVision
++				value={ value }
++				onChange={ onChange }
++				prefix={
++					<Spacer as={ Text } paddingLeft={ space( 1 ) } color="blue">
++						{ abbreviation }
++					</Spacer>
++				}
++				hideHTMLArrows
++			/>
++			<RangeControl
++				label={ label }
++				hideLabelFromVision
++				min={ min }
++				max={ max }
++				value={ value }
++				onChange={ onChange }
++				withInputField={ false }
++			/>
++		</Spacer>
++	);
++};
+diff --git a/packages/components/src/ui/color-picker/picker.tsx b/packages/components/src/ui/color-picker/picker.tsx
+new file mode 100644
+index 00000000000000..16723a9e417569
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/picker.tsx
+@@ -0,0 +1,26 @@
++/**
++ * External dependencies
++ */
++import type { ColorFormats } from 'tinycolor2';
++import { HslColorPicker, HslaColorPicker } from 'react-colorful';
++
++interface PickerProps {
++	color: ColorFormats.HSL | ColorFormats.HSLA;
++	enableAlpha: boolean;
++	onChange: ( nextColor: ColorFormats.HSL | ColorFormats.HSLA ) => void;
++}
++
++export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
++	// RC accepts s and l as a range from 0 - 100, whereas tinycolor expects a decimal value representing the percentage
++	// so we need to make sure that we're giving RC the correct color format that it expects
++	const reactColorfulColor = {
++		h: color.h,
++		s: color.s <= 1 ? Math.floor( color.s * 100 ) : color.s,
++		l: color.l <= 1 ? Math.floor( color.l * 100 ) : color.l,
++		a: ( color as ColorFormats.HSLA ).a,
++	};
++
++	const Component = enableAlpha ? HslaColorPicker : HslColorPicker;
++
++	return <Component color={ reactColorfulColor } onChange={ onChange } />;
++};
+diff --git a/packages/components/src/ui/color-picker/rgb-input.tsx b/packages/components/src/ui/color-picker/rgb-input.tsx
+new file mode 100644
+index 00000000000000..adb0ed6950613d
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/rgb-input.tsx
+@@ -0,0 +1,73 @@
++/**
++ * External dependencies
++ */
++import colorize, { ColorFormats } from 'tinycolor2';
++
++/**
++ * Internal dependencies
++ */
++import { InputWithSlider } from './input-with-slider';
++
++interface RgbInputProps {
++	color: ColorFormats.HSLA;
++	onChange: ( color: ColorFormats.HSLA ) => void;
++	enableAlpha: boolean;
++}
++
++export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
++	const { r, g, b, a } = colorize( color ).toRgb();
++
++	return (
++		<>
++			<InputWithSlider
++				min={ 0 }
++				max={ 255 }
++				label="Red"
++				abbreviation="R"
++				value={ r }
++				onChange={ ( nextR: number ) =>
++					onChange( colorize( { r: nextR, g, b, a } ).toHsl() )
++				}
++			/>
++			<InputWithSlider
++				min={ 0 }
++				max={ 255 }
++				label="Green"
++				abbreviation="G"
++				value={ g }
++				onChange={ ( nextG: number ) =>
++					onChange( colorize( { r, g: nextG, b, a } ).toHsl() )
++				}
++			/>
++			<InputWithSlider
++				min={ 0 }
++				max={ 255 }
++				label="Blue"
++				abbreviation="B"
++				value={ b }
++				onChange={ ( nextB: number ) =>
++					onChange( colorize( { r, g, b: nextB, a } ).toHsl() )
++				}
++			/>
++			{ enableAlpha && (
++				<InputWithSlider
++					min={ 0 }
++					max={ 100 }
++					label="Alpha"
++					abbreviation="A"
++					value={ Math.trunc( a * 100 ) }
++					onChange={ ( nextA: number ) =>
++						onChange(
++							colorize( {
++								r,
++								g,
++								b,
++								a: nextA / 100,
++							} ).toHsl()
++						)
++					}
++				/>
++			) }
++		</>
++	);
++};
+diff --git a/packages/components/src/ui/color-picker/stories/index.js b/packages/components/src/ui/color-picker/stories/index.js
+new file mode 100644
+index 00000000000000..db25d392724a5d
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/stories/index.js
+@@ -0,0 +1,59 @@
++/**
++ * External dependencies
++ */
++import { boolean, select } from '@storybook/addon-knobs';
++import colorize from 'tinycolor2';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { ColorPicker } from '..';
++import { Flex } from '../../../flex';
++import { Spacer } from '../../../spacer';
++import { space } from '../../utils/space';
++
++export default {
++	component: ColorPicker,
++	title: 'Components (Experimental)/ColorPicker',
++};
++
++const PROP_UNSET = 'unset';
++
++const Example = () => {
++	const [ color, setColor ] = useState( undefined );
++	const props = {
++		enableAlpha: boolean( 'enableAlpha', false ),
++		copyFormat: select(
++			'copyFormat',
++			[ PROP_UNSET, 'rgb', 'hsl', 'hex' ],
++			PROP_UNSET
++		),
++	};
++
++	if ( props.copyFormat === PROP_UNSET ) {
++		delete props.copyFormat;
++	}
++
++	return (
++		<Flex
++			as={ Spacer }
++			gap={ space( 2 ) }
++			justify="space-around"
++			align="flex-start"
++			marginTop={ space( 10 ) }
++		>
++			<ColorPicker { ...props } color={ color } onChange={ setColor } />
++			<div>{ colorize( color ).toHslString() }</div>
++			<ColorPicker { ...props } color={ color } onChange={ setColor } />
++		</Flex>
++	);
++};
++
++export const _default = () => {
++	return <Example />;
++};
+diff --git a/packages/components/src/ui/color-picker/styles.ts b/packages/components/src/ui/color-picker/styles.ts
+new file mode 100644
+index 00000000000000..afd79c2cf999bd
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/styles.ts
+@@ -0,0 +1,61 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import InnerSelectControl from '../../select-control';
++import InnerRangeControl from '../../range-control';
++import { StyledField } from '../../base-control/styles/base-control-styles';
++import { space } from '../utils/space';
++
++export const SelectControl = styled( InnerSelectControl )`
++	width: 5em;
++`;
++
++export const RangeControl = styled( InnerRangeControl )`
++	flex: 1;
++
++	${ StyledField } {
++		margin-bottom: 0;
++	}
++`;
++
++export const ColorfulWrapper = styled.div`
++	width: 216px;
++
++	.react-colorful {
++		display: flex;
++		flex-direction: column;
++		align-items: center;
++		width: 216px;
++		height: auto;
++	}
++
++	.react-colorful__saturation {
++		width: 100%;
++		border-radius: 0;
++		height: 216px;
++		margin-bottom: ${ space( 4 ) };
++		border-bottom: none;
++	}
++
++	.react-colorful__hue,
++	.react-colorful__alpha {
++		width: 184px;
++		height: 16px;
++		border-radius: 16px;
++		margin-bottom: ${ space( 2 ) };
++	}
++
++	.react-colorful__pointer {
++		height: 16px;
++		width: 16px;
++	}
++
++	${ StyledField } {
++		margin-bottom: 0;
++	}
++`;
+diff --git a/packages/components/src/ui/color-picker/types.ts b/packages/components/src/ui/color-picker/types.ts
+new file mode 100644
+index 00000000000000..f55909138c3e96
+--- /dev/null
++++ b/packages/components/src/ui/color-picker/types.ts
+@@ -0,0 +1 @@
++export type ColorType = 'rgb' | 'hsl' | 'hex';
+diff --git a/packages/components/src/utils/hooks/test/use-controlled-value.js b/packages/components/src/utils/hooks/test/use-controlled-value.js
+index 1d63d9248021ea..22c7091a85fc82 100644
+--- a/packages/components/src/utils/hooks/test/use-controlled-value.js
++++ b/packages/components/src/utils/hooks/test/use-controlled-value.js
+@@ -38,7 +38,7 @@ describe( 'useControlledValue', () => {
+ 		expect( getInput() ).toHaveValue( 'Code is Poetry' );
+ 	} );
+ 
+-	it( 'should not call onChange only when there is no value being passed in', () => {
++	it( 'should call onChange only when there is no value being passed in', () => {
+ 		const onChange = jest.fn();
+ 		render( <Input defaultValue="WordPress.org" onChange={ onChange } /> );
+ 
+@@ -47,7 +47,7 @@ describe( 'useControlledValue', () => {
+ 		fireEvent.change( getInput(), { target: { value: 'Code is Poetry' } } );
+ 
+ 		expect( getInput() ).toHaveValue( 'Code is Poetry' );
+-		expect( onChange ).not.toHaveBeenCalled();
++		expect( onChange ).toHaveBeenCalledWith( 'Code is Poetry' );
+ 	} );
+ 
+ 	it( 'should call onChange when there is a value passed in', () => {
+diff --git a/packages/components/src/utils/hooks/use-controlled-value.ts b/packages/components/src/utils/hooks/use-controlled-value.ts
+index c0878e75f191cf..5a3824d465c07c 100644
+--- a/packages/components/src/utils/hooks/use-controlled-value.ts
++++ b/packages/components/src/utils/hooks/use-controlled-value.ts
+@@ -27,8 +27,18 @@ export function useControlledValue< T >( {
+ 	const initialValue = hasValue ? valueProp : defaultValue;
+ 	const [ state, setState ] = useState( initialValue );
+ 	const value = hasValue ? valueProp : state;
+-	const setValue =
+-		hasValue && typeof onChange === 'function' ? onChange : setState;
++
++	let setValue: ( nextValue: T ) => void;
++	if ( hasValue && typeof onChange === 'function' ) {
++		setValue = onChange;
++	} else if ( ! hasValue && typeof onChange === 'function' ) {
++		setValue = ( nextValue ) => {
++			onChange( nextValue );
++			setState( nextValue );
++		};
++	} else {
++		setValue = setState;
++	}
+ 
+ 	return [ value, setValue ];
+ }
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 1d70cfac56f546..0c43554ae83fc0 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -22,6 +22,7 @@
+ 		"src/animate/**/*",
+ 		"src/base-control/**/*",
+ 		"src/base-field/**/*",
++		"src/button/**/*",
+ 		"src/card/**/*",
+ 		"src/dashicon/**/*",
+ 		"src/disabled/**/*",
+@@ -34,18 +35,24 @@
+ 		"src/grid/**/*",
+ 		"src/h-stack/**/*",
+ 		"src/heading/**/*",
++		"src/item-group/**/*",
+ 		"src/input-control/**/*",
+ 		"src/icon/**/*",
+-		"src/item-group/**/*",
++		"src/number-control/**/*",
++		"src/popover/**/*",
++		"src/range-control/**/*",
+ 		"src/scroll-lock/**/*",
+ 		"src/scrollable/**/*",
+ 		"src/segmented-control/**/*",
++		"src/select-control/**/*",
+ 		"src/shortcut/**/*",
++		"src/slot-fill/**/*",
+ 		"src/spacer/**/*",
+ 		"src/spinner/**/*",
+ 		"src/surface/**/*",
+ 		"src/text/**/*",
+ 		"src/tip/**/*",
++		"src/tooltip/**/*",
+ 		"src/truncate/**/*",
+ 		"src/ui/**/*",
+ 		"src/utils/**/*",
+diff --git a/packages/compose/README.md b/packages/compose/README.md
+index 4dc5f4603c8338..c66787eb8c3d77 100644
+--- a/packages/compose/README.md
++++ b/packages/compose/README.md
+@@ -186,7 +186,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `import('react').Ref<HTMLElement>`: A ref to assign to the target element.
++-   `import('react').Ref<TElementType>`: A ref to assign to the target element.
+ 
+ ### useDebounce
+ 
+diff --git a/packages/compose/src/hooks/use-copy-to-clipboard/index.js b/packages/compose/src/hooks/use-copy-to-clipboard/index.js
+index 3089915a455e2c..a7c40199f16d72 100644
+--- a/packages/compose/src/hooks/use-copy-to-clipboard/index.js
++++ b/packages/compose/src/hooks/use-copy-to-clipboard/index.js
+@@ -27,11 +27,12 @@ function useUpdatedRef( value ) {
+ /**
+  * Copies the given text to the clipboard when the element is clicked.
+  *
++ * @template {HTMLElement} TElementType
+  * @param {string | (() => string)} text      The text to copy. Use a function if not
+  *                                            already available and expensive to compute.
+  * @param {Function}                onSuccess Called when to text is copied.
+  *
+- * @return {import('react').Ref<HTMLElement>} A ref to assign to the target element.
++ * @return {import('react').Ref<TElementType>} A ref to assign to the target element.
+  */
+ export default function useCopyToClipboard( text, onSuccess ) {
+ 	// Store the dependencies as refs and continuesly update them so they're

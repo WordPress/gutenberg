@@ -1,0 +1,40 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7b294f3663ef0c..f2df4dce334bc4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `Divider`: Make the divider visible by default (`display: inline`) in flow layout containers when the divider orientation is vertical ([#39316](https://github.com/WordPress/gutenberg/pull/39316)).
+ -   Stop using deprecated `event.keyCode` in favor of `event.key` for keyboard events in `UnitControl` and `InputControl`.  ([#39360](https://github.com/WordPress/gutenberg/pull/39360))
+ -   `ColorPalette`: refine custom color button's label. ([#39386](https://github.com/WordPress/gutenberg/pull/39386))
++-   `FocalPointPicker`: stop using `UnitControl`'s deprecated `unit` prop ([#39504](https://github.com/WordPress/gutenberg/pull/39504)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/focal-point-picker/controls.js b/packages/components/src/focal-point-picker/controls.js
+index 36991e05604139..8158c9508c5cf4 100644
+--- a/packages/components/src/focal-point-picker/controls.js
++++ b/packages/components/src/focal-point-picker/controls.js
+@@ -42,13 +42,13 @@ export default function FocalPointPickerControls( {
+ 		<ControlWrapper className="focal-point-picker__controls">
+ 			<UnitControl
+ 				label={ __( 'Left' ) }
+-				value={ valueX }
++				value={ [ valueX, '%' ].join( '' ) }
+ 				onChange={ ( next ) => handleChange( next, 'x' ) }
+ 				dragDirection="e"
+ 			/>
+ 			<UnitControl
+ 				label={ __( 'Top' ) }
+-				value={ valueY }
++				value={ [ valueY, '%' ].join( '' ) }
+ 				onChange={ ( next ) => handleChange( next, 'y' ) }
+ 				dragDirection="s"
+ 			/>
+@@ -63,7 +63,6 @@ function UnitControl( props ) {
+ 			labelPosition="top"
+ 			max={ TEXTCONTROL_MAX }
+ 			min={ TEXTCONTROL_MIN }
+-			unit="%"
+ 			units={ [ { value: '%', label: '%' } ] }
+ 			{ ...props }
+ 		/>

@@ -1,0 +1,32 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 71aa08d6934034..08e1027f3e7870 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ ### Enhancements
+ 
+ -   `MenuGroup`: Simplify the MenuGroup styles within dropdown menus. ([#65561](https://github.com/WordPress/gutenberg/pull/65561)).
++-   `DatePicker`: Use compact button size. ([#65653](https://github.com/WordPress/gutenberg/pull/65653)).
+ 
+ ## 28.8.0 (2024-09-19)
+ 
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index 33fc736564d5e6..5a565ee38cec59 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -125,6 +125,7 @@ export function DatePicker( {
+ 							)
+ 						);
+ 					} }
++					size="compact"
+ 				/>
+ 				<NavigatorHeading level={ 3 }>
+ 					<strong>
+@@ -150,6 +151,7 @@ export function DatePicker( {
+ 							)
+ 						);
+ 					} }
++					size="compact"
+ 				/>
+ 			</Navigator>
+ 			<Calendar

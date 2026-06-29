@@ -1,0 +1,1177 @@
+diff --git a/packages/admin-ui/src/breadcrumbs/style.scss b/packages/admin-ui/src/breadcrumbs/style.scss
+index 944e1b6044b4bf..c15416a8bbebd5 100644
+--- a/packages/admin-ui/src/breadcrumbs/style.scss
++++ b/packages/admin-ui/src/breadcrumbs/style.scss
+@@ -2,10 +2,10 @@
+ 
+ .admin-ui-breadcrumbs__list {
+ 	// @TODO: use Text component from UI when available.
+-	font-family: var(--wpds-font-family-heading);
+-	font-size: var(--wpds-font-size-lg);
+-	font-weight: var(--wpds-font-weight-medium);
+-	line-height: var(--wpds-font-line-height-lg);
++	font-family: var(--wpds-typography-font-family-heading);
++	font-size: var(--wpds-typography-font-size-lg);
++	font-weight: var(--wpds-typography-font-weight-medium);
++	line-height: var(--wpds-typography-line-height-lg);
+ 	list-style: none;
+ 	padding: 0;
+ 	margin: 0;
+diff --git a/packages/admin-ui/src/page/style.scss b/packages/admin-ui/src/page/style.scss
+index 3eac0e7e13ad64..beeda52033cb6b 100644
+--- a/packages/admin-ui/src/page/style.scss
++++ b/packages/admin-ui/src/page/style.scss
+@@ -20,10 +20,10 @@
+ 
+ .admin-ui-page__header-title {
+ 	// @TODO: use Text component from UI when available.
+-	font-family: var(--wpds-font-family-heading);
+-	font-size: var(--wpds-font-size-lg);
+-	font-weight: var(--wpds-font-weight-medium);
+-	line-height: var(--wpds-font-line-height-lg);
++	font-family: var(--wpds-typography-font-family-heading);
++	font-size: var(--wpds-typography-font-size-lg);
++	font-weight: var(--wpds-typography-font-weight-medium);
++	line-height: var(--wpds-typography-line-height-lg);
+ 	margin: 0;
+ 	overflow: hidden;
+ 	text-overflow: ellipsis;
+@@ -37,8 +37,8 @@
+ .admin-ui-page__header-subtitle {
+ 	padding-block-end: var(--wpds-dimension-padding-xs);
+ 	color: var(--wpds-color-fg-content-neutral-weak);
+-	font-size: var(--wpds-font-size-md);
+-	line-height: var(--wpds-font-line-height-md);
++	font-size: var(--wpds-typography-font-size-md);
++	line-height: var(--wpds-typography-line-height-md);
+ 	margin: 0;
+ }
+ 
+@@ -67,7 +67,7 @@
+ 			// ... and display labels.
+ 			&::after {
+ 				content: attr(aria-label);
+-				font-size: var(--wpds-font-size-sm);
++				font-size: var(--wpds-typography-font-size-sm);
+ 			}
+ 		}
+ 	}
+diff --git a/packages/dataviews/src/components/dataform-layouts/panel/style.scss b/packages/dataviews/src/components/dataform-layouts/panel/style.scss
+index 4f53971e01a49c..5ff0fc78513f14 100644
+--- a/packages/dataviews/src/components/dataform-layouts/panel/style.scss
++++ b/packages/dataviews/src/components/dataform-layouts/panel/style.scss
+@@ -44,7 +44,7 @@
+ 
+ 		.dataforms-layouts-panel__field-control {
+ 			color: $gray-700;
+-			font-weight: var(--wpds-font-weight-regular);
++			font-weight: var(--wpds-typography-font-weight-regular);
+ 		}
+ 	}
+ }
+@@ -122,12 +122,12 @@
+ 	flex-grow: 1;
+ 	min-width: 0;
+ 	min-height: $grid-unit-30;
+-	line-height: var(--wpds-font-line-height-md);
++	line-height: var(--wpds-typography-line-height-md);
+ 	display: flex;
+ 	align-items: center;
+ 	overflow: hidden;
+ 	word-break: break-word;
+-	font-weight: var(--wpds-font-weight-medium);
++	font-weight: var(--wpds-typography-font-weight-medium);
+ 
+ 	> * {
+ 		min-width: 0;
+diff --git a/packages/eslint-plugin/docs/rules/no-ds-tokens.md b/packages/eslint-plugin/docs/rules/no-ds-tokens.md
+index 7eaafa28c8841d..2aea8bbcd28b76 100644
+--- a/packages/eslint-plugin/docs/rules/no-ds-tokens.md
++++ b/packages/eslint-plugin/docs/rules/no-ds-tokens.md
+@@ -13,7 +13,7 @@ const style = 'color: var(--wpds-color-fg-content-neutral)';
+ ```
+ 
+ ```js
+-const style = `border: 1px solid var(--wpds-border-color)`;
++const style = `border: 1px solid var(--wpds-color-stroke-surface-neutral)`;
+ ```
+ 
+ ```jsx
+diff --git a/packages/eslint-plugin/rules/__tests__/no-ds-tokens.js b/packages/eslint-plugin/rules/__tests__/no-ds-tokens.js
+index 10c1113400fc14..ba02a531a60490 100644
+--- a/packages/eslint-plugin/rules/__tests__/no-ds-tokens.js
++++ b/packages/eslint-plugin/rules/__tests__/no-ds-tokens.js
+@@ -56,7 +56,7 @@ ruleTester.run( 'no-ds-tokens', rule, {
+ 			],
+ 		},
+ 		{
+-			code: 'const style = `border: 1px solid var(--wpds-border-color, var(--wpds-border-fallback))`;',
++			code: 'const style = `border: 1px solid var(--wpds-color-stroke-surface-neutral, var(--wpds-color-stroke-surface-neutral-weak))`;',
+ 			errors: [
+ 				{
+ 					messageId: 'disallowed',
+@@ -64,7 +64,7 @@ ruleTester.run( 'no-ds-tokens', rule, {
+ 			],
+ 		},
+ 		{
+-			code: `const token = '--wpds-color-fg';`,
++			code: `const token = '--wpds-color-fg-content-neutral';`,
+ 			errors: [
+ 				{
+ 					messageId: 'disallowed',
+@@ -72,7 +72,7 @@ ruleTester.run( 'no-ds-tokens', rule, {
+ 			],
+ 		},
+ 		{
+-			code: 'const style = `--wpds-color-fg: red`;',
++			code: 'const style = `--wpds-color-fg-content-neutral: red`;',
+ 			errors: [
+ 				{
+ 					messageId: 'disallowed',
+diff --git a/packages/eslint-plugin/rules/__tests__/no-setting-ds-tokens.js b/packages/eslint-plugin/rules/__tests__/no-setting-ds-tokens.js
+index 4fe944febd1419..b818caa06d3e07 100644
+--- a/packages/eslint-plugin/rules/__tests__/no-setting-ds-tokens.js
++++ b/packages/eslint-plugin/rules/__tests__/no-setting-ds-tokens.js
+@@ -46,7 +46,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
+ 			],
+ 		},
+ 		{
+-			code: `<div style={ { '--wpds-font-size-md': '10px', color: 'blue' } } />`,
++			code: `<div style={ { '--wpds-typography-font-size-md': '10px', color: 'blue' } } />`,
+ 			errors: [
+ 				{
+ 					messageId: 'disallowedSet',
+@@ -62,7 +62,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
+ 			],
+ 		},
+ 		{
+-			code: `function getStyles() { return { '--wpds-font-size-md': '10px' }; }`,
++			code: `function getStyles() { return { '--wpds-typography-font-size-md': '10px' }; }`,
+ 			errors: [
+ 				{
+ 					messageId: 'disallowedSet',
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 269dafb1125c47..c3d4a1fee4463a 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -2,9 +2,21 @@
+ 
+ ## Unreleased
+ 
++### Breaking changes
++
++-   Renamed typography tokens from `--wpds-font-*` to `--wpds-typography-*`. Sub-groups that correspond to CSS `font-*` properties retain the `font-` prefix; `line-height` does not. To migrate:
++    -   `--wpds-font-family-*`: use `--wpds-typography-font-family-*` instead.
++    -   `--wpds-font-size-*`: use `--wpds-typography-font-size-*` instead.
++    -   `--wpds-font-weight-*`: use `--wpds-typography-font-weight-*` instead.
++    -   `--wpds-font-line-height-*`: use `--wpds-typography-line-height-*` instead.
++
++### Enhancements
++
++-   The design token fallback build plugins (PostCSS, esbuild, Vite) now throw an error when encountering an unknown `--wpds-*` token, instead of silently skipping it.
++
+ ## 0.10.0 (2026-04-01)
+ 
+-### Enhancement
++### Enhancements
+ 
+ -   Change the default value of `--wpds-cursor-control` from `default` to `pointer` ([#76762](https://github.com/WordPress/gutenberg/pull/76762)).
+ 
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index 384aa3a16a0174..a9b8dbd84e8406 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -13,6 +13,36 @@ A theming package that's part of the WordPress Design System. It has two parts:
+ 
+ In the **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
+ 
++### Using Design Tokens
++
++Design tokens are delivered as CSS custom properties (e.g. `var(--wpds-color-fg-content-neutral)`). To use them, a stylesheet defining the token values must be loaded on the page.
++
++The [`ThemeProvider`](#theme-provider) component can be used to customize token values like colors and density for a specific part of your application.
++
++#### Within WordPress
++
++Stylesheets are managed on your behalf in a WordPress context, so you don't need to worry about loading them yourself.
++
++#### Outside WordPress
++
++Outside of WordPress, you will need to install and load the design tokens stylesheet to support the full range of theming capabilities:
++
++```
++npm install @wordpress/theme
++```
++
++```js
++import '@wordpress/theme/design-tokens.css';
++```
++
++This stylesheet is universal and does not have a separate RTL version.
++
++### Developer Tools
++
++For the best development experience, we recommend configuring the [build plugins](#build-plugins) and [Stylelint rules](#stylelint-plugins) provided by this package. The build plugins automatically inject fallback values into `var(--wpds-*)` references so components render correctly even when the tokens stylesheet is not yet loaded, and will raise an error if a reference does not match a known token. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
++
++If you use `@wordpress/build` to build your scripts, the build plugins are already enabled by default.
++
+ ### Architecture
+ 
+ Internally, the design system uses a tiered token architecture:
+@@ -52,27 +82,29 @@ Semantic tokens follow a consistent naming pattern:
+ 
+ **Type** indicates what kind of value it represents, usually mapping to a DTCG token type.
+ 
+-| Value       | Description                                                                    |
+-| ----------- | ------------------------------------------------------------------------------ |
+-| `color`     | Color values for backgrounds, foregrounds, and strokes                         |
+-| `dimension` | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
+-| `border`    | Border properties like radius and width                                        |
+-| `elevation` | Shadow definitions for layering and depth                                      |
+-| `font`      | Typography properties like family, size, and line-height                       |
++| Value        | Description                                                                    |
++| ------------ | ------------------------------------------------------------------------------ |
++| `color`      | Color values for backgrounds, foregrounds, and strokes                         |
++| `dimension`  | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
++| `border`     | Border properties like radius and width                                        |
++| `elevation`  | Shadow definitions for layering and depth                                      |
++| `typography` | Typography properties like font family, font size, and line-height             |
+ 
+ **Property** is the specific design property being defined.
+ 
+-| Value     | Description                        |
+-| --------- | ---------------------------------- |
+-| `bg`      | Background color                   |
+-| `fg`      | Foreground color (text and icons)  |
+-| `stroke`  | Border and outline color           |
+-| `padding` | Internal spacing within an element |
+-| `gap`     | Spacing between elements           |
+-| `radius`  | Border radius for rounded corners  |
+-| `width`   | Border width                       |
+-| `size`    | Font size                          |
+-| `family`  | Font family                        |
++| Value         | Description                        |
++| ------------- | ---------------------------------- |
++| `bg`          | Background color                   |
++| `fg`          | Foreground color (text and icons)  |
++| `stroke`      | Border and outline color           |
++| `padding`     | Internal spacing within an element |
++| `gap`         | Spacing between elements           |
++| `radius`      | Border radius for rounded corners  |
++| `width`       | Border width                       |
++| `font-size`   | Font size                          |
++| `font-family` | Font family                        |
++| `font-weight` | Font weight                        |
++| `line-height` | Line height                        |
+ 
+ **Target** is the component or element type the token applies to.
+ 
+@@ -136,10 +168,7 @@ import { ThemeProvider } from '@wordpress/theme';
+ 
+ function App() {
+ 	return (
+-		<ThemeProvider
+-			color={ { primary: 'blue' } }
+-			density="compact"
+-		>
++		<ThemeProvider color={ { primary: 'blue' } } density="compact">
+ 			{ /* Your app content */ }
+ 		</ThemeProvider>
+ 	);
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index 565e039dfae72d..45b3a86390b50a 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -157,22 +157,22 @@ Do not edit directly.
+ 
+ ### Typography
+ 
+-| Variable name                 | Description                                  |
+-| ----------------------------- | -------------------------------------------- |
+-| `--wpds-font-family-heading`  | Headings font family                         |
+-| `--wpds-font-family-body`     | Body font family                             |
+-| `--wpds-font-family-mono`     | Monospace font family                        |
+-| `--wpds-font-size-xs`         | Extra small font size                        |
+-| `--wpds-font-size-sm`         | Small font size                              |
+-| `--wpds-font-size-md`         | Medium font size                             |
+-| `--wpds-font-size-lg`         | Large font size                              |
+-| `--wpds-font-size-xl`         | Extra large font size                        |
+-| `--wpds-font-size-2xl`        | 2X large font size                           |
+-| `--wpds-font-line-height-xs`  | Extra small line height                      |
+-| `--wpds-font-line-height-sm`  | Small line height                            |
+-| `--wpds-font-line-height-md`  | Medium line height                           |
+-| `--wpds-font-line-height-lg`  | Large line height                            |
+-| `--wpds-font-line-height-xl`  | Extra large line height                      |
+-| `--wpds-font-line-height-2xl` | 2X large line height                         |
+-| `--wpds-font-weight-regular`  | Regular font weight for body text            |
+-| `--wpds-font-weight-medium`   | Medium font weight for emphasis and headings |
++| Variable name                           | Description                                  |
++| --------------------------------------- | -------------------------------------------- |
++| `--wpds-typography-font-family-heading` | Headings font family                         |
++| `--wpds-typography-font-family-body`    | Body font family                             |
++| `--wpds-typography-font-family-mono`    | Monospace font family                        |
++| `--wpds-typography-font-size-xs`        | Extra small font size                        |
++| `--wpds-typography-font-size-sm`        | Small font size                              |
++| `--wpds-typography-font-size-md`        | Medium font size                             |
++| `--wpds-typography-font-size-lg`        | Large font size                              |
++| `--wpds-typography-font-size-xl`        | Extra large font size                        |
++| `--wpds-typography-font-size-2xl`       | 2X large font size                           |
++| `--wpds-typography-line-height-xs`      | Extra small line height                      |
++| `--wpds-typography-line-height-sm`      | Small line height                            |
++| `--wpds-typography-line-height-md`      | Medium line height                           |
++| `--wpds-typography-line-height-lg`      | Large line height                            |
++| `--wpds-typography-line-height-xl`      | Extra large line height                      |
++| `--wpds-typography-line-height-2xl`     | 2X large line height                         |
++| `--wpds-typography-font-weight-regular` | Regular font weight for body text            |
++| `--wpds-typography-font-weight-medium`  | Medium font weight for emphasis and headings |
+diff --git a/packages/theme/src/postcss-plugins/add-fallback-to-var.ts b/packages/theme/src/postcss-plugins/add-fallback-to-var.ts
+index a75f60d7668a03..8a517f393ea6ce 100644
+--- a/packages/theme/src/postcss-plugins/add-fallback-to-var.ts
++++ b/packages/theme/src/postcss-plugins/add-fallback-to-var.ts
+@@ -27,7 +27,11 @@ export function addFallbackToVar(
+ 		( match, tokenName: string ) => {
+ 			let fallback = tokenFallbacks[ tokenName ];
+ 			if ( fallback === undefined ) {
+-				return match;
++				throw new Error(
++					`Unknown design token: ${ tokenName }. ` +
++						'This token is not in the design system. ' +
++						'If this token was recently renamed, update all references to use the new name.'
++				);
+ 			}
+ 			if ( escapeQuotes ) {
+ 				fallback = fallback
+diff --git a/packages/theme/src/postcss-plugins/ds-token-fallbacks.mjs b/packages/theme/src/postcss-plugins/ds-token-fallbacks.mjs
+index c240e0a4a84388..99b65a7e410920 100644
+--- a/packages/theme/src/postcss-plugins/ds-token-fallbacks.mjs
++++ b/packages/theme/src/postcss-plugins/ds-token-fallbacks.mjs
+@@ -30,7 +30,11 @@ export function addFallbackToVar( cssValue, { escapeQuotes = false } = {} ) {
+ 		( match, tokenName ) => {
+ 			let fallback = tokenFallbacks[ tokenName ];
+ 			if ( fallback === undefined ) {
+-				return match;
++				throw new Error(
++					`Unknown design token: ${ tokenName }. ` +
++						'This token is not in the design system. ' +
++						'If this token was recently renamed, update all references to use the new name.'
++				);
+ 			}
+ 			if ( escapeQuotes ) {
+ 				fallback = fallback
+diff --git a/packages/theme/src/postcss-plugins/test/add-fallback-to-var.test.ts b/packages/theme/src/postcss-plugins/test/add-fallback-to-var.test.ts
+index 7ca06799140ca5..a3aff1d0bd0a70 100644
+--- a/packages/theme/src/postcss-plugins/test/add-fallback-to-var.test.ts
++++ b/packages/theme/src/postcss-plugins/test/add-fallback-to-var.test.ts
+@@ -8,9 +8,10 @@ const mockFallbacks: Record< string, string > = {
+ 		'var(--wp-admin-theme-color, #3858e9)',
+ 	'--wpds-color-bg-interactive-brand-strong-active':
+ 		'color-mix(in oklch, var(--wp-admin-theme-color, #3858e9) 92%, black)',
+-	'--wpds-font-family-body':
++	'--wpds-typography-font-family-body':
+ 		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
+-	'--wpds-font-family-mono': '"Menlo", "Consolas", monaco, monospace',
++	'--wpds-typography-font-family-mono':
++		'"Menlo", "Consolas", monaco, monospace',
+ };
+ 
+ describe( 'addFallbackToVar', () => {
+@@ -20,10 +21,10 @@ describe( 'addFallbackToVar', () => {
+ 		).toBe( 'var(--wpds-border-radius-sm, 2px)' );
+ 	} );
+ 
+-	it( 'leaves unknown tokens untouched', () => {
+-		expect(
++	it( 'throws for unknown tokens', () => {
++		expect( () =>
+ 			addFallbackToVar( 'var(--wpds-nonexistent-token)', mockFallbacks )
+-		).toBe( 'var(--wpds-nonexistent-token)' );
++		).toThrow( /Unknown design token: --wpds-nonexistent-token/ );
+ 	} );
+ 
+ 	it( 'leaves non-wpds custom properties untouched', () => {
+@@ -96,23 +97,23 @@ describe( 'addFallbackToVar', () => {
+ 		it( 'does not escape quotes by default', () => {
+ 			expect(
+ 				addFallbackToVar(
+-					'var(--wpds-font-family-body)',
++					'var(--wpds-typography-font-family-body)',
+ 					mockFallbacks
+ 				)
+ 			).toBe(
+-				'var(--wpds-font-family-body, -apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif)'
++				'var(--wpds-typography-font-family-body, -apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif)'
+ 			);
+ 		} );
+ 
+ 		it( 'escapes double quotes when enabled', () => {
+ 			expect(
+ 				addFallbackToVar(
+-					'var(--wpds-font-family-mono)',
++					'var(--wpds-typography-font-family-mono)',
+ 					mockFallbacks,
+ 					{ escapeQuotes: true }
+ 				)
+ 			).toBe(
+-				'var(--wpds-font-family-mono, \\"Menlo\\", \\"Consolas\\", monaco, monospace)'
++				'var(--wpds-typography-font-family-mono, \\"Menlo\\", \\"Consolas\\", monaco, monospace)'
+ 			);
+ 		} );
+ 
+diff --git a/packages/theme/src/postcss-plugins/test/ds-token-fallbacks.test.ts b/packages/theme/src/postcss-plugins/test/ds-token-fallbacks.test.ts
+new file mode 100644
+index 00000000000000..6f3b7d4ef975e1
+--- /dev/null
++++ b/packages/theme/src/postcss-plugins/test/ds-token-fallbacks.test.ts
+@@ -0,0 +1,39 @@
++import { addFallbackToVar } from '../ds-token-fallbacks.mjs';
++
++describe( 'addFallbackToVar', () => {
++	it( 'injects a fallback for a known token', () => {
++		expect(
++			addFallbackToVar( 'var(--wpds-typography-font-family-mono)' )
++		).toBe(
++			'var(--wpds-typography-font-family-mono, "Menlo", "Consolas", monaco, monospace)'
++		);
++	} );
++
++	it( 'throws for an unknown token', () => {
++		expect( () => addFallbackToVar( 'var(--wpds-nonexistent)' ) ).toThrow(
++			'Unknown design token: --wpds-nonexistent'
++		);
++	} );
++
++	it( 'leaves var() calls that already have a fallback', () => {
++		expect(
++			addFallbackToVar( 'var(--wpds-border-radius-sm, 999px)' )
++		).toBe( 'var(--wpds-border-radius-sm, 999px)' );
++	} );
++
++	it( 'leaves var() calls that are not design token properties', () => {
++		expect( addFallbackToVar( 'var(--my-custom-prop)' ) ).toBe(
++			'var(--my-custom-prop)'
++		);
++	} );
++
++	it( 'escapes quotes in fallback values when escapeQuotes is true', () => {
++		expect(
++			addFallbackToVar( 'var(--wpds-typography-font-family-mono)', {
++				escapeQuotes: true,
++			} )
++		).toBe(
++			'var(--wpds-typography-font-family-mono, \\"Menlo\\", \\"Consolas\\", monaco, monospace)'
++		);
++	} );
++} );
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index cd18375611a602..5bae431804377f 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -130,25 +130,27 @@
+ 		0 6px 6px 0 #00000008, 0 8px 8px 0 #00000005; /* For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. */
+ 	--wpds-elevation-xs: 0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005,
+ 		0 3px 3px 0 #00000005, 0 4px 4px 0 #00000003; /* For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame. */
+-	--wpds-font-family-body: -apple-system, system-ui, 'Segoe UI', 'Roboto',
+-		'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif; /* Body font family */
+-	--wpds-font-family-heading: -apple-system, system-ui, 'Segoe UI', 'Roboto',
+-		'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif; /* Headings font family */
+-	--wpds-font-family-mono: 'Menlo', 'Consolas', monaco, monospace; /* Monospace font family */
+-	--wpds-font-line-height-2xl: 40px; /* 2X large line height */
+-	--wpds-font-line-height-lg: 28px; /* Large line height */
+-	--wpds-font-line-height-md: 24px; /* Medium line height */
+-	--wpds-font-line-height-sm: 20px; /* Small line height */
+-	--wpds-font-line-height-xl: 32px; /* Extra large line height */
+-	--wpds-font-line-height-xs: 16px; /* Extra small line height */
+-	--wpds-font-size-2xl: 32px; /* 2X large font size */
+-	--wpds-font-size-lg: 15px; /* Large font size */
+-	--wpds-font-size-md: 13px; /* Medium font size */
+-	--wpds-font-size-sm: 12px; /* Small font size */
+-	--wpds-font-size-xl: 20px; /* Extra large font size */
+-	--wpds-font-size-xs: 11px; /* Extra small font size */
+-	--wpds-font-weight-medium: 499; /* Medium font weight for emphasis and headings */
+-	--wpds-font-weight-regular: 400; /* Regular font weight for body text */
++	--wpds-typography-font-family-body: -apple-system, system-ui, 'Segoe UI',
++		'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue',
++		sans-serif; /* Body font family */
++	--wpds-typography-font-family-heading: -apple-system, system-ui, 'Segoe UI',
++		'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue',
++		sans-serif; /* Headings font family */
++	--wpds-typography-font-family-mono: 'Menlo', 'Consolas', monaco, monospace; /* Monospace font family */
++	--wpds-typography-font-size-2xl: 32px; /* 2X large font size */
++	--wpds-typography-font-size-lg: 15px; /* Large font size */
++	--wpds-typography-font-size-md: 13px; /* Medium font size */
++	--wpds-typography-font-size-sm: 12px; /* Small font size */
++	--wpds-typography-font-size-xl: 20px; /* Extra large font size */
++	--wpds-typography-font-size-xs: 11px; /* Extra small font size */
++	--wpds-typography-font-weight-medium: 499; /* Medium font weight for emphasis and headings */
++	--wpds-typography-font-weight-regular: 400; /* Regular font weight for body text */
++	--wpds-typography-line-height-2xl: 40px; /* 2X large line height */
++	--wpds-typography-line-height-lg: 28px; /* Large line height */
++	--wpds-typography-line-height-md: 24px; /* Medium line height */
++	--wpds-typography-line-height-sm: 20px; /* Small line height */
++	--wpds-typography-line-height-xl: 32px; /* Extra large line height */
++	--wpds-typography-line-height-xs: 16px; /* Extra small line height */
+ }
+ 
+ [data-wpds-theme-provider-id][data-wpds-density='compact'] {
+diff --git a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+index 1786d525dbfc00..6fd2cca1548b92 100644
+--- a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
++++ b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+@@ -141,23 +141,24 @@ export default {
+ 		'0 1px 2px 0 #0000000d, 0 2px 3px 0 #0000000a, 0 6px 6px 0 #00000008, 0 8px 8px 0 #00000005',
+ 	'--wpds-elevation-xs':
+ 		'0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005, 0 3px 3px 0 #00000005, 0 4px 4px 0 #00000003',
+-	'--wpds-font-family-body':
++	'--wpds-typography-font-family-body':
+ 		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
+-	'--wpds-font-family-heading':
++	'--wpds-typography-font-family-heading':
+ 		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
+-	'--wpds-font-family-mono': '"Menlo", "Consolas", monaco, monospace',
+-	'--wpds-font-line-height-2xl': '40px',
+-	'--wpds-font-line-height-lg': '28px',
+-	'--wpds-font-line-height-md': '24px',
+-	'--wpds-font-line-height-sm': '20px',
+-	'--wpds-font-line-height-xl': '32px',
+-	'--wpds-font-line-height-xs': '16px',
+-	'--wpds-font-size-2xl': '32px',
+-	'--wpds-font-size-lg': '15px',
+-	'--wpds-font-size-md': '13px',
+-	'--wpds-font-size-sm': '12px',
+-	'--wpds-font-size-xl': '20px',
+-	'--wpds-font-size-xs': '11px',
+-	'--wpds-font-weight-medium': '499',
+-	'--wpds-font-weight-regular': '400',
++	'--wpds-typography-font-family-mono':
++		'"Menlo", "Consolas", monaco, monospace',
++	'--wpds-typography-font-size-2xl': '32px',
++	'--wpds-typography-font-size-lg': '15px',
++	'--wpds-typography-font-size-md': '13px',
++	'--wpds-typography-font-size-sm': '12px',
++	'--wpds-typography-font-size-xl': '20px',
++	'--wpds-typography-font-size-xs': '11px',
++	'--wpds-typography-font-weight-medium': '499',
++	'--wpds-typography-font-weight-regular': '400',
++	'--wpds-typography-line-height-2xl': '40px',
++	'--wpds-typography-line-height-lg': '28px',
++	'--wpds-typography-line-height-md': '24px',
++	'--wpds-typography-line-height-sm': '20px',
++	'--wpds-typography-line-height-xl': '32px',
++	'--wpds-typography-line-height-xs': '16px',
+ };
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index 0f037a16be9da6..469cfa20eb0345 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -127,21 +127,21 @@ export default [
+ 	'--wpds-elevation-sm',
+ 	'--wpds-elevation-md',
+ 	'--wpds-elevation-lg',
+-	'--wpds-font-family-heading',
+-	'--wpds-font-family-body',
+-	'--wpds-font-family-mono',
+-	'--wpds-font-size-xs',
+-	'--wpds-font-size-sm',
+-	'--wpds-font-size-md',
+-	'--wpds-font-size-lg',
+-	'--wpds-font-size-xl',
+-	'--wpds-font-size-2xl',
+-	'--wpds-font-line-height-xs',
+-	'--wpds-font-line-height-sm',
+-	'--wpds-font-line-height-md',
+-	'--wpds-font-line-height-lg',
+-	'--wpds-font-line-height-xl',
+-	'--wpds-font-line-height-2xl',
+-	'--wpds-font-weight-regular',
+-	'--wpds-font-weight-medium',
++	'--wpds-typography-font-family-heading',
++	'--wpds-typography-font-family-body',
++	'--wpds-typography-font-family-mono',
++	'--wpds-typography-font-size-xs',
++	'--wpds-typography-font-size-sm',
++	'--wpds-typography-font-size-md',
++	'--wpds-typography-font-size-lg',
++	'--wpds-typography-font-size-xl',
++	'--wpds-typography-font-size-2xl',
++	'--wpds-typography-line-height-xs',
++	'--wpds-typography-line-height-sm',
++	'--wpds-typography-line-height-md',
++	'--wpds-typography-line-height-lg',
++	'--wpds-typography-line-height-xl',
++	'--wpds-typography-line-height-2xl',
++	'--wpds-typography-font-weight-regular',
++	'--wpds-typography-font-weight-medium',
+ ];
+diff --git a/packages/theme/src/stylelint-plugins/no-unknown-ds-tokens.mjs b/packages/theme/src/stylelint-plugins/no-unknown-ds-tokens.mjs
+index 39bbabacfc05d9..b2e059c836bae8 100644
+--- a/packages/theme/src/stylelint-plugins/no-unknown-ds-tokens.mjs
++++ b/packages/theme/src/stylelint-plugins/no-unknown-ds-tokens.mjs
+@@ -13,12 +13,12 @@ const DS_TOKEN_PREFIX = 'wpds-';
+  *
+  * @example
+  * extractCSSVariables(
+- *   'border: 1px solid var(--wpds-border-color, var(--wpds-border-fallback)); ' +
+- *   'color: var(--wpds-color-fg, black); ' +
++ *   'border: 1px solid var(--wpds-border-radius-sm, var(--wpds-border-radius-md)); ' +
++ *   'color: var(--wpds-color-fg-content-neutral, black); ' +
+  *   'background: var(--unrelated-bg);',
+  *   'wpds'
+  * );
+- * // → Set { '--wpds-border-color', '--wpds-border-fallback', '--wpds-color-fg' }
++ * // → Set { '--wpds-border-radius-sm', '--wpds-border-radius-md', '--wpds-color-fg-content-neutral' }
+  */
+ function extractCSSVariables( value, prefix = '' ) {
+ 	const regex = /--[\w-]+/g;
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index 1543d8233ad72a..a533f5028b62b2 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -56,7 +56,7 @@ export default defineConfig( {
+ 				// See: https://issues.chromium.org/issues/40552893
+ 				// See: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/font-weight#fallback_weights
+ 				if (
+-					token.id.startsWith( 'wpds-font.weight.' ) &&
++					token.id.startsWith( 'wpds-typography.font-weight.' ) &&
+ 					token.$value === 500
+ 				) {
+ 					return '499';
+@@ -235,22 +235,22 @@ export default defineConfig( {
+ 				{
+ 					name: 'FontFamily',
+ 					description: 'Font family variants.',
+-					patterns: [ /^wpds-font\.family\.([^.]+)$/ ],
++					patterns: [ /^wpds-typography\.font-family\.([^.]+)$/ ],
+ 				},
+ 				{
+ 					name: 'FontSize',
+ 					description: 'Font size scale.',
+-					patterns: [ /^wpds-font\.size\.([^.]+)$/ ],
++					patterns: [ /^wpds-typography\.font-size\.([^.]+)$/ ],
+ 				},
+ 				{
+ 					name: 'FontWeight',
+ 					description: 'Font weight variants.',
+-					patterns: [ /^wpds-font\.weight\.([^.]+)$/ ],
++					patterns: [ /^wpds-typography\.font-weight\.([^.]+)$/ ],
+ 				},
+ 				{
+ 					name: 'LineHeight',
+ 					description: 'Line height scale.',
+-					patterns: [ /^wpds-font\.line-height\.([^.]+)$/ ],
++					patterns: [ /^wpds-typography\.line-height\.([^.]+)$/ ],
+ 				},
+ 			],
+ 		} ),
+diff --git a/packages/theme/tokens/typography.json b/packages/theme/tokens/typography.json
+index 33fa12fc5484d7..826a6a9804b21c 100644
+--- a/packages/theme/tokens/typography.json
++++ b/packages/theme/tokens/typography.json
+@@ -1,6 +1,6 @@
+ {
+-	"wpds-font": {
+-		"family": {
++	"wpds-typography": {
++		"font-family": {
+ 			"$type": "fontFamily",
+ 			"heading": {
+ 				"$value": [
+@@ -35,7 +35,7 @@
+ 				"$description": "Monospace font family"
+ 			}
+ 		},
+-		"size": {
++		"font-size": {
+ 			"$type": "dimension",
+ 			"xs": {
+ 				"$value": { "value": 11, "unit": "px" },
+@@ -95,7 +95,7 @@
+ 				"com.figma.scopes": [ "LINE_HEIGHT" ]
+ 			}
+ 		},
+-		"weight": {
++		"font-weight": {
+ 			"$type": "fontWeight",
+ 			"regular": {
+ 				"$value": 400,
+diff --git a/packages/theme/tsconfig.src.json b/packages/theme/tsconfig.src.json
+index 92744233c7d32e..2e723c7900c300 100644
+--- a/packages/theme/tsconfig.src.json
++++ b/packages/theme/tsconfig.src.json
+@@ -3,8 +3,9 @@
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
+ 		"moduleResolution": "bundler",
+-		"types": [ "style-imports" ]
++		"types": [ "jest", "style-imports" ]
+ 	},
++	"exclude": [],
+ 	"files": [ "global.d.ts" ],
+ 	"references": [ { "path": "../element" }, { "path": "../private-apis" } ]
+ }
+diff --git a/packages/ui/src/badge/style.module.css b/packages/ui/src/badge/style.module.css
+index 04629b3ac448a6..74ce49581a8c3f 100644
+--- a/packages/ui/src/badge/style.module.css
++++ b/packages/ui/src/badge/style.module.css
+@@ -5,10 +5,10 @@
+ 		padding-inline: var(--wpds-dimension-padding-sm);
+ 		padding-block: var(--wpds-dimension-padding-xs);
+ 		border-radius: var(--wpds-border-radius-lg);
+-		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-sm);
+-		font-weight: var(--wpds-font-weight-regular);
+-		line-height: var(--wpds-font-line-height-xs);
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-sm);
++		font-weight: var(--wpds-typography-font-weight-regular);
++		line-height: var(--wpds-typography-line-height-xs);
+ 	}
+ 
+ 	.is-high-intent {
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+index c94818a13138fb..a3ecb4100dbdf4 100644
+--- a/packages/ui/src/button/style.module.css
++++ b/packages/ui/src/button/style.module.css
+@@ -20,7 +20,7 @@
+ 		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-md);
+ 		--wp-ui-button-height: 40px;
+ 		--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
+-		--wp-ui-button-font-size: var(--wpds-font-size-md);
++		--wp-ui-button-font-size: var(--wpds-typography-font-size-md);
+ 		--wp-ui-button-min-width: calc(4ch + 2 * var(--wp-ui-button-padding-inline));
+ 
+ 		/* by default, borders have the same color as the background */
+@@ -28,7 +28,7 @@
+ 		--wp-ui-button-border-color-active: var(--wp-ui-button-background-color-active);
+ 		--wp-ui-button-border-color-disabled: var(--wp-ui-button-background-color-disabled);
+ 
+-		--_gcd-button-font-family: var(--wpds-font-family-body);
++		--_gcd-button-font-family: var(--wpds-typography-font-family-body);
+ 		--_gcd-button-font-size: var(--wp-ui-button-font-size);
+ 		--_gcd-button-font-weight: var(--wp-ui-button-font-weight);
+ 
+@@ -48,10 +48,10 @@
+ 		border-radius: var(--wpds-border-radius-sm);
+ 		background-color: var(--wp-ui-button-background-color);
+ 		background-clip: padding-box;
+-		font-family: var(--wpds-font-family-body);
++		font-family: var(--wpds-typography-font-family-body);
+ 		font-size: var(--wp-ui-button-font-size);
+ 		font-weight: var(--wp-ui-button-font-weight);
+-		line-height: var(--wpds-font-line-height-sm);
++		line-height: var(--wpds-typography-line-height-sm);
+ 		text-decoration: none;
+ 		color: var(--wp-ui-button-foreground-color);
+ 		cursor: var(--wpds-cursor-control);
+diff --git a/packages/ui/src/card/stories/index.story.tsx b/packages/ui/src/card/stories/index.story.tsx
+index b43b6910ec672e..1bc3e73b6e0092 100644
+--- a/packages/ui/src/card/stories/index.story.tsx
++++ b/packages/ui/src/card/stories/index.story.tsx
+@@ -10,10 +10,10 @@ function Text( { children }: { children: React.ReactNode } ) {
+ 		<p
+ 			style={ {
+ 				margin: 0,
+-				fontFamily: 'var(--wpds-font-family-body)',
+-				fontSize: 'var(--wpds-font-size-md)',
+-				fontWeight: 'var(--wpds-font-weight-regular)',
+-				lineHeight: 'var(--wpds-font-line-height-sm)',
++				fontFamily: 'var(--wpds-typography-font-family-body)',
++				fontSize: 'var(--wpds-typography-font-size-md)',
++				fontWeight: 'var(--wpds-typography-font-weight-regular)',
++				lineHeight: 'var(--wpds-typography-line-height-sm)',
+ 				textWrap: 'pretty',
+ 				color: 'var(--wpds-color-fg-content-neutral-weak)',
+ 			} }
+diff --git a/packages/ui/src/collapsible-card/stories/index.story.tsx b/packages/ui/src/collapsible-card/stories/index.story.tsx
+index b587604c8e63a8..fcecd9ecd5077e 100644
+--- a/packages/ui/src/collapsible-card/stories/index.story.tsx
++++ b/packages/ui/src/collapsible-card/stories/index.story.tsx
+@@ -12,10 +12,10 @@ function Text( { children }: { children: React.ReactNode } ) {
+ 		<p
+ 			style={ {
+ 				margin: 0,
+-				fontFamily: 'var(--wpds-font-family-body)',
+-				fontSize: 'var(--wpds-font-size-md)',
+-				fontWeight: 'var(--wpds-font-weight-regular)',
+-				lineHeight: 'var(--wpds-font-line-height-sm)',
++				fontFamily: 'var(--wpds-typography-font-family-body)',
++				fontSize: 'var(--wpds-typography-font-size-md)',
++				fontWeight: 'var(--wpds-typography-font-weight-regular)',
++				lineHeight: 'var(--wpds-typography-line-height-sm)',
+ 				textWrap: 'pretty',
+ 				color: 'var(--wpds-color-fg-content-neutral-weak)',
+ 			} }
+@@ -183,7 +183,7 @@ export const WithHeaderDescription: Story = {
+ 					<CollapsibleCard.HeaderDescription>
+ 						<span
+ 							style={ {
+-								fontSize: 'var(--wpds-font-size-sm)',
++								fontSize: 'var(--wpds-typography-font-size-sm)',
+ 								color: 'var(--wpds-color-fg-content-neutral-weak)',
+ 							} }
+ 						>
+diff --git a/packages/ui/src/dialog/style.module.css b/packages/ui/src/dialog/style.module.css
+index 0ccca150eeef99..dca0a0514461b4 100644
+--- a/packages/ui/src/dialog/style.module.css
++++ b/packages/ui/src/dialog/style.module.css
+@@ -37,9 +37,9 @@
+ 		border-radius: var(--wpds-border-radius-lg);
+ 		box-shadow: var(--wpds-elevation-lg);
+ 		overflow: auto;
+-		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-md);
+-		line-height: var(--wpds-font-line-height-md);
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-md);
++		line-height: var(--wpds-typography-line-height-md);
+ 		color: var(--wpds-color-fg-content-neutral);
+ 
+ 		&[data-starting-style],
+diff --git a/packages/ui/src/empty-state/style.module.css b/packages/ui/src/empty-state/style.module.css
+index bc7dfd4a2e70a0..e6081ff437124f 100644
+--- a/packages/ui/src/empty-state/style.module.css
++++ b/packages/ui/src/empty-state/style.module.css
+@@ -8,7 +8,7 @@
+ 		text-align: center;
+ 		max-width: var(--wpds-dimension-surface-width-sm);
+ 		gap: var(--wpds-dimension-gap-xs);
+-		font-family: var(--wpds-font-family-body);
++		font-family: var(--wpds-typography-font-family-body);
+ 		color: var(--wpds-color-fg-content-neutral);
+ 		text-wrap: balance;
+ 	}
+diff --git a/packages/ui/src/form/primitives/input-layout/style.module.css b/packages/ui/src/form/primitives/input-layout/style.module.css
+index 853340083f7d83..7d44d1b3a45914 100644
+--- a/packages/ui/src/form/primitives/input-layout/style.module.css
++++ b/packages/ui/src/form/primitives/input-layout/style.module.css
+@@ -11,13 +11,13 @@
+ 		border-style: solid;
+ 		border-color: var(--wpds-color-stroke-interactive-neutral);
+ 		border-radius: var(--wpds-border-radius-sm);
+-		font-family: var(--wpds-font-family-body);
+-		font-size: max(var(--wpds-font-size-md), 16px); /* avoid mobile zoom */
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: max(var(--wpds-typography-font-size-md), 16px); /* avoid mobile zoom */
+ 		line-height: 1;
+ 		color: var(--wpds-color-fg-interactive-neutral);
+ 
+ 		@media (min-width: 600px) {
+-			font-size: var(--wpds-font-size-md);
++			font-size: var(--wpds-typography-font-size-md);
+ 		}
+ 
+ 		&.is-size-compact {
+diff --git a/packages/ui/src/link/style.module.css b/packages/ui/src/link/style.module.css
+index 1aa7a796a3e421..78d14f5d34ebdf 100644
+--- a/packages/ui/src/link/style.module.css
++++ b/packages/ui/src/link/style.module.css
+@@ -65,7 +65,7 @@
+ 
+ 	.link-icon {
+ 		margin-inline-start: var(--wpds-dimension-padding-xs);
+-		font-weight: var(--wpds-font-weight-regular);
++		font-weight: var(--wpds-typography-font-weight-regular);
+ 	}
+ 
+ 	.link-icon::after {
+diff --git a/packages/ui/src/notice/style.module.css b/packages/ui/src/notice/style.module.css
+index abeeced6f5a9a1..534ef851484686 100644
+--- a/packages/ui/src/notice/style.module.css
++++ b/packages/ui/src/notice/style.module.css
+@@ -3,7 +3,7 @@
+ @layer wp-ui-components {
+ 	.notice {
+ 		--icon-height: 24px;
+-		--text-vertical-padding: calc((var(--icon-height) - var(--wpds-font-line-height-sm)) / 2);
++		--text-vertical-padding: calc((var(--icon-height) - var(--wpds-typography-line-height-sm)) / 2);
+ 
+ 		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-neutral-weak);
+ 		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-neutral);
+@@ -64,10 +64,10 @@
+ 
+ 	.action-link {
+ 		flex-shrink: 0;
+-		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-md);
+-		font-weight: var(--wpds-font-weight-regular);
+-		line-height: var(--wpds-font-line-height-sm);
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-md);
++		font-weight: var(--wpds-typography-font-weight-regular);
++		line-height: var(--wpds-typography-line-height-sm);
+ 		margin-block: auto;
+ 
+ 		/* Add more horizontal space when following another action link/button */
+diff --git a/packages/ui/src/popover/style.module.css b/packages/ui/src/popover/style.module.css
+index d46f66a1f1bfde..150e9aff57c8d0 100644
+--- a/packages/ui/src/popover/style.module.css
++++ b/packages/ui/src/popover/style.module.css
+@@ -11,9 +11,9 @@
+ 		border-radius: var(--wpds-border-radius-md);
+ 		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+ 		box-shadow: var(--wpds-elevation-md);
+-		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-md);
+-		line-height: var(--wpds-font-line-height-md);
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-md);
++		line-height: var(--wpds-typography-line-height-md);
+ 		color: var(--wpds-color-fg-content-neutral);
+ 		outline: 0;
+ 	}
+diff --git a/packages/ui/src/tabs/style.module.css b/packages/ui/src/tabs/style.module.css
+index 4a4fe7b8829bff..cbccb0042b1f44 100644
+--- a/packages/ui/src/tabs/style.module.css
++++ b/packages/ui/src/tabs/style.module.css
+@@ -122,8 +122,8 @@
+ 		cursor: var(--wpds-cursor-control);
+ 
+ 		/* Typography */
+-		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-md);
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-md);
+ 		white-space: nowrap;
+ 
+ 		/* Characters in some languages (e.g. Japanese) may have a native higher line-height. */
+diff --git a/packages/ui/src/text/style.module.css b/packages/ui/src/text/style.module.css
+index 2ca0707c098678..a2e1ea1d3f9817 100644
+--- a/packages/ui/src/text/style.module.css
++++ b/packages/ui/src/text/style.module.css
+@@ -6,88 +6,88 @@
+ 	}
+ 
+ 	.heading-2xl {
+-		--_gcd-heading-font-size: var(--wpds-font-size-2xl);
++		--_gcd-heading-font-size: var(--wpds-typography-font-size-2xl);
+ 
+-		font-family: var(--wpds-font-family-heading);
+-		font-size: var(--wpds-font-size-2xl);
+-		line-height: var(--wpds-font-line-height-2xl);
+-		font-weight: var(--wpds-font-weight-medium);
++		font-family: var(--wpds-typography-font-family-heading);
++		font-size: var(--wpds-typography-font-size-2xl);
++		line-height: var(--wpds-typography-line-height-2xl);
++		font-weight: var(--wpds-typography-font-weight-medium);
+ 	}
+ 
+ 	.heading-xl {
+-		--_gcd-heading-font-size: var(--wpds-font-size-xl);
++		--_gcd-heading-font-size: var(--wpds-typography-font-size-xl);
+ 
+-		font-family: var(--wpds-font-family-heading);
+-		font-size: var(--wpds-font-size-xl);
+-		line-height: var(--wpds-font-line-height-md);
+-		font-weight: var(--wpds-font-weight-medium);
++		font-family: var(--wpds-typography-font-family-heading);
++		font-size: var(--wpds-typography-font-size-xl);
++		line-height: var(--wpds-typography-line-height-md);
++		font-weight: var(--wpds-typography-font-weight-medium);
+ 	}
+ 
+ 	.heading-lg {
+-		--_gcd-heading-font-size: var(--wpds-font-size-lg);
++		--_gcd-heading-font-size: var(--wpds-typography-font-size-lg);
+ 
+-		font-family: var(--wpds-font-family-heading);
+-		font-size: var(--wpds-font-size-lg);
+-		line-height: var(--wpds-font-line-height-sm);
+-		font-weight: var(--wpds-font-weight-medium);
++		font-family: var(--wpds-typography-font-family-heading);
++		font-size: var(--wpds-typography-font-size-lg);
++		line-height: var(--wpds-typography-line-height-sm);
++		font-weight: var(--wpds-typography-font-weight-medium);
+ 	}
+ 
+ 	.heading-md {
+-		--_gcd-heading-font-size: var(--wpds-font-size-md);
++		--_gcd-heading-font-size: var(--wpds-typography-font-size-md);
+ 
+-		font-family: var(--wpds-font-family-heading);
+-		font-size: var(--wpds-font-size-md);
+-		line-height: var(--wpds-font-line-height-sm);
+-		font-weight: var(--wpds-font-weight-medium);
++		font-family: var(--wpds-typography-font-family-heading);
++		font-size: var(--wpds-typography-font-size-md);
++		line-height: var(--wpds-typography-line-height-sm);
++		font-weight: var(--wpds-typography-font-weight-medium);
+ 	}
+ 
+ 	.heading-sm {
+-		--_gcd-heading-font-size: var(--wpds-font-size-xs);
++		--_gcd-heading-font-size: var(--wpds-typography-font-size-xs);
+ 
+-		font-family: var(--wpds-font-family-heading);
+-		font-size: var(--wpds-font-size-xs);
+-		line-height: var(--wpds-font-line-height-xs);
+-		font-weight: var(--wpds-font-weight-medium);
++		font-family: var(--wpds-typography-font-family-heading);
++		font-size: var(--wpds-typography-font-size-xs);
++		line-height: var(--wpds-typography-line-height-xs);
++		font-weight: var(--wpds-typography-font-weight-medium);
+ 		text-transform: uppercase;
+ 	}
+ 
+ 	.body-xl {
+-		--_gcd-p-font-size: var(--wpds-font-size-xl);
+-		--_gcd-p-line-height: var(--wpds-font-line-height-xl);
++		--_gcd-p-font-size: var(--wpds-typography-font-size-xl);
++		--_gcd-p-line-height: var(--wpds-typography-line-height-xl);
+ 
+-		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-xl);
+-		line-height: var(--wpds-font-line-height-xl);
+-		font-weight: var(--wpds-font-weight-regular);
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-xl);
++		line-height: var(--wpds-typography-line-height-xl);
++		font-weight: var(--wpds-typography-font-weight-regular);
+ 	}
+ 
+ 	.body-lg {
+-		--_gcd-p-font-size: var(--wpds-font-size-lg);
+-		--_gcd-p-line-height: var(--wpds-font-line-height-md);
++		--_gcd-p-font-size: var(--wpds-typography-font-size-lg);
++		--_gcd-p-line-height: var(--wpds-typography-line-height-md);
+ 
+-		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-lg);
+-		line-height: var(--wpds-font-line-height-md);
+-		font-weight: var(--wpds-font-weight-regular);
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-lg);
++		line-height: var(--wpds-typography-line-height-md);
++		font-weight: var(--wpds-typography-font-weight-regular);
+ 	}
+ 
+ 	.body-md {
+-		--_gcd-p-font-size: var(--wpds-font-size-md);
+-		--_gcd-p-line-height: var(--wpds-font-line-height-sm);
++		--_gcd-p-font-size: var(--wpds-typography-font-size-md);
++		--_gcd-p-line-height: var(--wpds-typography-line-height-sm);
+ 
+-		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-md);
+-		line-height: var(--wpds-font-line-height-sm);
+-		font-weight: var(--wpds-font-weight-regular);
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-md);
++		line-height: var(--wpds-typography-line-height-sm);
++		font-weight: var(--wpds-typography-font-weight-regular);
+ 	}
+ 
+ 	.body-sm {
+-		--_gcd-p-font-size: var(--wpds-font-size-sm);
+-		--_gcd-p-line-height: var(--wpds-font-line-height-xs);
++		--_gcd-p-font-size: var(--wpds-typography-font-size-sm);
++		--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
+ 
+-		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-sm);
+-		line-height: var(--wpds-font-line-height-xs);
+-		font-weight: var(--wpds-font-weight-regular);
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-sm);
++		line-height: var(--wpds-typography-line-height-xs);
++		font-weight: var(--wpds-typography-font-weight-regular);
+ 	}
+ }
+diff --git a/packages/ui/src/tooltip/style.module.css b/packages/ui/src/tooltip/style.module.css
+index e189357fb57c0c..58a705a623d093 100644
+--- a/packages/ui/src/tooltip/style.module.css
++++ b/packages/ui/src/tooltip/style.module.css
+@@ -11,8 +11,8 @@
+ 			var(--wpds-dimension-padding-xs)
+ 			var(--wpds-dimension-padding-sm);
+ 		border-radius: var(--wpds-border-radius-sm);
+-		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-sm);
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-sm);
+ 		line-height: 1.4; /* TODO: use DS token for line height */
+ 		color: var(--wpds-color-fg-content-neutral);
+ 		box-shadow: var(--wpds-elevation-sm);
+diff --git a/packages/ui/src/utils/css/field.module.css b/packages/ui/src/utils/css/field.module.css
+index d6d9778e763863..7456982f0585a4 100644
+--- a/packages/ui/src/utils/css/field.module.css
++++ b/packages/ui/src/utils/css/field.module.css
+@@ -2,29 +2,29 @@
+ 
+ @layer wp-ui-utilities {
+ 	.label {
+-		--wp-ui-field-label-line-height: var(--wpds-font-line-height-xs);
++		--wp-ui-field-label-line-height: var(--wpds-typography-line-height-xs);
+ 
+-		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-xs);
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-xs);
+ 		line-height: var(--wp-ui-field-label-line-height);
+-		font-weight: var(--wpds-font-weight-medium);
++		font-weight: var(--wpds-typography-font-weight-medium);
+ 		text-transform: uppercase;
+ 		color: var(--wpds-color-fg-content-neutral);
+ 
+ 		&.is-plain {
+-			font-size: var(--wpds-font-size-md);
++			font-size: var(--wpds-typography-font-size-md);
+ 			text-transform: none;
+ 		}
+ 	}
+ 
+ 	.description {
+-		--_gcd-p-font-size: var(--wpds-font-size-sm);
+-		--_gcd-p-line-height: var(--wpds-font-line-height-xs);
++		--_gcd-p-font-size: var(--wpds-typography-font-size-sm);
++		--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
+ 		--_gcd-p-margin: 0;
+ 
+-		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-sm);
+-		line-height: var(--wpds-font-line-height-xs);
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-sm);
++		line-height: var(--wpds-typography-line-height-xs);
+ 		color: var(--wpds-color-fg-content-neutral-weak);
+ 	}
+ }
+diff --git a/packages/ui/src/utils/css/global-css-defense.module.css b/packages/ui/src/utils/css/global-css-defense.module.css
+index e48fc411eac553..dfcc04e59801fc 100644
+--- a/packages/ui/src/utils/css/global-css-defense.module.css
++++ b/packages/ui/src/utils/css/global-css-defense.module.css
+@@ -103,7 +103,7 @@ p.p {
+ :is(h1, h2, h3, h4, h5, h6).heading {
+ 	color: var(--_gcd-heading-color, var(--wpds-color-fg-content-neutral));
+ 	font-size: var(--_gcd-heading-font-size, inherit);
+-	font-weight: var(--_gcd-heading-font-weight, var(--wpds-font-weight-medium));
++	font-weight: var(--_gcd-heading-font-weight, var(--wpds-typography-font-weight-medium));
+ 	margin: var(--_gcd-heading-margin, 0);
+ }
+ 
+diff --git a/packages/ui/src/utils/css/item-popup.module.css b/packages/ui/src/utils/css/item-popup.module.css
+index 5de02f78bd2aef..217bf45c176821 100644
+--- a/packages/ui/src/utils/css/item-popup.module.css
++++ b/packages/ui/src/utils/css/item-popup.module.css
+@@ -16,8 +16,8 @@
+ 		border: 1px solid var(--wpds-color-stroke-surface-neutral);
+ 		box-shadow: var(--wpds-elevation-md);
+ 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+-		font-family: var(--wpds-font-family-body);
+-		font-size: var(--wpds-font-size-md);
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-md);
+ 		line-height: 1.4;
+ 		color: var(--wpds-color-fg-interactive-neutral);
+ 	}
+diff --git a/storybook/decorators/with-design-system-theme.tsx b/storybook/decorators/with-design-system-theme.tsx
+index 584cbf89a877da..4594d980278bbd 100644
+--- a/storybook/decorators/with-design-system-theme.tsx
++++ b/storybook/decorators/with-design-system-theme.tsx
+@@ -66,7 +66,7 @@ export function WithDesignSystemTheme(
+ 							display: 'block',
+ 							opacity: 0.5,
+ 							marginTop: 'var(--wpds-dimension-gap-md)',
+-							fontSize: 'var(--wpds-font-size-xs)',
++							fontSize: 'var(--wpds-typography-font-size-xs)',
+ 							color: 'var(--wpds-color-fg-content-neutral-weak)',
+ 							textTransform: 'uppercase',
+ 							textAlign: 'end',

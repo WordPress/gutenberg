@@ -1,0 +1,88 @@
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 1034f318c90064..0ddcecaaab7f23 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -144,24 +144,6 @@
+ 	--wpds-font-weight-regular: 400; /* Regular font weight for body text */
+ }
+ 
+-[data-wpds-theme-provider-id][data-wpds-density='default'] {
+-	--wpds-dimension-base: 4px; /* Base dimension unit */
+-	--wpds-dimension-gap-2xl: 32px; /* 2x extra large gap */
+-	--wpds-dimension-gap-3xl: 40px; /* 3x extra large gap */
+-	--wpds-dimension-gap-lg: 16px; /* Large gap */
+-	--wpds-dimension-gap-md: 12px; /* Medium gap */
+-	--wpds-dimension-gap-sm: 8px; /* Small gap */
+-	--wpds-dimension-gap-xl: 24px; /* Extra large gap */
+-	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
+-	--wpds-dimension-padding-2xl: 24px; /* 2x extra large padding */
+-	--wpds-dimension-padding-3xl: 32px; /* 3x extra large padding */
+-	--wpds-dimension-padding-lg: 16px; /* Large padding */
+-	--wpds-dimension-padding-md: 12px; /* Medium padding */
+-	--wpds-dimension-padding-sm: 8px; /* Small padding */
+-	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
+-	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
+-}
+-
+ [data-wpds-theme-provider-id][data-wpds-density='compact'] {
+ 	--wpds-dimension-gap-2xl: 24px; /* 2x extra large gap */
+ 	--wpds-dimension-gap-3xl: 32px; /* 3x extra large gap */
+@@ -196,6 +178,24 @@
+ 	--wpds-dimension-padding-xs: 8px; /* Extra small padding */
+ }
+ 
++[data-wpds-theme-provider-id][data-wpds-density='default'] {
++	--wpds-dimension-base: 4px; /* Base dimension unit */
++	--wpds-dimension-gap-2xl: 32px; /* 2x extra large gap */
++	--wpds-dimension-gap-3xl: 40px; /* 3x extra large gap */
++	--wpds-dimension-gap-lg: 16px; /* Large gap */
++	--wpds-dimension-gap-md: 12px; /* Medium gap */
++	--wpds-dimension-gap-sm: 8px; /* Small gap */
++	--wpds-dimension-gap-xl: 24px; /* Extra large gap */
++	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
++	--wpds-dimension-padding-2xl: 24px; /* 2x extra large padding */
++	--wpds-dimension-padding-3xl: 32px; /* 3x extra large padding */
++	--wpds-dimension-padding-lg: 16px; /* Large padding */
++	--wpds-dimension-padding-md: 12px; /* Medium padding */
++	--wpds-dimension-padding-sm: 8px; /* Small padding */
++	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
++	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
++}
++
+ @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {
+ 	:root {
+ 		--wpds-border-width-focus: 1.5px; /* Border width for focus ring */
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index 2cdc08a4525e50..cfe85eb89ce4cf 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -64,23 +64,23 @@ export default defineConfig( {
+ 			modeSelectors: [
+ 				{
+ 					tokens: [ 'wpds-dimension.*' ],
+-					mode: '.',
++					mode: 'compact',
+ 					selectors: [
+-						"[data-wpds-theme-provider-id][data-wpds-density='default']",
++						"[data-wpds-theme-provider-id][data-wpds-density='compact']",
+ 					],
+ 				},
+ 				{
+ 					tokens: [ 'wpds-dimension.*' ],
+-					mode: 'compact',
++					mode: 'comfortable',
+ 					selectors: [
+-						"[data-wpds-theme-provider-id][data-wpds-density='compact']",
++						"[data-wpds-theme-provider-id][data-wpds-density='comfortable']",
+ 					],
+ 				},
+ 				{
+ 					tokens: [ 'wpds-dimension.*' ],
+-					mode: 'comfortable',
++					mode: '.',
+ 					selectors: [
+-						"[data-wpds-theme-provider-id][data-wpds-density='comfortable']",
++						"[data-wpds-theme-provider-id][data-wpds-density='default']",
+ 					],
+ 				},
+ 				{

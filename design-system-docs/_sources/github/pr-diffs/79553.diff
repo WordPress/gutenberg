@@ -1,0 +1,214 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 75c4fcc23059cf..fa20412191f5cd 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   Fix package export type paths for `.mjs` subpaths to match the generated `.d.mts` declarations ([#79553](https://github.com/WordPress/gutenberg/pull/79553)).
++
+ ## 0.16.0 (2026-06-24)
+ 
+ ### Breaking Changes
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index e8cc14ee1e6d78..13aca507213522 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -39,7 +39,7 @@
+ 		},
+ 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
+ 		"./design-tokens.js": {
+-			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
++			"types": "./build-types/prebuilt/js/design-tokens.d.mts",
+ 			"import": "./build-module/prebuilt/js/design-tokens.mjs",
+ 			"default": "./build/prebuilt/js/design-tokens.cjs"
+ 		},
+@@ -59,17 +59,17 @@
+ 			"default": "./src/vite-plugins/vite-ds-token-fallbacks.mjs"
+ 		},
+ 		"./stylelint-plugins/no-unknown-ds-tokens": {
+-			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.ts",
++			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.mts",
+ 			"import": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs",
+ 			"default": "./build/stylelint-plugins/no-unknown-ds-tokens.cjs"
+ 		},
+ 		"./stylelint-plugins/no-setting-wpds-custom-properties": {
+-			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.ts",
++			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.mts",
+ 			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
+ 			"default": "./build/stylelint-plugins/no-setting-wpds-custom-properties.cjs"
+ 		},
+ 		"./stylelint-plugins/no-token-fallback-values": {
+-			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.ts",
++			"types": "./build-types/stylelint-plugins/no-token-fallback-values.d.mts",
+ 			"import": "./src/stylelint-plugins/no-token-fallback-values.mjs",
+ 			"default": "./build/stylelint-plugins/no-token-fallback-values.cjs"
+ 		},
+diff --git a/tools/build-scripts/build.mjs b/tools/build-scripts/build.mjs
+index fc2f6aaca27efd..51a652ff4fd70b 100644
+--- a/tools/build-scripts/build.mjs
++++ b/tools/build-scripts/build.mjs
+@@ -159,6 +159,14 @@ async function build() {
+ 			env: { ...process.env, NODE_ENV: 'production' },
+ 		} );
+ 
++		if ( ! skipTypes ) {
++			console.log( '\n✅ Checking package export targets...' );
++			await exec( 'node', [
++				path.join( __dirname, 'packages/check-package-exports.cjs' ),
++				'packages/theme',
++			] );
++		}
++
+ 		console.log( '\n📦 Building blocks manifests...' );
+ 		const blocksDirs = [
+ 			{
+diff --git a/tools/build-scripts/package.json b/tools/build-scripts/package.json
+index 101d01b8c5acb7..c0cdde1afbf399 100644
+--- a/tools/build-scripts/package.json
++++ b/tools/build-scripts/package.json
+@@ -48,6 +48,7 @@
+ 		"build-vendors": "node ./packages/build-vendors.mjs",
+ 		"generate-worker-placeholders": "node ./packages/generate-worker-placeholders.mjs",
+ 		"resolve-trace-source-maps": "node ./packages/resolve-trace-source-maps.cjs",
++		"check-package-exports": "node ./packages/check-package-exports.cjs packages/theme",
+ 		"check-type-declarations": "node ./packages/check-build-type-declaration-files.cjs"
+ 	}
+ }
+diff --git a/tools/build-scripts/packages/check-package-exports.cjs b/tools/build-scripts/packages/check-package-exports.cjs
+new file mode 100644
+index 00000000000000..d6bda0a7303fc2
+--- /dev/null
++++ b/tools/build-scripts/packages/check-package-exports.cjs
+@@ -0,0 +1,128 @@
++/**
++ * This script verifies that package.json `exports` targets exist on disk.
++ * Run it after building package runtime files and TypeScript declarations.
++ */
++
++/**
++ * External dependencies
++ */
++const fs = require( 'fs' );
++const path = require( 'path' );
++
++const ROOT_DIR = path.resolve( __dirname, '../../..' );
++
++function collectExportTargets( value, trail = [] ) {
++	if ( typeof value === 'string' ) {
++		return [ { trail, target: value } ];
++	}
++
++	if ( Array.isArray( value ) ) {
++		return value.flatMap( ( nestedValue, index ) =>
++			collectExportTargets( nestedValue, [ ...trail, index ] )
++		);
++	}
++
++	if ( value && typeof value === 'object' && ! Array.isArray( value ) ) {
++		return Object.entries( value ).flatMap( ( [ key, nestedValue ] ) =>
++			collectExportTargets( nestedValue, [ ...trail, key ] )
++		);
++	}
++
++	return [];
++}
++
++function formatExportPath( trail ) {
++	return trail.reduce(
++		( formattedPath, segment ) =>
++			/^[a-zA-Z_$][\w$]*$/.test( segment )
++				? `${ formattedPath }.${ segment }`
++				: `${ formattedPath }[${ JSON.stringify( segment ) }]`,
++		'exports'
++	);
++}
++
++function escapeRegExp( value ) {
++	return value.replace( /[|\\{}()[\]^$+?.*]/g, '\\$&' );
++}
++
++function hasMatchingTarget( packageRoot, directory, pattern ) {
++	return fs
++		.readdirSync( directory, { withFileTypes: true } )
++		.some( ( entry ) => {
++			const entryPath = path.join( directory, entry.name );
++			const relativePath = `./${ path
++				.relative( packageRoot, entryPath )
++				.split( path.sep )
++				.join( '/' ) }`;
++
++			return (
++				pattern.test( relativePath ) ||
++				( entry.isDirectory() &&
++					hasMatchingTarget( packageRoot, entryPath, pattern ) )
++			);
++		} );
++}
++
++function exportTargetExists( packageRoot, target ) {
++	if ( ! target.includes( '*' ) ) {
++		return fs.existsSync( path.join( packageRoot, target ) );
++	}
++
++	const wildcardIndex = target.indexOf( '*' );
++	const targetPrefix = target.slice( 0, wildcardIndex );
++	const searchRoot = path.join(
++		packageRoot,
++		targetPrefix.slice( 0, targetPrefix.lastIndexOf( '/' ) + 1 )
++	);
++
++	if ( ! fs.existsSync( searchRoot ) ) {
++		return false;
++	}
++
++	const pattern = new RegExp(
++		`^${ escapeRegExp( target ).replace( /\\\*/g, '.*' ) }$`
++	);
++
++	return hasMatchingTarget( packageRoot, searchRoot, pattern );
++}
++
++function checkPackageExports( packagePath ) {
++	const packageRoot = path.resolve( ROOT_DIR, packagePath );
++	const packageJsonPath = path.join( packageRoot, 'package.json' );
++	const packageJson = JSON.parse(
++		fs.readFileSync( packageJsonPath, 'utf8' )
++	);
++	const missingTargets = collectExportTargets( packageJson.exports )
++		.filter( ( { target } ) => target.startsWith( './' ) )
++		.filter(
++			( { target } ) => ! exportTargetExists( packageRoot, target )
++		);
++
++	if ( ! missingTargets.length ) {
++		return [];
++	}
++
++	return [
++		`${ packageJson.name }: Missing package export target${
++			missingTargets.length === 1 ? '' : 's'
++		}:`,
++		...missingTargets.map(
++			( { trail, target } ) =>
++				`- ${ formatExportPath( trail ) } -> ${ target }`
++		),
++	];
++}
++
++const packagePaths = process.argv.slice( 2 );
++
++if ( ! packagePaths.length ) {
++	console.error( 'Usage: node check-package-exports.cjs <package-path>...' );
++	process.exit( 1 );
++}
++
++const errors = packagePaths.flatMap( checkPackageExports );
++
++if ( errors.length ) {
++	console.error( errors.join( '\n' ) );
++	process.exit( 1 );
++}

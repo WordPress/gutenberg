@@ -1,0 +1,27 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 1882a1615fccf1..b77ba5718f95b4 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `Card`: Add `overflow: clip` to `Card.Root` to prevent child content from overflowing rounded corners ([#76678](https://github.com/WordPress/gutenberg/pull/76678)).
++
+ ### Internal
+ 
+ -   `Tabs`: Add development-mode validation for Tab/Panel count matching ([#75170](https://github.com/WordPress/gutenberg/pull/75170)).
+diff --git a/packages/ui/src/card/style.module.css b/packages/ui/src/card/style.module.css
+index f784e98cd9375e..e1d4c7d732df76 100644
+--- a/packages/ui/src/card/style.module.css
++++ b/packages/ui/src/card/style.module.css
+@@ -10,6 +10,7 @@
+ 		flex-direction: column;
+ 		border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+ 		border-radius: var(--wpds-border-radius-lg);
++		overflow: clip;
+ 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+ 	}
+ 

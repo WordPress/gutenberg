@@ -1,0 +1,61 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 3d30e7664ae887..46dde98299caf7 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -90,6 +90,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+         >
+           <div
+             className="components-dropdown components-circular-option-picker__dropdown-link-action"
++            tabIndex="-1"
+           >
+             <button
+               aria-describedby={null}
+diff --git a/packages/block-library/src/template-part/edit/index.js b/packages/block-library/src/template-part/edit/index.js
+index f8ce00e9429847..65a932f0983e4b 100644
+--- a/packages/block-library/src/template-part/edit/index.js
++++ b/packages/block-library/src/template-part/edit/index.js
+@@ -179,9 +179,6 @@ export default function TemplatePartEdit( {
+ 								<ToolbarButton
+ 									aria-expanded={ isOpen }
+ 									onClick={ onToggle }
+-									// Disable when open to prevent odd FireFox bug causing reopening.
+-									// As noted in https://github.com/WordPress/gutenberg/pull/24990#issuecomment-689094119 .
+-									disabled={ isOpen }
+ 								>
+ 									{ __( 'Replace' ) }
+ 								</ToolbarButton>
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.js.snap b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+index 7bf8892b02e943..1f3a28741b6408 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+@@ -111,6 +111,7 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+ >
+   <div
+     className="components-dropdown components-circular-option-picker__dropdown-link-action"
++    tabIndex="-1"
+   >
+     <ForwardRef(Button)
+       aria-expanded={false}
+@@ -545,6 +546,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+           >
+             <div
+               className="components-dropdown components-circular-option-picker__dropdown-link-action"
++              tabIndex="-1"
+             >
+               <ForwardRef(Button)
+                 aria-expanded={false}
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index b5b0e3a421d378..ebee9c2b5abd3c 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -85,6 +85,10 @@ export default function Dropdown( {
+ 		<div
+ 			className={ classnames( 'components-dropdown', className ) }
+ 			ref={ containerRef }
++			// Some UAs focus the closest focusable parent when the toggle is
++			// clicked. Making this div focusable ensures such UAs will focus
++			// it and `closeIfFocusOutside` can tell if the toggle was clicked.
++			tabIndex="-1"
+ 		>
+ 			{ renderToggle( args ) }
+ 			{ isOpen && (

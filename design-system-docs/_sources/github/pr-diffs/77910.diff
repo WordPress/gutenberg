@@ -1,0 +1,12 @@
+diff --git a/packages/ui/src/link/style.module.css b/packages/ui/src/link/style.module.css
+index 04713e72f448ae..11476c785d3458 100644
+--- a/packages/ui/src/link/style.module.css
++++ b/packages/ui/src/link/style.module.css
+@@ -50,6 +50,7 @@
+ 	 * inline-block so the link underline stays scoped to the text. */
+ 
+ 	.link-icon {
++		line-height: 1;
+ 		display: inline-block;
+ 		margin-inline-start: var(--wpds-dimension-padding-xs);
+ 		font-weight: var(--wpds-typography-font-weight-regular);

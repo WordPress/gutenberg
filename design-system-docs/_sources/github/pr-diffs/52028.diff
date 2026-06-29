@@ -1,0 +1,114 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6e38eb22213fc2..eb684ffe6b1aff 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,9 +2,13 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `TextControl`: Add `id` prop to allow for custom IDs in `TextControl`s ([#52028](https://github.com/WordPress/gutenberg/pull/52028)).
++
+ ### Bug Fix
+ 
+-- `Popover`: Pin `react-dropdown-menu` version to avoid breaking changes in dependency updates. ([52356](https://github.com/WordPress/gutenberg/pull/52356)).
++-   `Popover`: Pin `react-dropdown-menu` version to avoid breaking changes in dependency updates. ([52356](https://github.com/WordPress/gutenberg/pull/52356)).
+ 
+ ## 25.3.0 (2023-07-05)
+ 
+@@ -32,6 +36,7 @@
+ -   `UnitControl`: Revamp support for changing unit by typing ([#39303](https://github.com/WordPress/gutenberg/pull/39303)).
+ -   `Modal`: Update corner radius to be between buttons and the site view frame, in a 2-4-8 system. ([#51254](https://github.com/WordPress/gutenberg/pull/51254)).
+ -   `ItemGroup`: Update button focus state styles to be inline with other button focus states in the editor. ([#51576](https://github.com/WordPress/gutenberg/pull/51576)).
++-   `ItemGroup`: Update button focus state styles to target `:focus-visible` rather than `:focus`. ([#51787](https://github.com/WordPress/gutenberg/pull/51787)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/text-control/index.tsx b/packages/components/src/text-control/index.tsx
+index 15d792489ba99e..34c9028c1cb8bc 100644
+--- a/packages/components/src/text-control/index.tsx
++++ b/packages/components/src/text-control/index.tsx
+@@ -26,13 +26,13 @@ function UnforwardedTextControl(
+ 		hideLabelFromVision,
+ 		value,
+ 		help,
++		id: idProp,
+ 		className,
+ 		onChange,
+ 		type = 'text',
+ 		...additionalProps
+ 	} = props;
+-	const instanceId = useInstanceId( TextControl );
+-	const id = `inspector-text-control-${ instanceId }`;
++	const id = useInstanceId( TextControl, 'inspector-text-control', idProp );
+ 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
+ 		onChange( event.target.value );
+ 
+diff --git a/packages/components/src/text-control/test/text-control.tsx b/packages/components/src/text-control/test/text-control.tsx
+new file mode 100644
+index 00000000000000..fc048b93992f08
+--- /dev/null
++++ b/packages/components/src/text-control/test/text-control.tsx
+@@ -0,0 +1,61 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import TextControl from '..';
++
++const noop = () => {};
++
++describe( 'TextControl', () => {
++	describe( 'When no ID prop is provided', () => {
++		it( 'should generate an ID', () => {
++			render( <TextControl onChange={ noop } value="" /> );
++
++			expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(
++				'id',
++				expect.stringMatching( /^inspector-text-control-/ )
++			);
++		} );
++
++		it( 'should be labelled correctly', () => {
++			const labelValue = 'Test Label';
++			render(
++				<TextControl label={ labelValue } onChange={ noop } value="" />
++			);
++
++			expect(
++				screen.getByRole( 'textbox', { name: labelValue } )
++			).toBeVisible();
++		} );
++	} );
++
++	describe( 'When an ID prop is provided', () => {
++		const id = 'test-id';
++
++		it( 'should use the passed ID prop if provided', () => {
++			render( <TextControl id={ id } onChange={ noop } value="" /> );
++
++			expect( screen.getByRole( 'textbox' ) ).toHaveAttribute( 'id', id );
++		} );
++
++		it( 'should be labelled correctly', () => {
++			const labelValue = 'Test Label';
++			render(
++				<TextControl
++					label={ labelValue }
++					id={ id }
++					onChange={ noop }
++					value=""
++				/>
++			);
++
++			expect(
++				screen.getByRole( 'textbox', { name: labelValue } )
++			).toBeVisible();
++		} );
++	} );
++} );

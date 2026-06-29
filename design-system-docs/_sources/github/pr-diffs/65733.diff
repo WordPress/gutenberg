@@ -1,0 +1,86 @@
+diff --git a/packages/block-editor/src/hooks/duotone.js b/packages/block-editor/src/hooks/duotone.js
+index 51130ccb9ec2a4..dbd47831c42668 100644
+--- a/packages/block-editor/src/hooks/duotone.js
++++ b/packages/block-editor/src/hooks/duotone.js
+@@ -314,8 +314,11 @@ function useDuotoneStyles( {
+ 	}, [ isValidFilter, blockElement, colors ] );
+ }
+ 
++// Used for generating the instance ID
++const DUOTONE_BLOCK_PROPS_REFERENCE = {};
++
+ function useBlockProps( { clientId, name, style } ) {
+-	const id = useInstanceId( useBlockProps );
++	const id = useInstanceId( DUOTONE_BLOCK_PROPS_REFERENCE );
+ 	const selector = useMemo( () => {
+ 		const blockType = getBlockType( name );
+ 
+diff --git a/packages/block-editor/src/hooks/layout-child.js b/packages/block-editor/src/hooks/layout-child.js
+index 8beb50c1b82849..558d5e2cc626bf 100644
+--- a/packages/block-editor/src/hooks/layout-child.js
++++ b/packages/block-editor/src/hooks/layout-child.js
+@@ -17,6 +17,9 @@ import {
+ 	GridItemMovers,
+ } from '../components/grid';
+ 
++// Used for generating the instance ID
++const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};
++
+ function useBlockPropsChildLayoutStyles( { style } ) {
+ 	const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
+ 		return ! select( blockEditorStore ).getSettings().disableLayoutStyles;
+@@ -32,7 +35,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
+ 	} = layout;
+ 	const parentLayout = useLayout() || {};
+ 	const { columnCount, minimumColumnWidth } = parentLayout;
+-	const id = useInstanceId( useBlockPropsChildLayoutStyles );
++	const id = useInstanceId( LAYOUT_CHILD_BLOCK_PROPS_REFERENCE );
+ 	const selector = `.wp-container-content-${ id }`;
+ 
+ 	// Check that the grid layout attributes are of the correct type, so that we don't accidentally
+diff --git a/packages/block-editor/src/hooks/position.js b/packages/block-editor/src/hooks/position.js
+index 95a9c2198e4c71..bf1b730cd67d1a 100644
+--- a/packages/block-editor/src/hooks/position.js
++++ b/packages/block-editor/src/hooks/position.js
+@@ -310,6 +310,9 @@ export default {
+ 	},
+ };
+ 
++// Used for generating the instance ID
++const POSITION_BLOCK_PROPS_REFERENCE = {};
++
+ function useBlockProps( { name, style } ) {
+ 	const hasPositionBlockSupport = hasBlockSupport(
+ 		name,
+@@ -318,7 +321,7 @@ function useBlockProps( { name, style } ) {
+ 	const isPositionDisabled = useIsPositionDisabled( { name } );
+ 	const allowPositionStyles = hasPositionBlockSupport && ! isPositionDisabled;
+ 
+-	const id = useInstanceId( useBlockProps );
++	const id = useInstanceId( POSITION_BLOCK_PROPS_REFERENCE );
+ 
+ 	// Higher specificity to override defaults in editor UI.
+ 	const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index ef0fefe199c2e3..ad930d3affdd14 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -72,6 +72,9 @@ const getNodeText = ( node: React.ReactNode ): string => {
+ 
+ const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
+ 
++// Used for generating the instance ID
++const AUTOCOMPLETE_HOOK_REFERENCE = {};
++
+ export function useAutocomplete( {
+ 	record,
+ 	onChange,
+@@ -79,7 +82,7 @@ export function useAutocomplete( {
+ 	completers,
+ 	contentRef,
+ }: UseAutocompleteProps ) {
+-	const instanceId = useInstanceId( useAutocomplete );
++	const instanceId = useInstanceId( AUTOCOMPLETE_HOOK_REFERENCE );
+ 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
+ 
+ 	const [ filteredOptions, setFilteredOptions ] = useState<

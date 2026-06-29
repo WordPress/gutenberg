@@ -1,0 +1,105 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 129fcfbccf3a31..5e7016ff5c5fe9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `Elevation`: Remove "experimental" designation ([#61017](https://github.com/WordPress/gutenberg/pull/61017)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/elevation/README.md b/packages/components/src/elevation/README.md
+index 3cdb379b82ab4f..30d9cb0666d612 100644
+--- a/packages/components/src/elevation/README.md
++++ b/packages/components/src/elevation/README.md
+@@ -1,9 +1,5 @@
+ # Elevation
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `Elevation` is a core component that renders shadow, using the component system's shadow system.
+ 
+ ## Usage
+@@ -12,7 +8,7 @@ The shadow effect is generated using the `value` prop.
+ 
+ ```jsx
+ import {
+-	__experimentalElevation as Elevation,
++	Elevation,
+ 	__experimentalSurface as Surface,
+ 	__experimentalText as Text,
+ } from '@wordpress/components';
+@@ -75,7 +71,7 @@ Size of the shadow, based on the Style system's elevation system. The `value` de
+ In the example below, `isInteractive` is activated to give a better sense of depth.
+ 
+ ```jsx
+-import { __experimentalElevation as Elevation } from '@wordpress/components';
++import { Elevation } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+diff --git a/packages/components/src/elevation/component.tsx b/packages/components/src/elevation/component.tsx
+index d116859d9a303a..c203b236a5cf8c 100644
+--- a/packages/components/src/elevation/component.tsx
++++ b/packages/components/src/elevation/component.tsx
+@@ -29,7 +29,7 @@ function UnconnectedElevation(
+  *
+  * ```jsx
+  * import {
+- *	__experimentalElevation as Elevation,
++ *	Elevation,
+  *	__experimentalSurface as Surface,
+  *	__experimentalText as Text,
+  * } from '@wordpress/components';
+diff --git a/packages/components/src/elevation/stories/index.story.tsx b/packages/components/src/elevation/stories/index.story.tsx
+index 912268f5341147..326f13eaec78d8 100644
+--- a/packages/components/src/elevation/stories/index.story.tsx
++++ b/packages/components/src/elevation/stories/index.story.tsx
+@@ -10,7 +10,7 @@ import { Elevation } from '..';
+ 
+ const meta: Meta< typeof Elevation > = {
+ 	component: Elevation,
+-	title: 'Components (Experimental)/Elevation',
++	title: 'Components/Elevation',
+ 	argTypes: {
+ 		as: { control: { type: 'text' } },
+ 		borderRadius: { control: { type: 'text' } },
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..ebc3a9961aafb4 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -77,7 +77,13 @@ export { default as Dropdown } from './dropdown';
+ export { default as __experimentalDropdownContentWrapper } from './dropdown/dropdown-content-wrapper';
+ export { default as DropdownMenu } from './dropdown-menu';
+ export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
+-export { Elevation as __experimentalElevation } from './elevation';
++export {
++	/**
++	 * @deprecated Import `Elevation` instead.
++	 */
++	Elevation as __experimentalElevation,
++	Elevation,
++} from './elevation';
+ export { default as ExternalLink } from './external-link';
+ export { Flex, FlexBlock, FlexItem } from './flex';
+ export { default as FocalPointPicker } from './focal-point-picker';
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..ca5ae85d02767c 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'elevation',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

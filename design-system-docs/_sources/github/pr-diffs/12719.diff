@@ -1,0 +1,34 @@
+diff --git a/packages/components/src/date-time/date.js b/packages/components/src/date-time/date.js
+index c23d5a0f105b43..0854846b752446 100644
+--- a/packages/components/src/date-time/date.js
++++ b/packages/components/src/date-time/date.js
+@@ -13,6 +13,7 @@ import { Component } from '@wordpress/element';
+  * Module Constants
+  */
+ const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
++const isRTL = () => document.documentElement.dir === 'rtl';
+ 
+ class DatePicker extends Component {
+ 	constructor() {
+@@ -55,6 +56,7 @@ class DatePicker extends Component {
+ 					onDateChange={ this.onChangeMoment }
+ 					transitionDuration={ 0 }
+ 					weekDayFormat="ddd"
++					isRTL={ isRTL() }
+ 				/>
+ 			</div>
+ 		);
+diff --git a/packages/components/src/date-time/style.scss b/packages/components/src/date-time/style.scss
+index 8c99f8216e1fd8..e564636246f2b0 100644
+--- a/packages/components/src/date-time/style.scss
++++ b/packages/components/src/date-time/style.scss
+@@ -1,5 +1,8 @@
+-// We can't reference this package with ~ because of how Lerna handles packages. 😩
++// We can't reference this package with ~ because of how Lerna handles packages.
++// Also, don't convert styles to RTL because react-dates uses an isRTL flag instead.
++/*rtl:begin:ignore*/
+ @import "node_modules/react-dates/lib/css/_datepicker";
++/*rtl:end:ignore*/
+ 
+ .components-datetime {
+ 	.components-datetime__calendar-help {

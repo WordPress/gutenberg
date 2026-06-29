@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index df0f930314364a..012db98e8c2ebd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -24,6 +24,10 @@
+ -   `Autocomplete`: Remove `getAutoCompleterUI` factory pattern ([#77048](https://github.com/WordPress/gutenberg/pull/77048)).
+ -   `CustomSelectControl`, `Sandbox`: Rename internal React function names ([#77148](https://github.com/WordPress/gutenberg/pull/77148)).
+ 
++### Code Quality
++
++-   `Textarea`: remove unnecessary style [#77221](https://github.com/WordPress/gutenberg/pull/77221).
++
+ ## 32.5.0 (2026-04-01)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/textarea-control/styles/textarea-control-styles.ts b/packages/components/src/textarea-control/styles/textarea-control-styles.ts
+index 7d6ba1671eaece..51208a570b5624 100644
+--- a/packages/components/src/textarea-control/styles/textarea-control-styles.ts
++++ b/packages/components/src/textarea-control/styles/textarea-control-styles.ts
+@@ -66,7 +66,6 @@ export const StyledTextarea = styled.textarea`
+ 		background: ${ COLORS.ui.backgroundDisabled };
+ 		border-color: ${ COLORS.ui.borderDisabled };
+ 		color: ${ COLORS.ui.textDisabled };
+-		opacity: 1;
+ 	}
+ 
+ 	// Use opacity to work in various editor styles.

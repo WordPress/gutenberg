@@ -1,0 +1,217 @@
+diff --git a/packages/components/src/modal/aria-helper.ts b/packages/components/src/modal/aria-helper.ts
+index bd11fb71253e1e..0c059baf713696 100644
+--- a/packages/components/src/modal/aria-helper.ts
++++ b/packages/components/src/modal/aria-helper.ts
+@@ -30,7 +30,7 @@ export function modalize( modalElement?: HTMLDivElement ) {
+ 		}
+ 
+ 		if ( elementShouldBeHidden( element ) ) {
+-			element.setAttribute( 'aria-hidden', 'true' );
++			element.setAttribute( 'inert', '' );
+ 			hiddenElements.push( element );
+ 		}
+ 	}
+@@ -49,6 +49,7 @@ export function elementShouldBeHidden( element: Element ) {
+ 		element.tagName === 'SCRIPT' ||
+ 		element.hasAttribute( 'hidden' ) ||
+ 		element.hasAttribute( 'aria-hidden' ) ||
++		element.hasAttribute( 'inert' ) ||
+ 		element.hasAttribute( 'aria-live' ) ||
+ 		( role && LIVE_REGION_ARIA_ROLES.has( role ) )
+ 	);
+@@ -64,6 +65,6 @@ export function unmodalize() {
+ 	}
+ 
+ 	for ( const element of hiddenElements ) {
+-		element.removeAttribute( 'aria-hidden' );
++		element.removeAttribute( 'inert' );
+ 	}
+ }
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 2dec0f65240f9b..9bf80abc55a90b 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -129,7 +129,7 @@ function UnforwardedModal(
+ 	}, [ contentRef ] );
+ 
+ 	// Accessibly isolates/unisolates the modal.
+-	useEffect( () => {
++	useLayoutEffect( () => {
+ 		ariaHelper.modalize( ref.current );
+ 		return () => ariaHelper.unmodalize();
+ 	}, [] );
+diff --git a/packages/components/src/modal/test/aria-helper.ts b/packages/components/src/modal/test/aria-helper.ts
+index 0ee9b0b947aa51..7fba95a1eb3bf6 100644
+--- a/packages/components/src/modal/test/aria-helper.ts
++++ b/packages/components/src/modal/test/aria-helper.ts
+@@ -17,16 +17,9 @@ describe( 'aria-helper', () => {
+ 			expect( elementShouldBeHidden( element ) ).toBe( false );
+ 		} );
+ 
+-		it( 'should return false when an element has the aria-hidden attribute with value "true"', () => {
++		it( 'should return false when an element has the inert attribute', () => {
+ 			const element = document.createElement( 'div' );
+-			element.setAttribute( 'aria-hidden', 'true' );
+-
+-			expect( elementShouldBeHidden( element ) ).toBe( false );
+-		} );
+-
+-		it( 'should return false when an element has the aria-hidden attribute with value "false"', () => {
+-			const element = document.createElement( 'div' );
+-			element.setAttribute( 'aria-hidden', 'false' );
++			element.setAttribute( 'inert', '' );
+ 
+ 			expect( elementShouldBeHidden( element ) ).toBe( false );
+ 		} );
+diff --git a/packages/components/src/modal/test/index.tsx b/packages/components/src/modal/test/index.tsx
+index b53e12b450a171..8d9c4500d9f979 100644
+--- a/packages/components/src/modal/test/index.tsx
++++ b/packages/components/src/modal/test/index.tsx
+@@ -234,7 +234,7 @@ describe( 'Modal', () => {
+ 
+ 		// Opens outer modal > hides container.
+ 		await user.click( screen.getByRole( 'button', { name: 'Start' } ) );
+-		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
++		expect( container ).toHaveAttribute( 'inert' );
+ 
+ 		// Disable reason: No semantic query can reach the overlay.
+ 		// eslint-disable-next-line testing-library/no-node-access
+@@ -242,16 +242,16 @@ describe( 'Modal', () => {
+ 
+ 		// Opens inner modal > hides outer modal.
+ 		await user.click( screen.getByRole( 'button', { name: 'Nest' } ) );
+-		expect( outer ).toHaveAttribute( 'aria-hidden', 'true' );
++		expect( outer ).toHaveAttribute( 'inert' );
+ 
+ 		// Closes inner modal > Unhides outer modal and container stays hidden.
+ 		await user.keyboard( '[Escape]' );
+-		expect( outer ).not.toHaveAttribute( 'aria-hidden' );
+-		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
++		expect( outer ).not.toHaveAttribute( 'inert' );
++		expect( container ).toHaveAttribute( 'inert' );
+ 
+ 		// Closes outer modal > Unhides container.
+ 		await user.keyboard( '[Escape]' );
+-		expect( container ).not.toHaveAttribute( 'aria-hidden' );
++		expect( container ).not.toHaveAttribute( 'inert' );
+ 	} );
+ 
+ 	it( 'should render `headerActions` React nodes', async () => {
+diff --git a/test/e2e/specs/site-editor/font-library.spec.js b/test/e2e/specs/site-editor/font-library.spec.js
+index 1824257df12fd3..1fe87ec0aebf56 100644
+--- a/test/e2e/specs/site-editor/font-library.spec.js
++++ b/test/e2e/specs/site-editor/font-library.spec.js
+@@ -87,9 +87,10 @@ test.describe( 'Font Library', () => {
+ 					name: 'Manage fonts',
+ 				} )
+ 				.click();
+-			await expect( page.getByRole( 'dialog' ) ).toBeVisible();
+ 			await expect(
+-				page.getByRole( 'heading', { name: 'Fonts', exact: true } )
++				page
++					.getByRole( 'dialog' )
++					.getByRole( 'heading', { name: 'Fonts', exact: true } )
+ 			).toBeVisible();
+ 		} );
+ 
+@@ -106,12 +107,13 @@ test.describe( 'Font Library', () => {
+ 					name: 'Manage fonts',
+ 				} )
+ 				.click();
+-			await page.getByRole( 'button', { name: 'System Font' } ).click();
++			const dialog = page.getByRole( 'dialog' );
++			await dialog.getByRole( 'button', { name: 'System Font' } ).click();
+ 			await expect(
+-				page.getByRole( 'heading', { name: 'System Font' } )
++				dialog.getByRole( 'heading', { name: 'System Font' } )
+ 			).toBeVisible();
+ 			await expect(
+-				page.getByRole( 'checkbox', { name: 'System Font Normal' } )
++				dialog.getByRole( 'checkbox', { name: 'System Font Normal' } )
+ 			).toBeVisible();
+ 		} );
+ 	} );
+@@ -174,15 +176,16 @@ test.describe( 'Font Library', () => {
+ 					.getByText( 'Fonts were installed successfully.' )
+ 			).toBeVisible();
+ 			await page.getByRole( 'tab', { name: 'Library' } ).click();
++			const dialog = page.getByRole( 'dialog' );
+ 			// Provides coverage for https://github.com/WordPress/gutenberg/issues/60040.
+-			await page.getByRole( 'button', { name: 'Exo 2' } ).click();
++			await dialog.getByRole( 'button', { name: 'Exo 2' } ).click();
+ 			await expect( page.getByLabel( 'Exo 2 Normal' ) ).toBeVisible();
+ 			await expect(
+ 				page.getByLabel( 'Exo 2 Semi-bold Italic' )
+ 			).toBeVisible();
+ 
+ 			// Check CSS preset was created.
+-			await page.getByRole( 'button', { name: 'Close' } ).click();
++			await dialog.getByRole( 'button', { name: 'Close' } ).click();
+ 			await page
+ 				.getByRole( 'button', { name: 'Headings', exact: true } )
+ 				.click();
+@@ -200,9 +203,13 @@ test.describe( 'Font Library', () => {
+ 				} )
+ 				.click();
+ 
+-			await page.getByRole( 'button', { name: 'Exo 2' } ).click();
+-			await page.getByRole( 'button', { name: 'Delete' } ).click();
+-			await page.getByRole( 'button', { name: 'Delete' } ).click();
++			await dialog.getByRole( 'button', { name: 'Exo 2' } ).click();
++			await dialog.getByRole( 'button', { name: 'Delete' } ).click();
++			await page
++				.getByRole( 'dialog' )
++				.last()
++				.getByRole( 'button', { name: 'Delete' } )
++				.click();
+ 			await expect(
+ 				page
+ 					.getByLabel( 'Library' )
+@@ -248,9 +255,9 @@ test.describe( 'Font Library', () => {
+ 				.getByRole( 'button', { name: 'Jost 2 variants' } )
+ 				.click();
+ 
+-			await expect( page.getByRole( 'dialog' ) ).toBeVisible();
++			const dialog = page.getByRole( 'dialog' );
+ 			await expect(
+-				page.getByRole( 'heading', { name: 'Fonts' } )
++				dialog.getByRole( 'heading', { name: 'Fonts' } )
+ 			).toBeVisible();
+ 
+ 			// Check correct font is displayed in Font Library
+@@ -259,7 +266,7 @@ test.describe( 'Font Library', () => {
+ 			).toBeVisible();
+ 
+ 			// Close the Font Library dialog
+-			await page.getByRole( 'button', { name: 'Close' } ).click();
++			await dialog.getByRole( 'button', { name: 'Close' } ).click();
+ 
+ 			// Click "Back"
+ 			await page.getByRole( 'button', { name: 'Back' } ).click();
+@@ -280,9 +287,8 @@ test.describe( 'Font Library', () => {
+ 				.getByRole( 'button', { name: 'Cardo 3 variants' } )
+ 				.click();
+ 
+-			await expect( page.getByRole( 'dialog' ) ).toBeVisible();
+ 			await expect(
+-				page.getByRole( 'heading', { name: 'Fonts' } )
++				dialog.getByRole( 'heading', { name: 'Fonts' } )
+ 			).toBeVisible();
+ 
+ 			// Check correct font is displayed in Font Library
+diff --git a/test/e2e/specs/site-editor/template-registration.spec.js b/test/e2e/specs/site-editor/template-registration.spec.js
+index 4f35d81737ae29..21e28832e37025 100644
+--- a/test/e2e/specs/site-editor/template-registration.spec.js
++++ b/test/e2e/specs/site-editor/template-registration.spec.js
+@@ -84,7 +84,10 @@ test.describe( 'Block template registration', () => {
+ 		const searchResults = page.getByLabel( 'Actions' );
+ 		await searchResults.first().click();
+ 		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();
+-		await page.getByRole( 'button', { name: 'Reset' } ).click();
++		await page
++			.getByRole( 'dialog' )
++			.getByRole( 'button', { name: 'Reset' } )
++			.click();
+ 
+ 		await expect( resetNotice ).toBeVisible();
+ 		await expect( savedButton ).toBeVisible();

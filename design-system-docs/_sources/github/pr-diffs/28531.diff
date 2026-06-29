@@ -1,0 +1,813 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 93175042b78fb5..5d6a6d82a77db6 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -965,6 +965,12 @@
+ 		"markdown_source": "../packages/components/src/form-token-field/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "Grid",
++		"slug": "grid",
++		"markdown_source": "../packages/components/src/grid/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "Guide",
+ 		"slug": "guide",
+diff --git a/package-lock.json b/package-lock.json
+index 9c3ecff96c6c19..6e6b14f36a868a 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -10533,6 +10533,137 @@
+ 				}
+ 			}
+ 		},
++		"@testing-library/jest-dom": {
++			"version": "5.11.9",
++			"resolved": "https://registry.npmjs.org/@testing-library/jest-dom/-/jest-dom-5.11.9.tgz",
++			"integrity": "sha512-Mn2gnA9d1wStlAIT2NU8J15LNob0YFBVjs2aEQ3j8rsfRQo+lAs7/ui1i2TGaJjapLmuNPLTsrm+nPjmZDwpcQ==",
++			"dev": true,
++			"requires": {
++				"@babel/runtime": "^7.9.2",
++				"@types/testing-library__jest-dom": "^5.9.1",
++				"aria-query": "^4.2.2",
++				"chalk": "^3.0.0",
++				"css": "^3.0.0",
++				"css.escape": "^1.5.1",
++				"lodash": "^4.17.15",
++				"redent": "^3.0.0"
++			},
++			"dependencies": {
++				"ansi-styles": {
++					"version": "4.3.0",
++					"resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-4.3.0.tgz",
++					"integrity": "sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==",
++					"dev": true,
++					"requires": {
++						"color-convert": "^2.0.1"
++					}
++				},
++				"atob": {
++					"version": "2.1.2",
++					"resolved": "https://registry.npmjs.org/atob/-/atob-2.1.2.tgz",
++					"integrity": "sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==",
++					"dev": true
++				},
++				"chalk": {
++					"version": "3.0.0",
++					"resolved": "https://registry.npmjs.org/chalk/-/chalk-3.0.0.tgz",
++					"integrity": "sha512-4D3B6Wf41KOYRFdszmDqMCGq5VV/uMAB273JILmO+3jAlh8X4qDtdtgCR3fxtbLEMzSx22QdhnDcJvu2u1fVwg==",
++					"dev": true,
++					"requires": {
++						"ansi-styles": "^4.1.0",
++						"supports-color": "^7.1.0"
++					}
++				},
++				"color-convert": {
++					"version": "2.0.1",
++					"resolved": "https://registry.npmjs.org/color-convert/-/color-convert-2.0.1.tgz",
++					"integrity": "sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==",
++					"dev": true,
++					"requires": {
++						"color-name": "~1.1.4"
++					}
++				},
++				"color-name": {
++					"version": "1.1.4",
++					"resolved": "https://registry.npmjs.org/color-name/-/color-name-1.1.4.tgz",
++					"integrity": "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==",
++					"dev": true
++				},
++				"css": {
++					"version": "3.0.0",
++					"resolved": "https://registry.npmjs.org/css/-/css-3.0.0.tgz",
++					"integrity": "sha512-DG9pFfwOrzc+hawpmqX/dHYHJG+Bsdb0klhyi1sDneOgGOXy9wQIC8hzyVp1e4NRYDBdxcylvywPkkXCHAzTyQ==",
++					"dev": true,
++					"requires": {
++						"inherits": "^2.0.4",
++						"source-map": "^0.6.1",
++						"source-map-resolve": "^0.6.0"
++					}
++				},
++				"has-flag": {
++					"version": "4.0.0",
++					"resolved": "https://registry.npmjs.org/has-flag/-/has-flag-4.0.0.tgz",
++					"integrity": "sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==",
++					"dev": true
++				},
++				"indent-string": {
++					"version": "4.0.0",
++					"resolved": "https://registry.npmjs.org/indent-string/-/indent-string-4.0.0.tgz",
++					"integrity": "sha512-EdDDZu4A2OyIK7Lr/2zG+w5jmbuk1DVBnEwREQvBzspBJkCEbRa8GxU1lghYcaGJCnRWibjDXlq779X1/y5xwg==",
++					"dev": true
++				},
++				"inherits": {
++					"version": "2.0.4",
++					"resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz",
++					"integrity": "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==",
++					"dev": true
++				},
++				"redent": {
++					"version": "3.0.0",
++					"resolved": "https://registry.npmjs.org/redent/-/redent-3.0.0.tgz",
++					"integrity": "sha512-6tDA8g98We0zd0GvVeMT9arEOnTw9qM03L9cJXaCjrip1OO764RDBLBfrB4cwzNGDj5OA5ioymC9GkizgWJDUg==",
++					"dev": true,
++					"requires": {
++						"indent-string": "^4.0.0",
++						"strip-indent": "^3.0.0"
++					}
++				},
++				"source-map": {
++					"version": "0.6.1",
++					"resolved": "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz",
++					"integrity": "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==",
++					"dev": true
++				},
++				"source-map-resolve": {
++					"version": "0.6.0",
++					"resolved": "https://registry.npmjs.org/source-map-resolve/-/source-map-resolve-0.6.0.tgz",
++					"integrity": "sha512-KXBr9d/fO/bWo97NXsPIAW1bFSBOuCnjbNTBMO7N59hsv5i9yzRDfcYwwt0l04+VqnKC+EwzvJZIP/qkuMgR/w==",
++					"dev": true,
++					"requires": {
++						"atob": "^2.1.2",
++						"decode-uri-component": "^0.2.0"
++					}
++				},
++				"strip-indent": {
++					"version": "3.0.0",
++					"resolved": "https://registry.npmjs.org/strip-indent/-/strip-indent-3.0.0.tgz",
++					"integrity": "sha512-laJTa3Jb+VQpaC6DseHhF7dXVqHTfJPCRDaEbid/drOhgitgYku/letMUqOXFoWV0zIIUbjpdH2t+tYj4bQMRQ==",
++					"dev": true,
++					"requires": {
++						"min-indent": "^1.0.0"
++					}
++				},
++				"supports-color": {
++					"version": "7.2.0",
++					"resolved": "https://registry.npmjs.org/supports-color/-/supports-color-7.2.0.tgz",
++					"integrity": "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==",
++					"dev": true,
++					"requires": {
++						"has-flag": "^4.0.0"
++					}
++				}
++			}
++		},
+ 		"@testing-library/react": {
+ 			"version": "11.2.2",
+ 			"resolved": "https://registry.npmjs.org/@testing-library/react/-/react-11.2.2.tgz",
+@@ -11011,6 +11142,15 @@
+ 			"integrity": "sha512-/gG2M/Imw7cQFp8PGvz/SwocNrmKFjFsm5Pb8HdbHkZ1K8pmuPzOX4VeVoiEecFCVf4CsN1r3/BRvx+6sNqwtQ==",
+ 			"dev": true
+ 		},
++		"@types/testing-library__jest-dom": {
++			"version": "5.9.5",
++			"resolved": "https://registry.npmjs.org/@types/testing-library__jest-dom/-/testing-library__jest-dom-5.9.5.tgz",
++			"integrity": "sha512-ggn3ws+yRbOHog9GxnXiEZ/35Mow6YtPZpd7Z5mKDeZS/o7zx3yAle0ov/wjhVB5QT4N2Dt+GNoGCdqkBGCajQ==",
++			"dev": true,
++			"requires": {
++				"@types/jest": "*"
++			}
++		},
+ 		"@types/tinycolor2": {
+ 			"version": "1.4.2",
+ 			"resolved": "https://registry.npmjs.org/@types/tinycolor2/-/tinycolor2-1.4.2.tgz",
+@@ -25872,6 +26012,12 @@
+ 			"integrity": "sha1-lGfQMsOM+u+58teVASUwYvh/ob0=",
+ 			"dev": true
+ 		},
++		"css.escape": {
++			"version": "1.5.1",
++			"resolved": "https://registry.npmjs.org/css.escape/-/css.escape-1.5.1.tgz",
++			"integrity": "sha1-QuJ9T6BK4y+TGktNQZH6nN3ul8s=",
++			"dev": true
++		},
+ 		"cssesc": {
+ 			"version": "3.0.0",
+ 			"resolved": "https://registry.npmjs.org/cssesc/-/cssesc-3.0.0.tgz",
+diff --git a/package.json b/package.json
+index 4262869f488686..8f1d34c29a6c51 100644
+--- a/package.json
++++ b/package.json
+@@ -95,6 +95,7 @@
+ 		"@storybook/addon-storysource": "6.1.11",
+ 		"@storybook/addon-viewport": "6.1.11",
+ 		"@storybook/react": "6.1.11",
++		"@testing-library/jest-dom": "5.11.9",
+ 		"@testing-library/react": "11.2.2",
+ 		"@types/classnames": "2.2.10",
+ 		"@types/eslint": "6.8.0",
+diff --git a/packages/components/src/grid/README.md b/packages/components/src/grid/README.md
+new file mode 100644
+index 00000000000000..ab96e289b89268
+--- /dev/null
++++ b/packages/components/src/grid/README.md
+@@ -0,0 +1,78 @@
++# Grid
++
++`Grid` is a primitive layout component that can arrange content in a grid configuration.
++
++## Usage
++
++```jsx
++import {
++	__experientalGrid as Grid,
++	__experimentalView as View,
++} from '@wordpress/components';
++
++function Example() {
++	return (
++		<Grid columns={ 3 }>
++			<View>One</View>
++			<View>Two</View>
++			<View>Three</View>
++		</Grid>
++	);
++}
++```
++
++## Props
++
++##### align
++
++**Type**: `CSS['alignItems']`
++
++Adjusts the block alignment of children.
++
++##### alignment
++
++**Type**: `GridAlignment`
++
++Adjusts the horizontal and vertical alignment of children.
++
++##### columns
++
++**Type**: `number`,`(number`,`null)[]`
++
++Adjusts the number of columns of the `Grid`.
++
++##### gap
++
++**Type**: `number`
++
++Gap between each child.
++
++##### isInline
++
++**Type**: `boolean`
++
++Changes the CSS display from `grid` to `inline-grid`.
++
++##### justify
++
++**Type**: `CSS['justifyContent']`
++
++Adjusts the inline alignment of children.
++
++##### rows
++
++**Type**: `number`,`(number`,`null)[]`
++
++Adjusts the number of rows of the `Grid`.
++
++##### templateColumns
++
++**Type**: `CSS['gridTemplateColumns']`
++
++Adjusts the CSS grid `template-columns`.
++
++##### templateRows
++
++**Type**: `CSS['gridTemplateRows']`
++
++Adjusts the CSS grid `template-rows`.
+diff --git a/packages/components/src/grid/grid-utils.js b/packages/components/src/grid/grid-utils.js
+new file mode 100644
+index 00000000000000..583108964b67f7
+--- /dev/null
++++ b/packages/components/src/grid/grid-utils.js
+@@ -0,0 +1,19 @@
++const ALIGNMENTS = {
++	bottom: { alignItems: 'flex-end', justifyContent: 'center' },
++	bottomLeft: { alignItems: 'flex-start', justifyContent: 'flex-end' },
++	bottomRight: { alignItems: 'flex-end', justifyContent: 'flex-end' },
++	center: { alignItems: 'center', justifyContent: 'center' },
++	spaced: { alignItems: 'center', justifyContent: 'space-between' },
++	left: { alignItems: 'center', justifyContent: 'flex-start' },
++	right: { alignItems: 'center', justifyContent: 'flex-end' },
++	stretch: { alignItems: 'stretch' },
++	top: { alignItems: 'flex-start', justifyContent: 'center' },
++	topLeft: { alignItems: 'flex-start', justifyContent: 'flex-start' },
++	topRight: { alignItems: 'flex-start', justifyContent: 'flex-end' },
++};
++
++export function getAlignmentProps( alignment ) {
++	const alignmentProps = ALIGNMENTS[ alignment ] || {};
++
++	return alignmentProps;
++}
+diff --git a/packages/components/src/grid/grid.js b/packages/components/src/grid/grid.js
+new file mode 100644
+index 00000000000000..0a03b36391abaa
+--- /dev/null
++++ b/packages/components/src/grid/grid.js
+@@ -0,0 +1,37 @@
++/**
++ * Internal dependencies
++ */
++import { createComponent } from '../utils/create-component';
++import { useGrid } from './use-grid';
++
++/**
++ * `Grid` is a primitive layout component that can arrange content in a grid configuration.
++ *
++ * @example
++ * ```jsx
++ * import { __experimentalGrid as Grid } from `@wordpress/components`
++ *
++ * function Example() {
++ *   return (
++ *     <Grid columns={3}>
++ *       <View>
++ *         One
++ *       </View>
++ *       <View>
++ *         Two
++ *       </View>
++ *       <View>
++ *         Three
++ *       </View>
++ *     </Grid>
++ *   );
++ * }
++ * ```
++ */
++const Grid = createComponent( {
++	as: 'div',
++	useHook: useGrid,
++	name: 'Grid',
++} );
++
++export default Grid;
+diff --git a/packages/components/src/grid/index.js b/packages/components/src/grid/index.js
+new file mode 100644
+index 00000000000000..4af7eb7b6eea62
+--- /dev/null
++++ b/packages/components/src/grid/index.js
+@@ -0,0 +1,2 @@
++export { default } from './grid';
++export * from './use-grid';
+diff --git a/packages/components/src/grid/stories/index.js b/packages/components/src/grid/stories/index.js
+new file mode 100644
+index 00000000000000..def0ec021d44ef
+--- /dev/null
++++ b/packages/components/src/grid/stories/index.js
+@@ -0,0 +1,46 @@
++/**
++ * External dependencies
++ */
++import { number } from '@storybook/addon-knobs';
++
++/**
++ * Internal dependencies
++ */
++import View from '../../view';
++import Grid from '../index';
++
++export default {
++	component: Grid,
++	title: 'Components/Grid',
++};
++
++const Item = ( props ) => (
++	<View
++		css={ {
++			borderRadius: 8,
++			background: '#eee',
++			padding: 8,
++			textAlign: 'center',
++		} }
++		{ ...props }
++	/>
++);
++
++export const _default = () => {
++	const props = {
++		columns: number( 'columns', 4 ),
++		gap: number( 'gap', 2 ),
++	};
++	return (
++		<Grid alignment="bottom" { ...props }>
++			<Item>One</Item>
++			<Item>Two</Item>
++			<Item>Three</Item>
++			<Item>Four</Item>
++			<Item>Five</Item>
++			<Item>Six</Item>
++			<Item>Seven</Item>
++			<Item>Eight</Item>
++		</Grid>
++	);
++};
+diff --git a/packages/components/src/grid/test/index.js b/packages/components/src/grid/test/index.js
+new file mode 100644
+index 00000000000000..db1e6d91a9d952
+--- /dev/null
++++ b/packages/components/src/grid/test/index.js
+@@ -0,0 +1,165 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++import { ui } from '@wp-g2/styles';
++
++/**
++ * Internal dependencies
++ */
++import View from '../../view';
++import Grid from '../index';
++
++describe( 'props', () => {
++	test( 'should render correctly', () => {
++		const { container } = render(
++			<Grid>
++				<View />
++				<View />
++			</Grid>
++		);
++
++		expect( container.firstChild ).toHaveStyle( {
++			display: 'grid',
++			gridTemplateColumns: 'repeat(2,1fr)',
++			gap: `calc(${ ui.get( 'gridBase' ) } * 3)`,
++		} );
++	} );
++
++	test( 'should render gap', () => {
++		const { container } = render(
++			<Grid columns="3" gap={ 4 }>
++				<View />
++				<View />
++				<View />
++			</Grid>
++		);
++
++		expect( container.firstChild ).toHaveStyle( {
++			display: 'grid',
++			gridTemplateColumns: 'repeat(3,1fr)',
++			gap: `calc(${ ui.get( 'gridBase' ) } * 4)`,
++		} );
++	} );
++
++	test( 'should render custom columns', () => {
++		const { container } = render(
++			<Grid columns="7">
++				<View />
++				<View />
++				<View />
++			</Grid>
++		);
++
++		expect( container.firstChild ).toHaveStyle( {
++			display: 'grid',
++			gridTemplateColumns: 'repeat(7,1fr)',
++		} );
++	} );
++
++	test( 'should render custom rows', () => {
++		const { container } = render(
++			<Grid rows="7">
++				<View />
++				<View />
++				<View />
++			</Grid>
++		);
++
++		expect( container.firstChild ).toHaveStyle( {
++			display: 'grid',
++			gridTemplateRows: 'repeat(7,1fr)',
++		} );
++	} );
++
++	test( 'should render align', () => {
++		const { container } = render(
++			<Grid align="flex-start">
++				<View />
++				<View />
++				<View />
++			</Grid>
++		);
++
++		expect( container.firstChild ).toHaveStyle( {
++			alignItems: 'flex-start',
++			display: 'grid',
++		} );
++	} );
++
++	test( 'should render alignment spaced', () => {
++		const { container } = render(
++			<Grid alignment="spaced">
++				<View />
++				<View />
++				<View />
++			</Grid>
++		);
++
++		expect( container.firstChild ).toHaveStyle( {
++			display: 'grid',
++			alignItems: 'center',
++			justifyContent: 'space-between',
++		} );
++	} );
++
++	test( 'should render justify', () => {
++		const { container } = render(
++			<Grid justify="flex-start">
++				<View />
++				<View />
++				<View />
++			</Grid>
++		);
++
++		expect( container.firstChild ).toHaveStyle( {
++			display: 'grid',
++			justifyContent: 'flex-start',
++		} );
++	} );
++
++	test( 'should render isInline', () => {
++		const { container } = render(
++			<Grid columns="3" isInline>
++				<View />
++				<View />
++				<View />
++			</Grid>
++		);
++
++		expect( container.firstChild ).toHaveStyle( {
++			display: 'inline-grid',
++			gridTemplateColumns: 'repeat(3,1fr)',
++		} );
++	} );
++
++	test( 'should render custom templateColumns', () => {
++		const { container } = render(
++			<Grid templateColumns="1fr auto 1fr">
++				<View />
++				<View />
++				<View />
++			</Grid>
++		);
++
++		expect( container.firstChild ).toHaveStyle( {
++			display: 'grid',
++			gridTemplateColumns: '1fr auto 1fr',
++		} );
++	} );
++
++	test( 'should render custom templateRows', () => {
++		const { container } = render(
++			<Grid templateRows="1fr auto 1fr">
++				<View />
++				<View />
++				<View />
++			</Grid>
++		);
++
++		expect( container.firstChild ).toHaveStyle( {
++			display: 'grid',
++			gridTemplateRows: '1fr auto 1fr',
++		} );
++	} );
++} );
+diff --git a/packages/components/src/grid/types.ts b/packages/components/src/grid/types.ts
+new file mode 100644
+index 00000000000000..a1eaa7a02ee59f
+--- /dev/null
++++ b/packages/components/src/grid/types.ts
+@@ -0,0 +1,70 @@
++import { CSSProperties } from 'react';
++import { ResponsiveCSSValue } from '../utils/types';
++
++type GridAlignment =
++	| 'bottom'
++	| 'bottomLeft'
++	| 'bottomRight'
++	| 'center'
++	| 'spaced'
++	| 'left'
++	| 'right'
++	| 'stretch'
++	| 'top'
++	| 'topLeft'
++	| 'topRight';
++
++type GridColumns = ResponsiveCSSValue< number >;
++
++type GridRows = ResponsiveCSSValue< number >;
++
++export type Props = {
++	/**
++	 * Adjusts the block alignment of children.
++	 */
++	align?: CSSProperties[ 'alignItems' ];
++	/**
++	 * Adjusts the horizontal and vertical alignment of children.
++	 */
++	alignment?: GridAlignment;
++	/**
++	 * Adjusts the number of columns of the `Grid`.
++	 *
++	 * @default 2
++	 */
++	columns?: GridColumns;
++	/**
++	 * Adjusts the `grid-column-gap`.
++	 */
++	columnGap?: CSSProperties[ 'gridColumnGap' ];
++	/**
++	 * Changes the CSS display from `grid` to `inline-grid`.
++	 */
++	isInline?: boolean;
++	/**
++	 * Gap between each child.
++	 *
++	 * @default 3
++	 */
++	gap?: number;
++	/**
++	 * Adjusts the inline alignment of children.
++	 */
++	justify?: CSSProperties[ 'justifyContent' ];
++	/**
++	 * Adjusts the `grid-row-gap`.
++	 */
++	rowGap?: CSSProperties[ 'gridRowGap' ];
++	/**
++	 * Adjusts the number of rows of the `Grid`.
++	 */
++	rows?: GridRows;
++	/**
++	 * Adjusts the CSS grid `template-columns`.
++	 */
++	templateColumns?: CSSProperties[ 'gridTemplateColumns' ];
++	/**
++	 * Adjusts the CSS grid `template-rows`.
++	 */
++	templateRows?: CSSProperties[ 'gridTemplateRows' ];
++};
+diff --git a/packages/components/src/grid/use-grid.js b/packages/components/src/grid/use-grid.js
+new file mode 100644
+index 00000000000000..9dc0d6da698999
+--- /dev/null
++++ b/packages/components/src/grid/use-grid.js
+@@ -0,0 +1,76 @@
++/**
++ * External dependencies
++ */
++import { useContextSystem } from '@wp-g2/context';
++import { css, cx, useResponsiveValue } from '@wp-g2/styles';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { getAlignmentProps } from './grid-utils';
++
++/**
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
++ */
++export function useGrid( props ) {
++	const {
++		align,
++		alignment,
++		className,
++		columnGap,
++		columns = 2,
++		gap = 3,
++		isInline = false,
++		justify,
++		rowGap,
++		rows,
++		templateColumns,
++		templateRows,
++		...otherProps
++	} = useContextSystem( props, 'Grid' );
++
++	const column = useResponsiveValue( columns );
++	const row = useResponsiveValue( rows );
++
++	const gridTemplateColumns =
++		templateColumns || ( !! columns && `repeat(${ column }, 1fr)` );
++	const gridTemplateRows =
++		templateRows || ( !! rows && `repeat(${ row }, 1fr)` );
++
++	const classes = useMemo( () => {
++		const alignmentProps = getAlignmentProps( alignment );
++
++		const gridClasses = css( {
++			alignItems: align,
++			display: isInline ? 'inline-grid' : 'grid',
++			gap,
++			gridTemplateColumns,
++			gridTemplateRows,
++			gridRowGap: rowGap,
++			gridColumnGap: columnGap,
++			justifyContent: justify,
++			verticalAlign: isInline ? 'middle' : null,
++			...alignmentProps,
++		} );
++
++		return cx( gridClasses, className );
++	}, [
++		align,
++		alignment,
++		className,
++		columnGap,
++		gap,
++		gridTemplateColumns,
++		gridTemplateRows,
++		isInline,
++		justify,
++		rowGap,
++	] );
++
++	return { ...otherProps, className: classes };
++}
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 16133a197d007d..84d87495b37c21 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -71,6 +71,7 @@ export { default as FormToggle } from './form-toggle';
+ export { default as FormTokenField } from './form-token-field';
+ export { default as __experimentalGradientPicker } from './gradient-picker';
+ export { default as __experimentalCustomGradientPicker } from './custom-gradient-picker';
++export { default as __experimentalGrid } from './grid';
+ export { default as Guide } from './guide';
+ export { default as GuidePage } from './guide/page';
+ export { default as Icon } from './icon';
+@@ -131,6 +132,7 @@ export {
+ export { default as TreeSelect } from './tree-select';
+ export { default as __experimentalTruncate } from './truncate';
+ export { default as __experimentalUnitControl } from './unit-control';
++export { default as __experimentalView } from './view';
+ export { default as VisuallyHidden } from './visually-hidden';
+ export { default as IsolatedEventContainer } from './isolated-event-container';
+ export {
+diff --git a/packages/components/src/utils/create-component.js b/packages/components/src/utils/create-component.js
+index 9b3b435f23318a..6269c83967f704 100644
+--- a/packages/components/src/utils/create-component.js
++++ b/packages/components/src/utils/create-component.js
+@@ -7,7 +7,7 @@ import { identity } from 'lodash';
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../view';
++import View from '../view';
+ 
+ /* eslint-disable jsdoc/require-returns-description */
+ /**
+diff --git a/packages/components/src/view/index.js b/packages/components/src/view/index.js
+index 64c032291ab979..6dd227ec960634 100644
+--- a/packages/components/src/view/index.js
++++ b/packages/components/src/view/index.js
+@@ -1 +1 @@
+-export { default as View } from './view';
++export { default } from './view';
+diff --git a/packages/components/src/view/test/view.js b/packages/components/src/view/test/view.js
+index a9524e88101871..c3ab622390226d 100644
+--- a/packages/components/src/view/test/view.js
++++ b/packages/components/src/view/test/view.js
+@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../index';
++import View from '../index';
+ 
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {
+diff --git a/test/unit/config/testing-library.js b/test/unit/config/testing-library.js
+new file mode 100644
+index 00000000000000..50df4303ae3f05
+--- /dev/null
++++ b/test/unit/config/testing-library.js
+@@ -0,0 +1 @@
++require( '@testing-library/jest-dom' );
+diff --git a/test/unit/jest.config.js b/test/unit/jest.config.js
+index dc0c39f41a7dea..4a8b6c7bf2c07c 100644
+--- a/test/unit/jest.config.js
++++ b/test/unit/jest.config.js
+@@ -20,6 +20,7 @@ module.exports = {
+ 		'<rootDir>/test/unit/config/global-mocks.js',
+ 		'<rootDir>/test/unit/config/gutenberg-phase.js',
+ 	],
++	setupFilesAfterEnv: [ '<rootDir>/test/unit/config/testing-library.js' ],
+ 	testURL: 'http://localhost',
+ 	testPathIgnorePatterns: [
+ 		'/.git/',

@@ -1,0 +1,84 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 02b83fadfcfc20..a9d18c4ff3040f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -25,6 +25,7 @@
+ -   `ToolbarButton`: Convert to TypeScript ([#47750](https://github.com/WordPress/gutenberg/pull/47750)).
+ -   `DimensionControl(Experimental)`: Convert to TypeScript ([#47351](https://github.com/WordPress/gutenberg/pull/47351)).
+ -   `PaletteEdit`: Convert to TypeScript ([#47764](https://github.com/WordPress/gutenberg/pull/47764)).
++-   `QueryControls`: Refactor away from Lodash (`.groupBy`) ([#48779](https://github.com/WordPress/gutenberg/pull/48779)).
+ 
+ ## 23.5.0 (2023-03-01)
+ 
+diff --git a/packages/components/src/query-controls/terms.ts b/packages/components/src/query-controls/terms.ts
+index d9164dae3a9cd1..7224d3bda6b46e 100644
+--- a/packages/components/src/query-controls/terms.ts
++++ b/packages/components/src/query-controls/terms.ts
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { groupBy } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -13,6 +8,11 @@ import type {
+ 	TermsByParent,
+ } from './types';
+ 
++const ensureParentsAreDefined = (
++	terms: TermWithParentAndChildren[]
++): terms is ( TermWithParentAndChildren & { parent: number } )[] => {
++	return terms.every( ( term ) => term.parent !== null );
++};
+ /**
+  * Returns terms in a tree form.
+  *
+@@ -22,22 +22,33 @@ import type {
+  */
+ export function buildTermsTree( flatTerms: readonly ( Author | Category )[] ) {
+ 	const flatTermsWithParentAndChildren: TermWithParentAndChildren[] =
+-		flatTerms.map( ( term ) => {
+-			return {
+-				children: [],
+-				parent: null,
+-				...term,
+-				id: String( term.id ),
+-			};
+-		} );
++		flatTerms.map( ( term ) => ( {
++			children: [],
++			parent: null,
++			...term,
++			id: String( term.id ),
++		} ) );
+ 
+-	const termsByParent: TermsByParent = groupBy(
+-		flatTermsWithParentAndChildren,
+-		'parent'
+-	);
+-	if ( termsByParent.null && termsByParent.null.length ) {
++	// We use a custom type guard here to ensure that the parent property is
++	// defined on all terms. The type of the `parent` property is `number | null`
++	// and we need to ensure that it is `number`. This is because we use the
++	// `parent` property as a key in the `termsByParent` object.
++	if ( ! ensureParentsAreDefined( flatTermsWithParentAndChildren ) ) {
+ 		return flatTermsWithParentAndChildren;
+ 	}
++
++	const termsByParent = flatTermsWithParentAndChildren.reduce(
++		( acc: TermsByParent, term ) => {
++			const { parent } = term;
++			if ( ! acc[ parent ] ) {
++				acc[ parent ] = [];
++			}
++			acc[ parent ].push( term );
++			return acc;
++		},
++		{}
++	);
++
+ 	const fillWithChildren = (
+ 		terms: TermWithParentAndChildren[]
+ 	): TermWithParentAndChildren[] => {

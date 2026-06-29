@@ -1,0 +1,190 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bbfbb0066b71f0..5e0bdaf633b085 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -46,6 +46,7 @@
+ 
+ -   `AlignmentMatrixControl`: Migrate styles from Emotion to a CSS module ([#73714](https://github.com/WordPress/gutenberg/pull/73714) and [#73757](https://github.com/WordPress/gutenberg/pull/73757)).
+ -   `AnglePickerControl`: Migrate styles from Emotion to a CSS module ([#73786](https://github.com/WordPress/gutenberg/pull/73786)).
++-   `Menu`: Clean up popover wrappers ([#74207](https://github.com/WordPress/gutenberg/pull/74207)).
+ -   `Button`, `DateCalendar`, `DateRangeCalendar`, `CheckboxControl`, `Panel`, `Placeholder`: Remove outdated vendor prefix properties in CSS ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
+ 
+ ## 30.9.0 (2025-11-26)
+diff --git a/packages/components/src/menu/popover.tsx b/packages/components/src/menu/popover.tsx
+index 6a3ad9eb683b51..80c5910bf015aa 100644
+--- a/packages/components/src/menu/popover.tsx
++++ b/packages/components/src/menu/popover.tsx
+@@ -71,7 +71,7 @@ export const Popover = forwardRef<
+ 	}
+ 
+ 	return (
+-		<Ariakit.Menu
++		<Styled.Menu
+ 			{ ...otherProps }
+ 			ref={ ref }
+ 			modal={ modal }
+@@ -87,17 +87,9 @@ export const Popover = forwardRef<
+ 			wrapperProps={ wrapperProps }
+ 			hideOnEscape={ hideOnEscape }
+ 			unmountOnHide
+-			render={ ( renderProps ) => (
+-				// Two wrappers are needed for the entry animation, where the menu
+-				// container scales with a different factor than its contents.
+-				// The {...renderProps} are passed to the inner wrapper, so that the
+-				// menu element is the direct parent of the menu item elements.
+-				<Styled.PopoverOuterWrapper variant={ menuContext.variant }>
+-					<Styled.PopoverInnerWrapper { ...renderProps } />
+-				</Styled.PopoverOuterWrapper>
+-			) }
++			variant={ menuContext.variant }
+ 		>
+ 			{ children }
+-		</Ariakit.Menu>
++		</Styled.Menu>
+ 	);
+ } );
+diff --git a/packages/components/src/menu/styles.ts b/packages/components/src/menu/styles.ts
+index acbc63c4095fbe..1eecb223d27be3 100644
+--- a/packages/components/src/menu/styles.ts
++++ b/packages/components/src/menu/styles.ts
+@@ -32,10 +32,25 @@ const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VAR
+ 
+ const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
+ 
+-export const PopoverOuterWrapper = styled.div<
+-	Pick< ContextProps, 'variant' >
+->`
++export const Menu = styled( Ariakit.Menu )< Pick< ContextProps, 'variant' > >`
+ 	position: relative;
++	/* Same as popover component */
++	/* TODO: is there a way to read the sass variable? */
++	z-index: 1000000;
++
++	display: grid;
++	grid-template-columns: ${ GRID_TEMPLATE_COLS };
++	grid-template-rows: auto;
++
++	box-sizing: border-box;
++	min-width: 160px;
++	max-width: 320px;
++	max-height: var( --popover-available-height );
++
++	padding: ${ CONTENT_WRAPPER_PADDING };
++
++	overscroll-behavior: contain;
++	overflow: auto;
+ 
+ 	background-color: ${ COLORS.ui.background };
+ 	border-radius: ${ CONFIG.radiusMedium };
+@@ -45,7 +60,8 @@ export const PopoverOuterWrapper = styled.div<
+ 			: DEFAULT_BOX_SHADOW };
+ 	` }
+ 
+-	overflow: hidden;
++	/* Only visible in Windows High Contrast mode */
++	outline: 2px solid transparent !important;
+ 
+ 	/* Open/close animation */
+ 	@media not ( prefers-reduced-motion ) {
+@@ -58,58 +74,34 @@ export const PopoverOuterWrapper = styled.div<
+ 
+ 		/* Regardless of the side, fade in and out. */
+ 		opacity: 0;
+-		&:has( [data-enter] ) {
++		&[data-enter] {
+ 			opacity: 1;
+ 		}
+ 
+ 		/* Slide in the direction the menu is opening. */
+-		&:has( [data-side='bottom'] ) {
++		&[data-side='bottom'] {
+ 			transform: translateY( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+ 		}
+-		&:has( [data-side='top'] ) {
++		&[data-side='top'] {
+ 			transform: translateY( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+ 		}
+-		&:has( [data-side='left'] ) {
++		&[data-side='left'] {
+ 			transform: translateX( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+ 		}
+-		&:has( [data-side='right'] ) {
++		&[data-side='right'] {
+ 			transform: translateX( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+ 		}
+-		&:has( [data-enter][data-side='bottom'] ),
+-		&:has( [data-enter][data-side='top'] ) {
++		&[data-enter][data-side='bottom'],
++		&[data-enter][data-side='top'] {
+ 			transform: translateY( 0 );
+ 		}
+-		&:has( [data-enter][data-side='left'] ),
+-		&:has( [data-enter][data-side='right'] ) {
++		&[data-enter][data-side='left'],
++		&[data-enter][data-side='right'] {
+ 			transform: translateX( 0 );
+ 		}
+ 	}
+ `;
+ 
+-export const PopoverInnerWrapper = styled.div`
+-	position: relative;
+-	/* Same as popover component */
+-	/* TODO: is there a way to read the sass variable? */
+-	z-index: 1000000;
+-
+-	display: grid;
+-	grid-template-columns: ${ GRID_TEMPLATE_COLS };
+-	grid-template-rows: auto;
+-
+-	box-sizing: border-box;
+-	min-width: 160px;
+-	max-width: 320px;
+-	max-height: var( --popover-available-height );
+-
+-	padding: ${ CONTENT_WRAPPER_PADDING };
+-
+-	overscroll-behavior: contain;
+-	overflow: auto;
+-
+-	/* Only visible in Windows High Contrast mode */
+-	outline: 2px solid transparent !important;
+-`;
+-
+ const baseItem = css`
+ 	all: unset;
+ 
+@@ -181,7 +173,7 @@ const baseItem = css`
+ 	}
+ 
+ 	/* When the item is the trigger of an open submenu */
+-	${ PopoverInnerWrapper }:not(:focus) &:not(:focus)[aria-expanded="true"] {
++	${ Menu }:not(:focus) &:not(:focus)[aria-expanded="true"] {
+ 		background-color: ${ LIGHT_BACKGROUND_COLOR };
+ 		color: ${ COLORS.theme.foreground };
+ 	}
+@@ -279,9 +271,9 @@ export const ItemSuffixWrapper = styled.span`
+ 	 * When the parent menu item is active, except when it's a non-focused/hovered
+ 	 * submenu trigger (in that case, color should not be inherited)
+ 	 */
+-	[data-active-item]:not( [data-focus-visible] ) *:not(${ PopoverInnerWrapper }) &,
++	[data-active-item]:not( [data-focus-visible] ) *:not(${ Menu }) &,
+ 	/* When the parent menu item is disabled */
+-	[aria-disabled='true'] *:not(${ PopoverInnerWrapper }) & {
++	[aria-disabled='true'] *:not(${ Menu }) & {
+ 		color: inherit;
+ 	}
+ `;
+@@ -344,10 +336,8 @@ export const ItemHelpText = styled( Truncate )`
+ 	color: ${ LIGHTER_TEXT_COLOR };
+ 	overflow-wrap: anywhere;
+ 
+-	[data-active-item]:not( [data-focus-visible] )
+-		*:not( ${ PopoverInnerWrapper } )
+-		&,
+-	[aria-disabled='true'] *:not( ${ PopoverInnerWrapper } ) & {
++	[data-active-item]:not( [data-focus-visible] ) *:not( ${ Menu } ) &,
++	[aria-disabled='true'] *:not( ${ Menu } ) & {
+ 		color: inherit;
+ 	}
+ `;

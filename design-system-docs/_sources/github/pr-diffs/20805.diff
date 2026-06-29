@@ -1,0 +1,702 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 75b5514dca1e96..537f6ea671988d 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -929,6 +929,12 @@
+ 		"markdown_source": "../packages/components/src/radio-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "RadioGroup",
++		"slug": "radio-group",
++		"markdown_source": "../packages/components/src/radio-group/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "RangeControl",
+ 		"slug": "range-control",
+diff --git a/packages/components/src/button-group/index.js b/packages/components/src/button-group/index.js
+index 6f4fb672c8c6ef..2ef2b5e94c6018 100644
+--- a/packages/components/src/button-group/index.js
++++ b/packages/components/src/button-group/index.js
+@@ -3,10 +3,15 @@
+  */
+ import classnames from 'classnames';
+ 
+-function ButtonGroup( { className, ...props } ) {
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++function ButtonGroup( { className, ...props }, ref ) {
+ 	const classes = classnames( 'components-button-group', className );
+ 
+-	return <div { ...props } className={ classes } role="group" />;
++	return <div ref={ ref } role="group" className={ classes } { ...props } />;
+ }
+ 
+-export default ButtonGroup;
++export default forwardRef( ButtonGroup );
+diff --git a/packages/components/src/date-time/test/__snapshots__/time.js.snap b/packages/components/src/date-time/test/__snapshots__/time.js.snap
+index e27e600f089f22..b65d4fddd151c0 100644
+--- a/packages/components/src/date-time/test/__snapshots__/time.js.snap
++++ b/packages/components/src/date-time/test/__snapshots__/time.js.snap
+@@ -317,7 +317,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is specified 1`]
+           value="00"
+         />
+       </div>
+-      <ButtonGroup
++      <ForwardRef(ButtonGroup)
+         className="components-datetime__time-field components-datetime__time-field-am-pm"
+       >
+         <ForwardRef(Button)
+@@ -336,7 +336,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is specified 1`]
+         >
+           PM
+         </ForwardRef(Button)>
+-      </ButtonGroup>
++      </ForwardRef(ButtonGroup)>
+     </div>
+   </fieldset>
+ </div>
+@@ -498,7 +498,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is true 1`] = `
+           value="00"
+         />
+       </div>
+-      <ButtonGroup
++      <ForwardRef(ButtonGroup)
+         className="components-datetime__time-field components-datetime__time-field-am-pm"
+       >
+         <ForwardRef(Button)
+@@ -517,7 +517,7 @@ exports[`TimePicker matches the snapshot when the is12hour prop is true 1`] = `
+         >
+           PM
+         </ForwardRef(Button)>
+-      </ButtonGroup>
++      </ForwardRef(ButtonGroup)>
+     </div>
+   </fieldset>
+ </div>
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 75ddd43d7daf71..f5142afb2f86e0 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -71,6 +71,8 @@ export { default as PanelRow } from './panel/row';
+ export { default as Placeholder } from './placeholder';
+ export { default as Popover } from './popover';
+ export { default as QueryControls } from './query-controls';
++export { default as __experimentalRadio } from './radio';
++export { default as __experimentalRadioGroup } from './radio-group';
+ export { default as RadioControl } from './radio-control';
+ export { default as RangeControl } from './range-control';
+ export { default as ResizableBox } from './resizable-box';
+diff --git a/packages/components/src/radio-context/index.js b/packages/components/src/radio-context/index.js
+new file mode 100644
+index 00000000000000..58a7783dcb84e0
+--- /dev/null
++++ b/packages/components/src/radio-context/index.js
+@@ -0,0 +1,11 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext } from '@wordpress/element';
++
++const RadioContext = createContext( {
++	state: null,
++	setState: () => {},
++} );
++
++export default RadioContext;
+diff --git a/packages/components/src/radio-control/README.md b/packages/components/src/radio-control/README.md
+index 2a55a81718fb15..f08f7da87b4953 100644
+--- a/packages/components/src/radio-control/README.md
++++ b/packages/components/src/radio-control/README.md
+@@ -121,3 +121,4 @@ A function that receives the value of the new option that is being selected as i
+ 
+ * To select one or more items from a set, use the `CheckboxControl` component.
+ * To toggle a single setting on or off, use the `ToggleControl` component.
++* To format as a button group, use the `RadioGroup` component.
+diff --git a/packages/components/src/radio-group/README.md b/packages/components/src/radio-group/README.md
+new file mode 100644
+index 00000000000000..7c6eab29b0bf1e
+--- /dev/null
++++ b/packages/components/src/radio-group/README.md
+@@ -0,0 +1,87 @@
++# RadioGroup
++
++Use a RadioGroup component when you want users to select one option from a small set of options.
++
++![RadioGroup component](https://wordpress.org/gutenberg/files/2018/12/s_96EC471FE9C9D91A996770229947AAB54A03351BDE98F444FD3C1BF0CED365EA_1541792995815_ButtonGroup.png)
++
++## Table of contents
++
++1. [Design guidelines](#design-guidelines)
++2. [Development guidelines](#development-guidelines)
++3. [Related components](#related-components)
++
++## Design guidelines
++
++### Usage
++
++#### Selected action
++
++Only one option in a radio group can be selected and active at a time. Selecting one option deselects any other.
++
++### Best practices
++
++Radio groups should:
++
++- **Be clearly and accurately labeled.**
++- **Clearly communicate that clicking or tapping will trigger an action.**
++- **Use established colors appropriately.** For example, only use red buttons for actions that are difficult or impossible to undo.
++- **Have consistent locations in the interface.**
++- **Have a default option already selected.**
++
++### States
++
++#### Active and available radio groups
++
++A radio group’s state makes it clear which option is active. Hover and focus states express the available selection options for buttons in a button group.
++
++#### Disabled radio groups
++
++Radio groups that cannot be selected can either be given a disabled state, or be hidden.
++
++## Development guidelines
++
++### Usage
++
++#### Controlled
++
++```jsx
++import { Radio, RadioGroup } from '@wordpress/components';
++import { useState } from '@wordpress/element';
++
++const MyControlledRadioRadioGroup = () => {
++	const [ checked, setChecked ] = useState( '25' );
++	return (
++		<RadioGroup accessibilityLabel="Width" onChange={ setChecked } checked={ checked }>
++			<Radio value="25">25%</Radio>
++			<Radio value="50">50%</Radio>
++			<Radio value="75">75%</Radio>
++			<Radio value="100">100%</Radio>
++		</RadioGroup>
++	);
++};
++```
++
++#### Uncontrolled
++
++When using the RadioGroup component as an uncontrolled component, the default value can be set with the `defaultChecked` prop.
++
++```jsx
++import { Radio, RadioGroup } from '@wordpress/components';
++import { useState } from '@wordpress/element';
++
++const MyUncontrolledRadioRadioGroup = () => {
++	return (
++		<RadioGroup accessibilityLabel="Width" defaultChecked="25">
++			<Radio value="25">25%</Radio>
++			<Radio value="50">50%</Radio>
++			<Radio value="75">75%</Radio>
++			<Radio value="100">100%</Radio>
++		</RadioGroup>
++	);
++};
++```
++
++## Related components
++
++- For simple buttons that are related, use a `ButtonGroup` component.
++- For traditional radio options, use a `RadioControl` component.
+diff --git a/packages/components/src/radio-group/index.js b/packages/components/src/radio-group/index.js
+new file mode 100644
+index 00000000000000..11f24605297923
+--- /dev/null
++++ b/packages/components/src/radio-group/index.js
+@@ -0,0 +1,53 @@
++/**
++ * External dependencies
++ */
++import { useRadioState, RadioGroup as ReakitRadioGroup } from 'reakit/Radio';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import ButtonGroup from '../button-group';
++import RadioContext from '../radio-context';
++
++function RadioGroup(
++	{
++		accessibilityLabel,
++		checked,
++		defaultChecked,
++		disabled,
++		onChange,
++		...props
++	},
++	ref
++) {
++	const radioState = useRadioState( {
++		state: defaultChecked,
++		baseId: props.id,
++	} );
++	const radioContext = {
++		...radioState,
++		disabled,
++		// controlled or uncontrolled
++		state: checked || radioState.state,
++		setState: onChange || radioState.setState,
++	};
++
++	return (
++		<RadioContext.Provider value={ radioContext }>
++			<ReakitRadioGroup
++				ref={ ref }
++				as={ ButtonGroup }
++				aria-label={ accessibilityLabel }
++				{ ...radioState }
++				{ ...props }
++			/>
++		</RadioContext.Provider>
++	);
++}
++
++export default forwardRef( RadioGroup );
+diff --git a/packages/components/src/radio-group/stories/index.js b/packages/components/src/radio-group/stories/index.js
+new file mode 100644
+index 00000000000000..5844cd82016b57
+--- /dev/null
++++ b/packages/components/src/radio-group/stories/index.js
+@@ -0,0 +1,71 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import Radio from '../../radio';
++import RadioGroup from '../';
++
++export default { title: 'Components/RadioGroup', component: RadioGroup };
++
++export const _default = () => {
++	/* eslint-disable no-restricted-syntax */
++	return (
++		<RadioGroup
++			// id is required for server side rendering
++			id="default-radiogroup"
++			accessibilityLabel="options"
++			defaultChecked="option2"
++		>
++			<Radio value="option1">Option 1</Radio>
++			<Radio value="option2">Option 2</Radio>
++			<Radio value="option3">Option 3</Radio>
++		</RadioGroup>
++	);
++	/* eslint-enable no-restricted-syntax */
++};
++
++export const disabled = () => {
++	/* eslint-disable no-restricted-syntax */
++	return (
++		<RadioGroup
++			// id is required for server side rendering
++			id="disabled-radiogroup"
++			disabled
++			accessibilityLabel="options"
++			defaultChecked="option2"
++		>
++			<Radio value="option1">Option 1</Radio>
++			<Radio value="option2">Option 2</Radio>
++			<Radio value="option3">Option 3</Radio>
++		</RadioGroup>
++	);
++	/* eslint-enable no-restricted-syntax */
++};
++
++const ControlledRadioGroupWithState = () => {
++	const [ checked, setChecked ] = useState( 'option2' );
++
++	/* eslint-disable no-restricted-syntax */
++	return (
++		<RadioGroup
++			// id is required for server side rendering
++			id="controlled-radiogroup"
++			accessibilityLabel="options"
++			checked={ checked }
++			onChange={ setChecked }
++		>
++			<Radio value="option1">Option 1</Radio>
++			<Radio value="option2">Option 2</Radio>
++			<Radio value="option3">Option 3</Radio>
++		</RadioGroup>
++	);
++	/* eslint-enable no-restricted-syntax */
++};
++
++export const controlled = () => {
++	return <ControlledRadioGroupWithState />;
++};
+diff --git a/packages/components/src/radio/index.js b/packages/components/src/radio/index.js
+new file mode 100644
+index 00000000000000..6d7305002e3fce
+--- /dev/null
++++ b/packages/components/src/radio/index.js
+@@ -0,0 +1,36 @@
++/**
++ * External dependencies
++ */
++import { Radio as ReakitRadio } from 'reakit/Radio';
++
++/**
++ * WordPress dependencies
++ */
++import { useContext, forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../button';
++import RadioContext from '../radio-context';
++
++function Radio( { children, value, ...props }, ref ) {
++	const radioContext = useContext( RadioContext );
++	const checked = radioContext.state === value;
++
++	return (
++		<ReakitRadio
++			ref={ ref }
++			as={ Button }
++			isPrimary={ checked }
++			isSecondary={ ! checked }
++			value={ value }
++			{ ...radioContext }
++			{ ...props }
++		>
++			{ children || value }
++		</ReakitRadio>
++	);
++}
++
++export default forwardRef( Radio );
+diff --git a/packages/components/src/radio/stories/index.js b/packages/components/src/radio/stories/index.js
+new file mode 100644
+index 00000000000000..b64c35ed7ba17f
+--- /dev/null
++++ b/packages/components/src/radio/stories/index.js
+@@ -0,0 +1,20 @@
++/**
++ * Internal dependencies
++ */
++import RadioGroup from '../../radio-group';
++import Radio from '../';
++
++export default { title: 'Components/Radio', component: Radio };
++
++export const _default = () => {
++	// Radio components must be a descendent of a RadioGroup component.
++	/* eslint-disable no-restricted-syntax */
++	return (
++		// id is required for server side rendering
++		<RadioGroup id="default-radiogroup" accessibilityLabel="options">
++			<Radio value="option1">Option 1</Radio>
++			<Radio value="option2">Option 2</Radio>
++		</RadioGroup>
++	);
++	/* eslint-enable no-restricted-syntax */
++};
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index 29079fd8792325..321b96d00f17af 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -4369,6 +4369,55 @@ exports[`Storyshots Components/Popover Positioning 1`] = `
+ </div>
+ `;
+ 
++exports[`Storyshots Components/Radio Default 1`] = `
++<div
++  aria-label="options"
++  className="components-button-group"
++  id="default-radiogroup"
++  onFocus={[Function]}
++  onKeyDown={[Function]}
++  onKeyUp={[Function]}
++  role="radiogroup"
++>
++  <button
++    aria-checked={false}
++    checked={false}
++    className="components-button is-secondary"
++    id="default-radiogroup-1"
++    onChange={[Function]}
++    onClick={[Function]}
++    onFocus={[Function]}
++    onKeyDown={[Function]}
++    onKeyUp={[Function]}
++    onMouseDown={[Function]}
++    role="radio"
++    tabIndex={-1}
++    type="radio"
++    value="option1"
++  >
++    Option 1
++  </button>
++  <button
++    aria-checked={false}
++    checked={false}
++    className="components-button is-secondary"
++    id="default-radiogroup-2"
++    onChange={[Function]}
++    onClick={[Function]}
++    onFocus={[Function]}
++    onKeyDown={[Function]}
++    onKeyUp={[Function]}
++    onMouseDown={[Function]}
++    role="radio"
++    tabIndex={-1}
++    type="radio"
++    value="option2"
++  >
++    Option 2
++  </button>
++</div>
++`;
++
+ exports[`Storyshots Components/RadioControl Default 1`] = `
+ <div
+   className="components-base-control components-radio-control"
+@@ -4520,6 +4569,225 @@ exports[`Storyshots Components/RadioControl With Help 1`] = `
+ </div>
+ `;
+ 
++exports[`Storyshots Components/RadioGroup Controlled 1`] = `
++<div
++  aria-label="options"
++  className="components-button-group"
++  id="controlled-radiogroup"
++  onFocus={[Function]}
++  onKeyDown={[Function]}
++  onKeyUp={[Function]}
++  role="radiogroup"
++>
++  <button
++    aria-checked={false}
++    checked={false}
++    className="components-button is-secondary"
++    id="controlled-radiogroup-1"
++    onChange={[Function]}
++    onClick={[Function]}
++    onFocus={[Function]}
++    onKeyDown={[Function]}
++    onKeyUp={[Function]}
++    onMouseDown={[Function]}
++    role="radio"
++    tabIndex={-1}
++    type="radio"
++    value="option1"
++  >
++    Option 1
++  </button>
++  <button
++    aria-checked={true}
++    checked={true}
++    className="components-button is-primary"
++    id="controlled-radiogroup-2"
++    onChange={[Function]}
++    onClick={[Function]}
++    onFocus={[Function]}
++    onKeyDown={[Function]}
++    onKeyUp={[Function]}
++    onMouseDown={[Function]}
++    role="radio"
++    tabIndex={-1}
++    type="radio"
++    value="option2"
++  >
++    Option 2
++  </button>
++  <button
++    aria-checked={false}
++    checked={false}
++    className="components-button is-secondary"
++    id="controlled-radiogroup-3"
++    onChange={[Function]}
++    onClick={[Function]}
++    onFocus={[Function]}
++    onKeyDown={[Function]}
++    onKeyUp={[Function]}
++    onMouseDown={[Function]}
++    role="radio"
++    tabIndex={-1}
++    type="radio"
++    value="option3"
++  >
++    Option 3
++  </button>
++</div>
++`;
++
++exports[`Storyshots Components/RadioGroup Default 1`] = `
++<div
++  aria-label="options"
++  className="components-button-group"
++  id="default-radiogroup"
++  onFocus={[Function]}
++  onKeyDown={[Function]}
++  onKeyUp={[Function]}
++  role="radiogroup"
++>
++  <button
++    aria-checked={false}
++    checked={false}
++    className="components-button is-secondary"
++    id="default-radiogroup-1"
++    onChange={[Function]}
++    onClick={[Function]}
++    onFocus={[Function]}
++    onKeyDown={[Function]}
++    onKeyUp={[Function]}
++    onMouseDown={[Function]}
++    role="radio"
++    tabIndex={-1}
++    type="radio"
++    value="option1"
++  >
++    Option 1
++  </button>
++  <button
++    aria-checked={true}
++    checked={true}
++    className="components-button is-primary"
++    id="default-radiogroup-2"
++    onChange={[Function]}
++    onClick={[Function]}
++    onFocus={[Function]}
++    onKeyDown={[Function]}
++    onKeyUp={[Function]}
++    onMouseDown={[Function]}
++    role="radio"
++    tabIndex={-1}
++    type="radio"
++    value="option2"
++  >
++    Option 2
++  </button>
++  <button
++    aria-checked={false}
++    checked={false}
++    className="components-button is-secondary"
++    id="default-radiogroup-3"
++    onChange={[Function]}
++    onClick={[Function]}
++    onFocus={[Function]}
++    onKeyDown={[Function]}
++    onKeyUp={[Function]}
++    onMouseDown={[Function]}
++    role="radio"
++    tabIndex={-1}
++    type="radio"
++    value="option3"
++  >
++    Option 3
++  </button>
++</div>
++`;
++
++exports[`Storyshots Components/RadioGroup Disabled 1`] = `
++<div
++  aria-label="options"
++  className="components-button-group"
++  id="disabled-radiogroup"
++  onFocus={[Function]}
++  onKeyDown={[Function]}
++  onKeyUp={[Function]}
++  role="radiogroup"
++>
++  <button
++    aria-checked={false}
++    aria-disabled={true}
++    checked={false}
++    className="components-button is-secondary"
++    disabled={true}
++    id="disabled-radiogroup-1"
++    onChange={[Function]}
++    onClick={[Function]}
++    onFocus={[Function]}
++    onKeyDown={[Function]}
++    onKeyUp={[Function]}
++    onMouseDown={[Function]}
++    role="radio"
++    style={
++      Object {
++        "pointerEvents": "none",
++      }
++    }
++    type="radio"
++    value="option1"
++  >
++    Option 1
++  </button>
++  <button
++    aria-checked={true}
++    aria-disabled={true}
++    checked={true}
++    className="components-button is-primary"
++    disabled={true}
++    id="disabled-radiogroup-2"
++    onChange={[Function]}
++    onClick={[Function]}
++    onFocus={[Function]}
++    onKeyDown={[Function]}
++    onKeyUp={[Function]}
++    onMouseDown={[Function]}
++    role="radio"
++    style={
++      Object {
++        "pointerEvents": "none",
++      }
++    }
++    type="radio"
++    value="option2"
++  >
++    Option 2
++  </button>
++  <button
++    aria-checked={false}
++    aria-disabled={true}
++    checked={false}
++    className="components-button is-secondary"
++    disabled={true}
++    id="disabled-radiogroup-3"
++    onChange={[Function]}
++    onClick={[Function]}
++    onFocus={[Function]}
++    onKeyDown={[Function]}
++    onKeyUp={[Function]}
++    onMouseDown={[Function]}
++    role="radio"
++    style={
++      Object {
++        "pointerEvents": "none",
++      }
++    }
++    type="radio"
++    value="option3"
++  >
++    Option 3
++  </button>
++</div>
++`;
++
+ exports[`Storyshots Components/RangeControl Custom Marks 1`] = `
+ .emotion-36 {
+   -webkit-tap-highlight-color: transparent;

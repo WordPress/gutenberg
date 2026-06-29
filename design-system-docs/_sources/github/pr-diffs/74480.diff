@@ -1,0 +1,32 @@
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index ca4533c679108b..c3edbaccbc65ea 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -167,15 +167,21 @@ export function UnforwardedButton(
+ 	const trulyDisabled = disabled && ! accessibleWhenDisabled;
+ 	const Tag = href !== undefined && ! disabled ? 'a' : 'button';
+ 	const buttonProps: ComponentPropsWithoutRef< 'button' > =
+-		Tag === 'button'
+-			? {
+-					type: 'button',
+-					disabled: trulyDisabled,
++	Tag === 'button'
++		? {
++				type: 'button',
++				disabled: trulyDisabled,
++				...( ariaChecked !== undefined && {
+ 					'aria-checked': ariaChecked,
++				} ),
++				...( ariaPressed !== undefined && {
+ 					'aria-pressed': ariaPressed,
++				} ),
++				...( ariaSelected !== undefined && {
+ 					'aria-selected': ariaSelected,
+-			  }
+-			: {};
++				} ),
++		  }
++		: {};
+ 	const anchorProps: ComponentPropsWithoutRef< 'a' > =
+ 		Tag === 'a' ? { href, target } : {};
+ 

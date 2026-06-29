@@ -1,0 +1,556 @@
+diff --git a/packages/components/src/dashicon/index.js b/packages/components/src/dashicon/index.js
+index e2f54deed1f9b2..97f90b70bf4fde 100644
+--- a/packages/components/src/dashicon/index.js
++++ b/packages/components/src/dashicon/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * @typedef OwnProps
+  *
+- * @property {string} icon        Icon name
++ * @property {import('./types').IconKey} icon Icon name
+  * @property {string} [className] Class name
+  */
+ /** @typedef {import('react').ComponentPropsWithoutRef<'span'> & OwnProps} Props */
+diff --git a/packages/components/src/dashicon/types.ts b/packages/components/src/dashicon/types.ts
+new file mode 100644
+index 00000000000000..a8be986a606a3a
+--- /dev/null
++++ b/packages/components/src/dashicon/types.ts
+@@ -0,0 +1,345 @@
++export type IconKey =
++	| 'admin-appearance'
++	| 'admin-collapse'
++	| 'admin-comments'
++	| 'admin-customizer'
++	| 'admin-generic'
++	| 'admin-home'
++	| 'admin-links'
++	| 'admin-media'
++	| 'admin-multisite'
++	| 'admin-network'
++	| 'admin-page'
++	| 'admin-plugins'
++	| 'admin-post'
++	| 'admin-settings'
++	| 'admin-site-alt'
++	| 'admin-site-alt2'
++	| 'admin-site-alt3'
++	| 'admin-site'
++	| 'admin-tools'
++	| 'admin-users'
++	| 'airplane'
++	| 'album'
++	| 'align-center'
++	| 'align-full-width'
++	| 'align-left'
++	| 'align-none'
++	| 'align-pull-left'
++	| 'align-pull-right'
++	| 'align-right'
++	| 'align-wide'
++	| 'amazon'
++	| 'analytics'
++	| 'archive'
++	| 'arrow-down-alt'
++	| 'arrow-down-alt2'
++	| 'arrow-down'
++	| 'arrow-left-alt'
++	| 'arrow-left-alt2'
++	| 'arrow-left'
++	| 'arrow-right-alt'
++	| 'arrow-right-alt2'
++	| 'arrow-right'
++	| 'arrow-up-alt'
++	| 'arrow-up-alt2'
++	| 'arrow-up'
++	| 'arrow-up-duplicate'
++	| 'art'
++	| 'awards'
++	| 'backup'
++	| 'bank'
++	| 'beer'
++	| 'bell'
++	| 'block-default'
++	| 'book-alt'
++	| 'book'
++	| 'buddicons-activity'
++	| 'buddicons-bbpress-logo'
++	| 'buddicons-buddypress-logo'
++	| 'buddicons-community'
++	| 'buddicons-forums'
++	| 'buddicons-friends'
++	| 'buddicons-groups'
++	| 'buddicons-pm'
++	| 'buddicons-replies'
++	| 'buddicons-topics'
++	| 'buddicons-tracking'
++	| 'building'
++	| 'businessman'
++	| 'businessperson'
++	| 'businesswoman'
++	| 'button'
++	| 'calculator'
++	| 'camera-alt'
++	| 'car'
++	| 'calendar-alt'
++	| 'calendar'
++	| 'camera'
++	| 'carrot'
++	| 'cart'
++	| 'category'
++	| 'chart-area'
++	| 'chart-bar'
++	| 'chart-line'
++	| 'chart-pie'
++	| 'clipboard'
++	| 'clock'
++	| 'cloud-saved'
++	| 'cloud-upload'
++	| 'cloud'
++	| 'columns'
++	| 'code-standards'
++	| 'coffee'
++	| 'color-picker'
++	| 'controls-back'
++	| 'controls-forward'
++	| 'controls-pause'
++	| 'controls-play'
++	| 'controls-repeat'
++	| 'controls-skipback'
++	| 'controls-skipforward'
++	| 'controls-volumeoff'
++	| 'controls-volumeon'
++	| 'cover-image'
++	| 'dashboard'
++	| 'database'
++	| 'database-add'
++	| 'database-export'
++	| 'database-import'
++	| 'database-remove'
++	| 'database-view'
++	| 'desktop'
++	| 'dismiss'
++	| 'download'
++	| 'drumstick'
++	| 'edit'
++	| 'edit-large'
++	| 'edit-page'
++	| 'editor-aligncenter'
++	| 'editor-alignleft'
++	| 'editor-alignright'
++	| 'editor-bold'
++	| 'editor-break'
++	| 'editor-code'
++	| 'editor-code-duplicate'
++	| 'editor-contract'
++	| 'editor-customchar'
++	| 'editor-expand'
++	| 'editor-help'
++	| 'editor-indent'
++	| 'editor-insertmore'
++	| 'editor-italic'
++	| 'editor-justify'
++	| 'editor-kitchensink'
++	| 'editor-ltr'
++	| 'editor-ol-rtl'
++	| 'editor-ol'
++	| 'editor-outdent'
++	| 'editor-paragraph'
++	| 'editor-paste-text'
++	| 'editor-paste-word'
++	| 'editor-quote'
++	| 'editor-removeformatting'
++	| 'editor-rtl'
++	| 'editor-spellcheck'
++	| 'editor-strikethrough'
++	| 'editor-table'
++	| 'editor-textcolor'
++	| 'editor-ul'
++	| 'editor-underline'
++	| 'editor-unlink'
++	| 'editor-video'
++	| 'ellipsis'
++	| 'email-alt'
++	| 'email-alt2'
++	| 'email'
++	| 'embed-audio'
++	| 'embed-generic'
++	| 'embed-photo'
++	| 'embed-post'
++	| 'embed-video'
++	| 'excerpt-view'
++	| 'exit'
++	| 'external'
++	| 'facebook-alt'
++	| 'facebook'
++	| 'feedback'
++	| 'filter'
++	| 'flag'
++	| 'food'
++	| 'format-aside'
++	| 'format-audio'
++	| 'format-chat'
++	| 'format-gallery'
++	| 'format-image'
++	| 'format-quote'
++	| 'format-status'
++	| 'format-video'
++	| 'forms'
++	| 'fullscreen-alt'
++	| 'fullscreen-exit-alt'
++	| 'games'
++	| 'google'
++	| 'googleplus'
++	| 'grid-view'
++	| 'groups'
++	| 'hammer'
++	| 'heading'
++	| 'heart'
++	| 'hidden'
++	| 'hourglass'
++	| 'html'
++	| 'id-alt'
++	| 'id'
++	| 'image-crop'
++	| 'image-filter'
++	| 'image-flip-horizontal'
++	| 'image-flip-vertical'
++	| 'image-rotate-left'
++	| 'image-rotate-right'
++	| 'image-rotate'
++	| 'images-alt'
++	| 'images-alt2'
++	| 'index-card'
++	| 'info-outline'
++	| 'info'
++	| 'insert-after'
++	| 'insert-before'
++	| 'insert'
++	| 'instagram'
++	| 'keyboard-hide'
++	| 'laptop'
++	| 'layout'
++	| 'leftright'
++	| 'lightbulb'
++	| 'list-view'
++	| 'linkedin'
++	| 'location-alt'
++	| 'location'
++	| 'lock-duplicate'
++	| 'lock'
++	| 'marker'
++	| 'media-archive'
++	| 'media-audio'
++	| 'media-code'
++	| 'media-default'
++	| 'media-document'
++	| 'media-interactive'
++	| 'media-spreadsheet'
++	| 'media-text'
++	| 'media-video'
++	| 'megaphone'
++	| 'menu-alt'
++	| 'menu-alt2'
++	| 'menu-alt3'
++	| 'menu'
++	| 'money-alt'
++	| 'microphone'
++	| 'migrate'
++	| 'minus'
++	| 'money'
++	| 'move'
++	| 'nametag'
++	| 'networking'
++	| 'no-alt'
++	| 'no'
++	| 'open-folder'
++	| 'palmtree'
++	| 'paperclip'
++	| 'performance'
++	| 'pets'
++	| 'pdf'
++	| 'phone'
++	| 'pinterest'
++	| 'playlist-audio'
++	| 'playlist-video'
++	| 'plus-alt'
++	| 'plus-light'
++	| 'plus'
++	| 'portfolio'
++	| 'post-status'
++	| 'pressthis'
++	| 'products'
++	| 'plugins-checked'
++	| 'plus-alt2'
++	| 'podio'
++	| 'printer'
++	| 'privacy'
++	| 'randomize'
++	| 'reddit'
++	| 'redo'
++	| 'remove'
++	| 'rest-api'
++	| 'rss'
++	| 'saved'
++	| 'schedule'
++	| 'screenoptions'
++	| 'search'
++	| 'share-alt'
++	| 'share-alt2'
++	| 'share'
++	| 'shield-alt'
++	| 'shield'
++	| 'shortcode'
++	| 'slides'
++	| 'smartphone'
++	| 'smiley'
++	| 'sort'
++	| 'sos'
++	| 'star-empty'
++	| 'star-filled'
++	| 'star-half'
++	| 'sticky'
++	| 'store'
++	| 'spotify'
++	| 'superhero'
++	| 'superhero-alt'
++	| 'table-col-after'
++	| 'table-col-before'
++	| 'table-col-delete'
++	| 'table-row-after'
++	| 'table-row-before'
++	| 'table-row-delete'
++	| 'tablet'
++	| 'tag'
++	| 'tagcloud'
++	| 'testimonial'
++	| 'text'
++	| 'text-page'
++	| 'thumbs-down'
++	| 'thumbs-up'
++	| 'tickets-alt'
++	| 'tickets'
++	| 'tide'
++	| 'translation'
++	| 'trash'
++	| 'twitch'
++	| 'twitter'
++	| 'twitter-alt'
++	| 'undo'
++	| 'universal-access-alt'
++	| 'universal-access'
++	| 'unlock'
++	| 'update-alt'
++	| 'update'
++	| 'upload'
++	| 'vault'
++	| 'video-alt'
++	| 'video-alt2'
++	| 'video-alt3'
++	| 'visibility'
++	| 'warning'
++	| 'welcome-add-page'
++	| 'welcome-comments'
++	| 'welcome-learn-more'
++	| 'welcome-view-site'
++	| 'welcome-widgets-menus'
++	| 'welcome-write-blog'
++	| 'whatsapp'
++	| 'wordpress-alt'
++	| 'wordpress'
++	| 'xing'
++	| 'yes-alt'
++	| 'yes'
++	| 'youtube';
+diff --git a/packages/components/src/icon/index.js b/packages/components/src/icon/index.js
+deleted file mode 100644
+index 225964a2e79aee..00000000000000
+--- a/packages/components/src/icon/index.js
++++ /dev/null
+@@ -1,62 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import {
+-	cloneElement,
+-	createElement,
+-	Component,
+-	isValidElement,
+-} from '@wordpress/element';
+-import { SVG } from '@wordpress/primitives';
+-
+-/**
+- * Internal dependencies
+- */
+-import Dashicon from '../dashicon';
+-
+-function Icon( { icon = null, size, ...additionalProps } ) {
+-	if ( 'string' === typeof icon ) {
+-		return <Dashicon icon={ icon } { ...additionalProps } />;
+-	}
+-
+-	if ( icon && Dashicon === icon.type ) {
+-		return cloneElement( icon, {
+-			...additionalProps,
+-		} );
+-	}
+-
+-	// Icons should be 24x24 by default.
+-	const iconSize = size || 24;
+-	if ( 'function' === typeof icon ) {
+-		if ( icon.prototype instanceof Component ) {
+-			return createElement( icon, {
+-				size: iconSize,
+-				...additionalProps,
+-			} );
+-		}
+-
+-		return icon( { size: iconSize, ...additionalProps } );
+-	}
+-
+-	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
+-		const appliedProps = {
+-			width: iconSize,
+-			height: iconSize,
+-			...icon.props,
+-			...additionalProps,
+-		};
+-
+-		return <SVG { ...appliedProps } />;
+-	}
+-
+-	if ( isValidElement( icon ) ) {
+-		return cloneElement( icon, {
+-			size: iconSize,
+-			...additionalProps,
+-		} );
+-	}
+-
+-	return icon;
+-}
+-
+-export default Icon;
+diff --git a/packages/components/src/icon/index.tsx b/packages/components/src/icon/index.tsx
+new file mode 100644
+index 00000000000000..e4f10d0e7fdbe5
+--- /dev/null
++++ b/packages/components/src/icon/index.tsx
+@@ -0,0 +1,106 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { ComponentType, HTMLProps, SVGProps } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import {
++	cloneElement,
++	createElement,
++	Component,
++	isValidElement,
++} from '@wordpress/element';
++import { SVG } from '@wordpress/primitives';
++
++/**
++ * Internal dependencies
++ */
++import Dashicon from '../dashicon';
++import type { IconKey as DashiconIconKey } from '../dashicon/types';
++
++type IconType< P > = DashiconIconKey | ComponentType< P > | JSX.Element;
++
++interface BaseProps< P > {
++	/**
++	 * The icon to render. Supported values are: Dashicons (specified as
++	 * strings), functions, Component instances and `null`.
++	 *
++	 * @default null
++	 */
++	icon?: IconType< P > | null;
++	/**
++	 * The size (width and height) of the icon.
++	 *
++	 * @default 24
++	 */
++	size?: number;
++}
++
++type AdditionalProps< T > = T extends ComponentType< infer U >
++	? U
++	: T extends DashiconIconKey
++	? SVGProps< SVGSVGElement >
++	: {};
++
++export type Props< P > = BaseProps< P > & AdditionalProps< IconType< P > >;
++
++function Icon< P >( {
++	icon = null,
++	size = 24,
++	...additionalProps
++}: Props< P > ) {
++	if ( 'string' === typeof icon ) {
++		return (
++			<Dashicon
++				icon={ icon }
++				{ ...( additionalProps as HTMLProps< HTMLSpanElement > ) }
++			/>
++		);
++	}
++
++	if ( isValidElement( icon ) && Dashicon === icon.type ) {
++		return cloneElement( icon, {
++			...additionalProps,
++		} );
++	}
++
++	if ( 'function' === typeof icon ) {
++		if ( icon.prototype instanceof Component ) {
++			return createElement( icon, ( {
++				size,
++				...additionalProps,
++			} as unknown ) as P );
++		}
++
++		return ( icon as ( ...args: any[] ) => JSX.Element )( {
++			size,
++			...additionalProps,
++		} );
++	}
++
++	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
++		const appliedProps = {
++			width: size,
++			height: size,
++			...icon.props,
++			...additionalProps,
++		};
++
++		return <SVG { ...appliedProps } />;
++	}
++
++	if ( isValidElement( icon ) ) {
++		return cloneElement( icon, {
++			// @ts-ignore Just forwarding the size prop along
++			size,
++			...additionalProps,
++		} );
++	}
++
++	return icon;
++}
++
++export default Icon;
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index ca00ff32d3db98..e7f194dfb19cbd 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -27,6 +27,7 @@
+ 		"src/flex/**/*",
+ 		"src/form-group/**/*",
+ 		"src/heading/**/*",
++		"src/icon/**/*",
+ 		"src/scroll-lock/**/*",
+ 		"src/shortcut/**/*",
+ 		"src/spinner/**/*",

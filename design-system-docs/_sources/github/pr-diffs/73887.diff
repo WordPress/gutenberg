@@ -1,0 +1,1315 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6131133f8774f2..b88a9dea4eb608 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -37,6 +37,8 @@
+ 
+ -   `Modal`: Fix vertical scroll issue by reducing style specificity to allow overrides. ([#73739](https://github.com/WordPress/gutenberg/pull/73739))
+ -   `Notice`: Fix notice component spacing issue when actions are present. ([#69430](https://github.com/WordPress/gutenberg/pull/69430))
++-   `DatePicker`: Fix missing scheduled events and current date indicators. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
++-   `DatePicker`: Fix handling of `currentDate` when passed values as Date or timestamp. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/date-time/constants.ts b/packages/components/src/date-time/constants.ts
+index ebd88aaf7d4186..750f0747d37fd0 100644
+--- a/packages/components/src/date-time/constants.ts
++++ b/packages/components/src/date-time/constants.ts
+@@ -1 +1 @@
+-export const TIMEZONELESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
++export const TIMEZONELESS_FORMAT = 'Y-m-d\\TH:i:s';
+diff --git a/packages/components/src/date-time/date-time/test/index.tsx b/packages/components/src/date-time/date-time/test/index.tsx
+index 69325bbc503bcc..4237b567f398cd 100644
+--- a/packages/components/src/date-time/date-time/test/index.tsx
++++ b/packages/components/src/date-time/date-time/test/index.tsx
+@@ -58,17 +58,17 @@ describe( 'DateTimePicker', () => {
+ 			} )
+ 		).toBeVisible();
+ 
+-		onChange.mockImplementation( ( newDate ) => {
+-			rerender(
+-				<DateTimePicker currentDate={ newDate } onChange={ onChange } />
+-			);
+-		} );
+-
+ 		await user.click(
+ 			screen.getByRole( 'button', { name: 'November 20, 2025' } )
+ 		);
+ 
+ 		expect( onChange ).toHaveBeenCalledWith( '2025-11-20T00:00:00' );
++
++		const nextDate = onChange.mock.calls[ 0 ][ 0 ];
++		rerender(
++			<DateTimePicker currentDate={ nextDate } onChange={ onChange } />
++		);
++
+ 		expect(
+ 			screen.getByRole( 'button', {
+ 				name: 'November 20, 2025. Selected',
+@@ -156,34 +156,251 @@ describe( 'DateTimePicker', () => {
+ 							} )
+ 						).toBeVisible();
+ 
+-						onChange.mockImplementation( ( newDate ) => {
+-							rerender(
+-								<DateTimePicker
+-									currentDate={ newDate }
+-									onChange={ onChange }
+-								/>
+-							);
+-						} );
+-
+ 						await user.click(
+ 							screen.getByRole( 'button', { name: clickButton } )
+ 						);
+ 
++						expect( onChange ).toHaveBeenCalledWith( expectedDate );
++
++						const nextDate = onChange.mock.calls[ 0 ][ 0 ];
++						rerender(
++							<DateTimePicker
++								currentDate={ nextDate }
++								onChange={ onChange }
++							/>
++						);
++
+ 						expect( screen.getByLabelText( 'Day' ) ).toHaveValue(
+ 							expectedDay
+ 						);
+-						expect( onChange ).toHaveBeenCalledWith( expectedDate );
+ 						expect(
+ 							screen.getByRole( 'button', {
+ 								name: selectedButton,
+ 							} )
+ 						).toBeVisible();
+ 					} );
++
++					it( 'should display event indicators correctly', () => {
++						// Test event indicators, where Date objects constructed
++						// from timezoneless strings are passed to the component
++						// and thus are interpreted in browser timezone.
++
++						timezoneMock.register( timezone );
++
++						render(
++							<DateTimePicker
++								currentDate={ initialDate }
++								events={ [ { date: new Date( initialDate ) } ] }
++							/>
++						);
++
++						expect(
++							screen.getByRole( 'button', {
++								name: `${ initialButton }. There is 1 event`,
++							} )
++						).toBeVisible();
++					} );
+ 				}
+ 			);
+ 		} );
+ 	} );
+ 
++	describe( 'input types with timezone variations', () => {
++		afterEach( () => {
++			jest.useRealTimers();
++			timezoneMock.unregister();
++		} );
++
++		function transformOnChangeToDate( nextValue: string ): Date {
++			// Timezoneless string represents site timezone. Convert to UTC
++			// instant in site timezone. In typical usage, consumers should
++			// align `@wordpress/date` settings to match their browser timezone
++			// when working with dates, to avoid having to manage this
++			// conversion themselves.
++			const settings = getSettings();
++			const offsetMs = settings.timezone.offset * 60 * 60 * 1000;
++			const asUTC = new Date( nextValue + 'Z' );
++			return new Date( asUTC.getTime() - offsetMs );
++		}
++
++		describe.each( [
++			{
++				direction: 'browser behind site',
++				timezone: 'US/Pacific' as const,
++			},
++			{
++				direction: 'browser matches site',
++				timezone: 'US/Eastern' as const,
++			},
++			{
++				direction: 'browser ahead of site',
++				timezone: 'Australia/Adelaide' as const,
++			},
++		] )( '$direction', ( { timezone } ) => {
++			// Input types should be treated assuming the timezone offset configured
++			// through `@wordpress/date` settings, i.e. the site's timezone. Inputs
++			// representing the same site timezone time should display and output
++			// identically. The site timezone in these tests is UTC-5 (set in
++			// beforeAll), where 20:00 site time = 01:00 UTC the next day.
++			describe.each( [
++				{
++					type: 'timezoneless string',
++					initialDate: '2025-11-15T20:00:00',
++					transformOnChange: ( nextValue: string ) => nextValue,
++				},
++				{
++					type: 'string with timezone',
++					initialDate: '2025-11-16T01:00:00Z',
++					transformOnChange: ( nextValue: string ) =>
++						transformOnChangeToDate( nextValue ).toISOString(),
++				},
++				{
++					type: 'Date object',
++					initialDate: new Date( Date.UTC( 2025, 10, 16, 1, 0, 0 ) ),
++					transformOnChange: transformOnChangeToDate,
++				},
++				{
++					type: 'timestamp',
++					initialDate: Date.UTC( 2025, 10, 16, 1, 0, 0 ),
++					transformOnChange: ( nextValue: string ) =>
++						transformOnChangeToDate( nextValue ).getTime(),
++				},
++				{
++					type: 'undefined',
++					initialDate: undefined,
++					transformOnChange: ( nextValue: string ) => nextValue,
++				},
++			] )( 'with $type', ( { initialDate, transformOnChange } ) => {
++				it( 'should display and select dates according to site timezone', async () => {
++					timezoneMock.register( timezone );
++
++					// Normalize "current" time to the same time, so we can
++					// assert the same behavior between undefined or explicitly
++					// set initial dates.
++					let user: ReturnType< typeof userEvent.setup >;
++					if ( initialDate === undefined ) {
++						jest.useFakeTimers();
++						jest.setSystemTime( Date.UTC( 2025, 10, 16, 1, 0, 0 ) );
++						user = userEvent.setup( {
++							advanceTimers: jest.advanceTimersByTime,
++						} );
++					} else {
++						user = userEvent.setup();
++					}
++
++					const onChange = jest.fn();
++					const { rerender } = render(
++						<DateTimePicker
++							currentDate={ initialDate }
++							onChange={ onChange }
++						/>
++					);
++
++					// Should display the correct initial date and time assuming
++					// settings for the current site. If incorrectly using UTC,
++					// this would show Nov 16 at 01:00 instead of Nov 15 at 20:00.
++					//
++					// When initialDate is undefined, the fake time is set to
++					// Nov 16 01:00 UTC (Nov 15 20:00 site time), in which case the
++					// current date of Nov 15 is both "Selected" and "Today".
++					expect(
++						screen.getByRole( 'button', {
++							name:
++								initialDate === undefined
++									? 'November 15, 2025. Selected. Today'
++									: 'November 15, 2025. Selected',
++						} )
++					).toBeVisible();
++					expect( screen.getByLabelText( 'Hours' ) ).toHaveValue(
++						20
++					);
++					expect( screen.getByLabelText( 'Minutes' ) ).toHaveValue(
++						0
++					);
++
++					await user.click(
++						screen.getByRole( 'button', {
++							name: 'November 20, 2025',
++						} )
++					);
++
++					// Changing date should preserve the time, calling onChange with
++					// a timezoneless string. The timezoneless string is assumed to
++					// represent the site timezone.
++					expect( onChange ).toHaveBeenCalledWith(
++						'2025-11-20T20:00:00'
++					);
++
++					let nextDate = onChange.mock.calls[ 0 ][ 0 ];
++					rerender(
++						<DateTimePicker
++							currentDate={ transformOnChange( nextDate ) }
++							onChange={ onChange }
++						/>
++					);
++
++					expect(
++						screen.getByRole( 'button', {
++							name: 'November 20, 2025. Selected',
++						} )
++					).toBeVisible();
++					expect( screen.getByLabelText( 'Hours' ) ).toHaveValue(
++						20
++					);
++					expect( screen.getByLabelText( 'Minutes' ) ).toHaveValue(
++						0
++					);
++
++					// Changing the time should output timezoneless string with
++					// only the updated hour, and not changing the date.
++					onChange.mockClear();
++					const hoursInput = screen.getByLabelText( 'Hours' );
++					await user.clear( hoursInput );
++					await user.type( hoursInput, '22' );
++					await user.keyboard( '{Tab}' );
++					expect( onChange ).toHaveBeenCalledWith(
++						'2025-11-20T22:00:00'
++					);
++
++					nextDate = onChange.mock.calls[ 0 ][ 0 ];
++					rerender(
++						<DateTimePicker
++							currentDate={ transformOnChange( nextDate ) }
++							onChange={ onChange }
++						/>
++					);
++
++					expect( screen.getByLabelText( 'Hours' ) ).toHaveValue(
++						22
++					);
++					expect( screen.getByLabelText( 'Minutes' ) ).toHaveValue(
++						0
++					);
++
++					// Ensure week boundaries keyboard navigation is calculated
++					// correctly in the configured timezone, not the browser's.
++					await user.click(
++						screen.getByRole( 'button', {
++							name: 'November 20, 2025. Selected',
++						} )
++					);
++					await user.keyboard( '{Home}' );
++					expect(
++						screen.getByRole( 'button', {
++							name: 'November 16, 2025',
++						} )
++					).toHaveFocus();
++					await user.keyboard( '{End}' );
++					expect(
++						screen.getByRole( 'button', {
++							name: 'November 22, 2025',
++						} )
++					).toHaveFocus();
++				} );
++			} );
++		} );
++	} );
++
+ 	it( 'should preserve time when changing date', async () => {
+ 		const user = userEvent.setup();
+ 		const onChange = jest.fn();
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index 136e9040a26240..33f44dd92af43f 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -2,18 +2,15 @@
+  * External dependencies
+  */
+ import {
+-	format,
+ 	isSameDay,
+ 	subMonths,
+ 	addMonths,
+-	startOfDay,
+ 	isEqual,
+ 	addDays,
++	subDays,
+ 	subWeeks,
+ 	addWeeks,
+ 	isSameMonth,
+-	startOfWeek,
+-	endOfWeek,
+ } from 'date-fns';
+ import type { KeyboardEventHandler } from 'react';
+ 
+@@ -22,7 +19,7 @@ import type { KeyboardEventHandler } from 'react';
+  */
+ import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
+ import { arrowLeft, arrowRight } from '@wordpress/icons';
+-import { getSettings, gmdateI18n } from '@wordpress/date';
++import { dateI18n, date as formatDate, getSettings } from '@wordpress/date';
+ import { useState, useRef, useEffect } from '@wordpress/element';
+ 
+ /**
+@@ -40,7 +37,11 @@ import {
+ 	DayOfWeek,
+ 	DayButton,
+ } from './styles';
+-import { inputToDate } from '../utils';
++import {
++	inputToDate,
++	setInConfiguredTimezone,
++	startOfDayInConfiguredTimezone,
++} from '../utils';
+ import { TIMEZONELESS_FORMAT } from '../constants';
+ 
+ /**
+@@ -70,7 +71,7 @@ export function DatePicker( {
+ 	onMonthPreviewed,
+ 	startOfWeek: weekStartsOn = 0,
+ }: DatePickerProps ) {
+-	const date = currentDate ? inputToDate( currentDate ) : new Date();
++	const date = inputToDate( currentDate ?? new Date() );
+ 
+ 	const {
+ 		calendar,
+@@ -81,14 +82,16 @@ export function DatePicker( {
+ 		viewPreviousMonth,
+ 		viewNextMonth,
+ 	} = useLilius( {
+-		selected: [ startOfDay( date ) ],
+-		viewing: startOfDay( date ),
++		selected: [ startOfDayInConfiguredTimezone( date ) ],
++		viewing: startOfDayInConfiguredTimezone( date ),
+ 		weekStartsOn,
+ 	} );
+ 
+ 	// Used to implement a roving tab index. Tracks the day that receives focus
+ 	// when the user tabs into the calendar.
+-	const [ focusable, setFocusable ] = useState( startOfDay( date ) );
++	const [ focusable, setFocusable ] = useState(
++		startOfDayInConfiguredTimezone( date )
++	);
+ 
+ 	// Allows us to only programmatically focus() a day when focus was already
+ 	// within the calendar. This stops us stealing focus from e.g. a TimePicker
+@@ -100,9 +103,9 @@ export function DatePicker( {
+ 	const [ prevCurrentDate, setPrevCurrentDate ] = useState( currentDate );
+ 	if ( currentDate !== prevCurrentDate ) {
+ 		setPrevCurrentDate( currentDate );
+-		setSelected( [ startOfDay( date ) ] );
+-		setViewing( startOfDay( date ) );
+-		setFocusable( startOfDay( date ) );
++		setSelected( [ startOfDayInConfiguredTimezone( date ) ] );
++		setViewing( startOfDayInConfiguredTimezone( date ) );
++		setFocusable( startOfDayInConfiguredTimezone( date ) );
+ 	}
+ 
+ 	return (
+@@ -119,18 +122,26 @@ export function DatePicker( {
+ 					onClick={ () => {
+ 						viewPreviousMonth();
+ 						setFocusable( subMonths( focusable, 1 ) );
++						const prevMonth = subMonths( viewing, 1 );
+ 						onMonthPreviewed?.(
+-							format(
+-								subMonths( viewing, 1 ),
+-								TIMEZONELESS_FORMAT
++							dateI18n(
++								TIMEZONELESS_FORMAT,
++								prevMonth,
++								-prevMonth.getTimezoneOffset()
+ 							)
+ 						);
+ 					} }
+ 					size="compact"
+ 				/>
+ 				<NavigatorHeading level={ 3 }>
+-					<strong>{ gmdateI18n( 'F', viewing ) }</strong>{ ' ' }
+-					{ gmdateI18n( 'Y', viewing ) }
++					<strong>
++						{ dateI18n(
++							'F',
++							viewing,
++							-viewing.getTimezoneOffset()
++						) }
++					</strong>{ ' ' }
++					{ dateI18n( 'Y', viewing, -viewing.getTimezoneOffset() ) }
+ 				</NavigatorHeading>
+ 				<ViewNextMonthButton
+ 					icon={ isRTL() ? arrowLeft : arrowRight }
+@@ -139,10 +150,12 @@ export function DatePicker( {
+ 					onClick={ () => {
+ 						viewNextMonth();
+ 						setFocusable( addMonths( focusable, 1 ) );
++						const nextMonth = addMonths( viewing, 1 );
+ 						onMonthPreviewed?.(
+-							format(
+-								addMonths( viewing, 1 ),
+-								TIMEZONELESS_FORMAT
++							dateI18n(
++								TIMEZONELESS_FORMAT,
++								nextMonth,
++								-nextMonth.getTimezoneOffset()
+ 							)
+ 						);
+ 					} }
+@@ -155,7 +168,7 @@ export function DatePicker( {
+ 			>
+ 				{ calendar[ 0 ][ 0 ].map( ( day ) => (
+ 					<DayOfWeek key={ day.toString() }>
+-						{ gmdateI18n( 'D', day ) }
++						{ dateI18n( 'D', day, -day.getTimezoneOffset() ) }
+ 					</DayOfWeek>
+ 				) ) }
+ 				{ calendar[ 0 ].map( ( week ) =>
+@@ -171,7 +184,10 @@ export function DatePicker( {
+ 								isSelected={ isSelected( day ) }
+ 								isFocusable={ isEqual( day, focusable ) }
+ 								isFocusAllowed={ isFocusWithinCalendar }
+-								isToday={ isSameDay( day, new Date() ) }
++								isToday={ isSameDay(
++									day,
++									startOfDayInConfiguredTimezone( new Date() )
++								) }
+ 								isInvalid={
+ 									isInvalidDate ? isInvalidDate( day ) : false
+ 								}
+@@ -183,19 +199,18 @@ export function DatePicker( {
+ 								onClick={ () => {
+ 									setSelected( [ day ] );
+ 									setFocusable( day );
++									const newDate = setInConfiguredTimezone(
++										date,
++										{
++											year: day.getFullYear(),
++											month: day.getMonth(),
++											date: day.getDate(),
++										}
++									);
+ 									onChange?.(
+-										format(
+-											// Don't change the selected date's time fields.
+-											new Date(
+-												day.getFullYear(),
+-												day.getMonth(),
+-												day.getDate(),
+-												date.getHours(),
+-												date.getMinutes(),
+-												date.getSeconds(),
+-												date.getMilliseconds()
+-											),
+-											TIMEZONELESS_FORMAT
++										formatDate(
++											TIMEZONELESS_FORMAT,
++											newDate
+ 										)
+ 									);
+ 								} }
+@@ -226,11 +241,23 @@ export function DatePicker( {
+ 										nextFocusable = addMonths( day, 1 );
+ 									}
+ 									if ( event.key === 'Home' ) {
+-										nextFocusable = startOfWeek( day );
++										const dayOfWeek = day.getDay();
++										const daysToSubtract =
++											( dayOfWeek - weekStartsOn + 7 ) %
++											7;
++										nextFocusable = subDays(
++											day,
++											daysToSubtract
++										);
+ 									}
+ 									if ( event.key === 'End' ) {
+-										nextFocusable = startOfDay(
+-											endOfWeek( day )
++										const dayOfWeek = day.getDay();
++										const daysToAdd =
++											( weekStartsOn + 6 - dayOfWeek ) %
++											7;
++										nextFocusable = addDays(
++											day,
++											daysToAdd
+ 										);
+ 									}
+ 									if ( nextFocusable ) {
+@@ -244,9 +271,10 @@ export function DatePicker( {
+ 										) {
+ 											setViewing( nextFocusable );
+ 											onMonthPreviewed?.(
+-												format(
++												dateI18n(
++													TIMEZONELESS_FORMAT,
+ 													nextFocusable,
+-													TIMEZONELESS_FORMAT
++													-nextFocusable.getTimezoneOffset()
+ 												)
+ 											);
+ 										}
+@@ -306,7 +334,7 @@ function Day( {
+ 			className="components-datetime__date__day" // Unused, for backwards compatibility.
+ 			disabled={ isInvalid }
+ 			tabIndex={ isFocusable ? 0 : -1 }
+-			aria-label={ getDayLabel( day, isSelected, numEvents ) }
++			aria-label={ getDayLabel( day, isSelected, isToday, numEvents ) }
+ 			column={ column }
+ 			isSelected={ isSelected }
+ 			isToday={ isToday }
+@@ -314,44 +342,45 @@ function Day( {
+ 			onClick={ onClick }
+ 			onKeyDown={ onKeyDown }
+ 		>
+-			{ gmdateI18n( 'j', day ) }
++			{ dateI18n( 'j', day, -day.getTimezoneOffset() ) }
+ 		</DayButton>
+ 	);
+ }
+ 
+-function getDayLabel( date: Date, isSelected: boolean, numEvents: number ) {
++function getDayLabel(
++	date: Date,
++	isSelected: boolean,
++	isToday: boolean,
++	numEvents: number
++) {
+ 	const { formats } = getSettings();
+-	const localizedDate = gmdateI18n( formats.date, date );
+-	if ( isSelected && numEvents > 0 ) {
+-		return sprintf(
+-			// translators: 1: The calendar date. 2: Number of events on the calendar date.
+-			_n(
+-				'%1$s. Selected. There is %2$d event',
+-				'%1$s. Selected. There are %2$d events',
+-				numEvents
+-			),
+-			localizedDate,
+-			numEvents
+-		);
+-	} else if ( isSelected ) {
+-		return sprintf(
+-			// translators: 1: The calendar date.
+-			__( '%1$s. Selected' ),
+-			localizedDate
+-		);
+-	} else if ( numEvents > 0 ) {
+-		return sprintf(
+-			// translators: 1: The calendar date. 2: Number of events on the calendar date.
+-			_n(
+-				'%1$s. There is %2$d event',
+-				'%1$s. There are %2$d events',
++	const localizedDate = dateI18n(
++		formats.date,
++		date,
++		-date.getTimezoneOffset()
++	);
++
++	const parts = [ localizedDate ];
++
++	if ( isSelected ) {
++		parts.push( __( 'Selected' ) );
++	}
++
++	if ( isToday ) {
++		parts.push( __( 'Today' ) );
++	}
++
++	if ( numEvents > 0 ) {
++		parts.push(
++			sprintf(
++				// translators: %d: Number of events on the calendar date.
++				_n( 'There is %d event', 'There are %d events', numEvents ),
+ 				numEvents
+-			),
+-			localizedDate,
+-			numEvents
++			)
+ 		);
+ 	}
+-	return localizedDate;
++
++	return parts.join( '. ' );
+ }
+ 
+ export default DatePicker;
+diff --git a/packages/components/src/date-time/date/test/index.tsx b/packages/components/src/date-time/date/test/index.tsx
+index a0c21dce2be76f..e6c19163b5ff83 100644
+--- a/packages/components/src/date-time/date/test/index.tsx
++++ b/packages/components/src/date-time/date/test/index.tsx
+@@ -25,7 +25,7 @@ describe( 'DatePicker', () => {
+ 		const todayDescription = format( new Date(), 'MMMM d, yyyy' );
+ 		expect(
+ 			screen.getByRole( 'button', {
+-				name: `${ todayDescription }. Selected`,
++				name: `${ todayDescription }. Selected. Today`,
+ 			} )
+ 		).toBeInTheDocument();
+ 	} );
+diff --git a/packages/components/src/date-time/test/utils.test.ts b/packages/components/src/date-time/test/utils.test.ts
+index becc038cd5475d..b855fa9c772913 100644
+--- a/packages/components/src/date-time/test/utils.test.ts
++++ b/packages/components/src/date-time/test/utils.test.ts
+@@ -3,13 +3,46 @@
+  */
+ import timezoneMock from 'timezone-mock';
+ 
++/**
++ * WordPress dependencies
++ */
++import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
++
+ /**
+  * Internal dependencies
+  */
+ import { inputToDate } from '../utils';
+ 
+ describe( 'inputToDate', () => {
+-	describe( 'timezoneless strings parsed as UTC', () => {
++	let originalSettings: DateSettings;
++
++	beforeAll( () => {
++		originalSettings = getSettings();
++	} );
++
++	afterEach( () => {
++		timezoneMock.unregister();
++	} );
++
++	afterAll( () => {
++		setSettings( originalSettings );
++	} );
++
++	describe( 'timezoneless strings', () => {
++		beforeEach( () => {
++			// Default settings are UTC, but make it explicit so these tests
++			// don't depend on global settings state.
++			setSettings( {
++				...originalSettings,
++				timezone: {
++					offset: 0,
++					offsetFormatted: '0',
++					string: '',
++					abbr: '',
++				},
++			} );
++		} );
++
+ 		describe.each( [
+ 			{
+ 				timezone: 'US/Pacific' as const,
+@@ -28,10 +61,6 @@ describe( 'inputToDate', () => {
+ 				timezoneMock.register( timezone );
+ 			} );
+ 
+-			afterEach( () => {
+-				timezoneMock.unregister();
+-			} );
+-
+ 			it( 'should parse midnight as UTC midnight, preventing day shifts', () => {
+ 				const result = inputToDate( '2025-11-01T00:00:00' );
+ 
+@@ -68,6 +97,55 @@ describe( 'inputToDate', () => {
+ 		} );
+ 	} );
+ 
++	describe( 'timezoneless strings with a site timezone string (DST-aware)', () => {
++		beforeEach( () => {
++			setSettings( {
++				...originalSettings,
++				timezone: {
++					offset: -5,
++					offsetFormatted: '-5',
++					string: 'America/New_York',
++					abbr: 'EST',
++				},
++			} );
++		} );
++
++		describe.each( [
++			{
++				timezone: 'US/Pacific' as const,
++				description: 'Pacific time (behind UTC)',
++			},
++			{
++				timezone: 'UTC' as const,
++				description: 'UTC (zero offset)',
++			},
++			{
++				timezone: 'Australia/Adelaide' as const,
++				description: 'Adelaide (ahead of UTC)',
++			},
++		] )( 'in $description', ( { timezone } ) => {
++			beforeEach( () => {
++				timezoneMock.register( timezone );
++			} );
++
++			it( 'should interpret midnight using site timezone (winter)', () => {
++				// Jan 10 is Eastern Standard Time in New York (UTC-5)
++				const result = inputToDate( '2025-01-10T00:00:00' );
++				expect( result.toISOString() ).toBe(
++					'2025-01-10T05:00:00.000Z'
++				);
++			} );
++
++			it( 'should interpret midnight using site timezone (summer/DST)', () => {
++				// Mar 10 is Eastern Daylight Time in New York (UTC-4)
++				const result = inputToDate( '2025-03-10T00:00:00' );
++				expect( result.toISOString() ).toBe(
++					'2025-03-10T04:00:00.000Z'
++				);
++			} );
++		} );
++	} );
++
+ 	describe( 'strings with timezone indicators', () => {
+ 		describe.each( [
+ 			{
+@@ -106,23 +184,44 @@ describe( 'inputToDate', () => {
+ 		} );
+ 	} );
+ 
+-	describe( 'non-string inputs', () => {
+-		it( 'should handle Date objects', () => {
+-			const input = new Date( '2025-11-01T00:00:00Z' );
++	describe( 'Date objects', () => {
++		it( 'should extract the UTC timestamp, not local time components', () => {
++			// Mock Pacific timezone where local time differs from UTC.
++			// This ensures the test fails on trunk if we incorrectly preserve
++			// local components instead of extracting the UTC timestamp.
++			timezoneMock.register( 'US/Pacific' );
++
++			// Create Nov 1, 2025 at 15:30:45 UTC
++			const timestamp = Date.UTC( 2025, 10, 1, 15, 30, 45 );
++			const input = new Date( timestamp );
+ 			const result = inputToDate( input );
+ 
++			// Should preserve the exact UTC moment (15:30:45), not the local
++			// Pacific time components (7:30:45 or 8:30:45 depending on DST).
+ 			expect( result.getUTCFullYear() ).toBe( 2025 );
+-			expect( result.getUTCMonth() ).toBe( 10 );
++			expect( result.getUTCMonth() ).toBe( 10 ); // November
+ 			expect( result.getUTCDate() ).toBe( 1 );
++			expect( result.getUTCHours() ).toBe( 15 ); // UTC hour, not 7 or 8
++			expect( result.getUTCMinutes() ).toBe( 30 );
++			expect( result.getUTCSeconds() ).toBe( 45 );
+ 		} );
++	} );
++
++	describe( 'timestamps', () => {
++		it( 'should preserve the UTC moment exactly', () => {
++			// Ensure we're using a different timezone from UTC (the tests use
++			// UTC by default).
++			timezoneMock.register( 'US/Pacific' );
+ 
+-		it( 'should convert timestamps to Date', () => {
+-			const timestamp = Date.UTC( 2025, 10, 1, 0, 0, 0 );
++			const timestamp = Date.UTC( 2025, 10, 1, 15, 30, 45 );
+ 			const result = inputToDate( timestamp );
+ 
+ 			expect( result.getUTCFullYear() ).toBe( 2025 );
+-			expect( result.getUTCMonth() ).toBe( 10 );
++			expect( result.getUTCMonth() ).toBe( 10 ); // November
+ 			expect( result.getUTCDate() ).toBe( 1 );
++			expect( result.getUTCHours() ).toBe( 15 );
++			expect( result.getUTCMinutes() ).toBe( 30 );
++			expect( result.getUTCSeconds() ).toBe( 45 );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index e2bba32b246722..245446736e8ab9 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -1,13 +1,14 @@
+ /**
+  * External dependencies
+  */
+-import { startOfMinute, format, set, setMonth } from 'date-fns';
++import { startOfMinute } from 'date-fns';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { useState, useMemo, useEffect } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
++import { date as formatDate } from '@wordpress/date';
+ 
+ /**
+  * Internal dependencies
+@@ -31,6 +32,7 @@ import {
+ 	inputToDate,
+ 	buildPadInputStateReducer,
+ 	validateInputElementTarget,
++	setInConfiguredTimezone,
+ } from '../utils';
+ import { TIMEZONELESS_FORMAT } from '../constants';
+ import { TimeInput } from './time-input';
+@@ -66,17 +68,13 @@ export function TimePicker( {
+ }: TimePickerProps ) {
+ 	const [ date, setDate ] = useState( () =>
+ 		// Truncate the date at the minutes, see: #15495.
+-		currentTime ? startOfMinute( inputToDate( currentTime ) ) : new Date()
++		startOfMinute( inputToDate( currentTime ?? new Date() ) )
+ 	);
+ 
+ 	// Reset the state when currentTime changed.
+ 	// TODO: useEffect() shouldn't be used like this, causes an unnecessary render
+ 	useEffect( () => {
+-		setDate(
+-			currentTime
+-				? startOfMinute( inputToDate( currentTime ) )
+-				: new Date()
+-		);
++		setDate( startOfMinute( inputToDate( currentTime ?? new Date() ) ) );
+ 	}, [ currentTime ] );
+ 
+ 	const monthOptions = [
+@@ -96,15 +94,14 @@ export function TimePicker( {
+ 
+ 	const { day, month, year, minutes, hours } = useMemo(
+ 		() => ( {
+-			day: format( date, 'dd' ),
+-			month: format(
+-				date,
+-				'MM'
++			day: formatDate( 'd', date ),
++			month: formatDate(
++				'm',
++				date
+ 			) as ( typeof monthOptions )[ number ][ 'value' ],
+-			year: format( date, 'yyyy' ),
+-			minutes: format( date, 'mm' ),
+-			hours: format( date, 'HH' ),
+-			am: format( date, 'a' ),
++			year: formatDate( 'Y', date ),
++			minutes: formatDate( 'i', date ),
++			hours: formatDate( 'H', date ),
+ 		} ),
+ 		[ date ]
+ 	);
+@@ -118,9 +115,13 @@ export function TimePicker( {
+ 			// We can safely assume value is a number if target is valid.
+ 			const numberValue = Number( value );
+ 
+-			const newDate = set( date, { [ method ]: numberValue } );
++			// Internal date is UTC-normalized, but the field should be updated
++			// as if in the configured timezone.
++			const newDate = setInConfiguredTimezone( date, {
++				[ method ]: numberValue,
++			} );
+ 			setDate( newDate );
+-			onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
++			onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+ 		};
+ 		return callback;
+ 	};
+@@ -129,12 +130,14 @@ export function TimePicker( {
+ 		hours: newHours,
+ 		minutes: newMinutes,
+ 	}: TimeInputValue ) => {
+-		const newDate = set( date, {
++		// Internal date is UTC-normalized, but the field should be updated
++		// as if in the configured timezone.
++		const newDate = setInConfiguredTimezone( date, {
+ 			hours: newHours,
+ 			minutes: newMinutes,
+ 		} );
+ 		setDate( newDate );
+-		onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
++		onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+ 	};
+ 
+ 	const dayField = (
+@@ -167,9 +170,13 @@ export function TimePicker( {
+ 				value={ month }
+ 				options={ monthOptions }
+ 				onChange={ ( value ) => {
+-					const newDate = setMonth( date, Number( value ) - 1 );
++					// Internal date is UTC-normalized, but the field should be updated
++					// as if in the configured timezone.
++					const newDate = setInConfiguredTimezone( date, {
++						month: Number( value ) - 1,
++					} );
+ 					setDate( newDate );
+-					onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
++					onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+ 				} }
+ 			/>
+ 		</MonthSelectWrapper>
+diff --git a/packages/components/src/date-time/time/test/index.tsx b/packages/components/src/date-time/time/test/index.tsx
+index 6f843fda75336c..6a9eb2327a996c 100644
+--- a/packages/components/src/date-time/time/test/index.tsx
++++ b/packages/components/src/date-time/time/test/index.tsx
+@@ -3,6 +3,12 @@
+  */
+ import { render, screen } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
++import timezoneMock from 'timezone-mock';
++
++/**
++ * WordPress dependencies
++ */
++import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
+ 
+ /**
+  * Internal dependencies
+@@ -423,4 +429,166 @@ describe( 'TimePicker', () => {
+ 		expect( Number.isNaN( parseInt( hoursInput, 10 ) ) ).toBe( false );
+ 		expect( Number.isNaN( parseInt( minutesInput, 10 ) ) ).toBe( false );
+ 	} );
++
++	describe( 'input types with timezone variations', () => {
++		let originalSettings: DateSettings;
++
++		beforeAll( () => {
++			originalSettings = getSettings();
++			setSettings( {
++				...originalSettings,
++				timezone: {
++					offset: -5,
++					offsetFormatted: '-5',
++					string: 'America/New_York',
++					abbr: 'EST',
++				},
++			} );
++		} );
++
++		afterEach( () => {
++			jest.useRealTimers();
++			timezoneMock.unregister();
++		} );
++
++		afterAll( () => {
++			setSettings( originalSettings );
++		} );
++
++		describe.each( [
++			{
++				direction: 'browser behind site',
++				timezone: 'US/Pacific' as const,
++			},
++			{
++				direction: 'browser matches UTC (zero offset)',
++				timezone: 'UTC' as const,
++			},
++			{
++				direction: 'browser ahead of site',
++				timezone: 'Australia/Adelaide' as const,
++			},
++		] )( '$direction', ( { timezone } ) => {
++			beforeEach( () => {
++				timezoneMock.register( timezone );
++			} );
++
++			function transformOnChangeToDate( nextValue: string ): Date {
++				// Timezoneless string represents site timezone. Convert to UTC
++				// instant in site timezone. In typical usage, consumers should
++				// align `@wordpress/date` settings to match their browser timezone
++				// when working with dates, to avoid having to manage this
++				// conversion themselves.
++				const settings = getSettings();
++				const offsetMs = settings.timezone.offset * 60 * 60 * 1000;
++				const asUTC = new Date( nextValue + 'Z' );
++				return new Date( asUTC.getTime() - offsetMs );
++			}
++
++			describe.each( [
++				{
++					type: 'timezoneless string',
++					initialTime: '2025-12-18T07:00:00',
++					transformOnChange: ( nextValue: string ) => nextValue,
++				},
++				{
++					type: 'string with timezone',
++					initialTime: '2025-12-18T12:00:00Z',
++					transformOnChange: ( nextValue: string ) =>
++						transformOnChangeToDate( nextValue ).toISOString(),
++				},
++				{
++					type: 'Date object',
++					initialTime: new Date( Date.UTC( 2025, 11, 18, 12, 0, 0 ) ),
++					transformOnChange: transformOnChangeToDate,
++				},
++				{
++					type: 'timestamp',
++					initialTime: Date.UTC( 2025, 11, 18, 12, 0, 0 ),
++					transformOnChange: ( nextValue: string ) =>
++						transformOnChangeToDate( nextValue ).getTime(),
++				},
++				{
++					type: 'undefined',
++					initialTime: undefined,
++					transformOnChange: ( nextValue: string ) => nextValue,
++				},
++			] )( 'with $type', ( { initialTime, transformOnChange } ) => {
++				it( 'should output timezoneless string matching displayed time', async () => {
++					// For undefined, set fake system time to get a known current time
++					let user: ReturnType< typeof userEvent.setup >;
++					if ( initialTime === undefined ) {
++						jest.useFakeTimers();
++						// Set system time to 12:00 UTC
++						jest.setSystemTime(
++							Date.UTC( 2025, 11, 18, 12, 0, 0 )
++						);
++						user = userEvent.setup( {
++							advanceTimers: jest.advanceTimersByTime,
++						} );
++					} else {
++						user = userEvent.setup();
++					}
++
++					const onChange = jest.fn();
++
++					const { rerender } = render(
++						<TimePicker
++							currentTime={ initialTime }
++							onChange={ onChange }
++						/>
++					);
++
++					// Should display the correct initial date and time assuming
++					// settings for the current site.
++					expect( screen.getByLabelText( 'Hours' ) ).toHaveValue( 7 );
++					expect( screen.getByLabelText( 'Minutes' ) ).toHaveValue(
++						0
++					);
++					expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 18 );
++
++					// Changing the hours by one should adjust just the hour.
++					await user.clear( screen.getByLabelText( 'Hours' ) );
++					await user.type( screen.getByLabelText( 'Hours' ), '08' );
++					await user.keyboard( '{Tab}' );
++					expect( onChange ).toHaveBeenCalledWith(
++						'2025-12-18T08:00:00'
++					);
++
++					// Test round-trip by passing onChange output back as input
++					let nextDate = onChange.mock.calls[ 0 ][ 0 ];
++					rerender(
++						<TimePicker
++							currentTime={ transformOnChange( nextDate ) }
++							onChange={ onChange }
++						/>
++					);
++					expect( screen.getByLabelText( 'Hours' ) ).toHaveValue( 8 );
++					expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 18 );
++					onChange.mockClear();
++
++					// Changing the minutes should adjust just the minutes.
++					await user.clear( screen.getByLabelText( 'Minutes' ) );
++					await user.type( screen.getByLabelText( 'Minutes' ), '30' );
++					await user.keyboard( '{Tab}' );
++					expect( onChange ).toHaveBeenCalledWith(
++						'2025-12-18T08:30:00'
++					);
++
++					// Test round-trip by passing onChange output back as input
++					nextDate = onChange.mock.calls[ 0 ][ 0 ];
++					rerender(
++						<TimePicker
++							currentTime={ transformOnChange( nextDate ) }
++							onChange={ onChange }
++						/>
++					);
++					expect( screen.getByLabelText( 'Minutes' ) ).toHaveValue(
++						30
++					);
++					expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 18 );
++				} );
++			} );
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/date-time/utils.ts b/packages/components/src/date-time/utils.ts
+index f7dc2effc776ad..8e95a1dfa8e1da 100644
+--- a/packages/components/src/date-time/utils.ts
++++ b/packages/components/src/date-time/utils.ts
+@@ -1,9 +1,13 @@
+ /**
+  * External dependencies
+  */
+-import { toDate } from 'date-fns';
+ import { UTCDateMini } from '@date-fns/utc';
+ 
++/**
++ * WordPress dependencies
++ */
++import { date as formatDate, getDate } from '@wordpress/date';
++
+ /**
+  * Internal dependencies
+  */
+@@ -12,24 +16,56 @@ import type { InputAction } from '../input-control/reducer/actions';
+ import { COMMIT, PRESS_DOWN, PRESS_UP } from '../input-control/reducer/actions';
+ 
+ /**
+- * Like date-fns's toDate, but tries to guess the format when a string is
+- * given. For timezoneless strings, parse it as UTC using `@date-fns/utc` to
+- * ensure calendar dates remain consistent across different browser timezones.
++ * Converts a date input to a UTC-normalized date for consistent date
++ * manipulation. Timezoneless strings are interpreted using the timezone
++ * offset from @wordpress/date settings. Date objects and timestamps
++ * represent specific UTC instants.
+  *
+  * @param input Value to turn into a date.
+  */
+ export function inputToDate( input: Date | string | number ): Date {
+ 	if ( typeof input === 'string' ) {
+-		// Strings without timezone indicators are parsed as UTC to prevent day-
+-		// shift bugs across browser timezones. Note that JavaScript doesn't
+-		// fully support ISO-8601 time strings, so the behavior of passing these
+-		// through to the Date constructor is non-deterministic.
++		// Note that JavaScript doesn't fully support ISO-8601 time strings, so
++		// the behavior of passing these through to the Date constructor is
++		// non-deterministic.
+ 		//
+ 		// See: https://tc39.es/ecma262/#sec-date-time-string-format
+ 		const hasTimezone = /Z|[+-]\d{2}(:?\d{2})?$/.test( input );
+-		return hasTimezone ? new Date( input ) : new UTCDateMini( input + 'Z' );
++		if ( hasTimezone ) {
++			return new UTCDateMini( new Date( input ) );
++		}
++
++		// Strings without timezone indicators are interpreted using configured
++		// timezone offset, then converted to UTC for internal storage.
++		return new UTCDateMini( getDate( input ).getTime() );
+ 	}
+-	return toDate( input );
++
++	// Date objects and number timestamps represent specific UTC moments.
++	// Convert to milliseconds since epoch for consistent UTC handling.
++	const time = input instanceof Date ? input.getTime() : input;
++	return new UTCDateMini( time );
++}
++
++/**
++ * Returns the start of day (midnight) as a browser-local Date for the calendar
++ * day in the configured timezone in @wordpress/date settings. This is necessary
++ * because date-fns's startOfDay operates in browser local time, which can cause
++ * off-by-one-day bugs when browser and configured timezones differ.
++ *
++ * For example, if the UTC time is Nov 16, 01:00 UTC and configured timezone
++ * is UTC-5, the date is Nov 15. This function returns a browser-local Date
++ * at Nov 15, 00:00 (browser local midnight) so it matches calendar days.
++ *
++ * @param date A Date object normalized to UTC
++ * @return A browser-local Date at midnight for the configured timezone date
++ */
++export function startOfDayInConfiguredTimezone( date: Date ): Date {
++	// Determine the calendar day in the configured WordPress timezone and
++	// return a browser-local Date at midnight for that calendar day.
++	const year = Number( formatDate( 'Y', date ) );
++	const month = Number( formatDate( 'n', date ) ) - 1;
++	const day = Number( formatDate( 'j', date ) );
++	return new Date( year, month, day, 0, 0, 0, 0 );
+ }
+ 
+ /**
+@@ -74,6 +110,47 @@ export function buildPadInputStateReducer( pad: number ) {
+ 	};
+ }
+ 
++/**
++ * Updates specific date fields in the configured timezone and returns a new
++ * UTC date.
++ *
++ * @param date    A Date object
++ * @param updates Object with fields to update
++ * @return A Date object normalized to UTC with the updated values
++ */
++export function setInConfiguredTimezone(
++	date: Date,
++	updates: Partial< {
++		year: number;
++		month: number;
++		date: number;
++		hours: number;
++		minutes: number;
++		seconds: number;
++	} >
++): Date {
++	const values = {
++		year: Number( formatDate( 'Y', date ) ),
++		month: Number( formatDate( 'n', date ) ) - 1,
++		date: Number( formatDate( 'j', date ) ),
++		hours: Number( formatDate( 'H', date ) ),
++		minutes: Number( formatDate( 'i', date ) ),
++		seconds: Number( formatDate( 's', date ) ),
++		...updates,
++	};
++
++	const year = String( values.year );
++	const month = String( values.month + 1 ).padStart( 2, '0' );
++	const day = String( values.date ).padStart( 2, '0' );
++	const hours = String( values.hours ).padStart( 2, '0' );
++	const minutes = String( values.minutes ).padStart( 2, '0' );
++	const seconds = String( values.seconds ).padStart( 2, '0' );
++	const timezoneless = `${ year }-${ month }-${ day }T${ hours }:${ minutes }:${ seconds }`;
++
++	// Parse as WordPress-configured timezone time and convert to a UTC instant.
++	return new UTCDateMini( getDate( timezoneless ).getTime() );
++}
++
+ /**
+  * Validates the target of a React event to ensure it is an input element and
+  * that the input is valid.
+diff --git a/packages/date/CHANGELOG.md b/packages/date/CHANGELOG.md
+index 73833222c78f2b..edf78989285d7d 100644
+--- a/packages/date/CHANGELOG.md
++++ b/packages/date/CHANGELOG.md
+@@ -4,7 +4,8 @@
+ 
+ ## Bug Fixes
+ 
+-- Fixed incorrect spacing for the time format. It was `g: i` (`14: 30`), and it's now `g:i` (`14:30`). See [#73924](https://github.com/WordPress/gutenberg/pull/73924).
++-   Fixed incorrect spacing for the time format. It was `g: i` (`14: 30`), and it's now `g:i` (`14:30`). ([#73924](https://github.com/WordPress/gutenberg/pull/73924))
++-   Fixed `timezone` argument handling to properly treat `0` numeric timezone values as a valid UTC offset (UTC+0). Previously, these were treated as if the `timezone` argument was not passed. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
+ 
+ ## 5.36.0 (2025-11-26)
+ 
+diff --git a/packages/date/src/index.ts b/packages/date/src/index.ts
+index d511ef854b10b4..4c26c4007999b8 100644
+--- a/packages/date/src/index.ts
++++ b/packages/date/src/index.ts
+@@ -605,13 +605,11 @@ function buildMoment(
+ ) {
+ 	const dateMoment = momentLib( dateValue );
+ 
+-	if ( timezone && ! isUTCOffset( timezone ) ) {
+-		// The ! isUTCOffset() check guarantees that timezone is a string.
+-		return dateMoment.tz( timezone as string );
+-	}
+-
+-	if ( timezone && isUTCOffset( timezone ) ) {
+-		return dateMoment.utcOffset( timezone );
++	if ( timezone !== '' ) {
++		return isUTCOffset( timezone )
++			? dateMoment.utcOffset( timezone )
++			: // A false isUTCOffset() guarantees that timezone is a string.
++			  dateMoment.tz( timezone as string );
+ 	}
+ 
+ 	if ( settings.timezone.string ) {
+diff --git a/packages/date/src/test/index.js b/packages/date/src/test/index.js
+index 082679bbb87470..9bc5970344af9e 100644
+--- a/packages/date/src/test/index.js
++++ b/packages/date/src/test/index.js
+@@ -466,6 +466,29 @@ describe( 'Function dateI18n', () => {
+ 		setSettings( settings );
+ 	} );
+ 
++	it( 'should format date into a UTC date when given UTC offset 0', () => {
++		const settings = getSettings();
++
++		// Simulate different timezone.
++		setSettings( {
++			...settings,
++			timezone: { offset: -4, string: 'America/New_York' },
++		} );
++
++		// Check that offset 0 formats in UTC, not site timezone.
++		// This is a regression test for a bug where offset 0 was falsy
++		// and fell through to use site timezone instead.
++		const formattedDate = dateI18n(
++			'Y-m-d H:i',
++			'2019-06-18T11:00:00.000Z',
++			0
++		);
++		expect( formattedDate ).toBe( '2019-06-18 11:00' );
++
++		// Restore default settings.
++		setSettings( settings );
++	} );
++
+ 	it( 'should format date into a UTC date if `gmt` is set to `true`', () => {
+ 		const settings = getSettings();
+ 

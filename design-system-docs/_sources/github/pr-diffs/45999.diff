@@ -1,0 +1,317 @@
+diff --git a/packages/block-editor/src/components/publish-date-time-picker/index.js b/packages/block-editor/src/components/publish-date-time-picker/index.js
+index 364fb095948024..418006cf854c14 100644
+--- a/packages/block-editor/src/components/publish-date-time-picker/index.js
++++ b/packages/block-editor/src/components/publish-date-time-picker/index.js
+@@ -29,8 +29,6 @@ function PublishDateTimePicker(
+ 			/>
+ 			<DateTimePicker
+ 				startOfWeek={ getSettings().l10n.startOfWeek }
+-				__nextRemoveHelpButton
+-				__nextRemoveResetButton
+ 				onChange={ onChange }
+ 				{ ...additionalProps }
+ 			/>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c57f3b01d58256..fb09053e89cf83 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
++-   `DateTimePicker`: Remove deprecated `__nextRemoveHelpButton` and `__nextRemoveResetButton` ([#45999](https://github.com/WordPress/gutenberg/pull/45999)).
+ 
+ ## 22.1.0 (2022-11-16)
+ 
+diff --git a/packages/components/src/date-time/README.md b/packages/components/src/date-time/README.md
+index e01d9074953f25..c65cf6d3a1aaea 100644
+--- a/packages/components/src/date-time/README.md
++++ b/packages/components/src/date-time/README.md
+@@ -26,8 +26,6 @@ const MyDateTimePicker = () => {
+ 			currentDate={ date }
+ 			onChange={ ( newDate ) => setDate( newDate ) }
+ 			is12Hour={ true }
+-			__nextRemoveHelpButton
+-			__nextRemoveResetButton
+ 		/>
+ 	);
+ };
+@@ -83,17 +81,3 @@ The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
+ 
+ - Required: No
+ - Default: 0
+-
+-### `__nextRemoveHelpButton`: `boolean`
+-
+-Start opting in to not displaying a Help button which will become the default in a future version.
+-
+-- Required: No
+-- Default: `false`
+-
+-### `__nextRemoveResetButton`: `boolean`
+-
+-Start opting in to not displaying a Reset button which will become the default in a future version.
+-
+-- Required: No
+-- Default: `false`
+diff --git a/packages/components/src/date-time/date-time/index.tsx b/packages/components/src/date-time/date-time/index.tsx
+index 3d97b19dc17c6c..b563a31694fd91 100644
+--- a/packages/components/src/date-time/date-time/index.tsx
++++ b/packages/components/src/date-time/date-time/index.tsx
+@@ -6,21 +6,16 @@ import type { ForwardedRef } from 'react';
+ /**
+  * WordPress dependencies
+  */
+-import { useState, forwardRef } from '@wordpress/element';
++import { forwardRef } from '@wordpress/element';
+ import { __, _x } from '@wordpress/i18n';
+-import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+  */
+-import Button from '../../button';
+ import { default as DatePicker } from '../date';
+ import { default as TimePicker } from '../time';
+ import type { DateTimePickerProps } from '../types';
+-import { Wrapper, CalendarHelp } from './styles';
+-import { HStack } from '../../h-stack';
+-import { Heading } from '../../heading';
+-import { Spacer } from '../../spacer';
++import { Wrapper } from './styles';
+ 
+ export { DatePicker, TimePicker };
+ 
+@@ -35,157 +30,24 @@ function UnforwardedDateTimePicker(
+ 		onChange,
+ 		events,
+ 		startOfWeek,
+-		__nextRemoveHelpButton = false,
+-		__nextRemoveResetButton = false,
+ 	}: DateTimePickerProps,
+ 	ref: ForwardedRef< any >
+ ) {
+-	if ( ! __nextRemoveHelpButton ) {
+-		deprecated( 'Help button in wp.components.DateTimePicker', {
+-			since: '13.4',
+-			version: '14.6', // Six months of plugin releases.
+-			hint: 'Set the `__nextRemoveHelpButton` prop to `true` to remove this warning and opt in to the new behaviour, which will become the default in a future version.',
+-		} );
+-	}
+-	if ( ! __nextRemoveResetButton ) {
+-		deprecated( 'Reset button in wp.components.DateTimePicker', {
+-			since: '13.4',
+-			version: '14.6', // Six months of plugin releases.
+-			hint: 'Set the `__nextRemoveResetButton` prop to `true` to remove this warning and opt in to the new behaviour, which will become the default in a future version.',
+-		} );
+-	}
+-
+-	const [ calendarHelpIsVisible, setCalendarHelpIsVisible ] =
+-		useState( false );
+-
+-	function onClickDescriptionToggle() {
+-		setCalendarHelpIsVisible( ! calendarHelpIsVisible );
+-	}
+-
+ 	return (
+ 		<Wrapper ref={ ref } className="components-datetime" spacing={ 4 }>
+-			{ ! calendarHelpIsVisible && (
+-				<>
+-					<TimePicker
+-						currentTime={ currentDate }
+-						onChange={ onChange }
+-						is12Hour={ is12Hour }
+-					/>
+-					<DatePicker
+-						currentDate={ currentDate }
+-						onChange={ onChange }
+-						isInvalidDate={ isInvalidDate }
+-						events={ events }
+-						onMonthPreviewed={ onMonthPreviewed }
+-						startOfWeek={ startOfWeek }
+-					/>
+-				</>
+-			) }
+-			{ calendarHelpIsVisible && (
+-				<CalendarHelp
+-					className="components-datetime__calendar-help" // Unused, for backwards compatibility.
+-				>
+-					<Heading level={ 4 }>{ __( 'Click to Select' ) }</Heading>
+-					<ul>
+-						<li>
+-							{ __(
+-								'Click the right or left arrows to select other months in the past or the future.'
+-							) }
+-						</li>
+-						<li>{ __( 'Click the desired day to select it.' ) }</li>
+-					</ul>
+-					<Heading level={ 4 }>
+-						{ __( 'Navigating with a keyboard' ) }
+-					</Heading>
+-					<ul>
+-						<li>
+-							<abbr
+-								aria-label={ _x( 'Enter', 'keyboard button' ) }
+-							>
+-								↵
+-							</abbr>
+-							{
+-								' ' /* JSX removes whitespace, but a space is required for screen readers. */
+-							}
+-							<span>{ __( 'Select the date in focus.' ) }</span>
+-						</li>
+-						<li>
+-							<abbr aria-label={ __( 'Left and Right Arrows' ) }>
+-								←/→
+-							</abbr>
+-							{
+-								' ' /* JSX removes whitespace, but a space is required for screen readers. */
+-							}
+-							{ __(
+-								'Move backward (left) or forward (right) by one day.'
+-							) }
+-						</li>
+-						<li>
+-							<abbr aria-label={ __( 'Up and Down Arrows' ) }>
+-								↑/↓
+-							</abbr>
+-							{
+-								' ' /* JSX removes whitespace, but a space is required for screen readers. */
+-							}
+-							{ __(
+-								'Move backward (up) or forward (down) by one week.'
+-							) }
+-						</li>
+-						<li>
+-							<abbr aria-label={ __( 'Page Up and Page Down' ) }>
+-								{ __( 'PgUp/PgDn' ) }
+-							</abbr>
+-							{
+-								' ' /* JSX removes whitespace, but a space is required for screen readers. */
+-							}
+-							{ __(
+-								'Move backward (PgUp) or forward (PgDn) by one month.'
+-							) }
+-						</li>
+-						<li>
+-							<abbr aria-label={ __( 'Home and End' ) }>
+-								{ /* Translators: Home/End reffer to the 'Home' and 'End' buttons on the keyboard.*/ }
+-								{ __( 'Home/End' ) }
+-							</abbr>
+-							{
+-								' ' /* JSX removes whitespace, but a space is required for screen readers. */
+-							}
+-							{ __(
+-								'Go to the first (Home) or last (End) day of a week.'
+-							) }
+-						</li>
+-					</ul>
+-				</CalendarHelp>
+-			) }
+-			{ ( ! __nextRemoveResetButton || ! __nextRemoveHelpButton ) && (
+-				<HStack
+-					className="components-datetime__buttons" // Unused, for backwards compatibility.
+-				>
+-					{ ! __nextRemoveResetButton &&
+-						! calendarHelpIsVisible &&
+-						currentDate && (
+-							<Button
+-								className="components-datetime__date-reset-button" // Unused, for backwards compatibility.
+-								variant="link"
+-								onClick={ () => onChange?.( null ) }
+-							>
+-								{ __( 'Reset' ) }
+-							</Button>
+-						) }
+-					<Spacer />
+-					{ ! __nextRemoveHelpButton && (
+-						<Button
+-							className="components-datetime__date-help-toggle" // Unused, for backwards compatibility.
+-							variant="link"
+-							onClick={ onClickDescriptionToggle }
+-						>
+-							{ calendarHelpIsVisible
+-								? __( 'Close' )
+-								: __( 'Calendar Help' ) }
+-						</Button>
+-					) }
+-				</HStack>
+-			) }
++			<TimePicker
++				currentTime={ currentDate }
++				onChange={ onChange }
++				is12Hour={ is12Hour }
++			/>
++			<DatePicker
++				currentDate={ currentDate }
++				onChange={ onChange }
++				isInvalidDate={ isInvalidDate }
++				events={ events }
++				onMonthPreviewed={ onMonthPreviewed }
++				startOfWeek={ startOfWeek }
++			/>
+ 		</Wrapper>
+ 	);
+ }
+@@ -207,8 +69,6 @@ function UnforwardedDateTimePicker(
+  *       currentDate={ date }
+  *       onChange={ ( newDate ) => setDate( newDate ) }
+  *       is12Hour
+- *       __nextRemoveHelpButton
+- *       __nextRemoveResetButton
+  *     />
+  *   );
+  * };
+diff --git a/packages/components/src/date-time/date-time/styles.ts b/packages/components/src/date-time/date-time/styles.ts
+index a7f23eb276e047..51dc6e71f0c468 100644
+--- a/packages/components/src/date-time/date-time/styles.ts
++++ b/packages/components/src/date-time/date-time/styles.ts
+@@ -11,7 +11,3 @@ import { VStack } from '../../v-stack';
+ export const Wrapper = styled( VStack )`
+ 	box-sizing: border-box;
+ `;
+-
+-export const CalendarHelp = styled.div`
+-	min-width: 260px;
+-`;
+diff --git a/packages/components/src/date-time/stories/date-time.tsx b/packages/components/src/date-time/stories/date-time.tsx
+index 53d369728d34d7..068bbe5a5038f9 100644
+--- a/packages/components/src/date-time/stories/date-time.tsx
++++ b/packages/components/src/date-time/stories/date-time.tsx
+@@ -52,10 +52,7 @@ const Template: ComponentStory< typeof DateTimePicker > = ( {
+ export const Default: ComponentStory< typeof DateTimePicker > = Template.bind(
+ 	{}
+ );
+-Default.args = {
+-	__nextRemoveHelpButton: true,
+-	__nextRemoveResetButton: true,
+-};
++Default.args = {};
+ 
+ export const WithEvents: ComponentStory< typeof DateTimePicker > =
+ 	Template.bind( {} );
+diff --git a/packages/components/src/date-time/types.ts b/packages/components/src/date-time/types.ts
+index ae99a7082dcd27..02df096a866b9c 100644
+--- a/packages/components/src/date-time/types.ts
++++ b/packages/components/src/date-time/types.ts
+@@ -73,20 +73,4 @@ export type DateTimePickerProps = Omit< DatePickerProps, 'onChange' > &
+ 		 * passed the date and time as an argument.
+ 		 */
+ 		onChange?: ( date: string | null ) => void;
+-
+-		/**
+-		 * Start opting in to not displaying a Help button which will become the
+-		 * default in a future version.
+-		 *
+-		 * @default false
+-		 */
+-		__nextRemoveHelpButton?: boolean;
+-
+-		/**
+-		 * Start opting in to not displaying a Reset button which will become
+-		 * the default in a future version.
+-		 *
+-		 * @default false
+-		 */
+-		__nextRemoveResetButton?: boolean;
+ 	};

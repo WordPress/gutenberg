@@ -1,0 +1,366 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 3d082a14a92bff..8f02a338d1de2c 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -190,9 +190,12 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                       red
+                     </span>
+                     <span
+-                      class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
++                      aria-label="Click to edit hex value"
++                      class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex components-color-palette__custom-color-value--is-editable emotion-14 emotion-5"
+                       data-wp-c16t="true"
+                       data-wp-component="Truncate"
++                      role="button"
++                      tabindex="0"
+                     >
+                       #f00
+                     </span>
+diff --git a/packages/block-editor/src/components/color-palette/test/control.js b/packages/block-editor/src/components/color-palette/test/control.js
+index e1a5529544f791..62dd023266512e 100644
+--- a/packages/block-editor/src/components/color-palette/test/control.js
++++ b/packages/block-editor/src/components/color-palette/test/control.js
+@@ -1,7 +1,14 @@
+ /**
+  * External dependencies
+  */
+-import { render, waitFor, queryByAttribute } from '@testing-library/react';
++import {
++	render,
++	waitFor,
++	queryByAttribute,
++	fireEvent,
++	screen,
++} from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
+ 
+ /**
+  * Internal dependencies
+@@ -37,4 +44,116 @@ describe( 'ColorPaletteControl', () => {
+ 
+ 		expect( container ).toMatchSnapshot();
+ 	} );
++
++	it( 'allows editing hex value on click', async () => {
++		await renderAndValidate(
++			<ColorPaletteControl
++				label="Test Color"
++				value="#f00"
++				colors={ [ { color: '#f00', name: 'red' } ] }
++				disableCustomColors={ false }
++				onChange={ noop }
++			/>
++		);
++
++		const hexValue = screen.getByRole( 'button', {
++			name: /click to edit hex value/i,
++		} );
++		await userEvent.click( hexValue );
++
++		const input = screen.getByRole( 'textbox', {
++			name: /edit color hex value/i,
++		} );
++		expect( input ).toBeInTheDocument();
++		expect( input ).toHaveValue( '#f00' );
++	} );
++
++	it( 'validates hex input on blur', async () => {
++		const onChange = jest.fn();
++		await renderAndValidate(
++			<ColorPaletteControl
++				label="Test Color"
++				value="#f00"
++				colors={ [ { color: '#f00', name: 'red' } ] }
++				disableCustomColors={ false }
++				onChange={ onChange }
++			/>
++		);
++
++		const hexValue = screen.getByRole( 'button', {
++			name: /click to edit hex value/i,
++		} );
++		await userEvent.click( hexValue );
++
++		const input = screen.getByRole( 'textbox', {
++			name: /edit color hex value/i,
++		} );
++		await userEvent.clear( input );
++		await userEvent.type( input, '#ff0000' );
++		fireEvent.blur( input );
++
++		expect( onChange ).toHaveBeenCalledWith( '#ff0000' );
++	} );
++
++	it( 'reverts to previous value on invalid hex', async () => {
++		const onChange = jest.fn();
++		await renderAndValidate(
++			<ColorPaletteControl
++				label="Test Color"
++				value="#f00"
++				colors={ [ { color: '#f00', name: 'red' } ] }
++				disableCustomColors={ false }
++				onChange={ onChange }
++			/>
++		);
++
++		const hexValue = screen.getByRole( 'button', {
++			name: /click to edit hex value/i,
++		} );
++		await userEvent.click( hexValue );
++
++		const input = screen.getByRole( 'textbox', {
++			name: /edit color hex value/i,
++		} );
++		await userEvent.clear( input );
++		await userEvent.type( input, 'invalid' );
++		fireEvent.blur( input );
++
++		expect( onChange ).not.toHaveBeenCalled();
++		expect(
++			screen.getByRole( 'button', { name: /click to edit hex value/i } )
++		).toHaveTextContent( '#f00' );
++	} );
++
++	it( 'handles keyboard interaction', async () => {
++		const onChange = jest.fn();
++		await renderAndValidate(
++			<ColorPaletteControl
++				label="Test Color"
++				value="#f00"
++				colors={ [ { color: '#f00', name: 'red' } ] }
++				disableCustomColors={ false }
++				onChange={ onChange }
++			/>
++		);
++
++		const hexValue = screen.getByRole( 'button', {
++			name: /click to edit hex value/i,
++		} );
++
++		fireEvent.keyDown( hexValue, { key: 'Enter' } );
++		const input = screen.getByRole( 'textbox', {
++			name: /edit color hex value/i,
++		} );
++		expect( input ).toBeInTheDocument();
++
++		await userEvent.clear( input );
++		await userEvent.type( input, '#00f' );
++		fireEvent.keyDown( input, { key: 'Escape' } );
++
++		expect( onChange ).not.toHaveBeenCalled();
++		expect(
++			screen.getByRole( 'button', { name: /click to edit hex value/i } )
++		).toHaveTextContent( '#f00' );
++	} );
+ } );
+diff --git a/packages/components/src/color-palette/README.md b/packages/components/src/color-palette/README.md
+index 0fbfbd4d710013..2ffe183ca85486 100644
+--- a/packages/components/src/color-palette/README.md
++++ b/packages/components/src/color-palette/README.md
+@@ -32,6 +32,15 @@ for the `ColorPalette`'s color swatches, by rendering your `ColorPalette` with a
+ `Popover.Slot` further up the element tree and within a
+ `SlotFillProvider` overall.
+ 
++## Features
++
++- Select from predefined color swatches
++- Custom color picker with optional alpha channel
++- Direct hex value editing for hex colors (click the hex value to edit)
++- Clearing color selection
++- Multiple palette support
++- Keyboard navigation
++
+ ## Props
+ 
+ The component accepts the following props.
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index de4e4f4206fe3a..9c82ffc970701f 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -1,7 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import type { ForwardedRef } from 'react';
++import type {
++	ForwardedRef,
++	MouseEvent,
++	ChangeEvent,
++	KeyboardEvent,
++} from 'react';
+ import { colord, extend } from 'colord';
+ import namesPlugin from 'colord/plugins/names';
+ import a11yPlugin from 'colord/plugins/a11y';
+@@ -12,7 +17,14 @@ import clsx from 'clsx';
+  */
+ import { useInstanceId } from '@wordpress/compose';
+ import { __, sprintf } from '@wordpress/i18n';
+-import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
++import {
++	useCallback,
++	useMemo,
++	useState,
++	forwardRef,
++	useEffect,
++	useRef,
++} from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -31,6 +43,7 @@ import type {
+ 	MultiplePalettesProps,
+ 	PaletteObject,
+ 	SinglePaletteProps,
++	CustomColorValueInputProps,
+ } from './types';
+ import type { WordPressComponentProps } from '../context';
+ import type { DropdownProps } from '../dropdown/types';
+@@ -42,6 +55,97 @@ import {
+ 
+ extend( [ namesPlugin, a11yPlugin ] );
+ 
++function CustomColorValueInput( {
++	value,
++	onChange,
++	isHex,
++}: CustomColorValueInputProps ) {
++	const [ isEditing, setIsEditing ] = useState( false );
++	const [ inputValue, setInputValue ] = useState( value );
++	const inputRef = useRef< HTMLInputElement >( null );
++	const truncateRef = useRef< HTMLDivElement >( null );
++
++	useEffect( () => {
++		setInputValue( value );
++	}, [ value ] );
++
++	useEffect( () => {
++		if ( isEditing && inputRef.current ) {
++			inputRef.current.focus();
++		}
++	}, [ isEditing ] );
++
++	const handleClick = ( e: MouseEvent< HTMLDivElement > ) => {
++		e.preventDefault();
++		if ( isHex ) {
++			setIsEditing( true );
++		}
++	};
++
++	const handleChange = ( e: ChangeEvent< HTMLInputElement > ) => {
++		setInputValue( e.target.value );
++	};
++
++	const handleTruncateKeyDown = ( e: KeyboardEvent< HTMLDivElement > ) => {
++		if ( isHex && ( e.key === 'Enter' || e.key === ' ' ) ) {
++			e.preventDefault();
++			setIsEditing( true );
++		}
++	};
++
++	const handleBlur = () => {
++		setIsEditing( false );
++		if ( isHex && /^#[0-9A-Fa-f]{6}$/.test( inputValue || '' ) ) {
++			onChange( inputValue );
++		} else {
++			setInputValue( value );
++		}
++	};
++
++	const handleKeyDown = ( e: KeyboardEvent< HTMLInputElement > ) => {
++		if ( e.key === 'Enter' ) {
++			( e.target as HTMLInputElement ).blur();
++		} else if ( e.key === 'Escape' ) {
++			setInputValue( value );
++			setIsEditing( false );
++			truncateRef.current?.focus();
++		}
++	};
++
++	if ( isEditing && isHex ) {
++		return (
++			<input
++				ref={ inputRef }
++				type="text"
++				value={ inputValue || '' }
++				onChange={ handleChange }
++				onBlur={ handleBlur }
++				onKeyDown={ handleKeyDown }
++				className="components-color-palette__custom-color-value-input"
++				aria-label={ __( 'Edit color hex value' ) }
++			/>
++		);
++	}
++
++	return (
++		<Truncate
++			ref={ truncateRef }
++			className={ clsx( 'components-color-palette__custom-color-value', {
++				'components-color-palette__custom-color-value--is-hex': isHex,
++				'components-color-palette__custom-color-value--is-editable':
++					isHex,
++			} ) }
++			onClick={ handleClick }
++			onKeyDown={ handleTruncateKeyDown }
++			role={ isHex ? 'button' : undefined }
++			tabIndex={ isHex ? 0 : undefined }
++			aria-label={ isHex ? __( 'Click to edit hex value' ) : undefined }
++		>
++			{ value }
++		</Truncate>
++	);
++}
++
+ function SinglePalette( {
+ 	className,
+ 	clearColor,
+@@ -220,7 +324,7 @@ function UnforwardedColorPalette(
+ 			/>
+ 		</DropdownContentWrapper>
+ 	);
+-	const isHex = value?.startsWith( '#' );
++	const isHex = value?.startsWith( '#' ) ?? false;
+ 
+ 	// Leave hex values as-is. Remove the `var()` wrapper from CSS vars.
+ 	const displayValue = value?.replace( /^var\((.+)\)$/, '$1' );
+@@ -311,22 +415,11 @@ function UnforwardedColorPalette(
+ 										? buttonLabelName
+ 										: __( 'No color selected' ) }
+ 								</Truncate>
+-								{ /*
+-								This `Truncate` is always rendered, even if
+-								there is no `displayValue`, to ensure the layout
+-								does not shift
+-								*/ }
+-								<Truncate
+-									className={ clsx(
+-										'components-color-palette__custom-color-value',
+-										{
+-											'components-color-palette__custom-color-value--is-hex':
+-												isHex,
+-										}
+-									) }
+-								>
+-									{ displayValue }
+-								</Truncate>
++								<CustomColorValueInput
++									value={ displayValue }
++									onChange={ onChange }
++									isHex={ isHex }
++								/>
+ 							</VStack>
+ 						</VStack>
+ 					) }
+diff --git a/packages/components/src/color-palette/types.ts b/packages/components/src/color-palette/types.ts
+index b2a7a884fec57d..c6f4446542e13a 100644
+--- a/packages/components/src/color-palette/types.ts
++++ b/packages/components/src/color-palette/types.ts
+@@ -122,3 +122,9 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
+ 				'aria-label'?: never;
+ 		  }
+ 	);
++
++export type CustomColorValueInputProps = {
++	value?: string;
++	onChange: ( newColor?: string ) => void;
++	isHex: boolean;
++};

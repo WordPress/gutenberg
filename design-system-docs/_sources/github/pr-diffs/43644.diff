@@ -1,0 +1,33 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b8000b2772d714..44712242e5a741 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
+ -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
++-   `Navigation`: use `code` instead of `keyCode` for keyboard events ([#43644](https://github.com/WordPress/gutenberg/pull/43644/)).
+ 
+ ## 20.0.0 (2022-08-24)
+ 
+diff --git a/packages/components/src/navigation/menu/menu-title-search.js b/packages/components/src/navigation/menu/menu-title-search.js
+index 9e0caabccc4f98..8271cdf8b8f083 100644
+--- a/packages/components/src/navigation/menu/menu-title-search.js
++++ b/packages/components/src/navigation/menu/menu-title-search.js
+@@ -3,7 +3,6 @@
+  */
+ import { useEffect, useRef } from '@wordpress/element';
+ import { __, _n, sprintf } from '@wordpress/i18n';
+-import { ESCAPE } from '@wordpress/keycodes';
+ 
+ /**
+  * Internal dependencies
+@@ -61,7 +60,7 @@ function MenuTitleSearch( {
+ 	};
+ 
+ 	function onKeyDown( event ) {
+-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
++		if ( event.code === 'Escape' && ! event.defaultPrevented ) {
+ 			event.preventDefault();
+ 			onClose();
+ 		}

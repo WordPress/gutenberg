@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4289866ce8b46f..2cb9849819bef4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ 
+ -   `__experimentalBorderControl` can now be imported as a stable `BorderControl` ([#65475](https://github.com/WordPress/gutenberg/pull/65475)).
+ -   `__experimentalBorderBoxControl` can now be imported as a stable `BorderBoxControl` ([#65586](https://github.com/WordPress/gutenberg/pull/65586)).
++-   `__experimentalNavigator*` components can now be imported as a stable `Navigator`. Similarly, the `__experimentalUseNavigator` hook can be imported as a stable `useNavigator` ([#65802](https://github.com/WordPress/gutenberg/pull/65802)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index 69e76b0b91f43f..e82d6da70279e8 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -129,15 +129,21 @@ export { default as __experimentalNavigationGroup } from './navigation/group';
+ export { default as __experimentalNavigationItem } from './navigation/item';
+ export { default as __experimentalNavigationMenu } from './navigation/menu';
+ export {
++	/** @deprecated Import `Navigator` instead. */
+ 	NavigatorProvider as __experimentalNavigatorProvider,
++	/** @deprecated Import `Navigator` and use `Navigator.Screen` instead. */
+ 	NavigatorScreen as __experimentalNavigatorScreen,
++	/** @deprecated Import `Navigator` and use `Navigator.Button` instead. */
+ 	NavigatorButton as __experimentalNavigatorButton,
++	/** @deprecated Import `Navigator` and use `Navigator.BackButton` instead. */
+ 	NavigatorBackButton as __experimentalNavigatorBackButton,
++	/** @deprecated Import `Navigator` and use `Navigator.BackButton` instead. */
+ 	NavigatorToParentButton as __experimentalNavigatorToParentButton,
+ } from './navigator/legacy';
+ export {
+ 	Navigator,
+ 	useNavigator,
++	/** @deprecated Import `useNavigator` instead. */
+ 	useNavigator as __experimentalUseNavigator,
+ } from './navigator';
+ export { default as Notice } from './notice';

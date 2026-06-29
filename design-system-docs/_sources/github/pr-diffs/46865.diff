@@ -1,0 +1,408 @@
+diff --git a/packages/block-editor/src/components/block-alignment-matrix-control/index.js b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+index 6ea7b2a49c8a95..8acb125a1ad931 100644
+--- a/packages/block-editor/src/components/block-alignment-matrix-control/index.js
++++ b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+@@ -23,8 +23,7 @@ function BlockAlignmentMatrixControl( props ) {
+ 
+ 	return (
+ 		<Dropdown
+-			position="bottom right"
+-			popoverProps={ { variant: 'toolbar' } }
++			popoverProps={ { variant: 'toolbar', placement: 'bottom-start' } }
+ 			renderToggle={ ( { onToggle, isOpen } ) => {
+ 				const openOnArrowDown = ( event ) => {
+ 					if ( ! isOpen && event.keyCode === DOWN ) {
+diff --git a/packages/block-editor/src/components/block-navigation/dropdown.js b/packages/block-editor/src/components/block-navigation/dropdown.js
+index 8574d66e943160..e04589d002c539 100644
+--- a/packages/block-editor/src/components/block-navigation/dropdown.js
++++ b/packages/block-editor/src/components/block-navigation/dropdown.js
+@@ -56,7 +56,7 @@ function BlockNavigationDropdown( { isDisabled, ...props }, ref ) {
+ 	return (
+ 		<Dropdown
+ 			contentClassName="block-editor-block-navigation__popover"
+-			position="bottom right"
++			popoverProps={ { placement: 'bottom-start' } }
+ 			renderToggle={ ( { isOpen, onToggle } ) => (
+ 				<BlockNavigationDropdownToggle
+ 					{ ...props }
+diff --git a/packages/block-editor/src/components/color-style-selector/index.js b/packages/block-editor/src/components/color-style-selector/index.js
+index 40f2a7276a4697..957e3adc400e67 100644
+--- a/packages/block-editor/src/components/color-style-selector/index.js
++++ b/packages/block-editor/src/components/color-style-selector/index.js
+@@ -87,7 +87,7 @@ const BlockColorsStyleSelector = ( { children, ...other } ) => {
+ 
+ 	return (
+ 		<Dropdown
+-			position="bottom right"
++			popoverProps={ { placement: 'bottom-start' } }
+ 			className="block-library-colors-selector"
+ 			contentClassName="block-library-colors-selector__popover"
+ 			renderToggle={ renderToggleComponent( other ) }
+diff --git a/packages/block-editor/src/components/image-editor/constants.js b/packages/block-editor/src/components/image-editor/constants.js
+index b2419aa07b7ce7..92b58c628f7ae1 100644
+--- a/packages/block-editor/src/components/image-editor/constants.js
++++ b/packages/block-editor/src/components/image-editor/constants.js
+@@ -1,6 +1,6 @@
+ export const MIN_ZOOM = 100;
+ export const MAX_ZOOM = 300;
+ export const POPOVER_PROPS = {
+-	position: 'bottom right',
++	placement: 'bottom-start',
+ 	variant: 'toolbar',
+ };
+diff --git a/packages/block-editor/src/components/inserter/index.js b/packages/block-editor/src/components/inserter/index.js
+index 258faff2b826ab..660857b955dcc1 100644
+--- a/packages/block-editor/src/components/inserter/index.js
++++ b/packages/block-editor/src/components/inserter/index.js
+@@ -207,7 +207,7 @@ class Inserter extends Component {
+ 					'block-editor-inserter__popover',
+ 					{ 'is-quick': isQuick }
+ 				) }
+-				position={ position }
++				popoverProps={ { position } }
+ 				onToggle={ this.onToggle }
+ 				expandOnMobile
+ 				headerTitle={ __( 'Add a block' ) }
+diff --git a/packages/block-editor/src/components/tool-selector/index.js b/packages/block-editor/src/components/tool-selector/index.js
+index 3da6ebc5a9c468..1e93a18cf6bb9e 100644
+--- a/packages/block-editor/src/components/tool-selector/index.js
++++ b/packages/block-editor/src/components/tool-selector/index.js
+@@ -51,7 +51,7 @@ function ToolSelector( props, ref ) {
+ 					label={ __( 'Tools' ) }
+ 				/>
+ 			) }
+-			position="bottom right"
++			popoverProps={ { placement: 'bottom-start' } }
+ 			renderContent={ () => (
+ 				<>
+ 					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 98d12002606e50..c2d589cf216e7d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `Dropdown`: deprecate `position`  prop, use `popoverProps` instead ([46865](https://github.com/WordPress/gutenberg/pull/46865)).
++
+ ### Internal
+ 
+ -   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
+diff --git a/packages/components/src/dropdown/README.md b/packages/components/src/dropdown/README.md
+index 62482f398e26ca..3dd321ed900128 100644
+--- a/packages/components/src/dropdown/README.md
++++ b/packages/components/src/dropdown/README.md
+@@ -13,7 +13,7 @@ const MyDropdown = () => (
+ 	<Dropdown
+ 		className="my-container-class-name"
+ 		contentClassName="my-popover-content-classname"
+-		position="bottom right"
++		popoverProps={ { placement: 'bottom-start' } }
+ 		renderToggle={ ( { isOpen, onToggle } ) => (
+ 			<Button
+ 				variant="primary"
+@@ -90,13 +90,6 @@ Use this object to access properties/features of the `Popover` component that ar
+ 
+ -   Required: No
+ 
+-### `position`: `PopoverProps[ 'position' ]`
+-
+-The direction in which the popover should open relative to its parent node. Specify a y- and an x-axis as a space-separated string. Supports `"top"`, `"bottom"` y-axis, and `"left"`, `"center"`, `"right"` x-axis.
+-
+--   Required: No
+--   Default: `"top center"`
+-
+ ### `renderContent`: `( props: CallbackProps ) => ReactNode`
+ 
+ A callback invoked to render the content of the dropdown menu.
+diff --git a/packages/components/src/dropdown/index.tsx b/packages/components/src/dropdown/index.tsx
+index f048c6dfcad052..06499be7f9c303 100644
+--- a/packages/components/src/dropdown/index.tsx
++++ b/packages/components/src/dropdown/index.tsx
+@@ -9,6 +9,7 @@ import type { ForwardedRef } from 'react';
+  */
+ import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -41,14 +42,24 @@ function UnforwardedDropdown(
+ 		expandOnMobile,
+ 		headerTitle,
+ 		focusOnMount,
+-		position,
+ 		popoverProps,
+ 		onClose,
+ 		onToggle,
+ 		style,
++
++		// Deprecated props
++		position,
+ 	}: DropdownProps,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
++	if ( position !== undefined ) {
++		deprecated( '`position` prop in wp.components.Dropdown', {
++			since: '6.2',
++			alternative: '`popoverProps.placement` prop',
++			hint: 'Note that the `position` prop will override any values passed through the `popoverProps.placement` prop.',
++		} );
++	}
++
+ 	// Use internal state instead of a ref to make sure that the component
+ 	// re-renders when the popover's anchor updates.
+ 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
+@@ -141,7 +152,7 @@ function UnforwardedDropdown(
+ 					{ ...popoverProps }
+ 					className={ classnames(
+ 						'components-dropdown__content',
+-						popoverProps ? popoverProps.className : undefined,
++						popoverProps?.className,
+ 						contentClassName
+ 					) }
+ 				>
+@@ -161,18 +172,18 @@ function UnforwardedDropdown(
+  * const MyDropdown = () => (
+  *   <Dropdown
+  *     className="my-container-class-name"
+- *     contentClassName="my-popover-content-classname"
+- *     position="bottom right"
++ *     contentClassName="my-dropdown-content-classname"
++ *     popoverProps={ { placement: 'bottom-start' } }
+  *     renderToggle={ ( { isOpen, onToggle } ) => (
+  *       <Button
+  *         variant="primary"
+  *         onClick={ onToggle }
+  *         aria-expanded={ isOpen }
+  *       >
+- *         Toggle Popover!
++ *         Toggle Dropdown!
+  *       </Button>
+  *     ) }
+- *     renderContent={ () => <div>This is the content of the popover.</div> }
++ *     renderContent={ () => <div>This is the content of the dropdown.</div> }
+  *   />
+  * );
+  * ```
+diff --git a/packages/components/src/dropdown/stories/index.tsx b/packages/components/src/dropdown/stories/index.tsx
+index ff155b6c42b5b9..5f21f7d4b30d34 100644
+--- a/packages/components/src/dropdown/stories/index.tsx
++++ b/packages/components/src/dropdown/stories/index.tsx
+@@ -16,11 +16,12 @@ const meta: ComponentMeta< typeof Dropdown > = {
+ 	subcomponents: { DropdownContentWrapper },
+ 	argTypes: {
+ 		focusOnMount: {
++			options: [ 'firstElement', true, false ],
+ 			control: {
+ 				type: 'radio',
+-				options: [ 'firstElement', true, false ],
+ 			},
+ 		},
++		position: { control: { type: null } },
+ 		renderContent: { control: { type: null } },
+ 		renderToggle: { control: { type: null } },
+ 	},
+@@ -42,7 +43,6 @@ const Template: ComponentStory< typeof Dropdown > = ( args ) => {
+ 
+ export const Default: ComponentStory< typeof Dropdown > = Template.bind( {} );
+ Default.args = {
+-	position: 'bottom right',
+ 	renderToggle: ( { isOpen, onToggle } ) => (
+ 		<Button onClick={ onToggle } aria-expanded={ isOpen } isPrimary>
+ 			Open dropdown
+diff --git a/packages/components/src/dropdown/types.ts b/packages/components/src/dropdown/types.ts
+index 822c9d4f2bc436..4842dc7d0a362a 100644
+--- a/packages/components/src/dropdown/types.ts
++++ b/packages/components/src/dropdown/types.ts
+@@ -81,16 +81,6 @@ export type DropdownProps = {
+ 		ComponentPropsWithoutRef< typeof Popover >,
+ 		'children'
+ 	>;
+-	/**
+-	 * The direction in which the popover should open
+-	 * relative to its parent node.
+-	 * Specify a y- and an x-axis as a space-separated string.
+-	 * Supports "top", "bottom" y-axis,
+-	 * and "left", "center", "right" x-axis.
+-	 *
+-	 * @default 'top center'
+-	 */
+-	position?: PopoverProps[ 'position' ];
+ 	/**
+ 	 * A callback invoked to render the content of the dropdown menu.
+ 	 * Its first argument is the same as the renderToggle prop.
+@@ -112,4 +102,13 @@ export type DropdownProps = {
+ 	 * The style of the global container.
+ 	 */
+ 	style?: CSSProperties;
++	/**
++	 * Legacy way to specify the popover's position with respect to its anchor.
++	 * For details about the possible values, see the `Popover` component's docs.
++	 * _Note: this prop is deprecated. Use the `popoverProps.placement` prop
++	 * instead._
++	 *
++	 * @deprecated
++	 */
++	position?: PopoverProps[ 'position' ];
+ };
+diff --git a/packages/edit-post/src/components/header/template-title/index.js b/packages/edit-post/src/components/header/template-title/index.js
+index adfceb88553452..c0745dc0451b74 100644
+--- a/packages/edit-post/src/components/header/template-title/index.js
++++ b/packages/edit-post/src/components/header/template-title/index.js
+@@ -77,7 +77,7 @@ function TemplateTitle() {
+ 			</Button>
+ 			{ hasOptions ? (
+ 				<Dropdown
+-					position="bottom center"
++					popoverProps={ { placement: 'bottom' } }
+ 					contentClassName="edit-post-template-top-area__popover"
+ 					renderToggle={ ( { onToggle } ) => (
+ 						<Button
+diff --git a/packages/edit-post/src/components/sidebar/post-schedule/index.js b/packages/edit-post/src/components/sidebar/post-schedule/index.js
+index 8ef3291e6096c7..dca0dd12c6d6be 100644
+--- a/packages/edit-post/src/components/sidebar/post-schedule/index.js
++++ b/packages/edit-post/src/components/sidebar/post-schedule/index.js
+@@ -16,7 +16,7 @@ export default function PostSchedule() {
+ 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+ 	// Memoize popoverProps to avoid returning a new object every time.
+ 	const popoverProps = useMemo(
+-		() => ( { anchor: popoverAnchor } ),
++		() => ( { anchor: popoverAnchor, placement: 'bottom-end' } ),
+ 		[ popoverAnchor ]
+ 	);
+ 
+@@ -29,7 +29,6 @@ export default function PostSchedule() {
+ 				<span>{ __( 'Publish' ) }</span>
+ 				<Dropdown
+ 					popoverProps={ popoverProps }
+-					position="bottom left"
+ 					contentClassName="edit-post-post-schedule__dialog"
+ 					focusOnMount
+ 					renderToggle={ ( { isOpen, onToggle } ) => (
+diff --git a/packages/edit-post/src/components/sidebar/post-template/index.js b/packages/edit-post/src/components/sidebar/post-template/index.js
+index ea7df1f94311ce..88809294f17db8 100644
+--- a/packages/edit-post/src/components/sidebar/post-template/index.js
++++ b/packages/edit-post/src/components/sidebar/post-template/index.js
+@@ -20,7 +20,7 @@ export default function PostTemplate() {
+ 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+ 	// Memoize popoverProps to avoid returning a new object every time.
+ 	const popoverProps = useMemo(
+-		() => ( { anchor: popoverAnchor } ),
++		() => ( { anchor: popoverAnchor, placement: 'bottom-end' } ),
+ 		[ popoverAnchor ]
+ 	);
+ 
+@@ -57,7 +57,6 @@ export default function PostTemplate() {
+ 			<span>{ __( 'Template' ) }</span>
+ 			<Dropdown
+ 				popoverProps={ popoverProps }
+-				position="bottom left"
+ 				className="edit-post-post-template__dropdown"
+ 				contentClassName="edit-post-post-template__dialog"
+ 				focusOnMount
+diff --git a/packages/edit-post/src/components/sidebar/post-url/index.js b/packages/edit-post/src/components/sidebar/post-url/index.js
+index 46b592c82b4964..1dc1b8d804cd77 100644
+--- a/packages/edit-post/src/components/sidebar/post-url/index.js
++++ b/packages/edit-post/src/components/sidebar/post-url/index.js
+@@ -16,7 +16,7 @@ export default function PostURL() {
+ 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+ 	// Memoize popoverProps to avoid returning a new object every time.
+ 	const popoverProps = useMemo(
+-		() => ( { anchor: popoverAnchor } ),
++		() => ( { anchor: popoverAnchor, placement: 'bottom-end' } ),
+ 		[ popoverAnchor ]
+ 	);
+ 
+@@ -26,7 +26,6 @@ export default function PostURL() {
+ 				<span>{ __( 'URL' ) }</span>
+ 				<Dropdown
+ 					popoverProps={ popoverProps }
+-					position="bottom left"
+ 					className="edit-post-post-url__dropdown"
+ 					contentClassName="edit-post-post-url__dialog"
+ 					focusOnMount
+diff --git a/packages/edit-post/src/components/sidebar/post-visibility/index.js b/packages/edit-post/src/components/sidebar/post-visibility/index.js
+index 43d9e6ab4264b9..080737c431f1e0 100644
+--- a/packages/edit-post/src/components/sidebar/post-visibility/index.js
++++ b/packages/edit-post/src/components/sidebar/post-visibility/index.js
+@@ -21,6 +21,7 @@ export function PostVisibility() {
+ 			// Anchor the popover to the middle of the entire row so that it doesn't
+ 			// move around when the label changes.
+ 			anchor: popoverAnchor,
++			placement: 'bottom-end',
+ 		} ),
+ 		[ popoverAnchor ]
+ 	);
+@@ -40,7 +41,6 @@ export function PostVisibility() {
+ 					) }
+ 					{ canEdit && (
+ 						<Dropdown
+-							position="bottom left"
+ 							contentClassName="edit-post-post-visibility__dialog"
+ 							popoverProps={ popoverProps }
+ 							focusOnMount
+diff --git a/packages/edit-site/src/components/header-edit-mode/document-actions/index.js b/packages/edit-site/src/components/header-edit-mode/document-actions/index.js
+index 30acc5fe04d443..e738f4bd23d135 100644
+--- a/packages/edit-site/src/components/header-edit-mode/document-actions/index.js
++++ b/packages/edit-site/src/components/header-edit-mode/document-actions/index.js
+@@ -88,6 +88,7 @@ export default function DocumentActions() {
+ 			// Use the title wrapper as the popover anchor so that the dropdown is
+ 			// centered over the whole title area rather than just one part of it.
+ 			anchor: popoverAnchor,
++			placement: 'bottom',
+ 		} ),
+ 		[ popoverAnchor ]
+ 	);
+@@ -146,7 +147,6 @@ export default function DocumentActions() {
+ 
+ 				<Dropdown
+ 					popoverProps={ popoverProps }
+-					position="bottom center"
+ 					renderToggle={ ( { isOpen, onToggle } ) => (
+ 						<Button
+ 							className="edit-site-document-actions__get-info"
+diff --git a/packages/editor/src/components/table-of-contents/index.js b/packages/editor/src/components/table-of-contents/index.js
+index 97d96efaf84738..c63fdbfd83e25c 100644
+--- a/packages/editor/src/components/table-of-contents/index.js
++++ b/packages/editor/src/components/table-of-contents/index.js
+@@ -23,7 +23,9 @@ function TableOfContents(
+ 	);
+ 	return (
+ 		<Dropdown
+-			position={ repositionDropdown ? 'middle right right' : 'bottom' }
++			popoverProps={ {
++				placement: repositionDropdown ? 'right' : 'bottom',
++			} }
+ 			className="table-of-contents"
+ 			contentClassName="table-of-contents__popover"
+ 			renderToggle={ ( { isOpen, onToggle } ) => (
+diff --git a/packages/interface/src/components/more-menu-dropdown/index.js b/packages/interface/src/components/more-menu-dropdown/index.js
+index cc9ab69d0e6a59..d6a32d57b05f86 100644
+--- a/packages/interface/src/components/more-menu-dropdown/index.js
++++ b/packages/interface/src/components/more-menu-dropdown/index.js
+@@ -28,7 +28,7 @@ export default function MoreMenuDropdown( {
+ 			icon={ moreVertical }
+ 			label={ label }
+ 			popoverProps={ {
+-				position: 'bottom left',
++				placement: 'bottom-end',
+ 				...popoverProps,
+ 				className: classnames(
+ 					'interface-more-menu-dropdown__content',
+diff --git a/packages/list-reusable-blocks/src/components/import-dropdown/index.js b/packages/list-reusable-blocks/src/components/import-dropdown/index.js
+index ddeed025b42c54..94f70a1551199d 100644
+--- a/packages/list-reusable-blocks/src/components/import-dropdown/index.js
++++ b/packages/list-reusable-blocks/src/components/import-dropdown/index.js
+@@ -13,7 +13,7 @@ import ImportForm from '../import-form';
+ function ImportDropdown( { onUpload } ) {
+ 	return (
+ 		<Dropdown
+-			position="bottom right"
++			popoverProps={ { placement: 'bottom-start' } }
+ 			contentClassName="list-reusable-blocks-import-dropdown__content"
+ 			renderToggle={ ( { isOpen, onToggle } ) => (
+ 				<Button

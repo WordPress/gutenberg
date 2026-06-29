@@ -1,0 +1,310 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8345184770646c..3ebdebd863fb8d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Bug Fixes
+ 
+ -   `Button`: Remove fixed width from small and compact buttons with icons ([#69378](https://github.com/WordPress/gutenberg/pull/69378)).
++-   `ToolsPanel`: Updated the ARIA labels to match the visible text to improve accessibilty ([#68592](https://github.com/WordPress/gutenberg/pull/68592)).
+ 
+ ## 29.5.0 (2025-02-28)
+ 
+diff --git a/packages/components/src/tools-panel/test/index.tsx b/packages/components/src/tools-panel/test/index.tsx
+index 68cf72233121e0..981f94793a4333 100644
+--- a/packages/components/src/tools-panel/test/index.tsx
++++ b/packages/components/src/tools-panel/test/index.tsx
+@@ -802,7 +802,7 @@ describe( 'ToolsPanel', () => {
+ 
+ 			const altItem = screen.getByText( 'Nested Control 2' );
+ 			const altMenuItem = screen.getByRole( 'menuitemcheckbox', {
+-				name: 'Show Nested Control 2',
++				name: 'Nested Control 2',
+ 				checked: false,
+ 			} );
+ 
+@@ -840,7 +840,7 @@ describe( 'ToolsPanel', () => {
+ 
+ 			const altItem = screen.getByText( 'Nested Control 2' );
+ 			const altMenuItem = screen.getByRole( 'menuitemcheckbox', {
+-				name: 'Show Nested Control 2',
++				name: 'Nested Control 2',
+ 				checked: false,
+ 			} );
+ 
+@@ -1090,12 +1090,12 @@ describe( 'ToolsPanel', () => {
+ 			// and appear in the panel menu.
+ 			expect(
+ 				screen.getByRole( 'menuitemcheckbox', {
+-					name: 'Show Alt',
++					name: 'Alt',
+ 				} )
+ 			).toBeInTheDocument();
+ 			expect(
+ 				screen.queryByRole( 'menuitemcheckbox', {
+-					name: 'Hide and reset Example',
++					name: 'Example',
+ 				} )
+ 			).not.toBeInTheDocument();
+ 
+@@ -1104,12 +1104,12 @@ describe( 'ToolsPanel', () => {
+ 			rerender( <TestSlotFillPanel panelId="9999" /> );
+ 			expect(
+ 				screen.queryByRole( 'menuitemcheckbox', {
+-					name: 'Show Alt',
++					name: 'Alt',
+ 				} )
+ 			).not.toBeInTheDocument();
+ 			expect(
+ 				screen.getByRole( 'menuitemcheckbox', {
+-					name: 'Hide and reset Example',
++					name: 'Example',
+ 				} )
+ 			).toBeInTheDocument();
+ 		} );
+diff --git a/packages/components/src/tools-panel/tools-panel-header/component.tsx b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+index 1f35258bd50ee1..49fc8008918f61 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+@@ -98,24 +98,12 @@ const OptionalControlsGroup = ( {
+ 	return (
+ 		<>
+ 			{ items.map( ( [ label, isSelected ] ) => {
+-				const itemLabel = isSelected
+-					? sprintf(
+-							// translators: %s: The name of the control being hidden and reset e.g. "Padding".
+-							__( 'Hide and reset %s' ),
+-							label
+-					  )
+-					: sprintf(
+-							// translators: %s: The name of the control to display e.g. "Padding".
+-							_x( 'Show %s', 'input control' ),
+-							label
+-					  );
+-
+ 				return (
+ 					<MenuItem
+ 						key={ label }
+ 						icon={ isSelected ? check : null }
+ 						isSelected={ isSelected }
+-						label={ itemLabel }
++						label={ label }
+ 						onClick={ () => {
+ 							if ( isSelected ) {
+ 								speak(
+diff --git a/test/e2e/specs/editor/blocks/navigation-colors.spec.js b/test/e2e/specs/editor/blocks/navigation-colors.spec.js
+index 80b36d54980b1e..fe8ce3ebedc7d7 100644
+--- a/test/e2e/specs/editor/blocks/navigation-colors.spec.js
++++ b/test/e2e/specs/editor/blocks/navigation-colors.spec.js
+@@ -144,9 +144,7 @@ test.describe( 'Navigation colors', () => {
+ 		await editor.openDocumentSettingsSidebar();
+ 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
+ 		await page.getByRole( 'button', { name: 'Color options' } ).click();
+-		await page
+-			.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
+-			.click();
++		await page.getByRole( 'menuitemcheckbox', { name: 'Link' } ).click();
+ 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
+ 		await page.getByRole( 'button', { name: 'Link', exact: true } ).click();
+ 		// rga(207, 46 ,46) is the color of the "vivid red" color preset.
+diff --git a/test/e2e/specs/editor/various/block-bindings/custom-sources.spec.js b/test/e2e/specs/editor/various/block-bindings/custom-sources.spec.js
+index fab6e10a7568cf..31393ef2da8e57 100644
+--- a/test/e2e/specs/editor/various/block-bindings/custom-sources.spec.js
++++ b/test/e2e/specs/editor/various/block-bindings/custom-sources.spec.js
+@@ -774,7 +774,7 @@ test.describe( 'Registered sources', () => {
+ 			await page.getByLabel( 'Attributes options' ).click();
+ 			await page
+ 				.getByRole( 'menuitemcheckbox', {
+-					name: 'Show content',
++					name: 'content',
+ 				} )
+ 				.click();
+ 			await page.getByRole( 'button', { name: 'content' } ).click();
+@@ -796,7 +796,7 @@ test.describe( 'Registered sources', () => {
+ 			} );
+ 			await page.getByLabel( 'Attributes options' ).click();
+ 			const contentAttribute = page.getByRole( 'menuitemcheckbox', {
+-				name: 'Show content',
++				name: 'content',
+ 			} );
+ 			await expect( contentAttribute ).toBeVisible();
+ 		} );
+@@ -809,7 +809,7 @@ test.describe( 'Registered sources', () => {
+ 			} );
+ 			await page.getByLabel( 'Attributes options' ).click();
+ 			const contentAttribute = page.getByRole( 'menuitemcheckbox', {
+-				name: 'Show content',
++				name: 'content',
+ 			} );
+ 			await expect( contentAttribute ).toBeVisible();
+ 		} );
+@@ -839,24 +839,24 @@ test.describe( 'Registered sources', () => {
+ 				.getByLabel( 'Attributes options' )
+ 				.click();
+ 			const urlAttribute = page.getByRole( 'menuitemcheckbox', {
+-				name: 'Show url',
++				name: 'url',
+ 			} );
+ 			await expect( urlAttribute ).toBeVisible();
+ 			const textAttribute = page.getByRole( 'menuitemcheckbox', {
+-				name: 'Show text',
++				name: 'text',
+ 			} );
+ 			await expect( textAttribute ).toBeVisible();
+ 			const linkTargetAttribute = page.getByRole( 'menuitemcheckbox', {
+-				name: 'Show linkTarget',
++				name: 'linkTarget',
+ 			} );
+ 			await expect( linkTargetAttribute ).toBeVisible();
+ 			const relAttribute = page.getByRole( 'menuitemcheckbox', {
+-				name: 'Show rel',
++				name: 'rel',
+ 			} );
+ 			await expect( relAttribute ).toBeVisible();
+ 			// Check not supported attributes are not included.
+ 			const tagNameAttribute = page.getByRole( 'menuitemcheckbox', {
+-				name: 'Show tagName',
++				name: 'tagName',
+ 			} );
+ 			await expect( tagNameAttribute ).toBeHidden();
+ 		} );
+@@ -874,24 +874,24 @@ test.describe( 'Registered sources', () => {
+ 				.getByLabel( 'Attributes options' )
+ 				.click();
+ 			const urlAttribute = page.getByRole( 'menuitemcheckbox', {
+-				name: 'Show url',
++				name: 'url',
+ 			} );
+ 			await expect( urlAttribute ).toBeVisible();
+ 			const idAttribute = page.getByRole( 'menuitemcheckbox', {
+-				name: 'Show id',
++				name: 'id',
+ 			} );
+ 			await expect( idAttribute ).toBeVisible();
+ 			const titleAttribute = page.getByRole( 'menuitemcheckbox', {
+-				name: 'Show title',
++				name: 'title',
+ 			} );
+ 			await expect( titleAttribute ).toBeVisible();
+ 			const altAttribute = page.getByRole( 'menuitemcheckbox', {
+-				name: 'Show alt',
++				name: 'alt',
+ 			} );
+ 			await expect( altAttribute ).toBeVisible();
+ 			// Check not supported attributes are not included.
+ 			const linkClassAttribute = page.getByRole( 'menuitemcheckbox', {
+-				name: 'Show linkClass',
++				name: 'linkClass',
+ 			} );
+ 			await expect( linkClassAttribute ).toBeHidden();
+ 		} );
+diff --git a/test/e2e/specs/editor/various/block-bindings/post-meta.spec.js b/test/e2e/specs/editor/various/block-bindings/post-meta.spec.js
+index 318707e22f098d..92edb6ad8dd461 100644
+--- a/test/e2e/specs/editor/various/block-bindings/post-meta.spec.js
++++ b/test/e2e/specs/editor/various/block-bindings/post-meta.spec.js
+@@ -156,7 +156,7 @@ test.describe( 'Post Meta source', () => {
+ 				await page.getByLabel( 'Attributes options' ).click();
+ 				await page
+ 					.getByRole( 'menuitemcheckbox', {
+-						name: 'Show content',
++						name: 'content',
+ 					} )
+ 					.click();
+ 				const contentBinding = page.getByRole( 'button', {
+@@ -187,7 +187,7 @@ test.describe( 'Post Meta source', () => {
+ 				await page.getByLabel( 'Attributes options' ).click();
+ 				await page
+ 					.getByRole( 'menuitemcheckbox', {
+-						name: 'Show content',
++						name: 'content',
+ 					} )
+ 					.click();
+ 				const contentBinding = page.getByRole( 'button', {
+@@ -213,7 +213,7 @@ test.describe( 'Post Meta source', () => {
+ 				await page.getByLabel( 'Attributes options' ).click();
+ 				await page
+ 					.getByRole( 'menuitemcheckbox', {
+-						name: 'Show content',
++						name: 'content',
+ 					} )
+ 					.click();
+ 				await page
+@@ -575,7 +575,7 @@ test.describe( 'Post Meta source', () => {
+ 			await page.getByLabel( 'Attributes options' ).click();
+ 			await page
+ 				.getByRole( 'menuitemcheckbox', {
+-					name: 'Show content',
++					name: 'content',
+ 				} )
+ 				.click();
+ 			await page
+@@ -598,7 +598,7 @@ test.describe( 'Post Meta source', () => {
+ 			await page.getByLabel( 'Attributes options' ).click();
+ 			await page
+ 				.getByRole( 'menuitemcheckbox', {
+-					name: 'Show content',
++					name: 'content',
+ 				} )
+ 				.click();
+ 			await page
+diff --git a/test/e2e/specs/editor/various/change-detection.spec.js b/test/e2e/specs/editor/various/change-detection.spec.js
+index 12d13b4890e368..48849af44f591d 100644
+--- a/test/e2e/specs/editor/various/change-detection.spec.js
++++ b/test/e2e/specs/editor/various/change-detection.spec.js
+@@ -455,7 +455,7 @@ test.describe( 'Change detection', () => {
+ 			.click();
+ 		await page
+ 			.getByRole( 'menu', { name: 'Typography options' } )
+-			.getByRole( 'menuitemcheckbox', { name: 'Show drop cap' } )
++			.getByRole( 'menuitemcheckbox', { name: 'drop cap' } )
+ 			.click();
+ 
+ 		await page
+diff --git a/test/e2e/specs/editor/various/editor-modes.spec.js b/test/e2e/specs/editor/various/editor-modes.spec.js
+index 4e856e6214ca8c..036c413365e38d 100644
+--- a/test/e2e/specs/editor/various/editor-modes.spec.js
++++ b/test/e2e/specs/editor/various/editor-modes.spec.js
+@@ -45,7 +45,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
+ 			.getByRole( 'button', { name: 'Typography options' } )
+ 			.click();
+ 		await page
+-			.getByRole( 'menuitemcheckbox', { name: 'Show Drop cap' } )
++			.getByRole( 'menuitemcheckbox', { name: 'Drop cap' } )
+ 			.click();
+ 
+ 		await expect(
+@@ -74,7 +74,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
+ 			.getByRole( 'button', { name: 'Typography options' } )
+ 			.click();
+ 		await page
+-			.getByRole( 'menuitemcheckbox', { name: 'Show Drop cap' } )
++			.getByRole( 'menuitemcheckbox', { name: 'Drop cap' } )
+ 			.click();
+ 		await page.getByRole( 'checkbox', { name: 'Drop cap' } ).check();
+ 
+diff --git a/test/e2e/specs/editor/various/font-appearance-control.spec.js b/test/e2e/specs/editor/various/font-appearance-control.spec.js
+index 4b148b6dd8587c..9f8df9d86628bb 100644
+--- a/test/e2e/specs/editor/various/font-appearance-control.spec.js
++++ b/test/e2e/specs/editor/various/font-appearance-control.spec.js
+@@ -81,7 +81,7 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
+ 			.getByRole( 'button', { name: 'Typography options' } )
+ 			.click();
+ 		await page
+-			.getByRole( 'menuitemcheckbox', { name: 'Show Appearance' } )
++			.getByRole( 'menuitemcheckbox', { name: 'Appearance' } )
+ 			.click();
+ 		await expect(
+ 			page.getByRole( 'combobox', { name: 'Appearance' } )
+diff --git a/test/e2e/specs/widgets/customizing-widgets.spec.js b/test/e2e/specs/widgets/customizing-widgets.spec.js
+index 04b09da84928e1..6251acd9922740 100644
+--- a/test/e2e/specs/widgets/customizing-widgets.spec.js
++++ b/test/e2e/specs/widgets/customizing-widgets.spec.js
+@@ -553,7 +553,7 @@ test.describe( 'Widgets Customizer', () => {
+ 
+ 		// Change `drop cap` (Any change made in this section is sufficient; not required to be `drop cap`).
+ 		await page.click( 'role=button[name="Typography options"i]' );
+-		await page.click( 'role=menuitemcheckbox[name="Show Drop cap"i]' );
++		await page.click( 'role=menuitemcheckbox[name="Drop cap"i]' );
+ 
+ 		await page.click( 'role=checkbox[name="Drop cap"i]' );
+ 

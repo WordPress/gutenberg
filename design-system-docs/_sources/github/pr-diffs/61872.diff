@@ -1,0 +1,90 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 73365bda8de59e..09ff36f34def5e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Internal
+ 
++-   Add type support for CSS Custom Properties ([#61872](https://github.com/WordPress/gutenberg/pull/61872)).
+ -   Remove usage of deprecated spreading of `key` prop in JSX in CustomSelectControl and FormTokenField components ([#61692](https://github.com/WordPress/gutenberg/pull/61692)).
+ -   Tooltip: Fix Ariakit tooltip store usage ([#61858](https://github.com/WordPress/gutenberg/pull/61858)).
+ 
+diff --git a/packages/components/src/color-palette/stories/index.story.tsx b/packages/components/src/color-palette/stories/index.story.tsx
+index b49de51c1d16e3..727e840ff99358 100644
+--- a/packages/components/src/color-palette/stories/index.story.tsx
++++ b/packages/components/src/color-palette/stories/index.story.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import type { CSSProperties } from 'react';
+ import type { Meta, StoryFn } from '@storybook/react';
+ 
+ /**
+@@ -92,13 +91,11 @@ MultipleOrigins.args = {
+ export const CSSVariables: StoryFn< typeof ColorPalette > = ( args ) => {
+ 	return (
+ 		<div
+-			style={
+-				{
+-					'--red': '#f00',
+-					'--yellow': '#ff0',
+-					'--blue': '#00f',
+-				} as CSSProperties
+-			}
++			style={ {
++				'--red': '#f00',
++				'--yellow': '#ff0',
++				'--blue': '#00f',
++			} }
+ 		>
+ 			<Template { ...args } />
+ 		</div>
+diff --git a/packages/components/src/css.d.ts b/packages/components/src/css.d.ts
+new file mode 100644
+index 00000000000000..598eb388f6d352
+--- /dev/null
++++ b/packages/components/src/css.d.ts
+@@ -0,0 +1,9 @@
++import type * as CSS from 'csstype';
++
++// See: https://github.com/DefinitelyTyped/DefinitelyTyped/blob/f6d4d15522356eba4a0267142834e3abc6b603fc/types/react/index.d.ts#L2580-L2587
++declare module 'csstype' {
++	interface Properties {
++		// Allow any CSS Custom Properties
++		[ index: `--${ string }` ]: any;
++	}
++}
+diff --git a/packages/components/src/progress-bar/index.tsx b/packages/components/src/progress-bar/index.tsx
+index ed13c036e99162..d670d558ebd837 100644
+--- a/packages/components/src/progress-bar/index.tsx
++++ b/packages/components/src/progress-bar/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { CSSProperties, ForwardedRef } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -26,13 +26,11 @@ function UnforwardedProgressBar(
+ 	return (
+ 		<ProgressBarStyled.Track className={ className }>
+ 			<ProgressBarStyled.Indicator
+-				style={
+-					{
+-						'--indicator-width': ! isIndeterminate
+-							? `${ value }%`
+-							: undefined,
+-					} as CSSProperties
+-				}
++				style={ {
++					'--indicator-width': ! isIndeterminate
++						? `${ value }%`
++						: undefined,
++				} }
+ 				isIndeterminate={ isIndeterminate }
+ 			/>
+ 			<ProgressBarStyled.ProgressElement

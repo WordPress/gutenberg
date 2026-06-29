@@ -1,0 +1,35 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ca2d278909aa78..07d76de898ee91 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,13 +18,13 @@
+ -   `PaletteEdit`: Fix padding in RTL languages ([#54034](https://github.com/WordPress/gutenberg/pull/54034)).
+ -   `CircularOptionPicker`: make focus styles resilient to button size changes ([#54196](https://github.com/WordPress/gutenberg/pull/54196)).
+ 
+-
+ ### Internal
+ 
+ -   `Composite`: Convert to TypeScript ([#54028](https://github.com/WordPress/gutenberg/pull/54028)).
+ -   `BorderControl`: Refactor unit tests to use `userEvent` ([#54155](https://github.com/WordPress/gutenberg/pull/54155))
+ -   `FocusableIframe`: Convert to TypeScript ([#53979](https://github.com/WordPress/gutenberg/pull/53979)).
+ -   `Popover`: Remove unused `overlay` type from `positionToPlacement` utility function ([#54101](https://github.com/WordPress/gutenberg/pull/54101)).
++-   `IsolatedEventContainer`: Convert unit test to TypeScript ([#54316](https://github.com/WordPress/gutenberg/pull/54316)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/isolated-event-container/test/index.js b/packages/components/src/isolated-event-container/test/index.tsx
+similarity index 97%
+rename from packages/components/src/isolated-event-container/test/index.js
+rename to packages/components/src/isolated-event-container/test/index.tsx
+index 2f13cf06b6db66..a914527b937ff2 100644
+--- a/packages/components/src/isolated-event-container/test/index.js
++++ b/packages/components/src/isolated-event-container/test/index.tsx
+@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * Internal dependencies
+  */
+-import IsolatedEventContainer from '../';
++import IsolatedEventContainer from '..';
+ 
+ describe( 'IsolatedEventContainer', () => {
+ 	it( 'should pass props to container', async () => {

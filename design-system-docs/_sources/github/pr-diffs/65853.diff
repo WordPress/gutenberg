@@ -1,0 +1,175 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eb158bcd5111a9..4f8f6400bc544f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `ToolsPanel`: atomic one-step state update when (un)registering panels ([#65564](https://github.com/WordPress/gutenberg/pull/65564)).
+ -   `Navigator`: fix `isInitial` logic ([#65527](https://github.com/WordPress/gutenberg/pull/65527)).
+ -   `ToggleGroupControl`: Fix arrow key navigation in RTL ([#65735](https://github.com/WordPress/gutenberg/pull/65735)).
++-   `Composite`: fix legacy support for the store prop ([#65821](https://github.com/WordPress/gutenberg/pull/65821)).
+ 
+ ## 28.8.0 (2024-09-19)
+ 
+diff --git a/packages/components/src/composite/group-label.tsx b/packages/components/src/composite/group-label.tsx
+index 17070dbb86bf81..7e3c6ffdc7759c 100644
+--- a/packages/components/src/composite/group-label.tsx
++++ b/packages/components/src/composite/group-label.tsx
+@@ -20,11 +20,13 @@ export const CompositeGroupLabel = forwardRef<
+ 	WordPressComponentProps< CompositeGroupLabelProps, 'div', false >
+ >( function CompositeGroupLabel( props, ref ) {
+ 	const context = useCompositeContext();
++
++	// @ts-expect-error The store prop is undocumented and only used by the
++	// legacy compat layer. The `store` prop is documented, but its type is
++	// obfuscated to discourage its use outside of the component's internals.
++	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
++
+ 	return (
+-		<Ariakit.CompositeGroupLabel
+-			store={ context.store as Ariakit.CompositeStore }
+-			{ ...props }
+-			ref={ ref }
+-		/>
++		<Ariakit.CompositeGroupLabel store={ store } { ...props } ref={ ref } />
+ 	);
+ } );
+diff --git a/packages/components/src/composite/group.tsx b/packages/components/src/composite/group.tsx
+index ae21ca6f11dd92..bcfb47e684613d 100644
+--- a/packages/components/src/composite/group.tsx
++++ b/packages/components/src/composite/group.tsx
+@@ -20,11 +20,11 @@ export const CompositeGroup = forwardRef<
+ 	WordPressComponentProps< CompositeGroupProps, 'div', false >
+ >( function CompositeGroup( props, ref ) {
+ 	const context = useCompositeContext();
+-	return (
+-		<Ariakit.CompositeGroup
+-			store={ context.store as Ariakit.CompositeStore }
+-			{ ...props }
+-			ref={ ref }
+-		/>
+-	);
++
++	// @ts-expect-error The store prop is undocumented and only used by the
++	// legacy compat layer. The `store` prop is documented, but its type is
++	// obfuscated to discourage its use outside of the component's internals.
++	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
++
++	return <Ariakit.CompositeGroup store={ store } { ...props } ref={ ref } />;
+ } );
+diff --git a/packages/components/src/composite/hover.tsx b/packages/components/src/composite/hover.tsx
+index ca0bd9d8f6aa12..1507a1879cc19f 100644
+--- a/packages/components/src/composite/hover.tsx
++++ b/packages/components/src/composite/hover.tsx
+@@ -20,11 +20,11 @@ export const CompositeHover = forwardRef<
+ 	WordPressComponentProps< CompositeHoverProps, 'div', false >
+ >( function CompositeHover( props, ref ) {
+ 	const context = useCompositeContext();
+-	return (
+-		<Ariakit.CompositeHover
+-			store={ context.store as Ariakit.CompositeStore }
+-			{ ...props }
+-			ref={ ref }
+-		/>
+-	);
++
++	// @ts-expect-error The store prop is undocumented and only used by the
++	// legacy compat layer. The `store` prop is documented, but its type is
++	// obfuscated to discourage its use outside of the component's internals.
++	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
++
++	return <Ariakit.CompositeGroup store={ store } { ...props } ref={ ref } />;
+ } );
+diff --git a/packages/components/src/composite/index.tsx b/packages/components/src/composite/index.tsx
+index e9e97072261fbf..8eb562f5bdab38 100644
+--- a/packages/components/src/composite/index.tsx
++++ b/packages/components/src/composite/index.tsx
+@@ -73,7 +73,10 @@ export const Composite = Object.assign(
+ 		},
+ 		ref
+ 	) {
+-		const store = Ariakit.useCompositeStore( {
++		// @ts-expect-error The store prop is undocumented and only used by the
++		// legacy compat layer.
++		const storeProp = props.store as Ariakit.CompositeStore;
++		const internalStore = Ariakit.useCompositeStore( {
+ 			activeId,
+ 			defaultActiveId,
+ 			setActiveId,
+@@ -85,6 +88,8 @@ export const Composite = Object.assign(
+ 			rtl,
+ 		} );
+ 
++		const store = storeProp ?? internalStore;
++
+ 		const contextValue = useMemo(
+ 			() => ( {
+ 				store,
+diff --git a/packages/components/src/composite/item.tsx b/packages/components/src/composite/item.tsx
+index 6d75b90f0baaaa..4a02f76039a5cf 100644
+--- a/packages/components/src/composite/item.tsx
++++ b/packages/components/src/composite/item.tsx
+@@ -20,11 +20,11 @@ export const CompositeItem = forwardRef<
+ 	WordPressComponentProps< CompositeItemProps, 'button', false >
+ >( function CompositeItem( props, ref ) {
+ 	const context = useCompositeContext();
+-	return (
+-		<Ariakit.CompositeItem
+-			store={ context.store as Ariakit.CompositeStore }
+-			{ ...props }
+-			ref={ ref }
+-		/>
+-	);
++
++	// @ts-expect-error The store prop is undocumented and only used by the
++	// legacy compat layer. The `store` prop is documented, but its type is
++	// obfuscated to discourage its use outside of the component's internals.
++	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
++
++	return <Ariakit.CompositeItem store={ store } { ...props } ref={ ref } />;
+ } );
+diff --git a/packages/components/src/composite/row.tsx b/packages/components/src/composite/row.tsx
+index a082af03ad6785..1a88da557785e9 100644
+--- a/packages/components/src/composite/row.tsx
++++ b/packages/components/src/composite/row.tsx
+@@ -20,11 +20,11 @@ export const CompositeRow = forwardRef<
+ 	WordPressComponentProps< CompositeRowProps, 'div', false >
+ >( function CompositeRow( props, ref ) {
+ 	const context = useCompositeContext();
+-	return (
+-		<Ariakit.CompositeRow
+-			store={ context.store as Ariakit.CompositeStore }
+-			{ ...props }
+-			ref={ ref }
+-		/>
+-	);
++
++	// @ts-expect-error The store prop is undocumented and only used by the
++	// legacy compat layer. The `store` prop is documented, but its type is
++	// obfuscated to discourage its use outside of the component's internals.
++	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
++
++	return <Ariakit.CompositeRow store={ store } { ...props } ref={ ref } />;
+ } );
+diff --git a/packages/components/src/composite/typeahead.tsx b/packages/components/src/composite/typeahead.tsx
+index 771d58bcb6c25c..519c59ea374e5d 100644
+--- a/packages/components/src/composite/typeahead.tsx
++++ b/packages/components/src/composite/typeahead.tsx
+@@ -20,11 +20,11 @@ export const CompositeTypeahead = forwardRef<
+ 	WordPressComponentProps< CompositeTypeaheadProps, 'div', false >
+ >( function CompositeTypeahead( props, ref ) {
+ 	const context = useCompositeContext();
+-	return (
+-		<Ariakit.CompositeTypeahead
+-			store={ context.store as Ariakit.CompositeStore }
+-			{ ...props }
+-			ref={ ref }
+-		/>
+-	);
++
++	// @ts-expect-error The store prop is undocumented and only used by the
++	// legacy compat layer. The `store` prop is documented, but its type is
++	// obfuscated to discourage its use outside of the component's internals.
++	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
++
++	return <Ariakit.CompositeRow store={ store } { ...props } ref={ ref } />;
+ } );

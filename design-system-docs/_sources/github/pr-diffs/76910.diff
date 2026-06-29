@@ -1,0 +1,561 @@
+diff --git a/package-lock.json b/package-lock.json
+index 3eb9a714bf28f1..de4c7eca64094d 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -62696,7 +62696,8 @@
+ 				"@wordpress/primitives": "file:../primitives",
+ 				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/theme": "file:../theme",
+-				"clsx": "^2.1.1"
++				"clsx": "^2.1.1",
++				"tabbable": "^6.4.0"
+ 			},
+ 			"devDependencies": {
+ 				"@storybook/addon-docs": "^10.2.8",
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 630cd8ff0384e6..fb73a8dbe4a4d5 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -16,9 +16,11 @@
+ ### Enhancements
+ 
+ -   `Dialog.Root`: expose `disablePointerDismissal` prop ([#76847](https://github.com/WordPress/gutenberg/pull/76847)).
++-   `Dialog.Popup`: Default `initialFocus` now deprioritizes the close icon, focusing the first tabbable content element instead (following WAI-ARIA APG guidance) ([#76910](https://github.com/WordPress/gutenberg/pull/76910)).
+ 
+ ### Internal
+ 
++-   Extract `useDeprioritizedInitialFocus` shared hook for reuse across overlay components ([#76910](https://github.com/WordPress/gutenberg/pull/76910)).
+ -   `Tabs`: Add development-mode validation for Tab/Panel count matching ([#75170](https://github.com/WordPress/gutenberg/pull/75170)).
+ 
+ ### TypeScript
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 92164b9690f824..13943c8891108e 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -53,7 +53,8 @@
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/theme": "file:../theme",
+-		"clsx": "^2.1.1"
++		"clsx": "^2.1.1",
++		"tabbable": "^6.4.0"
+ 	},
+ 	"devDependencies": {
+ 		"@storybook/addon-docs": "^10.2.8",
+diff --git a/packages/ui/src/dialog/close-icon.tsx b/packages/ui/src/dialog/close-icon.tsx
+index b70b1f0b114227..72baf09bcc9a63 100644
+--- a/packages/ui/src/dialog/close-icon.tsx
++++ b/packages/ui/src/dialog/close-icon.tsx
+@@ -22,6 +22,7 @@ const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
+ 						{ ...props }
+ 						icon={ icon ?? close }
+ 						label={ label ?? __( 'Close' ) }
++						data-wp-ui-dialog-close-icon=""
+ 					/>
+ 				}
+ 			/>
+diff --git a/packages/ui/src/dialog/popup.tsx b/packages/ui/src/dialog/popup.tsx
+index 735b5bbc29b439..43eec71a115c11 100644
+--- a/packages/ui/src/dialog/popup.tsx
++++ b/packages/ui/src/dialog/popup.tsx
+@@ -1,11 +1,13 @@
+ import { Dialog as _Dialog } from '@base-ui/react/dialog';
+ import clsx from 'clsx';
+ import { forwardRef } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
+ import {
+ 	type ThemeProvider as ThemeProviderType,
+ 	privateApis as themePrivateApis,
+ } from '@wordpress/theme';
+ import { unlock } from '../lock-unlock';
++import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+ import { DialogValidationProvider } from './context';
+ import styles from './style.module.css';
+ import type { PopupProps } from './types';
+@@ -13,6 +15,8 @@ import type { PopupProps } from './types';
+ const ThemeProvider: typeof ThemeProviderType =
+ 	unlock( themePrivateApis ).ThemeProvider;
+ 
++const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
++
+ /**
+  * Renders the dialog popup element that contains the dialog content.
+  * Uses a portal to render outside the DOM hierarchy.
+@@ -28,18 +32,24 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
+ 	},
+ 	ref
+ ) {
++	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
++		initialFocus,
++		deprioritizedAttribute: CLOSE_ICON_ATTR,
++	} );
++	const mergedRef = useMergeRefs( [ ref, popupRef ] );
++
+ 	return (
+ 		<_Dialog.Portal>
+ 			<_Dialog.Backdrop className={ styles.backdrop } />
+ 			<ThemeProvider>
+ 				<_Dialog.Popup
+-					ref={ ref }
++					ref={ mergedRef }
+ 					className={ clsx(
+ 						styles.popup,
+ 						className,
+ 						styles[ `is-${ size }` ]
+ 					) }
+-					initialFocus={ initialFocus }
++					initialFocus={ resolvedInitialFocus }
+ 					finalFocus={ finalFocus }
+ 					{ ...props }
+ 				>
+diff --git a/packages/ui/src/dialog/test/index.test.tsx b/packages/ui/src/dialog/test/index.test.tsx
+index efce84ee6de797..f06286c7018182 100644
+--- a/packages/ui/src/dialog/test/index.test.tsx
++++ b/packages/ui/src/dialog/test/index.test.tsx
+@@ -306,4 +306,121 @@ describe( 'Dialog', () => {
+ 			expect( onError ).not.toHaveBeenCalled();
+ 		} );
+ 	} );
++
++	describe( 'Initial focus', () => {
++		it( 'should focus the first content element, skipping the close icon', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Dialog.Root>
++					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++					<Dialog.Popup>
++						<Dialog.Header>
++							<Dialog.Title>My Title</Dialog.Title>
++							<Dialog.CloseIcon />
++						</Dialog.Header>
++						<button>Content Button</button>
++					</Dialog.Popup>
++				</Dialog.Root>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open Dialog' } )
++			);
++
++			await waitFor( () => {
++				expect(
++					screen.getByRole( 'button', { name: 'Content Button' } )
++				).toHaveFocus();
++			} );
++		} );
++
++		it( 'should fall back to the close icon when it is the only tabbable element', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Dialog.Root>
++					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++					<Dialog.Popup>
++						<Dialog.Header>
++							<Dialog.Title>My Title</Dialog.Title>
++							<Dialog.CloseIcon />
++						</Dialog.Header>
++						<p>No tabbable content here</p>
++					</Dialog.Popup>
++				</Dialog.Root>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open Dialog' } )
++			);
++
++			await waitFor( () => {
++				expect(
++					screen.getByRole( 'button', { name: 'Close' } )
++				).toHaveFocus();
++			} );
++		} );
++
++		it( 'should not move focus when initialFocus is false', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Dialog.Root>
++					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++					<Dialog.Popup initialFocus={ false }>
++						<Dialog.Header>
++							<Dialog.Title>My Title</Dialog.Title>
++							<Dialog.CloseIcon />
++						</Dialog.Header>
++						<button>Content Button</button>
++					</Dialog.Popup>
++				</Dialog.Root>
++			);
++
++			const trigger = screen.getByRole( 'button', {
++				name: 'Open Dialog',
++			} );
++			await user.click( trigger );
++
++			await waitFor( () => {
++				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
++			} );
++
++			expect(
++				screen.getByRole( 'button', { name: 'Content Button' } )
++			).not.toHaveFocus();
++			expect(
++				screen.getByRole( 'button', { name: 'Close' } )
++			).not.toHaveFocus();
++		} );
++
++		it( 'should use a custom initialFocus callback as-is', async () => {
++			const user = userEvent.setup();
++			const customFocus = jest.fn( () => false as const );
++
++			render(
++				<Dialog.Root>
++					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++					<Dialog.Popup initialFocus={ customFocus }>
++						<Dialog.Header>
++							<Dialog.Title>My Title</Dialog.Title>
++							<Dialog.CloseIcon />
++						</Dialog.Header>
++						<button>Content Button</button>
++					</Dialog.Popup>
++				</Dialog.Root>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Open Dialog' } )
++			);
++
++			await waitFor( () => {
++				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
++			} );
++
++			expect( customFocus ).toHaveBeenCalled();
++		} );
++	} );
+ } );
+diff --git a/packages/ui/src/utils/test/use-deprioritized-initial-focus.test.tsx b/packages/ui/src/utils/test/use-deprioritized-initial-focus.test.tsx
+new file mode 100644
+index 00000000000000..9b5096ad91bdf9
+--- /dev/null
++++ b/packages/ui/src/utils/test/use-deprioritized-initial-focus.test.tsx
+@@ -0,0 +1,230 @@
++import { render, screen } from '@testing-library/react';
++import { createRef, useEffect } from '@wordpress/element';
++import { useDeprioritizedInitialFocus } from '../use-deprioritized-initial-focus';
++
++const ATTR = 'data-test-deprioritized';
++
++function TestHarness( {
++	initialFocus,
++	onResolved,
++}: {
++	initialFocus?: Parameters<
++		typeof useDeprioritizedInitialFocus
++	>[ 0 ][ 'initialFocus' ];
++	onResolved: (
++		result: ReturnType< typeof useDeprioritizedInitialFocus >
++	) => void;
++} ) {
++	const result = useDeprioritizedInitialFocus( {
++		initialFocus,
++		deprioritizedAttribute: ATTR,
++	} );
++
++	useEffect( () => {
++		onResolved( result );
++	} );
++
++	return (
++		<div ref={ result.popupRef } data-testid="popup">
++			<button { ...{ [ ATTR ]: '' } }>Close</button>
++			<button>Action</button>
++			<input type="text" />
++		</div>
++	);
++}
++
++describe( 'useDeprioritizedInitialFocus', () => {
++	describe( 'passthrough', () => {
++		it( 'passes through false unchanged', () => {
++			let resolved: ReturnType< typeof useDeprioritizedInitialFocus >;
++
++			render(
++				<TestHarness
++					initialFocus={ false }
++					onResolved={ ( r ) => {
++						resolved = r;
++					} }
++				/>
++			);
++
++			expect( resolved!.resolvedInitialFocus ).toBe( false );
++		} );
++
++		it( 'passes through a ref unchanged', () => {
++			const ref = createRef< HTMLElement >();
++			let resolved: ReturnType< typeof useDeprioritizedInitialFocus >;
++
++			render(
++				<TestHarness
++					initialFocus={ ref }
++					onResolved={ ( r ) => {
++						resolved = r;
++					} }
++				/>
++			);
++
++			expect( resolved!.resolvedInitialFocus ).toBe( ref );
++		} );
++
++		it( 'passes through a custom callback unchanged', () => {
++			const cb = () => true as const;
++			let resolved: ReturnType< typeof useDeprioritizedInitialFocus >;
++
++			render(
++				<TestHarness
++					initialFocus={ cb }
++					onResolved={ ( r ) => {
++						resolved = r;
++					} }
++				/>
++			);
++
++			expect( resolved!.resolvedInitialFocus ).toBe( cb );
++		} );
++	} );
++
++	describe( 'default behavior (initialFocus undefined or true)', () => {
++		it.each( [ undefined, true ] )(
++			'returns a callback when initialFocus is %s',
++			( value ) => {
++				let resolved: ReturnType< typeof useDeprioritizedInitialFocus >;
++
++				render(
++					<TestHarness
++						initialFocus={ value }
++						onResolved={ ( r ) => {
++							resolved = r;
++						} }
++					/>
++				);
++
++				expect( typeof resolved!.resolvedInitialFocus ).toBe(
++					'function'
++				);
++			}
++		);
++
++		it( 'returns the popup element on touch interactions', () => {
++			let resolved: ReturnType< typeof useDeprioritizedInitialFocus >;
++
++			render(
++				<TestHarness
++					onResolved={ ( r ) => {
++						resolved = r;
++					} }
++				/>
++			);
++
++			const callback = resolved!.resolvedInitialFocus as (
++				type: string
++			) => HTMLElement | boolean | null;
++			const result = callback( 'touch' );
++
++			expect( result ).toBe( screen.getByTestId( 'popup' ) );
++		} );
++
++		it( 'skips the deprioritized element on non-touch interactions', () => {
++			let resolved: ReturnType< typeof useDeprioritizedInitialFocus >;
++
++			render(
++				<TestHarness
++					onResolved={ ( r ) => {
++						resolved = r;
++					} }
++				/>
++			);
++
++			const callback = resolved!.resolvedInitialFocus as (
++				type: string
++			) => HTMLElement | boolean | null;
++			const result = callback( 'mouse' );
++
++			// Should return the Action button, skipping Close
++			expect( result ).toBeInstanceOf( HTMLButtonElement );
++			expect( result as HTMLButtonElement ).toHaveTextContent( 'Action' );
++		} );
++
++		it( 'falls back to default when only deprioritized elements exist', () => {
++			let resolved: ReturnType< typeof useDeprioritizedInitialFocus >;
++
++			function OnlyDeprioritized( {
++				onResolved: onResolvedProp,
++			}: {
++				onResolved: (
++					r: ReturnType< typeof useDeprioritizedInitialFocus >
++				) => void;
++			} ) {
++				const result = useDeprioritizedInitialFocus( {
++					initialFocus: undefined,
++					deprioritizedAttribute: ATTR,
++				} );
++
++				useEffect( () => {
++					onResolvedProp( result );
++				} );
++
++				return (
++					<div ref={ result.popupRef } data-testid="popup">
++						<button { ...{ [ ATTR ]: '' } }>Close</button>
++						<p>No other tabbable elements</p>
++					</div>
++				);
++			}
++
++			render(
++				<OnlyDeprioritized
++					onResolved={ ( r ) => {
++						resolved = r;
++					} }
++				/>
++			);
++
++			const callback = resolved!.resolvedInitialFocus as (
++				type: string
++			) => HTMLElement | boolean | null;
++			const result = callback( 'keyboard' );
++
++			// Falls back to Base UI's default
++			expect( result ).toBe( true );
++		} );
++
++		it( 'returns true when popupRef is not attached', () => {
++			let resolved: ReturnType< typeof useDeprioritizedInitialFocus >;
++
++			function NoRef( {
++				onResolved: onResolvedProp,
++			}: {
++				onResolved: (
++					r: ReturnType< typeof useDeprioritizedInitialFocus >
++				) => void;
++			} ) {
++				const result = useDeprioritizedInitialFocus( {
++					initialFocus: undefined,
++					deprioritizedAttribute: ATTR,
++				} );
++
++				useEffect( () => {
++					onResolvedProp( result );
++				} );
++
++				// Intentionally not attaching popupRef to any element
++				return <div>Nothing</div>;
++			}
++
++			render(
++				<NoRef
++					onResolved={ ( r ) => {
++						resolved = r;
++					} }
++				/>
++			);
++
++			const callback = resolved!.resolvedInitialFocus as (
++				type: string
++			) => HTMLElement | boolean | null;
++
++			expect( callback( 'touch' ) ).toBe( true );
++			expect( callback( 'mouse' ) ).toBe( true );
++		} );
++	} );
++} );
+diff --git a/packages/ui/src/utils/use-deprioritized-initial-focus.ts b/packages/ui/src/utils/use-deprioritized-initial-focus.ts
+new file mode 100644
+index 00000000000000..6a925d7ecdc34d
+--- /dev/null
++++ b/packages/ui/src/utils/use-deprioritized-initial-focus.ts
+@@ -0,0 +1,83 @@
++import type { Dialog as _Dialog } from '@base-ui/react/dialog';
++import { useMemo, useRef } from '@wordpress/element';
++import { tabbable } from 'tabbable';
++
++/**
++ * Derived from Base UI's `Dialog.Popup.Props['initialFocus']`.
++ * The same type is shared by all Base UI overlay popups (Dialog, Popover, etc.).
++ */
++type InitialFocus = _Dialog.Popup.Props[ 'initialFocus' ];
++
++/**
++ * Options matching Base UI's internal tabbable configuration.
++ * @see https://github.com/floating-ui/floating-ui/blob/master/packages/react/src/utils/tabbable.ts
++ */
++const getTabbableOptions = () => ( {
++	getShadowRoot: true,
++	displayCheck:
++		typeof ResizeObserver === 'function' &&
++		ResizeObserver.toString().includes( '[native code]' )
++			? ( 'full' as const )
++			: ( 'none' as const ),
++} );
++
++/**
++ * Returns a resolved `initialFocus` value that deprioritizes elements
++ * marked with a given data attribute (e.g. a close icon), and an internal
++ * ref that must be merged onto the popup element.
++ *
++ * When `initialFocus` is `undefined` or `true` (the default behavior),
++ * the hook replaces it with a callback that:
++ * 1. On touch interactions — focuses the popup element itself (preventing
++ *    the virtual keyboard on Android), matching Base UI's default.
++ * 2. On other interactions — returns the first tabbable element that does
++ *    *not* carry `deprioritizedAttribute`. Falls back to Base UI's default
++ *    when the deprioritized element is the only tabbable element.
++ *
++ * All other `initialFocus` values (`false`, `RefObject`, callback) pass
++ * through unchanged.
++ *
++ * @param props
++ * @param props.initialFocus           The consumer-provided `initialFocus` value.
++ * @param props.deprioritizedAttribute The data attribute whose elements should be deprioritized.
++ */
++export function useDeprioritizedInitialFocus( {
++	initialFocus,
++	deprioritizedAttribute,
++}: {
++	initialFocus: InitialFocus;
++	deprioritizedAttribute: string;
++} ) {
++	const popupRef = useRef< HTMLDivElement >( null );
++
++	const resolvedInitialFocus = useMemo( (): InitialFocus => {
++		if ( initialFocus !== undefined && initialFocus !== true ) {
++			return initialFocus;
++		}
++
++		return ( interactionType ): HTMLElement | boolean | null => {
++			if ( interactionType === 'touch' ) {
++				return popupRef.current ?? true;
++			}
++
++			const popup = popupRef.current;
++			if ( ! popup ) {
++				return true;
++			}
++
++			const tabbables = tabbable( popup, getTabbableOptions() );
++			for ( const el of tabbables ) {
++				if (
++					el instanceof HTMLElement &&
++					! el.hasAttribute( deprioritizedAttribute )
++				) {
++					return el;
++				}
++			}
++
++			return true;
++		};
++	}, [ initialFocus, deprioritizedAttribute ] );
++
++	return { resolvedInitialFocus, popupRef };
++}

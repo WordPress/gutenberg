@@ -1,0 +1,404 @@
+diff --git a/packages/components/src/base-control/stories/index.story.tsx b/packages/components/src/base-control/stories/index.story.tsx
+index ca35b793621577..90517c75b5e95e 100644
+--- a/packages/components/src/base-control/stories/index.story.tsx
++++ b/packages/components/src/base-control/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import BaseControl, { useBaseControlProps } from '..';
+ import Button from '../../button';
+ 
+ const meta: Meta< typeof BaseControl > = {
+-	title: 'Components/BaseControl',
++	title: 'Components/Selection & Input/Common/BaseControl',
++	id: 'components-basecontrol',
+ 	component: BaseControl,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+diff --git a/packages/components/src/checkbox-control/stories/index.story.tsx b/packages/components/src/checkbox-control/stories/index.story.tsx
+index 3c55ba3192a3cf..a68e380a8f7332 100644
+--- a/packages/components/src/checkbox-control/stories/index.story.tsx
++++ b/packages/components/src/checkbox-control/stories/index.story.tsx
+@@ -17,7 +17,8 @@ import { HStack } from '../../h-stack';
+ 
+ const meta: Meta< typeof CheckboxControl > = {
+ 	component: CheckboxControl,
+-	title: 'Components/CheckboxControl',
++	title: 'Components/Selection & Input/Common/CheckboxControl',
++	id: 'components-checkboxcontrol',
+ 	argTypes: {
+ 		onChange: {
+ 			action: 'onChange',
+diff --git a/packages/components/src/circular-option-picker/stories/index.story.tsx b/packages/components/src/circular-option-picker/stories/index.story.tsx
+index e091a2ac54d41e..d0314670fe1694 100644
+--- a/packages/components/src/circular-option-picker/stories/index.story.tsx
++++ b/packages/components/src/circular-option-picker/stories/index.story.tsx
+@@ -17,7 +17,8 @@ const CircularOptionPickerStoryContext = createContext< {
+ } >( {} );
+ 
+ const meta: Meta< typeof CircularOptionPicker > = {
+-	title: 'Components/CircularOptionPicker',
++	title: 'Components/Selection & Input/Color/CircularOptionPicker',
++	id: 'components-circularoptionpicker',
+ 	component: CircularOptionPicker,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+diff --git a/packages/components/src/color-indicator/stories/index.story.tsx b/packages/components/src/color-indicator/stories/index.story.tsx
+index 8a2557f30659e0..c24c26f5e844b3 100644
+--- a/packages/components/src/color-indicator/stories/index.story.tsx
++++ b/packages/components/src/color-indicator/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import ColorIndicator from '..';
+ 
+ const meta: Meta< typeof ColorIndicator > = {
+ 	component: ColorIndicator,
+-	title: 'Components/ColorIndicator',
++	title: 'Components/Selection & Input/Color/ColorIndicator',
++	id: 'components-colorindicator',
+ 	argTypes: {
+ 		colorValue: {
+ 			control: { type: 'color' },
+diff --git a/packages/components/src/color-palette/stories/index.story.tsx b/packages/components/src/color-palette/stories/index.story.tsx
+index 727e840ff99358..5342fc5222be6a 100644
+--- a/packages/components/src/color-palette/stories/index.story.tsx
++++ b/packages/components/src/color-palette/stories/index.story.tsx
+@@ -14,7 +14,8 @@ import { useState } from '@wordpress/element';
+ import ColorPalette from '..';
+ 
+ const meta: Meta< typeof ColorPalette > = {
+-	title: 'Components/ColorPalette',
++	title: 'Components/Selection & Input/Color/ColorPalette',
++	id: 'components-colorpalette',
+ 	component: ColorPalette,
+ 	argTypes: {
+ 		as: { control: { type: null } },
+diff --git a/packages/components/src/color-picker/stories/index.story.tsx b/packages/components/src/color-picker/stories/index.story.tsx
+index 9f2198515db1e6..44040a5265c5d3 100644
+--- a/packages/components/src/color-picker/stories/index.story.tsx
++++ b/packages/components/src/color-picker/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import { ColorPicker } from '../component';
+ 
+ const meta: Meta< typeof ColorPicker > = {
+ 	component: ColorPicker,
+-	title: 'Components/ColorPicker',
++	title: 'Components/Selection & Input/Color/ColorPicker',
++	id: 'components-colorpicker',
+ 	argTypes: {
+ 		as: { control: { type: null } },
+ 		color: { control: { type: null } },
+diff --git a/packages/components/src/combobox-control/stories/index.story.tsx b/packages/components/src/combobox-control/stories/index.story.tsx
+index 516cd262fd5aa6..954f0d96fb0d76 100644
+--- a/packages/components/src/combobox-control/stories/index.story.tsx
++++ b/packages/components/src/combobox-control/stories/index.story.tsx
+@@ -34,7 +34,8 @@ const countries = [
+ ];
+ 
+ const meta: Meta< typeof ComboboxControl > = {
+-	title: 'Components/ComboboxControl',
++	title: 'Components/Selection & Input/Common/ComboboxControl',
++	id: 'components-comboboxcontrol',
+ 	component: ComboboxControl,
+ 	argTypes: {
+ 		value: { control: { type: null } },
+diff --git a/packages/components/src/custom-gradient-picker/stories/index.story.tsx b/packages/components/src/custom-gradient-picker/stories/index.story.tsx
+index 3be8eb36e5a3c2..23d5239e5d240d 100644
+--- a/packages/components/src/custom-gradient-picker/stories/index.story.tsx
++++ b/packages/components/src/custom-gradient-picker/stories/index.story.tsx
+@@ -13,7 +13,8 @@ import { useState } from '@wordpress/element';
+ import CustomGradientPicker from '../';
+ 
+ const meta: Meta< typeof CustomGradientPicker > = {
+-	title: 'Components/CustomGradientPicker',
++	title: 'Components/Selection & Input/Color/CustomGradientPicker',
++	id: 'components-customgradientpicker',
+ 	component: CustomGradientPicker,
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
+diff --git a/packages/components/src/custom-select-control-v2/stories/index.story.tsx b/packages/components/src/custom-select-control-v2/stories/index.story.tsx
+index a3324a5fa03a47..3595ee2e951990 100644
+--- a/packages/components/src/custom-select-control-v2/stories/index.story.tsx
++++ b/packages/components/src/custom-select-control-v2/stories/index.story.tsx
+@@ -14,7 +14,8 @@ import { useState } from '@wordpress/element';
+ import CustomSelectControlV2 from '..';
+ 
+ const meta: Meta< typeof CustomSelectControlV2 > = {
+-	title: 'Components/CustomSelectControl v2',
++	title: 'Components/Selection & Input/Common/CustomSelectControl v2',
++	id: 'components-customselectcontrol-v2',
+ 	component: CustomSelectControlV2,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+diff --git a/packages/components/src/date-time/stories/date-time.story.tsx b/packages/components/src/date-time/stories/date-time.story.tsx
+index 86a627bbec35e0..7636e2fdc80a30 100644
+--- a/packages/components/src/date-time/stories/date-time.story.tsx
++++ b/packages/components/src/date-time/stories/date-time.story.tsx
+@@ -15,7 +15,8 @@ import DateTimePicker from '../date-time';
+ import { daysFromNow, isWeekend } from './utils';
+ 
+ const meta: Meta< typeof DateTimePicker > = {
+-	title: 'Components/DateTimePicker',
++	title: 'Components/Selection & Input/Time & Date/DateTimePicker',
++	id: 'components-datetimepicker',
+ 	component: DateTimePicker,
+ 	argTypes: {
+ 		currentDate: { control: 'date' },
+diff --git a/packages/components/src/date-time/stories/date.story.tsx b/packages/components/src/date-time/stories/date.story.tsx
+index 8d1513d014c8c8..36fef0c5bfd195 100644
+--- a/packages/components/src/date-time/stories/date.story.tsx
++++ b/packages/components/src/date-time/stories/date.story.tsx
+@@ -15,7 +15,8 @@ import DatePicker from '../date';
+ import { daysFromNow, isWeekend } from './utils';
+ 
+ const meta: Meta< typeof DatePicker > = {
+-	title: 'Components/DatePicker',
++	title: 'Components/Selection & Input/Time & Date/DatePicker',
++	id: 'components-datepicker',
+ 	component: DatePicker,
+ 	argTypes: {
+ 		currentDate: { control: 'date' },
+diff --git a/packages/components/src/date-time/stories/time.story.tsx b/packages/components/src/date-time/stories/time.story.tsx
+index 947b5bd64d5eb1..c19b5b4f48f5c2 100644
+--- a/packages/components/src/date-time/stories/time.story.tsx
++++ b/packages/components/src/date-time/stories/time.story.tsx
+@@ -14,7 +14,8 @@ import { useState, useEffect } from '@wordpress/element';
+ import TimePicker from '../time';
+ 
+ const meta: Meta< typeof TimePicker > = {
+-	title: 'Components/TimePicker',
++	title: 'Components/Selection & Input/Time & Date/TimePicker',
++	id: 'components-timepicker',
+ 	component: TimePicker,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { 'TimePicker.TimeInput': TimePicker.TimeInput },
+diff --git a/packages/components/src/drop-zone/stories/index.story.tsx b/packages/components/src/drop-zone/stories/index.story.tsx
+index 1ee9af5b851ebc..7e2dcbf03c03b1 100644
+--- a/packages/components/src/drop-zone/stories/index.story.tsx
++++ b/packages/components/src/drop-zone/stories/index.story.tsx
+@@ -9,7 +9,8 @@ import DropZone from '..';
+ 
+ const meta: Meta< typeof DropZone > = {
+ 	component: DropZone,
+-	title: 'Components/DropZone',
++	id: 'components-dropzone',
++	title: 'Components/Selection & Input/File Upload/DropZone',
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
+ 		controls: { expanded: true },
+diff --git a/packages/components/src/form-file-upload/stories/index.story.tsx b/packages/components/src/form-file-upload/stories/index.story.tsx
+index a4cf3298da6b14..3599ccc51c22eb 100644
+--- a/packages/components/src/form-file-upload/stories/index.story.tsx
++++ b/packages/components/src/form-file-upload/stories/index.story.tsx
+@@ -14,7 +14,8 @@ import { upload as uploadIcon } from '@wordpress/icons';
+ import FormFileUpload from '..';
+ 
+ const meta: Meta< typeof FormFileUpload > = {
+-	title: 'Components/FormFileUpload',
++	title: 'Components/Selection & Input/File Upload/FormFileUpload',
++	id: 'components-formfileupload',
+ 	component: FormFileUpload,
+ 	argTypes: {
+ 		icon: { control: { type: null } },
+diff --git a/packages/components/src/form-token-field/stories/index.story.tsx b/packages/components/src/form-token-field/stories/index.story.tsx
+index 117dec9e9df5a1..729120ad456553 100644
+--- a/packages/components/src/form-token-field/stories/index.story.tsx
++++ b/packages/components/src/form-token-field/stories/index.story.tsx
+@@ -15,7 +15,8 @@ import FormTokenField from '../';
+ 
+ const meta: Meta< typeof FormTokenField > = {
+ 	component: FormTokenField,
+-	title: 'Components/FormTokenField',
++	title: 'Components/Selection & Input/Common/FormTokenField',
++	id: 'components-formtokenfield',
+ 	argTypes: {
+ 		value: {
+ 			control: { type: null },
+diff --git a/packages/components/src/gradient-picker/stories/index.story.tsx b/packages/components/src/gradient-picker/stories/index.story.tsx
+index b5f3a9dbca15a5..b2b73b8b609966 100644
+--- a/packages/components/src/gradient-picker/stories/index.story.tsx
++++ b/packages/components/src/gradient-picker/stories/index.story.tsx
+@@ -13,7 +13,8 @@ import { useState } from '@wordpress/element';
+ import GradientPicker from '..';
+ 
+ const meta: Meta< typeof GradientPicker > = {
+-	title: 'Components/GradientPicker',
++	title: 'Components/Selection & Input/Color/GradientPicker',
++	id: 'components-gradientpicker',
+ 	component: GradientPicker,
+ 	parameters: {
+ 		controls: { expanded: true },
+diff --git a/packages/components/src/input-control/stories/index.story.tsx b/packages/components/src/input-control/stories/index.story.tsx
+index 1a9290e8e856ea..8cef6a5d37c81b 100644
+--- a/packages/components/src/input-control/stories/index.story.tsx
++++ b/packages/components/src/input-control/stories/index.story.tsx
+@@ -16,7 +16,8 @@ import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
+ import Button from '../../button';
+ 
+ const meta: Meta< typeof InputControl > = {
+-	title: 'Components (Experimental)/InputControl',
++	title: 'Components (Experimental)/Selection & Input/InputControl',
++	id: 'components-experimental-inputcontrol',
+ 	component: InputControl,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { InputControlPrefixWrapper, InputControlSuffixWrapper },
+diff --git a/packages/components/src/number-control/stories/index.story.tsx b/packages/components/src/number-control/stories/index.story.tsx
+index 3588063f0f4bb2..3feb0d63eadc2a 100644
+--- a/packages/components/src/number-control/stories/index.story.tsx
++++ b/packages/components/src/number-control/stories/index.story.tsx
+@@ -14,7 +14,8 @@ import { useState } from '@wordpress/element';
+ import NumberControl from '..';
+ 
+ const meta: Meta< typeof NumberControl > = {
+-	title: 'Components (Experimental)/NumberControl',
++	title: 'Components (Experimental)/Selection & Input/NumberControl',
++	id: 'components-experimental-numbercontrol',
+ 	component: NumberControl,
+ 	argTypes: {
+ 		onChange: { action: 'onChange' },
+diff --git a/packages/components/src/radio-control/stories/index.story.tsx b/packages/components/src/radio-control/stories/index.story.tsx
+index dae00e57962f47..3c76f7610d0d79 100644
+--- a/packages/components/src/radio-control/stories/index.story.tsx
++++ b/packages/components/src/radio-control/stories/index.story.tsx
+@@ -15,7 +15,8 @@ import RadioControl from '..';
+ 
+ const meta: Meta< typeof RadioControl > = {
+ 	component: RadioControl,
+-	title: 'Components/RadioControl',
++	title: 'Components/Selection & Input/Common/RadioControl',
++	id: 'components-radiocontrol',
+ 	argTypes: {
+ 		onChange: {
+ 			action: 'onChange',
+diff --git a/packages/components/src/range-control/stories/index.story.tsx b/packages/components/src/range-control/stories/index.story.tsx
+index 7775c364195722..dcff3513733527 100644
+--- a/packages/components/src/range-control/stories/index.story.tsx
++++ b/packages/components/src/range-control/stories/index.story.tsx
+@@ -18,7 +18,8 @@ const ICONS = { starEmpty, starFilled, styles, wordpress };
+ 
+ const meta: Meta< typeof RangeControl > = {
+ 	component: RangeControl,
+-	title: 'Components/RangeControl',
++	title: 'Components/Selection & Input/Common/RangeControl',
++	id: 'components-rangecontrol',
+ 	argTypes: {
+ 		afterIcon: {
+ 			control: { type: 'select' },
+diff --git a/packages/components/src/search-control/stories/index.story.tsx b/packages/components/src/search-control/stories/index.story.tsx
+index 59618dd7e0913b..5e5f6b594e73e7 100644
+--- a/packages/components/src/search-control/stories/index.story.tsx
++++ b/packages/components/src/search-control/stories/index.story.tsx
+@@ -14,7 +14,8 @@ import { useState } from '@wordpress/element';
+ import SearchControl from '..';
+ 
+ const meta: Meta< typeof SearchControl > = {
+-	title: 'Components/SearchControl',
++	title: 'Components/Selection & Input/Common/SearchControl',
++	id: 'components-searchcontrol',
+ 	component: SearchControl,
+ 	argTypes: {
+ 		onChange: { action: 'onChange' },
+diff --git a/packages/components/src/select-control/stories/index.story.tsx b/packages/components/src/select-control/stories/index.story.tsx
+index 5e57a4eaecd5ab..e9461ef6904f6f 100644
+--- a/packages/components/src/select-control/stories/index.story.tsx
++++ b/packages/components/src/select-control/stories/index.story.tsx
+@@ -15,7 +15,8 @@ import SelectControl from '../';
+ import { InputControlPrefixWrapper } from '../../input-control/input-prefix-wrapper';
+ 
+ const meta: Meta< typeof SelectControl > = {
+-	title: 'Components/SelectControl',
++	title: 'Components/Selection & Input/Common/SelectControl',
++	id: 'components-selectcontrol',
+ 	component: SelectControl,
+ 	argTypes: {
+ 		help: { control: { type: 'text' } },
+diff --git a/packages/components/src/textarea-control/stories/index.story.tsx b/packages/components/src/textarea-control/stories/index.story.tsx
+index a8e5dc036248db..c303883a92c5d7 100644
+--- a/packages/components/src/textarea-control/stories/index.story.tsx
++++ b/packages/components/src/textarea-control/stories/index.story.tsx
+@@ -15,7 +15,8 @@ import TextareaControl from '..';
+ 
+ const meta: Meta< typeof TextareaControl > = {
+ 	component: TextareaControl,
+-	title: 'Components/TextareaControl',
++	title: 'Components/Selection & Input/Common/TextareaControl',
++	id: 'components-textareacontrol',
+ 	argTypes: {
+ 		onChange: { action: 'onChange' },
+ 		label: { control: { type: 'text' } },
+diff --git a/packages/components/src/toggle-control/stories/index.story.tsx b/packages/components/src/toggle-control/stories/index.story.tsx
+index 97723aa207a394..b9db0474bc7603 100644
+--- a/packages/components/src/toggle-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-control/stories/index.story.tsx
+@@ -14,7 +14,8 @@ import { useState } from '@wordpress/element';
+ import ToggleControl from '..';
+ 
+ const meta: Meta< typeof ToggleControl > = {
+-	title: 'Components/ToggleControl',
++	title: 'Components/Selection & Input/Common/ToggleControl',
++	id: 'components-togglecontrol',
+ 	component: ToggleControl,
+ 	argTypes: {
+ 		checked: { control: { type: null } },
+diff --git a/packages/components/src/toggle-group-control/stories/index.story.tsx b/packages/components/src/toggle-group-control/stories/index.story.tsx
+index 92f1e6076248bd..afdfa457f66348 100644
+--- a/packages/components/src/toggle-group-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-group-control/stories/index.story.tsx
+@@ -27,7 +27,8 @@ const meta: Meta< typeof ToggleGroupControl > = {
+ 	component: ToggleGroupControl,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
+-	title: 'Components (Experimental)/ToggleGroupControl',
++	title: 'Components (Experimental)/Selection & Input/ToggleGroupControl',
++	id: 'components-experimental-togglegroupcontrol',
+ 	argTypes: {
+ 		help: { control: { type: 'text' } },
+ 		onChange: { action: 'onChange' },
+diff --git a/packages/components/src/tree-select/stories/index.story.tsx b/packages/components/src/tree-select/stories/index.story.tsx
+index 33103786bbc541..703147dc145344 100644
+--- a/packages/components/src/tree-select/stories/index.story.tsx
++++ b/packages/components/src/tree-select/stories/index.story.tsx
+@@ -14,7 +14,8 @@ import { useState } from '@wordpress/element';
+ import TreeSelect from '../';
+ 
+ const meta: Meta< typeof TreeSelect > = {
+-	title: 'Components/TreeSelect',
++	title: 'Components/Selection & Input/Common/TreeSelect',
++	id: 'components-treeselect',
+ 	component: TreeSelect,
+ 	argTypes: {
+ 		help: { control: { type: 'text' } },
+diff --git a/packages/components/src/unit-control/stories/index.story.tsx b/packages/components/src/unit-control/stories/index.story.tsx
+index 5134d4902144da..de8f476e26e5c7 100644
+--- a/packages/components/src/unit-control/stories/index.story.tsx
++++ b/packages/components/src/unit-control/stories/index.story.tsx
+@@ -16,7 +16,8 @@ import { CSS_UNITS } from '../utils';
+ 
+ const meta: Meta< typeof UnitControl > = {
+ 	component: UnitControl,
+-	title: 'Components (Experimental)/UnitControl',
++	title: 'Components (Experimental)/Selection & Input/UnitControl',
++	id: 'components-experimental-unitcontrol',
+ 	argTypes: {
+ 		__unstableInputWidth: { control: { type: 'text' } },
+ 		__unstableStateReducer: { control: { type: null } },
+diff --git a/storybook/preview.js b/storybook/preview.js
+index 435fa4dbc43264..a7c9aa0c085fc1 100644
+--- a/storybook/preview.js
++++ b/storybook/preview.js
+@@ -136,11 +136,20 @@ export const parameters = {
+ 					'Layout',
+ 					'Navigation',
+ 					'Overlays',
++					'Selection & Input',
++					[ 'Color', 'Common', 'File Upload', 'Time & Date' ],
+ 					'Typography',
+ 					'Utilities',
+ 				],
+ 				'Components (Experimental)',
+-				[ 'Layout', 'Navigation', 'Overlays', 'Typography' ],
++				[
++					'Actions',
++					'Layout',
++					'Navigation',
++					'Overlays',
++					'Selection & Input',
++					'Typography',
++				],
+ 				'Icons',
+ 			],
+ 		},

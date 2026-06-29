@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1a64b44c6a95b6..567cd3c0483db7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `ToggleGroupControl`: Fix active background for empty string value ([#69969](https://github.com/WordPress/gutenberg/pull/69969)).
+ -   `Button`: Fix tertiary variant displaying incorrect text color in pressed and hover states ([#68542](https://github.com/WordPress/gutenberg/pull/68542)).
+ 
+ ### Enhancement
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 9f3427e95a6017..3391c929fffbe1 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -54,7 +54,7 @@ function UnconnectedToggleGroupControl(
+ 	const [ controlElement, setControlElement ] = useState< HTMLElement >();
+ 	const refs = useMergeRefs( [ setControlElement, forwardedRef ] );
+ 	const selectedRect = useTrackElementOffsetRect(
+-		value || value === 0 ? selectedElement : undefined
++		value !== null && value !== undefined ? selectedElement : undefined
+ 	);
+ 	useAnimatedOffsetRect( controlElement, selectedRect, {
+ 		prefix: 'selected',

@@ -1,0 +1,438 @@
+diff --git a/packages/boot/src/components/canvas/back-button.scss b/packages/boot/src/components/canvas/back-button.scss
+index 3691ed867a1a44..7a35fc1d77007c 100644
+--- a/packages/boot/src/components/canvas/back-button.scss
++++ b/packages/boot/src/components/canvas/back-button.scss
+@@ -33,7 +33,7 @@
+ 	&:focus:not(:active) {
+ 		outline:
+ 			var(--wpds-border-width-focus) solid
+-			var(--wpds-color-stroke-focus-brand);
++			var(--wpds-color-stroke-focus);
+ 		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+ 	}
+ }
+diff --git a/packages/boot/src/components/site-hub/style.scss b/packages/boot/src/components/site-hub/style.scss
+index f0a4b2df1115de..3bd44a887521c5 100644
+--- a/packages/boot/src/components/site-hub/style.scss
++++ b/packages/boot/src/components/site-hub/style.scss
+@@ -46,7 +46,7 @@
+ 	&:focus:not(:active) {
+ 		outline:
+ 			var(--wpds-border-width-focus) solid
+-			var(--wpds-color-stroke-focus-brand);
++			var(--wpds-color-stroke-focus);
+ 		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+ 	}
+ }
+diff --git a/packages/boot/src/components/site-icon-link/style.scss b/packages/boot/src/components/site-icon-link/style.scss
+index 07c3d76843b37d..54c5e3481c9d18 100644
+--- a/packages/boot/src/components/site-icon-link/style.scss
++++ b/packages/boot/src/components/site-icon-link/style.scss
+@@ -18,7 +18,7 @@ $header-height: variables.$header-height;
+ 	&:focus:not(:active) {
+ 		outline:
+ 			var(--wpds-border-width-focus) solid
+-			var(--wpds-color-stroke-focus-brand);
++			var(--wpds-color-stroke-focus);
+ 		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+ 	}
+ }
+diff --git a/packages/components/src/external-link/style.scss b/packages/components/src/external-link/style.scss
+index 4078905b526acc..3bda01baeab133 100644
+--- a/packages/components/src/external-link/style.scss
++++ b/packages/components/src/external-link/style.scss
+@@ -23,7 +23,7 @@
+ 	&:focus {
+ 		outline:
+ 			var(--wpds-border-width-focus) solid
+-			var(--wpds-color-stroke-focus-brand);
++			var(--wpds-color-stroke-focus);
+ 		// Override style from wp-admin common.css.
+ 		box-shadow: none;
+ 		border-radius: 0;
+diff --git a/packages/components/src/tab-panel/style.scss b/packages/components/src/tab-panel/style.scss
+index 98f577e080ad86..c6038dcca7f9d8 100644
+--- a/packages/components/src/tab-panel/style.scss
++++ b/packages/components/src/tab-panel/style.scss
+@@ -87,7 +87,7 @@
+ 	&:focus-visible::before {
+ 		box-shadow:
+ 			0 0 0 var(--wpds-border-width-focus)
+-			var(--wpds-color-stroke-focus-brand);
++			var(--wpds-color-stroke-focus);
+ 
+ 		// Windows high contrast mode.
+ 		outline: 2px solid transparent;
+@@ -115,7 +115,7 @@
+ 	&:focus-visible {
+ 		box-shadow:
+ 			0 0 0 var(--wpds-border-width-focus)
+-			var(--wpds-color-stroke-focus-brand);
++			var(--wpds-color-stroke-focus);
+ 
+ 		// Windows high contrast mode.
+ 		outline: 2px solid transparent;
+diff --git a/packages/dataviews/src/components/dataform-layouts/panel/style.scss b/packages/dataviews/src/components/dataform-layouts/panel/style.scss
+index a75aa344d3340d..d795293cc20076 100644
+--- a/packages/dataviews/src/components/dataform-layouts/panel/style.scss
++++ b/packages/dataviews/src/components/dataform-layouts/panel/style.scss
+@@ -70,7 +70,7 @@
+ 		opacity: 1;
+ 		outline:
+ 			var(--wpds-border-width-focus) solid
+-			var(--wpds-color-stroke-focus-brand);
++			var(--wpds-color-stroke-focus);
+ 	}
+ }
+ 
+diff --git a/packages/dataviews/src/components/dataviews-filters/style.scss b/packages/dataviews/src/components/dataviews-filters/style.scss
+index 39522e717b203a..56082230a3b8cc 100644
+--- a/packages/dataviews/src/components/dataviews-filters/style.scss
++++ b/packages/dataviews/src/components/dataviews-filters/style.scss
+@@ -116,7 +116,7 @@
+ 			outline: none;
+ 			box-shadow:
+ 				0 0 0 var(--wpds-border-width-focus)
+-				var(--wpds-color-stroke-focus-brand);
++				var(--wpds-color-stroke-focus);
+ 		}
+ 
+ 		.dataviews-filters-__summary-filter-text-name {
+@@ -166,7 +166,7 @@
+ 			outline: none;
+ 			box-shadow:
+ 				0 0 0 var(--wpds-border-width-focus)
+-				var(--wpds-color-stroke-focus-brand);
++				var(--wpds-color-stroke-focus);
+ 		}
+ 	}
+ }
+@@ -347,7 +347,7 @@
+ 			background: var(--wpds-color-background-surface-neutral-strong);
+ 			box-shadow:
+ 				inset 0 0 0 var(--wpds-border-width-focus)
+-				var(--wpds-color-stroke-focus-brand);
++				var(--wpds-color-stroke-focus);
+ 		}
+ 
+ 		&::placeholder {
+diff --git a/packages/dataviews/src/components/dataviews-layouts/activity/style.scss b/packages/dataviews/src/components/dataviews-layouts/activity/style.scss
+index 26ff15dbb66fdd..322b7ea9d9d02f 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/activity/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/activity/style.scss
+@@ -36,7 +36,7 @@
+ 				cursor: var(--wpds-cursor-control);
+ 
+ 				&:focus-visible {
+-					outline: var(--wp-admin-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
++					outline: var(--wp-admin-border-width-focus) solid var(--wpds-color-stroke-focus);
+ 					outline-offset: var(--wp-admin-border-width-focus);
+ 					border-radius: var(--wpds-border-radius-sm);
+ 				}
+diff --git a/packages/dataviews/src/components/dataviews-layouts/grid/style.scss b/packages/dataviews/src/components/dataviews-layouts/grid/style.scss
+index 751e4733c72493..fc5d004e9d4795 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/grid/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/grid/style.scss
+@@ -44,7 +44,7 @@
+ 				left: 0;
+ 				width: 100%;
+ 				height: 100%;
+-				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus-brand);
++				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus);
+ 				border-radius: var(--wpds-border-radius-md);
+ 				pointer-events: none;
+ 
+@@ -91,7 +91,7 @@
+ 				inset 0 0 0 var(--wpds-border-width-sm) var(--wpds-color-background-surface-neutral-strong);
+ 		}
+ 		.dataviews-view-grid__media:focus::after {
+-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus-brand);
++			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus);
+ 		}
+ 	}
+ 
+diff --git a/packages/dataviews/src/components/dataviews-layouts/list/style.scss b/packages/dataviews/src/components/dataviews-layouts/list/style.scss
+index 269d1ff6fe82b1..341731189e20d8 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/list/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/list/style.scss
+@@ -117,7 +117,7 @@ div.dataviews-view-list {
+ 				position: absolute;
+ 				content: "";
+ 				inset: var(--wp-admin-border-width-focus);
+-				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus-brand);
++				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus);
+ 				border-radius: var(--wpds-border-radius-sm);
+ 				// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 				outline: 2px solid transparent;
+diff --git a/packages/dataviews/src/components/dataviews-layouts/picker-activity/style.scss b/packages/dataviews/src/components/dataviews-layouts/picker-activity/style.scss
+index 74d1ebfab6f3ab..5d5e857c1d489d 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/picker-activity/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/picker-activity/style.scss
+@@ -10,7 +10,7 @@
+ 		}
+ 
+ 		.dataviews-view-picker-activity__item[data-active-item="true"] {
+-			outline: 2px solid var(--wpds-color-stroke-focus-brand);
++			outline: 2px solid var(--wpds-color-stroke-focus);
+ 			outline-offset: -2px;
+ 		}
+ 	}
+diff --git a/packages/dataviews/src/components/dataviews-layouts/picker-grid/style.scss b/packages/dataviews/src/components/dataviews-layouts/picker-grid/style.scss
+index 69839befa8bd06..5c816d6cab6672 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/picker-grid/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/picker-grid/style.scss
+@@ -44,7 +44,7 @@
+ 				inset 0 0 0 var(--wpds-border-width-sm) var(--wpds-color-background-surface-neutral-strong);
+ 		}
+ 		.dataviews-view-picker-grid__media:focus::after {
+-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus-brand);
++			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus);
+ 		}
+ 	}
+ 
+@@ -56,7 +56,7 @@
+ 		}
+ 
+ 		[data-active-item="true"] {
+-			outline: 2px solid var(--wpds-color-stroke-focus-brand);
++			outline: 2px solid var(--wpds-color-stroke-focus);
+ 		}
+ 	}
+ 
+diff --git a/packages/dataviews/src/components/dataviews-layouts/picker-table/style.scss b/packages/dataviews/src/components/dataviews-layouts/picker-table/style.scss
+index cedcfd3ffc3ef0..da78c389e7c680 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/picker-table/style.scss
++++ b/packages/dataviews/src/components/dataviews-layouts/picker-table/style.scss
+@@ -18,7 +18,7 @@
+ 		}
+ 
+ 		[data-active-item="true"] {
+-			outline: 2px solid var(--wpds-color-stroke-focus-brand);
++			outline: 2px solid var(--wpds-color-stroke-focus);
+ 		}
+ 	}
+ 
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 28dfac6b4a1679..08be6aabcb5de4 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ ### Breaking Changes
+ 
+ -   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).
++-   Rename the `--wpds-color-stroke-focus-brand` design token to `--wpds-color-stroke-focus` ([#79125](https://github.com/WordPress/gutenberg/pull/79125)).
+ 
+ ## 0.15.0 (2026-06-10)
+ 
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index 775e83316e5951..9d00eaa1ff2b39 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -229,7 +229,7 @@ The interactive state of the element. The default (no modifier) is the idle stat
+ | `--wpds-color-stroke-interactive-error`                       | Accessible stroke color used for interactive error-toned elements with normal emphasis.                                                     |
+ | `--wpds-color-stroke-interactive-error-active`                | Accessible stroke color used for interactive error-toned elements with normal emphasis that are hovered, focused, or active.                |
+ | `--wpds-color-stroke-interactive-error-strong`                | Accessible stroke color used for interactive error-toned elements with strong emphasis.                                                     |
+-| `--wpds-color-stroke-focus-brand`                             | Accessible stroke color applied to focus rings.                                                                                             |
++| `--wpds-color-stroke-focus`                                   | Accessible stroke color applied to focus rings.                                                                                             |
+ 
+ ### Cursor
+ 
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 3f7e297b6f7764..695197af9b80e4 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -198,7 +198,7 @@
+ 	/* Accessible stroke color used for interactive error-toned elements with strong emphasis. */
+ 	--wpds-color-stroke-interactive-error-strong: #cc1818;
+ 	/* Accessible stroke color applied to focus rings. */
+-	--wpds-color-stroke-focus-brand: #3858e9;
++	--wpds-color-stroke-focus: #3858e9;
+ 	/* Cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). */
+ 	--wpds-cursor-control: pointer;
+ 	/* Base dimension unit */
+diff --git a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+index 1717f4bedc77fa..2ec2990558f780 100644
+--- a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
++++ b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+@@ -87,7 +87,7 @@ export default {
+ 	'--wpds-color-foreground-interactive-neutral-strong-disabled': '#8d8d8d',
+ 	'--wpds-color-foreground-interactive-neutral-weak': '#707070',
+ 	'--wpds-color-foreground-interactive-neutral-weak-disabled': '#8d8d8d',
+-	'--wpds-color-stroke-focus-brand': 'var(--wp-admin-theme-color, #3858e9)',
++	'--wpds-color-stroke-focus': 'var(--wp-admin-theme-color, #3858e9)',
+ 	'--wpds-color-stroke-interactive-brand':
+ 		'var(--wp-admin-theme-color, #3858e9)',
+ 	'--wpds-color-stroke-interactive-brand-active':
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index 6354b93c85579b..3fba96a3f96111 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -101,7 +101,7 @@ export default [
+ 	'--wpds-color-stroke-interactive-error',
+ 	'--wpds-color-stroke-interactive-error-active',
+ 	'--wpds-color-stroke-interactive-error-strong',
+-	'--wpds-color-stroke-focus-brand',
++	'--wpds-color-stroke-focus',
+ 	'--wpds-cursor-control',
+ 	'--wpds-dimension-base',
+ 	'--wpds-dimension-padding-xs',
+diff --git a/packages/theme/src/prebuilt/ts/color-tokens.ts b/packages/theme/src/prebuilt/ts/color-tokens.ts
+index 52568e45ff34c5..3e900d96211b49 100644
+--- a/packages/theme/src/prebuilt/ts/color-tokens.ts
++++ b/packages/theme/src/prebuilt/ts/color-tokens.ts
+@@ -18,7 +18,7 @@ export default {
+ 	'primary-stroke3': [
+ 		'background-thumb-brand',
+ 		'background-thumb-brand-active',
+-		'stroke-focus-brand',
++		'stroke-focus',
+ 		'stroke-interactive-brand',
+ 		'stroke-surface-brand-strong',
+ 	],
+diff --git a/packages/theme/src/prebuilt/ts/token-types.ts b/packages/theme/src/prebuilt/ts/token-types.ts
+index 0bcd7990e63d25..6bd44d3ee136dc 100644
+--- a/packages/theme/src/prebuilt/ts/token-types.ts
++++ b/packages/theme/src/prebuilt/ts/token-types.ts
+@@ -54,13 +54,7 @@ export type BorderWidthSize = 'xs' | 'sm' | 'md' | 'lg' | 'focus';
+ /**
+  * Target elements that tokens can be applied to.
+  */
+-export type Target =
+-	| 'surface'
+-	| 'interactive'
+-	| 'track'
+-	| 'thumb'
+-	| 'content'
+-	| 'focus';
++export type Target = 'surface' | 'interactive' | 'track' | 'thumb' | 'content';
+ 
+ /**
+  * Background color variants for surface elements.
+diff --git a/packages/theme/src/stylelint-plugins/test/__snapshots__/no-token-fallback-values.test.ts.snap b/packages/theme/src/stylelint-plugins/test/__snapshots__/no-token-fallback-values.test.ts.snap
+index 3766ca9307852d..ce2dfe2686a1da 100644
+--- a/packages/theme/src/stylelint-plugins/test/__snapshots__/no-token-fallback-values.test.ts.snap
++++ b/packages/theme/src/stylelint-plugins/test/__snapshots__/no-token-fallback-values.test.ts.snap
+@@ -40,12 +40,12 @@ exports[`flags warnings with invalid css (wpds fallbacks) snapshot matches warni
+   },
+   {
+     "column": 53,
+-    "endColumn": 89,
++    "endColumn": 83,
+     "endLine": 10,
+     "line": 10,
+     "rule": "plugin-wpds/no-token-fallback-values",
+     "severity": "error",
+-    "text": "Do not add a fallback value for Design System token '--wpds-color-stroke-focus-brand'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
++    "text": "Do not add a fallback value for Design System token '--wpds-color-stroke-focus'. Fallbacks are injected automatically at build time. (plugin-wpds/no-token-fallback-values)",
+   },
+   {
+     "column": 32,
+diff --git a/packages/theme/src/stylelint-plugins/test/fixtures/no-token-fallback-values-invalid.css b/packages/theme/src/stylelint-plugins/test/fixtures/no-token-fallback-values-invalid.css
+index 80b11e69b83bbf..913f447feca1ba 100644
+--- a/packages/theme/src/stylelint-plugins/test/fixtures/no-token-fallback-values-invalid.css
++++ b/packages/theme/src/stylelint-plugins/test/fixtures/no-token-fallback-values-invalid.css
+@@ -7,7 +7,7 @@
+ 
+ /* Invalid: Fallbacks in complex values */
+ .complex {
+-	outline: var(--wpds-border-width-focus, 2px) solid var(--wpds-color-stroke-focus-brand, #0073aa);
++	outline: var(--wpds-border-width-focus, 2px) solid var(--wpds-color-stroke-focus, #0073aa);
+ }
+ 
+ /* Invalid: A wpds token with a fallback, even when nested inside another var() */
+diff --git a/packages/theme/tokens/color.json b/packages/theme/tokens/color.json
+index 5af439362c83f8..787c48eb20010d 100644
+--- a/packages/theme/tokens/color.json
++++ b/packages/theme/tokens/color.json
+@@ -1491,10 +1491,8 @@
+ 				}
+ 			},
+ 			"focus": {
+-				"brand": {
+-					"$value": "{wpds-color.primitive.primary.stroke3}",
+-					"$description": "Accessible stroke color applied to focus rings."
+-				}
++				"$value": "{wpds-color.primitive.primary.stroke3}",
++				"$description": "Accessible stroke color applied to focus rings."
+ 			},
+ 			"$extensions": {
+ 				"com.figma.scopes": [ "STROKE" ]
+diff --git a/packages/ui/src/tabs/style.module.css b/packages/ui/src/tabs/style.module.css
+index ef74f59bbb99ff..2adcfe7209f5bd 100644
+--- a/packages/ui/src/tabs/style.module.css
++++ b/packages/ui/src/tabs/style.module.css
+@@ -99,7 +99,7 @@
+ 				box-sizing: border-box;
+ 				border:
+ 					var(--wpds-border-width-focus) solid
+-					var(--wpds-color-stroke-focus-brand);
++					var(--wpds-color-stroke-focus);
+ 			}
+ 		}
+ 
+@@ -155,7 +155,7 @@
+ 				/* Outline works for Windows high contrast mode as well. */
+ 				outline:
+ 					var(--wpds-border-width-focus) solid
+-					var(--wpds-color-stroke-focus-brand);
++					var(--wpds-color-stroke-focus);
+ 				border-radius: var(--wpds-border-radius-sm);
+ 
+ 				/* Animation */
+diff --git a/packages/ui/src/utils/css/focus.module.css b/packages/ui/src/utils/css/focus.module.css
+index f4df21e4379abb..20c3d182dd6d57 100644
+--- a/packages/ui/src/utils/css/focus.module.css
++++ b/packages/ui/src/utils/css/focus.module.css
+@@ -28,10 +28,10 @@
+ 		.outset-ring--focus-within-except-active:focus-within:not(:has(:active)),
+ 		.outset-ring--focus-within-visible:focus-within:has(:focus-visible),
+ 		:focus-visible .outset-ring--focus-parent-visible {
+-			--_gcd-a-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+-			--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
++			--_gcd-a-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
++			--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+ 
+-			outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
++			outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+ 		}
+ 	}
+ }
+diff --git a/routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.module.css b/routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.module.css
+index 42102bedba52ea..7c526373201e2b 100644
+--- a/routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.module.css
++++ b/routes/dashboard/widget-dashboard/components/dashboard-widget-chrome/dashboard-widget-chrome.module.css
+@@ -21,7 +21,7 @@
+  * to content focus, and to `:focus-visible` so a mouse click doesn't draw it.
+  */
+ .widgetChrome:has(.widgetChromeContent :focus-visible) {
+-	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
++	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+ 	outline-offset: 2px;
+ }
+ 
+diff --git a/routes/dashboard/widget-dashboard/components/widgets/widget-resize-handle.module.css b/routes/dashboard/widget-dashboard/components/widgets/widget-resize-handle.module.css
+index 7b8e4e4757895a..5ccae037b77777 100644
+--- a/routes/dashboard/widget-dashboard/components/widgets/widget-resize-handle.module.css
++++ b/routes/dashboard/widget-dashboard/components/widgets/widget-resize-handle.module.css
+@@ -12,7 +12,7 @@
+ }
+ 
+ .handle:focus-visible {
+-	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
++	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+ 	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+ 	outline-offset: calc(var(--wpds-dimension-base) * 0.5);
+ 	border-radius: var(--wpds-border-radius-sm);
+diff --git a/routes/dashboard/widget-dashboard/components/widgets/widgets.module.css b/routes/dashboard/widget-dashboard/components/widgets/widgets.module.css
+index eead0d8c779147..8294ff7c0c282a 100644
+--- a/routes/dashboard/widget-dashboard/components/widgets/widgets.module.css
++++ b/routes/dashboard/widget-dashboard/components/widgets/widgets.module.css
+@@ -22,7 +22,7 @@
+ }
+ 
+ .tileEditMode:focus-visible {
+-	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
++	outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus);
+ 	outline-offset: 2px;
+ }
+ 

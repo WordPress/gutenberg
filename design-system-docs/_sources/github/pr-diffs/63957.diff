@@ -1,0 +1,163 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6c32534598fb5c..f8666e96a20a15 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `CustomSelectControl`: Restore `describedBy` functionality ([#63957](https://github.com/WordPress/gutenberg/pull/63957)).
++
+ ### Internal
+ 
+ -   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).
+diff --git a/packages/components/src/custom-select-control/index.tsx b/packages/components/src/custom-select-control/index.tsx
+index 5bce6afc4d92b6..8735b8d320991e 100644
+--- a/packages/components/src/custom-select-control/index.tsx
++++ b/packages/components/src/custom-select-control/index.tsx
+@@ -4,6 +4,12 @@
+ import * as Ariakit from '@ariakit/react';
+ import clsx from 'clsx';
+ 
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
++import { __, sprintf } from '@wordpress/i18n';
++
+ /**
+  * Internal dependencies
+  */
+@@ -11,6 +17,7 @@ import _CustomSelect from '../custom-select-control-v2/custom-select';
+ import CustomSelectItem from '../custom-select-control-v2/item';
+ import * as Styled from '../custom-select-control-v2/styles';
+ import type { CustomSelectProps } from './types';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ function useDeprecatedProps( {
+ 	__experimentalShowSelectedHint,
+@@ -35,6 +42,15 @@ function applyOptionDeprecations( {
+ 	};
+ }
+ 
++function getDescribedBy( currentValue: string, describedBy?: string ) {
++	if ( describedBy ) {
++		return describedBy;
++	}
++
++	// translators: %s: The selected option.
++	return sprintf( __( 'Currently selected: %s' ), currentValue );
++}
++
+ function CustomSelectControl( props: CustomSelectProps ) {
+ 	const {
+ 		__next40pxDefaultSize = false,
+@@ -48,8 +64,13 @@ function CustomSelectControl( props: CustomSelectProps ) {
+ 		...restProps
+ 	} = useDeprecatedProps( props );
+ 
++	const descriptionId = useInstanceId(
++		CustomSelectControl,
++		'custom-select-control__description'
++	);
++
+ 	// Forward props + store from v2 implementation
+-	const store = Ariakit.useSelectStore( {
++	const store = Ariakit.useSelectStore< string >( {
+ 		async setValue( nextValue ) {
+ 			const nextOption = options.find(
+ 				( item ) => item.name === nextValue
+@@ -117,9 +138,9 @@ function CustomSelectControl( props: CustomSelectProps ) {
+ 			);
+ 		} );
+ 
+-	const renderSelectedValueHint = () => {
+-		const { value: currentValue } = store.getState();
++	const { value: currentValue } = store.getState();
+ 
++	const renderSelectedValueHint = () => {
+ 		const selectedOptionHint = options
+ 			?.map( applyOptionDeprecations )
+ 			?.find( ( { name } ) => currentValue === name )?.hint;
+@@ -153,23 +174,30 @@ function CustomSelectControl( props: CustomSelectProps ) {
+ 	} )();
+ 
+ 	return (
+-		<_CustomSelect
+-			aria-describedby={ describedBy }
+-			renderSelectedValue={
+-				showSelectedHint ? renderSelectedValueHint : undefined
+-			}
+-			size={ translatedSize }
+-			store={ store }
+-			className={ clsx(
+-				// Keeping the classname for legacy reasons
+-				'components-custom-select-control',
+-				classNameProp
+-			) }
+-			isLegacy
+-			{ ...restProps }
+-		>
+-			{ children }
+-		</_CustomSelect>
++		<>
++			<_CustomSelect
++				aria-describedby={ descriptionId }
++				renderSelectedValue={
++					showSelectedHint ? renderSelectedValueHint : undefined
++				}
++				size={ translatedSize }
++				store={ store }
++				className={ clsx(
++					// Keeping the classname for legacy reasons
++					'components-custom-select-control',
++					classNameProp
++				) }
++				isLegacy
++				{ ...restProps }
++			>
++				{ children }
++			</_CustomSelect>
++			<VisuallyHidden>
++				<span id={ descriptionId }>
++					{ getDescribedBy( currentValue, describedBy ) }
++				</span>
++			</VisuallyHidden>
++		</>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/custom-select-control/test/index.tsx b/packages/components/src/custom-select-control/test/index.tsx
+index 73dcb039df3f1b..4bc96f318138c5 100644
+--- a/packages/components/src/custom-select-control/test/index.tsx
++++ b/packages/components/src/custom-select-control/test/index.tsx
+@@ -670,5 +670,27 @@ describe.each( [
+ 			expect( currentSelectedItem ).not.toHaveFocus();
+ 			expect( onBlurMock ).toHaveBeenCalledTimes( 1 );
+ 		} );
++
++		it( 'should render the describedBy text when specified', async () => {
++			const describedByText = 'My description.';
++
++			render(
++				<Component { ...props } describedBy={ describedByText } />
++			);
++
++			expect(
++				screen.getByRole( 'combobox' )
++			).toHaveAccessibleDescription( describedByText );
++		} );
++
++		it( 'should render the default ARIA description when describedBy is not specified', async () => {
++			render( <Component { ...props } /> );
++
++			expect(
++				screen.getByRole( 'combobox' )
++			).toHaveAccessibleDescription(
++				`Currently selected: ${ props.options[ 0 ].name }`
++			);
++		} );
+ 	} );
+ } );

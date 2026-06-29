@@ -1,0 +1,70 @@
+diff --git a/packages/block-library/src/embed/embed-placeholder.js b/packages/block-library/src/embed/embed-placeholder.js
+index 247d012674c4bf..3d9053e3d156b6 100644
+--- a/packages/block-library/src/embed/embed-placeholder.js
++++ b/packages/block-library/src/embed/embed-placeholder.js
+@@ -28,18 +28,20 @@ const EmbedPlaceholder = ( props ) => {
+ 				>
+ 					{ _x( 'Embed', 'button label' ) }
+ 				</Button>
+-				{ cannotEmbed &&
+-					<p className="components-placeholder__error">
+-						{ __( 'Sorry, this content could not be embedded.' ) }<br />
+-						<Button isSecondary onClick={ tryAgain }>{ _x( 'Try again', 'button label' ) }</Button> <Button isSecondary onClick={ fallback }>{ _x( 'Convert to link', 'button label' ) }</Button>
+-					</p>
+-				}
+ 			</form>
+ 			<div className="components-placeholder__learn-more">
+ 				<ExternalLink href={ __( 'https://wordpress.org/support/article/embeds/' ) }>
+ 					{ __( 'Learn more about embeds' ) }
+ 				</ExternalLink>
+ 			</div>
++			{ cannotEmbed &&
++				<div className="components-placeholder__error">
++					<div className="components-placeholder__instructions">
++						{ __( 'Sorry, this content could not be embedded.' ) }
++					</div>
++					<Button isSecondary onClick={ tryAgain }>{ _x( 'Try again', 'button label' ) }</Button> <Button isSecondary onClick={ fallback }>{ _x( 'Convert to link', 'button label' ) }</Button>
++				</div>
++			}
+ 		</Placeholder>
+ 	);
+ };
+diff --git a/packages/block-library/src/table/editor.scss b/packages/block-library/src/table/editor.scss
+index 4bbab7aaeeae1d..7c69994400e558 100644
+--- a/packages/block-library/src/table/editor.scss
++++ b/packages/block-library/src/table/editor.scss
+@@ -63,6 +63,10 @@
+ 		}
+ 	}
+ 
++	.components-base-control__field {
++		margin-bottom: 0;
++	}
++
+ 	.wp-block-table__placeholder-button {
+ 		margin-top: auto;
+ 		margin-right: auto;
+diff --git a/packages/components/src/placeholder/style.scss b/packages/components/src/placeholder/style.scss
+index beaac89a7c30c3..84f922752bb6a8 100644
+--- a/packages/components/src/placeholder/style.scss
++++ b/packages/components/src/placeholder/style.scss
+@@ -26,6 +26,7 @@
+ 	}
+ }
+ 
++.components-placeholder__error,
+ .components-placeholder__instructions,
+ .components-placeholder__label,
+ .components-placeholder__fieldset {
+@@ -74,6 +75,11 @@
+ 	margin-bottom: 1em;
+ }
+ 
++.components-placeholder__error {
++	margin-top: 1em;
++	width: 100%;
++}
++
+ .components-placeholder__preview img {
+ 	margin: 3%;
+ 	width: 50%;

@@ -1,0 +1,65 @@
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index fdd406530ee297..e78ad7d8e4524a 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { deburr } from 'lodash';
++import { noop, deburr } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+@@ -46,7 +46,7 @@ function ComboboxControl( {
+ 	label,
+ 	options,
+ 	onChange,
+-	onFilterValueChange,
++	onFilterValueChange = noop,
+ 	hideLabelFromVision,
+ 	help,
+ 	allowReset = true,
+diff --git a/packages/components/src/combobox-control/stories/index.js b/packages/components/src/combobox-control/stories/index.js
+index 8bca43c948fd34..5a96bbced2f2d5 100644
+--- a/packages/components/src/combobox-control/stories/index.js
++++ b/packages/components/src/combobox-control/stories/index.js
+@@ -259,14 +259,14 @@ export default {
+ 	component: ComboboxControl,
+ };
+ 
+-function ComboboxControlWithState() {
+-	const mapCountryOption = ( country ) => ( {
+-		value: country.code,
+-		label: country.name,
+-	} );
+-	const [ filteredOptions, setFilteredOptions ] = useState(
+-		countries.map( mapCountryOption )
+-	);
++const mapCountryOption = ( country ) => ( {
++	value: country.code,
++	label: country.name,
++} );
++
++const countryOptions = countries.map( mapCountryOption );
++
++function CountryCodeComboboxControl() {
+ 	const [ value, setValue ] = useState( null );
+ 
+ 	return (
+@@ -275,13 +275,10 @@ function ComboboxControlWithState() {
+ 				value={ value }
+ 				onChange={ setValue }
+ 				label="Select a country"
+-				options={ filteredOptions }
+-				onFilterValueChange={ () =>
+-					setFilteredOptions( countries.map( mapCountryOption ) )
+-				}
++				options={ countryOptions }
+ 			/>
+ 			<p>Value: { value }</p>
+ 		</>
+ 	);
+ }
+-export const _default = () => <ComboboxControlWithState />;
++export const _default = () => <CountryCodeComboboxControl />;

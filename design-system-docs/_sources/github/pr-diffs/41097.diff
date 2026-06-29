@@ -1,0 +1,2371 @@
+diff --git a/packages/block-editor/src/components/index.js b/packages/block-editor/src/components/index.js
+index 43448fdae43b7d..2330a35e338cc6 100644
+--- a/packages/block-editor/src/components/index.js
++++ b/packages/block-editor/src/components/index.js
+@@ -147,6 +147,7 @@ export { default as useBlockDisplayInformation } from './use-block-display-infor
+ export { default as __unstableIframe } from './iframe';
+ export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
+ export { default as __experimentalBlockPatternsList } from './block-patterns-list';
++export { default as __experimentalPublishDateTimePicker } from './publish-date-time-picker';
+ 
+ /*
+  * State Related Components
+diff --git a/packages/block-editor/src/components/publish-date-time-picker/README.md b/packages/block-editor/src/components/publish-date-time-picker/README.md
+new file mode 100644
+index 00000000000000..98ff682eb79422
+--- /dev/null
++++ b/packages/block-editor/src/components/publish-date-time-picker/README.md
+@@ -0,0 +1,52 @@
++# `PublishDateTimePicker`
++
++`<PublishDateTimePicker />` is a component used to select the date and time that
++a post will be published. It wraps the `<DateTimePicker />` component found in
++`@wordpress/components` and adds additional post-specific controls.
++
++See [the documentation for DateTimePicker](/packages/components/src/date-time)
++for more information.
++
++## Usage
++
++```jsx
++import { Dropdown, Button } from '@wordpress/components';
++import { __experimentalPublishDateTimePicker as PublishDateTimePicker } from '@wordpress/block-editor';
++import { useState } from '@wordpress/element';
++
++const MyDateTimePicker = () => {
++	const [ date, setDate ] = useState( new Date() );
++
++	return (
++		<Dropdown
++			renderToggle={ ( { isOpen, onToggle } ) => (
++				<Button
++					onClick={ onToggle }
++					aria-expanded={ isOpen }
++				>
++					Select post date
++				</Button>
++			) }
++			renderContent={ ( { onClose } ) => (
++				<PublishDateTimePicker
++					currentDate={ date }
++					onChange={ ( newDate ) => setDate( newDate ) }
++					onClose={ onClose }
++				/>
++			) }
++		/>
++	);
++};
++```
++
++## Props
++
++`PublishDateTimePicker` supports all of the props that
++[`DateTimePicker`](/packages/components/src/date-time#Props) supports, plus:
++
++### onClose
++
++Called when the user presses the close button.
++
++- Type: `Function`
++- Required: Yes
+diff --git a/packages/block-editor/src/components/publish-date-time-picker/index.js b/packages/block-editor/src/components/publish-date-time-picker/index.js
+new file mode 100644
+index 00000000000000..7244ed3a5c35f4
+--- /dev/null
++++ b/packages/block-editor/src/components/publish-date-time-picker/index.js
+@@ -0,0 +1,50 @@
++/**
++ * WordPress dependencies
++ */
++import {
++	DateTimePicker,
++	__experimentalHStack as HStack,
++	__experimentalSpacer as Spacer,
++	Button,
++} from '@wordpress/components';
++import { closeSmall } from '@wordpress/icons';
++import { __ } from '@wordpress/i18n';
++import { forwardRef } from '@wordpress/element';
++
++function PublishDateTimePicker(
++	{ onClose, onChange, ...additionalProps },
++	ref
++) {
++	return (
++		<div ref={ ref } className="block-editor-publish-date-time-picker">
++			{ /* TODO: This header is essentially the same as the one in <PostVisiblity />. DRY it up. */ }
++			<HStack className="block-editor-publish-date-time-picker__header">
++				<h2 className="block-editor-publish-date-time-picker__heading">
++					{ __( 'Publish' ) }
++				</h2>
++				<Spacer />
++				<Button
++					className="block-editor-publish-date-time-picker__reset"
++					variant="tertiary"
++					onClick={ () => onChange?.( null ) }
++				>
++					{ __( 'Now' ) }
++				</Button>
++				<Button
++					className="block-editor-publish-date-time-picker__close"
++					icon={ closeSmall }
++					label={ __( 'Close' ) }
++					onClick={ onClose }
++				/>
++			</HStack>
++			<DateTimePicker
++				__nextRemoveHelpButton
++				__nextRemoveResetButton
++				onChange={ onChange }
++				{ ...additionalProps }
++			/>
++		</div>
++	);
++}
++
++export default forwardRef( PublishDateTimePicker );
+diff --git a/packages/block-editor/src/components/publish-date-time-picker/style.scss b/packages/block-editor/src/components/publish-date-time-picker/style.scss
+new file mode 100644
+index 00000000000000..517700e2ca5c25
+--- /dev/null
++++ b/packages/block-editor/src/components/publish-date-time-picker/style.scss
+@@ -0,0 +1,20 @@
++.block-editor-publish-date-time-picker__header {
++	margin-bottom: 1em;
++}
++
++.block-editor-publish-date-time-picker__heading {
++	font-size: $default-font-size;
++	margin: 0;
++}
++
++.block-editor-publish-date-time-picker__reset {
++	height: $icon-size;
++	margin: 0;
++	text-decoration: underline;
++}
++
++[class].block-editor-publish-date-time-picker__close {
++	height: $icon-size;
++	min-width: $icon-size;
++	padding: 0;
++}
+diff --git a/packages/block-editor/src/style.scss b/packages/block-editor/src/style.scss
+index 5f036b4d9b264d..56ae7fb6c24d17 100644
+--- a/packages/block-editor/src/style.scss
++++ b/packages/block-editor/src/style.scss
+@@ -42,6 +42,7 @@
+ @import "./components/media-placeholder/style.scss";
+ @import "./components/multi-selection-inspector/style.scss";
+ @import "./components/plain-text/style.scss";
++@import "./components/publish-date-time-picker/style.scss";
+ @import "./components/responsive-block-control/style.scss";
+ @import "./components/rich-text/style.scss";
+ @import "./components/skip-to-selected-block/style.scss";
+diff --git a/packages/block-library/src/post-date/edit.js b/packages/block-library/src/post-date/edit.js
+index da33f65418116c..dd7bd46852f7ec 100644
+--- a/packages/block-library/src/post-date/edit.js
++++ b/packages/block-library/src/post-date/edit.js
+@@ -18,13 +18,13 @@ import {
+ 	InspectorControls,
+ 	useBlockProps,
+ 	__experimentalDateFormatPicker as DateFormatPicker,
++	__experimentalPublishDateTimePicker as PublishDateTimePicker,
+ } from '@wordpress/block-editor';
+ import {
+ 	Dropdown,
+ 	ToolbarGroup,
+ 	ToolbarButton,
+ 	ToggleControl,
+-	DateTimePicker,
+ 	PanelBody,
+ } from '@wordpress/components';
+ import { __, sprintf } from '@wordpress/i18n';
+@@ -101,13 +101,14 @@ export default function PostDateEdit( {
+ 					<ToolbarGroup>
+ 						<Dropdown
+ 							popoverProps={ { anchorRef: timeRef.current } }
+-							renderContent={ () => (
+-								<DateTimePicker
++							renderContent={ ( { onClose } ) => (
++								<PublishDateTimePicker
+ 									currentDate={ date }
+ 									onChange={ setDate }
+ 									is12Hour={ is12HourFormat(
+ 										siteTimeFormat
+ 									) }
++									onClose={ onClose }
+ 								/>
+ 							) }
+ 							renderToggle={ ( { isOpen, onToggle } ) => {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f0d806fe71411d..b538beecb144dd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,8 @@
+ -   `SelectControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#41269](https://github.com/WordPress/gutenberg/pull/41269)).
+ -   `ColorPicker`: Strip leading hash character from hex values pasted into input. ([#41223](https://github.com/WordPress/gutenberg/pull/41223))
+ -   `ColorPicker`: Display detailed color inputs by default. ([#41222](https://github.com/WordPress/gutenberg/pull/41222))
++-   Updated design for the `DateTimePicker`, `DatePicker` and `TimePicker` components ([#41097](https://github.com/WordPress/gutenberg/pull/41097)).
++-   `DateTimePicker`: Add `__nextRemoveHelpButton` and `__nextRemoveResetButton` for opting into new behaviour where there is no Help and Reset button ([#41097](https://github.com/WordPress/gutenberg/pull/41097)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/date-time/README.md b/packages/components/src/date-time/README.md
+index 6c2cddd62841ad..6784af6c15ceb0 100644
+--- a/packages/components/src/date-time/README.md
++++ b/packages/components/src/date-time/README.md
+@@ -26,6 +26,8 @@ const MyDateTimePicker = () => {
+ 			currentDate={ date }
+ 			onChange={ ( newDate ) => setDate( newDate ) }
+ 			is12Hour={ true }
++			__nextRemoveHelpButton
++			__nextRemoveResetButton
+ 		/>
+ 	);
+ };
+@@ -74,3 +76,17 @@ List of events to show in the date picker. Each event will appear as a dot on th
+ 
+ -   Type: `Array`
+ -   Required: No
++
++### `__nextRemoveHelpButton`: `boolean`
++
++Start opting in to not displaying a Help button which will become the default in a future version.
++
++- Required: No
++- Default: `false`
++
++### `__nextRemoveResetButton`: `boolean`
++
++Start opting in to not displaying a Reset button which will become the default in a future version.
++
++- Required: No
++- Default: `false`
+diff --git a/packages/components/src/date-time/date-time/index.tsx b/packages/components/src/date-time/date-time/index.tsx
+new file mode 100644
+index 00000000000000..0f9997403c3631
+--- /dev/null
++++ b/packages/components/src/date-time/date-time/index.tsx
+@@ -0,0 +1,217 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++import type { ForwardedRef } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState, forwardRef } from '@wordpress/element';
++import { __, _x } from '@wordpress/i18n';
++import deprecated from '@wordpress/deprecated';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../../button';
++import { default as DatePicker } from '../date';
++import { default as TimePicker } from '../time';
++import type { DateTimePickerProps } from '../types';
++import { CalendarHelp } from './styles';
++import { HStack } from '../../h-stack';
++import { Heading } from '../../heading';
++import { Spacer } from '../../spacer';
++
++export { DatePicker, TimePicker };
++
++function UnforwardedDateTimePicker(
++	{
++		currentDate,
++		is12Hour,
++		isInvalidDate,
++		onMonthPreviewed = noop,
++		onChange,
++		events,
++		__nextRemoveHelpButton = false,
++		__nextRemoveResetButton = false,
++	}: DateTimePickerProps,
++	ref: ForwardedRef< any >
++) {
++	if ( ! __nextRemoveHelpButton ) {
++		deprecated( 'Help button in wp.components.DateTimePicker', {
++			since: '13.4',
++			version: '14.6', // Six months of plugin releases.
++			hint:
++				'Set the `__nextRemoveHelpButton` prop to `true` to remove this warning and opt in to the new behaviour, which will become the default in a future version.',
++		} );
++	}
++	if ( ! __nextRemoveResetButton ) {
++		deprecated( 'Reset button in wp.components.DateTimePicker', {
++			since: '13.4',
++			version: '14.6', // Six months of plugin releases.
++			hint:
++				'Set the `__nextRemoveResetButton` prop to `true` to remove this warning and opt in to the new behaviour, which will become the default in a future version.',
++		} );
++	}
++
++	const [ calendarHelpIsVisible, setCalendarHelpIsVisible ] = useState(
++		false
++	);
++
++	function onClickDescriptionToggle() {
++		setCalendarHelpIsVisible( ! calendarHelpIsVisible );
++	}
++
++	return (
++		<div ref={ ref } className="components-datetime">
++			{ ! calendarHelpIsVisible && (
++				<>
++					<TimePicker
++						currentTime={ currentDate }
++						onChange={ onChange }
++						is12Hour={ is12Hour }
++					/>
++					<DatePicker
++						currentDate={ currentDate }
++						onChange={ onChange }
++						isInvalidDate={ isInvalidDate }
++						events={ events }
++						onMonthPreviewed={ onMonthPreviewed }
++					/>
++				</>
++			) }
++			{ calendarHelpIsVisible && (
++				<CalendarHelp
++					className="components-datetime__calendar-help" // Unused, for backwards compatibility.
++				>
++					<Heading level={ 4 }>{ __( 'Click to Select' ) }</Heading>
++					<ul>
++						<li>
++							{ __(
++								'Click the right or left arrows to select other months in the past or the future.'
++							) }
++						</li>
++						<li>{ __( 'Click the desired day to select it.' ) }</li>
++					</ul>
++					<Heading level={ 4 }>
++						{ __( 'Navigating with a keyboard' ) }
++					</Heading>
++					<ul>
++						<li>
++							<abbr
++								aria-label={ _x( 'Enter', 'keyboard button' ) }
++							>
++								↵
++							</abbr>
++							{
++								' ' /* JSX removes whitespace, but a space is required for screen readers. */
++							}
++							<span>{ __( 'Select the date in focus.' ) }</span>
++						</li>
++						<li>
++							<abbr aria-label={ __( 'Left and Right Arrows' ) }>
++								←/→
++							</abbr>
++							{
++								' ' /* JSX removes whitespace, but a space is required for screen readers. */
++							}
++							{ __(
++								'Move backward (left) or forward (right) by one day.'
++							) }
++						</li>
++						<li>
++							<abbr aria-label={ __( 'Up and Down Arrows' ) }>
++								↑/↓
++							</abbr>
++							{
++								' ' /* JSX removes whitespace, but a space is required for screen readers. */
++							}
++							{ __(
++								'Move backward (up) or forward (down) by one week.'
++							) }
++						</li>
++						<li>
++							<abbr aria-label={ __( 'Page Up and Page Down' ) }>
++								{ __( 'PgUp/PgDn' ) }
++							</abbr>
++							{
++								' ' /* JSX removes whitespace, but a space is required for screen readers. */
++							}
++							{ __(
++								'Move backward (PgUp) or forward (PgDn) by one month.'
++							) }
++						</li>
++						<li>
++							<abbr aria-label={ __( 'Home and End' ) }>
++								{ /* Translators: Home/End reffer to the 'Home' and 'End' buttons on the keyboard.*/ }
++								{ __( 'Home/End' ) }
++							</abbr>
++							{
++								' ' /* JSX removes whitespace, but a space is required for screen readers. */
++							}
++							{ __(
++								'Go to the first (Home) or last (End) day of a week.'
++							) }
++						</li>
++					</ul>
++				</CalendarHelp>
++			) }
++			{ ( ! __nextRemoveResetButton || ! __nextRemoveHelpButton ) && (
++				<HStack
++					className="components-datetime__buttons" // Unused, for backwards compatibility.
++				>
++					{ ! __nextRemoveResetButton &&
++						! calendarHelpIsVisible &&
++						currentDate && (
++							<Button
++								className="components-datetime__date-reset-button" // Unused, for backwards compatibility.
++								variant="link"
++								onClick={ () => onChange?.( null ) }
++							>
++								{ __( 'Reset' ) }
++							</Button>
++						) }
++					<Spacer />
++					{ ! __nextRemoveHelpButton && (
++						<Button
++							className="components-datetime__date-help-toggle" // Unused, for backwards compatibility.
++							variant="link"
++							onClick={ onClickDescriptionToggle }
++						>
++							{ calendarHelpIsVisible
++								? __( 'Close' )
++								: __( 'Calendar Help' ) }
++						</Button>
++					) }
++				</HStack>
++			) }
++		</div>
++	);
++}
++
++/**
++ * DateTimePicker is a React component that renders a calendar and clock for
++ * date and time selection. The calendar and clock components can be accessed
++ * individually using the `DatePicker` and `TimePicker` components respectively.
++ *
++ * ```jsx
++ * import { DateTimePicker } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyDateTimePicker = () => {
++ *   const [ date, setDate ] = useState( new Date() );
++ *
++ *   return (
++ *     <DateTimePicker
++ *       currentDate={ date }
++ *       onChange={ ( newDate ) => setDate( newDate ) }
++ *       is12Hour
++ *     />
++ *   );
++ * };
++ * ```
++ */
++export const DateTimePicker = forwardRef( UnforwardedDateTimePicker );
++
++export default DateTimePicker;
+diff --git a/packages/components/src/date-time/date-time/styles.ts b/packages/components/src/date-time/date-time/styles.ts
+new file mode 100644
+index 00000000000000..8c5693213eabbe
+--- /dev/null
++++ b/packages/components/src/date-time/date-time/styles.ts
+@@ -0,0 +1,8 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++export const CalendarHelp = styled.div`
++	min-width: 260px;
++`;
+diff --git a/packages/components/src/date-time/datepicker.scss b/packages/components/src/date-time/date/datepicker.scss
+similarity index 100%
+rename from packages/components/src/date-time/datepicker.scss
+rename to packages/components/src/date-time/date/datepicker.scss
+diff --git a/packages/components/src/date-time/date.tsx b/packages/components/src/date-time/date/index.tsx
+similarity index 82%
+rename from packages/components/src/date-time/date.tsx
+rename to packages/components/src/date-time/date/index.tsx
+index 4c3a1fe748d826..0e583c6c5e150a 100644
+--- a/packages/components/src/date-time/date.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -2,10 +2,11 @@
+  * External dependencies
+  */
+ import moment from 'moment';
+-import classnames from 'classnames';
+ import type { Moment } from 'moment';
+ import { noop } from 'lodash';
+-
++// Needed to initialise the default datepicker styles.
++// See: https://github.com/airbnb/react-dates#initialize
++import 'react-dates/initialize';
+ // `react-dates` doesn't tree-shake correctly, so we import from the individual
+ // component here.
+ import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
+@@ -15,12 +16,14 @@ import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerS
+  */
+ import { useEffect, useRef } from '@wordpress/element';
+ import { isRTL, _n, sprintf } from '@wordpress/i18n';
++import { arrowLeft, arrowRight } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { getMomentDate } from './utils';
+-import type { DatePickerDayProps, DatePickerProps } from './types';
++import type { DatePickerDayProps, DatePickerProps } from '../types';
++import { Day, NavPrevButton, NavNextButton } from './styles';
+ 
+ const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+ const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
+@@ -64,14 +67,14 @@ function DatePickerDay( { day, events = [] }: DatePickerDayProps ) {
+ 	}, [ events.length ] );
+ 
+ 	return (
+-		<div
++		<Day
+ 			ref={ ref }
+-			className={ classnames( 'components-datetime__date__day', {
+-				'has-events': events?.length,
+-			} ) }
++			className="components-datetime__date__day" // Unused, for backwards compatibility.
++			hasEvents={ !! events?.length }
++			alignment="center"
+ 		>
+ 			{ day.format( 'D' ) }
+-		</div>
++		</Day>
+ 	);
+ }
+ 
+@@ -102,6 +105,7 @@ export function DatePicker( {
+ 	onMonthPreviewed,
+ }: DatePickerProps ) {
+ 	const nodeRef = useRef< HTMLDivElement >( null );
++
+ 	const onMonthPreviewedHandler = ( newMonthDate: Moment ) => {
+ 		onMonthPreviewed?.( newMonthDate.toISOString() );
+ 		keepFocusInside();
+@@ -175,6 +179,7 @@ export function DatePicker( {
+ 				date={ momentDate }
+ 				initialVisibleMonth={ null }
+ 				daySize={ 30 }
++				horizontalMonthPadding={ 0 }
+ 				focused
+ 				hideKeyboardShortcutsPanel
+ 				// This is a hack to force the calendar to update on month or year change
+@@ -200,6 +205,28 @@ export function DatePicker( {
+ 						events={ getEventsPerDay( day ) }
+ 					/>
+ 				) }
++				renderMonthElement={ ( { month } ) => (
++					<>
++						<strong>{ month.format( 'MMMM' ) }</strong>{ ' ' }
++						{ month.format( 'YYYY' ) }
++					</>
++				) }
++				renderNavPrevButton={ ( { ariaLabel, ...props } ) => (
++					<NavPrevButton
++						icon={ arrowLeft }
++						variant="tertiary"
++						aria-label={ ariaLabel }
++						{ ...props }
++					/>
++				) }
++				renderNavNextButton={ ( { ariaLabel, ...props } ) => (
++					<NavNextButton
++						icon={ arrowRight }
++						variant="tertiary"
++						aria-label={ ariaLabel }
++						{ ...props }
++					/>
++				) }
+ 				onFocusChange={ noop }
+ 			/>
+ 		</div>
+diff --git a/packages/components/src/date-time/date/style.scss b/packages/components/src/date-time/date/style.scss
+new file mode 100644
+index 00000000000000..26b41d089a86a1
+--- /dev/null
++++ b/packages/components/src/date-time/date/style.scss
+@@ -0,0 +1,75 @@
++@import "./datepicker.scss";
++
++// Styles that overrides the calendar styling provided by react-dates go here.
++// Everything else goes in styles.ts.
++
++.components-datetime__date {
++	//
++	// Margin overrides
++	//
++
++	// Remove the left and right margin from the calendar by setting all the
++	// containers' widths to 100%. This means that the slide left / slide right
++	// animation won't work but we don't want that, anyway.
++
++	.CalendarMonthGrid__horizontal,
++	.DayPicker_weekHeader_li {
++		transform: none !important; // Override inline style.
++		width: 100% !important; // Override inline style.
++	}
++
++	.CalendarMonthGrid_month__horizontal,
++	.CalendarMonth_table,
++	.DayPicker_weekHeader {
++		width: 100%;
++	}
++
++	.DayPicker_weekHeaders__horizontal {
++		margin: 0;
++	}
++
++	.DayPicker_weekHeader_ul {
++		display: flex;
++	}
++
++	//
++	// Theming
++	//
++
++	.DayPicker_weekHeader {
++		top: 50px;
++	}
++
++	.CalendarMonth_caption {
++		font-size: $default-font-size;
++	}
++
++	.CalendarMonth_table {
++		border-collapse: separate;
++		border-spacing: 2px;
++	}
++
++	.CalendarDay {
++		border: none;
++		font-size: $default-font-size;
++		border-radius: $radius-round;
++
++		&:focus {
++			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 #{ $border-width-focus + $border-width } $white;
++			outline: 2px solid transparent; // Shown in Windows 10 high contrast mode.
++		}
++	}
++
++	.CalendarDay__selected {
++		background: var(--wp-admin-theme-color);
++		border: 2px solid transparent; // This indicates selection in Windows 10 high contrast mode.
++
++		&:hover {
++			background: var(--wp-admin-theme-color-darker-20);
++		}
++
++		&:focus {
++			box-shadow: inset 0 0 0 $border-width $white;
++		}
++	}
++}
+diff --git a/packages/components/src/date-time/date/styles.ts b/packages/components/src/date-time/date/styles.ts
+new file mode 100644
+index 00000000000000..e80229a3050b4c
+--- /dev/null
++++ b/packages/components/src/date-time/date/styles.ts
+@@ -0,0 +1,55 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css } from '@emotion/react';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../../button';
++import { COLORS } from '../../utils';
++import { VStack } from '../../v-stack';
++
++// Styles that overrides the calendar styling provided by react-dates go in
++// style.scss. Everything else goes here.
++
++export const Day = styled( VStack )< { hasEvents: boolean } >`
++	height: 100%;
++	position: relative;
++
++	${ ( props ) =>
++		props.hasEvents &&
++		`
++		::before {
++			background: var(--wp-admin-theme-color);
++			border-radius: 2px;
++			bottom: 0;
++			content: " ";
++			height: 4px;
++			left: 50%;
++			margin-left: -2px;
++			position: absolute;
++			width: 4px;
++
++			.CalendarDay__selected & {
++				background: ${ COLORS.white };
++			}
++		}
++		` }
++`;
++
++const baseNavButton = css`
++	position: absolute;
++	top: 15px;
++`;
++
++export const NavPrevButton = styled( Button )`
++	${ baseNavButton }
++	left: 0;
++`;
++
++export const NavNextButton = styled( Button )`
++	${ baseNavButton }
++	right: 0;
++`;
+diff --git a/packages/components/src/date-time/test/date.tsx b/packages/components/src/date-time/date/test/index.tsx
+similarity index 98%
+rename from packages/components/src/date-time/test/date.tsx
+rename to packages/components/src/date-time/date/test/index.tsx
+index a0065e3f04a8fd..57e8f12335cfab 100644
+--- a/packages/components/src/date-time/test/date.tsx
++++ b/packages/components/src/date-time/date/test/index.tsx
+@@ -9,7 +9,7 @@ import 'react-dates/initialize';
+ /**
+  * Internal dependencies
+  */
+-import DatePicker from '../date';
++import DatePicker from '..';
+ 
+ describe( 'DatePicker', () => {
+ 	it( 'should highlight the current date', () => {
+diff --git a/packages/components/src/date-time/test/utils.ts b/packages/components/src/date-time/date/test/utils.ts
+similarity index 100%
+rename from packages/components/src/date-time/test/utils.ts
+rename to packages/components/src/date-time/date/test/utils.ts
+diff --git a/packages/components/src/date-time/utils.ts b/packages/components/src/date-time/date/utils.ts
+similarity index 100%
+rename from packages/components/src/date-time/utils.ts
+rename to packages/components/src/date-time/date/utils.ts
+diff --git a/packages/components/src/date-time/index.ts b/packages/components/src/date-time/index.ts
+new file mode 100644
+index 00000000000000..a103bac0d30efb
+--- /dev/null
++++ b/packages/components/src/date-time/index.ts
+@@ -0,0 +1,9 @@
++/**
++ * Internal dependencies
++ */
++import { default as DatePicker } from './date';
++import { default as TimePicker } from './time';
++import { default as DateTimePicker } from './date-time';
++
++export { DatePicker, TimePicker };
++export default DateTimePicker;
+diff --git a/packages/components/src/date-time/index.tsx b/packages/components/src/date-time/index.tsx
+deleted file mode 100644
+index 85d9bdaf218e41..00000000000000
+--- a/packages/components/src/date-time/index.tsx
++++ /dev/null
+@@ -1,196 +0,0 @@
+-/**
+- * External dependencies
+- */
+-// Needed to initialise the default datepicker styles.
+-// See: https://github.com/airbnb/react-dates#initialize
+-import 'react-dates/initialize';
+-import { noop } from 'lodash';
+-import type { ForwardedRef } from 'react';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState, forwardRef } from '@wordpress/element';
+-import { __, _x } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import Button from '../button';
+-import { default as DatePicker } from './date';
+-import { default as TimePicker } from './time';
+-import type { DateTimePickerProps } from './types';
+-
+-export { DatePicker, TimePicker };
+-
+-function UnforwardedDateTimePicker(
+-	{
+-		currentDate,
+-		is12Hour,
+-		isInvalidDate,
+-		onMonthPreviewed = noop,
+-		onChange,
+-		events,
+-	}: DateTimePickerProps,
+-	ref: ForwardedRef< any >
+-) {
+-	const [ calendarHelpIsVisible, setCalendarHelpIsVisible ] = useState(
+-		false
+-	);
+-
+-	function onClickDescriptionToggle() {
+-		setCalendarHelpIsVisible( ! calendarHelpIsVisible );
+-	}
+-
+-	return (
+-		<div ref={ ref } className="components-datetime">
+-			{ ! calendarHelpIsVisible && (
+-				<>
+-					<TimePicker
+-						currentTime={ currentDate }
+-						onChange={ onChange }
+-						is12Hour={ is12Hour }
+-					/>
+-					<DatePicker
+-						currentDate={ currentDate }
+-						onChange={ onChange }
+-						isInvalidDate={ isInvalidDate }
+-						events={ events }
+-						onMonthPreviewed={ onMonthPreviewed }
+-					/>
+-				</>
+-			) }
+-			{ calendarHelpIsVisible && (
+-				<>
+-					<div className="components-datetime__calendar-help">
+-						<h4>{ __( 'Click to Select' ) }</h4>
+-						<ul>
+-							<li>
+-								{ __(
+-									'Click the right or left arrows to select other months in the past or the future.'
+-								) }
+-							</li>
+-							<li>
+-								{ __( 'Click the desired day to select it.' ) }
+-							</li>
+-						</ul>
+-						<h4>{ __( 'Navigating with a keyboard' ) }</h4>
+-						<ul>
+-							<li>
+-								<abbr
+-									aria-label={ _x(
+-										'Enter',
+-										'keyboard button'
+-									) }
+-								>
+-									↵
+-								</abbr>
+-								{
+-									' ' /* JSX removes whitespace, but a space is required for screen readers. */
+-								}
+-								<span>
+-									{ __( 'Select the date in focus.' ) }
+-								</span>
+-							</li>
+-							<li>
+-								<abbr
+-									aria-label={ __( 'Left and Right Arrows' ) }
+-								>
+-									←/→
+-								</abbr>
+-								{
+-									' ' /* JSX removes whitespace, but a space is required for screen readers. */
+-								}
+-								{ __(
+-									'Move backward (left) or forward (right) by one day.'
+-								) }
+-							</li>
+-							<li>
+-								<abbr aria-label={ __( 'Up and Down Arrows' ) }>
+-									↑/↓
+-								</abbr>
+-								{
+-									' ' /* JSX removes whitespace, but a space is required for screen readers. */
+-								}
+-								{ __(
+-									'Move backward (up) or forward (down) by one week.'
+-								) }
+-							</li>
+-							<li>
+-								<abbr
+-									aria-label={ __( 'Page Up and Page Down' ) }
+-								>
+-									{ __( 'PgUp/PgDn' ) }
+-								</abbr>
+-								{
+-									' ' /* JSX removes whitespace, but a space is required for screen readers. */
+-								}
+-								{ __(
+-									'Move backward (PgUp) or forward (PgDn) by one month.'
+-								) }
+-							</li>
+-							<li>
+-								<abbr aria-label={ __( 'Home and End' ) }>
+-									{ /* Translators: Home/End reffer to the 'Home' and 'End' buttons on the keyboard.*/ }
+-									{ __( 'Home/End' ) }
+-								</abbr>
+-								{
+-									' ' /* JSX removes whitespace, but a space is required for screen readers. */
+-								}
+-								{ __(
+-									'Go to the first (Home) or last (End) day of a week.'
+-								) }
+-							</li>
+-						</ul>
+-					</div>
+-				</>
+-			) }
+-			<div className="components-datetime__buttons">
+-				{ ! calendarHelpIsVisible && currentDate && (
+-					<Button
+-						className="components-datetime__date-reset-button"
+-						variant="link"
+-						onClick={ () => onChange?.( null ) }
+-					>
+-						{ __( 'Reset' ) }
+-					</Button>
+-				) }
+-				<Button
+-					className="components-datetime__date-help-toggle"
+-					variant="link"
+-					onClick={ onClickDescriptionToggle }
+-				>
+-					{ calendarHelpIsVisible
+-						? __( 'Close' )
+-						: __( 'Calendar Help' ) }
+-				</Button>
+-			</div>
+-		</div>
+-	);
+-}
+-
+-/**
+- * DateTimePicker is a React component that renders a calendar and clock for
+- * date and time selection. The calendar and clock components can be accessed
+- * individually using the `DatePicker` and `TimePicker` components respectively.
+- *
+- * ```jsx
+- * import { DateTimePicker } from '@wordpress/components';
+- * import { useState } from '@wordpress/element';
+- *
+- * const MyDateTimePicker = () => {
+- *   const [ date, setDate ] = useState( new Date() );
+- *
+- *   return (
+- *     <DateTimePicker
+- *       currentDate={ date }
+- *       onChange={ ( newDate ) => setDate( newDate ) }
+- *       is12Hour
+- *     />
+- *   );
+- * };
+- * ```
+- */
+-export const DateTimePicker = forwardRef( UnforwardedDateTimePicker );
+-
+-export default DateTimePicker;
+diff --git a/packages/components/src/date-time/stories/index.tsx b/packages/components/src/date-time/stories/date-time.tsx
+similarity index 97%
+rename from packages/components/src/date-time/stories/index.tsx
+rename to packages/components/src/date-time/stories/date-time.tsx
+index fb126edb81f4e4..bea4028e7fb567 100644
+--- a/packages/components/src/date-time/stories/index.tsx
++++ b/packages/components/src/date-time/stories/date-time.tsx
+@@ -11,7 +11,7 @@ import { useState, useEffect } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import DateTimePicker from '..';
++import DateTimePicker from '../date-time';
+ import { daysFromNow, isWeekend } from './utils';
+ 
+ const meta: ComponentMeta< typeof DateTimePicker > = {
+diff --git a/packages/components/src/date-time/style.scss b/packages/components/src/date-time/style.scss
+index 636f7851218798..9e059d0d5be6d3 100644
+--- a/packages/components/src/date-time/style.scss
++++ b/packages/components/src/date-time/style.scss
+@@ -1,262 +1 @@
+-@import "./datepicker";
+-
+-.components-datetime {
+-	// This padding is leveraged when the component is used alone,
+-	// usually inside popovers.
+-	padding: $grid-unit-20;
+-
+-	// This rule removes the padding when used inside a panel.
+-	.components-panel__body & {
+-		padding: 0;
+-	}
+-
+-	.components-datetime__calendar-help {
+-		padding: $grid-unit-20;
+-		min-width: 260px;
+-
+-		h4 {
+-			margin: 0;
+-		}
+-	}
+-
+-	.components-datetime__buttons {
+-		display: flex;
+-		justify-content: space-between;
+-	}
+-
+-	.components-datetime__date-help-toggle {
+-		display: block;
+-		margin-left: auto;
+-	}
+-
+-	fieldset {
+-		border: 0;
+-		padding: 0;
+-		margin: 0;
+-	}
+-
+-	select,
+-	input {
+-		@include input-style__neutral();
+-	}
+-
+-	// Override inherited conflicting styles to be consistent.
+-	select,
+-	input[type="number"],
+-	.components-button {
+-		height: 30px;
+-		margin-top: 0;
+-		margin-bottom: 0;
+-	}
+-
+-	.components-button:focus {
+-		z-index: z-index(".components-button {:focus or .is-primary}");
+-	}
+-}
+-
+-.components-datetime__date {
+-	min-height: 236px;
+-	border-top: 1px solid $gray-300;
+-
+-	// Override external DatePicker styles.
+-	.DayPickerNavigation_leftButton__horizontalDefault {
+-		/*!rtl:begin:ignore*/
+-		left: 13px;
+-		/*!rtl:end:ignore*/
+-	}
+-
+-	.CalendarMonth_caption {
+-		font-size: $default-font-size;
+-	}
+-
+-	// Seperate borders so that border respect border radius
+-	.CalendarMonth_table {
+-		border-collapse: separate;
+-		border-spacing: 2px;
+-	}
+-
+-	.CalendarDay {
+-		font-size: $default-font-size;
+-		border: none;
+-		border-radius: $radius-round;
+-		text-align: center;
+-
+-		&:focus {
+-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 #{ $border-width-focus + $border-width } $white;
+-			outline: 2px solid transparent; // Shown in Windows 10 high contrast mode.
+-		}
+-	}
+-
+-	.CalendarDay__selected {
+-		background: var(--wp-admin-theme-color);
+-		border: 2px solid transparent; // This indicates selection in Windows 10 high contrast mode.
+-
+-		&:hover {
+-			background: var(--wp-admin-theme-color-darker-20);
+-		}
+-
+-		&:focus {
+-			box-shadow: inset 0 0 0 $border-width $white;
+-		}
+-	}
+-
+-	.DayPickerNavigation_button__horizontalDefault {
+-		padding: 2px 8px;
+-		top: 20px;
+-
+-		&:focus {
+-			@include input-style__focus();
+-		}
+-	}
+-
+-	.DayPicker_weekHeader {
+-		top: 50px;
+-		.DayPicker_weekHeader_ul {
+-			margin: 1px;
+-			padding-left: 0;
+-			padding-right: 0;
+-		}
+-	}
+-
+-	&.is-description-visible .DayPicker {
+-		visibility: hidden;
+-	}
+-}
+-
+-.components-datetime__date .CalendarDay .components-datetime__date__day {
+-	height: 100%;
+-	display: flex;
+-	justify-content: center;
+-	align-content: center;
+-	flex-direction: column;
+-	position: relative;
+-
+-	&.has-events::before {
+-		content: " ";
+-		width: 4px;
+-		height: 4px;
+-		border-radius: 2px;
+-		position: absolute;
+-		left: 50%;
+-		margin-left: -2px;
+-		bottom: 0;
+-		background-color: $white;
+-	}
+-}
+-
+-.components-datetime__date .CalendarDay:not(.CalendarDay__selected) .components-datetime__date__day.has-events::before {
+-	background: var(--wp-admin-theme-color);
+-}
+-
+-.components-datetime__time {
+-	padding-bottom: $grid-unit-20;
+-
+-	fieldset {
+-		position: relative;
+-		margin-bottom: 0.5em;
+-	}
+-
+-	fieldset + fieldset {
+-		margin-bottom: 0;
+-	}
+-
+-	.components-datetime__time-field-am-pm fieldset {
+-		margin-top: 0;
+-	}
+-
+-	.components-datetime__time-wrapper {
+-		display: flex;
+-
+-		.components-datetime__time-separator {
+-			display: inline-block;
+-			padding: 0 3px 0 0;
+-		}
+-
+-		.components-datetime__time-field {
+-
+-			&-time {
+-				/*rtl:ignore*/
+-				direction: ltr;
+-			}
+-
+-			select {
+-				margin-right: $grid-unit-05;
+-
+-				&:focus {
+-					position: relative;
+-					z-index: 1;
+-				}
+-			}
+-
+-			input[type="number"] {
+-				padding: 2px;
+-				margin-right: $grid-unit-05;
+-				text-align: center;
+-				-moz-appearance: textfield;
+-
+-				&:focus {
+-					position: relative;
+-					z-index: 1;
+-				}
+-
+-				&::-webkit-inner-spin-button {
+-					-webkit-appearance: none;
+-					margin: 0;
+-				}
+-			}
+-		}
+-	}
+-
+-	// Makes the month appear before the day if time format uses AM/PM
+-	// We are assuming MM-DD-YYY correlates with AM/PM
+-	&.is-12-hour {
+-		.components-datetime__time-field-day input {
+-			margin: 0 -$grid-unit-05 0 0 !important;
+-			border-radius: $radius-block-ui 0 0 $radius-block-ui !important;
+-		}
+-		.components-datetime__time-field-year input {
+-			border-radius: 0 $radius-block-ui $radius-block-ui 0 !important;
+-		}
+-	}
+-}
+-
+-.components-datetime__timezone {
+-	line-height: 30px;
+-	margin-left: $grid-unit-05;
+-	text-decoration: underline dotted;
+-}
+-
+-.components-datetime__time-legend {
+-	font-weight: 600;
+-	margin-top: 0.5em;
+-
+-	&.invisible {
+-		position: absolute;
+-		top: -999em;
+-		left: -999em;
+-	}
+-}
+-
+-.components-datetime__time-field-integer-field {
+-	font-family: inherit;
+-}
+-
+-.components-datetime__time-field-hours-input,
+-.components-datetime__time-field-minutes-input,
+-.components-datetime__time-field-day-input {
+-	width: 35px;
+-}
+-
+-.components-datetime__time-field-year-input {
+-	width: 55px;
+-}
+-
+-.components-datetime__time-field-month-select {
+-	max-width: 145px;
+-}
+-
+-// Hack to center the datepicker component within the popover.
+-// It sets its own styles so centering is tricky.
+-.components-popover .components-datetime__date {
+-	padding-left: $grid-unit-05;
+-}
++@import "./date/style.scss";
+diff --git a/packages/components/src/date-time/time.tsx b/packages/components/src/date-time/time.tsx
+deleted file mode 100644
+index 9d0c1cfa4c394f..00000000000000
+--- a/packages/components/src/date-time/time.tsx
++++ /dev/null
+@@ -1,321 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-import { isInteger } from 'lodash';
+-import moment from 'moment';
+-import type { FocusEvent } from 'react';
+-import type { Moment } from 'moment';
+-
+-/**
+- * WordPress dependencies
+- */
+-import {
+-	createElement,
+-	useState,
+-	useMemo,
+-	useEffect,
+-} from '@wordpress/element';
+-import { __ } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import Button from '../button';
+-import ButtonGroup from '../button-group';
+-import TimeZone from './timezone';
+-import type { WordPressComponentProps } from '../ui/context';
+-import type { UpdateOnBlurAsIntegerFieldProps, TimePickerProps } from './types';
+-
+-const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+-
+-function from12hTo24h( hours: number, isPm: boolean ) {
+-	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
+-}
+-
+-/**
+- * A shared component to parse, validate, and handle remounting of the
+- * underlying form field element like <input> and <select>.
+- */
+-function UpdateOnBlurAsIntegerField( {
+-	as,
+-	value,
+-	onUpdate,
+-	className,
+-	...props
+-}: WordPressComponentProps< UpdateOnBlurAsIntegerFieldProps, 'input', true > ) {
+-	function handleBlur( event: FocusEvent< HTMLInputElement > ) {
+-		const { target } = event;
+-
+-		if ( String( value ) === target.value ) {
+-			return;
+-		}
+-
+-		const parsedValue = parseInt( target.value, 10 );
+-
+-		// Run basic number validation on the input.
+-		if (
+-			! isInteger( parsedValue ) ||
+-			( typeof props.max !== 'undefined' && parsedValue > props.max ) ||
+-			( typeof props.min !== 'undefined' && parsedValue < props.min )
+-		) {
+-			// If validation failed, reset the value to the previous valid value.
+-			target.value = String( value );
+-		} else {
+-			// Otherwise, it's valid, call onUpdate.
+-			onUpdate( parsedValue );
+-		}
+-	}
+-
+-	return createElement( as || 'input', {
+-		// Re-mount the input value to accept the latest value as the defaultValue.
+-		key: value,
+-		defaultValue: value,
+-		onBlur: handleBlur,
+-		className: classnames(
+-			'components-datetime__time-field-integer-field',
+-			className
+-		),
+-		...props,
+-	} );
+-}
+-
+-/**
+- * TimePicker is a React component that renders a clock for time selection.
+- *
+- * ```jsx
+- * import { TimePicker } from '@wordpress/components';
+- * import { useState } from '@wordpress/element';
+- *
+- * const MyTimePicker = () => {
+- *   const [ time, setTime ] = useState( new Date() );
+- *
+- *   return (
+- *     <TimePicker
+- *       currentTime={ date }
+- *       onChange={ ( newTime ) => setTime( newTime ) }
+- *       is12Hour
+- *     />
+- *   );
+- * };
+- * ```
+- */
+-export function TimePicker( {
+-	is12Hour,
+-	currentTime,
+-	onChange,
+-}: TimePickerProps ) {
+-	const [ date, setDate ] = useState( () =>
+-		// Truncate the date at the minutes, see: #15495.
+-		currentTime ? moment( currentTime ).startOf( 'minutes' ) : moment()
+-	);
+-
+-	// Reset the state when currentTime changed.
+-	useEffect( () => {
+-		setDate(
+-			currentTime ? moment( currentTime ).startOf( 'minutes' ) : moment()
+-		);
+-	}, [ currentTime ] );
+-
+-	const { day, month, year, minutes, hours, am } = useMemo(
+-		() => ( {
+-			day: date.format( 'DD' ),
+-			month: date.format( 'MM' ),
+-			year: date.format( 'YYYY' ),
+-			minutes: date.format( 'mm' ),
+-			hours: date.format( is12Hour ? 'hh' : 'HH' ),
+-			am: Number( date.format( 'H' ) ) <= 11 ? 'AM' : 'PM',
+-		} ),
+-		[ date, is12Hour ]
+-	);
+-
+-	/**
+-	 * Function that sets the date state and calls the onChange with a new date.
+-	 * The date is truncated at the minutes.
+-	 *
+-	 * @param {Moment} newDate The date object.
+-	 */
+-	function changeDate( newDate: Moment ) {
+-		setDate( newDate );
+-		onChange?.( newDate.format( TIMEZONELESS_FORMAT ) );
+-	}
+-
+-	function update( name: 'date' | 'month' | 'year' | 'hours' | 'minutes' ) {
+-		return ( value: number ) => {
+-			// If the 12-hour format is being used and the 'PM' period is selected, then
+-			// the incoming value (which ranges 1-12) should be increased by 12 to match
+-			// the expected 24-hour format.
+-			let adjustedValue = value;
+-			if ( name === 'hours' && is12Hour ) {
+-				adjustedValue = from12hTo24h( value, am === 'PM' );
+-			}
+-
+-			// Clone the date and call the specific setter function according to `name`.
+-			const newDate = date.clone()[ name ]( adjustedValue );
+-			changeDate( newDate );
+-		};
+-	}
+-
+-	function updateAmPm( value: 'AM' | 'PM' ) {
+-		return () => {
+-			if ( am === value ) {
+-				return;
+-			}
+-
+-			const parsedHours = parseInt( hours, 10 );
+-
+-			const newDate = date
+-				.clone()
+-				.hours( from12hTo24h( parsedHours, value === 'PM' ) );
+-
+-			changeDate( newDate );
+-		};
+-	}
+-
+-	const dayFormat = (
+-		<div className="components-datetime__time-field components-datetime__time-field-day">
+-			<UpdateOnBlurAsIntegerField
+-				aria-label={ __( 'Day' ) }
+-				className="components-datetime__time-field-day-input"
+-				type="number"
+-				// The correct function to call in moment.js is "date" not "day".
+-				name="date"
+-				value={ day }
+-				step={ 1 }
+-				min={ 1 }
+-				max={ 31 }
+-				onUpdate={ update( 'date' ) }
+-			/>
+-		</div>
+-	);
+-
+-	const monthFormat = (
+-		<div className="components-datetime__time-field components-datetime__time-field-month">
+-			<UpdateOnBlurAsIntegerField
+-				as="select"
+-				aria-label={ __( 'Month' ) }
+-				className="components-datetime__time-field-month-select"
+-				name="month"
+-				value={ month }
+-				// The value starts from 0, so we have to -1 when setting month.
+-				onUpdate={ ( value ) => update( 'month' )( value - 1 ) }
+-			>
+-				<option value="01">{ __( 'January' ) }</option>
+-				<option value="02">{ __( 'February' ) }</option>
+-				<option value="03">{ __( 'March' ) }</option>
+-				<option value="04">{ __( 'April' ) }</option>
+-				<option value="05">{ __( 'May' ) }</option>
+-				<option value="06">{ __( 'June' ) }</option>
+-				<option value="07">{ __( 'July' ) }</option>
+-				<option value="08">{ __( 'August' ) }</option>
+-				<option value="09">{ __( 'September' ) }</option>
+-				<option value="10">{ __( 'October' ) }</option>
+-				<option value="11">{ __( 'November' ) }</option>
+-				<option value="12">{ __( 'December' ) }</option>
+-			</UpdateOnBlurAsIntegerField>
+-		</div>
+-	);
+-
+-	const dayMonthFormat = is12Hour ? (
+-		<>
+-			{ monthFormat }
+-			{ dayFormat }
+-		</>
+-	) : (
+-		<>
+-			{ dayFormat }
+-			{ monthFormat }
+-		</>
+-	);
+-
+-	return (
+-		<div className={ classnames( 'components-datetime__time' ) }>
+-			<fieldset>
+-				<legend className="components-datetime__time-legend invisible">
+-					{ __( 'Date' ) }
+-				</legend>
+-				<div className="components-datetime__time-wrapper">
+-					{ dayMonthFormat }
+-
+-					<div className="components-datetime__time-field components-datetime__time-field-year">
+-						<UpdateOnBlurAsIntegerField
+-							aria-label={ __( 'Year' ) }
+-							className="components-datetime__time-field-year-input"
+-							type="number"
+-							name="year"
+-							step={ 1 }
+-							min={ 0 }
+-							max={ 9999 }
+-							value={ year }
+-							onUpdate={ update( 'year' ) }
+-						/>
+-					</div>
+-				</div>
+-			</fieldset>
+-
+-			<fieldset>
+-				<legend className="components-datetime__time-legend invisible">
+-					{ __( 'Time' ) }
+-				</legend>
+-				<div className="components-datetime__time-wrapper">
+-					<div className="components-datetime__time-field components-datetime__time-field-time">
+-						<UpdateOnBlurAsIntegerField
+-							aria-label={ __( 'Hours' ) }
+-							className="components-datetime__time-field-hours-input"
+-							type="number"
+-							name="hours"
+-							step={ 1 }
+-							min={ is12Hour ? 1 : 0 }
+-							max={ is12Hour ? 12 : 23 }
+-							value={ hours }
+-							onUpdate={ update( 'hours' ) }
+-						/>
+-						<span
+-							className="components-datetime__time-separator"
+-							aria-hidden="true"
+-						>
+-							:
+-						</span>
+-						<UpdateOnBlurAsIntegerField
+-							aria-label={ __( 'Minutes' ) }
+-							className="components-datetime__time-field-minutes-input"
+-							type="number"
+-							name="minutes"
+-							step={ 1 }
+-							min={ 0 }
+-							max={ 59 }
+-							value={ minutes }
+-							onUpdate={ update( 'minutes' ) }
+-						/>
+-					</div>
+-					{ is12Hour && (
+-						<ButtonGroup className="components-datetime__time-field components-datetime__time-field-am-pm">
+-							<Button
+-								variant={
+-									am === 'AM' ? 'primary' : 'secondary'
+-								}
+-								onClick={ updateAmPm( 'AM' ) }
+-								className="components-datetime__time-am-button"
+-							>
+-								{ __( 'AM' ) }
+-							</Button>
+-							<Button
+-								variant={
+-									am === 'PM' ? 'primary' : 'secondary'
+-								}
+-								onClick={ updateAmPm( 'PM' ) }
+-								className="components-datetime__time-pm-button"
+-							>
+-								{ __( 'PM' ) }
+-							</Button>
+-						</ButtonGroup>
+-					) }
+-
+-					<TimeZone />
+-				</div>
+-			</fieldset>
+-		</div>
+-	);
+-}
+-
+-export default TimePicker;
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+new file mode 100644
+index 00000000000000..b7a50288168746
+--- /dev/null
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -0,0 +1,356 @@
++/**
++ * External dependencies
++ */
++import moment from 'moment';
++
++/**
++ * WordPress dependencies
++ */
++import { useState, useMemo, useEffect } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../../button';
++import ButtonGroup from '../../button-group';
++import TimeZone from './timezone';
++import type { TimePickerProps } from '../types';
++import {
++	Wrapper,
++	Fieldset,
++	Legend,
++	HoursInput,
++	TimeSeparator,
++	MinutesInput,
++	MonthSelectWrapper,
++	MonthSelect,
++	DayInput,
++	YearInput,
++	TimeWrapper,
++} from './styles';
++import { HStack } from '../../h-stack';
++import { Spacer } from '../../spacer';
++import type { InputChangeCallback } from '../../input-control/types';
++import type { InputState } from '../../input-control/reducer/state';
++import {
++	COMMIT,
++	InputAction,
++	PRESS_DOWN,
++	PRESS_UP,
++} from '../../input-control/reducer/actions';
++
++const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
++
++function from12hTo24h( hours: number, isPm: boolean ) {
++	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
++}
++
++/**
++ * Creates an InputControl reducer used to pad an input so that it is always a
++ * given width. For example, the hours and minutes inputs are padded to 2 so
++ * that '4' appears as '04'.
++ *
++ * @param  pad How many digits the value should be.
++ */
++function buildPadInputStateReducer( pad: number ) {
++	return ( state: InputState, action: InputAction ) => {
++		const nextState = { ...state };
++		if (
++			action.type === COMMIT ||
++			action.type === PRESS_UP ||
++			action.type === PRESS_DOWN
++		) {
++			if ( nextState.value !== undefined ) {
++				nextState.value = nextState.value
++					.toString()
++					.padStart( pad, '0' );
++			}
++		}
++		return nextState;
++	};
++}
++
++/**
++ * TimePicker is a React component that renders a clock for time selection.
++ *
++ * ```jsx
++ * import { TimePicker } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyTimePicker = () => {
++ *   const [ time, setTime ] = useState( new Date() );
++ *
++ *   return (
++ *     <TimePicker
++ *       currentTime={ date }
++ *       onChange={ ( newTime ) => setTime( newTime ) }
++ *       is12Hour
++ *     />
++ *   );
++ * };
++ * ```
++ */
++export function TimePicker( {
++	is12Hour,
++	currentTime,
++	onChange,
++}: TimePickerProps ) {
++	const [ date, setDate ] = useState( () =>
++		// Truncate the date at the minutes, see: #15495.
++		currentTime ? moment( currentTime ).startOf( 'minutes' ) : moment()
++	);
++
++	// Reset the state when currentTime changed.
++	useEffect( () => {
++		setDate(
++			currentTime ? moment( currentTime ).startOf( 'minutes' ) : moment()
++		);
++	}, [ currentTime ] );
++
++	const { day, month, year, minutes, hours, am } = useMemo(
++		() => ( {
++			day: date.format( 'DD' ),
++			month: date.format( 'MM' ),
++			year: date.format( 'YYYY' ),
++			minutes: date.format( 'mm' ),
++			hours: date.format( is12Hour ? 'hh' : 'HH' ),
++			am: Number( date.format( 'H' ) ) <= 11 ? 'AM' : 'PM',
++		} ),
++		[ date, is12Hour ]
++	);
++
++	const buildNumberControlChangeCallback = (
++		method: 'hours' | 'minutes' | 'date' | 'year'
++	) => {
++		const callback: InputChangeCallback = ( value, { event } ) => {
++			if ( ! ( event.target instanceof HTMLInputElement ) ) {
++				return;
++			}
++
++			if ( ! event.target.validity.valid ) {
++				return;
++			}
++
++			// We can safely assume value is a number if target is valid.
++			let numberValue = Number( value );
++
++			// If the 12-hour format is being used and the 'PM' period is
++			// selected, then the incoming value (which ranges 1-12) should be
++			// increased by 12 to match the expected 24-hour format.
++			if ( method === 'hours' && is12Hour ) {
++				numberValue = from12hTo24h( numberValue, am === 'PM' );
++			}
++
++			const newDate = date.clone()[ method ]( numberValue );
++			setDate( newDate );
++			onChange?.( newDate.format( TIMEZONELESS_FORMAT ) );
++		};
++		return callback;
++	};
++
++	function buildAmPmChangeCallback( value: 'AM' | 'PM' ) {
++		return () => {
++			if ( am === value ) {
++				return;
++			}
++
++			const parsedHours = parseInt( hours, 10 );
++
++			const newDate = date
++				.clone()
++				.hours( from12hTo24h( parsedHours, value === 'PM' ) );
++			setDate( newDate );
++			onChange?.( newDate.format( TIMEZONELESS_FORMAT ) );
++		};
++	}
++
++	const dayField = (
++		<DayInput
++			className="components-datetime__time-field components-datetime__time-field-day" // Unused, for backwards compatibility.
++			label={ __( 'Day' ) }
++			hideLabelFromVision
++			__next36pxDefaultSize
++			value={ day }
++			step={ 1 }
++			min={ 1 }
++			max={ 31 }
++			required
++			hideHTMLArrows
++			isPressEnterToChange
++			isDragEnabled={ false }
++			isShiftStepEnabled={ false }
++			onChange={ buildNumberControlChangeCallback( 'date' ) }
++		/>
++	);
++
++	const monthField = (
++		<MonthSelectWrapper>
++			<MonthSelect
++				className="components-datetime__time-field components-datetime__time-field-month" // Unused, for backwards compatibility.
++				label={ __( 'Month' ) }
++				hideLabelFromVision
++				__nextHasNoMarginBottom
++				value={ month }
++				options={ [
++					{ value: '01', label: __( 'January' ) },
++					{ value: '02', label: __( 'February' ) },
++					{ value: '03', label: __( 'March' ) },
++					{ value: '04', label: __( 'April' ) },
++					{ value: '05', label: __( 'May' ) },
++					{ value: '06', label: __( 'June' ) },
++					{ value: '07', label: __( 'July' ) },
++					{ value: '08', label: __( 'August' ) },
++					{ value: '09', label: __( 'September' ) },
++					{ value: '10', label: __( 'October' ) },
++					{ value: '11', label: __( 'November' ) },
++					{ value: '12', label: __( 'December' ) },
++				] }
++				onChange={ ( value ) => {
++					const newDate = date.clone().month( Number( value ) - 1 );
++					setDate( newDate );
++					onChange?.( newDate.format( TIMEZONELESS_FORMAT ) );
++				} }
++			/>
++		</MonthSelectWrapper>
++	);
++
++	return (
++		<Wrapper
++			className="components-datetime__time" // Unused, for backwards compatibility.
++		>
++			<Fieldset>
++				<Legend
++					className="components-datetime__time-legend" // Unused, for backwards compatibility.
++				>
++					{ __( 'Time' ) }
++				</Legend>
++				<HStack
++					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
++				>
++					<TimeWrapper
++						className="components-datetime__time-field components-datetime__time-field-time" // Unused, for backwards compatibility.
++					>
++						<HoursInput
++							className="components-datetime__time-field-hours-input" // Unused, for backwards compatibility.
++							label={ __( 'Hours' ) }
++							hideLabelFromVision
++							__next36pxDefaultSize
++							value={ hours }
++							step={ 1 }
++							min={ is12Hour ? 1 : 0 }
++							max={ is12Hour ? 12 : 23 }
++							required
++							hideHTMLArrows
++							isPressEnterToChange
++							isDragEnabled={ false }
++							isShiftStepEnabled={ false }
++							onChange={ buildNumberControlChangeCallback(
++								'hours'
++							) }
++							__unstableStateReducer={ buildPadInputStateReducer(
++								2
++							) }
++						/>
++						<TimeSeparator
++							className="components-datetime__time-separator" // Unused, for backwards compatibility.
++							aria-hidden="true"
++						>
++							:
++						</TimeSeparator>
++						<MinutesInput
++							className="components-datetime__time-field-minutes-input" // Unused, for backwards compatibility.
++							label={ __( 'Minutes' ) }
++							hideLabelFromVision
++							__next36pxDefaultSize
++							value={ minutes }
++							step={ 1 }
++							min={ 0 }
++							max={ 59 }
++							required
++							hideHTMLArrows
++							isPressEnterToChange
++							isDragEnabled={ false }
++							isShiftStepEnabled={ false }
++							onChange={ buildNumberControlChangeCallback(
++								'minutes'
++							) }
++							__unstableStateReducer={ buildPadInputStateReducer(
++								2
++							) }
++						/>
++					</TimeWrapper>
++					{ is12Hour && (
++						<ButtonGroup
++							className="components-datetime__time-field components-datetime__time-field-am-pm" // Unused, for backwards compatibility.
++						>
++							<Button
++								className="components-datetime__time-am-button" // Unused, for backwards compatibility.
++								variant={
++									am === 'AM' ? 'primary' : 'secondary'
++								}
++								onClick={ buildAmPmChangeCallback( 'AM' ) }
++							>
++								{ __( 'AM' ) }
++							</Button>
++							<Button
++								className="components-datetime__time-pm-button" // Unused, for backwards compatibility.
++								variant={
++									am === 'PM' ? 'primary' : 'secondary'
++								}
++								onClick={ buildAmPmChangeCallback( 'PM' ) }
++							>
++								{ __( 'PM' ) }
++							</Button>
++						</ButtonGroup>
++					) }
++					<Spacer />
++					<TimeZone />
++				</HStack>
++			</Fieldset>
++			<Fieldset>
++				<Legend
++					className="components-datetime__time-legend" // Unused, for backwards compatibility.
++				>
++					{ __( 'Date' ) }
++				</Legend>
++				<HStack
++					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
++				>
++					{ is12Hour ? (
++						<>
++							{ monthField }
++							{ dayField }
++						</>
++					) : (
++						<>
++							{ dayField }
++							{ monthField }
++						</>
++					) }
++					<YearInput
++						className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
++						label={ __( 'Year' ) }
++						hideLabelFromVision
++						__next36pxDefaultSize
++						value={ year }
++						step={ 1 }
++						min={ 1 }
++						max={ 9999 }
++						required
++						hideHTMLArrows
++						isPressEnterToChange
++						isDragEnabled={ false }
++						isShiftStepEnabled={ false }
++						onChange={ buildNumberControlChangeCallback( 'year' ) }
++						__unstableStateReducer={ buildPadInputStateReducer(
++							4
++						) }
++					/>
++				</HStack>
++			</Fieldset>
++		</Wrapper>
++	);
++}
++
++export default TimePicker;
+diff --git a/packages/components/src/date-time/time/styles.ts b/packages/components/src/date-time/time/styles.ts
+new file mode 100644
+index 00000000000000..7bd3377376d9f9
+--- /dev/null
++++ b/packages/components/src/date-time/time/styles.ts
+@@ -0,0 +1,119 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css } from '@emotion/react';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS, CONFIG } from '../../utils';
++import { space } from '../../ui/utils/space';
++import {
++	Input,
++	BackdropUI,
++} from '../../input-control/styles/input-control-styles';
++import NumberControl from '../../number-control';
++import SelectControl from '../../select-control';
++import { Select } from '../../select-control/styles/select-control-styles';
++
++export const Wrapper = styled.div``;
++
++export const Fieldset = styled.fieldset`
++	border: 0;
++	margin: 0 0 ${ space( 2 * 2 ) } 0;
++	padding: 0;
++
++	&:last-child {
++		margin-bottom: 0;
++	}
++`;
++
++export const Legend = styled.legend`
++	margin-bottom: ${ space( 2 ) };
++	padding: 0;
++`;
++
++export const TimeWrapper = styled.div`
++	direction: ltr;
++	display: flex;
++`;
++
++const baseInput = css`
++	&&& ${ Input } {
++		padding-left: ${ space( 2 ) };
++		padding-right: ${ space( 2 ) };
++		text-align: center;
++	}
++`;
++
++export const HoursInput = styled( NumberControl )`
++	${ baseInput }
++
++	width: ${ space( 9 ) };
++
++	&&& ${ Input } {
++		padding-right: 0;
++	}
++
++	&&& ${ BackdropUI } {
++		border-right: 0;
++		border-top-right-radius: 0;
++		border-bottom-right-radius: 0;
++	}
++`;
++
++export const TimeSeparator = styled.span`
++	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 700 ] };
++	border-bottom: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 700 ] };
++	line-height: calc(
++		${ CONFIG.controlHeight } - ${ CONFIG.borderWidth } * 2
++	);
++	display: inline-block;
++`;
++
++export const MinutesInput = styled( NumberControl )`
++	${ baseInput }
++
++	width: ${ space( 9 ) };
++
++	&&& ${ Input } {
++		padding-left: 0;
++	}
++
++	&&& ${ BackdropUI } {
++		border-left: 0;
++		border-top-left-radius: 0;
++		border-bottom-left-radius: 0;
++	}
++`;
++
++// Ideally we wouldn't need a wrapper, but can't otherwise target the
++// <BaseControl> in <SelectControl>
++export const MonthSelectWrapper = styled.div`
++	flex-grow: 1;
++`;
++
++export const MonthSelect = styled( SelectControl )`
++	height: 36px;
++
++	${ Select } {
++		line-height: 30px;
++	}
++`;
++
++export const DayInput = styled( NumberControl )`
++	${ baseInput }
++
++	width: ${ space( 9 ) };
++`;
++
++export const YearInput = styled( NumberControl )`
++	${ baseInput }
++
++	width: ${ space( 14 ) };
++`;
++
++export const TimeZone = styled.div`
++	text-decoration: underline dotted;
++`;
+diff --git a/packages/components/src/date-time/test/time.tsx b/packages/components/src/date-time/time/test/index.tsx
+similarity index 96%
+rename from packages/components/src/date-time/test/time.tsx
+rename to packages/components/src/date-time/time/test/index.tsx
+index 3681366495f8a0..9d23ee63fba418 100644
+--- a/packages/components/src/date-time/test/time.tsx
++++ b/packages/components/src/date-time/time/test/index.tsx
+@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * Internal dependencies
+  */
+-import TimePicker from '../time';
++import TimePicker from '..';
+ 
+ describe( 'TimePicker', () => {
+ 	it( 'should call onChange with updated date values', async () => {
+@@ -90,7 +90,7 @@ describe( 'TimePicker', () => {
+ 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T10:00:00' );
+ 	} );
+ 
+-	it( 'should not call onChange with an updated hour (12-hour clock) if the hour is out of bounds', async () => {
++	it( 'should call onChange with a bounded hour (12-hour clock) if the hour is out of bounds', async () => {
+ 		const user = userEvent.setup( {
+ 			advanceTimers: jest.advanceTimersByTime,
+ 		} );
+@@ -111,7 +111,7 @@ describe( 'TimePicker', () => {
+ 		await user.type( hoursInput, '22' );
+ 		await user.keyboard( '{Tab}' );
+ 
+-		expect( onChangeSpy ).not.toHaveBeenCalled();
++		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T00:00:00' );
+ 	} );
+ 
+ 	it( 'should call onChange with an updated hour (24-hour clock)', async () => {
+@@ -138,7 +138,7 @@ describe( 'TimePicker', () => {
+ 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T22:00:00' );
+ 	} );
+ 
+-	it( 'should not call onChange with an updated minute if out of bounds', async () => {
++	it( 'should call onChange with a bounded minute if out of bounds', async () => {
+ 		const user = userEvent.setup( {
+ 			advanceTimers: jest.advanceTimersByTime,
+ 		} );
+@@ -159,7 +159,7 @@ describe( 'TimePicker', () => {
+ 		await user.type( minutesInput, '99' );
+ 		await user.keyboard( '{Tab}' );
+ 
+-		expect( onChangeSpy ).not.toHaveBeenCalled();
++		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T11:59:00' );
+ 	} );
+ 
+ 	it( 'should switch to PM correctly', async () => {
+diff --git a/packages/components/src/date-time/timezone.tsx b/packages/components/src/date-time/time/timezone.tsx
+similarity index 85%
+rename from packages/components/src/date-time/timezone.tsx
+rename to packages/components/src/date-time/time/timezone.tsx
+index 34592699d06052..a31f4358a05765 100644
+--- a/packages/components/src/date-time/timezone.tsx
++++ b/packages/components/src/date-time/time/timezone.tsx
+@@ -7,7 +7,8 @@ import { __experimentalGetSettings as getDateSettings } from '@wordpress/date';
+ /**
+  * Internal dependencies
+  */
+-import Tooltip from '../tooltip';
++import Tooltip from '../../tooltip';
++import { TimeZone as StyledComponent } from './styles';
+ 
+ /**
+  * Displays timezone information when user timezone is different from site
+@@ -38,7 +39,9 @@ const TimeZone = () => {
+ 
+ 	return (
+ 		<Tooltip position="top center" text={ timezoneDetail }>
+-			<div className="components-datetime__timezone">{ zoneAbbr }</div>
++			<StyledComponent className="components-datetime__timezone">
++				{ zoneAbbr }
++			</StyledComponent>
+ 		</Tooltip>
+ 	);
+ };
+diff --git a/packages/components/src/date-time/types.ts b/packages/components/src/date-time/types.ts
+index 1293721f3e27dc..512ea0e4ea3f07 100644
+--- a/packages/components/src/date-time/types.ts
++++ b/packages/components/src/date-time/types.ts
+@@ -2,24 +2,6 @@
+  * External dependencies
+  */
+ import type { Moment } from 'moment';
+-import type { ReactNode } from 'react';
+-
+-export type UpdateOnBlurAsIntegerFieldProps = {
+-	/**
+-	 * The value of the integer field.
+-	 */
+-	value: number | string;
+-
+-	/**
+-	 * Called when the field is changed.
+-	 */
+-	onUpdate: ( value: number ) => void;
+-
+-	/**
+-	 * Children to render inside the field.
+-	 */
+-	children?: ReactNode;
+-};
+ 
+ export type TimePickerProps = {
+ 	/**
+@@ -103,4 +85,20 @@ export type DateTimePickerProps = Omit< DatePickerProps, 'onChange' > &
+ 		 * passed the date and time as an argument.
+ 		 */
+ 		onChange?: ( date: string | null ) => void;
++
++		/**
++		 * Start opting in to not displaying a Help button which will become the
++		 * default in a future version.
++		 *
++		 * @default false
++		 */
++		__nextRemoveHelpButton?: boolean;
++
++		/**
++		 * Start opting in to not displaying a Reset button which will become
++		 * the default in a future version.
++		 *
++		 * @default false
++		 */
++		__nextRemoveResetButton?: boolean;
+ 	};
+diff --git a/packages/e2e-tests/specs/editor/various/datepicker.test.js b/packages/e2e-tests/specs/editor/various/datepicker.test.js
+index 62428b1c4ec010..f9c8daa16483d7 100644
+--- a/packages/e2e-tests/specs/editor/various/datepicker.test.js
++++ b/packages/e2e-tests/specs/editor/various/datepicker.test.js
+@@ -15,12 +15,24 @@ async function getSelectedOptionLabel( selector ) {
+ }
+ 
+ async function getDatePickerValues() {
+-	const year = await getInputValue( '[aria-label="Year"]' );
+-	const month = await getInputValue( '[aria-label="Month"]' );
+-	const monthLabel = await getSelectedOptionLabel( '[aria-label="Month"]' );
+-	const day = await getInputValue( '[aria-label="Day"]' );
+-	const hours = await getInputValue( '[aria-label="Hours"]' );
+-	const minutes = await getInputValue( '[aria-label="Minutes"]' );
++	const year = await getInputValue(
++		'.components-datetime__time-field-year input'
++	);
++	const month = await getInputValue(
++		'.components-datetime__time-field-month select'
++	);
++	const monthLabel = await getSelectedOptionLabel(
++		'.components-datetime__time-field-month select'
++	);
++	const day = await getInputValue(
++		'.components-datetime__time-field-day input'
++	);
++	const hours = await getInputValue(
++		'.components-datetime__time-field-hours-input input'
++	);
++	const minutes = await getInputValue(
++		'.components-datetime__time-field-minutes-input input'
++	);
+ 	const amOrPm = await page.$eval(
+ 		'.components-datetime__time-field-am-pm .is-primary',
+ 		( element ) => element.innerText.toLowerCase()
+@@ -126,7 +138,7 @@ describe.each( [ [ 'UTC-10' ], [ 'UTC' ], [ 'UTC+10' ] ] )(
+ 			await page.click( '.edit-post-post-schedule__toggle' );
+ 
+ 			// Clear the date.
+-			await page.click( '.components-datetime__date-reset-button' );
++			await page.click( '.block-editor-publish-date-time-picker__reset' );
+ 
+ 			const publishingDate = await getPublishingDate();
+ 
+diff --git a/packages/e2e-tests/specs/editor/various/post-visibility.test.js b/packages/e2e-tests/specs/editor/various/post-visibility.test.js
+index fa93b1217f6005..346d05661e706b 100644
+--- a/packages/e2e-tests/specs/editor/various/post-visibility.test.js
++++ b/packages/e2e-tests/specs/editor/various/post-visibility.test.js
+@@ -92,7 +92,7 @@ describe( 'Post visibility', () => {
+ 		// Set a publish date for the next month.
+ 		await page.click( '.edit-post-post-schedule__toggle' );
+ 		await page.click(
+-			'div[aria-label="Move forward to switch to the next month."]'
++			'*[aria-label="Move forward to switch to the next month."]'
+ 		);
+ 		await (
+ 			await page.$x(
+diff --git a/packages/e2e-tests/specs/editor/various/scheduling.test.js b/packages/e2e-tests/specs/editor/various/scheduling.test.js
+index 0ed6171ad72085..71f802f9598ab9 100644
+--- a/packages/e2e-tests/specs/editor/various/scheduling.test.js
++++ b/packages/e2e-tests/specs/editor/various/scheduling.test.js
+@@ -58,11 +58,11 @@ describe( 'Scheduling', () => {
+ 
+ 		await page.click( '.edit-post-post-schedule__toggle' );
+ 		await page.click(
+-			'div[aria-label="Move backward to switch to the previous month."]'
++			'*[aria-label="Move backward to switch to the previous month."]'
+ 		);
+ 		expect( await isDateTimeComponentFocused() ).toBe( true );
+ 		await page.click(
+-			'div[aria-label="Move forward to switch to the next month."]'
++			'*[aria-label="Move forward to switch to the next month."]'
+ 		);
+ 		expect( await isDateTimeComponentFocused() ).toBe( true );
+ 	} );
+diff --git a/packages/e2e-tests/specs/editor/various/switch-to-draft.test.js b/packages/e2e-tests/specs/editor/various/switch-to-draft.test.js
+index 1b26fcb50a31fd..f92468cd6037cb 100644
+--- a/packages/e2e-tests/specs/editor/various/switch-to-draft.test.js
++++ b/packages/e2e-tests/specs/editor/various/switch-to-draft.test.js
+@@ -63,7 +63,7 @@ async function scheduleTestPost( postType, viewport ) {
+ 	// Set a publish date for the next month.
+ 	await page.click( '.edit-post-post-schedule__toggle' );
+ 	await page.click(
+-		'div[aria-label="Move forward to switch to the next month."]'
++		'*[aria-label="Move forward to switch to the next month."]'
+ 	);
+ 
+ 	await (
+diff --git a/packages/edit-post/src/components/sidebar/post-schedule/index.js b/packages/edit-post/src/components/sidebar/post-schedule/index.js
+index 5b6c9a0e6481dc..7bfc9ce3e8b57a 100644
+--- a/packages/edit-post/src/components/sidebar/post-schedule/index.js
++++ b/packages/edit-post/src/components/sidebar/post-schedule/index.js
+@@ -33,7 +33,9 @@ export function PostSchedule() {
+ 							</Button>
+ 						</>
+ 					) }
+-					renderContent={ () => <PostScheduleForm /> }
++					renderContent={ ( { onClose } ) => (
++						<PostScheduleForm onClose={ onClose } />
++					) }
+ 				/>
+ 			</PanelRow>
+ 		</PostScheduleCheck>
+diff --git a/packages/edit-post/src/components/sidebar/post-schedule/style.scss b/packages/edit-post/src/components/sidebar/post-schedule/style.scss
+index 1b41f731f8feb3..cd954324bcb9b8 100644
+--- a/packages/edit-post/src/components/sidebar/post-schedule/style.scss
++++ b/packages/edit-post/src/components/sidebar/post-schedule/style.scss
+@@ -13,8 +13,6 @@
+ 	text-align: right;
+ }
+ 
+-// Zero out a blanket padding that is set on the dropdown component.
+-// The datetime component has its own padding.
+ .edit-post-post-schedule__dialog .components-popover__content {
+-	padding: 0;
++	padding: $grid-unit-20;
+ }
+diff --git a/packages/editor/src/components/post-schedule/index.js b/packages/editor/src/components/post-schedule/index.js
+index 740baa4c9ea7c7..33d998a135c94f 100644
+--- a/packages/editor/src/components/post-schedule/index.js
++++ b/packages/editor/src/components/post-schedule/index.js
+@@ -3,8 +3,8 @@
+  */
+ import { __experimentalGetSettings } from '@wordpress/date';
+ import { useDispatch, useSelect } from '@wordpress/data';
+-import { DateTimePicker } from '@wordpress/components';
+-import { useRef, useState, useMemo } from '@wordpress/element';
++import { __experimentalPublishDateTimePicker as PublishDateTimePicker } from '@wordpress/block-editor';
++import { useState, useMemo } from '@wordpress/element';
+ import { store as coreStore } from '@wordpress/core-data';
+ 
+ /**
+@@ -21,7 +21,7 @@ function getDayOfTheMonth( date = new Date(), firstDay = true ) {
+ 	).toISOString();
+ }
+ 
+-export default function PostSchedule() {
++export default function PostSchedule( { onClose } ) {
+ 	const { postDate, postType } = useSelect(
+ 		( select ) => ( {
+ 			postDate: select( editorStore ).getEditedPostAttribute( 'date' ),
+@@ -61,7 +61,6 @@ export default function PostSchedule() {
+ 		[ eventsByPostType ]
+ 	);
+ 
+-	const ref = useRef();
+ 	const settings = __experimentalGetSettings();
+ 
+ 	// To know if the current timezone is a 12 hour time with look for "a" in the time format
+@@ -75,20 +74,14 @@ export default function PostSchedule() {
+ 			.join( '' ) // Reverse the string and test for "a" not followed by a slash.
+ 	);
+ 
+-	function onChange( newDate ) {
+-		onUpdateDate( newDate );
+-		const { ownerDocument } = ref.current;
+-		ownerDocument.activeElement.blur();
+-	}
+-
+ 	return (
+-		<DateTimePicker
+-			ref={ ref }
++		<PublishDateTimePicker
+ 			currentDate={ postDate }
+-			onChange={ onChange }
++			onChange={ onUpdateDate }
+ 			is12Hour={ is12HourTime }
+ 			events={ events }
+ 			onMonthPreviewed={ setPreviewedMonth }
++			onClose={ onClose }
+ 		/>
+ 	);
+ }

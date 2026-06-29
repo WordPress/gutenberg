@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index aaee63a66ba53a..240254fa589c85 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Internal
+ 
+ -   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
++-   `ColorPalette`: Update typing for `onChange` method parameter ([46890](https://github.com/WordPress/gutenberg/pull/46890)).
+ 
+ ## 23.1.0 (2023-01-02)
+ 
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index 13b791144a07c4..d883cb598630d3 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -228,7 +228,7 @@ function UnforwardedColorPalette(
+ 		__experimentalIsRenderedInSidebar = false,
+ 		...otherProps
+ 	} = props;
+-	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
++	const clearColor = useCallback( () => onChange( '' ), [ onChange ] );
+ 
+ 	const hasMultipleColorOrigins =
+ 		colors.length > 0 &&
+diff --git a/packages/components/src/color-palette/types.ts b/packages/components/src/color-palette/types.ts
+index 1f9c66c0fb604d..3a4ea957bc0206 100644
+--- a/packages/components/src/color-palette/types.ts
++++ b/packages/components/src/color-palette/types.ts
+@@ -24,7 +24,7 @@ type PaletteProps = {
+ 	/**
+ 	 * Callback called when a color is selected.
+ 	 */
+-	onChange: ( newColor?: string, index?: number ) => void;
++	onChange: ( newColor: string, index?: number ) => void;
+ 	value?: string;
+ 	actions?: ReactNode;
+ };

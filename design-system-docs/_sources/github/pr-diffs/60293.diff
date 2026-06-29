@@ -1,0 +1,408 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3e2e9e834b708f..1726daaf90f885 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,6 +22,10 @@
+ 
+ -   `CustomSelectControlV2`: Fix hint behavior in legacy ([#60183](https://github.com/WordPress/gutenberg/pull/60183)).
+ 
++### Enhancement
++
++-   `SelectControl`: Make component type generic to allow type narrowing ([#60293](https://github.com/WordPress/gutenberg/pull/60293)).
++
+ ## 27.2.0 (2024-03-21)
+ 
+ -   `Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index b0d8c20be74ac6..3f2a443fda712f 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -71,6 +71,20 @@ function buildPadInputStateReducer( pad: number ) {
+ 	};
+ }
+ 
++type MonthValue =
++	| '01'
++	| '02'
++	| '03'
++	| '04'
++	| '05'
++	| '06'
++	| '07'
++	| '08'
++	| '09'
++	| '10'
++	| '11'
++	| '12';
++
+ /**
+  * TimePicker is a React component that renders a clock for time selection.
+  *
+@@ -114,7 +128,7 @@ export function TimePicker( {
+ 	const { day, month, year, minutes, hours, am } = useMemo(
+ 		() => ( {
+ 			day: format( date, 'dd' ),
+-			month: format( date, 'MM' ),
++			month: format( date, 'MM' ) as MonthValue,
+ 			year: format( date, 'yyyy' ),
+ 			minutes: format( date, 'mm' ),
+ 			hours: format( date, is12Hour ? 'hh' : 'HH' ),
+@@ -197,7 +211,7 @@ export function TimePicker( {
+ 
+ 	const monthField = (
+ 		<MonthSelectWrapper>
+-			<SelectControl
++			<SelectControl< MonthValue >
+ 				className="components-datetime__time-field components-datetime__time-field-month" // Unused, for backwards compatibility.
+ 				label={ __( 'Month' ) }
+ 				hideLabelFromVision
+diff --git a/packages/components/src/query-controls/index.tsx b/packages/components/src/query-controls/index.tsx
+index de53c63a9b8a82..3557335ebac5a0 100644
+--- a/packages/components/src/query-controls/index.tsx
++++ b/packages/components/src/query-controls/index.tsx
+@@ -85,7 +85,11 @@ export function QueryControls( {
+ 						__next40pxDefaultSize={ __next40pxDefaultSize }
+ 						key="query-controls-order-select"
+ 						label={ __( 'Order by' ) }
+-						value={ `${ orderBy }/${ order }` }
++						value={
++							orderBy === undefined || order === undefined
++								? undefined
++								: `${ orderBy }/${ order }`
++						}
+ 						options={ [
+ 							{
+ 								label: __( 'Newest to oldest' ),
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 3a550be7daa333..90680f93be79ea 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -29,8 +29,12 @@ function useUniqueId( idProp?: string ) {
+ 	return idProp || id;
+ }
+ 
+-function UnforwardedSelectControl(
+-	props: WordPressComponentProps< SelectControlProps, 'select', false >,
++function UnforwardedSelectControl< OptionType extends string >(
++	props: WordPressComponentProps<
++		SelectControlProps< OptionType >,
++		'select',
++		false
++	>,
+ 	ref: React.ForwardedRef< HTMLSelectElement >
+ ) {
+ 	const {
+@@ -174,6 +178,14 @@ function UnforwardedSelectControl(
+  * };
+  * ```
+  */
+-export const SelectControl = forwardRef( UnforwardedSelectControl );
++export const SelectControl = forwardRef( UnforwardedSelectControl ) as <
++	OptionType extends string,
++>(
++	props: WordPressComponentProps<
++		SelectControlProps< OptionType >,
++		'select',
++		false
++	> & { ref?: React.ForwardedRef< HTMLSelectElement > }
++) => ReturnType< typeof UnforwardedSelectControl >;
+ 
+ export default SelectControl;
+diff --git a/packages/components/src/select-control/types-test.tsx b/packages/components/src/select-control/types-test.tsx
+new file mode 100644
+index 00000000000000..1c9d279318d068
+--- /dev/null
++++ b/packages/components/src/select-control/types-test.tsx
+@@ -0,0 +1,220 @@
++/**
++ * Internal dependencies
++ */
++import SelectControl from '.';
++
++/**
++ * Single type
++ */
++// Normal select, no generic or option provided. Any value is allowed here.
++<SelectControl value="string" multiple={ false } />;
++
++// Normal select, no generic provided. Value type is inferred from available options.
++<SelectControl
++	value="string"
++	multiple={ false }
++	options={ [
++		{
++			value: 'string',
++			label: 'String',
++		},
++		{
++			value: 'otherstring',
++			label: 'Other String',
++		},
++	] }
++/>;
++
++// Normal select, no generic provided. Value type is inferred from available options.
++// Incorrect value type provided to test validation is working.
++<SelectControl
++	// @ts-expect-error "string" is not "narrow" or "value", so throw an error
++	value="string"
++	multiple={ false }
++	options={ [
++		{
++			value: 'narrow',
++			label: 'Narrow',
++		},
++		{
++			value: 'value',
++			label: 'Value',
++		},
++	] }
++	onChange={ ( value ) => {
++		// Typescript can't guarantee the value isn't modified by the
++		// user, so we can't assign a type to value here.
++		return value === 'string';
++	} }
++/>;
++
++// Select with explicit generic provided.
++// Both value and options.value must match the provided generic.
++<SelectControl< 'narrow' | 'value' >
++	value="narrow"
++	options={ [
++		{
++			value: 'narrow',
++			label: 'Narrow',
++		},
++		{
++			value: 'value',
++			label: 'Value',
++		},
++	] }
++	multiple={ false }
++/>;
++
++// Select with explicit generic provided.
++// Both value and options.value must match the provided generic.
++// Incorrect value type provided to test validation is working.
++<SelectControl< 'narrow' | 'value' >
++	// @ts-expect-error "string" is not "narrow" or "value", so throw an error
++	value="string"
++	multiple={ false }
++	options={ [
++		{
++			// @ts-expect-error "string" is not "narrow" or "value", so throw an error
++			value: 'string',
++			label: 'String',
++		},
++		{
++			// @ts-expect-error "otherstring" is not "narrow" or "value", so throw an error
++			value: 'otherstring',
++			label: 'Other String',
++		},
++	] }
++/>;
++
++// Select with explicit generic provided.
++// Usually this would result in a type error with no generic,
++// but this has been explicitly loosened to bypass errors.
++<SelectControl< string >
++	value="string"
++	multiple={ false }
++	options={ [
++		{
++			value: 'narrow',
++			label: 'Narrow',
++		},
++		{
++			value: 'value',
++			label: 'Value',
++		},
++	] }
++/>;
++
++/**
++ * Multiple type
++ */
++// Normal select, no generic or option provided. Any value is allowed here.
++<SelectControl value={ [ 'string' ] } multiple />;
++
++// Normal select, no generic provided. Value type is inferred from available options.
++<SelectControl
++	value={ [ 'string' ] }
++	multiple
++	options={ [
++		{
++			value: 'string',
++			label: 'String',
++		},
++		{
++			value: 'otherstring',
++			label: 'Other String',
++		},
++	] }
++/>;
++
++// Normal select, no generic provided. Value type is inferred from available options.
++// Incorrect value type provided to test validation is working.
++<SelectControl
++	// @ts-expect-error "string" is not "narrow" or "value", so throw an error
++	value={ [ 'string' ] }
++	multiple
++	options={ [
++		{
++			value: 'narrow',
++			label: 'Narrow',
++		},
++		{
++			value: 'value',
++			label: 'Value',
++		},
++	] }
++/>;
++
++// Select with explicit generic provided.
++// Both value and options.value must match the provided generic.
++<SelectControl< 'narrow' | 'value' >
++	value={ [ 'narrow' ] }
++	multiple
++	options={ [
++		{
++			value: 'narrow',
++			label: 'Narrow',
++		},
++		{
++			value: 'value',
++			label: 'Value',
++		},
++	] }
++/>;
++// Select with explicit generic provided.
++// Both value and options.value must match the provided generic.
++// Value used with multiple matching strings in array.
++<SelectControl< 'narrow' | 'value' >
++	value={ [ 'narrow', 'value' ] }
++	multiple
++	options={ [
++		{
++			value: 'narrow',
++			label: 'Narrow',
++		},
++		{
++			value: 'value',
++			label: 'Value',
++		},
++	] }
++/>;
++
++// Select with explicit generic provided.
++// Both value and options.value must match the provided generic.
++// Incorrect value type provided to test validation is working.
++<SelectControl< 'narrow' | 'value' >
++	// @ts-expect-error "string" is not "narrow" or "value", so throw an error
++	value={ [ 'string' ] }
++	multiple
++	options={ [
++		{
++			// @ts-expect-error "string" is not "narrow" or "value", so throw an error
++			value: 'string',
++			label: 'String',
++		},
++		{
++			// @ts-expect-error "otherstring" is not "narrow" or "value", so throw an error
++			value: 'otherstring',
++			label: 'Other String',
++		},
++	] }
++/>;
++
++// Select with explicit generic provided.
++// Both value and options.value must match the provided generic.
++// Value with 1 matching and 1 non-matching value provided to test validation is working.
++<SelectControl< 'narrow' | 'value' >
++	// @ts-expect-error "string" is not "narrow" or "value", so throw an error
++	value={ [ 'string', 'narrow' ] }
++	multiple
++	options={ [
++		{
++			value: 'narrow',
++			label: 'Narrow',
++		},
++		{
++			// @ts-expect-error "string" is not "narrow" or "value", so throw an error
++			value: 'string',
++			label: 'String',
++		},
++	] }
++/>;
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+index b8ec42cc4b72f2..74be99a97594a9 100644
+--- a/packages/components/src/select-control/types.ts
++++ b/packages/components/src/select-control/types.ts
+@@ -9,7 +9,7 @@ import type { ChangeEvent, FocusEvent, ReactNode } from 'react';
+ import type { InputBaseProps } from '../input-control/types';
+ import type { BaseControlProps } from '../base-control/types';
+ 
+-type SelectControlBaseProps = Pick<
++type SelectControlBaseProps< OptionType extends string = string > = Pick<
+ 	InputBaseProps,
+ 	| '__next36pxDefaultSize'
+ 	| '__next40pxDefaultSize'
+@@ -33,7 +33,7 @@ type SelectControlBaseProps = Pick<
+ 			 * The internal value used to choose the selected value.
+ 			 * This is also the value passed to `onChange` when the option is selected.
+ 			 */
+-			value: string;
++			value: OptionType;
+ 			id?: string;
+ 			/**
+ 			 * Whether or not the option should have the disabled attribute.
+@@ -55,7 +55,9 @@ type SelectControlBaseProps = Pick<
+ 		children?: ReactNode;
+ 	};
+ 
+-export type SelectControlSingleSelectionProps = SelectControlBaseProps & {
++export type SelectControlSingleSelectionProps<
++	OptionType extends string = string,
++> = SelectControlBaseProps< OptionType > & {
+ 	/**
+ 	 * If this property is added, multiple values can be selected. The `value` passed should be an array.
+ 	 *
+@@ -64,7 +66,7 @@ export type SelectControlSingleSelectionProps = SelectControlBaseProps & {
+ 	 * @default false
+ 	 */
+ 	multiple?: false;
+-	value?: string;
++	value?: OptionType & {};
+ 	/**
+ 	 * A function that receives the value of the new option that is being selected as input.
+ 	 *
+@@ -77,7 +79,9 @@ export type SelectControlSingleSelectionProps = SelectControlBaseProps & {
+ 	) => void;
+ };
+ 
+-export type SelectControlMultipleSelectionProps = SelectControlBaseProps & {
++export type SelectControlMultipleSelectionProps<
++	OptionType extends string = string,
++> = SelectControlBaseProps< OptionType > & {
+ 	/**
+ 	 * If this property is added, multiple values can be selected. The `value` passed should be an array.
+ 	 *
+@@ -86,7 +90,7 @@ export type SelectControlMultipleSelectionProps = SelectControlBaseProps & {
+ 	 * @default false
+ 	 */
+ 	multiple: true;
+-	value?: string[];
++	value?: ( OptionType & {} )[];
+ 	/**
+ 	 * A function that receives the value of the new option that is being selected as input.
+ 	 *
+@@ -99,6 +103,6 @@ export type SelectControlMultipleSelectionProps = SelectControlBaseProps & {
+ 	) => void;
+ };
+ 
+-export type SelectControlProps =
+-	| SelectControlSingleSelectionProps
+-	| SelectControlMultipleSelectionProps;
++export type SelectControlProps< OptionType extends string = string > =
++	| SelectControlSingleSelectionProps< OptionType >
++	| SelectControlMultipleSelectionProps< OptionType >;

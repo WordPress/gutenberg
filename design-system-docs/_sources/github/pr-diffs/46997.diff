@@ -1,0 +1,1135 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 118e3b8cbaa221..5190af098b75e4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `DropdownMenu`: migrate Storybook to controls ([47149](https://github.com/WordPress/gutenberg/pull/47149)).
+ -   Removed deprecated `@storybook/addon-knobs` dependency from the package ([47152](https://github.com/WordPress/gutenberg/pull/47152)).
+ -   `ColorListPicker`: Convert to TypeScript ([#46358](https://github.com/WordPress/gutenberg/pull/46358)).
++-   `Button`: Convert to TypeScript ([#46997](https://github.com/WordPress/gutenberg/pull/46997)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx b/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
+index c4001369f8e015..d5fe6a9eb1f761 100644
+--- a/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
+@@ -16,7 +16,7 @@ import { useBorderBoxControlLinkedButton } from './hook';
+ import type { LinkedButtonProps } from '../types';
+ 
+ const BorderBoxControlLinkedButton = (
+-	props: WordPressComponentProps< LinkedButtonProps, 'div' >,
++	props: WordPressComponentProps< LinkedButtonProps, 'button' >,
+ 	forwardedRef: React.ForwardedRef< any >
+ ) => {
+ 	const { className, isLinked, ...buttonProps } =
+diff --git a/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts b/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts
+index 043c101b05f5a4..27ed54351aaf81 100644
+--- a/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts
++++ b/packages/components/src/border-box-control/border-box-control-linked-button/hook.ts
+@@ -13,7 +13,7 @@ import { useCx } from '../../utils/hooks/use-cx';
+ import type { LinkedButtonProps } from '../types';
+ 
+ export function useBorderBoxControlLinkedButton(
+-	props: WordPressComponentProps< LinkedButtonProps, 'div' >
++	props: WordPressComponentProps< LinkedButtonProps, 'button' >
+ ) {
+ 	const {
+ 		className,
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index 1f5bef1a54c1cd..3ec28331ffc425 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -166,7 +166,7 @@ const BorderControlDropdown = (
+ 			onClick={ onToggle }
+ 			variant="tertiary"
+ 			aria-label={ toggleAriaLabel }
+-			position={ dropdownPosition }
++			tooltipPosition={ dropdownPosition }
+ 			label={ __( 'Border color and style picker' ) }
+ 			showTooltip={ true }
+ 		>
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index b8b3a7f3111d2b..66bbae67ebcd57 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -121,131 +121,125 @@ The presence of a `href` prop determines whether an `anchor` element is rendered
+ 
+ Props not included in this set will be applied to the `a` or `button` element.
+ 
+-#### disabled
++#### `children`: `ReactNode`
+ 
+-Whether the button is disabled. If `true`, this will force a `button` element to be rendered.
++The button's children.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-#### href
++#### `className`: `string`
+ 
+-If provided, renders `a` instead of `button`.
++An optional additional class name to apply to the rendered button.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-#### variant
++#### `describedBy`: `string`
+ 
+-Specifies the button's style. The accepted values are `'primary'` (the primary button styles), `'secondary'` (the default button styles), `'tertiary'` (the text-based button styles), and `'link'` (the link button styles).
++An accessible description for the button.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-#### isDestructive
++#### `disabled`: `boolean`
+ 
+-Renders a red text-based button style to indicate destructive behavior.
++Whether the button is disabled. If `true`, this will force a `button` element to be rendered.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-#### isSmall
++#### `focus`: `boolean`
+ 
+-Decreases the size of the button.
++Whether the button is focused.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-#### isPressed
++#### `href`: `string`
+ 
+-Renders a pressed button style.
++If provided, renders `a` instead of `button`.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-#### isBusy
++#### `icon`: `IconProps< unknown >[ 'icon' ]`
+ 
+-Indicates activity while a action is being performed.
++If provided, renders an [Icon](/packages/components/src/icon/README.md) component inside the button.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-#### focus
++#### `iconPosition`: `'left' | 'right'`
+ 
+-Whether the button is focused.
++If provided with `icon`, sets the position of icon relative to the `text`. Available options are `left|right`.
+ 
+--   Type: `Boolean`
+ -   Required: No
++-   Default: `left`
+ 
+-#### target
++#### `iconSize`: `IconProps< unknown >[ 'size' ]`
+ 
+-If provided with `href`, sets the `target` attribute to the `a`.
++If provided with `icon`, sets the icon size. Please refer to the [Icon](/packages/components/src/icon/README.md) component for more details regarding the default value of its `size` prop.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-#### className
++#### `isBusy`: `boolean`
+ 
+-An optional additional class name to apply to the rendered button.
++Indicates activity while a action is being performed.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-#### icon
++#### `isDestructive`: `boolean`
+ 
+-If provided, renders an [Icon](/packages/components/src/icon/README.md) component inside the button.
++Renders a red text-based button style to indicate destructive behavior.
+ 
+--   Type: `String|Function|WPComponent|null`
+ -   Required: No
+ 
+-#### iconSize
++#### `isPressed`: `boolean`
+ 
+-If provided with `icon`, sets the icon size. Please refer to the [Icon](/packages/components/src/icon/README.md) component for more details regarding the default value of its `size` prop.
++Renders a pressed button style.
+ 
+--   Type: `Number`
+ -   Required: No
+ 
+-#### iconPosition
++#### `isSmall`: `boolean`
+ 
+-If provided with `icon`, sets the position of icon relative to the `text`. Available options are `left|right`.
++Decreases the size of the button.
+ 
+--   Type: `string`
+ -   Required: No
+--   Default: `left`
+ 
+-#### text
++#### `label`: `string`
+ 
+-If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
++Sets the `aria-label` of the component, if none is provided. Sets the Tooltip content if `showTooltip` is provided.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-#### showTooltip
++#### `shortcut`: `string | { display: string; ariaLabel: string; }`
++
++If provided with `showTooltip`, appends the Shortcut label to the tooltip content. If an object is provided, it should contain `display` and `ariaLabel` keys.
++
++-   Required: No
++
++#### `showTooltip`: `boolean`
+ 
+ If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) component for the button.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+-#### tooltipPosition
++#### `target`: `string`
+ 
+-If provided with`showTooltip`, sets the position of the tooltip. Please refer to the [Tooltip](/packages/components/src/tooltip/README.md) component for more details regarding the defaults.
++If provided with `href`, sets the `target` attribute to the `a`.
+ 
+--   Type: `String`
+--   Require: No
++-   Required: No
+ 
+-#### shortcut
++#### `text`: `string`
+ 
+-If provided with `showTooltip`, appends the Shortcut label to the tooltip content. If an `Object` is provided, it should contain `display` and `ariaLabel` keys.
++If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
+ 
+--   Type: `String|Object`
+ -   Required: No
+ 
+-#### label
++#### `tooltipPosition`: `PopoverProps[ 'position' ]`
+ 
+-Sets the `aria-label` of the component, if none is provided. Sets the Tooltip content if `showTooltip` is provided.
++If provided with`showTooltip`, sets the position of the tooltip. Please refer to the [Tooltip](/packages/components/src/tooltip/README.md) component for more details regarding the defaults.
++
++-   Required: No
++
++#### `variant`: `'primary' | 'secondary' | 'tertiary' | 'link'`
++
++Specifies the button's style. The accepted values are `'primary'` (the primary button styles), `'secondary'` (the default button styles), `'tertiary'` (the text-based button styles), and `'link'` (the link button styles).
+ 
+--   Type: `String`
+ -   Required: No
+ 
+ ## Related components
+diff --git a/packages/components/src/button/deprecated.js b/packages/components/src/button/deprecated.tsx
+similarity index 54%
+rename from packages/components/src/button/deprecated.js
+rename to packages/components/src/button/deprecated.tsx
+index 5f18e0e5eb1648..5d39e53c1008c1 100644
+--- a/packages/components/src/button/deprecated.js
++++ b/packages/components/src/button/deprecated.tsx
+@@ -1,4 +1,8 @@
+-// @ts-nocheck
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -8,9 +12,20 @@ import { forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import Button from '../button';
++import Button from '.';
++import type { DeprecatedIconButtonProps } from './types';
+ 
+-function IconButton( { labelPosition, size, tooltip, label, ...props }, ref ) {
++function UnforwardedIconButton(
++	{
++		label,
++		labelPosition,
++		size,
++		tooltip,
++		...props
++	}: React.ComponentPropsWithoutRef< typeof Button > &
++		DeprecatedIconButtonProps,
++	ref: ForwardedRef< any >
++) {
+ 	deprecated( 'wp.components.IconButton', {
+ 		since: '5.4',
+ 		alternative: 'wp.components.Button',
+@@ -29,4 +44,4 @@ function IconButton( { labelPosition, size, tooltip, label, ...props }, ref ) {
+ 	);
+ }
+ 
+-export default forwardRef( IconButton );
++export default forwardRef( UnforwardedIconButton );
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.tsx
+similarity index 59%
+rename from packages/components/src/button/index.js
+rename to packages/components/src/button/index.tsx
+index 1b0fd57a441a91..5ffc22d3020e1c 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.tsx
+@@ -1,8 +1,14 @@
+-// @ts-nocheck
+ /**
+  * External dependencies
+  */
+ import classnames from 'classnames';
++import type {
++	ComponentPropsWithoutRef,
++	ForwardedRef,
++	HTMLAttributes,
++	MouseEvent,
++	ReactElement,
++} from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -17,8 +23,9 @@ import { useInstanceId } from '@wordpress/compose';
+ import Tooltip from '../tooltip';
+ import Icon from '../icon';
+ import { VisuallyHidden } from '../visually-hidden';
++import type { ButtonProps, DeprecatedButtonProps } from './types';
+ 
+-const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
++const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
+ 
+ function useDeprecatedProps( {
+ 	isDefault,
+@@ -28,7 +35,7 @@ function useDeprecatedProps( {
+ 	isLink,
+ 	variant,
+ 	...otherProps
+-} ) {
++}: ButtonProps & DeprecatedButtonProps ): ButtonProps {
+ 	let computedVariant = variant;
+ 
+ 	if ( isPrimary ) {
+@@ -63,10 +70,11 @@ function useDeprecatedProps( {
+ 	};
+ }
+ 
+-export function Button( props, ref ) {
++export function UnforwardedButton(
++	props: ButtonProps,
++	ref: ForwardedRef< any >
++) {
+ 	const {
+-		href,
+-		target,
+ 		isSmall,
+ 		isPressed,
+ 		isBusy,
+@@ -85,18 +93,26 @@ export function Button( props, ref ) {
+ 		variant,
+ 		__experimentalIsFocusable: isFocusable,
+ 		describedBy,
+-		...additionalProps
++		...buttonOrAnchorProps
+ 	} = useDeprecatedProps( props );
++
++	const { href, target, ...additionalProps } =
++		'href' in buttonOrAnchorProps
++			? buttonOrAnchorProps
++			: { href: undefined, target: undefined, ...buttonOrAnchorProps };
++
+ 	const instanceId = useInstanceId(
+ 		Button,
+ 		'components-button__description'
+ 	);
+ 
+ 	const hasChildren =
+-		children?.[ 0 ] &&
+-		children[ 0 ] !== null &&
+-		// Tooltip should not considered as a child
+-		children?.[ 0 ]?.props?.className !== 'components-tooltip';
++		( 'string' === typeof children && !! children ) ||
++		( Array.isArray( children ) &&
++			children?.[ 0 ] &&
++			children[ 0 ] !== null &&
++			// Tooltip should not considered as a child
++			children?.[ 0 ]?.props?.className !== 'components-tooltip' );
+ 
+ 	const classes = classnames( 'components-button', className, {
+ 		'is-secondary': variant === 'secondary',
+@@ -113,24 +129,29 @@ export function Button( props, ref ) {
+ 
+ 	const trulyDisabled = disabled && ! isFocusable;
+ 	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
+-	const tagProps =
+-		Tag === 'a'
+-			? { href, target }
+-			: {
++	const buttonProps: ComponentPropsWithoutRef< 'button' > =
++		Tag === 'button'
++			? {
+ 					type: 'button',
+ 					disabled: trulyDisabled,
+ 					'aria-pressed': isPressed,
+-			  };
++			  }
++			: {};
++	const anchorProps: ComponentPropsWithoutRef< 'a' > =
++		Tag === 'a' ? { href, target } : {};
+ 
+ 	if ( disabled && isFocusable ) {
+ 		// In this case, the button will be disabled, but still focusable and
+ 		// perceivable by screen reader users.
+-		tagProps[ 'aria-disabled' ] = true;
++		buttonProps[ 'aria-disabled' ] = true;
++		anchorProps[ 'aria-disabled' ] = true;
+ 
+ 		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
+-			additionalProps[ disabledEvent ] = ( event ) => {
+-				event.stopPropagation();
+-				event.preventDefault();
++			additionalProps[ disabledEvent ] = ( event: MouseEvent ) => {
++				if ( event ) {
++					event.stopPropagation();
++					event.preventDefault();
++				}
+ 			};
+ 		}
+ 	}
+@@ -145,24 +166,24 @@ export function Button( props, ref ) {
+ 			// There's a label and...
+ 			( !! label &&
+ 				// The children are empty and...
+-				! children?.length &&
++				! ( children as string | ReactElement[] )?.length &&
+ 				// The tooltip is not explicitly disabled.
+ 				false !== showTooltip ) );
+ 
+-	const descriptionId = describedBy ? instanceId : null;
++	const descriptionId = describedBy ? instanceId : undefined;
+ 
+ 	const describedById =
+ 		additionalProps[ 'aria-describedby' ] || descriptionId;
+ 
+-	const element = (
+-		<Tag
+-			{ ...tagProps }
+-			{ ...additionalProps }
+-			className={ classes }
+-			aria-label={ additionalProps[ 'aria-label' ] || label }
+-			aria-describedby={ describedById }
+-			ref={ ref }
+-		>
++	const commonProps = {
++		className: classes,
++		'aria-label': additionalProps[ 'aria-label' ] || label,
++		'aria-describedby': describedById,
++		ref,
++	};
++
++	const elementChildren = (
++		<>
+ 			{ icon && iconPosition === 'left' && (
+ 				<Icon icon={ icon } size={ iconSize } />
+ 			) }
+@@ -171,9 +192,28 @@ export function Button( props, ref ) {
+ 				<Icon icon={ icon } size={ iconSize } />
+ 			) }
+ 			{ children }
+-		</Tag>
++		</>
+ 	);
+ 
++	const element =
++		Tag === 'a' ? (
++			<a
++				{ ...anchorProps }
++				{ ...( additionalProps as HTMLAttributes< HTMLAnchorElement > ) }
++				{ ...commonProps }
++			>
++				{ elementChildren }
++			</a>
++		) : (
++			<button
++				{ ...buttonProps }
++				{ ...( additionalProps as HTMLAttributes< HTMLButtonElement > ) }
++				{ ...commonProps }
++			>
++				{ elementChildren }
++			</button>
++		);
++
+ 	if ( ! shouldShowTooltip ) {
+ 		return (
+ 			<>
+@@ -190,7 +230,12 @@ export function Button( props, ref ) {
+ 	return (
+ 		<>
+ 			<Tooltip
+-				text={ children?.length && describedBy ? describedBy : label }
++				text={
++					( children as string | ReactElement[] )?.length &&
++					describedBy
++						? describedBy
++						: label
++				}
+ 				shortcut={ shortcut }
+ 				position={ tooltipPosition }
+ 			>
+@@ -205,4 +250,20 @@ export function Button( props, ref ) {
+ 	);
+ }
+ 
+-export default forwardRef( Button );
++/**
++ * Lets users take actions and make choices with a single click or tap.
++ *
++ * ```jsx
++ * import { Button } from '@wordpress/components';
++ * const Mybutton = () => (
++ *   <Button
++ *     variant="primary"
++ *     onClick={ handleClick }
++ *   >
++ *     Click here
++ *   </Button>
++ * );
++ * ```
++ */
++export const Button = forwardRef( UnforwardedButton );
++export default Button;
+diff --git a/packages/components/src/button/stories/index.js b/packages/components/src/button/stories/index.js
+deleted file mode 100644
+index 569bd845c34253..00000000000000
+--- a/packages/components/src/button/stories/index.js
++++ /dev/null
+@@ -1,179 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import {
+-	formatBold,
+-	formatItalic,
+-	link,
+-	more,
+-	wordpress,
+-} from '@wordpress/icons';
+-
+-/**
+- * Internal dependencies
+- */
+-import './style.css';
+-import Button from '../';
+-
+-export default {
+-	title: 'Components/Button',
+-	component: Button,
+-	argTypes: {
+-		label: {
+-			control: { type: 'text' },
+-			description:
+-				'Sets the `aria-label` of the component, if none is provided. Sets the Tooltip content if `showTooltip` is provided.',
+-		},
+-		children: {
+-			control: { type: 'text' },
+-		},
+-		href: {
+-			control: { type: 'text' },
+-			description: 'If provided, renders `a` instead of `button`.',
+-		},
+-		icon: {
+-			control: { type: 'select' },
+-			description:
+-				'If provided, renders an `Icon` component inside the button.',
+-			options: [ 'wordpress', 'link', 'more' ],
+-			mapping: {
+-				wordpress,
+-				link,
+-				more,
+-			},
+-		},
+-		iconSize: {
+-			control: { type: 'number' },
+-			description: 'If provided with `icon`, sets the icon size.',
+-		},
+-		iconPosition: {
+-			control: { type: 'select' },
+-			description:
+-				'If provided with `icon`, sets the position of icon relative to the `text`. Available options are `left|right`.',
+-			options: [ 'left', 'right' ],
+-			table: {
+-				defaultValue: { summary: `left` },
+-			},
+-		},
+-		isBusy: {
+-			control: 'boolean',
+-			description:
+-				'Indicates activity while a action is being performed.',
+-		},
+-		isDestructive: {
+-			control: 'boolean',
+-			description:
+-				'Renders a red text-based button style to indicate destructive behavior.',
+-		},
+-		isPressed: {
+-			control: 'boolean',
+-			description: 'Renders a pressed button style.',
+-		},
+-		isSmall: {
+-			control: 'boolean',
+-			description: 'Decreases the size of the button.',
+-		},
+-		disabled: {
+-			control: 'boolean',
+-			description:
+-				'Whether the button is disabled. If `true`, this will force a `button` element to be rendered.',
+-		},
+-		shortcut: {
+-			control: { type: 'text' },
+-			description:
+-				'If provided with `showTooltip`, appends the Shortcut label to the tooltip content. If an `Object` is provided, it should contain `display` and `ariaLabel` keys.',
+-		},
+-		showTooltip: {
+-			control: 'boolean',
+-			description:
+-				'If provided, renders a `Tooltip` component for the button.',
+-		},
+-		tooltipPosition: {
+-			control: { type: 'text' },
+-			description:
+-				'If provided with `showTooltip`, sets the position of the tooltip.',
+-		},
+-		text: {
+-			control: { type: 'text' },
+-			description:
+-				'If provided, displays the given text inside the button. If the button contains `children` elements, the text is displayed before them.',
+-		},
+-		target: {
+-			control: { type: 'text' },
+-			description:
+-				'If provided with `href`, sets the `target` attribute to the `a`.',
+-		},
+-		variant: {
+-			control: { type: 'select' },
+-			description: "Specifies the button's style.",
+-			options: [ 'primary', 'secondary', 'tertiary', 'link' ],
+-		},
+-		__experimentalIsFocusable: {
+-			control: 'boolean',
+-			description: 'Makes the button focusable even when disabled',
+-		},
+-	},
+-	parameters: {
+-		controls: { expanded: true },
+-		docs: { source: { state: 'open' } },
+-	},
+-};
+-
+-function Template( { children, ...props } ) {
+-	return <Button { ...props }>{ children }</Button>;
+-}
+-
+-export const Default = Template.bind( {} );
+-Default.args = {
+-	children: 'Code is poetry',
+-};
+-
+-export const Primary = Template.bind( {} );
+-Primary.args = {
+-	...Default.args,
+-	variant: 'primary',
+-};
+-
+-export const Secondary = Template.bind( {} );
+-Secondary.args = {
+-	...Default.args,
+-	variant: 'secondary',
+-};
+-
+-export const Tertiary = Template.bind( {} );
+-Tertiary.args = {
+-	...Default.args,
+-	variant: 'tertiary',
+-};
+-
+-export const Link = Template.bind( {} );
+-Link.args = {
+-	...Default.args,
+-	variant: 'link',
+-};
+-
+-export const IsDestructive = Template.bind( {} );
+-IsDestructive.args = {
+-	...Default.args,
+-	isDestructive: true,
+-};
+-
+-export const Icon = Template.bind( {} );
+-Icon.args = {
+-	label: 'Code is poetry',
+-	icon: 'wordpress',
+-};
+-
+-export const groupedIcons = () => {
+-	const GroupContainer = ( { children } ) => (
+-		<div style={ { display: 'inline-flex' } }>{ children }</div>
+-	);
+-
+-	return (
+-		<GroupContainer>
+-			<Button icon={ formatBold } label="Bold" />
+-			<Button icon={ formatItalic } label="Italic" />
+-			<Button icon={ link } label="Link" />
+-		</GroupContainer>
+-	);
+-};
+diff --git a/packages/components/src/button/stories/index.tsx b/packages/components/src/button/stories/index.tsx
+new file mode 100644
+index 00000000000000..ed4aafe3ae2310
+--- /dev/null
++++ b/packages/components/src/button/stories/index.tsx
+@@ -0,0 +1,106 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++import type { ReactNode } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import {
++	formatBold,
++	formatItalic,
++	link,
++	more,
++	wordpress,
++} from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import './style.css';
++import Button from '..';
++
++const meta: ComponentMeta< typeof Button > = {
++	title: 'Components/Button',
++	component: Button,
++	argTypes: {
++		// Overrides a limitation of the docgen interpreting our TS types for this as required.
++		href: { type: { name: 'string', required: false } },
++		icon: {
++			control: { type: 'select' },
++			options: [ 'wordpress', 'link', 'more' ],
++			mapping: {
++				wordpress,
++				link,
++				more,
++			},
++		},
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof Button > = ( props ) => {
++	return <Button { ...props }></Button>;
++};
++
++export const Default: ComponentStory< typeof Button > = Template.bind( {} );
++Default.args = {
++	children: 'Code is poetry',
++};
++
++export const Primary: ComponentStory< typeof Button > = Template.bind( {} );
++Primary.args = {
++	...Default.args,
++	variant: 'primary',
++};
++
++export const Secondary: ComponentStory< typeof Button > = Template.bind( {} );
++Secondary.args = {
++	...Default.args,
++	variant: 'secondary',
++};
++
++export const Tertiary: ComponentStory< typeof Button > = Template.bind( {} );
++Tertiary.args = {
++	...Default.args,
++	variant: 'tertiary',
++};
++
++export const Link: ComponentStory< typeof Button > = Template.bind( {} );
++Link.args = {
++	...Default.args,
++	variant: 'link',
++};
++
++export const IsDestructive: ComponentStory< typeof Button > = Template.bind(
++	{}
++);
++IsDestructive.args = {
++	...Default.args,
++	isDestructive: true,
++};
++
++export const Icon: ComponentStory< typeof Button > = Template.bind( {} );
++Icon.args = {
++	label: 'Code is poetry',
++	icon: 'wordpress',
++};
++
++export const GroupedIcons: ComponentStory< typeof Button > = () => {
++	const GroupContainer = ( { children }: { children: ReactNode } ) => (
++		<div style={ { display: 'inline-flex' } }>{ children }</div>
++	);
++
++	return (
++		<GroupContainer>
++			<Button icon={ formatBold } label="Bold" />
++			<Button icon={ formatItalic } label="Italic" />
++			<Button icon={ link } label="Link" />
++		</GroupContainer>
++	);
++};
+diff --git a/packages/components/src/button/test/index.js b/packages/components/src/button/test/index.tsx
+similarity index 91%
+rename from packages/components/src/button/test/index.js
+rename to packages/components/src/button/test/index.tsx
+index 1f8edc70702e77..c1ff33b8ba82c2 100644
+--- a/packages/components/src/button/test/index.js
++++ b/packages/components/src/button/test/index.tsx
+@@ -12,8 +12,8 @@ import { plusCircle } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import Button from '../';
+-import { Tooltip } from '../../';
++import Button from '..';
++import Tooltip from '../../tooltip';
+ 
+ jest.mock( '../../icon', () => () => <div data-testid="test-icon" /> );
+ 
+@@ -126,6 +126,7 @@ describe( 'Button', () => {
+ 		} );
+ 
+ 		it( 'should not pass the prop target into the element', () => {
++			// @ts-expect-error - `target` requires `href`
+ 			render( <Button target="_blank" /> );
+ 
+ 			expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
+@@ -139,13 +140,12 @@ describe( 'Button', () => {
+ 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'gutenberg' );
+ 		} );
+ 
+-		it( 'should render an additional WordPress prop of value awesome', () => {
+-			render( <Button WordPress="awesome" /> );
++		it( 'should pass additional props to the element', () => {
++			render( <Button type="submit" /> );
+ 
+-			expect( console ).toHaveErrored();
+ 			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+-				'wordpress',
+-				'awesome'
++				'type',
++				'submit'
+ 			);
+ 		} );
+ 
+@@ -342,6 +342,7 @@ describe( 'Button', () => {
+ 		} );
+ 
+ 		it( 'should become a button again when disabled is supplied', () => {
++			// @ts-expect-error - a button should not have `href`
+ 			render( <Button href="https://wordpress.org/" disabled /> );
+ 
+ 			expect( screen.getByRole( 'button' ) ).toBeVisible();
+@@ -360,11 +361,13 @@ describe( 'Button', () => {
+ 
+ 	describe( 'deprecated props', () => {
+ 		it( 'should not break when the legacy isPrimary prop is passed', () => {
++			// @ts-expect-error
+ 			render( <Button isPrimary /> );
+ 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-primary' );
+ 		} );
+ 
+ 		it( 'should not break when the legacy isSecondary prop is passed', () => {
++			// @ts-expect-error
+ 			render( <Button isSecondary /> );
+ 			expect( screen.getByRole( 'button' ) ).toHaveClass(
+ 				'is-secondary'
+@@ -372,16 +375,19 @@ describe( 'Button', () => {
+ 		} );
+ 
+ 		it( 'should not break when the legacy isTertiary prop is passed', () => {
++			// @ts-expect-error
+ 			render( <Button isTertiary /> );
+ 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-tertiary' );
+ 		} );
+ 
+ 		it( 'should not break when the legacy isLink prop is passed', () => {
++			// @ts-expect-error
+ 			render( <Button isLink /> );
+ 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-link' );
+ 		} );
+ 
+ 		it( 'should warn when the isDefault prop is passed', () => {
++			// @ts-expect-error
+ 			render( <Button isDefault /> );
+ 			expect( screen.getByRole( 'button' ) ).toHaveClass(
+ 				'is-secondary'
+@@ -389,4 +395,21 @@ describe( 'Button', () => {
+ 			expect( console ).toHaveWarned();
+ 		} );
+ 	} );
++
++	describe( 'static typing', () => {
++		<>
++			<Button href="foo" />
++			{ /* @ts-expect-error - `target` requires `href` */ }
++			<Button target="foo" />
++			{ /* @ts-expect-error - `disabled` is only for buttons */ }
++			<Button href="foo" disabled />
++			<Button href="foo" type="image/png" />
++			{ /* @ts-expect-error - if button, type must be submit/reset/button */ }
++			<Button type="image/png" />
++			{ /* @ts-expect-error */ }
++			<Button type="invalidtype" />
++			{ /* @ts-expect-error - although the runtime behavior will allow this to be an anchor, this is probably a mistake. */ }
++			<Button disabled __experimentalIsFocusable href="foo" />
++		</>;
++	} );
+ } );
+diff --git a/packages/components/src/button/types.ts b/packages/components/src/button/types.ts
+new file mode 100644
+index 00000000000000..0a9f6e2718f61c
+--- /dev/null
++++ b/packages/components/src/button/types.ts
+@@ -0,0 +1,138 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { Props as IconProps } from '../icon';
++import type { PopoverProps } from '../popover/types';
++import type { WordPressComponentProps } from '../ui/context/wordpress-component';
++
++export type ButtonProps =
++	| WordPressComponentProps< BaseButtonProps & _ButtonProps, 'button', false >
++	| WordPressComponentProps< BaseButtonProps & AnchorProps, 'a', false >;
++
++type BaseButtonProps = {
++	/**
++	 * The button's children.
++	 */
++	children?: ReactNode;
++	/**
++	 * An accessible description for the button.
++	 */
++	describedBy?: string;
++	/**
++	 * Whether the button is focused.
++	 */
++	focus?: boolean;
++	/**
++	 * If provided, renders an Icon component inside the button.
++	 */
++	icon?: IconProps< unknown >[ 'icon' ];
++	/**
++	 * If provided with `icon`, sets the position of icon relative to the `text`.
++	 *
++	 * @default 'left'
++	 */
++	iconPosition?: 'left' | 'right';
++	/**
++	 * If provided with `icon`, sets the icon size.
++	 * Please refer to the Icon component for more details regarding
++	 * the default value of its `size` prop.
++	 */
++	iconSize?: IconProps< unknown >[ 'size' ];
++	/**
++	 * Indicates activity while a action is being performed.
++	 */
++	isBusy?: boolean;
++	/**
++	 * Renders a red text-based button style to indicate destructive behavior.
++	 */
++	isDestructive?: boolean;
++	/**
++	 * Renders a pressed button style.
++	 */
++	isPressed?: boolean;
++	/**
++	 * Decreases the size of the button.
++	 */
++	isSmall?: boolean;
++	/**
++	 * Sets the `aria-label` of the component, if none is provided.
++	 * Sets the Tooltip content if `showTooltip` is provided.
++	 */
++	label?: string;
++	/**
++	 * If provided with `showTooltip`, appends the Shortcut label to the tooltip content.
++	 * If an object is provided, it should contain `display` and `ariaLabel` keys.
++	 */
++	shortcut?: string | { display: string; ariaLabel: string };
++	/**
++	 * If provided, renders a Tooltip component for the button.
++	 */
++	showTooltip?: boolean;
++	/**
++	 * If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
++	 */
++	text?: string;
++	/**
++	 * If provided with `showTooltip`, sets the position of the tooltip.
++	 * Please refer to the Tooltip component for more details regarding the defaults.
++	 */
++	tooltipPosition?: PopoverProps[ 'position' ];
++	/**
++	 * Specifies the button's style.
++	 * The accepted values are:
++	 * 'primary' (the primary button styles)
++	 * 'secondary' (the default button styles)
++	 * 'tertiary' (the text-based button styles)
++	 * 'link' (the link button styles)
++	 */
++	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
++	/**
++	 * Whether this is focusable.
++	 */
++	__experimentalIsFocusable?: boolean;
++};
++
++type _ButtonProps = {
++	/**
++	 * Whether the button is disabled.
++	 * If `true`, this will force a `button` element to be rendered.
++	 */
++	disabled?: boolean;
++};
++
++type AnchorProps = {
++	/**
++	 * Whether the button is disabled.
++	 * If `true`, this will force a `button` element to be rendered.
++	 */
++	disabled?: false;
++	/**
++	 * If provided, renders `a` instead of `button`.
++	 */
++	href: string;
++	/**
++	 * If provided with `href`, sets the `target` attribute to the `a`.
++	 */
++	target?: string;
++};
++
++export type DeprecatedButtonProps = {
++	isDefault?: boolean;
++	isLink?: boolean;
++	isPrimary?: boolean;
++	isSecondary?: boolean;
++	isTertiary?: boolean;
++};
++
++export type DeprecatedIconButtonProps = {
++	labelPosition: ButtonProps[ 'tooltipPosition' ];
++	showTooltip?: boolean;
++	size: ButtonProps[ 'iconSize' ];
++	label: ButtonProps[ 'label' ];
++	tooltip: ButtonProps[ 'label' ];
++};
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index 5f0b01df2ce5af..75bfbb76ba2116 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -16,6 +16,7 @@ import {
+ 	startOfWeek,
+ 	endOfWeek,
+ } from 'date-fns';
++import type { KeyboardEventHandler } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -273,7 +274,7 @@ type DayProps = {
+ 	numEvents: number;
+ 	isInvalid: boolean;
+ 	onClick: () => void;
+-	onKeyDown: ( event: KeyboardEvent ) => void;
++	onKeyDown: KeyboardEventHandler;
+ };
+ 
+ function Day( {
+diff --git a/packages/components/src/dropdown/stories/index.tsx b/packages/components/src/dropdown/stories/index.tsx
+index 5f21f7d4b30d34..4e634cce5ae7b6 100644
+--- a/packages/components/src/dropdown/stories/index.tsx
++++ b/packages/components/src/dropdown/stories/index.tsx
+@@ -44,7 +44,7 @@ const Template: ComponentStory< typeof Dropdown > = ( args ) => {
+ export const Default: ComponentStory< typeof Dropdown > = Template.bind( {} );
+ Default.args = {
+ 	renderToggle: ( { isOpen, onToggle } ) => (
+-		<Button onClick={ onToggle } aria-expanded={ isOpen } isPrimary>
++		<Button onClick={ onToggle } aria-expanded={ isOpen } variant="primary">
+ 			Open dropdown
+ 		</Button>
+ 	),
+diff --git a/packages/components/src/form-token-field/token.tsx b/packages/components/src/form-token-field/token.tsx
+index 9d2c522037d8e9..e5633aa3b75cf0 100644
+--- a/packages/components/src/form-token-field/token.tsx
++++ b/packages/components/src/form-token-field/token.tsx
+@@ -73,7 +73,7 @@ export default function Token( {
+ 			<Button
+ 				className="components-form-token-field__remove-token"
+ 				icon={ closeSmall }
+-				onClick={ ! disabled && onClick }
++				onClick={ ! disabled ? onClick : undefined }
+ 				label={ messages.remove }
+ 				aria-describedby={ `components-form-token-field__token-text-${ instanceId }` }
+ 			/>
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index 1bb63b77063273..bcd815ba8886d5 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -25,7 +25,7 @@ const TabButton = ( {
+ }: TabButtonProps ) => (
+ 	<Button
+ 		role="tab"
+-		tabIndex={ selected ? null : -1 }
++		tabIndex={ selected ? undefined : -1 }
+ 		aria-selected={ selected }
+ 		id={ tabId }
+ 		__experimentalIsFocusable
+diff --git a/packages/components/src/tab-panel/types.ts b/packages/components/src/tab-panel/types.ts
+index 7528ca99d05d25..5a5b883a51a308 100644
+--- a/packages/components/src/tab-panel/types.ts
++++ b/packages/components/src/tab-panel/types.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { ReactNode } from 'react';
++import type { MouseEvent, ReactNode } from 'react';
+ 
+ /**
+  * Internal dependencies

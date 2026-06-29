@@ -1,0 +1,227 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 01b8e032ff4f1b..d3647667d79605 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ ### Bug Fix
+ 
+ -  `InputControl`: Fix misaligned textarea input control ([#49116](https://github.com/WordPress/gutenberg/pull/49116)).
++-  `ToolsPanel`: Ensure consistency in menu item order ([#49222](https://github.com/WordPress/gutenberg/pull/49222)).
+ 
+ ## 23.6.0 (2023-03-15)
+ 
+diff --git a/packages/components/src/tools-panel/test/index.tsx b/packages/components/src/tools-panel/test/index.tsx
+index 2a4fdbdf0aa96e..04f93c2f0ba814 100644
+--- a/packages/components/src/tools-panel/test/index.tsx
++++ b/packages/components/src/tools-panel/test/index.tsx
+@@ -954,6 +954,92 @@ describe( 'ToolsPanel', () => {
+ 			expect( items[ 1 ] ).toHaveTextContent( 'Item 2' );
+ 		} );
+ 
++		it( 'should maintain menu item order', async () => {
++			const InconsistentItems = () => (
++				<ToolsPanelItems>
++					<ToolsPanelItem
++						label="Item 1"
++						hasValue={ () => false }
++						isShownByDefault
++					>
++						<div>Item 1</div>
++					</ToolsPanelItem>
++					<ToolsPanelItem
++						label="Item 2"
++						hasValue={ () => false }
++						isShownByDefault
++					>
++						<div>Item 2</div>
++					</ToolsPanelItem>
++				</ToolsPanelItems>
++			);
++
++			const { rerender } = render(
++				<SlotFillProvider>
++					<InconsistentItems key="order-test-step-1" />
++					<ToolsPanelItems>
++						<ToolsPanelItem
++							label="Item 3"
++							hasValue={ () => false }
++							isShownByDefault
++						>
++							<div>Item 3</div>
++						</ToolsPanelItem>
++					</ToolsPanelItems>
++					<ToolsPanel { ...defaultProps }>
++						<Slot />
++					</ToolsPanel>
++				</SlotFillProvider>
++			);
++
++			// Open dropdown menu.
++			const user = userEvent.setup();
++			let menuButton = getMenuButton();
++			await user.click( menuButton );
++
++			// Confirm all the existing menu items are present and in the
++			// expected order.
++			let menuItems = await screen.findAllByRole( 'menuitemcheckbox' );
++
++			expect( menuItems.length ).toEqual( 3 );
++			expect( menuItems[ 0 ] ).toHaveTextContent( 'Item 1' );
++			expect( menuItems[ 1 ] ).toHaveTextContent( 'Item 2' );
++			expect( menuItems[ 2 ] ).toHaveTextContent( 'Item 3' );
++
++			// Close the dropdown menu.
++			await user.click( menuButton );
++
++			rerender(
++				<SlotFillProvider>
++					<InconsistentItems key="order-test-step-2" />
++					<ToolsPanelItems>
++						<ToolsPanelItem
++							label="Item 3"
++							hasValue={ () => false }
++							isShownByDefault
++						>
++							<div>Item 3</div>
++						</ToolsPanelItem>
++					</ToolsPanelItems>
++					<ToolsPanel { ...defaultProps }>
++						<Slot />
++					</ToolsPanel>
++				</SlotFillProvider>
++			);
++
++			// Reopen dropdown menu.
++			menuButton = getMenuButton();
++			await user.click( menuButton );
++
++			// Confirm the menu item order has been maintained.
++			menuItems = await screen.findAllByRole( 'menuitemcheckbox' );
++
++			expect( menuItems.length ).toEqual( 3 );
++			expect( menuItems[ 0 ] ).toHaveTextContent( 'Item 1' );
++			expect( menuItems[ 1 ] ).toHaveTextContent( 'Item 2' );
++			expect( menuItems[ 2 ] ).toHaveTextContent( 'Item 3' );
++		} );
++
+ 		it( 'should not trigger callback when fill has not updated yet when panel has', () => {
+ 			// Fill provided controls can update independently to the panel.
+ 			// A `panelId` prop was added to both panels and items
+diff --git a/packages/components/src/tools-panel/tools-panel/hook.ts b/packages/components/src/tools-panel/tools-panel/hook.ts
+index 65e1e7bd761b45..35d4c06279419d 100644
+--- a/packages/components/src/tools-panel/tools-panel/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel/hook.ts
+@@ -30,7 +30,9 @@ const generateMenuItems = ( {
+ 	panelItems,
+ 	shouldReset,
+ 	currentMenuItems,
++	menuItemOrder,
+ }: ToolsPanelMenuItemsConfig ) => {
++	const newMenuItems: ToolsPanelMenuItems = { default: {}, optional: {} };
+ 	const menuItems: ToolsPanelMenuItems = { default: {}, optional: {} };
+ 
+ 	panelItems.forEach( ( { hasValue, isShownByDefault, label } ) => {
+@@ -42,7 +44,31 @@ const generateMenuItems = ( {
+ 		const existingItemValue = currentMenuItems?.[ group ]?.[ label ];
+ 		const value = existingItemValue ? existingItemValue : hasValue();
+ 
+-		menuItems[ group ][ label ] = shouldReset ? false : value;
++		newMenuItems[ group ][ label ] = shouldReset ? false : value;
++	} );
++
++	// Loop the known, previously registered items first to maintain menu order.
++	menuItemOrder.forEach( ( key ) => {
++		if ( newMenuItems.default.hasOwnProperty( key ) ) {
++			menuItems.default[ key ] = newMenuItems.default[ key ];
++		}
++
++		if ( newMenuItems.optional.hasOwnProperty( key ) ) {
++			menuItems.optional[ key ] = newMenuItems.optional[ key ];
++		}
++	} );
++
++	// Loop newMenuItems object adding any that aren't in the known items order.
++	Object.keys( newMenuItems.default ).forEach( ( key ) => {
++		if ( ! menuItems.default.hasOwnProperty( key ) ) {
++			menuItems.default[ key ] = newMenuItems.default[ key ];
++		}
++	} );
++
++	Object.keys( newMenuItems.optional ).forEach( ( key ) => {
++		if ( ! menuItems.optional.hasOwnProperty( key ) ) {
++			menuItems.optional[ key ] = newMenuItems.optional[ key ];
++		}
+ 	} );
+ 
+ 	return menuItems;
+@@ -82,12 +108,14 @@ export function useToolsPanel(
+ 
+ 	// Allow panel items to register themselves.
+ 	const [ panelItems, setPanelItems ] = useState< ToolsPanelItem[] >( [] );
++	const [ menuItemOrder, setMenuItemOrder ] = useState< string[] >( [] );
+ 	const [ resetAllFilters, setResetAllFilters ] = useState<
+ 		ResetAllFilter[]
+ 	>( [] );
+ 
+ 	const registerPanelItem = useCallback(
+ 		( item: ToolsPanelItem ) => {
++			// Add item to panel items.
+ 			setPanelItems( ( items ) => {
+ 				const newItems = [ ...items ];
+ 				// If an item with this label has already been registered, remove it
+@@ -101,8 +129,18 @@ export function useToolsPanel(
+ 				}
+ 				return [ ...newItems, item ];
+ 			} );
++
++			// Track the initial order of item registration. This is used for
++			// maintaining menu item order later.
++			setMenuItemOrder( ( items ) => {
++				if ( items.includes( item.label ) ) {
++					return items;
++				}
++
++				return [ ...items, item.label ];
++			} );
+ 		},
+-		[ setPanelItems ]
++		[ setPanelItems, setMenuItemOrder ]
+ 	);
+ 
+ 	// Panels need to deregister on unmount to avoid orphans in menu state.
+@@ -160,10 +198,11 @@ export function useToolsPanel(
+ 				panelItems,
+ 				shouldReset: false,
+ 				currentMenuItems: prevState,
++				menuItemOrder,
+ 			} );
+ 			return items;
+ 		} );
+-	}, [ panelItems, setMenuItems ] );
++	}, [ panelItems, setMenuItems, menuItemOrder ] );
+ 
+ 	// Force a menu item to be checked.
+ 	// This is intended for use with default panel items. They are displayed
+@@ -267,10 +306,11 @@ export function useToolsPanel(
+ 		// Turn off display of all non-default items.
+ 		const resetMenuItems = generateMenuItems( {
+ 			panelItems,
++			menuItemOrder,
+ 			shouldReset: true,
+ 		} );
+ 		setMenuItems( resetMenuItems );
+-	}, [ panelItems, resetAllFilters, resetAll, setMenuItems ] );
++	}, [ panelItems, resetAllFilters, resetAll, setMenuItems, menuItemOrder ] );
+ 
+ 	// Assist ItemGroup styling when there are potentially hidden placeholder
+ 	// items by identifying first & last items that are toggled on for display.
+diff --git a/packages/components/src/tools-panel/types.ts b/packages/components/src/tools-panel/types.ts
+index 2657175caad7a5..183ed3254fe80a 100644
+--- a/packages/components/src/tools-panel/types.ts
++++ b/packages/components/src/tools-panel/types.ts
+@@ -187,4 +187,5 @@ export type ToolsPanelMenuItemsConfig = {
+ 	panelItems: ToolsPanelItem[];
+ 	shouldReset: boolean;
+ 	currentMenuItems?: ToolsPanelMenuItems;
++	menuItemOrder: string[];
+ };

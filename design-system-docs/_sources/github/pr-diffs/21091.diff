@@ -1,0 +1,1101 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index fbd0a960597ba4..c9e4d0b8b32d7c 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -629,6 +629,12 @@
+ 		"markdown_source": "../packages/components/README.md",
+ 		"parent": null
+ 	},
++	{
++		"title": "AlignmentMatrixControl",
++		"slug": "alignment-matrix-control",
++		"markdown_source": "../packages/components/src/alignment-matrix-control/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "AnglePickerControl",
+ 		"slug": "angle-picker-control",
+diff --git a/packages/block-editor/src/components/block-alignment-matrix-toolbar/index.js b/packages/block-editor/src/components/block-alignment-matrix-toolbar/index.js
+new file mode 100644
+index 00000000000000..fae00840d121bf
+--- /dev/null
++++ b/packages/block-editor/src/components/block-alignment-matrix-toolbar/index.js
+@@ -0,0 +1,67 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++import { DOWN } from '@wordpress/keycodes';
++import {
++	Button,
++	Dropdown,
++	ToolbarGroup,
++	__experimentalAlignmentMatrixControl as AlignmentMatrixControl,
++} from '@wordpress/components';
++
++export function BlockAlignmentMatrixToolbar( props ) {
++	const {
++		label = __( 'Change matrix alignment' ),
++		onChange = noop,
++		value = 'center',
++	} = props;
++
++	const icon = <AlignmentMatrixControl.Icon value={ value } />;
++	const className = 'block-editor-block-alignment-matrix-toolbar';
++	const popoverClassName = `${ className }__popover`;
++
++	return (
++		<Dropdown
++			position="bottom right"
++			className={ className }
++			popoverProps={ { className: popoverClassName } }
++			renderToggle={ ( { onToggle, isOpen } ) => {
++				const openOnArrowDown = ( event ) => {
++					if ( ! isOpen && event.keyCode === DOWN ) {
++						event.preventDefault();
++						event.stopPropagation();
++						onToggle();
++					}
++				};
++
++				return (
++					<ToolbarGroup>
++						<Button
++							onClick={ onToggle }
++							aria-haspopup="true"
++							aria-expanded={ isOpen }
++							onKeyDown={ openOnArrowDown }
++							label={ label }
++							icon={ icon }
++							showTooltip
++						/>
++					</ToolbarGroup>
++				);
++			} }
++			renderContent={ () => (
++				<AlignmentMatrixControl
++					hasFocusBorder={ false }
++					onChange={ onChange }
++					value={ value }
++				/>
++			) }
++		/>
++	);
++}
++
++export default BlockAlignmentMatrixToolbar;
+diff --git a/packages/block-editor/src/components/block-alignment-matrix-toolbar/style.scss b/packages/block-editor/src/components/block-alignment-matrix-toolbar/style.scss
+new file mode 100644
+index 00000000000000..46c24c89fbd5b6
+--- /dev/null
++++ b/packages/block-editor/src/components/block-alignment-matrix-toolbar/style.scss
+@@ -0,0 +1,7 @@
++.block-editor-block-alignment-matrix-toolbar__popover {
++	.components-popover__content {
++		min-width: 0;
++		padding: $grid-unit;
++		width: auto;
++	}
++}
+diff --git a/packages/block-editor/src/components/index.js b/packages/block-editor/src/components/index.js
+index e0c1ecd7901617..0c16514a59a8d0 100644
+--- a/packages/block-editor/src/components/index.js
++++ b/packages/block-editor/src/components/index.js
+@@ -8,6 +8,7 @@ export * from './font-sizes';
+ export { default as AlignmentToolbar } from './alignment-toolbar';
+ export { default as Autocomplete } from './autocomplete';
+ export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
++export { default as __experimentalBlockAlignmentMatrixToolbar } from './block-alignment-matrix-toolbar';
+ export { default as BlockBreadcrumb } from './block-breadcrumb';
+ export { BlockContextProvider } from './block-context';
+ export { default as BlockControls } from './block-controls';
+diff --git a/packages/block-editor/src/style.scss b/packages/block-editor/src/style.scss
+index a04b2cc8cd26be..55419603a6d1e8 100644
+--- a/packages/block-editor/src/style.scss
++++ b/packages/block-editor/src/style.scss
+@@ -6,6 +6,7 @@
+ // Only add styles for components that are used inside the editing canvas here:
+ 
+ @import "./autocompleters/style.scss";
++@import "./components/block-alignment-matrix-toolbar/style.scss";
+ @import "./components/block-icon/style.scss";
+ @import "./components/block-inspector/style.scss";
+ @import "./components/block-list/style.scss";
+diff --git a/packages/block-library/src/cover/block.json b/packages/block-library/src/cover/block.json
+index c2b3098b16c23e..630bb1aeed8430 100644
+--- a/packages/block-library/src/cover/block.json
++++ b/packages/block-library/src/cover/block.json
+@@ -40,6 +40,9 @@
+ 		},
+ 		"customGradient": {
+ 			"type": "string"
++		},
++		"contentPosition": {
++			"type": "string"
+ 		}
+ 	}
+ }
+diff --git a/packages/block-library/src/cover/edit.js b/packages/block-library/src/cover/edit.js
+index 5fe5db7a206757..70c0d1b350dccc 100644
+--- a/packages/block-library/src/cover/edit.js
++++ b/packages/block-library/src/cover/edit.js
+@@ -33,6 +33,7 @@ import {
+ 	__experimentalUseGradient,
+ 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
+ 	__experimentalUnitControl as UnitControl,
++	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
+ } from '@wordpress/block-editor';
+ import { __ } from '@wordpress/i18n';
+ import { withDispatch } from '@wordpress/data';
+@@ -49,6 +50,8 @@ import {
+ 	CSS_UNITS,
+ 	backgroundImageStyles,
+ 	dimRatioToClass,
++	isContentPositionCenter,
++	getPositionClassName,
+ } from './shared';
+ 
+ /**
+@@ -233,6 +236,7 @@ function CoverEdit( {
+ 	noticeOperations,
+ } ) {
+ 	const {
++		contentPosition,
+ 		id,
+ 		backgroundType,
+ 		dimRatio,
+@@ -293,6 +297,13 @@ function CoverEdit( {
+ 	const controls = (
+ 		<>
+ 			<BlockControls>
++				<BlockAlignmentMatrixToolbar
++					label={ __( 'Change content position' ) }
++					value={ contentPosition }
++					onChange={ ( nextPosition ) =>
++						setAttributes( { contentPosition: nextPosition } )
++					}
++				/>
+ 				{ hasBackground && (
+ 					<MediaReplaceFlow
+ 						mediaId={ id }
+@@ -439,14 +450,22 @@ function CoverEdit( {
+ 		);
+ 	}
+ 
+-	const classes = classnames( className, dimRatioToClass( dimRatio ), {
+-		'is-dark-theme': isDark,
+-		'has-background-dim': dimRatio !== 0,
+-		'has-parallax': hasParallax,
+-		[ overlayColor.class ]: overlayColor.class,
+-		'has-background-gradient': gradientValue,
+-		[ gradientClass ]: ! url && gradientClass,
+-	} );
++	const classes = classnames(
++		className,
++		dimRatioToClass( dimRatio ),
++		{
++			'is-dark-theme': isDark,
++			'has-background-dim': dimRatio !== 0,
++			'has-parallax': hasParallax,
++			[ overlayColor.class ]: overlayColor.class,
++			'has-background-gradient': gradientValue,
++			[ gradientClass ]: ! url && gradientClass,
++			'has-custom-content-position': ! isContentPositionCenter(
++				contentPosition
++			),
++		},
++		getPositionClassName( contentPosition )
++	);
+ 
+ 	return (
+ 		<>
+diff --git a/packages/block-library/src/cover/save.js b/packages/block-library/src/cover/save.js
+index 4e45fa41347b58..0e4fdbdd176909 100644
+--- a/packages/block-library/src/cover/save.js
++++ b/packages/block-library/src/cover/save.js
+@@ -20,12 +20,15 @@ import {
+ 	VIDEO_BACKGROUND_TYPE,
+ 	backgroundImageStyles,
+ 	dimRatioToClass,
++	isContentPositionCenter,
++	getPositionClassName,
+ } from './shared';
+ 
+ export default function save( { attributes } ) {
+ 	const {
+ 		backgroundType,
+ 		gradient,
++		contentPosition,
+ 		customGradient,
+ 		customOverlayColor,
+ 		dimRatio,
+@@ -70,7 +73,11 @@ export default function save( { attributes } ) {
+ 			'has-parallax': hasParallax,
+ 			'has-background-gradient': gradient || customGradient,
+ 			[ gradientClass ]: ! url && gradientClass,
+-		}
++			'has-custom-content-position': ! isContentPositionCenter(
++				contentPosition
++			),
++		},
++		getPositionClassName( contentPosition )
+ 	);
+ 
+ 	return (
+diff --git a/packages/block-library/src/cover/shared.js b/packages/block-library/src/cover/shared.js
+index 1fba24ccd1c68f..655fe7d5947269 100644
+--- a/packages/block-library/src/cover/shared.js
++++ b/packages/block-library/src/cover/shared.js
+@@ -1,3 +1,16 @@
++const POSITION_CLASSNAMES = {
++	'top left': 'is-position-top-left',
++	'top center': 'is-position-top-center',
++	'top right': 'is-position-top-right',
++	'center left': 'is-position-center-left',
++	'center center': 'is-position-center-center',
++	center: 'is-position-center-center',
++	'center right': 'is-position-center-right',
++	'bottom left': 'is-position-bottom-left',
++	'bottom center': 'is-position-bottom-center',
++	'bottom right': 'is-position-bottom-right',
++};
++
+ export const IMAGE_BACKGROUND_TYPE = 'image';
+ export const VIDEO_BACKGROUND_TYPE = 'video';
+ export const COVER_MIN_HEIGHT = 50;
+@@ -56,3 +69,17 @@ export function attributesFromMedia( setAttributes ) {
+ 		} );
+ 	};
+ }
++
++export function getPositionClassName( contentPosition ) {
++	if ( contentPosition === undefined ) return '';
++
++	return POSITION_CLASSNAMES[ contentPosition ];
++}
++
++export function isContentPositionCenter( contentPosition ) {
++	return (
++		! contentPosition ||
++		contentPosition === 'center center' ||
++		contentPosition === 'center'
++	);
++}
+diff --git a/packages/block-library/src/cover/style.scss b/packages/block-library/src/cover/style.scss
+index 1742bf45f9de5a..4dc295d28fd849 100644
+--- a/packages/block-library/src/cover/style.scss
++++ b/packages/block-library/src/cover/style.scss
+@@ -10,6 +10,8 @@
+ 	justify-content: center;
+ 	align-items: center;
+ 	overflow: hidden;
++	padding: $grid-unit-20;
++
+ 	&.has-parallax {
+ 		background-attachment: fixed;
+ 
+@@ -108,6 +110,53 @@
+ 			color: inherit;
+ 		}
+ 	}
++
++	// Position: Top
++	&.is-position-top-left {
++		align-items: flex-start;
++		justify-content: flex-start;
++	}
++	&.is-position-top-center {
++		align-items: flex-start;
++		justify-content: center;
++	}
++	&.is-position-top-right {
++		align-items: flex-start;
++		justify-content: flex-end;
++	}
++	// Position: Center
++	&.is-position-center-left {
++		align-items: center;
++		justify-content: flex-start;
++	}
++	&.is-position-center-center {
++		align-items: center;
++		justify-content: center;
++	}
++	&.is-position-center-right {
++		align-items: center;
++		justify-content: flex-end;
++	}
++	// Position: Bottom
++	&.is-position-bottom-left {
++		align-items: flex-end;
++		justify-content: flex-start;
++	}
++	&.is-position-bottom-center {
++		align-items: flex-end;
++		justify-content: center;
++	}
++	&.is-position-bottom-right {
++		align-items: flex-end;
++		justify-content: flex-end;
++	}
++
++	&.has-custom-content-position.has-custom-content-position {
++		.wp-block-cover__inner-container {
++			margin: 0;
++			width: auto;
++		}
++	}
+ }
+ 
+ .wp-block-cover__video-background {
+diff --git a/packages/components/src/alignment-matrix-control/README.md b/packages/components/src/alignment-matrix-control/README.md
+new file mode 100644
+index 00000000000000..2b24a52e3ca71c
+--- /dev/null
++++ b/packages/components/src/alignment-matrix-control/README.md
+@@ -0,0 +1,18 @@
++# AlignmentMatrixControl
++
++AlignmentMatrixControl components let adjust horizontal and vertical alignments for UI.
++
++## Usage
++
++```jsx
++import { AlignmentMatrixControl } from '@wordpress/components';
++import { useState } from '@wordpress/elememt';
++
++const Example = () => {
++	const [ alignment, setAlignment ] = useState( 'center center' );
++
++	return (
++		<AlignmentMatrixControl value={ alignment } onChange={ setAlignment } />
++	);
++};
++```
+diff --git a/packages/components/src/alignment-matrix-control/cell.js b/packages/components/src/alignment-matrix-control/cell.js
+new file mode 100644
+index 00000000000000..2485b306abf43d
+--- /dev/null
++++ b/packages/components/src/alignment-matrix-control/cell.js
+@@ -0,0 +1,35 @@
++/**
++ * External dependencies
++ */
++import { unstable_CompositeItem as CompositeItem } from 'reakit/Composite';
++
++/**
++ * Internal dependencies
++ */
++import Tooltip from '../tooltip';
++import VisuallyHidden from '../visually-hidden';
++
++/**
++ * Internal dependencies
++ */
++import { ALIGNMENT_LABEL } from './utils';
++import {
++	Cell as CellView,
++	Point,
++} from './styles/alignment-matrix-control-styles';
++
++export default function Cell( { isActive = false, value, ...props } ) {
++	const tooltipText = ALIGNMENT_LABEL[ value ];
++
++	return (
++		<Tooltip text={ tooltipText }>
++			<CompositeItem as={ CellView } role="gridcell" { ...props }>
++				{ /* VoiceOver needs a text content to be rendered within grid cell,
++			otherwise it'll announce the content as "blank". So we use a visually
++			hidden element instead of aria-label. */ }
++				<VisuallyHidden>{ value }</VisuallyHidden>
++				<Point isActive={ isActive } role="presentation" />
++			</CompositeItem>
++		</Tooltip>
++	);
++}
+diff --git a/packages/components/src/alignment-matrix-control/icon.js b/packages/components/src/alignment-matrix-control/icon.js
+new file mode 100644
+index 00000000000000..e712b7471ff237
+--- /dev/null
++++ b/packages/components/src/alignment-matrix-control/icon.js
+@@ -0,0 +1,59 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import { ALIGNMENTS, getAlignmentIndex } from './utils';
++import {
++	Root,
++	Cell,
++	Point,
++} from './styles/alignment-matrix-control-icon-styles';
++
++const BASE_SIZE = 24;
++
++export default function AlignmentMatrixControlIcon( {
++	className,
++	disablePointerEvents = true,
++	size = BASE_SIZE,
++	style = {},
++	value = 'center',
++	...props
++} ) {
++	const alignIndex = getAlignmentIndex( value );
++	const scale = ( size / BASE_SIZE ).toFixed( 2 );
++
++	const classes = classnames(
++		'component-alignment-matrix-control-icon',
++		className
++	);
++
++	const styles = {
++		...style,
++		transform: `scale(${ scale })`,
++	};
++
++	return (
++		<Root
++			{ ...props }
++			className={ classes }
++			disablePointerEvents={ disablePointerEvents }
++			role="presentation"
++			size={ size }
++			style={ styles }
++		>
++			{ ALIGNMENTS.map( ( align, index ) => {
++				const isActive = alignIndex === index;
++
++				return (
++					<Cell key={ align }>
++						<Point isActive={ isActive } />
++					</Cell>
++				);
++			} ) }
++		</Root>
++	);
++}
+diff --git a/packages/components/src/alignment-matrix-control/index.js b/packages/components/src/alignment-matrix-control/index.js
+new file mode 100644
+index 00000000000000..20467dd5068e4b
+--- /dev/null
++++ b/packages/components/src/alignment-matrix-control/index.js
+@@ -0,0 +1,115 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++import classnames from 'classnames';
++import {
++	unstable_useCompositeState as useCompositeState,
++	unstable_Composite as Composite,
++	unstable_CompositeGroup as CompositeGroup,
++} from 'reakit';
++
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++import { useInstanceId } from '@wordpress/compose';
++import { useState, useEffect } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import Cell from './cell';
++import { Root, Row } from './styles/alignment-matrix-control-styles';
++import { useRTL } from '../utils/rtl';
++import AlignmentMatrixControlIcon from './icon';
++import { GRID, getItemId } from './utils';
++
++function useBaseId( id ) {
++	const instanceId = useInstanceId(
++		AlignmentMatrixControl,
++		'alignment-matrix-control'
++	);
++
++	return id || instanceId;
++}
++
++export default function AlignmentMatrixControl( {
++	className,
++	id,
++	label = __( 'Alignment Matrix Control' ),
++	defaultValue = 'center center',
++	value,
++	onChange = noop,
++	width = 92,
++	...props
++} ) {
++	const [ immutableDefaultValue ] = useState( value ?? defaultValue );
++	const isRTL = useRTL();
++	const baseId = useBaseId( id );
++	const initialCurrentId = getItemId( baseId, immutableDefaultValue );
++
++	const composite = useCompositeState( {
++		baseId,
++		currentId: initialCurrentId,
++		rtl: isRTL,
++	} );
++
++	const handleOnChange = ( nextValue ) => {
++		onChange( nextValue );
++	};
++
++	useEffect( () => {
++		if ( typeof value !== 'undefined' ) {
++			composite.setCurrentId( getItemId( baseId, value ) );
++		}
++	}, [ value, composite.setCurrentId ] );
++
++	const classes = classnames(
++		'component-alignment-matrix-control',
++		className
++	);
++
++	return (
++		<Composite
++			{ ...props }
++			{ ...composite }
++			aria-label={ label }
++			as={ Root }
++			className={ classes }
++			role="grid"
++			width={ width }
++		>
++			{ GRID.map( ( cells, index ) => (
++				<CompositeGroup
++					{ ...composite }
++					as={ Row }
++					role="row"
++					key={ index }
++				>
++					{ cells.map( ( cell ) => {
++						const cellId = getItemId( baseId, cell );
++						const isActive = composite.currentId === cellId;
++
++						return (
++							<Cell
++								{ ...composite }
++								id={ cellId }
++								isActive={ isActive }
++								key={ cell }
++								value={ cell }
++								onFocus={ () => handleOnChange( cell ) }
++								onClick={ () =>
++									// VoiceOver doesn't focus elements on click
++									composite.move( cellId )
++								}
++							/>
++						);
++					} ) }
++				</CompositeGroup>
++			) ) }
++		</Composite>
++	);
++}
++
++AlignmentMatrixControl.Icon = AlignmentMatrixControlIcon;
+diff --git a/packages/components/src/alignment-matrix-control/stories/index.js b/packages/components/src/alignment-matrix-control/stories/index.js
+new file mode 100644
+index 00000000000000..a7139239fbd6c1
+--- /dev/null
++++ b/packages/components/src/alignment-matrix-control/stories/index.js
+@@ -0,0 +1,44 @@
++/**
++ * External dependencies
++ */
++import { number, select } from '@storybook/addon-knobs';
++/**
++ * WordPress dependencies
++ */
++import { Icon as BaseIcon } from '@wordpress/icons';
++/**
++ * Internal dependencies
++ */
++import AlignmentMatrixControl from '../';
++import { ALIGNMENTS } from '../utils';
++
++const alignmentOptions = ALIGNMENTS.reduce( ( options, item ) => {
++	return { ...options, [ item ]: item };
++}, {} );
++
++export default {
++	title: 'Components/AlignmentMatrixControl',
++	component: AlignmentMatrixControl,
++};
++
++export const _default = () => {
++	const props = {
++		value: select( 'value', alignmentOptions, 'center center' ),
++	};
++
++	return <AlignmentMatrixControl { ...props } />;
++};
++
++export const icon = () => {
++	const props = {
++		value: select( 'value', alignmentOptions, 'center center' ),
++		size: number( 'size', 24 ),
++	};
++
++	return (
++		<BaseIcon
++			icon={ <AlignmentMatrixControl.Icon size={ props.size } /> }
++			{ ...props }
++		/>
++	);
++};
+diff --git a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.js b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.js
+new file mode 100644
+index 00000000000000..8dfe83f423f540
+--- /dev/null
++++ b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.js
+@@ -0,0 +1,69 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css } from '@emotion/core';
++
++/**
++ * Internal dependencies
++ */
++import {
++	rootBase,
++	pointBase,
++	Cell as CellBase,
++} from './alignment-matrix-control-styles';
++
++const rootSize = () => {
++	const padding = 2;
++	const size = 24;
++
++	return css( {
++		gridTemplateRows: `repeat( 3, calc( ${ size - 2 }px / 3))`,
++		padding,
++		maxHeight: size,
++		maxWidth: size,
++	} );
++};
++
++const rootPointerEvents = ( { disablePointerEvents } ) => {
++	return css( {
++		pointerEvents: disablePointerEvents ? 'none' : null,
++	} );
++};
++
++export const Wrapper = styled.div`
++	box-sizing: border-box;
++	padding: 2px;
++`;
++
++export const Root = styled.div`
++	transform-origin: top left;
++	height: 100%;
++	width: 100%;
++
++	${rootBase};
++	${rootSize};
++	${rootPointerEvents};
++`;
++
++const pointActive = ( { isActive } ) => {
++	const boxShadow = isActive ? `0 0 0 1px currentColor` : null;
++
++	return css`
++		box-shadow: ${boxShadow};
++		color: currentColor;
++
++		*:hover > & {
++			color: currentColor;
++		}
++	`;
++};
++
++export const Point = styled.span`
++	height: 2px;
++	width: 2px;
++	${pointBase};
++	${pointActive};
++`;
++
++export const Cell = CellBase;
+diff --git a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js
+new file mode 100644
+index 00000000000000..d5552eeb5911d4
+--- /dev/null
++++ b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js
+@@ -0,0 +1,92 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css } from '@emotion/core';
++
++/**
++ * Internal dependencies
++ */
++import { color, reduceMotion } from '../../utils/style-mixins';
++
++export const rootBase = () => {
++	return css`
++		border-radius: 2px;
++		box-sizing: border-box;
++		display: grid;
++		grid-template-columns: repeat( 3, 1fr );
++		outline: none;
++	`;
++};
++
++const rootSize = ( { size = 92 } ) => {
++	return css`
++		grid-template-rows: repeat( 3, calc( ${size}px / 3 ) );
++		width: ${size}px;
++	`;
++};
++
++export const Root = styled.div`
++	${rootBase};
++
++	border: 1px solid transparent;
++	cursor: pointer;
++	grid-template-columns: auto;
++
++	${rootSize};
++`;
++
++export const Row = styled.div`
++	box-sizing: border-box;
++	display: grid;
++	grid-template-columns: repeat( 3, 1fr );
++`;
++
++const pointActive = ( { isActive } ) => {
++	const boxShadow = isActive ? `0 0 0 2px ${ color( 'black' ) }` : null;
++	const pointColor = isActive ? color( 'black' ) : color( 'lightGray.800' );
++	const pointColorHover = isActive
++		? color( 'black' )
++		: color( 'blue.medium.focus' );
++
++	return css`
++		box-shadow: ${boxShadow};
++		color: ${pointColor};
++
++		*:hover > & {
++			color: ${pointColorHover};
++		}
++	`;
++};
++
++export const pointBase = ( props ) => {
++	return css`
++		background: currentColor;
++		box-sizing: border-box;
++		display: grid;
++		margin: auto;
++		transition: all 120ms linear;
++
++		${reduceMotion( 'transition' )}
++		${pointActive( props )}
++	`;
++};
++
++export const Point = styled.span`
++	height: 6px;
++	width: 6px;
++	${pointBase}
++`;
++
++export const Cell = styled.span`
++	appearance: none;
++	border: none;
++	box-sizing: border-box;
++	margin: 0;
++	display: flex;
++	position: relative;
++	outline: none;
++	align-items: center;
++	justify-content: center;
++	padding: 0;
++`;
+diff --git a/packages/components/src/alignment-matrix-control/test/index.js b/packages/components/src/alignment-matrix-control/test/index.js
+new file mode 100644
+index 00000000000000..7758d77d317ae1
+--- /dev/null
++++ b/packages/components/src/alignment-matrix-control/test/index.js
+@@ -0,0 +1,85 @@
++/**
++ * External dependencies
++ */
++import { render, unmountComponentAtNode } from 'react-dom';
++import { act, Simulate } from 'react-dom/test-utils';
++
++/**
++ * Internal dependencies
++ */
++import AlignmentMatrixControl from '../';
++
++const __windowFocus = window.focus;
++
++beforeAll( () => {
++	window.focus = jest.fn();
++} );
++
++afterAll( () => {
++	window.focus = __windowFocus;
++} );
++
++let container = null;
++
++beforeEach( () => {
++	container = document.createElement( 'div' );
++	document.body.appendChild( container );
++} );
++
++afterEach( () => {
++	unmountComponentAtNode( container );
++	container.remove();
++	container = null;
++} );
++
++const getControl = () => {
++	return container.querySelector( '.component-alignment-matrix-control' );
++};
++
++const getCells = () => {
++	const control = getControl();
++	return control.querySelectorAll( '[role="gridcell"]' );
++};
++
++describe( 'AlignmentMatrixControl', () => {
++	describe( 'Basic rendering', () => {
++		it( 'should render', () => {
++			act( () => {
++				render( <AlignmentMatrixControl />, container );
++			} );
++			const control = getControl();
++
++			expect( control ).toBeTruthy();
++		} );
++	} );
++
++	describe( 'Change value', () => {
++		it( 'should change value on cell click', () => {
++			const spy = jest.fn();
++
++			act( () => {
++				render(
++					<AlignmentMatrixControl
++						value={ 'center' }
++						onChange={ spy }
++					/>,
++					container
++				);
++			} );
++
++			const cells = getCells();
++
++			act( () => Simulate.click( cells[ 3 ] ) );
++
++			expect( spy.mock.calls[ 0 ][ 0 ] ).toBe( 'center left' );
++
++			act( () => Simulate.click( cells[ 4 ] ) );
++
++			expect( spy.mock.calls[ 1 ][ 0 ] ).toBe( 'center center' );
++
++			act( () => Simulate.click( cells[ 7 ] ) );
++
++			expect( spy.mock.calls[ 2 ][ 0 ] ).toBe( 'bottom center' );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/alignment-matrix-control/utils.js b/packages/components/src/alignment-matrix-control/utils.js
+new file mode 100644
+index 00000000000000..77d08b9f080591
+--- /dev/null
++++ b/packages/components/src/alignment-matrix-control/utils.js
+@@ -0,0 +1,72 @@
++/**
++ * External dependencies
++ */
++import { flattenDeep } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++
++export const GRID = [
++	[ 'top left', 'top center', 'top right' ],
++	[ 'center left', 'center center', 'center right' ],
++	[ 'bottom left', 'bottom center', 'bottom right' ],
++];
++
++// Stored as map as i18n __() only accepts strings (not variables)
++export const ALIGNMENT_LABEL = {
++	'top left': __( 'Top Left' ),
++	'top center': __( 'Top Center' ),
++	'top right': __( 'Top Right' ),
++	'center left': __( 'Center Left' ),
++	'center center': __( 'Center Center' ),
++	'center right': __( 'Center Right' ),
++	'bottom left': __( 'Bottom Left' ),
++	'bottom center': __( 'Bottom Center' ),
++	'bottom right': __( 'Bottom Right' ),
++};
++
++// Transforms GRID into a flat Array of values
++export const ALIGNMENTS = flattenDeep( GRID );
++
++/**
++ * Parses and transforms an incoming value to better match the alignment values
++ *
++ * @param {string} value An alignment value to parse.
++ *
++ * @return {string} The parsed value.
++ */
++export function transformValue( value ) {
++	const nextValue = value === 'center' ? 'center center' : value;
++
++	return nextValue.replace( '-', ' ' );
++}
++
++/**
++ * Creates an item ID based on a prefix ID and an alignment value.
++ *
++ * @param {string} prefixId An ID to prefix.
++ * @param {string} value An alignment value.
++ *
++ * @return {string} The item id.
++ */
++export function getItemId( prefixId, value ) {
++	const valueId = transformValue( value ).replace( ' ', '-' );
++
++	return `${ prefixId }-${ valueId }`;
++}
++
++/**
++ * Retrieves the alignment index from a value.
++ *
++ * @param {string} alignment Value to check.
++ *
++ * @return {number} The index of a matching alignment.
++ */
++export function getAlignmentIndex( alignment = 'center' ) {
++	const item = transformValue( alignment ).replace( '-', ' ' );
++	const index = ALIGNMENTS.indexOf( item );
++
++	return index > -1 ? index : undefined;
++}
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 22010927940e1b..293eff0c10bf11 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -11,6 +11,7 @@ export {
+ } from '@wordpress/primitives';
+ 
+ // Components
++export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
+ export { default as Animate } from './animate';
+ export { default as AnglePickerControl } from './angle-picker-control';
+ export { default as Autocomplete } from './autocomplete';
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index c09a86b3cf6781..7622ba461913e0 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -37,7 +37,7 @@ import {
+ 	Wrapper,
+ } from './styles/range-control-styles';
+ import InputField from './input-field';
+-import { useRtl } from '../utils/rtl';
++import { useRTL } from '../utils/rtl';
+ 
+ const BaseRangeControl = forwardRef(
+ 	(
+@@ -71,7 +71,7 @@ const BaseRangeControl = forwardRef(
+ 		},
+ 		ref
+ 	) => {
+-		const isRTL = useRtl();
++		const isRTL = useRTL();
+ 
+ 		const sliderValue =
+ 			valueProp !== undefined ? valueProp : initialPosition;
+diff --git a/packages/components/src/utils/rtl.js b/packages/components/src/utils/rtl.js
+index bc312455baa3a6..88a3f651af96c1 100644
+--- a/packages/components/src/utils/rtl.js
++++ b/packages/components/src/utils/rtl.js
+@@ -14,7 +14,7 @@ const UPPER_RIGHT_REGEXP = new RegExp( /Right/g );
+  *
+  * @return {boolean} Whether document is RTL.
+  */
+-function getRtl() {
++export function getRTL() {
+ 	return !! ( document && document.documentElement.dir === 'rtl' );
+ }
+ 
+@@ -23,8 +23,8 @@ function getRtl() {
+  *
+  * @return {boolean} Whether document is RTL.
+  */
+-export function useRtl() {
+-	return getRtl();
++export function useRTL() {
++	return getRTL();
+ }
+ 
+ /**
+@@ -83,12 +83,12 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
+  */
+ export function rtl( ltrStyles = {}, rtlStyles ) {
+ 	return () => {
+-		const isRtl = getRtl();
++		const isRTL = getRTL();
+ 
+ 		if ( rtlStyles ) {
+-			return isRtl ? css( rtlStyles ) : css( ltrStyles );
++			return isRTL ? css( rtlStyles ) : css( ltrStyles );
+ 		}
+ 
+-		return isRtl ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
++		return isRTL ? css( convertLTRToRTL( ltrStyles ) ) : css( ltrStyles );
+ 	};
+ }
+diff --git a/packages/compose/README.md b/packages/compose/README.md
+index 66e6d5dab88206..454ee6293b2ae6 100644
+--- a/packages/compose/README.md
++++ b/packages/compose/README.md
+@@ -126,6 +126,7 @@ Provides a unique instance ID.
+ _Parameters_
+ 
+ -   _object_ `Object`: Object reference to create an id for.
++-   _prefix_ `string`: Prefix for the unique id.
+ 
+ <a name="useKeyboardShortcut" href="#useKeyboardShortcut">#</a> **useKeyboardShortcut**
+ 
+diff --git a/packages/compose/src/hooks/use-instance-id/index.js b/packages/compose/src/hooks/use-instance-id/index.js
+index 2b93a5fe1b5a6e..fd36653552162a 100644
+--- a/packages/compose/src/hooks/use-instance-id/index.js
++++ b/packages/compose/src/hooks/use-instance-id/index.js
+@@ -20,7 +20,11 @@ function createId( object ) {
+  * Provides a unique instance ID.
+  *
+  * @param {Object} object Object reference to create an id for.
++ * @param {string} prefix Prefix for the unique id.
+  */
+-export default function useInstanceId( object ) {
+-	return useMemo( () => createId( object ), [ object ] );
++export default function useInstanceId( object, prefix ) {
++	return useMemo( () => {
++		const id = createId( object );
++		return prefix ? `${ prefix }-${ id }` : id;
++	}, [ object ] );
+ }

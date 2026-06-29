@@ -1,0 +1,168 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 55f5f489fbb31b..d52010acc6e9a9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   Fixed an issue where the `Guide` component’s close button became invisible on hover when used on light backgrounds. The component's close button now relies on the default button hover effect, and the custom hover color is applied only within `welcome-guide` implementations to maintain consistency. ([#73220](https://github.com/WordPress/gutenberg/pull/73220))
++
+ ## 30.8.0 (2025-11-12)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/guide/style.scss b/packages/components/src/guide/style.scss
+index 06813db8da2a01..30a273d197e032 100644
+--- a/packages/components/src/guide/style.scss
++++ b/packages/components/src/guide/style.scss
+@@ -31,12 +31,6 @@
+ 			align-self: flex-start;
+ 			margin: $grid-unit-10 $grid-unit-10 0 0;
+ 			position: static;
+-
+-			&:hover {
+-				svg {
+-					fill: $white;
+-				}
+-			}
+ 		}
+ 	}
+ 
+diff --git a/packages/edit-post/CHANGELOG.md b/packages/edit-post/CHANGELOG.md
+index e3106b1a406aea..75059993a434a5 100644
+--- a/packages/edit-post/CHANGELOG.md
++++ b/packages/edit-post/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Adjusted `welcome-guide` styles to define the close-button hover state internally after refactoring in the shared `Guide` component.
++
+ ## 8.35.0 (2025-11-12)
+ 
+ ## 8.34.0 (2025-10-29)
+diff --git a/packages/edit-post/src/components/welcome-guide/style.scss b/packages/edit-post/src/components/welcome-guide/style.scss
+index 5c15d0949f957e..e6c0793a65383f 100644
+--- a/packages/edit-post/src/components/welcome-guide/style.scss
++++ b/packages/edit-post/src/components/welcome-guide/style.scss
+@@ -34,6 +34,13 @@
+ 		margin: 0 4px;
+ 		vertical-align: text-top;
+ 	}
++	.components-button {
++		&:hover {
++			svg {
++				fill: $white;
++			}
++		}
++	}
+ }
+ 
+ .edit-template-welcome-guide {
+diff --git a/packages/edit-site/CHANGELOG.md b/packages/edit-site/CHANGELOG.md
+index c0bf907ca5832c..0802dc24db9b95 100644
+--- a/packages/edit-site/CHANGELOG.md
++++ b/packages/edit-site/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Updated `welcome-guide` styles to apply the close-button hover color locally, following changes to the shared `Guide` component.
++
+ ## 6.35.0 (2025-11-12)
+ 
+ ## 6.34.0 (2025-10-29)
+diff --git a/packages/edit-site/src/components/welcome-guide/style.scss b/packages/edit-site/src/components/welcome-guide/style.scss
+index 5a54cc04e48420..3c3daae1c0ce26 100644
+--- a/packages/edit-site/src/components/welcome-guide/style.scss
++++ b/packages/edit-site/src/components/welcome-guide/style.scss
+@@ -1,3 +1,4 @@
++@use "@wordpress/base-styles/colors" as *;
+ @use "@wordpress/base-styles/variables" as *;
+ 
+ .edit-site-welcome-guide {
+@@ -49,4 +50,11 @@
+ 		margin: 0 4px;
+ 		vertical-align: text-top;
+ 	}
++	.components-button {
++		&:hover {
++			svg {
++				fill: $white;
++			}
++		}
++	}
+ }
+diff --git a/packages/edit-widgets/CHANGELOG.md b/packages/edit-widgets/CHANGELOG.md
+index 007c6841e374e4..db6258125ebf48 100644
+--- a/packages/edit-widgets/CHANGELOG.md
++++ b/packages/edit-widgets/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Updated the `welcome-guide` implementation to specify its own close-button hover color, matching previous behavior after changes in the `Guide` component.
++
+ ## 6.35.0 (2025-11-12)
+ 
+ ## 6.34.0 (2025-10-29)
+diff --git a/packages/edit-widgets/src/components/welcome-guide/style.scss b/packages/edit-widgets/src/components/welcome-guide/style.scss
+index ebcb157156737f..a995f7668f1572 100644
+--- a/packages/edit-widgets/src/components/welcome-guide/style.scss
++++ b/packages/edit-widgets/src/components/welcome-guide/style.scss
+@@ -1,3 +1,4 @@
++@use "@wordpress/base-styles/colors" as *;
+ @use "@wordpress/base-styles/variables" as *;
+ 
+ .edit-widgets-welcome-guide {
+@@ -32,4 +33,11 @@
+ 		margin: 0 4px;
+ 		vertical-align: text-top;
+ 	}
++	.components-button {
++		&:hover {
++			svg {
++				fill: $white;
++			}
++		}
++	}
+ }
+diff --git a/packages/editor/CHANGELOG.md b/packages/editor/CHANGELOG.md
+index 05320fabd64b56..9946f02cb69047 100644
+--- a/packages/editor/CHANGELOG.md
++++ b/packages/editor/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Applied the `welcome-guide` close-button hover color locally to maintain consistent styling after changes to the shared `Guide` component.
++
+ ## 14.35.0 (2025-11-12)
+ 
+ ## 14.34.0 (2025-10-29)
+diff --git a/packages/editor/src/components/global-styles-sidebar/style.scss b/packages/editor/src/components/global-styles-sidebar/style.scss
+index 6ef5f5ff51e698..441628644efa72 100644
+--- a/packages/editor/src/components/global-styles-sidebar/style.scss
++++ b/packages/editor/src/components/global-styles-sidebar/style.scss
+@@ -116,4 +116,11 @@
+ 			vertical-align: bottom;
+ 		}
+ 	}
++	.components-button {
++		&:hover {
++			svg {
++				fill: $white;
++			}
++		}
++	}
+ }

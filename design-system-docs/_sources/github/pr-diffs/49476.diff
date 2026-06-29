@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/border-control/border-control/README.md b/packages/components/src/border-control/border-control/README.md
+index 901859df2395e9..14b3df6afaf6c9 100644
+--- a/packages/components/src/border-control/border-control/README.md
++++ b/packages/components/src/border-control/border-control/README.md
+@@ -22,6 +22,7 @@ a "shape" abstraction.
+ ```jsx
+ import { __experimentalBorderControl as BorderControl } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
++import { useState } from '@wordpress/element';
+ 
+ const colors = [
+ 	{ name: 'Blue 20', color: '#72aee6' },

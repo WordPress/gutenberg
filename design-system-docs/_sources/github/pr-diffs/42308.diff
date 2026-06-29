@@ -1,0 +1,95 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bb2b2a04c56aad..1944af962098a7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -   `Slot`/`Fill`: Refactor away from Lodash ([#42153](https://github.com/WordPress/gutenberg/pull/42153/)).
+ -   `ComboboxControl`: Refactor away from `_.deburr()` ([#42169](https://github.com/WordPress/gutenberg/pull/42169/)).
+ -   `FormTokenField`: Refactor away from `_.identity()` ([#42215](https://github.com/WordPress/gutenberg/pull/42215/)).
++-   `SelectControl`: Use roles and `@testing-library/user-event` in unit tests ([#42308](https://github.com/WordPress/gutenberg/pull/42308)).
+ -   `Autocomplete`: Refactor away from `_.deburr()` ([#42266](https://github.com/WordPress/gutenberg/pull/42266/)).
+ -   `MenuItem`: Refactor away from `_.isString()` ([#42268](https://github.com/WordPress/gutenberg/pull/42268/)).
+ -   `Shortcut`: Refactor away from `_.isString()` ([#42268](https://github.com/WordPress/gutenberg/pull/42268/)).
+diff --git a/packages/components/src/select-control/test/select-control.tsx b/packages/components/src/select-control/test/select-control.tsx
+index e1979ccbd709b4..3e0dd45d62b586 100644
+--- a/packages/components/src/select-control/test/select-control.tsx
++++ b/packages/components/src/select-control/test/select-control.tsx
+@@ -1,21 +1,29 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen, fireEvent } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
+ 
+ /**
+  * Internal dependencies
+  */
+ import SelectControl from '..';
+ 
++const setupUser = () =>
++	userEvent.setup( {
++		advanceTimers: jest.advanceTimersByTime,
++	} );
++
+ describe( 'SelectControl', () => {
+ 	it( 'should not render when no options or children are provided', () => {
+-		const { container } = render( <SelectControl /> );
++		render( <SelectControl /> );
+ 
+-		expect( container.firstChild ).toBeNull();
++		// use `queryByRole` to avoid throwing an error with `getByRole`
++		expect( screen.queryByRole( 'combobox' ) ).not.toBeInTheDocument();
+ 	} );
+ 
+ 	it( 'should not render its children', async () => {
++		const user = setupUser();
+ 		const handleChangeMock = jest.fn();
+ 
+ 		render(
+@@ -30,13 +38,12 @@ describe( 'SelectControl', () => {
+ 			</SelectControl>
+ 		);
+ 
+-		expect( screen.getByText( 'Option 1' ) ).toBeInTheDocument();
++		expect(
++			screen.getByRole( 'option', { name: 'Option 1' } )
++		).toBeInTheDocument();
+ 
+-		const selectElement = screen.getByLabelText( 'Select' );
+-
+-		fireEvent.change( selectElement, {
+-			target: { value: 'option-group-option-1' },
+-		} );
++		const selectElement = screen.getByRole( 'combobox' );
++		await user.selectOptions( selectElement, 'option-group-option-1' );
+ 
+ 		expect( handleChangeMock ).toHaveBeenCalledWith(
+ 			'option-group-option-1',
+@@ -45,6 +52,7 @@ describe( 'SelectControl', () => {
+ 	} );
+ 
+ 	it( 'should not render its options', async () => {
++		const user = setupUser();
+ 		const handleChangeMock = jest.fn();
+ 
+ 		render(
+@@ -66,13 +74,12 @@ describe( 'SelectControl', () => {
+ 			/>
+ 		);
+ 
+-		expect( screen.getByText( 'Option 1' ) ).toBeInTheDocument();
+-
+-		const selectElement = screen.getByLabelText( 'Select' );
++		expect(
++			screen.getByRole( 'option', { name: 'Option 1' } )
++		).toBeInTheDocument();
+ 
+-		fireEvent.change( selectElement, {
+-			target: { value: 'option-2' },
+-		} );
++		const selectElement = screen.getByRole( 'combobox' );
++		await user.selectOptions( selectElement, 'option-2' );
+ 
+ 		expect( handleChangeMock ).toHaveBeenCalledWith(
+ 			'option-2',

@@ -1,0 +1,336 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index aa72d126dfb69d..3a6ce15c62a7a9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -21,6 +21,7 @@
+ 
+ ### Enhancements
+ 
++-   `ToggleGroupControl`: support disabled options ([#63450](https://github.com/WordPress/gutenberg/pull/63450)).
+ -   `CustomSelectControl`: Stabilize `__experimentalShowSelectedHint` and `options[]. __experimentalHint` props ([#63248](https://github.com/WordPress/gutenberg/pull/63248)).
+ 
+ ## 28.3.0 (2024-07-10)
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index a7adcc81aa7359..cdfa4b1883cc16 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -132,6 +132,11 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   border: 0;
+ }
+ 
++.emotion-12[disabled] {
++  opacity: 0.4;
++  cursor: default;
++}
++
+ .emotion-12:active {
+   background: #fff;
+ }
+@@ -213,6 +218,11 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   border: 0;
+ }
+ 
++.emotion-18[disabled] {
++  opacity: 0.4;
++  cursor: default;
++}
++
+ .emotion-18:active {
+   background: #fff;
+ }
+@@ -238,7 +248,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+         class="components-toggle-group-control emotion-8 emotion-9"
+         data-wp-c16t="true"
+         data-wp-component="ToggleGroupControl"
+-        id="toggle-group-control-as-radio-group-10"
++        id="toggle-group-control-as-radio-group-11"
+         role="radiogroup"
+       >
+         <div
+@@ -252,7 +262,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+             data-value="uppercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+-            id="toggle-group-control-as-radio-group-10-24"
++            id="toggle-group-control-as-radio-group-11-30"
+             role="radio"
+             type="button"
+             value="uppercase"
+@@ -291,7 +301,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+             data-value="lowercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+-            id="toggle-group-control-as-radio-group-10-25"
++            id="toggle-group-control-as-radio-group-11-31"
+             role="radio"
+             type="button"
+             value="lowercase"
+@@ -452,6 +462,11 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+   border: 0;
+ }
+ 
++.emotion-12[disabled] {
++  opacity: 0.4;
++  cursor: default;
++}
++
+ .emotion-12:active {
+   background: #fff;
+ }
+@@ -486,7 +501,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+         class="components-toggle-group-control emotion-8 emotion-9"
+         data-wp-c16t="true"
+         data-wp-component="ToggleGroupControl"
+-        id="toggle-group-control-as-radio-group-9"
++        id="toggle-group-control-as-radio-group-10"
+         role="radiogroup"
+       >
+         <div
+@@ -499,7 +514,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+             data-value="rigas"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+-            id="toggle-group-control-as-radio-group-9-22"
++            id="toggle-group-control-as-radio-group-10-28"
+             role="radio"
+             type="button"
+             value="rigas"
+@@ -521,7 +536,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+             data-value="jack"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+-            id="toggle-group-control-as-radio-group-9-23"
++            id="toggle-group-control-as-radio-group-10-29"
+             role="radio"
+             type="button"
+             value="jack"
+@@ -677,6 +692,11 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   border: 0;
+ }
+ 
++.emotion-12[disabled] {
++  opacity: 0.4;
++  cursor: default;
++}
++
+ .emotion-12:active {
+   background: #fff;
+ }
+@@ -758,6 +778,11 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   border: 0;
+ }
+ 
++.emotion-18[disabled] {
++  opacity: 0.4;
++  cursor: default;
++}
++
+ .emotion-18:active {
+   background: #fff;
+ }
+@@ -991,6 +1016,11 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+   border: 0;
+ }
+ 
++.emotion-12[disabled] {
++  opacity: 0.4;
++  cursor: default;
++}
++
+ .emotion-12:active {
+   background: #fff;
+ }
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index eadbb498ad92a5..098407feef1493 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -80,6 +80,13 @@ const optionsWithTooltip = (
+ 		/>
+ 	</>
+ );
++const optionsWithDisabledOption = (
++	<>
++		<ToggleGroupControlOption value="pizza" label="Pizza" />
++		<ToggleGroupControlOption value="rice" label="Rice" disabled />
++		<ToggleGroupControlOption value="pasta" label="Pasta" />
++	</>
++);
+ 
+ describe.each( [
+ 	[ 'uncontrolled', ToggleGroupControl ],
+@@ -351,6 +358,53 @@ describe.each( [
+ 
+ 				expect( expectedFocusTarget ).toHaveFocus();
+ 			} );
++
++			it( 'should ignore disabled radio options', async () => {
++				const mockOnChange = jest.fn();
++
++				render(
++					<Component
++						value="pizza"
++						onChange={ mockOnChange }
++						label="Test Toggle Group Control"
++					>
++						{ optionsWithDisabledOption }
++					</Component>
++				);
++
++				await sleep();
++				await press.Tab();
++
++				expect(
++					screen.getByRole( 'radio', { name: 'Pizza' } )
++				).toBeChecked();
++				expect(
++					screen.getByRole( 'radio', { name: 'Rice' } )
++				).toBeDisabled();
++
++				// Arrow navigation skips the disabled option
++				await press.ArrowRight();
++				expect(
++					screen.getByRole( 'radio', { name: 'Pasta' } )
++				).toBeChecked();
++				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
++				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pasta' );
++
++				// Arrow navigation skips the disabled option
++				await press.ArrowLeft();
++				expect(
++					screen.getByRole( 'radio', { name: 'Pizza' } )
++				).toBeChecked();
++				expect( mockOnChange ).toHaveBeenCalledTimes( 2 );
++				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pizza' );
++
++				// Clicks don't cause the option to be selected
++				await click( screen.getByRole( 'radio', { name: 'Rice' } ) );
++				expect(
++					screen.getByRole( 'radio', { name: 'Pizza' } )
++				).toBeChecked();
++				expect( mockOnChange ).toHaveBeenCalledTimes( 2 );
++			} );
+ 		} );
+ 
+ 		describe( 'isDeselectable = true', () => {
+@@ -421,6 +475,66 @@ describe.each( [
+ 					} )
+ 				).toHaveFocus();
+ 			} );
++
++			it( 'should ignore disabled options', async () => {
++				const mockOnChange = jest.fn();
++
++				render(
++					<Component
++						value="pizza"
++						isDeselectable
++						onChange={ mockOnChange }
++						label="Test Toggle Group Control"
++					>
++						{ optionsWithDisabledOption }
++					</Component>
++				);
++
++				await sleep();
++				await press.Tab();
++
++				expect(
++					screen.getByRole( 'button', {
++						name: 'Pizza',
++						pressed: true,
++					} )
++				).toBeVisible();
++				expect(
++					screen.getByRole( 'button', {
++						name: 'Rice',
++						pressed: false,
++					} )
++				).toBeDisabled();
++
++				// Tab key navigation skips the disabled option
++				await press.Tab();
++				await press.Space();
++				expect(
++					screen.getByRole( 'button', {
++						name: 'Pasta',
++						pressed: true,
++					} )
++				).toHaveFocus();
++				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
++				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pasta' );
++
++				// Tab key navigation skips the disabled option
++				await press.ShiftTab();
++				expect(
++					screen.getByRole( 'button', {
++						name: 'Pizza',
++						pressed: false,
++					} )
++				).toHaveFocus();
++
++				// Clicks don't cause the option to be selected.
++				await click(
++					screen.getByRole( 'button', {
++						name: 'Rice',
++					} )
++				);
++				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
++			} );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index b2b94bd6df233a..30d74e68913f22 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -52,7 +52,9 @@ function ToggleGroupControlOptionBase(
+ 			false
+ 		>,
+ 		// the element's id is generated internally
+-		'id'
++		| 'id'
++		// due to how the component works, only the `disabled` prop should be used
++		| 'aria-disabled'
+ 	>,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+@@ -82,6 +84,7 @@ function ToggleGroupControlOptionBase(
+ 		children,
+ 		showTooltip = false,
+ 		onFocus: onFocusProp,
++		disabled,
+ 		...otherButtonProps
+ 	} = buttonProps;
+ 
+@@ -130,6 +133,7 @@ function ToggleGroupControlOptionBase(
+ 				{ isDeselectable ? (
+ 					<button
+ 						{ ...commonProps }
++						disabled={ disabled }
+ 						onFocus={ onFocusProp }
+ 						aria-pressed={ isPressed }
+ 						type="button"
+@@ -139,6 +143,7 @@ function ToggleGroupControlOptionBase(
+ 					</button>
+ 				) : (
+ 					<Ariakit.Radio
++						disabled={ disabled }
+ 						render={
+ 							<button
+ 								type="button"
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+index c929af69414004..999a25df8bdd40 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+@@ -64,6 +64,11 @@ export const buttonView = ( {
+ 		border: 0;
+ 	}
+ 
++	&[disabled] {
++		opacity: 0.4;
++		cursor: default;
++	}
++
+ 	&:active {
+ 		background: ${ CONFIG.toggleGroupControlBackgroundColor };
+ 	}

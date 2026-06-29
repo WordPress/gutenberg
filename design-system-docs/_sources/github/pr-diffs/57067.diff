@@ -1,0 +1,60 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b1c41b9a05f53f..387f5b10d0a738 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,15 +5,14 @@
+ ### Bug Fix
+ 
+ -   `PaletteEdit`: Consider digits when generating kebab-cased slug ([#56713](https://github.com/WordPress/gutenberg/pull/56713)).
++-   `Button`: Fix logic of `has-text` class addition ([#56949](https://github.com/WordPress/gutenberg/pull/56949)).
++-   `Snackbar`: Fix `__unstableHTML` support ([#57067](https://github.com/WordPress/gutenberg/pull/57067)).
++
+ 
+ ### Experimental
+ 
+ -   `TabPanel`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
+ 
+-### Bug Fix
+-
+--   `Button`: Fix logic of `has-text` class addition ([#56949](https://github.com/WordPress/gutenberg/pull/56949)).
+-
+ ## 25.14.0 (2023-12-13)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/snackbar/index.tsx b/packages/components/src/snackbar/index.tsx
+index 45f1800bb2249f..9ca48fe02a20d3 100644
+--- a/packages/components/src/snackbar/index.tsx
++++ b/packages/components/src/snackbar/index.tsx
+@@ -8,7 +8,12 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { speak } from '@wordpress/a11y';
+-import { useEffect, forwardRef, renderToString } from '@wordpress/element';
++import {
++	useEffect,
++	forwardRef,
++	renderToString,
++	RawHTML,
++} from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import warning from '@wordpress/warning';
+ 
+@@ -53,6 +58,7 @@ function UnforwardedSnackbar(
+ 		onRemove,
+ 		icon = null,
+ 		explicitDismiss = false,
++		__unstableHTML,
+ 		// onDismiss is a callback executed when the snackbar is dismissed.
+ 		// It is distinct from onRemove, which _looks_ like a callback but is
+ 		// actually the function to call to remove the snackbar from the UI.
+@@ -119,6 +125,10 @@ function UnforwardedSnackbar(
+ 		}
+ 	);
+ 
++	if ( __unstableHTML && typeof children === 'string' ) {
++		children = <RawHTML>{ children }</RawHTML>;
++	}
++
+ 	return (
+ 		<div
+ 			ref={ ref }

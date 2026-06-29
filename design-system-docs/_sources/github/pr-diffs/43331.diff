@@ -1,0 +1,507 @@
+diff --git a/packages/block-editor/src/hooks/font-appearance.js b/packages/block-editor/src/hooks/font-appearance.js
+index b398ef58dc28c4..af25daed0d30b5 100644
+--- a/packages/block-editor/src/hooks/font-appearance.js
++++ b/packages/block-editor/src/hooks/font-appearance.js
+@@ -58,6 +58,7 @@ export function FontAppearanceEdit( props ) {
+ 			hasFontStyles={ hasFontStyles }
+ 			hasFontWeights={ hasFontWeights }
+ 			value={ { fontStyle, fontWeight } }
++			size="__unstable-large"
+ 		/>
+ 	);
+ }
+diff --git a/packages/block-editor/src/hooks/font-family.js b/packages/block-editor/src/hooks/font-family.js
+index 12c36eac6882b0..fe8693f64421bf 100644
+--- a/packages/block-editor/src/hooks/font-family.js
++++ b/packages/block-editor/src/hooks/font-family.js
+@@ -132,6 +132,8 @@ export function FontFamilyEdit( {
+ 			fontFamilies={ fontFamilies }
+ 			value={ value }
+ 			onChange={ onChange }
++			size="__unstable-large"
++			__nextHasNoMarginBottom
+ 		/>
+ 	);
+ }
+diff --git a/packages/block-editor/src/hooks/font-size.js b/packages/block-editor/src/hooks/font-size.js
+index f0b7315d02330e..40abdd8f8eb302 100644
+--- a/packages/block-editor/src/hooks/font-size.js
++++ b/packages/block-editor/src/hooks/font-size.js
+@@ -147,6 +147,8 @@ export function FontSizeEdit( props ) {
+ 			onChange={ onChange }
+ 			value={ fontSizeValue }
+ 			withReset={ false }
++			size="__unstable-large"
++			__nextHasNoMarginBottom
+ 		/>
+ 	);
+ }
+diff --git a/packages/block-editor/src/hooks/letter-spacing.js b/packages/block-editor/src/hooks/letter-spacing.js
+index 3dc0d82b7b9a7a..9e214fd07d792c 100644
+--- a/packages/block-editor/src/hooks/letter-spacing.js
++++ b/packages/block-editor/src/hooks/letter-spacing.js
+@@ -46,6 +46,7 @@ export function LetterSpacingEdit( props ) {
+ 			value={ style?.typography?.letterSpacing }
+ 			onChange={ onChange }
+ 			__unstableInputWidth={ '100%' }
++			size="__unstable-large"
+ 		/>
+ 	);
+ }
+diff --git a/packages/block-editor/src/hooks/line-height.js b/packages/block-editor/src/hooks/line-height.js
+index 7f4c2d5a4aa01b..c8397d850a1e55 100644
+--- a/packages/block-editor/src/hooks/line-height.js
++++ b/packages/block-editor/src/hooks/line-height.js
+@@ -42,6 +42,7 @@ export function LineHeightEdit( props ) {
+ 			__nextHasNoMarginBottom={ true }
+ 			value={ style?.typography?.lineHeight }
+ 			onChange={ onChange }
++			size="__unstable-large"
+ 		/>
+ 	);
+ }
+diff --git a/packages/block-editor/src/hooks/text-decoration.js b/packages/block-editor/src/hooks/text-decoration.js
+index 65f0aadf77d1e1..17ba9ee73f698f 100644
+--- a/packages/block-editor/src/hooks/text-decoration.js
++++ b/packages/block-editor/src/hooks/text-decoration.js
+@@ -46,6 +46,7 @@ export function TextDecorationEdit( props ) {
+ 		<TextDecorationControl
+ 			value={ style?.typography?.textDecoration }
+ 			onChange={ onChange }
++			size="__unstable-large"
+ 		/>
+ 	);
+ }
+diff --git a/packages/block-editor/src/hooks/text-transform.js b/packages/block-editor/src/hooks/text-transform.js
+index b2710b5f654b59..588327633ecb8a 100644
+--- a/packages/block-editor/src/hooks/text-transform.js
++++ b/packages/block-editor/src/hooks/text-transform.js
+@@ -46,6 +46,7 @@ export function TextTransformEdit( props ) {
+ 		<TextTransformControl
+ 			value={ style?.typography?.textTransform }
+ 			onChange={ onChange }
++			size="__unstable-large"
+ 		/>
+ 	);
+ }
+diff --git a/packages/block-editor/src/hooks/typography.scss b/packages/block-editor/src/hooks/typography.scss
+index 7d7d44c24b4e2a..ea939116dfba3c 100644
+--- a/packages/block-editor/src/hooks/typography.scss
++++ b/packages/block-editor/src/hooks/typography.scss
+@@ -1,10 +1,4 @@
+ .typography-block-support-panel {
+-	.components-font-size-picker__controls,
+-	.block-editor-text-decoration-control__buttons,
+-	.block-editor-text-transform-control__buttons {
+-		margin-bottom: 0;
+-	}
+-
+ 	.single-column {
+ 		grid-column: span 1;
+ 	}
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7d3fd67a4984ff..3974615604b4d1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ -   `AlignmentMatrixControl`: keep the physical direction in RTL languages ([#43126](https://github.com/WordPress/gutenberg/pull/43126)).
+ -   `AlignmentMatrixControl`: Fix the `width` prop so it works as intended ([#43482](https://github.com/WordPress/gutenberg/pull/43482)).
+ -   `SelectControl`, `CustomSelectControl`: Truncate long option strings ([#43301](https://github.com/WordPress/gutenberg/pull/43301)).
++-   `ToggleGroupControl`: Fix minor inconsistency in label height ([#43331](https://github.com/WordPress/gutenberg/pull/43331)).
+ -   `Popover`: fix and improve opening animation ([#43186](https://github.com/WordPress/gutenberg/pull/43186)).
+ -   `Popover`: fix incorrect deps in hooks resulting in incorrect positioning after calling `update` ([#43267](https://github.com/WordPress/gutenberg/pull/43267/)).
+ -   `FontSizePicker`: Fix excessive margin between label and input ([#43304](https://github.com/WordPress/gutenberg/pull/43304)).
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 2ce03affa087fd..519a7702985ce1 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -22,6 +22,13 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ }
+ 
+ .emotion-4 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++}
++
++.emotion-6 {
+   font-size: 11px;
+   font-weight: 500;
+   line-height: 1.4;
+@@ -31,7 +38,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+   padding: 0;
+ }
+ 
+-.emotion-6 {
++.emotion-8 {
+   background: #fff;
+   border: 1px solid transparent;
+   border-radius: 2px;
+@@ -49,23 +56,23 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+-  .emotion-6 {
++  .emotion-8 {
+     transition-duration: 0ms;
+   }
+ }
+ 
+-.emotion-6:focus-within {
++.emotion-8:focus-within {
+   border-color: var( --wp-admin-theme-color-darker-10, #006ba1);
+   box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #007cba);
+   outline: none;
+   z-index: 1;
+ }
+ 
+-.emotion-6:hover {
++.emotion-8:hover {
+   border-color: #757575;
+ }
+ 
+-.emotion-8 {
++.emotion-10 {
+   background: #1e1e1e;
+   border-radius: 2px;
+   box-shadow: transparent;
+@@ -79,12 +86,12 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+-  .emotion-8 {
++  .emotion-10 {
+     transition-duration: 0ms;
+   }
+ }
+ 
+-.emotion-10 {
++.emotion-12 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+   display: -ms-inline-flexbox;
+@@ -97,7 +104,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+   flex: 1;
+ }
+ 
+-.emotion-12 {
++.emotion-14 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -138,34 +145,34 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+-  .emotion-12 {
++  .emotion-14 {
+     transition-duration: 0ms;
+   }
+ }
+ 
+-.emotion-12::-moz-focus-inner {
++.emotion-14::-moz-focus-inner {
+   border: 0;
+ }
+ 
+-.emotion-12:active {
++.emotion-14:active {
+   background: #fff;
+ }
+ 
+-.emotion-13 {
++.emotion-15 {
+   width: 30px;
+   padding-left: 0;
+   padding-right: 0;
+ }
+ 
+-.emotion-14 {
++.emotion-16 {
+   color: #fff;
+ }
+ 
+-.emotion-14:active {
++.emotion-16:active {
+   background: transparent;
+ }
+ 
+-.emotion-15 {
++.emotion-17 {
+   font-size: 13px;
+   line-height: 1;
+ }
+@@ -176,16 +183,18 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+   <div
+     class="components-base-control__field emotion-2 emotion-3"
+   >
+-    <div>
++    <div
++      class="emotion-4 emotion-5"
++    >
+       <span
+-        class="components-base-control__label emotion-4 emotion-5"
++        class="components-base-control__label emotion-6 emotion-7"
+       >
+         Test Toggle Group Control
+       </span>
+     </div>
+     <div
+       aria-label="Test Toggle Group Control"
+-      class="components-toggle-group-control emotion-6 emotion-7"
++      class="components-toggle-group-control emotion-8 emotion-9"
+       data-wp-c16t="true"
+       data-wp-component="ToggleGroupControl"
+       id="toggle-group-control-1"
+@@ -196,18 +205,18 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+         style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
+       />
+       <div
+-        class="emotion-8 emotion-9"
++        class="emotion-10 emotion-11"
+         role="presentation"
+         style="transform: translateX(0px); transition: none; width: 0px;"
+       />
+       <div
+-        class="emotion-10 emotion-11"
++        class="emotion-12 emotion-13"
+         data-active="true"
+       >
+         <button
+           aria-checked="true"
+           aria-label="Uppercase"
+-          class="emotion-12 emotion-13 components-toggle-group-control-option-base emotion-14"
++          class="emotion-14 emotion-15 components-toggle-group-control-option-base emotion-16"
+           data-value="uppercase"
+           data-wp-c16t="true"
+           data-wp-component="ToggleGroupControlOptionBase"
+@@ -216,7 +225,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+           tabindex="0"
+         >
+           <div
+-            class="emotion-15 emotion-16"
++            class="emotion-17 emotion-18"
+           >
+             <svg
+               aria-hidden="true"
+@@ -234,13 +243,13 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+         </button>
+       </div>
+       <div
+-        class="emotion-10 emotion-11"
++        class="emotion-12 emotion-13"
+         data-active="false"
+       >
+         <button
+           aria-checked="false"
+           aria-label="Lowercase"
+-          class="emotion-12 emotion-13 components-toggle-group-control-option-base"
++          class="emotion-14 emotion-15 components-toggle-group-control-option-base"
+           data-value="lowercase"
+           data-wp-c16t="true"
+           data-wp-component="ToggleGroupControlOptionBase"
+@@ -249,7 +258,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+           tabindex="-1"
+         >
+           <div
+-            class="emotion-15 emotion-16"
++            class="emotion-17 emotion-18"
+           >
+             <svg
+               aria-hidden="true"
+@@ -293,6 +302,13 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+ }
+ 
+ .emotion-4 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++}
++
++.emotion-6 {
+   font-size: 11px;
+   font-weight: 500;
+   line-height: 1.4;
+@@ -302,7 +318,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+   padding: 0;
+ }
+ 
+-.emotion-6 {
++.emotion-8 {
+   background: #fff;
+   border: 1px solid transparent;
+   border-radius: 2px;
+@@ -320,23 +336,23 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+-  .emotion-6 {
++  .emotion-8 {
+     transition-duration: 0ms;
+   }
+ }
+ 
+-.emotion-6:focus-within {
++.emotion-8:focus-within {
+   border-color: var( --wp-admin-theme-color-darker-10, #006ba1);
+   box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #007cba);
+   outline: none;
+   z-index: 1;
+ }
+ 
+-.emotion-6:hover {
++.emotion-8:hover {
+   border-color: #757575;
+ }
+ 
+-.emotion-8 {
++.emotion-10 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+   display: -ms-inline-flexbox;
+@@ -349,7 +365,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+   flex: 1;
+ }
+ 
+-.emotion-10 {
++.emotion-12 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -390,20 +406,20 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+-  .emotion-10 {
++  .emotion-12 {
+     transition-duration: 0ms;
+   }
+ }
+ 
+-.emotion-10::-moz-focus-inner {
++.emotion-12::-moz-focus-inner {
+   border: 0;
+ }
+ 
+-.emotion-10:active {
++.emotion-12:active {
+   background: #fff;
+ }
+ 
+-.emotion-11 {
++.emotion-13 {
+   font-size: 13px;
+   line-height: 1;
+ }
+@@ -414,16 +430,18 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+   <div
+     class="components-base-control__field emotion-2 emotion-3"
+   >
+-    <div>
++    <div
++      class="emotion-4 emotion-5"
++    >
+       <span
+-        class="components-base-control__label emotion-4 emotion-5"
++        class="components-base-control__label emotion-6 emotion-7"
+       >
+         Test Toggle Group Control
+       </span>
+     </div>
+     <div
+       aria-label="Test Toggle Group Control"
+-      class="components-toggle-group-control emotion-6 emotion-7"
++      class="components-toggle-group-control emotion-8 emotion-9"
+       data-wp-c16t="true"
+       data-wp-component="ToggleGroupControl"
+       id="toggle-group-control-0"
+@@ -434,13 +452,13 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+         style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
+       />
+       <div
+-        class="emotion-8 emotion-9"
++        class="emotion-10 emotion-11"
+         data-active="false"
+       >
+         <button
+           aria-checked="false"
+           aria-label="R"
+-          class="emotion-10 components-toggle-group-control-option-base"
++          class="emotion-12 components-toggle-group-control-option-base"
+           data-value="rigas"
+           data-wp-c16t="true"
+           data-wp-component="ToggleGroupControlOptionBase"
+@@ -449,20 +467,20 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+           tabindex="0"
+         >
+           <div
+-            class="emotion-11 emotion-12"
++            class="emotion-13 emotion-14"
+           >
+             R
+           </div>
+         </button>
+       </div>
+       <div
+-        class="emotion-8 emotion-9"
++        class="emotion-10 emotion-11"
+         data-active="false"
+       >
+         <button
+           aria-checked="false"
+           aria-label="J"
+-          class="emotion-10 components-toggle-group-control-option-base"
++          class="emotion-12 components-toggle-group-control-option-base"
+           data-value="jack"
+           data-wp-c16t="true"
+           data-wp-component="ToggleGroupControlOptionBase"
+@@ -471,7 +489,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+           tabindex="-1"
+         >
+           <div
+-            class="emotion-11 emotion-12"
++            class="emotion-13 emotion-14"
+           >
+             J
+           </div>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 05603a602ba067..61a072441fae06 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -31,6 +31,7 @@ import BaseControl from '../../base-control';
+ import type { ToggleGroupControlProps } from '../types';
+ import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
+ import ToggleGroupControlContext from '../context';
++import { VisualLabelWrapper } from './styles';
+ import * as styles from './styles';
+ 
+ const noop = () => {};
+@@ -102,11 +103,11 @@ function UnconnectedToggleGroupControl(
+ 				value={ { ...radio, isBlock: ! isAdaptiveWidth, size } }
+ 			>
+ 				{ ! hideLabelFromVision && (
+-					<div>
++					<VisualLabelWrapper>
+ 						<BaseControl.VisualLabel>
+ 							{ label }
+ 						</BaseControl.VisualLabel>
+-					</div>
++					</VisualLabelWrapper>
+ 				) }
+ 				<RadioGroup
+ 					{ ...radio }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+index 5d92004603778f..8cfed980974c90 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -73,3 +73,8 @@ export const BackdropView = styled.div`
+ 	${ reduceMotion( 'transition' ) }
+ 	z-index: 1;
+ `;
++
++export const VisualLabelWrapper = styled.div`
++	// Makes the inline label be the correct height, equivalent to setting line-height: 0
++	display: flex;
++`;

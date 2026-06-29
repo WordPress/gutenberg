@@ -1,0 +1,117 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3d54eee6ba3809..d29f08b10d58a3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ ### Enhancements
+ 
+ -   `BorderControl`: Improve labelling, tooltips and DOM structure ([#42348](https://github.com/WordPress/gutenberg/pull/42348/)).
++-   `BorderControl`: Allow optional rendering as fieldset with legend ([#42611](https://github.com/WordPress/gutenberg/pull/42611)).
+ -   `BaseControl`: Set zero padding on `StyledLabel` to ensure cross-browser styling ([#42348](https://github.com/WordPress/gutenberg/pull/42348/)).
+ -   `InputControl`: Implement wrapper subcomponents for adding responsive padding to `prefix`/`suffix` ([#42378](https://github.com/WordPress/gutenberg/pull/42378)).
+ -   `SelectControl`: Add flag for larger default size ([#42456](https://github.com/WordPress/gutenberg/pull/42456/)).
+diff --git a/packages/components/src/border-control/border-control/README.md b/packages/components/src/border-control/border-control/README.md
+index a4d0f2017f2d65..b63094eadd2aef 100644
+--- a/packages/components/src/border-control/border-control/README.md
++++ b/packages/components/src/border-control/border-control/README.md
+@@ -113,6 +113,14 @@ _Note: the value may be `undefined` if a user clears all border properties._
+ 
+ - Required: Yes
+ 
++### `renderAsFieldset`: `boolean`
++
++Whether or not the `BorderControl` should render as a fieldset and use a legend
++for its label.
++
++- Required: No
++- Default: false
++
+ ### `shouldSanitizeBorder`: `boolean`
+ 
+ If opted into, sanitizing the border means that if no width or color have been
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index e7cea20616d582..221c943822329d 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -16,19 +16,19 @@ import { VisuallyHidden } from '../../visually-hidden';
+ import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import { useBorderControl } from './hook';
+ 
+-import type { BorderControlProps, LabelProps } from '../types';
++import type { BorderControlProps, BorderLabelProps } from '../types';
+ 
+-const BorderLabel = ( props: LabelProps ) => {
+-	const { label, hideLabelFromVision } = props;
++const BorderLabel = ( props: BorderLabelProps ) => {
++	const { label, hideLabelFromVision, ...labelProps } = props;
+ 
+ 	if ( ! label ) {
+ 		return null;
+ 	}
+ 
+ 	return hideLabelFromVision ? (
+-		<VisuallyHidden as="legend">{ label }</VisuallyHidden>
++		<VisuallyHidden { ...labelProps }>{ label }</VisuallyHidden>
+ 	) : (
+-		<StyledLabel as="legend">{ label }</StyledLabel>
++		<StyledLabel { ...labelProps }>{ label }</StyledLabel>
+ 	);
+ };
+ 
+@@ -50,6 +50,7 @@ const UnconnectedBorderControl = (
+ 		placeholder,
+ 		__unstablePopoverProps,
+ 		previousStyleSelection,
++		renderAsFieldset = false,
+ 		showDropdownHeader,
+ 		sliderClassName,
+ 		value: border,
+@@ -64,10 +65,15 @@ const UnconnectedBorderControl = (
+ 	} = useBorderControl( props );
+ 
+ 	return (
+-		<View as="fieldset" { ...otherProps } ref={ forwardedRef }>
++		<View
++			as={ renderAsFieldset ? 'fieldset' : undefined }
++			{ ...otherProps }
++			ref={ forwardedRef }
++		>
+ 			<BorderLabel
+ 				label={ label }
+ 				hideLabelFromVision={ hideLabelFromVision }
++				as={ renderAsFieldset ? 'legend' : undefined }
+ 			/>
+ 			<HStack spacing={ 3 }>
+ 				<HStack className={ innerWrapperClassName } alignment="stretch">
+diff --git a/packages/components/src/border-control/types.ts b/packages/components/src/border-control/types.ts
+index 0605b2e40fe413..1ff39077518cfd 100644
+--- a/packages/components/src/border-control/types.ts
++++ b/packages/components/src/border-control/types.ts
+@@ -60,6 +60,13 @@ export type LabelProps = {
+ 	label?: string;
+ };
+ 
++export type BorderLabelProps = LabelProps & {
++	/**
++	 * Allows rendering the label as a legend for use inside a fieldset.
++	 */
++	as?: 'legend';
++};
++
+ export type BorderControlProps = ColorProps &
+ 	LabelProps & {
+ 		/**
+@@ -84,6 +91,13 @@ export type BorderControlProps = ColorProps &
+ 		 * An internal prop used to control the visibility of the dropdown.
+ 		 */
+ 		__unstablePopoverProps?: Record< string, unknown >;
++		/**
++		 * Whether or not the `BorderControl` should render as a fieldset and
++		 * use a legend for its label.
++		 *
++		 * @default false
++		 */
++		renderAsFieldset?: boolean;
+ 		/**
+ 		 * If opted into, sanitizing the border means that if no width or color
+ 		 * have been selected, the border style is also cleared and `undefined`

@@ -1,0 +1,210 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 73150d640d73d9..a91c82413277c8 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -7,6 +7,10 @@
+ -   Add `--wpds-border-radius-xl` for page and app shell surfaces so nested cards and notices can stay on `--wpds-border-radius-lg` without matching the parent radius ([#78913](https://github.com/WordPress/gutenberg/pull/78913)).
+ -   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `subtle`, `moderate`, `pronounced`) via prebuilt design token modes. [#78816](https://github.com/WordPress/gutenberg/pull/78816).
+ 
++### Enhancements
++
++-   `ThemeProvider`: forward the `cornerRadius` preset to the document element when `isRoot` is set, matching `color` and `cursor`. [#79153](https://github.com/WordPress/gutenberg/pull/79153).
++
+ ### Breaking Changes
+ 
+ -   Rename the `bg` and `fg` design token groups to `background` and `foreground`. All `--wpds-color-bg-*` custom properties are now `--wpds-color-background-*`, and all `--wpds-color-fg-*` custom properties are now `--wpds-color-foreground-*` ([#79098](https://github.com/WordPress/gutenberg/pull/79098)).
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 695197af9b80e4..bbf40879c5432f 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -334,7 +334,8 @@
+ 	}
+ }
+ 
+-[data-wpds-corner-radius='none'] {
++[data-wpds-corner-radius='none'],
++:root:has( [data-wpds-root-provider='true'][data-wpds-corner-radius='none'] ) {
+ 	/* Buttons and other elements nested inside controls. */
+ 	--wpds-border-radius-xs: 0;
+ 	/* Standalone buttons, inputs, and compact controls. */
+@@ -347,7 +348,10 @@
+ 	--wpds-border-radius-xl: 0;
+ }
+ 
+-[data-wpds-corner-radius='subtle'] {
++[data-wpds-corner-radius='subtle'],
++:root:has(
++		[data-wpds-root-provider='true'][data-wpds-corner-radius='subtle']
++	) {
+ 	/* Buttons and other elements nested inside controls. */
+ 	--wpds-border-radius-xs: 1px;
+ 	/* Standalone buttons, inputs, and compact controls. */
+@@ -360,7 +364,10 @@
+ 	--wpds-border-radius-xl: 12px;
+ }
+ 
+-[data-wpds-corner-radius='moderate'] {
++[data-wpds-corner-radius='moderate'],
++:root:has(
++		[data-wpds-root-provider='true'][data-wpds-corner-radius='moderate']
++	) {
+ 	/* Buttons and other elements nested inside controls. */
+ 	--wpds-border-radius-xs: 6px;
+ 	/* Standalone buttons, inputs, and compact controls. */
+@@ -373,7 +380,10 @@
+ 	--wpds-border-radius-xl: 20px;
+ }
+ 
+-[data-wpds-corner-radius='pronounced'] {
++[data-wpds-corner-radius='pronounced'],
++:root:has(
++		[data-wpds-root-provider='true'][data-wpds-corner-radius='pronounced']
++	) {
+ 	/* Buttons and other elements nested inside controls. */
+ 	--wpds-border-radius-xs: 18px;
+ 	/* Standalone buttons, inputs, and compact controls. */
+diff --git a/packages/theme/src/test/theme-provider.test.tsx b/packages/theme/src/test/theme-provider.test.tsx
+index 37e410d717494b..b1d0433279f126 100644
+--- a/packages/theme/src/test/theme-provider.test.tsx
++++ b/packages/theme/src/test/theme-provider.test.tsx
+@@ -3,6 +3,8 @@
+ // is asserted on the provider's own scoping element (where the property is
+ // defined and from which real children would inherit) and on the document root.
+ 
++import { readFileSync } from 'fs';
++import { join } from 'path';
+ import { render, screen } from '@testing-library/react';
+ import { ThemeProvider } from '../theme-provider';
+ 
+@@ -21,6 +23,7 @@ jest.mock( '../style.module.css', () => ( {
+ const BRAND_BG = '--wpds-color-background-interactive-brand-strong';
+ const SURFACE_BG = '--wpds-color-background-surface-neutral';
+ const CURSOR_CONTROL = '--wpds-cursor-control';
++const BORDER_RADIUS_SM = '--wpds-border-radius-sm';
+ const PRIMARY = '#1e90ff';
+ const OTHER_PRIMARY = '#8e44ad';
+ const BACKGROUND = '#f8f8f8';
+@@ -127,6 +130,72 @@ describe( 'ThemeProvider', () => {
+ 
+ 			expect( readProp( document.documentElement, BRAND_BG ) ).toBe( '' );
+ 		} );
++
++		// Unlike color/cursor (emitted at runtime in the provider's own
++		// `<style>`), the `cornerRadius` preset resolves to
++		// `--wpds-border-radius-*` values through the prebuilt design-token CSS
++		// (the modes authored in `terrazzo.config.ts`). A root provider relies
++		// on that stylesheet's `:root:has( [data-wpds-root-provider='true']… )`
++		// rule to forward the preset to the document element, so these tests
++		// load the prebuilt CSS to exercise it. It is injected only for this
++		// block (it also defines base tokens on `:root`) to avoid interfering
++		// with the color assertions above.
++		describe( 'cornerRadius forwarding', () => {
++			let prebuiltStyle: HTMLStyleElement;
++
++			beforeAll( () => {
++				prebuiltStyle = document.createElement( 'style' );
++				prebuiltStyle.textContent = readFileSync(
++					join( __dirname, '../prebuilt/css/design-tokens.css' ),
++					'utf8'
++				);
++				document.head.appendChild( prebuiltStyle );
++			} );
++
++			afterAll( () => {
++				prebuiltStyle.remove();
++			} );
++
++			it( 'forwards the preset to the document root when isRoot is set', () => {
++				render(
++					<ThemeProvider isRoot cornerRadius="moderate">
++						<div data-testid="child">x</div>
++					</ThemeProvider>
++				);
++
++				const provider = getScopingProvider(
++					screen.getByTestId( 'child' )
++				);
++				const forwarded = readProp(
++					document.documentElement,
++					BORDER_RADIUS_SM
++				);
++
++				// `:root` resolves to the same `moderate` value as the provider.
++				expect( forwarded ).toBeTruthy();
++				expect( forwarded ).toBe(
++					readProp( provider, BORDER_RADIUS_SM )
++				);
++			} );
++
++			it( 'does not forward the preset to the document root by default', () => {
++				render(
++					<ThemeProvider cornerRadius="moderate">
++						<div data-testid="child">x</div>
++					</ThemeProvider>
++				);
++
++				const provider = getScopingProvider(
++					screen.getByTestId( 'child' )
++				);
++
++				// `:root` keeps the base preset rather than the provider's
++				// `moderate` one, since the provider is not a root provider.
++				expect(
++					readProp( document.documentElement, BORDER_RADIUS_SM )
++				).not.toBe( readProp( provider, BORDER_RADIUS_SM ) );
++			} );
++		} );
+ 	} );
+ 
+ 	describe( 'nested providers', () => {
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index 44b8f8612b767c..cd92c93e8ebebd 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -69,21 +69,42 @@ const config: Config = {
+ 						'@media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi )',
+ 					],
+ 				},
++				// Each corner-radius preset is applied via the
++				// `data-wpds-corner-radius` attribute that `ThemeProvider`
++				// sets on its scoping element. The additional
++				// `:root:has([data-wpds-root-provider="true"]…)` selector lets
++				// a root `ThemeProvider` forward its preset to the document
++				// element, matching how `color` and `cursor` tokens already
++				// behave so the whole token surface stays consistent on
++				// `<html>` (e.g. for PHP-rendered admin UI outside the React
++				// app).
+ 				{
+ 					mode: 'corner-radius-none',
+-					selectors: [ '[data-wpds-corner-radius="none"]' ],
++					selectors: [
++						'[data-wpds-corner-radius="none"]',
++						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="none"])',
++					],
+ 				},
+ 				{
+ 					mode: 'corner-radius-subtle',
+-					selectors: [ '[data-wpds-corner-radius="subtle"]' ],
++					selectors: [
++						'[data-wpds-corner-radius="subtle"]',
++						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="subtle"])',
++					],
+ 				},
+ 				{
+ 					mode: 'corner-radius-moderate',
+-					selectors: [ '[data-wpds-corner-radius="moderate"]' ],
++					selectors: [
++						'[data-wpds-corner-radius="moderate"]',
++						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="moderate"])',
++					],
+ 				},
+ 				{
+ 					mode: 'corner-radius-pronounced',
+-					selectors: [ '[data-wpds-corner-radius="pronounced"]' ],
++					selectors: [
++						'[data-wpds-corner-radius="pronounced"]',
++						':root:has([data-wpds-root-provider="true"][data-wpds-corner-radius="pronounced"])',
++					],
+ 				},
+ 			],
+ 			legacyHex: true,

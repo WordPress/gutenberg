@@ -1,0 +1,691 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 5ad25a66edaff4..b24c3129f1134e 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -96,6 +96,11 @@ module.exports = {
+ 						message:
+ 							'`puppeteer-testing-library` is still experimental.',
+ 					},
++					{
++						name: '@emotion/css',
++						message:
++							'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support',
++					},
+ 				],
+ 			},
+ 		],
+diff --git a/packages/components/src/base-field/hook.js b/packages/components/src/base-field/hook.js
+index f11a7169a3f5f1..28f7a3b5e6aae0 100644
+--- a/packages/components/src/base-field/hook.js
++++ b/packages/components/src/base-field/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/base-field/styles.js b/packages/components/src/base-field/styles.js
+index 20e12fee0e57f2..9c9946b85caa21 100644
+--- a/packages/components/src/base-field/styles.js
++++ b/packages/components/src/base-field/styles.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/card/card-body/hook.js b/packages/components/src/card/card-body/hook.js
+index 1f27df7ec47a19..3de530b38017b0 100644
+--- a/packages/components/src/card/card-body/hook.js
++++ b/packages/components/src/card/card-body/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/card/card-divider/hook.js b/packages/components/src/card/card-divider/hook.js
+index 9095e1497881ea..3f05de00abc04e 100644
+--- a/packages/components/src/card/card-divider/hook.js
++++ b/packages/components/src/card/card-divider/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/card/card-footer/hook.js b/packages/components/src/card/card-footer/hook.js
+index c52d4530c5d0f9..bc1345ddff1105 100644
+--- a/packages/components/src/card/card-footer/hook.js
++++ b/packages/components/src/card/card-footer/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/card/card-header/hook.js b/packages/components/src/card/card-header/hook.js
+index 5d272495ea348e..fa046ec316142b 100644
+--- a/packages/components/src/card/card-header/hook.js
++++ b/packages/components/src/card/card-header/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/card/card-media/hook.js b/packages/components/src/card/card-media/hook.js
+index fd2fba826b6e46..c0ade5fa2ffc26 100644
+--- a/packages/components/src/card/card-media/hook.js
++++ b/packages/components/src/card/card-media/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/card/card/component.js b/packages/components/src/card/card/component.js
+index 0f266f33841ac6..f49f67128883b5 100644
+--- a/packages/components/src/card/card/component.js
++++ b/packages/components/src/card/card/component.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/card/card/hook.js b/packages/components/src/card/card/hook.js
+index e90d51ec669c3e..ee3e66a22e98fb 100644
+--- a/packages/components/src/card/card/hook.js
++++ b/packages/components/src/card/card/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/card/styles.js b/packages/components/src/card/styles.js
+index 6d874a49fcceab..d4ecdd89db176c 100644
+--- a/packages/components/src/card/styles.js
++++ b/packages/components/src/card/styles.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 0bf253d1b03791..3e296464554e72 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css, cx } from '@emotion/css';
+ // eslint-disable-next-line no-restricted-imports
+ import { Separator } from 'reakit';
+diff --git a/packages/components/src/divider/styles.ts b/packages/components/src/divider/styles.ts
+index 3a6b1e20ca9861..b13218ab657fe8 100644
+--- a/packages/components/src/divider/styles.ts
++++ b/packages/components/src/divider/styles.ts
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/elevation/hook.js b/packages/components/src/elevation/hook.js
+index 173c331597f34b..3f4d6c88dbedee 100644
+--- a/packages/components/src/elevation/hook.js
++++ b/packages/components/src/elevation/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css, cx } from '@emotion/css';
+ import { isNil } from 'lodash';
+ 
+diff --git a/packages/components/src/elevation/styles.js b/packages/components/src/elevation/styles.js
+index 23c29f01d85bcf..8199f1264023d2 100644
+--- a/packages/components/src/elevation/styles.js
++++ b/packages/components/src/elevation/styles.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ export const Elevation = css`
+diff --git a/packages/components/src/flex/flex-item/hook.js b/packages/components/src/flex/flex-item/hook.js
+index 4ab2ff3beeee0b..9ea9c077e7889c 100644
+--- a/packages/components/src/flex/flex-item/hook.js
++++ b/packages/components/src/flex/flex-item/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css, cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/flex/flex/hook.js b/packages/components/src/flex/flex/hook.js
+index 044644e3c55a44..1af2602a38255d 100644
+--- a/packages/components/src/flex/flex/hook.js
++++ b/packages/components/src/flex/flex/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css, cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/flex/styles.js b/packages/components/src/flex/styles.js
+index 9fdeade2335fca..a1ca92db3afee6 100644
+--- a/packages/components/src/flex/styles.js
++++ b/packages/components/src/flex/styles.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ export const Flex = css`
+diff --git a/packages/components/src/grid/hook.js b/packages/components/src/grid/hook.js
+index 9de54c0e0a7a27..69c1e74b4954d8 100644
+--- a/packages/components/src/grid/hook.js
++++ b/packages/components/src/grid/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css, cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/scrollable/hook.js b/packages/components/src/scrollable/hook.js
+index 1451d46161275e..db71d3dc158f9b 100644
+--- a/packages/components/src/scrollable/hook.js
++++ b/packages/components/src/scrollable/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/scrollable/styles.js b/packages/components/src/scrollable/styles.js
+index 0bff9cf580bcd2..d9ae60f8f0396e 100644
+--- a/packages/components/src/scrollable/styles.js
++++ b/packages/components/src/scrollable/styles.js
+@@ -1,7 +1,11 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
++
+ /**
+  * Internal dependencies
+  */
+diff --git a/packages/components/src/spacer/hook.ts b/packages/components/src/spacer/hook.ts
+index 17215d0dfebfb8..2bca326ed584f4 100644
+--- a/packages/components/src/spacer/hook.ts
++++ b/packages/components/src/spacer/hook.ts
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css, cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/surface/hook.js b/packages/components/src/surface/hook.js
+index 1269bc06c7cae1..10b46a20aeb060 100644
+--- a/packages/components/src/surface/hook.js
++++ b/packages/components/src/surface/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/surface/styles.js b/packages/components/src/surface/styles.js
+index 2df015ef303c7c..093f96d68e8a63 100644
+--- a/packages/components/src/surface/styles.js
++++ b/packages/components/src/surface/styles.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/text/hook.js b/packages/components/src/text/hook.js
+index 10016bf53fc90e..601f8139a9859e 100644
+--- a/packages/components/src/text/hook.js
++++ b/packages/components/src/text/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css, cx } from '@emotion/css';
+ import { isPlainObject } from 'lodash';
+ 
+diff --git a/packages/components/src/text/styles.js b/packages/components/src/text/styles.js
+index 6323d6aedc5124..3f8dc4dd3e2070 100644
+--- a/packages/components/src/text/styles.js
++++ b/packages/components/src/text/styles.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/truncate/hook.js b/packages/components/src/truncate/hook.js
+index 1598074718270c..be990dd4fcc77f 100644
+--- a/packages/components/src/truncate/hook.js
++++ b/packages/components/src/truncate/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css, cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/truncate/styles.js b/packages/components/src/truncate/styles.js
+index b70e64fa76828e..d49a3e3294630f 100644
+--- a/packages/components/src/truncate/styles.js
++++ b/packages/components/src/truncate/styles.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ export const Truncate = css`
+diff --git a/packages/components/src/ui/context/use-context-system.js b/packages/components/src/ui/context/use-context-system.js
+index 48926b32c8e83f..5abbe63ef24457 100644
+--- a/packages/components/src/ui/context/use-context-system.js
++++ b/packages/components/src/ui/context/use-context-system.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/ui/control-group/hook.js b/packages/components/src/ui/control-group/hook.js
+index 3dd09bc997afaf..1a94aced2f835d 100644
+--- a/packages/components/src/ui/control-group/hook.js
++++ b/packages/components/src/ui/control-group/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/ui/control-group/styles.js b/packages/components/src/ui/control-group/styles.js
+index ef811dec1c51c4..2163aac28175c5 100644
+--- a/packages/components/src/ui/control-group/styles.js
++++ b/packages/components/src/ui/control-group/styles.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ export const first = css`
+diff --git a/packages/components/src/ui/control-label/hook.js b/packages/components/src/ui/control-label/hook.js
+index 54d4b940f4515e..66e0d7612ea769 100644
+--- a/packages/components/src/ui/control-label/hook.js
++++ b/packages/components/src/ui/control-label/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/ui/control-label/styles.js b/packages/components/src/ui/control-label/styles.js
+index 209b9fee06adfd..1a1afde87719b7 100644
+--- a/packages/components/src/ui/control-label/styles.js
++++ b/packages/components/src/ui/control-label/styles.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/ui/form-group/form-group-styles.js b/packages/components/src/ui/form-group/form-group-styles.js
+index d1c4766658159a..c69bd8b1e43def 100644
+--- a/packages/components/src/ui/form-group/form-group-styles.js
++++ b/packages/components/src/ui/form-group/form-group-styles.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ export const FormGroup = css`
+diff --git a/packages/components/src/ui/form-group/use-form-group.js b/packages/components/src/ui/form-group/use-form-group.js
+index 102a5efa634b36..b107b5cb95f988 100644
+--- a/packages/components/src/ui/form-group/use-form-group.js
++++ b/packages/components/src/ui/form-group/use-form-group.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/ui/item-group/styles.ts b/packages/components/src/ui/item-group/styles.ts
+index 8ada7b89237793..a5efb4afa9cc3e 100644
+--- a/packages/components/src/ui/item-group/styles.ts
++++ b/packages/components/src/ui/item-group/styles.ts
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/ui/item-group/use-item-group.ts b/packages/components/src/ui/item-group/use-item-group.ts
+index 0942a743cd9385..a30dfdc2d9ce4f 100644
+--- a/packages/components/src/ui/item-group/use-item-group.ts
++++ b/packages/components/src/ui/item-group/use-item-group.ts
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/ui/item-group/use-item.ts b/packages/components/src/ui/item-group/use-item.ts
+index 9f1f5736562c30..f654a886d70a31 100644
+--- a/packages/components/src/ui/item-group/use-item.ts
++++ b/packages/components/src/ui/item-group/use-item.ts
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/ui/popover/content.js b/packages/components/src/ui/popover/content.js
+index fbf48792b96489..cdb29e8c5bd582 100644
+--- a/packages/components/src/ui/popover/content.js
++++ b/packages/components/src/ui/popover/content.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css, cx } from '@emotion/css';
+ // eslint-disable-next-line no-restricted-imports
+ import { Popover as ReakitPopover } from 'reakit';
+diff --git a/packages/components/src/ui/popover/styles.js b/packages/components/src/ui/popover/styles.js
+index 9fc4dbc91352d7..b3bb67def80ab9 100644
+--- a/packages/components/src/ui/popover/styles.js
++++ b/packages/components/src/ui/popover/styles.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/ui/tooltip/content.js b/packages/components/src/ui/tooltip/content.js
+index 9a05ec7bbaaefe..4861941aa0552b 100644
+--- a/packages/components/src/ui/tooltip/content.js
++++ b/packages/components/src/ui/tooltip/content.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ // eslint-disable-next-line no-restricted-imports
+ import { Tooltip as ReakitTooltip } from 'reakit';
+diff --git a/packages/components/src/ui/tooltip/styles.js b/packages/components/src/ui/tooltip/styles.js
+index e50a89aab24099..8e3d0fabb69d4a 100644
+--- a/packages/components/src/ui/tooltip/styles.js
++++ b/packages/components/src/ui/tooltip/styles.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ import styled from '@emotion/styled';
+ 
+diff --git a/packages/components/src/ui/utils/get-high-dpi.ts b/packages/components/src/ui/utils/get-high-dpi.ts
+index b38e953511ddad..15b0e2f0aae001 100644
+--- a/packages/components/src/ui/utils/get-high-dpi.ts
++++ b/packages/components/src/ui/utils/get-high-dpi.ts
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css, CSSInterpolation } from '@emotion/css';
+ 
+ export function getHighDpi(
+diff --git a/packages/components/src/ui/visually-hidden/hook.js b/packages/components/src/ui/visually-hidden/hook.js
+index 26f3ced9797d54..a0d67887f10d72 100644
+--- a/packages/components/src/ui/visually-hidden/hook.js
++++ b/packages/components/src/ui/visually-hidden/hook.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { cx } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/ui/visually-hidden/styles.js b/packages/components/src/ui/visually-hidden/styles.js
+index 87f650b610d596..972c5a65f6e4ba 100644
+--- a/packages/components/src/ui/visually-hidden/styles.js
++++ b/packages/components/src/ui/visually-hidden/styles.js
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ /**
+diff --git a/packages/components/src/utils/browsers.js b/packages/components/src/utils/browsers.js
+index 4e71dd75954cb5..96008a62ac6a64 100644
+--- a/packages/components/src/utils/browsers.js
++++ b/packages/components/src/utils/browsers.js
+@@ -1,11 +1,14 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ 
+ /* eslint-disable jsdoc/no-undefined-types */
+ /**
+- * @param {TemplateStringsArray}                     strings
++ * @param {TemplateStringsArray}                                      strings
+  * @param {import('@emotion/css/create-instance').CSSInterpolation[]} interpolations
+  */
+ export function firefoxOnly( strings, ...interpolations ) {
+@@ -19,7 +22,7 @@ export function firefoxOnly( strings, ...interpolations ) {
+ }
+ 
+ /**
+- * @param {TemplateStringsArray}                     strings
++ * @param {TemplateStringsArray}                                      strings
+  * @param {import('@emotion/css/create-instance').CSSInterpolation[]} interpolations
+  */
+ export function safariOnly( strings, ...interpolations ) {
+diff --git a/packages/components/src/z-stack/component.tsx b/packages/components/src/z-stack/component.tsx
+index 8b4d0b6d107d20..b3357e881d262b 100644
+--- a/packages/components/src/z-stack/component.tsx
++++ b/packages/components/src/z-stack/component.tsx
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css, cx } from '@emotion/css';
+ // eslint-disable-next-line no-restricted-imports
+ import type { Ref, ReactNode } from 'react';
+diff --git a/packages/components/src/z-stack/styles.ts b/packages/components/src/z-stack/styles.ts
+index 60ae05a2a897e4..e74a60de0c705f 100644
+--- a/packages/components/src/z-stack/styles.ts
++++ b/packages/components/src/z-stack/styles.ts
+@@ -1,6 +1,9 @@
+ /**
+  * External dependencies
+  */
++// Disable reason: Temporarily disable for existing usages
++// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
++// eslint-disable-next-line no-restricted-imports
+ import { css } from '@emotion/css';
+ import styled from '@emotion/styled';
+ 

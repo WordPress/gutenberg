@@ -1,0 +1,1080 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index ba65b56b2f5037..354a1d162fb219 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1043,6 +1043,18 @@
+ 		"markdown_source": "../packages/components/src/navigation/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "NavigatorBackLink",
++		"slug": "navigator-back-link",
++		"markdown_source": "../packages/components/src/navigator/navigator-back-link/README.md",
++		"parent": "components"
++	},
++	{
++		"title": "NavigatorLink",
++		"slug": "navigator-link",
++		"markdown_source": "../packages/components/src/navigator/navigator-link/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "NavigatorProvider",
+ 		"slug": "navigator-provider",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 7951653ca10127..c6932a4b5cb08d 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -100,6 +100,8 @@ export { default as __experimentalNavigationMenu } from './navigation/menu';
+ export {
+ 	NavigatorProvider as __experimentalNavigatorProvider,
+ 	NavigatorScreen as __experimentalNavigatorScreen,
++	NavigatorLink as __experimentalNavigatorLink,
++	NavigatorBackLink as __experimentalNavigatorBackLink,
+ 	useNavigator as __experimentalUseNavigator,
+ } from './navigator';
+ export { default as Notice } from './notice';
+diff --git a/packages/components/src/navigator/context.ts b/packages/components/src/navigator/context.ts
+index 17b26fb9c14ad5..cf326f7bc352b9 100644
+--- a/packages/components/src/navigator/context.ts
++++ b/packages/components/src/navigator/context.ts
+@@ -8,5 +8,9 @@ import { createContext } from '@wordpress/element';
+  */
+ import type { NavigatorContext as NavigatorContextType } from './types';
+ 
+-const initialContextValue: NavigatorContextType = [ {}, () => {} ];
++const initialContextValue: NavigatorContextType = {
++	location: {},
++	push: () => {},
++	pop: () => {},
++};
+ export const NavigatorContext = createContext( initialContextValue );
+diff --git a/packages/components/src/navigator/index.ts b/packages/components/src/navigator/index.ts
+index b30e5cdf396de8..29e27f7e23c693 100644
+--- a/packages/components/src/navigator/index.ts
++++ b/packages/components/src/navigator/index.ts
+@@ -1,3 +1,5 @@
+ export { default as NavigatorProvider } from './navigator-provider';
+ export { default as NavigatorScreen } from './navigator-screen';
++export { default as NavigatorLink } from './navigator-link';
++export { default as NavigatorBackLink } from './navigator-back-link';
+ export { default as useNavigator } from './use-navigator';
+diff --git a/packages/components/src/navigator/navigator-back-link/README.md b/packages/components/src/navigator/navigator-back-link/README.md
+new file mode 100644
+index 00000000000000..ca98894f56209a
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-back-link/README.md
+@@ -0,0 +1,19 @@
++# `NavigatorBackLink`
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++**TODO**
++
++The `Navigator*` family of components is _not_ opinionated in terms of UI, and can be composed with any UI components to navigate between the nested screens.
++
++## Usage
++
++**TODO**
++
++## Props
++
++The component accepts the following props:
++
++**TODO**
+diff --git a/packages/components/src/navigator/navigator-back-link/component.tsx b/packages/components/src/navigator/navigator-back-link/component.tsx
+new file mode 100644
+index 00000000000000..0b1d3b398c068b
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-back-link/component.tsx
+@@ -0,0 +1,32 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
++import { View } from '../../view';
++import { useNavigatorBackLink } from './hook';
++import type { NavigatorBackLinkProps } from '../types';
++
++function NavigatorBackLink(
++	props: WordPressComponentProps< NavigatorBackLinkProps, 'button' >,
++	forwardedRef: Ref< any >
++) {
++	const navigatorBackLinkProps = useNavigatorBackLink( props );
++
++	return <View ref={ forwardedRef } { ...navigatorBackLinkProps } />;
++}
++
++/**
++ * TODO: add example
++ */
++const ConnectedNavigatorBackLink = contextConnect(
++	NavigatorBackLink,
++	'NavigatorBackLink'
++);
++
++export default ConnectedNavigatorBackLink;
+diff --git a/packages/components/src/navigator/navigator-back-link/hook.ts b/packages/components/src/navigator/navigator-back-link/hook.ts
+new file mode 100644
+index 00000000000000..1c8eb9962c287f
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-back-link/hook.ts
+@@ -0,0 +1,37 @@
++/**
++ * WordPress dependencies
++ */
++import { useCallback } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
++import Button from '../../button';
++import useNavigator from '../use-navigator';
++import type { NavigatorBackLinkProps } from '../types';
++
++export function useNavigatorBackLink(
++	props: WordPressComponentProps< NavigatorBackLinkProps, 'button' >
++) {
++	const { onClick, as = Button, ...otherProps } = useContextSystem(
++		props,
++		'NavigatorBackLink'
++	);
++
++	const { pop } = useNavigator();
++	const handleClick: React.MouseEventHandler< HTMLElement > = useCallback(
++		( e ) => {
++			e.preventDefault();
++			pop();
++			onClick?.( e );
++		},
++		[ pop, onClick ]
++	);
++
++	return {
++		as,
++		onClick: handleClick,
++		...otherProps,
++	};
++}
+diff --git a/packages/components/src/navigator/navigator-back-link/index.ts b/packages/components/src/navigator/navigator-back-link/index.ts
+new file mode 100644
+index 00000000000000..b404d7fd44a81a
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-back-link/index.ts
+@@ -0,0 +1 @@
++export { default } from './component';
+diff --git a/packages/components/src/navigator/navigator-link/README.md b/packages/components/src/navigator/navigator-link/README.md
+new file mode 100644
+index 00000000000000..7c40918859dbe9
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-link/README.md
+@@ -0,0 +1,19 @@
++# `NavigatorLink`
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++**TODO**
++
++The `Navigator*` family of components is _not_ opinionated in terms of UI, and can be composed with any UI components to navigate between the nested screens.
++
++## Usage
++
++**TODO**
++
++## Props
++
++The component accepts the following props:
++
++**TODO**
+diff --git a/packages/components/src/navigator/navigator-link/component.tsx b/packages/components/src/navigator/navigator-link/component.tsx
+new file mode 100644
+index 00000000000000..6d46135a3a2e6a
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-link/component.tsx
+@@ -0,0 +1,29 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
++import { View } from '../../view';
++import { useNavigatorLink } from './hook';
++import type { NavigatorLinkProps } from '../types';
++
++function NavigatorLink(
++	props: WordPressComponentProps< NavigatorLinkProps, 'button' >,
++	forwardedRef: Ref< any >
++) {
++	const navigatorLinkProps = useNavigatorLink( props );
++
++	return <View ref={ forwardedRef } { ...navigatorLinkProps } />;
++}
++
++/**
++ * TODO: add example
++ */
++const ConnectedNavigatorLink = contextConnect( NavigatorLink, 'NavigatorLink' );
++
++export default ConnectedNavigatorLink;
+diff --git a/packages/components/src/navigator/navigator-link/hook.ts b/packages/components/src/navigator/navigator-link/hook.ts
+new file mode 100644
+index 00000000000000..19a34cbdeede80
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-link/hook.ts
+@@ -0,0 +1,50 @@
++/**
++ * WordPress dependencies
++ */
++import { useCallback } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
++import Button from '../../button';
++import useNavigator from '../use-navigator';
++import type { NavigatorLinkProps } from '../types';
++
++const cssSelectorForAttribute = ( attrName: string, attrValue: string ) =>
++	`[${ attrName }="${ attrValue }"]`;
++
++export function useNavigatorLink(
++	props: WordPressComponentProps< NavigatorLinkProps, 'button' >
++) {
++	const {
++		path,
++		onClick,
++		as = Button,
++		attributeName = 'id',
++		...otherProps
++	} = useContextSystem( props, 'NavigatorLink' );
++
++	const { push } = useNavigator();
++	const handleClick: React.MouseEventHandler< HTMLElement > = useCallback(
++		( e ) => {
++			e.preventDefault();
++			push( path, {
++				focusTargetSelector: cssSelectorForAttribute(
++					attributeName,
++					path
++				),
++			} );
++			onClick?.( e );
++		},
++		[ push, onClick ]
++	);
++
++	return {
++		as,
++		onClick: handleClick,
++		path,
++		...otherProps,
++		[ attributeName ]: path,
++	};
++}
+diff --git a/packages/components/src/navigator/navigator-link/index.ts b/packages/components/src/navigator/navigator-link/index.ts
+new file mode 100644
+index 00000000000000..b404d7fd44a81a
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-link/index.ts
+@@ -0,0 +1 @@
++export { default } from './component';
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index df17ba55b05591..7a0a994b1c47d0 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo, useState } from '@wordpress/element';
++import { useMemo, useState, useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -21,7 +21,11 @@ import {
+ import { useCx } from '../../utils/hooks/use-cx';
+ import { View } from '../../view';
+ import { NavigatorContext } from '../context';
+-import type { NavigatorProviderProps, NavigatorPath } from '../types';
++import type {
++	NavigatorProviderProps,
++	NavigatorLocation,
++	NavigatorContext as NavigatorContextType,
++} from '../types';
+ 
+ function NavigatorProvider(
+ 	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
+@@ -34,9 +38,59 @@ function NavigatorProvider(
+ 		...otherProps
+ 	} = useContextSystem( props, 'NavigatorProvider' );
+ 
+-	const [ path, setPath ] = useState< NavigatorPath >( {
+-		path: initialPath,
+-	} );
++	const [ locationHistory, setLocationHistory ] = useState<
++		NavigatorLocation[]
++	>( [
++		{
++			path: initialPath,
++			isBack: false,
++			isInitial: true,
++		},
++	] );
++
++	const push: NavigatorContextType[ 'push' ] = useCallback(
++		( path, options ) => {
++			const { focusTargetSelector, ...restOptions } = options;
++
++			// The `focusTargetSelector` needs to be applied on the current
++			// location, while the remaining options need to be applied on the
++			// incoming location
++			setLocationHistory( [
++				...locationHistory.slice( 0, -1 ),
++				{
++					...locationHistory[ locationHistory.length - 1 ],
++					isBack: false,
++					focusTargetSelector,
++				},
++				{
++					...restOptions,
++					path,
++					isBack: false,
++					isInitial: false,
++				},
++			] );
++		},
++		[ locationHistory ]
++	);
++
++	const pop: NavigatorContextType[ 'pop' ] = useCallback( () => {
++		if ( locationHistory.length > 1 ) {
++			setLocationHistory( [
++				...locationHistory.slice( 0, -2 ),
++				// Force the `isBack` flag to `true` when navigating back.
++				{
++					...locationHistory[ locationHistory.length - 2 ],
++					isBack: true,
++				},
++			] );
++		}
++	}, [ locationHistory ] );
++
++	const navigatorContextValue: NavigatorContextType = {
++		location: locationHistory[ locationHistory.length - 1 ],
++		push,
++		pop,
++	};
+ 
+ 	const cx = useCx();
+ 	const classes = useMemo(
+@@ -47,7 +101,7 @@ function NavigatorProvider(
+ 
+ 	return (
+ 		<View ref={ forwardedRef } className={ classes } { ...otherProps }>
+-			<NavigatorContext.Provider value={ [ path, setPath ] }>
++			<NavigatorContext.Provider value={ navigatorContextValue }>
+ 				{ children }
+ 			</NavigatorContext.Provider>
+ 		</View>
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 85631b0b5227a5..20de630c20cfb6 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -10,8 +10,9 @@ import { css } from '@emotion/react';
+ /**
+  * WordPress dependencies
+  */
+-import { useContext, useEffect, useState, useMemo } from '@wordpress/element';
+-import { useReducedMotion, useFocusOnMount } from '@wordpress/compose';
++import { focus } from '@wordpress/dom';
++import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
++import { useReducedMotion } from '@wordpress/compose';
+ import { isRTL } from '@wordpress/i18n';
+ 
+ /**
+@@ -46,9 +47,9 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 	);
+ 
+ 	const prefersReducedMotion = useReducedMotion();
+-	const [ currentPath ] = useContext( NavigatorContext );
+-	const isMatch = currentPath.path === path;
+-	const ref = useFocusOnMount();
++	const { location } = useContext( NavigatorContext );
++	const isMatch = location.path === path;
++	const wrapperRef = useRef< HTMLDivElement >( null );
+ 
+ 	const cx = useCx();
+ 	const classes = useMemo(
+@@ -65,12 +66,40 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 		[ className ]
+ 	);
+ 
+-	// This flag is used to only apply the focus on mount when the actual path changes.
+-	// It avoids the focus to happen on the first render.
+-	const [ hasPathChanged, setHasPathChanged ] = useState( false );
++	// Focus restoration
++	const isInitialLocation = location.isInitial && ! location.isBack;
++
+ 	useEffect( () => {
+-		setHasPathChanged( true );
+-	}, [ path ] );
++		// Only attempt to restore focus:
++		// - if the current location is not the initial one (to avoid moving focus on page load)
++		// - when the screen becomes visible
++		// - if the wrapper ref has been assigned
++		if ( isInitialLocation || ! isMatch || ! wrapperRef.current ) {
++			return;
++		}
++
++		let elementToFocus: HTMLElement | null = null;
++
++		// When navigating back, if a selector is provided, use it to look for the
++		// target element (assumed to be a node inside the current NavigatorScreen)
++		if ( location.isBack && location.focusTargetSelector ) {
++			elementToFocus = wrapperRef.current.querySelector(
++				location.focusTargetSelector
++			);
++		}
++
++		// If the previous query didn't run or find any element to focus, fallback
++		// to the first tabbable element in the screen (or the screen itself).
++		if ( ! elementToFocus ) {
++			const firstTabbable = ( focus.tabbable.find(
++				wrapperRef.current
++			) as HTMLElement[] )[ 0 ];
++
++			elementToFocus = firstTabbable ?? wrapperRef.current;
++		}
++
++		elementToFocus.focus();
++	}, [ isInitialLocation, isMatch ] );
+ 
+ 	if ( ! isMatch ) {
+ 		return null;
+@@ -96,8 +125,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 	const initial = {
+ 		opacity: 0,
+ 		x:
+-			( isRTL() && currentPath.isBack ) ||
+-			( ! isRTL() && ! currentPath.isBack )
++			( isRTL() && location.isBack ) || ( ! isRTL() && ! location.isBack )
+ 				? 50
+ 				: -50,
+ 	};
+@@ -105,8 +133,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 		delay: animationExitDelay,
+ 		opacity: 0,
+ 		x:
+-			( ! isRTL() && currentPath.isBack ) ||
+-			( isRTL() && ! currentPath.isBack )
++			( ! isRTL() && location.isBack ) || ( isRTL() && ! location.isBack )
+ 				? 50
+ 				: -50,
+ 		transition: {
+@@ -123,7 +150,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 
+ 	return (
+ 		<motion.div
+-			ref={ hasPathChanged ? ref : undefined }
++			ref={ wrapperRef }
+ 			className={ classes }
+ 			{ ...otherProps }
+ 			{ ...animatedProps }
+diff --git a/packages/components/src/navigator/stories/index.js b/packages/components/src/navigator/stories/index.js
+index 97e527216eef38..99117926f852d3 100644
+--- a/packages/components/src/navigator/stories/index.js
++++ b/packages/components/src/navigator/stories/index.js
+@@ -11,24 +11,18 @@ import { Card, CardBody, CardFooter, CardHeader } from '../../card';
+ import { HStack } from '../../h-stack';
+ import { Flyout } from '../../flyout';
+ import { useCx } from '../../utils/hooks/use-cx';
+-import { NavigatorProvider, NavigatorScreen, useNavigator } from '../';
++import {
++	NavigatorProvider,
++	NavigatorScreen,
++	NavigatorLink,
++	NavigatorBackLink,
++} from '../';
+ 
+ export default {
+ 	title: 'Components (Experimental)/Navigator',
+ 	component: NavigatorProvider,
+ };
+ 
+-function NavigatorButton( { path, isBack = false, ...props } ) {
+-	const navigator = useNavigator();
+-	return (
+-		<Button
+-			variant="secondary"
+-			onClick={ () => navigator.push( path, { isBack } ) }
+-			{ ...props }
+-		/>
+-	);
+-}
+-
+ const MyNavigation = () => {
+ 	const cx = useCx();
+ 	return (
+@@ -42,17 +36,20 @@ const MyNavigation = () => {
+ 						<p>This is the home screen.</p>
+ 
+ 						<HStack justify="flex-start" wrap>
+-							<NavigatorButton path="/child">
++							<NavigatorLink variant="secondary" path="/child">
+ 								Navigate to child screen.
+-							</NavigatorButton>
++							</NavigatorLink>
+ 
+-							<NavigatorButton path="/overflow-child">
++							<NavigatorLink
++								variant="secondary"
++								path="/overflow-child"
++							>
+ 								Navigate to screen with horizontal overflow.
+-							</NavigatorButton>
++							</NavigatorLink>
+ 
+-							<NavigatorButton path="/stickies">
++							<NavigatorLink variant="secondary" path="/stickies">
+ 								Navigate to screen with sticky content.
+-							</NavigatorButton>
++							</NavigatorLink>
+ 
+ 							<Flyout
+ 								trigger={
+@@ -74,9 +71,9 @@ const MyNavigation = () => {
+ 				<Card>
+ 					<CardBody>
+ 						<p>This is the child screen.</p>
+-						<NavigatorButton path="/" isBack>
++						<NavigatorBackLink variant="secondary">
+ 							Go back
+-						</NavigatorButton>
++						</NavigatorBackLink>
+ 					</CardBody>
+ 				</Card>
+ 			</NavigatorScreen>
+@@ -84,9 +81,9 @@ const MyNavigation = () => {
+ 			<NavigatorScreen path="/overflow-child">
+ 				<Card>
+ 					<CardBody>
+-						<NavigatorButton path="/" isBack>
++						<NavigatorBackLink variant="secondary">
+ 							Go back
+-						</NavigatorButton>
++						</NavigatorBackLink>
+ 						<div
+ 							className={ cx(
+ 								css( `
+@@ -114,9 +111,9 @@ const MyNavigation = () => {
+ 			<NavigatorScreen path="/stickies">
+ 				<Card>
+ 					<Sticky as={ CardHeader } z="2">
+-						<NavigatorButton path="/" isBack>
++						<NavigatorBackLink variant="secondary">
+ 							Go back
+-						</NavigatorButton>
++						</NavigatorBackLink>
+ 					</Sticky>
+ 					<CardBody>
+ 						<Sticky top="69px" colors="papayawhip/peachpuff">
+diff --git a/packages/components/src/navigator/types.ts b/packages/components/src/navigator/types.ts
+index acc5aecb840dff..87732a85a56512 100644
+--- a/packages/components/src/navigator/types.ts
++++ b/packages/components/src/navigator/types.ts
+@@ -4,23 +4,24 @@
+ // eslint-disable-next-line no-restricted-imports
+ import type { ReactNode } from 'react';
+ 
+-type NavigatorPathOptions = {
+-	isBack?: boolean;
++type NavigateOptions = {
++	focusTargetSelector?: string;
+ };
+ 
+-export type NavigatorPath = NavigatorPathOptions & {
++export type NavigatorLocation = NavigateOptions & {
++	isInitial?: boolean;
++	isBack?: boolean;
+ 	path?: string;
+ };
+ 
+-export type NavigatorContext = [
+-	NavigatorPath,
+-	( path: NavigatorPath ) => void
+-];
++export type NavigatorContext = {
++	location: NavigatorLocation;
++	push: ( path: string, options: NavigateOptions ) => void;
++	pop: () => void;
++};
+ 
+ // Returned by the `useNavigator` hook
+-export type Navigator = {
+-	push: ( path: string, options: NavigatorPathOptions ) => void;
+-};
++export type Navigator = NavigatorContext;
+ 
+ export type NavigatorProviderProps = {
+ 	/**
+@@ -43,3 +44,28 @@ export type NavigatorScreenProps = {
+ 	 */
+ 	children: ReactNode;
+ };
++
++export type NavigatorBackLinkProps = {
++	/**
++	 * The children elements.
++	 */
++	children: ReactNode;
++	/**
++	 * The callback called in response to a `click` event.
++	 */
++	onClick?: React.MouseEventHandler< HTMLElement >;
++};
++
++export type NavigatorLinkProps = NavigatorBackLinkProps & {
++	/**
++	 * The path to navigate to.
++	 */
++	path: string;
++	/**
++	 * The HTML attribute used to identify the `NavigatorLink`, which is used
++	 * by `Navigator` to restore focus.
++	 *
++	 * @default 'id'
++	 */
++	attributeName?: string;
++};
+diff --git a/packages/components/src/navigator/use-navigator.ts b/packages/components/src/navigator/use-navigator.ts
+index 4d39de1fe5ceb4..5a425b695ba9c3 100644
+--- a/packages/components/src/navigator/use-navigator.ts
++++ b/packages/components/src/navigator/use-navigator.ts
+@@ -13,12 +13,12 @@ import type { Navigator } from './types';
+  * Retrieves a `navigator` instance.
+  */
+ function useNavigator(): Navigator {
+-	const [ , setPath ] = useContext( NavigatorContext );
++	const { location, push, pop } = useContext( NavigatorContext );
+ 
+ 	return {
+-		push( path, options ) {
+-			setPath( { path, ...options } );
+-		},
++		location,
++		push,
++		pop,
+ 	};
+ }
+ 
+diff --git a/packages/edit-post/src/components/preferences-modal/index.js b/packages/edit-post/src/components/preferences-modal/index.js
+index ccd323f3380386..a1a8190c4474c5 100644
+--- a/packages/edit-post/src/components/preferences-modal/index.js
++++ b/packages/edit-post/src/components/preferences-modal/index.js
+@@ -9,7 +9,8 @@ import { get } from 'lodash';
+ import {
+ 	__experimentalNavigatorProvider as NavigatorProvider,
+ 	__experimentalNavigatorScreen as NavigatorScreen,
+-	__experimentalUseNavigator as useNavigator,
++	__experimentalNavigatorLink as NavigatorLink,
++	__experimentalNavigatorBackLink as NavigatorBackLink,
+ 	__experimentalItemGroup as ItemGroup,
+ 	__experimentalItem as Item,
+ 	__experimentalHStack as HStack,
+@@ -18,7 +19,6 @@ import {
+ 	FlexItem,
+ 	Modal,
+ 	TabPanel,
+-	Button,
+ 	Card,
+ 	CardHeader,
+ 	CardBody,
+@@ -55,21 +55,6 @@ import BlockManager from '../block-manager';
+ const MODAL_NAME = 'edit-post/preferences';
+ const PREFERENCES_MENU = 'preferences-menu';
+ 
+-function NavigationButton( {
+-	as: Tag = Button,
+-	path,
+-	isBack = false,
+-	...props
+-} ) {
+-	const navigator = useNavigator();
+-	return (
+-		<Tag
+-			onClick={ () => navigator.push( path, { isBack } ) }
+-			{ ...props }
+-		/>
+-	);
+-}
+-
+ export default function PreferencesModal() {
+ 	const isLargeViewport = useViewportMatch( 'medium' );
+ 	const { closeModal } = useDispatch( editPostStore );
+@@ -334,7 +319,7 @@ export default function PreferencesModal() {
+ 							<ItemGroup>
+ 								{ tabs.map( ( tab ) => {
+ 									return (
+-										<NavigationButton
++										<NavigatorLink
+ 											key={ tab.name }
+ 											path={ tab.name }
+ 											as={ Item }
+@@ -356,7 +341,7 @@ export default function PreferencesModal() {
+ 													/>
+ 												</FlexItem>
+ 											</HStack>
+-										</NavigationButton>
++										</NavigatorLink>
+ 									);
+ 								} ) }
+ 							</ItemGroup>
+@@ -376,12 +361,10 @@ export default function PreferencesModal() {
+ 									size="small"
+ 									gap="6"
+ 								>
+-									<NavigationButton
+-										path="/"
++									<NavigatorBackLink
+ 										icon={
+ 											isRTL() ? chevronRight : chevronLeft
+ 										}
+-										isBack
+ 										aria-label={ __(
+ 											'Navigate to the previous view'
+ 										) }
+diff --git a/packages/edit-site/src/components/global-styles/context-menu.js b/packages/edit-site/src/components/global-styles/context-menu.js
+index 70b33622ba5a4b..afed35c13ff6a7 100644
+--- a/packages/edit-site/src/components/global-styles/context-menu.js
++++ b/packages/edit-site/src/components/global-styles/context-menu.js
+@@ -12,7 +12,7 @@ import { useHasBorderPanel } from './border-panel';
+ import { useHasColorPanel } from './color-utils';
+ import { useHasDimensionsPanel } from './dimensions-panel';
+ import { useHasTypographyPanel } from './typography-panel';
+-import NavigationButton from './navigation-button';
++import { NavigationButton } from './navigation-button';
+ 
+ function ContextMenu( { name, parentMenu = '' } ) {
+ 	const hasTypographyPanel = useHasTypographyPanel( name );
+diff --git a/packages/edit-site/src/components/global-styles/header.js b/packages/edit-site/src/components/global-styles/header.js
+index f380aa76330831..5bc5b539e11c99 100644
+--- a/packages/edit-site/src/components/global-styles/header.js
++++ b/packages/edit-site/src/components/global-styles/header.js
+@@ -14,15 +14,14 @@ import { chevronRight, chevronLeft, Icon } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import NavigationButton from './navigation-button';
++import { NavigationBackButton } from './navigation-button';
+ 
+-function ScreenHeader( { back, title, description } ) {
++function ScreenHeader( { title, description } ) {
+ 	return (
+ 		<VStack spacing={ 2 }>
+ 			<HStack spacing={ 2 }>
+ 				<View>
+-					<NavigationButton
+-						path={ back }
++					<NavigationBackButton
+ 						icon={
+ 							<Icon
+ 								icon={ isRTL() ? chevronRight : chevronLeft }
+@@ -30,7 +29,6 @@ function ScreenHeader( { back, title, description } ) {
+ 							/>
+ 						}
+ 						size="small"
+-						isBack
+ 						aria-label={ __( 'Navigate to the previous view' ) }
+ 					/>
+ 				</View>
+diff --git a/packages/edit-site/src/components/global-styles/navigation-button.js b/packages/edit-site/src/components/global-styles/navigation-button.js
+index c891a79302b4b7..b6f1f821cd870e 100644
+--- a/packages/edit-site/src/components/global-styles/navigation-button.js
++++ b/packages/edit-site/src/components/global-styles/navigation-button.js
+@@ -2,23 +2,17 @@
+  * WordPress dependencies
+  */
+ import {
+-	__experimentalUseNavigator as useNavigator,
++	__experimentalNavigatorLink as NavigatorLink,
++	__experimentalNavigatorBackLink as NavigatorBackLink,
+ 	__experimentalItem as Item,
+ 	FlexItem,
+ 	__experimentalHStack as HStack,
+ } from '@wordpress/components';
+ import { Icon } from '@wordpress/icons';
+ 
+-function NavigationButton( {
+-	path,
+-	icon,
+-	children,
+-	isBack = false,
+-	...props
+-} ) {
+-	const navigator = useNavigator();
++function GenericNavigationButton( { icon, children, ...props } ) {
+ 	return (
+-		<Item onClick={ () => navigator.push( path, { isBack } ) } { ...props }>
++		<Item { ...props }>
+ 			{ icon && (
+ 				<HStack justify="flex-start">
+ 					<FlexItem>
+@@ -32,4 +26,12 @@ function NavigationButton( {
+ 	);
+ }
+ 
+-export default NavigationButton;
++function NavigationButton( props ) {
++	return <NavigatorLink as={ GenericNavigationButton } { ...props } />;
++}
++
++function NavigationBackButton( props ) {
++	return <NavigatorBackLink as={ GenericNavigationButton } { ...props } />;
++}
++
++export { NavigationButton, NavigationBackButton };
+diff --git a/packages/edit-site/src/components/global-styles/palette.js b/packages/edit-site/src/components/global-styles/palette.js
+index 10fb3cbb048023..5a2385b3289dc9 100644
+--- a/packages/edit-site/src/components/global-styles/palette.js
++++ b/packages/edit-site/src/components/global-styles/palette.js
+@@ -17,7 +17,7 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Subtitle from './subtitle';
+-import NavigationButton from './navigation-button';
++import { NavigationButton } from './navigation-button';
+ import { useSetting } from './hooks';
+ 
+ const EMPTY_COLORS = [];
+diff --git a/packages/edit-site/src/components/global-styles/screen-background-color.js b/packages/edit-site/src/components/global-styles/screen-background-color.js
+index d8328a16586d1a..b35b64d03b124e 100644
+--- a/packages/edit-site/src/components/global-styles/screen-background-color.js
++++ b/packages/edit-site/src/components/global-styles/screen-background-color.js
+@@ -17,7 +17,6 @@ import {
+ } from './hooks';
+ 
+ function ScreenBackgroundColor( { name } ) {
+-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
+ 	const supports = getSupportedGlobalStylesPanels( name );
+ 	const [ solids ] = useSetting( 'color.palette', name );
+ 	const [ gradients ] = useSetting( 'color.gradients', name );
+@@ -86,7 +85,6 @@ function ScreenBackgroundColor( { name } ) {
+ 	return (
+ 		<>
+ 			<ScreenHeader
+-				back={ parentMenu + '/colors' }
+ 				title={ __( 'Background' ) }
+ 				description={ __(
+ 					'Set a background color or gradient for the whole site.'
+diff --git a/packages/edit-site/src/components/global-styles/screen-block-list.js b/packages/edit-site/src/components/global-styles/screen-block-list.js
+index 78267de7d18ab4..4b13f43b1588fc 100644
+--- a/packages/edit-site/src/components/global-styles/screen-block-list.js
++++ b/packages/edit-site/src/components/global-styles/screen-block-list.js
+@@ -17,7 +17,7 @@ import { useHasColorPanel } from './color-utils';
+ import { useHasDimensionsPanel } from './dimensions-panel';
+ import { useHasTypographyPanel } from './typography-panel';
+ import ScreenHeader from './header';
+-import NavigationButton from './navigation-button';
++import { NavigationButton } from './navigation-button';
+ 
+ function BlockMenuItem( { block } ) {
+ 	const hasTypographyPanel = useHasTypographyPanel( block.name );
+@@ -48,7 +48,6 @@ function ScreenBlockList() {
+ 	return (
+ 		<>
+ 			<ScreenHeader
+-				back="/"
+ 				title={ __( 'Blocks' ) }
+ 				description={ __(
+ 					'Customize the appearance of specific blocks and for the whole site.'
+diff --git a/packages/edit-site/src/components/global-styles/screen-block.js b/packages/edit-site/src/components/global-styles/screen-block.js
+index 9c1200ad1ddae0..10455855d97e58 100644
+--- a/packages/edit-site/src/components/global-styles/screen-block.js
++++ b/packages/edit-site/src/components/global-styles/screen-block.js
+@@ -14,7 +14,7 @@ function ScreenBlock( { name } ) {
+ 
+ 	return (
+ 		<>
+-			<ScreenHeader back="/blocks" title={ blockType.title } />
++			<ScreenHeader title={ blockType.title } />
+ 			<ContextMenu parentMenu={ '/blocks/' + name } name={ name } />
+ 		</>
+ 	);
+diff --git a/packages/edit-site/src/components/global-styles/screen-color-palette.js b/packages/edit-site/src/components/global-styles/screen-color-palette.js
+index 033d6427b7d2fc..554c16cbb83c14 100644
+--- a/packages/edit-site/src/components/global-styles/screen-color-palette.js
++++ b/packages/edit-site/src/components/global-styles/screen-color-palette.js
+@@ -17,12 +17,10 @@ import ScreenHeader from './header';
+ 
+ function ScreenColorPalette( { name } ) {
+ 	const [ currentTab, setCurrentTab ] = useState( 'solid' );
+-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
+ 
+ 	return (
+ 		<>
+ 			<ScreenHeader
+-				back={ parentMenu + '/colors' }
+ 				title={ __( 'Palette' ) }
+ 				description={ __(
+ 					'Palettes are used to provide default color options for blocks and various design tools. Here you can edit the colors with their labels.'
+diff --git a/packages/edit-site/src/components/global-styles/screen-colors.js b/packages/edit-site/src/components/global-styles/screen-colors.js
+index 0480664845ae27..77afba1ab514be 100644
+--- a/packages/edit-site/src/components/global-styles/screen-colors.js
++++ b/packages/edit-site/src/components/global-styles/screen-colors.js
+@@ -15,7 +15,7 @@ import {
+  */
+ import ScreenHeader from './header';
+ import Palette from './palette';
+-import NavigationButton from './navigation-button';
++import { NavigationButton } from './navigation-button';
+ import { getSupportedGlobalStylesPanels, useStyle } from './hooks';
+ import Subtitle from './subtitle';
+ 
+@@ -93,7 +93,6 @@ function ScreenColors( { name } ) {
+ 	return (
+ 		<>
+ 			<ScreenHeader
+-				back={ parentMenu ? parentMenu : '/' }
+ 				title={ __( 'Colors' ) }
+ 				description={ __(
+ 					'Manage palettes and the default color of different global elements on the site.'
+diff --git a/packages/edit-site/src/components/global-styles/screen-layout.js b/packages/edit-site/src/components/global-styles/screen-layout.js
+index 36d9b2444ee67c..74c7ac1851e1ee 100644
+--- a/packages/edit-site/src/components/global-styles/screen-layout.js
++++ b/packages/edit-site/src/components/global-styles/screen-layout.js
+@@ -11,16 +11,12 @@ import DimensionsPanel, { useHasDimensionsPanel } from './dimensions-panel';
+ import ScreenHeader from './header';
+ 
+ function ScreenLayout( { name } ) {
+-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
+ 	const hasBorderPanel = useHasBorderPanel( name );
+ 	const hasDimensionsPanel = useHasDimensionsPanel( name );
+ 
+ 	return (
+ 		<>
+-			<ScreenHeader
+-				back={ parentMenu ? parentMenu : '/' }
+-				title={ __( 'Layout' ) }
+-			/>
++			<ScreenHeader title={ __( 'Layout' ) } />
+ 			{ hasDimensionsPanel && <DimensionsPanel name={ name } /> }
+ 			{ hasBorderPanel && <BorderPanel name={ name } /> }
+ 		</>
+diff --git a/packages/edit-site/src/components/global-styles/screen-link-color.js b/packages/edit-site/src/components/global-styles/screen-link-color.js
+index 6d033a77f2ecd6..d939bf000ef9e5 100644
+--- a/packages/edit-site/src/components/global-styles/screen-link-color.js
++++ b/packages/edit-site/src/components/global-styles/screen-link-color.js
+@@ -16,7 +16,6 @@ import {
+ } from './hooks';
+ 
+ function ScreenLinkColor( { name } ) {
+-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
+ 	const supports = getSupportedGlobalStylesPanels( name );
+ 	const [ solids ] = useSetting( 'color.palette', name );
+ 	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
+@@ -47,7 +46,6 @@ function ScreenLinkColor( { name } ) {
+ 	return (
+ 		<>
+ 			<ScreenHeader
+-				back={ parentMenu + '/colors' }
+ 				title={ __( 'Links' ) }
+ 				description={ __(
+ 					'Set the default color used for links across the site.'
+diff --git a/packages/edit-site/src/components/global-styles/screen-root.js b/packages/edit-site/src/components/global-styles/screen-root.js
+index 26fbf29cf9810d..7761407f0363d4 100644
+--- a/packages/edit-site/src/components/global-styles/screen-root.js
++++ b/packages/edit-site/src/components/global-styles/screen-root.js
+@@ -17,7 +17,7 @@ import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import StylesPreview from './preview';
+-import NavigationButton from './navigation-button';
++import { NavigationButton } from './navigation-button';
+ import ContextMenu from './context-menu';
+ 
+ function ScreenRoot() {
+diff --git a/packages/edit-site/src/components/global-styles/screen-text-color.js b/packages/edit-site/src/components/global-styles/screen-text-color.js
+index 2ab386641b788d..4c212adfe33475 100644
+--- a/packages/edit-site/src/components/global-styles/screen-text-color.js
++++ b/packages/edit-site/src/components/global-styles/screen-text-color.js
+@@ -16,7 +16,6 @@ import {
+ } from './hooks';
+ 
+ function ScreenTextColor( { name } ) {
+-	const parentMenu = name === undefined ? '' : '/blocks/' + name;
+ 	const supports = getSupportedGlobalStylesPanels( name );
+ 	const [ solids ] = useSetting( 'color.palette', name );
+ 	const [ areCustomSolidsEnabled ] = useSetting( 'color.custom', name );
+@@ -39,7 +38,6 @@ function ScreenTextColor( { name } ) {
+ 	return (
+ 		<>
+ 			<ScreenHeader
+-				back={ parentMenu + '/colors' }
+ 				title={ __( 'Text' ) }
+ 				description={ __(
+ 					'Set the default color used for text across the site.'
+diff --git a/packages/edit-site/src/components/global-styles/screen-typography-element.js b/packages/edit-site/src/components/global-styles/screen-typography-element.js
+index 65c49255cb13e3..46b53a3a7b3d31 100644
+--- a/packages/edit-site/src/components/global-styles/screen-typography-element.js
++++ b/packages/edit-site/src/components/global-styles/screen-typography-element.js
+@@ -21,13 +21,9 @@ const elements = {
+ };
+ 
+ function ScreenTypographyElement( { name, element } ) {
+-	const parentMenu =
+-		name === undefined ? '/typography' : '/blocks/' + name + '/typography';
+-
+ 	return (
+ 		<>
+ 			<ScreenHeader
+-				back={ parentMenu }
+ 				title={ elements[ element ].title }
+ 				description={ elements[ element ].description }
+ 			/>
+diff --git a/packages/edit-site/src/components/global-styles/screen-typography.js b/packages/edit-site/src/components/global-styles/screen-typography.js
+index b2fe028c2de54f..d3b3cada3c680e 100644
+--- a/packages/edit-site/src/components/global-styles/screen-typography.js
++++ b/packages/edit-site/src/components/global-styles/screen-typography.js
+@@ -13,7 +13,7 @@ import {
+  * Internal dependencies
+  */
+ import ScreenHeader from './header';
+-import NavigationButton from './navigation-button';
++import { NavigationButton } from './navigation-button';
+ import { useStyle } from './hooks';
+ import Subtitle from './subtitle';
+ import TypographyPanel from './typography-panel';
+@@ -72,7 +72,6 @@ function ScreenTypography( { name } ) {
+ 	return (
+ 		<>
+ 			<ScreenHeader
+-				back={ parentMenu ? parentMenu : '/' }
+ 				title={ __( 'Typography' ) }
+ 				description={ __(
+ 					'Manage the typography settings for different elements.'
+@@ -101,7 +100,7 @@ function ScreenTypography( { name } ) {
+ 				</div>
+ 			) }
+ 
+-			{ /* no typogrpahy elements support yet for blocks */ }
++			{ /* no typography elements support yet for blocks */ }
+ 			{ !! name && <TypographyPanel name={ name } element="text" /> }
+ 		</>
+ 	);

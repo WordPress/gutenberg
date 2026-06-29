@@ -1,0 +1,144 @@
+diff --git a/packages/components/src/tab-panel/stories/index.story.tsx b/packages/components/src/tab-panel/stories/index.story.tsx
+index 06adb16c480083..00bf3d6cd034f8 100644
+--- a/packages/components/src/tab-panel/stories/index.story.tsx
++++ b/packages/components/src/tab-panel/stories/index.story.tsx
+@@ -1,17 +1,6 @@
+-/**
+- * External dependencies
+- */
+ import type { Meta, StoryFn } from '@storybook/react-vite';
+ import { fn } from 'storybook/test';
+-
+-/**
+- * WordPress dependencies
+- */
+ import { link, more, wordpress } from '@wordpress/icons';
+-
+-/**
+- * Internal dependencies
+- */
+ import TabPanel from '..';
+ 
+ const meta: Meta< typeof TabPanel > = {
+@@ -22,9 +11,9 @@ const meta: Meta< typeof TabPanel > = {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 		componentStatus: {
+-			status: 'use-with-caution',
++			status: 'not-recommended',
+ 			whereUsed: 'global',
+-			notes: 'When building for the Gutenberg repo, use `Tabs` instead. Otherwise, continue using for now.',
++			notes: 'Use `Tabs` from `@wordpress/ui` instead.',
+ 		},
+ 	},
+ 	args: {
+diff --git a/packages/components/src/tabs/stories/index.story.tsx b/packages/components/src/tabs/stories/index.story.tsx
+index f128a6897d7f3d..1fbf8a08c45c99 100644
+--- a/packages/components/src/tabs/stories/index.story.tsx
++++ b/packages/components/src/tabs/stories/index.story.tsx
+@@ -1,18 +1,7 @@
+-/**
+- * External dependencies
+- */
+ import type { Meta, StoryFn } from '@storybook/react-vite';
+ import { fn } from 'storybook/test';
+-
+-/**
+- * WordPress dependencies
+- */
+ import { wordpress, more, link } from '@wordpress/icons';
+ import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+ import { Tabs } from '..';
+ import { Slot, Fill, Provider as SlotFillProvider } from '../../slot-fill';
+ import Button from '../../button';
+@@ -35,9 +24,9 @@ const meta: Meta< typeof Tabs > = {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 		componentStatus: {
+-			status: 'recommended',
++			status: 'not-recommended',
+ 			whereUsed: 'global',
+-			notes: 'When building for the Gutenberg repo, use this component instead of `TabPanel`. Otherwise, continue using `TabPanel`. Both will be superseded by `Tabs` in `@wordpress/ui`, but continue using these for now.',
++			notes: 'Use `Tabs` from `@wordpress/ui` instead.',
+ 		},
+ 	},
+ 	args: {
+diff --git a/packages/eslint-plugin/rules/__tests__/use-recommended-components.js b/packages/eslint-plugin/rules/__tests__/use-recommended-components.js
+index b15ccd4ec7fecb..09c60a7c2eb98e 100644
+--- a/packages/eslint-plugin/rules/__tests__/use-recommended-components.js
++++ b/packages/eslint-plugin/rules/__tests__/use-recommended-components.js
+@@ -31,7 +31,7 @@ ruleTester.run( 'use-recommended-components', rule, {
+ 		"import { Link } from '@wordpress/ui';",
+ 		"import { Stack } from '@wordpress/ui';",
+ 		"import { Text } from '@wordpress/ui';",
+-		"import { Badge, Icon, Link, Stack, Text } from '@wordpress/ui';",
++		"import { Badge, Icon, Link, Stack, Tabs, Text } from '@wordpress/ui';",
+ 	],
+ 
+ 	invalid: [
+@@ -77,6 +77,17 @@ ruleTester.run( 'use-recommended-components', rule, {
+ 				},
+ 			],
+ 		},
++		{
++			code: "import { Tabs, TabPanel } from '@wordpress/components';",
++			errors: [
++				{
++					message: 'Use `Tabs` from `@wordpress/ui` instead.',
++				},
++				{
++					message: 'Use `Tabs` from `@wordpress/ui` instead.',
++				},
++			],
++		},
+ 	],
+ } );
+ 
+diff --git a/packages/eslint-plugin/rules/use-recommended-components.js b/packages/eslint-plugin/rules/use-recommended-components.js
+index 6b452f21c8d86a..706c59fce1fa8b 100644
+--- a/packages/eslint-plugin/rules/use-recommended-components.js
++++ b/packages/eslint-plugin/rules/use-recommended-components.js
+@@ -17,6 +17,7 @@ const ALLOWLIST = {
+ 			'Icon',
+ 			'Link',
+ 			'Stack',
++			'Tabs',
+ 			'Text',
+ 			'VisuallyHidden',
+ 		],
+@@ -50,6 +51,8 @@ const DENYLIST = {
+ 		CardHeader:
+ 			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
+ 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
++		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
++		Tabs: 'Use `Tabs` from `@wordpress/ui` instead.',
+ 		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
+ 	},
+ };
+diff --git a/packages/ui/src/tabs/stories/index.story.tsx b/packages/ui/src/tabs/stories/index.story.tsx
+index 2e1f40c203be21..6af00adb79c2dc 100644
+--- a/packages/ui/src/tabs/stories/index.story.tsx
++++ b/packages/ui/src/tabs/stories/index.story.tsx
+@@ -7,6 +7,7 @@ import * as Tooltip from '../../tooltip';
+ const meta: Meta< typeof Tabs.Root > = {
+ 	title: 'Design System/Components/Tabs',
+ 	component: Tabs.Root,
++	tags: [ 'manifest' ],
+ 	subcomponents: {
+ 		'Tabs.List': Tabs.List,
+ 		'Tabs.Tab': Tabs.Tab,
+@@ -14,9 +15,8 @@ const meta: Meta< typeof Tabs.Root > = {
+ 	},
+ 	parameters: {
+ 		componentStatus: {
+-			status: 'use-with-caution',
++			status: 'recommended',
+ 			whereUsed: 'global',
+-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of color consistency with `@wordpress/components`. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
+ 		},
+ 	},
+ };

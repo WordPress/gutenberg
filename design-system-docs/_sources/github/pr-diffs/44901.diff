@@ -1,0 +1,67 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 9d0776c1730c69..ec7e859a4cb224 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -97,6 +97,7 @@ module.exports = {
+ 							'dropRight',
+ 							'each',
+ 							'escapeRegExp',
++							'every',
+ 							'extend',
+ 							'findIndex',
+ 							'findKey',
+diff --git a/packages/blocks/src/api/utils.js b/packages/blocks/src/api/utils.js
+index ba094e073fe2b1..2349b9b6eef603 100644
+--- a/packages/blocks/src/api/utils.js
++++ b/packages/blocks/src/api/utils.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { every, reduce } from 'lodash';
++import { reduce } from 'lodash';
+ import { colord, extend } from 'colord';
+ import namesPlugin from 'colord/plugins/names';
+ import a11yPlugin from 'colord/plugins/a11y';
+@@ -57,10 +57,8 @@ export function isUnmodifiedDefaultBlock( block ) {
+ 	const newDefaultBlock = isUnmodifiedDefaultBlock.block;
+ 	const blockType = getBlockType( defaultBlockName );
+ 
+-	return every(
+-		blockType?.attributes,
+-		( value, key ) =>
+-			newDefaultBlock.attributes[ key ] === block.attributes[ key ]
++	return Object.keys( blockType?.attributes ?? {} ).every(
++		( key ) => newDefaultBlock.attributes[ key ] === block.attributes[ key ]
+ 	);
+ }
+ 
+diff --git a/packages/components/src/higher-order/with-fallback-styles/index.js b/packages/components/src/higher-order/with-fallback-styles/index.js
+index c5ce92c758141f..57532b9915874d 100644
+--- a/packages/components/src/higher-order/with-fallback-styles/index.js
++++ b/packages/components/src/higher-order/with-fallback-styles/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { every, isEqual } from 'lodash';
++import { isEqual } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -45,10 +45,14 @@ export default ( mapNodeToProps ) =>
+ 						this.nodeRef,
+ 						this.props
+ 					);
++
+ 					if ( ! isEqual( newFallbackStyles, fallbackStyles ) ) {
+ 						this.setState( {
+ 							fallbackStyles: newFallbackStyles,
+-							grabStylesCompleted: !! every( newFallbackStyles ),
++							grabStylesCompleted:
++								Object.values( newFallbackStyles ).every(
++									Boolean
++								),
+ 						} );
+ 					}
+ 				}

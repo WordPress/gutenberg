@@ -1,0 +1,122 @@
+diff --git a/packages/components/src/ui/__storybook-utils/example-grid.js b/packages/components/src/ui/__storybook-utils/example-grid.js
+deleted file mode 100644
+index 4695fb7e5e1e0a..00000000000000
+--- a/packages/components/src/ui/__storybook-utils/example-grid.js
++++ /dev/null
+@@ -1,61 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { Grid } from '../../grid';
+-import { Surface } from '../../surface';
+-import { Text } from '../../text';
+-import { View } from '../../view';
+-import { VStack } from '../../v-stack';
+-
+-const Container = ( { children } ) => (
+-	<div
+-		style={ {
+-			maxWidth: 1280,
+-			width: '100%',
+-			marginLeft: 'auto',
+-			marginRight: 'auto',
+-		} }
+-	>
+-		{ children }
+-	</div>
+-);
+-
+-export const ExampleGrid = ( { children } ) => (
+-	<Container>
+-		<Grid columns={ [ 2, 2, 4 ] } gap="1px">
+-			{ children }
+-		</Grid>
+-	</Container>
+-);
+-
+-export const ExampleGridItem = ( { children } ) => (
+-	<Surface
+-		variant="secondary"
+-		style={ {
+-			padding: 20,
+-		} }
+-	>
+-		<VStack alignment="center">{ children }</VStack>
+-	</Surface>
+-);
+-
+-export const ExampleMetaContent = ( { title, items = [] } ) => {
+-	return (
+-		<Grid templateColumns="60px 1fr">
+-			<View>
+-				<Text size="caption" weight="bold" align="right" isBlock>
+-					{ title }
+-				</Text>
+-			</View>
+-			<VStack spacing={ 1 }>
+-				{ items.map( ( item, index ) => (
+-					<View key={ index }>
+-						<Text size="caption" isBlock>
+-							{ item }
+-						</Text>
+-					</View>
+-				) ) }
+-			</VStack>
+-		</Grid>
+-	);
+-};
+diff --git a/packages/components/src/ui/__storybook-utils/index.js b/packages/components/src/ui/__storybook-utils/index.js
+deleted file mode 100644
+index 54a95be9a0b0d0..00000000000000
+--- a/packages/components/src/ui/__storybook-utils/index.js
++++ /dev/null
+@@ -1 +0,0 @@
+-export * from './example-grid';
+diff --git a/packages/components/src/ui/__storybook-utils/page.js b/packages/components/src/ui/__storybook-utils/page.js
+deleted file mode 100644
+index 58892dbb57155c..00000000000000
+--- a/packages/components/src/ui/__storybook-utils/page.js
++++ /dev/null
+@@ -1,29 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { VStack } from '../../v-stack';
+-import { View } from '../../view';
+-import { Heading } from '../../heading';
+-import { Divider } from '../../divider';
+-
+-function Page( { title = 'Component', children } ) {
+-	return (
+-		<div
+-			style={ {
+-				paddingTop: 24,
+-				paddingBottom: '20vh',
+-				maxWidth: '1280px',
+-				marginLeft: 'auto',
+-				marginRight: 'auto',
+-			} }
+-		>
+-			<VStack spacing={ 6 }>
+-				<Heading size={ 1 }>{ title }</Heading>
+-				<Divider />
+-				<View>{ children }</View>
+-			</VStack>
+-		</div>
+-	);
+-}
+-
+-export default Page;
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 2b292520a92bed..461926ecc0de6d 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -86,7 +86,6 @@
+ 		"src/toolbar-dropdown-menu",
+ 		"src/toolbar-group",
+ 		"src/toolbar-item",
+-		"src/tree-grid",
+-		"src/ui/__storybook-utils"
++		"src/tree-grid"
+ 	]
+ }

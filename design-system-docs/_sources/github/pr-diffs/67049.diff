@@ -1,0 +1,28 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8fc7aff329b031..ce151116df5bfb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,10 @@
+ -   `BoxControl`: Passive deprecate `onMouseOver`/`onMouseOut`. Pass to the `inputProps` prop instead ([#67332](https://github.com/WordPress/gutenberg/pull/67332)).
+ -   `BoxControl`: Deprecate 36px default size ([#66704](https://github.com/WordPress/gutenberg/pull/66704)).
+ 
++### Enhancements
++
++-   `BorderBoxControl`: Reduce gap value when unlinked ([#67049](https://github.com/WordPress/gutenberg/pull/67049)).
++
+ ### Experimental
+ 
+ -   `Menu`: throw when subcomponents are not rendered inside top level `Menu` ([#67411](https://github.com/WordPress/gutenberg/pull/67411)).
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index 0c887ab5f701c3..94e1728076b181 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -73,7 +73,7 @@ const BorderBoxControlSplitControls = (
+ 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
+ 
+ 	return (
+-		<Grid { ...otherProps } ref={ mergedRef } gap={ 4 }>
++		<Grid { ...otherProps } ref={ mergedRef } gap={ 3 }>
+ 			<BorderBoxControlVisualizer value={ value } size={ size } />
+ 			<BorderControl
+ 				className={ centeredClassName }

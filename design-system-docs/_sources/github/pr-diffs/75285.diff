@@ -1,0 +1,485 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 394a29c3fe06ca..405e84c478fb65 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fixes
+ 
+ -   `TimePicker`: Fix date parsing for years below 1000 by implementing ISO 8601 compliant year formatting with zero-padding ([#75343](https://github.com/WordPress/gutenberg/pull/75343)).
++-   `TimePicker`: Prevent Invalid Date from propagating via `onChange` when date fields are cleared ([#75285](https://github.com/WordPress/gutenberg/pull/75285)).
+ -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
+ -   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
+ -   `ToggleControl`: Prevent `__nextHasNoMarginBottom` from logging a console warning ([#75296](https://github.com/WordPress/gutenberg/pull/75296)).
+@@ -12,6 +13,7 @@
+ 
+ ### Enhancements
+ 
++-   `TimePicker`, `DateTimePicker`: Add `minYear` prop to control minimum selectable year. Defaults to 1, enabling support for historical dates. Post scheduling continues to restrict dates to the current year and future via the `minYear` prop ([#75285](https://github.com/WordPress/gutenberg/pull/75285)).
+ -   Improve visual emphasis of the selected item in the ToggleGroupControl component ([#75138](https://github.com/WordPress/gutenberg/pull/75138)).
+ 
+ ### Internal
+diff --git a/packages/components/src/date-time/README.md b/packages/components/src/date-time/README.md
+index b57a3f859b0e11..4df884ad0c274b 100644
+--- a/packages/components/src/date-time/README.md
++++ b/packages/components/src/date-time/README.md
+@@ -89,3 +89,27 @@ The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
+ 
+ - Required: No
+ - Default: 0
++
++### `minYear`: `number`
++
++The minimum year that can be selected in the year input field.
++
++- Required: No
++- Default: `1`
++
++**Usage examples:**
++
++```jsx
++// Default behavior - allows years from 1 onwards
++<DateTimePicker
++	currentDate={ date }
++	onChange={ setDate }
++/>
++
++// For post scheduling - restrict to current year and future only
++<DateTimePicker
++	currentDate={ date }
++	onChange={ setDate }
++	minYear={ new Date().getFullYear() }
++/>
++```
+diff --git a/packages/components/src/date-time/date-time/index.tsx b/packages/components/src/date-time/date-time/index.tsx
+index 2be59694253700..2770e6d6dcfa40 100644
+--- a/packages/components/src/date-time/date-time/index.tsx
++++ b/packages/components/src/date-time/date-time/index.tsx
+@@ -30,6 +30,7 @@ function UnforwardedDateTimePicker(
+ 		onChange,
+ 		events,
+ 		startOfWeek,
++		minYear = 1,
+ 	}: DateTimePickerProps,
+ 	ref: ForwardedRef< any >
+ ) {
+@@ -41,6 +42,7 @@ function UnforwardedDateTimePicker(
+ 					onChange={ onChange }
+ 					is12Hour={ is12Hour }
+ 					dateOrder={ dateOrder }
++					minYear={ minYear }
+ 				/>
+ 				<DatePicker
+ 					currentDate={ currentDate }
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index 245446736e8ab9..00cc88b0a978df 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -65,6 +65,7 @@ export function TimePicker( {
+ 	onChange,
+ 	dateOrder: dateOrderProp,
+ 	hideLabelFromVision = false,
++	minYear = 1,
+ }: TimePickerProps ) {
+ 	const [ date, setDate ] = useState( () =>
+ 		// Truncate the date at the minutes, see: #15495.
+@@ -106,8 +107,23 @@ export function TimePicker( {
+ 		[ date ]
+ 	);
+ 
++	const updateDate = ( newDate: Date ) => {
++		// Guard against Invalid Date propagation.
++		if (
++			newDate instanceof Date &&
++			! Number.isFinite( newDate.getTime() )
++		) {
++			return;
++		}
++
++		setDate( newDate );
++		onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
++	};
++
+ 	const buildNumberControlChangeCallback = ( method: 'date' | 'year' ) => {
+ 		const callback: InputChangeCallback = ( value, { event } ) => {
++			// validateInputElementTarget checks event.target.validity.valid,
++			// which catches empty values via the 'required' attribute
+ 			if ( ! validateInputElementTarget( event ) ) {
+ 				return;
+ 			}
+@@ -120,8 +136,7 @@ export function TimePicker( {
+ 			const newDate = setInConfiguredTimezone( date, {
+ 				[ method ]: numberValue,
+ 			} );
+-			setDate( newDate );
+-			onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
++			updateDate( newDate );
+ 		};
+ 		return callback;
+ 	};
+@@ -136,8 +151,7 @@ export function TimePicker( {
+ 			hours: newHours,
+ 			minutes: newMinutes,
+ 		} );
+-		setDate( newDate );
+-		onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
++		updateDate( newDate );
+ 	};
+ 
+ 	const dayField = (
+@@ -175,8 +189,7 @@ export function TimePicker( {
+ 					const newDate = setInConfiguredTimezone( date, {
+ 						month: Number( value ) - 1,
+ 					} );
+-					setDate( newDate );
+-					onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
++					updateDate( newDate );
+ 				} }
+ 			/>
+ 		</MonthSelectWrapper>
+@@ -191,7 +204,7 @@ export function TimePicker( {
+ 			__next40pxDefaultSize
+ 			value={ year }
+ 			step={ 1 }
+-			min={ 1 }
++			min={ minYear }
+ 			max={ 9999 }
+ 			required
+ 			spinControls="none"
+diff --git a/packages/components/src/date-time/time/test/index.tsx b/packages/components/src/date-time/time/test/index.tsx
+index cb0ff6331771db..b6fdc9f7aa58d2 100644
+--- a/packages/components/src/date-time/time/test/index.tsx
++++ b/packages/components/src/date-time/time/test/index.tsx
+@@ -633,4 +633,236 @@ describe( 'TimePicker', () => {
+ 			expect( outputDate ).not.toContain( 'Invalid' );
+ 		} );
+ 	} );
++
++	describe( 'Invalid date handling', () => {
++		it( 'should not emit invalid dates when year is cleared and blurred', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="1986-10-18T11:00:00"
++					onChange={ onChangeSpy }
++					is12Hour
++				/>
++			);
++
++			const yearInput = screen.getByLabelText( 'Year' );
++
++			// Clear the year field and blur
++			await user.clear( yearInput );
++			await user.keyboard( '{Tab}' );
++
++			// Verify the input field value after browser coercion
++			expect( yearInput ).toHaveValue( 1 );
++
++			// When the year is cleared, the browser may coerce to minYear.
++			// If onChange is called, it should only emit valid date strings.
++			onChangeSpy.mock.calls.forEach( ( call ) => {
++				const dateString = call[ 0 ];
++				expect( dateString ).toMatch(
++					/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/
++				);
++				expect( dateString ).not.toContain( 'NaN' );
++				expect( dateString ).not.toContain( 'Invalid' );
++			} );
++		} );
++
++		it( 'should not call onChange with an invalid date when day is cleared and month is changed', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="1986-10-18T11:00:00"
++					onChange={ onChangeSpy }
++					is12Hour
++				/>
++			);
++
++			const dayInput = screen.getByLabelText( 'Day' );
++			const monthInput = screen.getByLabelText( 'Month' );
++
++			// Clear the day field
++			await user.clear( dayInput );
++			// Change the month (this would create an invalid date if day is 0)
++			await user.selectOptions( monthInput, '12' );
++
++			// Verify the input field value after browser coercion
++			expect( dayInput ).toHaveValue( 1 );
++
++			// Verify that if onChange was called, it only received valid date strings.
++			// Our guard should prevent invalid dates from being emitted, so any calls
++			// should have properly formatted dates without "NaN" or "Invalid".
++			onChangeSpy.mock.calls.forEach( ( call ) => {
++				const dateString = call[ 0 ];
++				expect( dateString ).toMatch(
++					/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/
++				);
++				expect( dateString ).not.toContain( 'NaN' );
++				expect( dateString ).not.toContain( 'Invalid' );
++			} );
++		} );
++
++		it( 'should handle years below 1000 when minYear allows them', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="1986-10-18T11:00:00"
++					onChange={ onChangeSpy }
++					minYear={ 1 }
++					is12Hour
++				/>
++			);
++
++			const yearInput = screen.getByLabelText( 'Year' );
++
++			// Clear the year field and blur - browser will coerce to minYear (1)
++			await user.clear( yearInput );
++			await user.keyboard( '{Tab}' );
++
++			// Verify the input field value after browser coercion to minYear
++			expect( yearInput ).toHaveValue( 1 );
++
++			// Verify that if onChange was called, it only received valid date strings
++			onChangeSpy.mock.calls.forEach( ( call ) => {
++				const dateString = call[ 0 ];
++				expect( dateString ).toMatch(
++					/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/
++				);
++				expect( dateString ).not.toContain( 'NaN' );
++				expect( dateString ).not.toContain( 'Invalid' );
++			} );
++		} );
++	} );
++
++	describe( 'Years below 1000 support', () => {
++		it( 'should handle year 999 with zero-padded output', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="0999-10-18T11:00:00"
++					onChange={ onChangeSpy }
++					minYear={ 1 }
++				/>
++			);
++
++			const yearInput = screen.getByLabelText( 'Year' );
++
++			// Verify input displays human-readable year (not zero-padded)
++			expect( yearInput ).toHaveValue( 999 );
++
++			// Change to year 500
++			await user.clear( yearInput );
++			await user.type( yearInput, '500' );
++			await user.keyboard( '{Tab}' );
++
++			// Verify input displays human-readable year
++			expect( yearInput ).toHaveValue( 500 );
++
++			// Verify onChange emits zero-padded ISO 8601 format
++			const lastCall =
++				onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
++			expect( lastCall[ 0 ] ).toMatch( /^0500-10-18T/ );
++			expect( lastCall[ 0 ] ).not.toContain( 'NaN' );
++		} );
++
++		it( 'should handle year 1 with zero-padded output', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="0001-01-01T12:00:00"
++					onChange={ onChangeSpy }
++					minYear={ 1 }
++				/>
++			);
++
++			const yearInput = screen.getByLabelText( 'Year' );
++
++			// Verify input displays human-readable year (not zero-padded)
++			expect( yearInput ).toHaveValue( 1 );
++
++			// Change to year 99
++			await user.clear( yearInput );
++			await user.type( yearInput, '99' );
++			await user.keyboard( '{Tab}' );
++
++			// Verify input displays human-readable year
++			expect( yearInput ).toHaveValue( 99 );
++
++			// Verify onChange emits zero-padded ISO 8601 format
++			const lastCall =
++				onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
++			expect( lastCall[ 0 ] ).toMatch( /^0099-01-01T/ );
++		} );
++
++		it( 'should allow years below 1000 when minYear permits', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="1986-10-18T11:00:00"
++					onChange={ onChangeSpy }
++					minYear={ 1 }
++				/>
++			);
++
++			const yearInput = screen.getByLabelText( 'Year' );
++
++			// Verify initial input displays correctly
++			expect( yearInput ).toHaveValue( 1986 );
++
++			// Type year 500 - should be allowed
++			await user.clear( yearInput );
++			await user.type( yearInput, '500' );
++			await user.keyboard( '{Tab}' );
++
++			// Verify input displays human-readable year (not zero-padded)
++			expect( yearInput ).toHaveValue( 500 );
++
++			// Verify onChange was called with zero-padded ISO 8601 format
++			expect( onChangeSpy ).toHaveBeenCalled();
++			const lastCall =
++				onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
++			expect( lastCall[ 0 ] ).toMatch( /^0500-/ );
++		} );
++
++		it( 'should handle year 500 correctly', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="0500-06-15T09:30:00"
++					onChange={ onChangeSpy }
++					minYear={ 1 }
++				/>
++			);
++
++			const yearInput = screen.getByLabelText( 'Year' );
++
++			// Verify input displays human-readable year (not zero-padded)
++			expect( yearInput ).toHaveValue( 500 );
++
++			// Change to year 750
++			await user.clear( yearInput );
++			await user.type( yearInput, '750' );
++			await user.keyboard( '{Tab}' );
++
++			// Verify input displays human-readable year
++			expect( yearInput ).toHaveValue( 750 );
++
++			// Verify onChange emits zero-padded ISO 8601 format
++			const lastCall =
++				onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
++			expect( lastCall[ 0 ] ).toMatch( /^0750-06-15T/ );
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/date-time/types.ts b/packages/components/src/date-time/types.ts
+index 1f2298d9d450b5..68c39d7b4d4718 100644
+--- a/packages/components/src/date-time/types.ts
++++ b/packages/components/src/date-time/types.ts
+@@ -36,6 +36,13 @@ export type TimePickerProps = {
+ 	 * @default false
+ 	 */
+ 	hideLabelFromVision?: boolean;
++
++	/**
++	 * The minimum year that can be selected in the year input field.
++	 *
++	 * @default 1
++	 */
++	minYear?: number;
+ };
+ 
+ export type TimeInputValue = {
+diff --git a/packages/editor/src/components/post-schedule/index.js b/packages/editor/src/components/post-schedule/index.js
+index e324e40896d379..c0ad5541181b57 100644
+--- a/packages/editor/src/components/post-schedule/index.js
++++ b/packages/editor/src/components/post-schedule/index.js
+@@ -6,7 +6,7 @@ import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
+ /**
+  * WordPress dependencies
+  */
+-import { getSettings } from '@wordpress/date';
++import { getDate, getSettings } from '@wordpress/date';
+ import { _x } from '@wordpress/i18n';
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+@@ -94,6 +94,11 @@ export function PrivatePostSchedule( {
+ 			.join( '' ) // Reverse the string and test for "a" not followed by a slash.
+ 	);
+ 
++	// Get the current year in the site's timezone to use as the minimum schedulable year.
++	// We use getDate() instead of new Date() to ensure we respect the WordPress site's
++	// configured timezone rather than the browser/system timezone.
++	const currentSiteYear = getDate().getFullYear();
++
+ 	return (
+ 		<PrivatePublishDateTimePicker
+ 			currentDate={ postDate }
+@@ -103,6 +108,7 @@ export function PrivatePostSchedule( {
+ 				/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
+ 				_x( 'dmy', 'date order' )
+ 			}
++			minYear={ currentSiteYear }
+ 			events={ events }
+ 			onMonthPreviewed={ ( date ) =>
+ 				setPreviewedMonth( parseISO( date ) )
+diff --git a/test/e2e/specs/editor/various/datepicker.spec.js b/test/e2e/specs/editor/various/datepicker.spec.js
+index f6337016c18ed1..5f961897a18a01 100644
+--- a/test/e2e/specs/editor/various/datepicker.spec.js
++++ b/test/e2e/specs/editor/various/datepicker.spec.js
+@@ -40,7 +40,7 @@ TIMEZONES.forEach( ( timezone ) => {
+ 			).toHaveText( 'Immediately' );
+ 		} );
+ 
+-		test( 'should show the publishing date if the date is in the past', async ( {
++		test( 'should not allow scheduling to a past year', async ( {
+ 			page,
+ 		} ) => {
+ 			const datepicker = page.getByRole( 'button', {
+@@ -48,18 +48,26 @@ TIMEZONES.forEach( ( timezone ) => {
+ 			} );
+ 			await datepicker.click();
+ 
+-			// Change the publishing date to a year in the future.
+-			await page
++			const yearInput = page
+ 				.getByRole( 'group', { name: 'Date' } )
+-				.getByRole( 'spinbutton', { name: 'Year' } )
+-				.click();
++				.getByRole( 'spinbutton', { name: 'Year' } );
++
++			// Get the current year value
++			const currentYear = await yearInput.inputValue();
++
++			// Try to decrease the year
++			await yearInput.click();
+ 			await page.keyboard.press( 'ArrowDown' );
++
++			// The year should remain at the current year (cannot go to past)
++			await expect( yearInput ).toHaveValue( currentYear );
++
+ 			await page.keyboard.press( 'Escape' );
+ 
+-			// The expected date format will be "Sep 26, 2018 11:52 pm".
++			// Since the date hasn't changed from current, it should still show "Immediately"
+ 			await expect(
+ 				page.getByRole( 'button', { name: 'Change date' } )
+-			).toContainText( /^[A-Za-z]+\s\d{1,2},\s\d{1,4}/ );
++			).toHaveText( 'Immediately' );
+ 		} );
+ 
+ 		test( 'should show the publishing date if the date is in the future', async ( {

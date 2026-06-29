@@ -1,0 +1,125 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f120524899f369..7cc38f5d2dbc44 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,10 @@
+     -   `BorderControl` ([#79418](https://github.com/WordPress/gutenberg/pull/79418))
+     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
+ 
++### Enhancements
++
++-   `SandBox`: Add `allowPopups` prop to opt into `allow-popups` in the iframe's sandbox attribute ([#69617](https://github.com/WordPress/gutenberg/pull/69617)).
++
+ ### Documentation
+ 
+ -   Document the safe `clsx` pattern for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490)).
+diff --git a/packages/components/src/sandbox/index.tsx b/packages/components/src/sandbox/index.tsx
+index bd8290437208db..b0928a3b45ccc5 100644
+--- a/packages/components/src/sandbox/index.tsx
++++ b/packages/components/src/sandbox/index.tsx
+@@ -203,11 +203,16 @@ function IsolatedSandBox( {
+ 	scripts = [],
+ 	onFocus,
+ 	tabIndex,
++	allowPopups = false,
+ }: SandBoxContentProps ) {
+ 	const ref = useRef< HTMLIFrameElement >( null );
+ 	const [ width, setWidth ] = useState( 0 );
+ 	const [ height, setHeight ] = useState( 0 );
+ 
++	const sandbox = `allow-scripts allow-presentation${
++		allowPopups ? ' allow-popups' : ''
++	}`;
++
+ 	const srcDoc = useMemo(
+ 		() => buildSandBoxDocument( { html, title, type, styles, scripts } ),
+ 		[ html, title, type, styles, scripts ]
+@@ -281,7 +286,7 @@ function IsolatedSandBox( {
+ 			title={ title }
+ 			tabIndex={ tabIndex }
+ 			className="components-sandbox"
+-			sandbox="allow-scripts allow-presentation"
++			sandbox={ sandbox }
+ 			srcDoc={ srcDoc }
+ 			onFocus={ onFocus }
+ 			width={ Math.ceil( width ) }
+@@ -312,11 +317,16 @@ function SameOriginSandBox( {
+ 	scripts = [],
+ 	onFocus,
+ 	tabIndex,
++	allowPopups = false,
+ }: SandBoxContentProps ) {
+ 	const ref = useRef< HTMLIFrameElement >( null );
+ 	const [ width, setWidth ] = useState( 0 );
+ 	const [ height, setHeight ] = useState( 0 );
+ 
++	const sandbox = `allow-scripts allow-same-origin allow-presentation${
++		allowPopups ? ' allow-popups' : ''
++	}`;
++
+ 	function isFrameAccessible() {
+ 		try {
+ 			return !! ref.current?.contentDocument?.body;
+@@ -463,7 +473,7 @@ function SameOriginSandBox( {
+ 			title={ title }
+ 			tabIndex={ tabIndex }
+ 			className="components-sandbox"
+-			sandbox="allow-scripts allow-same-origin allow-presentation"
++			sandbox={ sandbox }
+ 			onFocus={ onFocus }
+ 			width={ Math.ceil( width ) }
+ 			height={ Math.ceil( height ) }
+diff --git a/packages/components/src/sandbox/test/index.tsx b/packages/components/src/sandbox/test/index.tsx
+index e970ef564c0545..bfb96d4ab27716 100644
+--- a/packages/components/src/sandbox/test/index.tsx
++++ b/packages/components/src/sandbox/test/index.tsx
+@@ -49,6 +49,27 @@ describe( 'SandBox', () => {
+ 		);
+ 	} );
+ 
++	it( 'should not include allow-popups by default', () => {
++		render( <SandBox html="<p>Hello</p>" title="No Popups" /> );
++
++		const iframe = screen.getByTitle< HTMLIFrameElement >( 'No Popups' );
++
++		expect( iframe.getAttribute( 'sandbox' ) ).not.toContain(
++			'allow-popups'
++		);
++	} );
++
++	it( 'should include allow-popups when allowPopups is set', () => {
++		render( <SandBox html="<p>Hello</p>" title="Popups" allowPopups /> );
++
++		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Popups' );
++
++		expect( iframe ).toHaveAttribute(
++			'sandbox',
++			'allow-scripts allow-presentation allow-popups'
++		);
++	} );
++
+ 	it( 'should set srcdoc with the provided html content', () => {
+ 		render( <SandBox html="<p>Hello</p>" title="Test Title" /> );
+ 
+diff --git a/packages/components/src/sandbox/types.ts b/packages/components/src/sandbox/types.ts
+index 416937b296724b..9c7e7454771df2 100644
+--- a/packages/components/src/sandbox/types.ts
++++ b/packages/components/src/sandbox/types.ts
+@@ -10,6 +10,17 @@ export type SandBoxProps = {
+ 	 * @default false
+ 	 */
+ 	allowSameOrigin?: boolean;
++	/**
++	 * Whether to include `allow-popups` in the iframe's sandbox attribute.
++	 * When true, content inside the iframe is allowed to open new browsing
++	 * contexts (e.g. links that open in a new tab, or `window.open`).
++	 *
++	 * Enable this for previews whose content includes links that should be
++	 * followable, such as embeds.
++	 *
++	 * @default false
++	 */
++	allowPopups?: boolean;
+ 	/**
+ 	 * The HTML to render in the body of the iframe document.
+ 	 *

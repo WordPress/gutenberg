@@ -1,0 +1,180 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ecf4d3628c0839..dd14d1f24e626f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ -   `Button`: Fix logic of `has-text` class addition ([#56949](https://github.com/WordPress/gutenberg/pull/56949)).
+ -   `FormTokenField`: Fix a regression where the suggestion list would re-open after clicking away from the input ([#57002](https://github.com/WordPress/gutenberg/pull/57002)).
+ -   `Snackbar`: Remove erroneous `__unstableHTML` prop from TypeScript definitions ([#57218](https://github.com/WordPress/gutenberg/pull/57218)).
++-   `Truncate`: improve handling of non-string `children` ([#57261](https://github.com/WordPress/gutenberg/pull/57261)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/truncate/README.md b/packages/components/src/truncate/README.md
+index d173edb14977cd..7665d82de0ba87 100644
+--- a/packages/components/src/truncate/README.md
++++ b/packages/components/src/truncate/README.md
+@@ -24,6 +24,14 @@ function Example() {
+ 
+ ## Props
+ 
++##### `children`: `ReactNode`
++
++The children elements.
++
++Note: text truncation will be attempted only if the `children` are either of type `string` or `number`. In any other scenarios, the component will not attempt to truncate the text, and will pass through the `children`.
++
++-   Required: Yes
++
+ ##### `ellipsis`: `string`
+ 
+ The ellipsis string when truncating the text by the `limit` prop's value.
+diff --git a/packages/components/src/truncate/hook.ts b/packages/components/src/truncate/hook.ts
+index 3877e216ba5801..16406a4e51bb9a 100644
+--- a/packages/components/src/truncate/hook.ts
++++ b/packages/components/src/truncate/hook.ts
+@@ -33,17 +33,24 @@ export default function useTruncate(
+ 
+ 	const cx = useCx();
+ 
+-	const truncatedContent = truncateContent(
+-		typeof children === 'string' ? children : '',
+-		{
+-			ellipsis,
+-			ellipsizeMode,
+-			limit,
+-			numberOfLines,
+-		}
+-	);
++	let childrenAsText;
++	if ( typeof children === 'string' ) {
++		childrenAsText = children;
++	} else if ( typeof children === 'number' ) {
++		childrenAsText = children.toString();
++	}
+ 
+-	const shouldTruncate = ellipsizeMode === TRUNCATE_TYPE.auto;
++	const truncatedContent = childrenAsText
++		? truncateContent( childrenAsText, {
++				ellipsis,
++				ellipsizeMode,
++				limit,
++				numberOfLines,
++		  } )
++		: children;
++
++	const shouldTruncate =
++		!! childrenAsText && ellipsizeMode === TRUNCATE_TYPE.auto;
+ 
+ 	const classes = useMemo( () => {
+ 		const truncateLines = css`
+diff --git a/packages/components/src/truncate/test/index.tsx b/packages/components/src/truncate/test/index.tsx
+index 082b6aa232d477..399393a25e4201 100644
+--- a/packages/components/src/truncate/test/index.tsx
++++ b/packages/components/src/truncate/test/index.tsx
+@@ -8,36 +8,63 @@ import { render, screen } from '@testing-library/react';
+  */
+ import { Truncate } from '..';
+ 
+-describe( 'props', () => {
+-	test( 'should render correctly', () => {
+-		render( <Truncate>Lorem ipsum.</Truncate> );
+-		expect( screen.getByText( 'Lorem ipsum.' ) ).toBeVisible();
+-	} );
++describe( 'Truncate', () => {
++	describe( 'with string or number children', () => {
++		test( 'should pass through when no truncation props are set', () => {
++			render( <Truncate>Lorem ipsum</Truncate> );
++			expect( screen.getByText( 'Lorem ipsum' ) ).toBeVisible();
++		} );
+ 
+-	test( 'should render limit', () => {
+-		render(
+-			<Truncate limit={ 1 } ellipsizeMode="tail">
+-				Lorem ipsum.
+-			</Truncate>
+-		);
+-		expect( screen.getByText( 'L…' ) ).toBeVisible();
+-	} );
++		test( 'should render numbers correctly', () => {
++			render( <Truncate>{ 14 }</Truncate> );
++			expect( screen.getByText( '14' ) ).toBeVisible();
++		} );
++
++		test( 'should truncate text from the start when the limit prop is set and the ellipsizeMode is tail', () => {
++			render(
++				<Truncate limit={ 1 } ellipsizeMode="tail">
++					Lorem ipsum
++				</Truncate>
++			);
++			expect( screen.getByText( 'L…' ) ).toBeVisible();
++		} );
++
++		test( 'should truncate text from the end when the limit prop is set and the ellipsizeMode is head', () => {
++			render(
++				<Truncate limit={ 1 } ellipsizeMode="head">
++					Lorem ipsum
++				</Truncate>
++			);
++			expect( screen.getByText( '…m' ) ).toBeVisible();
++		} );
++
++		test( 'should render custom ellipsis', () => {
++			render(
++				<Truncate ellipsis="!!!" limit={ 5 } ellipsizeMode="tail">
++					Lorem ipsum.
++				</Truncate>
++			);
++			expect( screen.getByText( 'Lorem!!!' ) ).toBeVisible();
++		} );
+ 
+-	test( 'should render custom ellipsis', () => {
+-		render(
+-			<Truncate ellipsis="!!!" limit={ 5 } ellipsizeMode="tail">
+-				Lorem ipsum.
+-			</Truncate>
+-		);
+-		expect( screen.getByText( 'Lorem!!!' ) ).toBeVisible();
++		test( 'should render custom ellipsizeMode', () => {
++			render(
++				<Truncate ellipsis="!!!" ellipsizeMode="middle" limit={ 5 }>
++					Lorem ipsum.
++				</Truncate>
++			);
++			expect( screen.getByText( 'Lo!!!m.' ) ).toBeVisible();
++		} );
+ 	} );
+ 
+-	test( 'should render custom ellipsizeMode', () => {
+-		render(
+-			<Truncate ellipsis="!!!" ellipsizeMode="middle" limit={ 5 }>
+-				Lorem ipsum.
+-			</Truncate>
+-		);
+-		expect( screen.getByText( 'Lo!!!m.' ) ).toBeVisible();
++	describe( 'with other children types', () => {
++		test( 'should no-op and output a warning to console', () => {
++			render(
++				<Truncate>
++					<>Lorem ipsum</>
++				</Truncate>
++			);
++			expect( screen.getByText( 'Lorem ipsum' ) ).toBeVisible();
++		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/truncate/types.ts b/packages/components/src/truncate/types.ts
+index f9b720657d9b59..6725f9e225f8a4 100644
+--- a/packages/components/src/truncate/types.ts
++++ b/packages/components/src/truncate/types.ts
+@@ -48,6 +48,10 @@ export type TruncateProps = {
+ 	numberOfLines?: number;
+ 	/**
+ 	 * The children elements.
++	 *
++	 * Note: text truncation will be attempted only if the `children` are either
++	 * of type `string` or `number`. In any other scenarios, the component will
++	 * not attempt to truncate the text, and will pass through the `children`.
+ 	 */
+ 	children: ReactNode;
+ };

@@ -1,0 +1,205 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index fd7e9183781eaf..8a44b5ef74a1e6 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -51,6 +51,11 @@ const restrictedImports = [
+ 		message:
+ 			'Please use Reakit API through `@wordpress/components` instead.',
+ 	},
++	{
++		name: '@ariakit/react',
++		message:
++			'Please use Ariakit API through `@wordpress/components` instead.',
++	},
+ 	{
+ 		name: 'redux',
+ 		importNames: [ 'combineReducers' ],
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 83094370d0a500..5d4dee69162dc7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ ### Internal
+ 
+ -   `Tooltip`, `Shortcut`: Remove unused `ui/` components from the codebase ([#54573](https://github.com/WordPress/gutenberg/pull/54573))
++-   Refactor ariakit usages to use the `render` prop instead of `as` and to use the namespace import ([#54696](https://github.com/WordPress/gutenberg/pull/54696)).
+ -   Update `uuid` package to 9.0.1 ([#54725](https://github.com/WordPress/gutenberg/pull/54725)).
+ 
+ ## 25.8.0 (2023-09-20)
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index 4fff7dc306b023..eb34ed1fe7df93 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -1,6 +1,7 @@
+ /**
+  * External dependencies
+  */
++// eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
+ import classnames from 'classnames';
+ import type { ForwardedRef } from 'react';
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index 3682aa3a5f1f6d..302e54e01e4ddc 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -3,7 +3,7 @@
+  */
+ import type { ForwardedRef } from 'react';
+ // eslint-disable-next-line no-restricted-imports
+-import { Radio } from '@ariakit/react/radio';
++import * as Ariakit from '@ariakit/react';
+ // eslint-disable-next-line no-restricted-imports
+ import { motion, useReducedMotion } from 'framer-motion';
+ 
+@@ -140,7 +140,7 @@ function ToggleGroupControlOptionBase(
+ 						<ButtonContentView>{ children }</ButtonContentView>
+ 					</button>
+ 				) : (
+-					<Radio
++					<Ariakit.Radio
+ 						render={
+ 							<button
+ 								{ ...commonProps }
+@@ -154,7 +154,7 @@ function ToggleGroupControlOptionBase(
+ 						value={ value }
+ 					>
+ 						<ButtonContentView>{ children }</ButtonContentView>
+-					</Radio>
++					</Ariakit.Radio>
+ 				) }
+ 			</WithToolTip>
+ 			{ /* Animated backdrop using framer motion's shared layout animation */ }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+index e83306b91cb7cd..93412fb80fd996 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+@@ -3,7 +3,7 @@
+  */
+ import type { ForwardedRef } from 'react';
+ // eslint-disable-next-line no-restricted-imports
+-import { RadioGroup, useRadioStore } from '@ariakit/react/radio';
++import * as Ariakit from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -61,7 +61,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
+ 		  }
+ 		: undefined;
+ 
+-	const radio = useRadioStore( {
++	const radio = Ariakit.useRadioStore( {
+ 		defaultValue,
+ 		value,
+ 		setValue: wrappedOnChangeProp,
+@@ -84,16 +84,16 @@ function UnforwardedToggleGroupControlAsRadioGroup(
+ 
+ 	return (
+ 		<ToggleGroupControlContext.Provider value={ groupContextValue }>
+-			<RadioGroup
++			<Ariakit.RadioGroup
+ 				store={ radio }
+ 				aria-label={ label }
+-				as={ View }
++				render={ <View /> }
+ 				{ ...otherProps }
+ 				id={ baseId }
+ 				ref={ forwardedRef }
+ 			>
+ 				{ children }
+-			</RadioGroup>
++			</Ariakit.RadioGroup>
+ 		</ToggleGroupControlContext.Provider>
+ 	);
+ }
+diff --git a/packages/components/src/toolbar/toolbar-context/index.ts b/packages/components/src/toolbar/toolbar-context/index.ts
+index 462c3c83b46a87..87c35c75fc68f1 100644
+--- a/packages/components/src/toolbar/toolbar-context/index.ts
++++ b/packages/components/src/toolbar/toolbar-context/index.ts
+@@ -1,13 +1,16 @@
+ /**
+  * External dependencies
+  */
+-import type { ToolbarStore } from '@ariakit/react/toolbar';
++// eslint-disable-next-line no-restricted-imports
++import type * as Ariakit from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { createContext } from '@wordpress/element';
+ 
+-const ToolbarContext = createContext< ToolbarStore | undefined >( undefined );
++const ToolbarContext = createContext< Ariakit.ToolbarStore | undefined >(
++	undefined
++);
+ 
+ export default ToolbarContext;
+diff --git a/packages/components/src/toolbar/toolbar-item/index.tsx b/packages/components/src/toolbar/toolbar-item/index.tsx
+index 3bf55aedd8a48a..2c343eb173a27b 100644
+--- a/packages/components/src/toolbar/toolbar-item/index.tsx
++++ b/packages/components/src/toolbar/toolbar-item/index.tsx
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { ToolbarItem as BaseToolbarItem } from '@ariakit/react/toolbar';
++// eslint-disable-next-line no-restricted-imports
++import * as Ariakit from '@ariakit/react';
+ import type { ForwardedRef } from 'react';
+ 
+ /**
+@@ -48,7 +49,7 @@ function ToolbarItem(
+ 		: Component && <Component>{ children }</Component>;
+ 
+ 	return (
+-		<BaseToolbarItem
++		<Ariakit.ToolbarItem
+ 			{ ...allProps }
+ 			store={ accessibleToolbarStore }
+ 			render={ render }
+diff --git a/packages/components/src/toolbar/toolbar/toolbar-container.tsx b/packages/components/src/toolbar/toolbar/toolbar-container.tsx
+index f27b443fdce309..fb60b8e8b496d5 100644
+--- a/packages/components/src/toolbar/toolbar/toolbar-container.tsx
++++ b/packages/components/src/toolbar/toolbar/toolbar-container.tsx
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { useToolbarStore, Toolbar } from '@ariakit/react/toolbar';
++// eslint-disable-next-line no-restricted-imports
++import * as Ariakit from '@ariakit/react';
+ import type { ForwardedRef } from 'react';
+ 
+ /**
+@@ -21,7 +22,7 @@ function UnforwardedToolbarContainer(
+ 	{ label, ...props }: WordPressComponentProps< ToolbarProps, 'div', false >,
+ 	ref: ForwardedRef< any >
+ ) {
+-	const toolbarStore = useToolbarStore( {
++	const toolbarStore = Ariakit.useToolbarStore( {
+ 		focusLoop: true,
+ 		rtl: isRTL(),
+ 	} );
+@@ -29,7 +30,7 @@ function UnforwardedToolbarContainer(
+ 	return (
+ 		// This will provide state for `ToolbarButton`'s
+ 		<ToolbarContext.Provider value={ toolbarStore }>
+-			<Toolbar
++			<Ariakit.Toolbar
+ 				ref={ ref }
+ 				aria-label={ label }
+ 				store={ toolbarStore }
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index bbb8a8d24b8086..9ea7b88a65db03 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import * as Ariakit from '@ariakit/react/tooltip';
++// eslint-disable-next-line no-restricted-imports
++import * as Ariakit from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies

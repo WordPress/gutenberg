@@ -1,0 +1,40 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b37b7b876abe48..95d841a4e185f1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,16 +4,14 @@
+ 
+ ### Bug Fixes
+ 
+-<<<<<<< fix/rtc-inline-inserter
+ -   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).
+-=======
+ -   `ValidatedRangeControl`: Fix `aria-label` rendered as `[object Object]` when `required` or `markWhenOptional` is set ([#77042](https://github.com/WordPress/gutenberg/pull/77042)).
+ -   `Autocomplete`: Fix matching logic to prefer longest overlapping trigger ([#77018](https://github.com/WordPress/gutenberg/pull/77018)).
+ 
+ ### Internal
+ 
+--   Autocomplete: Refactor `useAutocomplete` to use `useReducer` ([#77020](https://github.com/WordPress/gutenberg/pull/77020)).
+->>>>>>> trunk
++-   `Autocomplete`: Refactor `useAutocomplete` to use `useReducer` ([#77020](https://github.com/WordPress/gutenberg/pull/77020)).
++-   `Button`: Remove obsolete Safari + VoiceOver workaround for visually hidden text ([#77107](https://github.com/WordPress/gutenberg/pull/77107)).
+ 
+ ## 32.5.0 (2026-04-01)
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 44ca2bf1409957..645e83de9c86b3 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -410,12 +410,6 @@
+ 			fill: CanvasText;
+ 		}
+ 	}
+-
+-	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.
+-	// See https://core.trac.wordpress.org/ticket/42006 and https://github.com/h5bp/html5-boilerplate/issues/1985
+-	.components-visually-hidden {
+-		height: auto;
+-	}
+ }
+ 
+ @keyframes components-button__busy-animation {

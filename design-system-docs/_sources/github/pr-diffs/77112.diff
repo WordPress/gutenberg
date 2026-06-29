@@ -1,0 +1,217 @@
+diff --git a/eslint.config.mjs b/eslint.config.mjs
+index af1f1ef566231f..f789514b76e6d1 100644
+--- a/eslint.config.mjs
++++ b/eslint.config.mjs
+@@ -131,6 +131,17 @@ const restrictedImports = [
+ 	},
+ ];
+ 
++// Common `no-restricted-imports` configuration for `@wordpress/ui` paths,
++// which occur across multiple override configs. The exclusion here allows
++// Base UI to be imported directly in `@wordpress/ui`, which is the intended
++// abstraction layer for BaseUI components.
++const UI_RESTRICTED_IMPORTS = {
++	paths: restrictedImports.filter(
++		( { name } ) => name !== '@base-ui/react'
++	),
++	patterns: [],
++};
++
+ const restrictedSyntax = [
+ 	{
+ 		selector:
+@@ -663,13 +674,30 @@ export default dedupePlugins( [
+ 	// Override: UI src — allow base-ui imports.
+ 	{
+ 		files: [ 'packages/ui/src/**' ],
++		rules: {
++			'no-restricted-imports': [ 'error', UI_RESTRICTED_IMPORTS ],
++		},
++	},
++
++	// Override: UI stories — prevent barrel imports. Namespace re-exports cause
++	// react-docgen-typescript to resolve the wrong component when a story's
++	// component is imported via the barrel.
++	//
++	// See: https://github.com/storybookjs/storybook/issues/32839
++	{
++		files: [ 'packages/ui/src/**/stories/*.story.@(ts|tsx)' ],
+ 		rules: {
+ 			'no-restricted-imports': [
+ 				'error',
+ 				{
+-					paths: restrictedImports.filter(
+-						( { name } ) => ! [ '@base-ui/react' ].includes( name )
+-					),
++					...UI_RESTRICTED_IMPORTS,
++					patterns: UI_RESTRICTED_IMPORTS.patterns.concat( [
++						{
++							regex: '^\\.\\.(/\\.\\.)+/?$',
++							message:
++								"Don't import from the `@wordpress/ui` barrel in stories, which break import resolution in Storybook. Use an import from the component's own directory instead (e.g. `import { Icon } from '../icon';`).",
++						},
++					] ),
+ 				},
+ 			],
+ 		},
+diff --git a/packages/ui/src/alert-dialog/stories/index.story.tsx b/packages/ui/src/alert-dialog/stories/index.story.tsx
+index 1227ae1826e70f..814a70b8a6885c 100644
+--- a/packages/ui/src/alert-dialog/stories/index.story.tsx
++++ b/packages/ui/src/alert-dialog/stories/index.story.tsx
+@@ -3,8 +3,8 @@ import { useId, useState } from '@wordpress/element';
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { action } from 'storybook/actions';
+ import { fn } from 'storybook/test';
+-
+-import { AlertDialog, Text } from '../..';
++import * as AlertDialog from '../';
++import { Text } from '../../text';
+ 
+ const meta: Meta< typeof AlertDialog.Root > = {
+ 	title: 'Design System/Components/AlertDialog',
+diff --git a/packages/ui/src/empty-state/stories/index.story.tsx b/packages/ui/src/empty-state/stories/index.story.tsx
+index af9ebed23ea03e..bc5560a47d73ac 100644
+--- a/packages/ui/src/empty-state/stories/index.story.tsx
++++ b/packages/ui/src/empty-state/stories/index.story.tsx
+@@ -1,6 +1,7 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { search } from '@wordpress/icons';
+-import { Button, EmptyState } from '../..';
++import { Button } from '../../button';
++import * as EmptyState from '../';
+ 
+ const meta: Meta< typeof EmptyState.Root > = {
+ 	title: 'Design System/Components/EmptyState',
+diff --git a/packages/ui/src/form/input-control/stories/index.story.tsx b/packages/ui/src/form/input-control/stories/index.story.tsx
+index dc7c1d1313f660..afe1b49eddab7d 100644
+--- a/packages/ui/src/form/input-control/stories/index.story.tsx
++++ b/packages/ui/src/form/input-control/stories/index.story.tsx
+@@ -1,7 +1,10 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { useState } from '@wordpress/element';
+ import { plus, reset, seen, unseen } from '@wordpress/icons';
+-import { IconButton, InputControl, InputLayout, Stack } from '../../..';
++import { InputControl } from '../';
++import { IconButton } from '../../../icon-button';
++import { InputLayout } from '../../primitives/input-layout';
++import { Stack } from '../../../stack';
+ import {
+ 	WithPrefix,
+ 	WithSuffixControl,
+diff --git a/packages/ui/src/form/primitives/field/stories/index.story.tsx b/packages/ui/src/form/primitives/field/stories/index.story.tsx
+index b6e17e9a087407..ef1243f428a8ad 100644
+--- a/packages/ui/src/form/primitives/field/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/field/stories/index.story.tsx
+@@ -1,6 +1,6 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { useId } from '@wordpress/element';
+-import { Field } from '../../../..';
++import * as Field from '../';
+ import { DETAILS_EXAMPLE } from '../../../stories/shared';
+ 
+ const meta: Meta< typeof Field.Root > = {
+diff --git a/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx b/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
+index 2648987fb3609f..6658ff285911ff 100644
+--- a/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
+@@ -1,5 +1,5 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+-import { Fieldset } from '../../../..';
++import * as Fieldset from '../';
+ import { DETAILS_EXAMPLE } from '../../../stories/shared';
+ 
+ const meta: Meta< typeof Fieldset.Root > = {
+diff --git a/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx b/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx
+index a391ec1fd84e58..78a83861e90f0c 100644
+--- a/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/input-layout/stories/index.story.tsx
+@@ -1,6 +1,7 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { copy } from '@wordpress/icons';
+-import { IconButton, InputLayout } from '../../../..';
++import { InputLayout } from '../';
++import { IconButton } from '../../../../icon-button';
+ 
+ const meta: Meta< typeof InputLayout > = {
+ 	title: 'Design System/Components/Form/Primitives/InputLayout',
+diff --git a/packages/ui/src/form/primitives/input/stories/index.story.tsx b/packages/ui/src/form/primitives/input/stories/index.story.tsx
+index eb81e6d95ad3d2..cc2952596a15d8 100644
+--- a/packages/ui/src/form/primitives/input/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/input/stories/index.story.tsx
+@@ -1,5 +1,6 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+-import { Input, InputLayout } from '../../../..';
++import { Input } from '../';
++import { InputLayout } from '../../input-layout';
+ import { WithSuffixControl } from '../../input-layout/stories/index.story';
+ 
+ const meta: Meta< typeof Input > = {
+diff --git a/packages/ui/src/form/primitives/select/stories/index.story.tsx b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+index 5227173de6400f..4e6b016606f866 100644
+--- a/packages/ui/src/form/primitives/select/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+@@ -1,5 +1,5 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+-import { Select } from '../../../..';
++import * as Select from '../';
+ 
+ const meta: Meta< typeof Select.Root > = {
+ 	title: 'Design System/Components/Form/Primitives/Select',
+diff --git a/packages/ui/src/popover/stories/index.story.tsx b/packages/ui/src/popover/stories/index.story.tsx
+index a5c037ab25d5dc..3264ae6f1d22b9 100644
+--- a/packages/ui/src/popover/stories/index.story.tsx
++++ b/packages/ui/src/popover/stories/index.story.tsx
+@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { useId, useRef, useState } from '@wordpress/element';
+ import { SlotFillProvider, Slot } from '@wordpress/components';
+ import { close, info } from '@wordpress/icons';
+-import { Popover, VisuallyHidden } from '../..';
++import * as Popover from '../';
++import { VisuallyHidden } from '../../visually-hidden';
+ import { Icon } from '../../icon';
+ import { IconButton } from '../../icon-button';
+ import { GenericIframe, useMeasure } from './utils';
+diff --git a/packages/ui/src/tabs/stories/index.story.tsx b/packages/ui/src/tabs/stories/index.story.tsx
+index e588d6dd22e732..4f221869adf8a4 100644
+--- a/packages/ui/src/tabs/stories/index.story.tsx
++++ b/packages/ui/src/tabs/stories/index.story.tsx
+@@ -1,7 +1,8 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { useState, cloneElement } from '@wordpress/element';
+ import { link, more, wordpress } from '@wordpress/icons';
+-import { Tabs, Tooltip } from '../..';
++import * as Tabs from '../';
++import * as Tooltip from '../../tooltip';
+ 
+ const meta: Meta< typeof Tabs.Root > = {
+ 	title: 'Design System/Components/Tabs',
+diff --git a/packages/ui/src/tooltip/stories/index.story.tsx b/packages/ui/src/tooltip/stories/index.story.tsx
+index 0822576f6db59e..3b8d44dde30a15 100644
+--- a/packages/ui/src/tooltip/stories/index.story.tsx
++++ b/packages/ui/src/tooltip/stories/index.story.tsx
+@@ -1,6 +1,7 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { formatBold, formatItalic } from '@wordpress/icons';
+-import { Icon, Tooltip } from '../..';
++import { Icon } from '../../icon';
++import * as Tooltip from '../';
+ 
+ const meta: Meta< typeof Tooltip.Root > = {
+ 	title: 'Design System/Components/Tooltip',
+diff --git a/packages/ui/src/tooltip/stories/usage-guidelines.story.tsx b/packages/ui/src/tooltip/stories/usage-guidelines.story.tsx
+index 8e660df702da6c..222e29734ff3ba 100644
+--- a/packages/ui/src/tooltip/stories/usage-guidelines.story.tsx
++++ b/packages/ui/src/tooltip/stories/usage-guidelines.story.tsx
+@@ -5,7 +5,11 @@ import {
+ 	formatUnderline,
+ 	info,
+ } from '@wordpress/icons';
+-import { Icon, IconButton, Popover, Tooltip, VisuallyHidden } from '../..';
++import * as Tooltip from '../';
++import { Icon } from '../../icon';
++import { IconButton } from '../../icon-button';
++import * as Popover from '../../popover';
++import { VisuallyHidden } from '../../visually-hidden';
+ 
+ const meta: Meta = {
+ 	title: 'Design System/Components/Tooltip/Usage Guidelines',

@@ -1,0 +1,179 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a76e57dbda5a0a..796d550e86ec79 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Enhancements
+ 
+ -   `TreeGrid`: Add tests for `onCollapseRow`, `onExpandRow`, and `onFocusRow` callback functions. ([#38942](https://github.com/WordPress/gutenberg/pull/38942)).
++-   `TreeGrid`: Update callback tests to use `TreeGridRow` and `TreeGridCell` sub-components. ([#39002](https://github.com/WordPress/gutenberg/pull/39002)).
+ 
+ ## 19.4.0 (2022-02-10)
+ 
+diff --git a/packages/components/src/tree-grid/test/__snapshots__/index.js.snap b/packages/components/src/tree-grid/test/__snapshots__/index.js.snap
+index 4126bab5e34753..db862583f22e01 100644
+--- a/packages/components/src/tree-grid/test/__snapshots__/index.js.snap
++++ b/packages/components/src/tree-grid/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`TreeGrid simple rendering renders a table, tbody and any child elements 1`] = `"<table role=\\"treegrid\\"><tbody><tr><td>Test</td></tr></tbody></table>"`;
++exports[`TreeGrid simple rendering renders a table, tbody and any child elements 1`] = `"<table role=\\"treegrid\\"><tbody><tr role=\\"row\\" aria-level=\\"1\\" aria-posinset=\\"1\\" aria-setsize=\\"1\\"><td role=\\"gridcell\\">Test</td></tr></tbody></table>"`;
+diff --git a/packages/components/src/tree-grid/test/index.js b/packages/components/src/tree-grid/test/index.js
+index ac2552cabbe885..b565ebdb4a57eb 100644
+--- a/packages/components/src/tree-grid/test/index.js
++++ b/packages/components/src/tree-grid/test/index.js
+@@ -13,6 +13,8 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import TreeGrid from '../';
++import TreeGridRow from '../row';
++import TreeGridCell from '../cell';
+ 
+ const TestButton = forwardRef( ( { ...props }, ref ) => (
+ 	<button { ...props } ref={ ref }></button>
+@@ -46,9 +48,9 @@ describe( 'TreeGrid', () => {
+ 		it( 'renders a table, tbody and any child elements', () => {
+ 			const { container } = render(
+ 				<TreeGrid>
+-					<tr>
+-						<td>Test</td>
+-					</tr>
++					<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 1 }>
++						<TreeGridCell withoutGridItem>Test</TreeGridCell>
++					</TreeGridRow>
+ 				</TreeGrid>
+ 			);
+ 
+@@ -62,21 +64,36 @@ describe( 'TreeGrid', () => {
+ 
+ 			render(
+ 				<TreeGrid onExpandRow={ onExpandRow }>
+-					<tr role="row" aria-expanded="true">
+-						<td>
++					<TreeGridRow
++						level={ 1 }
++						positionInSet={ 1 }
++						setSize={ 3 }
++						isExpanded={ true }
++					>
++						<TreeGridCell withoutGridItem>
+ 							<TestButton>Row 1</TestButton>
+-						</td>
+-					</tr>
+-					<tr role="row" aria-expanded="false">
+-						<td>
++						</TreeGridCell>
++					</TreeGridRow>
++					<TreeGridRow
++						level={ 1 }
++						positionInSet={ 2 }
++						setSize={ 3 }
++						isExpanded={ false }
++					>
++						<TreeGridCell withoutGridItem>
+ 							<TestButton>Row 2</TestButton>
+-						</td>
+-					</tr>
+-					<tr role="row" aria-expanded="true">
+-						<td>
++						</TreeGridCell>
++					</TreeGridRow>
++					<TreeGridRow
++						level={ 1 }
++						positionInSet={ 3 }
++						setSize={ 3 }
++						isExpanded={ true }
++					>
++						<TreeGridCell withoutGridItem>
+ 							<TestButton>Row 3</TestButton>
+-						</td>
+-					</tr>
++						</TreeGridCell>
++					</TreeGridRow>
+ 				</TreeGrid>
+ 			);
+ 
+@@ -99,21 +116,36 @@ describe( 'TreeGrid', () => {
+ 
+ 			render(
+ 				<TreeGrid onCollapseRow={ onCollapseRow }>
+-					<tr role="row" aria-expanded="false">
+-						<td>
++					<TreeGridRow
++						level={ 1 }
++						positionInSet={ 1 }
++						setSize={ 3 }
++						isExpanded={ false }
++					>
++						<TreeGridCell withoutGridItem>
+ 							<TestButton>Row 1</TestButton>
+-						</td>
+-					</tr>
+-					<tr role="row" aria-expanded="true">
+-						<td>
++						</TreeGridCell>
++					</TreeGridRow>
++					<TreeGridRow
++						level={ 1 }
++						positionInSet={ 2 }
++						setSize={ 3 }
++						isExpanded={ true }
++					>
++						<TreeGridCell withoutGridItem>
+ 							<TestButton>Row 2</TestButton>
+-						</td>
+-					</tr>
+-					<tr role="row" aria-expanded="false">
+-						<td>
++						</TreeGridCell>
++					</TreeGridRow>
++					<TreeGridRow
++						level={ 1 }
++						positionInSet={ 3 }
++						setSize={ 3 }
++						isExpanded={ false }
++					>
++						<TreeGridCell withoutGridItem>
+ 							<TestButton>Row 3</TestButton>
+-						</td>
+-					</tr>
++						</TreeGridCell>
++					</TreeGridRow>
+ 				</TreeGrid>
+ 			);
+ 
+@@ -133,21 +165,21 @@ describe( 'TreeGrid', () => {
+ 	describe( 'onFocusRow', () => {
+ 		const TestTree = ( { onFocusRow } ) => (
+ 			<TreeGrid onFocusRow={ onFocusRow }>
+-				<tr role="row" aria-expanded="false">
+-					<td>
++				<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 3 }>
++					<TreeGridCell withoutGridItem>
+ 						<TestButton>Row 1</TestButton>
+-					</td>
+-				</tr>
+-				<tr role="row" aria-expanded="true">
+-					<td>
++					</TreeGridCell>
++				</TreeGridRow>
++				<TreeGridRow level={ 1 } positionInSet={ 2 } setSize={ 3 }>
++					<TreeGridCell withoutGridItem>
+ 						<TestButton>Row 2</TestButton>
+-					</td>
+-				</tr>
+-				<tr role="row" aria-expanded="false">
+-					<td>
++					</TreeGridCell>
++				</TreeGridRow>
++				<TreeGridRow level={ 1 } positionInSet={ 3 } setSize={ 3 }>
++					<TreeGridCell withoutGridItem>
+ 						<TestButton>Row 3</TestButton>
+-					</td>
+-				</tr>
++					</TreeGridCell>
++				</TreeGridRow>
+ 			</TreeGrid>
+ 		);
+ 

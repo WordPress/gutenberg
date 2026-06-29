@@ -1,0 +1,12 @@
+diff --git a/packages/base-styles/_mixins.scss b/packages/base-styles/_mixins.scss
+index f3e24b1f99d621..1fe266ce2a3154 100644
+--- a/packages/base-styles/_mixins.scss
++++ b/packages/base-styles/_mixins.scss
+@@ -235,6 +235,7 @@
+ }
+ 
+ @mixin input-control {
++	color: #2c3338 !important;
+ 	font-family: $default-font;
+ 	padding: 6px 8px;
+ 	@include input-style__neutral();

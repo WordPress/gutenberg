@@ -1,0 +1,49 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ff4a8b714c9a52..b124a4776278b0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,10 +2,6 @@
+ 
+ ## Unreleased
+ 
+-### Bug Fixes
+-
+--  `FormFileUpload`: Prevent HEIC and HEIF files from being uploaded on Safari ([#67139](https://github.com/WordPress/gutenberg/pull/67139)).
+-
+ ### Deprecations
+ 
+ -   `DimensionControl`: Deprecate 36px default size ([#66705](https://github.com/WordPress/gutenberg/pull/66705)).
+@@ -22,6 +18,9 @@
+ -   `GradientPicker`: Disable `Clear` button if there's no value. ([#67108](https://github.com/WordPress/gutenberg/pull/67108)).
+ -   `DuotonePicker`: Disable `Clear` button if there's no value. ([#67108](https://github.com/WordPress/gutenberg/pull/67108)).
+ -   `ColorPicker`: Add accessible label for copy button ([#67094](https://github.com/WordPress/gutenberg/pull/67094)).
++-   `FormFileUpload`: Prevent HEIC and HEIF files from being uploaded on Safari ([#67139](https://github.com/WordPress/gutenberg/pull/67139)).
++-   `Composite.Hover`: Restore functionality ([#67212](https://github.com/WordPress/gutenberg/pull/67212)).
++-   `Composite.Typeahead`: Restore functionality ([#67212](https://github.com/WordPress/gutenberg/pull/67212)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/composite/hover.tsx b/packages/components/src/composite/hover.tsx
+index 1507a1879cc19f..a8a0ebfb4729fe 100644
+--- a/packages/components/src/composite/hover.tsx
++++ b/packages/components/src/composite/hover.tsx
+@@ -26,5 +26,5 @@ export const CompositeHover = forwardRef<
+ 	// obfuscated to discourage its use outside of the component's internals.
+ 	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
+ 
+-	return <Ariakit.CompositeGroup store={ store } { ...props } ref={ ref } />;
++	return <Ariakit.CompositeHover store={ store } { ...props } ref={ ref } />;
+ } );
+diff --git a/packages/components/src/composite/typeahead.tsx b/packages/components/src/composite/typeahead.tsx
+index 519c59ea374e5d..3a3c3875a33604 100644
+--- a/packages/components/src/composite/typeahead.tsx
++++ b/packages/components/src/composite/typeahead.tsx
+@@ -26,5 +26,7 @@ export const CompositeTypeahead = forwardRef<
+ 	// obfuscated to discourage its use outside of the component's internals.
+ 	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
+ 
+-	return <Ariakit.CompositeRow store={ store } { ...props } ref={ ref } />;
++	return (
++		<Ariakit.CompositeTypeahead store={ store } { ...props } ref={ ref } />
++	);
+ } );

@@ -1,0 +1,243 @@
+diff --git a/packages/block-editor/src/components/date-format-picker/index.js b/packages/block-editor/src/components/date-format-picker/index.js
+index 7a2ed46b4a9b04..8c35b025bfccf6 100644
+--- a/packages/block-editor/src/components/date-format-picker/index.js
++++ b/packages/block-editor/src/components/date-format-picker/index.js
+@@ -117,7 +117,6 @@ function NonDefaultControls( { format, onChange } ) {
+ 	return (
+ 		<VStack>
+ 			<CustomSelectControl
+-				__nextUnconstrainedWidth
+ 				label={ __( 'Choose a format' ) }
+ 				options={ [ ...suggestedOptions, customOption ] }
+ 				value={
+diff --git a/packages/block-editor/src/components/font-appearance-control/index.js b/packages/block-editor/src/components/font-appearance-control/index.js
+index b635cb71d39a5e..18e814ad23ddb4 100644
+--- a/packages/block-editor/src/components/font-appearance-control/index.js
++++ b/packages/block-editor/src/components/font-appearance-control/index.js
+@@ -215,7 +215,6 @@ export default function FontAppearanceControl( props ) {
+ 				onChange={ ( { selectedItem } ) =>
+ 					onChange( selectedItem.style )
+ 				}
+-				__nextUnconstrainedWidth
+ 			/>
+ 		)
+ 	);
+diff --git a/packages/block-editor/src/components/spacing-sizes-control/input-controls/spacing-input-control.js b/packages/block-editor/src/components/spacing-sizes-control/input-controls/spacing-input-control.js
+index c2b6ae30de7ac9..f0b0d28e70c0fd 100644
+--- a/packages/block-editor/src/components/spacing-sizes-control/input-controls/spacing-input-control.js
++++ b/packages/block-editor/src/components/spacing-sizes-control/input-controls/spacing-input-control.js
+@@ -297,7 +297,6 @@ export default function SpacingInputControl( {
+ 					options={ options }
+ 					label={ ariaLabel }
+ 					hideLabelFromVision={ true }
+-					__nextUnconstrainedWidth={ true }
+ 					size={ '__unstable-large' }
+ 					onMouseOver={ onMouseOver }
+ 					onMouseOut={ onMouseOut }
+diff --git a/packages/block-editor/src/hooks/position.js b/packages/block-editor/src/hooks/position.js
+index 5017cb34fc18bd..e1e26d54aa2420 100644
+--- a/packages/block-editor/src/hooks/position.js
++++ b/packages/block-editor/src/hooks/position.js
+@@ -288,7 +288,6 @@ export function PositionPanelPure( {
+ 						help={ stickyHelpText }
+ 					>
+ 						<CustomSelectControl
+-							__nextUnconstrainedWidth
+ 							__next40pxDefaultSize
+ 							className="block-editor-hooks__position-selection__select-control"
+ 							label={ __( 'Position' ) }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b6d1af65f61f72..9edf124bbdf73c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   `CustomSelectControl`: Remove deprecated `__nextUnconstrainedWidth` prop and promote to default behavior ([#58974](https://github.com/WordPress/gutenberg/pull/58974)).
++
+ ## 26.0.1 (2024-02-13)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/custom-select-control/README.md b/packages/components/src/custom-select-control/README.md
+index 56f82f6ead84b6..ff890c606af467 100644
+--- a/packages/components/src/custom-select-control/README.md
++++ b/packages/components/src/custom-select-control/README.md
+@@ -41,7 +41,6 @@ function MyCustomSelectControl() {
+ 	const [ , setFontSize ] = useState();
+ 	return (
+ 		<CustomSelectControl
+-			__nextUnconstrainedWidth
+ 			label="Font Size"
+ 			options={ options }
+ 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
+@@ -53,7 +52,6 @@ function MyControlledCustomSelectControl() {
+ 	const [ fontSize, setFontSize ] = useState( options[ 0 ] );
+ 	return (
+ 		<CustomSelectControl
+-			__nextUnconstrainedWidth
+ 			label="Font Size"
+ 			options={ options }
+ 			onChange={ ( { selectedItem } ) => setFontSize( selectedItem ) }
+@@ -114,14 +112,6 @@ Can be used to externally control the value of the control, like in the `MyContr
+ -   Type: `Object`
+ -   Required: No
+ 
+-#### __nextUnconstrainedWidth
+-
+-Start opting into the unconstrained width style that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
+-
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
+-
+ #### onMouseOver
+ 
+ A handler for onMouseOver events.
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index eb3cf5ba0676e0..5805e18b98dd41 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -11,7 +11,6 @@ import classnames from 'classnames';
+ import { Icon, check } from '@wordpress/icons';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { useCallback, useState } from '@wordpress/element';
+-import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -19,9 +18,9 @@ import deprecated from '@wordpress/deprecated';
+ import { VisuallyHidden } from '../visually-hidden';
+ import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
+ import SelectControlChevronDown from '../select-control/chevron-down';
+-import { InputBaseWithBackCompatMinWidth } from './styles';
+ import { StyledLabel } from '../base-control/styles/base-control-styles';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
++import InputBase from '../input-control/input-base';
+ 
+ const itemToString = ( item ) => item?.name;
+ // This is needed so that in Windows, where
+@@ -67,8 +66,6 @@ export default function CustomSelectControl( props ) {
+ 	const {
+ 		/** Start opting into the larger default height that will become the default size in a future version. */
+ 		__next40pxDefaultSize = false,
+-		/** Start opting into the unconstrained width that will become the default in a future version. */
+-		__nextUnconstrainedWidth = false,
+ 		className,
+ 		hideLabelFromVision,
+ 		label,
+@@ -116,17 +113,6 @@ export default function CustomSelectControl( props ) {
+ 		onBlur?.( e );
+ 	}
+ 
+-	if ( ! __nextUnconstrainedWidth ) {
+-		deprecated(
+-			'Constrained width styles for wp.components.CustomSelectControl',
+-			{
+-				since: '6.1',
+-				version: '6.4',
+-				hint: 'Set the `__nextUnconstrainedWidth` prop to true to start opting into the new styles, which will become the default in a future version',
+-			}
+-		);
+-	}
+-
+ 	function getDescribedBy() {
+ 		if ( describedBy ) {
+ 			return describedBy;
+@@ -180,14 +166,9 @@ export default function CustomSelectControl( props ) {
+ 					{ label }
+ 				</StyledLabel>
+ 			) }
+-			<InputBaseWithBackCompatMinWidth
++			<InputBase
+ 				__next40pxDefaultSize={ __next40pxDefaultSize }
+-				__nextUnconstrainedWidth={ __nextUnconstrainedWidth }
+ 				isFocused={ isOpen || isFocused }
+-				__unstableInputWidth={
+-					__nextUnconstrainedWidth ? undefined : 'auto'
+-				}
+-				labelPosition={ __nextUnconstrainedWidth ? undefined : 'top' }
+ 				size={ size }
+ 				suffix={ <SelectControlChevronDown /> }
+ 			>
+@@ -215,7 +196,7 @@ export default function CustomSelectControl( props ) {
+ 							</span>
+ 						) }
+ 				</SelectControlSelect>
+-			</InputBaseWithBackCompatMinWidth>
++			</InputBase>
+ 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+ 			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
+ 				{ isOpen &&
+diff --git a/packages/components/src/custom-select-control/stories/index.story.js b/packages/components/src/custom-select-control/stories/index.story.js
+index d8fea5c7baa003..ecfa3b06392ae9 100644
+--- a/packages/components/src/custom-select-control/stories/index.story.js
++++ b/packages/components/src/custom-select-control/stories/index.story.js
+@@ -20,7 +20,6 @@ export default {
+ 
+ export const Default = CustomSelectControl.bind( {} );
+ Default.args = {
+-	__nextUnconstrainedWidth: true,
+ 	label: 'Label',
+ 	options: [
+ 		{
+diff --git a/packages/components/src/custom-select-control/styles.ts b/packages/components/src/custom-select-control/styles.ts
+deleted file mode 100644
+index e16b5d0b7bdd7a..00000000000000
+--- a/packages/components/src/custom-select-control/styles.ts
++++ /dev/null
+@@ -1,28 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-import styled from '@emotion/styled';
+-
+-/**
+- * Internal dependencies
+- */
+-import InputBase from '../input-control/input-base';
+-import { Container as InputControlContainer } from '../input-control/styles/input-control-styles';
+-
+-type BackCompatMinWidthProps = {
+-	__nextUnconstrainedWidth: boolean;
+-};
+-
+-const backCompatMinWidth = ( props: BackCompatMinWidthProps ) =>
+-	! props.__nextUnconstrainedWidth
+-		? css`
+-				${ InputControlContainer } {
+-					min-width: 130px;
+-				}
+-		  `
+-		: '';
+-
+-export const InputBaseWithBackCompatMinWidth = styled( InputBase )`
+-	${ backCompatMinWidth }
+-`;
+diff --git a/packages/components/src/custom-select-control/test/index.js b/packages/components/src/custom-select-control/test/index.js
+index 52bb841a4f953e..a4c61d0cdcecd9 100644
+--- a/packages/components/src/custom-select-control/test/index.js
++++ b/packages/components/src/custom-select-control/test/index.js
+@@ -46,7 +46,6 @@ const props = {
+ 			},
+ 		},
+ 	],
+-	__nextUnconstrainedWidth: true,
+ };
+ 
+ const ControlledCustomSelectControl = ( { options } ) => {
+diff --git a/packages/components/src/font-size-picker/font-size-picker-select.tsx b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+index 32438cfab81153..c5dca6bdb37a04 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-select.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+@@ -69,7 +69,6 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
+ 	return (
+ 		<CustomSelectControl
+ 			__next40pxDefaultSize={ __next40pxDefaultSize }
+-			__nextUnconstrainedWidth
+ 			className="components-font-size-picker__select"
+ 			label={ __( 'Font size' ) }
+ 			hideLabelFromVision

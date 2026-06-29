@@ -1,0 +1,1391 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9113bd5879ea32..f5e9fea45f264f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -27,6 +27,7 @@
+ -   `Button`: Convert to TypeScript ([#46997](https://github.com/WordPress/gutenberg/pull/46997)).
+ -   `BoxControl`: Convert to TypeScript ([#47622](https://github.com/WordPress/gutenberg/pull/47622)).
+ -   `QueryControls`: Convert to TypeScript ([#46721](https://github.com/WordPress/gutenberg/pull/46721)).
++-   `TreeGrid`: Convert to TypeScript ([#47516](https://github.com/WordPress/gutenberg/pull/47516)).
+ -   `Notice`: refactor to TypeScript ([47118](https://github.com/WordPress/gutenberg/pull/47118)).
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/tree-grid/README.md b/packages/components/src/tree-grid/README.md
+index 45e140306b58ad..6ba8dcf45c85f5 100644
+--- a/packages/components/src/tree-grid/README.md
++++ b/packages/components/src/tree-grid/README.md
+@@ -10,7 +10,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ ## Development guidelines
+ 
+-`TreeGrid`, `TreeGridRow`, and `TreeGridCell` are components used to create a tree hierarchy. They're not visually styled components, but instead help with adding keyboard navigation and roving tab index behaviors to tree grid structures.
++`TreeGrid`, `TreeGridRow`, and `TreeGridCell` are components used to create a tree hierarchy. They're not visually styled components, but instead help with adding keyboard navigation and roving tabindex behaviors to tree grid structures.
+ 
+ A tree grid is a hierarchical 2 dimensional UI component, for example it could be used to implement a file system browser.
+ 
+@@ -31,69 +31,36 @@ function TreeMenu() {
+ 			<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 2 }>
+ 				<TreeGridCell>
+ 					{ ( props ) => (
+-						<Button onClick={ onSelect } { ...props }>
+-							Select
+-						</Button>
++						<Button onClick={ onSelect } { ...props }>Select</Button>
+ 					) }
+ 				</TreeGridCell>
+ 				<TreeGridCell>
+ 					{ ( props ) => (
+-						<Button onClick={ onMoveUp } { ...props }>
+-							Move Up
+-						</Button>
+-					) }
+-				</TreeGridCell>
+-				<TreeGridCell>
+-					{ ( props ) => (
+-						<Button onClick={ onMoveDown } { ...props }>
+-							Move Down
+-						</Button>
++						<Button onClick={ onMove } { ...props }>Move</Button>
+ 					) }
+ 				</TreeGridCell>
+ 			</TreeGridRow>
+ 			<TreeGridRow level={ 1 } positionInSet={ 2 } setSize={ 2 }>
+ 				<TreeGridCell>
+ 					{ ( props ) => (
+-						<Button onClick={ onSelect } { ...props }>
+-							Select
+-						</Button>
+-					) }
+-				</TreeGridCell>
+-				<TreeGridCell>
+-					{ ( props ) => (
+-						<Button onClick={ onMoveUp } { ...props }>
+-							Move Up
+-						</Button>
++						<Button onClick={ onSelect } { ...props }>Select</Button>
+ 					) }
+ 				</TreeGridCell>
+ 				<TreeGridCell>
+ 					{ ( props ) => (
+-						<Button onClick={ onMoveDown } { ...props }>
+-							Move Down
+-						</Button>
++						<Button onClick={ onMove } { ...props }>Move</Button>
+ 					) }
+ 				</TreeGridCell>
+ 			</TreeGridRow>
+ 			<TreeGridRow level={ 2 } positionInSet={ 1 } setSize={ 1 }>
+ 				<TreeGridCell>
+ 					{ ( props ) => (
+-						<Button onClick={ onSelect } { ...props }>
+-							Select
+-						</Button>
+-					) }
+-				</TreeGridCell>
+-				<TreeGridCell>
+-					{ ( props ) => (
+-						<Button onClick={ onMoveUp } { ...props }>
+-							Move Up
+-						</Button>
++						<Button onClick={ onSelect } { ...props }>Select</Button>
+ 					) }
+ 				</TreeGridCell>
+ 				<TreeGridCell>
+ 					{ ( props ) => (
+-						<Button onClick={ onMoveDown } { ...props }>
+-							Move Down
+-						</Button>
++						<Button onClick={ onMove } { ...props }>Move</Button>
+ 					) }
+ 				</TreeGridCell>
+ 			</TreeGridRow>
+@@ -112,27 +79,24 @@ Aside from the documented callback functions, any props specified will be passed
+ 
+ `TreeGrid` should always have children.
+ 
+-###### onFocusRow( event: Event, startRow: HTMLElement, destinationRow: HTMLElement )
++###### `onFocusRow`: `( event: KeyboardEvent, startRow: HTMLElement, destinationRow: HTMLElement ) => void`
+ 
+ Callback that fires when focus is shifted from one row to another via the Up and Down keys. Callback is also fired on Home and End keys which move focus from the beginning row to the end row.
+ The callback is passed the event, the start row element that the focus was on originally, and
+ the destination row element after the focus has moved.
+ 
+--   Type: `Function`
+ -   Required: No
+ 
+-###### onCollapseRow( row: HTMLElement )
++###### `onCollapseRow`: `( row: HTMLElement ) => void`
+ 
+ A callback that passes in the row element to be collapsed.
+ 
+--   Type: `Function`
+ -   Required: No
+ 
+-###### onExpandRow( row: HTMLElement )
++###### `onExpandRow`: `( row: HTMLElement ) => void`
+ 
+ A callback that passes in the row element to be expanded.
+ 
+--   Type: `Function`
+ -   Required: No
+ 
+ #### TreeGridRow
+@@ -141,32 +105,28 @@ A callback that passes in the row element to be expanded.
+ 
+ Additional props other than those specified below will be passed to the `tr` element rendered by `TreeGridRow`, so for example, it is possible to also set a `className` on a row.
+ 
+-###### level
++###### `level`: `number`
+ 
+ An integer value designating the level in the hierarchical tree structure. Counting starts at 1. A value of `1` indicates the root level of the structure.
+ 
+--   Type: `Number`
+ -   Required: Yes
+ 
+-###### positionInSet
++###### `positionInSet`: `number`
+ 
+ An integer value that represents the position in the set. A set is the count of elements at a specific level. Counting starts at 1.
+ 
+--   Type: `Number`
+ -   Required: Yes
+ 
+-###### setSize
++###### `setSize`: `number`
+ 
+-An integer value that represents the total number of items in the set ... that is the total number of items at this specific level of the hierarchy.
++An integer value that represents the total number of items in the set, at this specific level of the hierarchy.
+ 
+--   Type: `Number`
+ -   Required: Yes
+ 
+-###### isExpanded
++###### `isExpanded`: `boolean`
+ 
+ An optional value that designates whether a row is expanded or collapsed. Currently this value only sets the correct aria-expanded property on a row, it has no other built-in behavior.
+ 
+--   Type: `Boolean`
+ -   Required: No
+ 
+ ### TreeGridCell
+@@ -182,14 +142,14 @@ An optional value that designates whether a row is expanded or collapsed. Curren
+ ```jsx
+ <TreeGridCell>
+ 	{ ( props ) => (
+-		<Button onClick={ onMoveDown } { ...props }>
+-			Move Down
++		<Button onClick={ doSomething } { ...props }>
++			Do something
+ 		</Button>
+ 	) }
+ </TreeGridCell>
+ ```
+ 
+-Props passed as an argument to the render prop must be passed to the child focusable component/element within the cell. If a component is used, it must correctly handle the `onFocus`, `tabIndex`, and `ref` props, passing these to the element it renders. These props are used to handle the roving tab index functionality of the tree grid.
++Props passed as an argument to the render prop must be passed to the child focusable component/element within the cell. If a component is used, it must correctly handle the `onFocus`, `tabIndex`, and `ref` props, passing these to the element it renders. These props are used to handle the roving tabindex functionality of the tree grid.
+ 
+ ## Related components
+ 
+diff --git a/packages/components/src/tree-grid/cell.js b/packages/components/src/tree-grid/cell.js
+deleted file mode 100644
+index dd4e2654d64e5e..00000000000000
+--- a/packages/components/src/tree-grid/cell.js
++++ /dev/null
+@@ -1,24 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import TreeGridItem from './item';
+-
+-export default forwardRef( function TreeGridCell(
+-	{ children, withoutGridItem = false, ...props },
+-	ref
+-) {
+-	return (
+-		<td { ...props } role="gridcell">
+-			{ withoutGridItem ? (
+-				children
+-			) : (
+-				<TreeGridItem ref={ ref }>{ children }</TreeGridItem>
+-			) }
+-		</td>
+-	);
+-} );
+diff --git a/packages/components/src/tree-grid/cell.tsx b/packages/components/src/tree-grid/cell.tsx
+new file mode 100644
+index 00000000000000..f33e8e8d9c6eb1
+--- /dev/null
++++ b/packages/components/src/tree-grid/cell.tsx
+@@ -0,0 +1,41 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import TreeGridItem from './item';
++import type { WordPressComponentProps } from '../ui/context';
++import type { TreeGridCellProps } from './types';
++
++function UnforwardedTreeGridCell(
++	{
++		children,
++		withoutGridItem = false,
++		...props
++	}: WordPressComponentProps< TreeGridCellProps, 'td', false >,
++	ref: React.ForwardedRef< any >
++) {
++	return (
++		<td { ...props } role="gridcell">
++			{ withoutGridItem ? (
++				<>{ children }</>
++			) : (
++				<TreeGridItem ref={ ref }>{ children }</TreeGridItem>
++			) }
++		</td>
++	);
++}
++
++/**
++ * `TreeGridCell` is used to create a tree hierarchy.
++ * It is not a visually styled component, but instead helps with adding
++ * keyboard navigation and roving tab index behaviors to tree grid structures.
++ *
++ * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
++ */
++export const TreeGridCell = forwardRef( UnforwardedTreeGridCell );
++
++export default TreeGridCell;
+diff --git a/packages/components/src/tree-grid/index.js b/packages/components/src/tree-grid/index.tsx
+similarity index 69%
+rename from packages/components/src/tree-grid/index.js
+rename to packages/components/src/tree-grid/index.tsx
+index 81bc5cfe9fa535..7087bafc86f70b 100644
+--- a/packages/components/src/tree-grid/index.js
++++ b/packages/components/src/tree-grid/index.tsx
+@@ -9,24 +9,22 @@ import { UP, DOWN, LEFT, RIGHT, HOME, END } from '@wordpress/keycodes';
+  * Internal dependencies
+  */
+ import RovingTabIndexContainer from './roving-tab-index';
++import type { TreeGridProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+ /**
+  * Return focusables in a row element, excluding those from other branches
+  * nested within the row.
+  *
+- * @param {Element} rowElement The DOM element representing the row.
++ * @param rowElement The DOM element representing the row.
+  *
+- * @return {Array | undefined} The array of focusables in the row.
++ * @return The array of focusables in the row.
+  */
+-function getRowFocusables( rowElement ) {
++function getRowFocusables( rowElement: HTMLElement ) {
+ 	const focusablesInRow = focus.focusable.find( rowElement, {
+ 		sequential: true,
+ 	} );
+ 
+-	if ( ! focusablesInRow || ! focusablesInRow.length ) {
+-		return;
+-	}
+-
+ 	return focusablesInRow.filter( ( focusable ) => {
+ 		return focusable.closest( '[role="row"]' ) === rowElement;
+ 	} );
+@@ -35,16 +33,8 @@ function getRowFocusables( rowElement ) {
+ /**
+  * Renders both a table and tbody element, used to create a tree hierarchy.
+  *
+- * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/components/src/tree-grid/README.md
+- * @param {Object}    props                      Component props.
+- * @param {WPElement} props.children             Children to be rendered.
+- * @param {Function}  props.onExpandRow          Callback to fire when row is expanded.
+- * @param {Function}  props.onCollapseRow        Callback to fire when row is collapsed.
+- * @param {Function}  props.onFocusRow           Callback to fire when moving focus to a different row.
+- * @param {string}    props.applicationAriaLabel Label to use for the application role.
+- * @param {Object}    ref                        A ref to the underlying DOM table element.
+  */
+-function TreeGrid(
++function UnforwardedTreeGrid(
+ 	{
+ 		children,
+ 		onExpandRow = () => {},
+@@ -52,11 +42,12 @@ function TreeGrid(
+ 		onFocusRow = () => {},
+ 		applicationAriaLabel,
+ 		...props
+-	},
+-	ref
++	}: WordPressComponentProps< TreeGridProps, 'table', false >,
++	/** A ref to the underlying DOM table element. */
++	ref: React.ForwardedRef< HTMLTableElement >
+ ) {
+ 	const onKeyDown = useCallback(
+-		( event ) => {
++		( event: React.KeyboardEvent< HTMLTableElement > ) => {
+ 			const { keyCode, metaKey, ctrlKey, altKey } = event;
+ 
+ 			// The shift key is intentionally absent from the following list,
+@@ -65,7 +56,9 @@ function TreeGrid(
+ 
+ 			if (
+ 				hasModifierKeyPressed ||
+-				! [ UP, DOWN, LEFT, RIGHT, HOME, END ].includes( keyCode )
++				! ( [ UP, DOWN, LEFT, RIGHT, HOME, END ] as number[] ).includes(
++					keyCode
++				)
+ 			) {
+ 				return;
+ 			}
+@@ -75,21 +68,33 @@ function TreeGrid(
+ 
+ 			const { activeElement } = document;
+ 			const { currentTarget: treeGridElement } = event;
+-			if ( ! treeGridElement.contains( activeElement ) ) {
++
++			if (
++				! activeElement ||
++				! treeGridElement.contains( activeElement )
++			) {
+ 				return;
+ 			}
+ 
+ 			// Calculate the columnIndex of the active element.
+-			const activeRow = activeElement.closest( '[role="row"]' );
++			const activeRow =
++				activeElement.closest< HTMLElement >( '[role="row"]' );
++
++			if ( ! activeRow ) {
++				return;
++			}
++
+ 			const focusablesInRow = getRowFocusables( activeRow );
+-			const currentColumnIndex = focusablesInRow.indexOf( activeElement );
++			const currentColumnIndex = focusablesInRow.indexOf(
++				activeElement as HTMLElement
++			);
+ 			const canExpandCollapse = 0 === currentColumnIndex;
+ 			const cannotFocusNextColumn =
+ 				canExpandCollapse &&
+ 				activeRow.getAttribute( 'aria-expanded' ) === 'false' &&
+ 				keyCode === RIGHT;
+ 
+-			if ( [ LEFT, RIGHT ].includes( keyCode ) ) {
++			if ( ( [ LEFT, RIGHT ] as number[] ).includes( keyCode ) ) {
+ 				// Calculate to the next element.
+ 				let nextIndex;
+ 				if ( keyCode === LEFT ) {
+@@ -116,22 +121,25 @@ function TreeGrid(
+ 						// If a row is focused, and it is collapsed, moves to the parent row (if there is one).
+ 						const level = Math.max(
+ 							parseInt(
+-								activeRow?.getAttribute( 'aria-level' ) ?? 1,
++								activeRow?.getAttribute( 'aria-level' ) ?? '1',
+ 								10
+ 							) - 1,
+ 							1
+ 						);
+ 						const rows = Array.from(
+-							treeGridElement.querySelectorAll( '[role="row"]' )
++							treeGridElement.querySelectorAll< HTMLElement >(
++								'[role="row"]'
++							)
+ 						);
+ 						let parentRow = activeRow;
+ 						const currentRowIndex = rows.indexOf( activeRow );
+ 						for ( let i = currentRowIndex; i >= 0; i-- ) {
++							const ariaLevel =
++								rows[ i ].getAttribute( 'aria-level' );
++
+ 							if (
+-								parseInt(
+-									rows[ i ].getAttribute( 'aria-level' ),
+-									10
+-								) === level
++								ariaLevel !== null &&
++								parseInt( ariaLevel, 10 ) === level
+ 							) {
+ 								parentRow = rows[ i ];
+ 								break;
+@@ -172,10 +180,12 @@ function TreeGrid(
+ 				// Prevent key use for anything else. This ensures Voiceover
+ 				// doesn't try to handle key navigation.
+ 				event.preventDefault();
+-			} else if ( [ UP, DOWN ].includes( keyCode ) ) {
++			} else if ( ( [ UP, DOWN ] as number[] ).includes( keyCode ) ) {
+ 				// Calculate the rowIndex of the next row.
+ 				const rows = Array.from(
+-					treeGridElement.querySelectorAll( '[role="row"]' )
++					treeGridElement.querySelectorAll< HTMLElement >(
++						'[role="row"]'
++					)
+ 				);
+ 				const currentRowIndex = rows.indexOf( activeRow );
+ 				let nextRowIndex;
+@@ -226,10 +236,12 @@ function TreeGrid(
+ 				// Prevent key use for anything else. This ensures Voiceover
+ 				// doesn't try to handle key navigation.
+ 				event.preventDefault();
+-			} else if ( [ HOME, END ].includes( keyCode ) ) {
++			} else if ( ( [ HOME, END ] as number[] ).includes( keyCode ) ) {
+ 				// Calculate the rowIndex of the next row.
+ 				const rows = Array.from(
+-					treeGridElement.querySelectorAll( '[role="row"]' )
++					treeGridElement.querySelectorAll< HTMLElement >(
++						'[role="row"]'
++					)
+ 				);
+ 				const currentRowIndex = rows.indexOf( activeRow );
+ 				let nextRowIndex;
+@@ -306,7 +318,71 @@ function TreeGrid(
+ 	/* eslint-enable jsx-a11y/no-noninteractive-element-to-interactive-role */
+ }
+ 
+-export default forwardRef( TreeGrid );
++/**
++ * `TreeGrid` is used to create a tree hierarchy.
++ * It is not a visually styled component, but instead helps with adding
++ * keyboard navigation and roving tab index behaviors to tree grid structures.
++ *
++ * A tree grid is a hierarchical 2 dimensional UI component, for example it could be
++ * used to implement a file system browser.
++ *
++ * A tree grid allows the user to navigate using arrow keys.
++ * Up/down to navigate vertically across rows, and left/right to navigate horizontally
++ * between focusables in a row.
++ *
++ * The `TreeGrid` renders both a `table` and `tbody` element, and is intended to be used
++ * with `TreeGridRow` (`tr`) and `TreeGridCell` (`td`) to build out a grid.
++ *
++ * ```jsx
++ * function TreeMenu() {
++ * 	return (
++ * 		<TreeGrid>
++ * 			<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 2 }>
++ * 				<TreeGridCell>
++ * 					{ ( props ) => (
++ * 						<Button onClick={ onSelect } { ...props }>Select</Button>
++ * 					) }
++ * 				</TreeGridCell>
++ * 				<TreeGridCell>
++ * 					{ ( props ) => (
++ * 						<Button onClick={ onMove } { ...props }>Move</Button>
++ * 					) }
++ * 				</TreeGridCell>
++ * 			</TreeGridRow>
++ * 			<TreeGridRow level={ 1 } positionInSet={ 2 } setSize={ 2 }>
++ * 				<TreeGridCell>
++ * 					{ ( props ) => (
++ * 						<Button onClick={ onSelect } { ...props }>Select</Button>
++ * 					) }
++ * 				</TreeGridCell>
++ * 				<TreeGridCell>
++ * 					{ ( props ) => (
++ * 						<Button onClick={ onMove } { ...props }>Move</Button>
++ * 					) }
++ * 				</TreeGridCell>
++ * 			</TreeGridRow>
++ * 			<TreeGridRow level={ 2 } positionInSet={ 1 } setSize={ 1 }>
++ * 				<TreeGridCell>
++ * 					{ ( props ) => (
++ * 						<Button onClick={ onSelect } { ...props }>Select</Button>
++ * 					) }
++ * 				</TreeGridCell>
++ * 				<TreeGridCell>
++ * 					{ ( props ) => (
++ * 						<Button onClick={ onMove } { ...props }>Move</Button>
++ * 					) }
++ * 				</TreeGridCell>
++ * 			</TreeGridRow>
++ * 		</TreeGrid>
++ * 	);
++ * }
++ * ```
++ *
++ * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
++ */
++export const TreeGrid = forwardRef( UnforwardedTreeGrid );
++
++export default TreeGrid;
+ export { default as TreeGridRow } from './row';
+ export { default as TreeGridCell } from './cell';
+ export { default as TreeGridItem } from './item';
+diff --git a/packages/components/src/tree-grid/item.js b/packages/components/src/tree-grid/item.js
+deleted file mode 100644
+index 1d79b5640731b3..00000000000000
+--- a/packages/components/src/tree-grid/item.js
++++ /dev/null
+@@ -1,20 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import RovingTabIndexItem from './roving-tab-index-item';
+-
+-export default forwardRef( function TreeGridItem(
+-	{ children, ...props },
+-	ref
+-) {
+-	return (
+-		<RovingTabIndexItem ref={ ref } { ...props }>
+-			{ children }
+-		</RovingTabIndexItem>
+-	);
+-} );
+diff --git a/packages/components/src/tree-grid/item.tsx b/packages/components/src/tree-grid/item.tsx
+new file mode 100644
+index 00000000000000..7e32fb346248fa
+--- /dev/null
++++ b/packages/components/src/tree-grid/item.tsx
+@@ -0,0 +1,32 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import RovingTabIndexItem from './roving-tab-index-item';
++import type { RovingTabIndexItemProps } from './types';
++
++function UnforwardedTreeGridItem(
++	{ children, ...props }: RovingTabIndexItemProps,
++	ref: React.ForwardedRef< any >
++) {
++	return (
++		<RovingTabIndexItem ref={ ref } { ...props }>
++			{ children }
++		</RovingTabIndexItem>
++	);
++}
++
++/**
++ * `TreeGridItem` is used to create a tree hierarchy.
++ * It is not a visually styled component, but instead helps with adding
++ * keyboard navigation and roving tab index behaviors to tree grid structures.
++ *
++ * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
++ */
++export const TreeGridItem = forwardRef( UnforwardedTreeGridItem );
++
++export default TreeGridItem;
+diff --git a/packages/components/src/tree-grid/roving-tab-index-context.js b/packages/components/src/tree-grid/roving-tab-index-context.ts
+similarity index 52%
+rename from packages/components/src/tree-grid/roving-tab-index-context.js
+rename to packages/components/src/tree-grid/roving-tab-index-context.ts
+index 90c3ca16704d74..a0ff4ae486df45 100644
+--- a/packages/components/src/tree-grid/roving-tab-index-context.js
++++ b/packages/components/src/tree-grid/roving-tab-index-context.ts
+@@ -3,7 +3,15 @@
+  */
+ import { createContext, useContext } from '@wordpress/element';
+ 
+-const RovingTabIndexContext = createContext();
++const RovingTabIndexContext = createContext<
++	| {
++			lastFocusedElement: HTMLElement | undefined;
++			setLastFocusedElement: React.Dispatch<
++				React.SetStateAction< HTMLElement | undefined >
++			>;
++	  }
++	| undefined
++>( undefined );
+ export const useRovingTabIndexContext = () =>
+ 	useContext( RovingTabIndexContext );
+ export const RovingTabIndexProvider = RovingTabIndexContext.Provider;
+diff --git a/packages/components/src/tree-grid/roving-tab-index-item.js b/packages/components/src/tree-grid/roving-tab-index-item.js
+deleted file mode 100644
+index 1ac76950d038d5..00000000000000
+--- a/packages/components/src/tree-grid/roving-tab-index-item.js
++++ /dev/null
+@@ -1,33 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useRef, forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useRovingTabIndexContext } from './roving-tab-index-context';
+-
+-export default forwardRef( function RovingTabIndexItem(
+-	{ children, as: Component, ...props },
+-	forwardedRef
+-) {
+-	const localRef = useRef();
+-	const ref = forwardedRef || localRef;
+-	const { lastFocusedElement, setLastFocusedElement } =
+-		useRovingTabIndexContext();
+-	let tabIndex;
+-
+-	if ( lastFocusedElement ) {
+-		tabIndex = lastFocusedElement === ref.current ? 0 : -1;
+-	}
+-
+-	const onFocus = ( event ) => setLastFocusedElement( event.target );
+-	const allProps = { ref, tabIndex, onFocus, ...props };
+-
+-	if ( typeof children === 'function' ) {
+-		return children( allProps );
+-	}
+-
+-	return <Component { ...allProps }>{ children }</Component>;
+-} );
+diff --git a/packages/components/src/tree-grid/roving-tab-index-item.tsx b/packages/components/src/tree-grid/roving-tab-index-item.tsx
+new file mode 100644
+index 00000000000000..6bcea5862bf160
+--- /dev/null
++++ b/packages/components/src/tree-grid/roving-tab-index-item.tsx
+@@ -0,0 +1,50 @@
++/**
++ * WordPress dependencies
++ */
++import { useRef, forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { useRovingTabIndexContext } from './roving-tab-index-context';
++import type { RovingTabIndexItemProps } from './types';
++
++export const RovingTabIndexItem = forwardRef(
++	function UnforwardedRovingTabIndexItem(
++		{ children, as: Component, ...props }: RovingTabIndexItemProps,
++		forwardedRef: React.ForwardedRef< any >
++	) {
++		const localRef = useRef< any >();
++		const ref = forwardedRef || localRef;
++		// @ts-expect-error - We actually want to throw an error if this is undefined.
++		const { lastFocusedElement, setLastFocusedElement } =
++			useRovingTabIndexContext();
++		let tabIndex;
++
++		if ( lastFocusedElement ) {
++			tabIndex =
++				lastFocusedElement ===
++				// TODO: The original implementation simply used `ref.current` here, assuming
++				// that a forwarded ref would always be an object, which is not necessarily true.
++				// This workaround maintains the original runtime behavior in a type-safe way,
++				// but should be revisited.
++				( 'current' in ref ? ref.current : undefined )
++					? 0
++					: -1;
++		}
++
++		const onFocus: React.FocusEventHandler< HTMLElement > = ( event ) =>
++			setLastFocusedElement?.( event.target );
++		const allProps = { ref, tabIndex, onFocus, ...props };
++
++		if ( typeof children === 'function' ) {
++			return children( allProps );
++		}
++
++		if ( ! Component ) return null;
++
++		return <Component { ...allProps }>{ children }</Component>;
++	}
++);
++
++export default RovingTabIndexItem;
+diff --git a/packages/components/src/tree-grid/roving-tab-index.js b/packages/components/src/tree-grid/roving-tab-index.tsx
+similarity index 76%
+rename from packages/components/src/tree-grid/roving-tab-index.js
+rename to packages/components/src/tree-grid/roving-tab-index.tsx
+index b390c70f291d4d..6d6d989fbc3ffa 100644
+--- a/packages/components/src/tree-grid/roving-tab-index.js
++++ b/packages/components/src/tree-grid/roving-tab-index.tsx
+@@ -12,12 +12,14 @@ import { RovingTabIndexProvider } from './roving-tab-index-context';
+  * Provider for adding roving tab index behaviors to tree grid structures.
+  *
+  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/components/src/tree-grid/README.md
+- *
+- * @param {Object}    props          Component props.
+- * @param {WPElement} props.children Children to be rendered
+  */
+-export default function RovingTabIndex( { children } ) {
+-	const [ lastFocusedElement, setLastFocusedElement ] = useState();
++export default function RovingTabIndex( {
++	children,
++}: {
++	children: React.ReactNode;
++} ) {
++	const [ lastFocusedElement, setLastFocusedElement ] =
++		useState< HTMLElement >();
+ 
+ 	// Use `useMemo` to avoid creation of a new object for the providerValue
+ 	// on every render. Only create a new object when the `lastFocusedElement`
+diff --git a/packages/components/src/tree-grid/row.js b/packages/components/src/tree-grid/row.js
+deleted file mode 100644
+index 744055194ad226..00000000000000
+--- a/packages/components/src/tree-grid/row.js
++++ /dev/null
+@@ -1,31 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-
+-function TreeGridRow(
+-	{ children, level, positionInSet, setSize, isExpanded, ...props },
+-	ref
+-) {
+-	return (
+-		// Disable reason: Due to an error in the ARIA 1.1 specification, the
+-		// aria-posinset and aria-setsize properties are not supported on row
+-		// elements. This is being corrected in ARIA 1.2. Consequently, the
+-		// linting rule fails when validating this markup.
+-		//
+-		// eslint-disable-next-line jsx-a11y/role-supports-aria-props
+-		<tr
+-			{ ...props }
+-			ref={ ref }
+-			role="row"
+-			aria-level={ level }
+-			aria-posinset={ positionInSet }
+-			aria-setsize={ setSize }
+-			aria-expanded={ isExpanded }
+-		>
+-			{ children }
+-		</tr>
+-	);
+-}
+-
+-export default forwardRef( TreeGridRow );
+diff --git a/packages/components/src/tree-grid/row.tsx b/packages/components/src/tree-grid/row.tsx
+new file mode 100644
+index 00000000000000..a4b69cd46e1797
+--- /dev/null
++++ b/packages/components/src/tree-grid/row.tsx
+@@ -0,0 +1,47 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { WordPressComponentProps } from '../ui/context';
++import type { TreeGridRowProps } from './types';
++
++function UnforwardedTreeGridRow(
++	{
++		children,
++		level,
++		positionInSet,
++		setSize,
++		isExpanded,
++		...props
++	}: WordPressComponentProps< TreeGridRowProps, 'tr', false >,
++	ref: React.ForwardedRef< HTMLTableRowElement >
++) {
++	return (
++		<tr
++			{ ...props }
++			ref={ ref }
++			role="row"
++			aria-level={ level }
++			aria-posinset={ positionInSet }
++			aria-setsize={ setSize }
++			aria-expanded={ isExpanded }
++		>
++			{ children }
++		</tr>
++	);
++}
++
++/**
++ * `TreeGridRow` is used to create a tree hierarchy.
++ * It is not a visually styled component, but instead helps with adding
++ * keyboard navigation and roving tab index behaviors to tree grid structures.
++ *
++ * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
++ */
++export const TreeGridRow = forwardRef( UnforwardedTreeGridRow );
++
++export default TreeGridRow;
+diff --git a/packages/components/src/tree-grid/stories/index.js b/packages/components/src/tree-grid/stories/index.js
+deleted file mode 100644
+index e1a75448f39791..00000000000000
+--- a/packages/components/src/tree-grid/stories/index.js
++++ /dev/null
+@@ -1,106 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { Fragment } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import TreeGrid, { TreeGridRow, TreeGridCell } from '../';
+-import { Button } from '../../';
+-
+-export default {
+-	title: 'Components (Experimental)/TreeGrid',
+-	component: TreeGrid,
+-};
+-
+-const groceries = [
+-	{
+-		name: 'Fruit',
+-		types: [
+-			{
+-				name: 'Apple',
+-			},
+-			{
+-				name: 'Orange',
+-			},
+-			{
+-				name: 'Pear',
+-			},
+-		],
+-	},
+-	{
+-		name: 'Vegetable',
+-		types: [
+-			{
+-				name: 'Cucumber',
+-			},
+-			{
+-				name: 'Parsnip',
+-			},
+-			{
+-				name: 'Pumpkin',
+-			},
+-		],
+-	},
+-];
+-
+-const Descender = ( { level } ) => {
+-	if ( level === 1 ) {
+-		return '';
+-	}
+-	const indentation = '\u00A0'.repeat( ( level - 1 ) * 4 );
+-
+-	return <span aria-hidden="true">{ indentation + '├ ' }</span>;
+-};
+-
+-const Rows = ( { items, level = 1 } ) => {
+-	return items.map( ( item, index ) => {
+-		const hasChildren = !! item.types && !! item.types.length;
+-		return (
+-			<Fragment key={ item.name }>
+-				<TreeGridRow
+-					positionInSet={ index + 1 }
+-					setSize={ items.length }
+-					level={ level }
+-				>
+-					<TreeGridCell>
+-						{ ( props ) => (
+-							<>
+-								<Descender level={ level } />
+-								<Button variant="primary" { ...props }>
+-									{ item.name }
+-								</Button>
+-							</>
+-						) }
+-					</TreeGridCell>
+-					<TreeGridCell>
+-						{ ( props ) => (
+-							<Button variant="secondary" { ...props }>
+-								Move Up
+-							</Button>
+-						) }
+-					</TreeGridCell>
+-					<TreeGridCell>
+-						{ ( props ) => (
+-							<Button variant="secondary" { ...props }>
+-								Move Down
+-							</Button>
+-						) }
+-					</TreeGridCell>
+-				</TreeGridRow>
+-				{ hasChildren && (
+-					<Rows items={ item.types } level={ level + 1 } />
+-				) }
+-			</Fragment>
+-		);
+-	} );
+-};
+-
+-export const _default = () => {
+-	return (
+-		<TreeGrid>
+-			<Rows items={ groceries } />
+-		</TreeGrid>
+-	);
+-};
+diff --git a/packages/components/src/tree-grid/stories/index.tsx b/packages/components/src/tree-grid/stories/index.tsx
+new file mode 100644
+index 00000000000000..6ae39be6e7caf0
+--- /dev/null
++++ b/packages/components/src/tree-grid/stories/index.tsx
+@@ -0,0 +1,144 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { Fragment } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import TreeGrid, { TreeGridRow, TreeGridCell } from '..';
++import { Button } from '../../button';
++import InputControl from '../../input-control';
++
++const meta: ComponentMeta< typeof TreeGrid > = {
++	title: 'Components (Experimental)/TreeGrid',
++	component: TreeGrid,
++	subcomponents: { TreeGridRow, TreeGridCell },
++	argTypes: {
++		children: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++	},
++};
++export default meta;
++
++const groceries = [
++	{
++		name: 'Fruit',
++		types: [
++			{
++				name: 'Apple',
++			},
++			{
++				name: 'Orange',
++			},
++			{
++				name: 'Pear',
++			},
++		],
++	},
++	{
++		name: 'Vegetable',
++		types: [
++			{
++				name: 'Cucumber',
++			},
++			{
++				name: 'Parsnip',
++			},
++			{
++				name: 'Pumpkin',
++			},
++		],
++	},
++];
++
++const Descender = ( { level }: { level: number } ) => {
++	if ( level === 1 ) {
++		return null;
++	}
++	const indentation = '\u00A0'.repeat( ( level - 1 ) * 4 );
++
++	return <span aria-hidden="true">{ indentation + '├ ' }</span>;
++};
++
++type Item = {
++	name: string;
++	types?: Item[];
++};
++
++const Rows = ( {
++	items = [],
++	level = 1,
++}: {
++	items?: Item[];
++	level?: number;
++} ) => {
++	return (
++		<>
++			{ items.map( ( item, index ) => {
++				const hasChildren = !! item.types && !! item.types.length;
++				return (
++					<Fragment key={ item.name }>
++						<TreeGridRow
++							positionInSet={ index + 1 }
++							setSize={ items.length }
++							level={ level }
++							isExpanded
++						>
++							<TreeGridCell>
++								{ ( props ) => (
++									<>
++										<Descender level={ level } />
++										<Button variant="primary" { ...props }>
++											{ item.name }
++										</Button>
++									</>
++								) }
++							</TreeGridCell>
++							<TreeGridCell>
++								{ ( props ) => (
++									<InputControl
++										label="Description"
++										hideLabelFromVision
++										placeholder="Description"
++										{ ...props }
++									/>
++								) }
++							</TreeGridCell>
++							<TreeGridCell>
++								{ ( props ) => (
++									<InputControl
++										label="Notes"
++										hideLabelFromVision
++										placeholder="Notes"
++										{ ...props }
++									/>
++								) }
++							</TreeGridCell>
++						</TreeGridRow>
++						{ hasChildren && (
++							<Rows items={ item.types } level={ level + 1 } />
++						) }
++					</Fragment>
++				);
++			} ) }
++		</>
++	);
++};
++
++const Template: ComponentStory< typeof TreeGrid > = ( args ) => (
++	<TreeGrid { ...args } />
++);
++
++export const Default = Template.bind( {} );
++Default.args = {
++	children: <Rows items={ groceries } />,
++};
+diff --git a/packages/components/src/tree-grid/test/__snapshots__/cell.js.snap b/packages/components/src/tree-grid/test/__snapshots__/cell.tsx.snap
+similarity index 100%
+rename from packages/components/src/tree-grid/test/__snapshots__/cell.js.snap
+rename to packages/components/src/tree-grid/test/__snapshots__/cell.tsx.snap
+diff --git a/packages/components/src/tree-grid/test/__snapshots__/index.js.snap b/packages/components/src/tree-grid/test/__snapshots__/index.tsx.snap
+similarity index 100%
+rename from packages/components/src/tree-grid/test/__snapshots__/index.js.snap
+rename to packages/components/src/tree-grid/test/__snapshots__/index.tsx.snap
+diff --git a/packages/components/src/tree-grid/test/__snapshots__/roving-tab-index-item.js.snap b/packages/components/src/tree-grid/test/__snapshots__/roving-tab-index-item.tsx.snap
+similarity index 100%
+rename from packages/components/src/tree-grid/test/__snapshots__/roving-tab-index-item.js.snap
+rename to packages/components/src/tree-grid/test/__snapshots__/roving-tab-index-item.tsx.snap
+diff --git a/packages/components/src/tree-grid/test/__snapshots__/roving-tab-index.js.snap b/packages/components/src/tree-grid/test/__snapshots__/roving-tab-index.tsx.snap
+similarity index 100%
+rename from packages/components/src/tree-grid/test/__snapshots__/roving-tab-index.js.snap
+rename to packages/components/src/tree-grid/test/__snapshots__/roving-tab-index.tsx.snap
+diff --git a/packages/components/src/tree-grid/test/__snapshots__/row.js.snap b/packages/components/src/tree-grid/test/__snapshots__/row.tsx.snap
+similarity index 100%
+rename from packages/components/src/tree-grid/test/__snapshots__/row.js.snap
+rename to packages/components/src/tree-grid/test/__snapshots__/row.tsx.snap
+diff --git a/packages/components/src/tree-grid/test/cell.js b/packages/components/src/tree-grid/test/cell.tsx
+similarity index 81%
+rename from packages/components/src/tree-grid/test/cell.js
+rename to packages/components/src/tree-grid/test/cell.tsx
+index 7e62f751512d24..e0791d6206dc7b 100644
+--- a/packages/components/src/tree-grid/test/cell.js
++++ b/packages/components/src/tree-grid/test/cell.tsx
+@@ -11,12 +11,15 @@ import { forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import TreeGrid from '../';
++import TreeGrid from '..';
+ import TreeGridCell from '../cell';
+ 
+-const TestButton = forwardRef( ( { ...props }, ref ) => (
+-	<button { ...props } ref={ ref }></button>
+-) );
++const TestButton = forwardRef(
++	(
++		{ ...props }: React.ComponentPropsWithoutRef< 'button' >,
++		ref: React.ForwardedRef< HTMLButtonElement >
++	) => <button { ...props } ref={ ref }></button>
++);
+ 
+ describe( 'TreeGridCell', () => {
+ 	it( 'requires TreeGrid to be declared as a parent component somewhere in the component hierarchy', () => {
+diff --git a/packages/components/src/tree-grid/test/index.js b/packages/components/src/tree-grid/test/index.tsx
+similarity index 95%
+rename from packages/components/src/tree-grid/test/index.js
+rename to packages/components/src/tree-grid/test/index.tsx
+index 679000b91204bc..74294be24f8b5e 100644
+--- a/packages/components/src/tree-grid/test/index.js
++++ b/packages/components/src/tree-grid/test/index.tsx
+@@ -12,13 +12,16 @@ import { forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import TreeGrid from '../';
++import TreeGrid from '..';
+ import TreeGridRow from '../row';
+ import TreeGridCell from '../cell';
+ 
+-const TestButton = forwardRef( ( { ...props }, ref ) => (
+-	<button { ...props } ref={ ref }></button>
+-) );
++const TestButton = forwardRef(
++	(
++		{ ...props }: React.ComponentPropsWithoutRef< 'button' >,
++		ref: React.ForwardedRef< HTMLButtonElement >
++	) => <button { ...props } ref={ ref }></button>
++);
+ 
+ describe( 'TreeGrid', () => {
+ 	const originalGetClientRects = window.Element.prototype.getClientRects;
+@@ -35,6 +38,7 @@ describe( 'TreeGrid', () => {
+ 	] );
+ 
+ 	beforeAll( () => {
++		// @ts-expect-error - This is just a mock
+ 		window.Element.prototype.getClientRects =
+ 			jest.fn( mockedGetClientRects );
+ 	} );
+@@ -162,7 +166,11 @@ describe( 'TreeGrid', () => {
+ 	} );
+ 
+ 	describe( 'onFocusRow', () => {
+-		const TestTree = ( { onFocusRow } ) => (
++		const TestTree = ( {
++			onFocusRow,
++		}: {
++			onFocusRow: React.ComponentProps< typeof TreeGrid >[ 'onFocusRow' ];
++		} ) => (
+ 			<TreeGrid onFocusRow={ onFocusRow }>
+ 				<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 3 }>
+ 					<TreeGridCell withoutGridItem>
+diff --git a/packages/components/src/tree-grid/test/roving-tab-index-item.js b/packages/components/src/tree-grid/test/roving-tab-index-item.tsx
+similarity index 85%
+rename from packages/components/src/tree-grid/test/roving-tab-index-item.js
+rename to packages/components/src/tree-grid/test/roving-tab-index-item.tsx
+index 0f2c6bd58c7c60..fe426d1bb5c535 100644
+--- a/packages/components/src/tree-grid/test/roving-tab-index-item.js
++++ b/packages/components/src/tree-grid/test/roving-tab-index-item.tsx
+@@ -14,9 +14,12 @@ import { forwardRef } from '@wordpress/element';
+ import RovingTabIndex from '../roving-tab-index';
+ import RovingTabIndexItem from '../roving-tab-index-item';
+ 
+-const TestButton = forwardRef( ( { ...props }, ref ) => (
+-	<button { ...props } ref={ ref }></button>
+-) );
++const TestButton = forwardRef(
++	(
++		{ ...props }: React.ComponentPropsWithoutRef< 'button' >,
++		ref: React.ForwardedRef< HTMLButtonElement >
++	) => <button { ...props } ref={ ref }></button>
++);
+ 
+ describe( 'RovingTabIndexItem', () => {
+ 	it( 'requires RovingTabIndex to be declared as a parent component somewhere in the component hierarchy', () => {
+@@ -52,7 +55,7 @@ describe( 'RovingTabIndexItem', () => {
+ 		const { container } = render(
+ 			<RovingTabIndex>
+ 				<RovingTabIndexItem>
+-					{ ( props ) => (
++					{ ( props: React.ComponentProps< typeof TestButton > ) => (
+ 						<TestButton className="my-button" { ...props }>
+ 							Click Me!
+ 						</TestButton>
+diff --git a/packages/components/src/tree-grid/test/roving-tab-index.js b/packages/components/src/tree-grid/test/roving-tab-index.tsx
+similarity index 100%
+rename from packages/components/src/tree-grid/test/roving-tab-index.js
+rename to packages/components/src/tree-grid/test/roving-tab-index.tsx
+diff --git a/packages/components/src/tree-grid/test/row.js b/packages/components/src/tree-grid/test/row.tsx
+similarity index 85%
+rename from packages/components/src/tree-grid/test/row.js
+rename to packages/components/src/tree-grid/test/row.tsx
+index 77b092c0735224..d0cdf2c9b7aeeb 100644
+--- a/packages/components/src/tree-grid/test/row.js
++++ b/packages/components/src/tree-grid/test/row.tsx
+@@ -13,7 +13,7 @@ describe( 'TreeGridRow', () => {
+ 		const { container } = render(
+ 			<table>
+ 				<tbody>
+-					<TreeGridRow level="1" positionInSet="1" setSize="1">
++					<TreeGridRow level={ 1 } positionInSet={ 1 } setSize={ 1 }>
+ 						<td>Test</td>
+ 					</TreeGridRow>
+ 				</tbody>
+@@ -29,9 +29,9 @@ describe( 'TreeGridRow', () => {
+ 				<tbody>
+ 					<TreeGridRow
+ 						className="my-row"
+-						level="1"
+-						positionInSet="1"
+-						setSize="1"
++						level={ 1 }
++						positionInSet={ 1 }
++						setSize={ 1 }
+ 					>
+ 						<td>Test</td>
+ 					</TreeGridRow>
+diff --git a/packages/components/src/tree-grid/types.ts b/packages/components/src/tree-grid/types.ts
+new file mode 100644
+index 00000000000000..47c2739f43dc7c
+--- /dev/null
++++ b/packages/components/src/tree-grid/types.ts
+@@ -0,0 +1,116 @@
++export type TreeGridRowProps = {
++	/**
++	 * The children to be rendered in the row.
++	 */
++	children: React.ReactNode;
++	/**
++	 * An integer value designating the level in the hierarchical tree structure.
++	 * Counting starts at 1. A value of `1` indicates the root level of the structure.
++	 */
++	level: NonNullable< React.AriaAttributes[ 'aria-level' ] >;
++	/**
++	 * An integer value that represents the position in the set.
++	 * A set is the count of elements at a specific level. Counting starts at 1.
++	 */
++	positionInSet: NonNullable< React.AriaAttributes[ 'aria-posinset' ] >;
++	/**
++	 * An integer value that represents the total number of items in the set,
++	 * at this specific level of the hierarchy.
++	 */
++	setSize: NonNullable< React.AriaAttributes[ 'aria-setsize' ] >;
++	/**
++	 * An optional value that designates whether a row is expanded or collapsed.
++	 * Currently this value only sets the correct aria-expanded property on a row,
++	 * it has no other built-in behavior.
++	 */
++	isExpanded?: boolean;
++};
++
++type RovingTabIndexItemPassThruProps = {
++	ref: React.ForwardedRef< any >;
++	tabIndex?: number;
++	onFocus: React.FocusEventHandler< any >;
++	[ key: string ]: any;
++};
++
++export type RovingTabIndexItemProps = {
++	/**
++	 * A render function that receives the props necessary to make it participate in the
++	 * roving tabindex. Any extra props will also be passed through to this function.
++	 *
++	 * Props passed as an argument to the render prop must be passed to the child
++	 * focusable component/element within the cell. If a component is used, it must
++	 * correctly handle the `onFocus`, `tabIndex`, and `ref` props, passing these to the
++	 * element it renders. These props are used to handle the roving tabindex functionality
++	 * of the tree grid.
++	 *
++	 * ```jsx
++	 * <TreeGridCell>
++	 * 	{ ( props ) => (
++	 * 		<Button onClick={ doSomething } { ...props }>
++	 * 			Do something
++	 * 		</Button>
++	 * 	) }
++	 * </TreeGridCell>
++	 * ```
++	 */
++	children?: ( props: RovingTabIndexItemPassThruProps ) => JSX.Element;
++	/**
++	 * If `children` is not a function, this component will be used instead.
++	 */
++	as?: React.ComponentType< RovingTabIndexItemPassThruProps >;
++	[ key: string ]: any;
++};
++
++export type TreeGridCellProps =
++	| ( {
++			/**
++			 * Render `children` without wrapping it in a `TreeGridItem` component.
++			 * This means that `children` will not participate in the roving tabindex.
++			 *
++			 * @default false
++			 */
++			withoutGridItem?: false;
++	  } & NonNullable< Pick< RovingTabIndexItemProps, 'children' > > )
++	| {
++			children: React.ReactNode;
++			withoutGridItem: true;
++	  };
++
++export type TreeGridProps = {
++	/**
++	 * Label to use for the element with the `application` role.
++	 */
++	applicationAriaLabel?: string;
++	/**
++	 * The children to be rendered in the tree grid.
++	 */
++	children: React.ReactNode;
++	/**
++	 * Callback to fire when row is expanded.
++	 *
++	 * @default noop
++	 */
++	onExpandRow?: ( row: HTMLElement ) => void;
++	/**
++	 * Callback to fire when row is collapsed.
++	 *
++	 * @default noop
++	 */
++	onCollapseRow?: ( row: HTMLElement ) => void;
++	/**
++	 * Callback that fires when focus is shifted from one row to another via
++	 * the Up and Down keys. Callback is also fired on Home and End keys which
++	 * move focus from the beginning row to the end row.
++	 *
++	 * The callback is passed the event, the start row element that the focus was on
++	 * originally, and the destination row element after the focus has moved.
++	 *
++	 * @default noop
++	 */
++	onFocusRow?: (
++		event: React.KeyboardEvent< HTMLTableElement >,
++		startRow: HTMLElement,
++		destinationRow: HTMLElement
++	) => void;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 82b1966d37a7b8..26b4929b9a57ed 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -58,7 +58,6 @@
+ 		"src/navigation",
+ 		"src/palette-edit",
+ 		"src/panel/body.js",
+-		"src/toolbar",
+-		"src/tree-grid"
++		"src/toolbar"
+ 	]
+ }
+diff --git a/packages/dom/src/focusable.js b/packages/dom/src/focusable.js
+index 75e4f72f0c1f77..5050952879f60f 100644
+--- a/packages/dom/src/focusable.js
++++ b/packages/dom/src/focusable.js
+@@ -95,7 +95,7 @@ function isValidFocusableArea( element ) {
+  *                                       not sequentially focusable.
+  *                                       https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
+  *
+- * @return {Element[]} Focusable elements.
++ * @return {HTMLElement[]} Focusable elements.
+  */
+ export function find( context, { sequential = false } = {} ) {
+ 	/* eslint-disable jsdoc/no-undefined-types */

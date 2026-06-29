@@ -1,0 +1,114 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3cbc2b3159aac9..eeb98f71c61584 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,11 +2,16 @@
+ 
+ ## Unreleased
+ 
++### Deprecation
++
++-   `BoxControl`: Remove "experimental" designation ([#60921](https://github.com/WordPress/gutenberg/pull/60921)).
++
+ ## 27.4.0 (2024-04-19)
+ 
+ ### Deprecation
+ 
+ -   `Navigation`: Soft deprecate component ([#59182](https://github.com/WordPress/gutenberg/pull/59182)).
++-   `BoxControl`: Remove "experimental" designation ([#60921](https://github.com/WordPress/gutenberg/pull/60921)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/box-control/README.md b/packages/components/src/box-control/README.md
+index 2fd214b79157f7..364509b0189bcd 100644
+--- a/packages/components/src/box-control/README.md
++++ b/packages/components/src/box-control/README.md
+@@ -1,16 +1,12 @@
+ # BoxControl
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ BoxControl components let users set values for Top, Right, Bottom, and Left. This can be used as an input control for values like `padding` or `margin`.
+ 
+ ## Usage
+ 
+ ```jsx
+ import { useState } from 'react';
+-import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
++import { BoxControl } from '@wordpress/components';
+ 
+ const Example = () => {
+ 	const [ values, setValues ] = useState( {
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index 9c3452d4ccb806..3f9791c2ba4d7a 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -51,7 +51,7 @@ function useUniqueId( idProp?: string ) {
+  * This can be used as an input control for values like `padding` or `margin`.
+  *
+  * ```jsx
+- * import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
++ * import { BoxControl } from '@wordpress/components';
+  * import { useState } from '@wordpress/element';
+  *
+  * const Example = () => {
+diff --git a/packages/components/src/box-control/stories/index.story.tsx b/packages/components/src/box-control/stories/index.story.tsx
+index 1b6604048f6d52..783f9d047b1bb0 100644
+--- a/packages/components/src/box-control/stories/index.story.tsx
++++ b/packages/components/src/box-control/stories/index.story.tsx
+@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
+ import BoxControl from '../';
+ 
+ const meta: Meta< typeof BoxControl > = {
+-	title: 'Components (Experimental)/BoxControl',
++	title: 'Components/BoxControl',
+ 	component: BoxControl,
+ 	argTypes: {
+ 		values: { control: { type: null } },
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..8660863a58f4e3 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -36,8 +36,12 @@ export {
+ } from './border-box-control';
+ export { BorderControl as __experimentalBorderControl } from './border-control';
+ export {
++	/**
++	 * @deprecated Import `BoxControl` instead.
++	 */
+ 	default as __experimentalBoxControl,
+ 	applyValueToSides as __experimentalApplyValueToSides,
++	default as BoxControl,
+ } from './box-control';
+ export { default as Button } from './button';
+ export { default as ButtonGroup } from './button-group';
+diff --git a/packages/components/src/tools-panel/tools-panel/README.md b/packages/components/src/tools-panel/tools-panel/README.md
+index df41b623eefb6c..feec34319c689a 100644
+--- a/packages/components/src/tools-panel/tools-panel/README.md
++++ b/packages/components/src/tools-panel/tools-panel/README.md
+@@ -60,7 +60,7 @@ import styled from '@emotion/styled';
+  * WordPress dependencies
+  */
+ import {
+-	__experimentalBoxControl as BoxControl,
++	BoxControl,
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ 	__experimentalUnitControl as UnitControl,
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..a52e797ae6d2f6 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'boxcontrol',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

@@ -1,0 +1,77 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d995a8b3193eb0..058f24d6bba3da 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `BaseControl`: Apply `text-wrap: pretty` to help text to avoid typographic widows ([#79112](https://github.com/WordPress/gutenberg/pull/79112)).
++-   `Button`: Add a minimum width to text-based buttons to ensure visual balance for short labels ([#79286](https://github.com/WordPress/gutenberg/pull/79286)).
+ -   `Button`, `DropdownMenu`, `FormToggle`, `Modal`, `Panel`, `RadioControl`, `Toolbar`: Migrate hardcoded border and stroke colors to WPDS tokens ([#79244](https://github.com/WordPress/gutenberg/pull/79244)).
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 302f36f68cccce..5944297fa584f7 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -26,13 +26,21 @@
+ 		transition: box-shadow 0.1s linear;
+ 	}
+ 
++	$button-padding-x: 12px;
++
+ 	height: $button-size;
+ 	align-items: center;
+ 	box-sizing: border-box;
+-	padding: 4px 12px; // Allows 32px min-height.
++	padding: 4px $button-padding-x; // Allows 32px min-height.
+ 	border-radius: $radius-small;
+ 	color: $components-color-foreground;
+ 
++	&:not(.is-link):not(.has-icon) {
++		// Minimum width to ensure visual balance for very short labels (like "Ok").
++		justify-content: center;
++		min-width: calc(4ch + #{ $button-padding-x * 2 });
++	}
++
+ 	&.is-next-40px-default-size {
+ 		height: $button-size-next-default-40px;
+ 	}
+@@ -321,11 +329,17 @@
+ 	}
+ 
+ 	&.is-small {
++		$button-padding-x-small: 8px;
++
+ 		height: var(--wpds-dimension-size-sm);
+ 		line-height: 22px;
+-		padding: 0 8px;
++		padding: 0 $button-padding-x-small;
+ 		font-size: 11px;
+ 
++		&:not(.is-link):not(.has-icon) {
++			min-width: calc(4ch + #{ $button-padding-x-small * 2 });
++		}
++
+ 		&.has-icon:not(.has-text) {
+ 			padding: 0;
+ 			min-width: var(--wpds-dimension-size-sm);
+@@ -335,12 +349,13 @@
+ 	&.has-icon {
+ 		padding: 6px; // Works for 24px icons. Smaller icons are vertically centered by flex alignments.
+ 
+-		// Icon buttons are square.
+-		min-width: $button-size;
+-		justify-content: center;
++		&:not(.has-text) {
++			// Icon buttons are square.
++			min-width: $button-size;
+ 
+-		&.is-next-40px-default-size {
+-			min-width: $button-size-next-default-40px;
++			&.is-next-40px-default-size {
++				min-width: $button-size-next-default-40px;
++			}
+ 		}
+ 
+ 		.dashicon {

@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9a36a4322c74ea..9869e752e33816 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ ### Experimental
+ 
+ -   `DropdownMenu` v2: Tweak styles ([#50967](https://github.com/WordPress/gutenberg/pull/50967), [#51097](https://github.com/WordPress/gutenberg/pull/51097)).
++-   `DropdownMenu` v2: change default placement to match the legacy `DropdownMenu` component  ([#51133](https://github.com/WordPress/gutenberg/pull/51133)).
+ -   `DropdownMenu` v2: Render in the default `Popover.Slot` ([#51046](https://github.com/WordPress/gutenberg/pull/51046)).
+ 
+ ## 25.0.0 (2023-05-24)
+diff --git a/packages/components/src/dropdown-menu-v2/README.md b/packages/components/src/dropdown-menu-v2/README.md
+index c3896f8ca11093..910690280015f5 100644
+--- a/packages/components/src/dropdown-menu-v2/README.md
++++ b/packages/components/src/dropdown-menu-v2/README.md
+@@ -110,7 +110,7 @@ The distance in pixels from the trigger.
+ The preferred alignment against the trigger. May change when collisions occur.
+ 
+ - Required: no
+-- Default: `"center"`
++- Default: `"start"`
+ 
+ ##### `alignOffset`: `number`
+ 
+diff --git a/packages/components/src/dropdown-menu-v2/types.ts b/packages/components/src/dropdown-menu-v2/types.ts
+index 4b2d5aad71120a..4ea3543167025c 100644
+--- a/packages/components/src/dropdown-menu-v2/types.ts
++++ b/packages/components/src/dropdown-menu-v2/types.ts
+@@ -44,7 +44,7 @@ export type DropdownMenuProps = {
+ 	 * The preferred alignment against the trigger.
+ 	 * May change when collisions occur.
+ 	 *
+-	 * @default 'center'
++	 * @default 'start'
+ 	 */
+ 	align?: DropdownMenuPrimitive.DropdownMenuContentProps[ 'align' ];
+ 	/**

@@ -1,0 +1,65 @@
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+index a53eced1219db4..8171222f3d7419 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+@@ -79,7 +79,7 @@ export const buttonView = ( {
+ `;
+ 
+ const pressed = css`
+-	color: ${ COLORS.theme.foregroundInverted };
++	color: '#000';
+ 
+ 	&:active {
+ 		background: transparent;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+index 8376b66a5a86cf..ca3d83e98bec6e 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -17,9 +17,9 @@ export const toggleGroupControl = ( {
+ }: Pick< ToggleGroupControlProps, 'isBlock' | 'isDeselectable' > & {
+ 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
+ } ) => css`
+-	background: ${ COLORS.ui.background };
+-	border: 1px solid transparent;
+-	border-radius: ${ CONFIG.radiusSmall };
++	background: #f5f5f5;
++	//border: 1px solid transparent;
++	//border-radius: ${ CONFIG.radiusSmall };
+ 	display: inline-flex;
+ 	min-width: 0;
+ 	position: relative;
+@@ -39,11 +39,11 @@ export const toggleGroupControl = ( {
+ 		content: '';
+ 		position: absolute;
+ 		pointer-events: none;
+-		background: ${ COLORS.theme.foreground };
++		background: ${ COLORS.theme.background };
+ 
+ 		// Windows High Contrast mode will show this outline, but not the box-shadow.
+-		outline: 2px solid transparent;
+-		outline-offset: -3px;
++		outline: 1.5px solid ${ COLORS.gray[400] };
++		//outline-offset: -3px;
+ 
+ 		/* Using a large value to avoid antialiasing rounding issues
+ 			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
+@@ -56,7 +56,7 @@ export const toggleGroupControl = ( {
+ 							var( --antialiasing-factor )
+ 					)
+ 			) / ${ CONFIG.radiusXSmall };
+-		left: -1px; // Correcting for border.
++		left: 0; // Correcting for border.
+ 		width: calc( var( --antialiasing-factor ) * 1px );
+ 		height: calc( var( --selected-height, 0 ) * 1px );
+ 		transform-origin: left top;
+@@ -82,8 +82,8 @@ const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
+ 		}
+ 
+ 		&:focus-within {
+-			border-color: ${ COLORS.ui.borderFocus };
+-			box-shadow: ${ CONFIG.controlBoxShadowFocus };
++			//border-color: ${ COLORS.ui.borderFocus };
++			//box-shadow: ${ CONFIG.controlBoxShadowFocus };
+ 			z-index: 1;
+ 			// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 			outline: 2px solid transparent;

@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 353199871a17e9..0ddf7c5e512112 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -26,6 +26,7 @@
+ -   `Dropdown`: Make sure cleanup (closing the dropdown) only runs when the menu has actually been opened.
+ -   Enhance the TypeScript migration guidelines ([#41669](https://github.com/WordPress/gutenberg/pull/41669)).
+ -   `ExternalLink`: Convert to TypeScript ([#41681](https://github.com/WordPress/gutenberg/pull/41681)).
++-   `InputControl` updated to satisfy `react/exhuastive-deps` eslint rule ([#41601](https://github.com/WordPress/gutenberg/pull/41601))
+ 
+ ## 19.12.0 (2022-06-01)
+ 
+diff --git a/packages/components/src/input-control/utils.ts b/packages/components/src/input-control/utils.ts
+index b051cb8b4dd5e2..ff4550fac3a106 100644
+--- a/packages/components/src/input-control/utils.ts
++++ b/packages/components/src/input-control/utils.ts
+@@ -63,7 +63,7 @@ export function useDragCursor(
+ 			// @ts-expect-error
+ 			document.documentElement.style.cursor = null;
+ 		}
+-	}, [ isDragging ] );
++	}, [ isDragging, dragCursor ] );
+ 
+ 	return dragCursor;
+ }

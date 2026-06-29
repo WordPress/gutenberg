@@ -1,0 +1,83 @@
+diff --git a/packages/ui/src/form/primitives/input/input.tsx b/packages/ui/src/form/primitives/input/input.tsx
+index a1848acbc0fd59..145e5ddf079242 100644
+--- a/packages/ui/src/form/primitives/input/input.tsx
++++ b/packages/ui/src/form/primitives/input/input.tsx
+@@ -7,11 +7,20 @@ import type { InputProps } from './types';
+ import { InputLayout } from '../input-layout';
+ 
+ export const Input = forwardRef< HTMLElement, InputProps >( function Input(
+-	{ className, size = 'default', prefix, suffix, style, ...restProps },
++	{
++		className,
++		size = 'default',
++		prefix,
++		suffix,
++		style,
++		rootRef,
++		...restProps
++	},
+ 	ref
+ ) {
+ 	return (
+ 		<InputLayout
++			ref={ rootRef }
+ 			className={ clsx(
+ 				focusStyles[ 'outset-ring--focus-within' ],
+ 				className
+diff --git a/packages/ui/src/form/primitives/input/types.ts b/packages/ui/src/form/primitives/input/types.ts
+index 20502d5d46428a..fabd5c2efc2526 100644
+--- a/packages/ui/src/form/primitives/input/types.ts
++++ b/packages/ui/src/form/primitives/input/types.ts
+@@ -11,6 +11,12 @@ export type InputProps = Omit<
+ 		 * Whether the field is disabled.
+ 		 */
+ 		disabled?: boolean;
++		/**
++		 * Ref to the root element. Useful for anchoring popups to the
++		 * full input container (including prefix/suffix) rather than
++		 * the inner `<input>`.
++		 */
++		rootRef?: React.Ref< HTMLDivElement >;
+ 	} & {
+ 		/**
+ 		 * The type of the input element.
+diff --git a/packages/ui/src/form/primitives/select/popup.tsx b/packages/ui/src/form/primitives/select/popup.tsx
+index 6e8a3ad54b746a..a0381f031ca56e 100644
+--- a/packages/ui/src/form/primitives/select/popup.tsx
++++ b/packages/ui/src/form/primitives/select/popup.tsx
+@@ -16,11 +16,15 @@ const ThemeProvider: typeof ThemeProviderType =
+ 	unlock( themePrivateApis ).ThemeProvider;
+ 
+ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
+-	function Popup( { className, children, style, ...restProps }, ref ) {
++	function Popup(
++		{ anchor, className, children, style, ...restProps },
++		ref
++	) {
+ 		return (
+ 			<_Select.Portal>
+ 				<_Select.Positioner
+ 					{ ...ITEM_POPUP_POSITIONER_PROPS }
++					anchor={ anchor }
+ 					alignItemWithTrigger={ false }
+ 					style={ style }
+ 					className={ clsx(
+diff --git a/packages/ui/src/form/primitives/select/types.ts b/packages/ui/src/form/primitives/select/types.ts
+index 591104f8806fcb..d1562cd158a598 100644
+--- a/packages/ui/src/form/primitives/select/types.ts
++++ b/packages/ui/src/form/primitives/select/types.ts
+@@ -27,7 +27,13 @@ export type SelectTriggerProps = Omit< _Select.Trigger.Props, 'children' > & {
+ 	children?: _Select.Value.Props[ 'children' ];
+ };
+ 
+-export type SelectPopupProps = _Select.Popup.Props;
++export type SelectPopupProps = _Select.Popup.Props & {
++	/**
++	 * An element to position the popup against.
++	 * By default, the popup is positioned against the trigger.
++	 */
++	anchor?: _Select.Positioner.Props[ 'anchor' ];
++};
+ 
+ export type SelectItemProps = Omit<
+ 	_Select.Item.Props,

@@ -1,0 +1,30 @@
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 987c75d769b727..8c8a48c891f612 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -384,7 +384,11 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 	}
+ 
+ 	function handleCommaKey() {
+-		if ( inputHasValidValue() ) {
++		if (
++			inputHasValidValue() &&
++			( ! __experimentalValidateInput ||
++				__experimentalValidateInput( incompleteTokenValue ) )
++		) {
+ 			addNewToken( incompleteTokenValue );
+ 		}
+ 
+@@ -432,7 +436,11 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		if ( selectedSuggestion ) {
+ 			addNewToken( selectedSuggestion );
+ 			preventDefault = true;
+-		} else if ( inputHasValidValue() ) {
++		} else if (
++			inputHasValidValue() &&
++			( ! __experimentalValidateInput ||
++				__experimentalValidateInput( incompleteTokenValue ) )
++		) {
+ 			addNewToken( incompleteTokenValue );
+ 			preventDefault = true;
+ 		}

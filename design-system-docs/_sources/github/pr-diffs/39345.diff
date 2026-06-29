@@ -1,0 +1,136 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 74b338633c1b15..a605e79bbc05ef 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `ConfirmDialog`: Add support for custom label text on the confirmation and cancelation buttons ([#38994](https://github.com/WordPress/gutenberg/pull/38994))
+ -   `InputControl`: Allow `onBlur` for empty values to commit the change when `isPressEnterToChange` is true, and move reset behavior to the ESCAPE key. ([#39109](https://github.com/WordPress/gutenberg/pull/39109)).
+ -   `TreeGrid`: Add tests for Home/End keyboard navigation. Add `onFocusRow` callback for Home/End keyboard navigation, this was missed in the implementation PR. Modify test for expanding/collapsing a row as row 1 implements this now. Update README with latest changes. ([#39302](https://github.com/WordPress/gutenberg/pull/39302))
++-   `ToggleGroupControlOption`: Calculate width from button content and remove `LabelPlaceholderView` ([#39345](https://github.com/WordPress/gutenberg/pull/39345))
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/font-size-picker/test/index.js b/packages/components/src/font-size-picker/test/index.js
+index a1158f50e26f25..e714f317769552 100644
+--- a/packages/components/src/font-size-picker/test/index.js
++++ b/packages/components/src/font-size-picker/test/index.js
+@@ -203,7 +203,6 @@ describe( 'FontSizePicker', () => {
+ 				);
+ 				const element = screen.getByLabelText( 'Large' );
+ 				expect( element ).toBeInTheDocument();
+-				expect( element.children ).toHaveLength( 2 );
+ 				expect( element.children[ 0 ].textContent ).toBe( '1.7' );
+ 			} );
+ 			it( 'should use incremental sequence of numbers as labels if we have complex css', () => {
+@@ -223,7 +222,6 @@ describe( 'FontSizePicker', () => {
+ 				);
+ 				const element = screen.getByLabelText( 'Large' );
+ 				expect( element ).toBeInTheDocument();
+-				expect( element.children ).toHaveLength( 2 );
+ 				expect( element.children[ 0 ].textContent ).toBe( '3' );
+ 			} );
+ 		} );
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+index c3663a83a9b170..51b4d087035508 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+@@ -122,21 +122,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
+ .emotion-11 {
+   font-size: 13px;
+   line-height: 1;
+-  position: absolute;
+-  top: 50%;
+-  left: 50%;
+-  -webkit-transform: translate( -50%, -50% );
+-  -moz-transform: translate( -50%, -50% );
+-  -ms-transform: translate( -50%, -50% );
+-  transform: translate( -50%, -50% );
+-}
+-
+-.emotion-13 {
+-  font-size: 13px;
+-  font-weight: bold;
+-  height: 0;
+-  overflow: hidden;
+-  visibility: hidden;
+ }
+ 
+ <div
+@@ -180,12 +165,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
+           >
+             R
+           </div>
+-          <div
+-            aria-hidden="true"
+-            class="emotion-13 emotion-14"
+-          >
+-            R
+-          </div>
+         </button>
+       </div>
+       <div
+@@ -208,12 +187,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
+           >
+             J
+           </div>
+-          <div
+-            aria-hidden="true"
+-            class="emotion-13 emotion-14"
+-          >
+-            J
+-          </div>
+         </button>
+       </div>
+     </div>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+index 8b082b4b82eaaf..39f2cd98f3ea05 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+@@ -24,7 +24,7 @@ import * as styles from './styles';
+ import { useCx } from '../../utils/hooks';
+ import Tooltip from '../../tooltip';
+ 
+-const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
++const { ButtonContentView, LabelView } = styles;
+ 
+ const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
+ 	if ( showTooltip && text ) {
+@@ -88,9 +88,6 @@ function ToggleGroupControlOption(
+ 					value={ value }
+ 				>
+ 					<ButtonContentView>{ label }</ButtonContentView>
+-					<LabelPlaceholderView aria-hidden>
+-						{ label }
+-					</LabelPlaceholderView>
+ 				</Radio>
+ 			</WithToolTip>
+ 		</LabelView>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option/styles.ts
+index 9486e9b05f40de..3e49726cd39bb0 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/styles.ts
+@@ -61,24 +61,12 @@ export const buttonActive = css`
+ export const ButtonContentView = styled.div`
+ 	font-size: ${ CONFIG.fontSize };
+ 	line-height: 1;
+-	position: absolute;
+-	top: 50%;
+-	left: 50%;
+-	transform: translate( -50%, -50% );
+ `;
+ 
+ export const separatorActive = css`
+ 	background: transparent;
+ `;
+ 
+-export const LabelPlaceholderView = styled.div`
+-	font-size: ${ CONFIG.fontSize };
+-	font-weight: bold;
+-	height: 0;
+-	overflow: hidden;
+-	visibility: hidden;
+-`;
+-
+ export const medium = css`
+ 	min-height: ${ CONFIG.controlHeight };
+ `;

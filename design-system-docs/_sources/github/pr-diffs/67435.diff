@@ -1,0 +1,50 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7865993d4e995f..2b2c4abc6fed9e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,9 @@
+ ### Enhancements
+ 
+ -   `BorderBoxControl`: Reduce gap value when unlinked ([#67049](https://github.com/WordPress/gutenberg/pull/67049)).
++-   `DropdownMenu`: Increase option height to 40px ([#67435](https://github.com/WordPress/gutenberg/pull/67435)).
++-   `MenuItem`: Increase height to 40px ([#67435](https://github.com/WordPress/gutenberg/pull/67435)).
++-   `MenuItemsChoice`: Increase option height to 40px ([#67435](https://github.com/WordPress/gutenberg/pull/67435)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/dropdown-menu/index.tsx b/packages/components/src/dropdown-menu/index.tsx
+index 0e4501be4839c0..de83695978c2df 100644
+--- a/packages/components/src/dropdown-menu/index.tsx
++++ b/packages/components/src/dropdown-menu/index.tsx
+@@ -164,6 +164,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+ 						{ controlSets?.flatMap( ( controlSet, indexOfSet ) =>
+ 							controlSet.map( ( control, indexOfControl ) => (
+ 								<Button
++									__next40pxDefaultSize
+ 									key={ [
+ 										indexOfSet,
+ 										indexOfControl,
+diff --git a/packages/components/src/dropdown-menu/style.scss b/packages/components/src/dropdown-menu/style.scss
+index 1c716d80410e12..29fd6db18ba283 100644
+--- a/packages/components/src/dropdown-menu/style.scss
++++ b/packages/components/src/dropdown-menu/style.scss
+@@ -53,7 +53,7 @@
+ 
+ 	.components-menu-item__button,
+ 	.components-menu-item__button.components-button {
+-		min-height: $button-size;
++		min-height: $button-size-next-default-40px;
+ 		height: auto;
+ 		text-align: left;
+ 		padding-left: $grid-unit-10;
+diff --git a/packages/components/src/menu-items-choice/style.scss b/packages/components/src/menu-items-choice/style.scss
+index 383eb4066ba86b..c33ce43301842b 100644
+--- a/packages/components/src/menu-items-choice/style.scss
++++ b/packages/components/src/menu-items-choice/style.scss
+@@ -1,5 +1,6 @@
+ .components-menu-items-choice,
+ .components-menu-items-choice.components-button {
++	min-height: $button-size-next-default-40px;
+ 	height: auto;
+ 
+ 	svg {

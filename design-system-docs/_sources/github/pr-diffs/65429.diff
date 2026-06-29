@@ -1,0 +1,80 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fef1769c19b0f7..3b6dae5193ac14 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `TreeSelect`: Deprecate 36px default size ([#67855](https://github.com/WordPress/gutenberg/pull/67855)).
+ -   `SelectControl`: Deprecate 36px default size ([#66898](https://github.com/WordPress/gutenberg/pull/66898)).
+ -   `InputControl`: Deprecate 36px default size ([#66897](https://github.com/WordPress/gutenberg/pull/66897)).
++-   Soft deprecate `ButtonGroup` component. Use `ToggleGroupControl` instead ([#65429](https://github.com/WordPress/gutenberg/pull/65429)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/button-group/README.md b/packages/components/src/button-group/README.md
+index 5c0179d6877af9..579103dc70e062 100644
+--- a/packages/components/src/button-group/README.md
++++ b/packages/components/src/button-group/README.md
+@@ -1,5 +1,9 @@
+ # ButtonGroup
+ 
++<div class="callout callout-alert">
++	This component is deprecated. Use `ToggleGroupControl` instead.
++</div>
++
+ ButtonGroup can be used to group any related buttons together. To emphasize related buttons, a group should share a common container.
+ 
+ ![ButtonGroup component](https://wordpress.org/gutenberg/files/2018/12/s_96EC471FE9C9D91A996770229947AAB54A03351BDE98F444FD3C1BF0CED365EA_1541792995815_ButtonGroup.png)
+diff --git a/packages/components/src/button-group/index.tsx b/packages/components/src/button-group/index.tsx
+index fb2659c2a0d7de..4bdf3a139188b5 100644
+--- a/packages/components/src/button-group/index.tsx
++++ b/packages/components/src/button-group/index.tsx
+@@ -8,6 +8,7 @@ import type { ForwardedRef } from 'react';
+  * WordPress dependencies
+  */
+ import { forwardRef } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -22,6 +23,11 @@ function UnforwardedButtonGroup(
+ 	const { className, ...restProps } = props;
+ 	const classes = clsx( 'components-button-group', className );
+ 
++	deprecated( 'wp.components.ButtonGroup', {
++		since: '6.8',
++		alternative: 'wp.components.ToggleGroupControl',
++	} );
++
+ 	return (
+ 		<div ref={ ref } role="group" className={ classes } { ...restProps } />
+ 	);
+@@ -31,6 +37,8 @@ function UnforwardedButtonGroup(
+  * ButtonGroup can be used to group any related buttons together. To emphasize
+  * related buttons, a group should share a common container.
+  *
++ * @deprecated Use `ToggleGroupControl` instead.
++ *
+  * ```jsx
+  * import { Button, ButtonGroup } from '@wordpress/components';
+  *
+diff --git a/packages/components/src/button-group/stories/index.story.tsx b/packages/components/src/button-group/stories/index.story.tsx
+index 4b5ab3d5dfdb6b..a2df76004d4385 100644
+--- a/packages/components/src/button-group/stories/index.story.tsx
++++ b/packages/components/src/button-group/stories/index.story.tsx
+@@ -9,8 +9,15 @@ import type { Meta, StoryObj } from '@storybook/react';
+ import ButtonGroup from '..';
+ import Button from '../../button';
+ 
++/**
++ * ButtonGroup can be used to group any related buttons together.
++ * To emphasize related buttons, a group should share a common container.
++ *
++ * This component is deprecated. Use `ToggleGroupControl` instead.
++ */
+ const meta: Meta< typeof ButtonGroup > = {
+-	title: 'Components/ButtonGroup',
++	title: 'Components (Deprecated)/ButtonGroup',
++	id: 'components-buttongroup',
+ 	component: ButtonGroup,
+ 	argTypes: {
+ 		children: { control: false },

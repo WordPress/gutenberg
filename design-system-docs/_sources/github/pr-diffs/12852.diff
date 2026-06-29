@@ -1,0 +1,217 @@
+diff --git a/packages/block-library/src/audio/test/__snapshots__/index.js.snap b/packages/block-library/src/audio/test/__snapshots__/index.js.snap
+index e064799f81a1d3..ec88637dd05799 100644
+--- a/packages/block-library/src/audio/test/__snapshots__/index.js.snap
++++ b/packages/block-library/src/audio/test/__snapshots__/index.js.snap
+@@ -33,31 +33,7 @@ exports[`core/audio block edit matches snapshot 1`] = `
+   >
+     <div
+       class="components-drop-zone"
+-    >
+-      <div
+-        class="components-drop-zone__content"
+-      >
+-        <svg
+-          aria-hidden="true"
+-          class="dashicon dashicons-upload components-drop-zone__content-icon"
+-          focusable="false"
+-          height="40"
+-          role="img"
+-          viewBox="0 0 20 20"
+-          width="40"
+-          xmlns="http://www.w3.org/2000/svg"
+-        >
+-          <path
+-            d="M8 14V8H5l5-6 5 6h-3v6H8zm-2 2v-6H4v8h12.01v-8H14v6H6z"
+-          />
+-        </svg>
+-        <span
+-          class="components-drop-zone__content-text"
+-        >
+-          Drop files to upload
+-        </span>
+-      </div>
+-    </div>
++    />
+     <div
+       class="components-form-file-upload"
+     >
+diff --git a/packages/block-library/src/cover/test/__snapshots__/index.js.snap b/packages/block-library/src/cover/test/__snapshots__/index.js.snap
+index 0592141c6088c6..8ed40b5ba42654 100644
+--- a/packages/block-library/src/cover/test/__snapshots__/index.js.snap
++++ b/packages/block-library/src/cover/test/__snapshots__/index.js.snap
+@@ -33,31 +33,7 @@ exports[`core/cover block edit matches snapshot 1`] = `
+   >
+     <div
+       class="components-drop-zone"
+-    >
+-      <div
+-        class="components-drop-zone__content"
+-      >
+-        <svg
+-          aria-hidden="true"
+-          class="dashicon dashicons-upload components-drop-zone__content-icon"
+-          focusable="false"
+-          height="40"
+-          role="img"
+-          viewBox="0 0 20 20"
+-          width="40"
+-          xmlns="http://www.w3.org/2000/svg"
+-        >
+-          <path
+-            d="M8 14V8H5l5-6 5 6h-3v6H8zm-2 2v-6H4v8h12.01v-8H14v6H6z"
+-          />
+-        </svg>
+-        <span
+-          class="components-drop-zone__content-text"
+-        >
+-          Drop files to upload
+-        </span>
+-      </div>
+-    </div>
++    />
+     <div
+       class="components-form-file-upload"
+     >
+diff --git a/packages/block-library/src/gallery/test/__snapshots__/index.js.snap b/packages/block-library/src/gallery/test/__snapshots__/index.js.snap
+index 73fc964e1f4a4b..221e6659c92ea3 100644
+--- a/packages/block-library/src/gallery/test/__snapshots__/index.js.snap
++++ b/packages/block-library/src/gallery/test/__snapshots__/index.js.snap
+@@ -33,31 +33,7 @@ exports[`core/gallery block edit matches snapshot 1`] = `
+   >
+     <div
+       class="components-drop-zone"
+-    >
+-      <div
+-        class="components-drop-zone__content"
+-      >
+-        <svg
+-          aria-hidden="true"
+-          class="dashicon dashicons-upload components-drop-zone__content-icon"
+-          focusable="false"
+-          height="40"
+-          role="img"
+-          viewBox="0 0 20 20"
+-          width="40"
+-          xmlns="http://www.w3.org/2000/svg"
+-        >
+-          <path
+-            d="M8 14V8H5l5-6 5 6h-3v6H8zm-2 2v-6H4v8h12.01v-8H14v6H6z"
+-          />
+-        </svg>
+-        <span
+-          class="components-drop-zone__content-text"
+-        >
+-          Drop files to upload
+-        </span>
+-      </div>
+-    </div>
++    />
+     <div
+       class="components-form-file-upload"
+     >
+diff --git a/packages/block-library/src/video/test/__snapshots__/index.js.snap b/packages/block-library/src/video/test/__snapshots__/index.js.snap
+index 0f7157024c04cd..0ae056f34736cb 100644
+--- a/packages/block-library/src/video/test/__snapshots__/index.js.snap
++++ b/packages/block-library/src/video/test/__snapshots__/index.js.snap
+@@ -33,31 +33,7 @@ exports[`core/video block edit matches snapshot 1`] = `
+   >
+     <div
+       class="components-drop-zone"
+-    >
+-      <div
+-        class="components-drop-zone__content"
+-      >
+-        <svg
+-          aria-hidden="true"
+-          class="dashicon dashicons-upload components-drop-zone__content-icon"
+-          focusable="false"
+-          height="40"
+-          role="img"
+-          viewBox="0 0 20 20"
+-          width="40"
+-          xmlns="http://www.w3.org/2000/svg"
+-        >
+-          <path
+-            d="M8 14V8H5l5-6 5 6h-3v6H8zm-2 2v-6H4v8h12.01v-8H14v6H6z"
+-          />
+-        </svg>
+-        <span
+-          class="components-drop-zone__content-text"
+-        >
+-          Drop files to upload
+-        </span>
+-      </div>
+-    </div>
++    />
+     <div
+       class="components-form-file-upload"
+     >
+diff --git a/packages/components/src/drop-zone/index.js b/packages/components/src/drop-zone/index.js
+index 5a9960583ed198..07e384e22f9476 100644
+--- a/packages/components/src/drop-zone/index.js
++++ b/packages/components/src/drop-zone/index.js
+@@ -71,24 +71,25 @@ class DropZoneComponent extends Component {
+ 			[ `is-dragging-${ type }` ]: !! type,
+ 		} );
+ 
+-		return (
+-			<div ref={ this.dropZoneElement } className={ classes }>
++		let children;
++		if ( isDraggingOverElement ) {
++			children = (
+ 				<div className="components-drop-zone__content">
+-					{ [
+-						<Dashicon
+-							key="icon"
+-							icon="upload"
+-							size="40"
+-							className="components-drop-zone__content-icon"
+-						/>,
+-						<span
+-							key="text"
+-							className="components-drop-zone__content-text"
+-						>
+-							{ label ? label : __( 'Drop files to upload' ) }
+-						</span>,
+-					] }
++					<Dashicon
++						icon="upload"
++						size="40"
++						className="components-drop-zone__content-icon"
++					/>
++					<span className="components-drop-zone__content-text">
++						{ label ? label : __( 'Drop files to upload' ) }
++					</span>
+ 				</div>
++			);
++		}
++
++		return (
++			<div ref={ this.dropZoneElement } className={ classes }>
++				{ children }
+ 			</div>
+ 		);
+ 	}
+diff --git a/packages/components/src/drop-zone/style.scss b/packages/components/src/drop-zone/style.scss
+index 0103f4af011588..4b36a7fb9a2bc3 100644
+--- a/packages/components/src/drop-zone/style.scss
++++ b/packages/components/src/drop-zone/style.scss
+@@ -19,10 +19,6 @@
+ 
+ 	&.is-dragging-over-element {
+ 		background-color: rgba($blue-dark-900, 0.8);
+-
+-		.components-drop-zone__content {
+-			display: block;
+-		}
+ 	}
+ }
+ 
+@@ -37,7 +33,6 @@
+ 	text-align: center;
+ 	color: $white;
+ 	transition: transform 0.2s ease-in-out;
+-	display: none;
+ }
+ 
+ .components-drop-zone.is-dragging-over-element .components-drop-zone__content {

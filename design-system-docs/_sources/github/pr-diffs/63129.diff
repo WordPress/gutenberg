@@ -1,0 +1,62 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 19ab4ff66815f4..a67639f69c1a03 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `ToolbarButton`: Deprecate `isDisabled` prop and merge with `disabled` ([#63101](https://github.com/WordPress/gutenberg/pull/63101)).
+ -   `Button`: Stabilize `__experimentalIsFocusable` prop as `accessibleWhenDisabled` ([#62282](https://github.com/WordPress/gutenberg/pull/62282)).
+ -   `ToolbarButton`: Always keep focusable when disabled ([#63102](https://github.com/WordPress/gutenberg/pull/63102)).
++-   `ProgressBar`: Fix indeterminate RTL support. ([#63129](https://github.com/WordPress/gutenberg/pull/63129)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/progress-bar/styles.ts b/packages/components/src/progress-bar/styles.ts
+index 0e91556b96b9d2..79b9103e73a1ed 100644
+--- a/packages/components/src/progress-bar/styles.ts
++++ b/packages/components/src/progress-bar/styles.ts
+@@ -4,19 +4,28 @@
+ import styled from '@emotion/styled';
+ import { css, keyframes } from '@emotion/react';
+ 
++/**
++ * WordPress dependencies
++ */
++import { isRTL } from '@wordpress/i18n';
++
+ /**
+  * Internal dependencies
+  */
+ import { COLORS, CONFIG } from '../utils';
+ 
+-const animateProgressBar = keyframes( {
+-	'0%': {
+-		left: '-50%',
+-	},
+-	'100%': {
+-		left: '100%',
+-	},
+-} );
++function animateProgressBar( isRtl = false ) {
++	const animationDirection = isRtl ? 'right' : 'left';
++
++	return keyframes( {
++		'0%': {
++			[ animationDirection ]: '-50%',
++		},
++		'100%': {
++			[ animationDirection ]: '100%',
++		},
++	} );
++}
+ 
+ // Width of the indicator for the indeterminate progress bar
+ export const INDETERMINATE_TRACK_WIDTH = 50;
+@@ -67,7 +76,7 @@ export const Indicator = styled.div< {
+ 					animationDuration: '1.5s',
+ 					animationTimingFunction: 'ease-in-out',
+ 					animationIterationCount: 'infinite',
+-					animationName: animateProgressBar,
++					animationName: animateProgressBar( isRTL() ),
+ 					width: `${ INDETERMINATE_TRACK_WIDTH }%`,
+ 			  } )
+ 			: css( {

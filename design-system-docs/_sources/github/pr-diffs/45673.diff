@@ -1,0 +1,33 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 76ed17d09c30c1..7bc55c4fa49459 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Bug Fix
+ 
+ -   `Autocomplete`: Fix unexpected block insertion during IME composition ([#45510](https://github.com/WordPress/gutenberg/pull/45510)).
++-   `ToolsPanelItem`: Prevent unintended calls to onDeselect when parent panel is remounted and item is rendered via SlotFill ([#45673](https://github.com/WordPress/gutenberg/pull/45673))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index 582ff88113dba5..4e0db5b9881d3e 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -108,11 +108,15 @@ export function useToolsPanelItem(
+ 	const menuGroup = isShownByDefault ? 'default' : 'optional';
+ 	const isMenuItemChecked = menuItems?.[ menuGroup ]?.[ label ];
+ 	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
++	const isRegistered = menuItems?.[ menuGroup ]?.[ label ] !== undefined;
+ 
+ 	// Determine if the panel item's corresponding menu is being toggled and
+ 	// trigger appropriate callback if it is.
+ 	useEffect( () => {
+-		if ( isResetting || ! hasMatchingPanel ) {
++		// We check whether this item is currently registered as items rendered
++		// via fills can persist through the parent panel being remounted.
++		// See: https://github.com/WordPress/gutenberg/pull/45673
++		if ( ! isRegistered || isResetting || ! hasMatchingPanel ) {
+ 			return;
+ 		}
+ 

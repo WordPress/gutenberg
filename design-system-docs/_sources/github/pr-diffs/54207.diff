@@ -1,0 +1,160 @@
+diff --git a/packages/block-editor/src/components/block-canvas/index.js b/packages/block-editor/src/components/block-canvas/index.js
+index 431f45243e6dce..03cc856bd3f9e9 100644
+--- a/packages/block-editor/src/components/block-canvas/index.js
++++ b/packages/block-editor/src/components/block-canvas/index.js
+@@ -1,3 +1,8 @@
++/**
++ * WordPress dependencies
++ */
++import { useMergeRefs } from '@wordpress/compose';
++
+ /**
+  * Internal dependencies
+  */
+@@ -6,16 +11,19 @@ import EditorStyles from '../editor-styles';
+ import Iframe from '../iframe';
+ import WritingFlow from '../writing-flow';
+ import { useMouseMoveTypingReset } from '../observe-typing';
++import { useClipboardHandler } from '../copy-handler';
+ 
+ export function ExperimentalBlockCanvas( {
+ 	shouldIframe = true,
+ 	height = '300px',
+ 	children = <BlockList />,
+ 	styles,
+-	contentRef,
++	contentRef: contentRefProp,
+ 	iframeProps,
+ } ) {
+ 	const resetTypingRef = useMouseMoveTypingReset();
++	const copyHandler = useClipboardHandler();
++	const contentRef = useMergeRefs( [ copyHandler, contentRefProp ] );
+ 
+ 	if ( ! shouldIframe ) {
+ 		return (
+diff --git a/packages/customize-widgets/src/components/sidebar-block-editor/index.js b/packages/customize-widgets/src/components/sidebar-block-editor/index.js
+index e65a85c8b341e9..87abbf919f8a6d 100644
+--- a/packages/customize-widgets/src/components/sidebar-block-editor/index.js
++++ b/packages/customize-widgets/src/components/sidebar-block-editor/index.js
+@@ -9,7 +9,6 @@ import {
+ 	BlockTools,
+ 	BlockSelectionClearer,
+ 	BlockInspector,
+-	CopyHandler,
+ 	privateApis as blockEditorPrivateApis,
+ 	__unstableBlockSettingsMenuFirstItem,
+ } from '@wordpress/block-editor';
+@@ -114,19 +113,17 @@ export default function SidebarBlockEditor( {
+ 					isFixedToolbarActive={ isFixedToolbarActive }
+ 				/>
+ 
+-				<CopyHandler>
+-					<BlockTools>
+-						<BlockSelectionClearer>
+-							<BlockCanvas
+-								shouldIframe={ false }
+-								styles={ settings.defaultEditorStyles }
+-								height="100%"
+-							>
+-								<BlockList renderAppender={ BlockAppender } />
+-							</BlockCanvas>
+-						</BlockSelectionClearer>
+-					</BlockTools>
+-				</CopyHandler>
++				<BlockTools>
++					<BlockSelectionClearer>
++						<BlockCanvas
++							shouldIframe={ false }
++							styles={ settings.defaultEditorStyles }
++							height="100%"
++						>
++							<BlockList renderAppender={ BlockAppender } />
++						</BlockCanvas>
++					</BlockSelectionClearer>
++				</BlockTools>
+ 
+ 				{ createPortal(
+ 					// This is a temporary hack to prevent button component inside <BlockInspector>
+diff --git a/packages/edit-post/src/components/visual-editor/index.js b/packages/edit-post/src/components/visual-editor/index.js
+index fa8047dbac5ba7..1a0365fc05ecb8 100644
+--- a/packages/edit-post/src/components/visual-editor/index.js
++++ b/packages/edit-post/src/components/visual-editor/index.js
+@@ -13,7 +13,6 @@ import {
+ 	store as blockEditorStore,
+ 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
+ 	__unstableUseTypewriter as useTypewriter,
+-	__unstableUseClipboardHandler as useClipboardHandler,
+ 	__unstableUseTypingObserver as useTypingObserver,
+ 	__experimentalUseResizeCanvas as useResizeCanvas,
+ 	useSetting,
+@@ -185,7 +184,6 @@ export default function VisualEditor( { styles } ) {
+ 	const ref = useRef();
+ 	const contentRef = useMergeRefs( [
+ 		ref,
+-		useClipboardHandler(),
+ 		useTypewriter(),
+ 		useBlockSelectionClearer(),
+ 	] );
+diff --git a/packages/edit-site/src/components/block-editor/site-editor-canvas.js b/packages/edit-site/src/components/block-editor/site-editor-canvas.js
+index 9e89e91f655c42..55bcf5b6121809 100644
+--- a/packages/edit-site/src/components/block-editor/site-editor-canvas.js
++++ b/packages/edit-site/src/components/block-editor/site-editor-canvas.js
+@@ -10,14 +10,9 @@ import { useRef } from '@wordpress/element';
+ import {
+ 	BlockList,
+ 	BlockTools,
+-	__unstableUseClipboardHandler as useClipboardHandler,
+ 	store as blockEditorStore,
+ } from '@wordpress/block-editor';
+-import {
+-	useMergeRefs,
+-	useViewportMatch,
+-	useResizeObserver,
+-} from '@wordpress/compose';
++import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
+ /**
+  * Internal dependencies
+  */
+@@ -76,8 +71,6 @@ export default function SiteEditorCanvas() {
+ 		! isMobileViewport;
+ 
+ 	const contentRef = useRef();
+-	const mergedRefs = useMergeRefs( [ contentRef, useClipboardHandler() ] );
+-
+ 	const isTemplateTypeNavigation = templateType === 'wp_navigation';
+ 
+ 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
+@@ -127,7 +120,7 @@ export default function SiteEditorCanvas() {
+ 								<EditorCanvas
+ 									enableResizing={ enableResizing }
+ 									settings={ settings }
+-									contentRef={ mergedRefs }
++									contentRef={ contentRef }
+ 								>
+ 									{ resizeObserver }
+ 									<BlockList
+diff --git a/packages/edit-widgets/src/components/widget-areas-block-editor-provider/index.js b/packages/edit-widgets/src/components/widget-areas-block-editor-provider/index.js
+index f3a7b84d5ded68..d538e37ad1ec8a 100644
+--- a/packages/edit-widgets/src/components/widget-areas-block-editor-provider/index.js
++++ b/packages/edit-widgets/src/components/widget-areas-block-editor-provider/index.js
+@@ -10,10 +10,7 @@ import {
+ 	useResourcePermissions,
+ } from '@wordpress/core-data';
+ import { useMemo } from '@wordpress/element';
+-import {
+-	CopyHandler,
+-	privateApis as blockEditorPrivateApis,
+-} from '@wordpress/block-editor';
++import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+ import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
+ import { store as preferencesStore } from '@wordpress/preferences';
+ 
+@@ -107,7 +104,7 @@ export default function WidgetAreasBlockEditorProvider( {
+ 				useSubRegistry={ false }
+ 				{ ...props }
+ 			>
+-				<CopyHandler>{ children }</CopyHandler>
++				{ children }
+ 				<PatternsMenuItems rootClientId={ widgetAreaId } />
+ 			</ExperimentalBlockEditorProvider>
+ 		</SlotFillProvider>

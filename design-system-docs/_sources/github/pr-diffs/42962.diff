@@ -1,0 +1,308 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 87ba6702af5398..f9e66c7ff59836 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ 
+ ### Enhancements
+ 
++-   `SelectControl`, `CustomSelectControl`: Refresh and refactor chevron down icon ([#42962](https://github.com/WordPress/gutenberg/pull/42962)).
+ -   `FontSizePicker`: Add large size variant ([#42716](https://github.com/WordPress/gutenberg/pull/42716/)).
+ -   `Popover`: tidy up code, add more comments ([#42944](https://github.com/WordPress/gutenberg/pull/42944)).
+ -   Add `box-sizing` reset style mixin to utils ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index 1f3a2bf7804138..0a3fe89c0468bd 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -7,7 +7,7 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { Icon, check, chevronDown } from '@wordpress/icons';
++import { Icon, check } from '@wordpress/icons';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { useCallback, useState } from '@wordpress/element';
+ 
+@@ -16,7 +16,8 @@ import { useCallback, useState } from '@wordpress/element';
+  */
+ import { VisuallyHidden } from '../';
+ import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
+-import InputBase from '../input-control/input-base';
++import SelectControlChevronDown from '../select-control/chevron-down';
++import { InputBaseWithBackCompatMinWidth } from './styles';
+ import { StyledLabel } from '../base-control/styles/base-control-styles';
+ 
+ const itemToString = ( item ) => item?.name;
+@@ -147,12 +148,16 @@ export default function CustomSelectControl( {
+ 					{ label }
+ 				</StyledLabel>
+ 			) }
+-			<InputBase
++			<InputBaseWithBackCompatMinWidth
++				__next36pxDefaultSize={ __next36pxDefaultSize }
++				__nextUnconstrainedWidth={ __nextUnconstrainedWidth }
+ 				isFocused={ isOpen || isFocused }
+ 				__unstableInputWidth={
+ 					__nextUnconstrainedWidth ? undefined : 'auto'
+ 				}
+ 				labelPosition={ __nextUnconstrainedWidth ? undefined : 'top' }
++				size={ size }
++				suffix={ <SelectControlChevronDown /> }
+ 			>
+ 				<SelectControlSelect
+ 					as="button"
+@@ -164,24 +169,13 @@ export default function CustomSelectControl( {
+ 						// This is needed because some speech recognition software don't support `aria-labelledby`.
+ 						'aria-label': label,
+ 						'aria-labelledby': undefined,
+-						className: classnames(
+-							'components-custom-select-control__button',
+-							{
+-								'is-next-unconstrained-width':
+-									__nextUnconstrainedWidth,
+-							}
+-						),
++						className: 'components-custom-select-control__button',
+ 						describedBy: getDescribedBy(),
+ 					} ) }
+ 				>
+ 					{ itemToString( selectedItem ) }
+-					<Icon
+-						icon={ chevronDown }
+-						className="components-custom-select-control__button-icon"
+-						size={ 18 }
+-					/>
+ 				</SelectControlSelect>
+-			</InputBase>
++			</InputBaseWithBackCompatMinWidth>
+ 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+ 			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
+ 				{ isOpen &&
+diff --git a/packages/components/src/custom-select-control/style.scss b/packages/components/src/custom-select-control/style.scss
+index 4edeb56d4290f3..e6ca7945abfe1e 100644
+--- a/packages/components/src/custom-select-control/style.scss
++++ b/packages/components/src/custom-select-control/style.scss
+@@ -7,18 +7,6 @@
+ 	position: relative;
+ 	text-align: left;
+ 	outline: 0; // focus ring is handled elsewhere
+-
+-	&:not(.is-next-unconstrained-width) {
+-		min-width: 130px;
+-	}
+-
+-	.components-custom-select-control__button-icon {
+-		height: 100%;
+-		padding: 0;
+-		position: absolute;
+-		right: $grid-unit-05;
+-		top: 0;
+-	}
+ }
+ 
+ .components-custom-select-control__menu {
+diff --git a/packages/components/src/custom-select-control/styles.ts b/packages/components/src/custom-select-control/styles.ts
+new file mode 100644
+index 00000000000000..e16b5d0b7bdd7a
+--- /dev/null
++++ b/packages/components/src/custom-select-control/styles.ts
+@@ -0,0 +1,28 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import InputBase from '../input-control/input-base';
++import { Container as InputControlContainer } from '../input-control/styles/input-control-styles';
++
++type BackCompatMinWidthProps = {
++	__nextUnconstrainedWidth: boolean;
++};
++
++const backCompatMinWidth = ( props: BackCompatMinWidthProps ) =>
++	! props.__nextUnconstrainedWidth
++		? css`
++				${ InputControlContainer } {
++					min-width: 130px;
++				}
++		  `
++		: '';
++
++export const InputBaseWithBackCompatMinWidth = styled( InputBase )`
++	${ backCompatMinWidth }
++`;
+diff --git a/packages/components/src/select-control/chevron-down.tsx b/packages/components/src/select-control/chevron-down.tsx
+new file mode 100644
+index 00000000000000..cb8ce67c0c03b3
+--- /dev/null
++++ b/packages/components/src/select-control/chevron-down.tsx
+@@ -0,0 +1,25 @@
++/**
++ * WordPress dependencies
++ */
++import { chevronDown, Icon } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import {
++	chevronIconSize,
++	DownArrowWrapper,
++	InputControlSuffixWrapperWithClickThrough,
++} from './styles/select-control-styles';
++
++const SelectControlChevronDown = () => {
++	return (
++		<InputControlSuffixWrapperWithClickThrough>
++			<DownArrowWrapper>
++				<Icon icon={ chevronDown } size={ chevronIconSize } />
++			</DownArrowWrapper>
++		</InputControlSuffixWrapperWithClickThrough>
++	);
++};
++
++export default SelectControlChevronDown;
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 252230baefa9ab..2abd647388cf27 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -9,16 +9,16 @@ import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
+  */
+ import { useInstanceId } from '@wordpress/compose';
+ import { useState, forwardRef } from '@wordpress/element';
+-import { Icon, chevronDown } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+  */
+ import BaseControl from '../base-control';
+ import InputBase from '../input-control/input-base';
+-import { Select, DownArrowWrapper } from './styles/select-control-styles';
++import { Select } from './styles/select-control-styles';
+ import type { WordPressComponentProps } from '../ui/context';
+ import type { SelectControlProps } from './types';
++import SelectControlChevronDown from './chevron-down';
+ 
+ const noop = () => {};
+ 
+@@ -48,6 +48,7 @@ function UnforwardedSelectControl(
+ 		children,
+ 		prefix,
+ 		suffix,
++		__next36pxDefaultSize = false,
+ 		__nextHasNoMarginBottom = false,
+ 		...props
+ 	}: WordPressComponentProps< SelectControlProps, 'select', false >,
+@@ -100,18 +101,14 @@ function UnforwardedSelectControl(
+ 				isFocused={ isFocused }
+ 				label={ label }
+ 				size={ size }
+-				suffix={
+-					suffix || (
+-						<DownArrowWrapper>
+-							<Icon icon={ chevronDown } size={ 18 } />
+-						</DownArrowWrapper>
+-					)
+-				}
++				suffix={ suffix || <SelectControlChevronDown /> }
+ 				prefix={ prefix }
+ 				labelPosition={ labelPosition }
++				__next36pxDefaultSize={ __next36pxDefaultSize }
+ 			>
+ 				<Select
+ 					{ ...props }
++					__next36pxDefaultSize={ __next36pxDefaultSize }
+ 					aria-describedby={ helpId }
+ 					className="components-select-control__input"
+ 					disabled={ disabled }
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index 878863c7d73e02..ed56359972fffa 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -8,7 +8,9 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import { COLORS, rtl } from '../../utils';
++import { space } from '../../ui/utils/space';
+ import type { SelectControlProps } from '../types';
++import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper';
+ 
+ interface SelectProps
+ 	extends Pick< SelectControlProps, '__next36pxDefaultSize' | 'disabled' > {
+@@ -85,29 +87,33 @@ const sizeStyles = ( {
+ 	return css( style );
+ };
+ 
++export const chevronIconSize = 18;
++
+ const sizePaddings = ( {
+ 	__next36pxDefaultSize,
+ 	selectSize = 'default',
+ }: SelectProps ) => {
++	const iconWidth = chevronIconSize;
++
+ 	const sizes = {
+ 		default: {
+ 			paddingLeft: 16,
+-			paddingRight: 32,
++			paddingRight: 16 + iconWidth,
+ 		},
+ 		small: {
+ 			paddingLeft: 8,
+-			paddingRight: 24,
++			paddingRight: 8 + iconWidth,
+ 		},
+ 		'__unstable-large': {
+ 			paddingLeft: 16,
+-			paddingRight: 32,
++			paddingRight: 16 + iconWidth,
+ 		},
+ 	};
+ 
+ 	if ( ! __next36pxDefaultSize ) {
+ 		sizes.default = {
+ 			paddingLeft: 8,
+-			paddingRight: 24,
++			paddingRight: 8 + iconWidth,
+ 		};
+ 	}
+ 
+@@ -129,6 +135,8 @@ export const Select = styled.select< SelectProps >`
+ 		font-family: inherit;
+ 		margin: 0;
+ 		width: 100%;
++		max-width: none;
++		cursor: pointer;
+ 
+ 		${ disabledStyles };
+ 		${ fontSizeStyles };
+@@ -138,17 +146,15 @@ export const Select = styled.select< SelectProps >`
+ `;
+ 
+ export const DownArrowWrapper = styled.div`
+-	align-items: center;
+-	bottom: 0;
+-	display: flex;
+-	padding: 0 4px;
+-	pointer-events: none;
++	margin-inline-end: ${ space( -1 ) }; // optically adjust the icon
++	line-height: 0;
++`;
++
++export const InputControlSuffixWrapperWithClickThrough = styled(
++	InputControlSuffixWrapper
++)`
+ 	position: absolute;
+-	top: 0;
++	pointer-events: none;
+ 
+ 	${ rtl( { right: 0 } ) }
+-
+-	svg {
+-		display: block;
+-	}
+ `;

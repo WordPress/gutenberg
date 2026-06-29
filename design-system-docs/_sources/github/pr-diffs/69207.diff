@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/number-control/README.md b/packages/components/src/number-control/README.md
+index 486092790548ee..98f38051fcf063 100644
+--- a/packages/components/src/number-control/README.md
++++ b/packages/components/src/number-control/README.md
+@@ -4,7 +4,7 @@
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-NumberControl is an enhanced HTML [`input[type="number]`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number) element.
++NumberControl is an enhanced HTML [`input[type="number"]`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number) element.
+ 
+ ## Usage
+ 

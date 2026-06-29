@@ -1,0 +1,36 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9677144c3bc5d5..ec21b24435d805 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `FormTokenField`: Do not suggest the selected one even if `{ value: string }` is passed ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
+ 
++### Enhancements
++
++-   `AnglePickerControl`: Use NumberControl as input field ([#41472](https://github.com/WordPress/gutenberg/pull/41472)).
++
+ ### Internal
+ 
+ -   `FormTokenField`: Convert to TypeScirpt and refactor to functional component ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
+@@ -39,6 +43,7 @@
+ -   `Surface`: Convert to TypeScript ([#41212](https://github.com/WordPress/gutenberg/pull/41212)).
+ -   `Autocomplete` updated to satisfy `react/exhuastive-deps` eslint rule ([#41382](https://github.com/WordPress/gutenberg/pull/41382))
+ -   `DateDayPicker` updated to satisfy `react/exhuastive-deps` eslint rule ([#41470](https://github.com/WordPress/gutenberg/pull/41470)).
++
+ ### Experimental
+ 
+ -   `Spacer`: Add RTL support. ([#41172](https://github.com/WordPress/gutenberg/pull/41172))
+diff --git a/packages/components/src/angle-picker-control/index.js b/packages/components/src/angle-picker-control/index.js
+index ff0e60e37232be..4fb51adc47f857 100644
+--- a/packages/components/src/angle-picker-control/index.js
++++ b/packages/components/src/angle-picker-control/index.js
+@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import { FlexBlock, FlexItem } from '../flex';
+-import NumberControl from '../input-control';
++import NumberControl from '../number-control';
+ import AngleCircle from './angle-circle';
+ import { Root } from './styles/angle-picker-control-styles';
+ import { space } from '../ui/utils/space';

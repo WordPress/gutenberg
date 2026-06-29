@@ -1,0 +1,50 @@
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index bb6910496a059c..80222620b874df 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -201,6 +201,20 @@
+ 		}
+ 	}
+ 
++	&.is-destructive.is-tertiary {
++		box-shadow: none;
++
++		&:hover:not(:disabled) {
++			box-shadow: inset 0 0 0 $border-width $alert-red;
++			color: $alert-red;
++		}
++
++		&:focus:not(:disabled) {
++			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $alert-red;
++			color: $alert-red;
++		}
++	}
++
+ 
+ 	/**
+ 	 * Link buttons.
+diff --git a/packages/edit-site/src/components/list/actions/index.js b/packages/edit-site/src/components/list/actions/index.js
+index 016196fb57c10e..30d96fbd002426 100644
+--- a/packages/edit-site/src/components/list/actions/index.js
++++ b/packages/edit-site/src/components/list/actions/index.js
+@@ -68,6 +68,7 @@ export default function Actions( { template } ) {
+ 							/>
+ 							<MenuItem
+ 								isDestructive
++								isTertiary
+ 								onClick={ () => {
+ 									removeTemplate( template );
+ 									onClose();
+diff --git a/packages/editor/src/components/post-trash/index.js b/packages/editor/src/components/post-trash/index.js
+index 33f5fc504468e2..1074d5b129e272 100644
+--- a/packages/editor/src/components/post-trash/index.js
++++ b/packages/editor/src/components/post-trash/index.js
+@@ -22,7 +22,7 @@ function PostTrash( { isNew, postId, postType, ...props } ) {
+ 		<Button
+ 			className="editor-post-trash"
+ 			isDestructive
+-			variant="tertiary"
++			variant="secondary"
+ 			onClick={ onClick }
+ 		>
+ 			{ __( 'Move to trash' ) }

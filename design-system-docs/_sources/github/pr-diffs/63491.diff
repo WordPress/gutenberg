@@ -1,0 +1,310 @@
+diff --git a/packages/block-library/src/query/edit/inspector-controls/author-control.js b/packages/block-library/src/query/edit/inspector-controls/author-control.js
+index 1d33ae96f13e80..b27322837e4b9e 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/author-control.js
++++ b/packages/block-library/src/query/edit/inspector-controls/author-control.js
+@@ -76,6 +76,7 @@ function AuthorControl( { value, onChange } ) {
+ 			suggestions={ authorsInfo.names }
+ 			onChange={ onAuthorChange }
+ 			__experimentalShowHowTo={ false }
++			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 		/>
+ 	);
+diff --git a/packages/block-library/src/query/edit/inspector-controls/index.js b/packages/block-library/src/query/edit/inspector-controls/index.js
+index 4c3500f4bd23fa..0fa6a176c1b796 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/index.js
++++ b/packages/block-library/src/query/edit/inspector-controls/index.js
+@@ -239,7 +239,7 @@ export default function QueryInspectorControls( props ) {
+ 			) }
+ 			{ ! inherit && showFiltersPanel && (
+ 				<ToolsPanel
+-					className="block-library-query-toolspanel__filters"
++					className="block-library-query-toolspanel__filters" // unused but kept for backward compatibility
+ 					label={ __( 'Filters' ) }
+ 					resetAll={ () => {
+ 						setQuery( {
+diff --git a/packages/block-library/src/query/edit/inspector-controls/parent-control.js b/packages/block-library/src/query/edit/inspector-controls/parent-control.js
+index 36cb5186476908..33cc1f83eda591 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/parent-control.js
++++ b/packages/block-library/src/query/edit/inspector-controls/parent-control.js
+@@ -138,6 +138,7 @@ function ParentControl( { parents, postType, onChange } ) {
+ 			suggestions={ suggestions }
+ 			onChange={ onParentChange }
+ 			__experimentalShowHowTo={ false }
++			__nextHasNoMarginBottom
+ 		/>
+ 	);
+ }
+diff --git a/packages/block-library/src/query/edit/inspector-controls/taxonomy-controls.js b/packages/block-library/src/query/edit/inspector-controls/taxonomy-controls.js
+index 49b1ca9ec5bef1..447b667cdacb56 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/taxonomy-controls.js
++++ b/packages/block-library/src/query/edit/inspector-controls/taxonomy-controls.js
+@@ -1,7 +1,10 @@
+ /**
+  * WordPress dependencies
+  */
+-import { FormTokenField } from '@wordpress/components';
++import {
++	FormTokenField,
++	__experimentalVStack as VStack,
++} from '@wordpress/components';
+ import { useSelect } from '@wordpress/data';
+ import { store as coreStore } from '@wordpress/core-data';
+ import { useState, useEffect } from '@wordpress/element';
+@@ -53,7 +56,7 @@ export function TaxonomyControls( { onChange, query } ) {
+ 	}
+ 
+ 	return (
+-		<>
++		<VStack spacing={ 4 }>
+ 			{ taxonomies.map( ( taxonomy ) => {
+ 				const termIds = taxQuery?.[ taxonomy.slug ] || [];
+ 				const handleChange = ( newTermIds ) =>
+@@ -73,7 +76,7 @@ export function TaxonomyControls( { onChange, query } ) {
+ 					/>
+ 				);
+ 			} ) }
+-		</>
++		</VStack>
+ 	);
+ }
+ 
+@@ -187,6 +190,7 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
+ 				displayTransform={ decodeEntities }
+ 				onChange={ onTermsChange }
+ 				__experimentalShowHowTo={ false }
++				__nextHasNoMarginBottom
+ 				__next40pxDefaultSize
+ 			/>
+ 		</div>
+diff --git a/packages/block-library/src/query/editor.scss b/packages/block-library/src/query/editor.scss
+index 67d98f88359ef6..b86eae0cbf65a8 100644
+--- a/packages/block-library/src/query/editor.scss
++++ b/packages/block-library/src/query/editor.scss
+@@ -49,15 +49,6 @@
+ 	}
+ }
+ 
+-.block-library-query-toolspanel__filters {
+-	.components-form-token-field__help {
+-		margin-bottom: 0;
+-	}
+-	.block-library-query-inspector__taxonomy-control:not(:last-child) {
+-		margin-bottom: $grid-unit-30;
+-	}
+-}
+-
+ .wp-block-query__enhanced-pagination-modal {
+ 	@include break-small() {
+ 		max-width: $break-mobile;
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6ac86a4e483bc9..aa72d126dfb69d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Deprecations
++
++-   `FormTokenField`: Deprecate bottom margin. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0 ([#63491](https://github.com/WordPress/gutenberg/pull/63491)).
++
+ ### Bug Fixes
+ 
+ -   `ComboboxControl`: Fix ComboboxControl reset button when using the keyboard. ([#63410](https://github.com/WordPress/gutenberg/pull/63410))
+diff --git a/packages/components/src/form-token-field/README.md b/packages/components/src/form-token-field/README.md
+index f78aec83014956..3da19ba534d312 100644
+--- a/packages/components/src/form-token-field/README.md
++++ b/packages/components/src/form-token-field/README.md
+@@ -61,7 +61,7 @@ The `value` property is handled in a manner similar to controlled form component
+ -   `__experimentalShowHowTo` - If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
+ -   `__experimentalValidateInput` - If passed, all introduced values will be validated before being added as tokens.
+ -   `__experimentalAutoSelectFirstMatch` - If true, the select the first matching suggestion when the user presses the Enter key (or space when tokenizeOnSpace is true).
+--   `__nextHasNoMarginBottom` - Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.5. (The prop can be safely removed once this happens.)
++-   `__nextHasNoMarginBottom` - Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0. (The prop can be safely removed once this happens.)
+ -   `tokenizeOnBlur` - If true, add any incompleteTokenValue as a new token when the field loses focus.
+ 
+ ## Usage
+@@ -87,6 +87,7 @@ const MyFormTokenField = () => {
+ 			value={ selectedContinents }
+ 			suggestions={ continents }
+ 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
++			__nextHasNoMarginBottom
+ 		/>
+ 	);
+ };
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 9fa3d3b7323df2..9f05dfee008da0 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -12,6 +12,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
+ import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
+ import { speak } from '@wordpress/a11y';
+ import isShallowEqual from '@wordpress/is-shallow-equal';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -77,6 +78,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		tokenizeOnBlur = false,
+ 	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >( props );
+ 
++	if ( ! __nextHasNoMarginBottom ) {
++		deprecated( 'Bottom margin styles for wp.components.FormTokenField', {
++			since: '6.7',
++			version: '7.0',
++			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
++		} );
++	}
++
+ 	const instanceId = useInstanceId( FormTokenField );
+ 
+ 	// We reset to these initial values again in the onBlur
+diff --git a/packages/components/src/form-token-field/stories/index.story.tsx b/packages/components/src/form-token-field/stories/index.story.tsx
+index da61a0b313bfe9..117dec9e9df5a1 100644
+--- a/packages/components/src/form-token-field/stories/index.story.tsx
++++ b/packages/components/src/form-token-field/stories/index.story.tsx
+@@ -62,6 +62,7 @@ export const Default: StoryFn< typeof FormTokenField > = DefaultTemplate.bind(
+ Default.args = {
+ 	label: 'Type a continent',
+ 	suggestions: continents,
++	__nextHasNoMarginBottom: true,
+ };
+ 
+ export const Async: StoryFn< typeof FormTokenField > = ( {
+@@ -99,6 +100,7 @@ export const Async: StoryFn< typeof FormTokenField > = ( {
+ Async.args = {
+ 	label: 'Type a continent',
+ 	suggestions: continents,
++	__nextHasNoMarginBottom: true,
+ };
+ 
+ export const DropdownSelector: StoryFn< typeof FormTokenField > =
+diff --git a/packages/editor/CHANGELOG.md b/packages/editor/CHANGELOG.md
+index ce2dca762099c2..61bc9b796768ba 100644
+--- a/packages/editor/CHANGELOG.md
++++ b/packages/editor/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Deprecations
++
++-   `PostTaxonomiesFlatTermSelector`: Deprecate bottom margin. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0 ([#63491](https://github.com/WordPress/gutenberg/pull/63491)).
++
+ ## 14.3.0 (2024-07-10)
+ 
+ ## 14.2.0 (2024-06-26)
+diff --git a/packages/editor/README.md b/packages/editor/README.md
+index 710ca1aa577766..a019411ef53ed1 100644
+--- a/packages/editor/README.md
++++ b/packages/editor/README.md
+@@ -1364,6 +1364,7 @@ _Parameters_
+ 
+ -   _props_ `Object`: The component props.
+ -   _props.slug_ `string`: The slug of the taxonomy.
++-   _props.\_\_nextHasNoMarginBottom_ `boolean`: Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0. (The prop can be safely removed once this happens.)
+ 
+ _Returns_
+ 
+diff --git a/packages/editor/src/components/post-publish-panel/maybe-tags-panel.js b/packages/editor/src/components/post-publish-panel/maybe-tags-panel.js
+index ce4ac1713d6389..537d62f382805e 100644
+--- a/packages/editor/src/components/post-publish-panel/maybe-tags-panel.js
++++ b/packages/editor/src/components/post-publish-panel/maybe-tags-panel.js
+@@ -28,7 +28,7 @@ const TagsPanel = () => {
+ 					'Tags help users and search engines navigate your site and find your content. Add a few keywords to describe your post.'
+ 				) }
+ 			</p>
+-			<FlatTermSelector slug="post_tag" />
++			<FlatTermSelector slug="post_tag" __nextHasNoMarginBottom />
+ 		</PanelBody>
+ 	);
+ };
+diff --git a/packages/editor/src/components/post-taxonomies/flat-term-selector.js b/packages/editor/src/components/post-taxonomies/flat-term-selector.js
+index 37cea02b0f0f9a..5f581e898c953e 100644
+--- a/packages/editor/src/components/post-taxonomies/flat-term-selector.js
++++ b/packages/editor/src/components/post-taxonomies/flat-term-selector.js
+@@ -5,6 +5,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
+ import { useEffect, useMemo, useState } from '@wordpress/element';
+ import { FormTokenField, withFilters } from '@wordpress/components';
+ import { useSelect, useDispatch } from '@wordpress/data';
++import deprecated from '@wordpress/deprecated';
+ import { store as coreStore } from '@wordpress/core-data';
+ import { useDebounce } from '@wordpress/compose';
+ import { speak } from '@wordpress/a11y';
+@@ -55,16 +56,28 @@ const termNamesToIds = ( names, terms ) => {
+ /**
+  * Renders a flat term selector component.
+  *
+- * @param {Object} props      The component props.
+- * @param {string} props.slug The slug of the taxonomy.
++ * @param {Object}  props                         The component props.
++ * @param {string}  props.slug                    The slug of the taxonomy.
++ * @param {boolean} props.__nextHasNoMarginBottom Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0. (The prop can be safely removed once this happens.)
+  *
+  * @return {JSX.Element} The rendered flat term selector component.
+  */
+-export function FlatTermSelector( { slug } ) {
++export function FlatTermSelector( { slug, __nextHasNoMarginBottom } ) {
+ 	const [ values, setValues ] = useState( [] );
+ 	const [ search, setSearch ] = useState( '' );
+ 	const debouncedSearch = useDebounce( setSearch, 500 );
+ 
++	if ( ! __nextHasNoMarginBottom ) {
++		deprecated(
++			'Bottom margin styles for wp.editor.PostTaxonomiesFlatTermSelector',
++			{
++				since: '6.7',
++				version: '7.0',
++				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
++			}
++		);
++	}
++
+ 	const {
+ 		terms,
+ 		termIds,
+@@ -290,6 +303,7 @@ export function FlatTermSelector( { slug } ) {
+ 					removed: termRemovedLabel,
+ 					remove: removeTermLabel,
+ 				} }
++				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 			/>
+ 			<MostUsedTerms taxonomy={ taxonomy } onSelect={ appendTerm } />
+ 		</>
+diff --git a/packages/editor/src/components/post-taxonomies/index.js b/packages/editor/src/components/post-taxonomies/index.js
+index d96027a918c182..dc2345fd6197f7 100644
+--- a/packages/editor/src/components/post-taxonomies/index.js
++++ b/packages/editor/src/components/post-taxonomies/index.js
+@@ -32,10 +32,17 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
+ 		const TaxonomyComponent = taxonomy.hierarchical
+ 			? HierarchicalTermSelector
+ 			: FlatTermSelector;
++		const taxonomyComponentProps = {
++			slug: taxonomy.slug,
++			...( taxonomy.hierarchical
++				? {}
++				: { __nextHasNoMarginBottom: true } ),
++		};
++
+ 		return (
+ 			<Fragment key={ `taxonomy-${ taxonomy.slug }` }>
+ 				{ taxonomyWrapper(
+-					<TaxonomyComponent slug={ taxonomy.slug } />,
++					<TaxonomyComponent { ...taxonomyComponentProps } />,
+ 					taxonomy
+ 				) }
+ 			</Fragment>
+diff --git a/packages/interface/src/components/complementary-area/style.scss b/packages/interface/src/components/complementary-area/style.scss
+index c15be5678a4460..f45273516f53b5 100644
+--- a/packages/interface/src/components/complementary-area/style.scss
++++ b/packages/interface/src/components/complementary-area/style.scss
+@@ -33,7 +33,7 @@
+ 		}
+ 	}
+ 
+-	p:not(.components-base-control__help) {
++	p:not(.components-base-control__help, .components-form-token-field__help) {
+ 		margin-top: 0;
+ 	}
+ 

@@ -1,0 +1,47 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 26cc239688eed8..fbf17597df3b2e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `FormFileUpload`: Remove temporary fix for selecting .heic file in Chromium browsers ([#70383](https://github.com/WordPress/gutenberg/pull/70383)).
++
+ ## 29.11.0 (2025-06-04)
+ 
+ ### Enhancement
+diff --git a/packages/components/src/form-file-upload/index.tsx b/packages/components/src/form-file-upload/index.tsx
+index 378dc144c6fe8c..f6d98860ec979f 100644
+--- a/packages/components/src/form-file-upload/index.tsx
++++ b/packages/components/src/form-file-upload/index.tsx
+@@ -58,18 +58,6 @@ export function FormFileUpload( {
+ 			{ children }
+ 		</Button>
+ 	);
+-	// @todo: Temporary fix a bug that prevents Chromium browsers from selecting ".heic" files
+-	// from the file upload. See https://core.trac.wordpress.org/ticket/62268#comment:4.
+-	// This can be removed once the Chromium fix is in the stable channel.
+-	// Prevent Safari from adding "image/heic" and "image/heif" to the accept attribute.
+-	const isSafari =
+-		globalThis.window?.navigator.userAgent.includes( 'Safari' ) &&
+-		! globalThis.window?.navigator.userAgent.includes( 'Chrome' ) &&
+-		! globalThis.window?.navigator.userAgent.includes( 'Chromium' );
+-	const compatAccept =
+-		! isSafari && !! accept?.includes( 'image/*' )
+-			? `${ accept }, image/heic, image/heif`
+-			: accept;
+ 
+ 	return (
+ 		<div className="components-form-file-upload">
+@@ -79,7 +67,7 @@ export function FormFileUpload( {
+ 				ref={ ref }
+ 				multiple={ multiple }
+ 				style={ { display: 'none' } }
+-				accept={ compatAccept }
++				accept={ accept }
+ 				onChange={ onChange }
+ 				onClick={ onClick }
+ 				data-testid="form-file-upload-input"

@@ -1,0 +1,363 @@
+diff --git a/packages/block-editor/src/components/global-styles/dimensions-panel.js b/packages/block-editor/src/components/global-styles/dimensions-panel.js
+index 3c1a0f258c2233..9493966bc38c43 100644
+--- a/packages/block-editor/src/components/global-styles/dimensions-panel.js
++++ b/packages/block-editor/src/components/global-styles/dimensions-panel.js
+@@ -602,7 +602,6 @@ export default function DimensionsPanel( {
+ 				>
+ 					{ ! showSpacingPresetsControl && (
+ 						<BoxControl
+-							__next40pxDefaultSize
+ 							values={ paddingValues }
+ 							onChange={ setPaddingValues }
+ 							label={ __( 'Padding' ) }
+@@ -645,7 +644,6 @@ export default function DimensionsPanel( {
+ 				>
+ 					{ ! showSpacingPresetsControl && (
+ 						<BoxControl
+-							__next40pxDefaultSize
+ 							values={ marginValues }
+ 							onChange={ setMarginValues }
+ 							inputProps={ {
+@@ -701,7 +699,6 @@ export default function DimensionsPanel( {
+ 					{ ! showSpacingPresetsControl &&
+ 						( isAxialGap ? (
+ 							<BoxControl
+-								__next40pxDefaultSize
+ 								label={ __( 'Block spacing' ) }
+ 								min={ 0 }
+ 								onChange={ setGapValues }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 82c79c020ac6c2..3103ad1e1e9b67 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,7 +4,9 @@
+ 
+ ### Breaking Changes
+ 
+--   `TextControl`: The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79386](https://github.com/WordPress/gutenberg/pull/79386)).
++-   The `__next40pxDefaultSize` prop is now true by default. The prop can be safely removed ([#79386](https://github.com/WordPress/gutenberg/pull/79386), [#79419](https://github.com/WordPress/gutenberg/pull/79419)):
++    -   `BoxControl`
++    -   `TextControl`
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/box-control/README.md b/packages/components/src/box-control/README.md
+index 4c0f100065092e..35176e7de201ef 100644
+--- a/packages/components/src/box-control/README.md
++++ b/packages/components/src/box-control/README.md
+@@ -20,25 +20,13 @@ function Example() {
+   } );
+ 
+   return (
+-    <BoxControl
+-      __next40pxDefaultSize
+-      values={ values }
+-      onChange={ setValues }
+-    />
++    <BoxControl values={ values } onChange={ setValues } />
+   );
+ };
+ ```
+ 
+ ## Props
+ 
+-### `__next40pxDefaultSize`
+-
+- - Type: `boolean`
+- - Required: No
+- - Default: `false`
+-
+-Start opting into the larger default height that will become the default size in a future version.
+-
+ ### `allowReset`
+ 
+  - Type: `boolean`
+diff --git a/packages/components/src/box-control/input-control.tsx b/packages/components/src/box-control/box-input-control.tsx
+similarity index 98%
+rename from packages/components/src/box-control/input-control.tsx
+rename to packages/components/src/box-control/box-input-control.tsx
+index 3a79ea0733e752..d435704afa8edd 100644
+--- a/packages/components/src/box-control/input-control.tsx
++++ b/packages/components/src/box-control/box-input-control.tsx
+@@ -76,7 +76,6 @@ function getSidesToModify(
+ }
+ 
+ export default function BoxInputControl( {
+-	__next40pxDefaultSize,
+ 	onChange = noop,
+ 	onFocus = noop,
+ 	values,
+@@ -208,7 +207,7 @@ export default function BoxInputControl( {
+ 							{ ...props }
+ 							min={ min }
+ 							__shouldNotWarnDeprecated36pxSize
+-							__next40pxDefaultSize={ __next40pxDefaultSize }
++							__next40pxDefaultSize
+ 							className="component-box-control__unit-control"
+ 							id={ inputId }
+ 							isPressEnterToChange
+@@ -224,7 +223,7 @@ export default function BoxInputControl( {
+ 					</Tooltip>
+ 
+ 					<FlexedRangeControl
+-						__next40pxDefaultSize={ __next40pxDefaultSize }
++						__next40pxDefaultSize
+ 						__shouldNotWarnDeprecated36pxSize
+ 						aria-controls={ inputId }
+ 						label={ LABELS[ side ] }
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index 461c7dc897d993..daf7cbbad8314e 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -10,7 +10,7 @@ import warning from '@wordpress/warning';
+  * Internal dependencies
+  */
+ import { BaseControl } from '../base-control';
+-import InputControl from './input-control';
++import BoxInputControl from './box-input-control';
+ import LinkedButton from './linked-button';
+ import { Grid } from '../grid';
+ import {
+@@ -27,7 +27,6 @@ import {
+ } from './utils';
+ import { useControlledState } from '../utils/hooks';
+ import type { BoxControlProps, BoxControlValue } from './types';
+-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ const defaultInputProps = {
+ 	min: 0,
+@@ -58,17 +57,12 @@ function useUniqueId( idProp?: string ) {
+  *   } );
+  *
+  *   return (
+- *     <BoxControl
+- *       __next40pxDefaultSize
+- *       values={ values }
+- *       onChange={ setValues }
+- *     />
++ *     <BoxControl values={ values } onChange={ setValues } />
+  *   );
+  * };
+  * ```
+  */
+ function BoxControl( {
+-	__next40pxDefaultSize = false,
+ 	id: idProp,
+ 	inputProps = defaultInputProps,
+ 	onChange = noop,
+@@ -137,16 +131,10 @@ function BoxControl( {
+ 		setSelectedUnits,
+ 		sides,
+ 		values: inputValues,
+-		__next40pxDefaultSize,
+ 		presets,
+ 		presetKey,
+ 	};
+ 
+-	maybeWarnDeprecated36pxSize( {
+-		componentName: 'BoxControl',
+-		__next40pxDefaultSize,
+-		size: undefined,
+-	} );
+ 	const sidesToRender = getAllowedSides( sides );
+ 
+ 	if ( ( presets && ! presetKey ) || ( ! presets && presetKey ) ) {
+@@ -170,9 +158,7 @@ function BoxControl( {
+ 			</BaseControl.VisualLabel>
+ 			{ isLinked && (
+ 				<InputWrapper>
+-					{ /* Disable reason: the parent component is handling the __next40pxDefaultSize prop */ }
+-					{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+-					<InputControl side="all" { ...inputControlProps } />
++					<BoxInputControl side="all" { ...inputControlProps } />
+ 				</InputWrapper>
+ 			) }
+ 			{ ! hasOneSide && (
+@@ -187,9 +173,7 @@ function BoxControl( {
+ 			{ ! isLinked &&
+ 				splitOnAxis &&
+ 				[ 'vertical', 'horizontal' ].map( ( axis ) => (
+-					// Disable reason: the parent component is handling the __next40pxDefaultSize prop
+-					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+-					<InputControl
++					<BoxInputControl
+ 						key={ axis }
+ 						side={ axis as 'horizontal' | 'vertical' }
+ 						{ ...inputControlProps }
+@@ -198,9 +182,7 @@ function BoxControl( {
+ 			{ ! isLinked &&
+ 				! splitOnAxis &&
+ 				Array.from( sidesToRender ).map( ( axis ) => (
+-					// Disable reason: the parent component is handling the __next40pxDefaultSize prop
+-					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+-					<InputControl
++					<BoxInputControl
+ 						key={ axis }
+ 						side={ axis }
+ 						{ ...inputControlProps }
+diff --git a/packages/components/src/box-control/stories/index.story.tsx b/packages/components/src/box-control/stories/index.story.tsx
+index 6ea7e63fd01d99..29ee243a788ab6 100644
+--- a/packages/components/src/box-control/stories/index.story.tsx
++++ b/packages/components/src/box-control/stories/index.story.tsx
+@@ -36,7 +36,7 @@ const meta: Meta< typeof BoxControl > = {
+ export default meta;
+ 
+ const TemplateUncontrolled: StoryFn< typeof BoxControl > = ( props ) => {
+-	return <BoxControl __next40pxDefaultSize { ...props } />;
++	return <BoxControl { ...props } />;
+ };
+ 
+ const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
+@@ -44,7 +44,6 @@ const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
+ 
+ 	return (
+ 		<BoxControl
+-			__next40pxDefaultSize
+ 			values={ values }
+ 			{ ...props }
+ 			onChange={ ( nextValue ) => {
+@@ -58,7 +57,6 @@ const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
+ export const Default = TemplateUncontrolled.bind( {} );
+ Default.args = {
+ 	label: 'Label',
+-	__next40pxDefaultSize: true,
+ };
+ 
+ export const Controlled = TemplateControlled.bind( {} );
+diff --git a/packages/components/src/box-control/test/index.tsx b/packages/components/src/box-control/test/index.tsx
+index 894385cf0eeb48..c7a52d3dec1e12 100644
+--- a/packages/components/src/box-control/test/index.tsx
++++ b/packages/components/src/box-control/test/index.tsx
+@@ -29,7 +29,6 @@ const ControlledBoxControl = (
+ 
+ 	return (
+ 		<BoxControl
+-			__next40pxDefaultSize
+ 			values={ state }
+ 			onChange={ ( next ) => setState( next ) }
+ 			{ ...extraProps }
+@@ -42,7 +41,7 @@ const UncontrolledBoxControl = ( {
+ 	...props
+ }: DistributiveOmit< BoxControlProps, 'onChange' > & {
+ 	onChange?: BoxControlProps[ 'onChange' ];
+-} ) => <BoxControl __next40pxDefaultSize onChange={ onChange } { ...props } />;
++} ) => <BoxControl onChange={ onChange } { ...props } />;
+ 
+ describe( 'BoxControl', () => {
+ 	describe( 'Basic rendering', () => {
+diff --git a/packages/components/src/box-control/types.ts b/packages/components/src/box-control/types.ts
+index 8c763f6ccb4d7c..72831b3b4bd4b1 100644
+--- a/packages/components/src/box-control/types.ts
++++ b/packages/components/src/box-control/types.ts
+@@ -27,6 +27,13 @@ type UnitControlPassthroughProps = Omit<
+ >;
+ 
+ type DeprecatedBoxControlProps = {
++	/**
++	 * Start opting into the larger default height that will become the default size in a future version.
++	 *
++	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
++	 * @ignore
++	 */
++	__next40pxDefaultSize?: boolean;
+ 	/**
+ 	 * @deprecated Pass to the `inputProps` prop instead.
+ 	 * @ignore
+@@ -94,12 +101,6 @@ export type BoxControlProps = Pick< UnitControlProps, 'units' > &
+ 		 * The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.
+ 		 */
+ 		values?: BoxControlValue;
+-		/**
+-		 * Start opting into the larger default height that will become the default size in a future version.
+-		 *
+-		 * @default false
+-		 */
+-		__next40pxDefaultSize?: boolean;
+ 	} & (
+ 		| {
+ 				/**
+diff --git a/packages/components/src/tools-panel/tools-panel/README.md b/packages/components/src/tools-panel/tools-panel/README.md
+index b5e6860e2bd072..d88dab63dc86f7 100644
+--- a/packages/components/src/tools-panel/tools-panel/README.md
++++ b/packages/components/src/tools-panel/tools-panel/README.md
+@@ -126,7 +126,6 @@ export function DimensionPanel() {
+ 				onDeselect={ () => setPadding( undefined ) }
+ 			>
+ 				<BoxControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Padding' ) }
+ 					onChange={ setPadding }
+ 					values={ padding }
+@@ -139,7 +138,6 @@ export function DimensionPanel() {
+ 				onDeselect={ () => setMargin( undefined ) }
+ 			>
+ 				<BoxControl
+-					__next40pxDefaultSize
+ 					label={ __( 'Margin' ) }
+ 					onChange={ setMargin }
+ 					values={ margin }
+diff --git a/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md b/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
+index c0b71194969e41..c97988576fe368 100644
+--- a/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
++++ b/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md
+@@ -10,7 +10,6 @@ The following components are checked by this rule:
+ 
+ -   BorderBoxControl
+ -   BorderControl
+--   BoxControl
+ -   Button
+ -   ComboboxControl
+ -   CustomSelectControl
+diff --git a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+index 9d9b59a287ab4e..45aaf74c18165b 100644
+--- a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+@@ -112,7 +112,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
+ 				import {
+ 					BorderBoxControl,
+ 					BorderControl,
+-					BoxControl,
+ 					ComboboxControl,
+ 					CustomSelectControl,
+ 					FontAppearanceControl,
+@@ -131,7 +130,6 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
+ 				<>
+ 					<BorderBoxControl __next40pxDefaultSize />
+ 					<BorderControl __next40pxDefaultSize />
+-					<BoxControl __next40pxDefaultSize />
+ 					<ComboboxControl __next40pxDefaultSize />
+ 					<CustomSelectControl __next40pxDefaultSize />
+ 					<FontAppearanceControl __next40pxDefaultSize />
+diff --git a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+index e470eab17d3cbb..b2edbcdf59e8b6 100644
+--- a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+@@ -14,7 +14,6 @@ const { hasTruthyJsxAttribute } = require( '../utils' );
+ const COMPONENTS_REQUIRING_40PX = new Set( [
+ 	'BorderBoxControl',
+ 	'BorderControl',
+-	'BoxControl',
+ 	'Button',
+ 	'ClipboardButton',
+ 	'ComboboxControl',
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index 4c762f1c8f538b..b287df218f97a8 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -159,12 +159,10 @@ const restrictedSyntax = [
+ 		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
+ 		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
+ 	},
+-	{
+-		selector:
+-			'JSXElement[openingElement.name.name="TextControl"] JSXAttribute[name.name="__next40pxDefaultSize"]',
+-		message:
+-			'The `__next40pxDefaultSize` prop is no longer needed on `TextControl`.',
+-	},
++	...[ 'BoxControl', 'TextControl' ].map( ( componentName ) => ( {
++		selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,
++		message: `The \`__next40pxDefaultSize\` prop is no longer needed on \`${ componentName }\`.`,
++	} ) ),
+ 	{
+ 		selector:
+ 			'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',

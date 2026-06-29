@@ -1,0 +1,142 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 63ec961b80f3c2..5ec6853128c31c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Deprecation
++
++-   `Navigation`: Soft deprecate component ([#59182](https://github.com/WordPress/gutenberg/pull/59182)).
++
+ ### Enhancements
+ 
+ -   `ExternalLink`: Use unicode arrow instead of svg icon ([#60255](https://github.com/WordPress/gutenberg/pull/60255)).
+diff --git a/packages/components/src/navigation/README.md b/packages/components/src/navigation/README.md
+index 3a1fa992611b62..b294eb78331eef 100644
+--- a/packages/components/src/navigation/README.md
++++ b/packages/components/src/navigation/README.md
+@@ -1,5 +1,9 @@
+ # Navigation
+ 
++<div class="callout callout-alert">
++This component is deprecated. Consider using `Navigator` instead.
++</div>
++
+ <div class="callout callout-alert">
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+diff --git a/packages/components/src/navigation/back-button/index.tsx b/packages/components/src/navigation/back-button/index.tsx
+index 182faa8773726d..f1fb79ae40d484 100644
+--- a/packages/components/src/navigation/back-button/index.tsx
++++ b/packages/components/src/navigation/back-button/index.tsx
+@@ -64,6 +64,9 @@ function UnforwardedNavigationBackButton(
+ 	);
+ }
+ 
++/**
++ * @deprecated Use `Navigator` instead.
++ */
+ export const NavigationBackButton = forwardRef(
+ 	UnforwardedNavigationBackButton
+ );
+diff --git a/packages/components/src/navigation/group/index.tsx b/packages/components/src/navigation/group/index.tsx
+index cd91fb97365d26..60febcf7644569 100644
+--- a/packages/components/src/navigation/group/index.tsx
++++ b/packages/components/src/navigation/group/index.tsx
+@@ -19,6 +19,9 @@ import type { NavigationGroupProps } from '../types';
+ 
+ let uniqueId = 0;
+ 
++/**
++ * @deprecated Use `Navigator` instead.
++ */
+ export function NavigationGroup( {
+ 	children,
+ 	className,
+diff --git a/packages/components/src/navigation/index.tsx b/packages/components/src/navigation/index.tsx
+index dfc1b26cb33ad0..9ccd4f46e5f182 100644
+--- a/packages/components/src/navigation/index.tsx
++++ b/packages/components/src/navigation/index.tsx
+@@ -28,6 +28,8 @@ const noop = () => {};
+ /**
+  * Render a navigation list with optional groupings and hierarchy.
+  *
++ * @deprecated Use `Navigator` instead.
++ *
+  * ```jsx
+  * import {
+  *   __experimentalNavigation as Navigation,
+diff --git a/packages/components/src/navigation/item/index.tsx b/packages/components/src/navigation/item/index.tsx
+index 2fd1aebefcbbac..d234ed1a549b59 100644
+--- a/packages/components/src/navigation/item/index.tsx
++++ b/packages/components/src/navigation/item/index.tsx
+@@ -22,6 +22,9 @@ import type { NavigationItemProps } from '../types';
+ 
+ const noop = () => {};
+ 
++/**
++ * @deprecated Use `Navigator` instead.
++ */
+ export function NavigationItem( props: NavigationItemProps ) {
+ 	const {
+ 		badge,
+diff --git a/packages/components/src/navigation/menu/index.tsx b/packages/components/src/navigation/menu/index.tsx
+index b001bd0fa0f3d8..8fcddf3faddb9e 100644
+--- a/packages/components/src/navigation/menu/index.tsx
++++ b/packages/components/src/navigation/menu/index.tsx
+@@ -23,6 +23,9 @@ import { MenuUI } from '../styles/navigation-styles';
+ 
+ import type { NavigationMenuProps } from '../types';
+ 
++/**
++ * @deprecated Use `Navigator` instead.
++ */
+ export function NavigationMenu( props: NavigationMenuProps ) {
+ 	const {
+ 		backButtonLabel,
+diff --git a/packages/components/src/navigation/stories/index.story.tsx b/packages/components/src/navigation/stories/index.story.tsx
+index e0a3f1e1397576..2f09ace29f16e5 100644
+--- a/packages/components/src/navigation/stories/index.story.tsx
++++ b/packages/components/src/navigation/stories/index.story.tsx
+@@ -19,8 +19,14 @@ import { MoreExamplesStory } from './utils/more-examples';
+ import { HideIfEmptyStory } from './utils/hide-if-empty';
+ import './style.css';
+ 
++/**
++ * Render a navigation list with optional groupings and hierarchy.
++ *
++ * This component is deprecated. Consider using `Navigator` instead.
++ */
+ const meta: Meta< typeof Navigation > = {
+-	title: 'Components (Experimental)/Navigation',
++	title: 'Components (Deprecated)/Navigation',
++	id: 'components-navigation',
+ 	component: Navigation,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 21ee902c02a36d..629f06bf98edf9 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,10 +1,19 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,
+ 				to: '/components-',
+ 			},
++			{
++				from: new RegExp(
++					`\/components-experimental-(?=${ PREVIOUSLY_EXPERIMENTAL_COMPONENTS.map(
++						( str ) => `${ str }\\b`
++					).join( '|' ) })`
++				),
++				to: '/components-',
++			},
+ 		];
+ 
+ 		const params = new URLSearchParams( window.location.search );

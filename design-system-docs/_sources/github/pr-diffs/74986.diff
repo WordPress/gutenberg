@@ -1,0 +1,559 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 91370e60ceebe5..c949cc9bcc3d5b 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   Remove `Box` component. Components that previously used `Box` should use the equivalent design tokens in their CSS directly ([#74981](https://github.com/WordPress/gutenberg/issues/74981)).
++
+ ### New Features
+ 
+ -   Add `Tabs` primitive ([#74652](https://github.com/WordPress/gutenberg/pull/74652)).
+diff --git a/packages/ui/README.md b/packages/ui/README.md
+index ef1a3ad5a59537..f22f7a3a076c02 100644
+--- a/packages/ui/README.md
++++ b/packages/ui/README.md
+@@ -39,13 +39,14 @@ import '@wordpress/theme/design-tokens.css';
+ ### Basic Component Usage
+ 
+ ```tsx
+-import { Box } from '@wordpress/ui';
++import { Stack } from '@wordpress/ui';
+ 
+ function MyComponent() {
+ 	return (
+-		<Box background="neutral" padding="sm">
+-			Hello World
+-		</Box>
++		<Stack gap="sm">
++			<div>Item 1</div>
++			<div>Item 2</div>
++		</Stack>
+ 	);
+ }
+ ```
+@@ -59,11 +60,11 @@ All components in the design system follow consistent patterns for maximum flexi
+ Every component supports the `render` prop for complete control over the underlying HTML element:
+ 
+ ```tsx
+-import { Box } from '@wordpress/ui';
++import { Stack } from '@wordpress/ui';
+ 
+ function MyComponent() {
+-	// Render Box as a <span /> instead of the default <div />
+-	return <Box render={ <span /> }>{ /* ... */ }</Box>;
++	// Render Stack as a <section /> instead of the default <div />
++	return <Stack render={ <section /> }>{ /* ... */ }</Stack>;
+ }
+ ```
+ 
+@@ -73,12 +74,12 @@ All components forward refs to their underlying DOM elements:
+ 
+ ```tsx
+ import { useRef } from '@wordpress/element';
+-import { Box } from '@wordpress/ui';
++import { Stack } from '@wordpress/ui';
+ 
+ function MyComponent() {
+-	const boxRef = useRef< HTMLDivElement >( null );
++	const stackRef = useRef< HTMLDivElement >( null );
+ 
+-	return <Box ref={ boxRef }>{ /* ... */ }</Box>;
++	return <Stack ref={ stackRef }>{ /* ... */ }</Stack>;
+ }
+ ```
+ 
+@@ -87,11 +88,11 @@ function MyComponent() {
+ Components merge provided `className` props with their internal styles:
+ 
+ ```tsx
+-import { Box } from '@wordpress/ui';
++import { Stack } from '@wordpress/ui';
+ 
+ function MyComponent() {
+ 	// Your custom CSS className is merged with component styles
+-	return <Box className="my-custom-class">{ /* ... */ }</Box>;
++	return <Stack className="my-custom-class">{ /* ... */ }</Stack>;
+ }
+ ```
+ 
+diff --git a/packages/ui/src/badge/badge.tsx b/packages/ui/src/badge/badge.tsx
+index 054f46066a9220..abd9fc40bf4616 100644
+--- a/packages/ui/src/badge/badge.tsx
++++ b/packages/ui/src/badge/badge.tsx
+@@ -1,88 +1,29 @@
++import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
+ import { forwardRef } from '@wordpress/element';
+-import { Box } from '../box';
+-import { type BoxProps } from '../box/types';
+ import { type BadgeProps } from './types';
+-
+-/**
+- * Default render function that renders a span element with the given props.
+- */
+-const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'span' > ) => (
+-	<span { ...props } />
+-);
+-
+-/**
+- * Maps intent values to Box backgroundColor and color props.
+- * Uses strong emphasis styles (as emphasis prop has been removed).
+- */
+-const getIntentStyles = (
+-	intent: BadgeProps[ 'intent' ]
+-): Partial< BoxProps > => {
+-	switch ( intent ) {
+-		case 'high':
+-			return {
+-				backgroundColor: 'error',
+-				color: 'error',
+-			};
+-		case 'medium':
+-			return {
+-				backgroundColor: 'warning',
+-				color: 'warning',
+-			};
+-		case 'low':
+-			return {
+-				backgroundColor: 'caution',
+-				color: 'caution',
+-			};
+-		case 'stable':
+-			return {
+-				backgroundColor: 'success',
+-				color: 'success',
+-			};
+-		case 'informational':
+-			return {
+-				backgroundColor: 'info',
+-				color: 'info',
+-			};
+-		case 'draft':
+-			return {
+-				backgroundColor: 'neutral-weak',
+-				color: 'neutral',
+-			};
+-		case 'none':
+-		default:
+-			return {
+-				backgroundColor: 'neutral',
+-				color: 'neutral-weak',
+-			};
+-	}
+-};
++import styles from './style.module.css';
+ 
+ /**
+  * A badge component for displaying labels with semantic intent.
+- * Built on the Box primitive for consistent theming and accessibility.
+  */
+-export const Badge = forwardRef< HTMLDivElement, BadgeProps >( function Badge(
+-	{ children, intent = 'none', render = DEFAULT_RENDER, ...props },
++export const Badge = forwardRef< HTMLSpanElement, BadgeProps >( function Badge(
++	{ children, intent = 'none', render, className, ...props },
+ 	ref
+ ) {
+-	const intentStyles = getIntentStyles( intent );
++	const element = useRender( {
++		render,
++		defaultTagName: 'span',
++		ref,
++		props: mergeProps< 'span' >( props, {
++			className: clsx(
++				styles.badge,
++				styles[ `is-${ intent }-intent` ],
++				className
++			),
++			children,
++		} ),
++	} );
+ 
+-	return (
+-		<Box
+-			{ ...intentStyles }
+-			padding={ { inline: 'sm', block: 'xs' } }
+-			borderRadius="lg"
+-			render={ render }
+-			style={ {
+-				fontFamily: 'var(--wpds-font-family-body)',
+-				fontSize: 'var(--wpds-font-size-sm)',
+-				fontWeight: 'var(--wpds-font-weight-regular)',
+-				lineHeight: 'var(--wpds-font-line-height-xs)',
+-				...props.style,
+-			} }
+-			ref={ ref }
+-		>
+-			{ children }
+-		</Box>
+-	);
++	return element;
+ } );
+diff --git a/packages/ui/src/badge/style.module.css b/packages/ui/src/badge/style.module.css
+new file mode 100644
+index 00000000000000..fe339a844c78a6
+--- /dev/null
++++ b/packages/ui/src/badge/style.module.css
+@@ -0,0 +1,48 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.badge {
++		padding-inline: var(--wpds-dimension-padding-sm);
++		padding-block: var(--wpds-dimension-padding-xs);
++		border-radius: var(--wpds-border-radius-lg);
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wpds-font-size-sm);
++		font-weight: var(--wpds-font-weight-regular);
++		line-height: var(--wpds-font-line-height-xs);
++	}
++
++	.is-high-intent {
++		background-color: var(--wpds-color-bg-surface-error);
++		color: var(--wpds-color-fg-content-error);
++	}
++
++	.is-medium-intent {
++		background-color: var(--wpds-color-bg-surface-warning);
++		color: var(--wpds-color-fg-content-warning);
++	}
++
++	.is-low-intent {
++		background-color: var(--wpds-color-bg-surface-caution);
++		color: var(--wpds-color-fg-content-caution);
++	}
++
++	.is-stable-intent {
++		background-color: var(--wpds-color-bg-surface-success);
++		color: var(--wpds-color-fg-content-success);
++	}
++
++	.is-informational-intent {
++		background-color: var(--wpds-color-bg-surface-info);
++		color: var(--wpds-color-fg-content-info);
++	}
++
++	.is-draft-intent {
++		background-color: var(--wpds-color-bg-surface-neutral-weak);
++		color: var(--wpds-color-fg-content-neutral);
++	}
++
++	.is-none-intent {
++		background-color: var(--wpds-color-bg-surface-neutral);
++		color: var(--wpds-color-fg-content-neutral-weak);
++	}
++}
+diff --git a/packages/ui/src/box/box.tsx b/packages/ui/src/box/box.tsx
+deleted file mode 100644
+index 180fb387645893..00000000000000
+--- a/packages/ui/src/box/box.tsx
++++ /dev/null
+@@ -1,107 +0,0 @@
+-import { useRender, mergeProps } from '@base-ui/react';
+-import { forwardRef } from '@wordpress/element';
+-import { type BoxProps } from './types';
+-
+-/**
+- * Default render function that renders a div element with the given props.
+- */
+-const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'div' > ) => (
+-	<div { ...props } />
+-);
+-
+-/**
+- * Capitalizes the first character of a string.
+- */
+-const capitalize = ( str: string ): string =>
+-	str.charAt( 0 ).toUpperCase() + str.slice( 1 );
+-
+-/**
+- * Converts a size token name to a CSS design token property reference (with
+- * fallback).
+- *
+- * @param property The CSS property name.
+- * @param value    The size token name.
+- * @return A CSS value string with variable references.
+- */
+-const getSpacingValue = ( property: string, value: string ): string =>
+-	`var(--wpds-dimension-${ property }-${ value }, var(--wpds-dimension-${ property }-${ value }))`;
+-
+-/**
+- * Generates CSS styles for properties with optionally directional values,
+- * normalizing single values and objects with directional keys for logical
+- * properties.
+- *
+- * @param property The CSS property name from BoxProps.
+- * @param value    The property value (single or object with directional keys).
+- * @return A CSSProperties object with the computed styles.
+- */
+-const getDimensionVariantStyles = < T extends keyof BoxProps >(
+-	property: T,
+-	value: NonNullable< BoxProps[ T ] >
+-): React.CSSProperties =>
+-	typeof value !== 'object'
+-		? { [ property ]: getSpacingValue( property, value ) }
+-		: Object.keys( value ).reduce(
+-				( result, key ) => ( {
+-					...result,
+-					[ property + capitalize( key ) ]: getSpacingValue(
+-						property,
+-						value[ key ]
+-					),
+-				} ),
+-				{} as Record< string, string >
+-		  );
+-
+-/**
+- * A low-level visual primitive that provides an interface for applying design
+- * token-based customization for background, text, padding, and more.
+- */
+-export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
+-	{
+-		target = 'surface',
+-		backgroundColor,
+-		color,
+-		padding,
+-		borderRadius,
+-		borderWidth,
+-		borderColor,
+-		render = DEFAULT_RENDER,
+-		...props
+-	},
+-	ref
+-) {
+-	const style: React.CSSProperties = {};
+-
+-	if ( backgroundColor ) {
+-		style.backgroundColor = `var(--wpds-color-bg-${ target }-${ backgroundColor }, var(--wpds-color-bg-surface-${ backgroundColor }))`;
+-	}
+-
+-	if ( color ) {
+-		style.color = `var(--wpds-color-fg-${ target }-${ color }, var(--wpds-color-fg-content-${ color }))`;
+-	}
+-
+-	if ( padding ) {
+-		Object.assign( style, getDimensionVariantStyles( 'padding', padding ) );
+-	}
+-
+-	if ( borderRadius ) {
+-		style.borderRadius = `var(--wpds-border-radius-${ target }-${ borderRadius }, var(--wpds-border-radius-${ borderRadius }))`;
+-	}
+-
+-	if ( borderWidth ) {
+-		style.borderWidth = `var(--wpds-border-width-${ target }-${ borderWidth }, var(--wpds-border-width-${ borderWidth }))`;
+-		style.borderStyle = 'solid';
+-	}
+-
+-	if ( borderColor ) {
+-		style.borderColor = `var(--wpds-color-stroke-${ target }-${ borderColor }, var(--wpds-color-stroke-surface-${ borderColor }))`;
+-	}
+-
+-	const element = useRender( {
+-		render,
+-		ref,
+-		props: mergeProps< 'div' >( props, { style } ),
+-	} );
+-
+-	return element;
+-} );
+diff --git a/packages/ui/src/box/index.ts b/packages/ui/src/box/index.ts
+deleted file mode 100644
+index aae32603581ca3..00000000000000
+--- a/packages/ui/src/box/index.ts
++++ /dev/null
+@@ -1 +0,0 @@
+-export { Box } from './box';
+diff --git a/packages/ui/src/box/stories/index.story.tsx b/packages/ui/src/box/stories/index.story.tsx
+deleted file mode 100644
+index 0f5614432d8a44..00000000000000
+--- a/packages/ui/src/box/stories/index.story.tsx
++++ /dev/null
+@@ -1,49 +0,0 @@
+-import { type Meta, type StoryObj } from '@storybook/react-vite';
+-import { type PaddingSize } from '@wordpress/theme';
+-import { Box } from '../box';
+-
+-const meta: Meta< typeof Box > = {
+-	title: 'Design System/Components/Box',
+-	component: Box,
+-};
+-export default meta;
+-
+-type Story = StoryObj< typeof Box >;
+-
+-export const Default: Story = {
+-	args: {
+-		children: 'Box',
+-		backgroundColor: 'info',
+-		color: 'info',
+-		padding: 'sm',
+-		borderColor: 'brand',
+-		borderRadius: 'md',
+-		borderWidth: 'sm',
+-	},
+-	argTypes: {
+-		padding: {
+-			control: 'select',
+-			options: [
+-				'xs',
+-				'sm',
+-				'md',
+-				'lg',
+-				'xl',
+-				'2xl',
+-				'3xl',
+-			] satisfies PaddingSize[],
+-		},
+-	},
+-};
+-
+-export const DirectionalPadding: Story = {
+-	...Default,
+-	args: {
+-		...Default.args,
+-		padding: {
+-			blockStart: 'sm',
+-			inline: 'md',
+-			blockEnd: 'lg',
+-		},
+-	},
+-};
+diff --git a/packages/ui/src/box/test/box.test.tsx b/packages/ui/src/box/test/box.test.tsx
+deleted file mode 100644
+index 912dbafdf49005..00000000000000
+--- a/packages/ui/src/box/test/box.test.tsx
++++ /dev/null
+@@ -1,29 +0,0 @@
+-import { render, screen } from '@testing-library/react';
+-import { createRef } from '@wordpress/element';
+-import { Box } from '../box';
+-
+-describe( 'Box', () => {
+-	it( 'forwards ref', () => {
+-		const ref = createRef< HTMLDivElement >();
+-
+-		render( <Box ref={ ref }>Content</Box> );
+-
+-		expect( ref.current ).toBeInstanceOf( HTMLDivElement );
+-	} );
+-
+-	it( 'merges props', () => {
+-		render(
+-			<Box backgroundColor="brand" style={ { width: '10px' } }>
+-				Content
+-			</Box>
+-		);
+-
+-		const box = screen.getByText( 'Content' );
+-
+-		expect( box ).toHaveStyle( {
+-			'background-color':
+-				'var(--wpds-color-bg-surface-brand, var(--wpds-color-bg-surface-brand))',
+-			width: '10px',
+-		} );
+-	} );
+-} );
+diff --git a/packages/ui/src/box/types.ts b/packages/ui/src/box/types.ts
+deleted file mode 100644
+index 22bae4eb9e1094..00000000000000
+--- a/packages/ui/src/box/types.ts
++++ /dev/null
+@@ -1,61 +0,0 @@
+-import {
+-	type PaddingSize,
+-	type BorderRadiusSize,
+-	type BorderWidthSize,
+-	type Target,
+-	type SurfaceBackgroundColor,
+-	type ContentForegroundColor,
+-	type SurfaceStrokeColor,
+-} from '@wordpress/theme';
+-import { type ComponentProps } from '../utils/types';
+-
+-type DimensionVariant< T > = {
+-	block?: T;
+-	blockStart?: T;
+-	blockEnd?: T;
+-	inline?: T;
+-	inlineStart?: T;
+-	inlineEnd?: T;
+-};
+-
+-export interface BoxProps extends ComponentProps< 'div' > {
+-	/**
+-	 * The target rendering element design token grouping to use for the box.
+-	 */
+-	target?: Target;
+-
+-	/**
+-	 * The surface background design token for box background color.
+-	 */
+-	backgroundColor?: SurfaceBackgroundColor;
+-
+-	/**
+-	 * The surface foreground design token for box text color.
+-	 */
+-	color?: ContentForegroundColor;
+-
+-	/**
+-	 * The surface spacing design token or base unit multiplier for box padding.
+-	 */
+-	padding?: PaddingSize | DimensionVariant< PaddingSize >;
+-
+-	/**
+-	 * The surface border radius design token.
+-	 */
+-	borderRadius?: BorderRadiusSize;
+-
+-	/**
+-	 * The surface border width design token.
+-	 */
+-	borderWidth?: BorderWidthSize;
+-
+-	/**
+-	 * The surface border stroke color design token.
+-	 */
+-	borderColor?: SurfaceStrokeColor;
+-
+-	/**
+-	 * The content to be rendered inside the component.
+-	 */
+-	children?: React.ReactNode;
+-}
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 64c8c05f34ec93..b303bd87834b9d 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -1,5 +1,4 @@
+ export * from './badge';
+-export * from './box';
+ export * from './button';
+ export * from './form/primitives';
+ export * from './icon';
+diff --git a/packages/ui/src/stack/stories/index.story.tsx b/packages/ui/src/stack/stories/index.story.tsx
+index 66ab560c04c314..4dd2019beb93d7 100644
+--- a/packages/ui/src/stack/stories/index.story.tsx
++++ b/packages/ui/src/stack/stories/index.story.tsx
+@@ -1,6 +1,5 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { Stack } from '../index';
+-import { Box } from '../../box';
+ 
+ const meta: Meta< typeof Stack > = {
+ 	title: 'Design System/Components/Stack',
+@@ -9,9 +8,9 @@ const meta: Meta< typeof Stack > = {
+ export default meta;
+ 
+ const DemoBox = ( { variant }: { variant?: 'lg' } ) => (
+-	<Box
+-		backgroundColor="brand"
++	<div
+ 		style={ {
++			backgroundColor: 'var(--wpds-color-bg-surface-brand)',
+ 			width: variant === 'lg' ? '150px' : '100px',
+ 			height: variant === 'lg' ? '150px' : '100px',
+ 		} }

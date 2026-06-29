@@ -1,0 +1,1217 @@
+diff --git a/package-lock.json b/package-lock.json
+index 5a35fae54dcf1e..acc6623a96913a 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -11948,10 +11948,10 @@
+ 				"@wordpress/primitives": "file:packages/primitives",
+ 				"@wordpress/rich-text": "file:packages/rich-text",
+ 				"@wordpress/warning": "file:packages/warning",
+-				"@wp-g2/components": "^0.0.140",
+-				"@wp-g2/context": "^0.0.140",
+-				"@wp-g2/styles": "^0.0.140",
+-				"@wp-g2/utils": "^0.0.140",
++				"@wp-g2/components": "^0.0.150",
++				"@wp-g2/context": "^0.0.150",
++				"@wp-g2/styles": "^0.0.150",
++				"@wp-g2/utils": "^0.0.150",
+ 				"classnames": "^2.2.5",
+ 				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^6.0.15",
+@@ -11970,6 +11970,137 @@
+ 				"rememo": "^3.0.0",
+ 				"tinycolor2": "^1.4.2",
+ 				"uuid": "^8.3.0"
++			},
++			"dependencies": {
++				"@emotion/is-prop-valid": {
++					"version": "0.8.8",
++					"resolved": "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz",
++					"integrity": "sha512-u5WtneEAr5IDG2Wv65yhunPSMLIpuKsbuOktRojfrEiEvRyC85LgPMZI63cr7NUqT8ZIGdSVg8ZKGxIug4lXcA==",
++					"requires": {
++						"@emotion/memoize": "0.7.4"
++					}
++				},
++				"@emotion/memoize": {
++					"version": "0.7.4",
++					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.4.tgz",
++					"integrity": "sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw=="
++				},
++				"@wp-g2/components": {
++					"version": "0.0.150",
++					"resolved": "https://registry.npmjs.org/@wp-g2/components/-/components-0.0.150.tgz",
++					"integrity": "sha512-wolFRz5X53jFTgnqLfZlJue7xs3ucGHksR9zBsONKXwolDvING0cJLn9U17vuU7dB7WFzf8lLxKxPvdFyYMcoQ==",
++					"requires": {
++						"@popperjs/core": "^2.5.4",
++						"@wp-g2/context": "^0.0.150",
++						"@wp-g2/styles": "^0.0.150",
++						"@wp-g2/utils": "^0.0.150",
++						"csstype": "^3.0.3",
++						"downshift": "^6.0.15",
++						"framer-motion": "^2.1.0",
++						"highlight-words-core": "^1.2.2",
++						"history": "^4.9.0",
++						"lodash": "^4.17.19",
++						"path-to-regexp": "^1.7.0",
++						"react-colorful": "4.4.4",
++						"react-textarea-autosize": "^8.2.0",
++						"react-use-gesture": "^9.0.0",
++						"reakit": "^1.3.4"
++					}
++				},
++				"@wp-g2/context": {
++					"version": "0.0.150",
++					"resolved": "https://registry.npmjs.org/@wp-g2/context/-/context-0.0.150.tgz",
++					"integrity": "sha512-VaC79oGUhJ/4THEW0XupIhunovV0u5IMLZfIrDAs5k0eqp45CO30zghMv2DQBQnuSzI1PH6DJCoHGkn4DTBDfw==",
++					"requires": {
++						"@wp-g2/styles": "^0.0.150",
++						"@wp-g2/utils": "^0.0.150",
++						"lodash": "^4.17.19"
++					}
++				},
++				"@wp-g2/create-styles": {
++					"version": "0.0.150",
++					"resolved": "https://registry.npmjs.org/@wp-g2/create-styles/-/create-styles-0.0.150.tgz",
++					"integrity": "sha512-Dl2k/s9qtcJ86v2eTGfX/NdS9mjnCk1zWj0fEbCxKxdDCBEoGmYeFsBq16+ZEEA0YgyTzq8QmYjLhhSNGHwptQ==",
++					"requires": {
++						"@emotion/core": "^10.1.1",
++						"@emotion/is-prop-valid": "^0.8.8",
++						"@wp-g2/utils": "^0.0.150",
++						"create-emotion": "^10.0.27",
++						"emotion": "^10.0.27",
++						"emotion-theming": "^10.0.27",
++						"lodash": "^4.17.19",
++						"mitt": "^2.1.0",
++						"rtlcss": "^2.6.2",
++						"styled-griddie": "^0.1.3"
++					}
++				},
++				"@wp-g2/styles": {
++					"version": "0.0.150",
++					"resolved": "https://registry.npmjs.org/@wp-g2/styles/-/styles-0.0.150.tgz",
++					"integrity": "sha512-5CewOL0Ts5IdQIrW7d7Oa5joU1SWsVVBx9q+7rXfaXjFyeGliLrpRPchBk3OBPCQmw938kcexsa7eySlKFT67Q==",
++					"requires": {
++						"@wp-g2/create-styles": "^0.0.150",
++						"@wp-g2/utils": "^0.0.150"
++					}
++				},
++				"@wp-g2/utils": {
++					"version": "0.0.150",
++					"resolved": "https://registry.npmjs.org/@wp-g2/utils/-/utils-0.0.150.tgz",
++					"integrity": "sha512-CXJEZvwZwlLJfvsfWyxzAxd8qCVzZp9kK7w+GJ883K6NythPymOVJwECUEv2PG3xTUo5qwX4mAwePhA8ZPTHfQ==",
++					"requires": {
++						"copy-to-clipboard": "^3.3.1",
++						"create-emotion": "^10.0.27",
++						"deepmerge": "^4.2.2",
++						"fast-deep-equal": "^3.1.3",
++						"hoist-non-react-statics": "^3.3.2",
++						"json2mq": "^0.2.0",
++						"lodash": "^4.17.19",
++						"memize": "^1.1.0",
++						"react-merge-refs": "^1.1.0",
++						"react-resize-aware": "^3.1.0",
++						"tinycolor2": "^1.4.2",
++						"use-enhanced-state": "^0.0.13",
++						"use-isomorphic-layout-effect": "^1.0.0"
++					},
++					"dependencies": {
++						"react-merge-refs": {
++							"version": "1.1.0",
++							"resolved": "https://registry.npmjs.org/react-merge-refs/-/react-merge-refs-1.1.0.tgz",
++							"integrity": "sha512-alTKsjEL0dKH/ru1Iyn7vliS2QRcBp9zZPGoWxUOvRGWPUYgjo+V01is7p04It6KhgrzhJGnIj9GgX8W4bZoCQ=="
++						}
++					}
++				},
++				"csstype": {
++					"version": "3.0.6",
++					"resolved": "https://registry.npmjs.org/csstype/-/csstype-3.0.6.tgz",
++					"integrity": "sha512-+ZAmfyWMT7TiIlzdqJgjMb7S4f1beorDbWbsocyK4RaiqA5RTX3K14bnBWmmA9QEM0gRdsjyyrEmcyga8Zsxmw=="
++				},
++				"fast-deep-equal": {
++					"version": "3.1.3",
++					"resolved": "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz",
++					"integrity": "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
++				},
++				"hoist-non-react-statics": {
++					"version": "3.3.2",
++					"resolved": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz",
++					"integrity": "sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==",
++					"requires": {
++						"react-is": "^16.7.0"
++					}
++				},
++				"isarray": {
++					"version": "0.0.1",
++					"resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz",
++					"integrity": "sha1-ihis/Kmo9Bd+Cav8YDiTmwXR7t8="
++				},
++				"path-to-regexp": {
++					"version": "1.8.0",
++					"resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-1.8.0.tgz",
++					"integrity": "sha512-n43JRhlUKUAlibEJhPeir1ncUID16QnEjNpwzNdO3Lm4ywrBpBZ5oLD0I6br9evr1Y9JTqwRtAh7JLoOzAQdVA==",
++					"requires": {
++						"isarray": "0.0.1"
++					}
++				}
+ 			}
+ 		},
+ 		"@wordpress/compose": {
+@@ -12856,186 +12987,6 @@
+ 				"lodash": "^4.17.19"
+ 			}
+ 		},
+-		"@wp-g2/components": {
+-			"version": "0.0.140",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/components/-/components-0.0.140.tgz",
+-			"integrity": "sha512-bychuhZ3wPSB457CHYcogoPQPlP/eUA9GoTo0Fv0rj7f44Gr9XlPoqVT+GQa3CmPnvSCAl1sjoe75Vkaoo/O1w==",
+-			"requires": {
+-				"@popperjs/core": "^2.5.4",
+-				"@wp-g2/context": "^0.0.140",
+-				"@wp-g2/styles": "^0.0.140",
+-				"@wp-g2/utils": "^0.0.140",
+-				"csstype": "^3.0.3",
+-				"downshift": "^6.0.15",
+-				"framer-motion": "^2.1.0",
+-				"highlight-words-core": "^1.2.2",
+-				"history": "^4.9.0",
+-				"lodash": "^4.17.19",
+-				"path-to-regexp": "^1.7.0",
+-				"react-colorful": "4.4.4",
+-				"react-textarea-autosize": "^8.2.0",
+-				"react-use-gesture": "^9.0.0",
+-				"reakit": "1.1.0"
+-			},
+-			"dependencies": {
+-				"csstype": {
+-					"version": "3.0.6",
+-					"resolved": "https://registry.npmjs.org/csstype/-/csstype-3.0.6.tgz",
+-					"integrity": "sha512-+ZAmfyWMT7TiIlzdqJgjMb7S4f1beorDbWbsocyK4RaiqA5RTX3K14bnBWmmA9QEM0gRdsjyyrEmcyga8Zsxmw=="
+-				},
+-				"isarray": {
+-					"version": "0.0.1",
+-					"resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz",
+-					"integrity": "sha1-ihis/Kmo9Bd+Cav8YDiTmwXR7t8="
+-				},
+-				"path-to-regexp": {
+-					"version": "1.8.0",
+-					"resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-1.8.0.tgz",
+-					"integrity": "sha512-n43JRhlUKUAlibEJhPeir1ncUID16QnEjNpwzNdO3Lm4ywrBpBZ5oLD0I6br9evr1Y9JTqwRtAh7JLoOzAQdVA==",
+-					"requires": {
+-						"isarray": "0.0.1"
+-					}
+-				},
+-				"reakit": {
+-					"version": "1.1.0",
+-					"resolved": "https://registry.npmjs.org/reakit/-/reakit-1.1.0.tgz",
+-					"integrity": "sha512-d/ERtwgBndBPsyPBPUl5jueyfFgsglIfQCnLMKuxM0PaWiIZ6Ys3XsYaNy/AaG8k46Ee5cQPMdRrR30nVcSToQ==",
+-					"requires": {
+-						"@popperjs/core": "^2.4.2",
+-						"body-scroll-lock": "^3.0.2",
+-						"reakit-system": "^0.13.0",
+-						"reakit-utils": "^0.13.0",
+-						"reakit-warning": "^0.4.0"
+-					}
+-				},
+-				"reakit-system": {
+-					"version": "0.13.1",
+-					"resolved": "https://registry.npmjs.org/reakit-system/-/reakit-system-0.13.1.tgz",
+-					"integrity": "sha512-qglfQ53FsJh5+VSkjMtBg7eZiowj9zXOyfJJxfaXh/XYTVe/5ibzWg6rvGHyvSm6C3D7Q2sg/NPCLmCtYGGvQA==",
+-					"requires": {
+-						"reakit-utils": "^0.13.1"
+-					}
+-				},
+-				"reakit-utils": {
+-					"version": "0.13.1",
+-					"resolved": "https://registry.npmjs.org/reakit-utils/-/reakit-utils-0.13.1.tgz",
+-					"integrity": "sha512-NBKgsot3tU91gZgK5MTInI/PR0T3kIsTmbU5MbGggSOcwU2dG/kbE8IrM2lC6ayCSL2W2QWkijT6kewdrIX7Gw=="
+-				},
+-				"reakit-warning": {
+-					"version": "0.4.1",
+-					"resolved": "https://registry.npmjs.org/reakit-warning/-/reakit-warning-0.4.1.tgz",
+-					"integrity": "sha512-AgnRN6cf8DYBF/mK2JEMFVL67Sbon8fDbFy1kfm0EDibtGsMOQtsFYfozZL7TwmJ4yg68VMhg8tmPHchVQRrlg==",
+-					"requires": {
+-						"reakit-utils": "^0.13.1"
+-					}
+-				}
+-			}
+-		},
+-		"@wp-g2/context": {
+-			"version": "0.0.140",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/context/-/context-0.0.140.tgz",
+-			"integrity": "sha512-z32fxZ2tCVmYQC+wyyziyrhEvWBPFBQfUhUHF85JmTUPzQQeEPiLC3rgDAT0fUTFlJHinPJQq6871RDqFSwCUA==",
+-			"requires": {
+-				"@wp-g2/styles": "^0.0.140",
+-				"@wp-g2/utils": "^0.0.140",
+-				"lodash": "^4.17.19"
+-			}
+-		},
+-		"@wp-g2/create-styles": {
+-			"version": "0.0.140",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/create-styles/-/create-styles-0.0.140.tgz",
+-			"integrity": "sha512-/60DxWjCAhsoYOqY7aiHVbkTAF+L6qZIyHyH50oNs9FTVkcRLHQFSC0kHgAam+Z9K3eImQ7hM52wfBDqae0q2Q==",
+-			"requires": {
+-				"@emotion/core": "^10.1.1",
+-				"@emotion/is-prop-valid": "^0.8.8",
+-				"@wp-g2/utils": "^0.0.140",
+-				"create-emotion": "^10.0.27",
+-				"emotion": "^10.0.27",
+-				"emotion-theming": "^10.0.27",
+-				"lodash": "^4.17.19",
+-				"mitt": "^2.1.0",
+-				"rtlcss": "^2.6.2",
+-				"styled-griddie": "^0.1.3"
+-			},
+-			"dependencies": {
+-				"@emotion/is-prop-valid": {
+-					"version": "0.8.8",
+-					"resolved": "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz",
+-					"integrity": "sha512-u5WtneEAr5IDG2Wv65yhunPSMLIpuKsbuOktRojfrEiEvRyC85LgPMZI63cr7NUqT8ZIGdSVg8ZKGxIug4lXcA==",
+-					"requires": {
+-						"@emotion/memoize": "0.7.4"
+-					}
+-				},
+-				"@emotion/memoize": {
+-					"version": "0.7.4",
+-					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.4.tgz",
+-					"integrity": "sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw=="
+-				}
+-			}
+-		},
+-		"@wp-g2/styles": {
+-			"version": "0.0.140",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/styles/-/styles-0.0.140.tgz",
+-			"integrity": "sha512-wAvtqQOqX2zYpfEdVK4l4abH/hUUgw/+8+E5PvPgrsvqFg8IehNSksnjNF5/IloLRGAH70d8ytjMuMnUK8PVYA==",
+-			"requires": {
+-				"@wp-g2/create-styles": "^0.0.140",
+-				"@wp-g2/utils": "^0.0.140"
+-			}
+-		},
+-		"@wp-g2/utils": {
+-			"version": "0.0.140",
+-			"resolved": "https://registry.npmjs.org/@wp-g2/utils/-/utils-0.0.140.tgz",
+-			"integrity": "sha512-a4uYi/XQEDrOAIO3JUQ+L/oeSkgp+08pSy41xxQ1nIRHs7X+Du84X2EFQrvZfGBRuXuVlVuUIlN2e0IE8yUZKw==",
+-			"requires": {
+-				"copy-to-clipboard": "^3.3.1",
+-				"create-emotion": "^10.0.27",
+-				"deepmerge": "^4.2.2",
+-				"fast-deep-equal": "^3.1.3",
+-				"hoist-non-react-statics": "^3.3.2",
+-				"json2mq": "^0.2.0",
+-				"lodash": "^4.17.19",
+-				"memize": "^1.1.0",
+-				"react-merge-refs": "^1.1.0",
+-				"react-resize-aware": "^3.1.0",
+-				"reakit-warning": "^0.5.5",
+-				"tinycolor2": "^1.4.2",
+-				"use-enhanced-state": "^0.0.13",
+-				"use-isomorphic-layout-effect": "^1.0.0"
+-			},
+-			"dependencies": {
+-				"fast-deep-equal": {
+-					"version": "3.1.3",
+-					"resolved": "https://registry.npmjs.org/fast-deep-equal/-/fast-deep-equal-3.1.3.tgz",
+-					"integrity": "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
+-				},
+-				"hoist-non-react-statics": {
+-					"version": "3.3.2",
+-					"resolved": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz",
+-					"integrity": "sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==",
+-					"requires": {
+-						"react-is": "^16.7.0"
+-					}
+-				},
+-				"react-merge-refs": {
+-					"version": "1.1.0",
+-					"resolved": "https://registry.npmjs.org/react-merge-refs/-/react-merge-refs-1.1.0.tgz",
+-					"integrity": "sha512-alTKsjEL0dKH/ru1Iyn7vliS2QRcBp9zZPGoWxUOvRGWPUYgjo+V01is7p04It6KhgrzhJGnIj9GgX8W4bZoCQ=="
+-				},
+-				"reakit-utils": {
+-					"version": "0.14.4",
+-					"resolved": "https://registry.npmjs.org/reakit-utils/-/reakit-utils-0.14.4.tgz",
+-					"integrity": "sha512-jDEf/NmZVJ6fs10G16ifD+RFhQikSLN7VfjRHu0CPoUj4g6lFXd5PPcRXCY81qiqc9FVHjr2d2fmsw1hs6xUxA=="
+-				},
+-				"reakit-warning": {
+-					"version": "0.5.5",
+-					"resolved": "https://registry.npmjs.org/reakit-warning/-/reakit-warning-0.5.5.tgz",
+-					"integrity": "sha512-OuP1r7rlSSJZsoLuc0CPA2ACPKnWO8HDbFktiiidbT67UjuX6udYV1AUsIgMJ8ado9K5gZGjPj7IB/GDYo9Yjg==",
+-					"requires": {
+-						"reakit-utils": "^0.14.4"
+-					}
+-				}
+-			}
+-		},
+ 		"@xtuc/ieee754": {
+ 			"version": "1.2.0",
+ 			"resolved": "https://registry.npmjs.org/@xtuc/ieee754/-/ieee754-1.2.0.tgz",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 89c40661ab3329..79b0df3c4a3320 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -45,10 +45,10 @@
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/rich-text": "file:../rich-text",
+ 		"@wordpress/warning": "file:../warning",
+-		"@wp-g2/components": "^0.0.140",
+-		"@wp-g2/context": "^0.0.140",
+-		"@wp-g2/styles": "^0.0.140",
+-		"@wp-g2/utils": "^0.0.140",
++		"@wp-g2/components": "^0.0.150",
++		"@wp-g2/context": "^0.0.150",
++		"@wp-g2/styles": "^0.0.150",
++		"@wp-g2/utils": "^0.0.150",
+ 		"classnames": "^2.2.5",
+ 		"dom-scroll-into-view": "^1.2.1",
+ 		"downshift": "^6.0.15",
+diff --git a/packages/components/src/ui/flex/types.ts b/packages/components/src/ui/flex/types.ts
+index 3e3c84fa4fdf32..36036885727f5c 100644
+--- a/packages/components/src/ui/flex/types.ts
++++ b/packages/components/src/ui/flex/types.ts
+@@ -109,7 +109,7 @@ export type FlexProps = {
+ 	 * }
+ 	 * ```
+ 	 */
+-	gap?: number;
++	gap?: import('react').ReactText;
+ 	/**
+ 	 * Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
+ 	 * In the example below, `flex-start` will align the children content to the left.
+diff --git a/packages/components/src/ui/h-stack/README.md b/packages/components/src/ui/h-stack/README.md
+new file mode 100644
+index 00000000000000..bf627f85c39937
+--- /dev/null
++++ b/packages/components/src/ui/h-stack/README.md
+@@ -0,0 +1,127 @@
++# HStack
++
++`HStack` (Horizontal Stack) arranges child elements in a horizontal line.
++
++## Usage
++
++`HStack` can render anything inside.
++
++```jsx 
++function Example() {
++	return (
++		<HStack>
++			<View css={ [ ui.background.blue ] }>
++				<Text>Ana</Text>
++			</View>
++			<View css={ [ ui.background.blue ] }>
++				<Text>Elsa</Text>
++			</View>
++			<View css={ [ ui.background.blue ] }>
++				<Text>Olaf</Text>
++			</View>
++		</HStack>
++	);
++}
++```
++
++## Props
++
++##### alignment
++
++**Type**: `HStackAlignment` | `CSS[ 'alignItems' ]`
++
++Determines how the child elements are aligned.
++
++-   `top`: Aligns content to the top.
++-   `topLeft`: Aligns content to the top/left.
++-   `topRight`: Aligns content to the top/right.
++-   `left`: Aligns content to the left.
++-   `center`: Aligns content to the center.
++-   `right`: Aligns content to the right.
++-   `bottom`: Aligns content to the bottom.
++-   `bottomLeft`: Aligns content to the bottom/left.
++-   `bottomRight`: Aligns content to the bottom/right.
++-   `edge`: Aligns content to the edges of the container.
++-   `stretch`: Stretches content to the edges of the container.
++
++##### direction
++
++**Type**: `FlexDirection`
++
++The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
++
++##### expanded
++
++**Type**: `boolean`
++
++Expands to the maximum available width (if horizontal) or height (if vertical).
++
++##### justify
++
++**Type**: `CSS['justifyContent']`
++
++Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
++In the example below, `flex-start` will align the children content to the left.
++
++##### spacing
++
++**Type**: `CSS['width']`
++
++The amount of space between each child element. Spacing in between each child can be adjusted by using `spacing`.
++The value of `spacing` works as a multiplier to the library's grid system (base of `4px`).
++
++##### wrap
++
++**Type**: `boolean`
++
++Determines if children should wrap.
++
++## Spacer
++
++When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to take up the remaining space.
++
++```jsx live
++import { HStack, Spacer, Text, View } from '@wp-g2/components';
++import { ui } from '@wp-g2/styles';
++
++function Example() {
++	return (
++		<HStack>
++			<View css={[ui.background.blue]}>
++				<Text>Ana</Text>
++			</View>
++			<Spacer css={[ui.background.blue]}>
++				<Text>Elsa</Text>
++			</Spacer>
++			<View css={[ui.background.blue]}>
++				<Text>Olaf</Text>
++			</View>
++		</HStack>
++	);
++}
++```
++
++`Spacer` also be used in-between items to push them apart.
++
++```jsx live
++import { HStack, Spacer, Text, View } from '@wp-g2/components';
++import { ui } from '@wp-g2/styles';
++
++function Example() {
++	return (
++		<HStack>
++			<View css={[ui.background.blue]}>
++				<Text>Ana</Text>
++			</View>
++			<Spacer />
++			<View css={[ui.background.blue]}>
++				<Text>Elsa</Text>
++			</View>
++			<View css={[ui.background.blue]}>
++				<Text>Olaf</Text>
++			</View>
++		</HStack>
++	);
++}
++```
++
+diff --git a/packages/components/src/ui/h-stack/h-stack-utils.js b/packages/components/src/ui/h-stack/h-stack-utils.js
+new file mode 100644
+index 00000000000000..288cdc79b7db96
+--- /dev/null
++++ b/packages/components/src/ui/h-stack/h-stack-utils.js
+@@ -0,0 +1,56 @@
++/**
++ * External dependencies
++ */
++import { isNil } from 'lodash';
++
++/** @type {import('./types').Alignments} */
++const ALIGNMENTS = {
++	bottom: { align: 'flex-end', justify: 'center' },
++	bottomLeft: { align: 'flex-start', justify: 'flex-end' },
++	bottomRight: { align: 'flex-end', justify: 'flex-end' },
++	center: { align: 'center', justify: 'center' },
++	edge: { align: 'center', justify: 'space-between' },
++	left: { align: 'center', justify: 'flex-start' },
++	right: { align: 'center', justify: 'flex-end' },
++	stretch: { align: 'stretch' },
++	top: { align: 'flex-start', justify: 'center' },
++	topLeft: { align: 'flex-start', justify: 'flex-start' },
++	topRight: { align: 'flex-start', justify: 'flex-end' },
++};
++
++/** @type {import('./types').Alignments} */
++const V_ALIGNMENTS = {
++	bottom: { justify: 'flex-end', align: 'center' },
++	bottomLeft: { justify: 'flex-start', align: 'flex-end' },
++	bottomRight: { justify: 'flex-end', align: 'flex-end' },
++	center: { justify: 'center', align: 'center' },
++	edge: { justify: 'space-between', align: 'center' },
++	left: { justify: 'center', align: 'flex-start' },
++	right: { justify: 'center', align: 'flex-end' },
++	stretch: { justify: 'stretch' },
++	top: { justify: 'flex-start', align: 'center' },
++	topLeft: { justify: 'flex-start', align: 'flex-start' },
++	topRight: { justify: 'flex-start', align: 'flex-end' },
++};
++
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param {import('./types').HStackAlignment | import('react').CSSProperties[ 'alignItems' ]} alignment Where to align.
++ * @param {import('../flex/types').FlexDirection} [direction='row'] Direction to align.
++ * @return {import('./types').AlignmentProps} Alignment props.
++ */
++/* eslint-enable jsdoc/valid-types */
++export function getAlignmentProps( alignment, direction = 'row' ) {
++	if ( isNil( alignment ) ) {
++		return {};
++	}
++	const isVertical = direction === 'column';
++	const props = isVertical ? V_ALIGNMENTS : ALIGNMENTS;
++
++	const alignmentProps =
++		alignment in props
++			? props[ /** @type {keyof typeof ALIGNMENTS} */ ( alignment ) ]
++			: { align: alignment };
++
++	return alignmentProps;
++}
+diff --git a/packages/components/src/ui/h-stack/h-stack.js b/packages/components/src/ui/h-stack/h-stack.js
+new file mode 100644
+index 00000000000000..8ffdda1f28fe85
+--- /dev/null
++++ b/packages/components/src/ui/h-stack/h-stack.js
+@@ -0,0 +1,11 @@
++/**
++ * Internal dependencies
++ */
++import { createComponent } from '../utils';
++import { useHStack } from './use-h-stack';
++
++export default createComponent( {
++	as: 'div',
++	useHook: useHStack,
++	name: 'HStack',
++} );
+diff --git a/packages/components/src/ui/h-stack/index.js b/packages/components/src/ui/h-stack/index.js
+new file mode 100644
+index 00000000000000..b52a8c22b4d2c7
+--- /dev/null
++++ b/packages/components/src/ui/h-stack/index.js
+@@ -0,0 +1,2 @@
++export { default as HStack } from './h-stack';
++export * from './use-h-stack';
+diff --git a/packages/components/src/ui/h-stack/stories/HStack.stories.js b/packages/components/src/ui/h-stack/stories/HStack.stories.js
+new file mode 100644
+index 00000000000000..1d777bc6ea7a61
+--- /dev/null
++++ b/packages/components/src/ui/h-stack/stories/HStack.stories.js
+@@ -0,0 +1,22 @@
++/**
++ * Internal dependencies
++ */
++import { View } from '../../view';
++import { HStack } from '../index';
++
++export default {
++	component: HStack,
++	title: 'G2 Components (Experimental)/HStack',
++};
++
++export const _default = () => {
++	return (
++		<HStack spacing={ 3 }>
++			<View>One</View>
++			<View>Two</View>
++			<View>Three</View>
++			<View>Four</View>
++			<View>Five</View>
++		</HStack>
++	);
++};
+diff --git a/packages/components/src/ui/h-stack/test/__snapshots__/index.js.snap b/packages/components/src/ui/h-stack/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..2238493a1747f0
+--- /dev/null
++++ b/packages/components/src/ui/h-stack/test/__snapshots__/index.js.snap
+@@ -0,0 +1,295 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render alignment 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  --wp-g2-flex-gap: calc(4px * 2);
++  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
++  --wp-g2-flex-item-margin-bottom: 0;
++  --wp-g2-flex-item-margin-right: calc(4px * 2);
++  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
++  --wp-g2-flex-item-margin-left: 0;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: center;
++  -webkit-justify-content: center;
++  -ms-flex-pack: center;
++  justify-content: center;
++  width: 100%;
++  --wp-g2-h-stack-spacing: calc(4px * 2);
++  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 2);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++  margin-left: calc(var(--wp-g2-grid-base) * 2);
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++  min-width: 0;
++}
++
++<div
++  class="components-flex wp-components-flex components-h-stack wp-components-h-stack emotion-2"
++  data-g2-c16t="true"
++  data-g2-component="HStack"
++>
++  <div
++    class="emotion-0"
++  />
++  <div
++    class="emotion-0"
++  />
++</div>
++`;
++
++exports[`props should render correctly 1`] = `
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  --wp-g2-flex-gap: calc(4px * 2);
++  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
++  --wp-g2-flex-item-margin-bottom: 0;
++  --wp-g2-flex-item-margin-right: calc(4px * 2);
++  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
++  --wp-g2-flex-item-margin-left: 0;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  --wp-g2-h-stack-spacing: calc(4px * 2);
++  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 2);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++  margin-left: calc(4px * 2);
++  margin-left: calc(var(--wp-g2-grid-base) * 2);
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++  min-width: 0;
++}
++
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++<div
++  class="components-flex wp-components-flex components-h-stack wp-components-h-stack emotion-2"
++  data-g2-c16t="true"
++  data-g2-component="HStack"
++>
++  <div
++    class="emotion-0"
++  />
++  <div
++    class="emotion-0"
++  />
++</div>
++`;
++
++exports[`props should render spacing 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  box-sizing: border-box;
++  -moz-osx-font-smoothing: grayscale;
++  -webkit-font-smoothing: antialiased;
++  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
++  font-family: var(--wp-g2-font-family);
++  font-size: 13px;
++  font-size: var(--wp-g2-font-size);
++  font-weight: normal;
++  font-weight: var(--wp-g2-font-weight);
++  margin: 0;
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  --wp-g2-flex-gap: calc(4px * 5);
++  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 5);
++  --wp-g2-flex-item-margin-bottom: 0;
++  --wp-g2-flex-item-margin-right: calc(4px * 2);
++  --wp-g2-flex-item-margin-right: var(--wp-g2-flex-gap);
++  --wp-g2-flex-item-margin-left: 0;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: justify;
++  -webkit-justify-content: space-between;
++  -ms-flex-pack: justify;
++  justify-content: space-between;
++  width: 100%;
++  --wp-g2-h-stack-spacing: calc(4px * 5);
++  --wp-g2-h-stack-spacing: calc(var(--wp-g2-grid-base) * 5);
++}
++
++@media (prefers-reduced-motion) {
++  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++    -webkit-transition: none !important;
++    transition: none !important;
++  }
++}
++
++[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
++  -webkit-transition: none !important;
++  transition: none !important;
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
++  margin-left: calc(4px * 5);
++  margin-left: calc(var(--wp-g2-grid-base) * 5);
++}
++
++.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
++  min-width: 0;
++}
++
++<div
++  class="components-flex wp-components-flex components-h-stack wp-components-h-stack emotion-2"
++  data-g2-c16t="true"
++  data-g2-component="HStack"
++>
++  <div
++    class="emotion-0"
++  />
++  <div
++    class="emotion-0"
++  />
++</div>
++`;
+diff --git a/packages/components/src/ui/h-stack/test/index.js b/packages/components/src/ui/h-stack/test/index.js
+new file mode 100644
+index 00000000000000..56190f81db4cdd
+--- /dev/null
++++ b/packages/components/src/ui/h-stack/test/index.js
+@@ -0,0 +1,42 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { View } from '../../view';
++import { HStack } from '..';
++
++describe( 'props', () => {
++	test( 'should render correctly', () => {
++		const { container } = render(
++			<HStack>
++				<View />
++				<View />
++			</HStack>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render alignment', () => {
++		const { container } = render(
++			<HStack alignment="center">
++				<View />
++				<View />
++			</HStack>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render spacing', () => {
++		const { container } = render(
++			<HStack spacing={ 5 }>
++				<View />
++				<View />
++			</HStack>
++		);
++		expect( container.firstChild ).toMatchSnapshot();
++	} );
++} );
+diff --git a/packages/components/src/ui/h-stack/types.ts b/packages/components/src/ui/h-stack/types.ts
+new file mode 100644
+index 00000000000000..694b3866af5add
+--- /dev/null
++++ b/packages/components/src/ui/h-stack/types.ts
+@@ -0,0 +1,123 @@
++import { CSSProperties } from 'react';
++import { FlexProps } from '../flex/types';
++
++export type HStackAlignment =
++	| 'bottom'
++	| 'bottomLeft'
++	| 'bottomRight'
++	| 'center'
++	| 'edge'
++	| 'left'
++	| 'right'
++	| 'stretch'
++	| 'top'
++	| 'topLeft'
++	| 'topRight';
++
++export type AlignmentProps = {
++	justify?: CSSProperties[ 'justifyContent' ];
++	align?: CSSProperties[ 'alignItems' ];
++};
++
++export type Alignments = Record<HStackAlignment, AlignmentProps>;
++
++export type Props = Omit< FlexProps, 'align' | 'gap' > & {
++	/**
++	 * Determines how the child elements are aligned.
++	 *
++	 * * `top`: Aligns content to the top.
++	 * * `topLeft`: Aligns content to the top/left.
++	 * * `topRight`: Aligns content to the top/right.
++	 * * `left`: Aligns content to the left.
++	 * * `center`: Aligns content to the center.
++	 * * `right`: Aligns content to the right.
++	 * * `bottom`: Aligns content to the bottom.
++	 * * `bottomLeft`: Aligns content to the bottom/left.
++	 * * `bottomRight`: Aligns content to the bottom/right.
++	 * * `edge`: Aligns content to the edges of the container.
++	 * * `stretch`: Stretches content to the edges of the container.
++	 *
++	 * @default 'edge'
++	 *
++	 * @example
++	 *```jsx
++	 * import { HStack, Text, View } from `@wp-g2/components`
++	 * import { ui } from `@wp-g2/styles`
++	 *
++	 * function Example() {
++	 *   return (
++	 *     <HStack alignment="center">
++	 *       <View css={[ui.background.blue]}>
++	 *         <Text>Ana</Text>
++	 *       </View>
++	 *       <View css={[ui.background.blue]}>
++	 *         <Text>Elsa</Text>
++	 *       </View>
++	 *       <View css={[ui.background.blue]}>
++	 *         <Text>Olaf</Text>
++	 *       </View>
++	 *     </HStack>
++	 *   );
++	 * }
++	 *```
++	 */
++	alignment?: HStackAlignment | CSSProperties[ 'alignItems' ];
++	/**
++	 * The amount of space between each child element. Spacing in between each child can be adjusted by using `spacing`.
++	 * The value of `spacing` works as a multiplier to the library's grid system (base of `4px`).
++	 *
++	 * @default 2
++	 *
++	 * @example
++	 * ```jsx
++	 * import { HStack, Text, View } from `@wp-g2/components`
++	 * import { ui } from `@wp-g2/styles`
++	 *
++	 * function Example() {
++	 *   return (
++	 *     <HStack alignment="center" spacing={8}>
++	 *       <View css={[ui.background.blue]}>
++	 *         <Text>Ana</Text>
++	 *       </View>
++	 *       <View css={[ui.background.blue]}>
++	 *         <Text>Elsa</Text>
++	 *       </View>
++	 *       <View css={[ui.background.blue]}>
++	 *         <Text>Olaf</Text>
++	 *       </View>
++	 *     </HStack>
++	 *   );
++	 * }
++	 *```
++	 */
++	spacing?: CSSProperties[ 'width' ];
++};
++
++/**
++ * `HStack` (Horizontal Stack) arranges child elements in a horizontal line.
++ *
++ * @remarks
++ * `HStack` can render anything inside.
++ *
++ * @example
++ * ```jsx
++ * import { HStack, Text, View } from `@wp-g2/components`
++ * import { ui } from `@wp-g2/styles`
++ *
++ * function Example() {
++ *   return (
++ *     <HStack>
++ *       <View css={[ui.background.blue]}>
++ *         <Text>Ana</Text>
++ *       </View>
++ *       <View css={[ui.background.blue]}>
++ *         <Text>Elsa</Text>
++ *       </View>
++ *       <View css={[ui.background.blue]}>
++ *         <Text>Olaf</Text>
++ *       </View>
++ *     </HStack>
++ *   );
++ * }
++ * ```
++ */
+diff --git a/packages/components/src/ui/h-stack/use-h-stack.js b/packages/components/src/ui/h-stack/use-h-stack.js
+new file mode 100644
+index 00000000000000..1d79efa22d89d4
+--- /dev/null
++++ b/packages/components/src/ui/h-stack/use-h-stack.js
+@@ -0,0 +1,79 @@
++/**
++ * External dependencies
++ */
++import { hasNamespace, useContextSystem } from '@wp-g2/context';
++import { css, cx, ui } from '@wp-g2/styles';
++import { getValidChildren } from '@wp-g2/utils';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { FlexItem, useFlex } from '../flex';
++import { getAlignmentProps } from './h-stack-utils';
++
++/**
++ *
++ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
++ */
++export function useHStack( props ) {
++	const {
++		alignment = 'edge',
++		children,
++		className,
++		direction,
++		spacing = 2,
++		...otherProps
++	} = useContextSystem( props, 'HStack' );
++
++	const align = getAlignmentProps( alignment, direction );
++
++	const validChildren = getValidChildren( children );
++	const clonedChildren = validChildren.map(
++		// @ts-ignore
++		( /** @type {import('react').ReactElement} */ child, index ) => {
++			const _key = child.key || `hstack-${ index }`;
++			const _isSpacer = hasNamespace( child, [ 'Spacer' ] );
++
++			if ( _isSpacer ) {
++				return (
++					<FlexItem
++						isBlock
++						key={ _key }
++						{ ...child.props }
++						{ ...ui.$( 'Spacer' ) }
++					/>
++				);
++			}
++
++			return child;
++		}
++	);
++
++	const classes = useMemo( () => {
++		return cx(
++			css( {
++				[ ui.createToken( 'HStackSpacing' ) ]: ui.space( spacing ),
++			} ),
++			className
++		);
++	}, [ className, spacing ] );
++
++	const propsForFlex = {
++		className: classes,
++		children: clonedChildren,
++		direction,
++		justify: 'center',
++		...align,
++		...otherProps,
++		gap: spacing,
++	};
++
++	const flexProps = useFlex( propsForFlex );
++
++	return flexProps;
++}
+diff --git a/packages/e2e-tests/specs/editor/various/font-size-picker.test.js b/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
+index 84edbd564b5352..4b92a9fb427f22 100644
+--- a/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
++++ b/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
+@@ -86,8 +86,14 @@ describe( 'Font Size Picker', () => {
+ 		);
+ 
+ 		await first( await page.$x( FONT_SIZE_LABEL_SELECTOR ) ).click();
++
++		// Disable reason: Wait for changes to apply.
++		// eslint-disable-next-line no-restricted-syntax
++		await page.waitForTimeout( 100 );
++
+ 		await pressKeyTimes( 'ArrowDown', 2 );
+ 		await page.keyboard.press( 'Enter' );
++
+ 		await page.keyboard.press( 'Tab' );
+ 		await page.keyboard.press( 'Tab' );
+ 
+@@ -114,6 +120,10 @@ describe( 'Font Size Picker', () => {
+ 		await pressKeyTimes( 'Backspace', 5 );
+ 		await page.keyboard.press( 'Enter' );
+ 
++		// Disable reason: Wait for changes to apply.
++		// eslint-disable-next-line no-restricted-syntax
++		await page.waitForTimeout( 1000 );
++
+ 		// Ensure content matches snapshot.
+ 		const content = await getEditedPostContent();
+ 		expect( content ).toMatchSnapshot();

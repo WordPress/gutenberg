@@ -1,0 +1,72 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e2cb1f3c4b2045..b152a89d72dc8b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `Popover`, `Dropdown`, `CustomGradientPicker`: Fix dropdown positioning by always targeting the rendered toggle, and switch off width in the Popover size middleware to stop reducing the width of the popover. ([#41361](https://github.com/WordPress/gutenberg/pull/41361))
++
+ ### Enhancements
+ 
+ -   `SelectControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#41269](https://github.com/WordPress/gutenberg/pull/41269)).
+diff --git a/packages/components/src/custom-gradient-picker/utils.js b/packages/components/src/custom-gradient-picker/utils.js
+index c7c8d8289ba63c..bca3790c766461 100644
+--- a/packages/components/src/custom-gradient-picker/utils.js
++++ b/packages/components/src/custom-gradient-picker/utils.js
+@@ -75,7 +75,7 @@ export function getGradientAstWithControlPoints(
+ 			return {
+ 				length: {
+ 					type: '%',
+-					value: position.toString(),
++					value: position?.toString(),
+ 				},
+ 				type: a < 1 ? 'rgba' : 'rgb',
+ 				value: a < 1 ? [ r, g, b, a ] : [ r, g, b ],
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index ce080c1be0adb6..72a394ef043e62 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -108,7 +108,11 @@ export default function Dropdown( props ) {
+ 					// This value is used to ensure that the dropdowns
+ 					// align with the editor header by default.
+ 					offset={ 13 }
+-					anchorRef={ ! hasAnchorRef ? containerRef : undefined }
++					anchorRef={
++						! hasAnchorRef
++							? containerRef?.current?.firstChild // Anchor to the rendered toggle.
++							: undefined
++					}
+ 					{ ...popoverProps }
+ 					className={ classnames(
+ 						'components-dropdown__content',
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index b24013bc7c45ee..60c8df63cd0bf4 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -180,11 +180,11 @@ const Popover = (
+ 		__unstableForcePosition
+ 			? undefined
+ 			: size( {
+-					apply( { width, height } ) {
++					apply( sizeProps ) {
++						const { height } = sizeProps;
+ 						if ( ! refs.floating.current ) return;
+-
++						// Reduce the height of the popover to the available space.
+ 						Object.assign( refs.floating.current.firstChild.style, {
+-							maxWidth: `${ width }px`,
+ 							maxHeight: `${ height }px`,
+ 							overflow: 'auto',
+ 						} );
+@@ -194,6 +194,7 @@ const Popover = (
+ 		shift( {
+ 			crossAxis: true,
+ 			limiter: limitShift(),
++			padding: 1, // Necessary to avoid flickering at the edge of the viewport.
+ 		} ),
+ 		hasArrow ? arrow( { element: arrowRef } ) : undefined,
+ 	].filter( ( m ) => !! m );

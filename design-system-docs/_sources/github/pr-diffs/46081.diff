@@ -1,0 +1,117 @@
+diff --git a/packages/block-editor/src/components/inserter/block-patterns-explorer/sidebar.js b/packages/block-editor/src/components/inserter/block-patterns-explorer/sidebar.js
+index 122e1fd95ebb4f..71431342221228 100644
+--- a/packages/block-editor/src/components/inserter/block-patterns-explorer/sidebar.js
++++ b/packages/block-editor/src/components/inserter/block-patterns-explorer/sidebar.js
+@@ -36,6 +36,7 @@ function PatternsExplorerSearch( { filterValue, setFilterValue } ) {
+ 	return (
+ 		<div className={ baseClassName }>
+ 			<SearchControl
++				__nextHasNoMarginBottom
+ 				onChange={ setFilterValue }
+ 				value={ filterValue }
+ 				label={ __( 'Search for patterns' ) }
+diff --git a/packages/block-editor/src/components/inserter/menu.js b/packages/block-editor/src/components/inserter/menu.js
+index 37a09dd4488700..7745cb9aeae7db 100644
+--- a/packages/block-editor/src/components/inserter/menu.js
++++ b/packages/block-editor/src/components/inserter/menu.js
+@@ -228,6 +228,7 @@ function InserterMenu(
+ 				} ) }
+ 			>
+ 				<SearchControl
++					__nextHasNoMarginBottom
+ 					className="block-editor-inserter__search"
+ 					onChange={ ( value ) => {
+ 						if ( hoveredItem ) setHoveredItem( null );
+diff --git a/packages/block-editor/src/components/inserter/quick-inserter.js b/packages/block-editor/src/components/inserter/quick-inserter.js
+index d9eabfc3363fc4..39a5ac5c75b849 100644
+--- a/packages/block-editor/src/components/inserter/quick-inserter.js
++++ b/packages/block-editor/src/components/inserter/quick-inserter.js
+@@ -99,6 +99,7 @@ export default function QuickInserter( {
+ 		>
+ 			{ showSearch && (
+ 				<SearchControl
++					__nextHasNoMarginBottom
+ 					className="block-editor-inserter__search"
+ 					value={ filterValue }
+ 					onChange={ ( value ) => {
+diff --git a/packages/block-editor/src/components/inserter/style.scss b/packages/block-editor/src/components/inserter/style.scss
+index dc1036a5b5c260..b07e2722cc52f6 100644
+--- a/packages/block-editor/src/components/inserter/style.scss
++++ b/packages/block-editor/src/components/inserter/style.scss
+@@ -107,10 +107,6 @@ $block-inserter-tabs-height: 44px;
+ 	.components-search-control__icon {
+ 		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
+ 	}
+-
+-	.components-base-control__field {
+-		margin-bottom: 0;
+-	}
+ }
+ 
+ .block-editor-inserter__tabs {
+diff --git a/packages/block-library/src/template-part/edit/selection-modal.js b/packages/block-library/src/template-part/edit/selection-modal.js
+index f979df799c6be6..7a544d9898ff1a 100644
+--- a/packages/block-library/src/template-part/edit/selection-modal.js
++++ b/packages/block-library/src/template-part/edit/selection-modal.js
+@@ -88,6 +88,7 @@ export default function TemplatePartSelectionModal( {
+ 		<div className="block-library-template-part__selection-content">
+ 			<div className="block-library-template-part__selection-search">
+ 				<SearchControl
++					__nextHasNoMarginBottom
+ 					onChange={ setSearchValue }
+ 					value={ searchValue }
+ 					label={ __( 'Search for replacements' ) }
+diff --git a/packages/edit-post/src/components/block-manager/index.js b/packages/edit-post/src/components/block-manager/index.js
+index d670ea52cf569a..3adc2e3e91848f 100644
+--- a/packages/edit-post/src/components/block-manager/index.js
++++ b/packages/edit-post/src/components/block-manager/index.js
+@@ -66,6 +66,7 @@ function BlockManager( {
+ 				</div>
+ 			) }
+ 			<SearchControl
++				__nextHasNoMarginBottom
+ 				label={ __( 'Search for a block' ) }
+ 				placeholder={ __( 'Search for a block' ) }
+ 				value={ search }
+diff --git a/packages/edit-site/src/components/add-new-template/add-custom-template-modal.js b/packages/edit-site/src/components/add-new-template/add-custom-template-modal.js
+index aece3595575f0f..2c97a4c4bc31be 100644
+--- a/packages/edit-site/src/components/add-new-template/add-custom-template-modal.js
++++ b/packages/edit-site/src/components/add-new-template/add-custom-template-modal.js
+@@ -131,6 +131,7 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
+ 		<>
+ 			{ showSearchControl && (
+ 				<SearchControl
++					__nextHasNoMarginBottom
+ 					onChange={ setSearch }
+ 					value={ search }
+ 					label={ labels.search_items }
+diff --git a/packages/edit-site/src/components/global-styles/screen-block-list.js b/packages/edit-site/src/components/global-styles/screen-block-list.js
+index f2d989fc99218d..a203a99ba276ab 100644
+--- a/packages/edit-site/src/components/global-styles/screen-block-list.js
++++ b/packages/edit-site/src/components/global-styles/screen-block-list.js
+@@ -129,6 +129,7 @@ function ScreenBlockList() {
+ 				) }
+ 			/>
+ 			<SearchControl
++				__nextHasNoMarginBottom
+ 				className="edit-site-block-types-search"
+ 				onChange={ setFilterValue }
+ 				value={ filterValue }
+diff --git a/packages/edit-site/src/components/global-styles/style.scss b/packages/edit-site/src/components/global-styles/style.scss
+index 3c15ebba159b05..c081703f1f37b2 100644
+--- a/packages/edit-site/src/components/global-styles/style.scss
++++ b/packages/edit-site/src/components/global-styles/style.scss
+@@ -52,8 +52,12 @@
+ 	}
+ }
+ 
+-.edit-site-global-styles-header__description,
++.edit-site-global-styles-header__description {
++	padding: 0 $grid-unit-20;
++}
++
+ .edit-site-block-types-search {
++	margin-bottom: $grid-unit-10;
+ 	padding: 0 $grid-unit-20;
+ }
+ 

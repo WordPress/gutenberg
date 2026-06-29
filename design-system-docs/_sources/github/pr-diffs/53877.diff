@@ -1,0 +1,31 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3b9682c4adf4c6..f204ea25751932 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `SandBox`: Fix the cleanup method in useEffect ([#53796](https://github.com/WordPress/gutenberg/pull/53796)).
+ 
++### Enhancements
++
++-   `ProgressBar`: Add transition to determinate indicator ([#53877](https://github.com/WordPress/gutenberg/pull/53877)).
++
+ ## 25.6.0 (2023-08-16)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/progress-bar/styles.ts b/packages/components/src/progress-bar/styles.ts
+index 293fb5e14c0739..e983797d3d92bc 100644
+--- a/packages/components/src/progress-bar/styles.ts
++++ b/packages/components/src/progress-bar/styles.ts
+@@ -54,7 +54,10 @@ export const Indicator = styled.div< {
+ 					animationName: animateProgressBar,
+ 					width: `${ INDETERMINATE_TRACK_WIDTH }%`,
+ 			  } )
+-			: css( { width: `${ value }%` } ) };
++			: css( {
++					width: `${ value }%`,
++					transition: 'width 0.4s ease-in-out',
++			  } ) };
+ `;
+ 
+ export const ProgressElement = styled.progress`

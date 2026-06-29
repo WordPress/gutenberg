@@ -1,0 +1,44 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f3c851344b9769..ce3fd808e7ed89 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -51,6 +51,7 @@
+ 
+ ### Internal
+ 
++-   `DropdownMenu` v2: fix flashing menu item styles when using keyboard ([#64873](https://github.com/WordPress/gutenberg/pull/64873)).
+ -   `DropdownMenu` v2: refactor to overloaded naming convention ([#64654](https://github.com/WordPress/gutenberg/pull/64654)).
+ -   `Composite` V2: fix Storybook docgen ([#64682](https://github.com/WordPress/gutenberg/pull/64682)).
+ 
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/dropdown-menu-v2/styles.ts
+index 9e71316b6b9dc5..a39ef83326c3aa 100644
+--- a/packages/components/src/dropdown-menu-v2/styles.ts
++++ b/packages/components/src/dropdown-menu-v2/styles.ts
+@@ -171,16 +171,23 @@ const baseItem = css`
+ 		cursor: not-allowed;
+ 	}
+ 
+-	/* Hover */
+-	&[data-active-item]:not( [data-focus-visible] ):not(
++	/* Active item (including hover)
++	 * Note: we should be able to remove :focus-visible once
++	 * https://github.com/ariakit/ariakit/issues/4083 is fixed and released
++	 */
++	&[data-active-item]:not( [data-focus-visible] ):not( :focus-visible ):not(
+ 			[aria-disabled='true']
+ 		) {
+ 		background-color: ${ COLORS.theme.accent };
+ 		color: ${ COLORS.white };
+ 	}
+ 
+-	/* Keyboard focus (focus-visible) */
+-	&[data-focus-visible] {
++	/* Keyboard focus (focus-visible)
++	 * Note: we should be able to remove :focus-visible once
++	 * https://github.com/ariakit/ariakit/issues/4083 is fixed and released
++	 */
++	&[data-focus-visible],
++	&:focus-visible {
+ 		box-shadow: 0 0 0 1.5px ${ COLORS.theme.accent };
+ 
+ 		/* Only visible in Windows High Contrast mode */

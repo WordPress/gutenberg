@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/palette-edit/index.js b/packages/components/src/palette-edit/index.js
+index ef2abca3cc6b48..a02fcabe2ae18d 100644
+--- a/packages/components/src/palette-edit/index.js
++++ b/packages/components/src/palette-edit/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { kebabCase } from 'lodash';
++import { paramCase as kebabCase } from 'change-case';
+ 
+ /**
+  * WordPress dependencies

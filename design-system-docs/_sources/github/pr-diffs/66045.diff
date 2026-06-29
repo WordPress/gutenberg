@@ -1,0 +1,36 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 870f96308aa462..6d3714d9cb5db6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   `RangeControl`: do not tooltip contents to the DOM when not shown ([#65875](https://github.com/WordPress/gutenberg/pull/65875)).
+ -   `Tabs`: fix skipping indication animation glitch ([#65878](https://github.com/WordPress/gutenberg/pull/65878)).
+ -   `ToggleGroupControl`: Don't autoselect option on first group focus ([#65892](https://github.com/WordPress/gutenberg/pull/65892)).
++-   `Button`: fix `box-shadow` transition for secondary variation ([#66045](https://github.com/WordPress/gutenberg/pull/66045)).
+ 
+ ### Deprecations
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 444e4d397b3ef8..61455a54e26f6b 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -133,7 +133,7 @@
+ 	 */
+ 
+ 	&.is-secondary {
+-		box-shadow: inset 0 0 0 $border-width $components-color-accent;
++		box-shadow: inset 0 0 0 $border-width $components-color-accent, 0 0 0 currentColor;
+ 		outline: 1px solid transparent; // Shown in high contrast mode.
+ 		white-space: nowrap;
+ 		color: $components-color-accent;
+@@ -148,6 +148,10 @@
+ 		&[aria-disabled="true"]:hover:not(:focus) {
+ 			box-shadow: inset 0 0 0 $border-width $gray-300;
+ 		}
++
++		&:focus:not(:disabled) {
++			box-shadow: 0 0 0 currentColor inset, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
++		}
+ 	}
+ 
+ 	/**

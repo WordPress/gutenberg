@@ -1,0 +1,17 @@
+[
+	{
+		"number": 71398,
+		"url": "https://github.com/WordPress/gutenberg/pull/71398",
+		"error": "HTTP 406: {\"message\":\"Sorry, the diff exceeded the maximum number of files (300). Consider using 'List pull requests files' API or locally cloning the repository instead.\",\"errors\":[{\"resource\":\"PullRequest\",\"field\":\"diff\",\"code\":\"too_large\"}],\"documentation_url\":\"https://docs.github.com/rest/pulls/pulls#list"
+	},
+	{
+		"number": 61562,
+		"url": "https://github.com/WordPress/gutenberg/pull/61562",
+		"error": "HTTP 406: {\"message\":\"Sorry, the diff exceeded the maximum number of files (300). Consider using 'List pull requests files' API or locally cloning the repository instead.\",\"errors\":[{\"resource\":\"PullRequest\",\"field\":\"diff\",\"code\":\"too_large\"}],\"documentation_url\":\"https://docs.github.com/rest/pulls/pulls#list"
+	},
+	{
+		"number": 41455,
+		"url": "https://github.com/WordPress/gutenberg/pull/41455",
+		"error": "HTTP 406: {\"message\":\"Sorry, the diff exceeded the maximum number of files (300). Consider using 'List pull requests files' API or locally cloning the repository instead.\",\"errors\":[{\"resource\":\"PullRequest\",\"field\":\"diff\",\"code\":\"too_large\"}],\"documentation_url\":\"https://docs.github.com/rest/pulls/pulls#list"
+	}
+]

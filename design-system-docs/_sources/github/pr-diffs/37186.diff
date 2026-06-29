@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/custom-gradient-bar/control-points.js b/packages/components/src/custom-gradient-bar/control-points.js
+index aeed04ba94bb46..55121e7f1f5018 100644
+--- a/packages/components/src/custom-gradient-bar/control-points.js
++++ b/packages/components/src/custom-gradient-bar/control-points.js
+@@ -225,7 +225,7 @@ function ControlPoints( {
+ 									);
+ 								} }
+ 							/>
+-							{ ! disableRemove && (
++							{ ! disableRemove && controlPoints.length > 2 && (
+ 								<Button
+ 									className="components-custom-gradient-picker__remove-control-point"
+ 									onClick={ () => {

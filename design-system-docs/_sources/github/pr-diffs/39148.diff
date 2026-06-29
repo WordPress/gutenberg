@@ -1,0 +1,141 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6e95c817109bbe..578aa54debafec 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   Normalize `font-family` on `Button`, `ColorPalette`, `ComoboboxControl`, `DateTimePicker`, `FormTokenField`, `InputControl`, `SelectControl`, and `ToggleGroupControl` ([#38969](https://github.com/WordPress/gutenberg/pull/38969)).
+ -   Fix input value selection of `InputControl`-based controls in Firefox and Safari with axial constraint of drag gesture ([#38968](https://github.com/WordPress/gutenberg/pull/38968)).
++-   Fix `UnitControl`'s behavior around updating the unit when a new `value` is passed (i.e. in controlled mode). ([#39148](https://github.com/WordPress/gutenberg/pull/39148)).
+ 
+ ## 19.5.0 (2022-02-23)
+ 
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 8a7a165b25ef97..abb116ccc329ac 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -13,7 +13,7 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { forwardRef, useMemo, useRef } from '@wordpress/element';
++import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import { ENTER } from '@wordpress/keycodes';
+ 
+@@ -70,6 +70,10 @@ function UnitControl(
+ 		}
+ 	);
+ 
++	useEffect( () => {
++		setUnit( initialUnit );
++	}, [ initialUnit ] );
++
+ 	// Stores parsed value for hand-off in state reducer.
+ 	const refParsedValue = useRef< string | null >( null );
+ 
+diff --git a/packages/components/src/unit-control/test/index.js b/packages/components/src/unit-control/test/index.js
+index 2efee9ea337590..fef9814e6a2d5c 100644
+--- a/packages/components/src/unit-control/test/index.js
++++ b/packages/components/src/unit-control/test/index.js
+@@ -1,17 +1,19 @@
+ /**
+  * External dependencies
+  */
+-import { render, fireEvent } from '@testing-library/react';
++import { render, fireEvent, screen } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { UP, DOWN, ENTER, ESCAPE } from '@wordpress/keycodes';
++import { useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import UnitControl from '../';
++import { parseUnit } from '../utils';
+ 
+ const getComponent = () =>
+ 	document.body.querySelector( '.components-unit-control' );
+@@ -25,6 +27,47 @@ const getUnitLabel = () =>
+ const fireKeyDown = ( data ) =>
+ 	fireEvent.keyDown( document.activeElement || document.body, data );
+ 
++const ControlledSyncUnits = () => {
++	const [ state, setState ] = useState( { valueA: '', valueB: '' } );
++
++	// Keep the unit sync'd between the two `UnitControl` instances.
++	const onUnitControlChange = ( fieldName, newValue ) => {
++		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
++		const [ quantity, newUnit ] = parseUnit( newValue );
++
++		if ( ! Number.isFinite( quantity ) ) {
++			return;
++		}
++
++		const nextState = { ...state, [ fieldName ]: newValue };
++
++		Object.entries( state ).forEach( ( [ stateProp, stateValue ] ) => {
++			const [ stateQuantity, stateUnit ] = parseUnit( stateValue );
++
++			if ( stateProp !== fieldName && stateUnit !== newUnit ) {
++				nextState[ stateProp ] = `${ stateQuantity }${ newUnit }`;
++			}
++		} );
++
++		setState( nextState );
++	};
++
++	return (
++		<>
++			<UnitControl
++				label="Field A"
++				value={ state.valueA }
++				onChange={ ( v ) => onUnitControlChange( 'valueA', v ) }
++			/>
++			<UnitControl
++				label="Field B"
++				value={ state.valueB }
++				onChange={ ( v ) => onUnitControlChange( 'valueB', v ) }
++			/>
++		</>
++	);
++};
++
+ describe( 'UnitControl', () => {
+ 	describe( 'Basic rendering', () => {
+ 		it( 'should render', () => {
+@@ -266,6 +309,31 @@ describe( 'UnitControl', () => {
+ 
+ 			expect( state ).toBe( '62%' );
+ 		} );
++
++		it( 'should update unit value when a new raw value is passed', () => {
++			render( <ControlledSyncUnits /> );
++
++			const [ inputA, inputB ] = screen.getAllByRole( 'spinbutton' );
++			const [ selectA, selectB ] = screen.getAllByRole( 'combobox' );
++
++			inputA.focus();
++			fireEvent.change( inputA, { target: { value: '55' } } );
++
++			inputB.focus();
++			fireEvent.change( inputB, { target: { value: '14' } } );
++
++			selectA.focus();
++			fireEvent.change( selectA, { target: { value: 'rem' } } );
++
++			expect( selectA ).toHaveValue( 'rem' );
++			expect( selectB ).toHaveValue( 'rem' );
++
++			selectB.focus();
++			fireEvent.change( selectB, { target: { value: 'vw' } } );
++
++			expect( selectA ).toHaveValue( 'vw' );
++			expect( selectB ).toHaveValue( 'vw' );
++		} );
+ 	} );
+ 
+ 	describe( 'Unit Parser', () => {

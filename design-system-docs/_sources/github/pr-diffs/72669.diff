@@ -1,0 +1,53 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5df18acf3e2d08..b0fcf3cec3255e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,9 @@
+ -   `Button`: Ensure that icons don't shrink ([#72474](https://github.com/WordPress/gutenberg/pull/72474)).
+ -   `Popover`: Fix `onDialogClose` logic to only close the popover if the blur event targets the specific popover instance ([#72376](https://github.com/WordPress/gutenberg/pull/72376)).
+ -   `Badge`: Add max-width for text truncation ([#72653](https://github.com/WordPress/gutenberg/pull/72653)).
++-   `Tabs`: Replace `rem` with `px` in tablist overflow fade ([#72669](https://github.com/WordPress/gutenberg/pull/72669)).
++-   `Modal`: Replace `rem` in heading text with a standard `px` value ([#72669](https://github.com/WordPress/gutenberg/pull/72669)).
++-   Validated form controls: Replace `rem` with `px` in error message ([#72669](https://github.com/WordPress/gutenberg/pull/72669)).
+ 
+ ## 30.6.0 (2025-10-17)
+ 
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index 5e456e973d1f06..c6395f091a0b3c 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -151,7 +151,7 @@
+ 	left: 0;
+ 
+ 	.components-modal__header-heading {
+-		font-size: 1.2rem;
++		font-size: $font-size-x-large;
+ 		font-weight: 600;
+ 	}
+ 
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index 7e0c2534942a41..6a5a7e34906d52 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -58,7 +58,7 @@ export const StyledTabList = styled( Ariakit.TabList )`
+ 			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
+ 	--antialiasing-factor: 100;
+ 	&[aria-orientation='horizontal'] {
+-		--fade-width: 4rem;
++		--fade-width: 64px;
+ 		--fade-gradient-base: transparent 0%, black var( --fade-width );
+ 		--fade-gradient-composed: var( --fade-gradient-base ), black 60%,
+ 			transparent 50%;
+diff --git a/packages/components/src/validated-form-controls/style.scss b/packages/components/src/validated-form-controls/style.scss
+index 8ba79514fd6a94..dc96158a8c7bd7 100644
+--- a/packages/components/src/validated-form-controls/style.scss
++++ b/packages/components/src/validated-form-controls/style.scss
+@@ -61,7 +61,7 @@
+ 	gap: 4px;
+ 	margin: 8px 0 0;
+ 	font-family: $font-family-body;
+-	font-size: 0.75rem;
++	font-size: $font-size-small;
+ 	line-height: 16px; // matches the icon size
+ 	color: $components-color-gray-700;
+ 	animation:

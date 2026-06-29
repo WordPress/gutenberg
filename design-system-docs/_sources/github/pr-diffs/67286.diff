@@ -1,0 +1,45 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 81e325c8d9b3ff..6c2ac9474b798c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -41,6 +41,7 @@
+ -   `SlotFill`: rewrite the `Slot` component from class component to functional ([#67153](https://github.com/WordPress/gutenberg/pull/67153)).
+ -   `Menu.ItemHelpText`: Fix text wrapping to prevent unintended word breaks ([#67011](https://github.com/WordPress/gutenberg/pull/67011)).
+ -   `BorderBoxControl`: Suppress redundant warnings for deprecated 36px size ([#67213](https://github.com/WordPress/gutenberg/pull/67213)).
++-   `CustomGradientPicker`: Prepare `Button`s for 40px default size ([#67286](https://github.com/WordPress/gutenberg/pull/67286)).
+ 
+ ## 28.12.0 (2024-11-16)
+ 
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+index 3911e21e0f9348..d68ee7502e1f63 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+@@ -66,6 +66,7 @@ function ControlPointButton( {
+ 				aria-describedby={ descriptionId }
+ 				aria-haspopup="true"
+ 				aria-expanded={ isOpen }
++				__next40pxDefaultSize
+ 				className={ clsx(
+ 					'components-custom-gradient-picker__control-point-button',
+ 					{
+@@ -349,6 +350,7 @@ function InsertPoint( {
+ 			} }
+ 			renderToggle={ ( { isOpen, onToggle } ) => (
+ 				<Button
++					__next40pxDefaultSize
+ 					aria-expanded={ isOpen }
+ 					aria-haspopup="true"
+ 					onClick={ () => {
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index fea18f340951e5..b9f2bee9dbe4eb 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -47,7 +47,7 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ 		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
+ 		height: inherit;
+ 		width: inherit;
+-		min-width: $grid-unit-20;
++		min-width: $grid-unit-20 !important;
+ 		border-radius: $radius-round;
+ 
+ 		background: $white;

@@ -1,0 +1,293 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f224c9184cdd37..e7f5f5ca7b00fd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   `TextHighlight`: Convert to TypeScript ([#41698](https://github.com/WordPress/gutenberg/pull/41698)).
+ -   `Scrollable`: Convert to TypeScript ([#42016](https://github.com/WordPress/gutenberg/pull/42016)).
+ -   `Spacer`: Complete TypeScript migration ([#42013](https://github.com/WordPress/gutenberg/pull/42013)).
++-   `VisuallyHidden`: Convert to TypeScript ([#42220](https://github.com/WordPress/gutenberg/pull/42220)).
+ -   `TreeSelect`: Refactor away from `_.repeat()` ([#42070](https://github.com/WordPress/gutenberg/pull/42070/)).
+ -   `FocalPointPicker` updated to satisfy `react/exhuastive-deps` eslint rule ([#41520](https://github.com/WordPress/gutenberg/pull/41520)).
+ -   `ColorPicker` updated to satisfy `react/exhuastive-deps` eslint rule ([#41294](https://github.com/WordPress/gutenberg/pull/41294)).
+diff --git a/packages/components/src/visually-hidden/component.js b/packages/components/src/visually-hidden/component.tsx
+similarity index 53%
+rename from packages/components/src/visually-hidden/component.js
+rename to packages/components/src/visually-hidden/component.tsx
+index f0f1f7218655a7..ffaa7f564019b2 100644
+--- a/packages/components/src/visually-hidden/component.js
++++ b/packages/components/src/visually-hidden/component.tsx
+@@ -1,15 +1,24 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem, contextConnect } from '../ui/context';
++import {
++	useContextSystem,
++	contextConnect,
++	WordPressComponentProps,
++} from '../ui/context';
+ import { visuallyHidden } from './styles';
+ import { View } from '../view';
++import type { VisuallyHiddenProps } from './types';
+ 
+-/**
+- * @param {import('../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                                               forwardedRef
+- */
+-function VisuallyHidden( props, forwardedRef ) {
++function UnconnectedVisuallyHidden(
++	props: WordPressComponentProps< VisuallyHiddenProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const { style: styleProp, ...contextProps } = useContextSystem(
+ 		props,
+ 		'VisuallyHidden'
+@@ -27,22 +36,21 @@ function VisuallyHidden( props, forwardedRef ) {
+  * `VisuallyHidden` is a component used to render text intended to be visually
+  * hidden, but will show for alternate devices, for example a screen reader.
+  *
+- * @example
+  * ```jsx
+  * import { VisuallyHidden } from `@wordpress/components`;
+  *
+  * function Example() {
+- * 	return (
+- * 		<VisuallyHidden>
+- * 			<label>Code is Poetry</label>
+- * 		</VisuallyHidden>
+- * 	);
++ *   return (
++ *     <VisuallyHidden>
++ *       <label>Code is Poetry</label>
++ *     </VisuallyHidden>
++ *   );
+  * }
+  * ```
+  */
+-const ConnectedVisuallyHidden = contextConnect(
+-	VisuallyHidden,
++export const VisuallyHidden = contextConnect(
++	UnconnectedVisuallyHidden,
+ 	'VisuallyHidden'
+ );
+ 
+-export default ConnectedVisuallyHidden;
++export default VisuallyHidden;
+diff --git a/packages/components/src/visually-hidden/index.js b/packages/components/src/visually-hidden/index.ts
+similarity index 100%
+rename from packages/components/src/visually-hidden/index.js
+rename to packages/components/src/visually-hidden/index.ts
+diff --git a/packages/components/src/visually-hidden/stories/index.js b/packages/components/src/visually-hidden/stories/index.js
+deleted file mode 100644
+index 497fb0c2ab23d8..00000000000000
+--- a/packages/components/src/visually-hidden/stories/index.js
++++ /dev/null
+@@ -1,42 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { VisuallyHidden } from '..';
+-
+-export default {
+-	title: 'Components/VisuallyHidden',
+-	component: VisuallyHidden,
+-};
+-
+-export const _default = () => (
+-	<>
+-		<VisuallyHidden>This should not show.</VisuallyHidden>
+-		<div>
+-			This text will{ ' ' }
+-			<VisuallyHidden as="span">but not inline </VisuallyHidden> always
+-			show.
+-		</div>
+-	</>
+-);
+-
+-export const withForwardedProps = () => (
+-	<>
+-		Additional props can be passed to VisuallyHidden and are forwarded to
+-		the rendered element.{ ' ' }
+-		<VisuallyHidden as="span" data-id="test">
+-			Check out my data attribute!{ ' ' }
+-		</VisuallyHidden>
+-		Inspect the HTML to see!
+-	</>
+-);
+-
+-export const withAdditionalClassNames = () => (
+-	<>
+-		Additional class names passed to VisuallyHidden extend the component
+-		class name.{ ' ' }
+-		<VisuallyHidden as="label" className="test-input">
+-			Check out my class!{ ' ' }
+-		</VisuallyHidden>
+-		Inspect the HTML to see!
+-	</>
+-);
+diff --git a/packages/components/src/visually-hidden/stories/index.tsx b/packages/components/src/visually-hidden/stories/index.tsx
+new file mode 100644
+index 00000000000000..7ed337b5bac9f3
+--- /dev/null
++++ b/packages/components/src/visually-hidden/stories/index.tsx
+@@ -0,0 +1,66 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { VisuallyHidden } from '..';
++
++const meta: ComponentMeta< typeof VisuallyHidden > = {
++	component: VisuallyHidden,
++	title: 'Components/VisuallyHidden',
++	argTypes: {
++		children: { control: { type: null } },
++		as: { control: { type: 'text' } },
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++export const Default: ComponentStory< typeof VisuallyHidden > = ( args ) => (
++	<>
++		<VisuallyHidden as="span" { ...args }>
++			This should not show.
++		</VisuallyHidden>
++		<div>
++			This text will{ ' ' }
++			<VisuallyHidden as="span" { ...args }>
++				but not inline{ ' ' }
++			</VisuallyHidden>{ ' ' }
++			always show.
++		</div>
++	</>
++);
++
++export const WithForwardedProps: ComponentStory< typeof VisuallyHidden > = (
++	args
++) => (
++	<>
++		Additional props can be passed to VisuallyHidden and are forwarded to
++		the rendered element.{ ' ' }
++		<VisuallyHidden as="span" data-id="test" { ...args }>
++			Check out my data attribute!{ ' ' }
++		</VisuallyHidden>
++		Inspect the HTML to see!
++	</>
++);
++
++export const WithAdditionalClassNames: ComponentStory<
++	typeof VisuallyHidden
++> = ( args ) => (
++	<>
++		Additional class names passed to VisuallyHidden extend the component
++		class name.{ ' ' }
++		<VisuallyHidden as="label" className="test-input" { ...args }>
++			Check out my class!{ ' ' }
++		</VisuallyHidden>
++		Inspect the HTML to see!
++	</>
++);
+diff --git a/packages/components/src/visually-hidden/styles.js b/packages/components/src/visually-hidden/styles.ts
+similarity index 65%
+rename from packages/components/src/visually-hidden/styles.js
+rename to packages/components/src/visually-hidden/styles.ts
+index d061df7d46e963..bf6b171dcf73dd 100644
+--- a/packages/components/src/visually-hidden/styles.js
++++ b/packages/components/src/visually-hidden/styles.ts
+@@ -1,5 +1,9 @@
+-/** @type {import('react').CSSProperties} */
+-export const visuallyHidden = {
++/**
++ * External dependencies
++ */
++import type { CSSProperties } from 'react';
++
++export const visuallyHidden: CSSProperties = {
+ 	border: 0,
+ 	clip: 'rect(1px, 1px, 1px, 1px)',
+ 	WebkitClipPath: 'inset( 50% )',
+diff --git a/packages/components/src/visually-hidden/test/__snapshots__/index.js.snap b/packages/components/src/visually-hidden/test/__snapshots__/index.tsx.snap
+similarity index 100%
+rename from packages/components/src/visually-hidden/test/__snapshots__/index.js.snap
+rename to packages/components/src/visually-hidden/test/__snapshots__/index.tsx.snap
+diff --git a/packages/components/src/visually-hidden/test/index.js b/packages/components/src/visually-hidden/test/index.js
+deleted file mode 100644
+index 6fd0e2073c2e67..00000000000000
+--- a/packages/components/src/visually-hidden/test/index.js
++++ /dev/null
+@@ -1,19 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { VisuallyHidden } from '..';
+-
+-describe( 'VisuallyHidden', () => {
+-	it( 'should render correctly', () => {
+-		const { container } = render(
+-			<VisuallyHidden>This is hidden</VisuallyHidden>
+-		);
+-
+-		expect( container.firstChild ).toMatchSnapshot();
+-	} );
+-} );
+diff --git a/packages/components/src/visually-hidden/test/index.tsx b/packages/components/src/visually-hidden/test/index.tsx
+new file mode 100644
+index 00000000000000..9c66dbe4685a8e
+--- /dev/null
++++ b/packages/components/src/visually-hidden/test/index.tsx
+@@ -0,0 +1,17 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { VisuallyHidden } from '..';
++
++describe( 'VisuallyHidden', () => {
++	it( 'should render correctly', () => {
++		const text = 'This is hidden';
++		render( <VisuallyHidden>{ text }</VisuallyHidden> );
++		expect( screen.getByText( text ) ).toMatchSnapshot();
++	} );
++} );
+diff --git a/packages/components/src/visually-hidden/types.ts b/packages/components/src/visually-hidden/types.ts
+new file mode 100644
+index 00000000000000..bc05e82d6aeb95
+--- /dev/null
++++ b/packages/components/src/visually-hidden/types.ts
+@@ -0,0 +1,11 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++export type VisuallyHiddenProps = {
++	/**
++	 * The children elements.
++	 */
++	children: ReactNode;
++};

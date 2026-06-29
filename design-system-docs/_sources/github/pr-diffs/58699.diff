@@ -1,0 +1,130 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e06b7218c7b5db..a72abbabaee244 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Breaking Changes
+ 
++-   `CustomGradientPicker`: Remove deprecated `__nextHasNoMargin` prop and promote to default behavior ([#58699](https://github.com/WordPress/gutenberg/pull/58699)).
+ -   `AnglePickerControl`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#58700](https://github.com/WordPress/gutenberg/pull/58700)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/custom-gradient-picker/index.tsx b/packages/components/src/custom-gradient-picker/index.tsx
+index da777692e4db4e..66add261ce5e67 100644
+--- a/packages/components/src/custom-gradient-picker/index.tsx
++++ b/packages/components/src/custom-gradient-picker/index.tsx
+@@ -1,13 +1,11 @@
+ /**
+  * External dependencies
+  */
+-import classnames from 'classnames';
+ import type gradientParser from 'gradient-parser';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import deprecated from '@wordpress/deprecated';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+@@ -140,8 +138,6 @@ const GradientTypePicker = ( {
+  * ```
+  */
+ export function CustomGradientPicker( {
+-	/** Start opting into the new margin-free styles that will become the default in a future version. */
+-	__nextHasNoMargin = false,
+ 	value,
+ 	onChange,
+ 	__experimentalIsRenderedInSidebar = false,
+@@ -165,24 +161,8 @@ export function CustomGradientPicker( {
+ 		};
+ 	} );
+ 
+-	if ( ! __nextHasNoMargin ) {
+-		deprecated(
+-			'Outer margin styles for wp.components.CustomGradientPicker',
+-			{
+-				since: '6.1',
+-				version: '6.4',
+-				hint: 'Set the `__nextHasNoMargin` prop to true to start opting into the new styles, which will become the default in a future version',
+-			}
+-		);
+-	}
+-
+ 	return (
+-		<VStack
+-			spacing={ 4 }
+-			className={ classnames( 'components-custom-gradient-picker', {
+-				'is-next-has-no-margin': __nextHasNoMargin,
+-			} ) }
+-		>
++		<VStack spacing={ 4 } className="components-custom-gradient-picker">
+ 			<CustomGradientBar
+ 				__experimentalIsRenderedInSidebar={
+ 					__experimentalIsRenderedInSidebar
+diff --git a/packages/components/src/custom-gradient-picker/stories/index.story.tsx b/packages/components/src/custom-gradient-picker/stories/index.story.tsx
+index 6d19157238d28c..3be8eb36e5a3c2 100644
+--- a/packages/components/src/custom-gradient-picker/stories/index.story.tsx
++++ b/packages/components/src/custom-gradient-picker/stories/index.story.tsx
+@@ -40,6 +40,3 @@ const CustomGradientPickerWithState: StoryFn<
+ };
+ 
+ export const Default = CustomGradientPickerWithState.bind( {} );
+-Default.args = {
+-	__nextHasNoMargin: true,
+-};
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index a1a9a699a71a44..e7828127ff8d33 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -1,12 +1,5 @@
+ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 16px handles inside, that leaves 32px padding, half of which is 1å6.
+ 
+-.components-custom-gradient-picker {
+-	&:not(.is-next-has-no-margin) {
+-		margin-top: $grid-unit-15;
+-		margin-bottom: $grid-unit-30;
+-	}
+-}
+-
+ .components-custom-gradient-picker__gradient-bar {
+ 	border-radius: $radius-block-ui;
+ 	width: 100%;
+diff --git a/packages/components/src/custom-gradient-picker/types.ts b/packages/components/src/custom-gradient-picker/types.ts
+index f0dc50094a5b6e..f9efb90799daf2 100644
+--- a/packages/components/src/custom-gradient-picker/types.ts
++++ b/packages/components/src/custom-gradient-picker/types.ts
+@@ -10,6 +10,8 @@ export type CustomGradientPickerProps = {
+ 	 * can be safely removed once this happens.)
+ 	 *
+ 	 * @default false
++	 * @deprecated Default behavior since WP 6.5. Prop can be safely removed.
++	 * @ignore
+ 	 */
+ 	__nextHasNoMargin?: boolean;
+ 	/**
+diff --git a/packages/components/src/gradient-picker/index.tsx b/packages/components/src/gradient-picker/index.tsx
+index 52e7e716642da9..be6289eb5776dc 100644
+--- a/packages/components/src/gradient-picker/index.tsx
++++ b/packages/components/src/gradient-picker/index.tsx
+@@ -249,7 +249,6 @@ export function GradientPicker( {
+ 			<VStack spacing={ gradients.length ? 4 : 0 }>
+ 				{ ! disableCustomGradients && (
+ 					<CustomGradientPicker
+-						__nextHasNoMargin
+ 						__experimentalIsRenderedInSidebar={
+ 							__experimentalIsRenderedInSidebar
+ 						}
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index 694b7ad9511908..5c9d0cf77be8ad 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -152,7 +152,6 @@ function ColorPickerPopover< T extends Color | Gradient >( {
+ 			{ isGradient && (
+ 				<div className="components-palette-edit__popover-gradient-picker">
+ 					<CustomGradientPicker
+-						__nextHasNoMargin
+ 						__experimentalIsRenderedInSidebar
+ 						value={ element.gradient }
+ 						onChange={ ( newGradient ) => {

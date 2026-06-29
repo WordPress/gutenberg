@@ -1,0 +1,36 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e8d65cfd9ce837..fd89e5e01fd0f6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ - Add `text-wrap: balance` fallback to all instances of `text-wrap: pretty` for greater cross browser compatibility. ([#62233](https://github.com/WordPress/gutenberg/pull/62233))
+ 
++### Bug Fixes
++
++-   `Tabs`: Prevent accidental overflow in indicator ([#61979](https://github.com/WordPress/gutenberg/pull/61979)).
++
+ ## 28.0.0 (2024-05-31)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index cbd4290f06bff2..917bcbe755ee01 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -53,10 +53,12 @@ function useTrackElementOffset(
+ 
+ 		function updateIndicator( element: HTMLElement ) {
+ 			setIndicatorPosition( {
+-				left: element.offsetLeft,
+-				top: element.offsetTop,
+-				width: element.offsetWidth,
+-				height: element.offsetHeight,
++				// Workaround to prevent unwanted scrollbars, see:
++				// https://github.com/WordPress/gutenberg/pull/61979
++				left: Math.max( element.offsetLeft - 1, 0 ),
++				top: Math.max( element.offsetTop - 1, 0 ),
++				width: parseFloat( getComputedStyle( element ).width ),
++				height: parseFloat( getComputedStyle( element ).height ),
+ 			} );
+ 			updateCallbackRef.current?.();
+ 		}

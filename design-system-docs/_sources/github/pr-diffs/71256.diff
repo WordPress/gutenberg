@@ -1,0 +1,465 @@
+diff --git a/packages/block-editor/src/components/inserter/media-tab/media-tab.js b/packages/block-editor/src/components/inserter/media-tab/media-tab.js
+index ca901a127e5b42..fa3b53ec41584b 100644
+--- a/packages/block-editor/src/components/inserter/media-tab/media-tab.js
++++ b/packages/block-editor/src/components/inserter/media-tab/media-tab.js
+@@ -72,19 +72,11 @@ function MediaTab( {
+ 							render={ ( { open } ) => (
+ 								<Button
+ 									__next40pxDefaultSize
+-									onClick={ ( event ) => {
+-										// Safari doesn't emit a focus event on button elements when
+-										// clicked and we need to manually focus the button here.
+-										// The reason is that core's Media Library modal explicitly triggers a
+-										// focus event and therefore a `blur` event is triggered on a different
+-										// element, which doesn't contain the `data-unstable-ignore-focus-outside-for-relatedtarget`
+-										// attribute making the Inserter dialog to close.
+-										event.target.focus();
++									onClick={ () => {
+ 										open();
+ 									} }
+ 									className="block-editor-inserter__media-library-button"
+ 									variant="secondary"
+-									data-unstable-ignore-focus-outside-for-relatedtarget=".media-modal"
+ 								>
+ 									{ __( 'Open Media Library' ) }
+ 								</Button>
+diff --git a/packages/components/src/higher-order/with-focus-outside/test/index.tsx b/packages/components/src/higher-order/with-focus-outside/test/index.tsx
+index a53a1cf11298df..793b38e0112378 100644
+--- a/packages/components/src/higher-order/with-focus-outside/test/index.tsx
++++ b/packages/components/src/higher-order/with-focus-outside/test/index.tsx
+@@ -83,7 +83,7 @@ describe( 'withFocusOutside', () => {
+ 		await waitFor( () => expect( onFocusOutside ).not.toHaveBeenCalled() );
+ 	} );
+ 
+-	it( 'should call handler if focus doesn’t shift to element within component', async () => {
++	it( "should call handler if focus doesn't shift to element within component", async () => {
+ 		render( <TestComponent onFocusOutside={ onFocusOutside } /> );
+ 
+ 		const input = screen.getByRole( 'textbox' );
+@@ -92,32 +92,4 @@ describe( 'withFocusOutside', () => {
+ 
+ 		await waitFor( () => expect( onFocusOutside ).toHaveBeenCalled() );
+ 	} );
+-
+-	it( 'should not call handler if focus shifts outside the component when the document does not have focus', async () => {
+-		render( <TestComponent onFocusOutside={ onFocusOutside } /> );
+-
+-		// Force document.hasFocus() to return false to simulate the window/document losing focus
+-		// See https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
+-		document.hasFocus = () => false;
+-
+-		const input = screen.getByRole( 'textbox' );
+-		input.focus();
+-		input.blur();
+-
+-		await waitFor( () => expect( onFocusOutside ).not.toHaveBeenCalled() );
+-	} );
+-
+-	it( 'should cancel check when unmounting while queued', async () => {
+-		const { rerender } = render(
+-			<TestComponent onFocusOutside={ onFocusOutside } />
+-		);
+-
+-		const input = screen.getByRole( 'textbox' );
+-		input.focus();
+-		input.blur();
+-
+-		rerender( <div /> );
+-
+-		await waitFor( () => expect( onFocusOutside ).not.toHaveBeenCalled() );
+-	} );
+ } );
+diff --git a/packages/compose/src/hooks/use-focus-outside/index.ts b/packages/compose/src/hooks/use-focus-outside/index.ts
+index 812621a09d21d0..45b060174f277f 100644
+--- a/packages/compose/src/hooks/use-focus-outside/index.ts
++++ b/packages/compose/src/hooks/use-focus-outside/index.ts
+@@ -3,58 +3,7 @@
+  */
+ import { useCallback, useEffect, useRef } from '@wordpress/element';
+ 
+-/**
+- * Input types which are classified as button types, for use in considering
+- * whether element is a (focus-normalized) button.
+- */
+-const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
+-
+-/**
+- * List of HTML button elements subject to focus normalization
+- *
+- * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+- */
+-type FocusNormalizedButton =
+-	| HTMLButtonElement
+-	| HTMLLinkElement
+-	| HTMLInputElement;
+-
+-/**
+- * Returns true if the given element is a button element subject to focus
+- * normalization, or false otherwise.
+- *
+- * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+- *
+- * @param eventTarget The target from a mouse or touch event.
+- *
+- * @return Whether the element is a button element subject to focus normalization.
+- */
+-function isFocusNormalizedButton(
+-	eventTarget: EventTarget
+-): eventTarget is FocusNormalizedButton {
+-	if ( ! ( eventTarget instanceof window.HTMLElement ) ) {
+-		return false;
+-	}
+-	switch ( eventTarget.nodeName ) {
+-		case 'A':
+-		case 'BUTTON':
+-			return true;
+-
+-		case 'INPUT':
+-			return INPUT_BUTTON_TYPES.includes(
+-				( eventTarget as HTMLInputElement ).type
+-			);
+-	}
+-
+-	return false;
+-}
+-
+ type UseFocusOutsideReturn = {
+-	onFocus: React.FocusEventHandler;
+-	onMouseDown: React.MouseEventHandler;
+-	onMouseUp: React.MouseEventHandler;
+-	onTouchStart: React.TouchEventHandler;
+-	onTouchEnd: React.TouchEventHandler;
+ 	onBlur: React.FocusEventHandler;
+ };
+ 
+@@ -72,112 +21,67 @@ export default function useFocusOutside(
+ 	onFocusOutside: ( ( event: React.FocusEvent ) => void ) | undefined
+ ): UseFocusOutsideReturn {
+ 	const currentOnFocusOutsideRef = useRef( onFocusOutside );
++
+ 	useEffect( () => {
+ 		currentOnFocusOutsideRef.current = onFocusOutside;
+ 	}, [ onFocusOutside ] );
+ 
+-	const preventBlurCheckRef = useRef( false );
++	const onBlur: React.FocusEventHandler = useCallback( ( event ) => {
++		const containerElement = event.currentTarget as HTMLElement;
+ 
+-	const blurCheckTimeoutIdRef = useRef< number | undefined >();
+-
+-	/**
+-	 * Cancel a blur check timeout.
+-	 */
+-	const cancelBlurCheck = useCallback( () => {
+-		clearTimeout( blurCheckTimeoutIdRef.current );
+-	}, [] );
+-
+-	// Cancel blur checks on unmount.
+-	useEffect( () => {
+-		return () => cancelBlurCheck();
+-	}, [] );
+-
+-	// Cancel a blur check if the callback or ref is no longer provided.
+-	useEffect( () => {
+-		if ( ! onFocusOutside ) {
+-			cancelBlurCheck();
+-		}
+-	}, [ onFocusOutside, cancelBlurCheck ] );
+-
+-	/**
+-	 * Handles a mousedown or mouseup event to respectively assign and
+-	 * unassign a flag for preventing blur check on button elements. Some
+-	 * browsers, namely Firefox and Safari, do not emit a focus event on
+-	 * button elements when clicked, while others do. The logic here
+-	 * intends to normalize this as treating click on buttons as focus.
+-	 *
+-	 * @param event
+-	 * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+-	 */
+-	const normalizeButtonFocus: React.EventHandler<
+-		React.MouseEvent | React.TouchEvent
+-	> = useCallback( ( event ) => {
+-		const { type, target } = event;
+-		const isInteractionEnd = [ 'mouseup', 'touchend' ].includes( type );
+-
+-		if ( isInteractionEnd ) {
+-			preventBlurCheckRef.current = false;
+-		} else if ( isFocusNormalizedButton( target ) ) {
+-			preventBlurCheckRef.current = true;
+-		}
+-	}, [] );
+-
+-	/**
+-	 * A callback triggered when a blur event occurs on the element the handler
+-	 * is bound to.
+-	 *
+-	 * Calls the `onFocusOutside` callback in an immediate timeout if focus has
+-	 * move outside the bound element and is still within the document.
+-	 */
+-	const queueBlurCheck: React.FocusEventHandler = useCallback( ( event ) => {
+-		// React does not allow using an event reference asynchronously
+-		// due to recycling behavior, except when explicitly persisted.
+-		event.persist();
+-
+-		// Skip blur check if clicking button. See `normalizeButtonFocus`.
+-		if ( preventBlurCheckRef.current ) {
+-			return;
+-		}
+-
+-		// The usage of this attribute should be avoided. The only use case
+-		// would be when we load modals that are not React components and
+-		// therefore don't exist in the React tree. An example is opening
+-		// the Media Library modal from another dialog.
+-		// This attribute should contain a selector of the related target
+-		// we want to ignore, because we still need to trigger the blur event
+-		// on all other cases.
+-		const ignoreForRelatedTarget = event.target.getAttribute(
+-			'data-unstable-ignore-focus-outside-for-relatedtarget'
+-		);
++		// Catch if a popover is spawning another popover.
++		// Does our container element contain an element with a popover, and that popover is expanded?
++		// If so, we don't want to run the onFocusOutside callback because it's spawning another popover
++		// and will need focus returned to it.
+ 		if (
+-			ignoreForRelatedTarget &&
+-			event.relatedTarget?.closest( ignoreForRelatedTarget )
++			containerElement?.querySelector(
++				'[aria-haspopup][aria-expanded="true"]:not([aria-haspopup="false"])'
++			)
+ 		) {
++			// There is a bug here.
++			// - From the sidebar color selector
++			// - Click to change a color (Background, ex)
++			// - Color selector Popover opens
++			// - Click to select a custom color
++			// - Another popover opens
++			// - Click onto the canvas
++			// - Neweset popover closes
++			// - Old popover remains open
++			// Bug: How do we know to close all popovers when we are no longer able to track focus from this container?
+ 			return;
+ 		}
+ 
+-		blurCheckTimeoutIdRef.current = setTimeout( () => {
+-			// If document is not focused then focus should remain
+-			// inside the wrapped component and therefore we cancel
+-			// this blur event thereby leaving focus in place.
+-			// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
+-			if ( ! document.hasFocus() ) {
+-				event.preventDefault();
+-				return;
+-			}
++		// Use event.relatedTarget instead of activeElement since activeElement and target
++		// might be body during the first blur event. Also, we're concerned with where focus
++		// is moving to (inside or outside the container), not where it came from.
++		const relatedTarget = event.relatedTarget as HTMLElement;
+ 
+-			if ( 'function' === typeof currentOnFocusOutsideRef.current ) {
+-				currentOnFocusOutsideRef.current( event );
+-			}
+-		}, 0 );
++		// Focus is outside the container and we should run the onFocusOutside callback if:
++		// - No target element
++		// - No container element
++		// - Target element is not contained within the container
++		if (
++			! relatedTarget ||
++			! containerElement ||
++			! containerElement.contains( relatedTarget )
++		) {
++			// Wrapping in setTimeout to run the check after focus and rendering resolves.
++			// This is an issue when clicking the same button that opened the popover. Example:
++			// - Click button to open popover
++			// - Popover opens
++			// - Click button to close popover
++			//    - onMouseDown event is triggered on the button
++			//    - Blur event is triggered, which runs the onFocusOutside (onClose)
++			//    - Popover closes
++			//    - Button is now in a state of having a CLOSED popover
++			//    - onMouseUp event is triggered on the button, which opens the popover again
++			setTimeout( () => {
++				if ( 'function' === typeof currentOnFocusOutsideRef.current ) {
++					currentOnFocusOutsideRef.current( event );
++				}
++			}, 0 );
++		}
+ 	}, [] );
+ 
+-	return {
+-		onFocus: cancelBlurCheck,
+-		onMouseDown: normalizeButtonFocus,
+-		onMouseUp: normalizeButtonFocus,
+-		onTouchStart: normalizeButtonFocus,
+-		onTouchEnd: normalizeButtonFocus,
+-		onBlur: queueBlurCheck,
+-	};
++	return { onBlur };
+ }
+diff --git a/packages/compose/src/hooks/use-focus-outside/test/index.js b/packages/compose/src/hooks/use-focus-outside/test/index.js
+index e809689b226e20..ff43e4c145e670 100644
+--- a/packages/compose/src/hooks/use-focus-outside/test/index.js
++++ b/packages/compose/src/hooks/use-focus-outside/test/index.js
+@@ -1,3 +1,8 @@
++/**
++ * WordPress dependencies
++ */
++import { useRef } from '@wordpress/element';
++
+ /**
+  * External dependencies
+  */
+@@ -9,20 +14,25 @@ import userEvent from '@testing-library/user-event';
+  */
+ import useFocusOutside from '../';
+ 
+-const FocusOutsideComponent = ( { onFocusOutside: callback } ) => (
+-	<div>
+-		{ /* Wrapper */ }
+-		<div { ...useFocusOutside( callback ) }>
+-			<input type="text" />
+-			<button>Button inside the wrapper</button>
+-			<iframe title="test-iframe">
+-				<button>Inside the iframe</button>
+-			</iframe>
++const FocusOutsideComponent = ( { onFocusOutside: callback } ) => {
++	const containerRef = useRef( null );
++	const { onBlur } = useFocusOutside( callback, containerRef );
++
++	return (
++		<div>
++			{ /* Wrapper */ }
++			<div ref={ containerRef } onBlur={ onBlur }>
++				<input type="text" />
++				<button>Button inside the wrapper</button>
++				<iframe title="test-iframe">
++					<button>Inside the iframe</button>
++				</iframe>
++			</div>
++
++			<button>Button outside the wrapper</button>
+ 		</div>
+-
+-		<button>Button outside the wrapper</button>
+-	</div>
+-);
++	);
++};
+ 
+ describe( 'useFocusOutside', () => {
+ 	it( 'should not call handler if focus shifts to element within component', async () => {
+@@ -85,56 +95,4 @@ describe( 'useFocusOutside', () => {
+ 
+ 		expect( mockOnFocusOutside ).toHaveBeenCalled();
+ 	} );
+-
+-	it( 'should not call handler if focus shifts outside the component when the document does not have focus', async () => {
+-		// Force document.hasFocus() to return false to simulate the window/document losing focus
+-		// See https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
+-		const mockedDocumentHasFocus = jest
+-			.spyOn( document, 'hasFocus' )
+-			.mockImplementation( () => false );
+-		const mockOnFocusOutside = jest.fn();
+-		const user = userEvent.setup();
+-
+-		render(
+-			<FocusOutsideComponent onFocusOutside={ mockOnFocusOutside } />
+-		);
+-
+-		// Click and focus button inside the wrapper, then click and focus
+-		// a button outside the wrapper.
+-		await user.click(
+-			screen.getByRole( 'button', { name: 'Button inside the wrapper' } )
+-		);
+-		await user.click(
+-			screen.getByRole( 'button', { name: 'Button outside the wrapper' } )
+-		);
+-
+-		// The handler is not called thanks to the mocked return value of
+-		// `document.hasFocus()`
+-		expect( mockOnFocusOutside ).not.toHaveBeenCalled();
+-
+-		// Restore the `document.hasFocus()` function to its original implementation.
+-		mockedDocumentHasFocus.mockRestore();
+-	} );
+-
+-	it( 'should cancel check when unmounting while queued', async () => {
+-		const mockOnFocusOutside = jest.fn();
+-		const user = userEvent.setup();
+-
+-		const { unmount } = render(
+-			<FocusOutsideComponent onFocusOutside={ mockOnFocusOutside } />
+-		);
+-
+-		// Click and focus button inside the wrapper.
+-		const button = screen.getByRole( 'button', {
+-			name: 'Button inside the wrapper',
+-		} );
+-		await user.click( button );
+-
+-		// Simulate a blur event and the wrapper unmounting while the blur event
+-		// handler is queued
+-		button.blur();
+-		unmount();
+-
+-		expect( mockOnFocusOutside ).not.toHaveBeenCalled();
+-	} );
+ } );
+diff --git a/packages/edit-widgets/src/components/more-menu/index.js b/packages/edit-widgets/src/components/more-menu/index.js
+index 2613f3d605ff85..06e5ded9d34ccd 100644
+--- a/packages/edit-widgets/src/components/more-menu/index.js
++++ b/packages/edit-widgets/src/components/more-menu/index.js
+@@ -75,6 +75,8 @@ export default function MoreMenu() {
+ 								onClick={ () => {
+ 									setIsKeyboardShortcutsModalVisible( true );
+ 								} }
++								aria-expanded={ isKeyboardShortcutsModalActive }
++								aria-haspopup="dialog"
+ 								shortcut={ displayShortcut.access( 'h' ) }
+ 							>
+ 								{ __( 'Keyboard shortcuts' ) }
+diff --git a/packages/editor/src/components/more-menu/index.js b/packages/editor/src/components/more-menu/index.js
+index f5eaa45e4ed696..40163a45102eac 100644
+--- a/packages/editor/src/components/more-menu/index.js
++++ b/packages/editor/src/components/more-menu/index.js
+@@ -26,13 +26,24 @@ import ToolsMoreMenuGroup from './tools-more-menu-group';
+ import ViewMoreMenuGroup from './view-more-menu-group';
+ import { store as editorStore } from '../../store';
+ 
++const KEYBOARD_SHORTCUT_HELP_MODAL_NAME = 'editor/keyboard-shortcut-help';
++
+ export default function MoreMenu() {
+ 	const { openModal } = useDispatch( interfaceStore );
+ 	const { set: setPreference } = useDispatch( preferencesStore );
+ 	const { toggleDistractionFree } = useDispatch( editorStore );
+-	const showIconLabels = useSelect(
+-		( select ) =>
+-			select( preferencesStore ).get( 'core', 'showIconLabels' ),
++	const { isKeyboardShortcutsModalActive, showIconLabels } = useSelect(
++		( select ) => {
++			return {
++				isKeyboardShortcutsModalActive: select(
++					interfaceStore
++				).isModalActive( KEYBOARD_SHORTCUT_HELP_MODAL_NAME ),
++				showIconLabels: select( preferencesStore ).get(
++					'core',
++					'showIconLabels'
++				),
++			};
++		},
+ 		[]
+ 	);
+ 
+@@ -118,8 +129,12 @@ export default function MoreMenu() {
+ 						<MenuGroup label={ __( 'Tools' ) }>
+ 							<MenuItem
+ 								onClick={ () =>
+-									openModal( 'editor/keyboard-shortcut-help' )
++									openModal(
++										KEYBOARD_SHORTCUT_HELP_MODAL_NAME
++									)
+ 								}
++								aria-expanded={ isKeyboardShortcutsModalActive }
++								aria-haspopup="dialog"
+ 								shortcut={ displayShortcut.access( 'h' ) }
+ 							>
+ 								{ __( 'Keyboard shortcuts' ) }

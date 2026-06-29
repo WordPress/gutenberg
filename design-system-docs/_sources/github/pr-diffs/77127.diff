@@ -1,0 +1,124 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b0cd094e4ae81b..f9b75fd7d94a66 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `RadioControl`: Add support for disabled radio group [#77127](https://github.com/WordPress/gutenberg/pull/77127).
+ -   `FormTokenField`: Fix disabled styles. [#77137](https://github.com/WordPress/gutenberg/pull/77137)
+ -   `Textarea`: Fix disabled styles [#77129](https://github.com/WordPress/gutenberg/pull/77129).
+ -   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).
+diff --git a/packages/components/src/radio-control/index.tsx b/packages/components/src/radio-control/index.tsx
+index e8f8ecaa78fbad..b2d3c529f45dd1 100644
+--- a/packages/components/src/radio-control/index.tsx
++++ b/packages/components/src/radio-control/index.tsx
+@@ -67,6 +67,7 @@ export function RadioControl(
+ 		onChange,
+ 		onClick,
+ 		hideLabelFromVision,
++		disabled,
+ 		options = [],
+ 		id: preferredId,
+ 		...additionalProps
+@@ -89,6 +90,7 @@ export function RadioControl(
+ 			id={ id }
+ 			role="radiogroup"
+ 			className={ clsx( className, 'components-radio-control' ) }
++			disabled={ disabled }
+ 			aria-describedby={ !! help ? generateHelpId( id ) : undefined }
+ 		>
+ 			{ hideLabelFromVision ? (
+diff --git a/packages/components/src/radio-control/style.scss b/packages/components/src/radio-control/style.scss
+index d7a2a1f1d9217c..4df3bb7ea6a4d9 100644
+--- a/packages/components/src/radio-control/style.scss
++++ b/packages/components/src/radio-control/style.scss
+@@ -10,6 +10,7 @@
+ 
+ 	font-family: $default-font;
+ 	font-size: $default-font-size;
++
+ }
+ 
+ .components-radio-control__group-wrapper.has-help {
+@@ -34,7 +35,10 @@
+ 	margin: 0;
+ 	padding: 0;
+ 	appearance: none;
+-	cursor: pointer;
++
++	&:not(:disabled) {
++		cursor: pointer;
++	}
+ 
+ 	&:focus {
+ 		@include button-style-outset__focus(var(--wp-admin-theme-color));
+@@ -49,13 +53,28 @@
+ 			border-radius: $radius-round;
+ 		}
+ 	}
++
++	&:disabled {
++		background: $components-color-gray-100;
++		border: 1px solid $components-color-gray-300;
++		opacity: 1; // Override style from wp-admin forms.css.
++
++		&:checked::before {
++			border-color: $components-color-gray-300;
++			opacity: 1; // Override style from wp-admin forms.css.
++
++		}
++	}
+ }
+ 
+ .components-radio-control__label {
+ 	grid-column: 2;
+ 	grid-row: 1;
+ 
+-	cursor: pointer;
++	.components-radio-control:not(:disabled) & {
++		cursor: pointer;
++	}
++
+ 	line-height: $radio-input-size-sm;
+ 
+ 	@include break-small() {
+diff --git a/packages/components/src/radio-control/test/index.tsx b/packages/components/src/radio-control/test/index.tsx
+index 96806b3b2e4cea..03240d9e982b7f 100644
+--- a/packages/components/src/radio-control/test/index.tsx
++++ b/packages/components/src/radio-control/test/index.tsx
+@@ -82,6 +82,16 @@ describe.each( [
+ 			).toBeVisible();
+ 		} );
+ 
++		it( 'should disable the radio group when `disabled` is true', () => {
++			render(
++				<Component { ...defaultProps } disabled onChange={ () => {} } />
++			);
++
++			expect(
++				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
++			).toBeDisabled();
++		} );
++
+ 		it( 'should describe the radio group with the help text', () => {
+ 			const onChangeSpy = jest.fn();
+ 			render(
+diff --git a/packages/components/src/radio-control/types.ts b/packages/components/src/radio-control/types.ts
+index d1c3aa40d96481..18484bba541fec 100644
+--- a/packages/components/src/radio-control/types.ts
++++ b/packages/components/src/radio-control/types.ts
+@@ -7,6 +7,12 @@ export type RadioControlProps = Pick<
+ 	BaseControlProps,
+ 	'label' | 'help' | 'hideLabelFromVision'
+ > & {
++	/**
++	 * Whether the radio group should be disabled.
++	 *
++	 * @default false
++	 */
++	disabled?: boolean;
+ 	/**
+ 	 * A function that receives the value of the new option that is being
+ 	 * selected as input.

@@ -1,0 +1,1341 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e8beb4717d1e00..98d725769c4eb6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -35,6 +35,7 @@
+ -   `Tabs`: do not render hidden content ([#57046](https://github.com/WordPress/gutenberg/pull/57046)).
+ -   `Tabs`: improve hover and text alignment styles ([#57275](https://github.com/WordPress/gutenberg/pull/57275)).
+ -   `Tabs`: make sure `Tab`s are associated to the right `TabPanel`s, regardless of the order they're rendered in ([#57033](https://github.com/WordPress/gutenberg/pull/57033)).
++-   `BoxControl`: Update design ([#56665](https://github.com/WordPress/gutenberg/pull/56665)).
+ 
+ ## 25.14.0 (2023-12-13)
+ 
+diff --git a/packages/components/src/box-control/all-input-control.tsx b/packages/components/src/box-control/all-input-control.tsx
+index b66e10fdb4ce3f..9c18694bbd0b60 100644
+--- a/packages/components/src/box-control/all-input-control.tsx
++++ b/packages/components/src/box-control/all-input-control.tsx
+@@ -1,15 +1,25 @@
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
+ /**
+  * Internal dependencies
+  */
+ import type { UnitControlProps } from '../unit-control/types';
++import {
++	FlexedRangeControl,
++	StyledUnitControl,
++} from './styles/box-control-styles';
++import { HStack } from '../h-stack';
+ import type { BoxControlInputControlProps } from './types';
+-import UnitControl from './unit-control';
++import { parseQuantityAndUnitFromRawValue } from '../unit-control';
+ import {
+ 	LABELS,
+ 	applyValueToSides,
+ 	getAllValue,
+ 	isValuesMixed,
+ 	isValuesDefined,
++	CUSTOM_VALUE_SETTINGS,
+ } from './utils';
+ 
+ const noop = () => {};
+@@ -17,26 +27,29 @@ const noop = () => {};
+ export default function AllInputControl( {
+ 	onChange = noop,
+ 	onFocus = noop,
+-	onHoverOn = noop,
+-	onHoverOff = noop,
+ 	values,
+ 	sides,
+ 	selectedUnits,
+ 	setSelectedUnits,
+ 	...props
+ }: BoxControlInputControlProps ) {
++	const inputId = useInstanceId( AllInputControl, 'box-control-input-all' );
++
+ 	const allValue = getAllValue( values, selectedUnits, sides );
+ 	const hasValues = isValuesDefined( values );
+ 	const isMixed = hasValues && isValuesMixed( values, selectedUnits, sides );
+ 	const allPlaceholder = isMixed ? LABELS.mixed : undefined;
+ 
++	const [ parsedQuantity, parsedUnit ] =
++		parseQuantityAndUnitFromRawValue( allValue );
++
+ 	const handleOnFocus: React.FocusEventHandler< HTMLInputElement > = (
+ 		event
+ 	) => {
+ 		onFocus( event, { side: 'all' } );
+ 	};
+ 
+-	const handleOnChange: UnitControlProps[ 'onChange' ] = ( next ) => {
++	const onValueChange = ( next?: string ) => {
+ 		const isNumeric = next !== undefined && ! isNaN( parseFloat( next ) );
+ 		const nextValue = isNumeric ? next : undefined;
+ 		const nextValues = applyValueToSides( values, nextValue, sides );
+@@ -44,6 +57,12 @@ export default function AllInputControl( {
+ 		onChange( nextValues );
+ 	};
+ 
++	const sliderOnChange = ( next?: number ) => {
++		onValueChange(
++			next !== undefined ? [ next, parsedUnit ].join( '' ) : undefined
++		);
++	};
++
+ 	// Set selected unit so it can be used as fallback by unlinked controls
+ 	// when individual sides do not have a value containing a unit.
+ 	const handleOnUnitChange: UnitControlProps[ 'onUnitChange' ] = ( unit ) => {
+@@ -51,36 +70,37 @@ export default function AllInputControl( {
+ 		setSelectedUnits( newUnits );
+ 	};
+ 
+-	const handleOnHoverOn = () => {
+-		onHoverOn( {
+-			top: true,
+-			bottom: true,
+-			left: true,
+-			right: true,
+-		} );
+-	};
+-
+-	const handleOnHoverOff = () => {
+-		onHoverOff( {
+-			top: false,
+-			bottom: false,
+-			left: false,
+-			right: false,
+-		} );
+-	};
+-
+ 	return (
+-		<UnitControl
+-			{ ...props }
+-			disableUnits={ isMixed }
+-			isOnly
+-			value={ allValue }
+-			onChange={ handleOnChange }
+-			onUnitChange={ handleOnUnitChange }
+-			onFocus={ handleOnFocus }
+-			onHoverOn={ handleOnHoverOn }
+-			onHoverOff={ handleOnHoverOff }
+-			placeholder={ allPlaceholder }
+-		/>
++		<HStack>
++			<StyledUnitControl
++				{ ...props }
++				className="component-box-control__unit-control"
++				disableUnits={ isMixed }
++				id={ inputId }
++				isPressEnterToChange
++				value={ allValue }
++				onChange={ onValueChange }
++				onUnitChange={ handleOnUnitChange }
++				onFocus={ handleOnFocus }
++				placeholder={ allPlaceholder }
++				label={ LABELS.all }
++				hideLabelFromVision
++			/>
++
++			<FlexedRangeControl
++				__nextHasNoMarginBottom
++				aria-controls={ inputId }
++				label={ LABELS.all }
++				hideLabelFromVision
++				onChange={ sliderOnChange }
++				min={ 0 }
++				max={ CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.max ?? 10 }
++				step={
++					CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.step ?? 0.1
++				}
++				value={ parsedQuantity ?? 0 }
++				withInputField={ false }
++			/>
++		</HStack>
+ 	);
+ }
+diff --git a/packages/components/src/box-control/axial-input-controls.tsx b/packages/components/src/box-control/axial-input-controls.tsx
+index bc8a4bd420bbd2..173605f68a8721 100644
+--- a/packages/components/src/box-control/axial-input-controls.tsx
++++ b/packages/components/src/box-control/axial-input-controls.tsx
+@@ -1,10 +1,19 @@
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
+ /**
+  * Internal dependencies
+  */
+ import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
+-import UnitControl from './unit-control';
+-import { LABELS } from './utils';
+-import { Layout } from './styles/box-control-styles';
++import Tooltip from '../tooltip';
++import { CUSTOM_VALUE_SETTINGS, LABELS } from './utils';
++import {
++	FlexedBoxControlIcon,
++	FlexedRangeControl,
++	InputWrapper,
++	StyledUnitControl,
++} from './styles/box-control-styles';
+ import type { BoxControlInputControlProps } from './types';
+ 
+ const groupedSides = [ 'vertical', 'horizontal' ] as const;
+@@ -13,14 +22,17 @@ type GroupedSide = ( typeof groupedSides )[ number ];
+ export default function AxialInputControls( {
+ 	onChange,
+ 	onFocus,
+-	onHoverOn,
+-	onHoverOff,
+ 	values,
+ 	selectedUnits,
+ 	setSelectedUnits,
+ 	sides,
+ 	...props
+ }: BoxControlInputControlProps ) {
++	const generatedId = useInstanceId(
++		AxialInputControls,
++		`box-control-input`
++	);
++
+ 	const createHandleOnFocus =
+ 		( side: GroupedSide ) =>
+ 		( event: React.FocusEvent< HTMLInputElement > ) => {
+@@ -30,43 +42,7 @@ export default function AxialInputControls( {
+ 			onFocus( event, { side } );
+ 		};
+ 
+-	const createHandleOnHoverOn = ( side: GroupedSide ) => () => {
+-		if ( ! onHoverOn ) {
+-			return;
+-		}
+-		if ( side === 'vertical' ) {
+-			onHoverOn( {
+-				top: true,
+-				bottom: true,
+-			} );
+-		}
+-		if ( side === 'horizontal' ) {
+-			onHoverOn( {
+-				left: true,
+-				right: true,
+-			} );
+-		}
+-	};
+-
+-	const createHandleOnHoverOff = ( side: GroupedSide ) => () => {
+-		if ( ! onHoverOff ) {
+-			return;
+-		}
+-		if ( side === 'vertical' ) {
+-			onHoverOff( {
+-				top: false,
+-				bottom: false,
+-			} );
+-		}
+-		if ( side === 'horizontal' ) {
+-			onHoverOff( {
+-				left: false,
+-				right: false,
+-			} );
+-		}
+-	};
+-
+-	const createHandleOnChange = ( side: GroupedSide ) => ( next?: string ) => {
++	const handleOnValueChange = ( side: GroupedSide, next?: string ) => {
+ 		if ( ! onChange ) {
+ 			return;
+ 		}
+@@ -109,16 +85,8 @@ export default function AxialInputControls( {
+ 		? groupedSides.filter( ( side ) => sides.includes( side ) )
+ 		: groupedSides;
+ 
+-	const first = filteredSides[ 0 ];
+-	const last = filteredSides[ filteredSides.length - 1 ];
+-	const only = first === last && first;
+-
+ 	return (
+-		<Layout
+-			gap={ 0 }
+-			align="top"
+-			className="component-box-control__vertical-horizontal-input-controls"
+-		>
++		<>
+ 			{ filteredSides.map( ( side ) => {
+ 				const [ parsedQuantity, parsedUnit ] =
+ 					parseQuantityAndUnitFromRawValue(
+@@ -128,26 +96,65 @@ export default function AxialInputControls( {
+ 					side === 'vertical'
+ 						? selectedUnits.top
+ 						: selectedUnits.left;
++
++				const inputId = [ generatedId, side ].join( '-' );
++
+ 				return (
+-					<UnitControl
+-						{ ...props }
+-						isFirst={ first === side }
+-						isLast={ last === side }
+-						isOnly={ only === side }
+-						value={ [
+-							parsedQuantity,
+-							selectedUnit ?? parsedUnit,
+-						].join( '' ) }
+-						onChange={ createHandleOnChange( side ) }
+-						onUnitChange={ createHandleOnUnitChange( side ) }
+-						onFocus={ createHandleOnFocus( side ) }
+-						onHoverOn={ createHandleOnHoverOn( side ) }
+-						onHoverOff={ createHandleOnHoverOff( side ) }
+-						label={ LABELS[ side ] }
+-						key={ side }
+-					/>
++					<InputWrapper key={ side }>
++						<FlexedBoxControlIcon side={ side } sides={ sides } />
++						<Tooltip placement="top-end" text={ LABELS[ side ] }>
++							<StyledUnitControl
++								{ ...props }
++								className="component-box-control__unit-control"
++								id={ inputId }
++								isPressEnterToChange
++								value={ [
++									parsedQuantity,
++									selectedUnit ?? parsedUnit,
++								].join( '' ) }
++								onChange={ ( newValue ) =>
++									handleOnValueChange( side, newValue )
++								}
++								onUnitChange={ createHandleOnUnitChange(
++									side
++								) }
++								onFocus={ createHandleOnFocus( side ) }
++								label={ LABELS[ side ] }
++								hideLabelFromVision
++								key={ side }
++							/>
++						</Tooltip>
++						<FlexedRangeControl
++							__nextHasNoMarginBottom
++							aria-controls={ inputId }
++							label={ LABELS[ side ] }
++							hideLabelFromVision
++							onChange={ ( newValue ) =>
++								handleOnValueChange(
++									side,
++									newValue !== undefined
++										? [
++												newValue,
++												selectedUnit ?? parsedUnit,
++										  ].join( '' )
++										: undefined
++								)
++							}
++							min={ 0 }
++							max={
++								CUSTOM_VALUE_SETTINGS[ selectedUnit ?? 'px' ]
++									?.max ?? 10
++							}
++							step={
++								CUSTOM_VALUE_SETTINGS[ selectedUnit ?? 'px' ]
++									?.step ?? 0.1
++							}
++							value={ parsedQuantity ?? 0 }
++							withInputField={ false }
++						/>
++					</InputWrapper>
+ 				);
+ 			} ) }
+-		</Layout>
++		</>
+ 	);
+ }
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index c7fcf066c545ce..dcc890e8e3c510 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -9,17 +9,16 @@ import { __ } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import { BaseControl } from '../base-control';
+-import Button from '../button';
+-import { FlexItem, FlexBlock } from '../flex';
+ import AllInputControl from './all-input-control';
+ import InputControls from './input-controls';
+ import AxialInputControls from './axial-input-controls';
+-import BoxControlIcon from './icon';
+ import LinkedButton from './linked-button';
++import { Grid } from '../grid';
+ import {
+-	Root,
+-	Header,
+-	HeaderControlWrapper,
++	FlexedBoxControlIcon,
++	InputWrapper,
++	ResetButton,
++	LinkedButtonWrapper,
+ } from './styles/box-control-styles';
+ import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
+ import {
+@@ -155,57 +154,49 @@ function BoxControl( {
+ 	};
+ 
+ 	return (
+-		<Root id={ id } role="group" aria-labelledby={ headingId }>
+-			<Header className="component-box-control__header">
+-				<FlexItem>
+-					<BaseControl.VisualLabel id={ headingId }>
+-						{ label }
+-					</BaseControl.VisualLabel>
+-				</FlexItem>
+-				{ allowReset && (
+-					<FlexItem>
+-						<Button
+-							className="component-box-control__reset-button"
+-							variant="secondary"
+-							size="small"
+-							onClick={ handleOnReset }
+-							disabled={ ! isDirty }
+-						>
+-							{ __( 'Reset' ) }
+-						</Button>
+-					</FlexItem>
+-				) }
+-			</Header>
+-			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
+-				<FlexItem>
+-					<BoxControlIcon side={ side } sides={ sides } />
+-				</FlexItem>
+-				{ isLinked && (
+-					<FlexBlock>
+-						<AllInputControl
+-							aria-label={ label }
+-							{ ...inputControlProps }
+-						/>
+-					</FlexBlock>
+-				) }
+-				{ ! isLinked && splitOnAxis && (
+-					<FlexBlock>
+-						<AxialInputControls { ...inputControlProps } />
+-					</FlexBlock>
+-				) }
+-				{ ! hasOneSide && (
+-					<FlexItem>
+-						<LinkedButton
+-							onClick={ toggleLinked }
+-							isLinked={ isLinked }
+-						/>
+-					</FlexItem>
+-				) }
+-			</HeaderControlWrapper>
++		<Grid
++			id={ id }
++			columns={ 3 }
++			templateColumns="1fr min-content min-content"
++			role="group"
++			aria-labelledby={ headingId }
++		>
++			<BaseControl.VisualLabel id={ headingId }>
++				{ label }
++			</BaseControl.VisualLabel>
++			{ isLinked && (
++				<InputWrapper>
++					<FlexedBoxControlIcon side={ side } sides={ sides } />
++					<AllInputControl { ...inputControlProps } />
++				</InputWrapper>
++			) }
++			{ ! hasOneSide && (
++				<LinkedButtonWrapper>
++					<LinkedButton
++						onClick={ toggleLinked }
++						isLinked={ isLinked }
++					/>
++				</LinkedButtonWrapper>
++			) }
++
++			{ ! isLinked && splitOnAxis && (
++				<AxialInputControls { ...inputControlProps } />
++			) }
+ 			{ ! isLinked && ! splitOnAxis && (
+ 				<InputControls { ...inputControlProps } />
+ 			) }
+-		</Root>
++			{ allowReset && (
++				<ResetButton
++					className="component-box-control__reset-button"
++					variant="secondary"
++					size="small"
++					onClick={ handleOnReset }
++					disabled={ ! isDirty }
++				>
++					{ __( 'Reset' ) }
++				</ResetButton>
++			) }
++		</Grid>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/box-control/input-controls.tsx b/packages/components/src/box-control/input-controls.tsx
+index f72179f0d18c10..c8aaeae222749c 100644
+--- a/packages/components/src/box-control/input-controls.tsx
++++ b/packages/components/src/box-control/input-controls.tsx
+@@ -1,82 +1,81 @@
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
+ /**
+  * Internal dependencies
+  */
+-import UnitControl from './unit-control';
++import Tooltip from '../tooltip';
+ import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
+-import { ALL_SIDES, LABELS } from './utils';
+-import { LayoutContainer, Layout } from './styles/box-control-styles';
++import { ALL_SIDES, CUSTOM_VALUE_SETTINGS, LABELS } from './utils';
++import {
++	FlexedBoxControlIcon,
++	FlexedRangeControl,
++	InputWrapper,
++	StyledUnitControl,
++} from './styles/box-control-styles';
+ import type { BoxControlInputControlProps, BoxControlValue } from './types';
+-import type { UnitControlProps } from '../unit-control/types';
+ 
+ const noop = () => {};
+ 
+ export default function BoxInputControls( {
+ 	onChange = noop,
+ 	onFocus = noop,
+-	onHoverOn = noop,
+-	onHoverOff = noop,
+ 	values,
+ 	selectedUnits,
+ 	setSelectedUnits,
+ 	sides,
+ 	...props
+ }: BoxControlInputControlProps ) {
++	const generatedId = useInstanceId( BoxInputControls, 'box-control-input' );
++
+ 	const createHandleOnFocus =
+ 		( side: keyof BoxControlValue ) =>
+ 		( event: React.FocusEvent< HTMLInputElement > ) => {
+ 			onFocus( event, { side } );
+ 		};
+ 
+-	const createHandleOnHoverOn = ( side: keyof BoxControlValue ) => () => {
+-		onHoverOn( { [ side ]: true } );
+-	};
+-
+-	const createHandleOnHoverOff = ( side: keyof BoxControlValue ) => () => {
+-		onHoverOff( { [ side ]: false } );
+-	};
+-
+ 	const handleOnChange = ( nextValues: BoxControlValue ) => {
+ 		onChange( nextValues );
+ 	};
+ 
+-	const createHandleOnChange: (
+-		side: keyof BoxControlValue
+-	) => UnitControlProps[ 'onChange' ] =
+-		( side ) =>
+-		( next, { event } ) => {
+-			const nextValues = { ...values };
+-			const isNumeric =
+-				next !== undefined && ! isNaN( parseFloat( next ) );
+-			const nextValue = isNumeric ? next : undefined;
++	const handleOnValueChange = (
++		side: keyof BoxControlValue,
++		next?: string,
++		extra?: { event: React.SyntheticEvent< Element, Event > }
++	) => {
++		const nextValues = { ...values };
++		const isNumeric = next !== undefined && ! isNaN( parseFloat( next ) );
++		const nextValue = isNumeric ? next : undefined;
+ 
+-			nextValues[ side ] = nextValue;
++		nextValues[ side ] = nextValue;
+ 
+-			/**
+-			 * Supports changing pair sides. For example, holding the ALT key
+-			 * when changing the TOP will also update BOTTOM.
+-			 */
+-			// @ts-expect-error - TODO: event.altKey is only present when the change event was
+-			// triggered by a keyboard event. Should this feature be implemented differently so
+-			// it also works with drag events?
+-			if ( event.altKey ) {
+-				switch ( side ) {
+-					case 'top':
+-						nextValues.bottom = nextValue;
+-						break;
+-					case 'bottom':
+-						nextValues.top = nextValue;
+-						break;
+-					case 'left':
+-						nextValues.right = nextValue;
+-						break;
+-					case 'right':
+-						nextValues.left = nextValue;
+-						break;
+-				}
++		/**
++		 * Supports changing pair sides. For example, holding the ALT key
++		 * when changing the TOP will also update BOTTOM.
++		 */
++		// @ts-expect-error - TODO: event.altKey is only present when the change event was
++		// triggered by a keyboard event. Should this feature be implemented differently so
++		// it also works with drag events?
++		if ( extra?.event.altKey ) {
++			switch ( side ) {
++				case 'top':
++					nextValues.bottom = nextValue;
++					break;
++				case 'bottom':
++					nextValues.top = nextValue;
++					break;
++				case 'left':
++					nextValues.right = nextValue;
++					break;
++				case 'right':
++					nextValues.left = nextValue;
++					break;
+ 			}
++		}
+ 
+-			handleOnChange( nextValues );
+-		};
++		handleOnChange( nextValues );
++	};
+ 
+ 	const createHandleOnUnitChange =
+ 		( side: keyof BoxControlValue ) => ( next?: string ) => {
+@@ -90,45 +89,74 @@ export default function BoxInputControls( {
+ 		? ALL_SIDES.filter( ( side ) => sides.includes( side ) )
+ 		: ALL_SIDES;
+ 
+-	const first = filteredSides[ 0 ];
+-	const last = filteredSides[ filteredSides.length - 1 ];
+-	const only = first === last && first;
+-
+ 	return (
+-		<LayoutContainer className="component-box-control__input-controls-wrapper">
+-			<Layout
+-				gap={ 0 }
+-				align="top"
+-				className="component-box-control__input-controls"
+-			>
+-				{ filteredSides.map( ( side ) => {
+-					const [ parsedQuantity, parsedUnit ] =
+-						parseQuantityAndUnitFromRawValue( values[ side ] );
++		<>
++			{ filteredSides.map( ( side ) => {
++				const [ parsedQuantity, parsedUnit ] =
++					parseQuantityAndUnitFromRawValue( values[ side ] );
++
++				const computedUnit = values[ side ]
++					? parsedUnit
++					: selectedUnits[ side ];
++
++				const inputId = [ generatedId, side ].join( '-' );
+ 
+-					const computedUnit = values[ side ]
+-						? parsedUnit
+-						: selectedUnits[ side ];
++				return (
++					<InputWrapper key={ `box-control-${ side }` } expanded>
++						<FlexedBoxControlIcon side={ side } sides={ sides } />
++						<Tooltip placement="top-end" text={ LABELS[ side ] }>
++							<StyledUnitControl
++								{ ...props }
++								className="component-box-control__unit-control"
++								id={ inputId }
++								isPressEnterToChange
++								value={ [ parsedQuantity, computedUnit ].join(
++									''
++								) }
++								onChange={ ( nextValue, extra ) =>
++									handleOnValueChange(
++										side,
++										nextValue,
++										extra
++									)
++								}
++								onUnitChange={ createHandleOnUnitChange(
++									side
++								) }
++								onFocus={ createHandleOnFocus( side ) }
++								label={ LABELS[ side ] }
++								hideLabelFromVision
++							/>
++						</Tooltip>
+ 
+-					return (
+-						<UnitControl
+-							{ ...props }
+-							isFirst={ first === side }
+-							isLast={ last === side }
+-							isOnly={ only === side }
+-							value={ [ parsedQuantity, computedUnit ].join(
+-								''
+-							) }
+-							onChange={ createHandleOnChange( side ) }
+-							onUnitChange={ createHandleOnUnitChange( side ) }
+-							onFocus={ createHandleOnFocus( side ) }
+-							onHoverOn={ createHandleOnHoverOn( side ) }
+-							onHoverOff={ createHandleOnHoverOff( side ) }
++						<FlexedRangeControl
++							__nextHasNoMarginBottom
++							aria-controls={ inputId }
+ 							label={ LABELS[ side ] }
+-							key={ `box-control-${ side }` }
++							hideLabelFromVision
++							onChange={ ( newValue ) => {
++								handleOnValueChange(
++									side,
++									newValue !== undefined
++										? [ newValue, computedUnit ].join( '' )
++										: undefined
++								);
++							} }
++							min={ 0 }
++							max={
++								CUSTOM_VALUE_SETTINGS[ computedUnit ?? 'px' ]
++									?.max ?? 10
++							}
++							step={
++								CUSTOM_VALUE_SETTINGS[ computedUnit ?? 'px' ]
++									?.step ?? 0.1
++							}
++							value={ parsedQuantity ?? 0 }
++							withInputField={ false }
+ 						/>
+-					);
+-				} ) }
+-			</Layout>
+-		</LayoutContainer>
++					</InputWrapper>
++				);
++			} ) }
++		</>
+ 	);
+ }
+diff --git a/packages/components/src/box-control/styles/box-control-styles.ts b/packages/components/src/box-control/styles/box-control-styles.ts
+index d961d4322ba5ac..ce2c8aa227e586 100644
+--- a/packages/components/src/box-control/styles/box-control-styles.ts
++++ b/packages/components/src/box-control/styles/box-control-styles.ts
+@@ -1,80 +1,40 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/react';
+ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+  */
+-import { Flex } from '../../flex';
+-import BaseUnitControl from '../../unit-control';
+-import { rtl } from '../../utils';
+-import type { BoxUnitControlProps } from '../types';
+-
+-export const Root = styled.div`
+-	box-sizing: border-box;
+-	max-width: 235px;
+-	padding-bottom: 12px;
+-	width: 100%;
++import BoxControlIcon from '../icon';
++import Button from '../../button';
++import { HStack } from '../../h-stack';
++import RangeControl from '../../range-control';
++import UnitControl from '../../unit-control';
++import { space } from '../../utils/space';
++
++export const StyledUnitControl = styled( UnitControl )`
++	max-width: 90px;
+ `;
+ 
+-export const Header = styled( Flex )`
+-	margin-bottom: 8px;
++export const InputWrapper = styled( HStack )`
++	grid-column: 1 / span 3;
+ `;
+ 
+-export const HeaderControlWrapper = styled( Flex )`
+-	min-height: 30px;
+-	gap: 0;
++export const ResetButton = styled( Button )`
++	grid-area: 1 / 2;
++	justify-self: end;
+ `;
+ 
+-export const UnitControlWrapper = styled.div`
+-	box-sizing: border-box;
+-	max-width: 80px;
++export const LinkedButtonWrapper = styled.div`
++	grid-area: 1 / 3;
++	justify-self: end;
+ `;
+ 
+-export const LayoutContainer = styled( Flex )`
+-	justify-content: center;
+-	padding-top: 8px;
++export const FlexedBoxControlIcon = styled( BoxControlIcon )`
++	flex: 0 0 auto;
+ `;
+ 
+-export const Layout = styled( Flex )`
+-	position: relative;
+-	height: 100%;
++export const FlexedRangeControl = styled( RangeControl )`
+ 	width: 100%;
+-	justify-content: flex-start;
+-`;
+-
+-const unitControlBorderRadiusStyles = ( {
+-	isFirst,
+-	isLast,
+-	isOnly,
+-}: Pick< BoxUnitControlProps, 'isFirst' | 'isLast' | 'isOnly' > ) => {
+-	if ( isFirst ) {
+-		return rtl( { borderTopRightRadius: 0, borderBottomRightRadius: 0 } )();
+-	}
+-	if ( isLast ) {
+-		return rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )();
+-	}
+-	if ( isOnly ) {
+-		return css( { borderRadius: 2 } );
+-	}
+-
+-	return css( {
+-		borderRadius: 0,
+-	} );
+-};
+-
+-const unitControlMarginStyles = ( {
+-	isFirst,
+-	isOnly,
+-}: Pick< BoxUnitControlProps, 'isFirst' | 'isOnly' > ) => {
+-	const marginLeft = isFirst || isOnly ? 0 : -1;
+-
+-	return rtl( { marginLeft } )();
+-};
+-
+-export const UnitControl = styled( BaseUnitControl )`
+-	max-width: 60px;
+-	${ unitControlBorderRadiusStyles };
+-	${ unitControlMarginStyles };
++	margin-inline-end: ${ space( 2 ) };
+ `;
+diff --git a/packages/components/src/box-control/styles/box-control-visualizer-styles.ts b/packages/components/src/box-control/styles/box-control-visualizer-styles.ts
+deleted file mode 100644
+index bbfe66c9a71e98..00000000000000
+--- a/packages/components/src/box-control/styles/box-control-visualizer-styles.ts
++++ /dev/null
+@@ -1,75 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-import styled from '@emotion/styled';
+-
+-/**
+- * Internal dependencies
+- */
+-import { COLORS, rtl } from '../../utils';
+-
+-const containerPositionStyles = ( {
+-	isPositionAbsolute,
+-}: {
+-	isPositionAbsolute: boolean;
+-} ) => {
+-	if ( ! isPositionAbsolute ) return '';
+-
+-	return css`
+-		bottom: 0;
+-		left: 0;
+-		pointer-events: none;
+-		position: absolute;
+-		right: 0;
+-		top: 0;
+-		z-index: 1;
+-	`;
+-};
+-
+-export const Container = styled.div`
+-	box-sizing: border-box;
+-	position: relative;
+-	${ containerPositionStyles };
+-`;
+-
+-export const Side = styled.div`
+-	box-sizing: border-box;
+-	background: ${ COLORS.theme.accent };
+-	filter: brightness( 1 );
+-	opacity: 0;
+-	position: absolute;
+-	pointer-events: none;
+-	transition: opacity 120ms linear;
+-	z-index: 1;
+-
+-	${ ( { isActive }: { isActive: boolean } ) =>
+-		isActive &&
+-		`
+-		opacity: 0.3;
+-	` }
+-`;
+-
+-export const TopView = styled( Side )`
+-	top: 0;
+-	left: 0;
+-	right: 0;
+-`;
+-
+-export const RightView = styled( Side )`
+-	top: 0;
+-	bottom: 0;
+-	${ rtl( { right: 0 } ) };
+-`;
+-
+-export const BottomView = styled( Side )`
+-	bottom: 0;
+-	left: 0;
+-	right: 0;
+-`;
+-
+-export const LeftView = styled( Side )`
+-	top: 0;
+-	bottom: 0;
+-	${ rtl( { left: 0 } ) };
+-`;
+diff --git a/packages/components/src/box-control/test/index.tsx b/packages/components/src/box-control/test/index.tsx
+index 8a861eff37e1b2..1ea3c84aae9225 100644
+--- a/packages/components/src/box-control/test/index.tsx
++++ b/packages/components/src/box-control/test/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen } from '@testing-library/react';
++import { fireEvent, render, screen } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+ /**
+@@ -33,7 +33,10 @@ describe( 'BoxControl', () => {
+ 			render( <BoxControl onChange={ () => {} } /> );
+ 
+ 			expect(
+-				screen.getByRole( 'textbox', { name: 'Box Control' } )
++				screen.getByRole( 'group', { name: 'Box Control' } )
++			).toBeVisible();
++			expect(
++				screen.getByRole( 'textbox', { name: 'All sides' } )
+ 			).toBeVisible();
+ 		} );
+ 
+@@ -42,15 +45,41 @@ describe( 'BoxControl', () => {
+ 
+ 			render( <BoxControl onChange={ () => {} } /> );
+ 
+-			const input = screen.getByRole( 'textbox', {
+-				name: 'Box Control',
+-			} );
++			const input = screen.getByRole( 'textbox', { name: 'All sides' } );
+ 
+ 			await user.type( input, '100' );
+ 			await user.keyboard( '{Enter}' );
+ 
+ 			expect( input ).toHaveValue( '100' );
+ 		} );
++
++		it( 'should update input values when interacting with slider', () => {
++			render( <BoxControl onChange={ () => {} } /> );
++
++			const slider = screen.getByRole( 'slider' );
++
++			fireEvent.change( slider, { target: { value: 50 } } );
++
++			expect( slider ).toHaveValue( '50' );
++			expect(
++				screen.getByRole( 'textbox', { name: 'All sides' } )
++			).toHaveValue( '50' );
++		} );
++
++		it( 'should update slider values when interacting with input', async () => {
++			const user = userEvent.setup();
++			render( <BoxControl onChange={ () => {} } /> );
++
++			const input = screen.getByRole( 'textbox', {
++				name: 'All sides',
++			} );
++
++			await user.type( input, '50' );
++			await user.keyboard( '{Enter}' );
++
++			expect( input ).toHaveValue( '50' );
++			expect( screen.getByRole( 'slider' ) ).toHaveValue( '50' );
++		} );
+ 	} );
+ 
+ 	describe( 'Reset', () => {
+@@ -60,7 +89,7 @@ describe( 'BoxControl', () => {
+ 			render( <BoxControl onChange={ () => {} } /> );
+ 
+ 			const input = screen.getByRole( 'textbox', {
+-				name: 'Box Control',
++				name: 'All sides',
+ 			} );
+ 
+ 			await user.type( input, '100' );
+@@ -79,7 +108,7 @@ describe( 'BoxControl', () => {
+ 			render( <Example /> );
+ 
+ 			const input = screen.getByRole( 'textbox', {
+-				name: 'Box Control',
++				name: 'All sides',
+ 			} );
+ 
+ 			await user.type( input, '100' );
+@@ -98,7 +127,7 @@ describe( 'BoxControl', () => {
+ 			render( <Example /> );
+ 
+ 			const input = screen.getByRole( 'textbox', {
+-				name: 'Box Control',
++				name: 'All sides',
+ 			} );
+ 
+ 			await user.type( input, '100' );
+@@ -118,7 +147,7 @@ describe( 'BoxControl', () => {
+ 			render( <BoxControl onChange={ ( v ) => spyChange( v ) } /> );
+ 
+ 			const input = screen.getByRole( 'textbox', {
+-				name: 'Box Control',
++				name: 'All sides',
+ 			} );
+ 
+ 			await user.type( input, '100' );
+@@ -152,21 +181,49 @@ describe( 'BoxControl', () => {
+ 			);
+ 
+ 			await user.type(
+-				screen.getByRole( 'textbox', { name: 'Top' } ),
++				screen.getByRole( 'textbox', { name: 'Top side' } ),
+ 				'100'
+ 			);
+ 
+ 			expect(
+-				screen.getByRole( 'textbox', { name: 'Top' } )
++				screen.getByRole( 'textbox', { name: 'Top side' } )
+ 			).toHaveValue( '100' );
+ 			expect(
+-				screen.getByRole( 'textbox', { name: 'Right' } )
++				screen.getByRole( 'textbox', { name: 'Right side' } )
+ 			).not.toHaveValue();
+ 			expect(
+-				screen.getByRole( 'textbox', { name: 'Bottom' } )
++				screen.getByRole( 'textbox', { name: 'Bottom side' } )
+ 			).not.toHaveValue();
+ 			expect(
+-				screen.getByRole( 'textbox', { name: 'Left' } )
++				screen.getByRole( 'textbox', { name: 'Left side' } )
++			).not.toHaveValue();
++		} );
++
++		it( 'should update a single side value when using slider unlinked', async () => {
++			const user = userEvent.setup();
++
++			render( <Example /> );
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Unlink sides' } )
++			);
++
++			const slider = screen.getByRole( 'slider', { name: 'Right side' } );
++
++			fireEvent.change( slider, { target: { value: 50 } } );
++
++			expect( slider ).toHaveValue( '50' );
++			expect(
++				screen.getByRole( 'textbox', { name: 'Top side' } )
++			).not.toHaveValue();
++			expect(
++				screen.getByRole( 'textbox', { name: 'Right side' } )
++			).toHaveValue( '50' );
++			expect(
++				screen.getByRole( 'textbox', { name: 'Bottom side' } )
++			).not.toHaveValue();
++			expect(
++				screen.getByRole( 'textbox', { name: 'Left side' } )
+ 			).not.toHaveValue();
+ 		} );
+ 
+@@ -181,17 +238,68 @@ describe( 'BoxControl', () => {
+ 
+ 			await user.type(
+ 				screen.getByRole( 'textbox', {
+-					name: 'Vertical',
++					name: 'Top and bottom sides',
+ 				} ),
+ 				'100'
+ 			);
+ 
+ 			expect(
+-				screen.getByRole( 'textbox', { name: 'Vertical' } )
++				screen.getByRole( 'textbox', { name: 'Top and bottom sides' } )
+ 			).toHaveValue( '100' );
+ 			expect(
+-				screen.getByRole( 'textbox', { name: 'Horizontal' } )
++				screen.getByRole( 'textbox', { name: 'Left and right sides' } )
++			).not.toHaveValue();
++		} );
++
++		it( 'should update a whole axis using a slider when value is changed when unlinked', async () => {
++			const user = userEvent.setup();
++
++			render( <Example splitOnAxis /> );
++
++			await user.click(
++				screen.getByRole( 'button', { name: 'Unlink sides' } )
++			);
++
++			const slider = screen.getByRole( 'slider', {
++				name: 'Left and right sides',
++			} );
++
++			fireEvent.change( slider, { target: { value: 50 } } );
++
++			expect( slider ).toHaveValue( '50' );
++			expect(
++				screen.getByRole( 'textbox', { name: 'Top and bottom sides' } )
+ 			).not.toHaveValue();
++			expect(
++				screen.getByRole( 'textbox', { name: 'Left and right sides' } )
++			).toHaveValue( '50' );
++		} );
++
++		it( 'should show "Mixed" label when sides have different values but are linked', async () => {
++			const user = userEvent.setup();
++
++			render( <Example /> );
++
++			const unlinkButton = screen.getByRole( 'button', {
++				name: 'Unlink sides',
++			} );
++
++			await user.click( unlinkButton );
++
++			await user.type(
++				screen.getByRole( 'textbox', {
++					name: 'Right side',
++				} ),
++				'13'
++			);
++
++			expect(
++				screen.getByRole( 'textbox', { name: 'Right side' } )
++			).toHaveValue( '13' );
++
++			await user.click( unlinkButton );
++
++			expect( screen.getByPlaceholderText( 'Mixed' ) ).toHaveValue( '' );
+ 		} );
+ 	} );
+ 
+@@ -287,7 +395,7 @@ describe( 'BoxControl', () => {
+ 			render( <BoxControl onChange={ onChangeSpy } /> );
+ 
+ 			const valueInput = screen.getByRole( 'textbox', {
+-				name: 'Box Control',
++				name: 'All sides',
+ 			} );
+ 			const unitSelect = screen.getByRole( 'combobox', {
+ 				name: 'Select unit',
+diff --git a/packages/components/src/box-control/types.ts b/packages/components/src/box-control/types.ts
+index 0eba0e58fd33cc..12524559564ab7 100644
+--- a/packages/components/src/box-control/types.ts
++++ b/packages/components/src/box-control/types.ts
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import type { useHover } from '@use-gesture/react';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -16,6 +11,10 @@ export type BoxControlValue = {
+ 	left?: string;
+ };
+ 
++export type CustomValueUnits = {
++	[ key: string ]: { max: number; step: number };
++};
++
+ type UnitControlPassthroughProps = Omit<
+ 	UnitControlProps,
+ 	'label' | 'onChange' | 'onFocus' | 'onMouseOver' | 'onMouseOut' | 'units'
+@@ -92,22 +91,6 @@ export type BoxControlInputControlProps = UnitControlPassthroughProps & {
+ 	values: BoxControlValue;
+ };
+ 
+-export type BoxUnitControlProps = UnitControlPassthroughProps &
+-	Pick< UnitControlProps, 'onChange' | 'onFocus' > & {
+-		isFirst?: boolean;
+-		isLast?: boolean;
+-		isOnly?: boolean;
+-		label?: string;
+-		onHoverOff?: (
+-			event: ReturnType< typeof useHover >[ 'event' ],
+-			state: Omit< ReturnType< typeof useHover >, 'event' >
+-		) => void;
+-		onHoverOn?: (
+-			event: ReturnType< typeof useHover >[ 'event' ],
+-			state: Omit< ReturnType< typeof useHover >, 'event' >
+-		) => void;
+-	};
+-
+ export type BoxControlIconProps = {
+ 	/**
+ 	 * @default 24
+diff --git a/packages/components/src/box-control/unit-control.tsx b/packages/components/src/box-control/unit-control.tsx
+deleted file mode 100644
+index 24d71cf0d6cd34..00000000000000
+--- a/packages/components/src/box-control/unit-control.tsx
++++ /dev/null
+@@ -1,74 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { useHover } from '@use-gesture/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import BaseTooltip from '../tooltip';
+-import { UnitControlWrapper, UnitControl } from './styles/box-control-styles';
+-import type { BoxUnitControlProps } from './types';
+-
+-const noop = () => {};
+-
+-export default function BoxUnitControl( {
+-	isFirst,
+-	isLast,
+-	isOnly,
+-	onHoverOn = noop,
+-	onHoverOff = noop,
+-	label,
+-	value,
+-	...props
+-}: BoxUnitControlProps ) {
+-	const bindHoverGesture = useHover( ( { event, ...state } ) => {
+-		if ( state.hovering ) {
+-			onHoverOn( event, state );
+-		} else {
+-			onHoverOff( event, state );
+-		}
+-	} );
+-
+-	return (
+-		<UnitControlWrapper { ...bindHoverGesture() }>
+-			<Tooltip text={ label }>
+-				<UnitControl
+-					aria-label={ label }
+-					className="component-box-control__unit-control"
+-					isFirst={ isFirst }
+-					isLast={ isLast }
+-					isOnly={ isOnly }
+-					isPressEnterToChange
+-					isResetValueOnUnitChange={ false }
+-					value={ value }
+-					{ ...props }
+-				/>
+-			</Tooltip>
+-		</UnitControlWrapper>
+-	);
+-}
+-
+-function Tooltip( {
+-	children,
+-	text,
+-}: {
+-	children: JSX.Element;
+-	text?: string;
+-} ) {
+-	if ( ! text ) return children;
+-
+-	/**
+-	 * Wrapping the children in a `<div />` as Tooltip as it attempts
+-	 * to render the <UnitControl />. Using a plain `<div />` appears to
+-	 * resolve this issue.
+-	 *
+-	 * Originally discovered and referenced here:
+-	 * https://github.com/WordPress/gutenberg/pull/24966#issuecomment-685875026
+-	 */
+-	return (
+-		<BaseTooltip text={ text } placement="top">
+-			<div>{ children }</div>
+-		</BaseTooltip>
+-	);
+-}
+diff --git a/packages/components/src/box-control/utils.ts b/packages/components/src/box-control/utils.ts
+index 6614342d3da6d3..e480c9a9f4674a 100644
+--- a/packages/components/src/box-control/utils.ts
++++ b/packages/components/src/box-control/utils.ts
+@@ -7,17 +7,52 @@ import { __ } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
+-import type { BoxControlProps, BoxControlValue } from './types';
++import type {
++	BoxControlProps,
++	BoxControlValue,
++	CustomValueUnits,
++} from './types';
++
++export const CUSTOM_VALUE_SETTINGS: CustomValueUnits = {
++	px: { max: 300, step: 1 },
++	'%': { max: 100, step: 1 },
++	vw: { max: 100, step: 1 },
++	vh: { max: 100, step: 1 },
++	em: { max: 10, step: 0.1 },
++	rm: { max: 10, step: 0.1 },
++	svw: { max: 100, step: 1 },
++	lvw: { max: 100, step: 1 },
++	dvw: { max: 100, step: 1 },
++	svh: { max: 100, step: 1 },
++	lvh: { max: 100, step: 1 },
++	dvh: { max: 100, step: 1 },
++	vi: { max: 100, step: 1 },
++	svi: { max: 100, step: 1 },
++	lvi: { max: 100, step: 1 },
++	dvi: { max: 100, step: 1 },
++	vb: { max: 100, step: 1 },
++	svb: { max: 100, step: 1 },
++	lvb: { max: 100, step: 1 },
++	dvb: { max: 100, step: 1 },
++	vmin: { max: 100, step: 1 },
++	svmin: { max: 100, step: 1 },
++	lvmin: { max: 100, step: 1 },
++	dvmin: { max: 100, step: 1 },
++	vmax: { max: 100, step: 1 },
++	svmax: { max: 100, step: 1 },
++	lvmax: { max: 100, step: 1 },
++	dvmax: { max: 100, step: 1 },
++};
+ 
+ export const LABELS = {
+-	all: __( 'All' ),
+-	top: __( 'Top' ),
+-	bottom: __( 'Bottom' ),
+-	left: __( 'Left' ),
+-	right: __( 'Right' ),
++	all: __( 'All sides' ),
++	top: __( 'Top side' ),
++	bottom: __( 'Bottom side' ),
++	left: __( 'Left side' ),
++	right: __( 'Right side' ),
+ 	mixed: __( 'Mixed' ),
+-	vertical: __( 'Vertical' ),
+-	horizontal: __( 'Horizontal' ),
++	vertical: __( 'Top and bottom sides' ),
++	horizontal: __( 'Left and right sides' ),
+ };
+ 
+ export const DEFAULT_VALUES = {

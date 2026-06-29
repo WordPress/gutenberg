@@ -1,0 +1,70 @@
+diff --git a/packages/ui/src/tooltip/stories/index.story.tsx b/packages/ui/src/tooltip/stories/index.story.tsx
+index b45eb69822ee52..e40f723c63d466 100644
+--- a/packages/ui/src/tooltip/stories/index.story.tsx
++++ b/packages/ui/src/tooltip/stories/index.story.tsx
+@@ -163,6 +163,37 @@ export const WithCustomZIndex: StoryObj< typeof Tooltip.Root > = {
+ 	},
+ };
+ 
++/**
++ * The `--wp-ui-tooltip-background-color` and `--wp-ui-tooltip-color` CSS
++ * variables control the tooltip popup's surface and text colors. Override them
++ * either globally on `:root` or `body`, or per instance by passing a
++ * `Tooltip.Portal` with a `style` or `className` to `Tooltip.Popup`'s `portal`
++ * prop. The variables cascade from the portal wrapper to the popup rendered
++ * inside it.
++ */
++export const WithCustomColors: StoryObj< typeof Tooltip.Root > = {
++	name: 'With Custom Colors',
++	args: {
++		children: (
++			<>
++				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
++				<Tooltip.Popup
++					portal={
++						<Tooltip.Portal
++							style={ {
++								'--wp-ui-tooltip-background-color': '#fff',
++								'--wp-ui-tooltip-color': '#1e1e1e',
++							} }
++						/>
++					}
++				>
++					Save
++				</Tooltip.Popup>
++			</>
++		),
++	},
++};
++
+ /**
+  * Use `Tooltip.Provider` to control the delay before tooltips appear.
+  * This is useful when you have multiple tooltips and want them to share
+diff --git a/packages/ui/src/tooltip/style.module.css b/packages/ui/src/tooltip/style.module.css
+index 84755607dcd4f5..5307db57578d08 100644
+--- a/packages/ui/src/tooltip/style.module.css
++++ b/packages/ui/src/tooltip/style.module.css
+@@ -7,7 +7,10 @@
+ 		}
+ 
+ 		.popup {
+-			background-color: var(--wpds-color-background-surface-neutral-strong);
++			background-color: var(
++				--wp-ui-tooltip-background-color,
++				var(--wpds-color-background-surface-neutral-strong)
++			);
+ 			padding:
+ 				var(--wpds-dimension-padding-xs)
+ 				var(--wpds-dimension-padding-sm);
+@@ -15,7 +18,10 @@
+ 			font-family: var(--wpds-typography-font-family-body);
+ 			font-size: var(--wpds-typography-font-size-sm);
+ 			line-height: 1.4; /* TODO: use DS token for line height */
+-			color: var(--wpds-color-foreground-content-neutral);
++			color: var(
++				--wp-ui-tooltip-color,
++				var(--wpds-color-foreground-content-neutral)
++			);
+ 			box-shadow: var(--wpds-elevation-sm);
+ 
+ 			/*

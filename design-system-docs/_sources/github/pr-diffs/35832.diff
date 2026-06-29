@@ -1,0 +1,18 @@
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 3e2ee5db6072de..cbd74370b346e2 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -456,11 +456,11 @@ const Popover = (
+ 			defaultView.cancelAnimationFrame( rafId );
+ 
+ 			if ( anchorDocument && anchorDocument !== ownerDocument ) {
+-				anchorDocument.defaultView.removeEventListener(
++				anchorDocument.defaultView?.removeEventListener(
+ 					'resize',
+ 					refresh
+ 				);
+-				anchorDocument.defaultView.removeEventListener(
++				anchorDocument.defaultView?.removeEventListener(
+ 					'scroll',
+ 					refresh,
+ 					true

@@ -1,0 +1,187 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1e21a6f343b42a..51031d70ab6871 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ 
+ ### Internal
+ 
++-   Add `getOverlayLegacySlot()` helper and matching `.wp-overlay-legacy` styles. Lazily mounts a body-level container at `z-index: 99997` with `isolation: isolate` to be used as the portal target for legacy overlays in a follow-up. No runtime behavior change yet.
+ -   `NavigableContainer`: Refactor from class component to function component with hooks ([#77171](https://github.com/WordPress/gutenberg/pull/77171)).
+ -   `Menu`: Refactor `Menu.Popover` to use Ariakit’s `render` prop, wrapping content in `MenuMotionRoot` (motion styles) and `MenuSurface` (panel layout and `variant` chrome) ([#77460](https://github.com/WordPress/gutenberg/pull/77460)).
+ -   Fix types for TypeScript 7.0 ([#77177](https://github.com/WordPress/gutenberg/pull/77177)).
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index d316d1716f2e90..110652cccaa4bd 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -46,6 +46,7 @@
+ @use "./toolbar/toolbar-button/style.scss" as *;
+ @use "./toolbar/toolbar-group/style.scss" as *;
+ @use "./tooltip/style.scss" as *;
++@use "./utils/overlay-legacy-slot/style.scss" as *;
+ @use "./validated-form-controls/style.scss" as *;
+ 
+ // Include the default WP Components color variables.
+diff --git a/packages/components/src/utils/overlay-legacy-slot/index.ts b/packages/components/src/utils/overlay-legacy-slot/index.ts
+new file mode 100644
+index 00000000000000..85d924d9dcd883
+--- /dev/null
++++ b/packages/components/src/utils/overlay-legacy-slot/index.ts
+@@ -0,0 +1,67 @@
++/**
++ * Class name applied to the overlay legacy slot element.
++ */
++export const OVERLAY_LEGACY_SLOT_CLASSNAME = 'wp-overlay-legacy';
++
++/**
++ * Resolves the top-level document so that overlays portaling from inside an
++ * iframe still land in the parent document's slot. Falls back to the current
++ * document if `window.top` is inaccessible (cross-origin restrictions).
++ */
++function getTopLevelDocument(): Document {
++	try {
++		return window.top?.document ?? window.document;
++	} catch {
++		// Cross-origin access to `window.top.document` throws — use the
++		// current frame's document as a safe fallback.
++		return window.document;
++	}
++}
++
++let cachedSlot: HTMLDivElement | null = null;
++
++/**
++ * Lazily creates and returns the overlay legacy slot — a body-level container
++ * used as the portal target for legacy `@wordpress/components` overlays
++ * (Modal, Popover, Tooltip, Snackbar, Draggable clone).
++ *
++ * The slot has `z-index: 99997` and `isolation: isolate`, establishing a
++ * stacking context that sits below the WP admin bar (99,999) and below the
++ * overlay prime slot used by `@wordpress/ui` leaf overlays (99,998). Per-
++ * overlay z-indexes inside the slot continue to control relative ordering
++ * (Tooltip > Popover > Modal), but those values now stack relative to the
++ * slot rather than the document body.
++ *
++ * The slot is created in the top-level document (not the iframe's own
++ * document) so that overlays portaling from inside an iframe land in the
++ * parent document's slot. The element is cached and reused across calls; if
++ * the cached element has been detached or belongs to a different document,
++ * a fresh element is created.
++ *
++ * @return The overlay legacy slot element.
++ */
++export function getOverlayLegacySlot(): HTMLDivElement {
++	const doc = getTopLevelDocument();
++
++	if (
++		cachedSlot &&
++		cachedSlot.isConnected &&
++		cachedSlot.ownerDocument === doc
++	) {
++		return cachedSlot;
++	}
++
++	const existing = doc.body.querySelector< HTMLDivElement >(
++		`.${ OVERLAY_LEGACY_SLOT_CLASSNAME }`
++	);
++	if ( existing ) {
++		cachedSlot = existing;
++		return existing;
++	}
++
++	const slot = doc.createElement( 'div' );
++	slot.className = OVERLAY_LEGACY_SLOT_CLASSNAME;
++	doc.body.append( slot );
++	cachedSlot = slot;
++	return slot;
++}
+diff --git a/packages/components/src/utils/overlay-legacy-slot/style.scss b/packages/components/src/utils/overlay-legacy-slot/style.scss
+new file mode 100644
+index 00000000000000..be1d679e9a78c1
+--- /dev/null
++++ b/packages/components/src/utils/overlay-legacy-slot/style.scss
+@@ -0,0 +1,21 @@
++// Overlay legacy slot — body-level container that establishes a stacking
++// context for legacy `@wordpress/components` overlays (Modal, Popover,
++// Tooltip, Snackbar, Draggable clone).
++//
++// Sits below the WP admin bar (99,999) and below the overlay prime slot
++// used by `@wordpress/ui` leaf overlays (99,998). Declared outside any CSS
++// layer for predictable plugin-override semantics.
++//
++// `position: fixed; top: 0; left: 0` (with no width/height) makes the slot
++// a zero-sized anchor at the viewport origin. Descendants positioned with
++// viewport-relative coordinates (via floating-ui or similar) resolve
++// correctly. `isolation: isolate` creates a stacking context regardless of
++// the slot's positioning. The slot has no size, so it never intercepts
++// pointer events on its own.
++.wp-overlay-legacy {
++	position: fixed;
++	top: 0;
++	left: 0;
++	z-index: 99997;
++	isolation: isolate;
++}
+diff --git a/packages/components/src/utils/overlay-legacy-slot/test/index.ts b/packages/components/src/utils/overlay-legacy-slot/test/index.ts
+new file mode 100644
+index 00000000000000..12d10d42346a73
+--- /dev/null
++++ b/packages/components/src/utils/overlay-legacy-slot/test/index.ts
+@@ -0,0 +1,57 @@
++/**
++ * Internal dependencies
++ */
++import { getOverlayLegacySlot, OVERLAY_LEGACY_SLOT_CLASSNAME } from '..';
++
++describe( 'getOverlayLegacySlot', () => {
++	afterEach( () => {
++		document.body
++			.querySelectorAll( `.${ OVERLAY_LEGACY_SLOT_CLASSNAME }` )
++			.forEach( ( element ) => element.remove() );
++	} );
++
++	it( 'lazily creates a slot element on first call and appends it to the document body', () => {
++		expect(
++			document.body.querySelector( `.${ OVERLAY_LEGACY_SLOT_CLASSNAME }` )
++		).toBeNull();
++
++		const slot = getOverlayLegacySlot();
++
++		expect( slot ).toBeInstanceOf( HTMLDivElement );
++		expect( slot ).toHaveClass( OVERLAY_LEGACY_SLOT_CLASSNAME );
++		expect( slot.parentElement ).toBe( document.body );
++	} );
++
++	it( 'caches the singleton across calls', () => {
++		const first = getOverlayLegacySlot();
++		const second = getOverlayLegacySlot();
++
++		expect( second ).toBe( first );
++		expect(
++			document.body.querySelectorAll(
++				`.${ OVERLAY_LEGACY_SLOT_CLASSNAME }`
++			)
++		).toHaveLength( 1 );
++	} );
++
++	it( 'reuses an existing slot element already present in the DOM', () => {
++		const preexisting = document.createElement( 'div' );
++		preexisting.className = OVERLAY_LEGACY_SLOT_CLASSNAME;
++		document.body.append( preexisting );
++
++		const slot = getOverlayLegacySlot();
++
++		expect( slot ).toBe( preexisting );
++	} );
++
++	it( 'recreates the slot if the cached element has been detached', () => {
++		const first = getOverlayLegacySlot();
++		first.remove();
++
++		const second = getOverlayLegacySlot();
++
++		expect( second ).not.toBe( first );
++		expect( second.isConnected ).toBe( true );
++		expect( second.parentElement ).toBe( document.body );
++	} );
++} );

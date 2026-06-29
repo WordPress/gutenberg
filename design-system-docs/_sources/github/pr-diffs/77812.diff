@@ -1,0 +1,37 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2d1d8add3dc635..c0ac3f7493eef1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
++
+ ## 33.0.0 (2026-04-29)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/tab-panel/style.scss b/packages/components/src/tab-panel/style.scss
+index 93557a481d982d..a87fc63a6e7325 100644
+--- a/packages/components/src/tab-panel/style.scss
++++ b/packages/components/src/tab-panel/style.scss
+@@ -45,7 +45,7 @@
+ 
+ 		// Animation
+ 		@media not (prefers-reduced-motion) {
+-			transition: all 0.1s linear;
++			transition: height 0.1s linear;
+ 		}
+ 	}
+ 
+@@ -74,7 +74,7 @@
+ 
+ 		// Animation
+ 		@media not (prefers-reduced-motion) {
+-			transition: all 0.1s linear;
++			transition: box-shadow 0.1s linear;
+ 		}
+ 	}
+ 

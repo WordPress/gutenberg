@@ -1,0 +1,370 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 57e572896bdbb1..44f7b5c70d0f86 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,11 +13,16 @@
+ -   Fixed inconsistent padding in `UnitControl` ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
+ -   Added support for RTL behavior for the `ZStack`'s `offset` prop ([#36769](https://github.com/WordPress/gutenberg/pull/36769))
+ -   Fixed race conditions causing conditionally displayed `ToolsPanelItem` components to be erroneously deregistered ([36588](https://github.com/WordPress/gutenberg/pull/36588)).
++-   Added `__experimentalHideHeader` prop to `Modal` component ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
+ 
+ ### Bug Fix
+ 
+ -   Fixed spacing between `BaseControl` fields and help text within the `ToolsPanel` ([36334](https://github.com/WordPress/gutenberg/pull/36334))
+ 
++### Enhancements
++
++-   Wrapped `Modal` in a `forwardRef` call ([#36831](https://github.com/WordPress/gutenberg/pull/36831)).
++
+ ## 19.0.2 (2021-11-15)
+ 
+ -   Remove erroneous use of `??=` syntax from `build-module`.
+diff --git a/packages/components/src/modal/README.md b/packages/components/src/modal/README.md
+index f0cf06f8530125..b1cf8687f2ae3c 100644
+--- a/packages/components/src/modal/README.md
++++ b/packages/components/src/modal/README.md
+@@ -255,6 +255,16 @@ This property when set to `true` will render a full screen modal.
+ -   Required: No
+ -   Default: `false`
+ 
++#### __experimentalHideHeader
++
++When set to `true`, the Modal's header (including the icon, title and close button) will not be rendered.
++
++*Warning*: This property is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++
++-   Type: `boolean`
++-   Required: No
++-   Default: `false`
++
+ ## Related components
+ 
+ -   To notify a user with a message of medium importance, use `Notice`.
+diff --git a/packages/components/src/modal/aria-helper.js b/packages/components/src/modal/aria-helper.js
+index 277293b337f466..aa6ecd01064ee6 100644
+--- a/packages/components/src/modal/aria-helper.js
++++ b/packages/components/src/modal/aria-helper.js
+@@ -1,3 +1,5 @@
++//@ts-nocheck
++
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/modal/index.js b/packages/components/src/modal/index.js
+index aadfb0ec5e337b..244f708ebf58e7 100644
+--- a/packages/components/src/modal/index.js
++++ b/packages/components/src/modal/index.js
+@@ -1,3 +1,5 @@
++//@ts-nocheck
++
+ /**
+  * External dependencies
+  */
+@@ -6,7 +8,12 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { createPortal, useEffect, useRef } from '@wordpress/element';
++import {
++	createPortal,
++	useEffect,
++	useRef,
++	forwardRef,
++} from '@wordpress/element';
+ import {
+ 	useInstanceId,
+ 	useFocusReturn,
+@@ -30,31 +37,34 @@ import StyleProvider from '../style-provider';
+ // Used to count the number of open modals.
+ let openModalCount = 0;
+ 
+-export default function Modal( {
+-	bodyOpenClassName = 'modal-open',
+-	role = 'dialog',
+-	title = null,
+-	focusOnMount = true,
+-	shouldCloseOnEsc = true,
+-	shouldCloseOnClickOutside = true,
+-	isDismissable, // Deprecated
+-	isDismissible = isDismissable || true,
+-	/* accessibility */
+-	aria = {
+-		labelledby: null,
+-		describedby: null,
+-	},
+-	onRequestClose,
+-	icon,
+-	closeButtonLabel,
+-	children,
+-	style,
+-	overlayClassName,
+-	className,
+-	contentLabel,
+-	onKeyDown,
+-	isFullScreen = false,
+-} ) {
++function Modal( props, forwardedRef ) {
++	const {
++		bodyOpenClassName = 'modal-open',
++		role = 'dialog',
++		title = null,
++		focusOnMount = true,
++		shouldCloseOnEsc = true,
++		shouldCloseOnClickOutside = true,
++		isDismissable, // Deprecated
++		isDismissible = isDismissable || true,
++		/* accessibility */
++		aria = {
++			labelledby: null,
++			describedby: null,
++		},
++		onRequestClose,
++		icon,
++		closeButtonLabel,
++		children,
++		style,
++		overlayClassName,
++		className,
++		contentLabel,
++		onKeyDown,
++		isFullScreen = false,
++		__experimentalHideHeader = false,
++	} = props;
++
+ 	const ref = useRef();
+ 	const instanceId = useInstanceId( Modal );
+ 	const headingId = title
+@@ -106,7 +116,7 @@ export default function Modal( {
+ 	return createPortal(
+ 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+ 		<div
+-			ref={ ref }
++			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
+ 			className={ classnames(
+ 				'components-modal__screen-overlay',
+ 				overlayClassName
+@@ -139,38 +149,43 @@ export default function Modal( {
+ 					onKeyDown={ onKeyDown }
+ 				>
+ 					<div
+-						className={ 'components-modal__content' }
++						className={ classnames( 'components-modal__content', {
++							'hide-header': __experimentalHideHeader,
++						} ) }
+ 						role="document"
+ 					>
+-						<div className="components-modal__header">
+-							<div className="components-modal__header-heading-container">
+-								{ icon && (
+-									<span
+-										className="components-modal__icon-container"
+-										aria-hidden
+-									>
+-										{ icon }
+-									</span>
+-								) }
+-								{ title && (
+-									<h1
+-										id={ headingId }
+-										className="components-modal__header-heading"
+-									>
+-										{ title }
+-									</h1>
++						{ ! __experimentalHideHeader && (
++							<div className="components-modal__header">
++								<div className="components-modal__header-heading-container">
++									{ icon && (
++										<span
++											className="components-modal__icon-container"
++											aria-hidden
++										>
++											{ icon }
++										</span>
++									) }
++									{ title && (
++										<h1
++											id={ headingId }
++											className="components-modal__header-heading"
++										>
++											{ title }
++										</h1>
++									) }
++								</div>
++								{ isDismissible && (
++									<Button
++										onClick={ onRequestClose }
++										icon={ closeSmall }
++										label={
++											closeButtonLabel ||
++											__( 'Close dialog' )
++										}
++									/>
+ 								) }
+ 							</div>
+-							{ isDismissible && (
+-								<Button
+-									onClick={ onRequestClose }
+-									icon={ closeSmall }
+-									label={
+-										closeButtonLabel || __( 'Close dialog' )
+-									}
+-								/>
+-							) }
+-						</div>
++						) }
+ 						{ children }
+ 					</div>
+ 				</div>
+@@ -179,3 +194,5 @@ export default function Modal( {
+ 		document.body
+ 	);
+ }
++
++export default forwardRef( Modal );
+diff --git a/packages/components/src/modal/stories/index.js b/packages/components/src/modal/stories/index.js
+index 862b5f05f6fc09..e21f6c0159bd7f 100644
+--- a/packages/components/src/modal/stories/index.js
++++ b/packages/components/src/modal/stories/index.js
+@@ -55,6 +55,10 @@ export const _default = () => {
+ 		'shouldCloseOnClickOutside',
+ 		true
+ 	);
++	const __experimentalHideHeader = boolean(
++		'__experimentalHideHeader',
++		false
++	);
+ 
+ 	const iconComponent = showIcon ? <Icon icon={ wordpress } /> : null;
+ 
+@@ -65,6 +69,7 @@ export const _default = () => {
+ 		shouldCloseOnEsc,
+ 		shouldCloseOnClickOutside,
+ 		title,
++		__experimentalHideHeader,
+ 	};
+ 
+ 	return <ModalExample { ...modalProps } />;
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index 8e8298e5213a46..7f96b1ab0c691a 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -126,4 +126,13 @@
+ 		display: block;
+ 		margin-bottom: $grid-unit-30;
+ 	}
++
++	&.hide-header {
++		margin-top: 0;
++		padding-top: $grid-unit-30;
++
++		&::before {
++			content: none;
++		}
++	}
+ }
+diff --git a/packages/components/src/modal/test/index.js b/packages/components/src/modal/test/index.js
+index a751f09eadf2c4..be41a91df3e004 100644
+--- a/packages/components/src/modal/test/index.js
++++ b/packages/components/src/modal/test/index.js
+@@ -46,4 +46,15 @@ describe( 'Modal', () => {
+ 		const titleId = within( dialog ).getByText( 'Test Title' ).id;
+ 		expect( dialog ).toHaveAttribute( 'aria-labelledby', titleId );
+ 	} );
++
++	it( 'hides the header when the `__experimentalHideHeader` prop is used', () => {
++		render(
++			<Modal title="Test Title" __experimentalHideHeader>
++				<p>Modal content</p>
++			</Modal>
++		);
++		const dialog = screen.getByRole( 'dialog' );
++		const title = within( dialog ).queryByText( 'Test Title' );
++		expect( title ).not.toBeInTheDocument();
++	} );
+ } );
+diff --git a/packages/components/src/style-provider/index.js b/packages/components/src/style-provider/index.js
+index 32c9a33b937079..0d64c78cbc7b70 100644
+--- a/packages/components/src/style-provider/index.js
++++ b/packages/components/src/style-provider/index.js
+@@ -1,3 +1,5 @@
++//@ts-nocheck
++
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 0670a09563bba8..ad15431b8dab41 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -46,6 +46,7 @@
+ 		"src/icon/**/*",
+ 		"src/menu-item/**/*",
+ 		"src/menu-group/**/*",
++		"src/modal/**/*",
+ 		"src/navigable-container/**/*",
+ 		"src/navigator/**/*",
+ 		"src/number-control/**/*",
+@@ -57,6 +58,7 @@
+ 		"src/select-control/**/*",
+ 		"src/shortcut/**/*",
+ 		"src/slot-fill/**/*",
++		"src/style-provider/**/*",
+ 		"src/spacer/**/*",
+ 		"src/spinner/**/*",
+ 		"src/surface/**/*",
+diff --git a/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/__snapshots__/index.js.snap
+index 9b50a624ada291..e071916946e253 100644
+--- a/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is active 1`] = `
+-<Modal
++<ForwardRef(Modal)
+   className="edit-post-keyboard-shortcut-help-modal"
+   closeLabel="Close"
+   onRequestClose={[Function]}
+@@ -80,7 +80,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
+     }
+     title="Text formatting"
+   />
+-</Modal>
++</ForwardRef(Modal)>
+ `;
+ 
+ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is not active 1`] = `""`;
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+index 733a2b82a410b9..64724cbf81551f 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`PreferencesModal should match snapshot when the modal is active large viewports 1`] = `
+-<Modal
++<ForwardRef(Modal)
+   className="edit-post-preferences-modal"
+   closeLabel="Close"
+   onRequestClose={[Function]}
+@@ -30,11 +30,11 @@ exports[`PreferencesModal should match snapshot when the modal is active large v
+   >
+     <Component />
+   </TabPanel>
+-</Modal>
++</ForwardRef(Modal)>
+ `;
+ 
+ exports[`PreferencesModal should match snapshot when the modal is active small viewports 1`] = `
+-<Modal
++<ForwardRef(Modal)
+   className="edit-post-preferences-modal"
+   closeLabel="Close"
+   onRequestClose={[Function]}
+@@ -386,5 +386,5 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
+       </Card>
+     </NavigatorScreen>
+   </NavigatorProvider>
+-</Modal>
++</ForwardRef(Modal)>
+ `;

@@ -1,0 +1,102 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 50061fc828412d..1923e779bfbaa8 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   Remove numeric multiplier option for spacing tokens from `Stack` and `Box` components. ([#73852](https://github.com/WordPress/gutenberg/pull/73852), [#74008](https://github.com/WordPress/gutenberg/pull/74008))
++
+ ### New Features
+ 
+-- Add `Stack` component
++-   Add `Stack` component. ([#73928](https://github.com/WordPress/gutenberg/pull/73928))
+diff --git a/packages/ui/src/box/box.tsx b/packages/ui/src/box/box.tsx
+index 421838b26ad429..e64a0e29a3d21b 100644
+--- a/packages/ui/src/box/box.tsx
++++ b/packages/ui/src/box/box.tsx
+@@ -28,22 +28,20 @@ const capitalize = ( str: string ): string =>
+ 	str.charAt( 0 ).toUpperCase() + str.slice( 1 );
+ 
+ /**
+- * Converts a size value to a CSS design token property reference (with
+- * fallback) or a calculated value based on the base unit.
++ * Converts a size token name to a CSS design token property reference (with
++ * fallback).
+  *
+  * @param property The CSS property name.
+  * @param target   The design system token target.
+- * @param value    The size value, either a number (multiplier of base unit) or a string (token name).
++ * @param value    The size token name.
+  * @return A CSS value string with variable references.
+  */
+ const getSpacingValue = (
+ 	property: string,
+ 	target: string,
+-	value: number | string
++	value: string
+ ): string =>
+-	typeof value === 'number'
+-		? `calc(var(--wpds-dimension-base) * ${ value })`
+-		: `var(--wpds-dimension-${ property }-${ target }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
++	`var(--wpds-dimension-${ property }-${ target }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
+ 
+ /**
+  * Generates CSS styles for properties with optionally directional values,
+diff --git a/packages/ui/src/box/types.ts b/packages/ui/src/box/types.ts
+index d576238994b1a4..fc101665495cda 100644
+--- a/packages/ui/src/box/types.ts
++++ b/packages/ui/src/box/types.ts
+@@ -3,9 +3,7 @@
+  */
+ import { type ComponentProps } from '../utils/types';
+ 
+-type SizeToken = '2xs' | 'xs' | 'sm' | 'md' | 'lg';
+-
+-type Size = number | SizeToken;
++type Size = '2xs' | 'xs' | 'sm' | 'md' | 'lg';
+ 
+ type BackgroundColor =
+ 	| 'neutral'
+@@ -52,6 +50,14 @@ type StrokeColor =
+ 	| 'warning'
+ 	| 'warning-strong';
+ 
++type Target =
++	| 'surface'
++	| 'interactive'
++	| 'content'
++	| 'track'
++	| 'thumb'
++	| 'focus';
++
+ type DimensionVariant< T > = {
+ 	block?: T;
+ 	blockStart?: T;
+@@ -65,7 +71,7 @@ export interface BoxProps extends ComponentProps< 'div' > {
+ 	/**
+ 	 * The target rendering element design token grouping to use for the box.
+ 	 */
+-	target?: string;
++	target?: Target;
+ 
+ 	/**
+ 	 * The surface background design token for box background color.
+@@ -85,12 +91,12 @@ export interface BoxProps extends ComponentProps< 'div' > {
+ 	/**
+ 	 * The surface border radius design token.
+ 	 */
+-	borderRadius?: Exclude< SizeToken, '2xs' >;
++	borderRadius?: Exclude< Size, '2xs' >;
+ 
+ 	/**
+ 	 * The surface border width design token.
+ 	 */
+-	borderWidth?: Exclude< SizeToken, '2xs' >;
++	borderWidth?: Exclude< Size, '2xs' >;
+ 
+ 	/**
+ 	 * The surface border stroke color design token.

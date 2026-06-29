@@ -1,0 +1,603 @@
+diff --git a/packages/boot/src/components/navigation/items.tsx b/packages/boot/src/components/navigation/items.tsx
+index 8205dcb505f129..d53fa04422ebfa 100644
+--- a/packages/boot/src/components/navigation/items.tsx
++++ b/packages/boot/src/components/navigation/items.tsx
+@@ -16,7 +16,7 @@ import type { IconType } from '../../store/types';
+  *
+  * @param element - The element to check
+  */
+-function isSvg( element: unknown ): element is JSX.Element {
++function isSvg( element: unknown ): element is React.JSX.Element {
+ 	return (
+ 		isValidElement( element ) &&
+ 		( element.type === SVG || element.type === 'svg' )
+diff --git a/packages/boot/src/store/types.ts b/packages/boot/src/store/types.ts
+index 256016b4234800..1cd94a4fe86155 100644
+--- a/packages/boot/src/store/types.ts
++++ b/packages/boot/src/store/types.ts
+@@ -10,7 +10,7 @@ import type { ReactNode, ComponentType } from 'react';
+  * - SVG icons from @wordpress/icons
+  * - Data URLs for images
+  */
+-export type IconType = string | JSX.Element | ReactNode;
++export type IconType = string | React.JSX.Element | ReactNode;
+ 
+ export interface MenuItem {
+ 	id: string;
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7e9013d23033ac..88d46470b10c0a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,7 +22,7 @@
+ -   `Disabled`, `Modal`, `Popover`, `Tooltip`: Move context code to separate files to help docgen prop extraction ([#75316](https://github.com/WordPress/gutenberg/pull/75316)).
+ -   Update Emotion dependencies to ensure compatibility with React 19 ([#75324](https://github.com/WordPress/gutenberg/pull/75324)).
+ -   Update Testing Library packages used in unit tests ([#75340](https://github.com/WordPress/gutenberg/pull/75340)).
+--   Clean up type declarations using the `React` namespace ([#75499](https://github.com/WordPress/gutenberg/pull/75499)).
++-   Clean up type declarations using the `React` namespace ([#75499](https://github.com/WordPress/gutenberg/pull/75499) and ([#75508](https://github.com/WordPress/gutenberg/pull/75508))).
+ -   Always specify initial values for `useRef` calls ([#75513](https://github.com/WordPress/gutenberg/pull/75513)).
+ 
+ ## 32.1.0 (2026-01-29)
+diff --git a/packages/components/src/alignment-matrix-control/test/index.tsx b/packages/components/src/alignment-matrix-control/test/index.tsx
+index a820b69b26c8ff..b2fabd8ceb1ebd 100644
+--- a/packages/components/src/alignment-matrix-control/test/index.tsx
++++ b/packages/components/src/alignment-matrix-control/test/index.tsx
+@@ -18,7 +18,7 @@ const getCell = ( name: string ) => {
+ };
+ 
+ const renderAndInitCompositeStore = async (
+-	jsx: JSX.Element,
++	jsx: React.JSX.Element,
+ 	focusedCell = 'center center'
+ ) => {
+ 	const view = render( jsx );
+diff --git a/packages/components/src/animate/types.ts b/packages/components/src/animate/types.ts
+index aedebf34be70fe..53646b2556c513 100644
+--- a/packages/components/src/animate/types.ts
++++ b/packages/components/src/animate/types.ts
+@@ -28,5 +28,5 @@ type DistributiveTypeAndOptions< T extends { type?: any } > = T extends any
+ 	: never;
+ 
+ export type AnimateProps = DistributiveTypeAndOptions< GetAnimateOptions > & {
+-	children: ( props: { className?: string } ) => JSX.Element;
++	children: ( props: { className?: string } ) => React.JSX.Element;
+ };
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index a3afb4b54908cd..926a0df75f0d81 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -66,7 +66,7 @@ export function useAutocomplete( {
+ 		null
+ 	);
+ 	const [ AutocompleterUI, setAutocompleterUI ] = useState<
+-		( ( props: AutocompleterUIProps ) => JSX.Element | null ) | null
++		( ( props: AutocompleterUIProps ) => React.JSX.Element | null ) | null
+ 	>( null );
+ 
+ 	const backspacingRef = useRef( false );
+diff --git a/packages/components/src/composite/stories/index.story.tsx b/packages/components/src/composite/stories/index.story.tsx
+index 14e7894832167b..c23558ff2889ee 100644
+--- a/packages/components/src/composite/stories/index.story.tsx
++++ b/packages/components/src/composite/stories/index.story.tsx
+@@ -239,7 +239,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
+ 
+ 				// Render all context providers forwarded by the Slot via fillProps.
+ 				return forwardedContext.reduce(
+-					( inner: JSX.Element, [ Provider, props ] ) => (
++					( inner: React.JSX.Element, [ Provider, props ] ) => (
+ 						<Provider { ...props }>{ inner }</Provider>
+ 					),
+ 					innerMarkup
+diff --git a/packages/components/src/context/context-connect.ts b/packages/components/src/context/context-connect.ts
+index b7ec73f433045e..ed7c708df1e4b7 100644
+--- a/packages/components/src/context/context-connect.ts
++++ b/packages/components/src/context/context-connect.ts
+@@ -34,7 +34,7 @@ type ContextConnectOptions = {
+  * @return The connected WordPressComponent
+  */
+ export function contextConnect<
+-	C extends ( props: any, ref: ForwardedRef< any > ) => JSX.Element | null,
++	C extends ( props: any, ref: ForwardedRef< any > ) => ReactNode,
+ >(
+ 	Component: C &
+ 		AcceptsTwoArgs<
+@@ -55,7 +55,7 @@ export function contextConnect<
+  * @return The connected WordPressComponent
+  */
+ export function contextConnectWithoutRef< P >(
+-	Component: ( props: P ) => JSX.Element | null,
++	Component: ( props: P ) => ReactNode,
+ 	namespace: string
+ ) {
+ 	return _contextConnect( Component, namespace );
+@@ -65,7 +65,7 @@ export function contextConnectWithoutRef< P >(
+ // The hope is that we can improve render performance by removing functional
+ // component wrappers.
+ function _contextConnect<
+-	C extends ( props: any, ref: ForwardedRef< any > ) => JSX.Element | null,
++	C extends ( props: any, ref: ForwardedRef< any > ) => ReactNode,
+ 	O extends ContextConnectOptions,
+ >(
+ 	Component: C,
+diff --git a/packages/components/src/context/wordpress-component.ts b/packages/components/src/context/wordpress-component.ts
+index 6e88ed4efb094e..947378185d2b4f 100644
+--- a/packages/components/src/context/wordpress-component.ts
++++ b/packages/components/src/context/wordpress-component.ts
+@@ -24,7 +24,7 @@ export type WordPressComponentProps<
+ 	( IsPolymorphic extends true
+ 		? {
+ 				/** The HTML element or React component to render the component as. */
+-				as?: T | keyof JSX.IntrinsicElements;
++				as?: T | keyof React.JSX.IntrinsicElements;
+ 		  }
+ 		: {} );
+ 
+@@ -36,10 +36,8 @@ export type WordPressComponent<
+ 	< TT extends React.ElementType >(
+ 		props: WordPressComponentProps< O, TT, IsPolymorphic > &
+ 			( IsPolymorphic extends true ? { as: TT } : {} )
+-	): JSX.Element | null;
+-	(
+-		props: WordPressComponentProps< O, T, IsPolymorphic >
+-	): JSX.Element | null;
++	): React.ReactNode;
++	( props: WordPressComponentProps< O, T, IsPolymorphic > ): React.ReactNode;
+ 	displayName?: string;
+ 	/**
+ 	 * A CSS selector used to fake component interpolation in styled components
+diff --git a/packages/components/src/draggable/types.ts b/packages/components/src/draggable/types.ts
+index 5242ecf7d67eb6..61dd345e74d2ca 100644
+--- a/packages/components/src/draggable/types.ts
++++ b/packages/components/src/draggable/types.ts
+@@ -16,7 +16,7 @@ export type DraggableProps = {
+ 		 * `onDragEnd` handler.
+ 		 */
+ 		onDraggableEnd: ( event: DragEvent ) => void;
+-	} ) => JSX.Element | null;
++	} ) => React.JSX.Element | null;
+ 	/**
+ 	 * Whether to append the cloned element to the `ownerDocument` body.
+ 	 * By default, elements sourced by id are appended to the element's wrapper.
+diff --git a/packages/components/src/drop-zone/types.ts b/packages/components/src/drop-zone/types.ts
+index 86145e689b8b3e..e674c57886a21c 100644
+--- a/packages/components/src/drop-zone/types.ts
++++ b/packages/components/src/drop-zone/types.ts
+@@ -10,7 +10,7 @@ export type DropZoneProps = {
+ 	 *
+ 	 * @default "upload"
+ 	 */
+-	icon?: JSX.Element;
++	icon?: React.JSX.Element;
+ 	/**
+ 	 * A string to be shown within the drop zone area.
+ 	 *
+diff --git a/packages/components/src/dropdown-menu/types.ts b/packages/components/src/dropdown-menu/types.ts
+index 7deb08abaa28ec..eab21d3037855b 100644
+--- a/packages/components/src/dropdown-menu/types.ts
++++ b/packages/components/src/dropdown-menu/types.ts
+@@ -58,7 +58,7 @@ type ToggleProps = Partial<
+ 		'label' | 'text'
+ 	>
+ > & {
+-	as?: React.ElementType | keyof JSX.IntrinsicElements;
++	as?: React.ElementType | keyof React.JSX.IntrinsicElements;
+ 	'data-toolbar-item'?: boolean;
+ };
+ 
+diff --git a/packages/components/src/h-stack/test/index.tsx b/packages/components/src/h-stack/test/index.tsx
+index 75352f3dfd22f0..f9c57fdf417055 100644
+--- a/packages/components/src/h-stack/test/index.tsx
++++ b/packages/components/src/h-stack/test/index.tsx
+@@ -41,7 +41,7 @@ describe( 'props', () => {
+ 	} );
+ 
+ 	test( 'should not pass through invalid props to the `as` component', () => {
+-		const AsComponent = ( props: JSX.IntrinsicElements[ 'div' ] ) => {
++		const AsComponent = ( props: React.JSX.IntrinsicElements[ 'div' ] ) => {
+ 			return <div { ...props } />;
+ 		};
+ 
+diff --git a/packages/components/src/heading/hook.ts b/packages/components/src/heading/hook.ts
+index 311f2397615900..bf7eed2097ee40 100644
+--- a/packages/components/src/heading/hook.ts
++++ b/packages/components/src/heading/hook.ts
+@@ -20,7 +20,7 @@ export function useHeading(
+ 		...otherProps
+ 	} = useContextSystem( props, 'Heading' );
+ 
+-	const as = ( asProp || `h${ level }` ) as keyof JSX.IntrinsicElements;
++	const as = ( asProp || `h${ level }` ) as keyof React.JSX.IntrinsicElements;
+ 
+ 	const a11yProps: {
+ 		role?: string;
+diff --git a/packages/components/src/higher-order/with-notices/types.ts b/packages/components/src/higher-order/with-notices/types.ts
+index e914d21d82df7d..8c30e2324322b7 100644
+--- a/packages/components/src/higher-order/with-notices/types.ts
++++ b/packages/components/src/higher-order/with-notices/types.ts
+@@ -31,5 +31,5 @@ export type WithNoticeProps = {
+ 		 */
+ 		removeAllNotices: () => void;
+ 	};
+-	noticeUI: false | JSX.Element;
++	noticeUI: false | React.JSX.Element;
+ };
+diff --git a/packages/components/src/icon/index.tsx b/packages/components/src/icon/index.tsx
+index 07ec786da7a9a0..99189209d1f359 100644
+--- a/packages/components/src/icon/index.tsx
++++ b/packages/components/src/icon/index.tsx
+@@ -22,8 +22,8 @@ import type { IconKey as DashiconIconKey } from '../dashicon/types';
+ export type IconType =
+ 	| DashiconIconKey
+ 	| ComponentType< { size?: number } >
+-	| ( ( props: { size?: number } ) => JSX.Element )
+-	| JSX.Element;
++	| ( ( props: { size?: number } ) => React.JSX.Element )
++	| React.JSX.Element;
+ 
+ type AdditionalProps< T > = T extends ComponentType< infer U >
+ 	? U
+diff --git a/packages/components/src/menu-item/types.ts b/packages/components/src/menu-item/types.ts
+index d213af6153accc..218c92e3572f64 100644
+--- a/packages/components/src/menu-item/types.ts
++++ b/packages/components/src/menu-item/types.ts
+@@ -27,7 +27,7 @@ export type MenuItemProps = Pick< ButtonAsButtonProps, 'isDestructive' > & {
+ 	 *
+ 	 * @default null
+ 	 */
+-	icon?: JSX.Element | null;
++	icon?: React.JSX.Element | null;
+ 	/**
+ 	 * Determines where to display the provided `icon`.
+ 	 */
+diff --git a/packages/components/src/menu/stories/index.story.tsx b/packages/components/src/menu/stories/index.story.tsx
+index bb2df1e7a9f36c..1268905571d092 100644
+--- a/packages/components/src/menu/stories/index.story.tsx
++++ b/packages/components/src/menu/stories/index.story.tsx
+@@ -513,7 +513,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
+ 				const { forwardedContext = [] } = fillProps;
+ 
+ 				return forwardedContext.reduce(
+-					( inner: JSX.Element, [ Provider, props ] ) => (
++					( inner: React.JSX.Element, [ Provider, props ] ) => (
+ 						<Provider { ...props }>{ inner }</Provider>
+ 					),
+ 					innerMarkup
+diff --git a/packages/components/src/modal/types.ts b/packages/components/src/modal/types.ts
+index f6f35eec85fc73..c46052819cac7c 100644
+--- a/packages/components/src/modal/types.ts
++++ b/packages/components/src/modal/types.ts
+@@ -70,7 +70,7 @@ export type ModalProps = {
+ 	/**
+ 	 * If this property is added, an icon will be added before the title.
+ 	 */
+-	icon?: JSX.Element;
++	icon?: React.JSX.Element;
+ 	/**
+ 	 * If this property is set to false, the modal will not display a close icon
+ 	 * and cannot be dismissed.
+diff --git a/packages/components/src/navigation/README.md b/packages/components/src/navigation/README.md
+index b294eb78331eef..45af7dac6fb016 100644
+--- a/packages/components/src/navigation/README.md
++++ b/packages/components/src/navigation/README.md
+@@ -218,7 +218,7 @@ If provided, renders `a` instead of `button`.
+ 
+ ### `icon`
+ 
+--   Type: `JSX.Element`
++-   Type: `React.JSX.Element`
+ -   Required: No
+ 
+ If no `children` are passed, this prop allows to specify a custom icon for the menu item.
+diff --git a/packages/components/src/navigation/types.ts b/packages/components/src/navigation/types.ts
+index 4dbc9f5236cc33..e1dc4ca28f8ea1 100644
+--- a/packages/components/src/navigation/types.ts
++++ b/packages/components/src/navigation/types.ts
+@@ -180,7 +180,7 @@ export type NavigationItemBaseProps = {
+ 	 * If no `children` are passed, this prop allows to specify a custom icon for
+ 	 * the menu item.
+ 	 */
+-	icon?: JSX.Element;
++	icon?: React.JSX.Element;
+ 	/**
+ 	 * The unique identifier of the item.
+ 	 */
+diff --git a/packages/components/src/panel/README.md b/packages/components/src/panel/README.md
+index ae9c209f250f54..dcb3560bc023bf 100644
+--- a/packages/components/src/panel/README.md
++++ b/packages/components/src/panel/README.md
+@@ -117,7 +117,7 @@ The CSS class to apply to the wrapper element.
+ 
+ -   Required: No
+ 
+-###### `icon`: `JSX.Element`
++###### `icon`: `React.JSX.Element`
+ 
+ An icon to be shown next to the title.
+ 
+diff --git a/packages/components/src/panel/types.ts b/packages/components/src/panel/types.ts
+index 6b7ab35a57520a..c28a4e1a25166b 100644
+--- a/packages/components/src/panel/types.ts
++++ b/packages/components/src/panel/types.ts
+@@ -70,7 +70,7 @@ export type PanelBodyProps = {
+ 	/**
+ 	 * An icon to be shown next to the title.
+ 	 */
+-	icon?: JSX.Element;
++	icon?: React.JSX.Element;
+ 	/**
+ 	 * Whether or not the panel will start open.
+ 	 */
+@@ -104,7 +104,7 @@ export type PanelBodyTitleProps = Omit< ButtonAsButtonProps, 'icon' > & {
+ 	/**
+ 	 * An icon to be shown next to the title.
+ 	 */
+-	icon?: JSX.Element;
++	icon?: React.JSX.Element;
+ 	/**
+ 	 * Whether or not the `PanelBody` is currently opened or not.
+ 	 */
+diff --git a/packages/components/src/resizable-box/index.tsx b/packages/components/src/resizable-box/index.tsx
+index 6c08cdc3e308ae..fce7671b4214bd 100644
+--- a/packages/components/src/resizable-box/index.tsx
++++ b/packages/components/src/resizable-box/index.tsx
+@@ -104,7 +104,7 @@ function UnforwardedResizableBox(
+ 		...props
+ 	}: ResizableBoxProps,
+ 	ref: ForwardedRef< Resizable >
+-): JSX.Element {
++) {
+ 	return (
+ 		<Resizable
+ 			className={ clsx(
+diff --git a/packages/components/src/resizable-box/resize-tooltip/index.tsx b/packages/components/src/resizable-box/resize-tooltip/index.tsx
+index edab3f8406798c..cc255072d3582f 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/index.tsx
++++ b/packages/components/src/resizable-box/resize-tooltip/index.tsx
+@@ -46,7 +46,7 @@ function ResizeTooltip(
+ 		...props
+ 	}: ResizeTooltipProps,
+ 	ref: ForwardedRef< HTMLDivElement >
+-): JSX.Element | null {
++) {
+ 	const { label, resizeListener } = useResizeLabel( {
+ 		axis,
+ 		fadeTimeout,
+diff --git a/packages/components/src/resizable-box/resize-tooltip/label.tsx b/packages/components/src/resizable-box/resize-tooltip/label.tsx
+index 6f3cb4c77a49b4..13272be6e54041 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/label.tsx
++++ b/packages/components/src/resizable-box/resize-tooltip/label.tsx
+@@ -35,7 +35,7 @@ type LabelProps = React.DetailedHTMLProps<
+ function Label(
+ 	{ label, position = POSITIONS.corner, zIndex = 1000, ...props }: LabelProps,
+ 	ref: ForwardedRef< HTMLDivElement >
+-): JSX.Element | null {
++) {
+ 	const showLabel = !! label;
+ 
+ 	const isBottom = position === POSITIONS.bottom;
+diff --git a/packages/components/src/resizable-box/resize-tooltip/utils.ts b/packages/components/src/resizable-box/resize-tooltip/utils.ts
+index 804a0d3f402c53..04d00b0501451b 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/utils.ts
++++ b/packages/components/src/resizable-box/resize-tooltip/utils.ts
+@@ -19,7 +19,7 @@ interface UseResizeLabelProps {
+ 	/** The label value. */
+ 	label?: string;
+ 	/** Element to be rendered for resize listening events. */
+-	resizeListener: JSX.Element;
++	resizeListener: React.JSX.Element;
+ }
+ 
+ interface UseResizeLabelArgs {
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 1761693a8a7584..2aeb229eb27ee2 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -35,7 +35,7 @@ export type ToggleGroupControlOptionIconProps = Pick<
+ 	 * Icon displayed as the content of the option. Usually one of the icons from
+ 	 * the `@wordpress/icons` package, or a custom React `<svg>` icon.
+ 	 */
+-	icon: JSX.Element;
++	icon: React.JSX.Element;
+ 	/**
+ 	 * The text to accessibly label the icon option. Will also be shown in a tooltip.
+ 	 */
+diff --git a/packages/components/src/tree-grid/types.ts b/packages/components/src/tree-grid/types.ts
+index f4946ba58ca8a0..eefce4a8040002 100644
+--- a/packages/components/src/tree-grid/types.ts
++++ b/packages/components/src/tree-grid/types.ts
+@@ -61,7 +61,7 @@ export type RovingTabIndexItemProps = {
+ 	 * </TreeGridCell>
+ 	 * ```
+ 	 */
+-	children?: ( props: RovingTabIndexItemPassThruProps ) => JSX.Element;
++	children?: ( props: RovingTabIndexItemPassThruProps ) => React.JSX.Element;
+ 	/**
+ 	 * If `children` is not a function, this component will be used instead.
+ 	 */
+diff --git a/packages/components/src/v-stack/test/index.tsx b/packages/components/src/v-stack/test/index.tsx
+index e8ea1ab0ee396f..f5151a6e72987f 100644
+--- a/packages/components/src/v-stack/test/index.tsx
++++ b/packages/components/src/v-stack/test/index.tsx
+@@ -41,7 +41,7 @@ describe( 'props', () => {
+ 	} );
+ 
+ 	test( 'should not pass through invalid props to the `as` component', () => {
+-		const AsComponent = ( props: JSX.IntrinsicElements[ 'div' ] ) => {
++		const AsComponent = ( props: React.JSX.IntrinsicElements[ 'div' ] ) => {
+ 			return <div { ...props } />;
+ 		};
+ 
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index d64cc09ffbbe88..2d351e07706d73 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -32,6 +32,7 @@
+ - DataForm: Use public `ColorPicker` component instead of internal `Picker` in color control. [#75394](https://github.com/WordPress/gutenberg/pull/75394)
+ - Update Testing Library packages used in unit tests. [#75340](https://github.com/WordPress/gutenberg/pull/75340)
+ - Always specify initial values for `useRef` calls. [#75513](https://github.com/WordPress/gutenberg/pull/75513)
++- Clean up type declarations using the `React` namespace. ([#75508](https://github.com/WordPress/gutenberg/pull/75508)
+ 
+ ## 11.3.0 (2026-01-29)
+ 
+diff --git a/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx b/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx
+index 12584a0713dee5..d25eb948e6da72 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/grid/composite-grid.tsx
+@@ -287,7 +287,7 @@ const GridItem = forwardRef( function GridItem< Item >(
+ 	props: GridItemProps< Item > & {
+ 		ref?: React.ForwardedRef< HTMLDivElement >;
+ 	}
+-) => JSX.Element;
++) => React.ReactNode;
+ 
+ interface CompositeGridProps< Item > {
+ 	data: Item[];
+diff --git a/packages/editor/src/components/style-book/color-examples.tsx b/packages/editor/src/components/style-book/color-examples.tsx
+index f99b4107eae0ae..66318b750492d2 100644
+--- a/packages/editor/src/components/style-book/color-examples.tsx
++++ b/packages/editor/src/components/style-book/color-examples.tsx
+@@ -24,7 +24,7 @@ const ColorExamples = ( {
+ 	type,
+ 	templateColumns = '1fr 1fr',
+ 	itemHeight = '52px',
+-}: ColorExampleProps ): JSX.Element | null => {
++}: ColorExampleProps ) => {
+ 	if ( ! colors ) {
+ 		return null;
+ 	}
+diff --git a/packages/editor/src/components/style-book/duotone-examples.tsx b/packages/editor/src/components/style-book/duotone-examples.tsx
+index 6c24cb2c514bdb..717b4667bc7141 100644
+--- a/packages/editor/src/components/style-book/duotone-examples.tsx
++++ b/packages/editor/src/components/style-book/duotone-examples.tsx
+@@ -8,11 +8,7 @@ import { __experimentalGrid as Grid } from '@wordpress/components';
+  */
+ import type { Duotone } from './types';
+ 
+-const DuotoneExamples = ( {
+-	duotones,
+-}: {
+-	duotones: Duotone[];
+-} ): JSX.Element | null => {
++const DuotoneExamples = ( { duotones }: { duotones: Duotone[] } ) => {
+ 	if ( ! duotones ) {
+ 		return null;
+ 	}
+diff --git a/packages/editor/src/components/style-book/types.ts b/packages/editor/src/components/style-book/types.ts
+index 9a97c3aad7f79d..4cd32ee2ce50b6 100644
+--- a/packages/editor/src/components/style-book/types.ts
++++ b/packages/editor/src/components/style-book/types.ts
+@@ -17,7 +17,7 @@ export type BlockExample = {
+ 	name: string;
+ 	title: string;
+ 	category: string;
+-	content?: JSX.Element;
++	content?: React.JSX.Element;
+ 	blocks?: Block | Block[];
+ };
+ 
+diff --git a/packages/element/README.md b/packages/element/README.md
+index fe7dcee920d993..b0a944c3a2dfa7 100755
+--- a/packages/element/README.md
++++ b/packages/element/README.md
+@@ -294,7 +294,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `JSX.Element`: Dangerously-rendering component.
++-   Dangerously-rendering component.
+ 
+ ### render
+ 
+diff --git a/packages/element/src/raw-html.ts b/packages/element/src/raw-html.ts
+index 0fdc1f61cb0480..ca24135a5a37fe 100644
+--- a/packages/element/src/raw-html.ts
++++ b/packages/element/src/raw-html.ts
+@@ -31,10 +31,7 @@ export type RawHTMLProps = {
+  *
+  * @return Dangerously-rendering component.
+  */
+-export default function RawHTML( {
+-	children,
+-	...props
+-}: RawHTMLProps ): JSX.Element {
++export default function RawHTML( { children, ...props }: RawHTMLProps ) {
+ 	let rawHtml = '';
+ 
+ 	// Cast children as an array, and concatenate each element if it is a string.
+diff --git a/packages/fields/src/actions/duplicate-post.tsx b/packages/fields/src/actions/duplicate-post.tsx
+index 2bd1c9b68ea573..e3f476e798d5fe 100644
+--- a/packages/fields/src/actions/duplicate-post.tsx
++++ b/packages/fields/src/actions/duplicate-post.tsx
+@@ -30,7 +30,7 @@ interface Action< Item > {
+ 	label: string;
+ 	isEligible?: ( item: Item ) => boolean;
+ 	modalFocusOnMount?: string;
+-	RenderModal: ( props: RenderModalProps< Item > ) => JSX.Element;
++	RenderModal: ( props: RenderModalProps< Item > ) => React.JSX.Element;
+ }
+ 
+ const duplicatePost: Action< BasePost > = {
+diff --git a/packages/fields/src/actions/reorder-page.tsx b/packages/fields/src/actions/reorder-page.tsx
+index edb67f2e5f9b82..a870758443d81e 100644
+--- a/packages/fields/src/actions/reorder-page.tsx
++++ b/packages/fields/src/actions/reorder-page.tsx
+@@ -29,7 +29,7 @@ interface Action< Item > {
+ 	label: string;
+ 	isEligible?: ( item: Item ) => boolean;
+ 	modalFocusOnMount?: string;
+-	RenderModal: ( props: RenderModalProps< Item > ) => JSX.Element;
++	RenderModal: ( props: RenderModalProps< Item > ) => React.JSX.Element;
+ }
+ 
+ function isItemValid( item: BasePost ): boolean {
+diff --git a/packages/global-styles-ui/src/font-library/google-fonts-confirm-dialog.tsx b/packages/global-styles-ui/src/font-library/google-fonts-confirm-dialog.tsx
+index 5fe8f78a0d451f..eab917d9590865 100644
+--- a/packages/global-styles-ui/src/font-library/google-fonts-confirm-dialog.tsx
++++ b/packages/global-styles-ui/src/font-library/google-fonts-confirm-dialog.tsx
+@@ -11,7 +11,7 @@ import {
+ 	__experimentalSpacer as Spacer,
+ } from '@wordpress/components';
+ 
+-function GoogleFontsConfirmDialog(): JSX.Element {
++function GoogleFontsConfirmDialog() {
+ 	const handleConfirm = (): void => {
+ 		window.localStorage.setItem(
+ 			'wp-font-library-google-fonts-permission',
+diff --git a/packages/media-fields/src/types.ts b/packages/media-fields/src/types.ts
+index d593ce21330ca7..ae110e281af862 100644
+--- a/packages/media-fields/src/types.ts
++++ b/packages/media-fields/src/types.ts
+@@ -8,7 +8,7 @@ export type MediaKind = 'image' | 'video' | 'audio' | 'application';
+ export interface MediaType {
+ 	type: MediaKind;
+ 	label: string;
+-	icon: JSX.Element;
++	icon: React.JSX.Element;
+ }
+ 
+ // TODO: Update the Attachment type separately.
+diff --git a/packages/react-i18n/README.md b/packages/react-i18n/README.md
+index b5de8516678308..172f770fde51ce 100644
+--- a/packages/react-i18n/README.md
++++ b/packages/react-i18n/README.md
+@@ -44,7 +44,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `JSX.Element`: Children wrapped in the I18nProvider.
++-   Children wrapped in the I18nProvider.
+ 
+ ### useI18n
+ 
+diff --git a/packages/react-i18n/src/index.tsx b/packages/react-i18n/src/index.tsx
+index 5600bc463048c5..76640e14fb3b72 100644
+--- a/packages/react-i18n/src/index.tsx
++++ b/packages/react-i18n/src/index.tsx
+@@ -73,7 +73,7 @@ type I18nProviderProps = PropsWithChildren< { i18n: I18n } >;
+  * @param props i18n provider props.
+  * @return Children wrapped in the I18nProvider.
+  */
+-export function I18nProvider( props: I18nProviderProps ): JSX.Element {
++export function I18nProvider( props: I18nProviderProps ) {
+ 	const { children, i18n = defaultI18n } = props;
+ 	const [ update, forceUpdate ] = useReducer( () => [], [] );
+ 

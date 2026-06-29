@@ -1,0 +1,56 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 4cfaec8f0ecc94..b81977913de3c0 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -425,6 +425,7 @@ module.exports = {
+ 			files: [
+ 				'**/@(storybook|stories)/**',
+ 				'packages/components/src/**/*.tsx',
++				'packages/ui/src/**/*.tsx',
+ 			],
+ 			rules: {
+ 				// Useful to add story descriptions via JSDoc without specifying params,
+diff --git a/packages/ui/src/badge/badge.tsx b/packages/ui/src/badge/badge.tsx
+index 81846b304dd90d..4e79a86c091f3f 100644
+--- a/packages/ui/src/badge/badge.tsx
++++ b/packages/ui/src/badge/badge.tsx
+@@ -12,8 +12,6 @@ import { type BadgeProps } from './types';
+ 
+ /**
+  * Default render function that renders a span element with the given props.
+- *
+- * @param props The props to apply to the HTML element.
+  */
+ const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'span' > ) => (
+ 	<span { ...props } />
+@@ -22,7 +20,6 @@ const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'span' > ) => (
+ /**
+  * Maps intent values to Box backgroundColor and color props.
+  * Uses strong emphasis styles (as emphasis prop has been removed).
+- * @param intent
+  */
+ const getIntentStyles = (
+ 	intent: BadgeProps[ 'intent' ]
+diff --git a/packages/ui/src/box/box.tsx b/packages/ui/src/box/box.tsx
+index e64a0e29a3d21b..91367623d0db4e 100644
+--- a/packages/ui/src/box/box.tsx
++++ b/packages/ui/src/box/box.tsx
+@@ -11,8 +11,6 @@ import { renderElement } from '../utils/element';
+ 
+ /**
+  * Default render function that renders a div element with the given props.
+- *
+- * @param props The props to apply to the HTML element.
+  */
+ const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'div' > ) => (
+ 	<div { ...props } />
+@@ -20,9 +18,6 @@ const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'div' > ) => (
+ 
+ /**
+  * Capitalizes the first character of a string.
+- *
+- * @param str The string to capitalize.
+- * @return The capitalized string.
+  */
+ const capitalize = ( str: string ): string =>
+ 	str.charAt( 0 ).toUpperCase() + str.slice( 1 );

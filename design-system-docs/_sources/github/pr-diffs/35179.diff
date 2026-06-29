@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/item-group/stories/index.js b/packages/components/src/item-group/stories/index.js
+index 6c0ad5a671ffd7..6be6717e1f9ae8 100644
+--- a/packages/components/src/item-group/stories/index.js
++++ b/packages/components/src/item-group/stories/index.js
+@@ -101,7 +101,7 @@ export const dropdown = () => (
+ 	</Flyout>
+ );
+ 
+-export const SimpleColorSwatch = ( { color, style } ) => (
++const SimpleColorSwatch = ( { color, style } ) => (
+ 	<div
+ 		style={ {
+ 			...style,

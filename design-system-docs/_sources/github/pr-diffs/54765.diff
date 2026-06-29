@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index dbcdd8ca475572..b9b18a20c80496 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `Placeholder`: Improved DOM structure and screen reader announcements ([#45801](https://github.com/WordPress/gutenberg/pull/45801)).
+ -   `DateTimePicker`: fix onChange callback check so that it also works inside iframes ([#54669](https://github.com/WordPress/gutenberg/pull/54669)).
+ -   `FormTokenField`: Add `box-sizing` reset style and reset default padding ([#54734](https://github.com/WordPress/gutenberg/pull/54734)).
++-   `SlotFill`: Pass `Component` instance to unregisterSlot ([#54765](https://github.com/WordPress/gutenberg/pull/54765)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/slot-fill/slot.js b/packages/components/src/slot-fill/slot.js
+index a960647c3ab64e..f03192de95263f 100644
+--- a/packages/components/src/slot-fill/slot.js
++++ b/packages/components/src/slot-fill/slot.js
+@@ -47,7 +47,7 @@ class SlotComponent extends Component {
+ 		const { name, unregisterSlot, registerSlot } = this.props;
+ 
+ 		if ( prevProps.name !== name ) {
+-			unregisterSlot( prevProps.name );
++			unregisterSlot( prevProps.name, this );
+ 			registerSlot( name, this );
+ 		}
+ 	}

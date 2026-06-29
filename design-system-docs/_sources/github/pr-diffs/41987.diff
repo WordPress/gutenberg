@@ -1,0 +1,59 @@
+diff --git a/packages/components/src/modal/index.js b/packages/components/src/modal/index.js
+index 5230f6b4c4852f..3cccda2c927ce5 100644
+--- a/packages/components/src/modal/index.js
++++ b/packages/components/src/modal/index.js
+@@ -141,11 +141,6 @@ function Modal( props, forwardedRef ) {
+ 						}
+ 					) }
+ 					style={ style }
+-					ref={ useMergeRefs( [
+-						constrainedTabbingRef,
+-						focusReturnRef,
+-						focusOnMountRef,
+-					] ) }
+ 					role={ role }
+ 					aria-label={ contentLabel }
+ 					aria-labelledby={ contentLabel ? null : headingId }
+@@ -162,6 +157,12 @@ function Modal( props, forwardedRef ) {
+ 							'has-scrolled-content': hasScrolledContent,
+ 						} ) }
+ 						role="document"
++						tabIndex="0"
++						ref={ useMergeRefs( [
++							constrainedTabbingRef,
++							focusReturnRef,
++							focusOnMountRef,
++						] ) }
+ 						onScroll={ onContentContainerScroll }
+ 					>
+ 						{ ! __experimentalHideHeader && (
+diff --git a/packages/e2e-tests/specs/editor/various/shortcut-help.test.js b/packages/e2e-tests/specs/editor/various/shortcut-help.test.js
+index 838a3edac2a2a4..51f2db5e49f77b 100644
+--- a/packages/e2e-tests/specs/editor/various/shortcut-help.test.js
++++ b/packages/e2e-tests/specs/editor/various/shortcut-help.test.js
+@@ -21,6 +21,25 @@ describe( 'keyboard shortcut help modal', () => {
+ 		expect( shortcutHelpModalElements ).toHaveLength( 1 );
+ 	} );
+ 
++	// Added this test to ensure scrolling does not break in some browsers.
++	it( 'should contain tabindex on modal content div to improve compatibility with scrolling in browsers', async () => {
++		// Open modal.
++		await clickOnMoreMenuItem( 'Keyboard shortcuts' );
++		const shortcutHelpModalElements = await page.$$(
++			'.edit-post-keyboard-shortcut-help-modal'
++		);
++		await expect( shortcutHelpModalElements ).toHaveLength( 1 );
++
++		// Try to find tabindex of 0 on the div content element.
++		const findTabIndex = await page.evaluate(
++			() =>
++				document
++					.querySelector( 'div.components-modal__content' )
++					.getAttribute( 'tabindex' ) === '0'
++		);
++		await expect( findTabIndex ).toBe( true );
++	} );
++
+ 	it( 'closes the shortcut help modal when the close icon is clicked', async () => {
+ 		await clickOnCloseModalButton();
+ 		const shortcutHelpModalElements = await page.$$(

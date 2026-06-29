@@ -1,0 +1,56 @@
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+index 86efc5224077f4..020468991225c1 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+@@ -70,7 +70,7 @@ export const buttonView = ( {
+ 	}
+ 
+ 	&:active {
+-		background: ${ CONFIG.toggleGroupControlBackgroundColor };
++		background: ${ CONFIG.controlBackgroundColor };
+ 	}
+ 
+ 	${ isDeselectable && deselectable }
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 2040f479a231c2..1bc3945f9b3b16 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -7,18 +7,13 @@ import { COLORS } from './colors-values';
+ const CONTROL_HEIGHT = '36px';
+ 
+ const CONTROL_PROPS = {
+-	controlSurfaceColor: COLORS.white,
+-	controlTextActiveColor: COLORS.theme.accent,
+-
+ 	// These values should be shared with TextControl.
+ 	controlPaddingX: 12,
+ 	controlPaddingXSmall: 8,
+ 	controlPaddingXLarge: 12 * 1.3334, // TODO: Deprecate
+ 
+ 	controlBackgroundColor: COLORS.white,
+-	controlBoxShadow: 'transparent',
+ 	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.theme.accent }`,
+-	controlDestructiveBorderColor: COLORS.alert.red,
+ 	controlHeight: CONTROL_HEIGHT,
+ 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
+ 	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
+@@ -26,18 +21,9 @@ const CONTROL_PROPS = {
+ 	controlHeightXLarge: `calc( ${ CONTROL_HEIGHT } * 1.4 )`,
+ };
+ 
+-const TOGGLE_GROUP_CONTROL_PROPS = {
+-	toggleGroupControlBackgroundColor: CONTROL_PROPS.controlBackgroundColor,
+-	toggleGroupControlBorderColor: COLORS.ui.border,
+-	toggleGroupControlBackdropBackgroundColor:
+-		CONTROL_PROPS.controlSurfaceColor,
+-	toggleGroupControlBackdropBorderColor: COLORS.ui.border,
+-	toggleGroupControlButtonColorActive: CONTROL_PROPS.controlBackgroundColor,
+-};
+-
+ // Using Object.assign to avoid creating circular references when emitting
+ // TypeScript type declarations.
+-export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
++export default Object.assign( {}, CONTROL_PROPS, {
+ 	colorDivider: 'rgba(0, 0, 0, 0.1)',
+ 	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
+ 	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',

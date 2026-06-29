@@ -1,0 +1,55 @@
+diff --git a/packages/components/src/custom-select-control-v2/README.md b/packages/components/src/custom-select-control-v2/README.md
+index e44801681128b1..db7208c2d13015 100644
+--- a/packages/components/src/custom-select-control-v2/README.md
++++ b/packages/components/src/custom-select-control-v2/README.md
+@@ -1,9 +1,5 @@
+ # CustomSelectControlV2
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ Used to render a customizable select control component.
+ 
+ ## Development guidelines
+diff --git a/packages/components/src/custom-select-control-v2/stories/default.story.tsx b/packages/components/src/custom-select-control-v2/stories/default.story.tsx
+index ac2f9a51d5951d..07c0c62cb1edbd 100644
+--- a/packages/components/src/custom-select-control-v2/stories/default.story.tsx
++++ b/packages/components/src/custom-select-control-v2/stories/default.story.tsx
+@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
+ import CustomSelectControlV2 from '..';
+ 
+ const meta: Meta< typeof CustomSelectControlV2 > = {
+-	title: 'Components (Experimental)/CustomSelectControl v2/Default',
++	title: 'Components/CustomSelectControl v2/Default',
+ 	component: CustomSelectControlV2,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+diff --git a/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx b/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx
+index 120686ea84af61..dc1d4ca490d5dc 100644
+--- a/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx
++++ b/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx
+@@ -15,7 +15,7 @@ import CustomSelectControl from '../legacy-component';
+ import * as V1Story from '../../custom-select-control/stories/index.story';
+ 
+ const meta: Meta< typeof CustomSelectControl > = {
+-	title: 'Components (Experimental)/CustomSelectControl v2/Legacy',
++	title: 'Components/CustomSelectControl v2/Legacy',
+ 	component: CustomSelectControl,
+ 	argTypes: {
+ 		onChange: { control: { type: null } },
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..9515e4cbf2f5f6 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'customselectcontrol-v2',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

@@ -1,0 +1,428 @@
+diff --git a/packages/block-editor/src/components/block-controls/slot.js b/packages/block-editor/src/components/block-controls/slot.js
+index 72621eb21c7358..bbdb386fead701 100644
+--- a/packages/block-editor/src/components/block-controls/slot.js
++++ b/packages/block-editor/src/components/block-controls/slot.js
+@@ -5,7 +5,6 @@ import { useContext } from '@wordpress/element';
+ import {
+ 	__experimentalToolbarContext as ToolbarContext,
+ 	ToolbarGroup,
+-	__experimentalUseSlot as useSlot,
+ } from '@wordpress/components';
+ 
+ /**
+@@ -14,11 +13,10 @@ import {
+ import groups from './groups';
+ 
+ export default function BlockControlsSlot( { group = 'default', ...props } ) {
++	const { Slot, useSlot } = groups[ group ];
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+-	const Slot = groups[ group ].Slot;
+-	const slot = useSlot( Slot.__unstableName );
++	const slot = useSlot();
+ 	const hasFills = Boolean( slot.fills && slot.fills.length );
+-
+ 	if ( ! hasFills ) {
+ 		return null;
+ 	}
+diff --git a/packages/block-editor/src/components/block-inspector/index.js b/packages/block-editor/src/components/block-inspector/index.js
+index 2a8f7ffeb40dbc..666f5146f028d1 100644
+--- a/packages/block-editor/src/components/block-inspector/index.js
++++ b/packages/block-editor/src/components/block-inspector/index.js
+@@ -8,10 +8,7 @@ import {
+ 	hasBlockSupport,
+ 	store as blocksStore,
+ } from '@wordpress/blocks';
+-import {
+-	PanelBody,
+-	__experimentalUseSlot as useSlot,
+-} from '@wordpress/components';
++import { PanelBody } from '@wordpress/components';
+ import { useSelect } from '@wordpress/data';
+ 
+ /**
+@@ -28,6 +25,8 @@ import BlockVariationTransforms from '../block-variation-transforms';
+ import useBlockDisplayInformation from '../use-block-display-information';
+ import { store as blockEditorStore } from '../../store';
+ 
++const useAdvancedControlsSlot = InspectorAdvancedControls.__unstableUseSlot;
++
+ const BlockInspector = ( {
+ 	showNoBlockSelectedMessage = true,
+ 	bubblesVirtually = true,
+@@ -128,18 +127,15 @@ const BlockInspectorSingleBlock = ( {
+ 			) }
+ 			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
+ 			<div>
+-				<AdvancedControls
+-					slotName={ InspectorAdvancedControls.slotName }
+-					bubblesVirtually={ bubblesVirtually }
+-				/>
++				<AdvancedControls bubblesVirtually={ bubblesVirtually } />
+ 			</div>
+ 			<SkipToSelectedBlock key="back" />
+ 		</div>
+ 	);
+ };
+ 
+-const AdvancedControls = ( { slotName, bubblesVirtually } ) => {
+-	const slot = useSlot( slotName );
++const AdvancedControls = ( { bubblesVirtually } ) => {
++	const slot = useAdvancedControlsSlot();
+ 	const hasFills = Boolean( slot.fills && slot.fills.length );
+ 
+ 	if ( ! hasFills ) {
+diff --git a/packages/block-editor/src/components/block-toolbar/slot-fill.js b/packages/block-editor/src/components/block-toolbar/slot-fill.js
+new file mode 100644
+index 00000000000000..46f23ab008f184
+--- /dev/null
++++ b/packages/block-editor/src/components/block-toolbar/slot-fill.js
+@@ -0,0 +1,6 @@
++/**
++ * WordPress dependencies
++ */
++import { createSlotFill } from '@wordpress/components';
++
++export default createSlotFill( 'block-toolbar' );
+diff --git a/packages/block-editor/src/components/block-tools/back-compat.js b/packages/block-editor/src/components/block-tools/back-compat.js
+index a3bfb4ee68ab17..4c377d7abe0bdd 100644
+--- a/packages/block-editor/src/components/block-tools/back-compat.js
++++ b/packages/block-editor/src/components/block-tools/back-compat.js
+@@ -10,6 +10,7 @@ import deprecated from '@wordpress/deprecated';
+  */
+ import InsertionPoint, { InsertionPointOpenRef } from './insertion-point';
+ import BlockPopover from './block-popover';
++import blockToolbarSlotFill from '../block-toolbar/slot-fill';
+ 
+ export default function BlockToolsBackCompat( { children } ) {
+ 	const openRef = useContext( InsertionPointOpenRef );
+@@ -25,8 +26,8 @@ export default function BlockToolsBackCompat( { children } ) {
+ 	} );
+ 
+ 	return (
+-		<InsertionPoint __unstablePopoverSlot="block-toolbar">
+-			<BlockPopover __unstablePopoverSlot="block-toolbar" />
++		<InsertionPoint __unstablePopoverSlotFill={ blockToolbarSlotFill }>
++			<BlockPopover __unstablePopoverSlotFill={ blockToolbarSlotFill } />
+ 			{ children }
+ 		</InsertionPoint>
+ 	);
+diff --git a/packages/block-editor/src/components/block-tools/block-popover.js b/packages/block-editor/src/components/block-tools/block-popover.js
+index 8371cfff9bbba8..f88892c5d1004f 100644
+--- a/packages/block-editor/src/components/block-tools/block-popover.js
++++ b/packages/block-editor/src/components/block-tools/block-popover.js
+@@ -52,7 +52,7 @@ function BlockPopover( {
+ 	isValid,
+ 	isEmptyDefaultBlock,
+ 	capturingClientId,
+-	__unstablePopoverSlot,
++	__unstablePopoverSlotFill,
+ 	__unstableContentRef,
+ } ) {
+ 	const {
+@@ -208,7 +208,7 @@ function BlockPopover( {
+ 			__unstableStickyBoundaryElement={ stickyBoundaryElement }
+ 			// Render in the old slot if needed for backward compatibility,
+ 			// otherwise render in place (not in the the default popover slot).
+-			__unstableSlotName={ __unstablePopoverSlot || null }
++			__unstableSlotFill={ __unstablePopoverSlotFill || null }
+ 			__unstableBoundaryParent
+ 			// Observe movement for block animations (especially horizontal).
+ 			__unstableObserveElement={ node }
+@@ -322,7 +322,7 @@ function wrapperSelector( select ) {
+ }
+ 
+ export default function WrappedBlockPopover( {
+-	__unstablePopoverSlot,
++	__unstablePopoverSlotFill,
+ 	__unstableContentRef,
+ } ) {
+ 	const selected = useSelect( wrapperSelector, [] );
+@@ -351,7 +351,7 @@ export default function WrappedBlockPopover( {
+ 			isValid={ isValid }
+ 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
+ 			capturingClientId={ capturingClientId }
+-			__unstablePopoverSlot={ __unstablePopoverSlot }
++			__unstablePopoverSlotFill={ __unstablePopoverSlotFill }
+ 			__unstableContentRef={ __unstableContentRef }
+ 		/>
+ 	);
+diff --git a/packages/block-editor/src/components/block-tools/index.js b/packages/block-editor/src/components/block-tools/index.js
+index 4b81040dfa1a60..cc80929a874494 100644
+--- a/packages/block-editor/src/components/block-tools/index.js
++++ b/packages/block-editor/src/components/block-tools/index.js
+@@ -18,6 +18,7 @@ import InsertionPoint from './insertion-point';
+ import BlockPopover from './block-popover';
+ import { store as blockEditorStore } from '../../store';
+ import BlockContextualToolbar from './block-contextual-toolbar';
++import blockToolbarSlotFill from '../block-toolbar/slot-fill';
+ import { usePopoverScroll } from './use-popover-scroll';
+ 
+ /**
+@@ -124,7 +125,7 @@ export default function BlockTools( {
+ 				<BlockPopover __unstableContentRef={ __unstableContentRef } />
+ 				{ /* Used for the inline rich text toolbar. */ }
+ 				<Popover.Slot
+-					name="block-toolbar"
++					Slot={ blockToolbarSlotFill.Slot }
+ 					ref={ usePopoverScroll( __unstableContentRef ) }
+ 				/>
+ 				{ children }
+diff --git a/packages/block-editor/src/components/block-tools/insertion-point.js b/packages/block-editor/src/components/block-tools/insertion-point.js
+index 3739e81ff9ad0c..19b8521726cf00 100644
+--- a/packages/block-editor/src/components/block-tools/insertion-point.js
++++ b/packages/block-editor/src/components/block-tools/insertion-point.js
+@@ -28,7 +28,7 @@ import { usePopoverScroll } from './use-popover-scroll';
+ export const InsertionPointOpenRef = createContext();
+ 
+ function InsertionPointPopover( {
+-	__unstablePopoverSlot,
++	__unstablePopoverSlotFill,
+ 	__unstableContentRef,
+ } ) {
+ 	const { selectBlock } = useDispatch( blockEditorStore );
+@@ -215,7 +215,7 @@ function InsertionPointPopover( {
+ 			className="block-editor-block-list__insertion-point-popover"
+ 			// Render in the old slot if needed for backward compatibility,
+ 			// otherwise render in place (not in the the default popover slot).
+-			__unstableSlotName={ __unstablePopoverSlot || null }
++			__unstableSlotFill={ __unstablePopoverSlotFill || null }
+ 		>
+ 			<div
+ 				ref={ ref }
+@@ -256,7 +256,7 @@ function InsertionPointPopover( {
+ 
+ export default function InsertionPoint( {
+ 	children,
+-	__unstablePopoverSlot,
++	__unstablePopoverSlotFill,
+ 	__unstableContentRef,
+ } ) {
+ 	const isVisible = useSelect( ( select ) => {
+@@ -267,7 +267,7 @@ export default function InsertionPoint( {
+ 		<InsertionPointOpenRef.Provider value={ useRef( false ) }>
+ 			{ isVisible && (
+ 				<InsertionPointPopover
+-					__unstablePopoverSlot={ __unstablePopoverSlot }
++					__unstablePopoverSlotFill={ __unstablePopoverSlotFill }
+ 					__unstableContentRef={ __unstableContentRef }
+ 				/>
+ 			) }
+diff --git a/packages/block-editor/src/components/inspector-advanced-controls/index.js b/packages/block-editor/src/components/inspector-advanced-controls/index.js
+index 4ed9b6341142d8..14c7c998582f00 100644
+--- a/packages/block-editor/src/components/inspector-advanced-controls/index.js
++++ b/packages/block-editor/src/components/inspector-advanced-controls/index.js
+@@ -12,7 +12,7 @@ import {
+ import { useBlockEditContext } from '../block-edit/context';
+ 
+ const name = 'InspectorAdvancedControls';
+-const { Fill, Slot } = createSlotFill( name );
++const { Fill, Slot, useSlot } = createSlotFill( name );
+ 
+ function InspectorAdvancedControls( { children } ) {
+ 	const { isSelected } = useBlockEditContext();
+@@ -23,8 +23,8 @@ function InspectorAdvancedControls( { children } ) {
+ 	) : null;
+ }
+ 
+-InspectorAdvancedControls.slotName = name;
+ InspectorAdvancedControls.Slot = Slot;
++InspectorAdvancedControls.__unstableUseSlot = useSlot;
+ 
+ /**
+  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-advanced-controls/README.md
+diff --git a/packages/block-editor/src/components/rich-text/format-toolbar-container.js b/packages/block-editor/src/components/rich-text/format-toolbar-container.js
+index 69d70c79fed74f..37e8fb3e1907ef 100644
+--- a/packages/block-editor/src/components/rich-text/format-toolbar-container.js
++++ b/packages/block-editor/src/components/rich-text/format-toolbar-container.js
+@@ -7,6 +7,7 @@ import { Popover, ToolbarGroup } from '@wordpress/components';
+  * Internal dependencies
+  */
+ import BlockControls from '../block-controls';
++import blockToolbarSlotFill from '../block-toolbar/slot-fill';
+ import FormatToolbar from './format-toolbar';
+ 
+ const FormatToolbarContainer = ( { inline, anchorRef } ) => {
+@@ -19,7 +20,7 @@ const FormatToolbarContainer = ( { inline, anchorRef } ) => {
+ 				focusOnMount={ false }
+ 				anchorRef={ anchorRef }
+ 				className="block-editor-rich-text__inline-format-toolbar"
+-				__unstableSlotName="block-toolbar"
++				__unstableSlotFill={ blockToolbarSlotFill }
+ 			>
+ 				<div className="block-editor-rich-text__inline-format-toolbar-group">
+ 					<ToolbarGroup>
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index f054c43e6d7dd8..78a41009be8e57 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -164,7 +164,6 @@ export {
+ 	Slot,
+ 	Fill,
+ 	Provider as SlotFillProvider,
+-	useSlot as __experimentalUseSlot,
+ } from './slot-fill';
+ export { default as __experimentalStyleProvider } from './style-provider';
+ export { ZStack as __experimentalZStack } from './z-stack';
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index a30dfe4fb19faa..fc81965ac21a85 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -29,15 +29,15 @@ import { close } from '@wordpress/icons';
+ import { computePopoverPosition, offsetIframe } from './utils';
+ import Button from '../button';
+ import ScrollLock from '../scroll-lock';
+-import { Slot, Fill, useSlot } from '../slot-fill';
++import { createSlotFill } from '../slot-fill';
+ import { getAnimateClassName } from '../animate';
+ 
+ /**
+- * Name of slot in which popover should fill.
++ * The default SlotFill that popover uses.
+  *
+- * @type {string}
++ * @type {Object}
+  */
+-const SLOT_NAME = 'Popover';
++const defaultSlotFill = createSlotFill( 'Popover' );
+ 
+ function computeAnchorRect(
+ 	anchorRefFallback,
+@@ -253,7 +253,7 @@ const Popover = (
+ 		onClickOutside,
+ 		onFocusOutside,
+ 		__unstableStickyBoundaryElement,
+-		__unstableSlotName = SLOT_NAME,
++		__unstableSlotFill = defaultSlotFill,
+ 		__unstableObserveElement,
+ 		__unstableBoundaryParent,
+ 		__unstableForcePosition,
+@@ -263,12 +263,13 @@ const Popover = (
+ 	},
+ 	ref
+ ) => {
++	const { Fill, useSlot } = __unstableSlotFill;
+ 	const anchorRefFallback = useRef( null );
+ 	const contentRef = useRef( null );
+ 	const containerRef = useRef();
+ 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+ 	const [ animateOrigin, setAnimateOrigin ] = useState();
+-	const slot = useSlot( __unstableSlotName );
++	const slot = useSlot();
+ 	const isExpanded = expandOnMobile && isMobileViewport;
+ 	const [ containerResizeListener, contentSize ] = useResizeObserver();
+ 	noArrow = isExpanded || noArrow;
+@@ -566,7 +567,7 @@ const Popover = (
+ 	);
+ 
+ 	if ( slot.ref ) {
+-		content = <Fill name={ __unstableSlotName }>{ content }</Fill>;
++		content = <Fill>{ content }</Fill>;
+ 	}
+ 
+ 	if ( anchorRef || anchorRect ) {
+@@ -578,15 +579,8 @@ const Popover = (
+ 
+ const PopoverContainer = forwardRef( Popover );
+ 
+-function PopoverSlot( { name = SLOT_NAME }, ref ) {
+-	return (
+-		<Slot
+-			bubblesVirtually
+-			name={ name }
+-			className="popover-slot"
+-			ref={ ref }
+-		/>
+-	);
++function PopoverSlot( { Slot = defaultSlotFill.Slot }, ref ) {
++	return <Slot bubblesVirtually className="popover-slot" ref={ ref } />;
+ }
+ 
+ PopoverContainer.Slot = forwardRef( PopoverSlot );
+diff --git a/packages/components/src/slot-fill/index.js b/packages/components/src/slot-fill/index.js
+index 4bb323c28fad61..c1e27631144793 100644
+--- a/packages/components/src/slot-fill/index.js
++++ b/packages/components/src/slot-fill/index.js
+@@ -49,12 +49,10 @@ export function createSlotFill( name ) {
+ 
+ 	const SlotComponent = ( props ) => <Slot name={ name } { ...props } />;
+ 	SlotComponent.displayName = name + 'Slot';
+-	SlotComponent.__unstableName = name;
+ 
+ 	return {
+ 		Fill: FillComponent,
+ 		Slot: SlotComponent,
++		useSlot: () => useSlot( name ),
+ 	};
+ }
+-
+-export { useSlot };
+diff --git a/packages/edit-post/src/components/header/main-dashboard-button/index.js b/packages/edit-post/src/components/header/main-dashboard-button/index.js
+index efc3bfaad19e87..1a7c628e320a78 100644
+--- a/packages/edit-post/src/components/header/main-dashboard-button/index.js
++++ b/packages/edit-post/src/components/header/main-dashboard-button/index.js
+@@ -1,28 +1,23 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	__experimentalUseSlot as useSlot,
+-	createSlotFill,
+-} from '@wordpress/components';
++import { createSlotFill } from '@wordpress/components';
+ 
+-const slotName = '__experimentalMainDashboardButton';
++const { Fill: MainDashboardButton, Slot, useSlot } = createSlotFill(
++	'__experimentalMainDashboardButton'
++);
+ 
+-const { Fill, Slot: MainDashboardButtonSlot } = createSlotFill( slotName );
+-
+-const MainDashboardButton = Fill;
+-
+-const Slot = ( { children } ) => {
+-	const slot = useSlot( slotName );
++const MainDashboardButtonSlot = ( { children } ) => {
++	const slot = useSlot();
+ 	const hasFills = Boolean( slot.fills && slot.fills.length );
+ 
+ 	if ( ! hasFills ) {
+ 		return children;
+ 	}
+ 
+-	return <MainDashboardButtonSlot bubblesVirtually />;
++	return <Slot bubblesVirtually />;
+ };
+ 
+-MainDashboardButton.Slot = Slot;
++MainDashboardButton.Slot = MainDashboardButtonSlot;
+ 
+ export default MainDashboardButton;
+diff --git a/packages/edit-site/src/components/main-dashboard-button/index.js b/packages/edit-site/src/components/main-dashboard-button/index.js
+index efc3bfaad19e87..1818f6df5335a3 100644
+--- a/packages/edit-site/src/components/main-dashboard-button/index.js
++++ b/packages/edit-site/src/components/main-dashboard-button/index.js
+@@ -1,19 +1,16 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	__experimentalUseSlot as useSlot,
+-	createSlotFill,
+-} from '@wordpress/components';
++import { createSlotFill } from '@wordpress/components';
+ 
+-const slotName = '__experimentalMainDashboardButton';
+-
+-const { Fill, Slot: MainDashboardButtonSlot } = createSlotFill( slotName );
++const { Fill, Slot: MainDashboardButtonSlot, useSlot } = createSlotFill(
++	'__experimentalMainDashboardButton'
++);
+ 
+ const MainDashboardButton = Fill;
+ 
+ const Slot = ( { children } ) => {
+-	const slot = useSlot( slotName );
++	const slot = useSlot();
+ 	const hasFills = Boolean( slot.fills && slot.fills.length );
+ 
+ 	if ( ! hasFills ) {

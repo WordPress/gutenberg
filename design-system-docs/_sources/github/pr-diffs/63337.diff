@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 604a709d290f9e..57cc148a6bc06b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Enhancements
+ 
++-   `Tabs`: hyphenate tab labels ([#63337](https://github.com/WordPress/gutenberg/pull/63337)).
+ -   `Tooltip`: Add support for `className` prop ([#63157](https://github.com/WordPress/gutenberg/pull/63157)).
+ -   `Toolbar`: Add support for `vertical` orientation ([#60123](https://github.com/WordPress/gutenberg/pull/60123)).
+ -   `BaseControl`: forward ref on `VisualLabel` ([#63169](https://github.com/WordPress/gutenberg/pull/63169)).
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index d6fb117a3032a0..88e54285d619b1 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -75,6 +75,7 @@ export const Tab = styled( Ariakit.Tab )`
+ 		margin-left: 0;
+ 		font-weight: 500;
+ 		text-align: inherit;
++		hyphens: auto;
+ 
+ 		&[aria-disabled='true'] {
+ 			cursor: default;

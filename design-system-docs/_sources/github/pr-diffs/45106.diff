@@ -1,0 +1,128 @@
+diff --git a/packages/block-editor/src/components/inserter/test/reusable-blocks-tab.js b/packages/block-editor/src/components/inserter/test/reusable-blocks-tab.js
+index 2d074ab08894e3..90042d1df5d410 100644
+--- a/packages/block-editor/src/components/inserter/test/reusable-blocks-tab.js
++++ b/packages/block-editor/src/components/inserter/test/reusable-blocks-tab.js
+@@ -41,14 +41,14 @@ function InserterBlockList( props ) {
+ }
+ 
+ const initializeAllClosedMenuState = ( propOverrides ) => {
+-	const result = render( <InserterBlockList { ...propOverrides } /> );
+-	const activeTabs = result.container.querySelectorAll(
++	const { container } = render( <InserterBlockList { ...propOverrides } /> );
++	const activeTabs = container.querySelectorAll(
+ 		'.components-panel__body.is-opened button.components-panel__body-toggle'
+ 	);
+ 	activeTabs.forEach( ( tab ) => {
+ 		fireEvent.click( tab );
+ 	} );
+-	return result;
++	return container;
+ };
+ 
+ describe( 'InserterMenu', () => {
+@@ -92,7 +92,7 @@ describe( 'InserterMenu', () => {
+ 	} );
+ 
+ 	it( 'should list reusable blocks', () => {
+-		const { container } = initializeAllClosedMenuState();
++		const container = initializeAllClosedMenuState();
+ 		const blocks = container.querySelectorAll(
+ 			'.block-editor-block-types-list__item-title'
+ 		);
+diff --git a/packages/components/src/item-group/test/index.js b/packages/components/src/item-group/test/index.js
+index 9df7d022990c82..d052948b58d74d 100644
+--- a/packages/components/src/item-group/test/index.js
++++ b/packages/components/src/item-group/test/index.js
+@@ -11,12 +11,12 @@ import { Item, ItemGroup } from '..';
+ describe( 'ItemGroup', () => {
+ 	describe( 'ItemGroup component', () => {
+ 		it( 'should render correctly', () => {
+-			const wrapper = render(
++			const { container } = render(
+ 				<ItemGroup>
+ 					<Item>Code is poetry</Item>
+ 				</ItemGroup>
+ 			);
+-			expect( wrapper.container.firstChild ).toMatchSnapshot();
++			expect( container.firstChild ).toMatchSnapshot();
+ 		} );
+ 
+ 		it( 'should show borders when the isBordered prop is true', () => {
+diff --git a/packages/components/src/sandbox/test/index.js b/packages/components/src/sandbox/test/index.js
+index d0dadd107cddd9..1f01d267c787a6 100644
+--- a/packages/components/src/sandbox/test/index.js
++++ b/packages/components/src/sandbox/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { act, fireEvent, render, screen } from '@testing-library/react';
++import { fireEvent, render, screen } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -39,10 +39,7 @@ describe( 'Sandbox', () => {
+ 	};
+ 
+ 	it( 'should rerender with new emdeded content if html prop changes', () => {
+-		let result;
+-		act( () => {
+-			result = render( <TestWrapper /> );
+-		} );
++		const result = render( <TestWrapper /> );
+ 
+ 		const iframe = result.container.querySelector( '.components-sandbox' );
+ 
+@@ -54,9 +51,7 @@ describe( 'Sandbox', () => {
+ 			'https://super.embed'
+ 		);
+ 
+-		act( () => {
+-			fireEvent.click( screen.getByRole( 'button' ) );
+-		} );
++		fireEvent.click( screen.getByRole( 'button' ) );
+ 
+ 		sandboxedIframe =
+ 			iframe.contentWindow.document.body.querySelector( '.mock-iframe' );
+diff --git a/packages/components/src/ui/spinner/test/index.js b/packages/components/src/ui/spinner/test/index.js
+index 39ced6662a7654..d075ab82d0be13 100644
+--- a/packages/components/src/ui/spinner/test/index.js
++++ b/packages/components/src/ui/spinner/test/index.js
+@@ -10,23 +10,27 @@ import { Spinner } from '..';
+ 
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {
+-		const base = render( <Spinner /> );
+-		expect( base.container.firstChild ).toMatchSnapshot();
++		const { container } = render( <Spinner /> );
++		expect( container.firstChild ).toMatchSnapshot();
+ 	} );
+ 
+ 	test( 'should render color', () => {
+-		const base = render( <Spinner /> );
+-		const { container } = render( <Spinner color="blue" /> );
+-		expect( container.firstChild ).toMatchDiffSnapshot(
+-			base.container.firstChild
++		const { container } = render( <Spinner /> );
++		const { container: secondRenderContainer } = render(
++			<Spinner color="blue" />
++		);
++		expect( secondRenderContainer.firstChild ).toMatchDiffSnapshot(
++			container.firstChild
+ 		);
+ 	} );
+ 
+ 	test( 'should render size', () => {
+-		const base = render( <Spinner /> );
+-		const { container } = render( <Spinner size={ 31 } /> );
+-		expect( container.firstChild ).toMatchDiffSnapshot(
+-			base.container.firstChild
++		const { container } = render( <Spinner /> );
++		const { container: secondRenderContainer } = render(
++			<Spinner size={ 31 } />
++		);
++		expect( secondRenderContainer.firstChild ).toMatchDiffSnapshot(
++			container.firstChild
+ 		);
+ 	} );
+ } );

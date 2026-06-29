@@ -1,0 +1,833 @@
+diff --git a/package-lock.json b/package-lock.json
+index a5a0c340849e65..7d06261df86807 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -3813,18 +3813,6 @@
+ 				"@floating-ui/utils": "^0.1.1"
+ 			}
+ 		},
+-		"node_modules/@floating-ui/react-dom": {
+-			"version": "1.0.0",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-1.0.0.tgz",
+-			"integrity": "sha512-uiOalFKPG937UCLm42RxjESTWUVpbbatvlphQAU6bsv+ence6IoVG8JOUZcy8eW81NkU+Idiwvx10WFLmR4MIg==",
+-			"dependencies": {
+-				"@floating-ui/dom": "^1.0.0"
+-			},
+-			"peerDependencies": {
+-				"react": ">=16.8.0",
+-				"react-dom": ">=16.8.0"
+-			}
+-		},
+ 		"node_modules/@floating-ui/utils": {
+ 			"version": "0.1.1",
+ 			"resolved": "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.1.1.tgz",
+@@ -54555,7 +54543,7 @@
+ 				"@emotion/serialize": "^1.0.2",
+ 				"@emotion/styled": "^11.6.0",
+ 				"@emotion/utils": "^1.0.0",
+-				"@floating-ui/react-dom": "1.0.0",
++				"@floating-ui/react-dom": "^2.0.1",
+ 				"@radix-ui/react-dropdown-menu": "2.0.4",
+ 				"@use-gesture/react": "^10.2.24",
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -54605,6 +54593,18 @@
+ 				"react-dom": "^18.0.0"
+ 			}
+ 		},
++		"packages/components/node_modules/@floating-ui/react-dom": {
++			"version": "2.0.1",
++			"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.0.1.tgz",
++			"integrity": "sha512-rZtAmSht4Lry6gdhAJDrCp/6rKN7++JnL1/Anbr/DdeyYXQPxvg/ivrbYvJulbRf4vL8b212suwMM2lxbv+RQA==",
++			"dependencies": {
++				"@floating-ui/dom": "^1.3.0"
++			},
++			"peerDependencies": {
++				"react": ">=16.8.0",
++				"react-dom": ">=16.8.0"
++			}
++		},
+ 		"packages/components/node_modules/framer-motion": {
+ 			"version": "10.13.0",
+ 			"resolved": "https://registry.npmjs.org/framer-motion/-/framer-motion-10.13.0.tgz",
+@@ -58757,14 +58757,6 @@
+ 				"@floating-ui/utils": "^0.1.1"
+ 			}
+ 		},
+-		"@floating-ui/react-dom": {
+-			"version": "1.0.0",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-1.0.0.tgz",
+-			"integrity": "sha512-uiOalFKPG937UCLm42RxjESTWUVpbbatvlphQAU6bsv+ence6IoVG8JOUZcy8eW81NkU+Idiwvx10WFLmR4MIg==",
+-			"requires": {
+-				"@floating-ui/dom": "^1.0.0"
+-			}
+-		},
+ 		"@floating-ui/utils": {
+ 			"version": "0.1.1",
+ 			"resolved": "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.1.1.tgz",
+@@ -67277,7 +67269,7 @@
+ 				"@emotion/serialize": "^1.0.2",
+ 				"@emotion/styled": "^11.6.0",
+ 				"@emotion/utils": "^1.0.0",
+-				"@floating-ui/react-dom": "1.0.0",
++				"@floating-ui/react-dom": "^2.0.1",
+ 				"@radix-ui/react-dropdown-menu": "2.0.4",
+ 				"@use-gesture/react": "^10.2.24",
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -67320,6 +67312,14 @@
+ 				"valtio": "1.7.0"
+ 			},
+ 			"dependencies": {
++				"@floating-ui/react-dom": {
++					"version": "2.0.1",
++					"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.0.1.tgz",
++					"integrity": "sha512-rZtAmSht4Lry6gdhAJDrCp/6rKN7++JnL1/Anbr/DdeyYXQPxvg/ivrbYvJulbRf4vL8b212suwMM2lxbv+RQA==",
++					"requires": {
++						"@floating-ui/dom": "^1.3.0"
++					}
++				},
+ 				"framer-motion": {
+ 					"version": "10.13.0",
+ 					"resolved": "https://registry.npmjs.org/framer-motion/-/framer-motion-10.13.0.tgz",
+diff --git a/packages/block-editor/src/components/block-popover/inbetween.js b/packages/block-editor/src/components/block-popover/inbetween.js
+index cadd49632b2e83..a0175c4d4ae584 100644
+--- a/packages/block-editor/src/components/block-popover/inbetween.js
++++ b/packages/block-editor/src/components/block-popover/inbetween.js
+@@ -81,10 +81,10 @@ function BlockPopoverInbetween( {
+ 			return undefined;
+ 		}
+ 
+-		const { ownerDocument } = previousElement || nextElement;
++		const contextElement = previousElement || nextElement;
+ 
+ 		return {
+-			ownerDocument,
++			contextElement,
+ 			getBoundingClientRect() {
+ 				const previousRect = previousElement
+ 					? previousElement.getBoundingClientRect()
+diff --git a/packages/block-editor/src/components/block-popover/index.js b/packages/block-editor/src/components/block-popover/index.js
+index 26042e8c6d6e9c..13e6ba4d9e7f81 100644
+--- a/packages/block-editor/src/components/block-popover/index.js
++++ b/packages/block-editor/src/components/block-popover/index.js
+@@ -142,7 +142,7 @@ function BlockPopover(
+ 
+ 				return new window.DOMRect( left, top, width, height );
+ 			},
+-			ownerDocument: selectedElement.ownerDocument,
++			contextElement: selectedElement,
+ 		};
+ 	}, [
+ 		bottomClientId,
+diff --git a/packages/block-editor/src/components/list-view/drop-indicator.js b/packages/block-editor/src/components/list-view/drop-indicator.js
+index 8178bc92453bc1..04ce87b4a0c8d4 100644
+--- a/packages/block-editor/src/components/list-view/drop-indicator.js
++++ b/packages/block-editor/src/components/list-view/drop-indicator.js
+@@ -159,10 +159,8 @@ export default function ListViewDropIndicator( {
+ 			return undefined;
+ 		}
+ 
+-		const ownerDocument = targetElement.ownerDocument;
+-
+ 		return {
+-			ownerDocument,
++			contextElement: targetElement,
+ 			getBoundingClientRect() {
+ 				const rect = targetElement.getBoundingClientRect();
+ 				const indent = getDropIndicatorIndent( rect );
+@@ -189,9 +187,10 @@ export default function ListViewDropIndicator( {
+ 					'horizontal'
+ 				);
+ 
++				const doc = targetElement.ownerDocument;
+ 				const windowScroll =
+-					scrollContainer === ownerDocument.body ||
+-					scrollContainer === ownerDocument.documentElement;
++					scrollContainer === doc.body ||
++					scrollContainer === doc.documentElement;
+ 
+ 				// If the scroll container is not the window, offset the left position, if need be.
+ 				if ( scrollContainer && ! windowScroll ) {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4017491e46de67..2f38641af777dc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ -   `Shortcut`: Add Storybook stories ([#53627](https://github.com/WordPress/gutenberg/pull/53627)).
+ -   `SlotFill`: Do not render children when using `<Slot bubblesVirtually />`. ([#53272](https://github.com/WordPress/gutenberg/pull/53272))
++-   Update `@floating-ui/react-dom` to the latest version ([#46845](https://github.com/WordPress/gutenberg/pull/46845)).
+ 
+ ## 25.6.0 (2023-08-16)
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index a245281fc5ec99..2a4f7c380ee979 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -38,7 +38,7 @@
+ 		"@emotion/serialize": "^1.0.2",
+ 		"@emotion/styled": "^11.6.0",
+ 		"@emotion/utils": "^1.0.0",
+-		"@floating-ui/react-dom": "1.0.0",
++		"@floating-ui/react-dom": "^2.0.1",
+ 		"@radix-ui/react-dropdown-menu": "2.0.4",
+ 		"@use-gesture/react": "^10.2.24",
+ 		"@wordpress/a11y": "file:../a11y",
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 21f81e0f09e807..69c107cffda8d6 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -3,11 +3,11 @@
+  */
+ import type { ForwardedRef, SyntheticEvent, RefCallback } from 'react';
+ import classnames from 'classnames';
+-import type { Middleware, MiddlewareArguments } from '@floating-ui/react-dom';
+ import {
+ 	useFloating,
+ 	flip as flipMiddleware,
+ 	shift as shiftMiddleware,
++	limitShift,
+ 	autoUpdate,
+ 	arrow,
+ 	offset as offsetMiddleware,
+@@ -50,8 +50,6 @@ import ScrollLock from '../scroll-lock';
+ import { Slot, Fill, useSlot } from '../slot-fill';
+ import {
+ 	computePopoverPosition,
+-	getFrameOffset,
+-	getFrameScale,
+ 	positionToPlacement,
+ 	placementToMotionAnimationProps,
+ 	getReferenceOwnerDocument,
+@@ -64,7 +62,6 @@ import type {
+ 	PopoverAnchorRefReference,
+ 	PopoverAnchorRefTopBottom,
+ } from './types';
+-import { limitShift as customLimitShift } from './limit-shift';
+ import { overlayMiddlewares } from './overlay-middlewares';
+ 
+ /**
+@@ -262,69 +259,34 @@ const UnforwardedPopover = (
+ 		? positionToPlacement( position )
+ 		: placementProp;
+ 
+-	/**
+-	 * Offsets the position of the popover when the anchor is inside an iframe.
+-	 *
+-	 * Store the offset in a ref, due to constraints with floating-ui:
+-	 * https://floating-ui.com/docs/react-dom#variables-inside-middleware-functions.
+-	 */
+-	const frameOffsetRef = useRef( getFrameOffset( referenceOwnerDocument ) );
+-
+ 	const middleware = [
+ 		...( placementProp === 'overlay' ? overlayMiddlewares() : [] ),
+-		// Custom middleware which adjusts the popover's position by taking into
+-		// account the offset of the anchor's iframe (if any) compared to the page.
+-		{
+-			name: 'frameOffset',
+-			fn( { x, y }: MiddlewareArguments ) {
+-				if ( ! frameOffsetRef.current ) {
+-					return {
+-						x,
+-						y,
+-					};
+-				}
+-
+-				return {
+-					x: x + frameOffsetRef.current.x,
+-					y: y + frameOffsetRef.current.y,
+-					data: {
+-						// This will be used in the customLimitShift() function.
+-						amount: frameOffsetRef.current,
+-					},
+-				};
+-			},
+-		},
+ 		offsetMiddleware( offsetProp ),
+-		computedFlipProp ? flipMiddleware() : undefined,
+-		computedResizeProp
+-			? size( {
+-					apply( sizeProps ) {
+-						const { firstElementChild } =
+-							refs.floating.current ?? {};
+-
+-						// Only HTMLElement instances have the `style` property.
+-						if ( ! ( firstElementChild instanceof HTMLElement ) )
+-							return;
+-
+-						// Reduce the height of the popover to the available space.
+-						Object.assign( firstElementChild.style, {
+-							maxHeight: `${ sizeProps.availableHeight }px`,
+-							overflow: 'auto',
+-						} );
+-					},
+-			  } )
+-			: undefined,
+-		shift
+-			? shiftMiddleware( {
+-					crossAxis: true,
+-					limiter: customLimitShift(),
+-					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
+-			  } )
+-			: undefined,
++		computedFlipProp && flipMiddleware(),
++		computedResizeProp &&
++			size( {
++				apply( sizeProps ) {
++					const { firstElementChild } = refs.floating.current ?? {};
++
++					// Only HTMLElement instances have the `style` property.
++					if ( ! ( firstElementChild instanceof HTMLElement ) )
++						return;
++
++					// Reduce the height of the popover to the available space.
++					Object.assign( firstElementChild.style, {
++						maxHeight: `${ sizeProps.availableHeight }px`,
++						overflow: 'auto',
++					} );
++				},
++			} ),
++		shift &&
++			shiftMiddleware( {
++				crossAxis: true,
++				limiter: limitShift(),
++				padding: 1, // Necessary to avoid flickering at the edge of the viewport.
++			} ),
+ 		arrow( { element: arrowRef } ),
+-	].filter(
+-		( m: Middleware | undefined ): m is Middleware => m !== undefined
+-	);
++	];
+ 	const slotName = useContext( slotNameContext ) || __unstableSlotName;
+ 	const slot = useSlot( slotName );
+ 
+@@ -353,10 +315,6 @@ const UnforwardedPopover = (
+ 		// Positioning coordinates
+ 		x,
+ 		y,
+-		// Callback refs (not regular refs). This allows the position to be updated.
+-		// when either elements change.
+-		reference: referenceCallbackRef,
+-		floating,
+ 		// Object with "regular" refs to both "reference" and "floating"
+ 		refs,
+ 		// Type of CSS position property to use (absolute or fixed)
+@@ -372,6 +330,7 @@ const UnforwardedPopover = (
+ 		middleware,
+ 		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
+ 			autoUpdate( referenceParam, floatingParam, updateParam, {
++				layoutShift: false,
+ 				animationFrame: true,
+ 			} ),
+ 	} );
+@@ -406,17 +365,16 @@ const UnforwardedPopover = (
+ 			fallbackReferenceElement,
+ 			fallbackDocument: document,
+ 		} );
+-		const scale = getFrameScale( resultingReferenceOwnerDoc );
++
+ 		const resultingReferenceElement = getReferenceElement( {
+ 			anchor,
+ 			anchorRef,
+ 			anchorRect,
+ 			getAnchorRect,
+ 			fallbackReferenceElement,
+-			scale,
+ 		} );
+ 
+-		referenceCallbackRef( resultingReferenceElement );
++		refs.setReference( resultingReferenceElement );
+ 
+ 		setReferenceOwnerDocument( resultingReferenceOwnerDoc );
+ 	}, [
+@@ -429,23 +387,17 @@ const UnforwardedPopover = (
+ 		anchorRect,
+ 		getAnchorRect,
+ 		fallbackReferenceElement,
+-		referenceCallbackRef,
++		refs,
+ 	] );
+ 
+ 	// If the reference element is in a different ownerDocument (e.g. iFrame),
+ 	// we need to manually update the floating's position as the reference's owner
+-	// document scrolls. Also update the frame offset if the view resizes.
++	// document scrolls.
+ 	useLayoutEffect( () => {
+ 		if (
+-			// Reference and root documents are the same.
+-			referenceOwnerDocument === document ||
+-			// Reference and floating are in the same document.
+-			referenceOwnerDocument === refs.floating.current?.ownerDocument ||
+-			// The reference's document has no view (i.e. window)
+-			// or frame element (ie. it's not an iframe).
+-			! referenceOwnerDocument?.defaultView?.frameElement
++			! referenceOwnerDocument ||
++			! referenceOwnerDocument.defaultView
+ 		) {
+-			frameOffsetRef.current = undefined;
+ 			return;
+ 		}
+ 
+@@ -456,23 +408,17 @@ const UnforwardedPopover = (
+ 			? getScrollContainer( frameElement )
+ 			: null;
+ 
+-		const updateFrameOffset = () => {
+-			frameOffsetRef.current = getFrameOffset( referenceOwnerDocument );
+-			update();
+-		};
+-		defaultView.addEventListener( 'resize', updateFrameOffset );
+-		scrollContainer?.addEventListener( 'scroll', updateFrameOffset );
+-
+-		updateFrameOffset();
++		defaultView.addEventListener( 'resize', update );
++		scrollContainer?.addEventListener( 'scroll', update );
+ 
+ 		return () => {
+-			defaultView.removeEventListener( 'resize', updateFrameOffset );
+-			scrollContainer?.removeEventListener( 'scroll', updateFrameOffset );
++			defaultView.removeEventListener( 'resize', update );
++			scrollContainer?.removeEventListener( 'scroll', update );
+ 		};
+-	}, [ referenceOwnerDocument, update, refs.floating ] );
++	}, [ referenceOwnerDocument, update ] );
+ 
+ 	const mergedFloatingRef = useMergeRefs( [
+-		floating,
++		refs.setFloating,
+ 		dialogRef,
+ 		forwardedRef,
+ 	] );
+@@ -543,18 +489,12 @@ const UnforwardedPopover = (
+ 						left:
+ 							typeof arrowData?.x !== 'undefined' &&
+ 							Number.isFinite( arrowData.x )
+-								? `${
+-										arrowData.x +
+-										( frameOffsetRef.current?.x ?? 0 )
+-								  }px`
++								? `${ arrowData.x }px`
+ 								: '',
+ 						top:
+ 							typeof arrowData?.y !== 'undefined' &&
+ 							Number.isFinite( arrowData.y )
+-								? `${
+-										arrowData.y +
+-										( frameOffsetRef.current?.y ?? 0 )
+-								  }px`
++								? `${ arrowData.y }px`
+ 								: '',
+ 					} }
+ 				>
+diff --git a/packages/components/src/popover/limit-shift.ts b/packages/components/src/popover/limit-shift.ts
+deleted file mode 100644
+index 45e65a0b619098..00000000000000
+--- a/packages/components/src/popover/limit-shift.ts
++++ /dev/null
+@@ -1,205 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type {
+-	Axis,
+-	Coords,
+-	Placement,
+-	Side,
+-	MiddlewareArguments,
+-} from '@floating-ui/react-dom';
+-
+-/**
+- * Parts of this source were derived and modified from `floating-ui`,
+- * released under the MIT license.
+- *
+- * https://github.com/floating-ui/floating-ui
+- *
+- * Copyright (c) 2021 Floating UI contributors
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to deal
+- * in the Software without restriction, including without limitation the rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in all
+- * copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+- * SOFTWARE.
+- */
+-
+-/**
+- * Custom limiter function for the `shift` middleware.
+- * This function is mostly identical default `limitShift` from ``@floating-ui`;
+- * the only difference is that, when computing the min/max shift limits, it
+- * also takes into account the iframe offset that is added by the
+- * custom "frameOffset" middleware.
+- *
+- * All unexported types and functions are also from the `@floating-ui` library,
+- * and have been copied to this file for convenience.
+- */
+-
+-type LimitShiftOffset =
+-	| ( ( args: MiddlewareArguments ) =>
+-			| number
+-			| {
+-					/**
+-					 * Offset the limiting of the axis that runs along the alignment of the
+-					 * floating element.
+-					 */
+-					mainAxis?: number;
+-					/**
+-					 * Offset the limiting of the axis that runs along the side of the
+-					 * floating element.
+-					 */
+-					crossAxis?: number;
+-			  } )
+-	| number
+-	| {
+-			/**
+-			 * Offset the limiting of the axis that runs along the alignment of the
+-			 * floating element.
+-			 */
+-			mainAxis?: number;
+-			/**
+-			 * Offset the limiting of the axis that runs along the side of the
+-			 * floating element.
+-			 */
+-			crossAxis?: number;
+-	  };
+-
+-type LimitShiftOptions = {
+-	/**
+-	 * Offset when limiting starts. `0` will limit when the opposite edges of the
+-	 * reference and floating elements are aligned.
+-	 * - positive = start limiting earlier
+-	 * - negative = start limiting later
+-	 */
+-	offset: LimitShiftOffset;
+-	/**
+-	 * Whether to limit the axis that runs along the alignment of the floating
+-	 * element.
+-	 */
+-	mainAxis: boolean;
+-	/**
+-	 * Whether to limit the axis that runs along the side of the floating element.
+-	 */
+-	crossAxis: boolean;
+-};
+-
+-function getSide( placement: Placement ): Side {
+-	return placement.split( '-' )[ 0 ] as Side;
+-}
+-
+-function getMainAxisFromPlacement( placement: Placement ): Axis {
+-	return [ 'top', 'bottom' ].includes( getSide( placement ) ) ? 'x' : 'y';
+-}
+-
+-function getCrossAxis( axis: Axis ): Axis {
+-	return axis === 'x' ? 'y' : 'x';
+-}
+-
+-export const limitShift = (
+-	options: Partial< LimitShiftOptions > = {}
+-): {
+-	options: Partial< LimitShiftOffset >;
+-	fn: ( middlewareArguments: MiddlewareArguments ) => Coords;
+-} => ( {
+-	options,
+-	fn( middlewareArguments ) {
+-		const { x, y, placement, rects, middlewareData } = middlewareArguments;
+-		const {
+-			offset = 0,
+-			mainAxis: checkMainAxis = true,
+-			crossAxis: checkCrossAxis = true,
+-		} = options;
+-
+-		const coords = { x, y };
+-		const mainAxis = getMainAxisFromPlacement( placement );
+-		const crossAxis = getCrossAxis( mainAxis );
+-
+-		let mainAxisCoord = coords[ mainAxis ];
+-		let crossAxisCoord = coords[ crossAxis ];
+-
+-		const rawOffset =
+-			typeof offset === 'function'
+-				? offset( middlewareArguments )
+-				: offset;
+-		const computedOffset =
+-			typeof rawOffset === 'number'
+-				? { mainAxis: rawOffset, crossAxis: 0 }
+-				: { mainAxis: 0, crossAxis: 0, ...rawOffset };
+-
+-		// At the moment of writing, this is the only difference
+-		// with the `limitShift` function from `@floating-ui`.
+-		// This offset needs to be added to all min/max limits
+-		// in order to make the shift-limiting work as expected.
+-		const additionalFrameOffset = {
+-			x: 0,
+-			y: 0,
+-			...middlewareData.frameOffset?.amount,
+-		};
+-
+-		if ( checkMainAxis ) {
+-			const len = mainAxis === 'y' ? 'height' : 'width';
+-			const limitMin =
+-				rects.reference[ mainAxis ] -
+-				rects.floating[ len ] +
+-				computedOffset.mainAxis +
+-				additionalFrameOffset[ mainAxis ];
+-			const limitMax =
+-				rects.reference[ mainAxis ] +
+-				rects.reference[ len ] -
+-				computedOffset.mainAxis +
+-				additionalFrameOffset[ mainAxis ];
+-
+-			if ( mainAxisCoord < limitMin ) {
+-				mainAxisCoord = limitMin;
+-			} else if ( mainAxisCoord > limitMax ) {
+-				mainAxisCoord = limitMax;
+-			}
+-		}
+-
+-		if ( checkCrossAxis ) {
+-			const len = mainAxis === 'y' ? 'width' : 'height';
+-			const isOriginSide = [ 'top', 'left' ].includes(
+-				getSide( placement )
+-			);
+-			const limitMin =
+-				rects.reference[ crossAxis ] -
+-				rects.floating[ len ] +
+-				( isOriginSide
+-					? middlewareData.offset?.[ crossAxis ] ?? 0
+-					: 0 ) +
+-				( isOriginSide ? 0 : computedOffset.crossAxis ) +
+-				additionalFrameOffset[ crossAxis ];
+-			const limitMax =
+-				rects.reference[ crossAxis ] +
+-				rects.reference[ len ] +
+-				( isOriginSide
+-					? 0
+-					: middlewareData.offset?.[ crossAxis ] ?? 0 ) -
+-				( isOriginSide ? computedOffset.crossAxis : 0 ) +
+-				additionalFrameOffset[ crossAxis ];
+-
+-			if ( crossAxisCoord < limitMin ) {
+-				crossAxisCoord = limitMin;
+-			} else if ( crossAxisCoord > limitMax ) {
+-				crossAxisCoord = limitMax;
+-			}
+-		}
+-
+-		return {
+-			[ mainAxis ]: mainAxisCoord,
+-			[ crossAxis ]: crossAxisCoord,
+-		} as Coords;
+-	},
+-} );
+diff --git a/packages/components/src/popover/overlay-middlewares.tsx b/packages/components/src/popover/overlay-middlewares.tsx
+index 83cc1cd0d21a97..fb64d739dce3b6 100644
+--- a/packages/components/src/popover/overlay-middlewares.tsx
++++ b/packages/components/src/popover/overlay-middlewares.tsx
+@@ -1,14 +1,14 @@
+ /**
+  * External dependencies
+  */
+-import type { MiddlewareArguments } from '@floating-ui/react-dom';
++import type { MiddlewareState } from '@floating-ui/react-dom';
+ import { size } from '@floating-ui/react-dom';
+ 
+ export function overlayMiddlewares() {
+ 	return [
+ 		{
+ 			name: 'overlay',
+-			fn( { rects }: MiddlewareArguments ) {
++			fn( { rects }: MiddlewareState ) {
+ 				return rects.reference;
+ 			},
+ 		},
+diff --git a/packages/components/src/popover/utils.ts b/packages/components/src/popover/utils.ts
+index 2112b285969828..5833a65816c6d1 100644
+--- a/packages/components/src/popover/utils.ts
++++ b/packages/components/src/popover/utils.ts
+@@ -3,7 +3,7 @@
+  */
+ // eslint-disable-next-line no-restricted-imports
+ import type { MotionProps } from 'framer-motion';
+-import type { ReferenceType } from '@floating-ui/react-dom';
++import type { ReferenceType, VirtualElement } from '@floating-ui/react-dom';
+ 
+ /**
+  * Internal dependencies
+@@ -139,42 +139,6 @@ export const placementToMotionAnimationProps = (
+ 	};
+ };
+ 
+-/**
+- * Returns the offset of a document's frame element.
+- *
+- * @param document The iframe's owner document.
+- *
+- * @return The offset of the document's frame element, or undefined if the
+- * document has no frame element.
+- */
+-export const getFrameOffset = (
+-	document?: Document
+-): { x: number; y: number } | undefined => {
+-	const frameElement = document?.defaultView?.frameElement;
+-	if ( ! frameElement ) {
+-		return;
+-	}
+-	const iframeRect = frameElement.getBoundingClientRect();
+-	return { x: iframeRect.left, y: iframeRect.top };
+-};
+-
+-export const getFrameScale = (
+-	document?: Document
+-): {
+-	x: number;
+-	y: number;
+-} => {
+-	const frameElement = document?.defaultView?.frameElement as HTMLElement;
+-	if ( ! frameElement ) {
+-		return { x: 1, y: 1 };
+-	}
+-	const rect = frameElement.getBoundingClientRect();
+-	return {
+-		x: rect.width / frameElement.offsetWidth,
+-		y: rect.height / frameElement.offsetHeight,
+-	};
+-};
+-
+ export const getReferenceOwnerDocument = ( {
+ 	anchor,
+ 	anchorRef,
+@@ -197,7 +161,10 @@ export const getReferenceOwnerDocument = ( {
+ 	// with the `getBoundingClientRect()` function (like real elements).
+ 	// See https://floating-ui.com/docs/virtual-elements for more info.
+ 	let resultingReferenceOwnerDoc;
+-	if ( anchor ) {
++	if ( ( anchor as VirtualElement )?.contextElement ) {
++		resultingReferenceOwnerDoc = ( anchor as VirtualElement ).contextElement
++			?.ownerDocument;
++	} else if ( anchor ) {
+ 		resultingReferenceOwnerDoc = anchor.ownerDocument;
+ 	} else if ( ( anchorRef as PopoverAnchorRefTopBottom | undefined )?.top ) {
+ 		resultingReferenceOwnerDoc = ( anchorRef as PopoverAnchorRefTopBottom )
+@@ -231,13 +198,11 @@ export const getReferenceElement = ( {
+ 	anchorRect,
+ 	getAnchorRect,
+ 	fallbackReferenceElement,
+-	scale,
+ }: Pick<
+ 	PopoverProps,
+ 	'anchorRef' | 'anchorRect' | 'getAnchorRect' | 'anchor'
+ > & {
+ 	fallbackReferenceElement: Element | null;
+-	scale: { x: number; y: number };
+ } ): ReferenceType | null => {
+ 	let referenceElement = null;
+ 
+@@ -299,22 +264,6 @@ export const getReferenceElement = ( {
+ 		referenceElement = fallbackReferenceElement.parentElement;
+ 	}
+ 
+-	if ( referenceElement && ( scale.x !== 1 || scale.y !== 1 ) ) {
+-		// If the popover is inside an iframe, the coordinates of the
+-		// reference element need to be scaled to match the iframe's scale.
+-		const rect = referenceElement.getBoundingClientRect();
+-		referenceElement = {
+-			getBoundingClientRect() {
+-				return new window.DOMRect(
+-					rect.x * scale.x,
+-					rect.y * scale.y,
+-					rect.width * scale.x,
+-					rect.height * scale.y
+-				);
+-			},
+-		};
+-	}
+-
+ 	// Convert any `undefined` value to `null`.
+ 	return referenceElement ?? null;
+ };
+diff --git a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+index 29a743a5316de3..bfdb68b78cf578 100644
+--- a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
++++ b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+@@ -5,7 +5,7 @@ exports[`DotTip should render correctly 1`] = `
+   aria-label="Editor tips"
+   class="components-popover nux-dot-tip is-positioned"
+   role="dialog"
+-  style="position: absolute; top: 0px; left: 0px; opacity: 1; transform: none; transform-origin: 0% 50% 0;"
++  style="position: absolute; top: 0px; left: 0px; opacity: 0; transform: translateX(0px) translateY(0px) translateX(-2em) scale(0) translateZ(0); transform-origin: 0% 50% 0;"
+   tabindex="-1"
+ >
+   <div
+diff --git a/packages/nux/src/components/dot-tip/test/index.js b/packages/nux/src/components/dot-tip/test/index.js
+index 9d54e00088625e..8f8fba22dd626a 100644
+--- a/packages/nux/src/components/dot-tip/test/index.js
++++ b/packages/nux/src/components/dot-tip/test/index.js
+@@ -10,14 +10,6 @@ import userEvent from '@testing-library/user-event';
+ import { DotTip } from '..';
+ 
+ describe( 'DotTip', () => {
+-	beforeEach( () => {
+-		jest.useFakeTimers();
+-	} );
+-
+-	afterEach( () => {
+-		jest.useRealTimers();
+-	} );
+-
+ 	it( 'should not render anything if invisible', () => {
+ 		render(
+ 			<DotTip>
+@@ -43,9 +35,7 @@ describe( 'DotTip', () => {
+ 	} );
+ 
+ 	it( 'should call onDismiss when the dismiss button is clicked', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		const onDismiss = jest.fn();
+ 
+ 		render(
+@@ -64,9 +54,7 @@ describe( 'DotTip', () => {
+ 	} );
+ 
+ 	it( 'should call onDisable when the X button is clicked', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		const onDisable = jest.fn();
+ 
+ 		render(
+diff --git a/packages/rich-text/src/component/use-anchor.js b/packages/rich-text/src/component/use-anchor.js
+index aa803df7c76660..5cc62a2de4ffdd 100644
+--- a/packages/rich-text/src/component/use-anchor.js
++++ b/packages/rich-text/src/component/use-anchor.js
+@@ -51,7 +51,7 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
+ /**
+  * @typedef {Object} VirtualAnchorElement
+  * @property {() => DOMRect} getBoundingClientRect A function returning a DOMRect
+- * @property {Document}      ownerDocument         The element's ownerDocument
++ * @property {HTMLElement}   contextElement        The actual DOM element
+  */
+ 
+ /**
+@@ -64,7 +64,7 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
+  */
+ function createVirtualAnchorElement( range, editableContentElement ) {
+ 	return {
+-		ownerDocument: range.startContainer.ownerDocument,
++		contextElement: editableContentElement,
+ 		getBoundingClientRect() {
+ 			return editableContentElement.contains( range.startContainer )
+ 				? range.getBoundingClientRect()

@@ -1,0 +1,557 @@
+diff --git a/packages/block-editor/src/hooks/font-size.js b/packages/block-editor/src/hooks/font-size.js
+index f8fa94538f53ac..6cb950afc45641 100644
+--- a/packages/block-editor/src/hooks/font-size.js
++++ b/packages/block-editor/src/hooks/font-size.js
+@@ -150,6 +150,7 @@ export function FontSizeEdit( props ) {
+ 			onChange={ onChange }
+ 			value={ fontSizeValue }
+ 			withReset={ false }
++			withSlider
+ 			size="__unstable-large"
+ 			__nextHasNoMarginBottom
+ 		/>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8b72c8f62fa7b6..285f861cc3b730 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `BoxControl` & `CustomSelectControl`: Add `onMouseOver` and `onMouseOut` callback props to allow handling of these events by parent components ([#44955](https://github.com/WordPress/gutenberg/pull/44955))
+ 
++## Enhancements
++
++-   `FontSizePicker`: Improved slider design when `withSlider` is set ([#44598](https://github.com/WordPress/gutenberg/pull/44598)).
++
+ ### Bug Fix
+ 
+ -   `Button`: Fix RTL alignment for buttons containing an icon and text ([#44787](https://github.com/WordPress/gutenberg/pull/44787)).
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index 99a320d38f94ff..5f74dd09a28193 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -93,7 +93,7 @@ The current font size value.
+ 
+ ### withSlider
+ 
+-If `true`, the UI will contain a slider, instead of a numeric text input field. If `false`, no slider will be present.
++If `true`, a slider will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
+ 
+ -   Type: `Boolean`
+ -   Required: no
+@@ -101,7 +101,7 @@ If `true`, the UI will contain a slider, instead of a numeric text input field.
+ 
+ ### withReset
+ 
+-If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` or `withSlider` is `true`.
++If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
+ 
+ -   Type: `Boolean`
+ -   Required: no
+@@ -113,4 +113,4 @@ Start opting into the new margin-free styles that will become the default in a f
+ 
+ -   Type: `Boolean`
+ -   Required: no
+--   Default: `false`
+\ No newline at end of file
++-   Default: `false`
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index ed3a691c301f84..5adb5b75e9abda 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { ReactNode, ForwardedRef } from 'react';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -17,7 +17,11 @@ import { useState, useMemo, forwardRef } from '@wordpress/element';
+ import Button from '../button';
+ import RangeControl from '../range-control';
+ import { Flex, FlexItem } from '../flex';
+-import { default as UnitControl, useCustomUnits } from '../unit-control';
++import {
++	default as UnitControl,
++	parseQuantityAndUnitFromRawValue,
++	useCustomUnits,
++} from '../unit-control';
+ import CustomSelectControl from '../custom-select-control';
+ import { VisuallyHidden } from '../visually-hidden';
+ import {
+@@ -27,11 +31,9 @@ import {
+ import {
+ 	getFontSizeOptions,
+ 	getSelectedOption,
+-	splitValueAndUnitFromSize,
+ 	isSimpleCssValue,
+ 	CUSTOM_FONT_SIZE,
+ } from './utils';
+-import { VStack } from '../v-stack';
+ import { HStack } from '../h-stack';
+ import type {
+ 	FontSizePickerProps,
+@@ -47,20 +49,6 @@ import {
+ } from './styles';
+ import { Spacer } from '../spacer';
+ 
+-// This conditional is needed to maintain the spacing before the slider in the `withSlider` case.
+-const MaybeVStack = ( {
+-	__nextHasNoMarginBottom,
+-	children,
+-}: {
+-	__nextHasNoMarginBottom: boolean;
+-	children: ReactNode;
+-} ) =>
+-	! __nextHasNoMarginBottom ? (
+-		<>{ children }</>
+-	) : (
+-		<VStack spacing={ 6 } children={ children } />
+-	);
+-
+ const UnforwardedFontSizePicker = (
+ 	props: FontSizePickerProps,
+ 	ref: ForwardedRef< any >
+@@ -85,11 +73,6 @@ const UnforwardedFontSizePicker = (
+ 		} );
+ 	}
+ 
+-	const hasUnits = [ typeof value, typeof fontSizes?.[ 0 ]?.size ].includes(
+-		'string'
+-	);
+-	const noUnitsValue = ! hasUnits ? value : parseInt( String( value ) );
+-	const isPixelValue = typeof value === 'number' || value?.endsWith?.( 'px' );
+ 	const units = useCustomUnits( {
+ 		availableUnits: [ 'px', 'em', 'rem' ],
+ 	} );
+@@ -144,7 +127,10 @@ const UnforwardedFontSizePicker = (
+ 			! fontSizesContainComplexValues &&
+ 			typeof selectedOption.size === 'string'
+ 		) {
+-			const [ , unit ] = splitValueAndUnitFromSize( selectedOption.size );
++			const [ , unit ] = parseQuantityAndUnitFromRawValue(
++				selectedOption.size,
++				units
++			);
+ 			hint += `(${ unit })`;
+ 		}
+ 		return hint;
+@@ -170,14 +156,27 @@ const UnforwardedFontSizePicker = (
+ 		selectedOption.name
+ 	);
+ 
+-	const headerAriaLabel = `${ __( 'Size' ) } ${ headerHint || '' }`;
++	// If neither the value or first font size is a string, then FontSizePicker
++	// operates in a legacy "unitless" mode where UnitControl can only be used
++	// to select px values and onChange() is always called with number values.
++	const hasUnits =
++		typeof value === 'string' || typeof fontSizes[ 0 ]?.size === 'string';
++
++	const [ valueQuantity, valueUnit ] = parseQuantityAndUnitFromRawValue(
++		value,
++		units
++	);
++	const isValueUnitRelative =
++		!! valueUnit && [ 'em', 'rem' ].includes( valueUnit );
+ 
+ 	return (
+ 		<Container ref={ ref } className="components-font-size-picker">
+ 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
+ 			<Spacer>
+ 				<HStack className="components-font-size-picker__header">
+-					<HeaderLabel aria-label={ headerAriaLabel }>
++					<HeaderLabel
++						aria-label={ `${ __( 'Size' ) } ${ headerHint || '' }` }
++					>
+ 						{ __( 'Size' ) }
+ 						{ headerHint && (
+ 							<HeaderHint className="components-font-size-picker__header__hint">
+@@ -204,141 +203,149 @@ const UnforwardedFontSizePicker = (
+ 					) }
+ 				</HStack>
+ 			</Spacer>
+-			<MaybeVStack __nextHasNoMarginBottom={ __nextHasNoMarginBottom }>
+-				<Controls
+-					className="components-font-size-picker__controls"
+-					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-				>
+-					{ !! fontSizes.length &&
+-						shouldUseSelectControl &&
+-						! showCustomValueControl && (
+-							<CustomSelectControl
+-								__nextUnconstrainedWidth
+-								className="components-font-size-picker__select"
+-								label={ __( 'Font size' ) }
+-								hideLabelFromVision
+-								describedBy={ currentFontSizeSR }
+-								options={ options as FontSizeSelectOption[] }
+-								value={ (
+-									options as FontSizeSelectOption[]
+-								 ).find(
+-									( option ) =>
+-										option.key === selectedOption.slug
+-								) }
+-								onChange={ ( {
+-									selectedItem,
+-								}: {
+-									selectedItem: FontSizeSelectOption;
+-								} ) => {
++			<Controls
++				className="components-font-size-picker__controls"
++				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++			>
++				{ !! fontSizes.length &&
++					shouldUseSelectControl &&
++					! showCustomValueControl && (
++						<CustomSelectControl
++							__nextUnconstrainedWidth
++							className="components-font-size-picker__select"
++							label={ __( 'Font size' ) }
++							hideLabelFromVision
++							describedBy={ currentFontSizeSR }
++							options={ options as FontSizeSelectOption[] }
++							value={ ( options as FontSizeSelectOption[] ).find(
++								( option ) => option.key === selectedOption.slug
++							) }
++							onChange={ ( {
++								selectedItem,
++							}: {
++								selectedItem: FontSizeSelectOption;
++							} ) => {
++								if ( selectedItem.size === undefined ) {
++									onChange?.( undefined );
++								} else {
+ 									onChange?.(
+ 										hasUnits
+ 											? selectedItem.size
+ 											: Number( selectedItem.size )
+ 									);
+-									if (
+-										selectedItem.key === CUSTOM_FONT_SIZE
+-									) {
+-										setShowCustomValueControl( true );
++								}
++								if ( selectedItem.key === CUSTOM_FONT_SIZE ) {
++									setShowCustomValueControl( true );
++								}
++							} }
++							size={ size }
++						/>
++					) }
++				{ ! shouldUseSelectControl && ! showCustomValueControl && (
++					<ToggleGroupControl
++						__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
++						label={ __( 'Font size' ) }
++						hideLabelFromVision
++						value={ value }
++						onChange={ ( newValue ) => {
++							if ( newValue === undefined ) {
++								onChange?.( undefined );
++							} else {
++								onChange?.(
++									hasUnits ? newValue : Number( newValue )
++								);
++							}
++						} }
++						isBlock
++						size={ size }
++					>
++						{ ( options as FontSizeToggleGroupOption[] ).map(
++							( option ) => (
++								<ToggleGroupControlOption
++									key={ option.key }
++									value={ option.value }
++									label={ option.label }
++									aria-label={ option.name }
++									showTooltip={ true }
++								/>
++							)
++						) }
++					</ToggleGroupControl>
++				) }
++				{ ! disableCustomFontSizes && showCustomValueControl && (
++					<Flex className="components-font-size-picker__custom-size-control">
++						<FlexItem isBlock>
++							<UnitControl
++								label={ __( 'Custom' ) }
++								labelPosition="top"
++								hideLabelFromVision
++								value={ value }
++								onChange={ ( newValue ) => {
++									if ( newValue === undefined ) {
++										onChange?.( undefined );
++									} else {
++										onChange?.(
++											hasUnits
++												? newValue
++												: parseInt( newValue, 10 )
++										);
+ 									}
+ 								} }
+ 								size={ size }
++								units={ hasUnits ? units : [] }
++								min={ 0 }
+ 							/>
+-						) }
+-					{ ! shouldUseSelectControl && ! showCustomValueControl && (
+-						<ToggleGroupControl
+-							__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-							label={ __( 'Font size' ) }
+-							hideLabelFromVision
+-							value={ value }
+-							onChange={ ( newValue ) => {
+-								onChange?.(
+-									hasUnits ? newValue : Number( newValue )
+-								);
+-							} }
+-							isBlock
+-							size={ size }
+-						>
+-							{ ( options as FontSizeToggleGroupOption[] ).map(
+-								( option ) => (
+-									<ToggleGroupControlOption
+-										key={ option.key }
+-										value={ option.value }
+-										label={ option.label }
+-										aria-label={ option.name }
+-										showTooltip={ true }
+-									/>
+-								)
+-							) }
+-						</ToggleGroupControl>
+-					) }
+-					{ ! withSlider &&
+-						! disableCustomFontSizes &&
+-						showCustomValueControl && (
+-							<Flex className="components-font-size-picker__custom-size-control">
+-								<FlexItem isBlock>
+-									<UnitControl
+-										label={ __( 'Custom' ) }
+-										labelPosition="top"
++						</FlexItem>
++						{ withSlider && (
++							<FlexItem isBlock>
++								<Spacer marginX={ 2 } marginBottom={ 0 }>
++									<RangeControl
++										__nextHasNoMarginBottom={
++											__nextHasNoMarginBottom
++										}
++										className="components-font-size-picker__custom-input"
++										label={ __( 'Custom Size' ) }
+ 										hideLabelFromVision
+-										value={ value }
+-										onChange={ ( nextSize ) => {
+-											if (
+-												! nextSize ||
+-												0 === parseFloat( nextSize )
+-											) {
++										value={ valueQuantity }
++										initialPosition={ fallbackFontSize }
++										withInputField={ false }
++										onChange={ ( newValue ) => {
++											if ( newValue === undefined ) {
+ 												onChange?.( undefined );
+-											} else {
++											} else if ( hasUnits ) {
+ 												onChange?.(
+-													hasUnits
+-														? nextSize
+-														: parseInt(
+-																nextSize,
+-																10
+-														  )
++													newValue +
++														( valueUnit ?? 'px' )
+ 												);
++											} else {
++												onChange?.( newValue );
+ 											}
+ 										} }
+-										size={ size }
+-										units={ hasUnits ? units : [] }
++										min={ 0 }
++										max={ isValueUnitRelative ? 10 : 100 }
++										step={ isValueUnitRelative ? 0.1 : 1 }
+ 									/>
+-								</FlexItem>
+-								{ withReset && (
+-									<FlexItem>
+-										<ResetButton
+-											disabled={ value === undefined }
+-											onClick={ () => {
+-												onChange?.( undefined );
+-											} }
+-											isSmall
+-											variant="secondary"
+-											size={ size }
+-										>
+-											{ __( 'Reset' ) }
+-										</ResetButton>
+-									</FlexItem>
+-								) }
+-							</Flex>
++								</Spacer>
++							</FlexItem>
+ 						) }
+-				</Controls>
+-				{ withSlider && (
+-					<RangeControl
+-						__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-						className="components-font-size-picker__custom-input"
+-						label={ __( 'Custom Size' ) }
+-						value={
+-							isPixelValue && noUnitsValue
+-								? Number( noUnitsValue )
+-								: undefined
+-						}
+-						initialPosition={ fallbackFontSize }
+-						onChange={ ( newValue ) => {
+-							onChange?.( hasUnits ? newValue + 'px' : newValue );
+-						} }
+-						min={ 12 }
+-						max={ 100 }
+-					/>
++						{ withReset && (
++							<FlexItem>
++								<ResetButton
++									disabled={ value === undefined }
++									onClick={ () => {
++										onChange?.( undefined );
++									} }
++									isSmall
++									variant="secondary"
++									size={ size }
++								>
++									{ __( 'Reset' ) }
++								</ResetButton>
++							</FlexItem>
++						) }
++					</Flex>
+ 				) }
+-			</MaybeVStack>
++			</Controls>
+ 		</Container>
+ 	);
+ };
+diff --git a/packages/components/src/font-size-picker/test/utils.ts b/packages/components/src/font-size-picker/test/utils.ts
+index 18bc6f86e8fd03..829927051b4622 100644
+--- a/packages/components/src/font-size-picker/test/utils.ts
++++ b/packages/components/src/font-size-picker/test/utils.ts
+@@ -1,11 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import {
+-	isSimpleCssValue,
+-	splitValueAndUnitFromSize,
+-	getToggleGroupOptions,
+-} from '../utils';
++import { isSimpleCssValue, getToggleGroupOptions } from '../utils';
+ 
+ const simpleCSSCases: [ number | string, boolean ][] = [
+ 	// Test integers and non-integers.
+@@ -41,46 +37,6 @@ describe( 'isSimpleCssValue', () => {
+ 	);
+ } );
+ 
+-const splitValuesCases: [
+-	number | string,
+-	string | undefined,
+-	string | undefined
+-][] = [
+-	// Test integers and non-integers.
+-	[ 1, '1', undefined ],
+-	[ 1.25, '1.25', undefined ],
+-	[ '123', '123', undefined ],
+-	[ '1.5', '1.5', undefined ],
+-	[ '0.75', '0.75', undefined ],
+-	// Valid simple CSS values.
+-	[ '20px', '20', 'px' ],
+-	[ '0.8em', '0.8', 'em' ],
+-	[ '2rem', '2', 'rem' ],
+-	[ '1.4vw', '1.4', 'vw' ],
+-	[ '0.4vh', '0.4', 'vh' ],
+-	// Invalid negative values,
+-	[ '-5px', undefined, undefined ],
+-	// Complex CSS values that shouldn't parse.
+-	[ 'abs(-15px)', undefined, undefined ],
+-	[ 'calc(10px + 1)', undefined, undefined ],
+-	[ 'clamp(2.5rem, 4vw, 3rem)', undefined, undefined ],
+-	[ 'max(4.5em, 3vh)', undefined, undefined ],
+-	[ 'min(10px, 1rem)', undefined, undefined ],
+-	[ 'minmax(30px, auto)', undefined, undefined ],
+-	[ 'var(--wp--font-size)', undefined, undefined ],
+-];
+-
+-describe( 'splitValueAndUnitFromSize', () => {
+-	test.each( splitValuesCases )(
+-		'given %p as argument, returns value = %p and unit = %p',
+-		( cssValue, expectedValue, expectedUnit ) => {
+-			const [ value, unit ] = splitValueAndUnitFromSize( cssValue );
+-			expect( value ).toBe( expectedValue );
+-			expect( unit ).toBe( expectedUnit );
+-		}
+-	);
+-} );
+-
+ describe( 'getToggleGroupOptions', () => {
+ 	test( 'should assign t-shirt sizes by default up until the aliases length', () => {
+ 		const optionsArray = [
+diff --git a/packages/components/src/font-size-picker/utils.ts b/packages/components/src/font-size-picker/utils.ts
+index db6a07d7734af4..dfd578b06827a3 100644
+--- a/packages/components/src/font-size-picker/utils.ts
++++ b/packages/components/src/font-size-picker/utils.ts
+@@ -43,28 +43,6 @@ const FONT_SIZES_ALIASES = [
+ 	__( 'XXL' ),
+ ];
+ 
+-/**
+- * Helper util to split a font size to its numeric value
+- * and its `unit`, if exists.
+- *
+- * @param  size Font size.
+- * @return An array with the numeric value and the unit if exists.
+- */
+-export function splitValueAndUnitFromSize(
+-	size: NonNullable< FontSizePickerProps[ 'value' ] >
+-) {
+-	const [ numericValue, unit ] = `${ size }`.match( /[\d\.]+|\D+/g ) ?? [];
+-
+-	if (
+-		! isNaN( parseFloat( numericValue ) ) &&
+-		isFinite( Number( numericValue ) )
+-	) {
+-		return [ numericValue, unit ];
+-	}
+-
+-	return [];
+-}
+-
+ /**
+  * Some themes use css vars for their font sizes, so until we
+  * have the way of calculating them don't display them.
+diff --git a/packages/edit-site/src/components/global-styles/style.scss b/packages/edit-site/src/components/global-styles/style.scss
+index fabc0fa9b40233..3c15ebba159b05 100644
+--- a/packages/edit-site/src/components/global-styles/style.scss
++++ b/packages/edit-site/src/components/global-styles/style.scss
+@@ -19,6 +19,7 @@
+ 	margin-bottom: $grid-unit-20;
+ 	background: $gray-100;
+ 	border-radius: $radius-block-ui;
++	overflow: hidden;
+ }
+ 
+ .edit-site-typography-panel__full-width-control {
+diff --git a/packages/edit-site/src/components/global-styles/typography-panel.js b/packages/edit-site/src/components/global-styles/typography-panel.js
+index 82df0a57f20599..a1ef517560d42b 100644
+--- a/packages/edit-site/src/components/global-styles/typography-panel.js
++++ b/packages/edit-site/src/components/global-styles/typography-panel.js
+@@ -256,6 +256,7 @@ export default function TypographyPanel( { name, element, headingLevel } ) {
+ 						fontSizes={ fontSizesWithFluidValues }
+ 						disableCustomFontSizes={ disableCustomFontSizes }
+ 						withReset={ false }
++						withSlider
+ 						size="__unstable-large"
+ 						__nextHasNoMarginBottom
+ 					/>

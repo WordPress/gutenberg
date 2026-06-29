@@ -1,0 +1,141 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 1d00d8a9031779..408d776aa354de 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -349,7 +349,10 @@ module.exports = {
+ 			files: [ 'packages/components/src/**/*.[tj]s?(x)' ],
+ 			excludedFiles: [ ...developmentFiles ],
+ 			rules: {
+-				'react-hooks/exhaustive-deps': 'error',
++				'react-hooks/exhaustive-deps': [
++					'error',
++					{ additionalHooks: 'useUpdateEffect' },
++				],
+ 			},
+ 		},
+ 		{
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d20f381aa8fe9f..2a750563352a0c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -31,6 +31,8 @@
+ -   `LinkedButton`: remove unnecessary `span` tag ([#46063](https://github.com/WordPress/gutenberg/pull/46063))
+ -   NumberControl: refactor styles/tests/stories to TypeScript, replace fireEvent with user-event ([#45990](https://github.com/WordPress/gutenberg/pull/45990)).
+ -   `useBaseField`: Convert to TypeScript ([#45712](https://github.com/WordPress/gutenberg/pull/45712)).
++-   Add `useUpdateEffect` hook to the previously added `react-hooks/exhuastive-deps` eslint check ([#45771](https://github.com/WordPress/gutenberg/pull/45771)).
++-   `ToggleGroupControl`: Update `useUpdateEffect` usages to pass `exhaustive-deps` eslint rule ([#45771](https://github.com/WordPress/gutenberg/pull/45771)).
+ 
+ ### Documentation
+ 
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
+index 72e247659818f5..a9e78790711d34 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
+@@ -12,7 +12,7 @@ import {
+ 	usePrevious,
+ 	useResizeObserver,
+ } from '@wordpress/compose';
+-import { forwardRef, useRef, useState } from '@wordpress/element';
++import { forwardRef, useRef, useMemo } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -20,9 +20,12 @@ import { forwardRef, useRef, useState } from '@wordpress/element';
+ import { View } from '../../view';
+ import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
+ import ToggleGroupControlContext from '../context';
+-import { useUpdateEffect } from '../../utils/hooks';
++import { useControlledValue } from '../../utils/hooks';
+ import type { WordPressComponentProps } from '../../ui/context';
+-import type { ToggleGroupControlMainControlProps } from '../types';
++import type {
++	ToggleGroupControlMainControlProps,
++	ToggleGroupControlContextProps,
++} from '../types';
+ 
+ function UnforwardedToggleGroupControlAsButtonGroup(
+ 	{
+@@ -46,39 +49,26 @@ function UnforwardedToggleGroupControlAsButtonGroup(
+ 		ToggleGroupControlAsButtonGroup,
+ 		'toggle-group-control-as-button-group'
+ 	).toString();
+-	const [ selectedValue, setSelectedValue ] = useState( value );
+-	const groupContext = {
+-		baseId,
+-		state: selectedValue,
+-		setState: setSelectedValue,
+-	};
+ 	const previousValue = usePrevious( value );
+-
+-	// Propagate groupContext.state change.
+-	useUpdateEffect( () => {
+-		// Avoid calling onChange if groupContext state changed
+-		// from incoming value.
+-		if ( previousValue !== groupContext.state ) {
+-			onChange( groupContext.state );
+-		}
+-	}, [ groupContext.state ] );
+-
+-	// Sync incoming value with groupContext.state.
+-	useUpdateEffect( () => {
+-		if ( value !== groupContext.state ) {
+-			groupContext.setState( value );
+-		}
+-	}, [ value ] );
+-
++	const [ selectedValue, setSelectedValue ] = useControlledValue( {
++		defaultValue: previousValue,
++		onChange,
++		value,
++	} );
++	// Expose selectedValue getter/setter via context
++	const groupContext: ToggleGroupControlContextProps = useMemo(
++		() => ( {
++			baseId,
++			state: selectedValue,
++			setState: setSelectedValue,
++			isBlock: ! isAdaptiveWidth,
++			isDeselectable: true,
++			size,
++		} ),
++		[ baseId, selectedValue, setSelectedValue, isAdaptiveWidth, size ]
++	);
+ 	return (
+-		<ToggleGroupControlContext.Provider
+-			value={ {
+-				...groupContext,
+-				isBlock: ! isAdaptiveWidth,
+-				isDeselectable: true,
+-				size,
+-			} }
+-		>
++		<ToggleGroupControlContext.Provider value={ groupContext }>
+ 			<View
+ 				aria-label={ label }
+ 				{ ...otherProps }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+index 9f66e964d9d439..483efca45c4cc7 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+@@ -61,14 +61,17 @@ function UnforwardedToggleGroupControlAsRadioGroup(
+ 		if ( previousValue !== radio.state ) {
+ 			onChange( radio.state );
+ 		}
+-	}, [ radio.state ] );
++	}, [ radio.state, previousValue, onChange ] );
+ 
+ 	// Sync incoming value with radio.state.
++	const { state: radioState, setState: setRadioState } = radio;
+ 	useUpdateEffect( () => {
+-		if ( value !== radio.state ) {
+-			radio.setState( value );
++		if ( value !== radioState ) {
++			setRadioState( value );
+ 		}
+-	}, [ value ] );
++		// setRadioState needs to be listed even if in theory it's supposed to be a
++		// stable reference — that's an ESLint limitation.
++	}, [ value, radioState, setRadioState ] );
+ 
+ 	return (
+ 		<ToggleGroupControlContext.Provider

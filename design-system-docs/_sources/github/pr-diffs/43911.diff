@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4aa5eb6c3c7108..be4eec68a53ddf 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -50,6 +50,7 @@
+ -   `Popover`: refactor to TypeScript ([#43823](https://github.com/WordPress/gutenberg/pull/43823/)).
+ -   `BorderControl` and `BorderBoxControl`: replace temporary types with `Popover`'s types ([#43823](https://github.com/WordPress/gutenberg/pull/43823/)).
+ -   `DimensionControl`: Refactor tests to `@testing-library/react` ([#43916](https://github.com/WordPress/gutenberg/pull/43916)).
++-   `PaletteEditListView`: updated to satisfy `react/exhaustive-deps` eslint rule ([#43911](https://github.com/WordPress/gutenberg/pull/43911))
+ 
+ ## 20.0.0 (2022-08-24)
+ 
+diff --git a/packages/components/src/palette-edit/index.js b/packages/components/src/palette-edit/index.js
+index 065302acc10865..b76fc27e5fc60e 100644
+--- a/packages/components/src/palette-edit/index.js
++++ b/packages/components/src/palette-edit/index.js
+@@ -229,7 +229,7 @@ function PaletteEditListView( {
+ 				onChange( newElements.length ? newElements : undefined );
+ 			}
+ 		};
+-	}, [] );
++	}, [ onChange, slugPrefix ] );
+ 
+ 	const debounceOnChange = useDebounce( onChange, 100 );
+ 

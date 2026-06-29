@@ -1,0 +1,1926 @@
+diff --git a/packages/block-editor/src/components/global-styles/background-panel.js b/packages/block-editor/src/components/global-styles/background-panel.js
+index cfbf777cb01243..8a151f8a376537 100644
+--- a/packages/block-editor/src/components/global-styles/background-panel.js
++++ b/packages/block-editor/src/components/global-styles/background-panel.js
+@@ -5,7 +5,7 @@ import {
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ } from '@wordpress/components';
+-import { useCallback, Platform } from '@wordpress/element';
++import { useCallback } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import { getValueFromVariable } from '@wordpress/global-styles-engine';
+ 
+@@ -31,7 +31,7 @@ const DEFAULT_CONTROLS = {
+  * @return {boolean}        Whether site settings has activated background panel.
+  */
+ export function useHasBackgroundControl( settings, feature ) {
+-	return Platform.OS === 'web' && settings?.background?.[ feature ];
++	return settings?.background?.[ feature ];
+ }
+ 
+ /**
+@@ -44,7 +44,7 @@ export function useHasBackgroundControl( settings, feature ) {
+  */
+ export function useHasBackgroundPanel( settings ) {
+ 	const { backgroundImage, gradient } = settings?.background || {};
+-	return Platform.OS === 'web' && ( backgroundImage || gradient );
++	return backgroundImage || gradient;
+ }
+ 
+ /**
+diff --git a/packages/block-editor/src/components/global-styles/dimensions-panel.js b/packages/block-editor/src/components/global-styles/dimensions-panel.js
+index 05b1b93f5e49a8..c0746364170cfa 100644
+--- a/packages/block-editor/src/components/global-styles/dimensions-panel.js
++++ b/packages/block-editor/src/components/global-styles/dimensions-panel.js
+@@ -16,7 +16,7 @@ import {
+ 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+ } from '@wordpress/components';
+ import { Icon, alignNone, stretchWide } from '@wordpress/icons';
+-import { useCallback, useState, Platform } from '@wordpress/element';
++import { useCallback, useState } from '@wordpress/element';
+ import { getValueFromVariable } from '@wordpress/global-styles-engine';
+ 
+ /**
+@@ -43,18 +43,17 @@ export function useHasDimensionsPanel(
+ 	styleState = DEFAULT_BLOCK_STYLE_STATE
+ ) {
+ 	return (
+-		Platform.OS === 'web' &&
+-		( hasContentSize( settings ) ||
+-			hasWideSize( settings ) ||
+-			hasPadding( settings ) ||
+-			hasMargin( settings ) ||
+-			hasGap( settings ) ||
+-			hasHeight( settings ) ||
+-			hasMinHeight( settings ) ||
+-			hasMinWidth( settings ) ||
+-			hasWidth( settings ) ||
+-			hasAspectRatio( settings, styleState ) ||
+-			hasChildLayout( settings, styleState ) )
++		hasContentSize( settings ) ||
++		hasWideSize( settings ) ||
++		hasPadding( settings ) ||
++		hasMargin( settings ) ||
++		hasGap( settings ) ||
++		hasHeight( settings ) ||
++		hasMinHeight( settings ) ||
++		hasMinWidth( settings ) ||
++		hasWidth( settings ) ||
++		hasAspectRatio( settings, styleState ) ||
++		hasChildLayout( settings, styleState )
+ 	);
+ }
+ 
+diff --git a/packages/block-editor/src/hooks/anchor.js b/packages/block-editor/src/hooks/anchor.js
+index b49e1b5c1015df..8e2a31d2f4804a 100644
+--- a/packages/block-editor/src/hooks/anchor.js
++++ b/packages/block-editor/src/hooks/anchor.js
+@@ -5,7 +5,6 @@ import { addFilter } from '@wordpress/hooks';
+ import { TextControl, ExternalLink } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import { hasBlockSupport } from '@wordpress/blocks';
+-import { Platform } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -53,8 +52,6 @@ function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
+ 		return null;
+ 	}
+ 
+-	const isWeb = Platform.OS === 'web';
+-
+ 	return (
+ 		<InspectorControls group="advanced">
+ 			<TextControl
+@@ -65,23 +62,18 @@ function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
+ 					<>
+ 						{ __(
+ 							'Enter a word or two—without spaces—to make a unique web address just for this block, called an “anchor”. Then, you’ll be able to link directly to this section of your page.'
+-						) }
+-						{ isWeb && (
+-							<>
+-								{ ' ' }
+-								<ExternalLink
+-									href={ __(
+-										'https://wordpress.org/documentation/article/page-jumps/'
+-									) }
+-								>
+-									{ __( 'Learn more about anchors' ) }
+-								</ExternalLink>
+-							</>
+-						) }
++						) }{ ' ' }
++						<ExternalLink
++							href={ __(
++								'https://wordpress.org/documentation/article/page-jumps/'
++							) }
++						>
++							{ __( 'Learn more about anchors' ) }
++						</ExternalLink>
+ 					</>
+ 				}
+ 				value={ anchor || '' }
+-				placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
++				placeholder={ null }
+ 				onChange={ ( nextValue ) => {
+ 					nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
+ 					setAttributes( {
+diff --git a/packages/block-editor/src/hooks/border.js b/packages/block-editor/src/hooks/border.js
+index d95e20ea287aa9..d1094b769af606 100644
+--- a/packages/block-editor/src/hooks/border.js
++++ b/packages/block-editor/src/hooks/border.js
+@@ -8,7 +8,7 @@ import clsx from 'clsx';
+  */
+ import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
+ import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
+-import { Platform, useCallback, useMemo } from '@wordpress/element';
++import { useCallback, useMemo } from '@wordpress/element';
+ import { addFilter } from '@wordpress/hooks';
+ import { useSelect } from '@wordpress/data';
+ import { __ } from '@wordpress/i18n';
+@@ -217,10 +217,6 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
+  * @return {boolean} Whether there is support.
+  */
+ export function hasBorderSupport( blockName, feature = 'any' ) {
+-	if ( Platform.OS !== 'web' ) {
+-		return false;
+-	}
+-
+ 	const support = getBlockSupport( blockName, BORDER_SUPPORT_KEY );
+ 
+ 	if ( support === true ) {
+diff --git a/packages/block-editor/src/hooks/color.js b/packages/block-editor/src/hooks/color.js
+index 5da3f586bfee10..f2344d6b8faa2b 100644
+--- a/packages/block-editor/src/hooks/color.js
++++ b/packages/block-editor/src/hooks/color.js
+@@ -8,7 +8,7 @@ import clsx from 'clsx';
+  */
+ import { addFilter } from '@wordpress/hooks';
+ import { getBlockSupport } from '@wordpress/blocks';
+-import { useMemo, Platform, useCallback } from '@wordpress/element';
++import { useMemo, useCallback } from '@wordpress/element';
+ import { useSelect } from '@wordpress/data';
+ 
+ /**
+@@ -55,10 +55,6 @@ const hasColorSupport = ( blockNameOrType ) => {
+ };
+ 
+ const hasLinkColorSupport = ( blockType ) => {
+-	if ( Platform.OS !== 'web' ) {
+-		return false;
+-	}
+-
+ 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+ 
+ 	return (
+@@ -342,7 +338,6 @@ export function ColorEdit( {
+ 
+ 	const enableContrastChecking =
+ 		! isStateSelected &&
+-		Platform.OS === 'web' &&
+ 		! value?.color?.gradient &&
+ 		( settings?.color?.text || settings?.color?.link ) &&
+ 		// Contrast checking is enabled by default.
+diff --git a/packages/block-editor/src/hooks/dimensions.js b/packages/block-editor/src/hooks/dimensions.js
+index b968e356b146b3..f066faa7466423 100644
+--- a/packages/block-editor/src/hooks/dimensions.js
++++ b/packages/block-editor/src/hooks/dimensions.js
+@@ -6,7 +6,7 @@ import clsx from 'clsx';
+ /**
+  * WordPress dependencies
+  */
+-import { Platform, useState, useEffect, useCallback } from '@wordpress/element';
++import { useState, useEffect, useCallback } from '@wordpress/element';
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import { getBlockSupport } from '@wordpress/blocks';
+ import deprecated from '@wordpress/deprecated';
+@@ -171,10 +171,6 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
+  * @return {boolean} Whether there is support.
+  */
+ export function hasDimensionsSupport( blockName, feature = 'any' ) {
+-	if ( Platform.OS !== 'web' ) {
+-		return false;
+-	}
+-
+ 	const support = getBlockSupport( blockName, DIMENSIONS_SUPPORT_KEY );
+ 
+ 	if ( support === true ) {
+diff --git a/packages/block-editor/src/hooks/position.js b/packages/block-editor/src/hooks/position.js
+index ea5e29e7332f49..b2155d071a7f51 100644
+--- a/packages/block-editor/src/hooks/position.js
++++ b/packages/block-editor/src/hooks/position.js
+@@ -11,7 +11,7 @@ import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+ import { BaseControl, CustomSelectControl } from '@wordpress/components';
+ import { useInstanceId } from '@wordpress/compose';
+ import { useSelect } from '@wordpress/data';
+-import { useMemo, Platform } from '@wordpress/element';
++import { useMemo } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -264,32 +264,28 @@ export function PositionPanelPure( {
+ 		: DEFAULT_OPTION;
+ 
+ 	// Only display position controls if there is at least one option to choose from.
+-	return Platform.select( {
+-		web:
+-			options.length > 1 ? (
+-				<InspectorControls group="position">
+-					<BaseControl help={ stickyHelpText }>
+-						<CustomSelectControl
+-							__next40pxDefaultSize
+-							label={ __( 'Position' ) }
+-							hideLabelFromVision
+-							describedBy={ sprintf(
+-								// translators: %s: Currently selected position.
+-								__( 'Currently selected position: %s' ),
+-								selectedOption.name
+-							) }
+-							options={ options }
+-							value={ selectedOption }
+-							onChange={ ( { selectedItem } ) => {
+-								onChangeType( selectedItem.value );
+-							} }
+-							size="__unstable-large"
+-						/>
+-					</BaseControl>
+-				</InspectorControls>
+-			) : null,
+-		native: null,
+-	} );
++	return options.length > 1 ? (
++		<InspectorControls group="position">
++			<BaseControl help={ stickyHelpText }>
++				<CustomSelectControl
++					__next40pxDefaultSize
++					label={ __( 'Position' ) }
++					hideLabelFromVision
++					describedBy={ sprintf(
++						// translators: %s: Currently selected position.
++						__( 'Currently selected position: %s' ),
++						selectedOption.name
++					) }
++					options={ options }
++					value={ selectedOption }
++					onChange={ ( { selectedItem } ) => {
++						onChangeType( selectedItem.value );
++					} }
++					size="__unstable-large"
++				/>
++			</BaseControl>
++		</InspectorControls>
++	) : null;
+ }
+ 
+ export default {
+diff --git a/packages/block-editor/src/hooks/supports.js b/packages/block-editor/src/hooks/supports.js
+index 75f2bdf2dc219e..7d7ecfa90cd3d8 100644
+--- a/packages/block-editor/src/hooks/supports.js
++++ b/packages/block-editor/src/hooks/supports.js
+@@ -2,7 +2,6 @@
+  * WordPress dependencies
+  */
+ import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+-import { Platform } from '@wordpress/element';
+ 
+ const ALIGN_SUPPORT_KEY = 'align';
+ const ALIGN_WIDE_SUPPORT_KEY = 'alignWide';
+@@ -120,10 +119,6 @@ export const getAlignWideSupport = ( nameOrType ) =>
+  * @return {boolean} Whether there is support.
+  */
+ export function hasBorderSupport( nameOrType, feature = 'any' ) {
+-	if ( Platform.OS !== 'web' ) {
+-		return false;
+-	}
+-
+ 	const support = getBlockSupport( nameOrType, BORDER_SUPPORT_KEY );
+ 
+ 	if ( support === true ) {
+@@ -177,10 +172,6 @@ export const hasColorSupport = ( nameOrType ) => {
+  * @return {boolean} Whether the block supports the feature.
+  */
+ export const hasLinkColorSupport = ( nameOrType ) => {
+-	if ( Platform.OS !== 'web' ) {
+-		return false;
+-	}
+-
+ 	const colorSupport = getBlockSupport( nameOrType, COLOR_SUPPORT_KEY );
+ 
+ 	return (
+diff --git a/packages/block-editor/src/store/private-actions.js b/packages/block-editor/src/store/private-actions.js
+index d5a2f7ee0e9486..81c75028bf4fae 100644
+--- a/packages/block-editor/src/store/private-actions.js
++++ b/packages/block-editor/src/store/private-actions.js
+@@ -1,7 +1,6 @@
+ /**
+  * WordPress dependencies
+  */
+-import { Platform } from '@wordpress/element';
+ import deprecated from '@wordpress/deprecated';
+ import { speak } from '@wordpress/a11y';
+ import { __ } from '@wordpress/i18n';
+@@ -56,9 +55,7 @@ export function __experimentalUpdateSettings(
+ 
+ 	let cleanSettings = incomingSettings;
+ 
+-	// There are no plugins in the mobile apps, so there is no
+-	// need to strip the experimental settings:
+-	if ( stripExperimentalSettings && Platform.OS === 'web' ) {
++	if ( stripExperimentalSettings ) {
+ 		cleanSettings = {};
+ 		for ( const key in incomingSettings ) {
+ 			if ( ! privateSettings.includes( key ) ) {
+diff --git a/packages/block-editor/src/store/selectors.js b/packages/block-editor/src/store/selectors.js
+index 450223e4107988..08750ffa30c60c 100644
+--- a/packages/block-editor/src/store/selectors.js
++++ b/packages/block-editor/src/store/selectors.js
+@@ -12,7 +12,6 @@ import {
+ 	store as blocksStore,
+ 	privateApis as blocksPrivateApis,
+ } from '@wordpress/blocks';
+-import { Platform } from '@wordpress/element';
+ import { applyFilters } from '@wordpress/hooks';
+ import { symbol } from '@wordpress/icons';
+ import { create, remove, toHTMLString } from '@wordpress/rich-text';
+@@ -109,14 +108,6 @@ const DEFAULT_INSERTER_OPTIONS = {
+  */
+ export function getBlockName( state, clientId ) {
+ 	const block = state.blocks.byClientId.get( clientId );
+-	const socialLinkName = 'core/social-link';
+-
+-	if ( Platform.OS !== 'web' && block?.name === socialLinkName ) {
+-		const attributes = state.blocks.attributes.get( clientId );
+-		const { service } = attributes ?? {};
+-
+-		return service ? `${ socialLinkName }-${ service }` : socialLinkName;
+-	}
+ 	return block ? block.name : null;
+ }
+ 
+diff --git a/packages/block-library/src/gallery/edit.js b/packages/block-library/src/gallery/edit.js
+index 5488705a24ec96..12aeb5432b3895 100644
+--- a/packages/block-library/src/gallery/edit.js
++++ b/packages/block-library/src/gallery/edit.js
+@@ -17,7 +17,6 @@ import {
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+ 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ 	ToolbarDropdownMenu,
+-	PanelBody,
+ } from '@wordpress/components';
+ import {
+ 	store as blockEditorStore,
+@@ -29,7 +28,7 @@ import {
+ 	MediaReplaceFlow,
+ 	useSettings,
+ } from '@wordpress/block-editor';
+-import { Platform, useEffect, useMemo } from '@wordpress/element';
++import { useEffect, useMemo } from '@wordpress/element';
+ import { __, _x, sprintf } from '@wordpress/i18n';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { View } from '@wordpress/primitives';
+@@ -112,13 +111,9 @@ const NAVIGATION_BUTTON_TYPE_OPTIONS = [
+ ];
+ const ALLOWED_MEDIA_TYPES = [ 'image' ];
+ 
+-const PLACEHOLDER_TEXT = Platform.isNative
+-	? __( 'Add media' )
+-	: __( 'Drag and drop images, upload, or choose from your library.' );
+-
+-const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative
+-	? { type: 'stepper' }
+-	: {};
++const PLACEHOLDER_TEXT = __(
++	'Drag and drop images, upload, or choose from your library.'
++);
+ 
+ const DEFAULT_BLOCK = { name: 'core/image' };
+ const EMPTY_ARRAY = [];
+@@ -132,7 +127,6 @@ export default function GalleryEdit( props ) {
+ 		isSelected,
+ 		insertBlocksAfter,
+ 		isContentLocked,
+-		onFocus,
+ 	} = props;
+ 
+ 	const [ lightboxSetting, defaultRatios, themeRatios, showDefaultRatios ] =
+@@ -169,42 +163,32 @@ export default function GalleryEdit( props ) {
+ 	const { createSuccessNotice, createErrorNotice } =
+ 		useDispatch( noticesStore );
+ 
+-	const {
+-		getBlock,
+-		getSettings,
+-		innerBlockImages,
+-		blockWasJustInserted,
+-		multiGallerySelection,
+-	} = useSelect(
+-		( select ) => {
+-			const {
+-				getBlockName,
+-				getMultiSelectedBlockClientIds,
+-				getSettings: _getSettings,
+-				getBlock: _getBlock,
+-				wasBlockJustInserted,
+-			} = select( blockEditorStore );
+-			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
+-
+-			return {
+-				getBlock: _getBlock,
+-				getSettings: _getSettings,
+-				innerBlockImages:
+-					_getBlock( clientId )?.innerBlocks ?? EMPTY_ARRAY,
+-				blockWasJustInserted: wasBlockJustInserted(
+-					clientId,
+-					'inserter_menu'
+-				),
+-				multiGallerySelection:
+-					multiSelectedClientIds.length &&
+-					multiSelectedClientIds.every(
+-						( _clientId ) =>
+-							getBlockName( _clientId ) === 'core/gallery'
+-					),
+-			};
+-		},
+-		[ clientId ]
+-	);
++	const { getBlock, getSettings, innerBlockImages, multiGallerySelection } =
++		useSelect(
++			( select ) => {
++				const {
++					getBlockName,
++					getMultiSelectedBlockClientIds,
++					getSettings: _getSettings,
++					getBlock: _getBlock,
++				} = select( blockEditorStore );
++				const multiSelectedClientIds = getMultiSelectedBlockClientIds();
++
++				return {
++					getBlock: _getBlock,
++					getSettings: _getSettings,
++					innerBlockImages:
++						_getBlock( clientId )?.innerBlocks ?? EMPTY_ARRAY,
++					multiGallerySelection:
++						multiSelectedClientIds.length &&
++						multiSelectedClientIds.every(
++							( _clientId ) =>
++								getBlockName( _clientId ) === 'core/gallery'
++						),
++				};
++			},
++			[ clientId ]
++		);
+ 
+ 	const images = useMemo(
+ 		() =>
+@@ -327,15 +311,7 @@ export default function GalleryEdit( props ) {
+ 	}
+ 
+ 	function isValidFileType( file ) {
+-		// It's necessary to retrieve the media type from the raw image data for already-uploaded images on native.
+-		const nativeFileData =
+-			Platform.isNative && file.id
+-				? imageData.find( ( { id } ) => id === file.id )
+-				: null;
+-
+-		const mediaTypeSelector = nativeFileData
+-			? nativeFileData?.media_type
+-			: file.type;
++		const mediaTypeSelector = file.type;
+ 
+ 		return (
+ 			ALLOWED_MEDIA_TYPES.some(
+@@ -593,30 +569,15 @@ export default function GalleryEdit( props ) {
+ 
+ 	const hasImages = !! images.length;
+ 	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
+-	const imagesUploading = images.some( ( img ) =>
+-		! Platform.isNative
+-			? ! img.id && img.url?.indexOf( 'blob:' ) === 0
+-			: img.url?.indexOf( 'file:' ) === 0
++	const imagesUploading = images.some(
++		( img ) => ! img.id && img.url?.indexOf( 'blob:' ) === 0
+ 	);
+ 
+-	// MediaPlaceholder props are different between web and native hence, we provide a platform-specific set.
+-	const mediaPlaceholderProps = Platform.select( {
+-		web: {
+-			addToGallery: false,
+-			disableMediaButtons: imagesUploading,
+-			value: {},
+-		},
+-		native: {
+-			addToGallery: hasImageIds,
+-			isAppender: hasImages,
+-			disableMediaButtons:
+-				( hasImages && ! isSelected ) || imagesUploading,
+-			value: hasImageIds ? images : {},
+-			autoOpenMediaUpload:
+-				! hasImages && isSelected && blockWasJustInserted,
+-			onFocus,
+-		},
+-	} );
++	const mediaPlaceholderProps = {
++		addToGallery: false,
++		disableMediaButtons: imagesUploading,
++		value: {},
++	};
+ 	const mediaPlaceholder = (
+ 		<MediaPlaceholder
+ 			handleUpload={ false }
+@@ -637,17 +598,11 @@ export default function GalleryEdit( props ) {
+ 		className: clsx( className, 'has-nested-images' ),
+ 	} );
+ 
+-	const nativeInnerBlockProps = Platform.isNative && {
+-		marginHorizontal: 0,
+-		marginVertical: 0,
+-	};
+-
+ 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+ 		defaultBlock: DEFAULT_BLOCK,
+ 		directInsert: true,
+ 		orientation: 'horizontal',
+ 		renderAppender: false,
+-		...nativeInnerBlockProps,
+ 	} );
+ 
+ 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+@@ -666,189 +621,37 @@ export default function GalleryEdit( props ) {
+ 	return (
+ 		<>
+ 			<InspectorControls>
+-				{ Platform.isWeb && (
+-					<ToolsPanel
+-						label={ __( 'Settings' ) }
+-						resetAll={ () => {
+-							setAttributes( {
+-								navigationButtonType: 'icon',
+-								columns: undefined,
+-								imageCrop: true,
+-								randomOrder: false,
+-							} );
+-
+-							setAspectRatio( 'auto' );
+-
+-							if ( sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG ) {
+-								updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG );
+-							}
+-
+-							if ( linkTarget ) {
+-								toggleOpenInNewTab( false );
+-							}
+-						} }
+-						dropdownMenuProps={ dropdownMenuProps }
+-					>
+-						{ images.length > 1 && (
+-							<ToolsPanelItem
+-								isShownByDefault
+-								label={ __( 'Columns' ) }
+-								hasValue={ () =>
+-									!! columns && columns !== images.length
+-								}
+-								onDeselect={ () =>
+-									setColumnsNumber( undefined )
+-								}
+-							>
+-								<RangeControl
+-									label={ __( 'Columns' ) }
+-									value={
+-										columns
+-											? columns
+-											: defaultColumnsNumber(
+-													images.length
+-											  )
+-									}
+-									onChange={ setColumnsNumber }
+-									min={ 1 }
+-									max={ Math.min(
+-										MAX_COLUMNS,
+-										images.length
+-									) }
+-									required
+-									__next40pxDefaultSize
+-								/>
+-							</ToolsPanelItem>
+-						) }
+-						{ imageSizeOptions?.length > 0 && (
+-							<ToolsPanelItem
+-								isShownByDefault
+-								label={ __( 'Resolution' ) }
+-								hasValue={ () =>
+-									sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG
+-								}
+-								onDeselect={ () =>
+-									updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG )
+-								}
+-							>
+-								<SelectControl
+-									label={ __( 'Resolution' ) }
+-									help={ __(
+-										'Select the size of the source images.'
+-									) }
+-									value={ sizeSlug }
+-									options={ imageSizeOptions }
+-									onChange={ updateImagesSize }
+-									hideCancelButton
+-									size="__unstable-large"
+-								/>
+-							</ToolsPanelItem>
+-						) }
+-						<ToolsPanelItem
+-							isShownByDefault
+-							label={ __( 'Crop images to fit' ) }
+-							hasValue={ () => ! imageCrop }
+-							onDeselect={ () =>
+-								setAttributes( { imageCrop: true } )
+-							}
+-						>
+-							<ToggleControl
+-								label={ __( 'Crop images to fit' ) }
+-								checked={ !! imageCrop }
+-								onChange={ toggleImageCrop }
+-							/>
+-						</ToolsPanelItem>
+-						<ToolsPanelItem
+-							isShownByDefault
+-							label={ __( 'Randomize order' ) }
+-							hasValue={ () => !! randomOrder }
+-							onDeselect={ () =>
+-								setAttributes( { randomOrder: false } )
+-							}
+-						>
+-							<ToggleControl
+-								label={ __( 'Randomize order' ) }
+-								checked={ !! randomOrder }
+-								onChange={ toggleRandomOrder }
+-							/>
+-						</ToolsPanelItem>
+-						{ hasLinkTo && (
+-							<ToolsPanelItem
+-								isShownByDefault
+-								label={ __( 'Open images in new tab' ) }
+-								hasValue={ () => !! linkTarget }
+-								onDeselect={ () => toggleOpenInNewTab( false ) }
+-							>
+-								<ToggleControl
+-									label={ __( 'Open images in new tab' ) }
+-									checked={ linkTarget === '_blank' }
+-									onChange={ toggleOpenInNewTab }
+-								/>
+-							</ToolsPanelItem>
+-						) }
+-						{ aspectRatioOptions.length > 1 && (
+-							<ToolsPanelItem
+-								hasValue={ () =>
+-									!! aspectRatio && aspectRatio !== 'auto'
+-								}
+-								label={ __( 'Aspect ratio' ) }
+-								onDeselect={ () => setAspectRatio( 'auto' ) }
+-								isShownByDefault
+-							>
+-								<SelectControl
+-									__next40pxDefaultSize
+-									label={ __( 'Aspect ratio' ) }
+-									help={ __(
+-										'Set a consistent aspect ratio for all images in the gallery.'
+-									) }
+-									value={ aspectRatio }
+-									options={ aspectRatioOptions }
+-									onChange={ setAspectRatio }
+-								/>
+-							</ToolsPanelItem>
+-						) }
++				<ToolsPanel
++					label={ __( 'Settings' ) }
++					resetAll={ () => {
++						setAttributes( {
++							navigationButtonType: 'icon',
++							columns: undefined,
++							imageCrop: true,
++							randomOrder: false,
++						} );
++
++						setAspectRatio( 'auto' );
++
++						if ( sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG ) {
++							updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG );
++						}
++
++						if ( linkTarget ) {
++							toggleOpenInNewTab( false );
++						}
++					} }
++					dropdownMenuProps={ dropdownMenuProps }
++				>
++					{ images.length > 1 && (
+ 						<ToolsPanelItem
+-							label={ __( 'Navigation button type' ) }
+ 							isShownByDefault
+-							hasValue={ () => navigationButtonType !== 'icon' }
+-							onDeselect={ () =>
+-								setAttributes( {
+-									navigationButtonType: 'icon',
+-								} )
++							label={ __( 'Columns' ) }
++							hasValue={ () =>
++								!! columns && columns !== images.length
+ 							}
++							onDeselect={ () => setColumnsNumber( undefined ) }
+ 						>
+-							{ hasLightboxImages && (
+-								<ToggleGroupControl
+-									label={ __( 'Navigation button type' ) }
+-									value={ navigationButtonType }
+-									onChange={ ( value ) =>
+-										setAttributes( {
+-											navigationButtonType: value,
+-										} )
+-									}
+-									isBlock
+-									__next40pxDefaultSize
+-									help={ __(
+-										'Adjust the appearance of buttons in the lightbox.'
+-									) }
+-								>
+-									{ NAVIGATION_BUTTON_TYPE_OPTIONS.map(
+-										( option ) => (
+-											<ToggleGroupControlOption
+-												key={ option.value }
+-												value={ option.value }
+-												label={ option.label }
+-											/>
+-										)
+-									) }
+-								</ToggleGroupControl>
+-							) }
+-						</ToolsPanelItem>
+-					</ToolsPanel>
+-				) }
+-				{ Platform.isNative && (
+-					<PanelBody title={ __( 'Settings' ) }>
+-						{ images.length > 1 && (
+ 							<RangeControl
+ 								label={ __( 'Columns' ) }
+ 								value={
+@@ -859,12 +662,22 @@ export default function GalleryEdit( props ) {
+ 								onChange={ setColumnsNumber }
+ 								min={ 1 }
+ 								max={ Math.min( MAX_COLUMNS, images.length ) }
+-								{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
+ 								required
+ 								__next40pxDefaultSize
+ 							/>
+-						) }
+-						{ imageSizeOptions?.length > 0 && (
++						</ToolsPanelItem>
++					) }
++					{ imageSizeOptions?.length > 0 && (
++						<ToolsPanelItem
++							isShownByDefault
++							label={ __( 'Resolution' ) }
++							hasValue={ () =>
++								sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG
++							}
++							onDeselect={ () =>
++								updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG )
++							}
++						>
+ 							<SelectControl
+ 								label={ __( 'Resolution' ) }
+ 								help={ __(
+@@ -876,121 +689,171 @@ export default function GalleryEdit( props ) {
+ 								hideCancelButton
+ 								size="__unstable-large"
+ 							/>
+-						) }
+-						<SelectControl
+-							label={ __( 'Link' ) }
+-							value={ linkTo }
+-							onChange={ setLinkTo }
+-							options={ linkOptions }
+-							hideCancelButton
+-							size="__unstable-large"
+-						/>
++						</ToolsPanelItem>
++					) }
++					<ToolsPanelItem
++						isShownByDefault
++						label={ __( 'Crop images to fit' ) }
++						hasValue={ () => ! imageCrop }
++						onDeselect={ () =>
++							setAttributes( { imageCrop: true } )
++						}
++					>
+ 						<ToggleControl
+ 							label={ __( 'Crop images to fit' ) }
+ 							checked={ !! imageCrop }
+ 							onChange={ toggleImageCrop }
+ 						/>
++					</ToolsPanelItem>
++					<ToolsPanelItem
++						isShownByDefault
++						label={ __( 'Randomize order' ) }
++						hasValue={ () => !! randomOrder }
++						onDeselect={ () =>
++							setAttributes( { randomOrder: false } )
++						}
++					>
+ 						<ToggleControl
+ 							label={ __( 'Randomize order' ) }
+ 							checked={ !! randomOrder }
+ 							onChange={ toggleRandomOrder }
+ 						/>
+-						{ hasLinkTo && (
++					</ToolsPanelItem>
++					{ hasLinkTo && (
++						<ToolsPanelItem
++							isShownByDefault
++							label={ __( 'Open images in new tab' ) }
++							hasValue={ () => !! linkTarget }
++							onDeselect={ () => toggleOpenInNewTab( false ) }
++						>
+ 							<ToggleControl
+ 								label={ __( 'Open images in new tab' ) }
+ 								checked={ linkTarget === '_blank' }
+ 								onChange={ toggleOpenInNewTab }
+ 							/>
+-						) }
+-						{ aspectRatioOptions.length > 1 && (
++						</ToolsPanelItem>
++					) }
++					{ aspectRatioOptions.length > 1 && (
++						<ToolsPanelItem
++							hasValue={ () =>
++								!! aspectRatio && aspectRatio !== 'auto'
++							}
++							label={ __( 'Aspect ratio' ) }
++							onDeselect={ () => setAspectRatio( 'auto' ) }
++							isShownByDefault
++						>
+ 							<SelectControl
+-								label={ __( 'Aspect Ratio' ) }
++								__next40pxDefaultSize
++								label={ __( 'Aspect ratio' ) }
+ 								help={ __(
+ 									'Set a consistent aspect ratio for all images in the gallery.'
+ 								) }
+ 								value={ aspectRatio }
+ 								options={ aspectRatioOptions }
+ 								onChange={ setAspectRatio }
+-								hideCancelButton
+-								size="__unstable-large"
+ 							/>
+-						) }
+-					</PanelBody>
+-				) }
+-			</InspectorControls>
+-			{ Platform.isWeb ? (
+-				<BlockControls group="block">
+-					<ToolbarDropdownMenu
+-						icon={ linkIcon }
+-						label={ __( 'Link' ) }
++						</ToolsPanelItem>
++					) }
++					<ToolsPanelItem
++						label={ __( 'Navigation button type' ) }
++						isShownByDefault
++						hasValue={ () => navigationButtonType !== 'icon' }
++						onDeselect={ () =>
++							setAttributes( {
++								navigationButtonType: 'icon',
++							} )
++						}
+ 					>
+-						{ ( { onClose } ) => (
+-							<MenuGroup>
+-								{ linkOptions.map( ( linkItem ) => {
+-									const isOptionSelected =
+-										linkTo === linkItem.value;
+-									return (
+-										<MenuItem
+-											key={ linkItem.value }
+-											isSelected={ isOptionSelected }
+-											className={ clsx(
+-												'components-dropdown-menu__menu-item',
+-												{
+-													'is-active':
+-														isOptionSelected,
+-												}
+-											) }
+-											iconPosition="left"
+-											icon={ linkItem.icon }
+-											onClick={ () => {
+-												setLinkTo( linkItem.value );
+-												onClose();
+-											} }
+-											role="menuitemradio"
+-											info={ linkItem.infoText }
+-										>
+-											{ linkItem.label }
+-										</MenuItem>
+-									);
+-								} ) }
+-							</MenuGroup>
++						{ hasLightboxImages && (
++							<ToggleGroupControl
++								label={ __( 'Navigation button type' ) }
++								value={ navigationButtonType }
++								onChange={ ( value ) =>
++									setAttributes( {
++										navigationButtonType: value,
++									} )
++								}
++								isBlock
++								__next40pxDefaultSize
++								help={ __(
++									'Adjust the appearance of buttons in the lightbox.'
++								) }
++							>
++								{ NAVIGATION_BUTTON_TYPE_OPTIONS.map(
++									( option ) => (
++										<ToggleGroupControlOption
++											key={ option.value }
++											value={ option.value }
++											label={ option.label }
++										/>
++									)
++								) }
++							</ToggleGroupControl>
+ 						) }
+-					</ToolbarDropdownMenu>
+-				</BlockControls>
+-			) : null }
+-			{ Platform.isWeb && (
+-				<>
+-					{ ! multiGallerySelection && (
+-						<BlockControls group="other">
+-							<MediaReplaceFlow
+-								allowedTypes={ ALLOWED_MEDIA_TYPES }
+-								handleUpload={ false }
+-								onSelect={ updateImages }
+-								name={ __( 'Add' ) }
+-								multiple
+-								mediaIds={ images
+-									.filter( ( image ) => image.id )
+-									.map( ( image ) => image.id ) }
+-								addToGallery={ hasImageIds }
+-								variant="toolbar"
+-							/>
+-						</BlockControls>
++					</ToolsPanelItem>
++				</ToolsPanel>
++			</InspectorControls>
++			<BlockControls group="block">
++				<ToolbarDropdownMenu icon={ linkIcon } label={ __( 'Link' ) }>
++					{ ( { onClose } ) => (
++						<MenuGroup>
++							{ linkOptions.map( ( linkItem ) => {
++								const isOptionSelected =
++									linkTo === linkItem.value;
++								return (
++									<MenuItem
++										key={ linkItem.value }
++										isSelected={ isOptionSelected }
++										className={ clsx(
++											'components-dropdown-menu__menu-item',
++											{
++												'is-active': isOptionSelected,
++											}
++										) }
++										iconPosition="left"
++										icon={ linkItem.icon }
++										onClick={ () => {
++											setLinkTo( linkItem.value );
++											onClose();
++										} }
++										role="menuitemradio"
++										info={ linkItem.infoText }
++									>
++										{ linkItem.label }
++									</MenuItem>
++								);
++							} ) }
++						</MenuGroup>
+ 					) }
+-					<GapStyles
+-						blockGap={ attributes.style?.spacing?.blockGap }
+-						clientId={ clientId }
+-					/>
+-				</>
+-			) }
++				</ToolbarDropdownMenu>
++			</BlockControls>
++			<>
++				{ ! multiGallerySelection && (
++					<BlockControls group="other">
++						<MediaReplaceFlow
++							allowedTypes={ ALLOWED_MEDIA_TYPES }
++							handleUpload={ false }
++							onSelect={ updateImages }
++							name={ __( 'Add' ) }
++							multiple
++							mediaIds={ images
++								.filter( ( image ) => image.id )
++								.map( ( image ) => image.id ) }
++							addToGallery={ hasImageIds }
++							variant="toolbar"
++						/>
++					</BlockControls>
++				) }
++				<GapStyles
++					blockGap={ attributes.style?.spacing?.blockGap }
++					clientId={ clientId }
++				/>
++			</>
+ 			<Gallery
+ 				{ ...props }
+ 				isContentLocked={ isContentLocked }
+ 				images={ images }
+-				mediaPlaceholder={
+-					! hasImages || Platform.isNative
+-						? mediaPlaceholder
+-						: undefined
+-				}
++				mediaPlaceholder={ ! hasImages ? mediaPlaceholder : undefined }
+ 				blockProps={ innerBlocksProps }
+ 				insertBlocksAfter={ insertBlocksAfter }
+ 				multiGallerySelection={ multiGallerySelection }
+diff --git a/packages/block-library/src/heading/edit.js b/packages/block-library/src/heading/edit.js
+index a1721d46e2417d..54defbd6b099a8 100644
+--- a/packages/block-library/src/heading/edit.js
++++ b/packages/block-library/src/heading/edit.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { useEffect, Platform } from '@wordpress/element';
++import { useEffect } from '@wordpress/element';
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import {
+ 	RichText,
+@@ -90,7 +90,6 @@ function HeadingEdit( props ) {
+ 				onReplace={ onReplace }
+ 				onRemove={ () => onReplace( [] ) }
+ 				placeholder={ placeholder || __( 'Heading' ) }
+-				{ ...( Platform.isNative && { deleteEnter: true } ) } // setup RichText on native mobile to delete the "Enter" key as it's handled by the JS/RN side
+ 				{ ...blockProps }
+ 			/>
+ 		</>
+diff --git a/packages/block-library/src/list/edit.js b/packages/block-library/src/list/edit.js
+index 73551cd9cdee80..0d1a397b0a1336 100644
+--- a/packages/block-library/src/list/edit.js
++++ b/packages/block-library/src/list/edit.js
+@@ -19,7 +19,7 @@ import {
+ 	formatOutdentRTL,
+ } from '@wordpress/icons';
+ import { createBlock } from '@wordpress/blocks';
+-import { useCallback, useEffect, Platform } from '@wordpress/element';
++import { useCallback, useEffect } from '@wordpress/element';
+ import deprecated from '@wordpress/deprecated';
+ 
+ /**
+@@ -33,7 +33,6 @@ const DEFAULT_BLOCK = {
+ 	name: 'core/list-item',
+ };
+ const TEMPLATE = [ [ 'core/list-item' ] ];
+-const NATIVE_MARGIN_SPACING = 8;
+ 
+ /**
+  * At the moment, deprecations don't handle create blocks from attributes
+@@ -118,11 +117,10 @@ function IndentUI( { clientId } ) {
+ 	);
+ }
+ 
+-export default function Edit( { attributes, setAttributes, clientId, style } ) {
++export default function Edit( { attributes, setAttributes, clientId } ) {
+ 	const { ordered, type, reversed, start } = attributes;
+ 	const blockProps = useBlockProps( {
+ 		style: {
+-			...( Platform.isNative && style ),
+ 			listStyleType: ordered && type !== 'decimal' ? type : undefined,
+ 		},
+ 	} );
+@@ -133,11 +131,6 @@ export default function Edit( { attributes, setAttributes, clientId, style } ) {
+ 		template: TEMPLATE,
+ 		templateLock: false,
+ 		templateInsertUpdatesSelection: true,
+-		...( Platform.isNative && {
+-			marginVertical: NATIVE_MARGIN_SPACING,
+-			marginHorizontal: NATIVE_MARGIN_SPACING,
+-			renderAppender: false,
+-		} ),
+ 		__experimentalCaptureToolbars: true,
+ 	} );
+ 	useMigrateOnLoad( attributes, clientId );
+diff --git a/packages/block-library/src/list/ordered-list-settings.js b/packages/block-library/src/list/ordered-list-settings.js
+index 1488f088573639..5780b36c74147c 100644
+--- a/packages/block-library/src/list/ordered-list-settings.js
++++ b/packages/block-library/src/list/ordered-list-settings.js
+@@ -5,13 +5,11 @@ import { __ } from '@wordpress/i18n';
+ import { InspectorControls } from '@wordpress/block-editor';
+ import {
+ 	TextControl,
+-	PanelBody,
+ 	ToggleControl,
+ 	SelectControl,
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ } from '@wordpress/components';
+-import { Platform } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -46,17 +44,47 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
+ 
+ 	return (
+ 		<InspectorControls>
+-			{ Platform.isNative ? (
+-				<PanelBody title={ __( 'Settings' ) }>
++			<ToolsPanel
++				label={ __( 'Settings' ) }
++				resetAll={ () => {
++					setAttributes( {
++						type: undefined,
++						start: undefined,
++						reversed: undefined,
++					} );
++				} }
++				dropdownMenuProps={ dropdownMenuProps }
++			>
++				<ToolsPanelItem
++					label={ __( 'List style' ) }
++					isShownByDefault
++					hasValue={ () => !! type }
++					onDeselect={ () =>
++						setAttributes( {
++							type: undefined,
++						} )
++					}
++				>
+ 					<SelectControl
+ 						__next40pxDefaultSize
+ 						label={ __( 'List style' ) }
+ 						options={ LIST_STYLE_OPTIONS }
+-						value={ type }
++						value={ type || 'decimal' }
+ 						onChange={ ( newValue ) =>
+ 							setAttributes( { type: newValue } )
+ 						}
+ 					/>
++				</ToolsPanelItem>
++				<ToolsPanelItem
++					label={ __( 'Start value' ) }
++					isShownByDefault
++					hasValue={ () => !! start }
++					onDeselect={ () =>
++						setAttributes( {
++							start: undefined,
++						} )
++					}
++				>
+ 					<TextControl
+ 						__next40pxDefaultSize
+ 						label={ __( 'Start value' ) }
+@@ -77,6 +105,17 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
+ 						}
+ 						step="1"
+ 					/>
++				</ToolsPanelItem>
++				<ToolsPanelItem
++					label={ __( 'Reverse order' ) }
++					isShownByDefault
++					hasValue={ () => !! reversed }
++					onDeselect={ () =>
++						setAttributes( {
++							reversed: undefined,
++						} )
++					}
++				>
+ 					<ToggleControl
+ 						label={ __( 'Reverse order' ) }
+ 						checked={ reversed || false }
+@@ -87,93 +126,8 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
+ 							} );
+ 						} }
+ 					/>
+-				</PanelBody>
+-			) : (
+-				<ToolsPanel
+-					label={ __( 'Settings' ) }
+-					resetAll={ () => {
+-						setAttributes( {
+-							type: undefined,
+-							start: undefined,
+-							reversed: undefined,
+-						} );
+-					} }
+-					dropdownMenuProps={ dropdownMenuProps }
+-				>
+-					<ToolsPanelItem
+-						label={ __( 'List style' ) }
+-						isShownByDefault
+-						hasValue={ () => !! type }
+-						onDeselect={ () =>
+-							setAttributes( {
+-								type: undefined,
+-							} )
+-						}
+-					>
+-						<SelectControl
+-							__next40pxDefaultSize
+-							label={ __( 'List style' ) }
+-							options={ LIST_STYLE_OPTIONS }
+-							value={ type || 'decimal' }
+-							onChange={ ( newValue ) =>
+-								setAttributes( { type: newValue } )
+-							}
+-						/>
+-					</ToolsPanelItem>
+-					<ToolsPanelItem
+-						label={ __( 'Start value' ) }
+-						isShownByDefault
+-						hasValue={ () => !! start }
+-						onDeselect={ () =>
+-							setAttributes( {
+-								start: undefined,
+-							} )
+-						}
+-					>
+-						<TextControl
+-							__next40pxDefaultSize
+-							label={ __( 'Start value' ) }
+-							type="number"
+-							onChange={ ( value ) => {
+-								const int = parseInt( value, 10 );
+-
+-								setAttributes( {
+-									// It should be possible to unset the value,
+-									// e.g. with an empty string.
+-									start: isNaN( int ) ? undefined : int,
+-								} );
+-							} }
+-							value={
+-								Number.isInteger( start )
+-									? start.toString( 10 )
+-									: ''
+-							}
+-							step="1"
+-						/>
+-					</ToolsPanelItem>
+-					<ToolsPanelItem
+-						label={ __( 'Reverse order' ) }
+-						isShownByDefault
+-						hasValue={ () => !! reversed }
+-						onDeselect={ () =>
+-							setAttributes( {
+-								reversed: undefined,
+-							} )
+-						}
+-					>
+-						<ToggleControl
+-							label={ __( 'Reverse order' ) }
+-							checked={ reversed || false }
+-							onChange={ ( value ) => {
+-								setAttributes( {
+-									// Unset the attribute if not reversed.
+-									reversed: value || undefined,
+-								} );
+-							} }
+-						/>
+-					</ToolsPanelItem>
+-				</ToolsPanel>
+-			) }
++				</ToolsPanelItem>
++			</ToolsPanel>
+ 		</InspectorControls>
+ 	);
+ };
+diff --git a/packages/block-library/src/navigation/edit/index.js b/packages/block-library/src/navigation/edit/index.js
+index c33080b68a1708..99526943f8dc30 100644
+--- a/packages/block-library/src/navigation/edit/index.js
++++ b/packages/block-library/src/navigation/edit/index.js
+@@ -6,13 +6,7 @@ import clsx from 'clsx';
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	useCallback,
+-	useState,
+-	useEffect,
+-	useRef,
+-	Platform,
+-} from '@wordpress/element';
++import { useCallback, useState, useEffect, useRef } from '@wordpress/element';
+ import {
+ 	InspectorControls,
+ 	useBlockProps,
+@@ -152,12 +146,7 @@ function ColorTools( {
+ 	// Detect if we're editing inside an overlay template part.
+ 	const isWithinOverlay = useSelect( () => isWithinNavigationOverlay(), [] );
+ 
+-	// Turn on contrast checker for web only since it's not supported on mobile yet.
+-	const enableContrastChecking = Platform.OS === 'web';
+ 	useEffect( () => {
+-		if ( ! enableContrastChecking ) {
+-			return;
+-		}
+ 		detectColors(
+ 			navRef.current,
+ 			setDetectedColor,
+@@ -182,12 +171,7 @@ function ColorTools( {
+ 				setDetectedOverlayBackgroundColor
+ 			);
+ 		}
+-	}, [
+-		enableContrastChecking,
+-		overlayTextColor.color,
+-		overlayBackgroundColor.color,
+-		navRef,
+-	] );
++	}, [ overlayTextColor.color, overlayBackgroundColor.color, navRef ] );
+ 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+ 	if ( ! colorGradientSettings.hasColorsOrGradients ) {
+ 		return null;
+@@ -248,18 +232,14 @@ function ColorTools( {
+ 				gradients={ [] }
+ 				disableCustomGradients
+ 			/>
+-			{ enableContrastChecking && (
+-				<>
+-					<ContrastChecker
+-						backgroundColor={ detectedBackgroundColor }
+-						textColor={ detectedColor }
+-					/>
+-					<ContrastChecker
+-						backgroundColor={ detectedOverlayBackgroundColor }
+-						textColor={ detectedOverlayColor }
+-					/>
+-				</>
+-			) }
++			<ContrastChecker
++				backgroundColor={ detectedBackgroundColor }
++				textColor={ detectedColor }
++			/>
++			<ContrastChecker
++				backgroundColor={ detectedOverlayBackgroundColor }
++				textColor={ detectedOverlayColor }
++			/>
+ 		</>
+ 	);
+ }
+diff --git a/packages/block-library/src/pullquote/edit.js b/packages/block-library/src/pullquote/edit.js
+index 3b0831a26352d0..55a1e97ff5cb31 100644
+--- a/packages/block-library/src/pullquote/edit.js
++++ b/packages/block-library/src/pullquote/edit.js
+@@ -14,7 +14,6 @@ import {
+ 	useBlockProps,
+ } from '@wordpress/block-editor';
+ import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+-import { Platform } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -22,8 +21,6 @@ import { Platform } from '@wordpress/element';
+ import { Figure } from './figure';
+ import { BlockQuote } from './blockquote';
+ 
+-const isWebPlatform = Platform.OS === 'web';
+-
+ function PullQuoteEdit( {
+ 	attributes,
+ 	setAttributes,
+@@ -69,7 +66,7 @@ function PullQuoteEdit( {
+ 					{ shouldShowCitation && (
+ 						<RichText
+ 							identifier="citation"
+-							tagName={ isWebPlatform ? 'cite' : undefined }
++							tagName="cite"
+ 							style={ { display: 'block' } }
+ 							value={ citation }
+ 							aria-label={ __( 'Pullquote citation text' ) }
+diff --git a/packages/block-library/src/quote/edit.js b/packages/block-library/src/quote/edit.js
+index e26cc4693ed35a..046be8723b45c6 100644
+--- a/packages/block-library/src/quote/edit.js
++++ b/packages/block-library/src/quote/edit.js
+@@ -16,7 +16,7 @@ import {
+ } from '@wordpress/block-editor';
+ import { BlockQuotation } from '@wordpress/components';
+ import { useDispatch, useRegistry } from '@wordpress/data';
+-import { Platform, useEffect } from '@wordpress/element';
++import { useEffect } from '@wordpress/element';
+ import deprecated from '@wordpress/deprecated';
+ import { verse } from '@wordpress/icons';
+ 
+@@ -26,8 +26,6 @@ import { verse } from '@wordpress/icons';
+ import { migrateToQuoteV2 } from './deprecated';
+ import { Caption } from '../utils/caption';
+ 
+-const isWebPlatform = Platform.OS === 'web';
+-
+ const TEMPLATE = [ [ 'core/paragraph', {} ] ];
+ 
+ /**
+@@ -72,7 +70,6 @@ export default function QuoteEdit( {
+ 	insertBlocksAfter,
+ 	clientId,
+ 	className,
+-	style,
+ 	isSelected,
+ } ) {
+ 	const { textAlign, allowedBlocks } = attributes;
+@@ -83,7 +80,6 @@ export default function QuoteEdit( {
+ 		className: clsx( className, {
+ 			[ `has-text-align-${ textAlign }` ]: textAlign,
+ 		} ),
+-		...( ! isWebPlatform && { style } ),
+ 	} );
+ 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+ 		template: TEMPLATE,
+@@ -107,8 +103,8 @@ export default function QuoteEdit( {
+ 				{ innerBlocksProps.children }
+ 				<Caption
+ 					attributeKey="citation"
+-					tagName={ isWebPlatform ? 'cite' : 'p' }
+-					style={ isWebPlatform && { display: 'block' } }
++					tagName="cite"
++					style={ { display: 'block' } }
+ 					isSelected={ isSelected }
+ 					attributes={ attributes }
+ 					setAttributes={ setAttributes }
+@@ -125,7 +121,6 @@ export default function QuoteEdit( {
+ 					excludeElementClassName
+ 					className="wp-block-quote__citation"
+ 					insertBlocksAfter={ insertBlocksAfter }
+-					{ ...( ! isWebPlatform ? { textAlign } : {} ) }
+ 				/>
+ 			</BlockQuotation>
+ 		</>
+diff --git a/packages/block-library/src/video/edit-common-settings.js b/packages/block-library/src/video/edit-common-settings.js
+index 00c03085145279..a93fa3ba14021c 100644
+--- a/packages/block-library/src/video/edit-common-settings.js
++++ b/packages/block-library/src/video/edit-common-settings.js
+@@ -7,7 +7,7 @@ import {
+ 	SelectControl,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ } from '@wordpress/components';
+-import { useMemo, useCallback, Platform } from '@wordpress/element';
++import { useMemo, useCallback } from '@wordpress/element';
+ 
+ const options = [
+ 	{ value: 'auto', label: __( 'Auto' ) },
+@@ -23,12 +23,9 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
+ 		'Autoplay may cause usability issues for some users.'
+ 	);
+ 
+-	const getAutoplayHelp = Platform.select( {
+-		web: useCallback( ( checked ) => {
+-			return checked ? autoPlayHelpText : null;
+-		}, [] ),
+-		native: autoPlayHelpText,
+-	} );
++	const getAutoplayHelp = useCallback( ( checked ) => {
++		return checked ? autoPlayHelpText : null;
++	}, [] );
+ 
+ 	const toggleFactory = useMemo( () => {
+ 		const toggleAttribute = ( attribute ) => {
+diff --git a/packages/blocks/src/api/raw-handling/html-to-blocks.ts b/packages/blocks/src/api/raw-handling/html-to-blocks.ts
+index bfb8f9bc3f02fd..41e3ea3b24390d 100644
+--- a/packages/blocks/src/api/raw-handling/html-to-blocks.ts
++++ b/packages/blocks/src/api/raw-handling/html-to-blocks.ts
+@@ -1,13 +1,7 @@
+-/**
+- * WordPress dependencies
+- */
+-import { Platform } from '@wordpress/element';
+-
+ /**
+  * Internal dependencies
+  */
+ import { createBlock, findTransform } from '../factory';
+-import parse from '../parser';
+ import { getBlockAttributes } from '../parser/get-block-attributes';
+ import { getRawTransforms } from './get-raw-transforms';
+ import type { Block } from '../../types';
+@@ -42,13 +36,6 @@ export function htmlToBlocks(
+ 		) as unknown as ( typeof transforms )[ number ] | null;
+ 
+ 		if ( ! rawTransform ) {
+-			// Until the HTML block is supported in the native version, we'll parse it
+-			// instead of creating the block to generate it as an unsupported block.
+-			if ( ( Platform as Record< string, unknown > ).isNative ) {
+-				return parse(
+-					`<!-- wp:html -->${ node.outerHTML }<!-- /wp:html -->`
+-				);
+-			}
+ 			return createBlock(
+ 				// Should not be hardcoded.
+ 				'core/html',
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fe8436ee66fa70..39a42d6d8ab130 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,10 @@
+ 
+ -   `Tooltip`: Use `--wpds-border-radius-md` for portaled popup surfaces, aligning with menus and popovers ([#78983](https://github.com/WordPress/gutenberg/pull/78983)).
+ 
++### Internal
++
++-   `UnitControl`: Remove dead native code branches now that `Platform.OS` is always `'web'` following the React Native removal ([#79031](https://github.com/WordPress/gutenberg/pull/79031)).
++
+ ## 34.0.0 (2026-05-27)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/unit-control/utils.ts b/packages/components/src/unit-control/utils.ts
+index f9b3d9b2731357..bb8eaf8dd5b056 100644
+--- a/packages/components/src/unit-control/utils.ts
++++ b/packages/components/src/unit-control/utils.ts
+@@ -2,227 +2,208 @@
+  * WordPress dependencies
+  */
+ import { __, _x } from '@wordpress/i18n';
+-import { Platform } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import type { WPUnitControlUnit } from './types';
+ 
+-const isWeb = Platform.OS === 'web';
+-
+ const allUnits: Record< string, WPUnitControlUnit > = {
+ 	px: {
+ 		value: 'px',
+-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
++		label: 'px',
+ 		a11yLabel: __( 'Pixels (px)' ),
+ 		step: 1,
+ 	},
+ 	'%': {
+ 		value: '%',
+-		label: isWeb ? '%' : __( 'Percentage (%)' ),
++		label: '%',
+ 		a11yLabel: __( 'Percent (%)' ),
+ 		step: 0.1,
+ 	},
+ 	em: {
+ 		value: 'em',
+-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
++		label: 'em',
+ 		a11yLabel: _x( 'ems', 'Relative to parent font size (em)' ),
+ 		step: 0.01,
+ 	},
+ 	rem: {
+ 		value: 'rem',
+-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
++		label: 'rem',
+ 		a11yLabel: _x( 'rems', 'Relative to root font size (rem)' ),
+ 		step: 0.01,
+ 	},
+ 	vw: {
+ 		value: 'vw',
+-		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
++		label: 'vw',
+ 		a11yLabel: __( 'Viewport width (vw)' ),
+ 		step: 0.1,
+ 	},
+ 	vh: {
+ 		value: 'vh',
+-		label: isWeb ? 'vh' : __( 'Viewport height (vh)' ),
++		label: 'vh',
+ 		a11yLabel: __( 'Viewport height (vh)' ),
+ 		step: 0.1,
+ 	},
+ 	vmin: {
+ 		value: 'vmin',
+-		label: isWeb ? 'vmin' : __( 'Viewport smallest dimension (vmin)' ),
++		label: 'vmin',
+ 		a11yLabel: __( 'Viewport smallest dimension (vmin)' ),
+ 		step: 0.1,
+ 	},
+ 	vmax: {
+ 		value: 'vmax',
+-		label: isWeb ? 'vmax' : __( 'Viewport largest dimension (vmax)' ),
++		label: 'vmax',
+ 		a11yLabel: __( 'Viewport largest dimension (vmax)' ),
+ 		step: 0.1,
+ 	},
+ 	ch: {
+ 		value: 'ch',
+-		label: isWeb ? 'ch' : __( 'Width of the zero (0) character (ch)' ),
++		label: 'ch',
+ 		a11yLabel: __( 'Width of the zero (0) character (ch)' ),
+ 		step: 0.01,
+ 	},
+ 	ex: {
+ 		value: 'ex',
+-		label: isWeb ? 'ex' : __( 'x-height of the font (ex)' ),
++		label: 'ex',
+ 		a11yLabel: __( 'x-height of the font (ex)' ),
+ 		step: 0.01,
+ 	},
+ 	cm: {
+ 		value: 'cm',
+-		label: isWeb ? 'cm' : __( 'Centimeters (cm)' ),
++		label: 'cm',
+ 		a11yLabel: __( 'Centimeters (cm)' ),
+ 		step: 0.001,
+ 	},
+ 	mm: {
+ 		value: 'mm',
+-		label: isWeb ? 'mm' : __( 'Millimeters (mm)' ),
++		label: 'mm',
+ 		a11yLabel: __( 'Millimeters (mm)' ),
+ 		step: 0.1,
+ 	},
+ 	in: {
+ 		value: 'in',
+-		label: isWeb ? 'in' : __( 'Inches (in)' ),
++		label: 'in',
+ 		a11yLabel: __( 'Inches (in)' ),
+ 		step: 0.001,
+ 	},
+ 	pc: {
+ 		value: 'pc',
+-		label: isWeb ? 'pc' : __( 'Picas (pc)' ),
++		label: 'pc',
+ 		a11yLabel: __( 'Picas (pc)' ),
+ 		step: 1,
+ 	},
+ 	pt: {
+ 		value: 'pt',
+-		label: isWeb ? 'pt' : __( 'Points (pt)' ),
++		label: 'pt',
+ 		a11yLabel: __( 'Points (pt)' ),
+ 		step: 1,
+ 	},
+ 	svw: {
+ 		value: 'svw',
+-		label: isWeb ? 'svw' : __( 'Small viewport width (svw)' ),
++		label: 'svw',
+ 		a11yLabel: __( 'Small viewport width (svw)' ),
+ 		step: 0.1,
+ 	},
+ 	svh: {
+ 		value: 'svh',
+-		label: isWeb ? 'svh' : __( 'Small viewport height (svh)' ),
++		label: 'svh',
+ 		a11yLabel: __( 'Small viewport height (svh)' ),
+ 		step: 0.1,
+ 	},
+ 	svi: {
+ 		value: 'svi',
+-		label: isWeb
+-			? 'svi'
+-			: __( 'Viewport smallest size in the inline direction (svi)' ),
++		label: 'svi',
+ 		a11yLabel: __( 'Small viewport width or height (svi)' ),
+ 		step: 0.1,
+ 	},
+ 	svb: {
+ 		value: 'svb',
+-		label: isWeb
+-			? 'svb'
+-			: __( 'Viewport smallest size in the block direction (svb)' ),
++		label: 'svb',
+ 		a11yLabel: __( 'Small viewport width or height (svb)' ),
+ 		step: 0.1,
+ 	},
+ 	svmin: {
+ 		value: 'svmin',
+-		label: isWeb
+-			? 'svmin'
+-			: __( 'Small viewport smallest dimension (svmin)' ),
++		label: 'svmin',
+ 		a11yLabel: __( 'Small viewport smallest dimension (svmin)' ),
+ 		step: 0.1,
+ 	},
+ 	lvw: {
+ 		value: 'lvw',
+-		label: isWeb ? 'lvw' : __( 'Large viewport width (lvw)' ),
++		label: 'lvw',
+ 		a11yLabel: __( 'Large viewport width (lvw)' ),
+ 		step: 0.1,
+ 	},
+ 	lvh: {
+ 		value: 'lvh',
+-		label: isWeb ? 'lvh' : __( 'Large viewport height (lvh)' ),
++		label: 'lvh',
+ 		a11yLabel: __( 'Large viewport height (lvh)' ),
+ 		step: 0.1,
+ 	},
+ 	lvi: {
+ 		value: 'lvi',
+-		label: isWeb ? 'lvi' : __( 'Large viewport width or height (lvi)' ),
++		label: 'lvi',
+ 		a11yLabel: __( 'Large viewport width or height (lvi)' ),
+ 		step: 0.1,
+ 	},
+ 	lvb: {
+ 		value: 'lvb',
+-		label: isWeb ? 'lvb' : __( 'Large viewport width or height (lvb)' ),
++		label: 'lvb',
+ 		a11yLabel: __( 'Large viewport width or height (lvb)' ),
+ 		step: 0.1,
+ 	},
+ 	lvmin: {
+ 		value: 'lvmin',
+-		label: isWeb
+-			? 'lvmin'
+-			: __( 'Large viewport smallest dimension (lvmin)' ),
++		label: 'lvmin',
+ 		a11yLabel: __( 'Large viewport smallest dimension (lvmin)' ),
+ 		step: 0.1,
+ 	},
+ 	dvw: {
+ 		value: 'dvw',
+-		label: isWeb ? 'dvw' : __( 'Dynamic viewport width (dvw)' ),
++		label: 'dvw',
+ 		a11yLabel: __( 'Dynamic viewport width (dvw)' ),
+ 		step: 0.1,
+ 	},
+ 	dvh: {
+ 		value: 'dvh',
+-		label: isWeb ? 'dvh' : __( 'Dynamic viewport height (dvh)' ),
++		label: 'dvh',
+ 		a11yLabel: __( 'Dynamic viewport height (dvh)' ),
+ 		step: 0.1,
+ 	},
+ 	dvi: {
+ 		value: 'dvi',
+-		label: isWeb ? 'dvi' : __( 'Dynamic viewport width or height (dvi)' ),
++		label: 'dvi',
+ 		a11yLabel: __( 'Dynamic viewport width or height (dvi)' ),
+ 		step: 0.1,
+ 	},
+ 	dvb: {
+ 		value: 'dvb',
+-		label: isWeb ? 'dvb' : __( 'Dynamic viewport width or height (dvb)' ),
++		label: 'dvb',
+ 		a11yLabel: __( 'Dynamic viewport width or height (dvb)' ),
+ 		step: 0.1,
+ 	},
+ 	dvmin: {
+ 		value: 'dvmin',
+-		label: isWeb
+-			? 'dvmin'
+-			: __( 'Dynamic viewport smallest dimension (dvmin)' ),
++		label: 'dvmin',
+ 		a11yLabel: __( 'Dynamic viewport smallest dimension (dvmin)' ),
+ 		step: 0.1,
+ 	},
+ 	dvmax: {
+ 		value: 'dvmax',
+-		label: isWeb
+-			? 'dvmax'
+-			: __( 'Dynamic viewport largest dimension (dvmax)' ),
++		label: 'dvmax',
+ 		a11yLabel: __( 'Dynamic viewport largest dimension (dvmax)' ),
+ 		step: 0.1,
+ 	},
+ 	svmax: {
+ 		value: 'svmax',
+-		label: isWeb
+-			? 'svmax'
+-			: __( 'Small viewport largest dimension (svmax)' ),
++		label: 'svmax',
+ 		a11yLabel: __( 'Small viewport largest dimension (svmax)' ),
+ 		step: 0.1,
+ 	},
+ 	lvmax: {
+ 		value: 'lvmax',
+-		label: isWeb
+-			? 'lvmax'
+-			: __( 'Large viewport largest dimension (lvmax)' ),
++		label: 'lvmax',
+ 		a11yLabel: __( 'Large viewport largest dimension (lvmax)' ),
+ 		step: 0.1,
+ 	},
+diff --git a/packages/edit-site/src/store/selectors.js b/packages/edit-site/src/store/selectors.js
+index 6dd04fbc3f3239..19bac9941b4db5 100644
+--- a/packages/edit-site/src/store/selectors.js
++++ b/packages/edit-site/src/store/selectors.js
+@@ -4,7 +4,6 @@
+ import { store as coreDataStore } from '@wordpress/core-data';
+ import { createRegistrySelector, createSelector } from '@wordpress/data';
+ import deprecated from '@wordpress/deprecated';
+-import { Platform } from '@wordpress/element';
+ import { store as preferencesStore } from '@wordpress/preferences';
+ import { store as editorStore } from '@wordpress/editor';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+@@ -100,12 +99,9 @@ export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
+ 		version: '6.8',
+ 		alternative: `select( 'core/core' ).getEntityRecords( 'postType', 'wp_block' )`,
+ 	} );
+-	const isWeb = Platform.OS === 'web';
+-	return isWeb
+-		? select( coreDataStore ).getEntityRecords( 'postType', 'wp_block', {
+-				per_page: -1,
+-		  } )
+-		: [];
++	return select( coreDataStore ).getEntityRecords( 'postType', 'wp_block', {
++		per_page: -1,
++	} );
+ } );
+ 
+ /**
+diff --git a/packages/edit-widgets/src/components/sidebar/index.js b/packages/edit-widgets/src/components/sidebar/index.js
+index a42a6d7c4be7a4..3786174361fad2 100644
+--- a/packages/edit-widgets/src/components/sidebar/index.js
++++ b/packages/edit-widgets/src/components/sidebar/index.js
+@@ -1,12 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	useEffect,
+-	Platform,
+-	useContext,
+-	useCallback,
+-} from '@wordpress/element';
++import { useEffect, useContext, useCallback } from '@wordpress/element';
+ import { isRTL, __ } from '@wordpress/i18n';
+ import {
+ 	ComplementaryArea,
+@@ -21,10 +16,7 @@ import { drawerLeft, drawerRight } from '@wordpress/icons';
+ import { privateApis as componentsPrivateApis } from '@wordpress/components';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ 
+-const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
+-	web: true,
+-	native: false,
+-} );
++const SIDEBAR_ACTIVE_BY_DEFAULT = true;
+ 
+ const BLOCK_INSPECTOR_IDENTIFIER = 'edit-widgets/block-inspector';
+ 
+diff --git a/packages/editor/src/components/more-menu/view-more-menu-group.js b/packages/editor/src/components/more-menu/view-more-menu-group.js
+index 23e2cf82d82c6d..caa3c1394ff3f8 100644
+--- a/packages/editor/src/components/more-menu/view-more-menu-group.js
++++ b/packages/editor/src/components/more-menu/view-more-menu-group.js
+@@ -2,10 +2,9 @@
+  * WordPress dependencies
+  */
+ import { createSlotFill } from '@wordpress/components';
+-import { Platform } from '@wordpress/element';
+ 
+ const { Fill: ViewMoreMenuGroup, Slot } = createSlotFill(
+-	Platform.OS === 'web' ? Symbol( 'ViewMoreMenuGroup' ) : 'ViewMoreMenuGroup'
++	Symbol( 'ViewMoreMenuGroup' )
+ );
+ 
+ ViewMoreMenuGroup.Slot = ( { fillProps } ) => <Slot fillProps={ fillProps } />;
+diff --git a/packages/editor/src/components/sidebar/index.js b/packages/editor/src/components/sidebar/index.js
+index cf2951813afafb..68b53ace26a14b 100644
+--- a/packages/editor/src/components/sidebar/index.js
++++ b/packages/editor/src/components/sidebar/index.js
+@@ -6,13 +6,7 @@ import {
+ 	store as blockEditorStore,
+ } from '@wordpress/block-editor';
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import {
+-	Platform,
+-	useCallback,
+-	useContext,
+-	useEffect,
+-	useRef,
+-} from '@wordpress/element';
++import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
+ import { isRTL, __, _x } from '@wordpress/i18n';
+ import { drawerLeft, drawerRight } from '@wordpress/icons';
+ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+@@ -47,10 +41,7 @@ import {
+ 
+ const { Tabs } = unlock( componentsPrivateApis );
+ 
+-const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
+-	web: true,
+-	native: false,
+-} );
++const SIDEBAR_ACTIVE_BY_DEFAULT = true;
+ 
+ const SidebarContent = ( {
+ 	tabName,
+diff --git a/packages/editor/src/store/selectors.js b/packages/editor/src/store/selectors.js
+index 926aa7af02ac7a..125df2865c2f82 100644
+--- a/packages/editor/src/store/selectors.js
++++ b/packages/editor/src/store/selectors.js
+@@ -11,7 +11,6 @@ import { isInTheFuture, getDate } from '@wordpress/date';
+ import { addQueryArgs, cleanForSlug } from '@wordpress/url';
+ import { createSelector, createRegistrySelector } from '@wordpress/data';
+ import deprecated from '@wordpress/deprecated';
+-import { Platform } from '@wordpress/element';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+ import { store as coreStore } from '@wordpress/core-data';
+ import { store as preferencesStore } from '@wordpress/preferences';
+@@ -524,8 +523,7 @@ export function isEditedPostSaveable( state ) {
+ 	return (
+ 		!! getEditedPostAttribute( state, 'title' ) ||
+ 		!! getEditedPostAttribute( state, 'excerpt' ) ||
+-		! isEditedPostEmpty( state ) ||
+-		Platform.OS === 'native'
++		! isEditedPostEmpty( state )
+ 	);
+ }
+ 

@@ -1,0 +1,449 @@
+diff --git a/packages/components/src/theme/index.tsx b/packages/components/src/theme/index.tsx
+index fbb92f59278d1b..e29e3de5e6bcd8 100644
+--- a/packages/components/src/theme/index.tsx
++++ b/packages/components/src/theme/index.tsx
+@@ -1,3 +1,9 @@
++/**
++ * External dependencies
++ */
++import clsx from 'clsx';
++import type { CSSProperties } from 'react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -6,11 +12,70 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { ThemeProps } from './types';
++import type { ThemeOutputValues, ThemeProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+-import { colorVariables, Wrapper } from './styles';
+ import { generateThemeVariables } from './color-algorithms';
+-import { useCx } from '../utils';
++import styles from './style.module.scss';
++import { PolymorphicElement } from '../utils/polymorphic-element';
++
++type ThemeGrayKey = keyof NonNullable<
++	ThemeOutputValues[ 'colors' ][ 'gray' ]
++>;
++type ThemeColorVariable =
++	| '--wp-components-color-accent'
++	| '--wp-components-color-accent-darker-10'
++	| '--wp-components-color-accent-darker-20'
++	| '--wp-components-color-accent-inverted'
++	| '--wp-components-color-background'
++	| '--wp-components-color-foreground'
++	| '--wp-components-color-foreground-inverted'
++	| `--wp-components-color-gray-${ ThemeGrayKey }`;
++
++type ThemeStyle = CSSProperties &
++	Partial< Record< ThemeColorVariable, string > >;
++
++const getColorVariables = ( { colors }: ThemeOutputValues ) => {
++	const style: ThemeStyle = {};
++
++	if ( colors.accent ) {
++		style[ '--wp-components-color-accent' ] = colors.accent;
++	}
++
++	if ( colors.accentDarker10 ) {
++		style[ '--wp-components-color-accent-darker-10' ] =
++			colors.accentDarker10;
++	}
++
++	if ( colors.accentDarker20 ) {
++		style[ '--wp-components-color-accent-darker-20' ] =
++			colors.accentDarker20;
++	}
++
++	if ( colors.accentInverted ) {
++		style[ '--wp-components-color-accent-inverted' ] =
++			colors.accentInverted;
++	}
++
++	if ( colors.background ) {
++		style[ '--wp-components-color-background' ] = colors.background;
++	}
++
++	if ( colors.foreground ) {
++		style[ '--wp-components-color-foreground' ] = colors.foreground;
++	}
++
++	if ( colors.foregroundInverted ) {
++		style[ '--wp-components-color-foreground-inverted' ] =
++			colors.foregroundInverted;
++	}
++
++	Object.entries( colors.gray || {} ).forEach( ( [ key, value ] ) => {
++		style[ `--wp-components-color-gray-${ key }` as ThemeColorVariable ] =
++			value;
++	} );
++
++	return style;
++};
+ 
+ /**
+  * `Theme` allows defining theme variables for components in the `@wordpress/components` package.
+@@ -35,21 +100,31 @@ function Theme( {
+ 	accent,
+ 	background,
+ 	className,
++	style,
+ 	...props
+ }: WordPressComponentProps< ThemeProps, 'div', true > ) {
+-	const cx = useCx();
+-	const classes = useMemo(
++	const themeVariables = useMemo(
+ 		() =>
+-			cx(
+-				...colorVariables(
+-					generateThemeVariables( { accent, background } )
+-				),
+-				className
++			getColorVariables(
++				generateThemeVariables( { accent, background } )
+ 			),
+-		[ accent, background, className, cx ]
++		[ accent, background ]
++	);
++	const wrapperStyle = useMemo(
++		() => ( {
++			...themeVariables,
++			...style,
++		} ),
++		[ style, themeVariables ]
+ 	);
+ 
+-	return <Wrapper className={ classes } { ...props } />;
++	return (
++		<PolymorphicElement
++			className={ clsx( styles.wrapper, className ) }
++			style={ wrapperStyle }
++			{ ...props }
++		/>
++	);
+ }
+ 
+ export default Theme;
+diff --git a/packages/components/src/theme/style.module.scss b/packages/components/src/theme/style.module.scss
+new file mode 100644
+index 00000000000000..7dbb3487c7f9ca
+--- /dev/null
++++ b/packages/components/src/theme/style.module.scss
+@@ -0,0 +1,4 @@
++.wrapper {
++	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Preserve Theme's currentColor fallback when no foreground variable is generated. */
++	color: var(--wp-components-color-foreground, currentColor);
++}
+diff --git a/packages/components/src/theme/styles.ts b/packages/components/src/theme/styles.ts
+deleted file mode 100644
+index 948c2d586649fb..00000000000000
+--- a/packages/components/src/theme/styles.ts
++++ /dev/null
+@@ -1,35 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-import { css } from '@emotion/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import type { ThemeOutputValues } from './types';
+-
+-export const colorVariables = ( { colors }: ThemeOutputValues ) => {
+-	const shades = Object.entries( colors.gray || {} )
+-		.map( ( [ k, v ] ) => `--wp-components-color-gray-${ k }: ${ v };` )
+-		.join( '' );
+-
+-	return [
+-		css`
+-			--wp-components-color-accent: ${ colors.accent };
+-			--wp-components-color-accent-darker-10: ${ colors.accentDarker10 };
+-			--wp-components-color-accent-darker-20: ${ colors.accentDarker20 };
+-			--wp-components-color-accent-inverted: ${ colors.accentInverted };
+-
+-			--wp-components-color-background: ${ colors.background };
+-			--wp-components-color-foreground: ${ colors.foreground };
+-			--wp-components-color-foreground-inverted: ${ colors.foregroundInverted };
+-
+-			${ shades }
+-		`,
+-	];
+-};
+-
+-export const Wrapper = styled.div`
+-	color: var( --wp-components-color-foreground, currentColor );
+-`;
+diff --git a/packages/components/src/theme/test/index.tsx b/packages/components/src/theme/test/index.tsx
+index 1b32fa1dfa2d66..49636b3dbe54d9 100644
+--- a/packages/components/src/theme/test/index.tsx
++++ b/packages/components/src/theme/test/index.tsx
+@@ -25,6 +25,15 @@ const MyThemableComponent = ( props: MyThemableComponentProps ) => {
+ };
+ 
+ describe( 'Theme', () => {
++	it( 'should support the as prop', () => {
++		render( <Theme as="section" data-testid="theme" /> );
++
++		expect( screen.getByTestId( 'theme' ) ).toHaveProperty(
++			'tagName',
++			'SECTION'
++		);
++	} );
++
+ 	describe( 'accent color', () => {
+ 		it( 'does not define the accent color (and its variations) as a CSS variable when the `accent` prop is undefined', () => {
+ 			render(
+diff --git a/packages/components/src/utils/polymorphic-element.tsx b/packages/components/src/utils/polymorphic-element.tsx
+new file mode 100644
+index 00000000000000..0e39b3c4b616c3
+--- /dev/null
++++ b/packages/components/src/utils/polymorphic-element.tsx
+@@ -0,0 +1,40 @@
++/**
++ * External dependencies
++ */
++import type * as React from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++type PolymorphicElementProps< T extends React.ElementType > = Omit<
++	React.ComponentPropsWithoutRef< T >,
++	'as'
++> & {
++	as?: T;
++};
++
++type PolymorphicElementRef< T extends React.ElementType > =
++	React.ComponentPropsWithRef< T >[ 'ref' ];
++
++function UnforwardedPolymorphicElement< T extends React.ElementType = 'div' >(
++	{ as, ...props }: PolymorphicElementProps< T >,
++	ref: PolymorphicElementRef< T >
++) {
++	const Element = as || 'div';
++
++	return <Element ref={ ref } { ...props } />;
++}
++
++/**
++ * Internal utility for components that need Emotion-compatible `as` behavior
++ * while rendering with plain React elements.
++ */
++export const PolymorphicElement = forwardRef(
++	UnforwardedPolymorphicElement
++) as < T extends React.ElementType = 'div' >(
++	props: PolymorphicElementProps< T > & {
++		ref?: PolymorphicElementRef< T >;
++	}
++) => React.ReactElement | null;
+diff --git a/packages/components/src/view/component.tsx b/packages/components/src/view/component.tsx
+index 6742bd9f52e510..f395cf08ce8088 100644
+--- a/packages/components/src/view/component.tsx
++++ b/packages/components/src/view/component.tsx
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -12,14 +7,25 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
++import { PolymorphicElement } from '../utils/polymorphic-element';
+ 
+-const PolymorphicDiv = styled.div``;
++type ViewProps< T extends React.ElementType > = WordPressComponentProps<
++	{},
++	T
++> & {
++	/**
++	 * Legacy Emotion prop accepted by `View`. It is intentionally consumed here
++	 * so it does not leak to the rendered element after Emotion is removed.
++	 */
++	css?: unknown;
++};
+ 
+ function UnforwardedView< T extends React.ElementType = 'div' >(
+-	{ as, ...restProps }: WordPressComponentProps< {}, T >,
++	{ css: _css, ...restProps }: ViewProps< T >,
+ 	ref: React.ForwardedRef< any >
+ ) {
+-	return <PolymorphicDiv as={ as } ref={ ref } { ...restProps } />;
++	void _css;
++	return <PolymorphicElement ref={ ref } { ...restProps } />;
+ }
+ 
+ /**
+diff --git a/packages/components/src/view/test/__snapshots__/index.js.snap b/packages/components/src/view/test/__snapshots__/index.js.snap
+index f7014a5fd7b191..6a80237402112a 100644
+--- a/packages/components/src/view/test/__snapshots__/index.js.snap
++++ b/packages/components/src/view/test/__snapshots__/index.js.snap
+@@ -1,20 +1,28 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`props should render as another element 1`] = `
++exports[`props should render as a custom component 1`] = `
+ <div>
+-  <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++  <section
++    class="custom-class"
++    data-custom-component="true"
++    data-testid="custom-view"
+   >
+     <span />
++  </section>
++</div>
++`;
++
++exports[`props should render as another element 1`] = `
++<div>
++  <p>
++    <span />
+   </p>
+ </div>
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+ <div>
+-  <div
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
+-  >
++  <div>
+     <span />
+   </div>
+ </div>
+@@ -23,7 +31,7 @@ exports[`props should render correctly 1`] = `
+ exports[`props should render with custom styles (Array) 1`] = `
+ <div>
+   <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++    data-testid="custom-css-array-view"
+   >
+     <span />
+   </p>
+@@ -33,7 +41,7 @@ exports[`props should render with custom styles (Array) 1`] = `
+ exports[`props should render with custom styles (object) 1`] = `
+ <div>
+   <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++    data-testid="custom-css-object-view"
+   >
+     <span />
+   </p>
+@@ -43,7 +51,7 @@ exports[`props should render with custom styles (object) 1`] = `
+ exports[`props should render with custom styles (string) 1`] = `
+ <div>
+   <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++    data-testid="custom-css-string-view"
+   >
+     <span />
+   </p>
+diff --git a/packages/components/src/view/test/index.js b/packages/components/src/view/test/index.js
+index 56c6f7cd7a1487..456066804b15c3 100644
+--- a/packages/components/src/view/test/index.js
++++ b/packages/components/src/view/test/index.js
+@@ -1,7 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import { render } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -27,10 +32,33 @@ describe( 'props', () => {
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ 
++	test( 'should render as a custom component', () => {
++		const CustomComponent = forwardRef( ( props, ref ) => (
++			<section ref={ ref } data-custom-component { ...props } />
++		) );
++
++		const ref = jest.fn();
++		const { container } = render(
++			<View
++				as={ CustomComponent }
++				className="custom-class"
++				data-testid="custom-view"
++				ref={ ref }
++			>
++				<span />
++			</View>
++		);
++
++		const customView = screen.getByTestId( 'custom-view' );
++		expect( container ).toMatchSnapshot();
++		expect( ref ).toHaveBeenCalledWith( customView );
++	} );
++
+ 	test( 'should render with custom styles (string)', () => {
+ 		const { container } = render(
+ 			<View
+ 				as="p"
++				data-testid="custom-css-string-view"
+ 				css={ `
+ 					background: pink;
+ 				` }
+@@ -39,12 +67,16 @@ describe( 'props', () => {
+ 			</View>
+ 		);
+ 		expect( container ).toMatchSnapshot();
++		expect(
++			screen.getByTestId( 'custom-css-string-view' )
++		).not.toHaveAttribute( 'css' );
+ 	} );
+ 
+ 	test( 'should render with custom styles (object)', () => {
+ 		const { container } = render(
+ 			<View
+ 				as="p"
++				data-testid="custom-css-object-view"
+ 				css={ {
+ 					background: 'pink',
+ 				} }
+@@ -53,12 +85,16 @@ describe( 'props', () => {
+ 			</View>
+ 		);
+ 		expect( container ).toMatchSnapshot();
++		expect(
++			screen.getByTestId( 'custom-css-object-view' )
++		).not.toHaveAttribute( 'css' );
+ 	} );
+ 
+ 	test( 'should render with custom styles (Array)', () => {
+ 		const { container } = render(
+ 			<View
+ 				as="p"
++				data-testid="custom-css-array-view"
+ 				css={ [
+ 					{
+ 						background: 'pink',
+@@ -70,5 +106,8 @@ describe( 'props', () => {
+ 			</View>
+ 		);
+ 		expect( container ).toMatchSnapshot();
++		expect(
++			screen.getByTestId( 'custom-css-array-view' )
++		).not.toHaveAttribute( 'css' );
+ 	} );
+ } );

@@ -1,0 +1,464 @@
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 5339b043c25be8..b3bdc5e1c53373 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -16,7 +16,7 @@ import {
+ import { DividerView } from './styles';
+ import type { Props } from './types';
+ 
+-function Divider(
++function UnconnectedDivider(
+ 	props: WordPressComponentProps< Props, 'hr', false >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+@@ -53,6 +53,6 @@ function Divider(
+  * }
+  * ```
+  */
+-const ConnectedDivider = contextConnect( Divider, 'Divider' );
++export const Divider = contextConnect( UnconnectedDivider, 'Divider' );
+ 
+-export default ConnectedDivider;
++export default Divider;
+diff --git a/packages/components/src/divider/stories/index.js b/packages/components/src/divider/stories/index.js
+deleted file mode 100644
+index a721007068aaa6..00000000000000
+--- a/packages/components/src/divider/stories/index.js
++++ /dev/null
+@@ -1,64 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useCx } from '../../utils';
+-import { Text } from '../../text';
+-import { Divider } from '..';
+-
+-export default {
+-	component: Divider,
+-	title: 'Components (Experimental)/Divider',
+-	argTypes: {
+-		margin: {
+-			control: { type: 'number' },
+-		},
+-		marginStart: {
+-			control: { type: 'number' },
+-		},
+-		marginEnd: {
+-			control: { type: 'number' },
+-		},
+-	},
+-};
+-
+-const HorizontalTemplate = ( args ) => (
+-	<div>
+-		<Text>Some text before the divider</Text>
+-		<Divider { ...args } />
+-		<Text>Some text after the divider</Text>
+-	</div>
+-);
+-
+-const VerticalTemplate = ( args ) => {
+-	const cx = useCx();
+-	const wrapperClassName = cx( css`
+-		display: flex;
+-		align-items: stretch;
+-		justify-content: start;
+-	` );
+-
+-	return (
+-		<div className={ wrapperClassName }>
+-			<Text>Some text before the divider</Text>
+-			<Divider orientation="vertical" { ...args } />
+-			<Text>Some text after the divider</Text>
+-		</div>
+-	);
+-};
+-
+-export const Horizontal = HorizontalTemplate.bind( {} );
+-Horizontal.args = {
+-	margin: 2,
+-	marginStart: undefined,
+-	marginEnd: undefined,
+-};
+-
+-export const Vertical = VerticalTemplate.bind( {} );
+-Vertical.args = {
+-	...Horizontal.args,
+-};
+diff --git a/packages/components/src/divider/stories/index.tsx b/packages/components/src/divider/stories/index.tsx
+new file mode 100644
+index 00000000000000..b2e6bb05e03a37
+--- /dev/null
++++ b/packages/components/src/divider/stories/index.tsx
+@@ -0,0 +1,70 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { Text } from '../../text';
++import { Divider } from '..';
++
++const meta: ComponentMeta< typeof Divider > = {
++	component: Divider,
++	title: 'Components (Experimental)/Divider',
++	argTypes: {
++		margin: {
++			control: { type: 'number' },
++		},
++		marginStart: {
++			control: { type: 'number' },
++		},
++		marginEnd: {
++			control: { type: 'number' },
++		},
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const HorizontalTemplate: ComponentStory< typeof Divider > = ( args ) => (
++	<div>
++		<Text>Some text before the divider</Text>
++		<Divider { ...args } />
++		<Text>Some text after the divider</Text>
++	</div>
++);
++
++const VerticalTemplate: ComponentStory< typeof Divider > = ( args ) => {
++	const styles = {
++		display: 'flex',
++		alignItems: 'stretch',
++		justifyContent: 'start',
++	};
++
++	return (
++		<div style={ styles }>
++			<Text>Some text before the divider</Text>
++			<Divider { ...args } />
++			<Text>Some text after the divider</Text>
++		</div>
++	);
++};
++
++export const Horizontal: ComponentStory<
++	typeof Divider
++> = HorizontalTemplate.bind( {} );
++Horizontal.args = {
++	margin: 2,
++};
++
++export const Vertical: ComponentStory< typeof Divider > = VerticalTemplate.bind(
++	{}
++);
++Vertical.args = {
++	...Horizontal.args,
++	orientation: 'vertical',
++};
+diff --git a/packages/components/src/divider/types.ts b/packages/components/src/divider/types.ts
+index e531aa0561afdb..885d78f6925c98 100644
+--- a/packages/components/src/divider/types.ts
++++ b/packages/components/src/divider/types.ts
+@@ -24,4 +24,6 @@ export interface OwnProps {
+ 	marginEnd?: SpaceInput;
+ }
+ 
+-export interface Props extends Omit< SeparatorProps, 'children' >, OwnProps {}
++export interface Props
++	extends Omit< SeparatorProps, 'children' | 'unstable_system' >,
++		OwnProps {}
+diff --git a/packages/components/src/heading/component.tsx b/packages/components/src/heading/component.tsx
+index b16a819ba99087..75a9f4a1d7f4fa 100644
+--- a/packages/components/src/heading/component.tsx
++++ b/packages/components/src/heading/component.tsx
+@@ -10,7 +10,7 @@ import { contextConnect, WordPressComponentProps } from '../ui/context';
+ import { View } from '../view';
+ import { useHeading, HeadingProps } from './hook';
+ 
+-function Heading(
++function UnconnectedHeading(
+ 	props: WordPressComponentProps< HeadingProps, 'h1' >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+@@ -24,13 +24,13 @@ function Heading(
+  *
+  * @example
+  * ```jsx
+- * import { Heading } from `@wordpress/components`
++ * import { __experimentalHeading as Heading } from "@wordpress/components";
+  *
+  * function Example() {
+  *   return <Heading>Code is Poetry</Heading>;
+  * }
+  * ```
+  */
+-const ConnectedHeading = contextConnect( Heading, 'Heading' );
++export const Heading = contextConnect( UnconnectedHeading, 'Heading' );
+ 
+-export default ConnectedHeading;
++export default Heading;
+diff --git a/packages/components/src/heading/stories/index.js b/packages/components/src/heading/stories/index.js
+deleted file mode 100644
+index 55caec6c8850c2..00000000000000
+--- a/packages/components/src/heading/stories/index.js
++++ /dev/null
+@@ -1,24 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { Heading } from '../';
+-
+-export default {
+-	component: Heading,
+-	title: 'Components (Experimental)/Heading',
+-};
+-
+-export const _default = () => {
+-	return (
+-		<>
+-			<Heading level={ 1 } uppercase>
+-				Heading
+-			</Heading>
+-			<Heading level={ 2 }>Heading</Heading>
+-			<Heading level={ 3 }>Heading</Heading>
+-			<Heading level={ 4 }>Heading</Heading>
+-			<Heading level={ 5 }>Heading</Heading>
+-			<Heading level={ 6 }>Heading</Heading>
+-		</>
+-	);
+-};
+diff --git a/packages/components/src/heading/stories/index.tsx b/packages/components/src/heading/stories/index.tsx
+new file mode 100644
+index 00000000000000..f25b21728e9a6e
+--- /dev/null
++++ b/packages/components/src/heading/stories/index.tsx
+@@ -0,0 +1,37 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { Heading } from '..';
++
++const meta: ComponentMeta< typeof Heading > = {
++	component: Heading,
++	title: 'Components (Experimental)/Heading',
++	argTypes: {
++		adjustLineHeightForInnerControls: { control: { type: 'text' } },
++		as: { control: { type: 'text' } },
++		color: { control: { type: 'color' } },
++		display: { control: { type: 'text' } },
++		letterSpacing: { control: { type: 'text' } },
++		lineHeight: { control: { type: 'text' } },
++		optimizeReadabilityFor: { control: { type: 'color' } },
++		variant: { control: { type: 'radio' }, options: [ 'muted' ] },
++		weight: { control: { type: 'text' } },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++export const Default: ComponentStory< typeof Heading > = ( props ) => (
++	<Heading { ...props } />
++);
++Default.args = {
++	children: 'Heading',
++};
+diff --git a/packages/components/src/text/types.ts b/packages/components/src/text/types.ts
+index ff98a27f6625a7..8a5065a9b98ee9 100644
+--- a/packages/components/src/text/types.ts
++++ b/packages/components/src/text/types.ts
+@@ -8,13 +8,6 @@ import type { Props as TruncateProps } from '../truncate/types';
+  */
+ import type { CSSProperties } from 'react';
+ 
+-type TextAdjustLineHeightForInnerControls =
+-	| boolean
+-	| 'large'
+-	| 'medium'
+-	| 'small'
+-	| 'xSmall';
+-
+ export type TextSize =
+ 	| 'body'
+ 	| 'caption'
+@@ -35,7 +28,12 @@ export interface Props extends TruncateProps {
+ 	/**
+ 	 * Automatically calculate the appropriate line-height value for contents that render text and Control elements (e.g. `TextInput`).
+ 	 */
+-	adjustLineHeightForInnerControls?: TextAdjustLineHeightForInnerControls;
++	adjustLineHeightForInnerControls?:
++		| boolean
++		| 'large'
++		| 'medium'
++		| 'small'
++		| 'xSmall';
+ 	/**
+ 	 * Adjusts the text color.
+ 	 */
+diff --git a/packages/components/src/ui/context/context-connect.js b/packages/components/src/ui/context/context-connect.ts
+similarity index 66%
+rename from packages/components/src/ui/context/context-connect.js
+rename to packages/components/src/ui/context/context-connect.ts
+index 5dcbb174dbdd03..63aba66e42d778 100644
+--- a/packages/components/src/ui/context/context-connect.js
++++ b/packages/components/src/ui/context/context-connect.ts
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import { uniq } from 'lodash';
++import type { ForwardedRef, ReactChild, ReactNode } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -14,8 +15,13 @@ import warn from '@wordpress/warning';
+  */
+ import { CONNECT_STATIC_NAMESPACE } from './constants';
+ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
++import type { WordPressComponentFromProps } from '.';
++
++type ContextConnectOptions = {
++	/** Defaults to `false`. */
++	memo?: boolean;
++};
+ 
+-/* eslint-disable jsdoc/valid-types */
+ /**
+  * Forwards ref (React.ForwardRef) and "Connects" (or registers) a component
+  * within the Context system under a specified namespace.
+@@ -24,15 +30,16 @@ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
+  * The hope is that we can improve render performance by removing functional
+  * component wrappers.
+  *
+- * @template {import('./wordpress-component').WordPressComponentProps<{}, any, any>} P
+- * @param {(props: P, ref: import('react').Ref<any>) => JSX.Element | null} Component            The component to register into the Context system.
+- * @param {string}                                                          namespace            The namespace to register the component under.
+- * @param {Object}                                                          options
+- * @param {boolean}                                                         [options.memo=false]
+- * @return {import('./wordpress-component').WordPressComponentFromProps<P>} The connected WordPressComponent
++ * @param  Component The component to register into the Context system.
++ * @param  namespace The namespace to register the component under.
++ * @param  options
++ * @return The connected WordPressComponent
+  */
+-export function contextConnect( Component, namespace, options = {} ) {
+-	/* eslint-enable jsdoc/valid-types */
++export function contextConnect< P >(
++	Component: ( props: P, ref: ForwardedRef< any > ) => JSX.Element | null,
++	namespace: string,
++	options: ContextConnectOptions = {}
++): WordPressComponentFromProps< P > {
+ 	const { memo: memoProp = false } = options;
+ 
+ 	let WrappedComponent = forwardRef( Component );
+@@ -75,10 +82,12 @@ export function contextConnect( Component, namespace, options = {} ) {
+ /**
+  * Attempts to retrieve the connected namespace from a component.
+  *
+- * @param {import('react').ReactChild | undefined | {}} Component The component to retrieve a namespace from.
+- * @return {Array<string>} The connected namespaces.
++ * @param  Component The component to retrieve a namespace from.
++ * @return The connected namespaces.
+  */
+-export function getConnectNamespace( Component ) {
++export function getConnectNamespace(
++	Component: ReactChild | undefined | {}
++): string[] {
+ 	if ( ! Component ) return [];
+ 
+ 	let namespaces = [];
+@@ -101,11 +110,13 @@ export function getConnectNamespace( Component ) {
+ /**
+  * Checks to see if a component is connected within the Context system.
+  *
+- * @param {import('react').ReactNode} Component The component to retrieve a namespace from.
+- * @param {Array<string>|string}      match     The namespace to check.
+- * @return {boolean} The result.
++ * @param  Component The component to retrieve a namespace from.
++ * @param  match     The namespace to check.
+  */
+-export function hasConnectNamespace( Component, match ) {
++export function hasConnectNamespace(
++	Component: ReactNode,
++	match: string[] | string
++): boolean {
+ 	if ( ! Component ) return false;
+ 
+ 	if ( typeof match === 'string' ) {
+diff --git a/packages/components/src/ui/context/index.js b/packages/components/src/ui/context/index.ts
+similarity index 100%
+rename from packages/components/src/ui/context/index.js
+rename to packages/components/src/ui/context/index.ts
+diff --git a/packages/components/src/ui/context/wordpress-component.ts b/packages/components/src/ui/context/wordpress-component.ts
+index c4b3ad5bd7ab67..74c563669c5d85 100644
+--- a/packages/components/src/ui/context/wordpress-component.ts
++++ b/packages/components/src/ui/context/wordpress-component.ts
+@@ -18,6 +18,7 @@ export type WordPressComponentProps<
+ 	Omit< React.ComponentPropsWithRef< T >, 'as' | keyof P | 'children' > &
+ 	( IsPolymorphic extends true
+ 		? {
++				/** The HTML element or React component to render the component as. */
+ 				as?: T | keyof JSX.IntrinsicElements;
+ 		  }
+ 		: {} );
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index a3077fd06012ec..bb38249afa6248 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -86,7 +86,7 @@
+ 		"src/**/*.ios.js",
+ 		"src/**/*.native.js",
+ 		"src/**/react-native-*",
+-		"src/**/stories",
++		"src/**/stories/**.js", // only exclude js files, tsx files should be checked
+ 		"src/**/test",
+ 		"src/ui/__storybook-utils",
+ 		"src/ui/font-size-control"
+diff --git a/storybook/main.js b/storybook/main.js
+index e06408e83dc816..76b4bf6eab7457 100644
+--- a/storybook/main.js
++++ b/storybook/main.js
+@@ -1,8 +1,8 @@
+ const stories = [
+-	process.env.NODE_ENV !== 'test' && './stories/**/*.@(js|mdx)',
+-	'../packages/block-editor/src/**/stories/*.js',
+-	'../packages/components/src/**/stories/*.js',
+-	'../packages/icons/src/**/stories/*.js',
++	process.env.NODE_ENV !== 'test' && './stories/**/*.@(js|tsx|mdx)',
++	'../packages/block-editor/src/**/stories/*.@(js|tsx|mdx)',
++	'../packages/components/src/**/stories/*.@(js|tsx|mdx)',
++	'../packages/icons/src/**/stories/*.@(js|tsx|mdx)',
+ ].filter( Boolean );
+ 
+ const customEnvVariables = {};
+diff --git a/storybook/preview.js b/storybook/preview.js
+index 536f467b0fd986..4c0d87c15a83fc 100644
+--- a/storybook/preview.js
++++ b/storybook/preview.js
+@@ -22,6 +22,9 @@ export const globalTypes = {
+ export const decorators = [ WithRTL ];
+ 
+ export const parameters = {
++	controls: {
++		sort: 'requiredFirst',
++	},
+ 	knobs: {
+ 		// Knobs are deprecated, and new stories should use addon-controls.
+ 		// Will be enabled on a per-story basis until migration is complete.

@@ -1,0 +1,143 @@
+diff --git a/packages/block-editor/src/components/autocomplete/index.js b/packages/block-editor/src/components/autocomplete/index.js
+index 9584f658e0a448..f6c0ff0b3d6b63 100644
+--- a/packages/block-editor/src/components/autocomplete/index.js
++++ b/packages/block-editor/src/components/autocomplete/index.js
+@@ -23,9 +23,12 @@ import blockAutocompleter from '../../autocompleters/block';
+  */
+ const EMPTY_ARRAY = [];
+ 
+-function useCompleters( { completers = EMPTY_ARRAY } ) {
++function useCompleters( { completers = EMPTY_ARRAY, isEnabled = true } ) {
+ 	const { name } = useBlockEditContext();
+ 	return useMemo( () => {
++		if ( ! isEnabled ) {
++			return EMPTY_ARRAY;
++		}
+ 		let filteredCompleters = [ ...completers ];
+ 
+ 		if (
+@@ -51,7 +54,7 @@ function useCompleters( { completers = EMPTY_ARRAY } ) {
+ 		}
+ 
+ 		return filteredCompleters;
+-	}, [ completers, name ] );
++	}, [ completers, name, isEnabled ] );
+ }
+ 
+ export function useBlockEditorAutocompleteProps( props ) {
+diff --git a/packages/block-editor/src/components/rich-text/index.js b/packages/block-editor/src/components/rich-text/index.js
+index 2d3c724f7c4d70..4ab89aded8ec95 100644
+--- a/packages/block-editor/src/components/rich-text/index.js
++++ b/packages/block-editor/src/components/rich-text/index.js
+@@ -371,6 +371,7 @@ export function RichTextWrapper(
+ 		completers: autocompleters,
+ 		record: value,
+ 		onChange,
++		isEnabled: isSelected,
+ 	} );
+ 
+ 	useMarkPersistent( { html: adjustedValue, value } );
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index f33608440a4c6f..da3eac6e9465ab 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -101,6 +101,7 @@ export function useAutocomplete( {
+ 	onReplace,
+ 	completers,
+ 	contentRef,
++	isEnabled = true,
+ }: UseAutocompleteProps ) {
+ 	const instanceId = useInstanceId( AUTOCOMPLETE_HOOK_REFERENCE );
+ 	const [ state, dispatch ] = useReducer( autocompleteReducer, initialState );
+@@ -241,13 +242,19 @@ export function useAutocomplete( {
+ 	// but this is a preemptive performance improvement, since the autocompleter
+ 	// is a potential bottleneck for the editor type metric.
+ 	const textContent = useMemo( () => {
++		if ( ! isEnabled ) {
++			return '';
++		}
+ 		if ( isCollapsed( record ) ) {
+ 			return getTextContent( slice( record, 0 ) );
+ 		}
+ 		return '';
+-	}, [ record ] );
++	}, [ record, isEnabled ] );
+ 
+ 	useEffect( () => {
++		if ( ! isEnabled ) {
++			return;
++		}
+ 		const isTextChange = record.text !== prevRecordTextRef.current;
+ 		prevRecordTextRef.current = record.text;
+ 
+@@ -302,7 +309,7 @@ export function useAutocomplete( {
+ 		dispatch( { type: 'MATCH', completer, query } );
+ 		// We want to avoid introducing unexpected side effects.
+ 		// See https://github.com/WordPress/gutenberg/pull/41820
+-	}, [ textContent ] );
++	}, [ textContent, isEnabled ] );
+ 
+ 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
+ 	const { className } = autocompleter || {};
+@@ -376,6 +383,7 @@ export function useLastDifferentValue(
+ }
+ 
+ export function useAutocompleteProps( options: UseAutocompleteProps ) {
++	const { isEnabled = true } = options;
+ 	const ref = useRef< HTMLElement >( null );
+ 	const onKeyDownRef =
+ 		useRef< ( event: KeyboardEvent ) => void >( undefined );
+@@ -389,19 +397,25 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
+ 
+ 	const mergedRefs = useMergeRefs( [
+ 		ref,
+-		useRefEffect( ( element: HTMLElement ) => {
+-			function _onKeyDown( event: KeyboardEvent ) {
+-				onKeyDownRef.current?.( event );
+-			}
+-			element.addEventListener( 'keydown', _onKeyDown );
+-			return () => {
+-				element.removeEventListener( 'keydown', _onKeyDown );
+-			};
+-		}, [] ),
++		useRefEffect(
++			( element: HTMLElement ) => {
++				if ( ! isEnabled ) {
++					return;
++				}
++				function _onKeyDown( event: KeyboardEvent ) {
++					onKeyDownRef.current?.( event );
++				}
++				element.addEventListener( 'keydown', _onKeyDown );
++				return () => {
++					element.removeEventListener( 'keydown', _onKeyDown );
++				};
++			},
++			[ isEnabled ]
++		),
+ 	] );
+ 
+ 	// We only want to show the popover if the user has typed something.
+-	const didUserInput = record.text !== previousRecord?.text;
++	const didUserInput = isEnabled && record.text !== previousRecord?.text;
+ 
+ 	if ( ! didUserInput ) {
+ 		return { ref: mergedRefs };
+diff --git a/packages/components/src/autocomplete/types.ts b/packages/components/src/autocomplete/types.ts
+index 52e9ed7ecbba35..4e975c178072cf 100644
+--- a/packages/components/src/autocomplete/types.ts
++++ b/packages/components/src/autocomplete/types.ts
+@@ -184,6 +184,13 @@ export type UseAutocompleteProps = {
+ 	 * `Autocomplete`'s `Popover`.
+ 	 */
+ 	contentRef: ContentRef;
++	/**
++	 * Whether the autocompleter should be active. Defaults to `true`. When
++	 * `false`, the heavy bits — match scanning, keydown listener attachment,
++	 * popover state — are skipped while the hook still returns a stable ref so
++	 * the host can attach it unconditionally.
++	 */
++	isEnabled?: boolean;
+ };
+ 
+ export type AutocompleteState = {

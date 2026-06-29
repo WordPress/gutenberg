@@ -1,0 +1,1892 @@
+diff --git a/packages/components/src/menu/README.md b/packages/components/src/menu/README.md
+index 6732610c0c6cae..12f120b871f85d 100644
+--- a/packages/components/src/menu/README.md
++++ b/packages/components/src/menu/README.md
+@@ -1,344 +1,591 @@
+-# `Menu`
++# Menu
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
++<!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
+ 
+-`Menu` displays a menu to the user (such as a set of actions or functions). The menu is rendered in a popover (this pattern is also known as a "Dropdown menu"), which is triggered by a button.
++🔒 This component is locked as a [private API](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/). We do not yet recommend using this outside of the Gutenberg project.
+ 
+-## Design guidelines
++<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-menu--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
+ 
+-### Usage
++Menu is a collection of React components that combine to render
++ARIA-compliant [menu](https://www.w3.org/WAI/ARIA/apg/patterns/menu/) and
++[menu button](https://www.w3.org/WAI/ARIA/apg/patterns/menubutton/) patterns.
+ 
+-#### When to use a `Menu`
++`Menu` itself is a wrapper component and context provider.
++It is responsible for managing the state of the menu and its items, and for
++rendering the `Menu.TriggerButton` (or the `Menu.SubmenuTriggerItem`)
++component, and the `Menu.Popover` component.
+ 
+-Use a `Menu` when you want users to:
++## Props
+ 
+--   Choose an action or change a setting from a list, AND
+--   Only see the available choices contextually.
++### `as`
+ 
+-`Menu` is a React component to render an expandable menu of buttons. It is similar in purpose to a `<select>` element, with the distinction that it does not maintain a value. Instead, each option behaves as an action button.
++ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | "canvas" | ... 516 more ... | ("view" & FunctionComponent<...>)`
++ - Required: No
+ 
+-If you need to display all the available options at all times, consider using a Toolbar instead. Use a `Menu` to display a list of actions after the user interacts with a button.
++The HTML element or React component to render the component as.
+ 
+-**Do**
+-Use a `Menu` to display a list of actions after the user interacts with an icon.
++### `children`
+ 
+-**Don’t** use a `Menu` for important actions that should always be visible. Use a `Toolbar` instead.
++ - Type: `ReactNode`
++ - Required: No
+ 
+-**Don’t**
+-Don’t use a `Menu` for frequently used actions. Use a `Toolbar` instead.
++The elements, which should include one instance of the `Menu.TriggerButton`
++component and one instance of the `Menu.Popover` component.
+ 
+-#### Behavior
++### `defaultOpen`
+ 
+-Generally, the parent button should indicate that interacting with it will show a `Menu`.
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
+ 
+-The parent button should retain the same visual styling regardless of whether the `Menu` is displayed or not.
++Whether the menu popover and its contents should be visible by default.
+ 
+-#### Placement
++Note: this prop will be overridden by the `open` prop if it is
++provided (meaning the component will be used in "controlled" mode).
+ 
+-The `Menu` should typically appear directly below, or below and to the left of, the parent button. If there isn’t enough space below to display the full `Menu`, it can be displayed instead above the parent button.
++### `open`
+ 
+-## Development guidelines
++ - Type: `boolean`
++ - Required: No
+ 
+-This component is still highly experimental, and it's not normally accessible to consumers of the `@wordpress/components` package.
++Whether the menu popover and its contents should be visible.
++Should be used in conjunction with `onOpenChange` in order to control
++the open state of the menu popover.
+ 
+-The component exposes a set of components that are meant to be used in combination with each other in order to implement a `Menu` correctly.
++Note: this prop will set the component in "controlled" mode, and it will
++override the `defaultOpen` prop.
+ 
+-### `Menu`
++### `onOpenChange`
+ 
+-The root component, used to specify the menu's trigger and its contents.
++ - Type: `(open: boolean) => void`
++ - Required: No
++
++A callback that gets called when the `open` state changes.
++
++### `placement`
++
++ - Type: `"top" | "bottom" | "left" | "right" | "top-start" | "bottom-start" | "left-start" | "right-start" | "top-end" | "bottom-end" | ...`
++ - Required: No
++ - Default: `'bottom-start' for root-level menus, 'right-start' for submenus`
++
++The placement of the menu popover.
++
++## Subcomponents
++
++### Menu.TriggerButton
++
++Renders a menu button that toggles the visibility of a sibling
++`Menu.Popover` component when clicked or when using arrow keys.
+ 
+ #### Props
+ 
+-The component accepts the following props:
++##### `accessibleWhenDisabled`
+ 
+-##### `trigger`: `React.ReactNode`
++ - Type: `boolean`
++ - Required: No
+ 
+-The button triggering the menu popover.
++Indicates whether the element should be focusable even when it is
++`disabled`.
+ 
+--   Required: yes
++This is important when discoverability is a concern. For example:
+ 
+-##### `children`: `React.ReactNode`
++> A toolbar in an editor contains a set of special smart paste functions
++that are disabled when the clipboard is empty or when the function is not
++applicable to the current content of the clipboard. It could be helpful to
++keep the disabled buttons focusable if the ability to discover their
++functionality is primarily via their presence on the toolbar.
+ 
+-The contents of the menu (ie. one or more menu items).
++Learn more on [Focusability of disabled
++controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols).
+ 
+--   Required: yes
++##### `children`
+ 
+-##### `defaultOpen`: `boolean`
++ - Type: `ReactNode`
++ - Required: No
+ 
+-The open state of the menu popover when it is initially rendered. Use when not wanting to control its open state.
++The contents of the menu trigger button.
+ 
+--   Required: no
+--   Default: `false`
++##### `disabled`
+ 
+-##### `open`: `boolean`
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
+ 
+-The controlled open state of the menu popover. Must be used in conjunction with `onOpenChange`.
++Determines if the element is disabled. This sets the `aria-disabled`
++attribute accordingly, enabling support for all elements, including those
++that don't support the native `disabled` attribute.
+ 
+--   Required: no
++This feature can be combined with the `accessibleWhenDisabled` prop to
++make disabled elements still accessible via keyboard.
+ 
+-##### `onOpenChange`: `(open: boolean) => void`
++##### `render`
+ 
+-Event handler called when the open state of the menu popover changes.
++ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Required: No
+ 
+--   Required: no
++Allows the component to be rendered as a different HTML element or React
++component. The value can be a React element or a function that takes in the
++original component props and gives back a React element with the props
++merged.
+ 
+-##### `modal`: `boolean`
++### Menu.Popover
+ 
+-The modality of the menu popover. When set to true, interaction with outside elements will be disabled and only menu content will be visible to screen readers.
++Renders a dropdown menu element that's controlled by a sibling
++`Menu.TriggerButton` component. It renders a popover and automatically
++focuses on items when the menu is shown.
+ 
+--   Required: no
+--   Default: `true`
++The only valid children of `Menu.Popover` are `Menu.Item`,
++`Menu.RadioItem`, `Menu.CheckboxItem`, `Menu.Group`, `Menu.Separator`,
++and `Menu` (for nested dropdown menus).
+ 
+-##### `placement`: ``'top' | 'top-start' | 'top-end' | 'right' | 'right-start' | 'right-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end'`
++#### Props
+ 
+-The placement of the menu popover.
++##### `children`
++
++ - Type: `ReactNode`
++ - Required: No
++
++The contents of the menu popover, which should include instances of the
++`Menu.Item`, `Menu.CheckboxItem`, `Menu.RadioItem`, `Menu.Group`, and
++`Menu.Separator` components.
++
++##### `gutter`
++
++ - Type: `number`
++ - Required: No
++ - Default: `8 for root-level menus, 16 for nested menus`
++
++The distance between the popover and the anchor element.
++
++##### `hideOnEscape`
++
++ - Type: `BooleanOrCallback<KeyboardEvent | React.KeyboardEvent<Element>>`
++ - Required: No
++ - Default: ``( event ) => { event.preventDefault(); return true; }``
+ 
+--   Required: no
+--   Default: `'bottom-start'` for root-level menus, `'right-start'` for nested menus
++Determines if the menu popover will hide when the user presses the
++Escape key.
+ 
+-##### `gutter`: `number`
++This prop can be either a boolean or a function that accepts an event as an
++argument and returns a boolean. The event object represents the keydown
++event that initiated the hide action, which could be either a native
++keyboard event or a React synthetic event.
+ 
+-The distance in pixels from the trigger.
++##### `modal`
+ 
+--   Required: no
+--   Default: `8` for root-level menus, `16` for nested menus
++ - Type: `boolean`
++ - Required: No
++ - Default: `true`
+ 
+-##### `shift`: `number`
++The modality of the menu popover. When set to true, interaction with
++outside elements will be disabled and only menu content will be visible to
++screen readers.
+ 
+-The skidding of the popover along the anchor element. Can be set to negative values to make the popover shift to the opposite side.
++Determines whether the menu popover is modal. Modal dialogs have distinct
++states and behaviors:
++- The `portal` and `preventBodyScroll` props are set to `true`. They can
++  still be manually set to `false`.
++- When the dialog is open, element tree outside it will be inert.
+ 
+--   Required: no
+--   Default: `0` for root-level menus, `-8` for nested menus
++##### `shift`
+ 
+-### `Menu.Item`
++ - Type: `number`
++ - Required: No
++ - Default: `0 for root-level menus, -8 for nested menus`
+ 
+-Used to render a menu item.
++The skidding of the popover along the anchor element. Can be set to
++negative values to make the popover shift to the opposite side.
++
++### Menu.Item
++
++Renders a menu item inside the `Menu.Popover` or `Menu.Group` components.
++
++It can optionally contain one instance of the `Menu.ItemLabel` component
++and one instance of the `Menu.ItemHelpText` component.
+ 
+ #### Props
+ 
+-The component accepts the following props:
++##### `children`
++
++ - Type: `ReactNode`
++ - Required: Yes
++
++The contents of the menu item, which could include one instance of the
++`Menu.ItemLabel` component and/or one instance of the `Menu.ItemHelpText`
++component.
+ 
+-##### `children`: `React.ReactNode`
++##### `disabled`
+ 
+-The contents of the item
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
+ 
+--   Required: yes
++Determines if the element is disabled. This sets the `aria-disabled`
++attribute accordingly, enabling support for all elements, including those
++that don't support the native `disabled` attribute.
+ 
+-##### `prefix`: `React.ReactNode`
++##### `hideOnClick`
+ 
+-The contents of the item's prefix.
++ - Type: `BooleanOrCallback<MouseEvent<HTMLElement, MouseEvent>>`
++ - Required: No
++ - Default: `true`
+ 
+--   Required: no
++Determines if the menu should hide when this item is clicked.
+ 
+-##### `suffix`: `React.ReactNode`
++**Note**: This behavior isn't triggered if this menu item is rendered as a
++link and modifier keys are used to either open the link in a new tab or
++download it.
+ 
+-The contents of the item's suffix.
++##### `prefix`
+ 
+--   Required: no
++ - Type: `ReactNode`
++ - Required: No
+ 
+-##### `hideOnClick`: `boolean`
++The contents of the menu item's prefix, such as an icon.
+ 
+-Whether to hide the menu popover when the menu item is clicked.
++##### `render`
+ 
+--   Required: no
+--   Default: `true`
++ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Required: No
+ 
+-##### `disabled`: `boolean`
++Allows the component to be rendered as a different HTML element or React
++component. The value can be a React element or a function that takes in the
++original component props and gives back a React element with the props
++merged.
+ 
+-Determines if the element is disabled.
++##### `suffix`
+ 
+--   Required: no
+--   Default: `false`
++ - Type: `ReactNode`
++ - Required: No
+ 
+-### `Menu.CheckboxItem`
++The contents of the menu item's suffix, such as a keyboard shortcut.
+ 
+-Used to render a checkbox item.
++### Menu.RadioItem
++
++Renders a radio menu item inside the `Menu.Popover` or `Menu.Group`
++components.
++
++It can optionally contain one instance of the `Menu.ItemLabel` component
++and one instance of the `Menu.ItemHelpText` component.
+ 
+ #### Props
+ 
+-The component accepts the following props:
++##### `children`
+ 
+-##### `children`: `React.ReactNode`
++ - Type: `ReactNode`
++ - Required: Yes
+ 
+-The contents of the item
++The contents of the menu item, which could include one instance of the
++`Menu.ItemLabel` component and/or one instance of the `Menu.ItemHelpText`
++component.
+ 
+--   Required: yes
++##### `checked`
+ 
+-##### `suffix`: `React.ReactNode`
++ - Type: `boolean`
++ - Required: No
+ 
+-The contents of the item's suffix.
++The controlled checked state of the radio menu item.
+ 
+--   Required: no
++Note: this prop will override the `defaultChecked` prop.
+ 
+-##### `hideOnClick`: `boolean`
++##### `disabled`
+ 
+-Whether to hide the menu popover when the menu item is clicked.
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
+ 
+--   Required: no
+--   Default: `false`
++Determines if the element is disabled. This sets the `aria-disabled`
++attribute accordingly, enabling support for all elements, including those
++that don't support the native `disabled` attribute.
+ 
+-##### `disabled`: `boolean`
++##### `defaultChecked`
+ 
+-Determines if the element is disabled.
++ - Type: `boolean`
++ - Required: No
+ 
+--   Required: no
+--   Default: `false`
++The checked state of the radio menu item when it is initially rendered.
++Use when not wanting to control its checked state.
+ 
+-##### `name`: `string`
++Note: this prop will be overriden by the `checked` prop, if it is defined.
+ 
+-The checkbox item's name.
++##### `hideOnClick`
+ 
+--   Required: yes
++ - Type: `BooleanOrCallback<MouseEvent<HTMLElement, MouseEvent>>`
++ - Required: No
++ - Default: `false`
+ 
+-##### `value`: `string`
++Determines if the menu should hide when this item is clicked.
+ 
+-The checkbox item's value, useful when using multiple checkbox items
+-associated to the same `name`.
++**Note**: This behavior isn't triggered if this menu item is rendered as a
++link and modifier keys are used to either open the link in a new tab or
++download it.
+ 
+--   Required: no
++##### `name`
+ 
+-##### `checked`: `boolean`
++ - Type: `string`
++ - Required: Yes
+ 
+-The checkbox item's value, useful when using multiple checkbox items
+-associated to the same `name`.
++The radio item's name.
++
++##### `onChange`
++
++ - Type: `BivariantCallback<(event: ChangeEvent<HTMLInputElement>) => void>`
++ - Required: No
++
++A function that is called when the checkbox's checked state changes.
+ 
+--   Required: no
++##### `render`
+ 
+-##### `defaultChecked`: `boolean`
++ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Required: No
+ 
+-The checked state of the checkbox menu item when it is initially rendered. Use when not wanting to control its checked state.
++Allows the component to be rendered as a different HTML element or React
++component. The value can be a React element or a function that takes in the
++original component props and gives back a React element with the props
++merged.
+ 
+--   Required: no
++##### `suffix`
+ 
+-##### `onChange`: `( event: React.ChangeEvent< HTMLInputElement > ) => void;`
++ - Type: `ReactNode`
++ - Required: No
+ 
+-Event handler called when the checked state of the checkbox menu item changes.
++The contents of the menu item's suffix, such as a keyboard shortcut.
++
++##### `value`
++
++ - Type: `string | number`
++ - Required: Yes
++
++The radio item's value.
+ 
+--   Required: no
++### Menu.CheckboxItem
+ 
+-### `Menu.RadioItem`
++Renders a checkbox menu item inside the `Menu.Popover` or `Menu.Group`
++components.
+ 
+-Used to render a radio item.
++It can optionally contain one instance of the `Menu.ItemLabel` component
++and one instance of the `Menu.ItemHelpText` component.
+ 
+ #### Props
+ 
+-The component accepts the following props:
++##### `children`
+ 
+-##### `children`: `React.ReactNode`
++ - Type: `ReactNode`
++ - Required: Yes
+ 
+-The contents of the item
++The contents of the menu item, which could include one instance of the
++`Menu.ItemLabel` component and/or one instance of the `Menu.ItemHelpText`
++component.
+ 
+--   Required: yes
++##### `checked`
+ 
+-##### `suffix`: `React.ReactNode`
++ - Type: `boolean`
++ - Required: No
+ 
+-The contents of the item's suffix.
++The controlled checked state of the checkbox menu item.
+ 
+--   Required: no
++Note: this prop will override the `defaultChecked` prop.
+ 
+-##### `hideOnClick`: `boolean`
++##### `disabled`
+ 
+-Whether to hide the menu popover when the menu item is clicked.
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
+ 
+--   Required: no
+--   Default: `false`
++Determines if the element is disabled. This sets the `aria-disabled`
++attribute accordingly, enabling support for all elements, including those
++that don't support the native `disabled` attribute.
+ 
+-##### `disabled`: `boolean`
++##### `defaultChecked`
+ 
+-Determines if the element is disabled.
++ - Type: `boolean`
++ - Required: No
+ 
+--   Required: no
+--   Default: `false`
++The checked state of the checkbox menu item when it is initially rendered.
++Use when not wanting to control its checked state.
+ 
+-##### `name`: `string`
++Note: this prop will be overriden by the `checked` prop, if it is defined.
+ 
+-The radio item's name.
++##### `hideOnClick`
+ 
+--   Required: yes
++ - Type: `BooleanOrCallback<MouseEvent<HTMLElement, MouseEvent>>`
++ - Required: No
++ - Default: `false`
+ 
+-##### `value`: `string | number`
++Determines if the menu should hide when this item is clicked.
+ 
+-The radio item's value.
++**Note**: This behavior isn't triggered if this menu item is rendered as a
++link and modifier keys are used to either open the link in a new tab or
++download it.
+ 
+--   Required: yes
++##### `name`
+ 
+-##### `checked`: `boolean`
++ - Type: `string`
++ - Required: Yes
+ 
+-The checkbox item's value, useful when using multiple checkbox items
+-associated to the same `name`.
++The checkbox menu item's name.
++
++##### `onChange`
++
++ - Type: `ChangeEventHandler<HTMLInputElement>`
++ - Required: No
+ 
+--   Required: no
++A function that is called when the checkbox's checked state changes.
+ 
+-##### `defaultChecked`: `boolean`
++##### `render`
+ 
+-The checked state of the radio menu item when it is initially rendered. Use when not wanting to control its checked state.
++ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Required: No
+ 
+--   Required: no
++Allows the component to be rendered as a different HTML element or React
++component. The value can be a React element or a function that takes in the
++original component props and gives back a React element with the props
++merged.
+ 
+-##### `onChange`: `( event: React.ChangeEvent< HTMLInputElement > ) => void;`
++##### `suffix`
+ 
+-Event handler called when the checked radio menu item changes.
++ - Type: `ReactNode`
++ - Required: No
+ 
+--   Required: no
++The contents of the menu item's suffix, such as a keyboard shortcut.
++
++##### `value`
++
++ - Type: `string | number | readonly string[]`
++ - Required: No
++
++The checkbox item's value, useful when using multiple checkbox menu items
++associated to the same `name`.
+ 
+-### `Menu.ItemLabel`
++### Menu.ItemLabel
+ 
+-Used to render the menu item's label.
++Renders a menu item's label text. It should be wrapped with `Menu.Item`,
++`Menu.RadioItem`, or `Menu.CheckboxItem`.
+ 
+ #### Props
+ 
+-The component accepts the following props:
++##### `as`
+ 
+-##### `children`: `React.ReactNode`
++ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
++ - Required: No
+ 
+-The label contents.
++The HTML element or React component to render the component as.
+ 
+--   Required: yes
++### Menu.ItemHelpText
+ 
+-### `Menu.ItemHelpText`
++Renders a menu item's help text. It should be wrapped with `Menu.Item`,
++`Menu.RadioItem`, or `Menu.CheckboxItem`.
+ 
+-Used to render the menu item's help text.
++#### Props
++
++##### `as`
++
++ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
++ - Required: No
++
++The HTML element or React component to render the component as.
++
++### Menu.Group
++
++Renders a group for menu items.
++
++It should contain one instance of `Menu.GroupLabel` and one or more
++instances of `Menu.Item`, `Menu.RadioItem`, or `Menu.CheckboxItem`.
+ 
+ #### Props
+ 
+-The component accepts the following props:
++##### `children`
+ 
+-##### `children`: `React.ReactNode`
++ - Type: `ReactNode`
++ - Required: Yes
+ 
+-The help text contents.
++The contents of the menu group, which should include one instance of the
++`Menu.GroupLabel` component and one or more instances of `Menu.Item`,
++`Menu.CheckboxItem`, and `Menu.RadioItem`.
+ 
+--   Required: yes
++### Menu.GroupLabel
+ 
+-### `Menu.Group`
++Renders a label in a menu group.
+ 
+-Used to group menu items.
++This component should be wrapped with `Menu.Group` so the
++`aria-labelledby` is correctly set on the group element.
+ 
+ #### Props
+ 
+-The component accepts the following props:
++##### `children`
+ 
+-##### `children`: `React.ReactNode`
++ - Type: `ReactNode`
++ - Required: Yes
+ 
+-The contents of the menu group (ie. an optional menu group label and one or more menu items).
++The contents of the menu group label, which should provide an accessible
++label for the menu group.
+ 
+--   Required: yes
++### Menu.Separator
+ 
+-### `Menu.GroupLabel`
++Renders a divider between menu items or menu groups.
+ 
+-Used to render a group label. The label text should be kept as short as possible.
++#### Props
++
++### Menu.SubmenuTriggerItem
++
++Renders a menu item that toggles the visibility of a sibling
++`Menu.Popover` component when clicked or when using arrow keys.
++
++This component is used to create a nested dropdown menu.
+ 
+ #### Props
+ 
+-The component accepts the following props:
++##### `children`
++
++ - Type: `ReactNode`
++ - Required: Yes
++
++The contents of the menu item, which could include one instance of the
++`Menu.ItemLabel` component and/or one instance of the `Menu.ItemHelpText`
++component.
++
++##### `disabled`
++
++ - Type: `boolean`
++ - Required: No
++ - Default: `false`
++
++Determines if the element is disabled. This sets the `aria-disabled`
++attribute accordingly, enabling support for all elements, including those
++that don't support the native `disabled` attribute.
++
++##### `hideOnClick`
++
++ - Type: `BooleanOrCallback<MouseEvent<HTMLElement, MouseEvent>>`
++ - Required: No
++ - Default: `true`
++
++Determines if the menu should hide when this item is clicked.
++
++**Note**: This behavior isn't triggered if this menu item is rendered as a
++link and modifier keys are used to either open the link in a new tab or
++download it.
++
++##### `prefix`
++
++ - Type: `ReactNode`
++ - Required: No
++
++The contents of the menu item's prefix, such as an icon.
++
++##### `render`
+ 
+-##### `children`: `React.ReactNode`
++ - Type: `ReactElement<any, string | JSXElementConstructor<any>> | RenderProp<HTMLAttributes<any> & { ref?: Ref<any>; }>`
++ - Required: No
+ 
+-The contents of the menu group label.
++Allows the component to be rendered as a different HTML element or React
++component. The value can be a React element or a function that takes in the
++original component props and gives back a React element with the props
++merged.
+ 
+--   Required: yes
++##### `suffix`
+ 
+-### `Menu.Separator`
++ - Type: `ReactNode`
++ - Required: No
+ 
+-Used to render a visual separator.
++The contents of the menu item's suffix, such as a keyboard shortcut.
+diff --git a/packages/components/src/menu/checkbox-item.tsx b/packages/components/src/menu/checkbox-item.tsx
+index 69339387c3add5..a3ae4d77085986 100644
+--- a/packages/components/src/menu/checkbox-item.tsx
++++ b/packages/components/src/menu/checkbox-item.tsx
+@@ -13,18 +13,18 @@ import { Icon, check } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import { MenuContext } from './context';
+-import type { MenuCheckboxItemProps } from './types';
++import { Context } from './context';
++import type { CheckboxItemProps } from './types';
+ import * as Styled from './styles';
+ 
+-export const MenuCheckboxItem = forwardRef<
++export const CheckboxItem = forwardRef<
+ 	HTMLDivElement,
+-	WordPressComponentProps< MenuCheckboxItemProps, 'div', false >
+->( function MenuCheckboxItem(
++	WordPressComponentProps< CheckboxItemProps, 'div', false >
++>( function CheckboxItem(
+ 	{ suffix, children, disabled = false, hideOnClick = false, ...props },
+ 	ref
+ ) {
+-	const menuContext = useContext( MenuContext );
++	const menuContext = useContext( Context );
+ 
+ 	if ( ! menuContext?.store ) {
+ 		throw new Error(
+@@ -33,7 +33,7 @@ export const MenuCheckboxItem = forwardRef<
+ 	}
+ 
+ 	return (
+-		<Styled.MenuCheckboxItem
++		<Styled.CheckboxItem
+ 			ref={ ref }
+ 			{ ...props }
+ 			accessibleWhenDisabled
+@@ -50,17 +50,17 @@ export const MenuCheckboxItem = forwardRef<
+ 				<Icon icon={ check } size={ 24 } />
+ 			</Ariakit.MenuItemCheck>
+ 
+-			<Styled.MenuItemContentWrapper>
+-				<Styled.MenuItemChildrenWrapper>
++			<Styled.ItemContentWrapper>
++				<Styled.ItemChildrenWrapper>
+ 					{ children }
+-				</Styled.MenuItemChildrenWrapper>
++				</Styled.ItemChildrenWrapper>
+ 
+ 				{ suffix && (
+ 					<Styled.ItemSuffixWrapper>
+ 						{ suffix }
+ 					</Styled.ItemSuffixWrapper>
+ 				) }
+-			</Styled.MenuItemContentWrapper>
+-		</Styled.MenuCheckboxItem>
++			</Styled.ItemContentWrapper>
++		</Styled.CheckboxItem>
+ 	);
+ } );
+diff --git a/packages/components/src/menu/context.tsx b/packages/components/src/menu/context.tsx
+index 1205015c57cbee..fa38f2c75aea61 100644
+--- a/packages/components/src/menu/context.tsx
++++ b/packages/components/src/menu/context.tsx
+@@ -6,8 +6,6 @@ import { createContext } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import type { MenuContext as MenuContextType } from './types';
++import type { ContextProps } from './types';
+ 
+-export const MenuContext = createContext< MenuContextType | undefined >(
+-	undefined
+-);
++export const Context = createContext< ContextProps | undefined >( undefined );
+diff --git a/packages/components/src/menu/docs-manifest.json b/packages/components/src/menu/docs-manifest.json
+new file mode 100644
+index 00000000000000..c47fd97e8e09f7
+--- /dev/null
++++ b/packages/components/src/menu/docs-manifest.json
+@@ -0,0 +1,62 @@
++{
++	"$schema": "../../schemas/docs-manifest.json",
++	"displayName": "Menu",
++	"filePath": "./index.tsx",
++	"subcomponents": [
++		{
++			"displayName": "TriggerButton",
++			"preferredDisplayName": "Menu.TriggerButton",
++			"filePath": "./trigger-button.tsx"
++		},
++		{
++			"displayName": "Popover",
++			"preferredDisplayName": "Menu.Popover",
++			"filePath": "./popover.tsx"
++		},
++		{
++			"displayName": "Item",
++			"preferredDisplayName": "Menu.Item",
++			"filePath": "./item.tsx"
++		},
++		{
++			"displayName": "RadioItem",
++			"preferredDisplayName": "Menu.RadioItem",
++			"filePath": "./radio-item.tsx"
++		},
++		{
++			"displayName": "CheckboxItem",
++			"preferredDisplayName": "Menu.CheckboxItem",
++			"filePath": "./checkbox-item.tsx"
++		},
++		{
++			"displayName": "ItemLabel",
++			"preferredDisplayName": "Menu.ItemLabel",
++			"filePath": "./item-label.tsx"
++		},
++		{
++			"displayName": "ItemHelpText",
++			"preferredDisplayName": "Menu.ItemHelpText",
++			"filePath": "./item-help-text.tsx"
++		},
++		{
++			"displayName": "Group",
++			"preferredDisplayName": "Menu.Group",
++			"filePath": "./group.tsx"
++		},
++		{
++			"displayName": "GroupLabel",
++			"preferredDisplayName": "Menu.GroupLabel",
++			"filePath": "./group-label.tsx"
++		},
++		{
++			"displayName": "Separator",
++			"preferredDisplayName": "Menu.Separator",
++			"filePath": "./separator.tsx"
++		},
++		{
++			"displayName": "SubmenuTriggerItem",
++			"preferredDisplayName": "Menu.SubmenuTriggerItem",
++			"filePath": "./submenu-trigger-item.tsx"
++		}
++	]
++}
+diff --git a/packages/components/src/menu/group-label.tsx b/packages/components/src/menu/group-label.tsx
+index 5bf081880cb1d7..ce6ecb06900d06 100644
+--- a/packages/components/src/menu/group-label.tsx
++++ b/packages/components/src/menu/group-label.tsx
+@@ -7,16 +7,16 @@ import { forwardRef, useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import { MenuContext } from './context';
++import { Context } from './context';
+ import { Text } from '../text';
+-import type { MenuGroupLabelProps } from './types';
++import type { GroupLabelProps } from './types';
+ import * as Styled from './styles';
+ 
+-export const MenuGroupLabel = forwardRef<
++export const GroupLabel = forwardRef<
+ 	HTMLDivElement,
+-	WordPressComponentProps< MenuGroupLabelProps, 'div', false >
+->( function MenuGroup( props, ref ) {
+-	const menuContext = useContext( MenuContext );
++	WordPressComponentProps< GroupLabelProps, 'div', false >
++>( function Group( props, ref ) {
++	const menuContext = useContext( Context );
+ 
+ 	if ( ! menuContext?.store ) {
+ 		throw new Error(
+@@ -25,7 +25,7 @@ export const MenuGroupLabel = forwardRef<
+ 	}
+ 
+ 	return (
+-		<Styled.MenuGroupLabel
++		<Styled.GroupLabel
+ 			ref={ ref }
+ 			render={
+ 				// @ts-expect-error The `children` prop is passed
+diff --git a/packages/components/src/menu/group.tsx b/packages/components/src/menu/group.tsx
+index 834350955f3c5d..3b503069a61556 100644
+--- a/packages/components/src/menu/group.tsx
++++ b/packages/components/src/menu/group.tsx
+@@ -7,15 +7,15 @@ import { forwardRef, useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import { MenuContext } from './context';
+-import type { MenuGroupProps } from './types';
++import { Context } from './context';
++import type { GroupProps } from './types';
+ import * as Styled from './styles';
+ 
+-export const MenuGroup = forwardRef<
++export const Group = forwardRef<
+ 	HTMLDivElement,
+-	WordPressComponentProps< MenuGroupProps, 'div', false >
+->( function MenuGroup( props, ref ) {
+-	const menuContext = useContext( MenuContext );
++	WordPressComponentProps< GroupProps, 'div', false >
++>( function Group( props, ref ) {
++	const menuContext = useContext( Context );
+ 
+ 	if ( ! menuContext?.store ) {
+ 		throw new Error(
+@@ -24,10 +24,6 @@ export const MenuGroup = forwardRef<
+ 	}
+ 
+ 	return (
+-		<Styled.MenuGroup
+-			ref={ ref }
+-			{ ...props }
+-			store={ menuContext.store }
+-		/>
++		<Styled.Group ref={ ref } { ...props } store={ menuContext.store } />
+ 	);
+ } );
+diff --git a/packages/components/src/menu/index.tsx b/packages/components/src/menu/index.tsx
+index 2e0fc91cfbc34f..e129c4e5867f02 100644
+--- a/packages/components/src/menu/index.tsx
++++ b/packages/components/src/menu/index.tsx
+@@ -13,21 +13,21 @@ import { isRTL as isRTLFn } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import { useContextSystem, contextConnectWithoutRef } from '../context';
+-import type { MenuContext as MenuContextType, MenuProps } from './types';
+-import { MenuContext } from './context';
+-import { MenuItem } from './item';
+-import { MenuCheckboxItem } from './checkbox-item';
+-import { MenuRadioItem } from './radio-item';
+-import { MenuGroup } from './group';
+-import { MenuGroupLabel } from './group-label';
+-import { MenuSeparator } from './separator';
+-import { MenuItemLabel } from './item-label';
+-import { MenuItemHelpText } from './item-help-text';
+-import { MenuTriggerButton } from './trigger-button';
+-import { MenuSubmenuTriggerItem } from './submenu-trigger-item';
+-import { MenuPopover } from './popover';
++import type { ContextProps, Props } from './types';
++import { Context } from './context';
++import { Item } from './item';
++import { CheckboxItem } from './checkbox-item';
++import { RadioItem } from './radio-item';
++import { Group } from './group';
++import { GroupLabel } from './group-label';
++import { Separator } from './separator';
++import { ItemLabel } from './item-label';
++import { ItemHelpText } from './item-help-text';
++import { TriggerButton } from './trigger-button';
++import { SubmenuTriggerItem } from './submenu-trigger-item';
++import { Popover } from './popover';
+ 
+-const UnconnectedMenu = ( props: MenuProps ) => {
++const UnconnectedMenu = ( props: Props ) => {
+ 	const {
+ 		children,
+ 		defaultOpen = false,
+@@ -39,10 +39,10 @@ const UnconnectedMenu = ( props: MenuProps ) => {
+ 		variant,
+ 	} = useContextSystem<
+ 		// @ts-expect-error TODO: missing 'className' in MenuProps
+-		typeof props & Pick< MenuContextType, 'variant' >
++		typeof props & Pick< ContextProps, 'variant' >
+ 	>( props, 'Menu' );
+ 
+-	const parentContext = useContext( MenuContext );
++	const parentContext = useContext( Context );
+ 
+ 	const rtl = isRTLFn();
+ 
+@@ -84,49 +84,119 @@ const UnconnectedMenu = ( props: MenuProps ) => {
+ 	);
+ 
+ 	return (
+-		<MenuContext.Provider value={ contextValue }>
+-			{ children }
+-		</MenuContext.Provider>
++		<Context.Provider value={ contextValue }>{ children }</Context.Provider>
+ 	);
+ };
+ 
++/**
++ * Menu is a collection of React components that combine to render
++ * ARIA-compliant [menu](https://www.w3.org/WAI/ARIA/apg/patterns/menu/) and
++ * [menu button](https://www.w3.org/WAI/ARIA/apg/patterns/menubutton/) patterns.
++ *
++ * `Menu` itself is a wrapper component and context provider.
++ * It is responsible for managing the state of the menu and its items, and for
++ * rendering the `Menu.TriggerButton` (or the `Menu.SubmenuTriggerItem`)
++ * component, and the `Menu.Popover` component.
++ */
+ export const Menu = Object.assign(
+ 	contextConnectWithoutRef( UnconnectedMenu, 'Menu' ),
+ 	{
+-		Context: Object.assign( MenuContext, {
++		Context: Object.assign( Context, {
+ 			displayName: 'Menu.Context',
+ 		} ),
+-		Item: Object.assign( MenuItem, {
++		/**
++		 * Renders a menu item inside the `Menu.Popover` or `Menu.Group` components.
++		 *
++		 * It can optionally contain one instance of the `Menu.ItemLabel` component
++		 * and one instance of the `Menu.ItemHelpText` component.
++		 */
++		Item: Object.assign( Item, {
+ 			displayName: 'Menu.Item',
+ 		} ),
+-		RadioItem: Object.assign( MenuRadioItem, {
++		/**
++		 * Renders a radio menu item inside the `Menu.Popover` or `Menu.Group`
++		 * components.
++		 *
++		 * It can optionally contain one instance of the `Menu.ItemLabel` component
++		 * and one instance of the `Menu.ItemHelpText` component.
++		 */
++		RadioItem: Object.assign( RadioItem, {
+ 			displayName: 'Menu.RadioItem',
+ 		} ),
+-		CheckboxItem: Object.assign( MenuCheckboxItem, {
++		/**
++		 * Renders a checkbox menu item inside the `Menu.Popover` or `Menu.Group`
++		 * components.
++		 *
++		 * It can optionally contain one instance of the `Menu.ItemLabel` component
++		 * and one instance of the `Menu.ItemHelpText` component.
++		 */
++		CheckboxItem: Object.assign( CheckboxItem, {
+ 			displayName: 'Menu.CheckboxItem',
+ 		} ),
+-		Group: Object.assign( MenuGroup, {
++		/**
++		 * Renders a group for menu items.
++		 *
++		 * It should contain one instance of `Menu.GroupLabel` and one or more
++		 * instances of `Menu.Item`, `Menu.RadioItem`, or `Menu.CheckboxItem`.
++		 */
++		Group: Object.assign( Group, {
+ 			displayName: 'Menu.Group',
+ 		} ),
+-		GroupLabel: Object.assign( MenuGroupLabel, {
++		/**
++		 * Renders a label in a menu group.
++		 *
++		 * This component should be wrapped with `Menu.Group` so the
++		 * `aria-labelledby` is correctly set on the group element.
++		 */
++		GroupLabel: Object.assign( GroupLabel, {
+ 			displayName: 'Menu.GroupLabel',
+ 		} ),
+-		Separator: Object.assign( MenuSeparator, {
++		/**
++		 * Renders a divider between menu items or menu groups.
++		 */
++		Separator: Object.assign( Separator, {
+ 			displayName: 'Menu.Separator',
+ 		} ),
+-		ItemLabel: Object.assign( MenuItemLabel, {
++		/**
++		 * Renders a menu item's label text. It should be wrapped with `Menu.Item`,
++		 * `Menu.RadioItem`, or `Menu.CheckboxItem`.
++		 */
++		ItemLabel: Object.assign( ItemLabel, {
+ 			displayName: 'Menu.ItemLabel',
+ 		} ),
+-		ItemHelpText: Object.assign( MenuItemHelpText, {
++		/**
++		 * Renders a menu item's help text. It should be wrapped with `Menu.Item`,
++		 * `Menu.RadioItem`, or `Menu.CheckboxItem`.
++		 */
++		ItemHelpText: Object.assign( ItemHelpText, {
+ 			displayName: 'Menu.ItemHelpText',
+ 		} ),
+-		Popover: Object.assign( MenuPopover, {
++		/**
++		 * Renders a dropdown menu element that's controlled by a sibling
++		 * `Menu.TriggerButton` component. It renders a popover and automatically
++		 * focuses on items when the menu is shown.
++		 *
++		 * The only valid children of `Menu.Popover` are `Menu.Item`,
++		 * `Menu.RadioItem`, `Menu.CheckboxItem`, `Menu.Group`, `Menu.Separator`,
++		 * and `Menu` (for nested dropdown menus).
++		 */
++		Popover: Object.assign( Popover, {
+ 			displayName: 'Menu.Popover',
+ 		} ),
+-		TriggerButton: Object.assign( MenuTriggerButton, {
++		/**
++		 * Renders a menu button that toggles the visibility of a sibling
++		 * `Menu.Popover` component when clicked or when using arrow keys.
++		 */
++		TriggerButton: Object.assign( TriggerButton, {
+ 			displayName: 'Menu.TriggerButton',
+ 		} ),
+-		SubmenuTriggerItem: Object.assign( MenuSubmenuTriggerItem, {
++		/**
++		 * Renders a menu item that toggles the visibility of a sibling
++		 * `Menu.Popover` component when clicked or when using arrow keys.
++		 *
++		 * This component is used to create a nested dropdown menu.
++		 */
++		SubmenuTriggerItem: Object.assign( SubmenuTriggerItem, {
+ 			displayName: 'Menu.SubmenuTriggerItem',
+ 		} ),
+ 	}
+diff --git a/packages/components/src/menu/item-help-text.tsx b/packages/components/src/menu/item-help-text.tsx
+index 13d14c294125bd..e47c54d702342f 100644
+--- a/packages/components/src/menu/item-help-text.tsx
++++ b/packages/components/src/menu/item-help-text.tsx
+@@ -7,14 +7,14 @@ import { forwardRef, useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import { MenuContext } from './context';
++import { Context } from './context';
+ import * as Styled from './styles';
+ 
+-export const MenuItemHelpText = forwardRef<
++export const ItemHelpText = forwardRef<
+ 	HTMLSpanElement,
+ 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
+->( function MenuItemHelpText( props, ref ) {
+-	const menuContext = useContext( MenuContext );
++>( function ItemHelpText( props, ref ) {
++	const menuContext = useContext( Context );
+ 
+ 	if ( ! menuContext?.store ) {
+ 		throw new Error(
+@@ -22,7 +22,5 @@ export const MenuItemHelpText = forwardRef<
+ 		);
+ 	}
+ 
+-	return (
+-		<Styled.MenuItemHelpText numberOfLines={ 2 } ref={ ref } { ...props } />
+-	);
++	return <Styled.ItemHelpText numberOfLines={ 2 } ref={ ref } { ...props } />;
+ } );
+diff --git a/packages/components/src/menu/item-label.tsx b/packages/components/src/menu/item-label.tsx
+index 4f5f80e547861f..3a3367f4b481fe 100644
+--- a/packages/components/src/menu/item-label.tsx
++++ b/packages/components/src/menu/item-label.tsx
+@@ -7,14 +7,14 @@ import { forwardRef, useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import { MenuContext } from './context';
++import { Context } from './context';
+ import * as Styled from './styles';
+ 
+-export const MenuItemLabel = forwardRef<
++export const ItemLabel = forwardRef<
+ 	HTMLSpanElement,
+ 	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
+->( function MenuItemLabel( props, ref ) {
+-	const menuContext = useContext( MenuContext );
++>( function ItemLabel( props, ref ) {
++	const menuContext = useContext( Context );
+ 
+ 	if ( ! menuContext?.store ) {
+ 		throw new Error(
+@@ -22,7 +22,5 @@ export const MenuItemLabel = forwardRef<
+ 		);
+ 	}
+ 
+-	return (
+-		<Styled.MenuItemLabel numberOfLines={ 1 } ref={ ref } { ...props } />
+-	);
++	return <Styled.ItemLabel numberOfLines={ 1 } ref={ ref } { ...props } />;
+ } );
+diff --git a/packages/components/src/menu/item.tsx b/packages/components/src/menu/item.tsx
+index a716cbcc89654c..560d20c30436ce 100644
+--- a/packages/components/src/menu/item.tsx
++++ b/packages/components/src/menu/item.tsx
+@@ -7,14 +7,14 @@ import { forwardRef, useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import type { MenuItemProps } from './types';
++import type { ItemProps } from './types';
+ import * as Styled from './styles';
+-import { MenuContext } from './context';
++import { Context } from './context';
+ 
+-export const MenuItem = forwardRef<
++export const Item = forwardRef<
+ 	HTMLDivElement,
+-	WordPressComponentProps< MenuItemProps, 'div', false >
+->( function MenuItem(
++	WordPressComponentProps< ItemProps, 'div', false >
++>( function Item(
+ 	{
+ 		prefix,
+ 		suffix,
+@@ -26,7 +26,7 @@ export const MenuItem = forwardRef<
+ 	},
+ 	ref
+ ) {
+-	const menuContext = useContext( MenuContext );
++	const menuContext = useContext( Context );
+ 
+ 	if ( ! menuContext?.store ) {
+ 		throw new Error(
+@@ -41,7 +41,7 @@ export const MenuItem = forwardRef<
+ 	const computedStore = store ?? menuContext.store;
+ 
+ 	return (
+-		<Styled.MenuItem
++		<Styled.Item
+ 			ref={ ref }
+ 			{ ...props }
+ 			accessibleWhenDisabled
+@@ -51,17 +51,17 @@ export const MenuItem = forwardRef<
+ 		>
+ 			<Styled.ItemPrefixWrapper>{ prefix }</Styled.ItemPrefixWrapper>
+ 
+-			<Styled.MenuItemContentWrapper>
+-				<Styled.MenuItemChildrenWrapper>
++			<Styled.ItemContentWrapper>
++				<Styled.ItemChildrenWrapper>
+ 					{ children }
+-				</Styled.MenuItemChildrenWrapper>
++				</Styled.ItemChildrenWrapper>
+ 
+ 				{ suffix && (
+ 					<Styled.ItemSuffixWrapper>
+ 						{ suffix }
+ 					</Styled.ItemSuffixWrapper>
+ 				) }
+-			</Styled.MenuItemContentWrapper>
+-		</Styled.MenuItem>
++			</Styled.ItemContentWrapper>
++		</Styled.Item>
+ 	);
+ } );
+diff --git a/packages/components/src/menu/popover.tsx b/packages/components/src/menu/popover.tsx
+index 19972a31027ce1..6a3ad9eb683b51 100644
+--- a/packages/components/src/menu/popover.tsx
++++ b/packages/components/src/menu/popover.tsx
+@@ -17,18 +17,18 @@ import {
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import type { MenuPopoverProps } from './types';
++import type { PopoverProps } from './types';
+ import * as Styled from './styles';
+-import { MenuContext } from './context';
++import { Context } from './context';
+ 
+-export const MenuPopover = forwardRef<
++export const Popover = forwardRef<
+ 	HTMLDivElement,
+-	WordPressComponentProps< MenuPopoverProps, 'div', false >
+->( function MenuPopover(
++	WordPressComponentProps< PopoverProps, 'div', false >
++>( function Popover(
+ 	{ gutter, children, shift, modal = true, ...otherProps },
+ 	ref
+ ) {
+-	const menuContext = useContext( MenuContext );
++	const menuContext = useContext( Context );
+ 
+ 	// Extract the side from the applied placement — useful for animations.
+ 	// Using `currentPlacement` instead of `placement` to make sure that we
+@@ -92,9 +92,9 @@ export const MenuPopover = forwardRef<
+ 				// container scales with a different factor than its contents.
+ 				// The {...renderProps} are passed to the inner wrapper, so that the
+ 				// menu element is the direct parent of the menu item elements.
+-				<Styled.MenuPopoverOuterWrapper variant={ menuContext.variant }>
+-					<Styled.MenuPopoverInnerWrapper { ...renderProps } />
+-				</Styled.MenuPopoverOuterWrapper>
++				<Styled.PopoverOuterWrapper variant={ menuContext.variant }>
++					<Styled.PopoverInnerWrapper { ...renderProps } />
++				</Styled.PopoverOuterWrapper>
+ 			) }
+ 		>
+ 			{ children }
+diff --git a/packages/components/src/menu/radio-item.tsx b/packages/components/src/menu/radio-item.tsx
+index 28b3199d7d36b8..1da6d573c26852 100644
+--- a/packages/components/src/menu/radio-item.tsx
++++ b/packages/components/src/menu/radio-item.tsx
+@@ -13,8 +13,8 @@ import { Icon } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import { MenuContext } from './context';
+-import type { MenuRadioItemProps } from './types';
++import { Context } from './context';
++import type { RadioItemProps } from './types';
+ import * as Styled from './styles';
+ import { SVG, Circle } from '@wordpress/primitives';
+ 
+@@ -24,14 +24,14 @@ const radioCheck = (
+ 	</SVG>
+ );
+ 
+-export const MenuRadioItem = forwardRef<
++export const RadioItem = forwardRef<
+ 	HTMLDivElement,
+-	WordPressComponentProps< MenuRadioItemProps, 'div', false >
+->( function MenuRadioItem(
++	WordPressComponentProps< RadioItemProps, 'div', false >
++>( function RadioItem(
+ 	{ suffix, children, disabled = false, hideOnClick = false, ...props },
+ 	ref
+ ) {
+-	const menuContext = useContext( MenuContext );
++	const menuContext = useContext( Context );
+ 
+ 	if ( ! menuContext?.store ) {
+ 		throw new Error(
+@@ -40,7 +40,7 @@ export const MenuRadioItem = forwardRef<
+ 	}
+ 
+ 	return (
+-		<Styled.MenuRadioItem
++		<Styled.RadioItem
+ 			ref={ ref }
+ 			{ ...props }
+ 			accessibleWhenDisabled
+@@ -57,17 +57,17 @@ export const MenuRadioItem = forwardRef<
+ 				<Icon icon={ radioCheck } size={ 24 } />
+ 			</Ariakit.MenuItemCheck>
+ 
+-			<Styled.MenuItemContentWrapper>
+-				<Styled.MenuItemChildrenWrapper>
++			<Styled.ItemContentWrapper>
++				<Styled.ItemChildrenWrapper>
+ 					{ children }
+-				</Styled.MenuItemChildrenWrapper>
++				</Styled.ItemChildrenWrapper>
+ 
+ 				{ suffix && (
+ 					<Styled.ItemSuffixWrapper>
+ 						{ suffix }
+ 					</Styled.ItemSuffixWrapper>
+ 				) }
+-			</Styled.MenuItemContentWrapper>
+-		</Styled.MenuRadioItem>
++			</Styled.ItemContentWrapper>
++		</Styled.RadioItem>
+ 	);
+ } );
+diff --git a/packages/components/src/menu/separator.tsx b/packages/components/src/menu/separator.tsx
+index 57cff572c287a0..bdf79c8bb472a2 100644
+--- a/packages/components/src/menu/separator.tsx
++++ b/packages/components/src/menu/separator.tsx
+@@ -7,15 +7,15 @@ import { forwardRef, useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import { MenuContext } from './context';
+-import type { MenuSeparatorProps } from './types';
++import { Context } from './context';
++import type { SeparatorProps } from './types';
+ import * as Styled from './styles';
+ 
+-export const MenuSeparator = forwardRef<
++export const Separator = forwardRef<
+ 	HTMLHRElement,
+-	WordPressComponentProps< MenuSeparatorProps, 'hr', false >
+->( function MenuSeparator( props, ref ) {
+-	const menuContext = useContext( MenuContext );
++	WordPressComponentProps< SeparatorProps, 'hr', false >
++>( function Separator( props, ref ) {
++	const menuContext = useContext( Context );
+ 
+ 	if ( ! menuContext?.store ) {
+ 		throw new Error(
+@@ -24,7 +24,7 @@ export const MenuSeparator = forwardRef<
+ 	}
+ 
+ 	return (
+-		<Styled.MenuSeparator
++		<Styled.Separator
+ 			ref={ ref }
+ 			{ ...props }
+ 			store={ menuContext.store }
+diff --git a/packages/components/src/menu/stories/best-practices.mdx b/packages/components/src/menu/stories/best-practices.mdx
+new file mode 100644
+index 00000000000000..148e9c187c600d
+--- /dev/null
++++ b/packages/components/src/menu/stories/best-practices.mdx
+@@ -0,0 +1,38 @@
++import { Meta } from '@storybook/blocks';
++
++import * as MenuStories from './index.story';
++
++<Meta of={ MenuStories } name="Best Practices" />
++
++# Menu
++
++## Usage
++
++### When to use a `Menu`
++
++Use a `Menu` when you want users to:
++
++-   Choose an action or change a setting from a list, AND
++-   Only see the available choices contextually.
++
++`Menu` is a React component to render an expandable menu of buttons. It is similar in purpose to a `<select>` element, with the distinction that it does not maintain a value. Instead, each option behaves as an action button.
++
++If you need to display all the available options at all times, consider using a Toolbar instead. Use a `Menu` to display a list of actions after the user interacts with a button.
++
++**Do**
++Use a `Menu` to display a list of actions after the user interacts with an icon.
++
++**Don’t** use a `Menu` for important actions that should always be visible. Use a `Toolbar` instead.
++
++**Don’t**
++Don’t use a `Menu` for frequently used actions. Use a `Toolbar` instead.
++
++### Behavior
++
++Generally, the parent button should indicate that interacting with it will show a `Menu`.
++
++The parent button should retain the same visual styling regardless of whether the `Menu` is displayed or not.
++
++### Placement
++
++The `Menu` should typically appear directly below, or below and to the left of, the parent button. If there isn’t enough space below to display the full `Menu`, it can be displayed instead above the parent button.
+diff --git a/packages/components/src/menu/stories/index.story.tsx b/packages/components/src/menu/stories/index.story.tsx
+index 37ebb6f905dc84..de9e4cdd652102 100644
+--- a/packages/components/src/menu/stories/index.story.tsx
++++ b/packages/components/src/menu/stories/index.story.tsx
+@@ -20,10 +20,10 @@ import Button from '../../button';
+ import Modal from '../../modal';
+ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+ import { ContextSystemProvider } from '../../context';
+-import type { MenuProps } from '../types';
++import type { Props } from '../types';
+ 
+ const meta: Meta< typeof Menu > = {
+-	id: 'components-experimental-menu',
++	id: 'components-menu',
+ 	title: 'Components (Experimental)/Actions/Menu',
+ 	component: Menu,
+ 	subcomponents: {
+@@ -183,7 +183,7 @@ export const WithSubmenu: StoryObj< typeof Menu > = {
+ };
+ 
+ export const WithCheckboxes: StoryObj< typeof Menu > = {
+-	render: function WithCheckboxes( props: MenuProps ) {
++	render: function WithCheckboxes( props: Props ) {
+ 		const [ isAChecked, setAChecked ] = useState( false );
+ 		const [ isBChecked, setBChecked ] = useState( true );
+ 		const [ multipleCheckboxesValue, setMultipleCheckboxesValue ] =
+@@ -333,7 +333,7 @@ export const WithCheckboxes: StoryObj< typeof Menu > = {
+ };
+ 
+ export const WithRadios: StoryObj< typeof Menu > = {
+-	render: function WithRadios( props: MenuProps ) {
++	render: function WithRadios( props: Props ) {
+ 		const [ radioValue, setRadioValue ] = useState( 'two' );
+ 		const onRadioChange: React.ComponentProps<
+ 			typeof Menu.RadioItem
+@@ -411,7 +411,7 @@ const modalOnTopOfMenuPopover = css`
+ `;
+ 
+ export const WithModals: StoryObj< typeof Menu > = {
+-	render: function WithModals( props: MenuProps ) {
++	render: function WithModals( props: Props ) {
+ 		const [ isOuterModalOpen, setOuterModalOpen ] = useState( false );
+ 		const [ isInnerModalOpen, setInnerModalOpen ] = useState( false );
+ 
+@@ -527,7 +527,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
+ };
+ 
+ export const WithSlotFill: StoryObj< typeof Menu > = {
+-	render: ( props: MenuProps ) => {
++	render: ( props: Props ) => {
+ 		return (
+ 			<SlotFillProvider>
+ 				<Menu { ...props }>
+@@ -579,7 +579,7 @@ const toolbarVariantContextValue = {
+ };
+ 
+ export const ToolbarVariant: StoryObj< typeof Menu > = {
+-	render: ( props: MenuProps ) => (
++	render: ( props: Props ) => (
+ 		// TODO: add toolbar
+ 		<ContextSystemProvider value={ toolbarVariantContextValue }>
+ 			<Menu { ...props }>
+@@ -619,7 +619,7 @@ export const ToolbarVariant: StoryObj< typeof Menu > = {
+ };
+ 
+ export const InsideModal: StoryObj< typeof Menu > = {
+-	render: function InsideModal( props: MenuProps ) {
++	render: function InsideModal( props: Props ) {
+ 		const [ isModalOpen, setModalOpen ] = useState( false );
+ 		return (
+ 			<>
+diff --git a/packages/components/src/menu/styles.ts b/packages/components/src/menu/styles.ts
+index cda5c7321f38b4..1235d6ae7ec1b4 100644
+--- a/packages/components/src/menu/styles.ts
++++ b/packages/components/src/menu/styles.ts
+@@ -12,7 +12,7 @@ import { COLORS, font, rtl, CONFIG } from '../utils';
+ import { space } from '../utils/space';
+ import Icon from '../icon';
+ import { Truncate } from '../truncate';
+-import type { MenuContext } from './types';
++import type { ContextProps } from './types';
+ 
+ const ANIMATION_PARAMS = {
+ 	SCALE_AMOUNT_OUTER: 0.82,
+@@ -42,8 +42,8 @@ const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VAR
+ 
+ const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
+ 
+-export const MenuPopoverOuterWrapper = styled.div<
+-	Pick< MenuContext, 'variant' >
++export const PopoverOuterWrapper = styled.div<
++	Pick< ContextProps, 'variant' >
+ >`
+ 	position: relative;
+ 
+@@ -95,7 +95,7 @@ export const MenuPopoverOuterWrapper = styled.div<
+ 	}
+ `;
+ 
+-export const MenuPopoverInnerWrapper = styled.div`
++export const PopoverInnerWrapper = styled.div`
+ 	position: relative;
+ 	/* Same as popover component */
+ 	/* TODO: is there a way to read the sass variable? */
+@@ -219,7 +219,7 @@ const baseItem = css`
+ 	}
+ 
+ 	/* When the item is the trigger of an open submenu */
+-	${ MenuPopoverInnerWrapper }:not(:focus) &:not(:focus)[aria-expanded="true"] {
++	${ PopoverInnerWrapper }:not(:focus) &:not(:focus)[aria-expanded="true"] {
+ 		background-color: ${ LIGHT_BACKGROUND_COLOR };
+ 		color: ${ COLORS.theme.foreground };
+ 	}
+@@ -229,15 +229,15 @@ const baseItem = css`
+ 	}
+ `;
+ 
+-export const MenuItem = styled( Ariakit.MenuItem )`
++export const Item = styled( Ariakit.MenuItem )`
+ 	${ baseItem };
+ `;
+ 
+-export const MenuCheckboxItem = styled( Ariakit.MenuItemCheckbox )`
++export const CheckboxItem = styled( Ariakit.MenuItemCheckbox )`
+ 	${ baseItem };
+ `;
+ 
+-export const MenuRadioItem = styled( Ariakit.MenuItemRadio )`
++export const RadioItem = styled( Ariakit.MenuItemRadio )`
+ 	${ baseItem };
+ `;
+ 
+@@ -249,14 +249,14 @@ export const ItemPrefixWrapper = styled.span`
+ 	 * Even when the item is not checked, occupy the same screen space to avoid
+ 	 * the space collapside when no items are checked.
+ 	 */
+-	${ MenuCheckboxItem } > &,
+-	${ MenuRadioItem } > & {
++	${ CheckboxItem } > &,
++	${ RadioItem } > & {
+ 		/* Same width as the check icons */
+ 		min-width: ${ space( 6 ) };
+ 	}
+ 
+-	${ MenuCheckboxItem } > &,
+-	${ MenuRadioItem } > &,
++	${ CheckboxItem } > &,
++	${ RadioItem } > &,
+ 	&:not( :empty ) {
+ 		margin-inline-end: ${ space( 2 ) };
+ 	}
+@@ -278,7 +278,7 @@ export const ItemPrefixWrapper = styled.span`
+ 	}
+ `;
+ 
+-export const MenuItemContentWrapper = styled.div`
++export const ItemContentWrapper = styled.div`
+ 	/*
+ 	 * Always occupy the second column, since the first column
+ 	 * is taken by the prefix wrapper (when displayed).
+@@ -293,7 +293,7 @@ export const MenuItemContentWrapper = styled.div`
+ 	pointer-events: none;
+ `;
+ 
+-export const MenuItemChildrenWrapper = styled.div`
++export const ItemChildrenWrapper = styled.div`
+ 	flex: 1;
+ 
+ 	display: inline-flex;
+@@ -317,19 +317,19 @@ export const ItemSuffixWrapper = styled.span`
+ 	 * When the parent menu item is active, except when it's a non-focused/hovered
+ 	 * submenu trigger (in that case, color should not be inherited)
+ 	 */
+-	[data-active-item]:not( [data-focus-visible] ) *:not(${ MenuPopoverInnerWrapper }) &,
++	[data-active-item]:not( [data-focus-visible] ) *:not(${ PopoverInnerWrapper }) &,
+ 	/* When the parent menu item is disabled */
+-	[aria-disabled='true'] *:not(${ MenuPopoverInnerWrapper }) & {
++	[aria-disabled='true'] *:not(${ PopoverInnerWrapper }) & {
+ 		color: inherit;
+ 	}
+ `;
+ 
+-export const MenuGroup = styled( Ariakit.MenuGroup )`
++export const Group = styled( Ariakit.MenuGroup )`
+ 	/* Ignore this element when calculating the layout. Useful for subgrid */
+ 	display: contents;
+ `;
+ 
+-export const MenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
++export const GroupLabel = styled( Ariakit.MenuGroupLabel )`
+ 	/* Occupy the width of all grid columns (ie. full width) */
+ 	grid-column: 1 / -1;
+ 
+@@ -338,8 +338,8 @@ export const MenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
+ 	padding-inline: ${ ITEM_PADDING_INLINE };
+ `;
+ 
+-export const MenuSeparator = styled( Ariakit.MenuSeparator )<
+-	Pick< MenuContext, 'variant' >
++export const Separator = styled( Ariakit.MenuSeparator )<
++	Pick< ContextProps, 'variant' >
+ >`
+ 	/* Occupy the width of all grid columns (ie. full width) */
+ 	grid-column: 1 / -1;
+@@ -370,22 +370,22 @@ export const SubmenuChevronIcon = styled( Icon )`
+ 	) };
+ `;
+ 
+-export const MenuItemLabel = styled( Truncate )`
++export const ItemLabel = styled( Truncate )`
+ 	font-size: ${ font( 'default.fontSize' ) };
+ 	line-height: 20px;
+ 	color: inherit;
+ `;
+ 
+-export const MenuItemHelpText = styled( Truncate )`
++export const ItemHelpText = styled( Truncate )`
+ 	font-size: ${ font( 'helpText.fontSize' ) };
+ 	line-height: 16px;
+ 	color: ${ LIGHTER_TEXT_COLOR };
+ 	overflow-wrap: anywhere;
+ 
+ 	[data-active-item]:not( [data-focus-visible] )
+-		*:not( ${ MenuPopoverInnerWrapper } )
++		*:not( ${ PopoverInnerWrapper } )
+ 		&,
+-	[aria-disabled='true'] *:not( ${ MenuPopoverInnerWrapper } ) & {
++	[aria-disabled='true'] *:not( ${ PopoverInnerWrapper } ) & {
+ 		color: inherit;
+ 	}
+ `;
+diff --git a/packages/components/src/menu/submenu-trigger-item.tsx b/packages/components/src/menu/submenu-trigger-item.tsx
+index 23932a14bdaff4..9ea24d259af300 100644
+--- a/packages/components/src/menu/submenu-trigger-item.tsx
++++ b/packages/components/src/menu/submenu-trigger-item.tsx
+@@ -13,16 +13,16 @@ import { chevronRightSmall } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import type { MenuItemProps } from './types';
+-import { MenuContext } from './context';
+-import { MenuItem } from './item';
++import type { ItemProps } from './types';
++import { Context } from './context';
++import { Item } from './item';
+ import * as Styled from './styles';
+ 
+-export const MenuSubmenuTriggerItem = forwardRef<
++export const SubmenuTriggerItem = forwardRef<
+ 	HTMLDivElement,
+-	WordPressComponentProps< MenuItemProps, 'div', false >
+->( function MenuSubmenuTriggerItem( { suffix, ...otherProps }, ref ) {
+-	const menuContext = useContext( MenuContext );
++	WordPressComponentProps< ItemProps, 'div', false >
++>( function SubmenuTriggerItem( { suffix, ...otherProps }, ref ) {
++	const menuContext = useContext( Context );
+ 
+ 	if ( ! menuContext?.store.parent ) {
+ 		throw new Error(
+@@ -36,10 +36,10 @@ export const MenuSubmenuTriggerItem = forwardRef<
+ 			accessibleWhenDisabled
+ 			store={ menuContext.store }
+ 			render={
+-				<MenuItem
++				<Item
+ 					{ ...otherProps }
+ 					// The menu item needs to register and be part of the parent menu.
+-					// Without specifying the store explicitly, the `MenuItem` component
++					// Without specifying the store explicitly, the `Item` component
+ 					// would otherwise read the store via context and pick up the one from
+ 					// the sub-menu `Menu` component.
+ 					store={ menuContext.store.parent }
+diff --git a/packages/components/src/menu/trigger-button.tsx b/packages/components/src/menu/trigger-button.tsx
+index b99804efef0f17..b5309ae44aadb7 100644
+--- a/packages/components/src/menu/trigger-button.tsx
++++ b/packages/components/src/menu/trigger-button.tsx
+@@ -12,14 +12,14 @@ import { forwardRef, useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
+-import type { MenuTriggerButtonProps } from './types';
+-import { MenuContext } from './context';
++import type { TriggerButtonProps } from './types';
++import { Context } from './context';
+ 
+-export const MenuTriggerButton = forwardRef<
++export const TriggerButton = forwardRef<
+ 	HTMLDivElement,
+-	WordPressComponentProps< MenuTriggerButtonProps, 'button', false >
+->( function MenuTriggerButton( { children, disabled = false, ...props }, ref ) {
+-	const menuContext = useContext( MenuContext );
++	WordPressComponentProps< TriggerButtonProps, 'button', false >
++>( function TriggerButton( { children, disabled = false, ...props }, ref ) {
++	const menuContext = useContext( Context );
+ 
+ 	if ( ! menuContext?.store ) {
+ 		throw new Error(
+diff --git a/packages/components/src/menu/types.ts b/packages/components/src/menu/types.ts
+index f9bb0782529d1f..4532d97fb13dd9 100644
+--- a/packages/components/src/menu/types.ts
++++ b/packages/components/src/menu/types.ts
+@@ -3,7 +3,7 @@
+  */
+ import type * as Ariakit from '@ariakit/react';
+ 
+-export interface MenuContext {
++export interface ContextProps {
+ 	/**
+ 	 * The ariakit store shared across all Menu subcomponents.
+ 	 */
+@@ -14,7 +14,7 @@ export interface MenuContext {
+ 	variant?: 'toolbar';
+ }
+ 
+-export interface MenuProps {
++export interface Props {
+ 	/**
+ 	 * The elements, which should include one instance of the `Menu.TriggerButton`
+ 	 * component and one instance of the `Menu.Popover` component.
+@@ -50,7 +50,7 @@ export interface MenuProps {
+ 	placement?: Ariakit.MenuProviderProps[ 'placement' ];
+ }
+ 
+-export interface MenuPopoverProps {
++export interface PopoverProps {
+ 	/**
+ 	 * The contents of the menu popover, which should include instances of the
+ 	 * `Menu.Item`, `Menu.CheckboxItem`, `Menu.RadioItem`, `Menu.Group`, and
+@@ -98,7 +98,7 @@ export interface MenuPopoverProps {
+ 	hideOnEscape?: Ariakit.MenuProps[ 'hideOnEscape' ];
+ }
+ 
+-export interface MenuTriggerButtonProps {
++export interface TriggerButtonProps {
+ 	/**
+ 	 * The contents of the menu trigger button.
+ 	 */
+@@ -139,7 +139,7 @@ export interface MenuTriggerButtonProps {
+ 	accessibleWhenDisabled?: Ariakit.MenuButtonProps[ 'accessibleWhenDisabled' ];
+ }
+ 
+-export interface MenuGroupProps {
++export interface GroupProps {
+ 	/**
+ 	 * The contents of the menu group, which should include one instance of the
+ 	 * `Menu.GroupLabel` component and one or more instances of `Menu.Item`,
+@@ -148,7 +148,7 @@ export interface MenuGroupProps {
+ 	children: Ariakit.MenuGroupProps[ 'children' ];
+ }
+ 
+-export interface MenuGroupLabelProps {
++export interface GroupLabelProps {
+ 	/**
+ 	 * The contents of the menu group label, which should provide an accessible
+ 	 * label for the menu group.
+@@ -156,7 +156,7 @@ export interface MenuGroupLabelProps {
+ 	children: Ariakit.MenuGroupLabelProps[ 'children' ];
+ }
+ 
+-export interface MenuItemProps {
++export interface ItemProps {
+ 	/**
+ 	 * The contents of the menu item, which could include one instance of the
+ 	 * `Menu.ItemLabel` component and/or one instance of the `Menu.ItemHelpText`
+@@ -203,7 +203,7 @@ export interface MenuItemProps {
+ 	store?: Ariakit.MenuItemProps[ 'store' ];
+ }
+ 
+-export interface MenuCheckboxItemProps {
++export interface CheckboxItemProps {
+ 	/**
+ 	 * The contents of the menu item, which could include one instance of the
+ 	 * `Menu.ItemLabel` component and/or one instance of the `Menu.ItemHelpText`
+@@ -267,7 +267,7 @@ export interface MenuCheckboxItemProps {
+ 	onChange?: Ariakit.MenuItemCheckboxProps[ 'onChange' ];
+ }
+ 
+-export interface MenuRadioItemProps {
++export interface RadioItemProps {
+ 	/**
+ 	 * The contents of the menu item, which could include one instance of the
+ 	 * `Menu.ItemLabel` component and/or one instance of the `Menu.ItemHelpText`
+@@ -330,4 +330,4 @@ export interface MenuRadioItemProps {
+ 	onChange?: Ariakit.MenuItemRadioProps[ 'onChange' ];
+ }
+ 
+-export interface MenuSeparatorProps {}
++export interface SeparatorProps {}
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index d3f156a6eb788b..a4f6941e981114 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -7,6 +7,7 @@
+ 			'boxcontrol',
+ 			'customselectcontrol-v2',
+ 			'dimensioncontrol',
++			'menu',
+ 			'navigation',
+ 			'navigator',
+ 			'progressbar',

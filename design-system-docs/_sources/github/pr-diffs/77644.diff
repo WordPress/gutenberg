@@ -1,0 +1,419 @@
+diff --git a/docs/reference-guides/core-blocks.md b/docs/reference-guides/core-blocks.md
+index 1a33bcb957139b..23e2a1b8a1e38d 100644
+--- a/docs/reference-guides/core-blocks.md
++++ b/docs/reference-guides/core-blocks.md
+@@ -294,7 +294,7 @@ Add an image or video with a text overlay. ([Source](https://github.com/WordPres
+ -	**Name:** core/cover
+ -	**Category:** media
+ -	**Supports:** align, allowedBlocks, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), filter (duotone), interactivity (clientNavigation), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+--	**Attributes:** alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, poster, sizeSlug, tagName, templateLock, url, useFeaturedImage
++-	**Attributes:** alt, backgroundType, contentPosition, customGradient, customOverlayColor, customPosition, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, poster, sizeSlug, tagName, templateLock, url, useFeaturedImage
+ 
+ ## Details
+ 
+diff --git a/packages/block-editor/src/components/background-image-control/index.js b/packages/block-editor/src/components/background-image-control/index.js
+index f28ed1a6f62f1e..a152b43b98d6c2 100644
+--- a/packages/block-editor/src/components/background-image-control/index.js
++++ b/packages/block-editor/src/components/background-image-control/index.js
+@@ -50,6 +50,32 @@ import {
+ 
+ const IMAGE_BACKGROUND_TYPE = 'image';
+ 
++const BACKGROUND_POSITION_UNITS = [
++	{ value: '%', label: '%', default: 50 },
++	{ value: 'px', label: 'px', default: 0 },
++	{ value: 'em', label: 'em', default: 0 },
++	{ value: 'rem', label: 'rem', default: 0 },
++	{ value: 'vw', label: 'vw', default: 0 },
++	{ value: 'vh', label: 'vh', default: 0 },
++];
++
++/**
++ * Parses a CSS background-position string into X and Y components.
++ *
++ * @param {string} value CSS background-position value.
++ * @return {{ x: string|undefined, y: string|undefined }} Parsed X and Y components.
++ */
++const parseBackgroundPosition = ( value ) => {
++	if ( ! value ) {
++		return { x: undefined, y: undefined };
++	}
++	const parts = value.split( ' ' ).filter( Boolean );
++	return {
++		x: parts[ 0 ] ?? undefined,
++		y: parts.length > 1 ? parts[ 1 ] : parts[ 0 ],
++	};
++};
++
+ const BACKGROUND_POPOVER_PROPS = {
+ 	placement: 'left-start',
+ 	offset: 36,
+@@ -451,6 +477,12 @@ function BackgroundSizeControls( {
+ 		style?.background?.backgroundAttachment ||
+ 		inheritedValue?.background?.backgroundAttachment;
+ 
++	// Set a default background position for non-site-wide, uploaded images with a size of 'contain'.
++	const backgroundPositionValue =
++		! positionValue && isUploadedImage && 'contain' === sizeValue
++			? defaultValues?.backgroundPosition
++			: positionValue;
++
+ 	/*
+ 	 * Set default values for uploaded images.
+ 	 * The default values are passed by the consumer.
+@@ -541,6 +573,52 @@ function BackgroundSizeControls( {
+ 		);
+ 	};
+ 
++	const { x: posX, y: posY } = parseBackgroundPosition(
++		backgroundPositionValue ?? ''
++	);
++	const positionXValue = posX ?? '50%';
++	const positionYValue = posY ?? '50%';
++
++	const updateBackgroundPositionX = ( next ) => {
++		if ( next === undefined ) {
++			onChange(
++				setImmutably(
++					style,
++					[ 'background', 'backgroundPosition' ],
++					undefined
++				)
++			);
++			return;
++		}
++		onChange(
++			setImmutably(
++				style,
++				[ 'background', 'backgroundPosition' ],
++				`${ next } ${ positionYValue }`
++			)
++		);
++	};
++
++	const updateBackgroundPositionY = ( next ) => {
++		if ( next === undefined ) {
++			onChange(
++				setImmutably(
++					style,
++					[ 'background', 'backgroundPosition' ],
++					undefined
++				)
++			);
++			return;
++		}
++		onChange(
++			setImmutably(
++				style,
++				[ 'background', 'backgroundPosition' ],
++				`${ positionXValue } ${ next }`
++			)
++		);
++	};
++
+ 	const toggleIsRepeated = () =>
+ 		onChange(
+ 			setImmutably(
+@@ -559,20 +637,31 @@ function BackgroundSizeControls( {
+ 			)
+ 		);
+ 
+-	// Set a default background position for non-site-wide, uploaded images with a size of 'contain'.
+-	const backgroundPositionValue =
+-		! positionValue && isUploadedImage && 'contain' === sizeValue
+-			? defaultValues?.backgroundPosition
+-			: positionValue;
+-
+ 	return (
+ 		<VStack spacing={ 3 } className="single-column">
+ 			<FocalPointPicker
+ 				label={ __( 'Focal point' ) }
++				__experimentalHideControls
+ 				url={ imageValue }
+ 				value={ backgroundPositionToCoords( backgroundPositionValue ) }
+ 				onChange={ updateBackgroundPosition }
+ 			/>
++			<HStack spacing={ 2 }>
++				<UnitControl
++					label={ __( 'X position' ) }
++					value={ positionXValue }
++					onChange={ updateBackgroundPositionX }
++					units={ BACKGROUND_POSITION_UNITS }
++					size="__unstable-large"
++				/>
++				<UnitControl
++					label={ __( 'Y position' ) }
++					value={ positionYValue }
++					onChange={ updateBackgroundPositionY }
++					units={ BACKGROUND_POSITION_UNITS }
++					size="__unstable-large"
++				/>
++			</HStack>
+ 			<ToggleControl
+ 				label={ __( 'Fixed background' ) }
+ 				checked={ attachmentValue === 'fixed' }
+diff --git a/packages/block-library/src/cover/block.json b/packages/block-library/src/cover/block.json
+index 97095ab4b95152..e0702ed9538280 100644
+--- a/packages/block-library/src/cover/block.json
++++ b/packages/block-library/src/cover/block.json
+@@ -50,6 +50,9 @@
+ 		"focalPoint": {
+ 			"type": "object"
+ 		},
++		"customPosition": {
++			"type": "string"
++		},
+ 		"minHeight": {
+ 			"type": "number"
+ 		},
+diff --git a/packages/block-library/src/cover/edit/index.js b/packages/block-library/src/cover/edit/index.js
+index 060be347b26a5b..9b701c8cc7b9c8 100644
+--- a/packages/block-library/src/cover/edit/index.js
++++ b/packages/block-library/src/cover/edit/index.js
+@@ -102,6 +102,7 @@ function CoverEdit( {
+ 		useFeaturedImage,
+ 		dimRatio,
+ 		focalPoint,
++		customPosition,
+ 		hasParallax,
+ 		isDark,
+ 		isRepeated,
+@@ -445,13 +446,13 @@ function CoverEdit( {
+ 
+ 	const backgroundImage = url ? `url(${ url })` : undefined;
+ 
+-	const backgroundPosition = mediaPosition( focalPoint );
++	const backgroundPosition = customPosition ?? mediaPosition( focalPoint );
+ 
+ 	const bgStyle = { backgroundColor: overlayColor.color };
+ 	const mediaStyle = {
+ 		objectPosition:
+-			focalPoint && isImgElement
+-				? mediaPosition( focalPoint )
++			( focalPoint || customPosition ) && isImgElement
++				? customPosition ?? mediaPosition( focalPoint )
+ 				: undefined,
+ 	};
+ 
+diff --git a/packages/block-library/src/cover/edit/inspector-controls.js b/packages/block-library/src/cover/edit/inspector-controls.js
+index d5a517e60a0437..aa7be357891fd5 100644
+--- a/packages/block-library/src/cover/edit/inspector-controls.js
++++ b/packages/block-library/src/cover/edit/inspector-controls.js
+@@ -41,6 +41,26 @@ const { cleanEmptyObject, ResolutionTool, HTMLElementControl } = unlock(
+ 	blockEditorPrivateApis
+ );
+ 
++const BACKGROUND_POSITION_UNITS = [
++	{ value: '%', label: '%', default: 50 },
++	{ value: 'px', label: 'px', default: 0 },
++	{ value: 'em', label: 'em', default: 0 },
++	{ value: 'rem', label: 'rem', default: 0 },
++	{ value: 'vw', label: 'vw', default: 0 },
++	{ value: 'vh', label: 'vh', default: 0 },
++];
++
++const parseBackgroundPosition = ( value ) => {
++	if ( ! value ) {
++		return { x: undefined, y: undefined };
++	}
++	const parts = value.split( ' ' ).filter( Boolean );
++	return {
++		x: parts[ 0 ] ?? undefined,
++		y: parts.length > 1 ? parts[ 1 ] : parts[ 0 ],
++	};
++};
++
+ function CoverHeightInput( {
+ 	onChange,
+ 	onUnitChange,
+@@ -105,6 +125,7 @@ export default function CoverInspectorControls( {
+ 		id,
+ 		dimRatio,
+ 		focalPoint,
++		customPosition,
+ 		hasParallax,
+ 		isRepeated,
+ 		minHeight,
+@@ -180,6 +201,38 @@ export default function CoverInspectorControls( {
+ 
+ 	const showFocalPointPicker = isVideoBackground || isImageBackground;
+ 
++	// Effective CSS position string: customPosition takes precedence over focalPoint.
++	const effectivePositionStr =
++		customPosition ??
++		( focalPoint ? mediaPosition( focalPoint ) : undefined );
++	const { x: posX, y: posY } = parseBackgroundPosition(
++		effectivePositionStr ?? ''
++	);
++	const positionXValue = posX ?? '50%';
++	const positionYValue = posY ?? '50%';
++
++	const updateBackgroundPositionX = ( next ) => {
++		if ( next === undefined ) {
++			setAttributes( { customPosition: undefined } );
++			return;
++		}
++		setAttributes( {
++			customPosition: `${ next } ${ positionYValue }`,
++			focalPoint: undefined,
++		} );
++	};
++
++	const updateBackgroundPositionY = ( next ) => {
++		if ( next === undefined ) {
++			setAttributes( { customPosition: undefined } );
++			return;
++		}
++		setAttributes( {
++			customPosition: `${ positionXValue } ${ next }`,
++			focalPoint: undefined,
++		} );
++	};
++
+ 	const imperativeFocalPointPreview = ( value ) => {
+ 		const [ styleOfRef, property ] = mediaElement.current
+ 			? [ mediaElement.current.style, 'objectPosition' ]
+@@ -201,6 +254,7 @@ export default function CoverInspectorControls( {
+ 							setAttributes( {
+ 								hasParallax: false,
+ 								focalPoint: undefined,
++								customPosition: undefined,
+ 								isRepeated: false,
+ 								alt: '',
+ 								poster: undefined,
+@@ -251,15 +305,19 @@ export default function CoverInspectorControls( {
+ 							<ToolsPanelItem
+ 								label={ __( 'Focal point' ) }
+ 								isShownByDefault
+-								hasValue={ () => !! focalPoint }
++								hasValue={ () =>
++									!! focalPoint || !! customPosition
++								}
+ 								onDeselect={ () =>
+ 									setAttributes( {
+ 										focalPoint: undefined,
++										customPosition: undefined,
+ 									} )
+ 								}
+ 							>
+ 								<FocalPointPicker
+ 									label={ __( 'Focal point' ) }
++									__experimentalHideControls
+ 									url={ url }
+ 									value={ focalPoint }
+ 									onDragStart={ imperativeFocalPointPreview }
+@@ -267,9 +325,31 @@ export default function CoverInspectorControls( {
+ 									onChange={ ( newFocalPoint ) =>
+ 										setAttributes( {
+ 											focalPoint: newFocalPoint,
++											customPosition: undefined,
+ 										} )
+ 									}
+ 								/>
++								<div
++									style={ {
++										display: 'flex',
++										gap: '8px',
++									} }
++								>
++									<UnitControl
++										__next40pxDefaultSize
++										label={ __( 'X position' ) }
++										value={ positionXValue }
++										onChange={ updateBackgroundPositionX }
++										units={ BACKGROUND_POSITION_UNITS }
++									/>
++									<UnitControl
++										__next40pxDefaultSize
++										label={ __( 'Y position' ) }
++										value={ positionYValue }
++										onChange={ updateBackgroundPositionY }
++										units={ BACKGROUND_POSITION_UNITS }
++									/>
++								</div>
+ 							</ToolsPanelItem>
+ 						) }
+ 						{ isVideoBackground && (
+diff --git a/packages/block-library/src/cover/save.js b/packages/block-library/src/cover/save.js
+index f4fce991630678..2bb98da97694b7 100644
+--- a/packages/block-library/src/cover/save.js
++++ b/packages/block-library/src/cover/save.js
+@@ -35,6 +35,7 @@ export default function save( { attributes } ) {
+ 		customOverlayColor,
+ 		dimRatio,
+ 		focalPoint,
++		customPosition,
+ 		useFeaturedImage,
+ 		hasParallax,
+ 		isDark,
+@@ -77,13 +78,13 @@ export default function save( { attributes } ) {
+ 
+ 	const objectPosition =
+ 		// prettier-ignore
+-		focalPoint && isImgElement
+-			  ? mediaPosition(focalPoint)
++		( focalPoint || customPosition ) && isImgElement
++			  ? ( customPosition ?? mediaPosition(focalPoint) )
+ 			  : undefined;
+ 
+ 	const backgroundImage = url ? `url(${ url })` : undefined;
+ 
+-	const backgroundPosition = mediaPosition( focalPoint );
++	const backgroundPosition = customPosition ?? mediaPosition( focalPoint );
+ 
+ 	const classes = clsx(
+ 		{
+diff --git a/packages/components/src/focal-point-picker/index.tsx b/packages/components/src/focal-point-picker/index.tsx
+index e4d38711877d02..a85b015e37b7a0 100644
+--- a/packages/components/src/focal-point-picker/index.tsx
++++ b/packages/components/src/focal-point-picker/index.tsx
+@@ -89,6 +89,7 @@ const GRID_OVERLAY_TIMEOUT = 600;
+ export function FocalPointPicker( {
+ 	// Prevent passing to internal component.
+ 	__nextHasNoMarginBottom: _,
++	__experimentalHideControls = false,
+ 	autoPlay = true,
+ 	className,
+ 	help,
+@@ -279,13 +280,15 @@ export function FocalPointPicker( {
+ 					/>
+ 				</MediaContainer>
+ 			</MediaWrapper>
+-			<Controls
+-				hasHelpText={ !! help }
+-				point={ { x, y } }
+-				onChange={ ( value ) => {
+-					onChange?.( getFinalValue( value ) );
+-				} }
+-			/>
++			{ ! __experimentalHideControls && (
++				<Controls
++					hasHelpText={ !! help }
++					point={ { x, y } }
++					onChange={ ( value ) => {
++						onChange?.( getFinalValue( value ) );
++					} }
++				/>
++			) }
+ 			{ !! help && <StyledHelp>{ help }</StyledHelp> }
+ 		</Container>
+ 	);
+diff --git a/packages/components/src/focal-point-picker/types.ts b/packages/components/src/focal-point-picker/types.ts
+index 9b2139466ebcad..0195cda6dba72a 100644
+--- a/packages/components/src/focal-point-picker/types.ts
++++ b/packages/components/src/focal-point-picker/types.ts
+@@ -27,6 +27,14 @@ export type FocalPointPickerProps = Pick<
+ 	 * @ignore
+ 	 */
+ 	__next40pxDefaultSize?: boolean;
++	/**
++	 * If true, the built-in X/Y position text inputs are not rendered.
++	 * Useful when replacing them with custom controls (e.g. ones that
++	 * support additional CSS units beyond percentages).
++	 *
++	 * @default false
++	 */
++	__experimentalHideControls?: boolean;
+ 	/**
+ 	 * Autoplays HTML5 video. This only applies to video sources (`url`).
+ 	 *

@@ -1,0 +1,43 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a71b5a0ddef35f..0e589c0bfa2dec 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `CustomSelectControl`: Restore `describedBy` functionality ([#63957](https://github.com/WordPress/gutenberg/pull/63957)).
+ -   `Button`: Improve the aria-disabled focus style ([#62480](https://github.com/WordPress/gutenberg/pull/62480)).
+ -   `Modal`: Fix the dismissal logic for React development mode ([#64132](https://github.com/WordPress/gutenberg/pull/64132)).
++-   `Autocompleter UI`: Fix text color when hovering selected item ([#64294](https://github.com/WordPress/gutenberg/pull/64294)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.tsx b/packages/components/src/autocomplete/autocompleter-ui.tsx
+index 1a5aacf1438abc..c6c1b94deb577e 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.tsx
++++ b/packages/components/src/autocomplete/autocompleter-ui.tsx
+@@ -64,9 +64,11 @@ function ListBox( {
+ 						'components-autocomplete__result',
+ 						className,
+ 						{
++							// Unused, for backwards compatibility.
+ 							'is-selected': index === selectedIndex,
+ 						}
+ 					) }
++					variant={ index === selectedIndex ? 'primary' : undefined }
+ 					onClick={ () => onSelect( option ) }
+ 				>
+ 					{ option.label }
+diff --git a/packages/components/src/autocomplete/style.scss b/packages/components/src/autocomplete/style.scss
+index fdb29fe577f206..75b219210f42e2 100644
+--- a/packages/components/src/autocomplete/style.scss
++++ b/packages/components/src/autocomplete/style.scss
+@@ -13,10 +13,4 @@
+ 	&:focus:not(:disabled) {
+ 		@include block-toolbar-button-style__focus();
+ 	}
+-
+-	&.is-selected,
+-	&:not(:disabled,[aria-disabled="true"]):active {
+-		background: $components-color-accent;
+-		color: $white;
+-	}
+ }

@@ -1,0 +1,194 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index b65c0aead24a5f..41c8930e068e36 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -719,6 +719,12 @@
+ 		"markdown_source": "../packages/components/src/clipboard-button/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "ColorControl",
++		"slug": "color-control",
++		"markdown_source": "../packages/components/src/color-control/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "ColorIndicator",
+ 		"slug": "color-indicator",
+diff --git a/packages/components/src/color-control/README.md b/packages/components/src/color-control/README.md
+new file mode 100644
+index 00000000000000..0ccb6d2376c690
+--- /dev/null
++++ b/packages/components/src/color-control/README.md
+@@ -0,0 +1,61 @@
++# ColorControl
++
++ColorControl is used to generate a color picker user interface with the option to include a label and help text.
++
++## Usage
++
++Render a user interface to change fixed background setting.
++```jsx
++import { ColorControl } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++const MyColorControl = withState( {
++	backgroundColor: '#fff',
++} )( ( { backgroundColor, setState } ) => (
++	<ColorControl
++		label={ 'Background Color' }
++		color={ backgroundColor }
++		onChange={ value => setState( { backgroundColor: value.hex } ) }
++		disableAlpha
++	/>
++) );
++```
++
++## Props
++
++The component accepts the following props:
++
++### label
++
++If this property is added, a label will be generated using label property as the content.
++
++- Type: `String`
++- Required: No
++
++### help
++
++If this property is added, a help text will be generated using help property as the content.
++
++- Type: `String|WPElement`
++- Required: No
++
++### color
++
++The color that will be selected.
++
++- Type: `String`
++- Required: No
++
++### onChange
++
++A function that receives the selected color value
++
++- Type: `function`
++- Required: Yes
++
++### className
++
++The class that will be added with `components-base-control` and `component-color-control` to the classes of the wrapper div. If no className is passed only `components-base-control` and `component-color-control` are used.
++
++Type: String
++- Required: No
+diff --git a/packages/components/src/color-control/index.js b/packages/components/src/color-control/index.js
+new file mode 100644
+index 00000000000000..60d1672a96e75b
+--- /dev/null
++++ b/packages/components/src/color-control/index.js
+@@ -0,0 +1,46 @@
++/**
++ * External dependencies
++ */
++import { isFunction } from 'lodash';
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { withInstanceId } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import BaseControl from '../base-control';
++import ColorPicker from '../color-picker';
++
++const ColorControl = ( props ) => {
++	const { label, color, help, instanceId, className, onChange, disableAlpha } = props;
++	const id = `color-toggle-control-${ instanceId }`;
++
++	let describedBy, helpLabel;
++	if ( help ) {
++		describedBy = id + '__help';
++		helpLabel = isFunction( help ) ? help( color ) : help;
++	}
++	return (
++		<BaseControl
++			id={ id }
++			label={ label }
++			help={ helpLabel }
++			className={ classnames( 'component-color-control', className ) }
++		>
++			<ColorPicker
++				color={ color }
++				onChangeComplete={ ( val ) => {
++					onChange( val );
++				} }
++				disableAlpha={ disableAlpha }
++				aria-describedby={ describedBy }
++			/>
++		</BaseControl>
++	);
++};
++
++export default withInstanceId( ColorControl );
+diff --git a/packages/components/src/color-control/stories/index.js b/packages/components/src/color-control/stories/index.js
+new file mode 100644
+index 00000000000000..f13487f1c4f637
+--- /dev/null
++++ b/packages/components/src/color-control/stories/index.js
+@@ -0,0 +1,40 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import ColorControl from '../';
++
++export default { title: 'Components|ColorControl', component: ColorControl };
++
++const ColorControlWithState = ( { ...props } ) => {
++	const [ color, setColor ] = useState( '#f00' );
++	return (
++		<ColorControl
++			{ ...props }
++			color={ color }
++			onChangeComplete={ ( value ) => setColor( value.hex ) }
++		/>
++	);
++};
++
++export const _default = () => {
++	return (
++		<ColorControlWithState
++			label="Color Control Default"
++			disableAlpha
++		/>
++	);
++};
++
++export const alphaEnabled = () => {
++	return (
++		<ColorControlWithState
++			label="Color Control with Alpha Enabled"
++			disableAlpha={ false }
++		/>
++	);
++};
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 0378e2e69e038a..0c99a926fd0ca6 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -33,6 +33,7 @@ export { default as CardHeader } from './card/header';
+ export { default as CardMedia } from './card/media';
+ export { default as CheckboxControl } from './checkbox-control';
+ export { default as ClipboardButton } from './clipboard-button';
++export { default as ColorControl } from './color-control';
+ export { default as __experimentalColorEdit } from './color-edit';
+ export { default as ColorIndicator } from './color-indicator';
+ export { default as ColorPalette } from './color-palette';

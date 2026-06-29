@@ -1,0 +1,235 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index afefa65cf06e1d..200215f1fffa35 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -278,7 +278,6 @@ module.exports = {
+ 					// Temporary rules until we're ready to officially deprecate the bottom margins.
+ 					...[
+ 						'BaseControl',
+-						'ComboboxControl',
+ 						'RangeControl',
+ 						'SearchControl',
+ 						'SelectControl',
+diff --git a/packages/block-library/src/avatar/user-control.js b/packages/block-library/src/avatar/user-control.js
+index da06193f2f92ac..8781a218152c8a 100644
+--- a/packages/block-library/src/avatar/user-control.js
++++ b/packages/block-library/src/avatar/user-control.js
+@@ -48,7 +48,6 @@ export default function UserControl( { value, onChange } ) {
+ 	return (
+ 		<ComboboxControl
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			label={ __( 'User' ) }
+ 			help={ __(
+ 				'Select the avatar user to display, if it is blank it will use the post/page author.'
+diff --git a/packages/block-library/src/page-list/edit.js b/packages/block-library/src/page-list/edit.js
+index 458b8075749e5d..d98491cd36fc80 100644
+--- a/packages/block-library/src/page-list/edit.js
++++ b/packages/block-library/src/page-list/edit.js
+@@ -341,7 +341,6 @@ export default function PageListEdit( {
+ 								isShownByDefault
+ 							>
+ 								<ComboboxControl
+-									__nextHasNoMarginBottom
+ 									__next40pxDefaultSize
+ 									className="editor-page-attributes__parent"
+ 									label={ __( 'Parent' ) }
+diff --git a/packages/block-library/src/post-author/edit.js b/packages/block-library/src/post-author/edit.js
+index 8a1aebca02f784..9f1b0da05938b6 100644
+--- a/packages/block-library/src/post-author/edit.js
++++ b/packages/block-library/src/post-author/edit.js
+@@ -98,7 +98,6 @@ function AuthorCombobox( { value, onChange } ) {
+ 	return (
+ 		<ComboboxControl
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			label={ __( 'Author' ) }
+ 			options={ authorOptions }
+ 			value={ value?.id }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 72a54fdbc5db69..05679ccb0caa6a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `ToggleGroupControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74004](https://github.com/WordPress/gutenberg/pull/74004)).
+ -   `ToggleControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74012](https://github.com/WordPress/gutenberg/pull/74012)).
+ -   `TreeSelect`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74014](https://github.com/WordPress/gutenberg/pull/74014)).
++-   `ComboboxControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74034](https://github.com/WordPress/gutenberg/pull/74034)).
+ -   `DimensionControl`: Completely remove deprecated component ([#73944](https://github.com/WordPress/gutenberg/pull/73944)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/combobox-control/README.md b/packages/components/src/combobox-control/README.md
+index 7a11c8b95fe2e9..8759be906a7138 100644
+--- a/packages/components/src/combobox-control/README.md
++++ b/packages/components/src/combobox-control/README.md
+@@ -35,7 +35,6 @@ function MyComboboxControl() {
+ 	return (
+ 		<ComboboxControl
+ 			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+ 			label="Font Size"
+ 			value={ fontSize }
+ 			onChange={ setFontSize }
+@@ -142,14 +141,6 @@ Start opting into the larger default height that will become the default size in
+ - Required: No
+ - Default: `false`
+ 
+-#### __nextHasNoMarginBottom
+-
+-Start opting into the new margin-free styles that will become the default in a future version.
+-
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
+-
+ ## Related components
+ 
+ -   Like this component, but without a search input, the [`CustomSelectControl`](https://developer.wordpress.org/block-editor/reference-guides/components/custom-select-control/) component.
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index 4dc0fccf5917f2..4da91e3634f13d 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -95,7 +95,6 @@ const getIndexOfMatchingSuggestion = (
+  * 	return (
+  * 		<ComboboxControl
+  * 			__next40pxDefaultSize
+- * 			__nextHasNoMarginBottom
+  * 			label="Font Size"
+  * 			value={ fontSize }
+  * 			onChange={ setFontSize }
+@@ -116,7 +115,6 @@ const getIndexOfMatchingSuggestion = (
+  */
+ function ComboboxControl( props: ComboboxControlProps ) {
+ 	const {
+-		__nextHasNoMarginBottom = false,
+ 		__next40pxDefaultSize = false,
+ 		value: valueProp,
+ 		label,
+@@ -330,8 +328,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 	return (
+ 		<DetectOutside onFocusOutside={ onFocusOutside }>
+ 			<BaseControl
+-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-				__associatedWPComponentName="ComboboxControl"
++				__nextHasNoMarginBottom
+ 				className={ clsx( className, 'components-combobox-control' ) }
+ 				label={ label }
+ 				id={ `components-form-token-input-${ instanceId }` }
+diff --git a/packages/components/src/combobox-control/stories/index.story.tsx b/packages/components/src/combobox-control/stories/index.story.tsx
+index b2c60adda287dd..03e2ce01510046 100644
+--- a/packages/components/src/combobox-control/stories/index.story.tsx
++++ b/packages/components/src/combobox-control/stories/index.story.tsx
+@@ -82,7 +82,6 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
+ export const Default = Template.bind( {} );
+ Default.args = {
+ 	__next40pxDefaultSize: true,
+-	__nextHasNoMarginBottom: true,
+ 	label: 'Select a country',
+ 	options: countryOptions,
+ };
+diff --git a/packages/components/src/combobox-control/test/index.tsx b/packages/components/src/combobox-control/test/index.tsx
+index 0815a61b89b6e6..b20688c62887b0 100644
+--- a/packages/components/src/combobox-control/test/index.tsx
++++ b/packages/components/src/combobox-control/test/index.tsx
+@@ -58,13 +58,7 @@ const getOptionSearchString = ( option: ComboboxControlOption ) =>
+ 	option.label.substring( 0, 11 );
+ 
+ const ComboboxControl = ( props: ComboboxControlProps ) => {
+-	return (
+-		<_ComboboxControl
+-			{ ...props }
+-			__next40pxDefaultSize
+-			__nextHasNoMarginBottom
+-		/>
+-	);
++	return <_ComboboxControl { ...props } __next40pxDefaultSize />;
+ };
+ 
+ const ControlledComboboxControl = ( {
+diff --git a/packages/components/src/combobox-control/types.ts b/packages/components/src/combobox-control/types.ts
+index 3398e9ee9a760e..babbca2efea04b 100644
+--- a/packages/components/src/combobox-control/types.ts
++++ b/packages/components/src/combobox-control/types.ts
+@@ -12,12 +12,15 @@ export type ComboboxControlOption = {
+ 
+ export type ComboboxControlProps = Pick<
+ 	BaseControlProps,
+-	| '__nextHasNoMarginBottom'
+-	| 'className'
+-	| 'label'
+-	| 'hideLabelFromVision'
+-	| 'help'
++	'className' | 'label' | 'hideLabelFromVision' | 'help'
+ > & {
++	/**
++	 * Start opting into the new margin-free styles that will become the default in a future version.
++	 *
++	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
++	 * @ignore
++	 */
++	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * Custom renderer invoked for each option in the suggestion list.
+ 	 * The render prop receives as its argument an object containing, under the `item` key,
+diff --git a/packages/components/src/validated-form-controls/components/combobox-control.tsx b/packages/components/src/validated-form-controls/components/combobox-control.tsx
+index 8ffb46fb9a827c..8df0556b83ab21 100644
+--- a/packages/components/src/validated-form-controls/components/combobox-control.tsx
++++ b/packages/components/src/validated-form-controls/components/combobox-control.tsx
+@@ -19,7 +19,7 @@ const UnforwardedValidatedComboboxControl = (
+ 		...restProps
+ 	}: Omit<
+ 		React.ComponentProps< typeof ComboboxControl >,
+-		'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
++		'__next40pxDefaultSize'
+ 	> &
+ 		ValidatedControlProps,
+ 	forwardedRef: React.ForwardedRef< HTMLInputElement >
+@@ -52,11 +52,7 @@ const UnforwardedValidatedComboboxControl = (
+ 				)
+ 			}
+ 		>
+-			<ComboboxControl
+-				__nextHasNoMarginBottom
+-				__next40pxDefaultSize
+-				{ ...restProps }
+-			/>
++			<ComboboxControl __next40pxDefaultSize { ...restProps } />
+ 		</ControlWithError>
+ 	);
+ };
+diff --git a/packages/editor/src/components/page-attributes/parent.js b/packages/editor/src/components/page-attributes/parent.js
+index 5bca7d7fa444d2..ba9ff799b4cf6c 100644
+--- a/packages/editor/src/components/page-attributes/parent.js
++++ b/packages/editor/src/components/page-attributes/parent.js
+@@ -194,7 +194,6 @@ export function PageAttributesParent() {
+ 
+ 	return (
+ 		<ComboboxControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			className="editor-page-attributes__parent"
+ 			label={ __( 'Parent' ) }
+diff --git a/packages/editor/src/components/post-author/combobox.js b/packages/editor/src/components/post-author/combobox.js
+index 7cc71056646b77..0fa9f6b62b962a 100644
+--- a/packages/editor/src/components/post-author/combobox.js
++++ b/packages/editor/src/components/post-author/combobox.js
+@@ -34,7 +34,6 @@ export default function PostAuthorCombobox() {
+ 
+ 	return (
+ 		<ComboboxControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			label={ __( 'Author' ) }
+ 			options={ authorOptions }
+diff --git a/packages/fields/src/fields/parent/parent-edit.tsx b/packages/fields/src/fields/parent/parent-edit.tsx
+index cd79781e824019..4e865e5f150f6a 100644
+--- a/packages/fields/src/fields/parent/parent-edit.tsx
++++ b/packages/fields/src/fields/parent/parent-edit.tsx
+@@ -266,7 +266,6 @@ export function PageAttributesParent( {
+ 
+ 	return (
+ 		<ComboboxControl
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			label={ __( 'Parent' ) }
+ 			help={ __( 'Choose a parent page.' ) }

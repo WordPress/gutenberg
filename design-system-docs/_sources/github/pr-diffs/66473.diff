@@ -1,0 +1,90 @@
+diff --git a/docs/tool/manifest.js b/docs/tool/manifest.js
+index 3c1f0fee2090ff..2004fae84f7ccc 100644
+--- a/docs/tool/manifest.js
++++ b/docs/tool/manifest.js
+@@ -15,7 +15,7 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
+ 		'**/src/mobile/**/README.md',
+ 		'packages/components/src/theme/README.md',
+ 		'packages/components/src/view/README.md',
+-		'packages/components/src/dropdown-menu-v2/README.md',
++		'packages/components/src/menu/README.md',
+ 		'packages/components/src/tabs/README.md',
+ 		'packages/components/src/custom-select-control-v2/README.md',
+ 	],
+diff --git a/packages/components/src/dropdown-menu-v2/README.md b/packages/components/src/menu/README.md
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/README.md
+rename to packages/components/src/menu/README.md
+diff --git a/packages/components/src/dropdown-menu-v2/checkbox-item.tsx b/packages/components/src/menu/checkbox-item.tsx
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/checkbox-item.tsx
+rename to packages/components/src/menu/checkbox-item.tsx
+diff --git a/packages/components/src/dropdown-menu-v2/context.tsx b/packages/components/src/menu/context.tsx
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/context.tsx
+rename to packages/components/src/menu/context.tsx
+diff --git a/packages/components/src/dropdown-menu-v2/group-label.tsx b/packages/components/src/menu/group-label.tsx
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/group-label.tsx
+rename to packages/components/src/menu/group-label.tsx
+diff --git a/packages/components/src/dropdown-menu-v2/group.tsx b/packages/components/src/menu/group.tsx
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/group.tsx
+rename to packages/components/src/menu/group.tsx
+diff --git a/packages/components/src/dropdown-menu-v2/index.tsx b/packages/components/src/menu/index.tsx
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/index.tsx
+rename to packages/components/src/menu/index.tsx
+diff --git a/packages/components/src/dropdown-menu-v2/item-help-text.tsx b/packages/components/src/menu/item-help-text.tsx
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/item-help-text.tsx
+rename to packages/components/src/menu/item-help-text.tsx
+diff --git a/packages/components/src/dropdown-menu-v2/item-label.tsx b/packages/components/src/menu/item-label.tsx
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/item-label.tsx
+rename to packages/components/src/menu/item-label.tsx
+diff --git a/packages/components/src/dropdown-menu-v2/item.tsx b/packages/components/src/menu/item.tsx
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/item.tsx
+rename to packages/components/src/menu/item.tsx
+diff --git a/packages/components/src/dropdown-menu-v2/radio-item.tsx b/packages/components/src/menu/radio-item.tsx
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/radio-item.tsx
+rename to packages/components/src/menu/radio-item.tsx
+diff --git a/packages/components/src/dropdown-menu-v2/separator.tsx b/packages/components/src/menu/separator.tsx
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/separator.tsx
+rename to packages/components/src/menu/separator.tsx
+diff --git a/packages/components/src/dropdown-menu-v2/stories/index.story.tsx b/packages/components/src/menu/stories/index.story.tsx
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/stories/index.story.tsx
+rename to packages/components/src/menu/stories/index.story.tsx
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/menu/styles.ts
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/styles.ts
+rename to packages/components/src/menu/styles.ts
+diff --git a/packages/components/src/dropdown-menu-v2/test/index.tsx b/packages/components/src/menu/test/index.tsx
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/test/index.tsx
+rename to packages/components/src/menu/test/index.tsx
+diff --git a/packages/components/src/dropdown-menu-v2/types.ts b/packages/components/src/menu/types.ts
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/types.ts
+rename to packages/components/src/menu/types.ts
+diff --git a/packages/components/src/dropdown-menu-v2/use-temporary-focus-visible-fix.ts b/packages/components/src/menu/use-temporary-focus-visible-fix.ts
+similarity index 100%
+rename from packages/components/src/dropdown-menu-v2/use-temporary-focus-visible-fix.ts
+rename to packages/components/src/menu/use-temporary-focus-visible-fix.ts
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 51f820251b8d7c..6d28765c2f685e 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -3,7 +3,7 @@
+  */
+ import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
+ import { createPrivateSlotFill } from './slot-fill';
+-import { DropdownMenuV2 } from './dropdown-menu-v2';
++import { DropdownMenuV2 } from './menu';
+ import { ComponentsContext } from './context/context-system-provider';
+ import Theme from './theme';
+ import { Tabs } from './tabs';

@@ -1,0 +1,110 @@
+diff --git a/packages/components/src/tree-grid/test/__snapshots__/roving-tab-index-item.js.snap b/packages/components/src/tree-grid/test/__snapshots__/roving-tab-index-item.js.snap
+index 73aa1411cffc19..5e803bdd95c85f 100644
+--- a/packages/components/src/tree-grid/test/__snapshots__/roving-tab-index-item.js.snap
++++ b/packages/components/src/tree-grid/test/__snapshots__/roving-tab-index-item.js.snap
+@@ -1,25 +1,27 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`RovingTabIndexItem allows another component to be specified as the rendered component using the \`as\` prop 1`] = `
+-<button
+-  onFocus={[Function]}
+-/>
++<div>
++  <button />
++</div>
+ `;
+ 
+ exports[`RovingTabIndexItem allows children to be declared using a child render function as an alternative to \`as\` 1`] = `
+-<button
+-  className="my-button"
+-  onFocus={[Function]}
+->
+-  Click Me!
+-</button>
++<div>
++  <button
++    class="my-button"
++  >
++    Click Me!
++  </button>
++</div>
+ `;
+ 
+ exports[`RovingTabIndexItem forwards props to the \`as\` component 1`] = `
+-<button
+-  className="my-button"
+-  onFocus={[Function]}
+->
+-  Click Me!
+-</button>
++<div>
++  <button
++    class="my-button"
++  >
++    Click Me!
++  </button>
++</div>
+ `;
+diff --git a/packages/components/src/tree-grid/test/roving-tab-index-item.js b/packages/components/src/tree-grid/test/roving-tab-index-item.js
+index 74e071a71881e1..0f2c6bd58c7c60 100644
+--- a/packages/components/src/tree-grid/test/roving-tab-index-item.js
++++ b/packages/components/src/tree-grid/test/roving-tab-index-item.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import TestRenderer from 'react-test-renderer';
++import { render } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -21,23 +21,23 @@ const TestButton = forwardRef( ( { ...props }, ref ) => (
+ describe( 'RovingTabIndexItem', () => {
+ 	it( 'requires RovingTabIndex to be declared as a parent component somewhere in the component hierarchy', () => {
+ 		expect( () =>
+-			TestRenderer.create( <RovingTabIndexItem as={ TestButton } /> )
++			render( <RovingTabIndexItem as={ TestButton } /> )
+ 		).toThrow();
+ 		expect( console ).toHaveErrored();
+ 	} );
+ 
+ 	it( 'allows another component to be specified as the rendered component using the `as` prop', () => {
+-		const renderer = TestRenderer.create(
++		const { container } = render(
+ 			<RovingTabIndex>
+ 				<RovingTabIndexItem as={ TestButton } />
+ 			</RovingTabIndex>
+ 		);
+ 
+-		expect( renderer.toJSON() ).toMatchSnapshot();
++		expect( container ).toMatchSnapshot();
+ 	} );
+ 
+ 	it( 'forwards props to the `as` component', () => {
+-		const renderer = TestRenderer.create(
++		const { container } = render(
+ 			<RovingTabIndex>
+ 				<RovingTabIndexItem as={ TestButton } className="my-button">
+ 					Click Me!
+@@ -45,11 +45,11 @@ describe( 'RovingTabIndexItem', () => {
+ 			</RovingTabIndex>
+ 		);
+ 
+-		expect( renderer.toJSON() ).toMatchSnapshot();
++		expect( container ).toMatchSnapshot();
+ 	} );
+ 
+ 	it( 'allows children to be declared using a child render function as an alternative to `as`', () => {
+-		const renderer = TestRenderer.create(
++		const { container } = render(
+ 			<RovingTabIndex>
+ 				<RovingTabIndexItem>
+ 					{ ( props ) => (
+@@ -61,6 +61,6 @@ describe( 'RovingTabIndexItem', () => {
+ 			</RovingTabIndex>
+ 		);
+ 
+-		expect( renderer.toJSON() ).toMatchSnapshot();
++		expect( container ).toMatchSnapshot();
+ 	} );
+ } );

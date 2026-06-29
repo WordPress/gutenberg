@@ -1,0 +1,255 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 240d896fac6586..f4c36e987bcb1b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `NavigableContainer`: Convert to TypeScript ([#49377](https://github.com/WordPress/gutenberg/pull/49377)).
+ -   Move rich-text related types to the rich-text package ([#49651](https://github.com/WordPress/gutenberg/pull/49651)).
++-   `SlotFill`: simplified the implementation and removed unused code ([#50098](https://github.com/WordPress/gutenberg/pull/50098) and [#50133](https://github.com/WordPress/gutenberg/pull/50133))
+ 
+ ### Documentation
+ 
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/fill.js b/packages/components/src/slot-fill/bubbles-virtually/fill.js
+index d13359eed7fb52..c86f3d0765fabc 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/fill.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/fill.js
+@@ -30,7 +30,8 @@ function useForceUpdate() {
+ 
+ export default function Fill( { name, children } ) {
+ 	const { registerFill, unregisterFill, ...slot } = useSlot( name );
+-	const ref = useRef( { rerender: useForceUpdate() } );
++	const rerender = useForceUpdate();
++	const ref = useRef( { rerender } );
+ 
+ 	useEffect( () => {
+ 		// We register fills so we can keep track of their existence.
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+index 47c31f1906cfa4..9a00a90a7c8354 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+@@ -8,7 +8,7 @@ import { proxyMap } from 'valtio/utils';
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo, useCallback, useRef } from '@wordpress/element';
++import { useState } from '@wordpress/element';
+ import isShallowEqual from '@wordpress/is-shallow-equal';
+ 
+ /**
+@@ -16,13 +16,13 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
+  */
+ import SlotFillContext from './slot-fill-context';
+ 
+-function useSlotRegistry() {
+-	const slots = useRef( proxyMap() );
+-	const fills = useRef( proxyMap() );
++function createSlotRegistry() {
++	const slots = proxyMap();
++	const fills = proxyMap();
+ 
+-	const registerSlot = useCallback( ( name, ref, fillProps ) => {
+-		const slot = slots.current.get( name ) || {};
+-		slots.current.set(
++	function registerSlot( name, ref, fillProps ) {
++		const slot = slots.get( name ) || {};
++		slots.set(
+ 			name,
+ 			valRef( {
+ 				...slot,
+@@ -30,77 +30,63 @@ function useSlotRegistry() {
+ 				fillProps: fillProps || slot.fillProps || {},
+ 			} )
+ 		);
+-	}, [] );
++	}
+ 
+-	const unregisterSlot = useCallback( ( name, ref ) => {
++	function unregisterSlot( name, ref ) {
+ 		// Make sure we're not unregistering a slot registered by another element
+ 		// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
+-		if ( slots.current.get( name )?.ref === ref ) {
+-			slots.current.delete( name );
++		if ( slots.get( name )?.ref === ref ) {
++			slots.delete( name );
+ 		}
+-	}, [] );
++	}
+ 
+-	const updateSlot = useCallback( ( name, fillProps ) => {
+-		const slot = slots.current.get( name );
++	function updateSlot( name, fillProps ) {
++		const slot = slots.get( name );
+ 		if ( ! slot ) {
+ 			return;
+ 		}
+ 
+-		if ( ! isShallowEqual( slot.fillProps, fillProps ) ) {
+-			slot.fillProps = fillProps;
+-			const slotFills = fills.current.get( name );
+-			if ( slotFills ) {
+-				// Force update fills.
+-				slotFills.map( ( fill ) => fill.current.rerender() );
+-			}
++		if ( isShallowEqual( slot.fillProps, fillProps ) ) {
++			return;
+ 		}
+-	}, [] );
+ 
+-	const registerFill = useCallback( ( name, ref ) => {
+-		fills.current.set(
+-			name,
+-			valRef( [ ...( fills.current.get( name ) || [] ), ref ] )
+-		);
+-	}, [] );
++		slot.fillProps = fillProps;
++		const slotFills = fills.get( name );
++		if ( slotFills ) {
++			// Force update fills.
++			slotFills.map( ( fill ) => fill.current.rerender() );
++		}
++	}
++
++	function registerFill( name, ref ) {
++		fills.set( name, valRef( [ ...( fills.get( name ) || [] ), ref ] ) );
++	}
+ 
+-	const unregisterFill = useCallback( ( name, ref ) => {
+-		if ( fills.current.get( name ) ) {
+-			fills.current.set(
+-				name,
+-				valRef(
+-					fills.current
+-						.get( name )
+-						.filter( ( fillRef ) => fillRef !== ref )
+-				)
+-			);
++	function unregisterFill( name, ref ) {
++		const fillsForName = fills.get( name );
++		if ( ! fillsForName ) {
++			return;
+ 		}
+-	}, [] );
+ 
+-	// Memoizing the return value so it can be directly passed to Provider value
+-	const registry = useMemo(
+-		() => ( {
+-			slots: slots.current,
+-			fills: fills.current,
+-			registerSlot,
+-			updateSlot,
+-			unregisterSlot,
+-			registerFill,
+-			unregisterFill,
+-		} ),
+-		[
+-			registerSlot,
+-			updateSlot,
+-			unregisterSlot,
+-			registerFill,
+-			unregisterFill,
+-		]
+-	);
++		fills.set(
++			name,
++			valRef( fillsForName.filter( ( fillRef ) => fillRef !== ref ) )
++		);
++	}
+ 
+-	return registry;
++	return {
++		slots,
++		fills,
++		registerSlot,
++		updateSlot,
++		unregisterSlot,
++		registerFill,
++		unregisterFill,
++	};
+ }
+ 
+ export default function SlotFillProvider( { children } ) {
+-	const registry = useSlotRegistry();
++	const [ registry ] = useState( createSlotRegistry );
+ 	return (
+ 		<SlotFillContext.Provider value={ registry }>
+ 			{ children }
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/use-slot.js b/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
+index 8c5a0182ea0743..20b00c2cdf2649 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
+@@ -7,7 +7,7 @@ import { useSnapshot } from 'valtio';
+ /**
+  * WordPress dependencies
+  */
+-import { useCallback, useContext } from '@wordpress/element';
++import { useMemo, useContext } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -15,52 +15,25 @@ import { useCallback, useContext } from '@wordpress/element';
+ import SlotFillContext from './slot-fill-context';
+ 
+ export default function useSlot( name ) {
+-	const {
+-		updateSlot: registryUpdateSlot,
+-		unregisterSlot: registryUnregisterSlot,
+-		registerFill: registryRegisterFill,
+-		unregisterFill: registryUnregisterFill,
+-		...registry
+-	} = useContext( SlotFillContext );
++	const registry = useContext( SlotFillContext );
+ 	const slots = useSnapshot( registry.slots, { sync: true } );
+-	// The important bit here is that this call ensures
+-	// the hook only causes a re-render if the slot
+-	// with the given name change, not any other slot.
++	// The important bit here is that the `useSnapshot` call ensures that the
++	// hook only causes a re-render if the slot with the given name changes,
++	// not any other slot.
+ 	const slot = slots.get( name );
+ 
+-	const updateSlot = useCallback(
+-		( fillProps ) => {
+-			registryUpdateSlot( name, fillProps );
+-		},
+-		[ name, registryUpdateSlot ]
+-	);
+-
+-	const unregisterSlot = useCallback(
+-		( slotRef ) => {
+-			registryUnregisterSlot( name, slotRef );
+-		},
+-		[ name, registryUnregisterSlot ]
+-	);
+-
+-	const registerFill = useCallback(
+-		( fillRef ) => {
+-			registryRegisterFill( name, fillRef );
+-		},
+-		[ name, registryRegisterFill ]
+-	);
+-
+-	const unregisterFill = useCallback(
+-		( fillRef ) => {
+-			registryUnregisterFill( name, fillRef );
+-		},
+-		[ name, registryUnregisterFill ]
++	const api = useMemo(
++		() => ( {
++			updateSlot: ( fillProps ) => registry.updateSlot( name, fillProps ),
++			unregisterSlot: ( ref ) => registry.unregisterSlot( name, ref ),
++			registerFill: ( ref ) => registry.registerFill( name, ref ),
++			unregisterFill: ( ref ) => registry.unregisterFill( name, ref ),
++		} ),
++		[ name, registry ]
+ 	);
+ 
+ 	return {
+ 		...slot,
+-		updateSlot,
+-		unregisterSlot,
+-		registerFill,
+-		unregisterFill,
++		...api,
+ 	};
+ }

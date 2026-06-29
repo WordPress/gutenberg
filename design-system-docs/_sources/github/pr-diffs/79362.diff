@@ -1,0 +1,79 @@
+diff --git a/package-lock.json b/package-lock.json
+index cd8b086c5497fd..a49418dc1a8e1c 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -20122,6 +20122,20 @@
+ 				"@babel/core": "^7.4.0 || ^8.0.0-0 <8.0.0"
+ 			}
+ 		},
++		"node_modules/babel-plugin-transform-import-meta": {
++			"version": "2.3.3",
++			"resolved": "https://registry.npmjs.org/babel-plugin-transform-import-meta/-/babel-plugin-transform-import-meta-2.3.3.tgz",
++			"integrity": "sha512-bbh30qz1m6ZU1ybJoNOhA2zaDvmeXMnGNBMVMDOJ1Fni4+wMBoy/j7MTRVmqAUCIcy54/rEnr9VEBsfcgbpm3Q==",
++			"dev": true,
++			"license": "BSD-3-Clause",
++			"dependencies": {
++				"@babel/template": "^7.25.9",
++				"tslib": "^2.8.1"
++			},
++			"peerDependencies": {
++				"@babel/core": "^7.10.0"
++			}
++		},
+ 		"node_modules/babel-preset-current-node-syntax": {
+ 			"version": "1.0.1",
+ 			"resolved": "https://registry.npmjs.org/babel-preset-current-node-syntax/-/babel-preset-current-node-syntax-1.0.1.tgz",
+@@ -55027,6 +55041,7 @@
+ 				"@wordpress/jest-preset-default": "file:../../packages/jest-preset-default",
+ 				"@wordpress/scripts": "file:../../packages/scripts",
+ 				"babel-jest": "^29.7.0",
++				"babel-plugin-transform-import-meta": "^2.3.3",
+ 				"glob": "^7.1.2",
+ 				"jest": "^29.6.2",
+ 				"jest-environment-jsdom": "^30.2.0",
+diff --git a/packages/theme/src/test/theme-provider.test.tsx b/packages/theme/src/test/theme-provider.test.tsx
+index b1d0433279f126..e60a270f60ea99 100644
+--- a/packages/theme/src/test/theme-provider.test.tsx
++++ b/packages/theme/src/test/theme-provider.test.tsx
+@@ -146,7 +146,10 @@ describe( 'ThemeProvider', () => {
+ 			beforeAll( () => {
+ 				prebuiltStyle = document.createElement( 'style' );
+ 				prebuiltStyle.textContent = readFileSync(
+-					join( __dirname, '../prebuilt/css/design-tokens.css' ),
++					join(
++						import.meta.dirname,
++						'../prebuilt/css/design-tokens.css'
++					),
+ 					'utf8'
+ 				);
+ 				document.head.appendChild( prebuiltStyle );
+diff --git a/test/unit/package.json b/test/unit/package.json
+index ed1120c8204940..d8de644307d4d5 100644
+--- a/test/unit/package.json
++++ b/test/unit/package.json
+@@ -29,6 +29,7 @@
+ 		"@wordpress/jest-preset-default": "file:../../packages/jest-preset-default",
+ 		"@wordpress/scripts": "file:../../packages/scripts",
+ 		"babel-jest": "^29.7.0",
++		"babel-plugin-transform-import-meta": "^2.3.3",
+ 		"glob": "^7.1.2",
+ 		"jest": "^29.6.2",
+ 		"jest-environment-jsdom": "^30.2.0",
+diff --git a/test/unit/scripts/babel-transformer.js b/test/unit/scripts/babel-transformer.js
+index 8116811dcfde27..62a03bddb72a72 100644
+--- a/test/unit/scripts/babel-transformer.js
++++ b/test/unit/scripts/babel-transformer.js
+@@ -4,11 +4,9 @@
+ const fs = require( 'fs' );
+ const babelJest = require( 'babel-jest' );
+ 
+-// Remove this workaround when https://github.com/facebook/jest/issues/11444 gets resolved in Jest.
+-const babelJestInterop = babelJest.__esModule ? babelJest.default : babelJest;
+-
+-const babelJestTransformer = babelJestInterop.createTransformer( {
++const babelJestTransformer = babelJest.createTransformer( {
+ 	presets: [ require.resolve( '@wordpress/babel-preset-default' ) ],
++	plugins: [ require.resolve( 'babel-plugin-transform-import-meta' ) ],
+ } );
+ 
+ module.exports = {

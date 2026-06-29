@@ -1,0 +1,166 @@
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index d7e3af18148a46..f4a5958a2b3e94 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -31,7 +31,8 @@
+ ### Breaking Changes
+ 
+ - Fields with `Edit` defined or `type` will automatically be considered as filters unless `filterBy` is set to `false`.
+-- Add `renderItemLink` prop support in the `DataViews` component. It replaces `onClickItem`prop and allows integration with router libraries.
++- Add `renderItemLink` prop support in the `DataViews` component. It replaces `onClickItem` prop and allows integration with router libraries.
++- All action modals are wrapped in a `<Suspense>` component with an empty fallback.
+ 
+ ### Internal
+ 
+diff --git a/packages/dataviews/src/components/dataviews-item-actions/index.tsx b/packages/dataviews/src/components/dataviews-item-actions/index.tsx
+index 3554ac6a285886..7e0c93629d875a 100644
+--- a/packages/dataviews/src/components/dataviews-item-actions/index.tsx
++++ b/packages/dataviews/src/components/dataviews-item-actions/index.tsx
+@@ -13,7 +13,7 @@ import {
+ 	privateApis as componentsPrivateApis,
+ } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+-import { useMemo, useState } from '@wordpress/element';
++import { useMemo, useState, Suspense } from '@wordpress/element';
+ import { moreVertical } from '@wordpress/icons';
+ import { useRegistry } from '@wordpress/data';
+ 
+@@ -106,18 +106,20 @@ export function ActionModal< Item >( {
+ 	const label =
+ 		typeof action.label === 'string' ? action.label : action.label( items );
+ 	return (
+-		<Modal
+-			title={ action.modalHeader || label }
+-			__experimentalHideHeader={ !! action.hideModalHeader }
+-			onRequestClose={ closeModal }
+-			focusOnMount={ action.modalFocusOnMount ?? true }
+-			size={ action.modalSize || 'medium' }
+-			overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
+-				action.id
+-			) }` }
+-		>
+-			<action.RenderModal items={ items } closeModal={ closeModal } />
+-		</Modal>
++		<Suspense fallback={ null }>
++			<Modal
++				title={ action.modalHeader || label }
++				__experimentalHideHeader={ !! action.hideModalHeader }
++				onRequestClose={ closeModal }
++				focusOnMount={ action.modalFocusOnMount ?? true }
++				size={ action.modalSize || 'medium' }
++				overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
++					action.id
++				) }` }
++			>
++				<action.RenderModal items={ items } closeModal={ closeModal } />
++			</Modal>
++		</Suspense>
+ 	);
+ }
+ 
+diff --git a/packages/dataviews/src/test/dataviews.tsx b/packages/dataviews/src/test/dataviews.tsx
+index 58f46c2cd0f34f..044b866a192212 100644
+--- a/packages/dataviews/src/test/dataviews.tsx
++++ b/packages/dataviews/src/test/dataviews.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen } from '@testing-library/react';
++import { act, render, screen } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+ /**
+@@ -145,6 +145,28 @@ function DataViewWrapper( {
+ 	return <DataViews { ...dataViewProps } />;
+ }
+ 
++function createSuspender< T = number >() {
++	let resolve: ( value: T ) => void;
++	let resolvedValue = undefined as T | undefined;
++	const promise = new Promise( ( res ) => {
++		resolve = res;
++	} );
++
++	return {
++		read: () => {
++			if ( resolvedValue === undefined ) {
++				throw promise;
++			}
++			return resolvedValue;
++		},
++		resolve( value: T ) {
++			resolvedValue = value;
++			resolve( value );
++		},
++		promise,
++	};
++}
++
+ // jest.useFakeTimers();
+ 
+ describe( 'DataViews component', () => {
+@@ -256,6 +278,50 @@ describe( 'DataViews component', () => {
+ 			expect( screen.getByText( 'Actions' ) ).toBeInTheDocument();
+ 		} );
+ 
++		it( 'hides action modal during loading', async () => {
++			const suspender = createSuspender();
++
++			render(
++				<DataViewWrapper
++					actions={ [
++						{
++							id: 'lazy-action',
++							label: 'Lazy action',
++							RenderModal: () => {
++								const value = suspender.read();
++								return <div>Resolved: { value }</div>;
++							},
++							modalHeader: 'Modal header',
++						},
++					] }
++				/>
++			);
++
++			const user = userEvent.setup();
++			await user.click(
++				screen.getAllByRole( 'button', {
++					name: 'Actions',
++				} )[ 0 ] // Clicks the first action button in the table
++			);
++			await user.click(
++				screen.getByRole( 'menuitem', {
++					name: 'Lazy action',
++				} )
++			);
++
++			expect(
++				screen.queryByText( 'Modal header' )
++			).not.toBeInTheDocument();
++
++			await act( async () => {
++				suspender.resolve( 113 );
++				await suspender.promise;
++			} );
++
++			expect( screen.getByText( 'Modal header' ) ).toBeInTheDocument();
++			expect( screen.getByText( 'Resolved: 113' ) ).toBeInTheDocument();
++		} );
++
+ 		it( 'should trigger the onClickItem callback if isItemClickable returns true and title field is clicked', async () => {
+ 			const onClickItemCallback = jest.fn();
+ 
+diff --git a/packages/dataviews/src/types.ts b/packages/dataviews/src/types.ts
+index 35fedacaf66e81..4342a986de2500 100644
+--- a/packages/dataviews/src/types.ts
++++ b/packages/dataviews/src/types.ts
+@@ -543,6 +543,8 @@ export interface RenderModalProps< Item > {
+ export interface ActionModal< Item > extends ActionBase< Item > {
+ 	/**
+ 	 * Modal to render when the action is triggered.
++	 * The modal will be wrapped in a <Suspense> and the default fallback
++	 * behavior is to render nothing until the modal is ready.
+ 	 */
+ 	RenderModal: ( {
+ 		items,

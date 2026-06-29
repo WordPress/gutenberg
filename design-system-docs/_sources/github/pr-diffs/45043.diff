@@ -1,0 +1,80 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1ff727b29145db..a6b1fff372a940 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -49,6 +49,7 @@
+ -   `Sandbox`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44378](https://github.com/WordPress/gutenberg/pull/44378))
+ -   `FontSizePicker`: Convert to TypeScript ([#44449](https://github.com/WordPress/gutenberg/pull/44449)).
+ -   `FontSizePicker`: Replace SCSS with Emotion + components ([#44483](https://github.com/WordPress/gutenberg/pull/44483)).
++-   `Tooltip`: updated to ignore `react/exhaustive-deps` eslint rule ([#45043](https://github.com/WordPress/gutenberg/pull/45043))
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index c4b8a5ea6c147c..491c7a76a97cda 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -228,6 +228,9 @@ function Tooltip( props ) {
+ 		document.removeEventListener( 'mouseup', cancelIsMouseDown );
+ 	};
+ 
++	// Ignore reason: updating the deps array here could cause unexpected changes in behavior.
++	// Deferring until a more detailed investigation/refactor can be performed.
++	// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	useEffect( () => clearOnUnmount, [] );
+ 
+ 	if ( Children.count( children ) !== 1 ) {
+diff --git a/packages/components/src/tooltip/index.native.js b/packages/components/src/tooltip/index.native.js
+index 4fd8de0814e66f..61b08c052dfacc 100644
+--- a/packages/components/src/tooltip/index.native.js
++++ b/packages/components/src/tooltip/index.native.js
+@@ -62,6 +62,9 @@ const useKeyboardVisibility = () => {
+ 			showListener.remove();
+ 			hideListener.remove();
+ 		};
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ 
+ 	return keyboardVisible;
+@@ -102,6 +105,9 @@ const Tooltip = ( {
+ 			} );
+ 		}
+ 		return () => onHandleScreenTouch( null );
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ visible ] );
+ 
+ 	// Manage visibility animation.
+@@ -115,6 +121,9 @@ const Tooltip = ( {
+ 			setAnimating( true );
+ 			startAnimation();
+ 		}
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ visible ] );
+ 
+ 	// Manage tooltip visibility and position in relation to keyboard.
+@@ -133,6 +142,9 @@ const Tooltip = ( {
+ 			setAnimating( true );
+ 			setVisible( false );
+ 		}
++		// Disable reason: deferring this refactor to the native team.
++		// see https://github.com/WordPress/gutenberg/pull/41166
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ visible, keyboardVisible ] );
+ 
+ 	// Manage tooltip position during keyboard frame changes.
+@@ -261,6 +273,9 @@ const TooltipSlot = ( { children, ...rest } ) => {
+ 		setHandleScreenTouch( null );
+ 	};
+ 	// Memoize context value to avoid unnecessary rerenders of the Provider's children
++	// Disable reason: deferring this refactor to the native team.
++	// see https://github.com/WordPress/gutenberg/pull/41166
++	// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	const value = useMemo( () => ( { onHandleScreenTouch } ) );
+ 
+ 	return (

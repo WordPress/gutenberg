@@ -1,0 +1,204 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 93b191bff269d6..396f441f6dd307 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Deprecations
+ 
+ -   `Radio`: Deprecate 36px default size ([#66572](https://github.com/WordPress/gutenberg/pull/66572)).
++-   `DimensionControl`: Deprecate 36px default size ([#66705](https://github.com/WordPress/gutenberg/pull/66705)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/dimension-control/README.md b/packages/components/src/dimension-control/README.md
+index 78c1a60275c13a..fd04d99ca4ca93 100644
+--- a/packages/components/src/dimension-control/README.md
++++ b/packages/components/src/dimension-control/README.md
+@@ -22,6 +22,7 @@ export default function MyCustomDimensionControl() {
+ 	return (
+ 		<DimensionControl
+ 			__nextHasNoMarginBottom
++			__next40pxDefaultSize
+ 			label={ 'Padding' }
+ 			icon={ 'desktop' }
+ 			onChange={ ( value ) => setPaddingSize( value ) }
+diff --git a/packages/components/src/dimension-control/index.tsx b/packages/components/src/dimension-control/index.tsx
+index 25880f9b4fdb38..2cc39379ebde0c 100644
+--- a/packages/components/src/dimension-control/index.tsx
++++ b/packages/components/src/dimension-control/index.tsx
+@@ -18,6 +18,7 @@ import type { DimensionControlProps, Size } from './types';
+ import type { SelectControlSingleSelectionProps } from '../select-control/types';
+ import { ContextSystemProvider } from '../context';
+ import deprecated from '@wordpress/deprecated';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ const CONTEXT_VALUE = {
+ 	BaseControl: {
+@@ -41,6 +42,7 @@ const CONTEXT_VALUE = {
+  *
+  * 	return (
+  * 		<DimensionControl
++ * 			__next40pxDefaultSize
+  * 			__nextHasNoMarginBottom
+  * 			label={ 'Padding' }
+  * 			icon={ 'desktop' }
+@@ -68,6 +70,12 @@ export function DimensionControl( props: DimensionControlProps ) {
+ 		version: '7.0',
+ 	} );
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'DimensionControl',
++		__next40pxDefaultSize,
++		size: undefined,
++	} );
++
+ 	const onChangeSpacingSize: SelectControlSingleSelectionProps[ 'onChange' ] =
+ 		( val ) => {
+ 			const theSize = findSizeBySlug( sizes, val );
+diff --git a/packages/components/src/dimension-control/stories/index.story.tsx b/packages/components/src/dimension-control/stories/index.story.tsx
+index 15a63fcf6ccf6c..61fd0aae4ee768 100644
+--- a/packages/components/src/dimension-control/stories/index.story.tsx
++++ b/packages/components/src/dimension-control/stories/index.story.tsx
+@@ -50,6 +50,7 @@ const Template: StoryFn< typeof DimensionControl > = ( args ) => (
+ export const Default = Template.bind( {} );
+ Default.args = {
+ 	__nextHasNoMarginBottom: true,
++	__next40pxDefaultSize: true,
+ 	label: 'Please select a size',
+ 	sizes,
+ };
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index bd2c26d641fe72..fd6cc2df3fcde7 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -126,12 +126,12 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   font-size: 16px;
+-  height: 32px;
+-  min-height: 32px;
++  height: 40px;
++  min-height: 40px;
+   padding-top: 0;
+   padding-bottom: 0;
+-  padding-left: 8px;
+-  padding-right: 26px;
++  padding-left: 12px;
++  padding-right: 30px;
+   overflow: hidden;
+ }
+ 
+@@ -157,8 +157,8 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+ }
+ 
+ .emotion-21 {
+-  -webkit-padding-end: 8px;
+-  padding-inline-end: 8px;
++  -webkit-padding-end: 12px;
++  padding-inline-end: 12px;
+   position: absolute;
+   pointer-events: none;
+   right: 0;
+@@ -408,12 +408,12 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   font-size: 16px;
+-  height: 32px;
+-  min-height: 32px;
++  height: 40px;
++  min-height: 40px;
+   padding-top: 0;
+   padding-bottom: 0;
+-  padding-left: 8px;
+-  padding-right: 26px;
++  padding-left: 12px;
++  padding-right: 30px;
+   overflow: hidden;
+ }
+ 
+@@ -439,8 +439,8 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+ }
+ 
+ .emotion-21 {
+-  -webkit-padding-end: 8px;
+-  padding-inline-end: 8px;
++  -webkit-padding-end: 12px;
++  padding-inline-end: 12px;
+   position: absolute;
+   pointer-events: none;
+   right: 0;
+@@ -700,12 +700,12 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   font-size: 16px;
+-  height: 32px;
+-  min-height: 32px;
++  height: 40px;
++  min-height: 40px;
+   padding-top: 0;
+   padding-bottom: 0;
+-  padding-left: 8px;
+-  padding-right: 26px;
++  padding-left: 12px;
++  padding-right: 30px;
+   overflow: hidden;
+ }
+ 
+@@ -731,8 +731,8 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+ }
+ 
+ .emotion-21 {
+-  -webkit-padding-end: 8px;
+-  padding-inline-end: 8px;
++  -webkit-padding-end: 12px;
++  padding-inline-end: 12px;
+   position: absolute;
+   pointer-events: none;
+   right: 0;
+@@ -1004,12 +1004,12 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   font-size: 16px;
+-  height: 32px;
+-  min-height: 32px;
++  height: 40px;
++  min-height: 40px;
+   padding-top: 0;
+   padding-bottom: 0;
+-  padding-left: 8px;
+-  padding-right: 26px;
++  padding-left: 12px;
++  padding-right: 30px;
+   overflow: hidden;
+ }
+ 
+@@ -1035,8 +1035,8 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+ }
+ 
+ .emotion-21 {
+-  -webkit-padding-end: 8px;
+-  padding-inline-end: 8px;
++  -webkit-padding-end: 12px;
++  padding-inline-end: 12px;
+   position: absolute;
+   pointer-events: none;
+   right: 0;
+diff --git a/packages/components/src/dimension-control/test/index.test.js b/packages/components/src/dimension-control/test/index.test.js
+index 14f1c509f70cf9..8f3cb7ea944cd1 100644
+--- a/packages/components/src/dimension-control/test/index.test.js
++++ b/packages/components/src/dimension-control/test/index.test.js
+@@ -15,7 +15,13 @@ import { plus } from '@wordpress/icons';
+ import { DimensionControl as _DimensionControl } from '../';
+ 
+ const DimensionControl = ( props ) => {
+-	return <_DimensionControl { ...props } __nextHasNoMarginBottom />;
++	return (
++		<_DimensionControl
++			{ ...props }
++			__next40pxDefaultSize
++			__nextHasNoMarginBottom
++		/>
++	);
+ };
+ 
+ describe( 'DimensionControl', () => {

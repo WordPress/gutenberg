@@ -1,0 +1,625 @@
+diff --git a/packages/components/src/card/stories/_index.js b/packages/components/src/card/stories/_index.js
+deleted file mode 100644
+index be87a44e6d6a78..00000000000000
+--- a/packages/components/src/card/stories/_index.js
++++ /dev/null
+@@ -1,37 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { text, boolean } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Card, CardBody, CardFooter, CardHeader } from '../';
+-import { getCardStoryProps } from './_utils';
+-
+-export default { title: 'Components/Card', component: Card };
+-
+-export const _default = () => {
+-	const props = getCardStoryProps();
+-
+-	const body = text( 'Body: children', 'Code is Poetry' );
+-	const isBodyShady = boolean( 'Body: isShady', false );
+-
+-	const header = text( 'Header: children', 'Header' );
+-	const isHeaderShady = boolean( 'Header: isShady', false );
+-
+-	const footer = text( 'Footer: children', 'Footer' );
+-	const isFooterShady = boolean( 'Footer: isShady', false );
+-
+-	return (
+-		<Card { ...props }>
+-			{ header && (
+-				<CardHeader isShady={ isHeaderShady }>{ header }</CardHeader>
+-			) }
+-			{ body && <CardBody isShady={ isBodyShady }>{ body }</CardBody> }
+-			{ footer && (
+-				<CardFooter isShady={ isFooterShady }>{ footer }</CardFooter>
+-			) }
+-		</Card>
+-	);
+-};
+diff --git a/packages/components/src/card/stories/_utils.js b/packages/components/src/card/stories/_utils.js
+deleted file mode 100644
+index b65b511f5ae205..00000000000000
+--- a/packages/components/src/card/stories/_utils.js
++++ /dev/null
+@@ -1,50 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, select } from '@storybook/addon-knobs';
+-
+-export const getCardProps = ( props = {} ) => {
+-	const { size } = props;
+-
+-	return {
+-		isBorderless: boolean( 'Card: isBorderless', false ),
+-		isElevated: boolean( 'Card: isElevated', false ),
+-		size: select(
+-			'Card: size',
+-			{
+-				large: 'large',
+-				medium: 'medium',
+-				small: 'small',
+-				extraSmall: 'extraSmall',
+-			},
+-			size || 'medium'
+-		),
+-	};
+-};
+-
+-export const getCardStyleProps = ( props = {} ) => {
+-	const width = select(
+-		'Example: Width',
+-		{
+-			'640px': 640,
+-			'360px': 360,
+-			'240px': 240,
+-			'50%': '50%',
+-			'100%': '100%',
+-		},
+-		props.width || '360px'
+-	);
+-
+-	return {
+-		style: {
+-			width,
+-		},
+-	};
+-};
+-
+-export const getCardStoryProps = () => {
+-	return {
+-		...getCardStyleProps(),
+-		...getCardProps(),
+-	};
+-};
+diff --git a/packages/components/src/card/stories/body.js b/packages/components/src/card/stories/body.js
+deleted file mode 100644
+index e67ac663bd50a8..00000000000000
+--- a/packages/components/src/card/stories/body.js
++++ /dev/null
+@@ -1,24 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, text } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Card, CardBody } from '../';
+-import { getCardStoryProps } from './_utils';
+-
+-export default { title: 'Components/Card/Body', component: CardBody };
+-
+-export const _default = () => {
+-	const props = getCardStoryProps();
+-	const content = text( 'Body: children', 'Content' );
+-	const isShady = boolean( 'Body: isShady', false );
+-
+-	return (
+-		<Card { ...props }>
+-			<CardBody isShady={ isShady }>{ content }</CardBody>
+-		</Card>
+-	);
+-};
+diff --git a/packages/components/src/card/stories/divider.js b/packages/components/src/card/stories/divider.js
+deleted file mode 100644
+index a6eda85335f19e..00000000000000
+--- a/packages/components/src/card/stories/divider.js
++++ /dev/null
+@@ -1,19 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { Card, CardBody, CardDivider } from '../';
+-import { getCardStoryProps } from './_utils';
+-
+-export default { title: 'Components/Card/Divider', component: CardDivider };
+-
+-export const _default = () => {
+-	const props = getCardStoryProps();
+-
+-	return (
+-		<Card { ...props }>
+-			<CardBody>...</CardBody>
+-			<CardDivider />
+-			<CardBody>...</CardBody>
+-		</Card>
+-	);
+-};
+diff --git a/packages/components/src/card/stories/footer.js b/packages/components/src/card/stories/footer.js
+deleted file mode 100644
+index e33bc6acd02ca5..00000000000000
+--- a/packages/components/src/card/stories/footer.js
++++ /dev/null
+@@ -1,43 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, text } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Card, CardFooter } from '../';
+-import Button from '../../button';
+-import { FlexBlock, FlexItem } from '../../flex';
+-import { getCardStoryProps } from './_utils';
+-
+-export default { title: 'Components/Card/Footer', component: CardFooter };
+-
+-export const _default = () => {
+-	const props = getCardStoryProps();
+-	const content = text( 'Footer: children', 'Content' );
+-	const isShady = boolean( 'Footer: isShady', false );
+-
+-	return (
+-		<Card { ...props }>
+-			<CardFooter isShady={ isShady }>{ content }</CardFooter>
+-		</Card>
+-	);
+-};
+-
+-export const alignment = () => {
+-	const props = getCardStoryProps();
+-	const content = text( 'Footer: children', 'Content' );
+-	const isShady = boolean( 'Footer: isShady', false );
+-
+-	return (
+-		<Card { ...props }>
+-			<CardFooter isShady={ isShady }>
+-				<FlexBlock>{ content }</FlexBlock>
+-				<FlexItem>
+-					<Button variant="primary">Action</Button>
+-				</FlexItem>
+-			</CardFooter>
+-		</Card>
+-	);
+-};
+diff --git a/packages/components/src/card/stories/header.js b/packages/components/src/card/stories/header.js
+deleted file mode 100644
+index 67a413a6db94bf..00000000000000
+--- a/packages/components/src/card/stories/header.js
++++ /dev/null
+@@ -1,43 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, text } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Card, CardHeader } from '../';
+-import Button from '../../button';
+-import { FlexBlock, FlexItem } from '../../flex';
+-import { getCardStoryProps } from './_utils';
+-
+-export default { title: 'Components/Card/Header', component: CardHeader };
+-
+-export const _default = () => {
+-	const props = getCardStoryProps();
+-	const content = text( 'Header: children', 'Content' );
+-	const isShady = boolean( 'Header: isShady', false );
+-
+-	return (
+-		<Card { ...props }>
+-			<CardHeader isShady={ isShady }>{ content }</CardHeader>
+-		</Card>
+-	);
+-};
+-
+-export const alignment = () => {
+-	const props = getCardStoryProps();
+-	const content = text( 'Header: children', 'Content' );
+-	const isShady = boolean( 'Header: isShady', false );
+-
+-	return (
+-		<Card { ...props }>
+-			<CardHeader isShady={ isShady }>
+-				<FlexBlock>{ content }</FlexBlock>
+-				<FlexItem>
+-					<Button variant="primary">Action</Button>
+-				</FlexItem>
+-			</CardHeader>
+-		</Card>
+-	);
+-};
+diff --git a/packages/components/src/card/stories/index.js b/packages/components/src/card/stories/index.js
+new file mode 100644
+index 00000000000000..8bf66a57feaec5
+--- /dev/null
++++ b/packages/components/src/card/stories/index.js
+@@ -0,0 +1,201 @@
++/**
++ * External dependencies
++ */
++import { boolean, select, number } from '@storybook/addon-knobs';
++
++/**
++ * Internal dependencies
++ */
++import {
++	Card,
++	CardHeader,
++	CardBody,
++	CardDivider,
++	CardMedia,
++	CardFooter,
++} from '../index';
++import { Text } from '../../text';
++import { Heading } from '../../heading';
++import Button from '../../button';
++
++export default {
++	component: Card,
++	title: 'Components/Card',
++};
++
++const KNOBS_GROUPS = {
++	Card: 'Card',
++	CardBody: 'CardBody',
++	CardHeader: 'CardHeader',
++	CardFooter: 'CardFooter',
++};
++
++// Using `unset` instead of `undefined` as Storybook seems to sometimes pass an
++// empty string instead of `undefined`, which is not ideal.
++// https://github.com/storybookjs/storybook/issues/800
++const PROP_UNSET = 'unset';
++
++export const _default = () => {
++	const cardProps = {
++		isBorderless: boolean( 'Card: isBorderless', false, KNOBS_GROUPS.Card ),
++		isRounded: boolean( 'Card: isRounded', true, KNOBS_GROUPS.Card ),
++		elevation: number( 'Card: elevation', 0, {}, KNOBS_GROUPS.Card ),
++		size: select(
++			'Card: size',
++			{
++				large: 'large',
++				medium: 'medium',
++				small: 'small',
++				xSmall: 'xSmall',
++			},
++			'medium',
++			KNOBS_GROUPS.Card
++		),
++		style: {
++			width: select(
++				'Card: width (via inline styles)',
++				{
++					'640px': 640,
++					'360px': 360,
++					'240px': 240,
++					'50%': '50%',
++					'100%': '100%',
++				},
++				360,
++				KNOBS_GROUPS.Card
++			),
++		},
++	};
++
++	const cardHeaderProps = {
++		isBorderless: select(
++			'CardHeader: isBorderless',
++			{
++				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
++				true: true,
++				false: false,
++			},
++			PROP_UNSET,
++			KNOBS_GROUPS.CardHeader
++		),
++		isShady: boolean(
++			'CardHeader: isShady',
++			false,
++			KNOBS_GROUPS.CardHeader
++		),
++		size: select(
++			'CardHeader: size',
++			{
++				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
++				large: 'large',
++				medium: 'medium',
++				small: 'small',
++				xSmall: 'xSmall',
++			},
++			PROP_UNSET,
++			KNOBS_GROUPS.CardHeader
++		),
++	};
++
++	const cardBodyProps = {
++		isShady: boolean( 'CardBody: isShady', false, KNOBS_GROUPS.CardBody ),
++		size: select(
++			'CardBody: size',
++			{
++				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
++				large: 'large',
++				medium: 'medium',
++				small: 'small',
++				xSmall: 'xSmall',
++			},
++			PROP_UNSET,
++			KNOBS_GROUPS.CardBody
++		),
++	};
++
++	const cardFooterProps = {
++		isBorderless: select(
++			'CardFooter: isBorderless',
++			{
++				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
++				true: true,
++				false: false,
++			},
++			PROP_UNSET,
++			KNOBS_GROUPS.CardFooter
++		),
++		isShady: boolean(
++			'CardFooter: isShady',
++			false,
++			KNOBS_GROUPS.CardFooter
++		),
++		justify: select(
++			'CardFooter: justify',
++			{
++				flexStart: 'flex-start',
++				flexEnd: 'flex-end',
++				center: 'center',
++				spaceAround: 'space-around',
++				spaceBetween: 'space-between',
++				spaceEvenly: 'space-evenly',
++			},
++			'space-between',
++			KNOBS_GROUPS.CardFooter
++		),
++		size: select(
++			'CardFooter: size',
++			{
++				'unset (defaults to the value set on the <Card> parent)': PROP_UNSET,
++				large: 'large',
++				medium: 'medium',
++				small: 'small',
++				xSmall: 'xSmall',
++			},
++			PROP_UNSET,
++			KNOBS_GROUPS.CardFooter
++		),
++	};
++
++	// Do not pass the `size` and `isBorderless` props when their value is `undefined`.
++	// This allows the `CardHeader`, `CardBody` and `CardFooter` components to use
++	// the values that are set on the parent `Card` component by default.
++	for ( const componentProps of [
++		cardHeaderProps,
++		cardFooterProps,
++		cardBodyProps,
++	] ) {
++		for ( const prop of [ 'isBorderless', 'size' ] ) {
++			if ( componentProps[ prop ] === PROP_UNSET ) {
++				delete componentProps[ prop ];
++			}
++		}
++	}
++
++	return (
++		<Card { ...cardProps }>
++			<CardHeader { ...cardHeaderProps }>
++				<Heading>CardHeader</Heading>
++			</CardHeader>
++			<CardBody { ...cardBodyProps }>
++				<Text>CardBody</Text>
++			</CardBody>
++			<CardBody { ...cardBodyProps }>
++				<Text>CardBody (before CardDivider)</Text>
++			</CardBody>
++			<CardDivider />
++			<CardBody { ...cardBodyProps }>
++				<Text>CardBody (after CardDivider)</Text>
++			</CardBody>
++			<CardMedia>
++				<img
++					alt="Card Media"
++					src="https://images.unsplash.com/photo-1566125882500-87e10f726cdc?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1867&q=80"
++				/>
++			</CardMedia>
++			<CardFooter { ...cardFooterProps }>
++				<Text>CardFooter</Text>
++				<Button variant="secondary">Action Button</Button>
++			</CardFooter>
++		</Card>
++	);
++};
+diff --git a/packages/components/src/card/stories/media.js b/packages/components/src/card/stories/media.js
+deleted file mode 100644
+index db7597d9c6b571..00000000000000
+--- a/packages/components/src/card/stories/media.js
++++ /dev/null
+@@ -1,160 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, number, select, text } from '@storybook/addon-knobs';
+-import styled from '@emotion/styled';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Card, CardBody, CardFooter, CardHeader, CardMedia } from '../';
+-import { getCardStoryProps } from './_utils';
+-
+-export default { title: 'Components/Card/Media', component: CardMedia };
+-
+-const DummyImage = () => (
+-	<img
+-		src="https://images.unsplash.com/photo-1570776765652-4ce2a88cc1f9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
+-		alt="SMELLING MARSHMELLOW ICECREAM CONE"
+-	/>
+-);
+-
+-export const _default = () => {
+-	const mediaOnTop = boolean( 'Example: On Top', true );
+-	const props = getCardStoryProps();
+-
+-	const showTopContent = ! mediaOnTop;
+-	const showBottomContent = ! showTopContent;
+-	const content = text( 'Body: children', 'Content' );
+-
+-	return (
+-		<Card { ...props }>
+-			{ showTopContent && <CardBody>{ content }</CardBody> }
+-			<CardMedia>
+-				<DummyImage />
+-			</CardMedia>
+-			{ showBottomContent && <CardBody>{ content }</CardBody> }
+-		</Card>
+-	);
+-};
+-
+-export const onTop = () => {
+-	const props = getCardStoryProps();
+-
+-	return (
+-		<Card { ...props }>
+-			<CardMedia>
+-				<DummyImage />
+-			</CardMedia>
+-			<CardBody>
+-				<div>Content</div>
+-			</CardBody>
+-		</Card>
+-	);
+-};
+-
+-export const onBottom = () => {
+-	const props = getCardStoryProps();
+-
+-	return (
+-		<Card { ...props }>
+-			<CardBody>Content</CardBody>
+-			<CardMedia>
+-				<DummyImage />
+-			</CardMedia>
+-		</Card>
+-	);
+-};
+-
+-export const headerAndFooter = () => {
+-	const props = getCardStoryProps();
+-
+-	return (
+-		<Card { ...props }>
+-			<CardHeader>Header Content</CardHeader>
+-			<CardMedia>
+-				<DummyImage />
+-			</CardMedia>
+-			<CardFooter isShady>Caption</CardFooter>
+-		</Card>
+-	);
+-};
+-
+-export const iframeEmbed = () => {
+-	const props = getCardStoryProps();
+-
+-	return (
+-		<Card { ...props }>
+-			<CardHeader>Header Content</CardHeader>
+-			<CardMedia>
+-				<iframe
+-					width="560"
+-					height="315"
+-					src="https://www.youtube.com/embed/zGP6zk7jcrQ"
+-					frameBorder="0"
+-					allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+-					allowFullScreen
+-					title="Corgi"
+-				></iframe>
+-			</CardMedia>
+-		</Card>
+-	);
+-};
+-
+-/**
+- * Referring to other styled components:
+- * https://www.styled-components.com/docs/advanced#referring-to-other-components
+- * https://www.styled-components.com/docs/advanced#caveat
+- */
+-const StyledCardMedia = styled( CardMedia )( '' );
+-const StyledCardBody = styled( CardBody )( '' );
+-
+-const HorizontallyAlignedCard = styled( Card )`
+-	display: flex;
+-
+-	&.is-right {
+-		flex-direction: row-reverse;
+-	}
+-
+-	${ StyledCardBody } {
+-		flex: 1;
+-	}
+-
+-	${ StyledCardMedia } {
+-		&.is-left {
+-			border-radius: 3px 0 0 3px;
+-		}
+-		&.is-right {
+-			border-radius: 0 3px 3px 0;
+-		}
+-	}
+-`;
+-
+-export const horizontallyAligned = () => {
+-	const align = select(
+-		'Example: Align',
+-		{
+-			left: 'left',
+-			right: 'right',
+-		},
+-		'left'
+-	);
+-	const maxWidth = number( 'Example: Media Width', 200 );
+-	const content = text( 'Body: children', 'Content' );
+-	const classes = `is-${ align }`;
+-
+-	return (
+-		<>
+-			<p>
+-				Note: This story demonstrates how this UI may be created. It
+-				requires extra styling.
+-			</p>
+-			<HorizontallyAlignedCard className={ classes }>
+-				<StyledCardMedia className={ classes } style={ { maxWidth } }>
+-					<DummyImage />
+-				</StyledCardMedia>
+-				<StyledCardBody>{ content }</StyledCardBody>
+-			</HorizontallyAlignedCard>
+-		</>
+-	);
+-};

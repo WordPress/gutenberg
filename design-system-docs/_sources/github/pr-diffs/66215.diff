@@ -1,0 +1,113 @@
+diff --git a/packages/block-editor/src/components/block-inspector/style.scss b/packages/block-editor/src/components/block-inspector/style.scss
+index 92a9a0dd03ab35..e04dfd8e9a480a 100644
+--- a/packages/block-editor/src/components/block-inspector/style.scss
++++ b/packages/block-editor/src/components/block-inspector/style.scss
+@@ -46,9 +46,3 @@
+ .block-editor-block-inspector__no-block-tools {
+ 	border-top: $border-width solid $gray-300;
+ }
+-
+-.block-editor-block-inspector__tab-item {
+-	flex: 1 1 0px;
+-	display: flex;
+-	justify-content: center;
+-}
+diff --git a/packages/block-editor/src/components/inspector-controls-tabs/index.js b/packages/block-editor/src/components/inspector-controls-tabs/index.js
+index c8d9536aeb9caf..12465df0ca467c 100644
+--- a/packages/block-editor/src/components/inspector-controls-tabs/index.js
++++ b/packages/block-editor/src/components/inspector-controls-tabs/index.js
+@@ -46,18 +46,13 @@ export default function InspectorControlsTabs( {
+ 				<Tabs.TabList>
+ 					{ tabs.map( ( tab ) =>
+ 						showIconLabels ? (
+-							<Tabs.Tab
+-								key={ tab.name }
+-								tabId={ tab.name }
+-								className={ tab.className }
+-							>
++							<Tabs.Tab key={ tab.name } tabId={ tab.name }>
+ 								{ tab.title }
+ 							</Tabs.Tab>
+ 						) : (
+ 							<Tooltip text={ tab.title } key={ tab.name }>
+ 								<Tabs.Tab
+ 									tabId={ tab.name }
+-									className={ tab.className }
+ 									aria-label={ tab.title }
+ 								>
+ 									<Icon icon={ tab.icon } />
+diff --git a/packages/block-editor/src/components/inspector-controls-tabs/utils.js b/packages/block-editor/src/components/inspector-controls-tabs/utils.js
+index b70eb25e274a9b..ff05e79cbd37cc 100644
+--- a/packages/block-editor/src/components/inspector-controls-tabs/utils.js
++++ b/packages/block-editor/src/components/inspector-controls-tabs/utils.js
+@@ -9,7 +9,6 @@ export const TAB_SETTINGS = {
+ 	title: __( 'Settings' ),
+ 	value: 'settings',
+ 	icon: cog,
+-	className: 'block-editor-block-inspector__tab-item',
+ };
+ 
+ export const TAB_STYLES = {
+@@ -17,7 +16,6 @@ export const TAB_STYLES = {
+ 	title: __( 'Styles' ),
+ 	value: 'styles',
+ 	icon: styles,
+-	className: 'block-editor-block-inspector__tab-item',
+ };
+ 
+ export const TAB_LIST_VIEW = {
+@@ -25,5 +23,4 @@ export const TAB_LIST_VIEW = {
+ 	title: __( 'List View' ),
+ 	value: 'list-view',
+ 	icon: listView,
+-	className: 'block-editor-block-inspector__tab-item',
+ };
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 53ff933848338c..bd96eed8762b37 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Tabs`: restore vertical alignent for tabs content ([#66215](https://github.com/WordPress/gutenberg/pull/66215)).
+ -   `Tabs`: fix indicator animation ([#66198](https://github.com/WordPress/gutenberg/pull/66198)).
+ -   `ColorPalette`: prevent overflow of custom color button background ([#66152](https://github.com/WordPress/gutenberg/pull/66152)).
+ -   `RadioGroup`: Fix arrow key navigation in RTL ([#66202](https://github.com/WordPress/gutenberg/pull/66202)).
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index 36e0ed6f6b0147..717316227ddb3c 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -207,7 +207,6 @@ export const Tab = styled( Ariakit.Tab )`
+ 	[aria-orientation='horizontal'] & {
+ 		padding-inline: ${ space( 4 ) };
+ 		height: ${ space( 12 ) };
+-		text-align: center;
+ 		scroll-margin: 24px;
+ 
+ 		&::after {
+@@ -219,7 +218,6 @@ export const Tab = styled( Ariakit.Tab )`
+ 	[aria-orientation='vertical'] & {
+ 		padding: ${ space( 2 ) } ${ space( 3 ) };
+ 		min-height: ${ space( 10 ) };
+-		text-align: start;
+ 
+ 		&[aria-selected='true'] {
+ 			color: ${ COLORS.theme.accent };
+@@ -234,6 +232,16 @@ export const Tab = styled( Ariakit.Tab )`
+ 
+ export const TabChildren = styled.span`
+ 	flex-grow: 1;
++
++	display: flex;
++	align-items: center;
++
++	[aria-orientation='horizontal'] & {
++		justify-content: center;
++	}
++	[aria-orientation='vertical'] & {
++		justify-content: start;
++	}
+ `;
+ 
+ export const TabChevron = styled( Icon )`

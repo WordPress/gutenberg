@@ -1,0 +1,368 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 626223889dbe03..897bf7f56a0c3c 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `Field.Description`: Apply `text-wrap: pretty` to description text to avoid typographic widows ([#79143](https://github.com/WordPress/gutenberg/pull/79143)).
++-   `Autocomplete`: Add `Autocomplete.Group` and `Autocomplete.GroupLabel` subcomponents ([#78901](https://github.com/WordPress/gutenberg/pull/78901)).
+ 
+ ## 0.15.0 (2026-06-10)
+ 
+diff --git a/packages/ui/src/form/primitives/autocomplete/group-label.tsx b/packages/ui/src/form/primitives/autocomplete/group-label.tsx
+new file mode 100644
+index 00000000000000..10c5d560d76721
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/group-label.tsx
+@@ -0,0 +1,25 @@
++import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { Text } from '../../../text';
++import type { AutocompleteGroupLabelProps } from './types';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++
++/**
++ * Renders a label for an `Autocomplete.Group`, describing the group of items
++ * it is associated with.
++ */
++export const GroupLabel = forwardRef<
++	HTMLDivElement,
++	AutocompleteGroupLabelProps
++>( function GroupLabel( { className, children, ...restProps }, ref ) {
++	return (
++		<Text
++			variant="heading-sm"
++			className={ clsx( itemPopupStyles[ 'group-label' ], className ) }
++			render={ <_Autocomplete.GroupLabel ref={ ref } { ...restProps } /> }
++		>
++			{ children }
++		</Text>
++	);
++} );
+diff --git a/packages/ui/src/form/primitives/autocomplete/group.tsx b/packages/ui/src/form/primitives/autocomplete/group.tsx
+new file mode 100644
+index 00000000000000..ee354eb1548915
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/group.tsx
+@@ -0,0 +1,24 @@
++import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import type { AutocompleteGroupProps } from './types';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++
++/**
++ * Groups related items together with an associated label rendered by
++ * `Autocomplete.GroupLabel`. When `items` is provided, child
++ * `Autocomplete.Collection` components iterate over them.
++ */
++export const Group = forwardRef< HTMLDivElement, AutocompleteGroupProps >(
++	function Group( { className, children, ...restProps }, ref ) {
++		return (
++			<_Autocomplete.Group
++				className={ clsx( itemPopupStyles.group, className ) }
++				ref={ ref }
++				{ ...restProps }
++			>
++				{ children }
++			</_Autocomplete.Group>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/autocomplete/index.ts b/packages/ui/src/form/primitives/autocomplete/index.ts
+index d98f21ea9ef33f..b3af11ffdc8c9d 100644
+--- a/packages/ui/src/form/primitives/autocomplete/index.ts
++++ b/packages/ui/src/form/primitives/autocomplete/index.ts
+@@ -1,6 +1,8 @@
+ export { Clear } from './clear';
+ export { Collection } from './collection';
+ export { Empty } from './empty';
++export { Group } from './group';
++export { GroupLabel } from './group-label';
+ export { InputGroup } from './input-group';
+ export { Input } from './input';
+ export { Item } from './item';
+diff --git a/packages/ui/src/form/primitives/autocomplete/stories/fixtures.ts b/packages/ui/src/form/primitives/autocomplete/stories/fixtures.ts
+index 0f879ce035bf72..01006d649516d3 100644
+--- a/packages/ui/src/form/primitives/autocomplete/stories/fixtures.ts
++++ b/packages/ui/src/form/primitives/autocomplete/stories/fixtures.ts
+@@ -3,6 +3,11 @@ export interface FixtureItem {
+ 	value: string;
+ }
+ 
++export interface FixtureGroup {
++	label: string;
++	items: FixtureItem[];
++}
++
+ export const COMMANDS: FixtureItem[] = [
+ 	{ id: 'c1', value: 'Add new page' },
+ 	{ id: 'c2', value: 'Add new post' },
+@@ -14,6 +19,32 @@ export const COMMANDS: FixtureItem[] = [
+ 	{ id: 'c8', value: 'Toggle dark mode' },
+ ];
+ 
++export const GROUPED_COMMANDS: FixtureGroup[] = [
++	{
++		label: 'Content',
++		items: [
++			{ id: 'g1', value: 'Add new page' },
++			{ id: 'g2', value: 'Add new post' },
++			{ id: 'g3', value: 'Edit site' },
++		],
++	},
++	{
++		label: 'Management',
++		items: [
++			{ id: 'g4', value: 'Manage plugins' },
++			{ id: 'g5', value: 'Manage users' },
++			{ id: 'g6', value: 'Open settings' },
++		],
++	},
++	{
++		label: 'Appearance',
++		items: [
++			{ id: 'g7', value: 'Toggle dark mode' },
++			{ id: 'g8', value: 'View site' },
++		],
++	},
++];
++
+ export const USERS: FixtureItem[] = [
+ 	{ id: 'm1', value: 'alice' },
+ 	{ id: 'm2', value: 'bob' },
+diff --git a/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx b/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
+index 4a3253a385f5df..c4cb05265f8ed2 100644
+--- a/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
+@@ -6,7 +6,14 @@ import { Icon } from '../../../../icon';
+ import { Input } from '../../input';
+ import { InputLayout } from '../../input-layout';
+ import { Textarea } from '../../textarea';
+-import { COMMANDS, URLS, USERS, type FixtureItem } from './fixtures';
++import {
++	COMMANDS,
++	GROUPED_COMMANDS,
++	URLS,
++	USERS,
++	type FixtureGroup,
++	type FixtureItem,
++} from './fixtures';
+ 
+ const meta: Meta< typeof Autocomplete.Root > = {
+ 	title: 'Design System/Components/Form/Primitives/Autocomplete',
+@@ -20,6 +27,8 @@ const meta: Meta< typeof Autocomplete.Root > = {
+ 		'Autocomplete.List': Autocomplete.List,
+ 		'Autocomplete.ListBody': Autocomplete.ListBody,
+ 		'Autocomplete.Collection': Autocomplete.Collection,
++		'Autocomplete.Group': Autocomplete.Group,
++		'Autocomplete.GroupLabel': Autocomplete.GroupLabel,
+ 		'Autocomplete.Item': Autocomplete.Item,
+ 		'Autocomplete.Value': Autocomplete.Value,
+ 		'Autocomplete.Empty': Autocomplete.Empty,
+@@ -444,3 +453,47 @@ export const WithCustomZIndex: Story = {
+ 		),
+ 	},
+ };
++
++/**
++ * Suggestions can be organized into labeled groups with `Autocomplete.Group`
++ * and `Autocomplete.GroupLabel`.
++ */
++export const Grouped: Story = {
++	args: {
++		items: GROUPED_COMMANDS,
++		children: (
++			<>
++				<Autocomplete.Input placeholder="Type a command" />
++				<Autocomplete.Popup>
++					<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
++					<Autocomplete.List>
++						<Autocomplete.ListBody>
++							<Autocomplete.Collection>
++								{ ( group: FixtureGroup ) => (
++									<Autocomplete.Group
++										key={ group.label }
++										items={ group.items }
++									>
++										<Autocomplete.GroupLabel>
++											{ group.label }
++										</Autocomplete.GroupLabel>
++										<Autocomplete.Collection>
++											{ ( item: FixtureItem ) => (
++												<Autocomplete.Item
++													key={ item.id }
++													value={ item }
++												>
++													{ item.value }
++												</Autocomplete.Item>
++											) }
++										</Autocomplete.Collection>
++									</Autocomplete.Group>
++								) }
++							</Autocomplete.Collection>
++						</Autocomplete.ListBody>
++					</Autocomplete.List>
++				</Autocomplete.Popup>
++			</>
++		),
++	},
++};
+diff --git a/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx b/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx
+index 03efa51dd2374d..5d350ad0cc9e2e 100644
+--- a/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx
++++ b/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx
+@@ -378,4 +378,78 @@ describe( 'Autocomplete', () => {
+ 			expect( screen.queryByRole( 'tooltip' ) ).not.toBeInTheDocument();
+ 		} );
+ 	} );
++
++	describe( 'grouped items', () => {
++		const GROUPED_ITEMS = [
++			{
++				label: 'Group 1',
++				items: [
++					{ id: '1', value: 'Item 1' },
++					{ id: '2', value: 'Item 2' },
++				],
++			},
++			{
++				label: 'Group 2',
++				items: [ { id: '3', value: 'Item 3' } ],
++			},
++		];
++
++		it( 'forwards refs', async () => {
++			const user = userEvent.setup();
++			const groupRef = createRef< HTMLDivElement >();
++			const groupLabelRef = createRef< HTMLDivElement >();
++
++			render(
++				<Autocomplete.Root items={ GROUPED_ITEMS }>
++					<Autocomplete.Input placeholder="Search" />
++					<Autocomplete.Popup>
++						<Autocomplete.List>
++							<Autocomplete.ListBody>
++								<Autocomplete.Collection>
++									{ ( group ) => (
++										<Autocomplete.Group
++											key={ group.label }
++											ref={
++												group.label === 'Group 1'
++													? groupRef
++													: undefined
++											}
++											items={ group.items }
++										>
++											<Autocomplete.GroupLabel
++												ref={
++													group.label === 'Group 1'
++														? groupLabelRef
++														: undefined
++												}
++											>
++												{ group.label }
++											</Autocomplete.GroupLabel>
++											<Autocomplete.Collection>
++												{ ( item ) => (
++													<Autocomplete.Item
++														key={ item.id }
++														value={ item }
++													>
++														{ item.value }
++													</Autocomplete.Item>
++												) }
++											</Autocomplete.Collection>
++										</Autocomplete.Group>
++									) }
++								</Autocomplete.Collection>
++							</Autocomplete.ListBody>
++						</Autocomplete.List>
++					</Autocomplete.Popup>
++				</Autocomplete.Root>
++			);
++
++			await user.type( screen.getByRole( 'combobox' ), 'Item' );
++
++			await waitFor( () => {
++				expect( groupRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++			expect( groupLabelRef.current ).toBeInstanceOf( HTMLDivElement );
++		} );
++	} );
+ } );
+diff --git a/packages/ui/src/form/primitives/autocomplete/types.ts b/packages/ui/src/form/primitives/autocomplete/types.ts
+index fe23a2ef35c2a5..db6c643a6e6286 100644
+--- a/packages/ui/src/form/primitives/autocomplete/types.ts
++++ b/packages/ui/src/form/primitives/autocomplete/types.ts
+@@ -20,6 +20,18 @@ export type AutocompleteEmptyProps = ComponentProps<
+ 	children?: React.ReactNode;
+ };
+ 
++export type AutocompleteGroupProps = ComponentProps<
++	typeof _Autocomplete.Group
++> & {
++	children?: React.ReactNode;
++};
++
++export type AutocompleteGroupLabelProps = ComponentProps<
++	typeof _Autocomplete.GroupLabel
++> & {
++	children?: React.ReactNode;
++};
++
+ export type AutocompleteInputProps = Omit<
+ 	ComponentProps< typeof _Autocomplete.Input >,
+ 	'size'
+diff --git a/packages/ui/src/utils/css/item-popup.module.css b/packages/ui/src/utils/css/item-popup.module.css
+index 77c8b70302241b..2c4293f66eec43 100644
+--- a/packages/ui/src/utils/css/item-popup.module.css
++++ b/packages/ui/src/utils/css/item-popup.module.css
+@@ -50,8 +50,20 @@
+ 			}
+ 		}
+ 
++		.group:not(:first-child) {
++			margin-block-start: var(--wpds-dimension-gap-sm);
++		}
++
++		.group-label {
++			display: flex;
++			align-items: center;
++			min-height: var(--wpds-dimension-size-md);
++			padding-inline: var(--wpds-dimension-padding-md);
++			color: var(--wpds-color-foreground-content-neutral-weak);
++		}
++
+ 		.item {
+-			--wp-ui-popup-item-height: 40px;
++			--wp-ui-popup-item-height: var(--wpds-dimension-size-lg);
+ 			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-md);
+ 			--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
+ 
+@@ -74,12 +86,12 @@
+ 			}
+ 
+ 			&.is-size-compact {
+-				--wp-ui-popup-item-height: 32px;
++				--wp-ui-popup-item-height: var(--wpds-dimension-size-md);
+ 				--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
+ 			}
+ 
+ 			&.is-size-small {
+-				--wp-ui-popup-item-height: 24px;
++				--wp-ui-popup-item-height: var(--wpds-dimension-size-sm);
+ 				--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
+ 				--wp-ui-popup-item-padding-block: 2px;
+ 			}
+@@ -116,7 +128,7 @@
+ 		/* Only style when there is content, because otherwise the element would block clicks
+ 		on the .list beneath it (both share grid-area: main and overlap). */
+ 		.empty:not(:empty) {
+-			--wp-ui-popup-empty-min-height: 40px;
++			--wp-ui-popup-empty-min-height: var(--wpds-dimension-size-lg);
+ 			--wp-ui-popup-empty-padding-inline: var(--wpds-dimension-padding-md);
+ 
+ 			grid-area: main;

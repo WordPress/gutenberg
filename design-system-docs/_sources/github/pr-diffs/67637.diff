@@ -1,0 +1,95 @@
+diff --git a/packages/dataviews/src/components/dataviews-view-config/index.tsx b/packages/dataviews/src/components/dataviews-view-config/index.tsx
+index f13670f27cdab7..17200b47e9195e 100644
+--- a/packages/dataviews/src/components/dataviews-view-config/index.tsx
++++ b/packages/dataviews/src/components/dataviews-view-config/index.tsx
+@@ -67,45 +67,52 @@ function ViewTypeMenu( {
+ 	}
+ 	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
+ 	return (
+-		<Menu
+-			trigger={
+-				<Button
+-					size="compact"
+-					icon={ activeView?.icon }
+-					label={ __( 'Layout' ) }
+-				/>
+-			}
+-		>
+-			{ availableLayouts.map( ( layout ) => {
+-				const config = VIEW_LAYOUTS.find( ( v ) => v.type === layout );
+-				if ( ! config ) {
+-					return null;
++		<Menu>
++			<Menu.TriggerButton
++				render={
++					<Button
++						size="compact"
++						icon={ activeView?.icon }
++						label={ __( 'Layout' ) }
++					/>
+ 				}
+-				return (
+-					<Menu.RadioItem
+-						key={ layout }
+-						value={ layout }
+-						name="view-actions-available-view"
+-						checked={ layout === view.type }
+-						hideOnClick
+-						onChange={ ( e: ChangeEvent< HTMLInputElement > ) => {
+-							switch ( e.target.value ) {
+-								case 'list':
+-								case 'grid':
+-								case 'table':
+-									return onChangeView( {
+-										...view,
+-										type: e.target.value,
+-										...defaultLayouts[ e.target.value ],
+-									} );
+-							}
+-							warning( 'Invalid dataview' );
+-						} }
+-					>
+-						<Menu.ItemLabel>{ config.label }</Menu.ItemLabel>
+-					</Menu.RadioItem>
+-				);
+-			} ) }
++			/>
++			<Menu.Popover>
++				{ availableLayouts.map( ( layout ) => {
++					const config = VIEW_LAYOUTS.find(
++						( v ) => v.type === layout
++					);
++					if ( ! config ) {
++						return null;
++					}
++					return (
++						<Menu.RadioItem
++							key={ layout }
++							value={ layout }
++							name="view-actions-available-view"
++							checked={ layout === view.type }
++							hideOnClick
++							onChange={ (
++								e: ChangeEvent< HTMLInputElement >
++							) => {
++								switch ( e.target.value ) {
++									case 'list':
++									case 'grid':
++									case 'table':
++										return onChangeView( {
++											...view,
++											type: e.target.value,
++											...defaultLayouts[ e.target.value ],
++										} );
++								}
++								warning( 'Invalid dataview' );
++							} }
++						>
++							<Menu.ItemLabel>{ config.label }</Menu.ItemLabel>
++						</Menu.RadioItem>
++					);
++				} ) }
++			</Menu.Popover>
+ 		</Menu>
+ 	);
+ }

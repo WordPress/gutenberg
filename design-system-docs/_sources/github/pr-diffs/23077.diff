@@ -1,0 +1,742 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index c8d44a63acc475..c066c06add13b3 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1019,6 +1019,12 @@
+ 		"markdown_source": "../packages/components/src/resizable-box/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "ResizeTooltip",
++		"slug": "resize-tooltip",
++		"markdown_source": "../packages/components/src/resizable-box/resize-tooltip/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "ResponsiveWrapper",
+ 		"slug": "responsive-wrapper",
+diff --git a/package-lock.json b/package-lock.json
+index 253ed76d8dc689..94fdb87c8b79bf 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -10613,6 +10613,7 @@
+ 				"moment": "^2.22.1",
+ 				"re-resizable": "^6.0.0",
+ 				"react-dates": "^17.1.1",
++				"react-resize-aware": "^3.0.1",
+ 				"react-spring": "^8.0.20",
+ 				"react-use-gesture": "^7.0.15",
+ 				"reakit": "^1.1.0",
+diff --git a/packages/block-library/src/spacer/edit.js b/packages/block-library/src/spacer/edit.js
+index ada34882b623c1..445dbd7fc45989 100644
+--- a/packages/block-library/src/spacer/edit.js
++++ b/packages/block-library/src/spacer/edit.js
+@@ -11,6 +11,7 @@ import { InspectorControls } from '@wordpress/block-editor';
+ import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
+ import { compose, withInstanceId } from '@wordpress/compose';
+ import { withDispatch } from '@wordpress/data';
++import { useState } from '@wordpress/element';
+ 
+ const MIN_SPACER_HEIGHT = 20;
+ const MAX_SPACER_HEIGHT = 500;
+@@ -22,6 +23,7 @@ const SpacerEdit = ( {
+ 	onResizeStart,
+ 	onResizeStop,
+ } ) => {
++	const [ isResizing, setIsResizing ] = useState( false );
+ 	const { height } = attributes;
+ 	const updateHeight = ( value ) => {
+ 		setAttributes( {
+@@ -29,6 +31,21 @@ const SpacerEdit = ( {
+ 		} );
+ 	};
+ 
++	const handleOnResizeStart = ( ...args ) => {
++		onResizeStart( ...args );
++		setIsResizing( true );
++	};
++
++	const handleOnResizeStop = ( event, direction, elt, delta ) => {
++		onResizeStop();
++		const spacerHeight = Math.min(
++			parseInt( height + delta.height, 10 ),
++			MAX_SPACER_HEIGHT
++		);
++		updateHeight( spacerHeight );
++		setIsResizing( false );
++	};
++
+ 	return (
+ 		<>
+ 			<ResizableBox
+@@ -52,16 +69,15 @@ const SpacerEdit = ( {
+ 					bottomLeft: false,
+ 					topLeft: false,
+ 				} }
+-				onResizeStart={ onResizeStart }
+-				onResizeStop={ ( event, direction, elt, delta ) => {
+-					onResizeStop();
+-					const spacerHeight = Math.min(
+-						parseInt( height + delta.height, 10 ),
+-						MAX_SPACER_HEIGHT
+-					);
+-					updateHeight( spacerHeight );
+-				} }
++				onResizeStart={ handleOnResizeStart }
++				onResizeStop={ handleOnResizeStop }
+ 				showHandle={ isSelected }
++				__experimentalShowTooltip={ true }
++				__experimentalTooltipProps={ {
++					axis: 'y',
++					position: 'bottom',
++					isVisible: isResizing,
++				} }
+ 			/>
+ 			<InspectorControls>
+ 				<PanelBody title={ __( 'Spacer settings' ) }>
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 715a701707f2fb..c0bc0286813827 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -52,6 +52,7 @@
+ 		"moment": "^2.22.1",
+ 		"re-resizable": "^6.0.0",
+ 		"react-dates": "^17.1.1",
++		"react-resize-aware": "^3.0.1",
+ 		"react-spring": "^8.0.20",
+ 		"react-use-gesture": "^7.0.15",
+ 		"reakit": "^1.1.0",
+diff --git a/packages/components/src/resizable-box/index.js b/packages/components/src/resizable-box/index.js
+index e9bc2a190f260e..38a780f8e71b6b 100644
+--- a/packages/components/src/resizable-box/index.js
++++ b/packages/components/src/resizable-box/index.js
+@@ -4,7 +4,19 @@
+ import classnames from 'classnames';
+ import { Resizable } from 're-resizable';
+ 
+-function ResizableBox( { className, showHandle = true, ...props } ) {
++/**
++ * Internal dependencies
++ */
++import ResizeTooltip from './resize-tooltip';
++
++function ResizableBox( {
++	className,
++	children,
++	showHandle = true,
++	__experimentalShowTooltip: showTooltip = false,
++	__experimentalTooltipProps: tooltipProps = {},
++	...props
++} ) {
+ 	// Removes the inline styles in the drag handles.
+ 	const handleStylesOverrides = {
+ 		width: null,
+@@ -83,7 +95,10 @@ function ResizableBox( { className, showHandle = true, ...props } ) {
+ 				bottomLeft: handleStylesOverrides,
+ 			} }
+ 			{ ...props }
+-		/>
++		>
++			{ children }
++			{ showTooltip && <ResizeTooltip { ...tooltipProps } /> }
++		</Resizable>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/resizable-box/resize-tooltip/README.md b/packages/components/src/resizable-box/resize-tooltip/README.md
+new file mode 100644
+index 00000000000000..513ed0d9fa83ce
+--- /dev/null
++++ b/packages/components/src/resizable-box/resize-tooltip/README.md
+@@ -0,0 +1,105 @@
++# ResizeTooltip
++
++ResizeTooltip displays the dimensions of an element whenever the width or height of the element changes.
++
++## Usage
++
++```jsx
++const Example = () => {
++	return (
++		<div style={ { position: 'relative' } }>
++			<ResizeTooltip />
++			...
++		</div>
++	);
++};
++```
++
++Be sure that the parent element containing `<ResizeTooltip />` has the `position` style property defined. This is important as `<ResizeTooltip />` uses `position` based techniques to determine size changes.
++
++### Positions
++
++`<ResizeTooltip />` has three positions;
++
++-   `bottom` (Default)
++-   `corner`
++
++##### `bottom`
++
++The `bottom` position (default) renders the dimensions label at the bottom-center of the (parent) element.
++
++##### `corner`
++
++The `corner` position renders the dimensions label in the top-right corner of the (parent) element.
++
++## Props
++
++### axis
++
++Limits the label to render corresponding to the axis. By default, the label will automatically render based on both `x` and `y` changes.
++
++-   Type: `String`
++-   Required: No
++-   Values: `x` | `y`
++
++### fadeTimeout
++
++Duration (in `ms`) before the label disappears after resize event.
++
++-   Type: `Number`
++-   Required: No
++-   Default: `180`
++
++### isVisible
++
++Determines if the label can render.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `true`
++
++### labelRef
++
++Callback [Ref](https://reactjs.org/docs/forwarding-refs.html) for the label element.
++
++-   Type: `Function`
++-   Required: No
++
++### onMove
++
++Callback function when the (observed) element resizes, specifically with a `mousemove` based event.
++
++-   Type: `Function`
++-   Required: No
++
++### onResize
++
++Callback function when the (observed) element resizes.
++
++-   Type: `Function`
++-   Required: No
++
++### position
++
++The positions for the label.
++
++-   Type: `String`
++-   Required: No
++-   Default: `corner`
++-   Values: `bottom` | `corner`
++
++### showPx
++
++Renders a `PX` unit suffix after the width or height value in the label.
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `true`
++
++### zIndex
++
++The `z-index` style property for the label.
++
++-   Type: `Number`
++-   Required: No
++-   Default: `1000`
+diff --git a/packages/components/src/resizable-box/resize-tooltip/index.js b/packages/components/src/resizable-box/resize-tooltip/index.js
+new file mode 100644
+index 00000000000000..0188d847eacfac
+--- /dev/null
++++ b/packages/components/src/resizable-box/resize-tooltip/index.js
+@@ -0,0 +1,64 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import Label from './label';
++import { useResizeLabel, POSITIONS } from './utils';
++import { Root } from './styles/resize-tooltip.styles';
++
++function ResizeTooltip(
++	{
++		axis,
++		className,
++		fadeTimeout = 180,
++		isVisible = true,
++		labelRef,
++		onResize = noop,
++		position = POSITIONS.bottom,
++		showPx = true,
++		zIndex = 1000,
++		...props
++	},
++	ref
++) {
++	const { label, resizeListener } = useResizeLabel( {
++		axis,
++		fadeTimeout,
++		onResize,
++		showPx,
++		position,
++	} );
++
++	if ( ! isVisible ) return null;
++
++	const classes = classnames( 'components-resize-tooltip', className );
++
++	return (
++		<Root aria-hidden="true" className={ classes } ref={ ref } { ...props }>
++			{ resizeListener }
++			<Label
++				aria-hidden={ props[ 'aria-hidden' ] }
++				fadeTimeout={ fadeTimeout }
++				isVisible={ isVisible }
++				label={ label }
++				position={ position }
++				ref={ labelRef }
++				zIndex={ zIndex }
++			/>
++		</Root>
++	);
++}
++
++const ForwardedComponent = forwardRef( ResizeTooltip );
++
++export default ForwardedComponent;
+diff --git a/packages/components/src/resizable-box/resize-tooltip/label.js b/packages/components/src/resizable-box/resize-tooltip/label.js
+new file mode 100644
+index 00000000000000..b63e4fd9e50c62
+--- /dev/null
++++ b/packages/components/src/resizable-box/resize-tooltip/label.js
+@@ -0,0 +1,85 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { POSITIONS } from './utils';
++import { useRTL } from '../../utils/style-mixins';
++import {
++	TooltipWrapper,
++	Tooltip,
++	LabelText,
++} from './styles/resize-tooltip.styles';
++
++const CORNER_OFFSET = 4;
++const CURSOR_OFFSET_TOP = CORNER_OFFSET * 2.5;
++
++function Label(
++	{ label, position = POSITIONS.corner, zIndex = 1000, ...props },
++	ref
++) {
++	const isRTL = useRTL();
++
++	const showLabel = !! label;
++
++	const isBottom = position === POSITIONS.bottom;
++	const isCorner = position === POSITIONS.corner;
++
++	if ( ! showLabel ) return null;
++
++	let style = {
++		opacity: showLabel ? 1 : null,
++		zIndex,
++	};
++
++	let labelStyle = {};
++
++	if ( isBottom ) {
++		style = {
++			...style,
++			position: 'absolute',
++			bottom: CURSOR_OFFSET_TOP * -1,
++			left: '50%',
++			transform: 'translate(-50%, 0)',
++		};
++
++		labelStyle = {
++			transform: `translate(0, 100%)`,
++		};
++	}
++
++	if ( isCorner ) {
++		style = {
++			...style,
++			position: 'absolute',
++			top: CORNER_OFFSET,
++			right: isRTL ? null : CORNER_OFFSET,
++			left: isRTL ? CORNER_OFFSET : null,
++		};
++	}
++
++	return (
++		<TooltipWrapper
++			aria-hidden="true"
++			className="components-resizable-tooltip__tooltip-wrapper"
++			isActive={ showLabel }
++			ref={ ref }
++			style={ style }
++			{ ...props }
++		>
++			<Tooltip
++				className="components-resizable-tooltip__tooltip"
++				style={ labelStyle }
++			>
++				<LabelText as="span">{ label }</LabelText>
++			</Tooltip>
++		</TooltipWrapper>
++	);
++}
++
++const ForwardedComponent = forwardRef( Label );
++
++export default ForwardedComponent;
+diff --git a/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js
+new file mode 100644
+index 00000000000000..dbe67eb14b50ef
+--- /dev/null
++++ b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.js
+@@ -0,0 +1,53 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import Text from '../../../text';
++import { text } from '../../../text/styles/text-mixins';
++import { color } from '../../../utils/style-mixins';
++
++export const Root = styled.div`
++	bottom: 0;
++	box-sizing: border-box;
++	left: 0;
++	pointer-events: none;
++	position: absolute;
++	right: 0;
++	top: 0;
++`;
++
++export const TooltipWrapper = styled.div`
++	align-items: center;
++	box-sizing: border-box;
++	display: inline-flex;
++	justify-content: center;
++	opacity: 0;
++	pointer-events: none;
++	transition: opacity 120ms linear;
++`;
++
++export const Tooltip = styled.div`
++	background: ${ color( 'ui.border' ) };
++	border-radius: 2px;
++	box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.2 );
++	box-sizing: border-box;
++	color: ${ color( 'ui.textDark' ) };
++	padding: 4px 6px;
++	position: relative;
++`;
++
++// TODO: Resolve need to use &&& to increase specificity
++// https://github.com/WordPress/gutenberg/issues/18483
++
++export const LabelText = styled( Text )`
++	&&& {
++		${ text };
++		display: block;
++		font-size: 13px;
++		line-height: 1;
++	}
++`;
+diff --git a/packages/components/src/resizable-box/resize-tooltip/utils.js b/packages/components/src/resizable-box/resize-tooltip/utils.js
+new file mode 100644
+index 00000000000000..f0ec585d99c6f9
+--- /dev/null
++++ b/packages/components/src/resizable-box/resize-tooltip/utils.js
+@@ -0,0 +1,222 @@
++/**
++ * External dependencies
++ */
++import { noop } from 'lodash';
++import useResizeAware from 'react-resize-aware';
++
++/**
++ * WordPress dependencies
++ */
++import { useEffect, useRef, useState } from '@wordpress/element';
++
++const { clearTimeout, setTimeout } = window;
++
++export const POSITIONS = {
++	bottom: 'bottom',
++	corner: 'corner',
++};
++
++/**
++ * @typedef {Object} UseResizeLabelProps
++ *
++ * @property {undefined|string} label The label value.
++ * @property {Function} resizeListener Element to be rendered for resize listening events.
++ */
++
++/**
++ * Custom hook that manages resize listener events. It also provides a label
++ * based on current resize width x height values.
++ *
++ * @param {Object} props
++ * @param {string} props.axis Only shows the label corresponding to the axis.
++ * @param {number} props.fadeTimeout Duration (ms) before deactivating the resize label.
++ * @param {boolean} props.onResize Callback when a resize occurs. Provides { width, height } callback.
++ * @param {string} props.position Adjusts label value.
++ * @param {boolean} props.showPx Whether to add `PX` to the label.
++ *
++ * @return {UseResizeLabelProps} Properties for hook.
++ */
++export function useResizeLabel( {
++	axis,
++	fadeTimeout = 180,
++	onResize = noop,
++	position = POSITIONS.bottom,
++	showPx = false,
++} ) {
++	/*
++	 * The width/height values derive from this special useResizeAware hook.
++	 * This custom hook uses injects an iFrame into the element, allowing it
++	 * to tap into the onResize (window) callback events.
++	 */
++	const [ resizeListener, sizes ] = useResizeAware();
++
++	/*
++	 * Indicates if the x/y axis is preferred.
++	 * If set, we will avoid resetting the moveX and moveY values.
++	 * This will allow for the preferred axis values to persist in the label.
++	 */
++	const isAxisControlled = !! axis;
++
++	/*
++	 * The moveX and moveY values are used to track whether the label should
++	 * display width, height, or width x height.
++	 */
++	const [ moveX, setMoveX ] = useState( false );
++	const [ moveY, setMoveY ] = useState( false );
++
++	/*
++	 * Cached dimension values to check for width/height updates from the
++	 * sizes property from useResizeAware()
++	 */
++	const heightRef = useRef( height );
++	const widthRef = useRef( width );
++
++	/*
++	 * This timeout is used with setMoveX and setMoveY to determine of
++	 * both width and height values have changed at (roughly) the same time.
++	 */
++	const moveTimeoutRef = useRef();
++
++	const { width, height } = sizes;
++
++	const unsetMoveXY = () => {
++		/*
++		 * If axis is controlled, we will avoid resetting the moveX and moveY values.
++		 * This will allow for the preferred axis values to persist in the label.
++		 */
++		if ( isAxisControlled ) return;
++		setMoveX( false );
++		setMoveY( false );
++	};
++
++	const debounceUnsetMoveXY = () => {
++		if ( moveTimeoutRef.current ) {
++			clearTimeout( moveTimeoutRef.current );
++		}
++
++		moveTimeoutRef.current = setTimeout( unsetMoveXY, fadeTimeout );
++	};
++
++	useEffect( () => {
++		/*
++		 * On the initial render of useResizeAware, the height and width values are
++		 * null. They are calculated then set using via an internal useEffect hook.
++		 */
++		const isRendered = width !== null || height !== null;
++
++		if ( ! isRendered ) return;
++
++		const didWidthChange = width !== widthRef.current;
++		const didHeightChange = height !== heightRef.current;
++
++		if ( ! didWidthChange && ! didHeightChange ) return;
++
++		/*
++		 * After the initial render, the useResizeAware will set the first
++		 * width and height values. We'll sync those values with our
++		 * width and height refs. However, we shouldn't render our Tooltip
++		 * label on this first cycle.
++		 */
++		if ( width && ! widthRef.current && height && ! heightRef.current ) {
++			widthRef.current = width;
++			heightRef.current = height;
++			return;
++		}
++
++		/*
++		 * After the first cycle, we can track width and height changes.
++		 */
++		if ( didWidthChange ) {
++			setMoveX( true );
++			widthRef.current = width;
++		}
++
++		if ( didHeightChange ) {
++			setMoveY( true );
++			heightRef.current = height;
++		}
++
++		onResize( { width, height } );
++		debounceUnsetMoveXY();
++	}, [ width, height ] );
++
++	const label = getSizeLabel( {
++		axis,
++		height,
++		moveX,
++		moveY,
++		position,
++		showPx,
++		width,
++	} );
++
++	return {
++		label,
++		resizeListener,
++	};
++}
++
++/**
++ * Gets the resize label based on width and height values (as well as recent changes).
++ *
++ * @param {Object} props
++ * @param {string} props.axis Only shows the label corresponding to the axis.
++ * @param {number} props.height Height value.
++ * @param {boolean} props.moveX Recent width (x axis) changes.
++ * @param {boolean} props.moveY Recent width (y axis) changes.
++ * @param {string} props.position Adjusts label value.
++ * @param {boolean} props.showPx Whether to add `PX` to the label.
++ * @param {number} props.width Width value.
++ *
++ * @return {undefined | string} The rendered label.
++ */
++function getSizeLabel( {
++	axis,
++	height,
++	moveX = false,
++	moveY = false,
++	position = POSITIONS.bottom,
++	showPx = false,
++	width,
++} ) {
++	if ( ! moveX && ! moveY ) return null;
++
++	/*
++	 * Corner position...
++	 * We want the label to appear like width x height.
++	 */
++	if ( position === POSITIONS.corner ) {
++		return `${ width } x ${ height }`;
++	}
++
++	/*
++	 * Other POSITIONS...
++	 * The label will combine both width x height values if both
++	 * values have recently been changed.
++	 *
++	 * Otherwise, only width or height will be displayed.
++	 * The `PX` unit will be added, if specified by the `showPx` prop.
++	 */
++	const labelUnit = showPx ? ' px' : '';
++
++	if ( axis ) {
++		if ( axis === 'x' && moveX ) {
++			return `${ width }${ labelUnit }`;
++		}
++		if ( axis === 'y' && moveY ) {
++			return `${ height }${ labelUnit }`;
++		}
++	}
++
++	if ( moveX && moveY ) {
++		return `${ width } x ${ height }`;
++	}
++	if ( moveX ) {
++		return `${ width }${ labelUnit }`;
++	}
++	if ( moveY ) {
++		return `${ height }${ labelUnit }`;
++	}
++
++	return null;
++}
+diff --git a/packages/components/src/resizable-box/stories/index.js b/packages/components/src/resizable-box/stories/index.js
+index da7d9133acd22b..d5dbe702bc72cf 100644
+--- a/packages/components/src/resizable-box/stories/index.js
++++ b/packages/components/src/resizable-box/stories/index.js
+@@ -59,12 +59,17 @@ export const _default = () => {
+ 		bottomLeft: boolean( 'enable.bottomLeft', false ),
+ 		topLeft: boolean( 'enable.topLeft', false ),
+ 	};
++	const __experimentalShowTooltip = boolean(
++		'__experimentalShowTooltip',
++		false
++	);
+ 
+ 	const props = {
+ 		enable,
+ 		minHeight,
+ 		minWidth,
+ 		showHandle,
++		__experimentalShowTooltip,
+ 	};
+ 
+ 	return (
+diff --git a/packages/components/src/resizable-box/styles/resizable-box.styles.js b/packages/components/src/resizable-box/styles/resizable-box.styles.js
+new file mode 100644
+index 00000000000000..e69de29bb2d1d6
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index f765d119bbfe03..ab20b2c89d2d0c 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -144,6 +144,8 @@ export const UI = {
+ 	borderLight: LIGHT_GRAY[ 600 ],
+ 	label: DARK_GRAY[ 500 ],
+ 	textDisabled: DARK_GRAY[ 150 ],
++	textDark: BASE.white,
++	textLight: BASE.black,
+ };
+ 
+ export const COLORS = {

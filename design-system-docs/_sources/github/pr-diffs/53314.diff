@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d0e758045f4817..b3a8e0ff28407d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ 
+ -   `Tooltip`: dynamically render in the DOM only when visible ([#54312](https://github.com/WordPress/gutenberg/pull/54312)).
+ -   `PaletteEdit`: Fix padding in RTL languages ([#54034](https://github.com/WordPress/gutenberg/pull/54034)).
++-   `ToolbarItem`: Fix children not showing in rendered components ([#53314](https://github.com/WordPress/gutenberg/pull/53314)).
+ -   `CircularOptionPicker`: make focus styles resilient to button size changes ([#54196](https://github.com/WordPress/gutenberg/pull/54196)).
+ 
+ ### Internal
+diff --git a/packages/components/src/toolbar/toolbar-item/index.tsx b/packages/components/src/toolbar/toolbar-item/index.tsx
+index ccfe5084545577..3bf55aedd8a48a 100644
+--- a/packages/components/src/toolbar/toolbar-item/index.tsx
++++ b/packages/components/src/toolbar/toolbar-item/index.tsx
+@@ -43,7 +43,9 @@ function ToolbarItem(
+ 		return children( allProps );
+ 	}
+ 
+-	const render = isRenderProp ? children : Component && <Component />;
++	const render = isRenderProp
++		? children
++		: Component && <Component>{ children }</Component>;
+ 
+ 	return (
+ 		<BaseToolbarItem

@@ -1,0 +1,288 @@
+diff --git a/.stylelintrc.mjs b/.stylelintrc.mjs
+new file mode 100644
+index 00000000000000..603f6e8f6f9945
+--- /dev/null
++++ b/.stylelintrc.mjs
+@@ -0,0 +1,7 @@
++import { createRequire } from 'module';
++
++const require = createRequire( import.meta.url );
++
++export default {
++	extends: require.resolve( '@wordpress/stylelint-tools/config' ),
++};
+diff --git a/package-lock.json b/package-lock.json
+index a0b31b6d563f22..5e45d60b83efcf 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -30,6 +30,7 @@
+ 				"@wordpress/eslint-tools": "file:./tools/eslint",
+ 				"@wordpress/release-tools": "file:./tools/release",
+ 				"@wordpress/scripts": "file:./packages/scripts",
++				"@wordpress/stylelint-tools": "file:./tools/stylelint",
+ 				"@wordpress/vips": "file:./packages/vips",
+ 				"concurrently": "^3.5.0",
+ 				"cross-env": "^7.0.3",
+@@ -39,7 +40,6 @@
+ 				"npm-run-all": "^4.1.5",
+ 				"patch-package": "^8.0.0",
+ 				"rimraf": "^5.0.10",
+-				"stylelint-plugin-logical-css": "^1.2.3",
+ 				"syncpack": "^15.3.1",
+ 				"typescript": "^6.0.2",
+ 				"wait-on": "^8.0.1"
+@@ -15874,6 +15874,10 @@
+ 			"resolved": "packages/stylelint-config",
+ 			"link": true
+ 		},
++		"node_modules/@wordpress/stylelint-tools": {
++			"resolved": "tools/stylelint",
++			"link": true
++		},
+ 		"node_modules/@wordpress/styles-route": {
+ 			"resolved": "routes/styles",
+ 			"link": true
+@@ -42487,7 +42491,6 @@
+ 			"version": "1.2.3",
+ 			"resolved": "https://registry.npmjs.org/stylelint-plugin-logical-css/-/stylelint-plugin-logical-css-1.2.3.tgz",
+ 			"integrity": "sha512-yzSDrw4yyZJosgMablqqQzCeJmsPRAK/H7X1XzliQkYvoC/ZHBfHKos27dQEwwSLBUaYg+7nJ1ct7OlST4iqZA==",
+-			"dev": true,
+ 			"license": "MIT",
+ 			"engines": {
+ 				"node": ">=18.12.0"
+@@ -47516,6 +47519,7 @@
+ 				"@testing-library/dom": "^10.4.1",
+ 				"@testing-library/react": "^16.3.2",
+ 				"@testing-library/user-event": "^14.6.1",
++				"@wordpress/stylelint-tools": "file:../../tools/stylelint",
+ 				"deep-freeze": "^0.0.1"
+ 			},
+ 			"engines": {
+@@ -47841,6 +47845,7 @@
+ 				"@types/jest": "^29.5.14",
+ 				"@types/react-dom": "^18.3.1",
+ 				"@wordpress/jest-console": "file:../jest-console",
++				"@wordpress/stylelint-tools": "file:../../tools/stylelint",
+ 				"snapshot-diff": "^0.10.0",
+ 				"storybook": "^10.2.8",
+ 				"timezone-mock": "^1.3.6"
+@@ -54648,6 +54653,14 @@
+ 				"release-cli": "cli.js"
+ 			}
+ 		},
++		"tools/stylelint": {
++			"name": "@wordpress/stylelint-tools",
++			"version": "1.0.0",
++			"license": "GPL-2.0-or-later",
++			"dependencies": {
++				"stylelint-plugin-logical-css": "^1.2.3"
++			}
++		},
+ 		"tools/validation": {
+ 			"name": "@wordpress/validation-tools",
+ 			"version": "0.0.0",
+diff --git a/package.json b/package.json
+index 5914b20f98ad62..2ea183e6a8c082 100644
+--- a/package.json
++++ b/package.json
+@@ -70,6 +70,7 @@
+ 		"@wordpress/eslint-tools": "file:./tools/eslint",
+ 		"@wordpress/release-tools": "file:./tools/release",
+ 		"@wordpress/scripts": "file:./packages/scripts",
++		"@wordpress/stylelint-tools": "file:./tools/stylelint",
+ 		"@wordpress/vips": "file:./packages/vips",
+ 		"concurrently": "^3.5.0",
+ 		"cross-env": "^7.0.3",
+@@ -79,7 +80,6 @@
+ 		"npm-run-all": "^4.1.5",
+ 		"patch-package": "^8.0.0",
+ 		"rimraf": "^5.0.10",
+-		"stylelint-plugin-logical-css": "^1.2.3",
+ 		"syncpack": "^15.3.1",
+ 		"typescript": "^6.0.2",
+ 		"wait-on": "^8.0.1"
+diff --git a/packages/block-library/.stylelintrc.mjs b/packages/block-library/.stylelintrc.mjs
+index 6a4c33bff82f50..dc91bffc2c426d 100644
+--- a/packages/block-library/.stylelintrc.mjs
++++ b/packages/block-library/.stylelintrc.mjs
+@@ -1,4 +1,4 @@
+-import baseConfig from '../../.stylelintrc.js';
++import baseConfig from '@wordpress/stylelint-tools/config';
+ 
+ const [ disallowedValues, disallowedValueMessages ] =
+ 	baseConfig.rules[ 'declaration-property-value-disallowed-list' ];
+@@ -9,7 +9,7 @@ const { cursor: _ignoredCursorRule, ...blockLibraryDisallowedValues } =
+ 
+ /** @type {import('stylelint').Config} */
+ export default {
+-	extends: '../../.stylelintrc.js',
++	extends: '@wordpress/stylelint-tools/config',
+ 	rules: {
+ 		'declaration-property-value-disallowed-list': [
+ 			blockLibraryDisallowedValues,
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index 43b8228cd5bb68..d11793b3f1d822 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -144,6 +144,7 @@
+ 		"@testing-library/dom": "^10.4.1",
+ 		"@testing-library/react": "^16.3.2",
+ 		"@testing-library/user-event": "^14.6.1",
++		"@wordpress/stylelint-tools": "file:../../tools/stylelint",
+ 		"deep-freeze": "^0.0.1"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/components/.stylelintrc.mjs b/packages/components/.stylelintrc.mjs
+index 0cf1cdcb7d20ed..23f93083bd6ab6 100644
+--- a/packages/components/.stylelintrc.mjs
++++ b/packages/components/.stylelintrc.mjs
+@@ -1,6 +1,6 @@
+ /** @type {import('stylelint').Config} */
+ export default {
+-	extends: '../../.stylelintrc.js',
++	extends: '@wordpress/stylelint-tools/config',
+ 	rules: {
+ 		'declaration-property-value-disallowed-list': [
+ 			{
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 9234ca683a7b2d..954bb012243981 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -112,6 +112,7 @@
+ 		"@types/jest": "^29.5.14",
+ 		"@types/react-dom": "^18.3.1",
+ 		"@wordpress/jest-console": "file:../jest-console",
++		"@wordpress/stylelint-tools": "file:../../tools/stylelint",
+ 		"snapshot-diff": "^0.10.0",
+ 		"storybook": "^10.2.8",
+ 		"timezone-mock": "^1.3.6"
+diff --git a/packages/scripts/CHANGELOG.md b/packages/scripts/CHANGELOG.md
+index 0eb2534e3b0667..6944aca08aed2f 100644
+--- a/packages/scripts/CHANGELOG.md
++++ b/packages/scripts/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `lint-style`: Detect .cjs and .mjs config files so the bundled default config is not used when one of these is present ([#79226](https://github.com/WordPress/gutenberg/pull/79226)).
++
+ ## 32.4.1 (2026-06-16)
+ 
+ ## 32.4.0 (2026-06-10)
+diff --git a/packages/scripts/scripts/lint-style.js b/packages/scripts/scripts/lint-style.js
+index ef8b0ad3bf0e78..ed5385f2ea5889 100644
+--- a/packages/scripts/scripts/lint-style.js
++++ b/packages/scripts/scripts/lint-style.js
+@@ -24,10 +24,14 @@ const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '**/*.{css,pcss,scss}' ];
+ const hasLintConfig =
+ 	hasArgInCLI( '--config' ) ||
+ 	hasProjectFile( '.stylelintrc.js' ) ||
++	hasProjectFile( '.stylelintrc.cjs' ) ||
++	hasProjectFile( '.stylelintrc.mjs' ) ||
+ 	hasProjectFile( '.stylelintrc.json' ) ||
+ 	hasProjectFile( '.stylelintrc.yaml' ) ||
+ 	hasProjectFile( '.stylelintrc.yml' ) ||
+ 	hasProjectFile( 'stylelint.config.js' ) ||
++	hasProjectFile( 'stylelint.config.cjs' ) ||
++	hasProjectFile( 'stylelint.config.mjs' ) ||
+ 	hasProjectFile( '.stylelintrc' ) ||
+ 	hasPackageProp( 'stylelint' );
+ 
+diff --git a/packages/stylelint-config/test/utils/index.js b/packages/stylelint-config/test/utils/index.js
+index eac8c554591a95..ea9c3451899835 100644
+--- a/packages/stylelint-config/test/utils/index.js
++++ b/packages/stylelint-config/test/utils/index.js
+@@ -7,8 +7,20 @@ const util = require( 'node:util' ),
+ 
+ const execute = util.promisify( childProcess.exec );
+ 
++/*
++ * Resolve Stylelint's binary through Node's module resolution rather than a
++ * fixed `node_modules/.bin` path, so the test works regardless of whether the
++ * dependency is hoisted to the repo root or isolated in this package.
++ */
++const stylelintBin = path.join(
++	path.dirname( require.resolve( 'stylelint/package.json' ) ),
++	'bin/stylelint.mjs'
++);
++
+ const generateStylelintCommand = ( filename ) =>
+-	'node_modules/.bin/stylelint ' +
++	'node ' +
++	stylelintBin +
++	' ' +
+ 	path.resolve( __dirname, '../', filename ) +
+ 	' -c' +
+ 	path.resolve( __dirname, '../', './.stylelintrc.tests.json' ) +
+diff --git a/packages/theme/src/stylelint-plugins/test/utils/index.ts b/packages/theme/src/stylelint-plugins/test/utils/index.ts
+index dead57ce4417b2..f958584abca1f3 100644
+--- a/packages/theme/src/stylelint-plugins/test/utils/index.ts
++++ b/packages/theme/src/stylelint-plugins/test/utils/index.ts
+@@ -4,11 +4,23 @@ import childProcess from 'node:child_process';
+ 
+ const execute = util.promisify( childProcess.exec );
+ 
++/*
++ * Resolve Stylelint's binary through Node's module resolution rather than a
++ * fixed `node_modules/.bin` path, so the test works regardless of whether the
++ * dependency is hoisted to the repo root or isolated in this package.
++ */
++const stylelintBin = path.join(
++	path.dirname( require.resolve( 'stylelint/package.json' ) ),
++	'bin/stylelint.mjs'
++);
++
+ const generateStylelintCommand = (
+ 	filename: string,
+ 	configFile: string
+ ): string =>
+-	'node_modules/.bin/stylelint ' +
++	'node ' +
++	stylelintBin +
++	' ' +
+ 	path.resolve( __dirname, '../', filename ) +
+ 	' -c ' +
+ 	path.resolve( __dirname, '../', configFile ) +
+diff --git a/.stylelintrc.js b/tools/stylelint/config.js
+similarity index 100%
+rename from .stylelintrc.js
+rename to tools/stylelint/config.js
+diff --git a/tools/stylelint/package.json b/tools/stylelint/package.json
+new file mode 100644
+index 00000000000000..115cb3d52bf814
+--- /dev/null
++++ b/tools/stylelint/package.json
+@@ -0,0 +1,31 @@
++{
++	"name": "@wordpress/stylelint-tools",
++	"version": "1.0.0",
++	"description": "Consolidated Stylelint configuration for the repo.",
++	"private": true,
++	"author": "The WordPress Contributors",
++	"license": "GPL-2.0-or-later",
++	"keywords": [
++		"wordpress",
++		"gutenberg",
++		"stylelint"
++	],
++	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/stylelint",
++	"repository": {
++		"type": "git",
++		"url": "git+https://github.com/WordPress/gutenberg.git",
++		"directory": "tools/stylelint"
++	},
++	"bugs": {
++		"url": "https://github.com/WordPress/gutenberg/issues"
++	},
++	"exports": {
++		"./config": "./config.js"
++	},
++	"dependencies": {
++		"stylelint-plugin-logical-css": "^1.2.3"
++	},
++	"publishConfig": {
++		"access": "public"
++	}
++}

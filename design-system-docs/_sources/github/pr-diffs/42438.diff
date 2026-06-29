@@ -1,0 +1,337 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 32a0a853c04eb0..3b55bc09412e63 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -81,6 +81,7 @@ module.exports = {
+ 						importNames: [
+ 							'chunk',
+ 							'clamp',
++							'compact',
+ 							'concat',
+ 							'countBy',
+ 							'defaults',
+diff --git a/packages/block-editor/src/components/block-mobile-toolbar/block-actions-menu.native.js b/packages/block-editor/src/components/block-mobile-toolbar/block-actions-menu.native.js
+index c3db55044386aa..d1081cfa2d39c5 100644
+--- a/packages/block-editor/src/components/block-mobile-toolbar/block-actions-menu.native.js
++++ b/packages/block-editor/src/components/block-mobile-toolbar/block-actions-menu.native.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { Platform, findNodeHandle } from 'react-native';
+-import { partial, first, castArray, last, compact, every } from 'lodash';
++import { partial, first, castArray, last, every } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+@@ -202,7 +202,7 @@ const BlockActionsMenu = ( {
+ 		},
+ 	};
+ 
+-	const options = compact( [
++	const options = [
+ 		wrapBlockMover && allOptions.backwardButton,
+ 		wrapBlockMover && allOptions.forwardButton,
+ 		wrapBlockSettings && allOptions.settings,
+@@ -215,7 +215,7 @@ const BlockActionsMenu = ( {
+ 		canDuplicate && allOptions.duplicateButton,
+ 		isReusableBlockType && allOptions.convertToRegularBlocks,
+ 		! isLocked && allOptions.delete,
+-	] );
++	].filter( Boolean );
+ 
+ 	// End early if there are no options to show.
+ 	if ( ! options.length ) {
+diff --git a/packages/block-editor/src/components/block-settings-menu-controls/index.js b/packages/block-editor/src/components/block-settings-menu-controls/index.js
+index 77c8ac87bb54ea..28bfbb27066b1a 100644
+--- a/packages/block-editor/src/components/block-settings-menu-controls/index.js
++++ b/packages/block-editor/src/components/block-settings-menu-controls/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { compact, map } from 'lodash';
++import { map } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -37,7 +37,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
+ 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
+ 			return {
+ 				selectedBlocks: map(
+-					compact( getBlocksByClientId( ids ) ),
++					getBlocksByClientId( ids ).filter( Boolean ),
+ 					( block ) => block.name
+ 				),
+ 				selectedClientIds: ids,
+diff --git a/packages/block-editor/src/components/list-view/branch.js b/packages/block-editor/src/components/list-view/branch.js
+index a8c47f3628578b..16f0e6488431c2 100644
+--- a/packages/block-editor/src/components/list-view/branch.js
++++ b/packages/block-editor/src/components/list-view/branch.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { compact } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -95,7 +90,7 @@ function ListViewBranch( props ) {
+ 
+ 	const { expandedState, draggedClientIds } = useListViewContext();
+ 
+-	const filteredBlocks = compact( blocks );
++	const filteredBlocks = blocks.filter( Boolean );
+ 	const blockCount = filteredBlocks.length;
+ 	let nextPosition = listPosition;
+ 
+diff --git a/packages/block-library/src/columns/edit.native.js b/packages/block-library/src/columns/edit.native.js
+index 842c7787b830bf..306ab96709df84 100644
+--- a/packages/block-library/src/columns/edit.native.js
++++ b/packages/block-library/src/columns/edit.native.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { View, Dimensions } from 'react-native';
+-import { times, map, compact, delay } from 'lodash';
++import { times, map, delay } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+@@ -474,7 +474,7 @@ const ColumnsEdit = ( props ) => {
+ 
+ 			return {
+ 				columnCount: getBlockCount( clientId ),
+-				isDefaultColumns: ! compact( isContentEmpty ).length,
++				isDefaultColumns: ! isContentEmpty.filter( Boolean ).length,
+ 				innerWidths: innerColumnsWidths,
+ 				hasParents: !! parents.length,
+ 				parentBlockAlignment: getBlockAttributes( parents[ 0 ] )?.align,
+diff --git a/packages/block-library/src/embed/embed-placeholder.native.js b/packages/block-library/src/embed/embed-placeholder.native.js
+index aca1acee5125fb..966b96c939217c 100644
+--- a/packages/block-library/src/embed/embed-placeholder.native.js
++++ b/packages/block-library/src/embed/embed-placeholder.native.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { View, Text, TouchableWithoutFeedback } from 'react-native';
+-import { compact } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -68,11 +67,11 @@ const EmbedPlaceholder = ( {
+ 		},
+ 	};
+ 
+-	const options = compact( [
++	const options = [
+ 		cannotEmbed && errorPickerOptions.retry,
+ 		cannotEmbed && errorPickerOptions.convertToLink,
+ 		cannotEmbed && errorPickerOptions.editLink,
+-	] );
++	].filter( Boolean );
+ 
+ 	function onPickerSelect( value ) {
+ 		const selectedItem = options.find( ( item ) => item.value === value );
+diff --git a/packages/block-library/src/more/save.js b/packages/block-library/src/more/save.js
+index c1cfa662e958af..cee6a7b15ed245 100644
+--- a/packages/block-library/src/more/save.js
++++ b/packages/block-library/src/more/save.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { compact } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -14,6 +9,8 @@ export default function save( { attributes: { customText, noTeaser } } ) {
+ 	const noTeaserTag = noTeaser ? '<!--noteaser-->' : '';
+ 
+ 	return (
+-		<RawHTML>{ compact( [ moreTag, noTeaserTag ] ).join( '\n' ) }</RawHTML>
++		<RawHTML>
++			{ [ moreTag, noTeaserTag ].filter( Boolean ).join( '\n' ) }
++		</RawHTML>
+ 	);
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 34f8c772070835..2740bab2fa935f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,8 @@
+ -   `Divider`, `Flex`, `Spacer`: Improve documentation for the `SpaceInput` prop ([#42376](https://github.com/WordPress/gutenberg/pull/42376)).
+ -   `Elevation`: Convert to TypeScript ([#42302](https://github.com/WordPress/gutenberg/pull/42302)).
+ -   `ScrollLock`: Convert to TypeScript ([#42303](https://github.com/WordPress/gutenberg/pull/42303)).
++-   `TreeSelect`: Refactor away from `_.compact()` ([#42438](https://github.com/WordPress/gutenberg/pull/42438)).
++-   `MediaEdit`: Refactor away from `_.compact()` for mobile ([#42438](https://github.com/WordPress/gutenberg/pull/42438)).
+ 
+ ## 19.15.0 (2022-07-13)
+ 
+diff --git a/packages/components/src/mobile/media-edit/index.native.js b/packages/components/src/mobile/media-edit/index.native.js
+index 09c5495ffa7d3c..471bd7d23ecfa5 100644
+--- a/packages/components/src/mobile/media-edit/index.native.js
++++ b/packages/components/src/mobile/media-edit/index.native.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { compact } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -46,11 +41,11 @@ export class MediaEdit extends Component {
+ 	getMediaOptionsItems() {
+ 		const { pickerOptions, openReplaceMediaOptions, source } = this.props;
+ 
+-		return compact( [
++		return [
+ 			source?.uri && editOption,
+ 			openReplaceMediaOptions && replaceOption,
+ 			...( pickerOptions ? pickerOptions : [] ),
+-		] );
++		].filter( Boolean );
+ 	}
+ 
+ 	getDestructiveButtonIndex() {
+diff --git a/packages/components/src/tree-select/index.tsx b/packages/components/src/tree-select/index.tsx
+index 594fb80a81a4ac..b7e76cf53cc7ec 100644
+--- a/packages/components/src/tree-select/index.tsx
++++ b/packages/components/src/tree-select/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { unescape as unescapeString, compact } from 'lodash';
++import { unescape as unescapeString } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -11,7 +11,7 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { SelectControl } from '../select-control';
+-import type { TreeSelectProps, Tree, SelectOptions } from './types';
++import type { TreeSelectProps, Tree, SelectOptions, Truthy } from './types';
+ 
+ function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
+ 	return tree.flatMap( ( treeNode ) => [
+@@ -72,6 +72,7 @@ function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
+  * }
+  * ```
+  */
++
+ export function TreeSelect( {
+ 	label,
+ 	noOptionLabel,
+@@ -81,10 +82,10 @@ export function TreeSelect( {
+ 	...props
+ }: TreeSelectProps ) {
+ 	const options = useMemo( () => {
+-		return compact( [
++		return [
+ 			noOptionLabel && { value: '', label: noOptionLabel },
+ 			...getSelectOptions( tree ),
+-		] );
++		].filter( < T, >( option: T ): option is Truthy< T > => !! option );
+ 	}, [ noOptionLabel, tree ] );
+ 
+ 	return (
+diff --git a/packages/components/src/tree-select/types.ts b/packages/components/src/tree-select/types.ts
+index aafc057be34205..ba58244e13bd27 100644
+--- a/packages/components/src/tree-select/types.ts
++++ b/packages/components/src/tree-select/types.ts
+@@ -9,6 +9,10 @@ import type { ComponentProps } from 'react';
+ import type SelectControl from '../select-control';
+ import type { SelectControlProps } from '../select-control/types';
+ 
++export type Truthy< T > = T extends false | '' | 0 | null | undefined
++	? never
++	: T;
++
+ export type SelectOptions = Required<
+ 	ComponentProps< typeof SelectControl >
+ >[ 'options' ];
+diff --git a/packages/core-data/src/resolvers.js b/packages/core-data/src/resolvers.js
+index 5b4eaac015e5bf..b468a3fff7fe15 100644
+--- a/packages/core-data/src/resolvers.js
++++ b/packages/core-data/src/resolvers.js
+@@ -1,16 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import {
+-	camelCase,
+-	compact,
+-	find,
+-	get,
+-	includes,
+-	map,
+-	mapKeys,
+-	uniq,
+-} from 'lodash';
++import { camelCase, find, get, includes, map, mapKeys, uniq } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -313,7 +304,7 @@ export const canUser =
+ 		// return the expected result in the native version. Instead, API requests
+ 		// only return the result, without including response properties like the headers.
+ 		const allowHeader = response.headers?.get( 'allow' );
+-		const key = compact( [ action, resource, id ] ).join( '/' );
++		const key = [ action, resource, id ].filter( Boolean ).join( '/' );
+ 		const isAllowed = includes( allowHeader, method );
+ 		dispatch.receiveUserPermission( key, isAllowed );
+ 	};
+diff --git a/packages/core-data/src/selectors.ts b/packages/core-data/src/selectors.ts
+index 508c06ccff06f0..dffd97c6ca039e 100644
+--- a/packages/core-data/src/selectors.ts
++++ b/packages/core-data/src/selectors.ts
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import createSelector from 'rememo';
+-import { set, map, find, get, filter, compact } from 'lodash';
++import { set, map, find, get, filter } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -1115,7 +1115,7 @@ export function canUser(
+ 	resource: string,
+ 	id?: GenericRecordKey
+ ): boolean | undefined {
+-	const key = compact( [ action, resource, id ] ).join( '/' );
++	const key = [ action, resource, id ].filter( Boolean ).join( '/' );
+ 	return get( state, [ 'userPermissions', key ] );
+ }
+ 
+diff --git a/tools/webpack/shared.js b/tools/webpack/shared.js
+index 1d686a26e9efda..d8a615eceead58 100644
+--- a/tools/webpack/shared.js
++++ b/tools/webpack/shared.js
+@@ -4,7 +4,6 @@
+ const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
+ const { DefinePlugin } = require( 'webpack' );
+ const TerserPlugin = require( 'terser-webpack-plugin' );
+-const { compact } = require( 'lodash' );
+ const postcss = require( 'postcss' );
+ 
+ /**
+@@ -41,13 +40,13 @@ const baseConfig = {
+ 	},
+ 	mode,
+ 	module: {
+-		rules: compact( [
++		rules: [
+ 			{
+ 				test: /\.js$/,
+ 				use: require.resolve( 'source-map-loader' ),
+ 				enforce: 'pre',
+ 			},
+-		] ),
++		],
+ 	},
+ 	watchOptions: {
+ 		ignored: [

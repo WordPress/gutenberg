@@ -1,0 +1,89 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index cbf32c9eab93ba..708fd49b13ed43 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `CustomSelectControlV2`: add root element wrapper. ([#62803](https://github.com/WordPress/gutenberg/pull/62803))
++
+ ## 28.2.0 (2024-06-26)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index 414a805eccfb1a..f76c7f67ea77b4 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -88,11 +88,13 @@ function _CustomSelect(
+ 		label,
+ 		size,
+ 		store,
++		className,
+ 		...restProps
+ 	} = props;
+ 
+ 	return (
+-		<>
++		// Where should `restProps` be forwarded to?
++		<div className={ className }>
+ 			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
+ 				<VisuallyHidden as="label">{ label }</VisuallyHidden>
+ 			) : (
+@@ -116,7 +118,7 @@ function _CustomSelect(
+ 					</CustomSelectContext.Provider>
+ 				</Styled.SelectPopover>
+ 			</InputBase>
+-		</>
++		</div>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+index e2b9a8a7471e5f..209483775db9e4 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+@@ -3,6 +3,7 @@
+  */
+ // eslint-disable-next-line no-restricted-imports
+ import * as Ariakit from '@ariakit/react';
++import clsx from 'clsx';
+ 
+ /**
+  * Internal dependencies
+@@ -21,6 +22,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 		onChange,
+ 		size = 'default',
+ 		value,
++		className: classNameProp,
+ 		...restProps
+ 	} = props;
+ 
+@@ -122,6 +124,10 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 			}
+ 			size={ translatedSize }
+ 			store={ store }
++			className={ clsx(
++				'components-custom-select-control',
++				classNameProp
++			) }
+ 			{ ...restProps }
+ 		>
+ 			{ children }
+diff --git a/packages/components/src/custom-select-control-v2/types.ts b/packages/components/src/custom-select-control-v2/types.ts
+index 12b41ba54f4a20..3c192cfa56711f 100644
+--- a/packages/components/src/custom-select-control-v2/types.ts
++++ b/packages/components/src/custom-select-control-v2/types.ts
+@@ -50,6 +50,10 @@ export type CustomSelectButtonProps = {
+ };
+ 
+ export type _CustomSelectProps = CustomSelectButtonProps & {
++	/**
++	 * Additional className added to the root wrapper element.
++	 */
++	className?: string;
+ 	/**
+ 	 * The child elements. This should be composed of `CustomSelectItem` components.
+ 	 */

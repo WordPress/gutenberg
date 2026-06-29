@@ -1,0 +1,288 @@
+diff --git a/packages/block-editor/src/components/block-lock/modal.js b/packages/block-editor/src/components/block-lock/modal.js
+index 00429c3a9b6992..580498bc38e382 100644
+--- a/packages/block-editor/src/components/block-lock/modal.js
++++ b/packages/block-editor/src/components/block-lock/modal.js
+@@ -88,7 +88,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
+ 				blockInformation.title
+ 			) }
+ 			overlayClassName="block-editor-block-lock-modal"
+-			closeLabel={ __( 'Close' ) }
+ 			onRequestClose={ onClose }
+ 		>
+ 			<p>
+diff --git a/packages/block-editor/src/components/inserter/block-patterns-explorer/explorer.js b/packages/block-editor/src/components/inserter/block-patterns-explorer/explorer.js
+index d9aecc848ab6d9..914177941821f3 100644
+--- a/packages/block-editor/src/components/inserter/block-patterns-explorer/explorer.js
++++ b/packages/block-editor/src/components/inserter/block-patterns-explorer/explorer.js
+@@ -38,7 +38,6 @@ function PatternsExplorerModal( { onModalClose, ...restProps } ) {
+ 	return (
+ 		<Modal
+ 			title={ __( 'Patterns' ) }
+-			closeLabel={ __( 'Close' ) }
+ 			onRequestClose={ onModalClose }
+ 			isFullScreen
+ 		>
+diff --git a/packages/block-library/src/navigation/edit/navigation-menu-delete-control.js b/packages/block-library/src/navigation/edit/navigation-menu-delete-control.js
+index bc33650def1830..5d37c577f96b8b 100644
+--- a/packages/block-library/src/navigation/edit/navigation-menu-delete-control.js
++++ b/packages/block-library/src/navigation/edit/navigation-menu-delete-control.js
+@@ -37,7 +37,6 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
+ 						__( 'Delete %s' ),
+ 						title
+ 					) }
+-					closeLabel={ __( 'Cancel' ) }
+ 					onRequestClose={ () => setIsConfirmModalVisible( false ) }
+ 				>
+ 					<p>
+diff --git a/packages/block-library/src/page-list/edit.js b/packages/block-library/src/page-list/edit.js
+index 8a18b79ce58507..380d1c8ac7ae15 100644
+--- a/packages/block-library/src/page-list/edit.js
++++ b/packages/block-library/src/page-list/edit.js
+@@ -116,7 +116,6 @@ function ConvertToLinksModal( { onClick, disabled } ) {
+ 			</BlockControls>
+ 			{ isOpen && (
+ 				<Modal
+-					closeLabel={ __( 'Close' ) }
+ 					onRequestClose={ closeModal }
+ 					title={ __( 'Customize this menu' ) }
+ 					className={ 'wp-block-page-list-modal' }
+diff --git a/packages/block-library/src/query/edit/index.js b/packages/block-library/src/query/edit/index.js
+index e9b449c694b9c3..5f5dc7815e0072 100644
+--- a/packages/block-library/src/query/edit/index.js
++++ b/packages/block-library/src/query/edit/index.js
+@@ -84,7 +84,6 @@ function PatternSelectionModal( {
+ 		<Modal
+ 			className="block-editor-query-pattern__selection-modal"
+ 			title={ __( 'Choose a pattern' ) }
+-			closeLabel={ __( 'Cancel' ) }
+ 			onRequestClose={ () => setIsPatternSelectionModalOpen( false ) }
+ 		>
+ 			<BlockContextProvider value={ blockPreviewContext }>
+diff --git a/packages/block-library/src/template-part/edit/index.js b/packages/block-library/src/template-part/edit/index.js
+index 502bd3d00feef6..3dcf548bd117a3 100644
+--- a/packages/block-library/src/template-part/edit/index.js
++++ b/packages/block-library/src/template-part/edit/index.js
+@@ -202,7 +202,6 @@ export default function TemplatePartEdit( {
+ 						__( 'Choose a %s' ),
+ 						areaObject.label.toLowerCase()
+ 					) }
+-					closeLabel={ __( 'Cancel' ) }
+ 					onRequestClose={ () =>
+ 						setIsTemplatePartSelectionOpen( false )
+ 					}
+diff --git a/packages/block-library/src/template-part/edit/title-modal.js b/packages/block-library/src/template-part/edit/title-modal.js
+index 94f512aa457b7c..f813541bd7d733 100644
+--- a/packages/block-library/src/template-part/edit/title-modal.js
++++ b/packages/block-library/src/template-part/edit/title-modal.js
+@@ -28,7 +28,6 @@ export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
+ 				__( 'Name and create your new %s' ),
+ 				areaLabel.toLowerCase()
+ 			) }
+-			closeLabel={ __( 'Cancel' ) }
+ 			overlayClassName="wp-block-template-part__placeholder-create-new__title-form"
+ 			onRequestClose={ onClose }
+ 		>
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 10316b56993c40..ed00dd2624452c 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -202,8 +202,7 @@ function UnforwardedModal(
+ 										onClick={ onRequestClose }
+ 										icon={ close }
+ 										label={
+-											closeButtonLabel ||
+-											__( 'Close dialog' )
++											closeButtonLabel || __( 'Close' )
+ 										}
+ 									/>
+ 								) }
+diff --git a/packages/customize-widgets/src/components/keyboard-shortcut-help-modal/index.js b/packages/customize-widgets/src/components/keyboard-shortcut-help-modal/index.js
+index 5739af79abcf7f..f8467d31b52b47 100644
+--- a/packages/customize-widgets/src/components/keyboard-shortcut-help-modal/index.js
++++ b/packages/customize-widgets/src/components/keyboard-shortcut-help-modal/index.js
+@@ -110,7 +110,6 @@ export default function KeyboardShortcutHelpModal( {
+ 		<Modal
+ 			className="customize-widgets-keyboard-shortcut-help-modal"
+ 			title={ __( 'Keyboard shortcuts' ) }
+-			closeLabel={ __( 'Close' ) }
+ 			onRequestClose={ toggleModal }
+ 		>
+ 			<ShortcutSection
+diff --git a/packages/e2e-tests/specs/editor/various/nux.test.js b/packages/e2e-tests/specs/editor/various/nux.test.js
+index 22219c925564da..1edc92e9e85752 100644
+--- a/packages/e2e-tests/specs/editor/various/nux.test.js
++++ b/packages/e2e-tests/specs/editor/various/nux.test.js
+@@ -105,7 +105,7 @@ describe( 'New User Experience (NUX)', () => {
+ 		expect( welcomeGuide ).not.toBeNull();
+ 
+ 		// Close the guide
+-		await page.click( 'button[aria-label="Close dialog"]' );
++		await page.click( '[role="dialog"] button[aria-label="Close"]' );
+ 
+ 		// Reload the editor.
+ 		await page.reload();
+@@ -125,7 +125,7 @@ describe( 'New User Experience (NUX)', () => {
+ 		expect( welcomeGuide ).not.toBeNull();
+ 
+ 		// Close the guide.
+-		await page.click( 'button[aria-label="Close dialog"]' );
++		await page.click( '[role="dialog"] button[aria-label="Close"]' );
+ 
+ 		// Focus should be in post title field.
+ 		const postTitle = await page.waitForSelector(
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+index 5076bd397f32aa..c0d2d8b7a6b73c 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+@@ -84,7 +84,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+         </h1>
+       </div>
+       <button
+-        aria-label="Close dialog"
++        aria-label="Close"
+         class="components-button has-icon"
+         type="button"
+       >
+@@ -703,7 +703,7 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+         </h1>
+       </div>
+       <button
+-        aria-label="Close dialog"
++        aria-label="Close"
+         class="components-button has-icon"
+         type="button"
+       >
+diff --git a/packages/edit-post/src/components/sidebar/post-template/create-modal.js b/packages/edit-post/src/components/sidebar/post-template/create-modal.js
+index 5064305d2b5858..4cd78edae3c495 100644
+--- a/packages/edit-post/src/components/sidebar/post-template/create-modal.js
++++ b/packages/edit-post/src/components/sidebar/post-template/create-modal.js
+@@ -100,7 +100,6 @@ export default function PostTemplateCreateModal( { onClose } ) {
+ 	return (
+ 		<Modal
+ 			title={ __( 'Create custom template' ) }
+-			closeLabel={ __( 'Close' ) }
+ 			onRequestClose={ cancel }
+ 			className="edit-post-post-template__create-modal"
+ 		>
+diff --git a/packages/edit-post/src/components/start-page-options/index.js b/packages/edit-post/src/components/start-page-options/index.js
+index a50d7c545617f8..eaad498fa3cb82 100644
+--- a/packages/edit-post/src/components/start-page-options/index.js
++++ b/packages/edit-post/src/components/start-page-options/index.js
+@@ -113,7 +113,6 @@ export default function StartPageOptions() {
+ 		<Modal
+ 			className="edit-post-start-page-options__modal"
+ 			title={ __( 'Choose a pattern' ) }
+-			closeLabel={ __( 'Cancel' ) }
+ 			onRequestClose={ () => {
+ 				setModalState( START_PAGE_MODAL_STATES.CLOSED );
+ 			} }
+diff --git a/packages/edit-site/src/components/add-new-template/add-custom-generic-template-modal.js b/packages/edit-site/src/components/add-new-template/add-custom-generic-template-modal.js
+index 470277248a24b5..05688d032a5917 100644
+--- a/packages/edit-site/src/components/add-new-template/add-custom-generic-template-modal.js
++++ b/packages/edit-site/src/components/add-new-template/add-custom-generic-template-modal.js
+@@ -52,7 +52,6 @@ function AddCustomGenericTemplateModal( {
+ 	return (
+ 		<Modal
+ 			title={ __( 'Create custom template' ) }
+-			closeLabel={ __( 'Close' ) }
+ 			onRequestClose={ () => {
+ 				onClose();
+ 			} }
+diff --git a/packages/edit-site/src/components/add-new-template/add-custom-template-modal.js b/packages/edit-site/src/components/add-new-template/add-custom-template-modal.js
+index 2c97a4c4bc31be..a670a8e55eca0b 100644
+--- a/packages/edit-site/src/components/add-new-template/add-custom-template-modal.js
++++ b/packages/edit-site/src/components/add-new-template/add-custom-template-modal.js
+@@ -184,7 +184,6 @@ function AddCustomTemplateModal( {
+ 				entityForSuggestions.labels.singular_name
+ 			) }
+ 			className={ baseCssClass }
+-			closeLabel={ __( 'Close' ) }
+ 			onRequestClose={ onClose }
+ 		>
+ 			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
+diff --git a/packages/edit-site/src/components/create-template-part-modal/index.js b/packages/edit-site/src/components/create-template-part-modal/index.js
+index c429645214e036..e2cbdbf89288cd 100644
+--- a/packages/edit-site/src/components/create-template-part-modal/index.js
++++ b/packages/edit-site/src/components/create-template-part-modal/index.js
+@@ -41,7 +41,6 @@ export default function CreateTemplatePartModal( { closeModal, onCreate } ) {
+ 	return (
+ 		<Modal
+ 			title={ __( 'Create a template part' ) }
+-			closeLabel={ __( 'Close' ) }
+ 			onRequestClose={ closeModal }
+ 			overlayClassName="edit-site-create-template-part-modal"
+ 		>
+diff --git a/packages/edit-site/src/components/keyboard-shortcut-help-modal/index.js b/packages/edit-site/src/components/keyboard-shortcut-help-modal/index.js
+index fc03e16008e30c..aac95775cf1d0d 100644
+--- a/packages/edit-site/src/components/keyboard-shortcut-help-modal/index.js
++++ b/packages/edit-site/src/components/keyboard-shortcut-help-modal/index.js
+@@ -94,7 +94,6 @@ export default function KeyboardShortcutHelpModal( {
+ 		<Modal
+ 			className="edit-site-keyboard-shortcut-help-modal"
+ 			title={ __( 'Keyboard shortcuts' ) }
+-			closeLabel={ __( 'Close' ) }
+ 			onRequestClose={ toggleModal }
+ 		>
+ 			<ShortcutSection
+diff --git a/packages/edit-site/src/components/list/actions/rename-menu-item.js b/packages/edit-site/src/components/list/actions/rename-menu-item.js
+index a3517dfee78c0e..f8a12313c1848d 100644
+--- a/packages/edit-site/src/components/list/actions/rename-menu-item.js
++++ b/packages/edit-site/src/components/list/actions/rename-menu-item.js
+@@ -75,7 +75,6 @@ export default function RenameMenuItem( { template, onClose } ) {
+ 			{ isModalOpen && (
+ 				<Modal
+ 					title={ __( 'Rename' ) }
+-					closeLabel={ __( 'Close' ) }
+ 					onRequestClose={ () => {
+ 						setIsModalOpen( false );
+ 					} }
+diff --git a/packages/edit-widgets/src/components/keyboard-shortcut-help-modal/index.js b/packages/edit-widgets/src/components/keyboard-shortcut-help-modal/index.js
+index c33efcbb181676..228aba170af8f6 100644
+--- a/packages/edit-widgets/src/components/keyboard-shortcut-help-modal/index.js
++++ b/packages/edit-widgets/src/components/keyboard-shortcut-help-modal/index.js
+@@ -101,7 +101,6 @@ export default function KeyboardShortcutHelpModal( {
+ 		<Modal
+ 			className="edit-widgets-keyboard-shortcut-help-modal"
+ 			title={ __( 'Keyboard shortcuts' ) }
+-			closeLabel={ __( 'Close' ) }
+ 			onRequestClose={ toggleModal }
+ 		>
+ 			<ShortcutSection
+diff --git a/packages/interface/src/components/preferences-modal/index.js b/packages/interface/src/components/preferences-modal/index.js
+index b91be8b21204a3..99bb9d3c25dcf4 100644
+--- a/packages/interface/src/components/preferences-modal/index.js
++++ b/packages/interface/src/components/preferences-modal/index.js
+@@ -9,7 +9,6 @@ export default function PreferencesModal( { closeModal, children } ) {
+ 		<Modal
+ 			className="interface-preferences-modal"
+ 			title={ __( 'Preferences' ) }
+-			closeLabel={ __( 'Close' ) }
+ 			onRequestClose={ closeModal }
+ 		>
+ 			{ children }
+diff --git a/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js b/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
+index 34927a4ce0169c..18824b892544a8 100644
+--- a/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
++++ b/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
+@@ -120,7 +120,6 @@ export default function ReusableBlockConvertButton( {
+ 					{ isModalOpen && (
+ 						<Modal
+ 							title={ __( 'Create Reusable block' ) }
+-							closeLabel={ __( 'Close' ) }
+ 							onRequestClose={ () => {
+ 								setIsModalOpen( false );
+ 								setTitle( '' );
+diff --git a/test/e2e/specs/editor/various/preview.spec.js b/test/e2e/specs/editor/various/preview.spec.js
+index be2f4ddb65d27b..d71d9ada9b5103 100644
+--- a/test/e2e/specs/editor/various/preview.spec.js
++++ b/test/e2e/specs/editor/various/preview.spec.js
+@@ -343,6 +343,8 @@ class PreviewUtils {
+ 			return;
+ 		}
+ 
+-		await this.page.click( 'role=button[name="Close dialog"i]' );
++		await this.page.click(
++			'role=dialog[name="Preferences"i] >> role=button[name="Close"i]'
++		);
+ 	}
+ }

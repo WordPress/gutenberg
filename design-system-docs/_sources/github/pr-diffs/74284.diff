@@ -1,0 +1,197 @@
+diff --git a/packages/ui/src/box/box.tsx b/packages/ui/src/box/box.tsx
+index e64a0e29a3d21b..1a16925094aa45 100644
+--- a/packages/ui/src/box/box.tsx
++++ b/packages/ui/src/box/box.tsx
+@@ -1,13 +1,6 @@
+-/**
+- * WordPress dependencies
+- */
++import { useRender, mergeProps } from '@base-ui/react';
+ import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+ import { type BoxProps } from './types';
+-import { renderElement } from '../utils/element';
+ 
+ /**
+  * Default render function that renders a div element with the given props.
+@@ -90,7 +83,7 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
+ 	},
+ 	ref
+ ) {
+-	const style: React.CSSProperties = { ...props.style };
++	const style: React.CSSProperties = {};
+ 
+ 	if ( backgroundColor ) {
+ 		style.backgroundColor = `var(--wpds-color-bg-${ target }-${ backgroundColor }, var(--wpds-color-bg-surface-${ backgroundColor }))`;
+@@ -120,9 +113,11 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
+ 		style.borderColor = `var(--wpds-color-stroke-${ target }-${ borderColor }, var(--wpds-color-stroke-surface-${ borderColor }))`;
+ 	}
+ 
+-	return renderElement< 'div' >( {
++	const element = useRender( {
+ 		render,
+ 		ref,
+-		props: { ...props, style },
++		props: mergeProps< 'div' >( props, { style } ),
+ 	} );
++
++	return element;
+ } );
+diff --git a/packages/ui/src/stack/stack.tsx b/packages/ui/src/stack/stack.tsx
+index c83c3f03f34073..b339d5fa7ae28b 100644
+--- a/packages/ui/src/stack/stack.tsx
++++ b/packages/ui/src/stack/stack.tsx
+@@ -1,17 +1,5 @@
+-/**
+- * External dependencies
+- */
+-import clsx from 'clsx';
+-
+-/**
+- * WordPress dependencies
+- */
++import { useRender, mergeProps } from '@base-ui/react';
+ import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { renderElement } from '../utils/element';
+ import { type StackProps } from './types';
+ import styles from './style.module.css';
+ 
+@@ -23,20 +11,19 @@ export const Stack = forwardRef< HTMLDivElement, StackProps >( function Stack(
+ 	{ direction, gap, align, justify, wrap, render, ...props },
+ 	ref
+ ) {
+-	const className = clsx( props.className, styles.stack );
+-
+ 	const style: React.CSSProperties = {
+ 		gap: gap && `var(--wpds-dimension-gap-${ gap })`,
+ 		alignItems: align,
+ 		justifyContent: justify,
+ 		flexDirection: direction,
+ 		flexWrap: wrap,
+-		...props.style,
+ 	};
+ 
+-	return renderElement< 'div' >( {
++	const element = useRender( {
+ 		render,
+ 		ref,
+-		props: { ...props, style, className },
++		props: mergeProps< 'div' >( props, { style, className: styles.stack } ),
+ 	} );
++
++	return element;
+ } );
+diff --git a/packages/ui/src/stack/test/stack.test.tsx b/packages/ui/src/stack/test/stack.test.tsx
+index 13e3bd1e7d74b3..82dad1841caba1 100644
+--- a/packages/ui/src/stack/test/stack.test.tsx
++++ b/packages/ui/src/stack/test/stack.test.tsx
+@@ -1,18 +1,11 @@
+-/**
+- * External dependencies
+- */
+-import { render } from '@testing-library/react';
+-
+-/**
+- * WordPress dependencies
+- */
++import { render, screen } from '@testing-library/react';
+ import { createRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+ import { Stack } from '../stack';
+ 
++jest.mock( './style.module.css', () => ( {
++	stack: 'stack-class',
++} ) );
++
+ describe( 'Stack', () => {
+ 	it( 'forwards ref', () => {
+ 		const ref = createRef< HTMLDivElement >();
+@@ -21,4 +14,21 @@ describe( 'Stack', () => {
+ 
+ 		expect( ref.current ).toBeInstanceOf( HTMLDivElement );
+ 	} );
++
++	it( 'merges props', () => {
++		render(
++			<Stack
++				align="center"
++				className="custom-class"
++				style={ { width: '10px' } }
++			>
++				Content
++			</Stack>
++		);
++
++		const stack = screen.getByText( 'Content' );
++
++		expect( stack ).toHaveStyle( { width: '10px', alignItems: 'center' } );
++		expect( stack ).toHaveClass( 'custom-class', 'stack-class' );
++	} );
+ } );
+diff --git a/packages/ui/src/utils/element.ts b/packages/ui/src/utils/element.ts
+deleted file mode 100644
+index 560f4ac199f0a5..00000000000000
+--- a/packages/ui/src/utils/element.ts
++++ /dev/null
+@@ -1,51 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { cloneElement, createElement } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import type { ComponentProps } from './types';
+-
+-type RenderProp< E extends React.ElementType > = NonNullable<
+-	ComponentProps< E >[ 'render' ]
+->;
+-
+-/**
+- * Renders an element from a render prop (a component or an element), with
+- * merged props and ref.
+- *
+- * @param options                Render options.
+- * @param options.render         The render prop (component or element).
+- * @param options.defaultTagName The default tag name to use if no render prop
+- *                               is provided.
+- * @param options.props          Props to pass to or merge with the element.
+- * @param options.ref            Optional ref to attach to the element.
+- * @return The rendered element.
+- */
+-export const renderElement = < E extends React.ElementType >( {
+-	render,
+-	defaultTagName = 'div',
+-	props,
+-	ref,
+-}: {
+-	render?: RenderProp< E >;
+-	defaultTagName?: keyof JSX.IntrinsicElements;
+-	props: Omit< ComponentProps< E >, 'render' >;
+-	ref?: React.Ref<
+-		E extends keyof HTMLElementTagNameMap
+-			? HTMLElementTagNameMap[ E ]
+-			: Element
+-	>;
+-} ): React.ReactElement => {
+-	const propsWithRef = ref ? { ...props, ref } : props;
+-
+-	if ( render === undefined ) {
+-		return createElement( defaultTagName, propsWithRef );
+-	} else if ( typeof render === 'function' ) {
+-		return render( propsWithRef );
+-	}
+-
+-	return cloneElement( render, propsWithRef );
+-};

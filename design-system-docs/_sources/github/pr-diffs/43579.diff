@@ -1,0 +1,150 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5bfb10af6c3148..49dca6b4611f4f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -31,6 +31,7 @@
+ ### Internal
+ 
+ -   `Tooltip`: Refactor tests to `@testing-library/react` ([#43061](https://github.com/WordPress/gutenberg/pull/43061)).
++-   `ClipboardButton`, `FocusableIframe`, `IsolatedEventContainer`, `withConstrainedTabbing`, `withSpokenMessages`: Improve TypeScript types ([#43579](https://github.com/WordPress/gutenberg/pull/43579)).
+ -   Clean up unused and duplicate `COLORS` values ([#43445](https://github.com/WordPress/gutenberg/pull/43445)).
+ -   Update `floating-ui` to the latest version ([#43206](https://github.com/WordPress/gutenberg/pull/43206)).
+ -   `DateTimePicker`, `TimePicker`, `DatePicker`: Switch from `moment` to `date-fns` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
+diff --git a/packages/components/src/clipboard-button/index.js b/packages/components/src/clipboard-button/index.js
+index abea826c36f3d1..9cce2dbefa9a79 100644
+--- a/packages/components/src/clipboard-button/index.js
++++ b/packages/components/src/clipboard-button/index.js
+@@ -17,6 +17,14 @@ import Button from '../button';
+ 
+ const TIMEOUT = 4000;
+ 
++/**
++ * @param {Object}                    props
++ * @param {string}                    [props.className]
++ * @param {import('react').ReactNode} props.children
++ * @param {() => void}                props.onCopy
++ * @param {() => void}                [props.onFinishCopy]
++ * @param {string}                    props.text
++ */
+ export default function ClipboardButton( {
+ 	className,
+ 	children,
+@@ -30,9 +38,11 @@ export default function ClipboardButton( {
+ 		alternative: 'wp.compose.useCopyToClipboard',
+ 	} );
+ 
++	/** @type {import('react').MutableRefObject<ReturnType<setTimeout> | undefined>} */
+ 	const timeoutId = useRef();
+ 	const ref = useCopyToClipboard( text, () => {
+ 		onCopy();
++		// @ts-expect-error: Should check if .current is defined, but not changing because this component is deprecated.
+ 		clearTimeout( timeoutId.current );
+ 
+ 		if ( onFinishCopy ) {
+@@ -41,6 +51,7 @@ export default function ClipboardButton( {
+ 	} );
+ 
+ 	useEffect( () => {
++		// @ts-expect-error: Should check if .current is defined, but not changing because this component is deprecated.
+ 		clearTimeout( timeoutId.current );
+ 	}, [] );
+ 
+@@ -51,7 +62,9 @@ export default function ClipboardButton( {
+ 	// This causes documentHasSelection() in the copy-handler component to
+ 	// mistakenly override the ClipboardButton, and copy a serialized string
+ 	// of the current block instead.
++	/** @type {import('react').ClipboardEventHandler<HTMLButtonElement>} */
+ 	const focusOnCopyEventTarget = ( event ) => {
++		// @ts-expect-error: Should be currentTarget, but not changing because this component is deprecated.
+ 		event.target.focus();
+ 	};
+ 
+diff --git a/packages/components/src/focusable-iframe/index.js b/packages/components/src/focusable-iframe/index.js
+index f9c1da6406320d..0374bebf7eba0c 100644
+--- a/packages/components/src/focusable-iframe/index.js
++++ b/packages/components/src/focusable-iframe/index.js
+@@ -4,7 +4,12 @@
+ import { useMergeRefs, useFocusableIframe } from '@wordpress/compose';
+ import deprecated from '@wordpress/deprecated';
+ 
++/**
++ * @param {Object}                                 props
++ * @param {import('react').Ref<HTMLIFrameElement>} props.iframeRef
++ */
+ export default function FocusableIframe( { iframeRef, ...props } ) {
++	// @ts-expect-error: Return type for useFocusableIframe() is incorrect.
+ 	const ref = useMergeRefs( [ iframeRef, useFocusableIframe() ] );
+ 	deprecated( 'wp.components.FocusableIframe', {
+ 		since: '5.9',
+diff --git a/packages/components/src/higher-order/with-constrained-tabbing/index.js b/packages/components/src/higher-order/with-constrained-tabbing/index.js
+index db1dbe27f6908c..506df55550bcc5 100644
+--- a/packages/components/src/higher-order/with-constrained-tabbing/index.js
++++ b/packages/components/src/higher-order/with-constrained-tabbing/index.js
+@@ -11,7 +11,7 @@ const withConstrainedTabbing = createHigherOrderComponent(
+ 		function ComponentWithConstrainedTabbing( props ) {
+ 			const ref = useConstrainedTabbing();
+ 			return (
+-				<div ref={ ref } tabIndex="-1">
++				<div ref={ ref } tabIndex={ -1 }>
+ 					<WrappedComponent { ...props } />
+ 				</div>
+ 			);
+diff --git a/packages/components/src/higher-order/with-spoken-messages/index.js b/packages/components/src/higher-order/with-spoken-messages/index.js
+index ab84c8869ef1c2..4302c8f252d4f9 100644
+--- a/packages/components/src/higher-order/with-spoken-messages/index.js
++++ b/packages/components/src/higher-order/with-spoken-messages/index.js
+@@ -4,6 +4,8 @@
+ import { createHigherOrderComponent, useDebounce } from '@wordpress/compose';
+ import { speak } from '@wordpress/a11y';
+ 
++/** @typedef {import('@wordpress/element').WPComponent} WPComponent */
++
+ /**
+  * A Higher Order Component used to be provide speak and debounced speak
+  * functions.
+diff --git a/packages/components/src/isolated-event-container/index.js b/packages/components/src/isolated-event-container/index.js
+index ec0daad03c63d8..5b24d36d0b1acb 100644
+--- a/packages/components/src/isolated-event-container/index.js
++++ b/packages/components/src/isolated-event-container/index.js
+@@ -4,6 +4,9 @@
+ import { forwardRef } from '@wordpress/element';
+ import deprecated from '@wordpress/deprecated';
+ 
++/**
++ * @type {import('react').MouseEventHandler<HTMLDivElement>}
++ */
+ function stopPropagation( event ) {
+ 	event.stopPropagation();
+ }
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 2b292520a92bed..e3e1c4ced5d9b9 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -43,7 +43,6 @@
+ 		"src/angle-picker-control",
+ 		"src/autocomplete",
+ 		"src/box-control",
+-		"src/clipboard-button",
+ 		"src/color-list-picker",
+ 		"src/combobox-control",
+ 		"src/custom-gradient-picker",
+@@ -52,19 +51,15 @@
+ 		"src/drop-zone",
+ 		"src/duotone-picker",
+ 		"src/focal-point-picker",
+-		"src/focusable-iframe",
+ 		"src/font-size-picker",
+ 		"src/form-file-upload",
+ 		"src/gradient-picker",
+ 		"src/guide",
+ 		"src/higher-order/navigate-regions",
+-		"src/higher-order/with-constrained-tabbing",
+ 		"src/higher-order/with-fallback-styles",
+ 		"src/higher-order/with-filters",
+ 		"src/higher-order/with-focus-return",
+-		"src/higher-order/with-spoken-messages",
+ 		"src/higher-order/with-notices",
+-		"src/isolated-event-container",
+ 		"src/keyboard-shortcuts",
+ 		"src/menu-items-choice",
+ 		"src/navigation",

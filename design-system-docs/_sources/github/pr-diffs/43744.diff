@@ -1,0 +1,81 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 997f9a43969162..926d4bab6eef53 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -   `ComboboxControl`: Add unit tests ([#42403](https://github.com/WordPress/gutenberg/pull/42403)).
+ -   `NavigableContainer`: use `code` instead of `keyCode` for keyboard events, rewrite tests using RTL and `user-event` ([#43606](https://github.com/WordPress/gutenberg/pull/43606/)).
+ -   `ComboboxControl`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41417](https://github.com/WordPress/gutenberg/pull/41417))
++-   `FormTokenField`: Refactor away from Lodash ([#43744](https://github.com/WordPress/gutenberg/pull/43744/)).
+ 
+ ## 20.0.0 (2022-08-24)
+ 
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index aa7211ca16e1ea..cca98fd5e6d827 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { last, clone, map, some } from 'lodash';
+ import classnames from 'classnames';
+ import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
+ 
+@@ -258,7 +257,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		const text = event.value;
+ 		const separator = tokenizeOnSpace ? /[ ,\t]+/ : /[,\t]+/;
+ 		const items = text.split( separator );
+-		const tokenValue = last( items ) || '';
++		const tokenValue = items[ items.length - 1 ] || '';
+ 
+ 		if ( items.length > 1 ) {
+ 			addNewTokens( items.slice( 0, -1 ) );
+@@ -413,7 +412,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		];
+ 
+ 		if ( tokensToAdd.length > 0 ) {
+-			const newValue = clone( value );
++			const newValue = [ ...value ];
+ 			newValue.splice( getIndexOfInput(), 0, ...tokensToAdd );
+ 			onChange( newValue );
+ 		}
+@@ -503,7 +502,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 	}
+ 
+ 	function valueContainsToken( token: string ) {
+-		return some( value, ( item ) => {
++		return value.some( ( item ) => {
+ 			return getTokenValue( token ) === getTokenValue( item );
+ 		} );
+ 	}
+@@ -564,7 +563,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 	}
+ 
+ 	function renderTokensAndInput() {
+-		const components = map( value, renderToken );
++		const components = value.map( renderToken );
+ 		components.splice( getIndexOfInput(), 0, renderInput() );
+ 
+ 		return components;
+diff --git a/packages/components/src/form-token-field/suggestions-list.tsx b/packages/components/src/form-token-field/suggestions-list.tsx
+index cb3f8299c935f7..e7a7f3fc266a7e 100644
+--- a/packages/components/src/form-token-field/suggestions-list.tsx
++++ b/packages/components/src/form-token-field/suggestions-list.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { map } from 'lodash';
+ import scrollView from 'dom-scroll-into-view';
+ import classnames from 'classnames';
+ import type { MouseEventHandler, ReactNode } from 'react';
+@@ -114,7 +113,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
+ 			id={ `components-form-token-suggestions-${ instanceId }` }
+ 			role="listbox"
+ 		>
+-			{ map( suggestions, ( suggestion, index ) => {
++			{ suggestions.map( ( suggestion, index ) => {
+ 				const matchText = computeSuggestionMatch( suggestion );
+ 				const className = classnames(
+ 					'components-form-token-field__suggestion',

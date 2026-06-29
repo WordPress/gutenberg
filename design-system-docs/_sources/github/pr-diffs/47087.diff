@@ -1,0 +1,412 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4de0d44e82a248..79c598619b0d78 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   `AnglePickerControl`: Convert to TypeScript ([#45820](https://github.com/WordPress/gutenberg/pull/45820)).
+ -   `ResizableBox`: refactor styles to TypeScript ([47756](https://github.com/WordPress/gutenberg/pull/47756)).
+ -   `BorderBoxControl`: migrate tests to TypeScript, remove act() call ([47755](https://github.com/WordPress/gutenberg/pull/47755)).
++-   `Toolbar`: Convert to TypeScript ([#47087](https://github.com/WordPress/gutenberg/pull/47087)).
+ 
+ ## 23.3.0 (2023-02-01)
+ 
+diff --git a/packages/components/src/toolbar/stories/index.js b/packages/components/src/toolbar/stories/index.tsx
+similarity index 74%
+rename from packages/components/src/toolbar/stories/index.js
+rename to packages/components/src/toolbar/stories/index.tsx
+index 39e69da286a9e3..73064e580a24c1 100644
+--- a/packages/components/src/toolbar/stories/index.js
++++ b/packages/components/src/toolbar/stories/index.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -18,6 +23,7 @@ import {
+ 	arrowRight,
+ 	chevronDown,
+ } from '@wordpress/icons';
++import { SVG, Path } from '@wordpress/primitives';
+ 
+ /**
+  * Internal dependencies
+@@ -29,9 +35,9 @@ import {
+ 	ToolbarItem,
+ 	ToolbarDropdownMenu,
+ } from '..';
+-import { SVG, Path, DropdownMenu } from '../../';
++import DropdownMenu from '../../dropdown-menu';
+ 
+-export default {
++const meta: ComponentMeta< typeof Toolbar > = {
+ 	title: 'Components/Toolbar',
+ 	component: Toolbar,
+ 	subcomponents: {
+@@ -49,6 +55,8 @@ export default {
+ 	},
+ };
+ 
++export default meta;
++
+ function InlineImageIcon() {
+ 	return (
+ 		<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+@@ -57,7 +65,7 @@ function InlineImageIcon() {
+ 	);
+ }
+ 
+-const Template = ( props ) => (
++const Template: ComponentStory< typeof Toolbar > = ( props ) => (
+ 	<div style={ { height: 280 } }>
+ 		<Toolbar { ...props } />
+ 	</div>
+@@ -74,29 +82,32 @@ Default.args = {
+ 			</ToolbarGroup>
+ 			<ToolbarGroup>
+ 				<ToolbarItem>
+-					{ ( toggleProps ) => (
+-						<DropdownMenu
+-							hasArrowIndicator
+-							icon={ alignLeft }
+-							label="Align"
+-							controls={ [
+-								{
+-									icon: alignLeft,
+-									title: 'Align left',
+-									isActive: true,
+-								},
+-								{
+-									icon: alignCenter,
+-									title: 'Align center',
+-								},
+-								{
+-									icon: alignRight,
+-									title: 'Align right',
+-								},
+-							] }
+-							toggleProps={ toggleProps }
+-						/>
+-					) }
++					{
++						// @ts-expect-error TODO: Remove when ToolbarItem/DropdownMenu is typed
++						( toggleProps ) => (
++							<DropdownMenu
++								hasArrowIndicator
++								icon={ alignLeft }
++								label="Align"
++								controls={ [
++									{
++										icon: alignLeft,
++										title: 'Align left',
++										isActive: true,
++									},
++									{
++										icon: alignCenter,
++										title: 'Align center',
++									},
++									{
++										icon: alignRight,
++										title: 'Align right',
++									},
++								] }
++								toggleProps={ toggleProps }
++							/>
++						)
++					}
+ 				</ToolbarItem>
+ 			</ToolbarGroup>
+ 			<ToolbarGroup>
+@@ -106,6 +117,7 @@ Default.args = {
+ 				<ToolbarButton icon={ link } label="Link" />
+ 				<ToolbarGroup
+ 					isCollapsed
++					// @ts-expect-error TODO: Remove when ToolbarGroup is typed
+ 					icon={ false }
+ 					label="More rich text controls"
+ 					controls={ [
+@@ -119,6 +131,7 @@ Default.args = {
+ 				/>
+ 			</ToolbarGroup>
+ 			<ToolbarGroup
++				// @ts-expect-error TODO: Remove when ToolbarGroup is typed
+ 				icon={ more }
+ 				label="Align"
+ 				isCollapsed
+diff --git a/packages/components/src/toolbar/test/index.js b/packages/components/src/toolbar/test/index.tsx
+similarity index 100%
+rename from packages/components/src/toolbar/test/index.js
+rename to packages/components/src/toolbar/test/index.tsx
+diff --git a/packages/components/src/toolbar/test/toolbar-group.js b/packages/components/src/toolbar/test/toolbar-group.tsx
+similarity index 96%
+rename from packages/components/src/toolbar/test/toolbar-group.js
+rename to packages/components/src/toolbar/test/toolbar-group.tsx
+index 1b4c2613c4474c..e37d9fdc14972a 100644
+--- a/packages/components/src/toolbar/test/toolbar-group.js
++++ b/packages/components/src/toolbar/test/toolbar-group.tsx
+@@ -23,7 +23,7 @@ describe( 'ToolbarGroup', () => {
+ 		} );
+ 
+ 		it( 'should render a list of controls with buttons', () => {
+-			const clickHandler = ( event ) => event;
++			const clickHandler = ( event: Event ) => event;
+ 			const controls = [
+ 				{
+ 					icon: 'wordpress',
+@@ -41,7 +41,7 @@ describe( 'ToolbarGroup', () => {
+ 		} );
+ 
+ 		it( 'should render a list of controls with buttons and active control', () => {
+-			const clickHandler = ( event ) => event;
++			const clickHandler = ( event: Event ) => event;
+ 			const controls = [
+ 				{
+ 					icon: 'wordpress',
+diff --git a/packages/components/src/toolbar/toolbar-button/index.js b/packages/components/src/toolbar/toolbar-button/index.js
+index 51300c304fdc7c..bdfc44e0d64fbf 100644
+--- a/packages/components/src/toolbar/toolbar-button/index.js
++++ b/packages/components/src/toolbar/toolbar-button/index.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/toolbar/toolbar-button/toolbar-button-container.js b/packages/components/src/toolbar/toolbar-button/toolbar-button-container.js
+index dcb8ea0026256a..5417aeb3e7ba7b 100644
+--- a/packages/components/src/toolbar/toolbar-button/toolbar-button-container.js
++++ b/packages/components/src/toolbar/toolbar-button/toolbar-button-container.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ const ToolbarButtonContainer = ( props ) => (
+ 	<div className={ props.className }>{ props.children }</div>
+ );
+diff --git a/packages/components/src/toolbar/toolbar-context/index.js b/packages/components/src/toolbar/toolbar-context/index.js
+index a5095c503f6ece..1eaeef2b8e243b 100644
+--- a/packages/components/src/toolbar/toolbar-context/index.js
++++ b/packages/components/src/toolbar/toolbar-context/index.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/toolbar/toolbar-dropdown-menu/index.js b/packages/components/src/toolbar/toolbar-dropdown-menu/index.js
+index 5fcfe51313631c..5185b61b16d86f 100644
+--- a/packages/components/src/toolbar/toolbar-dropdown-menu/index.js
++++ b/packages/components/src/toolbar/toolbar-dropdown-menu/index.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/toolbar/toolbar-group/index.js b/packages/components/src/toolbar/toolbar-group/index.js
+index 09f46b6c43cd90..c86954e04929a1 100644
+--- a/packages/components/src/toolbar/toolbar-group/index.js
++++ b/packages/components/src/toolbar/toolbar-group/index.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.js b/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.js
+index 371f4b9e5f6561..147e610bb0624f 100644
+--- a/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.js
++++ b/packages/components/src/toolbar/toolbar-group/toolbar-group-collapsed.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/toolbar/toolbar-group/toolbar-group-container.js b/packages/components/src/toolbar/toolbar-group/toolbar-group-container.js
+index 936960f9c5d7f9..903da65b6be40a 100644
+--- a/packages/components/src/toolbar/toolbar-group/toolbar-group-container.js
++++ b/packages/components/src/toolbar/toolbar-group/toolbar-group-container.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ const ToolbarGroupContainer = ( { className, children, ...props } ) => (
+ 	<div className={ className } { ...props }>
+ 		{ children }
+diff --git a/packages/components/src/toolbar/toolbar-item/index.js b/packages/components/src/toolbar/toolbar-item/index.js
+index 7f938d55f85584..595a14dbf32a85 100644
+--- a/packages/components/src/toolbar/toolbar-item/index.js
++++ b/packages/components/src/toolbar/toolbar-item/index.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck
++
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/src/toolbar/toolbar/README.md b/packages/components/src/toolbar/toolbar/README.md
+index 2ce5bc8b2ad9bd..6692d3f63f34e5 100644
+--- a/packages/components/src/toolbar/toolbar/README.md
++++ b/packages/components/src/toolbar/toolbar/README.md
+@@ -59,11 +59,16 @@ function MyToolbar() {
+ 
+ Toolbar will pass all HTML props to the underlying element. Additionally, you can pass the custom props specified below.
+ 
+-#### label
++#### `className`: `string`
++
++Class to set on the container div.
++
++-   Required: No
++
++#### `label`: `string`
+ 
+ An accessible label for the toolbar.
+ 
+--   Type: `String`
+ -   Required: Yes
+ 
+ ## Related components
+diff --git a/packages/components/src/toolbar/toolbar/index.js b/packages/components/src/toolbar/toolbar/index.tsx
+similarity index 55%
+rename from packages/components/src/toolbar/toolbar/index.js
+rename to packages/components/src/toolbar/toolbar/index.tsx
+index f798e3c3776a9f..db5ced5a382a21 100644
+--- a/packages/components/src/toolbar/toolbar/index.js
++++ b/packages/components/src/toolbar/toolbar/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -14,18 +15,17 @@ import deprecated from '@wordpress/deprecated';
+  */
+ import ToolbarGroup from '../toolbar-group';
+ import ToolbarContainer from './toolbar-container';
++import type { ToolbarProps } from './types';
++import type { WordPressComponentProps } from '../../ui/context';
+ 
+-/**
+- * Renders a toolbar.
+- *
+- * To add controls, simply pass `ToolbarButton` components as children.
+- *
+- * @param {Object} props             Component props.
+- * @param {string} [props.className] Class to set on the container div.
+- * @param {string} [props.label]     ARIA label for toolbar container.
+- * @param {Object} ref               React Element ref.
+- */
+-function Toolbar( { className, label, ...props }, ref ) {
++function UnforwardedToolbar(
++	{
++		className,
++		label,
++		...props
++	}: WordPressComponentProps< ToolbarProps, 'div', false >,
++	ref: ForwardedRef< any >
++) {
+ 	if ( ! label ) {
+ 		deprecated( 'Using Toolbar without label prop', {
+ 			since: '5.6',
+@@ -49,4 +49,25 @@ function Toolbar( { className, label, ...props }, ref ) {
+ 	);
+ }
+ 
+-export default forwardRef( Toolbar );
++/**
++ * Renders a toolbar.
++ *
++ * To add controls, simply pass `ToolbarButton` components as children.
++ *
++ * ```jsx
++ * import { Toolbar, ToolbarButton } from '@wordpress/components';
++ * import { formatBold, formatItalic, link } from '@wordpress/icons';
++ *
++ * function MyToolbar() {
++ *   return (
++ *     <Toolbar label="Options">
++ *       <ToolbarButton icon={ formatBold } label="Bold" />
++ *       <ToolbarButton icon={ formatItalic } label="Italic" />
++ *       <ToolbarButton icon={ link } label="Link" />
++ *     </Toolbar>
++ *   );
++ * }
++ * ```
++ */
++export const Toolbar = forwardRef( UnforwardedToolbar );
++export default Toolbar;
+diff --git a/packages/components/src/toolbar/toolbar/toolbar-container.js b/packages/components/src/toolbar/toolbar/toolbar-container.tsx
+similarity index 68%
+rename from packages/components/src/toolbar/toolbar/toolbar-container.js
+rename to packages/components/src/toolbar/toolbar/toolbar-container.tsx
+index 4e39fb0990677b..496fb9281651fa 100644
+--- a/packages/components/src/toolbar/toolbar/toolbar-container.js
++++ b/packages/components/src/toolbar/toolbar/toolbar-container.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import { useToolbarState, Toolbar } from 'reakit/Toolbar';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -13,8 +14,13 @@ import { isRTL } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import ToolbarContext from '../toolbar-context';
++import type { ToolbarProps } from './types';
++import type { WordPressComponentProps } from '../../ui/context';
+ 
+-function ToolbarContainer( { label, ...props }, ref ) {
++function UnforwardedToolbarContainer(
++	{ label, ...props }: WordPressComponentProps< ToolbarProps, 'div', false >,
++	ref: ForwardedRef< any >
++) {
+ 	// https://reakit.io/docs/basic-concepts/#state-hooks
+ 	// Passing baseId for server side rendering (which includes snapshots)
+ 	// If an id prop is passed to Toolbar, toolbar items will use it as a base for their ids
+@@ -37,4 +43,5 @@ function ToolbarContainer( { label, ...props }, ref ) {
+ 	);
+ }
+ 
+-export default forwardRef( ToolbarContainer );
++export const ToolbarContainer = forwardRef( UnforwardedToolbarContainer );
++export default ToolbarContainer;
+diff --git a/packages/components/src/toolbar/toolbar/types.ts b/packages/components/src/toolbar/toolbar/types.ts
+new file mode 100644
+index 00000000000000..f6a6b9667ab4b4
+--- /dev/null
++++ b/packages/components/src/toolbar/toolbar/types.ts
+@@ -0,0 +1,15 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++export type ToolbarProps = {
++	/**
++	 * Children to be rendered inside the toolbar.
++	 */
++	children?: ReactNode;
++	/**
++	 * An accessible label for the toolbar.
++	 */
++	label: string;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index c54fddc4e2a7ba..43277b1448994f 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -60,7 +60,6 @@
+ 		"src/menu-items-choice",
+ 		"src/navigation",
+ 		"src/palette-edit",
+-		"src/panel/body.js",
+-		"src/toolbar"
++		"src/panel/body.js"
+ 	]
+ }

@@ -1,0 +1,1573 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 3fa7e6fd690e8e..94dc53f7da1877 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -199,43 +199,46 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                 </div>
+               </div>
+               <div
+-                aria-label="Custom color picker."
+                 class="components-circular-option-picker"
+-                id="option-picker-0"
+-                role="listbox"
+               >
+                 <div
+-                  class="components-circular-option-picker__swatches"
++                  aria-label="Custom color picker."
++                  id="components-circular-option-picker-0"
++                  role="listbox"
+                 >
+                   <div
+-                    class="components-circular-option-picker__option-group components-circular-option-picker__swatches"
++                    class="components-circular-option-picker__swatches"
+                   >
+                     <div
+-                      class="components-circular-option-picker__option-wrapper"
++                      class="components-circular-option-picker__option-group components-circular-option-picker__swatches"
+                     >
+-                      <button
+-                        aria-label="Color: red"
+-                        aria-selected="true"
+-                        class="components-button components-circular-option-picker__option is-pressed"
+-                        id="option-picker-0-0"
+-                        role="option"
+-                        style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
+-                        tabindex="0"
+-                        type="button"
+-                      />
+-                      <svg
+-                        aria-hidden="true"
+-                        fill="#000"
+-                        focusable="false"
+-                        height="24"
+-                        viewBox="0 0 24 24"
+-                        width="24"
+-                        xmlns="http://www.w3.org/2000/svg"
++                      <div
++                        class="components-circular-option-picker__option-wrapper"
+                       >
+-                        <path
+-                          d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
++                        <button
++                          aria-label="Color: red"
++                          aria-selected="true"
++                          class="components-button components-circular-option-picker__option is-pressed"
++                          id="components-circular-option-picker-0-0"
++                          role="option"
++                          style="background-color: rgb(255, 0, 0); color: rgb(255, 0, 0);"
++                          tabindex="0"
++                          type="button"
+                         />
+-                      </svg>
++                        <svg
++                          aria-hidden="true"
++                          fill="#000"
++                          focusable="false"
++                          height="24"
++                          viewBox="0 0 24 24"
++                          width="24"
++                          xmlns="http://www.w3.org/2000/svg"
++                        >
++                          <path
++                            d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
++                          />
++                        </svg>
++                      </div>
+                     </div>
+                   </div>
+                 </div>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 05f08225788cce..d79a5de61c63ec 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   `BorderControl`: Apply proper metrics and simpler text ([#53998](https://github.com/WordPress/gutenberg/pull/53998)).
+ -   `FormTokenField`: Update styling for consistency and increased visibility ([#54402](https://github.com/WordPress/gutenberg/pull/54402)).
+ -   `Tooltip`: Add new `hideOnClick` prop ([#54406](https://github.com/WordPress/gutenberg/pull/54406)).
++-   `CircularOptionPicker`: Add option to use previous non-listbox behaviour, for contexts where buttons are more appropriate than a list of options ([#54290](https://github.com/WordPress/gutenberg/pull/54290)).
+ -   `DuotonePicker/ColorListPicker`: Adds appropriate labels to 'Duotone Filter' color pickers ([#54468](https://github.com/WordPress/gutenberg/pull/54468)).
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/circular-option-picker/README.md b/packages/components/src/circular-option-picker/README.md
+index 122eca4fa56327..a7595daa349cd7 100644
+--- a/packages/components/src/circular-option-picker/README.md
++++ b/packages/components/src/circular-option-picker/README.md
+@@ -80,6 +80,20 @@ The child elements.
+ 
+ - Required: No
+ 
++### `asButtons`: `boolean`
++
++Whether the control should present as a set of buttons, each with its own tab stop.
++
++- Required: No
++- Default: `false`
++
++### `loop`: `boolean`
++
++Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
++
++- Required: No
++- Default: `true`
++
+ ## Subcomponents
+ 
+ ### `CircularOptionPicker.ButtonAction`
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-actions.tsx b/packages/components/src/circular-option-picker/circular-option-picker-actions.tsx
+new file mode 100644
+index 00000000000000..2817569b0564ed
+--- /dev/null
++++ b/packages/components/src/circular-option-picker/circular-option-picker-actions.tsx
+@@ -0,0 +1,60 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../button';
++import Dropdown from '../dropdown';
++import type { DropdownLinkActionProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
++import type { ButtonAsButtonProps } from '../button/types';
++
++export function DropdownLinkAction( {
++	buttonProps,
++	className,
++	dropdownProps,
++	linkText,
++}: DropdownLinkActionProps ) {
++	return (
++		<Dropdown
++			className={ classnames(
++				'components-circular-option-picker__dropdown-link-action',
++				className
++			) }
++			renderToggle={ ( { isOpen, onToggle } ) => (
++				<Button
++					aria-expanded={ isOpen }
++					aria-haspopup="true"
++					onClick={ onToggle }
++					variant="link"
++					{ ...buttonProps }
++				>
++					{ linkText }
++				</Button>
++			) }
++			{ ...dropdownProps }
++		/>
++	);
++}
++
++export function ButtonAction( {
++	className,
++	children,
++	...additionalProps
++}: WordPressComponentProps< ButtonAsButtonProps, 'button', false > ) {
++	return (
++		<Button
++			className={ classnames(
++				'components-circular-option-picker__clear',
++				className
++			) }
++			variant="tertiary"
++			{ ...additionalProps }
++		>
++			{ children }
++		</Button>
++	);
++}
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-context.tsx b/packages/components/src/circular-option-picker/circular-option-picker-context.tsx
+new file mode 100644
+index 00000000000000..cafb0b90e3017f
+--- /dev/null
++++ b/packages/components/src/circular-option-picker/circular-option-picker-context.tsx
+@@ -0,0 +1,12 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { CircularOptionPickerContextProps } from './types';
++
++export const CircularOptionPickerContext =
++	createContext< CircularOptionPickerContextProps >( {} );
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-option-group.tsx b/packages/components/src/circular-option-picker/circular-option-picker-option-group.tsx
+new file mode 100644
+index 00000000000000..2b50d80799b849
+--- /dev/null
++++ b/packages/components/src/circular-option-picker/circular-option-picker-option-group.tsx
+@@ -0,0 +1,34 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import type { OptionGroupProps } from './types';
++
++export function OptionGroup( {
++	className,
++	options,
++	...additionalProps
++}: OptionGroupProps ) {
++	const role =
++		'aria-label' in additionalProps || 'aria-labelledby' in additionalProps
++			? 'group'
++			: undefined;
++
++	return (
++		<div
++			{ ...additionalProps }
++			role={ role }
++			className={ classnames(
++				'components-circular-option-picker__option-group',
++				'components-circular-option-picker__swatches',
++				className
++			) }
++		>
++			{ options }
++		</div>
++	);
++}
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+new file mode 100644
+index 00000000000000..0cfbea06538aab
+--- /dev/null
++++ b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+@@ -0,0 +1,139 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++import type { ForwardedRef } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
++import { forwardRef, useContext, useEffect } from '@wordpress/element';
++import { Icon, check } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import { CircularOptionPickerContext } from './circular-option-picker-context';
++import Button from '../button';
++import { CompositeItem } from '../composite';
++import Tooltip from '../tooltip';
++import type {
++	OptionProps,
++	CircularOptionPickerCompositeState,
++	CircularOptionPickerContextProps,
++} from './types';
++
++const hasSelectedOption = new Map();
++
++function UnforwardedOptionAsButton(
++	props: {
++		id?: string;
++		className?: string;
++		isPressed?: boolean;
++	},
++	forwardedRef: ForwardedRef< any >
++) {
++	return <Button { ...props } ref={ forwardedRef }></Button>;
++}
++
++const OptionAsButton = forwardRef( UnforwardedOptionAsButton );
++
++function UnforwardedOptionAsOption(
++	props: {
++		id: string;
++		className?: string;
++		isSelected?: boolean;
++		context: CircularOptionPickerContextProps;
++	},
++	forwardedRef: ForwardedRef< any >
++) {
++	const { id, className, isSelected, context, ...additionalProps } = props;
++	const { isComposite, ..._compositeState } = context;
++	const compositeState =
++		_compositeState as CircularOptionPickerCompositeState;
++	const { baseId, currentId, setCurrentId } = compositeState;
++
++	useEffect( () => {
++		// If we call `setCurrentId` here, it doesn't update for other
++		// Option renders in the same pass. So we have to store our own
++		// map to make sure that we only set the first selected option.
++		// We still need to check `currentId` because the control will
++		// update this as the user moves around, and that state should
++		// be maintained as the group gains and loses focus.
++		if ( isSelected && ! currentId && ! hasSelectedOption.get( baseId ) ) {
++			hasSelectedOption.set( baseId, true );
++			setCurrentId( id );
++		}
++	}, [ baseId, currentId, id, isSelected, setCurrentId ] );
++
++	return (
++		<CompositeItem
++			{ ...additionalProps }
++			{ ...compositeState }
++			as={ Button }
++			id={ id }
++			// Ideally we'd let the underlying `Button` component
++			// handle this by passing `isPressed` as a prop.
++			// Unfortunately doing so also sets `aria-pressed` as
++			// an attribute on the element, which is incompatible
++			// with `role="option"`, and there is no way at this
++			// point to override that behaviour.
++			className={ classnames( className, {
++				'is-pressed': isSelected,
++			} ) }
++			role="option"
++			aria-selected={ !! isSelected }
++			ref={ forwardedRef }
++		/>
++	);
++}
++
++const OptionAsOption = forwardRef( UnforwardedOptionAsOption );
++
++export function Option( {
++	className,
++	isSelected,
++	selectedIconProps = {},
++	tooltipText,
++	...additionalProps
++}: OptionProps ) {
++	const compositeContext = useContext( CircularOptionPickerContext );
++	const { isComposite, baseId } = compositeContext;
++	const id = useInstanceId(
++		Option,
++		baseId || 'components-circular-option-picker__option'
++	);
++
++	const commonProps = {
++		id,
++		className: 'components-circular-option-picker__option',
++		...additionalProps,
++	};
++
++	const optionControl = isComposite ? (
++		<OptionAsOption
++			{ ...commonProps }
++			context={ compositeContext }
++			isSelected={ isSelected }
++		/>
++	) : (
++		<OptionAsButton { ...commonProps } isPressed={ isSelected } />
++	);
++
++	return (
++		<div
++			className={ classnames(
++				className,
++				'components-circular-option-picker__option-wrapper'
++			) }
++		>
++			{ tooltipText ? (
++				<Tooltip text={ tooltipText }>{ optionControl }</Tooltip>
++			) : (
++				optionControl
++			) }
++			{ isSelected && <Icon icon={ check } { ...selectedIconProps } /> }
++		</div>
++	);
++}
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker.tsx b/packages/components/src/circular-option-picker/circular-option-picker.tsx
+new file mode 100644
+index 00000000000000..08c5ad94a34cb7
+--- /dev/null
++++ b/packages/components/src/circular-option-picker/circular-option-picker.tsx
+@@ -0,0 +1,202 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
++import { useEffect } from '@wordpress/element';
++import { isRTL } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import { CircularOptionPickerContext } from './circular-option-picker-context';
++import { Composite, useCompositeState } from '../composite';
++import type {
++	CircularOptionPickerProps,
++	ListboxCircularOptionPickerProps,
++	ButtonsCircularOptionPickerProps,
++} from './types';
++import { Option } from './circular-option-picker-option';
++import { OptionGroup } from './circular-option-picker-option-group';
++import {
++	ButtonAction,
++	DropdownLinkAction,
++} from './circular-option-picker-actions';
++
++/**
++ *`CircularOptionPicker` is a component that displays a set of options as circular buttons.
++ *
++ * ```jsx
++ * import { CircularOptionPicker } from '../circular-option-picker';
++ * import { useState } from '@wordpress/element';
++ *
++ * const Example = () => {
++ * 	const [ currentColor, setCurrentColor ] = useState();
++ * 	const colors = [
++ * 		{ color: '#f00', name: 'Red' },
++ * 		{ color: '#0f0', name: 'Green' },
++ * 		{ color: '#00f', name: 'Blue' },
++ * 	];
++ * 	const colorOptions = (
++ * 		<>
++ * 			{ colors.map( ( { color, name }, index ) => {
++ * 				return (
++ * 					<CircularOptionPicker.Option
++ * 						key={ `${ color }-${ index }` }
++ * 						tooltipText={ name }
++ * 						style={ { backgroundColor: color, color } }
++ * 						isSelected={ index === currentColor }
++ * 						onClick={ () => setCurrentColor( index ) }
++ * 						aria-label={ name }
++ * 					/>
++ * 				);
++ * 			} ) }
++ * 		</>
++ * 	);
++ * 	return (
++ * 		<CircularOptionPicker
++ * 				options={ colorOptions }
++ * 				actions={
++ * 					<CircularOptionPicker.ButtonAction
++ * 						onClick={ () => setCurrentColor( undefined ) }
++ * 					>
++ * 						{ 'Clear' }
++ * 					</CircularOptionPicker.ButtonAction>
++ * 				}
++ * 			/>
++ * 	);
++ * };
++ * ```
++ */
++
++function ListboxCircularOptionPicker(
++	props: ListboxCircularOptionPickerProps
++) {
++	const {
++		actions,
++		options,
++		baseId,
++		className,
++		loop = true,
++		children,
++		...additionalProps
++	} = props;
++	const rtl = isRTL();
++
++	const compositeState = useCompositeState( { baseId, loop, rtl } );
++	const { setBaseId, setLoop, setRTL } = compositeState;
++
++	// These are necessary as `useCompositeState` is sealed after
++	// the first render, so although unlikely to happen, if a state
++	// property should change, we need to process it accordingly.
++
++	useEffect( () => {
++		setBaseId( baseId );
++	}, [ setBaseId, baseId ] );
++
++	useEffect( () => {
++		setLoop( loop );
++	}, [ setLoop, loop ] );
++
++	useEffect( () => {
++		setRTL( rtl );
++	}, [ setRTL, rtl ] );
++
++	const compositeContext = {
++		isComposite: true,
++		...compositeState,
++	};
++
++	return (
++		<div className={ className }>
++			<CircularOptionPickerContext.Provider value={ compositeContext }>
++				<Composite
++					{ ...additionalProps }
++					{ ...compositeState }
++					role={ 'listbox' }
++				>
++					{ options }
++				</Composite>
++				{ children }
++				{ actions }
++			</CircularOptionPickerContext.Provider>
++		</div>
++	);
++}
++
++function ButtonsCircularOptionPicker(
++	props: ButtonsCircularOptionPickerProps
++) {
++	const { actions, options, children, baseId, ...additionalProps } = props;
++
++	return (
++		<div { ...additionalProps }>
++			<CircularOptionPickerContext.Provider
++				value={ { isComposite: false, baseId } }
++			>
++				{ options }
++				{ children }
++				{ actions }
++			</CircularOptionPickerContext.Provider>
++		</div>
++	);
++}
++
++function CircularOptionPicker( props: CircularOptionPickerProps ) {
++	const {
++		asButtons,
++		actions: actionsProp,
++		options: optionsProp,
++		children,
++		className,
++		...additionalProps
++	} = props;
++
++	const baseId = useInstanceId(
++		CircularOptionPicker,
++		'components-circular-option-picker',
++		additionalProps.id
++	);
++
++	const OptionPickerImplementation = asButtons
++		? ButtonsCircularOptionPicker
++		: ListboxCircularOptionPicker;
++
++	const actions = actionsProp ? (
++		<div className="components-circular-option-picker__custom-clear-wrapper">
++			{ actionsProp }
++		</div>
++	) : undefined;
++
++	const options = (
++		<div className={ 'components-circular-option-picker__swatches' }>
++			{ optionsProp }
++		</div>
++	);
++
++	return (
++		<OptionPickerImplementation
++			{ ...additionalProps }
++			baseId={ baseId }
++			className={ classnames(
++				'components-circular-option-picker',
++				className
++			) }
++			actions={ actions }
++			options={ options }
++		>
++			{ children }
++		</OptionPickerImplementation>
++	);
++}
++
++CircularOptionPicker.Option = Option;
++CircularOptionPicker.OptionGroup = OptionGroup;
++CircularOptionPicker.ButtonAction = ButtonAction;
++CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
++
++export default CircularOptionPicker;
+diff --git a/packages/components/src/circular-option-picker/index.tsx b/packages/components/src/circular-option-picker/index.tsx
+index e32cfb822808c8..ef975c21ee6545 100644
+--- a/packages/components/src/circular-option-picker/index.tsx
++++ b/packages/components/src/circular-option-picker/index.tsx
+@@ -1,264 +1,13 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useInstanceId } from '@wordpress/compose';
+-import { createContext, useContext, useEffect } from '@wordpress/element';
+-import { Icon, check } from '@wordpress/icons';
+-import { isRTL } from '@wordpress/i18n';
+-
+ /**
+  * Internal dependencies
+  */
+-import Button from '../button';
+-import { Composite, CompositeItem, useCompositeState } from '../composite';
+-import Dropdown from '../dropdown';
+-import Tooltip from '../tooltip';
+-import type {
+-	CircularOptionPickerProps,
+-	DropdownLinkActionProps,
+-	OptionGroupProps,
+-	OptionProps,
+-} from './types';
+-import type { WordPressComponentProps } from '../ui/context';
+-import type { ButtonAsButtonProps } from '../button/types';
+-
+-const CircularOptionPickerContext = createContext( {} );
+-
+-const hasSelectedOption = new Map();
+-
+-export function Option( {
+-	className,
+-	isSelected,
+-	selectedIconProps,
+-	tooltipText,
+-	...additionalProps
+-}: OptionProps ) {
+-	const compositeState = useContext( CircularOptionPickerContext );
+-	const {
+-		baseId = 'option',
+-		currentId,
+-		setCurrentId,
+-	} = compositeState as any;
+-	const id = useInstanceId( Option, baseId );
+-
+-	useEffect( () => {
+-		// If we call `setCurrentId` here, it doesn't update for other
+-		// Option renders in the same pass. So we have to store our own
+-		// map to make sure that we only set the first selected option.
+-		// We still need to check `currentId` because the control will
+-		// update this as the user moves around, and that state should
+-		// be maintained as the group gains and loses focus.
+-		if ( isSelected && ! currentId && ! hasSelectedOption.get( baseId ) ) {
+-			hasSelectedOption.set( baseId, true );
+-			setCurrentId( id );
+-		}
+-	} );
+-
+-	const optionControl = (
+-		<CompositeItem
+-			as={ Button }
+-			className={ classnames(
+-				'components-circular-option-picker__option',
+-				{
+-					'is-pressed': isSelected,
+-				}
+-			) }
+-			id={ id }
+-			{ ...additionalProps }
+-			{ ...compositeState }
+-			role="option"
+-			aria-selected={ !! isSelected }
+-		/>
+-	);
+-
+-	return (
+-		<div
+-			className={ classnames(
+-				className,
+-				'components-circular-option-picker__option-wrapper'
+-			) }
+-		>
+-			{ tooltipText ? (
+-				<Tooltip text={ tooltipText }>{ optionControl }</Tooltip>
+-			) : (
+-				optionControl
+-			) }
+-			{ isSelected && (
+-				<Icon
+-					icon={ check }
+-					{ ...( selectedIconProps ? selectedIconProps : {} ) }
+-				/>
+-			) }
+-		</div>
+-	);
+-}
+-
+-export function OptionGroup( {
+-	className,
+-	options,
+-	...additionalProps
+-}: OptionGroupProps ) {
+-	const { 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby } =
+-		additionalProps as any;
+-	const role = ariaLabel || ariaLabelledby ? 'group' : undefined;
+-
+-	return (
+-		<div
+-			{ ...additionalProps }
+-			role={ role }
+-			className={ classnames(
+-				'components-circular-option-picker__option-group',
+-				'components-circular-option-picker__swatches',
+-				className
+-			) }
+-		>
+-			{ options }
+-		</div>
+-	);
+-}
+-
+-export function DropdownLinkAction( {
+-	buttonProps,
+-	className,
+-	dropdownProps,
+-	linkText,
+-}: DropdownLinkActionProps ) {
+-	return (
+-		<Dropdown
+-			className={ classnames(
+-				'components-circular-option-picker__dropdown-link-action',
+-				className
+-			) }
+-			renderToggle={ ( { isOpen, onToggle } ) => (
+-				<Button
+-					aria-expanded={ isOpen }
+-					aria-haspopup="true"
+-					onClick={ onToggle }
+-					variant="link"
+-					{ ...buttonProps }
+-				>
+-					{ linkText }
+-				</Button>
+-			) }
+-			{ ...dropdownProps }
+-		/>
+-	);
+-}
+-
+-export function ButtonAction( {
+-	className,
+-	children,
+-	...additionalProps
+-}: WordPressComponentProps< ButtonAsButtonProps, 'button', false > ) {
+-	return (
+-		<Button
+-			className={ classnames(
+-				'components-circular-option-picker__clear',
+-				className
+-			) }
+-			variant="tertiary"
+-			{ ...additionalProps }
+-		>
+-			{ children }
+-		</Button>
+-	);
+-}
+-
+-/**
+- *`CircularOptionPicker` is a component that displays a set of options as circular buttons.
+- *
+- * ```jsx
+- * import { CircularOptionPicker } from '../circular-option-picker';
+- * import { useState } from '@wordpress/element';
+- *
+- * const Example = () => {
+- * 	const [ currentColor, setCurrentColor ] = useState();
+- * 	const colors = [
+- * 		{ color: '#f00', name: 'Red' },
+- * 		{ color: '#0f0', name: 'Green' },
+- * 		{ color: '#00f', name: 'Blue' },
+- * 	];
+- * 	const colorOptions = (
+- * 		<>
+- * 			{ colors.map( ( { color, name }, index ) => {
+- * 				return (
+- * 					<CircularOptionPicker.Option
+- * 						key={ `${ color }-${ index }` }
+- * 						tooltipText={ name }
+- * 						style={ { backgroundColor: color, color } }
+- * 						isSelected={ index === currentColor }
+- * 						onClick={ () => setCurrentColor( index ) }
+- * 						aria-label={ name }
+- * 					/>
+- * 				);
+- * 			} ) }
+- * 		</>
+- * 	);
+- * 	return (
+- * 		<CircularOptionPicker
+- * 				options={ colorOptions }
+- * 				actions={
+- * 					<CircularOptionPicker.ButtonAction
+- * 						onClick={ () => setCurrentColor( undefined ) }
+- * 					>
+- * 						{ 'Clear' }
+- * 					</CircularOptionPicker.ButtonAction>
+- * 				}
+- * 			/>
+- * 	);
+- * };
+- * ```
+- */
+-
+-function CircularOptionPicker( props: CircularOptionPickerProps ) {
+-	const {
+-		actions,
+-		className,
+-		id: idProp,
+-		options,
+-		children,
+-		loop = true,
+-		...additionalProps
+-	} = props;
+-	const id = useInstanceId( CircularOptionPicker, 'option-picker', idProp );
+-	const rtl = isRTL();
+-	const compositeState = useCompositeState( { baseId: id, loop, rtl } );
+-
+-	return (
+-		<Composite
+-			{ ...additionalProps }
+-			{ ...compositeState }
+-			role={ 'listbox' }
+-			className={ classnames(
+-				'components-circular-option-picker',
+-				className
+-			) }
+-		>
+-			<CircularOptionPickerContext.Provider value={ compositeState }>
+-				<div
+-					className={ 'components-circular-option-picker__swatches' }
+-				>
+-					{ options }
+-				</div>
+-				{ children }
+-				{ actions && (
+-					<div className="components-circular-option-picker__custom-clear-wrapper">
+-						{ actions }
+-					</div>
+-				) }
+-			</CircularOptionPickerContext.Provider>
+-		</Composite>
+-	);
+-}
++import CircularOptionPicker from './circular-option-picker';
+ 
+-CircularOptionPicker.Option = Option;
+-CircularOptionPicker.OptionGroup = OptionGroup;
+-CircularOptionPicker.ButtonAction = ButtonAction;
+-CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
++export { Option } from './circular-option-picker-option';
++export { OptionGroup } from './circular-option-picker-option-group';
++export {
++	ButtonAction,
++	DropdownLinkAction,
++} from './circular-option-picker-actions';
+ 
+ export default CircularOptionPicker;
+diff --git a/packages/components/src/circular-option-picker/stories/index.story.tsx b/packages/components/src/circular-option-picker/stories/index.story.tsx
+index 4ad346b93cf5cc..45643e9d6dd6e1 100644
+--- a/packages/components/src/circular-option-picker/stories/index.story.tsx
++++ b/packages/components/src/circular-option-picker/stories/index.story.tsx
+@@ -9,11 +9,7 @@ import { useState, createContext, useContext } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import {
+-	ButtonAction,
+-	default as CircularOptionPicker,
+-	DropdownLinkAction,
+-} from '..';
++import CircularOptionPicker from '..';
+ 
+ const CircularOptionPickerStoryContext = createContext< {
+ 	currentColor?: string;
+@@ -25,11 +21,14 @@ const meta: Meta< typeof CircularOptionPicker > = {
+ 	component: CircularOptionPicker,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		'CircularOptionPicker.Option': Option,
++		'CircularOptionPicker.Option': CircularOptionPicker.Option,
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		'CircularOptionPicker.ButtonAction': ButtonAction,
++		'CircularOptionPicker.OptionGroup': CircularOptionPicker.OptionGroup,
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+-		'CircularOptionPicker.DropdownLinkAction': DropdownLinkAction,
++		'CircularOptionPicker.ButtonAction': CircularOptionPicker.ButtonAction,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		'CircularOptionPicker.DropdownLinkAction':
++			CircularOptionPicker.DropdownLinkAction,
+ 	},
+ 	argTypes: {
+ 		actions: { control: { type: null } },
+@@ -112,7 +111,33 @@ const Template: StoryFn< typeof CircularOptionPicker > = ( props ) => (
+ );
+ 
+ export const Default = Template.bind( {} );
+-Default.args = { options: <DefaultOptions /> };
++Default.args = {
++	'aria-label': 'Circular Option Picker',
++	options: <DefaultOptions />,
++};
++
++export const AsButtons = Template.bind( {} );
++AsButtons.args = {
++	...Default.args,
++	asButtons: true,
++};
++
++export const WithLoopingDisabled = Template.bind( {} );
++WithLoopingDisabled.args = {
++	...Default.args,
++	loop: false,
++};
++WithLoopingDisabled.parameters = {
++	docs: {
++		source: {
++			code: `<CircularOptionPicker
++  aria-label="${ WithLoopingDisabled.args[ 'aria-label' ] }"
++  loop={false}
++  options={<DefaultOptions />}
++/>`,
++		},
++	},
++};
+ 
+ export const WithButtonAction = Template.bind( {} );
+ WithButtonAction.args = {
+diff --git a/packages/components/src/circular-option-picker/test/index.tsx b/packages/components/src/circular-option-picker/test/index.tsx
+new file mode 100644
+index 00000000000000..48a0aca40faf3e
+--- /dev/null
++++ b/packages/components/src/circular-option-picker/test/index.tsx
+@@ -0,0 +1,133 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * Internal dependencies
++ */
++import CircularOptionPicker from '..';
++
++const SINGLE_OPTION = [ <CircularOptionPicker.Option key={ 'option' } /> ];
++
++const MULTIPLE_OPTIONS = [
++	<CircularOptionPicker.Option
++		key={ 'option-1' }
++		aria-label={ 'Option One' }
++	/>,
++	<CircularOptionPicker.Option
++		key={ 'option-2' }
++		aria-label={ 'Option Two' }
++	/>,
++];
++
++const DEFAULT_PROPS = {
++	'aria-label': 'Circular Option Picker',
++	options: SINGLE_OPTION,
++};
++
++function getOption( name: string ) {
++	return screen.getByRole( 'option', { name } );
++}
++
++describe( 'CircularOptionPicker', () => {
++	describe( 'when `asButtons` is not set', () => {
++		it( 'should render as a listbox', async () => {
++			render( <CircularOptionPicker { ...DEFAULT_PROPS } /> );
++
++			expect( screen.getByRole( 'listbox' ) ).toBeInTheDocument();
++			expect( screen.getByRole( 'option' ) ).toBeInTheDocument();
++			expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
++		} );
++	} );
++
++	describe( 'when `asButtons` is false', () => {
++		it( 'should render as a listbox', async () => {
++			render(
++				<CircularOptionPicker
++					{ ...DEFAULT_PROPS }
++					asButtons={ false }
++				/>
++			);
++
++			expect( screen.getByRole( 'listbox' ) ).toBeInTheDocument();
++			expect( screen.getByRole( 'option' ) ).toBeInTheDocument();
++			expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
++		} );
++	} );
++
++	describe( 'when `asButtons` is true', () => {
++		it( 'should render as buttons', async () => {
++			render(
++				<CircularOptionPicker { ...DEFAULT_PROPS } asButtons={ true } />
++			);
++
++			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
++			expect( screen.queryByRole( 'option' ) ).not.toBeInTheDocument();
++			expect( screen.getByRole( 'button' ) ).toBeInTheDocument();
++		} );
++	} );
++
++	describe( 'when `loop` is not set', () => {
++		it( 'should loop', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<CircularOptionPicker
++					{ ...DEFAULT_PROPS }
++					options={ MULTIPLE_OPTIONS }
++				/>
++			);
++
++			await user.tab();
++			expect( getOption( 'Option One' ) ).toHaveFocus();
++			await user.keyboard( '[ArrowRight]' );
++			expect( getOption( 'Option Two' ) ).toHaveFocus();
++			await user.keyboard( '[ArrowRight]' );
++			expect( getOption( 'Option One' ) ).toHaveFocus();
++		} );
++	} );
++
++	describe( 'when `loop` is true', () => {
++		it( 'should loop', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<CircularOptionPicker
++					{ ...DEFAULT_PROPS }
++					options={ MULTIPLE_OPTIONS }
++					loop={ true }
++				/>
++			);
++
++			await user.tab();
++			expect( getOption( 'Option One' ) ).toHaveFocus();
++			await user.keyboard( '[ArrowRight]' );
++			expect( getOption( 'Option Two' ) ).toHaveFocus();
++			await user.keyboard( '[ArrowRight]' );
++			expect( getOption( 'Option One' ) ).toHaveFocus();
++		} );
++	} );
++
++	describe( 'when `loop` is false', () => {
++		it( 'should not loop', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<CircularOptionPicker
++					{ ...DEFAULT_PROPS }
++					loop={ false }
++					options={ MULTIPLE_OPTIONS }
++				/>
++			);
++
++			await user.tab();
++			expect( getOption( 'Option One' ) ).toHaveFocus();
++			await user.keyboard( '[ArrowRight]' );
++			expect( getOption( 'Option Two' ) ).toHaveFocus();
++			await user.keyboard( '[ArrowRight]' );
++			expect( getOption( 'Option Two' ) ).toHaveFocus();
++		} );
++	} );
++} );
+diff --git a/packages/components/src/circular-option-picker/types.ts b/packages/components/src/circular-option-picker/types.ts
+index 7ebd78da4020f3..5a54a334124351 100644
+--- a/packages/components/src/circular-option-picker/types.ts
++++ b/packages/components/src/circular-option-picker/types.ts
+@@ -14,8 +14,9 @@ import type { Icon } from '@wordpress/icons';
+ import type { ButtonAsButtonProps } from '../button/types';
+ import type { DropdownProps } from '../dropdown/types';
+ import type { WordPressComponentProps } from '../ui/context';
++import type { CompositeState } from '../composite';
+ 
+-export type CircularOptionPickerProps = {
++type CommonCircularOptionPickerProps = {
+ 	/**
+ 	 * An ID to apply to the component.
+ 	 */
+@@ -40,22 +41,55 @@ export type CircularOptionPickerProps = {
+ 	 * The child elements.
+ 	 */
+ 	children?: ReactNode;
++};
++
++type WithBaseId = {
++	baseId: string;
++};
++
++type FullListboxCircularOptionPickerProps = CommonCircularOptionPickerProps & {
+ 	/**
+-	 * Whether the keyboard interaction should wrap around.
++	 * Whether the control should present as a set of buttons,
++	 * each with its own tab stop.
++	 */
++	asButtons?: false;
++	/**
++	 * Prevents keyboard interaction from wrapping around.
++	 * Only used when `asButtons` is not true.
+ 	 *
+ 	 * @default true
+ 	 */
+ 	loop?: boolean;
+ } & (
+-	| {
+-			'aria-label': string;
+-			'aria-labelledby'?: never;
+-	  }
+-	| {
+-			'aria-label'?: never;
+-			'aria-labelledby': string;
+-	  }
+- );
++		| {
++				'aria-label': string;
++				'aria-labelledby'?: never;
++		  }
++		| {
++				'aria-label'?: never;
++				'aria-labelledby': string;
++		  }
++	 );
++
++export type ListboxCircularOptionPickerProps = WithBaseId &
++	Omit< FullListboxCircularOptionPickerProps, 'asButtons' >;
++
++type FullButtonsCircularOptionPickerProps = CommonCircularOptionPickerProps & {
++	/**
++	 * Whether the control should present as a set of buttons,
++	 * each with its own tab stop.
++	 *
++	 * @default false
++	 */
++	asButtons: true;
++};
++
++export type ButtonsCircularOptionPickerProps = WithBaseId &
++	Omit< FullButtonsCircularOptionPickerProps, 'asButtons' >;
++
++export type CircularOptionPickerProps =
++	| FullListboxCircularOptionPickerProps
++	| FullButtonsCircularOptionPickerProps;
+ 
+ export type DropdownLinkActionProps = {
+ 	buttonProps?: Omit<
+@@ -88,3 +122,8 @@ export type OptionProps = Omit<
+ 		'icon' | 'size'
+ 	>;
+ };
++
++export type CircularOptionPickerCompositeState = CompositeState;
++export type CircularOptionPickerContextProps =
++	| { isComposite?: false; baseId?: string }
++	| ( { isComposite: true } & CircularOptionPickerCompositeState );
+diff --git a/packages/components/src/color-palette/README.md b/packages/components/src/color-palette/README.md
+index 5db11051655b66..7b13b3905dd4ae 100644
+--- a/packages/components/src/color-palette/README.md
++++ b/packages/components/src/color-palette/README.md
+@@ -84,3 +84,17 @@ Currently active value.
+ Callback called when a color is selected.
+ 
+ -   Required: Yes
++
++### `asButtons`: `boolean`
++
++Whether the control should present as a set of buttons, each with its own tab stop.
++
++- Required: No
++- Default: `false`
++
++### `loop`: `boolean`
++
++Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
++
++- Required: No
++- Default: `true`
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index 72cd4c0f171ae5..60aeb6ed4d39ed 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -48,7 +48,7 @@ function SinglePalette( {
+ 	colors,
+ 	onChange,
+ 	value,
+-	...otherProps
++	...additionalProps
+ }: SinglePaletteProps ) {
+ 	const colorOptions = useMemo( () => {
+ 		return colors.map( ( { color, name }, index ) => {
+@@ -95,7 +95,7 @@ function SinglePalette( {
+ 		<CircularOptionPicker.OptionGroup
+ 			className={ className }
+ 			options={ colorOptions }
+-			{ ...otherProps }
++			{ ...additionalProps }
+ 		/>
+ 	);
+ }
+@@ -178,6 +178,8 @@ function UnforwardedColorPalette(
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+ 	const {
++		asButtons,
++		loop,
+ 		clearable = true,
+ 		colors = [],
+ 		disableCustomColors = false,
+@@ -188,7 +190,7 @@ function UnforwardedColorPalette(
+ 		headingLevel = 2,
+ 		'aria-label': ariaLabel,
+ 		'aria-labelledby': ariaLabelledby,
+-		...otherProps
++		...additionalProps
+ 	} = props;
+ 	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
+ 
+@@ -248,17 +250,36 @@ function UnforwardedColorPalette(
+ 		</CircularOptionPicker.ButtonAction>
+ 	);
+ 
+-	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
+-	if ( ariaLabel ) {
+-		ariaProps = { 'aria-label': ariaLabel };
+-	} else if ( ariaLabelledby ) {
+-		ariaProps = { 'aria-labelledby': ariaLabelledby };
++	let metaProps:
++		| { asButtons: false; loop?: boolean; 'aria-label': string }
++		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
++		| { asButtons: true };
++
++	if ( asButtons ) {
++		metaProps = { asButtons: true };
+ 	} else {
+-		ariaProps = { 'aria-label': __( 'Custom color picker.' ) };
++		const _metaProps: { asButtons: false; loop?: boolean } = {
++			asButtons: false,
++			loop,
++		};
++
++		if ( ariaLabel ) {
++			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
++		} else if ( ariaLabelledby ) {
++			metaProps = {
++				..._metaProps,
++				'aria-labelledby': ariaLabelledby,
++			};
++		} else {
++			metaProps = {
++				..._metaProps,
++				'aria-label': __( 'Custom color picker.' ),
++			};
++		}
+ 	}
+ 
+ 	return (
+-		<VStack spacing={ 3 } ref={ forwardedRef } { ...otherProps }>
++		<VStack spacing={ 3 } ref={ forwardedRef } { ...additionalProps }>
+ 			{ ! disableCustomColors && (
+ 				<CustomColorPickerDropdown
+ 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
+@@ -310,7 +331,7 @@ function UnforwardedColorPalette(
+ 				/>
+ 			) }
+ 			<CircularOptionPicker
+-				{ ...ariaProps }
++				{ ...metaProps }
+ 				actions={ actions }
+ 				options={
+ 					hasMultipleColorOrigins ? (
+diff --git a/packages/components/src/color-palette/types.ts b/packages/components/src/color-palette/types.ts
+index 7025ef156127b4..0b097aa108d38e 100644
+--- a/packages/components/src/color-palette/types.ts
++++ b/packages/components/src/color-palette/types.ts
+@@ -82,6 +82,20 @@ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
+ 	 * Currently active value.
+ 	 */
+ 	value?: string;
++	/**
++	 * Whether the control should present as a set of buttons,
++	 * each with its own tab stop.
++	 *
++	 * @default false
++	 */
++	asButtons?: boolean;
++	/**
++	 * Prevents keyboard interaction from wrapping around.
++	 * Only used when `asButtons` is not true.
++	 *
++	 * @default true
++	 */
++	loop?: boolean;
+ 	/**
+ 	 * Whether this is rendered in the sidebar.
+ 	 *
+diff --git a/packages/components/src/composite/index.ts b/packages/components/src/composite/index.ts
+index ddb10fffa12ad9..2a4e3655426908 100644
+--- a/packages/components/src/composite/index.ts
++++ b/packages/components/src/composite/index.ts
+@@ -17,3 +17,6 @@ export {
+ 	CompositeItem,
+ 	useCompositeState,
+ } from 'reakit';
++
++/* eslint-disable-next-line no-restricted-imports */
++export type { CompositeStateReturn as CompositeState } from 'reakit';
+diff --git a/packages/components/src/duotone-picker/README.md b/packages/components/src/duotone-picker/README.md
+index 7b272e38dd8412..4c1b5c13c4be10 100644
+--- a/packages/components/src/duotone-picker/README.md
++++ b/packages/components/src/duotone-picker/README.md
+@@ -64,6 +64,20 @@ An array of colors for the duotone effect.
+ 
+ Callback which is called when the duotone colors change.
+ 
++### `asButtons`: `boolean`
++
++Whether the control should present as a set of buttons, each with its own tab stop.
++
++- Required: No
++- Default: `false`
++
++### `loop`: `boolean`
++
++Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
++
++- Required: No
++- Default: `true`
++
+ ## DuotoneSwatch Props
+ 
+ ### `values`
+diff --git a/packages/components/src/duotone-picker/duotone-picker.tsx b/packages/components/src/duotone-picker/duotone-picker.tsx
+index 7a681f67bec8b7..70e5753175eac0 100644
+--- a/packages/components/src/duotone-picker/duotone-picker.tsx
++++ b/packages/components/src/duotone-picker/duotone-picker.tsx
+@@ -55,6 +55,8 @@ import type { DuotonePickerProps } from './types';
+  * ```
+  */
+ function DuotonePicker( {
++	asButtons,
++	loop,
+ 	clearable = true,
+ 	unsetable = true,
+ 	colorPalette,
+@@ -122,18 +124,37 @@ function DuotonePicker( {
+ 		);
+ 	} );
+ 
+-	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
+-	if ( ariaLabel ) {
+-		ariaProps = { 'aria-label': ariaLabel };
+-	} else if ( ariaLabelledby ) {
+-		ariaProps = { 'aria-labelledby': ariaLabelledby };
++	let metaProps:
++		| { asButtons: false; loop?: boolean; 'aria-label': string }
++		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
++		| { asButtons: true };
++
++	if ( asButtons ) {
++		metaProps = { asButtons: true };
+ 	} else {
+-		ariaProps = { 'aria-label': __( 'Custom color picker.' ) };
++		const _metaProps: { asButtons: false; loop?: boolean } = {
++			asButtons: false,
++			loop,
++		};
++
++		if ( ariaLabel ) {
++			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
++		} else if ( ariaLabelledby ) {
++			metaProps = {
++				..._metaProps,
++				'aria-labelledby': ariaLabelledby,
++			};
++		} else {
++			metaProps = {
++				..._metaProps,
++				'aria-label': __( 'Custom color picker.' ),
++			};
++		}
+ 	}
+ 
+ 	return (
+ 		<CircularOptionPicker
+-			{ ...ariaProps }
++			{ ...metaProps }
+ 			options={ unsetable ? [ unsetOption, ...options ] : options }
+ 			actions={
+ 				!! clearable && (
+diff --git a/packages/components/src/duotone-picker/types.ts b/packages/components/src/duotone-picker/types.ts
+index 80f3c369f13164..9c5a71439f7cf0 100644
+--- a/packages/components/src/duotone-picker/types.ts
++++ b/packages/components/src/duotone-picker/types.ts
+@@ -39,6 +39,20 @@ export type DuotonePickerProps = {
+ 	 * Callback which is called when the duotone colors change.
+ 	 */
+ 	onChange: ( value: DuotonePickerProps[ 'value' ] | undefined ) => void;
++	/**
++	 * Whether the control should present as a set of buttons,
++	 * each with its own tab stop.
++	 *
++	 * @default false
++	 */
++	asButtons?: boolean;
++	/**
++	 * Prevents keyboard interaction from wrapping around.
++	 * Only used when `asButtons` is not true.
++	 *
++	 * @default true
++	 */
++	loop?: boolean;
+ } & (
+ 	| {
+ 			/**
+diff --git a/packages/components/src/gradient-picker/README.md b/packages/components/src/gradient-picker/README.md
+index 0901d14043eab8..6d7a482df82820 100644
+--- a/packages/components/src/gradient-picker/README.md
++++ b/packages/components/src/gradient-picker/README.md
+@@ -102,3 +102,17 @@ The heading level. Only applies in cases where gradients are provided from multi
+ 
+ -   Required: No
+ -   Default: `2`
++
++### `asButtons`: `boolean`
++
++Whether the control should present as a set of buttons, each with its own tab stop.
++
++- Required: No
++- Default: `false`
++
++### `loop`: `boolean`
++
++Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
++
++- Required: No
++- Default: `true`
+diff --git a/packages/components/src/gradient-picker/index.tsx b/packages/components/src/gradient-picker/index.tsx
+index e384d62925bcb4..13e2a430660380 100644
+--- a/packages/components/src/gradient-picker/index.tsx
++++ b/packages/components/src/gradient-picker/index.tsx
+@@ -41,7 +41,7 @@ function SingleOrigin( {
+ 	gradients,
+ 	onChange,
+ 	value,
+-	...otherProps
++	...additionalProps
+ }: PickerProps< GradientObject > ) {
+ 	const gradientOptions = useMemo( () => {
+ 		return gradients.map( ( { gradient, name }, index ) => (
+@@ -74,7 +74,7 @@ function SingleOrigin( {
+ 		<CircularOptionPicker.OptionGroup
+ 			className={ className }
+ 			options={ gradientOptions }
+-			{ ...otherProps }
++			{ ...additionalProps }
+ 		/>
+ 	);
+ }
+@@ -116,30 +116,51 @@ function MultipleOrigin( {
+ 
+ function Component( props: PickerProps< any > ) {
+ 	const {
++		asButtons,
++		loop,
+ 		actions,
+ 		headingLevel,
+ 		'aria-label': ariaLabel,
+ 		'aria-labelledby': ariaLabelledby,
+-		...otherProps
++		...additionalProps
+ 	} = props;
+ 	const options = isMultipleOriginArray( props.gradients ) ? (
+-		<MultipleOrigin headingLevel={ headingLevel } { ...otherProps } />
++		<MultipleOrigin headingLevel={ headingLevel } { ...additionalProps } />
+ 	) : (
+-		<SingleOrigin { ...otherProps } />
++		<SingleOrigin { ...additionalProps } />
+ 	);
+ 
+-	let ariaProps: { 'aria-label': string } | { 'aria-labelledby': string };
+-	if ( ariaLabel ) {
+-		ariaProps = { 'aria-label': ariaLabel };
+-	} else if ( ariaLabelledby ) {
+-		ariaProps = { 'aria-labelledby': ariaLabelledby };
++	let metaProps:
++		| { asButtons: false; loop?: boolean; 'aria-label': string }
++		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
++		| { asButtons: true };
++
++	if ( asButtons ) {
++		metaProps = { asButtons: true };
+ 	} else {
+-		ariaProps = { 'aria-label': __( 'Custom gradient picker.' ) };
++		const _metaProps: { asButtons: false; loop?: boolean } = {
++			asButtons: false,
++			loop,
++		};
++
++		if ( ariaLabel ) {
++			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
++		} else if ( ariaLabelledby ) {
++			metaProps = {
++				..._metaProps,
++				'aria-labelledby': ariaLabelledby,
++			};
++		} else {
++			metaProps = {
++				..._metaProps,
++				'aria-label': __( 'Custom color picker.' ),
++			};
++		}
+ 	}
+ 
+ 	return (
+ 		<CircularOptionPicker
+-			{ ...ariaProps }
++			{ ...metaProps }
+ 			actions={ actions }
+ 			options={ options }
+ 		/>
+@@ -200,6 +221,7 @@ export function GradientPicker( {
+ 	disableCustomGradients = false,
+ 	__experimentalIsRenderedInSidebar,
+ 	headingLevel = 2,
++	...additionalProps
+ }: GradientPickerComponentProps ) {
+ 	const clearGradient = useCallback(
+ 		() => onChange( undefined ),
+@@ -237,6 +259,7 @@ export function GradientPicker( {
+ 				) }
+ 				{ ( gradients.length || clearable ) && (
+ 					<Component
++						{ ...additionalProps }
+ 						className={ className }
+ 						clearGradient={ clearGradient }
+ 						gradients={ gradients }
+diff --git a/packages/components/src/gradient-picker/types.ts b/packages/components/src/gradient-picker/types.ts
+index 9eca42f0b7f868..b26a464df5e187 100644
+--- a/packages/components/src/gradient-picker/types.ts
++++ b/packages/components/src/gradient-picker/types.ts
+@@ -42,6 +42,20 @@ type GradientPickerBaseProps = {
+ 	 * @default 2
+ 	 */
+ 	headingLevel?: HeadingSize;
++	/**
++	 * Whether the control should present as a set of buttons,
++	 * each with its own tab stop.
++	 *
++	 * @default false
++	 */
++	asButtons?: boolean;
++	/**
++	 * Prevents keyboard interaction from wrapping around.
++	 * Only used when `asButtons` is not true.
++	 *
++	 * @default true
++	 */
++	loop?: boolean;
+ } & (
+ 	| {
+ 			/**

@@ -1,0 +1,57 @@
+diff --git a/packages/block-editor/src/components/inspector-controls/README.md b/packages/block-editor/src/components/inspector-controls/README.md
+index 916f53b5f42d8b..10af070602f943 100644
+--- a/packages/block-editor/src/components/inspector-controls/README.md
++++ b/packages/block-editor/src/components/inspector-controls/README.md
+@@ -96,7 +96,6 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
+ 				<InspectorControls>
+ 					<PanelBody title={ __( 'Settings' ) }>
+ 						<CheckboxControl
+-							__nextHasNoMarginBottom
+ 							heading="Checkbox Field"
+ 							label="Tick Me"
+ 							help="Additional help text"
+diff --git a/packages/block-library/src/form-input/edit.js b/packages/block-library/src/form-input/edit.js
+index 6f3782e64678db..b8cc3f6f124b44 100644
+--- a/packages/block-library/src/form-input/edit.js
++++ b/packages/block-library/src/form-input/edit.js
+@@ -68,7 +68,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
+ 								isShownByDefault
+ 							>
+ 								<CheckboxControl
+-									__nextHasNoMarginBottom
+ 									label={ __( 'Inline label' ) }
+ 									checked={ inlineLabel }
+ 									onChange={ ( newVal ) => {
+@@ -89,7 +88,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
+ 							isShownByDefault
+ 						>
+ 							<CheckboxControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Required' ) }
+ 								checked={ required }
+ 								onChange={ ( newVal ) => {
+diff --git a/packages/block-library/src/navigation-link/link-ui/page-creator.js b/packages/block-library/src/navigation-link/link-ui/page-creator.js
+index e5e4c291deaaba..991ac260f0d4dc 100644
+--- a/packages/block-library/src/navigation-link/link-ui/page-creator.js
++++ b/packages/block-library/src/navigation-link/link-ui/page-creator.js
+@@ -137,7 +137,6 @@ export function LinkUIPageCreator( {
+ 						/>
+ 
+ 						<CheckboxControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Publish immediately' ) }
+ 							help={ __(
+ 								'If unchecked, the page will be created as a draft.'
+diff --git a/packages/components/src/checkbox-control/index.tsx b/packages/components/src/checkbox-control/index.tsx
+index e62b5306e96beb..31cea61ddcac54 100644
+--- a/packages/components/src/checkbox-control/index.tsx
++++ b/packages/components/src/checkbox-control/index.tsx
+@@ -44,6 +44,8 @@ export function CheckboxControl(
+ 	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
+ ) {
+ 	const {
++		// @ts-expect-error - Prevent passing this to `input`.
++		__nextHasNoMarginBottom: _,
+ 		label,
+ 		className,
+ 		heading,

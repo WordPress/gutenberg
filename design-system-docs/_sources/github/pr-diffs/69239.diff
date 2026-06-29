@@ -1,0 +1,64 @@
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx b/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
+index 4f5eafb17523b4..44deda8ec481d8 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
+@@ -22,6 +22,25 @@ import type {
+ } from '../types';
+ import type { MouseEventHandler } from 'react';
+ 
++const isLightGradient = (
++	background: React.CSSProperties[ 'background' ]
++): boolean => {
++	if ( typeof background !== 'string' ) {
++		return false;
++	}
++
++	return (
++		background.includes( 'rgb(255, 255, 255)' ) ||
++		background.includes( '#fff' ) ||
++		background.includes( '#ffffff' ) ||
++		background.includes( 'white' ) ||
++		// Check for rgba with high values.
++		/rgba?\(\s*(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d),\s*(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d),\s*(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)(?:,\s*(?:0?\.\d+|1))?\s*\)/.test(
++			background
++		)
++	);
++};
++
+ const customGradientBarReducer = (
+ 	state: CustomGradientBarReducerState,
+ 	action: CustomGradientBarReducerAction
+@@ -135,7 +154,11 @@ export default function CustomGradientBar( {
+ 		<div
+ 			className={ clsx(
+ 				'components-custom-gradient-picker__gradient-bar',
+-				{ 'has-gradient': hasGradient }
++				{
++					'has-gradient': hasGradient,
++					'has-light-gradient':
++						hasGradient && isLightGradient( background ),
++				}
+ 			) }
+ 			onMouseEnter={ onMouseEnterAndMove }
+ 			onMouseMove={ onMouseEnterAndMove }
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index b9f2bee9dbe4eb..112f46e7d0d59c 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -7,6 +7,16 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ 	position: relative;
+ 	z-index: 1;
+ 
++	border: 1px solid $components-color-accent;
++	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
++
++	&.has-light-gradient {
++		border: 1px solid $gray-900;
++		box-shadow:
++			inset 0 0 0 1px rgba(0, 0, 0, 0.1),
++			0 0 0 1px rgba(0, 0, 0, 0.1);
++	}
++
+ 	&.has-gradient {
+ 		// The background image creates a checkerboard pattern. Ignore rtlcss to
+ 		// make it work both in LTR and RTL.

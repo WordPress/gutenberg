@@ -1,0 +1,1042 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 550dc5d19bf496..764fc24904ca75 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -2057,6 +2057,12 @@
+ 		"markdown_source": "../packages/style-engine/docs/using-the-style-engine-with-block-supports.md",
+ 		"parent": "packages-style-engine"
+ 	},
++	{
++		"title": "@wordpress/style-runtime",
++		"slug": "packages-style-runtime",
++		"markdown_source": "../packages/style-runtime/README.md",
++		"parent": "packages"
++	},
+ 	{
+ 		"title": "@wordpress/stylelint-config",
+ 		"slug": "packages-stylelint-config",
+diff --git a/package-lock.json b/package-lock.json
+index 01a389e67be08b..b0db9cf6a27df8 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -21095,6 +21095,10 @@
+ 			"resolved": "packages/style-engine",
+ 			"link": true
+ 		},
++		"node_modules/@wordpress/style-runtime": {
++			"resolved": "packages/style-runtime",
++			"link": true
++		},
+ 		"node_modules/@wordpress/stylelint-config": {
+ 			"resolved": "packages/stylelint-config",
+ 			"link": true
+@@ -57546,6 +57550,7 @@
+ 				"@wordpress/i18n": "file:../i18n",
+ 				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/route": "file:../route",
++				"@wordpress/style-runtime": "file:../style-runtime",
+ 				"@wordpress/ui": "file:../ui",
+ 				"clsx": "^2.1.1"
+ 			},
+@@ -58254,6 +58259,7 @@
+ 				"@wordpress/primitives": "file:../primitives",
+ 				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/rich-text": "file:../rich-text",
++				"@wordpress/style-runtime": "file:../style-runtime",
+ 				"@wordpress/warning": "file:../warning",
+ 				"change-case": "^4.1.2",
+ 				"clsx": "^2.1.1",
+@@ -60504,6 +60510,7 @@
+ 				"@dnd-kit/utilities": "^3.2.2",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/element": "file:../element",
++				"@wordpress/style-runtime": "file:../style-runtime",
+ 				"clsx": "^2.1.1"
+ 			},
+ 			"devDependencies": {
+@@ -61799,6 +61806,15 @@
+ 				"npm": ">=8.19.2"
+ 			}
+ 		},
++		"packages/style-runtime": {
++			"name": "@wordpress/style-runtime",
++			"version": "0.1.0",
++			"license": "GPL-2.0-or-later",
++			"engines": {
++				"node": ">=20.10.0",
++				"npm": ">=10.2.3"
++			}
++		},
+ 		"packages/stylelint-config": {
+ 			"name": "@wordpress/stylelint-config",
+ 			"version": "23.37.0",
+@@ -62686,6 +62702,7 @@
+ 			"dependencies": {
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/private-apis": "file:../private-apis",
++				"@wordpress/style-runtime": "file:../style-runtime",
+ 				"colorjs.io": "^0.6.0",
+ 				"memize": "^2.1.0"
+ 			},
+@@ -62787,6 +62804,7 @@
+ 				"@wordpress/keycodes": "file:../keycodes",
+ 				"@wordpress/primitives": "file:../primitives",
+ 				"@wordpress/private-apis": "file:../private-apis",
++				"@wordpress/style-runtime": "file:../style-runtime",
+ 				"@wordpress/theme": "file:../theme",
+ 				"clsx": "^2.1.1",
+ 				"tabbable": "^6.4.0"
+@@ -63048,6 +63066,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@emotion/babel-plugin": "11.13.5",
++				"@wordpress/style-runtime": "file:../style-runtime",
+ 				"autoprefixer": "10.4.21",
+ 				"browserslist-to-esbuild": "2.1.1",
+ 				"change-case": "4.1.2",
+diff --git a/packages/admin-ui/package.json b/packages/admin-ui/package.json
+index 1386181d523332..484a0989d50268 100644
+--- a/packages/admin-ui/package.json
++++ b/packages/admin-ui/package.json
+@@ -50,6 +50,7 @@
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/route": "file:../route",
++		"@wordpress/style-runtime": "file:../style-runtime",
+ 		"@wordpress/ui": "file:../ui",
+ 		"clsx": "^2.1.1"
+ 	},
+diff --git a/packages/admin-ui/tsconfig.json b/packages/admin-ui/tsconfig.json
+index 93e8788fe99150..7ae2242db44227 100644
+--- a/packages/admin-ui/tsconfig.json
++++ b/packages/admin-ui/tsconfig.json
+@@ -10,6 +10,7 @@
+ 		{ "path": "../i18n" },
+ 		{ "path": "../private-apis" },
+ 		{ "path": "../route" },
++		{ "path": "../style-runtime" },
+ 		{ "path": "../ui" }
+ 	]
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 895d32a5b3172b..a887548e025c3b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Enhancements
+ 
++-   `StyleProvider`: Add support for injecting package CSS module styles into target documents ([#77965](https://github.com/WordPress/gutenberg/pull/77965)).
+ -   `Button`: Align `link` variant underline (offset and thickness) with `ExternalLink` and `Link` from `@wordpress/ui` ([#77842](https://github.com/WordPress/gutenberg/pull/77842)).
+ -   `Modal`: render as a bottom sheet on mobile so the height adapts to the content and CTAs stay within thumb reach ([#77956](https://github.com/WordPress/gutenberg/pull/77956)).
+ -   `Text`: Use a theme-aware gray token for the muted variant ([#77999](https://github.com/WordPress/gutenberg/pull/77999)).
+diff --git a/packages/components/package.json b/packages/components/package.json
+index dfba4cae50a80c..0d948e6da42ca0 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -81,6 +81,7 @@
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/rich-text": "file:../rich-text",
++		"@wordpress/style-runtime": "file:../style-runtime",
+ 		"@wordpress/warning": "file:../warning",
+ 		"change-case": "^4.1.2",
+ 		"clsx": "^2.1.1",
+diff --git a/packages/components/src/style-provider/index.tsx b/packages/components/src/style-provider/index.tsx
+index 1c1b55589dedcc..de3719e11423c2 100644
+--- a/packages/components/src/style-provider/index.tsx
++++ b/packages/components/src/style-provider/index.tsx
+@@ -1,13 +1,8 @@
+-/**
+- * External dependencies
+- */
+ import { CacheProvider } from '@emotion/react';
+ import createCache from '@emotion/cache';
+ import * as uuid from 'uuid';
+-
+-/**
+- * Internal dependencies
+- */
++import { useLayoutEffect } from '@wordpress/element';
++import { registerDocument } from '@wordpress/style-runtime';
+ import type { StyleProviderProps } from './types';
+ 
+ const uuidCache = new Set();
+@@ -36,6 +31,14 @@ const memoizedCreateCacheWithContainer = ( container: HTMLElement ) => {
+ export function StyleProvider( props: StyleProviderProps ) {
+ 	const { children, document } = props;
+ 
++	useLayoutEffect( () => {
++		if ( ! document ) {
++			return;
++		}
++
++		return registerDocument( document );
++	}, [ document ] );
++
+ 	if ( ! document ) {
+ 		return null;
+ 	}
+diff --git a/packages/components/src/style-provider/test/index.tsx b/packages/components/src/style-provider/test/index.tsx
+new file mode 100644
+index 00000000000000..ae1a548415d4ae
+--- /dev/null
++++ b/packages/components/src/style-provider/test/index.tsx
+@@ -0,0 +1,38 @@
++import { render } from '@testing-library/react';
++import { registerStyle } from '@wordpress/style-runtime';
++import StyleProvider from '..';
++
++type GlobalScopeWithStyleRuntime = typeof globalThis & {
++	__wpStyleRuntime?: unknown;
++};
++
++describe( 'StyleProvider', () => {
++	const globalScope = globalThis as GlobalScopeWithStyleRuntime;
++
++	afterEach( () => {
++		delete globalScope.__wpStyleRuntime;
++		document.head.innerHTML = '';
++	} );
++
++	it( 'registers the provided document for package style injection', () => {
++		render(
++			<StyleProvider document={ document }>
++				<div />
++			</StyleProvider>
++		);
++
++		registerStyle( 'test-style', '.test-class{color:red;}' );
++
++		const iframeDocument = document.implementation.createHTMLDocument();
++
++		render(
++			<StyleProvider document={ iframeDocument }>
++				<div />
++			</StyleProvider>
++		);
++
++		expect( iframeDocument.head.innerHTML ).toBe(
++			'<style data-wp-hash="test-style">.test-class{color:red;}</style>'
++		);
++	} );
++} );
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 5ffbacc28763e1..e86cbfa127ae2e 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -27,6 +27,7 @@
+ 		{ "path": "../private-apis" },
+ 		{ "path": "../react-i18n" },
+ 		{ "path": "../rich-text" },
++		{ "path": "../style-runtime" },
+ 		{ "path": "../warning" }
+ 	],
+ 	"files": [ "global.d.ts", "storybook.d.ts" ],
+diff --git a/packages/dependency-extraction-webpack-plugin/lib/util.js b/packages/dependency-extraction-webpack-plugin/lib/util.js
+index dcbea317b9500c..71a1002af83a9e 100644
+--- a/packages/dependency-extraction-webpack-plugin/lib/util.js
++++ b/packages/dependency-extraction-webpack-plugin/lib/util.js
+@@ -7,6 +7,7 @@ const BUNDLED_PACKAGES = [
+ 	'@wordpress/grid',
+ 	'@wordpress/icons',
+ 	'@wordpress/interface',
++	'@wordpress/style-runtime',
+ 	'@wordpress/ui',
+ 	'@wordpress/undo-manager',
+ 	'@wordpress/views',
+diff --git a/packages/grid/package.json b/packages/grid/package.json
+index 83ef4d354f7dbc..6ba7fe05b20b04 100644
+--- a/packages/grid/package.json
++++ b/packages/grid/package.json
+@@ -52,6 +52,7 @@
+ 		"@dnd-kit/utilities": "^3.2.2",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/element": "file:../element",
++		"@wordpress/style-runtime": "file:../style-runtime",
+ 		"clsx": "^2.1.1"
+ 	},
+ 	"devDependencies": {
+diff --git a/packages/grid/tsconfig.json b/packages/grid/tsconfig.json
+index 0b9f79cd41f69c..33c2b06cb1e63c 100644
+--- a/packages/grid/tsconfig.json
++++ b/packages/grid/tsconfig.json
+@@ -4,5 +4,9 @@
+ 	"compilerOptions": {
+ 		"types": [ "jest", "style-imports" ]
+ 	},
+-	"references": [ { "path": "../compose" }, { "path": "../element" } ]
++	"references": [
++		{ "path": "../compose" },
++		{ "path": "../element" },
++		{ "path": "../style-runtime" }
++	]
+ }
+diff --git a/packages/style-runtime/CHANGELOG.md b/packages/style-runtime/CHANGELOG.md
+new file mode 100644
+index 00000000000000..90afa110726014
+--- /dev/null
++++ b/packages/style-runtime/CHANGELOG.md
+@@ -0,0 +1,5 @@
++# Changelog
++
++## Unreleased
++
++-   Initial release.
+diff --git a/packages/style-runtime/README.md b/packages/style-runtime/README.md
+new file mode 100644
+index 00000000000000..1e86d9b1fbb13d
+--- /dev/null
++++ b/packages/style-runtime/README.md
+@@ -0,0 +1,82 @@
++# Style Runtime
++
++Runtime helpers for registering styles and injecting them into one or more documents.
++
++CSS module imports are evaluated as JavaScript module side effects. By default,
++that means generated style tags are inserted into the root document. This works
++for most screens, but it does not cover styles for components rendered inside
++another document, such as an iframe canvas.
++
++`@wordpress/style-runtime` keeps a shared registry of style text and target
++documents. Build tooling can register compiled styles when CSS modules are
++imported, while host components can register additional documents that should
++receive those styles.
++
++## Usage
++
++Generated CSS module output registers styles with a stable hash:
++
++```js
++import { registerStyle } from '@wordpress/style-runtime';
++
++registerStyle( 'style-hash', '.example{color:red;}' );
++```
++
++Hosts that render package components into another document register that
++document as a style target:
++
++```js
++import { registerDocument } from '@wordpress/style-runtime';
++
++const unregisterDocument = registerDocument( iframe.contentDocument );
++
++// Later, when the document is no longer used:
++unregisterDocument();
++```
++
++When a document is registered, all previously registered styles are injected
++into it. Future styles are injected into every registered document.
++
++The runtime coordinates separately bundled copies of this package through a
++reserved `globalThis.__wpStyleRuntime` object. Consumers should use the public
++APIs below instead of reading or writing that global directly.
++
++## API
++
++### `registerStyle`
++
++Registers CSS text under a stable hash and injects it into all registered
++documents. The hash is used to deduplicate style tags, so the same style is not
++inserted more than once per document.
++
++Registered styles are retained for the lifetime of the page so they can be
++replayed into documents that are registered later.
++
++```js
++import { registerStyle } from '@wordpress/style-runtime';
++
++registerStyle( 'style-hash', '.example{color:red;}' );
++```
++
++### `registerDocument`
++
++Registers a document as a style injection target and returns a cleanup
++function. Documents are reference-counted, so the same document can be
++registered by multiple providers and will only stop receiving future styles
++after every registration has been cleaned up.
++
++```js
++import { registerDocument } from '@wordpress/style-runtime';
++
++const cleanup = registerDocument( document );
++
++cleanup();
++```
++
++## Contributing to this package
++
++This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
++
++To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
++
++<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+diff --git a/packages/style-runtime/package.json b/packages/style-runtime/package.json
+new file mode 100644
+index 00000000000000..7257e9eadc2271
+--- /dev/null
++++ b/packages/style-runtime/package.json
+@@ -0,0 +1,47 @@
++{
++	"name": "@wordpress/style-runtime",
++	"version": "0.1.0",
++	"description": "Runtime helpers for injecting WordPress package styles.",
++	"author": "The WordPress Contributors",
++	"license": "GPL-2.0-or-later",
++	"keywords": [
++		"wordpress",
++		"style",
++		"runtime"
++	],
++	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/style-runtime/README.md",
++	"repository": {
++		"type": "git",
++		"url": "git+https://github.com/WordPress/gutenberg.git",
++		"directory": "packages/style-runtime"
++	},
++	"bugs": {
++		"url": "https://github.com/WordPress/gutenberg/issues"
++	},
++	"engines": {
++		"node": ">=20.10.0",
++		"npm": ">=10.2.3"
++	},
++	"files": [
++		"src",
++		"build",
++		"build-module",
++		"build-types",
++		"*.md"
++	],
++	"main": "build/index.cjs",
++	"module": "build-module/index.mjs",
++	"exports": {
++		".": {
++			"types": "./build-types/index.d.ts",
++			"import": "./build-module/index.mjs",
++			"default": "./build/index.cjs"
++		},
++		"./package.json": "./package.json"
++	},
++	"types": "build-types",
++	"sideEffects": false,
++	"publishConfig": {
++		"access": "public"
++	}
++}
+diff --git a/packages/style-runtime/src/index.ts b/packages/style-runtime/src/index.ts
+new file mode 100644
+index 00000000000000..cd6f884ed293d7
+--- /dev/null
++++ b/packages/style-runtime/src/index.ts
+@@ -0,0 +1,166 @@
++type GlobalScopeWithStyleRuntime = typeof globalThis & {
++	// This global is shared by separately bundled copies of this package.
++	// Keep its shape backward compatible after release.
++	__wpStyleRuntime?: {
++		documents: Map< Document, number >;
++		styles: Map< string, string >;
++		injectedStyles: WeakMap< Document, Set< string > >;
++	};
++};
++
++const STYLE_HASH_ATTRIBUTE = 'data-wp-hash';
++
++/**
++ * Returns the shared style runtime registry.
++ *
++ * The registry is stored on `globalThis` so separately bundled copies of this
++ * package can coordinate through the same document and style maps.
++ *
++ * @return The shared runtime registry.
++ */
++function getRuntime() {
++	const globalScope = globalThis as GlobalScopeWithStyleRuntime;
++
++	if ( globalScope.__wpStyleRuntime ) {
++		return globalScope.__wpStyleRuntime;
++	}
++
++	globalScope.__wpStyleRuntime = {
++		documents: new Map(),
++		styles: new Map(),
++		injectedStyles: new WeakMap(),
++	};
++
++	if ( typeof document !== 'undefined' ) {
++		registerDocument( document );
++	}
++
++	return globalScope.__wpStyleRuntime;
++}
++
++/**
++ * Checks whether a document already contains a style tag for a hash.
++ *
++ * @param targetDocument Document to inspect.
++ * @param hash           Stable hash for the transformed CSS.
++ *
++ * @return Whether the style hash already exists in the document.
++ */
++function documentContainsStyleHash(
++	targetDocument: Document,
++	hash: string
++): boolean {
++	if ( ! targetDocument.head ) {
++		return false;
++	}
++
++	for ( const style of targetDocument.head.querySelectorAll(
++		`style[${ STYLE_HASH_ATTRIBUTE }]`
++	) ) {
++		if ( style.getAttribute( STYLE_HASH_ATTRIBUTE ) === hash ) {
++			return true;
++		}
++	}
++
++	return false;
++}
++
++/**
++ * Injects a registered style into a document, unless that document already
++ * contains a style tag for the same hash.
++ *
++ * @param targetDocument Document to inject the style into.
++ * @param hash           Stable hash for the transformed CSS.
++ * @param css            CSS text to inject.
++ */
++function injectStyle( targetDocument: Document, hash: string, css: string ) {
++	if ( ! targetDocument.head ) {
++		return;
++	}
++
++	const runtime = getRuntime();
++	let injectedStyles = runtime.injectedStyles.get( targetDocument );
++
++	if ( ! injectedStyles ) {
++		injectedStyles = new Set();
++		runtime.injectedStyles.set( targetDocument, injectedStyles );
++	}
++
++	if ( injectedStyles.has( hash ) ) {
++		return;
++	}
++
++	// Older generated CSS module output can still inject matching style tags
++	// after this document's cache is created, so keep the DOM as the fallback
++	// source of truth on cache misses.
++	if ( documentContainsStyleHash( targetDocument, hash ) ) {
++		injectedStyles.add( hash );
++		return;
++	}
++
++	const style = targetDocument.createElement( 'style' );
++	style.setAttribute( STYLE_HASH_ATTRIBUTE, hash );
++	style.appendChild( targetDocument.createTextNode( css ) );
++	targetDocument.head.appendChild( style );
++	injectedStyles.add( hash );
++}
++
++/**
++ * Registers a document as a style injection target.
++ *
++ * Existing registered styles are replayed into the document immediately.
++ * Documents are reference-counted so multiple providers can safely register the
++ * same document without one cleanup removing it while another registration is
++ * still active.
++ *
++ * @param targetDocument Document to receive registered styles.
++ * @return Cleanup function that unregisters this document registration.
++ */
++export function registerDocument( targetDocument: Document ) {
++	const runtime = getRuntime();
++
++	runtime.documents.set(
++		targetDocument,
++		( runtime.documents.get( targetDocument ) ?? 0 ) + 1
++	);
++
++	for ( const [ hash, css ] of runtime.styles ) {
++		injectStyle( targetDocument, hash, css );
++	}
++
++	return () => {
++		const count = runtime.documents.get( targetDocument );
++
++		if ( count === undefined ) {
++			return;
++		}
++
++		if ( count <= 1 ) {
++			runtime.documents.delete( targetDocument );
++			return;
++		}
++
++		runtime.documents.set( targetDocument, count - 1 );
++	};
++}
++
++/**
++ * Registers a style and injects it into all registered documents.
++ *
++ * The hash is used as the deduplication key, so calling this repeatedly with
++ * the same hash will not add duplicate style tags to a document.
++ * Registered styles are retained for the lifetime of the page so they can be
++ * replayed into documents that are registered later.
++ *
++ * @param hash Stable hash for the transformed CSS.
++ * @param css  CSS text to inject.
++ */
++export function registerStyle( hash: string, css: string ) {
++	const runtime = getRuntime();
++
++	runtime.styles.set( hash, css );
++
++	for ( const targetDocument of runtime.documents.keys() ) {
++		injectStyle( targetDocument, hash, css );
++	}
++}
+diff --git a/packages/style-runtime/test/index.ts b/packages/style-runtime/test/index.ts
+new file mode 100644
+index 00000000000000..744a6c9fe592b5
+--- /dev/null
++++ b/packages/style-runtime/test/index.ts
+@@ -0,0 +1,93 @@
++import { registerDocument, registerStyle } from '../src';
++
++type GlobalScopeWithStyleRuntime = typeof globalThis & {
++	__wpStyleRuntime?: unknown;
++};
++
++describe( 'style runtime', () => {
++	const globalScope = globalThis as GlobalScopeWithStyleRuntime;
++
++	afterEach( () => {
++		delete globalScope.__wpStyleRuntime;
++		document.head.innerHTML = '';
++	} );
++
++	it( 'injects registered styles into the root document', () => {
++		registerStyle( 'test-style', '.test-class{color:red;}' );
++
++		expect( document.head.innerHTML ).toBe(
++			'<style data-wp-hash="test-style">.test-class{color:red;}</style>'
++		);
++	} );
++
++	it( 'replays registered styles into newly registered documents', () => {
++		registerStyle( 'test-style', '.test-class{color:red;}' );
++
++		const iframeDocument = document.implementation.createHTMLDocument();
++		registerDocument( iframeDocument );
++
++		expect( iframeDocument.head.innerHTML ).toBe(
++			'<style data-wp-hash="test-style">.test-class{color:red;}</style>'
++		);
++	} );
++
++	it( 'injects future styles into all registered documents', () => {
++		const iframeDocument = document.implementation.createHTMLDocument();
++		registerDocument( iframeDocument );
++
++		registerStyle( 'test-style', '.test-class{color:red;}' );
++
++		expect( iframeDocument.head.innerHTML ).toBe(
++			'<style data-wp-hash="test-style">.test-class{color:red;}</style>'
++		);
++	} );
++
++	it( 'deduplicates styles by hash', () => {
++		registerStyle( 'test-style', '.test-class{color:red;}' );
++		registerStyle( 'test-style', '.test-class{color:red;}' );
++
++		expect(
++			document.head.querySelectorAll( 'style[data-wp-hash="test-style"]' )
++		).toHaveLength( 1 );
++	} );
++
++	it( 'deduplicates styles with hashes that are not selector-safe', () => {
++		const hash = 'test-style"]\\';
++		registerStyle( hash, '.test-class{color:red;}' );
++		registerStyle( hash, '.test-class{color:red;}' );
++
++		const styles = document.head.querySelectorAll( 'style[data-wp-hash]' );
++
++		expect( styles ).toHaveLength( 1 );
++		expect( styles[ 0 ] ).toHaveAttribute( 'data-wp-hash', hash );
++	} );
++
++	it( 'deduplicates against existing style tags injected after a document is registered', () => {
++		const iframeDocument = document.implementation.createHTMLDocument();
++		registerDocument( iframeDocument );
++		registerStyle( 'test-style', '.test-class{color:red;}' );
++
++		const existingStyle = iframeDocument.createElement( 'style' );
++		existingStyle.setAttribute( 'data-wp-hash', 'legacy-style' );
++		existingStyle.appendChild(
++			iframeDocument.createTextNode( '.legacy-class{color:blue;}' )
++		);
++		iframeDocument.head.appendChild( existingStyle );
++
++		registerStyle( 'legacy-style', '.legacy-class{color:blue;}' );
++
++		expect(
++			iframeDocument.head.querySelectorAll( 'style[data-wp-hash]' )
++		).toHaveLength( 2 );
++	} );
++
++	it( 'stops injecting into documents after cleanup', () => {
++		const iframeDocument = document.implementation.createHTMLDocument();
++		const cleanup = registerDocument( iframeDocument );
++
++		cleanup();
++		registerStyle( 'test-style', '.test-class{color:red;}' );
++
++		expect( iframeDocument.head.childElementCount ).toBe( 0 );
++	} );
++} );
+diff --git a/packages/style-runtime/tsconfig.json b/packages/style-runtime/tsconfig.json
+new file mode 100644
+index 00000000000000..7ff060ab6ce105
+--- /dev/null
++++ b/packages/style-runtime/tsconfig.json
+@@ -0,0 +1,4 @@
++{
++	"$schema": "https://json.schemastore.org/tsconfig.json",
++	"extends": "../../tsconfig.base.json"
++}
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index abebf3e3b7f4ac..7a779221f42ce2 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -86,6 +86,7 @@
+ 	"dependencies": {
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/private-apis": "file:../private-apis",
++		"@wordpress/style-runtime": "file:../style-runtime",
+ 		"colorjs.io": "^0.6.0",
+ 		"memize": "^2.1.0"
+ 	},
+diff --git a/packages/theme/tsconfig.json b/packages/theme/tsconfig.json
+index fd9097cc282475..b88eeb2f72c79f 100644
+--- a/packages/theme/tsconfig.json
++++ b/packages/theme/tsconfig.json
+@@ -5,6 +5,7 @@
+ 	},
+ 	"files": [],
+ 	"references": [
++		{ "path": "../style-runtime" },
+ 		{ "path": "./tsconfig.src.json" },
+ 		{ "path": "./tsconfig.bin.json" }
+ 	]
+diff --git a/packages/theme/tsconfig.src.json b/packages/theme/tsconfig.src.json
+index 5d5953b0e5a972..3924b135a97250 100644
+--- a/packages/theme/tsconfig.src.json
++++ b/packages/theme/tsconfig.src.json
+@@ -7,5 +7,9 @@
+ 	},
+ 	"exclude": [],
+ 	"files": [ "global.d.ts" ],
+-	"references": [ { "path": "../element" }, { "path": "../private-apis" } ]
++	"references": [
++		{ "path": "../element" },
++		{ "path": "../private-apis" },
++		{ "path": "../style-runtime" }
++	]
+ }
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 1dc580b28fbcae..9cc674ea3987d3 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -52,6 +52,7 @@
+ 		"@wordpress/keycodes": "file:../keycodes",
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/private-apis": "file:../private-apis",
++		"@wordpress/style-runtime": "file:../style-runtime",
+ 		"@wordpress/theme": "file:../theme",
+ 		"clsx": "^2.1.1",
+ 		"tabbable": "^6.4.0"
+diff --git a/packages/ui/tsconfig.json b/packages/ui/tsconfig.json
+index ccfbdcfd94f17a..4060c432adb43b 100644
+--- a/packages/ui/tsconfig.json
++++ b/packages/ui/tsconfig.json
+@@ -18,6 +18,7 @@
+ 		{ "path": "../keycodes" },
+ 		{ "path": "../primitives" },
+ 		{ "path": "../private-apis" },
++		{ "path": "../style-runtime" },
+ 		{ "path": "../theme" }
+ 	],
+ 	"files": [ "global.d.ts" ],
+diff --git a/packages/wp-build/CHANGELOG.md b/packages/wp-build/CHANGELOG.md
+index eabf9e8b11bf9b..d8c1f84a8b0f28 100644
+--- a/packages/wp-build/CHANGELOG.md
++++ b/packages/wp-build/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   Register generated CSS module styles with `@wordpress/style-runtime` so they can be injected into registered documents, such as editor iframes ([#77965](https://github.com/WordPress/gutenberg/pull/77965)).
++
+ ## 0.13.0 (2026-04-29)
+ 
+ ### Bug Fixes
+diff --git a/packages/wp-build/README.md b/packages/wp-build/README.md
+index 7862c47593bcc7..43875f03b56884 100644
+--- a/packages/wp-build/README.md
++++ b/packages/wp-build/README.md
+@@ -52,6 +52,13 @@ or via npm script:
+ }
+ ```
+ 
++### Testing Generated Styles
++
++Generated CSS module output skips automatic style injection when `NODE_ENV` is
++`test`. Node-based DOM implementations such as jsdom do not reliably support
++modern CSS features, so tests that need actual styles in the DOM should
++run in a browser environment.
++
+ ## Package Configuration
+ 
+ Configure your `package.json` with the following optional fields:
+diff --git a/packages/wp-build/lib/build.mjs b/packages/wp-build/lib/build.mjs
+index fbbafa279836ea..96005adb2234a0 100755
+--- a/packages/wp-build/lib/build.mjs
++++ b/packages/wp-build/lib/build.mjs
+@@ -6,6 +6,7 @@
+ import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
+ import path from 'path';
+ import { createHash } from 'node:crypto';
++import { createRequire as createNodeRequire } from 'node:module';
+ import { parseArgs } from 'node:util';
+ import esbuild from 'esbuild';
+ import glob from 'fast-glob';
+@@ -161,6 +162,33 @@ const wordpressExternalsPlugin = createWordpressExternalsPlugin(
+ 	HANDLE_PREFIX
+ );
+ 
++const styleRuntimeRequire = createNodeRequire( import.meta.url );
++const STYLE_RUNTIME_PACKAGE_NAME = '@wordpress/style-runtime';
++// Use the source entry instead of the package export so wp-build can bootstrap
++// from a clean checkout before style-runtime has generated build output.
++const STYLE_RUNTIME_ENTRY = path.join(
++	path.dirname(
++		styleRuntimeRequire.resolve(
++			`${ STYLE_RUNTIME_PACKAGE_NAME }/package.json`
++		)
++	),
++	'src/index.ts'
++);
++
++// CSS module output generated by this package imports the style runtime. Resolve
++// it from `@wordpress/build` so consumers don't need to expose transitive deps.
++function styleRuntimeAliasPlugin() {
++	return {
++		name: 'style-runtime-alias',
++		setup( build ) {
++			build.onResolve(
++				{ filter: /^@wordpress\/style-runtime$/ },
++				() => ( { path: STYLE_RUNTIME_ENTRY } )
++			);
++		},
++	};
++}
++
+ /**
+  * Get SASS options for the given working directory.
+  *
+@@ -220,7 +248,15 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
+ 			.digest( 'hex' )
+ 			.slice( 0, 10 );
+ 
+-		let cssModule = `if (typeof document !== 'undefined' && process.env.NODE_ENV !== 'test' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
++		// Skip automatic style injection in Node-based test environments, where DOM
++		// implementations do not reliably support modern CSS features like @layer.
++		let cssModule = cssModules
++			? `import { registerStyle } from '@wordpress/style-runtime';
++if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
++	registerStyle("${ hash }", ${ JSON.stringify( css ) });
++}
++`
++			: `if (typeof document !== 'undefined' && process.env.NODE_ENV !== 'test' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
+ 	const style = document.createElement("style");
+ 	style.setAttribute("data-wp-hash", "${ hash }");
+ 	style.appendChild(document.createTextNode(${ JSON.stringify( css ) }));
+@@ -251,6 +287,7 @@ function inlineStyle( contents ) {
+ function createStyleBundlingPlugins( workingDir ) {
+ 	const sassOptions = getSassOptions( workingDir );
+ 	return [
++		styleRuntimeAliasPlugin(),
+ 		// Handle CSS modules (.module.css and .module.scss)
+ 		sassPlugin( {
+ 			embedded: true,
+@@ -534,7 +571,10 @@ async function bundlePackage( packageName, options = {} ) {
+ 			};
+ 		}
+ 
+-		const baseBundlePlugins = [ momentTimezoneAliasPlugin() ];
++		const baseBundlePlugins = [
++			momentTimezoneAliasPlugin(),
++			styleRuntimeAliasPlugin(),
++		];
+ 
+ 		builds.push(
+ 			esbuild.build( {
+@@ -621,6 +661,7 @@ async function bundlePackage( packageName, options = {} ) {
+ 					minify: true,
+ 					define: getDefine( false ),
+ 					plugins: [
++						styleRuntimeAliasPlugin(),
+ 						wordpressExternalsPlugin(
+ 							`${ baseFileName }.min`,
+ 							'esm',
+@@ -647,6 +688,7 @@ async function bundlePackage( packageName, options = {} ) {
+ 						minify: false,
+ 						define: getDefine( true ),
+ 						plugins: [
++							styleRuntimeAliasPlugin(),
+ 							wordpressExternalsPlugin(
+ 								`${ baseFileName }.min`,
+ 								'esm',
+@@ -1335,8 +1377,10 @@ async function transpilePackage( packageName ) {
+ 		dsTokenFallbacksJs,
+ 		needsEmotionPlugin && emotionPlugin,
+ 		wasmInlinePlugin,
+-		externalizeAllExceptCssPlugin,
++		// CSS modules import @wordpress/style-runtime in generated JS. Resolve
++		// that alias before externalizing imports so the runtime is bundled.
+ 		...createStyleBundlingPlugins( packageDir ),
++		externalizeAllExceptCssPlugin,
+ 	].filter( Boolean );
+ 
+ 	if ( packageJson.main ) {
+@@ -1613,6 +1657,7 @@ async function buildRoute( routeName ) {
+ 					minify: true,
+ 					define: getDefine( false ),
+ 					plugins: [
++						styleRuntimeAliasPlugin(),
+ 						wordpressExternalsPlugin(
+ 							'route.min',
+ 							'esm',
+@@ -1630,6 +1675,7 @@ async function buildRoute( routeName ) {
+ 					minify: false,
+ 					define: getDefine( true ),
+ 					plugins: [
++						styleRuntimeAliasPlugin(),
+ 						wordpressExternalsPlugin(
+ 							'route.min',
+ 							'esm',
+@@ -1662,13 +1708,13 @@ async function buildRoute( routeName ) {
+ 				minify: true,
+ 				define: getDefine( false ),
+ 				plugins: [
++					...createStyleBundlingPlugins( routeDir ),
+ 					wordpressExternalsPlugin(
+ 						'content.min',
+ 						'esm',
+ 						[],
+ 						true // Generate asset file for minified build
+ 					),
+-					...createStyleBundlingPlugins( routeDir ),
+ 				],
+ 			} ),
+ 			esbuild.build( {
+@@ -1680,13 +1726,13 @@ async function buildRoute( routeName ) {
+ 				minify: false,
+ 				define: getDefine( true ),
+ 				plugins: [
++					...createStyleBundlingPlugins( routeDir ),
+ 					wordpressExternalsPlugin(
+ 						'content.min',
+ 						'esm',
+ 						[],
+ 						false // Skip asset file for non-minified build
+ 					),
+-					...createStyleBundlingPlugins( routeDir ),
+ 				],
+ 			} ),
+ 		] );
+@@ -1757,13 +1803,13 @@ async function buildWidget( widgetName ) {
+ 					minify: true,
+ 					define: getDefine( false ),
+ 					plugins: [
++						...createStyleBundlingPlugins( widgetDir ),
+ 						wordpressExternalsPlugin(
+ 							'render.min',
+ 							'esm',
+ 							[],
+ 							true // Generate asset file for minified build
+ 						),
+-						...createStyleBundlingPlugins( widgetDir ),
+ 					],
+ 				} ),
+ 				esbuild.build( {
+@@ -1775,13 +1821,13 @@ async function buildWidget( widgetName ) {
+ 					minify: false,
+ 					define: getDefine( true ),
+ 					plugins: [
++						...createStyleBundlingPlugins( widgetDir ),
+ 						wordpressExternalsPlugin(
+ 							'render.min',
+ 							'esm',
+ 							[],
+ 							false // Skip asset file for non-minified build
+ 						),
+-						...createStyleBundlingPlugins( widgetDir ),
+ 					],
+ 				} ),
+ 			] );
+@@ -1807,6 +1853,7 @@ async function buildWidget( widgetName ) {
+ 					minify: true,
+ 					define: getDefine( false ),
+ 					plugins: [
++						styleRuntimeAliasPlugin(),
+ 						wordpressExternalsPlugin(
+ 							'widget.min',
+ 							'esm',
+@@ -1824,6 +1871,7 @@ async function buildWidget( widgetName ) {
+ 					minify: false,
+ 					define: getDefine( true ),
+ 					plugins: [
++						styleRuntimeAliasPlugin(),
+ 						wordpressExternalsPlugin(
+ 							'widget.min',
+ 							'esm',
+diff --git a/packages/wp-build/package.json b/packages/wp-build/package.json
+index 8434bc36f2628b..5ceabecc7be201 100644
+--- a/packages/wp-build/package.json
++++ b/packages/wp-build/package.json
+@@ -36,6 +36,7 @@
+ 	},
+ 	"dependencies": {
+ 		"@emotion/babel-plugin": "11.13.5",
++		"@wordpress/style-runtime": "file:../style-runtime",
+ 		"autoprefixer": "10.4.21",
+ 		"browserslist-to-esbuild": "2.1.1",
+ 		"change-case": "4.1.2",
+diff --git a/packages/wp-build/tsconfig.json b/packages/wp-build/tsconfig.json
+index eefe446fcc14e1..2766c08fc797b2 100644
+--- a/packages/wp-build/tsconfig.json
++++ b/packages/wp-build/tsconfig.json
+@@ -17,6 +17,7 @@
+ 		"noEmit": true,
+ 		"outDir": ".cache"
+ 	},
++	"references": [ { "path": "../style-runtime" } ],
+ 	"include": [ "." ],
+ 	"exclude": [
+ 		// Excluded to maintain consistency with bin/tsconfig.json
+diff --git a/tsconfig.json b/tsconfig.json
+index 13f15984163b27..dba162ff1cee44 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -75,6 +75,7 @@
+ 		{ "path": "packages/router" },
+ 		{ "path": "packages/shortcode" },
+ 		{ "path": "packages/style-engine" },
++		{ "path": "packages/style-runtime" },
+ 		{ "path": "packages/sync" },
+ 		{ "path": "packages/theme" },
+ 		{ "path": "packages/token-list" },

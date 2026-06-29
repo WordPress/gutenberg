@@ -1,0 +1,1165 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 764ba404cd68a8..4043259c26ad1e 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -10,6 +10,8 @@
+ -   `Select`: `Select.Item` no longer renders its `value` as fallback item content. Pass item content explicitly as `children`. Migrate `<Select.Item value="Foo" />` to `<Select.Item value="Foo">Foo</Select.Item>` ([#77861](https://github.com/WordPress/gutenberg/pull/77861)).
+ -   `Tooltip`: **`Popup` positioner API** ([#78089](https://github.com/WordPress/gutenberg/pull/78089)). Add a `Tooltip.Positioner` subcomponent and an optional `positioner` prop on `Tooltip.Popup` (when omitted, the default `Tooltip.Positioner` is used). Remove `side`, `align`, and `sideOffset` from `Tooltip.Popup`; pass `positioner={ <Tooltip.Positioner side="…" align="…" sideOffset={ … } /> }` instead. The new subcomponent exposes the full positioner surface (`alignOffset`, `anchor`, `collisionAvoidance`, `collisionBoundary`, `collisionPadding`, `sticky`, etc.) and mirrors the existing `portal` slot pattern.
+ -   `CollapsibleCard.Header`: Now renders an outer `<div>` wrapper around the trigger. Forwarded props (`className`, `aria-*`, `data-*`) and `ref` land on this outer wrapper instead of the inner click-target div ([#77962](https://github.com/WordPress/gutenberg/pull/77962)).
++-   `Popover`: **`Popup` positioner API** ([#78168](https://github.com/WordPress/gutenberg/pull/78168)). Add a `Popover.Positioner` subcomponent and an optional `positioner` prop on `Popover.Popup` (when omitted, the default `Popover.Positioner` is used). Remove `side`, `align`, `sideOffset`, `alignOffset`, `anchor`, `arrowPadding`, `collisionAvoidance`, `collisionBoundary`, `collisionPadding`, and `sticky` from `Popover.Popup`; pass `positioner={ <Popover.Positioner side="…" align="…" anchor={ … } /> }` instead.
++-   `Tooltip`, `Popover`, `Select`, `Autocomplete`, `Dialog`, `Drawer`, `AlertDialog`: Narrow the TypeScript types of the `Portal` subcomponent props to the package's standard `ComponentProps` shape. `className` and `style` no longer accept the `(state) => …` callback variant, and `render` no longer accepts the two-arg `(props, state) => …` variant from Base UI. Runtime behavior is unchanged ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
+ 
+ ### New Features
+ 
+@@ -34,6 +36,8 @@
+ -   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+ -   `IconButton`: Add a `positioner` prop, accepting a `<Tooltip.Positioner />` element, to customize how the tooltip is positioned relative to the button ([#78089](https://github.com/WordPress/gutenberg/pull/78089)).
+ -   `CollapsibleCard.Header`: Pass `render={ <h2 /> }` (or any of `<h1>`–`<h6>`) to wrap the trigger in a heading and contribute to the document outline, following the W3C APG accordion pattern (heading wraps button) ([#77962](https://github.com/WordPress/gutenberg/pull/77962)).
++-   `Select`: Add a `Select.Positioner` subcomponent and a `positioner` slot prop on `Select.Popup` to customize the popup placement, mirroring the existing `portal` slot pattern ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
++-   `Autocomplete`: Add an `Autocomplete.Positioner` subcomponent and a `positioner` slot prop on `Autocomplete.Popup` to customize the popup placement, mirroring the existing `portal` slot pattern ([#78168](https://github.com/WordPress/gutenberg/pull/78168)).
+ 
+ ### Internal
+ 
+diff --git a/packages/ui/CONTRIBUTING.md b/packages/ui/CONTRIBUTING.md
+index 023139c7cf4ed3..6de37c3546c2e0 100644
+--- a/packages/ui/CONTRIBUTING.md
++++ b/packages/ui/CONTRIBUTING.md
+@@ -215,6 +215,40 @@ function MyComponent( props, ref ) {
+ }
+ ```
+ 
++## Overlay Slot Props
++
++Compound overlay primitives (`Tooltip`, `Popover`, `Select`, `Autocomplete`, etc.) expose their underlying Base UI subcomponents (`Portal`, `Positioner`, …) through **slot props** on `Popup` rather than as flat prop subsets. The corresponding subcomponents are exported alongside `Popup` (e.g. `Tooltip.Portal`, `Tooltip.Positioner`).
++
++### Pattern
++
++For each Base UI subcomponent that we want to expose to consumers:
++
++1. Export a renderable wrapper subcomponent matching the Base UI subcomponent's name (e.g. `Tooltip.Positioner`).
++2. Add an optional slot prop on `Popup` named after the subcomponent (e.g. `positioner`). The prop type accepts a React element of the matching subcomponent: `ReactElement< Omit< MySubcomponentProps, 'children' > >`.
++3. When the slot prop is omitted, `Popup` uses the wrapper subcomponent with default props.
++4. When the slot prop is provided, `Popup` clones the given element and injects the rest of the subtree as `children`. Use the `renderSlotWithChildren` helper to keep this consistent across overlays.
++
++```tsx
++<Tooltip.Popup
++	portal={ <Tooltip.Portal container={ myContainer } /> }
++	positioner={ <Tooltip.Positioner side="right" sideOffset={ 8 } /> }
++>
++	Save
++</Tooltip.Popup>
++```
++
++### Why
++
++-   One mental model across overlays — same prop names, same prop shape, regardless of which primitive is in use.
++-   The wrapper subcomponents are also valid as standalone exports for advanced compositions.
++-   `Popup` does not need to maintain a hand-picked `Pick<>` list of positioner/portal props. The full Base UI surface is reachable through the corresponding subcomponent.
++
++### When to add a new slot prop
++
++Only when there is a concrete consumer that needs to reach a Base UI subcomponent's customization. Do not preemptively expose slots.
++
++High-level wrappers that hide `Popup` (for example `IconButton`, which renders a `Tooltip` internally) should re-expose the same slot props — same name, same shape — to keep the API uniform.
++
+ ## CSS Architecture
+ 
+ ### CSS Layers
+diff --git a/packages/ui/src/alert-dialog/types.ts b/packages/ui/src/alert-dialog/types.ts
+index 459e32f2320986..1de2eb6a04a2b4 100644
+--- a/packages/ui/src/alert-dialog/types.ts
++++ b/packages/ui/src/alert-dialog/types.ts
+@@ -1,11 +1,9 @@
+ import type { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
+-import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
++import type { ReactElement, ReactNode } from 'react';
+ 
+ import type { ComponentProps } from '../utils/types';
+ 
+-export type PortalProps = ComponentPropsWithoutRef<
+-	typeof _AlertDialog.Portal
+->;
++export type PortalProps = ComponentProps< typeof _AlertDialog.Portal >;
+ 
+ /**
+  * The return type of `onConfirm`. Return `void` (or nothing) to auto-close
+diff --git a/packages/ui/src/dialog/types.ts b/packages/ui/src/dialog/types.ts
+index 1c0457111c5b1e..bca28f15def848 100644
+--- a/packages/ui/src/dialog/types.ts
++++ b/packages/ui/src/dialog/types.ts
+@@ -1,11 +1,11 @@
+ import type { Dialog as _Dialog } from '@base-ui/react/dialog';
+-import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
++import type { ReactElement, ReactNode } from 'react';
+ 
+ import type { Button } from '../button';
+ import type { IconButton } from '../icon-button';
+ import type { ComponentProps } from '../utils/types';
+ 
+-export type PortalProps = ComponentPropsWithoutRef< typeof _Dialog.Portal >;
++export type PortalProps = ComponentProps< typeof _Dialog.Portal >;
+ 
+ export interface RootProps
+ 	extends Pick<
+diff --git a/packages/ui/src/drawer/types.ts b/packages/ui/src/drawer/types.ts
+index 104df82ac665fe..03722279ef3d29 100644
+--- a/packages/ui/src/drawer/types.ts
++++ b/packages/ui/src/drawer/types.ts
+@@ -1,10 +1,10 @@
+ import type { Drawer as _Drawer } from '@base-ui/react/drawer';
+-import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
++import type { ReactElement, ReactNode } from 'react';
+ import type { Button } from '../button';
+ import type { IconButton } from '../icon-button';
+ import type { ComponentProps } from '../utils/types';
+ 
+-export type PortalProps = ComponentPropsWithoutRef< typeof _Drawer.Portal >;
++export type PortalProps = ComponentProps< typeof _Drawer.Portal >;
+ 
+ export interface RootProps
+ 	extends Pick<
+diff --git a/packages/ui/src/form/primitives/autocomplete/index.ts b/packages/ui/src/form/primitives/autocomplete/index.ts
+index 99df32900cda13..d98f21ea9ef33f 100644
+--- a/packages/ui/src/form/primitives/autocomplete/index.ts
++++ b/packages/ui/src/form/primitives/autocomplete/index.ts
+@@ -6,7 +6,8 @@ export { Input } from './input';
+ export { Item } from './item';
+ export { List } from './list';
+ export { ListBody } from './list-body';
+-export { Portal } from './portal';
+ export { Popup } from './popup';
++export { Portal } from './portal';
++export { Positioner } from './positioner';
+ export { Root } from './root';
+ export { Value } from './value';
+diff --git a/packages/ui/src/form/primitives/autocomplete/popup.tsx b/packages/ui/src/form/primitives/autocomplete/popup.tsx
+index 451cd72c7073c2..001bb90643af9a 100644
+--- a/packages/ui/src/form/primitives/autocomplete/popup.tsx
++++ b/packages/ui/src/form/primitives/autocomplete/popup.tsx
+@@ -8,35 +8,31 @@ import {
+ import { unlock } from '../../../lock-unlock';
+ import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
+ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+-import resetStyles from '../../../utils/css/resets.module.css';
+-import styles from './style.module.css';
+ import { Portal } from './portal';
++import { Positioner } from './positioner';
+ import type { AutocompletePopupProps } from './types';
+-import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
+ 
+ const ThemeProvider: typeof ThemeProviderType =
+ 	unlock( themePrivateApis ).ThemeProvider;
+ 
+ export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
+-	function Popup( { className, portal, ...restProps }, ref ) {
+-		const portalChildren = (
+-			<_Autocomplete.Positioner
+-				{ ...ITEM_POPUP_POSITIONER_PROPS }
+-				className={ clsx(
+-					resetStyles[ 'box-sizing' ],
+-					styles.positioner
+-				) }
+-			>
+-				<ThemeProvider>
+-					<_Autocomplete.Popup
+-						ref={ ref }
+-						className={ clsx( itemPopupStyles.popup, className ) }
+-						{ ...restProps }
+-					/>
+-				</ThemeProvider>
+-			</_Autocomplete.Positioner>
++	function Popup( { className, portal, positioner, ...restProps }, ref ) {
++		const popupContent = (
++			<ThemeProvider>
++				<_Autocomplete.Popup
++					ref={ ref }
++					className={ clsx( itemPopupStyles.popup, className ) }
++					{ ...restProps }
++				/>
++			</ThemeProvider>
+ 		);
+ 
+-		return renderSlotWithChildren( portal, <Portal />, portalChildren );
++		const positionedPopup = renderSlotWithChildren(
++			positioner,
++			<Positioner />,
++			popupContent
++		);
++
++		return renderSlotWithChildren( portal, <Portal />, positionedPopup );
+ 	}
+ );
+diff --git a/packages/ui/src/form/primitives/autocomplete/positioner.tsx b/packages/ui/src/form/primitives/autocomplete/positioner.tsx
+new file mode 100644
+index 00000000000000..9ca5721595c7b1
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/positioner.tsx
+@@ -0,0 +1,32 @@
++import clsx from 'clsx';
++import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import { forwardRef } from '@wordpress/element';
++import type { PositionerProps } from './types';
++import resetStyles from '../../../utils/css/resets.module.css';
++import styles from './style.module.css';
++import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
++
++/**
++ * Positions the floating autocomplete popup relative to its input. Pass to
++ * `Autocomplete.Popup`'s `positioner` prop to customize `side`, `align`,
++ * `sideOffset`, collision behavior, etc. When `positioner` is omitted,
++ * `Autocomplete.Popup` uses this component with default props.
++ */
++const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
++	function AutocompletePositioner( { className, ...props }, ref ) {
++		return (
++			<_Autocomplete.Positioner
++				{ ...ITEM_POPUP_POSITIONER_PROPS }
++				{ ...props }
++				ref={ ref }
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					styles.positioner,
++					className
++				) }
++			/>
++		);
++	}
++);
++
++export { Positioner };
+diff --git a/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx b/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
+index f7c01eac45925c..4a3253a385f5df 100644
+--- a/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
+@@ -13,6 +13,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
+ 	component: Autocomplete.Root,
+ 	subcomponents: {
+ 		'Autocomplete.Portal': Autocomplete.Portal,
++		'Autocomplete.Positioner': Autocomplete.Positioner,
+ 		'Autocomplete.Popup': Autocomplete.Popup,
+ 		'Autocomplete.Input': Autocomplete.Input,
+ 		'Autocomplete.InputGroup': Autocomplete.InputGroup,
+diff --git a/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx b/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx
+index ce8d0d42708711..48abc63a61ef17 100644
+--- a/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx
++++ b/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx
+@@ -159,4 +159,45 @@ describe( 'Autocomplete', () => {
+ 			);
+ 		} );
+ 	} );
++
++	describe( 'positioner', () => {
++		it( 'should render the custom positioner element wrapping the popup content', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Autocomplete.Root items={ ITEMS }>
++					<Autocomplete.Input placeholder="Search" />
++					<Autocomplete.Popup
++						positioner={
++							<Autocomplete.Positioner data-testid="custom-positioner" />
++						}
++					>
++						<Autocomplete.List>
++							<Autocomplete.ListBody>
++								<Autocomplete.Collection>
++									{ ( item ) => (
++										<Autocomplete.Item
++											key={ item.id }
++											value={ item }
++										>
++											{ item.value }
++										</Autocomplete.Item>
++									) }
++								</Autocomplete.Collection>
++							</Autocomplete.ListBody>
++						</Autocomplete.List>
++					</Autocomplete.Popup>
++				</Autocomplete.Root>
++			);
++
++			await user.type( screen.getByRole( 'combobox' ), 'Item 1' );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			const positioner = screen.getByTestId( 'custom-positioner' );
++
++			expect( positioner ).toContainElement( item );
++		} );
++	} );
+ } );
+diff --git a/packages/ui/src/form/primitives/autocomplete/types.ts b/packages/ui/src/form/primitives/autocomplete/types.ts
+index 89e5923682767d..251b46201ba0a3 100644
+--- a/packages/ui/src/form/primitives/autocomplete/types.ts
++++ b/packages/ui/src/form/primitives/autocomplete/types.ts
+@@ -1,12 +1,12 @@
+ import type { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
+-import type { ComponentPropsWithoutRef, ReactElement } from 'react';
++import type { ReactElement } from 'react';
+ import type { ComponentProps } from '../../../utils/types';
+ 
+ export type AutocompleteCollectionProps = _Autocomplete.Collection.Props;
+ 
+-export type PortalProps = ComponentPropsWithoutRef<
+-	typeof _Autocomplete.Portal
+->;
++export type PortalProps = ComponentProps< typeof _Autocomplete.Portal >;
++
++export type PositionerProps = ComponentProps< typeof _Autocomplete.Positioner >;
+ 
+ export type AutocompleteClearProps = ComponentProps<
+ 	typeof _Autocomplete.Clear
+@@ -58,6 +58,14 @@ export type AutocompletePopupProps = ComponentProps<
+ 	 * portal element; they would be ignored.
+ 	 */
+ 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
++	/**
++	 * Optional positioner element, typically `<Autocomplete.Positioner />`
++	 * with custom positioning props (`side`, `align`, `sideOffset`, collision
++	 * settings, etc.). When omitted, `Autocomplete.Popup` uses
++	 * `Autocomplete.Positioner` with default props. Do not pass `children` on
++	 * the positioner element; they would be ignored.
++	 */
++	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
+ };
+ 
+ export type AutocompleteRootProps = ComponentProps<
+diff --git a/packages/ui/src/form/primitives/constants.ts b/packages/ui/src/form/primitives/constants.ts
+index 6ea8a7ac6b8c49..b35c8f9877000a 100644
+--- a/packages/ui/src/form/primitives/constants.ts
++++ b/packages/ui/src/form/primitives/constants.ts
+@@ -1,10 +1,13 @@
+-import type { Select as _Select } from '@base-ui/react/select';
+-
+ /**
+- * Shared positioning props for item popups (Select, Combobox, etc.).
++ * Shared positioning defaults for item-list popups. Consumed as individual
++ * default values by `Select.Positioner` and `Autocomplete.Positioner`. Each
++ * key is validated by the consuming positioner's prop types at the use
++ * site, so a value here that does not satisfy either Base UI positioner's
++ * type will surface as a type error in `select/positioner.tsx` or
++ * `autocomplete/positioner.tsx`.
+  */
+ export const ITEM_POPUP_POSITIONER_PROPS = {
+ 	align: 'start',
+ 	sideOffset: 8,
+ 	collisionPadding: 12,
+-} satisfies Partial< _Select.Positioner.Props >;
++} as const;
+diff --git a/packages/ui/src/form/primitives/select/index.ts b/packages/ui/src/form/primitives/select/index.ts
+index 8c00e747fd16de..3e46cbb75370f8 100644
+--- a/packages/ui/src/form/primitives/select/index.ts
++++ b/packages/ui/src/form/primitives/select/index.ts
+@@ -1,5 +1,6 @@
+ export { Item } from './item';
+-export { Portal } from './portal';
+ export { Popup } from './popup';
++export { Portal } from './portal';
++export { Positioner } from './positioner';
+ export { Root } from './root';
+ export { Trigger } from './trigger';
+diff --git a/packages/ui/src/form/primitives/select/popup.tsx b/packages/ui/src/form/primitives/select/popup.tsx
+index c1f666b851dc6b..f7db6f9079e5c0 100644
+--- a/packages/ui/src/form/primitives/select/popup.tsx
++++ b/packages/ui/src/form/primitives/select/popup.tsx
+@@ -7,49 +7,45 @@ import {
+ } from '@wordpress/theme';
+ import { unlock } from '../../../lock-unlock';
+ import { Portal } from './portal';
++import { Positioner } from './positioner';
+ import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
+ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+-import resetStyles from '../../../utils/css/resets.module.css';
+-import styles from './style.module.css';
+ import type { SelectPopupProps } from './types';
+-import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
+ 
+ const ThemeProvider: typeof ThemeProviderType =
+ 	unlock( themePrivateApis ).ThemeProvider;
+ 
+ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
+-	function Popup( { className, portal, children, ...restProps }, ref ) {
+-		const portalChildren = (
+-			<_Select.Positioner
+-				{ ...ITEM_POPUP_POSITIONER_PROPS }
+-				alignItemWithTrigger={ false }
+-				className={ clsx(
+-					resetStyles[ 'box-sizing' ],
+-					styles.positioner
+-				) }
+-			>
+-				<ThemeProvider>
+-					<_Select.Popup
+-						ref={ ref }
+-						className={ clsx( itemPopupStyles.popup, className ) }
+-						{ ...restProps }
+-					>
+-						<_Select.List className={ itemPopupStyles.list }>
+-							<div
+-								className={
+-									itemPopupStyles[
+-										'list-scrollable-container'
+-									]
+-								}
+-							>
+-								{ children }
+-							</div>
+-						</_Select.List>
+-					</_Select.Popup>
+-				</ThemeProvider>
+-			</_Select.Positioner>
++	function Popup(
++		{ className, portal, positioner, children, ...restProps },
++		ref
++	) {
++		const popupContent = (
++			<ThemeProvider>
++				<_Select.Popup
++					ref={ ref }
++					className={ clsx( itemPopupStyles.popup, className ) }
++					{ ...restProps }
++				>
++					<_Select.List className={ itemPopupStyles.list }>
++						<div
++							className={
++								itemPopupStyles[ 'list-scrollable-container' ]
++							}
++						>
++							{ children }
++						</div>
++					</_Select.List>
++				</_Select.Popup>
++			</ThemeProvider>
+ 		);
+ 
+-		return renderSlotWithChildren( portal, <Portal />, portalChildren );
++		const positionedPopup = renderSlotWithChildren(
++			positioner,
++			<Positioner />,
++			popupContent
++		);
++
++		return renderSlotWithChildren( portal, <Portal />, positionedPopup );
+ 	}
+ );
+diff --git a/packages/ui/src/form/primitives/select/positioner.tsx b/packages/ui/src/form/primitives/select/positioner.tsx
+new file mode 100644
+index 00000000000000..490eae38100cab
+--- /dev/null
++++ b/packages/ui/src/form/primitives/select/positioner.tsx
+@@ -0,0 +1,36 @@
++import clsx from 'clsx';
++import { Select as _Select } from '@base-ui/react/select';
++import { forwardRef } from '@wordpress/element';
++import type { PositionerProps } from './types';
++import resetStyles from '../../../utils/css/resets.module.css';
++import styles from './style.module.css';
++import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
++
++/**
++ * Positions the floating select popup relative to its trigger. Pass to
++ * `Select.Popup`'s `positioner` prop to customize `side`, `align`,
++ * `sideOffset`, collision behavior, etc. When `positioner` is omitted,
++ * `Select.Popup` uses this component with default props.
++ */
++const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
++	function SelectPositioner( { className, ...props }, ref ) {
++		return (
++			<_Select.Positioner
++				{ ...ITEM_POPUP_POSITIONER_PROPS }
++				// Override Base UI's `true` default so the popup is placed
++				// relative to the trigger rather than aligned with the
++				// highlighted item. Consumers can opt back in by passing `true`.
++				alignItemWithTrigger={ false }
++				{ ...props }
++				ref={ ref }
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					styles.positioner,
++					className
++				) }
++			/>
++		);
++	}
++);
++
++export { Positioner };
+diff --git a/packages/ui/src/form/primitives/select/stories/index.story.tsx b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+index 0c7a02ef700e9d..7f71dfd86766ff 100644
+--- a/packages/ui/src/form/primitives/select/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+@@ -7,6 +7,7 @@ const meta: Meta< typeof Select.Root > = {
+ 	subcomponents: {
+ 		'Select.Trigger': Select.Trigger,
+ 		'Select.Portal': Select.Portal,
++		'Select.Positioner': Select.Positioner,
+ 		'Select.Popup': Select.Popup,
+ 		'Select.Item': Select.Item,
+ 	},
+diff --git a/packages/ui/src/form/primitives/select/test/index.test.tsx b/packages/ui/src/form/primitives/select/test/index.test.tsx
+index 1f6894d9668590..3376123835a0dc 100644
+--- a/packages/ui/src/form/primitives/select/test/index.test.tsx
++++ b/packages/ui/src/form/primitives/select/test/index.test.tsx
+@@ -211,4 +211,32 @@ describe( 'Select', () => {
+ 			);
+ 		} );
+ 	} );
++
++	describe( 'positioner', () => {
++		it( 'should render the custom positioner element wrapping the popup content', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Select.Root>
++					<Select.Trigger />
++					<Select.Popup
++						positioner={
++							<Select.Positioner data-testid="custom-positioner" />
++						}
++					>
++						<Select.Item value="Item 1">Item 1</Select.Item>
++					</Select.Popup>
++				</Select.Root>
++			);
++
++			await user.click( screen.getByRole( 'combobox' ) );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			const positioner = screen.getByTestId( 'custom-positioner' );
++
++			expect( positioner ).toContainElement( item );
++		} );
++	} );
+ } );
+diff --git a/packages/ui/src/form/primitives/select/types.ts b/packages/ui/src/form/primitives/select/types.ts
+index cf46a244e3d146..48253eb6e2532c 100644
+--- a/packages/ui/src/form/primitives/select/types.ts
++++ b/packages/ui/src/form/primitives/select/types.ts
+@@ -1,10 +1,12 @@
+ import type { Select as _Select } from '@base-ui/react/select';
+-import type { ComponentPropsWithoutRef, ReactElement } from 'react';
++import type { ReactElement } from 'react';
+ 
+ import type { ComponentProps } from '../../../utils/types';
+ import type { InputLayoutProps } from '../input-layout/types';
+ 
+-export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
++export type PortalProps = ComponentProps< typeof _Select.Portal >;
++
++export type PositionerProps = ComponentProps< typeof _Select.Positioner >;
+ 
+ // The second type parameter is the `multiple` flag (currently disabled).
+ export type SelectRootProps< Value = unknown > = Omit<
+@@ -54,6 +56,14 @@ export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
+ 	 * be ignored.
+ 	 */
+ 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
++	/**
++	 * Optional positioner element, typically `<Select.Positioner />` with
++	 * custom positioning props (`side`, `align`, `sideOffset`, collision
++	 * settings, etc.). When omitted, `Select.Popup` uses `Select.Positioner`
++	 * with default props. Do not pass `children` on the positioner element;
++	 * they would be ignored.
++	 */
++	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
+ };
+ 
+ export type SelectItemProps = Omit<
+diff --git a/packages/ui/src/popover/index.ts b/packages/ui/src/popover/index.ts
+index 13cee0f8c41f86..9c93b15fc82322 100644
+--- a/packages/ui/src/popover/index.ts
++++ b/packages/ui/src/popover/index.ts
+@@ -3,8 +3,19 @@ import { Close } from './close';
+ import { Description } from './description';
+ import { Popup } from './popup';
+ import { Portal } from './portal';
++import { Positioner } from './positioner';
+ import { Root } from './root';
+ import { Title } from './title';
+ import { Trigger } from './trigger';
+ 
+-export { Arrow, Close, Description, Portal, Popup, Root, Title, Trigger };
++export {
++	Arrow,
++	Close,
++	Description,
++	Popup,
++	Portal,
++	Positioner,
++	Root,
++	Title,
++	Trigger,
++};
+diff --git a/packages/ui/src/popover/popup.tsx b/packages/ui/src/popover/popup.tsx
+index dac8b348271ecd..06c2b70ae0faf5 100644
+--- a/packages/ui/src/popover/popup.tsx
++++ b/packages/ui/src/popover/popup.tsx
+@@ -7,11 +7,11 @@ import {
+ 	privateApis as themePrivateApis,
+ } from '@wordpress/theme';
+ import { unlock } from '../lock-unlock';
+-import resetStyles from '../utils/css/resets.module.css';
+ import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+ import { renderSlotWithChildren } from '../utils/render-slot-with-children';
+ import { PopoverValidationProvider } from './context';
+ import { Portal } from './portal';
++import { Positioner } from './positioner';
+ import styles from './style.module.css';
+ import type { PopupProps } from './types';
+ 
+@@ -26,27 +26,18 @@ const CLOSE_ATTR = 'data-wp-ui-popover-close';
+  * Handles portal rendering, positioning relative to the anchor, collision
+  * avoidance, focus management, and optional backdrop. Use
+  * `portal={ <Popover.Portal container={ ... } /> }` for cross-document
+- * scenarios such as iframes.
++ * scenarios such as iframes, and `positioner={ <Popover.Positioner … /> }`
++ * to customize placement.
+  */
+ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
+ 	{
+-		align = 'center',
+-		alignOffset,
+-		anchor,
+-		// Matches the popup's border-radius (--wpds-border-radius-md).
+-		arrowPadding = 8,
+ 		backdrop = false,
+ 		children,
+ 		className,
+-		collisionAvoidance,
+-		collisionBoundary,
+-		collisionPadding,
+ 		portal,
++		positioner,
+ 		finalFocus,
+ 		initialFocus,
+-		side = 'bottom',
+-		sideOffset = 8,
+-		sticky,
+ 		variant = 'default',
+ 		...props
+ 	},
+@@ -62,43 +53,35 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
+ 		<_Popover.Backdrop className={ styles.backdrop } />
+ 	) : null;
+ 
+-	const positioner = (
+-		<_Popover.Positioner
+-			align={ align }
+-			alignOffset={ alignOffset }
+-			anchor={ anchor }
+-			arrowPadding={ arrowPadding }
+-			collisionAvoidance={ collisionAvoidance }
+-			collisionBoundary={ collisionBoundary }
+-			collisionPadding={ collisionPadding }
+-			side={ side }
+-			sideOffset={ sideOffset }
+-			sticky={ sticky }
+-			className={ clsx( resetStyles[ 'box-sizing' ], styles.positioner ) }
+-		>
+-			<ThemeProvider>
+-				<_Popover.Popup
+-					ref={ mergedPopupRef }
+-					initialFocus={ resolvedInitialFocus }
+-					finalFocus={ finalFocus }
+-					className={ clsx(
+-						variant !== 'unstyled' && styles.popup,
+-						className
+-					) }
+-					{ ...props }
+-				>
+-					<PopoverValidationProvider>
+-						{ children }
+-					</PopoverValidationProvider>
+-				</_Popover.Popup>
+-			</ThemeProvider>
+-		</_Popover.Positioner>
++	const popupContent = (
++		<ThemeProvider>
++			<_Popover.Popup
++				ref={ mergedPopupRef }
++				initialFocus={ resolvedInitialFocus }
++				finalFocus={ finalFocus }
++				className={ clsx(
++					variant !== 'unstyled' && styles.popup,
++					className
++				) }
++				{ ...props }
++			>
++				<PopoverValidationProvider>
++					{ children }
++				</PopoverValidationProvider>
++			</_Popover.Popup>
++		</ThemeProvider>
++	);
++
++	const positionedPopup = renderSlotWithChildren(
++		positioner,
++		<Positioner />,
++		popupContent
+ 	);
+ 
+ 	const portalChildren = (
+ 		<>
+ 			{ backdropElement }
+-			{ positioner }
++			{ positionedPopup }
+ 		</>
+ 	);
+ 
+diff --git a/packages/ui/src/popover/positioner.tsx b/packages/ui/src/popover/positioner.tsx
+new file mode 100644
+index 00000000000000..4193ddfe307a4d
+--- /dev/null
++++ b/packages/ui/src/popover/positioner.tsx
+@@ -0,0 +1,45 @@
++import clsx from 'clsx';
++import { Popover as _Popover } from '@base-ui/react/popover';
++import { forwardRef } from '@wordpress/element';
++import type { PositionerProps } from './types';
++import resetStyles from '../utils/css/resets.module.css';
++import styles from './style.module.css';
++
++/**
++ * Positions the floating popover content relative to the anchor. Pass to
++ * `Popover.Popup`'s `positioner` prop to customize `side`, `align`,
++ * `sideOffset`, collision behavior, etc. When `positioner` is omitted,
++ * `Popover.Popup` uses this component with default props.
++ */
++const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
++	function PopoverPositioner(
++		{
++			align = 'center',
++			// Matches the popup's border-radius (--wpds-border-radius-md).
++			arrowPadding = 8,
++			className,
++			side = 'bottom',
++			sideOffset = 8,
++			...props
++		},
++		ref
++	) {
++		return (
++			<_Popover.Positioner
++				ref={ ref }
++				align={ align }
++				arrowPadding={ arrowPadding }
++				side={ side }
++				sideOffset={ sideOffset }
++				{ ...props }
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					styles.positioner,
++					className
++				) }
++			/>
++		);
++	}
++);
++
++export { Positioner };
+diff --git a/packages/ui/src/popover/root.tsx b/packages/ui/src/popover/root.tsx
+index 564f59019a3a7d..4bcccbb7a66d4f 100644
+--- a/packages/ui/src/popover/root.tsx
++++ b/packages/ui/src/popover/root.tsx
+@@ -12,8 +12,11 @@ import type { RootProps } from './types';
+  *
+  * - `Popover.Root` — provides open state and context to all sub-components.
+  * - `Popover.Trigger` — the button that toggles the popup.
+- * - `Popover.Popup` — the floating container (positioning, collision
+- *   avoidance); portals by default or via `portal={ <Popover.Portal /> }`.
++ * - `Popover.Popup` — the floating container. Portals by default or via
++ *   `portal={ <Popover.Portal /> }`, and is positioned by default or via
++ *   `positioner={ <Popover.Positioner /> }`.
++ * - `Popover.Positioner` — controls placement, alignment, offset, collision
++ *   behavior, and anchor for the floating content.
+  * - `Popover.Arrow` — an optional arrow pointing toward the anchor.
+  * - `Popover.Title` — **required** heading that labels the popover for
+  *   accessibility (can be visually hidden).
+diff --git a/packages/ui/src/popover/stories/index.story.tsx b/packages/ui/src/popover/stories/index.story.tsx
+index 4839b1b7251ab6..1795ba74b7e90c 100644
+--- a/packages/ui/src/popover/stories/index.story.tsx
++++ b/packages/ui/src/popover/stories/index.story.tsx
+@@ -14,6 +14,7 @@ const meta: Meta< typeof Popover.Root > = {
+ 	subcomponents: {
+ 		'Popover.Trigger': Popover.Trigger,
+ 		'Popover.Portal': Popover.Portal,
++		'Popover.Positioner': Popover.Positioner,
+ 		'Popover.Popup': Popover.Popup,
+ 		'Popover.Arrow': Popover.Arrow,
+ 		'Popover.Title': Popover.Title,
+@@ -88,7 +89,7 @@ export const NoArrow: Story = {
+ };
+ 
+ /**
+- * All combinations of `side` and `align` props on `Popover.Popup`.
++ * All combinations of `side` and `align` props on `Popover.Positioner`.
+  *
+  * Each row shows a side (`top`, `right`, `bottom`, `left`), and each column
+  * shows an alignment (`start`, `center`, `end`).
+@@ -116,12 +117,16 @@ export const Positioning: Story = {
+ 								{ side } / { align }
+ 							</Popover.Trigger>
+ 							<Popover.Popup
+-								side={ side }
+-								align={ align }
+-								collisionAvoidance={ {
+-									side: 'none',
+-									align: 'none',
+-								} }
++								positioner={
++									<Popover.Positioner
++										side={ side }
++										align={ align }
++										collisionAvoidance={ {
++											side: 'none',
++											align: 'none',
++										} }
++									/>
++								}
+ 							>
+ 								<VisuallyHidden render={ <Popover.Title /> }>
+ 									{ side } / { align }
+@@ -416,16 +421,21 @@ export const OverlayPlacement: Story = {
+ 					</Popover.Trigger>
+ 					<Popover.Popup
+ 						ref={ popupRef }
+-						side="bottom"
+-						align="center"
+-						sideOffset={
+-							-1 *
+-							( popupSize.height / 2 + triggerSize.height / 2 )
++						positioner={
++							<Popover.Positioner
++								side="bottom"
++								align="center"
++								sideOffset={
++									-1 *
++									( popupSize.height / 2 +
++										triggerSize.height / 2 )
++								}
++								collisionAvoidance={ {
++									side: 'none',
++									align: 'none',
++								} }
++							/>
+ 						}
+-						collisionAvoidance={ {
+-							side: 'none',
+-							align: 'none',
+-						} }
+ 					>
+ 						<Popover.Title
+ 							style={ {
+@@ -538,8 +548,12 @@ export const CollisionAvoidance: Story = {
+ 					<Popover.Root defaultOpen>
+ 						<Popover.Trigger>Flip (default)</Popover.Trigger>
+ 						<Popover.Popup
+-							side="top"
+-							collisionBoundary={ boundary ?? undefined }
++							positioner={
++								<Popover.Positioner
++									side="top"
++									collisionBoundary={ boundary ?? undefined }
++								/>
++							}
+ 						>
+ 							<Popover.Title
+ 								style={ {
+@@ -558,12 +572,16 @@ export const CollisionAvoidance: Story = {
+ 					<Popover.Root defaultOpen>
+ 						<Popover.Trigger>No collision</Popover.Trigger>
+ 						<Popover.Popup
+-							side="top"
+-							collisionBoundary={ boundary ?? undefined }
+-							collisionAvoidance={ {
+-								side: 'none',
+-								align: 'none',
+-							} }
++							positioner={
++								<Popover.Positioner
++									side="top"
++									collisionBoundary={ boundary ?? undefined }
++									collisionAvoidance={ {
++										side: 'none',
++										align: 'none',
++									} }
++								/>
++							}
+ 						>
+ 							<Popover.Title
+ 								style={ {
+@@ -646,8 +664,12 @@ export const CrossIframe: Story = {
+ 											}
+ 										/>
+ 									}
+-									collisionBoundary={
+-										iframeBoundary ?? undefined
++									positioner={
++										<Popover.Positioner
++											collisionBoundary={
++												iframeBoundary ?? undefined
++											}
++										/>
+ 									}
+ 								>
+ 									<Popover.Arrow />
+@@ -739,8 +761,12 @@ export const CrossIframeWithSlotFill: Story = {
+ 											}
+ 										/>
+ 									}
+-									collisionBoundary={
+-										iframeBoundary ?? undefined
++									positioner={
++										<Popover.Positioner
++											collisionBoundary={
++												iframeBoundary ?? undefined
++											}
++										/>
+ 									}
+ 								>
+ 									<Popover.Arrow />
+@@ -816,9 +842,9 @@ export const WithCustomZIndex: Story = {
+ };
+ 
+ /**
+- * Use the `anchor` prop on `Popover.Popup` to position the popover against an
+- * arbitrary element instead of the built-in trigger. Base UI accepts four
+- * anchor types:
++ * Pass an `anchor` to `Popover.Positioner` (via `Popover.Popup`'s `positioner`
++ * slot) to position the popover against an arbitrary element instead of the
++ * built-in trigger. `anchor` accepts four types:
+  *
+  * 1. **Element** — a direct DOM element reference.
+  * 2. **VirtualElement** — an object with a `getBoundingClientRect()` method.
+@@ -852,7 +878,7 @@ export const Anchor: Story = {
+ 			textAlign: 'center' as const,
+ 		};
+ 
+-		const popupProps = {
++		const sharedPositionerProps = {
+ 			collisionAvoidance: {
+ 				side: 'none' as const,
+ 				align: 'none' as const,
+@@ -875,8 +901,12 @@ export const Anchor: Story = {
+ 					</div>
+ 					<Popover.Root open>
+ 						<Popover.Popup
+-							anchor={ elementAnchor ?? undefined }
+-							{ ...popupProps }
++							positioner={
++								<Popover.Positioner
++									anchor={ elementAnchor ?? undefined }
++									{ ...sharedPositionerProps }
++								/>
++							}
+ 						>
+ 							<VisuallyHidden render={ <Popover.Title /> }>
+ 								Element anchor
+@@ -896,8 +926,12 @@ export const Anchor: Story = {
+ 					</div>
+ 					<Popover.Root open>
+ 						<Popover.Popup
+-							anchor={ virtualAnchor }
+-							{ ...popupProps }
++							positioner={
++								<Popover.Positioner
++									anchor={ virtualAnchor }
++									{ ...sharedPositionerProps }
++								/>
++							}
+ 						>
+ 							<VisuallyHidden render={ <Popover.Title /> }>
+ 								Virtual anchor
+@@ -916,7 +950,14 @@ export const Anchor: Story = {
+ 						RefObject anchor
+ 					</div>
+ 					<Popover.Root open>
+-						<Popover.Popup anchor={ refAnchor } { ...popupProps }>
++						<Popover.Popup
++							positioner={
++								<Popover.Positioner
++									anchor={ refAnchor }
++									{ ...sharedPositionerProps }
++								/>
++							}
++						>
+ 							<VisuallyHidden render={ <Popover.Title /> }>
+ 								Ref anchor
+ 							</VisuallyHidden>
+@@ -935,8 +976,12 @@ export const Anchor: Story = {
+ 					</div>
+ 					<Popover.Root open>
+ 						<Popover.Popup
+-							anchor={ () => callbackTarget.current }
+-							{ ...popupProps }
++							positioner={
++								<Popover.Positioner
++									anchor={ () => callbackTarget.current }
++									{ ...sharedPositionerProps }
++								/>
++							}
+ 						>
+ 							<VisuallyHidden render={ <Popover.Title /> }>
+ 								Callback anchor
+@@ -991,13 +1036,12 @@ export const ToolbarVariant: Story = {
+ };
+ 
+ /**
+- * Base UI's Positioner exposes `--available-height` and
+- * `--available-width` CSS variables representing the space
+- * between the anchor and the viewport edge. Apply them as `max-height` /
+- * `max-width` via the `style` prop (which targets the positioner) to
+- * constrain the popup size. Then add `overflow: auto` on an inner wrapper
+- * so scrolling happens inside the popup content area — this replaces the
+- * legacy Popover's `resize` prop.
++ * `Popover.Positioner` exposes `--available-height` and `--available-width`
++ * CSS variables representing the space between the anchor and the viewport
++ * edge. These cascade down to `Popover.Popup`, where applying them as
++ * `max-height` / `max-width` via the `style` prop constrains the popup size.
++ * Then add `overflow: auto` on an inner wrapper so scrolling happens inside
++ * the popup content area — this replaces the legacy Popover's `resize` prop.
+  *
+  * Open the popover and resize or scroll the container to see the popup shrink
+  * to fit.
+@@ -1019,7 +1063,7 @@ export const ViewportConstrainedSize: Story = {
+ 				<Popover.Root { ...args }>
+ 					<Popover.Trigger>Show Content</Popover.Trigger>
+ 					<Popover.Popup
+-						side="bottom"
++						positioner={ <Popover.Positioner side="bottom" /> }
+ 						style={ {
+ 							maxHeight: 'var(--available-height, 300px)',
+ 							maxWidth: 'var(--available-width, 300px)',
+diff --git a/packages/ui/src/popover/test/index.test.tsx b/packages/ui/src/popover/test/index.test.tsx
+index 236c98f2fa5ec2..38ae907d209feb 100644
+--- a/packages/ui/src/popover/test/index.test.tsx
++++ b/packages/ui/src/popover/test/index.test.tsx
+@@ -528,6 +528,35 @@ describe( 'Popover', () => {
+ 		} );
+ 	} );
+ 
++	describe( 'positioner', () => {
++		it( 'should render the custom positioner element wrapping the popup content', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Popover.Root>
++					<Popover.Trigger>Open</Popover.Trigger>
++					<Popover.Popup
++						positioner={
++							<Popover.Positioner data-testid="custom-positioner" />
++						}
++					>
++						<Popover.Title>Title</Popover.Title>
++						Positioner slot content
++					</Popover.Popup>
++				</Popover.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++			const content = await screen.findByText(
++				'Positioner slot content'
++			);
++			const positioner = screen.getByTestId( 'custom-positioner' );
++
++			expect( positioner ).toContainElement( content );
++		} );
++	} );
++
+ 	describe( 'anchor', () => {
+ 		it( 'should render the popup when an anchor element is provided without a trigger', async () => {
+ 			function AnchorTest() {
+@@ -539,7 +568,13 @@ describe( 'Popover', () => {
+ 							Anchor element
+ 						</div>
+ 						<Popover.Root defaultOpen>
+-							<Popover.Popup anchor={ anchorEl ?? undefined }>
++							<Popover.Popup
++								positioner={
++									<Popover.Positioner
++										anchor={ anchorEl ?? undefined }
++									/>
++								}
++							>
+ 								<Popover.Title>Title</Popover.Title>
+ 								Anchored content
+ 							</Popover.Popup>
+diff --git a/packages/ui/src/popover/types.ts b/packages/ui/src/popover/types.ts
+index fb5315f4f12e1c..b2d0be05aca52b 100644
+--- a/packages/ui/src/popover/types.ts
++++ b/packages/ui/src/popover/types.ts
+@@ -1,9 +1,11 @@
+-import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
++import type { ReactElement, ReactNode } from 'react';
+ import type { Popover as _Popover } from '@base-ui/react/popover';
+ 
+ import type { ComponentProps } from '../utils/types';
+ 
+-export type PortalProps = ComponentPropsWithoutRef< typeof _Popover.Portal >;
++export type PortalProps = ComponentProps< typeof _Popover.Portal >;
++
++export type PositionerProps = ComponentProps< typeof _Popover.Positioner >;
+ 
+ export interface RootProps
+ 	extends Pick<
+@@ -27,19 +29,6 @@ export interface TriggerProps
+ 
+ export interface PopupProps
+ 	extends ComponentProps< 'div' >,
+-		Pick<
+-			_Popover.Positioner.Props,
+-			| 'align'
+-			| 'alignOffset'
+-			| 'anchor'
+-			| 'arrowPadding'
+-			| 'collisionAvoidance'
+-			| 'collisionBoundary'
+-			| 'collisionPadding'
+-			| 'side'
+-			| 'sideOffset'
+-			| 'sticky'
+-		>,
+ 		Pick< _Popover.Popup.Props, 'initialFocus' | 'finalFocus' > {
+ 	/**
+ 	 * Whether to render a backdrop overlay behind the popover.
+@@ -66,6 +55,15 @@ export interface PopupProps
+ 	 */
+ 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
+ 
++	/**
++	 * Optional positioner element, typically `<Popover.Positioner />` with
++	 * custom positioning props (`side`, `align`, `sideOffset`, collision
++	 * settings, anchor, etc.). When omitted, `Popover.Popup` uses
++	 * `Popover.Positioner` with default props. Do not pass `children` on
++	 * the positioner element; they would be ignored.
++	 */
++	positioner?: ReactElement< Omit< PositionerProps, 'children' > >;
++
+ 	/**
+ 	 * The visual style variant of the popup.
+ 	 *
+diff --git a/packages/ui/src/tooltip/types.ts b/packages/ui/src/tooltip/types.ts
+index 4eb2c2dea7e2b5..13c534ea80532d 100644
+--- a/packages/ui/src/tooltip/types.ts
++++ b/packages/ui/src/tooltip/types.ts
+@@ -1,13 +1,11 @@
+-import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
++import type { ReactElement, ReactNode } from 'react';
+ import type { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
+ 
+ import type { ComponentProps } from '../utils/types';
+ 
+-export type PortalProps = ComponentPropsWithoutRef< typeof _Tooltip.Portal >;
++export type PortalProps = ComponentProps< typeof _Tooltip.Portal >;
+ 
+-export type PositionerProps = ComponentPropsWithoutRef<
+-	typeof _Tooltip.Positioner
+->;
++export type PositionerProps = ComponentProps< typeof _Tooltip.Positioner >;
+ 
+ export type RootProps = Pick< _Tooltip.Root.Props, 'disabled' | 'children' >;
+ 

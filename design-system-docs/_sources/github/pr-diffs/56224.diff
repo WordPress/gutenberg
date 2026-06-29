@@ -1,0 +1,135 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 37ad2a65da28af..eb6e595e304ecf 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Experimental
++
++-   `Tabs`: Memoize and expose the component context ([#56224](https://github.com/WordPress/gutenberg/pull/56224)).
++
+ ## 25.12.0 (2023-11-16)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/tabs/index.tsx b/packages/components/src/tabs/index.tsx
+index 59eb83f5240590..12dd0b4fcc83f4 100644
+--- a/packages/components/src/tabs/index.tsx
++++ b/packages/components/src/tabs/index.tsx
+@@ -8,7 +8,7 @@ import * as Ariakit from '@ariakit/react';
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { useLayoutEffect, useRef } from '@wordpress/element';
++import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -154,8 +154,16 @@ function Tabs( {
+ 		setSelectedId,
+ 	] );
+ 
++	const contextValue = useMemo(
++		() => ( {
++			store,
++			instanceId,
++		} ),
++		[ store, instanceId ]
++	);
++
+ 	return (
+-		<TabsContext.Provider value={ { store, instanceId } }>
++		<TabsContext.Provider value={ contextValue }>
+ 			{ children }
+ 		</TabsContext.Provider>
+ 	);
+@@ -164,4 +172,6 @@ function Tabs( {
+ Tabs.TabList = TabList;
+ Tabs.Tab = Tab;
+ Tabs.TabPanel = TabPanel;
++Tabs.Context = TabsContext;
++
+ export default Tabs;
+diff --git a/packages/components/src/tabs/stories/index.story.tsx b/packages/components/src/tabs/stories/index.story.tsx
+index 08e29589881707..ce8c8324edaee4 100644
+--- a/packages/components/src/tabs/stories/index.story.tsx
++++ b/packages/components/src/tabs/stories/index.story.tsx
+@@ -20,6 +20,14 @@ import Button from '../../button';
+ const meta: Meta< typeof Tabs > = {
+ 	title: 'Components (Experimental)/Tabs',
+ 	component: Tabs,
++	subcomponents: {
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		'Tabs.TabList': Tabs.TabList,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		'Tabs.Tab': Tabs.Tab,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		'Tabs.TabPanel': Tabs.TabPanel,
++	},
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
+ 		controls: { expanded: true },
+diff --git a/packages/components/src/tabs/tab.tsx b/packages/components/src/tabs/tab.tsx
+index 03e5d80871c56a..4bfc99e8ef43b1 100644
+--- a/packages/components/src/tabs/tab.tsx
++++ b/packages/components/src/tabs/tab.tsx
+@@ -2,14 +2,14 @@
+  * WordPress dependencies
+  */
+ 
+-import { useContext, forwardRef } from '@wordpress/element';
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import type { TabProps } from './types';
+ import warning from '@wordpress/warning';
+-import { TabsContext } from './context';
++import { useTabsContext } from './context';
+ import { Tab as StyledTab } from './styles';
+ import type { WordPressComponentProps } from '../context';
+ 
+@@ -17,9 +17,9 @@ export const Tab = forwardRef<
+ 	HTMLButtonElement,
+ 	WordPressComponentProps< TabProps, 'button', false >
+ >( function Tab( { children, id, disabled, render, ...otherProps }, ref ) {
+-	const context = useContext( TabsContext );
++	const context = useTabsContext();
+ 	if ( ! context ) {
+-		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
++		warning( '`Tabs.Tab` must be wrapped in a `Tabs` component.' );
+ 		return null;
+ 	}
+ 	const { store, instanceId } = context;
+diff --git a/packages/components/src/tabs/tabpanel.tsx b/packages/components/src/tabs/tabpanel.tsx
+index f477d1d3b4b437..8e8d72280a4935 100644
+--- a/packages/components/src/tabs/tabpanel.tsx
++++ b/packages/components/src/tabs/tabpanel.tsx
+@@ -6,7 +6,7 @@
+  * WordPress dependencies
+  */
+ 
+-import { forwardRef, useContext } from '@wordpress/element';
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -15,14 +15,14 @@ import type { TabPanelProps } from './types';
+ import { TabPanel as StyledTabPanel } from './styles';
+ 
+ import warning from '@wordpress/warning';
+-import { TabsContext } from './context';
++import { useTabsContext } from './context';
+ import type { WordPressComponentProps } from '../context';
+ 
+ export const TabPanel = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< TabPanelProps, 'div', false >
+ >( function TabPanel( { children, id, focusable = true, ...otherProps }, ref ) {
+-	const context = useContext( TabsContext );
++	const context = useTabsContext();
+ 	if ( ! context ) {
+ 		warning( '`Tabs.TabPanel` must be wrapped in a `Tabs` component.' );
+ 		return null;

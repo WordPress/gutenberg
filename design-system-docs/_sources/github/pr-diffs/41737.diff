@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index ce01422b65fa87..d25a5659c188ed 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -168,7 +168,7 @@ function ComboboxControl( {
+ 
+ 	const handleOnReset = () => {
+ 		onChange( null );
+-		inputContainer.current.input.focus();
++		inputContainer.current.focus();
+ 	};
+ 
+ 	// Update current selections when the filter input changes.

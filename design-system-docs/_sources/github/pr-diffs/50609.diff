@@ -1,0 +1,32 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 83d74153ccb1cc..7de5a4537097b5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ 
+ ### Bug Fix
+ 
++-   `ColorPicker`: Add an outline when the color picker select box is focused([#50609](https://github.com/WordPress/gutenberg/pull/50609)).
+ -   `InputControl`: Fix focus style to support Windows High Contrast mode ([#50772](https://github.com/WordPress/gutenberg/pull/50772)).
+ 
+ ## 24.0.0 (2023-05-10)
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index 1592f6a201656a..f78db13a8fd73f 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -29,8 +29,13 @@ export const NumberControlWrapper = styled( NumberControl )`
+ export const SelectControl = styled( InnerSelectControl )`
+ 	margin-left: ${ space( -2 ) };
+ 	width: 5em;
+-	${ BackdropUI } {
+-		display: block;
++	/*
++	 * Remove border, but preserve focus styles
++	 * TODO: this override should be removed,
++	 * see https://github.com/WordPress/gutenberg/pull/50609
++	 */
++	select:not( :focus ) ~ ${ BackdropUI }${ BackdropUI }${ BackdropUI } {
++		border-color: transparent;
+ 	}
+ `;
+ 

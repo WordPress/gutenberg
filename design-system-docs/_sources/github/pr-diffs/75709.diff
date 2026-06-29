@@ -1,0 +1,61 @@
+diff --git a/packages/base-styles/_mixins.scss b/packages/base-styles/_mixins.scss
+index d0657edc6b784f..74974a84254ec5 100644
+--- a/packages/base-styles/_mixins.scss
++++ b/packages/base-styles/_mixins.scss
+@@ -224,15 +224,17 @@
+ @mixin snackbar-container() {
+ 	position: fixed;
+ 	bottom: 24px;
+-	left: 50%;
+-	right: auto;
+-	transform: translateX(-50%);
+-	width: max-content;
+-	max-width: calc(100vw - 32px);
++	left: 0;
++	right: 0;
++	padding-inline: 16px;
+ 	box-sizing: border-box;
+ 	display: flex;
+ 	flex-direction: column;
+-	align-items: center;
++	pointer-events: none;
++
++	.components-snackbar {
++		margin-inline: auto;
++	}
+ }
+ 
+ // These are additional styles for all captions, when the theme opts in to block styles.
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9237ef43fd48b9..13f7b96bfc16e6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `SnackbarList`: Fix scaling distortion when a snackbar's content is updated in place via a shared notice ID ([#75709](https://github.com/WordPress/gutenberg/pull/75709)).
++
+ ## 32.2.0 (2026-02-18)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/snackbar/list.tsx b/packages/components/src/snackbar/list.tsx
+index 7697cfcc623a69..ba10c2a4c3692a 100644
+--- a/packages/components/src/snackbar/list.tsx
++++ b/packages/components/src/snackbar/list.tsx
+@@ -86,7 +86,12 @@ export function SnackbarList( {
+ 
+ 					return (
+ 						<motion.div
+-							layout={ ! isReducedMotion } // See https://www.framer.com/docs/animation/#layout-animations
++							layout={ isReducedMotion ? false : 'position' } // See https://www.framer.com/docs/animation/#layout-animations
++							// Ensures a stable full-width bounding box so that
++							// `layout="position"` only ever detects vertical
++							// shifts, preventing horizontal animation when
++							// notice text changes in place.
++							style={ { width: '100%' } }
+ 							initial="init"
+ 							animate="open"
+ 							exit="exit"

@@ -1,0 +1,54 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 921d1dc1dfa21c..26505bef7fdfb2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,10 +5,7 @@
+ ### Bug Fixes
+ 
+ -   `Tabs`: Ensure font size inheritance for tab buttons in all contexts ([#71346](https://github.com/WordPress/gutenberg/pull/71346)).
+-
+-### Internal
+-
+-- Display names for Context providers [#71208](https://github.com/WordPress/gutenberg/pull/71208)
++-   Validated form controls: Fix Sass var handling for red color ([#71391](https://github.com/WordPress/gutenberg/pull/71391)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/validated-form-controls/style.scss b/packages/components/src/validated-form-controls/style.scss
+index ecd5058f9130fb..87faed4dca8cb4 100644
+--- a/packages/components/src/validated-form-controls/style.scss
++++ b/packages/components/src/validated-form-controls/style.scss
+@@ -2,14 +2,14 @@
+ 	// For components based on InputBase
+ 	&:has(:is(input, select):user-invalid)
+ 	.components-input-control__backdrop {
+-		--wp-components-color-accent: $alert-red;
++		--wp-components-color-accent: #{$alert-red};
+ 		border-color: $alert-red;
+ 	}
+ 
+ 	// For TextControl, TextareaControl
+ 	:is(textarea, input[type="text"]):user-invalid {
+-		--wp-admin-theme-color: $alert-red;
+-		--wp-components-color-accent: $alert-red;
++		--wp-admin-theme-color: #{$alert-red};
++		--wp-components-color-accent: #{$alert-red};
+ 		border-color: $alert-red;
+ 	}
+ 
+@@ -26,13 +26,13 @@
+ 
+ 	// For CustomSelectControl
+ 	&:has(select:user-invalid) .components-input-control__backdrop {
+-		--wp-components-color-accent: $alert-red;
++		--wp-components-color-accent: #{$alert-red};
+ 		border-color: $alert-red;
+ 	}
+ 
+ 	// For ToggleGroupControl
+ 	&:has(input[type="radio"]:invalid) {
+-		--wp-components-color-accent: $alert-red;
++		--wp-components-color-accent: #{$alert-red};
+ 	}
+ }
+ 

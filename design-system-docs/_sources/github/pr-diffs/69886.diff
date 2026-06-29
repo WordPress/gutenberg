@@ -1,0 +1,51 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1f2dc95d649f54..54cb9b74155a83 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ -   `Popover`: improve Storybook examples around onClose and onFocusOutside props. ([#69688](https://github.com/WordPress/gutenberg/pull/69688))
+ -   `FormTokenField`: Add theming support ([#69638](https://github.com/WordPress/gutenberg/pull/69638)).
+ -   `ComboboxControl`: Add theming support ([#69638](https://github.com/WordPress/gutenberg/pull/69638)).
++-   `ComboboxControl`: Allow additional input props ([#69886](https://github.com/WordPress/gutenberg/pull/69886)).
+ 
+ ## 29.7.0 (2025-03-27)
+ 
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index 9c6bd2a4d75dd2..7601f50eaee28d 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -35,6 +35,7 @@ import type { TokenInputProps } from '../form-token-field/types';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
++import type { WordPressComponentProps } from '../context';
+ import Spinner from '../spinner';
+ 
+ const noop = () => {};
+@@ -114,7 +115,9 @@ const getIndexOfMatchingSuggestion = (
+  * }
+  * ```
+  */
+-function ComboboxControl( props: ComboboxControlProps ) {
++function ComboboxControl(
++	props: WordPressComponentProps< ComboboxControlProps, 'input', false >
++) {
+ 	const {
+ 		__nextHasNoMarginBottom = false,
+ 		__next40pxDefaultSize = false,
+@@ -134,6 +137,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 		__experimentalRenderItem,
+ 		expandOnFocus = true,
+ 		placeholder,
++		...restProps
+ 	} = useDeprecated36pxDefaultSizeProp( props );
+ 
+ 	const [ value, setValue ] = useControlledValue( {
+@@ -362,6 +366,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 									matchingSuggestions
+ 								) }
+ 								onChange={ onInputChange }
++								{ ...restProps }
+ 							/>
+ 						</FlexBlock>
+ 						{ isLoading && <Spinner /> }

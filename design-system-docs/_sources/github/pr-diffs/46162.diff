@@ -1,0 +1,558 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 833519075ccba7..694babc5bebcb4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -38,6 +38,7 @@
+ -   `useBaseField`: Convert to TypeScript ([#45712](https://github.com/WordPress/gutenberg/pull/45712)).
+ -   `Dashicon`: Convert to TypeScript ([#45924](https://github.com/WordPress/gutenberg/pull/45924)).
+ -   `PaletteEdit`: add follow up changelog for #45681 and tests [#46095](https://github.com/WordPress/gutenberg/pull/46095).
++-   `AlignmentMatrixControl`: Convert to TypeScript ([#46162](https://github.com/WordPress/gutenberg/pull/46162)).
+ 
+ ### Documentation
+ 
+diff --git a/packages/components/src/alignment-matrix-control/README.md b/packages/components/src/alignment-matrix-control/README.md
+index 16b7333c09db74..576fe77c1f25a4 100644
+--- a/packages/components/src/alignment-matrix-control/README.md
++++ b/packages/components/src/alignment-matrix-control/README.md
+@@ -30,8 +30,7 @@ The component accepts the following props:
+ 
+ ### className
+ 
+-The class that will be added to the classes of the wrapper <Composite/> component.
+-
++The class that will be added to the classes of the underlying `grid` widget.
+ -   Type: `string`
+ -   Required: No
+ 
+@@ -44,7 +43,7 @@ Unique ID for the component.
+ 
+ ### label
+ 
+-Accessible label. If provided, sets the `aria-label` attribute of the underlying <Composite/> component.
++Accessible label. If provided, sets the `aria-label` attribute of the underlying `grid` widget.
+ 
+ -   Type: `string`
+ -   Required: No
+@@ -54,26 +53,27 @@ Accessible label. If provided, sets the `aria-label` attribute of the underlying
+ 
+ If provided, sets the default alignment value.
+ 
+-- Type: `string`
++- Type: `AlignmentMatrixControlValue`
+ - Required: No
+ - Default: `center center`
+ 
+ ### value
+ 
+ The current alignment value.
+-- Type: `string`
++
++- Type: `AlignmentMatrixControlValue`
+ - Required: No
+ 
+ ### onChange
+ 
+ A function that receives the updated alignment value.
+ 
+--   Type: `( nextValue: string ) => void`
++-   Type: `( newValue: AlignmentMatrixControlValue ) => void`
+ -   Required: No
+ 
+ ### width
+ 
+-If provided, sets the width of the wrapper <Composite/> component.
++If provided, sets the width of the control.
+ 
+  - Type: `number`
+  - Required: No
+diff --git a/packages/components/src/alignment-matrix-control/cell.js b/packages/components/src/alignment-matrix-control/cell.tsx
+similarity index 74%
+rename from packages/components/src/alignment-matrix-control/cell.js
+rename to packages/components/src/alignment-matrix-control/cell.tsx
+index 2aeb839831c0c0..b6e19c56022915 100644
+--- a/packages/components/src/alignment-matrix-control/cell.js
++++ b/packages/components/src/alignment-matrix-control/cell.tsx
+@@ -13,8 +13,14 @@ import {
+ 	Cell as CellView,
+ 	Point,
+ } from './styles/alignment-matrix-control-styles';
++import type { AlignmentMatrixControlCellProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+-export default function Cell( { isActive = false, value, ...props } ) {
++export default function Cell( {
++	isActive = false,
++	value,
++	...props
++}: WordPressComponentProps< AlignmentMatrixControlCellProps, 'span', false > ) {
+ 	const tooltipText = ALIGNMENT_LABEL[ value ];
+ 
+ 	return (
+diff --git a/packages/components/src/alignment-matrix-control/icon.js b/packages/components/src/alignment-matrix-control/icon.tsx
+similarity index 77%
+rename from packages/components/src/alignment-matrix-control/icon.js
+rename to packages/components/src/alignment-matrix-control/icon.tsx
+index e712b7471ff237..b294bc7551e19d 100644
+--- a/packages/components/src/alignment-matrix-control/icon.js
++++ b/packages/components/src/alignment-matrix-control/icon.tsx
+@@ -12,17 +12,19 @@ import {
+ 	Cell,
+ 	Point,
+ } from './styles/alignment-matrix-control-icon-styles';
++import type { AlignmentMatrixControlIconProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+ const BASE_SIZE = 24;
+ 
+-export default function AlignmentMatrixControlIcon( {
++function AlignmentMatrixControlIcon( {
+ 	className,
+ 	disablePointerEvents = true,
+ 	size = BASE_SIZE,
+ 	style = {},
+ 	value = 'center',
+ 	...props
+-} ) {
++}: WordPressComponentProps< AlignmentMatrixControlIconProps, 'div', false > ) {
+ 	const alignIndex = getAlignmentIndex( value );
+ 	const scale = ( size / BASE_SIZE ).toFixed( 2 );
+ 
+@@ -42,7 +44,6 @@ export default function AlignmentMatrixControlIcon( {
+ 			className={ classes }
+ 			disablePointerEvents={ disablePointerEvents }
+ 			role="presentation"
+-			size={ size }
+ 			style={ styles }
+ 		>
+ 			{ ALIGNMENTS.map( ( align, index ) => {
+@@ -57,3 +58,5 @@ export default function AlignmentMatrixControlIcon( {
+ 		</Root>
+ 	);
+ }
++
++export default AlignmentMatrixControlIcon;
+diff --git a/packages/components/src/alignment-matrix-control/index.js b/packages/components/src/alignment-matrix-control/index.tsx
+similarity index 70%
+rename from packages/components/src/alignment-matrix-control/index.js
+rename to packages/components/src/alignment-matrix-control/index.tsx
+index 44dbe33d95a94d..0e34e4052346da 100644
+--- a/packages/components/src/alignment-matrix-control/index.js
++++ b/packages/components/src/alignment-matrix-control/index.tsx
+@@ -18,10 +18,15 @@ import { Composite, CompositeGroup, useCompositeState } from '../composite';
+ import { Root, Row } from './styles/alignment-matrix-control-styles';
+ import AlignmentMatrixControlIcon from './icon';
+ import { GRID, getItemId } from './utils';
++import type { WordPressComponentProps } from '../ui/context';
++import type {
++	AlignmentMatrixControlProps,
++	AlignmentMatrixControlValue,
++} from './types';
+ 
+ const noop = () => {};
+ 
+-function useBaseId( id ) {
++function useBaseId( id?: string ) {
+ 	const instanceId = useInstanceId(
+ 		AlignmentMatrixControl,
+ 		'alignment-matrix-control'
+@@ -30,7 +35,27 @@ function useBaseId( id ) {
+ 	return id || instanceId;
+ }
+ 
+-export default function AlignmentMatrixControl( {
++/**
++ *
++ * AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
++ *
++ * ```jsx
++ * import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const Example = () => {
++ * 	const [ alignment, setAlignment ] = useState( 'center center' );
++ *
++ * 	return (
++ * 		<AlignmentMatrixControl
++ * 			value={ alignment }
++ * 			onChange={ setAlignment }
++ * 		/>
++ * 	);
++ * };
++ * ```
++ */
++export function AlignmentMatrixControl( {
+ 	className,
+ 	id,
+ 	label = __( 'Alignment Matrix Control' ),
+@@ -39,7 +64,7 @@ export default function AlignmentMatrixControl( {
+ 	onChange = noop,
+ 	width = 92,
+ 	...props
+-} ) {
++}: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
+ 	const [ immutableDefaultValue ] = useState( value ?? defaultValue );
+ 	const baseId = useBaseId( id );
+ 	const initialCurrentId = getItemId( baseId, immutableDefaultValue );
+@@ -50,7 +75,7 @@ export default function AlignmentMatrixControl( {
+ 		rtl: isRTL(),
+ 	} );
+ 
+-	const handleOnChange = ( nextValue ) => {
++	const handleOnChange = ( nextValue: AlignmentMatrixControlValue ) => {
+ 		onChange( nextValue );
+ 	};
+ 
+@@ -107,3 +132,5 @@ export default function AlignmentMatrixControl( {
+ }
+ 
+ AlignmentMatrixControl.Icon = AlignmentMatrixControlIcon;
++
++export default AlignmentMatrixControl;
+diff --git a/packages/components/src/alignment-matrix-control/stories/index.js b/packages/components/src/alignment-matrix-control/stories/index.tsx
+similarity index 70%
+rename from packages/components/src/alignment-matrix-control/stories/index.js
+rename to packages/components/src/alignment-matrix-control/stories/index.tsx
+index babdd47c1e95f4..6401907f921693 100644
+--- a/packages/components/src/alignment-matrix-control/stories/index.js
++++ b/packages/components/src/alignment-matrix-control/stories/index.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -7,21 +12,18 @@ import { Icon } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import AlignmentMatrixControl from '../';
+-import { ALIGNMENTS } from '../utils';
++import AlignmentMatrixControl from '..';
+ import { HStack } from '../../h-stack';
++import type { AlignmentMatrixControlProps } from '../types';
+ 
+-export default {
++const meta: ComponentMeta< typeof AlignmentMatrixControl > = {
+ 	title: 'Components (Experimental)/AlignmentMatrixControl',
+ 	component: AlignmentMatrixControl,
+ 	subcomponents: {
+ 		'AlignmentMatrixControl.Icon': AlignmentMatrixControl.Icon,
+ 	},
+ 	argTypes: {
+-		defaultValue: { options: ALIGNMENTS },
+ 		onChange: { action: 'onChange', control: { type: null } },
+-		label: { control: { type: 'text' } },
+-		width: { control: { type: 'number' } },
+ 		value: { control: { type: null } },
+ 	},
+ 	parameters: {
+@@ -29,9 +31,15 @@ export default {
+ 		docs: { source: { state: 'open' } },
+ 	},
+ };
++export default meta;
+ 
+-const Template = ( { defaultValue, onChange, ...props } ) => {
+-	const [ value, setValue ] = useState();
++const Template: ComponentStory< typeof AlignmentMatrixControl > = ( {
++	defaultValue,
++	onChange,
++	...props
++} ) => {
++	const [ value, setValue ] =
++		useState< AlignmentMatrixControlProps[ 'value' ] >();
+ 
+ 	// Convenience handler for Canvas view so changes are reflected
+ 	useEffect( () => {
+@@ -43,7 +51,7 @@ const Template = ( { defaultValue, onChange, ...props } ) => {
+ 			{ ...props }
+ 			onChange={ ( ...changeArgs ) => {
+ 				setValue( ...changeArgs );
+-				onChange( ...changeArgs );
++				onChange?.( ...changeArgs );
+ 			} }
+ 			value={ value }
+ 		/>
+diff --git a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.js b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.ts
+similarity index 72%
+rename from packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.js
+rename to packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.ts
+index 5333e9b775625b..a14894633e05d1 100644
+--- a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.js
++++ b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.ts
+@@ -12,6 +12,10 @@ import {
+ 	pointBase,
+ 	Cell as CellBase,
+ } from './alignment-matrix-control-styles';
++import type {
++	AlignmentMatrixControlIconProps,
++	AlignmentMatrixControlCellProps,
++} from '../types';
+ 
+ const rootSize = () => {
+ 	const padding = 1.5;
+@@ -25,9 +29,11 @@ const rootSize = () => {
+ 	} );
+ };
+ 
+-const rootPointerEvents = ( { disablePointerEvents } ) => {
++const rootPointerEvents = ( {
++	disablePointerEvents,
++}: Pick< AlignmentMatrixControlIconProps, 'disablePointerEvents' > ) => {
+ 	return css( {
+-		pointerEvents: disablePointerEvents ? 'none' : null,
++		pointerEvents: disablePointerEvents ? 'none' : undefined,
+ 	} );
+ };
+ 
+@@ -46,7 +52,9 @@ export const Root = styled.div`
+ 	${ rootPointerEvents };
+ `;
+ 
+-const pointActive = ( { isActive } ) => {
++const pointActive = ( {
++	isActive,
++}: Pick< AlignmentMatrixControlCellProps, 'isActive' > ) => {
+ 	const boxShadow = isActive ? `0 0 0 1px currentColor` : null;
+ 
+ 	return css`
+diff --git a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.ts
+similarity index 81%
+rename from packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js
+rename to packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.ts
+index f16ec53827403f..5adde6002ba3b4 100644
+--- a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js
++++ b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.ts
+@@ -8,6 +8,10 @@ import { css } from '@emotion/react';
+  * Internal dependencies
+  */
+ import { COLORS, reduceMotion } from '../../utils';
++import type {
++	AlignmentMatrixControlProps,
++	AlignmentMatrixControlCellProps,
++} from '../types';
+ 
+ export const rootBase = () => {
+ 	return css`
+@@ -27,7 +31,9 @@ const rootSize = ( { size = 92 } ) => {
+ 	`;
+ };
+ 
+-export const Root = styled.div`
++export const Root = styled.div< {
++	size: AlignmentMatrixControlProps[ 'width' ];
++} >`
+ 	${ rootBase };
+ 
+ 	border: 1px solid transparent;
+@@ -43,7 +49,9 @@ export const Row = styled.div`
+ 	grid-template-columns: repeat( 3, 1fr );
+ `;
+ 
+-const pointActive = ( { isActive } ) => {
++const pointActive = ( {
++	isActive,
++}: Pick< AlignmentMatrixControlCellProps, 'isActive' > ) => {
+ 	const boxShadow = isActive ? `0 0 0 2px ${ COLORS.gray[ 900 ] }` : null;
+ 	const pointColor = isActive ? COLORS.gray[ 900 ] : COLORS.gray[ 400 ];
+ 	const pointColorHover = isActive ? COLORS.gray[ 900 ] : COLORS.ui.theme;
+@@ -58,7 +66,9 @@ const pointActive = ( { isActive } ) => {
+ 	`;
+ };
+ 
+-export const pointBase = ( props ) => {
++export const pointBase = (
++	props: Pick< AlignmentMatrixControlCellProps, 'isActive' >
++) => {
+ 	return css`
+ 		background: currentColor;
+ 		box-sizing: border-box;
+diff --git a/packages/components/src/alignment-matrix-control/test/index.js b/packages/components/src/alignment-matrix-control/test/index.tsx
+similarity index 92%
+rename from packages/components/src/alignment-matrix-control/test/index.js
+rename to packages/components/src/alignment-matrix-control/test/index.tsx
+index 2343c474f0a8d8..0e9661fe595b09 100644
+--- a/packages/components/src/alignment-matrix-control/test/index.js
++++ b/packages/components/src/alignment-matrix-control/test/index.tsx
+@@ -6,13 +6,13 @@ import { act, render, screen, within } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import AlignmentMatrixControl from '../';
++import AlignmentMatrixControl from '..';
+ 
+ const getControl = () => {
+ 	return screen.getByRole( 'grid' );
+ };
+ 
+-const getCell = ( name ) => {
++const getCell = ( name: string ) => {
+ 	return within( getControl() ).getByRole( 'gridcell', { name } );
+ };
+ 
+diff --git a/packages/components/src/alignment-matrix-control/types.ts b/packages/components/src/alignment-matrix-control/types.ts
+new file mode 100644
+index 00000000000000..892781234e694c
+--- /dev/null
++++ b/packages/components/src/alignment-matrix-control/types.ts
+@@ -0,0 +1,54 @@
++export type AlignmentMatrixControlValue =
++	| 'top left'
++	| 'top center'
++	| 'top right'
++	| 'center left'
++	| 'center'
++	| 'center center'
++	| 'center right'
++	| 'bottom left'
++	| 'bottom center'
++	| 'bottom right';
++
++export type AlignmentMatrixControlProps = {
++	/**
++	 * Accessible label. If provided, sets the `aria-label` attribute of the
++	 * underlying `grid` widget.
++	 *
++	 * @default 'Alignment Matrix Control'
++	 */
++	label?: string;
++	/**
++	 * If provided, sets the default alignment value.
++	 *
++	 * @default 'center center'
++	 */
++	defaultValue?: AlignmentMatrixControlValue;
++	/**
++	 * The current alignment value.
++	 */
++	value?: AlignmentMatrixControlValue;
++	/**
++	 * A function that receives the updated alignment value.
++	 */
++	onChange?: ( newValue: AlignmentMatrixControlValue ) => void;
++	/**
++	 * If provided, sets the width of the control.
++	 *
++	 * @default 92
++	 */
++	width?: number;
++};
++
++export type AlignmentMatrixControlIconProps = Pick<
++	AlignmentMatrixControlProps,
++	'value'
++> & {
++	disablePointerEvents?: boolean;
++	size?: number;
++};
++
++export type AlignmentMatrixControlCellProps = {
++	isActive?: boolean;
++	value: NonNullable< AlignmentMatrixControlProps[ 'value' ] >;
++};
+diff --git a/packages/components/src/alignment-matrix-control/utils.js b/packages/components/src/alignment-matrix-control/utils.tsx
+similarity index 58%
+rename from packages/components/src/alignment-matrix-control/utils.js
+rename to packages/components/src/alignment-matrix-control/utils.tsx
+index 4934e422d196cb..a9fa7e57d67dbf 100644
+--- a/packages/components/src/alignment-matrix-control/utils.js
++++ b/packages/components/src/alignment-matrix-control/utils.tsx
+@@ -2,20 +2,25 @@
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
++/**
++ * Internal dependencies
++ */
++import type { AlignmentMatrixControlValue } from './types';
+ 
+-export const GRID = [
++export const GRID: AlignmentMatrixControlValue[][] = [
+ 	[ 'top left', 'top center', 'top right' ],
+ 	[ 'center left', 'center center', 'center right' ],
+ 	[ 'bottom left', 'bottom center', 'bottom right' ],
+ ];
+ 
+ // Stored as map as i18n __() only accepts strings (not variables)
+-export const ALIGNMENT_LABEL = {
++export const ALIGNMENT_LABEL: Record< AlignmentMatrixControlValue, string > = {
+ 	'top left': __( 'Top Left' ),
+ 	'top center': __( 'Top Center' ),
+ 	'top right': __( 'Top Right' ),
+ 	'center left': __( 'Center Left' ),
+ 	'center center': __( 'Center Center' ),
++	center: __( 'Center Center' ),
+ 	'center right': __( 'Center Right' ),
+ 	'bottom left': __( 'Bottom Left' ),
+ 	'bottom center': __( 'Bottom Center' ),
+@@ -28,25 +33,28 @@ export const ALIGNMENTS = GRID.flat();
+ /**
+  * Parses and transforms an incoming value to better match the alignment values
+  *
+- * @param {string} value An alignment value to parse.
++ * @param  value An alignment value to parse.
+  *
+- * @return {string} The parsed value.
++ * @return The parsed value.
+  */
+-export function transformValue( value ) {
++export function transformValue( value: AlignmentMatrixControlValue ) {
+ 	const nextValue = value === 'center' ? 'center center' : value;
+ 
+-	return nextValue.replace( '-', ' ' );
++	return nextValue.replace( '-', ' ' ) as AlignmentMatrixControlValue;
+ }
+ 
+ /**
+  * Creates an item ID based on a prefix ID and an alignment value.
+  *
+- * @param {string} prefixId An ID to prefix.
+- * @param {string} value    An alignment value.
++ * @param  prefixId An ID to prefix.
++ * @param  value    An alignment value.
+  *
+- * @return {string} The item id.
++ * @return The item id.
+  */
+-export function getItemId( prefixId, value ) {
++export function getItemId(
++	prefixId: string,
++	value: AlignmentMatrixControlValue
++) {
+ 	const valueId = transformValue( value ).replace( ' ', '-' );
+ 
+ 	return `${ prefixId }-${ valueId }`;
+@@ -55,12 +63,14 @@ export function getItemId( prefixId, value ) {
+ /**
+  * Retrieves the alignment index from a value.
+  *
+- * @param {string} alignment Value to check.
++ * @param  alignment Value to check.
+  *
+- * @return {number} The index of a matching alignment.
++ * @return The index of a matching alignment.
+  */
+-export function getAlignmentIndex( alignment = 'center' ) {
+-	const item = transformValue( alignment ).replace( '-', ' ' );
++export function getAlignmentIndex(
++	alignment: AlignmentMatrixControlValue = 'center'
++) {
++	const item = transformValue( alignment );
+ 	const index = ALIGNMENTS.indexOf( item );
+ 
+ 	return index > -1 ? index : undefined;
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 04a8eaa8d4d9ec..6d7cfacb6a6abb 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -40,7 +40,6 @@
+ 		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
+ 		"src/**/test/**/*.js", // only exclude js files, ts{x} files should be checked
+ 		"src/index.js",
+-		"src/alignment-matrix-control",
+ 		"src/angle-picker-control",
+ 		"src/autocomplete",
+ 		"src/box-control",

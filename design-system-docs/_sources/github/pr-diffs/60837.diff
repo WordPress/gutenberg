@@ -1,0 +1,671 @@
+diff --git a/packages/block-editor/src/components/block-alignment-matrix-control/index.js b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+index 53baa97421e6c1..cdec41dfc7b978 100644
+--- a/packages/block-editor/src/components/block-alignment-matrix-control/index.js
++++ b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+@@ -6,7 +6,7 @@ import { DOWN } from '@wordpress/keycodes';
+ import {
+ 	ToolbarButton,
+ 	Dropdown,
+-	__experimentalAlignmentMatrixControl as AlignmentMatrixControl,
++	AlignmentMatrixControl,
+ } from '@wordpress/components';
+ 
+ const noop = () => {};
+diff --git a/packages/block-editor/src/components/font-appearance-control/index.js b/packages/block-editor/src/components/font-appearance-control/index.js
+index 18e814ad23ddb4..bb2af1b6db4fff 100644
+--- a/packages/block-editor/src/components/font-appearance-control/index.js
++++ b/packages/block-editor/src/components/font-appearance-control/index.js
+@@ -203,6 +203,8 @@ export default function FontAppearanceControl( props ) {
+ 		);
+ 	};
+ 
++	console.debug('selectOptions: ', selectOptions );
++
+ 	return (
+ 		hasStylesOrWeights && (
+ 			<CustomSelectControl
+@@ -212,8 +214,11 @@ export default function FontAppearanceControl( props ) {
+ 				describedBy={ getDescribedBy() }
+ 				options={ selectOptions }
+ 				value={ currentSelection }
+-				onChange={ ( { selectedItem } ) =>
+-					onChange( selectedItem.style )
++				onChange={ ( { selectedItem } ) => {
++						console.debug( selectedItem );
++						// @todo style is missing from the object
++						onChange( selectedItem.style );
++					}
+ 				}
+ 			/>
+ 		)
+diff --git a/packages/block-editor/src/components/global-styles/border-panel.js b/packages/block-editor/src/components/global-styles/border-panel.js
+index e02616082cf6a8..e2a88fbd9f8dad 100644
+--- a/packages/block-editor/src/components/global-styles/border-panel.js
++++ b/packages/block-editor/src/components/global-styles/border-panel.js
+@@ -2,9 +2,9 @@
+  * WordPress dependencies
+  */
+ import {
+-	__experimentalBorderBoxControl as BorderBoxControl,
+-	__experimentalHasSplitBorders as hasSplitBorders,
+-	__experimentalIsDefinedBorder as isDefinedBorder,
++	BorderBoxControl,
++	hasSplitBorders,
++	isDefinedBorder,
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ 	__experimentalItemGroup as ItemGroup,
+diff --git a/packages/block-editor/src/components/global-styles/dimensions-panel.js b/packages/block-editor/src/components/global-styles/dimensions-panel.js
+index 94e53eec163721..f4f82242c4d82f 100644
+--- a/packages/block-editor/src/components/global-styles/dimensions-panel.js
++++ b/packages/block-editor/src/components/global-styles/dimensions-panel.js
+@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
+ import {
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+-	__experimentalBoxControl as BoxControl,
++	BoxControl,
+ 	__experimentalHStack as HStack,
+ 	__experimentalUnitControl as UnitControl,
+ 	__experimentalUseCustomUnits as useCustomUnits,
+diff --git a/packages/block-editor/src/components/global-styles/typography-panel.js b/packages/block-editor/src/components/global-styles/typography-panel.js
+index 7fab783c4d0e7b..dd9f7e8a7750eb 100644
+--- a/packages/block-editor/src/components/global-styles/typography-panel.js
++++ b/packages/block-editor/src/components/global-styles/typography-panel.js
+@@ -219,6 +219,8 @@ export default function TypographyPanel( {
+ 		fontStyle: newFontStyle,
+ 		fontWeight: newFontWeight,
+ 	} ) => {
++		console.debug(fontStyle);
++		console.debug(fontWeight);
+ 		onChange( {
+ 			...value,
+ 			typography: {
+diff --git a/packages/block-editor/src/hooks/border.js b/packages/block-editor/src/hooks/border.js
+index a8ed9bccaf7df9..78964409fa8953 100644
+--- a/packages/block-editor/src/hooks/border.js
++++ b/packages/block-editor/src/hooks/border.js
+@@ -7,7 +7,7 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
+-import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
++import { hasSplitBorders } from '@wordpress/components';
+ import { Platform, useCallback, useMemo } from '@wordpress/element';
+ import { addFilter } from '@wordpress/hooks';
+ import { useSelect } from '@wordpress/data';
+diff --git a/packages/block-library/src/navigation/edit/navigation-menu-delete-control.js b/packages/block-library/src/navigation/edit/navigation-menu-delete-control.js
+index 567e2a79abf4e5..a0ccf29a702cd4 100644
+--- a/packages/block-library/src/navigation/edit/navigation-menu-delete-control.js
++++ b/packages/block-library/src/navigation/edit/navigation-menu-delete-control.js
+@@ -1,10 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	Button,
+-	__experimentalConfirmDialog as ConfirmDialog,
+-} from '@wordpress/components';
++import { Button, ConfirmDialog } from '@wordpress/components';
+ import { store as coreStore, useEntityId } from '@wordpress/core-data';
+ import { useDispatch } from '@wordpress/data';
+ import { useState } from '@wordpress/element';
+diff --git a/packages/block-library/src/table/edit.js b/packages/block-library/src/table/edit.js
+index b8f239a01095d9..408335c5d578ee 100644
+--- a/packages/block-library/src/table/edit.js
++++ b/packages/block-library/src/table/edit.js
+@@ -26,7 +26,7 @@ import {
+ 	TextControl,
+ 	ToggleControl,
+ 	ToolbarDropdownMenu,
+-	__experimentalHasSplitBorders as hasSplitBorders,
++	hasSplitBorders,
+ } from '@wordpress/components';
+ import {
+ 	alignLeft,
+diff --git a/packages/components/src/alignment-matrix-control/README.md b/packages/components/src/alignment-matrix-control/README.md
+index d087a177d8d414..0d42e8718cff80 100644
+--- a/packages/components/src/alignment-matrix-control/README.md
++++ b/packages/components/src/alignment-matrix-control/README.md
+@@ -10,7 +10,7 @@ AlignmentMatrixControl components enable adjustments to horizontal and vertical
+ 
+ ```jsx
+ import { useState } from 'react';
+-import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '@wordpress/components';
++import { AlignmentMatrixControl } from '@wordpress/components';
+ 
+ const Example = () => {
+ 	const [ alignment, setAlignment ] = useState( 'center center' );
+diff --git a/packages/components/src/alignment-matrix-control/index.tsx b/packages/components/src/alignment-matrix-control/index.tsx
+index 3de0e401187d53..d5417ddfbc421d 100644
+--- a/packages/components/src/alignment-matrix-control/index.tsx
++++ b/packages/components/src/alignment-matrix-control/index.tsx
+@@ -25,7 +25,7 @@ import type { AlignmentMatrixControlProps } from './types';
+  * AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
+  *
+  * ```jsx
+- * import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '@wordpress/components';
++ * import { AlignmentMatrixControl } from '@wordpress/components';
+  * import { useState } from '@wordpress/element';
+  *
+  * const Example = () => {
+diff --git a/packages/components/src/alignment-matrix-control/stories/index.story.tsx b/packages/components/src/alignment-matrix-control/stories/index.story.tsx
+index 03bec9d92a8b78..9d276def5b001f 100644
+--- a/packages/components/src/alignment-matrix-control/stories/index.story.tsx
++++ b/packages/components/src/alignment-matrix-control/stories/index.story.tsx
+@@ -17,7 +17,7 @@ import { HStack } from '../../h-stack';
+ import type { AlignmentMatrixControlProps } from '../types';
+ 
+ const meta: Meta< typeof AlignmentMatrixControl > = {
+-	title: 'Components (Experimental)/AlignmentMatrixControl',
++	title: 'Components/AlignmentMatrixControl',
+ 	component: AlignmentMatrixControl,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+diff --git a/packages/components/src/border-box-control/border-box-control/README.md b/packages/components/src/border-box-control/border-box-control/README.md
+index 20352e03c8243d..5d5be1cae690ad 100644
+--- a/packages/components/src/border-box-control/border-box-control/README.md
++++ b/packages/components/src/border-box-control/border-box-control/README.md
+@@ -28,7 +28,7 @@ show "Mixed" placeholder text.
+ 
+ ```jsx
+ import { useState } from 'react';
+-import { __experimentalBorderBoxControl as BorderBoxControl } from '@wordpress/components';
++import { BorderBoxControl } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ 
+ const colors = [
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index 26967ad7f63ddb..f1a55f88c03b75 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -162,7 +162,7 @@ const UnconnectedBorderBoxControl = (
+  * view's width input would show "Mixed" placeholder text.
+  *
+  * ```jsx
+- * import { __experimentalBorderBoxControl as BorderBoxControl } from '@wordpress/components';
++ * import { BorderBoxControl } from '@wordpress/components';
+  * import { __ } from '@wordpress/i18n';
+  *
+  * const colors = [
+diff --git a/packages/components/src/border-box-control/stories/index.story.tsx b/packages/components/src/border-box-control/stories/index.story.tsx
+index 5b5d7f311208c0..7ac8cbbea8c159 100644
+--- a/packages/components/src/border-box-control/stories/index.story.tsx
++++ b/packages/components/src/border-box-control/stories/index.story.tsx
+@@ -16,7 +16,7 @@ import Button from '../../button';
+ import { BorderBoxControl } from '../';
+ 
+ const meta: Meta< typeof BorderBoxControl > = {
+-	title: 'Components (Experimental)/BorderBoxControl',
++	title: 'Components/BorderBoxControl',
+ 	component: BorderBoxControl,
+ 	argTypes: {
+ 		onChange: { action: 'onChange' },
+diff --git a/packages/components/src/border-control/border-control/README.md b/packages/components/src/border-control/border-control/README.md
+index 51fb7172b7c553..292e1d19288294 100644
+--- a/packages/components/src/border-control/border-control/README.md
++++ b/packages/components/src/border-control/border-control/README.md
+@@ -21,7 +21,7 @@ a "shape" abstraction.
+ 
+ ```jsx
+ import { useState } from 'react';
+-import { __experimentalBorderControl as BorderControl } from '@wordpress/components';
++import { BorderControl } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ 
+ const colors = [
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 5fe2abce1b4117..6dc3e8a6891ad2 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -134,7 +134,7 @@ const UnconnectedBorderControl = (
+  * a "shape" abstraction.
+  *
+  * ```jsx
+- * import { __experimentalBorderControl as BorderControl } from '@wordpress/components';
++ * import { BorderControl } from '@wordpress/components';
+  * import { __ } from '@wordpress/i18n';
+  *
+  * const colors = [
+diff --git a/packages/components/src/border-control/stories/index.story.tsx b/packages/components/src/border-control/stories/index.story.tsx
+index 9a5349d302c276..19938db5d0e51e 100644
+--- a/packages/components/src/border-control/stories/index.story.tsx
++++ b/packages/components/src/border-control/stories/index.story.tsx
+@@ -16,7 +16,7 @@ import { BorderControl } from '..';
+ import type { Border } from '../types';
+ 
+ const meta: Meta< typeof BorderControl > = {
+-	title: 'Components (Experimental)/BorderControl',
++	title: 'Components/BorderControl',
+ 	component: BorderControl,
+ 	argTypes: {
+ 		onChange: {
+diff --git a/packages/components/src/box-control/README.md b/packages/components/src/box-control/README.md
+index 2fd214b79157f7..1a4bd6ea53dff6 100644
+--- a/packages/components/src/box-control/README.md
++++ b/packages/components/src/box-control/README.md
+@@ -10,7 +10,7 @@ BoxControl components let users set values for Top, Right, Bottom, and Left. Thi
+ 
+ ```jsx
+ import { useState } from 'react';
+-import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
++import { BoxControl } from '@wordpress/components';
+ 
+ const Example = () => {
+ 	const [ values, setValues ] = useState( {
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index 9c3452d4ccb806..3f9791c2ba4d7a 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -51,7 +51,7 @@ function useUniqueId( idProp?: string ) {
+  * This can be used as an input control for values like `padding` or `margin`.
+  *
+  * ```jsx
+- * import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
++ * import { BoxControl } from '@wordpress/components';
+  * import { useState } from '@wordpress/element';
+  *
+  * const Example = () => {
+diff --git a/packages/components/src/box-control/stories/index.story.tsx b/packages/components/src/box-control/stories/index.story.tsx
+index 1b6604048f6d52..783f9d047b1bb0 100644
+--- a/packages/components/src/box-control/stories/index.story.tsx
++++ b/packages/components/src/box-control/stories/index.story.tsx
+@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
+ import BoxControl from '../';
+ 
+ const meta: Meta< typeof BoxControl > = {
+-	title: 'Components (Experimental)/BoxControl',
++	title: 'Components/BoxControl',
+ 	component: BoxControl,
+ 	argTypes: {
+ 		values: { control: { type: null } },
+diff --git a/packages/components/src/confirm-dialog/README.md b/packages/components/src/confirm-dialog/README.md
+index 3ad42d9d68160e..2fbfaafa616285 100644
+--- a/packages/components/src/confirm-dialog/README.md
++++ b/packages/components/src/confirm-dialog/README.md
+@@ -23,7 +23,7 @@ Allows the component to be used standalone, just by declaring it as part of anot
+ Activating this mode is as simple as omitting the `isOpen` prop. The only mandatory prop, in this case, is the `onConfirm` callback. The message is passed as the `children`. You can pass any JSX you'd like, which allows to further format the message or include sub-component if you'd like:
+ 
+ ```jsx
+-import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
++import { ConfirmDialog } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+@@ -44,7 +44,7 @@ Let the parent component control when the dialog is open/closed. It's activated
+ 
+ ```jsx
+ import { useState } from 'react';
+-import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
++import { ConfirmDialog } from '@wordpress/components';
+ 
+ function Example() {
+ 	const [ isOpen, setIsOpen ] = useState( true );
+diff --git a/packages/components/src/confirm-dialog/component.tsx b/packages/components/src/confirm-dialog/component.tsx
+index 7e787439d91dfd..d4c72c9b1570de 100644
+--- a/packages/components/src/confirm-dialog/component.tsx
++++ b/packages/components/src/confirm-dialog/component.tsx
+@@ -138,7 +138,7 @@ const UnconnectedConfirmDialog = (
+  * Activating this mode is as simple as omitting the `isOpen` prop. The only mandatory prop, in this case, is the `onConfirm` callback. The message is passed as the `children`. You can pass any JSX you'd like, which allows to further format the message or include sub-component if you'd like:
+  *
+  * ```jsx
+- * import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
++ * import { ConfirmDialog } from '@wordpress/components';
+  *
+  * function Example() {
+  * 	return (
+@@ -158,7 +158,7 @@ const UnconnectedConfirmDialog = (
+  * -   You'll want to update the state that controls `isOpen` by updating it from the `onCancel` and `onConfirm` callbacks.
+  *
+  *```jsx
+- * import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
++ * import { ConfirmDialog } from '@wordpress/components';
+  * import { useState } from '@wordpress/element';
+  *
+  * function Example() {
+diff --git a/packages/components/src/confirm-dialog/stories/index.story.tsx b/packages/components/src/confirm-dialog/stories/index.story.tsx
+index 85636c0ddc81ed..d242e765c7cbec 100644
+--- a/packages/components/src/confirm-dialog/stories/index.story.tsx
++++ b/packages/components/src/confirm-dialog/stories/index.story.tsx
+@@ -16,7 +16,7 @@ import { ConfirmDialog } from '../component';
+ 
+ const meta: Meta< typeof ConfirmDialog > = {
+ 	component: ConfirmDialog,
+-	title: 'Components (Experimental)/ConfirmDialog',
++	title: 'Components/ConfirmDialog',
+ 	argTypes: {
+ 		isOpen: {
+ 			control: { type: null },
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+index 8071a7e932a8bd..64c684a0a9233a 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+@@ -30,6 +30,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 	// Forward props + store from v2 implementation
+ 	const store = Ariakit.useSelectStore( {
+ 		async setValue( nextValue ) {
++			console.debug('nextValue: ', nextValue);
+ 			if ( ! onChange ) return;
+ 
+ 			// Executes the logic in a microtask after the popup is closed.
+@@ -37,6 +38,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 			await Promise.resolve();
+ 			const state = store.getState();
+ 
++			console.debug(state);
++
+ 			const changeObject = {
+ 				highlightedIndex: state.renderedItems.findIndex(
+ 					( item ) => item.value === nextValue
+@@ -45,7 +48,9 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ 				isOpen: state.open,
+ 				selectedItem: {
+ 					name: nextValue as string,
+-					key: nextValue as string,
++					key: nextValue as string, // @todo Why key and name have the same value?
++					// @todo this structure is not compatible with the one from FontAppearanceControl, which
++					// expects an `style` attribute. Probably something to be fixed in FontAppearanceControl? Or am I missing something here?
+ 				},
+ 				type: '',
+ 			};
+@@ -129,3 +134,14 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
+ }
+ 
+ export default CustomSelectControl;
++
++// for backwards compatibility
++export function StableCustomSelectControl( props: LegacyCustomSelectProps ) {
++	console.debug(props);
++	return (
++		<CustomSelectControl
++			{ ...props }
++			__experimentalShowSelectedHint={ false }
++		/>
++	);
++}
+diff --git a/packages/components/src/custom-select-control-v2/stories/default.story.tsx b/packages/components/src/custom-select-control-v2/stories/default.story.tsx
+index ac2f9a51d5951d..07c0c62cb1edbd 100644
+--- a/packages/components/src/custom-select-control-v2/stories/default.story.tsx
++++ b/packages/components/src/custom-select-control-v2/stories/default.story.tsx
+@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
+ import CustomSelectControlV2 from '..';
+ 
+ const meta: Meta< typeof CustomSelectControlV2 > = {
+-	title: 'Components (Experimental)/CustomSelectControl v2/Default',
++	title: 'Components/CustomSelectControl v2/Default',
+ 	component: CustomSelectControlV2,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+diff --git a/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx b/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx
+index 120686ea84af61..dc1d4ca490d5dc 100644
+--- a/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx
++++ b/packages/components/src/custom-select-control-v2/stories/legacy.story.tsx
+@@ -15,7 +15,7 @@ import CustomSelectControl from '../legacy-component';
+ import * as V1Story from '../../custom-select-control/stories/index.story';
+ 
+ const meta: Meta< typeof CustomSelectControl > = {
+-	title: 'Components (Experimental)/CustomSelectControl v2/Legacy',
++	title: 'Components/CustomSelectControl v2/Legacy',
+ 	component: CustomSelectControl,
+ 	argTypes: {
+ 		onChange: { control: { type: null } },
+diff --git a/packages/components/src/index.native.js b/packages/components/src/index.native.js
+index 1421316d27b400..be9366126c153e 100644
+--- a/packages/components/src/index.native.js
++++ b/packages/components/src/index.native.js
+@@ -35,7 +35,10 @@ export {
+ 
+ export { default as __experimentalStyleProvider } from './style-provider';
+ export { default as BaseControl } from './base-control';
+-export { hasSplitBorders as __experimentalHasSplitBorders } from './border-box-control/utils';
++export {
++	hasSplitBorders as __experimentalHasSplitBorders,
++	hasSplitBorders,
++} from './border-box-control/utils';
+ export { default as TextareaControl } from './textarea-control';
+ export { default as PanelBody } from './panel/body';
+ export { default as PanelActions } from './panel/actions';
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..7e3127012b1636 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -12,7 +12,10 @@ export {
+ } from '@wordpress/primitives';
+ 
+ // Components.
+-export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
++export {
++	default as __experimentalAlignmentMatrixControl,
++	AlignmentMatrixControl,
++} from './alignment-matrix-control';
+ export {
+ 	default as Animate,
+ 	getAnimateClassName as __unstableGetAnimateClassName,
+@@ -33,11 +36,20 @@ export {
+ 	hasSplitBorders as __experimentalHasSplitBorders,
+ 	isDefinedBorder as __experimentalIsDefinedBorder,
+ 	isEmptyBorder as __experimentalIsEmptyBorder,
++	BorderBoxControl,
++	hasSplitBorders,
++	isDefinedBorder,
++	isEmptyBorder,
+ } from './border-box-control';
+-export { BorderControl as __experimentalBorderControl } from './border-control';
++export {
++	BorderControl as __experimentalBorderControl,
++	BorderControl,
++} from './border-control';
+ export {
+ 	default as __experimentalBoxControl,
+ 	applyValueToSides as __experimentalApplyValueToSides,
++	default as BoxControl,
++	applyValueToSides,
+ } from './box-control';
+ export { default as Button } from './button';
+ export { default as ButtonGroup } from './button-group';
+@@ -62,8 +74,12 @@ export {
+ 	CompositeItem as __unstableCompositeItem,
+ 	useCompositeState as __unstableUseCompositeState,
+ } from './composite';
+-export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
+-export { StableCustomSelectControl as CustomSelectControl } from './custom-select-control';
++export {
++	ConfirmDialog as __experimentalConfirmDialog,
++	ConfirmDialog,
++} from './confirm-dialog';
++export { StableCustomSelectControl as CustomSelectControl } from './custom-select-control-v2/legacy-component';
++export { default as CustomSelectControlV2 } from './custom-select-control-v2';
+ export { default as Dashicon } from './dashicon';
+ export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
+ export { default as __experimentalDimensionControl } from './dimension-control';
+diff --git a/packages/components/src/tools-panel/tools-panel/README.md b/packages/components/src/tools-panel/tools-panel/README.md
+index df41b623eefb6c..feec34319c689a 100644
+--- a/packages/components/src/tools-panel/tools-panel/README.md
++++ b/packages/components/src/tools-panel/tools-panel/README.md
+@@ -60,7 +60,7 @@ import styled from '@emotion/styled';
+  * WordPress dependencies
+  */
+ import {
+-	__experimentalBoxControl as BoxControl,
++	BoxControl,
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ 	__experimentalUnitControl as UnitControl,
+diff --git a/packages/edit-site/src/components/global-styles/font-library-modal/installed-fonts.js b/packages/edit-site/src/components/global-styles/font-library-modal/installed-fonts.js
+index b33bb1b639d000..4dad3cb386290b 100644
+--- a/packages/edit-site/src/components/global-styles/font-library-modal/installed-fonts.js
++++ b/packages/edit-site/src/components/global-styles/font-library-modal/installed-fonts.js
+@@ -3,7 +3,7 @@
+  */
+ import {
+ 	Button,
+-	__experimentalConfirmDialog as ConfirmDialog,
++	ConfirmDialog,
+ 	__experimentalHStack as HStack,
+ 	__experimentalHeading as Heading,
+ 	__experimentalNavigatorProvider as NavigatorProvider,
+diff --git a/packages/edit-site/src/components/global-styles/screen-block.js b/packages/edit-site/src/components/global-styles/screen-block.js
+index 9811f10b834dab..dfc4faf011d51e 100644
+--- a/packages/edit-site/src/components/global-styles/screen-block.js
++++ b/packages/edit-site/src/components/global-styles/screen-block.js
+@@ -9,7 +9,7 @@ import { store as coreStore } from '@wordpress/core-data';
+ import {
+ 	PanelBody,
+ 	__experimentalVStack as VStack,
+-	__experimentalHasSplitBorders as hasSplitBorders,
++	hasSplitBorders,
+ } from '@wordpress/components';
+ import { __, sprintf } from '@wordpress/i18n';
+ 
+diff --git a/packages/edit-site/src/components/global-styles/screen-revisions/index.js b/packages/edit-site/src/components/global-styles/screen-revisions/index.js
+index 6a20e23c916746..d2dc130699a40e 100644
+--- a/packages/edit-site/src/components/global-styles/screen-revisions/index.js
++++ b/packages/edit-site/src/components/global-styles/screen-revisions/index.js
+@@ -4,7 +4,7 @@
+ import { __, sprintf } from '@wordpress/i18n';
+ import {
+ 	__experimentalUseNavigator as useNavigator,
+-	__experimentalConfirmDialog as ConfirmDialog,
++	ConfirmDialog,
+ 	Spinner,
+ } from '@wordpress/components';
+ import { useSelect, useDispatch } from '@wordpress/data';
+diff --git a/packages/edit-site/src/components/page-patterns/delete-category-menu-item.js b/packages/edit-site/src/components/page-patterns/delete-category-menu-item.js
+index adb33e71816e56..76a99608933d48 100644
+--- a/packages/edit-site/src/components/page-patterns/delete-category-menu-item.js
++++ b/packages/edit-site/src/components/page-patterns/delete-category-menu-item.js
+@@ -1,10 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	MenuItem,
+-	__experimentalConfirmDialog as ConfirmDialog,
+-} from '@wordpress/components';
++import { MenuItem, ConfirmDialog } from '@wordpress/components';
+ import { store as coreStore } from '@wordpress/core-data';
+ import { useDispatch } from '@wordpress/data';
+ import { useState } from '@wordpress/element';
+diff --git a/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/delete-confirm-dialog.js b/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/delete-confirm-dialog.js
+index fdfb189fd3cd12..7aa815745cbc2f 100644
+--- a/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/delete-confirm-dialog.js
++++ b/packages/edit-site/src/components/sidebar-navigation-screen-navigation-menu/delete-confirm-dialog.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
++import { ConfirmDialog } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ 
+ export default function DeleteConfirmDialog( { onClose, onConfirm } ) {
+diff --git a/packages/edit-site/src/components/template-actions/index.js b/packages/edit-site/src/components/template-actions/index.js
+index 06a644f79c29e0..dfbad113372db4 100644
+--- a/packages/edit-site/src/components/template-actions/index.js
++++ b/packages/edit-site/src/components/template-actions/index.js
+@@ -9,7 +9,7 @@ import {
+ 	DropdownMenu,
+ 	MenuGroup,
+ 	MenuItem,
+-	__experimentalConfirmDialog as ConfirmDialog,
++	ConfirmDialog,
+ } from '@wordpress/components';
+ import { moreVertical } from '@wordpress/icons';
+ import { store as noticesStore } from '@wordpress/notices';
+diff --git a/packages/editor/src/components/editor-canvas/edit-template-blocks-notification.js b/packages/editor/src/components/editor-canvas/edit-template-blocks-notification.js
+index 98b67216bf5038..b5b4a1ce1973c8 100644
+--- a/packages/editor/src/components/editor-canvas/edit-template-blocks-notification.js
++++ b/packages/editor/src/components/editor-canvas/edit-template-blocks-notification.js
+@@ -5,7 +5,7 @@ import { useSelect } from '@wordpress/data';
+ import { store as coreStore } from '@wordpress/core-data';
+ import { useEffect, useState } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+-import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
++import { ConfirmDialog } from '@wordpress/components';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/editor/src/components/post-switch-to-draft-button/index.js b/packages/editor/src/components/post-switch-to-draft-button/index.js
+index 6aa17416004849..83672e99b47464 100644
+--- a/packages/editor/src/components/post-switch-to-draft-button/index.js
++++ b/packages/editor/src/components/post-switch-to-draft-button/index.js
+@@ -1,10 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	Button,
+-	__experimentalConfirmDialog as ConfirmDialog,
+-} from '@wordpress/components';
++import { Button, ConfirmDialog } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import { useState } from '@wordpress/element';
+diff --git a/packages/editor/src/components/post-trash/index.js b/packages/editor/src/components/post-trash/index.js
+index ebb078804da6d4..e5c5dd389d3dee 100644
+--- a/packages/editor/src/components/post-trash/index.js
++++ b/packages/editor/src/components/post-trash/index.js
+@@ -2,10 +2,7 @@
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import {
+-	Button,
+-	__experimentalConfirmDialog as ConfirmDialog,
+-} from '@wordpress/components';
++import { Button, ConfirmDialog } from '@wordpress/components';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { useState } from '@wordpress/element';
+ 
+diff --git a/packages/editor/src/components/post-visibility/index.js b/packages/editor/src/components/post-visibility/index.js
+index 0dde8905cbb36f..671ec6cd28734b 100644
+--- a/packages/editor/src/components/post-visibility/index.js
++++ b/packages/editor/src/components/post-visibility/index.js
+@@ -3,10 +3,7 @@
+  */
+ import { __ } from '@wordpress/i18n';
+ import { useState } from '@wordpress/element';
+-import {
+-	VisuallyHidden,
+-	__experimentalConfirmDialog as ConfirmDialog,
+-} from '@wordpress/components';
++import { VisuallyHidden, ConfirmDialog } from '@wordpress/components';
+ import { useInstanceId } from '@wordpress/compose';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
+diff --git a/packages/editor/src/components/template-validation-notice/index.js b/packages/editor/src/components/template-validation-notice/index.js
+index 4aa1faac4bd9ce..0bf35f6bd78b87 100644
+--- a/packages/editor/src/components/template-validation-notice/index.js
++++ b/packages/editor/src/components/template-validation-notice/index.js
+@@ -1,10 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	Notice,
+-	__experimentalConfirmDialog as ConfirmDialog,
+-} from '@wordpress/components';
++import { Notice, ConfirmDialog } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import { useState } from '@wordpress/element';
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..db9eb8befb4749 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,14 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'alignmentmatrixcontrol',
++			'borderboxcontrol',
++			'bordercontrol',
++			'boxcontrol',
++			'confirmdialog',
++			'customselectcontrol-v2',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..901ff4c20ed277 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `Tabs`: Remove "experimental" designation ([#61072](https://github.com/WordPress/gutenberg/pull/61072)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/tabs/stories/index.story.tsx b/packages/components/src/tabs/stories/index.story.tsx
+index 883a75c46ad139..885a2752a3a690 100644
+--- a/packages/components/src/tabs/stories/index.story.tsx
++++ b/packages/components/src/tabs/stories/index.story.tsx
+@@ -18,7 +18,7 @@ import DropdownMenu from '../../dropdown-menu';
+ import Button from '../../button';
+ 
+ const meta: Meta< typeof Tabs > = {
+-	title: 'Components (Experimental)/Tabs',
++	title: 'Components/Tabs',
+ 	component: Tabs,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..dc370ccc86dd62 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,6 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation', 'tabs' ];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

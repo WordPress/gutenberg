@@ -1,0 +1,434 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 149d230349c77c..4ae09aba932081 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -150,6 +150,7 @@ module.exports = {
+ 		],
+ 		'@wordpress/no-unsafe-wp-apis': 'off',
+ 		'@wordpress/data-no-store-string-literals': 'error',
++		'@wordpress/use-recommended-components': 'error',
+ 		'eslint-comments/no-unused-disable': 'error',
+ 		'import/default': 'error',
+ 		'import/named': 'error',
+diff --git a/packages/block-editor/src/components/global-styles/color-panel.js b/packages/block-editor/src/components/global-styles/color-panel.js
+index eaf0447c10491d..b2d0f0776786b9 100644
+--- a/packages/block-editor/src/components/global-styles/color-panel.js
++++ b/packages/block-editor/src/components/global-styles/color-panel.js
+@@ -10,6 +10,8 @@ import {
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ 	__experimentalHStack as HStack,
++	// TODO: Replace this ZStack with ad hoc CSS.
++	// eslint-disable-next-line @wordpress/use-recommended-components
+ 	__experimentalZStack as ZStack,
+ 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+ 	ColorIndicator,
+@@ -22,6 +24,7 @@ import {
+ import { useCallback, useRef } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import { getValueFromVariable } from '@wordpress/global-styles-engine';
++import { reset as resetIcon } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+@@ -31,7 +34,6 @@ import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
+ import { useToolsPanelDropdownMenuProps } from './utils';
+ import { setImmutably } from '../../utils/object';
+ import { unlock } from '../../lock-unlock';
+-import { reset as resetIcon } from '@wordpress/icons';
+ 
+ export function useHasColorPanel( settings ) {
+ 	const hasTextPanel = useHasTextPanel( settings );
+diff --git a/packages/block-editor/src/components/global-styles/filters-panel.js b/packages/block-editor/src/components/global-styles/filters-panel.js
+index befd8b7acdcbfd..d8616a67115dde 100644
+--- a/packages/block-editor/src/components/global-styles/filters-panel.js
++++ b/packages/block-editor/src/components/global-styles/filters-panel.js
+@@ -10,6 +10,8 @@ import {
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ 	__experimentalHStack as HStack,
++	// TODO: Replace this ZStack with ad hoc CSS.
++	// eslint-disable-next-line @wordpress/use-recommended-components
+ 	__experimentalZStack as ZStack,
+ 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+ 	MenuGroup,
+diff --git a/packages/eslint-plugin/CHANGELOG.md b/packages/eslint-plugin/CHANGELOG.md
+index f7acf9e52b3a36..a9c1f3a2a14af5 100644
+--- a/packages/eslint-plugin/CHANGELOG.md
++++ b/packages/eslint-plugin/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   Added [`use-recommended-components`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/use-recommended-components.md) rule to encourage the use of recommended UI components in a WordPress environment ([#76222](https://github.com/WordPress/gutenberg/pull/76222)).
++
+ ## 24.3.0 (2026-03-04)
+ 
+ ### New Features
+diff --git a/packages/eslint-plugin/README.md b/packages/eslint-plugin/README.md
+index 50f12c69ac9f16..b425a64b5e9172 100644
+--- a/packages/eslint-plugin/README.md
++++ b/packages/eslint-plugin/README.md
+@@ -87,6 +87,7 @@ The granular rulesets will not define any environment globals. As such, if they
+ | [no-i18n-in-save](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-i18n-in-save.md)                                             | Disallow translation functions in block save methods.                                           |             |
+ | [no-unguarded-get-range-at](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)                         | Disallow the usage of unguarded `getRangeAt` calls.                                             | ✓           |
+ | [no-unsafe-wp-apis](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-wp-apis.md)                                         | Disallow the usage of unsafe APIs from `@wordpress/*` packages                                  | ✓           |
++| [use-recommended-components](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/use-recommended-components.md)                       | Encourage the use of recommended UI components in a WordPress environment.                      |             |
+ | [no-unused-vars-before-return](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)                   | Disallow assigning variable values if unused before a return.                                   | ✓           |
+ | [no-wp-process-env](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-wp-process-env.md)                                         | Disallow legacy usage of WordPress variables via `process.env` like `process.env.SCRIPT_DEBUG`. | ✓           |
+ | [react-no-unsafe-timeout](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)                             | Disallow unsafe `setTimeout` in component.                                                      |             |
+diff --git a/packages/eslint-plugin/docs/rules/use-recommended-components.md b/packages/eslint-plugin/docs/rules/use-recommended-components.md
+new file mode 100644
+index 00000000000000..36501e80599c85
+--- /dev/null
++++ b/packages/eslint-plugin/docs/rules/use-recommended-components.md
+@@ -0,0 +1,25 @@
++# Encourage the use of recommended components (use-recommended-components)
++
++Encourages the use of recommended UI components in a WordPress environment by flagging imports that have a better alternative. The component lists are maintained directly in the rule and represent an evolving, up-to-date set of guidance.
++
++## Rule details
++
++Examples of **incorrect** code for this rule:
++
++```js
++// @wordpress/ui — this component isn't recommended yet.
++import { SomeComponent } from '@wordpress/ui';
++
++// @wordpress/components — a newer alternative is available.
++import { TextControl } from '@wordpress/components';
++```
++
++Examples of **correct** code for this rule:
++
++```js
++// Packages not covered by the rule are unaffected.
++import { Button } from '@wordpress/components';
++
++// Default and namespace imports are not checked.
++import UI from '@wordpress/ui';
++```
+diff --git a/packages/eslint-plugin/rules/__tests__/use-recommended-components.js b/packages/eslint-plugin/rules/__tests__/use-recommended-components.js
+new file mode 100644
+index 00000000000000..bc3db1c6d6181c
+--- /dev/null
++++ b/packages/eslint-plugin/rules/__tests__/use-recommended-components.js
+@@ -0,0 +1,96 @@
++/* eslint-env jest */
++
++/**
++ * External dependencies
++ */
++import { RuleTester } from 'eslint';
++
++/**
++ * Internal dependencies
++ */
++import rule, { ALLOWLIST, DENYLIST } from '../use-recommended-components';
++
++const ruleTester = new RuleTester( {
++	parserOptions: {
++		sourceType: 'module',
++		ecmaVersion: 6,
++	},
++} );
++
++ruleTester.run( 'use-recommended-components', rule, {
++	valid: [
++		// Unrelated packages are not affected.
++		"import { Anything } from 'other-package';",
++		"import { Button } from '@wordpress/components';",
++
++		// Default and namespace imports are not affected.
++		"import UI from '@wordpress/ui';",
++		"import * as UI from '@wordpress/ui';",
++
++		// Allowed @wordpress/ui components.
++		"import { Badge } from '@wordpress/ui';",
++		"import { Stack } from '@wordpress/ui';",
++		"import { Badge, Stack } from '@wordpress/ui';",
++	],
++
++	invalid: [
++		// Allowlist: non-allowed @wordpress/ui imports are flagged.
++		{
++			code: "import { SomeComponent } from '@wordpress/ui';",
++			errors: [
++				{
++					message:
++						'`SomeComponent` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
++					type: 'ImportSpecifier',
++				},
++			],
++		},
++		{
++			code: "import { Foo, Bar } from '@wordpress/ui';",
++			errors: [
++				{
++					message:
++						'`Foo` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
++					type: 'ImportSpecifier',
++				},
++				{
++					message:
++						'`Bar` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
++					type: 'ImportSpecifier',
++				},
++			],
++		},
++		// Denylist: denied components are flagged with their message.
++		{
++			code: "import { __experimentalZStack } from '@wordpress/components';",
++			errors: [
++				{
++					message:
++						'__experimentalZStack is planned for deprecation. Write your own CSS instead.',
++					type: 'ImportSpecifier',
++				},
++			],
++		},
++		{
++			code: "import { __experimentalZStack as ZStack } from '@wordpress/components';",
++			errors: [
++				{
++					message:
++						'__experimentalZStack is planned for deprecation. Write your own CSS instead.',
++					type: 'ImportSpecifier',
++				},
++			],
++		},
++	],
++} );
++
++describe( 'ALLOWLIST and DENYLIST', () => {
++	it( 'should not have overlapping package keys', () => {
++		const allowlistPackages = Object.keys( ALLOWLIST );
++		const denylistPackages = Object.keys( DENYLIST );
++		const overlap = allowlistPackages.filter( ( pkg ) =>
++			denylistPackages.includes( pkg )
++		);
++		expect( overlap ).toEqual( [] );
++	} );
++} );
+diff --git a/packages/eslint-plugin/rules/use-recommended-components.js b/packages/eslint-plugin/rules/use-recommended-components.js
+new file mode 100644
+index 00000000000000..d69c6c958d386a
+--- /dev/null
++++ b/packages/eslint-plugin/rules/use-recommended-components.js
+@@ -0,0 +1,114 @@
++/**
++ * Allowlist: only the listed components are permitted from these packages.
++ * Any other named import will be flagged with the package's message.
++ *
++ * `message` supports `{{ name }}` and `{{ source }}` placeholders.
++ *
++ * @type {Record<string, { allowed: string[], message?: string }>}
++ */
++const ALLOWLIST = {
++	'@wordpress/ui': {
++		allowed: [ 'Badge', 'Stack' ],
++		message:
++			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
++	},
++};
++
++/**
++ * Denylist: the listed components are flagged with a message pointing
++ * to a recommended alternative.
++ *
++ * Messages support `{{ name }}` and `{{ source }}` placeholders.
++ *
++ * @type {Record<string, Record<string, string>>}
++ */
++const DENYLIST = {
++	'@wordpress/components': {
++		__experimentalZStack:
++			'{{ name }} is planned for deprecation. Write your own CSS instead.',
++	},
++};
++
++/** @type {import('eslint').Rule.RuleModule} */
++const rule = {
++	meta: {
++		type: 'suggestion',
++		docs: {
++			description:
++				'Encourage the use of recommended UI components in a WordPress environment.',
++			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/use-recommended-components.md',
++		},
++		schema: [],
++	},
++	create( context ) {
++		return {
++			/** @param {import('estree').ImportDeclaration} node */
++			ImportDeclaration( node ) {
++				if ( typeof node.source.value !== 'string' ) {
++					return;
++				}
++
++				const source = node.source.value;
++
++				const allowlistEntry = ALLOWLIST[ source ];
++				const denylistEntry = DENYLIST[ source ];
++
++				if ( ! allowlistEntry && ! denylistEntry ) {
++					return;
++				}
++
++				node.specifiers.forEach( ( specifier ) => {
++					if ( specifier.type !== 'ImportSpecifier' ) {
++						return;
++					}
++
++					const name = specifier.imported.name;
++
++					if (
++						allowlistEntry &&
++						! allowlistEntry.allowed.includes( name )
++					) {
++						context.report( {
++							node: specifier,
++							message: resolveMessage(
++								allowlistEntry.message,
++								name,
++								source
++							),
++						} );
++					}
++
++					if ( denylistEntry?.hasOwnProperty( name ) ) {
++						context.report( {
++							node: specifier,
++							message: resolveMessage(
++								denylistEntry[ name ],
++								name,
++								source
++							),
++						} );
++					}
++				} );
++			},
++		};
++	},
++};
++
++/**
++ * @param {string|undefined} template
++ * @param {string}           name
++ * @param {string}           source
++ * @return {string} Resolved message string.
++ */
++function resolveMessage( template, name, source ) {
++	if ( ! template ) {
++		return `\`${ name }\` from \`${ source }\` is not recommended.`;
++	}
++	return template
++		.replace( /\{\{\s*name\s*\}\}/g, name )
++		.replace( /\{\{\s*source\s*\}\}/g, source );
++}
++
++module.exports = rule;
++module.exports.ALLOWLIST = ALLOWLIST;
++module.exports.DENYLIST = DENYLIST;
+diff --git a/packages/global-styles-ui/src/palette.tsx b/packages/global-styles-ui/src/palette.tsx
+index 2ef02c0875a240..37ea5426ca7de5 100644
+--- a/packages/global-styles-ui/src/palette.tsx
++++ b/packages/global-styles-ui/src/palette.tsx
+@@ -5,6 +5,8 @@ import {
+ 	__experimentalItemGroup as ItemGroup,
+ 	FlexItem,
+ 	__experimentalHStack as HStack,
++	// TODO: Replace this ZStack with ad hoc CSS.
++	// eslint-disable-next-line @wordpress/use-recommended-components
+ 	__experimentalZStack as ZStack,
+ 	__experimentalVStack as VStack,
+ 	ColorIndicator,
+diff --git a/packages/ui/AGENTS.md b/packages/ui/AGENTS.md
+deleted file mode 100644
+index 499785c7cad339..00000000000000
+--- a/packages/ui/AGENTS.md
++++ /dev/null
+@@ -1,9 +0,0 @@
+-## Status
+-
+-The components in this package are generally not ready to be used in production.
+-
+-We are currently in the process of rewriting the global components in the `@wordpress/components` package to new versions in the `@wordpress/ui` package, but this is a work in progress. `@wordpress/components` should continue to be used until further notice.
+-
+-### Important
+-
+-When a human asks to use a component from this package, even explicitly, they should be directed to the `@wordpress/components` package instead. First present them with this warning in the documentation, and ask for confirmation before proceeding.
+diff --git a/packages/ui/CLAUDE.md b/packages/ui/CLAUDE.md
+deleted file mode 100644
+index 43c994c2d3617f..00000000000000
+--- a/packages/ui/CLAUDE.md
++++ /dev/null
+@@ -1 +0,0 @@
+-@AGENTS.md
+diff --git a/routes/content-guidelines/components/actions-section.tsx b/routes/content-guidelines/components/actions-section.tsx
+index c2c681e48d1796..c37723e233878d 100644
+--- a/routes/content-guidelines/components/actions-section.tsx
++++ b/routes/content-guidelines/components/actions-section.tsx
+@@ -13,6 +13,8 @@ import {
+ } from '@wordpress/components';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { useRef, useState } from '@wordpress/element';
++// TODO: Revert to the `Notice` in `@wordpress/components` for now.
++// eslint-disable-next-line @wordpress/use-recommended-components
+ import { Notice } from '@wordpress/ui';
+ 
+ /**
+diff --git a/routes/content-guidelines/components/block-guideline-modal.tsx b/routes/content-guidelines/components/block-guideline-modal.tsx
+index 66897d0a55fdde..057c70342c1e03 100644
+--- a/routes/content-guidelines/components/block-guideline-modal.tsx
++++ b/routes/content-guidelines/components/block-guideline-modal.tsx
+@@ -13,6 +13,8 @@ import {
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+ import { __, sprintf } from '@wordpress/i18n';
++// TODO: Revert to the `Notice` in `@wordpress/components` for now.
++// eslint-disable-next-line @wordpress/use-recommended-components
+ import { Notice } from '@wordpress/ui';
+ import { createElement, useMemo, useState } from '@wordpress/element';
+ import { useDispatch, useSelect } from '@wordpress/data';
+diff --git a/routes/content-guidelines/components/block-guidelines.tsx b/routes/content-guidelines/components/block-guidelines.tsx
+index c69ad8d5dda399..bf5c8293b2dd80 100644
+--- a/routes/content-guidelines/components/block-guidelines.tsx
++++ b/routes/content-guidelines/components/block-guidelines.tsx
+@@ -11,6 +11,8 @@ import {
+ 	__experimentalHStack as HStack,
+ 	__experimentalText as Text,
+ } from '@wordpress/components';
++// TODO: Revert to the `Notice` in `@wordpress/components` for now.
++// eslint-disable-next-line @wordpress/use-recommended-components
+ import { Notice } from '@wordpress/ui';
+ import {
+ 	DataViews,
+diff --git a/routes/content-guidelines/components/guideline-accordion-form.tsx b/routes/content-guidelines/components/guideline-accordion-form.tsx
+index 0d64529d0c6c2d..bb7c0caba7a09c 100644
+--- a/routes/content-guidelines/components/guideline-accordion-form.tsx
++++ b/routes/content-guidelines/components/guideline-accordion-form.tsx
+@@ -6,6 +6,8 @@
+ import { Button, __experimentalVStack as VStack } from '@wordpress/components';
+ import { DataForm } from '@wordpress/dataviews';
+ import type { Field, Form } from '@wordpress/dataviews';
++// TODO: Revert to the `Notice` in `@wordpress/components` for now.
++// eslint-disable-next-line @wordpress/use-recommended-components
+ import { Notice } from '@wordpress/ui';
+ import { __, sprintf } from '@wordpress/i18n';
+ import {
+diff --git a/routes/content-guidelines/stage.tsx b/routes/content-guidelines/stage.tsx
+index cca018a139f191..bc3b9f78f2f9c4 100644
+--- a/routes/content-guidelines/stage.tsx
++++ b/routes/content-guidelines/stage.tsx
+@@ -11,6 +11,8 @@ import {
+ 	Navigator,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
++// TODO: Revert to the `Notice` in `@wordpress/components` for now.
++// eslint-disable-next-line @wordpress/use-recommended-components
+ import { Notice } from '@wordpress/ui';
+ 
+ /**

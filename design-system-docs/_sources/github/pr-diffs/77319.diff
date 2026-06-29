@@ -1,0 +1,45 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 8dd4a407d00c41..893bc2e8c48642 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ ### Internal
+ 
+ -   Extract shared `useScheduleValidation` hook; refactor `Dialog`, `Popover`, and `Tabs` validation contexts to use it ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
++-   `Tabs`: Wrap two validation timeout waits in `act(...)` to avoid intermittent test warnings ([#77319](https://github.com/WordPress/gutenberg/pull/77319)).
+ 
+ ## 0.11.0 (2026-04-15)
+ 
+diff --git a/packages/ui/src/tabs/test/index.test.tsx b/packages/ui/src/tabs/test/index.test.tsx
+index 0281f3ac14b7eb..bbf25a21fdde6c 100644
+--- a/packages/ui/src/tabs/test/index.test.tsx
++++ b/packages/ui/src/tabs/test/index.test.tsx
+@@ -1,5 +1,5 @@
+ /* eslint-disable jest/no-conditional-expect */
+-import { render, screen, waitFor } from '@testing-library/react';
++import { act, render, screen, waitFor } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ import { DirectionProvider } from '@base-ui/react/direction-provider';
+ import { useEffect, useState, createRef } from '@wordpress/element';
+@@ -2344,7 +2344,9 @@ describe( 'Tabs', () => {
+ 			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
+ 
+ 			// Wait a bit to ensure validation has run
+-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
++			await act(
++				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
++			);
+ 
+ 			expect( errors ).toHaveLength( 0 );
+ 
+@@ -2391,7 +2393,9 @@ describe( 'Tabs', () => {
+ 			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
+ 
+ 			// Wait for validation
+-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
++			await act(
++				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
++			);
+ 
+ 			// No errors since counts match
+ 			expect( errors ).toHaveLength( 0 );

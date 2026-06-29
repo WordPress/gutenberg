@@ -1,0 +1,875 @@
+diff --git a/packages/block-editor/src/hooks/position.js b/packages/block-editor/src/hooks/position.js
+index cfccb23663aa0d..640fda33d2c72b 100644
+--- a/packages/block-editor/src/hooks/position.js
++++ b/packages/block-editor/src/hooks/position.js
+@@ -296,7 +296,7 @@ export function PositionPanel( props ) {
+ 					>
+ 						<CustomSelectControl
+ 							__nextUnconstrainedWidth
+-							__next36pxDefaultSize
++							__next40pxDefaultSize
+ 							className="block-editor-hooks__position-selection__select-control"
+ 							label={ __( 'Position' ) }
+ 							hideLabelFromVision
+diff --git a/packages/block-library/src/rss/edit.js b/packages/block-library/src/rss/edit.js
+index d24de5c291d511..7c35d63f4fc894 100644
+--- a/packages/block-library/src/rss/edit.js
++++ b/packages/block-library/src/rss/edit.js
+@@ -69,7 +69,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
+ 					>
+ 						<HStack wrap>
+ 							<InputControl
+-								__next36pxDefaultSize
++								__next40pxDefaultSize
+ 								placeholder={ __( 'Enter URL here…' ) }
+ 								value={ feedURL }
+ 								onChange={ ( value ) =>
+@@ -77,7 +77,11 @@ export default function RSSEdit( { attributes, setAttributes } ) {
+ 								}
+ 								className="wp-block-rss__placeholder-input"
+ 							/>
+-							<Button variant="primary" type="submit">
++							<Button
++								__next40pxDefaultSize
++								variant="primary"
++								type="submit"
++							>
+ 								{ __( 'Use URL' ) }
+ 							</Button>
+ 						</HStack>
+diff --git a/packages/block-library/src/template-part/edit/import-controls.js b/packages/block-library/src/template-part/edit/import-controls.js
+index c8f4fbc2e647df..ca9708f65764b4 100644
+--- a/packages/block-library/src/template-part/edit/import-controls.js
++++ b/packages/block-library/src/template-part/edit/import-controls.js
+@@ -147,7 +147,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
+ 						options={ options }
+ 						onChange={ ( value ) => setSelectedSidebar( value ) }
+ 						disabled={ ! options.length }
+-						__next36pxDefaultSize
++						__next40pxDefaultSize
+ 						__nextHasNoMarginBottom
+ 					/>
+ 				</FlexBlock>
+@@ -158,6 +158,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
+ 					} }
+ 				>
+ 					<Button
++						__next40pxDefaultSize
+ 						variant="primary"
+ 						type="submit"
+ 						isBusy={ isBusy }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6f9291d27e1cdc..210a74d99f0efa 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `Button`: deprecating `isPressed` prop in favour of `aria-pressed` ([#54740](https://github.com/WordPress/gutenberg/pull/54740)).
+ -   `DuotonePicker/ColorListPicker`: Adds appropriate label and description to 'Duotone Filter' picker ([#54473](https://github.com/WordPress/gutenberg/pull/54473)).
+ -   `Modal`: Accessibly hide/show outer modal when nested ([#54743](https://github.com/WordPress/gutenberg/pull/54743)).
++-   `InputControl`, `NumberControl`, `UnitControl`, `SelectControl`, `CustomSelectControl`, `TreeSelect`: Add opt-in prop for next 40px default size, superseding the `__next36pxDefaultSize` prop ([#53819](https://github.com/WordPress/gutenberg/pull/53819)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index 10b9f0a307c010..ed9e73e525e449 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -21,6 +21,7 @@ import { Select as SelectControlSelect } from '../select-control/styles/select-c
+ import SelectControlChevronDown from '../select-control/chevron-down';
+ import { InputBaseWithBackCompatMinWidth } from './styles';
+ import { StyledLabel } from '../base-control/styles/base-control-styles';
++import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ 
+ const itemToString = ( item ) => item?.name;
+ // This is needed so that in Windows, where
+@@ -65,7 +66,7 @@ const stateReducer = (
+ export default function CustomSelectControl( props ) {
+ 	const {
+ 		/** Start opting into the larger default height that will become the default size in a future version. */
+-		__next36pxDefaultSize = false,
++		__next40pxDefaultSize = false,
+ 		/** Start opting into the unconstrained width that will become the default in a future version. */
+ 		__nextUnconstrainedWidth = false,
+ 		className,
+@@ -82,7 +83,11 @@ export default function CustomSelectControl( props ) {
+ 		onFocus,
+ 		onBlur,
+ 		__experimentalShowSelectedHint = false,
+-	} = props;
++	} = useDeprecated36pxDefaultSizeProp(
++		props,
++		'wp.components.CustomSelectControl',
++		'6.4'
++	);
+ 
+ 	const {
+ 		getLabelProps,
+@@ -180,7 +185,7 @@ export default function CustomSelectControl( props ) {
+ 				</StyledLabel>
+ 			) }
+ 			<InputBaseWithBackCompatMinWidth
+-				__next36pxDefaultSize={ __next36pxDefaultSize }
++				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 				__nextUnconstrainedWidth={ __nextUnconstrainedWidth }
+ 				isFocused={ isOpen || isFocused }
+ 				__unstableInputWidth={
+@@ -197,7 +202,7 @@ export default function CustomSelectControl( props ) {
+ 					onFocus={ handleOnFocus }
+ 					onBlur={ handleOnBlur }
+ 					selectSize={ size }
+-					__next36pxDefaultSize={ __next36pxDefaultSize }
++					__next40pxDefaultSize={ __next40pxDefaultSize }
+ 					{ ...getToggleButtonProps( {
+ 						// This is needed because some speech recognition software don't support `aria-labelledby`.
+ 						'aria-label': label,
+@@ -232,8 +237,8 @@ export default function CustomSelectControl( props ) {
+ 										'is-highlighted':
+ 											index === highlightedIndex,
+ 										'has-hint': !! item.__experimentalHint,
+-										'is-next-36px-default-size':
+-											__next36pxDefaultSize,
++										'is-next-40px-default-size':
++											__next40pxDefaultSize,
+ 									}
+ 								),
+ 								style: item.style,
+diff --git a/packages/components/src/custom-select-control/stories/index.story.js b/packages/components/src/custom-select-control/stories/index.story.js
+index f7075afb0026be..d8fea5c7baa003 100644
+--- a/packages/components/src/custom-select-control/stories/index.story.js
++++ b/packages/components/src/custom-select-control/stories/index.story.js
+@@ -7,7 +7,7 @@ export default {
+ 	title: 'Components/CustomSelectControl',
+ 	component: CustomSelectControl,
+ 	argTypes: {
+-		__next36pxDefaultSize: { control: { type: 'boolean' } },
++		__next40pxDefaultSize: { control: { type: 'boolean' } },
+ 		__experimentalShowSelectedHint: { control: { type: 'boolean' } },
+ 		size: {
+ 			options: [ 'small', 'default', '__unstable-large' ],
+diff --git a/packages/components/src/custom-select-control/style.scss b/packages/components/src/custom-select-control/style.scss
+index b231218ef4b611..06c912cd510f91 100644
+--- a/packages/components/src/custom-select-control/style.scss
++++ b/packages/components/src/custom-select-control/style.scss
+@@ -44,7 +44,7 @@
+ 	cursor: default;
+ 	line-height: $icon-size + $grid-unit-05;
+ 
+-	&:not(.is-next-36px-default-size) {
++	&:not(.is-next-40px-default-size) {
+ 		padding: $grid-unit-10;
+ 	}
+ 
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index 4821b71c3dd358..b0d8c20be74ac6 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
+ import BaseControl from '../../base-control';
+ import Button from '../../button';
+ import ButtonGroup from '../../button-group';
++import SelectControl from '../../select-control';
+ import TimeZone from './timezone';
+ import type { TimePickerProps } from '../types';
+ import {
+@@ -24,7 +25,6 @@ import {
+ 	TimeSeparator,
+ 	MinutesInput,
+ 	MonthSelectWrapper,
+-	MonthSelect,
+ 	DayInput,
+ 	YearInput,
+ 	TimeWrapper,
+@@ -181,7 +181,7 @@ export function TimePicker( {
+ 			className="components-datetime__time-field components-datetime__time-field-day" // Unused, for backwards compatibility.
+ 			label={ __( 'Day' ) }
+ 			hideLabelFromVision
+-			__next36pxDefaultSize
++			__next40pxDefaultSize
+ 			value={ day }
+ 			step={ 1 }
+ 			min={ 1 }
+@@ -197,10 +197,11 @@ export function TimePicker( {
+ 
+ 	const monthField = (
+ 		<MonthSelectWrapper>
+-			<MonthSelect
++			<SelectControl
+ 				className="components-datetime__time-field components-datetime__time-field-month" // Unused, for backwards compatibility.
+ 				label={ __( 'Month' ) }
+ 				hideLabelFromVision
++				__next40pxDefaultSize
+ 				__nextHasNoMarginBottom
+ 				value={ month }
+ 				options={ [
+@@ -247,7 +248,7 @@ export function TimePicker( {
+ 							className="components-datetime__time-field-hours-input" // Unused, for backwards compatibility.
+ 							label={ __( 'Hours' ) }
+ 							hideLabelFromVision
+-							__next36pxDefaultSize
++							__next40pxDefaultSize
+ 							value={ hours }
+ 							step={ 1 }
+ 							min={ is12Hour ? 1 : 0 }
+@@ -274,7 +275,7 @@ export function TimePicker( {
+ 							className="components-datetime__time-field-minutes-input" // Unused, for backwards compatibility.
+ 							label={ __( 'Minutes' ) }
+ 							hideLabelFromVision
+-							__next36pxDefaultSize
++							__next40pxDefaultSize
+ 							value={ minutes }
+ 							step={ 1 }
+ 							min={ 0 }
+@@ -301,6 +302,7 @@ export function TimePicker( {
+ 								variant={
+ 									am === 'AM' ? 'primary' : 'secondary'
+ 								}
++								__next40pxDefaultSize
+ 								onClick={ buildAmPmChangeCallback( 'AM' ) }
+ 							>
+ 								{ __( 'AM' ) }
+@@ -310,6 +312,7 @@ export function TimePicker( {
+ 								variant={
+ 									am === 'PM' ? 'primary' : 'secondary'
+ 								}
++								__next40pxDefaultSize
+ 								onClick={ buildAmPmChangeCallback( 'PM' ) }
+ 							>
+ 								{ __( 'PM' ) }
+@@ -345,7 +348,7 @@ export function TimePicker( {
+ 						className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
+ 						label={ __( 'Year' ) }
+ 						hideLabelFromVision
+-						__next36pxDefaultSize
++						__next40pxDefaultSize
+ 						value={ year }
+ 						step={ 1 }
+ 						min={ 1 }
+diff --git a/packages/components/src/date-time/time/styles.ts b/packages/components/src/date-time/time/styles.ts
+index bc579a6731ee98..1aa273aab304c7 100644
+--- a/packages/components/src/date-time/time/styles.ts
++++ b/packages/components/src/date-time/time/styles.ts
+@@ -14,8 +14,6 @@ import {
+ 	BackdropUI,
+ } from '../../input-control/styles/input-control-styles';
+ import NumberControl from '../../number-control';
+-import SelectControl from '../../select-control';
+-import { Select } from '../../select-control/styles/select-control-styles';
+ 
+ export const Wrapper = styled.div`
+ 	box-sizing: border-box;
+@@ -92,14 +90,6 @@ export const MonthSelectWrapper = styled.div`
+ 	flex-grow: 1;
+ `;
+ 
+-export const MonthSelect = styled( SelectControl )`
+-	height: 36px;
+-
+-	${ Select } {
+-		line-height: 30px;
+-	}
+-`;
+-
+ export const DayInput = styled( NumberControl )`
+ 	${ baseInput }
+ 
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index b1586995caa54e..41afdd3e40d5ed 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -19,6 +19,7 @@ import type { InputControlProps } from './types';
+ import { space } from '../ui/utils/space';
+ import { useDraft } from './utils';
+ import BaseControl from '../base-control';
++import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ 
+ const noop = () => {};
+ 
+@@ -30,8 +31,11 @@ function useUniqueId( idProp?: string ) {
+ }
+ 
+ export function UnforwardedInputControl(
+-	{
+-		__next36pxDefaultSize,
++	props: InputControlProps,
++	ref: ForwardedRef< HTMLInputElement >
++) {
++	const {
++		__next40pxDefaultSize,
+ 		__unstableStateReducer: stateReducer = ( state ) => state,
+ 		__unstableInputWidth,
+ 		className,
+@@ -50,10 +54,13 @@ export function UnforwardedInputControl(
+ 		style,
+ 		suffix,
+ 		value,
+-		...props
+-	}: InputControlProps,
+-	ref: ForwardedRef< HTMLInputElement >
+-) {
++		...restProps
++	} = useDeprecated36pxDefaultSizeProp< InputControlProps >(
++		props,
++		'wp.components.InputControl',
++		'6.4'
++	);
++
+ 	const [ isFocused, setIsFocused ] = useState( false );
+ 
+ 	const id = useUniqueId( idProp );
+@@ -61,7 +68,7 @@ export function UnforwardedInputControl(
+ 
+ 	const draftHookProps = useDraft( {
+ 		value,
+-		onBlur: props.onBlur,
++		onBlur: restProps.onBlur,
+ 		onChange,
+ 	} );
+ 
+@@ -78,7 +85,7 @@ export function UnforwardedInputControl(
+ 			__nextHasNoMarginBottom
+ 		>
+ 			<InputBase
+-				__next36pxDefaultSize={ __next36pxDefaultSize }
++				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 				__unstableInputWidth={ __unstableInputWidth }
+ 				disabled={ disabled }
+ 				gap={ 3 }
+@@ -94,9 +101,9 @@ export function UnforwardedInputControl(
+ 				suffix={ suffix }
+ 			>
+ 				<InputField
+-					{ ...props }
++					{ ...restProps }
+ 					{ ...helpProp }
+-					__next36pxDefaultSize={ __next36pxDefaultSize }
++					__next40pxDefaultSize={ __next40pxDefaultSize }
+ 					className="components-input-control__input"
+ 					disabled={ disabled }
+ 					id={ id }
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index 03adfec1b07ab3..64544971840b34 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -24,6 +24,7 @@ import {
+ import type { InputBaseProps, LabelPosition } from './types';
+ import type { WordPressComponentProps } from '../context';
+ import { ContextSystemProvider } from '../context';
++import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ 
+ function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( InputBase );
+@@ -60,8 +61,11 @@ function getUIFlexProps( labelPosition?: LabelPosition ) {
+ }
+ 
+ export function InputBase(
+-	{
+-		__next36pxDefaultSize,
++	props: WordPressComponentProps< InputBaseProps, 'div' >,
++	ref: ForwardedRef< HTMLDivElement >
++) {
++	const {
++		__next40pxDefaultSize,
+ 		__unstableInputWidth,
+ 		children,
+ 		className,
+@@ -74,16 +78,19 @@ export function InputBase(
+ 		prefix,
+ 		size = 'default',
+ 		suffix,
+-		...props
+-	}: WordPressComponentProps< InputBaseProps, 'div' >,
+-	ref: ForwardedRef< HTMLDivElement >
+-) {
++		...restProps
++	} = useDeprecated36pxDefaultSizeProp(
++		props,
++		'wp.components.InputBase',
++		'6.4'
++	);
++
+ 	const id = useUniqueId( idProp );
+ 	const hideLabel = hideLabelFromVision || ! label;
+ 
+ 	const { paddingLeft, paddingRight } = getSizeConfig( {
+ 		inputSize: size,
+-		__next36pxDefaultSize,
++		__next40pxDefaultSize,
+ 	} );
+ 	const prefixSuffixContextValue = useMemo( () => {
+ 		return {
+@@ -95,7 +102,7 @@ export function InputBase(
+ 	return (
+ 		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
+ 		<Root
+-			{ ...props }
++			{ ...restProps }
+ 			{ ...getUIFlexProps( labelPosition ) }
+ 			className={ className }
+ 			gap={ 2 }
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 1f3e16f9dde406..37e79d5b254f83 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -80,7 +80,7 @@ export const Container = styled.div< ContainerProps >`
+ `;
+ 
+ type InputProps = {
+-	__next36pxDefaultSize?: boolean;
++	__next40pxDefaultSize?: boolean;
+ 	disabled?: boolean;
+ 	inputSize?: Size;
+ 	isDragging?: boolean;
+@@ -120,14 +120,14 @@ const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
+ 
+ export const getSizeConfig = ( {
+ 	inputSize: size,
+-	__next36pxDefaultSize,
++	__next40pxDefaultSize,
+ }: InputProps ) => {
+ 	// Paddings may be overridden by the custom paddings props.
+ 	const sizes = {
+ 		default: {
+-			height: 36,
++			height: 40,
+ 			lineHeight: 1,
+-			minHeight: 36,
++			minHeight: 40,
+ 			paddingLeft: space( 4 ),
+ 			paddingRight: space( 4 ),
+ 		},
+@@ -147,7 +147,7 @@ export const getSizeConfig = ( {
+ 		},
+ 	};
+ 
+-	if ( ! __next36pxDefaultSize ) {
++	if ( ! __next40pxDefaultSize ) {
+ 		sizes.default = {
+ 			height: 30,
+ 			lineHeight: 1,
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index 44c791f263e46e..a804efadd89d38 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -27,11 +27,18 @@ export type Size = 'default' | 'small' | '__unstable-large';
+ 
+ interface BaseProps {
+ 	/**
+-	 * Start opting into the larger default height that will become the default size in a future version.
++	 * Deprecated. Use `__next40pxDefaultSize` instead.
+ 	 *
+ 	 * @default false
++	 * @deprecated
+ 	 */
+ 	__next36pxDefaultSize?: boolean;
++	/**
++	 * Start opting into the larger default height that will become the default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next40pxDefaultSize?: boolean;
+ 	__unstableInputWidth?: CSSProperties[ 'width' ];
+ 	/**
+ 	 * If true, the label will only be visible to screen readers.
+@@ -66,7 +73,8 @@ export type InputChangeCallback< P = {} > = (
+ 	extra: { event: SyntheticEvent } & P
+ ) => void;
+ 
+-export interface InputFieldProps extends BaseProps {
++export interface InputFieldProps
++	extends Omit< BaseProps, '__next36pxDefaultSize' > {
+ 	/**
+ 	 * Determines the drag axis.
+ 	 *
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index e0a09ec06a8295..fce0a7f76f49ed 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -25,16 +25,20 @@ import type { NumberControlProps } from './types';
+ import { HStack } from '../h-stack';
+ import { Spacer } from '../spacer';
+ import { useCx } from '../utils';
++import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ 
+ const noop = () => {};
+ 
+ function UnforwardedNumberControl(
+-	{
++	props: WordPressComponentProps< NumberControlProps, 'input', false >,
++	forwardedRef: ForwardedRef< any >
++) {
++	const {
+ 		__unstableStateReducer: stateReducerProp,
+ 		className,
+ 		dragDirection = 'n',
+ 		hideHTMLArrows = false,
+-		spinControls = 'native',
++		spinControls = hideHTMLArrows ? 'none' : 'native',
+ 		isDragEnabled = true,
+ 		isShiftStepEnabled = true,
+ 		label,
+@@ -49,17 +53,19 @@ function UnforwardedNumberControl(
+ 		size = 'default',
+ 		suffix,
+ 		onChange = noop,
+-		...props
+-	}: WordPressComponentProps< NumberControlProps, 'input', false >,
+-	forwardedRef: ForwardedRef< any >
+-) {
++		...restProps
++	} = useDeprecated36pxDefaultSizeProp< NumberControlProps >(
++		props,
++		'wp.components.NumberControl',
++		'6.4'
++	);
++
+ 	if ( hideHTMLArrows ) {
+ 		deprecated( 'wp.components.NumberControl hideHTMLArrows prop ', {
+ 			alternative: 'spinControls="none"',
+ 			since: '6.2',
+ 			version: '6.3',
+ 		} );
+-		spinControls = 'none';
+ 	}
+ 	const inputRef = useRef< HTMLInputElement >();
+ 	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
+@@ -212,7 +218,7 @@ function UnforwardedNumberControl(
+ 		<Input
+ 			autoComplete={ autoComplete }
+ 			inputMode="numeric"
+-			{ ...props }
++			{ ...restProps }
+ 			className={ classes }
+ 			dragDirection={ dragDirection }
+ 			hideHTMLArrows={ spinControls !== 'native' }
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index c7408ea26f18a2..9c6ce0aba5d27e 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -18,6 +18,7 @@ import { Select } from './styles/select-control-styles';
+ import type { WordPressComponentProps } from '../context';
+ import type { SelectControlProps } from './types';
+ import SelectControlChevronDown from './chevron-down';
++import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ 
+ const noop = () => {};
+ 
+@@ -50,10 +51,14 @@ function UnforwardedSelectControl(
+ 		children,
+ 		prefix,
+ 		suffix,
+-		__next36pxDefaultSize = false,
++		__next40pxDefaultSize = false,
+ 		__nextHasNoMarginBottom = false,
+ 		...restProps
+-	} = props;
++	} = useDeprecated36pxDefaultSizeProp(
++		props,
++		'wp.components.SelectControl',
++		'6.4'
++	);
+ 	const [ isFocused, setIsFocused ] = useState( false );
+ 	const id = useUniqueId( idProp );
+ 	const helpId = help ? `${ id }__help` : undefined;
+@@ -107,11 +112,11 @@ function UnforwardedSelectControl(
+ 				}
+ 				prefix={ prefix }
+ 				labelPosition={ labelPosition }
+-				__next36pxDefaultSize={ __next36pxDefaultSize }
++				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 			>
+ 				<Select
+ 					{ ...restProps }
+-					__next36pxDefaultSize={ __next36pxDefaultSize }
++					__next40pxDefaultSize={ __next40pxDefaultSize }
+ 					aria-describedby={ helpId }
+ 					className="components-select-control__input"
+ 					disabled={ disabled }
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index 2374015d747faf..c4b9088bbbcf93 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -15,7 +15,7 @@ import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper'
+ interface SelectProps
+ 	extends Pick<
+ 		SelectControlProps,
+-		'__next36pxDefaultSize' | 'disabled' | 'multiple'
++		'__next40pxDefaultSize' | 'disabled' | 'multiple'
+ 	> {
+ 	// Using `selectSize` instead of `size` to avoid a type conflict with the
+ 	// `size` HTML attribute of the `select` element.
+@@ -52,7 +52,7 @@ const fontSizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
+ };
+ 
+ const sizeStyles = ( {
+-	__next36pxDefaultSize,
++	__next40pxDefaultSize,
+ 	multiple,
+ 	selectSize = 'default',
+ }: SelectProps ) => {
+@@ -64,8 +64,8 @@ const sizeStyles = ( {
+ 
+ 	const sizes = {
+ 		default: {
+-			height: 36,
+-			minHeight: 36,
++			height: 40,
++			minHeight: 40,
+ 			paddingTop: 0,
+ 			paddingBottom: 0,
+ 		},
+@@ -83,7 +83,7 @@ const sizeStyles = ( {
+ 		},
+ 	};
+ 
+-	if ( ! __next36pxDefaultSize ) {
++	if ( ! __next40pxDefaultSize ) {
+ 		sizes.default = {
+ 			height: 30,
+ 			minHeight: 30,
+@@ -100,7 +100,7 @@ const sizeStyles = ( {
+ export const chevronIconSize = 18;
+ 
+ const sizePaddings = ( {
+-	__next36pxDefaultSize,
++	__next40pxDefaultSize,
+ 	multiple,
+ 	selectSize = 'default',
+ }: SelectProps ) => {
+@@ -110,7 +110,7 @@ const sizePaddings = ( {
+ 		'__unstable-large': 16,
+ 	};
+ 
+-	if ( ! __next36pxDefaultSize ) {
++	if ( ! __next40pxDefaultSize ) {
+ 		padding.default = 8;
+ 	}
+ 
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+index a5699bc7f5e04e..b8ec42cc4b72f2 100644
+--- a/packages/components/src/select-control/types.ts
++++ b/packages/components/src/select-control/types.ts
+@@ -12,6 +12,7 @@ import type { BaseControlProps } from '../base-control/types';
+ type SelectControlBaseProps = Pick<
+ 	InputBaseProps,
+ 	| '__next36pxDefaultSize'
++	| '__next40pxDefaultSize'
+ 	| 'disabled'
+ 	| 'hideLabelFromVision'
+ 	| 'label'
+diff --git a/packages/components/src/tree-select/index.tsx b/packages/components/src/tree-select/index.tsx
+index dbb8686df4d29d..6b7b61b7487a23 100644
+--- a/packages/components/src/tree-select/index.tsx
++++ b/packages/components/src/tree-select/index.tsx
+@@ -9,6 +9,7 @@ import { decodeEntities } from '@wordpress/html-entities';
+  */
+ import { SelectControl } from '../select-control';
+ import type { TreeSelectProps, Tree, Truthy } from './types';
++import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ 
+ function getSelectOptions(
+ 	tree: Tree[],
+@@ -72,14 +73,20 @@ function getSelectOptions(
+  * ```
+  */
+ 
+-export function TreeSelect( {
+-	label,
+-	noOptionLabel,
+-	onChange,
+-	selectedId,
+-	tree = [],
+-	...props
+-}: TreeSelectProps ) {
++export function TreeSelect( props: TreeSelectProps ) {
++	const {
++		label,
++		noOptionLabel,
++		onChange,
++		selectedId,
++		tree = [],
++		...restProps
++	} = useDeprecated36pxDefaultSizeProp(
++		props,
++		'wp.components.TreeSelect',
++		'6.4'
++	);
++
+ 	const options = useMemo( () => {
+ 		return [
+ 			noOptionLabel && { value: '', label: noOptionLabel },
+@@ -91,7 +98,7 @@ export function TreeSelect( {
+ 		<SelectControl
+ 			{ ...{ label, options, onChange } }
+ 			value={ selectedId }
+-			{ ...props }
++			{ ...restProps }
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 24b849199946db..cc657f5fd67f40 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -26,6 +26,7 @@ import {
+ import { useControlledState } from '../utils/hooks';
+ import { escapeRegExp } from '../utils/strings';
+ import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
++import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ 
+ function UnforwardedUnitControl(
+ 	unitControlProps: WordPressComponentProps<
+@@ -55,7 +56,11 @@ function UnforwardedUnitControl(
+ 		value: valueProp,
+ 		onFocus: onFocusProp,
+ 		...props
+-	} = unitControlProps;
++	} = useDeprecated36pxDefaultSizeProp(
++		unitControlProps,
++		'wp.components.UnitControl',
++		'6.4'
++	);
+ 
+ 	if ( 'unit' in unitControlProps ) {
+ 		deprecated( 'UnitControl unit prop', {
+@@ -182,7 +187,12 @@ function UnforwardedUnitControl(
+ 			disabled={ disabled }
+ 			isUnitSelectTabbable={ isUnitSelectTabbable }
+ 			onChange={ handleOnUnitChange }
+-			size={ size }
++			size={
++				size === 'small' ||
++				( size === 'default' && ! props.__next40pxDefaultSize )
++					? 'small'
++					: 'default'
++			}
+ 			unit={ unit }
+ 			units={ units }
+ 			onFocus={ onFocusProp }
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.ts b/packages/components/src/unit-control/styles/unit-control-styles.ts
+index 92b1f5f2fd8b4e..5ff1fa9a3ef00b 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.ts
++++ b/packages/components/src/unit-control/styles/unit-control-styles.ts
+@@ -36,7 +36,7 @@ export const ValueInput = styled( NumberControl )`
+ 
+ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
+ 	const sizes = {
+-		default: css`
++		small: css`
+ 			box-sizing: border-box;
+ 			padding: 2px 1px;
+ 			width: 20px;
+@@ -47,7 +47,7 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
+ 			text-transform: uppercase;
+ 			text-align-last: center;
+ 		`,
+-		large: css`
++		default: css`
+ 			box-sizing: border-box;
+ 			min-width: 24px;
+ 			max-width: 48px;
+@@ -64,7 +64,7 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
+ 		`,
+ 	};
+ 
+-	return selectSize === '__unstable-large' ? sizes.large : sizes.default;
++	return sizes[ selectSize ];
+ };
+ 
+ export const UnitLabel = styled.div< SelectProps >`
+@@ -79,7 +79,7 @@ export const UnitLabel = styled.div< SelectProps >`
+ 
+ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
+ 	const sizes = {
+-		default: css`
++		small: css`
+ 			height: 100%;
+ 			border: 1px solid transparent;
+ 			transition:
+@@ -101,7 +101,7 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
+ 				z-index: 1;
+ 			}
+ 		`,
+-		large: css`
++		default: css`
+ 			display: flex;
+ 			justify-content: center;
+ 			align-items: center;
+@@ -121,7 +121,7 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
+ 		`,
+ 	};
+ 
+-	return selectSize === '__unstable-large' ? sizes.large : sizes.default;
++	return sizes[ selectSize ];
+ };
+ 
+ export const UnitSelect = styled.select< SelectProps >`
+diff --git a/packages/components/src/unit-control/types.ts b/packages/components/src/unit-control/types.ts
+index f97d168e7f10ee..9164502668a2b0 100644
+--- a/packages/components/src/unit-control/types.ts
++++ b/packages/components/src/unit-control/types.ts
+@@ -9,11 +9,10 @@ import type { FocusEventHandler } from 'react';
+ import type {
+ 	InputChangeCallback,
+ 	InputControlProps,
+-	Size as InputSize,
+ } from '../input-control/types';
+ import type { NumberControlProps } from '../number-control/types';
+ 
+-export type SelectSize = InputSize;
++export type SelectSize = 'default' | 'small';
+ 
+ export type WPUnitControlUnit = {
+ 	/**
+@@ -42,7 +41,7 @@ export type UnitControlOnChangeCallback = InputChangeCallback< {
+ 	data?: WPUnitControlUnit;
+ } >;
+ 
+-export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
++export type UnitSelectControlProps = {
+ 	/**
+ 	 * Whether the control can be focused via keyboard navigation.
+ 	 *
+@@ -53,6 +52,10 @@ export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
+ 	 * A callback function invoked when the value is changed.
+ 	 */
+ 	onChange?: UnitControlOnChangeCallback;
++	/**
++	 * The size of the unit select.
++	 */
++	size?: SelectSize;
+ 	/**
+ 	 * Current unit.
+ 	 */
+@@ -65,7 +68,8 @@ export type UnitSelectControlProps = Pick< InputControlProps, 'size' > & {
+ 	units?: WPUnitControlUnit[];
+ };
+ 
+-export type UnitControlProps = Omit< UnitSelectControlProps, 'unit' > &
++export type UnitControlProps = Pick< InputControlProps, 'size' > &
++	Omit< UnitSelectControlProps, 'size' | 'unit' > &
+ 	Omit< NumberControlProps, 'spinControls' | 'suffix' | 'type' > & {
+ 		/**
+ 		 * If `true`, the unit `<select>` is hidden.
+diff --git a/packages/components/src/utils/use-deprecated-props.ts b/packages/components/src/utils/use-deprecated-props.ts
+index 8c102906970d0e..6df8e25303738c 100644
+--- a/packages/components/src/utils/use-deprecated-props.ts
++++ b/packages/components/src/utils/use-deprecated-props.ts
+@@ -11,14 +11,16 @@ export function useDeprecated36pxDefaultSizeProp<
+ >(
+ 	props: P,
+ 	/** The component identifier in dot notation, e.g. `wp.components.ComponentName`. */
+-	componentIdentifier: string
++	componentIdentifier: string,
++	/** Version in which the prop was deprecated. */
++	since: string = '6.3'
+ ) {
+ 	const { __next36pxDefaultSize, __next40pxDefaultSize, ...otherProps } =
+ 		props;
+ 	if ( typeof __next36pxDefaultSize !== 'undefined' ) {
+ 		deprecated( '`__next36pxDefaultSize` prop in ' + componentIdentifier, {
+ 			alternative: '`__next40pxDefaultSize`',
+-			since: '6.3',
++			since,
+ 		} );
+ 	}
+ 

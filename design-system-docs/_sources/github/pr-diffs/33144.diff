@@ -1,0 +1,798 @@
+diff --git a/packages/components/src/card/card-body/component.js b/packages/components/src/card/card-body/component.js
+index 455ddc85ef5b20..e34c44df1c66d1 100644
+--- a/packages/components/src/card/card-body/component.js
++++ b/packages/components/src/card/card-body/component.js
+@@ -3,8 +3,8 @@
+  */
+ import { contextConnect } from '../../ui/context';
+ import { Scrollable } from '../../scrollable';
+-import { View } from '../../view';
+ import { useCardBody } from './hook';
++import { CardBodyView } from '../styles';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').BodyProps, 'div'>} props
+@@ -14,10 +14,16 @@ function CardBody( props, forwardedRef ) {
+ 	const { isScrollable, ...otherProps } = useCardBody( props );
+ 
+ 	if ( isScrollable ) {
+-		return <Scrollable { ...otherProps } ref={ forwardedRef } />;
++		return (
++			<Scrollable
++				as={ CardBodyView }
++				{ ...otherProps }
++				ref={ forwardedRef }
++			/>
++		);
+ 	}
+ 
+-	return <View { ...otherProps } ref={ forwardedRef } />;
++	return <CardBodyView { ...otherProps } ref={ forwardedRef } />;
+ }
+ 
+ /**
+diff --git a/packages/components/src/card/card-body/hook.js b/packages/components/src/card/card-body/hook.js
+index 3de530b38017b0..6f8a7824f16f93 100644
+--- a/packages/components/src/card/card-body/hook.js
++++ b/packages/components/src/card/card-body/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -15,7 +7,7 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { useContextSystem } from '../../ui/context';
+-import * as styles from '../styles';
++import { cx } from '../../utils';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').BodyProps, 'div'>} props
+@@ -32,10 +24,6 @@ export function useCardBody( props ) {
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+-				styles.Body,
+-				styles.borderRadius,
+-				styles.cardPaddings[ size ],
+-				isShady && styles.shady,
+ 				// This classname is added for legacy compatibility reasons.
+ 				'components-card__body',
+ 				className
+@@ -47,5 +35,7 @@ export function useCardBody( props ) {
+ 		...otherProps,
+ 		className: classes,
+ 		isScrollable,
++		isShady,
++		size,
+ 	};
+ }
+diff --git a/packages/components/src/card/card-divider/component.js b/packages/components/src/card/card-divider/component.js
+index d3cce90bc02ba0..3ba945bbddc04e 100644
+--- a/packages/components/src/card/card-divider/component.js
++++ b/packages/components/src/card/card-divider/component.js
+@@ -2,8 +2,8 @@
+  * Internal dependencies
+  */
+ import { contextConnect } from '../../ui/context';
+-import { Divider } from '../../divider';
+ import { useCardDivider } from './hook';
++import { CardDividerView } from '../styles';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr', false>} props
+@@ -12,7 +12,7 @@ import { useCardDivider } from './hook';
+ function CardDivider( props, forwardedRef ) {
+ 	const dividerProps = useCardDivider( props );
+ 
+-	return <Divider { ...dividerProps } ref={ forwardedRef } />;
++	return <CardDividerView { ...dividerProps } ref={ forwardedRef } />;
+ }
+ 
+ /**
+diff --git a/packages/components/src/card/card-divider/hook.js b/packages/components/src/card/card-divider/hook.js
+index 3f05de00abc04e..1bcc9c173bd2da 100644
+--- a/packages/components/src/card/card-divider/hook.js
++++ b/packages/components/src/card/card-divider/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -15,7 +7,7 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { useContextSystem } from '../../ui/context';
+-import * as styles from '../styles';
++import { cx } from '../../utils';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr', false>} props
+@@ -29,8 +21,6 @@ export function useCardDivider( props ) {
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+-				styles.Divider,
+-				styles.borderColor,
+ 				// This classname is added for legacy compatibility reasons.
+ 				'components-card__divider',
+ 				className
+diff --git a/packages/components/src/card/card-footer/component.js b/packages/components/src/card/card-footer/component.js
+index b5ef215eb3964a..98867143a42888 100644
+--- a/packages/components/src/card/card-footer/component.js
++++ b/packages/components/src/card/card-footer/component.js
+@@ -2,8 +2,8 @@
+  * Internal dependencies
+  */
+ import { contextConnect } from '../../ui/context';
+-import { Flex } from '../../flex';
+ import { useCardFooter } from './hook';
++import { CardFooterView } from '../styles';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FooterProps, 'div'>} props
+@@ -12,7 +12,7 @@ import { useCardFooter } from './hook';
+ function CardFooter( props, forwardedRef ) {
+ 	const footerProps = useCardFooter( props );
+ 
+-	return <Flex { ...footerProps } ref={ forwardedRef } />;
++	return <CardFooterView { ...footerProps } ref={ forwardedRef } />;
+ }
+ 
+ /**
+diff --git a/packages/components/src/card/card-footer/hook.js b/packages/components/src/card/card-footer/hook.js
+index bc1345ddff1105..803a6c79d291e7 100644
+--- a/packages/components/src/card/card-footer/hook.js
++++ b/packages/components/src/card/card-footer/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -15,7 +7,7 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { useContextSystem } from '../../ui/context';
+-import * as styles from '../styles';
++import { cx } from '../../utils';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FooterProps, 'div'>} props
+@@ -33,22 +25,19 @@ export function useCardFooter( props ) {
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+-				styles.Footer,
+-				styles.borderRadius,
+-				styles.borderColor,
+-				styles.cardPaddings[ size ],
+-				isBorderless && styles.borderless,
+-				isShady && styles.shady,
+ 				// This classname is added for legacy compatibility reasons.
+ 				'components-card__footer',
+ 				className
+ 			),
+-		[ className, isBorderless, isShady, size ]
++		[ className ]
+ 	);
+ 
+ 	return {
+ 		...otherProps,
+ 		className: classes,
+ 		justify,
++		isBorderless,
++		isShady,
++		size,
+ 	};
+ }
+diff --git a/packages/components/src/card/card-header/component.js b/packages/components/src/card/card-header/component.js
+index 621448d82856a1..17bd1614e28732 100644
+--- a/packages/components/src/card/card-header/component.js
++++ b/packages/components/src/card/card-header/component.js
+@@ -2,8 +2,8 @@
+  * Internal dependencies
+  */
+ import { contextConnect } from '../../ui/context';
+-import { Flex } from '../../flex';
+ import { useCardHeader } from './hook';
++import { CardHeaderView } from '../styles';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').HeaderProps, 'div'>} props
+@@ -12,7 +12,7 @@ import { useCardHeader } from './hook';
+ function CardHeader( props, forwardedRef ) {
+ 	const headerProps = useCardHeader( props );
+ 
+-	return <Flex { ...headerProps } ref={ forwardedRef } />;
++	return <CardHeaderView { ...headerProps } ref={ forwardedRef } />;
+ }
+ 
+ /**
+diff --git a/packages/components/src/card/card-header/hook.js b/packages/components/src/card/card-header/hook.js
+index fa046ec316142b..14f65d47c9a290 100644
+--- a/packages/components/src/card/card-header/hook.js
++++ b/packages/components/src/card/card-header/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -15,7 +7,7 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { useContextSystem } from '../../ui/context';
+-import * as styles from '../styles';
++import { cx } from '../../utils';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').HeaderProps, 'div'>} props
+@@ -32,12 +24,6 @@ export function useCardHeader( props ) {
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+-				styles.Header,
+-				styles.borderRadius,
+-				styles.borderColor,
+-				styles.cardPaddings[ size ],
+-				isBorderless && styles.borderless,
+-				isShady && styles.shady,
+ 				// This classname is added for legacy compatibility reasons.
+ 				'components-card__header',
+ 				className
+@@ -48,5 +34,8 @@ export function useCardHeader( props ) {
+ 	return {
+ 		...otherProps,
+ 		className: classes,
++		isBorderless,
++		isShady,
++		size,
+ 	};
+ }
+diff --git a/packages/components/src/card/card-media/component.js b/packages/components/src/card/card-media/component.js
+index 3c562604eb964b..f7cc29f01f729c 100644
+--- a/packages/components/src/card/card-media/component.js
++++ b/packages/components/src/card/card-media/component.js
+@@ -1,9 +1,21 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../../ui/utils';
++import { contextConnect } from '../../ui/context';
++import { CardMediaView } from '../styles';
+ import { useCardMedia } from './hook';
+ 
++/**
++ *
++ * @param {import('../../ui/context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
++ * @param {import('react').Ref<any>}                                                                             forwardedRef
++ */
++function CardMedia( props, forwardedRef ) {
++	const contextProps = useCardMedia( props );
++
++	return <CardMediaView ref={ forwardedRef } { ...contextProps } />;
++}
++
+ /**
+  * `CardMedia` provides a container for media elements within a `Card`.
+  *
+@@ -21,10 +33,6 @@ import { useCardMedia } from './hook';
+  * );
+  * ```
+  */
+-const CardMedia = createComponent( {
+-	as: 'div',
+-	useHook: useCardMedia,
+-	name: 'CardMedia',
+-} );
++const ConnectedCardMedia = contextConnect( CardMedia, 'CardMedia' );
+ 
+-export default CardMedia;
++export default ConnectedCardMedia;
+diff --git a/packages/components/src/card/card-media/hook.js b/packages/components/src/card/card-media/hook.js
+index c0ade5fa2ffc26..5665325b46f87c 100644
+--- a/packages/components/src/card/card-media/hook.js
++++ b/packages/components/src/card/card-media/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -15,7 +7,7 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { useContextSystem } from '../../ui/context';
+-import * as styles from '../styles';
++import { cx } from '../../utils';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+@@ -26,8 +18,6 @@ export function useCardMedia( props ) {
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+-				styles.Media,
+-				styles.borderRadius,
+ 				// This classname is added for legacy compatibility reasons.
+ 				'components-card__media',
+ 				className
+diff --git a/packages/components/src/card/card/component.js b/packages/components/src/card/card/component.js
+index f49f67128883b5..c656cd9d30bd0b 100644
+--- a/packages/components/src/card/card/component.js
++++ b/packages/components/src/card/card/component.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -16,31 +8,17 @@ import { useMemo } from '@wordpress/element';
+  */
+ import { contextConnect, ContextSystemProvider } from '../../ui/context';
+ import { Elevation } from '../../elevation';
+-import { View } from '../../view';
+-import * as styles from '../styles';
++import { CardView, CardContentView } from '../styles';
+ import { useCard } from './hook';
+-import CONFIG from '../../utils/config-values';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
+  * @param {import('react').Ref<any>}                                                              forwardedRef
+  */
+ function Card( props, forwardedRef ) {
+-	const {
+-		children,
+-		elevation,
+-		isBorderless,
+-		isRounded,
+-		size,
+-		...otherProps
+-	} = useCard( props );
+-	const elevationBorderRadius = isRounded ? CONFIG.cardBorderRadius : 0;
+-
+-	const elevationClassName = useMemo(
+-		() => css( { borderRadius: elevationBorderRadius } ),
+-		[ elevationBorderRadius ]
++	const { children, elevation, isBorderless, size, ...otherProps } = useCard(
++		props
+ 	);
+-
+ 	const contextProviderValue = useMemo( () => {
+ 		const contextProps = {
+ 			size,
+@@ -55,19 +33,18 @@ function Card( props, forwardedRef ) {
+ 
+ 	return (
+ 		<ContextSystemProvider value={ contextProviderValue }>
+-			<View { ...otherProps } ref={ forwardedRef }>
+-				<View className={ styles.Content }>{ children }</View>
++			<CardView
++				isBorderless={ isBorderless }
++				{ ...otherProps }
++				ref={ forwardedRef }
++			>
++				<CardContentView>{ children }</CardContentView>
+ 				<Elevation
+-					className={ elevationClassName }
+ 					isInteractive={ false }
+ 					value={ elevation ? 1 : 0 }
+ 				/>
+-				<Elevation
+-					className={ elevationClassName }
+-					isInteractive={ false }
+-					value={ elevation }
+-				/>
+-			</View>
++				<Elevation isInteractive={ false } value={ elevation } />
++			</CardView>
+ 		</ContextSystemProvider>
+ 	);
+ }
+diff --git a/packages/components/src/card/card/hook.js b/packages/components/src/card/card/hook.js
+index ee3e66a22e98fb..ce3a5fa6096bc4 100644
+--- a/packages/components/src/card/card/hook.js
++++ b/packages/components/src/card/card/hook.js
+@@ -1,11 +1,3 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { cx } from '@emotion/css';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -17,7 +9,7 @@ import { useMemo } from '@wordpress/element';
+  */
+ import { useContextSystem } from '../../ui/context';
+ import { useSurface } from '../../surface';
+-import * as styles from '../styles';
++import { cx } from '../../utils';
+ 
+ /**
+  * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
+@@ -60,14 +52,7 @@ export function useCard( props ) {
+ 	} = useContextSystem( useDeprecatedProps( props ), 'Card' );
+ 
+ 	const classes = useMemo( () => {
+-		return cx(
+-			styles.Card,
+-			isBorderless && styles.boxShadowless,
+-			isRounded && styles.rounded,
+-			// This classname is added for legacy compatibility reasons.
+-			'components-card',
+-			className
+-		);
++		return cx( 'components-card', className );
+ 	}, [ className, isBorderless, isRounded ] );
+ 
+ 	const surfaceProps = useSurface( { ...otherProps, className: classes } );
+diff --git a/packages/components/src/card/styles.js b/packages/components/src/card/styles.js
+deleted file mode 100644
+index d4ecdd89db176c..00000000000000
+--- a/packages/components/src/card/styles.js
++++ /dev/null
+@@ -1,108 +0,0 @@
+-/**
+- * External dependencies
+- */
+-// Disable reason: Temporarily disable for existing usages
+-// until we remove them as part of https://github.com/WordPress/gutenberg/issues/30503#deprecating-emotion-css
+-// eslint-disable-next-line no-restricted-imports
+-import { css } from '@emotion/css';
+-
+-/**
+- * Internal dependencies
+- */
+-import { COLORS, CONFIG } from '../utils';
+-
+-export const Card = css`
+-	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };
+-	outline: none;
+-`;
+-
+-export const Header = css`
+-	border-bottom: 1px solid;
+-
+-	&:last-child {
+-		border-bottom: none;
+-	}
+-`;
+-
+-export const Footer = css`
+-	border-top: 1px solid;
+-
+-	&:first-child {
+-		border-top: none;
+-	}
+-`;
+-
+-export const Content = css`
+-	height: 100%;
+-`;
+-
+-export const Body = css`
+-	height: auto;
+-	max-height: 100%;
+-`;
+-
+-export const Media = css`
+-	box-sizing: border-box;
+-	overflow: hidden;
+-
+-	& > img,
+-	& > iframe {
+-		display: block;
+-		height: auto;
+-		max-width: 100%;
+-		width: 100%;
+-	}
+-`;
+-
+-export const Divider = css`
+-	box-sizing: border-box;
+-	display: block;
+-	width: 100%;
+-`;
+-
+-export const borderRadius = css`
+-	&:first-of-type {
+-		border-top-left-radius: ${ CONFIG.cardBorderRadius };
+-		border-top-right-radius: ${ CONFIG.cardBorderRadius };
+-	}
+-
+-	&:last-of-type {
+-		border-bottom-left-radius: ${ CONFIG.cardBorderRadius };
+-		border-bottom-right-radius: ${ CONFIG.cardBorderRadius };
+-	}
+-`;
+-
+-export const borderColor = css`
+-	border-color: ${ CONFIG.colorDivider };
+-`;
+-
+-export const boxShadowless = css`
+-	box-shadow: none;
+-`;
+-
+-export const borderless = css`
+-	border: none;
+-`;
+-
+-export const rounded = css`
+-	border-radius: ${ CONFIG.cardBorderRadius };
+-`;
+-
+-export const cardPaddings = {
+-	large: css`
+-		padding: ${ CONFIG.cardPaddingLarge };
+-	`,
+-	medium: css`
+-		padding: ${ CONFIG.cardPaddingMedium };
+-	`,
+-	small: css`
+-		padding: ${ CONFIG.cardPaddingSmall };
+-	`,
+-	xSmall: css`
+-		padding: ${ CONFIG.cardPaddingXSmall };
+-	`,
+-};
+-
+-export const shady = css`
+-	background-color: ${ COLORS.lightGray[ 200 ] };
+-`;
+diff --git a/packages/components/src/card/styles.ts b/packages/components/src/card/styles.ts
+new file mode 100644
+index 00000000000000..8b9b7863c82124
+--- /dev/null
++++ b/packages/components/src/card/styles.ts
+@@ -0,0 +1,164 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css } from '@emotion/react';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS, CONFIG } from '../utils';
++import { Elevation } from '../elevation';
++import { Divider } from '../divider';
++import { Flex } from '../flex';
++import type {
++	Props as CardProps,
++	FooterProps,
++	BodyProps,
++	BaseSubComponentProps,
++	HeaderProps,
++} from './types';
++
++type CardViewProps = Pick<
++	Required< CardProps >,
++	'isBorderless' | 'isRounded'
++>;
++
++const rounded = css`
++	border-radius: ${ CONFIG.cardBorderRadius };
++`;
++
++const boxShadowless = css`
++	box-shadow: none;
++`;
++
++const renderBorderlessCardView = ( { isBorderless }: CardViewProps ) =>
++	isBorderless && boxShadowless;
++
++const renderRounded = ( { isRounded }: CardViewProps ) => isRounded && rounded;
++
++export const CardView = styled.div< CardViewProps >`
++	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };
++	outline: none;
++
++	${ renderBorderlessCardView }
++	${ renderRounded }
++
++	${ Elevation.selector } {
++		${ ( props ) =>
++			css( {
++				borderRadius: props.isRounded ? CONFIG.cardBorderRadius : 0,
++			} ) }
++	}
++`;
++
++export const CardContentView = styled.div`
++	height: 100%;
++`;
++
++export const cardPaddings = {
++	large: css`
++		padding: ${ CONFIG.cardPaddingLarge };
++	`,
++	medium: css`
++		padding: ${ CONFIG.cardPaddingMedium };
++	`,
++	small: css`
++		padding: ${ CONFIG.cardPaddingSmall };
++	`,
++	xSmall: css`
++		padding: ${ CONFIG.cardPaddingXSmall };
++	`,
++};
++
++const borderless = css`
++	border: none;
++`;
++
++const renderBorderless = ( { isBorderless }: { isBorderless: boolean } ) =>
++	isBorderless && borderless;
++
++const renderSize = ( { size }: Required< BaseSubComponentProps > ) =>
++	cardPaddings[ size ];
++
++const borderRadius = css`
++	&:first-of-type {
++		border-top-left-radius: ${ CONFIG.cardBorderRadius };
++		border-top-right-radius: ${ CONFIG.cardBorderRadius };
++	}
++
++	&:last-of-type {
++		border-bottom-left-radius: ${ CONFIG.cardBorderRadius };
++		border-bottom-right-radius: ${ CONFIG.cardBorderRadius };
++	}
++`;
++
++const borderColor = css`
++	border-color: ${ CONFIG.colorDivider };
++`;
++
++const shady = css`
++	background-color: ${ COLORS.lightGray[ 200 ] };
++`;
++
++const renderShady = ( { isShady }: Required< BaseSubComponentProps > ) =>
++	isShady && shady;
++
++export const CardHeaderView = styled.div< Required< HeaderProps > >`
++	border-bottom: 1px solid;
++
++	&:last-child {
++		border-bottom: none;
++	}
++	${ borderRadius }
++	${ borderColor }
++	${ renderSize }
++	${ renderBorderless }
++	${ renderShady }
++`;
++
++export const CardFooterView = styled( Flex )< Required< FooterProps > >`
++	border-top: 1px solid;
++
++	&:first-child {
++		border-top: none;
++	}
++
++	${ borderRadius }
++	${ borderColor }
++	${ renderSize }
++	${ renderBorderless }
++`;
++
++export const CardBodyView = styled.div<
++	Omit< Required< BodyProps >, 'isScrollable' >
++>`
++	height: auto;
++	max-height: 100%;
++	${ borderRadius }
++	${ renderSize }
++	${ renderShady }
++`;
++
++export const CardMediaView = styled.div`
++	box-sizing: border-box;
++	overflow: hidden;
++
++	& > img,
++	& > iframe {
++		display: block;
++		height: auto;
++		max-width: 100%;
++		width: 100%;
++	}
++
++	${ borderRadius }
++`;
++
++export const CardDividerView = styled( Divider )`
++	box-sizing: border-box;
++	display: block;
++	width: 100%;
++
++	${ borderColor }
++`;
+diff --git a/packages/components/src/card/types.ts b/packages/components/src/card/types.ts
+index eed2958c90d07c..863b69cbf72f7d 100644
+--- a/packages/components/src/card/types.ts
++++ b/packages/components/src/card/types.ts
+@@ -52,7 +52,7 @@ export type Props = SurfaceProps &
+ 		isElevated?: boolean;
+ 	};
+ 
+-type BaseSubComponentProps = SizeableProps & {
++export type BaseSubComponentProps = SizeableProps & {
+ 	/**
+ 	 * The children elements.
+ 	 */
+diff --git a/packages/components/src/utils/cx.ts b/packages/components/src/utils/cx.ts
+new file mode 100644
+index 00000000000000..51bb9c5b32a0f7
+--- /dev/null
++++ b/packages/components/src/utils/cx.ts
+@@ -0,0 +1,14 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import { cx } from '@emotion/css';
++
++/**
++ * We export `cx` from a single place so that we can access it without
++ * having to disable the restricted import every time.
++ *
++ * We do NOT export `css` because we want to continue to disallow `css`
++ * from being used, but `cx` is safe to use in any emotion context.
++ */
++export { cx };
+diff --git a/packages/components/src/utils/index.js b/packages/components/src/utils/index.js
+index 94d8a67cc04607..57dd7be2910d2c 100644
+--- a/packages/components/src/utils/index.js
++++ b/packages/components/src/utils/index.js
+@@ -1,2 +1,3 @@
+ export * from './hooks';
+ export * from './style-mixins';
++export * from './cx';

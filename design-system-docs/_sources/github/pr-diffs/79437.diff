@@ -1,0 +1,124 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index df6a1003c945aa..413f2fb130b0eb 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### New Features
+ 
++-   Add `--wpds-dimension-size-xl` and `--wpds-dimension-size-2xl` for larger element sizes ([#79437](https://github.com/WordPress/gutenberg/pull/79437)).
+ -   Add `--wpds-color-stroke-surface-caution` and `--wpds-color-stroke-surface-caution-strong` so the `caution` tone has the same stroke-surface coverage as the other status tones ([#79198](https://github.com/WordPress/gutenberg/pull/79198)).
+ -   Add `--wpds-border-radius-xl` for page and app shell surfaces so nested cards and notices can stay on `--wpds-border-radius-lg` without matching the parent radius ([#78913](https://github.com/WordPress/gutenberg/pull/78913)).
+ -   Add `cornerRadius` prop to `ThemeProvider` for configuring the border-radius preset (`none`, `subtle`, `moderate`, `pronounced`) via prebuilt design token modes. [#78816](https://github.com/WordPress/gutenberg/pull/78816).
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index 30bf0ff5913447..a4ee1922d509ba 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -277,6 +277,8 @@ The interactive state of the element. The default (no modifier) is the idle stat
+ | `--wpds-dimension-size-sm`           | For icons and small buttons                                              |
+ | `--wpds-dimension-size-md`           | For medium-sized buttons and inputs                                      |
+ | `--wpds-dimension-size-lg`           | Default size for buttons and inputs                                      |
++| `--wpds-dimension-size-xl`           | For large media and interface elements                                   |
++| `--wpds-dimension-size-2xl`          | For extra large media and interface elements                             |
+ | `--wpds-dimension-surface-width-xs`  | Extra small surface width                                                |
+ | `--wpds-dimension-surface-width-sm`  | Small surface width                                                      |
+ | `--wpds-dimension-surface-width-md`  | Medium surface width                                                     |
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 86f696da40078c..dd8a81bff5af4a 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -273,6 +273,10 @@
+ 	--wpds-dimension-size-md: 32px;
+ 	/* Default size for buttons and inputs */
+ 	--wpds-dimension-size-lg: 40px;
++	/* For large media and interface elements */
++	--wpds-dimension-size-xl: 48px;
++	/* For extra large media and interface elements */
++	--wpds-dimension-size-2xl: 64px;
+ 	/* Extra small surface width */
+ 	--wpds-dimension-surface-width-xs: 240px;
+ 	/* Small surface width */
+diff --git a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+index a78762c4706779..0ddeb223d0f722 100644
+--- a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
++++ b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+@@ -143,6 +143,7 @@ export default {
+ 	'--wpds-dimension-padding-sm': '8px',
+ 	'--wpds-dimension-padding-xl': '20px',
+ 	'--wpds-dimension-padding-xs': '4px',
++	'--wpds-dimension-size-2xl': '64px',
+ 	'--wpds-dimension-size-2xs': '16px',
+ 	'--wpds-dimension-size-3xs': '12px',
+ 	'--wpds-dimension-size-4xs': '8px',
+@@ -150,6 +151,7 @@ export default {
+ 	'--wpds-dimension-size-lg': '40px',
+ 	'--wpds-dimension-size-md': '32px',
+ 	'--wpds-dimension-size-sm': '24px',
++	'--wpds-dimension-size-xl': '48px',
+ 	'--wpds-dimension-size-xs': '20px',
+ 	'--wpds-dimension-surface-width-2xl': '960px',
+ 	'--wpds-dimension-surface-width-lg': '560px',
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index aa9036daeb46b8..7b513b3b857a8b 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -139,6 +139,8 @@ export default [
+ 	'--wpds-dimension-size-sm',
+ 	'--wpds-dimension-size-md',
+ 	'--wpds-dimension-size-lg',
++	'--wpds-dimension-size-xl',
++	'--wpds-dimension-size-2xl',
+ 	'--wpds-dimension-surface-width-xs',
+ 	'--wpds-dimension-surface-width-sm',
+ 	'--wpds-dimension-surface-width-md',
+diff --git a/packages/theme/src/prebuilt/ts/token-types.ts b/packages/theme/src/prebuilt/ts/token-types.ts
+index f4b856a259f15c..1aabdaa476daa4 100644
+--- a/packages/theme/src/prebuilt/ts/token-types.ts
++++ b/packages/theme/src/prebuilt/ts/token-types.ts
+@@ -24,7 +24,9 @@ export type ElementSize =
+ 	| 'xs'
+ 	| 'sm'
+ 	| 'md'
+-	| 'lg';
++	| 'lg'
++	| 'xl'
++	| '2xl';
+ 
+ /**
+  * Size scale for surface width tokens.
+diff --git a/packages/theme/tokens/dimension.json b/packages/theme/tokens/dimension.json
+index 08cd75b876d902..053ea2cd3bde65 100644
+--- a/packages/theme/tokens/dimension.json
++++ b/packages/theme/tokens/dimension.json
+@@ -42,6 +42,10 @@
+ 				"90": {
+ 					"$value": { "value": 48, "unit": "px" },
+ 					"$description": "12x base spacing"
++				},
++				"100": {
++					"$value": { "value": 64, "unit": "px" },
++					"$description": "16x base spacing"
+ 				}
+ 			}
+ 		},
+@@ -207,6 +211,20 @@
+ 				"$extensions": {
+ 					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
+ 				}
++			},
++			"xl": {
++				"$value": "{wpds-dimension.primitive.space.90}",
++				"$description": "For large media and interface elements",
++				"$extensions": {
++					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
++				}
++			},
++			"2xl": {
++				"$value": "{wpds-dimension.primitive.space.100}",
++				"$description": "For extra large media and interface elements",
++				"$extensions": {
++					"com.figma.scopes": [ "WIDTH_HEIGHT" ]
++				}
+ 			}
+ 		},
+ 		"surface-width": {

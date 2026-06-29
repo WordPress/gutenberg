@@ -1,0 +1,199 @@
+diff --git a/packages/block-editor/src/components/spacing-sizes-control/style.scss b/packages/block-editor/src/components/spacing-sizes-control/style.scss
+index 2382aa76853d03..2fb33b5c565fba 100644
+--- a/packages/block-editor/src/components/spacing-sizes-control/style.scss
++++ b/packages/block-editor/src/components/spacing-sizes-control/style.scss
+@@ -39,15 +39,9 @@
+ 	}
+ }
+ 
+-.spacing-sizes-control__wrapper {
+-	& + & {
+-		margin-top: $grid-unit-10;
+-	}
+-}
+-
+ .spacing-sizes-control__header {
+ 	height: $grid-unit-20;
+-	margin-bottom: $grid-unit-10;
++	margin-bottom: $grid-unit-15;
+ }
+ 
+ .spacing-sizes-control__dropdown {
+@@ -63,3 +57,7 @@
+ .spacing-sizes-control__custom-toggle {
+ 	flex: 0 0 auto;
+ }
++
++.spacing-sizes-control__icon {
++	margin-left: $grid-unit-05 * -1; // Aligns the icon to the control header.
++}
+diff --git a/packages/block-editor/src/components/spacing-sizes-control/utils.js b/packages/block-editor/src/components/spacing-sizes-control/utils.js
+index 7ca0e1b6f660fd..32f0dbc59ac466 100644
+--- a/packages/block-editor/src/components/spacing-sizes-control/utils.js
++++ b/packages/block-editor/src/components/spacing-sizes-control/utils.js
+@@ -4,7 +4,6 @@
+ import { __ } from '@wordpress/i18n';
+ import {
+ 	sidesAll,
+-	sidesAxial,
+ 	sidesBottom,
+ 	sidesHorizontal,
+ 	sidesLeft,
+@@ -24,7 +23,7 @@ export const DEFAULT_VALUES = {
+ 
+ export const ICONS = {
+ 	custom: sidesAll,
+-	axial: sidesAxial,
++	axial: sidesAll,
+ 	horizontal: sidesHorizontal,
+ 	vertical: sidesVertical,
+ 	top: sidesTop,
+diff --git a/packages/icons/src/library/settings.js b/packages/icons/src/library/settings.js
+index 31d6da68a71955..cc1593cf489d3e 100644
+--- a/packages/icons/src/library/settings.js
++++ b/packages/icons/src/library/settings.js
+@@ -5,7 +5,8 @@ import { SVG, Path } from '@wordpress/primitives';
+ 
+ const settings = (
+ 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+-		<Path d="M14.5 13.8c-1.1 0-2.1.7-2.4 1.8H4V17h8.1c.3 1 1.3 1.8 2.4 1.8s2.1-.7 2.4-1.8H20v-1.5h-3.1c-.3-1-1.3-1.7-2.4-1.7zM11.9 7c-.3-1-1.3-1.8-2.4-1.8S7.4 6 7.1 7H4v1.5h3.1c.3 1 1.3 1.8 2.4 1.8s2.1-.7 2.4-1.8H20V7h-8.1z" />
++		<Path d="m19 7.5h-7.628c-.3089-.87389-1.1423-1.5-2.122-1.5-.97966 0-1.81309.62611-2.12197 1.5h-2.12803v1.5h2.12803c.30888.87389 1.14231 1.5 2.12197 1.5.9797 0 1.8131-.62611 2.122-1.5h7.628z" />
++		<Path d="m19 15h-2.128c-.3089-.8739-1.1423-1.5-2.122-1.5s-1.8131.6261-2.122 1.5h-7.628v1.5h7.628c.3089.8739 1.1423 1.5 2.122 1.5s1.8131-.6261 2.122-1.5h2.128z" />
+ 	</SVG>
+ );
+ 
+diff --git a/packages/icons/src/library/sides-all.js b/packages/icons/src/library/sides-all.js
+index d6e027685640a6..31717e244aadf9 100644
+--- a/packages/icons/src/library/sides-all.js
++++ b/packages/icons/src/library/sides-all.js
+@@ -5,10 +5,7 @@ import { SVG, Path } from '@wordpress/primitives';
+ 
+ const sidesAll = (
+ 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+-		<Path
+-			d="M3.5 17H5V7H3.5v10zM7 20.5h10V19H7v1.5zM19 7v10h1.5V7H19zM7 5h10V3.5H7V5z"
+-			style={ { fill: '#1e1e1e' } }
+-		/>
++		<Path d="m7.5 6h9v-1.5h-9zm0 13.5h9v-1.5h-9zm-3-3h1.5v-9h-1.5zm13.5-9v9h1.5v-9z" />
+ 	</SVG>
+ );
+ 
+diff --git a/packages/icons/src/library/sides-bottom.js b/packages/icons/src/library/sides-bottom.js
+index d1615ebc2a93b0..48cd1516e7c16b 100644
+--- a/packages/icons/src/library/sides-bottom.js
++++ b/packages/icons/src/library/sides-bottom.js
+@@ -5,11 +5,11 @@ import { SVG, Path } from '@wordpress/primitives';
+ 
+ const sidesBottom = (
+ 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+-		<Path d="M7 20.5h10V19H7v1.5z" style={ { fill: '#1e1e1e' } } />
+ 		<Path
+-			d="M3.5 17H5V7H3.5v10zM19 7v10h1.5V7H19zM7 5h10V3.5H7V5z"
+-			style={ { fill: '#1e1e1e', opacity: 0.1 } }
++			d="m7.5 6h9v-1.5h-9zm0 13.5h9v-1.5h-9zm-3-3h1.5v-9h-1.5zm13.5-9v9h1.5v-9z"
++			style={ { opacity: 0.25 } }
+ 		/>
++		<Path d="m16.5 19.5h-9v-1.5h9z" style={ { fill: '#1e1e1e' } } />
+ 	</SVG>
+ );
+ 
+diff --git a/packages/icons/src/library/sides-horizontal.js b/packages/icons/src/library/sides-horizontal.js
+index 87402487689e3b..05509ef8dc2b5e 100644
+--- a/packages/icons/src/library/sides-horizontal.js
++++ b/packages/icons/src/library/sides-horizontal.js
+@@ -6,13 +6,11 @@ import { SVG, Path } from '@wordpress/primitives';
+ const sidesHorizontal = (
+ 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+ 		<Path
+-			d="M3.5 17H5V7H3.5v10zM19 7v10h1.5V7H19z"
+-			style={ { fill: '#1e1e1e' } }
+-		/>
+-		<Path
+-			d="M7 20.5h10V19H7v1.5zm0-17V5h10V3.5H7z"
+-			style={ { fill: '#1e1e1e', opacity: 0.1 } }
++			d="m7.5 6h9v-1.5h-9zm0 13.5h9v-1.5h-9zm-3-3h1.5v-9h-1.5zm13.5-9v9h1.5v-9z"
++			style={ { opacity: 0.25 } }
+ 		/>
++		<Path d="m4.5 7.5v9h1.5v-9z" />
++		<Path d="m18 7.5v9h1.5v-9z" />
+ 	</SVG>
+ );
+ 
+diff --git a/packages/icons/src/library/sides-left.js b/packages/icons/src/library/sides-left.js
+index ff2189f76a0dc9..39a917e7d05b04 100644
+--- a/packages/icons/src/library/sides-left.js
++++ b/packages/icons/src/library/sides-left.js
+@@ -5,11 +5,11 @@ import { SVG, Path } from '@wordpress/primitives';
+ 
+ const sidesLeft = (
+ 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+-		<Path d="M5 17H3.5V7H5v10z" style={ { fill: '#1e1e1e' } } />
+ 		<Path
+-			d="M7 20.5h10V19H7v1.5zM19 7v10h1.5V7H19zM7 5h10V3.5H7V5z"
+-			style={ { fill: '#1e1e1e', opacity: 0.1 } }
++			d="m7.5 6h9v-1.5h-9zm0 13.5h9v-1.5h-9zm-3-3h1.5v-9h-1.5zm13.5-9v9h1.5v-9z"
++			style={ { opacity: 0.25 } }
+ 		/>
++		<Path d="m4.5 16.5v-9h1.5v9z" />
+ 	</SVG>
+ );
+ 
+diff --git a/packages/icons/src/library/sides-right.js b/packages/icons/src/library/sides-right.js
+index 1abb83ad1bb689..b21e0668aeb55d 100644
+--- a/packages/icons/src/library/sides-right.js
++++ b/packages/icons/src/library/sides-right.js
+@@ -5,11 +5,11 @@ import { SVG, Path } from '@wordpress/primitives';
+ 
+ const sidesRight = (
+ 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+-		<Path d="M20.5 7H19v10h1.5V7z" style={ { fill: '#1e1e1e' } } />
+ 		<Path
+-			d="M3.5 17H5V7H3.5v10zM7 20.5h10V19H7v1.5zm0-17V5h10V3.5H7z"
+-			style={ { fill: '#1e1e1e', opacity: 0.1 } }
++			d="m7.5 6h9v-1.5h-9zm0 13.5h9v-1.5h-9zm-3-3h1.5v-9h-1.5zm13.5-9v9h1.5v-9z"
++			style={ { opacity: 0.25 } }
+ 		/>
++		<Path d="m18 16.5v-9h1.5v9z" />
+ 	</SVG>
+ );
+ 
+diff --git a/packages/icons/src/library/sides-top.js b/packages/icons/src/library/sides-top.js
+index 8519397ffd63e1..f416a4c235f3b7 100644
+--- a/packages/icons/src/library/sides-top.js
++++ b/packages/icons/src/library/sides-top.js
+@@ -6,10 +6,10 @@ import { SVG, Path } from '@wordpress/primitives';
+ const sidesTop = (
+ 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+ 		<Path
+-			d="M3.5 17H5V7H3.5v10zM7 20.5h10V19H7v1.5zM19 7v10h1.5V7H19z"
+-			style={ { fill: '#1e1e1e', opacity: 0.1 } }
++			d="m7.5 6h9v-1.5h-9zm0 13.5h9v-1.5h-9zm-3-3h1.5v-9h-1.5zm13.5-9v9h1.5v-9z"
++			style={ { opacity: 0.25 } }
+ 		/>
+-		<Path d="M7 5h10V3.5H7V5z" style={ { fill: '#1e1e1e' } } />
++		<Path d="m16.5 6h-9v-1.5h9z" />
+ 	</SVG>
+ );
+ 
+diff --git a/packages/icons/src/library/sides-vertical.js b/packages/icons/src/library/sides-vertical.js
+index 09306cf72549a7..5352dffd4e50b3 100644
+--- a/packages/icons/src/library/sides-vertical.js
++++ b/packages/icons/src/library/sides-vertical.js
+@@ -6,13 +6,11 @@ import { SVG, Path } from '@wordpress/primitives';
+ const sidesVertical = (
+ 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+ 		<Path
+-			d="M3.5 17H5V7H3.5v10zM19 7v10h1.5V7H19z"
+-			style={ { fill: '#1e1e1e', opacity: 0.1 } }
+-		/>
+-		<Path
+-			d="M7 20.5h10V19H7v1.5zm0-17V5h10V3.5H7z"
+-			style={ { fill: '#1e1e1e' } }
++			d="m7.5 6h9v-1.5h-9zm0 13.5h9v-1.5h-9zm-3-3h1.5v-9h-1.5zm13.5-9v9h1.5v-9z"
++			style={ { opacity: 0.25 } }
+ 		/>
++		<Path d="m7.5 6h9v-1.5h-9z" />
++		<Path d="m7.5 19.5h9v-1.5h-9z" />
+ 	</SVG>
+ );
+ 

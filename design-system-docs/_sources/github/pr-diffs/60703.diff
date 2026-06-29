@@ -1,0 +1,19 @@
+diff --git a/packages/components/src/dimension-control/stories/index.story.tsx b/packages/components/src/dimension-control/stories/index.story.tsx
+index 0698125c446ca7..1220be3d4eea1f 100644
+--- a/packages/components/src/dimension-control/stories/index.story.tsx
++++ b/packages/components/src/dimension-control/stories/index.story.tsx
+@@ -29,10 +29,10 @@ export default {
+ 				mobile,
+ 			},
+ 		},
+-		parameters: {
+-			controls: { expanded: true },
+-			docs: { canvas: { sourceState: 'shown' } },
+-		},
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { canvas: { sourceState: 'shown' } },
+ 	},
+ } as Meta< typeof DimensionControl >;
+ 

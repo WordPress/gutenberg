@@ -1,0 +1,15 @@
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index c78c7f715e8689..b1498938ab8bf4 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -75,7 +75,9 @@ export default function CustomSelectControl( {
+ 		items,
+ 		itemToString,
+ 		onSelectedItemChange,
+-		selectedItem: _selectedItem,
++		...( typeof _selectedItem !== 'undefined' && _selectedItem !== null
++			? { selectedItem: _selectedItem }
++			: undefined ),
+ 		stateReducer,
+ 	} );
+ 

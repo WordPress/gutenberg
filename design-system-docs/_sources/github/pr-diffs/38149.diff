@@ -1,0 +1,405 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f147e9015da4bc..5314bfcce427a4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -37,6 +37,7 @@
+ ### Experimental
+ 
+ -   Add basic history location support to `Navigator` ([#37416](https://github.com/WordPress/gutenberg/pull/37416)).
++-   Add focus restoration to `Navigator` ([#38149](https://github.com/WordPress/gutenberg/pull/38149)).
+ 
+ ## 19.2.0 (2022-01-04)
+ 
+diff --git a/packages/components/src/navigator/navigator-provider/README.md b/packages/components/src/navigator/navigator-provider/README.md
+index dcad45dd5c4be5..39d32222979e00 100644
+--- a/packages/components/src/navigator/navigator-provider/README.md
++++ b/packages/components/src/navigator/navigator-provider/README.md
+@@ -68,7 +68,9 @@ The `navigator` instance has a few properties:
+ 
+ The `push` function allows navigating to a given path. The second argument can augment the navigation operations with different options.
+ 
+-There currently aren't any available options.
++The available options are:
++
++- `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back.
+ 
+ ### `pop`: `() => void`
+ 
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index fc1e9c31d01fb5..a801f1245ab84f 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -42,28 +42,17 @@ function NavigatorProvider(
+ 	>( [
+ 		{
+ 			path: initialPath,
+-			isBack: false,
+-			isInitial: true,
+ 		},
+ 	] );
+ 
+ 	const push: NavigatorContextType[ 'push' ] = useCallback(
+-		( path, options ) => {
+-			// Force the `isBack` flag to `false` when navigating forward on both the
+-			// previous and the new location.
+-			// Also force the `isInitial` flag to `false` for the new location, to make
+-			// sure it doesn't get overridden by mistake.
++		( path, options = {} ) => {
+ 			setLocationHistory( [
+-				...locationHistory.slice( 0, -1 ),
+-				{
+-					...locationHistory[ locationHistory.length - 1 ],
+-					isBack: false,
+-				},
++				...locationHistory,
+ 				{
+ 					...options,
+ 					path,
+ 					isBack: false,
+-					isInitial: false,
+ 				},
+ 			] );
+ 		},
+@@ -72,7 +61,6 @@ function NavigatorProvider(
+ 
+ 	const pop: NavigatorContextType[ 'pop' ] = useCallback( () => {
+ 		if ( locationHistory.length > 1 ) {
+-			// Force the `isBack` flag to `true` when navigating back.
+ 			setLocationHistory( [
+ 				...locationHistory.slice( 0, -2 ),
+ 				{
+@@ -85,7 +73,10 @@ function NavigatorProvider(
+ 
+ 	const navigatorContextValue: NavigatorContextType = useMemo(
+ 		() => ( {
+-			location: locationHistory[ locationHistory.length - 1 ],
++			location: {
++				...locationHistory[ locationHistory.length - 1 ],
++				isInitial: locationHistory.length === 1,
++			},
+ 			push,
+ 			pop,
+ 		} ),
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 033c1884ea9b2f..7cf629a7b0f6d3 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -9,8 +9,13 @@ import { css } from '@emotion/react';
+ /**
+  * WordPress dependencies
+  */
+-import { useContext, useEffect, useState, useMemo } from '@wordpress/element';
+-import { useReducedMotion, useFocusOnMount } from '@wordpress/compose';
++import { focus } from '@wordpress/dom';
++import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
++import {
++	useReducedMotion,
++	useMergeRefs,
++	usePrevious,
++} from '@wordpress/compose';
+ import { isRTL } from '@wordpress/i18n';
+ 
+ /**
+@@ -47,7 +52,9 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 	const prefersReducedMotion = useReducedMotion();
+ 	const { location } = useContext( NavigatorContext );
+ 	const isMatch = location.path === path;
+-	const ref = useFocusOnMount();
++	const wrapperRef = useRef< HTMLDivElement >( null );
++
++	const previousLocation = usePrevious( location );
+ 
+ 	const cx = useCx();
+ 	const classes = useMemo(
+@@ -64,12 +71,41 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 		[ className ]
+ 	);
+ 
+-	// This flag is used to only apply the focus on mount when the actual path changes.
+-	// It avoids the focus to happen on the first render.
+-	const [ hasPathChanged, setHasPathChanged ] = useState( false );
++	// Focus restoration
++	const isInitialLocation = location.isInitial && ! location.isBack;
+ 	useEffect( () => {
+-		setHasPathChanged( true );
+-	}, [ path ] );
++		// Only attempt to restore focus:
++		// - if the current location is not the initial one (to avoid moving focus on page load)
++		// - when the screen becomes visible
++		// - if the wrapper ref has been assigned
++		if ( isInitialLocation || ! isMatch || ! wrapperRef.current ) {
++			return;
++		}
++
++		let elementToFocus: HTMLElement | null = null;
++
++		// When navigating back, if a selector is provided, use it to look for the
++		// target element (assumed to be a node inside the current NavigatorScreen)
++		if ( location.isBack && previousLocation?.focusTargetSelector ) {
++			elementToFocus = wrapperRef.current.querySelector(
++				previousLocation.focusTargetSelector
++			);
++		}
++
++		// If the previous query didn't run or find any element to focus, fallback
++		// to the first tabbable element in the screen (or the screen itself).
++		if ( ! elementToFocus ) {
++			const firstTabbable = ( focus.tabbable.find(
++				wrapperRef.current
++			) as HTMLElement[] )[ 0 ];
++
++			elementToFocus = firstTabbable ?? wrapperRef.current;
++		}
++
++		elementToFocus.focus();
++	}, [ isInitialLocation, isMatch ] );
++
++	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
+ 
+ 	if ( ! isMatch ) {
+ 		return null;
+@@ -77,7 +113,11 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 
+ 	if ( prefersReducedMotion ) {
+ 		return (
+-			<View ref={ forwardedRef } className={ classes } { ...otherProps }>
++			<View
++				ref={ mergedWrapperRef }
++				className={ classes }
++				{ ...otherProps }
++			>
+ 				{ children }
+ 			</View>
+ 		);
+@@ -120,7 +160,7 @@ function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
+ 
+ 	return (
+ 		<motion.div
+-			ref={ hasPathChanged ? ref : undefined }
++			ref={ mergedWrapperRef }
+ 			className={ classes }
+ 			{ ...otherProps }
+ 			{ ...animatedProps }
+diff --git a/packages/components/src/navigator/stories/index.js b/packages/components/src/navigator/stories/index.js
+index 4b80f92132f50c..6f7be1bccb96b7 100644
+--- a/packages/components/src/navigator/stories/index.js
++++ b/packages/components/src/navigator/stories/index.js
+@@ -20,11 +20,23 @@ export default {
+ 
+ function NavigatorButton( { path, ...props } ) {
+ 	const { push } = useNavigator();
++	const dataAttrName = 'data-navigator-focusable-id';
++	const dataAttrValue = path;
++
++	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
++
++	const buttonProps = {
++		...props,
++		[ dataAttrName ]: dataAttrValue,
++	};
++
+ 	return (
+ 		<Button
+ 			variant="secondary"
+-			onClick={ () => push( path ) }
+-			{ ...props }
++			onClick={ () =>
++				push( path, { focusTargetSelector: dataAttrCssSelector } )
++			}
++			{ ...buttonProps }
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/navigator/test/index.js b/packages/components/src/navigator/test/index.js
+index 9611638e5335c8..5f06fdf6eece11 100644
+--- a/packages/components/src/navigator/test/index.js
++++ b/packages/components/src/navigator/test/index.js
+@@ -44,6 +44,30 @@ function NavigatorButton( { path, onClick, ...props } ) {
+ 	);
+ }
+ 
++function NavigatorButtonWithFocusRestoration( { path, onClick, ...props } ) {
++	const { push } = useNavigator();
++	const dataAttrName = 'data-navigator-focusable-id';
++	const dataAttrValue = path;
++
++	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
++
++	const buttonProps = {
++		...props,
++		[ dataAttrName ]: dataAttrValue,
++	};
++
++	return (
++		<button
++			onClick={ () => {
++				push( path, { focusTargetSelector: dataAttrCssSelector } );
++				// Used to spy on the values passed to `navigator.push`
++				onClick?.( { type: 'push', path } );
++			} }
++			{ ...buttonProps }
++		/>
++	);
++}
++
+ function NavigatorBackButton( { onClick, ...props } ) {
+ 	const { pop } = useNavigator();
+ 	return (
+@@ -65,28 +89,28 @@ const MyNavigation = ( {
+ 	<NavigatorProvider initialPath={ initialPath }>
+ 		<NavigatorScreen path={ PATHS.HOME }>
+ 			<p>This is the home screen.</p>
+-			<NavigatorButton
+-				path={ PATHS.CHILD }
+-				onClick={ onNavigatorButtonClick }
+-			>
+-				Navigate to child screen.
+-			</NavigatorButton>
+ 			<NavigatorButton
+ 				path={ PATHS.NOT_FOUND }
+ 				onClick={ onNavigatorButtonClick }
+ 			>
+ 				Navigate to non-existing screen.
+ 			</NavigatorButton>
++			<NavigatorButtonWithFocusRestoration
++				path={ PATHS.CHILD }
++				onClick={ onNavigatorButtonClick }
++			>
++				Navigate to child screen.
++			</NavigatorButtonWithFocusRestoration>
+ 		</NavigatorScreen>
+ 
+ 		<NavigatorScreen path={ PATHS.CHILD }>
+ 			<p>This is the child screen.</p>
+-			<NavigatorButton
++			<NavigatorButtonWithFocusRestoration
+ 				path={ PATHS.NESTED }
+ 				onClick={ onNavigatorButtonClick }
+ 			>
+ 				Navigate to nested screen.
+-			</NavigatorButton>
++			</NavigatorButtonWithFocusRestoration>
+ 			<NavigatorBackButton onClick={ onNavigatorButtonClick }>
+ 				Go back
+ 			</NavigatorBackButton>
+@@ -298,4 +322,32 @@ describe( 'Navigator', () => {
+ 			type: 'push',
+ 		} );
+ 	} );
++
++	it( 'should restore focus correctly', () => {
++		render( <MyNavigation /> );
++
++		expect( getHomeScreen() ).toBeInTheDocument();
++
++		// Navigate to child screen
++		fireEvent.click( getToChildScreenButton() );
++
++		expect( getChildScreen() ).toBeInTheDocument();
++
++		// Navigate to nested screen
++		fireEvent.click( getToNestedScreenButton() );
++
++		expect( getNestedScreen() ).toBeInTheDocument();
++
++		// Navigate back to child screen, check that focus was correctly restored
++		fireEvent.click( getBackButton() );
++
++		expect( getChildScreen() ).toBeInTheDocument();
++		expect( getToNestedScreenButton() ).toHaveFocus();
++
++		// Navigate back to home screen, check that focus was correctly restored
++		fireEvent.click( getBackButton() );
++
++		expect( getHomeScreen() ).toBeInTheDocument();
++		expect( getToChildScreenButton() ).toHaveFocus();
++	} );
+ } );
+diff --git a/packages/components/src/navigator/types.ts b/packages/components/src/navigator/types.ts
+index 8a6a5f56492039..24e513d2571806 100644
+--- a/packages/components/src/navigator/types.ts
++++ b/packages/components/src/navigator/types.ts
+@@ -3,7 +3,9 @@
+  */
+ import type { ReactNode } from 'react';
+ 
+-type NavigateOptions = {};
++type NavigateOptions = {
++	focusTargetSelector?: string;
++};
+ 
+ export type NavigatorLocation = NavigateOptions & {
+ 	isInitial?: boolean;
+@@ -13,7 +15,7 @@ export type NavigatorLocation = NavigateOptions & {
+ 
+ export type NavigatorContext = {
+ 	location: NavigatorLocation;
+-	push: ( path: string, options: NavigateOptions ) => void;
++	push: ( path: string, options?: NavigateOptions ) => void;
+ 	pop: () => void;
+ };
+ 
+diff --git a/packages/edit-post/src/components/preferences-modal/index.js b/packages/edit-post/src/components/preferences-modal/index.js
+index 09c36c7bd2875c..22d74c7e0158a1 100644
+--- a/packages/edit-post/src/components/preferences-modal/index.js
++++ b/packages/edit-post/src/components/preferences-modal/index.js
+@@ -57,7 +57,25 @@ const PREFERENCES_MENU = 'preferences-menu';
+ 
+ function NavigationButton( { as: Tag = Button, path, ...props } ) {
+ 	const { push } = useNavigator();
+-	return <Tag onClick={ () => push( path ) } { ...props } />;
++
++	const dataAttrName = 'data-navigator-focusable-id';
++	const dataAttrValue = path;
++
++	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
++
++	const tagProps = {
++		...props,
++		[ dataAttrName ]: dataAttrValue,
++	};
++
++	return (
++		<Tag
++			onClick={ () =>
++				push( path, { focusTargetSelector: dataAttrCssSelector } )
++			}
++			{ ...tagProps }
++		/>
++	);
+ }
+ 
+ function NavigationBackButton( { as: Tag = Button, ...props } ) {
+diff --git a/packages/edit-site/src/components/global-styles/navigation-button.js b/packages/edit-site/src/components/global-styles/navigation-button.js
+index 72545c80e4832a..4d383386840c29 100644
+--- a/packages/edit-site/src/components/global-styles/navigation-button.js
++++ b/packages/edit-site/src/components/global-styles/navigation-button.js
+@@ -24,10 +24,27 @@ function GenericNavigationButton( { icon, children, ...props } ) {
+ 		</Item>
+ 	);
+ }
++
+ function NavigationButton( { path, ...props } ) {
+ 	const { push } = useNavigator();
++
++	const dataAttrName = 'data-navigator-focusable-id';
++	const dataAttrValue = path;
++
++	const dataAttrCssSelector = `[${ dataAttrName }="${ dataAttrValue }"]`;
++
++	const buttonProps = {
++		...props,
++		[ dataAttrName ]: dataAttrValue,
++	};
++
+ 	return (
+-		<GenericNavigationButton onClick={ () => push( path ) } { ...props } />
++		<GenericNavigationButton
++			onClick={ () =>
++				push( path, { focusTargetSelector: dataAttrCssSelector } )
++			}
++			{ ...buttonProps }
++		/>
+ 	);
+ }
+ 

@@ -1,0 +1,213 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 4e685f9ab3cb33..c039a6b6460632 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -83,6 +83,7 @@ module.exports = {
+ 							'capitalize',
+ 							'chunk',
+ 							'clamp',
++							'cloneDeep',
+ 							'compact',
+ 							'concat',
+ 							'countBy',
+diff --git a/packages/block-editor/src/components/block-list/test/block-list-context.native.js b/packages/block-editor/src/components/block-list/test/block-list-context.native.js
+index e968a54662d06b..e4e1911fa3237b 100644
+--- a/packages/block-editor/src/components/block-list/test/block-list-context.native.js
++++ b/packages/block-editor/src/components/block-list/test/block-list-context.native.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { cloneDeep } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -19,6 +14,9 @@ import {
+ 	ROOT_LEVEL_ID,
+ } from './fixtures/block-list-context.native';
+ 
++// Deep clone an object to avoid mutating it later.
++const cloneObject = ( obj ) => JSON.parse( JSON.stringify( obj ) );
++
+ describe( 'findBlockLayoutByClientId', () => {
+ 	it( "finds a block's layout data at root level", () => {
+ 		const { findBlockLayoutByClientId } = DEFAULT_BLOCK_LIST_CONTEXT;
+@@ -66,7 +64,7 @@ describe( 'findBlockLayoutByClientId', () => {
+ describe( 'deleteBlockLayoutByClientId', () => {
+ 	it( "deletes a block's layout data at root level", () => {
+ 		const { findBlockLayoutByClientId } = DEFAULT_BLOCK_LIST_CONTEXT;
+-		const defaultBlockLayouts = cloneDeep( BLOCKS_LAYOUTS_DATA );
++		const defaultBlockLayouts = cloneObject( BLOCKS_LAYOUTS_DATA );
+ 		const currentBlockLayouts = deleteBlockLayoutByClientId(
+ 			defaultBlockLayouts,
+ 			ROOT_LEVEL_ID
+@@ -82,7 +80,7 @@ describe( 'deleteBlockLayoutByClientId', () => {
+ 
+ 	it( "deletes a nested block's layout data with inner blocks", () => {
+ 		const { findBlockLayoutByClientId } = DEFAULT_BLOCK_LIST_CONTEXT;
+-		const defaultBlockLayouts = cloneDeep( BLOCKS_LAYOUTS_DATA );
++		const defaultBlockLayouts = cloneObject( BLOCKS_LAYOUTS_DATA );
+ 		const currentBlockLayouts = deleteBlockLayoutByClientId(
+ 			defaultBlockLayouts,
+ 			NESTED_WITH_INNER_BLOCKS_ID
+@@ -98,7 +96,7 @@ describe( 'deleteBlockLayoutByClientId', () => {
+ 
+ 	it( "deletes a deep nested block's layout data", () => {
+ 		const { findBlockLayoutByClientId } = DEFAULT_BLOCK_LIST_CONTEXT;
+-		const defaultBlockLayouts = cloneDeep( BLOCKS_LAYOUTS_DATA );
++		const defaultBlockLayouts = cloneObject( BLOCKS_LAYOUTS_DATA );
+ 		const currentBlockLayouts = deleteBlockLayoutByClientId(
+ 			defaultBlockLayouts,
+ 			DEEP_NESTED_ID
+@@ -120,7 +118,7 @@ describe( 'updateBlocksLayouts', () => {
+ 			findBlockLayoutByClientId,
+ 			updateBlocksLayouts,
+ 		} = DEFAULT_BLOCK_LIST_CONTEXT;
+-		const currentBlockLayouts = cloneDeep( blocksLayouts );
++		const currentBlockLayouts = cloneObject( blocksLayouts );
+ 		const BLOCK_CLIENT_ID = PARAGRAPH_BLOCK_LAYOUT_DATA.clientId;
+ 
+ 		updateBlocksLayouts( currentBlockLayouts, PARAGRAPH_BLOCK_LAYOUT_DATA );
+@@ -142,7 +140,7 @@ describe( 'updateBlocksLayouts', () => {
+ 		const { findBlockLayoutByClientId, updateBlocksLayouts } =
+ 			DEFAULT_BLOCK_LIST_CONTEXT;
+ 		const currentBlockLayouts = {
+-			current: cloneDeep( BLOCKS_LAYOUTS_DATA ),
++			current: cloneObject( BLOCKS_LAYOUTS_DATA ),
+ 		};
+ 		const PARENT_BLOCK_CLIENT_ID = GROUP_BLOCK_LAYOUT_DATA.clientId;
+ 
+@@ -181,7 +179,7 @@ describe( 'updateBlocksLayouts', () => {
+ 		const { findBlockLayoutByClientId, updateBlocksLayouts } =
+ 			DEFAULT_BLOCK_LIST_CONTEXT;
+ 		const currentBlockLayouts = {
+-			current: cloneDeep( BLOCKS_LAYOUTS_DATA ),
++			current: cloneObject( BLOCKS_LAYOUTS_DATA ),
+ 		};
+ 
+ 		// Add block layout data to it's parents inner blocks
+@@ -207,7 +205,7 @@ describe( 'updateBlocksLayouts', () => {
+ 		const { findBlockLayoutByClientId, updateBlocksLayouts } =
+ 			DEFAULT_BLOCK_LIST_CONTEXT;
+ 		const currentBlockLayouts = {
+-			current: cloneDeep( BLOCKS_LAYOUTS_DATA ),
++			current: cloneObject( BLOCKS_LAYOUTS_DATA ),
+ 		};
+ 
+ 		updateBlocksLayouts( currentBlockLayouts, {
+@@ -227,7 +225,7 @@ describe( 'updateBlocksLayouts', () => {
+ 		const { findBlockLayoutByClientId, updateBlocksLayouts } =
+ 			DEFAULT_BLOCK_LIST_CONTEXT;
+ 		const currentBlockLayouts = {
+-			current: cloneDeep( BLOCKS_LAYOUTS_DATA ),
++			current: cloneObject( BLOCKS_LAYOUTS_DATA ),
+ 		};
+ 
+ 		updateBlocksLayouts( currentBlockLayouts, {
+diff --git a/packages/block-library/src/utils/migrate-font-family.js b/packages/block-library/src/utils/migrate-font-family.js
+index bb2108b569fe17..cd15c74802ad02 100644
+--- a/packages/block-library/src/utils/migrate-font-family.js
++++ b/packages/block-library/src/utils/migrate-font-family.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { cloneDeep } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -21,17 +16,14 @@ export default function ( attributes ) {
+ 		return attributes;
+ 	}
+ 
+-	// Clone first so when we delete the fontFamily
+-	// below we're not modifying the original
+-	// attributes. Because the deprecation may be discarded
+-	// we don't want to alter the original attributes.
+-	const atts = cloneDeep( attributes );
+-	const fontFamily = atts.style.typography.fontFamily.split( '|' ).pop();
+-	delete atts.style.typography.fontFamily;
+-	atts.style = cleanEmptyObject( atts.style );
++	const { fontFamily, ...typography } = attributes.style.typography;
+ 
+ 	return {
+-		...atts,
+-		fontFamily,
++		...attributes,
++		style: cleanEmptyObject( {
++			...attributes.style,
++			typography,
++		} ),
++		fontFamily: fontFamily.split( '|' ).pop(),
+ 	};
+ }
+diff --git a/packages/components/src/ui/context/context-system-provider.js b/packages/components/src/ui/context/context-system-provider.js
+index 00f09c0b76c0fd..d72fac51be99f6 100644
+--- a/packages/components/src/ui/context/context-system-provider.js
++++ b/packages/components/src/ui/context/context-system-provider.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEqual, merge, cloneDeep } from 'lodash';
++import { isEqual, merge } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -66,7 +66,7 @@ function useContextSystemBridge( { value } ) {
+ 	// `parentContext` will always be memoized (i.e., the result of this hook itself)
+ 	// or the default value from when the `ComponentsContext` was originally
+ 	// initialized (which will never change, it's a static variable)
+-	// so this memoization will prevent `merge` and `cloneDeep` from rerunning unless
++	// so this memoization will prevent `merge` and `JSON.parse/stringify` from rerunning unless
+ 	// the references to `value` change OR the `parentContext` has an actual material change
+ 	// (because again, it's guaranteed to be memoized or a static reference to the empty object
+ 	// so we know that the only changes for `parentContext` are material ones... i.e., why we
+@@ -74,9 +74,10 @@ function useContextSystemBridge( { value } ) {
+ 	// need to bother with the `value`). The `useUpdateEffect` above will ensure that we are
+ 	// correctly warning when the `value` isn't being properly memoized. All of that to say
+ 	// that this should be super safe to assume that `useMemo` will only run on actual
+-	// changes to the two dependencies, therefore saving us calls to `merge` and `cloneDeep`!
++	// changes to the two dependencies, therefore saving us calls to `merge` and `JSON.parse/stringify`!
+ 	const config = useMemo( () => {
+-		return merge( cloneDeep( parentContext ), value );
++		// Deep clone `parentContext` to avoid mutating it later.
++		return merge( JSON.parse( JSON.stringify( parentContext ) ), value );
+ 	}, [ parentContext, value ] );
+ 
+ 	return config;
+diff --git a/packages/edit-site/src/components/global-styles/hooks.js b/packages/edit-site/src/components/global-styles/hooks.js
+index 662aeed77519b1..9f9a7c789d6ae9 100644
+--- a/packages/edit-site/src/components/global-styles/hooks.js
++++ b/packages/edit-site/src/components/global-styles/hooks.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { get, cloneDeep, set, isEqual } from 'lodash';
++import { get, set, isEqual } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -48,7 +48,8 @@ export function useSetting( path, blockName, source = 'all' ) {
+ 
+ 	const setSetting = ( newValue ) => {
+ 		setUserConfig( ( currentConfig ) => {
+-			const newUserConfig = cloneDeep( currentConfig );
++			// Deep clone `currentConfig` to avoid mutating it later.
++			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
+ 			const pathToSet = PATHS_WITH_MERGE[ path ]
+ 				? fullPath + '.custom'
+ 				: fullPath;
+@@ -109,7 +110,8 @@ export function useStyle( path, blockName, source = 'all' ) {
+ 
+ 	const setStyle = ( newValue ) => {
+ 		setUserConfig( ( currentConfig ) => {
+-			const newUserConfig = cloneDeep( currentConfig );
++			// Deep clone `currentConfig` to avoid mutating it later.
++			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
+ 			set(
+ 				newUserConfig,
+ 				finalPath,

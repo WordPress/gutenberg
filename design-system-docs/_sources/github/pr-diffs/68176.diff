@@ -1,0 +1,85 @@
+diff --git a/packages/block-library/src/cover/test/edit.js b/packages/block-library/src/cover/test/edit.js
+index f5d6a5301ef6d2..72f51150c27443 100644
+--- a/packages/block-library/src/cover/test/edit.js
++++ b/packages/block-library/src/cover/test/edit.js
+@@ -200,9 +200,7 @@ describe( 'Cover block', () => {
+ 
+ 				await selectBlock( 'Block: Cover' );
+ 				expect(
+-					screen.getByRole( 'heading', {
+-						name: 'Settings',
+-					} )
++					await screen.findByRole( 'heading', { name: 'Settings' } )
+ 				).toBeInTheDocument();
+ 			} );
+ 		} );
+@@ -216,7 +214,7 @@ describe( 'Cover block', () => {
+ 			);
+ 			await selectBlock( 'Block: Cover' );
+ 			await userEvent.click(
+-				screen.getByLabelText( 'Fixed background' )
++				await screen.findByLabelText( 'Fixed background' )
+ 			);
+ 			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
+ 				'has-parallax'
+@@ -232,7 +230,7 @@ describe( 'Cover block', () => {
+ 			);
+ 			await selectBlock( 'Block: Cover' );
+ 			await userEvent.click(
+-				screen.getByLabelText( 'Repeated background' )
++				await screen.findByLabelText( 'Repeated background' )
+ 			);
+ 			expect( screen.getByLabelText( 'Block: Cover' ) ).toHaveClass(
+ 				'is-repeated'
+@@ -245,7 +243,7 @@ describe( 'Cover block', () => {
+ 			} );
+ 
+ 			await selectBlock( 'Block: Cover' );
+-			await userEvent.clear( screen.getByLabelText( 'Left' ) );
++			await userEvent.clear( await screen.findByLabelText( 'Left' ) );
+ 			await userEvent.type( screen.getByLabelText( 'Left' ), '100' );
+ 
+ 			expect(
+@@ -262,7 +260,7 @@ describe( 'Cover block', () => {
+ 
+ 			await selectBlock( 'Block: Cover' );
+ 			await userEvent.type(
+-				screen.getByLabelText( 'Alternative text' ),
++				await screen.findByLabelText( 'Alternative text' ),
+ 				'Me'
+ 			);
+ 			expect( screen.getByAltText( 'Me' ) ).toBeInTheDocument();
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8227d9b894a979..e95708f498263f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,7 @@
+ 
+ -   `SlotFill`: rewrite the non-portal version to use `observableMap` ([#67400](https://github.com/WordPress/gutenberg/pull/67400)).
+ -   `DatePicker`: Prepare day buttons for 40px default size ([#68156](https://github.com/WordPress/gutenberg/pull/68156)).
++-   `SlotFill`: register slots in a layout effect ([#68176](https://github.com/WordPress/gutenberg/pull/68176)).
+ 
+ ## 29.0.0 (2024-12-11)
+ 
+diff --git a/packages/components/src/slot-fill/slot.tsx b/packages/components/src/slot-fill/slot.tsx
+index 82feaa04199f51..c1182562672c0b 100644
+--- a/packages/components/src/slot-fill/slot.tsx
++++ b/packages/components/src/slot-fill/slot.tsx
+@@ -9,7 +9,7 @@ import type { ReactElement, ReactNode, Key } from 'react';
+ import { useObservableValue } from '@wordpress/compose';
+ import {
+ 	useContext,
+-	useEffect,
++	useLayoutEffect,
+ 	useRef,
+ 	Children,
+ 	cloneElement,
+@@ -54,7 +54,7 @@ function Slot( props: Omit< SlotComponentProps, 'bubblesVirtually' > ) {
+ 
+ 	const { name, children, fillProps = {} } = props;
+ 
+-	useEffect( () => {
++	useLayoutEffect( () => {
+ 		const instance = instanceRef.current;
+ 		registry.registerSlot( name, instance );
+ 		return () => registry.unregisterSlot( name, instance );

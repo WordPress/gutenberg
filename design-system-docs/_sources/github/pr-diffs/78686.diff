@@ -1,0 +1,1163 @@
+diff --git a/.github/ISSUE_TEMPLATE/New_release.md b/.github/ISSUE_TEMPLATE/New_release.md
+index 58f491c4b02e80..044badee87b2fe 100644
+--- a/.github/ISSUE_TEMPLATE/New_release.md
++++ b/.github/ISSUE_TEMPLATE/New_release.md
+@@ -5,7 +5,7 @@ about: A checklist for the Gutenberg plugin release process
+ labels: Gutenberg Plugin, [Type] Project Management
+ ---
+ 
+-This issue is to provide visibility on the progress of the release process of Gutenberg VERSION_NUMBER and to centralize any conversations about it. The ultimate goal of this issue is to keep the reference of the steps, resources, work, and conversations about this release so it can be helpful for the next contributors releasing a new Gutenberg version.
++This issue is to provide visibility on the progress of the release process of Gutenberg VERSION_NUMBER and to centralize any conversations about it. The ultimate goal of this issue is to keep a reference of the steps, resources, work, and conversations about this release so it can be helpful for the next contributors releasing a new Gutenberg version.
+ 
+ -   Gutenberg version to release: {VERSION_NUMBER} ([milestone](https://github.com/WordPress/gutenberg/milestone/{MILESTONE_ID}?closed=1))
+ -   Release Manager (a.k.a. Release Lead):
+diff --git a/docs/contributors/code/coding-guidelines.md b/docs/contributors/code/coding-guidelines.md
+index ea88af9cf56055..c7ea2ba5872b51 100644
+--- a/docs/contributors/code/coding-guidelines.md
++++ b/docs/contributors/code/coding-guidelines.md
+@@ -155,13 +155,13 @@ if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+ }
+ ```
+ 
+-The public interface of such APIs is not yet finalized. Aside from references within the code, they APIs should neither be documented nor mentioned in any CHANGELOG. They should effectively be considered to not exist from an external perspective. In most cases, they should only be exposed to satisfy requirements between packages maintained in this repository.
++The public interface of such APIs is not yet finalized. Aside from references within the code, these APIs should neither be documented nor mentioned in any CHANGELOG. They should effectively be considered to not exist from an external perspective. In most cases, they should only be exposed to satisfy requirements between packages maintained in this repository.
+ 
+ While a plugin-only API may often stabilize into a publicly-available API, there is no guarantee that it will.
+ 
+ #### Private APIs
+ 
+-Each `@wordpress` package wanting to privately access or expose a private APIs can
++Each `@wordpress` package wanting to privately access or expose private APIs can
+ do so by opting-in to `@wordpress/private-apis`:
+ 
+ ```js
+@@ -407,7 +407,7 @@ export function MyComponent() {
+ 
+ WordPress extenders cannot update the private block settings on their own. The `updateSettings()` actions of the `@wordpress/block-editor` store will filter out all the settings that are **not** a part of the public API. The only way to actually store them is via the private action `__experimentalUpdateSettings()`.
+ 
+-To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/actions.js](/packages/block-editor/src/store/actions.js):
++To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/private-actions.js](/packages/block-editor/src/store/private-actions.js):
+ 
+ ```js
+ const privateSettings = [
+diff --git a/docs/contributors/code/getting-started-with-code-contribution.md b/docs/contributors/code/getting-started-with-code-contribution.md
+index 62d0f874446be5..d4032d3d670d1e 100644
+--- a/docs/contributors/code/getting-started-with-code-contribution.md
++++ b/docs/contributors/code/getting-started-with-code-contribution.md
+@@ -66,7 +66,7 @@ npm run wp-env start
+ 
+ This script will create a Docker instance behind the scenes with the latest WordPress Docker image, and then will map the Gutenberg plugin code from your local copy to the environment as a Docker volume. This way, any changes you make to the code locally are reflected immediately in the WordPress instance.
+ 
+-> Note: `npm run` will use the `wp-env` / `WordPress`?? version specified within the Gutenberg project, making sure you are running the latest wp-env version.
++> Note: `npm run` will use the `wp-env` / `WordPress` version specified within the Gutenberg project, making sure you are running the latest wp-env version.
+ 
+ To stop the running environment:
+ 
+diff --git a/docs/contributors/code/managing-packages.md b/docs/contributors/code/managing-packages.md
+index 6e135eea857d04..44fa17362acbf5 100644
+--- a/docs/contributors/code/managing-packages.md
++++ b/docs/contributors/code/managing-packages.md
+@@ -4,7 +4,7 @@ This repository uses [npm workspaces](https://docs.npmjs.com/cli/v10/using-npm/w
+ 
+ Maintaining dozens of npm packages is difficult—it can be tough to keep track of changes. That's why we use `CHANGELOG.md` files for each package to simplify the release process. As a contributor, you should add an entry to the aforementioned file each time you contribute adding production code as described in [Maintaining Changelogs](https://github.com/WordPress/gutenberg/blob/HEAD/packages/README.md#maintaining-changelogs) section.
+ 
+-Publishing WordPress packages to npm is automated by synchronizing it with the bi-weekly Gutenberg plugin RC1 release. You can learn more about this process and other ways to publish new versions of npm packages in the [Gutenberg Release Process document](/docs/contributors/code/release/README.md#packages-releases-to-npm-and-wordpress-core-updates).
++Publishing WordPress packages to npm is automated by synchronizing it with the bi-weekly Gutenberg plugin RC1 release. You can learn more about this process and other ways to publish new versions of npm packages in the [Gutenberg Release Process document](/docs/contributors/code/release/README.md#publication-of-packages).
+ 
+ ## Internal workspaces (tools and tests)
+ 
+diff --git a/docs/contributors/code/react-native/osx-setup-guide.md b/docs/contributors/code/react-native/osx-setup-guide.md
+index dab5f33448b74d..b0f67f8fb8f807 100644
+--- a/docs/contributors/code/react-native/osx-setup-guide.md
++++ b/docs/contributors/code/react-native/osx-setup-guide.md
+@@ -78,7 +78,7 @@ Install [Xcode](https://developer.apple.com/xcode/) via the app store and then o
+ 
+ ### react-native doctor
+ 
+-[react-native doctor](https://reactnative.dev/blog/2019/11/18/react-native-doctor) can be used to identify anything that's missing from your development environment. From your Gutenberg checkout, or relative to `/packages/react-native-editor folder`, run:
++[react-native doctor](https://reactnative.dev/blog/2019/11/18/react-native-doctor) can be used to identify anything that's missing from your development environment. From your Gutenberg checkout, or relative to `/packages/react-native-editor` folder, run:
+ 
+ ```sh
+ npx @react-native-community/cli doctor
+diff --git a/docs/contributors/code/release/plugin-release.md b/docs/contributors/code/release/plugin-release.md
+index f4fcef166d337a..85d06a5c511057 100644
+--- a/docs/contributors/code/release/plugin-release.md
++++ b/docs/contributors/code/release/plugin-release.md
+@@ -415,7 +415,7 @@ The minor release should only contain the _specific commits_ required. To do thi
+ If an RC already exists for a new version, you <strong>need</strong> to cherry-pick the same commits in the respective release branch, as they will not be included automatically. E.g.: If you're about to release a new minor release for 12.5 and just cherry-picked into <code>release/12.5</code>, but 12.6.0-rc.1 is already out, then you need to cherry-pick the same commits into the <code>release/12.6</code> branch, or they won't be included in subsequent releases for 12.6! Usually it's best to coordinate this process with the release coordinator for the next release.
+ </div>
+ 
+-The cherry-picking process can be automated with the [`npm run cherry-pick`](/docs/contributors/code/auto-cherry-picking.md) script, but be sure to use the `Backport to Gutenberg Minor Release` label when running the script.
++The cherry-picking process can be automated with the [`npm run other:cherry-pick`](/docs/contributors/code/auto-cherry-picking.md) script, but be sure to use the `Backport to Gutenberg Minor Release` label when running the script.
+ 
+ You must also ensure that all PRs being included are assigned to the GitHub Milestone on which the minor release is based. Bear in mind, that when PRs are _merged_ they are automatically assigned a milestone for the next _stable_ release. Therefore you will need to go back through each PR in GitHub and re-assign the Milestone.
+ 
+diff --git a/docs/contributors/documentation/copy-guide.md b/docs/contributors/documentation/copy-guide.md
+index 36de90c9de9600..91388b97f405ca 100644
+--- a/docs/contributors/documentation/copy-guide.md
++++ b/docs/contributors/documentation/copy-guide.md
+@@ -48,7 +48,7 @@ This isn’t to say that you should banish these words from your vocabulary. You
+ 
+ #### FOUR: Look out for “we.”
+ 
+-Any time text or instructions uses “we” a lot, it means the focus of the text is on the people behind the software and not the people using the software. Sometimes that’s what you actually want—but it’s usually not. The focus should typically be on the user, what they need, and how they benefit rather than “what we did” or “what we want.”
++Any time text or instructions use “we” a lot, it means the focus of the text is on the people behind the software and not the people using the software. Sometimes that’s what you actually want—but it’s usually not. The focus should typically be on the user, what they need, and how they benefit rather than “what we did” or “what we want.”
+ 
+ We’re the only ones that care about what we did or want; the user just wants software that works. If you see a lot of “we”s, think about whether you should reframe what you’re writing to focus on the benefits to and successes of the user.
+ 
+diff --git a/docs/contributors/folder-structure.md b/docs/contributors/folder-structure.md
+index 03c0b496fa67e2..0cfbc76bf13db9 100644
+--- a/docs/contributors/folder-structure.md
++++ b/docs/contributors/folder-structure.md
+@@ -83,8 +83,8 @@ The following snippet explains how the Gutenberg repository is structured omitti
+     ├── lib
+     │   PHP Source code of the Gutenberg plugin.
+     │
+-    ├── lib/compact/wordpress-x.x
+-    │   PHP code that was include in WordPress ont the WordPress X.X version.
++    ├── lib/compat/wordpress-x.x
++    │   PHP code that was included in WordPress on the WordPress X.X version.
+     │   It is kept to ensure plugin compatibility with older WordPress versions.
+     │
+     ├── packages
+diff --git a/docs/explanations/architecture/performance.md b/docs/explanations/architecture/performance.md
+index 3258e9589ab71d..9819f62d7f2bf8 100644
+--- a/docs/explanations/architecture/performance.md
++++ b/docs/explanations/architecture/performance.md
+@@ -39,10 +39,10 @@ To get the most accurate results, it's is important to use the exact same versio
+ To achieve that the command first prepares the following folder structure:
+ 
+     │
+-    ├── tests/packages/e2e-tests/specs/performance/*
++    ├── test/performance/specs/*
+     |   The actual performance tests to run
+     │
+-    ├── tests/test/emptytheme
++    ├── test/emptytheme
+     |   The theme used for the tests environment. (site editor)
+     │
+     │── envs/branch1/.wp-env.json
+diff --git a/docs/explanations/architecture/styles.md b/docs/explanations/architecture/styles.md
+index 68f09f04d21d32..05ac1dc6aa56bb 100644
+--- a/docs/explanations/architecture/styles.md
++++ b/docs/explanations/architecture/styles.md
+@@ -4,7 +4,7 @@ This document introduces the main concepts related to styles that affect the use
+ 
+ ## HTML and CSS
+ 
+-By creating a post in the block editor the user is creating a number of artifacts: a HTML document plus a number of CSS stylesheets, either embedded in the document or external.
++By creating a post in the block editor, the user is creating a number of artifacts: an HTML document plus a number of CSS stylesheets, either embedded in the document or external.
+ 
+ The final HTML document is the result of a few things:
+ 
+@@ -53,7 +53,7 @@ To build an experience like the one described above a block author needs a few p
+ 
+ 1. **A UI control**. It presents the user some choices, for example, to be able to change the font size of the block. The control takes care of reading the data from the block (does this block already have a font size assigned?) and other data it needs (what are the font sizes a user can use in this block?). See available [component library](https://developer.wordpress.org/block-editor/reference-guides/components/).
+ 2. **A block attribute**. The block needs to hold data to know which modifications were applied to it: whether it has been given a font size already for example. See how blocks can define [attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/).
+-3. **Access to style data**. A control may need external information about the styles available for a given block: the list of colors, or the list of font sizes, for example. These are called "style presets", as they are a preselection of styles usually defined by the theme, although WordPress provides some defaults. Check the [list of data](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#settings) a theme can provide to the editor and how a block author can get access to it via [useSetting](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#usesetting).
++3. **Access to style data**. A control may need external information about the styles available for a given block: the list of colors, or the list of font sizes, for example. These are called "style presets", as they are a preselection of styles usually defined by the theme, although WordPress provides some defaults. Check the [list of data](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/#settings) a theme can provide to the editor and how a block author can get access to it via [useSettings](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#usesettings).
+ 4. **Serialize the user style into HTML markup**. Upon a user action, the block HTML markup needs to be updated accordingly (apply the proper class or inline style). This process is called serialization and it is the [edit, save](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/), and [render_callback](https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/creating-dynamic-blocks/) functions' responsibility: these functions take block data and convert it into HTML.
+ 
+ In essence, these are the essential mechanics a block author needs to care about for their block to be able to be styled by the user. While this can be done completely manually, there's an API that automates this process for common style needs: block supports.
+diff --git a/docs/getting-started/glossary.md b/docs/getting-started/glossary.md
+index 57e18d25c5a674..8ef0f0957d505a 100644
+--- a/docs/getting-started/glossary.md
++++ b/docs/getting-started/glossary.md
+@@ -32,7 +32,7 @@ A theme built in block forward way that allows Full Site Editing to work. The co
+ 
+ ## Block categories
+ 
+-These are not a WordPress taxonomy, but instead used internally to sort blocks in the Block Library.
++These are not a WordPress taxonomy but instead are used internally to sort blocks in the Block Library.
+ 
+ ## Block ~Inserter~ Library
+ 
+diff --git a/docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md b/docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md
+index b41a7c86874331..a1a0bce3a7fb88 100644
+--- a/docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md
++++ b/docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md
+@@ -277,7 +277,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
+ 		return (
+ 			<div {...innerBlocksProps}>
+     			{ children }
+-				<!-- Insert any arbitrary html here at the same level as the children -->
++				{/* Insert any arbitrary html here at the same level as the children */}
+ 			</div>
+ 		);
+ 	},
+diff --git a/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md b/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md
+index dbd73e06c894c0..80ae08ffb2c6f6 100644
+--- a/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md
++++ b/docs/how-to-guides/data-basics/2-building-a-list-of-pages.md
+@@ -263,7 +263,7 @@ function MyFirstApp() {
+ 
+ Working outside of core-data, we would need to solve two problems here.
+ 
+-Firstly, out-of-order updates. Searching for „About” would trigger five API requests filtering for `A`, `Ab`, `Abo`, `Abou`, and `About`. These requests could finish in a different order than they started. It is possible that _search=A_ would resolve after _ search=About_ and thus we’d display the wrong data.
++Firstly, out-of-order updates. Searching for “About” would trigger five API requests filtering for `A`, `Ab`, `Abo`, `Abou`, and `About`. These requests could finish in a different order than they started. It is possible that _search=A_ would resolve after _search=About_ and thus we’d display the wrong data.
+ 
+ Gutenberg data helps by handling the asynchronous part behind the scenes. `useSelect` remembers the most recent call and returns only the data we expect.
+ 
+diff --git a/docs/how-to-guides/metabox.md b/docs/how-to-guides/metabox.md
+index 887e6dd6e507c3..16a0ab37fdbcb4 100644
+--- a/docs/how-to-guides/metabox.md
++++ b/docs/how-to-guides/metabox.md
+@@ -6,7 +6,7 @@ Prior to the block editor, custom meta boxes were used to extend the editor. Now
+ 
+ The block editor does support most existing meta boxes, see [the backward compatibility section below](#backward-compatibility) for details .
+ 
+-If you are interested in working with the post meta outside the editor, check out the [Sidebar Tutorial](/docs/how-to-guides/sidebar-tutorial/plugin-sidebar-0.md).
++If you are interested in working with the post meta outside the editor, check out the [Sidebar Tutorial](/docs/how-to-guides/plugin-sidebar-0.md).
+ 
+ ### Use blocks to store meta
+ 
+diff --git a/docs/how-to-guides/themes/theme-support.md b/docs/how-to-guides/themes/theme-support.md
+index b252613b1cb764..264506aa137f0a 100644
+--- a/docs/how-to-guides/themes/theme-support.md
++++ b/docs/how-to-guides/themes/theme-support.md
+@@ -471,10 +471,11 @@ The block will get attached the class `.wp-elements-<uuid>`.
+ 
+ Use this setting to enable the following Global Styles settings:
+ 
++- background: backgroundImage, backgroundSize, gradient
+ - border: color, radius, style, width
+-- color: link
++- color: link, heading, button, caption
+ - spacing: blockGap, margin, padding
+-- typography: lineHeight
++- typography: lineHeight, textColumns
+ - dimensions: aspectRatio, height, minHeight, minWidth, width
+ - position: sticky
+ 
+diff --git a/docs/private-apis.md b/docs/private-apis.md
+index 58eebd4ddd35ea..a2e1438ccf2790 100644
+--- a/docs/private-apis.md
++++ b/docs/private-apis.md
+@@ -96,7 +96,6 @@ Private exports:
+ - `normalizeString`
+ - `PrivateListView`
+ - `ResizableBoxPopover`
+-- `BlockInfo`
+ - `useHasBlockToolbar`
+ - `cleanEmptyObject`
+ - `BlockQuickNavigation`
+@@ -125,8 +124,8 @@ Private exports:
+ - `BlockStyleVariationOverridesWithConfig`
+ - `setBackgroundStyleDefaults`
+ - `sectionRootClientIdKey`
+-- `__unstableCommentIconFill`
+-- `__unstableCommentIconToolbarFill`
++- `NoteIconSlotFill`
++- `NoteIconToolbarSlotFill`
+ 
+ ### `core/block-editor` store
+ 
+diff --git a/docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md b/docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md
+index 01781b48f41e0a..2d4ae6d6bc82c0 100644
+--- a/docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md
++++ b/docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md
+@@ -24,8 +24,8 @@ The iframed post editor will make life easier for block and theme authors by red
+ 
+ While most editors, including the template editor, already work as iframes, for backward compatibility, the current post editor only works as an iframe when the following conditions are met (determined by [the useShouldIframe hook](https://github.com/WordPress/gutenberg/blob/cd4fae71551e0ebf27472da1d7bbdfce91a131ec/packages/edit-post/src/components/layout/use-should-iframe.js#L16)):
+ 
+-- **If the Gutenberg plugin is enabled:** The active theme is a block-based theme OR all registered blocks have `apiVersion` 3 or higher
+-- **If the Gutenberg plugin is not enabled:** All blocks present in the post content have `apiVersion` 3 or higher
++- **If the Gutenberg plugin is enabled:** The editor always works as an iframe.
++- **If the Gutenberg plugin is not enabled:** The editor always works as an iframe when any of the following is true: the device type is not `Desktop` (e.g., tablet or mobile previews), the current post type is `wp_template` or `wp_block`, zoom-out mode is active, or all blocks present in the post content have `apiVersion` 3 or higher.
+ 
+ In summary, if you haven't been able to fully test your blocks in the iframe editor yet, by maintaining `apiVersion` 2, you can prevent the post editor from working as an iframe in most cases. Once you've confirmed that your blocks work in the iframe editor, you can then migrate to `apiVersion` 3.
+ 
+@@ -89,7 +89,7 @@ If you attach event handlers, remember that the `useEffect` callback will not be
+ ```javascript
+ import { __ } from '@wordpress/i18n';
+ import { useBlockProps } from '@wordpress/block-editor';
+-import { useRefEffect } from '@wordpress/element';
++import { useRefEffect } from '@wordpress/compose';
+ 
+ export default function Edit() {
+ 	const ref = useRefEffect( ( element ) => {
+@@ -118,7 +118,7 @@ For the editor, scripts such as jQuery are loaded in the parent window (admin pa
+ ```javascript
+ import { __ } from '@wordpress/i18n';
+ import { useBlockProps } from '@wordpress/block-editor';
+-import { useRefEffect } from '@wordpress/element';
++import { useRefEffect } from '@wordpress/compose';
+ import jQuery from 'jquery';
+ 
+ export default function Edit() {
+@@ -148,7 +148,7 @@ In the meantime, you can use the script that is loaded inside the iframe. We've
+ ```javascript
+ import { __ } from '@wordpress/i18n';
+ import { useBlockProps } from '@wordpress/block-editor';
+-import { useRefEffect } from '@wordpress/element';
++import { useRefEffect } from '@wordpress/compose';
+ import jQuery from 'jquery';
+ 
+ export default function Edit() {
+diff --git a/docs/reference-guides/block-api/block-attributes.md b/docs/reference-guides/block-api/block-attributes.md
+index 1bb50917a9221c..38ab610956f794 100644
+--- a/docs/reference-guides/block-api/block-attributes.md
++++ b/docs/reference-guides/block-api/block-attributes.md
+@@ -44,7 +44,7 @@ function YourBlockEdit( { attributes } ) {
+ 
+ The block is responsible for using the `save` function to ensure that all attributes with a `source` field are saved according to the attributes definition. This is not automatic.
+ 
+-Attributes without a `source` will be automatically saved in the block [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-attributes).
++Attributes without a `source` will be automatically saved in the block [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-and-attributes).
+ 
+ For example, using the above attributes definition you would need to ensure that your `save` function has a corresponding img tag for the `url` attribute. The `title` and `size` attributes will be saved in the comment delimiter.
+ 
+@@ -105,7 +105,7 @@ _Example_: Example `enum`.
+ Attribute sources are used to define how the attribute values are extracted from saved post content. They provide a mechanism to map from the saved markup to a JavaScript representation of a block.
+ 
+ The available `source` values are:
+-- `(no value)` - when no `source` is specified then data is stored in the block's [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-attributes).
++- `(no value)` - when no `source` is specified then data is stored in the block's [comment delimiter](/docs/explanations/architecture/key-concepts.md#data-and-attributes).
+ - `attribute` - data is stored in an HTML element attribute.
+ - `text` - data is stored in HTML text.
+ - `html` - data is stored in HTML. This is typically used by `RichText`.
+diff --git a/docs/reference-guides/block-api/block-bindings.md b/docs/reference-guides/block-api/block-bindings.md
+index 4f28e564e9da07..fe8ec74eea9319 100644
+--- a/docs/reference-guides/block-api/block-bindings.md
++++ b/docs/reference-guides/block-api/block-bindings.md
+@@ -224,13 +224,13 @@ There are two filters available:
+ - `block_bindings_supported_attributes`: A general filter that receives the supported attributes array and the block type name.
+ - `block_bindings_supported_attributes_{$block_type}`: A dynamic filter specific to a block type (e.g., `block_bindings_supported_attributes_core/image`).
+ 
+-Example of adding support for the `caption` attribute on the Image block:
++Example of adding support for the `linkDestination` attribute on the Image block (attributes already supported by default are listed in the [Compatible blocks](#compatible-blocks-and-their-attributes) table above):
+ 
+ ```php
+ add_filter(
+ 	'block_bindings_supported_attributes_core/image',
+ 	function ( $supported_attributes ) {
+-		$supported_attributes[] = 'caption';
++		$supported_attributes[] = 'linkDestination';
+ 		return $supported_attributes;
+ 	}
+ );
+diff --git a/docs/reference-guides/block-api/block-context.md b/docs/reference-guides/block-api/block-context.md
+index ee192e4f3196cb..f4525b19016900 100644
+--- a/docs/reference-guides/block-api/block-context.md
++++ b/docs/reference-guides/block-api/block-context.md
+@@ -131,6 +131,7 @@ registerBlockType( 'my-plugin/record-title', {
+ ```js
+ import { TextControl } from '@wordpress/components';
+ import { InnerBlocks } from '@wordpress/block-editor';
++import { __ } from '@wordpress/i18n';
+ 
+ export default function Edit( props ) {
+ 	const MY_TEMPLATE = [ [ 'my-plugin/record-title', {} ] ];
+diff --git a/docs/reference-guides/block-api/block-edit-save.md b/docs/reference-guides/block-api/block-edit-save.md
+index 769b54b7976936..87b85a25623e63 100644
+--- a/docs/reference-guides/block-api/block-edit-save.md
++++ b/docs/reference-guides/block-api/block-edit-save.md
+@@ -213,7 +213,7 @@ it can help you adjust how a block is rendered. For example, you could render a
+ 
+ ```jsx
+ save: ( { attributes, innerBlocks } ) => {
+-	const { className, ...rest } = useBlockProps.save();
++	let { className, ...rest } = useBlockProps.save();
+ 
+ 	// innerBlocks could also be an object - react element during initialization
+ 	const numberOfInnerBlocks = innerBlocks?.length;
+diff --git a/docs/reference-guides/block-api/block-metadata.md b/docs/reference-guides/block-api/block-metadata.md
+index bd558445f4fc92..7088409447dd97 100644
+--- a/docs/reference-guides/block-api/block-metadata.md
++++ b/docs/reference-guides/block-api/block-metadata.md
+@@ -1,6 +1,6 @@
+ # Metadata in block.json
+ 
+-Starting with the WordPress 5.8 release, we recommend using the `block.json` metadata file as the canonical way to register block types with both PHP (server-side) and JavaScript (client-side). Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
++Starting with the WordPress 5.8 release, we recommend using the `block.json` metadata file as the canonical way to register block types with both PHP (server-side) and JavaScript (client-side). Here is an example `block.json` file that would define the metadata for a plugin creating a notice block.
+ 
+ **Example:**
+ 
+diff --git a/docs/reference-guides/block-api/block-supports.md b/docs/reference-guides/block-api/block-supports.md
+index daaea2638ccd87..cc73de631cec93 100644
+--- a/docs/reference-guides/block-api/block-supports.md
++++ b/docs/reference-guides/block-api/block-supports.md
+@@ -644,6 +644,7 @@ _**Note:** Since WordPress 6.2._
+ -   Type: `Object`
+ -   Default value: null
+ -   Subproperties:
++    -   `aspectRatio`: type `boolean`, default value `false`
+     -   `height`: type `boolean`, default value `false`
+     -   `minHeight`: type `boolean`, default value `false`
+     -   `minWidth`: type `boolean`, default value `false`
+@@ -654,11 +655,11 @@ This value signals that a block supports some of the CSS style properties relate
+ ```js
+ supports: {
+ 	dimensions: {
+-		aspectRatio: true // Enable aspect ratio control.
+-		height: true // Enable height control.
+-		minHeight: true // Enable min height control.
+-		minWidth: true // Enable min width control.
+-		width: true // Enable width control.
++		aspectRatio: true, // Enable aspect ratio control.
++		height: true, // Enable height control.
++		minHeight: true, // Enable min height control.
++		minWidth: true, // Enable min width control.
++		width: true, // Enable width control.
+ 	}
+ }
+ ```
+diff --git a/docs/reference-guides/block-api/block-transforms.md b/docs/reference-guides/block-api/block-transforms.md
+index 33d418cc68dd5b..b3a758dd9dc69b 100644
+--- a/docs/reference-guides/block-api/block-transforms.md
++++ b/docs/reference-guides/block-api/block-transforms.md
+@@ -152,7 +152,7 @@ transforms: {
+ 				} );
+ 			},
+ 		},
+-	];
++	],
+ }
+ ```
+ 
+@@ -183,7 +183,7 @@ transforms: {
+ 				} );
+ 			},
+ 		},
+-	];
++	],
+ }
+ ```
+ 
+@@ -247,7 +247,7 @@ We want to tell the editor to allow the inner `h2` and `p` elements. We do this
+ a `<RichText />` component is a good place to allow phrasing content otherwise we'll lose all text formatting on conversion.
+ 
+ ```js
+-schema = ({ phrasingContentSchema }) => {
++schema = ({ phrasingContentSchema }) => ({
+     div: {
+         required: true,
+         attributes: [ 'data-post-id' ],
+@@ -256,7 +256,7 @@ schema = ({ phrasingContentSchema }) => {
+             p: { children: phrasingContentSchema }
+         }
+     }
+-}
++})
+ ```
+ 
+ When we successfully match this content every HTML attribute will be stripped away except for `data-post-id` and if we have other arrangements of HTML inside of a given `div` then it won't match our transformer. Likewise we'd fail to match if we found an `<h3>` in there instead of an `<h2>`.
+diff --git a/docs/reference-guides/data/data-core-preferences.md b/docs/reference-guides/data/data-core-preferences.md
+index 5a39a15f5df110..bace94f750b3f7 100644
+--- a/docs/reference-guides/data/data-core-preferences.md
++++ b/docs/reference-guides/data/data-core-preferences.md
+@@ -8,7 +8,7 @@ Namespace: `core/preferences`.
+ 
+ ### get
+ 
+-Returns a boolean indicating whether a prefer is active for a particular scope.
++Returns a boolean indicating whether a preference is active for a particular scope.
+ 
+ _Parameters_
+ 
+diff --git a/docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md b/docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md
+index 3c23a981e1ddde..d4973157a31a36 100644
+--- a/docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md
++++ b/docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md
+@@ -404,7 +404,7 @@ const { state } = store( 'myFruitPlugin', {
+       const context = getContext();
+       return state.translatedFruits[ context.item ];
+     }
+-  }
++  },
+   actions: {
+     addMango() {
+       state.fruits.push( 'mango' );
+diff --git a/docs/reference-guides/theme-json-reference/styles-versions.md b/docs/reference-guides/theme-json-reference/styles-versions.md
+index b548d0eb23830e..898964a9e7023e 100644
+--- a/docs/reference-guides/theme-json-reference/styles-versions.md
++++ b/docs/reference-guides/theme-json-reference/styles-versions.md
+@@ -4,57 +4,67 @@ New styles options are integrated into theme.json on a regular basis. Knowing th
+ 
+ ## Styles keys
+ 
+-| Key | theme.json Since| Style Editor Since |
+-| --- | :---: | :---: |
+-| `color.gradient`              | 5.8 | 5.9 |
+-| `color.background`            | 5.8 | 5.9 |
+-| `color.text`                  | 5.8 | 5.9 |
+-| `border.color`                | 5.9 | 5.9 |
+-| `border.width`                | 5.9 | 5.9 |
+-| `border.style`                | 5.9 | 5.9 |
+-| `border.radius`               | 5.8 | 5.9 |
+-| `border.radius.topLeft`       | 5.9 | 5.9 |
+-| `border.radius.topRight`      | 5.9 | 5.9 |
+-| `border.radius.bottomLeft`    | 5.9 | 5.9 |
+-| `border.radius.bottomRight`   | 5.9 | 5.9 |
+-| `border.top.color`            | 6.1 | 6.1 |
+-| `border.top.width`            | 6.1 | 6.1 |
+-| `border.top.style`            | 6.1 | 6.1 |
+-| `border.right.color`          | 6.1 | 6.1 |
+-| `border.right.width`          | 6.1 | 6.1 |
+-| `border.right.style`          | 6.1 | 6.1 |
+-| `border.bottom.color`         | 6.1 | 6.1 |
+-| `border.bottom.width`         | 6.1 | 6.1 |
+-| `border.bottom.style`         | 6.1 | 6.1 |
+-| `border.left.color`           | 6.1 | 6.1 |
+-| `border.left.width`           | 6.1 | 6.1 |
+-| `border.left.style`           | 6.1 | 6.1 |
+-| `typography.fontFamily`       | 5.9 | 5.9 |
+-| `typography.fontSize`         | 5.8 | 5.9 |
+-| `typography.fontStyle`        | 5.9 | 5.9 |
+-| `typography.fontWeight`       | 5.9 | 5.9 |
+-| `typography.letterSpacing`    | 5.9 | 5.9 |
+-| `typography.lineHeight`       | 5.8 | 5.9 |
+-| `typography.textDecoration`   | 5.9 | 6.2 |
+-| `typography.textTransform`    | 5.9 | 6.0 |
+-| `spacing.padding`             | 5.9 | 5.9 |
+-| `spacing.padding.top`         | 5.8 | 5.9 |
+-| `spacing.padding.right`       | 5.8 | 5.9 |
+-| `spacing.padding.left`        | 5.8 | 5.9 |
+-| `spacing.padding.bottom`      | 5.8 | 5.9 |
+-| `spacing.margin`              | 5.9 | 5.9 |
+-| `spacing.margin.top`          | 5.8 | 5.9 |
+-| `spacing.margin.right`        | 5.8 | 5.9 |
+-| `spacing.margin.left`         | 5.8 | 5.9 |
+-| `spacing.margin.bottom`       | 5.8 | 5.9 |
+-| `spacing.blockGap`            | 5.9 | 5.9 |
+-| `dimensions.height`           | 7.0 | N/A |
+-| `dimensions.minHeight`        | 6.2 | N/A |
+-| `dimensions.minWidth`         | 7.1 | 7.1 |
+-| `dimensions.width`            | 7.0 | N/A |
+-| `outline.color`               | 6.2 | N/A |
+-| `outline.offset`              | 6.2 | N/A |
+-| `outline.style`               | 6.2 | N/A |
+-| `outline.width`               | 6.2 | N/A |
+-| `filter.duotone`              | 5.9 | N/A |
+-| `shadow`                      | 6.1 | 6.2 |
++| Key                               | theme.json Since | Style Editor Since |
++| --------------------------------- | :--------------: | :----------------: |
++| `color.gradient`                  |       5.8        |        5.9         |
++| `color.background`                |       5.8        |        5.9         |
++| `color.text`                      |       5.8        |        5.9         |
++| `border.color`                    |       5.9        |        5.9         |
++| `border.width`                    |       5.9        |        5.9         |
++| `border.style`                    |       5.9        |        5.9         |
++| `border.radius`                   |       5.8        |        5.9         |
++| `border.radius.topLeft`           |       5.9        |        5.9         |
++| `border.radius.topRight`          |       5.9        |        5.9         |
++| `border.radius.bottomLeft`        |       5.9        |        5.9         |
++| `border.radius.bottomRight`       |       5.9        |        5.9         |
++| `border.top.color`                |       6.1        |        6.1         |
++| `border.top.width`                |       6.1        |        6.1         |
++| `border.top.style`                |       6.1        |        6.1         |
++| `border.right.color`              |       6.1        |        6.1         |
++| `border.right.width`              |       6.1        |        6.1         |
++| `border.right.style`              |       6.1        |        6.1         |
++| `border.bottom.color`             |       6.1        |        6.1         |
++| `border.bottom.width`             |       6.1        |        6.1         |
++| `border.bottom.style`             |       6.1        |        6.1         |
++| `border.left.color`               |       6.1        |        6.1         |
++| `border.left.width`               |       6.1        |        6.1         |
++| `border.left.style`               |       6.1        |        6.1         |
++| `typography.fontFamily`           |       5.9        |        5.9         |
++| `typography.fontSize`             |       5.8        |        5.9         |
++| `typography.fontStyle`            |       5.9        |        5.9         |
++| `typography.fontWeight`           |       5.9        |        5.9         |
++| `typography.letterSpacing`        |       5.9        |        5.9         |
++| `typography.lineHeight`           |       5.8        |        5.9         |
++| `typography.textAlign`            |       6.6        |        6.6         |
++| `typography.textColumns`          |       6.1        |        N/A         |
++| `typography.textDecoration`       |       5.9        |        6.2         |
++| `typography.textIndent`           |       7.0        |        7.0         |
++| `typography.textTransform`        |       5.9        |        6.0         |
++| `typography.writingMode`          |       6.3        |        6.3         |
++| `spacing.padding`                 |       5.9        |        5.9         |
++| `spacing.padding.top`             |       5.8        |        5.9         |
++| `spacing.padding.right`           |       5.8        |        5.9         |
++| `spacing.padding.left`            |       5.8        |        5.9         |
++| `spacing.padding.bottom`          |       5.8        |        5.9         |
++| `spacing.margin`                  |       5.9        |        5.9         |
++| `spacing.margin.top`              |       5.8        |        5.9         |
++| `spacing.margin.right`            |       5.8        |        5.9         |
++| `spacing.margin.left`             |       5.8        |        5.9         |
++| `spacing.margin.bottom`           |       5.8        |        5.9         |
++| `spacing.blockGap`                |       5.9        |        5.9         |
++| `background.backgroundAttachment` |       6.7        |        6.7         |
++| `background.backgroundImage`      |       6.4        |        6.5         |
++| `background.backgroundPosition`   |       6.6        |        6.6         |
++| `background.backgroundRepeat`     |       6.6        |        6.6         |
++| `background.backgroundSize`       |       6.6        |        6.6         |
++| `dimensions.aspectRatio`          |       6.5        |        6.6         |
++| `dimensions.height`               |       7.0        |        N/A         |
++| `dimensions.minHeight`            |       6.2        |        N/A         |
++| `dimensions.minWidth`             |       7.1        |        7.1         |
++| `dimensions.width`                |       7.0        |        N/A         |
++| `outline.color`                   |       6.2        |        N/A         |
++| `outline.offset`                  |       6.2        |        N/A         |
++| `outline.style`                   |       6.2        |        N/A         |
++| `outline.width`                   |       6.2        |        N/A         |
++| `filter.duotone`                  |       5.9        |        N/A         |
++| `shadow`                          |       6.1        |        6.2         |
+diff --git a/packages/block-editor/CHANGELOG.md b/packages/block-editor/CHANGELOG.md
+index f99183c59948fb..a7026a856f03df 100644
+--- a/packages/block-editor/CHANGELOG.md
++++ b/packages/block-editor/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Documentation
++
++-   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
++
+ ### Internal
+ 
+ -   `ListView`: Compute the block visibility label once in `ListViewBlock` and pass it down to `ListViewBlockSelectButton`, removing a duplicated `useSelect`/`getBlockVisibilityLabel` call and clarifying that the label is exposed to assistive technology through the row's `aria-describedby` ([#78640](https://github.com/WordPress/gutenberg/pull/78640)).
+diff --git a/packages/block-editor/src/components/block-breadcrumb/README.md b/packages/block-editor/src/components/block-breadcrumb/README.md
+index c1ffe43472b0c1..c793e18dd09795 100644
+--- a/packages/block-editor/src/components/block-breadcrumb/README.md
++++ b/packages/block-editor/src/components/block-breadcrumb/README.md
+@@ -8,9 +8,9 @@ The block breadcrumb trail displays the hierarchy of the current block selection
+ 
+ ## Development guidelines
+ 
+-#### Props
++### Props
+ 
+-##### rootLabelText
++#### rootLabelText
+ 
+ Label text for the root element (the first `<li />`) of the breadcrumb trail.
+ 
+diff --git a/packages/block-editor/src/components/block-compare/README.md b/packages/block-editor/src/components/block-compare/README.md
+index 861d0e6d872df0..cf60ce2899ac7a 100644
+--- a/packages/block-editor/src/components/block-compare/README.md
++++ b/packages/block-editor/src/components/block-compare/README.md
+@@ -5,37 +5,37 @@ of converting the block.
+ 
+ A button is present on both blocks to then select one or the other.
+ 
+-#### Props
++## Props
+ 
+-##### block
++### block
+ 
+ The original object to compare against
+ 
+ -   Type: `Object`
+ -   Required: Yes
+ 
+-##### convertor
++### convertor
+ 
+ A function that returns a new, converted, block when supplied an existing block. The conversion may fix or alter the block in a way that helps with an invalid block.
+ 
+ -   Type: `func`
+ -   Required: Yes
+ 
+-##### convertButtonText
++### convertButtonText
+ 
+ Text to show in the convert button
+ 
+ -   Type: `string`
+ -   Required: Yes
+ 
+-##### onKeep
++### onKeep
+ 
+ Callback when the original block is required
+ 
+ -   Type: `func`
+ -   Required: Yes
+ 
+-##### onConvert
++### onConvert
+ 
+ Callback when the converted block is required.
+ 
+diff --git a/packages/block-editor/src/components/block-media-update-progress/README.md b/packages/block-editor/src/components/block-media-update-progress/README.md
+index 97abff477ea24f..6f193100974cc7 100644
+--- a/packages/block-editor/src/components/block-media-update-progress/README.md
++++ b/packages/block-editor/src/components/block-media-update-progress/README.md
+@@ -93,7 +93,7 @@ The argument of the callback is an object containing the following properties:
+ 
+ ### onMediaUploadStateReset
+ 
+-Callback called when the media upload is reset
++Callback called when the media upload is reset.
+ 
+ -   Type: `Function`
+ -   Required: No
+diff --git a/packages/block-editor/src/components/block-preview/README.md b/packages/block-editor/src/components/block-preview/README.md
+index 5cce2e45cb54ff..29b055e3a4bb8c 100644
+--- a/packages/block-editor/src/components/block-preview/README.md
++++ b/packages/block-editor/src/components/block-preview/README.md
+@@ -26,7 +26,7 @@ A block instance (object) or a blocks array you would like to render a preview.
+ 
+ Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview.
+ 
+-`viewportWidth` can be used to simulate how blocks look on different device sizes or to make sure make sure multiple previews will be rendered with the same scale, regardless of their content.
++`viewportWidth` can be used to simulate how blocks look on different device sizes or to make sure multiple previews will be rendered with the same scale, regardless of their content.
+ 
+ Set `viewportWidth` to `0` to make the viewport the same width as the container.
+ 
+diff --git a/packages/block-editor/src/components/caption/README.md b/packages/block-editor/src/components/caption/README.md
+index c8cf4ebe8701dd..4341a0330a4610 100644
+--- a/packages/block-editor/src/components/caption/README.md
++++ b/packages/block-editor/src/components/caption/README.md
+@@ -41,4 +41,4 @@ The properties `isSelected`, `onBlur`, `onChange`, `onFocus`, `shouldDisplay`, `
+ 
+ ## Related components
+ 
+-Caption components is mostly used by the [`BlockCaption`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-caption) component.
+\ No newline at end of file
++The Caption component is mostly used by the [`BlockCaption`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-caption) component.
+\ No newline at end of file
+diff --git a/packages/block-editor/src/components/justify-content-control/README.md b/packages/block-editor/src/components/justify-content-control/README.md
+index 519b2b446bcc72..f8174cd097e621 100644
+--- a/packages/block-editor/src/components/justify-content-control/README.md
++++ b/packages/block-editor/src/components/justify-content-control/README.md
+@@ -27,7 +27,7 @@ const MyJustifyToolbar = ( { attributes, setAttributes } ) => (
+ );
+ ```
+ 
+-**NOTE:** The justfify toolbar does not add any classes to your component, you must do this using the `setAttributes` function. The toolbar does define the following classnames you should use:
++**NOTE:** The justify toolbar does not add any classes to your component, you must do this using the `setAttributes` function. The toolbar does define the following classnames you should use:
+ 
+     items-justified-left
+     items-justified-center
+diff --git a/packages/block-editor/src/components/ungroup-button/README.md b/packages/block-editor/src/components/ungroup-button/README.md
+index fe1985535b103e..6dc5569b6e69ad 100644
+--- a/packages/block-editor/src/components/ungroup-button/README.md
++++ b/packages/block-editor/src/components/ungroup-button/README.md
+@@ -1,6 +1,6 @@
+ # Ungroup Button
+ 
+-The `UngroupButton` components adds an icon on the BlockControls toolbar when a group block is selected. Then, it's possible to ungroup the inner blocks. After click on the icon, it removes the group block holding the InnerBlocks components which are moved one level up in the hierarchy.
++The `UngroupButton` component adds an icon on the BlockControls toolbar when a group block is selected. Then, it's possible to ungroup the inner blocks. After click on the icon, it removes the group block holding the InnerBlocks components which are moved one level up in the hierarchy.
+ 
+ This only happens in the mobile WordPress apps.
+ 
+diff --git a/packages/block-editor/src/components/unit-control/README.md b/packages/block-editor/src/components/unit-control/README.md
+index e44ffb494deff1..a36f80fe698071 100644
+--- a/packages/block-editor/src/components/unit-control/README.md
++++ b/packages/block-editor/src/components/unit-control/README.md
+@@ -1,6 +1,6 @@
+ # UnitControl
+ 
+-UnitControl component allows the user to set a value as well as a unit (e.g. `px`). The allowed units are derived from the (experimental) `theme.json` settings file .
++UnitControl component allows the user to set a value as well as a unit (e.g. `px`). The allowed units are derived from the (experimental) `theme.json` settings file.
+ 
+ ```js
+ // theme.json
+diff --git a/packages/block-editor/src/components/url-popover/README.md b/packages/block-editor/src/components/url-popover/README.md
+index 08b738eb4ec795..cb150d5ac64588 100644
+--- a/packages/block-editor/src/components/url-popover/README.md
++++ b/packages/block-editor/src/components/url-popover/README.md
+@@ -123,7 +123,7 @@ drawer.
+ ## Useful UI pieces
+ 
+ The URLPopover exposes two components that may be used as child components to make the UI creation process easier.
+-Although in the editor these components are used inside URLPopover and they were built with URLPopover use cases in mind, it maybe is possible and perfectly fine to use them standalone if they fit a use-case.
++Although in the editor these components are used inside URLPopover and they were built with URLPopover use cases in mind, it may be possible and perfectly fine to use them standalone if they fit a use-case.
+ 
+ ### LinkViewer
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1944bb69f68478..e12081c7fe54eb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Documentation
++
++-   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
++
+ ## 34.0.0 (2026-05-27)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/card/card/README.md b/packages/components/src/card/card/README.md
+index f656c837614ca5..bda72135f0658a 100644
+--- a/packages/components/src/card/card/README.md
++++ b/packages/components/src/card/card/README.md
+@@ -85,9 +85,9 @@ This component provides a collection of sub-component that can be used to compos
+ 
+ -   [`<CardBody />`](/packages/components/src/card/card-body/README.md)
+ -   [`<CardDivider />`](/packages/components/src/card/card-divider/README.md)
+--   [`<CardFooter />`](/packages/components/src/card/card-footer/README.md))
+--   [`<CardHeader />`](/packages/components/src/card/card-header/README.md))
+--   [`<CardMedia />`](/packages/components/src/card/card-media/README.md))
++-   [`<CardFooter />`](/packages/components/src/card/card-footer/README.md)
++-   [`<CardHeader />`](/packages/components/src/card/card-header/README.md)
++-   [`<CardMedia />`](/packages/components/src/card/card-media/README.md)
+ 
+ ### Sub-Components Example
+ 
+@@ -165,7 +165,7 @@ const Example = () => (
+ );
+ ```
+ 
+-These sub-components are designed to be flexible. The Context props can be overridden by the sub-component(s) as required. In the following example, the last `<CardBody />` will render it's specified size:
++These sub-components are designed to be flexible. The Context props can be overridden by the sub-component(s) as required. In the following example, the last `<CardBody />` will render its specified size:
+ 
+ ```jsx
+ import { Card, CardBody } from '@wordpress/components';
+diff --git a/packages/components/src/checkbox-control/README.md b/packages/components/src/checkbox-control/README.md
+index e89ee489feca99..8548c0c3bafbaa 100644
+--- a/packages/components/src/checkbox-control/README.md
++++ b/packages/components/src/checkbox-control/README.md
+@@ -45,7 +45,7 @@ If only a few child checkboxes are checked, the parent checkbox becomes a mixed
+ 
+ ### Usage
+ 
+-Render an is author checkbox:
++Render an author checkbox:
+ 
+ ```jsx
+ import { useState } from 'react';
+diff --git a/packages/components/src/clipboard-button/README.md b/packages/components/src/clipboard-button/README.md
+index 94bd50b0476a58..960170e9b1c5ff 100644
+--- a/packages/components/src/clipboard-button/README.md
++++ b/packages/components/src/clipboard-button/README.md
+@@ -51,15 +51,15 @@ The text that will be copied to the clipboard.
+ 
+ The function that will be called when the text is copied.
+ 
+--- Type: `() => void`
+--- Required: yes
++- Type: `() => void`
++- Required: yes
+ 
+ ### onFinishCopy
+ 
+ The function that will be called when the text is copied and the copy animation is finished.
+ 
+--- Type: `() => void`
+--- Required: no
++- Type: `() => void`
++- Required: no
+ 
+ ### Inherited props
+ 
+diff --git a/packages/components/src/combobox-control/README.md b/packages/components/src/combobox-control/README.md
+index 8759be906a7138..4997c03613e43c 100644
+--- a/packages/components/src/combobox-control/README.md
++++ b/packages/components/src/combobox-control/README.md
+@@ -91,7 +91,7 @@ Function called when the control's search input value changes. The argument cont
+ 
+ #### onChange
+ 
+-Function called with the selected value changes.
++Function called when the selected value changes.
+ 
+ -   Type: `( value: string | null | undefined ) => void`
+ -   Required: No
+diff --git a/packages/components/src/confirm-dialog/README.md b/packages/components/src/confirm-dialog/README.md
+index 3ad42d9d68160e..7bfb9b04ae2f41 100644
+--- a/packages/components/src/confirm-dialog/README.md
++++ b/packages/components/src/confirm-dialog/README.md
+@@ -4,7 +4,7 @@
+ This feature is still experimental. "Experimental" means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-`ConfirmDialog` is built of top of [`Modal`](/packages/components/src/modal/README.md) and displays a confirmation dialog, with _confirm_ and _cancel_ buttons.
++`ConfirmDialog` is built on top of [`Modal`](/packages/components/src/modal/README.md) and displays a confirmation dialog, with _confirm_ and _cancel_ buttons.
+ 
+ The dialog is confirmed by clicking the _confirm_ button or by pressing the `Enter` key. It is cancelled (closed) by clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay).
+ 
+diff --git a/packages/components/src/flex/flex/README.md b/packages/components/src/flex/flex/README.md
+index ef36e2700ea304..5555ed6a1d9523 100644
+--- a/packages/components/src/flex/flex/README.md
++++ b/packages/components/src/flex/flex/README.md
+@@ -4,7 +4,7 @@
+ 
+ ## Usage
+ 
+-`Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
++`Flex` is used with any of its two sub-components, `FlexItem` and `FlexBlock`.
+ 
+ ```jsx
+ import { Flex, FlexBlock, FlexItem } from '@wordpress/components';
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index f97452637d462b..7003238064ce41 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -128,7 +128,7 @@ Show the popover fullscreen on mobile viewports.
+ 
+ Specifies whether the popover should flip across its axis if there isn't space for it in the normal placement.
+ 
+-When the using a 'top' placement, the popover will switch to a 'bottom' placement. When using a 'left' placement, the popover will switch to a `right' placement.
++When using a 'top' placement, the popover will switch to a 'bottom' placement. When using a 'left' placement, the popover will switch to a 'right' placement.
+ 
+ The popover will retain its alignment of 'start' or 'end' when flipping.
+ 
+diff --git a/packages/components/src/scrollable/README.md b/packages/components/src/scrollable/README.md
+index db93265340228b..a2365d9f15ccb9 100644
+--- a/packages/components/src/scrollable/README.md
++++ b/packages/components/src/scrollable/README.md
+@@ -4,7 +4,7 @@
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-`Scrollable` is a layout component that content in a scrollable container.
++`Scrollable` is a layout component that puts content in a scrollable container.
+ 
+ ## Usage
+ 
+diff --git a/packages/compose/CHANGELOG.md b/packages/compose/CHANGELOG.md
+index e99a6f3cc2a81e..54ce1ee5e43fa6 100644
+--- a/packages/compose/CHANGELOG.md
++++ b/packages/compose/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Documentation
++
++-   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
++
+ ## 8.0.0 (2026-05-27)
+ 
+ ### Breaking Changes
+diff --git a/packages/compose/src/hooks/use-drop-zone/README.md b/packages/compose/src/hooks/use-drop-zone/README.md
+index f35440c9f581f0..7726943bfac963 100644
+--- a/packages/compose/src/hooks/use-drop-zone/README.md
++++ b/packages/compose/src/hooks/use-drop-zone/README.md
+@@ -2,7 +2,7 @@
+ 
+ A hook to facilitate drag and drop handling within a designated drop zone area. An optional `dropZoneElement` can be provided, however by default the drop zone is bound by the area where the returned `ref` is assigned.
+ 
+-When using a `dropZoneElement`, it is expected that the `ref` will be attached to a node that is a descendent of the `dropZoneElement`. Additionally, the element passed to `dropZoneElement` should be stored in state rather than a plain ref to ensure reactive updating when it changes.
++When using a `dropZoneElement`, it is expected that the `ref` will be attached to a node that is a descendant of the `dropZoneElement`. Additionally, the element passed to `dropZoneElement` should be stored in state rather than a plain ref to ensure reactive updating when it changes.
+ 
+ ## Usage
+ 
+diff --git a/packages/create-block/README.md b/packages/create-block/README.md
+index 7240f25fac5a00..df9d46c2cff163 100644
+--- a/packages/create-block/README.md
++++ b/packages/create-block/README.md
+@@ -69,7 +69,7 @@ The rest of the configuration is set to all default values unless overridden wit
+ 
+ ```bash
+ -V, --version                output the version number
+--t, --template <name>        project template type name; allowed values: "static" (default), "es5", the name of an external npm package, or the path to a local directory
++-t, --template <name>        project template type name; allowed values: "standard" (default), "es5", the name of an external npm package, or the path to a local directory
+ --variant                    choose a block variant as defined by the template
+ --no-plugin                  scaffold block files only
+ --target-dir <directory>     the directory where the files will be scaffolded, defaults to the slug
+diff --git a/packages/editor/CHANGELOG.md b/packages/editor/CHANGELOG.md
+index 3ba908a8af66c9..63e4fb4355db3c 100644
+--- a/packages/editor/CHANGELOG.md
++++ b/packages/editor/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Documentation
++
++-   Fix documentation grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
++
+ ## 14.47.0 (2026-05-27)
+ 
+ ### Enhancements
+diff --git a/packages/editor/src/components/README.md b/packages/editor/src/components/README.md
+index 279e4bda3bae74..c49ff172809dca 100644
+--- a/packages/editor/src/components/README.md
++++ b/packages/editor/src/components/README.md
+@@ -1,7 +1,7 @@
+ # Editor Components
+ 
+ This folder holds reusable editor components exported by the `editor` module.
+-These components combined as children of the `EditorProvider` component can be use to build alternative Editor Layouts.
++These components, combined as children of the `EditorProvider` component, can be used to build alternative Editor Layouts.
+ 
+ ## Which components should live in this folder?
+ 
+diff --git a/packages/eslint-plugin/README.md b/packages/eslint-plugin/README.md
+index 409cbb8d685296..74444ba011ddc2 100644
+--- a/packages/eslint-plugin/README.md
++++ b/packages/eslint-plugin/README.md
+@@ -125,6 +125,11 @@ The granular rulesets will not define any environment globals. As such, if they
+ | [no-dom-globals-in-module-scope](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-module-scope.md)               | Disallow use of DOM globals in module scope.                                                    |             |
+ | [no-dom-globals-in-react-cc-render](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-react-cc-render.md)         | Disallow use of DOM globals in React class component render methods.                            |             |
+ | [no-dom-globals-in-react-fc](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-dom-globals-in-react-fc.md)                       | Disallow use of DOM globals in the render cycle of a React function component.                  |             |
++| [no-ds-tokens](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-ds-tokens.md)                                                   | Disallow any usage of `--wpds-*` CSS custom properties.                                         |             |
++| `no-global-active-element`                                                                                                                              | Disallow accessing the active element via `document.activeElement`.                             | ✓           |
++| `no-global-get-selection`                                                                                                                               | Disallow accessing the selection via `window.getSelection`.                                     | ✓           |
++| [no-setting-ds-tokens](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-setting-ds-tokens.md)                                   | Disallow setting any CSS custom property beginning with `--wpds-`.                              | ✓           |
++| [no-unknown-ds-tokens](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unknown-ds-tokens.md)                                   | Prevent use of non-existing `--wpds-*` variables.                                               | ✓           |
+ | [components-no-missing-40px-size-prop](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md)   | Disallow missing `__next40pxDefaultSize` prop on `@wordpress/components` components.            | ✓           |
+ | [components-no-unsafe-button-disabled](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/components-no-unsafe-button-disabled.md)   | Disallow using `disabled` on Button without `accessibleWhenDisabled`.                           | ✓           |
+ | [no-unsafe-render-order](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-render-order.md)                               | Prevent unsafe `render` composition orders that silently remove semantics.                      | ✓           |
+diff --git a/packages/interface/CHANGELOG.md b/packages/interface/CHANGELOG.md
+index 4ff9ff1aaaa178..b3f9b8e23c8a59 100644
+--- a/packages/interface/CHANGELOG.md
++++ b/packages/interface/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Documentation
++
++-   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
++
+ ## 9.32.0 (2026-05-27)
+ 
+ ## 9.31.0 (2026-05-14)
+diff --git a/packages/interface/src/components/complementary-area-more-menu-item/README.md b/packages/interface/src/components/complementary-area-more-menu-item/README.md
+index a369f7c3f600cc..921b48704880a4 100644
+--- a/packages/interface/src/components/complementary-area-more-menu-item/README.md
++++ b/packages/interface/src/components/complementary-area-more-menu-item/README.md
+@@ -16,7 +16,7 @@ Identifier of the complementary area. The string is saved on the store and allow
+ 
+ -   Type: `String`
+ -   Required: No
+--   Default: Concatenation of `name` of the plugin extracted from the context (when available) with the `targe` of the sidebar passed as a property.
++-   Default: Concatenation of `name` of the plugin extracted from the context (when available) with the `target` of the sidebar passed as a property.
+ 
+ ### target
+ 
+diff --git a/packages/keycodes/CHANGELOG.md b/packages/keycodes/CHANGELOG.md
+index f8d8039a9f7ddc..e432c0c44fb397 100644
+--- a/packages/keycodes/CHANGELOG.md
++++ b/packages/keycodes/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Documentation
++
++-   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
++
+ ## 4.47.0 (2026-05-27)
+ 
+ ## 4.46.0 (2026-05-14)
+diff --git a/packages/keycodes/README.md b/packages/keycodes/README.md
+index 181c48fa0ab76c..be2fca06021f0d 100644
+--- a/packages/keycodes/README.md
++++ b/packages/keycodes/README.md
+@@ -193,7 +193,7 @@ Keycode for PAGEUP key.
+ 
+ An object that contains functions to get raw shortcuts.
+ 
+-These are intended for user with the KeyboardShortcuts.
++These are intended for use with the KeyboardShortcuts.
+ 
+ _Usage_
+ 
+diff --git a/packages/keycodes/src/index.ts b/packages/keycodes/src/index.ts
+index 7ef3eb1ef13a95..8c10784d980921 100644
+--- a/packages/keycodes/src/index.ts
++++ b/packages/keycodes/src/index.ts
+@@ -221,7 +221,7 @@ export const modifiers: WPModifierHandler< WPModifier > = {
+ /**
+  * An object that contains functions to get raw shortcuts.
+  *
+- * These are intended for user with the KeyboardShortcuts.
++ * These are intended for use with the KeyboardShortcuts.
+  *
+  * @example
+  * ```js
+diff --git a/packages/lazy-import/CHANGELOG.md b/packages/lazy-import/CHANGELOG.md
+index a07a082ec6ce3f..56d21326eb882a 100644
+--- a/packages/lazy-import/CHANGELOG.md
++++ b/packages/lazy-import/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Documentation
++
++-   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
++
+ ## 2.47.0 (2026-05-27)
+ 
+ ## 2.46.0 (2026-05-14)
+diff --git a/packages/lazy-import/README.md b/packages/lazy-import/README.md
+index f08f494c410ce6..d543a43e2b9fea 100644
+--- a/packages/lazy-import/README.md
++++ b/packages/lazy-import/README.md
+@@ -77,7 +77,7 @@ try {
+ -   Type: `string`
+ -   Required: No
+ 
+-Local path pointing to a file or directory that can be used when other script that `main` needs to be imported.
++Local path pointing to a file or directory that can be used when other script than `main` needs to be imported.
+ 
+ #### `onInstall`
+ 
+diff --git a/packages/preferences/CHANGELOG.md b/packages/preferences/CHANGELOG.md
+index f5a29e0b4d4dcd..49e0975aec8ccc 100644
+--- a/packages/preferences/CHANGELOG.md
++++ b/packages/preferences/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Documentation
++
++-   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
++
+ ## 4.47.0 (2026-05-27)
+ 
+ ## 4.46.0 (2026-05-14)
+@@ -30,7 +34,7 @@
+ 
+ ### Internal
+ 
+-- TypeScript conversion
++-   TypeScript conversion
+ 
+ ## 4.33.0 (2025-10-17)
+ 
+diff --git a/packages/preferences/README.md b/packages/preferences/README.md
+index 8643726b3ccabd..7eaedb5841f584 100644
+--- a/packages/preferences/README.md
++++ b/packages/preferences/README.md
+@@ -232,7 +232,7 @@ The following selectors are available on the object returned by `wp.data.select(
+ 
+ #### get
+ 
+-Returns a boolean indicating whether a prefer is active for a particular scope.
++Returns a boolean indicating whether a preference is active for a particular scope.
+ 
+ _Parameters_
+ 
+diff --git a/packages/preferences/src/components/preferences-modal-tabs/README.md b/packages/preferences/src/components/preferences-modal-tabs/README.md
+index e1ffbd86a41b62..85432fe225feec 100644
+--- a/packages/preferences/src/components/preferences-modal-tabs/README.md
++++ b/packages/preferences/src/components/preferences-modal-tabs/README.md
+@@ -5,6 +5,7 @@
+ ## Example
+ 
+ See the `PreferencesModal` readme for usage info.
++
+ ## Props
+ ### sections
+ 
+diff --git a/packages/preferences/src/store/selectors.ts b/packages/preferences/src/store/selectors.ts
+index bf3282a3f54cf4..70ebe5c56b2449 100644
+--- a/packages/preferences/src/store/selectors.ts
++++ b/packages/preferences/src/store/selectors.ts
+@@ -50,7 +50,7 @@ const withDeprecatedKeys =
+ 	};
+ 
+ /**
+- * Returns a boolean indicating whether a prefer is active for a particular
++ * Returns a boolean indicating whether a preference is active for a particular
+  * scope.
+  *
+  * @param {StoreState} state The store state.
+diff --git a/packages/react-native-bridge/README.md b/packages/react-native-bridge/README.md
+index 8cb6f084e565c0..b3c3aaf3ec5bd5 100644
+--- a/packages/react-native-bridge/README.md
++++ b/packages/react-native-bridge/README.md
+@@ -19,7 +19,7 @@ This package is not yet published to npm. You can use it locally:
+ 1. In Xcode, in the project navigator, right click `Libraries` ➜ `Add Files to [your project's name]`
+ 2. Go to `node_modules` ➜ `react-native-bridge` and add `RNReactNativeGutenbergBridge.xcodeproj`
+ 3. In Xcode, in the project navigator, select your project. Add `libRNReactNativeGutenbergBridge.a` to your project's `Build Phases` ➜ `Link Binary With Libraries`
+-4. Run your project (`Cmd+R`)<
++4. Run your project (`Cmd+R`)
+ 
+ #### Android
+ 

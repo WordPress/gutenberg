@@ -1,0 +1,812 @@
+diff --git a/docs/manifest-devhub.json b/docs/manifest-devhub.json
+index 998097f22d10e9..9382e8dac0a7d8 100644
+--- a/docs/manifest-devhub.json
++++ b/docs/manifest-devhub.json
+@@ -635,6 +635,12 @@
+ 		"markdown_source": "../packages/components/src/dashicon/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "DatePicker",
++		"slug": "date-picker",
++		"markdown_source": "../packages/components/src/date-picker/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "DateTime",
+ 		"slug": "date-time",
+@@ -947,6 +953,12 @@
+ 		"markdown_source": "../packages/components/src/textarea-control/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "TimePicker",
++		"slug": "time-picker",
++		"markdown_source": "../packages/components/src/time-picker/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "ToggleControl",
+ 		"slug": "toggle-control",
+diff --git a/package.json b/package.json
+index fcb77778ca522b..ce98ba25433164 100644
+--- a/package.json
++++ b/package.json
+@@ -153,6 +153,7 @@
+ 		"typescript": "3.5.3",
+ 		"uuid": "3.3.2",
+ 		"webpack": "4.41.0",
++		"webpack-cli": "3.3.9",
+ 		"worker-farm": "1.7.0"
+ 	},
+ 	"scripts": {
+diff --git a/packages/components/src/date-picker/README.md b/packages/components/src/date-picker/README.md
+new file mode 100644
+index 00000000000000..33c4d1e66aa43e
+--- /dev/null
++++ b/packages/components/src/date-picker/README.md
+@@ -0,0 +1,51 @@
++# DateTimePicker
++
++DatePicker is a React component that renders a calendar date selection.
++
++## Best practices
++
++Date pickers should:
++
++- Use smart defaults and highlight the current date.
++
++## Usage
++
++Render a DatePicker.
++
++```jsx
++import { DatePicker } from '@wordpress/components';
++
++const MyDatePicker = ({ date }) => (
++		<DatePicker
++			currentDate={ date }
++			onChange={ ( date ) => console.log(date) }
++		/>
++	);
++});
++```
++
++## Props
++
++The component accepts the following props:
++
++### currentDate
++
++The current date and time at initialization. Optionally pass in a `null` value to specify no date is currently selected.
++
++- Type: `string`
++- Required: No
++- Default: today's date
++
++### onChange
++
++The function called when a new date or time has been selected. It is passed the `currentDate` as an argument.
++
++- Type: `Function`
++- Required: Yes
++
++### isInvalidDate
++
++A callback function which receives a Date object representing a day as an argument, and should return a Boolean to signify if the day is valid or not.
++
++- Type: `Function`
++- Required: No
+diff --git a/packages/components/src/date-time/date.js b/packages/components/src/date-picker/index.js
+similarity index 98%
+rename from packages/components/src/date-time/date.js
+rename to packages/components/src/date-picker/index.js
+index 7361494a61e688..71b63de52c1bdf 100644
+--- a/packages/components/src/date-time/date.js
++++ b/packages/components/src/date-picker/index.js
+@@ -81,7 +81,7 @@ class DatePicker extends Component {
+ 
+ 		return (
+ 			<div
+-				className="components-datetime__date"
++				className="components-date-picker"
+ 				ref={ this.nodeRef }
+ 			>
+ 				<DayPickerSingleDateController
+diff --git a/packages/components/src/date-picker/stories/index.js b/packages/components/src/date-picker/stories/index.js
+new file mode 100644
+index 00000000000000..e9a9234f40f890
+--- /dev/null
++++ b/packages/components/src/date-picker/stories/index.js
+@@ -0,0 +1,18 @@
++/**
++ * Internal dependencies
++ */
++import DatePicker from '..';
++
++export default { title: 'Pickers/Date', component: DatePicker };
++
++const mockProps = {
++	currentDate: '2019-10-22T23:23:23',
++	isInvalidDate: false,
++	// eslint-disable-next-line no-console
++	onChange: ( date ) => console.log( `date changed to ${ date }` ),
++};
++
++// eslint-disable-next-line no-console
++export const _default = () => <DatePicker onChange={ ( date ) => console.log( `date changed to ${ date }` ) } />;
++
++export const specified = () => <DatePicker { ...mockProps } />;
+diff --git a/packages/components/src/date-picker/style.scss b/packages/components/src/date-picker/style.scss
+new file mode 100644
+index 00000000000000..21624314eaac04
+--- /dev/null
++++ b/packages/components/src/date-picker/style.scss
+@@ -0,0 +1,56 @@
++// We can't reference this package with ~ because of how Lerna handles packages.
++// Also, don't convert styles to RTL because react-dates uses an isRTL flag instead.
++/*rtl:begin:ignore*/
++@import "node_modules/react-dates/lib/css/_datepicker";
++/*rtl:end:ignore*/
++
++.components-date-picker {
++	min-height: 236px;
++	border-top: 1px solid $light-gray-500;
++	margin-left: -$grid-size;
++	margin-right: -$grid-size;
++
++	// Override external DatePicker styles.
++	.CalendarMonth_caption {
++		font-size: $default-font-size;
++	}
++
++	.CalendarDay {
++		font-size: $default-font-size;
++		border: 1px solid transparent;
++		border-radius: $radius-round;
++		text-align: center;
++	}
++
++	.CalendarDay__selected {
++		background: theme(primary);
++
++		&:hover {
++			background: color(theme(primary) shade(15%));
++		}
++	}
++
++	.DayPickerNavigation_button__horizontalDefault {
++		padding: 2px 8px;
++		top: 20px;
++
++		&:focus {
++			@include input-style__focus();
++		}
++	}
++
++	.DayPicker_weekHeader {
++		top: 50px;
++	}
++
++	&.is-description-visible .DayPicker,
++	&.is-description-visible .components-datetime__date-help-button {
++		visibility: hidden;
++	}
++}
++
++// Hack to center the datepicker component within the popover.
++// It sets its own styles so centering is tricky.
++.components-popover .components-datetime__date {
++	padding-left: 4px;
++}
+diff --git a/packages/components/src/date-time/test/date.js b/packages/components/src/date-picker/test/date.js
+similarity index 99%
+rename from packages/components/src/date-time/test/date.js
+rename to packages/components/src/date-picker/test/date.js
+index cd1b1e1e12e2b2..32dc2757b98b0c 100644
+--- a/packages/components/src/date-time/test/date.js
++++ b/packages/components/src/date-picker/test/date.js
+@@ -7,7 +7,7 @@ import moment from 'moment';
+ /**
+  * Internal dependencies
+  */
+-import DatePicker from '../date';
++import DatePicker from '..';
+ 
+ const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+ 
+diff --git a/packages/components/src/date-time/index.js b/packages/components/src/date-time/index.js
+index bb7434d2e82ce3..b00544e9366062 100644
+--- a/packages/components/src/date-time/index.js
++++ b/packages/components/src/date-time/index.js
+@@ -15,9 +15,10 @@ import { __, _x } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import Button from '../button';
+-import { default as DatePicker } from './date';
+-import { default as TimePicker } from './time';
++import DatePicker from '../date-picker';
++import TimePicker from '../time-picker';
+ 
++// Keep this export to avoid breaking backward compatibility
+ export { DatePicker, TimePicker };
+ 
+ export class DateTimePicker extends Component {
+diff --git a/packages/components/src/date-time/stories/index.js b/packages/components/src/date-time/stories/index.js
+new file mode 100644
+index 00000000000000..f048699728811f
+--- /dev/null
++++ b/packages/components/src/date-time/stories/index.js
+@@ -0,0 +1,18 @@
++/**
++ * Internal dependencies
++ */
++import { DateTimePicker } from '..';
++
++export default { title: 'Pickers/DateTime', component: DateTimePicker };
++
++const mockProps = {
++	currentDate: '2019-10-22T23:23:23',
++	is12Hour: true,
++	isInvalidDate: false,
++	// eslint-disable-next-line no-console
++	onChange: () => console.log( 'date changed' ),
++};
++
++export const _default = () => <DateTimePicker />;
++
++export const specified = () => <DateTimePicker { ...mockProps } />;
+diff --git a/packages/components/src/date-time/style.scss b/packages/components/src/date-time/style.scss
+index 2863fb908ff107..0b5c7a41abdbe9 100644
+--- a/packages/components/src/date-time/style.scss
++++ b/packages/components/src/date-time/style.scss
+@@ -36,187 +36,6 @@
+ 	}
+ }
+ 
+-.components-datetime__date {
+-	min-height: 236px;
+-	border-top: 1px solid $light-gray-500;
+-	margin-left: -$grid-size;
+-	margin-right: -$grid-size;
+-
+-	// Override external DatePicker styles.
+-	.CalendarMonth_caption {
+-		font-size: $default-font-size;
+-	}
+-
+-	.CalendarDay {
+-		font-size: $default-font-size;
+-		border: 1px solid transparent;
+-		border-radius: $radius-round;
+-		text-align: center;
+-	}
+-
+-	.CalendarDay__selected {
+-		background: theme(primary);
+-
+-		&:hover {
+-			background: color(theme(primary) shade(15%));
+-		}
+-	}
+-
+-	.DayPickerNavigation_button__horizontalDefault {
+-		padding: 2px 8px;
+-		top: 20px;
+-
+-		&:focus {
+-			@include input-style__focus();
+-		}
+-	}
+-
+-	.DayPicker_weekHeader {
+-		top: 50px;
+-	}
+-
+-	&.is-description-visible .DayPicker,
+-	&.is-description-visible .components-datetime__date-help-button {
+-		visibility: hidden;
+-	}
+-}
+-
+-.components-datetime__time {
+-	margin-bottom: 1em;
+-
+-	fieldset {
+-		margin-top: 0.5em;
+-		position: relative;
+-	}
+-
+-	.components-datetime__time-field-am-pm fieldset {
+-		margin-top: 0;
+-	}
+-
+-	.components-datetime__time-wrapper {
+-		display: flex;
+-
+-		.components-datetime__time-separator {
+-			display: inline-block;
+-			padding: 0 3px 0 0;
+-			color: $dark-gray-500;
+-		}
+-
+-		.components-datetime__time-am-button {
+-			margin-left: 8px;
+-			margin-right: -1px;
+-			border-radius: 3px 0 0 3px;
+-		}
+-
+-		.components-datetime__time-pm-button {
+-			margin-left: -1px;
+-			border-radius: 0 3px 3px 0;
+-		}
+-
+-		.components-datetime__time-am-button:focus,
+-		.components-datetime__time-pm-button:focus {
+-			position: relative;
+-			z-index: 1;
+-		}
+-
+-		.components-datetime__time-am-button.is-toggled,
+-		.components-datetime__time-pm-button.is-toggled {
+-			background: $light-gray-300;
+-			border-color: $dark-gray-100;
+-			box-shadow: inset 0 2px 5px -3px $dark-gray-500;
+-			&:focus {
+-				box-shadow:
+-					inset 0 2px 5px -3px $dark-gray-500,
+-					0 0 0 1px $white,
+-					0 0 0 3px $blue-medium-focus;
+-			}
+-		}
+-
+-		.components-datetime__time-field {
+-
+-			&-time {
+-				/*rtl:ignore*/
+-				direction: ltr;
+-			}
+-
+-
+-			&.am-pm button {
+-				font-size: 11px;
+-				font-weight: 600;
+-			}
+-
+-			select {
+-				margin-right: 4px;
+-
+-				&:focus {
+-					position: relative;
+-					z-index: 1;
+-				}
+-			}
+-
+-			input[type="number"] {
+-				padding: 2px;
+-				margin-right: 4px;
+-				text-align: center;
+-				-moz-appearance: textfield;
+-
+-				&:focus {
+-					position: relative;
+-					z-index: 1;
+-				}
+-
+-				&::-webkit-inner-spin-button {
+-					-webkit-appearance: none;
+-					margin: 0;
+-				}
+-			}
+-		}
+-	}
+-
+-	// Makes the month appear before the day if time format uses AM/PM
+-	// We are assuming MM-DD-YYY correlates with AM/PM
+-	&.is-12-hour {
+-		.components-datetime__time-field-day input {
+-			margin: 0 -4px 0 0 !important;
+-			border-radius: $radius-round-rectangle 0 0 $radius-round-rectangle !important;
+-		}
+-		.components-datetime__time-field-year input {
+-			border-radius: 0 $radius-round-rectangle $radius-round-rectangle 0 !important;
+-		}
+-	}
+-}
+-
+-.components-datetime__time-legend {
+-	font-weight: 600;
+-	margin-top: 0.5em;
+-
+-	&.invisible {
+-		position: absolute;
+-		top: -999em;
+-		left: -999em;
+-	}
+-}
+-
+-.components-datetime__time-field-hours-input,
+-.components-datetime__time-field-minutes-input,
+-.components-datetime__time-field-day-input {
+-	width: 35px;
+-}
+-
+-.components-datetime__time-field-year-input {
+-	width: 55px;
+-}
+-
+-.components-datetime__time-field-month-select {
+-	max-width: 145px;
+-}
+-
+-// Hack to center the datepicker component within the popover.
+-// It sets its own styles so centering is tricky.
+-.components-popover .components-datetime__date {
+-	padding-left: 4px;
+-}
+-
+ // Used to prevent z-index issues on mobile.
+ // See: https://github.com/WordPress/gutenberg/pull/7621#issuecomment-424322735
+ .components-popover.edit-post-post-schedule__dialog.is-bottom.is-left {
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 8542a86ba9b659..b1cff689dc7b8a 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -11,7 +11,10 @@ export { default as ColorIndicator } from './color-indicator';
+ export { default as ColorPalette } from './color-palette';
+ export { default as ColorPicker } from './color-picker';
+ export { default as Dashicon } from './dashicon';
+-export { DateTimePicker, DatePicker, TimePicker } from './date-time';
++export { default as DatePicker } from './date-picker';
++export { default as TimePicker } from './time-picker';
++// Keep this as named export to avoid breaking backward compatibility
++export { DateTimePicker } from './date-time';
+ export { default as Disabled } from './disabled';
+ export { default as Draggable } from './draggable';
+ export { default as DropZone } from './drop-zone';
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 6365bff68cf568..62dfd18c4519ca 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -9,6 +9,8 @@
+ @import "./color-picker/style.scss";
+ @import "./dashicon/style.scss";
+ @import "./date-time/style.scss";
++@import "./date-picker/style.scss";
++@import "./time-picker/style.scss";
+ @import "./disabled/style.scss";
+ @import "./draggable/style.scss";
+ @import "./drop-zone/style.scss";
+diff --git a/packages/components/src/time-picker/README.md b/packages/components/src/time-picker/README.md
+new file mode 100644
+index 00000000000000..71ce96ef426cad
+--- /dev/null
++++ b/packages/components/src/time-picker/README.md
+@@ -0,0 +1,37 @@
++# TimePicker
++
++TimePicker is a React component that renders a clock for time selection.
++
++## Usage
++
++Render a TimePicker.
++
++```jsx
++import { TimePicker } from '@wordpress/components';
++
++const MyTimePicker = ({ date, is12HourTime }) => (
++    <TimePicker
++        currentTime={ date }
++        is12Hour={ is12HourTime }
++    />
++);
++```
++
++## Props
++
++The component accepts the following props:
++
++### currentTime
++
++The current date and time at initialization. Optionally pass in a `null` value to specify no date is currently selected.
++
++- Type: `string`
++- Required: No
++- Default: current's date and time
++
++### is12Hour
++
++Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed and the time format is assumed to be DD-MM-YYYY. 24-hour clock will have time formatted as MM-DD-YYYY.
++
++- Type: `bool`
++- Required: No
+diff --git a/packages/components/src/date-time/time.js b/packages/components/src/time-picker/index.js
+similarity index 85%
+rename from packages/components/src/date-time/time.js
+rename to packages/components/src/time-picker/index.js
+index 0cfc8c7dc8ea68..35621ea6532fa6 100644
+--- a/packages/components/src/date-time/time.js
++++ b/packages/components/src/time-picker/index.js
+@@ -198,10 +198,10 @@ class TimePicker extends Component {
+ 
+ 	renderMonth( month ) {
+ 		return (
+-			<div key="render-month" className="components-datetime__time-field components-datetime__time-field-month">
++			<div key="render-month" className="components-time-picker-field components-time-picker-field-month">
+ 				<select
+ 					aria-label={ __( 'Month' ) }
+-					className="components-datetime__time-field-month-select"
++					className="components-time-picker-field-month-select"
+ 					value={ month }
+ 					onChange={ this.onChangeMonth }
+ 					onBlur={ this.updateMonth }
+@@ -225,10 +225,10 @@ class TimePicker extends Component {
+ 
+ 	renderDay( day ) {
+ 		return (
+-			<div key="render-day" className="components-datetime__time-field components-datetime__time-field-day">
++			<div key="render-day" className="components-time-picker-field components-time-picker-field-day">
+ 				<input
+ 					aria-label={ __( 'Day' ) }
+-					className="components-datetime__time-field-day-input"
++					className="components-time-picker-field-day-input"
+ 					type="number"
+ 					value={ day }
+ 					step={ 1 }
+@@ -250,15 +250,15 @@ class TimePicker extends Component {
+ 		const { is12Hour } = this.props;
+ 		const { year, minutes, hours, am } = this.state;
+ 		return (
+-			<div className={ classnames( 'components-datetime__time' ) }>
++			<div className={ classnames( 'components-time-picker' ) }>
+ 				<fieldset>
+-					<legend className="components-datetime__time-legend invisible">{ __( 'Date' ) }</legend>
+-					<div className="components-datetime__time-wrapper">
++					<legend className="components-time-picker-legend invisible">{ __( 'Date' ) }</legend>
++					<div className="components-time-picker-wrapper">
+ 						{ this.renderDayMonthFormat( is12Hour ) }
+-						<div className="components-datetime__time-field components-datetime__time-field-year">
++						<div className="components-time-picker-field components-time-picker-field-year">
+ 							<input
+ 								aria-label={ __( 'Year' ) }
+-								className="components-datetime__time-field-year-input"
++								className="components-time-picker-field-year-input"
+ 								type="number"
+ 								step={ 1 }
+ 								value={ year }
+@@ -270,12 +270,12 @@ class TimePicker extends Component {
+ 				</fieldset>
+ 
+ 				<fieldset>
+-					<legend className="components-datetime__time-legend invisible">{ __( 'Time' ) }</legend>
+-					<div className="components-datetime__time-wrapper">
+-						<div className="components-datetime__time-field components-datetime__time-field-time">
++					<legend className="components-time-picker-legend invisible">{ __( 'Time' ) }</legend>
++					<div className="components-time-picker-wrapper">
++						<div className="components-time-picker-field components-time-picker-field-time">
+ 							<input
+ 								aria-label={ __( 'Hours' ) }
+-								className="components-datetime__time-field-hours-input"
++								className="components-time-picker-field-hours-input"
+ 								type="number"
+ 								step={ 1 }
+ 								min={ this.getMinHours() }
+@@ -285,11 +285,11 @@ class TimePicker extends Component {
+ 								onBlur={ this.updateHours }
+ 							/>
+ 							<span
+-								className="components-datetime__time-separator"
++								className="components-time-picker-separator"
+ 								aria-hidden="true">:</span>
+ 							<input
+ 								aria-label={ __( 'Minutes' ) }
+-								className="components-datetime__time-field-minutes-input"
++								className="components-time-picker-field-minutes-input"
+ 								type="number"
+ 								min={ 0 }
+ 								max={ 59 }
+@@ -299,11 +299,11 @@ class TimePicker extends Component {
+ 							/>
+ 						</div>
+ 						{ is12Hour && (
+-							<div className="components-datetime__time-field components-datetime__time-field-am-pm">
++							<div className="components-time-picker-field components-time-picker-field-am-pm">
+ 								<Button
+ 									aria-pressed={ am === 'AM' }
+ 									isDefault
+-									className="components-datetime__time-am-button"
++									className="components-time-picker-am-button"
+ 									isToggled={ am === 'AM' }
+ 									onClick={ this.updateAmPm( 'AM' ) }
+ 								>
+@@ -312,7 +312,7 @@ class TimePicker extends Component {
+ 								<Button
+ 									aria-pressed={ am === 'PM' }
+ 									isDefault
+-									className="components-datetime__time-pm-button"
++									className="components-time-picker-pm-button"
+ 									isToggled={ am === 'PM' }
+ 									onClick={ this.updateAmPm( 'PM' ) }
+ 								>
+diff --git a/packages/components/src/time-picker/stories/index.js b/packages/components/src/time-picker/stories/index.js
+new file mode 100644
+index 00000000000000..60267737835d00
+--- /dev/null
++++ b/packages/components/src/time-picker/stories/index.js
+@@ -0,0 +1,15 @@
++/**
++ * Internal dependencies
++ */
++import TimePicker from '..';
++
++export default { title: 'Pickers/Time', component: TimePicker };
++
++const mockProps = {
++	currentTime: '2019-10-22T23:23:23',
++	is12Hour: true,
++};
++
++export const _default = () => <TimePicker />;
++
++export const specified = () => <TimePicker { ...mockProps } />;
+diff --git a/packages/components/src/time-picker/style.scss b/packages/components/src/time-picker/style.scss
+new file mode 100644
+index 00000000000000..54f558ccd0d70e
+--- /dev/null
++++ b/packages/components/src/time-picker/style.scss
+@@ -0,0 +1,135 @@
++// We can't reference this package with ~ because of how Lerna handles packages.
++// Also, don't convert styles to RTL because react-dates uses an isRTL flag instead.
++/*rtl:begin:ignore*/
++@import "node_modules/react-dates/lib/css/_datepicker";
++/*rtl:end:ignore*/
++
++.components-time-picker {
++	margin-bottom: 1em;
++
++	fieldset {
++		margin-top: 0.5em;
++		position: relative;
++	}
++
++	.components-time-picker-field-am-pm fieldset {
++		margin-top: 0;
++	}
++
++	.components-time-picker-wrapper {
++		display: flex;
++
++		.components-time-picker-separator {
++			display: inline-block;
++			padding: 0 3px 0 0;
++			color: $dark-gray-500;
++		}
++
++		.components-time-picker-am-button {
++			margin-left: 8px;
++			margin-right: -1px;
++			border-radius: 3px 0 0 3px;
++		}
++
++		.components-time-picker-pm-button {
++			margin-left: -1px;
++			border-radius: 0 3px 3px 0;
++		}
++
++		.components-time-picker-am-button:focus,
++		.components-time-picker-pm-button:focus {
++			position: relative;
++			z-index: 1;
++		}
++
++		.components-time-picker-am-button.is-toggled,
++		.components-time-picker-pm-button.is-toggled {
++			background: $light-gray-300;
++			border-color: $dark-gray-100;
++			box-shadow: inset 0 2px 5px -3px $dark-gray-500;
++			&:focus {
++				box-shadow:
++					inset 0 2px 5px -3px $dark-gray-500,
++					0 0 0 1px $white,
++					0 0 0 3px $blue-medium-focus;
++			}
++		}
++
++		.components-time-picker-field {
++
++			&-time {
++				/*rtl:ignore*/
++				direction: ltr;
++			}
++
++
++			&.am-pm button {
++				font-size: 11px;
++				font-weight: 600;
++			}
++
++			select {
++				margin-right: 4px;
++
++				&:focus {
++					position: relative;
++					z-index: 1;
++				}
++			}
++
++			input[type="number"] {
++				padding: 2px;
++				margin-right: 4px;
++				text-align: center;
++				-moz-appearance: textfield;
++
++				&:focus {
++					position: relative;
++					z-index: 1;
++				}
++
++				&::-webkit-inner-spin-button {
++					-webkit-appearance: none;
++					margin: 0;
++				}
++			}
++		}
++	}
++
++	// Makes the month appear before the day if time format uses AM/PM
++	// We are assuming MM-DD-YYY correlates with AM/PM
++	&.is-12-hour {
++		.components-time-picker-field-day input {
++			margin: 0 -4px 0 0 !important;
++			border-radius: $radius-round-rectangle 0 0 $radius-round-rectangle !important;
++		}
++		.components-time-picker-field-year input {
++			border-radius: 0 $radius-round-rectangle $radius-round-rectangle 0 !important;
++		}
++	}
++}
++
++.components-time-picker-legend {
++	font-weight: 600;
++	margin-top: 0.5em;
++
++	&.invisible {
++		position: absolute;
++		top: -999em;
++		left: -999em;
++	}
++}
++
++.components-time-picker-field-hours-input,
++.components-time-picker-field-minutes-input,
++.components-time-picker-field-day-input {
++	width: 35px;
++}
++
++.components-time-picker-field-year-input {
++	width: 55px;
++}
++
++.components-time-picker-field-month-select {
++	max-width: 145px;
++}
+diff --git a/packages/components/src/date-time/test/__snapshots__/time.js.snap b/packages/components/src/time-picker/test/__snapshots__/time.js.snap
+similarity index 100%
+rename from packages/components/src/date-time/test/__snapshots__/time.js.snap
+rename to packages/components/src/time-picker/test/__snapshots__/time.js.snap
+diff --git a/packages/components/src/date-time/test/time.js b/packages/components/src/time-picker/test/time.js
+similarity index 99%
+rename from packages/components/src/date-time/test/time.js
+rename to packages/components/src/time-picker/test/time.js
+index 3d61d058f330ce..ea09be0dbe1080 100644
+--- a/packages/components/src/date-time/test/time.js
++++ b/packages/components/src/time-picker/test/time.js
+@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
+ /**
+  * Internal dependencies
+  */
+-import TimePicker from '../time';
++import TimePicker from '..';
+ 
+ describe( 'TimePicker', () => {
+ 	it( 'matches the snapshot when the is12hour prop is true', () => {

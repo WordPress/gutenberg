@@ -1,0 +1,104 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8c656f4adb48bb..8a9151e3fdc05e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,10 @@
+ 
+ -   `Modal`: Decrease close button size and remove horizontal offset ([#65131](https://github.com/WordPress/gutenberg/pull/65131)).
+ 
++### Bug Fixes
++
++-   `DatePicker`: better hover/focus styles ([#65117](https://github.com/WordPress/gutenberg/pull/65117)).
++
+ ### Internal
+ 
+ -   `Composite`: Remove from private APIs ([#63569](https://github.com/WordPress/gutenberg/pull/63569)).
+diff --git a/packages/components/src/date-time/date/styles.ts b/packages/components/src/date-time/date/styles.ts
+index bffc8ae35d2a64..84405854827ec9 100644
+--- a/packages/components/src/date-time/date/styles.ts
++++ b/packages/components/src/date-time/date/styles.ts
+@@ -7,13 +7,13 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import Button from '../../button';
+-import { COLORS, CONFIG } from '../../utils';
++import { boxSizingReset, COLORS, CONFIG } from '../../utils';
+ import { HStack } from '../../h-stack';
+ import { Heading } from '../../heading';
+ import { space } from '../../utils/space';
+ 
+ export const Wrapper = styled.div`
+-	box-sizing: border-box;
++	${ boxSizingReset }
+ `;
+ 
+ export const Navigator = styled( HStack )`
+@@ -38,7 +38,7 @@ export const Calendar = styled.div`
+ `;
+ 
+ export const DayOfWeek = styled.div`
+-	color: ${ COLORS.gray[ 700 ] };
++	color: ${ COLORS.theme.gray[ 700 ] };
+ 	font-size: ${ CONFIG.fontSize };
+ 	line-height: ${ CONFIG.fontLineHeightBase };
+ 
+@@ -90,15 +90,34 @@ export const DayButton = styled( Button, {
+ 		${ ( props ) =>
+ 			props.isSelected &&
+ 			`
+-			background: ${ COLORS.theme.accent };
+-			color: ${ COLORS.white };
++				background: ${ COLORS.theme.accent };
++
++				&,
++				&:hover:not(:disabled, [aria-disabled=true]) {
++					color: ${ COLORS.theme.accentInverted };
++				}
++
++				&:focus:not(:disabled),
++				&:focus:not(:disabled) {
++					border: ${ CONFIG.borderWidthFocus } solid currentColor;
++				}
++
++				/* Highlight the selected day for high-contrast mode */
++				&::after {
++					content: '';
++					position: absolute;
++					pointer-events: none;
++					inset: 0;
++					border-radius: inherit;
++					border: 1px solid transparent;
++				}
+ 			` }
+ 
+ 		${ ( props ) =>
+ 			! props.isSelected &&
+ 			props.isToday &&
+ 			`
+-			background: ${ COLORS.gray[ 200 ] };
++			background: ${ COLORS.theme.gray[ 200 ] };
+ 			` }
+ 	}
+ 
+@@ -106,15 +125,16 @@ export const DayButton = styled( Button, {
+ 		props.hasEvents &&
+ 		`
+ 		::before {
+-			background: ${ props.isSelected ? COLORS.white : COLORS.theme.accent };
++			border: 2px solid ${
++				props.isSelected
++					? COLORS.theme.accentInverted
++					: COLORS.theme.accent
++			};
+ 			border-radius: ${ CONFIG.radiusRound };
+-			bottom: 2px;
+ 			content: " ";
+-			height: 4px;
+ 			left: 50%;
+-			margin-left: -2px;
+ 			position: absolute;
+-			width: 4px;
++			transform: translate(-50%, 9px);
+ 		}
+ 		` }
+ `;

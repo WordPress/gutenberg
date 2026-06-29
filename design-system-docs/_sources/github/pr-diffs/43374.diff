@@ -1,0 +1,346 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 554d52e2f5299d..e36a5bed75e64c 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -141,6 +141,7 @@ module.exports = {
+ 							'sum',
+ 							'sumBy',
+ 							'take',
++							'times',
+ 							'toString',
+ 							'trim',
+ 							'truncate',
+diff --git a/packages/block-directory/src/components/block-ratings/stars.js b/packages/block-directory/src/components/block-ratings/stars.js
+index 96c03f36e1be5a..21c64290201b27 100644
+--- a/packages/block-directory/src/components/block-ratings/stars.js
++++ b/packages/block-directory/src/components/block-ratings/stars.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { times } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -24,7 +19,7 @@ function Stars( { rating } ) {
+ 				stars
+ 			) }
+ 		>
+-			{ times( fullStarCount, ( i ) => (
++			{ Array.from( { length: fullStarCount } ).map( ( _, i ) => (
+ 				<Icon
+ 					key={ `full_stars_${ i }` }
+ 					className="block-directory-block-ratings__star-full"
+@@ -32,7 +27,7 @@ function Stars( { rating } ) {
+ 					size={ 16 }
+ 				/>
+ 			) ) }
+-			{ times( halfStarCount, ( i ) => (
++			{ Array.from( { length: halfStarCount } ).map( ( _, i ) => (
+ 				<Icon
+ 					key={ `half_stars_${ i }` }
+ 					className="block-directory-block-ratings__star-half-full"
+@@ -40,7 +35,7 @@ function Stars( { rating } ) {
+ 					size={ 16 }
+ 				/>
+ 			) ) }
+-			{ times( emptyStarCount, ( i ) => (
++			{ Array.from( { length: emptyStarCount } ).map( ( _, i ) => (
+ 				<Icon
+ 					key={ `empty_stars_${ i }` }
+ 					className="block-directory-block-ratings__star-empty"
+diff --git a/packages/block-library/src/categories/edit.js b/packages/block-library/src/categories/edit.js
+index 7d1948caa8d39d..f6e70618a84cd4 100644
+--- a/packages/block-library/src/categories/edit.js
++++ b/packages/block-library/src/categories/edit.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { times, unescape } from 'lodash';
++import { unescape } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -114,7 +114,7 @@ export default function CategoriesEdit( {
+ 		const childCategories = getCategoriesList( id );
+ 		return [
+ 			<option key={ id }>
+-				{ times( level * 3, () => '\xa0' ) }
++				{ Array.from( { length: level * 3 } ).map( () => '\xa0' ) }
+ 				{ renderCategoryName( name ) }
+ 				{ showPostCounts && ` (${ count })` }
+ 			</option>,
+diff --git a/packages/block-library/src/columns/edit.js b/packages/block-library/src/columns/edit.js
+index 1edb80df450731..8879f0e52f2e7a 100644
+--- a/packages/block-library/src/columns/edit.js
++++ b/packages/block-library/src/columns/edit.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { get, times } from 'lodash';
++import { get } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -183,7 +183,9 @@ const ColumnsEditContainerWrapper = withDispatch(
+ 
+ 				innerBlocks = [
+ 					...getMappedColumnWidths( innerBlocks, widths ),
+-					...times( newColumns - previousColumns, () => {
++					...Array.from( {
++						length: newColumns - previousColumns,
++					} ).map( () => {
+ 						return createBlock( 'core/column', {
+ 							width: `${ newColumnWidth }%`,
+ 						} );
+@@ -192,7 +194,9 @@ const ColumnsEditContainerWrapper = withDispatch(
+ 			} else if ( isAddingColumn ) {
+ 				innerBlocks = [
+ 					...innerBlocks,
+-					...times( newColumns - previousColumns, () => {
++					...Array.from( {
++						length: newColumns - previousColumns,
++					} ).map( () => {
+ 						return createBlock( 'core/column' );
+ 					} ),
+ 				];
+diff --git a/packages/block-library/src/columns/edit.native.js b/packages/block-library/src/columns/edit.native.js
+index 4f62e227d890e2..96855e3da17e46 100644
+--- a/packages/block-library/src/columns/edit.native.js
++++ b/packages/block-library/src/columns/edit.native.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { View, Dimensions } from 'react-native';
+-import { times, map } from 'lodash';
++import { map } from 'lodash';
+ /**
+  * WordPress dependencies
+  */
+@@ -374,7 +374,9 @@ const ColumnsEditContainerWrapper = withDispatch(
+ 
+ 				innerBlocks = [
+ 					...getMappedColumnWidths( innerBlocks, widths ),
+-					...times( newColumns - previousColumns, () => {
++					...Array.from( {
++						length: newColumns - previousColumns,
++					} ).map( () => {
+ 						return createBlock( 'core/column', {
+ 							width: `${ newColumnWidth }%`,
+ 							verticalAlignment,
+@@ -384,7 +386,9 @@ const ColumnsEditContainerWrapper = withDispatch(
+ 			} else if ( isAddingColumn ) {
+ 				innerBlocks = [
+ 					...innerBlocks,
+-					...times( newColumns - previousColumns, () => {
++					...Array.from( {
++						length: newColumns - previousColumns,
++					} ).map( () => {
+ 						return createBlock( 'core/column', {
+ 							verticalAlignment,
+ 						} );
+diff --git a/packages/block-library/src/table/state.js b/packages/block-library/src/table/state.js
+index 185a9d69c2b1b4..ffd469e98d96eb 100644
+--- a/packages/block-library/src/table/state.js
++++ b/packages/block-library/src/table/state.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { times, get, mapValues, every, pick } from 'lodash';
++import { get, mapValues, every, pick } from 'lodash';
+ 
+ const INHERITED_COLUMN_ATTRIBUTES = [ 'align' ];
+ 
+@@ -16,8 +16,8 @@ const INHERITED_COLUMN_ATTRIBUTES = [ 'align' ];
+  */
+ export function createTable( { rowCount, columnCount } ) {
+ 	return {
+-		body: times( rowCount, () => ( {
+-			cells: times( columnCount, () => ( {
++		body: Array.from( { length: rowCount } ).map( () => ( {
++			cells: Array.from( { length: columnCount } ).map( () => ( {
+ 				content: '',
+ 				tag: 'td',
+ 			} ) ),
+@@ -167,23 +167,25 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
+ 		[ sectionName ]: [
+ 			...state[ sectionName ].slice( 0, rowIndex ),
+ 			{
+-				cells: times( cellCount, ( index ) => {
+-					const firstCellInColumn = get(
+-						firstRow,
+-						[ 'cells', index ],
+-						{}
+-					);
+-					const inheritedAttributes = pick(
+-						firstCellInColumn,
+-						INHERITED_COLUMN_ATTRIBUTES
+-					);
++				cells: Array.from( { length: cellCount } ).map(
++					( _, index ) => {
++						const firstCellInColumn = get(
++							firstRow,
++							[ 'cells', index ],
++							{}
++						);
++						const inheritedAttributes = pick(
++							firstCellInColumn,
++							INHERITED_COLUMN_ATTRIBUTES
++						);
+ 
+-					return {
+-						...inheritedAttributes,
+-						content: '',
+-						tag: sectionName === 'head' ? 'th' : 'td',
+-					};
+-				} ),
++						return {
++							...inheritedAttributes,
++							content: '',
++							tag: sectionName === 'head' ? 'th' : 'td',
++						};
++					}
++				),
+ 			},
+ 			...state[ sectionName ].slice( rowIndex ),
+ 		],
+diff --git a/packages/block-library/src/text-columns/edit.js b/packages/block-library/src/text-columns/edit.js
+index d9e2a0c6c1fd9f..180c786226c803 100644
+--- a/packages/block-library/src/text-columns/edit.js
++++ b/packages/block-library/src/text-columns/edit.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { get, times } from 'lodash';
++import { get } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -55,7 +55,7 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
+ 					className: `align${ width } columns-${ columns }`,
+ 				} ) }
+ 			>
+-				{ times( columns, ( index ) => {
++				{ Array.from( { length: columns } ).map( ( _, index ) => {
+ 					return (
+ 						<div
+ 							className="wp-block-column"
+diff --git a/packages/block-library/src/text-columns/save.js b/packages/block-library/src/text-columns/save.js
+index c859de8a519728..4f91841b2dca9b 100644
+--- a/packages/block-library/src/text-columns/save.js
++++ b/packages/block-library/src/text-columns/save.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { get, times } from 'lodash';
++import { get } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,7 +16,7 @@ export default function save( { attributes } ) {
+ 				className: `align${ width } columns-${ columns }`,
+ 			} ) }
+ 		>
+-			{ times( columns, ( index ) => (
++			{ Array.from( { length: columns } ).map( ( _, index ) => (
+ 				<div className="wp-block-column" key={ `column-${ index }` }>
+ 					<RichText.Content
+ 						tagName="p"
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ac38491c12dc06..88b13b46ecef29 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -30,6 +30,7 @@
+ -   `FormTokenField`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
+ -   `contextConnect`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
+ -   `ColorPalette`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
++-   `Guide`: Refactor away from `_.times()` ([#43374](https://github.com/WordPress/gutenberg/pull/43374/)).
+ 
+ ## 19.17.0 (2022-08-10)
+ 
+diff --git a/packages/components/src/guide/page-control.js b/packages/components/src/guide/page-control.js
+index 1a39fdd1426c8e..41547c18326dfd 100644
+--- a/packages/components/src/guide/page-control.js
++++ b/packages/components/src/guide/page-control.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { times } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -24,7 +19,7 @@ export default function PageControl( {
+ 			className="components-guide__page-control"
+ 			aria-label={ __( 'Guide controls' ) }
+ 		>
+-			{ times( numberOfPages, ( page ) => (
++			{ Array.from( { length: numberOfPages } ).map( ( _, page ) => (
+ 				<li
+ 					key={ page }
+ 					// Set aria-current="step" on the active page, see https://www.w3.org/TR/wai-aria-1.1/#aria-current
+diff --git a/packages/components/src/guide/stories/index.js b/packages/components/src/guide/stories/index.js
+index 1b1b7d9bb7c07b..be7a17b2590ce9 100644
+--- a/packages/components/src/guide/stories/index.js
++++ b/packages/components/src/guide/stories/index.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { times } from 'lodash';
+ import { text, number } from '@storybook/addon-knobs';
+ 
+ /**
+@@ -41,16 +40,18 @@ const ModalExample = ( { numberOfPages, ...props } ) => {
+ 				<Guide
+ 					{ ...props }
+ 					onFinish={ closeGuide }
+-					pages={ times( numberOfPages, ( page ) => ( {
+-						content: (
+-							<>
+-								<h1>
+-									Page { page + 1 } of { numberOfPages }
+-								</h1>
+-								<p>{ loremIpsum }</p>
+-							</>
+-						),
+-					} ) ) }
++					pages={ Array.from( { length: numberOfPages } ).map(
++						( _, page ) => ( {
++							content: (
++								<>
++									<h1>
++										Page { page + 1 } of { numberOfPages }
++									</h1>
++									<p>{ loremIpsum }</p>
++								</>
++							),
++						} )
++					) }
+ 				/>
+ 			) }
+ 		</>
+diff --git a/packages/e2e-tests/specs/performance/post-editor.test.js b/packages/e2e-tests/specs/performance/post-editor.test.js
+index 87395ae0bfda23..933b4973fb055e 100644
+--- a/packages/e2e-tests/specs/performance/post-editor.test.js
++++ b/packages/e2e-tests/specs/performance/post-editor.test.js
+@@ -157,9 +157,9 @@ describe( 'Post Editor Performance', () => {
+ 		await page.evaluate( () => {
+ 			const { createBlock } = window.wp.blocks;
+ 			const { dispatch } = window.wp.data;
+-			const blocks = window.lodash
+-				.times( 1000 )
+-				.map( () => createBlock( 'core/paragraph' ) );
++			const blocks = Array.from( { length: 1000 } ).map( () =>
++				createBlock( 'core/paragraph' )
++			);
+ 			dispatch( 'core/block-editor' ).resetBlocks( blocks );
+ 		} );
+ 		const paragraphs = await page.$$( '.wp-block' );

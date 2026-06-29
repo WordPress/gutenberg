@@ -1,0 +1,145 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 770a879d27d72f..9227c18248d1c3 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -128,6 +128,7 @@ module.exports = {
+ 							'reverse',
+ 							'size',
+ 							'snakeCase',
++							'startsWith',
+ 							'stubFalse',
+ 							'stubTrue',
+ 							'sum',
+diff --git a/packages/block-editor/src/components/link-control/is-url-like.js b/packages/block-editor/src/components/link-control/is-url-like.js
+index fe44da9fcdbdbb..3021ace38a26e1 100644
+--- a/packages/block-editor/src/components/link-control/is-url-like.js
++++ b/packages/block-editor/src/components/link-control/is-url-like.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { startsWith } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -20,6 +15,6 @@ import { isURL } from '@wordpress/url';
+  * @return {boolean} whether or not the value is potentially a URL.
+  */
+ export default function isURLLike( val ) {
+-	const isInternal = startsWith( val, '#' );
++	const isInternal = val?.startsWith( '#' );
+ 	return isURL( val ) || ( val && val.includes( 'www.' ) ) || isInternal;
+ }
+diff --git a/packages/block-editor/src/components/link-control/use-search-handler.js b/packages/block-editor/src/components/link-control/use-search-handler.js
+index b176268f90a650..47c20ed60b8e32 100644
+--- a/packages/block-editor/src/components/link-control/use-search-handler.js
++++ b/packages/block-editor/src/components/link-control/use-search-handler.js
+@@ -5,11 +5,6 @@ import { getProtocol, prependHTTP } from '@wordpress/url';
+ import { useCallback } from '@wordpress/element';
+ import { useSelect } from '@wordpress/data';
+ 
+-/**
+- * External dependencies
+- */
+-import { startsWith } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -38,7 +33,7 @@ export const handleDirectEntry = ( val ) => {
+ 		type = TEL_TYPE;
+ 	}
+ 
+-	if ( startsWith( val, '#' ) ) {
++	if ( val?.startsWith( '#' ) ) {
+ 		type = INTERNAL_TYPE;
+ 	}
+ 
+diff --git a/packages/blocks/src/api/serializer.js b/packages/blocks/src/api/serializer.js
+index 690220dbaf6910..09553966be587a 100644
+--- a/packages/blocks/src/api/serializer.js
++++ b/packages/blocks/src/api/serializer.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isEmpty, reduce, castArray, startsWith } from 'lodash';
++import { isEmpty, reduce, castArray } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -320,7 +320,7 @@ export function getCommentDelimitedContent(
+ 		: '';
+ 
+ 	// Strip core blocks of their namespace prefix.
+-	const blockName = startsWith( rawBlockName, 'core/' )
++	const blockName = rawBlockName?.startsWith( 'core/' )
+ 		? rawBlockName.slice( 5 )
+ 		: rawBlockName;
+ 
+diff --git a/packages/components/src/mobile/global-styles-context/utils.native.js b/packages/components/src/mobile/global-styles-context/utils.native.js
+index deca17b38c4cdf..84fbc957f0ca3e 100644
+--- a/packages/components/src/mobile/global-styles-context/utils.native.js
++++ b/packages/components/src/mobile/global-styles-context/utils.native.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { find, startsWith, get, camelCase, has } from 'lodash';
++import { find, get, camelCase, has } from 'lodash';
+ import { Dimensions } from 'react-native';
+ 
+ /**
+@@ -104,7 +104,7 @@ export function getBlockColors(
+ 
+ 	// Custom colors.
+ 	Object.entries( blockStyleAttributes ).forEach( ( [ key, value ] ) => {
+-		const isCustomColor = startsWith( value, '#' );
++		const isCustomColor = value?.startsWith?.( '#' );
+ 		let styleKey = key;
+ 
+ 		if ( BLOCK_STYLE_ATTRIBUTES_MAPPING[ styleKey ] ) {
+diff --git a/packages/edit-site/src/components/global-styles/use-global-styles-output.js b/packages/edit-site/src/components/global-styles/use-global-styles-output.js
+index da218184e3f028..2e27d0a4453459 100644
+--- a/packages/edit-site/src/components/global-styles/use-global-styles-output.js
++++ b/packages/edit-site/src/components/global-styles/use-global-styles-output.js
+@@ -10,7 +10,6 @@ import {
+ 	pickBy,
+ 	reduce,
+ 	set,
+-	startsWith,
+ } from 'lodash';
+ 
+ /**
+@@ -50,7 +49,7 @@ function compileStyleValue( uncompiledValue ) {
+ 	const VARIABLE_REFERENCE_PREFIX = 'var:';
+ 	const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
+ 	const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
+-	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
++	if ( uncompiledValue?.startsWith( VARIABLE_REFERENCE_PREFIX ) ) {
+ 		const variable = uncompiledValue
+ 			.slice( VARIABLE_REFERENCE_PREFIX.length )
+ 			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
+diff --git a/test/integration/full-content/full-content.test.js b/test/integration/full-content/full-content.test.js
+index 4aace84aab006c..8066d3b7eb8347 100644
+--- a/test/integration/full-content/full-content.test.js
++++ b/test/integration/full-content/full-content.test.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import glob from 'fast-glob';
+-import { startsWith, get } from 'lodash';
++import { get } from 'lodash';
+ import { format } from 'util';
+ 
+ /**
+@@ -237,7 +237,7 @@ describe( 'full post content fixture', () => {
+ 					.filter(
+ 						( basename ) =>
+ 							basename === nameToFilename ||
+-							startsWith( basename, nameToFilename + '__' )
++							basename.startsWith( nameToFilename + '__' )
+ 					)
+ 					.map( ( basename ) => {
+ 						const { filename: htmlFixtureFileName } =

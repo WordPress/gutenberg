@@ -1,0 +1,236 @@
+diff --git a/packages/components/src/base-control/index.js b/packages/components/src/base-control/index.js
+index bbeb0a7b77bb4d..4ec051c01159bd 100644
+--- a/packages/components/src/base-control/index.js
++++ b/packages/components/src/base-control/index.js
+@@ -20,7 +20,7 @@ import {
+  *                                                             That element should be passed as a child.
+  * @property {import('react').ReactNode} help                  If this property is added, a help text will be
+  *                                                             generated using help property as the content.
+- * @property {import('react').ReactNode} label                 If this property is added, a label will be generated
++ * @property {import('react').ReactNode} [label]               If this property is added, a label will be generated
+  *                                                             using label property as the content.
+  * @property {boolean}                   [hideLabelFromVision] If true, the label will only be visible to screen readers.
+  * @property {string}                    [className]           The class that will be added with "components-base-control" to the
+diff --git a/packages/components/src/select-control/index.js b/packages/components/src/select-control/index.tsx
+similarity index 65%
+rename from packages/components/src/select-control/index.js
+rename to packages/components/src/select-control/index.tsx
+index d93be19e11b353..2f13ab3278cde4 100644
+--- a/packages/components/src/select-control/index.js
++++ b/packages/components/src/select-control/index.tsx
+@@ -1,8 +1,10 @@
+ /**
+  * External dependencies
+  */
+-import { isEmpty, noop } from 'lodash';
++import { isEmpty, noop, omit } from 'lodash';
+ import classNames from 'classnames';
++// eslint-disable-next-line no-restricted-imports
++import type { ChangeEvent, FocusEvent, Ref } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,15 +18,39 @@ import { Icon, chevronDown } from '@wordpress/icons';
+  */
+ import BaseControl from '../base-control';
+ import InputBase from '../input-control/input-base';
++import type { InputBaseProps, LabelPosition } from '../input-control/types';
+ import { Select, DownArrowWrapper } from './styles/select-control-styles';
++import type { Size } from './types';
++import type { PolymorphicComponentProps } from '../ui/context';
+ 
+-function useUniqueId( idProp ) {
++function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( SelectControl );
+ 	const id = `inspector-select-control-${ instanceId }`;
+ 
+ 	return idProp || id;
+ }
+ 
++export interface SelectControlProps extends Omit< InputBaseProps, 'children' > {
++	help?: string;
++	hideLabelFromVision?: boolean;
++	multiple?: boolean;
++	onBlur?: ( event: FocusEvent< HTMLSelectElement > ) => void;
++	onFocus?: ( event: FocusEvent< HTMLSelectElement > ) => void;
++	onChange?: (
++		value: string | string[],
++		extra?: { event?: ChangeEvent< HTMLSelectElement > }
++	) => void;
++	options?: {
++		label: string;
++		value: string;
++		id?: string;
++		disabled?: boolean;
++	}[];
++	size?: Size;
++	value?: string | string[];
++	labelPosition?: LabelPosition;
++}
++
+ function SelectControl(
+ 	{
+ 		className,
+@@ -41,9 +67,11 @@ function SelectControl(
+ 		size = 'default',
+ 		value: valueProp,
+ 		labelPosition = 'top',
++		prefix,
++		suffix,
+ 		...props
+-	},
+-	ref
++	}: PolymorphicComponentProps< SelectControlProps, 'select', false >,
++	ref: Ref< HTMLSelectElement >
+ ) {
+ 	const [ isFocused, setIsFocused ] = useState( false );
+ 	const id = useUniqueId( idProp );
+@@ -52,17 +80,17 @@ function SelectControl(
+ 	// Disable reason: A select with an onchange throws a warning
+ 	if ( isEmpty( options ) ) return null;
+ 
+-	const handleOnBlur = ( event ) => {
++	const handleOnBlur = ( event: FocusEvent< HTMLSelectElement > ) => {
+ 		onBlur( event );
+ 		setIsFocused( false );
+ 	};
+ 
+-	const handleOnFocus = ( event ) => {
++	const handleOnFocus = ( event: FocusEvent< HTMLSelectElement > ) => {
+ 		onFocus( event );
+ 		setIsFocused( true );
+ 	};
+ 
+-	const handleOnChange = ( event ) => {
++	const handleOnChange = ( event: ChangeEvent< HTMLSelectElement > ) => {
+ 		if ( multiple ) {
+ 			const selectedOptions = [ ...event.target.options ].filter(
+ 				( { selected } ) => selected
+@@ -79,7 +107,7 @@ function SelectControl(
+ 
+ 	/* eslint-disable jsx-a11y/no-onchange */
+ 	return (
+-		<BaseControl help={ help }>
++		<BaseControl help={ help } id={ id }>
+ 			<InputBase
+ 				className={ classes }
+ 				disabled={ disabled }
+@@ -89,12 +117,14 @@ function SelectControl(
+ 				label={ label }
+ 				size={ size }
+ 				suffix={
+-					<DownArrowWrapper>
+-						<Icon icon={ chevronDown } size={ 18 } />
+-					</DownArrowWrapper>
++					suffix || (
++						<DownArrowWrapper>
++							<Icon icon={ chevronDown } size={ 18 } />
++						</DownArrowWrapper>
++					)
+ 				}
++				prefix={ prefix }
+ 				labelPosition={ labelPosition }
+-				{ ...props }
+ 			>
+ 				<Select
+ 					{ ...props }
+@@ -107,7 +137,7 @@ function SelectControl(
+ 					onChange={ handleOnChange }
+ 					onFocus={ handleOnFocus }
+ 					ref={ ref }
+-					size={ size }
++					selectSize={ size }
+ 					value={ valueProp }
+ 				>
+ 					{ options.map( ( option, index ) => {
+diff --git a/packages/components/src/select-control/styles/select-control-styles.js b/packages/components/src/select-control/styles/select-control-styles.ts
+similarity index 72%
+rename from packages/components/src/select-control/styles/select-control-styles.js
+rename to packages/components/src/select-control/styles/select-control-styles.ts
+index ddcb7cbab42b69..2bcb0c24d51825 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.js
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -8,8 +8,14 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import { COLORS, rtl } from '../../utils';
++import type { Size } from '../types';
+ 
+-const disabledStyles = ( { disabled } ) => {
++interface SelectProps {
++	disabled?: boolean;
++	selectSize?: Size;
++}
++
++const disabledStyles = ( { disabled }: SelectProps ) => {
+ 	if ( ! disabled ) return '';
+ 
+ 	return css( {
+@@ -17,13 +23,13 @@ const disabledStyles = ( { disabled } ) => {
+ 	} );
+ };
+ 
+-const fontSizeStyles = ( { size } ) => {
++const fontSizeStyles = ( { selectSize }: SelectProps ) => {
+ 	const sizes = {
+ 		default: '13px',
+ 		small: '11px',
+ 	};
+ 
+-	const fontSize = sizes[ size ];
++	const fontSize = sizes[ selectSize ];
+ 	const fontSizeMobile = '16px';
+ 
+ 	if ( ! fontSize ) return '';
+@@ -37,7 +43,7 @@ const fontSizeStyles = ( { size } ) => {
+ 	`;
+ };
+ 
+-const sizeStyles = ( { size } ) => {
++const sizeStyles = ( { selectSize }: SelectProps ) => {
+ 	const sizes = {
+ 		default: {
+ 			height: 30,
+@@ -51,7 +57,7 @@ const sizeStyles = ( { size } ) => {
+ 		},
+ 	};
+ 
+-	const style = sizes[ size ] || sizes.default;
++	const style = sizes[ selectSize ] || sizes.default;
+ 
+ 	return css( style );
+ };
+@@ -59,7 +65,7 @@ const sizeStyles = ( { size } ) => {
+ // TODO: Resolve need to use &&& to increase specificity
+ // https://github.com/WordPress/gutenberg/issues/18483
+ 
+-export const Select = styled.select`
++export const Select = styled.select< SelectProps >`
+ 	&&& {
+ 		appearance: none;
+ 		background: transparent;
+@@ -75,7 +81,7 @@ export const Select = styled.select`
+ 		${ fontSizeStyles };
+ 		${ sizeStyles };
+ 
+-		${ rtl( { paddingLeft: 8, paddingRight: 24 } )() }
++		${ rtl( { paddingLeft: 8, paddingRight: 24 } ) }
+ 	}
+ `;
+ 
+@@ -89,7 +95,7 @@ export const DownArrowWrapper = styled.div`
+ 	position: absolute;
+ 	top: 0;
+ 
+-	${ rtl( { right: 0 } )() }
++	${ rtl( { right: 0 } ) }
+ 
+ 	svg {
+ 		display: block;
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+new file mode 100644
+index 00000000000000..e69c3c45a9eb2f
+--- /dev/null
++++ b/packages/components/src/select-control/types.ts
+@@ -0,0 +1 @@
++export type Size = 'default' | 'small';

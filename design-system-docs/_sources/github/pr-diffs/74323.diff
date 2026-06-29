@@ -1,0 +1,55 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index df19a6de382d8d..30de91d5ea21c1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -42,6 +42,7 @@
+ -   `Notice`: Fix notice component spacing issue when actions are present. ([#69430](https://github.com/WordPress/gutenberg/pull/69430))
+ -   `DatePicker`: Fix missing scheduled events and current date indicators. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
+ -   `DatePicker`: Fix handling of `currentDate` when passed values as Date or timestamp. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
++-   `RangeControl`: Fix reset button requiring double-click when value is `0`. ([#74323](https://github.com/WordPress/gutenberg/pull/74323))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/range-control/utils.ts b/packages/components/src/range-control/utils.ts
+index 0bf0a4efaa3e0d..36754a81fcb0f7 100644
+--- a/packages/components/src/range-control/utils.ts
++++ b/packages/components/src/range-control/utils.ts
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useCallback } from '@wordpress/element';
++import { useCallback, useEffect, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -38,6 +38,8 @@ export function useControlledRangeValue(
+ 	settings: UseControlledRangeValueArgs
+ ) {
+ 	const { min, max, value: valueProp, initial } = settings;
++	const prevValuePropRef = useRef< typeof valueProp >();
++
+ 	const [ state, setInternalState ] = useControlledState(
+ 		floatClamp( valueProp, min, max ),
+ 		{
+@@ -46,6 +48,20 @@ export function useControlledRangeValue(
+ 		}
+ 	);
+ 
++	// Clear stale internal state when valueProp transitions from a number to null/undefined
++	useEffect( () => {
++		const isTransitionToNull =
++			typeof prevValuePropRef.current === 'number' &&
++			( valueProp === null || valueProp === undefined );
++
++		if ( isTransitionToNull ) {
++			setInternalState( null );
++		}
++
++		// Update ref after checking the condition
++		prevValuePropRef.current = valueProp;
++	}, [ valueProp, setInternalState ] );
++
+ 	const setState = useCallback(
+ 		( nextValue: number | null ) => {
+ 			if ( nextValue === null ) {

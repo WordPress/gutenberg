@@ -1,0 +1,37 @@
+diff --git a/packages/edit-post/src/components/visual-editor/index.js b/packages/edit-post/src/components/visual-editor/index.js
+index b34d8a1375b66c..358532e9387b27 100644
+--- a/packages/edit-post/src/components/visual-editor/index.js
++++ b/packages/edit-post/src/components/visual-editor/index.js
+@@ -39,7 +39,7 @@ function VisualEditor() {
+ 					<WritingFlow>
+ 						<ObserveTyping>
+ 							<CopyHandler>
+-								<PostTitle />
++								<PostTitle title="Static Title Value!" />
+ 								<BlockList />
+ 							</CopyHandler>
+ 						</ObserveTyping>
+diff --git a/packages/editor/src/components/post-title/index.js b/packages/editor/src/components/post-title/index.js
+index e1702076f81463..e2d0cc5ca400f6 100644
+--- a/packages/editor/src/components/post-title/index.js
++++ b/packages/editor/src/components/post-title/index.js
+@@ -132,7 +132,7 @@ class PostTitle extends Component {
+ 	}
+ }
+ 
+-const applyWithSelect = withSelect( ( select ) => {
++const applyWithSelect = withSelect( ( select, { fallbackTitle } ) => {
+ 	const { getEditedPostAttribute, isCleanNewPost } = select( 'core/editor' );
+ 	const { getSettings } = select( 'core/block-editor' );
+ 	const { getPostType } = select( 'core' );
+@@ -141,7 +141,9 @@ const applyWithSelect = withSelect( ( select ) => {
+ 
+ 	return {
+ 		isCleanNewPost: isCleanNewPost(),
+-		title: getEditedPostAttribute( 'title' ),
++		title: fallbackTitle
++			? fallbackTitle
++			: getEditedPostAttribute( 'title' ),
+ 		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
+ 		placeholder: titlePlaceholder,
+ 		isFocusMode: focusMode,

@@ -1,0 +1,14 @@
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 2e7877cf20613e..79f18faad4947f 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -26,6 +26,9 @@ function FontSizePicker( {
+ 	value,
+ 	withSlider = false,
+ } ) {
++	if ( disableCustomFontSizes && ! fontSizes.length ) {
++		return null;
++	}
+ 	const onChangeValue = ( event ) => {
+ 		const newValue = event.target.value;
+ 		if ( newValue === '' ) {

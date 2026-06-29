@@ -1,0 +1,73 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c9b09c40350232..fc0b91ad0eb078 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -31,6 +31,7 @@
+ -   `ComboboxControl`: Update reset button size ([#67215](https://github.com/WordPress/gutenberg/pull/67215)).
+ -   `Autocomplete`: Increase option height ([#67214](https://github.com/WordPress/gutenberg/pull/67214)).
+ -   `CircularOptionPicker`: Update `Button` sizes to be ready for 40px default size ([#67285](https://github.com/WordPress/gutenberg/pull/67285)).
++-   `DuotonePicker`: Simplify Button styles ([#66641](https://github.com/WordPress/gutenberg/pull/66641)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/duotone-picker/color-list-picker/index.tsx b/packages/components/src/duotone-picker/color-list-picker/index.tsx
+index bd009c5db1d7d4..e3925b7d064fdc 100644
+--- a/packages/components/src/duotone-picker/color-list-picker/index.tsx
++++ b/packages/components/src/duotone-picker/color-list-picker/index.tsx
+@@ -12,7 +12,6 @@ import Button from '../../button';
+ import ColorPalette from '../../color-palette';
+ import ColorIndicator from '../../color-indicator';
+ import Icon from '../../icon';
+-import { HStack } from '../../h-stack';
+ import type { ColorListPickerProps, ColorOptionProps } from './types';
+ import { useInstanceId } from '@wordpress/compose';
+ 
+@@ -32,23 +31,24 @@ function ColorOption( {
+ 	return (
+ 		<>
+ 			<Button
++				__next40pxDefaultSize
+ 				className="components-color-list-picker__swatch-button"
++				id={ labelId }
+ 				onClick={ () => setIsOpen( ( prev ) => ! prev ) }
+ 				aria-expanded={ isOpen }
+ 				aria-controls={ contentId }
+-			>
+-				<HStack justify="flex-start" spacing={ 2 }>
+-					{ value ? (
++				icon={
++					value ? (
+ 						<ColorIndicator
+ 							colorValue={ value }
+ 							className="components-color-list-picker__swatch-color"
+ 						/>
+ 					) : (
+ 						<Icon icon={ swatch } />
+-					) }
+-					<span id={ labelId }>{ label }</span>
+-				</HStack>
+-			</Button>
++					)
++				}
++				text={ label }
++			/>
+ 			<div
+ 				role="group"
+ 				id={ contentId }
+diff --git a/packages/components/src/duotone-picker/color-list-picker/style.scss b/packages/components/src/duotone-picker/color-list-picker/style.scss
+index dd0c79ffb8062b..56f2546158329a 100644
+--- a/packages/components/src/duotone-picker/color-list-picker/style.scss
++++ b/packages/components/src/duotone-picker/color-list-picker/style.scss
+@@ -7,12 +7,6 @@
+ 	margin: $grid-unit-10 0;
+ }
+ 
+-.components-color-list-picker__swatch-button {
+-	// Used to simulate styles as a .button.has-icon (which this component can't
+-	// opt into, because it has to show more than a simple SVG as the "icon")
+-	padding: 6px;
+-}
+-
+ .components-color-list-picker__swatch-color {
+ 	// Match the 24px size of the `swatch` icon (used when no color is set)
+ 	margin: 2px;

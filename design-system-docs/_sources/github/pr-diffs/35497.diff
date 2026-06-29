@@ -1,0 +1,220 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8ee778054d30ab..805aa3100edead 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   Removed the separator shown between `ToggleGroupControl` items ([#35497](https://github.com/WordPress/gutenberg/pull/35497)).
++
+ ### Breaking Changes
+ 
+ -   Removed the deprecated `position` and `menuLabel` from the `DropdownMenu` component ([#34537](https://github.com/WordPress/gutenberg/pull/34537)).
+diff --git a/packages/components/src/toggle-group-control/README.md b/packages/components/src/toggle-group-control/README.md
+index 9fb2ff0774489e..b50d4bd103d973 100644
+--- a/packages/components/src/toggle-group-control/README.md
++++ b/packages/components/src/toggle-group-control/README.md
+@@ -6,6 +6,8 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ `ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use `ToggleGroupControlOption` component.
+ 
++Only use this control when you know for sure the labels of items inside won't wrap. For items with longer labels, you can consider a `SelectControl` or a `CustomSelectControl` component instead.
++
+ ## Usage
+ 
+ ```js
+@@ -91,4 +93,4 @@ Label for the option. If needed, the `aria-label` prop can be used in addition t
+ 
+ -   Type: `string | number`
+ 
+-The value of the `ToggleGroupControlOption`.
+\ No newline at end of file
++The value of the `ToggleGroupControlOption`.
+diff --git a/packages/components/src/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/styles.ts
+index a5963eadc3c473..7f6756bd7417ff 100644
+--- a/packages/components/src/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/styles.ts
+@@ -107,17 +107,6 @@ export const ButtonContentView = styled.div`
+ 	transform: translate( -50%, -50% );
+ `;
+ 
+-export const SeparatorView = styled.div`
+-	background: ${ CONFIG.colorDivider };
+-	height: calc( 100% - 4px - 4px );
+-	position: absolute;
+-	right: 0;
+-	top: 4px;
+-	transition: background ${ CONFIG.transitionDuration } linear;
+-	${ reduceMotion( 'transition' ) }
+-	width: 1px;
+-`;
+-
+ export const separatorActive = css`
+ 	background: transparent;
+ `;
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+index 39e8f821a21cd3..4627ed759e63cd 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+@@ -152,24 +152,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
+   visibility: hidden;
+ }
+ 
+-.emotion-15 {
+-  background: rgba(0, 0, 0, 0.1);
+-  height: calc( 100% - 4px - 4px );
+-  position: absolute;
+-  right: 0;
+-  top: 4px;
+-  -webkit-transition: background 200ms linear;
+-  transition: background 200ms linear;
+-  width: 1px;
+-  background: transparent;
+-}
+-
+-@media ( prefers-reduced-motion: reduce ) {
+-  .emotion-15 {
+-    transition-duration: 0ms;
+-  }
+-}
+-
+ <div
+   class="components-base-control emotion-0 emotion-1"
+ >
+@@ -230,10 +212,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
+             R
+           </div>
+         </button>
+-        <div
+-          aria-hidden="true"
+-          class="emotion-15 emotion-16"
+-        />
+       </div>
+       <div
+         class="emotion-8 emotion-9"
+@@ -262,10 +240,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
+             J
+           </div>
+         </button>
+-        <div
+-          aria-hidden="true"
+-          class="emotion-15 emotion-16"
+-        />
+       </div>
+     </div>
+   </div>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-button.tsx b/packages/components/src/toggle-group-control/toggle-group-control-button.tsx
+index 81c0d7b656ed10..13e9ec1309581b 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-button.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-button.tsx
+@@ -16,19 +16,13 @@ import * as styles from './styles';
+ import type { ToggleGroupControlButtonProps } from './types';
+ import { useCx } from '../utils/hooks';
+ 
+-const {
+-	ButtonContentView,
+-	LabelPlaceholderView,
+-	LabelView,
+-	SeparatorView,
+-} = styles;
++const { ButtonContentView, LabelPlaceholderView, LabelView } = styles;
+ 
+ function ToggleGroupControlButton( {
+ 	className,
+ 	forwardedRef,
+ 	isBlock = false,
+ 	label,
+-	showSeparator,
+ 	value,
+ 	...props
+ }: ToggleGroupControlButtonProps ) {
+@@ -56,17 +50,8 @@ function ToggleGroupControlButton( {
+ 					{ label }
+ 				</LabelPlaceholderView>
+ 			</Radio>
+-			<ToggleGroupControlSeparator isActive={ ! showSeparator } />
+ 		</LabelView>
+ 	);
+ }
+ 
+-const ToggleGroupControlSeparator = memo(
+-	( { isActive }: { isActive: boolean } ) => {
+-		const cx = useCx();
+-		const classes = cx( isActive && styles.separatorActive );
+-		return <SeparatorView aria-hidden className={ classes } />;
+-	}
+-);
+-
+ export default memo( ToggleGroupControlButton );
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option.tsx
+index aceb7680bd62a1..19fd929aacd84b 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option.tsx
+@@ -13,33 +13,9 @@ import {
+ 	WordPressComponentProps,
+ } from '../ui/context';
+ import ToggleGroupControlButton from './toggle-group-control-button';
+-import type {
+-	ToggleGroupControlOptionProps,
+-	ToggleGroupControlContextProps,
+-} from './types';
++import type { ToggleGroupControlOptionProps } from './types';
+ import { useToggleGroupControlContext } from './toggle-group-control-context';
+ 
+-function getShowSeparator(
+-	toggleGroupControlContext: ToggleGroupControlContextProps,
+-	index: number
+-) {
+-	const { currentId, items, state } = toggleGroupControlContext;
+-	if ( items.length < 3 ) {
+-		return false;
+-	}
+-	const targetNodeExists =
+-		items.find( ( { id } ) => id === currentId )?.ref?.current?.dataset
+-			?.value === state;
+-	const isLast = index === items.length - 1;
+-	// If no target node exists, don't show the separator after the last item.
+-	if ( ! targetNodeExists ) {
+-		return ! isLast;
+-	}
+-	const isActive = items[ index ]?.id === currentId;
+-	const isNextActive = items[ index + 1 ]?.id === currentId;
+-	return ! ( isActive || isNextActive || isLast );
+-}
+-
+ function ToggleGroupControlOption(
+ 	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'input' >,
+ 	forwardedRef: import('react').Ref< any >
+@@ -53,17 +29,12 @@ function ToggleGroupControlOption(
+ 		{ ...props, id },
+ 		'ToggleGroupControlOption'
+ 	);
+-	const index = toggleGroupControlContext.items.findIndex(
+-		( item ) => item.id === buttonProps.id
+-	);
+-	const showSeparator = getShowSeparator( toggleGroupControlContext, index );
+ 	return (
+ 		<ToggleGroupControlButton
+ 			ref={ forwardedRef }
+ 			{ ...{
+ 				...toggleGroupControlContext,
+ 				...buttonProps,
+-				showSeparator,
+ 			} }
+ 		/>
+ 	);
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 905cee7d5c0260..838562af6904e1 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -85,7 +85,6 @@ export type ToggleGroupControlButtonProps = {
+ 	isBlock?: boolean;
+ 	label: string;
+ 	'aria-label'?: string;
+-	showSeparator?: boolean;
+ 	value?: ReactText;
+ 	state?: any;
+ };

@@ -1,0 +1,89 @@
+diff --git a/package-lock.json b/package-lock.json
+index 1749ed01a7cc2a..081fe1d3427a9a 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -17458,12 +17458,14 @@
+ 				"classnames": "^2.3.1",
+ 				"colord": "^2.7.0",
+ 				"date-fns": "^2.28.0",
++				"deepmerge": "^4.3.0",
+ 				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^6.0.15",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"framer-motion": "^7.6.1",
+ 				"gradient-parser": "^0.1.5",
+ 				"highlight-words-core": "^1.2.2",
++				"is-plain-object": "^5.0.0",
+ 				"lodash": "^4.17.21",
+ 				"memize": "^1.1.0",
+ 				"path-to-regexp": "^6.2.1",
+@@ -17481,6 +17483,11 @@
+ 					"resolved": "https://registry.npmjs.org/date-fns/-/date-fns-2.29.3.tgz",
+ 					"integrity": "sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA=="
+ 				},
++				"deepmerge": {
++					"version": "4.3.0",
++					"resolved": "https://registry.npmjs.org/deepmerge/-/deepmerge-4.3.0.tgz",
++					"integrity": "sha512-z2wJZXrmeHdvYJp/Ux55wIjqo81G5Bp4c+oELTW+7ar6SogWHajt5a9gO3s3IDaGSAXjDk0vlQKN3rms8ab3og=="
++				},
+ 				"path-to-regexp": {
+ 					"version": "6.2.1",
+ 					"resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-6.2.1.tgz",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index c4c94f7e6558ca..9f5b62e5956c67 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -59,12 +59,14 @@
+ 		"classnames": "^2.3.1",
+ 		"colord": "^2.7.0",
+ 		"date-fns": "^2.28.0",
++		"deepmerge": "^4.3.0",
+ 		"dom-scroll-into-view": "^1.2.1",
+ 		"downshift": "^6.0.15",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"framer-motion": "^7.6.1",
+ 		"gradient-parser": "^0.1.5",
+ 		"highlight-words-core": "^1.2.2",
++		"is-plain-object": "^5.0.0",
+ 		"lodash": "^4.17.21",
+ 		"memize": "^1.1.0",
+ 		"path-to-regexp": "^6.2.1",
+diff --git a/packages/components/src/ui/context/context-system-provider.js b/packages/components/src/ui/context/context-system-provider.js
+index 33f8ded8526d6d..b03a8c63228286 100644
+--- a/packages/components/src/ui/context/context-system-provider.js
++++ b/packages/components/src/ui/context/context-system-provider.js
+@@ -1,8 +1,9 @@
+ /**
+  * External dependencies
+  */
++import deepmerge from 'deepmerge';
+ import fastDeepEqual from 'fast-deep-equal/es6';
+-import { merge } from 'lodash';
++import { isPlainObject } from 'is-plain-object';
+ 
+ /**
+  * WordPress dependencies
+@@ -54,7 +55,7 @@ function useContextSystemBridge( { value } ) {
+ 	// `parentContext` will always be memoized (i.e., the result of this hook itself)
+ 	// or the default value from when the `ComponentsContext` was originally
+ 	// initialized (which will never change, it's a static variable)
+-	// so this memoization will prevent `merge` and `JSON.parse/stringify` from rerunning unless
++	// so this memoization will prevent `deepmerge()` from rerunning unless
+ 	// the references to `value` change OR the `parentContext` has an actual material change
+ 	// (because again, it's guaranteed to be memoized or a static reference to the empty object
+ 	// so we know that the only changes for `parentContext` are material ones... i.e., why we
+@@ -62,10 +63,12 @@ function useContextSystemBridge( { value } ) {
+ 	// need to bother with the `value`). The `useUpdateEffect` above will ensure that we are
+ 	// correctly warning when the `value` isn't being properly memoized. All of that to say
+ 	// that this should be super safe to assume that `useMemo` will only run on actual
+-	// changes to the two dependencies, therefore saving us calls to `merge` and `JSON.parse/stringify`!
++	// changes to the two dependencies, therefore saving us calls to `deepmerge()`!
+ 	const config = useMemo( () => {
+ 		// Deep clone `parentContext` to avoid mutating it later.
+-		return merge( JSON.parse( JSON.stringify( parentContext ) ), value );
++		return deepmerge( parentContext ?? {}, value ?? {}, {
++			isMergeableObject: isPlainObject,
++		} );
+ 	}, [ parentContext, value ] );
+ 
+ 	return config;

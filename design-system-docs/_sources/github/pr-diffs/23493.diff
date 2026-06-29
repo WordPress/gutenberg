@@ -1,0 +1,150 @@
+diff --git a/packages/block-editor/README.md b/packages/block-editor/README.md
+index b36d411125abba..a1d4238164b99a 100644
+--- a/packages/block-editor/README.md
++++ b/packages/block-editor/README.md
+@@ -21,7 +21,7 @@ import {
+ 	WritingFlow,
+ 	ObserveTyping
+ } from '@wordpress/block-editor';
+-import { Popover } from '@wordpress/components';
++import { SlotFillProvider, Popover } from '@wordpress/components';
+ import { useState } from '@wordpress/element';
+ 
+ function MyEditorComponent () {
+@@ -33,13 +33,15 @@ function MyEditorComponent () {
+ 			onInput={ updateBlocks }
+ 			onChange={ updateBlocks }
+ 		>
+-			<Popover.Slot name="block-toolbar" />
+-			<WritingFlow>
+-				<ObserveTyping>
+-					<BlockList />
+-				</ObserveTyping>
+-			</WritingFlow>
+-			<Popover.Slot />
++			<SlotFillProvider>
++				<Popover.Slot name="block-toolbar" />
++				<WritingFlow>
++					<ObserveTyping>
++						<BlockList />
++					</ObserveTyping>
++				</WritingFlow>
++				<Popover.Slot />
++			</SlotFillProvider>
+ 		</BlockEditorProvider>
+ 	);
+ }
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
+index 1fb905a56ffc98..dda3be6b82693e 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
+@@ -2,11 +2,17 @@
+  * WordPress dependencies
+  */
+ import { createContext } from '@wordpress/element';
++import warning from '@wordpress/warning';
+ 
+ const SlotFillContext = createContext( {
+ 	slots: {},
+ 	fills: {},
+-	registerSlot: () => {},
++	registerSlot: () => {
++		warning(
++			'Components must be wrapped within `SlotFillProvider`. ' +
++				'See https://developer.wordpress.org/block-editor/components/slot-fill/'
++		);
++	},
+ 	updateSlot: () => {},
+ 	unregisterSlot: () => {},
+ 	registerFill: () => {},
+diff --git a/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap b/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
+index bfac447c806050..6abf490ed1d12f 100644
+--- a/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
++++ b/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
+@@ -1,11 +1,5 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Slot bubblesVirtually false should not break without a Provider 1`] = `
+-<div>
+-  <div />
+-</div>
+-`;
+-
+ exports[`Slot bubblesVirtually false should subsume another slot by the same name 1`] = `
+ <div>
+   <div
+@@ -43,14 +37,6 @@ exports[`Slot bubblesVirtually false should unmount two slots with the same name
+ </div>
+ `;
+ 
+-exports[`Slot bubblesVirtually true should not break without a Provider 1`] = `
+-<div>
+-  <div>
+-    <div />
+-  </div>
+-</div>
+-`;
+-
+ exports[`Slot bubblesVirtually true should subsume another slot by the same name 1`] = `
+ <div>
+   <div
+@@ -178,3 +164,11 @@ exports[`Slot should render in expected order 1`] = `
+   />
+ </div>
+ `;
++
++exports[`Slot should warn without a Provider 1`] = `
++<div>
++  <div>
++    <div />
++  </div>
++</div>
++`;
+diff --git a/packages/components/src/slot-fill/test/slot.js b/packages/components/src/slot-fill/test/slot.js
+index fd639c888ec52b..b7b7365d16e8a7 100644
+--- a/packages/components/src/slot-fill/test/slot.js
++++ b/packages/components/src/slot-fill/test/slot.js
+@@ -208,6 +208,20 @@ describe( 'Slot', () => {
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ 
++	it( 'should warn without a Provider', () => {
++		const { container } = render(
++			<>
++				<div>
++					<Slot name="chicken" bubblesVirtually />
++				</div>
++				<Fill name="chicken" />
++			</>
++		);
++
++		expect( container ).toMatchSnapshot();
++		expect( console ).toHaveWarned();
++	} );
++
+ 	describe.each( [ false, true ] )(
+ 		'bubblesVirtually %p',
+ 		( bubblesVirtually ) => {
+@@ -300,22 +314,6 @@ describe( 'Slot', () => {
+ 				);
+ 				expect( container ).toMatchSnapshot();
+ 			} );
+-
+-			it( 'should not break without a Provider', () => {
+-				const { container } = render(
+-					<>
+-						<div>
+-							<Slot
+-								name="chicken"
+-								bubblesVirtually={ bubblesVirtually }
+-							/>
+-						</div>
+-						<Fill name="chicken" />
+-					</>
+-				);
+-
+-				expect( container ).toMatchSnapshot();
+-			} );
+ 		}
+ 	);
+ } );

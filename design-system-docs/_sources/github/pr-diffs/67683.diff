@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/scrollable/stories/index.story.tsx b/packages/components/src/scrollable/stories/index.story.tsx
+index 318a841f229788..4970b3720e8a07 100644
+--- a/packages/components/src/scrollable/stories/index.story.tsx
++++ b/packages/components/src/scrollable/stories/index.story.tsx
+@@ -70,6 +70,7 @@ const Template: StoryFn< typeof Scrollable > = ( { ...args } ) => {
+ 					} }
+ 					type="text"
+ 					value="Focus me"
++					readOnly
+ 				/>
+ 			</View>
+ 		</Scrollable>

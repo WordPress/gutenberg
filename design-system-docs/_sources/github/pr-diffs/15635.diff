@@ -1,0 +1,469 @@
+diff --git a/docs/manifest-devhub.json b/docs/manifest-devhub.json
+index 14b29c43ddb989..94f21727035536 100644
+--- a/docs/manifest-devhub.json
++++ b/docs/manifest-devhub.json
+@@ -899,12 +899,6 @@
+ 		"markdown_source": "../packages/components/src/select-control/README.md",
+ 		"parent": "components"
+ 	},
+-	{
+-		"title": "ServerSideRender",
+-		"slug": "server-side-render",
+-		"markdown_source": "../packages/components/src/server-side-render/README.md",
+-		"parent": "components"
+-	},
+ 	{
+ 		"title": "SlotFill",
+ 		"slug": "slot-fill",
+@@ -1361,6 +1355,12 @@
+ 		"markdown_source": "../packages/scripts/README.md",
+ 		"parent": "packages"
+ 	},
++	{
++		"title": "@wordpress/server-side-render",
++		"slug": "packages-server-side-render",
++		"markdown_source": "../packages/server-side-render/README.md",
++		"parent": "packages"
++	},
+ 	{
+ 		"title": "@wordpress/shortcode",
+ 		"slug": "packages-shortcode",
+diff --git a/lib/client-assets.php b/lib/client-assets.php
+index 4611cadab1172a..5e4d2651bb603d 100644
+--- a/lib/client-assets.php
++++ b/lib/client-assets.php
+@@ -289,6 +289,21 @@ function gutenberg_register_scripts_and_styles() {
+ 		)
+ 	);
+ 
++	// Add back compatibility for calls to wp.components.ServerSideRender.
++	wp_add_inline_script(
++		'wp-server-side-render',
++		implode(
++			"\n",
++			array(
++				'( function() {',
++				'	if ( wp && wp.components && wp.serverSideRender && ! wp.components.ServerSideRender ) {',
++				'		wp.components.ServerSideRender = wp.serverSideRender;',
++				'	};',
++				'} )();',
++			)
++		)
++	);
++
+ 	// Editor Styles.
+ 	// This empty stylesheet is defined to ensure backward compatibility.
+ 	gutenberg_override_style( 'wp-blocks', false );
+diff --git a/package-lock.json b/package-lock.json
+index 8632bb2c43cde7..e21b8504db5a29 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -3309,6 +3309,7 @@
+ 				"@wordpress/html-entities": "file:packages/html-entities",
+ 				"@wordpress/i18n": "file:packages/i18n",
+ 				"@wordpress/keycodes": "file:packages/keycodes",
++				"@wordpress/server-side-render": "file:packages/server-side-render",
+ 				"@wordpress/viewport": "file:packages/viewport",
+ 				"classnames": "^2.2.5",
+ 				"fast-average-color": "4.3.0",
+@@ -3363,7 +3364,6 @@
+ 			"requires": {
+ 				"@babel/runtime": "^7.4.4",
+ 				"@wordpress/a11y": "file:packages/a11y",
+-				"@wordpress/api-fetch": "file:packages/api-fetch",
+ 				"@wordpress/compose": "file:packages/compose",
+ 				"@wordpress/dom": "file:packages/dom",
+ 				"@wordpress/element": "file:packages/element",
+@@ -3826,6 +3826,18 @@
+ 				"webpack-livereload-plugin": "^2.2.0"
+ 			}
+ 		},
++		"@wordpress/server-side-render": {
++			"version": "file:packages/server-side-render",
++			"requires": {
++				"@babel/runtime": "^7.4.4",
++				"@wordpress/components": "file:packages/components",
++				"@wordpress/data": "file:packages/data",
++				"@wordpress/element": "file:packages/element",
++				"@wordpress/i18n": "file:packages/i18n",
++				"@wordpress/url": "file:packages/url",
++				"lodash": "^4.17.11"
++			}
++		},
+ 		"@wordpress/shortcode": {
+ 			"version": "file:packages/shortcode",
+ 			"requires": {
+diff --git a/package.json b/package.json
+index 790c5db1328d9c..62de2dba7741d3 100644
+--- a/package.json
++++ b/package.json
+@@ -56,6 +56,7 @@
+ 		"@wordpress/priority-queue": "file:packages/priority-queue",
+ 		"@wordpress/redux-routine": "file:packages/redux-routine",
+ 		"@wordpress/rich-text": "file:packages/rich-text",
++		"@wordpress/server-side-render": "file:packages/server-side-render",
+ 		"@wordpress/shortcode": "file:packages/shortcode",
+ 		"@wordpress/token-list": "file:packages/token-list",
+ 		"@wordpress/url": "file:packages/url",
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index 4465a8dfefc496..daa427cffd4a94 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -36,6 +36,7 @@
+ 		"@wordpress/html-entities": "file:../html-entities",
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/keycodes": "file:../keycodes",
++		"@wordpress/server-side-render": "file:../server-side-render",
+ 		"@wordpress/viewport": "file:../viewport",
+ 		"classnames": "^2.2.5",
+ 		"fast-average-color": "4.3.0",
+diff --git a/packages/block-library/src/archives/edit.js b/packages/block-library/src/archives/edit.js
+index c67cdc912e5260..6909b70ccc4271 100644
+--- a/packages/block-library/src/archives/edit.js
++++ b/packages/block-library/src/archives/edit.js
+@@ -8,7 +8,7 @@ import {
+ } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import { InspectorControls } from '@wordpress/block-editor';
+-import { ServerSideRender } from '@wordpress/editor';
++import ServerSideRender from '@wordpress/server-side-render';
+ 
+ export default function ArchivesEdit( { attributes, setAttributes } ) {
+ 	const { showPostCounts, displayAsDropdown } = attributes;
+diff --git a/packages/block-library/src/latest-comments/edit.js b/packages/block-library/src/latest-comments/edit.js
+index 61e7ec3e3aaabb..029778e24f2c59 100644
+--- a/packages/block-library/src/latest-comments/edit.js
++++ b/packages/block-library/src/latest-comments/edit.js
+@@ -8,7 +8,7 @@ import {
+ 	RangeControl,
+ 	ToggleControl,
+ } from '@wordpress/components';
+-import { ServerSideRender } from '@wordpress/editor';
++import ServerSideRender from '@wordpress/server-side-render';
+ import { Component } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ 
+diff --git a/packages/block-library/src/legacy-widget/edit/index.js b/packages/block-library/src/legacy-widget/edit/index.js
+index ac38184d22989b..31f36c2f7fac94 100644
+--- a/packages/block-library/src/legacy-widget/edit/index.js
++++ b/packages/block-library/src/legacy-widget/edit/index.js
+@@ -14,7 +14,7 @@ import {
+ 	BlockControls,
+ 	InspectorControls,
+ } from '@wordpress/block-editor';
+-import { ServerSideRender } from '@wordpress/editor';
++import ServerSideRender from '@wordpress/server-side-render';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e6db0bcd0c8ff4..5fc3cba4b28b46 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,10 @@
+ 
+ - Added missing documentation for `DropdownMenu` props `menuLabel`, `position`, `className`.
+ 
++### Breaking Change
++
++- `ServerSideRender` is no longer part of components. It was extracted to an independent package `@wordpress/server-side-render`.
++
+ 
+ ## 7.4.0 (2019-05-21)
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index d2aa5957d36a83..df7d8afa76457f 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -23,7 +23,6 @@
+ 	"dependencies": {
+ 		"@babel/runtime": "^7.4.4",
+ 		"@wordpress/a11y": "file:../a11y",
+-		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/dom": "file:../dom",
+ 		"@wordpress/element": "file:../element",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index ab0540fa2f232f..6395ea3d843a42 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -53,7 +53,6 @@ export { default as SelectControl } from './select-control';
+ export { default as Snackbar } from './snackbar';
+ export { default as SnackbarList } from './snackbar/list';
+ export { default as Spinner } from './spinner';
+-export { default as ServerSideRender } from './server-side-render';
+ export { default as TabPanel } from './tab-panel';
+ export { default as TextControl } from './text-control';
+ export { default as TextareaControl } from './textarea-control';
+diff --git a/packages/editor/CHANGELOG.md b/packages/editor/CHANGELOG.md
+index 3840d850ed599a..921a2b53fdb4a1 100644
+--- a/packages/editor/CHANGELOG.md
++++ b/packages/editor/CHANGELOG.md
+@@ -3,6 +3,9 @@
+ ### Deprecations
+ - The `getAutosave`, `getAutosaveAttribute`, and `hasAutosave` selectors are deprecated. Please use the `getAutosave` selector in the `@wordpress/core-data` package.
+ - The `resetAutosave` action is deprecated. An equivalent action `receiveAutosaves` has been added to the `@wordpress/core-data` package.
++- `ServerSideRender` component was deprecated. The component is now available in `@wordpress/server-side-render`.
++
++
+ 
+ ### Internal
+ 
+diff --git a/packages/editor/src/components/deprecated.js b/packages/editor/src/components/deprecated.js
+index 8468f254c2dccf..330116fabec58e 100644
+--- a/packages/editor/src/components/deprecated.js
++++ b/packages/editor/src/components/deprecated.js
+@@ -117,3 +117,4 @@ export {
+ 	withColors,
+ 	withFontSizes,
+ };
++export { default as ServerSideRender } from '@wordpress/server-side-render';
+diff --git a/packages/editor/src/components/index.js b/packages/editor/src/components/index.js
+index 9d12344c50dc2a..f8999c7868042f 100644
+--- a/packages/editor/src/components/index.js
++++ b/packages/editor/src/components/index.js
+@@ -1,6 +1,5 @@
+ // Block Creation Components
+ export * from './autocompleters';
+-export { default as ServerSideRender } from './server-side-render';
+ 
+ // Post Related Components
+ export { default as AutosaveMonitor } from './autosave-monitor';
+diff --git a/packages/editor/src/components/server-side-render/README.md b/packages/editor/src/components/server-side-render/README.md
+deleted file mode 100644
+index 3ef53b188e644f..00000000000000
+--- a/packages/editor/src/components/server-side-render/README.md
++++ /dev/null
+@@ -1,3 +0,0 @@
+-# ServerSideRender
+-
+-This utility component is a wrapper for the generic ServerSideRender in `@wordpress/components`. It adds the `post_id` parameter to the `urlQueryArgs` prop of the wrapped component. Use this component to ensure that the global `$post` object is set up properly in the server-side `render_callback` when rendering within the editor.
+diff --git a/packages/editor/src/components/server-side-render/index.js b/packages/editor/src/components/server-side-render/index.js
+deleted file mode 100644
+index 5830612ebcc36b..00000000000000
+--- a/packages/editor/src/components/server-side-render/index.js
++++ /dev/null
+@@ -1,18 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { ServerSideRender } from '@wordpress/components';
+-import { select } from '@wordpress/data';
+-
+-export default function( { urlQueryArgs = {}, ...props } ) {
+-	const { getCurrentPostId } = select( 'core/editor' );
+-
+-	urlQueryArgs = {
+-		post_id: getCurrentPostId(),
+-		...urlQueryArgs,
+-	};
+-
+-	return (
+-		<ServerSideRender urlQueryArgs={ urlQueryArgs } { ...props } />
+-	);
+-}
+diff --git a/packages/server-side-render/.npmrc b/packages/server-side-render/.npmrc
+new file mode 100644
+index 00000000000000..43c97e719a5a82
+--- /dev/null
++++ b/packages/server-side-render/.npmrc
+@@ -0,0 +1 @@
++package-lock=false
+diff --git a/packages/server-side-render/CHANGELOG.md b/packages/server-side-render/CHANGELOG.md
+new file mode 100644
+index 00000000000000..04ea9fe434a6fb
+--- /dev/null
++++ b/packages/server-side-render/CHANGELOG.md
+@@ -0,0 +1,5 @@
++## Unreleased
++
++### Enhancements
++
++- Extracted the package from `@wordpress/components` and `@wordpress/editor`;
+diff --git a/packages/components/src/server-side-render/README.md b/packages/server-side-render/README.md
+similarity index 76%
+rename from packages/components/src/server-side-render/README.md
+rename to packages/server-side-render/README.md
+index df9d75dec8fa4f..a975cd36f19d10 100644
+--- a/packages/components/src/server-side-render/README.md
++++ b/packages/server-side-render/README.md
+@@ -8,6 +8,23 @@ ServerSideRender should be regarded as a fallback or legacy mechanism, it is not
+ 
+ New blocks should be built in conjunction with any necessary REST API endpoints, so that JavaScript can be used for rendering client-side in the `edit` function. This gives the best user experience, instead of relying on using the PHP `render_callback`. The logic necessary for rendering should be included in the endpoint, so that both the client-side JavaScript and server-side PHP logic should require a minimal amount of differences.
+ 
++> This package is meant to be used only with WordPress core. Feel free to use it in your own project but please keep in mind that it might never get fully documented.
++
++## Installation
++
++Install the module
++
++```bash
++npm install @wordpress/server-side-render --save
++```
++
++_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
++
++## Usage
++
++The props accepted by the component are described below.
++
++
+ ## Props
+ 
+ ### attributes
+@@ -43,7 +60,7 @@ E.g: `{ post_id: 12 }`.
+ Render core/archives preview.
+ 
+ ```jsx
+-import { ServerSideRender } from '@wordpress/components';
++import { ServerSideRender } from '@wordpress/server-side-render';
+ 
+ const MyServerSideRender = () => (
+ 	<ServerSideRender
+diff --git a/packages/server-side-render/package.json b/packages/server-side-render/package.json
+new file mode 100644
+index 00000000000000..1f81f0be515781
+--- /dev/null
++++ b/packages/server-side-render/package.json
+@@ -0,0 +1,37 @@
++{
++	"name": "@wordpress/server-side-render",
++	"version": "1.0.0-alpha.1",
++	"description": "The component used with WordPress to server-side render a preview of dynamic blocks to display in the editor.",
++	"author": "The WordPress Contributors",
++	"license": "GPL-2.0-or-later",
++	"keywords": [
++		"wordpress",
++		"server-side",
++		"render"
++	],
++	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/server-side-render/README.md",
++	"repository": {
++		"type": "git",
++		"url": "https://github.com/WordPress/gutenberg.git",
++		"directory": "packages/server-side-render"
++	},
++	"bugs": {
++		"url": "https://github.com/WordPress/gutenberg/issues"
++	},
++	"main": "build/index.js",
++	"module": "build-module/index.js",
++	"react-native": "src/index",
++	"dependencies": {
++		"@babel/runtime": "^7.4.4",
++		"@wordpress/api-fetch": "file:../api-fetch",
++		"@wordpress/components": "file:../components",
++		"@wordpress/data": "file:../data",
++		"@wordpress/element": "file:../element",
++		"@wordpress/i18n": "file:../i18n",
++		"@wordpress/url": "file:../url",
++		"lodash": "^4.17.11"
++	},
++	"publishConfig": {
++		"access": "public"
++	}
++}
+diff --git a/packages/server-side-render/src/index.js b/packages/server-side-render/src/index.js
+new file mode 100644
+index 00000000000000..3958ee46941366
+--- /dev/null
++++ b/packages/server-side-render/src/index.js
+@@ -0,0 +1,46 @@
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++import { withSelect } from '@wordpress/data';
++
++/**
++ * Internal dependencies
++ */
++import ServerSideRender from './server-side-render';
++
++/**
++ * Constants
++ */
++const EMPTY_OBJECT = {};
++
++export default withSelect(
++	( select ) => {
++		const coreEditorSelect = select( 'core/editor' );
++		if ( coreEditorSelect ) {
++			const currentPostId = coreEditorSelect.getCurrentPostId();
++			if ( currentPostId ) {
++				return {
++					currentPostId,
++				};
++			}
++		}
++		return EMPTY_OBJECT;
++	}
++)(
++	( { urlQueryArgs = EMPTY_OBJECT, currentPostId, ...props } ) => {
++		const newUrlQueryArgs = useMemo( () => {
++			if ( ! currentPostId ) {
++				return urlQueryArgs;
++			}
++			return {
++				post_id: currentPostId,
++				...urlQueryArgs,
++			};
++		}, [ currentPostId, urlQueryArgs ] );
++
++		return (
++			<ServerSideRender urlQueryArgs={ newUrlQueryArgs } { ...props } />
++		);
++	}
++);
+diff --git a/packages/components/src/server-side-render/index.js b/packages/server-side-render/src/server-side-render.js
+similarity index 96%
+rename from packages/components/src/server-side-render/index.js
+rename to packages/server-side-render/src/server-side-render.js
+index d58564d2cd82eb..a0c6a915efae55 100644
+--- a/packages/components/src/server-side-render/index.js
++++ b/packages/server-side-render/src/server-side-render.js
+@@ -13,12 +13,10 @@ import {
+ import { __, sprintf } from '@wordpress/i18n';
+ import apiFetch from '@wordpress/api-fetch';
+ import { addQueryArgs } from '@wordpress/url';
+-
+-/**
+- * Internal dependencies
+- */
+-import Placeholder from '../placeholder';
+-import Spinner from '../spinner';
++import {
++	Placeholder,
++	Spinner,
++} from '@wordpress/components';
+ 
+ export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
+ 	return addQueryArgs( `/wp/v2/block-renderer/${ block }`, {
+diff --git a/packages/components/src/server-side-render/test/index.js b/packages/server-side-render/src/test/index.js
+similarity index 97%
+rename from packages/components/src/server-side-render/test/index.js
+rename to packages/server-side-render/src/test/index.js
+index c09814771f7a75..b97a80aa91b2b8 100644
+--- a/packages/components/src/server-side-render/test/index.js
++++ b/packages/server-side-render/src/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { rendererPath } from '../index';
++import { rendererPath } from '../server-side-render';
+ 
+ describe( 'rendererPath', function() {
+ 	test( 'should return an base path for empty input', function() {
+diff --git a/webpack.config.js b/webpack.config.js
+index 0c0748fb684062..8a8348bb494d52 100644
+--- a/webpack.config.js
++++ b/webpack.config.js
+@@ -88,6 +88,7 @@ module.exports = {
+ 			'dom-ready',
+ 			'redux-routine',
+ 			'token-list',
++			'server-side-render',
+ 			'shortcode',
+ 		].map( camelCaseDash ) ),
+ 		new CopyWebpackPlugin(

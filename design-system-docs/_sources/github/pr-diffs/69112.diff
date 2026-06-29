@@ -1,0 +1,49 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a36773a8e16d66..8ca35fe539ea33 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -3,6 +3,7 @@
+ ## Unreleased
+ 
+ -   `ComboboxControl`: Add an `isLoading` prop to show a loading spinner ([#68990](https://github.com/WordPress/gutenberg/pull/68990))
++-   `BorderControl`: adjust `useBorderControlDropdown` hook to use `1px` width when selecting the border color initially without explicitly setting width ([#69112](https://github.com/WordPress/gutenberg/pull/69112)).
+ 
+ ## 29.3.0 (2025-01-29)
+ 
+diff --git a/packages/components/src/border-control/border-control-dropdown/hook.ts b/packages/components/src/border-control/border-control-dropdown/hook.ts
+index 5366babc266c61..c00196e06079a6 100644
+--- a/packages/components/src/border-control/border-control-dropdown/hook.ts
++++ b/packages/components/src/border-control/border-control-dropdown/hook.ts
+@@ -31,7 +31,9 @@ export function useBorderControlDropdown(
+ 	} = useContextSystem( props, 'BorderControlDropdown' );
+ 
+ 	const [ widthValue ] = parseQuantityAndUnitFromRawValue( border?.width );
+-	const hasZeroWidth = widthValue === 0;
++	// If widthValue is 0, or on initial render we have width undefined.
++	// Need to set width to `1px`, if we change color first before adding border width.
++	const hasZeroWidth = widthValue === 0 || undefined === widthValue;
+ 
+ 	const onColorChange = ( color?: string ) => {
+ 		const style =
+diff --git a/packages/components/src/border-control/test/index.js b/packages/components/src/border-control/test/index.js
+index ff9007be28f1a2..2c369150e071b5 100644
+--- a/packages/components/src/border-control/test/index.js
++++ b/packages/components/src/border-control/test/index.js
+@@ -449,7 +449,7 @@ describe( 'BorderControl', () => {
+ 			expect( props.onChange ).toHaveBeenCalledWith( {
+ 				color: '#bd8600',
+ 				style: undefined,
+-				width: undefined,
++				width: '1px',
+ 			} );
+ 
+ 			await user.type( getWidthInput(), '0' );
+@@ -478,7 +478,7 @@ describe( 'BorderControl', () => {
+ 			expect( props.onChange ).toHaveBeenCalledWith( {
+ 				color: undefined,
+ 				style: 'dashed',
+-				width: undefined,
++				width: '1px',
+ 			} );
+ 
+ 			await user.type( getWidthInput(), '0' );

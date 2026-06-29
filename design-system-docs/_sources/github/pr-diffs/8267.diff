@@ -1,0 +1,900 @@
+diff --git a/packages/components/src/autocomplete/README.md b/packages/components/src/autocomplete/README.md
+index 102f88d4532501..fe7a467dfd30ba 100644
+--- a/packages/components/src/autocomplete/README.md
++++ b/packages/components/src/autocomplete/README.md
+@@ -1,5 +1,4 @@
+-Autocomplete
+-============
++# Autocomplete
+ 
+ This component is used to provide autocompletion support for a child input component.
+ 
+@@ -105,33 +104,59 @@ Whether to apply debouncing for the autocompleter. Set to true to enable debounc
+ - Type: `Boolean`
+ - Required: No
+ 
+-### Examples
++## Usage
+ 
+ The following is a contrived completer for fresh fruit.
+ 
+ ```jsx
+-const fruitCompleter = {
+-	name: 'fruit',
+-	// The prefix that triggers this completer
+-	triggerPrefix: '~',
+-	// The option data
+-	options: [
+-		{ visual: '🍎', name: 'Apple' },
+-		{ visual: '🍊', name: 'Orange' },
+-		{ visual: '🍇', name: 'Grapes' },
+-	],
+-	// Returns a label for an option like "🍊 Orange"
+-	getOptionLabel: option => [
+-		<span class="icon">{ option.visual }</span>,
+-		option.name
+-	],
+-	// Declares that options should be matched by their name
+-	getOptionKeywords: option => [ option.name ],
+-	// Declares that the Grapes option is disabled
+-	isOptionDisabled: option => option.name === 'Grapes',
+-	// Declares completions should be inserted as abbreviations
+-	getOptionCompletion: option => (
+-		<abbr title={ option.name }>{ option.visual }</abbr>
+-	),
++import { Autocomplete } from '@wordpress/components';
++
++function FreshFruitAutocomplete() {
++	const autocompleters = [
++		{
++			name: 'fruit',
++			// The prefix that triggers this completer
++			triggerPrefix: '~',
++			// The option data
++			options: [
++				{ visual: '🍎', name: 'Apple', id: 1 },
++				{ visual: '🍊', name: 'Orange', id: 2 },
++				{ visual: '🍇', name: 'Grapes', id: 3 },
++			],
++			// Returns a label for an option like "🍊 Orange"
++			getOptionLabel: option => (
++				<span>
++					<span className="icon" >{ option.visual }</span>{ option.name }
++				</span>
++			),
++			// Declares that options should be matched by their name
++			getOptionKeywords: option => [ option.name ],
++			// Declares that the Grapes option is disabled
++			isOptionDisabled: option => option.name === 'Grapes',
++			// Declares completions should be inserted as abbreviations
++			getOptionCompletion: option => (
++				<abbr title={ option.name }>{ option.visual }</abbr>
++			),
++		}
++	];
++		
++	return (
++		<div>
++			<Autocomplete completers={ autocompleters }>
++				{ ( { isExpanded, listBoxId, activeId } ) => (
++					<div
++						contentEditable
++						suppressContentEditableWarning
++						aria-autocomplete="list"
++						aria-expanded={ isExpanded }
++						aria-owns={ listBoxId }
++						aria-activedescendant={ activeId }
++					>
++					</div>
++				) }
++			</Autocomplete>
++			<p>Type ~ for triggering the autocomplete.</p>
++		</div>
++	);
+ };
+ ```
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index ac2dc6249714a1..1dd091908176d1 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -1,5 +1,4 @@
+-BaseControl
+-=======
++# BaseControl
+ 
+ BaseControl component is used to generate labels and help text for components handling user inputs.
+ 
+@@ -8,17 +7,21 @@ BaseControl component is used to generate labels and help text for components ha
+ 
+ Render a BaseControl for a textarea input:
+ ```jsx
+-	<BaseControl
+-		id="textarea-1" 
+-		label="Text"
+-		help="Enter some text"
+-	>
+-        <textarea
+-            id="textarea-1"
+-            onChange={ onChangeValue }
+-            value={ value }
+-        />
+-    </BaseControl>
++import { BaseControl } from '@wordpress/components';
++
++function MyBaseControl() {
++	return (
++		<BaseControl
++			id="textarea-1"
++			label="Text"
++			help="Enter some text"
++		>
++			<textarea
++				id="textarea-1"
++			/>
++		</BaseControl>
++    );
++}
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/button-group/README.md b/packages/components/src/button-group/README.md
+new file mode 100644
+index 00000000000000..34a8965687cd65
+--- /dev/null
++++ b/packages/components/src/button-group/README.md
+@@ -0,0 +1,16 @@
++# ButtonGroup
++
++## Usage
++
++```jsx
++import { Button, ButtonGroup } from '@wordpress/components';
++
++function MyButtonGroup() {
++	return (
++		<ButtonGroup>
++			<Button isPrimary>Button 1</Button>
++			<Button isPrimary>Button 2</Button>
++		</ButtonGroup>
++	);
++}
++```
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index 1bd9d997f481fb..d88151ad2b8400 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -9,12 +9,9 @@ The presence of a `href` prop determines whether an `anchor` element is rendered
+ Renders a button with default style.
+ 
+ ```jsx
+-/**
+- * WordPress dependencies
+- */
+ import { Button } from "@wordpress/components";
+ 
+-export default function ClickMeButton() {
++function MyButton() {
+ 	return (
+ 		<Button isDefault>
+ 			Click me!
+diff --git a/packages/components/src/checkbox-control/README.md b/packages/components/src/checkbox-control/README.md
+index 7f5b5f8b0c4070..6b0aa412fd7620 100644
+--- a/packages/components/src/checkbox-control/README.md
++++ b/packages/components/src/checkbox-control/README.md
+@@ -1,5 +1,4 @@
+-CheckboxControl
+-=======
++# CheckboxControl
+ 
+ CheckboxControl component is used to generate a checkbox input field.
+ 
+@@ -8,13 +7,20 @@ CheckboxControl component is used to generate a checkbox input field.
+ 
+ Render an is author checkbox:
+ ```jsx
+-    <CheckboxControl
+-        heading="User"
+-        label="Is author"
+-        help="Is the user a author or not?"
+-        checked={ checked }
+-        onChange={ onChange }
+-    />
++import { CheckboxControl } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++withState( {
++	isChecked: true,
++} )( ( { isChecked, setState } ) => ( 
++	<CheckboxControl
++		heading="User"
++		label="Is author"
++		help="Is the user a author or not?"
++		checked={ isChecked }
++		onChange={ ( isChecked ) => { setState( { isChecked } ) } }
++	/>
++) )
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/clipboard-button/README.md b/packages/components/src/clipboard-button/README.md
+new file mode 100644
+index 00000000000000..838602f0d5a760
+--- /dev/null
++++ b/packages/components/src/clipboard-button/README.md
+@@ -0,0 +1,21 @@
++# ClipboardButton
++
++## Usage
++
++```jsx
++import { ClipboardButton } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++withState( {
++	hasCopied: false,
++} )( ( { hasCopied, setState } ) => ( 
++	<ClipboardButton
++		isPrimary
++		text="Text to be copied."
++		onCopy={ () => setState( { hasCopied: true } ) }
++		onFinishCopy={ () => setState( { hasCopied: false } ) }
++	>
++		{ hasCopied ? 'Copied!' : 'Copy Text' }
++	</ClipboardButton>
++) )
++```
+diff --git a/packages/components/src/color-indicator/README.md b/packages/components/src/color-indicator/README.md
+new file mode 100644
+index 00000000000000..48fd911eba53fb
+--- /dev/null
++++ b/packages/components/src/color-indicator/README.md
+@@ -0,0 +1,13 @@
++# ColorIndicator
++
++## Usage
++
++```jsx
++import { ColorIndicator } from '@wordpress/components';
++
++function MyColorIndicator() {
++	return (
++		<ColorIndicator colorValue="#f00" />
++	);
++}
++```
+diff --git a/packages/components/src/color-palette/README.md b/packages/components/src/color-palette/README.md
+new file mode 100644
+index 00000000000000..9676785fe3697e
+--- /dev/null
++++ b/packages/components/src/color-palette/README.md
+@@ -0,0 +1,25 @@
++# ColorPalette
++
++## Usage
++```jsx
++import { ColorPalette } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++withState( {
++	color: '#f00',
++} )( ( { color, setState } ) => { 
++	const colors = [ 
++		{ name: 'red', color: '#f00' }, 
++		{ name: 'white', color: '#fff' }, 
++		{ name: 'blue', color: '#00f' }, 
++	];
++	
++	return ( 
++		<ColorPalette 
++			colors={ colors } 
++			value={ color }
++			onChange={ color => setState( { color } ) } 
++		/>
++	) 
++} )
++```
+diff --git a/packages/components/src/dashicon/README.md b/packages/components/src/dashicon/README.md
+new file mode 100644
+index 00000000000000..3e74a1de14dfc2
+--- /dev/null
++++ b/packages/components/src/dashicon/README.md
+@@ -0,0 +1,17 @@
++# Dashicon
++
++## Usage
++
++```jsx
++import { Dashicon } from '@wordpress/components';
++
++function MyDashicons() {
++	return (
++		<div>
++			<Dashicon icon="admin-home" />
++			<Dashicon icon="products" />
++			<Dashicon icon="wordpress" />
++		</div>
++	);
++}
++```
+diff --git a/packages/components/src/date-time/README.md b/packages/components/src/date-time/README.md
+index b5ecf1e85b6ed5..3ca5a9dc290210 100644
+--- a/packages/components/src/date-time/README.md
++++ b/packages/components/src/date-time/README.md
+@@ -1,5 +1,4 @@
+-DateTimePicker
+-=======
++# DateTimePicker
+ 
+ DateTimePicker is a React component to render a calendar and clock for selecting a date and time. The calendar and clock components can be accessed individually using the `DatePicker` and `TimePicker` components respectively.
+ 
+diff --git a/packages/components/src/disabled/README.md b/packages/components/src/disabled/README.md
+index 247e063fecb80d..c006ee57a2e1ac 100644
+--- a/packages/components/src/disabled/README.md
++++ b/packages/components/src/disabled/README.md
+@@ -1,5 +1,4 @@
+-Disabled
+-========
++# Disabled
+ 
+ Disabled is a component which disables descendant tabbable elements and prevents pointer interaction.
+ 
+@@ -8,25 +7,27 @@ Disabled is a component which disables descendant tabbable elements and prevents
+ Assuming you have a form component, you can disable all form inputs by wrapping the form with `<Disabled>`.
+ 
+ ```jsx
+-const DisableToggleForm = withState( {
+-	isDisabled: true,
+-} )( ( { isDisabled, setState } ) => {
+-	let form = <form><input /></form>;
++import { Button, Disabled, TextControl } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
+ 
++withState( {
++	isDisabled: true,
++} )( ( { isDisabled, setState } ) => { 
++	let input = <TextControl label="Input" onChange={ () => {} } />;
+ 	if ( isDisabled ) {
+-		form = <Disabled>{ form }</Disabled>;
++		input = <Disabled>{ input }</Disabled>;
+ 	}
+-
+-	const toggleDisabled = setState( ( state ) => ( {
+-		isDisabled: ! state.isDisabled,
+-	} ) );
+-
++	
++	const toggleDisabled = () => {
++		setState( ( state ) => ( { isDisabled: ! state.isDisabled } ) );
++	};
++	
+ 	return (
+ 		<div>
+-			{ form }
+-			<button onClick={ toggleDisabled }>
++			{ input }
++			<Button isPrimary onClick={ toggleDisabled }>
+ 				Toggle Disabled
+-			</button>
++			</Button>
+ 		</div>
+ 	);
+ } )
+diff --git a/packages/components/src/draggable/README.md b/packages/components/src/draggable/README.md
+index 974f1eab06db62..7ba24bdb53cc60 100644
+--- a/packages/components/src/draggable/README.md
++++ b/packages/components/src/draggable/README.md
+@@ -35,3 +35,26 @@ The function called when dragging ends.
+ - Type: `Function`
+ - Required: No
+ - Default: `noop`
++
++## Usage
++
++```jsx
++import { Dashicon, Draggable, Panel, PanelBody } from '@wordpress/components';
++
++function DraggablePanel() {
++	return (
++		<div id="draggable-panel">
++			<Panel header="Draggable panel" >
++				<PanelBody>
++					<Draggable
++						elementId="draggable-panel"
++						transferData={ { } }
++					>
++						<Dashicon icon="move" />
++					</Draggable>
++				</PanelBody>
++			</Panel>
++		</div>
++	);
++}
++```
+diff --git a/packages/components/src/drop-zone/README.md b/packages/components/src/drop-zone/README.md
+index acec85b06275b5..bd895447c8afb2 100644
+--- a/packages/components/src/drop-zone/README.md
++++ b/packages/components/src/drop-zone/README.md
+@@ -6,16 +6,22 @@
+ 
+ ```jsx
+ import { DropZoneProvider, DropZone } from '@wordpress/components';
+-
+-function MyComponent() {
+-	return (
+-		<DropZoneProvider>
+-			<div>
+-				<DropZone onDrop={ () => console.log( 'do something' ) } />
+-			</div>
+-		</DropZoneProvider>
+-	);
+-}
++import { withState } from '@wordpress/compose';
++
++withState( {
++	hasDropped: false,
++} )( ( { hasDropped, setState } ) => (
++	<DropZoneProvider>
++		<div>
++			{ hasDropped ? 'Dropped!' : 'Drop something here' }
++			<DropZone 
++				onFilesDrop={ () => setState( { hasDropped: true } ) }
++				onHTMLDrop={ () => setState( { hasDropped: true } )  }
++				onDrop={ () => setState( { hasDropped: true } ) } 
++			/>
++		</div>
++	</DropZoneProvider>
++) );
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/dropdown-menu/README.md b/packages/components/src/dropdown-menu/README.md
+index 5c7a4e082dd70d..e999f76b7d29bc 100644
+--- a/packages/components/src/dropdown-menu/README.md
++++ b/packages/components/src/dropdown-menu/README.md
+@@ -1,5 +1,4 @@
+-Dropdown Menu
+-=============
++# Dropdown Menu
+ 
+ Dropdown Menu is a React component to render an expandable menu of buttons. It is similar in purpose to a `<select>` element, with the distinction that it does not maintain a value. Instead, each option behaves as an action button.
+ 
+@@ -10,7 +9,7 @@ Render a Dropdown Menu with a set of controls:
+ ```jsx
+ import { DropdownMenu } from '@wordpress/components';
+ 
+-function DirectionMenu( { onMove } ) {
++function DirectionMenu() {
+ 	return (
+ 		<DropdownMenu
+ 			icon="move"
+@@ -19,22 +18,22 @@ function DirectionMenu( { onMove } ) {
+ 				{
+ 					title: 'Up',
+ 					icon: 'arrow-up-alt',
+-					onClick: () => onMove( 'up' )
++					onClick: () => console.log( 'up' )
+ 				},
+ 				{
+ 					title: 'Right',
+ 					icon: 'arrow-right-alt',
+-					onClick: () => onMove( 'right' )
++					onClick: () => console.log( 'right' )
+ 				},
+ 				{
+ 					title: 'Down',
+ 					icon: 'arrow-down-alt',
+-					onClick: () => onMove( 'down' )
++					onClick: () => console.log( 'down' )
+ 				},
+ 				{
+ 					title: 'Left',
+ 					icon: 'arrow-left-alt',
+-					onClick: () => onMove( 'left' )
++					onClick: () => console.log( 'left' )
+ 				},
+ 			] }
+ 		/>
+diff --git a/packages/components/src/dropdown/README.md b/packages/components/src/dropdown/README.md
+index d01df25f0c92be..51d4b0d911ab52 100644
+--- a/packages/components/src/dropdown/README.md
++++ b/packages/components/src/dropdown/README.md
+@@ -1,5 +1,4 @@
+-Dropdown
+-========
++# Dropdown
+ 
+ Dropdown is a React component to render a button that opens a floating content modal when clicked.
+ This components takes care of updating the state of the dropdown menu (opened/closed), handles closing the menu when clicking outside
+@@ -9,7 +8,7 @@ and uses render props to render the button and the content.
+ 
+ 
+ ```jsx
+-import { Dropdown } from '@wordpress/components';
++import { Button, Dropdown } from '@wordpress/components';
+ 
+ function MyDropdownMenu() {
+ 	return (
+@@ -18,9 +17,9 @@ function MyDropdownMenu() {
+ 			contentClassName="my-popover-content-classname"
+ 			position="bottom right"
+ 			renderToggle={ ( { isOpen, onToggle } ) => (
+-				<button onClick={ onToggle } aria-expanded={ isOpen }>
++				<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
+ 					Toggle Popover!
+-				</button>
++				</Button>
+ 			) }
+ 			renderContent={ () => (
+ 				<div>
+diff --git a/packages/components/src/external-link/README.md b/packages/components/src/external-link/README.md
+new file mode 100644
+index 00000000000000..436632bc9a5a5d
+--- /dev/null
++++ b/packages/components/src/external-link/README.md
+@@ -0,0 +1,13 @@
++# ExternalLink
++
++## Usage
++
++```jsx
++import { ExternalLink } from '@wordpress/components';
++
++function MyExternalLink() {
++	return (
++		<ExternalLink href="https://wordpress.org">WordPress.org</ExternalLink>
++	);
++}
++```
+diff --git a/packages/components/src/focusable-iframe/README.md b/packages/components/src/focusable-iframe/README.md
+index b1b09a74974a01..b612d9bac63437 100644
+--- a/packages/components/src/focusable-iframe/README.md
++++ b/packages/components/src/focusable-iframe/README.md
+@@ -1,5 +1,4 @@
+-Focusable Iframe
+-================
++# Focusable Iframe
+ 
+ `<FocusableIframe />` is a component rendering an `iframe` element enhanced to support focus events. By default, it is not possible to detect when an iframe is focused or clicked within. This enhanced component uses a technique which checks whether the target of a window `blur` event is the iframe, inferring that this has resulted in the focus of the iframe. It dispatches an emulated [`FocusEvent`](https://developer.mozilla.org/en-US/docs/Web/API/FocusEvent) on the iframe element with event bubbling, so a parent component binding its own `onFocus` event will account for focus transitioning within the iframe.
+ 
+@@ -13,8 +12,8 @@ import { FocusableIframe } from '@wordpress/components';
+ function MyIframe() {
+ 	return (
+ 		<FocusableIframe
+-			src="https://example.com"
+-			onFocus={ /* ... */ }
++			src="/"
++			onFocus={ () => console.log( 'iframe is focused' ) }
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index a7061714465c9b..8e29b77479c13c 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -1,5 +1,4 @@
+-FontSizePicker
+-========
++# FontSizePicker
+ 
+ FontSizePicker is a React component that renders a UI that allows users to select a font size.
+ The component renders a series of buttons that allow the user to select predefined (common) font sizes and contains a range slider that enables the user to select custom font sizes (by choosing the value.
+@@ -8,21 +7,27 @@ The component renders a series of buttons that allow the user to select predefin
+ 
+ 
+ ```jsx
+-import { Dropdown } from '@wordpress/components';
+-
+-function MyFontSizePicker() {
+-	return (
+-		<FontSizePicker
+-			fontSizes={ [
+-				{ shortName: 'S', size: 12 },
+-				{ shortName: 'M', size: 16 }
+-			] }
+-			fallbackFontSize={ fallbackFontSize }
++import { FontSizePicker } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++withState( {
++	fontSize: 16,
++} )( ( { fontSize, setState } ) => { 
++	const fontSizes = [
++		{ shortName: 'S', size: 12 },
++		{ shortName: 'M', size: 16 }
++	];
++	const fallbackFontSize = 16;
++	
++	return ( 
++		<FontSizePicker 
++			fontSizes={ fontSizes } 
+ 			value={ fontSize }
+-			onChange={ this.setFontSize }
++			fallbackFontSize={ fallbackFontSize }
++			onChange={ fontSize => setState( { fontSize } ) } 
+ 		/>
+-	);
+-}
++	); 
++} );
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/form-file-upload/README.md b/packages/components/src/form-file-upload/README.md
+new file mode 100644
+index 00000000000000..65743f587ff0ce
+--- /dev/null
++++ b/packages/components/src/form-file-upload/README.md
+@@ -0,0 +1,18 @@
++# FormFileUpload
++
++## Usage
++
++```jsx
++import { FormFileUpload } from '@wordpress/components';
++
++function MyFormFileUpload() {
++	return (
++		<FormFileUpload
++			accept="image/*"
++			onChange={ () => console.log('new image') }
++		>
++			Upload
++		</FormFileUpload>
++	);
++}
++```
+diff --git a/packages/components/src/form-toggle/README.md b/packages/components/src/form-toggle/README.md
+new file mode 100644
+index 00000000000000..a2309723fc9144
+--- /dev/null
++++ b/packages/components/src/form-toggle/README.md
+@@ -0,0 +1,17 @@
++# FormToggle
++
++## Usage
++
++```jsx
++import { FormToggle } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++withState( {
++	checked: true,
++} )( ( { checked, setState } ) => (
++	<FormToggle 
++		checked={ checked }
++		onChange={ () => setState( state => ( { checked: ! state.checked } ) ) } 
++	/>
++) )
++```
+diff --git a/packages/components/src/form-token-field/README.md b/packages/components/src/form-token-field/README.md
+index 38f6f78bf4d244..0ff943424840ef 100644
+--- a/packages/components/src/form-token-field/README.md
++++ b/packages/components/src/form-token-field/README.md
+@@ -1,5 +1,4 @@
+-Form Token Field
+-===========
++# Form Token Field
+ 
+ A `FormTokenField` is a field similar to the tags and categories fields in the interim editor chrome, or the "to" field in Mail on OS X. Tokens can be entered by typing them or selecting them from a list of suggested tokens.
+ 
+@@ -7,7 +6,7 @@ Up to one hundred suggestions that match what the user has typed so far will be
+ 
+ The `value` property is handled in a manner similar to controlled form components. See [Forms](http://facebook.github.io/react/docs/forms.html) in the React Documentation for more information.
+ 
+-### Keyboard Accessibility
++## Keyboard Accessibility
+ 
+ - `left arrow` - if input field is empty, move insertion point before previous token
+ - `right arrow` - if input field is empty, move insertion point after next token
+@@ -16,7 +15,7 @@ The `value` property is handled in a manner similar to controlled form component
+ - `tab` / `enter` - if suggestion selected, insert suggestion as a new token; otherwise, insert value typed into input as new token
+ - `comma` - insert value typed into input as new token
+ 
+-### Properties
++## Properties
+ 
+ - `value` - An array of strings or objects to display as tokens in the field. If objects are present in the array, they **must** have a property of `value`. Here is an example object that could be passed in as a value:
+ 
+@@ -52,21 +51,21 @@ The `value` property is handled in a manner similar to controlled form component
+ - `disabled` - When true, tokens are not able to be added or removed.
+ - `placeholder` - If passed, the `TokenField` input will show a placeholder string if no value tokens are present.
+ 
+-### Example
++## Usage
+ 
+ ```jsx
+-class extends Component {
+-	render() {
+-		return (
+-			<FormTokenField
+-				value={ this.state.tokens }
+-				onChange={ this.onTokensChange }
+-				suggestions={ this.state.suggestions } />
+-		);
+-	}
++import { FormTokenField } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
+ 
+-	onTokensChange( value ) {
+-		this.setState( { tokens: value } );
+-	}
+-}
++withState( {
++	tokens: [],
++	suggestions: [ 'Africa', 'America', 'Antarctica', 'Asia', 'Europe', 'Oceania' ],
++} )( ( { tokens, suggestions, setState } ) => ( 
++	<FormTokenField 
++		value={ tokens } 
++		suggestions={ suggestions } 
++		onChange={ tokens => setState( { tokens } ) }
++		placeholder="Type a continent"
++	/>
++) )
+ ```
+diff --git a/packages/components/src/icon-button/README.md b/packages/components/src/icon-button/README.md
+new file mode 100644
+index 00000000000000..6c19a4c0462279
+--- /dev/null
++++ b/packages/components/src/icon-button/README.md
+@@ -0,0 +1,16 @@
++# IconButton
++
++## Usage
++
++```jsx
++import { IconButton } from '@wordpress/components';
++
++function MyIconButton() {
++	return (
++		<IconButton
++			icon="ellipsis"
++			label="More"
++		/>
++	);
++}
++```
+diff --git a/packages/components/src/keyboard-shortcuts/README.md b/packages/components/src/keyboard-shortcuts/README.md
+index 4c0afce9fef1b7..63987b05b479f9 100644
+--- a/packages/components/src/keyboard-shortcuts/README.md
++++ b/packages/components/src/keyboard-shortcuts/README.md
+@@ -1,5 +1,4 @@
+-Keyboard Shortcuts
+-==================
++# Keyboard Shortcuts
+ 
+ `<KeyboardShortcuts />` is a component which handles keyboard sequences during the lifetime of the rendering element.
+ 
+@@ -12,30 +11,25 @@ It uses the [Mousetrap](https://craig.is/killing/mice) library to implement keyb
+ Render `<KeyboardShortcuts />` with a `shortcuts` prop object:
+ 
+ ```jsx
+-class SelectAllDetection extends Component {
+-	constructor() {
+-		super( ...arguments );
+-
+-		this.setAllSelected = this.setAllSelected.bind( this );
+-
+-		this.state = { isAllSelected: false };
+-	}
+-
+-	setAllSelected() {
+-		this.setState( { isAllSelected: true } );
+-	}
+-
+-	render() {
+-		return (
+-			<div>
+-				<KeyboardShortcuts shortcuts={ {
+-					'mod+a': this.setAllSelected,
+-				} } />
+-				Combination pressed? { isAllSelected ? 'Yes' : 'No' }
+-			</div>
+-		);
+-	}
+-}
++import { KeyboardShortcuts } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++withState( {
++	isAllSelected: false,
++} )( ( { isAllSelected, setState } ) => { 
++	const selectAll = () => {
++		setState( { isAllSelected: true } )
++	};
++	
++	return (
++		<div>
++			<KeyboardShortcuts shortcuts={ {
++				'mod+a': selectAll,
++			} } />
++			[cmd/ctrl + A] Combination pressed? { isAllSelected ? 'Yes' : 'No' }
++		</div>
++	) 
++} )
+ ```
+ 
+ ## Props
+diff --git a/packages/components/src/menu-group/README.md b/packages/components/src/menu-group/README.md
+new file mode 100644
+index 00000000000000..6aa7280202c28f
+--- /dev/null
++++ b/packages/components/src/menu-group/README.md
+@@ -0,0 +1,16 @@
++# MenuGroup
++
++## Usage
++
++```jsx
++import { MenuGroup, MenuItem } from '@wordpress/components';
++
++function MyMenuGroup() {
++	return (
++		<MenuGroup label="Settings">
++			<MenuItem>Setting 1</MenuItem>
++			<MenuItem>Setting 2</MenuItem>
++		</MenuGroup>
++	);
++}
++```
+diff --git a/packages/components/src/menu-item/README.md b/packages/components/src/menu-item/README.md
+new file mode 100644
+index 00000000000000..03e7bfaabad579
+--- /dev/null
++++ b/packages/components/src/menu-item/README.md
+@@ -0,0 +1,20 @@
++# MenuItem
++
++## Usage
++
++```jsx
++import { MenuItem } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++withState( {
++	isActive: true,
++} )( ( { isActive, setState } ) => (
++	<MenuItem
++		icon={ isActive ? 'yes' : 'no' }
++		isSelected={ isActive }
++		onClick={ () => setState( state => ( { isActive: ! state.isActive } ) ) }
++	>
++		Toggle
++	</MenuItem>
++) )
++```
+diff --git a/packages/components/src/menu-items-choice/README.md b/packages/components/src/menu-items-choice/README.md
+new file mode 100644
+index 00000000000000..28b2914b5a297c
+--- /dev/null
++++ b/packages/components/src/menu-items-choice/README.md
+@@ -0,0 +1,30 @@
++# MenuItemsChoice
++
++## Usage
++
++```jsx
++import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
++import { withState } from '@wordpress/compose';
++
++withState( {
++	mode: 'visual',
++	choices: [
++		{
++			value: 'visual',
++			label: 'Visual Editor',
++		},
++		{
++			value: 'text',
++			label: 'Code Editor',
++		},
++	],
++} )( ( { mode, choices, setState } ) => (
++	<MenuGroup label="Editor">
++		<MenuItemsChoice
++			choices={ choices }
++			value={ mode }
++			onSelect={ mode => setState( { mode } ) }
++		/>
++	</MenuGroup>
++) )
++```

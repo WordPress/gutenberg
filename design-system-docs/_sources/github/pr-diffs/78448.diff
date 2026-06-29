@@ -1,0 +1,670 @@
+diff --git a/package-lock.json b/package-lock.json
+index 95981e2327c960..94e2dcf115e3e1 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -4017,13 +4017,13 @@
+ 			}
+ 		},
+ 		"node_modules/@base-ui/react": {
+-			"version": "1.4.1",
+-			"resolved": "https://registry.npmjs.org/@base-ui/react/-/react-1.4.1.tgz",
+-			"integrity": "sha512-Ab5/LIhcmL8BQcsBUYiOfkSDRdLpvgUBzMK30cu684JPcLclYlztharvCZyNNgzJtbAiREzI9q0pI5erHCMgCw==",
++			"version": "1.5.0",
++			"resolved": "https://registry.npmjs.org/@base-ui/react/-/react-1.5.0.tgz",
++			"integrity": "sha512-z1gSAlced1yY+iM+mHDEtIkD8UI3Ebs52MuBPxvV6f5hRutk+xvCH/wuB7hDqDzK9JG5FoMz5nhrqtSs1wjt1A==",
+ 			"license": "MIT",
+ 			"dependencies": {
+ 				"@babel/runtime": "^7.29.2",
+-				"@base-ui/utils": "0.2.8",
++				"@base-ui/utils": "0.2.9",
+ 				"@floating-ui/react-dom": "^2.1.8",
+ 				"@floating-ui/utils": "^0.2.11",
+ 				"use-sync-external-store": "^1.6.0"
+@@ -4068,9 +4068,9 @@
+ 			}
+ 		},
+ 		"node_modules/@base-ui/utils": {
+-			"version": "0.2.8",
+-			"resolved": "https://registry.npmjs.org/@base-ui/utils/-/utils-0.2.8.tgz",
+-			"integrity": "sha512-jvOi+c+ftGlGotNcKnzPVg2IhCaDTB6/6R3JeqdjdXktuAJi3wKH9T7+svuaKh1mmfVU11UWzUZVH74JDfi/wQ==",
++			"version": "0.2.9",
++			"resolved": "https://registry.npmjs.org/@base-ui/utils/-/utils-0.2.9.tgz",
++			"integrity": "sha512-x/PDDCYzoqPpjrdyb3VcyylTI2IjUXEtYDGi5foh7KsnmNJIIaVwA2GLgDH1dps1GgXiJbA60hM+AyuTfQzIvw==",
+ 			"license": "MIT",
+ 			"dependencies": {
+ 				"@babel/runtime": "^7.29.2",
+@@ -65622,7 +65622,7 @@
+ 			"version": "0.14.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@base-ui/react": "^1.4.1",
++				"@base-ui/react": "^1.5.0",
+ 				"@types/react": "^18.3.27",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/compose": "file:../compose",
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index c45b456e269206..25e466d0976559 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -13,11 +13,16 @@
+ ### Bug Fixes
+ 
+ -   `Button.Icon`: Preserve icon view boxes so icons with non-standard `viewBox` values are not clipped ([#78614](https://github.com/WordPress/gutenberg/pull/78614)).
++-   `Tabs`: `onValueChange` now fires for automatic tab selection — when `Tabs` itself picks a tab without a consumer-supplied value (initial uncontrolled mount with no `defaultValue`, fallback to the first enabled tab when the first tab is disabled, or fallback when the currently selected tab is removed or becomes disabled) — inherited from [`@base-ui/react@1.5.0`](https://github.com/mui/base-ui/releases/tag/v1.5.0) ([#78448](https://github.com/WordPress/gutenberg/pull/78448)).
+ 
+ ### Enhancements
+ 
+ -   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
+ 
++### Internal
++
++-   Update `@base-ui/react` from `1.4.1` to [`1.5.0`](https://github.com/mui/base-ui/releases/tag/v1.5.0) ([#78448](https://github.com/WordPress/gutenberg/pull/78448)).
++
+ ## 0.14.0 (2026-05-27)
+ 
+ ### Breaking Changes
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index b20eeab05d0681..eaa196c26aa367 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -43,7 +43,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@base-ui/react": "^1.4.1",
++		"@base-ui/react": "^1.5.0",
+ 		"@types/react": "^18.3.27",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+diff --git a/packages/ui/src/drawer/style.module.css b/packages/ui/src/drawer/style.module.css
+index 0c74cef1164194..0b4e85785d61b7 100644
+--- a/packages/ui/src/drawer/style.module.css
++++ b/packages/ui/src/drawer/style.module.css
+@@ -1,17 +1,5 @@
+ @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+ 
+-/*
+- * Temporary workaround for a Base UI tabbability regression with
+- * checkVisibility() and display: contents.
+- * See: https://github.com/mui/base-ui/issues/4622
+- *
+- * This must stay outside the CSS layers to override ThemeProvider's
+- * unlayered display: contents.
+- */
+-[data-wpds-theme-provider-id]:has(> .popup) {
+-	display: block;
+-}
+-
+ @layer wp-ui-components {
+ 	.backdrop {
+ 		--backdrop-opacity: 0.35;
+diff --git a/packages/ui/src/tabs/test/index.test.tsx b/packages/ui/src/tabs/test/index.test.tsx
+index bbf25a21fdde6c..e8f553fb2a33b0 100644
+--- a/packages/ui/src/tabs/test/index.test.tsx
++++ b/packages/ui/src/tabs/test/index.test.tsx
+@@ -465,15 +465,30 @@ describe( 'Tabs', () => {
+ 		describe( 'when a selected tab id is not specified', () => {
+ 			describe( 'when left `undefined` [Uncontrolled]', () => {
+ 				it( 'should choose the first tab as selected', async () => {
++					const mockOnValueChange = jest.fn();
++
+ 					const user = userEvent.setup();
+ 
+-					render( <UncontrolledTabs tabs={ TABS } /> );
++					render(
++						<UncontrolledTabs
++							tabs={ TABS }
++							onValueChange={ mockOnValueChange }
++						/>
++					);
+ 
+-					// Alpha is automatically selected as the selected tab.
++					// Alpha is automatically selected as the selected tab,
++					// and `onValueChange` fires for the automatic selection.
+ 					await waitForComponentToBeInitializedWithSelectedTab(
+ 						'Alpha'
+ 					);
+ 
++					expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++					expect( mockOnValueChange ).toHaveBeenNthCalledWith(
++						1,
++						'alpha',
++						expect.anything()
++					);
++
+ 					// Press tab. The selected tab (alpha) received focus.
+ 					await user.keyboard( '{Tab}' );
+ 					expect(
+@@ -482,24 +497,34 @@ describe( 'Tabs', () => {
+ 							name: 'Alpha',
+ 						} )
+ 					).toHaveFocus();
+-
+-					// TODO: check that `onValueChange` fired
+-					// once https://github.com/mui/base-ui/issues/2097 is fixed
+ 				} );
+ 
+ 				it( 'should choose the first non-disabled tab if the first tab is disabled', async () => {
++					const mockOnValueChange = jest.fn();
++
+ 					const user = userEvent.setup();
+ 
+ 					render(
+-						<UncontrolledTabs tabs={ TABS_WITH_ALPHA_DISABLED } />
++						<UncontrolledTabs
++							tabs={ TABS_WITH_ALPHA_DISABLED }
++							onValueChange={ mockOnValueChange }
++						/>
+ 					);
+ 
+-					// Beta is automatically selected as the selected tab, since alpha is
+-					// disabled.
++					// Beta is automatically selected as the selected tab,
++					// since alpha is disabled, and `onValueChange` fires for
++					// the automatic selection.
+ 					await waitForComponentToBeInitializedWithSelectedTab(
+ 						'Beta'
+ 					);
+ 
++					expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++					expect( mockOnValueChange ).toHaveBeenNthCalledWith(
++						1,
++						'beta',
++						expect.anything()
++					);
++
+ 					// Press tab. The selected tab (beta) received focus. The corresponding
+ 					// tabpanel is shown.
+ 					await user.keyboard( '{Tab}' );
+@@ -509,9 +534,6 @@ describe( 'Tabs', () => {
+ 							name: 'Beta',
+ 						} )
+ 					).toHaveFocus();
+-
+-					// TODO: check that `onValueChange` fired
+-					// once https://github.com/mui/base-ui/issues/2097 is fixed
+ 				} );
+ 			} );
+ 			describe( 'when `null` [Controlled]', () => {
+@@ -982,12 +1004,12 @@ describe( 'Tabs', () => {
+ 					/>
+ 				);
+ 
+-				// Alpha is automatically selected as the selected tab.
++				// Alpha is selected from the consumer-provided initial value;
++				// `onValueChange` does not fire for consumer-provided initial
++				// selection (only for automatic fallback selection).
+ 				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
+ 
+-				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
+-				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
+-				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++				expect( mockOnValueChange ).not.toHaveBeenCalled();
+ 
+ 				// Focus the tablist (and the selected tab, alpha)
+ 				// Tab should initially focus the first tab in the tablist, which
+@@ -1082,12 +1104,12 @@ describe( 'Tabs', () => {
+ 					/>
+ 				);
+ 
+-				// Alpha is automatically selected as the selected tab.
++				// Alpha is selected from the consumer-provided initial value;
++				// `onValueChange` does not fire for consumer-provided initial
++				// selection.
+ 				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
+ 
+-				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
+-				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
+-				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++				expect( mockOnValueChange ).not.toHaveBeenCalled();
+ 
+ 				// Focus the tablist (and the selected tab, alpha)
+ 				// Tab should initially focus the first tab in the tablist, which
+@@ -1168,12 +1190,12 @@ describe( 'Tabs', () => {
+ 					/>
+ 				);
+ 
+-				// Alpha is automatically selected as the selected tab.
++				// Alpha is selected from the consumer-provided initial value;
++				// `onValueChange` does not fire for consumer-provided initial
++				// selection.
+ 				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
+ 
+-				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
+-				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
+-				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++				expect( mockOnValueChange ).not.toHaveBeenCalled();
+ 
+ 				// Focus the tablist (and the selected tab, alpha)
+ 				// Tab should initially focus the first tab in the tablist, which
+@@ -1293,12 +1315,12 @@ describe( 'Tabs', () => {
+ 					/>
+ 				);
+ 
+-				// Alpha is automatically selected as the selected tab.
++				// Alpha is selected from the consumer-provided initial value;
++				// `onValueChange` does not fire for consumer-provided initial
++				// selection.
+ 				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
+ 
+-				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
+-				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
+-				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++				expect( mockOnValueChange ).not.toHaveBeenCalled();
+ 
+ 				// Focus the tablist (and the selected tab, alpha)
+ 				// Tab should initially focus the first tab in the tablist, which
+@@ -1376,12 +1398,12 @@ describe( 'Tabs', () => {
+ 					</DirectionProvider>
+ 				);
+ 
+-				// Alpha is automatically selected as the selected tab.
++				// Alpha is selected from the consumer-provided initial value;
++				// `onValueChange` does not fire for consumer-provided initial
++				// selection.
+ 				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
+ 
+-				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
+-				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
+-				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++				expect( mockOnValueChange ).not.toHaveBeenCalled();
+ 
+ 				// Focus the tablist (and the selected tab, alpha)
+ 				// Tab should initially focus the first tab in the tablist, which
+@@ -1479,12 +1501,12 @@ describe( 'Tabs', () => {
+ 					/>
+ 				);
+ 
+-				// Alpha is automatically selected as the selected tab.
++				// Alpha is selected from the consumer-provided initial value;
++				// `onValueChange` does not fire for consumer-provided initial
++				// selection.
+ 				await waitForComponentToBeInitializedWithSelectedTab( 'Alpha' );
+ 
+-				// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
+-				// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
+-				// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++				expect( mockOnValueChange ).not.toHaveBeenCalled();
+ 
+ 				// Focus the tablist (and the selected tab, alpha)
+ 				// Tab should initially focus the first tab in the tablist, which
+@@ -1700,14 +1722,14 @@ describe( 'Tabs', () => {
+ 						/>
+ 					);
+ 
+-					// Alpha is automatically selected as the selected tab.
++					// Alpha is selected from the consumer-provided
++					// `defaultValue`; `onValueChange` does not fire for
++					// consumer-provided initial selection.
+ 					await waitForComponentToBeInitializedWithSelectedTab(
+ 						'Alpha'
+ 					);
+ 
+-					// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
+-					// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
+-					// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++					expect( mockOnValueChange ).not.toHaveBeenCalled();
+ 
+ 					// Select gamma
+ 					await user.click(
+@@ -1743,7 +1765,8 @@ describe( 'Tabs', () => {
+ 
+ 					expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
+ 
+-					// Falls back to the first tab.
++					// Falls back to the first tab and fires `onValueChange`
++					// for the automatic selection.
+ 					expect(
+ 						screen.getByRole( 'tab', {
+ 							name: 'Alpha',
+@@ -1756,7 +1779,11 @@ describe( 'Tabs', () => {
+ 						} )
+ 					).toBeVisible();
+ 
+-					expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++					expect( mockOnValueChange ).toHaveBeenCalledTimes( 2 );
++					expect( mockOnValueChange ).toHaveBeenLastCalledWith(
++						'alpha',
++						expect.anything()
++					);
+ 				} );
+ 			} );
+ 
+@@ -1809,9 +1836,7 @@ describe( 'Tabs', () => {
+ 									name: 'Alpha',
+ 								} )
+ 							).toBeVisible();
+-						}
+-
+-						if ( mode === 'Controlled' ) {
++						} else if ( mode === 'Controlled' ) {
+ 							// No tab should be selected i.e. it doesn't fall back to first tab.
+ 							expect(
+ 								screen.queryByRole( 'tab', { selected: true } )
+@@ -1841,9 +1866,7 @@ describe( 'Tabs', () => {
+ 									name: 'Alpha',
+ 								} )
+ 							).toBeVisible();
+-						}
+-
+-						if ( mode === 'Controlled' ) {
++						} else if ( mode === 'Controlled' ) {
+ 							// Gamma becomes selected again.
+ 							expect(
+ 								screen.getByRole( 'tab', {
+@@ -1858,7 +1881,20 @@ describe( 'Tabs', () => {
+ 							).toBeVisible();
+ 						}
+ 
+-						expect( mockOnValueChange ).not.toHaveBeenCalled();
++						if ( mode === 'Uncontrolled' ) {
++							// `onValueChange` fires once for the automatic
++							// fallback from gamma → alpha.
++							expect( mockOnValueChange ).toHaveBeenCalledTimes(
++								1
++							);
++							expect( mockOnValueChange ).toHaveBeenNthCalledWith(
++								1,
++								'alpha',
++								expect.anything()
++							);
++						} else if ( mode === 'Controlled' ) {
++							expect( mockOnValueChange ).not.toHaveBeenCalled();
++						}
+ 					} );
+ 
+ 					it( `should not fall back to the tab matching the \`${ propName }\` prop when a different selected tab is removed`, async () => {
+@@ -1929,9 +1965,7 @@ describe( 'Tabs', () => {
+ 									name: 'Beta',
+ 								} )
+ 							).toBeVisible();
+-						}
+-
+-						if ( mode === 'Controlled' ) {
++						} else if ( mode === 'Controlled' ) {
+ 							// No tab should be selected i.e. it doesn't fall back to gamma,
+ 							// even if it matches the `defaultValue` prop.
+ 							expect(
+@@ -1963,9 +1997,7 @@ describe( 'Tabs', () => {
+ 									name: 'Beta',
+ 								} )
+ 							).toBeVisible();
+-						}
+-
+-						if ( mode === 'Controlled' ) {
++						} else if ( mode === 'Controlled' ) {
+ 							expect(
+ 								screen.getByRole( 'tab', {
+ 									selected: true,
+@@ -1979,7 +2011,24 @@ describe( 'Tabs', () => {
+ 							).toBeVisible();
+ 						}
+ 
+-						expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++						if ( mode === 'Uncontrolled' ) {
++							// One call for the user click on alpha, plus one
++							// for the automatic fallback from alpha → beta.
++							expect( mockOnValueChange ).toHaveBeenCalledTimes(
++								2
++							);
++							expect(
++								mockOnValueChange
++							).toHaveBeenLastCalledWith(
++								'beta',
++								expect.anything()
++							);
++						} else if ( mode === 'Controlled' ) {
++							// Only the user click on alpha is observed.
++							expect( mockOnValueChange ).toHaveBeenCalledTimes(
++								1
++							);
++						}
+ 					} );
+ 				}
+ 			);
+@@ -2010,9 +2059,7 @@ describe( 'Tabs', () => {
+ 							await waitForComponentToBeInitializedWithSelectedTab(
+ 								'Alpha'
+ 							);
+-						}
+-
+-						if ( mode === 'Controlled' ) {
++						} else if ( mode === 'Controlled' ) {
+ 							// No initially selected tabs or tabpanels, since the `value`
+ 							// prop is not matching any known tabs.
+ 							await waitForComponentToBeInitializedWithSelectedTab(
+@@ -2020,7 +2067,20 @@ describe( 'Tabs', () => {
+ 							);
+ 						}
+ 
+-						expect( mockOnValueChange ).not.toHaveBeenCalled();
++						if ( mode === 'Uncontrolled' ) {
++							// `onValueChange` fires once for the automatic
++							// fallback from delta → alpha.
++							expect( mockOnValueChange ).toHaveBeenCalledTimes(
++								1
++							);
++							expect( mockOnValueChange ).toHaveBeenNthCalledWith(
++								1,
++								'alpha',
++								expect.anything()
++							);
++						} else if ( mode === 'Controlled' ) {
++							expect( mockOnValueChange ).not.toHaveBeenCalled();
++						}
+ 
+ 						// Re-render with delta added.
+ 						rerender(
+@@ -2043,9 +2103,7 @@ describe( 'Tabs', () => {
+ 									name: 'Alpha',
+ 								} )
+ 							).toBeVisible();
+-						}
+-
+-						if ( mode === 'Controlled' ) {
++						} else if ( mode === 'Controlled' ) {
+ 							// Delta becomes selected
+ 							expect(
+ 								screen.getByRole( 'tab', {
+@@ -2060,7 +2118,16 @@ describe( 'Tabs', () => {
+ 							).toBeVisible();
+ 						}
+ 
+-						expect( mockOnValueChange ).not.toHaveBeenCalled();
++						if ( mode === 'Uncontrolled' ) {
++							// Still only the one call from the initial fallback —
++							// adding delta does not change the active uncontrolled
++							// selection.
++							expect( mockOnValueChange ).toHaveBeenCalledTimes(
++								1
++							);
++						} else if ( mode === 'Controlled' ) {
++							expect( mockOnValueChange ).not.toHaveBeenCalled();
++						}
+ 					} );
+ 				}
+ 			);
+@@ -2072,7 +2139,7 @@ describe( 'Tabs', () => {
+ 			] )(
+ 				'when using the `%s` prop [%s]',
+ 				( propName, mode, Component ) => {
+-					it( `should keep the initial tab matching the \`${ propName }\` prop as selected even if it becomes disabled`, async () => {
++					it( `should handle the initial tab matching the \`${ propName }\` prop becoming disabled`, async () => {
+ 						const mockOnValueChange = jest.fn();
+ 
+ 						const initialComponentProps = {
+@@ -2100,36 +2167,81 @@ describe( 'Tabs', () => {
+ 							/>
+ 						);
+ 
+-						// Beta continues to be selected and focused, even if it is disabled.
+-						expect(
+-							screen.getByRole( 'tab', {
+-								selected: true,
+-								name: 'Beta',
+-							} )
+-						).toBeVisible();
+-						expect(
+-							screen.getByRole( 'tabpanel', {
+-								name: 'Beta',
+-							} )
+-						).toBeVisible();
++						if ( mode === 'Uncontrolled' ) {
++							// Selection falls back to alpha (the first
++							// enabled tab) and `onValueChange` fires for the
++							// automatic selection.
++							expect(
++								screen.getByRole( 'tab', {
++									selected: true,
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++							expect( mockOnValueChange ).toHaveBeenCalledTimes(
++								1
++							);
++							expect( mockOnValueChange ).toHaveBeenNthCalledWith(
++								1,
++								'alpha',
++								expect.anything()
++							);
++						} else if ( mode === 'Controlled' ) {
++							// Beta continues to be selected and focused,
++							// even if it is disabled.
++							expect(
++								screen.getByRole( 'tab', {
++									selected: true,
++									name: 'Beta',
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Beta',
++								} )
++							).toBeVisible();
++							expect( mockOnValueChange ).not.toHaveBeenCalled();
++						}
+ 
+ 						// Re-enable beta.
+ 						rerender( <Component { ...initialComponentProps } /> );
+ 
+-						// Beta continues to be selected and focused.
+-						expect(
+-							screen.getByRole( 'tab', {
+-								selected: true,
+-								name: 'Beta',
+-							} )
+-						).toBeVisible();
+-						expect(
+-							screen.getByRole( 'tabpanel', {
+-								name: 'Beta',
+-							} )
+-						).toBeVisible();
+-
+-						expect( mockOnValueChange ).not.toHaveBeenCalled();
++						if ( mode === 'Uncontrolled' ) {
++							// Alpha stays selected — re-enabling beta does
++							// not re-select it.
++							expect(
++								screen.getByRole( 'tab', {
++									selected: true,
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Alpha',
++								} )
++							).toBeVisible();
++							expect( mockOnValueChange ).toHaveBeenCalledTimes(
++								1
++							);
++						} else if ( mode === 'Controlled' ) {
++							// Beta continues to be selected and focused.
++							expect(
++								screen.getByRole( 'tab', {
++									selected: true,
++									name: 'Beta',
++								} )
++							).toBeVisible();
++							expect(
++								screen.getByRole( 'tabpanel', {
++									name: 'Beta',
++								} )
++							).toBeVisible();
++							expect( mockOnValueChange ).not.toHaveBeenCalled();
++						}
+ 					} );
+ 
+ 					it( 'should handle the user-selected tab becoming disabled', async () => {
+@@ -2147,14 +2259,14 @@ describe( 'Tabs', () => {
+ 							<Component { ...initialComponentProps } />
+ 						);
+ 
+-						// Alpha is automatically selected as the selected tab.
++						// Alpha is selected from the consumer-provided
++						// initial value; `onValueChange` does not fire for
++						// consumer-provided initial selection.
+ 						await waitForComponentToBeInitializedWithSelectedTab(
+ 							'Alpha'
+ 						);
+ 
+-						// TODO: re-enable once https://github.com/mui/base-ui/issues/2097 is fixed
+-						// expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
+-						// expect( mockOnValueChange ).toHaveBeenLastCalledWith( 'alpha' );
++						expect( mockOnValueChange ).not.toHaveBeenCalled();
+ 
+ 						// Click on beta tab, beta becomes selected.
+ 						await user.click(
+@@ -2200,9 +2312,7 @@ describe( 'Tabs', () => {
+ 									name: 'Alpha',
+ 								} )
+ 							).toBeVisible();
+-						}
+-
+-						if ( mode === 'Controlled' ) {
++						} else if ( mode === 'Controlled' ) {
+ 							// Beta continues to be selected, even if it is disabled.
+ 							expect(
+ 								screen.getByRole( 'tab', {
+@@ -2233,9 +2343,7 @@ describe( 'Tabs', () => {
+ 									name: 'Alpha',
+ 								} )
+ 							).toBeVisible();
+-						}
+-
+-						if ( mode === 'Controlled' ) {
++						} else if ( mode === 'Controlled' ) {
+ 							// Beta continues to be selected and focused.
+ 							expect(
+ 								screen.getByRole( 'tab', {
+@@ -2250,7 +2358,24 @@ describe( 'Tabs', () => {
+ 							).toBeVisible();
+ 						}
+ 
+-						expect( mockOnValueChange ).toHaveBeenCalledTimes( 1 );
++						if ( mode === 'Uncontrolled' ) {
++							// One call for the user click on beta, plus one
++							// for the automatic fallback to alpha when beta
++							// was disabled.
++							expect( mockOnValueChange ).toHaveBeenCalledTimes(
++								2
++							);
++							expect(
++								mockOnValueChange
++							).toHaveBeenLastCalledWith(
++								'alpha',
++								expect.anything()
++							);
++						} else if ( mode === 'Controlled' ) {
++							expect( mockOnValueChange ).toHaveBeenCalledTimes(
++								1
++							);
++						}
+ 					} );
+ 				}
+ 			);

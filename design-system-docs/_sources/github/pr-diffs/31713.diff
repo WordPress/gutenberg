@@ -1,0 +1,2618 @@
+diff --git a/packages/block-directory/src/plugins/get-install-missing/index.js b/packages/block-directory/src/plugins/get-install-missing/index.js
+index c228b53c0b35b3..80673914d4dc10 100644
+--- a/packages/block-directory/src/plugins/get-install-missing/index.js
++++ b/packages/block-directory/src/plugins/get-install-missing/index.js
+@@ -88,7 +88,7 @@ const ModifiedWarning = ( { originalBlock, ...props } ) => {
+ 			originalBlock.title || originalName
+ 		);
+ 		actions.push(
+-			<Button key="convert" onClick={ convertToHTML } isLink>
++			<Button key="convert" onClick={ convertToHTML } variant="link">
+ 				{ __( 'Keep as HTML' ) }
+ 			</Button>
+ 		);
+diff --git a/packages/block-directory/src/plugins/get-install-missing/install-button.js b/packages/block-directory/src/plugins/get-install-missing/install-button.js
+index b229b29bc10515..e092ba58c26641 100644
+--- a/packages/block-directory/src/plugins/get-install-missing/install-button.js
++++ b/packages/block-directory/src/plugins/get-install-missing/install-button.js
+@@ -43,7 +43,7 @@ export default function InstallButton( { attributes, block, clientId } ) {
+ 			}
+ 			disabled={ isInstallingBlock }
+ 			isBusy={ isInstallingBlock }
+-			isPrimary
++			variant="primary"
+ 		>
+ 			{ sprintf(
+ 				/* translators: %s: block name */
+diff --git a/packages/block-editor/src/components/block-breadcrumb/index.js b/packages/block-editor/src/components/block-breadcrumb/index.js
+index 422fbeffc0ed5d..e6d58b3e97c245 100644
+--- a/packages/block-editor/src/components/block-breadcrumb/index.js
++++ b/packages/block-editor/src/components/block-breadcrumb/index.js
+@@ -54,7 +54,7 @@ function BlockBreadcrumb() {
+ 				{ hasSelection && (
+ 					<Button
+ 						className="block-editor-block-breadcrumb__button"
+-						isTertiary
++						variant="tertiary"
+ 						onClick={ clearSelectedBlock }
+ 					>
+ 						{ __( 'Document' ) }
+@@ -66,7 +66,7 @@ function BlockBreadcrumb() {
+ 				<li key={ parentClientId }>
+ 					<Button
+ 						className="block-editor-block-breadcrumb__button"
+-						isTertiary
++						variant="tertiary"
+ 						onClick={ () => selectBlock( parentClientId ) }
+ 					>
+ 						<BlockTitle clientId={ parentClientId } />
+diff --git a/packages/block-editor/src/components/block-compare/block-view.js b/packages/block-editor/src/components/block-compare/block-view.js
+index 7bb45a4402f241..5a22c89851ce57 100644
+--- a/packages/block-editor/src/components/block-compare/block-view.js
++++ b/packages/block-editor/src/components/block-compare/block-view.js
+@@ -28,7 +28,7 @@ const BlockView = ( {
+ 			</div>
+ 
+ 			<div className="block-editor-block-compare__action">
+-				<Button isSecondary tabIndex="0" onClick={ action }>
++				<Button variant="secondary" tabIndex="0" onClick={ action }>
+ 					{ actionText }
+ 				</Button>
+ 			</div>
+diff --git a/packages/block-editor/src/components/block-compare/test/__snapshots__/block-view.js.snap b/packages/block-editor/src/components/block-compare/test/__snapshots__/block-view.js.snap
+index 95ad614306ea7b..d3adf817bb83fd 100644
+--- a/packages/block-editor/src/components/block-compare/test/__snapshots__/block-view.js.snap
++++ b/packages/block-editor/src/components/block-compare/test/__snapshots__/block-view.js.snap
+@@ -27,9 +27,9 @@ exports[`BlockView should match snapshot 1`] = `
+     className="block-editor-block-compare__action"
+   >
+     <ForwardRef(Button)
+-      isSecondary={true}
+       onClick={[Function]}
+       tabIndex="0"
++      variant="secondary"
+     >
+       action
+     </ForwardRef(Button)>
+diff --git a/packages/block-editor/src/components/block-list/block-invalid-warning.js b/packages/block-editor/src/components/block-list/block-invalid-warning.js
+index f9e98bd7ccec7a..941787ca95b2e7 100644
+--- a/packages/block-editor/src/components/block-list/block-invalid-warning.js
++++ b/packages/block-editor/src/components/block-list/block-invalid-warning.js
+@@ -56,7 +56,7 @@ export function BlockInvalidWarning( {
+ 					<Button
+ 						key="recover"
+ 						onClick={ attemptBlockRecovery }
+-						isPrimary
++						variant="primary"
+ 					>
+ 						{ __( 'Attempt Block Recovery' ) }
+ 					</Button>,
+diff --git a/packages/block-editor/src/components/block-pattern-setup/setup-toolbar.js b/packages/block-editor/src/components/block-pattern-setup/setup-toolbar.js
+index 7eba89edb25793..44157626ca9725 100644
+--- a/packages/block-editor/src/components/block-pattern-setup/setup-toolbar.js
++++ b/packages/block-editor/src/components/block-pattern-setup/setup-toolbar.js
+@@ -18,7 +18,7 @@ import { VIEWMODES } from './constants';
+ const Actions = ( { onStartBlank, onBlockPatternSelect } ) => (
+ 	<div className="block-editor-block-pattern-setup__actions">
+ 		<Button onClick={ onStartBlank }>{ __( 'Start blank' ) }</Button>
+-		<Button isPrimary onClick={ onBlockPatternSelect }>
++		<Button variant="primary" onClick={ onBlockPatternSelect }>
+ 			{ __( 'Choose' ) }
+ 		</Button>
+ 	</div>
+diff --git a/packages/block-editor/src/components/block-variation-picker/index.js b/packages/block-editor/src/components/block-variation-picker/index.js
+index f7db011f294875..24bdfa272c34b2 100644
+--- a/packages/block-editor/src/components/block-variation-picker/index.js
++++ b/packages/block-editor/src/components/block-variation-picker/index.js
+@@ -42,7 +42,7 @@ function BlockVariationPicker( {
+ 				{ variations.map( ( variation ) => (
+ 					<li key={ variation.name }>
+ 						<Button
+-							isSecondary
++							variant="secondary"
+ 							icon={ variation.icon }
+ 							iconSize={ 48 }
+ 							onClick={ () => onSelect( variation ) }
+@@ -61,7 +61,7 @@ function BlockVariationPicker( {
+ 			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+ 			{ allowSkip && (
+ 				<div className="block-editor-block-variation-picker__skip">
+-					<Button isLink onClick={ () => onSelect() }>
++					<Button variant="link" onClick={ () => onSelect() }>
+ 						{ __( 'Skip' ) }
+ 					</Button>
+ 				</div>
+diff --git a/packages/block-editor/src/components/image-size-control/index.js b/packages/block-editor/src/components/image-size-control/index.js
+index 94a41e8820ef68..f465ec1f6e3938 100644
+--- a/packages/block-editor/src/components/image-size-control/index.js
++++ b/packages/block-editor/src/components/image-size-control/index.js
+@@ -90,7 +90,9 @@ export default function ImageSizeControl( {
+ 									<Button
+ 										key={ scale }
+ 										isSmall
+-										isPrimary={ isCurrent }
++										variant={
++											isCurrent ? 'primary' : undefined
++										}
+ 										isPressed={ isCurrent }
+ 										onClick={ updateDimensions(
+ 											scaledWidth,
+diff --git a/packages/block-editor/src/components/link-control/link-preview.js b/packages/block-editor/src/components/link-control/link-preview.js
+index ef6bd09fcf270f..2207e42b810613 100644
+--- a/packages/block-editor/src/components/link-control/link-preview.js
++++ b/packages/block-editor/src/components/link-control/link-preview.js
+@@ -43,7 +43,7 @@ export default function LinkPreview( { value, onEditClick } ) {
+ 			</span>
+ 
+ 			<Button
+-				isSecondary
++				variant="secondary"
+ 				onClick={ () => onEditClick() }
+ 				className="block-editor-link-control__search-item-action"
+ 			>
+diff --git a/packages/block-editor/src/components/media-placeholder/index.js b/packages/block-editor/src/components/media-placeholder/index.js
+index b460e20755e57e..20f39d07bac5df 100644
+--- a/packages/block-editor/src/components/media-placeholder/index.js
++++ b/packages/block-editor/src/components/media-placeholder/index.js
+@@ -266,7 +266,7 @@ export function MediaPlaceholder( {
+ 				<Button
+ 					className="block-editor-media-placeholder__cancel-button"
+ 					title={ __( 'Cancel' ) }
+-					isLink
++					variant="link"
+ 					onClick={ onCancel }
+ 				>
+ 					{ __( 'Cancel' ) }
+@@ -283,7 +283,7 @@ export function MediaPlaceholder( {
+ 						className="block-editor-media-placeholder__button"
+ 						onClick={ openURLInput }
+ 						isPressed={ isURLInputVisible }
+-						isTertiary
++						variant="tertiary"
+ 					>
+ 						{ __( 'Insert from URL' ) }
+ 					</Button>
+@@ -316,7 +316,7 @@ export function MediaPlaceholder( {
+ 				render={ ( { open } ) => {
+ 					return (
+ 						<Button
+-							isTertiary
++							variant="tertiary"
+ 							onClick={ ( event ) => {
+ 								event.stopPropagation();
+ 								open();
+@@ -341,7 +341,7 @@ export function MediaPlaceholder( {
+ 							const content = (
+ 								<>
+ 									<Button
+-										isPrimary
++										variant="primary"
+ 										className={ classnames(
+ 											'block-editor-media-placeholder__button',
+ 											'block-editor-media-placeholder__upload-button'
+@@ -366,7 +366,7 @@ export function MediaPlaceholder( {
+ 				<>
+ 					{ renderDropZone() }
+ 					<FormFileUpload
+-						isPrimary
++						variant="primary"
+ 						className={ classnames(
+ 							'block-editor-media-placeholder__button',
+ 							'block-editor-media-placeholder__upload-button'
+diff --git a/packages/block-editor/src/components/preview-options/index.js b/packages/block-editor/src/components/preview-options/index.js
+index 122c85d852d0d2..5fb6ba1063bd45 100644
+--- a/packages/block-editor/src/components/preview-options/index.js
++++ b/packages/block-editor/src/components/preview-options/index.js
+@@ -29,7 +29,7 @@ export default function PreviewOptions( {
+ 		position: 'bottom left',
+ 	};
+ 	const toggleProps = {
+-		isTertiary: true,
++		variant: 'tertiary',
+ 		className: 'block-editor-post-preview__button-toggle',
+ 		disabled: ! isEnabled,
+ 		/* translators: button label text should, if possible, be under 16 characters. */
+diff --git a/packages/block-editor/src/components/skip-to-selected-block/index.js b/packages/block-editor/src/components/skip-to-selected-block/index.js
+index 61e7e3f8fd05df..089ed8189a08a3 100644
+--- a/packages/block-editor/src/components/skip-to-selected-block/index.js
++++ b/packages/block-editor/src/components/skip-to-selected-block/index.js
+@@ -19,7 +19,7 @@ const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
+ 
+ 	return selectedBlockClientId ? (
+ 		<Button
+-			isSecondary
++			variant="secondary"
+ 			className="block-editor-skip-to-selected-block"
+ 			onClick={ onClick }
+ 		>
+diff --git a/packages/block-editor/src/hooks/layout.js b/packages/block-editor/src/hooks/layout.js
+index 14a540cf3284fd..2f56d3517cf5de 100644
+--- a/packages/block-editor/src/hooks/layout.js
++++ b/packages/block-editor/src/hooks/layout.js
+@@ -113,7 +113,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
+ 						</div>
+ 						<div className="block-editor-hooks__layout-controls-reset">
+ 							<Button
+-								isSecondary
++								variant="secondary"
+ 								isSmall
+ 								disabled={ ! contentSize && ! wideSize }
+ 								onClick={ () =>
+diff --git a/packages/block-library/src/button/edit.js b/packages/block-library/src/button/edit.js
+index 3f36a564272392..70ce701138999b 100644
+--- a/packages/block-library/src/button/edit.js
++++ b/packages/block-library/src/button/edit.js
+@@ -49,7 +49,11 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
+ 						<Button
+ 							key={ widthValue }
+ 							isSmall
+-							isPrimary={ widthValue === selectedWidth }
++							variant={
++								widthValue === selectedWidth
++									? 'primary'
++									: undefined
++							}
+ 							onClick={ () => handleChange( widthValue ) }
+ 						>
+ 							{ widthValue }%
+diff --git a/packages/block-library/src/cover/edit.js b/packages/block-library/src/cover/edit.js
+index cd0f85b1a9e78b..bc215bfd537b1a 100644
+--- a/packages/block-library/src/cover/edit.js
++++ b/packages/block-library/src/cover/edit.js
+@@ -492,7 +492,7 @@ function CoverEdit( {
+ 						) }
+ 						<PanelRow>
+ 							<Button
+-								isSecondary
++								variant="secondary"
+ 								isSmall
+ 								className="block-library-cover__reset-button"
+ 								onClick={ () =>
+diff --git a/packages/block-library/src/embed/embed-placeholder.js b/packages/block-library/src/embed/embed-placeholder.js
+index f12f23eee4c732..e3ffb5ac02845c 100644
+--- a/packages/block-library/src/embed/embed-placeholder.js
++++ b/packages/block-library/src/embed/embed-placeholder.js
+@@ -33,7 +33,7 @@ const EmbedPlaceholder = ( {
+ 					placeholder={ __( 'Enter URL to embed here…' ) }
+ 					onChange={ onChange }
+ 				/>
+-				<Button isPrimary type="submit">
++				<Button variant="primary" type="submit">
+ 					{ _x( 'Embed', 'button label' ) }
+ 				</Button>
+ 			</form>
+@@ -51,10 +51,10 @@ const EmbedPlaceholder = ( {
+ 					<div className="components-placeholder__instructions">
+ 						{ __( 'Sorry, this content could not be embedded.' ) }
+ 					</div>
+-					<Button isSecondary onClick={ tryAgain }>
++					<Button variant="secondary" onClick={ tryAgain }>
+ 						{ _x( 'Try again', 'button label' ) }
+ 					</Button>{ ' ' }
+-					<Button isSecondary onClick={ fallback }>
++					<Button variant="secondary" onClick={ fallback }>
+ 						{ _x( 'Convert to link', 'button label' ) }
+ 					</Button>
+ 				</div>
+diff --git a/packages/block-library/src/missing/edit.js b/packages/block-library/src/missing/edit.js
+index cbe8536a3fdafd..2f9dbcb478d512 100644
+--- a/packages/block-library/src/missing/edit.js
++++ b/packages/block-library/src/missing/edit.js
+@@ -28,7 +28,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
+ 			originalName
+ 		);
+ 		actions.push(
+-			<Button key="convert" onClick={ convertToHTML } isPrimary>
++			<Button key="convert" onClick={ convertToHTML } variant="primary">
+ 				{ __( 'Keep as HTML' ) }
+ 			</Button>
+ 		);
+diff --git a/packages/block-library/src/navigation/placeholder.js b/packages/block-library/src/navigation/placeholder.js
+index 03b942f3b30bd0..a9e0e589910ce4 100644
+--- a/packages/block-library/src/navigation/placeholder.js
++++ b/packages/block-library/src/navigation/placeholder.js
+@@ -81,7 +81,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
+ 	}, [ isCreatingFromMenu, hasResolvedMenuItems ] );
+ 
+ 	const toggleProps = {
+-		isPrimary: true,
++		variant: 'primary',
+ 		className: 'wp-block-navigation-placeholder__actions__dropdown',
+ 	};
+ 	return (
+@@ -132,14 +132,16 @@ function NavigationPlaceholder( { onCreate }, ref ) {
+ 						) : undefined }
+ 						{ hasPages ? (
+ 							<Button
+-								isPrimary={ hasMenus ? false : true }
+-								isTertiary={ hasMenus ? true : false }
++								variant={ hasMenus ? 'tertiary' : 'primary' }
+ 								onClick={ onCreateAllPages }
+ 							>
+ 								{ __( 'Add all pages' ) }
+ 							</Button>
+ 						) : undefined }
+-						<Button isTertiary onClick={ onCreateEmptyMenu }>
++						<Button
++							variant="tertiary"
++							onClick={ onCreateEmptyMenu }
++						>
+ 							{ __( 'Start empty' ) }
+ 						</Button>
+ 					</div>
+diff --git a/packages/block-library/src/page-list/convert-to-links-modal.js b/packages/block-library/src/page-list/convert-to-links-modal.js
+index 6686ba3081b745..e900a9ab94d380 100644
+--- a/packages/block-library/src/page-list/convert-to-links-modal.js
++++ b/packages/block-library/src/page-list/convert-to-links-modal.js
+@@ -103,11 +103,11 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
+ 				) }
+ 			</p>
+ 			<div className="wp-block-page-list-modal-buttons">
+-				<Button isTertiary onClick={ onClose }>
++				<Button variant="tertiary" onClick={ onClose }>
+ 					{ __( 'Cancel' ) }
+ 				</Button>
+ 				<Button
+-					isPrimary
++					variant="primary"
+ 					disabled={ ! pagesFinished }
+ 					onClick={ convertSelectedBlockToNavigationLinks( {
+ 						pages,
+diff --git a/packages/block-library/src/post-comment/edit.js b/packages/block-library/src/post-comment/edit.js
+index 3acab9af7c0772..f3182d806c3a05 100644
+--- a/packages/block-library/src/post-comment/edit.js
++++ b/packages/block-library/src/post-comment/edit.js
+@@ -36,7 +36,7 @@ export default function Edit( { attributes, setAttributes } ) {
+ 					/>
+ 
+ 					<Button
+-						isPrimary
++						variant="primary"
+ 						onClick={ () => {
+ 							setAttributes( { commentId: commentIdInput } );
+ 						} }
+diff --git a/packages/block-library/src/rss/edit.js b/packages/block-library/src/rss/edit.js
+index d6908ad1fbb4a9..46a3e6a1a105d3 100644
+--- a/packages/block-library/src/rss/edit.js
++++ b/packages/block-library/src/rss/edit.js
+@@ -72,7 +72,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
+ 							}
+ 							className="wp-block-rss__placeholder-input"
+ 						/>
+-						<Button isPrimary type="submit">
++						<Button variant="primary" type="submit">
+ 							{ __( 'Use URL' ) }
+ 						</Button>
+ 					</form>
+diff --git a/packages/block-library/src/search/edit.js b/packages/block-library/src/search/edit.js
+index 1508583257fbec..ec794a60e44aca 100644
+--- a/packages/block-library/src/search/edit.js
++++ b/packages/block-library/src/search/edit.js
+@@ -295,9 +295,11 @@ export default function SearchEdit( {
+ 									<Button
+ 										key={ widthValue }
+ 										isSmall
+-										isPrimary={
++										variant={
+ 											`${ widthValue }%` ===
+ 											`${ width }${ widthUnit }`
++												? 'primary'
++												: undefined
+ 										}
+ 										onClick={ () =>
+ 											setAttributes( {
+diff --git a/packages/block-library/src/table/edit.js b/packages/block-library/src/table/edit.js
+index cccc2a3d3d5b32..113dd178b3caf1 100644
+--- a/packages/block-library/src/table/edit.js
++++ b/packages/block-library/src/table/edit.js
+@@ -528,7 +528,7 @@ function TableEdit( {
+ 						/>
+ 						<Button
+ 							className="blocks-table__placeholder-button"
+-							isPrimary
++							variant="primary"
+ 							type="submit"
+ 						>
+ 							{ __( 'Create Table' ) }
+diff --git a/packages/block-library/src/template-part/edit/placeholder/index.js b/packages/block-library/src/template-part/edit/placeholder/index.js
+index db5da513802590..4cd1ea4fc5e8b2 100644
+--- a/packages/block-library/src/template-part/edit/placeholder/index.js
++++ b/packages/block-library/src/template-part/edit/placeholder/index.js
+@@ -107,7 +107,7 @@ export default function TemplatePartPlaceholder( {
+ 							<>
+ 								{ enableSelection && (
+ 									<Button
+-										isPrimary
++										variant="primary"
+ 										onClick={ onToggle }
+ 										aria-expanded={ isOpen }
+ 									>
+@@ -115,9 +115,9 @@ export default function TemplatePartPlaceholder( {
+ 									</Button>
+ 								) }
+ 								<Button
+-									{ ...( enableSelection
+-										? { isTertiary: true }
+-										: { isPrimary: true } ) }
++									variant={
++										enableSelection ? 'tertiary' : 'primary'
++									}
+ 									onClick={ () =>
+ 										setStep( PLACEHOLDER_STEPS.patterns )
+ 									}
+diff --git a/packages/block-library/src/video/edit.js b/packages/block-library/src/video/edit.js
+index a1d787e455ec27..658640158bd4dc 100644
+--- a/packages/block-library/src/video/edit.js
++++ b/packages/block-library/src/video/edit.js
+@@ -199,7 +199,7 @@ function VideoEdit( {
+ 								}
+ 								render={ ( { open } ) => (
+ 									<Button
+-										isPrimary
++										variant="primary"
+ 										onClick={ open }
+ 										ref={ posterImageButton }
+ 										aria-describedby={
+@@ -226,7 +226,10 @@ function VideoEdit( {
+ 									  ) }
+ 							</p>
+ 							{ !! poster && (
+-								<Button onClick={ onRemovePoster } isTertiary>
++								<Button
++									onClick={ onRemovePoster }
++									variant="tertiary"
++								>
+ 									{ __( 'Remove' ) }
+ 								</Button>
+ 							) }
+diff --git a/packages/block-library/src/video/tracks-editor.js b/packages/block-library/src/video/tracks-editor.js
+index bb20bbf794cbf6..04f3f04f73cd05 100644
+--- a/packages/block-library/src/video/tracks-editor.js
++++ b/packages/block-library/src/video/tracks-editor.js
+@@ -73,7 +73,7 @@ function TrackList( { tracks, onEditPress } ) {
+ 				>
+ 					<span>{ track.label } </span>
+ 					<Button
+-						isTertiary
++						variant="tertiary"
+ 						onClick={ () => onEditPress( index ) }
+ 						aria-label={ sprintf(
+ 							/* translators: %s: Label of the video text track e.g: "French subtitles" */
+@@ -152,7 +152,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
+ 				/>
+ 				<div className="block-library-video-tracks-editor__single-track-editor-buttons-container">
+ 					<Button
+-						isSecondary
++						variant="secondary"
+ 						onClick={ () => {
+ 							const changes = {};
+ 							let hasChanges = false;
+@@ -179,7 +179,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
+ 					>
+ 						{ __( 'Close' ) }
+ 					</Button>
+-					<Button isDestructive isLink onClick={ onRemove }>
++					<Button isDestructive variant="link" onClick={ onRemove }>
+ 						{ __( 'Remove track' ) }
+ 					</Button>
+ 				</div>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 951908f23ab7bc..d85d01a72fdfa2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Deprecation
++
++-   `isPrimary`, `isSecondary`, `isTertiary` and `isLink` props in `Button` have been deprecated. Use `variant` instead ([#31713](https://github.com/WordPress/gutenberg/pull/31713)).
++
+ ## 14.1.0 (2021-05-20)
+ 
+ ## 14.0.0 (2021-05-14)
+diff --git a/packages/components/src/box-control/index.js b/packages/components/src/box-control/index.js
+index 21bf8314270ba0..49a8d153aee6fd 100644
+--- a/packages/components/src/box-control/index.js
++++ b/packages/components/src/box-control/index.js
+@@ -126,7 +126,7 @@ export default function BoxControl( {
+ 				<FlexItem>
+ 					<Button
+ 						className="component-box-control__reset-button"
+-						isSecondary
++						variant="secondary"
+ 						isSmall
+ 						onClick={ handleOnReset }
+ 						disabled={ ! isDirty }
+diff --git a/packages/components/src/box-control/linked-button.js b/packages/components/src/box-control/linked-button.js
+index 000a7b505ddcf3..3a24a62f188be0 100644
+--- a/packages/components/src/box-control/linked-button.js
++++ b/packages/components/src/box-control/linked-button.js
+@@ -19,8 +19,7 @@ export default function LinkedButton( { isLinked, ...props } ) {
+ 				<Button
+ 					{ ...props }
+ 					className="component-box-control__linked-button"
+-					isPrimary={ isLinked }
+-					isSecondary={ ! isLinked }
++					variant={ isLinked ? 'primary' : 'secondary' }
+ 					isSmall
+ 					icon={ isLinked ? link : linkOff }
+ 					iconSize={ 16 }
+diff --git a/packages/components/src/button-group/README.md b/packages/components/src/button-group/README.md
+index bc1a460cb5a487..2135a027afa5b6 100644
+--- a/packages/components/src/button-group/README.md
++++ b/packages/components/src/button-group/README.md
+@@ -51,8 +51,8 @@ import { Button, ButtonGroup } from '@wordpress/components';
+ 
+ const MyButtonGroup = () => (
+ 	<ButtonGroup>
+-		<Button isPrimary>Button 1</Button>
+-		<Button isPrimary>Button 2</Button>
++		<Button variant="primary">Button 1</Button>
++		<Button variant="primary">Button 2</Button>
+ 	</ButtonGroup>
+ );
+ ```
+diff --git a/packages/components/src/button-group/stories/index.js b/packages/components/src/button-group/stories/index.js
+index 50332eede746ac..3b82a4c86346b4 100644
+--- a/packages/components/src/button-group/stories/index.js
++++ b/packages/components/src/button-group/stories/index.js
+@@ -10,10 +10,10 @@ export const _default = () => {
+ 	const style = { margin: '0 4px' };
+ 	return (
+ 		<ButtonGroup>
+-			<Button isPrimary style={ style }>
++			<Button variant="primary" style={ style }>
+ 				Button 1
+ 			</Button>
+-			<Button isPrimary style={ style }>
++			<Button variant="primary" style={ style }>
+ 				Button 2
+ 			</Button>
+ 		</ButtonGroup>
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index 0a32c865df11a3..c4e0be59143c25 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -112,7 +112,7 @@ Renders a button with default style.
+ ```jsx
+ import { Button } from '@wordpress/components';
+ 
+-const MyButton = () => <Button isSecondary>Click me!</Button>;
++const MyButton = () => <Button variant="secondary">Click me!</Button>;
+ ```
+ 
+ ### Props
+@@ -137,29 +137,13 @@ If provided, renders `a` instead of `button`.
+ -   Required: No
+ -   Default: `undefined`
+ 
+-#### isSecondary
++#### variant
+ 
+-Renders a default button style.
++Specifies the button's style. The accepted values are `'primary'` (the primary button styles), `'secondary'` (the default button styles), `'tertiary'` (the text-based button styles), and `'link'` (the link button styles).
+ 
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
+-
+-#### isPrimary
+-
+-Renders a primary button style.
+-
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
+-
+-#### isTertiary
+-
+-Renders a text-based button style.
+-
+--   Type: `Boolean`
++-   Type: `String`
+ -   Required: No
+--   Default: `false`
++-   Default: `undefined`
+ 
+ #### isDestructive
+ 
+@@ -193,14 +177,6 @@ Indicates activity while a action is being performed.
+ -   Required: No
+ -   Default: `false`
+ 
+-#### isLink
+-
+-Renders a button with an anchor style.
+-
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
+-
+ #### focus
+ 
+ Whether the button is focused.
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.js
+index d3804056cd2a89..34b30a4338beac 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.js
+@@ -19,18 +19,55 @@ import VisuallyHidden from '../visually-hidden';
+ 
+ const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
+ 
++function useDeprecatedProps( {
++	isDefault,
++	isPrimary,
++	isSecondary,
++	isTertiary,
++	isLink,
++	variant,
++	...otherProps
++} ) {
++	let computedVariant = variant;
++
++	if ( isPrimary ) {
++		computedVariant ??= 'primary';
++	}
++
++	if ( isTertiary ) {
++		computedVariant ??= 'tertiary';
++	}
++
++	if ( isSecondary ) {
++		computedVariant ??= 'secondary';
++	}
++
++	if ( isDefault ) {
++		deprecated( 'Button isDefault prop', {
++			since: '5.4',
++			alternative: 'variant="secondary"',
++		} );
++
++		computedVariant ??= 'secondary';
++	}
++
++	if ( isLink ) {
++		computedVariant ??= 'link';
++	}
++
++	return {
++		...otherProps,
++		variant: computedVariant,
++	};
++}
++
+ export function Button( props, ref ) {
+ 	const {
+ 		href,
+ 		target,
+-		isPrimary,
+ 		isSmall,
+-		isTertiary,
+ 		isPressed,
+ 		isBusy,
+-		isDefault,
+-		isSecondary,
+-		isLink,
+ 		isDestructive,
+ 		className,
+ 		disabled,
+@@ -43,26 +80,20 @@ export function Button( props, ref ) {
+ 		label,
+ 		children,
+ 		text,
++		variant,
+ 		__experimentalIsFocusable: isFocusable,
+ 		describedBy,
+ 		...additionalProps
+-	} = props;
+-
+-	if ( isDefault ) {
+-		deprecated( 'Button isDefault prop', {
+-			since: '5.4',
+-			alternative: 'isSecondary',
+-		} );
+-	}
++	} = useDeprecatedProps( props );
+ 
+ 	const classes = classnames( 'components-button', className, {
+-		'is-secondary': isDefault || isSecondary,
+-		'is-primary': isPrimary,
++		'is-secondary': variant === 'secondary',
++		'is-primary': variant === 'primary',
+ 		'is-small': isSmall,
+-		'is-tertiary': isTertiary,
++		'is-tertiary': variant === 'tertiary',
+ 		'is-pressed': isPressed,
+ 		'is-busy': isBusy,
+-		'is-link': isLink,
++		'is-link': variant === 'link',
+ 		'is-destructive': isDestructive,
+ 		'has-text': !! icon && !! children,
+ 		'has-icon': !! icon,
+diff --git a/packages/components/src/button/stories/index.js b/packages/components/src/button/stories/index.js
+index faf75af0d5fb19..3de50fc0be432f 100644
+--- a/packages/components/src/button/stories/index.js
++++ b/packages/components/src/button/stories/index.js
+@@ -30,19 +30,19 @@ export const _default = () => {
+ export const primary = () => {
+ 	const label = text( 'Label', 'Primary Button' );
+ 
+-	return <Button isPrimary>{ label }</Button>;
++	return <Button variant="primary">{ label }</Button>;
+ };
+ 
+ export const secondary = () => {
+ 	const label = text( 'Label', 'Secondary Button' );
+ 
+-	return <Button isSecondary>{ label }</Button>;
++	return <Button variant="secondary">{ label }</Button>;
+ };
+ 
+ export const tertiary = () => {
+ 	const label = text( 'Label', 'Tertiary Button' );
+ 
+-	return <Button isTertiary>{ label }</Button>;
++	return <Button variant="tertiary">{ label }</Button>;
+ };
+ 
+ export const isDestructive = () => {
+@@ -64,7 +64,7 @@ export const isPrimaryDestructive = () => {
+ 
+ 	return (
+ 		<Button
+-			isPrimary
++			variant="primary"
+ 			isDestructive
+ 			isSmall={ isSmall }
+ 			disabled={ disabled }
+@@ -126,7 +126,7 @@ export const destructiveLink = () => {
+ 	const label = text( 'Label', 'Destructive Link' );
+ 
+ 	return (
+-		<Button isDestructive isLink>
++		<Button isDestructive variant="link">
+ 			{ label }
+ 		</Button>
+ 	);
+@@ -176,20 +176,20 @@ export const buttons = () => {
+ 			<h2>Small Buttons</h2>
+ 			<div className="story-buttons-container">
+ 				<Button isSmall>Button</Button>
+-				<Button isPrimary isSmall>
++				<Button variant="primary" isSmall>
+ 					Primary Button
+ 				</Button>
+-				<Button isSecondary isSmall>
++				<Button variant="secondary" isSmall>
+ 					Secondary Button
+ 				</Button>
+-				<Button isTertiary isSmall>
++				<Button variant="tertiary" isSmall>
+ 					Tertiary Button
+ 				</Button>
+ 				<Button isSmall icon={ more } />
+-				<Button isSmall isPrimary icon={ more } />
+-				<Button isSmall isSecondary icon={ more } />
+-				<Button isSmall isTertiary icon={ more } />
+-				<Button isSmall isPrimary icon={ more }>
++				<Button isSmall variant="primary" icon={ more } />
++				<Button isSmall variant="secondary" icon={ more } />
++				<Button isSmall variant="tertiary" icon={ more } />
++				<Button isSmall variant="primary" icon={ more }>
+ 					Icon & Text
+ 				</Button>
+ 			</div>
+@@ -197,14 +197,14 @@ export const buttons = () => {
+ 			<h2>Regular Buttons</h2>
+ 			<div className="story-buttons-container">
+ 				<Button>Button</Button>
+-				<Button isPrimary>Primary Button</Button>
+-				<Button isSecondary>Secondary Button</Button>
+-				<Button isTertiary>Tertiary Button</Button>
++				<Button variant="primary">Primary Button</Button>
++				<Button variant="secondary">Secondary Button</Button>
++				<Button variant="tertiary">Tertiary Button</Button>
+ 				<Button icon={ more } />
+-				<Button isPrimary icon={ more } />
+-				<Button isSecondary icon={ more } />
+-				<Button isTertiary icon={ more } />
+-				<Button isPrimary icon={ more }>
++				<Button variant="primary" icon={ more } />
++				<Button variant="secondary" icon={ more } />
++				<Button variant="tertiary" icon={ more } />
++				<Button variant="primary" icon={ more }>
+ 					Icon & Text
+ 				</Button>
+ 			</div>
+diff --git a/packages/components/src/button/test/index.js b/packages/components/src/button/test/index.js
+index 7c16354c42e8de..ea0a3257071c35 100644
+--- a/packages/components/src/button/test/index.js
++++ b/packages/components/src/button/test/index.js
+@@ -30,21 +30,43 @@ describe( 'Button', () => {
+ 		} );
+ 
+ 		it( 'should render a button element with is-primary class', () => {
+-			const button = shallow( <Button isPrimary /> ).find( 'button' );
++			const button = shallow( <Button variant="primary" /> ).find(
++				'button'
++			);
+ 			expect( button.hasClass( 'is-large' ) ).toBe( false );
+ 			expect( button.hasClass( 'is-primary' ) ).toBe( true );
+ 		} );
+ 
+-		it( 'should render a button element with is-small class', () => {
+-			const button = shallow( <Button isSecondary isSmall /> ).find(
+-				'button'
+-			);
++		it( 'should render a button element with is-secondary and is-small class', () => {
++			const button = shallow(
++				<Button variant="secondary" isSmall />
++			).find( 'button' );
+ 			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
+ 			expect( button.hasClass( 'is-large' ) ).toBe( false );
+ 			expect( button.hasClass( 'is-small' ) ).toBe( true );
+ 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
+ 		} );
+ 
++		it( 'should render a button element with is-tertiary class', () => {
++			const button = shallow( <Button variant="tertiary" /> ).find(
++				'button'
++			);
++			expect( button.hasClass( 'is-large' ) ).toBe( false );
++			expect( button.hasClass( 'is-primary' ) ).toBe( false );
++			expect( button.hasClass( 'is-secondary' ) ).toBe( false );
++			expect( button.hasClass( 'is-tertiary' ) ).toBe( true );
++		} );
++
++		it( 'should render a button element with is-link class', () => {
++			const button = shallow( <Button variant="link" /> ).find(
++				'button'
++			);
++			expect( button.hasClass( 'is-primary' ) ).toBe( false );
++			expect( button.hasClass( 'is-secondary' ) ).toBe( false );
++			expect( button.hasClass( 'is-tertiary' ) ).toBe( false );
++			expect( button.hasClass( 'is-link' ) ).toBe( true );
++		} );
++
+ 		it( 'should render a button element with is-pressed without button class', () => {
+ 			const button = shallow( <Button isPressed /> ).find( 'button' );
+ 			expect( button.hasClass( 'is-pressed' ) ).toBe( true );
+@@ -230,4 +252,33 @@ describe( 'Button', () => {
+ 			expect( ref.current.type ).toBe( 'button' );
+ 		} );
+ 	} );
++
++	describe( 'deprecated props', () => {
++		it( 'should not break when the legacy isPrimary prop is passed', () => {
++			const button = shallow( <Button isPrimary /> ).find( 'button' );
++			expect( button.hasClass( 'is-primary' ) ).toBe( true );
++		} );
++
++		it( 'should not break when the legacy isSecondary prop is passed', () => {
++			const button = shallow( <Button isSecondary /> ).find( 'button' );
++			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
++		} );
++
++		it( 'should not break when the legacy isTertiary prop is passed', () => {
++			const button = shallow( <Button isTertiary /> ).find( 'button' );
++			expect( button.hasClass( 'is-tertiary' ) ).toBe( true );
++		} );
++
++		it( 'should not break when the legacy isLink prop is passed', () => {
++			const button = shallow( <Button isLink /> ).find( 'button' );
++			expect( button.hasClass( 'is-link' ) ).toBe( true );
++		} );
++
++		it( 'should warn when the isDefault prop is passed', () => {
++			const button = shallow( <Button isDefault /> ).find( 'button' );
++			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
++
++			expect( console ).toHaveWarned();
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/card/stories/footer.js b/packages/components/src/card/stories/footer.js
+index 00d622cde4b34d..50e461aae8347f 100644
+--- a/packages/components/src/card/stories/footer.js
++++ b/packages/components/src/card/stories/footer.js
+@@ -36,7 +36,7 @@ export const alignment = () => {
+ 			<CardFooter isShady={ isShady }>
+ 				<FlexBlock>{ content }</FlexBlock>
+ 				<FlexItem>
+-					<Button isPrimary>Action</Button>
++					<Button variant="primary">Action</Button>
+ 				</FlexItem>
+ 			</CardFooter>
+ 		</Card>
+diff --git a/packages/components/src/card/stories/header.js b/packages/components/src/card/stories/header.js
+index 0a2027c532db7e..63d37f7bc0514b 100644
+--- a/packages/components/src/card/stories/header.js
++++ b/packages/components/src/card/stories/header.js
+@@ -36,7 +36,7 @@ export const alignment = () => {
+ 			<CardHeader isShady={ isShady }>
+ 				<FlexBlock>{ content }</FlexBlock>
+ 				<FlexItem>
+-					<Button isPrimary>Action</Button>
++					<Button variant="primary">Action</Button>
+ 				</FlexItem>
+ 			</CardHeader>
+ 		</Card>
+diff --git a/packages/components/src/circular-option-picker/index.js b/packages/components/src/circular-option-picker/index.js
+index 3da049b5f0bda3..a259d0eb97dceb 100644
+--- a/packages/components/src/circular-option-picker/index.js
++++ b/packages/components/src/circular-option-picker/index.js
+@@ -66,7 +66,7 @@ function DropdownLinkAction( {
+ 					aria-expanded={ isOpen }
+ 					aria-haspopup="true"
+ 					onClick={ onToggle }
+-					isLink
++					variant="link"
+ 					{ ...buttonProps }
+ 				>
+ 					{ linkText }
+@@ -85,7 +85,7 @@ function ButtonAction( { className, children, ...additionalProps } ) {
+ 				className
+ 			) }
+ 			isSmall
+-			isSecondary
++			variant="secondary"
+ 			{ ...additionalProps }
+ 		>
+ 			{ children }
+diff --git a/packages/components/src/clipboard-button/README.md b/packages/components/src/clipboard-button/README.md
+index 1244de821a04e2..1789278b3a1ab6 100644
+--- a/packages/components/src/clipboard-button/README.md
++++ b/packages/components/src/clipboard-button/README.md
+@@ -14,7 +14,7 @@ const MyClipboardButton = withState( {
+ 	hasCopied: false,
+ } )( ( { hasCopied, setState } ) => (
+ 	<ClipboardButton
+-		isPrimary
++		variant="primary"
+ 		text="Text to be copied."
+ 		onCopy={ () => setState( { hasCopied: true } ) }
+ 		onFinishCopy={ () => setState( { hasCopied: false } ) }
+diff --git a/packages/components/src/color-edit/index.js b/packages/components/src/color-edit/index.js
+index 31b49ad1454b33..85926eddbe69b3 100644
+--- a/packages/components/src/color-edit/index.js
++++ b/packages/components/src/color-edit/index.js
+@@ -136,7 +136,7 @@ function ColorOption( {
+ 									onConfirm();
+ 								}
+ 							} }
+-							isPrimary
++							variant="primary"
+ 						>
+ 							{ confirmLabel }
+ 						</Button>
+@@ -314,7 +314,7 @@ export default function ColorEdit( {
+ 				{ !! canReset && (
+ 					<Button
+ 						isSmall
+-						isSecondary
++						variant="secondary"
+ 						className="components-color-edit__reset-button"
+ 						onClick={ () => onChange() }
+ 					>
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.js.snap b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+index 1db3cdb27938f3..7bf8892b02e943 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+@@ -116,8 +116,8 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
+       aria-expanded={false}
+       aria-haspopup="true"
+       aria-label="Custom color picker"
+-      isLink={true}
+       onClick={[Function]}
++      variant="link"
+     >
+       <button
+         aria-describedby={null}
+@@ -550,8 +550,8 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                 aria-expanded={false}
+                 aria-haspopup="true"
+                 aria-label="Custom color picker"
+-                isLink={true}
+                 onClick={[Function]}
++                variant="link"
+               >
+                 <button
+                   aria-describedby={null}
+@@ -573,9 +573,9 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+         >
+           <ForwardRef(Button)
+             className="components-circular-option-picker__clear"
+-            isSecondary={true}
+             isSmall={true}
+             onClick={[Function]}
++            variant="secondary"
+           >
+             <button
+               aria-describedby={null}
+diff --git a/packages/components/src/custom-gradient-bar/control-points.js b/packages/components/src/custom-gradient-bar/control-points.js
+index 5bec42a2f2ae6c..0fc6076dd4e356 100644
+--- a/packages/components/src/custom-gradient-bar/control-points.js
++++ b/packages/components/src/custom-gradient-bar/control-points.js
+@@ -249,7 +249,7 @@ function ControlPoints( {
+ 										);
+ 										onClose();
+ 									} }
+-									isLink
++									variant="link"
+ 								>
+ 									{ __( 'Remove Control Point' ) }
+ 								</Button>
+diff --git a/packages/components/src/date-time/index.js b/packages/components/src/date-time/index.js
+index f433011786379f..603bf1dafd0bf4 100644
+--- a/packages/components/src/date-time/index.js
++++ b/packages/components/src/date-time/index.js
+@@ -146,7 +146,7 @@ function DateTimePicker(
+ 				{ ! calendarHelpIsVisible && currentDate && (
+ 					<Button
+ 						className="components-datetime__date-reset-button"
+-						isLink
++						variant="link"
+ 						onClick={ () => onChange( null ) }
+ 					>
+ 						{ __( 'Reset' ) }
+@@ -154,7 +154,7 @@ function DateTimePicker(
+ 				) }
+ 				<Button
+ 					className="components-datetime__date-help-toggle"
+-					isLink
++					variant="link"
+ 					onClick={ onClickDescriptionToggle }
+ 				>
+ 					{ calendarHelpIsVisible
+diff --git a/packages/components/src/date-time/time.js b/packages/components/src/date-time/time.js
+index de10573f992524..9063a6011a3357 100644
+--- a/packages/components/src/date-time/time.js
++++ b/packages/components/src/date-time/time.js
+@@ -261,16 +261,18 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
+ 					{ is12Hour && (
+ 						<ButtonGroup className="components-datetime__time-field components-datetime__time-field-am-pm">
+ 							<Button
+-								isPrimary={ am === 'AM' }
+-								isSecondary={ am !== 'AM' }
++								variant={
++									am === 'AM' ? 'primary' : 'secondary'
++								}
+ 								onClick={ updateAmPm( 'AM' ) }
+ 								className="components-datetime__time-am-button"
+ 							>
+ 								{ __( 'AM' ) }
+ 							</Button>
+ 							<Button
+-								isPrimary={ am === 'PM' }
+-								isSecondary={ am !== 'PM' }
++								variant={
++									am === 'PM' ? 'primary' : 'secondary'
++								}
+ 								onClick={ updateAmPm( 'PM' ) }
+ 								className="components-datetime__time-pm-button"
+ 							>
+diff --git a/packages/components/src/disabled/README.md b/packages/components/src/disabled/README.md
+index 46d8bc45835308..e5bb9a96f2e87e 100644
+--- a/packages/components/src/disabled/README.md
++++ b/packages/components/src/disabled/README.md
+@@ -25,7 +25,7 @@ const MyDisabled = withState( {
+ 	return (
+ 		<div>
+ 			{ input }
+-			<Button isPrimary onClick={ toggleDisabled }>
++			<Button variant="primary" onClick={ toggleDisabled }>
+ 				Toggle Disabled
+ 			</Button>
+ 		</div>
+diff --git a/packages/components/src/disabled/stories/index.js b/packages/components/src/disabled/stories/index.js
+index fb994153c1037c..fd90126d42fe6f 100644
+--- a/packages/components/src/disabled/stories/index.js
++++ b/packages/components/src/disabled/stories/index.js
+@@ -53,7 +53,7 @@ export const DisabledWithProp = () => {
+ 			<Disabled isDisabled={ isDisabled }>
+ 				<Form />
+ 			</Disabled>
+-			<Button isPrimary onClick={ toggleDisabled }>
++			<Button variant="primary" onClick={ toggleDisabled }>
+ 				Set isDisabled to { isDisabled ? 'false' : 'true' }
+ 			</Button>
+ 		</div>
+diff --git a/packages/components/src/dropdown/README.md b/packages/components/src/dropdown/README.md
+index d3d515c0ce8656..3558015b08b323 100644
+--- a/packages/components/src/dropdown/README.md
++++ b/packages/components/src/dropdown/README.md
+@@ -15,7 +15,11 @@ const MyDropdown = () => (
+ 		contentClassName="my-popover-content-classname"
+ 		position="bottom right"
+ 		renderToggle={ ( { isOpen, onToggle } ) => (
+-			<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
++			<Button
++				variant="primary"
++				onClick={ onToggle }
++				aria-expanded={ isOpen }
++			>
+ 				Toggle Popover!
+ 			</Button>
+ 		) }
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 5a1080c8d8b523..9acb94e06890de 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -139,7 +139,7 @@ function FontSizePicker(
+ 						onChange( undefined );
+ 					} }
+ 					isSmall
+-					isSecondary
++					variant="secondary"
+ 				>
+ 					{ __( 'Reset' ) }
+ 				</Button>
+diff --git a/packages/components/src/guide/stories/index.js b/packages/components/src/guide/stories/index.js
+index 3d6b6fb551359c..cae514e84107ad 100644
+--- a/packages/components/src/guide/stories/index.js
++++ b/packages/components/src/guide/stories/index.js
+@@ -28,7 +28,7 @@ const ModalExample = ( { numberOfPages, ...props } ) => {
+ 
+ 	return (
+ 		<>
+-			<Button isSecondary onClick={ openGuide }>
++			<Button variant="secondary" onClick={ openGuide }>
+ 				Open Guide
+ 			</Button>
+ 			{ isOpen && (
+diff --git a/packages/components/src/higher-order/with-constrained-tabbing/README.md b/packages/components/src/higher-order/with-constrained-tabbing/README.md
+index 5cbb5b6acaba77..a5b57f25aa7450 100644
+--- a/packages/components/src/higher-order/with-constrained-tabbing/README.md
++++ b/packages/components/src/higher-order/with-constrained-tabbing/README.md
+@@ -40,7 +40,7 @@ const MyComponentWithConstrainedTabbing = withState( {
+ 	return (
+ 		<div>
+ 			{ form }
+-			<Button isSecondary onClick={ toggleConstrain }>
++			<Button variant="secondary" onClick={ toggleConstrain }>
+ 				{ isConstrainedTabbing ? 'Disable' : 'Enable' } constrain
+ 				tabbing
+ 			</Button>
+diff --git a/packages/components/src/higher-order/with-fallback-styles/README.md b/packages/components/src/higher-order/with-fallback-styles/README.md
+index ba583e42013f16..1ac16ad7c72be5 100644
+--- a/packages/components/src/higher-order/with-fallback-styles/README.md
++++ b/packages/components/src/higher-order/with-fallback-styles/README.md
+@@ -18,7 +18,7 @@ const MyComponentWithFallbackStyles = withFallbackStyles(
+ 	}
+ )( ( { fallbackTextColor, fallbackBackgroundColor } ) => (
+ 	<div>
+-		<Button isPrimary>My button</Button>
++		<Button variant="primary">My button</Button>
+ 		<div>Text color: { fallbackTextColor }</div>
+ 		<div>Background color: { fallbackBackgroundColor }</div>
+ 	</div>
+diff --git a/packages/components/src/higher-order/with-focus-return/README.md b/packages/components/src/higher-order/with-focus-return/README.md
+index 0efff07c2dbdba..c219b84000f57c 100644
+--- a/packages/components/src/higher-order/with-focus-return/README.md
++++ b/packages/components/src/higher-order/with-focus-return/README.md
+@@ -34,7 +34,7 @@ const MyComponentWithFocusReturn = withState( {
+ 			/>
+ 			{ text && <EnhancedComponent /> }
+ 			{ text && (
+-				<Button isSecondary onClick={ unmount }>
++				<Button variant="secondary" onClick={ unmount }>
+ 					Unmount
+ 				</Button>
+ 			) }
+diff --git a/packages/components/src/higher-order/with-notices/README.md b/packages/components/src/higher-order/with-notices/README.md
+index b40f19a6031c16..84c484eba101b2 100644
+--- a/packages/components/src/higher-order/with-notices/README.md
++++ b/packages/components/src/higher-order/with-notices/README.md
+@@ -46,7 +46,7 @@ const MyComponentWithNotices = withNotices(
+ 		return (
+ 			<div>
+ 				{ noticeUI }
+-				<Button isSecondary onClick={ addError }>
++				<Button variant="secondary" onClick={ addError }>
+ 					Add error
+ 				</Button>
+ 			</div>
+diff --git a/packages/components/src/higher-order/with-spoken-messages/README.md b/packages/components/src/higher-order/with-spoken-messages/README.md
+index 568c47bf3a3573..6142b0438b08f3 100644
+--- a/packages/components/src/higher-order/with-spoken-messages/README.md
++++ b/packages/components/src/higher-order/with-spoken-messages/README.md
+@@ -8,11 +8,14 @@ import { withSpokenMessages, Button } from '@wordpress/components';
+ const MyComponentWithSpokenMessages = withSpokenMessages(
+ 	( { speak, debouncedSpeak } ) => (
+ 		<div>
+-			<Button isSecondary onClick={ () => speak( 'Spoken message' ) }>
++			<Button
++				variant="secondary"
++				onClick={ () => speak( 'Spoken message' ) }
++			>
+ 				Speak
+ 			</Button>
+ 			<Button
+-				isSecondary
++				variant="secondary"
+ 				onClick={ () => debouncedSpeak( 'Delayed message' ) }
+ 			>
+ 				Debounced Speak
+diff --git a/packages/components/src/modal/README.md b/packages/components/src/modal/README.md
+index f3979663f78bde..25cf81e6b81044 100644
+--- a/packages/components/src/modal/README.md
++++ b/packages/components/src/modal/README.md
+@@ -130,12 +130,12 @@ const MyModal = () => {
+ 
+ 	return (
+ 		<>
+-			<Button isSecondary onClick={ openModal }>
++			<Button variant="secondary" onClick={ openModal }>
+ 				Open Modal
+ 			</Button>
+ 			{ isOpen && (
+ 				<Modal title="This is my modal" onRequestClose={ closeModal }>
+-					<Button isSecondary onClick={ closeModal }>
++					<Button variant="secondary" onClick={ closeModal }>
+ 						My custom close button
+ 					</Button>
+ 				</Modal>
+diff --git a/packages/components/src/modal/stories/index.js b/packages/components/src/modal/stories/index.js
+index 1d6b4acc48d0be..6204051960e2b1 100644
+--- a/packages/components/src/modal/stories/index.js
++++ b/packages/components/src/modal/stories/index.js
+@@ -24,12 +24,12 @@ const ModalExample = ( props ) => {
+ 
+ 	return (
+ 		<>
+-			<Button isSecondary onClick={ openModal }>
++			<Button variant="secondary" onClick={ openModal }>
+ 				Open Modal
+ 			</Button>
+ 			{ isOpen && (
+ 				<Modal { ...props } onRequestClose={ closeModal }>
+-					<Button isSecondary onClick={ closeModal }>
++					<Button variant="secondary" onClick={ closeModal }>
+ 						Close Modal
+ 					</Button>
+ 				</Modal>
+diff --git a/packages/components/src/navigable-container/README.md b/packages/components/src/navigable-container/README.md
+index f513a43b2b3d80..25a795c1ec0c7d 100644
+--- a/packages/components/src/navigable-container/README.md
++++ b/packages/components/src/navigable-container/README.md
+@@ -60,23 +60,23 @@ const MyNavigableContainer = () => (
+ 	<div>
+ 		<span>Navigable Menu:</span>
+ 		<NavigableMenu onNavigate={ onNavigate } orientation="horizontal">
+-			<Button isSecondary>Item 1</Button>
+-			<Button isSecondary>Item 2</Button>
+-			<Button isSecondary>Item 3</Button>
++			<Button variant="secondary">Item 1</Button>
++			<Button variant="secondary">Item 2</Button>
++			<Button variant="secondary">Item 3</Button>
+ 		</NavigableMenu>
+ 
+ 		<span>Tabbable Container:</span>
+ 		<TabbableContainer onNavigate={ onNavigate }>
+-			<Button isSecondary tabIndex="0">
++			<Button variant="secondary" tabIndex="0">
+ 				Section 1
+ 			</Button>
+-			<Button isSecondary tabIndex="0">
++			<Button variant="secondary" tabIndex="0">
+ 				Section 2
+ 			</Button>
+-			<Button isSecondary tabIndex="0">
++			<Button variant="secondary" tabIndex="0">
+ 				Section 3
+ 			</Button>
+-			<Button isSecondary tabIndex="0">
++			<Button variant="secondary" tabIndex="0">
+ 				Section 4
+ 			</Button>
+ 		</TabbableContainer>
+diff --git a/packages/components/src/navigation/back-button/index.js b/packages/components/src/navigation/back-button/index.js
+index c52932bb8e8624..5912e104d2cbb7 100644
+--- a/packages/components/src/navigation/back-button/index.js
++++ b/packages/components/src/navigation/back-button/index.js
+@@ -43,7 +43,7 @@ function NavigationBackButton(
+ 		<MenuBackButtonUI
+ 			className={ classes }
+ 			href={ href }
+-			isTertiary
++			variant="tertiary"
+ 			ref={ ref }
+ 			onClick={ handleOnClick }
+ 		>
+diff --git a/packages/components/src/navigation/menu/menu-title-search.js b/packages/components/src/navigation/menu/menu-title-search.js
+index 02b87e8b089f14..8af2f4635990dc 100644
+--- a/packages/components/src/navigation/menu/menu-title-search.js
++++ b/packages/components/src/navigation/menu/menu-title-search.js
+@@ -100,7 +100,7 @@ function MenuTitleSearch( {
+ 
+ 			<Button
+ 				isSmall
+-				isTertiary
++				variant="tertiary"
+ 				label={ __( 'Close search' ) }
+ 				onClick={ onClose }
+ 			>
+diff --git a/packages/components/src/navigation/menu/menu-title.js b/packages/components/src/navigation/menu/menu-title.js
+index 2cb860c2758d37..ca4f6bfd9177bb 100644
+--- a/packages/components/src/navigation/menu/menu-title.js
++++ b/packages/components/src/navigation/menu/menu-title.js
+@@ -65,7 +65,7 @@ export default function NavigationMenuTitle( {
+ 							{ hasSearch && (
+ 								<Button
+ 									isSmall
+-									isTertiary
++									variant="tertiary"
+ 									label={ searchButtonLabel }
+ 									onClick={ () => setIsSearching( true ) }
+ 									ref={ searchButtonRef }
+diff --git a/packages/components/src/navigation/stories/controlled-state.js b/packages/components/src/navigation/stories/controlled-state.js
+index c4aa3aedf02711..ddb4d18f891361 100644
+--- a/packages/components/src/navigation/stories/controlled-state.js
++++ b/packages/components/src/navigation/stories/controlled-state.js
+@@ -102,7 +102,7 @@ export function ControlledStateStory() {
+ 				</p>
+ 				<p>
+ 					<Button
+-						isSecondary
++						variant="secondary"
+ 						onClick={ () => {
+ 							setActiveMenu( 'nested-sub-menu' );
+ 						} }
+@@ -112,7 +112,7 @@ export function ControlledStateStory() {
+ 				</p>
+ 				<p>
+ 					<Button
+-						isSecondary
++						variant="secondary"
+ 						onClick={ () => {
+ 							setActiveItem( 'child-2' );
+ 							setActiveMenu( 'sub-menu' );
+diff --git a/packages/components/src/notice/README.md b/packages/components/src/notice/README.md
+index 4c920f127c0038..418da933749292 100644
+--- a/packages/components/src/notice/README.md
++++ b/packages/components/src/notice/README.md
+@@ -107,7 +107,7 @@ The following props are used to control the behavior of the component.
+     -   A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
+     -   A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
+ -   `isDismissible`: (boolean) defaults to true, whether the notice should be dismissible or not
+--   `actions`: (array) an array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function. A `className` property can be used to add custom classes to the button styles. The default appearance of the button is inferred based on whether `url` or `onClick` are provided, rendering the button as a link if appropriate. A `noDefaultClasses` property value of `true` will remove all default styling. You can denote a primary button action for a notice by assigning a `isPrimary` value of `true`.
++-   `actions`: (array) an array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function. A `className` property can be used to add custom classes to the button styles. The default appearance of the button is inferred based on whether `url` or `onClick` are provided, rendering the button as a link if appropriate. A `noDefaultClasses` property value of `true` will remove all default styling. You can denote a primary button action for a notice by passing the `variant` property with a value of `primary`.
+ 
+ ## Related components
+ 
+diff --git a/packages/components/src/notice/index.js b/packages/components/src/notice/index.js
+index 4a2851b814f1de..9ef46235cfe55c 100644
+--- a/packages/components/src/notice/index.js
++++ b/packages/components/src/notice/index.js
+@@ -95,19 +95,29 @@ function Notice( {
+ 								className: buttonCustomClasses,
+ 								label,
+ 								isPrimary,
++								variant,
+ 								noDefaultClasses = false,
+ 								onClick,
+ 								url,
+ 							},
+ 							index
+ 						) => {
++							let computedVariant = variant;
++							if ( variant !== 'primary' && ! noDefaultClasses ) {
++								computedVariant = ! url ? 'secondary' : 'link';
++							}
++							if (
++								typeof computedVariant === 'undefined' &&
++								isPrimary
++							) {
++								computedVariant = 'primary';
++							}
++
+ 							return (
+ 								<Button
+ 									key={ index }
+ 									href={ url }
+-									isPrimary={ isPrimary }
+-									isSecondary={ ! noDefaultClasses && ! url }
+-									isLink={ ! noDefaultClasses && !! url }
++									variant={ computedVariant }
+ 									onClick={ url ? undefined : onClick }
+ 									className={ classnames(
+ 										'components-notice__action',
+diff --git a/packages/components/src/notice/test/__snapshots__/index.js.snap b/packages/components/src/notice/test/__snapshots__/index.js.snap
+index 0008b43de3a6d1..edf90602a9cee0 100644
+--- a/packages/components/src/notice/test/__snapshots__/index.js.snap
++++ b/packages/components/src/notice/test/__snapshots__/index.js.snap
+@@ -14,25 +14,21 @@ exports[`Notice should match snapshot 1`] = `
+       <ForwardRef(Button)
+         className="components-notice__action"
+         href="https://example.com"
+-        isLink={true}
+-        isSecondary={false}
++        variant="link"
+       >
+         More information
+       </ForwardRef(Button)>
+       <ForwardRef(Button)
+         className="components-notice__action"
+-        isLink={false}
+-        isSecondary={true}
+         onClick={[Function]}
++        variant="secondary"
+       >
+         Cancel
+       </ForwardRef(Button)>
+       <ForwardRef(Button)
+         className="components-notice__action"
+-        isLink={false}
+-        isPrimary={true}
+-        isSecondary={true}
+         onClick={[Function]}
++        variant="primary"
+       >
+         Submit
+       </ForwardRef(Button)>
+diff --git a/packages/components/src/notice/test/index.js b/packages/components/src/notice/test/index.js
+index 07841f8c5dc737..8f744ef3acb233 100644
+--- a/packages/components/src/notice/test/index.js
++++ b/packages/components/src/notice/test/index.js
+@@ -31,7 +31,7 @@ describe( 'Notice', () => {
+ 				actions={ [
+ 					{ label: 'More information', url: 'https://example.com' },
+ 					{ label: 'Cancel', onClick() {} },
+-					{ label: 'Submit', onClick() {}, isPrimary: true },
++					{ label: 'Submit', onClick() {}, variant: 'primary' },
+ 				] }
+ 			>
+ 				Example
+diff --git a/packages/components/src/placeholder/style.scss b/packages/components/src/placeholder/style.scss
+index 68022377dcc582..0958bb5a0b16c1 100644
+--- a/packages/components/src/placeholder/style.scss
++++ b/packages/components/src/placeholder/style.scss
+@@ -1,4 +1,5 @@
+-.components-placeholder.components-placeholder { // This needs specificity to override individual block styles.
++// This needs specificity to override individual block styles.
++.components-placeholder.components-placeholder {
+ 	box-sizing: border-box;
+ 	position: relative;
+ 	padding: 1em;
+@@ -106,9 +107,9 @@
+ 	}
+ }
+ 
+-// Any `<Button />` component with `isLink` prop will need extra spacing if placed
+-// immediately after a button which is *not* an `isLink` style button. This is because
+-// `isLink` has no padding so we need to account for this to avoid the buttons butting
++// Any `<Button />` component with `variant="link"` prop will need extra spacing if placed
++// immediately after a button which is *not* an `variant="link"` style button. This is because
++// `variant="link"` has no padding so we need to account for this to avoid the buttons butting
+ // up against each other. If it's the last item we don't need a right margin.
+ .components-placeholder__fieldset .components-button:not(.is-link) ~ .components-button.is-link {
+ 	margin-left: 10px; // equal to standard button inner padding
+@@ -121,7 +122,6 @@
+ 
+ // Element queries to show different layouts at various sizes.
+ .components-placeholder {
+-
+ 	// Medium and large sizes.
+ 	&.is-large {
+ 		.components-placeholder__label {
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index afb70fc9754aab..2518f35ea8bd3c 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -17,7 +17,7 @@ const MyPopover = withState( {
+ 		setState( ( state ) => ( { isVisible: ! state.isVisible } ) );
+ 	};
+ 	return (
+-		<Button isSecondary onClick={ toggleVisible }>
++		<Button variant="secondary" onClick={ toggleVisible }>
+ 			Toggle Popover!
+ 			{ isVisible && <Popover>Popover is toggled!</Popover> }
+ 		</Button>
+diff --git a/packages/components/src/popover/stories/index.js b/packages/components/src/popover/stories/index.js
+index 5fc1c09b278b3a..3986a5bad8ec4e 100644
+--- a/packages/components/src/popover/stories/index.js
++++ b/packages/components/src/popover/stories/index.js
+@@ -118,7 +118,7 @@ function DynamicHeightPopover() {
+ 		<div style={ { padding: '20px' } }>
+ 			<div>
+ 				<Button
+-					isPrimary
++					variant="primary"
+ 					onClick={ increase }
+ 					style={ {
+ 						marginRight: '20px',
+@@ -127,7 +127,7 @@ function DynamicHeightPopover() {
+ 					Increase Size
+ 				</Button>
+ 
+-				<Button isPrimary onClick={ decrease }>
++				<Button variant="primary" onClick={ decrease }>
+ 					Decrease Size
+ 				</Button>
+ 			</div>
+diff --git a/packages/components/src/radio/index.js b/packages/components/src/radio/index.js
+index 6d7305002e3fce..d7bdefbe608c9b 100644
+--- a/packages/components/src/radio/index.js
++++ b/packages/components/src/radio/index.js
+@@ -22,8 +22,7 @@ function Radio( { children, value, ...props }, ref ) {
+ 		<ReakitRadio
+ 			ref={ ref }
+ 			as={ Button }
+-			isPrimary={ checked }
+-			isSecondary={ ! checked }
++			variant={ checked ? 'primary' : 'secondary' }
+ 			value={ value }
+ 			{ ...radioContext }
+ 			{ ...props }
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index bec2cdd8783fd2..f15cd7b5b54784 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -288,7 +288,7 @@ function RangeControl(
+ 						<Button
+ 							className="components-range-control__reset"
+ 							disabled={ disabled || value === undefined }
+-							isSecondary
++							variant="secondary"
+ 							isSmall
+ 							onClick={ handleOnReset }
+ 						>
+diff --git a/packages/components/src/scroll-lock/README.md b/packages/components/src/scroll-lock/README.md
+index cdafa3dc415ada..f3912df94eb645 100644
+--- a/packages/components/src/scroll-lock/README.md
++++ b/packages/components/src/scroll-lock/README.md
+@@ -18,7 +18,7 @@ const MyScrollLock = withState( {
+ 	};
+ 	return (
+ 		<div>
+-			<Button isSecondary onClick={ toggleLock }>
++			<Button variant="secondary" onClick={ toggleLock }>
+ 				Toggle scroll lock
+ 			</Button>
+ 			{ isScrollLocked && <ScrollLock /> }
+diff --git a/packages/components/src/scroll-lock/stories/index.js b/packages/components/src/scroll-lock/stories/index.js
+index ead007d69a9287..9a9de3584e465c 100644
+--- a/packages/components/src/scroll-lock/stories/index.js
++++ b/packages/components/src/scroll-lock/stories/index.js
+@@ -19,7 +19,7 @@ const Example = () => {
+ 		<StripedBackground>
+ 			<div>Start scrolling down...</div>
+ 			<ToggleContainer>
+-				<Button isSecondary onClick={ toggleLock }>
++				<Button variant="secondary" onClick={ toggleLock }>
+ 					Toggle Scroll Lock
+ 				</Button>
+ 				{ isScrollLocked && <ScrollLock /> }
+diff --git a/packages/components/src/snackbar/index.js b/packages/components/src/snackbar/index.js
+index 84f78aee2ffd9a..30633e879120c4 100644
+--- a/packages/components/src/snackbar/index.js
++++ b/packages/components/src/snackbar/index.js
+@@ -130,7 +130,7 @@ function Snackbar(
+ 						<Button
+ 							key={ index }
+ 							href={ url }
+-							isTertiary
++							variant="tertiary"
+ 							onClick={ ( event ) =>
+ 								onActionClick( event, onClick )
+ 							}
+diff --git a/packages/components/src/tree-grid/stories/index.js b/packages/components/src/tree-grid/stories/index.js
+index ec79dfc60ffc35..e32690c45832cd 100644
+--- a/packages/components/src/tree-grid/stories/index.js
++++ b/packages/components/src/tree-grid/stories/index.js
+@@ -65,7 +65,7 @@ const Rows = ( { items, level = 1 } ) => {
+ 						{ ( props ) => (
+ 							<>
+ 								<Descender level={ level } />
+-								<Button isPrimary { ...props }>
++								<Button variant="primary" { ...props }>
+ 									{ item.name }
+ 								</Button>
+ 							</>
+@@ -73,14 +73,14 @@ const Rows = ( { items, level = 1 } ) => {
+ 					</TreeGridCell>
+ 					<TreeGridCell>
+ 						{ ( props ) => (
+-							<Button isSecondary { ...props }>
++							<Button variant="secondary" { ...props }>
+ 								Move Up
+ 							</Button>
+ 						) }
+ 					</TreeGridCell>
+ 					<TreeGridCell>
+ 						{ ( props ) => (
+-							<Button isSecondary { ...props }>
++							<Button variant="secondary" { ...props }>
+ 								Move Down
+ 							</Button>
+ 						) }
+diff --git a/packages/customize-widgets/src/components/header/index.js b/packages/customize-widgets/src/components/header/index.js
+index 6143da620e3357..b23c75de1d7ed6 100644
+--- a/packages/customize-widgets/src/components/header/index.js
++++ b/packages/customize-widgets/src/components/header/index.js
+@@ -76,7 +76,7 @@ function Header( {
+ 					<ToolbarButton
+ 						className="customize-widgets-header-toolbar__inserter-toggle"
+ 						isPressed={ isInserterOpened }
+-						isPrimary
++						variant="primary"
+ 						icon={ plus }
+ 						label={ _x(
+ 							'Add block',
+diff --git a/packages/customize-widgets/src/components/welcome-guide/index.js b/packages/customize-widgets/src/components/welcome-guide/index.js
+index da07909e705ab9..0621e327c28d11 100644
+--- a/packages/customize-widgets/src/components/welcome-guide/index.js
++++ b/packages/customize-widgets/src/components/welcome-guide/index.js
+@@ -37,7 +37,7 @@ export default function WelcomeGuide( { sidebar } ) {
+ 			</p>
+ 			<Button
+ 				className="customize-widgets-welcome-guide__button"
+-				isPrimary
++				variant="primary"
+ 				onClick={ () => toggleFeature( 'welcomeGuide' ) }
+ 			>
+ 				{ __( 'Got it' ) }
+diff --git a/packages/e2e-tests/plugins/hooks-api/index.js b/packages/e2e-tests/plugins/hooks-api/index.js
+index 6429cfe35015d2..fbbfa27c471648 100644
+--- a/packages/e2e-tests/plugins/hooks-api/index.js
++++ b/packages/e2e-tests/plugins/hooks-api/index.js
+@@ -16,7 +16,7 @@
+ 				Button,
+ 				{
+ 					className: 'e2e-reset-block-button',
+-					isSecondary: true,
++					variant: "secondary",
+ 					isLarge: true,
+ 					onClick: function() {
+ 						var emptyBlock = createBlock( props.name );
+diff --git a/packages/e2e-tests/plugins/plugins-api/annotations-sidebar.js b/packages/e2e-tests/plugins/plugins-api/annotations-sidebar.js
+index 88ff01965f9762..f631c4e9373649 100644
+--- a/packages/e2e-tests/plugins/plugins-api/annotations-sidebar.js
++++ b/packages/e2e-tests/plugins/plugins-api/annotations-sidebar.js
+@@ -59,7 +59,7 @@
+ 				el(
+ 					Button,
+ 					{
+-						isPrimary: true,
++						variant: "primary",
+ 						onClick: () => {
+ 							dispatch( 'core/annotations' ).__experimentalAddAnnotation( {
+ 								source: 'e2e-tests',
+@@ -77,7 +77,7 @@
+ 				el(
+ 					Button,
+ 					{
+-						isPrimary: true,
++						variant: "primary",
+ 						onClick: () => {
+ 							dispatch( 'core/annotations' ).__experimentalRemoveAnnotationsBySource( 'e2e-tests' );
+ 						}
+diff --git a/packages/e2e-tests/plugins/plugins-api/sidebar.js b/packages/e2e-tests/plugins/plugins-api/sidebar.js
+index 0fc9ccd34f5d13..da6397196fb95f 100644
+--- a/packages/e2e-tests/plugins/plugins-api/sidebar.js
++++ b/packages/e2e-tests/plugins/plugins-api/sidebar.js
+@@ -42,7 +42,7 @@
+ 				el(
+ 					Button,
+ 					{
+-						isPrimary: true,
++						variant:"primary",
+ 						onClick: props.resetTitle,
+ 					},
+ 					__( 'Reset' )
+diff --git a/packages/edit-navigation/src/components/add-menu/index.js b/packages/edit-navigation/src/components/add-menu/index.js
+index 0e21f6cf045d96..9843b6a051b993 100644
+--- a/packages/edit-navigation/src/components/add-menu/index.js
++++ b/packages/edit-navigation/src/components/add-menu/index.js
+@@ -92,7 +92,7 @@ export default function AddMenu( {
+ 			<Button
+ 				className="edit-navigation-add-menu__create-menu-button"
+ 				type="submit"
+-				isPrimary
++				variant="primary"
+ 				disabled={ ! menuName.length }
+ 				isBusy={ isCreatingMenu }
+ 			>
+diff --git a/packages/edit-navigation/src/components/error-boundary/index.js b/packages/edit-navigation/src/components/error-boundary/index.js
+index d466e3e7c4acfc..bea03d909c380d 100644
+--- a/packages/edit-navigation/src/components/error-boundary/index.js
++++ b/packages/edit-navigation/src/components/error-boundary/index.js
+@@ -37,7 +37,11 @@ class ErrorBoundary extends Component {
+ 			<Warning
+ 				className="navigation-editor-error-boundary"
+ 				actions={ [
+-					<Button key="recovery" onClick={ this.reboot } isSecondary>
++					<Button
++						key="recovery"
++						onClick={ this.reboot }
++						variant="secondary"
++					>
+ 						{ __( 'Attempt Recovery' ) }
+ 					</Button>,
+ 				] }
+diff --git a/packages/edit-navigation/src/components/header/index.js b/packages/edit-navigation/src/components/header/index.js
+index 41177d5bded10e..c923caf5b17676 100644
+--- a/packages/edit-navigation/src/components/header/index.js
++++ b/packages/edit-navigation/src/components/header/index.js
+@@ -56,7 +56,7 @@ export default function Header( {
+ 								'Switch menu, or create a new menu'
+ 							),
+ 							showTooltip: false,
+-							isTertiary: true,
++							variant: 'tertiary',
+ 							disabled: ! menus?.length,
+ 							__experimentalIsFocusable: true,
+ 						} }
+diff --git a/packages/edit-navigation/src/components/header/save-button.js b/packages/edit-navigation/src/components/header/save-button.js
+index 0ab895f6746dec..ed255851a22ef1 100644
+--- a/packages/edit-navigation/src/components/header/save-button.js
++++ b/packages/edit-navigation/src/components/header/save-button.js
+@@ -28,7 +28,7 @@ export default function SaveButton( { navigationPost } ) {
+ 	return (
+ 		<Button
+ 			className="edit-navigation-toolbar__save-button"
+-			isPrimary
++			variant="primary"
+ 			onClick={ () => {
+ 				saveNavigationPost( navigationPost );
+ 			} }
+diff --git a/packages/edit-navigation/src/components/menu-switcher/index.js b/packages/edit-navigation/src/components/menu-switcher/index.js
+index 5830b74dc02ee1..68162e433a7d63 100644
+--- a/packages/edit-navigation/src/components/menu-switcher/index.js
++++ b/packages/edit-navigation/src/components/menu-switcher/index.js
+@@ -47,7 +47,7 @@ export default function MenuSwitcher( {
+ 				/>
+ 			</MenuGroup>
+ 			<MenuGroup hideSeparator>
+-				<MenuItem isPrimary onClick={ openModal }>
++				<MenuItem variant="primary" onClick={ openModal }>
+ 					{ __( 'Create a new menu' ) }
+ 				</MenuItem>
+ 				{ isModalVisible && (
+diff --git a/packages/edit-navigation/src/components/sidebar/delete-menu.js b/packages/edit-navigation/src/components/sidebar/delete-menu.js
+index 717279419a5958..c6008bada77051 100644
+--- a/packages/edit-navigation/src/components/sidebar/delete-menu.js
++++ b/packages/edit-navigation/src/components/sidebar/delete-menu.js
+@@ -9,7 +9,7 @@ export default function DeleteMenu( { onDeleteMenu, isMenuBeingDeleted } ) {
+ 		<PanelBody>
+ 			<Button
+ 				className="edit-navigation-inspector-additions__delete-menu-button"
+-				isSecondary
++				variant="secondary"
+ 				isDestructive
+ 				isBusy={ isMenuBeingDeleted }
+ 				onClick={ () => {
+diff --git a/packages/edit-navigation/src/components/sidebar/manage-locations.js b/packages/edit-navigation/src/components/sidebar/manage-locations.js
+index b2bb9e8d1eb136..9058e2332e02eb 100644
+--- a/packages/edit-navigation/src/components/sidebar/manage-locations.js
++++ b/packages/edit-navigation/src/components/sidebar/manage-locations.js
+@@ -115,7 +115,7 @@ export default function ManageLocations( {
+ 				} }
+ 			/>
+ 			<Button
+-				isSecondary
++				variant="secondary"
+ 				style={ {
+ 					visibility: !! menuLocation.menu ? 'visible' : 'hidden',
+ 				} }
+@@ -138,7 +138,7 @@ export default function ManageLocations( {
+ 				{ menusWithSelection }
+ 			</ul>
+ 			<Button
+-				isSecondary
++				variant="secondary"
+ 				className="edit-navigation-manage-locations__open-menu-locations-modal-button"
+ 				aria-expanded={ isModalOpen }
+ 				onClick={ openModal }
+diff --git a/packages/edit-post/src/components/header/header-toolbar/index.js b/packages/edit-post/src/components/header/header-toolbar/index.js
+index a7581187b71166..223ca61be67d1a 100644
+--- a/packages/edit-post/src/components/header/header-toolbar/index.js
++++ b/packages/edit-post/src/components/header/header-toolbar/index.js
+@@ -80,7 +80,7 @@ function HeaderToolbar() {
+ 				hasOutlineItemsDisabled={ isTextModeEnabled }
+ 				repositionDropdown={ showIconLabels && ! isWideViewport }
+ 				showTooltip={ ! showIconLabels }
+-				isTertiary={ showIconLabels }
++				variant={ showIconLabels ? 'tertiary' : undefined }
+ 			/>
+ 			<ToolbarItem
+ 				as={ Button }
+@@ -107,7 +107,7 @@ function HeaderToolbar() {
+ 					ref={ inserterButton }
+ 					as={ Button }
+ 					className="edit-post-header-toolbar__inserter-toggle"
+-					isPrimary
++					variant="primary"
+ 					isPressed={ isInserterOpened }
+ 					onMouseDown={ ( event ) => {
+ 						event.preventDefault();
+@@ -138,19 +138,21 @@ function HeaderToolbar() {
+ 							<ToolbarItem
+ 								as={ ToolSelector }
+ 								showTooltip={ ! showIconLabels }
+-								isTertiary={ showIconLabels }
++								variant={
++									showIconLabels ? 'tertiary' : undefined
++								}
+ 								disabled={ isTextModeEnabled }
+ 							/>
+ 						) }
+ 						<ToolbarItem
+ 							as={ EditorHistoryUndo }
+ 							showTooltip={ ! showIconLabels }
+-							isTertiary={ showIconLabels }
++							variant={ showIconLabels ? 'tertiary' : undefined }
+ 						/>
+ 						<ToolbarItem
+ 							as={ EditorHistoryRedo }
+ 							showTooltip={ ! showIconLabels }
+-							isTertiary={ showIconLabels }
++							variant={ showIconLabels ? 'tertiary' : undefined }
+ 						/>
+ 						{ overflowItems }
+ 					</>
+diff --git a/packages/edit-post/src/components/header/more-menu/index.js b/packages/edit-post/src/components/header/more-menu/index.js
+index 90b3ba3675832a..17b763b26f3749 100644
+--- a/packages/edit-post/src/components/header/more-menu/index.js
++++ b/packages/edit-post/src/components/header/more-menu/index.js
+@@ -35,7 +35,7 @@ const MoreMenu = ( { showIconLabels } ) => {
+ 			popoverProps={ POPOVER_PROPS }
+ 			toggleProps={ {
+ 				showTooltip: ! showIconLabels,
+-				isTertiary: showIconLabels,
++				...( showIconLabels && { variant: 'tertiary' } ),
+ 				...TOGGLE_PROPS,
+ 			} }
+ 		>
+diff --git a/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap
+index af117caedc07b9..9ffdb5a699ff04 100644
+--- a/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/header/more-menu/test/__snapshots__/index.js.snap
+@@ -23,7 +23,6 @@ exports[`MoreMenu should match snapshot 1`] = `
+     }
+     toggleProps={
+       Object {
+-        "isTertiary": undefined,
+         "showTooltip": true,
+         "tooltipPosition": "bottom",
+       }
+diff --git a/packages/edit-post/src/components/header/template-title/delete-template.js b/packages/edit-post/src/components/header/template-title/delete-template.js
+index 7a3f5d5c382073..7daf7da26aa4f3 100644
+--- a/packages/edit-post/src/components/header/template-title/delete-template.js
++++ b/packages/edit-post/src/components/header/template-title/delete-template.js
+@@ -46,8 +46,7 @@ export default function DeleteTemplate() {
+ 		<MenuGroup className="edit-post-template-top-area__second-menu-group">
+ 			<MenuItem
+ 				isDestructive
+-				isTertiary
+-				isLink
++				variant="tertiary"
+ 				aria-label={ __( 'Delete template' ) }
+ 				onClick={ () => {
+ 					if (
+diff --git a/packages/edit-post/src/components/header/template-title/index.js b/packages/edit-post/src/components/header/template-title/index.js
+index d3d95f8d30b494..9aa21c0f27121d 100644
+--- a/packages/edit-post/src/components/header/template-title/index.js
++++ b/packages/edit-post/src/components/header/template-title/index.js
+@@ -49,7 +49,7 @@ function TemplateTitle() {
+ 								<Button
+ 									{ ...toolbarItemHTMLProps }
+ 									isSmall
+-									isTertiary
++									variant="tertiary"
+ 									onClick={ onToggle }
+ 									aria-label={ __( 'Template Options' ) }
+ 								>
+diff --git a/packages/edit-post/src/components/layout/actions-panel.js b/packages/edit-post/src/components/layout/actions-panel.js
+index a5b61bafd5c007..3c5f708e27e773 100644
+--- a/packages/edit-post/src/components/layout/actions-panel.js
++++ b/packages/edit-post/src/components/layout/actions-panel.js
+@@ -65,7 +65,7 @@ export default function ActionsPanel( {
+ 		unmountableContent = (
+ 			<div className="edit-post-layout__toggle-entities-saved-states-panel">
+ 				<Button
+-					isSecondary
++					variant="secondary"
+ 					className="edit-post-layout__toggle-entities-saved-states-panel-button"
+ 					onClick={ openEntitiesSavedStates }
+ 					aria-expanded={ false }
+@@ -78,7 +78,7 @@ export default function ActionsPanel( {
+ 		unmountableContent = (
+ 			<div className="edit-post-layout__toggle-publish-panel">
+ 				<Button
+-					isSecondary
++					variant="secondary"
+ 					className="edit-post-layout__toggle-publish-panel-button"
+ 					onClick={ togglePublishSidebar }
+ 					aria-expanded={ false }
+diff --git a/packages/edit-post/src/components/layout/index.js b/packages/edit-post/src/components/layout/index.js
+index 21115811d75892..52457c93507d2e 100644
+--- a/packages/edit-post/src/components/layout/index.js
++++ b/packages/edit-post/src/components/layout/index.js
+@@ -203,7 +203,7 @@ function Layout( { styles } ) {
+ 							{ ! isMobileViewport && ! sidebarIsOpened && (
+ 								<div className="edit-post-layout__toggle-sidebar-panel">
+ 									<Button
+-										isSecondary
++										variant="secondary"
+ 										className="edit-post-layout__toggle-sidebar-panel-button"
+ 										onClick={ openSidebarPanel }
+ 										aria-expanded={ false }
+diff --git a/packages/edit-post/src/components/preferences-modal/options/enable-custom-fields.js b/packages/edit-post/src/components/preferences-modal/options/enable-custom-fields.js
+index 2c3ab867a3469b..ea0cf9817a100f 100644
+--- a/packages/edit-post/src/components/preferences-modal/options/enable-custom-fields.js
++++ b/packages/edit-post/src/components/preferences-modal/options/enable-custom-fields.js
+@@ -23,7 +23,7 @@ export function CustomFieldsConfirmation( { willEnable } ) {
+ 			</p>
+ 			<Button
+ 				className="edit-post-preferences-modal__custom-fields-confirmation-button"
+-				isSecondary
++				variant="secondary"
+ 				isBusy={ isReloading }
+ 				disabled={ isReloading }
+ 				onClick={ () => {
+diff --git a/packages/edit-post/src/components/sidebar/post-schedule/index.js b/packages/edit-post/src/components/sidebar/post-schedule/index.js
+index 6d99ccf506141a..ea786d031b3d8e 100644
+--- a/packages/edit-post/src/components/sidebar/post-schedule/index.js
++++ b/packages/edit-post/src/components/sidebar/post-schedule/index.js
+@@ -27,7 +27,7 @@ export function PostSchedule() {
+ 								className="edit-post-post-schedule__toggle"
+ 								onClick={ onToggle }
+ 								aria-expanded={ isOpen }
+-								isTertiary
++								variant="tertiary"
+ 							>
+ 								<PostScheduleLabel />
+ 							</Button>
+diff --git a/packages/edit-post/src/components/sidebar/post-visibility/index.js b/packages/edit-post/src/components/sidebar/post-visibility/index.js
+index 2eacd4d3042aab..35043102f0e9e5 100644
+--- a/packages/edit-post/src/components/sidebar/post-visibility/index.js
++++ b/packages/edit-post/src/components/sidebar/post-visibility/index.js
+@@ -29,7 +29,7 @@ export function PostVisibility() {
+ 									aria-expanded={ isOpen }
+ 									className="edit-post-post-visibility__toggle"
+ 									onClick={ onToggle }
+-									isTertiary
++									variant="tertiary"
+ 								>
+ 									<PostVisibilityLabel />
+ 								</Button>
+diff --git a/packages/edit-post/src/components/sidebar/template/actions.js b/packages/edit-post/src/components/sidebar/template/actions.js
+index 2568f4881f3b25..ab9884b1638d8c 100644
+--- a/packages/edit-post/src/components/sidebar/template/actions.js
++++ b/packages/edit-post/src/components/sidebar/template/actions.js
+@@ -55,13 +55,13 @@ function PostTemplateActions() {
+ 			<div className="edit-post-template__actions">
+ 				{ !! template && (
+ 					<Button
+-						isLink
++						variant="link"
+ 						onClick={ () => __unstableSwitchToTemplateMode() }
+ 					>
+ 						{ __( 'Edit' ) }
+ 					</Button>
+ 				) }
+-				<Button isLink onClick={ () => setIsModalOpen( true ) }>
++				<Button variant="link" onClick={ () => setIsModalOpen( true ) }>
+ 					{ __( 'New' ) }
+ 				</Button>
+ 			</div>
+@@ -107,7 +107,7 @@ function PostTemplateActions() {
+ 						>
+ 							<FlexItem>
+ 								<Button
+-									isSecondary
++									variant="secondary"
+ 									onClick={ () => {
+ 										setIsModalOpen( false );
+ 										setTitle( '' );
+@@ -117,7 +117,7 @@ function PostTemplateActions() {
+ 								</Button>
+ 							</FlexItem>
+ 							<FlexItem>
+-								<Button isPrimary type="submit">
++								<Button variant="primary" type="submit">
+ 									{ __( 'Create' ) }
+ 								</Button>
+ 							</FlexItem>
+diff --git a/packages/edit-post/src/components/text-editor/index.js b/packages/edit-post/src/components/text-editor/index.js
+index c056b72a30ea68..c5191c2e561195 100644
+--- a/packages/edit-post/src/components/text-editor/index.js
++++ b/packages/edit-post/src/components/text-editor/index.js
+@@ -24,7 +24,7 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
+ 				<div className="edit-post-text-editor__toolbar">
+ 					<h2>{ __( 'Editing code' ) }</h2>
+ 					<Button
+-						isTertiary
++						variant="tertiary"
+ 						onClick={ onExit }
+ 						shortcut={ displayShortcut.secondary( 'm' ) }
+ 					>
+diff --git a/packages/edit-post/src/hooks/validate-multiple-use/index.js b/packages/edit-post/src/hooks/validate-multiple-use/index.js
+index 58700ac6cf7be6..00b6fc63bef21c 100644
+--- a/packages/edit-post/src/hooks/validate-multiple-use/index.js
++++ b/packages/edit-post/src/hooks/validate-multiple-use/index.js
+@@ -78,14 +78,14 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
+ 				actions={ [
+ 					<Button
+ 						key="find-original"
+-						isSecondary
++						variant="secondary"
+ 						onClick={ selectFirst }
+ 					>
+ 						{ __( 'Find original' ) }
+ 					</Button>,
+ 					<Button
+ 						key="remove"
+-						isSecondary
++						variant="secondary"
+ 						onClick={ () => props.onReplace( [] ) }
+ 					>
+ 						{ __( 'Remove' ) }
+@@ -93,7 +93,7 @@ const withMultipleValidation = createHigherOrderComponent( ( BlockEdit ) => {
+ 					outboundType && (
+ 						<Button
+ 							key="transform"
+-							isSecondary
++							variant="secondary"
+ 							onClick={ () =>
+ 								props.onReplace(
+ 									createBlock(
+diff --git a/packages/edit-site/src/components/editor/index.js b/packages/edit-site/src/components/editor/index.js
+index f02348d10f8d7d..557e8dfa8e225b 100644
+--- a/packages/edit-site/src/components/editor/index.js
++++ b/packages/edit-site/src/components/editor/index.js
+@@ -251,7 +251,7 @@ function Editor( { initialSettings } ) {
+ 												) : (
+ 													<div className="edit-site-editor__toggle-save-panel">
+ 														<Button
+-															isSecondary
++															variant="secondary"
+ 															className="edit-site-editor__toggle-save-panel-button"
+ 															onClick={
+ 																openEntitiesSavedStates
+diff --git a/packages/edit-site/src/components/header/index.js b/packages/edit-site/src/components/header/index.js
+index 9c6bdcb8c4e945..2a29478b29c81d 100644
+--- a/packages/edit-site/src/components/header/index.js
++++ b/packages/edit-site/src/components/header/index.js
+@@ -92,7 +92,7 @@ export default function Header( {
+ 				<div className="edit-site-header__toolbar">
+ 					<Button
+ 						ref={ inserterButton }
+-						isPrimary
++						variant="primary"
+ 						isPressed={ isInserterOpen }
+ 						className="edit-site-header-toolbar__inserter-toggle"
+ 						onMouseDown={ ( event ) => {
+diff --git a/packages/edit-site/src/components/navigation-sidebar/navigation-panel/new-template-dropdown.js b/packages/edit-site/src/components/navigation-sidebar/navigation-panel/new-template-dropdown.js
+index 127238e481f9e9..a0e3ee5a0062d3 100644
+--- a/packages/edit-site/src/components/navigation-sidebar/navigation-panel/new-template-dropdown.js
++++ b/packages/edit-site/src/components/navigation-sidebar/navigation-panel/new-template-dropdown.js
+@@ -81,7 +81,7 @@ export default function NewTemplateDropdown() {
+ 			toggleProps={ {
+ 				children: <Icon icon={ plus } />,
+ 				isSmall: true,
+-				isTertiary: true,
++				variant: 'tertiary',
+ 			} }
+ 		>
+ 			{ ( { onClose } ) => (
+diff --git a/packages/edit-site/src/components/save-button/index.js b/packages/edit-site/src/components/save-button/index.js
+index d32ce9ac5acc17..274048987b359f 100644
+--- a/packages/edit-site/src/components/save-button/index.js
++++ b/packages/edit-site/src/components/save-button/index.js
+@@ -34,7 +34,7 @@ export default function SaveButton( {
+ 	return (
+ 		<>
+ 			<Button
+-				isPrimary
++				variant="primary"
+ 				className="edit-site-save-button__button"
+ 				aria-disabled={ disabled }
+ 				aria-expanded={ isEntitiesSavedStatesOpen }
+diff --git a/packages/edit-site/src/components/sidebar/global-styles-sidebar.js b/packages/edit-site/src/components/sidebar/global-styles-sidebar.js
+index 7aea104e9d8a46..020546b12e1564 100644
+--- a/packages/edit-site/src/components/sidebar/global-styles-sidebar.js
++++ b/packages/edit-site/src/components/sidebar/global-styles-sidebar.js
+@@ -178,7 +178,7 @@ export default function GlobalStylesSidebar( {
+ 					<Button
+ 						className="edit-site-global-styles-sidebar__reset-button"
+ 						isSmall
+-						isTertiary
++						variant="tertiary"
+ 						disabled={ ! canRestart }
+ 						onClick={ onReset }
+ 					>
+diff --git a/packages/edit-site/src/components/template-part-converter/convert-to-template-part.js b/packages/edit-site/src/components/template-part-converter/convert-to-template-part.js
+index 863a6b2eabbaf5..c43bb4d77640b1 100644
+--- a/packages/edit-site/src/components/template-part-converter/convert-to-template-part.js
++++ b/packages/edit-site/src/components/template-part-converter/convert-to-template-part.js
+@@ -169,7 +169,7 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
+ 								>
+ 									<FlexItem>
+ 										<Button
+-											isSecondary
++											variant="secondary"
+ 											onClick={ () => {
+ 												setIsModalOpen( false );
+ 												setTitle( '' );
+@@ -179,7 +179,7 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
+ 										</Button>
+ 									</FlexItem>
+ 									<FlexItem>
+-										<Button isPrimary type="submit">
++										<Button variant="primary" type="submit">
+ 											{ __( 'Create' ) }
+ 										</Button>
+ 									</FlexItem>
+diff --git a/packages/edit-widgets/src/components/header/index.js b/packages/edit-widgets/src/components/header/index.js
+index c0475441002a25..3a67e7999482a4 100644
+--- a/packages/edit-widgets/src/components/header/index.js
++++ b/packages/edit-widgets/src/components/header/index.js
+@@ -87,7 +87,7 @@ function Header() {
+ 							ref={ inserterButton }
+ 							as={ Button }
+ 							className="edit-widgets-header-toolbar__inserter-toggle"
+-							isPrimary
++							variant="primary"
+ 							isPressed={ isInserterOpened }
+ 							onMouseDown={ ( event ) => {
+ 								event.preventDefault();
+diff --git a/packages/edit-widgets/src/components/save-button/index.js b/packages/edit-widgets/src/components/save-button/index.js
+index 60af723800c506..607a928416772c 100644
+--- a/packages/edit-widgets/src/components/save-button/index.js
++++ b/packages/edit-widgets/src/components/save-button/index.js
+@@ -25,7 +25,7 @@ function SaveButton() {
+ 
+ 	return (
+ 		<Button
+-			isPrimary
++			variant="primary"
+ 			isBusy={ isSaving }
+ 			aria-disabled={ isSaving }
+ 			onClick={ isSaving ? undefined : saveEditedWidgetAreas }
+diff --git a/packages/edit-widgets/src/components/sidebar/widget-areas.js b/packages/edit-widgets/src/components/sidebar/widget-areas.js
+index 120f0bdb132ec2..781c644f13ba09 100644
+--- a/packages/edit-widgets/src/components/sidebar/widget-areas.js
++++ b/packages/edit-widgets/src/components/sidebar/widget-areas.js
+@@ -61,7 +61,7 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
+ 								'autofocus[panel]': 'widgets',
+ 								return: 'themes.php?page=gutenberg-widgets',
+ 							} ) }
+-							isTertiary
++							variant="tertiary"
+ 						>
+ 							{ __( 'Manage with live preview' ) }
+ 						</Button>
+diff --git a/packages/editor/src/components/entities-saved-states/index.js b/packages/editor/src/components/entities-saved-states/index.js
+index af233aec56f264..0015cdecd6435c 100644
+--- a/packages/editor/src/components/entities-saved-states/index.js
++++ b/packages/editor/src/components/entities-saved-states/index.js
+@@ -141,7 +141,7 @@ export default function EntitiesSavedStates( { close } ) {
+ 			<div className="entities-saved-states__panel-header">
+ 				<Button
+ 					ref={ saveButtonRef }
+-					isPrimary
++					variant="primary"
+ 					disabled={
+ 						dirtyEntityRecords.length -
+ 							unselectedEntities.length ===
+diff --git a/packages/editor/src/components/error-boundary/index.js b/packages/editor/src/components/error-boundary/index.js
+index 872f843ab7966f..35f1f8133c72ac 100644
+--- a/packages/editor/src/components/error-boundary/index.js
++++ b/packages/editor/src/components/error-boundary/index.js
+@@ -11,7 +11,7 @@ import { useCopyToClipboard } from '@wordpress/compose';
+ function CopyButton( { text, children } ) {
+ 	const ref = useCopyToClipboard( text );
+ 	return (
+-		<Button isSecondary ref={ ref }>
++		<Button variant="secondary" ref={ ref }>
+ 			{ children }
+ 		</Button>
+ 	);
+@@ -59,7 +59,11 @@ class ErrorBoundary extends Component {
+ 			<Warning
+ 				className="editor-error-boundary"
+ 				actions={ [
+-					<Button key="recovery" onClick={ this.reboot } isSecondary>
++					<Button
++						key="recovery"
++						onClick={ this.reboot }
++						variant="secondary"
++					>
+ 						{ __( 'Attempt Recovery' ) }
+ 					</Button>,
+ 					<CopyButton key="copy-post" text={ this.getContent }>
+diff --git a/packages/editor/src/components/post-featured-image/index.js b/packages/editor/src/components/post-featured-image/index.js
+index 6f636bb5a98b8e..519e538c82c2b2 100644
+--- a/packages/editor/src/components/post-featured-image/index.js
++++ b/packages/editor/src/components/post-featured-image/index.js
+@@ -188,7 +188,7 @@ function PostFeaturedImage( {
+ 							allowedTypes={ ALLOWED_MEDIA_TYPES }
+ 							modalClass="editor-post-featured-image__media-modal"
+ 							render={ ( { open } ) => (
+-								<Button onClick={ open } isSecondary>
++								<Button onClick={ open } variant="secondary">
+ 									{ __( 'Replace Image' ) }
+ 								</Button>
+ 							) }
+@@ -197,7 +197,11 @@ function PostFeaturedImage( {
+ 				) }
+ 				{ !! featuredImageId && (
+ 					<MediaUploadCheck>
+-						<Button onClick={ onRemoveImage } isLink isDestructive>
++						<Button
++							onClick={ onRemoveImage }
++							variant="link"
++							isDestructive
++						>
+ 							{ postLabel.remove_featured_image ||
+ 								DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
+ 						</Button>
+diff --git a/packages/editor/src/components/post-format/index.js b/packages/editor/src/components/post-format/index.js
+index 57620a32b9025e..9f945f997f8d0c 100644
+--- a/packages/editor/src/components/post-format/index.js
++++ b/packages/editor/src/components/post-format/index.js
+@@ -100,7 +100,7 @@ export default function PostFormat() {
+ 					<div className="editor-post-format__suggestion">
+ 						{ __( 'Suggestion:' ) }{ ' ' }
+ 						<Button
+-							isLink
++							variant="link"
+ 							onClick={ () =>
+ 								onUpdatePostFormat( suggestion.id )
+ 							}
+diff --git a/packages/editor/src/components/post-locked-modal/index.js b/packages/editor/src/components/post-locked-modal/index.js
+index 679d02d3ee3b13..11f80b703a2f1c 100644
+--- a/packages/editor/src/components/post-locked-modal/index.js
++++ b/packages/editor/src/components/post-locked-modal/index.js
+@@ -194,7 +194,7 @@ export default function PostLockedModal() {
+ 					</div>
+ 
+ 					<div className="editor-post-locked-modal__buttons">
+-						<Button isPrimary href={ allPostsUrl }>
++						<Button variant="primary" href={ allPostsUrl }>
+ 							{ allPostsLabel }
+ 						</Button>
+ 					</div>
+@@ -217,11 +217,11 @@ export default function PostLockedModal() {
+ 					</div>
+ 
+ 					<div className="editor-post-locked-modal__buttons">
+-						<Button isSecondary href={ allPostsUrl }>
++						<Button variant="secondary" href={ allPostsUrl }>
+ 							{ allPostsLabel }
+ 						</Button>
+ 						<PostPreviewButton />
+-						<Button isPrimary href={ unlockUrl }>
++						<Button variant="primary" href={ unlockUrl }>
+ 							{ __( 'Take Over' ) }
+ 						</Button>
+ 					</div>
+diff --git a/packages/editor/src/components/post-preview-button/index.js b/packages/editor/src/components/post-preview-button/index.js
+index d7ee759c8b5d2e..7f51eb03635208 100644
+--- a/packages/editor/src/components/post-preview-button/index.js
++++ b/packages/editor/src/components/post-preview-button/index.js
+@@ -196,7 +196,7 @@ export class PostPreviewButton extends Component {
+ 
+ 		return (
+ 			<Button
+-				isTertiary={ ! this.props.className }
++				variant={ ! this.props.className ? 'tertiary' : undefined }
+ 				className={ classNames }
+ 				href={ href }
+ 				target={ this.getWindowTarget() }
+diff --git a/packages/editor/src/components/post-preview-button/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-preview-button/test/__snapshots__/index.js.snap
+index 220042a8a41aa7..344b2edd013c95 100644
+--- a/packages/editor/src/components/post-preview-button/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-preview-button/test/__snapshots__/index.js.snap
+@@ -5,9 +5,9 @@ exports[`PostPreviewButton render() should render currentPostLink otherwise 1`]
+   className="editor-post-preview"
+   disabled={false}
+   href="https://wordpress.org/?p=1"
+-  isTertiary={true}
+   onClick={[Function]}
+   target="wp-preview-1"
++  variant="tertiary"
+ >
+   Preview
+   <ForwardRef(VisuallyHidden)
+@@ -23,9 +23,9 @@ exports[`PostPreviewButton render() should render previewLink if provided 1`] =
+   className="editor-post-preview"
+   disabled={false}
+   href="https://wordpress.org/?p=1&preview=true"
+-  isTertiary={true}
+   onClick={[Function]}
+   target="wp-preview-1"
++  variant="tertiary"
+ >
+   Preview
+   <ForwardRef(VisuallyHidden)
+diff --git a/packages/editor/src/components/post-publish-button/index.js b/packages/editor/src/components/post-publish-button/index.js
+index 01d98a50541945..144822092bbdbf 100644
+--- a/packages/editor/src/components/post-publish-button/index.js
++++ b/packages/editor/src/components/post-publish-button/index.js
+@@ -149,7 +149,7 @@ export class PostPublishButton extends Component {
+ 			'aria-disabled': isButtonDisabled && ! hasNonPostEntityChanges,
+ 			className: 'editor-post-publish-button',
+ 			isBusy: ! isAutoSaving && isSaving && isPublished,
+-			isPrimary: true,
++			variant: 'primary',
+ 			onClick: this.createOnClick( onClickButton ),
+ 		};
+ 
+@@ -158,7 +158,7 @@ export class PostPublishButton extends Component {
+ 			'aria-expanded': isOpen,
+ 			className: 'editor-post-publish-panel__toggle',
+ 			isBusy: isSaving && isPublished,
+-			isPrimary: true,
++			variant: 'primary',
+ 			onClick: this.createOnClick( onClickToggle ),
+ 		};
+ 
+diff --git a/packages/editor/src/components/post-publish-panel/index.js b/packages/editor/src/components/post-publish-panel/index.js
+index babebe7325b866..8d9848528efd77 100644
+--- a/packages/editor/src/components/post-publish-panel/index.js
++++ b/packages/editor/src/components/post-publish-panel/index.js
+@@ -95,7 +95,7 @@ export class PostPublishPanel extends Component {
+ 								/>
+ 							</div>
+ 							<div className="editor-post-publish-panel__header-cancel-button">
+-								<Button onClick={ onClose } isSecondary>
++								<Button onClick={ onClose } variant="secondary">
+ 									{ __( 'Cancel' ) }
+ 								</Button>
+ 							</div>
+diff --git a/packages/editor/src/components/post-publish-panel/maybe-post-format-panel.js b/packages/editor/src/components/post-publish-panel/maybe-post-format-panel.js
+index 270d11fe749525..a9b836cb1a873b 100644
+--- a/packages/editor/src/components/post-publish-panel/maybe-post-format-panel.js
++++ b/packages/editor/src/components/post-publish-panel/maybe-post-format-panel.js
+@@ -27,7 +27,10 @@ const PostFormatSuggestion = ( {
+ 	suggestionText,
+ 	onUpdatePostFormat,
+ } ) => (
+-	<Button isLink onClick={ () => onUpdatePostFormat( suggestedPostFormat ) }>
++	<Button
++		variant="link"
++		onClick={ () => onUpdatePostFormat( suggestedPostFormat ) }
++	>
+ 		{ suggestionText }
+ 	</Button>
+ );
+diff --git a/packages/editor/src/components/post-publish-panel/postpublish.js b/packages/editor/src/components/post-publish-panel/postpublish.js
+index 3be45aefa59461..7c431aa4885f47 100644
+--- a/packages/editor/src/components/post-publish-panel/postpublish.js
++++ b/packages/editor/src/components/post-publish-panel/postpublish.js
+@@ -42,7 +42,7 @@ const getFuturePostUrl = ( post ) => {
+ function CopyButton( { text, onCopy, children } ) {
+ 	const ref = useCopyToClipboard( text, onCopy );
+ 	return (
+-		<Button isSecondary ref={ ref }>
++		<Button variant="secondary" ref={ ref }>
+ 			{ children }
+ 		</Button>
+ 	);
+@@ -127,7 +127,7 @@ class PostPublishPanelPostpublish extends Component {
+ 					/>
+ 					<div className="post-publish-panel__postpublish-buttons">
+ 						{ ! isScheduled && (
+-							<Button isSecondary href={ link }>
++							<Button variant="secondary" href={ link }>
+ 								{ viewPostLabel }
+ 							</Button>
+ 						) }
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index 601a5876e3102e..7bd560d187275c 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -95,7 +95,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is
+       className="editor-post-publish-panel__header-cancel-button"
+     >
+       <ForwardRef(Button)
+-        isSecondary={true}
++        variant="secondary"
+       >
+         Cancel
+       </ForwardRef(Button)>
+@@ -135,7 +135,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
+       className="editor-post-publish-panel__header-cancel-button"
+     >
+       <ForwardRef(Button)
+-        isSecondary={true}
++        variant="secondary"
+       >
+         Cancel
+       </ForwardRef(Button)>
+@@ -175,7 +175,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
+       className="editor-post-publish-panel__header-cancel-button"
+     >
+       <ForwardRef(Button)
+-        isSecondary={true}
++        variant="secondary"
+       >
+         Cancel
+       </ForwardRef(Button)>
+diff --git a/packages/editor/src/components/post-saved-state/index.js b/packages/editor/src/components/post-saved-state/index.js
+index 1103b0f7468785..114610c0247621 100644
+--- a/packages/editor/src/components/post-saved-state/index.js
++++ b/packages/editor/src/components/post-saved-state/index.js
+@@ -169,7 +169,7 @@ export default function PostSavedState( {
+ 			className="editor-post-save-draft"
+ 			onClick={ () => savePost() }
+ 			shortcut={ displayShortcut.primary( 's' ) }
+-			isTertiary
++			variant="tertiary"
+ 		>
+ 			{ label }
+ 		</Button>
+diff --git a/packages/editor/src/components/post-saved-state/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-saved-state/test/__snapshots__/index.js.snap
+index 7bdbf164f7481b..575ba88aa66114 100644
+--- a/packages/editor/src/components/post-saved-state/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-saved-state/test/__snapshots__/index.js.snap
+@@ -5,9 +5,9 @@ exports[`PostSavedState returns a switch to draft link if the post is published
+ exports[`PostSavedState should return Save button if edits to be saved 1`] = `
+ <ForwardRef(Button)
+   className="editor-post-save-draft"
+-  isTertiary={true}
+   onClick={[Function]}
+   shortcut="Ctrl+S"
++  variant="tertiary"
+ >
+   Save draft
+ </ForwardRef(Button)>
+diff --git a/packages/editor/src/components/post-switch-to-draft-button/index.js b/packages/editor/src/components/post-switch-to-draft-button/index.js
+index 122b5f8377e763..32f2cac753bd69 100644
+--- a/packages/editor/src/components/post-switch-to-draft-button/index.js
++++ b/packages/editor/src/components/post-switch-to-draft-button/index.js
+@@ -40,7 +40,7 @@ function PostSwitchToDraftButton( {
+ 			className="editor-post-switch-to-draft"
+ 			onClick={ onSwitch }
+ 			disabled={ isSaving }
+-			isTertiary
++			variant="tertiary"
+ 		>
+ 			{ isMobileViewport ? __( 'Draft' ) : __( 'Switch to draft' ) }
+ 		</Button>
+diff --git a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+index 234b5f25e8f6ac..24c7131cb70b2b 100644
+--- a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
++++ b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+@@ -487,7 +487,7 @@ class HierarchicalTermSelector extends Component {
+ 					onClick={ this.onToggleForm }
+ 					className="editor-post-taxonomies__hierarchical-terms-add"
+ 					aria-expanded={ showForm }
+-					isLink
++					variant="link"
+ 				>
+ 					{ newTermButtonLabel }
+ 				</Button>
+@@ -518,7 +518,7 @@ class HierarchicalTermSelector extends Component {
+ 						/>
+ 					) }
+ 					<Button
+-						isSecondary
++						variant="secondary"
+ 						type="submit"
+ 						className="editor-post-taxonomies__hierarchical-terms-submit"
+ 					>
+diff --git a/packages/editor/src/components/post-taxonomies/most-used-terms.js b/packages/editor/src/components/post-taxonomies/most-used-terms.js
+index da3539b05457e4..aa5a8d7a3b69bc 100644
+--- a/packages/editor/src/components/post-taxonomies/most-used-terms.js
++++ b/packages/editor/src/components/post-taxonomies/most-used-terms.js
+@@ -59,7 +59,10 @@ export default function MostUsedTerms( { onSelect, taxonomy } ) {
+ 			>
+ 				{ terms.map( ( term ) => (
+ 					<li key={ term.id }>
+-						<Button isLink onClick={ () => onSelect( term ) }>
++						<Button
++							variant="link"
++							onClick={ () => onSelect( term ) }
++						>
+ 							{ term.name }
+ 						</Button>
+ 					</li>
+diff --git a/packages/editor/src/components/post-trash/index.js b/packages/editor/src/components/post-trash/index.js
+index c82eb8d99c0a97..f0f07f9405f9e4 100644
+--- a/packages/editor/src/components/post-trash/index.js
++++ b/packages/editor/src/components/post-trash/index.js
+@@ -17,7 +17,7 @@ function PostTrash( { isNew, postId, postType, ...props } ) {
+ 		<Button
+ 			className="editor-post-trash"
+ 			isDestructive
+-			isTertiary
++			variant="tertiary"
+ 			onClick={ onClick }
+ 		>
+ 			{ __( 'Move to trash' ) }
+diff --git a/packages/interface/src/components/complementary-area/index.js b/packages/interface/src/components/complementary-area/index.js
+index 767e0d2425e83e..71fb6a610d6a32 100644
+--- a/packages/interface/src/components/complementary-area/index.js
++++ b/packages/interface/src/components/complementary-area/index.js
+@@ -149,7 +149,7 @@ function ComplementaryArea( {
+ 							label={ title }
+ 							icon={ showIconLabels ? check : icon }
+ 							showTooltip={ ! showIconLabels }
+-							isTertiary={ showIconLabels }
++							variant={ showIconLabels ? 'tertiary' : undefined }
+ 						/>
+ 					) }
+ 				</PinnedItems>
+diff --git a/packages/list-reusable-blocks/src/components/import-dropdown/index.js b/packages/list-reusable-blocks/src/components/import-dropdown/index.js
+index 712c8cb7a6317a..74aee0df9280c7 100644
+--- a/packages/list-reusable-blocks/src/components/import-dropdown/index.js
++++ b/packages/list-reusable-blocks/src/components/import-dropdown/index.js
+@@ -20,7 +20,11 @@ function ImportDropdown( { onUpload } ) {
+ 			position="bottom right"
+ 			contentClassName="list-reusable-blocks-import-dropdown__content"
+ 			renderToggle={ ( { isOpen, onToggle } ) => (
+-				<Button aria-expanded={ isOpen } onClick={ onToggle } isPrimary>
++				<Button
++					aria-expanded={ isOpen }
++					onClick={ onToggle }
++					variant="primary"
++				>
+ 					{ __( 'Import from JSON' ) }
+ 				</Button>
+ 			) }
+diff --git a/packages/list-reusable-blocks/src/components/import-form/index.js b/packages/list-reusable-blocks/src/components/import-form/index.js
+index a7305ec03552b6..a9dd565d29c551 100644
+--- a/packages/list-reusable-blocks/src/components/import-form/index.js
++++ b/packages/list-reusable-blocks/src/components/import-form/index.js
+@@ -107,7 +107,7 @@ class ImportForm extends Component {
+ 					type="submit"
+ 					isBusy={ isLoading }
+ 					disabled={ ! file || isLoading }
+-					isSecondary
++					variant="secondary"
+ 					className="list-reusable-blocks-import-form__button"
+ 				>
+ 					{ _x( 'Import', 'button label' ) }
+diff --git a/packages/nux/src/components/dot-tip/index.js b/packages/nux/src/components/dot-tip/index.js
+index 308e07a0b689c6..7f1461ab585664 100644
+--- a/packages/nux/src/components/dot-tip/index.js
++++ b/packages/nux/src/components/dot-tip/index.js
+@@ -58,7 +58,7 @@ export function DotTip( {
+ 		>
+ 			<p>{ children }</p>
+ 			<p>
+-				<Button isLink onClick={ onDismiss }>
++				<Button variant="link" onClick={ onDismiss }>
+ 					{ hasNextTip ? __( 'See next tip' ) : __( 'Got it' ) }
+ 				</Button>
+ 			</p>
+diff --git a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+index b8637fcbe88f28..b72099d193cfa8 100644
+--- a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
++++ b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+@@ -17,7 +17,7 @@ exports[`DotTip should render correctly 1`] = `
+   </p>
+   <p>
+     <ForwardRef(Button)
+-      isLink={true}
++      variant="link"
+     >
+       Got it
+     </ForwardRef(Button)>
+diff --git a/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js b/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
+index c14bfa44f0e4c7..ab7d8b12e44168 100644
+--- a/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
++++ b/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
+@@ -150,7 +150,7 @@ export default function ReusableBlockConvertButton( {
+ 								>
+ 									<FlexItem>
+ 										<Button
+-											isSecondary
++											variant="secondary"
+ 											onClick={ () => {
+ 												setIsModalOpen( false );
+ 												setTitle( '' );
+@@ -160,7 +160,7 @@ export default function ReusableBlockConvertButton( {
+ 										</Button>
+ 									</FlexItem>
+ 									<FlexItem>
+-										<Button isPrimary type="submit">
++										<Button variant="primary" type="submit">
+ 											{ __( 'Save' ) }
+ 										</Button>
+ 									</FlexItem>

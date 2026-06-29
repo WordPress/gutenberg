@@ -1,0 +1,86 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b8000b2772d714..50420b181c33ae 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Internal
+ 
++-   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
+ -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
+ -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
+ 
+diff --git a/packages/components/src/utils/keyboard.js b/packages/components/src/utils/keyboard.js
+deleted file mode 100644
+index 977b87ada21004..00000000000000
+--- a/packages/components/src/utils/keyboard.js
++++ /dev/null
+@@ -1,28 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { RIGHT, UP, DOWN, LEFT } from '@wordpress/keycodes';
+-
+-/**
+- * @type {number[]}
+- */
+-const arrowKeys = [ RIGHT, UP, DOWN, LEFT ];
+-
+-/**
+- * Normalizes the 'key' property of a KeyboardEvent in IE/Edge
+- *
+- * Source:
+- * https://github.com/downshift-js/downshift/blob/a71005bd879d05d7dcb892d1e0dc5c6ca74e9d39/src/utils.js#L279
+- *
+- * @param {import('react').KeyboardEvent} event A keyboardEvent object
+- *
+- * @return {string} The keyboard key
+- */
+-export function normalizeArrowKey( event ) {
+-	const { key, keyCode } = event;
+-
+-	if ( arrowKeys.includes( keyCode ) && key.indexOf( 'Arrow' ) !== 0 ) {
+-		return `Arrow${ key }`;
+-	}
+-	return key;
+-}
+diff --git a/packages/components/src/utils/test/keyboard.js b/packages/components/src/utils/test/keyboard.js
+deleted file mode 100644
+index 8ef46d8fec8603..00000000000000
+--- a/packages/components/src/utils/test/keyboard.js
++++ /dev/null
+@@ -1,34 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { RIGHT, UP, DOWN, LEFT, SPACE } from '@wordpress/keycodes';
+-
+-/**
+- * Internal dependencies
+- */
+-import { normalizeArrowKey } from '../keyboard';
+-
+-describe( 'normalizeArrowKey', () => {
+-	it.each`
+-		keyCode    | key               | normalized
+-		${ RIGHT } | ${ 'Right' }      | ${ 'ArrowRight' }
+-		${ UP }    | ${ 'Up' }         | ${ 'ArrowUp' }
+-		${ DOWN }  | ${ 'Down' }       | ${ 'ArrowDown' }
+-		${ LEFT }  | ${ 'Left' }       | ${ 'ArrowLeft' }
+-		${ RIGHT } | ${ 'ArrowRight' } | ${ 'ArrowRight' }
+-		${ UP }    | ${ 'ArrowUp' }    | ${ 'ArrowUp' }
+-		${ DOWN }  | ${ 'ArrowDown' }  | ${ 'ArrowDown' }
+-		${ LEFT }  | ${ 'ArrowLeft' }  | ${ 'ArrowLeft' }
+-		${ SPACE } | ${ 'Space' }      | ${ 'Space' }
+-	`(
+-		'should return $normalized for $key with keycode $keyCode',
+-		( { keyCode, key, normalized } ) => {
+-			const e = new window.KeyboardEvent( 'keydown', {
+-				key,
+-				keyCode,
+-			} );
+-
+-			expect( normalizeArrowKey( e ) ).toEqual( normalized );
+-		}
+-	);
+-} );

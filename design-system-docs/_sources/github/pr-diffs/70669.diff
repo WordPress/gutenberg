@@ -1,0 +1,91 @@
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index fe7a20dc71042d..940f26e0afd4af 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -359,6 +359,13 @@ function UnforwardedModal(
+ 						) }
+ 
+ 						<div
++							className={ clsx(
++								'components-modal__children-container',
++								{
++									'is-fill-size':
++										size === 'fill' || isFullScreen,
++								}
++							) }
+ 							ref={ useMergeRefs( [
+ 								childrenContainerRef,
+ 								focusOnMount === 'firstContentElement'
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index c6395f091a0b3c..e31f36f2aa4aac 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -208,3 +208,11 @@
+ 		outline-offset: -2px;
+ 	}
+ }
++
++// Children container for modal content.
++.components-modal__children-container {
++	// When the modal has fill size, make the children container take up the full available height
++	&.is-fill-size {
++		height: 100%;
++	}
++}
+diff --git a/packages/components/src/modal/test/index.tsx b/packages/components/src/modal/test/index.tsx
+index b53e12b450a171..9dfba07a289f07 100644
+--- a/packages/components/src/modal/test/index.tsx
++++ b/packages/components/src/modal/test/index.tsx
+@@ -486,4 +486,52 @@ describe( 'Modal', () => {
+ 			expect( baseElement ).not.toHaveClass( 'is-A-open' );
+ 		} );
+ 	} );
++
++	it( 'should apply fill size class to children container when size is fill', () => {
++		render(
++			<Modal size="fill" onRequestClose={ noop }>
++				<p>Modal content</p>
++			</Modal>
++		);
++
++		const dialog = screen.getByRole( 'dialog' );
++		// Disable reason: No semantic query can reach the children container class.
++		// eslint-disable-next-line testing-library/no-node-access
++		const childrenContainer = dialog.querySelector(
++			'.components-modal__children-container'
++		);
++		expect( childrenContainer ).toHaveClass( 'is-fill-size' );
++	} );
++
++	it( 'should apply fill size class to children container when isFullScreen is true', () => {
++		render(
++			<Modal isFullScreen onRequestClose={ noop }>
++				<p>Modal content</p>
++			</Modal>
++		);
++
++		const dialog = screen.getByRole( 'dialog' );
++		// Disable reason: No semantic query can reach the children container class.
++		// eslint-disable-next-line testing-library/no-node-access
++		const childrenContainer = dialog.querySelector(
++			'.components-modal__children-container'
++		);
++		expect( childrenContainer ).toHaveClass( 'is-fill-size' );
++	} );
++
++	it( 'should not apply fill size class to children container when size is not fill', () => {
++		render(
++			<Modal size="medium" onRequestClose={ noop }>
++				<p>Modal content</p>
++			</Modal>
++		);
++
++		const dialog = screen.getByRole( 'dialog' );
++		// Disable reason: No semantic query can reach the children container class.
++		// eslint-disable-next-line testing-library/no-node-access
++		const childrenContainer = dialog.querySelector(
++			'.components-modal__children-container'
++		);
++		expect( childrenContainer ).not.toHaveClass( 'is-fill-size' );
++	} );
+ } );

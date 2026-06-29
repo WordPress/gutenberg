@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e323c5d934503d..67b16ed6fe46b7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Bug Fix
+ 
++-   `AlignmentMatrixControl`: Fix the `width` prop so it works as intended ([#43482](https://github.com/WordPress/gutenberg/pull/43482)).
+ -   `SelectControl`, `CustomSelectControl`: Truncate long option strings ([#43301](https://github.com/WordPress/gutenberg/pull/43301)).
+ -   `Popover`: fix and improve opening animation ([#43186](https://github.com/WordPress/gutenberg/pull/43186)).
+ -   `Popover`: fix incorrect deps in hooks resulting in incorrect positioning after calling `update` ([#43267](https://github.com/WordPress/gutenberg/pull/43267/)).
+diff --git a/packages/components/src/alignment-matrix-control/index.js b/packages/components/src/alignment-matrix-control/index.js
+index cd84e4e7cdb56f..44dbe33d95a94d 100644
+--- a/packages/components/src/alignment-matrix-control/index.js
++++ b/packages/components/src/alignment-matrix-control/index.js
+@@ -75,7 +75,7 @@ export default function AlignmentMatrixControl( {
+ 			as={ Root }
+ 			className={ classes }
+ 			role="grid"
+-			width={ width }
++			size={ width }
+ 		>
+ 			{ GRID.map( ( cells, index ) => (
+ 				<CompositeGroup

@@ -1,0 +1,107 @@
+diff --git a/packages/components/src/dashicon/index.js b/packages/components/src/dashicon/index.js
+index 549a1ab3a281a9..e2f54deed1f9b2 100644
+--- a/packages/components/src/dashicon/index.js
++++ b/packages/components/src/dashicon/index.js
+@@ -2,7 +2,6 @@
+  * @typedef OwnProps
+  *
+  * @property {string} icon        Icon name
+- * @property {number} [size=20]   Icon size
+  * @property {string} [className] Class name
+  */
+ /** @typedef {import('react').ComponentPropsWithoutRef<'span'> & OwnProps} Props */
+@@ -11,7 +10,7 @@
+  * @param {Props} props
+  * @return {JSX.Element} Element
+  */
+-function Dashicon( { icon, size = 20, className, ...extraProps } ) {
++function Dashicon( { icon, className, ...extraProps } ) {
+ 	const iconClass = [
+ 		'dashicon',
+ 		'dashicons',
+@@ -21,19 +20,7 @@ function Dashicon( { icon, size = 20, className, ...extraProps } ) {
+ 		.filter( Boolean )
+ 		.join( ' ' );
+ 
+-	return (
+-		<span
+-			className={ iconClass }
+-			// Ignore reason: span attributes are the global attributes which do not include width/height
+-			// See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/span
+-			// See https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes
+-			// PR to remove: https://github.com/WordPress/gutenberg/pull/26067
+-			// @ts-ignore
+-			width={ size }
+-			height={ size }
+-			{ ...extraProps }
+-		/>
+-	);
++	return <span className={ iconClass } { ...extraProps } />;
+ }
+ 
+ export default Dashicon;
+diff --git a/packages/components/src/icon/index.js b/packages/components/src/icon/index.js
+index 71cff3b5abcf14..225964a2e79aee 100644
+--- a/packages/components/src/icon/index.js
++++ b/packages/components/src/icon/index.js
+@@ -15,22 +15,12 @@ import { SVG } from '@wordpress/primitives';
+ import Dashicon from '../dashicon';
+ 
+ function Icon( { icon = null, size, ...additionalProps } ) {
+-	// Dashicons should be 20x20 by default.
+-	const dashiconSize = size || 20;
+-
+ 	if ( 'string' === typeof icon ) {
+-		return (
+-			<Dashicon
+-				icon={ icon }
+-				size={ dashiconSize }
+-				{ ...additionalProps }
+-			/>
+-		);
++		return <Dashicon icon={ icon } { ...additionalProps } />;
+ 	}
+ 
+ 	if ( icon && Dashicon === icon.type ) {
+ 		return cloneElement( icon, {
+-			size: dashiconSize,
+ 			...additionalProps,
+ 		} );
+ 	}
+diff --git a/packages/components/src/icon/test/index.js b/packages/components/src/icon/test/index.js
+index 744ecebfcee9f2..b1f85a3daf1654 100644
+--- a/packages/components/src/icon/test/index.js
++++ b/packages/components/src/icon/test/index.js
+@@ -38,20 +38,6 @@ describe( 'Icon', () => {
+ 		);
+ 	} );
+ 
+-	it( 'renders a dashicon by slug and with a default size of 20', () => {
+-		const wrapper = shallow( <Icon icon="format-image" /> );
+-
+-		expect( wrapper.find( 'Dashicon' ).prop( 'size' ) ).toBe( 20 );
+-	} );
+-
+-	it( 'renders a dashicon by element and with a default size of 20', () => {
+-		const wrapper = shallow(
+-			<Icon icon={ <Dashicon icon="format-image" /> } />
+-		);
+-
+-		expect( wrapper.find( 'Dashicon' ).prop( 'size' ) ).toBe( 20 );
+-	} );
+-
+ 	it( 'renders a function', () => {
+ 		const wrapper = shallow( <Icon icon={ () => <span /> } /> );
+ 
+@@ -133,6 +119,11 @@ describe( 'Icon', () => {
+ 					return;
+ 				}
+ 
++				if ( [ 'dashicon', 'dashicon element' ].includes( label ) ) {
++					// `size` prop isn't passed through, since dashicon doesn't accept it.
++					return;
++				}
++
+ 				const wrapper = shallow( <Icon { ...props } size={ 32 } /> );
+ 
+ 				expect( wrapper.prop( 'size' ) ).toBe( 32 );

@@ -1,0 +1,182 @@
+diff --git a/packages/block-editor/src/components/inserter/style.scss b/packages/block-editor/src/components/inserter/style.scss
+index dd0cc50e31fcb4..35c18e1d9acce5 100644
+--- a/packages/block-editor/src/components/inserter/style.scss
++++ b/packages/block-editor/src/components/inserter/style.scss
+@@ -108,10 +108,6 @@ $block-inserter-tabs-height: 44px;
+ 
+ .block-editor-inserter__search {
+ 	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
+-
+-	.components-search-control__icon {
+-		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
+-	}
+ }
+ 
+ .block-editor-inserter__tabs {
+@@ -615,15 +611,9 @@ $block-inserter-tabs-height: 44px;
+ 	}
+ 
+ 	.block-editor-inserter__media-panel-search {
+-		&.components-search-control {
+-			input[type="search"].components-search-control__input {
+-				background: $white;
+-			}
+-			button.components-button {
+-				min-width: auto;
+-				padding-left: $grid-unit-05 * 0.5;
+-				padding-right: $grid-unit-05 * 0.5;
+-			}
++		// TODO: Consider using the Theme component to automatically adapt to a gray background.
++		&:not(:focus-within) {
++			--wp-components-color-background: #{$white};
+ 		}
+ 	}
+ }
+diff --git a/packages/components/src/navigation/menu/menu-title-search.tsx b/packages/components/src/navigation/menu/menu-title-search.tsx
+index d03766f28d7522..c1dbda5af88fb0 100644
+--- a/packages/components/src/navigation/menu/menu-title-search.tsx
++++ b/packages/components/src/navigation/menu/menu-title-search.tsx
+@@ -10,10 +10,11 @@ import { __, _n, sprintf } from '@wordpress/i18n';
+ import withSpokenMessages from '../../higher-order/with-spoken-messages';
+ import { useNavigationMenuContext } from './context';
+ import { useNavigationContext } from '../context';
+-import { MenuTitleSearchUI } from '../styles/navigation-styles';
+ import { SEARCH_FOCUS_DELAY } from '../constants';
+ 
+ import type { NavigationMenuTitleSearchProps } from '../types';
++import SearchControl from '../../search-control';
++import { MenuTitleSearchControlWrapper } from '../styles/navigation-styles';
+ 
+ function MenuTitleSearch( {
+ 	debouncedSpeak,
+@@ -80,9 +81,9 @@ function MenuTitleSearch( {
+ 	).trim();
+ 
+ 	return (
+-		<div className="components-navigation__menu-title-search">
+-			<MenuTitleSearchUI
+-				autoComplete="off"
++		<MenuTitleSearchControlWrapper>
++			<SearchControl
++				__nextHasNoMarginBottom
+ 				className="components-navigation__menu-search-input"
+ 				id={ inputId }
+ 				onChange={ ( value ) => onSearch?.( value ) }
+@@ -90,10 +91,9 @@ function MenuTitleSearch( {
+ 				placeholder={ placeholder }
+ 				onClose={ onClose }
+ 				ref={ inputRef }
+-				type="search"
+ 				value={ search }
+ 			/>
+-		</div>
++		</MenuTitleSearchControlWrapper>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/navigation/styles/navigation-styles.tsx b/packages/components/src/navigation/styles/navigation-styles.tsx
+index 27c508b98f26dc..820cf2224be885 100644
+--- a/packages/components/src/navigation/styles/navigation-styles.tsx
++++ b/packages/components/src/navigation/styles/navigation-styles.tsx
+@@ -17,7 +17,6 @@ import { Text } from '../../text';
+ import { Heading } from '../../heading';
+ import { reduceMotion, rtl } from '../../utils';
+ import { space } from '../../utils/space';
+-import SearchControl from '../../search-control';
+ 
+ export const NavigationUI = styled.div`
+ 	width: 100%;
+@@ -69,6 +68,11 @@ export const MenuTitleUI = styled.div`
+ 	width: 100%;
+ `;
+ 
++export const MenuTitleSearchControlWrapper = styled.div`
++	margin: 11px 0; // non-ideal hardcoding to maintain same height as Heading, could be improved
++	padding: 1px; // so the focus border doesn't get cut off by the overflow hidden on MenuTitleUI
++`;
++
+ export const MenuTitleActionsUI = styled.span`
+ 	height: ${ space( 6 ) }; // 24px, same height as the buttons inside
+ 
+@@ -91,32 +95,6 @@ export const MenuTitleActionsUI = styled.span`
+ 	}
+ `;
+ 
+-export const MenuTitleSearchUI = styled( SearchControl )`
+-	input[type='search'].components-search-control__input {
+-		margin: 0;
+-		background: #303030;
+-		color: #fff;
+-
+-		&:focus {
+-			background: #434343;
+-			color: #fff;
+-		}
+-
+-		&::placeholder {
+-			color: rgba( 255, 255, 255, 0.6 );
+-		}
+-	}
+-
+-	svg {
+-		fill: white;
+-	}
+-
+-	.components-button.has-icon {
+-		padding: 0;
+-		min-width: auto;
+-	}
+-`;
+-
+ export const GroupTitleUI = styled( Heading )`
+ 	min-height: ${ space( 12 ) };
+ 	align-items: center;
+diff --git a/packages/edit-site/src/components/add-new-template/style.scss b/packages/edit-site/src/components/add-new-template/style.scss
+index 4881745c92afae..305119eeb14e2c 100644
+--- a/packages/edit-site/src/components/add-new-template/style.scss
++++ b/packages/edit-site/src/components/add-new-template/style.scss
+@@ -21,18 +21,6 @@
+ 		}
+ 	}
+ 
+-	.components-search-control {
+-		input[type="search"].components-search-control__input {
+-			background: $white;
+-			border: 1px solid $gray-300;
+-
+-			&:focus {
+-				border-color: var(--wp-admin-theme-color);
+-				box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
+-			}
+-		}
+-	}
+-
+ 	@include break-medium() {
+ 		width: 456px;
+ 	}
+diff --git a/packages/edit-site/src/components/page-patterns/style.scss b/packages/edit-site/src/components/page-patterns/style.scss
+index 0f119773bdf215..e5bd44956b2629 100644
+--- a/packages/edit-site/src/components/page-patterns/style.scss
++++ b/packages/edit-site/src/components/page-patterns/style.scss
+@@ -31,17 +31,12 @@
+ 		flex-grow: 1;
+ 	}
+ 
+-	// The increased specificity here is to overcome component styles
+-	// without relying on internal component class names.
++	// TODO: Consider using the Theme component to automatically adapt to a dark background.
+ 	.edit-site-patterns__search {
+-		input[type="search"] {
+-			height: $button-size-next-default-40px;
+-			background: $gray-800;
+-			color: $gray-200;
++		--wp-components-color-foreground: #{$gray-200};
+ 
+-			&:focus {
+-				background: $gray-800;
+-			}
++		.components-input-control__container {
++			background: $gray-800;
+ 		}
+ 
+ 		svg {

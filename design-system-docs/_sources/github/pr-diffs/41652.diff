@@ -1,0 +1,188 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 7951d8b23a47f8..a4d8999d9dba7e 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -81,6 +81,7 @@ module.exports = {
+ 						importNames: [
+ 							'differenceWith',
+ 							'findIndex',
++							'isArray',
+ 							'isUndefined',
+ 							'memoize',
+ 							'negate',
+diff --git a/packages/block-editor/src/components/list-view/utils.js b/packages/block-editor/src/components/list-view/utils.js
+index 8ef1b23fadb784..f53f5a4cd4884a 100644
+--- a/packages/block-editor/src/components/list-view/utils.js
++++ b/packages/block-editor/src/components/list-view/utils.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { isArray } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -27,7 +22,7 @@ export const getBlockPositionDescription = ( position, siblingCount, level ) =>
+  * @return {boolean} Whether the block is in multi-selection set.
+  */
+ export const isClientIdSelected = ( clientId, selectedBlockClientIds ) =>
+-	isArray( selectedBlockClientIds ) && selectedBlockClientIds.length
++	Array.isArray( selectedBlockClientIds ) && selectedBlockClientIds.length
+ 		? selectedBlockClientIds.indexOf( clientId ) !== -1
+ 		: selectedBlockClientIds === clientId;
+ 
+diff --git a/packages/block-editor/src/store/selectors.js b/packages/block-editor/src/store/selectors.js
+index 4a1c0ca1354489..854fc47724562f 100644
+--- a/packages/block-editor/src/store/selectors.js
++++ b/packages/block-editor/src/store/selectors.js
+@@ -4,7 +4,6 @@
+ import {
+ 	castArray,
+ 	first,
+-	isArray,
+ 	isBoolean,
+ 	last,
+ 	map,
+@@ -1450,7 +1449,7 @@ const checkAllowList = ( list, item, defaultResult = null ) => {
+ 	if ( isBoolean( list ) ) {
+ 		return list;
+ 	}
+-	if ( isArray( list ) ) {
++	if ( Array.isArray( list ) ) {
+ 		// TODO: when there is a canonical way to detect that we are editing a post
+ 		// the following check should be changed to something like:
+ 		// if ( list.includes( 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
+diff --git a/packages/blocks/src/api/registration.js b/packages/blocks/src/api/registration.js
+index 3181b842478c72..f2e1f8c47b626c 100644
+--- a/packages/blocks/src/api/registration.js
++++ b/packages/blocks/src/api/registration.js
+@@ -5,7 +5,6 @@
+  */
+ import {
+ 	camelCase,
+-	isArray,
+ 	isEmpty,
+ 	isNil,
+ 	isObject,
+@@ -306,9 +305,9 @@ function translateBlockSettingUsingI18nSchema(
+ 		return _x( settingValue, i18nSchema, textdomain );
+ 	}
+ 	if (
+-		isArray( i18nSchema ) &&
++		Array.isArray( i18nSchema ) &&
+ 		! isEmpty( i18nSchema ) &&
+-		isArray( settingValue )
++		Array.isArray( settingValue )
+ 	) {
+ 		return settingValue.map( ( value ) =>
+ 			translateBlockSettingUsingI18nSchema(
+diff --git a/packages/blocks/src/api/templates.js b/packages/blocks/src/api/templates.js
+index 6c363dae825645..160456340aaffb 100644
+--- a/packages/blocks/src/api/templates.js
++++ b/packages/blocks/src/api/templates.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { every, map, get, mapValues, isArray } from 'lodash';
++import { every, map, get, mapValues } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -84,7 +84,7 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
+ 				} );
+ 			};
+ 			const normalizeAttribute = ( definition, value ) => {
+-				if ( isHTMLAttribute( definition ) && isArray( value ) ) {
++				if ( isHTMLAttribute( definition ) && Array.isArray( value ) ) {
+ 					// Introduce a deprecated call at this point
+ 					// When we're confident that "children" format should be removed from the templates.
+ 
+diff --git a/packages/components/src/button/index.native.js b/packages/components/src/button/index.native.js
+index 5f233a4622a152..02820e1731f71c 100644
+--- a/packages/components/src/button/index.native.js
++++ b/packages/components/src/button/index.native.js
+@@ -8,7 +8,6 @@ import {
+ 	View,
+ 	Platform,
+ } from 'react-native';
+-import { isArray } from 'lodash';
+ import { LongPressGestureHandler, State } from 'react-native-gesture-handler';
+ 
+ /**
+@@ -153,7 +152,7 @@ export function Button( props ) {
+ 			( !! label &&
+ 				// The children are empty and...
+ 				( ! children ||
+-					( isArray( children ) && ! children.length ) ) &&
++					( Array.isArray( children ) && ! children.length ) ) &&
+ 				// The tooltip is not explicitly disabled.
+ 				false !== showTooltip ) );
+ 
+diff --git a/packages/edit-post/src/components/block-manager/index.js b/packages/edit-post/src/components/block-manager/index.js
+index e2d455399364ea..e4b8a754876801 100644
+--- a/packages/edit-post/src/components/block-manager/index.js
++++ b/packages/edit-post/src/components/block-manager/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { filter, includes, isArray } from 'lodash';
++import { filter, includes } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -119,7 +119,7 @@ export default withSelect( ( select ) => {
+ 	const { getHiddenBlockTypes } = select( editPostStore );
+ 	const hiddenBlockTypes = getHiddenBlockTypes();
+ 	const numberOfHiddenBlocks =
+-		isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
++		Array.isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
+ 
+ 	return {
+ 		blockTypes: getBlockTypes(),
+diff --git a/packages/editor/src/components/theme-support-check/index.js b/packages/editor/src/components/theme-support-check/index.js
+index ae5426fbdd8921..b34a0e743cfead 100644
+--- a/packages/editor/src/components/theme-support-check/index.js
++++ b/packages/editor/src/components/theme-support-check/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { castArray, includes, isArray, get, some } from 'lodash';
++import { castArray, includes, get, some } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -26,7 +26,7 @@ export function ThemeSupportCheck( {
+ 		// In the latter case, we need to verify `postType` exists
+ 		// within `supported`. If `postType` isn't passed, then the check
+ 		// should fail.
+-		if ( 'post-thumbnails' === key && isArray( supported ) ) {
++		if ( 'post-thumbnails' === key && Array.isArray( supported ) ) {
+ 			return includes( supported, postType );
+ 		}
+ 		return supported;
+diff --git a/packages/element/src/utils.js b/packages/element/src/utils.js
+index ee5af6392ca64a..d3a9d10251af34 100644
+--- a/packages/element/src/utils.js
++++ b/packages/element/src/utils.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isArray, isNumber, isString } from 'lodash';
++import { isNumber, isString } from 'lodash';
+ 
+ /**
+  * Checks if the provided WP element is empty.
+@@ -14,7 +14,7 @@ export const isEmptyElement = ( element ) => {
+ 		return false;
+ 	}
+ 
+-	if ( isString( element ) || isArray( element ) ) {
++	if ( isString( element ) || Array.isArray( element ) ) {
+ 		return ! element.length;
+ 	}
+ 

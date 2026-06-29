@@ -1,0 +1,377 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8d9a1b2938729d..da2cd8c80056a3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Dashicon`: remove unnecessary type for `className` prop ([46849](https://github.com/WordPress/gutenberg/pull/46849)).
+ -   `ColorPicker` & `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom` ([#46448](https://github.com/WordPress/gutenberg/pull/46448)).
++-   `SandBox`: Convert to TypeScript ([#46478](https://github.com/WordPress/gutenberg/pull/46478)).
+ -   `ResponsiveWrapper`: Convert to TypeScript ([#46480](https://github.com/WordPress/gutenberg/pull/46480)).
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/sandbox/README.md b/packages/components/src/sandbox/README.md
+index ee3e124cae22e7..406b54d3de1bdf 100644
+--- a/packages/components/src/sandbox/README.md
++++ b/packages/components/src/sandbox/README.md
+@@ -1,4 +1,4 @@
+-# Sandbox
++# SandBox
+ 
+ This component provides an isolated environment for arbitrary HTML via iframes.
+ 
+@@ -8,6 +8,49 @@ This component provides an isolated environment for arbitrary HTML via iframes.
+ import { SandBox } from '@wordpress/components';
+ 
+ const MySandBox = () => (
+-	<SandBox html="<p>Content</p>" title="Sandbox" type="embed" />
++	<SandBox html="<p>Content</p>" title="SandBox" type="embed" />
+ );
+ ```
++
++## Props
++
++### `html`: `string`
++
++The HTML to render in the body of the iframe document.
++
++-   Required: No
++-   Default: ""
++
++### `onFocus`: `React.DOMAttributes< HTMLIFrameElement >[ 'onFocus' ]`
++
++The `onFocus` callback for the iframe.
++
++-   Required: No
++
++### `scripts`: `string[]`
++
++An array of script URLs to inject as `<script>` tags into the bottom of the `<body>` of the iframe document.
++
++-   Required: No
++-   Default: []
++
++### `styles`: `string[]`
++
++An array of CSS strings to inject into the `<head>` of the iframe document.
++
++-   Required: No
++-   Default: []
++
++### `title`: `string`
++
++The `<title>` of the iframe document.
++
++-   Required: No
++-   Default: ""
++
++### `type`: `string`
++
++The CSS class name to apply to the `<html>` and `<body>` elements of the iframe.
++
++-   Required: No
++-   Default: ""
+\ No newline at end of file
+diff --git a/packages/components/src/sandbox/index.js b/packages/components/src/sandbox/index.tsx
+similarity index 80%
+rename from packages/components/src/sandbox/index.js
+rename to packages/components/src/sandbox/index.tsx
+index ec7549bbd26243..b914165721fadc 100644
+--- a/packages/components/src/sandbox/index.js
++++ b/packages/components/src/sandbox/index.tsx
+@@ -9,6 +9,11 @@ import {
+ } from '@wordpress/element';
+ import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
+ 
++/**
++ * Internal dependencies
++ */
++import type { SandBoxProps } from './types';
++
+ const observeAndResizeJS = function () {
+ 	const { MutationObserver } = window;
+ 
+@@ -44,11 +49,11 @@ const observeAndResizeJS = function () {
+ 	// Hack: Remove viewport unit styles, as these are relative
+ 	// the iframe root and interfere with our mechanism for
+ 	// determining the unconstrained page bounds.
+-	function removeViewportStyles( ruleOrNode ) {
++	function removeViewportStyles( ruleOrNode: ElementCSSInlineStyle ) {
+ 		if ( ruleOrNode.style ) {
+-			[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function (
+-				style
+-			) {
++			(
++				[ 'width', 'height', 'minHeight', 'maxHeight' ] as const
++			 ).forEach( function ( style ) {
+ 				if (
+ 					/^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] )
+ 				) {
+@@ -83,6 +88,7 @@ const observeAndResizeJS = function () {
+ 	window.addEventListener( 'resize', sendResize, true );
+ };
+ 
++// TODO: These styles shouldn't be coupled with WordPress.
+ const style = `
+ 	body {
+ 		margin: 0;
+@@ -106,37 +112,53 @@ const style = `
+ 	}
+ `;
+ 
+-export default function Sandbox( {
++/**
++ * This component provides an isolated environment for arbitrary HTML via iframes.
++ *
++ * ```jsx
++ * import { SandBox } from '@wordpress/components';
++ *
++ * const MySandBox = () => (
++ * 	<SandBox html="<p>Content</p>" title="SandBox" type="embed" />
++ * );
++ * ```
++ */
++function SandBox( {
+ 	html = '',
+ 	title = '',
+ 	type,
+ 	styles = [],
+ 	scripts = [],
+ 	onFocus,
+-} ) {
+-	const ref = useRef();
++}: SandBoxProps ) {
++	const ref = useRef< HTMLIFrameElement >();
+ 	const [ width, setWidth ] = useState( 0 );
+ 	const [ height, setHeight ] = useState( 0 );
+ 
+ 	function isFrameAccessible() {
+ 		try {
+-			return !! ref.current.contentDocument.body;
++			return !! ref.current?.contentDocument?.body;
+ 		} catch ( e ) {
+ 			return false;
+ 		}
+ 	}
+ 
+-	function trySandbox( forceRerender = false ) {
++	function trySandBox( forceRerender = false ) {
+ 		if ( ! isFrameAccessible() ) {
+ 			return;
+ 		}
+ 
+-		const { contentDocument, ownerDocument } = ref.current;
+-		const { body } = contentDocument;
++		const { contentDocument, ownerDocument } =
++			ref.current as HTMLIFrameElement & {
++				contentDocument: Document;
++			};
+ 
+ 		if (
+ 			! forceRerender &&
+-			null !== body.getAttribute( 'data-resizable-iframe-connected' )
++			null !==
++				contentDocument?.body.getAttribute(
++					'data-resizable-iframe-connected'
++				)
+ 		) {
+ 			return;
+ 		}
+@@ -187,13 +209,13 @@ export default function Sandbox( {
+ 	}
+ 
+ 	useEffect( () => {
+-		trySandbox();
++		trySandBox();
+ 
+-		function tryNoForceSandbox() {
+-			trySandbox( false );
++		function tryNoForceSandBox() {
++			trySandBox( false );
+ 		}
+ 
+-		function checkMessageForResize( event ) {
++		function checkMessageForResize( event: MessageEvent ) {
+ 			const iframe = ref.current;
+ 
+ 			// Verify that the mounted element is the source of the message.
+@@ -221,19 +243,18 @@ export default function Sandbox( {
+ 		}
+ 
+ 		const iframe = ref.current;
+-		const { ownerDocument } = iframe;
+-		const { defaultView } = ownerDocument;
++		const defaultView = iframe?.ownerDocument?.defaultView;
+ 
+ 		// This used to be registered using <iframe onLoad={} />, but it made the iframe blank
+ 		// after reordering the containing block. See these two issues for more details:
+ 		// https://github.com/WordPress/gutenberg/issues/6146
+ 		// https://github.com/facebook/react/issues/18752
+-		iframe.addEventListener( 'load', tryNoForceSandbox, false );
+-		defaultView.addEventListener( 'message', checkMessageForResize );
++		iframe?.addEventListener( 'load', tryNoForceSandBox, false );
++		defaultView?.addEventListener( 'message', checkMessageForResize );
+ 
+ 		return () => {
+-			iframe?.removeEventListener( 'load', tryNoForceSandbox, false );
+-			defaultView.addEventListener( 'message', checkMessageForResize );
++			iframe?.removeEventListener( 'load', tryNoForceSandBox, false );
++			defaultView?.addEventListener( 'message', checkMessageForResize );
+ 		};
+ 		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+ 		// See https://github.com/WordPress/gutenberg/pull/44378
+@@ -241,14 +262,14 @@ export default function Sandbox( {
+ 	}, [] );
+ 
+ 	useEffect( () => {
+-		trySandbox();
++		trySandBox();
+ 		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+ 		// See https://github.com/WordPress/gutenberg/pull/44378
+ 		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ title, styles, scripts ] );
+ 
+ 	useEffect( () => {
+-		trySandbox( true );
++		trySandBox( true );
+ 		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
+ 		// See https://github.com/WordPress/gutenberg/pull/44378
+ 		// eslint-disable-next-line react-hooks/exhaustive-deps
+@@ -266,3 +287,5 @@ export default function Sandbox( {
+ 		/>
+ 	);
+ }
++
++export default SandBox;
+diff --git a/packages/components/src/sandbox/stories/index.tsx b/packages/components/src/sandbox/stories/index.tsx
+new file mode 100644
+index 00000000000000..c5fea158cbd21d
+--- /dev/null
++++ b/packages/components/src/sandbox/stories/index.tsx
+@@ -0,0 +1,32 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import SandBox from '..';
++
++const meta: ComponentMeta< typeof SandBox > = {
++	component: SandBox,
++	title: 'Components/SandBox',
++	argTypes: {
++		onFocus: { control: { type: null } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof SandBox > = ( args ) => (
++	<SandBox { ...args } />
++);
++
++export const Default = Template.bind( {} );
++Default.args = {
++	html: '<p>Arbitrary HTML content</p>',
++};
+diff --git a/packages/components/src/sandbox/test/index.js b/packages/components/src/sandbox/test/index.tsx
+similarity index 85%
+rename from packages/components/src/sandbox/test/index.js
+rename to packages/components/src/sandbox/test/index.tsx
+index f25bdca675cbfd..e1a51814ecab61 100644
+--- a/packages/components/src/sandbox/test/index.js
++++ b/packages/components/src/sandbox/test/index.tsx
+@@ -11,9 +11,9 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import Sandbox from '../';
++import SandBox from '..';
+ 
+-describe( 'Sandbox', () => {
++describe( 'SandBox', () => {
+ 	const TestWrapper = () => {
+ 		const [ html, setHtml ] = useState(
+ 			// MutationObserver implementation from JSDom does not work as intended
+@@ -33,7 +33,7 @@ describe( 'Sandbox', () => {
+ 				<button onClick={ updateHtml } className="mock-button">
+ 					Mock Button
+ 				</button>
+-				<Sandbox html={ html } title="Sandbox Title" />
++				<SandBox html={ html } title="SandBox Title" />
+ 			</div>
+ 		);
+ 	};
+@@ -41,7 +41,12 @@ describe( 'Sandbox', () => {
+ 	it( 'should rerender with new emdeded content if html prop changes', () => {
+ 		render( <TestWrapper /> );
+ 
+-		const iframe = screen.getByTitle( 'Sandbox Title' );
++		const iframe =
++			screen.getByTitle< HTMLIFrameElement >( 'SandBox Title' );
++
++		if ( ! iframe.contentWindow ) {
++			throw new Error();
++		}
+ 
+ 		let sandboxedIframe = within(
+ 			iframe.contentWindow.document.body
+diff --git a/packages/components/src/sandbox/types.ts b/packages/components/src/sandbox/types.ts
+new file mode 100644
+index 00000000000000..7edc91b938f299
+--- /dev/null
++++ b/packages/components/src/sandbox/types.ts
+@@ -0,0 +1,34 @@
++export type SandBoxProps = {
++	/**
++	 * The HTML to render in the body of the iframe document.
++	 *
++	 * @default ''
++	 */
++	html?: string;
++	/**
++	 * The `<title>` of the iframe document.
++	 *
++	 * @default ''
++	 */
++	title?: string;
++	/**
++	 * The CSS class name to apply to the `<html>` and `<body>` elements of the iframe.
++	 */
++	type?: string;
++	/**
++	 * An array of CSS strings to inject into the `<head>` of the iframe document.
++	 *
++	 * @default []
++	 */
++	styles?: string[];
++	/**
++	 * An array of script URLs to inject as `<script>` tags into the bottom of the `<body>` of the iframe document.
++	 *
++	 * @default []
++	 */
++	scripts?: string[];
++	/**
++	 * The `onFocus` callback for the iframe.
++	 */
++	onFocus?: React.DOMAttributes< HTMLIFrameElement >[ 'onFocus' ];
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 2497449242c850..ad419a2af4ec75 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -62,7 +62,6 @@
+ 		"src/palette-edit",
+ 		"src/panel",
+ 		"src/query-controls",
+-		"src/sandbox",
+ 		"src/toolbar",
+ 		"src/toolbar-button",
+ 		"src/toolbar-context",

@@ -1,0 +1,1489 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 8cc39af57531e4..07910088feb5e7 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1055,6 +1055,12 @@
+ 		"markdown_source": "../packages/components/src/navigator/navigator-button/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "NavigatorContainer",
++		"slug": "navigator-container",
++		"markdown_source": "../packages/components/src/navigator/navigator-container/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "NavigatorProvider",
+ 		"slug": "navigator-provider",
+diff --git a/packages/block-editor/src/components/inserter/block-patterns-tab.js b/packages/block-editor/src/components/inserter/block-patterns-tab.js
+index 83d7b899f181f7..9ddd2f0606ce80 100644
+--- a/packages/block-editor/src/components/inserter/block-patterns-tab.js
++++ b/packages/block-editor/src/components/inserter/block-patterns-tab.js
+@@ -15,6 +15,7 @@ import {
+ 	__experimentalItem as Item,
+ 	__experimentalHStack as HStack,
+ 	__experimentalNavigatorProvider as NavigatorProvider,
++	__experimentalNavigatorContainer as NavigatorContainer,
+ 	__experimentalNavigatorScreen as NavigatorScreen,
+ 	__experimentalNavigatorButton as NavigatorButton,
+ 	__experimentalNavigatorBackButton as NavigatorBackButton,
+@@ -252,47 +253,51 @@ function BlockPatternsTabNavigation( { onInsert, rootClientId } ) {
+ 
+ 	return (
+ 		<NavigatorProvider initialPath="/">
+-			<NavigatorScreen path="/">
+-				<ItemGroup>
+-					{ categories.map( ( category ) => (
+-						<NavigatorButton
+-							key={ category.name }
+-							path={ `/category/${ category.name }` }
+-							as={ Item }
+-							isAction
+-						>
+-							<HStack>
+-								<FlexBlock>{ category.label }</FlexBlock>
+-								<Icon
+-									icon={
+-										isRTL() ? chevronLeft : chevronRight
+-									}
+-								/>
+-							</HStack>
+-						</NavigatorButton>
+-					) ) }
+-				</ItemGroup>
+-			</NavigatorScreen>
++			<NavigatorContainer>
++				<NavigatorScreen path="/">
++					<ItemGroup>
++						{ categories.map( ( category ) => (
++							<NavigatorButton
++								key={ category.name }
++								path={ `/category/${ category.name }` }
++								as={ Item }
++								isAction
++							>
++								<HStack>
++									<FlexBlock>{ category.label }</FlexBlock>
++									<Icon
++										icon={
++											isRTL() ? chevronLeft : chevronRight
++										}
++									/>
++								</HStack>
++							</NavigatorButton>
++						) ) }
++					</ItemGroup>
++				</NavigatorScreen>
+ 
+-			{ categories.map( ( category ) => (
+-				<NavigatorScreen
+-					key={ category.name }
+-					path={ `/category/${ category.name }` }
+-				>
+-					<NavigatorBackButton
+-						icon={ isRTL() ? chevronRight : chevronLeft }
+-						isSmall
+-						aria-label={ __( 'Navigate to the categories list' ) }
++				{ categories.map( ( category ) => (
++					<NavigatorScreen
++						key={ category.name }
++						path={ `/category/${ category.name }` }
+ 					>
+-						{ __( 'Back' ) }
+-					</NavigatorBackButton>
+-					<BlockPatternsCategoryPanel
+-						category={ category }
+-						rootClientId={ rootClientId }
+-						onInsert={ onInsert }
+-					/>
+-				</NavigatorScreen>
+-			) ) }
++						<NavigatorBackButton
++							icon={ isRTL() ? chevronRight : chevronLeft }
++							isSmall
++							aria-label={ __(
++								'Navigate to the categories list'
++							) }
++						>
++							{ __( 'Back' ) }
++						</NavigatorBackButton>
++						<BlockPatternsCategoryPanel
++							category={ category }
++							rootClientId={ rootClientId }
++							onInsert={ onInsert }
++						/>
++					</NavigatorScreen>
++				) ) }
++			</NavigatorContainer>
+ 		</NavigatorProvider>
+ 	);
+ }
+diff --git a/packages/block-editor/src/components/inserter/media-tab/media-tab.js b/packages/block-editor/src/components/inserter/media-tab/media-tab.js
+index 639a63df271d00..bae1b1381393de 100644
+--- a/packages/block-editor/src/components/inserter/media-tab/media-tab.js
++++ b/packages/block-editor/src/components/inserter/media-tab/media-tab.js
+@@ -13,6 +13,7 @@ import {
+ 	__experimentalItem as Item,
+ 	__experimentalHStack as HStack,
+ 	__experimentalNavigatorProvider as NavigatorProvider,
++	__experimentalNavigatorContainer as NavigatorContainer,
+ 	__experimentalNavigatorScreen as NavigatorScreen,
+ 	__experimentalNavigatorButton as NavigatorButton,
+ 	__experimentalNavigatorBackButton as NavigatorBackButton,
+@@ -134,47 +135,51 @@ function MediaTab( {
+ function MediaTabNavigation( { onInsert, rootClientId, mediaCategories } ) {
+ 	return (
+ 		<NavigatorProvider initialPath="/">
+-			<NavigatorScreen path="/">
+-				<ItemGroup>
+-					{ mediaCategories.map( ( category ) => (
+-						<NavigatorButton
+-							key={ category.name }
+-							path={ `/category/${ category.name }` }
+-							as={ Item }
+-							isAction
+-						>
+-							<HStack>
+-								<FlexBlock>{ category.label }</FlexBlock>
+-								<Icon
+-									icon={
+-										isRTL() ? chevronLeft : chevronRight
+-									}
+-								/>
+-							</HStack>
+-						</NavigatorButton>
+-					) ) }
+-				</ItemGroup>
+-			</NavigatorScreen>
+-			{ mediaCategories.map( ( category ) => (
+-				<NavigatorScreen
+-					key={ category.name }
+-					path={ `/category/${ category.name }` }
+-				>
+-					<NavigatorBackButton
+-						className="rigatonious"
+-						icon={ isRTL() ? chevronRight : chevronLeft }
+-						isSmall
+-						aria-label={ __( 'Navigate to the categories list' ) }
+-					>
+-						{ __( 'Back' ) }
+-					</NavigatorBackButton>
+-					<MediaCategoryPanel
+-						rootClientId={ rootClientId }
+-						onInsert={ onInsert }
+-						category={ category }
+-					/>
++			<NavigatorContainer>
++				<NavigatorScreen path="/">
++					<ItemGroup>
++						{ mediaCategories.map( ( category ) => (
++							<NavigatorButton
++								key={ category.name }
++								path={ `/category/${ category.name }` }
++								as={ Item }
++								isAction
++							>
++								<HStack>
++									<FlexBlock>{ category.label }</FlexBlock>
++									<Icon
++										icon={
++											isRTL() ? chevronLeft : chevronRight
++										}
++									/>
++								</HStack>
++							</NavigatorButton>
++						) ) }
++					</ItemGroup>
+ 				</NavigatorScreen>
+-			) ) }
++				{ mediaCategories.map( ( category ) => (
++					<NavigatorScreen
++						key={ category.name }
++						path={ `/category/${ category.name }` }
++					>
++						<NavigatorBackButton
++							className="rigatonious"
++							icon={ isRTL() ? chevronRight : chevronLeft }
++							isSmall
++							aria-label={ __(
++								'Navigate to the categories list'
++							) }
++						>
++							{ __( 'Back' ) }
++						</NavigatorBackButton>
++						<MediaCategoryPanel
++							rootClientId={ rootClientId }
++							onInsert={ onInsert }
++							category={ category }
++						/>
++					</NavigatorScreen>
++				) ) }
++			</NavigatorContainer>
+ 		</NavigatorProvider>
+ 	);
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 22a08c2f0dd08c..76cd4f9b54b7f4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,10 @@
+ 
+ -   NumberControl: refactor styles/tests/stories to TypeScript, replace fireEvent with user-event ([#45990](https://github.com/WordPress/gutenberg/pull/45990)).
+ 
++### Experimental
++
++-   `Navigator`: `NavigatorScreen` components must now be placed in a `NavigatorCnotainer` component ([#XXX](https://github.com/WordPress/gutenberg/pull/XXX)).
++
+ ## 22.1.0 (2022-11-16)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 114884690e4821..b3838592818d51 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -112,6 +112,7 @@ export { default as __experimentalNavigationItem } from './navigation/item';
+ export { default as __experimentalNavigationMenu } from './navigation/menu';
+ export {
+ 	NavigatorProvider as __experimentalNavigatorProvider,
++	NavigatorContainer as __experimentalNavigatorContainer,
+ 	NavigatorScreen as __experimentalNavigatorScreen,
+ 	NavigatorButton as __experimentalNavigatorButton,
+ 	NavigatorBackButton as __experimentalNavigatorBackButton,
+diff --git a/packages/components/src/navigator/index.ts b/packages/components/src/navigator/index.ts
+index 49f5655dc4b39c..e5c19c26fcc52d 100644
+--- a/packages/components/src/navigator/index.ts
++++ b/packages/components/src/navigator/index.ts
+@@ -1,4 +1,5 @@
+ export { NavigatorProvider } from './navigator-provider';
++export { NavigatorContainer } from './navigator-container';
+ export { NavigatorScreen } from './navigator-screen';
+ export { NavigatorButton } from './navigator-button';
+ export { NavigatorBackButton } from './navigator-back-button';
+diff --git a/packages/components/src/navigator/navigator-back-button/README.md b/packages/components/src/navigator/navigator-back-button/README.md
+index d1470276975979..526931fd3fd55e 100644
+--- a/packages/components/src/navigator/navigator-back-button/README.md
++++ b/packages/components/src/navigator/navigator-back-button/README.md
+@@ -4,7 +4,7 @@
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-The `NavigatorBackButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) components (or the `useNavigator` hook).
++The `NavigatorBackButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorContainer`](/packages/components/src/navigator/navigator-container/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) components (or the `useNavigator` hook).
+ 
+ ## Usage
+ 
+diff --git a/packages/components/src/navigator/navigator-back-button/component.tsx b/packages/components/src/navigator/navigator-back-button/component.tsx
+index 498096edd7d465..8a77adab0a621a 100644
+--- a/packages/components/src/navigator/navigator-back-button/component.tsx
++++ b/packages/components/src/navigator/navigator-back-button/component.tsx
+@@ -23,13 +23,15 @@ function UnconnectedNavigatorBackButton(
+ /**
+  * The `NavigatorBackButton` component can be used to navigate to a screen and
+  * should be used in combination with the `NavigatorProvider`, the
+- * `NavigatorScreen` and the `NavigatorButton` components (or the `useNavigator`
++ * `NavigatorContainer`, the `NavigatorScreen` and the `NavigatorButton`
++ * components (or the `useNavigator`
+  * hook).
+  *
+  * @example
+  * ```jsx
+  * import {
+  *   __experimentalNavigatorProvider as NavigatorProvider,
++ *   __experimentalNavigatorContainer as NavigatorContainer,
+  *   __experimentalNavigatorScreen as NavigatorScreen,
+  *   __experimentalNavigatorButton as NavigatorButton,
+  *   __experimentalNavigatorBackButton as NavigatorBackButton,
+@@ -37,19 +39,21 @@ function UnconnectedNavigatorBackButton(
+  *
+  * const MyNavigation = () => (
+  *   <NavigatorProvider initialPath="/">
+- *     <NavigatorScreen path="/">
+- *       <p>This is the home screen.</p>
+- *        <NavigatorButton path="/child">
+- *          Navigate to child screen.
+- *       </NavigatorButton>
+- *     </NavigatorScreen>
++ *     <NavigatorContainer>
++ *       <NavigatorScreen path="/">
++ *         <p>This is the home screen.</p>
++ *          <NavigatorButton path="/child">
++ *            Navigate to child screen.
++ *         </NavigatorButton>
++ *       </NavigatorScreen>
+  *
+- *     <NavigatorScreen path="/child">
+- *       <p>This is the child screen.</p>
+- *       <NavigatorBackButton>
+- *         Go back
+- *       </NavigatorBackButton>
+- *     </NavigatorScreen>
++ *       <NavigatorScreen path="/child">
++ *         <p>This is the child screen.</p>
++ *         <NavigatorBackButton>
++ *           Go back
++ *         </NavigatorBackButton>
++ *       </NavigatorScreen>
++ *     </NavigatorContainer>
+  *   </NavigatorProvider>
+  * );
+  * ```
+diff --git a/packages/components/src/navigator/navigator-button/README.md b/packages/components/src/navigator/navigator-button/README.md
+index fc96c358cdb02e..638d4a15f78b8c 100644
+--- a/packages/components/src/navigator/navigator-button/README.md
++++ b/packages/components/src/navigator/navigator-button/README.md
+@@ -4,7 +4,7 @@
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-The `NavigatorButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
++The `NavigatorButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorContainer`](/packages/components/src/navigator/navigator-container/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
+ 
+ ## Usage
+ 
+diff --git a/packages/components/src/navigator/navigator-button/component.tsx b/packages/components/src/navigator/navigator-button/component.tsx
+index 2e446dac010c09..e48fe4a4322047 100644
+--- a/packages/components/src/navigator/navigator-button/component.tsx
++++ b/packages/components/src/navigator/navigator-button/component.tsx
+@@ -21,14 +21,16 @@ function UnconnectedNavigatorButton(
+ }
+ 
+ /**
+- * The `NavigatorButton` component can be used to navigate to a screen and should
+- * be used in combination with the `NavigatorProvider`, the `NavigatorScreen`
+- * and the `NavigatorBackButton` components (or the `useNavigator` hook).
++ * The `NavigatorButton` component can be used to navigate to a screen and
++ * should be used in combination with the `NavigatorProvider`, the
++ * `NavigatorContainer`, the `NavigatorScreen` and the `NavigatorBackButton`
++ * components (or the `useNavigator` hook).
+  *
+  * @example
+  * ```jsx
+  * import {
+  *   __experimentalNavigatorProvider as NavigatorProvider,
++ *   __experimentalNavigatorContainer as NavigatorContainer,
+  *   __experimentalNavigatorScreen as NavigatorScreen,
+  *   __experimentalNavigatorButton as NavigatorButton,
+  *   __experimentalNavigatorBackButton as NavigatorBackButton,
+@@ -36,19 +38,21 @@ function UnconnectedNavigatorButton(
+  *
+  * const MyNavigation = () => (
+  *   <NavigatorProvider initialPath="/">
+- *     <NavigatorScreen path="/">
+- *       <p>This is the home screen.</p>
+- *        <NavigatorButton path="/child">
+- *          Navigate to child screen.
+- *       </NavigatorButton>
+- *     </NavigatorScreen>
++ *     <NavigatorContainer>
++ *       <NavigatorScreen path="/">
++ *         <p>This is the home screen.</p>
++ *          <NavigatorButton path="/child">
++ *            Navigate to child screen.
++ *         </NavigatorButton>
++ *       </NavigatorScreen>
+  *
+- *     <NavigatorScreen path="/child">
+- *       <p>This is the child screen.</p>
+- *       <NavigatorBackButton>
+- *         Go back
+- *       </NavigatorBackButton>
+- *     </NavigatorScreen>
++ *       <NavigatorScreen path="/child">
++ *         <p>This is the child screen.</p>
++ *         <NavigatorBackButton>
++ *           Go back
++ *         </NavigatorBackButton>
++ *       </NavigatorScreen>
++ *     </NavigatorContainer>
+  *   </NavigatorProvider>
+  * );
+  * ```
+diff --git a/packages/components/src/navigator/navigator-container/README.md b/packages/components/src/navigator/navigator-container/README.md
+new file mode 100644
+index 00000000000000..8b51cabafab1ac
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-container/README.md
+@@ -0,0 +1,21 @@
++# `NavigatorContainer`
++
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
++The `NavigatorContainer` component is a container for `NavigatorScreen` components to be placed in. It should  be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorContainer`](/packages/components/src/navigator/navigator-container/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
++
++## Usage
++
++Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md#usage) for a usage example.
++
++## Props
++
++The component accepts the following props:
++
++### `className`: `string`
++
++Class name to add to the container element.
++
++-   Required: No
+diff --git a/packages/components/src/navigator/navigator-container/component.tsx b/packages/components/src/navigator/navigator-container/component.tsx
+new file mode 100644
+index 00000000000000..06e72de6f7680c
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-container/component.tsx
+@@ -0,0 +1,89 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++import { css } from '@emotion/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import {
++	contextConnect,
++	useContextSystem,
++	WordPressComponentProps,
++} from '../../ui/context';
++import { useCx } from '../../utils/hooks/use-cx';
++import { View } from '../../view';
++import type { NavigatorContainerProps } from '../types';
++
++function UnconnectedNavigatorContainer(
++	props: WordPressComponentProps< NavigatorContainerProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
++	const { children, className, ...otherProps } = useContextSystem(
++		props,
++		'NavigatorContainer'
++	);
++
++	const cx = useCx();
++	const classes = useMemo(
++		// Prevents horizontal overflow while animating screen transitions.
++		() => cx( css( { overflowX: 'hidden' } ), className ),
++		[ className, cx ]
++	);
++
++	return (
++		<View ref={ forwardedRef } className={ classes } { ...otherProps }>
++			{ children }
++		</View>
++	);
++}
++
++/**
++ * The `NavigatorContainer` component is a container for `NavigatorScreen`
++ * components to be placed in. It should be used in combination with the
++ * `NavigatorProvider`, the `NavigatorContainer`, the `NavigatorScreen` and the
++ * `NavigatorBackButton` components (or the `useNavigator` hook).
++ *
++ * @example
++ * ```jsx
++ * import {
++ *   __experimentalNavigatorProvider as NavigatorProvider,
++ *   __experimentalNavigatorContainer as NavigatorContainer,
++ *   __experimentalNavigatorScreen as NavigatorScreen,
++ *   __experimentalNavigatorButton as NavigatorButton,
++ *   __experimentalNavigatorBackButton as NavigatorBackButton,
++ * } from '@wordpress/components';
++ *
++ * const MyNavigation = () => (
++ *   <NavigatorProvider initialPath="/">
++ *     <NavigatorContainer>
++ *       <NavigatorScreen path="/">
++ *         <p>This is the home screen.</p>
++ *          <NavigatorButton path="/child">
++ *            Navigate to child screen.
++ *         </NavigatorButton>
++ *       </NavigatorScreen>
++ *
++ *       <NavigatorScreen path="/child">
++ *         <p>This is the child screen.</p>
++ *         <NavigatorBackButton>
++ *           Go back
++ *         </NavigatorBackButton>
++ *       </NavigatorScreen>
++ *     </NavigatorContainer>
++ *   </NavigatorProvider>
++ * );
++ * ```
++ */
++export const NavigatorContainer = contextConnect(
++	UnconnectedNavigatorContainer,
++	'NavigatorContainer'
++);
++
++export default NavigatorContainer;
+diff --git a/packages/components/src/navigator/navigator-container/index.ts b/packages/components/src/navigator/navigator-container/index.ts
+new file mode 100644
+index 00000000000000..8e329cc3699b93
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-container/index.ts
+@@ -0,0 +1 @@
++export { default as NavigatorContainer } from './component';
+diff --git a/packages/components/src/navigator/navigator-provider/README.md b/packages/components/src/navigator/navigator-provider/README.md
+index d552d2bb20634f..ff3200a2e9429a 100644
+--- a/packages/components/src/navigator/navigator-provider/README.md
++++ b/packages/components/src/navigator/navigator-provider/README.md
+@@ -11,6 +11,7 @@ The `NavigatorProvider` component allows rendering nested views/panels/menus (vi
+ ```jsx
+ import {
+   __experimentalNavigatorProvider as NavigatorProvider,
++  __experimentalNavigatorContainer as NavigatorContainer,
+   __experimentalNavigatorScreen as NavigatorScreen,
+   __experimentalNavigatorButton as NavigatorButton,
+   __experimentalNavigatorBackButton as NavigatorBackButton,
+@@ -18,19 +19,21 @@ import {
+ 
+ const MyNavigation = () => (
+   <NavigatorProvider initialPath="/">
+-    <NavigatorScreen path="/">
+-      <p>This is the home screen.</p>
+-       <NavigatorButton path="/child">
+-         Navigate to child screen.
+-      </NavigatorButton>
+-    </NavigatorScreen>
+-
+-    <NavigatorScreen path="/child">
+-      <p>This is the child screen.</p>
+-      <NavigatorBackButton>
+-        Go back
+-      </NavigatorBackButton>
+-    </NavigatorScreen>
++    <NavigatorContainer>
++      <NavigatorScreen path="/">
++        <p>This is the home screen.</p>
++         <NavigatorButton path="/child">
++           Navigate to child screen.
++        </NavigatorButton>
++      </NavigatorScreen>
++
++      <NavigatorScreen path="/child">
++        <p>This is the child screen.</p>
++        <NavigatorBackButton>
++          Go back
++        </NavigatorBackButton>
++      </NavigatorScreen>
++    </NavigatorContainer>
+   </NavigatorProvider>
+ );
+ ```
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index 57b18f6d92dba0..6cccefd452b805 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -1,37 +1,47 @@
+-/**
+- * External dependencies
+- */
+-import type { ForwardedRef } from 'react';
+-import { css } from '@emotion/react';
+-
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo, useState, useCallback } from '@wordpress/element';
++import {
++	useMemo,
++	useState,
++	useCallback,
++	Children,
++	isValidElement,
++} from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+  */
+-import {
+-	contextConnect,
+-	useContextSystem,
+-	WordPressComponentProps,
+-} from '../../ui/context';
+-import { useCx } from '../../utils/hooks/use-cx';
+-import { View } from '../../view';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
++import { contextConnectWithoutRef } from '../../ui/context/context-connect';
+ import { NavigatorContext } from '../context';
+ import type {
+ 	NavigatorProviderProps,
+ 	NavigatorLocation,
+ 	NavigatorContext as NavigatorContextType,
+ } from '../types';
++import { NavigatorScreen } from '../navigator-screen';
++import { NavigatorContainer } from '../navigator-container';
+ 
+ function UnconnectedNavigatorProvider(
+-	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
+-	forwardedRef: ForwardedRef< any >
++	props: WordPressComponentProps< NavigatorProviderProps, 'div', false >
+ ) {
+-	const { initialPath, children, className, ...otherProps } =
+-		useContextSystem( props, 'NavigatorProvider' );
++	const contextProps = useContextSystem( props, 'NavigatorProvider' );
++	const { initialPath } = contextProps;
++	let { children } = contextProps;
++
++	const hasScreenChildren = Children.toArray( children ).some(
++		( child ) => isValidElement( child ) && child.type === NavigatorScreen
++	);
++	if ( hasScreenChildren ) {
++		deprecated( 'NavigatorScreen as child of NavigatorProvider', {
++			since: '6.2',
++			version: '6.3',
++			alternative: 'NavigatorContainer',
++		} );
++		children = <NavigatorContainer>{ children }</NavigatorContainer>;
++	}
+ 
+ 	const [ locationHistory, setLocationHistory ] = useState<
+ 		NavigatorLocation[]
+@@ -81,25 +91,16 @@ function UnconnectedNavigatorProvider(
+ 		[ locationHistory, goTo, goBack ]
+ 	);
+ 
+-	const cx = useCx();
+-	const classes = useMemo(
+-		// Prevents horizontal overflow while animating screen transitions.
+-		() => cx( css( { overflowX: 'hidden' } ), className ),
+-		[ className, cx ]
+-	);
+-
+ 	return (
+-		<View ref={ forwardedRef } className={ classes } { ...otherProps }>
+-			<NavigatorContext.Provider value={ navigatorContextValue }>
+-				{ children }
+-			</NavigatorContext.Provider>
+-		</View>
++		<NavigatorContext.Provider value={ navigatorContextValue }>
++			{ children }
++		</NavigatorContext.Provider>
+ 	);
+ }
+ 
+ /**
+  * The `NavigatorProvider` component allows rendering nested views/panels/menus
+- * (via the `NavigatorScreen` component and navigate between these different
++ * (via the `NavigatorScreen` component) and navigate between these different
+  * view (via the `NavigatorButton` and `NavigatorBackButton` components or the
+  * `useNavigator` hook).
+  *
+@@ -107,6 +108,7 @@ function UnconnectedNavigatorProvider(
+  * ```jsx
+  * import {
+  *   __experimentalNavigatorProvider as NavigatorProvider,
++ *   __experimentalNavigatorContainer as NavigatorContainer,
+  *   __experimentalNavigatorScreen as NavigatorScreen,
+  *   __experimentalNavigatorButton as NavigatorButton,
+  *   __experimentalNavigatorBackButton as NavigatorBackButton,
+@@ -114,24 +116,26 @@ function UnconnectedNavigatorProvider(
+  *
+  * const MyNavigation = () => (
+  *   <NavigatorProvider initialPath="/">
+- *     <NavigatorScreen path="/">
+- *       <p>This is the home screen.</p>
+- *        <NavigatorButton path="/child">
+- *          Navigate to child screen.
+- *       </NavigatorButton>
+- *     </NavigatorScreen>
++ *     <NavigatorContainer>
++ *       <NavigatorScreen path="/">
++ *         <p>This is the home screen.</p>
++ *          <NavigatorButton path="/child">
++ *            Navigate to child screen.
++ *         </NavigatorButton>
++ *       </NavigatorScreen>
+  *
+- *     <NavigatorScreen path="/child">
+- *       <p>This is the child screen.</p>
+- *       <NavigatorBackButton>
+- *         Go back
+- *       </NavigatorBackButton>
+- *     </NavigatorScreen>
++ *       <NavigatorScreen path="/child">
++ *         <p>This is the child screen.</p>
++ *         <NavigatorBackButton>
++ *           Go back
++ *         </NavigatorBackButton>
++ *       </NavigatorScreen>
++ *     </NavigatorContainer>
+  *   </NavigatorProvider>
+  * );
+  * ```
+  */
+-export const NavigatorProvider = contextConnect(
++export const NavigatorProvider = contextConnectWithoutRef(
+ 	UnconnectedNavigatorProvider,
+ 	'NavigatorProvider'
+ );
+diff --git a/packages/components/src/navigator/navigator-screen/README.md b/packages/components/src/navigator/navigator-screen/README.md
+index 5ba5af44fe8c1a..c58062bad971e5 100644
+--- a/packages/components/src/navigator/navigator-screen/README.md
++++ b/packages/components/src/navigator/navigator-screen/README.md
+@@ -4,7 +4,7 @@
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+ 
+-The `NavigatorScreen` component represents a single view/screen/panel and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) and the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
++The `NavigatorScreen` component represents a single view/screen/panel and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorContainer`](/packages/components/src/navigator/navigator-container/README.md), the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) and the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
+ 
+ ## Usage
+ 
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 266bd553e0a8d2..9892608df1d1fd 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -209,6 +209,7 @@ function UnconnectedNavigatorScreen(
+  * ```jsx
+  * import {
+  *   __experimentalNavigatorProvider as NavigatorProvider,
++ *   __experimentalNavigatorContainer as NavigatorContainer,
+  *   __experimentalNavigatorScreen as NavigatorScreen,
+  *   __experimentalNavigatorButton as NavigatorButton,
+  *   __experimentalNavigatorBackButton as NavigatorBackButton,
+@@ -216,19 +217,21 @@ function UnconnectedNavigatorScreen(
+  *
+  * const MyNavigation = () => (
+  *   <NavigatorProvider initialPath="/">
+- *     <NavigatorScreen path="/">
+- *       <p>This is the home screen.</p>
+- *        <NavigatorButton path="/child">
+- *          Navigate to child screen.
+- *       </NavigatorButton>
+- *     </NavigatorScreen>
++ *     <NavigatorContainer>
++ *       <NavigatorScreen path="/">
++ *         <p>This is the home screen.</p>
++ *          <NavigatorButton path="/child">
++ *            Navigate to child screen.
++ *         </NavigatorButton>
++ *       </NavigatorScreen>
+  *
+- *     <NavigatorScreen path="/child">
+- *       <p>This is the child screen.</p>
+- *       <NavigatorBackButton>
+- *         Go back
+- *       </NavigatorBackButton>
+- *     </NavigatorScreen>
++ *       <NavigatorScreen path="/child">
++ *         <p>This is the child screen.</p>
++ *         <NavigatorBackButton>
++ *           Go back
++ *         </NavigatorBackButton>
++ *       </NavigatorScreen>
++ *     </NavigatorContainer>
+  *   </NavigatorProvider>
+  * );
+  * ```
+diff --git a/packages/components/src/navigator/stories/index.tsx b/packages/components/src/navigator/stories/index.tsx
+index a1f6e2fbf0c9a5..1236554b4fc1df 100644
+--- a/packages/components/src/navigator/stories/index.tsx
++++ b/packages/components/src/navigator/stories/index.tsx
+@@ -12,6 +12,7 @@ import { HStack } from '../../h-stack';
+ import Dropdown from '../../dropdown';
+ import {
+ 	NavigatorProvider,
++	NavigatorContainer,
+ 	NavigatorScreen,
+ 	NavigatorButton,
+ 	NavigatorBackButton,
+@@ -22,7 +23,6 @@ const meta: ComponentMeta< typeof NavigatorProvider > = {
+ 	title: 'Components (Experimental)/Navigator',
+ 	subcomponents: { NavigatorScreen, NavigatorButton, NavigatorBackButton },
+ 	argTypes: {
+-		as: { control: { type: null } },
+ 		children: { control: { type: null } },
+ 		initialPath: { control: { type: null } },
+ 	},
+@@ -37,135 +37,139 @@ const Template: ComponentStory< typeof NavigatorProvider > = ( {
+ 	style,
+ 	...props
+ } ) => (
+-	<NavigatorProvider
+-		style={ { ...style, height: '100vh', maxHeight: '450px' } }
+-		{ ...props }
+-	>
+-		<NavigatorScreen path="/">
+-			<Card>
+-				<CardBody>
+-					<p>This is the home screen.</p>
++	<NavigatorProvider { ...props }>
++		<NavigatorContainer
++			style={ { ...style, height: '100vh', maxHeight: '450px' } }
++		>
++			<NavigatorScreen path="/">
++				<Card>
++					<CardBody>
++						<p>This is the home screen.</p>
+ 
+-					<HStack justify="flex-start" wrap>
+-						<NavigatorButton variant="secondary" path="/child">
+-							Navigate to child screen.
+-						</NavigatorButton>
++						<HStack justify="flex-start" wrap>
++							<NavigatorButton variant="secondary" path="/child">
++								Navigate to child screen.
++							</NavigatorButton>
+ 
+-						<NavigatorButton
+-							variant="secondary"
+-							path="/overflow-child"
+-						>
+-							Navigate to screen with horizontal overflow.
+-						</NavigatorButton>
++							<NavigatorButton
++								variant="secondary"
++								path="/overflow-child"
++							>
++								Navigate to screen with horizontal overflow.
++							</NavigatorButton>
+ 
+-						<NavigatorButton variant="secondary" path="/stickies">
+-							Navigate to screen with sticky content.
+-						</NavigatorButton>
++							<NavigatorButton
++								variant="secondary"
++								path="/stickies"
++							>
++								Navigate to screen with sticky content.
++							</NavigatorButton>
+ 
+-						<Dropdown
+-							renderToggle={ ( {
+-								isOpen,
+-								onToggle,
+-							}: {
+-								// TODO: remove once `Dropdown` is refactored to TypeScript
+-								isOpen: boolean;
+-								onToggle: () => void;
+-							} ) => (
+-								<Button
+-									onClick={ onToggle }
+-									aria-expanded={ isOpen }
+-									variant="primary"
+-								>
+-									Open test dialog
+-								</Button>
+-							) }
+-							renderContent={ () => (
+-								<Card>
+-									<CardHeader>Go</CardHeader>
+-									<CardBody>Stuff</CardBody>
+-								</Card>
+-							) }
+-						/>
+-					</HStack>
+-				</CardBody>
+-			</Card>
+-		</NavigatorScreen>
++							<Dropdown
++								renderToggle={ ( {
++									isOpen,
++									onToggle,
++								}: {
++									// TODO: remove once `Dropdown` is refactored to TypeScript
++									isOpen: boolean;
++									onToggle: () => void;
++								} ) => (
++									<Button
++										onClick={ onToggle }
++										aria-expanded={ isOpen }
++										variant="primary"
++									>
++										Open test dialog
++									</Button>
++								) }
++								renderContent={ () => (
++									<Card>
++										<CardHeader>Go</CardHeader>
++										<CardBody>Stuff</CardBody>
++									</Card>
++								) }
++							/>
++						</HStack>
++					</CardBody>
++				</Card>
++			</NavigatorScreen>
+ 
+-		<NavigatorScreen path="/child">
+-			<Card>
+-				<CardBody>
+-					<p>This is the child screen.</p>
+-					<NavigatorBackButton variant="secondary">
+-						Go back
+-					</NavigatorBackButton>
+-				</CardBody>
+-			</Card>
+-		</NavigatorScreen>
++			<NavigatorScreen path="/child">
++				<Card>
++					<CardBody>
++						<p>This is the child screen.</p>
++						<NavigatorBackButton variant="secondary">
++							Go back
++						</NavigatorBackButton>
++					</CardBody>
++				</Card>
++			</NavigatorScreen>
+ 
+-		<NavigatorScreen path="/overflow-child">
+-			<Card>
+-				<CardBody>
+-					<NavigatorBackButton variant="secondary">
+-						Go back
+-					</NavigatorBackButton>
+-					<div
+-						style={ {
+-							display: 'inline-block',
+-							background: 'papayawhip',
+-						} }
+-					>
+-						<span
++			<NavigatorScreen path="/overflow-child">
++				<Card>
++					<CardBody>
++						<NavigatorBackButton variant="secondary">
++							Go back
++						</NavigatorBackButton>
++						<div
+ 							style={ {
+-								color: 'palevioletred',
+-								whiteSpace: 'nowrap',
+-								fontSize: '42vw',
++								display: 'inline-block',
++								background: 'papayawhip',
+ 							} }
+ 						>
+-							¯\_(ツ)_/¯
+-						</span>
+-					</div>
+-				</CardBody>
+-			</Card>
+-		</NavigatorScreen>
++							<span
++								style={ {
++									color: 'palevioletred',
++									whiteSpace: 'nowrap',
++									fontSize: '42vw',
++								} }
++							>
++								¯\_(ツ)_/¯
++							</span>
++						</div>
++					</CardBody>
++				</Card>
++			</NavigatorScreen>
+ 
+-		<NavigatorScreen path="/stickies">
+-			<Card>
+-				<CardHeader style={ getStickyStyles( { zIndex: 2 } ) }>
+-					<NavigatorBackButton variant="secondary">
+-						Go back
+-					</NavigatorBackButton>
+-				</CardHeader>
+-				<CardBody>
+-					<div
+-						style={ getStickyStyles( {
+-							top: 69,
+-							bgColor: 'peachpuff',
+-						} ) }
+-					>
+-						<h2>A wild sticky element appears</h2>
+-					</div>
+-					<MetaphorIpsum quantity={ 3 } />
+-				</CardBody>
+-				<CardBody>
+-					<div
++			<NavigatorScreen path="/stickies">
++				<Card>
++					<CardHeader style={ getStickyStyles( { zIndex: 2 } ) }>
++						<NavigatorBackButton variant="secondary">
++							Go back
++						</NavigatorBackButton>
++					</CardHeader>
++					<CardBody>
++						<div
++							style={ getStickyStyles( {
++								top: 69,
++								bgColor: 'peachpuff',
++							} ) }
++						>
++							<h2>A wild sticky element appears</h2>
++						</div>
++						<MetaphorIpsum quantity={ 3 } />
++					</CardBody>
++					<CardBody>
++						<div
++							style={ getStickyStyles( {
++								top: 69,
++								bgColor: 'paleturquoise',
++							} ) }
++						>
++							<h2>Another wild sticky element appears</h2>
++						</div>
++						<MetaphorIpsum quantity={ 3 } />
++					</CardBody>
++					<CardFooter
+ 						style={ getStickyStyles( {
+-							top: 69,
+-							bgColor: 'paleturquoise',
++							bgColor: 'mistyrose',
+ 						} ) }
+ 					>
+-						<h2>Another wild sticky element appears</h2>
+-					</div>
+-					<MetaphorIpsum quantity={ 3 } />
+-				</CardBody>
+-				<CardFooter
+-					style={ getStickyStyles( {
+-						bgColor: 'mistyrose',
+-					} ) }
+-				>
+-					<Button variant="primary">Primary noop</Button>
+-				</CardFooter>
+-			</Card>
+-		</NavigatorScreen>
++						<Button variant="primary">Primary noop</Button>
++					</CardFooter>
++				</Card>
++			</NavigatorScreen>
++		</NavigatorContainer>
+ 	</NavigatorProvider>
+ );
+ 
+diff --git a/packages/components/src/navigator/test/index.tsx b/packages/components/src/navigator/test/index.tsx
+index be836f0152fc20..ba4c081972a81a 100644
+--- a/packages/components/src/navigator/test/index.tsx
++++ b/packages/components/src/navigator/test/index.tsx
+@@ -15,6 +15,7 @@ import { useState } from '@wordpress/element';
+  */
+ import {
+ 	NavigatorProvider,
++	NavigatorContainer,
+ 	NavigatorScreen,
+ 	NavigatorButton,
+ 	NavigatorBackButton,
+@@ -146,73 +147,75 @@ const MyNavigation = ( {
+ 	return (
+ 		<>
+ 			<NavigatorProvider initialPath={ initialPath }>
+-				<NavigatorScreen path={ PATHS.HOME }>
+-					<p>{ SCREEN_TEXT.home }</p>
+-					<CustomNavigatorButton
+-						path={ PATHS.NOT_FOUND }
+-						onClick={ onNavigatorButtonClick }
+-					>
+-						{ BUTTON_TEXT.toNonExistingScreen }
+-					</CustomNavigatorButton>
+-					<CustomNavigatorButton
+-						path={ PATHS.CHILD }
+-						onClick={ onNavigatorButtonClick }
+-					>
+-						{ BUTTON_TEXT.toChildScreen }
+-					</CustomNavigatorButton>
+-					<CustomNavigatorButton
+-						path={ PATHS.INVALID_HTML_ATTRIBUTE }
+-						onClick={ onNavigatorButtonClick }
+-					>
+-						{ BUTTON_TEXT.toInvalidHtmlPathScreen }
+-					</CustomNavigatorButton>
+-				</NavigatorScreen>
+-
+-				<NavigatorScreen path={ PATHS.CHILD }>
+-					<p>{ SCREEN_TEXT.child }</p>
+-					<CustomNavigatorButtonWithFocusRestoration
+-						path={ PATHS.NESTED }
+-						onClick={ onNavigatorButtonClick }
+-					>
+-						{ BUTTON_TEXT.toNestedScreen }
+-					</CustomNavigatorButtonWithFocusRestoration>
+-					<CustomNavigatorBackButton
+-						onClick={ onNavigatorButtonClick }
+-					>
+-						{ BUTTON_TEXT.back }
+-					</CustomNavigatorBackButton>
+-
+-					<label htmlFor="test-input-inner">Inner input</label>
+-					<input
+-						name="test-input-inner"
+-						// eslint-disable-next-line no-restricted-syntax
+-						id="test-input-inner"
+-						onChange={ ( e ) => {
+-							setInnerInputValue( e.target.value );
+-						} }
+-						value={ innerInputValue }
+-					/>
+-				</NavigatorScreen>
+-
+-				<NavigatorScreen path={ PATHS.NESTED }>
+-					<p>{ SCREEN_TEXT.nested }</p>
+-					<CustomNavigatorBackButton
+-						onClick={ onNavigatorButtonClick }
+-					>
+-						{ BUTTON_TEXT.back }
+-					</CustomNavigatorBackButton>
+-				</NavigatorScreen>
+-
+-				<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
+-					<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
+-					<CustomNavigatorBackButton
+-						onClick={ onNavigatorButtonClick }
+-					>
+-						{ BUTTON_TEXT.back }
+-					</CustomNavigatorBackButton>
+-				</NavigatorScreen>
+-
+-				{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
++				<NavigatorContainer>
++					<NavigatorScreen path={ PATHS.HOME }>
++						<p>{ SCREEN_TEXT.home }</p>
++						<CustomNavigatorButton
++							path={ PATHS.NOT_FOUND }
++							onClick={ onNavigatorButtonClick }
++						>
++							{ BUTTON_TEXT.toNonExistingScreen }
++						</CustomNavigatorButton>
++						<CustomNavigatorButton
++							path={ PATHS.CHILD }
++							onClick={ onNavigatorButtonClick }
++						>
++							{ BUTTON_TEXT.toChildScreen }
++						</CustomNavigatorButton>
++						<CustomNavigatorButton
++							path={ PATHS.INVALID_HTML_ATTRIBUTE }
++							onClick={ onNavigatorButtonClick }
++						>
++							{ BUTTON_TEXT.toInvalidHtmlPathScreen }
++						</CustomNavigatorButton>
++					</NavigatorScreen>
++
++					<NavigatorScreen path={ PATHS.CHILD }>
++						<p>{ SCREEN_TEXT.child }</p>
++						<CustomNavigatorButtonWithFocusRestoration
++							path={ PATHS.NESTED }
++							onClick={ onNavigatorButtonClick }
++						>
++							{ BUTTON_TEXT.toNestedScreen }
++						</CustomNavigatorButtonWithFocusRestoration>
++						<CustomNavigatorBackButton
++							onClick={ onNavigatorButtonClick }
++						>
++							{ BUTTON_TEXT.back }
++						</CustomNavigatorBackButton>
++
++						<label htmlFor="test-input-inner">Inner input</label>
++						<input
++							name="test-input-inner"
++							// eslint-disable-next-line no-restricted-syntax
++							id="test-input-inner"
++							onChange={ ( e ) => {
++								setInnerInputValue( e.target.value );
++							} }
++							value={ innerInputValue }
++						/>
++					</NavigatorScreen>
++
++					<NavigatorScreen path={ PATHS.NESTED }>
++						<p>{ SCREEN_TEXT.nested }</p>
++						<CustomNavigatorBackButton
++							onClick={ onNavigatorButtonClick }
++						>
++							{ BUTTON_TEXT.back }
++						</CustomNavigatorBackButton>
++					</NavigatorScreen>
++
++					<NavigatorScreen path={ PATHS.INVALID_HTML_ATTRIBUTE }>
++						<p>{ SCREEN_TEXT.invalidHtmlPath }</p>
++						<CustomNavigatorBackButton
++							onClick={ onNavigatorButtonClick }
++						>
++							{ BUTTON_TEXT.back }
++						</CustomNavigatorBackButton>
++					</NavigatorScreen>
++
++					{ /* A `NavigatorScreen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
++				</NavigatorContainer>
+ 			</NavigatorProvider>
+ 
+ 			<label htmlFor="test-input-outer">Outer input</label>
+diff --git a/packages/components/src/navigator/types.ts b/packages/components/src/navigator/types.ts
+index 0b1a6a077ea7a0..f58f2a07518beb 100644
+--- a/packages/components/src/navigator/types.ts
++++ b/packages/components/src/navigator/types.ts
+@@ -34,6 +34,13 @@ export type NavigatorProviderProps = {
+ 	children: ReactNode;
+ };
+ 
++export type NavigatorContainerProps = {
++	/**
++	 * The children elements.
++	 */
++	children: ReactNode;
++};
++
+ export type NavigatorScreenProps = {
+ 	/**
+ 	 * The screen's path, matched against the current path stored in the navigator.
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+index f9f7be89c82a0c..d13f1a2de0861e 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+@@ -696,9 +696,9 @@ exports[`EditPostPreferencesModal should match snapshot when the modal is active
+       </button>
+     </div>
+     <div
+-      class="components-navigator-provider interface-preferences__provider emotion-0 emotion-1"
++      class="components-navigator-container interface-preferences__provider emotion-0 emotion-1"
+       data-wp-c16t="true"
+-      data-wp-component="NavigatorProvider"
++      data-wp-component="NavigatorContainer"
+     >
+       <div
+         class="emotion-2 components-navigator-screen"
+diff --git a/packages/edit-site/src/components/global-styles/ui.js b/packages/edit-site/src/components/global-styles/ui.js
+index 6eeada1e67c61d..0c408343d66e8c 100644
+--- a/packages/edit-site/src/components/global-styles/ui.js
++++ b/packages/edit-site/src/components/global-styles/ui.js
+@@ -3,6 +3,7 @@
+  */
+ import {
+ 	__experimentalNavigatorProvider as NavigatorProvider,
++	__experimentalNavigatorContainer as NavigatorContainer,
+ 	__experimentalNavigatorScreen as NavigatorScreen,
+ } from '@wordpress/components';
+ import { getBlockTypes } from '@wordpress/blocks';
+@@ -119,39 +120,38 @@ function GlobalStylesUI() {
+ 	const blocks = getBlockTypes();
+ 
+ 	return (
+-		<NavigatorProvider
+-			className="edit-site-global-styles-sidebar__navigator-provider"
+-			initialPath="/"
+-		>
+-			<GlobalStylesNavigationScreen path="/">
+-				<ScreenRoot />
+-			</GlobalStylesNavigationScreen>
+-
+-			<GlobalStylesNavigationScreen path="/variations">
+-				<ScreenStyleVariations />
+-			</GlobalStylesNavigationScreen>
+-
+-			<GlobalStylesNavigationScreen path="/blocks">
+-				<ScreenBlockList />
+-			</GlobalStylesNavigationScreen>
++		<NavigatorProvider initialPath="/">
++			<NavigatorContainer className="edit-site-global-styles-sidebar__navigator-provider">
++				<GlobalStylesNavigationScreen path="/">
++					<ScreenRoot />
++				</GlobalStylesNavigationScreen>
+ 
+-			{ blocks.map( ( block ) => (
+-				<GlobalStylesNavigationScreen
+-					key={ 'menu-block-' + block.name }
+-					path={ '/blocks/' + block.name }
+-				>
+-					<ScreenBlock name={ block.name } />
++				<GlobalStylesNavigationScreen path="/variations">
++					<ScreenStyleVariations />
+ 				</GlobalStylesNavigationScreen>
+-			) ) }
+ 
+-			<ContextScreens />
++				<GlobalStylesNavigationScreen path="/blocks">
++					<ScreenBlockList />
++				</GlobalStylesNavigationScreen>
+ 
+-			{ blocks.map( ( block ) => (
+-				<ContextScreens
+-					key={ 'screens-block-' + block.name }
+-					name={ block.name }
+-				/>
+-			) ) }
++				{ blocks.map( ( block ) => (
++					<GlobalStylesNavigationScreen
++						key={ 'menu-block-' + block.name }
++						path={ '/blocks/' + block.name }
++					>
++						<ScreenBlock name={ block.name } />
++					</GlobalStylesNavigationScreen>
++				) ) }
++
++				<ContextScreens />
++
++				{ blocks.map( ( block ) => (
++					<ContextScreens
++						key={ 'screens-block-' + block.name }
++						name={ block.name }
++					/>
++				) ) }
++			</NavigatorContainer>
+ 		</NavigatorProvider>
+ 	);
+ }
+diff --git a/packages/interface/src/components/preferences-modal-tabs/index.js b/packages/interface/src/components/preferences-modal-tabs/index.js
+index bc8f7358b834d4..3772e09b65f1cb 100644
+--- a/packages/interface/src/components/preferences-modal-tabs/index.js
++++ b/packages/interface/src/components/preferences-modal-tabs/index.js
+@@ -4,6 +4,7 @@
+ import { useViewportMatch } from '@wordpress/compose';
+ import {
+ 	__experimentalNavigatorProvider as NavigatorProvider,
++	__experimentalNavigatorContainer as NavigatorContainer,
+ 	__experimentalNavigatorScreen as NavigatorScreen,
+ 	__experimentalNavigatorButton as NavigatorButton,
+ 	__experimentalNavigatorBackButton as NavigatorBackButton,
+@@ -76,78 +77,77 @@ export default function PreferencesModalTabs( { sections } ) {
+ 		);
+ 	} else {
+ 		modalContent = (
+-			<NavigatorProvider
+-				initialPath="/"
+-				className="interface-preferences__provider"
+-			>
+-				<NavigatorScreen path="/">
+-					<Card isBorderless size="small">
+-						<CardBody>
+-							<ItemGroup>
+-								{ tabs.map( ( tab ) => {
+-									return (
+-										<NavigatorButton
+-											key={ tab.name }
+-											path={ tab.name }
+-											as={ Item }
+-											isAction
++			<NavigatorProvider initialPath="/">
++				<NavigatorContainer className="interface-preferences__provider">
++					<NavigatorScreen path="/">
++						<Card isBorderless size="small">
++							<CardBody>
++								<ItemGroup>
++									{ tabs.map( ( tab ) => {
++										return (
++											<NavigatorButton
++												key={ tab.name }
++												path={ tab.name }
++												as={ Item }
++												isAction
++											>
++												<HStack justify="space-between">
++													<FlexItem>
++														<Truncate>
++															{ tab.title }
++														</Truncate>
++													</FlexItem>
++													<FlexItem>
++														<Icon
++															icon={
++																isRTL()
++																	? chevronLeft
++																	: chevronRight
++															}
++														/>
++													</FlexItem>
++												</HStack>
++											</NavigatorButton>
++										);
++									} ) }
++								</ItemGroup>
++							</CardBody>
++						</Card>
++					</NavigatorScreen>
++					{ sections.length &&
++						sections.map( ( section ) => {
++							return (
++								<NavigatorScreen
++									key={ `${ section.name }-menu` }
++									path={ section.name }
++								>
++									<Card isBorderless size="large">
++										<CardHeader
++											isBorderless={ false }
++											justify="left"
++											size="small"
++											gap="6"
+ 										>
+-											<HStack justify="space-between">
+-												<FlexItem>
+-													<Truncate>
+-														{ tab.title }
+-													</Truncate>
+-												</FlexItem>
+-												<FlexItem>
+-													<Icon
+-														icon={
+-															isRTL()
+-																? chevronLeft
+-																: chevronRight
+-														}
+-													/>
+-												</FlexItem>
+-											</HStack>
+-										</NavigatorButton>
+-									);
+-								} ) }
+-							</ItemGroup>
+-						</CardBody>
+-					</Card>
+-				</NavigatorScreen>
+-				{ sections.length &&
+-					sections.map( ( section ) => {
+-						return (
+-							<NavigatorScreen
+-								key={ `${ section.name }-menu` }
+-								path={ section.name }
+-							>
+-								<Card isBorderless size="large">
+-									<CardHeader
+-										isBorderless={ false }
+-										justify="left"
+-										size="small"
+-										gap="6"
+-									>
+-										<NavigatorBackButton
+-											icon={
+-												isRTL()
+-													? chevronRight
+-													: chevronLeft
+-											}
+-											aria-label={ __(
+-												'Navigate to the previous view'
+-											) }
+-										/>
+-										<Text size="16">
+-											{ section.tabLabel }
+-										</Text>
+-									</CardHeader>
+-									<CardBody>{ section.content }</CardBody>
+-								</Card>
+-							</NavigatorScreen>
+-						);
+-					} ) }
++											<NavigatorBackButton
++												icon={
++													isRTL()
++														? chevronRight
++														: chevronLeft
++												}
++												aria-label={ __(
++													'Navigate to the previous view'
++												) }
++											/>
++											<Text size="16">
++												{ section.tabLabel }
++											</Text>
++										</CardHeader>
++										<CardBody>{ section.content }</CardBody>
++									</Card>
++								</NavigatorScreen>
++							);
++						} ) }
++				</NavigatorContainer>
+ 			</NavigatorProvider>
+ 		);
+ 	}

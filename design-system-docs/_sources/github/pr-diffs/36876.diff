@@ -1,0 +1,17 @@
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index cbd74370b346e2..93e0457b090062 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -131,7 +131,11 @@ function computeAnchorRect(
+ 	}
+ 
+ 	const { parentNode } = anchorRefFallback.current;
+-	const rect = parentNode.getBoundingClientRect();
++	const rect = offsetIframe(
++		parentNode.getBoundingClientRect(),
++		parentNode.ownerDocument,
++		container
++	);
+ 
+ 	if ( shouldAnchorIncludePadding ) {
+ 		return rect;

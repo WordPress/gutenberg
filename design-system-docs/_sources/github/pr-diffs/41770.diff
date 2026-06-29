@@ -1,0 +1,56 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4253e78f4f40f2..e524640a864ae7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `CustomGradientBar`: Fix insertion and control point positioning to more closely follow cursor. ([#41492](https://github.com/WordPress/gutenberg/pull/41492))
+ -   `FormTokenField`: Added Padding to resolve close button overlap issue ([#41556](https://github.com/WordPress/gutenberg/pull/41556)).
+ -   `ComboboxControl`: fix the autofocus behavior after resetting the value. ([#41737](https://github.com/WordPress/gutenberg/pull/41737)).
++-   `Autocomplete`: Prevent using multiple autocompleters in a single block from triggering an endless loop ([#41770](https://github.com/WordPress/gutenberg/pull/41770)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/autocomplete/index.js b/packages/components/src/autocomplete/index.js
+index c2fefc6af7e136..2715a2bdeebeea 100644
+--- a/packages/components/src/autocomplete/index.js
++++ b/packages/components/src/autocomplete/index.js
+@@ -278,6 +278,14 @@ function useAutocomplete( {
+ 		}
+ 	}, [ record ] );
+ 
++	// Used to track the number of filtered options for the subsequent useEffect
++	// This way, filteredOptions.length (which is part of state) isn't a dependency
++	// and cannot contribute to an infinite loop.
++	const filteredOptionsLengthRef = useRef();
++	useEffect( () => {
++		filteredOptionsLengthRef.current = filteredOptions.length;
++	}, [ filteredOptions.length ] );
++
+ 	useEffect( () => {
+ 		if ( ! textContent ) {
+ 			reset();
+@@ -309,7 +317,7 @@ function useAutocomplete( {
+ 				// it will be caught by this guard.
+ 				if ( tooDistantFromTrigger ) return false;
+ 
+-				const mismatch = filteredOptions.length === 0;
++				const mismatch = filteredOptionsLengthRef.current === 0;
+ 				const wordsFromTrigger = textWithoutTrigger.split( /\s/ );
+ 				// We need to allow the effect to run when not backspacing and if there
+ 				// was a mismatch. i.e when typing a trigger + the match string or when
+@@ -375,14 +383,7 @@ function useAutocomplete( {
+ 				: AutocompleterUI
+ 		);
+ 		setFilterValue( query );
+-	}, [
+-		textContent,
+-		AutocompleterUI,
+-		autocompleter,
+-		completers,
+-		record,
+-		filteredOptions.length,
+-	] );
++	}, [ textContent, AutocompleterUI, autocompleter, completers, record ] );
+ 
+ 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
+ 	const { className } = autocompleter || {};

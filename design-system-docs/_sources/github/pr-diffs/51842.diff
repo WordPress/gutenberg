@@ -1,0 +1,411 @@
+diff --git a/packages/base-styles/_variables.scss b/packages/base-styles/_variables.scss
+index 31f197ba64270e..584c057ec1ecab 100644
+--- a/packages/base-styles/_variables.scss
++++ b/packages/base-styles/_variables.scss
+@@ -48,7 +48,7 @@ $icon-size: 24px;
+ $button-size: 36px;
+ $button-size-next-default-40px: 40px; // transitionary variable for next default button size
+ $button-size-small: 24px;
+-$button-size-small-next-default-32px: 32px; // transitionary variable for next small button size
++$button-size-compact: 32px;
+ $header-height: 60px;
+ $panel-header-height: $grid-unit-60;
+ $nav-sidebar-width: 360px;
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2759cc629a336e..974fbc7bb8f11d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `UnitControl`: Revamp support for changing unit by typing ([#39303](https://github.com/WordPress/gutenberg/pull/39303)).
+ -   `Modal`: Update corner radius to be between buttons and the site view frame, in a 2-4-8 system. ([#51254](https://github.com/WordPress/gutenberg/pull/51254)).
++-   `Button`: Introduce `size` prop with `default`, `compact`, and `small` variants ([#51842](https://github.com/WordPress/gutenberg/pull/51842)).
+ -   `ItemGroup`: Update button focus state styles to be inline with other button focus states in the editor. ([#51576](https://github.com/WordPress/gutenberg/pull/51576)).
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index 66bbae67ebcd57..5430b869485ea0 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -198,6 +198,8 @@ Renders a pressed button style.
+ 
+ Decreases the size of the button.
+ 
++Deprecated in favor of the `size` prop. If both props are defined, the `size` prop will take precedence.
++
+ -   Required: No
+ 
+ #### `label`: `string`
+@@ -218,6 +220,19 @@ If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) com
+ 
+ -   Required: No
+ 
++#### `size`: `'default'` | `'compact'` | `'small'`
++
++The size of the button.
++
++-   `'default'`: For normal text-label buttons, unless it is a toggle button.
++-   `'compact'`: For toggle buttons, icon buttons, and buttons when used in context of either.
++-   `'small'`: For icon buttons associated with more advanced or auxiliary features.
++
++If the deprecated `isSmall` prop is also defined, this prop will take precedence.
++
++-   Required: No
++-   Default: `'default'`
++
+ #### `target`: `string`
+ 
+ If provided with `href`, sets the `target` attribute to the `a`.
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index 24932ab06a9b69..cc91cf46425867 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -33,11 +33,18 @@ function useDeprecatedProps( {
+ 	isSecondary,
+ 	isTertiary,
+ 	isLink,
++	isSmall,
++	size,
+ 	variant,
+ 	...otherProps
+ }: ButtonProps & DeprecatedButtonProps ): ButtonProps {
++	let computedSize = size;
+ 	let computedVariant = variant;
+ 
++	if ( isSmall ) {
++		computedSize ??= 'small';
++	}
++
+ 	if ( isPrimary ) {
+ 		computedVariant ??= 'primary';
+ 	}
+@@ -66,6 +73,7 @@ function useDeprecatedProps( {
+ 
+ 	return {
+ 		...otherProps,
++		size: computedSize,
+ 		variant: computedVariant,
+ 	};
+ }
+@@ -76,8 +84,6 @@ export function UnforwardedButton(
+ ) {
+ 	const {
+ 		__next40pxDefaultSize,
+-		__next32pxSmallSize,
+-		isSmall,
+ 		isPressed,
+ 		isBusy,
+ 		isDestructive,
+@@ -91,6 +97,7 @@ export function UnforwardedButton(
+ 		shortcut,
+ 		label,
+ 		children,
++		size = 'default',
+ 		text,
+ 		variant,
+ 		__experimentalIsFocusable: isFocusable,
+@@ -118,10 +125,10 @@ export function UnforwardedButton(
+ 
+ 	const classes = classnames( 'components-button', className, {
+ 		'is-next-40px-default-size': __next40pxDefaultSize,
+-		'is-next-32px-small-size': __next32pxSmallSize,
+ 		'is-secondary': variant === 'secondary',
+ 		'is-primary': variant === 'primary',
+-		'is-small': isSmall,
++		'is-small': size === 'small',
++		'is-compact': size === 'compact',
+ 		'is-tertiary': variant === 'tertiary',
+ 		'is-pressed': isPressed,
+ 		'is-busy': isBusy,
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index c93d7e2070c43b..a450ef60b46afd 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -257,25 +257,26 @@
+ 		/* stylelint-enable */
+ 	}
+ 
++	&.is-compact {
++		height: $button-size-compact;
++
++		&.has-icon:not(.has-text) {
++			padding: 0;
++			width: $button-size-compact;
++			min-width: $button-size-compact;
++		}
++	}
++
+ 	&.is-small {
+-		height: $button-size-small-next-default-32px;
++		height: $button-size-small;
+ 		line-height: 22px;
+ 		padding: 0 8px;
+ 		font-size: 11px;
+ 
+ 		&.has-icon:not(.has-text) {
+ 			padding: 0;
+-			width: $button-size-small-next-default-32px;
+-			min-width: $button-size-small-next-default-32px;
+-		}
+-
+-		&:not(.is-next-32px-small-size) {
+-			height: $button-size-small;
+-
+-			&.has-icon:not(.has-text) {
+-				width: $button-size-small;
+-				min-width: $button-size-small;
+-			}
++			width: $button-size-small;
++			min-width: $button-size-small;
+ 		}
+ 	}
+ 
+diff --git a/packages/components/src/button/test/index.tsx b/packages/components/src/button/test/index.tsx
+index 0219896781534e..881a71484c18f2 100644
+--- a/packages/components/src/button/test/index.tsx
++++ b/packages/components/src/button/test/index.tsx
+@@ -402,6 +402,19 @@ describe( 'Button', () => {
+ 			);
+ 			expect( console ).toHaveWarned();
+ 		} );
++
++		it( 'should not break when the legacy isSmall prop is passed', () => {
++			render( <Button isSmall /> );
++			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-small' );
++		} );
++
++		it( 'should prioritize the `size` prop over `isSmall`', () => {
++			render( <Button size="compact" isSmall /> );
++			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
++				'is-small'
++			);
++			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-compact' );
++		} );
+ 	} );
+ 
+ 	describe( 'static typing', () => {
+diff --git a/packages/components/src/button/types.ts b/packages/components/src/button/types.ts
+index 85188476e5f370..c55b74c0461573 100644
+--- a/packages/components/src/button/types.ts
++++ b/packages/components/src/button/types.ts
+@@ -25,15 +25,6 @@ type BaseButtonProps = {
+ 	 * @default false
+ 	 */
+ 	__next40pxDefaultSize?: boolean;
+-	/**
+-	 * Start opting into the larger `isSmall` button size that will become the
+-	 * default small size in a future version.
+-	 *
+-	 * Only takes effect when the `isSmall` prop is `true`.
+-	 *
+-	 * @default false
+-	 */
+-	__next32pxSmallSize?: boolean;
+ 	/**
+ 	 * The button's children.
+ 	 */
+@@ -74,8 +65,13 @@ type BaseButtonProps = {
+ 	 * Renders a pressed button style.
+ 	 */
+ 	isPressed?: boolean;
++	// TODO: Deprecate officially (add console warning and move to DeprecatedButtonProps).
+ 	/**
+ 	 * Decreases the size of the button.
++	 *
++	 * Deprecated in favor of the `size` prop. If both props are defined, the `size` prop will take precedence.
++	 *
++	 * @deprecated Use the `'small'` value on the `size` prop instead.
+ 	 */
+ 	isSmall?: boolean;
+ 	/**
+@@ -92,6 +88,18 @@ type BaseButtonProps = {
+ 	 * If provided, renders a Tooltip component for the button.
+ 	 */
+ 	showTooltip?: boolean;
++	/**
++	 * The size of the button.
++	 *
++	 * - `'default'`: For normal text-label buttons, unless it is a toggle button.
++	 * - `'compact'`: For toggle buttons, icon buttons, and buttons when used in context of either.
++	 * - `'small'`: For icon buttons associated with more advanced or auxiliary features.
++	 *
++	 * If the deprecated `isSmall` prop is also defined, this prop will take precedence.
++	 *
++	 * @default 'default'
++	 */
++	size?: 'default' | 'compact' | 'small';
+ 	/**
+ 	 * If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
+ 	 */
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index 74d8e54e8fd651..e454b3093bf6a5 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -14,6 +14,7 @@ import { useState, useMemo, forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
++import { Button } from '../button';
+ import RangeControl from '../range-control';
+ import { Flex, FlexItem } from '../flex';
+ import {
+@@ -31,7 +32,6 @@ import {
+ 	HeaderLabel,
+ 	HeaderToggle,
+ 	Controls,
+-	ResetButton,
+ } from './styles';
+ import { Spacer } from '../spacer';
+ import FontSizePickerSelect from './font-size-picker-select';
+@@ -268,17 +268,21 @@ const UnforwardedFontSizePicker = (
+ 						) }
+ 						{ withReset && (
+ 							<FlexItem>
+-								<ResetButton
++								<Button
+ 									disabled={ value === undefined }
+ 									onClick={ () => {
+ 										onChange?.( undefined );
+ 									} }
+-									isSmall
+ 									variant="secondary"
+-									size={ size }
++									__next40pxDefaultSize
++									size={
++										size !== '__unstable-large'
++											? 'small'
++											: 'default'
++									}
+ 								>
+ 									{ __( 'Reset' ) }
+-								</ResetButton>
++								</Button>
+ 							</FlexItem>
+ 						) }
+ 					</Flex>
+diff --git a/packages/components/src/font-size-picker/styles.ts b/packages/components/src/font-size-picker/styles.ts
+index 525c1be0c94b07..8ba0ce661c5eb7 100644
+--- a/packages/components/src/font-size-picker/styles.ts
++++ b/packages/components/src/font-size-picker/styles.ts
+@@ -11,7 +11,6 @@ import Button from '../button';
+ import { HStack } from '../h-stack';
+ import { space } from '../ui/utils/space';
+ import { COLORS } from '../utils';
+-import type { FontSizePickerProps } from './types';
+ 
+ export const Container = styled.fieldset`
+ 	border: 0;
+@@ -44,12 +43,3 @@ export const Controls = styled.div< {
+ 	${ ( props ) =>
+ 		! props.__nextHasNoMarginBottom && `margin-bottom: ${ space( 6 ) };` }
+ `;
+-
+-export const ResetButton = styled( Button )< {
+-	size: FontSizePickerProps[ 'size' ];
+-} >`
+-	&&& {
+-		height: ${ ( props ) =>
+-			props.size === '__unstable-large' ? '40px' : '30px' };
+-	}
+-`;
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index 0df307e4ee45c2..b2ab417d18af21 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -16,7 +16,7 @@ import deprecated from '@wordpress/deprecated';
+ /**
+  * Internal dependencies
+  */
+-import { Input, SpinButton } from './styles/number-control-styles';
++import { Input, SpinButton, styles } from './styles/number-control-styles';
+ import * as inputControlActionTypes from '../input-control/reducer/actions';
+ import { add, subtract, roundClamp } from '../utils/math';
+ import { ensureNumber, isValueEmpty } from '../utils/values';
+@@ -24,6 +24,7 @@ import type { WordPressComponentProps } from '../ui/context/wordpress-component'
+ import type { NumberControlProps } from './types';
+ import { HStack } from '../h-stack';
+ import { Spacer } from '../spacer';
++import { useCx } from '../utils';
+ 
+ const noop = () => {};
+ 
+@@ -78,6 +79,8 @@ function UnforwardedNumberControl(
+ 
+ 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
+ 	const classes = classNames( 'components-number-control', className );
++	const cx = useCx();
++	const spinButtonClasses = cx( size === 'small' && styles.smallSpinButtons );
+ 
+ 	const spinValue = (
+ 		value: string | number | undefined,
+@@ -236,6 +239,7 @@ function UnforwardedNumberControl(
+ 						<Spacer marginBottom={ 0 } marginRight={ 2 }>
+ 							<HStack spacing={ 1 }>
+ 								<SpinButton
++									className={ spinButtonClasses }
+ 									icon={ plusIcon }
+ 									isSmall
+ 									aria-hidden="true"
+@@ -244,9 +248,9 @@ function UnforwardedNumberControl(
+ 									onClick={ buildSpinButtonClickHandler(
+ 										'up'
+ 									) }
+-									size={ size }
+ 								/>
+ 								<SpinButton
++									className={ spinButtonClasses }
+ 									icon={ resetIcon }
+ 									isSmall
+ 									aria-hidden="true"
+@@ -255,7 +259,6 @@ function UnforwardedNumberControl(
+ 									onClick={ buildSpinButtonClickHandler(
+ 										'down'
+ 									) }
+-									size={ size }
+ 								/>
+ 							</HStack>
+ 						</Spacer>
+diff --git a/packages/components/src/number-control/styles/number-control-styles.ts b/packages/components/src/number-control/styles/number-control-styles.ts
+index dfc6171cf411b4..c18c02c69b790c 100644
+--- a/packages/components/src/number-control/styles/number-control-styles.ts
++++ b/packages/components/src/number-control/styles/number-control-styles.ts
+@@ -11,7 +11,6 @@ import InputControl from '../../input-control';
+ import { COLORS } from '../../utils';
+ import Button from '../../button';
+ import { space } from '../../ui/utils/space';
+-import type { NumberControlProps } from '../types';
+ 
+ const htmlArrowStyles = ( { hideHTMLArrows }: { hideHTMLArrows: boolean } ) => {
+ 	if ( ! hideHTMLArrows ) {
+@@ -35,23 +34,16 @@ export const Input = styled( InputControl )`
+ 	${ htmlArrowStyles };
+ `;
+ 
+-const spinButtonSizeStyles = ( {
+-	size,
+-}: Pick< NumberControlProps, 'size' > ) => {
+-	if ( size !== 'small' ) {
+-		return ``;
+-	}
+-
+-	return css`
+-		width: ${ space( 5 ) };
+-		min-width: ${ space( 5 ) };
+-		height: ${ space( 5 ) };
+-	`;
+-};
+-
+ export const SpinButton = styled( Button )`
+ 	&&&&& {
+ 		color: ${ COLORS.ui.theme };
+-		${ spinButtonSizeStyles }
+ 	}
+ `;
++
++const smallSpinButtons = css`
++	width: ${ space( 5 ) };
++	min-width: ${ space( 5 ) };
++	height: ${ space( 5 ) };
++`;
++
++export const styles = { smallSpinButtons };

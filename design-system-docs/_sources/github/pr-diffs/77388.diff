@@ -1,0 +1,23 @@
+diff --git a/packages/ui/src/types/css-modules.d.ts b/packages/ui/src/types/css-modules.d.ts
+deleted file mode 100644
+index 22fb5a58615ca8..00000000000000
+--- a/packages/ui/src/types/css-modules.d.ts
++++ /dev/null
+@@ -1,4 +0,0 @@
+-declare module '*.module.css' {
+-	const classes: { [ key: string ]: string };
+-	export default classes;
+-}
+diff --git a/packages/ui/tsconfig.json b/packages/ui/tsconfig.json
+index 81f7e58d2d1619..6d235e6c5c8be7 100644
+--- a/packages/ui/tsconfig.json
++++ b/packages/ui/tsconfig.json
+@@ -2,7 +2,7 @@
+ 	"$schema": "https://json.schemastore.org/tsconfig.json",
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
+-		"types": [ "node", "jest" ]
++		"types": [ "node", "jest", "style-imports" ]
+ 	},
+ 	"references": [
+ 		{ "path": "../a11y" },

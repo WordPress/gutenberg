@@ -1,0 +1,58 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1c89dd3825e42c..f1703404fd8d55 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,10 @@
+ -   `TextareaControl`: Add missing component CSS classname ([#70930](https://github.com/WordPress/gutenberg/pull/70930)).
+ -   `PaletteEdit`: Fill available space with input field ([#70935](https://github.com/WordPress/gutenberg/pull/70935)).
+ 
++### Enhancement
++
++-   `TextControl`: Improve theming support ([#70910](https://github.com/WordPress/gutenberg/pull/70910)).
++
+ ## 30.0.0 (2025-07-23)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/text-control/stories/index.story.tsx b/packages/components/src/text-control/stories/index.story.tsx
+index fe7fb538805da3..52f98124800b80 100644
+--- a/packages/components/src/text-control/stories/index.story.tsx
++++ b/packages/components/src/text-control/stories/index.story.tsx
+@@ -56,6 +56,7 @@ export const Default: StoryFn< typeof TextControl > = DefaultTemplate.bind(
+ Default.args = {
+ 	__nextHasNoMarginBottom: true,
+ 	__next40pxDefaultSize: true,
++	placeholder: 'Placeholder',
+ };
+ 
+ export const WithLabelAndHelpText: StoryFn< typeof TextControl > =
+diff --git a/packages/components/src/text-control/style.scss b/packages/components/src/text-control/style.scss
+index 476a85afb990d8..c3cf54fc003de5 100644
+--- a/packages/components/src/text-control/style.scss
++++ b/packages/components/src/text-control/style.scss
+@@ -18,7 +18,12 @@
+ 	margin: 0;
+ 	background: $components-color-background;
+ 	color: $components-color-foreground;
+-	@include input-control( $components-color-accent);
++	@include input-control( $components-color-accent );
++	border-color: $components-color-border;
++
++	&::placeholder {
++		color: $components-color-dark-gray-placeholder;
++	}
+ 
+ 	&.is-next-40px-default-size {
+ 		height: $grid-unit-50;
+diff --git a/packages/components/src/utils/theme-variables.scss b/packages/components/src/utils/theme-variables.scss
+index 14e44f3ddc7d2f..b74d63a4aeb6be 100644
+--- a/packages/components/src/utils/theme-variables.scss
++++ b/packages/components/src/utils/theme-variables.scss
+@@ -24,5 +24,8 @@ $components-color-gray-600: var(--wp-components-color-gray-600, $gray-600);
+ $components-color-gray-700: var(--wp-components-color-gray-700, $gray-700);
+ $components-color-gray-800: var(--wp-components-color-gray-800, $gray-800);
+ 
++$components-color-dark-gray-placeholder: color-mix(in srgb, $components-color-foreground, transparent 38%);
++$components-color-light-gray-placeholder: color-mix(in srgb, $components-color-background, transparent 35%);
++
+ // Semantic aliases (prefer these over raw gray values when applicable).
+ $components-color-border: #{ $components-color-gray-600 };

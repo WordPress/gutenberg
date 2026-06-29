@@ -1,0 +1,88 @@
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index c38d1d34e571a1..fc400c2f9b6467 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -67,6 +67,11 @@ const UnconnectedColorPicker = (
+ 
+ 	const handleChange = useCallback(
+ 		( nextValue: Colord ) => {
++			// Handle invalid/empty colors by clearing the selection
++			if ( ! nextValue?.isValid() ) {
++				debouncedSetColor( '' );
++				return;
++			}
+ 			debouncedSetColor( nextValue.toHex() );
+ 		},
+ 		[ debouncedSetColor ]
+diff --git a/packages/components/src/color-picker/hex-input.tsx b/packages/components/src/color-picker/hex-input.tsx
+index ef8b5356c0edc1..a453e6e697703a 100644
+--- a/packages/components/src/color-picker/hex-input.tsx
++++ b/packages/components/src/color-picker/hex-input.tsx
+@@ -20,7 +20,11 @@ import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
+ 
+ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+ 	const handleChange = ( nextValue: string | undefined ) => {
++		// When input is empty, pass colord('') which creates an invalid Colord object.
++		// This is handled in component.tsx by setting the color to an empty string,
++		// representing "no color selected".
+ 		if ( ! nextValue ) {
++			onChange( colord( '' ) );
+ 			return;
+ 		}
+ 		const hexValue = nextValue.startsWith( '#' )
+diff --git a/packages/components/src/color-picker/test/index.tsx b/packages/components/src/color-picker/test/index.tsx
+index c493a733dca1db..c8002c97667c47 100644
+--- a/packages/components/src/color-picker/test/index.tsx
++++ b/packages/components/src/color-picker/test/index.tsx
+@@ -95,7 +95,9 @@ describe( 'ColorPicker', () => {
+ 			await user.clear( hexInput );
+ 			await user.type( hexInput, '1ab' );
+ 
+-			expect( onChangeComplete ).toHaveBeenCalledTimes( 3 );
++			// Clearing the input triggers onChange once (to empty string),
++			// then typing triggers 3 more times
++			expect( onChangeComplete ).toHaveBeenCalledTimes( 4 );
+ 			expect( onChangeComplete ).toHaveBeenLastCalledWith(
+ 				legacyColorMatcher
+ 			);
+@@ -126,9 +128,39 @@ describe( 'ColorPicker', () => {
+ 			await user.clear( hexInput );
+ 			await user.type( hexInput, '1ab' );
+ 
+-			expect( onChange ).toHaveBeenCalledTimes( 3 );
++			// Clearing the input triggers onChange once (to empty string),
++			// then typing triggers 3 more times
++			expect( onChange ).toHaveBeenCalledTimes( 4 );
+ 			expect( onChange ).toHaveBeenLastCalledWith( '#11aabb' );
+ 		} );
++
++		it( 'should clear the color when hex input is cleared', async () => {
++			const user = userEvent.setup();
++			const onChange = jest.fn();
++			const color = '#ff0000';
++
++			render(
++				<ColorPicker
++					onChange={ onChange }
++					color={ color }
++					enableAlpha={ false }
++				/>
++			);
++
++			const formatSelector = screen.getByRole( 'combobox' );
++			expect( formatSelector ).toBeVisible();
++
++			await user.selectOptions( formatSelector, 'hex' );
++
++			const hexInput = screen.getByRole( 'textbox' );
++			expect( hexInput ).toBeVisible();
++
++			// Clear the entire hex input at once
++			await user.clear( hexInput );
++
++			// Should clear the color (pass empty string)
++			expect( onChange ).toHaveBeenCalledWith( '' );
++		} );
+ 	} );
+ 
+ 	describe.each( [

@@ -1,0 +1,128 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 285f861cc3b730..3881fea0860ffc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ ### Bug Fix
+ 
+ -   `Button`: Fix RTL alignment for buttons containing an icon and text ([#44787](https://github.com/WordPress/gutenberg/pull/44787)).
++-   `TabPanel`: Call `onSelect()` on every tab selection, regardless of whether it was triggered by user interaction ([#44028](https://github.com/WordPress/gutenberg/pull/44028)).
+ -   `FontSizePicker`: Fallback to font size `slug` if `name` is undefined  ([#45041](https://github.com/WordPress/gutenberg/pull/45041)).
+ 
+ ### Internal
+diff --git a/packages/components/src/tab-panel/test/index.tsx b/packages/components/src/tab-panel/test/index.tsx
+index 3b8f7aacc265c2..ce096cac6bcb5d 100644
+--- a/packages/components/src/tab-panel/test/index.tsx
++++ b/packages/components/src/tab-panel/test/index.tsx
+@@ -38,14 +38,22 @@ describe( 'TabPanel', () => {
+ 	it( 'should render a tabpanel, and clicking should change tabs', async () => {
+ 		const user = setupUser();
+ 		const panelRenderFunction = jest.fn();
++		const mockOnSelect = jest.fn();
+ 
+-		render( <TabPanel tabs={ TABS } children={ panelRenderFunction } /> );
++		render(
++			<TabPanel
++				tabs={ TABS }
++				children={ panelRenderFunction }
++				onSelect={ mockOnSelect }
++			/>
++		);
+ 
+ 		expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
+ 		expect(
+ 			screen.getByRole( 'tabpanel', { name: 'Alpha' } )
+ 		).toBeInTheDocument();
+ 		expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
++		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+ 
+ 		await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
+ 
+@@ -54,6 +62,7 @@ describe( 'TabPanel', () => {
+ 			screen.getByRole( 'tabpanel', { name: 'Beta' } )
+ 		).toBeInTheDocument();
+ 		expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 1 ] );
++		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
+ 
+ 		await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
+ 
+@@ -62,6 +71,7 @@ describe( 'TabPanel', () => {
+ 			screen.getByRole( 'tabpanel', { name: 'Alpha' } )
+ 		).toBeInTheDocument();
+ 		expect( panelRenderFunction ).toHaveBeenLastCalledWith( TABS[ 0 ] );
++		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
+ 	} );
+ 
+ 	it( 'should render with a tab initially selected by prop initialTabIndex', () => {
+@@ -117,4 +127,71 @@ describe( 'TabPanel', () => {
+ 			'gamma-class'
+ 		);
+ 	} );
++
++	it( 'should select `initialTabname` if defined', () => {
++		const mockOnSelect = jest.fn();
++
++		render(
++			<TabPanel
++				tabs={ TABS }
++				initialTabName="beta"
++				children={ () => undefined }
++				onSelect={ mockOnSelect }
++			/>
++		);
++		expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++		expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
++	} );
++
++	describe( 'fallbacks when new tab list invalidates current selection', () => {
++		it( 'should select `initialTabName` if defined', async () => {
++			const user = setupUser();
++			const mockOnSelect = jest.fn();
++
++			const { rerender } = render(
++				<TabPanel
++					tabs={ TABS }
++					initialTabName="gamma"
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
++
++			rerender(
++				<TabPanel
++					tabs={ TABS.slice( 1 ) /* remove alpha */ }
++					initialTabName="gamma"
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
++		} );
++
++		it( 'should select first tab if `initialTabName` not defined', async () => {
++			const user = setupUser();
++			const mockOnSelect = jest.fn();
++
++			const { rerender } = render(
++				<TabPanel
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
++
++			rerender(
++				<TabPanel
++					tabs={ TABS.slice( 1 ) /* remove alpha */ }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
++		} );
++	} );
+ } );

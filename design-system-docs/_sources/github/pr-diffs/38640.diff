@@ -1,0 +1,174 @@
+diff --git a/packages/components/src/alignment-matrix-control/README.md b/packages/components/src/alignment-matrix-control/README.md
+index 7e0f59948b0090..16b7333c09db74 100644
+--- a/packages/components/src/alignment-matrix-control/README.md
++++ b/packages/components/src/alignment-matrix-control/README.md
+@@ -1,5 +1,9 @@
+ # AlignmentMatrixControl
+ 
++<div class="callout callout-alert">
++This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++</div>
++
+ AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
+ 
+ ## Usage
+diff --git a/packages/components/src/alignment-matrix-control/stories/index.js b/packages/components/src/alignment-matrix-control/stories/index.js
+index bd85ec0b7f01ff..665980f3f0180f 100644
+--- a/packages/components/src/alignment-matrix-control/stories/index.js
++++ b/packages/components/src/alignment-matrix-control/stories/index.js
+@@ -17,7 +17,7 @@ const alignmentOptions = ALIGNMENTS.reduce( ( options, item ) => {
+ }, {} );
+ 
+ export default {
+-	title: 'Components/AlignmentMatrixControl',
++	title: 'Components (Experimental)/AlignmentMatrixControl',
+ 	component: AlignmentMatrixControl,
+ 	parameters: {
+ 		knobs: { disable: false },
+diff --git a/packages/components/src/box-control/stories/index.js b/packages/components/src/box-control/stories/index.js
+index 03f71885edb535..c05263adefb794 100644
+--- a/packages/components/src/box-control/stories/index.js
++++ b/packages/components/src/box-control/stories/index.js
+@@ -14,7 +14,10 @@ import BoxControl from '../';
+ import BoxControlVisualizer from '../visualizer';
+ import { Flex, FlexBlock } from '../../flex';
+ 
+-export default { title: 'Components/BoxControl', component: BoxControl };
++export default {
++	title: 'Components (Experimental)/BoxControl',
++	component: BoxControl,
++};
+ 
+ export const _default = () => {
+ 	return <BoxControl />;
+diff --git a/packages/components/src/input-control/stories/index.js b/packages/components/src/input-control/stories/index.js
+index 997edce7648053..fee95758c56a65 100644
+--- a/packages/components/src/input-control/stories/index.js
++++ b/packages/components/src/input-control/stories/index.js
+@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
+ import InputControl from '../';
+ 
+ export default {
+-	title: 'Components/InputControl',
++	title: 'Components (Experimental)/InputControl',
+ 	component: InputControl,
+ 	parameters: {
+ 		knobs: { disable: false },
+diff --git a/packages/components/src/navigation/stories/index.js b/packages/components/src/navigation/stories/index.js
+index 2b8cb59a906619..0c28f8c58347d2 100644
+--- a/packages/components/src/navigation/stories/index.js
++++ b/packages/components/src/navigation/stories/index.js
+@@ -15,7 +15,7 @@ import { HideIfEmptyStory } from './hide-if-empty';
+ import './style.css';
+ 
+ export default {
+-	title: 'Components/Navigation',
++	title: 'Components (Experimental)/Navigation',
+ 	component: Navigation,
+ 	subcomponents: {
+ 		NavigationBackButton,
+diff --git a/packages/components/src/number-control/stories/index.js b/packages/components/src/number-control/stories/index.js
+index 0652e06d586a0f..25106b0c364b83 100644
+--- a/packages/components/src/number-control/stories/index.js
++++ b/packages/components/src/number-control/stories/index.js
+@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
+ import NumberControl from '../';
+ 
+ export default {
+-	title: 'Components/NumberControl',
++	title: 'Components (Experimental)/NumberControl',
+ 	component: NumberControl,
+ 	parameters: {
+ 		knobs: { disable: false },
+diff --git a/packages/components/src/radio-group/stories/index.js b/packages/components/src/radio-group/stories/index.js
+index 57804933797f03..c827c180c7fe2f 100644
+--- a/packages/components/src/radio-group/stories/index.js
++++ b/packages/components/src/radio-group/stories/index.js
+@@ -9,7 +9,10 @@ import { useState } from '@wordpress/element';
+ import Radio from '../../radio';
+ import RadioGroup from '../';
+ 
+-export default { title: 'Components/RadioGroup', component: RadioGroup };
++export default {
++	title: 'Components (Experimental)/RadioGroup',
++	component: RadioGroup,
++};
+ 
+ export const _default = () => {
+ 	/* eslint-disable no-restricted-syntax */
+diff --git a/packages/components/src/radio/stories/index.js b/packages/components/src/radio/stories/index.js
+index 4caeeadeec2b98..622935a76e076b 100644
+--- a/packages/components/src/radio/stories/index.js
++++ b/packages/components/src/radio/stories/index.js
+@@ -4,7 +4,7 @@
+ import RadioGroup from '../../radio-group';
+ import Radio from '../';
+ 
+-export default { title: 'Components/Radio', component: Radio };
++export default { title: 'Components (Experimental)/Radio', component: Radio };
+ 
+ export const _default = () => {
+ 	// Radio components must be a descendent of a RadioGroup component.
+diff --git a/packages/components/src/toggle-group-control/stories/index.js b/packages/components/src/toggle-group-control/stories/index.js
+index 1836b76db1d500..99e6a391a7cef1 100644
+--- a/packages/components/src/toggle-group-control/stories/index.js
++++ b/packages/components/src/toggle-group-control/stories/index.js
+@@ -17,7 +17,7 @@ import Button from '../../button';
+ 
+ export default {
+ 	component: ToggleGroupControl,
+-	title: 'Components/ToggleGroupControl',
++	title: 'Components (Experimental)/ToggleGroupControl',
+ 	parameters: {
+ 		knobs: { disable: false },
+ 	},
+diff --git a/packages/components/src/tree-grid/stories/index.js b/packages/components/src/tree-grid/stories/index.js
+index e32690c45832cd..e1a75448f39791 100644
+--- a/packages/components/src/tree-grid/stories/index.js
++++ b/packages/components/src/tree-grid/stories/index.js
+@@ -9,7 +9,10 @@ import { Fragment } from '@wordpress/element';
+ import TreeGrid, { TreeGridRow, TreeGridCell } from '../';
+ import { Button } from '../../';
+ 
+-export default { title: 'Components/TreeGrid', component: TreeGrid };
++export default {
++	title: 'Components (Experimental)/TreeGrid',
++	component: TreeGrid,
++};
+ 
+ const groceries = [
+ 	{
+diff --git a/packages/components/src/unit-control/stories/index.js b/packages/components/src/unit-control/stories/index.js
+index 51726032e1ca4a..9603a05e3941a1 100644
+--- a/packages/components/src/unit-control/stories/index.js
++++ b/packages/components/src/unit-control/stories/index.js
+@@ -16,7 +16,7 @@ import UnitControl from '../';
+ import { CSS_UNITS } from '../utils';
+ 
+ export default {
+-	title: 'Components/UnitControl',
++	title: 'Components (Experimental)/UnitControl',
+ 	component: UnitControl,
+ 	parameters: {
+ 		knobs: { disable: false },
+diff --git a/storybook/preview.js b/storybook/preview.js
+index 7551e3083f242a..536f467b0fd986 100644
+--- a/storybook/preview.js
++++ b/storybook/preview.js
+@@ -27,4 +27,16 @@ export const parameters = {
+ 		// Will be enabled on a per-story basis until migration is complete.
+ 		disable: true,
+ 	},
++	options: {
++		storySort: {
++			order: [
++				'Docs',
++				'Playground',
++				'BlockEditor',
++				'Components',
++				'Components (Experimental)',
++				'Icons',
++			],
++		},
++	},
+ };

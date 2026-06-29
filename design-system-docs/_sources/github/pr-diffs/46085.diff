@@ -1,0 +1,255 @@
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index 95156a967d30cf..79be5af63a0d1f 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -30,6 +30,7 @@ $z-layers: (
+ 	".block-editor-url-input__suggestions": 30,
+ 	".edit-post-layout__footer": 30,
+ 	".interface-interface-skeleton__header": 30,
++	".edit-site-layout__header": 30,
+ 	".interface-interface-skeleton__content": 20,
+ 	".edit-widgets-header": 30,
+ 	".block-library-button__inline-link .block-editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
+diff --git a/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js b/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
+index d218b1104139cf..b7212dbf790c64 100644
+--- a/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
++++ b/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
+@@ -11,28 +11,16 @@ import { useCallback, useLayoutEffect, useState } from '@wordpress/element';
+ import { store as blockEditorStore } from '../../store';
+ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+ 
+-const COMMON_PROPS = {
+-	placement: 'top-start',
+-};
++const TOOLBAR_MARGIN = 12;
+ 
+-// By default the toolbar sets the `shift` prop. If the user scrolls the page
+-// down the toolbar will stay on screen by adopting a sticky position at the
+-// top of the viewport.
++// By default the toolbar sets the `shift` prop and flip properties.
++// If there is enough room, then once the block scrolls past the top of the screen,
++// then the toolbar is flipped to the bottom.
+ const DEFAULT_PROPS = {
+-	...COMMON_PROPS,
+-	flip: false,
+-	shift: true,
+-};
+-
+-// When there isn't enough height between the top of the block and the editor
+-// canvas, the `shift` prop is set to `false`, as it will cause the block to be
+-// obscured. The `flip` behavior is enabled, which positions the toolbar below
+-// the block. This only happens if the block is smaller than the viewport, as
+-// otherwise the toolbar will be off-screen.
+-const RESTRICTED_HEIGHT_PROPS = {
+-	...COMMON_PROPS,
++	placement: 'top-start',
++	strategy: 'fixed',
+ 	flip: true,
+-	shift: false,
++	shift: true,
+ };
+ 
+ /**
+@@ -50,22 +38,27 @@ function getProps( contentElement, selectedBlockElement, toolbarHeight ) {
+ 	}
+ 
+ 	const blockRect = selectedBlockElement.getBoundingClientRect();
+-	const contentRect = contentElement.getBoundingClientRect();
+ 
+ 	// The document element's clientHeight represents the viewport height.
+ 	const viewportHeight =
+ 		contentElement.ownerDocument.documentElement.clientHeight;
+ 
+-	const hasSpaceForToolbarAbove =
+-		blockRect.top - contentRect.top > toolbarHeight;
+ 	const isBlockTallerThanViewport =
+ 		blockRect.height > viewportHeight - toolbarHeight;
+ 
+-	if ( hasSpaceForToolbarAbove || isBlockTallerThanViewport ) {
+-		return DEFAULT_PROPS;
++	if ( isBlockTallerThanViewport ) {
++		return {
++			...DEFAULT_PROPS,
++			flip: false,
++			shift: { padding: toolbarHeight - TOOLBAR_MARGIN },
++		};
+ 	}
+ 
+-	return RESTRICTED_HEIGHT_PROPS;
++	return {
++		...DEFAULT_PROPS,
++		flip: { padding: toolbarHeight },
++		shift: { padding: toolbarHeight - TOOLBAR_MARGIN },
++	};
+ }
+ 
+ /**
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 833519075ccba7..a89c4afdbc7318 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -25,6 +25,7 @@
+ -   `ResizableBox`: Prevent unnecessary paint on resize handles ([#46196](https://github.com/WordPress/gutenberg/pull/46196)).
+ -   `Popover`: Prevent unnecessary paint caused by using outline ([#46201](https://github.com/WordPress/gutenberg/pull/46201)).
+ -   `PaletteEdit`: Global styles: add onChange actions to color palette items [#45681](https://github.com/WordPress/gutenberg/pull/45681).
++-   `Popover`: Add support for padding in `flip` and `shift` props, add `strategy` prop ([#46085](https://github.com/WordPress/gutenberg/pull/46085)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index e012dce41e9a90..b18529595d94b8 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -125,7 +125,7 @@ Show the popover fullscreen on mobile viewports.
+ 
+ -   Required: No
+ 
+-### `flip`: `boolean`
++### `flip`: `FlipProps | boolean`
+ 
+ Specifies whether the popover should flip across its axis if there isn't space for it in the normal placement.
+ 
+@@ -133,6 +133,8 @@ When the using a 'top' placement, the popover will switch to a 'bottom' placemen
+ 
+ The popover will retain its alignment of 'start' or 'end' when flipping.
+ 
++When passed an object, the amount of padding before flipping can be set using a `padding` property.
++
+ -   Required: No
+ -   Default: `true`
+ 
+@@ -224,6 +226,22 @@ Adjusts the size of the popover to prevent its contents from going out of view w
+ -   Required: No
+ -   Default: `true`
+ 
++### `shift`: `ShiftProps | boolean`
++
++Enables the popover to shift in order to stay in view when meeting the viewport edges.
++
++When passed an object, the amount of padding before shifting can be set using a `padding` property.
++
++-   Required: No
++-   Default: `true`
++
++### `strategy`: `'absolute' | 'fixed'`
++
++Sets the type of CSS position property to use for the popover.
++
++-   Required: No
++-   Default: `'absolute'`
++
+ ### `variant`: `'toolbar' | 'unstyled'`
+ 
+ Specifies the popover's style.
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 1d3b2af1dec1ae..e6906a51c1ecfd 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -181,6 +181,7 @@ const UnforwardedPopover = (
+ 		resize = true,
+ 		shift = false,
+ 		variant,
++		strategy: strategyProp = 'absolute',
+ 
+ 		// Deprecated props
+ 		__unstableForcePosition,
+@@ -291,7 +292,14 @@ const UnforwardedPopover = (
+ 			},
+ 		},
+ 		offsetMiddleware( offsetProp ),
+-		computedFlipProp ? flipMiddleware() : undefined,
++		computedFlipProp
++			? flipMiddleware( {
++					padding:
++						typeof computedFlipProp === 'object'
++							? computedFlipProp?.padding
++							: undefined,
++			  } )
++			: undefined,
+ 		computedResizeProp
+ 			? size( {
+ 					apply( sizeProps ) {
+@@ -314,7 +322,7 @@ const UnforwardedPopover = (
+ 			? shiftMiddleware( {
+ 					crossAxis: true,
+ 					limiter: customLimitShift(),
+-					padding: 1, // Necessary to avoid flickering at the edge of the viewport.
++					padding: typeof shift === 'object' ? shift?.padding : 1, // Necessary to avoid flickering at the edge of the viewport.
+ 			  } )
+ 			: undefined,
+ 		arrow( { element: arrowRef } ),
+@@ -362,6 +370,7 @@ const UnforwardedPopover = (
+ 		middlewareData: { arrow: arrowData },
+ 	} = useFloating( {
+ 		placement: normalizedPlacementFromProps,
++		strategy: strategyProp,
+ 		middleware,
+ 		whileElementsMounted: ( referenceParam, floatingParam, updateParam ) =>
+ 			autoUpdate( referenceParam, floatingParam, updateParam, {
+diff --git a/packages/components/src/popover/types.ts b/packages/components/src/popover/types.ts
+index 96cb7e5fd6f863..6629fba50c92fa 100644
+--- a/packages/components/src/popover/types.ts
++++ b/packages/components/src/popover/types.ts
+@@ -26,6 +26,14 @@ export type VirtualElement = Pick< Element, 'getBoundingClientRect' > & {
+ 	ownerDocument?: Document;
+ };
+ 
++export type FlipProps = {
++	padding?: number;
++};
++
++export type ShiftProps = {
++	padding?: number;
++};
++
+ export type PopoverProps = {
+ 	/**
+ 	 * The name of the Slot in which the popover should be rendered. It should
+@@ -67,7 +75,7 @@ export type PopoverProps = {
+ 	 *
+ 	 * @default true
+ 	 */
+-	flip?: boolean;
++	flip?: FlipProps | boolean;
+ 	/**
+ 	 * By default, the _first tabbable element_ in the popover will receive focus
+ 	 * when it mounts. This is the same as setting this prop to `"firstElement"`.
+@@ -133,7 +141,13 @@ export type PopoverProps = {
+ 	 *
+ 	 * @default false
+ 	 */
+-	shift?: boolean;
++	shift?: ShiftProps | boolean;
++	/**
++	 * Sets the type of CSS position property to use.
++	 *
++	 * @default 'absolute'
++	 */
++	strategy?: 'absolute' | 'fixed';
+ 	/**
+ 	 * Specifies the popover's style.
+ 	 *
+diff --git a/packages/edit-site/src/components/layout/style.scss b/packages/edit-site/src/components/layout/style.scss
+index 81c7c9869f8d99..261fc5038be6d3 100644
+--- a/packages/edit-site/src/components/layout/style.scss
++++ b/packages/edit-site/src/components/layout/style.scss
+@@ -24,6 +24,7 @@
+ 	grid-area: header;
+ 	height: $header-height;
+ 	display: flex;
++	z-index: z-index(".edit-site-layout__header");
+ }
+ 
+ .edit-site-layout__logo {
+diff --git a/packages/edit-widgets/src/components/header/style.scss b/packages/edit-widgets/src/components/header/style.scss
+index 279182e48a624e..2af35e3940dfea 100644
+--- a/packages/edit-widgets/src/components/header/style.scss
++++ b/packages/edit-widgets/src/components/header/style.scss
+@@ -2,6 +2,7 @@
+ 	display: flex;
+ 	align-items: center;
+ 	justify-content: space-between;
++	background: $white;
+ 	height: $header-height;
+ 	padding: 0 $grid-unit-20;
+ 	overflow: auto;

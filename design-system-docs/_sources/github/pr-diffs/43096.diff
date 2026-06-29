@@ -1,0 +1,98 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e974f7fa097939..8ae5def95484c0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -32,6 +32,7 @@
+ -   `BaseControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
+ -   `ToggleGroupControl`, `RangeControl`, `FontSizePicker`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#43062](https://github.com/WordPress/gutenberg/pull/43062)).
+ -   `BoxControl`: Export `applyValueToSides` util function. ([#42733](https://github.com/WordPress/gutenberg/pull/42733/)).
++-   `ColorPalette`: use index while iterating over color entries to avoid React "duplicated key" warning ([#43096](https://github.com/WordPress/gutenberg/pull/43096)).
+ -   `AnglePickerControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#43160](https://github.com/WordPress/gutenberg/pull/43160/)).
+ 
+ ### Internal
+diff --git a/packages/components/src/color-palette/index.js b/packages/components/src/color-palette/index.js
+index 876c9ccbf1f3bb..4d4f3e8bdd5b97 100644
+--- a/packages/components/src/color-palette/index.js
++++ b/packages/components/src/color-palette/index.js
+@@ -2,7 +2,6 @@
+ /**
+  * External dependencies
+  */
+-import { map } from 'lodash';
+ import { colord, extend } from 'colord';
+ import namesPlugin from 'colord/plugins/names';
+ import a11yPlugin from 'colord/plugins/a11y';
+@@ -35,15 +34,16 @@ function SinglePalette( {
+ 	actions,
+ } ) {
+ 	const colorOptions = useMemo( () => {
+-		return map( colors, ( { color, name } ) => {
++		return colors.map( ( { color, name }, index ) => {
+ 			const colordColor = colord( color );
++			const isSelected = value === color;
+ 
+ 			return (
+ 				<CircularOptionPicker.Option
+-					key={ color }
+-					isSelected={ value === color }
++					key={ `${ color }-${ index }` }
++					isSelected={ isSelected }
+ 					selectedIconProps={
+-						value === color
++						isSelected
+ 							? {
+ 									fill:
+ 										colordColor.contrast() >
+@@ -60,7 +60,7 @@ function SinglePalette( {
+ 					}
+ 					style={ { backgroundColor: color, color } }
+ 					onClick={
+-						value === color ? clearColor : () => onChange( color )
++						isSelected ? clearColor : () => onChange( color )
+ 					}
+ 					aria-label={
+ 						name
+diff --git a/packages/components/src/color-palette/stories/index.js b/packages/components/src/color-palette/stories/index.js
+index 736b597ad426c9..1b278e3ca96577 100644
+--- a/packages/components/src/color-palette/stories/index.js
++++ b/packages/components/src/color-palette/stories/index.js
+@@ -82,7 +82,7 @@ MultipleOrigins.args = {
+ 			],
+ 		},
+ 		{
+-			name: 'Primary colors',
++			name: 'Secondary colors',
+ 			colors: [
+ 				{ name: 'Orange', color: '#f60' },
+ 				{ name: 'Green', color: '#0f0' },
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.js.snap b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+index f229e98a0278fa..9c79cdef246d53 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+@@ -971,7 +971,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                 <Option
+                   aria-label="Color: red"
+                   isSelected={true}
+-                  key="#f00"
++                  key="#f00-0"
+                   onClick={[Function]}
+                   selectedIconProps={
+                     Object {
+@@ -1074,7 +1074,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                 <Option
+                   aria-label="Color: white"
+                   isSelected={false}
+-                  key="#fff"
++                  key="#fff-1"
+                   onClick={[Function]}
+                   selectedIconProps={Object {}}
+                   style={
+@@ -1134,7 +1134,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+                 <Option
+                   aria-label="Color: blue"
+                   isSelected={false}
+-                  key="#00f"
++                  key="#00f-2"
+                   onClick={[Function]}
+                   selectedIconProps={Object {}}
+                   style={

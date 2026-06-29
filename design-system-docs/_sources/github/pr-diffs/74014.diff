@@ -1,0 +1,195 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 3d4667311fada7..653feb2020b48f 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -283,7 +283,6 @@ module.exports = {
+ 						'SearchControl',
+ 						'SelectControl',
+ 						'ToggleControl',
+-						'TreeSelect',
+ 					].map( ( componentName ) => ( {
+ 						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
+ 						message:
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2de1710f377f58..c30d3bb8376919 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `FocalPointPicker`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73980](https://github.com/WordPress/gutenberg/pull/73980)).
+ -   `TextareaControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73970](https://github.com/WordPress/gutenberg/pull/73970)).
+ -   `ToggleGroupControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74004](https://github.com/WordPress/gutenberg/pull/74004)).
++-   `TreeSelect`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74014](https://github.com/WordPress/gutenberg/pull/74014)).
+ -   `DimensionControl`: Completely remove deprecated component ([#73944](https://github.com/WordPress/gutenberg/pull/73944)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/query-controls/author-select.tsx b/packages/components/src/query-controls/author-select.tsx
+index aad1184b44e481..8fd5a26fff9ed5 100644
+--- a/packages/components/src/query-controls/author-select.tsx
++++ b/packages/components/src/query-controls/author-select.tsx
+@@ -30,7 +30,6 @@ export default function AuthorSelect( {
+ 					? String( selectedAuthorId )
+ 					: undefined
+ 			}
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize={ __next40pxDefaultSize }
+ 		/>
+ 	);
+diff --git a/packages/components/src/query-controls/category-select.tsx b/packages/components/src/query-controls/category-select.tsx
+index bc2306ff048fa1..325735181b287d 100644
+--- a/packages/components/src/query-controls/category-select.tsx
++++ b/packages/components/src/query-controls/category-select.tsx
+@@ -1,13 +1,6 @@
+-/**
+- * Internal dependencies
+- */
++import { useMemo } from '@wordpress/element';
+ import { buildTermsTree } from './terms';
+ import TreeSelect from '../tree-select';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useMemo } from '@wordpress/element';
+ import type { CategorySelectProps } from './types';
+ 
+ export default function CategorySelect( {
+@@ -37,7 +30,6 @@ export default function CategorySelect( {
+ 					: undefined
+ 			}
+ 			{ ...props }
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize={ __next40pxDefaultSize }
+ 		/>
+ 	);
+diff --git a/packages/components/src/tree-select/README.md b/packages/components/src/tree-select/README.md
+index d2f73443a2a880..35764329ece342 100644
+--- a/packages/components/src/tree-select/README.md
++++ b/packages/components/src/tree-select/README.md
+@@ -15,7 +15,6 @@ const MyTreeSelect = () => {
+ 
+ 	return (
+ 		<TreeSelect
+-			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize
+ 			label="Parent page"
+ 			noOptionLabel="No parent page"
+@@ -62,14 +61,6 @@ const MyTreeSelect = () => {
+ 
+ Start opting into the larger default height that will become the default size in a future version.
+ 
+-### `__nextHasNoMarginBottom`
+-
+- - Type: `boolean`
+- - Required: No
+- - Default: `false`
+-
+-Start opting into the new margin-free styles that will become the default in a future version.
+-
+ ### `children`
+ 
+  - Type: `ReactNode`
+diff --git a/packages/components/src/tree-select/index.tsx b/packages/components/src/tree-select/index.tsx
+index 66116576361623..e858fc1e4f5c67 100644
+--- a/packages/components/src/tree-select/index.tsx
++++ b/packages/components/src/tree-select/index.tsx
+@@ -10,17 +10,8 @@ import { decodeEntities } from '@wordpress/html-entities';
+ import { SelectControl } from '../select-control';
+ import type { TreeSelectProps, Tree, Truthy } from './types';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+-import { ContextSystemProvider } from '../context';
+ import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+-const CONTEXT_VALUE = {
+-	BaseControl: {
+-		// Temporary during deprecation grace period: Overrides the underlying `__associatedWPComponentName`
+-		// via the context system to override the value set by SelectControl.
+-		_overrides: { __associatedWPComponentName: 'TreeSelect' },
+-	},
+-};
+-
+ function getSelectOptions(
+ 	tree: Tree[],
+ 	level = 0
+@@ -47,7 +38,6 @@ function getSelectOptions(
+  *
+  * 	return (
+  * 		<TreeSelect
+- * 			__nextHasNoMarginBottom
+  * 			__next40pxDefaultSize
+  * 			label="Parent page"
+  * 			noOptionLabel="No parent page"
+@@ -86,6 +76,7 @@ function getSelectOptions(
+  */
+ export function TreeSelect( props: TreeSelectProps ) {
+ 	const {
++		__nextHasNoMarginBottom: _, // Prevent passing to internal component
+ 		label,
+ 		noOptionLabel,
+ 		onChange,
+@@ -108,14 +99,13 @@ export function TreeSelect( props: TreeSelectProps ) {
+ 	} );
+ 
+ 	return (
+-		<ContextSystemProvider value={ CONTEXT_VALUE }>
+-			<SelectControl
+-				__shouldNotWarnDeprecated36pxSize
+-				{ ...{ label, options, onChange } }
+-				value={ selectedId }
+-				{ ...restProps }
+-			/>
+-		</ContextSystemProvider>
++		<SelectControl
++			__shouldNotWarnDeprecated36pxSize
++			{ ...{ label, options, onChange } }
++			value={ selectedId }
++			{ ...restProps }
++			__nextHasNoMarginBottom
++		/>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/tree-select/stories/index.story.tsx b/packages/components/src/tree-select/stories/index.story.tsx
+index 0ef8f44b790db0..56c5bab568aae1 100644
+--- a/packages/components/src/tree-select/stories/index.story.tsx
++++ b/packages/components/src/tree-select/stories/index.story.tsx
+@@ -49,7 +49,6 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
+ 
+ export const Default = TreeSelectWithState.bind( {} );
+ Default.args = {
+-	__nextHasNoMarginBottom: true,
+ 	__next40pxDefaultSize: true,
+ 	label: 'Label Text',
+ 	noOptionLabel: 'No parent page',
+diff --git a/packages/components/src/tree-select/types.ts b/packages/components/src/tree-select/types.ts
+index 59e8e173fab02f..89194adfcf393c 100644
+--- a/packages/components/src/tree-select/types.ts
++++ b/packages/components/src/tree-select/types.ts
+@@ -18,8 +18,15 @@ export interface Tree {
+ export interface TreeSelectProps
+ 	extends Omit<
+ 		SelectControlSingleSelectionProps,
+-		'value' | 'multiple' | 'onChange'
++		'value' | 'multiple' | 'onChange' | '__nextHasNoMarginBottom'
+ 	> {
++	/**
++	 * Start opting into the new margin-free styles that will become the default in a future version.
++	 *
++	 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
++	 * @ignore
++	 */
++	__nextHasNoMarginBottom?: boolean;
+ 	/**
+ 	 * If this property is added, an option will be added with this label to represent empty selection.
+ 	 */
+diff --git a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+index cfab000c71f5ad..4b306b8ed45217 100644
+--- a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
++++ b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+@@ -473,7 +473,6 @@ export function HierarchicalTermSelector( { slug } ) {
+ 						{ !! availableTerms.length && (
+ 							<TreeSelect
+ 								__next40pxDefaultSize
+-								__nextHasNoMarginBottom
+ 								label={ parentSelectLabel }
+ 								noOptionLabel={ noParentOption }
+ 								onChange={ onChangeFormParent }

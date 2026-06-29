@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/card/card/README.md b/packages/components/src/card/card/README.md
+index b640b7159c33db..72532cb24310f9 100644
+--- a/packages/components/src/card/card/README.md
++++ b/packages/components/src/card/card/README.md
+@@ -99,7 +99,7 @@ const Example = () => (
+ 		<CardMedia>
+ 			<img src="..." />
+ 		</CardMedia>
+-		<CardHeader>...</CardHeader>
++		<CardFooter>...</CardFooter>
+ 	</Card>
+ );
+ ```

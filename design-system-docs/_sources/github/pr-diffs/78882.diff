@@ -1,0 +1,1558 @@
+diff --git a/package-lock.json b/package-lock.json
+index 9d1da19ecd48ad..bc43b788b8f740 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -59012,6 +59012,7 @@
+ 			"version": "2.2.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/i18n": "file:../i18n",
+@@ -59040,6 +59041,9 @@
+ 				"@wordpress/rich-text": "file:../rich-text",
+ 				"uuid": "^14.0.0"
+ 			},
++			"devDependencies": {
++				"@types/react": "^19.2.13"
++			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+ 				"npm": ">=8.19.2"
+@@ -59384,6 +59388,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@react-spring/web": "^9.4.5",
++				"@types/react": "^19.2.13",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/blob": "file:../blob",
+@@ -59473,6 +59478,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@arraypress/waveform-player": "1.2.1",
++				"@types/react": "^19.2.13",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/autop": "file:../autop",
+@@ -59576,6 +59582,7 @@
+ 			"version": "15.20.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/autop": "file:../autop",
+ 				"@wordpress/blob": "file:../blob",
+ 				"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
+@@ -59624,6 +59631,7 @@
+ 			"version": "0.14.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/admin-ui": "file:../admin-ui",
+ 				"@wordpress/base-styles": "file:../base-styles",
+@@ -59758,6 +59766,7 @@
+ 				"@storybook/react-vite": "^10.2.8",
+ 				"@testing-library/jest-dom": "^6.9.1",
+ 				"@types/jest": "^29.5.14",
++				"@types/react-dom": "^19.2.3",
+ 				"@wordpress/jest-console": "file:../jest-console",
+ 				"snapshot-diff": "^0.10.0",
+ 				"storybook": "^10.2.8",
+@@ -59865,6 +59874,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@types/mousetrap": "^1.6.8",
++				"@types/react": "^19.2.13",
+ 				"@wordpress/deprecated": "file:../deprecated",
+ 				"@wordpress/dom": "file:../dom",
+ 				"@wordpress/element": "file:../element",
+@@ -59893,6 +59903,7 @@
+ 			"version": "1.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/data": "file:../data",
+ 				"@wordpress/element": "file:../element",
+@@ -59906,6 +59917,7 @@
+ 			"version": "1.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/admin-ui": "file:../admin-ui",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+@@ -59972,6 +59984,7 @@
+ 			"version": "7.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/block-editor": "file:../block-editor",
+ 				"@wordpress/blocks": "file:../blocks",
+@@ -60818,6 +60831,7 @@
+ 			"version": "10.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/deprecated": "file:../deprecated",
+ 				"@wordpress/element": "file:../element",
+@@ -60867,6 +60881,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@ariakit/react": "^0.4.21",
++				"@types/react": "^19.2.13",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/compose": "file:../compose",
+@@ -61301,6 +61316,7 @@
+ 			"version": "14.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+@@ -61656,6 +61672,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@react-spring/web": "^9.4.5",
++				"@types/react": "^19.2.13",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/blob": "file:../blob",
+@@ -61753,6 +61770,7 @@
+ 			"version": "1.14.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+@@ -61791,6 +61809,7 @@
+ 				"@dnd-kit/core": "^6.3.1",
+ 				"@dnd-kit/sortable": "^10.0.0",
+ 				"@dnd-kit/utilities": "^3.2.2",
++				"@types/react": "^19.2.13",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/style-runtime": "file:../style-runtime",
+@@ -61858,6 +61877,7 @@
+ 			"version": "13.2.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/primitives": "file:../primitives",
+ 				"change-case": "4.1.2"
+@@ -61875,6 +61895,7 @@
+ 			"version": "1.11.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/i18n": "file:../i18n",
+@@ -62025,6 +62046,7 @@
+ 			"version": "5.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/data": "file:../data",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/keycodes": "file:../keycodes"
+@@ -62042,6 +62064,7 @@
+ 			"version": "4.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/i18n": "file:../i18n"
+ 			},
+ 			"engines": {
+@@ -62066,6 +62089,7 @@
+ 			"version": "1.13.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/asset-loader": "file:../asset-loader",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/block-editor": "file:../block-editor",
+@@ -62108,6 +62132,7 @@
+ 			"version": "5.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/blob": "file:../blob",
+@@ -62132,6 +62157,7 @@
+ 			"version": "0.10.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+@@ -62165,6 +62191,7 @@
+ 			"version": "0.12.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/compose": "file:../compose",
+@@ -62197,6 +62224,7 @@
+ 			"version": "5.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/blob": "file:../blob",
+@@ -62227,6 +62255,7 @@
+ 			"version": "5.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/data": "file:../data",
+@@ -62307,6 +62336,7 @@
+ 			"version": "7.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/deprecated": "file:../deprecated",
+@@ -62359,6 +62389,7 @@
+ 			"version": "4.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+@@ -62412,6 +62443,7 @@
+ 			"version": "4.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/element": "file:../element",
+ 				"clsx": "^2.1.1"
+ 			},
+@@ -62484,6 +62516,7 @@
+ 			"version": "4.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/i18n": "file:../i18n",
+ 				"utility-types": "^3.10.0"
+@@ -62857,6 +62890,7 @@
+ 			"version": "7.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/data": "file:../data",
+@@ -62903,6 +62937,7 @@
+ 			"version": "1.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/private-apis": "file:../private-apis",
+@@ -63044,6 +63079,7 @@
+ 			"version": "6.23.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/blocks": "file:../blocks",
+ 				"@wordpress/components": "file:../components",
+@@ -63080,6 +63116,7 @@
+ 			"version": "2.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"change-case": "^4.1.2"
+ 			},
+ 			"engines": {
+@@ -63961,6 +63998,7 @@
+ 			"version": "0.14.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/element": "file:../element",
+ 				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/style-runtime": "file:../style-runtime",
+@@ -64057,6 +64095,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@base-ui/react": "^1.4.1",
++				"@types/react": "^19.2.13",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/element": "file:../element",
+@@ -64107,6 +64146,7 @@
+ 			"version": "0.32.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/blob": "file:../blob",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/data": "file:../data",
+@@ -64144,6 +64184,7 @@
+ 			"version": "6.47.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@types/react": "^19.2.13",
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/data": "file:../data",
+ 				"@wordpress/element": "file:../element"
+@@ -64755,6 +64796,7 @@
+ 				"@storybook/addon-docs": "^10.2.8",
+ 				"@storybook/icons": "^2.0.1",
+ 				"@storybook/react-vite": "^10.2.8",
++				"@types/react": "^19.2.13",
+ 				"@vitejs/plugin-react": "^5.1.2",
+ 				"@wordpress/theme": "file:../packages/theme",
+ 				"storybook": "^10.2.8",
+@@ -67136,6 +67178,9 @@
+ 				"@wordpress/i18n": "file:../../packages/i18n",
+ 				"@wordpress/icons": "file:../../packages/icons",
+ 				"@wordpress/ui": "file:../../packages/ui"
++			},
++			"devDependencies": {
++				"@types/react": "^19.2.13"
+ 			}
+ 		},
+ 		"widgets/events": {
+@@ -67150,6 +67195,9 @@
+ 				"@wordpress/i18n": "file:../../packages/i18n",
+ 				"@wordpress/icons": "file:../../packages/icons",
+ 				"@wordpress/ui": "file:../../packages/ui"
++			},
++			"devDependencies": {
++				"@types/react": "^19.2.13"
+ 			}
+ 		},
+ 		"widgets/hello-dolly": {
+@@ -67160,6 +67208,9 @@
+ 				"@wordpress/i18n": "file:../../packages/i18n",
+ 				"@wordpress/icons": "file:../../packages/icons",
+ 				"@wordpress/ui": "file:../../packages/ui"
++			},
++			"devDependencies": {
++				"@types/react": "^19.2.13"
+ 			}
+ 		},
+ 		"widgets/hello-world": {
+@@ -67169,6 +67220,9 @@
+ 				"@wordpress/icons": "file:../../packages/icons",
+ 				"@wordpress/ui": "file:../../packages/ui",
+ 				"clsx": "^2.1.1"
++			},
++			"devDependencies": {
++				"@types/react": "^19.2.13"
+ 			}
+ 		},
+ 		"widgets/news": {
+@@ -67182,6 +67236,9 @@
+ 				"@wordpress/i18n": "file:../../packages/i18n",
+ 				"@wordpress/icons": "file:../../packages/icons",
+ 				"@wordpress/ui": "file:../../packages/ui"
++			},
++			"devDependencies": {
++				"@types/react": "^19.2.13"
+ 			}
+ 		},
+ 		"widgets/quick-draft": {
+@@ -67203,6 +67260,9 @@
+ 				"@wordpress/ui": "file:../../packages/ui",
+ 				"@wordpress/url": "file:../../packages/url",
+ 				"clsx": "^2.1.1"
++			},
++			"devDependencies": {
++				"@types/react": "^19.2.13"
+ 			}
+ 		},
+ 		"widgets/site-health": {
+@@ -67216,6 +67276,9 @@
+ 				"@wordpress/icons": "file:../../packages/icons",
+ 				"@wordpress/primitives": "file:../../packages/primitives",
+ 				"@wordpress/ui": "file:../../packages/ui"
++			},
++			"devDependencies": {
++				"@types/react": "^19.2.13"
+ 			}
+ 		},
+ 		"widgets/site-preview": {
+@@ -67230,6 +67293,9 @@
+ 				"@wordpress/icons": "file:../../packages/icons",
+ 				"@wordpress/ui": "file:../../packages/ui",
+ 				"@wordpress/url": "file:../../packages/url"
++			},
++			"devDependencies": {
++				"@types/react": "^19.2.13"
+ 			}
+ 		},
+ 		"widgets/welcome": {
+@@ -67245,6 +67311,9 @@
+ 				"@wordpress/primitives": "file:../../packages/primitives",
+ 				"@wordpress/ui": "file:../../packages/ui",
+ 				"clsx": "^2.1.1"
++			},
++			"devDependencies": {
++				"@types/react": "^19.2.13"
+ 			}
+ 		}
+ 	}
+diff --git a/packages/admin-ui/CHANGELOG.md b/packages/admin-ui/CHANGELOG.md
+index 3fc4dcdd09563e..2591a7e42cc028 100644
+--- a/packages/admin-ui/CHANGELOG.md
++++ b/packages/admin-ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 2.2.0 (2026-05-27)
+ 
+ ## 2.1.0 (2026-05-14)
+diff --git a/packages/admin-ui/package.json b/packages/admin-ui/package.json
+index 53f748950f9cc1..1db7b3b1a3d7d2 100644
+--- a/packages/admin-ui/package.json
++++ b/packages/admin-ui/package.json
+@@ -45,6 +45,7 @@
+ 		"src/**/*.module.css"
+ 	],
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/i18n": "file:../i18n",
+diff --git a/packages/annotations/package.json b/packages/annotations/package.json
+index 3f6437b23d52cf..a609e391c1dece 100644
+--- a/packages/annotations/package.json
++++ b/packages/annotations/package.json
+@@ -49,6 +49,9 @@
+ 		"@wordpress/rich-text": "file:../rich-text",
+ 		"uuid": "^14.0.0"
+ 	},
++	"devDependencies": {
++		"@types/react": "^19.2.13"
++	},
+ 	"peerDependencies": {
+ 		"react": "^19.2.4"
+ 	},
+diff --git a/packages/block-editor/CHANGELOG.md b/packages/block-editor/CHANGELOG.md
+index a7026a856f03df..3169bc788d3b80 100644
+--- a/packages/block-editor/CHANGELOG.md
++++ b/packages/block-editor/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ### Documentation
+ 
+ -   Fix documentation typos and grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+diff --git a/packages/block-editor/package.json b/packages/block-editor/package.json
+index 030ff29a5c2687..b12e7cbc53a574 100644
+--- a/packages/block-editor/package.json
++++ b/packages/block-editor/package.json
+@@ -61,6 +61,7 @@
+ 	],
+ 	"dependencies": {
+ 		"@react-spring/web": "^9.4.5",
++		"@types/react": "^19.2.13",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/blob": "file:../blob",
+diff --git a/packages/block-library/CHANGELOG.md b/packages/block-library/CHANGELOG.md
+index bd6ccd89b17603..389105428fdfde 100644
+--- a/packages/block-library/CHANGELOG.md
++++ b/packages/block-library/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 9.47.0 (2026-05-27)
+ 
+ ### Internal
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index 69c68efc84e880..7579ea73fab2ed 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -95,6 +95,7 @@
+ 	],
+ 	"dependencies": {
+ 		"@arraypress/waveform-player": "1.2.1",
++		"@types/react": "^19.2.13",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/autop": "file:../autop",
+diff --git a/packages/blocks/CHANGELOG.md b/packages/blocks/CHANGELOG.md
+index ba6c81dfca8f28..e098f22a1553b7 100644
+--- a/packages/blocks/CHANGELOG.md
++++ b/packages/blocks/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 15.20.0 (2026-05-27)
+ 
+ ### Bug Fix
+diff --git a/packages/blocks/package.json b/packages/blocks/package.json
+index a9b8c8bb4dd7ba..e675580a686df9 100644
+--- a/packages/blocks/package.json
++++ b/packages/blocks/package.json
+@@ -51,6 +51,7 @@
+ 		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/autop": "file:../autop",
+ 		"@wordpress/blob": "file:../blob",
+ 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
+diff --git a/packages/boot/CHANGELOG.md b/packages/boot/CHANGELOG.md
+new file mode 100644
+index 00000000000000..d428248aef3a9c
+--- /dev/null
++++ b/packages/boot/CHANGELOG.md
+@@ -0,0 +1,7 @@
++<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
++
++## Unreleased
++
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+diff --git a/packages/boot/package.json b/packages/boot/package.json
+index 16c196edc7de37..2b4eeab4700d44 100644
+--- a/packages/boot/package.json
++++ b/packages/boot/package.json
+@@ -41,6 +41,7 @@
+ 	"wpScriptModuleExports": "./build-module/index.mjs",
+ 	"types": "build-types",
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/admin-ui": "file:../admin-ui",
+ 		"@wordpress/base-styles": "file:../base-styles",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 7c40e91a0cefcf..4da2293725ec0c 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -110,6 +110,7 @@
+ 		"@storybook/react-vite": "^10.2.8",
+ 		"@testing-library/jest-dom": "^6.9.1",
+ 		"@types/jest": "^29.5.14",
++		"@types/react-dom": "^19.2.3",
+ 		"@wordpress/jest-console": "file:../jest-console",
+ 		"snapshot-diff": "^0.10.0",
+ 		"storybook": "^10.2.8",
+diff --git a/packages/compose/CHANGELOG.md b/packages/compose/CHANGELOG.md
+index 54ce1ee5e43fa6..1e2e84ad664b45 100644
+--- a/packages/compose/CHANGELOG.md
++++ b/packages/compose/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ### Documentation
+ 
+ -   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+diff --git a/packages/compose/package.json b/packages/compose/package.json
+index c259904d350ae8..5ba6a2bf5a41b2 100644
+--- a/packages/compose/package.json
++++ b/packages/compose/package.json
+@@ -47,6 +47,7 @@
+ 	"sideEffects": false,
+ 	"dependencies": {
+ 		"@types/mousetrap": "^1.6.8",
++		"@types/react": "^19.2.13",
+ 		"@wordpress/deprecated": "file:../deprecated",
+ 		"@wordpress/dom": "file:../dom",
+ 		"@wordpress/element": "file:../element",
+diff --git a/packages/connectors/CHANGELOG.md b/packages/connectors/CHANGELOG.md
+new file mode 100644
+index 00000000000000..d428248aef3a9c
+--- /dev/null
++++ b/packages/connectors/CHANGELOG.md
+@@ -0,0 +1,7 @@
++<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
++
++## Unreleased
++
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+diff --git a/packages/connectors/package.json b/packages/connectors/package.json
+index f3429929260183..b0c63a7395698c 100644
+--- a/packages/connectors/package.json
++++ b/packages/connectors/package.json
+@@ -30,6 +30,7 @@
+ 	"wpScriptModuleExports": "./build-module/index.mjs",
+ 	"types": "build-types",
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/data": "file:../data",
+ 		"@wordpress/element": "file:../element",
+diff --git a/packages/content-types/CHANGELOG.md b/packages/content-types/CHANGELOG.md
+new file mode 100644
+index 00000000000000..d428248aef3a9c
+--- /dev/null
++++ b/packages/content-types/CHANGELOG.md
+@@ -0,0 +1,7 @@
++<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
++
++## Unreleased
++
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+diff --git a/packages/content-types/package.json b/packages/content-types/package.json
+index 88d753bb85448c..91258521aa4961 100644
+--- a/packages/content-types/package.json
++++ b/packages/content-types/package.json
+@@ -33,6 +33,7 @@
+ 	"wpScriptModuleExports": "./build-module/index.mjs",
+ 	"types": "build-types",
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/admin-ui": "file:../admin-ui",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+diff --git a/packages/core-data/CHANGELOG.md b/packages/core-data/CHANGELOG.md
+index 9d29a3aec1ba71..0273b87e065753 100644
+--- a/packages/core-data/CHANGELOG.md
++++ b/packages/core-data/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 7.47.0 (2026-05-27)
+ 
+ ## 7.46.0 (2026-05-14)
+diff --git a/packages/core-data/package.json b/packages/core-data/package.json
+index 7b6967141876bf..01906a97566c26 100644
+--- a/packages/core-data/package.json
++++ b/packages/core-data/package.json
+@@ -49,6 +49,7 @@
+ 		"build-module/index.mjs"
+ 	],
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/block-editor": "file:../block-editor",
+ 		"@wordpress/blocks": "file:../blocks",
+diff --git a/packages/data/CHANGELOG.md b/packages/data/CHANGELOG.md
+index cd950d7d41d2bb..3b92f68bbfeb77 100644
+--- a/packages/data/CHANGELOG.md
++++ b/packages/data/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 10.47.0 (2026-05-27)
+ 
+ ## 10.46.0 (2026-05-14)
+diff --git a/packages/data/package.json b/packages/data/package.json
+index 20640d6422ba27..70a34b9556e60d 100644
+--- a/packages/data/package.json
++++ b/packages/data/package.json
+@@ -45,6 +45,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/deprecated": "file:../deprecated",
+ 		"@wordpress/element": "file:../element",
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 58973050737312..05ab59ec761bca 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 15.0.0 (2026-05-27)
+ 
+ ### Breaking Changes
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index e3e69dd0a3bb28..5b0ad4ff263ef0 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -53,6 +53,7 @@
+ 	"sideEffects": false,
+ 	"dependencies": {
+ 		"@ariakit/react": "^0.4.21",
++		"@types/react": "^19.2.13",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/compose": "file:../compose",
+diff --git a/packages/editor/CHANGELOG.md b/packages/editor/CHANGELOG.md
+index 63e4fb4355db3c..642e7bdcaa2531 100644
+--- a/packages/editor/CHANGELOG.md
++++ b/packages/editor/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ### Documentation
+ 
+ -   Fix documentation grammar ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+diff --git a/packages/editor/package.json b/packages/editor/package.json
+index 47decf0ff84cea..42e90bbd7fd90e 100644
+--- a/packages/editor/package.json
++++ b/packages/editor/package.json
+@@ -60,6 +60,7 @@
+ 		"build-module/bindings/**"
+ 	],
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+diff --git a/packages/fields/CHANGELOG.md b/packages/fields/CHANGELOG.md
+index 164a5951fb73ce..ca8051e66f88b5 100644
+--- a/packages/fields/CHANGELOG.md
++++ b/packages/fields/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ### Internal
+ 
+ -   Migrate `Tooltip` consumers from `@wordpress/components` to the new compositional `Tooltip` in `@wordpress/ui` ([#78691](https://github.com/WordPress/gutenberg/pull/78691)).
+diff --git a/packages/fields/package.json b/packages/fields/package.json
+index 64e67a003b7cb3..467d5ed4c21990 100644
+--- a/packages/fields/package.json
++++ b/packages/fields/package.json
+@@ -48,6 +48,7 @@
+ 	],
+ 	"dependencies": {
+ 		"@react-spring/web": "^9.4.5",
++		"@types/react": "^19.2.13",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/blob": "file:../blob",
+diff --git a/packages/global-styles-ui/CHANGELOG.md b/packages/global-styles-ui/CHANGELOG.md
+new file mode 100644
+index 00000000000000..d428248aef3a9c
+--- /dev/null
++++ b/packages/global-styles-ui/CHANGELOG.md
+@@ -0,0 +1,7 @@
++<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
++
++## Unreleased
++
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+diff --git a/packages/global-styles-ui/package.json b/packages/global-styles-ui/package.json
+index 5aa252948f88f4..56821e35fbe2c8 100644
+--- a/packages/global-styles-ui/package.json
++++ b/packages/global-styles-ui/package.json
+@@ -44,6 +44,7 @@
+ 	},
+ 	"react-native": "src/index",
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+diff --git a/packages/grid/CHANGELOG.md b/packages/grid/CHANGELOG.md
+index 10e2ca85195104..4af9c0d5584c9c 100644
+--- a/packages/grid/CHANGELOG.md
++++ b/packages/grid/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ### Enhancements
+ 
+ -   Clamp tile resize so width cannot shrink below a single column
+diff --git a/packages/grid/package.json b/packages/grid/package.json
+index 9a0c4d9889c2b8..3665cc05448e89 100644
+--- a/packages/grid/package.json
++++ b/packages/grid/package.json
+@@ -50,6 +50,7 @@
+ 		"@dnd-kit/core": "^6.3.1",
+ 		"@dnd-kit/sortable": "^10.0.0",
+ 		"@dnd-kit/utilities": "^3.2.2",
++		"@types/react": "^19.2.13",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/style-runtime": "file:../style-runtime",
+diff --git a/packages/icons/CHANGELOG.md b/packages/icons/CHANGELOG.md
+index d22b11a599e641..6279dd0c586c13 100644
+--- a/packages/icons/CHANGELOG.md
++++ b/packages/icons/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ### Breaking Changes
+ 
+ -   Rename `timeToRead` icon to `time`. ([#78804](https://github.com/WordPress/gutenberg/pull/78804))
+diff --git a/packages/icons/package.json b/packages/icons/package.json
+index 7ee42cf98af9f0..81b5000fb11e21 100644
+--- a/packages/icons/package.json
++++ b/packages/icons/package.json
+@@ -44,6 +44,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"change-case": "4.1.2"
+diff --git a/packages/image-cropper/CHANGELOG.md b/packages/image-cropper/CHANGELOG.md
+index 4b59e715967632..9bde75bfec5c01 100644
+--- a/packages/image-cropper/CHANGELOG.md
++++ b/packages/image-cropper/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 1.11.0 (2026-05-27)
+ 
+ ## 1.10.0 (2026-05-14)
+diff --git a/packages/image-cropper/package.json b/packages/image-cropper/package.json
+index f44ba653a6ed67..aa89ecece6a522 100644
+--- a/packages/image-cropper/package.json
++++ b/packages/image-cropper/package.json
+@@ -44,6 +44,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/i18n": "file:../i18n",
+diff --git a/packages/keyboard-shortcuts/CHANGELOG.md b/packages/keyboard-shortcuts/CHANGELOG.md
+index dad52a5dcb9ebd..28c6c8dd39e206 100644
+--- a/packages/keyboard-shortcuts/CHANGELOG.md
++++ b/packages/keyboard-shortcuts/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 5.47.0 (2026-05-27)
+ 
+ ## 5.46.0 (2026-05-14)
+diff --git a/packages/keyboard-shortcuts/package.json b/packages/keyboard-shortcuts/package.json
+index 015c960c57d1c0..76042df7f0926a 100644
+--- a/packages/keyboard-shortcuts/package.json
++++ b/packages/keyboard-shortcuts/package.json
+@@ -43,6 +43,7 @@
+ 	"wpScript": true,
+ 	"types": "build-types/index.d.ts",
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/data": "file:../data",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/keycodes": "file:../keycodes"
+diff --git a/packages/keycodes/CHANGELOG.md b/packages/keycodes/CHANGELOG.md
+index e432c0c44fb397..04ee76607c5d25 100644
+--- a/packages/keycodes/CHANGELOG.md
++++ b/packages/keycodes/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ### Documentation
+ 
+ -   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+diff --git a/packages/keycodes/package.json b/packages/keycodes/package.json
+index d9782a245c3f82..ae89662d7877e3 100644
+--- a/packages/keycodes/package.json
++++ b/packages/keycodes/package.json
+@@ -44,6 +44,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/i18n": "file:../i18n"
+ 	},
+ 	"publishConfig": {
+diff --git a/packages/lazy-editor/CHANGELOG.md b/packages/lazy-editor/CHANGELOG.md
+index 26b25a644f9286..4bf27fe61f9cc0 100644
+--- a/packages/lazy-editor/CHANGELOG.md
++++ b/packages/lazy-editor/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 1.13.0 (2026-05-27)
+ 
+ ## 1.12.0 (2026-05-14)
+diff --git a/packages/lazy-editor/package.json b/packages/lazy-editor/package.json
+index 0c6ec72a0c9b05..b88d18e318b620 100644
+--- a/packages/lazy-editor/package.json
++++ b/packages/lazy-editor/package.json
+@@ -45,6 +45,7 @@
+ 	"wpScriptModuleExports": "./build-module/index.mjs",
+ 	"types": "build-types",
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/asset-loader": "file:../asset-loader",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/block-editor": "file:../block-editor",
+diff --git a/packages/list-reusable-blocks/CHANGELOG.md b/packages/list-reusable-blocks/CHANGELOG.md
+index b18d43112a8897..60c76a3e3bf436 100644
+--- a/packages/list-reusable-blocks/CHANGELOG.md
++++ b/packages/list-reusable-blocks/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 5.47.0 (2026-05-27)
+ 
+ ### Internal
+diff --git a/packages/list-reusable-blocks/package.json b/packages/list-reusable-blocks/package.json
+index 90bab9ee36bc2c..112cbf87a47196 100644
+--- a/packages/list-reusable-blocks/package.json
++++ b/packages/list-reusable-blocks/package.json
+@@ -45,6 +45,7 @@
+ 	"wpScript": true,
+ 	"types": "build-types",
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/blob": "file:../blob",
+diff --git a/packages/media-editor/CHANGELOG.md b/packages/media-editor/CHANGELOG.md
+new file mode 100644
+index 00000000000000..d428248aef3a9c
+--- /dev/null
++++ b/packages/media-editor/CHANGELOG.md
+@@ -0,0 +1,7 @@
++<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
++
++## Unreleased
++
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+diff --git a/packages/media-editor/package.json b/packages/media-editor/package.json
+index 55d699eb3442b7..9be93e7488de20 100644
+--- a/packages/media-editor/package.json
++++ b/packages/media-editor/package.json
+@@ -44,6 +44,7 @@
+ 		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+diff --git a/packages/media-fields/CHANGELOG.md b/packages/media-fields/CHANGELOG.md
+new file mode 100644
+index 00000000000000..d428248aef3a9c
+--- /dev/null
++++ b/packages/media-fields/CHANGELOG.md
+@@ -0,0 +1,7 @@
++<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
++
++## Unreleased
++
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+diff --git a/packages/media-fields/package.json b/packages/media-fields/package.json
+index 82b57784522031..246a3e80b07ef7 100644
+--- a/packages/media-fields/package.json
++++ b/packages/media-fields/package.json
+@@ -49,6 +49,7 @@
+ 		"src/**/*.scss"
+ 	],
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/compose": "file:../compose",
+diff --git a/packages/media-utils/CHANGELOG.md b/packages/media-utils/CHANGELOG.md
+index cf529cb5ad13b2..72efea400fb3cc 100644
+--- a/packages/media-utils/CHANGELOG.md
++++ b/packages/media-utils/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 5.47.0 (2026-05-27)
+ 
+ ## 5.46.0 (2026-05-14)
+diff --git a/packages/media-utils/package.json b/packages/media-utils/package.json
+index ca27ed5660c419..de6c9c1eb5fe36 100644
+--- a/packages/media-utils/package.json
++++ b/packages/media-utils/package.json
+@@ -47,6 +47,7 @@
+ 		"build-style/**"
+ 	],
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/blob": "file:../blob",
+diff --git a/packages/notices/CHANGELOG.md b/packages/notices/CHANGELOG.md
+index 5b6a9c9351af2d..07d3aff99b4bdd 100644
+--- a/packages/notices/CHANGELOG.md
++++ b/packages/notices/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 5.47.0 (2026-05-27)
+ 
+ ### Enhancements
+diff --git a/packages/notices/package.json b/packages/notices/package.json
+index 286ab12c4a7b40..87ace2b10d61af 100644
+--- a/packages/notices/package.json
++++ b/packages/notices/package.json
+@@ -49,6 +49,7 @@
+ 		"src/**/*.scss"
+ 	],
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/data": "file:../data",
+diff --git a/packages/plugins/CHANGELOG.md b/packages/plugins/CHANGELOG.md
+index 3b728e45089eed..dc3ef90c3ef755 100644
+--- a/packages/plugins/CHANGELOG.md
++++ b/packages/plugins/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 7.47.0 (2026-05-27)
+ 
+ ## 7.46.0 (2026-05-14)
+diff --git a/packages/plugins/package.json b/packages/plugins/package.json
+index 55ea3863be6485..5048aaed144116 100644
+--- a/packages/plugins/package.json
++++ b/packages/plugins/package.json
+@@ -43,6 +43,7 @@
+ 	"wpScript": true,
+ 	"types": "build-types",
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/deprecated": "file:../deprecated",
+diff --git a/packages/preferences/CHANGELOG.md b/packages/preferences/CHANGELOG.md
+index 49e0975aec8ccc..2eb123e6d95ab2 100644
+--- a/packages/preferences/CHANGELOG.md
++++ b/packages/preferences/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ### Documentation
+ 
+ -   Fix documentation typos ([#78686](https://github.com/WordPress/gutenberg/pull/78686)).
+diff --git a/packages/preferences/package.json b/packages/preferences/package.json
+index 86e61a6e4a5acb..85915cfe908adf 100644
+--- a/packages/preferences/package.json
++++ b/packages/preferences/package.json
+@@ -51,6 +51,7 @@
+ 	],
+ 	"sideEffects": false,
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+diff --git a/packages/primitives/CHANGELOG.md b/packages/primitives/CHANGELOG.md
+index e9e29fba92d2b9..2a2bb4cbc108be 100644
+--- a/packages/primitives/CHANGELOG.md
++++ b/packages/primitives/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 4.47.0 (2026-05-27)
+ 
+ ## 4.46.0 (2026-05-14)
+diff --git a/packages/primitives/package.json b/packages/primitives/package.json
+index 9be8aab84695cf..857bb31f2913ad 100644
+--- a/packages/primitives/package.json
++++ b/packages/primitives/package.json
+@@ -47,6 +47,7 @@
+ 		"src/**/*.scss"
+ 	],
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/element": "file:../element",
+ 		"clsx": "^2.1.1"
+ 	},
+diff --git a/packages/react-i18n/CHANGELOG.md b/packages/react-i18n/CHANGELOG.md
+index c6c79c6020e2ce..a5258ef8ea579d 100644
+--- a/packages/react-i18n/CHANGELOG.md
++++ b/packages/react-i18n/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 4.47.0 (2026-05-27)
+ 
+ ## 4.46.0 (2026-05-14)
+diff --git a/packages/react-i18n/package.json b/packages/react-i18n/package.json
+index 220cc0cadd6374..e9582d63b552b8 100644
+--- a/packages/react-i18n/package.json
++++ b/packages/react-i18n/package.json
+@@ -44,6 +44,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"utility-types": "^3.10.0"
+diff --git a/packages/rich-text/CHANGELOG.md b/packages/rich-text/CHANGELOG.md
+index 806155c9619a2d..2e6232c2542d84 100644
+--- a/packages/rich-text/CHANGELOG.md
++++ b/packages/rich-text/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 7.47.0 (2026-05-27)
+ 
+ ## 7.46.0 (2026-05-14)
+diff --git a/packages/rich-text/package.json b/packages/rich-text/package.json
+index 1bfa1893d42366..e34488299033e2 100644
+--- a/packages/rich-text/package.json
++++ b/packages/rich-text/package.json
+@@ -52,6 +52,7 @@
+ 		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/data": "file:../data",
+diff --git a/packages/router/CHANGELOG.md b/packages/router/CHANGELOG.md
+index 5955981492ed28..ef8e689fc06def 100644
+--- a/packages/router/CHANGELOG.md
++++ b/packages/router/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 1.47.0 (2026-05-27)
+ 
+ ## 1.46.0 (2026-05-14)
+diff --git a/packages/router/package.json b/packages/router/package.json
+index 3957a246994481..0b41292fccb2a7 100644
+--- a/packages/router/package.json
++++ b/packages/router/package.json
+@@ -43,6 +43,7 @@
+ 	"wpScript": true,
+ 	"types": "build-types",
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/private-apis": "file:../private-apis",
+diff --git a/packages/server-side-render/CHANGELOG.md b/packages/server-side-render/CHANGELOG.md
+index 8e7893caa14873..c4b71797a8a622 100644
+--- a/packages/server-side-render/CHANGELOG.md
++++ b/packages/server-side-render/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 6.23.0 (2026-05-27)
+ 
+ ## 6.22.0 (2026-05-14)
+diff --git a/packages/server-side-render/package.json b/packages/server-side-render/package.json
+index b6d54d8f5a165e..955b3d3935e830 100644
+--- a/packages/server-side-render/package.json
++++ b/packages/server-side-render/package.json
+@@ -45,6 +45,7 @@
+ 	"wpScriptDefaultExport": true,
+ 	"types": "build-types/index.d.ts",
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/blocks": "file:../blocks",
+ 		"@wordpress/components": "file:../components",
+diff --git a/packages/style-engine/CHANGELOG.md b/packages/style-engine/CHANGELOG.md
+index 539167627a9dbc..791c8a3351a3b2 100644
+--- a/packages/style-engine/CHANGELOG.md
++++ b/packages/style-engine/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 2.47.0 (2026-05-27)
+ 
+ ## 2.46.0 (2026-05-14)
+diff --git a/packages/style-engine/package.json b/packages/style-engine/package.json
+index 4e72e201257f62..3217dcb79239bf 100644
+--- a/packages/style-engine/package.json
++++ b/packages/style-engine/package.json
+@@ -65,6 +65,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"change-case": "^4.1.2"
+ 	},
+ 	"publishConfig": {
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index d578b3453f57f7..52849565a22cc4 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ### Breaking Changes
+ 
+ -   Drop the experimental `density` support from `ThemeProvider`. The `density` prop has been removed, along with the related `data-wpds-density` attribute and the per-density overrides on `--wpds-dimension-padding-*` / `--wpds-dimension-gap-*` tokens ([#78741](https://github.com/WordPress/gutenberg/pull/78741)).
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index d326205a0dda68..d00ee3621678cd 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -80,6 +80,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/element": "file:../element",
+ 		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/style-runtime": "file:../style-runtime",
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 73c69b8e4e78ef..fa921b0dc08716 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ### Bug Fixes
+ 
+ -   `Button.Icon`: Preserve icon view boxes so icons with non-standard `viewBox` values are not clipped ([#78614](https://github.com/WordPress/gutenberg/pull/78614)).
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index c994d28cd686bf..881df10d0e67ec 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -44,6 +44,7 @@
+ 	"sideEffects": false,
+ 	"dependencies": {
+ 		"@base-ui/react": "^1.4.1",
++		"@types/react": "^19.2.13",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/element": "file:../element",
+diff --git a/packages/upload-media/CHANGELOG.md b/packages/upload-media/CHANGELOG.md
+index b06962758eb94f..d13c6fd25d6965 100644
+--- a/packages/upload-media/CHANGELOG.md
++++ b/packages/upload-media/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 0.32.0 (2026-05-27)
+ 
+ ### Bug Fix
+diff --git a/packages/upload-media/package.json b/packages/upload-media/package.json
+index 7ecc49f39d9ab1..2fbf7a1c2c29b9 100644
+--- a/packages/upload-media/package.json
++++ b/packages/upload-media/package.json
+@@ -49,6 +49,7 @@
+ 		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/blob": "file:../blob",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/data": "file:../data",
+diff --git a/packages/viewport/CHANGELOG.md b/packages/viewport/CHANGELOG.md
+index f2481949b4ee99..eb563bafbb4a5b 100644
+--- a/packages/viewport/CHANGELOG.md
++++ b/packages/viewport/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Code Quality
++
++-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++
+ ## 6.47.0 (2026-05-27)
+ 
+ ## 6.46.0 (2026-05-14)
+diff --git a/packages/viewport/package.json b/packages/viewport/package.json
+index a0c5d4506f8d0e..b0e31a28b497fd 100644
+--- a/packages/viewport/package.json
++++ b/packages/viewport/package.json
+@@ -43,6 +43,7 @@
+ 	"wpScript": true,
+ 	"types": "build-types",
+ 	"dependencies": {
++		"@types/react": "^19.2.13",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/data": "file:../data",
+ 		"@wordpress/element": "file:../element"
+diff --git a/storybook/package.json b/storybook/package.json
+index 381bf6fc636633..7ae1c447f1b610 100644
+--- a/storybook/package.json
++++ b/storybook/package.json
+@@ -31,6 +31,7 @@
+ 		"@storybook/addon-docs": "^10.2.8",
+ 		"@storybook/icons": "^2.0.1",
+ 		"@storybook/react-vite": "^10.2.8",
++		"@types/react": "^19.2.13",
+ 		"@vitejs/plugin-react": "^5.1.2",
+ 		"@wordpress/theme": "file:../packages/theme",
+ 		"storybook": "^10.2.8",
+diff --git a/widgets/activity/package.json b/widgets/activity/package.json
+index db7d9e35bd797b..3d8e79f69bc501 100644
+--- a/widgets/activity/package.json
++++ b/widgets/activity/package.json
+@@ -13,5 +13,8 @@
+ 		"@wordpress/i18n": "file:../../packages/i18n",
+ 		"@wordpress/icons": "file:../../packages/icons",
+ 		"@wordpress/ui": "file:../../packages/ui"
++	},
++	"devDependencies": {
++		"@types/react": "^19.2.13"
+ 	}
+ }
+diff --git a/widgets/events/package.json b/widgets/events/package.json
+index 274ea37499ec59..ed13e46a64f40d 100644
+--- a/widgets/events/package.json
++++ b/widgets/events/package.json
+@@ -11,5 +11,8 @@
+ 		"@wordpress/i18n": "file:../../packages/i18n",
+ 		"@wordpress/icons": "file:../../packages/icons",
+ 		"@wordpress/ui": "file:../../packages/ui"
++	},
++	"devDependencies": {
++		"@types/react": "^19.2.13"
+ 	}
+ }
+diff --git a/widgets/hello-dolly/package.json b/widgets/hello-dolly/package.json
+index 22e7f9a296e511..d9a8c85d7d3dad 100644
+--- a/widgets/hello-dolly/package.json
++++ b/widgets/hello-dolly/package.json
+@@ -7,5 +7,8 @@
+ 		"@wordpress/i18n": "file:../../packages/i18n",
+ 		"@wordpress/icons": "file:../../packages/icons",
+ 		"@wordpress/ui": "file:../../packages/ui"
++	},
++	"devDependencies": {
++		"@types/react": "^19.2.13"
+ 	}
+ }
+diff --git a/widgets/hello-world/package.json b/widgets/hello-world/package.json
+index 283031130c0b61..98e609bb62c198 100644
+--- a/widgets/hello-world/package.json
++++ b/widgets/hello-world/package.json
+@@ -6,5 +6,8 @@
+ 		"@wordpress/icons": "file:../../packages/icons",
+ 		"@wordpress/ui": "file:../../packages/ui",
+ 		"clsx": "^2.1.1"
++	},
++	"devDependencies": {
++		"@types/react": "^19.2.13"
+ 	}
+ }
+diff --git a/widgets/news/package.json b/widgets/news/package.json
+index 0dc9253e58e5dd..3224b370c705b7 100644
+--- a/widgets/news/package.json
++++ b/widgets/news/package.json
+@@ -10,5 +10,8 @@
+ 		"@wordpress/i18n": "file:../../packages/i18n",
+ 		"@wordpress/icons": "file:../../packages/icons",
+ 		"@wordpress/ui": "file:../../packages/ui"
++	},
++	"devDependencies": {
++		"@types/react": "^19.2.13"
+ 	}
+ }
+diff --git a/widgets/quick-draft/package.json b/widgets/quick-draft/package.json
+index 05f5040ca09930..2277319b64d014 100644
+--- a/widgets/quick-draft/package.json
++++ b/widgets/quick-draft/package.json
+@@ -18,5 +18,8 @@
+ 		"@wordpress/url": "file:../../packages/url",
+ 		"@wordpress/ui": "file:../../packages/ui",
+ 		"clsx": "^2.1.1"
++	},
++	"devDependencies": {
++		"@types/react": "^19.2.13"
+ 	}
+ }
+diff --git a/widgets/site-health/package.json b/widgets/site-health/package.json
+index ff7225fcc6851b..8135ef3bafed23 100644
+--- a/widgets/site-health/package.json
++++ b/widgets/site-health/package.json
+@@ -10,5 +10,8 @@
+ 		"@wordpress/icons": "file:../../packages/icons",
+ 		"@wordpress/primitives": "file:../../packages/primitives",
+ 		"@wordpress/ui": "file:../../packages/ui"
++	},
++	"devDependencies": {
++		"@types/react": "^19.2.13"
+ 	}
+ }
+diff --git a/widgets/site-preview/package.json b/widgets/site-preview/package.json
+index 90338322d763fb..02ab0a6f6b9003 100644
+--- a/widgets/site-preview/package.json
++++ b/widgets/site-preview/package.json
+@@ -11,5 +11,8 @@
+ 		"@wordpress/icons": "file:../../packages/icons",
+ 		"@wordpress/ui": "file:../../packages/ui",
+ 		"@wordpress/url": "file:../../packages/url"
++	},
++	"devDependencies": {
++		"@types/react": "^19.2.13"
+ 	}
+ }
+diff --git a/widgets/welcome/package.json b/widgets/welcome/package.json
+index f9fdc0604da6ad..4359fe9b1ec715 100644
+--- a/widgets/welcome/package.json
++++ b/widgets/welcome/package.json
+@@ -12,5 +12,8 @@
+ 		"@wordpress/primitives": "file:../../packages/primitives",
+ 		"@wordpress/ui": "file:../../packages/ui",
+ 		"clsx": "^2.1.1"
++	},
++	"devDependencies": {
++		"@types/react": "^19.2.13"
+ 	}
+ }

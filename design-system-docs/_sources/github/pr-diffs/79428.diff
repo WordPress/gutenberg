@@ -1,0 +1,65 @@
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index 79f284c30f316b..88b2b695d9dba2 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -314,13 +314,13 @@ An alternative to loading the [design tokens stylesheet](#outside-wordpress), us
+ 
+ You do not need this helper if you already load the design tokens stylesheet or use fallback injection via the build plugins or `@wordpress/build`. In those cases, write bare `var(--wpds-*)` references in your source.
+ 
+-The `@wordpress/theme/design-token-fallbacks` export provides a generated `wpds-var()` function that wraps token references with the same fallback map used by the build plugins — for example, `wpds.wpds-var('--wpds-color-fg-content-neutral')` compiles to `var(--wpds-color-fg-content-neutral, #1e1e1e)`.
++The `@wordpress/theme/design-token-fallbacks` export provides a generated `wpds-var()` function that wraps token references with the same fallback map used by the build plugins. For example, `wpds.wpds-var('--wpds-color-foreground-content-neutral')` compiles to `var(--wpds-color-foreground-content-neutral, #1e1e1e)`.
+ 
+ ```scss
+ @use '@wordpress/theme/design-token-fallbacks' as wpds;
+ 
+ .example {
+-	color: wpds.wpds-var( '--wpds-color-fg-content-neutral' );
++	color: wpds.wpds-var( '--wpds-color-foreground-content-neutral' );
+ }
+ ```
+ 
+@@ -330,11 +330,7 @@ When using Sass with [`NodePackageImporter`](https://sass-lang.com/documentation
+ @use 'pkg:@wordpress/theme/design-token-fallbacks' as wpds;
+ ```
+ 
+-For Sass setups that resolve packages from `node_modules` with a load path, use:
+-
+-```scss
+-@use '@wordpress/theme/src/prebuilt/scss/design-token-fallbacks' as wpds;
+-```
++The same `@wordpress/theme/design-token-fallbacks` import also supports Sass setups that resolve packages from `node_modules` with a load path.
+ 
+ ## Contributing to this package
+ 
+diff --git a/packages/theme/design-token-fallbacks.scss b/packages/theme/design-token-fallbacks.scss
+new file mode 100644
+index 00000000000000..feaa946f067df4
+--- /dev/null
++++ b/packages/theme/design-token-fallbacks.scss
+@@ -0,0 +1 @@
++@forward "./src/prebuilt/scss/design-token-fallbacks";
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index a9eb4ac843a402..53489e2dbdfada 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -27,6 +27,7 @@
+ 		"build",
+ 		"build-module",
+ 		"build-types",
++		"design-token-fallbacks.scss",
+ 		"*.md"
+ 	],
+ 	"main": "build/index.cjs",
+@@ -38,7 +39,11 @@
+ 			"default": "./build/index.cjs"
+ 		},
+ 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
+-		"./design-token-fallbacks": "./src/prebuilt/scss/design-token-fallbacks.scss",
++		"./design-token-fallbacks": {
++			"sass": "./design-token-fallbacks.scss",
++			"style": "./design-token-fallbacks.scss",
++			"default": "./design-token-fallbacks.scss"
++		},
+ 		"./design-tokens.js": {
+ 			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
+ 			"import": "./build-module/prebuilt/js/design-tokens.mjs",

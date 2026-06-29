@@ -1,0 +1,92 @@
+diff --git a/packages/components/src/server-side-render/README.md b/packages/components/src/server-side-render/README.md
+index 55b0be7630dabb..df9d75dec8fa4f 100644
+--- a/packages/components/src/server-side-render/README.md
++++ b/packages/components/src/server-side-render/README.md
+@@ -8,6 +8,36 @@ ServerSideRender should be regarded as a fallback or legacy mechanism, it is not
+ 
+ New blocks should be built in conjunction with any necessary REST API endpoints, so that JavaScript can be used for rendering client-side in the `edit` function. This gives the best user experience, instead of relying on using the PHP `render_callback`. The logic necessary for rendering should be included in the endpoint, so that both the client-side JavaScript and server-side PHP logic should require a minimal amount of differences.
+ 
++## Props
++
++### attributes
++
++An object containing the attributes of the block to be server-side rendered.
++E.g: `{ displayAsDropdown: true }`, `{ showHierarchy: true }`, etc...
++- Type: `Object`
++- Required: No
++
++### block
++
++The identifier of the block to be server-side rendered.
++Examples: "core/archives", "core/latest-comments", "core/rss", etc...
++- Type: `String`
++- Required: Yes
++
++### className
++
++A class added to the DOM element that wraps the server side rendered block.
++Examples: "my-custom-server-side-rendered".
++- Type: `String`
++- Required: No
++
++### urlQueryArgs
++
++Query arguments to apply to the request URL.
++E.g: `{ post_id: 12 }`.
++- Type: `Object`
++- Required: No
++
+ ## Usage
+ 
+ Render core/archives preview.
+diff --git a/packages/components/src/server-side-render/index.js b/packages/components/src/server-side-render/index.js
+index ed11eac1c518bf..71d649dfbf6440 100644
+--- a/packages/components/src/server-side-render/index.js
++++ b/packages/components/src/server-side-render/index.js
+@@ -85,24 +85,42 @@ export class ServerSideRender extends Component {
+ 
+ 	render() {
+ 		const response = this.state.response;
++		const { className } = this.props;
+ 		if ( ! response ) {
+ 			return (
+-				<Placeholder><Spinner /></Placeholder>
++				<Placeholder
++					className={ className }
++				>
++					<Spinner />
++				</Placeholder>
+ 			);
+ 		} else if ( response.error ) {
+ 			// translators: %s: error message describing the problem
+ 			const errorMessage = sprintf( __( 'Error loading block: %s' ), response.errorMsg );
+ 			return (
+-				<Placeholder>{ errorMessage }</Placeholder>
++				<Placeholder
++					className={ className }
++				>
++					{ errorMessage }
++				</Placeholder>
+ 			);
+ 		} else if ( ! response.length ) {
+ 			return (
+-				<Placeholder>{ __( 'No results found.' ) }</Placeholder>
++				<Placeholder
++					className={ className }
++				>
++					{ __( 'No results found.' ) }
++				</Placeholder>
+ 			);
+ 		}
+ 
+ 		return (
+-			<RawHTML key="html">{ response }</RawHTML>
++			<RawHTML
++				key="html"
++				className={ className }
++			>
++				{ response }
++			</RawHTML>
+ 		);
+ 	}
+ }

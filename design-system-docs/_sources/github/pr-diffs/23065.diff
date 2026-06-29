@@ -1,0 +1,262 @@
+diff --git a/packages/components/src/panel/body.js b/packages/components/src/panel/body.js
+index 4121a99b6bbe25..dbb16968045edd 100644
+--- a/packages/components/src/panel/body.js
++++ b/packages/components/src/panel/body.js
+@@ -6,7 +6,7 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { Component, forwardRef } from '@wordpress/element';
++import { forwardRef, useState } from '@wordpress/element';
+ import { chevronUp, chevronDown } from '@wordpress/icons';
+ 
+ /**
+@@ -15,76 +15,69 @@ import { chevronUp, chevronDown } from '@wordpress/icons';
+ import Button from '../button';
+ import Icon from '../icon';
+ 
+-export class PanelBody extends Component {
+-	constructor( props ) {
+-		super( ...arguments );
+-		this.state = {
+-			opened: props.initialOpen === undefined ? true : props.initialOpen,
+-		};
+-		this.toggle = this.toggle.bind( this );
+-	}
++export function PanelBody( {
++	title,
++	children,
++	opened,
++	className,
++	icon,
++	forwardedRef,
++	initialOpen,
++	onToggle,
++} ) {
++	const [ isOpenedState, setOpenedState ] = useState(
++		initialOpen === undefined ? true : initialOpen
++	);
++	const isOpened = opened === undefined ? isOpenedState : opened;
+ 
+-	toggle( event ) {
++	const classes = classnames( 'components-panel__body', className, {
++		'is-opened': isOpened,
++	} );
++
++	const toggle = ( event ) => {
+ 		event.preventDefault();
+-		if ( this.props.opened === undefined ) {
+-			this.setState( ( state ) => ( {
+-				opened: ! state.opened,
+-			} ) );
++		if ( opened === undefined ) {
++			setOpenedState( ! isOpenedState );
+ 		}
+ 
+-		if ( this.props.onToggle ) {
+-			this.props.onToggle();
++		if ( onToggle ) {
++			onToggle();
+ 		}
+-	}
+-
+-	render() {
+-		const {
+-			title,
+-			children,
+-			opened,
+-			className,
+-			icon,
+-			forwardedRef,
+-		} = this.props;
+-		const isOpened = opened === undefined ? this.state.opened : opened;
+-		const classes = classnames( 'components-panel__body', className, {
+-			'is-opened': isOpened,
+-		} );
++	};
+ 
+-		return (
+-			<div className={ classes } ref={ forwardedRef }>
+-				{ !! title && (
+-					<h2 className="components-panel__body-title">
+-						<Button
+-							className="components-panel__body-toggle"
+-							onClick={ this.toggle }
+-							aria-expanded={ isOpened }
+-						>
+-							{ /*
+-								Firefox + NVDA don't announce aria-expanded because the browser
+-								repaints the whole element, so this wrapping span hides that.
+-							*/ }
+-							<span aria-hidden="true">
+-								<Icon
+-									className="components-panel__arrow"
+-									icon={ isOpened ? chevronUp : chevronDown }
+-								/>
+-							</span>
+-							{ title }
+-							{ icon && (
+-								<Icon
+-									icon={ icon }
+-									className="components-panel__icon"
+-									size={ 20 }
+-								/>
+-							) }
+-						</Button>
+-					</h2>
+-				) }
+-				{ isOpened && children }
+-			</div>
+-		);
+-	}
++	return (
++		<div className={ classes } ref={ forwardedRef }>
++			{ !! title && (
++				<h2 className="components-panel__body-title">
++					<Button
++						className="components-panel__body-toggle"
++						onClick={ toggle }
++						aria-expanded={ isOpened }
++					>
++						{ /*
++							Firefox + NVDA don't announce aria-expanded because the browser
++							repaints the whole element, so this wrapping span hides that.
++						*/ }
++						<span aria-hidden="true">
++							<Icon
++								className="components-panel__arrow"
++								icon={ isOpened ? chevronUp : chevronDown }
++							/>
++						</span>
++						{ title }
++						{ icon && (
++							<Icon
++								icon={ icon }
++								className="components-panel__icon"
++								size={ 20 }
++							/>
++						) }
++					</Button>
++				</h2>
++			) }
++			{ isOpened && children }
++		</div>
++	);
+ }
+ 
+ const forwardedPanelBody = ( props, ref ) => {
+diff --git a/packages/components/src/panel/test/body.js b/packages/components/src/panel/test/body.js
+index a3aa620432217f..5f2908c5093a95 100644
+--- a/packages/components/src/panel/test/body.js
++++ b/packages/components/src/panel/test/body.js
+@@ -8,6 +8,18 @@ import { shallow, mount } from 'enzyme';
+  */
+ import { PanelBody } from '../body';
+ 
++function getToggleButton( container ) {
++	return container.find( '.components-panel__body-toggle' ).first();
++}
++
++function clickToggle( container ) {
++	getToggleButton( container ).simulate( 'click' );
++}
++
++function getOpened( container ) {
++	return getToggleButton( container ).prop( 'aria-expanded' );
++}
++
+ describe( 'PanelBody', () => {
+ 	describe( 'basic rendering', () => {
+ 		it( 'should render an empty div with the matching className', () => {
+@@ -22,10 +34,7 @@ describe( 'PanelBody', () => {
+ 			const panelBody = shallow( <PanelBody title="Some Text" /> );
+ 			const button = panelBody.find( '.components-panel__body-toggle' );
+ 			expect( panelBody.hasClass( 'is-opened' ) ).toBe( true );
+-			expect( panelBody.state( 'opened' ) ).toBe( true );
+-			expect( button.prop( 'onClick' ) ).toBe(
+-				panelBody.instance().toggle
+-			);
++			expect( getOpened( panelBody ) ).toBe( true );
+ 			expect( button.childAt( 0 ).name() ).toBe( 'span' );
+ 			expect( button.childAt( 0 ).childAt( 0 ).name() ).toBe( 'Icon' );
+ 			expect( button.childAt( 1 ).text() ).toBe( 'Some Text' );
+@@ -35,7 +44,6 @@ describe( 'PanelBody', () => {
+ 			const panelBody = shallow(
+ 				<PanelBody title="Some Text" initialOpen={ false } />
+ 			);
+-			expect( panelBody.state( 'opened' ) ).toBe( false );
+ 			expect( panelBody.hasClass( 'is-opened' ) ).toBe( false );
+ 		} );
+ 
+@@ -47,21 +55,20 @@ describe( 'PanelBody', () => {
+ 					initialOpen={ false }
+ 				/>
+ 			);
+-			expect( panelBody.state( 'opened' ) ).toBe( false );
+ 			expect( panelBody.hasClass( 'is-opened' ) ).toBe( true );
+ 		} );
+ 
+ 		it( 'should render child elements within PanelBody element', () => {
+-			const panelBody = shallow( <PanelBody children="Some Text" /> );
+-			expect( panelBody.instance().props.children ).toBe( 'Some Text' );
++			const panelBody = mount( <PanelBody children="Some Text" /> );
++			expect( panelBody.prop( 'children' ) ).toBe( 'Some Text' );
+ 			expect( panelBody.text() ).toBe( 'Some Text' );
+ 		} );
+ 
+ 		it( 'should pass children prop but not render when sidebar is closed', () => {
+-			const panelBody = shallow(
++			const panelBody = mount(
+ 				<PanelBody children="Some Text" initialOpen={ false } />
+ 			);
+-			expect( panelBody.instance().props.children ).toBe( 'Some Text' );
++			expect( panelBody.prop( 'children' ) ).toBe( 'Some Text' );
+ 			// Text should be empty even though props.children is set.
+ 			expect( panelBody.text() ).toBe( '' );
+ 		} );
+@@ -69,29 +76,33 @@ describe( 'PanelBody', () => {
+ 
+ 	describe( 'mounting behavior', () => {
+ 		it( 'should mount with a default of being opened', () => {
+-			const panelBody = mount( <PanelBody /> );
+-			expect( panelBody.state( 'opened' ) ).toBe( true );
++			const panelBody = mount( <PanelBody title="Some Text" /> );
++			expect( getOpened( panelBody ) ).toBe( true );
+ 		} );
+ 
+ 		it( 'should mount with a state of not opened when initialOpen set to false', () => {
+-			const panelBody = mount( <PanelBody initialOpen={ false } /> );
+-			expect( panelBody.state( 'opened' ) ).toBe( false );
++			const panelBody = mount(
++				<PanelBody title="Some Text" initialOpen={ false } />
++			);
++			expect( getOpened( panelBody ) ).toBe( false );
+ 		} );
+ 	} );
+ 
+ 	describe( 'toggling behavior', () => {
+-		const fakeEvent = { preventDefault: () => undefined };
+-
+ 		it( 'should set the opened state to false when a toggle fires', () => {
+-			const panelBody = mount( <PanelBody /> );
+-			panelBody.instance().toggle( fakeEvent );
+-			expect( panelBody.state( 'opened' ) ).toBe( false );
++			const panelBody = mount( <PanelBody title="Some Text" /> );
++
++			clickToggle( panelBody );
++			expect( getOpened( panelBody ) ).toBe( false );
+ 		} );
+ 
+ 		it( 'should set the opened state to true when a toggle fires on a closed state', () => {
+-			const panelBody = mount( <PanelBody initialOpen={ false } /> );
+-			panelBody.instance().toggle( fakeEvent );
+-			expect( panelBody.state( 'opened' ) ).toBe( true );
++			const panelBody = mount(
++				<PanelBody title="Some Text" initialOpen={ false } />
++			);
++
++			clickToggle( panelBody );
++			expect( getOpened( panelBody ) ).toBe( true );
+ 		} );
+ 	} );
+ } );

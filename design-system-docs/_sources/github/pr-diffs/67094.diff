@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index dfb9454d8da1f0..34a90b6ca23b3c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ 
+ -   `ToggleGroupControl`: Fix active background for `0` value ([#66855](https://github.com/WordPress/gutenberg/pull/66855)).
+ -   `SlotFill`: Fix a bug where a stale value of `fillProps` could be used ([#67000](https://github.com/WordPress/gutenberg/pull/67000)).
++-   `ColorPicker`: Add accessible label for copy button ([#67094](https://github.com/WordPress/gutenberg/pull/67094)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/color-picker/color-copy-button.tsx b/packages/components/src/color-picker/color-copy-button.tsx
+index 0076a2125d00c0..6e49fa7ae85e74 100644
+--- a/packages/components/src/color-picker/color-copy-button.tsx
++++ b/packages/components/src/color-picker/color-copy-button.tsx
+@@ -55,16 +55,14 @@ export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
+ 		};
+ 	}, [] );
+ 
++	const label =
++		copiedColor === color.toHex() ? __( 'Copied!' ) : __( 'Copy' );
++
+ 	return (
+-		<Tooltip
+-			delay={ 0 }
+-			hideOnClick={ false }
+-			text={
+-				copiedColor === color.toHex() ? __( 'Copied!' ) : __( 'Copy' )
+-			}
+-		>
++		<Tooltip delay={ 0 } hideOnClick={ false } text={ label }>
+ 			<Button
+ 				size="compact"
++				aria-label={ label }
+ 				ref={ copyRef }
+ 				icon={ copy }
+ 				showTooltip={ false }

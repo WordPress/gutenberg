@@ -1,0 +1,595 @@
+diff --git a/packages/components/src/color-palette/stories/index.story.tsx b/packages/components/src/color-palette/stories/index.story.tsx
+index e129ac9f53f2e3..8ba54b154e3cb7 100644
+--- a/packages/components/src/color-palette/stories/index.story.tsx
++++ b/packages/components/src/color-palette/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react-vite';
++import type { Meta, StoryObj } from '@storybook/react-vite';
+ 
+ /**
+  * WordPress dependencies
+@@ -33,11 +33,13 @@ const meta: Meta< typeof ColorPalette > = {
+ };
+ export default meta;
+ 
+-const Template: StoryFn< typeof ColorPalette > = ( {
++type ColorPaletteStory = StoryObj< typeof ColorPalette >;
++
++const Template = ( {
+ 	onChange,
+ 	value,
+ 	...args
+-} ) => {
++}: React.ComponentProps< typeof ColorPalette > ) => {
+ 	const [ color, setColor ] = useState< string | undefined >( value );
+ 
+ 	return (
+@@ -52,49 +54,55 @@ const Template: StoryFn< typeof ColorPalette > = ( {
+ 	);
+ };
+ 
+-export const Default = Template.bind( {} );
+-Default.args = {
+-	colors: [
+-		{ name: 'Red', color: '#f00' },
+-		{ name: 'White', color: '#fff' },
+-		{ name: 'Blue', color: '#00f' },
+-	],
++export const Default: ColorPaletteStory = {
++	render: Template,
++	args: {
++		colors: [
++			{ name: 'Red', color: '#f00' },
++			{ name: 'White', color: '#fff' },
++			{ name: 'Blue', color: '#00f' },
++		],
++	},
+ };
+ 
+-export const InitialValue = Template.bind( {} );
+-InitialValue.args = {
+-	colors: [
+-		{ name: 'Red', color: '#f00' },
+-		{ name: 'White', color: '#fff' },
+-		{ name: 'Blue', color: '#00f' },
+-	],
+-	value: '#00f',
++export const InitialValue: ColorPaletteStory = {
++	render: Template,
++	args: {
++		colors: [
++			{ name: 'Red', color: '#f00' },
++			{ name: 'White', color: '#fff' },
++			{ name: 'Blue', color: '#00f' },
++		],
++		value: '#00f',
++	},
+ };
+ 
+-export const MultipleOrigins = Template.bind( {} );
+-MultipleOrigins.args = {
+-	colors: [
+-		{
+-			name: 'Primary colors',
+-			colors: [
+-				{ name: 'Red', color: '#f00' },
+-				{ name: 'Yellow', color: '#ff0' },
+-				{ name: 'Blue', color: '#00f' },
+-			],
+-		},
+-		{
+-			name: 'Secondary colors',
+-			colors: [
+-				{ name: 'Orange', color: '#f60' },
+-				{ name: 'Green', color: '#0f0' },
+-				{ name: 'Purple', color: '#60f' },
+-			],
+-		},
+-	],
++export const MultipleOrigins: ColorPaletteStory = {
++	render: Template,
++	args: {
++		colors: [
++			{
++				name: 'Primary colors',
++				colors: [
++					{ name: 'Red', color: '#f00' },
++					{ name: 'Yellow', color: '#ff0' },
++					{ name: 'Blue', color: '#00f' },
++				],
++			},
++			{
++				name: 'Secondary colors',
++				colors: [
++					{ name: 'Orange', color: '#f60' },
++					{ name: 'Green', color: '#0f0' },
++					{ name: 'Purple', color: '#60f' },
++				],
++			},
++		],
++	},
+ };
+ 
+-export const CSSVariables: StoryFn< typeof ColorPalette > = ( args ) => {
+-	return (
++export const CSSVariables: ColorPaletteStory = {
++	render: ( args ) => (
+ 		<div
+ 			style={ {
+ 				'--red': '#f00',
+@@ -104,12 +112,12 @@ export const CSSVariables: StoryFn< typeof ColorPalette > = ( args ) => {
+ 		>
+ 			<Template { ...args } />
+ 		</div>
+-	);
+-};
+-CSSVariables.args = {
+-	colors: [
+-		{ name: 'Red', color: 'var(--red)' },
+-		{ name: 'Yellow', color: 'var(--yellow)' },
+-		{ name: 'Blue', color: 'var(--blue)' },
+-	],
++	),
++	args: {
++		colors: [
++			{ name: 'Red', color: 'var(--red)' },
++			{ name: 'Yellow', color: 'var(--yellow)' },
++			{ name: 'Blue', color: 'var(--blue)' },
++		],
++	},
+ };
+diff --git a/packages/components/src/font-size-picker/stories/index.story.tsx b/packages/components/src/font-size-picker/stories/index.story.tsx
+index ece55aba30ee0b..c7e95ce8e48234 100644
+--- a/packages/components/src/font-size-picker/stories/index.story.tsx
++++ b/packages/components/src/font-size-picker/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react-vite';
++import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { fn } from 'storybook/test';
+ 
+ /**
+@@ -38,11 +38,13 @@ const meta: Meta< typeof FontSizePicker > = {
+ };
+ export default meta;
+ 
+-const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
++type FontSizePickerStory = StoryObj< typeof FontSizePicker >;
++
++const FontSizePickerWithState = ( {
+ 	value,
+ 	onChange,
+ 	...props
+-} ) => {
++}: React.ComponentProps< typeof FontSizePicker > ) => {
+ 	const [ fontSize, setFontSize ] = useState( value );
+ 	return (
+ 		<FontSizePicker
+@@ -57,10 +59,10 @@ const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
+ 	);
+ };
+ 
+-const TwoFontSizePickersWithState: StoryFn< typeof FontSizePicker > = ( {
++const TwoFontSizePickersWithState = ( {
+ 	fontSizes,
+ 	...props
+-} ) => {
++}: React.ComponentProps< typeof FontSizePicker > ) => {
+ 	return (
+ 		<>
+ 			<h2>Fewer font sizes</h2>
+@@ -75,148 +77,154 @@ const TwoFontSizePickersWithState: StoryFn< typeof FontSizePicker > = ( {
+ 	);
+ };
+ 
+-export const Default: StoryFn< typeof FontSizePicker > =
+-	FontSizePickerWithState.bind( {} );
+-Default.args = {
+-	__next40pxDefaultSize: true,
+-	disableCustomFontSizes: false,
+-	fontSizes: [
+-		{
+-			name: 'Small',
+-			slug: 'small',
+-			size: 12,
+-		},
+-		{
+-			name: 'Normal',
+-			slug: 'normal',
+-			size: 16,
+-		},
+-		{
+-			name: 'Big',
+-			slug: 'big',
+-			size: 26,
+-		},
+-	],
+-	value: 16,
+-	withSlider: false,
++export const Default: FontSizePickerStory = {
++	render: FontSizePickerWithState,
++	args: {
++		__next40pxDefaultSize: true,
++		disableCustomFontSizes: false,
++		fontSizes: [
++			{
++				name: 'Small',
++				slug: 'small',
++				size: 12,
++			},
++			{
++				name: 'Normal',
++				slug: 'normal',
++				size: 16,
++			},
++			{
++				name: 'Big',
++				slug: 'big',
++				size: 26,
++			},
++		],
++		value: 16,
++		withSlider: false,
++	},
+ };
+ 
+-export const WithSlider: StoryFn< typeof FontSizePicker > =
+-	FontSizePickerWithState.bind( {} );
+-WithSlider.args = {
+-	...Default.args,
+-	fallbackFontSize: 16,
+-	value: undefined,
+-	withSlider: true,
++export const WithSlider: FontSizePickerStory = {
++	render: FontSizePickerWithState,
++	args: {
++		...Default.args,
++		fallbackFontSize: 16,
++		value: undefined,
++		withSlider: true,
++	},
+ };
+ 
+ /**
+  * With custom font sizes disabled via the `disableCustomFontSizes` prop, the user will
+  * only be able to pick one of the predefined sizes passed in `fontSizes`.
+  */
+-export const WithCustomSizesDisabled: StoryFn< typeof FontSizePicker > =
+-	FontSizePickerWithState.bind( {} );
+-WithCustomSizesDisabled.args = {
+-	...Default.args,
+-	disableCustomFontSizes: true,
++export const WithCustomSizesDisabled: FontSizePickerStory = {
++	render: FontSizePickerWithState,
++	args: {
++		...Default.args,
++		disableCustomFontSizes: true,
++	},
+ };
+ 
+ /**
+  * When there are more than 5 font size options, the UI is no longer a toggle group.
+  */
+-export const WithMoreFontSizes: StoryFn< typeof FontSizePicker > =
+-	FontSizePickerWithState.bind( {} );
+-WithMoreFontSizes.args = {
+-	...Default.args,
+-	fontSizes: [
+-		{
+-			name: 'Tiny',
+-			slug: 'tiny',
+-			size: 8,
+-		},
+-		{
+-			name: 'Small',
+-			slug: 'small',
+-			size: 12,
+-		},
+-		{
+-			name: 'Normal',
+-			slug: 'normal',
+-			size: 16,
+-		},
+-		{
+-			name: 'Big',
+-			slug: 'big',
+-			size: 26,
+-		},
+-		{
+-			name: 'Bigger',
+-			slug: 'bigger',
+-			size: 30,
+-		},
+-		{
+-			name: 'Huge',
+-			slug: 'huge',
+-			size: 36,
+-		},
+-	],
+-	value: 8,
++export const WithMoreFontSizes: FontSizePickerStory = {
++	render: FontSizePickerWithState,
++	args: {
++		...Default.args,
++		fontSizes: [
++			{
++				name: 'Tiny',
++				slug: 'tiny',
++				size: 8,
++			},
++			{
++				name: 'Small',
++				slug: 'small',
++				size: 12,
++			},
++			{
++				name: 'Normal',
++				slug: 'normal',
++				size: 16,
++			},
++			{
++				name: 'Big',
++				slug: 'big',
++				size: 26,
++			},
++			{
++				name: 'Bigger',
++				slug: 'bigger',
++				size: 30,
++			},
++			{
++				name: 'Huge',
++				slug: 'huge',
++				size: 36,
++			},
++		],
++		value: 8,
++	},
+ };
+ 
+ /**
+  * When units like `px` are specified explicitly, it will be shown as a label hint.
+  */
+-export const WithUnits: StoryFn< typeof FontSizePicker > =
+-	TwoFontSizePickersWithState.bind( {} );
+-WithUnits.args = {
+-	...WithMoreFontSizes.args,
+-	fontSizes: WithMoreFontSizes.args.fontSizes?.map( ( option ) => ( {
+-		...option,
+-		size: `${ option.size }px`,
+-	} ) ),
+-	value: '8px',
++export const WithUnits: FontSizePickerStory = {
++	render: TwoFontSizePickersWithState,
++	args: {
++		...WithMoreFontSizes.args,
++		fontSizes: WithMoreFontSizes.args?.fontSizes?.map( ( option ) => ( {
++			...option,
++			size: `${ option.size }px`,
++		} ) ),
++		value: '8px',
++	},
+ };
+ 
+ /**
+  * The label hint will not be shown if it is a complex CSS value. Some examples of complex CSS values
+  * in this context are CSS functions like `calc()`, `clamp()`, and `var()`.
+  */
+-export const WithComplexCSSValues: StoryFn< typeof FontSizePicker > =
+-	TwoFontSizePickersWithState.bind( {} );
+-WithComplexCSSValues.args = {
+-	...Default.args,
+-	fontSizes: [
+-		{
+-			name: 'Small',
+-			slug: 'small',
+-			// Adding just one complex css value is enough
+-			size: 'clamp(1.75rem, 3vw, 2.25rem)',
+-		},
+-		{
+-			name: 'Medium',
+-			slug: 'medium',
+-			size: '1.125rem',
+-		},
+-		{
+-			name: 'Large',
+-			slug: 'large',
+-			size: '1.7rem',
+-		},
+-		{
+-			name: 'Extra Large',
+-			slug: 'extra-large',
+-			size: '1.95rem',
+-		},
+-		{
+-			name: 'Extra Extra Large',
+-			slug: 'extra-extra-large',
+-			size: '2.5rem',
+-		},
+-		{
+-			name: 'Huge',
+-			slug: 'huge',
+-			size: '2.8rem',
+-		},
+-	],
+-	value: '1.125rem',
++export const WithComplexCSSValues: FontSizePickerStory = {
++	render: TwoFontSizePickersWithState,
++	args: {
++		...Default.args,
++		fontSizes: [
++			{
++				name: 'Small',
++				slug: 'small',
++				// Adding just one complex css value is enough
++				size: 'clamp(1.75rem, 3vw, 2.25rem)',
++			},
++			{
++				name: 'Medium',
++				slug: 'medium',
++				size: '1.125rem',
++			},
++			{
++				name: 'Large',
++				slug: 'large',
++				size: '1.7rem',
++			},
++			{
++				name: 'Extra Large',
++				slug: 'extra-large',
++				size: '1.95rem',
++			},
++			{
++				name: 'Extra Extra Large',
++				slug: 'extra-extra-large',
++				size: '2.5rem',
++			},
++			{
++				name: 'Huge',
++				slug: 'huge',
++				size: '2.8rem',
++			},
++		],
++		value: '1.125rem',
++	},
+ };
+diff --git a/packages/components/src/gradient-picker/stories/index.story.tsx b/packages/components/src/gradient-picker/stories/index.story.tsx
+index 0b6d7a170f1d0a..576f43b02b1ec7 100644
+--- a/packages/components/src/gradient-picker/stories/index.story.tsx
++++ b/packages/components/src/gradient-picker/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react-vite';
++import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { fn } from 'storybook/test';
+ 
+ /**
+@@ -35,6 +35,8 @@ const meta: Meta< typeof GradientPicker > = {
+ };
+ export default meta;
+ 
++type GradientPickerStory = StoryObj< typeof GradientPicker >;
++
+ const GRADIENTS = [
+ 	{
+ 		name: 'Vivid cyan blue to vivid purple',
+@@ -86,10 +88,10 @@ const GRADIENTS = [
+ 	},
+ ];
+ 
+-const Template: StoryFn< typeof GradientPicker > = ( {
++const Template = ( {
+ 	onChange,
+ 	...props
+-} ) => {
++}: React.ComponentProps< typeof GradientPicker > ) => {
+ 	const [ gradient, setGradient ] =
+ 		useState< ( typeof props )[ 'value' ] >( null );
+ 	return (
+@@ -104,28 +106,32 @@ const Template: StoryFn< typeof GradientPicker > = ( {
+ 	);
+ };
+ 
+-export const Default = Template.bind( {} );
+-Default.args = {
+-	gradients: GRADIENTS,
++export const Default: GradientPickerStory = {
++	render: Template,
++	args: {
++		gradients: GRADIENTS,
++	},
+ };
+ 
+-export const WithNoExistingGradients = Template.bind( {} );
+-WithNoExistingGradients.args = {
+-	...Default.args,
+-	gradients: [],
++export const WithNoExistingGradients: GradientPickerStory = {
++	render: Template,
++	args: {
++		gradients: [],
++	},
+ };
+ 
+-export const MultipleOrigins = Template.bind( {} );
+-MultipleOrigins.args = {
+-	...Default.args,
+-	gradients: [
+-		{ name: 'Origin 1', gradients: GRADIENTS },
+-		{ name: 'Origin 2', gradients: GRADIENTS },
+-	],
++export const MultipleOrigins: GradientPickerStory = {
++	render: Template,
++	args: {
++		gradients: [
++			{ name: 'Origin 1', gradients: GRADIENTS },
++			{ name: 'Origin 2', gradients: GRADIENTS },
++		],
++	},
+ };
+ 
+-export const CSSVariables: StoryFn< typeof GradientPicker > = ( args ) => {
+-	return (
++export const CSSVariables: GradientPickerStory = {
++	render: ( args ) => (
+ 		<div
+ 			style={ {
+ 				'--red': '#f00',
+@@ -135,27 +141,27 @@ export const CSSVariables: StoryFn< typeof GradientPicker > = ( args ) => {
+ 		>
+ 			<Template { ...args } />
+ 		</div>
+-	);
+-};
+-CSSVariables.args = {
+-	...Default.args,
+-	gradients: [
+-		{
+-			name: 'Red to Yellow',
+-			gradient:
+-				'linear-gradient(135deg,var(--red) 0%,var(--yellow) 100%)',
+-			slug: 'red-to-yellow',
+-		},
+-		{
+-			name: 'Yellow to Blue',
+-			gradient:
+-				'linear-gradient(135deg,var(--yellow) 0%,var(--blue) 100%)',
+-			slug: 'yellow-to-blue',
+-		},
+-		{
+-			name: 'Blue to Red',
+-			gradient: 'linear-gradient(135deg,var(--blue) 0%,var(--red) 100%)',
+-			slug: 'blue-to-red',
+-		},
+-	],
++	),
++	args: {
++		gradients: [
++			{
++				name: 'Red to Yellow',
++				gradient:
++					'linear-gradient(135deg,var(--red) 0%,var(--yellow) 100%)',
++				slug: 'red-to-yellow',
++			},
++			{
++				name: 'Yellow to Blue',
++				gradient:
++					'linear-gradient(135deg,var(--yellow) 0%,var(--blue) 100%)',
++				slug: 'yellow-to-blue',
++			},
++			{
++				name: 'Blue to Red',
++				gradient:
++					'linear-gradient(135deg,var(--blue) 0%,var(--red) 100%)',
++				slug: 'blue-to-red',
++			},
++		],
++	},
+ };

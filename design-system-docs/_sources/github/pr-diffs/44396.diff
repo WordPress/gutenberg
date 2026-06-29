@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 80f8a21565b1f9..cead654d7dc712 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -47,6 +47,7 @@
+ -   `UnitControl`: Add tests ([#45260](https://github.com/WordPress/gutenberg/pull/45260)).
+ -   `Disabled`: Refactor the component to rely on the HTML `inert` attribute.
+ -   `CustomGradientBar`: Refactor away from Lodash ([#45367](https://github.com/WordPress/gutenberg/pull/45367/)).
++-   `Autocomplete`: use Popover's new `placement` prop instead of legacy `position` prop ([#44396](https://github.com/WordPress/gutenberg/pull/44396/)).
+ 
+ ## 21.3.0 (2022-10-19)
+ 
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.js b/packages/components/src/autocomplete/autocompleter-ui.js
+index 13da75123c4176..4ec217925e65c2 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.js
++++ b/packages/components/src/autocomplete/autocompleter-ui.js
+@@ -60,7 +60,7 @@ export function getAutoCompleterUI( autocompleter ) {
+ 			<Popover
+ 				focusOnMount={ false }
+ 				onClose={ onReset }
+-				position="top right"
++				placement="top-start"
+ 				className="components-autocomplete__popover"
+ 				anchor={ popoverAnchor }
+ 				ref={ popoverRef }

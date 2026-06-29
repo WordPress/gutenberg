@@ -1,0 +1,2353 @@
+diff --git a/babel.config.js b/babel.config.js
+index 7679cc1e837041..f950b6603a5127 100644
+--- a/babel.config.js
++++ b/babel.config.js
+@@ -3,6 +3,6 @@ module.exports = function( api ) {
+ 
+ 	return {
+ 		presets: [ '@wordpress/babel-preset-default' ],
+-		plugins: [ 'babel-plugin-inline-json-import' ],
++		plugins: [ 'babel-plugin-emotion', 'babel-plugin-inline-json-import' ],
+ 	};
+ };
+diff --git a/docs/manifest-devhub.json b/docs/manifest-devhub.json
+index 91bab63f6b8864..75573dd5ea1337 100644
+--- a/docs/manifest-devhub.json
++++ b/docs/manifest-devhub.json
+@@ -605,6 +605,12 @@
+ 		"markdown_source": "../packages/components/src/button/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "Card",
++		"slug": "card",
++		"markdown_source": "../packages/components/src/card/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "CheckboxControl",
+ 		"slug": "checkbox-control",
+diff --git a/package-lock.json b/package-lock.json
+index 8424989e170c8c..ac846e0ec88c08 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -206,7 +206,6 @@
+ 			"version": "7.0.0",
+ 			"resolved": "https://registry.npmjs.org/@babel/helper-module-imports/-/helper-module-imports-7.0.0.tgz",
+ 			"integrity": "sha512-aP/hlLq01DWNEiDg4Jn23i+CXxW/owM4WpDLFUbpjxe4NS3BhLVZQ5i7E0ZrxuQ/vwekIeciyamgB1UIYxxM6A==",
+-			"dev": true,
+ 			"requires": {
+ 				"@babel/types": "^7.0.0"
+ 			}
+@@ -1662,7 +1661,6 @@
+ 			"version": "10.0.19",
+ 			"resolved": "https://registry.npmjs.org/@emotion/cache/-/cache-10.0.19.tgz",
+ 			"integrity": "sha512-BoiLlk4vEsGBg2dAqGSJu0vJl/PgVtCYLBFJaEO8RmQzPugXewQCXZJNXTDFaRlfCs0W+quesayav4fvaif5WQ==",
+-			"dev": true,
+ 			"requires": {
+ 				"@emotion/sheet": "0.9.3",
+ 				"@emotion/stylis": "0.8.4",
+@@ -1671,27 +1669,47 @@
+ 			}
+ 		},
+ 		"@emotion/core": {
+-			"version": "10.0.21",
+-			"resolved": "https://registry.npmjs.org/@emotion/core/-/core-10.0.21.tgz",
+-			"integrity": "sha512-U9zbc7ovZ2ceIwbLXYZPJy6wPgnOdTNT4jENZ31ee6v2lojetV5bTbCVk6ciT8G3wQRyVaTTfUCH9WCrMzpRIw==",
+-			"dev": true,
++			"version": "10.0.22",
++			"resolved": "https://registry.npmjs.org/@emotion/core/-/core-10.0.22.tgz",
++			"integrity": "sha512-7eoP6KQVUyOjAkE6y4fdlxbZRA4ILs7dqkkm6oZUJmihtHv0UBq98VgPirq9T8F9K2gKu0J/au/TpKryKMinaA==",
+ 			"requires": {
+ 				"@babel/runtime": "^7.5.5",
+ 				"@emotion/cache": "^10.0.17",
+-				"@emotion/css": "^10.0.14",
+-				"@emotion/serialize": "^0.11.10",
++				"@emotion/css": "^10.0.22",
++				"@emotion/serialize": "^0.11.12",
+ 				"@emotion/sheet": "0.9.3",
+ 				"@emotion/utils": "0.11.2"
+ 			},
+ 			"dependencies": {
+ 				"@babel/runtime": {
+-					"version": "7.6.2",
+-					"resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.6.2.tgz",
+-					"integrity": "sha512-EXxN64agfUqqIGeEjI5dL5z0Sw0ZwWo1mLTi4mQowCZ42O59b7DRpZAnTC6OqdF28wMBMFKNb/4uFGrVaigSpg==",
+-					"dev": true,
++					"version": "7.7.2",
++					"resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.7.2.tgz",
++					"integrity": "sha512-JONRbXbTXc9WQE2mAZd1p0Z3DZ/6vaQIkgYMSTP3KjRCyd7rCZCcfhCyX+YjwcKxcZ82UrxbRD358bpExNgrjw==",
+ 					"requires": {
+ 						"regenerator-runtime": "^0.13.2"
+ 					}
++				},
++				"@emotion/css": {
++					"version": "10.0.22",
++					"resolved": "https://registry.npmjs.org/@emotion/css/-/css-10.0.22.tgz",
++					"integrity": "sha512-8phfa5mC/OadBTmGpMpwykIVH0gFCbUoO684LUkyixPq4F1Wwri7fK5Xlm8lURNBrd2TuvTbPUGxFsGxF9UacA==",
++					"requires": {
++						"@emotion/serialize": "^0.11.12",
++						"@emotion/utils": "0.11.2",
++						"babel-plugin-emotion": "^10.0.22"
++					}
++				},
++				"@emotion/serialize": {
++					"version": "0.11.14",
++					"resolved": "https://registry.npmjs.org/@emotion/serialize/-/serialize-0.11.14.tgz",
++					"integrity": "sha512-6hTsySIuQTbDbv00AnUO6O6Xafdwo5GswRlMZ5hHqiFx+4pZ7uGWXUQFW46Kc2taGhP89uXMXn/lWQkdyTosPA==",
++					"requires": {
++						"@emotion/hash": "0.7.3",
++						"@emotion/memoize": "0.7.3",
++						"@emotion/unitless": "0.7.4",
++						"@emotion/utils": "0.11.2",
++						"csstype": "^2.5.7"
++					}
+ 				}
+ 			}
+ 		},
+@@ -1709,14 +1727,12 @@
+ 		"@emotion/hash": {
+ 			"version": "0.7.3",
+ 			"resolved": "https://registry.npmjs.org/@emotion/hash/-/hash-0.7.3.tgz",
+-			"integrity": "sha512-14ZVlsB9akwvydAdaEnVnvqu6J2P6ySv39hYyl/aoB6w/V+bXX0tay8cF6paqbgZsN2n5Xh15uF4pE+GvE+itw==",
+-			"dev": true
++			"integrity": "sha512-14ZVlsB9akwvydAdaEnVnvqu6J2P6ySv39hYyl/aoB6w/V+bXX0tay8cF6paqbgZsN2n5Xh15uF4pE+GvE+itw=="
+ 		},
+ 		"@emotion/is-prop-valid": {
+-			"version": "0.8.3",
+-			"resolved": "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-0.8.3.tgz",
+-			"integrity": "sha512-We7VBiltAJ70KQA0dWkdPMXnYoizlxOXpvtjmu5/MBnExd+u0PGgV27WCYanmLAbCwAU30Le/xA0CQs/F/Otig==",
+-			"dev": true,
++			"version": "0.8.5",
++			"resolved": "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-0.8.5.tgz",
++			"integrity": "sha512-6ZODuZSFofbxSbcxwsFz+6ioPjb0ISJRRPLZ+WIbjcU2IMU0Io+RGQjjaTgOvNQl007KICBm7zXQaYQEC1r6Bg==",
+ 			"requires": {
+ 				"@emotion/memoize": "0.7.3"
+ 			}
+@@ -1724,8 +1740,7 @@
+ 		"@emotion/memoize": {
+ 			"version": "0.7.3",
+ 			"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.3.tgz",
+-			"integrity": "sha512-2Md9mH6mvo+ygq1trTeVp2uzAKwE2P7In0cRpD/M9Q70aH8L+rxMLbb3JCN2JoSWsV2O+DdFjfbbXoMoLBczow==",
+-			"dev": true
++			"integrity": "sha512-2Md9mH6mvo+ygq1trTeVp2uzAKwE2P7In0cRpD/M9Q70aH8L+rxMLbb3JCN2JoSWsV2O+DdFjfbbXoMoLBczow=="
+ 		},
+ 		"@emotion/serialize": {
+ 			"version": "0.11.11",
+@@ -1743,65 +1758,69 @@
+ 		"@emotion/sheet": {
+ 			"version": "0.9.3",
+ 			"resolved": "https://registry.npmjs.org/@emotion/sheet/-/sheet-0.9.3.tgz",
+-			"integrity": "sha512-c3Q6V7Df7jfwSq5AzQWbXHa5soeE4F5cbqi40xn0CzXxWW9/6Mxq48WJEtqfWzbZtW9odZdnRAkwCQwN12ob4A==",
+-			"dev": true
++			"integrity": "sha512-c3Q6V7Df7jfwSq5AzQWbXHa5soeE4F5cbqi40xn0CzXxWW9/6Mxq48WJEtqfWzbZtW9odZdnRAkwCQwN12ob4A=="
+ 		},
+ 		"@emotion/styled": {
+-			"version": "10.0.17",
+-			"resolved": "https://registry.npmjs.org/@emotion/styled/-/styled-10.0.17.tgz",
+-			"integrity": "sha512-zHMgWjHDMNjD+ux64POtDnjLAObniu3znxFBLSdV/RiEhSLjHIowfvSbbd/C33/3uwtI6Uzs2KXnRZtka/PpAQ==",
+-			"dev": true,
++			"version": "10.0.23",
++			"resolved": "https://registry.npmjs.org/@emotion/styled/-/styled-10.0.23.tgz",
++			"integrity": "sha512-gNr04eqBQ2iYUx8wFLZDfm3N8/QUOODu/ReDXa693uyQGy2OqA+IhPJk+kA7id8aOfwAsMuvZ0pJImEXXKtaVQ==",
+ 			"requires": {
+-				"@emotion/styled-base": "^10.0.17",
+-				"babel-plugin-emotion": "^10.0.17"
++				"@emotion/styled-base": "^10.0.23",
++				"babel-plugin-emotion": "^10.0.23"
+ 			}
+ 		},
+ 		"@emotion/styled-base": {
+-			"version": "10.0.19",
+-			"resolved": "https://registry.npmjs.org/@emotion/styled-base/-/styled-base-10.0.19.tgz",
+-			"integrity": "sha512-Sz6GBHTbOZoeZQKvkE9gQPzaJ6/qtoQ/OPvyG2Z/6NILlYk60Es1cEcTgTkm26H8y7A0GSgp4UmXl+srvsnFPg==",
+-			"dev": true,
++			"version": "10.0.24",
++			"resolved": "https://registry.npmjs.org/@emotion/styled-base/-/styled-base-10.0.24.tgz",
++			"integrity": "sha512-AnBImerf0h4dGAJVo0p0VE8KoAns71F28ErGFK474zbNAHX6yqSWQUasb+1jvg/VPwZjCp19+tAr6oOB0pwmLQ==",
+ 			"requires": {
+ 				"@babel/runtime": "^7.5.5",
+-				"@emotion/is-prop-valid": "0.8.3",
+-				"@emotion/serialize": "^0.11.11",
++				"@emotion/is-prop-valid": "0.8.5",
++				"@emotion/serialize": "^0.11.14",
+ 				"@emotion/utils": "0.11.2"
+ 			},
+ 			"dependencies": {
+ 				"@babel/runtime": {
+-					"version": "7.6.2",
+-					"resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.6.2.tgz",
+-					"integrity": "sha512-EXxN64agfUqqIGeEjI5dL5z0Sw0ZwWo1mLTi4mQowCZ42O59b7DRpZAnTC6OqdF28wMBMFKNb/4uFGrVaigSpg==",
+-					"dev": true,
++					"version": "7.7.2",
++					"resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.7.2.tgz",
++					"integrity": "sha512-JONRbXbTXc9WQE2mAZd1p0Z3DZ/6vaQIkgYMSTP3KjRCyd7rCZCcfhCyX+YjwcKxcZ82UrxbRD358bpExNgrjw==",
+ 					"requires": {
+ 						"regenerator-runtime": "^0.13.2"
+ 					}
++				},
++				"@emotion/serialize": {
++					"version": "0.11.14",
++					"resolved": "https://registry.npmjs.org/@emotion/serialize/-/serialize-0.11.14.tgz",
++					"integrity": "sha512-6hTsySIuQTbDbv00AnUO6O6Xafdwo5GswRlMZ5hHqiFx+4pZ7uGWXUQFW46Kc2taGhP89uXMXn/lWQkdyTosPA==",
++					"requires": {
++						"@emotion/hash": "0.7.3",
++						"@emotion/memoize": "0.7.3",
++						"@emotion/unitless": "0.7.4",
++						"@emotion/utils": "0.11.2",
++						"csstype": "^2.5.7"
++					}
+ 				}
+ 			}
+ 		},
+ 		"@emotion/stylis": {
+ 			"version": "0.8.4",
+ 			"resolved": "https://registry.npmjs.org/@emotion/stylis/-/stylis-0.8.4.tgz",
+-			"integrity": "sha512-TLmkCVm8f8gH0oLv+HWKiu7e8xmBIaokhxcEKPh1m8pXiV/akCiq50FvYgOwY42rjejck8nsdQxZlXZ7pmyBUQ==",
+-			"dev": true
++			"integrity": "sha512-TLmkCVm8f8gH0oLv+HWKiu7e8xmBIaokhxcEKPh1m8pXiV/akCiq50FvYgOwY42rjejck8nsdQxZlXZ7pmyBUQ=="
+ 		},
+ 		"@emotion/unitless": {
+ 			"version": "0.7.4",
+ 			"resolved": "https://registry.npmjs.org/@emotion/unitless/-/unitless-0.7.4.tgz",
+-			"integrity": "sha512-kBa+cDHOR9jpRJ+kcGMsysrls0leukrm68DmFQoMIWQcXdr2cZvyvypWuGYT7U+9kAExUE7+T7r6G3C3A6L8MQ==",
+-			"dev": true
++			"integrity": "sha512-kBa+cDHOR9jpRJ+kcGMsysrls0leukrm68DmFQoMIWQcXdr2cZvyvypWuGYT7U+9kAExUE7+T7r6G3C3A6L8MQ=="
+ 		},
+ 		"@emotion/utils": {
+ 			"version": "0.11.2",
+ 			"resolved": "https://registry.npmjs.org/@emotion/utils/-/utils-0.11.2.tgz",
+-			"integrity": "sha512-UHX2XklLl3sIaP6oiMmlVzT0J+2ATTVpf0dHQVyPJHTkOITvXfaSqnRk6mdDhV9pR8T/tHc3cex78IKXssmzrA==",
+-			"dev": true
++			"integrity": "sha512-UHX2XklLl3sIaP6oiMmlVzT0J+2ATTVpf0dHQVyPJHTkOITvXfaSqnRk6mdDhV9pR8T/tHc3cex78IKXssmzrA=="
+ 		},
+ 		"@emotion/weak-memoize": {
+ 			"version": "0.2.4",
+ 			"resolved": "https://registry.npmjs.org/@emotion/weak-memoize/-/weak-memoize-0.2.4.tgz",
+-			"integrity": "sha512-6PYY5DVdAY1ifaQW6XYTnOMihmBVT27elqSjEoodchsGjzYlEsTQMcEhSud99kVawatyTZRTiVkJ/c6lwbQ7nA==",
+-			"dev": true
++			"integrity": "sha512-6PYY5DVdAY1ifaQW6XYTnOMihmBVT27elqSjEoodchsGjzYlEsTQMcEhSud99kVawatyTZRTiVkJ/c6lwbQ7nA=="
+ 		},
+ 		"@evocateur/libnpmaccess": {
+ 			"version": "3.1.2",
+@@ -7283,6 +7302,8 @@
+ 			"version": "file:packages/components",
+ 			"requires": {
+ 				"@babel/runtime": "^7.4.4",
++				"@emotion/core": "10.0.22",
++				"@emotion/styled": "10.0.23",
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
+ 				"@wordpress/deprecated": "file:packages/deprecated",
+@@ -7296,6 +7317,7 @@
+ 				"classnames": "^2.2.5",
+ 				"clipboard": "^2.0.1",
+ 				"dom-scroll-into-view": "^1.2.1",
++				"hex-rgb": "^4.1.0",
+ 				"lodash": "^4.17.15",
+ 				"memize": "^1.0.5",
+ 				"moment": "^2.22.1",
+@@ -8297,7 +8319,6 @@
+ 			"version": "1.0.10",
+ 			"resolved": "https://registry.npmjs.org/argparse/-/argparse-1.0.10.tgz",
+ 			"integrity": "sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==",
+-			"dev": true,
+ 			"requires": {
+ 				"sprintf-js": "~1.0.2"
+ 			},
+@@ -8305,8 +8326,7 @@
+ 				"sprintf-js": {
+ 					"version": "1.0.3",
+ 					"resolved": "https://registry.npmjs.org/sprintf-js/-/sprintf-js-1.0.3.tgz",
+-					"integrity": "sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw=",
+-					"dev": true
++					"integrity": "sha1-BOaSb2YolTVPPdAVIDYzuFcpfiw="
+ 				}
+ 			}
+ 		},
+@@ -9238,21 +9258,34 @@
+ 			}
+ 		},
+ 		"babel-plugin-emotion": {
+-			"version": "10.0.21",
+-			"resolved": "https://registry.npmjs.org/babel-plugin-emotion/-/babel-plugin-emotion-10.0.21.tgz",
+-			"integrity": "sha512-03o+T6sfVAJhNDcSdLapgv4IeewcFPzxlvBUVdSf7o5PI57ZSxoDvmy+ZulVWSu+rOWAWkEejNcsb29TuzJHbg==",
+-			"dev": true,
++			"version": "10.0.23",
++			"resolved": "https://registry.npmjs.org/babel-plugin-emotion/-/babel-plugin-emotion-10.0.23.tgz",
++			"integrity": "sha512-1JiCyXU0t5S2xCbItejCduLGGcKmF3POT0Ujbexog2MI4IlRcIn/kWjkYwCUZlxpON0O5FC635yPl/3slr7cKQ==",
+ 			"requires": {
+ 				"@babel/helper-module-imports": "^7.0.0",
+ 				"@emotion/hash": "0.7.3",
+ 				"@emotion/memoize": "0.7.3",
+-				"@emotion/serialize": "^0.11.11",
++				"@emotion/serialize": "^0.11.14",
+ 				"babel-plugin-macros": "^2.0.0",
+ 				"babel-plugin-syntax-jsx": "^6.18.0",
+ 				"convert-source-map": "^1.5.0",
+ 				"escape-string-regexp": "^1.0.5",
+ 				"find-root": "^1.1.0",
+ 				"source-map": "^0.5.7"
++			},
++			"dependencies": {
++				"@emotion/serialize": {
++					"version": "0.11.14",
++					"resolved": "https://registry.npmjs.org/@emotion/serialize/-/serialize-0.11.14.tgz",
++					"integrity": "sha512-6hTsySIuQTbDbv00AnUO6O6Xafdwo5GswRlMZ5hHqiFx+4pZ7uGWXUQFW46Kc2taGhP89uXMXn/lWQkdyTosPA==",
++					"requires": {
++						"@emotion/hash": "0.7.3",
++						"@emotion/memoize": "0.7.3",
++						"@emotion/unitless": "0.7.4",
++						"@emotion/utils": "0.11.2",
++						"csstype": "^2.5.7"
++					}
++				}
+ 			}
+ 		},
+ 		"babel-plugin-extract-import-names": {
+@@ -9369,7 +9402,6 @@
+ 			"version": "2.6.1",
+ 			"resolved": "https://registry.npmjs.org/babel-plugin-macros/-/babel-plugin-macros-2.6.1.tgz",
+ 			"integrity": "sha512-6W2nwiXme6j1n2erPOnmRiWfObUhWH7Qw1LMi9XZy8cj+KtESu3T6asZvtk5bMQQjX8te35o7CFueiSdL/2NmQ==",
+-			"dev": true,
+ 			"requires": {
+ 				"@babel/runtime": "^7.4.2",
+ 				"cosmiconfig": "^5.2.0",
+@@ -9380,7 +9412,6 @@
+ 					"version": "5.2.1",
+ 					"resolved": "https://registry.npmjs.org/cosmiconfig/-/cosmiconfig-5.2.1.tgz",
+ 					"integrity": "sha512-H65gsXo1SKjf8zmrJ67eJk8aIRKV5ff2D4uKZIBZShbhGSpEmsQOPW/SKMKYhSTrqR7ufy6RP69rPogdaPh/kA==",
+-					"dev": true,
+ 					"requires": {
+ 						"import-fresh": "^2.0.0",
+ 						"is-directory": "^0.3.1",
+@@ -9392,7 +9423,6 @@
+ 					"version": "2.0.0",
+ 					"resolved": "https://registry.npmjs.org/import-fresh/-/import-fresh-2.0.0.tgz",
+ 					"integrity": "sha1-2BNVwVYS04bGH53dOSLUMEgipUY=",
+-					"dev": true,
+ 					"requires": {
+ 						"caller-path": "^2.0.0",
+ 						"resolve-from": "^3.0.0"
+@@ -9402,7 +9432,6 @@
+ 					"version": "4.0.0",
+ 					"resolved": "https://registry.npmjs.org/parse-json/-/parse-json-4.0.0.tgz",
+ 					"integrity": "sha1-vjX1Qlvh9/bHRxhPmKeIy5lHfuA=",
+-					"dev": true,
+ 					"requires": {
+ 						"error-ex": "^1.3.1",
+ 						"json-parse-better-errors": "^1.0.1"
+@@ -9411,14 +9440,12 @@
+ 				"path-parse": {
+ 					"version": "1.0.6",
+ 					"resolved": "https://registry.npmjs.org/path-parse/-/path-parse-1.0.6.tgz",
+-					"integrity": "sha512-GSmOT2EbHrINBf9SR7CDELwlJ8AENk3Qn7OikK4nFYAu3Ote2+JYNVvkpAEQm3/TLNEJFD/xZJjzyxg3KBWOzw==",
+-					"dev": true
++					"integrity": "sha512-GSmOT2EbHrINBf9SR7CDELwlJ8AENk3Qn7OikK4nFYAu3Ote2+JYNVvkpAEQm3/TLNEJFD/xZJjzyxg3KBWOzw=="
+ 				},
+ 				"resolve": {
+ 					"version": "1.12.0",
+ 					"resolved": "https://registry.npmjs.org/resolve/-/resolve-1.12.0.tgz",
+ 					"integrity": "sha512-B/dOmuoAik5bKcD6s6nXDCjzUKnaDvdkRyAk6rsmsKLipWj4797iothd7jmmUhWTfinVMU+wc56rYKsit2Qy4w==",
+-					"dev": true,
+ 					"requires": {
+ 						"path-parse": "^1.0.6"
+ 					}
+@@ -9554,8 +9581,7 @@
+ 		"babel-plugin-syntax-jsx": {
+ 			"version": "6.18.0",
+ 			"resolved": "https://registry.npmjs.org/babel-plugin-syntax-jsx/-/babel-plugin-syntax-jsx-6.18.0.tgz",
+-			"integrity": "sha1-CvMqmm4Tyno/1QaeYtew9Y0NiUY=",
+-			"dev": true
++			"integrity": "sha1-CvMqmm4Tyno/1QaeYtew9Y0NiUY="
+ 		},
+ 		"babel-plugin-syntax-trailing-function-commas": {
+ 			"version": "7.0.0-beta.0",
+@@ -10894,7 +10920,6 @@
+ 			"version": "2.0.0",
+ 			"resolved": "https://registry.npmjs.org/caller-callsite/-/caller-callsite-2.0.0.tgz",
+ 			"integrity": "sha1-hH4PzgoiN1CpoCfFSzNzGtMVQTQ=",
+-			"dev": true,
+ 			"requires": {
+ 				"callsites": "^2.0.0"
+ 			},
+@@ -10902,8 +10927,7 @@
+ 				"callsites": {
+ 					"version": "2.0.0",
+ 					"resolved": "https://registry.npmjs.org/callsites/-/callsites-2.0.0.tgz",
+-					"integrity": "sha1-BuuE8A7qQT2oav/vrL/7Ngk7PFA=",
+-					"dev": true
++					"integrity": "sha1-BuuE8A7qQT2oav/vrL/7Ngk7PFA="
+ 				}
+ 			}
+ 		},
+@@ -10911,7 +10935,6 @@
+ 			"version": "2.0.0",
+ 			"resolved": "https://registry.npmjs.org/caller-path/-/caller-path-2.0.0.tgz",
+ 			"integrity": "sha1-Ro+DBE42mrIBD6xfBs7uFbsssfQ=",
+-			"dev": true,
+ 			"requires": {
+ 				"caller-callsite": "^2.0.0"
+ 			}
+@@ -12274,8 +12297,7 @@
+ 		"convert-source-map": {
+ 			"version": "1.5.1",
+ 			"resolved": "https://registry.npmjs.org/convert-source-map/-/convert-source-map-1.5.1.tgz",
+-			"integrity": "sha1-uCeAl7m8IpNl3lxiz1/K7YtVmeU=",
+-			"dev": true
++			"integrity": "sha1-uCeAl7m8IpNl3lxiz1/K7YtVmeU="
+ 		},
+ 		"cookie": {
+ 			"version": "0.3.1",
+@@ -12907,8 +12929,7 @@
+ 		"csstype": {
+ 			"version": "2.6.7",
+ 			"resolved": "https://registry.npmjs.org/csstype/-/csstype-2.6.7.tgz",
+-			"integrity": "sha512-9Mcn9sFbGBAdmimWb2gLVDtFJzeKtDGIr76TUqmjZrw9LFXBMSU70lcs+C0/7fyCd6iBDqmksUcCOUIkisPHsQ==",
+-			"dev": true
++			"integrity": "sha512-9Mcn9sFbGBAdmimWb2gLVDtFJzeKtDGIr76TUqmjZrw9LFXBMSU70lcs+C0/7fyCd6iBDqmksUcCOUIkisPHsQ=="
+ 		},
+ 		"currently-unhandled": {
+ 			"version": "0.4.1",
+@@ -14026,7 +14047,6 @@
+ 			"version": "1.3.2",
+ 			"resolved": "https://registry.npmjs.org/error-ex/-/error-ex-1.3.2.tgz",
+ 			"integrity": "sha512-7dFHNmqeFSEt2ZBsCriorKnn3Z2pj+fd9kmI6QoWw4//DL+icEBfc0U7qJCisqrTsKTjw4fNFy2pW9OqStD84g==",
+-			"dev": true,
+ 			"requires": {
+ 				"is-arrayish": "^0.2.1"
+ 			}
+@@ -15571,8 +15591,7 @@
+ 		"find-root": {
+ 			"version": "1.1.0",
+ 			"resolved": "https://registry.npmjs.org/find-root/-/find-root-1.1.0.tgz",
+-			"integrity": "sha512-NKfW6bec6GfKc0SGx1e07QZY9PE99u0Bft/0rzSD5k3sO/vwkVUpDUKVm5Gpp5Ue3YfShPFTX2070tDs5kB9Ng==",
+-			"dev": true
++			"integrity": "sha512-NKfW6bec6GfKc0SGx1e07QZY9PE99u0Bft/0rzSD5k3sO/vwkVUpDUKVm5Gpp5Ue3YfShPFTX2070tDs5kB9Ng=="
+ 		},
+ 		"find-up": {
+ 			"version": "2.1.0",
+@@ -17312,6 +17331,11 @@
+ 			"integrity": "sha512-l9sfDFsuqtOqKDsQdqrMRk0U85RZc0RtOR9yPI7mRVOa4FsR/BVnZ0shmQRM96Ji99kYZP/7hn1cedc1+ApsTQ==",
+ 			"dev": true
+ 		},
++		"hex-rgb": {
++			"version": "4.1.0",
++			"resolved": "https://registry.npmjs.org/hex-rgb/-/hex-rgb-4.1.0.tgz",
++			"integrity": "sha512-n7xsIfyBkFChITGPh6FLtxNzAt2HxZLcQIY9hYH4gm2gmMQJHMguMH3E+jnmvUbSTF5QrmFnGab5Ippi+D7e/g=="
++		},
+ 		"highlight.js": {
+ 			"version": "9.12.0",
+ 			"resolved": "https://registry.npmjs.org/highlight.js/-/highlight.js-9.12.0.tgz",
+@@ -18240,8 +18264,7 @@
+ 		"is-arrayish": {
+ 			"version": "0.2.1",
+ 			"resolved": "https://registry.npmjs.org/is-arrayish/-/is-arrayish-0.2.1.tgz",
+-			"integrity": "sha1-d8mYQFJ6qOyxqLppe4BkWnqSap0=",
+-			"dev": true
++			"integrity": "sha1-d8mYQFJ6qOyxqLppe4BkWnqSap0="
+ 		},
+ 		"is-binary-path": {
+ 			"version": "1.0.1",
+@@ -18354,8 +18377,7 @@
+ 		"is-directory": {
+ 			"version": "0.3.1",
+ 			"resolved": "https://registry.npmjs.org/is-directory/-/is-directory-0.3.1.tgz",
+-			"integrity": "sha1-YTObbyR1/Hcv2cnYP1yFddwVSuE=",
+-			"dev": true
++			"integrity": "sha1-YTObbyR1/Hcv2cnYP1yFddwVSuE="
+ 		},
+ 		"is-equal-shallow": {
+ 			"version": "0.1.3",
+@@ -19995,7 +20017,6 @@
+ 			"version": "3.13.1",
+ 			"resolved": "https://registry.npmjs.org/js-yaml/-/js-yaml-3.13.1.tgz",
+ 			"integrity": "sha512-YfbcO7jXDdyj0DGxYVSlSeQNHbD7XPWvrVWeVUujrQEoZzWJIRrCPoyk6kL6IAjAG2IolMK4T0hNUe0HOUs5Jw==",
+-			"dev": true,
+ 			"requires": {
+ 				"argparse": "^1.0.7",
+ 				"esprima": "^4.0.0"
+@@ -20004,8 +20025,7 @@
+ 				"esprima": {
+ 					"version": "4.0.1",
+ 					"resolved": "https://registry.npmjs.org/esprima/-/esprima-4.0.1.tgz",
+-					"integrity": "sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==",
+-					"dev": true
++					"integrity": "sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A=="
+ 				}
+ 			}
+ 		},
+@@ -20109,8 +20129,7 @@
+ 		"json-parse-better-errors": {
+ 			"version": "1.0.2",
+ 			"resolved": "https://registry.npmjs.org/json-parse-better-errors/-/json-parse-better-errors-1.0.2.tgz",
+-			"integrity": "sha512-mrqyZKfX5EhL7hvqcV6WG1yYjnjeuYDzDhhcAAUrq8Po85NBQBJP+ZDUT75qZQ98IkUoBqdkExkukOU7Ts2wrw==",
+-			"dev": true
++			"integrity": "sha512-mrqyZKfX5EhL7hvqcV6WG1yYjnjeuYDzDhhcAAUrq8Po85NBQBJP+ZDUT75qZQ98IkUoBqdkExkukOU7Ts2wrw=="
+ 		},
+ 		"json-schema": {
+ 			"version": "0.2.3",
+@@ -28442,8 +28461,7 @@
+ 		"resolve-from": {
+ 			"version": "3.0.0",
+ 			"resolved": "https://registry.npmjs.org/resolve-from/-/resolve-from-3.0.0.tgz",
+-			"integrity": "sha1-six699nWiBvItuZTM17rywoYh0g=",
+-			"dev": true
++			"integrity": "sha1-six699nWiBvItuZTM17rywoYh0g="
+ 		},
+ 		"resolve-url": {
+ 			"version": "0.2.1",
+@@ -29509,8 +29527,7 @@
+ 		"source-map": {
+ 			"version": "0.5.7",
+ 			"resolved": "https://registry.npmjs.org/source-map/-/source-map-0.5.7.tgz",
+-			"integrity": "sha1-igOdLRAh0i0eoUyA2OpGi6LvP8w=",
+-			"dev": true
++			"integrity": "sha1-igOdLRAh0i0eoUyA2OpGi6LvP8w="
+ 		},
+ 		"source-map-loader": {
+ 			"version": "0.2.4",
+diff --git a/package.json b/package.json
+index d3bd64b3472042..1f727512198429 100644
+--- a/package.json
++++ b/package.json
+@@ -98,6 +98,7 @@
+ 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
+ 		"@wordpress/scripts": "file:packages/scripts",
+ 		"babel-loader": "8.0.6",
++		"babel-plugin-emotion": "10.0.23",
+ 		"babel-plugin-inline-json-import": "0.3.2",
+ 		"babel-plugin-react-native-classname-to-style": "1.2.2",
+ 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index c542fc3a79a7e0..3e5876a0c8d6eb 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -22,6 +22,8 @@
+ 	"react-native": "src/index",
+ 	"dependencies": {
+ 		"@babel/runtime": "^7.4.4",
++		"@emotion/core": "10.0.22",
++		"@emotion/styled": "10.0.23",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/deprecated": "file:../deprecated",
+@@ -35,6 +37,7 @@
+ 		"classnames": "^2.2.5",
+ 		"clipboard": "^2.0.1",
+ 		"dom-scroll-into-view": "^1.2.1",
++		"hex-rgb": "^4.1.0",
+ 		"lodash": "^4.17.15",
+ 		"memize": "^1.0.5",
+ 		"moment": "^2.22.1",
+diff --git a/packages/components/src/card/README.md b/packages/components/src/card/README.md
+new file mode 100644
+index 00000000000000..4a401b021a842d
+--- /dev/null
++++ b/packages/components/src/card/README.md
+@@ -0,0 +1,97 @@
++# Card
++
++Card provides a flexible and extensible content container.
++
++## Usage
++
++```jsx
++import { Card, CardBody } from '@wordpress/components';
++
++const Example = () => (
++	<Card>
++		<CardBody>...</CardBody>
++	</Card>
++);
++```
++
++## Props
++
++Name | Type | Default | Description
++--- | --- | --- | ---
++`isBorderless` | `boolean` | `false` | Determines the border style of the card.
++`isElevated` | `boolean` | `false` | Determines the elevation style of the card.
++`size` | `string` | `medium` | Determines the amount of padding within the card.
++
++## Sub-Components
++
++This component provides a collection of sub-component that can be used to compose various interfaces.
++
++-   [`<CardBody />`](./docs/body.md)
++-   [`<CardDivider />`](./docs/divider.md)
++-   [`<CardFooter />`](./docs/footer.md)
++-   [`<CardHeader />`](./docs/header.md)
++-   [`<CardMedia />`](./docs/media.md)
++
++### Sub-Components Example
++
++```jsx
++import {
++	Card,
++	CardBody,
++	CardDivider,
++	CardFooter,
++	CardHeader,
++	CardMedia
++} from '@wordpress/components';
++
++const Example = () => (
++	<Card>
++		<CardHeader>
++			...
++		</CardHeader>
++		<CardBody>
++			...
++		<CardBody>
++		<CardDivider />
++		<CardBody>
++			...
++		<CardBody>
++		<CardMedia>
++			<img src="..." />
++		</CardMedia>
++		<CardHeader>
++			...
++		</CardHeader>
++	</Card>
++);
++```
++
++### Context
++
++`<Card />`'s sub-components are connected to `<Card />` using [Context](https://reactjs.org/docs/context.html). Certain props like `size` and `variant` are passed through to the sub-components.
++
++In the following example, the `<CardBody />` will render with a size of `small`:
++
++```jsx
++import { Card, CardBody } from '@wordpress/components';
++
++const Example = () => (
++	<Card size="small">
++		<CardBody>...</CardBody>
++	</Card>
++);
++```
++
++These sub-components are designed to be flexible. The Context props can be overridden by the sub-component(s) as required. In the following example, the last `<CardBody />` will render it's specified size:
++
++```jsx
++import { Card, CardBody } from '@wordpress/components';
++
++const Example = () => (
++	<Card size="small">
++		<CardBody>...</CardBody>
++		<CardBody>...</CardBody>
++		<CardBody size="large">...</CardBody>
++	</Card>
++);
++```
+diff --git a/packages/components/src/card/body.js b/packages/components/src/card/body.js
+new file mode 100644
+index 00000000000000..9194d601169ea9
+--- /dev/null
++++ b/packages/components/src/card/body.js
+@@ -0,0 +1,32 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import { BodyUI } from './styles/card-styles';
++import { useCardContext } from './context';
++
++export const defaultProps = {
++	isShady: false,
++	size: 'medium',
++};
++
++export function CardBody( props ) {
++	const { className, isShady, ...additionalProps } = props;
++	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
++	const { size } = mergedProps;
++
++	const classes = classnames(
++		'components-card__body',
++		isShady && 'is-shady',
++		size && `is-size-${ size }`,
++		className
++	);
++
++	return <BodyUI { ...additionalProps } className={ classes } />;
++}
++
++export default CardBody;
+diff --git a/packages/components/src/card/context.js b/packages/components/src/card/context.js
+new file mode 100644
+index 00000000000000..2bcc31eaf65d4e
+--- /dev/null
++++ b/packages/components/src/card/context.js
+@@ -0,0 +1,7 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++export const CardContext = createContext( {} );
++export const useCardContext = () => useContext( CardContext );
+diff --git a/packages/components/src/card/divider.js b/packages/components/src/card/divider.js
+new file mode 100644
+index 00000000000000..09a4a59c726643
+--- /dev/null
++++ b/packages/components/src/card/divider.js
+@@ -0,0 +1,26 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import { DividerUI } from './styles/card-styles';
++
++export function CardDivider( props ) {
++	const { className, ...additionalProps } = props;
++
++	const classes = classnames( 'components-card__divider', className );
++
++	return (
++		<DividerUI
++			{ ...additionalProps }
++			children={ null }
++			className={ classes }
++			role="separator"
++		/>
++	);
++}
++
++export default CardDivider;
+diff --git a/packages/components/src/card/docs/body.md b/packages/components/src/card/docs/body.md
+new file mode 100644
+index 00000000000000..6693bf644b27c4
+--- /dev/null
++++ b/packages/components/src/card/docs/body.md
+@@ -0,0 +1,24 @@
++# CardBody
++
++CardBody renders an optional content area for a [`<Card />`](../).
++
++## Usage
++
++```jsx
++import { Card, CardBody } from '@wordpress/components';
++
++const Example = () => (
++	<Card>
++		<CardBody>...</CardBody>
++	</Card>
++);
++```
++
++## Props
++
++Name | Type | Default | Description
++--- | --- | --- | ---
++`isShady` | `boolean` | `false` | Renders with a light gray background color.
++`size` | `string` | `medium` | Determines the amount of padding within the component.
++
++Note: This component is connected to [`<Card />`'s Context](../README.md#context). Passing props directly to this component will override the props derived from context.
+diff --git a/packages/components/src/card/docs/divider.md b/packages/components/src/card/docs/divider.md
+new file mode 100644
+index 00000000000000..feac94af529568
+--- /dev/null
++++ b/packages/components/src/card/docs/divider.md
+@@ -0,0 +1,17 @@
++# CardDivider
++
++CardDivider renders an optional divider within a [`<Card />`](../).
++
++## Usage
++
++```jsx
++import { Card, CardBody, CardDivider } from '@wordpress/components';
++
++const Example = () => (
++	<Card>
++		<CardBody>...</CardBody>
++		<CardDivider />
++		<CardBody>...</CardBody>
++	</Card>
++);
++```
+diff --git a/packages/components/src/card/docs/footer.md b/packages/components/src/card/docs/footer.md
+new file mode 100644
+index 00000000000000..f109db255672af
+--- /dev/null
++++ b/packages/components/src/card/docs/footer.md
+@@ -0,0 +1,26 @@
++# CardFooter
++
++CardFooter renders an optional footer within a [`<Card />`](../).
++
++## Usage
++
++```jsx
++import { Card, CardFooter } from '@wordpress/components';
++
++const Example = () => (
++	<Card>
++		<CardFooter>...</CardFooter>
++	</Card>
++);
++```
++
++## Props
++
++Name | Type | Default | Description
++--- | --- | --- | ---
++`isBorderless` | `boolean` | `false` | Determines the border style of the card.
++`isElevated` | `boolean` | `false` | Determines the elevation style of the card.
++`isShady` | `boolean` | `false` | Renders with a light gray background color.
++`size` | `string` | `medium` | Determines the amount of padding within the component.
++
++Note: This component is connected to [`<Card />`'s Context](../README.md#context). Passing props directly to this component will override the props derived from context.
+diff --git a/packages/components/src/card/docs/header.md b/packages/components/src/card/docs/header.md
+new file mode 100644
+index 00000000000000..b3901f15625cca
+--- /dev/null
++++ b/packages/components/src/card/docs/header.md
+@@ -0,0 +1,26 @@
++# CardHeader
++
++CardHeader renders an optional header within a [`<Card />`](../).
++
++## Usage
++
++```jsx
++import { Card, CardHeader } from '@wordpress/components';
++
++const Example = () => (
++	<Card>
++		<CardHeader>...</CardHeader>
++	</Card>
++);
++```
++
++## Props
++
++Name | Type | Default | Description
++--- | --- | --- | ---
++`isBorderless` | `boolean` | `false` | Determines the border style of the card.
++`isElevated` | `boolean` | `false` | Determines the elevation style of the card.
++`isShady` | `boolean` | `false` | Renders with a light gray background color.
++`size` | `string` | `medium` | Determines the amount of padding within the component.
++
++Note: This component is connected to [`<Card />`'s Context](../README.md#context). Passing props directly to this component will override the props derived from context.
+diff --git a/packages/components/src/card/docs/media.md b/packages/components/src/card/docs/media.md
+new file mode 100644
+index 00000000000000..980e32127792ec
+--- /dev/null
++++ b/packages/components/src/card/docs/media.md
+@@ -0,0 +1,84 @@
++# CardMedia
++
++CardMedia provides a container for media elements, and renders within a [`<Card />`](../).
++
++## Usage
++
++```jsx
++import { Card, CardBody, CardMedia } from '@wordpress/components';
++
++const Example = () => (
++	<Card>
++		<CardMedia>
++			<img src="..." />
++		</CardMedia>
++		<CardBody>...</CardBody>
++	</Card>
++);
++```
++
++## Placement
++
++`<CardMedia />` can be placed in any order as a direct child of a `<Card />`. The styles will automatically round the corners of the inner media element.
++
++### Top
++
++```jsx
++import { Card, CardBody, CardMedia } from '@wordpress/components';
++
++const Example = () => (
++	<Card>
++		<CardMedia>
++			<img src="..." />
++		</CardMedia>
++		<CardBody>...</CardBody>
++	</Card>
++);
++```
++
++### Center
++
++```jsx
++import { Card, CardBody, CardMedia } from '@wordpress/components';
++
++const Example = () => (
++	<Card>
++		<CardBody>...</CardBody>
++		<CardMedia>
++			<img src="..." />
++		</CardMedia>
++		<CardBody>...</CardBody>
++	</Card>
++);
++```
++
++### Bottom
++
++```jsx
++import { Card, CardBody, CardMedia } from '@wordpress/components';
++
++const Example = () => (
++	<Card>
++		<CardBody>...</CardBody>
++		<CardMedia>
++			<img src="..." />
++		</CardMedia>
++	</Card>
++);
++```
++
++### Only
++
++`<CardMedia />` can also exist as the only child component of `<Card />`.
++
++```jsx
++import { Card, CardMedia } from '@wordpress/components';
++
++const Example = () => (
++	<Card>
++		<CardMedia>
++			<img src="..." />
++		</CardMedia>
++	</Card>
++);
++```
+diff --git a/packages/components/src/card/footer.js b/packages/components/src/card/footer.js
+new file mode 100644
+index 00000000000000..e4b66ce4022c78
+--- /dev/null
++++ b/packages/components/src/card/footer.js
+@@ -0,0 +1,34 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import { FooterUI } from './styles/card-styles';
++import { useCardContext } from './context';
++
++export const defaultProps = {
++	isBorderless: false,
++	isShady: false,
++	size: 'medium',
++};
++
++export function CardFooter( props ) {
++	const { className, isShady, ...additionalProps } = props;
++	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
++	const { isBorderless, size } = mergedProps;
++
++	const classes = classnames(
++		'components-card__footer',
++		isBorderless && 'is-borderless',
++		isShady && 'is-shady',
++		size && `is-size-${ size }`,
++		className
++	);
++
++	return <FooterUI { ...additionalProps } className={ classes } />;
++}
++
++export default CardFooter;
+diff --git a/packages/components/src/card/header.js b/packages/components/src/card/header.js
+new file mode 100644
+index 00000000000000..ece890cddd4604
+--- /dev/null
++++ b/packages/components/src/card/header.js
+@@ -0,0 +1,34 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import { HeaderUI } from './styles/card-styles';
++import { useCardContext } from './context';
++
++export const defaultProps = {
++	isBorderless: false,
++	isShady: false,
++	size: 'medium',
++};
++
++export function CardHeader( props ) {
++	const { className, isShady, ...additionalProps } = props;
++	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
++	const { isBorderless, size } = mergedProps;
++
++	const classes = classnames(
++		'components-card__header',
++		isBorderless && 'is-borderless',
++		isShady && 'is-shady',
++		size && `is-size-${ size }`,
++		className
++	);
++
++	return <HeaderUI { ...additionalProps } className={ classes } />;
++}
++
++export default CardHeader;
+diff --git a/packages/components/src/card/index.js b/packages/components/src/card/index.js
+new file mode 100644
+index 00000000000000..765b980567abf5
+--- /dev/null
++++ b/packages/components/src/card/index.js
+@@ -0,0 +1,51 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import { CardContext } from './context';
++import { CardUI } from './styles/card-styles';
++
++export const defaultProps = {
++	isBorderless: false,
++	isElevated: false,
++	size: 'medium',
++};
++
++export function Card( props ) {
++	const {
++		className,
++		isBorderless,
++		isElevated,
++		size,
++		...additionalProps
++	} = props;
++	const { Provider } = CardContext;
++
++	const contextProps = {
++		isBorderless,
++		isElevated,
++		size,
++	};
++
++	const classes = classnames(
++		'components-card',
++		isBorderless && 'is-borderless',
++		isElevated && 'is-elevated',
++		size && `is-size-${ size }`,
++		className
++	);
++
++	return (
++		<Provider value={ contextProps }>
++			<CardUI { ...additionalProps } className={ classes } />
++		</Provider>
++	);
++}
++
++Card.defaultProps = defaultProps;
++
++export default Card;
+diff --git a/packages/components/src/card/media.js b/packages/components/src/card/media.js
+new file mode 100644
+index 00000000000000..c660f6705649de
+--- /dev/null
++++ b/packages/components/src/card/media.js
+@@ -0,0 +1,19 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import { MediaUI } from './styles/card-styles';
++
++export function CardMedia( props ) {
++	const { className, ...additionalProps } = props;
++
++	const classes = classnames( 'components-card__media', className );
++
++	return <MediaUI { ...additionalProps } className={ classes } />;
++}
++
++export default CardMedia;
+diff --git a/packages/components/src/card/stories/_index.js b/packages/components/src/card/stories/_index.js
+new file mode 100644
+index 00000000000000..590a988df931d9
+--- /dev/null
++++ b/packages/components/src/card/stories/_index.js
+@@ -0,0 +1,43 @@
++/**
++ * External dependencies
++ */
++
++/* eslint-disable import/no-extraneous-dependencies */
++import { text, boolean } from '@storybook/addon-knobs';
++/* eslint-enable import/no-extraneous-dependencies */
++
++/**
++ * Internal dependencies
++ */
++import Card from '../index';
++import CardBody from '../body';
++import CardFooter from '../footer';
++import CardHeader from '../header';
++import { getCardStoryProps } from './_utils';
++
++export default { title: 'Components|Card', component: Card };
++
++export const _default = () => {
++	const props = getCardStoryProps();
++
++	const body = text( 'Body: children', 'Code is Poetry' );
++	const isBodyShady = boolean( 'Body: isShady', false );
++
++	const header = text( 'Header: children', 'Header' );
++	const isHeaderShady = boolean( 'Header: isShady', false );
++
++	const footer = text( 'Footer: children', 'Footer' );
++	const isFooterShady = boolean( 'Footer: isShady', false );
++
++	return (
++		<Card { ...props }>
++			{ header && (
++				<CardHeader isShady={ isHeaderShady }>{ header }</CardHeader>
++			) }
++			{ body && <CardBody isShady={ isBodyShady }>{ body }</CardBody> }
++			{ footer && (
++				<CardFooter isShady={ isFooterShady }>{ footer }</CardFooter>
++			) }
++		</Card>
++	);
++};
+diff --git a/packages/components/src/card/stories/_utils.js b/packages/components/src/card/stories/_utils.js
+new file mode 100644
+index 00000000000000..8e34f08d16a814
+--- /dev/null
++++ b/packages/components/src/card/stories/_utils.js
+@@ -0,0 +1,52 @@
++/**
++ * External dependencies
++ */
++/* eslint-disable import/no-extraneous-dependencies */
++import { boolean, select } from '@storybook/addon-knobs';
++/* eslint-enable import/no-extraneous-dependencies */
++
++export const getCardProps = ( props = {} ) => {
++	const { size } = props;
++
++	return {
++		isBorderless: boolean( 'Card: isBorderless', false ),
++		isElevated: boolean( 'Card: isElevated', false ),
++		size: select(
++			'Card: size',
++			{
++				large: 'large',
++				medium: 'medium',
++				small: 'small',
++				extraSmall: 'extraSmall',
++			},
++			size || 'medium'
++		),
++	};
++};
++
++export const getCardStyleProps = ( props = {} ) => {
++	const width = select(
++		'Example: Width',
++		{
++			'640px': 640,
++			'360px': 360,
++			'240px': 240,
++			'50%': '50%',
++			'100%': '100%',
++		},
++		props.width || '360px'
++	);
++
++	return {
++		style: {
++			width,
++		},
++	};
++};
++
++export const getCardStoryProps = () => {
++	return {
++		...getCardStyleProps(),
++		...getCardProps(),
++	};
++};
+diff --git a/packages/components/src/card/stories/body.js b/packages/components/src/card/stories/body.js
+new file mode 100644
+index 00000000000000..de226b72e7e89f
+--- /dev/null
++++ b/packages/components/src/card/stories/body.js
+@@ -0,0 +1,27 @@
++/**
++ * External dependencies
++ */
++/* eslint-disable import/no-extraneous-dependencies */
++import { boolean, text } from '@storybook/addon-knobs';
++/* eslint-enable import/no-extraneous-dependencies */
++
++/**
++ * Internal dependencies
++ */
++import Card from '../index';
++import CardBody from '../body';
++import { getCardStoryProps } from './_utils';
++
++export default { title: 'Components|Card/Body', component: CardBody };
++
++export const _default = () => {
++	const props = getCardStoryProps();
++	const content = text( 'Body: children', 'Content' );
++	const isShady = boolean( 'Body: isShady', false );
++
++	return (
++		<Card { ...props }>
++			<CardBody isShady={ isShady }>{ content }</CardBody>
++		</Card>
++	);
++};
+diff --git a/packages/components/src/card/stories/divider.js b/packages/components/src/card/stories/divider.js
+new file mode 100644
+index 00000000000000..c506cef28e7d58
+--- /dev/null
++++ b/packages/components/src/card/stories/divider.js
+@@ -0,0 +1,21 @@
++/**
++ * Internal dependencies
++ */
++import Card from '../index';
++import CardBody from '../body';
++import CardDivider from '../divider';
++import { getCardStoryProps } from './_utils';
++
++export default { title: 'Components|Card/Divider', component: CardDivider };
++
++export const _default = () => {
++	const props = getCardStoryProps();
++
++	return (
++		<Card { ...props }>
++			<CardBody>...</CardBody>
++			<CardDivider />
++			<CardBody>...</CardBody>
++		</Card>
++	);
++};
+diff --git a/packages/components/src/card/stories/footer.js b/packages/components/src/card/stories/footer.js
+new file mode 100644
+index 00000000000000..f21e640550c2e3
+--- /dev/null
++++ b/packages/components/src/card/stories/footer.js
+@@ -0,0 +1,27 @@
++/**
++ * External dependencies
++ */
++/* eslint-disable import/no-extraneous-dependencies */
++import { boolean, text } from '@storybook/addon-knobs';
++/* eslint-enable import/no-extraneous-dependencies */
++
++/**
++ * Internal dependencies
++ */
++import Card from '../index';
++import CardFooter from '../footer';
++import { getCardStoryProps } from './_utils';
++
++export default { title: 'Components|Card/Footer', component: CardFooter };
++
++export const _default = () => {
++	const props = getCardStoryProps();
++	const content = text( 'Footer: children', 'Content' );
++	const isShady = boolean( 'Footer: isShady', false );
++
++	return (
++		<Card { ...props }>
++			<CardFooter isShady={ isShady }>{ content }</CardFooter>
++		</Card>
++	);
++};
+diff --git a/packages/components/src/card/stories/header.js b/packages/components/src/card/stories/header.js
+new file mode 100644
+index 00000000000000..1314b701a93681
+--- /dev/null
++++ b/packages/components/src/card/stories/header.js
+@@ -0,0 +1,27 @@
++/**
++ * External dependencies
++ */
++/* eslint-disable import/no-extraneous-dependencies */
++import { boolean, text } from '@storybook/addon-knobs';
++/* eslint-enable import/no-extraneous-dependencies */
++
++/**
++ * Internal dependencies
++ */
++import Card from '../index';
++import CardHeader from '../header';
++import { getCardStoryProps } from './_utils';
++
++export default { title: 'Components|Card/Header', component: CardHeader };
++
++export const _default = () => {
++	const props = getCardStoryProps();
++	const content = text( 'Footer: children', 'Content' );
++	const isShady = boolean( 'Footer: isShady', false );
++
++	return (
++		<Card { ...props }>
++			<CardHeader isShady={ isShady }>{ content }</CardHeader>
++		</Card>
++	);
++};
+diff --git a/packages/components/src/card/stories/media.js b/packages/components/src/card/stories/media.js
+new file mode 100644
+index 00000000000000..4ecade543fc720
+--- /dev/null
++++ b/packages/components/src/card/stories/media.js
+@@ -0,0 +1,166 @@
++/**
++ * External dependencies
++ */
++/* eslint-disable import/no-extraneous-dependencies */
++import { boolean, number, select, text } from '@storybook/addon-knobs';
++/* eslint-enable import/no-extraneous-dependencies */
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import Card from '../index';
++import CardBody from '../body';
++import CardFooter from '../footer';
++import CardHeader from '../header';
++import CardMedia from '../media';
++import { getCardStoryProps } from './_utils';
++
++export default { title: 'Components|Card/Media', component: CardMedia };
++
++const DummyImage = () => (
++	<img
++		src="https://images.unsplash.com/photo-1570776765652-4ce2a88cc1f9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
++		alt="SMELLING MARSHMELLOW ICECREAM CONE"
++	/>
++);
++
++export const _default = () => {
++	const mediaOnTop = boolean( 'Example: On Top', true );
++	const props = getCardStoryProps();
++
++	const showTopContent = ! mediaOnTop;
++	const showBottomContent = ! showTopContent;
++	const content = text( 'Body: children', 'Content' );
++
++	return (
++		<Card { ...props }>
++			{ showTopContent && <CardBody>{ content }</CardBody> }
++			<CardMedia>
++				<DummyImage />
++			</CardMedia>
++			{ showBottomContent && <CardBody>{ content }</CardBody> }
++		</Card>
++	);
++};
++
++export const onTop = () => {
++	const props = getCardStoryProps();
++
++	return (
++		<Card { ...props }>
++			<CardMedia>
++				<DummyImage />
++			</CardMedia>
++			<CardBody>
++				<div>Content</div>
++			</CardBody>
++		</Card>
++	);
++};
++
++export const onBottom = () => {
++	const props = getCardStoryProps();
++
++	return (
++		<Card { ...props }>
++			<CardBody>Content</CardBody>
++			<CardMedia>
++				<DummyImage />
++			</CardMedia>
++		</Card>
++	);
++};
++
++export const headerAndFooter = () => {
++	const props = getCardStoryProps();
++
++	return (
++		<Card { ...props }>
++			<CardHeader>Header Content</CardHeader>
++			<CardMedia>
++				<DummyImage />
++			</CardMedia>
++			<CardFooter isShady>Caption</CardFooter>
++		</Card>
++	);
++};
++
++export const iframeEmbed = () => {
++	const props = getCardStoryProps();
++
++	return (
++		<Card { ...props }>
++			<CardHeader>Header Content</CardHeader>
++			<CardMedia>
++				<iframe
++					width="560"
++					height="315"
++					src="https://www.youtube.com/embed/zGP6zk7jcrQ"
++					frameBorder="0"
++					allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
++					allowFullScreen
++					title="Corgi"
++				></iframe>
++			</CardMedia>
++		</Card>
++	);
++};
++
++/**
++ * Referring to other styled components:
++ * https://www.styled-components.com/docs/advanced#referring-to-other-components
++ * https://www.styled-components.com/docs/advanced#caveat
++ */
++const StyledCardMedia = styled( CardMedia )( '' );
++const StyledCardBody = styled( CardBody )( '' );
++
++const HorizontallyAlignedCard = styled( Card )`
++	display: flex;
++
++	&.is-right {
++		flex-direction: row-reverse;
++	}
++
++	${ StyledCardBody } {
++		flex: 1;
++	}
++
++	${ StyledCardMedia } {
++		&.is-left {
++			border-radius: 3px 0 0 3px;
++		}
++		&.is-right {
++			border-radius: 0 3px 3px 0;
++		}
++	}
++`;
++
++export const horizontallyAligned = () => {
++	const align = select(
++		'Example: Align',
++		{
++			left: 'left',
++			right: 'right',
++		},
++		'left'
++	);
++	const maxWidth = number( 'Example: Media Width', 200 );
++	const content = text( 'Body: children', 'Content' );
++	const classes = `is-${ align }`;
++
++	return (
++		<>
++			<p>
++				Note: This story demonstrates how this UI may be created. It
++				requires extra styling.
++			</p>
++			<HorizontallyAlignedCard className={ classes }>
++				<StyledCardMedia className={ classes } style={ { maxWidth } }>
++					<DummyImage />
++				</StyledCardMedia>
++				<StyledCardBody>{ content }</StyledCardBody>
++			</HorizontallyAlignedCard>
++		</>
++	);
++};
+diff --git a/packages/components/src/card/styles/card-styles.js b/packages/components/src/card/styles/card-styles.js
+new file mode 100644
+index 00000000000000..150ff2ba1f57c9
+--- /dev/null
++++ b/packages/components/src/card/styles/card-styles.js
+@@ -0,0 +1,156 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import { HorizontalRule } from '../../primitives';
++import { color } from '../../utils/colors';
++
++export const styleProps = {
++	borderColor: color( 'lightGray.500' ),
++	borderRadius: '3px',
++	backgroundShady: color( 'lightGray.200' ),
++};
++
++const { borderColor, borderRadius, backgroundShady } = styleProps;
++
++export const CardUI = styled.div`
++	background: ${ color( 'white' ) };
++	box-sizing: border-box;
++	border-radius: ${ borderRadius };
++	border: 1px solid ${ borderColor };
++
++	${ handleBorderless };
++
++	&.is-elevated {
++		box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2),
++			0px 1px 1px 0px rgba(0, 0, 0, 0.14),
++			0px 2px 1px -1px rgba(0, 0, 0, 0.12);
++	}
++`;
++
++export const HeaderUI = styled.div`
++	border-bottom: 1px solid ${ borderColor };
++	border-top-left-radius: ${ borderRadius };
++	border-top-right-radius: ${ borderRadius };
++	box-sizing: border-box;
++
++	&:last-child {
++		border-bottom: none;
++	}
++
++	${ headerFooterSizes };
++	${ handleBorderless };
++	${ handleShady };
++`;
++
++export const MediaUI = styled.div`
++	box-sizing: border-box;
++	overflow: hidden;
++
++	& > img,
++	& > iframe {
++		display: block;
++		height: auto;
++		max-width: 100%;
++		width: 100%;
++	}
++
++	&:first-of-type {
++		border-top-left-radius: ${ borderRadius };
++		border-top-right-radius: ${ borderRadius };
++	}
++
++	&:last-of-type {
++		border-bottom-left-radius: ${ borderRadius };
++		border-bottom-right-radius: ${ borderRadius };
++	}
++`;
++
++export const BodyUI = styled.div`
++	box-sizing: border-box;
++
++	${ bodySize };
++	${ handleShady };
++`;
++
++export const FooterUI = styled.div`
++	border-top: 1px solid ${ borderColor };
++	border-bottom-left-radius: ${ borderRadius };
++	border-bottom-right-radius: ${ borderRadius };
++	box-sizing: border-box;
++
++	&:first-of-type {
++		border-top: none;
++	}
++
++	${ headerFooterSizes };
++	${ handleBorderless };
++	${ handleShady };
++`;
++
++export const DividerUI = styled( HorizontalRule )`
++	all: unset;
++	border-top: 1px solid ${ borderColor };
++	box-sizing: border-box;
++	display: block;
++	height: 0;
++	width: 100%;
++`;
++
++export function bodySize() {
++	return `
++		&.is-size {
++			&-large {
++				padding: 28px;
++			}
++			&-medium {
++				padding: 20px;
++			}
++			&-small {
++				padding: 12px;
++			}
++			&-extraSmall {
++				padding: 8px;
++			}
++		}
++	`;
++}
++
++export function headerFooterSizes() {
++	return `
++		&.is-size {
++			&-large {
++				padding: 20px 28px;
++			}
++			&-medium {
++				padding: 12px 20px;
++			}
++			&-small {
++				padding: 8px 12px;
++			}
++			&-extraSmall {
++				padding: 4px 8px;
++			}
++		}
++	`;
++}
++
++export function handleBorderless() {
++	return `
++		&.is-borderless {
++			border: none;
++		}
++	`;
++}
++
++export function handleShady() {
++	return `
++		&.is-shady {
++			background: ${ backgroundShady };
++		}
++	`;
++}
+diff --git a/packages/components/src/card/test/body.js b/packages/components/src/card/test/body.js
+new file mode 100644
+index 00000000000000..dbbe21cdd6028a
+--- /dev/null
++++ b/packages/components/src/card/test/body.js
+@@ -0,0 +1,48 @@
++/**
++ * External dependencies
++ */
++import { shallow } from 'enzyme';
++
++/**
++ * Internal dependencies
++ */
++import CardBody from '../body';
++
++describe( 'CardBody', () => {
++	describe( 'basic rendering', () => {
++		test( 'should have components-card className', () => {
++			const wrapper = shallow( <CardBody /> );
++			const cardBody = wrapper.find( '.components-card__body' );
++
++			expect( cardBody.length ).toBe( 1 );
++		} );
++
++		test( 'should be able to render content', () => {
++			const cardBody = shallow(
++				<CardBody>
++					<div className="content">Hello</div>
++				</CardBody>
++			);
++			const content = cardBody.find( '.content' );
++
++			expect( content.length ).toBe( 1 );
++			expect( content.text() ).toBe( 'Hello' );
++		} );
++	} );
++
++	describe( 'modifiers', () => {
++		test( 'should be able to render size modifier', () => {
++			const wrapper = shallow( <CardBody size="large" /> );
++			const cardBody = wrapper.find( '.components-card__body' );
++
++			expect( cardBody.hasClass( 'is-size-large' ) ).toBe( true );
++		} );
++
++		test( 'should be able to render shady modifier', () => {
++			const wrapper = shallow( <CardBody isShady /> );
++			const cardBody = wrapper.find( '.components-card__body' );
++
++			expect( cardBody.hasClass( 'is-shady' ) ).toBe( true );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/card/test/divider.js b/packages/components/src/card/test/divider.js
+new file mode 100644
+index 00000000000000..81f6012c9cd59a
+--- /dev/null
++++ b/packages/components/src/card/test/divider.js
+@@ -0,0 +1,38 @@
++/**
++ * External dependencies
++ */
++import { shallow } from 'enzyme';
++
++/**
++ * Internal dependencies
++ */
++import CardDivider from '../divider';
++
++describe( 'CardDivider', () => {
++	describe( 'basic rendering', () => {
++		test( 'should have components-card className', () => {
++			const wrapper = shallow( <CardDivider /> );
++			const cardDivider = wrapper.find( '.components-card__divider' );
++
++			expect( cardDivider.length ).toBe( 1 );
++		} );
++
++		test( 'should not render child content', () => {
++			const cardDivider = shallow(
++				<CardDivider>
++					<div className="content">Hello</div>
++				</CardDivider>
++			);
++			const content = cardDivider.find( '.content' );
++
++			expect( content.length ).toBe( 0 );
++		} );
++
++		test( 'should have role of separator', () => {
++			const wrapper = shallow( <CardDivider /> );
++			const cardDivider = wrapper.find( '.components-card__divider' );
++
++			expect( cardDivider.prop( 'role' ) ).toBe( 'separator' );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/card/test/footer.js b/packages/components/src/card/test/footer.js
+new file mode 100644
+index 00000000000000..bcd4308782437a
+--- /dev/null
++++ b/packages/components/src/card/test/footer.js
+@@ -0,0 +1,55 @@
++/**
++ * External dependencies
++ */
++import { shallow } from 'enzyme';
++
++/**
++ * Internal dependencies
++ */
++import CardFooter from '../footer';
++
++describe( 'CardFooter', () => {
++	describe( 'basic rendering', () => {
++		test( 'should have components-card className', () => {
++			const wrapper = shallow( <CardFooter /> );
++			const cardFooter = wrapper.find( '.components-card__footer' );
++
++			expect( cardFooter.length ).toBe( 1 );
++		} );
++
++		test( 'should be able to render content', () => {
++			const cardFooter = shallow(
++				<CardFooter>
++					<div className="content">Hello</div>
++				</CardFooter>
++			);
++			const content = cardFooter.find( '.content' );
++
++			expect( content.length ).toBe( 1 );
++			expect( content.text() ).toBe( 'Hello' );
++		} );
++	} );
++
++	describe( 'modifiers', () => {
++		test( 'should be able to render size modifier', () => {
++			const wrapper = shallow( <CardFooter size="large" /> );
++			const cardFooter = wrapper.find( '.components-card__footer' );
++
++			expect( cardFooter.hasClass( 'is-size-large' ) ).toBe( true );
++		} );
++
++		test( 'should be able to render shady modifier', () => {
++			const wrapper = shallow( <CardFooter isShady /> );
++			const cardFooter = wrapper.find( '.components-card__footer' );
++
++			expect( cardFooter.hasClass( 'is-shady' ) ).toBe( true );
++		} );
++
++		test( 'should be able to render borderless modifier', () => {
++			const wrapper = shallow( <CardFooter isBorderless /> );
++			const cardFooter = wrapper.find( '.components-card__footer' );
++
++			expect( cardFooter.hasClass( 'is-borderless' ) ).toBe( true );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/card/test/header.js b/packages/components/src/card/test/header.js
+new file mode 100644
+index 00000000000000..3323658aaa7b6b
+--- /dev/null
++++ b/packages/components/src/card/test/header.js
+@@ -0,0 +1,55 @@
++/**
++ * External dependencies
++ */
++import { shallow } from 'enzyme';
++
++/**
++ * Internal dependencies
++ */
++import CardHeader from '../header';
++
++describe( 'CardHeader', () => {
++	describe( 'basic rendering', () => {
++		test( 'should have components-card className', () => {
++			const wrapper = shallow( <CardHeader /> );
++			const cardHeader = wrapper.find( '.components-card__header' );
++
++			expect( cardHeader.length ).toBe( 1 );
++		} );
++
++		test( 'should be able to render content', () => {
++			const cardHeader = shallow(
++				<CardHeader>
++					<div className="content">Hello</div>
++				</CardHeader>
++			);
++			const content = cardHeader.find( '.content' );
++
++			expect( content.length ).toBe( 1 );
++			expect( content.text() ).toBe( 'Hello' );
++		} );
++	} );
++
++	describe( 'modifiers', () => {
++		test( 'should be able to render size modifier', () => {
++			const wrapper = shallow( <CardHeader size="large" /> );
++			const cardHeader = wrapper.find( '.components-card__header' );
++
++			expect( cardHeader.hasClass( 'is-size-large' ) ).toBe( true );
++		} );
++
++		test( 'should be able to render shady modifier', () => {
++			const wrapper = shallow( <CardHeader isShady /> );
++			const cardHeader = wrapper.find( '.components-card__header' );
++
++			expect( cardHeader.hasClass( 'is-shady' ) ).toBe( true );
++		} );
++
++		test( 'should be able to render borderless modifier', () => {
++			const wrapper = shallow( <CardHeader isBorderless /> );
++			const cardHeader = wrapper.find( '.components-card__header' );
++
++			expect( cardHeader.hasClass( 'is-borderless' ) ).toBe( true );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/card/test/index.js b/packages/components/src/card/test/index.js
+new file mode 100644
+index 00000000000000..16b4d3158971a0
+--- /dev/null
++++ b/packages/components/src/card/test/index.js
+@@ -0,0 +1,195 @@
++/**
++ * External dependencies
++ */
++import { mount, shallow } from 'enzyme';
++
++/**
++ * Internal dependencies
++ */
++import Card from '../';
++import CardBody from '../body';
++import CardDivider from '../divider';
++import CardFooter from '../footer';
++import CardHeader from '../header';
++import CardMedia from '../media';
++
++describe( 'Card', () => {
++	describe( 'basic rendering', () => {
++		test( 'should have components-card className', () => {
++			const wrapper = shallow( <Card /> );
++			const card = wrapper.find( '.components-card' );
++
++			expect( card.length ).toBeTruthy();
++		} );
++
++		test( 'should be able to render content', () => {
++			const card = shallow(
++				<Card>
++					<div className="content">Hello</div>
++				</Card>
++			);
++			const content = card.find( '.content' );
++
++			expect( content.length ).toBe( 1 );
++			expect( content.text() ).toBe( 'Hello' );
++		} );
++	} );
++
++	describe( 'styles', () => {
++		test( 'should render borderless', () => {
++			const wrapper = shallow( <Card isBorderless /> );
++			const card = wrapper.find( '.components-card' );
++
++			expect( card.hasClass( 'is-borderless' ) ).toBe( true );
++		} );
++
++		test( 'should render elevated styles', () => {
++			const wrapper = shallow( <Card isElevated /> );
++			const card = wrapper.find( '.components-card' );
++
++			expect( card.hasClass( 'is-elevated' ) ).toBe( true );
++		} );
++	} );
++
++	describe( 'CardBody', () => {
++		test( 'should be able to render', () => {
++			const card = mount(
++				<Card>
++					<CardBody>Hello</CardBody>
++				</Card>
++			);
++			const cardBody = card.find( 'CardBody' );
++
++			expect( cardBody.length ).toBe( 1 );
++			expect( cardBody.text() ).toBe( 'Hello' );
++		} );
++
++		test( 'should receive modifier props from context', () => {
++			const card = mount(
++				<Card size="extraSmall">
++					<CardBody>Hello</CardBody>
++				</Card>
++			);
++			const cardBody = card.find( '.components-card__body' ).first();
++
++			expect( cardBody.hasClass( 'is-size-extraSmall' ) ).toBe( true );
++		} );
++
++		test( 'should be able to override props from context', () => {
++			const card = mount(
++				<Card size="extraSmall">
++					<CardBody size="large">Hello</CardBody>
++				</Card>
++			);
++			const cardBody = card.find( '.components-card__body' ).first();
++
++			expect( cardBody.hasClass( 'is-size-large' ) ).toBe( true );
++		} );
++	} );
++
++	describe( 'CardHeader', () => {
++		test( 'should be able to render', () => {
++			const card = mount(
++				<Card>
++					<CardHeader>Hello</CardHeader>
++				</Card>
++			);
++			const cardHeader = card.find( 'CardHeader' );
++
++			expect( cardHeader.length ).toBe( 1 );
++			expect( cardHeader.text() ).toBe( 'Hello' );
++		} );
++
++		test( 'should receive modifier props from context', () => {
++			const card = mount(
++				<Card size="extraSmall" isBorderless={ true }>
++					<CardHeader>Hello</CardHeader>
++				</Card>
++			);
++			const cardHeader = card.find( '.components-card__header' ).first();
++
++			expect( cardHeader.hasClass( 'is-size-extraSmall' ) ).toBe( true );
++			expect( cardHeader.hasClass( 'is-borderless' ) ).toBe( true );
++		} );
++
++		test( 'should be able to override props from context', () => {
++			const card = mount(
++				<Card size="extraSmall" isBorderless={ true }>
++					<CardHeader size="large" isBorderless={ false }>
++						Hello
++					</CardHeader>
++				</Card>
++			);
++			const cardHeader = card.find( '.components-card__header' ).first();
++
++			expect( cardHeader.hasClass( 'is-size-large' ) ).toBe( true );
++			expect( cardHeader.hasClass( 'is-borderless' ) ).toBe( false );
++		} );
++	} );
++
++	describe( 'CardFooter', () => {
++		test( 'should be able to render', () => {
++			const card = mount(
++				<Card>
++					<CardFooter>Hello</CardFooter>
++				</Card>
++			);
++			const cardFooter = card.find( 'CardFooter' );
++
++			expect( cardFooter.length ).toBe( 1 );
++			expect( cardFooter.text() ).toBe( 'Hello' );
++		} );
++
++		test( 'should receive modifier props from context', () => {
++			const card = mount(
++				<Card size="extraSmall" isBorderless={ true }>
++					<CardFooter>Hello</CardFooter>
++				</Card>
++			);
++			const cardFooter = card.find( '.components-card__footer' ).first();
++
++			expect( cardFooter.hasClass( 'is-size-extraSmall' ) ).toBe( true );
++			expect( cardFooter.hasClass( 'is-borderless' ) ).toBe( true );
++		} );
++
++		test( 'should be able to override props from context', () => {
++			const card = mount(
++				<Card size="extraSmall" isBorderless={ true }>
++					<CardFooter size="large" isBorderless={ false }>
++						Hello
++					</CardFooter>
++				</Card>
++			);
++			const cardFooter = card.find( '.components-card__footer' ).first();
++
++			expect( cardFooter.hasClass( 'is-size-large' ) ).toBe( true );
++			expect( cardFooter.hasClass( 'is-borderless' ) ).toBe( false );
++		} );
++	} );
++
++	describe( 'CardDivider', () => {
++		test( 'should be able to render', () => {
++			const card = mount(
++				<Card>
++					<CardDivider />
++				</Card>
++			);
++			const cardBody = card.find( 'CardDivider' );
++
++			expect( cardBody.length ).toBe( 1 );
++		} );
++	} );
++
++	describe( 'CardMedia', () => {
++		test( 'should be able to render', () => {
++			const card = mount(
++				<Card>
++					<CardMedia />
++				</Card>
++			);
++			const cardBody = card.find( 'CardMedia' );
++
++			expect( cardBody.length ).toBe( 1 );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/card/test/media.js b/packages/components/src/card/test/media.js
+new file mode 100644
+index 00000000000000..935134d281dc21
+--- /dev/null
++++ b/packages/components/src/card/test/media.js
+@@ -0,0 +1,32 @@
++/**
++ * External dependencies
++ */
++import { shallow } from 'enzyme';
++
++/**
++ * Internal dependencies
++ */
++import CardMedia from '../media';
++
++describe( 'CardMedia', () => {
++	describe( 'basic rendering', () => {
++		test( 'should have components-card className', () => {
++			const wrapper = shallow( <CardMedia /> );
++			const cardMedia = wrapper.find( '.components-card__media' );
++
++			expect( cardMedia.length ).toBe( 1 );
++		} );
++
++		test( 'should be able to render content', () => {
++			const cardBody = shallow(
++				<CardMedia>
++					<div className="content">Hello</div>
++				</CardMedia>
++			);
++			const content = cardBody.find( '.content' );
++
++			expect( content.length ).toBe( 1 );
++			expect( content.text() ).toBe( 'Hello' );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index ac9694a49ba57b..3803719c2d8d1b 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -5,6 +5,12 @@ export { default as Autocomplete } from './autocomplete';
+ export { default as BaseControl } from './base-control';
+ export { default as Button } from './button';
+ export { default as ButtonGroup } from './button-group';
++export { default as Card } from './card';
++export { default as CardBody } from './card/body';
++export { default as CardDivider } from './card/divider';
++export { default as CardFooter } from './card/footer';
++export { default as CardHeader } from './card/header';
++export { default as CardMedia } from './card/media';
+ export { default as CheckboxControl } from './checkbox-control';
+ export { default as ClipboardButton } from './clipboard-button';
+ export { default as ColorIndicator } from './color-indicator';
+@@ -65,14 +71,28 @@ export { default as Tooltip } from './tooltip';
+ export { default as TreeSelect } from './tree-select';
+ export { default as VisuallyHidden } from './visually-hidden';
+ export { default as IsolatedEventContainer } from './isolated-event-container';
+-export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
++export {
++	createSlotFill,
++	Slot,
++	Fill,
++	Provider as SlotFillProvider,
++} from './slot-fill';
+ 
+ // Higher-Order Components
+ export { default as navigateRegions } from './higher-order/navigate-regions';
+-export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
+-export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
++export {
++	default as withConstrainedTabbing,
++} from './higher-order/with-constrained-tabbing';
++export {
++	default as withFallbackStyles,
++} from './higher-order/with-fallback-styles';
+ export { default as withFilters } from './higher-order/with-filters';
+ export { default as withFocusOutside } from './higher-order/with-focus-outside';
+-export { default as withFocusReturn, Provider as FocusReturnProvider } from './higher-order/with-focus-return';
++export {
++	default as withFocusReturn,
++	Provider as FocusReturnProvider,
++} from './higher-order/with-focus-return';
+ export { default as withNotices } from './higher-order/with-notices';
+-export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
++export {
++	default as withSpokenMessages,
++} from './higher-order/with-spoken-messages';
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+new file mode 100644
+index 00000000000000..8dfca09543f5e9
+--- /dev/null
++++ b/packages/components/src/utils/colors-values.js
+@@ -0,0 +1,115 @@
++/**
++ * Internal dependencies
++ */
++import { rgba } from './colors';
++export const BASE = {
++	black: '#000',
++	white: '#fff',
++};
++
++export const DARK_GRAY = {
++	900: '#191e23',
++	800: '#23282d',
++	700: '#32373c',
++	600: '#40464d',
++	500: '#555d66', // Use this most of the time for dark items.
++	400: '#606a73',
++	300: '#6c7781', // Lightest gray that can be used for AA text contrast.
++	200: '#7e8993',
++	150: '#8d96a0', // Lightest gray that can be used for AA non-text contrast.
++	100: '#8f98a1',
++};
++
++export const DARK_OPACITY = {
++	900: rgba( '#000510', 0.9 ),
++	800: rgba( '#00000a', 0.85 ),
++	700: rgba( '#06060b', 0.8 ),
++	600: rgba( '#000913', 0.75 ),
++	500: rgba( '#0a1829', 0.7 ),
++	400: rgba( '#0a1829', 0.65 ),
++	300: rgba( '#0e1c2e', 0.62 ),
++	200: rgba( '#162435', 0.55 ),
++	100: rgba( '#223443', 0.5 ),
++	backgroundFill: rgba( DARK_GRAY[ 700 ], 0.7 ),
++};
++
++export const DARK_OPACITY_LIGHT = {
++	900: rgba( '#304455', 0.45 ),
++	800: rgba( '#425863', 0.4 ),
++	700: rgba( '#667886', 0.35 ),
++	600: rgba( '#7b86a2', 0.3 ),
++	500: rgba( '#9197a2', 0.25 ),
++	400: rgba( '#95959c', 0.2 ),
++	300: rgba( '#829493', 0.15 ),
++	200: rgba( '#8b8b96', 0.1 ),
++	100: rgba( '#747474', 0.05 ),
++};
++
++export const LIGHT_GRAY = {
++	900: '#a2aab2',
++	800: '#b5bcc2',
++	700: '#ccd0d4',
++	600: '#d7dade',
++	500: '#e2e4e7', // Good for "grayed" items and borders.
++	400: '#e8eaeb', // Good for "readonly" input fields and special text selection.
++	300: '#edeff0',
++	200: '#f3f4f5',
++	100: '#f8f9f9',
++};
++
++export const LIGHT_OPACITY_LIGHT = {
++	900: rgba( BASE.white, 0.5 ),
++	800: rgba( BASE.white, 0.45 ),
++	700: rgba( BASE.white, 0.4 ),
++	600: rgba( BASE.white, 0.35 ),
++	500: rgba( BASE.white, 0.3 ),
++	400: rgba( BASE.white, 0.25 ),
++	300: rgba( BASE.white, 0.2 ),
++	200: rgba( BASE.white, 0.15 ),
++	100: rgba( BASE.white, 0.1 ),
++	backgroundFill: rgba( LIGHT_GRAY[ 300 ], 0.8 ),
++};
++
++// Additional colors.
++// Some are from https://make.wordpress.org/design/handbook/foundations/colors/.
++
++export const BLUE = {
++	wordpress: {
++		700: '#00669b',
++	},
++	dark: {
++		900: '#0071a1',
++	},
++	medium: {
++		900: '#006589',
++		800: '#00739c',
++		700: '#007fac',
++		600: '#008dbe',
++		500: '#00a0d2',
++		400: '#33b3db',
++		300: '#66c6e4',
++		200: '#bfe7f3',
++		100: '#e5f5fa',
++		highlight: '#b3e7fe',
++		focus: '#007cba',
++	},
++};
++
++export const ALERT = {
++	yellow: '#f0b849',
++	red: '#d94f4f',
++	green: '#4ab866',
++};
++
++export const COLORS = {
++	...BASE,
++	darkGrey: DARK_GRAY,
++	darkOpacity: DARK_OPACITY,
++	darkOpacityLight: DARK_OPACITY_LIGHT,
++	lightGray: LIGHT_GRAY,
++	lightGrayLight: LIGHT_OPACITY_LIGHT,
++	blue: BLUE,
++	alert: ALERT,
++};
++
++export default COLORS;
+diff --git a/packages/components/src/utils/colors.js b/packages/components/src/utils/colors.js
+new file mode 100644
+index 00000000000000..c4a1c6dae93324
+--- /dev/null
++++ b/packages/components/src/utils/colors.js
+@@ -0,0 +1,40 @@
++/**
++ * External dependencies
++ */
++import { get } from 'lodash';
++import hexRgb from 'hex-rgb';
++/**
++ * Internal dependencies
++ */
++import { COLORS } from './colors-values';
++
++/**
++ * Generating a CSS complient rgba() color value.
++ *
++ * @param {string} hexValue The hex value to convert to rgba().
++ * @param {number} alpha The alpha value for opacity.
++ * @return {string} The converted rgba() color value.
++ *
++ * @example
++ * rgba( '#000000', 0.5 )
++ * // rgba(0, 0, 0, 0.5)
++ */
++export function rgba( hexValue = '', alpha = 1 ) {
++	const [ r, g, b ] = hexRgb( hexValue, { format: 'array' } );
++	return `rgba(${ r }, ${ g }, ${ b }, ${ alpha })`;
++}
++
++/**
++ * Retrieves a color from the color palette.
++ *
++ * @param {string} value The value to retrieve.
++ * @return {string} The color (or fallback, if not found).
++ *
++ * @example
++ * color( 'blue.wordpress.700' )
++ * // #00669b
++ */
++export function color( value ) {
++	const fallbackColor = '#000';
++	return get( COLORS, value, fallbackColor );
++}
+diff --git a/storybook/.babelrc b/storybook/.babelrc
+index c97694a2f21a53..fe77bd84598748 100644
+--- a/storybook/.babelrc
++++ b/storybook/.babelrc
+@@ -1,6 +1,7 @@
+ {
+ 	"presets": [ "@wordpress/babel-preset-default" ],
+ 	"plugins": [
++		"babel-plugin-emotion",
+ 		"babel-plugin-inline-json-import"
+ 	]
+ }

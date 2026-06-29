@@ -1,0 +1,26 @@
+diff --git a/packages/block-editor/src/components/image-size-control/index.js b/packages/block-editor/src/components/image-size-control/index.js
+index a547732d6f7bc1..46e87de60f2fc8 100644
+--- a/packages/block-editor/src/components/image-size-control/index.js
++++ b/packages/block-editor/src/components/image-size-control/index.js
+@@ -48,8 +48,6 @@ export default function ImageSizeControl( {
+ 			) }
+ 			{ isResizable && (
+ 				<div className="block-editor-image-size-control">
+-					<p>{ __( 'Image dimensions' ) }</p>
+-
+ 					<HStack align="baseline" spacing="3">
+ 						<NumberControl
+ 							className="block-editor-image-size-control__width"
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1c9fb763995e99..4e5599d9eade76 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++-   `ImageSizeControl`: Remove the "Image Dimensions" label ([#49414](https://github.com/WordPress/gutenberg/pull/49414)).
++
+ ### Internal
+ 
+ -   `Animate`: Convert to TypeScript ([#49243](https://github.com/WordPress/gutenberg/pull/49243)).

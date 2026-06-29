@@ -1,0 +1,28 @@
+diff --git a/packages/components/src/ui/context/test/context-system-provider.js b/packages/components/src/ui/context/test/context-system-provider.js
+index 8b052bc06c27fe..e92f637634d826 100644
+--- a/packages/components/src/ui/context/test/context-system-provider.js
++++ b/packages/components/src/ui/context/test/context-system-provider.js
+@@ -61,7 +61,7 @@ describe( 'props', () => {
+ 		);
+ 
+ 		expect( container ).toMatchSnapshot();
+-		expect( container.firstChild.innerHTML ).toContain( 'Code is Poetry' );
++		expect( screen.getByText( 'Code is Poetry' ) ).toBeVisible();
+ 	} );
+ 
+ 	test( 'should render _override props', () => {
+@@ -100,10 +100,11 @@ describe( 'props', () => {
+ 
+ 		expect( container ).toMatchSnapshot();
+ 
+-		const el = container.querySelector( '.test-component' );
++		const element = screen.getByText( 'Code is Poetry' );
++		expect( element ).toBeVisible();
++		expect( element ).toHaveClass( 'test-component' );
+ 
+-		expect( el.innerHTML ).toContain( 'Code is Poetry' );
+-		expect( el.innerHTML ).not.toContain( 'WordPress.org' );
++		expect( screen.queryByText( 'WordPress.org' ) ).not.toBeInTheDocument();
+ 	} );
+ } );
+ 

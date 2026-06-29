@@ -1,0 +1,76 @@
+diff --git a/packages/block-editor/src/components/block-toolbar/block-toolbar-menu.native.js b/packages/block-editor/src/components/block-toolbar/block-toolbar-menu.native.js
+index c68e4be1c40545..8fe80b3501e4fb 100644
+--- a/packages/block-editor/src/components/block-toolbar/block-toolbar-menu.native.js
++++ b/packages/block-editor/src/components/block-toolbar/block-toolbar-menu.native.js
+@@ -26,7 +26,7 @@ import {
+ import { __, sprintf } from '@wordpress/i18n';
+ import { withDispatch, withSelect, useSelect } from '@wordpress/data';
+ import { withInstanceId, compose } from '@wordpress/compose';
+-import { moreHorizontalMobile } from '@wordpress/icons';
++import { moreHorizontal } from '@wordpress/icons';
+ import { useRef, useState } from '@wordpress/element';
+ import { store as noticesStore } from '@wordpress/notices';
+ import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+@@ -255,7 +255,7 @@ const BlockActionsMenu = ( {
+ 			<ToolbarGroup>
+ 				<ToolbarButton
+ 					title={ __( 'Open Block Actions Menu' ) }
+-					icon={ moreHorizontalMobile }
++					icon={ moreHorizontal }
+ 					disabled
+ 				/>
+ 			</ToolbarGroup>
+@@ -298,7 +298,7 @@ const BlockActionsMenu = ( {
+ 			<ToolbarButton
+ 				title={ __( 'Open Block Actions Menu' ) }
+ 				onClick={ onPickerPresent }
+-				icon={ moreHorizontalMobile }
++				icon={ moreHorizontal }
+ 				extraProps={ {
+ 					hint: accessibilityHint,
+ 				} }
+diff --git a/packages/icons/CHANGELOG.md b/packages/icons/CHANGELOG.md
+index 025ec126ad98c6..d1a8338fa97999 100644
+--- a/packages/icons/CHANGELOG.md
++++ b/packages/icons/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++-  Breaking change: deprecate `moreHorizontalMobile` icon. This was added in error, and `moreHorizontal` should be used instead. ([#71172](https://github.com/WordPress/gutenberg/pull/71172))
++
+ ## 10.28.0 (2025-08-07)
+ 
+ -   Add new `dashboard` icon ([#70300](https://github.com/WordPress/gutenberg/pull/70300)).
+diff --git a/packages/icons/src/index.ts b/packages/icons/src/index.ts
+index 8dc5f3fa9fddb3..df27ad5cdc5163 100644
+--- a/packages/icons/src/index.ts
++++ b/packages/icons/src/index.ts
+@@ -177,7 +177,6 @@ export { default as menu } from './library/menu';
+ export { default as mobile } from './library/mobile';
+ export { default as more } from './library/more';
+ export { default as moreHorizontal } from './library/more-horizontal';
+-export { default as moreHorizontalMobile } from './library/more-horizontal-mobile';
+ export { default as moreVertical } from './library/more-vertical';
+ export { default as moveTo } from './library/move-to';
+ export { default as navigation } from './library/navigation';
+diff --git a/packages/icons/src/library/more-horizontal-mobile.tsx b/packages/icons/src/library/more-horizontal-mobile.tsx
+deleted file mode 100644
+index a185c34bd069b5..00000000000000
+--- a/packages/icons/src/library/more-horizontal-mobile.tsx
++++ /dev/null
+@@ -1,14 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { SVG, Path } from '@wordpress/primitives';
+-
+-const moreHorizontalMobile = (
+-	<SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+-		<Path d="M7.5 12C7.5 11.1716 6.82843 10.5 6 10.5C5.17157 10.5 4.5 11.1716 4.5 12C4.5 12.8284 5.17157 13.5 6 13.5C6.82843 13.5 7.5 12.8284 7.5 12Z" />
+-		<Path d="M13.5 12C13.5 11.1716 12.8284 10.5 12 10.5C11.1716 10.5 10.5 11.1716 10.5 12C10.5 12.8284 11.1716 13.5 12 13.5C12.8284 13.5 13.5 12.8284 13.5 12Z" />
+-		<Path d="M19.5 12C19.5 11.1716 18.8284 10.5 18 10.5C17.1716 10.5 16.5 11.1716 16.5 12C16.5 12.8284 17.1716 13.5 18 13.5C18.8284 13.5 19.5 12.8284 19.5 12Z" />
+-	</SVG>
+-);
+-
+-export default moreHorizontalMobile;

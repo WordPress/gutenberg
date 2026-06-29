@@ -1,0 +1,363 @@
+diff --git a/packages/base-styles/_mixins.scss b/packages/base-styles/_mixins.scss
+index 1930948052aae7..506d12af84b2ff 100644
+--- a/packages/base-styles/_mixins.scss
++++ b/packages/base-styles/_mixins.scss
+@@ -318,6 +318,7 @@
+ 	height: $radio-input-size-sm;
+ 	min-width: $radio-input-size-sm;
+ 	max-width: $radio-input-size-sm;
++	position: relative;
+ 
+ 	@include break-small() {
+ 		height: $radio-input-size;
+@@ -328,9 +329,12 @@
+ 
+ 	&:checked::before {
+ 		box-sizing: inherit;
+-		width: 8px;
+-		height: 8px;
+-		transform: translate(7px, 7px);
++		width: math.div($radio-input-size-sm, 2);
++		height: math.div($radio-input-size-sm, 2);
++		position: absolute;
++		top: 50%;
++		left: 50%;
++		transform: translate(-50%, -50%);
+ 		margin: 0;
+ 		background-color: $white;
+ 
+@@ -338,7 +342,8 @@
+ 		border: 4px solid $white;
+ 
+ 		@include break-small() {
+-			transform: translate(5px, 5px);
++			width: math.div($radio-input-size, 2);
++			height: math.div($radio-input-size, 2);
+ 		}
+ 	}
+ 
+@@ -351,7 +356,7 @@
+ 
+ 	&:checked {
+ 		background: var(--wp-admin-theme-color);
+-		border-color: var(--wp-admin-theme-color);
++		border: none;
+ 	}
+ }
+ 
+diff --git a/packages/base-styles/_variables.scss b/packages/base-styles/_variables.scss
+index dfbc1e15ac2ffc..b10eeeb167dadf 100644
+--- a/packages/base-styles/_variables.scss
++++ b/packages/base-styles/_variables.scss
+@@ -93,7 +93,7 @@ $border-width-tab: 1.5px;
+ $helptext-font-size: 12px;
+ $radius-round: 50%;
+ $radius-block-ui: 2px;
+-$radio-input-size: 20px;
++$radio-input-size: 16px;
+ $radio-input-size-sm: 24px; // Width & height for small viewports.
+ 
+ // Deprecated, please avoid using these.
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6e8250529edd81..d58d7db9828967 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,10 @@
+ -   `CustomSelectControl`: Stabilize `__experimentalShowSelectedHint` and `options[]. __experimentalHint` props ([#63248](https://github.com/WordPress/gutenberg/pull/63248)).
+ -   `SelectControl`: Add `"minimal"` variant ([#63265](https://github.com/WordPress/gutenberg/pull/63265)).
+ -   `FontSizePicker`: tidy up internal logic ([#63553](https://github.com/WordPress/gutenberg/pull/63553)).
++-   `ToggleControl`: Update spacing and appearance to adhere to 4px baseline, slightly reducing footprint. Make label treatment and focus styles consistent with `RadioControl` and `CheckboxControl`. ([#63490](https://github.com/WordPress/gutenberg/pull/63490)).
++-   `CheckboxControl`: Slightly reduced footprint. Make label treatment, focus styles, and spacing consistent with `ToggleControl` and `RadioControl`. ([#63490](https://github.com/WordPress/gutenberg/pull/63490)).
++-   `RadioControl`: Slightly reduced footprint. Make label treatment, focus styles, and spacing consistent with `ToggleControl` and `CheckboxControl`. ([#63490](https://github.com/WordPress/gutenberg/pull/63490)).
++-   `FormToggle`: Update spacing and appearance to adhere to 4px baseline, slightly reducing footprint. Make label treatment and focus styles consistent with `RadioControl` and `CheckboxControl`. ([#63490](https://github.com/WordPress/gutenberg/pull/63490)).
+ -   `RangeControl`: Allow external `id` prop ([#63761](https://github.com/WordPress/gutenberg/pull/63761)).
+ 
+ ### Internal
+diff --git a/packages/components/src/checkbox-control/style.scss b/packages/components/src/checkbox-control/style.scss
+index 9fd563d85161fe..25394ba645ee80 100644
+--- a/packages/components/src/checkbox-control/style.scss
++++ b/packages/components/src/checkbox-control/style.scss
+@@ -3,7 +3,7 @@
+ 	--checkbox-input-size: 24px; // Width & height for small viewports.
+ 
+ 	@include break-small() {
+-		--checkbox-input-size: 20px;
++		--checkbox-input-size: 16px;
+ 	}
+ 
+ 	--checkbox-input-margin: #{$grid-unit-10};
+@@ -12,6 +12,7 @@
+ .components-checkbox-control__label {
+ 	// Ensure label is aligned with checkbox along X axis
+ 	line-height: var(--checkbox-input-size);
++	cursor: pointer;
+ }
+ 
+ .components-checkbox-control__input[type="checkbox"] {
+@@ -61,6 +62,7 @@
+ 	vertical-align: middle;
+ 	width: var(--checkbox-input-size);
+ 	aspect-ratio: 1;
++	line-height: 1; // maintains proper height even with WP common.css
+ 	flex-shrink: 0;
+ }
+ 
+diff --git a/packages/components/src/form-toggle/style.scss b/packages/components/src/form-toggle/style.scss
+index d04ad4c651f862..6fd25590b56e41 100644
+--- a/packages/components/src/form-toggle/style.scss
++++ b/packages/components/src/form-toggle/style.scss
+@@ -1,15 +1,16 @@
+ @use "sass:math";
+ 
+-$toggle-width: 36px;
+-$toggle-height: 18px;
++$toggle-width: $grid-unit-40;
++$toggle-height: $grid-unit-20;
+ $toggle-border-width: 1px;
+-$thumb-size:  $toggle-height - ($toggle-border-width * 6);
++$toggle-thumb-size:  $grid-unit-15;
+ 
+ $transition-duration: 0.2s;
+ 
+ .components-form-toggle {
+ 	position: relative;
+ 	display: inline-block;
++	height: $toggle-height;
+ 
+ 	// Unchecked state.
+ 	.components-form-toggle__track {
+@@ -19,7 +20,7 @@ $transition-duration: 0.2s;
+ 		box-sizing: border-box;
+ 		vertical-align: top;
+ 		background-color: $white;
+-		border: $toggle-border-width solid $gray-900;
++		border: $toggle-border-width solid $gray-600;
+ 		width: $toggle-width;
+ 		height: $toggle-height;
+ 		border-radius: math.div($toggle-height, 2);
+@@ -49,10 +50,10 @@ $transition-duration: 0.2s;
+ 		display: block;
+ 		position: absolute;
+ 		box-sizing: border-box;
+-		top: $toggle-border-width * 3;
+-		left: $toggle-border-width * 3;
+-		width: $thumb-size;
+-		height: $thumb-size;
++		top: math.div($toggle-thumb-size, 6);
++		left: math.div($toggle-thumb-size, 6);
++		width: $toggle-thumb-size;
++		height: $toggle-thumb-size;
+ 		border-radius: 50%;
+ 		transition:
+ 			$transition-duration transform ease,
+@@ -61,7 +62,7 @@ $transition-duration: 0.2s;
+ 		background-color: $gray-900;
+ 
+ 		// Transparent border acts as a fill in Windows High Contrast Mode.
+-		border: math.div($thumb-size, 2) solid transparent;
++		border: math.div($toggle-thumb-size, 2) solid transparent;
+ 	}
+ 
+ 	// Checked state.
+@@ -116,4 +117,8 @@ $transition-duration: 0.2s;
+ 	&::before {
+ 		content: "";
+ 	}
++
++	&:not(:disabled, [aria-disabled="true"]) {
++		cursor: pointer;
++	}
+ }
+diff --git a/packages/components/src/radio-control/index.tsx b/packages/components/src/radio-control/index.tsx
+index 11b9e32b9118b6..2a6f8e37cc8cb5 100644
+--- a/packages/components/src/radio-control/index.tsx
++++ b/packages/components/src/radio-control/index.tsx
+@@ -73,7 +73,7 @@ export function RadioControl(
+ 			help={ help }
+ 			className={ clsx( className, 'components-radio-control' ) }
+ 		>
+-			<VStack spacing={ 3 }>
++			<VStack spacing={ 2 }>
+ 				{ options.map( ( option, index ) => (
+ 					<div
+ 						key={ `${ id }-${ index }` }
+diff --git a/packages/components/src/radio-control/style.scss b/packages/components/src/radio-control/style.scss
+index 239ef38e65cc3b..a3d4abeb630d0d 100644
+--- a/packages/components/src/radio-control/style.scss
++++ b/packages/components/src/radio-control/style.scss
+@@ -13,7 +13,7 @@
+ 	cursor: pointer;
+ 
+ 	&:focus {
+-		box-shadow: 0 0 0 ($border-width * 2) $components-color-background, 0 0 0 ($border-width * 2 + $border-width-focus-fallback) $components-color-accent;
++		@include button-style-outset__focus(var(--wp-admin-theme-color));
+ 	}
+ 
+ 	&:checked {
+@@ -29,4 +29,9 @@
+ 
+ .components-radio-control__label {
+ 	cursor: pointer;
++	line-height: $radio-input-size-sm;
++
++	@include break-small() {
++		line-height: $radio-input-size;
++	}
+ }
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index c73ee1cb639eed..70317f4a2d0e0b 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -49,6 +49,7 @@
+ @import "./tab-panel/style.scss";
+ @import "./text-control/style.scss";
+ @import "./tip/style.scss";
++@import "./toggle-control/style.scss";
+ @import "./toolbar/toolbar/style.scss";
+ @import "./toolbar/toolbar-button/style.scss";
+ @import "./toolbar/toolbar-group/style.scss";
+diff --git a/packages/components/src/toggle-control/index.tsx b/packages/components/src/toggle-control/index.tsx
+index ed62aea7755cd9..89ef34f6d6e5e6 100644
+--- a/packages/components/src/toggle-control/index.tsx
++++ b/packages/components/src/toggle-control/index.tsx
+@@ -3,6 +3,7 @@
+  */
+ import type { ChangeEvent, ForwardedRef } from 'react';
+ import { css } from '@emotion/react';
++import clsx from 'clsx';
+ 
+ /**
+  * WordPress dependencies
+@@ -87,11 +88,17 @@ export function ToggleControl(
+ 	return (
+ 		<BaseControl
+ 			id={ id }
+-			help={ helpLabel }
++			help={
++				helpLabel && (
++					<span className="components-toggle-control__help">
++						{ helpLabel }
++					</span>
++				)
++			}
+ 			className={ classes }
+ 			__nextHasNoMarginBottom
+ 		>
+-			<HStack justify="flex-start" spacing={ 3 }>
++			<HStack justify="flex-start" spacing={ 2 }>
+ 				<FormToggle
+ 					id={ id }
+ 					checked={ checked }
+@@ -103,7 +110,9 @@ export function ToggleControl(
+ 				<FlexBlock
+ 					as="label"
+ 					htmlFor={ id }
+-					className="components-toggle-control__label"
++					className={ clsx( 'components-toggle-control__label', {
++						'is-disabled': disabled,
++					} ) }
+ 				>
+ 					{ label }
+ 				</FlexBlock>
+diff --git a/packages/components/src/toggle-control/style.scss b/packages/components/src/toggle-control/style.scss
+new file mode 100644
+index 00000000000000..263a372b00fe84
+--- /dev/null
++++ b/packages/components/src/toggle-control/style.scss
+@@ -0,0 +1,11 @@
++.components-toggle-control__label {
++	line-height: $toggle-height;
++
++	&:not(.is-disabled) {
++		cursor: pointer;
++	}
++}
++
++.components-toggle-control__help {
++	margin-left: $toggle-width + $grid-unit-10;
++}
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/enable-custom-fields.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/enable-custom-fields.js.snap
+index 1ecf664fa091f3..567b2bcbf8f885 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/enable-custom-fields.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/enable-custom-fields.js.snap
+@@ -29,7 +29,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
+-  gap: calc(4px * 3);
++  gap: calc(4px * 2);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+@@ -135,7 +135,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
+-  gap: calc(4px * 3);
++  gap: calc(4px * 2);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+@@ -231,7 +231,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
+-  gap: calc(4px * 3);
++  gap: calc(4px * 2);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+@@ -338,7 +338,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
+-  gap: calc(4px * 3);
++  gap: calc(4px * 2);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/meta-boxes-section.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/meta-boxes-section.js.snap
+index a872e7e0c1945d..f9fb99199a3197 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/meta-boxes-section.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/meta-boxes-section.js.snap
+@@ -29,7 +29,7 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
+-  gap: calc(4px * 3);
++  gap: calc(4px * 2);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+@@ -141,7 +141,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
+-  gap: calc(4px * 3);
++  gap: calc(4px * 2);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+@@ -337,7 +337,7 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
+   -webkit-flex-direction: row;
+   -ms-flex-direction: row;
+   flex-direction: row;
+-  gap: calc(4px * 3);
++  gap: calc(4px * 2);
+   -webkit-box-pack: start;
+   -ms-flex-pack: start;
+   -webkit-justify-content: flex-start;
+diff --git a/packages/preferences/src/components/preference-base-option/style.scss b/packages/preferences/src/components/preference-base-option/style.scss
+index d3caa60f8c8037..32040d0c9093a6 100644
+--- a/packages/preferences/src/components/preference-base-option/style.scss
++++ b/packages/preferences/src/components/preference-base-option/style.scss
+@@ -2,9 +2,4 @@
+ 	& + & {
+ 		margin-top: $grid-unit-20;
+ 	}
+-
+-	.components-base-control__help {
+-		margin-top: 0;
+-		margin-left: 48px;
+-	}
+ }

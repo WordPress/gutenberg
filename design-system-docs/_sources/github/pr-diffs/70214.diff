@@ -1,0 +1,35 @@
+diff --git a/packages/components/src/color-picker/hsl-input.tsx b/packages/components/src/color-picker/hsl-input.tsx
+index 8d2b0c7c444899..f48bf0d916f5d7 100644
+--- a/packages/components/src/color-picker/hsl-input.tsx
++++ b/packages/components/src/color-picker/hsl-input.tsx
+@@ -64,7 +64,7 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
+ 			<InputWithSlider
+ 				min={ 0 }
+ 				max={ 359 }
+-				label="Hue"
++				label="Hue (HSL H value)"
+ 				abbreviation="H"
+ 				value={ colorValue.h }
+ 				onChange={ ( nextH: number ) => {
+@@ -95,7 +95,7 @@ export const HslInput = ( { color, onChange, enableAlpha }: HslInputProps ) => {
+ 				<InputWithSlider
+ 					min={ 0 }
+ 					max={ 100 }
+-					label="Alpha"
++					label="Alpha (HSL A value)"
+ 					abbreviation="A"
+ 					value={ Math.trunc( 100 * colorValue.a ) }
+ 					onChange={ ( nextA: number ) => {
+diff --git a/packages/components/src/color-picker/rgb-input.tsx b/packages/components/src/color-picker/rgb-input.tsx
+index 21872db8472072..c5ea541e601162 100644
+--- a/packages/components/src/color-picker/rgb-input.tsx
++++ b/packages/components/src/color-picker/rgb-input.tsx
+@@ -48,7 +48,7 @@ export const RgbInput = ( { color, onChange, enableAlpha }: RgbInputProps ) => {
+ 				<InputWithSlider
+ 					min={ 0 }
+ 					max={ 100 }
+-					label="Alpha"
++					label="Alpha (RGB A value)"
+ 					abbreviation="A"
+ 					value={ Math.trunc( a * 100 ) }
+ 					onChange={ ( nextA: number ) =>

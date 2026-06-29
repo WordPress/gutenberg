@@ -1,0 +1,214 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 992e14622eb761..8d415af0f7e25f 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Enhancements
+ 
++-   `Field.Label`, `Fieldset.Legend`: Add `hideFromVision` prop to visually hide the label while keeping it accessible to screen readers ([#76052](https://github.com/WordPress/gutenberg/pull/76052)).
+ -   `Dialog`: Add `--wp-ui-dialog-z-index` CSS custom property for legacy z-index compatibility ([#75874](https://github.com/WordPress/gutenberg/pull/75874)).
+ 
+ ### Bug Fixes
+diff --git a/packages/ui/src/form/primitives/field/label.tsx b/packages/ui/src/form/primitives/field/label.tsx
+index d85560b8117bd5..bd50a2f11be8ad 100644
+--- a/packages/ui/src/form/primitives/field/label.tsx
++++ b/packages/ui/src/form/primitives/field/label.tsx
+@@ -2,10 +2,14 @@ import clsx from 'clsx';
+ import { Field as _Field } from '@base-ui/react/field';
+ import { forwardRef } from '@wordpress/element';
+ import fieldStyles from '../../../utils/css/field.module.css';
++import { VisuallyHidden } from '../../../visually-hidden';
+ import type { FieldLabelProps } from './types';
+ 
+ export const Label = forwardRef< HTMLLabelElement, FieldLabelProps >(
+-	function Label( { className, variant, ...restProps }, ref ) {
++	function Label(
++		{ className, hideFromVision, variant, ...restProps },
++		ref
++	) {
+ 		return (
+ 			<_Field.Label
+ 				ref={ ref }
+@@ -14,6 +18,10 @@ export const Label = forwardRef< HTMLLabelElement, FieldLabelProps >(
+ 					variant && fieldStyles[ `is-${ variant }` ],
+ 					className
+ 				) }
++				{ ...( hideFromVision && {
++					render: <VisuallyHidden />,
++					nativeLabel: false,
++				} ) }
+ 				{ ...restProps }
+ 			/>
+ 		);
+diff --git a/packages/ui/src/form/primitives/field/stories/index.story.tsx b/packages/ui/src/form/primitives/field/stories/index.story.tsx
+index 88054a735750da..b59a77e7e7bbbb 100644
+--- a/packages/ui/src/form/primitives/field/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/field/stories/index.story.tsx
+@@ -100,6 +100,23 @@ export const UsingAriaLabelledby: StoryObj< typeof Field.Root > = {
+ 	},
+ };
+ 
++/**
++ * When `hideFromVision` is set on `Field.Label`, the label is visually
++ * hidden but remains accessible to screen readers.
++ */
++export const HiddenLabel: StoryObj< typeof Field.Root > = {
++	args: {
++		children: (
++			<>
++				<Field.Label hideFromVision>Label</Field.Label>
++				<Field.Control
++					render={ <input type="text" placeholder="Placeholder" /> }
++				/>
++			</>
++		),
++	},
++};
++
+ /**
+  * To add rich content (such as links) to the description, use `Field.Details`.
+  *
+diff --git a/packages/ui/src/form/primitives/field/test/index.test.tsx b/packages/ui/src/form/primitives/field/test/index.test.tsx
+index 62af68ce9d512c..69aeddcab6ce2f 100644
+--- a/packages/ui/src/form/primitives/field/test/index.test.tsx
++++ b/packages/ui/src/form/primitives/field/test/index.test.tsx
+@@ -34,6 +34,19 @@ describe( 'Field', () => {
+ 		expect( detailsRef.current ).toBeInstanceOf( HTMLDivElement );
+ 	} );
+ 
++	it( 'keeps the accessible name when the label is visually hidden', () => {
++		render(
++			<Field.Root>
++				<Field.Label hideFromVision>Field Label</Field.Label>
++				<Field.Control render={ <input /> } />
++			</Field.Root>
++		);
++
++		expect(
++			screen.getByRole( 'textbox', { name: 'Field Label' } )
++		).toBeVisible();
++	} );
++
+ 	it( 'renders details with a semantically associated description for the control', () => {
+ 		render(
+ 			<Field.Root>
+diff --git a/packages/ui/src/form/primitives/field/types.ts b/packages/ui/src/form/primitives/field/types.ts
+index 30bd8bd35ed4a8..db1db868ef71f3 100644
+--- a/packages/ui/src/form/primitives/field/types.ts
++++ b/packages/ui/src/form/primitives/field/types.ts
+@@ -33,6 +33,13 @@ export type FieldLabelProps = ComponentProps< typeof Field.Label > & {
+ 	 * elements such as links or buttons.
+ 	 */
+ 	children?: Field.Label.Props[ 'children' ];
++	/**
++	 * Whether to visually hide the label while keeping it accessible
++	 * to screen readers.
++	 *
++	 * @default false
++	 */
++	hideFromVision?: boolean;
+ 	/**
+ 	 * The visual variant of the label.
+ 	 *
+diff --git a/packages/ui/src/form/primitives/fieldset/legend.tsx b/packages/ui/src/form/primitives/fieldset/legend.tsx
+index d891618016b150..aa5b37e83ae0e9 100644
+--- a/packages/ui/src/form/primitives/fieldset/legend.tsx
++++ b/packages/ui/src/form/primitives/fieldset/legend.tsx
+@@ -2,14 +2,21 @@ import clsx from 'clsx';
+ import { Fieldset as _Fieldset } from '@base-ui/react/fieldset';
+ import { forwardRef } from '@wordpress/element';
+ import fieldStyles from '../../../utils/css/field.module.css';
++import { VisuallyHidden } from '../../../visually-hidden';
+ import type { FieldsetLegendProps } from './types';
+ 
+ export const FieldsetLegend = forwardRef< HTMLDivElement, FieldsetLegendProps >(
+-	function FieldsetLegend( { className, ...restProps }, ref ) {
++	function FieldsetLegend(
++		{ className, hideFromVision, ...restProps },
++		ref
++	) {
+ 		return (
+ 			<_Fieldset.Legend
+ 				ref={ ref }
+ 				className={ clsx( fieldStyles.label, className ) }
++				{ ...( hideFromVision && {
++					render: <VisuallyHidden />,
++				} ) }
+ 				{ ...restProps }
+ 			/>
+ 		);
+diff --git a/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx b/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
+index 259c2df4cd5b77..4c7b2815704adf 100644
+--- a/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/fieldset/stories/index.story.tsx
+@@ -33,6 +33,26 @@ export const Default: Story = {
+ 	},
+ };
+ 
++/**
++ * When `hideFromVision` is set on `Fieldset.Legend`, the legend is visually
++ * hidden but remains accessible to screen readers.
++ */
++export const HiddenLegend: Story = {
++	args: {
++		children: (
++			<>
++				<Fieldset.Legend hideFromVision>Legend</Fieldset.Legend>
++				{ [ 'Apples', 'Bananas' ].map( ( fruit ) => (
++					// eslint-disable-next-line jsx-a11y/label-has-associated-control
++					<label key={ fruit }>
++						<input type="checkbox" /> { fruit }
++					</label>
++				) ) }
++			</>
++		),
++	},
++};
++
+ /**
+  * To add rich content (such as links) to the description, use `Fieldset.Details`.
+  *
+diff --git a/packages/ui/src/form/primitives/fieldset/test/index.test.tsx b/packages/ui/src/form/primitives/fieldset/test/index.test.tsx
+index 7ed17ab0f6c017..da4ddcd3e378a1 100644
+--- a/packages/ui/src/form/primitives/fieldset/test/index.test.tsx
++++ b/packages/ui/src/form/primitives/fieldset/test/index.test.tsx
+@@ -29,6 +29,20 @@ describe( 'Fieldset', () => {
+ 		expect( detailsRef.current ).toBeInstanceOf( HTMLDivElement );
+ 	} );
+ 
++	it( 'keeps the accessible name when the legend is visually hidden', () => {
++		render(
++			<Fieldset.Root>
++				<Fieldset.Legend hideFromVision>
++					Choose your options
++				</Fieldset.Legend>
++			</Fieldset.Root>
++		);
++
++		expect(
++			screen.getByRole( 'group', { name: 'Choose your options' } )
++		).toBeVisible();
++	} );
++
+ 	it( 'accessibly associates description when Fieldset.Description is present', () => {
+ 		render(
+ 			<Fieldset.Root>
+diff --git a/packages/ui/src/form/primitives/fieldset/types.ts b/packages/ui/src/form/primitives/fieldset/types.ts
+index 6c182e2e076411..5d838e68a7d4d7 100644
+--- a/packages/ui/src/form/primitives/fieldset/types.ts
++++ b/packages/ui/src/form/primitives/fieldset/types.ts
+@@ -7,6 +7,13 @@ export type FieldsetRootProps = ComponentProps< typeof _Fieldset.Root > & {
+ 
+ export type FieldsetLegendProps = ComponentProps< typeof _Fieldset.Legend > & {
+ 	children?: React.ReactNode;
++	/**
++	 * Whether to visually hide the legend while keeping it accessible
++	 * to screen readers.
++	 *
++	 * @default false
++	 */
++	hideFromVision?: boolean;
+ };
+ 
+ export type FieldsetDescriptionProps = ComponentProps< 'p' > & {

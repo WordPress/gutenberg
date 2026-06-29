@@ -1,0 +1,55 @@
+diff --git a/packages/block-library/src/freeform/modal.js b/packages/block-library/src/freeform/modal.js
+index 4ed4ef4d3a07ca..35652eb29948a3 100644
+--- a/packages/block-library/src/freeform/modal.js
++++ b/packages/block-library/src/freeform/modal.js
+@@ -25,7 +25,7 @@ function ModalAuxiliaryActions( { onClick, isModalFullScreen } ) {
+ 
+ 	return (
+ 		<Button
+-			size="small"
++			size="compact"
+ 			onClick={ onClick }
+ 			icon={ fullscreen }
+ 			isPressed={ isModalFullScreen }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e5d467f22d30c8..a57859a2d82cb1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Modal`: Modal: Increase size of the Close button ([#66792](https://github.com/WordPress/gutenberg/pull/66792)).
+ -   `ToggleGroupControl`: Fix active background for `0` value ([#66855](https://github.com/WordPress/gutenberg/pull/66855)).
+ -   `SlotFill`: Fix a bug where a stale value of `fillProps` could be used ([#67000](https://github.com/WordPress/gutenberg/pull/67000)).
+ -   `ColorPalette`: Disable `Clear` button if there's no color value. ([#67108](https://github.com/WordPress/gutenberg/pull/67108)).
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 7d55c9a4d5d1e6..2dec0f65240f9b 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -335,10 +335,10 @@ function UnforwardedModal(
+ 									<>
+ 										<Spacer
+ 											marginBottom={ 0 }
+-											marginLeft={ 3 }
++											marginLeft={ 2 }
+ 										/>
+ 										<Button
+-											size="small"
++											size="compact"
+ 											onClick={ (
+ 												event: React.MouseEvent< HTMLButtonElement >
+ 											) =>
+diff --git a/packages/components/src/modal/stories/index.story.tsx b/packages/components/src/modal/stories/index.story.tsx
+index 92c922bcb8a977..880688ed5c51c3 100644
+--- a/packages/components/src/modal/stories/index.story.tsx
++++ b/packages/components/src/modal/stories/index.story.tsx
+@@ -111,7 +111,7 @@ export const WithHeaderActions: StoryFn< typeof Modal > = Template.bind( {} );
+ WithHeaderActions.args = {
+ 	...Default.args,
+ 	headerActions: (
+-		<Button icon={ fullscreen } label="Fullscreen mode" size="small" />
++		<Button icon={ fullscreen } label="Fullscreen mode" size="compact" />
+ 	),
+ 	children: <div style={ { height: '200px' } } />,
+ };

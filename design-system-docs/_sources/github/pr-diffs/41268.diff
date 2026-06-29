@@ -1,0 +1,190 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index da1c74e33a7638..92c1d75882e590 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   `ComboboxControl`: use custom prefix when generating the instanceId ([#42134](https://github.com/WordPress/gutenberg/pull/42134).
+ -   `Popover`: pass missing anchor ref to the `getAnchorRect` callback prop. ([#42076](https://github.com/WordPress/gutenberg/pull/42076)).
+ -   `Popover`: call `getAnchorRect` callback prop even if `anchorRefFallback` has no value. ([#42329](https://github.com/WordPress/gutenberg/pull/42329)).
++-   Fix `ToolTip` position to ensure it is always positioned relative to the first child of the ToolTip. ([#41268](https://github.com/WordPress/gutenberg/pull/41268))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index 7bf2d4af2907dc..1521b10a29c308 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -13,8 +13,9 @@ import {
+ 	concatChildren,
+ 	useEffect,
+ 	useState,
++	useRef,
+ } from '@wordpress/element';
+-import { useDebounce } from '@wordpress/compose';
++import { useDebounce, useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -31,29 +32,45 @@ export const TOOLTIP_DELAY = 700;
+ 
+ const eventCatcher = <div className="event-catcher" />;
+ 
+-const getDisabledElement = ( { eventHandlers, child, childrenWithPopover } ) =>
+-	cloneElement(
++const getDisabledElement = ( {
++	eventHandlers,
++	child,
++	childrenWithPopover,
++	mergedRefs,
++} ) => {
++	return cloneElement(
+ 		<span className="disabled-element-wrapper">
+ 			{ cloneElement( eventCatcher, eventHandlers ) }
+ 			{ cloneElement( child, {
+ 				children: childrenWithPopover,
++				ref: mergedRefs,
+ 			} ) }
+ 		</span>,
+-		eventHandlers
++		{ ...eventHandlers }
+ 	);
++};
+ 
+-const getRegularElement = ( { child, eventHandlers, childrenWithPopover } ) =>
+-	cloneElement( child, {
++const getRegularElement = ( {
++	child,
++	eventHandlers,
++	childrenWithPopover,
++	mergedRefs,
++} ) => {
++	return cloneElement( child, {
+ 		...eventHandlers,
+ 		children: childrenWithPopover,
++		ref: mergedRefs,
+ 	} );
++};
+ 
+ const addPopoverToGrandchildren = ( {
++	anchorRef,
+ 	grandchildren,
+ 	isOver,
++	offset,
+ 	position,
+-	text,
+ 	shortcut,
++	text,
+ } ) =>
+ 	concatChildren(
+ 		grandchildren,
+@@ -64,7 +81,8 @@ const addPopoverToGrandchildren = ( {
+ 				className="components-tooltip"
+ 				aria-hidden="true"
+ 				animate={ false }
+-				offset={ 12 }
++				offset={ offset }
++				anchorRef={ anchorRef }
+ 				__unstableShift
+ 			>
+ 				{ text }
+@@ -111,6 +129,13 @@ function Tooltip( props ) {
+ 	const [ isOver, setIsOver ] = useState( false );
+ 	const delayedSetIsOver = useDebounce( setIsOver, delay );
+ 
++	// Create a reference to the Tooltip's child, to be passed to the Popover
++	// so that the Tooltip can be correctly positioned. Also, merge with the
++	// existing ref for the first child, so that its ref is preserved.
++	const childRef = useRef( null );
++	const existingChildRef = Children.toArray( children )[ 0 ]?.ref;
++	const mergedChildRefs = useMergeRefs( [ childRef, existingChildRef ] );
++
+ 	const createMouseDown = ( event ) => {
+ 		// Preserve original child callback behavior.
+ 		emitToChild( children, 'onMouseDown', event );
+@@ -214,10 +239,12 @@ function Tooltip( props ) {
+ 		: getRegularElement;
+ 
+ 	const popoverData = {
++		anchorRef: childRef,
+ 		isOver,
++		offset: 4,
+ 		position,
+-		text,
+ 		shortcut,
++		text,
+ 	};
+ 	const childrenWithPopover = addPopoverToGrandchildren( {
+ 		grandchildren,
+@@ -228,6 +255,7 @@ function Tooltip( props ) {
+ 		child,
+ 		eventHandlers,
+ 		childrenWithPopover,
++		mergedRefs: mergedChildRefs,
+ 	} );
+ }
+ 
+diff --git a/packages/components/src/tooltip/stories/index.js b/packages/components/src/tooltip/stories/index.js
+index 5bb0166c2e5511..a76b69731b41a6 100644
+--- a/packages/components/src/tooltip/stories/index.js
++++ b/packages/components/src/tooltip/stories/index.js
+@@ -35,19 +35,34 @@ export const _default = () => {
+ 	const position = select( 'Position', positionOptions, 'top center' );
+ 	const delay = number( 'Delay', 700 );
+ 	return (
+-		<Tooltip text={ tooltipText } position={ position } delay={ delay }>
+-			<div
+-				style={ {
+-					margin: '50px auto',
+-					width: '200px',
+-					padding: '20px',
+-					textAlign: 'center',
+-					border: '1px solid #ccc',
+-				} }
+-			>
+-				Hover for more information
+-			</div>
+-		</Tooltip>
++		<>
++			<Tooltip text={ tooltipText } position={ position } delay={ delay }>
++				<div
++					style={ {
++						margin: '50px auto',
++						width: '200px',
++						padding: '20px',
++						textAlign: 'center',
++						border: '1px solid #ccc',
++					} }
++				>
++					Hover for more information
++				</div>
++			</Tooltip>
++			<Tooltip text={ tooltipText } position={ position } delay={ delay }>
++				<div
++					style={ {
++						margin: '50px auto',
++						width: 'min-content',
++						padding: '4px',
++						textAlign: 'center',
++						border: '1px solid #ccc',
++					} }
++				>
++					Small target
++				</div>
++			</Tooltip>
++		</>
+ 	);
+ };
+ 
+diff --git a/packages/components/src/tooltip/style.scss b/packages/components/src/tooltip/style.scss
+index 3de494fa60359e..9a874246568f6b 100644
+--- a/packages/components/src/tooltip/style.scss
++++ b/packages/components/src/tooltip/style.scss
+@@ -2,7 +2,7 @@
+ 	z-index: z-index(".components-tooltip");
+ 
+ 	.components-popover__content {
+-		min-width: 0;
++		min-width: min-content;
+ 	}
+ }
+ 

@@ -1,0 +1,37 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2530b66152bdc2..f7b7bdc088cee9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,10 @@
+ -   `FocalPointPicker`: Default to new 40px size ([#64456](https://github.com/WordPress/gutenberg/pull/64456)).
+ -   `DropdownMenuV2`: adopt elevation scale ([#64432](https://github.com/WordPress/gutenberg/pull/64432)).
+ 
++### Bug Fixes
++
++-   `RangeControl`: tweak mark and label absolute positioning ([#64487](https://github.com/WordPress/gutenberg/pull/64487)).
++
+ ### Internal
+ 
+ -   `Composite` v2: add `Hover` and `Typeahead` subcomponents ([#64399](https://github.com/WordPress/gutenberg/pull/64399)).
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index 89f4864aee2ea6..ec1572d2679247 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -154,7 +154,7 @@ export const Mark = styled.span`
+ 	height: ${ thumbSize }px;
+ 	left: 0;
+ 	position: absolute;
+-	top: -4px;
++	top: 9px;
+ 	width: 1px;
+ 
+ 	${ markFill };
+@@ -170,7 +170,7 @@ export const MarkLabel = styled.span`
+ 	color: ${ COLORS.gray[ 300 ] };
+ 	font-size: 11px;
+ 	position: absolute;
+-	top: 12px;
++	top: 22px;
+ 	white-space: nowrap;
+ 
+ 	${ rtl( { left: 0 } ) };

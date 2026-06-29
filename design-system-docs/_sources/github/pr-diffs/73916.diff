@@ -1,0 +1,524 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index b896a0c3a70ef8..84869a6ece40dd 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -278,7 +278,6 @@ module.exports = {
+ 					// Temporary rules until we're ready to officially deprecate the bottom margins.
+ 					...[
+ 						'BaseControl',
+-						'CheckboxControl',
+ 						'ComboboxControl',
+ 						'DimensionControl',
+ 						'FocalPointPicker',
+diff --git a/packages/block-editor/src/components/block-lock/modal.js b/packages/block-editor/src/components/block-lock/modal.js
+index deadfef137d7ff..9d5c5f03b88c04 100644
+--- a/packages/block-editor/src/components/block-lock/modal.js
++++ b/packages/block-editor/src/components/block-lock/modal.js
+@@ -114,7 +114,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
+ 					>
+ 						<li>
+ 							<CheckboxControl
+-								__nextHasNoMarginBottom
+ 								className="block-editor-block-lock-modal__options-all"
+ 								label={ __( 'Lock all' ) }
+ 								checked={ isAllChecked }
+@@ -136,7 +135,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
+ 								{ allowsEditLocking && (
+ 									<li className="block-editor-block-lock-modal__checklist-item">
+ 										<CheckboxControl
+-											__nextHasNoMarginBottom
+ 											label={ __( 'Lock editing' ) }
+ 											checked={ !! lock.edit }
+ 											onChange={ ( edit ) =>
+@@ -158,7 +156,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
+ 								) }
+ 								<li className="block-editor-block-lock-modal__checklist-item">
+ 									<CheckboxControl
+-										__nextHasNoMarginBottom
+ 										label={ __( 'Lock movement' ) }
+ 										checked={ lock.move }
+ 										onChange={ ( move ) =>
+@@ -177,7 +174,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
+ 								</li>
+ 								<li className="block-editor-block-lock-modal__checklist-item">
+ 									<CheckboxControl
+-										__nextHasNoMarginBottom
+ 										label={ __( 'Lock removal' ) }
+ 										checked={ lock.remove }
+ 										onChange={ ( remove ) =>
+diff --git a/packages/block-editor/src/components/block-manager/category.js b/packages/block-editor/src/components/block-manager/category.js
+index 79d5896b4502e4..aac62fa2d6d9f1 100644
+--- a/packages/block-editor/src/components/block-manager/category.js
++++ b/packages/block-editor/src/components/block-manager/category.js
+@@ -83,7 +83,6 @@ function BlockManagerCategory( {
+ 			className="block-editor-block-manager__category"
+ 		>
+ 			<CheckboxControl
+-				__nextHasNoMarginBottom
+ 				checked={ isAllChecked }
+ 				onChange={ toggleAllVisible }
+ 				className="block-editor-block-manager__category-title"
+diff --git a/packages/block-editor/src/components/block-manager/checklist.js b/packages/block-editor/src/components/block-manager/checklist.js
+index d5456a14355efb..558913184ece2a 100644
+--- a/packages/block-editor/src/components/block-manager/checklist.js
++++ b/packages/block-editor/src/components/block-manager/checklist.js
+@@ -17,7 +17,6 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
+ 					className="block-editor-block-manager__checklist-item"
+ 				>
+ 					<CheckboxControl
+-						__nextHasNoMarginBottom
+ 						label={ blockType.title }
+ 						checked={ value.includes( blockType.name ) }
+ 						onChange={ ( ...args ) =>
+diff --git a/packages/block-editor/src/components/block-manager/index.js b/packages/block-editor/src/components/block-manager/index.js
+index df4e3e3f1f10ea..ec8ecae98fac3c 100644
+--- a/packages/block-editor/src/components/block-manager/index.js
++++ b/packages/block-editor/src/components/block-manager/index.js
+@@ -91,7 +91,6 @@ export default function BlockManager( {
+ 						}
+ 					} }
+ 					indeterminate={ isIndeterminate }
+-					__nextHasNoMarginBottom
+ 				/>
+ 			) }
+ 			<div
+diff --git a/packages/block-editor/src/components/link-control/settings.js b/packages/block-editor/src/components/link-control/settings.js
+index 60503444457c2b..2978d5f96665a8 100644
+--- a/packages/block-editor/src/components/link-control/settings.js
++++ b/packages/block-editor/src/components/link-control/settings.js
+@@ -45,7 +45,6 @@ const LinkControlSettings = ( { value, onChange = noop, settings } ) => {
+ 			// If render property is not provided, use CheckboxControl
+ 			return (
+ 				<CheckboxControl
+-					__nextHasNoMarginBottom
+ 					className="block-editor-link-control__setting"
+ 					key={ setting.id }
+ 					label={ setting.title }
+diff --git a/packages/block-library/src/breadcrumbs/edit.js b/packages/block-library/src/breadcrumbs/edit.js
+index d46c50e12a439a..3e6de4e898199b 100644
+--- a/packages/block-library/src/breadcrumbs/edit.js
++++ b/packages/block-library/src/breadcrumbs/edit.js
+@@ -261,7 +261,6 @@ export default function BreadcrumbEdit( {
+ 			</InspectorControls>
+ 			<InspectorControls group="advanced">
+ 				<CheckboxControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Show on homepage' ) }
+ 					checked={ showOnHomePage }
+ 					onChange={ ( value ) =>
+@@ -272,7 +271,6 @@ export default function BreadcrumbEdit( {
+ 					) }
+ 				/>
+ 				<CheckboxControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Prefer taxonomy terms' ) }
+ 					checked={ prefersTaxonomy }
+ 					onChange={ ( value ) =>
+diff --git a/packages/block-library/src/navigation-link/shared/controls.js b/packages/block-library/src/navigation-link/shared/controls.js
+index 02d2148af12eb7..1dc9171e15ead1 100644
+--- a/packages/block-library/src/navigation-link/shared/controls.js
++++ b/packages/block-library/src/navigation-link/shared/controls.js
+@@ -267,7 +267,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
+ 				isShownByDefault
+ 			>
+ 				<CheckboxControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Open in new tab' ) }
+ 					checked={ opensInNewTab }
+ 					onChange={ ( value ) =>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6116a6b4dd7d8c..641462c96fcbe3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,7 +5,8 @@
+ ### Breaking Changes
+ 
+ -   Validated form controls (private API): Removed `onValidate` prop (use `onChange` to set `customValidity` messages, or add conditionals directly inside the `customValidity` prop instead) ([#73559](https://github.com/WordPress/gutenberg/pull/73559)).
+--   `FormTokenField`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#73846](https://github.com/WordPress/gutenberg/pull/73846)).
++-   `FormTokenField`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73846](https://github.com/WordPress/gutenberg/pull/73846)).
++-   `CheckboxControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73916](https://github.com/WordPress/gutenberg/pull/73916)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/checkbox-control/README.md b/packages/components/src/checkbox-control/README.md
+index 90c33a1fab78d5..e89ee489feca99 100644
+--- a/packages/components/src/checkbox-control/README.md
++++ b/packages/components/src/checkbox-control/README.md
+@@ -55,7 +55,6 @@ const MyCheckboxControl = () => {
+ 	const [ isChecked, setChecked ] = useState( true );
+ 	return (
+ 		<CheckboxControl
+-			__nextHasNoMarginBottom
+ 			label="Is author"
+ 			help="Is the user a author or not?"
+ 			checked={ isChecked }
+@@ -103,13 +102,6 @@ If indeterminate is true the state of the checkbox will be indeterminate.
+ 
+ -   Required: No
+ 
+-#### `__nextHasNoMarginBottom`: `boolean`
+-
+-Start opting into the new margin-free styles that will become the default in a future version.
+-
+--   Required: No
+--   Default: `false`
+-
+ ## Related components
+ 
+ -   To select one option from a set, and you want to show all the available options at once, use the `RadioControl` component.
+diff --git a/packages/components/src/checkbox-control/index.tsx b/packages/components/src/checkbox-control/index.tsx
+index 98cf15dd228c14..e62b5306e96beb 100644
+--- a/packages/components/src/checkbox-control/index.tsx
++++ b/packages/components/src/checkbox-control/index.tsx
+@@ -31,7 +31,6 @@ import type { WordPressComponentProps } from '../context';
+  *   const [ isChecked, setChecked ] = useState( true );
+  *   return (
+  *     <CheckboxControl
+- *       __nextHasNoMarginBottom
+  *       label="Is author"
+  *       help="Is the user a author or not?"
+  *       checked={ isChecked }
+@@ -45,7 +44,6 @@ export function CheckboxControl(
+ 	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
+ ) {
+ 	const {
+-		__nextHasNoMarginBottom,
+ 		label,
+ 		className,
+ 		heading,
+@@ -95,8 +93,7 @@ export function CheckboxControl(
+ 
+ 	return (
+ 		<BaseControl
+-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-			__associatedWPComponentName="CheckboxControl"
++			__nextHasNoMarginBottom
+ 			label={ heading }
+ 			id={ id }
+ 			help={
+diff --git a/packages/components/src/checkbox-control/stories/index.story.tsx b/packages/components/src/checkbox-control/stories/index.story.tsx
+index a2936654c8629a..85e9fd03f09269 100644
+--- a/packages/components/src/checkbox-control/stories/index.story.tsx
++++ b/packages/components/src/checkbox-control/stories/index.story.tsx
+@@ -60,7 +60,6 @@ export const Default: StoryFn< typeof CheckboxControl > = DefaultTemplate.bind(
+ 	{}
+ );
+ Default.args = {
+-	__nextHasNoMarginBottom: true,
+ 	label: 'Is author',
+ 	help: 'Is the user an author or not?',
+ };
+@@ -90,7 +89,6 @@ export const Indeterminate: StoryFn< typeof CheckboxControl > = ( {
+ 				} }
+ 			/>
+ 			<CheckboxControl
+-				__nextHasNoMarginBottom
+ 				label="Apple"
+ 				checked={ fruits.apple }
+ 				onChange={ ( apple ) =>
+@@ -101,7 +99,6 @@ export const Indeterminate: StoryFn< typeof CheckboxControl > = ( {
+ 				}
+ 			/>
+ 			<CheckboxControl
+-				__nextHasNoMarginBottom
+ 				label="Orange"
+ 				checked={ fruits.orange }
+ 				onChange={ ( orange ) =>
+@@ -116,7 +113,6 @@ export const Indeterminate: StoryFn< typeof CheckboxControl > = ( {
+ };
+ Indeterminate.args = {
+ 	label: 'Select all',
+-	__nextHasNoMarginBottom: true,
+ };
+ 
+ /**
+@@ -161,6 +157,3 @@ export const WithCustomLabel: StoryFn< typeof CheckboxControl > = ( {
+ 		</HStack>
+ 	);
+ };
+-WithCustomLabel.args = {
+-	__nextHasNoMarginBottom: true,
+-};
+diff --git a/packages/components/src/checkbox-control/test/index.tsx b/packages/components/src/checkbox-control/test/index.tsx
+index 547f479184e862..899a9b100015b3 100644
+--- a/packages/components/src/checkbox-control/test/index.tsx
++++ b/packages/components/src/checkbox-control/test/index.tsx
+@@ -20,20 +20,13 @@ const noop = () => {};
+ const getInput = () => screen.getByRole( 'checkbox' ) as HTMLInputElement;
+ 
+ const CheckboxControl = ( props: Omit< CheckboxControlProps, 'onChange' > ) => {
+-	return (
+-		<BaseCheckboxControl
+-			onChange={ noop }
+-			{ ...props }
+-			__nextHasNoMarginBottom
+-		/>
+-	);
++	return <BaseCheckboxControl onChange={ noop } { ...props } />;
+ };
+ 
+ const ControlledCheckboxControl = ( { onChange }: CheckboxControlProps ) => {
+ 	const [ isChecked, setChecked ] = useState( false );
+ 	return (
+ 		<BaseCheckboxControl
+-			__nextHasNoMarginBottom
+ 			checked={ isChecked }
+ 			onChange={ ( value ) => {
+ 				setChecked( value );
+diff --git a/packages/components/src/checkbox-control/types.ts b/packages/components/src/checkbox-control/types.ts
+index 07ab55493fc661..29461471202920 100644
+--- a/packages/components/src/checkbox-control/types.ts
++++ b/packages/components/src/checkbox-control/types.ts
+@@ -8,10 +8,7 @@ import type { ReactNode } from 'react';
+  */
+ import type { BaseControlProps } from '../base-control/types';
+ 
+-export type CheckboxControlProps = Pick<
+-	BaseControlProps,
+-	'help' | '__nextHasNoMarginBottom'
+-> & {
++export type CheckboxControlProps = Pick< BaseControlProps, 'help' > & {
+ 	/**
+ 	 * A function that receives the checked state (boolean) as input.
+ 	 */
+diff --git a/packages/components/src/validated-form-controls/components/checkbox-control.tsx b/packages/components/src/validated-form-controls/components/checkbox-control.tsx
+index 63cf0d7644f6c2..bd1472816e1072 100644
+--- a/packages/components/src/validated-form-controls/components/checkbox-control.tsx
++++ b/packages/components/src/validated-form-controls/components/checkbox-control.tsx
+@@ -17,11 +17,7 @@ const UnforwardedValidatedCheckboxControl = (
+ 		customValidity,
+ 		markWhenOptional,
+ 		...restProps
+-	}: Omit<
+-		React.ComponentProps< typeof CheckboxControl >,
+-		'__nextHasNoMarginBottom'
+-	> &
+-		ValidatedControlProps,
++	}: React.ComponentProps< typeof CheckboxControl > & ValidatedControlProps,
+ 	forwardedRef: React.ForwardedRef< HTMLInputElement >
+ ) => {
+ 	const validityTargetRef = useRef< HTMLDivElement >( null );
+@@ -40,7 +36,6 @@ const UnforwardedValidatedCheckboxControl = (
+ 			}
+ 		>
+ 			<CheckboxControl
+-				__nextHasNoMarginBottom
+ 				// TODO: Upstream limitation - CheckboxControl doesn't support uncontrolled mode, visually.
+ 				{ ...restProps }
+ 			/>
+diff --git a/packages/dataviews/src/components/dataviews-bulk-actions/index.tsx b/packages/dataviews/src/components/dataviews-bulk-actions/index.tsx
+index a011e8966209dc..81370f4b42f5a7 100644
+--- a/packages/dataviews/src/components/dataviews-bulk-actions/index.tsx
++++ b/packages/dataviews/src/components/dataviews-bulk-actions/index.tsx
+@@ -124,7 +124,6 @@ export function BulkSelectionCheckbox< Item >( {
+ 	return (
+ 		<CheckboxControl
+ 			className="dataviews-view-table-selection-checkbox"
+-			__nextHasNoMarginBottom
+ 			checked={ areAllSelected }
+ 			indeterminate={ ! areAllSelected && !! selectedItems.length }
+ 			onChange={ () => {
+diff --git a/packages/dataviews/src/components/dataviews-picker/footer.tsx b/packages/dataviews/src/components/dataviews-picker/footer.tsx
+index 5d64d421dce23e..2151937ca817b9 100644
+--- a/packages/dataviews/src/components/dataviews-picker/footer.tsx
++++ b/packages/dataviews/src/components/dataviews-picker/footer.tsx
+@@ -46,7 +46,6 @@ function BulkSelectionCheckbox< Item >( {
+ 	return (
+ 		<CheckboxControl
+ 			className="dataviews-view-table-selection-checkbox"
+-			__nextHasNoMarginBottom
+ 			checked={ areAllSelected }
+ 			indeterminate={ ! areAllSelected && !! selectedItems.length }
+ 			onChange={ () => {
+diff --git a/packages/dataviews/src/components/dataviews-selection-checkbox/index.tsx b/packages/dataviews/src/components/dataviews-selection-checkbox/index.tsx
+index 886b29146c14fe..5be541e937fd49 100644
+--- a/packages/dataviews/src/components/dataviews-selection-checkbox/index.tsx
++++ b/packages/dataviews/src/components/dataviews-selection-checkbox/index.tsx
+@@ -39,7 +39,6 @@ export default function DataViewsSelectionCheckbox< Item >( {
+ 	return (
+ 		<CheckboxControl
+ 			className="dataviews-selection-checkbox"
+-			__nextHasNoMarginBottom
+ 			aria-label={ selectionLabel }
+ 			aria-disabled={ disabled }
+ 			checked={ checked }
+diff --git a/packages/editor/src/components/entities-saved-states/entity-record-item.js b/packages/editor/src/components/entities-saved-states/entity-record-item.js
+index 74b090a3941ac9..c5b6f43fc9d214 100644
+--- a/packages/editor/src/components/entities-saved-states/entity-record-item.js
++++ b/packages/editor/src/components/entities-saved-states/entity-record-item.js
+@@ -55,7 +55,6 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
+ 		<>
+ 			<PanelRow>
+ 				<CheckboxControl
+-					__nextHasNoMarginBottom
+ 					label={
+ 						decodeEntities( entityRecordTitle ) || __( 'Untitled' )
+ 					}
+diff --git a/packages/editor/src/components/post-pending-status/index.js b/packages/editor/src/components/post-pending-status/index.js
+index 352570c44a6630..225f2a44e4f0d2 100644
+--- a/packages/editor/src/components/post-pending-status/index.js
++++ b/packages/editor/src/components/post-pending-status/index.js
+@@ -30,7 +30,6 @@ export function PostPendingStatus() {
+ 	return (
+ 		<PostPendingStatusCheck>
+ 			<CheckboxControl
+-				__nextHasNoMarginBottom
+ 				label={ __( 'Pending review' ) }
+ 				checked={ status === 'pending' }
+ 				onChange={ togglePendingStatus }
+diff --git a/packages/editor/src/components/post-pingbacks/index.js b/packages/editor/src/components/post-pingbacks/index.js
+index 2ec9a4a78c54d6..57f48bf14ab083 100644
+--- a/packages/editor/src/components/post-pingbacks/index.js
++++ b/packages/editor/src/components/post-pingbacks/index.js
+@@ -25,7 +25,6 @@ function PostPingbacks() {
+ 
+ 	return (
+ 		<CheckboxControl
+-			__nextHasNoMarginBottom
+ 			label={ __( 'Enable pingbacks & trackbacks' ) }
+ 			checked={ pingStatus === 'open' }
+ 			onChange={ onTogglePingback }
+diff --git a/packages/editor/src/components/post-publish-panel/index.js b/packages/editor/src/components/post-publish-panel/index.js
+index 1fd36f9f69d7a2..85fb40c3d225b4 100644
+--- a/packages/editor/src/components/post-publish-panel/index.js
++++ b/packages/editor/src/components/post-publish-panel/index.js
+@@ -137,7 +137,6 @@ export class PostPublishPanel extends Component {
+ 				</div>
+ 				<div className="editor-post-publish-panel__footer">
+ 					<CheckboxControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Always show pre-publish checks.' ) }
+ 						checked={ isPublishSidebarEnabled }
+ 						onChange={ onTogglePublishSidebar }
+diff --git a/packages/editor/src/components/post-status/index.js b/packages/editor/src/components/post-status/index.js
+index 3ca5988028c39b..52c62940be1764 100644
+--- a/packages/editor/src/components/post-status/index.js
++++ b/packages/editor/src/components/post-status/index.js
+@@ -218,7 +218,6 @@ export default function PostStatus() {
+ 											className="editor-change-status__password-fieldset"
+ 										>
+ 											<CheckboxControl
+-												__nextHasNoMarginBottom
+ 												label={ __(
+ 													'Password protected'
+ 												) }
+diff --git a/packages/editor/src/components/post-sticky/index.js b/packages/editor/src/components/post-sticky/index.js
+index 145a70a0faf0b3..55a46a256e2ded 100644
+--- a/packages/editor/src/components/post-sticky/index.js
++++ b/packages/editor/src/components/post-sticky/index.js
+@@ -32,7 +32,6 @@ export default function PostSticky() {
+ 				help={ __( 'Pin this post to the top of the blog.' ) }
+ 				checked={ postSticky }
+ 				onChange={ () => editPost( { sticky: ! postSticky } ) }
+-				__nextHasNoMarginBottom
+ 			/>
+ 		</PostStickyCheck>
+ 	);
+diff --git a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+index 9bced2f5d80ab8..519ea7c1daf4a6 100644
+--- a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
++++ b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+@@ -367,7 +367,6 @@ export function HierarchicalTermSelector( { slug } ) {
+ 					className="editor-post-taxonomies__hierarchical-terms-choice"
+ 				>
+ 					<CheckboxControl
+-						__nextHasNoMarginBottom
+ 						checked={ terms.indexOf( term.id ) !== -1 }
+ 						onChange={ () => {
+ 							const termId = parseInt( term.id, 10 );
+diff --git a/packages/editor/src/components/start-page-options/index.js b/packages/editor/src/components/start-page-options/index.js
+index 77f0de22b9680c..7fd7ae95d24140 100644
+--- a/packages/editor/src/components/start-page-options/index.js
++++ b/packages/editor/src/components/start-page-options/index.js
+@@ -124,7 +124,6 @@ function StartPageOptionsModal( { onClose } ) {
+ 			>
+ 				<FlexItem>
+ 					<CheckboxControl
+-						__nextHasNoMarginBottom
+ 						checked={ showStartPatterns }
+ 						label={ __(
+ 							'Always show starter patterns for new pages'
+diff --git a/packages/fields/src/fields/password/edit.tsx b/packages/fields/src/fields/password/edit.tsx
+index 75226c1f93f15b..1d2f0c7c226bc9 100644
+--- a/packages/fields/src/fields/password/edit.tsx
++++ b/packages/fields/src/fields/password/edit.tsx
+@@ -38,7 +38,6 @@ function PasswordEdit( {
+ 			className="fields-controls__password"
+ 		>
+ 			<CheckboxControl
+-				__nextHasNoMarginBottom
+ 				label={ __( 'Password protected' ) }
+ 				help={ __( 'Only visible to those who know the password' ) }
+ 				checked={ showPassword }
+diff --git a/packages/fields/src/fields/ping-status/index.tsx b/packages/fields/src/fields/ping-status/index.tsx
+index 116ea986bc8663..896723ab2ff90a 100644
+--- a/packages/fields/src/fields/ping-status/index.tsx
++++ b/packages/fields/src/fields/ping-status/index.tsx
+@@ -25,7 +25,6 @@ function PingStatusEdit( {
+ 
+ 	return (
+ 		<CheckboxControl
+-			__nextHasNoMarginBottom
+ 			label={ __( 'Enable pingbacks & trackbacks' ) }
+ 			checked={ pingStatus === 'open' }
+ 			onChange={ onTogglePingback }
+diff --git a/packages/format-library/src/link/css-classes-setting.js b/packages/format-library/src/link/css-classes-setting.js
+index 36d5afe7934c07..fbcc903f894d9e 100644
+--- a/packages/format-library/src/link/css-classes-setting.js
++++ b/packages/format-library/src/link/css-classes-setting.js
+@@ -58,7 +58,6 @@ const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
+ 			<VisuallyHidden as="legend">{ setting.title }</VisuallyHidden>
+ 			<VStack spacing={ 3 }>
+ 				<CheckboxControl
+-					__nextHasNoMarginBottom
+ 					label={ setting.title }
+ 					onChange={ handleCheckboxChange }
+ 					checked={ isSettingActive || hasValue }
+diff --git a/packages/global-styles-ui/src/font-library/collection-font-variant.tsx b/packages/global-styles-ui/src/font-library/collection-font-variant.tsx
+index 679da08f8019e8..70c6fc430cbf24 100644
+--- a/packages/global-styles-ui/src/font-library/collection-font-variant.tsx
++++ b/packages/global-styles-ui/src/font-library/collection-font-variant.tsx
+@@ -34,7 +34,6 @@ function CollectionFontVariant( {
+ 				<CheckboxControl
+ 					checked={ selected }
+ 					onChange={ handleToggleActivation }
+-					__nextHasNoMarginBottom
+ 					id={ checkboxId }
+ 				/>
+ 				<label htmlFor={ checkboxId }>
+diff --git a/packages/global-styles-ui/src/font-library/font-collection.tsx b/packages/global-styles-ui/src/font-library/font-collection.tsx
+index c5891976b7dedd..f65bc0d692b8a1 100644
+--- a/packages/global-styles-ui/src/font-library/font-collection.tsx
++++ b/packages/global-styles-ui/src/font-library/font-collection.tsx
+@@ -423,7 +423,6 @@ function FontCollection( { slug }: { slug: string } ) {
+ 								checked={ isSelectAllChecked }
+ 								onChange={ toggleSelectAll }
+ 								indeterminate={ isIndeterminate }
+-								__nextHasNoMarginBottom
+ 							/>
+ 							<VStack spacing={ 0 }>
+ 								{ /*
+diff --git a/packages/global-styles-ui/src/font-library/installed-fonts.tsx b/packages/global-styles-ui/src/font-library/installed-fonts.tsx
+index 72a760ef46d37c..8d093c336641bb 100644
+--- a/packages/global-styles-ui/src/font-library/installed-fonts.tsx
++++ b/packages/global-styles-ui/src/font-library/installed-fonts.tsx
+@@ -408,7 +408,6 @@ function InstalledFonts() {
+ 									checked={ isSelectAllChecked }
+ 									onChange={ toggleSelectAll }
+ 									indeterminate={ isIndeterminate }
+-									__nextHasNoMarginBottom
+ 								/>
+ 								<Spacer margin={ 8 } />
+ 								{ /*
+diff --git a/packages/global-styles-ui/src/font-library/library-font-variant.tsx b/packages/global-styles-ui/src/font-library/library-font-variant.tsx
+index db585fc3e63eb7..4e8133d7e4aa08 100644
+--- a/packages/global-styles-ui/src/font-library/library-font-variant.tsx
++++ b/packages/global-styles-ui/src/font-library/library-font-variant.tsx
+@@ -49,7 +49,6 @@ function LibraryFontVariant( {
+ 				<CheckboxControl
+ 					checked={ isInstalled }
+ 					onChange={ handleToggleActivation }
+-					__nextHasNoMarginBottom
+ 					id={ checkboxId }
+ 				/>
+ 				<label htmlFor={ checkboxId }>

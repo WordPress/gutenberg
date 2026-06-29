@@ -1,0 +1,671 @@
+diff --git a/packages/components/src/date-time/test/utils.test.ts b/packages/components/src/date-time/test/utils.test.ts
+index b855fa9c772913..56257fbf1cc8c9 100644
+--- a/packages/components/src/date-time/test/utils.test.ts
++++ b/packages/components/src/date-time/test/utils.test.ts
+@@ -11,7 +11,7 @@ import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
+ /**
+  * Internal dependencies
+  */
+-import { inputToDate } from '../utils';
++import { inputToDate, isValidDate, getDaysInMonth } from '../utils';
+ 
+ describe( 'inputToDate', () => {
+ 	let originalSettings: DateSettings;
+@@ -225,3 +225,55 @@ describe( 'inputToDate', () => {
+ 		} );
+ 	} );
+ } );
++
++describe( 'isValidDate', () => {
++	it( 'should return true for valid dates', () => {
++		expect( isValidDate( new Date( '2025-02-05' ) ) ).toBe( true );
++		expect( isValidDate( new Date( 2025, 1, 5 ) ) ).toBe( true );
++		expect( isValidDate( new Date() ) ).toBe( true );
++	} );
++
++	it( 'should return false for Invalid Date', () => {
++		expect( isValidDate( new Date( 'invalid' ) ) ).toBe( false );
++		expect( isValidDate( new Date( NaN ) ) ).toBe( false );
++	} );
++
++	it( 'should return false for Date created with invalid string', () => {
++		expect( isValidDate( new Date( 'not-a-date' ) ) ).toBe( false );
++	} );
++} );
++
++describe( 'getDaysInMonth', () => {
++	it( 'should return 31 for January', () => {
++		expect( getDaysInMonth( 2025, 1 ) ).toBe( 31 );
++	} );
++
++	it( 'should return 28 for February in non-leap year', () => {
++		expect( getDaysInMonth( 2025, 2 ) ).toBe( 28 );
++		expect( getDaysInMonth( 2023, 2 ) ).toBe( 28 );
++		expect( getDaysInMonth( 2100, 2 ) ).toBe( 28 ); // Century year, not leap
++	} );
++
++	it( 'should return 29 for February in leap year', () => {
++		expect( getDaysInMonth( 2024, 2 ) ).toBe( 29 );
++		expect( getDaysInMonth( 2000, 2 ) ).toBe( 29 ); // Century year divisible by 400
++		expect( getDaysInMonth( 2028, 2 ) ).toBe( 29 );
++	} );
++
++	it( 'should return 30 for April, June, September, November', () => {
++		expect( getDaysInMonth( 2025, 4 ) ).toBe( 30 );
++		expect( getDaysInMonth( 2025, 6 ) ).toBe( 30 );
++		expect( getDaysInMonth( 2025, 9 ) ).toBe( 30 );
++		expect( getDaysInMonth( 2025, 11 ) ).toBe( 30 );
++	} );
++
++	it( 'should return 31 for March, May, July, August, October, December', () => {
++		expect( getDaysInMonth( 2025, 3 ) ).toBe( 31 );
++		expect( getDaysInMonth( 2025, 5 ) ).toBe( 31 );
++		expect( getDaysInMonth( 2025, 7 ) ).toBe( 31 );
++		expect( getDaysInMonth( 2025, 8 ) ).toBe( 31 );
++		expect( getDaysInMonth( 2025, 10 ) ).toBe( 31 );
++		expect( getDaysInMonth( 2025, 12 ) ).toBe( 31 );
++	} );
++} );
++
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index 245446736e8ab9..36e7ea1b62c64a 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -33,6 +33,8 @@ import {
+ 	buildPadInputStateReducer,
+ 	validateInputElementTarget,
+ 	setInConfiguredTimezone,
++	isValidDate,
++	getDaysInMonth,
+ } from '../utils';
+ import { TIMEZONELESS_FORMAT } from '../constants';
+ import { TimeInput } from './time-input';
+@@ -71,6 +73,11 @@ export function TimePicker( {
+ 		startOfMinute( inputToDate( currentTime ?? new Date() ) )
+ 	);
+ 
++	// Key to force re-render of inputs when values are clamped.
++	// Incrementing this remounts the input, resetting its internal state to match the controlled value.
++	const [ inputResetKey, setInputResetKey ] = useState( 0 );
++	const resetInputs = () => setInputResetKey( ( key ) => key + 1 );
++
+ 	// Reset the state when currentTime changed.
+ 	// TODO: useEffect() shouldn't be used like this, causes an unnecessary render
+ 	useEffect( () => {
+@@ -112,16 +119,82 @@ export function TimePicker( {
+ 				return;
+ 			}
+ 
+-			// We can safely assume value is a number if target is valid.
++			const stringValue = String( value ).trim();
+ 			const numberValue = Number( value );
+ 
++			// Get current date components in configured timezone.
++			const currentMonth = Number( formatDate( 'n', date ) );
++			const currentYear = Number( formatDate( 'Y', date ) );
++			const currentDay = Number( formatDate( 'j', date ) );
++
++			// Detect if field was cleared or contains incomplete/invalid input.
++			const previousValue = method === 'date' ? currentDay : currentYear;
++			const isEmpty = stringValue === '';
++			const isIncompleteYear = method === 'year' && numberValue < 1000;
++			// When a number input is cleared and blurred, the browser sets it to min.
++			// Read the min from the element rather than hardcoding it.
++			const target = event.target as HTMLInputElement;
++			const htmlMin = Number( target.min );
++			const wasResetByBrowser = numberValue === htmlMin && previousValue !== htmlMin;
++			const isCleared = isEmpty || isIncompleteYear || wasResetByBrowser;
++
++			if ( isCleared ) {
++				resetInputs();
++				return;
++			}
++
++			let updates: { date?: number; year?: number } = {};
++			let wasClamped = false;
++
++			if ( method === 'date' ) {
++				// Validate day: must be 1-31 and valid for current month/year.
++				// Clamp to valid range (consistent with hour/minute behavior).
++				const maxDays = getDaysInMonth( currentYear, currentMonth );
++				if ( isNaN( numberValue ) ) {
++					resetInputs();
++					return;
++				}
++				const clampedDay = Math.max( 1, Math.min( numberValue, maxDays ) );
++				wasClamped = clampedDay !== numberValue;
++				updates = { date: clampedDay };
++			}
++
++			if ( method === 'year' ) {
++				// Validate year: must be 1000-9999.
++				// Clamp to valid range (consistent with hour/minute behavior).
++				if ( isNaN( numberValue ) ) {
++					resetInputs();
++					return;
++				}
++				const clampedYear = Math.max( 1000, Math.min( numberValue, 9999 ) );
++				wasClamped = clampedYear !== numberValue;
++
++				// Re-validate day for new year (leap year handling).
++				// If current day exceeds max days in the new year/month, clamp it.
++				const maxDays = getDaysInMonth( clampedYear, currentMonth );
++				const validDay = Math.min( currentDay, maxDays );
++
++				updates = { year: clampedYear };
++				if ( validDay !== currentDay ) {
++					updates.date = validDay;
++					wasClamped = true;
++				}
++			}
++
+ 			// Internal date is UTC-normalized, but the field should be updated
+ 			// as if in the configured timezone.
+-			const newDate = setInConfiguredTimezone( date, {
+-				[ method ]: numberValue,
+-			} );
+-			setDate( newDate );
+-			onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
++			const newDate = setInConfiguredTimezone( date, updates );
++
++			// Only update if the new date is valid.
++			if ( isValidDate( newDate ) ) {
++				setDate( newDate );
++				onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
++
++				// If value was clamped, force re-render of inputs to show corrected value.
++				if ( wasClamped ) {
++					resetInputs();
++				}
++			}
+ 		};
+ 		return callback;
+ 	};
+@@ -142,7 +215,7 @@ export function TimePicker( {
+ 
+ 	const dayField = (
+ 		<DayInput
+-			key="day"
++			key={ `day-${ inputResetKey }` }
+ 			className="components-datetime__time-field components-datetime__time-field-day" // Unused, for backwards compatibility.
+ 			label={ __( 'Day' ) }
+ 			hideLabelFromVision
+@@ -157,6 +230,7 @@ export function TimePicker( {
+ 			isDragEnabled={ false }
+ 			isShiftStepEnabled={ false }
+ 			onChange={ buildNumberControlChangeCallback( 'date' ) }
++			__unstableStateReducer={ buildPadInputStateReducer( 2 ) }
+ 		/>
+ 	);
+ 
+@@ -170,13 +244,27 @@ export function TimePicker( {
+ 				value={ month }
+ 				options={ monthOptions }
+ 				onChange={ ( value ) => {
++					const newMonth = Number( value );
++					const currentDay = Number( formatDate( 'j', date ) );
++					const currentYear = Number( formatDate( 'Y', date ) );
++
++					// Check if current day is valid for new month.
++					// Clamp day to max valid day for the new month (e.g., Jan 31 -> Feb 28).
++					const maxDays = getDaysInMonth( currentYear, newMonth );
++					const validDay = Math.min( currentDay, maxDays );
++
+ 					// Internal date is UTC-normalized, but the field should be updated
+ 					// as if in the configured timezone.
+ 					const newDate = setInConfiguredTimezone( date, {
+-						month: Number( value ) - 1,
++						month: newMonth - 1,
++						date: validDay,
+ 					} );
+-					setDate( newDate );
+-					onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
++
++					// Only update if the new date is valid.
++					if ( isValidDate( newDate ) ) {
++						setDate( newDate );
++						onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
++					}
+ 				} }
+ 			/>
+ 		</MonthSelectWrapper>
+@@ -184,7 +272,7 @@ export function TimePicker( {
+ 
+ 	const yearField = (
+ 		<YearInput
+-			key="year"
++			key={ `year-${ inputResetKey }` }
+ 			className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
+ 			label={ __( 'Year' ) }
+ 			hideLabelFromVision
+diff --git a/packages/components/src/date-time/time/test/index.tsx b/packages/components/src/date-time/time/test/index.tsx
+index 6a9eb2327a996c..56b454d5aba511 100644
+--- a/packages/components/src/date-time/time/test/index.tsx
++++ b/packages/components/src/date-time/time/test/index.tsx
+@@ -591,4 +591,365 @@ describe( 'TimePicker', () => {
+ 			} );
+ 		} );
+ 	} );
++
++	describe( 'date validation', () => {
++		it( 'should clamp day when month changes to shorter month', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2025-01-31T10:00:00" // Jan 31
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const monthInput = screen.getByLabelText( 'Month' );
++			await user.selectOptions( monthInput, '02' ); // Feb (28 days in 2025)
++
++			// Should clamp day to 28 (Feb max in non-leap year)
++			expect( onChangeSpy ).toHaveBeenCalledWith( '2025-02-28T10:00:00' );
++		} );
++
++		it( 'should clamp day when changing from 31-day month to 30-day month', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2025-03-31T10:00:00" // Mar 31
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const monthInput = screen.getByLabelText( 'Month' );
++			await user.selectOptions( monthInput, '04' ); // April (30 days)
++
++			// Should clamp day to 30 (April max)
++			expect( onChangeSpy ).toHaveBeenCalledWith( '2025-04-30T10:00:00' );
++		} );
++
++		it( 'should handle leap year day validation when year changes', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2024-02-29T10:00:00" // Leap year Feb 29
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const yearInput = screen.getByLabelText( 'Year' );
++			await user.clear( yearInput );
++			await user.type( yearInput, '2025' ); // Non-leap year
++			await user.keyboard( '{Tab}' );
++
++			// Should clamp day to 28 (Feb max in non-leap year)
++			expect( onChangeSpy ).toHaveBeenCalledWith( '2025-02-28T10:00:00' );
++		} );
++
++		it( 'should not change day when staying within valid range for new month', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2025-01-15T10:00:00" // Jan 15
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const monthInput = screen.getByLabelText( 'Month' );
++			await user.selectOptions( monthInput, '02' ); // Feb (28 days, but 15 is valid)
++
++			// Day 15 is valid for Feb, should not change
++			expect( onChangeSpy ).toHaveBeenCalledWith( '2025-02-15T10:00:00' );
++		} );
++
++		it( 'should revert year when typing value below minimum (< 1000)', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2025-02-15T10:00:00"
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const yearInput = screen.getByLabelText( 'Year' );
++			await user.clear( yearInput );
++			await user.type( yearInput, '999' ); // Invalid: not a 4-digit year
++			await user.keyboard( '{Tab}' );
++
++			// Invalid years (<1000) should revert to original, not clamp
++			expect( onChangeSpy ).not.toHaveBeenCalled();
++			// Input should revert to the original value
++			expect( screen.getByLabelText( 'Year' ) ).toHaveValue( 2025 );
++		} );
++
++		it( 'should clamp year above maximum (> 9999) to 9999', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2025-02-15T10:00:00"
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const yearInput = screen.getByLabelText( 'Year' );
++			await user.clear( yearInput );
++			await user.type( yearInput, '10000' ); // Exceeds max, will be clamped to 9999
++			await user.keyboard( '{Tab}' );
++
++			// HTML5 validation clamps to max, so 9999 is emitted
++			expect( onChangeSpy ).toHaveBeenCalledWith( '9999-02-15T10:00:00' );
++			// Input should show the clamped value
++			expect( yearInput ).toHaveValue( 9999 );
++		} );
++
++		it( 'should revert day when typing value below minimum (< 1)', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2025-02-15T10:00:00"
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const dayInput = screen.getByLabelText( 'Day' );
++			await user.clear( dayInput );
++			await user.type( dayInput, '0' ); // Invalid: 0 is not a valid day
++			await user.keyboard( '{Tab}' );
++
++			// Invalid day (0, clamped to 1 by HTML5) should revert to original
++			expect( onChangeSpy ).not.toHaveBeenCalled();
++			// Input should revert to the original value
++			expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 15 );
++		} );
++
++		it( 'should clamp day above absolute maximum (> 31) to 31', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2025-01-15T10:00:00" // January has 31 days
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const dayInput = screen.getByLabelText( 'Day' );
++			await user.clear( dayInput );
++			await user.type( dayInput, '32' ); // Exceeds max, will be clamped to 31
++			await user.keyboard( '{Tab}' );
++
++			// HTML5 validation clamps to max, so 31 is emitted (valid for Jan)
++			expect( onChangeSpy ).toHaveBeenCalledWith( '2025-01-31T10:00:00' );
++			// Input should show the clamped value
++			expect( dayInput ).toHaveValue( 31 );
++		} );
++
++		it( 'should clamp day exceeding month maximum to max day', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2025-02-15T10:00:00"
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const dayInput = screen.getByLabelText( 'Day' );
++			await user.clear( dayInput );
++			await user.type( dayInput, '30' ); // Exceeds Feb max, will be clamped to 28
++			await user.keyboard( '{Tab}' );
++
++			// Should emit onChange with clamped day
++			expect( onChangeSpy ).toHaveBeenCalledWith( '2025-02-28T10:00:00' );
++			// Input should show the clamped value (key-based reset forces re-render)
++			expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 28 );
++		} );
++
++		it( 'should clamp day 29 to 28 in February of non-leap year', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2025-02-15T10:00:00" // 2025 is not a leap year
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const dayInput = screen.getByLabelText( 'Day' );
++			await user.clear( dayInput );
++			await user.type( dayInput, '29' ); // Exceeds Feb 2025 max, will be clamped to 28
++			await user.keyboard( '{Tab}' );
++
++			// Should emit onChange with clamped day
++			expect( onChangeSpy ).toHaveBeenCalledWith( '2025-02-28T10:00:00' );
++			// Input should show the clamped value (key-based reset forces re-render)
++			expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 28 );
++		} );
++
++		it( 'should accept day 29 in February of leap year', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2024-02-15T10:00:00" // 2024 is a leap year
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const dayInput = screen.getByLabelText( 'Day' );
++			await user.clear( dayInput );
++			await user.type( dayInput, '29' ); // Valid: Feb 2024 has 29 days
++			await user.keyboard( '{Tab}' );
++
++			// Should emit onChange - 29 is valid for Feb in leap year
++			expect( onChangeSpy ).toHaveBeenCalledWith( '2024-02-29T10:00:00' );
++			// Input should show the new valid value
++			expect( dayInput ).toHaveValue( 29 );
++		} );
++
++		it( 'should clamp day 31 to 30 in 30-day month', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2025-04-15T10:00:00" // April has 30 days
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const dayInput = screen.getByLabelText( 'Day' );
++			await user.clear( dayInput );
++			await user.type( dayInput, '31' ); // Exceeds April max, will be clamped to 30
++			await user.keyboard( '{Tab}' );
++
++			// Should emit onChange with clamped day
++			expect( onChangeSpy ).toHaveBeenCalledWith( '2025-04-30T10:00:00' );
++			// Input should show the clamped value (key-based reset forces re-render)
++			expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 30 );
++		} );
++
++		it( 'should revert year to original when cleared and blurred', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2026-02-15T10:00:00"
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const yearInput = screen.getByLabelText( 'Year' );
++			await user.clear( yearInput );
++			await user.keyboard( '{Tab}' );
++
++			// Should not emit onChange when reverting
++			expect( onChangeSpy ).not.toHaveBeenCalled();
++			// Input should revert to the original value
++			expect( screen.getByLabelText( 'Year' ) ).toHaveValue( 2026 );
++		} );
++
++		it( 'should revert day to original when cleared and blurred', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2025-02-15T10:00:00"
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const dayInput = screen.getByLabelText( 'Day' );
++			await user.clear( dayInput );
++			await user.keyboard( '{Tab}' );
++
++			// Should not emit onChange when reverting
++			expect( onChangeSpy ).not.toHaveBeenCalled();
++			// Input should revert to the original value
++			expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 15 );
++		} );
++
++		it( 'should never emit Invalid Date strings', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2025-02-15T10:00:00"
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			// Try various month changes
++			const monthInput = screen.getByLabelText( 'Month' );
++			await user.selectOptions( monthInput, '03' );
++			await user.selectOptions( monthInput, '04' );
++			await user.selectOptions( monthInput, '02' );
++
++			// Verify no Invalid Date was emitted in any call
++			onChangeSpy.mock.calls.forEach( ( call ) => {
++				const dateStr = call[ 0 ] as string;
++				expect( dateStr ).not.toContain( 'Invalid' );
++				expect( dateStr ).not.toContain( 'NaN' );
++
++				// Also verify it parses to a valid Date
++				const parsed = new Date( dateStr );
++				expect( Number.isNaN( parsed.getTime() ) ).toBe( false );
++			} );
++		} );
++
++		it( 'should allow valid day changes', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2025-02-15T10:00:00"
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const dayInput = screen.getByLabelText( 'Day' );
++			await user.clear( dayInput );
++			await user.type( dayInput, '20' );
++			await user.keyboard( '{Tab}' );
++
++			expect( onChangeSpy ).toHaveBeenCalledWith( '2025-02-20T10:00:00' );
++		} );
++
++		it( 'should allow valid year changes', async () => {
++			const user = userEvent.setup();
++			const onChangeSpy = jest.fn();
++
++			render(
++				<TimePicker
++					currentTime="2025-02-15T10:00:00"
++					onChange={ onChangeSpy }
++				/>
++			);
++
++			const yearInput = screen.getByLabelText( 'Year' );
++			await user.clear( yearInput );
++			await user.type( yearInput, '2030' );
++			await user.keyboard( '{Tab}' );
++
++			expect( onChangeSpy ).toHaveBeenCalledWith( '2030-02-15T10:00:00' );
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/date-time/utils.ts b/packages/components/src/date-time/utils.ts
+index 8e95a1dfa8e1da..d4784bd7faebfd 100644
+--- a/packages/components/src/date-time/utils.ts
++++ b/packages/components/src/date-time/utils.ts
+@@ -148,7 +148,36 @@ export function setInConfiguredTimezone(
+ 	const timezoneless = `${ year }-${ month }-${ day }T${ hours }:${ minutes }:${ seconds }`;
+ 
+ 	// Parse as WordPress-configured timezone time and convert to a UTC instant.
+-	return new UTCDateMini( getDate( timezoneless ).getTime() );
++	const result = new UTCDateMini( getDate( timezoneless ).getTime() );
++
++	// If the constructed date is invalid, return the original date unchanged.
++	if ( ! isValidDate( result ) ) {
++		return date;
++	}
++
++	return result;
++}
++
++/**
++ * Checks if a Date object is valid (not Invalid Date).
++ *
++ * @param date A Date object to validate
++ * @return True if the date is valid, false if it's an Invalid Date
++ */
++export function isValidDate( date: Date ): boolean {
++	return ! isNaN( date.getTime() );
++}
++
++/**
++ * Gets the number of days in a given month.
++ *
++ * @param year  The year (e.g., 2025)
++ * @param month The month (1-indexed, 1-12)
++ * @return The number of days in the month
++ */
++export function getDaysInMonth( year: number, month: number ): number {
++	// Using day 0 of the next month gives the last day of the target month
++	return new Date( year, month, 0 ).getDate();
+ }
+ 
+ /**
+diff --git a/packages/editor/src/components/post-schedule/index.js b/packages/editor/src/components/post-schedule/index.js
+index e324e40896d379..26737a86e106f2 100644
+--- a/packages/editor/src/components/post-schedule/index.js
++++ b/packages/editor/src/components/post-schedule/index.js
+@@ -55,9 +55,11 @@ export function PrivatePostSchedule( {
+ 	const { editPost } = useDispatch( editorStore );
+ 	const onUpdateDate = ( date ) => editPost( { date } );
+ 
+-	const [ previewedMonth, setPreviewedMonth ] = useState(
+-		startOfMonth( new Date( postDate ) )
+-	);
++	const [ previewedMonth, setPreviewedMonth ] = useState( () => {
++		const date = new Date( postDate );
++		// Fallback to current date if postDate is invalid (defense in depth).
++		return startOfMonth( isNaN( date.getTime() ) ? new Date() : date );
++	} );
+ 
+ 	// Pick up published and scheduled site posts.
+ 	const eventsByPostType = useSelect(

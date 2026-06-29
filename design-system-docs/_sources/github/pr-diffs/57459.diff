@@ -1,0 +1,230 @@
+diff --git a/packages/components/src/icon/index.tsx b/packages/components/src/icon/index.tsx
+index 3fbf4d18c5a00e..69a629ffbae150 100644
+--- a/packages/components/src/icon/index.tsx
++++ b/packages/components/src/icon/index.tsx
+@@ -18,6 +18,8 @@ import { SVG } from '@wordpress/primitives';
+  */
+ import Dashicon from '../dashicon';
+ import type { IconKey as DashiconIconKey } from '../dashicon/types';
++import { withCurrentColor } from './with-currentcolor';
++export { withCurrentColor } from './with-currentcolor';
+ 
+ export type IconType =
+ 	| DashiconIconKey
+@@ -39,6 +41,13 @@ interface BaseProps {
+ 	 * @default `20` when a Dashicon is rendered, `24` for all other icons.
+ 	 */
+ 	size?: number;
++	/**
++	 * Whether the icon should be rendered in the CSS `currentColor`.
++	 * Only has an effect on SVG elements.
++	 *
++	 * @default false
++	 */
++	currentColor?: boolean;
+ }
+ 
+ type AdditionalProps< T > = T extends ComponentType< infer U >
+@@ -52,6 +61,7 @@ export type Props = BaseProps & AdditionalProps< IconType >;
+ function Icon( {
+ 	icon = null,
+ 	size = 'string' === typeof icon ? 20 : 24,
++	currentColor = false,
+ 	...additionalProps
+ }: Props ) {
+ 	if ( 'string' === typeof icon ) {
+@@ -71,15 +81,16 @@ function Icon( {
+ 	}
+ 
+ 	if ( 'function' === typeof icon ) {
+-		return createElement( icon, {
++		const element = createElement( icon, {
+ 			size,
+ 			...additionalProps,
+ 		} );
++		return currentColor ? withCurrentColor( element ) : element;
+ 	}
+ 
+ 	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
+ 		const appliedProps = {
+-			...icon.props,
++			...( currentColor ? withCurrentColor( icon ) : icon ).props,
+ 			width: size,
+ 			height: size,
+ 			...additionalProps,
+@@ -89,11 +100,12 @@ function Icon( {
+ 	}
+ 
+ 	if ( isValidElement( icon ) ) {
+-		return cloneElement( icon, {
++		const element = cloneElement( icon, {
+ 			// @ts-ignore Just forwarding the size prop along
+ 			size,
+ 			...additionalProps,
+ 		} );
++		return currentColor ? withCurrentColor( element ) : element;
+ 	}
+ 
+ 	return icon;
+diff --git a/packages/components/src/icon/stories/index.story.tsx b/packages/components/src/icon/stories/index.story.tsx
+index 7d61be8df7f3ce..4da01ca9d653e3 100644
+--- a/packages/components/src/icon/stories/index.story.tsx
++++ b/packages/components/src/icon/stories/index.story.tsx
+@@ -32,42 +32,77 @@ Default.args = {
+ 	icon: wordpress,
+ };
+ 
+-export const FillColor: StoryFn< typeof Icon > = ( args ) => {
++/**
++ * When `icon` is an SVG element, the `currentColor` prop can be used to
++ * render it in the CSS `currentColor`.
++ */
++export const WithCurrentColor: StoryFn< typeof Icon > = ( args ) => {
+ 	return (
+ 		<div
+ 			style={ {
+-				fill: 'blue',
++				background: 'blue',
++				color: 'white',
+ 			} }
+ 		>
+ 			<Icon { ...args } />
++			Some text
+ 		</div>
+ 	);
+ };
+-FillColor.args = {
++WithCurrentColor.args = {
+ 	...Default.args,
++	currentColor: true,
+ };
+ 
++const renderIcon = ( { size = 24, ...restProps } ) => (
++	<SVG width={ size } height={ size } viewBox="0 0 24 24" { ...restProps }>
++		<Path d="M5 4v3h5.5v12h3V7H19V4z" />
++	</SVG>
++);
++
+ export const WithAFunction = Template.bind( {} );
+ WithAFunction.args = {
+ 	...Default.args,
+-	icon: () => (
+-		<SVG>
+-			<Path d="M5 4v3h5.5v12h3V7H19V4z" />
+-		</SVG>
+-	),
++	icon: renderIcon,
+ };
+-
+-const MyIconComponent = () => (
+-	<SVG>
++WithAFunction.parameters = {
++	docs: {
++		source: {
++			code: `
++const renderIcon = ( { size = 24, ...restProps } ) => (
++	<SVG width={ size } height={ size } viewBox="0 0 24 24" { ...restProps }>
+ 		<Path d="M5 4v3h5.5v12h3V7H19V4z" />
+ 	</SVG>
+ );
+ 
++<Icon icon={ renderIcon } />
++			`,
++		},
++	},
++};
++
++const MyIconComponent = renderIcon;
++
+ export const WithAComponent = Template.bind( {} );
+ WithAComponent.args = {
+ 	...Default.args,
+ 	icon: MyIconComponent,
+ };
++WithAComponent.parameters = {
++	docs: {
++		source: {
++			code: `
++const MyIconComponent = ( { size = 24, ...restProps } ) => (
++	<SVG width={ size } height={ size } viewBox="0 0 24 24" { ...restProps }>
++		<Path d="M5 4v3h5.5v12h3V7H19V4z" />
++	</SVG>
++);
++
++<Icon icon={ <MyIconComponent /> } />
++			`,
++		},
++	},
++};
+ 
+ export const WithAnSVG = Template.bind( {} );
+ WithAnSVG.args = {
+diff --git a/packages/components/src/icon/style.scss b/packages/components/src/icon/style.scss
+new file mode 100644
+index 00000000000000..0b6cb1d9b2084f
+--- /dev/null
++++ b/packages/components/src/icon/style.scss
+@@ -0,0 +1,3 @@
++.components-icon__with-currentcolor {
++	fill: currentColor;
++}
+diff --git a/packages/components/src/icon/with-currentcolor.tsx b/packages/components/src/icon/with-currentcolor.tsx
+new file mode 100644
+index 00000000000000..46ed3c86ed003d
+--- /dev/null
++++ b/packages/components/src/icon/with-currentcolor.tsx
+@@ -0,0 +1,30 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { cloneElement } from '@wordpress/element';
++
++/**
++ * Modifies an element to use the `currentColor` for the fills in its SVG descendants.
++ *
++ * In most cases you should be able to use the `currentColor` prop of the `Icon` component instead.
++ *
++ * ```jsx
++ * import { wordpress } from '@wordpress/icons';
++ * import { RangeControl } from '@wordpress/components';
++ *
++ * <RangeControl beforeIcon={ withCurrentColor( wordpress ) } />
++ * ```
++ */
++export function withCurrentColor( element: React.ReactElement ) {
++	return cloneElement( element, {
++		className: classnames(
++			'components-icon__with-currentcolor',
++			element.props.className
++		),
++	} );
++}
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 02dce83f66dcc6..54fc83ae3e2132 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -31,6 +31,7 @@
+ @import "./form-token-field/style.scss";
+ @import "./guide/style.scss";
+ @import "./higher-order/navigate-regions/style.scss";
++@import "./icon/style.scss";
+ @import "./menu-group/style.scss";
+ @import "./menu-item/style.scss";
+ @import "./menu-items-choice/style.scss";
+diff --git a/packages/components/src/theme/styles.ts b/packages/components/src/theme/styles.ts
+index 650852d3461757..58e517b932ba2a 100644
+--- a/packages/components/src/theme/styles.ts
++++ b/packages/components/src/theme/styles.ts
+@@ -30,4 +30,6 @@ export const colorVariables = ( { colors }: ThemeOutputValues ) => {
+ 	];
+ };
+ 
+-export const Wrapper = styled.div``;
++export const Wrapper = styled.div`
++	color: var( --wp-components-color-foreground );
++`;

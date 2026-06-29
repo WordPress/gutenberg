@@ -1,0 +1,25 @@
+diff --git a/packages/block-editor/src/components/global-styles/color-panel.js b/packages/block-editor/src/components/global-styles/color-panel.js
+index 04d295a0b0320d..7b49ab453bb453 100644
+--- a/packages/block-editor/src/components/global-styles/color-panel.js
++++ b/packages/block-editor/src/components/global-styles/color-panel.js
+@@ -272,14 +272,17 @@ function ColorPanelDropdown( {
+ 									</Tabs.TabList>
+ 
+ 									{ tabs.map( ( tab ) => {
++										const { key: tabKey, ...restTabProps } =
++											tab;
+ 										return (
+ 											<Tabs.TabPanel
+-												key={ tab.key }
+-												tabId={ tab.key }
++												key={ tabKey }
++												tabId={ tabKey }
+ 												focusable={ false }
+ 											>
+ 												<ColorPanelTab
+-													{ ...tab }
++													key={ tabKey }
++													{ ...restTabProps }
+ 													colorGradientControlSettings={
+ 														colorGradientControlSettings
+ 													}

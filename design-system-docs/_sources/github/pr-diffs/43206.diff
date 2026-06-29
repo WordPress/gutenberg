@@ -1,0 +1,112 @@
+diff --git a/package-lock.json b/package-lock.json
+index e58d76c7d2a927..6040fda35936ca 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -2837,25 +2837,24 @@
+ 			}
+ 		},
+ 		"@floating-ui/core": {
+-			"version": "0.6.2",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/core/-/core-0.6.2.tgz",
+-			"integrity": "sha512-jktYRmZwmau63adUG3GKOAVCofBXkk55S/zQ94XOorAHhwqFIOFAy1rSp2N0Wp6/tGbe9V3u/ExlGZypyY17rg=="
++			"version": "1.0.1",
++			"resolved": "https://registry.npmjs.org/@floating-ui/core/-/core-1.0.1.tgz",
++			"integrity": "sha512-bO37brCPfteXQfFY0DyNDGB3+IMe4j150KFQcgJ5aBP295p9nBGeHEs/p0czrRbtlHq4Px/yoPXO/+dOCcF4uA=="
+ 		},
+ 		"@floating-ui/dom": {
+-			"version": "0.4.5",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/dom/-/dom-0.4.5.tgz",
+-			"integrity": "sha512-b+prvQgJt8pieaKYMSJBXHxX/DYwdLsAWxKYqnO5dO2V4oo/TYBZJAUQCVNjTWWsrs6o4VDrNcP9+E70HAhJdw==",
++			"version": "1.0.1",
++			"resolved": "https://registry.npmjs.org/@floating-ui/dom/-/dom-1.0.1.tgz",
++			"integrity": "sha512-wBDiLUKWU8QNPNOTAFHiIAkBv1KlHauG2AhqjSeh2H+wR8PX+AArXfz8NkRexH5PgMJMmSOS70YS89AbWYh5dA==",
+ 			"requires": {
+-				"@floating-ui/core": "^0.6.2"
++				"@floating-ui/core": "^1.0.1"
+ 			}
+ 		},
+ 		"@floating-ui/react-dom": {
+-			"version": "0.6.3",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-0.6.3.tgz",
+-			"integrity": "sha512-hC+pS5D6AgS2wWjbmSQ6UR6Kpy+drvWGJIri6e1EDGADTPsCaa4KzCgmCczHrQeInx9tqs81EyDmbKJYY2swKg==",
++			"version": "1.0.0",
++			"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-1.0.0.tgz",
++			"integrity": "sha512-uiOalFKPG937UCLm42RxjESTWUVpbbatvlphQAU6bsv+ence6IoVG8JOUZcy8eW81NkU+Idiwvx10WFLmR4MIg==",
+ 			"requires": {
+-				"@floating-ui/dom": "^0.4.5",
+-				"use-isomorphic-layout-effect": "^1.1.1"
++				"@floating-ui/dom": "^1.0.0"
+ 			}
+ 		},
+ 		"@gar/promisify": {
+@@ -16688,7 +16687,7 @@
+ 				"@emotion/serialize": "^1.0.2",
+ 				"@emotion/styled": "^11.6.0",
+ 				"@emotion/utils": "1.0.0",
+-				"@floating-ui/react-dom": "0.6.3",
++				"@floating-ui/react-dom": "1.0.0",
+ 				"@use-gesture/react": "^10.2.6",
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
+@@ -57649,7 +57648,8 @@
+ 		"use-isomorphic-layout-effect": {
+ 			"version": "1.1.1",
+ 			"resolved": "https://registry.npmjs.org/use-isomorphic-layout-effect/-/use-isomorphic-layout-effect-1.1.1.tgz",
+-			"integrity": "sha512-L7Evj8FGcwo/wpbv/qvSfrkHFtOpCzvM5yl2KVyDJoylVuSvzphiiasmjgQPttIGBAy2WKiBNR98q8w7PiNgKQ=="
++			"integrity": "sha512-L7Evj8FGcwo/wpbv/qvSfrkHFtOpCzvM5yl2KVyDJoylVuSvzphiiasmjgQPttIGBAy2WKiBNR98q8w7PiNgKQ==",
++			"dev": true
+ 		},
+ 		"use-latest": {
+ 			"version": "1.2.0",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9adc298a483312..a3c80afe37a81d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ 
+ ### Internal
+ 
++-   Update `floating-ui` to the latest version ([#43206](https://github.com/WordPress/gutenberg/pull/43206)).
+ -   `DateTimePicker`, `TimePicker`, `DatePicker`: Switch from `moment` to `date-fns` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
+ -   `DatePicker`: Switch from `react-dates` to `use-lilius` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
+ 
+@@ -34,7 +35,7 @@
+ ### Enhancements
+ 
+ -   `ToggleGroupControlOptionIcon`: Maintain square proportions ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
+--   `ToggleGroupControlOptionIcon`: Add a required `label` prop so the button is always accessibly labeled. Also removes `showTooltip` from the accepted prop types, as the tooltip will now always be shown.  ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
++-   `ToggleGroupControlOptionIcon`: Add a required `label` prop so the button is always accessibly labeled. Also removes `showTooltip` from the accepted prop types, as the tooltip will now always be shown. ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
+ -   `SelectControl`, `CustomSelectControl`: Refresh and refactor chevron down icon ([#42962](https://github.com/WordPress/gutenberg/pull/42962)).
+ -   `FontSizePicker`: Add large size variant ([#42716](https://github.com/WordPress/gutenberg/pull/42716/)).
+ -   `Popover`: tidy up code, add more comments ([#42944](https://github.com/WordPress/gutenberg/pull/42944)).
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 7860b4a9f3b420..deeee6b65da696 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -36,7 +36,7 @@
+ 		"@emotion/serialize": "^1.0.2",
+ 		"@emotion/styled": "^11.6.0",
+ 		"@emotion/utils": "1.0.0",
+-		"@floating-ui/react-dom": "0.6.3",
++		"@floating-ui/react-dom": "1.0.0",
+ 		"@use-gesture/react": "^10.2.6",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index bd6cdb6021d2f0..bd59fe45181bc1 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -231,11 +231,11 @@ const Popover = (
+ 			? undefined
+ 			: size( {
+ 					apply( sizeProps ) {
+-						const { height } = sizeProps;
++						const { availableHeight } = sizeProps;
+ 						if ( ! refs.floating.current ) return;
+ 						// Reduce the height of the popover to the available space.
+ 						Object.assign( refs.floating.current.firstChild.style, {
+-							maxHeight: `${ height }px`,
++							maxHeight: `${ availableHeight }px`,
+ 							overflow: 'auto',
+ 						} );
+ 					},

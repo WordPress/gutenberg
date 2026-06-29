@@ -1,0 +1,222 @@
+diff --git a/docs/manifest-devhub.json b/docs/manifest-devhub.json
+index dfee8a25831c60..bfdf2e267fef62 100644
+--- a/docs/manifest-devhub.json
++++ b/docs/manifest-devhub.json
+@@ -833,6 +833,12 @@
+ 		"markdown_source": "../packages/components/src/popover/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "BlockQuotation",
++		"slug": "block-quotation",
++		"markdown_source": "../packages/components/src/primitives/block-quotation/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "HorizontalRule",
+ 		"slug": "horizontal-rule",
+diff --git a/packages/block-editor/src/components/alignment-toolbar/index.native.js b/packages/block-editor/src/components/alignment-toolbar/index.native.js
+new file mode 100644
+index 00000000000000..fdd842d0375141
+--- /dev/null
++++ b/packages/block-editor/src/components/alignment-toolbar/index.native.js
+@@ -0,0 +1,5 @@
++const AlignmentToolbar = () => {
++	return null;
++};
++
++export default AlignmentToolbar;
+diff --git a/packages/block-editor/src/components/index.native.js b/packages/block-editor/src/components/index.native.js
+index ae73aa0e4fb316..18e029c6a47229 100644
+--- a/packages/block-editor/src/components/index.native.js
++++ b/packages/block-editor/src/components/index.native.js
+@@ -4,6 +4,7 @@ export { default as BlockEdit } from './block-edit';
+ export { default as BlockFormatControls } from './block-format-controls';
+ export * from './colors';
+ export * from './font-sizes';
++export { default as AlignmentToolbar } from './alignment-toolbar';
+ export { default as InspectorControls } from './inspector-controls';
+ export { default as PlainText } from './plain-text';
+ export {
+diff --git a/packages/block-editor/src/components/rich-text/index.native.js b/packages/block-editor/src/components/rich-text/index.native.js
+index 7431817743a6e9..9cff30df3ef13d 100644
+--- a/packages/block-editor/src/components/rich-text/index.native.js
++++ b/packages/block-editor/src/components/rich-text/index.native.js
+@@ -883,6 +883,7 @@ export class RichText extends Component {
+ RichText.defaultProps = {
+ 	formattingControls: [ 'bold', 'italic', 'link', 'strikethrough' ],
+ 	format: 'string',
++	tagName: 'div',
+ };
+ 
+ const RichTextContainer = compose( [
+@@ -922,6 +923,11 @@ const RichTextContainer = compose( [
+ 				selectionStart.clientId === clientId &&
+ 				selectionStart.attributeKey === identifier
+ 			);
++		} else {
++			isSelected = isSelected && (
++				selectionStart.clientId === clientId &&
++				selectionStart.attributeKey === identifier
++			);
+ 		}
+ 
+ 		return {
+diff --git a/packages/block-library/src/index.native.js b/packages/block-library/src/index.native.js
+index fbe7ad59bb3b2d..b3411411ee75fd 100644
+--- a/packages/block-library/src/index.native.js
++++ b/packages/block-library/src/index.native.js
+@@ -113,6 +113,7 @@ export const registerCoreBlocks = () => {
+ 		nextpage,
+ 		separator,
+ 		list,
++		quote,
+ 	].forEach( ( { metadata, name, settings } ) => {
+ 		registerBlockType( name, {
+ 			...metadata,
+diff --git a/packages/block-library/src/quote/edit.js b/packages/block-library/src/quote/edit.js
+index 9c01310a3ade03..8955b78588bc3f 100644
+--- a/packages/block-library/src/quote/edit.js
++++ b/packages/block-library/src/quote/edit.js
+@@ -3,6 +3,7 @@
+  */
+ import { __ } from '@wordpress/i18n';
+ import { AlignmentToolbar, BlockControls, RichText } from '@wordpress/block-editor';
++import { BlockQuotation } from '@wordpress/components';
+ 
+ export default function QuoteEdit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
+ 	const { align, value, citation } = attributes;
+@@ -16,7 +17,7 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
+ 					} }
+ 				/>
+ 			</BlockControls>
+-			<blockquote className={ className } style={ { textAlign: align } }>
++			<BlockQuotation className={ className } style={ { textAlign: align } }>
+ 				<RichText
+ 					identifier="value"
+ 					multiline
+@@ -54,7 +55,7 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
+ 						className="wp-block-quote__citation"
+ 					/>
+ 				) }
+-			</blockquote>
++			</BlockQuotation>
+ 		</>
+ 	);
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 729769e7a872c3..50165750d8a058 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -1,3 +1,9 @@
++## Master
++
++### New Feature
++
++- Add new `BlockQuotation` block to the primitives folder to support blockquote in a multiplatform way. [#15482](https://github.com/WordPress/gutenberg/pull/15482).
++
+ ## 7.4.0 (2019-05-21)
+ 
+ ### New Feature
+diff --git a/packages/components/src/primitives/block-quotation/README.md b/packages/components/src/primitives/block-quotation/README.md
+new file mode 100644
+index 00000000000000..83d9f9057609ed
+--- /dev/null
++++ b/packages/components/src/primitives/block-quotation/README.md
+@@ -0,0 +1,15 @@
++# HorizontalRule
++
++A drop-in replacement for the HTML [blockquote](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/blockquote) element that works both on the web and in the mobile apps. It indicates that the enclosed text is an extended quotation.
++
++## Usage
++
++```jsx
++import { BlockQuotation } from '@wordpress/components';
++
++const MyBlockQuotation = () => (
++	<BlockQuotation>
++	   ...Quote content
++	</BlockQuotation>
++);
++```
+diff --git a/packages/components/src/primitives/block-quotation/index.js b/packages/components/src/primitives/block-quotation/index.js
+new file mode 100644
+index 00000000000000..f1ccb4968c84e2
+--- /dev/null
++++ b/packages/components/src/primitives/block-quotation/index.js
+@@ -0,0 +1 @@
++export const BlockQuotation = 'blockquote';
+diff --git a/packages/components/src/primitives/block-quotation/index.native.js b/packages/components/src/primitives/block-quotation/index.native.js
+new file mode 100644
+index 00000000000000..eea86435b5ebcd
+--- /dev/null
++++ b/packages/components/src/primitives/block-quotation/index.native.js
+@@ -0,0 +1,16 @@
++/**
++ * External dependencies
++ */
++import { View } from 'react-native';
++/**
++ * Internal dependencies
++ */
++import styles from './style.scss';
++
++export const BlockQuotation = ( props ) => {
++	return (
++		<View style={ styles.wpBlockQuote } >
++			{ props.children }
++		</View>
++	);
++};
+diff --git a/packages/components/src/primitives/block-quotation/style.native.scss b/packages/components/src/primitives/block-quotation/style.native.scss
+new file mode 100644
+index 00000000000000..02d315e1560b6b
+--- /dev/null
++++ b/packages/components/src/primitives/block-quotation/style.native.scss
+@@ -0,0 +1,7 @@
++.wpBlockQuote {
++	border-left-width: 4px;
++	border-left-color: $black;
++	border-left-style: solid;
++	padding-left: 8px;
++	margin-left: 8px;
++}
+diff --git a/packages/components/src/primitives/block-quotation/style.scss b/packages/components/src/primitives/block-quotation/style.scss
+new file mode 100644
+index 00000000000000..c1206d68958f7b
+--- /dev/null
++++ b/packages/components/src/primitives/block-quotation/style.scss
+@@ -0,0 +1,19 @@
++.wp-block-quote {
++	&.is-style-large,
++	&.is-large {
++		margin: 0 0 16px;
++		padding: 0 1em;
++
++		p {
++			font-size: 24px;
++			font-style: italic;
++			line-height: 1.6;
++		}
++
++		cite,
++		footer {
++			font-size: 18px;
++			text-align: right;
++		}
++	}
++}
+diff --git a/packages/components/src/primitives/index.js b/packages/components/src/primitives/index.js
+index 83d15090083940..ba5d2f6f2ab084 100644
+--- a/packages/components/src/primitives/index.js
++++ b/packages/components/src/primitives/index.js
+@@ -1,2 +1,3 @@
+ export * from './svg';
+ export * from './horizontal-rule';
++export * from './block-quotation';
+diff --git a/packages/viewport/src/index.native.js b/packages/viewport/src/index.native.js
+index e69de29bb2d1d6..8b137891791fe9 100644
+--- a/packages/viewport/src/index.native.js
++++ b/packages/viewport/src/index.native.js
+@@ -0,0 +1 @@
++

@@ -1,0 +1,25 @@
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 29981d46770eed..bd240ef9ac04bc 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -106,7 +106,7 @@ function UnconnectedNavigatorScreen(
+ 
+ 		// When navigating back, if a selector is provided, use it to look for the
+ 		// target element (assumed to be a node inside the current NavigatorScreen)
+-		if ( location.isBack && location?.focusTargetSelector ) {
++		if ( location.isBack && location.focusTargetSelector ) {
+ 			elementToFocus = wrapperRef.current.querySelector(
+ 				location.focusTargetSelector
+ 			);
+diff --git a/packages/edit-site/src/components/global-styles/screen-style-variations.js b/packages/edit-site/src/components/global-styles/screen-style-variations.js
+index e206fb1e443a0a..f9707b47f76701 100644
+--- a/packages/edit-site/src/components/global-styles/screen-style-variations.js
++++ b/packages/edit-site/src/components/global-styles/screen-style-variations.js
+@@ -19,7 +19,6 @@ function ScreenStyleVariations() {
+ 	return (
+ 		<>
+ 			<ScreenHeader
+-				back="/"
+ 				title={ __( 'Browse styles' ) }
+ 				description={ __(
+ 					'Choose a variation to change the look of the site.'

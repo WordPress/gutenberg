@@ -1,0 +1,96 @@
+diff --git a/packages/components/src/visually-hidden/index.js b/packages/components/src/visually-hidden/index.js
+index 17ac119ad01ad1..9824ab5106b9be 100644
+--- a/packages/components/src/visually-hidden/index.js
++++ b/packages/components/src/visually-hidden/index.js
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
+ /**
+  * Internal dependencies
+  */
+@@ -7,10 +12,10 @@ import { renderAsRenderProps } from './utils';
+  * VisuallyHidden component to render text out non-visually
+  * for use in devices such as a screen reader.
+  */
+-function VisuallyHidden( { as = 'div', ...props } ) {
++function VisuallyHidden( { as = 'div', className, ...props } ) {
+ 	return renderAsRenderProps( {
+ 		as,
+-		className: 'components-visually-hidden',
++		className: classnames( 'components-visually-hidden', className ),
+ 		...props,
+ 	} );
+ }
+diff --git a/packages/components/src/visually-hidden/stories/index.js b/packages/components/src/visually-hidden/stories/index.js
+index aaaa56991cc230..2b45ad1d15121c 100644
+--- a/packages/components/src/visually-hidden/stories/index.js
++++ b/packages/components/src/visually-hidden/stories/index.js
+@@ -18,3 +18,25 @@ export const _default = () => (
+ 		</div>
+ 	</>
+ );
++
++export const withForwardedProps = () => (
++	<>
++		Additional props can be passed to VisuallyHidden and are forwarded to
++		the rendered element.{ ' ' }
++		<VisuallyHidden as="span" data-id="test">
++			Check out my data attribute!{ ' ' }
++		</VisuallyHidden>
++		Inspect the HTML to see!
++	</>
++);
++
++export const withAdditionalClassNames = () => (
++	<>
++		Additional class names passed to VisuallyHidden extend the component
++		class name.{ ' ' }
++		<VisuallyHidden as="label" className="test-input">
++			Check out my class!{ ' ' }
++		</VisuallyHidden>
++		Inspect the HTML to see!
++	</>
++);
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index b9f1491f1eb4f6..1303d0d36eaa05 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -8790,6 +8790,35 @@ Array [
+ ]
+ `;
+ 
++exports[`Storyshots Components/VisuallyHidden With Additional Class Names 1`] = `
++Array [
++  "Additional class names passed to VisuallyHidden extend the component class name.",
++  " ",
++  <label
++    className="components-visually-hidden test-input"
++  >
++    Check out my class!
++     
++  </label>,
++  "Inspect the HTML to see!",
++]
++`;
++
++exports[`Storyshots Components/VisuallyHidden With Forwarded Props 1`] = `
++Array [
++  "Additional props can be passed to VisuallyHidden and are forwarded to the rendered element.",
++  " ",
++  <span
++    className="components-visually-hidden"
++    data-id="test"
++  >
++    Check out my data attribute!
++     
++  </span>,
++  "Inspect the HTML to see!",
++]
++`;
++
+ exports[`Storyshots Components|AnglePickerControl Default 1`] = `
+ <div
+   className="components-base-control components-angle-picker-control"

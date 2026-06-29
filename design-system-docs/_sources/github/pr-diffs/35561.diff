@@ -1,0 +1,212 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index edd4317f00f8e8..1bf203594e4803 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -31,6 +31,7 @@
+ ### Internal
+ 
+ -   Deleted the `createComponent` utility function ([#34929](https://github.com/WordPress/gutenberg/pull/34929)).
++-   Deleted the `useJumpStep` utility function ([#35561](https://github.com/WordPress/gutenberg/pull/35561)).
+ 
+ ## 17.0.0 (2021-09-09)
+ 
+diff --git a/packages/components/src/utils/hooks/index.js b/packages/components/src/utils/hooks/index.js
+index 51e796c7044403..beacf31b7562cd 100644
+--- a/packages/components/src/utils/hooks/index.js
++++ b/packages/components/src/utils/hooks/index.js
+@@ -1,5 +1,4 @@
+ export { default as useControlledState } from './use-controlled-state';
+-export { default as useJumpStep } from './use-jump-step';
+ export { default as useUpdateEffect } from './use-update-effect';
+ export { useControlledValue } from './use-controlled-value';
+ export { useCx } from './use-cx';
+diff --git a/packages/components/src/utils/hooks/test/use-jump-step.js b/packages/components/src/utils/hooks/test/use-jump-step.js
+deleted file mode 100644
+index 0a09d7096ca392..00000000000000
+--- a/packages/components/src/utils/hooks/test/use-jump-step.js
++++ /dev/null
+@@ -1,127 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, fireEvent, screen } from '@testing-library/react';
+-import { noop } from 'lodash';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-import { SHIFT } from '@wordpress/keycodes';
+-
+-/**
+- * Internal dependencies
+- */
+-import useJumpStep from '../use-jump-step';
+-
+-const getInput = () => screen.getByTestId( 'input' );
+-
+-describe( 'hooks', () => {
+-	describe( 'useJumpStep', () => {
+-		const Example = ( {
+-			value: valueProp,
+-			onChange = noop,
+-			step = 1,
+-			shiftStep = 10,
+-			isShiftStepEnabled = true,
+-		} ) => {
+-			const [ state, setState ] = useState( valueProp );
+-			const jumpStep = useJumpStep( {
+-				step,
+-				shiftStep,
+-				isShiftStepEnabled,
+-			} );
+-
+-			const handleOnChange = ( event ) => {
+-				const nextValue = event.target.value;
+-				setState( nextValue );
+-				onChange( nextValue );
+-			};
+-
+-			return (
+-				<input
+-					data-testid="input"
+-					type="number"
+-					value={ state }
+-					onChange={ handleOnChange }
+-					step={ jumpStep }
+-				/>
+-			);
+-		};
+-
+-		it( 'should use initial step value', () => {
+-			render( <Example value={ 10 } step={ 66 } /> );
+-			const input = getInput();
+-
+-			expect( input.getAttribute( 'step' ) ).toBe( '66' );
+-		} );
+-
+-		it( 'should modify step value on shift key down/up press', () => {
+-			render( <Example value={ 10 } /> );
+-			const input = getInput();
+-
+-			expect( input.getAttribute( 'step' ) ).toBe( '1' );
+-
+-			fireEvent.keyDown( window, { keyCode: SHIFT, shiftKey: true } );
+-
+-			expect( input.getAttribute( 'step' ) ).toBe( '10' );
+-
+-			fireEvent.keyUp( window, { keyCode: SHIFT, shiftKey: false } );
+-
+-			expect( input.getAttribute( 'step' ) ).toBe( '1' );
+-		} );
+-
+-		it( 'should not jump step if disabled', () => {
+-			render(
+-				<Example
+-					value={ 10 }
+-					isShiftStepEnabled={ false }
+-					step={ 1 }
+-					shiftStep={ 15 }
+-				/>
+-			);
+-			const input = getInput();
+-
+-			expect( input.getAttribute( 'step' ) ).toBe( '1' );
+-
+-			fireEvent.keyDown( window, { keyCode: SHIFT, shiftKey: true } );
+-
+-			expect( input.getAttribute( 'step' ) ).toBe( '1' );
+-
+-			fireEvent.keyUp( window, { keyCode: SHIFT, shiftKey: false } );
+-
+-			expect( input.getAttribute( 'step' ) ).toBe( '1' );
+-		} );
+-
+-		it( 'should calculate jumpStep value, using step as a multiplier to shiftStep', () => {
+-			render( <Example value={ 10 } step={ 0.5 } shiftStep={ 10 } /> );
+-			const input = getInput();
+-
+-			expect( input.getAttribute( 'step' ) ).toBe( '0.5' );
+-
+-			fireEvent.keyDown( window, { keyCode: SHIFT, shiftKey: true } );
+-
+-			expect( input.getAttribute( 'step' ) ).toBe( '5' );
+-
+-			fireEvent.keyUp( window, { keyCode: SHIFT, shiftKey: false } );
+-
+-			expect( input.getAttribute( 'step' ) ).toBe( '0.5' );
+-		} );
+-
+-		it( 'should allow for float values in step and shiftStep', () => {
+-			render( <Example value={ 10 } step={ 0.001 } shiftStep={ 10 } /> );
+-			const input = getInput();
+-
+-			expect( input.getAttribute( 'step' ) ).toBe( '0.001' );
+-
+-			fireEvent.keyDown( window, { keyCode: SHIFT, shiftKey: true } );
+-
+-			expect( input.getAttribute( 'step' ) ).toBe( '0.01' );
+-
+-			fireEvent.keyUp( window, { keyCode: SHIFT, shiftKey: false } );
+-
+-			expect( input.getAttribute( 'step' ) ).toBe( '0.001' );
+-		} );
+-	} );
+-} );
+diff --git a/packages/components/src/utils/hooks/use-jump-step.js b/packages/components/src/utils/hooks/use-jump-step.js
+deleted file mode 100644
+index 9a598ab6a29d3e..00000000000000
+--- a/packages/components/src/utils/hooks/use-jump-step.js
++++ /dev/null
+@@ -1,51 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useEffect, useState } from '@wordpress/element';
+-
+-/**
+- * A custom hook that calculates a step value (used by elements like input
+- * [type="number"]). This value can be modified based on whether the Shift
+- * key is being held down.
+- *
+- * For example, a shiftStep of 10, and a step of 1...
+- * Starting from 10, the next incremented value will be 11.
+- *
+- * Holding down shift...
+- * Starting from 10, the next incremented value will be 20.
+- *
+- * @param {Object}  props                           Properties for the hook.
+- * @param {boolean} [props.isShiftStepEnabled=true] Determines if jumping values with shift is enabled
+- * @param {number}  [props.shiftStep=10]            Multiplier to jump by, when holding shift key.
+- * @param {number}  [props.step=1]                  Multiplier to jump by, when not-holding shift key.
+- *
+- * @return {number} The jump step value.
+- */
+-function useJumpStep( {
+-	isShiftStepEnabled = true,
+-	shiftStep = 10,
+-	step = 1,
+-} ) {
+-	const [ isShiftKey, setIsShiftKey ] = useState( false );
+-
+-	useEffect( () => {
+-		/** @type {(event: KeyboardEvent)=>void} */
+-		const handleShiftKeyToggle = ( event ) => {
+-			setIsShiftKey( event.shiftKey );
+-		};
+-
+-		window.addEventListener( 'keydown', handleShiftKeyToggle );
+-		window.addEventListener( 'keyup', handleShiftKeyToggle );
+-
+-		return () => {
+-			window.removeEventListener( 'keydown', handleShiftKeyToggle );
+-			window.removeEventListener( 'keyup', handleShiftKeyToggle );
+-		};
+-	}, [] );
+-
+-	const isEnabled = isShiftStepEnabled && isShiftKey;
+-
+-	return isEnabled ? shiftStep * step : step;
+-}
+-
+-export default useJumpStep;

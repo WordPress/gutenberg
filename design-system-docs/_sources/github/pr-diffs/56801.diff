@@ -1,0 +1,129 @@
+diff --git a/packages/block-editor/src/components/colors-gradients/style.scss b/packages/block-editor/src/components/colors-gradients/style.scss
+index 6cade124b7fe46..4fc5adeec39b54 100644
+--- a/packages/block-editor/src/components/colors-gradients/style.scss
++++ b/packages/block-editor/src/components/colors-gradients/style.scss
+@@ -33,7 +33,6 @@ $swatch-gap: 12px;
+ 		.components-circular-option-picker__swatches {
+ 			display: grid;
+ 			grid-template-columns: repeat(6, $swatch-size);
+-			justify-content: space-between;
+ 		}
+ 	}
+ 
+diff --git a/packages/block-editor/src/components/duotone-control/index.js b/packages/block-editor/src/components/duotone-control/index.js
+index e110286976b1a6..247e0c51354b0e 100644
+--- a/packages/block-editor/src/components/duotone-control/index.js
++++ b/packages/block-editor/src/components/duotone-control/index.js
+@@ -65,14 +65,11 @@ function DuotoneControl( {
+ 			} }
+ 			renderContent={ () => (
+ 				<MenuGroup label={ __( 'Duotone' ) }>
+-					<div
+-						id={ descriptionId }
+-						className="block-editor-duotone-control__description"
+-					>
++					<p>
+ 						{ __(
+ 							'Create a two-tone color effect without losing your original image.'
+ 						) }
+-					</div>
++					</p>
+ 					<DuotonePicker
+ 						aria-label={ actionLabel }
+ 						aria-describedby={ descriptionId }
+diff --git a/packages/block-editor/src/components/duotone-control/style.scss b/packages/block-editor/src/components/duotone-control/style.scss
+index d80f7c4628c35f..3a3a5a143289b8 100644
+--- a/packages/block-editor/src/components/duotone-control/style.scss
++++ b/packages/block-editor/src/components/duotone-control/style.scss
+@@ -3,7 +3,7 @@
+ $swatch-size: 28px;
+ $swatch-gap: 12px;
+ 
+-$popover-width: $sidebar-width;
++$popover-width: 260px;
+ $popover-padding: $grid-unit-20;
+ 
+ $swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover-padding, $swatch-size + $swatch-gap));
+@@ -26,11 +26,6 @@ $swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover
+ 	}
+ }
+ 
+-.block-editor-duotone-control__description {
+-	margin: $grid-unit-20 0;
+-	font-size: $helptext-font-size;
+-}
+-
+ .block-editor-duotone-control__unset-indicator {
+ 	// Show a diagonal line (crossed out) for empty swatches.
+ 	background: linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%);
+diff --git a/packages/block-editor/src/components/global-styles/filters-panel.js b/packages/block-editor/src/components/global-styles/filters-panel.js
+index 6477f354280e12..42c2494489ed14 100644
+--- a/packages/block-editor/src/components/global-styles/filters-panel.js
++++ b/packages/block-editor/src/components/global-styles/filters-panel.js
+@@ -12,9 +12,9 @@ import {
+ 	__experimentalItemGroup as ItemGroup,
+ 	__experimentalHStack as HStack,
+ 	__experimentalZStack as ZStack,
+-	__experimentalVStack as VStack,
+ 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+ 	Button,
++	MenuGroup,
+ 	ColorIndicator,
+ 	DuotonePicker,
+ 	DuotoneSwatch,
+@@ -82,6 +82,10 @@ function FiltersToolsPanel( {
+ 			label={ _x( 'Filters', 'Name for applying graphical effects' ) }
+ 			resetAll={ resetAll }
+ 			panelId={ panelId }
++			dropdownMenuProps={ {
++				placement: 'left-start',
++				offset: 258, // sidebar width (280px) - button width (24px) + border (2px)
++			} }
+ 		>
+ 			{ children }
+ 		</ToolsPanel>
+@@ -197,8 +201,8 @@ export default function FiltersPanel( {
+ 							);
+ 						} }
+ 						renderContent={ () => (
+-							<DropdownContentWrapper paddingSize="medium">
+-								<VStack>
++							<DropdownContentWrapper paddingSize="small">
++								<MenuGroup label={ __( 'Duotone' ) }>
+ 									<p>
+ 										{ __(
+ 											'Create a two-tone color effect without losing your original image.'
+@@ -213,7 +217,7 @@ export default function FiltersPanel( {
+ 										value={ duotone }
+ 										onChange={ setDuotone }
+ 									/>
+-								</VStack>
++								</MenuGroup>
+ 							</DropdownContentWrapper>
+ 						) }
+ 					/>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f3019c250a6c42..4ca7c3f9f0d805 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `FormToggle`: fix sass deprecation warning ([#56672](https://github.com/WordPress/gutenberg/pull/56672)).
+ -   `QueryControls`: Add opt-in prop for 40px default size ([#56576](https://github.com/WordPress/gutenberg/pull/56576)).
+ -   `CheckboxControl`: Add option to not render label ([#56158](https://github.com/WordPress/gutenberg/pull/56158)).
++-   `PaletteEdit`: Gradient pickers to use same width as color pickers ([#56801](https://github.com/WordPress/gutenberg/pull/56801)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/palette-edit/style.scss b/packages/components/src/palette-edit/style.scss
+index 55fdfbf42cb525..d73c7ff46cc3c0 100644
+--- a/packages/components/src/palette-edit/style.scss
++++ b/packages/components/src/palette-edit/style.scss
+@@ -1,6 +1,6 @@
+ .components-palette-edit__popover-gradient-picker {
+-	width: 280px;
+-	padding: 8px;
++	width: 260px;
++	padding: $grid-unit-10;
+ }
+ .components-dropdown-menu__menu {
+ 	.components-palette-edit__menu-button {

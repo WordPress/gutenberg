@@ -1,0 +1,15 @@
+diff --git a/packages/components/src/card/card/README.md b/packages/components/src/card/card/README.md
+index 5a65369bb959d0..b640b7159c33db 100644
+--- a/packages/components/src/card/card/README.md
++++ b/packages/components/src/card/card/README.md
+@@ -12,8 +12,8 @@ import {
+ 	CardHeader,
+ 	CardBody,
+ 	CardFooter,
+-	Text,
+-	Heading,
++	__experimentalText as Text,
++	__experimentalHeading as Heading,
+ } from '@wordpress/components';
+ 
+ function Example() {

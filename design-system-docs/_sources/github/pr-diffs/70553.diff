@@ -1,0 +1,105 @@
+diff --git a/package-lock.json b/package-lock.json
+index 329e84ed081234..f69d8db6d544f0 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -5124,32 +5124,42 @@
+ 			}
+ 		},
+ 		"node_modules/@floating-ui/core": {
+-			"version": "1.4.1",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/core/-/core-1.4.1.tgz",
+-			"integrity": "sha512-jk3WqquEJRlcyu7997NtR5PibI+y5bi+LS3hPmguVClypenMsCY3CBa3LAQnozRCtCrYWSEtAdiskpamuJRFOQ==",
++			"version": "1.7.2",
++			"resolved": "https://registry.npmjs.org/@floating-ui/core/-/core-1.7.2.tgz",
++			"integrity": "sha512-wNB5ooIKHQc+Kui96jE/n69rHFWAVoxn5CAzL1Xdd8FG03cgY3MLO+GF9U3W737fYDSgPWA6MReKhBQBop6Pcw==",
++			"license": "MIT",
+ 			"dependencies": {
+-				"@floating-ui/utils": "^0.1.1"
++				"@floating-ui/utils": "^0.2.10"
+ 			}
+ 		},
+ 		"node_modules/@floating-ui/dom": {
+-			"version": "1.6.3",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/dom/-/dom-1.6.3.tgz",
+-			"integrity": "sha512-RnDthu3mzPlQ31Ss/BTwQ1zjzIhr3lk1gZB1OC56h/1vEtaXkESrOqL5fQVMfXpwGtRwX+YsZBdyHtJMQnkArw==",
++			"version": "1.7.2",
++			"resolved": "https://registry.npmjs.org/@floating-ui/dom/-/dom-1.7.2.tgz",
++			"integrity": "sha512-7cfaOQuCS27HD7DX+6ib2OrnW+b4ZBwDNnCcT0uTyidcmyWb03FnQqJybDBoCnpdxwBSfA94UAYlRCt7mV+TbA==",
++			"license": "MIT",
+ 			"dependencies": {
+-				"@floating-ui/core": "^1.0.0",
+-				"@floating-ui/utils": "^0.2.0"
++				"@floating-ui/core": "^1.7.2",
++				"@floating-ui/utils": "^0.2.10"
+ 			}
+ 		},
+-		"node_modules/@floating-ui/dom/node_modules/@floating-ui/utils": {
+-			"version": "0.2.8",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.2.8.tgz",
+-			"integrity": "sha512-kym7SodPp8/wloecOpcmSnWJsK7M0E5Wg8UcFA+uO4B9s5d0ywXOEro/8HM9x0rW+TljRzul/14UYz3TleT3ig==",
+-			"license": "MIT"
++		"node_modules/@floating-ui/react-dom": {
++			"version": "2.0.8",
++			"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.0.8.tgz",
++			"integrity": "sha512-HOdqOt3R3OGeTKidaLvJKcgg75S6tibQ3Tif4eyd91QnIJWr0NLvoXFpJA/j8HqkFSL68GDca9AuyWEHlhyClw==",
++			"license": "MIT",
++			"dependencies": {
++				"@floating-ui/dom": "^1.6.1"
++			},
++			"peerDependencies": {
++				"react": ">=16.8.0",
++				"react-dom": ">=16.8.0"
++			}
+ 		},
+ 		"node_modules/@floating-ui/utils": {
+-			"version": "0.1.6",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.1.6.tgz",
+-			"integrity": "sha512-OfX7E2oUDYxtBvsuS4e/jSn4Q9Qb6DzgeYtsAdkPZ47znpoNsMgZw0+tVijiv3uGNR6dgNlty6r9rzIzHjtd/A=="
++			"version": "0.2.10",
++			"resolved": "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.2.10.tgz",
++			"integrity": "sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==",
++			"license": "MIT"
+ 		},
+ 		"node_modules/@formatjs/ecma402-abstract": {
+ 			"version": "2.2.4",
+@@ -50416,7 +50426,7 @@
+ 				"@emotion/serialize": "^1.0.2",
+ 				"@emotion/styled": "^11.6.0",
+ 				"@emotion/utils": "^1.0.0",
+-				"@floating-ui/react-dom": "^2.0.8",
++				"@floating-ui/react-dom": "2.0.8",
+ 				"@types/gradient-parser": "0.1.3",
+ 				"@types/highlight-words-core": "1.2.1",
+ 				"@use-gesture/react": "^10.3.1",
+@@ -50463,18 +50473,6 @@
+ 				"react-dom": "^18.0.0"
+ 			}
+ 		},
+-		"packages/components/node_modules/@floating-ui/react-dom": {
+-			"version": "2.0.1",
+-			"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.0.1.tgz",
+-			"integrity": "sha512-rZtAmSht4Lry6gdhAJDrCp/6rKN7++JnL1/Anbr/DdeyYXQPxvg/ivrbYvJulbRf4vL8b212suwMM2lxbv+RQA==",
+-			"dependencies": {
+-				"@floating-ui/dom": "^1.3.0"
+-			},
+-			"peerDependencies": {
+-				"react": ">=16.8.0",
+-				"react-dom": ">=16.8.0"
+-			}
+-		},
+ 		"packages/components/node_modules/@types/gradient-parser": {
+ 			"version": "0.1.3",
+ 			"resolved": "https://registry.npmjs.org/@types/gradient-parser/-/gradient-parser-0.1.3.tgz",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 4f9ac01d4b0390..a139c1c7621a94 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -40,7 +40,7 @@
+ 		"@emotion/serialize": "^1.0.2",
+ 		"@emotion/styled": "^11.6.0",
+ 		"@emotion/utils": "^1.0.0",
+-		"@floating-ui/react-dom": "^2.0.8",
++		"@floating-ui/react-dom": "2.0.8",
+ 		"@types/gradient-parser": "0.1.3",
+ 		"@types/highlight-words-core": "1.2.1",
+ 		"@use-gesture/react": "^10.3.1",

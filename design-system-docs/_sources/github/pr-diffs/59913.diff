@@ -1,0 +1,123 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index cfb9d418ffbaa8..61fba6f264b52a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,10 @@
+ 
+ -   `TextControl`: Add typings for `date`, `time` and `datetime-local` ([#59666](https://github.com/WordPress/gutenberg/pull/59666)).
+ 
++### Internal
++
++-   `Button`: Keep deprecated props in type definitions ([#59913](https://github.com/WordPress/gutenberg/pull/59913)).
++
+ ## 27.1.0 (2024-03-06)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index a16f190e44704b..f1dcd86fb59a57 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -65,10 +65,9 @@ function useDeprecatedProps( {
+ 	}
+ 
+ 	if ( isDefault ) {
+-		deprecated( 'Button isDefault prop', {
++		deprecated( 'wp.components.Button `isDefault` prop', {
+ 			since: '5.4',
+ 			alternative: 'variant="secondary"',
+-			version: '6.2',
+ 		} );
+ 
+ 		computedVariant ??= 'secondary';
+@@ -87,7 +86,7 @@ function useDeprecatedProps( {
+ }
+ 
+ export function UnforwardedButton(
+-	props: ButtonProps,
++	props: ButtonProps & DeprecatedButtonProps,
+ 	ref: ForwardedRef< any >
+ ) {
+ 	const {
+diff --git a/packages/components/src/button/test/index.tsx b/packages/components/src/button/test/index.tsx
+index 699db1b75429f0..2b4a610c50bea0 100644
+--- a/packages/components/src/button/test/index.tsx
++++ b/packages/components/src/button/test/index.tsx
+@@ -554,13 +554,11 @@ describe( 'Button', () => {
+ 
+ 	describe( 'deprecated props', () => {
+ 		it( 'should not break when the legacy isPrimary prop is passed', () => {
+-			// @ts-expect-error
+ 			render( <Button isPrimary /> );
+ 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-primary' );
+ 		} );
+ 
+ 		it( 'should not break when the legacy isSecondary prop is passed', () => {
+-			// @ts-expect-error
+ 			render( <Button isSecondary /> );
+ 			expect( screen.getByRole( 'button' ) ).toHaveClass(
+ 				'is-secondary'
+@@ -568,19 +566,16 @@ describe( 'Button', () => {
+ 		} );
+ 
+ 		it( 'should not break when the legacy isTertiary prop is passed', () => {
+-			// @ts-expect-error
+ 			render( <Button isTertiary /> );
+ 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-tertiary' );
+ 		} );
+ 
+ 		it( 'should not break when the legacy isLink prop is passed', () => {
+-			// @ts-expect-error
+ 			render( <Button isLink /> );
+ 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-link' );
+ 		} );
+ 
+ 		it( 'should warn when the isDefault prop is passed', () => {
+-			// @ts-expect-error
+ 			render( <Button isDefault /> );
+ 			expect( screen.getByRole( 'button' ) ).toHaveClass(
+ 				'is-secondary'
+diff --git a/packages/components/src/button/types.ts b/packages/components/src/button/types.ts
+index e728739806af79..447ad1de79e358 100644
+--- a/packages/components/src/button/types.ts
++++ b/packages/components/src/button/types.ts
+@@ -149,10 +149,40 @@ type AnchorProps = {
+ };
+ 
+ export type DeprecatedButtonProps = {
++	/**
++	 * Gives the button a default style.
++	 *
++	 * @deprecated Use the `'secondary'` value on the `variant` prop instead.
++	 * @ignore
++	 */
+ 	isDefault?: boolean;
++	/**
++	 * Gives the button a link style.
++	 *
++	 * @deprecated Use the `'link'` value on the `variant` prop instead.
++	 * @ignore
++	 */
+ 	isLink?: boolean;
++	/**
++	 * Gives the button a primary style.
++	 *
++	 * @deprecated Use the `'primary'` value on the `variant` prop instead.
++	 * @ignore
++	 */
+ 	isPrimary?: boolean;
++	/**
++	 * Gives the button a default style.
++	 *
++	 * @deprecated Use the `'secondary'` value on the `variant` prop instead.
++	 * @ignore
++	 */
+ 	isSecondary?: boolean;
++	/**
++	 * Gives the button a text-based style.
++	 *
++	 * @deprecated Use the `'tertiary'` value on the `variant` prop instead.
++	 * @ignore
++	 */
+ 	isTertiary?: boolean;
+ };
+ 

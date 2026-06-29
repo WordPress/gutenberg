@@ -1,0 +1,768 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0676541a232413..21e3a01007a3ab 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -40,6 +40,7 @@
+ -   `contextConnect`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
+ -   `ColorPalette`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
+ -   `Guide`: Refactor away from `_.times()` ([#43374](https://github.com/WordPress/gutenberg/pull/43374/)).
++-   `Disabled`: Convert to TypeScript ([#42708](https://github.com/WordPress/gutenberg/pull/42708)).
+ -   `Guide`: Update tests to use `@testing-library/react` ([#43380](https://github.com/WordPress/gutenberg/pull/43380)).
+ -   `Modal`: use `KeyboardEvent.code` instead of deprecated `KeyboardEvent.keyCode`. improve unit tests ([#43429](https://github.com/WordPress/gutenberg/pull/43429/)).
+ -   `FocalPointPicker`: use `KeyboardEvent.code`, partially refactor tests to modern RTL and `user-event` ([#43441](https://github.com/WordPress/gutenberg/pull/43441/)).
+diff --git a/packages/components/src/disabled/index.js b/packages/components/src/disabled/index.js
+deleted file mode 100644
+index 9205d57f5a278c..00000000000000
+--- a/packages/components/src/disabled/index.js
++++ /dev/null
+@@ -1,55 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useDisabled } from '@wordpress/compose';
+-import { createContext } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { StyledWrapper } from './styles/disabled-styles';
+-
+-const Context = createContext( false );
+-const { Consumer, Provider } = Context;
+-
+-/**
+- * @typedef OwnProps
+- * @property {string}                    [className]       Classname for the disabled element.
+- * @property {import('react').ReactNode} children          Children to disable.
+- * @property {boolean}                   [isDisabled=true] Whether to disable the children.
+- */
+-
+-/**
+- * @param {OwnProps & import('react').HTMLAttributes<HTMLDivElement>} props
+- * @return {JSX.Element} Element wrapping the children to disable them when isDisabled is true.
+- */
+-function Disabled( { className, children, isDisabled = true, ...props } ) {
+-	/** @type {import('react').RefCallback<HTMLDivElement>} */
+-	const ref = useDisabled();
+-
+-	if ( ! isDisabled ) {
+-		return <Provider value={ false }>{ children }</Provider>;
+-	}
+-
+-	return (
+-		<Provider value={ true }>
+-			<StyledWrapper
+-				ref={ ref }
+-				className={ classnames( className, 'components-disabled' ) }
+-				{ ...props }
+-			>
+-				{ children }
+-			</StyledWrapper>
+-		</Provider>
+-	);
+-}
+-
+-Disabled.Context = Context;
+-Disabled.Consumer = Consumer;
+-
+-export default Disabled;
+diff --git a/packages/components/src/disabled/index.tsx b/packages/components/src/disabled/index.tsx
+new file mode 100644
+index 00000000000000..10618c19de93f2
+--- /dev/null
++++ b/packages/components/src/disabled/index.tsx
+@@ -0,0 +1,80 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { useDisabled } from '@wordpress/compose';
++import { createContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { StyledWrapper } from './styles/disabled-styles';
++import type { DisabledProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
++
++const Context = createContext< boolean >( false );
++const { Consumer, Provider } = Context;
++
++/**
++ * `Disabled` is a component which disables descendant tabbable elements and prevents pointer interaction.
++ *
++ * ```jsx
++ * import { Button, Disabled, TextControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyDisabled = () => {
++ * 	const [ isDisabled, setIsDisabled ] = useState( true );
++ *
++ * 	let input = <TextControl label="Input" onChange={ () => {} } />;
++ * 	if ( isDisabled ) {
++ * 		input = <Disabled>{ input }</Disabled>;
++ * 	}
++ *
++ * 	const toggleDisabled = () => {
++ * 		setIsDisabled( ( state ) => ! state );
++ * 	};
++ *
++ * 	return (
++ * 		<div>
++ * 			{ input }
++ * 			<Button variant="primary" onClick={ toggleDisabled }>
++ * 				Toggle Disabled
++ * 			</Button>
++ * 		</div>
++ * 	);
++ * };
++ * ```
++ */
++function Disabled( {
++	className,
++	children,
++	isDisabled = true,
++	...props
++}: Omit< WordPressComponentProps< DisabledProps, 'div' >, 'ref' > ) {
++	const ref = useDisabled();
++
++	if ( ! isDisabled ) {
++		return <Provider value={ false }>{ children }</Provider>;
++	}
++
++	return (
++		<Provider value={ true }>
++			<StyledWrapper
++				ref={ ref }
++				className={ classnames( className, 'components-disabled' ) }
++				{ ...props }
++			>
++				{ children }
++			</StyledWrapper>
++		</Provider>
++	);
++}
++
++Disabled.Context = Context;
++Disabled.Consumer = Consumer;
++
++export default Disabled;
+diff --git a/packages/components/src/disabled/stories/index.js b/packages/components/src/disabled/stories/index.js
+deleted file mode 100644
+index fd90126d42fe6f..00000000000000
+--- a/packages/components/src/disabled/stories/index.js
++++ /dev/null
+@@ -1,61 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import Disabled from '../';
+-import Button from '../../button/';
+-import SelectControl from '../../select-control/';
+-import TextControl from '../../text-control/';
+-import TextareaControl from '../../textarea-control/';
+-
+-export default {
+-	title: 'Components/Disabled',
+-	component: Disabled,
+-};
+-
+-const Form = () => (
+-	<div>
+-		<TextControl label="Text Control" />
+-		<TextareaControl label="TextArea Control" />
+-		<SelectControl
+-			label="Select Control"
+-			onChange={ () => {} }
+-			options={ [
+-				{ value: null, label: 'Select an option', disabled: true },
+-				{ value: 'a', label: 'Option A' },
+-				{ value: 'b', label: 'Option B' },
+-				{ value: 'c', label: 'Option C' },
+-			] }
+-		/>
+-	</div>
+-);
+-
+-export const _default = () => {
+-	return (
+-		<Disabled>
+-			<Form />
+-		</Disabled>
+-	);
+-};
+-
+-export const DisabledWithProp = () => {
+-	const [ isDisabled, setState ] = useState( true );
+-	const toggleDisabled = () => {
+-		setState( () => ! isDisabled );
+-	};
+-
+-	return (
+-		<div>
+-			<Disabled isDisabled={ isDisabled }>
+-				<Form />
+-			</Disabled>
+-			<Button variant="primary" onClick={ toggleDisabled }>
+-				Set isDisabled to { isDisabled ? 'false' : 'true' }
+-			</Button>
+-		</div>
+-	);
+-};
+diff --git a/packages/components/src/disabled/stories/index.tsx b/packages/components/src/disabled/stories/index.tsx
+new file mode 100644
+index 00000000000000..06246adde633f1
+--- /dev/null
++++ b/packages/components/src/disabled/stories/index.tsx
+@@ -0,0 +1,87 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import Disabled from '../';
++import SelectControl from '../../select-control/';
++import TextControl from '../../text-control/';
++import TextareaControl from '../../textarea-control/';
++
++const meta: ComponentMeta< typeof Disabled > = {
++	title: 'Components/Disabled',
++	component: Disabled,
++	argTypes: {
++		as: { control: { type: null } },
++		children: { control: { type: null } },
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++
++export default meta;
++
++const Form = () => {
++	const [ textControlValue, setTextControlValue ] = useState( '' );
++	const [ textAreaValue, setTextAreaValue ] = useState( '' );
++	return (
++		<div>
++			<TextControl
++				label="Text Control"
++				value={ textControlValue }
++				onChange={ setTextControlValue }
++			/>
++			<TextareaControl
++				label="TextArea Control"
++				value={ textAreaValue }
++				onChange={ setTextAreaValue }
++			/>
++			<SelectControl
++				label="Select Control"
++				onChange={ () => {} }
++				options={ [
++					{ value: '', label: 'Select an option', disabled: true },
++					{ value: 'a', label: 'Option A' },
++					{ value: 'b', label: 'Option B' },
++					{ value: 'c', label: 'Option C' },
++				] }
++			/>
++		</div>
++	);
++};
++
++export const Default: ComponentStory< typeof Disabled > = ( args ) => {
++	return (
++		<Disabled { ...args }>
++			<Form />
++		</Disabled>
++	);
++};
++Default.args = {
++	isDisabled: true,
++};
++
++export const ContentEditable: ComponentStory< typeof Disabled > = ( args ) => {
++	return (
++		<Disabled { ...args }>
++			<div contentEditable tabIndex={ 0 }>
++				contentEditable
++			</div>
++		</Disabled>
++	);
++};
++ContentEditable.args = {
++	isDisabled: true,
++};
+diff --git a/packages/components/src/disabled/styles/disabled-styles.js b/packages/components/src/disabled/styles/disabled-styles.tsx
+similarity index 100%
+rename from packages/components/src/disabled/styles/disabled-styles.js
+rename to packages/components/src/disabled/styles/disabled-styles.tsx
+diff --git a/packages/components/src/disabled/test/index.js b/packages/components/src/disabled/test/index.js
+deleted file mode 100644
+index 1369c737dcfd27..00000000000000
+--- a/packages/components/src/disabled/test/index.js
++++ /dev/null
+@@ -1,240 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import TestUtils from 'react-dom/test-utils';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { Component } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import Disabled from '../';
+-
+-jest.mock( '@wordpress/dom', () => {
+-	const focus = jest.requireActual( '../../../../dom/src' ).focus;
+-
+-	return {
+-		focus: {
+-			...focus,
+-			focusable: {
+-				...focus.focusable,
+-				find( context ) {
+-					// In JSDOM, all elements have zero'd widths and height.
+-					// This is a metric for focusable's `isVisible`, so find
+-					// and apply an arbitrary non-zero width.
+-					Array.from( context.querySelectorAll( '*' ) ).forEach(
+-						( element ) => {
+-							Object.defineProperties( element, {
+-								offsetWidth: {
+-									get: () => 1,
+-								},
+-							} );
+-						}
+-					);
+-
+-					return focus.focusable.find( ...arguments );
+-				},
+-			},
+-		},
+-	};
+-} );
+-
+-describe( 'Disabled', () => {
+-	let MutationObserver;
+-
+-	beforeAll( () => {
+-		MutationObserver = window.MutationObserver;
+-		window.MutationObserver = function () {};
+-		window.MutationObserver.prototype = {
+-			observe() {},
+-			disconnect() {},
+-		};
+-	} );
+-
+-	afterAll( () => {
+-		window.MutationObserver = MutationObserver;
+-	} );
+-
+-	const Form = () => (
+-		<form>
+-			<input />
+-			<div contentEditable tabIndex="0" />
+-		</form>
+-	);
+-
+-	// This is needed because TestUtils does not accept a stateless component.
+-	class DisabledComponent extends Component {
+-		render() {
+-			const { children, isDisabled } = this.props;
+-
+-			return <Disabled isDisabled={ isDisabled }>{ children }</Disabled>;
+-		}
+-	}
+-
+-	it( 'will disable all fields', () => {
+-		const wrapper = TestUtils.renderIntoDocument(
+-			<DisabledComponent>
+-				<Form />
+-			</DisabledComponent>
+-		);
+-
+-		const input = TestUtils.findRenderedDOMComponentWithTag(
+-			wrapper,
+-			'input'
+-		);
+-		const div = TestUtils.scryRenderedDOMComponentsWithTag(
+-			wrapper,
+-			'div'
+-		)[ 1 ];
+-
+-		expect( input.hasAttribute( 'disabled' ) ).toBe( true );
+-		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
+-		expect( div.hasAttribute( 'tabindex' ) ).toBe( false );
+-		expect( div.hasAttribute( 'disabled' ) ).toBe( false );
+-	} );
+-
+-	it( 'should cleanly un-disable via reconciliation', () => {
+-		// If this test suddenly starts failing, it means React has become
+-		// smarter about reusing children into grandfather element when the
+-		// parent is dropped, so we'd need to find another way to restore
+-		// original form state.
+-		// Using state for this test for easier manipulation of the child props.
+-		class MaybeDisable extends Component {
+-			constructor() {
+-				super( ...arguments );
+-				this.state = { isDisabled: true };
+-			}
+-
+-			render() {
+-				return this.state.isDisabled ? (
+-					<Disabled>
+-						<Form />
+-					</Disabled>
+-				) : (
+-					<Form />
+-				);
+-			}
+-		}
+-
+-		const wrapper = TestUtils.renderIntoDocument( <MaybeDisable /> );
+-		wrapper.setState( { isDisabled: false } );
+-
+-		const input = TestUtils.findRenderedDOMComponentWithTag(
+-			wrapper,
+-			'input'
+-		);
+-		const div = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'div' );
+-
+-		expect( input.hasAttribute( 'disabled' ) ).toBe( false );
+-		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'true' );
+-		expect( div.hasAttribute( 'tabindex' ) ).toBe( true );
+-	} );
+-
+-	it( 'will disable or enable descendant fields based on the isDisabled prop value', () => {
+-		class MaybeDisable extends Component {
+-			constructor() {
+-				super( ...arguments );
+-				this.state = { isDisabled: true };
+-			}
+-
+-			render() {
+-				return (
+-					<DisabledComponent isDisabled={ this.state.isDisabled }>
+-						<Form />
+-					</DisabledComponent>
+-				);
+-			}
+-		}
+-
+-		const wrapper = TestUtils.renderIntoDocument( <MaybeDisable /> );
+-
+-		const input = TestUtils.findRenderedDOMComponentWithTag(
+-			wrapper,
+-			'input'
+-		);
+-		const div = TestUtils.scryRenderedDOMComponentsWithTag(
+-			wrapper,
+-			'div'
+-		)[ 1 ];
+-
+-		expect( input.hasAttribute( 'disabled' ) ).toBe( true );
+-		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
+-
+-		wrapper.setState( { isDisabled: false } );
+-
+-		const input2 = TestUtils.findRenderedDOMComponentWithTag(
+-			wrapper,
+-			'input'
+-		);
+-		const div2 = TestUtils.scryRenderedDOMComponentsWithTag(
+-			wrapper,
+-			'div'
+-		)[ 0 ];
+-
+-		expect( input2.hasAttribute( 'disabled' ) ).toBe( false );
+-		expect( div2.getAttribute( 'contenteditable' ) ).not.toBe( 'false' );
+-	} );
+-
+-	// Ideally, we'd have two more test cases here:
+-	//
+-	//  - it( 'will disable all fields on component render change' )
+-	//  - it( 'will disable all fields on sneaky DOM manipulation' )
+-	//
+-	// Alas, JSDOM does not support MutationObserver:
+-	//
+-	//  https://github.com/jsdom/jsdom/issues/639
+-
+-	describe( 'Consumer', () => {
+-		class DisabledStatus extends Component {
+-			render() {
+-				return (
+-					<p>
+-						<Disabled.Consumer>
+-							{ ( isDisabled ) =>
+-								isDisabled ? 'Disabled' : 'Not disabled'
+-							}
+-						</Disabled.Consumer>
+-					</p>
+-				);
+-			}
+-		}
+-
+-		test( "lets components know that they're disabled via context", () => {
+-			const wrapper = TestUtils.renderIntoDocument(
+-				<DisabledComponent>
+-					<DisabledStatus />
+-				</DisabledComponent>
+-			);
+-			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag(
+-				wrapper,
+-				'p'
+-			);
+-			expect( wrapperElement.textContent ).toBe( 'Disabled' );
+-		} );
+-
+-		test( "lets components know that they're not disabled via context when isDisabled is false", () => {
+-			const wrapper = TestUtils.renderIntoDocument(
+-				<DisabledComponent isDisabled={ false }>
+-					<DisabledStatus />
+-				</DisabledComponent>
+-			);
+-			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag(
+-				wrapper,
+-				'p'
+-			);
+-			expect( wrapperElement.textContent ).toBe( 'Not disabled' );
+-		} );
+-
+-		test( "lets components know that they're not disabled via context", () => {
+-			const wrapper = TestUtils.renderIntoDocument( <DisabledStatus /> );
+-			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag(
+-				wrapper,
+-				'p'
+-			);
+-			expect( wrapperElement.textContent ).toBe( 'Not disabled' );
+-		} );
+-	} );
+-} );
+diff --git a/packages/components/src/disabled/test/index.tsx b/packages/components/src/disabled/test/index.tsx
+new file mode 100644
+index 00000000000000..2284fc3ee9e8c7
+--- /dev/null
++++ b/packages/components/src/disabled/test/index.tsx
+@@ -0,0 +1,174 @@
++/**
++ * External dependencies
++ */
++import { render, screen, waitFor } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import Disabled from '../';
++
++jest.mock( '@wordpress/dom', () => {
++	const focus = jest.requireActual( '../../../../dom/src' ).focus;
++	return {
++		focus: {
++			...focus,
++			focusable: {
++				...focus.focusable,
++				find( context: Element, options = { sequential: false } ) {
++					// In JSDOM, all elements have zero'd widths and height.
++					// This is a metric for focusable's `isVisible`, so find
++					// and apply an arbitrary non-zero width.
++					Array.from( context.querySelectorAll( '*' ) ).forEach(
++						( element ) => {
++							Object.defineProperties( element, {
++								offsetWidth: {
++									get: () => 1,
++									configurable: true,
++								},
++							} );
++						}
++					);
++
++					return focus.focusable.find( context, options );
++				},
++			},
++		},
++	};
++} );
++
++describe( 'Disabled', () => {
++	const Form = () => (
++		<form title="form">
++			<input />
++			<div title="edit my content" contentEditable tabIndex={ 0 } />
++		</form>
++	);
++
++	it( 'will disable all fields', () => {
++		render(
++			<Disabled>
++				<Form />
++			</Disabled>
++		);
++
++		const input = screen.getByRole( 'textbox' );
++		const contentEditable = screen.getByTitle( 'edit my content' );
++		expect( input ).toBeDisabled();
++		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'false' );
++		expect( contentEditable ).not.toHaveAttribute( 'tabindex' );
++		expect( contentEditable ).not.toHaveAttribute( 'disabled' );
++	} );
++
++	it( 'should cleanly un-disable via reconciliation', () => {
++		const MaybeDisable = ( { isDisabled = true } ) =>
++			isDisabled ? (
++				<Disabled>
++					<Form />
++				</Disabled>
++			) : (
++				<Form />
++			);
++
++		const { rerender } = render( <MaybeDisable /> );
++
++		const input = screen.getByRole( 'textbox' );
++		const contentEditable = screen.getByTitle( 'edit my content' );
++
++		expect( input ).toBeDisabled();
++		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'false' );
++
++		rerender( <MaybeDisable isDisabled={ false } /> );
++
++		expect( input ).not.toBeDisabled();
++		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'true' );
++		expect( contentEditable ).toHaveAttribute( 'tabindex' );
++	} );
++
++	it( 'will disable or enable descendant fields based on the isDisabled prop value', () => {
++		const MaybeDisable = ( { isDisabled = true } ) => (
++			<Disabled isDisabled={ isDisabled }>
++				<Form />
++			</Disabled>
++		);
++
++		const { rerender } = render( <MaybeDisable /> );
++
++		const input = screen.getByRole( 'textbox' );
++		const contentEditable = screen.getByTitle( 'edit my content' );
++
++		expect( input ).toBeDisabled();
++		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'false' );
++
++		rerender( <MaybeDisable isDisabled={ false } /> );
++
++		expect( input ).not.toBeDisabled();
++		expect( contentEditable ).toHaveAttribute( 'contenteditable', 'true' );
++	} );
++
++	it( 'will disable all fields on sneaky DOM manipulation', async () => {
++		render(
++			<Disabled>
++				<Form />
++			</Disabled>
++		);
++
++		const form = screen.getByTitle( 'form' );
++		form.insertAdjacentHTML(
++			'beforeend',
++			'<input title="sneaky input" />'
++		);
++		form.insertAdjacentHTML(
++			'beforeend',
++			'<div title="sneaky editable content" contentEditable tabIndex={ 0 } />'
++		);
++		const sneakyInput = screen.getByTitle( 'sneaky input' );
++		const sneakyEditable = screen.getByTitle( 'sneaky editable content' );
++
++		await waitFor( () => expect( sneakyInput ).toBeDisabled() );
++		await waitFor( () =>
++			expect( sneakyEditable ).toHaveAttribute(
++				'contenteditable',
++				'false'
++			)
++		);
++	} );
++
++	describe( 'Consumer', () => {
++		function DisabledStatus() {
++			return (
++				<p>
++					<Disabled.Consumer>
++						{ ( isDisabled ) =>
++							isDisabled ? 'Disabled' : 'Not disabled'
++						}
++					</Disabled.Consumer>
++				</p>
++			);
++		}
++
++		test( "lets components know that they're disabled via context", () => {
++			render(
++				<Disabled>
++					<DisabledStatus />
++				</Disabled>
++			);
++
++			expect( screen.getByText( 'Disabled' ) ).toBeInTheDocument();
++		} );
++
++		test( "lets components know that they're not disabled via context when isDisabled is false", () => {
++			render(
++				<Disabled isDisabled={ false }>
++					<DisabledStatus />
++				</Disabled>
++			);
++			expect( screen.getByText( 'Not disabled' ) ).toBeInTheDocument();
++		} );
++
++		test( "lets components know that they're not disabled via context when the Disabled component is not rendered at all", () => {
++			render( <DisabledStatus /> );
++			expect( screen.getByText( 'Not disabled' ) ).toBeInTheDocument();
++		} );
++	} );
++} );
+diff --git a/packages/components/src/disabled/types.ts b/packages/components/src/disabled/types.ts
+new file mode 100644
+index 00000000000000..804adbfddeff3b
+--- /dev/null
++++ b/packages/components/src/disabled/types.ts
+@@ -0,0 +1,13 @@
++export interface DisabledProps {
++	/**
++	 * Whether to disable all the descendant fields.
++	 *
++	 * @default true
++	 */
++	isDisabled?: boolean;
++
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
++}

@@ -1,0 +1,15 @@
+diff --git a/packages/components/src/panel/style.scss b/packages/components/src/panel/style.scss
+index 500e5e6fd1a798..65ebe06106d793 100644
+--- a/packages/components/src/panel/style.scss
++++ b/packages/components/src/panel/style.scss
+@@ -153,6 +153,10 @@
+ 	&:first-of-type {
+ 		margin-top: 0;
+ 	}
++
++	.components-base-control {
++		width: 100%;
++	}
+ }
+ 
+ .components-panel .circle-picker {

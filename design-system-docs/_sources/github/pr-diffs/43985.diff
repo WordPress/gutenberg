@@ -1,0 +1,140 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fbeaa1bb6267b4..20a610ad3acec6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,7 @@
+ -   `RangeControl`: Tweak dark gray marking color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
+ -   `UnitControl`: Tweak unit dropdown color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
+ -   `SearchControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43871](https://github.com/WordPress/gutenberg/pull/43871)).
++-   `UnitControl`: Consistently hide spin buttons ([#43985](https://github.com/WordPress/gutenberg/pull/43985)).
+ -   `CardHeader`, `CardBody`, `CardFooter`: Tweak `isShady` background colors to be consistent with the grays in `@wordpress/base-styles` ([#43719](https://github.com/WordPress/gutenberg/pull/43719)).
+ -   `InputControl`, `SelectControl`: Tweak `disabled` colors to be consistent with the grays in `@wordpress/base-styles` ([#43719](https://github.com/WordPress/gutenberg/pull/43719)).
+ -   `FocalPointPicker`: Tweak media placeholder background color to be consistent with the grays in `@wordpress/base-styles` ([#43994](https://github.com/WordPress/gutenberg/pull/43994)).
+diff --git a/packages/components/src/box-control/unit-control.js b/packages/components/src/box-control/unit-control.js
+index df4fac9c98935a..1355b39fb6de13 100644
+--- a/packages/components/src/box-control/unit-control.js
++++ b/packages/components/src/box-control/unit-control.js
+@@ -35,7 +35,6 @@ export default function BoxUnitControl( {
+ 				<UnitControl
+ 					aria-label={ label }
+ 					className="component-box-control__unit-control"
+-					hideHTMLArrows
+ 					isFirst={ isFirst }
+ 					isLast={ isLast }
+ 					isOnly={ isOnly }
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 73d2c692f0a29a..5a3d0967d9b022 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -265,7 +265,7 @@ function UnforwardedUnitControl(
+ 				autoComplete={ autoComplete }
+ 				className={ classes }
+ 				disabled={ disabled }
+-				disableUnits={ disableUnits }
++				hideHTMLArrows
+ 				isPressEnterToChange={ isPressEnterToChange }
+ 				label={ label }
+ 				onBlur={ handleOnBlur }
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.ts b/packages/components/src/unit-control/styles/unit-control-styles.ts
+index 832e1bac0d9362..ba5952a5ba65d6 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.ts
++++ b/packages/components/src/unit-control/styles/unit-control-styles.ts
+@@ -18,10 +18,6 @@ type SelectProps = {
+ 	selectSize: SelectSize;
+ };
+ 
+-type InputProps = {
+-	disableUnits?: boolean;
+-};
+-
+ export const Root = styled.div`
+ 	box-sizing: border-box;
+ 	position: relative;
+@@ -32,30 +28,14 @@ export const Root = styled.div`
+ 	}
+ `;
+ 
+-const arrowStyles = ( { disableUnits }: InputProps ) => {
+-	if ( disableUnits ) return '';
+-
+-	return css`
+-		&::-webkit-outer-spin-button,
+-		&::-webkit-inner-spin-button {
+-			-webkit-appearance: none;
+-			margin: 0;
+-		}
+-	`;
+-};
+-
+ // TODO: Resolve need to use &&& to increase specificity
+ // https://github.com/WordPress/gutenberg/issues/18483
+ 
+ export const ValueInput = styled( NumberControl )`
+ 	&&& {
+ 		input {
+-			appearance: none;
+-			-moz-appearance: textfield;
+ 			display: block;
+ 			width: 100%;
+-
+-			${ arrowStyles };
+ 		}
+ 	}
+ `;
+diff --git a/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap b/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
+deleted file mode 100644
+index 8674b01867901f..00000000000000
+--- a/packages/components/src/unit-control/test/__snapshots__/index.tsx.snap
++++ /dev/null
+@@ -1,31 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`UnitControl Basic rendering should render custom className 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -1,20 +1,20 @@
+-  <div
+-    class="components-unit-control-wrapper css-zi0c81-Root e1bagdl33"
+-  >
+-    <div
+--     class="components-flex components-input-control components-number-control components-unit-control e1bagdl32 ep48uk90 em5sgkm7 css-x6mixa-View-Flex-base-ItemsColumn-Root-Input-ValueInput-arrowStyles e19lxcc00"
+-+     class="components-flex components-input-control components-number-control components-unit-control hello e1bagdl32 ep48uk90 em5sgkm7 css-x6mixa-View-Flex-base-ItemsColumn-Root-Input-ValueInput-arrowStyles e19lxcc00"
+-      data-wp-c16t="true"
+-      data-wp-component="Flex"
+-    >
+-      <div
+-        class="components-input-control__container css-1o1a8cj-Container-containerDisabledStyles-containerWidthStyles em5sgkm6"
+-      >
+-        <input
+-          autocomplete="off"
+-          class="components-input-control__input css-1hsyo1w-Input-dragStyles-fontSizeStyles-sizeStyles-customPaddings em5sgkm5"
+--         id="inspector-input-control-1"
+-+         id="inspector-input-control-2"
+-          inputmode="numeric"
+-          max="Infinity"
+-          min="-Infinity"
+-          step="1"
+-          type="number"
+-`;
+diff --git a/packages/components/src/unit-control/test/index.tsx b/packages/components/src/unit-control/test/index.tsx
+index 72e7c06ee18b77..c4b6e80eba3562 100644
+--- a/packages/components/src/unit-control/test/index.tsx
++++ b/packages/components/src/unit-control/test/index.tsx
+@@ -111,9 +111,12 @@ describe( 'UnitControl', () => {
+ 				<UnitControl className="hello" />
+ 			);
+ 
+-			expect( withoutClassName.firstChild ).toMatchDiffSnapshot(
+-				withClassName.firstChild
+-			);
++			expect(
++				withoutClassName.querySelector( '.components-unit-control' )
++			).not.toHaveClass( 'hello' );
++			expect(
++				withClassName.querySelector( '.components-unit-control' )
++			).toHaveClass( 'hello' );
+ 		} );
+ 
+ 		it( 'should not render select, if units are disabled', () => {

@@ -1,0 +1,178 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f7f22160c2187b..80f3537e7749ec 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `PaletteEdit`: dedupe palette element slugs ([#65772](https://github.com/WordPress/gutenberg/pull/65772)).
+ -   `RangeControl`: do not tooltip contents to the DOM when not shown ([#65875](https://github.com/WordPress/gutenberg/pull/65875)).
+ -   `Tabs`: fix skipping indication animation glitch ([#65878](https://github.com/WordPress/gutenberg/pull/65878)).
++-   `ToggleGroupControl`: Don't autoselect option on first group focus ([#65892](https://github.com/WordPress/gutenberg/pull/65892)).
+ 
+ ## 28.9.0 (2024-10-03)
+ 
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index d2d98eaba85e6f..832c6d7cb7a8c8 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -283,7 +283,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+         class="components-toggle-group-control emotion-8 emotion-9"
+         data-wp-c16t="true"
+         data-wp-component="ToggleGroupControl"
+-        id="toggle-group-control-as-radio-group-11"
++        id="toggle-group-control-as-radio-group-12"
+         role="radiogroup"
+       >
+         <div
+@@ -297,7 +297,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+             data-value="uppercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+-            id="toggle-group-control-as-radio-group-11-30"
++            id="toggle-group-control-as-radio-group-12-32"
+             role="radio"
+             type="button"
+             value="uppercase"
+@@ -330,7 +330,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+             data-value="lowercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+-            id="toggle-group-control-as-radio-group-11-31"
++            id="toggle-group-control-as-radio-group-12-33"
+             role="radio"
+             type="button"
+             value="lowercase"
+@@ -575,7 +575,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+         class="components-toggle-group-control emotion-8 emotion-9"
+         data-wp-c16t="true"
+         data-wp-component="ToggleGroupControl"
+-        id="toggle-group-control-as-radio-group-10"
++        id="toggle-group-control-as-radio-group-11"
+         role="radiogroup"
+       >
+         <div
+@@ -588,7 +588,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+             data-value="rigas"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+-            id="toggle-group-control-as-radio-group-10-28"
++            id="toggle-group-control-as-radio-group-11-30"
+             role="radio"
+             type="button"
+             value="rigas"
+@@ -610,7 +610,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+             data-value="jack"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+-            id="toggle-group-control-as-radio-group-10-29"
++            id="toggle-group-control-as-radio-group-11-31"
+             role="radio"
+             type="button"
+             value="jack"
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index 170db01ae523c2..d7b4824fce4de8 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -162,6 +162,19 @@ describe.each( [
+ 		expect( mockOnChange ).toHaveBeenCalledWith( 'rigas' );
+ 	} );
+ 
++	it( 'should not set a value on focus', async () => {
++		render(
++			<Component label="Test Toggle Group Control">{ options }</Component>
++		);
++
++		const radio = screen.getByRole( 'radio', { name: 'R' } );
++		expect( radio ).not.toBeChecked();
++
++		await press.Tab();
++		expect( radio ).toHaveFocus();
++		expect( radio ).not.toBeChecked();
++	} );
++
+ 	it( 'should render tooltip where `showTooltip` === `true`', async () => {
+ 		render(
+ 			<Component label="Test Toggle Group Control">
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index d8604c59c540f0..b33f53dd706b53 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -75,7 +75,6 @@ function ToggleGroupControlOptionBase(
+ 		value,
+ 		children,
+ 		showTooltip = false,
+-		onFocus: onFocusProp,
+ 		disabled,
+ 		...otherButtonProps
+ 	} = buttonProps;
+@@ -132,7 +131,6 @@ function ToggleGroupControlOptionBase(
+ 					<button
+ 						{ ...commonProps }
+ 						disabled={ disabled }
+-						onFocus={ onFocusProp }
+ 						aria-pressed={ isPressed }
+ 						type="button"
+ 						onClick={ buttonOnClick }
+@@ -142,19 +140,17 @@ function ToggleGroupControlOptionBase(
+ 				) : (
+ 					<Ariakit.Radio
+ 						disabled={ disabled }
+-						render={
+-							<button
+-								type="button"
+-								{ ...commonProps }
+-								onFocus={ ( event ) => {
+-									onFocusProp?.( event );
+-									if ( event.defaultPrevented ) {
+-										return;
+-									}
+-									toggleGroupControlContext.setValue( value );
+-								} }
+-							/>
+-						}
++						onFocusVisible={ () => {
++							// Conditions ensure that the first visible focus to a radio group
++							// without a selected option will not automatically select the option.
++							if (
++								toggleGroupControlContext.value !== null ||
++								toggleGroupControlContext.activeItemIsNotFirstItem?.()
++							) {
++								toggleGroupControlContext.setValue( value );
++							}
++						} }
++						render={ <button type="button" { ...commonProps } /> }
+ 						value={ value }
+ 					>
+ 						<ButtonContentView>{ children }</ButtonContentView>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+index 342f9f128defd9..4481fc9f6138d8 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+@@ -75,6 +75,8 @@ function UnforwardedToggleGroupControlAsRadioGroup(
+ 
+ 	const groupContextValue = useMemo(
+ 		(): ToggleGroupControlContextProps => ( {
++			activeItemIsNotFirstItem: () =>
++				radio.getState().activeId !== radio.first(),
+ 			baseId,
+ 			isBlock: ! isAdaptiveWidth,
+ 			size,
+@@ -87,6 +89,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
+ 		[
+ 			baseId,
+ 			isAdaptiveWidth,
++			radio,
+ 			selectedValue,
+ 			setSelectedElement,
+ 			setValue,
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 2a4af680263dba..463d8d26e64410 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -131,6 +131,7 @@ export type ToggleGroupControlProps = Pick<
+ };
+ 
+ export type ToggleGroupControlContextProps = {
++	activeItemIsNotFirstItem?: () => boolean;
+ 	isDeselectable?: boolean;
+ 	baseId: string;
+ 	isBlock: ToggleGroupControlProps[ 'isBlock' ];

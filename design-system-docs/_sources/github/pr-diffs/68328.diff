@@ -1,0 +1,174 @@
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index c67c795addbf4d..089790bedfc118 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -8,10 +8,11 @@ Lets users take actions and make choices with a single click or tap.
+ 
+ ```jsx
+ import { Button } from '@wordpress/components';
+-const Mybutton = () => (
++const MyButton = () => (
+   <Button
+     variant="primary"
+     onClick={ handleClick }
++    __next40pxDefaultSize
+   >
+     Click here
+   </Button>
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index 0ab6b24b4dd6aa..e572e393ac2709 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -25,11 +25,13 @@ import Icon from '../icon';
+ import { VisuallyHidden } from '../visually-hidden';
+ import type { ButtonProps, DeprecatedButtonProps } from './types';
+ import { positionToPlacement } from '../popover/utils';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
+ 
+ function useDeprecatedProps( {
+ 	__experimentalIsFocusable,
++	__shouldNotWarnDeprecated36pxSize,
+ 	isDefault,
+ 	isPrimary,
+ 	isSecondary,
+@@ -81,6 +83,15 @@ function useDeprecatedProps( {
+ 		computedVariant ??= 'link';
+ 	}
+ 
++	if ( computedVariant !== 'link' ) {
++		maybeWarnDeprecated36pxSize( {
++			componentName: 'Button',
++			size: computedSize,
++			__next40pxDefaultSize: otherProps.__next40pxDefaultSize,
++			__shouldNotWarnDeprecated36pxSize,
++		} );
++	}
++
+ 	return {
+ 		...newProps,
+ 		...otherProps,
+@@ -292,10 +303,11 @@ export function UnforwardedButton(
+  *
+  * ```jsx
+  * import { Button } from '@wordpress/components';
+- * const Mybutton = () => (
++ * const MyButton = () => (
+  *   <Button
+  *     variant="primary"
+  *     onClick={ handleClick }
++ *     __next40pxDefaultSize
+  *   >
+  *     Click here
+  *   </Button>
+diff --git a/packages/components/src/button/stories/index.story.tsx b/packages/components/src/button/stories/index.story.tsx
+index 605b56686c702f..fbce879e2e4d88 100644
+--- a/packages/components/src/button/stories/index.story.tsx
++++ b/packages/components/src/button/stories/index.story.tsx
+@@ -63,6 +63,7 @@ const Template: StoryFn< typeof Button > = ( props ) => {
+ export const Default = Template.bind( {} );
+ Default.args = {
+ 	children: 'Code is poetry',
++	__next40pxDefaultSize: true,
+ };
+ 
+ /**
+@@ -113,10 +114,14 @@ IsDestructive.args = {
+ 	isDestructive: true,
+ };
+ 
++/**
++ * In most cases, the `"compact"` size should be used for icon buttons.
++ */
+ export const Icon = Template.bind( {} );
+ Icon.args = {
+ 	label: 'Code is poetry',
+ 	icon: 'wordpress',
++	size: 'compact',
+ };
+ 
+ export const GroupedIcons = () => {
+@@ -126,9 +131,9 @@ export const GroupedIcons = () => {
+ 
+ 	return (
+ 		<GroupContainer>
+-			<Button icon={ formatBold } label="Bold" />
+-			<Button icon={ formatItalic } label="Italic" />
+-			<Button icon={ link } label="Link" />
++			<Button size="compact" icon={ formatBold } label="Bold" />
++			<Button size="compact" icon={ formatItalic } label="Italic" />
++			<Button size="compact" icon={ link } label="Link" />
+ 		</GroupContainer>
+ 	);
+ };
+diff --git a/packages/components/src/button/types.ts b/packages/components/src/button/types.ts
+index d730f49b1e8138..2c545449923e8d 100644
+--- a/packages/components/src/button/types.ts
++++ b/packages/components/src/button/types.ts
+@@ -25,6 +25,13 @@ type BaseButtonProps = {
+ 	 * @default false
+ 	 */
+ 	__next40pxDefaultSize?: boolean;
++	/**
++	 * Do not throw a warning for the deprecated 36px default size.
++	 * For internal components of other components that already throw the warning.
++	 *
++	 * @ignore
++	 */
++	__shouldNotWarnDeprecated36pxSize?: boolean;
+ 	/**
+ 	 * Whether to keep the button focusable when disabled.
+ 	 *
+diff --git a/packages/components/src/navigator/stories/index.story.tsx b/packages/components/src/navigator/stories/index.story.tsx
+index 0baf6a1c9cf5bf..2dfff7e6716f43 100644
+--- a/packages/components/src/navigator/stories/index.story.tsx
++++ b/packages/components/src/navigator/stories/index.story.tsx
+@@ -145,6 +145,7 @@ const NavigatorButtonWithSkipFocus = ( {
+ 	return (
+ 		<Button
+ 			{ ...props }
++			__next40pxDefaultSize
+ 			style={ {
+ 				marginInline: '8px',
+ 				...props.style,
+diff --git a/packages/components/src/utils/deprecated-36px-size.ts b/packages/components/src/utils/deprecated-36px-size.ts
+index 0f87c2cd270c73..024c77a150f680 100644
+--- a/packages/components/src/utils/deprecated-36px-size.ts
++++ b/packages/components/src/utils/deprecated-36px-size.ts
+@@ -8,11 +8,15 @@ export function maybeWarnDeprecated36pxSize( {
+ 	__next40pxDefaultSize,
+ 	size,
+ 	__shouldNotWarnDeprecated36pxSize,
++	feature,
++	hint,
+ }: {
+ 	componentName: string;
+ 	__next40pxDefaultSize: boolean | undefined;
+ 	size: string | undefined;
+ 	__shouldNotWarnDeprecated36pxSize?: boolean;
++	feature?: string;
++	hint?: string;
+ } ) {
+ 	if (
+ 		__shouldNotWarnDeprecated36pxSize ||
+@@ -22,9 +26,14 @@ export function maybeWarnDeprecated36pxSize( {
+ 		return;
+ 	}
+ 
+-	deprecated( `36px default size for wp.components.${ componentName }`, {
+-		since: '6.8',
+-		version: '7.1',
+-		hint: 'Set the `__next40pxDefaultSize` prop to true to start opting into the new default size, which will become the default in a future version.',
+-	} );
++	deprecated(
++		feature ?? `36px default size for wp.components.${ componentName }`,
++		{
++			since: '6.8',
++			version: '7.1',
++			hint:
++				hint ??
++				'Set the `__next40pxDefaultSize` prop to true to start opting into the new default size, which will become the default in a future version.',
++		}
++	);
+ }

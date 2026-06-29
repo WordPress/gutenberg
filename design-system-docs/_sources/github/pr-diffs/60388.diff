@@ -1,0 +1,114 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1e1ed19c122244..acabd0666c7a8f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancement
++
++-   `ProgressBar`: Move the indicator width styles from emotion to a CSS variable ([#60388](https://github.com/WordPress/gutenberg/pull/60388)).
++
+ ## 27.3.0 (2024-04-03)
+ 
+ ### Bug Fix
+@@ -1072,7 +1076,7 @@
+ 
+ ### Enhancements
+ 
+--   `FontSizePicker`: Updated to take up full width of its parent and have a 40px Reset button when `size` is `__unstable-large` ((44559)[https://github.com/WordPress/gutenberg/pull/44559]).
++-   `FontSizePicker`: Updated to take up full width of its parent and have a 40px Reset button when `size` is `__unstable-large` ([44559](https://github.com/WordPress/gutenberg/pull/44559)).
+ -   `BorderBoxControl`: Omit unit select when width values are mixed ([#44592](https://github.com/WordPress/gutenberg/pull/44592))
+ -   `BorderControl`: Add ability to disable unit selection ([#44592](https://github.com/WordPress/gutenberg/pull/44592))
+ 
+@@ -1902,8 +1906,8 @@
+ 
+ ### Breaking Changes
+ 
+--   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+--   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
++-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
++-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
+ -   The experimental `Text` component has been completely re-written and enhanced with truncation support and separate variant, size, and weight props to allow for greater control. The previous `variant` prop has been completely removed.
+ 
+ ### Deprecation
+@@ -2236,7 +2240,7 @@
+ -   `withAPIData` has been removed. Please use the Core Data module or `@wordpress/api-fetch` directly instead.
+ -   `Draggable` as a DOM node drag handler has been deprecated. Please, use `Draggable` as a wrap component for your DOM node drag handler.
+ -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
+--   `withContext` has been removed. Please use `wp.element.createContext` instead. See: https://reactjs.org/docs/context.html.
++-   `withContext` has been removed. Please use `wp.element.createContext` instead. See: <https://reactjs.org/docs/context.html>.
+ 
+ ### New Feature
+ 
+diff --git a/packages/components/src/progress-bar/index.tsx b/packages/components/src/progress-bar/index.tsx
+index b5bd9ad46c34d3..924d993d66c8c8 100644
+--- a/packages/components/src/progress-bar/index.tsx
++++ b/packages/components/src/progress-bar/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { ForwardedRef } from 'react';
++import type { CSSProperties, ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -26,8 +26,12 @@ function UnforwardedProgressBar(
+ 	return (
+ 		<ProgressBarStyled.Track className={ className }>
+ 			<ProgressBarStyled.Indicator
++				style={
++					{
++						'--indicator-width': `${ value }%`,
++					} as CSSProperties
++				}
+ 				isIndeterminate={ isIndeterminate }
+-				value={ value }
+ 			/>
+ 			<ProgressBarStyled.ProgressElement
+ 				max={ 100 }
+diff --git a/packages/components/src/progress-bar/styles.ts b/packages/components/src/progress-bar/styles.ts
+index d33b0966d023bf..f04002f458c0aa 100644
+--- a/packages/components/src/progress-bar/styles.ts
++++ b/packages/components/src/progress-bar/styles.ts
+@@ -42,7 +42,6 @@ export const Track = styled.div`
+ 
+ export const Indicator = styled.div< {
+ 	isIndeterminate: boolean;
+-	value?: number;
+ } >`
+ 	display: inline-block;
+ 	position: absolute;
+@@ -60,7 +59,7 @@ export const Indicator = styled.div< {
+ 	outline: 2px solid transparent;
+ 	outline-offset: -2px;
+ 
+-	${ ( { isIndeterminate, value } ) =>
++	${ ( { isIndeterminate } ) =>
+ 		isIndeterminate
+ 			? css( {
+ 					animationDuration: '1.5s',
+@@ -70,7 +69,7 @@ export const Indicator = styled.div< {
+ 					width: `${ INDETERMINATE_TRACK_WIDTH }%`,
+ 			  } )
+ 			: css( {
+-					width: `${ value }%`,
++					width: 'var(--indicator-width)',
+ 					transition: 'width 0.4s ease-in-out',
+ 			  } ) };
+ `;
+diff --git a/packages/components/src/progress-bar/test/index.tsx b/packages/components/src/progress-bar/test/index.tsx
+index 425c54ce8a3022..de83d22ee20ba6 100644
+--- a/packages/components/src/progress-bar/test/index.tsx
++++ b/packages/components/src/progress-bar/test/index.tsx
+@@ -56,7 +56,7 @@ describe( 'ProgressBar', () => {
+ 		const indicator = container.firstChild?.firstChild;
+ 
+ 		expect( indicator ).toHaveStyle( {
+-			width: '55%',
++			'--indicator-width': '55%',
+ 		} );
+ 	} );
+ 

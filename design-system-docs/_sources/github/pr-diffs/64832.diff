@@ -1,0 +1,80 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 00204111a1efd6..2159065670fdb1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -67,6 +67,7 @@
+ -   `DropdownMenu` v2: refactor to overloaded naming convention ([#64654](https://github.com/WordPress/gutenberg/pull/64654)).
+ -   `DropdownMenu` v2: add `GroupLabel` subcomponent ([#64854](https://github.com/WordPress/gutenberg/pull/64854)).
+ -   `Composite` V2: fix Storybook docgen ([#64682](https://github.com/WordPress/gutenberg/pull/64682)).
++-   `Composite` V2: accept store props on top-level component ([#64832](https://github.com/WordPress/gutenberg/pull/64832)).
+ 
+ ## 28.6.0 (2024-08-21)
+ 
+diff --git a/packages/components/src/composite/index.tsx b/packages/components/src/composite/index.tsx
+index 787150eb9b7146..629010d271e811 100644
+--- a/packages/components/src/composite/index.tsx
++++ b/packages/components/src/composite/index.tsx
+@@ -52,9 +52,44 @@ export const Composite = Object.assign(
+ 		HTMLDivElement,
+ 		WordPressComponentProps< CompositeProps, 'div', false >
+ 	>( function Composite(
+-		{ children, store, disabled = false, ...props },
++		{
++			// Composite store props
++			activeId,
++			defaultActiveId,
++			setActiveId,
++			focusLoop = false,
++			focusWrap = false,
++			focusShift = false,
++			virtualFocus = false,
++			orientation = 'both',
++			rtl = false,
++
++			// Composite component props
++			children,
++			disabled = false,
++
++			// To be removed
++			store: storeProp,
++
++			// Rest props
++			...props
++		},
+ 		ref
+ 	) {
++		const newStore = Ariakit.useCompositeStore( {
++			activeId,
++			defaultActiveId,
++			setActiveId,
++			focusLoop,
++			focusWrap,
++			focusShift,
++			virtualFocus,
++			orientation,
++			rtl,
++		} );
++
++		const store = storeProp || newStore;
++
+ 		const contextValue = useMemo(
+ 			() => ( {
+ 				store,
+diff --git a/packages/components/src/composite/types.ts b/packages/components/src/composite/types.ts
+index 05a2b8473eb349..fcde842e1cba77 100644
+--- a/packages/components/src/composite/types.ts
++++ b/packages/components/src/composite/types.ts
+@@ -128,11 +128,11 @@ export type CompositeStoreProps = {
+ 	rtl?: Ariakit.CompositeStoreProps[ 'rtl' ];
+ };
+ 
+-export type CompositeProps = {
++export type CompositeProps = CompositeStoreProps & {
+ 	/**
+ 	 * Object returned by the `useCompositeStore` hook.
+ 	 */
+-	store: Ariakit.CompositeStore;
++	store?: Ariakit.CompositeStore;
+ 	/**
+ 	 * Allows the component to be rendered as a different HTML element or React
+ 	 * component. The value can be a React element or a function that takes in the

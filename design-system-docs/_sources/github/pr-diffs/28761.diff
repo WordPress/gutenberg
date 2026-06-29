@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 764aece8cbef05..5f7da5c0d07436 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -48,7 +48,7 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+ 		name: option.name,
+ 		size: option.size,
+ 		style: {
+-			fontSize: `min( ${ option.size }, ${ MAX_FONT_SIZE_DISPLAY } )`,
++			fontSize: `min( ${ option.size }px, ${ MAX_FONT_SIZE_DISPLAY } )`,
+ 		},
+ 	} ) );
+ }

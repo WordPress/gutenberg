@@ -1,0 +1,254 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 615e5f57bfe53d..1c5e0d64248b21 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   Update the border color used in `CardBody`, `CardHeader`, `CardFooter`, and `CardDivider` to a different shade of gray, in order to match the color used in other components ([#32566](https://github.com/WordPress/gutenberg/pull/32566)).
+ 
++### Bug Fix
++
++-   Added back `box-sizing: border-box` rule to `CardBody`, `CardHeader` and `CardFooter` components [#33511](https://github.com/WordPress/gutenberg/pull/33511).
++
+ ### Deprecation
+ 
+ -   `isPrimary`, `isSecondary`, `isTertiary` and `isLink` props in `Button` have been deprecated. Use `variant` instead ([#31713](https://github.com/WordPress/gutenberg/pull/31713)).
+diff --git a/packages/components/src/card/styles.js b/packages/components/src/card/styles.js
+index 6b4285c093d4ea..4ecd3a09105d87 100644
+--- a/packages/components/src/card/styles.js
++++ b/packages/components/src/card/styles.js
+@@ -15,6 +15,7 @@ export const Card = css`
+ 
+ export const Header = css`
+ 	border-bottom: 1px solid;
++	box-sizing: border-box;
+ 
+ 	&:last-child {
+ 		border-bottom: none;
+@@ -23,6 +24,7 @@ export const Header = css`
+ 
+ export const Footer = css`
+ 	border-top: 1px solid;
++	box-sizing: border-box;
+ 
+ 	&:first-of-type {
+ 		border-top: none;
+@@ -34,6 +36,7 @@ export const Content = css`
+ `;
+ 
+ export const Body = css`
++	box-sizing: border-box;
+ 	height: auto;
+ 	max-height: 100%;
+ `;
+diff --git a/packages/components/src/card/test/__snapshots__/index.js.snap b/packages/components/src/card/test/__snapshots__/index.js.snap
+index 1e9d8487435b0e..82fa34348ba3b3 100644
+--- a/packages/components/src/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/card/test/__snapshots__/index.js.snap
+@@ -8,8 +8,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-card__body components-card-body css-1fyyxcx-View-Body-borderRadius-medium em57xhy0"
+-+     class="components-scrollable components-card__body components-card-body css-q3qn5w-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium em57xhy0"
++-     class="components-card__body components-card-body css-1lr0m0h-View-Body-borderRadius-medium em57xhy0"
+++     class="components-scrollable components-card__body components-card-body css-qqu4qj-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -25,8 +25,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-card__body components-card-body css-1fyyxcx-View-Body-borderRadius-medium em57xhy0"
+-+     class="components-card__body components-card-body css-whouzc-View-Body-borderRadius-medium-shady em57xhy0"
++-     class="components-card__body components-card-body css-1lr0m0h-View-Body-borderRadius-medium em57xhy0"
+++     class="components-card__body components-card-body css-19nlika-View-Body-borderRadius-medium-shady em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -42,8 +42,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__footer components-card-footer css-1ma02pj-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
+-+     class="components-flex components-card__footer components-card-footer css-1ma4att-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium-shady em57xhy0"
++-     class="components-flex components-card__footer components-card-footer css-t1j3xg-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
+++     class="components-flex components-card__footer components-card-footer css-101hjjr-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium-shady em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -59,8 +59,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__footer components-card-footer css-1ma02pj-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
+-+     class="components-flex components-card__footer components-card-footer css-1hvr9sm-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
++-     class="components-flex components-card__footer components-card-footer css-t1j3xg-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
+++     class="components-flex components-card__footer components-card-footer css-1q5iaph-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-medium em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -76,8 +76,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__header components-card-header css-1s7cf5l-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium em57xhy0"
+-+     class="components-flex components-card__header components-card-header css-wk33sz-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium-shady em57xhy0"
++-     class="components-flex components-card__header components-card-header css-knnhft-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium em57xhy0"
+++     class="components-flex components-card__header components-card-header css-1nuvmhw-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium-shady em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="CardHeader"
+     >
+@@ -96,16 +96,16 @@ Snapshot Diff:
+       class="css-mgwsf4-View-Content em57xhy0"
+     >
+       <div
+--       class="components-flex components-card__header components-card-header css-1s7cf5l-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium em57xhy0"
+-+       class="components-flex components-card__header components-card-header css-1n33wp9-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large em57xhy0"
++-       class="components-flex components-card__header components-card-header css-knnhft-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-medium em57xhy0"
+++       class="components-flex components-card__header components-card-header css-9zq5kx-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large em57xhy0"
+         data-wp-c16t="true"
+         data-wp-component="CardHeader"
+       >
+         Header
+       </div>
+       <div
+--       class="components-card__body components-card-body css-1fyyxcx-View-Body-borderRadius-medium em57xhy0"
+-+       class="components-card__body components-card-body css-35zzqj-View-Body-borderRadius-large em57xhy0"
++-       class="components-card__body components-card-body css-1lr0m0h-View-Body-borderRadius-medium em57xhy0"
+++       class="components-card__body components-card-body css-bwr6fa-View-Body-borderRadius-large em57xhy0"
+         data-wp-c16t="true"
+         data-wp-component="CardBody"
+       >
+@@ -124,24 +124,24 @@ Snapshot Diff:
+         class="css-mgwsf4-View-Content em57xhy0"
+       >
+         <div
+--         class="components-flex components-card__header components-card-header css-atq4zi-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless em57xhy0"
+-+         class="components-flex components-card__header components-card-header css-1g7pztv-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small em57xhy0"
++-         class="components-flex components-card__header components-card-header css-lwijn2-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless em57xhy0"
+++         class="components-flex components-card__header components-card-header css-lnnbkk-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+           Header
+         </div>
+         <div
+--         class="components-card__body components-card-body css-35zzqj-View-Body-borderRadius-large em57xhy0"
+-+         class="components-card__body components-card-body css-1fyyxcx-View-Body-borderRadius-medium em57xhy0"
++-         class="components-card__body components-card-body css-bwr6fa-View-Body-borderRadius-large em57xhy0"
+++         class="components-card__body components-card-body css-1lr0m0h-View-Body-borderRadius-medium em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+           Body
+         </div>
+         <div
+--         class="components-flex components-card__footer components-card-footer css-1bj5fkv-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
+-+         class="components-flex components-card__footer components-card-footer css-1jclf0-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-xSmall em57xhy0"
++-         class="components-flex components-card__footer components-card-footer css-1ptqzjj-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
+++         class="components-flex components-card__footer components-card-footer css-1bztdp0-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-xSmall em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardFooter"
+         >
+@@ -166,24 +166,24 @@ Snapshot Diff:
+         class="css-mgwsf4-View-Content em57xhy0"
+       >
+         <div
+--         class="components-flex components-card__header components-card-header css-atq4zi-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless em57xhy0"
+-+         class="components-flex components-card__header components-card-header css-1g7pztv-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small em57xhy0"
++-         class="components-flex components-card__header components-card-header css-lwijn2-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-large-borderless em57xhy0"
+++         class="components-flex components-card__header components-card-header css-lnnbkk-View-Flex-sx-Base-sx-Items-ItemsRow-Header-borderRadius-borderColor-small em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+           Header
+         </div>
+         <div
+--         class="components-card__body components-card-body css-35zzqj-View-Body-borderRadius-large em57xhy0"
+-+         class="components-card__body components-card-body css-1bp82cr-View-Body-borderRadius-small em57xhy0"
++-         class="components-card__body components-card-body css-bwr6fa-View-Body-borderRadius-large em57xhy0"
+++         class="components-card__body components-card-body css-1cnf18v-View-Body-borderRadius-small em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+           Body
+         </div>
+         <div
+--         class="components-flex components-card__footer components-card-footer css-1bj5fkv-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
+-+         class="components-flex components-card__footer components-card-footer css-mflf6c-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-small em57xhy0"
++-         class="components-flex components-card__footer components-card-footer css-1ptqzjj-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-large-borderless em57xhy0"
+++         class="components-flex components-card__footer components-card-footer css-sifz68-View-Flex-sx-Base-sx-Items-ItemsRow-Footer-borderRadius-borderColor-small em57xhy0"
+           data-wp-c16t="true"
+           data-wp-component="CardFooter"
+         >
+@@ -224,6 +224,7 @@ Object {
+   justify-content: space-between;
+   width: 100%;
+   border-bottom: 1px solid;
++  box-sizing: border-box;
+   border-color: rgba(0, 0, 0, 0.1);
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+@@ -251,6 +252,7 @@ Object {
+ }
+ 
+ .emotion-6 {
++  box-sizing: border-box;
+   height: auto;
+   max-height: 100%;
+   padding: calc(4px * 4) calc(4px * 6);
+@@ -318,6 +320,7 @@ Object {
+   justify-content: space-between;
+   width: 100%;
+   border-top: 1px solid;
++  box-sizing: border-box;
+   border-color: rgba(0, 0, 0, 0.1);
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+@@ -471,6 +474,7 @@ Object {
+   justify-content: space-between;
+   width: 100%;
+   border-bottom: 1px solid;
++  box-sizing: border-box;
+   border-color: rgba(0, 0, 0, 0.1);
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+@@ -498,6 +502,7 @@ Object {
+ }
+ 
+ .emotion-6 {
++  box-sizing: border-box;
+   height: auto;
+   max-height: 100%;
+   padding: calc(4px * 4) calc(4px * 6);
+@@ -565,6 +570,7 @@ Object {
+   justify-content: space-between;
+   width: 100%;
+   border-top: 1px solid;
++  box-sizing: border-box;
+   border-color: rgba(0, 0, 0, 0.1);
+   padding: calc(4px * 4) calc(4px * 6);
+ }
+diff --git a/packages/components/src/flyout/test/__snapshots__/index.js.snap b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+index 93a028475c7bdc..1d9e3fffaeed3a 100644
+--- a/packages/components/src/flyout/test/__snapshots__/index.js.snap
++++ b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+@@ -19,6 +19,7 @@ exports[`props should render correctly 1`] = `
+ }
+ 
+ .emotion-5 {
++  box-sizing: border-box;
+   height: auto;
+   max-height: 100%;
+   padding: calc(4px * 4) calc(4px * 6);
+@@ -159,7 +160,7 @@ Snapshot Diff:
+           tabindex="-1"
+         />
+ +       <div
+-+         class="components-card__body components-card-body css-1fyyxcx-View-Body-borderRadius-medium em57xhy0"
+++         class="components-card__body components-card-body css-1lr0m0h-View-Body-borderRadius-medium em57xhy0"
+ +         data-wp-c16t="true"
+ +         data-wp-component="CardBody"
+ +       >

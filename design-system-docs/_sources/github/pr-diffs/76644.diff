@@ -1,0 +1,257 @@
+diff --git a/packages/block-editor/src/components/iframe/index.js b/packages/block-editor/src/components/iframe/index.js
+index a39ff71bbec9d5..a156b0a6c05396 100644
+--- a/packages/block-editor/src/components/iframe/index.js
++++ b/packages/block-editor/src/components/iframe/index.js
+@@ -96,17 +96,12 @@ function useBubbleEvents( iframeDocument ) {
+ 	} );
+ }
+ 
+-const iframeSrcCache = new WeakMap();
+-const iframeSrcCleanup = globalThis.FinalizationRegistry
+-	? new globalThis.FinalizationRegistry( ( url ) =>
+-			URL.revokeObjectURL( url )
+-	  )
+-	: undefined;
+-
+-function getIframeSrc( resolvedAssets ) {
+-	let src = iframeSrcCache.get( resolvedAssets );
+-	if ( src ) {
+-		return src;
++const iframeSrcDocCache = new WeakMap();
++
++function getIframeSrcDoc( resolvedAssets ) {
++	let srcDoc = iframeSrcDocCache.get( resolvedAssets );
++	if ( srcDoc ) {
++		return srcDoc;
+ 	}
+ 
+ 	// Correct doctype is required to enable rendering in standards mode.
+@@ -137,10 +132,9 @@ function getIframeSrc( resolvedAssets ) {
+ 	</body>
+ </html>`;
+ 
+-	src = URL.createObjectURL( new Blob( [ html ], { type: 'text/html' } ) );
+-	iframeSrcCache.set( resolvedAssets, src );
+-	iframeSrcCleanup?.register( resolvedAssets, src );
+-	return src;
++	srcDoc = html;
++	iframeSrcDocCache.set( resolvedAssets, srcDoc );
++	return srcDoc;
+ }
+ 
+ function Iframe( {
+@@ -182,11 +176,11 @@ function Iframe( {
+ 			) {
+ 				event.preventDefault();
+ 				// Manually handle link fragment navigation within the iframe. The iframe's
+-				// location is a blob URL, which can't be used to resolve relative links like
+-				// `#hash`. The relative link would be resolved against the iframe's base URL
+-				// or the parent frame's URL, causing the iframe to navigate to a completely
+-				// different page. Setting the `location.hash` works because it really sets the
+-				// blob URL's hash.
++				// location is `about:srcdoc`, which can't be used to resolve relative links
++				// like `#hash`. The relative link would be resolved against the iframe's base
++				// URL or the parent frame's URL, causing the iframe to navigate to a
++				// completely different page. Setting the `location.hash` works because it
++				// really sets the iframe document's hash.
+ 				//
+ 				// Links with fragments are used for example with footnotes. Clicking on these
+ 				// links will scroll smoothly to the anchors in the editor canvas.
+@@ -304,7 +298,7 @@ function Iframe( {
+ 		[ unguardedBodyRef ]
+ 	);
+ 
+-	const src = getIframeSrc( resolvedAssets );
++	const srcDoc = getIframeSrcDoc( resolvedAssets );
+ 
+ 	// Make sure to not render the before and after focusable div elements in view
+ 	// mode. They're only needed to capture focus in edit mode.
+@@ -323,7 +317,7 @@ function Iframe( {
+ 				} }
+ 				ref={ useMergeRefs( [ ref, setRef ] ) }
+ 				tabIndex={ tabIndex }
+-				src={ src }
++				srcDoc={ srcDoc }
+ 				title={ title }
+ 				onKeyDown={ ( event ) => {
+ 					if ( props.onKeyDown ) {
+diff --git a/packages/components/src/sandbox/index.tsx b/packages/components/src/sandbox/index.tsx
+index 14c57b42d566ab..dc56f126dacc4d 100644
+--- a/packages/components/src/sandbox/index.tsx
++++ b/packages/components/src/sandbox/index.tsx
+@@ -6,6 +6,7 @@ import {
+ 	useRef,
+ 	useState,
+ 	useEffect,
++	useMemo,
+ } from '@wordpress/element';
+ import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
+ 
+@@ -138,43 +139,16 @@ function SandBox( {
+ 	const [ width, setWidth ] = useState( 0 );
+ 	const [ height, setHeight ] = useState( 0 );
+ 
+-	function isFrameAccessible() {
+-		try {
+-			return !! ref.current?.contentDocument?.body;
+-		} catch ( e ) {
+-			return false;
+-		}
+-	}
+-
+-	function trySandBox( forceRerender = false ) {
+-		if ( ! isFrameAccessible() ) {
+-			return;
+-		}
+-
+-		const { contentDocument, ownerDocument } =
+-			ref.current as HTMLIFrameElement & {
+-				contentDocument: Document;
+-			};
+-
+-		if (
+-			! forceRerender &&
+-			null !==
+-				contentDocument?.body.getAttribute(
+-					'data-resizable-iframe-connected'
+-				)
+-		) {
+-			return;
+-		}
+-
+-		// Put the html snippet into a html document, and then write it to the iframe's document
+-		// we can use this in the future to inject custom styles or scripts.
++	const srcDoc = useMemo( () => {
++		const docLang =
++			typeof document !== 'undefined'
++				? document.documentElement.lang
++				: undefined;
++		// Put the html snippet into a html document.
+ 		// Scripts go into the body rather than the head, to support embedded content such as Instagram
+ 		// that expect the scripts to be part of the body.
+ 		const htmlDoc = (
+-			<html
+-				lang={ ownerDocument.documentElement.lang }
+-				className={ type }
+-			>
++			<html lang={ docLang } className={ type }>
+ 				<head>
+ 					<title>{ title }</title>
+ 					<style dangerouslySetInnerHTML={ { __html: style } } />
+@@ -203,21 +177,10 @@ function SandBox( {
+ 			</html>
+ 		);
+ 
+-		// Writing the document like this makes it act in the same way as if it was
+-		// loaded over the network, so DOM creation and mutation, script execution, etc.
+-		// all work as expected.
+-		contentDocument.open();
+-		contentDocument.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
+-		contentDocument.close();
+-	}
++		return '<!DOCTYPE html>' + renderToString( htmlDoc );
++	}, [ html, scripts, styles, title, type ] );
+ 
+ 	useEffect( () => {
+-		trySandBox();
+-
+-		function tryNoForceSandBox() {
+-			trySandBox( false );
+-		}
+-
+ 		function checkMessageForResize( event: MessageEvent ) {
+ 			const iframe = ref.current;
+ 
+@@ -248,15 +211,10 @@ function SandBox( {
+ 		const iframe = ref.current;
+ 		const defaultView = iframe?.ownerDocument?.defaultView;
+ 
+-		// This used to be registered using <iframe onLoad={} />, but it made the iframe blank
+-		// after reordering the containing block. See these two issues for more details:
+-		// https://github.com/WordPress/gutenberg/issues/6146
+-		// https://github.com/facebook/react/issues/18752
+-		iframe?.addEventListener( 'load', tryNoForceSandBox, false );
++		// Listen for resize messages from the iframe content.
+ 		defaultView?.addEventListener( 'message', checkMessageForResize );
+ 
+ 		return () => {
+-			iframe?.removeEventListener( 'load', tryNoForceSandBox, false );
+ 			defaultView?.removeEventListener(
+ 				'message',
+ 				checkMessageForResize
+@@ -266,24 +224,13 @@ function SandBox( {
+ 		// See https://github.com/WordPress/gutenberg/pull/44378
+ 	}, [] );
+ 
+-	useEffect( () => {
+-		trySandBox();
+-		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
+-		// See https://github.com/WordPress/gutenberg/pull/44378
+-	}, [ title, styles, scripts ] );
+-
+-	useEffect( () => {
+-		trySandBox( true );
+-		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
+-		// See https://github.com/WordPress/gutenberg/pull/44378
+-	}, [ html, type ] );
+-
+ 	return (
+ 		<iframe
+ 			ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
+ 			title={ title }
+ 			tabIndex={ tabIndex }
+ 			className="components-sandbox"
++			srcDoc={ srcDoc }
+ 			sandbox="allow-scripts allow-same-origin allow-presentation"
+ 			onFocus={ onFocus }
+ 			width={ Math.ceil( width ) }
+diff --git a/packages/components/src/sandbox/test/index.tsx b/packages/components/src/sandbox/test/index.tsx
+index e1a51814ecab61..be73b3a03dda2b 100644
+--- a/packages/components/src/sandbox/test/index.tsx
++++ b/packages/components/src/sandbox/test/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { fireEvent, render, screen, within } from '@testing-library/react';
++import { fireEvent, render, screen } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -44,28 +44,18 @@ describe( 'SandBox', () => {
+ 		const iframe =
+ 			screen.getByTitle< HTMLIFrameElement >( 'SandBox Title' );
+ 
+-		if ( ! iframe.contentWindow ) {
+-			throw new Error();
+-		}
+-
+-		let sandboxedIframe = within(
+-			iframe.contentWindow.document.body
+-		).getByTitle( 'Mock Iframe' );
+-
+-		expect( sandboxedIframe ).toHaveAttribute(
+-			'src',
+-			'https://super.embed'
++		// JSDOM does not reliably populate `iframe.contentWindow.document` when
++		// using `srcDoc`, so assert against the `srcdoc` attribute instead.
++		expect( iframe ).toHaveAttribute(
++			'srcdoc',
++			expect.stringContaining( 'https://super.embed' )
+ 		);
+ 
+ 		fireEvent.click( screen.getByRole( 'button' ) );
+ 
+-		sandboxedIframe = within(
+-			iframe.contentWindow.document.body
+-		).getByTitle( 'Mock Iframe' );
+-
+-		expect( sandboxedIframe ).toHaveAttribute(
+-			'src',
+-			'https://another.super.embed'
++		expect( iframe ).toHaveAttribute(
++			'srcdoc',
++			expect.stringContaining( 'https://another.super.embed' )
+ 		);
+ 	} );
+ } );

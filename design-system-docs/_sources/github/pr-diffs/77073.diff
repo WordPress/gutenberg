@@ -1,0 +1,153 @@
+diff --git a/packages/editor/src/components/post-title/index.js b/packages/editor/src/components/post-title/index.js
+index bc3831b3d7a0f9..556ae899ad2fd8 100644
+--- a/packages/editor/src/components/post-title/index.js
++++ b/packages/editor/src/components/post-title/index.js
+@@ -181,7 +181,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
+ 	const style = isEditingContentOnlySection ? { opacity: 0.2 } : undefined;
+ 
+ 	return (
+-		/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
++		/* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
+ 		<h1
+ 			ref={ useMergeRefs( [ richTextRef, focusRef ] ) }
+ 			contentEditable={ ! isEditingContentOnlySection && ! isPreview }
+@@ -195,7 +195,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
+ 			onPaste={ onPaste }
+ 			style={ style }
+ 		/>
+-		/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
++		/* eslint-enable jsx-a11y/no-noninteractive-element-to-interactive-role */
+ 	);
+ } );
+ 
+diff --git a/packages/eslint-plugin/CHANGELOG.md b/packages/eslint-plugin/CHANGELOG.md
+index 5a78abb6f2b8f3..659e57f36efe75 100644
+--- a/packages/eslint-plugin/CHANGELOG.md
++++ b/packages/eslint-plugin/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   Disabled the `jsx-a11y/heading-has-content` rule in the recommended configuration, which reports many false positives when heading elements are passed via a `render` prop ([#77073](https://github.com/WordPress/gutenberg/pull/77073)).
++
+ ## 24.5.0 (2026-04-01)
+ 
+ ## 24.4.0 (2026-03-18)
+diff --git a/packages/eslint-plugin/configs/jsx-a11y.js b/packages/eslint-plugin/configs/jsx-a11y.js
+index 61f3d6e5a33f0f..3606e3c14561a7 100644
+--- a/packages/eslint-plugin/configs/jsx-a11y.js
++++ b/packages/eslint-plugin/configs/jsx-a11y.js
+@@ -2,6 +2,9 @@ module.exports = {
+ 	extends: [ 'plugin:jsx-a11y/recommended' ],
+ 	plugins: [ 'jsx-a11y' ],
+ 	rules: {
++		// False positives with `render` props (e.g. `<Text render={ <h1 /> }>…</Text>`).
++		// See https://github.com/WordPress/gutenberg/issues/76501
++		'jsx-a11y/heading-has-content': 'off',
+ 		'jsx-a11y/label-has-associated-control': [
+ 			'error',
+ 			{
+diff --git a/packages/ui/src/card/stories/index.story.tsx b/packages/ui/src/card/stories/index.story.tsx
+index 8e84e27ee6ce96..b43b6910ec672e 100644
+--- a/packages/ui/src/card/stories/index.story.tsx
++++ b/packages/ui/src/card/stories/index.story.tsx
+@@ -116,7 +116,6 @@ export const CustomSemantics: Story = {
+ 		children: (
+ 			<>
+ 				<Card.Header>
+-					{ /* eslint-disable-next-line jsx-a11y/heading-has-content -- content provided via render prop */ }
+ 					<Card.Title render={ <h2 /> }>Section heading</Card.Title>
+ 				</Card.Header>
+ 				<Card.Content>
+diff --git a/packages/ui/src/card/test/index.test.tsx b/packages/ui/src/card/test/index.test.tsx
+index bd4de43b61b38c..584a4cfb469cda 100644
+--- a/packages/ui/src/card/test/index.test.tsx
++++ b/packages/ui/src/card/test/index.test.tsx
+@@ -82,7 +82,6 @@ describe( 'Card', () => {
+ 			render(
+ 				<Card.Root>
+ 					<Card.Header>
+-						{ /* eslint-disable-next-line jsx-a11y/heading-has-content -- content provided via render prop */ }
+ 						<Card.Title render={ <h2 /> }>Heading</Card.Title>
+ 					</Card.Header>
+ 				</Card.Root>
+diff --git a/packages/ui/src/empty-state/title.tsx b/packages/ui/src/empty-state/title.tsx
+index c7b86b7cd3c92f..3f5483fa4f0176 100644
+--- a/packages/ui/src/empty-state/title.tsx
++++ b/packages/ui/src/empty-state/title.tsx
+@@ -12,7 +12,6 @@ export const Title = forwardRef< HTMLHeadingElement, EmptyStateTitleProps >(
+ 		return (
+ 			<Text
+ 				variant="heading-lg"
+-				// eslint-disable-next-line jsx-a11y/heading-has-content -- content provided via render prop
+ 				render={ render ?? <h2 ref={ ref } { ...props } /> }
+ 				className={ clsx( styles.title, className ) }
+ 			>
+diff --git a/packages/ui/src/text/stories/index.story.tsx b/packages/ui/src/text/stories/index.story.tsx
+index f4bb861398039d..82a0cb9cfcdc5a 100644
+--- a/packages/ui/src/text/stories/index.story.tsx
++++ b/packages/ui/src/text/stories/index.story.tsx
+@@ -1,4 +1,3 @@
+-/* eslint-disable jsx-a11y/heading-has-content */
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { Text } from '../index';
+ import { Stack } from '../../stack';
+@@ -65,4 +64,3 @@ export const WithRenderProp: Story = {
+ 		</Stack>
+ 	),
+ };
+-/* eslint-enable jsx-a11y/heading-has-content */
+diff --git a/packages/ui/src/text/test/index.test.tsx b/packages/ui/src/text/test/index.test.tsx
+index f5ab9751a5d606..8599c7cb59ecaa 100644
+--- a/packages/ui/src/text/test/index.test.tsx
++++ b/packages/ui/src/text/test/index.test.tsx
+@@ -34,10 +34,7 @@ describe( 'Text', () => {
+ 	} );
+ 
+ 	it( 'supports the render prop', () => {
+-		render(
+-			// eslint-disable-next-line jsx-a11y/heading-has-content
+-			<Text render={ <h2 /> }>Section title</Text>
+-		);
++		render( <Text render={ <h2 /> }>Section title</Text> );
+ 
+ 		expect(
+ 			screen.getByRole( 'heading', { level: 2, name: 'Section title' } )
+diff --git a/storybook/stories/design-system/theme-example-application.story.tsx b/storybook/stories/design-system/theme-example-application.story.tsx
+index f8e4e245533cd3..76d49e7104d28f 100644
+--- a/storybook/stories/design-system/theme-example-application.story.tsx
++++ b/storybook/stories/design-system/theme-example-application.story.tsx
+@@ -146,7 +146,6 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
+ 									'var(--wpds-dimension-padding-xl) var(--wpds-dimension-padding-lg)',
+ 							} }
+ 						>
+-							{ /* eslint-disable jsx-a11y/heading-has-content */ }
+ 							<Text
+ 								variant="heading-sm"
+ 								render={ <h2 /> }
+@@ -157,7 +156,6 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
+ 							>
+ 								My App
+ 							</Text>
+-							{ /* eslint-enable jsx-a11y/heading-has-content */ }
+ 							<nav>
+ 								<Stack
+ 									direction="column"
+@@ -221,7 +219,6 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
+ 											gap: 'var(--wpds-dimension-gap-md)',
+ 										} }
+ 									>
+-										{ /* eslint-disable jsx-a11y/heading-has-content */ }
+ 										<Text
+ 											variant="heading-lg"
+ 											render={ <h1 /> }
+@@ -231,7 +228,6 @@ export const ExampleApplication: StoryObj< typeof ThemeProvider > = {
+ 										>
+ 											Settings
+ 										</Text>
+-										{ /* eslint-enable jsx-a11y/heading-has-content */ }
+ 										<Badge intent="informational">
+ 											Beta
+ 										</Badge>

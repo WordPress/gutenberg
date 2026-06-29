@@ -1,0 +1,514 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index e34586f6591068..aeba1b0d7a250a 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   Add `Text` primitive with predefined typographic variants (`heading-2xl` through `heading-sm`, `body-xl` through `body-sm`) built on design tokens ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
+ -   Add `Card` and `CollapsibleCard` primitives ([#76252](https://github.com/WordPress/gutenberg/pull/76252)).
++-   Add `Link` primitive ([#76013](https://github.com/WordPress/gutenberg/pull/76013)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 57d2e98fc9bb61..75765c8a38212f 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -6,6 +6,7 @@ export * as Dialog from './dialog';
+ export * from './form/primitives';
+ export * from './icon';
+ export * from './icon-button';
++export * from './link';
+ export * as Notice from './notice';
+ export * from './stack';
+ export * as Tabs from './tabs';
+diff --git a/packages/ui/src/link/index.ts b/packages/ui/src/link/index.ts
+new file mode 100644
+index 00000000000000..63b88256ef476a
+--- /dev/null
++++ b/packages/ui/src/link/index.ts
+@@ -0,0 +1 @@
++export { Link } from './link';
+diff --git a/packages/ui/src/link/link.tsx b/packages/ui/src/link/link.tsx
+new file mode 100644
+index 00000000000000..658d89d3fd81f2
+--- /dev/null
++++ b/packages/ui/src/link/link.tsx
+@@ -0,0 +1,73 @@
++import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
++import { type LinkProps } from './types';
++import resetStyles from '../utils/css/resets.module.css';
++import focusStyles from '../utils/css/focus.module.css';
++import styles from './style.module.css';
++
++/**
++ * A styled anchor element with support for semantic color tones and an
++ * unstyled escape hatch.
++ */
++export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
++	{
++		children,
++		variant = 'default',
++		tone = 'brand',
++		openInNewTab = false,
++		render,
++		className,
++		onClick,
++		...props
++	},
++	ref
++) {
++	const isInternalAnchor = !! props.href?.startsWith( '#' );
++
++	const handleClick = ( event: React.MouseEvent< HTMLAnchorElement > ) => {
++		if ( openInNewTab && isInternalAnchor ) {
++			event.preventDefault();
++		}
++		onClick?.( event );
++	};
++
++	const element = useRender( {
++		render,
++		defaultTagName: 'a',
++		ref,
++		props: mergeProps< 'a' >( props, {
++			className: clsx(
++				resetStyles[ 'box-sizing' ],
++				focusStyles[ 'outset-ring--focus' ],
++				variant !== 'unstyled' && styles.link,
++				variant !== 'unstyled' && styles[ `is-${ tone }` ],
++				variant === 'unstyled' && styles[ 'is-unstyled' ],
++				openInNewTab && styles[ 'has-link-icon' ],
++				className
++			),
++			onClick: handleClick,
++			target: openInNewTab ? '_blank' : undefined,
++			children: openInNewTab ? (
++				<>
++					<span className={ styles[ 'link-contents' ] }>
++						{ children }
++					</span>
++					<span
++						className={ styles[ 'link-icon' ] }
++						role="img"
++						aria-label={
++							/* translators: accessibility text appended to link text */
++							__( '(opens in a new tab)' )
++						}
++					/>
++				</>
++			) : (
++				children
++			),
++		} ),
++	} );
++
++	return element;
++} );
+diff --git a/packages/ui/src/link/stories/index.story.tsx b/packages/ui/src/link/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..e609b17e42ab77
+--- /dev/null
++++ b/packages/ui/src/link/stories/index.story.tsx
+@@ -0,0 +1,92 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { Link } from '../index';
++import { Stack } from '../../stack';
++import { Text } from '../../text';
++
++const meta: Meta< typeof Link > = {
++	title: 'Design System/Components/Link',
++	component: Link,
++};
++export default meta;
++
++type Story = StoryObj< typeof Link >;
++
++export const Default: Story = {
++	args: {
++		children: 'Learn more',
++		href: '#',
++	},
++};
++
++/**
++ * Note: `tone` has no effect on `unstyled` variant
++ */
++export const AllTonesAndVariants: Story = {
++	...Default,
++	argTypes: {
++		tone: {
++			control: false,
++		},
++		variant: {
++			control: false,
++		},
++	},
++	render: ( args ) => (
++		<Stack direction="column" gap="lg">
++			{ ( [ 'brand', 'neutral' ] as const ).map( ( tone ) =>
++				( [ 'default', 'unstyled' ] as const ).map( ( variant ) => (
++					<Stack
++						direction="column"
++						gap="xs"
++						key={ `${ tone }-${ variant }` }
++					>
++						<Text variant="heading-sm">
++							{ tone } tone, { variant } variant
++						</Text>
++						<Link { ...args } tone={ tone } variant={ variant } />
++					</Stack>
++				) )
++			) }
++		</Stack>
++	),
++};
++
++export const Inline: Story = {
++	...Default,
++	args: {
++		...Default.args,
++		children: 'inline link',
++	},
++	render: ( args ) => (
++		<Text variant="body-md" render={ <p /> }>
++			This is a paragraph with an <Link { ...args } /> that inherits its
++			typography from the parent Text component.
++		</Text>
++	),
++};
++
++/**
++ * When composing `Text` and `Link` via the `render` prop, the order matters:
++ * - `<Text render={ <Link /> } />` renders an `<a>` element (Link's default tag wins).
++ * - `<Link render={ <Text /> } />` renders a `<span>` element (Text's default tag wins).
++ */
++export const Standalone: Story = {
++	args: {
++		href: '#',
++	},
++	argTypes: {
++		children: {
++			control: false,
++		},
++	},
++	render: ( args ) => (
++		<Stack direction="column" gap="md">
++			<Text variant="body-md" render={ <Link { ...args } /> }>
++				A standalone link with body-md typography
++			</Text>
++			<Text variant="body-sm" render={ <Link { ...args } /> }>
++				A standalone link with body-sm typography
++			</Text>
++		</Stack>
++	),
++};
+diff --git a/packages/ui/src/link/style.module.css b/packages/ui/src/link/style.module.css
+new file mode 100644
+index 00000000000000..fa1f8f5a5cd2c9
+--- /dev/null
++++ b/packages/ui/src/link/style.module.css
+@@ -0,0 +1,68 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.link {
++		text-underline-offset: 0.2em;
++		text-decoration-thickness: 0.5px;
++	}
++
++	/* Brand tone */
++	.is-brand,
++	.is-brand:visited {
++		color: var(--wpds-color-fg-interactive-brand);
++	}
++
++	.is-brand:hover,
++	.is-brand:active {
++		color: var(--wpds-color-fg-interactive-brand-active);
++	}
++
++	/* Neutral tone */
++	.is-neutral,
++	.is-neutral:visited {
++		color: var(--wpds-color-fg-interactive-neutral);
++		text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
++	}
++
++	.is-neutral:hover,
++	.is-neutral:active {
++		color: var(--wpds-color-fg-interactive-neutral-active);
++	}
++
++	/* Unstyled variant */
++	.is-unstyled {
++		color: inherit;
++		text-decoration: none;
++	}
++
++	/* Link icon pattern — arrow rendered via ::after pseudo-element to avoid
++	 * Twemoji replacement and text-selection issues. Root <a> gets
++	 * text-decoration:none; the link-contents span re-applies it.
++	 * text-underline-offset is inherited and propagates from .link
++	 * automatically. text-decoration-thickness and text-decoration-color
++	 * are NOT inherited, so they are explicitly redeclared on
++	 * .link-contents (the latter via `inherit` to carry the neutral
++	 * tone's custom color token through). */
++	.has-link-icon {
++		text-decoration: none;
++	}
++
++	.link-contents {
++		text-decoration: underline;
++		text-decoration-color: inherit;
++		text-decoration-thickness: 0.5px;
++	}
++
++	.link-icon {
++		margin-inline-start: var(--wpds-dimension-padding-xs);
++		font-weight: var(--wpds-font-weight-regular);
++	}
++
++	.link-icon::after {
++		content: "\2197";
++	}
++
++	.link-icon:dir(rtl)::after {
++		content: "\2196";
++	}
++}
+diff --git a/packages/ui/src/link/test/index.test.tsx b/packages/ui/src/link/test/index.test.tsx
+new file mode 100644
+index 00000000000000..ede6bb158d71c3
+--- /dev/null
++++ b/packages/ui/src/link/test/index.test.tsx
+@@ -0,0 +1,93 @@
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { createRef } from '@wordpress/element';
++import { Link } from '../index';
++
++describe( 'Link', () => {
++	it( 'forwards ref', () => {
++		const ref = createRef< HTMLAnchorElement >();
++
++		render(
++			<Link ref={ ref } href="/">
++				Home
++			</Link>
++		);
++
++		expect( ref.current ).toBeInstanceOf( HTMLAnchorElement );
++	} );
++
++	describe( 'openInNewTab', () => {
++		it( 'sets target="_blank" when true', () => {
++			render(
++				<Link href="https://example.com" openInNewTab>
++					External
++				</Link>
++			);
++
++			expect( screen.getByRole( 'link' ) ).toHaveAttribute(
++				'target',
++				'_blank'
++			);
++		} );
++
++		it( 'does not set target="_blank" when false', () => {
++			render( <Link href="https://example.com">External</Link> );
++
++			expect( screen.getByRole( 'link' ) ).not.toHaveAttribute(
++				'target'
++			);
++		} );
++
++		it( 'renders an accessible arrow indicator', () => {
++			render(
++				<Link href="https://example.com" openInNewTab>
++					External
++				</Link>
++			);
++
++			expect(
++				screen.getByLabelText( '(opens in a new tab)' )
++			).toBeInTheDocument();
++		} );
++
++		it( 'prevents default for internal anchor links', async () => {
++			const user = userEvent.setup();
++			const onClick = jest.fn();
++
++			render(
++				<Link href="#section" openInNewTab onClick={ onClick }>
++					Jump
++				</Link>
++			);
++
++			await user.click( screen.getByRole( 'link' ) );
++
++			expect( onClick ).toHaveBeenCalledTimes( 1 );
++			expect( onClick.mock.calls[ 0 ][ 0 ].defaultPrevented ).toBe(
++				true
++			);
++		} );
++
++		it( 'does not prevent default for external links', async () => {
++			const user = userEvent.setup();
++			const onClick = jest.fn();
++
++			render(
++				<Link
++					href="https://example.com"
++					openInNewTab
++					onClick={ onClick }
++				>
++					External
++				</Link>
++			);
++
++			await user.click( screen.getByRole( 'link' ) );
++
++			expect( onClick ).toHaveBeenCalledTimes( 1 );
++			expect( onClick.mock.calls[ 0 ][ 0 ].defaultPrevented ).toBe(
++				false
++			);
++		} );
++	} );
++} );
+diff --git a/packages/ui/src/link/types.ts b/packages/ui/src/link/types.ts
+new file mode 100644
+index 00000000000000..8d1e3f76638f89
+--- /dev/null
++++ b/packages/ui/src/link/types.ts
+@@ -0,0 +1,36 @@
++import { type ReactNode } from 'react';
++import { type ComponentProps } from '../utils/types';
++
++export interface LinkProps extends Omit< ComponentProps< 'a' >, 'target' > {
++	/**
++	 * The visual treatment of the link.
++	 *
++	 * - `default`: Applies tone-based color and underline styles.
++	 * - `unstyled`: Strips all visual styles so consumers can bring their own.
++	 *
++	 * @default "default"
++	 */
++	variant?: 'default' | 'unstyled';
++
++	/**
++	 * The tone of the link. Tone describes a semantic color intent.
++	 * Only applies when `variant` is `default`.
++	 *
++	 * @default "brand"
++	 */
++	tone?: 'brand' | 'neutral';
++
++	/**
++	 * Whether to open the link in a new browser tab.
++	 * When true, sets `target="_blank"`, appends a visual arrow indicator,
++	 * and prevents navigation for internal anchors (`#`-prefixed hrefs).
++	 *
++	 * @default false
++	 */
++	openInNewTab?: boolean;
++
++	/**
++	 * The content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++}
+diff --git a/packages/ui/src/notice/action-link.tsx b/packages/ui/src/notice/action-link.tsx
+index 2be24d14f5ca74..8522fb6cf3ca4f 100644
+--- a/packages/ui/src/notice/action-link.tsx
++++ b/packages/ui/src/notice/action-link.tsx
+@@ -1,28 +1,22 @@
+-import { forwardRef } from '@wordpress/element';
+-import { useRender, mergeProps } from '@base-ui/react';
+ import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { Link } from '../link';
+ import type { ActionLinkProps } from './types';
+ import styles from './style.module.css';
+ 
+ /**
+  * An action link for use within Notice.Actions.
+- *
+- * TODO: This should use a shared Link component.
+  */
+ export const ActionLink = forwardRef< HTMLAnchorElement, ActionLinkProps >(
+-	function NoticeActionLink( { className, render, ...props }, ref ) {
+-		const element = useRender( {
+-			defaultTagName: 'a',
+-			render,
+-			ref,
+-			props: mergeProps< 'a' >(
+-				{
+-					className: clsx( styles[ 'action-link' ], className ),
+-				},
+-				props
+-			),
+-		} );
+-
+-		return element;
++	function NoticeActionLink( { className, ...props }, ref ) {
++		return (
++			<Link
++				ref={ ref }
++				className={ clsx( styles[ 'action-link' ], className ) }
++				{ ...props }
++				tone="neutral"
++				variant="default"
++			/>
++		);
+ 	}
+ );
+diff --git a/packages/ui/src/notice/style.module.css b/packages/ui/src/notice/style.module.css
+index 5b0ff9db732bf1..9e5b3d95d34dad 100644
+--- a/packages/ui/src/notice/style.module.css
++++ b/packages/ui/src/notice/style.module.css
+@@ -69,20 +69,6 @@
+ 		font-weight: var(--wpds-font-weight-regular);
+ 		line-height: var(--wpds-font-line-height-sm);
+ 		margin-block: auto;
+-		text-underline-offset: 0.2em;
+-		text-decoration-thickness: 0.5px;
+-		color: var(--wpds-color-fg-interactive-neutral);
+-		text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
+-
+-		&:visited {
+-			color: var(--wpds-color-fg-interactive-neutral);
+-			text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
+-		}
+-
+-		&:hover,
+-		&:active {
+-			color: var(--wpds-color-fg-interactive-neutral-active);
+-		}
+ 
+ 		/* Add more horizontal space when following another action link/button */
+ 		&:not(:first-child) {
+diff --git a/packages/ui/src/notice/types.ts b/packages/ui/src/notice/types.ts
+index 9f942fa0414cc3..11f938e3cc205f 100644
+--- a/packages/ui/src/notice/types.ts
++++ b/packages/ui/src/notice/types.ts
+@@ -3,6 +3,7 @@ import type { ComponentProps } from '../utils/types';
+ import type { IconProps } from '../icon/types';
+ import type { ButtonProps } from '../button/types';
+ import type { IconButtonProps } from '../icon-button/types';
++import type { LinkProps } from '../link/types';
+ 
+ export type NoticeIntent = 'warning' | 'success' | 'error' | 'info' | 'neutral';
+ 
+@@ -92,7 +93,7 @@ export interface ActionButtonProps
+ 	children?: ReactNode;
+ }
+ 
+-export interface ActionLinkProps extends ComponentProps< 'a' > {
++export interface ActionLinkProps extends Omit< LinkProps, 'variant' | 'tone' > {
+ 	/**
+ 	 * The content to be rendered inside the component.
+ 	 */

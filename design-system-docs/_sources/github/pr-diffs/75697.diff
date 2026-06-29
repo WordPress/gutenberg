@@ -1,0 +1,83 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index ddbc6fada8bd26..357ee51ab3ee2f 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   Add `--wpds-cursor-control` design token for interactive non-link elements ([#75697](https://github.com/WordPress/gutenberg/pull/75697)).
++
+ ## 0.7.0 (2026-02-18)
+ 
+ ### Breaking changes
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index 4580de704f5162..d73bd9a62842fe 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -114,6 +114,12 @@ Do not edit directly.
+ | `--wpds-color-stroke-interactive-error-strong`        | Accessible stroke color used for interactive error-toned elements with strong emphasis.                                                     |
+ | `--wpds-color-stroke-focus-brand`                     | Accessible stroke color applied to focus rings.                                                                                             |
+ 
++### Cursor
++
++| Variable name           | Description                                                                                       |
++| ----------------------- | ------------------------------------------------------------------------------------------------- |
++| `--wpds-cursor-control` | Cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). |
++
+ ### Dimension
+ 
+ | Variable name                  | Description            |
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 0ddcecaaab7f23..37eb443fbf35d1 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -100,6 +100,7 @@
+ 	--wpds-color-stroke-surface-success-strong: #007f30; /* Decorative stroke color used to define success-toned surface boundaries with strong emphasis. */
+ 	--wpds-color-stroke-surface-warning: #d0b381; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
+ 	--wpds-color-stroke-surface-warning-strong: #926300; /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
++	--wpds-cursor-control: default; /* Cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). */
+ 	--wpds-dimension-base: 4px; /* Base dimension unit */
+ 	--wpds-dimension-gap-2xl: 32px; /* 2x extra large gap */
+ 	--wpds-dimension-gap-3xl: 40px; /* 3x extra large gap */
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index 5703bf28b6d1ec..b9bb956c1fe1a8 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -101,6 +101,7 @@ export default [
+ 	'--wpds-color-stroke-interactive-error-active',
+ 	'--wpds-color-stroke-interactive-error-strong',
+ 	'--wpds-color-stroke-focus-brand',
++	'--wpds-cursor-control',
+ 	'--wpds-dimension-base',
+ 	'--wpds-dimension-padding-xs',
+ 	'--wpds-dimension-padding-sm',
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index cfe85eb89ce4cf..5b3d8b4dd2a70c 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -18,6 +18,7 @@ export default defineConfig( {
+ 	tokens: [
+ 		'./tokens/border.json',
+ 		'./tokens/color.json',
++		'./tokens/cursor.json',
+ 		'./tokens/dimension.json',
+ 		'./tokens/elevation.json',
+ 		'./tokens/typography.json',
+diff --git a/packages/theme/tokens/cursor.json b/packages/theme/tokens/cursor.json
+new file mode 100644
+index 00000000000000..4cbf753028b68e
+--- /dev/null
++++ b/packages/theme/tokens/cursor.json
+@@ -0,0 +1,9 @@
++{
++	"wpds-cursor": {
++		"$type": "string",
++		"control": {
++			"$value": "default",
++			"$description": "Cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles)."
++		}
++	}
++}

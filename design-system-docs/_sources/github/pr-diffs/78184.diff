@@ -1,0 +1,96 @@
+diff --git a/packages/ui/src/button/button.tsx b/packages/ui/src/button/button.tsx
+index 112f1af5a77123..9962c5b9d56502 100644
+--- a/packages/ui/src/button/button.tsx
++++ b/packages/ui/src/button/button.tsx
+@@ -9,6 +9,9 @@ import resetStyles from '../utils/css/resets.module.css';
+ import focusStyles from '../utils/css/focus.module.css';
+ import defenseStyles from '../utils/css/global-css-defense.module.css';
+ 
++/**
++ * A versatile button component with multiple variants, tones, and sizes.
++ */
+ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
+ 	function Button(
+ 		{
+diff --git a/packages/ui/src/button/icon.tsx b/packages/ui/src/button/icon.tsx
+index c6ae7ab9bdd469..45da9dc1dc03c5 100644
+--- a/packages/ui/src/button/icon.tsx
++++ b/packages/ui/src/button/icon.tsx
+@@ -1,14 +1,7 @@
+ import { forwardRef } from '@wordpress/element';
+-import { type IconProps } from '../icon/types';
++import { type ButtonIconProps } from './types';
+ import { Icon } from '../icon';
+ 
+-interface ButtonIconProps extends IconProps {
+-	/**
+-	 * The icon to display, from the `@wordpress/icons` package.
+-	 */
+-	icon: IconProps[ 'icon' ];
+-}
+-
+ export const ButtonIcon = forwardRef< SVGSVGElement, ButtonIconProps >(
+ 	function ButtonIcon( { icon, ...props }, ref ) {
+ 		return (
+diff --git a/packages/ui/src/button/index.ts b/packages/ui/src/button/index.ts
+index 991227d14cf0f1..0ece992c826e2a 100644
+--- a/packages/ui/src/button/index.ts
++++ b/packages/ui/src/button/index.ts
+@@ -1,16 +1,15 @@
+-import { Button as ButtonButton } from './button';
++import { Button as _Button } from './button';
+ import { ButtonIcon } from './icon';
+ 
++ButtonIcon.displayName = 'Button.Icon';
++
+ /**
+  * A versatile button component with multiple variants, tones, and sizes.
+- * Built on design tokens for consistent theming and accessibility.
+  */
+-export const Button = Object.assign( ButtonButton, {
++export const Button = Object.assign( _Button, {
+ 	/**
+ 	 * An icon component specifically designed to work well when rendered inside
+ 	 * a `Button` component.
+ 	 */
+ 	Icon: ButtonIcon,
+-} ) as typeof ButtonButton & {
+-	Icon: typeof ButtonIcon;
+-};
++} );
+diff --git a/packages/ui/src/button/stories/index.story.tsx b/packages/ui/src/button/stories/index.story.tsx
+index d0b1fa535fd658..590562b76bbe49 100644
+--- a/packages/ui/src/button/stories/index.story.tsx
++++ b/packages/ui/src/button/stories/index.story.tsx
+@@ -6,6 +6,9 @@ import { Button } from '../index';
+ const meta: Meta< typeof Button > = {
+ 	title: 'Design System/Components/Button',
+ 	component: Button,
++	subcomponents: {
++		'Button.Icon': Button.Icon,
++	},
+ 	argTypes: {
+ 		'aria-pressed': {
+ 			control: { type: 'boolean' },
+diff --git a/packages/ui/src/button/types.ts b/packages/ui/src/button/types.ts
+index e4e34c96d0473a..204f99e22d3ef7 100644
+--- a/packages/ui/src/button/types.ts
++++ b/packages/ui/src/button/types.ts
+@@ -1,5 +1,6 @@
+ import { type ReactNode, type HTMLAttributes } from 'react';
+ import type { Button as _Button } from '@base-ui/react/button';
++import { type IconProps } from '../icon/types';
+ import type { ComponentProps } from '../utils/types';
+ 
+ type _ButtonProps = ComponentProps< typeof _Button >;
+@@ -70,3 +71,10 @@ export interface ButtonProps
+ 	 */
+ 	loadingAnnouncement?: string;
+ }
++
++export interface ButtonIconProps extends IconProps {
++	/**
++	 * The icon to display, from the `@wordpress/icons` package.
++	 */
++	icon: IconProps[ 'icon' ];
++}

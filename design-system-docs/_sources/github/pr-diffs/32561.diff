@@ -1,0 +1,195 @@
+diff --git a/packages/components/src/card/card-body/index.js b/packages/components/src/card/card-body/index.js
+index 6a762463fcfe46..b31d7e1a7487cf 100644
+--- a/packages/components/src/card/card-body/index.js
++++ b/packages/components/src/card/card-body/index.js
+@@ -14,7 +14,12 @@ export const defaultProps = {
+ 	size: 'medium',
+ };
+ 
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param { import('../types').BodyProps & JSX.IntrinsicElements['div'] } props
++ */
+ export function CardBody( props ) {
++	/* eslint-enable jsdoc/valid-types */
+ 	const { className, isShady, ...additionalProps } = props;
+ 	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
+ 	const { size } = mergedProps;
+diff --git a/packages/components/src/card/card-divider/index.js b/packages/components/src/card/card-divider/index.js
+index 33e8a420ca0d6b..8ca003a5ab290c 100644
+--- a/packages/components/src/card/card-divider/index.js
++++ b/packages/components/src/card/card-divider/index.js
+@@ -8,7 +8,12 @@ import classnames from 'classnames';
+  */
+ import { DividerUI } from '../styles';
+ 
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param { JSX.IntrinsicElements['hr'] } props
++ */
+ export function CardDivider( props ) {
++	/* eslint-enable jsdoc/valid-types */
+ 	const { className, ...additionalProps } = props;
+ 
+ 	const classes = classnames( 'components-card__divider', className );
+diff --git a/packages/components/src/card/card-footer/index.js b/packages/components/src/card/card-footer/index.js
+index a54ff8dfc0c321..581cf7bb66dd4a 100644
+--- a/packages/components/src/card/card-footer/index.js
++++ b/packages/components/src/card/card-footer/index.js
+@@ -15,6 +15,9 @@ export const defaultProps = {
+ 	size: 'medium',
+ };
+ 
++/**
++ * @param { import('../types').FooterProps } props
++ */
+ export function CardFooter( props ) {
+ 	const { className, isShady, ...additionalProps } = props;
+ 	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
+diff --git a/packages/components/src/card/card-header/index.js b/packages/components/src/card/card-header/index.js
+index 7aa0296929a2fc..4d65462f9ec0b5 100644
+--- a/packages/components/src/card/card-header/index.js
++++ b/packages/components/src/card/card-header/index.js
+@@ -15,6 +15,9 @@ export const defaultProps = {
+ 	size: 'medium',
+ };
+ 
++/**
++ * @param { import('../types').HeaderProps } props
++ */
+ export function CardHeader( props ) {
+ 	const { className, isShady, ...additionalProps } = props;
+ 	const mergedProps = { ...defaultProps, ...useCardContext(), ...props };
+diff --git a/packages/components/src/card/card-media/index.js b/packages/components/src/card/card-media/index.js
+index 4458d74cda3514..11ed6f90923632 100644
+--- a/packages/components/src/card/card-media/index.js
++++ b/packages/components/src/card/card-media/index.js
+@@ -8,7 +8,12 @@ import classnames from 'classnames';
+  */
+ import { MediaUI } from '../styles';
+ 
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param { JSX.IntrinsicElements['div'] } props
++ */
+ export function CardMedia( props ) {
++	/* eslint-enable jsdoc/valid-types */
+ 	const { className, ...additionalProps } = props;
+ 
+ 	const classes = classnames( 'components-card__media', className );
+diff --git a/packages/components/src/card/card/index.js b/packages/components/src/card/card/index.js
+index 5731d5296d2a23..800137d27a3a92 100644
+--- a/packages/components/src/card/card/index.js
++++ b/packages/components/src/card/card/index.js
+@@ -15,7 +15,12 @@ export const defaultProps = {
+ 	size: 'medium',
+ };
+ 
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param { import('../types').Props & JSX.IntrinsicElements['div'] } props
++ */
+ export function Card( props ) {
++	/* eslint-enable jsdoc/valid-types */
+ 	const {
+ 		className,
+ 		isBorderless,
+diff --git a/packages/components/src/card/types.ts b/packages/components/src/card/types.ts
+new file mode 100644
+index 00000000000000..30b2d3e94cdfee
+--- /dev/null
++++ b/packages/components/src/card/types.ts
+@@ -0,0 +1,81 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { CSSProperties } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { Props as SurfaceProps } from '../surface/types';
++
++export type SizeOptions = 'xSmall' | 'small' | 'medium' | 'large';
++
++type SizeableProps = {
++	/**
++	 * Determines the amount of padding within the component.
++	 *
++	 * @default 'medium'
++	 */
++	size?: SizeOptions;
++};
++
++export type Props = SurfaceProps &
++	SizeableProps & {
++		/**
++		 * Renders without a border.
++		 *
++		 * @default false
++		 */
++		isBorderless?: boolean;
++		/**
++		 * Renders with rounded corners.
++		 *
++		 * @default true
++		 */
++		isRounded?: boolean;
++		/**
++		 * Renders with elevation styles (box shadow).
++		 *
++		 * @default false
++		 */
++		isElevated?: boolean;
++	};
++
++type BaseSubComponentProps = SizeableProps & {
++	/**
++	 * The children elements.
++	 */
++	children: React.ReactNode;
++	/**
++	 * Renders with a light gray background color.
++	 *
++	 * @default false
++	 */
++	isShady?: boolean;
++};
++
++export type BodyProps = BaseSubComponentProps & {
++	/**
++	 * Determines if the component is scrollable.
++	 *
++	 * @default true
++	 */
++	isScrollable?: boolean;
++};
++
++type MarginalSubComponentProps = BaseSubComponentProps & {
++	/**
++	 * Renders without a border.
++	 *
++	 * @default false
++	 */
++	isBorderless?: boolean;
++	className?: string;
++};
++
++export type HeaderProps = MarginalSubComponentProps;
++
++export type FooterProps = MarginalSubComponentProps & {
++	justify: CSSProperties[ 'justifyContent' ];
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 3290c994ee3ea9..baa52c6b59a08c 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -20,6 +20,7 @@
+ 		"src/animate/**/*",
+ 		"src/base-control/**/*",
+ 		"src/base-field/**/*",
++		"src/card/**/*",
+ 		"src/dashicon/**/*",
+ 		"src/disabled/**/*",
+ 		"src/divider/**/*",

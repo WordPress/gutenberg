@@ -1,0 +1,45 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6e5cdd5a1879ac..f5b2ebba2ca9f0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fix
+ 
++-   `Popover`, `Dropdown`: Fix width when `expandOnMobile` is enabled ([#42635](https://github.com/WordPress/gutenberg/pull/42635/)).
+ -   `CustomSelectControl`: Fix font size and hover/focus style inconsistencies with `SelectControl` ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
+ -   `AnglePickerControl`: Fix gap between elements in RTL mode ([#42534](https://github.com/WordPress/gutenberg/pull/42534)).
+ -   `RangeControl`: clamp initialPosition between min and max values ([#42571](https://github.com/WordPress/gutenberg/pull/42571)).
+diff --git a/packages/components/src/popover/stories/index.js b/packages/components/src/popover/stories/index.js
+index c270041b831636..0025e66fe0f4e1 100644
+--- a/packages/components/src/popover/stories/index.js
++++ b/packages/components/src/popover/stories/index.js
+@@ -27,6 +27,7 @@ export const _default = () => {
+ 	const show = boolean( 'Example: Show', true );
+ 	const children = text( 'children', 'Popover Content' );
+ 	const animate = boolean( 'animate', false );
++	const expandOnMobile = boolean( 'expandOnMobile', false );
+ 	const focusOnMount = select(
+ 		'focusOnMount',
+ 		{
+@@ -41,6 +42,7 @@ export const _default = () => {
+ 	const props = {
+ 		animate,
+ 		children,
++		expandOnMobile,
+ 		focusOnMount,
+ 		noArrow,
+ 		isAlternate,
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index 11697fedc2e6ad..6002139c2c8566 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -31,7 +31,7 @@
+ 		position: static;
+ 		height: calc(100% - #{ $panel-header-height });
+ 		overflow-y: visible;
+-		min-width: auto;
++		width: auto;
+ 		border: none;
+ 		outline: none;
+ 		border-top: $border-width solid $gray-900;

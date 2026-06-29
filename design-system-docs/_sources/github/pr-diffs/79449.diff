@@ -1,0 +1,964 @@
+diff --git a/packages/components/src/spacer/hook.ts b/packages/components/src/spacer/hook.ts
+index 3ef4b21e104c74..779526e8064655 100644
+--- a/packages/components/src/spacer/hook.ts
++++ b/packages/components/src/spacer/hook.ts
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/react';
++import clsx from 'clsx';
++import type { CSSProperties } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -9,8 +10,23 @@ import { css } from '@emotion/react';
+ import type { WordPressComponentProps } from '../context';
+ import { useContextSystem } from '../context';
+ import { space } from '../utils/space';
+-import { rtl, useCx } from '../utils';
+ import type { SpacerProps } from './types';
++import styles from './style.module.scss';
++
++type SpacerCustomProperty =
++	| '--wp-components-spacer-margin'
++	| '--wp-components-spacer-margin-block-start'
++	| '--wp-components-spacer-margin-block-end'
++	| '--wp-components-spacer-margin-inline-start'
++	| '--wp-components-spacer-margin-inline-end'
++	| '--wp-components-spacer-padding'
++	| '--wp-components-spacer-padding-block-start'
++	| '--wp-components-spacer-padding-block-end'
++	| '--wp-components-spacer-padding-inline-start'
++	| '--wp-components-spacer-padding-inline-end';
++
++type SpacerStyle = CSSProperties &
++	Partial< Record< SpacerCustomProperty, string > >;
+ 
+ function isDefined< T >( o: T ): o is Exclude< T, null | undefined > {
+ 	return typeof o !== 'undefined' && o !== null;
+@@ -35,74 +51,96 @@ export function useSpacer(
+ 		paddingTop,
+ 		paddingX,
+ 		paddingY,
++		style,
+ 		...otherProps
+ 	} = useContextSystem( props, 'Spacer' );
+ 
+-	const cx = useCx();
+-
+-	const classes = cx(
+-		isDefined( margin ) &&
+-			css`
+-				margin: ${ space( margin ) };
+-			`,
+-		isDefined( marginY ) &&
+-			css`
+-				margin-bottom: ${ space( marginY ) };
+-				margin-top: ${ space( marginY ) };
+-			`,
+-		isDefined( marginX ) &&
+-			css`
+-				margin-left: ${ space( marginX ) };
+-				margin-right: ${ space( marginX ) };
+-			`,
+-		isDefined( marginTop ) &&
+-			css`
+-				margin-top: ${ space( marginTop ) };
+-			`,
+-		isDefined( marginBottom ) &&
+-			css`
+-				margin-bottom: ${ space( marginBottom ) };
+-			`,
+-		isDefined( marginLeft ) &&
+-			rtl( {
+-				marginLeft: space( marginLeft ),
+-			} )(),
+-		isDefined( marginRight ) &&
+-			rtl( {
+-				marginRight: space( marginRight ),
+-			} )(),
+-		isDefined( padding ) &&
+-			css`
+-				padding: ${ space( padding ) };
+-			`,
+-		isDefined( paddingY ) &&
+-			css`
+-				padding-bottom: ${ space( paddingY ) };
+-				padding-top: ${ space( paddingY ) };
+-			`,
+-		isDefined( paddingX ) &&
+-			css`
+-				padding-left: ${ space( paddingX ) };
+-				padding-right: ${ space( paddingX ) };
+-			`,
+-		isDefined( paddingTop ) &&
+-			css`
+-				padding-top: ${ space( paddingTop ) };
+-			`,
+-		isDefined( paddingBottom ) &&
+-			css`
+-				padding-bottom: ${ space( paddingBottom ) };
+-			`,
+-		isDefined( paddingLeft ) &&
+-			rtl( {
+-				paddingLeft: space( paddingLeft ),
+-			} )(),
+-		isDefined( paddingRight ) &&
+-			rtl( {
+-				paddingRight: space( paddingRight ),
+-			} )(),
+-		className
+-	);
+-
+-	return { ...otherProps, className: classes };
++	const spacingStyle: SpacerStyle = {};
++
++	if ( isDefined( margin ) ) {
++		spacingStyle[ '--wp-components-spacer-margin' ] = space( margin );
++	}
++
++	if ( isDefined( marginY ) ) {
++		spacingStyle[ '--wp-components-spacer-margin-block-start' ] =
++			space( marginY );
++		spacingStyle[ '--wp-components-spacer-margin-block-end' ] =
++			space( marginY );
++	}
++
++	if ( isDefined( marginX ) ) {
++		spacingStyle[ '--wp-components-spacer-margin-inline-start' ] =
++			space( marginX );
++		spacingStyle[ '--wp-components-spacer-margin-inline-end' ] =
++			space( marginX );
++	}
++
++	if ( isDefined( marginTop ) ) {
++		spacingStyle[ '--wp-components-spacer-margin-block-start' ] =
++			space( marginTop );
++	}
++
++	if ( isDefined( marginBottom ) ) {
++		spacingStyle[ '--wp-components-spacer-margin-block-end' ] =
++			space( marginBottom );
++	}
++
++	if ( isDefined( marginLeft ) ) {
++		spacingStyle[ '--wp-components-spacer-margin-inline-start' ] =
++			space( marginLeft );
++	}
++
++	if ( isDefined( marginRight ) ) {
++		spacingStyle[ '--wp-components-spacer-margin-inline-end' ] =
++			space( marginRight );
++	}
++
++	if ( isDefined( padding ) ) {
++		spacingStyle[ '--wp-components-spacer-padding' ] = space( padding );
++	}
++
++	if ( isDefined( paddingY ) ) {
++		spacingStyle[ '--wp-components-spacer-padding-block-start' ] =
++			space( paddingY );
++		spacingStyle[ '--wp-components-spacer-padding-block-end' ] =
++			space( paddingY );
++	}
++
++	if ( isDefined( paddingX ) ) {
++		spacingStyle[ '--wp-components-spacer-padding-inline-start' ] =
++			space( paddingX );
++		spacingStyle[ '--wp-components-spacer-padding-inline-end' ] =
++			space( paddingX );
++	}
++
++	if ( isDefined( paddingTop ) ) {
++		spacingStyle[ '--wp-components-spacer-padding-block-start' ] =
++			space( paddingTop );
++	}
++
++	if ( isDefined( paddingBottom ) ) {
++		spacingStyle[ '--wp-components-spacer-padding-block-end' ] =
++			space( paddingBottom );
++	}
++
++	if ( isDefined( paddingLeft ) ) {
++		spacingStyle[ '--wp-components-spacer-padding-inline-start' ] =
++			space( paddingLeft );
++	}
++
++	if ( isDefined( paddingRight ) ) {
++		spacingStyle[ '--wp-components-spacer-padding-inline-end' ] =
++			space( paddingRight );
++	}
++
++	const spacerStyle: SpacerStyle = {
++		...spacingStyle,
++		...style,
++	};
++
++	return {
++		...otherProps,
++		className: clsx( styles.spacer, className ),
++		style: spacerStyle,
++	};
+ }
+diff --git a/packages/components/src/spacer/style.module.scss b/packages/components/src/spacer/style.module.scss
+new file mode 100644
+index 00000000000000..26fa3617c55f87
+--- /dev/null
++++ b/packages/components/src/spacer/style.module.scss
+@@ -0,0 +1,12 @@
++.spacer {
++	margin: var(--wp-components-spacer-margin);
++	margin-block-start: var(--wp-components-spacer-margin-block-start);
++	margin-block-end: var(--wp-components-spacer-margin-block-end);
++	margin-inline-start: var(--wp-components-spacer-margin-inline-start);
++	margin-inline-end: var(--wp-components-spacer-margin-inline-end);
++	padding: var(--wp-components-spacer-padding);
++	padding-block-start: var(--wp-components-spacer-padding-block-start);
++	padding-block-end: var(--wp-components-spacer-padding-block-end);
++	padding-inline-start: var(--wp-components-spacer-padding-inline-start);
++	padding-inline-end: var(--wp-components-spacer-padding-inline-end);
++}
+diff --git a/packages/components/src/spacer/test/__snapshots__/index.tsx.snap b/packages/components/src/spacer/test/__snapshots__/index.tsx.snap
+index 8f0aab30c74a1b..b7ceb7b70087ff 100644
+--- a/packages/components/src/spacer/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/spacer/test/__snapshots__/index.tsx.snap
+@@ -1,231 +1,11 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`props should override margin props from less to more specific 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+--     "margin": "calc(4px * 10)",
+--     "margin-bottom": "calc(4px * 1)",
+--     "margin-left": "calc(4px * 3)",
+--     "margin-right": "calc(4px * 5)",
+-+     "margin-bottom": "calc(4px * 2)",
+-    },
+-  ]
+-`;
+-
+-exports[`props should override padding props from less to more specific 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+-      "margin-bottom": "calc(4px * 2)",
+--     "padding": "calc(4px * 10)",
+--     "padding-bottom": "calc(4px * 2)",
+--     "padding-left": "calc(4px * 3)",
+--     "padding-top": "calc(4px * 5)",
+-    },
+-  ]
+-`;
+-
+ exports[`props should render correctly 1`] = `
+-.emotion-0 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ <div
+-  class="components-spacer emotion-0 emotion-1"
++  class="components-spacer"
+   data-testid="spacer"
+   data-wp-c16t="true"
+   data-wp-component="Spacer"
++  style="--wp-components-spacer-margin-block-end: calc(4px * 2);"
+ />
+ `;
+-
+-exports[`props should render margin 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+--     "margin": "calc(4px * 5)",
+-      "margin-bottom": "calc(4px * 2)",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render marginBottom 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+--     "margin-bottom": "calc(4px * 5)",
+-+     "margin-bottom": "calc(4px * 2)",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render marginLeft 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+-      "margin-bottom": "calc(4px * 2)",
+--     "margin-left": "calc(4px * 5)",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render marginRight 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+-      "margin-bottom": "calc(4px * 2)",
+--     "margin-right": "calc(4px * 5)",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render marginTop 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+-      "margin-bottom": "calc(4px * 2)",
+--     "margin-top": "calc(4px * 5)",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render marginX 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+-      "margin-bottom": "calc(4px * 2)",
+--     "margin-left": "calc(4px * 5)",
+--     "margin-right": "calc(4px * 5)",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render marginY 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+-      "margin-bottom": "calc(4px * 2)",
+--     "margin-top": "calc(4px * 5)",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render padding 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+-      "margin-bottom": "calc(4px * 2)",
+--     "padding": "calc(4px * 5)",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render paddingBottom 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+-      "margin-bottom": "calc(4px * 2)",
+--     "padding-bottom": "calc(4px * 5)",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render paddingLeft 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+-      "margin-bottom": "calc(4px * 2)",
+--     "padding-left": "calc(4px * 5)",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render paddingRight 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+-      "margin-bottom": "calc(4px * 2)",
+--     "padding-right": "calc(4px * 5)",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render paddingTop 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+-      "margin-bottom": "calc(4px * 2)",
+--     "padding-top": "calc(4px * 5)",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render paddingX 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+-      "margin-bottom": "calc(4px * 2)",
+--     "padding-left": "calc(4px * 5)",
+--     "padding-right": "calc(4px * 5)",
+-    },
+-  ]
+-`;
+-
+-exports[`props should render paddingY 1`] = `
+-Snapshot Diff:
+-- Received styles
+-+ Base styles
+-
+-  Array [
+-    Object {
+-      "margin-bottom": "calc(4px * 2)",
+--     "padding-bottom": "calc(4px * 5)",
+--     "padding-top": "calc(4px * 5)",
+-    },
+-  ]
+-`;
+diff --git a/packages/components/src/spacer/test/index.tsx b/packages/components/src/spacer/test/index.tsx
+index 1dfdd45615185a..fb7a5c3068253c 100644
+--- a/packages/components/src/spacer/test/index.tsx
++++ b/packages/components/src/spacer/test/index.tsx
+@@ -16,164 +16,169 @@ describe( 'props', () => {
+ 	} );
+ 
+ 	test( 'should render margin', () => {
+-		render( <Spacer data-testid="spacer" /> );
+-		render( <Spacer margin={ 5 } data-testid="customized-spacer" /> );
++		render( <Spacer margin={ 5 } data-testid="spacer" /> );
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin': 'calc(4px * 5)',
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
++		} );
+ 	} );
+ 
+ 	test( 'should render marginX', () => {
+-		render( <Spacer data-testid="spacer" /> );
+-		render( <Spacer marginX={ 5 } data-testid="customized-spacer" /> );
++		render( <Spacer marginX={ 5 } data-testid="spacer" /> );
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin-inline-start': 'calc(4px * 5)',
++			'--wp-components-spacer-margin-inline-end': 'calc(4px * 5)',
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
++		} );
+ 	} );
+ 
+ 	test( 'should render marginY', () => {
+-		render( <Spacer data-testid="spacer" /> );
+-		render( <Spacer marginY={ 5 } data-testid="customized-spacer" /> );
++		render( <Spacer marginY={ 5 } data-testid="spacer" /> );
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin-block-start': 'calc(4px * 5)',
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
++		} );
+ 	} );
+ 
+ 	test( 'should render marginTop', () => {
+-		render( <Spacer data-testid="spacer" /> );
+-		render( <Spacer marginTop={ 5 } data-testid="customized-spacer" /> );
++		render( <Spacer marginTop={ 5 } data-testid="spacer" /> );
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin-block-start': 'calc(4px * 5)',
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
++		} );
+ 	} );
+ 
+ 	test( 'should render marginBottom', () => {
+-		render( <Spacer data-testid="spacer" /> );
+-		render( <Spacer marginBottom={ 5 } data-testid="customized-spacer" /> );
++		render( <Spacer marginBottom={ 5 } data-testid="spacer" /> );
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 5)',
++		} );
+ 	} );
+ 
+ 	test( 'should render marginLeft', () => {
+-		render( <Spacer data-testid="spacer" /> );
+-		render( <Spacer marginLeft={ 5 } data-testid="customized-spacer" /> );
++		render( <Spacer marginLeft={ 5 } data-testid="spacer" /> );
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin-inline-start': 'calc(4px * 5)',
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
++		} );
+ 	} );
+ 
+ 	test( 'should render marginRight', () => {
+-		render( <Spacer data-testid="spacer" /> );
+-		render( <Spacer marginRight={ 5 } data-testid="customized-spacer" /> );
++		render( <Spacer marginRight={ 5 } data-testid="spacer" /> );
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin-inline-end': 'calc(4px * 5)',
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
++		} );
+ 	} );
+ 
+ 	test( 'should override margin props from less to more specific', () => {
+-		render( <Spacer data-testid="spacer" /> );
+ 		render(
+ 			<Spacer
+ 				margin={ 10 }
+ 				marginX={ 3 }
+ 				marginRight={ 5 }
+ 				marginBottom={ 1 }
+-				data-testid="customized-spacer"
++				data-testid="spacer"
+ 			/>
+ 		);
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin': 'calc(4px * 10)',
++			'--wp-components-spacer-margin-inline-start': 'calc(4px * 3)',
++			'--wp-components-spacer-margin-inline-end': 'calc(4px * 5)',
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 1)',
++		} );
+ 	} );
+ 
+ 	test( 'should render padding', () => {
+-		render( <Spacer data-testid="spacer" /> );
+-		render( <Spacer padding={ 5 } data-testid="customized-spacer" /> );
++		render( <Spacer padding={ 5 } data-testid="spacer" /> );
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
++			'--wp-components-spacer-padding': 'calc(4px * 5)',
++		} );
+ 	} );
+ 
+ 	test( 'should render paddingX', () => {
+-		render( <Spacer data-testid="spacer" /> );
+-		render( <Spacer paddingX={ 5 } data-testid="customized-spacer" /> );
++		render( <Spacer paddingX={ 5 } data-testid="spacer" /> );
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
++			'--wp-components-spacer-padding-inline-start': 'calc(4px * 5)',
++			'--wp-components-spacer-padding-inline-end': 'calc(4px * 5)',
++		} );
+ 	} );
+ 
+ 	test( 'should render paddingY', () => {
+-		render( <Spacer data-testid="spacer" /> );
+-		render( <Spacer paddingY={ 5 } data-testid="customized-spacer" /> );
++		render( <Spacer paddingY={ 5 } data-testid="spacer" /> );
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
++			'--wp-components-spacer-padding-block-start': 'calc(4px * 5)',
++			'--wp-components-spacer-padding-block-end': 'calc(4px * 5)',
++		} );
+ 	} );
+ 
+ 	test( 'should render paddingTop', () => {
+-		render( <Spacer data-testid="spacer" /> );
+-		render( <Spacer paddingTop={ 5 } data-testid="customized-spacer" /> );
++		render( <Spacer paddingTop={ 5 } data-testid="spacer" /> );
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
++			'--wp-components-spacer-padding-block-start': 'calc(4px * 5)',
++		} );
+ 	} );
+ 
+ 	test( 'should render paddingBottom', () => {
+-		render( <Spacer data-testid="spacer" /> );
+-		render(
+-			<Spacer paddingBottom={ 5 } data-testid="customized-spacer" />
+-		);
++		render( <Spacer paddingBottom={ 5 } data-testid="spacer" /> );
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
++			'--wp-components-spacer-padding-block-end': 'calc(4px * 5)',
++		} );
+ 	} );
+ 
+ 	test( 'should render paddingLeft', () => {
+-		render( <Spacer data-testid="spacer" /> );
+-		render( <Spacer paddingLeft={ 5 } data-testid="customized-spacer" /> );
++		render( <Spacer paddingLeft={ 5 } data-testid="spacer" /> );
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
++			'--wp-components-spacer-padding-inline-start': 'calc(4px * 5)',
++		} );
+ 	} );
+ 
+ 	test( 'should render paddingRight', () => {
+-		render( <Spacer data-testid="spacer" /> );
+-		render( <Spacer paddingRight={ 5 } data-testid="customized-spacer" /> );
++		render( <Spacer paddingRight={ 5 } data-testid="spacer" /> );
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
++			'--wp-components-spacer-padding-inline-end': 'calc(4px * 5)',
++		} );
+ 	} );
+ 
+ 	test( 'should override padding props from less to more specific', () => {
+-		render( <Spacer data-testid="spacer" /> );
+ 		render(
+ 			<Spacer
+ 				padding={ 10 }
+ 				paddingY={ 2 }
+ 				paddingTop={ 5 }
+ 				paddingLeft={ 3 }
+-				data-testid="customized-spacer"
++				data-testid="spacer"
+ 			/>
+ 		);
+ 
+-		expect(
+-			screen.getByTestId( 'customized-spacer' )
+-		).toMatchStyleDiffSnapshot( screen.getByTestId( 'spacer' ) );
++		expect( screen.getByTestId( 'spacer' ) ).toHaveStyle( {
++			'--wp-components-spacer-margin-block-end': 'calc(4px * 2)',
++			'--wp-components-spacer-padding': 'calc(4px * 10)',
++			'--wp-components-spacer-padding-block-start': 'calc(4px * 5)',
++			'--wp-components-spacer-padding-block-end': 'calc(4px * 2)',
++			'--wp-components-spacer-padding-inline-start': 'calc(4px * 3)',
++		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/utils/polymorphic-element.tsx b/packages/components/src/utils/polymorphic-element.tsx
+new file mode 100644
+index 00000000000000..0e39b3c4b616c3
+--- /dev/null
++++ b/packages/components/src/utils/polymorphic-element.tsx
+@@ -0,0 +1,40 @@
++/**
++ * External dependencies
++ */
++import type * as React from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++type PolymorphicElementProps< T extends React.ElementType > = Omit<
++	React.ComponentPropsWithoutRef< T >,
++	'as'
++> & {
++	as?: T;
++};
++
++type PolymorphicElementRef< T extends React.ElementType > =
++	React.ComponentPropsWithRef< T >[ 'ref' ];
++
++function UnforwardedPolymorphicElement< T extends React.ElementType = 'div' >(
++	{ as, ...props }: PolymorphicElementProps< T >,
++	ref: PolymorphicElementRef< T >
++) {
++	const Element = as || 'div';
++
++	return <Element ref={ ref } { ...props } />;
++}
++
++/**
++ * Internal utility for components that need Emotion-compatible `as` behavior
++ * while rendering with plain React elements.
++ */
++export const PolymorphicElement = forwardRef(
++	UnforwardedPolymorphicElement
++) as < T extends React.ElementType = 'div' >(
++	props: PolymorphicElementProps< T > & {
++		ref?: PolymorphicElementRef< T >;
++	}
++) => React.ReactElement | null;
+diff --git a/packages/components/src/view/component.tsx b/packages/components/src/view/component.tsx
+index 6742bd9f52e510..f395cf08ce8088 100644
+--- a/packages/components/src/view/component.tsx
++++ b/packages/components/src/view/component.tsx
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -12,14 +7,25 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import type { WordPressComponentProps } from '../context';
++import { PolymorphicElement } from '../utils/polymorphic-element';
+ 
+-const PolymorphicDiv = styled.div``;
++type ViewProps< T extends React.ElementType > = WordPressComponentProps<
++	{},
++	T
++> & {
++	/**
++	 * Legacy Emotion prop accepted by `View`. It is intentionally consumed here
++	 * so it does not leak to the rendered element after Emotion is removed.
++	 */
++	css?: unknown;
++};
+ 
+ function UnforwardedView< T extends React.ElementType = 'div' >(
+-	{ as, ...restProps }: WordPressComponentProps< {}, T >,
++	{ css: _css, ...restProps }: ViewProps< T >,
+ 	ref: React.ForwardedRef< any >
+ ) {
+-	return <PolymorphicDiv as={ as } ref={ ref } { ...restProps } />;
++	void _css;
++	return <PolymorphicElement ref={ ref } { ...restProps } />;
+ }
+ 
+ /**
+diff --git a/packages/components/src/view/test/__snapshots__/index.js.snap b/packages/components/src/view/test/__snapshots__/index.js.snap
+index f7014a5fd7b191..6a80237402112a 100644
+--- a/packages/components/src/view/test/__snapshots__/index.js.snap
++++ b/packages/components/src/view/test/__snapshots__/index.js.snap
+@@ -1,20 +1,28 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`props should render as another element 1`] = `
++exports[`props should render as a custom component 1`] = `
+ <div>
+-  <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++  <section
++    class="custom-class"
++    data-custom-component="true"
++    data-testid="custom-view"
+   >
+     <span />
++  </section>
++</div>
++`;
++
++exports[`props should render as another element 1`] = `
++<div>
++  <p>
++    <span />
+   </p>
+ </div>
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+ <div>
+-  <div
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
+-  >
++  <div>
+     <span />
+   </div>
+ </div>
+@@ -23,7 +31,7 @@ exports[`props should render correctly 1`] = `
+ exports[`props should render with custom styles (Array) 1`] = `
+ <div>
+   <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++    data-testid="custom-css-array-view"
+   >
+     <span />
+   </p>
+@@ -33,7 +41,7 @@ exports[`props should render with custom styles (Array) 1`] = `
+ exports[`props should render with custom styles (object) 1`] = `
+ <div>
+   <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++    data-testid="custom-css-object-view"
+   >
+     <span />
+   </p>
+@@ -43,7 +51,7 @@ exports[`props should render with custom styles (object) 1`] = `
+ exports[`props should render with custom styles (string) 1`] = `
+ <div>
+   <p
+-    class="css-1ragr82-PolymorphicDiv emotion-0"
++    data-testid="custom-css-string-view"
+   >
+     <span />
+   </p>
+diff --git a/packages/components/src/view/test/index.js b/packages/components/src/view/test/index.js
+index 56c6f7cd7a1487..456066804b15c3 100644
+--- a/packages/components/src/view/test/index.js
++++ b/packages/components/src/view/test/index.js
+@@ -1,7 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import { render } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -27,10 +32,33 @@ describe( 'props', () => {
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ 
++	test( 'should render as a custom component', () => {
++		const CustomComponent = forwardRef( ( props, ref ) => (
++			<section ref={ ref } data-custom-component { ...props } />
++		) );
++
++		const ref = jest.fn();
++		const { container } = render(
++			<View
++				as={ CustomComponent }
++				className="custom-class"
++				data-testid="custom-view"
++				ref={ ref }
++			>
++				<span />
++			</View>
++		);
++
++		const customView = screen.getByTestId( 'custom-view' );
++		expect( container ).toMatchSnapshot();
++		expect( ref ).toHaveBeenCalledWith( customView );
++	} );
++
+ 	test( 'should render with custom styles (string)', () => {
+ 		const { container } = render(
+ 			<View
+ 				as="p"
++				data-testid="custom-css-string-view"
+ 				css={ `
+ 					background: pink;
+ 				` }
+@@ -39,12 +67,16 @@ describe( 'props', () => {
+ 			</View>
+ 		);
+ 		expect( container ).toMatchSnapshot();
++		expect(
++			screen.getByTestId( 'custom-css-string-view' )
++		).not.toHaveAttribute( 'css' );
+ 	} );
+ 
+ 	test( 'should render with custom styles (object)', () => {
+ 		const { container } = render(
+ 			<View
+ 				as="p"
++				data-testid="custom-css-object-view"
+ 				css={ {
+ 					background: 'pink',
+ 				} }
+@@ -53,12 +85,16 @@ describe( 'props', () => {
+ 			</View>
+ 		);
+ 		expect( container ).toMatchSnapshot();
++		expect(
++			screen.getByTestId( 'custom-css-object-view' )
++		).not.toHaveAttribute( 'css' );
+ 	} );
+ 
+ 	test( 'should render with custom styles (Array)', () => {
+ 		const { container } = render(
+ 			<View
+ 				as="p"
++				data-testid="custom-css-array-view"
+ 				css={ [
+ 					{
+ 						background: 'pink',
+@@ -70,5 +106,8 @@ describe( 'props', () => {
+ 			</View>
+ 		);
+ 		expect( container ).toMatchSnapshot();
++		expect(
++			screen.getByTestId( 'custom-css-array-view' )
++		).not.toHaveAttribute( 'css' );
+ 	} );
+ } );

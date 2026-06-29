@@ -1,0 +1,194 @@
+diff --git a/package-lock.json b/package-lock.json
+index b8de200d80336a..73e9d8a9917020 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -16720,6 +16720,7 @@
+ 				"react-colorful": "^5.3.1",
+ 				"react-dates": "^21.8.0",
+ 				"reakit": "^1.3.8",
++				"remove-accents": "^0.4.2",
+ 				"uuid": "^8.3.0"
+ 			},
+ 			"dependencies": {
+diff --git a/packages/components/package.json b/packages/components/package.json
+index a151ed9c6bafe9..bc5a114b8d0810 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -67,6 +67,7 @@
+ 		"react-colorful": "^5.3.1",
+ 		"react-dates": "^21.8.0",
+ 		"reakit": "^1.3.8",
++		"remove-accents": "^0.4.2",
+ 		"uuid": "^8.3.0"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/components/src/navigation/group/index.js b/packages/components/src/navigation/group/index.js
+index 4a950084d3c53e..5ebebc2ed3b27f 100644
+--- a/packages/components/src/navigation/group/index.js
++++ b/packages/components/src/navigation/group/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { find, uniqueId } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,8 +15,10 @@ import { NavigationGroupContext } from './context';
+ import { GroupTitleUI } from '../styles/navigation-styles';
+ import { useNavigationContext } from '../context';
+ 
++let uniqueId = 0;
++
+ export default function NavigationGroup( { children, className, title } ) {
+-	const [ groupId ] = useState( uniqueId( 'group-' ) );
++	const [ groupId ] = useState( `group-${ ++uniqueId }` );
+ 	const {
+ 		navigationTree: { items },
+ 	} = useNavigationContext();
+@@ -25,7 +26,11 @@ export default function NavigationGroup( { children, className, title } ) {
+ 	const context = { group: groupId };
+ 
+ 	// Keep the children rendered to make sure invisible items are included in the navigation tree.
+-	if ( ! find( items, { group: groupId, _isVisible: true } ) ) {
++	if (
++		! Object.values( items ).some(
++			( item ) => item.group === groupId && item._isVisible
++		)
++	) {
+ 		return (
+ 			<NavigationGroupContext.Provider value={ context }>
+ 				{ children }
+diff --git a/packages/components/src/navigation/item/base.js b/packages/components/src/navigation/item/base.js
+index f430a00087fded..ea8b035f1fd917 100644
+--- a/packages/components/src/navigation/item/base.js
++++ b/packages/components/src/navigation/item/base.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { uniqueId } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,10 +15,12 @@ import { useNavigationContext } from '../context';
+ import { useNavigationTreeItem } from './use-navigation-tree-item';
+ import { ItemBaseUI } from '../styles/navigation-styles';
+ 
++let uniqueId = 0;
++
+ export default function NavigationItemBase( props ) {
+ 	const { children, className, ...restProps } = props;
+ 
+-	const [ itemId ] = useState( uniqueId( 'item-' ) );
++	const [ itemId ] = useState( `item-${ ++uniqueId }` );
+ 
+ 	useNavigationTreeItem( itemId, props );
+ 	const { navigationTree } = useNavigationContext();
+diff --git a/packages/components/src/navigation/menu/menu-title-search.js b/packages/components/src/navigation/menu/menu-title-search.js
+index 7780336d82d5c7..9e0caabccc4f98 100644
+--- a/packages/components/src/navigation/menu/menu-title-search.js
++++ b/packages/components/src/navigation/menu/menu-title-search.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { filter } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -49,7 +44,9 @@ function MenuTitleSearch( {
+ 			return;
+ 		}
+ 
+-		const count = filter( items, '_isVisible' ).length;
++		const count = Object.values( items ).filter(
++			( item ) => item._isVisible
++		).length;
+ 		const resultsFoundMessage = sprintf(
+ 			/* translators: %d: number of results. */
+ 			_n( '%d result found.', '%d results found.', count ),
+diff --git a/packages/components/src/navigation/menu/search-no-results-found.js b/packages/components/src/navigation/menu/search-no-results-found.js
+index 07391714c8dff3..1297ff1656db9b 100644
+--- a/packages/components/src/navigation/menu/search-no-results-found.js
++++ b/packages/components/src/navigation/menu/search-no-results-found.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { filter } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -19,7 +14,9 @@ export default function NavigationSearchNoResultsFound( { search } ) {
+ 		navigationTree: { items },
+ 	} = useNavigationContext();
+ 
+-	const resultsCount = filter( items, '_isVisible' ).length;
++	const resultsCount = Object.values( items ).filter(
++		( item ) => item._isVisible
++	).length;
+ 
+ 	if ( ! search || !! resultsCount ) {
+ 		return null;
+diff --git a/packages/components/src/navigation/use-navigation-tree-nodes.js b/packages/components/src/navigation/use-navigation-tree-nodes.js
+index c07b88260ee4a2..45ef1b53b3a174 100644
+--- a/packages/components/src/navigation/use-navigation-tree-nodes.js
++++ b/packages/components/src/navigation/use-navigation-tree-nodes.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { omit } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -13,14 +8,22 @@ export const useNavigationTreeNodes = () => {
+ 
+ 	const getNode = ( key ) => nodes[ key ];
+ 
+-	const addNode = ( key, value ) =>
+-		setNodes( ( original ) => ( {
++	const addNode = ( key, value ) => {
++		// eslint-disable-next-line no-unused-vars
++		const { children, ...newNode } = value;
++		return setNodes( ( original ) => ( {
+ 			...original,
+-			[ key ]: omit( value, 'children' ),
++			[ key ]: newNode,
+ 		} ) );
++	};
+ 
+-	const removeNode = ( key ) =>
+-		setNodes( ( original ) => omit( original, key ) );
++	const removeNode = ( key ) => {
++		return setNodes( ( original ) => {
++			// eslint-disable-next-line no-unused-vars
++			const { [ key ]: removedNode, ...remainingNodes } = original;
++			return remainingNodes;
++		} );
++	};
+ 
+ 	return { nodes, getNode, addNode, removeNode };
+ };
+diff --git a/packages/components/src/navigation/utils.js b/packages/components/src/navigation/utils.js
+index 251b90cfe44dfd..8b4d4f4701839c 100644
+--- a/packages/components/src/navigation/utils.js
++++ b/packages/components/src/navigation/utils.js
+@@ -1,11 +1,11 @@
+ /**
+  * External dependencies
+  */
+-import { deburr } from 'lodash';
++import removeAccents from 'remove-accents';
+ 
+ // @see packages/block-editor/src/components/inserter/search-items.js
+ export const normalizeInput = ( input ) =>
+-	deburr( input ).replace( /^\//, '' ).toLowerCase();
++	removeAccents( input ).replace( /^\//, '' ).toLowerCase();
+ 
+ export const normalizedSearch = ( title, search ) =>
+ 	-1 !== normalizeInput( title ).indexOf( normalizeInput( search ) );

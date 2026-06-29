@@ -1,0 +1,70 @@
+diff --git a/packages/theme/bin/terrazzo-plugin-mode-overrides/index.ts b/packages/theme/bin/terrazzo-plugin-mode-overrides/index.ts
+index b0f3cc03ecb3ae..d616f2f8d456d7 100644
+--- a/packages/theme/bin/terrazzo-plugin-mode-overrides/index.ts
++++ b/packages/theme/bin/terrazzo-plugin-mode-overrides/index.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { basename, join, dirname } from 'node:path';
++import { basename, join } from 'node:path';
+ import { fileURLToPath } from 'node:url';
+ import type { Plugin } from '@terrazzo/parser';
+ 
+@@ -155,9 +155,13 @@ function getModeOverrides(
+  * For each mode found in tokens (via $extensions.mode), generates a separate
+  * JSON file per source file containing tokens that have values for that mode.
+  *
++ * @param options          Plugin options.
++ * @param options.filePath Output path relative to outDir (default: 'modes').
+  * @return A Terrazzo plugin that generates mode-specific DTCG override files.
+  */
+-export default function pluginModeOverrides(): Plugin {
++export default function pluginModeOverrides( {
++	filePath = 'modes',
++} = {} ): Plugin {
+ 	return {
+ 		name: '@wordpress/terrazzo-plugin-mode-overrides',
+ 		async build( { outputFile, sources } ) {
+@@ -189,13 +193,20 @@ export default function pluginModeOverrides(): Plugin {
+ 					}
+ 
+ 					// Output as {basename}.{mode}.json (e.g., dimension.compact.json)
+-					const filePath = fileURLToPath( filename );
+-					const outFile = join(
+-						dirname( filePath ),
+-						'modes',
+-						`${ basename( filePath, '.json' ) }.${ mode }.json`
++					const jsonFileName = `${ basename(
++						fileURLToPath( filename ),
++						'.json'
++					) }.${ mode }.json`;
++
++					const outputFilePath = join(
++						filePath,
++						jsonFileName
++					).replace( /\\/g, '/' );
++
++					outputFile(
++						outputFilePath,
++						JSON.stringify( output, null, '\t' )
+ 					);
+-					outputFile( outFile, JSON.stringify( output, null, '\t' ) );
+ 				}
+ 			}
+ 		},
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index 8ba95cdb1cc9ff..dd7b001c516cfb 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -75,7 +75,9 @@ export default defineConfig( {
+ 		pluginDsTokenDocs( {
+ 			filename: '../../docs/ds-tokens.md',
+ 		} ),
+-		pluginModeOverrides(),
++		pluginModeOverrides( {
++			filePath: '../../tokens/modes',
++		} ),
+ 	],
+ 
+ 	// Linter rules current error when multiple entry files are used

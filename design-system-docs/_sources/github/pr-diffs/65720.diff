@@ -1,0 +1,170 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4c00ea32bae2cb..449abca7b6420c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   `ToggleGroupControl`: Fix arrow key navigation in RTL ([#65735](https://github.com/WordPress/gutenberg/pull/65735)).
+ -   `ToggleGroupControl`: indicator doesn't jump around when the layout around it changes ([#65175](https://github.com/WordPress/gutenberg/pull/65175)).
+ -   `Composite`: fix legacy support for the store prop ([#65821](https://github.com/WordPress/gutenberg/pull/65821)).
++-   `Composite`: make items tabbable if active element gets removed ([#65720](https://github.com/WordPress/gutenberg/pull/65720)).
+ 
+ ### Deprecations
+ 
+diff --git a/packages/components/src/composite/item.tsx b/packages/components/src/composite/item.tsx
+index 4a02f76039a5cf..edbf0b92e039af 100644
+--- a/packages/components/src/composite/item.tsx
++++ b/packages/components/src/composite/item.tsx
+@@ -26,5 +26,23 @@ export const CompositeItem = forwardRef<
+ 	// obfuscated to discourage its use outside of the component's internals.
+ 	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
+ 
+-	return <Ariakit.CompositeItem store={ store } { ...props } ref={ ref } />;
++	// If the active item is not connected, Composite may end up in a state
++	// where none of the items are tabbable. In this case, we force all items to
++	// be tabbable, so that as soon as an item received focus, it becomes active
++	// and Composite goes back to working as expected.
++	const tabbable = Ariakit.useStoreState( store, ( state ) => {
++		return (
++			state?.activeId !== null &&
++			! store?.item( state?.activeId )?.element?.isConnected
++		);
++	} );
++
++	return (
++		<Ariakit.CompositeItem
++			store={ store }
++			tabbable={ tabbable }
++			{ ...props }
++			ref={ ref }
++		/>
++	);
+ } );
+diff --git a/packages/components/src/composite/test/index.tsx b/packages/components/src/composite/test/index.tsx
+new file mode 100644
+index 00000000000000..64619aaed01bd6
+--- /dev/null
++++ b/packages/components/src/composite/test/index.tsx
+@@ -0,0 +1,123 @@
++/**
++ * External dependencies
++ */
++import { queryByAttribute, render, screen } from '@testing-library/react';
++import { click, press, waitFor } from '@ariakit/test';
++import type { ComponentProps } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { Composite } from '..';
++
++// This is necessary because of how Ariakit calculates page up and
++// page down. Without this, nothing has a height, and so paging up
++// and down doesn't behave as expected in tests.
++
++let clientHeightSpy: jest.SpiedGetter<
++	typeof HTMLElement.prototype.clientHeight
++>;
++
++beforeAll( () => {
++	clientHeightSpy = jest
++		.spyOn( HTMLElement.prototype, 'clientHeight', 'get' )
++		.mockImplementation( function getClientHeight( this: HTMLElement ) {
++			if ( this.tagName === 'BODY' ) {
++				return window.outerHeight;
++			}
++			return 50;
++		} );
++} );
++
++afterAll( () => {
++	clientHeightSpy?.mockRestore();
++} );
++
++async function renderAndValidate( ...args: Parameters< typeof render > ) {
++	const view = render( ...args );
++	await waitFor( () => {
++		const activeButton = queryByAttribute(
++			'data-active-item',
++			view.baseElement,
++			'true'
++		);
++		expect( activeButton ).not.toBeNull();
++	} );
++	return view;
++}
++
++function RemoveItemTest( props: ComponentProps< typeof Composite > ) {
++	const [ showThirdItem, setShowThirdItem ] = useState( true );
++	return (
++		<>
++			<button>Focus trap before composite</button>
++			<Composite { ...props }>
++				<Composite.Item>Item 1</Composite.Item>
++				<Composite.Item>Item 2</Composite.Item>
++				{ showThirdItem && <Composite.Item>Item 3</Composite.Item> }
++			</Composite>
++			<button onClick={ () => setShowThirdItem( ( value ) => ! value ) }>
++				Toggle third item
++			</button>
++		</>
++	);
++}
++
++describe( 'Composite', () => {
++	it( 'should remain focusable even when there are no elements in the DOM associated with the currently active ID', async () => {
++		await renderAndValidate( <RemoveItemTest /> );
++
++		const toggleButton = screen.getByRole( 'button', {
++			name: 'Toggle third item',
++		} );
++
++		await press.Tab();
++		await press.Tab();
++
++		expect(
++			screen.getByRole( 'button', { name: 'Item 1' } )
++		).toHaveFocus();
++
++		await press.ArrowRight();
++		await press.ArrowRight();
++
++		expect(
++			screen.getByRole( 'button', { name: 'Item 3' } )
++		).toHaveFocus();
++
++		await click( toggleButton );
++
++		expect(
++			screen.queryByRole( 'button', { name: 'Item 3' } )
++		).not.toBeInTheDocument();
++
++		await press.ShiftTab();
++
++		expect(
++			screen.getByRole( 'button', { name: 'Item 2' } )
++		).toHaveFocus();
++
++		await click( toggleButton );
++
++		expect(
++			screen.getByRole( 'button', { name: 'Item 3' } )
++		).toBeVisible();
++
++		await press.ShiftTab();
++
++		expect(
++			screen.getByRole( 'button', { name: 'Item 2' } )
++		).toHaveFocus();
++
++		await press.ArrowRight();
++
++		expect(
++			screen.getByRole( 'button', { name: 'Item 3' } )
++		).toHaveFocus();
++	} );
++} );

@@ -1,0 +1,13 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index adb9f8926cf5f4..c46f55e1cff6d4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,7 +16,7 @@
+ ### Enhancements
+ 
+ -   Update the visual design of the `Spinner` component. ([#37551](https://github.com/WordPress/gutenberg/pull/37551))
+-- TreeGrid accessibility enhancements. (#38358)
++- TreeGrid accessibility enhancements. ([#38358](https://github.com/WordPress/gutenberg/pull/38358))
+ 
+ ## 19.3.0 (2022-01-27)
+ 

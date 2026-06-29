@@ -1,0 +1,3947 @@
+diff --git a/babel.config.js b/babel.config.js
+index 9489945b27ef80..4ccd819ebd0fc9 100644
+--- a/babel.config.js
++++ b/babel.config.js
+@@ -3,6 +3,6 @@ module.exports = ( api ) => {
+ 
+ 	return {
+ 		presets: [ '@wordpress/babel-preset-default' ],
+-		plugins: [ 'babel-plugin-emotion', 'babel-plugin-inline-json-import' ],
++		plugins: [ '@emotion/babel-plugin', 'babel-plugin-inline-json-import' ],
+ 	};
+ };
+diff --git a/package-lock.json b/package-lock.json
+index bcf83300257837..c6f0667f8c3212 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -1526,10 +1526,64 @@
+ 				"@types/hammerjs": "^2.0.36"
+ 			}
+ 		},
++		"@emotion/babel-plugin": {
++			"version": "11.3.0",
++			"resolved": "https://registry.npmjs.org/@emotion/babel-plugin/-/babel-plugin-11.3.0.tgz",
++			"integrity": "sha512-UZKwBV2rADuhRp+ZOGgNWg2eYgbzKzQXfQPtJbu/PLy8onurxlNCLvxMQEvlr1/GudguPI5IU9qIY1+2z1M5bA==",
++			"requires": {
++				"@babel/helper-module-imports": "^7.12.13",
++				"@babel/plugin-syntax-jsx": "^7.12.13",
++				"@babel/runtime": "^7.13.10",
++				"@emotion/hash": "^0.8.0",
++				"@emotion/memoize": "^0.7.5",
++				"@emotion/serialize": "^1.0.2",
++				"babel-plugin-macros": "^2.6.1",
++				"convert-source-map": "^1.5.0",
++				"escape-string-regexp": "^4.0.0",
++				"find-root": "^1.1.0",
++				"source-map": "^0.5.7",
++				"stylis": "^4.0.3"
++			},
++			"dependencies": {
++				"@emotion/memoize": {
++					"version": "0.7.5",
++					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.5.tgz",
++					"integrity": "sha512-igX9a37DR2ZPGYtV6suZ6whr8pTFtyHL3K/oLUotxpSVO2ASaprmAe2Dkq7tBo7CRY7MMDrAa9nuQP9/YG8FxQ=="
++				},
++				"@emotion/serialize": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@emotion/serialize/-/serialize-1.0.2.tgz",
++					"integrity": "sha512-95MgNJ9+/ajxU7QIAruiOAdYNjxZX7G2mhgrtDWswA21VviYIRP1R5QilZ/bDY42xiKsaktP4egJb3QdYQZi1A==",
++					"requires": {
++						"@emotion/hash": "^0.8.0",
++						"@emotion/memoize": "^0.7.4",
++						"@emotion/unitless": "^0.7.5",
++						"@emotion/utils": "^1.0.0",
++						"csstype": "^3.0.2"
++					}
++				},
++				"@emotion/utils": {
++					"version": "1.0.0",
++					"resolved": "https://registry.npmjs.org/@emotion/utils/-/utils-1.0.0.tgz",
++					"integrity": "sha512-mQC2b3XLDs6QCW+pDQDiyO/EdGZYOygE8s5N5rrzjSI4M3IejPE/JPndCBwRT9z982aqQNi6beWs1UeayrQxxA=="
++				},
++				"csstype": {
++					"version": "3.0.8",
++					"resolved": "https://registry.npmjs.org/csstype/-/csstype-3.0.8.tgz",
++					"integrity": "sha512-jXKhWqXPmlUeoQnF/EhTtTl4C9SnrxSH/jZUih3jmO6lBKr99rP3/+FmrMj4EFpOXzMtXHAZkd3x0E6h6Fgflw=="
++				},
++				"escape-string-regexp": {
++					"version": "4.0.0",
++					"resolved": "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-4.0.0.tgz",
++					"integrity": "sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA=="
++				}
++			}
++		},
+ 		"@emotion/cache": {
+ 			"version": "10.0.29",
+ 			"resolved": "https://registry.npmjs.org/@emotion/cache/-/cache-10.0.29.tgz",
+ 			"integrity": "sha512-fU2VtSVlHiF27empSbxi1O2JFdNWZO+2NFHfwO0pxgTep6Xa3uGb+3pVKfLww2l/IBGLNEZl5Xf/++A4wAYDYQ==",
++			"dev": true,
+ 			"requires": {
+ 				"@emotion/sheet": "0.9.4",
+ 				"@emotion/stylis": "0.8.5",
+@@ -1540,7 +1594,8 @@
+ 				"@emotion/utils": {
+ 					"version": "0.11.3",
+ 					"resolved": "https://registry.npmjs.org/@emotion/utils/-/utils-0.11.3.tgz",
+-					"integrity": "sha512-0o4l6pZC+hI88+bzuaX/6BgOvQVhbt2PfmxauVaYOGgbsAw14wdKyvMCZXnsnsHys94iadcF+RG/wZyx6+ZZBw=="
++					"integrity": "sha512-0o4l6pZC+hI88+bzuaX/6BgOvQVhbt2PfmxauVaYOGgbsAw14wdKyvMCZXnsnsHys94iadcF+RG/wZyx6+ZZBw==",
++					"dev": true
+ 				}
+ 			}
+ 		},
+@@ -1548,6 +1603,7 @@
+ 			"version": "10.1.1",
+ 			"resolved": "https://registry.npmjs.org/@emotion/core/-/core-10.1.1.tgz",
+ 			"integrity": "sha512-ZMLG6qpXR8x031NXD8HJqugy/AZSkAuMxxqB46pmAR7ze47MhNJ56cdoX243QPZdGctrdfo+s08yZTiwaUcRKA==",
++			"dev": true,
+ 			"requires": {
+ 				"@babel/runtime": "^7.5.5",
+ 				"@emotion/cache": "^10.0.27",
+@@ -1560,7 +1616,8 @@
+ 				"@emotion/utils": {
+ 					"version": "0.11.3",
+ 					"resolved": "https://registry.npmjs.org/@emotion/utils/-/utils-0.11.3.tgz",
+-					"integrity": "sha512-0o4l6pZC+hI88+bzuaX/6BgOvQVhbt2PfmxauVaYOGgbsAw14wdKyvMCZXnsnsHys94iadcF+RG/wZyx6+ZZBw=="
++					"integrity": "sha512-0o4l6pZC+hI88+bzuaX/6BgOvQVhbt2PfmxauVaYOGgbsAw14wdKyvMCZXnsnsHys94iadcF+RG/wZyx6+ZZBw==",
++					"dev": true
+ 				}
+ 			}
+ 		},
+@@ -1568,6 +1625,7 @@
+ 			"version": "10.0.27",
+ 			"resolved": "https://registry.npmjs.org/@emotion/css/-/css-10.0.27.tgz",
+ 			"integrity": "sha512-6wZjsvYeBhyZQYNrGoR5yPMYbMBNEnanDrqmsqS1mzDm1cOTu12shvl2j4QHNS36UaTE0USIJawCH9C8oW34Zw==",
++			"dev": true,
+ 			"requires": {
+ 				"@emotion/serialize": "^0.11.15",
+ 				"@emotion/utils": "0.11.3",
+@@ -1585,7 +1643,26 @@
+ 				"@emotion/utils": {
+ 					"version": "0.11.3",
+ 					"resolved": "https://registry.npmjs.org/@emotion/utils/-/utils-0.11.3.tgz",
+-					"integrity": "sha512-0o4l6pZC+hI88+bzuaX/6BgOvQVhbt2PfmxauVaYOGgbsAw14wdKyvMCZXnsnsHys94iadcF+RG/wZyx6+ZZBw=="
++					"integrity": "sha512-0o4l6pZC+hI88+bzuaX/6BgOvQVhbt2PfmxauVaYOGgbsAw14wdKyvMCZXnsnsHys94iadcF+RG/wZyx6+ZZBw==",
++					"dev": true
++				}
++			}
++		},
++		"@emotion/css-prettifier": {
++			"version": "1.0.0",
++			"resolved": "https://registry.npmjs.org/@emotion/css-prettifier/-/css-prettifier-1.0.0.tgz",
++			"integrity": "sha512-efxSrRTiTqHTQVKW15Gz5H4pNAw8OqcG8NaiwkJIkqIdNXTD4Qr1zC1Ou6r2acd1oJJ2s56nb1ClnXMiWoj6gQ==",
++			"dev": true,
++			"requires": {
++				"@emotion/memoize": "^0.7.4",
++				"stylis": "^4.0.3"
++			},
++			"dependencies": {
++				"@emotion/memoize": {
++					"version": "0.7.5",
++					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.5.tgz",
++					"integrity": "sha512-igX9a37DR2ZPGYtV6suZ6whr8pTFtyHL3K/oLUotxpSVO2ASaprmAe2Dkq7tBo7CRY7MMDrAa9nuQP9/YG8FxQ==",
++					"dev": true
+ 				}
+ 			}
+ 		},
+@@ -1598,37 +1675,186 @@
+ 			"version": "0.8.5",
+ 			"resolved": "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-0.8.5.tgz",
+ 			"integrity": "sha512-6ZODuZSFofbxSbcxwsFz+6ioPjb0ISJRRPLZ+WIbjcU2IMU0Io+RGQjjaTgOvNQl007KICBm7zXQaYQEC1r6Bg==",
++			"optional": true,
+ 			"requires": {
+ 				"@emotion/memoize": "0.7.3"
+ 			}
+ 		},
++		"@emotion/jest": {
++			"version": "11.3.0",
++			"resolved": "https://registry.npmjs.org/@emotion/jest/-/jest-11.3.0.tgz",
++			"integrity": "sha512-LZqYc3yerhic1IvAcEwBLRs1DsUt3oY7Oz6n+e+HU32iYOK/vpfzlhgmQURE94BHfv6eCOj6DV38f3jSnIkBkQ==",
++			"dev": true,
++			"requires": {
++				"@babel/runtime": "^7.13.10",
++				"@emotion/css-prettifier": "^1.0.0",
++				"chalk": "^4.1.0",
++				"specificity": "^0.4.1",
++				"stylis": "^4.0.3"
++			},
++			"dependencies": {
++				"ansi-styles": {
++					"version": "4.3.0",
++					"resolved": "https://registry.npmjs.org/ansi-styles/-/ansi-styles-4.3.0.tgz",
++					"integrity": "sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==",
++					"dev": true,
++					"requires": {
++						"color-convert": "^2.0.1"
++					}
++				},
++				"chalk": {
++					"version": "4.1.1",
++					"resolved": "https://registry.npmjs.org/chalk/-/chalk-4.1.1.tgz",
++					"integrity": "sha512-diHzdDKxcU+bAsUboHLPEDQiw0qEe0qd7SYUn3HgcFlWgbDcfLGswOHYeGrHKzG9z6UYf01d9VFMfZxPM1xZSg==",
++					"dev": true,
++					"requires": {
++						"ansi-styles": "^4.1.0",
++						"supports-color": "^7.1.0"
++					}
++				},
++				"color-convert": {
++					"version": "2.0.1",
++					"resolved": "https://registry.npmjs.org/color-convert/-/color-convert-2.0.1.tgz",
++					"integrity": "sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==",
++					"dev": true,
++					"requires": {
++						"color-name": "~1.1.4"
++					}
++				},
++				"color-name": {
++					"version": "1.1.4",
++					"resolved": "https://registry.npmjs.org/color-name/-/color-name-1.1.4.tgz",
++					"integrity": "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==",
++					"dev": true
++				},
++				"has-flag": {
++					"version": "4.0.0",
++					"resolved": "https://registry.npmjs.org/has-flag/-/has-flag-4.0.0.tgz",
++					"integrity": "sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==",
++					"dev": true
++				},
++				"supports-color": {
++					"version": "7.2.0",
++					"resolved": "https://registry.npmjs.org/supports-color/-/supports-color-7.2.0.tgz",
++					"integrity": "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==",
++					"dev": true,
++					"requires": {
++						"has-flag": "^4.0.0"
++					}
++				}
++			}
++		},
+ 		"@emotion/memoize": {
+ 			"version": "0.7.3",
+ 			"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.3.tgz",
+-			"integrity": "sha512-2Md9mH6mvo+ygq1trTeVp2uzAKwE2P7In0cRpD/M9Q70aH8L+rxMLbb3JCN2JoSWsV2O+DdFjfbbXoMoLBczow=="
++			"integrity": "sha512-2Md9mH6mvo+ygq1trTeVp2uzAKwE2P7In0cRpD/M9Q70aH8L+rxMLbb3JCN2JoSWsV2O+DdFjfbbXoMoLBczow==",
++			"optional": true
+ 		},
+ 		"@emotion/native": {
+-			"version": "10.0.27",
+-			"resolved": "https://registry.npmjs.org/@emotion/native/-/native-10.0.27.tgz",
+-			"integrity": "sha512-3qxR2XFizGfABKKbX9kAYc0PHhKuCEuyxshoq3TaMEbi9asWHdQVChg32ULpblm4XAf9oxaitAU7J9SfdwFxtw==",
++			"version": "11.0.0",
++			"resolved": "https://registry.npmjs.org/@emotion/native/-/native-11.0.0.tgz",
++			"integrity": "sha512-IByi+OfagLtcQsXZMkS06ztcNMZePg6dqwzM4FIkXjN4PhoeJ/jTDRICT3pTIk3ChuurX2oF8fmE+0bfvYi/SA==",
+ 			"dev": true,
+ 			"requires": {
+-				"@emotion/primitives-core": "10.0.27"
++				"@emotion/primitives-core": "^11.0.0"
+ 			}
+ 		},
+ 		"@emotion/primitives-core": {
+-			"version": "10.0.27",
+-			"resolved": "https://registry.npmjs.org/@emotion/primitives-core/-/primitives-core-10.0.27.tgz",
+-			"integrity": "sha512-fRBEDNPSFFOrBJ0OcheuElayrNTNdLF9DzMxtL0sFgsCFvvadlzwJHhJMSwEJuxwARm9GhVLr1p8G8JGkK98lQ==",
++			"version": "11.0.0",
++			"resolved": "https://registry.npmjs.org/@emotion/primitives-core/-/primitives-core-11.0.0.tgz",
++			"integrity": "sha512-4zpfUV7hz9A+j7Hcyiend3LEtRogDXDtMzQy8LOoU39Mw5ntgvTlYQSPbQSzs98BJty/F9Ybyg3pBzFDdMpmDg==",
+ 			"dev": true,
+ 			"requires": {
+-				"css-to-react-native": "^2.2.1"
++				"css-to-react-native": "^3.0.0"
++			},
++			"dependencies": {
++				"css-to-react-native": {
++					"version": "3.0.0",
++					"resolved": "https://registry.npmjs.org/css-to-react-native/-/css-to-react-native-3.0.0.tgz",
++					"integrity": "sha512-Ro1yETZA813eoyUp2GDBhG2j+YggidUmzO1/v9eYBKR2EHVEniE2MI/NqpTQ954BMpTPZFsGNPm46qFB9dpaPQ==",
++					"dev": true,
++					"requires": {
++						"camelize": "^1.0.0",
++						"css-color-keywords": "^1.0.0",
++						"postcss-value-parser": "^4.0.2"
++					}
++				},
++				"postcss-value-parser": {
++					"version": "4.1.0",
++					"resolved": "https://registry.npmjs.org/postcss-value-parser/-/postcss-value-parser-4.1.0.tgz",
++					"integrity": "sha512-97DXOFbQJhk71ne5/Mt6cOu6yxsSfM0QGQyl0L25Gca4yGWEGJaig7l7gbCX623VqTBNGLRLaVUCnNkcedlRSQ==",
++					"dev": true
++				}
++			}
++		},
++		"@emotion/react": {
++			"version": "11.4.0",
++			"resolved": "https://registry.npmjs.org/@emotion/react/-/react-11.4.0.tgz",
++			"integrity": "sha512-4XklWsl9BdtatLoJpSjusXhpKv9YVteYKh9hPKP1Sxl+mswEFoUe0WtmtWjxEjkA51DQ2QRMCNOvKcSlCQ7ivg==",
++			"requires": {
++				"@babel/runtime": "^7.13.10",
++				"@emotion/cache": "^11.4.0",
++				"@emotion/serialize": "^1.0.2",
++				"@emotion/sheet": "^1.0.1",
++				"@emotion/utils": "^1.0.0",
++				"@emotion/weak-memoize": "^0.2.5",
++				"hoist-non-react-statics": "^3.3.1"
++			},
++			"dependencies": {
++				"@emotion/cache": {
++					"version": "11.4.0",
++					"resolved": "https://registry.npmjs.org/@emotion/cache/-/cache-11.4.0.tgz",
++					"integrity": "sha512-Zx70bjE7LErRO9OaZrhf22Qye1y4F7iDl+ITjet0J+i+B88PrAOBkKvaAWhxsZf72tDLajwCgfCjJ2dvH77C3g==",
++					"requires": {
++						"@emotion/memoize": "^0.7.4",
++						"@emotion/sheet": "^1.0.0",
++						"@emotion/utils": "^1.0.0",
++						"@emotion/weak-memoize": "^0.2.5",
++						"stylis": "^4.0.3"
++					}
++				},
++				"@emotion/memoize": {
++					"version": "0.7.5",
++					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.5.tgz",
++					"integrity": "sha512-igX9a37DR2ZPGYtV6suZ6whr8pTFtyHL3K/oLUotxpSVO2ASaprmAe2Dkq7tBo7CRY7MMDrAa9nuQP9/YG8FxQ=="
++				},
++				"@emotion/serialize": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@emotion/serialize/-/serialize-1.0.2.tgz",
++					"integrity": "sha512-95MgNJ9+/ajxU7QIAruiOAdYNjxZX7G2mhgrtDWswA21VviYIRP1R5QilZ/bDY42xiKsaktP4egJb3QdYQZi1A==",
++					"requires": {
++						"@emotion/hash": "^0.8.0",
++						"@emotion/memoize": "^0.7.4",
++						"@emotion/unitless": "^0.7.5",
++						"@emotion/utils": "^1.0.0",
++						"csstype": "^3.0.2"
++					}
++				},
++				"@emotion/sheet": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@emotion/sheet/-/sheet-1.0.1.tgz",
++					"integrity": "sha512-GbIvVMe4U+Zc+929N1V7nW6YYJtidj31lidSmdYcWozwoBIObXBnaJkKNDjZrLm9Nc0BR+ZyHNaRZxqNZbof5g=="
++				},
++				"csstype": {
++					"version": "3.0.8",
++					"resolved": "https://registry.npmjs.org/csstype/-/csstype-3.0.8.tgz",
++					"integrity": "sha512-jXKhWqXPmlUeoQnF/EhTtTl4C9SnrxSH/jZUih3jmO6lBKr99rP3/+FmrMj4EFpOXzMtXHAZkd3x0E6h6Fgflw=="
++				},
++				"hoist-non-react-statics": {
++					"version": "3.3.2",
++					"resolved": "https://registry.npmjs.org/hoist-non-react-statics/-/hoist-non-react-statics-3.3.2.tgz",
++					"integrity": "sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==",
++					"requires": {
++						"react-is": "^16.7.0"
++					}
++				}
+ 			}
+ 		},
+ 		"@emotion/serialize": {
+ 			"version": "0.11.15",
+ 			"resolved": "https://registry.npmjs.org/@emotion/serialize/-/serialize-0.11.15.tgz",
+ 			"integrity": "sha512-YE+qnrmGwyR+XB5j7Bi+0GT1JWsdcjM/d4POu+TXkcnrRs4RFCCsi3d/Ebf+wSStHqAlTT2+dfd+b9N9EO2KBg==",
++			"dev": true,
+ 			"requires": {
+ 				"@emotion/hash": "0.7.4",
+ 				"@emotion/memoize": "0.7.4",
+@@ -1640,54 +1866,84 @@
+ 				"@emotion/hash": {
+ 					"version": "0.7.4",
+ 					"resolved": "https://registry.npmjs.org/@emotion/hash/-/hash-0.7.4.tgz",
+-					"integrity": "sha512-fxfMSBMX3tlIbKUdtGKxqB1fyrH6gVrX39Gsv3y8lRYKUqlgDt3UMqQyGnR1bQMa2B8aGnhLZokZgg8vT0Le+A=="
++					"integrity": "sha512-fxfMSBMX3tlIbKUdtGKxqB1fyrH6gVrX39Gsv3y8lRYKUqlgDt3UMqQyGnR1bQMa2B8aGnhLZokZgg8vT0Le+A==",
++					"dev": true
+ 				},
+ 				"@emotion/memoize": {
+ 					"version": "0.7.4",
+ 					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.4.tgz",
+-					"integrity": "sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw=="
++					"integrity": "sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw==",
++					"dev": true
+ 				},
+ 				"@emotion/unitless": {
+ 					"version": "0.7.5",
+ 					"resolved": "https://registry.npmjs.org/@emotion/unitless/-/unitless-0.7.5.tgz",
+-					"integrity": "sha512-OWORNpfjMsSSUBVrRBVGECkhWcULOAJz9ZW8uK9qgxD+87M7jHRcvh/A96XXNhXTLmKcoYSQtBEX7lHMO7YRwg=="
++					"integrity": "sha512-OWORNpfjMsSSUBVrRBVGECkhWcULOAJz9ZW8uK9qgxD+87M7jHRcvh/A96XXNhXTLmKcoYSQtBEX7lHMO7YRwg==",
++					"dev": true
+ 				},
+ 				"@emotion/utils": {
+ 					"version": "0.11.3",
+ 					"resolved": "https://registry.npmjs.org/@emotion/utils/-/utils-0.11.3.tgz",
+-					"integrity": "sha512-0o4l6pZC+hI88+bzuaX/6BgOvQVhbt2PfmxauVaYOGgbsAw14wdKyvMCZXnsnsHys94iadcF+RG/wZyx6+ZZBw=="
++					"integrity": "sha512-0o4l6pZC+hI88+bzuaX/6BgOvQVhbt2PfmxauVaYOGgbsAw14wdKyvMCZXnsnsHys94iadcF+RG/wZyx6+ZZBw==",
++					"dev": true
+ 				}
+ 			}
+ 		},
+ 		"@emotion/sheet": {
+ 			"version": "0.9.4",
+ 			"resolved": "https://registry.npmjs.org/@emotion/sheet/-/sheet-0.9.4.tgz",
+-			"integrity": "sha512-zM9PFmgVSqBw4zL101Q0HrBVTGmpAxFZH/pYx/cjJT5advXguvcgjHFTCaIO3enL/xr89vK2bh0Mfyj9aa0ANA=="
++			"integrity": "sha512-zM9PFmgVSqBw4zL101Q0HrBVTGmpAxFZH/pYx/cjJT5advXguvcgjHFTCaIO3enL/xr89vK2bh0Mfyj9aa0ANA==",
++			"dev": true
+ 		},
+ 		"@emotion/styled": {
+-			"version": "10.0.23",
+-			"resolved": "https://registry.npmjs.org/@emotion/styled/-/styled-10.0.23.tgz",
+-			"integrity": "sha512-gNr04eqBQ2iYUx8wFLZDfm3N8/QUOODu/ReDXa693uyQGy2OqA+IhPJk+kA7id8aOfwAsMuvZ0pJImEXXKtaVQ==",
++			"version": "11.3.0",
++			"resolved": "https://registry.npmjs.org/@emotion/styled/-/styled-11.3.0.tgz",
++			"integrity": "sha512-fUoLcN3BfMiLlRhJ8CuPUMEyKkLEoM+n+UyAbnqGEsCd5IzKQ7VQFLtzpJOaCD2/VR2+1hXQTnSZXVJeiTNltA==",
+ 			"requires": {
+-				"@emotion/styled-base": "^10.0.23",
+-				"babel-plugin-emotion": "^10.0.23"
+-			}
+-		},
+-		"@emotion/styled-base": {
+-			"version": "10.0.24",
+-			"resolved": "https://registry.npmjs.org/@emotion/styled-base/-/styled-base-10.0.24.tgz",
+-			"integrity": "sha512-AnBImerf0h4dGAJVo0p0VE8KoAns71F28ErGFK474zbNAHX6yqSWQUasb+1jvg/VPwZjCp19+tAr6oOB0pwmLQ==",
+-			"requires": {
+-				"@babel/runtime": "^7.5.5",
+-				"@emotion/is-prop-valid": "0.8.5",
+-				"@emotion/serialize": "^0.11.14",
+-				"@emotion/utils": "0.11.2"
++				"@babel/runtime": "^7.13.10",
++				"@emotion/babel-plugin": "^11.3.0",
++				"@emotion/is-prop-valid": "^1.1.0",
++				"@emotion/serialize": "^1.0.2",
++				"@emotion/utils": "^1.0.0"
++			},
++			"dependencies": {
++				"@emotion/is-prop-valid": {
++					"version": "1.1.0",
++					"resolved": "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-1.1.0.tgz",
++					"integrity": "sha512-9RkilvXAufQHsSsjQ3PIzSns+pxuX4EW8EbGeSPjZMHuMx6z/MOzb9LpqNieQX4F3mre3NWS2+X3JNRHTQztUQ==",
++					"requires": {
++						"@emotion/memoize": "^0.7.4"
++					}
++				},
++				"@emotion/memoize": {
++					"version": "0.7.5",
++					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.5.tgz",
++					"integrity": "sha512-igX9a37DR2ZPGYtV6suZ6whr8pTFtyHL3K/oLUotxpSVO2ASaprmAe2Dkq7tBo7CRY7MMDrAa9nuQP9/YG8FxQ=="
++				},
++				"@emotion/serialize": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@emotion/serialize/-/serialize-1.0.2.tgz",
++					"integrity": "sha512-95MgNJ9+/ajxU7QIAruiOAdYNjxZX7G2mhgrtDWswA21VviYIRP1R5QilZ/bDY42xiKsaktP4egJb3QdYQZi1A==",
++					"requires": {
++						"@emotion/hash": "^0.8.0",
++						"@emotion/memoize": "^0.7.4",
++						"@emotion/unitless": "^0.7.5",
++						"@emotion/utils": "^1.0.0",
++						"csstype": "^3.0.2"
++					}
++				},
++				"csstype": {
++					"version": "3.0.8",
++					"resolved": "https://registry.npmjs.org/csstype/-/csstype-3.0.8.tgz",
++					"integrity": "sha512-jXKhWqXPmlUeoQnF/EhTtTl4C9SnrxSH/jZUih3jmO6lBKr99rP3/+FmrMj4EFpOXzMtXHAZkd3x0E6h6Fgflw=="
++				}
+ 			}
+ 		},
+ 		"@emotion/stylis": {
+ 			"version": "0.8.5",
+ 			"resolved": "https://registry.npmjs.org/@emotion/stylis/-/stylis-0.8.5.tgz",
+-			"integrity": "sha512-h6KtPihKFn3T9fuIrwvXXUOwlx3rfUvfZIcP5a6rh8Y7zjE3O06hT5Ss4S/YI1AYhuZ1kjaE/5EaOOI2NqSylQ=="
++			"integrity": "sha512-h6KtPihKFn3T9fuIrwvXXUOwlx3rfUvfZIcP5a6rh8Y7zjE3O06hT5Ss4S/YI1AYhuZ1kjaE/5EaOOI2NqSylQ==",
++			"dev": true
+ 		},
+ 		"@emotion/unitless": {
+ 			"version": "0.7.5",
+@@ -1695,9 +1951,9 @@
+ 			"integrity": "sha512-OWORNpfjMsSSUBVrRBVGECkhWcULOAJz9ZW8uK9qgxD+87M7jHRcvh/A96XXNhXTLmKcoYSQtBEX7lHMO7YRwg=="
+ 		},
+ 		"@emotion/utils": {
+-			"version": "0.11.2",
+-			"resolved": "https://registry.npmjs.org/@emotion/utils/-/utils-0.11.2.tgz",
+-			"integrity": "sha512-UHX2XklLl3sIaP6oiMmlVzT0J+2ATTVpf0dHQVyPJHTkOITvXfaSqnRk6mdDhV9pR8T/tHc3cex78IKXssmzrA=="
++			"version": "1.0.0",
++			"resolved": "https://registry.npmjs.org/@emotion/utils/-/utils-1.0.0.tgz",
++			"integrity": "sha512-mQC2b3XLDs6QCW+pDQDiyO/EdGZYOygE8s5N5rrzjSI4M3IejPE/JPndCBwRT9z982aqQNi6beWs1UeayrQxxA=="
+ 		},
+ 		"@emotion/weak-memoize": {
+ 			"version": "0.2.5",
+@@ -13185,10 +13441,12 @@
+ 			"version": "file:packages/components",
+ 			"requires": {
+ 				"@babel/runtime": "^7.13.10",
+-				"@emotion/cache": "^10.0.27",
+-				"@emotion/core": "^10.1.1",
+-				"@emotion/css": "^10.0.22",
+-				"@emotion/styled": "^10.0.23",
++				"@emotion/cache": "^11.1.3",
++				"@emotion/core": "^11.0.0",
++				"@emotion/css": "^11.1.3",
++				"@emotion/native": "^11.0.0",
++				"@emotion/react": "^11.1.5",
++				"@emotion/styled": "^11.3.0",
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
+ 				"@wordpress/date": "file:packages/date",
+@@ -13206,7 +13464,6 @@
+ 				"classnames": "^2.2.5",
+ 				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^6.0.15",
+-				"emotion": "^10.0.23",
+ 				"gradient-parser": "^0.1.5",
+ 				"highlight-words-core": "^1.2.2",
+ 				"lodash": "^4.17.21",
+@@ -13223,6 +13480,35 @@
+ 				"uuid": "^8.3.0"
+ 			},
+ 			"dependencies": {
++				"@emotion/cache": {
++					"version": "11.1.3",
++					"resolved": "https://registry.npmjs.org/@emotion/cache/-/cache-11.1.3.tgz",
++					"integrity": "sha512-n4OWinUPJVaP6fXxWZD9OUeQ0lY7DvtmtSuqtRWT0Ofo/sBLCVSgb4/Oa0Q5eFxcwablRKjUXqXtNZVyEwCAuA==",
++					"requires": {
++						"@emotion/memoize": "^0.7.4",
++						"@emotion/sheet": "^1.0.0",
++						"@emotion/utils": "^1.0.0",
++						"@emotion/weak-memoize": "^0.2.5",
++						"stylis": "^4.0.3"
++					}
++				},
++				"@emotion/core": {
++					"version": "11.0.0",
++					"resolved": "https://registry.npmjs.org/@emotion/core/-/core-11.0.0.tgz",
++					"integrity": "sha512-w4sE3AmHmyG6RDKf6mIbtHpgJUSJ2uGvPQb8VXFL7hFjMPibE8IiehG8cMX3Ztm4svfCQV6KqusQbeIOkurBcA=="
++				},
++				"@emotion/css": {
++					"version": "11.1.3",
++					"resolved": "https://registry.npmjs.org/@emotion/css/-/css-11.1.3.tgz",
++					"integrity": "sha512-RSQP59qtCNTf5NWD6xM08xsQdCZmVYnX/panPYvB6LQAPKQB6GL49Njf0EMbS3CyDtrlWsBcmqBtysFvfWT3rA==",
++					"requires": {
++						"@emotion/babel-plugin": "^11.0.0",
++						"@emotion/cache": "^11.1.3",
++						"@emotion/serialize": "^1.0.0",
++						"@emotion/sheet": "^1.0.0",
++						"@emotion/utils": "^1.0.0"
++					}
++				},
+ 				"@emotion/is-prop-valid": {
+ 					"version": "0.8.8",
+ 					"resolved": "https://registry.npmjs.org/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz",
+@@ -13236,13 +13522,65 @@
+ 					"resolved": "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.4.tgz",
+ 					"integrity": "sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw=="
+ 				},
++				"@emotion/native": {
++					"version": "11.0.0",
++					"resolved": "https://registry.npmjs.org/@emotion/native/-/native-11.0.0.tgz",
++					"integrity": "sha512-IByi+OfagLtcQsXZMkS06ztcNMZePg6dqwzM4FIkXjN4PhoeJ/jTDRICT3pTIk3ChuurX2oF8fmE+0bfvYi/SA==",
++					"requires": {
++						"@emotion/primitives-core": "^11.0.0"
++					}
++				},
++				"@emotion/primitives-core": {
++					"version": "11.0.0",
++					"resolved": "https://registry.npmjs.org/@emotion/primitives-core/-/primitives-core-11.0.0.tgz",
++					"integrity": "sha512-4zpfUV7hz9A+j7Hcyiend3LEtRogDXDtMzQy8LOoU39Mw5ntgvTlYQSPbQSzs98BJty/F9Ybyg3pBzFDdMpmDg==",
++					"requires": {
++						"css-to-react-native": "^3.0.0"
++					}
++				},
++				"@emotion/serialize": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@emotion/serialize/-/serialize-1.0.2.tgz",
++					"integrity": "sha512-95MgNJ9+/ajxU7QIAruiOAdYNjxZX7G2mhgrtDWswA21VviYIRP1R5QilZ/bDY42xiKsaktP4egJb3QdYQZi1A==",
++					"requires": {
++						"@emotion/hash": "^0.8.0",
++						"@emotion/memoize": "^0.7.4",
++						"@emotion/unitless": "^0.7.5",
++						"@emotion/utils": "^1.0.0",
++						"csstype": "^3.0.2"
++					}
++				},
++				"@emotion/sheet": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@emotion/sheet/-/sheet-1.0.1.tgz",
++					"integrity": "sha512-GbIvVMe4U+Zc+929N1V7nW6YYJtidj31lidSmdYcWozwoBIObXBnaJkKNDjZrLm9Nc0BR+ZyHNaRZxqNZbof5g=="
++				},
++				"@emotion/utils": {
++					"version": "1.0.0",
++					"resolved": "https://registry.npmjs.org/@emotion/utils/-/utils-1.0.0.tgz",
++					"integrity": "sha512-mQC2b3XLDs6QCW+pDQDiyO/EdGZYOygE8s5N5rrzjSI4M3IejPE/JPndCBwRT9z982aqQNi6beWs1UeayrQxxA=="
++				},
++				"css-to-react-native": {
++					"version": "3.0.0",
++					"resolved": "https://registry.npmjs.org/css-to-react-native/-/css-to-react-native-3.0.0.tgz",
++					"integrity": "sha512-Ro1yETZA813eoyUp2GDBhG2j+YggidUmzO1/v9eYBKR2EHVEniE2MI/NqpTQ954BMpTPZFsGNPm46qFB9dpaPQ==",
++					"requires": {
++						"camelize": "^1.0.0",
++						"css-color-keywords": "^1.0.0",
++						"postcss-value-parser": "^4.0.2"
++					}
++				},
++				"csstype": {
++					"version": "3.0.8",
++					"resolved": "https://registry.npmjs.org/csstype/-/csstype-3.0.8.tgz",
++					"integrity": "sha512-jXKhWqXPmlUeoQnF/EhTtTl4C9SnrxSH/jZUih3jmO6lBKr99rP3/+FmrMj4EFpOXzMtXHAZkd3x0E6h6Fgflw=="
++				},
+ 				"emotion": {
+ 					"version": "10.0.27",
+ 					"resolved": "https://registry.npmjs.org/emotion/-/emotion-10.0.27.tgz",
+ 					"integrity": "sha512-2xdDzdWWzue8R8lu4G76uWX5WhyQuzATon9LmNeCy/2BHVC6dsEpfhN1a0qhELgtDVdjyEA6J8Y/VlI5ZnaH0g==",
+ 					"requires": {
+-						"babel-plugin-emotion": "^10.0.27",
+-						"create-emotion": "^10.0.27"
++						"babel-plugin-emotion": "^10.0.27"
+ 					}
+ 				},
+ 				"fast-deep-equal": {
+@@ -13257,6 +13595,11 @@
+ 					"requires": {
+ 						"react-is": "^16.7.0"
+ 					}
++				},
++				"postcss-value-parser": {
++					"version": "4.1.0",
++					"resolved": "https://registry.npmjs.org/postcss-value-parser/-/postcss-value-parser-4.1.0.tgz",
++					"integrity": "sha512-97DXOFbQJhk71ne5/Mt6cOu6yxsSfM0QGQyl0L25Gca4yGWEGJaig7l7gbCX623VqTBNGLRLaVUCnNkcedlRSQ=="
+ 				}
+ 			}
+ 		},
+@@ -26827,24 +27170,6 @@
+ 				"elliptic": "^6.0.0"
+ 			}
+ 		},
+-		"create-emotion": {
+-			"version": "10.0.27",
+-			"resolved": "https://registry.npmjs.org/create-emotion/-/create-emotion-10.0.27.tgz",
+-			"integrity": "sha512-fIK73w82HPPn/RsAij7+Zt8eCE8SptcJ3WoRMfxMtjteYxud8GDTKKld7MYwAX2TVhrw29uR1N/bVGxeStHILg==",
+-			"requires": {
+-				"@emotion/cache": "^10.0.27",
+-				"@emotion/serialize": "^0.11.15",
+-				"@emotion/sheet": "0.9.4",
+-				"@emotion/utils": "0.11.3"
+-			},
+-			"dependencies": {
+-				"@emotion/utils": {
+-					"version": "0.11.3",
+-					"resolved": "https://registry.npmjs.org/@emotion/utils/-/utils-0.11.3.tgz",
+-					"integrity": "sha512-0o4l6pZC+hI88+bzuaX/6BgOvQVhbt2PfmxauVaYOGgbsAw14wdKyvMCZXnsnsHys94iadcF+RG/wZyx6+ZZBw=="
+-				}
+-			}
+-		},
+ 		"create-hash": {
+ 			"version": "1.2.0",
+ 			"resolved": "https://registry.npmjs.org/create-hash/-/create-hash-1.2.0.tgz",
+@@ -36834,31 +37159,6 @@
+ 				}
+ 			}
+ 		},
+-		"jest-emotion": {
+-			"version": "10.0.32",
+-			"resolved": "https://registry.npmjs.org/jest-emotion/-/jest-emotion-10.0.32.tgz",
+-			"integrity": "sha512-hW3IwWc47qRuxnGsWFGY6uIMX8F4YBzq+Qci3LAYUCUqUBNP+1DU1L5Nudo9Ry0NHVFOqDnDeip1p2UR0kVMwA==",
+-			"dev": true,
+-			"requires": {
+-				"@babel/runtime": "^7.5.5",
+-				"@types/jest": "^23.0.2",
+-				"chalk": "^2.4.1",
+-				"css": "^2.2.1"
+-			},
+-			"dependencies": {
+-				"chalk": {
+-					"version": "2.4.2",
+-					"resolved": "https://registry.npmjs.org/chalk/-/chalk-2.4.2.tgz",
+-					"integrity": "sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==",
+-					"dev": true,
+-					"requires": {
+-						"ansi-styles": "^3.2.1",
+-						"escape-string-regexp": "^1.0.5",
+-						"supports-color": "^5.3.0"
+-					}
+-				}
+-			}
+-		},
+ 		"jest-environment-jsdom": {
+ 			"version": "26.6.2",
+ 			"resolved": "https://registry.npmjs.org/jest-environment-jsdom/-/jest-environment-jsdom-26.6.2.tgz",
+@@ -55710,6 +56010,11 @@
+ 				}
+ 			}
+ 		},
++		"stylis": {
++			"version": "4.0.10",
++			"resolved": "https://registry.npmjs.org/stylis/-/stylis-4.0.10.tgz",
++			"integrity": "sha512-m3k+dk7QeJw660eIKRRn3xPF6uuvHs/FFzjX3HQ5ove0qYsiygoAhwn5a3IYKaZPo5LrYD0rfVmtv1gNY1uYwg=="
++		},
+ 		"sudo-prompt": {
+ 			"version": "9.1.1",
+ 			"resolved": "https://registry.npmjs.org/sudo-prompt/-/sudo-prompt-9.1.1.tgz",
+diff --git a/package.json b/package.json
+index a3f1a9d769bbca..de3e4e66437d3c 100644
+--- a/package.json
++++ b/package.json
+@@ -90,7 +90,11 @@
+ 		"@babel/plugin-syntax-jsx": "7.12.13",
+ 		"@babel/runtime-corejs3": "7.13.10",
+ 		"@babel/traverse": "7.13.0",
+-		"@emotion/native": "10.0.27",
++		"@emotion/native": "11.0.0",
++		"@emotion/babel-plugin": "11.3.0",
++		"@emotion/jest": "11.3.0",
++		"@emotion/react": "11.4.0",
++		"@emotion/styled": "11.3.0",
+ 		"@octokit/rest": "16.26.0",
+ 		"@octokit/webhooks": "7.1.0",
+ 		"@storybook/addon-a11y": "6.2.5",
+@@ -146,7 +150,6 @@
+ 		"appium": "1.20.2",
+ 		"babel-jest": "26.6.3",
+ 		"babel-loader": "8.2.2",
+-		"babel-plugin-emotion": "10.2.2",
+ 		"babel-plugin-inline-json-import": "0.3.2",
+ 		"babel-plugin-react-native-classname-to-style": "1.2.2",
+ 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
+@@ -172,7 +175,6 @@
+ 		"husky": "3.0.5",
+ 		"inquirer": "7.1.0",
+ 		"jest": "26.6.3",
+-		"jest-emotion": "10.0.32",
+ 		"jest-junit": "11.0.0",
+ 		"jest-serializer-enzyme": "1.0.0",
+ 		"jest-watch-typeahead": "0.6.1",
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 1328665a03eb5d..2502dc6b0ae297 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -1,24 +1,24 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`ColorPaletteControl matches the snapshot 1`] = `
+-.emotion-2 {
++.emotion-0 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+ }
+ 
+-.emotion-0 {
++.emotion-2 {
+   margin-bottom: 8px;
+ }
+ 
+-.components-panel__row .emotion-0 {
++.components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+ 
+ <div
+-  className="components-base-control block-editor-color-gradient-control emotion-2 emotion-3"
++  className="components-base-control block-editor-color-gradient-control emotion-0 emotion-1"
+ >
+   <div
+-    className="components-base-control__field emotion-0 emotion-1"
++    className="components-base-control__field emotion-2 emotion-3"
+   >
+     <fieldset>
+       <legend>
+diff --git a/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
+index dd0bc6f80877ce..04c3934b42225d 100644
+--- a/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Basic rendering should render 1`] = `"<div tabindex=\\"-1\\" class=\\"block-editor-link-control\\"><div class=\\"block-editor-link-control__search-input-wrapper\\"><form><div class=\\"components-base-control block-editor-url-input block-editor-link-control__search-input css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><input required=\\"\\" class=\\"block-editor-url-input__input\\" type=\\"text\\" placeholder=\\"Search or type url\\" role=\\"combobox\\" aria-label=\\"URL\\" aria-expanded=\\"false\\" aria-autocomplete=\\"list\\" aria-owns=\\"block-editor-url-input-suggestions-0\\" value=\\"\\"></div></div><div class=\\"block-editor-link-control__search-actions\\"><button type=\\"submit\\" class=\\"components-button block-editor-link-control__search-submit has-icon\\" aria-label=\\"Submit\\"><svg width=\\"24\\" height=\\"24\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"-2 -2 24 24\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M6.734 16.106l2.176-2.38-1.093-1.028-3.846 4.158 3.846 4.157 1.093-1.027-2.176-2.38h2.811c1.125 0 2.25.03 3.374 0 1.428-.001 3.362-.25 4.963-1.277 1.66-1.065 2.868-2.906 2.868-5.859 0-2.479-1.327-4.896-3.65-5.93-1.82-.813-3.044-.8-4.806-.788l-.567.002v1.5c.184 0 .368 0 .553-.002 1.82-.007 2.704-.014 4.21.657 1.854.827 2.76 2.657 2.76 4.561 0 2.472-.973 3.824-2.178 4.596-1.258.807-2.864 1.04-4.163 1.04h-.02c-1.115.03-2.229 0-3.344 0H6.734z\\"></path></svg></button></div></form></div><fieldset class=\\"block-editor-link-control__settings\\"><legend class=\\"components-visually-hidden\\">Currently selected link settings</legend><div class=\\"components-base-control components-toggle-control block-editor-link-control__setting css-wdf2ti-Wrapper e1puf3u0\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u1\\"><span class=\\"components-form-toggle\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Open in new tab</label></div></div></fieldset></div>"`;
++exports[`Basic rendering should render 1`] = `"<div tabindex=\\"-1\\" class=\\"block-editor-link-control\\"><div class=\\"block-editor-link-control__search-input-wrapper\\"><form><div class=\\"components-base-control block-editor-url-input block-editor-link-control__search-input css-wdf2ti-Wrapper e1puf3u3\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u2\\"><input required=\\"\\" class=\\"block-editor-url-input__input\\" type=\\"text\\" placeholder=\\"Search or type url\\" role=\\"combobox\\" aria-label=\\"URL\\" aria-expanded=\\"false\\" aria-autocomplete=\\"list\\" aria-owns=\\"block-editor-url-input-suggestions-0\\" value=\\"\\"></div></div><div class=\\"block-editor-link-control__search-actions\\"><button type=\\"submit\\" class=\\"components-button block-editor-link-control__search-submit has-icon\\" aria-label=\\"Submit\\"><svg width=\\"24\\" height=\\"24\\" xmlns=\\"http://www.w3.org/2000/svg\\" viewBox=\\"-2 -2 24 24\\" role=\\"img\\" aria-hidden=\\"true\\" focusable=\\"false\\"><path d=\\"M6.734 16.106l2.176-2.38-1.093-1.028-3.846 4.158 3.846 4.157 1.093-1.027-2.176-2.38h2.811c1.125 0 2.25.03 3.374 0 1.428-.001 3.362-.25 4.963-1.277 1.66-1.065 2.868-2.906 2.868-5.859 0-2.479-1.327-4.896-3.65-5.93-1.82-.813-3.044-.8-4.806-.788l-.567.002v1.5c.184 0 .368 0 .553-.002 1.82-.007 2.704-.014 4.21.657 1.854.827 2.76 2.657 2.76 4.561 0 2.472-.973 3.824-2.178 4.596-1.258.807-2.864 1.04-4.163 1.04h-.02c-1.115.03-2.229 0-3.344 0H6.734z\\"></path></svg></button></div></form></div><fieldset class=\\"block-editor-link-control__settings\\"><legend class=\\"components-visually-hidden\\">Currently selected link settings</legend><div class=\\"components-base-control components-toggle-control block-editor-link-control__setting css-wdf2ti-Wrapper e1puf3u3\\"><div class=\\"components-base-control__field css-11vcxb9-StyledField e1puf3u2\\"><span class=\\"components-form-toggle\\"><input class=\\"components-form-toggle__input\\" id=\\"inspector-toggle-control-0\\" type=\\"checkbox\\"><span class=\\"components-form-toggle__track\\"></span><span class=\\"components-form-toggle__thumb\\"></span></span><label for=\\"inspector-toggle-control-0\\" class=\\"components-toggle-control__label\\">Open in new tab</label></div></div></fieldset></div>"`;
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 900978d185f20f..2d87620e73235f 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -30,10 +30,12 @@
+ 	],
+ 	"dependencies": {
+ 		"@babel/runtime": "^7.13.10",
+-		"@emotion/cache": "^10.0.27",
+-		"@emotion/core": "^10.1.1",
+-		"@emotion/css": "^10.0.22",
+-		"@emotion/styled": "^10.0.23",
++		"@emotion/cache": "^11.1.3",
++		"@emotion/core": "^11.0.0",
++		"@emotion/css": "^11.1.3",
++		"@emotion/native": "^11.0.0",
++		"@emotion/react": "^11.1.5",
++		"@emotion/styled": "^11.3.0",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/date": "file:../date",
+@@ -51,7 +53,6 @@
+ 		"classnames": "^2.2.5",
+ 		"dom-scroll-into-view": "^1.2.1",
+ 		"downshift": "^6.0.15",
+-		"emotion": "^10.0.23",
+ 		"gradient-parser": "^0.1.5",
+ 		"highlight-words-core": "^1.2.2",
+ 		"lodash": "^4.17.21",
+diff --git a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.js b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.js
+index bda899a6b395c1..1982f4bb6107be 100644
+--- a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.js
++++ b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-icon-styles.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import styled from '@emotion/styled';
+-import { css } from '@emotion/core';
++import { css } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js
+index aff6cba52691b6..881e8636a91138 100644
+--- a/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js
++++ b/packages/components/src/alignment-matrix-control/styles/alignment-matrix-control-styles.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import styled from '@emotion/styled';
+-import { css } from '@emotion/core';
++import { css } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/box-control/styles/box-control-icon-styles.js b/packages/components/src/box-control/styles/box-control-icon-styles.js
+index 3443458d262dc0..aa8ee0926e8b19 100644
+--- a/packages/components/src/box-control/styles/box-control-icon-styles.js
++++ b/packages/components/src/box-control/styles/box-control-icon-styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/core';
++import { css } from '@emotion/css';
+ import styled from '@emotion/styled';
+ 
+ export const Root = styled.span`
+diff --git a/packages/components/src/box-control/styles/box-control-styles.js b/packages/components/src/box-control/styles/box-control-styles.js
+index b26c518949a502..93f8d2abc1aba6 100644
+--- a/packages/components/src/box-control/styles/box-control-styles.js
++++ b/packages/components/src/box-control/styles/box-control-styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/core';
++import { css } from '@emotion/css';
+ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/box-control/styles/box-control-visualizer-styles.js b/packages/components/src/box-control/styles/box-control-visualizer-styles.js
+index daf99519fa5760..94786b7dadc269 100644
+--- a/packages/components/src/box-control/styles/box-control-visualizer-styles.js
++++ b/packages/components/src/box-control/styles/box-control-visualizer-styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/core';
++import { css } from '@emotion/css';
+ import styled from '@emotion/styled';
+ 
+ /**
+diff --git a/packages/components/src/color-picker/test/__snapshots__/index.js.snap b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+index 98a90fc9593486..267c089cddf27e 100644
+--- a/packages/components/src/color-picker/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+@@ -96,10 +96,10 @@ Snapshot Diff:
+             </div>
+ @@ -119,22 +119,22 @@
+             <div
+-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
++              className="components-base-control__field css-11vcxb9-StyledField e1puf3u2"
+             >
+               <label
+-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
++                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u1"
+ -               htmlFor="inspector-text-control-4"
+ +               htmlFor="inspector-text-control-3"
+               >
+@@ -218,10 +218,10 @@ Snapshot Diff:
+             </div>
+ @@ -119,22 +119,22 @@
+             <div
+-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
++              className="components-base-control__field css-11vcxb9-StyledField e1puf3u2"
+             >
+               <label
+-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
++                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u1"
+ -               htmlFor="inspector-text-control-8"
+ +               htmlFor="inspector-text-control-7"
+               >
+@@ -340,10 +340,10 @@ Snapshot Diff:
+             </div>
+ @@ -119,22 +119,22 @@
+             <div
+-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
++              className="components-base-control__field css-11vcxb9-StyledField e1puf3u2"
+             >
+               <label
+-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
++                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u1"
+ -               htmlFor="inspector-text-control-10"
+ +               htmlFor="inspector-text-control-9"
+               >
+@@ -462,10 +462,10 @@ Snapshot Diff:
+             </div>
+ @@ -119,22 +119,22 @@
+             <div
+-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
++              className="components-base-control__field css-11vcxb9-StyledField e1puf3u2"
+             >
+               <label
+-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
++                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u1"
+ -               htmlFor="inspector-text-control-6"
+ +               htmlFor="inspector-text-control-5"
+               >
+@@ -547,10 +547,10 @@ Snapshot Diff:
+             </div>
+ @@ -119,22 +119,22 @@
+             <div
+-              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
++              className="components-base-control__field css-11vcxb9-StyledField e1puf3u2"
+             >
+               <label
+-                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
++                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u1"
+ -               htmlFor="inspector-text-control-2"
+ +               htmlFor="inspector-text-control-1"
+               >
+@@ -574,7 +574,7 @@ Snapshot Diff:
+ `;
+ 
+ exports[`ColorPicker should render color picker 1`] = `
+-.emotion-4 {
++.emotion-0 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+ }
+@@ -587,7 +587,7 @@ exports[`ColorPicker should render color picker 1`] = `
+   margin-bottom: inherit;
+ }
+ 
+-.emotion-0 {
++.emotion-4 {
+   display: inline-block;
+   margin-bottom: 8px;
+ }
+@@ -708,13 +708,13 @@ exports[`ColorPicker should render color picker 1`] = `
+         className="components-color-picker__inputs-fields"
+       >
+         <div
+-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
++          className="components-base-control components-color-picker__inputs-field emotion-0 emotion-1"
+         >
+           <div
+             className="components-base-control__field emotion-2 emotion-3"
+           >
+             <label
+-              className="components-base-control__label emotion-0 emotion-1"
++              className="components-base-control__label emotion-4 emotion-5"
+               htmlFor="inspector-text-control-0"
+             >
+               Color value in hexadecimal
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 2ea05e62d63f4d..c9d211bd01725d 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css, cx } from 'emotion';
++import { css, cx } from '@emotion/css';
+ // eslint-disable-next-line no-restricted-imports
+ import { Separator } from 'reakit';
+ // eslint-disable-next-line no-restricted-imports, no-duplicate-imports
+diff --git a/packages/components/src/divider/styles.ts b/packages/components/src/divider/styles.ts
+index 28b3c47fe103dd..3a6b1e20ca9861 100644
+--- a/packages/components/src/divider/styles.ts
++++ b/packages/components/src/divider/styles.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/divider/test/__snapshots__/index.js.snap b/packages/components/src/divider/test/__snapshots__/index.js.snap
+index c9bb8770ff64d6..417c424956ef50 100644
+--- a/packages/components/src/divider/test/__snapshots__/index.js.snap
++++ b/packages/components/src/divider/test/__snapshots__/index.js.snap
+@@ -2,7 +2,7 @@
+ 
+ exports[`props should render correctly 1`] = `
+ .emotion-0 {
+-  border-color: rgba(0,0,0,0.1);
++  border-color: rgba(0, 0, 0, 0.1);
+   border-width: 0 0 1px 0;
+   height: 0;
+   margin: 0;
+@@ -25,7 +25,7 @@ Snapshot Diff:
+ 
+ @@ -2,10 +2,8 @@
+     Object {
+-      "border-color": "rgba(0,0,0,0.1)",
++      "border-color": "rgba(0, 0, 0, 0.1)",
+       "border-width": "0 0 1px 0",
+       "height": "0",
+       "margin": "0",
+@@ -43,7 +43,7 @@ Snapshot Diff:
+ 
+ @@ -2,9 +2,8 @@
+     Object {
+-      "border-color": "rgba(0,0,0,0.1)",
++      "border-color": "rgba(0, 0, 0, 0.1)",
+       "border-width": "0 0 1px 0",
+       "height": "0",
+       "margin": "0",
+@@ -60,7 +60,7 @@ Snapshot Diff:
+ 
+ @@ -2,9 +2,8 @@
+     Object {
+-      "border-color": "rgba(0,0,0,0.1)",
++      "border-color": "rgba(0, 0, 0, 0.1)",
+       "border-width": "0 0 1px 0",
+       "height": "0",
+       "margin": "0",
+diff --git a/packages/components/src/elevation/hook.js b/packages/components/src/elevation/hook.js
+index 35e0e0bd95f989..173c331597f34b 100644
+--- a/packages/components/src/elevation/hook.js
++++ b/packages/components/src/elevation/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css, cx } from 'emotion';
++import { css, cx } from '@emotion/css';
+ import { isNil } from 'lodash';
+ 
+ /**
+diff --git a/packages/components/src/elevation/styles.js b/packages/components/src/elevation/styles.js
+index 4a22b2f598498a..23c29f01d85bcf 100644
+--- a/packages/components/src/elevation/styles.js
++++ b/packages/components/src/elevation/styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
+ 
+ export const Elevation = css`
+ 	background: transparent;
+diff --git a/packages/components/src/elevation/test/__snapshots__/index.js.snap b/packages/components/src/elevation/test/__snapshots__/index.js.snap
+index 578762b861f263..d00b77d5b52d68 100644
+--- a/packages/components/src/elevation/test/__snapshots__/index.js.snap
++++ b/packages/components/src/elevation/test/__snapshots__/index.js.snap
+@@ -4,27 +4,27 @@ exports[`props should render active 1`] = `
+ .emotion-0 {
+   background: transparent;
+   display: block;
+-  margin: 0 !important;
++  margin: 0!important;
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
+   border-radius: inherit;
+   bottom: 0;
+-  box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
++  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+   opacity: 1;
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+-  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+ }
+ 
+-*:hover > .emotion-0 {
+-  box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
++*:hover>.emotion-0 {
++  box-shadow: 0 14px 28px 0 rgba(0 ,0, 0, 0.7);
+ }
+ 
+-*:active > .emotion-0 {
+-  box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
++*:active>.emotion-0 {
++  box-shadow: 0 5px 10px 0 rgba(0 ,0, 0, 0.25);
+ }
+ 
+ <div
+@@ -39,19 +39,19 @@ exports[`props should render correctly 1`] = `
+ .emotion-0 {
+   background: transparent;
+   display: block;
+-  margin: 0 !important;
++  margin: 0!important;
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
+   border-radius: inherit;
+   bottom: 0;
+-  box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
++  box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+   opacity: 1;
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+-  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+ }
+ 
+ <div
+@@ -66,23 +66,23 @@ exports[`props should render hover 1`] = `
+ .emotion-0 {
+   background: transparent;
+   display: block;
+-  margin: 0 !important;
++  margin: 0!important;
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
+   border-radius: inherit;
+   bottom: 0;
+-  box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
++  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+   opacity: 1;
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+-  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+ }
+ 
+-*:hover > .emotion-0 {
+-  box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
++*:hover>.emotion-0 {
++  box-shadow: 0 14px 28px 0 rgba(0 ,0, 0, 0.7);
+ }
+ 
+ <div
+@@ -97,27 +97,27 @@ exports[`props should render isInteractive 1`] = `
+ .emotion-0 {
+   background: transparent;
+   display: block;
+-  margin: 0 !important;
++  margin: 0!important;
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
+   border-radius: inherit;
+   bottom: 0;
+-  box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
++  box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+   opacity: 1;
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+-  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+ }
+ 
+-*:hover > .emotion-0 {
+-  box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
++*:hover>.emotion-0 {
++  box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+ }
+ 
+-*:active > .emotion-0 {
+-  box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
++*:active>.emotion-0 {
++  box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+ }
+ 
+ <div
+@@ -132,27 +132,27 @@ exports[`props should render offset 1`] = `
+ .emotion-0 {
+   background: transparent;
+   display: block;
+-  margin: 0 !important;
++  margin: 0!important;
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
+   border-radius: inherit;
+   bottom: -2px;
+-  box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
++  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+   opacity: 1;
+   left: -2px;
+   right: -2px;
+   top: -2px;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+-  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+ }
+ 
+-*:hover > .emotion-0 {
+-  box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
++*:hover>.emotion-0 {
++  box-shadow: 0 14px 28px 0 rgba(0 ,0, 0, 0.7);
+ }
+ 
+-*:active > .emotion-0 {
+-  box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
++*:active>.emotion-0 {
++  box-shadow: 0 5px 10px 0 rgba(0 ,0, 0, 0.25);
+ }
+ 
+ <div
+@@ -167,19 +167,19 @@ exports[`props should render value 1`] = `
+ .emotion-0 {
+   background: transparent;
+   display: block;
+-  margin: 0 !important;
++  margin: 0!important;
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
+   border-radius: inherit;
+   bottom: 0;
+-  box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
++  box-shadow: 0 7px 14px 0 rgba(0 ,0, 0, 0.35);
+   opacity: 1;
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+-  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+ }
+ 
+ <div
+diff --git a/packages/components/src/flex/flex-item/hook.js b/packages/components/src/flex/flex-item/hook.js
+index 27b36edbaf2eb9..4ab2ff3beeee0b 100644
+--- a/packages/components/src/flex/flex-item/hook.js
++++ b/packages/components/src/flex/flex-item/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css, cx } from 'emotion';
++import { css, cx } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/flex/flex/hook.js b/packages/components/src/flex/flex/hook.js
+index 7fb645ebc2e71e..044644e3c55a44 100644
+--- a/packages/components/src/flex/flex/hook.js
++++ b/packages/components/src/flex/flex/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css, cx } from 'emotion';
++import { css, cx } from '@emotion/css';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/flex/styles.js b/packages/components/src/flex/styles.js
+index 68ba8a58be37c7..9fdeade2335fca 100644
+--- a/packages/components/src/flex/styles.js
++++ b/packages/components/src/flex/styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
+ 
+ export const Flex = css`
+ 	display: flex;
+diff --git a/packages/components/src/flex/test/__snapshots__/index.js.snap b/packages/components/src/flex/test/__snapshots__/index.js.snap
+index 7a5389de420edc..4eb89c8a5cbf42 100644
+--- a/packages/components/src/flex/test/__snapshots__/index.js.snap
++++ b/packages/components/src/flex/test/__snapshots__/index.js.snap
+@@ -6,7 +6,7 @@ Snapshot Diff:
+ + Second value
+ 
+ @@ -7,14 +7,10 @@
+-      class="components-flex-item css-1636tkh-Item css-1mm2cvy-View em57xhy0"
++      class="components-flex-item css-1o3e1r5-Item-sx-Base css-1mm2cvy-View em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="FlexItem"
+     />
+@@ -15,7 +15,7 @@ Snapshot Diff:
+ -   />
+ -   <div />
+ -   <div
+-      class="components-flex-item components-flex-block css-1fgvc79-Item-block css-1mm2cvy-View em57xhy0"
++      class="components-flex-item components-flex-block css-12rtc5p-Item-sx-Base-block css-1mm2cvy-View em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="FlexBlock"
+     />
+@@ -27,13 +27,12 @@ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
+-@@ -1,16 +1,16 @@
++@@ -1,15 +1,15 @@
+   Array [
+     Object {
+ -     "-ms-flex-align": "flex-start",
+ +     "-ms-flex-align": "center",
+       "-ms-flex-direction": "row",
+-      "-ms-flex-pack": "justify",
+ -     "-webkit-align-items": "flex-start",
+ -     "-webkit-box-align": "flex-start",
+ +     "-webkit-align-items": "center",
+@@ -52,14 +51,6 @@ Snapshot Diff:
+ 
+ exports[`props should render correctly 1`] = `
+ .emotion-0 {
+-  display: block;
+-  max-height: 100%;
+-  max-width: 100%;
+-  min-height: 0;
+-  min-width: 0;
+-}
+-
+-.emotion-6 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -73,16 +64,15 @@ exports[`props should render correctly 1`] = `
+   flex-direction: row;
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+-  -ms-flex-pack: justify;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-6 > * + *:not(marquee) {
++.emotion-0>*+*:not(marquee) {
+   margin-left: calc(4px * 2);
+ }
+ 
+-.emotion-6 > * {
++.emotion-0>* {
+   min-width: 0;
+ }
+ 
+@@ -92,23 +82,31 @@ exports[`props should render correctly 1`] = `
+   max-width: 100%;
+   min-height: 0;
+   min-width: 0;
++}
++
++.emotion-6 {
++  display: block;
++  max-height: 100%;
++  max-width: 100%;
++  min-height: 0;
++  min-width: 0;
+   -webkit-flex: 1;
+   -ms-flex: 1;
+   flex: 1;
+ }
+ 
+ <div
+-  class="components-flex emotion-6 emotion-1 emotion-2"
++  class="components-flex emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Flex"
+ >
+   <div
+-    class="components-flex-item emotion-0 emotion-1 emotion-2"
++    class="components-flex-item emotion-3 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="FlexItem"
+   />
+   <div
+-    class="components-flex-item components-flex-block emotion-3 emotion-1 emotion-2"
++    class="components-flex-item components-flex-block emotion-6 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="FlexBlock"
+   />
+@@ -125,7 +123,6 @@ Snapshot Diff:
+       "-ms-flex-align": "center",
+       "-ms-flex-direction": "row",
+ -     "-ms-flex-pack": "start",
+-+     "-ms-flex-pack": "justify",
+       "-webkit-align-items": "center",
+       "-webkit-box-align": "center",
+ -     "-webkit-box-pack": "start",
+@@ -140,6 +137,7 @@ Snapshot Diff:
+ +     "justify-content": "space-between",
+       "width": "100%",
+     },
++    Object {},
+   ]
+ `;
+ 
+diff --git a/packages/components/src/grid/hook.js b/packages/components/src/grid/hook.js
+index e596b1644dfd44..9de54c0e0a7a27 100644
+--- a/packages/components/src/grid/hook.js
++++ b/packages/components/src/grid/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css, cx } from 'emotion';
++import { css, cx } from '@emotion/css';
+ 
+ /**
+  * WordPress dependencies
+@@ -42,9 +42,9 @@ export default function useGrid( props ) {
+ 	const row = useResponsiveValue( rowsAsArray );
+ 
+ 	const gridTemplateColumns =
+-		templateColumns || ( !! columns && `repeat(${ column }, 1fr)` );
++		templateColumns || ( !! columns && `repeat( ${ column }, 1fr )` );
+ 	const gridTemplateRows =
+-		templateRows || ( !! rows && `repeat(${ row }, 1fr)` );
++		templateRows || ( !! rows && `repeat( ${ row }, 1fr )` );
+ 
+ 	const classes = useMemo( () => {
+ 		const alignmentProps = getAlignmentProps( alignment );
+diff --git a/packages/components/src/grid/test/grid.js b/packages/components/src/grid/test/grid.js
+index c7b8a6d40cc44c..8508fd419e5f73 100644
+--- a/packages/components/src/grid/test/grid.js
++++ b/packages/components/src/grid/test/grid.js
+@@ -21,7 +21,7 @@ describe( 'props', () => {
+ 
+ 		expect( container.firstChild ).toHaveStyle( {
+ 			display: 'grid',
+-			gridTemplateColumns: 'repeat(2,1fr)',
++			gridTemplateColumns: 'repeat( 2, 1fr )',
+ 			gap: `calc( ${ CONFIG.gridBase } * 3 )`,
+ 		} );
+ 	} );
+@@ -37,7 +37,7 @@ describe( 'props', () => {
+ 
+ 		expect( container.firstChild ).toHaveStyle( {
+ 			display: 'grid',
+-			gridTemplateColumns: 'repeat(3,1fr)',
++			gridTemplateColumns: 'repeat( 3, 1fr )',
+ 			gap: `calc( ${ CONFIG.gridBase } * 4 )`,
+ 		} );
+ 	} );
+@@ -53,7 +53,7 @@ describe( 'props', () => {
+ 
+ 		expect( container.firstChild ).toHaveStyle( {
+ 			display: 'grid',
+-			gridTemplateColumns: 'repeat(7,1fr)',
++			gridTemplateColumns: 'repeat( 7, 1fr )',
+ 		} );
+ 	} );
+ 
+@@ -68,7 +68,7 @@ describe( 'props', () => {
+ 
+ 		expect( container.firstChild ).toHaveStyle( {
+ 			display: 'grid',
+-			gridTemplateRows: 'repeat(7,1fr)',
++			gridTemplateRows: 'repeat( 7, 1fr )',
+ 		} );
+ 	} );
+ 
+@@ -129,7 +129,7 @@ describe( 'props', () => {
+ 
+ 		expect( container.firstChild ).toHaveStyle( {
+ 			display: 'inline-grid',
+-			gridTemplateColumns: 'repeat(3,1fr)',
++			gridTemplateColumns: 'repeat( 3, 1fr )',
+ 		} );
+ 	} );
+ 
+diff --git a/packages/components/src/h-stack/test/__snapshots__/index.js.snap b/packages/components/src/h-stack/test/__snapshots__/index.js.snap
+index c369ca66a25492..2715a20ed13f53 100644
+--- a/packages/components/src/h-stack/test/__snapshots__/index.js.snap
++++ b/packages/components/src/h-stack/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render alignment 1`] = `
+-.emotion-4 {
++.emotion-0 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -14,36 +14,36 @@ exports[`props should render alignment 1`] = `
+   -ms-flex-direction: row;
+   flex-direction: row;
+   -webkit-box-pack: center;
+-  -webkit-justify-content: center;
+   -ms-flex-pack: center;
++  -webkit-justify-content: center;
+   justify-content: center;
+   width: 100%;
+ }
+ 
+-.emotion-4 > * + *:not(marquee) {
++.emotion-0>*+*:not(marquee) {
+   margin-left: calc(4px * 2);
+ }
+ 
+-.emotion-4 > * {
++.emotion-0>* {
+   min-width: 0;
+ }
+ 
+ <div
+-  class="components-flex components-h-stack emotion-4 emotion-0 emotion-1"
++  class="components-flex components-h-stack emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="HStack"
+ >
+   <div
+-    class="emotion-0 emotion-1"
++    class="emotion-1 emotion-2"
+   />
+   <div
+-    class="emotion-0 emotion-1"
++    class="emotion-1 emotion-2"
+   />
+ </div>
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-4 {
++.emotion-0 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -57,35 +57,34 @@ exports[`props should render correctly 1`] = `
+   flex-direction: row;
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+-  -ms-flex-pack: justify;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-4 > * + *:not(marquee) {
++.emotion-0>*+*:not(marquee) {
+   margin-left: calc(4px * 2);
+ }
+ 
+-.emotion-4 > * {
++.emotion-0>* {
+   min-width: 0;
+ }
+ 
+ <div
+-  class="components-flex components-h-stack emotion-4 emotion-0 emotion-1"
++  class="components-flex components-h-stack emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="HStack"
+ >
+   <div
+-    class="emotion-0 emotion-1"
++    class="emotion-1 emotion-2"
+   />
+   <div
+-    class="emotion-0 emotion-1"
++    class="emotion-1 emotion-2"
+   />
+ </div>
+ `;
+ 
+ exports[`props should render spacing 1`] = `
+-.emotion-4 {
++.emotion-0 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -99,29 +98,28 @@ exports[`props should render spacing 1`] = `
+   flex-direction: row;
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+-  -ms-flex-pack: justify;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-4 > * + *:not(marquee) {
++.emotion-0>*+*:not(marquee) {
+   margin-left: calc(4px * 5);
+ }
+ 
+-.emotion-4 > * {
++.emotion-0>* {
+   min-width: 0;
+ }
+ 
+ <div
+-  class="components-flex components-h-stack emotion-4 emotion-0 emotion-1"
++  class="components-flex components-h-stack emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="HStack"
+ >
+   <div
+-    class="emotion-0 emotion-1"
++    class="emotion-1 emotion-2"
+   />
+   <div
+-    class="emotion-0 emotion-1"
++    class="emotion-1 emotion-2"
+   />
+ </div>
+ `;
+diff --git a/packages/components/src/heading/test/__snapshots__/index.js.snap b/packages/components/src/heading/test/__snapshots__/index.js.snap
+index ab32b7fe0b977d..910d5e6fcd4d9b 100644
+--- a/packages/components/src/heading/test/__snapshots__/index.js.snap
++++ b/packages/components/src/heading/test/__snapshots__/index.js.snap
+@@ -25,6 +25,7 @@ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
++@@ -1,10 +1,10 @@
+   Array [
+     Object {
+       "color": "#050505",
+@@ -35,7 +36,7 @@ Snapshot Diff:
+       "line-height": "1.2",
+       "margin": "0",
+     },
+-  ]
++    Object {},
+ `;
+ 
+ exports[`props should render level as a string 1`] = `
+@@ -43,6 +44,7 @@ Snapshot Diff:
+ - Received styles
+ + Base styles
+ 
++@@ -1,10 +1,10 @@
+   Array [
+     Object {
+       "color": "#050505",
+@@ -53,5 +55,5 @@ Snapshot Diff:
+       "line-height": "1.2",
+       "margin": "0",
+     },
+-  ]
++    Object {},
+ `;
+diff --git a/packages/components/src/input-control/styles/input-control-styles.js b/packages/components/src/input-control/styles/input-control-styles.js
+index 4cc115dd979cc6..57c6ee80f7d291 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.js
++++ b/packages/components/src/input-control/styles/input-control-styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/core';
++import { css } from '@emotion/css';
+ import styled from '@emotion/styled';
+ 
+ /**
+diff --git a/packages/components/src/number-control/styles/number-control-styles.js b/packages/components/src/number-control/styles/number-control-styles.js
+index abc89fc9161832..77d21a7dea3f15 100644
+--- a/packages/components/src/number-control/styles/number-control-styles.js
++++ b/packages/components/src/number-control/styles/number-control-styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/core';
++import { css } from '@emotion/css';
+ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/range-control/styles/range-control-styles.js b/packages/components/src/range-control/styles/range-control-styles.js
+index abf3f3cbefb26d..1cd0fcdd1c57d4 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.js
++++ b/packages/components/src/range-control/styles/range-control-styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/core';
++import { css } from '@emotion/css';
+ import styled from '@emotion/styled';
+ 
+ /**
+diff --git a/packages/components/src/select-control/styles/select-control-styles.js b/packages/components/src/select-control/styles/select-control-styles.js
+index a9b6ff9bc8acfe..6c035ad82c52bd 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.js
++++ b/packages/components/src/select-control/styles/select-control-styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/core';
++import { css } from '@emotion/css';
+ import styled from '@emotion/styled';
+ 
+ /**
+diff --git a/packages/components/src/spacer/hook.ts b/packages/components/src/spacer/hook.ts
+index a40bbcc1de44a5..1c09758798e9a7 100644
+--- a/packages/components/src/spacer/hook.ts
++++ b/packages/components/src/spacer/hook.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css, cx } from 'emotion';
++import { css, cx } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/spacer/test/__snapshots__/index.js.snap b/packages/components/src/spacer/test/__snapshots__/index.js.snap
+index ecf40a7e47be27..efbb6cbd02d1df 100644
+--- a/packages/components/src/spacer/test/__snapshots__/index.js.snap
++++ b/packages/components/src/spacer/test/__snapshots__/index.js.snap
+@@ -22,6 +22,7 @@ Snapshot Diff:
+ -     "margin": "calc(4px * 5)",
+       "margin-bottom": "calc(4px * 2)",
+     },
++    Object {},
+   ]
+ `;
+ 
+@@ -35,6 +36,7 @@ Snapshot Diff:
+ -     "margin-bottom": "calc(4px * 5)",
+ +     "margin-bottom": "calc(4px * 2)",
+     },
++    Object {},
+   ]
+ `;
+ 
+@@ -48,6 +50,7 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "margin-left": "calc(4px * 5)",
+     },
++    Object {},
+   ]
+ `;
+ 
+@@ -61,6 +64,7 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "margin-right": "calc(4px * 5)",
+     },
++    Object {},
+   ]
+ `;
+ 
+@@ -74,6 +78,7 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "margin-top": "calc(4px * 5)",
+     },
++    Object {},
+   ]
+ `;
+ 
+@@ -88,6 +93,7 @@ Snapshot Diff:
+ -     "margin-left": "calc(4px * 5)",
+ -     "margin-right": "calc(4px * 5)",
+     },
++    Object {},
+   ]
+ `;
+ 
+@@ -102,6 +108,7 @@ Snapshot Diff:
+ -     "margin-top": "calc(4px * 5)",
+ +     "margin-bottom": "calc(4px * 2)",
+     },
++    Object {},
+   ]
+ `;
+ 
+@@ -115,6 +122,7 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "padding": "calc(4px * 5)",
+     },
++    Object {},
+   ]
+ `;
+ 
+@@ -128,6 +136,7 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "padding-bottom": "calc(4px * 5)",
+     },
++    Object {},
+   ]
+ `;
+ 
+@@ -141,6 +150,7 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "padding-left": "calc(4px * 5)",
+     },
++    Object {},
+   ]
+ `;
+ 
+@@ -154,6 +164,7 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "padding-right": "calc(4px * 5)",
+     },
++    Object {},
+   ]
+ `;
+ 
+@@ -167,6 +178,7 @@ Snapshot Diff:
+       "margin-bottom": "calc(4px * 2)",
+ -     "padding-top": "calc(4px * 5)",
+     },
++    Object {},
+   ]
+ `;
+ 
+@@ -181,6 +193,7 @@ Snapshot Diff:
+ -     "padding-left": "calc(4px * 5)",
+ -     "padding-right": "calc(4px * 5)",
+     },
++    Object {},
+   ]
+ `;
+ 
+@@ -195,5 +208,6 @@ Snapshot Diff:
+ -     "padding-bottom": "calc(4px * 5)",
+ -     "padding-top": "calc(4px * 5)",
+     },
++    Object {},
+   ]
+ `;
+diff --git a/packages/components/src/spinner/styles/spinner-styles.js b/packages/components/src/spinner/styles/spinner-styles.js
+index 6acdaa88eeadad..7f92a0f16d350b 100644
+--- a/packages/components/src/spinner/styles/spinner-styles.js
++++ b/packages/components/src/spinner/styles/spinner-styles.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import styled from '@emotion/styled';
+-import { keyframes } from '@emotion/core';
++import { keyframes } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/style-provider/index.js b/packages/components/src/style-provider/index.js
+index 9cf99293897129..5ed248d8d4dde8 100644
+--- a/packages/components/src/style-provider/index.js
++++ b/packages/components/src/style-provider/index.js
+@@ -1,12 +1,15 @@
+ /**
+  * External dependencies
+  */
+-import { CacheProvider } from '@emotion/core';
++import { CacheProvider } from '@emotion/react';
+ import createCache from '@emotion/cache';
+ import memoize from 'memize';
++import * as uuid from 'uuid';
+ 
+ const memoizedCreateCacheWithContainer = memoize( ( container ) => {
+-	return createCache( { container } );
++	// emotion only accepts alphabetical and hyphenated keys so we just strip the numbers from the UUID. It _should_ be fine.
++	const key = uuid.v4().replace( /[0-9]/g, '' );
++	return createCache( { container, key } );
+ } );
+ 
+ export default function StyleProvider( { children, document } ) {
+diff --git a/packages/components/src/text/hook.js b/packages/components/src/text/hook.js
+index ae2afc7282558e..10016bf53fc90e 100644
+--- a/packages/components/src/text/hook.js
++++ b/packages/components/src/text/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css, cx } from 'emotion';
++import { css, cx } from '@emotion/css';
+ import { isPlainObject } from 'lodash';
+ 
+ /**
+diff --git a/packages/components/src/text/styles.js b/packages/components/src/text/styles.js
+index 707e7d7f914d87..6323d6aedc5124 100644
+--- a/packages/components/src/text/styles.js
++++ b/packages/components/src/text/styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/text/test/__snapshots__/index.js.snap b/packages/components/src/text/test/__snapshots__/index.js.snap
+index 6b0ae73ebfec20..bead4384c3f1e3 100644
+--- a/packages/components/src/text/test/__snapshots__/index.js.snap
++++ b/packages/components/src/text/test/__snapshots__/index.js.snap
+@@ -12,7 +12,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] =
+ .emotion-0 mark {
+   background: #f0b849;
+   border-radius: 2px;
+-  box-shadow: 0 0 0 1px rgba( 0,0,0,0.05 ) inset,0 -1px 0 rgba( 0,0,0,0.1 ) inset;
++  box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.05 ) inset,0 -1px 0 rgba( 0, 0, 0, 0.1 ) inset;
+ }
+ 
+ <span
+diff --git a/packages/components/src/truncate/hook.js b/packages/components/src/truncate/hook.js
+index 2d8755f3b9a336..1598074718270c 100644
+--- a/packages/components/src/truncate/hook.js
++++ b/packages/components/src/truncate/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css, cx } from 'emotion';
++import { css, cx } from '@emotion/css';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/truncate/styles.js b/packages/components/src/truncate/styles.js
+index 5536c45505a412..b70e64fa76828e 100644
+--- a/packages/components/src/truncate/styles.js
++++ b/packages/components/src/truncate/styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
+ 
+ export const Truncate = css`
+ 	display: block;
+diff --git a/packages/components/src/ui/card/body.js b/packages/components/src/ui/card/body.js
+index 99b624ba8cab7f..6a0e9c5bd7d7d0 100644
+--- a/packages/components/src/ui/card/body.js
++++ b/packages/components/src/ui/card/body.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { cx } from 'emotion';
++import { cx } from '@emotion/css';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/ui/card/component.js b/packages/components/src/ui/card/component.js
+index 725808d9f249c1..f33d2bbec4ba93 100644
+--- a/packages/components/src/ui/card/component.js
++++ b/packages/components/src/ui/card/component.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/ui/card/footer.js b/packages/components/src/ui/card/footer.js
+index f31a9e5510ace1..142f3c888a468b 100644
+--- a/packages/components/src/ui/card/footer.js
++++ b/packages/components/src/ui/card/footer.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { cx } from 'emotion';
++import { cx } from '@emotion/css';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/ui/card/header.js b/packages/components/src/ui/card/header.js
+index bf1ba57260686a..28a8e3eb80ba83 100644
+--- a/packages/components/src/ui/card/header.js
++++ b/packages/components/src/ui/card/header.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { cx } from 'emotion';
++import { cx } from '@emotion/css';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/ui/card/hook.js b/packages/components/src/ui/card/hook.js
+index f434a3626a066e..3aae3044ec5d04 100644
+--- a/packages/components/src/ui/card/hook.js
++++ b/packages/components/src/ui/card/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { cx } from 'emotion';
++import { cx } from '@emotion/css';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/ui/card/inner-body.js b/packages/components/src/ui/card/inner-body.js
+index ab12a97e020ed2..922d5a9478eb43 100644
+--- a/packages/components/src/ui/card/inner-body.js
++++ b/packages/components/src/ui/card/inner-body.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { cx } from 'emotion';
++import { cx } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/ui/card/styles.js b/packages/components/src/ui/card/styles.js
+index 27d2332d019f0a..75606a3b8bf9ea 100644
+--- a/packages/components/src/ui/card/styles.js
++++ b/packages/components/src/ui/card/styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/ui/card/test/__snapshots__/index.js.snap b/packages/components/src/ui/card/test/__snapshots__/index.js.snap
+index 0a7b8b88c77181..bb602c53357a08 100644
+--- a/packages/components/src/ui/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/card/test/__snapshots__/index.js.snap
+@@ -12,7 +12,7 @@ Snapshot Diff:
+       />
+       <div
+ -       class="css-yc36db-InnerBody components-card-inner-body css-1mm2cvy-View em57xhy0"
+-+       class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View em57xhy0"
+++       class="components-scrollable components-card-body css-sefkol-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View em57xhy0"
+         data-wp-c16t="true"
+ -       data-wp-component="CardInnerBody"
+ +       data-wp-component="CardBody"
+@@ -20,24 +20,24 @@ Snapshot Diff:
+         Code is Poetry.
+       </div>
+       <div
+-        class="components-flex components-card-footer css-g6s6xo-Flex-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View em57xhy0"
++        class="components-flex components-card-footer css-1in3f7o-Flex-sx-Base-sx-Items-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View em57xhy0"
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-9 {
+-  height: 100%;
+-}
+-
+-.emotion-18 {
++.emotion-0 {
+   background-color: #fff;
+   color: #000;
+   position: relative;
+-  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
++  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+   outline: none;
+   border-radius: 2px;
+ }
+ 
+-.emotion-0 {
++.emotion-3 {
++  height: 100%;
++}
++
++.emotion-6 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -51,11 +51,10 @@ exports[`props should render correctly 1`] = `
+   flex-direction: row;
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+-  -ms-flex-pack: justify;
+   justify-content: space-between;
+   width: 100%;
+   border-bottom: 1px solid;
+-  border-color: rgba(0,0,0,0.1);
++  border-color: rgba(0, 0, 0, 0.1);
+   min-height: 44px;
+   padding-bottom: calc(4px * 1);
+   padding-left: calc(4px * 3);
+@@ -63,25 +62,25 @@ exports[`props should render correctly 1`] = `
+   padding-top: calc(4px * 1);
+ }
+ 
+-.emotion-0 > * + *:not(marquee) {
++.emotion-6>*+*:not(marquee) {
+   margin-left: calc(4px * 2);
+ }
+ 
+-.emotion-0 > * {
++.emotion-6>* {
+   min-width: 0;
+ }
+ 
+-.emotion-0:first-of-type {
++.emotion-6:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-0:last-of-type {
++.emotion-6:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-3 {
++.emotion-9 {
+   height: 100%;
+   overflow-x: hidden;
+   overflow-y: auto;
+@@ -90,44 +89,45 @@ exports[`props should render correctly 1`] = `
+   padding: calc(4px * 3) calc(4px * 3);
+ }
+ 
+-@media only screen and ( min-device-width:40em ) {
+-  .emotion-3::-webkit-scrollbar {
++@media only screen and ( min-device-width: 40em ) {
++  .emotion-9::-webkit-scrollbar {
+     height: 12px;
+     width: 12px;
+   }
+ 
+-  .emotion-3::-webkit-scrollbar-track {
++  .emotion-9::-webkit-scrollbar-track {
+     background-color: transparent;
+   }
+ 
+-  .emotion-3::-webkit-scrollbar-track {
+-    background: rgba(0,0,0,0.04);
++  .emotion-9::-webkit-scrollbar-track {
++    background: rgba(0, 0, 0, 0.04);
+     border-radius: 8px;
+   }
+ 
+-  .emotion-3::-webkit-scrollbar-thumb {
++  .emotion-9::-webkit-scrollbar-thumb {
++    -webkit-background-clip: padding-box;
+     background-clip: padding-box;
+-    background-color: rgba(0,0,0,0.2);
+-    border: 2px solid rgba( 0,0,0,0 );
++    background-color: rgba(0, 0, 0, 0.2);
++    border: 2px solid rgba( 0, 0, 0, 0 );
+     border-radius: 7px;
+   }
+ 
+-  .emotion-3:hover::-webkit-scrollbar-thumb {
+-    background-color: rgba(0,0,0,0.5);
++  .emotion-9:hover::-webkit-scrollbar-thumb {
++    background-color: rgba(0, 0, 0, 0.5);
+   }
+ }
+ 
+-.emotion-3:first-of-type {
++.emotion-9:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-3:last-of-type {
++.emotion-9:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-6 {
++.emotion-12 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -140,11 +140,11 @@ exports[`props should render correctly 1`] = `
+   -ms-flex-direction: row;
+   flex-direction: row;
+   -webkit-box-pack: end;
+-  -webkit-justify-content: flex-end;
+   -ms-flex-pack: end;
++  -webkit-justify-content: flex-end;
+   justify-content: flex-end;
+   width: 100%;
+-  border-color: rgba(0,0,0,0.1);
++  border-color: rgba(0, 0, 0, 0.1);
+   min-height: 44px;
+   padding-bottom: calc(4px * 1);
+   padding-left: calc(4px * 3);
+@@ -152,85 +152,85 @@ exports[`props should render correctly 1`] = `
+   padding-top: calc(4px * 1);
+ }
+ 
+-.emotion-6 > * + *:not(marquee) {
++.emotion-12>*+*:not(marquee) {
+   margin-left: calc(4px * 2);
+ }
+ 
+-.emotion-6 > * {
++.emotion-12>* {
+   min-width: 0;
+ }
+ 
+-.emotion-6:first-of-type {
++.emotion-12:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-6:last-of-type {
++.emotion-12:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-12 {
++.emotion-15 {
+   background: transparent;
+   display: block;
+-  margin: 0 !important;
++  margin: 0!important;
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
+   border-radius: inherit;
+   bottom: 0;
+-  box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
++  box-shadow: 0 1px 2px 0 rgba(0 ,0, 0, 0.05);
+   opacity: 1;
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+-  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+   border-radius: 2px;
+ }
+ 
+-.emotion-15 {
++.emotion-18 {
+   background: transparent;
+   display: block;
+-  margin: 0 !important;
++  margin: 0!important;
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
+   border-radius: inherit;
+   bottom: 0;
+-  box-shadow: 0 2px 4px 0 rgba(0 ,0,0,0.1);
++  box-shadow: 0 2px 4px 0 rgba(0 ,0, 0, 0.1);
+   opacity: 1;
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+-  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+   border-radius: 2px;
+ }
+ 
+ <div
+-  class="components-surface components-card emotion-18 emotion-1 emotion-2"
++  class="components-surface components-card emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Card"
+ >
+   <div
+-    class="emotion-9 emotion-1 emotion-2"
++    class="emotion-3 emotion-1 emotion-2"
+   >
+     <div
+-      class="components-flex components-card-header emotion-0 emotion-1 emotion-2"
++      class="components-flex components-card-header emotion-6 emotion-1 emotion-2"
+       data-wp-c16t="true"
+       data-wp-component="CardHeader"
+       title="WordPress.org"
+     />
+     <div
+-      class="components-scrollable components-card-body emotion-3 emotion-1 emotion-2"
++      class="components-scrollable components-card-body emotion-9 emotion-1 emotion-2"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+       Code is Poetry.
+     </div>
+     <div
+-      class="components-flex components-card-footer emotion-6 emotion-1 emotion-2"
++      class="components-flex components-card-footer emotion-12 emotion-1 emotion-2"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -241,13 +241,13 @@ exports[`props should render correctly 1`] = `
+   </div>
+   <div
+     aria-hidden="true"
+-    class="components-elevation emotion-12 emotion-1 emotion-2"
++    class="components-elevation emotion-15 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+   <div
+     aria-hidden="true"
+-    class="components-elevation emotion-15 emotion-1 emotion-2"
++    class="components-elevation emotion-18 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+@@ -261,19 +261,19 @@ Snapshot Diff:
+ 
+ @@ -6,16 +6,16 @@
+     <div
+-      class="css-l50fc7-Content css-1mm2cvy-View em57xhy0"
++      class="css-1ruapvy-Content css-1mm2cvy-View em57xhy0"
+     />
+     <div
+       aria-hidden="true"
+--     class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View em57xhy0"
+-+     class="components-elevation css-xtff41-Elevation css-1mm2cvy-View em57xhy0"
++-     class="components-elevation css-1446wzr-Elevation-sx-Base-elevationClassName css-1mm2cvy-View em57xhy0"
+++     class="components-elevation css-5n3i96-Elevation-sx-Base-elevationClassName css-1mm2cvy-View em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+     <div
+       aria-hidden="true"
+--     class="components-elevation css-1ajhhcx-Elevation css-1mm2cvy-View em57xhy0"
+-+     class="components-elevation css-hdn3qt-Elevation css-1mm2cvy-View em57xhy0"
++-     class="components-elevation css-1k80jap-Elevation-sx-Base-elevationClassName css-1mm2cvy-View em57xhy0"
+++     class="components-elevation css-1mk3sew-Elevation-sx-Base-elevationClassName css-1mm2cvy-View em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+diff --git a/packages/components/src/ui/context/polymorphic-component.ts b/packages/components/src/ui/context/polymorphic-component.ts
+index 82c992acc1ef5f..d95748d7e177c1 100644
+--- a/packages/components/src/ui/context/polymorphic-component.ts
++++ b/packages/components/src/ui/context/polymorphic-component.ts
+@@ -4,7 +4,6 @@
+ // eslint-disable-next-line no-restricted-imports
+ import type * as React from 'react';
+ import type { As, RenderProp, ExtractHTMLAttributes } from 'reakit-utils/types';
+-import type { Interpolation } from 'create-emotion';
+ 
+ /**
+  * Based on https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/types.ts
+@@ -40,27 +39,7 @@ export type PolymorphicComponent< T extends As, O > = {
+ 	selector: `.${ string }`;
+ };
+ 
+-export type CreatePolymorphicComponent< T extends As, P > = (
+-	template: TemplateStringsArray,
+-	...styles: (
+-		| Interpolation< undefined >
+-		| PolymorphicComponent< any, any >
+-	 )[]
+-) => PolymorphicComponent< T, P >;
+-
+ export type ForwardedRef< TElement extends HTMLElement > =
+ 	| ( ( instance: TElement | null ) => void )
+ 	| React.MutableRefObject< TElement | null >
+ 	| null;
+-
+-export type CoreElements = {
+-	[ P in keyof JSX.IntrinsicElements ]: PolymorphicComponent< P, {} >;
+-};
+-
+-type CreateStyledComponents = {
+-	[ P in keyof JSX.IntrinsicElements ]: CreatePolymorphicComponent< P, {} >;
+-};
+-
+-export type CreateStyled = CreateStyledComponents & {
+-	< T extends As >( component: T ): CreatePolymorphicComponent< T, {} >;
+-};
+diff --git a/packages/components/src/ui/context/test/__snapshots__/context-system-provider.js.snap b/packages/components/src/ui/context/test/__snapshots__/context-system-provider.js.snap
+index 42d0529fc410be..0191524d2c644b 100644
+--- a/packages/components/src/ui/context/test/__snapshots__/context-system-provider.js.snap
++++ b/packages/components/src/ui/context/test/__snapshots__/context-system-provider.js.snap
+@@ -2,7 +2,7 @@
+ 
+ exports[`props should render _override props 1`] = `
+ <div
+-  class="components-component test-component css-1mm2cvy-View emotion-0"
++  class="components-component test-component emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Component"
+ >
+@@ -12,7 +12,7 @@ exports[`props should render _override props 1`] = `
+ 
+ exports[`props should render context props 1`] = `
+ <div
+-  class="components-component css-1mm2cvy-View emotion-0"
++  class="components-component emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Component"
+ >
+@@ -22,7 +22,7 @@ exports[`props should render context props 1`] = `
+ 
+ exports[`props should render correctly 1`] = `
+ <div
+-  class="components-component css-1mm2cvy-View emotion-0"
++  class="components-component emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Component"
+ />
+diff --git a/packages/components/src/ui/context/use-context-system.js b/packages/components/src/ui/context/use-context-system.js
+index 8501aa491e1070..04fdd3e70744cd 100644
+--- a/packages/components/src/ui/context/use-context-system.js
++++ b/packages/components/src/ui/context/use-context-system.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { cx } from 'emotion';
++import { cx } from '@emotion/css';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/ui/control-group/hook.js b/packages/components/src/ui/control-group/hook.js
+index 3166a2d67c8113..3dd09bc997afaf 100644
+--- a/packages/components/src/ui/control-group/hook.js
++++ b/packages/components/src/ui/control-group/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { cx } from 'emotion';
++import { cx } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/ui/control-group/styles.js b/packages/components/src/ui/control-group/styles.js
+index 0c03e04977a723..ef811dec1c51c4 100644
+--- a/packages/components/src/ui/control-group/styles.js
++++ b/packages/components/src/ui/control-group/styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
+ 
+ export const first = css`
+ 	border-bottom-right-radius: 0;
+diff --git a/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
+index a6d28ad9c5e09f..394e2545be5641 100644
+--- a/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/control-group/test/__snapshots__/index.js.snap
+@@ -15,20 +15,19 @@ exports[`props should render correctly 1`] = `
+   flex-direction: row;
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+-  -ms-flex-pack: justify;
+   justify-content: space-between;
+   width: 100%;
+ }
+ 
+-.emotion-0 > * + *:not(marquee) {
++.emotion-0>*+*:not(marquee) {
+   margin-left: -1px;
+ }
+ 
+-.emotion-0 > * {
++.emotion-0>* {
+   min-width: 0;
+ }
+ 
+-.emotion-0 > *:focus-within {
++.emotion-0>*:focus-within {
+   z-index: 1;
+ }
+ 
+diff --git a/packages/components/src/ui/control-label/hook.js b/packages/components/src/ui/control-label/hook.js
+index c21cbe3fc292fe..54d4b940f4515e 100644
+--- a/packages/components/src/ui/control-label/hook.js
++++ b/packages/components/src/ui/control-label/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { cx } from 'emotion';
++import { cx } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/ui/control-label/styles.js b/packages/components/src/ui/control-label/styles.js
+index a753ce18ee08f9..209b9fee06adfd 100644
+--- a/packages/components/src/ui/control-label/styles.js
++++ b/packages/components/src/ui/control-label/styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+index 2a568af4aaf00b..4d4445451d1ae7 100644
+--- a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+@@ -30,8 +30,8 @@ exports[`props should render correctly 1`] = `
+   user-select: none;
+ }
+ 
+-@media ( -webkit-min-device-pixel-ratio:1.25 ),( min-resolution:120dpi ) {
+-  .emotion-0 > * {
++@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
++  .emotion-0>* {
+     position: relative;
+     top: 0.5px;
+   }
+@@ -72,8 +72,8 @@ exports[`props should render no truncate 1`] = `
+   user-select: none;
+ }
+ 
+-@media ( -webkit-min-device-pixel-ratio:1.25 ),( min-resolution:120dpi ) {
+-  .emotion-0 > * {
++@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
++  .emotion-0>* {
+     position: relative;
+     top: 0.5px;
+   }
+@@ -118,8 +118,8 @@ exports[`props should render size 1`] = `
+   user-select: none;
+ }
+ 
+-@media ( -webkit-min-device-pixel-ratio:1.25 ),( min-resolution:120dpi ) {
+-  .emotion-0 > * {
++@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
++  .emotion-0>* {
+     position: relative;
+     top: 0.5px;
+   }
+diff --git a/packages/components/src/ui/form-group/form-group-styles.js b/packages/components/src/ui/form-group/form-group-styles.js
+index 1b7782c0e10464..d1c4766658159a 100644
+--- a/packages/components/src/ui/form-group/form-group-styles.js
++++ b/packages/components/src/ui/form-group/form-group-styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
+ 
+ export const FormGroup = css`
+ 	width: 100%;
+diff --git a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+index 118f21c4dc2a9b..5a64ab4c2af0c0 100644
+--- a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+@@ -1,11 +1,11 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render alignLabel 1`] = `
+-.emotion-3 {
++.emotion-0 {
+   width: 100%;
+ }
+ 
+-.emotion-0 {
++.emotion-3 {
+   display: inline-block;
+   line-height: calc(13px * 1.2);
+   margin: 0;
+@@ -24,27 +24,27 @@ exports[`props should render alignLabel 1`] = `
+   vertical-align: middle;
+ }
+ 
+-.emotion-0:active {
++.emotion-3:active {
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+ }
+ 
+-@media ( -webkit-min-device-pixel-ratio:1.25 ),( min-resolution:120dpi ) {
+-  .emotion-0 > * {
++@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
++  .emotion-3>* {
+     position: relative;
+     top: 0.5px;
+   }
+ }
+ 
+ <div
+-  class="emotion-3 components-form-group emotion-1 emotion-2"
++  class="emotion-0 components-form-group emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="FormGroup"
+ >
+   <label
+-    class="components-truncate components-text components-control-label emotion-0 emotion-1 emotion-2"
++    class="components-truncate components-text components-control-label emotion-3 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="ControlLabel"
+     for="fname"
+@@ -59,11 +59,11 @@ exports[`props should render alignLabel 1`] = `
+ `;
+ 
+ exports[`props should render vertically 1`] = `
+-.emotion-3 {
++.emotion-0 {
+   width: 100%;
+ }
+ 
+-.emotion-0 {
++.emotion-3 {
+   display: inline-block;
+   line-height: calc(13px * 1.2);
+   margin: 0;
+@@ -82,27 +82,27 @@ exports[`props should render vertically 1`] = `
+   vertical-align: middle;
+ }
+ 
+-.emotion-0:active {
++.emotion-3:active {
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+ }
+ 
+-@media ( -webkit-min-device-pixel-ratio:1.25 ),( min-resolution:120dpi ) {
+-  .emotion-0 > * {
++@media ( -webkit-min-device-pixel-ratio: 1.25 ), ( min-resolution: 120dpi ) {
++  .emotion-3>* {
+     position: relative;
+     top: 0.5px;
+   }
+ }
+ 
+ <div
+-  class="emotion-3 components-form-group emotion-1 emotion-2"
++  class="emotion-0 components-form-group emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="FormGroup"
+ >
+   <label
+-    class="components-truncate components-text components-control-label emotion-0 emotion-1 emotion-2"
++    class="components-truncate components-text components-control-label emotion-3 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="ControlLabel"
+     for="fname"
+diff --git a/packages/components/src/ui/form-group/use-form-group.js b/packages/components/src/ui/form-group/use-form-group.js
+index 27ea0b4f96d018..940bc56029aea1 100644
+--- a/packages/components/src/ui/form-group/use-form-group.js
++++ b/packages/components/src/ui/form-group/use-form-group.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { cx } from 'emotion';
++import { cx } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/ui/popover/content.js b/packages/components/src/ui/popover/content.js
+index 6356049bb98c12..ae4784518247f7 100644
+--- a/packages/components/src/ui/popover/content.js
++++ b/packages/components/src/ui/popover/content.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css, cx } from 'emotion';
++import { css, cx } from '@emotion/css';
+ // eslint-disable-next-line no-restricted-imports
+ import { Popover as ReakitPopover } from 'reakit';
+ 
+diff --git a/packages/components/src/ui/popover/styles.js b/packages/components/src/ui/popover/styles.js
+index 8618e684056baf..4147c2f2527247 100644
+--- a/packages/components/src/ui/popover/styles.js
++++ b/packages/components/src/ui/popover/styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+index 4ff2c3914ec19c..9248fa55781641 100644
+--- a/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/popover/test/__snapshots__/index.js.snap
+@@ -1,24 +1,24 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-3 {
+-  height: 100%;
+-}
+-
+-.emotion-12 {
++.emotion-0 {
+   background-color: #fff;
+   color: #000;
+   position: relative;
+-  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
++  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+   outline: none;
+   border-radius: 2px;
+ }
+ 
+-.emotion-12 .components-card-body {
++.emotion-0 .components-card-body {
+   max-height: 80vh;
+ }
+ 
+-.emotion-0 {
++.emotion-3 {
++  height: 100%;
++}
++
++.emotion-6 {
+   height: 100%;
+   overflow-x: hidden;
+   overflow-y: auto;
+@@ -27,83 +27,84 @@ exports[`props should render correctly 1`] = `
+   padding: calc(4px * 3) calc(4px * 3);
+ }
+ 
+-@media only screen and ( min-device-width:40em ) {
+-  .emotion-0::-webkit-scrollbar {
++@media only screen and ( min-device-width: 40em ) {
++  .emotion-6::-webkit-scrollbar {
+     height: 12px;
+     width: 12px;
+   }
+ 
+-  .emotion-0::-webkit-scrollbar-track {
++  .emotion-6::-webkit-scrollbar-track {
+     background-color: transparent;
+   }
+ 
+-  .emotion-0::-webkit-scrollbar-track {
+-    background: rgba(0,0,0,0.04);
++  .emotion-6::-webkit-scrollbar-track {
++    background: rgba(0, 0, 0, 0.04);
+     border-radius: 8px;
+   }
+ 
+-  .emotion-0::-webkit-scrollbar-thumb {
++  .emotion-6::-webkit-scrollbar-thumb {
++    -webkit-background-clip: padding-box;
+     background-clip: padding-box;
+-    background-color: rgba(0,0,0,0.2);
+-    border: 2px solid rgba( 0,0,0,0 );
++    background-color: rgba(0, 0, 0, 0.2);
++    border: 2px solid rgba( 0, 0, 0, 0 );
+     border-radius: 7px;
+   }
+ 
+-  .emotion-0:hover::-webkit-scrollbar-thumb {
+-    background-color: rgba(0,0,0,0.5);
++  .emotion-6:hover::-webkit-scrollbar-thumb {
++    background-color: rgba(0, 0, 0, 0.5);
+   }
+ }
+ 
+-.emotion-0:first-of-type {
++.emotion-6:first-of-type {
+   border-top-left-radius: 2px;
+   border-top-right-radius: 2px;
+ }
+ 
+-.emotion-0:last-of-type {
++.emotion-6:last-of-type {
+   border-bottom-left-radius: 2px;
+   border-bottom-right-radius: 2px;
+ }
+ 
+-.emotion-6 {
++.emotion-9 {
+   background: transparent;
+   display: block;
+-  margin: 0 !important;
++  margin: 0!important;
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
+   border-radius: inherit;
+   bottom: 0;
+-  box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
++  box-shadow: 0 1px 2px 0 rgba(0 ,0, 0, 0.05);
+   opacity: 1;
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+-  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+   border-radius: 2px;
+ }
+ 
+-.emotion-9 {
++.emotion-12 {
+   background: transparent;
+   display: block;
+-  margin: 0 !important;
++  margin: 0!important;
+   pointer-events: none;
+   position: absolute;
+   will-change: box-shadow;
+   border-radius: inherit;
+   bottom: 0;
+-  box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
++  box-shadow: 0 5px 10px 0 rgba(0 ,0, 0, 0.25);
+   opacity: 1;
+   left: 0;
+   right: 0;
+   top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+-  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
++  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
++  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+   border-radius: 2px;
+ }
+ 
+ <div
+-  class="components-surface components-card emotion-12 emotion-1 emotion-2"
++  class="components-surface components-card emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="Card"
+ >
+@@ -118,7 +119,7 @@ exports[`props should render correctly 1`] = `
+       tabindex="-1"
+     />
+     <div
+-      class="components-scrollable components-card-body emotion-0 emotion-1 emotion-2"
++      class="components-scrollable components-card-body emotion-6 emotion-1 emotion-2"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -127,13 +128,13 @@ exports[`props should render correctly 1`] = `
+   </div>
+   <div
+     aria-hidden="true"
+-    class="components-elevation emotion-6 emotion-1 emotion-2"
++    class="components-elevation emotion-9 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+   <div
+     aria-hidden="true"
+-    class="components-elevation emotion-9 emotion-1 emotion-2"
++    class="components-elevation emotion-12 emotion-1 emotion-2"
+     data-wp-c16t="true"
+     data-wp-component="Elevation"
+   />
+@@ -149,7 +150,7 @@ Snapshot Diff:
+   <div
+ -   aria-label="show"
+ +   aria-label="popover-base-popover"
+-    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View em57xhy0"
++    class="components-popover-content components-popover css-mlsx58-PopoverContent-classes css-1mm2cvy-View em57xhy0"
+     data-dialog="true"
+     data-wp-c16t="true"
+     data-wp-component="Popover"
+@@ -159,7 +160,7 @@ Snapshot Diff:
+     tabindex="-1"
+   >
+     <div
+-      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
++      class="components-surface components-card css-vg3gx-Surface-getBorders-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
+ `;
+ 
+ exports[`props should render without content 1`] = `
+@@ -171,7 +172,7 @@ Snapshot Diff:
+   <div
+ -   aria-label="popover-contentless-popover"
+ +   aria-label="popover-base-popover"
+-    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View em57xhy0"
++    class="components-popover-content components-popover css-mlsx58-PopoverContent-classes css-1mm2cvy-View em57xhy0"
+     data-dialog="true"
+     data-wp-c16t="true"
+     data-wp-component="Popover"
+@@ -181,7 +182,7 @@ Snapshot Diff:
+     tabindex="-1"
+   >
+     <div
+-      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
++      class="components-surface components-card css-vg3gx-Surface-getBorders-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
+ @@ -21,10 +21,17 @@
+           frameborder="0"
+           src="about:blank"
+@@ -189,7 +190,7 @@ Snapshot Diff:
+           tabindex="-1"
+         />
+ +       <div
+-+         class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View em57xhy0"
+++         class="components-scrollable components-card-body css-sefkol-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View em57xhy0"
+ +         data-wp-c16t="true"
+ +         data-wp-component="CardBody"
+ +       >
+@@ -198,6 +199,6 @@ Snapshot Diff:
+       </div>
+       <div
+         aria-hidden="true"
+-        class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View em57xhy0"
++        class="components-elevation css-1446wzr-Elevation-sx-Base-elevationClassName css-1mm2cvy-View em57xhy0"
+         data-wp-c16t="true"
+ `;
+diff --git a/packages/components/src/ui/scrollable/hook.js b/packages/components/src/ui/scrollable/hook.js
+index ca95f237dbd6aa..fe731bca7cd9a1 100644
+--- a/packages/components/src/ui/scrollable/hook.js
++++ b/packages/components/src/ui/scrollable/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { cx } from 'emotion';
++import { cx } from '@emotion/css';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/ui/scrollable/styles.js b/packages/components/src/ui/scrollable/styles.js
+index bed0a02fd02d2e..1ea5ef7dfc69b8 100644
+--- a/packages/components/src/ui/scrollable/styles.js
++++ b/packages/components/src/ui/scrollable/styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
+ /**
+  * Internal dependencies
+  */
+diff --git a/packages/components/src/ui/scrollable/test/__snapshots__/index.js.snap b/packages/components/src/ui/scrollable/test/__snapshots__/index.js.snap
+index a54d2409070c93..17f27dbbf43fcb 100644
+--- a/packages/components/src/ui/scrollable/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/scrollable/test/__snapshots__/index.js.snap
+@@ -7,7 +7,7 @@ exports[`props should render correctly 1`] = `
+   overflow-y: auto;
+ }
+ 
+-@media only screen and ( min-device-width:40em ) {
++@media only screen and ( min-device-width: 40em ) {
+   .emotion-0::-webkit-scrollbar {
+     height: 12px;
+     width: 12px;
+@@ -18,19 +18,20 @@ exports[`props should render correctly 1`] = `
+   }
+ 
+   .emotion-0::-webkit-scrollbar-track {
+-    background: rgba(0,0,0,0.04);
++    background: rgba(0, 0, 0, 0.04);
+     border-radius: 8px;
+   }
+ 
+   .emotion-0::-webkit-scrollbar-thumb {
++    -webkit-background-clip: padding-box;
+     background-clip: padding-box;
+-    background-color: rgba(0,0,0,0.2);
+-    border: 2px solid rgba( 0,0,0,0 );
++    background-color: rgba(0, 0, 0, 0.2);
++    border: 2px solid rgba( 0, 0, 0, 0 );
+     border-radius: 7px;
+   }
+ 
+   .emotion-0:hover::-webkit-scrollbar-thumb {
+-    background-color: rgba(0,0,0,0.5);
++    background-color: rgba(0, 0, 0, 0.5);
+   }
+ }
+ 
+@@ -50,13 +51,11 @@ Snapshot Diff:
+ 
+   Array [
+     Object {
+--     "-moz-scroll-behavior": "smooth",
+--     "-ms-scroll-behavior": "smooth",
+--     "-webkit-scroll-behavior": "smooth",
+       "height": "100%",
+       "overflow-x": "hidden",
+       "overflow-y": "auto",
+ -     "scroll-behavior": "smooth",
+     },
++    Object {},
+   ]
+ `;
+diff --git a/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap b/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
+index 3259fe3757e44b..badce6e5bb6024 100644
+--- a/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/spinner/test/__snapshots__/index.js.snap
+@@ -10,7 +10,7 @@ Snapshot Diff:
+       style="transform: scale(0.4444444444444444);"
+     >
+       <div
+-        class="css-lrlbd4-BarsView e1s9yo7h2"
++        class="css-tada40-BarsView e1s9yo7h0"
+ -       style="color: blue;"
+ +       style="color: rgb(0, 0, 0);"
+       >
+@@ -21,7 +21,7 @@ Snapshot Diff:
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-4 {
++.emotion-0 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -36,13 +36,11 @@ exports[`props should render correctly 1`] = `
+   opacity: 0.6;
+   position: absolute;
+   top: 0;
+-  -webkit-transform-origin: top left;
+-  -ms-transform-origin: top left;
+   transform-origin: top left;
+   width: 36px;
+ }
+ 
+-.emotion-0 {
++.emotion-4 {
+   color: currentColor;
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+@@ -53,13 +51,14 @@ exports[`props should render correctly 1`] = `
+   padding: 10px;
+   position: absolute;
+   top: 50%;
+-  -webkit-transform: translate( -50%,-50% );
+-  -ms-transform: translate( -50%,-50% );
+-  transform: translate( -50%,-50% );
++  -webkit-transform: translate( -50%, -50% );
++  -moz-transform: translate( -50%, -50% );
++  -ms-transform: translate( -50%, -50% );
++  transform: translate( -50%, -50% );
+   width: 54px;
+ }
+ 
+-.emotion-0 > div {
++.emotion-4>div {
+   -webkit-animation: ComponentsUISpinnerFadeAnimation 1000ms linear infinite;
+   animation: ComponentsUISpinnerFadeAnimation 1000ms linear infinite;
+   background: currentColor;
+@@ -72,105 +71,117 @@ exports[`props should render correctly 1`] = `
+   width: 6%;
+ }
+ 
+-.emotion-0 .InnerBar1 {
++.emotion-4 .InnerBar1 {
+   -webkit-animation-delay: 0s;
+   animation-delay: 0s;
+-  -webkit-transform: rotate( 0deg ) translate( 0,-130% );
+-  -ms-transform: rotate( 0deg ) translate( 0,-130% );
+-  transform: rotate( 0deg ) translate( 0,-130% );
++  -webkit-transform: rotate( 0deg ) translate( 0, -130% );
++  -moz-transform: rotate( 0deg ) translate( 0, -130% );
++  -ms-transform: rotate( 0deg ) translate( 0, -130% );
++  transform: rotate( 0deg ) translate( 0, -130% );
+ }
+ 
+-.emotion-0 .InnerBar2 {
++.emotion-4 .InnerBar2 {
+   -webkit-animation-delay: -0.9167s;
+   animation-delay: -0.9167s;
+-  -webkit-transform: rotate( 30deg ) translate( 0,-130% );
+-  -ms-transform: rotate( 30deg ) translate( 0,-130% );
+-  transform: rotate( 30deg ) translate( 0,-130% );
++  -webkit-transform: rotate( 30deg ) translate( 0, -130% );
++  -moz-transform: rotate( 30deg ) translate( 0, -130% );
++  -ms-transform: rotate( 30deg ) translate( 0, -130% );
++  transform: rotate( 30deg ) translate( 0, -130% );
+ }
+ 
+-.emotion-0 .InnerBar3 {
++.emotion-4 .InnerBar3 {
+   -webkit-animation-delay: -0.833s;
+   animation-delay: -0.833s;
+-  -webkit-transform: rotate( 60deg ) translate( 0,-130% );
+-  -ms-transform: rotate( 60deg ) translate( 0,-130% );
+-  transform: rotate( 60deg ) translate( 0,-130% );
++  -webkit-transform: rotate( 60deg ) translate( 0, -130% );
++  -moz-transform: rotate( 60deg ) translate( 0, -130% );
++  -ms-transform: rotate( 60deg ) translate( 0, -130% );
++  transform: rotate( 60deg ) translate( 0, -130% );
+ }
+ 
+-.emotion-0 .InnerBar4 {
++.emotion-4 .InnerBar4 {
+   -webkit-animation-delay: -0.7497s;
+   animation-delay: -0.7497s;
+-  -webkit-transform: rotate( 90deg ) translate( 0,-130% );
+-  -ms-transform: rotate( 90deg ) translate( 0,-130% );
+-  transform: rotate( 90deg ) translate( 0,-130% );
++  -webkit-transform: rotate( 90deg ) translate( 0, -130% );
++  -moz-transform: rotate( 90deg ) translate( 0, -130% );
++  -ms-transform: rotate( 90deg ) translate( 0, -130% );
++  transform: rotate( 90deg ) translate( 0, -130% );
+ }
+ 
+-.emotion-0 .InnerBar5 {
++.emotion-4 .InnerBar5 {
+   -webkit-animation-delay: -0.667s;
+   animation-delay: -0.667s;
+-  -webkit-transform: rotate( 120deg ) translate( 0,-130% );
+-  -ms-transform: rotate( 120deg ) translate( 0,-130% );
+-  transform: rotate( 120deg ) translate( 0,-130% );
++  -webkit-transform: rotate( 120deg ) translate( 0, -130% );
++  -moz-transform: rotate( 120deg ) translate( 0, -130% );
++  -ms-transform: rotate( 120deg ) translate( 0, -130% );
++  transform: rotate( 120deg ) translate( 0, -130% );
+ }
+ 
+-.emotion-0 .InnerBar6 {
++.emotion-4 .InnerBar6 {
+   -webkit-animation-delay: -0.5837s;
+   animation-delay: -0.5837s;
+-  -webkit-transform: rotate( 150deg ) translate( 0,-130% );
+-  -ms-transform: rotate( 150deg ) translate( 0,-130% );
+-  transform: rotate( 150deg ) translate( 0,-130% );
++  -webkit-transform: rotate( 150deg ) translate( 0, -130% );
++  -moz-transform: rotate( 150deg ) translate( 0, -130% );
++  -ms-transform: rotate( 150deg ) translate( 0, -130% );
++  transform: rotate( 150deg ) translate( 0, -130% );
+ }
+ 
+-.emotion-0 .InnerBar7 {
++.emotion-4 .InnerBar7 {
+   -webkit-animation-delay: -0.5s;
+   animation-delay: -0.5s;
+-  -webkit-transform: rotate( 180deg ) translate( 0,-130% );
+-  -ms-transform: rotate( 180deg ) translate( 0,-130% );
+-  transform: rotate( 180deg ) translate( 0,-130% );
++  -webkit-transform: rotate( 180deg ) translate( 0, -130% );
++  -moz-transform: rotate( 180deg ) translate( 0, -130% );
++  -ms-transform: rotate( 180deg ) translate( 0, -130% );
++  transform: rotate( 180deg ) translate( 0, -130% );
+ }
+ 
+-.emotion-0 .InnerBar8 {
++.emotion-4 .InnerBar8 {
+   -webkit-animation-delay: -0.4167s;
+   animation-delay: -0.4167s;
+-  -webkit-transform: rotate( 210deg ) translate( 0,-130% );
+-  -ms-transform: rotate( 210deg ) translate( 0,-130% );
+-  transform: rotate( 210deg ) translate( 0,-130% );
++  -webkit-transform: rotate( 210deg ) translate( 0, -130% );
++  -moz-transform: rotate( 210deg ) translate( 0, -130% );
++  -ms-transform: rotate( 210deg ) translate( 0, -130% );
++  transform: rotate( 210deg ) translate( 0, -130% );
+ }
+ 
+-.emotion-0 .InnerBar9 {
++.emotion-4 .InnerBar9 {
+   -webkit-animation-delay: -0.333s;
+   animation-delay: -0.333s;
+-  -webkit-transform: rotate( 240deg ) translate( 0,-130% );
+-  -ms-transform: rotate( 240deg ) translate( 0,-130% );
+-  transform: rotate( 240deg ) translate( 0,-130% );
++  -webkit-transform: rotate( 240deg ) translate( 0, -130% );
++  -moz-transform: rotate( 240deg ) translate( 0, -130% );
++  -ms-transform: rotate( 240deg ) translate( 0, -130% );
++  transform: rotate( 240deg ) translate( 0, -130% );
+ }
+ 
+-.emotion-0 .InnerBar10 {
++.emotion-4 .InnerBar10 {
+   -webkit-animation-delay: -0.2497s;
+   animation-delay: -0.2497s;
+-  -webkit-transform: rotate( 270deg ) translate( 0,-130% );
+-  -ms-transform: rotate( 270deg ) translate( 0,-130% );
+-  transform: rotate( 270deg ) translate( 0,-130% );
++  -webkit-transform: rotate( 270deg ) translate( 0, -130% );
++  -moz-transform: rotate( 270deg ) translate( 0, -130% );
++  -ms-transform: rotate( 270deg ) translate( 0, -130% );
++  transform: rotate( 270deg ) translate( 0, -130% );
+ }
+ 
+-.emotion-0 .InnerBar11 {
++.emotion-4 .InnerBar11 {
+   -webkit-animation-delay: -0.167s;
+   animation-delay: -0.167s;
+-  -webkit-transform: rotate( 300deg ) translate( 0,-130% );
+-  -ms-transform: rotate( 300deg ) translate( 0,-130% );
+-  transform: rotate( 300deg ) translate( 0,-130% );
++  -webkit-transform: rotate( 300deg ) translate( 0, -130% );
++  -moz-transform: rotate( 300deg ) translate( 0, -130% );
++  -ms-transform: rotate( 300deg ) translate( 0, -130% );
++  transform: rotate( 300deg ) translate( 0, -130% );
+ }
+ 
+-.emotion-0 .InnerBar12 {
++.emotion-4 .InnerBar12 {
+   -webkit-animation-delay: -0.0833s;
+   animation-delay: -0.0833s;
+-  -webkit-transform: rotate( 330deg ) translate( 0,-130% );
+-  -ms-transform: rotate( 330deg ) translate( 0,-130% );
+-  transform: rotate( 330deg ) translate( 0,-130% );
++  -webkit-transform: rotate( 330deg ) translate( 0, -130% );
++  -moz-transform: rotate( 330deg ) translate( 0, -130% );
++  -ms-transform: rotate( 330deg ) translate( 0, -130% );
++  transform: rotate( 330deg ) translate( 0, -130% );
+ }
+ 
+ <div
+   aria-busy="true"
+-  class="components-spinner emotion-4 emotion-5"
++  class="components-spinner emotion-0 emotion-1"
+   data-wp-c16t="true"
+   data-wp-component="Spinner"
+   style="height: 16px; width: 16px;"
+@@ -181,7 +192,7 @@ exports[`props should render correctly 1`] = `
+     style="transform: scale(0.4444444444444444);"
+   >
+     <div
+-      class="emotion-0 emotion-1"
++      class="emotion-4 emotion-5"
+       style="color: rgb(0, 0, 0);"
+     >
+       <div
+@@ -233,7 +244,7 @@ Snapshot Diff:
+ @@ -1,16 +1,16 @@
+   <div
+     aria-busy="true"
+-    class="components-spinner css-ssf0q0-ContainerView e1s9yo7h0"
++    class="components-spinner css-14ywscc-ContainerView e1s9yo7h2"
+     data-wp-c16t="true"
+     data-wp-component="Spinner"
+ -   style="height: 31px; width: 31px;"
+@@ -246,7 +257,7 @@ Snapshot Diff:
+ +     style="transform: scale(0.4444444444444444);"
+     >
+       <div
+-        class="css-lrlbd4-BarsView e1s9yo7h2"
++        class="css-tada40-BarsView e1s9yo7h0"
+         style="color: rgb(0, 0, 0);"
+       >
+ `;
+diff --git a/packages/components/src/ui/surface/hook.js b/packages/components/src/ui/surface/hook.js
+index cf69919b512f23..4994703855ecc2 100644
+--- a/packages/components/src/ui/surface/hook.js
++++ b/packages/components/src/ui/surface/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { cx } from 'emotion';
++import { cx } from '@emotion/css';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/ui/surface/styles.js b/packages/components/src/ui/surface/styles.js
+index 3ab046562b5b81..9520637504c1fb 100644
+--- a/packages/components/src/ui/surface/styles.js
++++ b/packages/components/src/ui/surface/styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/ui/surface/test/__snapshots__/index.js.snap b/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
+index 7f538e2616db75..a394f15c48f5c3 100644
+--- a/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/surface/test/__snapshots__/index.js.snap
+@@ -6,8 +6,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-1xmxoxz-Surface-primary css-1mm2cvy-View em57xhy0"
+-+   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
++-   class="components-surface css-1v0lads-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+++   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -21,8 +21,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-ttbcem-Surface-primary css-1mm2cvy-View em57xhy0"
+-+   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
++-   class="components-surface css-xbskxc-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+++   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -36,8 +36,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-xn6qe9-Surface-primary css-1mm2cvy-View em57xhy0"
+-+   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
++-   class="components-surface css-pznwh2-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+++   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -51,8 +51,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-1ql02am-Surface-primary css-1mm2cvy-View em57xhy0"
+-+   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
++-   class="components-surface css-17wbg6n-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+++   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -66,8 +66,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-1fc5hvl-Surface-primary css-1mm2cvy-View em57xhy0"
+-+   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
++-   class="components-surface css-e8z2n8-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+++   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+@@ -97,8 +97,8 @@ Snapshot Diff:
+ + Second value
+ 
+   <div
+--   class="components-surface css-1h2jxd6-Surface-secondary css-1mm2cvy-View em57xhy0"
+-+   class="components-surface css-asbdls-Surface-primary css-1mm2cvy-View em57xhy0"
++-   class="components-surface css-rpogp2-Surface-getBorders-secondary css-1mm2cvy-View em57xhy0"
+++   class="components-surface css-s3w0k-Surface-getBorders-primary css-1mm2cvy-View em57xhy0"
+     data-wp-c16t="true"
+     data-wp-component="Surface"
+   >
+diff --git a/packages/components/src/ui/tooltip/content.js b/packages/components/src/ui/tooltip/content.js
+index 1fc0780eae468b..ef2524a777c39d 100644
+--- a/packages/components/src/ui/tooltip/content.js
++++ b/packages/components/src/ui/tooltip/content.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { cx } from 'emotion';
++import { cx } from '@emotion/css';
+ // eslint-disable-next-line no-restricted-imports
+ import { Tooltip as ReakitTooltip } from 'reakit';
+ 
+diff --git a/packages/components/src/ui/tooltip/styles.js b/packages/components/src/ui/tooltip/styles.js
+index 868699e8bb1622..e50a89aab24099 100644
+--- a/packages/components/src/ui/tooltip/styles.js
++++ b/packages/components/src/ui/tooltip/styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
+ import styled from '@emotion/styled';
+ 
+ /**
+diff --git a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+index 606f38bce4f9cd..28e4689637abf8 100644
+--- a/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/tooltip/test/__snapshots__/index.js.snap
+@@ -1,32 +1,30 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-2 {
++.emotion-0 {
+   z-index: 1000002;
+   box-sizing: border-box;
+   opacity: 0;
+   outline: none;
+-  -webkit-transform-origin: top center;
+-  -ms-transform-origin: top center;
+   transform-origin: top center;
+   -webkit-transition: opacity 100ms ease;
+   transition: opacity 100ms ease;
+ }
+ 
+-.emotion-2[data-enter] {
++.emotion-0[data-enter] {
+   opacity: 1;
+ }
+ 
+-.emotion-0 {
+-  background: rgba( 0,0,0,0.8 );
++.emotion-3 {
++  background: rgba( 0, 0, 0, 0.8 );
+   border-radius: 6px;
+-  box-shadow: 0 0 0 1px rgba( 255,255,255,0.04 );
++  box-shadow: 0 0 0 1px rgba( 255, 255, 255, 0.04 );
+   color: #fff;
+   padding: 4px 8px;
+ }
+ 
+ <div
+-  class="emotion-2 components-tooltip-content emotion-3 emotion-4"
++  class="emotion-0 components-tooltip-content emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="TooltipContent"
+   id="base-tooltip"
+@@ -34,7 +32,7 @@ exports[`props should render correctly 1`] = `
+   style="pointer-events: none;"
+ >
+   <div
+-    class="emotion-0 emotion-1"
++    class="emotion-3 emotion-4"
+   >
+     Code is Poetry
+   </div>
+diff --git a/packages/components/src/ui/utils/get-high-dpi.ts b/packages/components/src/ui/utils/get-high-dpi.ts
+index 6e9073533300cf..92d190566548f7 100644
+--- a/packages/components/src/ui/utils/get-high-dpi.ts
++++ b/packages/components/src/ui/utils/get-high-dpi.ts
+@@ -1,12 +1,13 @@
+ /**
+  * External dependencies
+  */
+-import type { Interpolation } from '@emotion/core';
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
++// eslint-disable-next-line no-duplicate-imports
++import type { CSSInterpolation } from '@emotion/css';
+ 
+ export function getHighDpi(
+ 	strings: TemplateStringsArray,
+-	...interpolations: Interpolation[]
++	...interpolations: CSSInterpolation[]
+ ) {
+ 	const interpolatedStyles = css( strings, ...interpolations );
+ 
+diff --git a/packages/components/src/ui/visually-hidden/hook.js b/packages/components/src/ui/visually-hidden/hook.js
+index e8e7980c72dbec..d3906b300d1f26 100644
+--- a/packages/components/src/ui/visually-hidden/hook.js
++++ b/packages/components/src/ui/visually-hidden/hook.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { cx } from 'emotion';
++import { cx } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/ui/visually-hidden/styles.js b/packages/components/src/ui/visually-hidden/styles.js
+index 9265d0c0aee604..87f650b610d596 100644
+--- a/packages/components/src/ui/visually-hidden/styles.js
++++ b/packages/components/src/ui/visually-hidden/styles.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { css } from 'emotion';
++import { css } from '@emotion/css';
++
+ /**
+  * Internal dependencies
+  */
+diff --git a/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap b/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap
+index e6a1b7bd905bd3..9625c0ac2f00af 100644
+--- a/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap
+@@ -3,8 +3,7 @@
+ exports[`VisuallyHidden should render correctly 1`] = `
+ .emotion-0 {
+   border: 0;
+-  -webkit-clip: rect( 1px,1px,1px,1px );
+-  clip: rect( 1px,1px,1px,1px );
++  clip: rect( 1px, 1px, 1px, 1px );
+   -webkit-clip-path: inset( 50% );
+   -webkit-clip-path: inset( 50% );
+   clip-path: inset( 50% );
+@@ -14,13 +13,12 @@ exports[`VisuallyHidden should render correctly 1`] = `
+   padding: 0;
+   position: absolute;
+   width: 1px;
+-  word-wrap: normal !important;
++  word-wrap: normal!important;
+ }
+ 
+ .emotion-0:focus {
+   background-color: #edeff0;
+-  -webkit-clip: auto !important;
+-  clip: auto !important;
++  clip: auto!important;
+   -webkit-clip-path: none;
+   clip-path: none;
+   color: #444;
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.js b/packages/components/src/unit-control/styles/unit-control-styles.js
+index c5b300525debb8..b29f4c615bed7a 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.js
++++ b/packages/components/src/unit-control/styles/unit-control-styles.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/core';
++import { css } from '@emotion/css';
+ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/utils/input/base.js b/packages/components/src/utils/input/base.js
+index 3483b03893963f..7afdb8fd5e63df 100644
+--- a/packages/components/src/utils/input/base.js
++++ b/packages/components/src/utils/input/base.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/core';
++import { css } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/utils/input/input-control.js b/packages/components/src/utils/input/input-control.js
+index b6296b95c7ab43..4dcc93532b4498 100644
+--- a/packages/components/src/utils/input/input-control.js
++++ b/packages/components/src/utils/input/input-control.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/core';
++import { css } from '@emotion/css';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/utils/rtl.js b/packages/components/src/utils/rtl.js
+index 7e46a4bf6a2725..ae1f5a772f86d9 100644
+--- a/packages/components/src/utils/rtl.js
++++ b/packages/components/src/utils/rtl.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { css } from '@emotion/core';
++import { css } from '@emotion/css';
+ import { mapKeys } from 'lodash';
+ 
+ /**
+diff --git a/packages/components/src/v-stack/test/__snapshots__/index.js.snap b/packages/components/src/v-stack/test/__snapshots__/index.js.snap
+index 54e0d72bd011b0..97e51366d9b226 100644
+--- a/packages/components/src/v-stack/test/__snapshots__/index.js.snap
++++ b/packages/components/src/v-stack/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`props should render alignment 1`] = `
+-.emotion-4 {
++.emotion-0 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -14,35 +14,35 @@ exports[`props should render alignment 1`] = `
+   -ms-flex-direction: column;
+   flex-direction: column;
+   -webkit-box-pack: center;
+-  -webkit-justify-content: center;
+   -ms-flex-pack: center;
++  -webkit-justify-content: center;
+   justify-content: center;
+ }
+ 
+-.emotion-4 > * + *:not(marquee) {
++.emotion-0>*+*:not(marquee) {
+   margin-top: calc(4px * 2);
+ }
+ 
+-.emotion-4 > * {
++.emotion-0>* {
+   min-height: 0;
+ }
+ 
+ <div
+-  class="components-flex components-h-stack components-v-stack emotion-4 emotion-0 emotion-1"
++  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="VStack"
+ >
+   <div
+-    class="emotion-0 emotion-1"
++    class="emotion-1 emotion-2"
+   />
+   <div
+-    class="emotion-0 emotion-1"
++    class="emotion-1 emotion-2"
+   />
+ </div>
+ `;
+ 
+ exports[`props should render correctly 1`] = `
+-.emotion-4 {
++.emotion-0 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -56,34 +56,33 @@ exports[`props should render correctly 1`] = `
+   flex-direction: column;
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+-  -ms-flex-pack: justify;
+   justify-content: space-between;
+ }
+ 
+-.emotion-4 > * + *:not(marquee) {
++.emotion-0>*+*:not(marquee) {
+   margin-top: calc(4px * 2);
+ }
+ 
+-.emotion-4 > * {
++.emotion-0>* {
+   min-height: 0;
+ }
+ 
+ <div
+-  class="components-flex components-h-stack components-v-stack emotion-4 emotion-0 emotion-1"
++  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="VStack"
+ >
+   <div
+-    class="emotion-0 emotion-1"
++    class="emotion-1 emotion-2"
+   />
+   <div
+-    class="emotion-0 emotion-1"
++    class="emotion-1 emotion-2"
+   />
+ </div>
+ `;
+ 
+ exports[`props should render spacing 1`] = `
+-.emotion-4 {
++.emotion-0 {
+   display: -webkit-box;
+   display: -webkit-flex;
+   display: -ms-flexbox;
+@@ -97,28 +96,27 @@ exports[`props should render spacing 1`] = `
+   flex-direction: column;
+   -webkit-box-pack: justify;
+   -webkit-justify-content: space-between;
+-  -ms-flex-pack: justify;
+   justify-content: space-between;
+ }
+ 
+-.emotion-4 > * + *:not(marquee) {
++.emotion-0>*+*:not(marquee) {
+   margin-top: calc(4px * 5);
+ }
+ 
+-.emotion-4 > * {
++.emotion-0>* {
+   min-height: 0;
+ }
+ 
+ <div
+-  class="components-flex components-h-stack components-v-stack emotion-4 emotion-0 emotion-1"
++  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+   data-wp-component="VStack"
+ >
+   <div
+-    class="emotion-0 emotion-1"
++    class="emotion-1 emotion-2"
+   />
+   <div
+-    class="emotion-0 emotion-1"
++    class="emotion-1 emotion-2"
+   />
+ </div>
+ `;
+diff --git a/packages/components/src/view/test/__snapshots__/index.js.snap b/packages/components/src/view/test/__snapshots__/index.js.snap
+index c1851ac34cb9e2..dbdd3f54df453d 100644
+--- a/packages/components/src/view/test/__snapshots__/index.js.snap
++++ b/packages/components/src/view/test/__snapshots__/index.js.snap
+@@ -2,7 +2,7 @@
+ 
+ exports[`props should render as another element 1`] = `
+ <p
+-  class="css-1mm2cvy-View emotion-0"
++  class="emotion-0 emotion-1"
+ >
+   <span />
+ </p>
+@@ -10,7 +10,7 @@ exports[`props should render as another element 1`] = `
+ 
+ exports[`props should render correctly 1`] = `
+ <div
+-  class="css-1mm2cvy-View emotion-0"
++  class="emotion-0 emotion-1"
+ >
+   <span />
+ </div>
+@@ -18,7 +18,7 @@ exports[`props should render correctly 1`] = `
+ 
+ exports[`props should render with custom styles (Array) 1`] = `
+ <p
+-  class="css-1mm2cvy-View emotion-0"
++  class="emotion-0 emotion-1"
+ >
+   <span />
+ </p>
+@@ -26,7 +26,7 @@ exports[`props should render with custom styles (Array) 1`] = `
+ 
+ exports[`props should render with custom styles (object) 1`] = `
+ <p
+-  class="css-1mm2cvy-View emotion-0"
++  class="emotion-0 emotion-1"
+ >
+   <span />
+ </p>
+@@ -34,7 +34,7 @@ exports[`props should render with custom styles (object) 1`] = `
+ 
+ exports[`props should render with custom styles (string) 1`] = `
+ <p
+-  class="css-1mm2cvy-View emotion-0"
++  class="emotion-0 emotion-1"
+ >
+   <span />
+ </p>
+diff --git a/packages/components/src/visually-hidden/stories/index.js b/packages/components/src/visually-hidden/stories/index.js
+index 2b45ad1d15121c..74cea0d833eb2d 100644
+--- a/packages/components/src/visually-hidden/stories/index.js
++++ b/packages/components/src/visually-hidden/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import VisuallyHidden from '../';
++import VisuallyHidden from '..';
+ 
+ export default {
+ 	title: 'Components/VisuallyHidden',
+diff --git a/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap b/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
+index c9f64347ae092b..60dd16b56ad12c 100644
+--- a/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
+@@ -1,16 +1,16 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation message when toggled on 1`] = `
+-.emotion-2 {
++.emotion-0 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+ }
+ 
+-.emotion-0 {
++.emotion-2 {
+   margin-bottom: 8px;
+ }
+ 
+-.components-panel__row .emotion-0 {
++.components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+ 
+@@ -18,10 +18,10 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+   className="edit-post-preferences-modal__option"
+ >
+   <div
+-    className="components-base-control components-toggle-control emotion-2 emotion-3"
++    className="components-base-control components-toggle-control emotion-0 emotion-1"
+   >
+     <div
+-      className="components-base-control__field emotion-0 emotion-1"
++      className="components-base-control__field emotion-2 emotion-3"
+     >
+       <span
+         className="components-form-toggle is-checked"
+@@ -64,16 +64,16 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+ `;
+ 
+ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields are enabled 1`] = `
+-.emotion-2 {
++.emotion-0 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+ }
+ 
+-.emotion-0 {
++.emotion-2 {
+   margin-bottom: 8px;
+ }
+ 
+-.components-panel__row .emotion-0 {
++.components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+ 
+@@ -81,10 +81,10 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+   className="edit-post-preferences-modal__option"
+ >
+   <div
+-    className="components-base-control components-toggle-control emotion-2 emotion-3"
++    className="components-base-control components-toggle-control emotion-0 emotion-1"
+   >
+     <div
+-      className="components-base-control__field emotion-0 emotion-1"
++      className="components-base-control__field emotion-2 emotion-3"
+     >
+       <span
+         className="components-form-toggle is-checked"
+@@ -113,16 +113,16 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+ `;
+ 
+ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmation message when toggled off 1`] = `
+-.emotion-2 {
++.emotion-0 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+ }
+ 
+-.emotion-0 {
++.emotion-2 {
+   margin-bottom: 8px;
+ }
+ 
+-.components-panel__row .emotion-0 {
++.components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+ 
+@@ -130,10 +130,10 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+   className="edit-post-preferences-modal__option"
+ >
+   <div
+-    className="components-base-control components-toggle-control emotion-2 emotion-3"
++    className="components-base-control components-toggle-control emotion-0 emotion-1"
+   >
+     <div
+-      className="components-base-control__field emotion-0 emotion-1"
++      className="components-base-control__field emotion-2 emotion-3"
+     >
+       <span
+         className="components-form-toggle"
+@@ -176,16 +176,16 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+ `;
+ 
+ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fields are disabled 1`] = `
+-.emotion-2 {
++.emotion-0 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+ }
+ 
+-.emotion-0 {
++.emotion-2 {
+   margin-bottom: 8px;
+ }
+ 
+-.components-panel__row .emotion-0 {
++.components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+ 
+@@ -193,10 +193,10 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
+   className="edit-post-preferences-modal__option"
+ >
+   <div
+-    className="components-base-control components-toggle-control emotion-2 emotion-3"
++    className="components-base-control components-toggle-control emotion-0 emotion-1"
+   >
+     <div
+-      className="components-base-control__field emotion-0 emotion-1"
++      className="components-base-control__field emotion-2 emotion-3"
+     >
+       <span
+         className="components-form-toggle"
+diff --git a/storybook/main.js b/storybook/main.js
+index d410195ee23b1b..a47a600470558d 100644
+--- a/storybook/main.js
++++ b/storybook/main.js
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++const path = require( 'path' );
++
+ const stories = [
+ 	process.env.NODE_ENV !== 'test' && './stories/**/*.(js|mdx)',
+ 	'../packages/block-editor/src/**/stories/*.js',
+@@ -9,6 +14,24 @@ const customEnvVariables = {
+ 	COMPONENT_SYSTEM_PHASE: 1,
+ };
+ 
++const modulesDir = path.join( __dirname, '../node_modules' );
++
++// Workaround for Emtion 11
++// https://github.com/storybookjs/storybook/pull/13300#issuecomment-783268111
++const updateEmotionAliases = ( config ) => ( {
++	...config,
++	resolve: {
++		...config.resolve,
++		alias: {
++			...config.resolve.alias,
++			'@emotion/core': path.join( modulesDir, '@emotion/react' ),
++			'@emotion/styled': path.join( modulesDir, '@emotion/styled' ),
++			'@emotion/styled-base': path.join( modulesDir, '@emotion/styled' ),
++			'emotion-theming': path.join( modulesDir, '@emotion/react' ),
++		},
++	},
++} );
++
+ module.exports = {
+ 	stories,
+ 	addons: [
+@@ -21,6 +44,7 @@ module.exports = {
+ 		'@storybook/addon-viewport',
+ 		'@storybook/addon-a11y',
+ 	],
++	managerWebpack: updateEmotionAliases,
+ 	// Workaround:
+ 	// https://github.com/storybookjs/storybook/issues/12270
+ 	webpackFinal: async ( config ) => {
+@@ -35,6 +59,25 @@ module.exports = {
+ 			);
+ 		} );
+ 
++		return updateEmotionAliases( config );
++	},
++	babel: ( config ) => {
++		const getEntryIndexByName = ( type, name ) => {
++			return config[ type ].findIndex( ( entry ) => {
++				const entryName = Array.isArray( entry ) ? entry[ 0 ] : entry;
++				return entryName.includes( name );
++			} );
++		};
++
++		// Replace reference to v10 of the Babel plugin to v11.
++		const emotionPluginIndex = getEntryIndexByName(
++			'plugins',
++			'babel-plugin-emotion'
++		);
++		config.plugins[ emotionPluginIndex ] = require.resolve(
++			'@emotion/babel-plugin'
++		);
++
+ 		return config;
+ 	},
+ };
+diff --git a/test/native/jest.config.js b/test/native/jest.config.js
+index 2da93faad1859e..80d9dc1a8362f6 100644
+--- a/test/native/jest.config.js
++++ b/test/native/jest.config.js
+@@ -70,6 +70,9 @@ module.exports = {
+ 		// https://github.com/facebook/react-native/blob/HEAD/jest-preset.json#L20
+ 		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|react-clone-referenced-element))',
+ 	],
+-	snapshotSerializers: [ 'enzyme-to-json/serializer', 'jest-emotion' ],
++	snapshotSerializers: [
++		'enzyme-to-json/serializer',
++		'@emotion/jest/serializer',
++	],
+ 	reporters: [ 'default', 'jest-junit' ],
+ };
+diff --git a/test/unit/jest.config.js b/test/unit/jest.config.js
+index 84277c929d8171..0b92c014c4e336 100644
+--- a/test/unit/jest.config.js
++++ b/test/unit/jest.config.js
+@@ -36,7 +36,7 @@ module.exports = {
+ 	},
+ 	snapshotSerializers: [
+ 		'enzyme-to-json/serializer',
+-		'jest-emotion',
++		'@emotion/jest/serializer',
+ 		'snapshot-diff/serializer',
+ 	],
+ 	watchPlugins: [

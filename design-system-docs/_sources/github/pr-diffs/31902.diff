@@ -1,0 +1,1165 @@
+diff --git a/packages/components/src/alignment-matrix-control/cell.js b/packages/components/src/alignment-matrix-control/cell.js
+index 48dd339ebfc5a0..2aeb839831c0c0 100644
+--- a/packages/components/src/alignment-matrix-control/cell.js
++++ b/packages/components/src/alignment-matrix-control/cell.js
+@@ -3,7 +3,7 @@
+  */
+ import { CompositeItem } from '../composite';
+ import Tooltip from '../tooltip';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/base-control/index.js b/packages/components/src/base-control/index.js
+index aaae49a9a95da9..bbeb0a7b77bb4d 100644
+--- a/packages/components/src/base-control/index.js
++++ b/packages/components/src/base-control/index.js
+@@ -6,7 +6,7 @@ import classnames from 'classnames';
+ /**
+  * Internal dependencies
+  */
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ import {
+ 	Wrapper,
+ 	StyledField,
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.js
+index 34b30a4338beac..d610436edd39e3 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.js
+@@ -15,7 +15,7 @@ import { forwardRef } from '@wordpress/element';
+  */
+ import Tooltip from '../tooltip';
+ import Icon from '../icon';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
+ 
+diff --git a/packages/components/src/button/test/index.js b/packages/components/src/button/test/index.js
+index ea0a3257071c35..b4dc89eaaf092b 100644
+--- a/packages/components/src/button/test/index.js
++++ b/packages/components/src/button/test/index.js
+@@ -13,7 +13,7 @@ import { plusCircle } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import ButtonWithForwardedRef, { Button } from '../';
+-import VisuallyHidden from '../../visually-hidden';
++import { VisuallyHidden } from '../../visually-hidden';
+ 
+ describe( 'Button', () => {
+ 	describe( 'basic rendering', () => {
+diff --git a/packages/components/src/color-picker/hue.js b/packages/components/src/color-picker/hue.js
+index 7261b729a29477..b454712555b5c0 100644
+--- a/packages/components/src/color-picker/hue.js
++++ b/packages/components/src/color-picker/hue.js
+@@ -43,7 +43,7 @@ import { TAB } from '@wordpress/keycodes';
+  */
+ import { calculateHueChange } from './utils';
+ import KeyboardShortcuts from '../keyboard-shortcuts';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ export class Hue extends Component {
+ 	constructor() {
+diff --git a/packages/components/src/color-picker/inputs.js b/packages/components/src/color-picker/inputs.js
+index aa8d9ff7900367..eb649795047da3 100644
+--- a/packages/components/src/color-picker/inputs.js
++++ b/packages/components/src/color-picker/inputs.js
+@@ -18,7 +18,7 @@ import { chevronDown } from '@wordpress/icons';
+  */
+ import Button from '../button';
+ import TextControl from '../text-control';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ import { isValidHex } from './utils';
+ 
+ /* Wrapper for TextControl, only used to handle intermediate state while typing. */
+diff --git a/packages/components/src/color-picker/saturation.js b/packages/components/src/color-picker/saturation.js
+index 3b9666d734588f..fa0604bb11379b 100644
+--- a/packages/components/src/color-picker/saturation.js
++++ b/packages/components/src/color-picker/saturation.js
+@@ -44,7 +44,7 @@ import { compose, pure, withInstanceId } from '@wordpress/compose';
+ import { calculateSaturationChange } from './utils';
+ import Button from '../button';
+ import KeyboardShortcuts from '../keyboard-shortcuts';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ export class Saturation extends Component {
+ 	constructor( props ) {
+diff --git a/packages/components/src/color-picker/test/__snapshots__/index.js.snap b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+index 9adc7729df2928..6137b1d80a4e74 100644
+--- a/packages/components/src/color-picker/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+@@ -5,7 +5,7 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -11,36 +11,36 @@
++@@ -11,38 +11,38 @@
+           onTouchMove={[Function bound handleChange]}
+           onTouchStart={[Function bound handleChange]}
+           role="application"
+@@ -39,15 +39,17 @@ Snapshot Diff:
+             type="button"
+           />
+           <div
+-            className="components-visually-hidden"
++            className="components-visually-hidden css-1mm2cvy-View em57xhy0"
++            data-wp-c16t={true}
++            data-wp-component="VisuallyHidden"
+ -           id="color-picker-saturation-4"
+ +           id="color-picker-saturation-3"
+-          >
+-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
+-          </div>
+-        </div>
+-      </div>
+-@@ -56,11 +56,11 @@
++            style={
++              Object {
++                "WebkitClipPath": "inset( 50% )",
++                "border": 0,
++                "clip": "rect(1px, 1px, 1px, 1px)",
++@@ -73,11 +73,11 @@
+         >
+           <div
+             className="components-color-picker__active"
+@@ -60,7 +62,7 @@ Snapshot Diff:
+           />
+         </div>
+         <div
+-@@ -78,29 +78,29 @@
++@@ -95,31 +95,31 @@
+                 onMouseDown={[Function bound handleMouseDown]}
+                 onTouchMove={[Function bound handleChange]}
+                 onTouchStart={[Function bound handleChange]}
+@@ -86,15 +88,17 @@ Snapshot Diff:
+                   tabIndex="0"
+                 />
+                 <p
+-                  className="components-visually-hidden"
++                  className="components-visually-hidden css-1mm2cvy-View em57xhy0"
++                  data-wp-c16t={true}
++                  data-wp-component="VisuallyHidden"
+ -                 id="components-color-picker__hue-description-4"
+ +                 id="components-color-picker__hue-description-3"
+-                >
+-                  Move the arrow left or right to change hue.
+-                </p>
+-              </div>
+-            </div>
+-@@ -119,22 +119,22 @@
++                  style={
++                    Object {
++                      "WebkitClipPath": "inset( 50% )",
++                      "border": 0,
++                      "clip": "rect(1px, 1px, 1px, 1px)",
++@@ -153,22 +153,22 @@
+             <div
+               className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
+             >
+@@ -127,7 +131,7 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -11,36 +11,36 @@
++@@ -11,38 +11,38 @@
+           onTouchMove={[Function bound handleChange]}
+           onTouchStart={[Function bound handleChange]}
+           role="application"
+@@ -161,15 +165,17 @@ Snapshot Diff:
+             type="button"
+           />
+           <div
+-            className="components-visually-hidden"
++            className="components-visually-hidden css-1mm2cvy-View em57xhy0"
++            data-wp-c16t={true}
++            data-wp-component="VisuallyHidden"
+ -           id="color-picker-saturation-8"
+ +           id="color-picker-saturation-7"
+-          >
+-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
+-          </div>
+-        </div>
+-      </div>
+-@@ -56,11 +56,11 @@
++            style={
++              Object {
++                "WebkitClipPath": "inset( 50% )",
++                "border": 0,
++                "clip": "rect(1px, 1px, 1px, 1px)",
++@@ -73,11 +73,11 @@
+         >
+           <div
+             className="components-color-picker__active"
+@@ -182,7 +188,7 @@ Snapshot Diff:
+           />
+         </div>
+         <div
+-@@ -78,29 +78,29 @@
++@@ -95,31 +95,31 @@
+                 onMouseDown={[Function bound handleMouseDown]}
+                 onTouchMove={[Function bound handleChange]}
+                 onTouchStart={[Function bound handleChange]}
+@@ -208,15 +214,17 @@ Snapshot Diff:
+                   tabIndex="0"
+                 />
+                 <p
+-                  className="components-visually-hidden"
++                  className="components-visually-hidden css-1mm2cvy-View em57xhy0"
++                  data-wp-c16t={true}
++                  data-wp-component="VisuallyHidden"
+ -                 id="components-color-picker__hue-description-8"
+ +                 id="components-color-picker__hue-description-7"
+-                >
+-                  Move the arrow left or right to change hue.
+-                </p>
+-              </div>
+-            </div>
+-@@ -119,22 +119,22 @@
++                  style={
++                    Object {
++                      "WebkitClipPath": "inset( 50% )",
++                      "border": 0,
++                      "clip": "rect(1px, 1px, 1px, 1px)",
++@@ -153,22 +153,22 @@
+             <div
+               className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
+             >
+@@ -249,7 +257,7 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -11,36 +11,36 @@
++@@ -11,38 +11,38 @@
+           onTouchMove={[Function bound handleChange]}
+           onTouchStart={[Function bound handleChange]}
+           role="application"
+@@ -283,15 +291,17 @@ Snapshot Diff:
+             type="button"
+           />
+           <div
+-            className="components-visually-hidden"
++            className="components-visually-hidden css-1mm2cvy-View em57xhy0"
++            data-wp-c16t={true}
++            data-wp-component="VisuallyHidden"
+ -           id="color-picker-saturation-10"
+ +           id="color-picker-saturation-9"
+-          >
+-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
+-          </div>
+-        </div>
+-      </div>
+-@@ -56,11 +56,11 @@
++            style={
++              Object {
++                "WebkitClipPath": "inset( 50% )",
++                "border": 0,
++                "clip": "rect(1px, 1px, 1px, 1px)",
++@@ -73,11 +73,11 @@
+         >
+           <div
+             className="components-color-picker__active"
+@@ -304,7 +314,7 @@ Snapshot Diff:
+           />
+         </div>
+         <div
+-@@ -78,29 +78,29 @@
++@@ -95,31 +95,31 @@
+                 onMouseDown={[Function bound handleMouseDown]}
+                 onTouchMove={[Function bound handleChange]}
+                 onTouchStart={[Function bound handleChange]}
+@@ -330,15 +340,17 @@ Snapshot Diff:
+                   tabIndex="0"
+                 />
+                 <p
+-                  className="components-visually-hidden"
++                  className="components-visually-hidden css-1mm2cvy-View em57xhy0"
++                  data-wp-c16t={true}
++                  data-wp-component="VisuallyHidden"
+ -                 id="components-color-picker__hue-description-10"
+ +                 id="components-color-picker__hue-description-9"
+-                >
+-                  Move the arrow left or right to change hue.
+-                </p>
+-              </div>
+-            </div>
+-@@ -119,22 +119,22 @@
++                  style={
++                    Object {
++                      "WebkitClipPath": "inset( 50% )",
++                      "border": 0,
++                      "clip": "rect(1px, 1px, 1px, 1px)",
++@@ -153,22 +153,22 @@
+             <div
+               className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
+             >
+@@ -371,7 +383,7 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -11,36 +11,36 @@
++@@ -11,38 +11,38 @@
+           onTouchMove={[Function bound handleChange]}
+           onTouchStart={[Function bound handleChange]}
+           role="application"
+@@ -405,15 +417,17 @@ Snapshot Diff:
+             type="button"
+           />
+           <div
+-            className="components-visually-hidden"
++            className="components-visually-hidden css-1mm2cvy-View em57xhy0"
++            data-wp-c16t={true}
++            data-wp-component="VisuallyHidden"
+ -           id="color-picker-saturation-6"
+ +           id="color-picker-saturation-5"
+-          >
+-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
+-          </div>
+-        </div>
+-      </div>
+-@@ -56,11 +56,11 @@
++            style={
++              Object {
++                "WebkitClipPath": "inset( 50% )",
++                "border": 0,
++                "clip": "rect(1px, 1px, 1px, 1px)",
++@@ -73,11 +73,11 @@
+         >
+           <div
+             className="components-color-picker__active"
+@@ -426,7 +440,7 @@ Snapshot Diff:
+           />
+         </div>
+         <div
+-@@ -78,29 +78,29 @@
++@@ -95,31 +95,31 @@
+                 onMouseDown={[Function bound handleMouseDown]}
+                 onTouchMove={[Function bound handleChange]}
+                 onTouchStart={[Function bound handleChange]}
+@@ -452,15 +466,17 @@ Snapshot Diff:
+                   tabIndex="0"
+                 />
+                 <p
+-                  className="components-visually-hidden"
++                  className="components-visually-hidden css-1mm2cvy-View em57xhy0"
++                  data-wp-c16t={true}
++                  data-wp-component="VisuallyHidden"
+ -                 id="components-color-picker__hue-description-6"
+ +                 id="components-color-picker__hue-description-5"
+-                >
+-                  Move the arrow left or right to change hue.
+-                </p>
+-              </div>
+-            </div>
+-@@ -119,22 +119,22 @@
++                  style={
++                    Object {
++                      "WebkitClipPath": "inset( 50% )",
++                      "border": 0,
++                      "clip": "rect(1px, 1px, 1px, 1px)",
++@@ -153,22 +153,22 @@
+             <div
+               className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
+             >
+@@ -506,20 +522,20 @@ Snapshot Diff:
+             onKeyDown={[Function preventKeyEvents]}
+             style={
+               Object {
+-@@ -36,11 +36,11 @@
+-            }
+-            type="button"
++@@ -38,11 +38,11 @@
+           />
+           <div
+-            className="components-visually-hidden"
++            className="components-visually-hidden css-1mm2cvy-View em57xhy0"
++            data-wp-c16t={true}
++            data-wp-component="VisuallyHidden"
+ -           id="color-picker-saturation-2"
+ +           id="color-picker-saturation-1"
+-          >
+-            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
+-          </div>
+-        </div>
+-      </div>
+-@@ -78,11 +78,11 @@
++            style={
++              Object {
++                "WebkitClipPath": "inset( 50% )",
++                "border": 0,
++                "clip": "rect(1px, 1px, 1px, 1px)",
++@@ -95,11 +95,11 @@
+                 onMouseDown={[Function bound handleMouseDown]}
+                 onTouchMove={[Function bound handleChange]}
+                 onTouchStart={[Function bound handleChange]}
+@@ -532,20 +548,20 @@ Snapshot Diff:
+                   aria-valuemax="1"
+                   aria-valuemin="359"
+                   aria-valuenow={0}
+-@@ -96,11 +96,11 @@
+-                  }
+-                  tabIndex="0"
++@@ -115,11 +115,11 @@
+                 />
+                 <p
+-                  className="components-visually-hidden"
++                  className="components-visually-hidden css-1mm2cvy-View em57xhy0"
++                  data-wp-c16t={true}
++                  data-wp-component="VisuallyHidden"
+ -                 id="components-color-picker__hue-description-2"
+ +                 id="components-color-picker__hue-description-1"
+-                >
+-                  Move the arrow left or right to change hue.
+-                </p>
+-              </div>
+-            </div>
+-@@ -119,22 +119,22 @@
++                  style={
++                    Object {
++                      "WebkitClipPath": "inset( 50% )",
++                      "border": 0,
++                      "clip": "rect(1px, 1px, 1px, 1px)",
++@@ -153,22 +153,22 @@
+             <div
+               className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
+             >
+@@ -574,20 +590,20 @@ Snapshot Diff:
+ `;
+ 
+ exports[`ColorPicker should render color picker 1`] = `
+-.emotion-0 {
++.emotion-4 {
+   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+   font-size: 13px;
+ }
+ 
+-.emotion-2 {
++.emotion-6 {
+   margin-bottom: calc(4px * 2);
+ }
+ 
+-.components-panel__row .emotion-2 {
++.components-panel__row .emotion-6 {
+   margin-bottom: inherit;
+ }
+ 
+-.emotion-4 {
++.emotion-8 {
+   display: inline-block;
+   margin-bottom: calc(4px * 2);
+ }
+@@ -631,8 +647,25 @@ exports[`ColorPicker should render color picker 1`] = `
+           type="button"
+         />
+         <div
+-          className="components-visually-hidden"
++          className="components-visually-hidden emotion-0 emotion-1"
++          data-wp-c16t={true}
++          data-wp-component="VisuallyHidden"
+           id="color-picker-saturation-0"
++          style={
++            Object {
++              "WebkitClipPath": "inset( 50% )",
++              "border": 0,
++              "clip": "rect(1px, 1px, 1px, 1px)",
++              "clipPath": "inset( 50% )",
++              "height": "1px",
++              "margin": "-1px",
++              "overflow": "hidden",
++              "padding": 0,
++              "position": "absolute",
++              "width": "1px",
++              "wordWrap": "normal",
++            }
++          }
+         >
+           Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
+         </div>
+@@ -691,8 +724,25 @@ exports[`ColorPicker should render color picker 1`] = `
+                 tabIndex="0"
+               />
+               <p
+-                className="components-visually-hidden"
++                className="components-visually-hidden emotion-0 emotion-1"
++                data-wp-c16t={true}
++                data-wp-component="VisuallyHidden"
+                 id="components-color-picker__hue-description-0"
++                style={
++                  Object {
++                    "WebkitClipPath": "inset( 50% )",
++                    "border": 0,
++                    "clip": "rect(1px, 1px, 1px, 1px)",
++                    "clipPath": "inset( 50% )",
++                    "height": "1px",
++                    "margin": "-1px",
++                    "overflow": "hidden",
++                    "padding": 0,
++                    "position": "absolute",
++                    "width": "1px",
++                    "wordWrap": "normal",
++                  }
++                }
+               >
+                 Move the arrow left or right to change hue.
+               </p>
+@@ -708,13 +758,13 @@ exports[`ColorPicker should render color picker 1`] = `
+         className="components-color-picker__inputs-fields"
+       >
+         <div
+-          className="components-base-control components-color-picker__inputs-field emotion-0 emotion-1"
++          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
+         >
+           <div
+-            className="components-base-control__field emotion-2 emotion-3"
++            className="components-base-control__field emotion-6 emotion-7"
+           >
+             <label
+-              className="components-base-control__label emotion-4 emotion-5"
++              className="components-base-control__label emotion-8 emotion-9"
+               htmlFor="inspector-text-control-0"
+             >
+               Color value in hexadecimal
+diff --git a/packages/components/src/custom-gradient-bar/control-points.js b/packages/components/src/custom-gradient-bar/control-points.js
+index 0fc6076dd4e356..e5edfc88820144 100644
+--- a/packages/components/src/custom-gradient-bar/control-points.js
++++ b/packages/components/src/custom-gradient-bar/control-points.js
+@@ -18,7 +18,7 @@ import Button from '../button';
+ import ColorPicker from '../color-picker';
+ import Dropdown from '../dropdown';
+ import KeyboardShortcuts from '../keyboard-shortcuts';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ import {
+ 	addControlPoint,
+diff --git a/packages/components/src/external-link/index.js b/packages/components/src/external-link/index.js
+index 14b11492e4fb7f..45c2e403f14c4e 100644
+--- a/packages/components/src/external-link/index.js
++++ b/packages/components/src/external-link/index.js
+@@ -14,7 +14,7 @@ import { external } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ import { StyledIcon } from './styles/external-link-styles';
+ 
+ export function ExternalLink(
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 9acb94e06890de..1f8bf8e02b06bd 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -17,7 +17,7 @@ import Button from '../button';
+ import RangeControl from '../range-control';
+ import { default as UnitControl, useCustomUnits } from '../unit-control';
+ import CustomSelectControl from '../custom-select-control';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ const DEFAULT_FONT_SIZE = 'default';
+ const CUSTOM_FONT_SIZE = 'custom';
+diff --git a/packages/components/src/form-token-field/token.js b/packages/components/src/form-token-field/token.js
+index bf6f9d814635c4..fb34d9d20d8cbc 100644
+--- a/packages/components/src/form-token-field/token.js
++++ b/packages/components/src/form-token-field/token.js
+@@ -15,7 +15,7 @@ import { closeSmall } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import Button from '../button';
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ export default function Token( {
+ 	value,
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index b114267b92909f..86d40d1db38fb9 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -147,7 +147,7 @@ export {
+ 	useCustomUnits as __experimentalUseCustomUnits,
+ 	parseUnit as __experimentalParseUnit,
+ } from './unit-control';
+-export { default as VisuallyHidden } from './visually-hidden';
++export { VisuallyHidden } from './visually-hidden';
+ export { VStack as __experimentalVStack } from './v-stack';
+ export { default as IsolatedEventContainer } from './isolated-event-container';
+ export {
+diff --git a/packages/components/src/input-control/label.js b/packages/components/src/input-control/label.js
+index c02dd57f9f770f..1c5888fa965128 100644
+--- a/packages/components/src/input-control/label.js
++++ b/packages/components/src/input-control/label.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import VisuallyHidden from '../visually-hidden';
++import { VisuallyHidden } from '../visually-hidden';
+ import { Label as BaseLabel } from './styles/input-control-styles';
+ 
+ export default function Label( {
+diff --git a/packages/components/src/navigation/menu/menu-title-search.js b/packages/components/src/navigation/menu/menu-title-search.js
+index 8af2f4635990dc..dec922098bf87d 100644
+--- a/packages/components/src/navigation/menu/menu-title-search.js
++++ b/packages/components/src/navigation/menu/menu-title-search.js
+@@ -15,7 +15,7 @@ import { ESCAPE } from '@wordpress/keycodes';
+  * Internal dependencies
+  */
+ import Button from '../../button';
+-import VisuallyHidden from '../../visually-hidden';
++import { VisuallyHidden } from '../../visually-hidden';
+ import withSpokenMessages from '../../higher-order/with-spoken-messages';
+ import { useNavigationMenuContext } from './context';
+ import { useNavigationContext } from '../context';
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 21f13e7d492f55..22ae2fb4779954 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -47,4 +47,3 @@
+ @import "./toolbar-button/style.scss";
+ @import "./toolbar-group/style.scss";
+ @import "./tooltip/style.scss";
+-@import "./visually-hidden/style.scss";
+diff --git a/packages/components/src/ui/form-group/form-group-label.js b/packages/components/src/ui/form-group/form-group-label.js
+index b39f000916a5ff..8d6c282018cad8 100644
+--- a/packages/components/src/ui/form-group/form-group-label.js
++++ b/packages/components/src/ui/form-group/form-group-label.js
+@@ -7,7 +7,7 @@ import { memo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { ControlLabel } from '../control-label';
+-import VisuallyHidden from '../../visually-hidden';
++import { VisuallyHidden } from '../../visually-hidden';
+ 
+ /**
+  * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupLabelProps, 'label'>} props
+@@ -18,7 +18,7 @@ function FormGroupLabel( { children, id, labelHidden = false, ...props } ) {
+ 
+ 	if ( labelHidden ) {
+ 		return (
+-			<VisuallyHidden as="label" htmlFor={ id }>
++			<VisuallyHidden as="label" htmlFor={ id?.toString() }>
+ 				{ children }
+ 			</VisuallyHidden>
+ 		);
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index be51b3ca56cc92..e8587d84b298ad 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -3,4 +3,3 @@ export * from './control-label';
+ export * from './form-group';
+ export * from './shortcut';
+ export * from './spinner';
+-export * from './visually-hidden';
+diff --git a/packages/components/src/ui/visually-hidden/component.js b/packages/components/src/ui/visually-hidden/component.js
+deleted file mode 100644
+index 6912caa4e08433..00000000000000
+--- a/packages/components/src/ui/visually-hidden/component.js
++++ /dev/null
+@@ -1,31 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { createComponent } from '../utils';
+-import { useVisuallyHidden } from './hook';
+-
+-/**
+- * `VisuallyHidden` is a component used to render text intended to be visually
+- * hidden, but will show for alternate devices, for example a screen reader.
+- *
+- * @example
+- * ```jsx
+- * import { View, VisuallyHidden } from `@wordpress/components/ui`;
+- *
+- * function Example() {
+- * 	return (
+- * 		<VisuallyHidden>
+- * 			<View as="label">Code is Poetry</View>
+- * 		</VisuallyHidden>
+- * 	);
+- * }
+- * ```
+- */
+-
+-const VisuallyHidden = createComponent( {
+-	as: 'div',
+-	useHook: useVisuallyHidden,
+-	name: 'VisuallyHidden',
+-} );
+-
+-export default VisuallyHidden;
+diff --git a/packages/components/src/ui/visually-hidden/hook.js b/packages/components/src/ui/visually-hidden/hook.js
+deleted file mode 100644
+index 4ec0c056d4b490..00000000000000
+--- a/packages/components/src/ui/visually-hidden/hook.js
++++ /dev/null
+@@ -1,26 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import * as styles from './styles';
+-import { useCx } from '../../utils/hooks/use-cx';
+-
+-// duplicate this for the sake of being able to export it, it'll be removed when we replace VisuallyHidden in components/src anyway
+-/** @typedef {import('../context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} Props */
+-
+-/**
+- * @param {import('../context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+- */
+-export function useVisuallyHidden( { className, ...props } ) {
+-	// circumvent the context system and write the classnames ourselves
+-	const cx = useCx();
+-	const classes = cx(
+-		'components-visually-hidden wp-components-visually-hidden',
+-		className,
+-		styles.VisuallyHidden
+-	);
+-
+-	return {
+-		className: classes,
+-		...props,
+-	};
+-}
+diff --git a/packages/components/src/ui/visually-hidden/index.js b/packages/components/src/ui/visually-hidden/index.js
+deleted file mode 100644
+index 8bbed8b73ac9eb..00000000000000
+--- a/packages/components/src/ui/visually-hidden/index.js
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export { default as VisuallyHidden } from './component';
+-export * from './hook';
+diff --git a/packages/components/src/ui/visually-hidden/stories/index.js b/packages/components/src/ui/visually-hidden/stories/index.js
+deleted file mode 100644
+index b5f55c1fa1d24d..00000000000000
+--- a/packages/components/src/ui/visually-hidden/stories/index.js
++++ /dev/null
+@@ -1,42 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { VisuallyHidden } from '..';
+-
+-export default {
+-	title: 'G2 Components (Experimental)/VisuallyHidden',
+-	component: VisuallyHidden,
+-};
+-
+-export const _default = () => (
+-	<>
+-		<VisuallyHidden>This should not show.</VisuallyHidden>
+-		<div>
+-			This text will{ ' ' }
+-			<VisuallyHidden as="span">but not inline </VisuallyHidden> always
+-			show.
+-		</div>
+-	</>
+-);
+-
+-export const withForwardedProps = () => (
+-	<>
+-		Additional props can be passed to VisuallyHidden and are forwarded to
+-		the rendered element.{ ' ' }
+-		<VisuallyHidden as="span" data-id="test">
+-			Check out my data attribute!{ ' ' }
+-		</VisuallyHidden>
+-		Inspect the HTML to see!
+-	</>
+-);
+-
+-export const withAdditionalClassNames = () => (
+-	<>
+-		Additional class names passed to VisuallyHidden extend the component
+-		class name.{ ' ' }
+-		<VisuallyHidden as="label" className="test-input">
+-			Check out my class!{ ' ' }
+-		</VisuallyHidden>
+-		Inspect the HTML to see!
+-	</>
+-);
+diff --git a/packages/components/src/ui/visually-hidden/styles.js b/packages/components/src/ui/visually-hidden/styles.js
+deleted file mode 100644
+index 2067f169aea909..00000000000000
+--- a/packages/components/src/ui/visually-hidden/styles.js
++++ /dev/null
+@@ -1,40 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { css } from '@emotion/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { COLORS } from '../../utils/colors-values';
+-
+-export const VisuallyHidden = css`
+-	border: 0;
+-	clip: rect( 1px, 1px, 1px, 1px );
+-	-webkit-clip-path: inset( 50% );
+-	clip-path: inset( 50% );
+-	height: 1px;
+-	margin: -1px;
+-	overflow: hidden;
+-	padding: 0;
+-	position: absolute;
+-	width: 1px;
+-	word-wrap: normal !important;
+-
+-	&:focus {
+-		background-color: ${ COLORS.lightGray[ '300' ] };
+-		clip: auto !important;
+-		clip-path: none;
+-		color: #444;
+-		display: block;
+-		font-size: 1em;
+-		height: auto;
+-		left: 5px;
+-		line-height: normal;
+-		padding: 15px 23px 14px;
+-		text-decoration: none;
+-		top: 5px;
+-		width: auto;
+-		z-index: 100000;
+-	}
+-`;
+diff --git a/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap b/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap
+deleted file mode 100644
+index 9e064e5e1fbe03..00000000000000
+--- a/packages/components/src/ui/visually-hidden/test/__snapshots__/index.js.snap
++++ /dev/null
+@@ -1,43 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`VisuallyHidden should render correctly 1`] = `
+-.emotion-0 {
+-  border: 0;
+-  clip: rect( 1px, 1px, 1px, 1px );
+-  -webkit-clip-path: inset( 50% );
+-  -webkit-clip-path: inset( 50% );
+-  clip-path: inset( 50% );
+-  height: 1px;
+-  margin: -1px;
+-  overflow: hidden;
+-  padding: 0;
+-  position: absolute;
+-  width: 1px;
+-  word-wrap: normal!important;
+-}
+-
+-.emotion-0:focus {
+-  background-color: #edeff0;
+-  clip: auto!important;
+-  -webkit-clip-path: none;
+-  clip-path: none;
+-  color: #444;
+-  display: block;
+-  font-size: 1em;
+-  height: auto;
+-  left: 5px;
+-  line-height: normal;
+-  padding: 15px 23px 14px;
+-  -webkit-text-decoration: none;
+-  text-decoration: none;
+-  top: 5px;
+-  width: auto;
+-  z-index: 100000;
+-}
+-
+-<div
+-  class="components-visually-hidden wp-components-visually-hidden emotion-0 emotion-1"
+->
+-  This is hidden
+-</div>
+-`;
+diff --git a/packages/components/src/visually-hidden/README.md b/packages/components/src/visually-hidden/README.md
+index 1f490f5134af26..9da03aeeb3b7b8 100644
+--- a/packages/components/src/visually-hidden/README.md
++++ b/packages/components/src/visually-hidden/README.md
+@@ -1,9 +1,17 @@
+ # VisuallyHidden
+ 
+-A component used to render text intended to be visually hidden, but will show for alternate devices, for example a screen reader.
++`VisuallyHidden` is a component used to render text intended to be visually hidden, but will show for alternate devices, for example a screen reader.
+ 
+-### Usage
++## Usage
+ 
+ ```jsx
+-<VisuallyHidden> Show text for screenreader. </VisuallyHidden>
++import { VisuallyHidden } from '@wordpress/components';
++
++function Example() {
++	return (
++		<VisuallyHidden>
++			<label>Code is Poetry</label>
++		</VisuallyHidden>
++	);
++}
+ ```
+diff --git a/packages/components/src/visually-hidden/component.js b/packages/components/src/visually-hidden/component.js
+new file mode 100644
+index 00000000000000..01b9e65ddc5119
+--- /dev/null
++++ b/packages/components/src/visually-hidden/component.js
+@@ -0,0 +1,48 @@
++/**
++ * Internal dependencies
++ */
++import { useContextSystem, contextConnect } from '../ui/context';
++import { visuallyHidden } from './styles';
++import { View } from '../view';
++
++/**
++ * @param {import('../ui/context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
++ * @param {import('react').Ref<any>}                                                                          forwardedRef
++ */
++function VisuallyHidden( props, forwardedRef ) {
++	const { style: styleProp, ...contextProps } = useContextSystem(
++		props,
++		'VisuallyHidden'
++	);
++	return (
++		<View
++			ref={ forwardedRef }
++			{ ...contextProps }
++			style={ { ...visuallyHidden, ...( styleProp || {} ) } }
++		/>
++	);
++}
++
++/**
++ * `VisuallyHidden` is a component used to render text intended to be visually
++ * hidden, but will show for alternate devices, for example a screen reader.
++ *
++ * @example
++ * ```jsx
++ * import { VisuallyHidden } from `@wordpress/components`;
++ *
++ * function Example() {
++ * 	return (
++ * 		<VisuallyHidden>
++ * 			<label>Code is Poetry</label>
++ * 		</VisuallyHidden>
++ * 	);
++ * }
++ * ```
++ */
++const ConnectedVisuallyHidden = contextConnect(
++	VisuallyHidden,
++	'VisuallyHidden'
++);
++
++export default ConnectedVisuallyHidden;
+diff --git a/packages/components/src/visually-hidden/index.js b/packages/components/src/visually-hidden/index.js
+index d320002f4fa27d..4b0eb62431163f 100644
+--- a/packages/components/src/visually-hidden/index.js
++++ b/packages/components/src/visually-hidden/index.js
+@@ -1,45 +1 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { renderAsRenderProps } from './utils';
+-
+-/**
+- * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+- * @typedef OwnProps
+- * @property {T} [as='div'] Component to render, e.g. `"div"` or `MyComponent`.
+- */
+-
+-/**
+- * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+- * @typedef {OwnProps<T> & import('react').ComponentPropsWithRef<T>} Props
+- */
+-
+-/**
+- * VisuallyHidden component to render text out non-visually
+- * for use in devices such as a screen reader.
+- *
+- * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+- * @param {Props<T>}                 props
+- * @param {import('react').Ref<any>} forwardedRef
+- * @return {JSX.Element} Element
+- */
+-function VisuallyHidden( { as = 'div', className, ...props }, forwardedRef ) {
+-	return renderAsRenderProps( {
+-		as,
+-		className: classnames( 'components-visually-hidden', className ),
+-		...props,
+-		ref: forwardedRef,
+-	} );
+-}
+-
+-export default forwardRef( VisuallyHidden );
++export { default as VisuallyHidden } from './component';
+diff --git a/packages/components/src/visually-hidden/stories/index.js b/packages/components/src/visually-hidden/stories/index.js
+index 74cea0d833eb2d..497fb0c2ab23d8 100644
+--- a/packages/components/src/visually-hidden/stories/index.js
++++ b/packages/components/src/visually-hidden/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import VisuallyHidden from '..';
++import { VisuallyHidden } from '..';
+ 
+ export default {
+ 	title: 'Components/VisuallyHidden',
+diff --git a/packages/components/src/visually-hidden/style.scss b/packages/components/src/visually-hidden/style.scss
+deleted file mode 100644
+index 8c8d8472d57793..00000000000000
+--- a/packages/components/src/visually-hidden/style.scss
++++ /dev/null
+@@ -1,30 +0,0 @@
+-.components-visually-hidden {
+-	border: 0;
+-	clip: rect(1px, 1px, 1px, 1px);
+-	-webkit-clip-path: inset(50%);
+-	clip-path: inset(50%);
+-	height: 1px;
+-	margin: -1px;
+-	overflow: hidden;
+-	padding: 0;
+-	position: absolute;
+-	width: 1px;
+-	word-wrap: normal !important;
+-}
+-
+-.components-visually-hidden:focus {
+-	background-color: $gray-300;
+-	clip: auto !important;
+-	clip-path: none;
+-	color: #444;
+-	display: block;
+-	font-size: 1em;
+-	height: auto;
+-	left: 5px;
+-	line-height: normal;
+-	padding: 15px 23px 14px;
+-	text-decoration: none;
+-	top: 5px;
+-	width: auto;
+-	z-index: 100000;
+-}
+diff --git a/packages/components/src/visually-hidden/styles.js b/packages/components/src/visually-hidden/styles.js
+new file mode 100644
+index 00000000000000..d061df7d46e963
+--- /dev/null
++++ b/packages/components/src/visually-hidden/styles.js
+@@ -0,0 +1,14 @@
++/** @type {import('react').CSSProperties} */
++export const visuallyHidden = {
++	border: 0,
++	clip: 'rect(1px, 1px, 1px, 1px)',
++	WebkitClipPath: 'inset( 50% )',
++	clipPath: 'inset( 50% )',
++	height: '1px',
++	margin: '-1px',
++	overflow: 'hidden',
++	padding: 0,
++	position: 'absolute',
++	width: '1px',
++	wordWrap: 'normal',
++};
+diff --git a/packages/components/src/visually-hidden/test/__snapshots__/index.js.snap b/packages/components/src/visually-hidden/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..5c045e322e756d
+--- /dev/null
++++ b/packages/components/src/visually-hidden/test/__snapshots__/index.js.snap
+@@ -0,0 +1,12 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`VisuallyHidden should render correctly 1`] = `
++<div
++  class="components-visually-hidden emotion-0 emotion-1"
++  data-wp-c16t="true"
++  data-wp-component="VisuallyHidden"
++  style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal;"
++>
++  This is hidden
++</div>
++`;
+diff --git a/packages/components/src/ui/visually-hidden/test/index.js b/packages/components/src/visually-hidden/test/index.js
+similarity index 100%
+rename from packages/components/src/ui/visually-hidden/test/index.js
+rename to packages/components/src/visually-hidden/test/index.js
+diff --git a/packages/components/src/visually-hidden/utils.js b/packages/components/src/visually-hidden/utils.js
+deleted file mode 100644
+index d5eabd100461cc..00000000000000
+--- a/packages/components/src/visually-hidden/utils.js
++++ /dev/null
+@@ -1,31 +0,0 @@
+-/**
+- * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+- * @typedef OwnProps
+- * @property {T}                                                                                        [as='div'] Component to render
+- * @property {import('react').ReactNode | ((props: import('react').ComponentProps<T>) => JSX.Element) } [children] Children or render props function
+- */
+-
+-/**
+- * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+- * @typedef {OwnProps<T> & import('react').ComponentProps<T>} Props
+- */
+-
+-/**
+- * renderAsRenderProps is used to wrap a component and convert
+- * the passed property "as" either a string or component, to the
+- * rendered tag if a string, or component.
+- *
+- * See VisuallyHidden hidden for example.
+- *
+- * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+- * @param {Props<T>} props
+- * @return {JSX.Element} The rendered element.
+- */
+-function renderAsRenderProps( { as: Component = 'div', ...props } ) {
+-	if ( typeof props.children === 'function' ) {
+-		return props.children( props );
+-	}
+-	return <Component { ...props } />;
+-}
+-
+-export { renderAsRenderProps };
+diff --git a/packages/editor/src/components/post-preview-button/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-preview-button/test/__snapshots__/index.js.snap
+index 344b2edd013c95..77951af0f8eff5 100644
+--- a/packages/editor/src/components/post-preview-button/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-preview-button/test/__snapshots__/index.js.snap
+@@ -10,11 +10,11 @@ exports[`PostPreviewButton render() should render currentPostLink otherwise 1`]
+   variant="tertiary"
+ >
+   Preview
+-  <ForwardRef(VisuallyHidden)
++  <VisuallyHidden
+     as="span"
+   >
+     (opens in a new tab)
+-  </ForwardRef(VisuallyHidden)>
++  </VisuallyHidden>
+ </ForwardRef(Button)>
+ `;
+ 
+@@ -28,10 +28,10 @@ exports[`PostPreviewButton render() should render previewLink if provided 1`] =
+   variant="tertiary"
+ >
+   Preview
+-  <ForwardRef(VisuallyHidden)
++  <VisuallyHidden
+     as="span"
+   >
+     (opens in a new tab)
+-  </ForwardRef(VisuallyHidden)>
++  </VisuallyHidden>
+ </ForwardRef(Button)>
+ `;

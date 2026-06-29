@@ -1,0 +1,42 @@
+diff --git a/packages/components/src/base-control/style.scss b/packages/components/src/base-control/style.scss
+deleted file mode 100644
+index 89a94a045873c1..00000000000000
+--- a/packages/components/src/base-control/style.scss
++++ /dev/null
+@@ -1,24 +0,0 @@
+-.components-base-control {
+-	font-family: $default-font;
+-	font-size: $default-font-size;
+-
+-	.components-base-control__field {
+-		margin-bottom: $grid-unit-10;
+-
+-		.components-panel__row & {
+-			margin-bottom: inherit;
+-		}
+-	}
+-
+-	.components-base-control__label {
+-		display: inline-block;
+-		margin-bottom: $grid-unit-10;
+-	}
+-
+-	.components-base-control__help {
+-		margin-top: -$grid-unit-10;
+-		font-size: $helptext-font-size;
+-		font-style: normal;
+-		color: $gray-700;
+-	}
+-}
+diff --git a/packages/components/src/base-control/styles/base-control-styles.js b/packages/components/src/base-control/styles/base-control-styles.js
+index c1dcbb1cb659db..d175554989177f 100644
+--- a/packages/components/src/base-control/styles/base-control-styles.js
++++ b/packages/components/src/base-control/styles/base-control-styles.js
+@@ -27,7 +27,6 @@ export const StyledLabel = styled.label`
+ `;
+ 
+ export const StyledHelp = styled.p`
+-	margin-top: -${ space( 1 ) };
+ 	font-size: ${ font( 'helpText.fontSize' ) };
+ 	font-style: normal;
+ 	color: ${ color( 'mediumGray.text' ) };

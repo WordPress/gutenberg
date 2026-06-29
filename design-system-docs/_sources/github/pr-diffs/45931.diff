@@ -1,0 +1,182 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2e47db6c778689..84aecaedd51f3c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
++-   `InputControl`, `NumberControl`, `UnitControl`: Add `help` prop for additional description ([#45931](https://github.com/WordPress/gutenberg/pull/45931)).
+ 
+ ## 22.1.0 (2022-11-16)
+ 
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index ee6ab9e0d1334a..b1586995caa54e 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -18,6 +18,7 @@ import InputField from './input-field';
+ import type { InputControlProps } from './types';
+ import { space } from '../ui/utils/space';
+ import { useDraft } from './utils';
++import BaseControl from '../base-control';
+ 
+ const noop = () => {};
+ 
+@@ -35,6 +36,7 @@ export function UnforwardedInputControl(
+ 		__unstableInputWidth,
+ 		className,
+ 		disabled = false,
++		help,
+ 		hideLabelFromVision = false,
+ 		id: idProp,
+ 		isPressEnterToChange = false,
+@@ -63,43 +65,55 @@ export function UnforwardedInputControl(
+ 		onChange,
+ 	} );
+ 
++	// ARIA descriptions can only contain plain text, so fall back to aria-details if not.
++	const helpPropName =
++		typeof help === 'string' ? 'aria-describedby' : 'aria-details';
++	const helpProp = !! help ? { [ helpPropName ]: `${ id }__help` } : {};
++
+ 	return (
+-		<InputBase
+-			__next36pxDefaultSize={ __next36pxDefaultSize }
+-			__unstableInputWidth={ __unstableInputWidth }
++		<BaseControl
+ 			className={ classes }
+-			disabled={ disabled }
+-			gap={ 3 }
+-			hideLabelFromVision={ hideLabelFromVision }
++			help={ help }
+ 			id={ id }
+-			isFocused={ isFocused }
+-			justify="left"
+-			label={ label }
+-			labelPosition={ labelPosition }
+-			prefix={ prefix }
+-			size={ size }
+-			style={ style }
+-			suffix={ suffix }
++			__nextHasNoMarginBottom
+ 		>
+-			<InputField
+-				{ ...props }
++			<InputBase
+ 				__next36pxDefaultSize={ __next36pxDefaultSize }
+-				className="components-input-control__input"
++				__unstableInputWidth={ __unstableInputWidth }
+ 				disabled={ disabled }
++				gap={ 3 }
++				hideLabelFromVision={ hideLabelFromVision }
+ 				id={ id }
+ 				isFocused={ isFocused }
+-				isPressEnterToChange={ isPressEnterToChange }
+-				onKeyDown={ onKeyDown }
+-				onValidate={ onValidate }
+-				paddingInlineStart={ prefix ? space( 2 ) : undefined }
+-				paddingInlineEnd={ suffix ? space( 2 ) : undefined }
+-				ref={ ref }
+-				setIsFocused={ setIsFocused }
++				justify="left"
++				label={ label }
++				labelPosition={ labelPosition }
++				prefix={ prefix }
+ 				size={ size }
+-				stateReducer={ stateReducer }
+-				{ ...draftHookProps }
+-			/>
+-		</InputBase>
++				style={ style }
++				suffix={ suffix }
++			>
++				<InputField
++					{ ...props }
++					{ ...helpProp }
++					__next36pxDefaultSize={ __next36pxDefaultSize }
++					className="components-input-control__input"
++					disabled={ disabled }
++					id={ id }
++					isFocused={ isFocused }
++					isPressEnterToChange={ isPressEnterToChange }
++					onKeyDown={ onKeyDown }
++					onValidate={ onValidate }
++					paddingInlineStart={ prefix ? space( 2 ) : undefined }
++					paddingInlineEnd={ suffix ? space( 2 ) : undefined }
++					ref={ ref }
++					setIsFocused={ setIsFocused }
++					size={ size }
++					stateReducer={ stateReducer }
++					{ ...draftHookProps }
++				/>
++			</InputBase>
++		</BaseControl>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/input-control/stories/index.tsx b/packages/components/src/input-control/stories/index.tsx
+index 3199e42e630318..031711a173c18e 100644
+--- a/packages/components/src/input-control/stories/index.tsx
++++ b/packages/components/src/input-control/stories/index.tsx
+@@ -40,6 +40,12 @@ Default.args = {
+ 	placeholder: 'Placeholder',
+ };
+ 
++export const WithHelpText = Template.bind( {} );
++WithHelpText.args = {
++	...Default.args,
++	help: 'Help text to describe the control.',
++};
++
+ /**
+  * A `prefix` can be inserted before the input. By default, the prefix is aligned with the edge of the input border,
+  * with no padding. If you want to apply standard padding in accordance with the size variant, use the provided
+diff --git a/packages/components/src/input-control/test/index.js b/packages/components/src/input-control/test/index.js
+index 97878838dc41ab..dd3e8dddb957e1 100644
+--- a/packages/components/src/input-control/test/index.js
++++ b/packages/components/src/input-control/test/index.js
+@@ -50,6 +50,24 @@ describe( 'InputControl', () => {
+ 
+ 			expect( input ).toBeInTheDocument();
+ 		} );
++
++		it( 'should render help text as description', () => {
++			render( <InputControl help="My help text" /> );
++			expect(
++				screen.getByRole( 'textbox', { description: 'My help text' } )
++			).toBeInTheDocument();
++		} );
++
++		it( 'should render help as aria-details when not plain text', () => {
++			render( <InputControl help={ <a href="/foo">My help text</a> } /> );
++
++			const input = screen.getByRole( 'textbox' );
++			const help = screen.getByRole( 'link', { name: 'My help text' } );
++
++			expect(
++				help.closest( `#${ input.getAttribute( 'aria-details' ) }` )
++			).toBeVisible();
++		} );
+ 	} );
+ 
+ 	describe( 'Ensurance of focus for number inputs', () => {
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index db9fe4b75cb42b..dbbc0567b3d158 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -15,6 +15,7 @@ import type { useDrag } from '@use-gesture/react';
+ import type { StateReducer } from './reducer/state';
+ import type { WordPressComponentProps } from '../ui/context';
+ import type { FlexProps } from '../flex/types';
++import type { BaseControlProps } from '../base-control/types';
+ 
+ export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge';
+ 
+@@ -171,6 +172,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
+ 
+ export interface InputControlProps
+ 	extends Omit< InputBaseProps, 'children' | 'isFocused' | keyof FlexProps >,
++		Pick< BaseControlProps, 'help' >,
+ 		/**
+ 		 * The `prefix` prop in `WordPressComponentProps< InputFieldProps, 'input', false >` comes from the
+ 		 * `HTMLInputAttributes` and clashes with the one from `InputBaseProps`. So we have to omit it from

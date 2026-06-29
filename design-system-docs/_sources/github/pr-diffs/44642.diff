@@ -1,0 +1,577 @@
+diff --git a/package-lock.json b/package-lock.json
+index 9986f336b11f78..b24be033327c02 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -17499,7 +17499,8 @@
+ 				"reakit": "^1.3.8",
+ 				"remove-accents": "^0.4.2",
+ 				"use-lilius": "^2.0.1",
+-				"uuid": "^8.3.0"
++				"uuid": "^8.3.0",
++				"valtio": "^1.7.0"
+ 			},
+ 			"dependencies": {
+ 				"date-fns": {
+@@ -25906,7 +25907,7 @@
+ 		"array-ify": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/array-ify/-/array-ify-1.0.0.tgz",
+-			"integrity": "sha512-c5AMf34bKdvPhQ7tBGhqkgKNUzMr4WUs+WDtC2ZUGOUncbxKMTvqxYctiseW3+L4bA8ec+GcZ6/A/FW4m8ukng==",
++			"integrity": "sha1-nlKHYrSpBmrRY6aWKjZEGOlibs4=",
+ 			"dev": true
+ 		},
+ 		"array-includes": {
+@@ -31438,7 +31439,7 @@
+ 		"debuglog": {
+ 			"version": "1.0.1",
+ 			"resolved": "https://registry.npmjs.org/debuglog/-/debuglog-1.0.1.tgz",
+-			"integrity": "sha512-syBZ+rnAK3EgMsH2aYEOLUW7mZSY9Gb+0wUMCFsZvcmiz+HigA0LOcq/HoQqVuGG+EKykunc7QG2bzrponfaSw==",
++			"integrity": "sha1-qiT/uaw9+aI1GDfPstJ5NgzXhJI=",
+ 			"dev": true
+ 		},
+ 		"decache": {
+@@ -36343,7 +36344,7 @@
+ 		"git-remote-origin-url": {
+ 			"version": "2.0.0",
+ 			"resolved": "https://registry.npmjs.org/git-remote-origin-url/-/git-remote-origin-url-2.0.0.tgz",
+-			"integrity": "sha512-eU+GGrZgccNJcsDH5LkXR3PB9M958hxc7sbA8DFJjrv9j4L2P/eZfKhM+QD6wyzpiv+b1BpK0XrYCxkovtjSLw==",
++			"integrity": "sha1-UoJlna4hBxRaERJhEq0yFuxfpl8=",
+ 			"dev": true,
+ 			"requires": {
+ 				"gitconfiglocal": "^1.0.0",
+@@ -36390,7 +36391,7 @@
+ 		"gitconfiglocal": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/gitconfiglocal/-/gitconfiglocal-1.0.0.tgz",
+-			"integrity": "sha512-spLUXeTAVHxDtKsJc8FkFVgFtMdEN9qPGpL23VfSHx4fP4+Ds097IXLvymbnDH8FnmxX5Nr9bPw3A+AQ6mWEaQ==",
++			"integrity": "sha1-QdBF84UaXqiPA/JMocYXgRRGS5s=",
+ 			"dev": true,
+ 			"requires": {
+ 				"ini": "^1.3.2"
+@@ -37580,7 +37581,7 @@
+ 		"humanize-ms": {
+ 			"version": "1.2.1",
+ 			"resolved": "https://registry.npmjs.org/humanize-ms/-/humanize-ms-1.2.1.tgz",
+-			"integrity": "sha512-Fl70vYtsAFb/C06PTS9dZBo7ihau+Tu/DNCk/OyHhea07S+aeMWpFFkUaXRa8fI+ScZbEI8dfSxwY7gxZ9SAVQ==",
++			"integrity": "sha1-xG4xWaKT9riW2ikxbYtv6Lt5u+0=",
+ 			"dev": true,
+ 			"requires": {
+ 				"ms": "^2.0.0"
+@@ -38597,7 +38598,7 @@
+ 		"is-text-path": {
+ 			"version": "1.0.1",
+ 			"resolved": "https://registry.npmjs.org/is-text-path/-/is-text-path-1.0.1.tgz",
+-			"integrity": "sha512-xFuJpne9oFz5qDaodwmmG08e3CawH/2ZV8Qqza1Ko7Sk8POWbkRdwIoAWVhqvq0XeUzANEhKo2n0IXUGBm7A/w==",
++			"integrity": "sha1-Thqg+1G/vLPpJogAE5cgLBd1tm4=",
+ 			"dev": true,
+ 			"requires": {
+ 				"text-extensions": "^1.0.0"
+@@ -42348,7 +42349,7 @@
+ 		"jsonparse": {
+ 			"version": "1.3.1",
+ 			"resolved": "https://registry.npmjs.org/jsonparse/-/jsonparse-1.3.1.tgz",
+-			"integrity": "sha512-POQXvpdL69+CluYsillJ7SUhKvytYjW9vG/GKpnf+xP8UWgYEM/RaMzHHofbALDiKbbP1W8UEYmgGl39WkPZsg==",
++			"integrity": "sha1-P02uSpH6wxX3EGL4UhzCOfE2YoA=",
+ 			"dev": true
+ 		},
+ 		"jsprim": {
+@@ -43435,7 +43436,7 @@
+ 		"lodash.ismatch": {
+ 			"version": "4.4.0",
+ 			"resolved": "https://registry.npmjs.org/lodash.ismatch/-/lodash.ismatch-4.4.0.tgz",
+-			"integrity": "sha512-fPMfXjGQEV9Xsq/8MTSgUf255gawYRbjwMyDbcvDhXgV7enSZA0hynz6vMPnpAb5iONEzBHBPsT+0zes5Z301g==",
++			"integrity": "sha1-dWy1FQyjum8RCFp4hJZF8Yj4Xzc=",
+ 			"dev": true
+ 		},
+ 		"lodash.isplainobject": {
+@@ -50551,7 +50552,7 @@
+ 		"promzard": {
+ 			"version": "0.3.0",
+ 			"resolved": "https://registry.npmjs.org/promzard/-/promzard-0.3.0.tgz",
+-			"integrity": "sha512-JZeYqd7UAcHCwI+sTOeUDYkvEU+1bQ7iE0UT1MgB/tERkAPkesW46MrpIySzODi+owTjZtiF8Ay5j9m60KmMBw==",
++			"integrity": "sha1-JqXW7ox97kyxIggwWs+5O6OCqe4=",
+ 			"dev": true,
+ 			"requires": {
+ 				"read": "1"
+@@ -50585,7 +50586,7 @@
+ 		"proto-list": {
+ 			"version": "1.2.4",
+ 			"resolved": "https://registry.npmjs.org/proto-list/-/proto-list-1.2.4.tgz",
+-			"integrity": "sha512-vtK/94akxsTMhe0/cbfpR+syPuszcuwhqVjJq26CuNDgFGj682oRBXOP5MJpv2r7JtE8MsiepGIqvvOTBwn2vA==",
++			"integrity": "sha1-IS1b/hMYMGpCD2QCuOJv85ZHqEk=",
+ 			"dev": true
+ 		},
+ 		"protocols": {
+@@ -50604,6 +50605,11 @@
+ 				"ipaddr.js": "1.9.1"
+ 			}
+ 		},
++		"proxy-compare": {
++			"version": "2.3.0",
++			"resolved": "https://registry.npmjs.org/proxy-compare/-/proxy-compare-2.3.0.tgz",
++			"integrity": "sha512-c3L2CcAi7f7pvlD0D7xsF+2CQIW8C3HaYx2Pfgq8eA4HAl3GAH6/dVYsyBbYF/0XJs2ziGLrzmz5fmzPm6A0pQ=="
++		},
+ 		"proxy-from-env": {
+ 			"version": "1.1.0",
+ 			"resolved": "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz",
+@@ -51704,7 +51710,7 @@
+ 		"read": {
+ 			"version": "1.0.7",
+ 			"resolved": "https://registry.npmjs.org/read/-/read-1.0.7.tgz",
+-			"integrity": "sha512-rSOKNYUmaxy0om1BNjMN4ezNT6VKK+2xF4GBhc81mkH7L60i6dp8qPYrkndNLT3QPphoII3maL9PVC9XmhHwVQ==",
++			"integrity": "sha1-s9oZvQUkMal2cdRKQmNK33ELQMQ=",
+ 			"dev": true,
+ 			"requires": {
+ 				"mute-stream": "~0.0.4"
+@@ -57159,7 +57165,7 @@
+ 		"temp-dir": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/temp-dir/-/temp-dir-1.0.0.tgz",
+-			"integrity": "sha512-xZFXEGbG7SNC3itwBzI3RYjq/cEhBkx2hJuKGIUOcEULmkQExXiHat2z/qkISYsuR+IKumhEfKKbV5qXmhICFQ==",
++			"integrity": "sha1-CnwOom06Oa+n4OvqnB/AvE2qAR0=",
+ 			"dev": true
+ 		},
+ 		"terminal-link": {
+@@ -58363,6 +58369,11 @@
+ 				"object-assign": "^4.1.1"
+ 			}
+ 		},
++		"use-sync-external-store": {
++			"version": "1.2.0",
++			"resolved": "https://registry.npmjs.org/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz",
++			"integrity": "sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA=="
++		},
+ 		"util": {
+ 			"version": "0.11.1",
+ 			"resolved": "https://registry.npmjs.org/util/-/util-0.11.1.tgz",
+@@ -58467,6 +58478,15 @@
+ 				"builtins": "^1.0.3"
+ 			}
+ 		},
++		"valtio": {
++			"version": "1.7.0",
++			"resolved": "https://registry.npmjs.org/valtio/-/valtio-1.7.0.tgz",
++			"integrity": "sha512-3Tnix66EERwMcrl1rfB3ylcewOcL5L/GiPmC3FlVNreQzqf2jufEeqlNmgnLgSGchkEmH3WYVtS+x6Qw4r+yzQ==",
++			"requires": {
++				"proxy-compare": "2.3.0",
++				"use-sync-external-store": "1.2.0"
++			}
++		},
+ 		"vargs": {
+ 			"version": "0.1.0",
+ 			"resolved": "https://registry.npmjs.org/vargs/-/vargs-0.1.0.tgz",
+diff --git a/packages/block-editor/src/components/block-controls/slot.js b/packages/block-editor/src/components/block-controls/slot.js
+index 72621eb21c7358..c8cb65848e9f77 100644
+--- a/packages/block-editor/src/components/block-controls/slot.js
++++ b/packages/block-editor/src/components/block-controls/slot.js
+@@ -5,7 +5,7 @@ import { useContext } from '@wordpress/element';
+ import {
+ 	__experimentalToolbarContext as ToolbarContext,
+ 	ToolbarGroup,
+-	__experimentalUseSlot as useSlot,
++	__experimentalUseSlotFills as useSlotFills,
+ } from '@wordpress/components';
+ 
+ /**
+@@ -16,8 +16,8 @@ import groups from './groups';
+ export default function BlockControlsSlot( { group = 'default', ...props } ) {
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+ 	const Slot = groups[ group ].Slot;
+-	const slot = useSlot( Slot.__unstableName );
+-	const hasFills = Boolean( slot.fills && slot.fills.length );
++	const fills = useSlotFills( Slot.__unstableName );
++	const hasFills = Boolean( fills && fills.length );
+ 
+ 	if ( ! hasFills ) {
+ 		return null;
+diff --git a/packages/block-editor/src/components/block-inspector/index.js b/packages/block-editor/src/components/block-inspector/index.js
+index 3accd8ee6babd3..46c8bb6d245253 100644
+--- a/packages/block-editor/src/components/block-inspector/index.js
++++ b/packages/block-editor/src/components/block-inspector/index.js
+@@ -10,7 +10,7 @@ import {
+ } from '@wordpress/blocks';
+ import {
+ 	PanelBody,
+-	__experimentalUseSlot as useSlot,
++	__experimentalUseSlotFills as useSlotFills,
+ 	FlexItem,
+ 	__experimentalHStack as HStack,
+ 	__experimentalVStack as VStack,
+@@ -284,8 +284,8 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
+ };
+ 
+ const AdvancedControls = () => {
+-	const slot = useSlot( InspectorAdvancedControls.slotName );
+-	const hasFills = Boolean( slot.fills && slot.fills.length );
++	const fills = useSlotFills( InspectorAdvancedControls.slotName );
++	const hasFills = Boolean( fills && fills.length );
+ 
+ 	if ( ! hasFills ) {
+ 		return null;
+diff --git a/packages/block-editor/src/components/inspector-controls/slot.js b/packages/block-editor/src/components/inspector-controls/slot.js
+index 1f30357cf7815e..010332c0a3112d 100644
+--- a/packages/block-editor/src/components/inspector-controls/slot.js
++++ b/packages/block-editor/src/components/inspector-controls/slot.js
+@@ -1,7 +1,10 @@
+ /**
+  * WordPress dependencies
+  */
+-import { __experimentalUseSlot as useSlot } from '@wordpress/components';
++import {
++	__experimentalUseSlot as useSlot,
++	__experimentalUseSlotFills as useSlotFills,
++} from '@wordpress/components';
+ import warning from '@wordpress/warning';
+ 
+ /**
+@@ -18,12 +21,13 @@ export default function InspectorControlsSlot( {
+ } ) {
+ 	const Slot = groups[ group ]?.Slot;
+ 	const slot = useSlot( Slot?.__unstableName );
++	const fills = useSlotFills( Slot?.__unstableName );
+ 	if ( ! Slot || ! slot ) {
+ 		warning( `Unknown InspectorControl group "${ group }" provided.` );
+ 		return null;
+ 	}
+ 
+-	const hasFills = Boolean( slot.fills && slot.fills.length );
++	const hasFills = Boolean( fills && fills.length );
+ 	if ( ! hasFills ) {
+ 		return null;
+ 	}
+diff --git a/packages/components/package.json b/packages/components/package.json
+index c03b2447814e06..4f1f622f208821 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -69,7 +69,8 @@
+ 		"reakit": "^1.3.8",
+ 		"remove-accents": "^0.4.2",
+ 		"use-lilius": "^2.0.1",
+-		"uuid": "^8.3.0"
++		"uuid": "^8.3.0",
++		"valtio": "^1.7.0"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^17.0.0",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 474ce6ea1548f6..50abc0b331581f 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -188,6 +188,7 @@ export {
+ 	Fill,
+ 	Provider as SlotFillProvider,
+ 	useSlot as __experimentalUseSlot,
++	useSlotFills as __experimentalUseSlotFills,
+ } from './slot-fill';
+ export { default as __experimentalStyleProvider } from './style-provider';
+ export { ZStack as __experimentalZStack } from './z-stack';
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
+index 8ea7d2cc55b9a5..cd1576fd19c3ac 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
+@@ -1,4 +1,8 @@
+ // @ts-nocheck
++/**
++ * External dependencies
++ */
++import { proxyMap } from 'valtio/utils';
+ /**
+  * WordPress dependencies
+  */
+@@ -6,8 +10,8 @@ import { createContext } from '@wordpress/element';
+ import warning from '@wordpress/warning';
+ 
+ const SlotFillContext = createContext( {
+-	slots: {},
+-	fills: {},
++	slots: proxyMap(),
++	fills: proxyMap(),
+ 	registerSlot: () => {
+ 		warning(
+ 			'Components must be wrapped within `SlotFillProvider`. ' +
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+index 0468a4db0b1289..c25b524079063b 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+@@ -1,8 +1,14 @@
+ // @ts-nocheck
++/**
++ * External dependencies
++ */
++import { ref as valRef } from 'valtio';
++import { proxyMap } from 'valtio/utils';
++
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo, useCallback, useState } from '@wordpress/element';
++import { useMemo, useCallback, useRef } from '@wordpress/element';
+ import isShallowEqual from '@wordpress/is-shallow-equal';
+ 
+ /**
+@@ -11,79 +17,68 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
+ import SlotFillContext from './slot-fill-context';
+ 
+ function useSlotRegistry() {
+-	const [ slots, setSlots ] = useState( {} );
+-	const [ fills, setFills ] = useState( {} );
++	const slots = useRef( proxyMap() );
++	const fills = useRef( proxyMap() );
+ 
+ 	const registerSlot = useCallback( ( name, ref, fillProps ) => {
+-		setSlots( ( prevSlots ) => {
+-			const slot = prevSlots[ name ] || {};
+-			return {
+-				...prevSlots,
+-				[ name ]: {
+-					...slot,
+-					ref: ref || slot.ref,
+-					fillProps: fillProps || slot.fillProps || {},
+-				},
+-			};
+-		} );
++		const slot = slots.current.get( name ) || {};
++		slots.current.set(
++			name,
++			valRef( {
++				...slot,
++				ref: ref || slot.ref,
++				fillProps: fillProps || slot.fillProps || {},
++			} )
++		);
+ 	}, [] );
+ 
+ 	const unregisterSlot = useCallback( ( name, ref ) => {
+-		setSlots( ( prevSlots ) => {
+-			const { [ name ]: slot, ...nextSlots } = prevSlots;
+-			// Make sure we're not unregistering a slot registered by another element
+-			// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
+-			if ( slot?.ref === ref ) {
+-				return nextSlots;
+-			}
+-			return prevSlots;
+-		} );
++		// Make sure we're not unregistering a slot registered by another element
++		// See https://github.com/WordPress/gutenberg/pull/19242#issuecomment-590295412
++		if ( slots.current.get( name )?.ref === ref ) {
++			slots.current.delete( name );
++		}
+ 	}, [] );
+ 
+-	const updateSlot = useCallback(
+-		( name, fillProps ) => {
+-			const slot = slots[ name ];
+-			if ( ! slot ) {
+-				return;
+-			}
+-			if ( ! isShallowEqual( slot.fillProps, fillProps ) ) {
+-				slot.fillProps = fillProps;
+-				const slotFills = fills[ name ];
+-				if ( slotFills ) {
+-					// Force update fills.
+-					slotFills.map( ( fill ) => fill.current.rerender() );
+-				}
++	const updateSlot = useCallback( ( name, fillProps ) => {
++		const slot = slots.current.get( name );
++		if ( ! slot ) {
++			return;
++		}
++
++		if ( ! isShallowEqual( slot.fillProps, fillProps ) ) {
++			slot.fillProps = fillProps;
++			const slotFills = fills.current.get( name );
++			if ( slotFills ) {
++				// Force update fills.
++				slotFills.map( ( fill ) => fill.current.rerender() );
+ 			}
+-		},
+-		[ slots, fills ]
+-	);
++		}
++	}, [] );
+ 
+ 	const registerFill = useCallback( ( name, ref ) => {
+-		setFills( ( prevFills ) => ( {
+-			...prevFills,
+-			[ name ]: [ ...( prevFills[ name ] || [] ), ref ],
+-		} ) );
++		fills.current.set(
++			name,
++			valRef( [ ...( fills.current.get( name ) || [] ), ref ] )
++		);
+ 	}, [] );
+ 
+ 	const unregisterFill = useCallback( ( name, ref ) => {
+-		setFills( ( prevFills ) => {
+-			if ( prevFills[ name ] ) {
+-				return {
+-					...prevFills,
+-					[ name ]: prevFills[ name ].filter(
+-						( fillRef ) => fillRef !== ref
+-					),
+-				};
+-			}
+-			return prevFills;
+-		} );
++		if ( fills.current.get( name ) ) {
++			fills.current.set(
++				name,
++				fills.current
++					.get( name )
++					.filter( ( fillRef ) => fillRef !== ref )
++			);
++		}
+ 	}, [] );
+ 
+ 	// Memoizing the return value so it can be directly passed to Provider value
+ 	const registry = useMemo(
+ 		() => ( {
+-			slots,
+-			fills,
++			slots: slots.current,
++			fills: fills.current,
+ 			registerSlot,
+ 			updateSlot,
+ 			unregisterSlot,
+@@ -91,8 +86,6 @@ function useSlotRegistry() {
+ 			unregisterFill,
+ 		} ),
+ 		[
+-			slots,
+-			fills,
+ 			registerSlot,
+ 			updateSlot,
+ 			unregisterSlot,
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/use-slot-fills.js b/packages/components/src/slot-fill/bubbles-virtually/use-slot-fills.js
+new file mode 100644
+index 00000000000000..29e4380ed3d43d
+--- /dev/null
++++ b/packages/components/src/slot-fill/bubbles-virtually/use-slot-fills.js
+@@ -0,0 +1,24 @@
++// @ts-nocheck
++/**
++ * External dependencies
++ */
++import { useSnapshot } from 'valtio';
++
++/**
++ * WordPress dependencies
++ */
++import { useContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import SlotFillContext from './slot-fill-context';
++
++export default function useSlotFills( name ) {
++	const registry = useContext( SlotFillContext );
++	const fills = useSnapshot( registry.fills, { sync: true } );
++	// The important bit here is that this call ensures that the hook
++	// only causes a re-render if the "fills" of a given slot name
++	// change change, not any fills.
++	return fills.get( name );
++}
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/use-slot.js b/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
+index c954ad2c7573fe..2d07a2c36ae079 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
+@@ -1,8 +1,13 @@
+ // @ts-nocheck
++/**
++ * External dependencies
++ */
++import { useSnapshot } from 'valtio';
++
+ /**
+  * WordPress dependencies
+  */
+-import { useCallback, useContext, useMemo } from '@wordpress/element';
++import { useCallback, useContext } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -11,10 +16,11 @@ import SlotFillContext from './slot-fill-context';
+ 
+ export default function useSlot( name ) {
+ 	const registry = useContext( SlotFillContext );
+-
+-	const slot = registry.slots[ name ] || {};
+-	const slotFills = registry.fills[ name ];
+-	const fills = useMemo( () => slotFills || [], [ slotFills ] );
++	const slots = useSnapshot( registry.slots, { sync: true } );
++	// The important bit here is that this call ensures
++	// the hook only causes a re-render if the slot
++	// with the given name change, not any other slot.
++	const slot = slots.get( name );
+ 
+ 	const updateSlot = useCallback(
+ 		( fillProps ) => {
+@@ -48,7 +54,6 @@ export default function useSlot( name ) {
+ 		...slot,
+ 		updateSlot,
+ 		unregisterSlot,
+-		fills,
+ 		registerFill,
+ 		unregisterFill,
+ 	};
+diff --git a/packages/components/src/slot-fill/index.js b/packages/components/src/slot-fill/index.js
+index 4bb323c28fad61..18aea104677012 100644
+--- a/packages/components/src/slot-fill/index.js
++++ b/packages/components/src/slot-fill/index.js
+@@ -14,6 +14,7 @@ import BubblesVirtuallySlot from './bubbles-virtually/slot';
+ import BubblesVirtuallySlotFillProvider from './bubbles-virtually/slot-fill-provider';
+ import SlotFillProvider from './provider';
+ import useSlot from './bubbles-virtually/use-slot';
++export { default as useSlotFills } from './bubbles-virtually/use-slot-fills';
+ 
+ export function Fill( props ) {
+ 	// We're adding both Fills here so they can register themselves before
+diff --git a/packages/edit-post/src/components/header/main-dashboard-button/index.js b/packages/edit-post/src/components/header/main-dashboard-button/index.js
+index efc3bfaad19e87..0878a7cce49012 100644
+--- a/packages/edit-post/src/components/header/main-dashboard-button/index.js
++++ b/packages/edit-post/src/components/header/main-dashboard-button/index.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import {
+-	__experimentalUseSlot as useSlot,
++	__experimentalUseSlotFills as useSlotFills,
+ 	createSlotFill,
+ } from '@wordpress/components';
+ 
+@@ -13,8 +13,8 @@ const { Fill, Slot: MainDashboardButtonSlot } = createSlotFill( slotName );
+ const MainDashboardButton = Fill;
+ 
+ const Slot = ( { children } ) => {
+-	const slot = useSlot( slotName );
+-	const hasFills = Boolean( slot.fills && slot.fills.length );
++	const fills = useSlotFills( slotName );
++	const hasFills = Boolean( fills && fills.length );
+ 
+ 	if ( ! hasFills ) {
+ 		return children;
+diff --git a/packages/edit-site/src/components/main-dashboard-button/index.js b/packages/edit-site/src/components/main-dashboard-button/index.js
+index efc3bfaad19e87..0878a7cce49012 100644
+--- a/packages/edit-site/src/components/main-dashboard-button/index.js
++++ b/packages/edit-site/src/components/main-dashboard-button/index.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import {
+-	__experimentalUseSlot as useSlot,
++	__experimentalUseSlotFills as useSlotFills,
+ 	createSlotFill,
+ } from '@wordpress/components';
+ 
+@@ -13,8 +13,8 @@ const { Fill, Slot: MainDashboardButtonSlot } = createSlotFill( slotName );
+ const MainDashboardButton = Fill;
+ 
+ const Slot = ( { children } ) => {
+-	const slot = useSlot( slotName );
+-	const hasFills = Boolean( slot.fills && slot.fills.length );
++	const fills = useSlotFills( slotName );
++	const hasFills = Boolean( fills && fills.length );
+ 
+ 	if ( ! hasFills ) {
+ 		return children;

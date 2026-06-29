@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 81ad1717801a95..33677f10b58fcb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -64,6 +64,7 @@
+ 
+ -   `TimePicker`: use ToggleGroupControl for AM/PM toggle ([#64800](https://github.com/WordPress/gutenberg/pull/64800)).
+ -   `ColorPalette` utils: do not normalize undefined color values ([#64969](https://github.com/WordPress/gutenberg/pull/64969)).
++-   `DatePicker` restore round radius for event dot ([#65031](https://github.com/WordPress/gutenberg/pull/65031)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/date-time/date/styles.ts b/packages/components/src/date-time/date/styles.ts
+index 8f208b53fac22a..bffc8ae35d2a64 100644
+--- a/packages/components/src/date-time/date/styles.ts
++++ b/packages/components/src/date-time/date/styles.ts
+@@ -107,6 +107,7 @@ export const DayButton = styled( Button, {
+ 		`
+ 		::before {
+ 			background: ${ props.isSelected ? COLORS.white : COLORS.theme.accent };
++			border-radius: ${ CONFIG.radiusRound };
+ 			bottom: 2px;
+ 			content: " ";
+ 			height: 4px;

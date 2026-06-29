@@ -1,0 +1,78 @@
+diff --git a/packages/components/src/utils/element-rect.ts b/packages/components/src/utils/element-rect.ts
+index 550ec35b0bc932..a96c25ecfac949 100644
+--- a/packages/components/src/utils/element-rect.ts
++++ b/packages/components/src/utils/element-rect.ts
+@@ -3,11 +3,7 @@
+  * WordPress dependencies
+  */
+ import { useLayoutEffect, useRef, useState } from '@wordpress/element';
+-import { useResizeObserver } from '@wordpress/compose';
+-/**
+- * Internal dependencies
+- */
+-import { useEvent } from './hooks/use-event';
++import { useEvent, useResizeObserver } from '@wordpress/compose';
+ 
+ /**
+  * The position and dimensions of an element, relative to its offset parent.
+diff --git a/packages/components/src/utils/hooks/use-event.ts b/packages/components/src/utils/hooks/use-event.ts
+deleted file mode 100644
+index eefac9478a8b4f..00000000000000
+--- a/packages/components/src/utils/hooks/use-event.ts
++++ /dev/null
+@@ -1,38 +0,0 @@
+-/* eslint-disable jsdoc/require-param */
+-/**
+- * WordPress dependencies
+- */
+-import { useRef, useInsertionEffect, useCallback } from '@wordpress/element';
+-
+-/**
+- * Any function.
+- */
+-export type AnyFunction = ( ...args: any ) => any;
+-
+-/**
+- * Creates a stable callback function that has access to the latest state and
+- * can be used within event handlers and effect callbacks. Throws when used in
+- * the render phase.
+- *
+- * @example
+- *
+- * ```tsx
+- * function Component(props) {
+- *   const onClick = useEvent(props.onClick);
+- *   React.useEffect(() => {}, [onClick]);
+- * }
+- * ```
+- */
+-export function useEvent< T extends AnyFunction >( callback?: T ) {
+-	const ref = useRef< AnyFunction | undefined >( () => {
+-		throw new Error( 'Cannot call an event handler while rendering.' );
+-	} );
+-	useInsertionEffect( () => {
+-		ref.current = callback;
+-	} );
+-	return useCallback< AnyFunction >(
+-		( ...args ) => ref.current?.( ...args ),
+-		[]
+-	) as T;
+-}
+-/* eslint-enable jsdoc/require-param */
+diff --git a/packages/components/src/utils/hooks/use-on-value-update.ts b/packages/components/src/utils/hooks/use-on-value-update.ts
+index 5726f3977daf04..05c7173d092fac 100644
+--- a/packages/components/src/utils/hooks/use-on-value-update.ts
++++ b/packages/components/src/utils/hooks/use-on-value-update.ts
+@@ -2,11 +2,8 @@
+ /**
+  * WordPress dependencies
+  */
++import { useEvent } from '@wordpress/compose';
+ import { useRef, useEffect } from '@wordpress/element';
+-/**
+- * Internal dependencies
+- */
+-import { useEvent } from './use-event';
+ 
+ /**
+  * Context object for the `onUpdate` callback of `useOnValueUpdate`.

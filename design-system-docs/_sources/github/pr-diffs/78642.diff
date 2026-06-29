@@ -1,0 +1,57 @@
+diff --git a/packages/editor/src/components/collaborators-presence/avatar/test/index.tsx b/packages/editor/src/components/collaborators-presence/avatar/test/index.tsx
+index 78c0b1b200a198..e25524fac35bbb 100644
+--- a/packages/editor/src/components/collaborators-presence/avatar/test/index.tsx
++++ b/packages/editor/src/components/collaborators-presence/avatar/test/index.tsx
+@@ -16,13 +16,18 @@ import { Tooltip } from '@wordpress/ui';
+ import Avatar from '..';
+ 
+ /**
+- * Wraps the avatar in a `Tooltip.Provider` with `delay={ 0 }` so hover-based
+- * tooltip-presence assertions don't have to wait for the real-world delay.
++ * Wraps the avatar in a `Tooltip.Provider` with `delay={ 0 }` and
++ * `closeDelay={ 0 }` so hover-based tooltip-presence assertions don't have to
++ * wait for the real-world open/close delay.
+  *
+  * @param ui The avatar element (or anything else) to render.
+  */
+ function renderAvatar( ui: React.ReactElement ): ReturnType< typeof render > {
+-	return render( <Tooltip.Provider delay={ 0 }>{ ui }</Tooltip.Provider> );
++	return render(
++		<Tooltip.Provider delay={ 0 } closeDelay={ 0 }>
++			{ ui }
++		</Tooltip.Provider>
++	);
+ }
+ 
+ /**
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 8bc914f4af0471..3a09852dad5990 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `Tooltip.Provider`: Widen the types to accept all props of the equivalent `Tooltip.Provider` from `@base-ui/react` (types-only change) ([#78642](https://github.com/WordPress/gutenberg/pull/78642)).
++
+ ## 0.14.0 (2026-05-27)
+ 
+ ### Breaking Changes
+diff --git a/packages/ui/src/tooltip/types.ts b/packages/ui/src/tooltip/types.ts
+index 13c534ea80532d..4d32ee3107f653 100644
+--- a/packages/ui/src/tooltip/types.ts
++++ b/packages/ui/src/tooltip/types.ts
+@@ -9,10 +9,7 @@ export type PositionerProps = ComponentProps< typeof _Tooltip.Positioner >;
+ 
+ export type RootProps = Pick< _Tooltip.Root.Props, 'disabled' | 'children' >;
+ 
+-export type ProviderProps = Pick<
+-	_Tooltip.Provider.Props,
+-	'delay' | 'children'
+->;
++export type ProviderProps = _Tooltip.Provider.Props;
+ 
+ export interface TriggerProps extends ComponentProps< 'button' > {
+ 	/**

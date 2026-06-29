@@ -1,0 +1,334 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2d2761924fb633..0692037a63435e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,9 @@
+ 
+ -   `GradientPicker`: Add `enableAlpha` prop ([#66974](https://github.com/WordPress/gutenberg/pull/66974))
+ -   `CustomGradientPicker`: Add `enableAlpha` prop ([#66974](https://github.com/WordPress/gutenberg/pull/66974))
++-   `Menu`: Replace hardcoded white color with theme-ready variable ([#67649](https://github.com/WordPress/gutenberg/pull/67649)).
++-   `Navigation` (deprecated): Replace hardcoded white color with theme-ready variable ([#67649](https://github.com/WordPress/gutenberg/pull/67649)).
++-   `ToggleGroupControl`: Replace hardcoded white color with theme-ready variable ([#67649](https://github.com/WordPress/gutenberg/pull/67649)).
+ -   `RangeControl`: Update the design of the range control marks ([#67611](https://github.com/WordPress/gutenberg/pull/67611))
+ 
+ ### Deprecations
+diff --git a/packages/components/src/menu/styles.ts b/packages/components/src/menu/styles.ts
+index 0e0752bf24cd10..cda5c7321f38b4 100644
+--- a/packages/components/src/menu/styles.ts
++++ b/packages/components/src/menu/styles.ts
+@@ -201,7 +201,7 @@ const baseItem = css`
+ 			[aria-disabled='true']
+ 		) {
+ 		background-color: ${ COLORS.theme.accent };
+-		color: ${ COLORS.white };
++		color: ${ COLORS.theme.accentInverted };
+ 	}
+ 
+ 	/* Keyboard focus (focus-visible) */
+diff --git a/packages/components/src/navigation/styles/navigation-styles.tsx b/packages/components/src/navigation/styles/navigation-styles.tsx
+index 580c0eef4dba8f..0cde63146856bc 100644
+--- a/packages/components/src/navigation/styles/navigation-styles.tsx
++++ b/packages/components/src/navigation/styles/navigation-styles.tsx
+@@ -134,11 +134,11 @@ export const ItemBaseUI = styled.li`
+ 
+ 	&.is-active {
+ 		background-color: ${ COLORS.theme.accent };
+-		color: ${ COLORS.white };
++		color: ${ COLORS.theme.accentInverted };
+ 
+ 		> button,
+ 		> a {
+-			color: ${ COLORS.white };
++			color: ${ COLORS.theme.accentInverted };
+ 			opacity: 1;
+ 		}
+ 	}
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index f344cd6ba16528..91e9f291ddf018 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -72,7 +72,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   content: '';
+   position: absolute;
+   pointer-events: none;
+-  background: #1e1e1e;
++  background: var(--wp-components-color-foreground, #1e1e1e);
+   outline: 2px solid transparent;
+   outline-offset: -3px;
+   --antialiasing-factor: 100;
+@@ -134,7 +134,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   background: transparent;
+   border: none;
+   border-radius: 1px;
+-  color: #757575;
++  color: var(--wp-components-color-gray-700, #757575);
+   fill: currentColor;
+   cursor: pointer;
+   display: -webkit-box;
+@@ -158,12 +158,12 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   user-select: none;
+   width: 100%;
+   z-index: 2;
+-  color: #1e1e1e;
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   height: 32px;
+   aspect-ratio: 1;
+   padding-left: 0;
+   padding-right: 0;
+-  color: #fff;
++  color: var(--wp-components-color-foreground-inverted, #fff);
+ }
+ 
+ @media not ( prefers-reduced-motion ) {
+@@ -183,7 +183,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+ }
+ 
+ .emotion-12:active {
+-  background: #fff;
++  background: var(--wp-components-color-background, #fff);
+ }
+ 
+ .emotion-12:active {
+@@ -211,7 +211,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   background: transparent;
+   border: none;
+   border-radius: 1px;
+-  color: #757575;
++  color: var(--wp-components-color-gray-700, #757575);
+   fill: currentColor;
+   cursor: pointer;
+   display: -webkit-box;
+@@ -235,7 +235,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   user-select: none;
+   width: 100%;
+   z-index: 2;
+-  color: #1e1e1e;
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   height: 32px;
+   aspect-ratio: 1;
+   padding-left: 0;
+@@ -259,7 +259,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+ }
+ 
+ .emotion-17:active {
+-  background: #fff;
++  background: var(--wp-components-color-background, #fff);
+ }
+ 
+ <div>
+@@ -437,7 +437,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+   content: '';
+   position: absolute;
+   pointer-events: none;
+-  background: #1e1e1e;
++  background: var(--wp-components-color-foreground, #1e1e1e);
+   outline: 2px solid transparent;
+   outline-offset: -3px;
+   --antialiasing-factor: 100;
+@@ -499,7 +499,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+   background: transparent;
+   border: none;
+   border-radius: 1px;
+-  color: #757575;
++  color: var(--wp-components-color-gray-700, #757575);
+   fill: currentColor;
+   cursor: pointer;
+   display: -webkit-box;
+@@ -542,7 +542,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+ }
+ 
+ .emotion-12:active {
+-  background: #fff;
++  background: var(--wp-components-color-background, #fff);
+ }
+ 
+ .emotion-13 {
+@@ -706,7 +706,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   content: '';
+   position: absolute;
+   pointer-events: none;
+-  background: #1e1e1e;
++  background: var(--wp-components-color-foreground, #1e1e1e);
+   outline: 2px solid transparent;
+   outline-offset: -3px;
+   --antialiasing-factor: 100;
+@@ -768,7 +768,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   background: transparent;
+   border: none;
+   border-radius: 1px;
+-  color: #757575;
++  color: var(--wp-components-color-gray-700, #757575);
+   fill: currentColor;
+   cursor: pointer;
+   display: -webkit-box;
+@@ -792,12 +792,12 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   user-select: none;
+   width: 100%;
+   z-index: 2;
+-  color: #1e1e1e;
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   height: 32px;
+   aspect-ratio: 1;
+   padding-left: 0;
+   padding-right: 0;
+-  color: #fff;
++  color: var(--wp-components-color-foreground-inverted, #fff);
+ }
+ 
+ @media not ( prefers-reduced-motion ) {
+@@ -817,7 +817,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+ }
+ 
+ .emotion-12:active {
+-  background: #fff;
++  background: var(--wp-components-color-background, #fff);
+ }
+ 
+ .emotion-12:active {
+@@ -845,7 +845,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   background: transparent;
+   border: none;
+   border-radius: 1px;
+-  color: #757575;
++  color: var(--wp-components-color-gray-700, #757575);
+   fill: currentColor;
+   cursor: pointer;
+   display: -webkit-box;
+@@ -869,7 +869,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   user-select: none;
+   width: 100%;
+   z-index: 2;
+-  color: #1e1e1e;
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   height: 32px;
+   aspect-ratio: 1;
+   padding-left: 0;
+@@ -893,7 +893,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+ }
+ 
+ .emotion-17:active {
+-  background: #fff;
++  background: var(--wp-components-color-background, #fff);
+ }
+ 
+ <div>
+@@ -1065,7 +1065,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+   content: '';
+   position: absolute;
+   pointer-events: none;
+-  background: #1e1e1e;
++  background: var(--wp-components-color-foreground, #1e1e1e);
+   outline: 2px solid transparent;
+   outline-offset: -3px;
+   --antialiasing-factor: 100;
+@@ -1127,7 +1127,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+   background: transparent;
+   border: none;
+   border-radius: 1px;
+-  color: #757575;
++  color: var(--wp-components-color-gray-700, #757575);
+   fill: currentColor;
+   cursor: pointer;
+   display: -webkit-box;
+@@ -1170,7 +1170,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+ }
+ 
+ .emotion-12:active {
+-  background: #fff;
++  background: var(--wp-components-color-background, #fff);
+ }
+ 
+ .emotion-13 {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+index c0248f9b3f7f22..a53eced1219db4 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+@@ -38,7 +38,7 @@ export const buttonView = ( {
+ 	background: transparent;
+ 	border: none;
+ 	border-radius: ${ CONFIG.radiusXSmall };
+-	color: ${ COLORS.gray[ 700 ] };
++	color: ${ COLORS.theme.gray[ 700 ] };
+ 	fill: currentColor;
+ 	cursor: pointer;
+ 	display: flex;
+@@ -70,7 +70,7 @@ export const buttonView = ( {
+ 	}
+ 
+ 	&:active {
+-		background: ${ CONFIG.controlBackgroundColor };
++		background: ${ COLORS.ui.background };
+ 	}
+ 
+ 	${ isDeselectable && deselectable }
+@@ -79,7 +79,7 @@ export const buttonView = ( {
+ `;
+ 
+ const pressed = css`
+-	color: ${ COLORS.white };
++	color: ${ COLORS.theme.foregroundInverted };
+ 
+ 	&:active {
+ 		background: transparent;
+@@ -87,11 +87,11 @@ const pressed = css`
+ `;
+ 
+ const deselectable = css`
+-	color: ${ COLORS.gray[ 900 ] };
++	color: ${ COLORS.theme.foreground };
+ 
+ 	&:focus {
+ 		box-shadow:
+-			inset 0 0 0 1px ${ COLORS.white },
++			inset 0 0 0 1px ${ COLORS.ui.background },
+ 			0 0 0 ${ CONFIG.borderWidthFocus } ${ COLORS.theme.accent };
+ 		outline: 2px solid transparent;
+ 	}
+@@ -112,7 +112,7 @@ const isIconStyles = ( {
+ 	};
+ 
+ 	return css`
+-		color: ${ COLORS.gray[ 900 ] };
++		color: ${ COLORS.theme.foreground };
+ 		height: ${ iconButtonSizes[ size ] };
+ 		aspect-ratio: 1;
+ 		padding-left: 0;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+index bb6efe476b2b2c..8376b66a5a86cf 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -39,7 +39,7 @@ export const toggleGroupControl = ( {
+ 		content: '';
+ 		position: absolute;
+ 		pointer-events: none;
+-		background: ${ COLORS.gray[ 900 ] };
++		background: ${ COLORS.theme.foreground };
+ 
+ 		// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 		outline: 2px solid transparent;
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index 1ad528d13f0108..439d464f1460b1 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -75,6 +75,9 @@ export const COLORS = Object.freeze( {
+ 	 * @deprecated Use semantic aliases in `COLORS.ui` or theme-ready variables in `COLORS.theme.gray`.
+ 	 */
+ 	gray: GRAY, // TODO: Stop exporting this when everything is migrated to `theme` or `ui`
++	/**
++	 * @deprecated Prefer theme-ready variables in `COLORS.theme`.
++	 */
+ 	white,
+ 	alert: ALERT,
+ 	/**
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 1bc3945f9b3b16..13b704540e9c4c 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -12,7 +12,6 @@ const CONTROL_PROPS = {
+ 	controlPaddingXSmall: 8,
+ 	controlPaddingXLarge: 12 * 1.3334, // TODO: Deprecate
+ 
+-	controlBackgroundColor: COLORS.white,
+ 	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.theme.accent }`,
+ 	controlHeight: CONTROL_HEIGHT,
+ 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,

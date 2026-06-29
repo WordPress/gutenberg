@@ -1,0 +1,26 @@
+diff --git a/packages/dataviews/src/components/dataviews-item-actions/index.tsx b/packages/dataviews/src/components/dataviews-item-actions/index.tsx
+index 70df04e4333e6f..8da945e9c14663 100644
+--- a/packages/dataviews/src/components/dataviews-item-actions/index.tsx
++++ b/packages/dataviews/src/components/dataviews-item-actions/index.tsx
+@@ -238,7 +238,7 @@ function CompactItemActions< Item >( {
+ 						/>
+ 					}
+ 				/>
+-				<Menu.Popover>
++				<Menu.Popover modal={ false }>
+ 					<ActionsMenuGroup
+ 						actions={ actions }
+ 						item={ item }
+diff --git a/packages/dataviews/src/dataviews-layouts/list/index.tsx b/packages/dataviews/src/dataviews-layouts/list/index.tsx
+index dadc53b5d733a7..b22bfa40f75599 100644
+--- a/packages/dataviews/src/dataviews-layouts/list/index.tsx
++++ b/packages/dataviews/src/dataviews-layouts/list/index.tsx
+@@ -241,7 +241,7 @@ function ListItem< Item >( {
+ 								/>
+ 							}
+ 						/>
+-						<Menu.Popover>
++						<Menu.Popover modal={ false }>
+ 							<ActionsMenuGroup
+ 								actions={ eligibleActions }
+ 								item={ item }

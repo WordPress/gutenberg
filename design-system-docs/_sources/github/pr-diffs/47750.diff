@@ -1,0 +1,244 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 90df12abba3cf3..6c24c5ad52dce6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -   `withFallbackStyles` HOC: Convert to TypeScript ([#48720](https://github.com/WordPress/gutenberg/pull/48720)).
+ -   `navigateRegions` HOC: Convert to TypeScript ([#48632](https://github.com/WordPress/gutenberg/pull/48632)).
+ -   `withSpokenMessages`: HOC: Convert to TypeScript ([#48163](https://github.com/WordPress/gutenberg/pull/48163)).
++-   `ToolbarButton`: Convert to TypeScript ([#47750](https://github.com/WordPress/gutenberg/pull/47750)).
+ -   `DimensionControl(Experimental)`: Convert to TypeScript ([#47351](https://github.com/WordPress/gutenberg/pull/47351)).
+ 
+ ## 23.5.0 (2023-03-01)
+diff --git a/packages/components/src/toolbar/toolbar-button/README.md b/packages/components/src/toolbar/toolbar-button/README.md
+index 92e9e61777aff5..6bde73117b02c5 100644
+--- a/packages/components/src/toolbar/toolbar-button/README.md
++++ b/packages/components/src/toolbar/toolbar-button/README.md
+@@ -51,7 +51,19 @@ function Edit() {
+ 
+ ## Props
+ 
+-This component accepts [the same API of the Button](/packages/components/src/button/README.md#props) component.
++This component accepts [the same API of the Button](/packages/components/src/button/README.md#props) component in addition to:
++
++#### `containerClassName`: `string`
++
++An optional additional class name to apply to the button container.
++
++-   Required: No
++
++#### `subscript`: `string`
++
++An optional subscript for the button.
++
++-   Required: No
+ 
+ ## Related components
+ 
+diff --git a/packages/components/src/toolbar/toolbar-button/index.js b/packages/components/src/toolbar/toolbar-button/index.tsx
+similarity index 53%
+rename from packages/components/src/toolbar/toolbar-button/index.js
+rename to packages/components/src/toolbar/toolbar-button/index.tsx
+index bdfc44e0d64fbf..00c5c364e94ce9 100644
+--- a/packages/components/src/toolbar/toolbar-button/index.js
++++ b/packages/components/src/toolbar/toolbar-button/index.tsx
+@@ -1,13 +1,14 @@
+-// @ts-nocheck
+-
+ /**
+  * External dependencies
+  */
+ import classnames from 'classnames';
++import type { ForwardedRef } from 'react';
++
+ /**
+  * WordPress dependencies
+  */
+ import { useContext, forwardRef } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+@@ -15,19 +16,22 @@ import Button from '../../button';
+ import ToolbarItem from '../toolbar-item';
+ import ToolbarContext from '../toolbar-context';
+ import ToolbarButtonContainer from './toolbar-button-container';
++import type { ToolbarButtonProps } from './types';
++import type { WordPressComponentProps } from '../../ui/context';
++import type React from 'react';
+ 
+-function ToolbarButton(
++function UnforwardedToolbarButton(
+ 	{
+-		containerClassName,
++		children,
+ 		className,
++		containerClassName,
+ 		extraProps,
+-		children,
+-		title,
+ 		isActive,
+ 		isDisabled,
++		title,
+ 		...props
+-	},
+-	ref
++	}: WordPressComponentProps< ToolbarButtonProps, typeof Button, false >,
++	ref: ForwardedRef< any >
+ ) {
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+ 
+@@ -40,8 +44,14 @@ function ToolbarButton(
+ 					label={ title }
+ 					shortcut={ props.shortcut }
+ 					data-subscript={ props.subscript }
+-					onClick={ ( event ) => {
++					onClick={ (
++						event: React.MouseEvent<
++							HTMLButtonElement & HTMLAnchorElement,
++							MouseEvent
++						>
++					) => {
+ 						event.stopPropagation();
++						// TODO: Possible bug; maybe use onClick instead of props.onClick.
+ 						if ( props.onClick ) {
+ 							props.onClick( event );
+ 						}
+@@ -72,18 +82,43 @@ function ToolbarButton(
+ 			{ ...props }
+ 			ref={ ref }
+ 		>
+-			{ ( toolbarItemProps ) => (
+-				<Button
+-					label={ title }
+-					isPressed={ isActive }
+-					disabled={ isDisabled }
+-					{ ...toolbarItemProps }
+-				>
+-					{ children }
+-				</Button>
+-			) }
++			{
++				// @ts-expect-error
++				( toolbarItemProps ) => (
++					<Button
++						label={ title }
++						isPressed={ isActive }
++						disabled={ isDisabled }
++						{ ...toolbarItemProps }
++					>
++						{ children }
++					</Button>
++				)
++			}
+ 		</ToolbarItem>
+ 	);
+ }
+ 
+-export default forwardRef( ToolbarButton );
++/**
++ * ToolbarButton can be used to add actions to a toolbar, usually inside a Toolbar
++ * or ToolbarGroup when used to create general interfaces.
++ *
++ * ```jsx
++ * import { Toolbar, ToolbarButton } from '@wordpress/components';
++ * import { edit } from '@wordpress/icons';
++ *
++ * function MyToolbar() {
++ *   return (
++ *		<Toolbar label="Options">
++ *			<ToolbarButton
++ *				icon={ edit }
++ *				label="Edit"
++ *				onClick={ () => alert( 'Editing' ) }
++ *			/>
++ *		</Toolbar>
++ *   );
++ * }
++ * ```
++ */
++export const ToolbarButton = forwardRef( UnforwardedToolbarButton );
++export default ToolbarButton;
+diff --git a/packages/components/src/toolbar/toolbar-button/toolbar-button-container.js b/packages/components/src/toolbar/toolbar-button/toolbar-button-container.js
+deleted file mode 100644
+index 5417aeb3e7ba7b..00000000000000
+--- a/packages/components/src/toolbar/toolbar-button/toolbar-button-container.js
++++ /dev/null
+@@ -1,6 +0,0 @@
+-// @ts-nocheck
+-
+-const ToolbarButtonContainer = ( props ) => (
+-	<div className={ props.className }>{ props.children }</div>
+-);
+-export default ToolbarButtonContainer;
+diff --git a/packages/components/src/toolbar/toolbar-button/toolbar-button-container.tsx b/packages/components/src/toolbar/toolbar-button/toolbar-button-container.tsx
+new file mode 100644
+index 00000000000000..47594c1e99b58b
+--- /dev/null
++++ b/packages/components/src/toolbar/toolbar-button/toolbar-button-container.tsx
+@@ -0,0 +1,13 @@
++/**
++ * Internal dependencies
++ */
++import type { ToolbarButtonContainerProps } from './types';
++
++const ToolbarButtonContainer = ( {
++	children,
++	className,
++}: ToolbarButtonContainerProps ) => (
++	<div className={ className }>{ children }</div>
++);
++
++export default ToolbarButtonContainer;
+diff --git a/packages/components/src/toolbar/toolbar-button/types.ts b/packages/components/src/toolbar/toolbar-button/types.ts
+new file mode 100644
+index 00000000000000..da7038c213324a
+--- /dev/null
++++ b/packages/components/src/toolbar/toolbar-button/types.ts
+@@ -0,0 +1,46 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++export type ToolbarButtonProps = {
++	/**
++	 * Children to be rendered inside the button.
++	 */
++	children?: ReactNode;
++	/**
++	 * An optional class name for the button container.
++	 */
++	containerClassName?: string;
++	/**
++	 * Additional props to be passed alongside props.
++	 */
++	extraProps?: any;
++	/**
++	 * Indicates if the button is active.
++	 */
++	isActive?: boolean;
++	/**
++	 * Indicates if the button is disabled.
++	 */
++	isDisabled?: boolean;
++	/**
++	 * An optional subscript for the button.
++	 */
++	subscript?: string;
++	/**
++	 * An optional title/label for the button.
++	 */
++	title?: string;
++};
++
++export type ToolbarButtonContainerProps = {
++	/**
++	 * Children to be rendered inside the button container.
++	 */
++	children?: ReactNode;
++	/**
++	 * An optional class name for the button container.
++	 */
++	className?: string;
++};

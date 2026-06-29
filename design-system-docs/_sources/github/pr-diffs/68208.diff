@@ -1,0 +1,158 @@
+diff --git a/bin/api-docs/gen-components-docs/markdown/index.mjs b/bin/api-docs/gen-components-docs/markdown/index.mjs
+index 126fdf0057b6e5..5978e7e80fe260 100644
+--- a/bin/api-docs/gen-components-docs/markdown/index.mjs
++++ b/bin/api-docs/gen-components-docs/markdown/index.mjs
+@@ -8,6 +8,19 @@ import json2md from 'json2md';
+  */
+ import { generateMarkdownPropsJson } from './props.mjs';
+ 
++/**
++ * If the string is contentful, ensure that it ends with a single newline.
++ * Otherwise normalize to `undefined`.
++ *
++ * @param {string} [str]
++ */
++function normalizeTrailingNewline( str ) {
++	if ( ! str?.trim() ) {
++		return undefined;
++	}
++	return str.replace( /\n*$/, '\n' );
++}
++
+ export function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
+ 	const mainDocsJson = [
+ 		{ h1: typeDocs.displayName },
+@@ -15,7 +28,7 @@ export function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
+ 		{
+ 			p: `<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-${ typeDocs.displayName.toLowerCase() }--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>`,
+ 		},
+-		typeDocs.description,
++		normalizeTrailingNewline( typeDocs.description ),
+ 		...generateMarkdownPropsJson( typeDocs.props ),
+ 	];
+ 
+@@ -26,7 +39,7 @@ export function generateMarkdownDocs( { typeDocs, subcomponentTypeDocs } ) {
+ 					{
+ 						h3: subcomponentTypeDoc.displayName,
+ 					},
+-					subcomponentTypeDoc.description,
++					normalizeTrailingNewline( subcomponentTypeDoc.description ),
+ 					...generateMarkdownPropsJson( subcomponentTypeDoc.props, {
+ 						headingLevel: 4,
+ 					} ),
+diff --git a/packages/components/src/alignment-matrix-control/README.md b/packages/components/src/alignment-matrix-control/README.md
+index af97e3ae0607cd..267b368454c499 100644
+--- a/packages/components/src/alignment-matrix-control/README.md
++++ b/packages/components/src/alignment-matrix-control/README.md
+@@ -21,6 +21,7 @@ const Example = () => {
+ 	);
+ };
+ ```
++
+ ## Props
+ 
+ ### `defaultValue`
+diff --git a/packages/components/src/angle-picker-control/README.md b/packages/components/src/angle-picker-control/README.md
+index d9389c6564338f..8b98ba813adde8 100644
+--- a/packages/components/src/angle-picker-control/README.md
++++ b/packages/components/src/angle-picker-control/README.md
+@@ -23,6 +23,7 @@ function Example() {
+   );
+ }
+ ```
++
+ ## Props
+ 
+ ### `as`
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index 839464b41260b5..9c8920fbc06896 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -25,6 +25,7 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
+ 	);
+ );
+ ```
++
+ ## Props
+ 
+ ### `__nextHasNoMarginBottom`
+@@ -113,6 +114,7 @@ const MyBaseControl = () => (
+ 	</BaseControl>
+ );
+ ```
++
+ #### Props
+ 
+ ##### `as`
+diff --git a/packages/components/src/box-control/README.md b/packages/components/src/box-control/README.md
+index da08cafceee42f..6192cfa47367ba 100644
+--- a/packages/components/src/box-control/README.md
++++ b/packages/components/src/box-control/README.md
+@@ -28,6 +28,7 @@ function Example() {
+   );
+ };
+ ```
++
+ ## Props
+ 
+ ### `__next40pxDefaultSize`
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index 99a6d0f9c24cfb..d63dee9007c2f0 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -17,6 +17,7 @@ const Mybutton = () => (
+   </Button>
+ );
+ ```
++
+ ## Props
+ 
+ ### `__next40pxDefaultSize`
+diff --git a/packages/components/src/form-file-upload/README.md b/packages/components/src/form-file-upload/README.md
+index c6a7205815de53..d281b1ca639274 100644
+--- a/packages/components/src/form-file-upload/README.md
++++ b/packages/components/src/form-file-upload/README.md
+@@ -19,6 +19,7 @@ const MyFormFileUpload = () => (
+   </FormFileUpload>
+ );
+ ```
++
+ ## Props
+ 
+ ### `__next40pxDefaultSize`
+diff --git a/packages/components/src/gradient-picker/README.md b/packages/components/src/gradient-picker/README.md
+index ec0210d03c0a43..652fcbf30ae135 100644
+--- a/packages/components/src/gradient-picker/README.md
++++ b/packages/components/src/gradient-picker/README.md
+@@ -43,6 +43,7 @@ const MyGradientPicker = () => {
+   );
+ };
+ ```
++
+ ## Props
+ 
+ ### `__experimentalIsRenderedInSidebar`
+diff --git a/packages/components/src/icon/README.md b/packages/components/src/icon/README.md
+index 63d52c1fd20b13..29e621f80c1fd9 100644
+--- a/packages/components/src/icon/README.md
++++ b/packages/components/src/icon/README.md
+@@ -11,6 +11,7 @@ import { wordpress } from '@wordpress/icons';
+ 
+ <Icon icon={ wordpress } />
+ ```
++
+ ## Props
+ 
+ ### `icon`
+diff --git a/packages/components/src/tree-select/README.md b/packages/components/src/tree-select/README.md
+index 493c83bf993b0c..5f3247bdb3322b 100644
+--- a/packages/components/src/tree-select/README.md
++++ b/packages/components/src/tree-select/README.md
+@@ -51,6 +51,7 @@ const MyTreeSelect = () => {
+ 	);
+ }
+ ```
++
+ ## Props
+ 
+ ### `__next40pxDefaultSize`

@@ -1,0 +1,39 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0698cdf42ba168..b0ce4acaa591eb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `SearchControl`: polish metrics for `compact` size variant ([#54663](https://github.com/WordPress/gutenberg/pull/54663)).
++
+ ### Bug Fix
+ 
+ -   `Placeholder`: Improved DOM structure and screen reader announcements ([#45801](https://github.com/WordPress/gutenberg/pull/45801)).
+diff --git a/packages/components/src/search-control/style.scss b/packages/components/src/search-control/style.scss
+index d9750721cf42b6..21bd875f699a98 100644
+--- a/packages/components/src/search-control/style.scss
++++ b/packages/components/src/search-control/style.scss
+@@ -43,6 +43,8 @@
+ 
+ 	&.is-size-compact input[type="search"].components-search-control__input {
+ 		height: $grid-unit-40;
++		padding-left: $grid-unit-10;
++		padding-right: $grid-unit-40;
+ 	}
+ 
+ }
+@@ -58,6 +60,10 @@
+ 	justify-content: center;
+ 
+ 	width: $icon-size;
++
++	.is-size-compact & {
++		right: $grid-unit-05;
++	}
+ }
+ 
+ .components-search-control__input-wrapper {

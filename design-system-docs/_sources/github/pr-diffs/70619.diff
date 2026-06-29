@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 641a0f8934821a..169eb0583cd404 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,8 @@
+ ### Bug Fixes
+ 
+ -   `FormTokenField`: Fix focus lost on tab when `__experimentalExpandOnFocus` is set ([#70591](https://github.com/WordPress/gutenberg/pull/70591)).
++-   `SelectControl`: Fix font-size for medium screens to ensure consistency with other inputs ([#70619](https://github.com/WordPress/gutenberg/pull/70619)).
++
+ 
+ ## 29.12.0 (2025-06-25)
+ 
+diff --git a/packages/components/src/select-control/style.scss b/packages/components/src/select-control/style.scss
+index 1558314af554f8..c01cc1051fcb3b 100644
+--- a/packages/components/src/select-control/style.scss
++++ b/packages/components/src/select-control/style.scss
+@@ -2,9 +2,3 @@
+ 	outline: 0;
+ 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
+ }
+-
+-@media (max-width: #{ ($break-medium) }) {
+-	.components-base-control .components-base-control__field .components-select-control__input {
+-		font-size: 16px;
+-	}
+-}

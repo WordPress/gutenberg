@@ -1,0 +1,842 @@
+diff --git a/package-lock.json b/package-lock.json
+index 52f6282f88689c..46977bbcaa386d 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -15514,6 +15514,7 @@
+ 				"@wordpress/primitives": "file:packages/primitives",
+ 				"@wordpress/rich-text": "file:packages/rich-text",
+ 				"@wordpress/warning": "file:packages/warning",
++				"ariakit": "2.0.0-alpha.12",
+ 				"classnames": "^2.3.1",
+ 				"colord": "^2.7.0",
+ 				"dom-scroll-into-view": "^1.2.1",
+@@ -23838,6 +23839,27 @@
+ 				"@babel/runtime-corejs3": "^7.10.2"
+ 			}
+ 		},
++		"ariakit": {
++			"version": "2.0.0-alpha.12",
++			"resolved": "https://registry.npmjs.org/ariakit/-/ariakit-2.0.0-alpha.12.tgz",
++			"integrity": "sha512-zx/BvDYcpqT2bZV8zWSpw1LjgFfosR05DK1BGTCyc5GAdwjmb7Mjaz+Hp3gpAIrrcxWJwtSWviwyJNFxw8WrZQ==",
++			"requires": {
++				"@popperjs/core": "^2.10.2",
++				"ariakit-utils": "^0.17.0-alpha.9"
++			},
++			"dependencies": {
++				"@popperjs/core": {
++					"version": "2.11.0",
++					"resolved": "https://registry.npmjs.org/@popperjs/core/-/core-2.11.0.tgz",
++					"integrity": "sha512-zrsUxjLOKAzdewIDRWy9nsV1GQsKBCWaGwsZQlCgr6/q+vjyZhFgqedLfFBuI9anTPEUT4APq9Mu0SZBTzIcGQ=="
++				}
++			}
++		},
++		"ariakit-utils": {
++			"version": "0.17.0-alpha.9",
++			"resolved": "https://registry.npmjs.org/ariakit-utils/-/ariakit-utils-0.17.0-alpha.9.tgz",
++			"integrity": "sha512-HjVoKMJayLIZcBqTA9BY4YxohDEQfYAhlnJsXKC/VJaSIhl967NuZJNeUTNsH0IIApdhlJD8BbGpKvo5BdZ8LQ=="
++		},
+ 		"arr-diff": {
+ 			"version": "4.0.0",
+ 			"resolved": "https://registry.npmjs.org/arr-diff/-/arr-diff-4.0.0.tgz",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index b952fb856351d9..0fc44c56421b49 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -49,6 +49,7 @@
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/rich-text": "file:../rich-text",
+ 		"@wordpress/warning": "file:../warning",
++		"ariakit": "2.0.0-alpha.12",
+ 		"classnames": "^2.3.1",
+ 		"colord": "^2.7.0",
+ 		"dom-scroll-into-view": "^1.2.1",
+diff --git a/packages/components/src/alignment-matrix-control/cell.js b/packages/components/src/alignment-matrix-control/cell.js
+index 2aeb839831c0c0..f3640ac3118819 100644
+--- a/packages/components/src/alignment-matrix-control/cell.js
++++ b/packages/components/src/alignment-matrix-control/cell.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { CompositeItem } from '../composite';
++import { CompositeItem } from '../composite2';
+ import Tooltip from '../tooltip';
+ import { VisuallyHidden } from '../visually-hidden';
+ 
+diff --git a/packages/components/src/alignment-matrix-control/index.js b/packages/components/src/alignment-matrix-control/index.js
+index d9665eb5d446dc..ae347dab54da29 100644
+--- a/packages/components/src/alignment-matrix-control/index.js
++++ b/packages/components/src/alignment-matrix-control/index.js
+@@ -9,13 +9,13 @@ import classnames from 'classnames';
+  */
+ import { __, isRTL } from '@wordpress/i18n';
+ import { useInstanceId } from '@wordpress/compose';
+-import { useState, useEffect } from '@wordpress/element';
++import { useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Cell from './cell';
+-import { Composite, CompositeGroup, useCompositeState } from '../composite';
++import { Composite, CompositeRow, useCompositeState } from '../composite2';
+ import { Root, Row } from './styles/alignment-matrix-control-styles';
+ import AlignmentMatrixControlIcon from './icon';
+ import { GRID, getItemId } from './utils';
+@@ -41,24 +41,16 @@ export default function AlignmentMatrixControl( {
+ } ) {
+ 	const [ immutableDefaultValue ] = useState( value ?? defaultValue );
+ 	const baseId = useBaseId( id );
+-	const initialCurrentId = getItemId( baseId, immutableDefaultValue );
++	const defaultActiveId = getItemId( baseId, immutableDefaultValue );
++	const activeId =
++		value !== undefined ? getItemId( baseId, value ) : undefined;
+ 
+ 	const composite = useCompositeState( {
+-		baseId,
+-		currentId: initialCurrentId,
++		defaultActiveId,
++		activeId,
+ 		rtl: isRTL(),
+ 	} );
+ 
+-	const handleOnChange = ( nextValue ) => {
+-		onChange( nextValue );
+-	};
+-
+-	useEffect( () => {
+-		if ( typeof value !== 'undefined' ) {
+-			composite.setCurrentId( getItemId( baseId, value ) );
+-		}
+-	}, [ value, composite.setCurrentId ] );
+-
+ 	const classes = classnames(
+ 		'component-alignment-matrix-control',
+ 		className
+@@ -67,7 +59,7 @@ export default function AlignmentMatrixControl( {
+ 	return (
+ 		<Composite
+ 			{ ...props }
+-			{ ...composite }
++			state={ composite }
+ 			aria-label={ label }
+ 			as={ Root }
+ 			className={ classes }
+@@ -75,29 +67,22 @@ export default function AlignmentMatrixControl( {
+ 			width={ width }
+ 		>
+ 			{ GRID.map( ( cells, index ) => (
+-				<CompositeGroup
+-					{ ...composite }
+-					as={ Row }
+-					role="row"
+-					key={ index }
+-				>
++				<CompositeRow as={ Row } role="row" key={ index }>
+ 					{ cells.map( ( cell ) => {
+ 						const cellId = getItemId( baseId, cell );
+-						const isActive = composite.currentId === cellId;
+-
++						const isActive = composite.activeId === cellId;
+ 						return (
+ 							<Cell
+-								{ ...composite }
+ 								id={ cellId }
+ 								isActive={ isActive }
+ 								key={ cell }
+ 								value={ cell }
+-								onFocus={ () => handleOnChange( cell ) }
++								onFocus={ () => onChange( cell ) }
+ 								tabIndex={ isActive ? 0 : -1 }
+ 							/>
+ 						);
+ 					} ) }
+-				</CompositeGroup>
++				</CompositeRow>
+ 			) ) }
+ 		</Composite>
+ 	);
+diff --git a/packages/components/src/alignment-matrix-control/stories/index.js b/packages/components/src/alignment-matrix-control/stories/index.js
+index bd85ec0b7f01ff..477cad71aa1d22 100644
+--- a/packages/components/src/alignment-matrix-control/stories/index.js
++++ b/packages/components/src/alignment-matrix-control/stories/index.js
+@@ -26,7 +26,11 @@ export default {
+ 
+ export const _default = () => {
+ 	const props = {
+-		value: select( 'value', alignmentOptions, 'center center' ),
++		defaultValue: select(
++			'defaultValue',
++			alignmentOptions,
++			'center center'
++		),
+ 	};
+ 
+ 	return <AlignmentMatrixControl { ...props } />;
+diff --git a/packages/components/src/composite2/index.js b/packages/components/src/composite2/index.js
+new file mode 100644
+index 00000000000000..6a74d8afcc2e76
+--- /dev/null
++++ b/packages/components/src/composite2/index.js
+@@ -0,0 +1,7 @@
++/* eslint-disable-next-line no-restricted-imports */
++export {
++	Composite,
++	CompositeRow,
++	CompositeItem,
++	useCompositeState,
++} from 'ariakit/composite';
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 15a61adab5c2ac..1af6bd4e1a277d 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ // eslint-disable-next-line no-restricted-imports
+-import { Separator } from 'reakit';
++import { Separator } from 'ariakit/separator';
+ // eslint-disable-next-line no-restricted-imports
+ import type { Ref } from 'react';
+ 
+diff --git a/packages/components/src/divider/types.ts b/packages/components/src/divider/types.ts
+index e531aa0561afdb..b524ac8db260af 100644
+--- a/packages/components/src/divider/types.ts
++++ b/packages/components/src/divider/types.ts
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ // eslint-disable-next-line no-restricted-imports
+-import type { SeparatorProps } from 'reakit';
++import type { SeparatorProps } from 'ariakit/separator';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 7951653ca10127..06aa0b757a768c 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -47,6 +47,12 @@ export {
+ 	CompositeItem as __unstableCompositeItem,
+ 	useCompositeState as __unstableUseCompositeState,
+ } from './composite';
++export {
++	Composite as __unstableComposite2,
++	CompositeRow as __unstableCompositeRow2,
++	CompositeItem as __unstableCompositeItem2,
++	useCompositeState as __unstableUseCompositeState2,
++} from './composite2';
+ export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
+ export { default as CustomSelectControl } from './custom-select-control';
+ export { default as Dashicon } from './dashicon';
+diff --git a/packages/components/src/radio-context/index.js b/packages/components/src/radio-context/index.js
+index 58a7783dcb84e0..2332d701052399 100644
+--- a/packages/components/src/radio-context/index.js
++++ b/packages/components/src/radio-context/index.js
+@@ -4,8 +4,8 @@
+ import { createContext } from '@wordpress/element';
+ 
+ const RadioContext = createContext( {
+-	state: null,
+-	setState: () => {},
++	value: null,
++	setValue: () => {},
+ } );
+ 
+ export default RadioContext;
+diff --git a/packages/components/src/radio-group/index.js b/packages/components/src/radio-group/index.js
+index 517af1c0dcba6d..4ac2458742a507 100644
+--- a/packages/components/src/radio-group/index.js
++++ b/packages/components/src/radio-group/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { useRadioState, RadioGroup as ReakitRadioGroup } from 'reakit/Radio';
++import { useRadioState, RadioGroup as AriakitRadioGroup } from 'ariakit/radio';
+ 
+ /**
+  * WordPress dependencies
+@@ -19,24 +19,19 @@ function RadioGroup(
+ 	ref
+ ) {
+ 	const radioState = useRadioState( {
+-		state: defaultChecked,
+-		baseId: props.id,
++		defaultValue: defaultChecked,
++		value: checked,
++		setValue: onChange,
+ 	} );
+-	const radioContext = {
+-		...radioState,
+-		disabled,
+-		// controlled or uncontrolled
+-		state: checked ?? radioState.state,
+-		setState: onChange ?? radioState.setState,
+-	};
++	const radioContext = { ...radioState, disabled };
+ 
+ 	return (
+ 		<RadioContext.Provider value={ radioContext }>
+-			<ReakitRadioGroup
++			<AriakitRadioGroup
+ 				ref={ ref }
+ 				as={ ButtonGroup }
+ 				aria-label={ label }
+-				{ ...radioState }
++				state={ radioState }
+ 				{ ...props }
+ 			/>
+ 		</RadioContext.Provider>
+diff --git a/packages/components/src/radio-group/stories/index.js b/packages/components/src/radio-group/stories/index.js
+index 57804933797f03..527d46956d605b 100644
+--- a/packages/components/src/radio-group/stories/index.js
++++ b/packages/components/src/radio-group/stories/index.js
+@@ -14,12 +14,7 @@ export default { title: 'Components/RadioGroup', component: RadioGroup };
+ export const _default = () => {
+ 	/* eslint-disable no-restricted-syntax */
+ 	return (
+-		<RadioGroup
+-			// id is required for server side rendering
+-			id="default-radiogroup"
+-			label="options"
+-			defaultChecked="option2"
+-		>
++		<RadioGroup label="options" defaultChecked="option2">
+ 			<Radio value="option1">Option 1</Radio>
+ 			<Radio value="option2">Option 2</Radio>
+ 			<Radio value="option3">Option 3</Radio>
+@@ -31,13 +26,7 @@ export const _default = () => {
+ export const disabled = () => {
+ 	/* eslint-disable no-restricted-syntax */
+ 	return (
+-		<RadioGroup
+-			// id is required for server side rendering
+-			id="disabled-radiogroup"
+-			disabled
+-			label="options"
+-			defaultChecked="option2"
+-		>
++		<RadioGroup disabled label="options" defaultChecked="option2">
+ 			<Radio value="option1">Option 1</Radio>
+ 			<Radio value="option2">Option 2</Radio>
+ 			<Radio value="option3">Option 3</Radio>
+@@ -51,13 +40,7 @@ const ControlledRadioGroupWithState = () => {
+ 
+ 	/* eslint-disable no-restricted-syntax */
+ 	return (
+-		<RadioGroup
+-			// id is required for server side rendering
+-			id="controlled-radiogroup"
+-			label="options"
+-			checked={ checked }
+-			onChange={ setChecked }
+-		>
++		<RadioGroup label="options" checked={ checked } onChange={ setChecked }>
+ 			<Radio value={ 0 }>Option 1</Radio>
+ 			<Radio value={ 1 }>Option 2</Radio>
+ 			<Radio value={ 2 }>Option 3</Radio>
+diff --git a/packages/components/src/radio/index.js b/packages/components/src/radio/index.js
+index d7bdefbe608c9b..214964ed7b414e 100644
+--- a/packages/components/src/radio/index.js
++++ b/packages/components/src/radio/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { Radio as ReakitRadio } from 'reakit/Radio';
++import { Radio as AriakitRadio } from 'ariakit/radio';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,19 +16,19 @@ import RadioContext from '../radio-context';
+ 
+ function Radio( { children, value, ...props }, ref ) {
+ 	const radioContext = useContext( RadioContext );
+-	const checked = radioContext.state === value;
++	const checked = radioContext.value === value;
+ 
+ 	return (
+-		<ReakitRadio
++		<AriakitRadio
+ 			ref={ ref }
+ 			as={ Button }
+ 			variant={ checked ? 'primary' : 'secondary' }
+ 			value={ value }
+-			{ ...radioContext }
++			disabled={ radioContext.disabled }
+ 			{ ...props }
+ 		>
+ 			{ children || value }
+-		</ReakitRadio>
++		</AriakitRadio>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/radio/stories/index.js b/packages/components/src/radio/stories/index.js
+index 4caeeadeec2b98..5ec9b0efa6ffc3 100644
+--- a/packages/components/src/radio/stories/index.js
++++ b/packages/components/src/radio/stories/index.js
+@@ -10,8 +10,7 @@ export const _default = () => {
+ 	// Radio components must be a descendent of a RadioGroup component.
+ 	/* eslint-disable no-restricted-syntax */
+ 	return (
+-		// id is required for server side rendering
+-		<RadioGroup id="default-radiogroup" label="options">
++		<RadioGroup label="options">
+ 			<Radio value="option1">Option 1</Radio>
+ 			<Radio value="option2">Option 2</Radio>
+ 		</RadioGroup>
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+index 679369cb776cd4..203d7491ca01ae 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+@@ -49,6 +49,25 @@ exports[`ToggleGroupControl should render correctly 1`] = `
+ }
+ 
+ .emotion-6 {
++  background: #1e1e1e;
++  border-radius: 2px;
++  box-shadow: transparent;
++  left: 0;
++  position: absolute;
++  top: 2px;
++  bottom: 2px;
++  -webkit-transition: -webkit-transform 160ms ease;
++  transition: transform 160ms ease;
++  z-index: 1;
++}
++
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-6 {
++    transition-duration: 0ms;
++  }
++}
++
++.emotion-8 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+   display: -ms-inline-flexbox;
+@@ -61,7 +80,7 @@ exports[`ToggleGroupControl should render correctly 1`] = `
+   flex: 1;
+ }
+ 
+-.emotion-8 {
++.emotion-10 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -100,20 +119,20 @@ exports[`ToggleGroupControl should render correctly 1`] = `
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+-  .emotion-8 {
++  .emotion-10 {
+     transition-duration: 0ms;
+   }
+ }
+ 
+-.emotion-8::-moz-focus-inner {
++.emotion-10::-moz-focus-inner {
+   border: 0;
+ }
+ 
+-.emotion-8:active {
++.emotion-10:active {
+   background: #fff;
+ }
+ 
+-.emotion-9 {
++.emotion-11 {
+   font-size: 13px;
+   line-height: 1;
+   position: absolute;
+@@ -125,7 +144,7 @@ exports[`ToggleGroupControl should render correctly 1`] = `
+   transform: translate( -50%, -50% );
+ }
+ 
+-.emotion-11 {
++.emotion-13 {
+   font-size: 13px;
+   font-weight: bold;
+   height: 0;
+@@ -151,7 +170,6 @@ exports[`ToggleGroupControl should render correctly 1`] = `
+       class="medium components-toggle-group-control emotion-4 emotion-5"
+       data-wp-c16t="true"
+       data-wp-component="ToggleGroupControl"
+-      id="toggle-group-control-0"
+       role="radiogroup"
+     >
+       <iframe
+@@ -163,55 +181,61 @@ exports[`ToggleGroupControl should render correctly 1`] = `
+       />
+       <div
+         class="emotion-6 emotion-7"
++        role="presentation"
++        style="transform: translateX(0px); transition: none; width: 0px;"
++      />
++      <div
++        class="emotion-8 emotion-9"
+         data-active="false"
+       >
+         <button
+           aria-checked="false"
+           aria-label="R"
+-          class="emotion-8 components-toggle-group-control-option"
++          class="emotion-10 components-toggle-group-control-option"
++          data-command=""
+           data-value="rigas"
+           data-wp-c16t="true"
+           data-wp-component="ToggleGroupControlOption"
+-          id="toggle-group-control-0-0"
++          id="toggle-group-control-option-0"
+           role="radio"
+-          tabindex="0"
+         >
+           <div
+-            class="emotion-9 emotion-10"
++            class="emotion-11 emotion-12"
+           >
+             R
+           </div>
+           <div
+             aria-hidden="true"
+-            class="emotion-11 emotion-12"
++            class="emotion-13 emotion-14"
+           >
+             R
+           </div>
+         </button>
+       </div>
+       <div
+-        class="emotion-6 emotion-7"
++        class="emotion-8 emotion-9"
+         data-active="false"
+       >
+         <button
+           aria-checked="false"
+           aria-label="J"
+-          class="emotion-8 components-toggle-group-control-option"
++          class="emotion-10 components-toggle-group-control-option"
++          data-command=""
+           data-value="jack"
+           data-wp-c16t="true"
+           data-wp-component="ToggleGroupControlOption"
+-          id="toggle-group-control-0-1"
++          id="toggle-group-control-option-1"
+           role="radio"
+           tabindex="-1"
+         >
+           <div
+-            class="emotion-9 emotion-10"
++            class="emotion-11 emotion-12"
+           >
+             J
+           </div>
+           <div
+             aria-hidden="true"
+-            class="emotion-11 emotion-12"
++            class="emotion-13 emotion-14"
+           >
+             J
+           </div>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+index d42f7d8ab9c3c5..6df83bbd3a49d0 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+@@ -2,9 +2,9 @@
+  * External dependencies
+  */
+ // eslint-disable-next-line no-restricted-imports
+-import type { Ref } from 'react';
++import type { FocusEvent, Ref } from 'react';
+ // eslint-disable-next-line no-restricted-imports
+-import { Radio } from 'reakit';
++import { Radio } from 'ariakit/radio';
+ 
+ /**
+  * WordPress dependencies
+@@ -45,7 +45,7 @@ function ToggleGroupControlOption(
+ 	const toggleGroupControlContext = useToggleGroupControlContext();
+ 	const id = useInstanceId(
+ 		ToggleGroupControlOption,
+-		toggleGroupControlContext.baseId || 'toggle-group-control-option'
++		'toggle-group-control-option'
+ 	) as string;
+ 	const buttonProps = useContextSystem(
+ 		{ ...props, id },
+@@ -58,13 +58,14 @@ function ToggleGroupControlOption(
+ 		label,
+ 		value,
+ 		showTooltip = false,
++		state,
+ 		...radioProps
+ 	} = {
+ 		...toggleGroupControlContext,
+ 		...buttonProps,
+ 	};
+ 
+-	const isActive = radioProps.state === value;
++	const isActive = state.value === value;
+ 	const cx = useCx();
+ 	const labelViewClasses = cx( isBlock && styles.labelBlock );
+ 	const classes = cx(
+@@ -82,6 +83,11 @@ function ToggleGroupControlOption(
+ 				<Radio
+ 					{ ...radioProps }
+ 					as="button"
++					onFocus={ ( event: FocusEvent< HTMLButtonElement > ) => {
++						radioProps.onFocus?.( event );
++						if ( event.defaultPrevented ) return;
++						state.setValue( value );
++					} }
+ 					aria-label={ optionLabel }
+ 					className={ classes }
+ 					data-value={ value }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index a4059ecef6eeac..f32f561c5df67a 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -4,7 +4,7 @@
+ // eslint-disable-next-line no-restricted-imports
+ import type { Ref } from 'react';
+ // eslint-disable-next-line no-restricted-imports
+-import { RadioGroup, useRadioState } from 'reakit';
++import { RadioGroup, useRadioState } from 'ariakit/radio';
+ import useResizeAware from 'react-resize-aware';
+ 
+ /**
+@@ -12,7 +12,7 @@ import useResizeAware from 'react-resize-aware';
+  */
+ import { __ } from '@wordpress/i18n';
+ import { useRef, useMemo } from '@wordpress/element';
+-import { useMergeRefs, useInstanceId, usePrevious } from '@wordpress/compose';
++import { useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -22,7 +22,7 @@ import {
+ 	useContextSystem,
+ 	WordPressComponentProps,
+ } from '../../ui/context';
+-import { useUpdateEffect, useCx } from '../../utils/hooks';
++import { useCx } from '../../utils/hooks';
+ import { View } from '../../view';
+ import BaseControl from '../../base-control';
+ import ToggleGroupControlBackdrop from './toggle-group-control-backdrop';
+@@ -44,38 +44,17 @@ function ToggleGroupControl(
+ 		hideLabelFromVision = false,
+ 		help,
+ 		onChange = noop,
+-		value,
+ 		children,
+ 		...otherProps
+ 	} = useContextSystem( props, 'ToggleGroupControl' );
+ 	const cx = useCx();
+ 	const containerRef = useRef();
+ 	const [ resizeListener, sizes ] = useResizeAware();
+-	const baseId = useInstanceId(
+-		ToggleGroupControl,
+-		'toggle-group-control'
+-	).toString();
+-	const radio = useRadioState( {
+-		baseId,
+-		state: value,
+-	} );
+-	const previousValue = usePrevious( value );
+-
+-	// Propagate radio.state change
+-	useUpdateEffect( () => {
+-		// Avoid calling onChange if radio state changed
+-		// from incoming value.
+-		if ( previousValue !== radio.state ) {
+-			onChange( radio.state );
+-		}
+-	}, [ radio.state ] );
+-
+-	// Sync incoming value with radio.state
+-	useUpdateEffect( () => {
+-		if ( value !== radio.state ) {
+-			radio.setState( value );
+-		}
+-	}, [ value ] );
++	const value =
++		'value' in otherProps && otherProps.value === undefined
++			? null
++			: otherProps.value;
++	const radio = useRadioState( { value, setValue: onChange } );
+ 
+ 	const classes = useMemo(
+ 		() =>
+@@ -87,10 +66,11 @@ function ToggleGroupControl(
+ 			),
+ 		[ className, isBlock ]
+ 	);
++
+ 	return (
+ 		<BaseControl help={ help }>
+ 			<ToggleGroupControlContext.Provider
+-				value={ { ...radio, isBlock: ! isAdaptiveWidth } }
++				value={ { state: radio, isBlock: ! isAdaptiveWidth } }
+ 			>
+ 				{ ! hideLabelFromVision && (
+ 					<div>
+@@ -100,7 +80,7 @@ function ToggleGroupControl(
+ 					</div>
+ 				) }
+ 				<RadioGroup
+-					{ ...radio }
++					state={ radio }
+ 					aria-label={ label }
+ 					as={ View }
+ 					className={ classes }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/toggle-group-control-backdrop.tsx b/packages/components/src/toggle-group-control/toggle-group-control/toggle-group-control-backdrop.tsx
+index db53128a178c61..4a23d287a9f13e 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/toggle-group-control-backdrop.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/toggle-group-control-backdrop.tsx
+@@ -13,7 +13,7 @@ function ToggleGroupControlBackdrop( {
+ 	containerRef,
+ 	containerWidth,
+ 	isAdaptiveWidth,
+-	state,
++	value,
+ }: ToggleGroupControlBackdropProps ) {
+ 	const [ left, setLeft ] = useState( 0 );
+ 	const [ width, setWidth ] = useState( 0 );
+@@ -28,7 +28,7 @@ function ToggleGroupControlBackdrop( {
+ 		 * Workaround for Reakit
+ 		 */
+ 		const targetNode = containerNode.querySelector(
+-			`[data-value="${ state }"]`
++			`[data-value="${ value }"]`
+ 		);
+ 		setRenderBackdrop( !! targetNode );
+ 		if ( ! targetNode ) {
+@@ -65,7 +65,7 @@ function ToggleGroupControlBackdrop( {
+ 			window.clearTimeout( dimensionsRequestId );
+ 			window.cancelAnimationFrame( animationRequestId );
+ 		};
+-	}, [ canAnimate, containerRef, containerWidth, state, isAdaptiveWidth ] );
++	}, [ canAnimate, containerRef, containerWidth, value, isAdaptiveWidth ] );
+ 
+ 	if ( ! renderBackdrop ) {
+ 		return null;
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index b14099c1ad35dd..17eac656eefc13 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -2,9 +2,14 @@
+  * External dependencies
+  */
+ // eslint-disable-next-line no-restricted-imports
+-import type { MutableRefObject, ReactNode, ReactText } from 'react';
++import type {
++	MutableRefObject,
++	ReactNode,
++	ReactText,
++	SyntheticEvent,
++} from 'react';
+ // eslint-disable-next-line no-restricted-imports
+-import type { RadioStateReturn } from 'reakit';
++import type { RadioState } from 'ariakit/radio';
+ 
+ /**
+  * Internal dependencies
+@@ -13,6 +18,10 @@ import type { FormElementProps } from '../utils/types';
+ 
+ export type ToggleGroupControlOptionProps = {
+ 	value: ReactText;
++	/**
++	 * Callback function that is called when the radio button state changes.
++	 */
++	onChange?: ( event: SyntheticEvent< HTMLInputElement > ) => void;
+ 	/**
+ 	 * Label for the option. If needed, the `aria-label` prop can be used in addition
+ 	 * to specify a different label for assistive technologies.
+@@ -73,7 +82,7 @@ export type ToggleGroupControlProps = Omit<
+ 	/**
+ 	 * Callback when a segment is selected.
+ 	 */
+-	onChange?: ( value: ReactText | undefined ) => void;
++	onChange?: ( value: ReactText | null ) => void;
+ 	/**
+ 	 * The value of `ToggleGroupControl`
+ 	 */
+@@ -89,7 +98,11 @@ export type ToggleGroupControlProps = Omit<
+ 	help?: ReactNode;
+ };
+ 
+-export type ToggleGroupControlContextProps = RadioStateReturn & {
++export type ToggleGroupControlContextProps = {
++	/**
++	 * Radio state.
++	 */
++	state: RadioState;
+ 	/**
+ 	 * Renders `ToggleGroupControl` as a (CSS) block element.
+ 	 *
+@@ -102,5 +115,5 @@ export type ToggleGroupControlBackdropProps = {
+ 	containerRef: MutableRefObject< HTMLElement | undefined >;
+ 	containerWidth?: number | null;
+ 	isAdaptiveWidth?: boolean;
+-	state?: any;
++	value?: any;
+ };
+diff --git a/packages/components/src/toolbar-item/index.js b/packages/components/src/toolbar-item/index.js
+index 7f938d55f85584..a7799b6b7e6489 100644
+--- a/packages/components/src/toolbar-item/index.js
++++ b/packages/components/src/toolbar-item/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { ToolbarItem as BaseToolbarItem } from 'reakit/Toolbar';
++import { ToolbarItem as BaseToolbarItem } from 'ariakit/toolbar';
+ 
+ /**
+  * WordPress dependencies
+@@ -36,7 +36,7 @@ function ToolbarItem( { children, as: Component, ...props }, ref ) {
+ 
+ 	return (
+ 		<BaseToolbarItem
+-			{ ...accessibleToolbarState }
++			state={ accessibleToolbarState }
+ 			{ ...allProps }
+ 			as={ Component }
+ 		>
+diff --git a/packages/components/src/toolbar/toolbar-container.js b/packages/components/src/toolbar/toolbar-container.js
+index 4e39fb0990677b..8cf55874bd2405 100644
+--- a/packages/components/src/toolbar/toolbar-container.js
++++ b/packages/components/src/toolbar/toolbar-container.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { useToolbarState, Toolbar } from 'reakit/Toolbar';
++import { useToolbarState, Toolbar } from 'ariakit/toolbar';
+ 
+ /**
+  * WordPress dependencies
+@@ -15,12 +15,8 @@ import { isRTL } from '@wordpress/i18n';
+ import ToolbarContext from '../toolbar-context';
+ 
+ function ToolbarContainer( { label, ...props }, ref ) {
+-	// https://reakit.io/docs/basic-concepts/#state-hooks
+-	// Passing baseId for server side rendering (which includes snapshots)
+-	// If an id prop is passed to Toolbar, toolbar items will use it as a base for their ids
+ 	const toolbarState = useToolbarState( {
+-		loop: true,
+-		baseId: props.id,
++		focusLoop: true,
+ 		rtl: isRTL(),
+ 	} );
+ 
+@@ -30,7 +26,7 @@ function ToolbarContainer( { label, ...props }, ref ) {
+ 			<Toolbar
+ 				ref={ ref }
+ 				aria-label={ label }
+-				{ ...toolbarState }
++				state={ toolbarState }
+ 				{ ...props }
+ 			/>
+ 		</ToolbarContext.Provider>

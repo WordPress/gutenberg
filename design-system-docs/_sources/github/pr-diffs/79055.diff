@@ -1,0 +1,491 @@
+diff --git a/package-lock.json b/package-lock.json
+index d317cf3076eafd..506781b8595381 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -150,19 +150,30 @@
+ 				"js-yaml": "bin/js-yaml.js"
+ 			}
+ 		},
++		"node_modules/@ariakit/components": {
++			"version": "0.1.2",
++			"resolved": "https://registry.npmjs.org/@ariakit/components/-/components-0.1.2.tgz",
++			"integrity": "sha512-tvh2P0x1cJnoPXnmDEJwdRk3z7x6cTB8ArctcZdAUXlRg9tuwW/rJoBFJMzD5qMI9CDDlQ3Zctx58HvENw4BYw==",
++			"license": "MIT",
++			"dependencies": {
++				"@ariakit/store": "0.1.2",
++				"@ariakit/utils": "0.1.2"
++			}
++		},
+ 		"node_modules/@ariakit/core": {
+ 			"version": "0.4.18",
+ 			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.18.tgz",
+ 			"integrity": "sha512-9urEa+GbZTSyredq3B/3thQjTcSZSUC68XctwCkJNH/xNfKN5O+VThiem2rcJxpsGw8sRUQenhagZi0yB4foyg==",
++			"dev": true,
+ 			"license": "MIT"
+ 		},
+ 		"node_modules/@ariakit/react": {
+-			"version": "0.4.21",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.21.tgz",
+-			"integrity": "sha512-UjP99Y7cWxA5seRECEE0RPZFImkLGFIWPflp65t0BVZwlMw4wp9OJZRHMrnkEkKl5KBE2NR/gbbzwHc6VNGzsA==",
++			"version": "0.4.29",
++			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.29.tgz",
++			"integrity": "sha512-SLXlsddWHSwfUol4Yi0zULlalNWjzWjpS3zg7B7aaPd64saONQ5ktWf9KMxqBklcpjMLeF2dB9BAHAvpPVdCIQ==",
+ 			"license": "MIT",
+ 			"dependencies": {
+-				"@ariakit/react-core": "0.4.21"
++				"@ariakit/react-components": "0.1.2"
+ 			},
+ 			"funding": {
+ 				"type": "opencollective",
+@@ -173,21 +184,61 @@
+ 				"react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
+ 			}
+ 		},
+-		"node_modules/@ariakit/react-core": {
+-			"version": "0.4.21",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.21.tgz",
+-			"integrity": "sha512-rUI9uB/gT3mROFja/ka7/JukkdljIZR3eq3BGiQqX4Ni/KBMDvPK8FvVLnC0TGzWcqNY2bbfve8QllvHzuw4fQ==",
++		"node_modules/@ariakit/react-components": {
++			"version": "0.1.2",
++			"resolved": "https://registry.npmjs.org/@ariakit/react-components/-/react-components-0.1.2.tgz",
++			"integrity": "sha512-SM+SPMAVlOZmGAfWNBza+0k9y4mkA5/dJhDoOyhE96cbNARy665uLdwowSJl1JGuFfcZzuzAwGon7f/rYeyfkQ==",
+ 			"license": "MIT",
+ 			"dependencies": {
+-				"@ariakit/core": "0.4.18",
+-				"@floating-ui/dom": "^1.0.0",
+-				"use-sync-external-store": "^1.2.0"
++				"@ariakit/components": "0.1.2",
++				"@ariakit/react-store": "0.1.2",
++				"@ariakit/react-utils": "0.1.2",
++				"@ariakit/store": "0.1.2",
++				"@ariakit/utils": "0.1.2",
++				"@floating-ui/dom": "^1.0.0"
+ 			},
+ 			"peerDependencies": {
+ 				"react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+ 				"react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
+ 			}
+ 		},
++		"node_modules/@ariakit/react-store": {
++			"version": "0.1.2",
++			"resolved": "https://registry.npmjs.org/@ariakit/react-store/-/react-store-0.1.2.tgz",
++			"integrity": "sha512-1r1Gn0tqhnOS0LFvHNGzn5/8C5aOANO5vb0Gxh94oR/be4zwCSE2zfQjOjRfpL+BBDhOcProME2+G6UslEJxbg==",
++			"license": "MIT",
++			"dependencies": {
++				"@ariakit/react-utils": "0.1.2",
++				"@ariakit/store": "0.1.2",
++				"@ariakit/utils": "0.1.2",
++				"use-sync-external-store": "^1.6.0"
++			},
++			"peerDependencies": {
++				"react": "^17.0.0 || ^18.0.0 || ^19.0.0"
++			}
++		},
++		"node_modules/@ariakit/react-utils": {
++			"version": "0.1.2",
++			"resolved": "https://registry.npmjs.org/@ariakit/react-utils/-/react-utils-0.1.2.tgz",
++			"integrity": "sha512-Rnl6D1542Mqu80xK++oUv1JXS0PtNmKXd9nkdud5nyvySiBDTrmPqRW44/D+5GbuZrboreQuY3tPYwKL7a7onQ==",
++			"license": "MIT",
++			"dependencies": {
++				"@ariakit/store": "0.1.2",
++				"@ariakit/utils": "0.1.2"
++			},
++			"peerDependencies": {
++				"react": "^17.0.0 || ^18.0.0 || ^19.0.0"
++			}
++		},
++		"node_modules/@ariakit/store": {
++			"version": "0.1.2",
++			"resolved": "https://registry.npmjs.org/@ariakit/store/-/store-0.1.2.tgz",
++			"integrity": "sha512-SS7bV4+a+1q9M9i0WV6DD4P/ypRKlCvII8soo2UMe1yuaxZA/Fc0htHe+EZwjJ6TMLjHfHh2TDSnXyrjC7QImA==",
++			"license": "MIT",
++			"dependencies": {
++				"@ariakit/utils": "0.1.2"
++			}
++		},
+ 		"node_modules/@ariakit/test": {
+ 			"version": "0.4.13",
+ 			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.4.13.tgz",
+@@ -215,6 +266,12 @@
+ 				}
+ 			}
+ 		},
++		"node_modules/@ariakit/utils": {
++			"version": "0.1.2",
++			"resolved": "https://registry.npmjs.org/@ariakit/utils/-/utils-0.1.2.tgz",
++			"integrity": "sha512-lBJhtBWpKjIck/9i7G8cahvaUgLsyGklI/Pjv+VtY9KTzyuzX5GpRbbLKMS/e1qLnFPS4C3CybYB70b1bVcAkw==",
++			"license": "MIT"
++		},
+ 		"node_modules/@asamuzakjp/css-color": {
+ 			"version": "3.2.0",
+ 			"resolved": "https://registry.npmjs.org/@asamuzakjp/css-color/-/css-color-3.2.0.tgz",
+@@ -48778,7 +48835,7 @@
+ 			"version": "34.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@ariakit/react": "^0.4.21",
++				"@ariakit/react": "^0.4.29",
+ 				"@date-fns/utc": "^2.1.1",
+ 				"@emotion/cache": "^11.14.0",
+ 				"@emotion/css": "^11.13.5",
+@@ -48854,38 +48911,6 @@
+ 				"react-dom": "^18.0.0"
+ 			}
+ 		},
+-		"packages/components/node_modules/@ariakit/react": {
+-			"version": "0.4.22",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.22.tgz",
+-			"integrity": "sha512-NKVBwMIGGfgMr2AoxvmUWmAeE/g6X/pDozR1S0yInF5tyem2DZQm+Td/9mKmZPu5e0x0hbEX1AQrb8SvL4VoBg==",
+-			"license": "MIT",
+-			"dependencies": {
+-				"@ariakit/react-core": "0.4.22"
+-			},
+-			"funding": {
+-				"type": "opencollective",
+-				"url": "https://opencollective.com/ariakit"
+-			},
+-			"peerDependencies": {
+-				"react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+-				"react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
+-			}
+-		},
+-		"packages/components/node_modules/@ariakit/react-core": {
+-			"version": "0.4.22",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.22.tgz",
+-			"integrity": "sha512-fWzQjMDhMCPGXDJ0/MkYF9vktclwF9XPxKm2fCwYfJMFtAha3ZKXnme2t+IAxguBLtklzW+5xTAEjKV4xn9s7A==",
+-			"license": "MIT",
+-			"dependencies": {
+-				"@ariakit/core": "0.4.18",
+-				"@floating-ui/dom": "^1.0.0",
+-				"use-sync-external-store": "^1.2.0"
+-			},
+-			"peerDependencies": {
+-				"react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+-				"react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
+-			}
+-		},
+ 		"packages/components/node_modules/@emotion/css": {
+ 			"version": "11.13.5",
+ 			"resolved": "https://registry.npmjs.org/@emotion/css/-/css-11.13.5.tgz",
+@@ -50281,7 +50306,7 @@
+ 			"version": "15.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@ariakit/react": "^0.4.21",
++				"@ariakit/react": "^0.4.29",
+ 				"@types/react": "^18.3.27",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a8a7bdcb69566f..384a69c37c8f6b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,8 @@
+ ### Internal
+ 
+ -   `UnitControl`: Remove dead native code branches now that `Platform.OS` is always `'web'` following the React Native removal ([#79031](https://github.com/WordPress/gutenberg/pull/79031)).
++-   `Tabs`: Update `@ariakit/react` to `0.4.29`, adopting the upstream fix that moves focus to the selected tab on a controlled selection change, and removing the now-unnecessary controlled-mode focus workarounds ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
++-   `ToggleGroupControl`: Radio options now render an auto-generated `name` attribute, following Ariakit's `Radio` behavior ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
+ -   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+ 
+ ## 34.0.0 (2026-05-27)
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 3f7ac2be95de46..0598be18098650 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -50,7 +50,7 @@
+ 		"src/**/*.scss"
+ 	],
+ 	"dependencies": {
+-		"@ariakit/react": "^0.4.21",
++		"@ariakit/react": "^0.4.29",
+ 		"@date-fns/utc": "^2.1.1",
+ 		"@emotion/cache": "^11.14.0",
+ 		"@emotion/css": "^11.13.5",
+diff --git a/packages/components/src/tabs/index.tsx b/packages/components/src/tabs/index.tsx
+index 2cbe487976c59e..9908bbdbfd7656 100644
+--- a/packages/components/src/tabs/index.tsx
++++ b/packages/components/src/tabs/index.tsx
+@@ -7,7 +7,7 @@ import * as Ariakit from '@ariakit/react';
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { useEffect, useMemo } from '@wordpress/element';
++import { useMemo } from '@wordpress/element';
+ import { isRTL } from '@wordpress/i18n';
+ 
+ /**
+@@ -84,31 +84,6 @@ export const Tabs = Object.assign(
+ 			rtl: isRTL(),
+ 		} );
+ 
+-		const { items, activeId } = Ariakit.useStoreState( store );
+-		const { setActiveId } = store;
+-
+-		useEffect( () => {
+-			requestAnimationFrame( () => {
+-				const focusedElement =
+-					items?.[ 0 ]?.element?.ownerDocument.activeElement;
+-
+-				if (
+-					! focusedElement ||
+-					! items.some( ( item ) => focusedElement === item.element )
+-				) {
+-					return; // Return early if no tabs are focused.
+-				}
+-
+-				// If, after ariakit re-computes the active tab, that tab doesn't match
+-				// the currently focused tab, then we force an update to ariakit to avoid
+-				// any mismatches, especially when navigating to previous/next tab with
+-				// arrow keys.
+-				if ( activeId !== focusedElement.id ) {
+-					setActiveId( focusedElement.id );
+-				}
+-			} );
+-		}, [ activeId, items, setActiveId ] );
+-
+ 		const contextValue = useMemo(
+ 			() => ( {
+ 				store,
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index b7cfef7e19a096..4e199aa22a2fc5 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import * as Ariakit from '@ariakit/react';
++import { useStoreState } from '@ariakit/react';
+ import clsx from 'clsx';
+ 
+ /**
+@@ -73,15 +73,14 @@ export const TabList = forwardRef<
+ >( function TabList( { children, ...otherProps }, ref ) {
+ 	const { store } = useTabsContext() ?? {};
+ 
+-	const selectedId = Ariakit.useStoreState( store, 'selectedId' );
+-	const activeId = Ariakit.useStoreState( store, 'activeId' );
+-	const selectOnMove = Ariakit.useStoreState( store, 'selectOnMove' );
+-	const items = Ariakit.useStoreState( store, 'items' );
++	const selectedId = useStoreState( store, 'selectedId' );
++	const selectOnMove = useStoreState( store, 'selectOnMove' );
++	const items = useStoreState( store, 'items' );
+ 	const [ parent, setParent ] = useState< HTMLElement >();
+ 	const refs = useMergeRefs( [ ref, setParent ] );
+ 
+ 	const selectedItem = store?.item( selectedId );
+-	const renderedItems = Ariakit.useStoreState( store, 'renderedItems' );
++	const renderedItems = useStoreState( store, 'renderedItems' );
+ 
+ 	const selectedItemIndex =
+ 		renderedItems && selectedItem
+@@ -110,20 +109,6 @@ export const TabList = forwardRef<
+ 	// Make sure selected tab is scrolled into view.
+ 	useScrollRectIntoView( parent, selectedRect );
+ 
+-	const onBlur = () => {
+-		if ( ! selectOnMove ) {
+-			return;
+-		}
+-
+-		// When automatic tab selection is on, make sure that the active tab is up
+-		// to date with the selected tab when leaving the tablist. This makes sure
+-		// that the selected tab will receive keyboard focus when tabbing back into
+-		// the tablist.
+-		if ( selectedId !== activeId ) {
+-			store?.setActiveId( selectedId );
+-		}
+-	};
+-
+ 	if ( ! store ) {
+ 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
+ 		return null;
+@@ -141,7 +126,6 @@ export const TabList = forwardRef<
+ 					tabIndex={ props.tabIndex ?? -1 }
+ 				/>
+ 			) }
+-			onBlur={ onBlur }
+ 			data-select-on-move={ selectOnMove ? 'true' : 'false' }
+ 			{ ...otherProps }
+ 			className={ clsx(
+diff --git a/packages/components/src/tabs/test/index.tsx b/packages/components/src/tabs/test/index.tsx
+index fd9ceb38190a79..7ff6106a2e8752 100644
+--- a/packages/components/src/tabs/test/index.tsx
++++ b/packages/components/src/tabs/test/index.tsx
+@@ -1465,28 +1465,24 @@ describe( 'Tabs', () => {
+ 							/>
+ 						);
+ 
+-						// When the selected tab is changed, focus should not be changed.
++						// When the selected tab is changed by the controlling
++						// component while the tablist holds focus, focus moves to
++						// the newly selected tab (Gamma).
+ 						expect(
+ 							screen.getByRole( 'tab', {
+ 								selected: true,
+ 								name: 'Gamma',
+ 							} )
+-						).toBeVisible();
+-						expect(
+-							screen.getByRole( 'tab', {
+-								selected: false,
+-								name: 'Beta',
+-							} )
+ 						).toHaveFocus();
+ 
+-						// Arrow left should move focus to the previous tab (alpha).
+-						// The alpha tab should be always focused, and should be selected
++						// Arrow left should move focus to the previous tab (Beta).
++						// Beta should always be focused, and should be selected
+ 						// when the `selectOnMove` prop is set to `true`.
+ 						await press.ArrowLeft();
+ 						expect(
+ 							screen.getByRole( 'tab', {
+ 								selected: selectOnMove,
+-								name: 'Alpha',
++								name: 'Beta',
+ 							} )
+ 						).toHaveFocus();
+ 					} );
+@@ -1530,18 +1526,15 @@ describe( 'Tabs', () => {
+ 							</>
+ 						);
+ 
+-						// When the selected tab is changed, it should not automatically receive focus.
++						// When the selected tab is changed by the controlling
++						// component while the tablist holds focus, focus moves to
++						// the newly selected tab (Gamma), which also becomes the
++						// active tab.
+ 						expect(
+ 							screen.getByRole( 'tab', {
+ 								selected: true,
+ 								name: 'Gamma',
+ 							} )
+-						).toBeVisible();
+-						expect(
+-							screen.getByRole( 'tab', {
+-								selected: false,
+-								name: 'Beta',
+-							} )
+ 						).toHaveFocus();
+ 
+ 						// Press shift+tab, move focus to the button before Tabs
+@@ -1550,18 +1543,14 @@ describe( 'Tabs', () => {
+ 							screen.getByRole( 'button', { name: 'Focus me' } )
+ 						).toHaveFocus();
+ 
+-						// Press tab, move focus back to the tablist
++						// Press tab, move focus back to the tablist. Because the
++						// newly selected tab became the active tab, focus returns
++						// to Gamma regardless of `selectOnMove`.
+ 						await press.Tab();
+-
+-						const betaTab = screen.getByRole( 'tab', {
+-							name: 'Beta',
+-						} );
+-						const gammaTab = screen.getByRole( 'tab', {
+-							name: 'Gamma',
+-						} );
+-
+ 						expect(
+-							selectOnMove ? gammaTab : betaTab
++							screen.getByRole( 'tab', {
++								name: 'Gamma',
++							} )
+ 						).toHaveFocus();
+ 					} );
+ 				}
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index d17b1dff6bff50..2e4342655e5b4c 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -264,6 +264,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+             id="wp-components-base-control-19-40"
++            name=":r3e:"
+             role="radio"
+             type="button"
+             value="uppercase"
+@@ -297,6 +298,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+             id="wp-components-base-control-19-41"
++            name=":r3e:"
+             role="radio"
+             type="button"
+             value="lowercase"
+@@ -525,6 +527,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+             id="wp-components-base-control-18-38"
++            name=":r37:"
+             role="radio"
+             type="button"
+             value="rigas"
+@@ -547,6 +550,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+             id="wp-components-base-control-18-39"
++            name=":r37:"
+             role="radio"
+             type="button"
+             value="jack"
+@@ -834,6 +838,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+             id="wp-components-base-control-1-2"
++            name=":r7:"
+             role="radio"
+             type="button"
+             value="uppercase"
+@@ -867,6 +872,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+             id="wp-components-base-control-1-3"
++            name=":r7:"
+             role="radio"
+             type="button"
+             value="lowercase"
+@@ -1089,6 +1095,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+             id="wp-components-base-control-0-0"
++            name=":r0:"
+             role="radio"
+             type="button"
+             value="rigas"
+@@ -1111,6 +1118,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+             id="wp-components-base-control-0-1"
++            name=":r0:"
+             role="radio"
+             type="button"
+             value="jack"
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index e9af7262da130d..20b34c5a1d74bc 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ 
+ ### Internal
+ 
++-   Update `@ariakit/react` to `0.4.29` ([#79055](https://github.com/WordPress/gutenberg/pull/79055)).
+ -   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+ 
+ ## 15.0.0 (2026-05-27)
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index 82281ec886eb9a..048a2e626609c6 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -51,7 +51,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@ariakit/react": "^0.4.21",
++		"@ariakit/react": "^0.4.29",
+ 		"@types/react": "^18.3.27",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",

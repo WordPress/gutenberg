@@ -1,0 +1,24 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 70147d49597fab..caa88b1e7245b4 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Documentation
+ 
++-   Add ["Design System/Tokens/Introduction" page](https://wordpress.github.io/gutenberg/?path=/docs/design-system-tokens-introduction--docs) to Storybook ([#78449](https://github.com/WordPress/gutenberg/pull/78449)).
+ -   Add "How to pick a token" and "Naming pattern" guidance to [the design system tokens reference documentation](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md) ([#78438](https://github.com/WordPress/gutenberg/pull/78438)).
+ 
+ ## 0.13.0 (2026-05-14)
+diff --git a/packages/theme/src/stories/tokens.mdx b/packages/theme/src/stories/tokens.mdx
+new file mode 100644
+index 00000000000000..fdbe171645b3e2
+--- /dev/null
++++ b/packages/theme/src/stories/tokens.mdx
+@@ -0,0 +1,6 @@
++import { Meta, Markdown } from '@storybook/addon-docs/blocks';
++import Tokens from '../../docs/tokens.md?raw';
++
++<Meta title="Design System/Tokens/Introduction" />
++
++<Markdown>{Tokens}</Markdown>

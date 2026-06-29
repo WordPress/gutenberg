@@ -1,0 +1,92 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 129fcfbccf3a31..d0b9775d592dff 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `Divider`: Remove "experimental" designation ([#61016](https://github.com/WordPress/gutenberg/pull/61016)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/divider/README.md b/packages/components/src/divider/README.md
+index c81026b7b55871..311872b11083a4 100644
+--- a/packages/components/src/divider/README.md
++++ b/packages/components/src/divider/README.md
+@@ -1,16 +1,12 @@
+ # Divider
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `Divider` is a layout component that separates groups of related content.
+ 
+ ## Usage
+ 
+ ```jsx
+ import {
+-	__experimentalDivider as Divider,
++	Divider,
+ 	__experimentalText as Text,
+ 	__experimentalVStack as VStack,
+ } from `@wordpress/components`;
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 3870c2f12c4fc3..bd42197ee544d1 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -33,7 +33,7 @@ function UnconnectedDivider(
+  *
+  * ```js
+  * import {
+- * 		__experimentalDivider as Divider,
++ * 		Divider,
+  * 		__experimentalText as Text,
+  * 		__experimentalVStack as VStack,
+  * } from `@wordpress/components`;
+diff --git a/packages/components/src/divider/stories/index.story.tsx b/packages/components/src/divider/stories/index.story.tsx
+index 4910c1b591c524..abe02ea97c4270 100644
+--- a/packages/components/src/divider/stories/index.story.tsx
++++ b/packages/components/src/divider/stories/index.story.tsx
+@@ -12,7 +12,7 @@ import { Flex } from '../../flex';
+ 
+ const meta: Meta< typeof Divider > = {
+ 	component: Divider,
+-	title: 'Components (Experimental)/Divider',
++	title: 'Components/Divider',
+ 	argTypes: {
+ 		margin: {
+ 			control: { type: 'text' },
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..ab1c51d3cfbd5a 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -69,7 +69,13 @@ export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
+ export { default as __experimentalDimensionControl } from './dimension-control';
+ export { default as Disabled } from './disabled';
+ export { DisclosureContent as __unstableDisclosureContent } from './disclosure';
+-export { Divider as __experimentalDivider } from './divider';
++export {
++	/**
++	 * @deprecated Import `Divider` instead.
++	 */
++	Divider as __experimentalDivider,
++	Divider,
++} from './divider';
+ export { default as Draggable } from './draggable';
+ export { default as DropZone } from './drop-zone';
+ export { default as DropZoneProvider } from './drop-zone/provider';
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..6da9c0f3da954e 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,6 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation', 'divider' ];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

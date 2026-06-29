@@ -1,0 +1,112 @@
+diff --git a/packages/block-editor/src/components/duotone-control/index.js b/packages/block-editor/src/components/duotone-control/index.js
+index 7682e7ee157e8d..e110286976b1a6 100644
+--- a/packages/block-editor/src/components/duotone-control/index.js
++++ b/packages/block-editor/src/components/duotone-control/index.js
+@@ -12,8 +12,10 @@ import {
+ import { __ } from '@wordpress/i18n';
+ import { DOWN } from '@wordpress/keycodes';
+ import { Icon, filter } from '@wordpress/icons';
++import { useInstanceId } from '@wordpress/compose';
+ 
+ function DuotoneControl( {
++	id: idProp,
+ 	colorPalette,
+ 	duotonePalette,
+ 	disableCustomColors,
+@@ -31,6 +33,11 @@ function DuotoneControl( {
+ 	} else {
+ 		toolbarIcon = <Icon icon={ filter } />;
+ 	}
++
++	const actionLabel = __( 'Apply duotone filter' );
++	const id = useInstanceId( DuotoneControl, 'duotone-control', idProp );
++	const descriptionId = `${ id }__description`;
++
+ 	return (
+ 		<Dropdown
+ 			popoverProps={ {
+@@ -51,19 +58,24 @@ function DuotoneControl( {
+ 						aria-haspopup="true"
+ 						aria-expanded={ isOpen }
+ 						onKeyDown={ openOnArrowDown }
+-						label={ __( 'Apply duotone filter' ) }
++						label={ actionLabel }
+ 						icon={ toolbarIcon }
+ 					/>
+ 				);
+ 			} }
+ 			renderContent={ () => (
+ 				<MenuGroup label={ __( 'Duotone' ) }>
+-					<div className="block-editor-duotone-control__description">
++					<div
++						id={ descriptionId }
++						className="block-editor-duotone-control__description"
++					>
+ 						{ __(
+ 							'Create a two-tone color effect without losing your original image.'
+ 						) }
+ 					</div>
+ 					<DuotonePicker
++						aria-label={ actionLabel }
++						aria-describedby={ descriptionId }
+ 						colorPalette={ colorPalette }
+ 						duotonePalette={ duotonePalette }
+ 						disableCustomColors={ disableCustomColors }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 36ba45825e54fd..54792edb924ba2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `SearchControl`: polish metrics for `compact` size variant ([#54663](https://github.com/WordPress/gutenberg/pull/54663)).
+ -   `Button`: deprecating `isPressed` prop in favour of `aria-pressed` ([#54740](https://github.com/WordPress/gutenberg/pull/54740)).
++-   `DuotonePicker/ColorListPicker`: Adds appropriate label and description to 'Duotone Filter' picker ([#54473](https://github.com/WordPress/gutenberg/pull/54473)).
+ 
+ ### Bug Fix
+ 
+@@ -37,7 +38,7 @@
+ -   `DuotonePicker/ColorListPicker`: Adds appropriate labels to 'Duotone Filter' color pickers ([#54468](https://github.com/WordPress/gutenberg/pull/54468)).
+ -   `SearchControl`: support new `40px` and `32px` sizes ([#54548](https://github.com/WordPress/gutenberg/pull/54548)).
+ -   `FormTokenField`: Add `tokenizeOnBlur` prop to add any incompleteTokenValue as a new token when field loses focus ([#54445](https://github.com/WordPress/gutenberg/pull/54445)).
+-- `Sandbox`: Add `tabIndex` prop ([#54408](https://github.com/WordPress/gutenberg/pull/54408)).
++-   `Sandbox`: Add `tabIndex` prop ([#54408](https://github.com/WordPress/gutenberg/pull/54408)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/duotone-picker/duotone-picker.tsx b/packages/components/src/duotone-picker/duotone-picker.tsx
+index 70e5753175eac0..759c517b4759e1 100644
+--- a/packages/components/src/duotone-picker/duotone-picker.tsx
++++ b/packages/components/src/duotone-picker/duotone-picker.tsx
+@@ -67,6 +67,7 @@ function DuotonePicker( {
+ 	onChange,
+ 	'aria-label': ariaLabel,
+ 	'aria-labelledby': ariaLabelledby,
++	...otherProps
+ }: DuotonePickerProps ) {
+ 	const [ defaultDark, defaultLight ] = useMemo(
+ 		() => getDefaultColors( colorPalette ),
+@@ -74,13 +75,15 @@ function DuotonePicker( {
+ 	);
+ 
+ 	const isUnset = value === 'unset';
++	const unsetOptionLabel = __( 'Unset' );
+ 
+ 	const unsetOption = (
+ 		<CircularOptionPicker.Option
+ 			key="unset"
+ 			value="unset"
+ 			isSelected={ isUnset }
+-			tooltipText={ __( 'Unset' ) }
++			tooltipText={ unsetOptionLabel }
++			aria-label={ unsetOptionLabel }
+ 			className="components-duotone-picker__color-indicator"
+ 			onClick={ () => {
+ 				onChange( isUnset ? undefined : 'unset' );
+@@ -154,6 +157,7 @@ function DuotonePicker( {
+ 
+ 	return (
+ 		<CircularOptionPicker
++			{ ...otherProps }
+ 			{ ...metaProps }
+ 			options={ unsetable ? [ unsetOption, ...options ] : options }
+ 			actions={

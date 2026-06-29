@@ -1,0 +1,61 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 401d92d06afe19..b21a2eba653d95 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `Button`: Never apply `aria-disabled` to anchor ([#63376](https://github.com/WordPress/gutenberg/pull/63376)).
++
+ ### Internal
+ 
+ -   `CustomSelectControlV2`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index ac495007838403..f49baff60233f6 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -162,7 +162,7 @@ export function UnforwardedButton(
+ 	} );
+ 
+ 	const trulyDisabled = disabled && ! accessibleWhenDisabled;
+-	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
++	const Tag = href !== undefined && ! disabled ? 'a' : 'button';
+ 	const buttonProps: ComponentPropsWithoutRef< 'button' > =
+ 		Tag === 'button'
+ 			? {
+diff --git a/packages/components/src/button/test/index.tsx b/packages/components/src/button/test/index.tsx
+index 02fe6ecb851c4b..df359eff7cced8 100644
+--- a/packages/components/src/button/test/index.tsx
++++ b/packages/components/src/button/test/index.tsx
+@@ -542,6 +542,19 @@ describe( 'Button', () => {
+ 
+ 			expect( screen.getByRole( 'button' ) ).toBeVisible();
+ 		} );
++
++		it( 'should become a button again when disabled is supplied, even with `accessibleWhenDisabled`', () => {
++			render(
++				<Button
++					// @ts-expect-error - a button should not have `href`
++					// eslint-disable-next-line no-restricted-syntax
++					href="https://wordpress.org/"
++					disabled
++					accessibleWhenDisabled
++				/>
++			);
++			expect( screen.getByRole( 'button' ) ).toBeVisible();
++		} );
+ 	} );
+ 
+ 	describe( 'ref forwarding', () => {
+@@ -646,7 +659,7 @@ describe( 'Button', () => {
+ 			<Button type="image/png" />
+ 			{ /* @ts-expect-error */ }
+ 			<Button type="invalidtype" />
+-			{ /* @ts-expect-error - although the runtime behavior will allow this to be an anchor, this is probably a mistake. */ }
++			{ /* @ts-expect-error */ }
+ 			<Button disabled accessibleWhenDisabled href="foo" />
+ 		</>;
+ 	} );

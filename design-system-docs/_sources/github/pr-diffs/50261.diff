@@ -1,0 +1,270 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4b39d87de055f6..ba7661f2247910 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ 
+ ### Enhancements
+ 
++-   `FormTokenField`, `ComboboxControl`: Add `__next40pxDefaultSize` prop to opt into the new 40px default size, superseding the `__next36pxDefaultSize` prop ([#50261](https://github.com/WordPress/gutenberg/pull/50261)).
+ -   `Modal`: Add css class to children container ([#50099](https://github.com/WordPress/gutenberg/pull/50099)).
+ 
+ ## 23.9.0 (2023-04-26)
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index 07bc89a5df482b..eb8ae89c0971e5 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -32,6 +32,7 @@ import { useControlledValue } from '../utils/hooks';
+ import { normalizeTextString } from '../utils/strings';
+ import type { ComboboxControlOption, ComboboxControlProps } from './types';
+ import type { TokenInputProps } from '../form-token-field/types';
++import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ 
+ const noop = () => {};
+ 
+@@ -104,23 +105,28 @@ const getIndexOfMatchingSuggestion = (
+  * }
+  * ```
+  */
+-function ComboboxControl( {
+-	__nextHasNoMarginBottom = false,
+-	__next36pxDefaultSize = false,
+-	value: valueProp,
+-	label,
+-	options,
+-	onChange: onChangeProp,
+-	onFilterValueChange = noop,
+-	hideLabelFromVision,
+-	help,
+-	allowReset = true,
+-	className,
+-	messages = {
+-		selected: __( 'Item selected.' ),
+-	},
+-	__experimentalRenderItem,
+-}: ComboboxControlProps ) {
++function ComboboxControl( props: ComboboxControlProps ) {
++	const {
++		__nextHasNoMarginBottom = false,
++		__next40pxDefaultSize = false,
++		value: valueProp,
++		label,
++		options,
++		onChange: onChangeProp,
++		onFilterValueChange = noop,
++		hideLabelFromVision,
++		help,
++		allowReset = true,
++		className,
++		messages = {
++			selected: __( 'Item selected.' ),
++		},
++		__experimentalRenderItem,
++	} = useDeprecated36pxDefaultSizeProp< ComboboxControlProps >(
++		props,
++		'wp.components.ComboboxControl'
++	);
++
+ 	const [ value, setValue ] = useControlledValue( {
+ 		value: valueProp,
+ 		onChange: onChangeProp,
+@@ -314,7 +320,7 @@ function ComboboxControl( {
+ 					onKeyDown={ onKeyDown }
+ 				>
+ 					<InputWrapperFlex
+-						__next36pxDefaultSize={ __next36pxDefaultSize }
++						__next40pxDefaultSize={ __next40pxDefaultSize }
+ 					>
+ 						<FlexBlock>
+ 							<TokenInput
+diff --git a/packages/components/src/combobox-control/stories/index.tsx b/packages/components/src/combobox-control/stories/index.tsx
+index ca30b62d2d2889..fe6fe2a9ef9ef1 100644
+--- a/packages/components/src/combobox-control/stories/index.tsx
++++ b/packages/components/src/combobox-control/stories/index.tsx
+@@ -65,7 +65,6 @@ const Template: ComponentStory< typeof ComboboxControl > = ( {
+ };
+ export const Default = Template.bind( {} );
+ Default.args = {
+-	__next36pxDefaultSize: false,
+ 	allowReset: false,
+ 	label: 'Select a country',
+ 	options: countryOptions,
+diff --git a/packages/components/src/combobox-control/styles.ts b/packages/components/src/combobox-control/styles.ts
+index 25c71788fd602c..de1ed2fb76677c 100644
+--- a/packages/components/src/combobox-control/styles.ts
++++ b/packages/components/src/combobox-control/styles.ts
+@@ -12,9 +12,9 @@ import { space } from '../ui/utils/space';
+ import type { ComboboxControlProps } from './types';
+ 
+ const deprecatedDefaultSize = ( {
+-	__next36pxDefaultSize,
+-}: Pick< ComboboxControlProps, '__next36pxDefaultSize' > ) =>
+-	! __next36pxDefaultSize &&
++	__next40pxDefaultSize,
++}: Pick< ComboboxControlProps, '__next40pxDefaultSize' > ) =>
++	! __next40pxDefaultSize &&
+ 	css`
+ 		height: 28px; // 30px - 2px vertical borders on parent container
+ 		padding-left: ${ space( 1 ) };
+@@ -22,7 +22,7 @@ const deprecatedDefaultSize = ( {
+ 	`;
+ 
+ export const InputWrapperFlex = styled( Flex )`
+-	height: 34px; // 36px - 2px vertical borders on parent container
++	height: 38px; // 40px - 2px vertical borders on parent container
+ 	padding-left: ${ space( 2 ) };
+ 	padding-right: ${ space( 2 ) };
+ 
+diff --git a/packages/components/src/combobox-control/types.ts b/packages/components/src/combobox-control/types.ts
+index bcc4b8b9ed03cb..6a32fb17e16c08 100644
+--- a/packages/components/src/combobox-control/types.ts
++++ b/packages/components/src/combobox-control/types.ts
+@@ -26,11 +26,18 @@ export type ComboboxControlProps = Pick<
+ 		item: ComboboxControlOption;
+ 	} ) => React.ReactNode;
+ 	/**
+-	 * Start opting into the larger default height that will become the default size in a future version.
++	 * Deprecated. Use `__next40pxDefaultSize` instead.
+ 	 *
+ 	 * @default false
++	 * @deprecated
+ 	 */
+ 	__next36pxDefaultSize?: boolean;
++	/**
++	 * Start opting into the larger default height that will become the default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next40pxDefaultSize?: boolean;
+ 	/**
+ 	 * Show a reset button to clear the input.
+ 	 *
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 5c87db86514b7e..e3781880370628 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -27,6 +27,7 @@ import {
+ 	StyledLabel,
+ } from '../base-control/styles/base-control-styles';
+ import { Spacer } from '../spacer';
++import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ 
+ const identity = ( value: string ) => value;
+ 
+@@ -69,10 +70,13 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		__experimentalExpandOnFocus = false,
+ 		__experimentalValidateInput = () => true,
+ 		__experimentalShowHowTo = true,
+-		__next36pxDefaultSize = false,
++		__next40pxDefaultSize = false,
+ 		__experimentalAutoSelectFirstMatch = false,
+ 		__nextHasNoMarginBottom = false,
+-	} = props;
++	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >(
++		props,
++		'wp.components.FormTokenField'
++	);
+ 
+ 	const instanceId = useInstanceId( FormTokenField );
+ 
+@@ -702,7 +706,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 					align="center"
+ 					gap={ 1 }
+ 					wrap={ true }
+-					__next36pxDefaultSize={ __next36pxDefaultSize }
++					__next40pxDefaultSize={ __next40pxDefaultSize }
+ 					hasTokens={ !! value.length }
+ 				>
+ 					{ renderTokensAndInput() }
+diff --git a/packages/components/src/form-token-field/styles.ts b/packages/components/src/form-token-field/styles.ts
+index 73044d57a95386..55cfbe5e242f5b 100644
+--- a/packages/components/src/form-token-field/styles.ts
++++ b/packages/components/src/form-token-field/styles.ts
+@@ -11,22 +11,22 @@ import { Flex } from '../flex';
+ import { space } from '../ui/utils/space';
+ 
+ type TokensAndInputWrapperProps = {
+-	__next36pxDefaultSize: boolean;
++	__next40pxDefaultSize: boolean;
+ 	hasTokens: boolean;
+ };
+ 
+ const deprecatedPaddings = ( {
+-	__next36pxDefaultSize,
++	__next40pxDefaultSize,
+ 	hasTokens,
+ }: TokensAndInputWrapperProps ) =>
+-	! __next36pxDefaultSize &&
++	! __next40pxDefaultSize &&
+ 	css`
+ 		padding-top: ${ space( hasTokens ? 1 : 0.5 ) };
+ 		padding-bottom: ${ space( hasTokens ? 1 : 0.5 ) };
+ 	`;
+ 
+ export const TokensAndInputWrapperFlex = styled( Flex )`
+-	padding: 5px ${ space( 1 ) };
++	padding: 7px;
+ 
+ 	${ deprecatedPaddings }
+ `;
+diff --git a/packages/components/src/form-token-field/types.ts b/packages/components/src/form-token-field/types.ts
+index 44c11d6461859c..fe466ffbe59f84 100644
+--- a/packages/components/src/form-token-field/types.ts
++++ b/packages/components/src/form-token-field/types.ts
+@@ -151,13 +151,20 @@ export interface FormTokenFieldProps
+ 	 * @default true
+ 	 */
+ 	__experimentalShowHowTo?: boolean;
++	/**
++	 * Deprecated. Use `__next40pxDefaultSize` instead.
++	 *
++	 * @default false
++	 * @deprecated
++	 */
++	__next36pxDefaultSize?: boolean;
+ 	/**
+ 	 * Start opting into the larger default height that will become the
+ 	 * default size in a future version.
+ 	 *
+ 	 * @default false
+ 	 */
+-	__next36pxDefaultSize?: boolean;
++	__next40pxDefaultSize?: boolean;
+ 	/**
+ 	 * If true, the select the first matching suggestion when the user presses
+ 	 * the Enter key (or space when tokenizeOnSpace is true).
+diff --git a/packages/components/src/utils/use-deprecated-props.ts b/packages/components/src/utils/use-deprecated-props.ts
+new file mode 100644
+index 00000000000000..ee5dcc67a75303
+--- /dev/null
++++ b/packages/components/src/utils/use-deprecated-props.ts
+@@ -0,0 +1,29 @@
++/**
++ * WordPress dependencies
++ */
++import deprecated from '@wordpress/deprecated';
++
++export function useDeprecated36pxDefaultSizeProp<
++	P extends Record< string, any > & {
++		__next36pxDefaultSize?: boolean;
++		__next40pxDefaultSize?: boolean;
++	}
++>(
++	props: P,
++	/** The component identifier in dot notation, e.g. `wp.components.ComponentName`. */
++	componentIdentifier: string
++) {
++	const { __next36pxDefaultSize, __next40pxDefaultSize, ...otherProps } =
++		props;
++	if ( typeof __next36pxDefaultSize !== 'undefined' ) {
++		deprecated( '`__next36pxDefaultSize` prop in ' + componentIdentifier, {
++			alternative: '`__next40pxDefaultSize`',
++			since: '6.3',
++		} );
++	}
++
++	return {
++		...otherProps,
++		__next40pxDefaultSize: __next40pxDefaultSize ?? __next36pxDefaultSize,
++	};
++}

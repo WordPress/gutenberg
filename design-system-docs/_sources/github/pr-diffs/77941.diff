@@ -1,0 +1,70 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 7bd9bbe2e5f5fe..45dd888c586a33 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fixes
+ 
+ -   `Drawer`: Restore the slide-out animation when the popup closes ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
++-   `Drawer`: Forward the `render` prop on `Drawer.Content` to the scroll container instead of leaking it as a DOM attribute, matching `Dialog.Content` ([#77941](https://github.com/WordPress/gutenberg/pull/77941)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/ui/src/drawer/content.tsx b/packages/ui/src/drawer/content.tsx
+index 1e09be2f9be7ac..b3139f6bac3a60 100644
+--- a/packages/ui/src/drawer/content.tsx
++++ b/packages/ui/src/drawer/content.tsx
+@@ -1,3 +1,4 @@
++import { mergeProps, useRender } from '@base-ui/react';
+ import { Drawer as _Drawer } from '@base-ui/react/drawer';
+ import clsx from 'clsx';
+ import { forwardRef } from '@wordpress/element';
+@@ -28,25 +29,36 @@ import type { ContentProps } from './types';
+  * the popup (gated by the scroll edge on vertical drawers).
+  */
+ const Content = forwardRef< HTMLDivElement, ContentProps >(
+-	function DrawerContent( { className, children, onScroll, ...props }, ref ) {
++	function DrawerContent(
++		{ className, render, children, onScroll, ...props },
++		ref
++	) {
+ 		const { ref: scrollStateRef, onScroll: scrollStateOnScroll } =
+ 			useOverlayScrollStateAttributes< HTMLDivElement >( onScroll );
+ 		const mergedRef = useMergeRefs( [ ref, scrollStateRef ] );
+ 
+-		return (
+-			<div
+-				ref={ mergedRef }
+-				className={ clsx(
++		const element = useRender( {
++			defaultTagName: 'div',
++			render,
++			ref: mergedRef,
++			props: mergeProps< 'div' >( props, {
++				className: clsx(
+ 					styles.content,
+ 					focusStyles[ 'outset-ring--focus-visible' ],
+ 					className
+-				) }
+-				onScroll={ scrollStateOnScroll }
+-				{ ...props }
+-			>
+-				<_Drawer.Content>{ children }</_Drawer.Content>
+-			</div>
+-		);
++				),
++				onScroll: scrollStateOnScroll,
++				// `_Drawer.Content` carries the `[data-drawer-content]`
++				// marker that Base UI's swipe-dismiss logic uses to skip
++				// mouse-drag swipes started inside the body, preserving
++				// text selection. It must sit *inside* the scroll
++				// container so the popup's edge padding gutter falls
++				// outside the marker and stays mouse-draggable.
++				children: <_Drawer.Content>{ children }</_Drawer.Content>,
++			} ),
++		} );
++
++		return element;
+ 	}
+ );
+ 

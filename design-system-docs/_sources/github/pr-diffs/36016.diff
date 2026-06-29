@@ -1,0 +1,21 @@
+diff --git a/packages/components/src/color-palette/index.js b/packages/components/src/color-palette/index.js
+index 5ba5e585b8c71c..f876e07332b4fb 100644
+--- a/packages/components/src/color-palette/index.js
++++ b/packages/components/src/color-palette/index.js
+@@ -77,7 +77,7 @@ export default function ColorPalette( {
+ 	);
+ 
+ 	return (
+-		<VStack spacing={ 3 }>
++		<VStack spacing={ 3 } className={ className }>
+ 			{ ! disableCustomColors && (
+ 				<Dropdown
+ 					renderContent={ renderCustomColorPicker }
+@@ -96,7 +96,6 @@ export default function ColorPalette( {
+ 				/>
+ 			) }
+ 			<CircularOptionPicker
+-				className={ className }
+ 				options={ colorOptions }
+ 				actions={
+ 					!! clearable && (

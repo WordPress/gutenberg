@@ -1,0 +1,78 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0c0fab401d02a8..2b736c82d2bd76 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ ### Enhancements
+ 
++-   `ColorPalette`: partial support of `color-mix()` CSS colors ([#64224](https://github.com/WordPress/gutenberg/pull/64224)).
+ -   `TimeInput`: Expose as subcomponent of `TimePicker` ([#63145](https://github.com/WordPress/gutenberg/pull/63145)).
+ -   `RadioControl`: add support for option help text ([#63751](https://github.com/WordPress/gutenberg/pull/63751)).
+ -   `Guide`: Add `__next40pxDefaultSize` to buttons ([#64181](https://github.com/WordPress/gutenberg/pull/64181)).
+diff --git a/packages/components/src/color-palette/utils.ts b/packages/components/src/color-palette/utils.ts
+index 79141bf752eb73..cfe909c580f8bc 100644
+--- a/packages/components/src/color-palette/utils.ts
++++ b/packages/components/src/color-palette/utils.ts
+@@ -17,6 +17,18 @@ import type { ColorObject, ColorPaletteProps, PaletteObject } from './types';
+ 
+ extend( [ namesPlugin, a11yPlugin ] );
+ 
++/**
++ * Checks if a color value is a simple CSS color.
++ *
++ * @param value The color value to check.
++ * @return A boolean indicating whether the color value is a simple CSS color.
++ */
++const isSimpleCSSColor = ( value: string ): boolean => {
++	const valueIsCssVariable = /var\(/.test( value ?? '' );
++	const valueIsColorMix = /color-mix\(/.test( value ?? '' );
++	return ! valueIsCssVariable && ! valueIsColorMix;
++};
++
+ export const extractColorNameFromCurrentValue = (
+ 	currentValue?: ColorPaletteProps[ 'value' ],
+ 	colors: ColorPaletteProps[ 'colors' ] = [],
+@@ -25,11 +37,12 @@ export const extractColorNameFromCurrentValue = (
+ 	if ( ! currentValue ) {
+ 		return '';
+ 	}
+-
+-	const currentValueIsCssVariable = /^var\(/.test( currentValue );
+-	const normalizedCurrentValue = currentValueIsCssVariable
+-		? currentValue
+-		: colord( currentValue ).toHex();
++	const currentValueIsSimpleColor = currentValue
++		? isSimpleCSSColor( currentValue )
++		: false;
++	const normalizedCurrentValue = currentValueIsSimpleColor
++		? colord( currentValue ).toHex()
++		: currentValue;
+ 
+ 	// Normalize format of `colors` to simplify the following loop
+ 	type normalizedPaletteObject = { colors: ColorObject[] };
+@@ -38,9 +51,9 @@ export const extractColorNameFromCurrentValue = (
+ 		: [ { colors: colors as ColorObject[] } ];
+ 	for ( const { colors: paletteColors } of colorPalettes ) {
+ 		for ( const { name: colorName, color: colorValue } of paletteColors ) {
+-			const normalizedColorValue = currentValueIsCssVariable
+-				? colorValue
+-				: colord( colorValue ).toHex();
++			const normalizedColorValue = currentValueIsSimpleColor
++				? colord( colorValue ).toHex()
++				: colorValue;
+ 
+ 			if ( normalizedCurrentValue === normalizedColorValue ) {
+ 				return colorName;
+@@ -79,9 +92,9 @@ export const normalizeColorValue = (
+ 	value: string | undefined,
+ 	element: HTMLElement | null
+ ) => {
+-	const currentValueIsCssVariable = /^var\(/.test( value ?? '' );
++	const valueIsSimpleColor = value ? isSimpleCSSColor( value ) : false;
+ 
+-	if ( ! currentValueIsCssVariable || element === null ) {
++	if ( valueIsSimpleColor || element === null ) {
+ 		return value;
+ 	}
+ 

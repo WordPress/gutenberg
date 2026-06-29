@@ -1,0 +1,155 @@
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 177bfc406480a4..c1072cb3ca95e8 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -68,6 +68,7 @@ export { default as Modal } from './modal';
+ export { default as ScrollLock } from './scroll-lock';
+ export { NavigableMenu, TabbableContainer } from './navigable-container';
+ export { default as __experimentalNavigation } from './navigation';
++export { default as __experimentalNavigationBackButton } from './navigation/back-button';
+ export { default as __experimentalNavigationGroup } from './navigation/group';
+ export { default as __experimentalNavigationItem } from './navigation/item';
+ export { default as __experimentalNavigationMenu } from './navigation/menu';
+diff --git a/packages/components/src/navigation/back-button/index.js b/packages/components/src/navigation/back-button/index.js
+new file mode 100644
+index 00000000000000..1dda57800edb45
+--- /dev/null
++++ b/packages/components/src/navigation/back-button/index.js
+@@ -0,0 +1,47 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++import { Icon, chevronLeft } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import { useNavigationContext } from '../context';
++import { MenuBackButtonUI } from '../styles/navigation-styles';
++
++export default function NavigationMenu( {
++	backButtonLabel,
++	className,
++	href,
++	onClick,
++	parentMenu,
++} ) {
++	const { setActiveMenu, navigationTree } = useNavigationContext();
++
++	const classes = classnames(
++		'components-navigation__back-button',
++		className
++	);
++
++	const parentMenuTitle = navigationTree.getMenu( parentMenu )?.title;
++
++	return (
++		<MenuBackButtonUI
++			className={ classes }
++			isTertiary
++			href={ href }
++			onClick={ () =>
++				parentMenu ? setActiveMenu( parentMenu, 'right' ) : onClick
++			}
++		>
++			<Icon icon={ chevronLeft } />
++			{ backButtonLabel || parentMenuTitle || __( 'Back' ) }
++		</MenuBackButtonUI>
++	);
++}
+diff --git a/packages/components/src/navigation/menu/index.js b/packages/components/src/navigation/menu/index.js
+index fc223ddbe63d87..a8418ef09ea9c1 100644
+--- a/packages/components/src/navigation/menu/index.js
++++ b/packages/components/src/navigation/menu/index.js
+@@ -3,22 +3,13 @@
+  */
+ import classnames from 'classnames';
+ 
+-/**
+- * WordPress dependencies
+- */
+-import { __ } from '@wordpress/i18n';
+-import { Icon, chevronLeft } from '@wordpress/icons';
+-
+ /**
+  * Internal dependencies
+  */
+ import { ROOT_MENU } from '../constants';
+ import { useNavigationContext } from '../context';
+-import {
+-	MenuBackButtonUI,
+-	MenuTitleUI,
+-	MenuUI,
+-} from '../styles/navigation-styles';
++import { MenuTitleUI, MenuUI } from '../styles/navigation-styles';
++import NavigationBackButton from '../back-button';
+ import { NavigationMenuContext } from './context';
+ import { useNavigationTreeMenu } from './use-navigation-tree-menu';
+ 
+@@ -32,11 +23,7 @@ export default function NavigationMenu( props ) {
+ 		title,
+ 	} = props;
+ 	useNavigationTreeMenu( props );
+-	const {
+-		activeMenu,
+-		setActiveMenu,
+-		navigationTree,
+-	} = useNavigationContext();
++	const { activeMenu } = useNavigationContext();
+ 	const isActive = activeMenu === menu;
+ 
+ 	const classes = classnames( 'components-navigation__menu', className );
+@@ -55,20 +42,14 @@ export default function NavigationMenu( props ) {
+ 		);
+ 	}
+ 
+-	const parentMenuTitle = navigationTree.getMenu( parentMenu )?.title;
+-
+ 	return (
+ 		<NavigationMenuContext.Provider value={ context }>
+ 			<MenuUI className={ classes }>
+ 				{ parentMenu && (
+-					<MenuBackButtonUI
+-						className="components-navigation__back-button"
+-						isTertiary
+-						onClick={ () => setActiveMenu( parentMenu, 'right' ) }
+-					>
+-						<Icon icon={ chevronLeft } />
+-						{ backButtonLabel || parentMenuTitle || __( 'Back' ) }
+-					</MenuBackButtonUI>
++					<NavigationBackButton
++						backButtonLabel={ backButtonLabel }
++						parentMenu={ parentMenu }
++					/>
+ 				) }
+ 				{ title && (
+ 					<MenuTitleUI
+diff --git a/packages/components/src/navigation/styles/navigation-styles.js b/packages/components/src/navigation/styles/navigation-styles.js
+index ef8d1a5ce3d3b8..93c347a54ca250 100644
+--- a/packages/components/src/navigation/styles/navigation-styles.js
++++ b/packages/components/src/navigation/styles/navigation-styles.js
+@@ -15,7 +15,7 @@ export const NavigationUI = styled.div`
+ 	width: 100%;
+ 	background-color: ${ G2.darkGray.primary };
+ 	color: #f0f0f0;
+-	padding: 8px;
++	padding: 0 8px;
+ 	overflow: hidden;
+ `;
+ 
+@@ -29,6 +29,9 @@ export const MenuUI = styled.div`
+ 		margin: 0;
+ 		list-style: none;
+ 	}
++	.components-navigation__back-button {
++		margin-bottom: 24px;
++	}
+ `;
+ 
+ export const MenuBackButtonUI = styled( Button )`

@@ -1,0 +1,34 @@
+diff --git a/packages/block-editor/src/components/block-draggable/index.js b/packages/block-editor/src/components/block-draggable/index.js
+index 1e4048c90ab618..0b8f3c2d87f520 100644
+--- a/packages/block-editor/src/components/block-draggable/index.js
++++ b/packages/block-editor/src/components/block-draggable/index.js
+@@ -22,16 +22,25 @@ const BlockDraggable = ( {
+ } ) => {
+ 	const { srcRootClientId, isDraggable, icon } = useSelect(
+ 		( select ) => {
+-			const { canMoveBlocks, getBlockRootClientId, getBlockName } =
+-				select( blockEditorStore );
+-			const { getBlockType } = select( blocksStore );
++			const {
++				canMoveBlocks,
++				getBlockRootClientId,
++				getBlockName,
++				getBlockAttributes,
++			} = select( blockEditorStore );
++			const { getBlockType, getActiveBlockVariation } =
++				select( blocksStore );
+ 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+ 			const blockName = getBlockName( clientIds[ 0 ] );
++			const variation = getActiveBlockVariation(
++				blockName,
++				getBlockAttributes( clientIds[ 0 ] )
++			);
+ 
+ 			return {
+ 				srcRootClientId: rootClientId,
+ 				isDraggable: canMoveBlocks( clientIds, rootClientId ),
+-				icon: getBlockType( blockName )?.icon,
++				icon: variation?.icon || getBlockType( blockName )?.icon,
+ 			};
+ 		},
+ 		[ clientIds ]

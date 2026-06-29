@@ -1,0 +1,364 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a0d2f7c0fbafe9..ecdd381137bdd3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Internal
+ 
++-   `Animate`: Convert to TypeScript ([#49243](https://github.com/WordPress/gutenberg/pull/49243)).
+ -   `CustomGradientPicker`: Convert to TypeScript ([#48929](https://github.com/WordPress/gutenberg/pull/48929)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/animate/index.js b/packages/components/src/animate/index.js
+deleted file mode 100644
+index f648b00ed3a640..00000000000000
+--- a/packages/components/src/animate/index.js
++++ /dev/null
+@@ -1,60 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * @typedef {'top' | 'top left' | 'top right' | 'middle' | 'middle left' | 'middle right' | 'bottom' | 'bottom left' | 'bottom right'} AppearOrigin
+- * @typedef {'left' | 'right'} SlideInOrigin
+- * @typedef {{ type: 'appear'; origin?: AppearOrigin }} AppearOptions
+- * @typedef {{ type: 'slide-in'; origin?: SlideInOrigin }} SlideInOptions
+- * @typedef {{ type: 'loading' }} LoadingOptions
+- * @typedef {AppearOptions | SlideInOptions | LoadingOptions} GetAnimateOptions
+- */
+-
+-/* eslint-disable jsdoc/valid-types */
+-/**
+- * @param {GetAnimateOptions['type']} type The animation type
+- * @return {'top' | 'left'} Default origin
+- */
+-function getDefaultOrigin( type ) {
+-	return type === 'appear' ? 'top' : 'left';
+-}
+-/* eslint-enable jsdoc/valid-types */
+-
+-/**
+- * @param {GetAnimateOptions} options
+- *
+- * @return {string | undefined} ClassName that applies the animations
+- */
+-export function getAnimateClassName( options ) {
+-	if ( options.type === 'loading' ) {
+-		return classnames( 'components-animate__loading' );
+-	}
+-
+-	const { type, origin = getDefaultOrigin( type ) } = options;
+-
+-	if ( type === 'appear' ) {
+-		const [ yAxis, xAxis = 'center' ] = origin.split( ' ' );
+-		return classnames( 'components-animate__appear', {
+-			[ 'is-from-' + xAxis ]: xAxis !== 'center',
+-			[ 'is-from-' + yAxis ]: yAxis !== 'middle',
+-		} );
+-	}
+-
+-	if ( type === 'slide-in' ) {
+-		return classnames(
+-			'components-animate__slide-in',
+-			'is-from-' + origin
+-		);
+-	}
+-
+-	return undefined;
+-}
+-
+-// @ts-ignore Reason: Planned for deprecation
+-export default function Animate( { type, options = {}, children } ) {
+-	return children( {
+-		className: getAnimateClassName( { type, ...options } ),
+-	} );
+-}
+diff --git a/packages/components/src/animate/index.tsx b/packages/components/src/animate/index.tsx
+new file mode 100644
+index 00000000000000..f73090bf85dba9
+--- /dev/null
++++ b/packages/components/src/animate/index.tsx
+@@ -0,0 +1,75 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import type { AnimateProps, GetAnimateOptions } from './types';
++
++/**
++ * @param type The animation type
++ * @return Default origin
++ */
++function getDefaultOrigin( type?: GetAnimateOptions[ 'type' ] ) {
++	return type === 'appear' ? 'top' : 'left';
++}
++
++/**
++ * @param options
++ *
++ * @return ClassName that applies the animations
++ */
++export function getAnimateClassName( options: GetAnimateOptions ) {
++	if ( options.type === 'loading' ) {
++		return classnames( 'components-animate__loading' );
++	}
++
++	const { type, origin = getDefaultOrigin( type ) } = options;
++
++	if ( type === 'appear' ) {
++		const [ yAxis, xAxis = 'center' ] = origin.split( ' ' );
++		return classnames( 'components-animate__appear', {
++			[ 'is-from-' + xAxis ]: xAxis !== 'center',
++			[ 'is-from-' + yAxis ]: yAxis !== 'middle',
++		} );
++	}
++
++	if ( type === 'slide-in' ) {
++		return classnames(
++			'components-animate__slide-in',
++			'is-from-' + origin
++		);
++	}
++
++	return undefined;
++}
++
++/**
++ * Simple interface to introduce animations to components.
++ *
++ * ```jsx
++ * import { Animate, Notice } from '@wordpress/components';
++ *
++ * const MyAnimatedNotice = () => (
++ * 	<Animate type="slide-in" options={ { origin: 'top' } }>
++ * 		{ ( { className } ) => (
++ * 			<Notice className={ className } status="success">
++ * 				<p>Animation finished.</p>
++ * 			</Notice>
++ * 		) }
++ * 	</Animate>
++ * );
++ * ```
++ */
++export function Animate( { type, options = {}, children }: AnimateProps ) {
++	return children( {
++		className: getAnimateClassName( {
++			type,
++			...options,
++		} as GetAnimateOptions ),
++	} );
++}
++
++export default Animate;
+diff --git a/packages/components/src/animate/stories/index.js b/packages/components/src/animate/stories/index.js
+deleted file mode 100644
+index 0f0e83b8cbcec8..00000000000000
+--- a/packages/components/src/animate/stories/index.js
++++ /dev/null
+@@ -1,53 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import Animate from '../';
+-import Notice from '../../notice';
+-
+-export default { title: 'Components/Animate', component: Animate };
+-
+-export const _default = () => (
+-	<Animate>
+-		{ ( { className } ) => (
+-			<Notice className={ className } status="success">
+-				<p>{ `No default animation. Use one of type = "appear", "slide-in", or "loading".` }</p>
+-			</Notice>
+-		) }
+-	</Animate>
+-);
+-
+-// Unexported helper for different origins.
+-const Appear = ( { origin } ) => (
+-	<Animate type="appear" options={ { origin } }>
+-		{ ( { className } ) => (
+-			<Notice className={ className } status="success">
+-				<p>Appear animation. Origin: { origin }.</p>
+-			</Notice>
+-		) }
+-	</Animate>
+-);
+-
+-export const appearTopLeft = () => <Appear origin="top left" />;
+-export const appearTopRight = () => <Appear origin="top right" />;
+-export const appearBottomLeft = () => <Appear origin="bottom left" />;
+-export const appearBottomRight = () => <Appear origin="bottom right" />;
+-
+-export const loading = () => (
+-	<Animate type="loading">
+-		{ ( { className } ) => (
+-			<Notice className={ className } status="success">
+-				<p>Loading animation.</p>
+-			</Notice>
+-		) }
+-	</Animate>
+-);
+-
+-export const slideIn = () => (
+-	<Animate type="slide-in">
+-		{ ( { className } ) => (
+-			<Notice className={ className } status="success">
+-				<p>Slide-in animation.</p>
+-			</Notice>
+-		) }
+-	</Animate>
+-);
+diff --git a/packages/components/src/animate/stories/index.tsx b/packages/components/src/animate/stories/index.tsx
+new file mode 100644
+index 00000000000000..11537cea450e4d
+--- /dev/null
++++ b/packages/components/src/animate/stories/index.tsx
+@@ -0,0 +1,102 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { Animate } from '..';
++import Notice from '../../notice';
++
++const meta: ComponentMeta< typeof Animate > = {
++	title: 'Components/Animate',
++	component: Animate,
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof Animate > = ( props ) => (
++	<Animate { ...props } />
++);
++
++export const Default: ComponentStory< typeof Animate > = Template.bind( {} );
++Default.args = {
++	children: ( { className } ) => (
++		<Notice className={ className } status="success">
++			<p>{ `No default animation. Use one of type = "appear", "slide-in", or "loading".` }</p>
++		</Notice>
++	),
++};
++
++export const AppearTopLeft: ComponentStory< typeof Animate > = Template.bind(
++	{}
++);
++AppearTopLeft.args = {
++	type: 'appear',
++	options: { origin: 'top left' },
++	children: ( { className } ) => (
++		<Notice className={ className } status="success">
++			<p>Appear animation. Origin: top left.</p>
++		</Notice>
++	),
++};
++export const AppearTopRight: ComponentStory< typeof Animate > = Template.bind(
++	{}
++);
++AppearTopRight.args = {
++	type: 'appear',
++	options: { origin: 'top right' },
++	children: ( { className } ) => (
++		<Notice className={ className } status="success">
++			<p>Appear animation. Origin: top right.</p>
++		</Notice>
++	),
++};
++export const AppearBottomLeft: ComponentStory< typeof Animate > = Template.bind(
++	{}
++);
++AppearBottomLeft.args = {
++	type: 'appear',
++	options: { origin: 'bottom left' },
++	children: ( { className } ) => (
++		<Notice className={ className } status="success">
++			<p>Appear animation. Origin: bottom left.</p>
++		</Notice>
++	),
++};
++export const AppearBottomRight: ComponentStory< typeof Animate > =
++	Template.bind( {} );
++AppearBottomRight.args = {
++	type: 'appear',
++	options: { origin: 'bottom right' },
++	children: ( { className } ) => (
++		<Notice className={ className } status="success">
++			<p>Appear animation. Origin: bottom right.</p>
++		</Notice>
++	),
++};
++
++export const Loading: ComponentStory< typeof Animate > = Template.bind( {} );
++Loading.args = {
++	type: 'loading',
++	children: ( { className } ) => (
++		<Notice className={ className } status="success">
++			<p>Loading animation.</p>
++		</Notice>
++	),
++};
++
++export const SlideIn: ComponentStory< typeof Animate > = Template.bind( {} );
++SlideIn.args = {
++	type: 'slide-in',
++	options: { origin: 'left' },
++	children: ( { className } ) => (
++		<Notice className={ className } status="success">
++			<p>Slide-in animation.</p>
++		</Notice>
++	),
++};
+diff --git a/packages/components/src/animate/types.ts b/packages/components/src/animate/types.ts
+new file mode 100644
+index 00000000000000..aedebf34be70fe
+--- /dev/null
++++ b/packages/components/src/animate/types.ts
+@@ -0,0 +1,32 @@
++export type AppearOptions = {
++	type: 'appear';
++	origin?:
++		| 'top'
++		| 'top left'
++		| 'top right'
++		| 'middle'
++		| 'middle left'
++		| 'middle right'
++		| 'bottom'
++		| 'bottom left'
++		| 'bottom right';
++};
++type SlideInOptions = { type: 'slide-in'; origin?: 'left' | 'right' };
++type LoadingOptions = { type: 'loading'; origin?: never };
++type NoAnimationOptions = { type?: never; origin?: never };
++
++export type GetAnimateOptions =
++	| AppearOptions
++	| SlideInOptions
++	| LoadingOptions
++	| NoAnimationOptions;
++
++// Create a new type that and distributes the `Pick` operator separately to
++// every individual type of a union, thus preserving that same union.
++type DistributiveTypeAndOptions< T extends { type?: any } > = T extends any
++	? Pick< T, 'type' > & { options?: Omit< T, 'type' > }
++	: never;
++
++export type AnimateProps = DistributiveTypeAndOptions< GetAnimateOptions > & {
++	children: ( props: { className?: string } ) => JSX.Element;
++};

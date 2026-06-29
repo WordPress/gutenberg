@@ -1,0 +1,34 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 87ba32abf86d40..b15c3344939622 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `useAutocomplete`: Fix autocomple UI flicker when deleting trigger prefix ([#69562](https://github.com/WordPress/gutenberg/pull/69562)).
++
+ ## 29.6.0 (2025-03-13)
+ 
+ ### Enhancement
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index 7a75be8eca5c84..796cccd782d281 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -394,12 +394,13 @@ export function useAutocomplete( {
+ 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
+ 		: null;
+ 	const hasSelection = record.start !== undefined;
++	const showPopover = !! textContent && hasSelection && !! AutocompleterUI;
+ 
+ 	return {
+ 		listBoxId,
+ 		activeId,
+ 		onKeyDown: withIgnoreIMEEvents( handleKeyDown ),
+-		popover: hasSelection && AutocompleterUI && (
++		popover: showPopover && (
+ 			<AutocompleterUI
+ 				className={ className }
+ 				filterValue={ filterValue }

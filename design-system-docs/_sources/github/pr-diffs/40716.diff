@@ -1,0 +1,550 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1abf30ff318a72..cc5f93a1d91cd0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,11 @@
+ -   `UnitControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40627](https://github.com/WordPress/gutenberg/pull/40627)).
+ -   `SelectControl`: Improved TypeScript support ([#40737](https://github.com/WordPress/gutenberg/pull/40737)).
+ -   `ToggleControlGroup`: Switch to internal `Icon` component for dashicon support ([40717](https://github.com/WordPress/gutenberg/pull/40717)).
++-    Improve `ToolsPanel` accessibility. ([#40716](https://github.com/WordPress/gutenberg/pull/40716))
++
++### Bug Fix
++
++-    The `Button` component now displays the label as the tooltip for icon only buttons. ([#40716](https://github.com/WordPress/gutenberg/pull/40716))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/button/index.js b/packages/components/src/button/index.js
+index 8df05574d8dc65..9b01f0cd49c089 100644
+--- a/packages/components/src/button/index.js
++++ b/packages/components/src/button/index.js
+@@ -3,7 +3,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { isArray } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -140,8 +139,7 @@ export function Button( props, ref ) {
+ 			// There's a label and...
+ 			( !! label &&
+ 				// The children are empty and...
+-				( ! children ||
+-					( isArray( children ) && ! children.length ) ) &&
++				! children?.length &&
+ 				// The tooltip is not explicitly disabled.
+ 				false !== showTooltip ) );
+ 
+@@ -186,7 +184,7 @@ export function Button( props, ref ) {
+ 	return (
+ 		<>
+ 			<Tooltip
+-				text={ describedBy ? describedBy : label }
++				text={ children?.length && describedBy ? describedBy : label }
+ 				shortcut={ shortcut }
+ 				position={ tooltipPosition }
+ 			>
+diff --git a/packages/components/src/button/test/index.js b/packages/components/src/button/test/index.js
+index b4dc89eaaf092b..9d2b9f5383ceab 100644
+--- a/packages/components/src/button/test/index.js
++++ b/packages/components/src/button/test/index.js
+@@ -164,7 +164,7 @@ describe( 'Button', () => {
+ 			expect( buttonDescription ).toBe( 'Description text' );
+ 		} );
+ 
+-		it( 'should populate tooltip with describedBy content', () => {
++		it( 'should populate tooltip with label content for buttons without visible labels (no children)', () => {
+ 			const buttonTooltip = shallow(
+ 				<Button
+ 					describedBy="Description text"
+@@ -173,6 +173,21 @@ describe( 'Button', () => {
+ 				/>
+ 			).find( 'Tooltip' );
+ 
++			expect( buttonTooltip.prop( 'text' ) ).toBe( 'Label' );
++		} );
++
++		it( 'should populate tooltip with description content for buttons with visible labels (buttons with children)', () => {
++			const buttonTooltip = shallow(
++				<Button
++					label="Label"
++					describedBy="Description text"
++					icon={ plusCircle }
++					showTooltip
++				>
++					Children
++				</Button>
++			).find( 'Tooltip' );
++
+ 			expect( buttonTooltip.prop( 'text' ) ).toBe( 'Description text' );
+ 		} );
+ 
+diff --git a/packages/components/src/menu-item/style.scss b/packages/components/src/menu-item/style.scss
+index 5c88db241f4e01..18c2666025a5db 100644
+--- a/packages/components/src/menu-item/style.scss
++++ b/packages/components/src/menu-item/style.scss
+@@ -38,6 +38,16 @@
+ 			margin-right: 0;
+ 		}
+ 	}
++
++	&:disabled,
++	&[aria-disabled="true"] {
++		// Override the button component's tertiary background and color.
++		&.is-tertiary {
++			background: none;
++			color: var(--wp-admin-theme-color-darker-10);
++			opacity: 0.3;
++		}
++	}
+ }
+ 
+ .components-menu-item__info-wrapper {
+diff --git a/packages/components/src/tools-panel/test/__snapshots__/index.js.snap b/packages/components/src/tools-panel/test/__snapshots__/index.js.snap
+index 4170e62700cfcd..395f3820e1eabb 100644
+--- a/packages/components/src/tools-panel/test/__snapshots__/index.js.snap
++++ b/packages/components/src/tools-panel/test/__snapshots__/index.js.snap
+@@ -167,7 +167,7 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
+         <button
+           aria-expanded="false"
+           aria-haspopup="true"
+-          aria-label="View options"
++          aria-label="Panel header options"
+           class="components-button components-dropdown-menu__toggle is-small has-icon"
+           type="button"
+         >
+diff --git a/packages/components/src/tools-panel/test/index.js b/packages/components/src/tools-panel/test/index.js
+index d1d884d439fa43..ffe696e388aa5d 100644
+--- a/packages/components/src/tools-panel/test/index.js
++++ b/packages/components/src/tools-panel/test/index.js
+@@ -161,7 +161,7 @@ const renderPanel = () => {
+  */
+ const getMenuButton = () => {
+ 	return screen.getByRole( 'button', {
+-		name: /view([\w\s]+)options/i,
++		name: /Panel([\w\s]+)header([\w\s]+)options/i,
+ 	} );
+ };
+ 
+@@ -178,7 +178,6 @@ const openDropdownMenu = () => {
+ 
+ // Opens dropdown then selects the menu item by label before simulating a click.
+ const selectMenuItem = async ( label ) => {
+-	openDropdownMenu();
+ 	const menuItem = await screen.findByText( label );
+ 	fireEvent.click( menuItem );
+ };
+@@ -289,18 +288,30 @@ describe( 'ToolsPanel', () => {
+ 
+ 		it( 'should render panel item when corresponding menu item is selected', async () => {
+ 			renderPanel();
++			await openDropdownMenu();
+ 			await selectMenuItem( altControlProps.label );
+ 			const control = await screen.findByText( 'Alt control' );
+ 
+ 			expect( control ).toBeInTheDocument();
++
++			// Test the aria live announcement.
++			const announcement = await screen.getByText( 'Alt is now visible' );
++			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
+ 		} );
+ 
+ 		it( 'should prevent optional panel item rendering when toggled off via menu item', async () => {
+ 			renderPanel();
++			await openDropdownMenu();
+ 			await selectMenuItem( controlProps.label );
+ 			const control = screen.queryByText( 'Example control' );
+ 
+ 			expect( control ).not.toBeInTheDocument();
++
++			// Test the aria live announcement.
++			const announcement = await screen.getByText(
++				'Example hidden and reset to default'
++			);
++			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
+ 		} );
+ 
+ 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
+@@ -319,10 +330,17 @@ describe( 'ToolsPanel', () => {
+ 
+ 			expect( control ).toBeInTheDocument();
+ 
++			await openDropdownMenu();
+ 			await selectMenuItem( controlProps.label );
+ 			const resetControl = screen.getByText( 'Default control' );
+ 
+ 			expect( resetControl ).toBeInTheDocument();
++
++			// Test the aria live announcement.
++			const announcement = await screen.getByText(
++				'Example reset to default'
++			);
++			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
+ 		} );
+ 
+ 		it( 'should render appropriate menu groups', async () => {
+@@ -657,6 +675,8 @@ describe( 'ToolsPanel', () => {
+ 
+ 		it( 'should call onDeselect callback when menu item is toggled off', async () => {
+ 			renderPanel();
++
++			await openDropdownMenu();
+ 			await selectMenuItem( controlProps.label );
+ 
+ 			expect( controlProps.onSelect ).not.toHaveBeenCalled();
+@@ -665,6 +685,8 @@ describe( 'ToolsPanel', () => {
+ 
+ 		it( 'should call onSelect callback when menu item is toggled on', async () => {
+ 			renderPanel();
++
++			await openDropdownMenu();
+ 			await selectMenuItem( altControlProps.label );
+ 
+ 			expect( altControlProps.onSelect ).toHaveBeenCalledTimes( 1 );
+@@ -673,6 +695,8 @@ describe( 'ToolsPanel', () => {
+ 
+ 		it( 'should call resetAll callback when its menu item is selected', async () => {
+ 			renderPanel();
++
++			await openDropdownMenu();
+ 			await selectMenuItem( 'Reset all' );
+ 
+ 			expect( resetAll ).toHaveBeenCalledTimes( 1 );
+@@ -688,6 +712,7 @@ describe( 'ToolsPanel', () => {
+ 		it( 'should call onDeselect after previous reset all', async () => {
+ 			renderPanel();
+ 
++			await openDropdownMenu();
+ 			await selectMenuItem( 'Reset all' ); // Initial control is displayed by default.
+ 			await selectMenuItem( controlProps.label ); // Re-display control.
+ 
+@@ -715,9 +740,8 @@ describe( 'ToolsPanel', () => {
+ 			openDropdownMenu();
+ 
+ 			const defaultItem = screen.getByText( 'Nested Control 1' );
+-			const defaultMenuItem = screen.getByRole( 'menuitemcheckbox', {
++			const defaultMenuItem = screen.getByRole( 'menuitem', {
+ 				name: 'Reset Nested Control 1',
+-				checked: true,
+ 			} );
+ 
+ 			const altItem = screen.getByText( 'Nested Control 2' );
+@@ -754,9 +778,8 @@ describe( 'ToolsPanel', () => {
+ 			openDropdownMenu();
+ 
+ 			const defaultItem = screen.getByText( 'Nested Control 1' );
+-			const defaultMenuItem = screen.getByRole( 'menuitemcheckbox', {
++			const defaultMenuItem = screen.getByRole( 'menuitem', {
+ 				name: 'Reset Nested Control 1',
+-				checked: true,
+ 			} );
+ 
+ 			const altItem = screen.getByText( 'Nested Control 2' );
+@@ -807,6 +830,7 @@ describe( 'ToolsPanel', () => {
+ 			expect( secondItem ).toBeInTheDocument();
+ 
+ 			// Toggle on the first item.
++			await openDropdownMenu();
+ 			await selectMenuItem( altControlProps.label );
+ 
+ 			// The order of items should be as per their original source order.
+@@ -964,7 +988,7 @@ describe( 'ToolsPanel', () => {
+ 			isShownByDefault: false,
+ 		};
+ 
+-		it( 'should render appropriate icon for the dropdown menu where there are default controls', async () => {
++		it( 'should render appropriate labels and descriptions for the dropdown menu where there are default controls', async () => {
+ 			render(
+ 				<ToolsPanel { ...defaultProps }>
+ 					<ToolsPanelItem { ...defaultControls }>
+@@ -977,13 +1001,18 @@ describe( 'ToolsPanel', () => {
+ 			);
+ 
+ 			const optionsDisplayedIcon = screen.getByRole( 'button', {
+-				name: 'View options',
++				name: 'Panel header options',
+ 			} );
+ 
+ 			expect( optionsDisplayedIcon ).toBeInTheDocument();
++
++			// The dropdown toggle doesn't have a description when an option is displayed.
++			// In this case the default control is displayed.
++			expect( optionsDisplayedIcon ).not.toHaveAccessibleDescription();
+ 		} );
+ 
+-		it( 'should render appropriate icons for the dropdown menu where there are no default controls', async () => {
++		it( 'should render appropriate labels and descriptions for the dropdown menu where there are no default controls', async () => {
++			// All options are inactive.
+ 			render(
+ 				<ToolsPanel { ...defaultProps }>
+ 					<ToolsPanelItem { ...optionalControls }>
+@@ -992,25 +1021,49 @@ describe( 'ToolsPanel', () => {
+ 				</ToolsPanel>
+ 			);
+ 
+-			// There are unactivated, optional menu items in the Tools Panel dropdown.
+ 			const optionsHiddenIcon = screen.getByRole( 'button', {
+-				name: 'View and add options',
++				name: 'Panel header options',
+ 			} );
+ 
++			// The dropdown toggle has a description indicating that all options are hidden.
+ 			expect( optionsHiddenIcon ).toBeInTheDocument();
++			expect( optionsHiddenIcon ).toHaveAccessibleDescription(
++				'All options are currently hidden'
++			);
+ 
++			// Activate one of the options.
++			await openDropdownMenu();
+ 			await selectMenuItem( optionalControls.label );
+ 
+-			// There are now NO unactivated, optional menu items in the Tools Panel dropdown.
+-			expect(
+-				screen.queryByRole( 'button', { name: 'View and add options' } )
+-			).not.toBeInTheDocument();
+-
+ 			const optionsDisplayedIcon = screen.getByRole( 'button', {
+-				name: 'View options',
++				name: 'Panel header options',
+ 			} );
+ 
+-			expect( optionsDisplayedIcon ).toBeInTheDocument();
++			// The dropdown toggle no longer has a description.
++			expect( optionsDisplayedIcon ).not.toHaveAccessibleDescription();
++		} );
++	} );
++
++	describe( 'reset all button', () => {
++		it( "should disable the reset all button when there's nothing to reset", async () => {
++			await renderPanel();
++			await openDropdownMenu();
++
++			const resetAllItem = await screen.findByRole( 'menuitem', {
++				disabled: false,
++			} );
++			expect( resetAllItem ).toBeInTheDocument();
++
++			await selectMenuItem( 'Reset all' );
++
++			// Test the aria live announcement.
++			const announcement = await screen.getByText( 'All options reset' );
++			expect( announcement ).toHaveAttribute( 'aria-live', 'assertive' );
++
++			const disabledResetAllItem = await screen.findByRole( 'menuitem', {
++				disabled: true,
++			} );
++			expect( disabledResetAllItem ).toBeInTheDocument();
+ 		} );
+ 	} );
+ 
+diff --git a/packages/components/src/tools-panel/tools-panel-header/component.tsx b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+index 99981a2dc4a557..62a40a966dcb7d 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+@@ -6,6 +6,7 @@ import type { ForwardedRef } from 'react';
+ /**
+  * WordPress dependencies
+  */
++import { speak } from '@wordpress/a11y';
+ import { check, reset, moreVertical, plus } from '@wordpress/icons';
+ import { __, _x, sprintf } from '@wordpress/i18n';
+ 
+@@ -24,11 +25,8 @@ import type {
+ 	ToolsPanelHeaderProps,
+ } from '../types';
+ 
+-const noop = () => {};
+-
+ const DefaultControlsGroup = ( {
+ 	items,
+-	onClose,
+ 	toggleItem,
+ }: ToolsPanelControlsGroupProps ) => {
+ 	if ( ! items.length ) {
+@@ -38,27 +36,41 @@ const DefaultControlsGroup = ( {
+ 	return (
+ 		<MenuGroup>
+ 			{ items.map( ( [ label, hasValue ] ) => {
+-				const icon = hasValue ? reset : check;
+-				const itemLabel = hasValue
+-					? sprintf(
+-							// translators: %s: The name of the control being reset e.g. "Padding".
+-							__( 'Reset %s' ),
+-							label
+-					  )
+-					: undefined;
++				if ( hasValue ) {
++					return (
++						<MenuItem
++							key={ label }
++							role="menuitem"
++							icon={ reset }
++							label={ sprintf(
++								// translators: %s: The name of the control being reset e.g. "Padding".
++								__( 'Reset %s' ),
++								label
++							) }
++							onClick={ () => {
++								toggleItem( label );
++								speak(
++									sprintf(
++										// translators: %s: The name of the control being reset e.g. "Padding".
++										__( '%s reset to default' ),
++										label
++									),
++									'assertive'
++								);
++							} }
++						>
++							{ label }
++						</MenuItem>
++					);
++				}
+ 
+ 				return (
+ 					<MenuItem
+ 						key={ label }
+-						icon={ icon }
+-						isSelected={ true }
+-						disabled={ ! hasValue }
+-						label={ itemLabel }
+-						onClick={ () => {
+-							toggleItem( label );
+-							onClose();
+-						} }
+ 						role="menuitemcheckbox"
++						icon={ check }
++						isSelected
++						aria-disabled
+ 					>
+ 						{ label }
+ 					</MenuItem>
+@@ -70,7 +82,6 @@ const DefaultControlsGroup = ( {
+ 
+ const OptionalControlsGroup = ( {
+ 	items,
+-	onClose,
+ 	toggleItem,
+ }: ToolsPanelControlsGroupProps ) => {
+ 	if ( ! items.length ) {
+@@ -99,8 +110,26 @@ const OptionalControlsGroup = ( {
+ 						isSelected={ isSelected }
+ 						label={ itemLabel }
+ 						onClick={ () => {
++							if ( isSelected ) {
++								speak(
++									sprintf(
++										// translators: %s: The name of the control being reset e.g. "Padding".
++										__( '%s hidden and reset to default' ),
++										label
++									),
++									'assertive'
++								);
++							} else {
++								speak(
++									sprintf(
++										// translators: %s: The name of the control being reset e.g. "Padding".
++										__( '%s is now visible' ),
++										label
++									),
++									'assertive'
++								);
++							}
+ 							toggleItem( label );
+-							onClose();
+ 						} }
+ 						role="menuitemcheckbox"
+ 					>
+@@ -135,12 +164,18 @@ const ToolsPanelHeader = (
+ 	const defaultItems = Object.entries( menuItems?.default || {} );
+ 	const optionalItems = Object.entries( menuItems?.optional || {} );
+ 	const dropDownMenuIcon = areAllOptionalControlsHidden ? plus : moreVertical;
+-	const dropDownMenuLabelText = areAllOptionalControlsHidden
+-		? _x(
+-				'View and add options',
+-				'Button label to reveal tool panel options'
+-		  )
+-		: _x( 'View options', 'Button label to reveal tool panel options' );
++	const dropDownMenuLabelText = sprintf(
++		// translators: %s: The name of the tool e.g. "Color" or "Typography".
++		_x( '%s options', 'Button label to reveal tool panel options' ),
++		labelText
++	);
++	const dropdownMenuDescriptionText = areAllOptionalControlsHidden
++		? __( 'All options are currently hidden' )
++		: undefined;
++
++	const canResetAll = [ ...defaultItems, ...optionalItems ].some(
++		( [ , isSelected ] ) => isSelected
++	);
+ 
+ 	return (
+ 		<HStack { ...headerProps } ref={ forwardedRef }>
+@@ -152,26 +187,33 @@ const ToolsPanelHeader = (
+ 					icon={ dropDownMenuIcon }
+ 					label={ dropDownMenuLabelText }
+ 					menuProps={ { className: dropdownMenuClassName } }
+-					toggleProps={ { isSmall: true } }
++					toggleProps={ {
++						isSmall: true,
++						describedBy: dropdownMenuDescriptionText,
++					} }
+ 				>
+-					{ ( { onClose = noop } ) => (
++					{ () => (
+ 						<>
+ 							<DefaultControlsGroup
+ 								items={ defaultItems }
+-								onClose={ onClose }
+ 								toggleItem={ toggleItem }
+ 							/>
+ 							<OptionalControlsGroup
+ 								items={ optionalItems }
+-								onClose={ onClose }
+ 								toggleItem={ toggleItem }
+ 							/>
+ 							<MenuGroup>
+ 								<MenuItem
++									aria-disabled={ ! canResetAll }
+ 									variant={ 'tertiary' }
+ 									onClick={ () => {
+-										resetAll();
+-										onClose();
++										if ( canResetAll ) {
++											resetAll();
++											speak(
++												__( 'All options reset' ),
++												'assertive'
++											);
++										}
+ 									} }
+ 								>
+ 									{ __( 'Reset all' ) }
+diff --git a/packages/components/src/tools-panel/types.ts b/packages/components/src/tools-panel/types.ts
+index a4dce88471f992..3290b9fe497fc7 100644
+--- a/packages/components/src/tools-panel/types.ts
++++ b/packages/components/src/tools-panel/types.ts
+@@ -148,7 +148,6 @@ export type ToolsPanelContext = {
+ 
+ export type ToolsPanelControlsGroupProps = {
+ 	items: [ string, boolean ][];
+-	onClose: () => void;
+ 	toggleItem: ( label: string ) => void;
+ };
+ 
+diff --git a/test/e2e/specs/widgets/customizing-widgets.spec.js b/test/e2e/specs/widgets/customizing-widgets.spec.js
+index fa08502c882081..45f73dc4875edd 100644
+--- a/test/e2e/specs/widgets/customizing-widgets.spec.js
++++ b/test/e2e/specs/widgets/customizing-widgets.spec.js
+@@ -549,9 +549,7 @@ test.describe( 'Widgets Customizer', () => {
+ 		await page.click( 'role=menuitem[name="Show more settings"i]' );
+ 
+ 		// Change `drop cap` (Any change made in this section is sufficient; not required to be `drop cap`).
+-		await page.click(
+-			'css=.typography-block-support-panel >> role=button[name=/^View( and add)? options$/]'
+-		);
++		await page.click( 'role=button[name="Typography options"i]' );
+ 		await page.click( 'role=menuitemcheckbox[name="Show Drop cap"i]' );
+ 
+ 		await page.click( 'role=checkbox[name="Drop cap"i]' );

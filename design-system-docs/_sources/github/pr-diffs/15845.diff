@@ -1,0 +1,25 @@
+diff --git a/packages/components/src/primitives/block-quotation/style.scss b/packages/components/src/primitives/block-quotation/style.scss
+deleted file mode 100644
+index c1206d68958f7b..00000000000000
+--- a/packages/components/src/primitives/block-quotation/style.scss
++++ /dev/null
+@@ -1,19 +0,0 @@
+-.wp-block-quote {
+-	&.is-style-large,
+-	&.is-large {
+-		margin: 0 0 16px;
+-		padding: 0 1em;
+-
+-		p {
+-			font-size: 24px;
+-			font-style: italic;
+-			line-height: 1.6;
+-		}
+-
+-		cite,
+-		footer {
+-			font-size: 18px;
+-			text-align: right;
+-		}
+-	}
+-}

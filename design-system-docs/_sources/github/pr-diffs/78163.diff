@@ -1,0 +1,277 @@
+diff --git a/packages/grid/src/dashboard-grid/grid-item.tsx b/packages/grid/src/dashboard-grid/grid-item.tsx
+index 3ff0704ca9f189..d5876e07c43a0f 100644
+--- a/packages/grid/src/dashboard-grid/grid-item.tsx
++++ b/packages/grid/src/dashboard-grid/grid-item.tsx
+@@ -72,7 +72,13 @@ export function GridItem( {
+ 	// frame that follows a column step never renders the overlay
+ 	// at the pre-step offset.
+ 	const lastResizeDeltaRef = useRef< ResizeDelta | null >( null );
+-	const { attributes, listeners, setNodeRef, isDragging } = useSortable( {
++	const {
++		attributes,
++		listeners,
++		setNodeRef,
++		setActivatorNodeRef,
++		isDragging,
++	} = useSortable( {
+ 		id: item.key,
+ 		disabled,
+ 	} );
+@@ -197,12 +203,7 @@ export function GridItem( {
+ 	) : null;
+ 
+ 	return (
+-		<div
+-			ref={ mergedRef }
+-			className={ itemClassName }
+-			style={ style }
+-			{ ...attributes }
+-		>
++		<div ref={ mergedRef } className={ itemClassName } style={ style }>
+ 			{ actionableArea ? (
+ 				<div
+ 					style={ { display: 'contents' } }
+@@ -213,17 +214,21 @@ export function GridItem( {
+ 			) : null }
+ 
+ 			<div
++				ref={ setActivatorNodeRef }
++				{ ...attributes }
+ 				{ ...listeners }
+ 				style={ {
+ 					height: '100%',
+-					// Cursor lives on the listener wrapper rather
+-					// than the outer tile so `actionableArea`
+-					// children render their own cursor (e.g.
+-					// `pointer` on buttons) instead of inheriting
+-					// the grid's `grab`. Setting `undefined`
+-					// during an active gesture leaves the property
+-					// off the DOM so the document-level cursor
+-					// lock from the resize handle takes over.
++					// Keyboard activation needs `attributes` (tabIndex)
++					// and `listeners` (onKeyDown) on the same focused
++					// node; `setActivatorNodeRef` points dnd-kit's
++					// keyboard sensor here, the outer keeps `setNodeRef`
++					// for measurement.
++					//
++					// Cursor lives on this wrapper so `actionableArea`
++					// children (mounted outside it) keep their own;
++					// `undefined` during a gesture defers to the resize
++					// handle's document cursor lock.
+ 					cursor: getItemCursor( disabled, interacting ),
+ 				} }
+ 			>
+diff --git a/packages/grid/src/dashboard-grid/test/keyboard-activation.test.tsx b/packages/grid/src/dashboard-grid/test/keyboard-activation.test.tsx
+new file mode 100644
+index 00000000000000..e781d335ebe225
+--- /dev/null
++++ b/packages/grid/src/dashboard-grid/test/keyboard-activation.test.tsx
+@@ -0,0 +1,76 @@
++/**
++ * @jest-environment jsdom
++ */
++
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { DashboardGrid } from '..';
++
++class MockResizeObserver {
++	observed: Set< Element > = new Set();
++	observe( element: Element ) {
++		this.observed.add( element );
++	}
++	unobserve( element: Element ) {
++		this.observed.delete( element );
++	}
++	disconnect() {
++		this.observed.clear();
++	}
++}
++
++let originalResizeObserver: typeof ResizeObserver;
++
++beforeEach( () => {
++	originalResizeObserver = global.ResizeObserver;
++	( global as unknown as { ResizeObserver: unknown } ).ResizeObserver =
++		MockResizeObserver;
++} );
++
++afterEach( () => {
++	( global as unknown as { ResizeObserver: unknown } ).ResizeObserver =
++		originalResizeObserver;
++} );
++
++describe( 'DashboardGrid keyboard activation', () => {
++	it( 'places the dnd-kit keyboard activator on the inner wrapper, not the outer item', () => {
++		// Verifies the DOM hierarchy: keyboard activation needs the
++		// focused node and the keydown listener to share a node, so
++		// the activator must live nested inside the outer item.
++		/* eslint-disable testing-library/no-container, testing-library/no-node-access */
++		const { container } = render(
++			<DashboardGrid
++				layout={ [ { key: 'a', width: 1 } ] }
++				columns={ 2 }
++				editMode
++			>
++				<div key="a">A</div>
++			</DashboardGrid>
++		);
++
++		// Edit mode also renders a resize handle with `role="button"`;
++		// `aria-roledescription="sortable"` isolates the activator.
++		const activator = container.querySelector(
++			'[role="button"][aria-roledescription="sortable"]'
++		);
++		expect( activator ).not.toBeNull();
++		expect( activator ).toHaveAttribute( 'tabindex', '0' );
++
++		// Outer item is identified by its inline `grid-column-end`
++		// placement style; the activator must be its descendant.
++		const items = container.querySelectorAll(
++			'[style*="grid-column-end"]'
++		);
++		expect( items ).toHaveLength( 1 );
++		const item = items[ 0 ];
++		expect( activator ).not.toBe( item );
++		expect( item.contains( activator! ) ).toBe( true );
++		/* eslint-enable testing-library/no-container, testing-library/no-node-access */
++	} );
++} );
+diff --git a/packages/grid/src/dashboard-lanes/lanes-item.tsx b/packages/grid/src/dashboard-lanes/lanes-item.tsx
+index cc19ca201c94ba..62b98ac8475092 100644
+--- a/packages/grid/src/dashboard-lanes/lanes-item.tsx
++++ b/packages/grid/src/dashboard-lanes/lanes-item.tsx
+@@ -98,7 +98,13 @@ export function LanesItem( {
+ 	} | null >( null );
+ 	const lastResizeDeltaRef = useRef< ResizeDelta | null >( null );
+ 
+-	const { attributes, listeners, setNodeRef, isDragging } = useSortable( {
++	const {
++		attributes,
++		listeners,
++		setNodeRef,
++		setActivatorNodeRef,
++		isDragging,
++	} = useSortable( {
+ 		id: itemKey,
+ 		disabled,
+ 	} );
+@@ -206,7 +212,6 @@ export function LanesItem( {
+ 			className={ itemClassName }
+ 			style={ style }
+ 			{ ...{ [ LANES_DATA_KEY ]: itemKey } }
+-			{ ...attributes }
+ 		>
+ 			{ actionableArea ? (
+ 				<div
+@@ -218,17 +223,21 @@ export function LanesItem( {
+ 			) : null }
+ 
+ 			<div
++				ref={ setActivatorNodeRef }
++				{ ...attributes }
+ 				{ ...listeners }
+ 				style={ {
+ 					height: '100%',
+-					// Cursor lives on the listener wrapper rather
+-					// than the outer item so `actionableArea`
+-					// children render their own cursor (e.g.
+-					// `pointer` on buttons) instead of inheriting
+-					// the surface's `grab`. Setting `undefined`
+-					// during an active gesture leaves the property
+-					// off the DOM so the document-level cursor
+-					// lock from the resize handle takes over.
++					// Keyboard activation needs `attributes` (tabIndex)
++					// and `listeners` (onKeyDown) on the same focused
++					// node; `setActivatorNodeRef` points dnd-kit's
++					// keyboard sensor here, the outer keeps `setNodeRef`
++					// for measurement.
++					//
++					// Cursor lives on this wrapper so `actionableArea`
++					// children (mounted outside it) keep their own;
++					// `undefined` during a gesture defers to the resize
++					// handle's document cursor lock.
+ 					cursor: getItemCursor( disabled, interacting ),
+ 				} }
+ 			>
+diff --git a/packages/grid/src/dashboard-lanes/test/keyboard-activation.test.tsx b/packages/grid/src/dashboard-lanes/test/keyboard-activation.test.tsx
+new file mode 100644
+index 00000000000000..7ea2babd7882c0
+--- /dev/null
++++ b/packages/grid/src/dashboard-lanes/test/keyboard-activation.test.tsx
+@@ -0,0 +1,69 @@
++/**
++ * @jest-environment jsdom
++ */
++
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { DashboardLanes } from '..';
++
++class MockResizeObserver {
++	observed: Set< Element > = new Set();
++	observe( element: Element ) {
++		this.observed.add( element );
++	}
++	unobserve( element: Element ) {
++		this.observed.delete( element );
++	}
++	disconnect() {
++		this.observed.clear();
++	}
++}
++
++let originalResizeObserver: typeof ResizeObserver;
++
++beforeEach( () => {
++	originalResizeObserver = global.ResizeObserver;
++	( global as unknown as { ResizeObserver: unknown } ).ResizeObserver =
++		MockResizeObserver;
++} );
++
++afterEach( () => {
++	( global as unknown as { ResizeObserver: unknown } ).ResizeObserver =
++		originalResizeObserver;
++} );
++
++describe( 'DashboardLanes keyboard activation', () => {
++	it( 'places the dnd-kit keyboard activator on the inner wrapper, not the outer item', () => {
++		// Verifies the DOM hierarchy: keyboard activation needs the
++		// focused node and the keydown listener to share a node, so
++		// the activator must live nested inside the outer item.
++		/* eslint-disable testing-library/no-container, testing-library/no-node-access */
++		const { container } = render(
++			<DashboardLanes layout={ [ { key: 'a' } ] } columns={ 2 } editMode>
++				<div key="a">A</div>
++			</DashboardLanes>
++		);
++
++		// Edit mode also renders a resize handle with `role="button"`;
++		// `aria-roledescription="sortable"` isolates the activator.
++		const activator = container.querySelector(
++			'[role="button"][aria-roledescription="sortable"]'
++		);
++		expect( activator ).not.toBeNull();
++		expect( activator ).toHaveAttribute( 'tabindex', '0' );
++
++		// Outer item is identified by `data-lanes-key`; the activator
++		// must be its descendant.
++		const lanesItem = container.querySelector( '[data-lanes-key="a"]' );
++		expect( lanesItem ).not.toBeNull();
++		expect( activator ).not.toBe( lanesItem );
++		expect( lanesItem!.contains( activator! ) ).toBe( true );
++		/* eslint-enable testing-library/no-container, testing-library/no-node-access */
++	} );
++} );

@@ -1,0 +1,35 @@
+diff --git a/packages/components/src/toolbar/toolbar-group/style.scss b/packages/components/src/toolbar/toolbar-group/style.scss
+index 668968d40babbe..b518d54a5c36cd 100644
+--- a/packages/components/src/toolbar/toolbar-group/style.scss
++++ b/packages/components/src/toolbar/toolbar-group/style.scss
+@@ -1,7 +1,7 @@
+ .components-toolbar-group {
+ 	min-height: $block-toolbar-height;
+-	border-right: $border-width solid $gray-900;
+-	background-color: $white;
++	border-right: $border-width solid $components-color-foreground;
++	background-color: $components-color-background;
+ 	display: inline-flex;
+ 	flex-shrink: 0;
+ 	flex-wrap: wrap;
+diff --git a/packages/components/src/toolbar/toolbar/style.scss b/packages/components/src/toolbar/toolbar/style.scss
+index b53df6303e0fbf..8708dc70c92f8f 100644
+--- a/packages/components/src/toolbar/toolbar/style.scss
++++ b/packages/components/src/toolbar/toolbar/style.scss
+@@ -1,6 +1,6 @@
+ .components-accessible-toolbar {
+ 	display: inline-flex;
+-	border: $border-width solid $gray-900;
++	border: $border-width solid $components-color-foreground;
+ 	border-radius: $radius-small;
+ 	flex-shrink: 0;
+ 
+@@ -79,7 +79,7 @@
+ 			}
+ 
+ 			&::before {
+-				background: $gray-900;
++				background: $components-color-foreground;
+ 			}
+ 		}
+ 

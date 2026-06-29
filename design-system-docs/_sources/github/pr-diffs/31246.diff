@@ -1,0 +1,65 @@
+diff --git a/packages/components/src/ui/context/context-connect.js b/packages/components/src/ui/context/context-connect.js
+index 896d86dc767ecc..a6960e3389a8e6 100644
+--- a/packages/components/src/ui/context/context-connect.js
++++ b/packages/components/src/ui/context/context-connect.js
+@@ -28,12 +28,12 @@ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
+  * @param {(props: P, ref: import('react').Ref<any>) => JSX.Element | null} Component The component to register into the Context system.
+  * @param {string} namespace The namespace to register the component under.
+  * @param {Object} options
+- * @param {boolean} [options.memo=true]
++ * @param {boolean} [options.memo=false]
+  * @return {import('./polymorphic-component').PolymorphicComponent<import('./polymorphic-component').ElementTypeFromViewOwnProps<P>, import('./polymorphic-component').PropsFromViewOwnProps<P>>} The connected PolymorphicComponent
+  */
+ export function contextConnect( Component, namespace, options = {} ) {
+ 	/* eslint-enable jsdoc/valid-types */
+-	const { memo: memoProp = true } = options;
++	const { memo: memoProp = false } = options;
+ 
+ 	let WrappedComponent = forwardRef( Component );
+ 	if ( memoProp ) {
+diff --git a/packages/components/src/ui/utils/create-component.tsx b/packages/components/src/ui/utils/create-component.tsx
+index d25d4a0002f879..960a0572b9f47c 100644
+--- a/packages/components/src/ui/utils/create-component.tsx
++++ b/packages/components/src/ui/utils/create-component.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { identity } from 'lodash';
+ // eslint-disable-next-line no-restricted-imports
+ import type { Ref } from 'react';
+ import type { As } from 'reakit-utils/types';
+@@ -41,9 +40,9 @@ export const createComponent = <
+ 	P extends ViewOwnProps< {}, A >
+ >( {
+ 	as,
+-	name = 'Component',
+-	useHook = identity,
+-	memo = true,
++	name,
++	useHook,
++	memo = false,
+ }: Options< A, P > ): PolymorphicComponent<
+ 	ElementTypeFromViewOwnProps< P >,
+ 	PropsFromViewOwnProps< P >
+diff --git a/packages/components/src/ui/utils/test/create-component.js b/packages/components/src/ui/utils/test/create-component.js
+index 03378da1ff8873..00a87454736f17 100644
+--- a/packages/components/src/ui/utils/test/create-component.js
++++ b/packages/components/src/ui/utils/test/create-component.js
+@@ -23,6 +23,7 @@ describe( 'createComponent', () => {
+ 		as: 'output',
+ 		name,
+ 		useHook,
++		memo: true,
+ 	} );
+ 	const Output = createComponent( {
+ 		as: 'output',
+@@ -40,7 +41,7 @@ describe( 'createComponent', () => {
+ 		expect( container.firstChild.innerHTML ).toBe( 'Example output' );
+ 	} );
+ 
+-	it( 'should create a memoized, ref-forwarded component by default', () => {
++	it( 'should create a memoized, ref-forwarded component', () => {
+ 		expect( MemoizedOutput.$$typeof ).toEqual( Symbol.for( 'react.memo' ) );
+ 		const ref = createRef();
+ 		const wrapper = render(

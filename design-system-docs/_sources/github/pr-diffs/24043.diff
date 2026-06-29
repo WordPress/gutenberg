@@ -1,0 +1,23 @@
+diff --git a/packages/components/src/toolbar/toolbar-container.js b/packages/components/src/toolbar/toolbar-container.js
+index 2ea7cfc7fee8c9..5141e6fe69f959 100644
+--- a/packages/components/src/toolbar/toolbar-container.js
++++ b/packages/components/src/toolbar/toolbar-container.js
+@@ -12,12 +12,17 @@ import { forwardRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import ToolbarContext from '../toolbar-context';
++import { getRTL } from '../utils/rtl';
+ 
+ function ToolbarContainer( { accessibilityLabel, ...props }, ref ) {
+ 	// https://reakit.io/docs/basic-concepts/#state-hooks
+ 	// Passing baseId for server side rendering (which includes snapshots)
+ 	// If an id prop is passed to Toolbar, toolbar items will use it as a base for their ids
+-	const toolbarState = useToolbarState( { loop: true, baseId: props.id } );
++	const toolbarState = useToolbarState( {
++		loop: true,
++		baseId: props.id,
++		rtl: getRTL(),
++	} );
+ 
+ 	return (
+ 		// This will provide state for `ToolbarButton`'s

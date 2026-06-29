@@ -1,0 +1,150 @@
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/fill.js b/packages/components/src/slot-fill/bubbles-virtually/fill.js
+index 2257e9a01b3499..38390ab28954c2 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/fill.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/fill.js
+@@ -1,16 +1,21 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRef, useEffect, createPortal } from '@wordpress/element';
++import { useRef, useState, useEffect, createPortal } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import useSlot from './use-slot';
+ 
++function useForceUpdate() {
++	const [ , setState ] = useState( {} );
++	return () => setState( {} );
++}
++
+ export default function Fill( { name, children } ) {
+ 	const slot = useSlot( name );
+-	const ref = useRef();
++	const ref = useRef( { rerender: useForceUpdate() } );
+ 
+ 	useEffect( () => {
+ 		// We register fills so we can keep track of their existance.
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+index c9bba8a6d7f64b..d9a3efb75159db 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+@@ -2,6 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useMemo, useCallback, useState } from '@wordpress/element';
++import isShallowEqual from '@wordpress/is-shallow-equal';
+ 
+ /**
+  * Internal dependencies
+@@ -14,13 +15,13 @@ function useSlotRegistry() {
+ 
+ 	const registerSlot = useCallback( ( name, ref, fillProps ) => {
+ 		setSlots( ( prevSlots ) => {
+-			const currentSlot = prevSlots[ name ] || {};
++			const slot = prevSlots[ name ] || {};
+ 			return {
+ 				...prevSlots,
+ 				[ name ]: {
+-					...currentSlot,
+-					ref: ref || currentSlot.ref,
+-					fillProps: fillProps || currentSlot.fillProps || {},
++					...slot,
++					ref: ref || slot.ref,
++					fillProps: fillProps || slot.fillProps || {},
+ 				},
+ 			};
+ 		} );
+@@ -38,6 +39,24 @@ function useSlotRegistry() {
+ 		} );
+ 	}, [] );
+ 
++	const updateSlot = useCallback(
++		( name, fillProps ) => {
++			const slot = slots[ name ];
++			if ( ! slot ) {
++				return;
++			}
++			if ( ! isShallowEqual( slot.fillProps, fillProps ) ) {
++				slot.fillProps = fillProps;
++				const slotFills = fills[ name ];
++				if ( slotFills ) {
++					// Force update fills
++					slotFills.map( ( fill ) => fill.current.rerender() );
++				}
++			}
++		},
++		[ slots, fills ]
++	);
++
+ 	const registerFill = useCallback( ( name, ref ) => {
+ 		setFills( ( prevFills ) => ( {
+ 			...prevFills,
+@@ -65,8 +84,7 @@ function useSlotRegistry() {
+ 			slots,
+ 			fills,
+ 			registerSlot,
+-			// Just for readability
+-			updateSlot: registerSlot,
++			updateSlot,
+ 			unregisterSlot,
+ 			registerFill,
+ 			unregisterFill,
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot.js b/packages/components/src/slot-fill/bubbles-virtually/slot.js
+index 0483a5057e1f22..ace175e4b5a59e 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot.js
+@@ -2,13 +2,11 @@
+  * WordPress dependencies
+  */
+ import { useRef, useLayoutEffect, useContext } from '@wordpress/element';
+-import isShallowEqual from '@wordpress/is-shallow-equal';
+ 
+ /**
+  * Internal dependencies
+  */
+ import SlotFillContext from './slot-fill-context';
+-import useSlot from './use-slot';
+ 
+ export default function Slot( {
+ 	name,
+@@ -18,7 +16,6 @@ export default function Slot( {
+ } ) {
+ 	const registry = useContext( SlotFillContext );
+ 	const ref = useRef();
+-	const slot = useSlot( name );
+ 
+ 	useLayoutEffect( () => {
+ 		registry.registerSlot( name, ref, fillProps );
+@@ -31,12 +28,10 @@ export default function Slot( {
+ 		// of fillProps.
+ 	}, [ registry.registerSlot, registry.unregisterSlot, name ] );
+ 
+-	// fillProps may be an update that interact with the layout, so
+-	// we useLayoutEffect
++	// fillProps may be an update that interacts with the layout, so we
++	// useLayoutEffect
+ 	useLayoutEffect( () => {
+-		if ( slot.fillProps && ! isShallowEqual( slot.fillProps, fillProps ) ) {
+-			registry.updateSlot( name, ref, fillProps );
+-		}
++		registry.updateSlot( name, fillProps );
+ 	} );
+ 
+ 	return <Component ref={ ref } { ...props } />;
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/use-slot.js b/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
+index 8fdaeb58666521..bf6fb960294672 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/use-slot.js
+@@ -16,8 +16,8 @@ export default function useSlot( name ) {
+ 	const fills = useMemo( () => slotFills || [], [ slotFills ] );
+ 
+ 	const updateSlot = useCallback(
+-		( slotRef, slotFillProps ) => {
+-			registry.updateSlot( name, slotRef, slotFillProps );
++		( fillProps ) => {
++			registry.updateSlot( name, fillProps );
+ 		},
+ 		[ name, registry.updateSlot ]
+ 	);

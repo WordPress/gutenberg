@@ -1,0 +1,201 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..be6fc64fee9aef 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `ToggleGroupControl`: Remove "experimental" designation ([#61067](https://github.com/WordPress/gutenberg/pull/61067)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..1777b8797d5d05 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -156,9 +156,21 @@ export { default as TextHighlight } from './text-highlight';
+ export { default as Tip } from './tip';
+ export { default as ToggleControl } from './toggle-control';
+ export {
++	/**
++	 * @deprecated Import `ToggleGroupControl` instead.
++	 */
+ 	ToggleGroupControl as __experimentalToggleGroupControl,
++	/**
++	 * @deprecated Import `ToggleGroupControlOption` instead.
++	 */
+ 	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
++	/**
++	 * @deprecated Import `ToggleGroupControlOptionIcon` instead.
++	 */
+ 	ToggleGroupControlOptionIcon as __experimentalToggleGroupControlOptionIcon,
++	ToggleGroupControl,
++	ToggleGroupControlOption,
++	ToggleGroupControlOptionIcon,
+ } from './toggle-group-control';
+ export {
+ 	Toolbar,
+diff --git a/packages/components/src/toggle-group-control/stories/index.story.tsx b/packages/components/src/toggle-group-control/stories/index.story.tsx
+index 92f1e6076248bd..3bc5abe74230e9 100644
+--- a/packages/components/src/toggle-group-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-group-control/stories/index.story.tsx
+@@ -27,7 +27,7 @@ const meta: Meta< typeof ToggleGroupControl > = {
+ 	component: ToggleGroupControl,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
+-	title: 'Components (Experimental)/ToggleGroupControl',
++	title: 'Components/ToggleGroupControl',
+ 	argTypes: {
+ 		help: { control: { type: 'text' } },
+ 		onChange: { action: 'onChange' },
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index 421a6078b04956..1e829e7f5e4991 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -184,8 +184,8 @@ function ToggleGroupControlOptionBase(
+  * @example
+  * ```jsx
+  * import {
+- *   __experimentalToggleGroupControl as ToggleGroupControl,
+- *   __experimentalToggleGroupControlOptionBase as ToggleGroupControlOptionBase,
++ *   ToggleGroupControl,
++ *   ToggleGroupControlOptionBase,
+  * } from '@wordpress/components';
+  *
+  * function Example() {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+index 8b96470e21301e..4df6682ae56208 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+@@ -1,17 +1,13 @@
+ # `ToggleGroupControlOptionIcon`
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `ToggleGroupControlOptionIcon` is a form component which is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md) and displays an icon.
+ 
+ ## Usage
+ 
+ ```js
+ import {
+-	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
++	ToggleGroupControl,
++	ToggleGroupControlOptionIcon,
+ } from '@wordpress/components';
+ import { formatLowercase, formatUppercase } from '@wordpress/icons';
+ 
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+index ec009d82344c39..980bbdbbf8bc76 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+@@ -45,8 +45,8 @@ function UnforwardedToggleGroupControlOptionIcon(
+  * ```jsx
+  *
+  * import {
+- *	__experimentalToggleGroupControl as ToggleGroupControl,
+- *	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
++ *	ToggleGroupControl,
++ *	ToggleGroupControlOptionIcon,
+  * from '@wordpress/components';
+  * import { formatLowercase, formatUppercase } from '@wordpress/icons';
+  *
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+index 7f9f4d32f29fc3..817d6fa1faec14 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+@@ -1,9 +1,5 @@
+ # `ToggleGroupControlOption`
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `ToggleGroupControlOption` is a form component and is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md).
+ 
+ 
+@@ -11,8 +7,8 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ ```js
+ import {
+-	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
++	ToggleGroupControl,
++	ToggleGroupControlOption,
+ } from '@wordpress/components';
+ 
+ function Example() {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+index e4b9cff4b80330..105e806182475e 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+@@ -42,8 +42,8 @@ function UnforwardedToggleGroupControlOption(
+  *
+  * ```jsx
+  * import {
+- *   __experimentalToggleGroupControl as ToggleGroupControl,
+- *   __experimentalToggleGroupControlOption as ToggleGroupControlOption,
++ *   ToggleGroupControl,
++ *   ToggleGroupControlOption,
+  * } from '@wordpress/components';
+  *
+  * function Example() {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/README.md b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+index 64e0489f4171b7..9afa85a40e7f97 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+@@ -1,9 +1,5 @@
+ # `ToggleGroupControl`
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use [`ToggleGroupControlOption`](/packages/components/src/toggle-group-control/toggle-group-control-option/README.md) component.
+ 
+ This component is intended for selecting a single persistent value from a set of options, similar to a how a radio button group would work. If you simply want a toggle to switch between views, use a [`TabPanel`](/packages/components/src/tab-panel/README.md) instead.
+@@ -14,8 +10,8 @@ Only use this control when you know for sure the labels of items inside won't wr
+ 
+ ```js
+ import {
+-	__experimentalToggleGroupControl as ToggleGroupControl,
+-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
++	ToggleGroupControl,
++	ToggleGroupControlOption,
+ } from '@wordpress/components';
+ 
+ function Example() {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 2fa35e2a5e80a6..18f5f73d8a2a49 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -111,8 +111,8 @@ function UnconnectedToggleGroupControl(
+  *
+  * ```jsx
+  * import {
+- *   __experimentalToggleGroupControl as ToggleGroupControl,
+- *   __experimentalToggleGroupControlOption as ToggleGroupControlOption,
++ *   ToggleGroupControl,
++ *   ToggleGroupControlOption,
+  * } from '@wordpress/components';
+  *
+  * function Example() {
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..1caa0e544d5b38 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'togglegroupcontrol',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

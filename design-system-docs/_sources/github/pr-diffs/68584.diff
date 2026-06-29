@@ -1,0 +1,40 @@
+diff --git a/packages/components/src/angle-picker-control/README.md b/packages/components/src/angle-picker-control/README.md
+index 9908282fd9ef9a..842c33e209755b 100644
+--- a/packages/components/src/angle-picker-control/README.md
++++ b/packages/components/src/angle-picker-control/README.md
+@@ -19,7 +19,7 @@ function Example() {
+     <AnglePickerControl
+       value={ angle }
+       onChange={ setAngle }
+-    </>
++    />
+   );
+ }
+ ```
+@@ -55,3 +55,10 @@ A function that receives the new value of the input.
+ 
+ The current value of the input. The value represents an angle in degrees
+ and should be a value between 0 and 360.
++
++### `className`
++
++  - Type: `string`
++  - Required: No
++
++A string of classes to be added to the control component.
+\ No newline at end of file
+diff --git a/packages/components/src/angle-picker-control/types.ts b/packages/components/src/angle-picker-control/types.ts
+index d453be1d6023bd..45924df2c41348 100644
+--- a/packages/components/src/angle-picker-control/types.ts
++++ b/packages/components/src/angle-picker-control/types.ts
+@@ -23,6 +23,10 @@ export type AnglePickerControlProps = {
+ 	 * and should be a value between 0 and 360.
+ 	 */
+ 	value: number | string;
++	/**
++	 * Additional classes to apply to the angle picker.
++	 */
++	className?: string;
+ };
+ 
+ export type AngleCircleProps = Pick<

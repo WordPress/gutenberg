@@ -1,0 +1,270 @@
+diff --git a/packages/components/src/ui/flex/flex-styles.js b/packages/components/src/ui/flex/styles.js
+similarity index 100%
+rename from packages/components/src/ui/flex/flex-styles.js
+rename to packages/components/src/ui/flex/styles.js
+diff --git a/packages/components/src/ui/flex/use-flex-item.js b/packages/components/src/ui/flex/use-flex-item.js
+index 854a08c6d93304..c8d129cd0984ef 100644
+--- a/packages/components/src/ui/flex/use-flex-item.js
++++ b/packages/components/src/ui/flex/use-flex-item.js
+@@ -7,7 +7,7 @@ import { css, cx, ui } from '@wp-g2/styles';
+ /**
+  * Internal dependencies
+  */
+-import * as styles from './flex-styles';
++import * as styles from './styles';
+ 
+ /**
+  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexItemProps, 'div'>} props
+diff --git a/packages/components/src/ui/flex/use-flex.js b/packages/components/src/ui/flex/use-flex.js
+index 4d990b4f853b12..c16687f37939ec 100644
+--- a/packages/components/src/ui/flex/use-flex.js
++++ b/packages/components/src/ui/flex/use-flex.js
+@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import * as styles from './flex-styles';
++import * as styles from './styles';
+ 
+ /**
+  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexProps, 'div'>} props
+diff --git a/packages/components/src/ui/grid/grid.js b/packages/components/src/ui/grid/component.js
+similarity index 94%
+rename from packages/components/src/ui/grid/grid.js
+rename to packages/components/src/ui/grid/component.js
+index 73d236b41e169c..8739e734736c40 100644
+--- a/packages/components/src/ui/grid/grid.js
++++ b/packages/components/src/ui/grid/component.js
+@@ -2,7 +2,7 @@
+  * Internal dependencies
+  */
+ import { createComponent } from '../utils';
+-import useGrid from './use-grid';
++import useGrid from './hook';
+ 
+ /**
+  * `Grid` is a primitive layout component that can arrange content in a grid configuration.
+diff --git a/packages/components/src/ui/grid/use-grid.js b/packages/components/src/ui/grid/hook.js
+similarity index 100%
+rename from packages/components/src/ui/grid/use-grid.js
+rename to packages/components/src/ui/grid/hook.js
+diff --git a/packages/components/src/ui/grid/index.js b/packages/components/src/ui/grid/index.js
+index dac772156147ca..7085d14bf0d5ca 100644
+--- a/packages/components/src/ui/grid/index.js
++++ b/packages/components/src/ui/grid/index.js
+@@ -1,2 +1,2 @@
+-export { default as Grid } from './grid';
+-export { default as useGrid } from './use-grid';
++export { default as Grid } from './component';
++export { default as useGrid } from './hook';
+diff --git a/packages/components/src/ui/grid/stories/index.js b/packages/components/src/ui/grid/stories/index.js
+index 871b4b881f5fab..8df6c7162ee485 100644
+--- a/packages/components/src/ui/grid/stories/index.js
++++ b/packages/components/src/ui/grid/stories/index.js
+@@ -7,7 +7,7 @@ import { number } from '@storybook/addon-knobs';
+  * Internal dependencies
+  */
+ import { View } from '../../view';
+-import Grid from '../grid';
++import { Grid } from '..';
+ 
+ export default {
+ 	component: Grid,
+diff --git a/packages/components/src/ui/grid/test/grid.js b/packages/components/src/ui/grid/test/grid.js
+index cefd3194cc6c5c..eb082cca8d3fc2 100644
+--- a/packages/components/src/ui/grid/test/grid.js
++++ b/packages/components/src/ui/grid/test/grid.js
+@@ -8,7 +8,7 @@ import { ui } from '@wp-g2/styles';
+  * Internal dependencies
+  */
+ import { View } from '../../view';
+-import Grid from '../grid';
++import { Grid } from '..';
+ 
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {
+diff --git a/packages/components/src/ui/h-stack/h-stack.js b/packages/components/src/ui/h-stack/component.js
+similarity index 79%
+rename from packages/components/src/ui/h-stack/h-stack.js
+rename to packages/components/src/ui/h-stack/component.js
+index 8ffdda1f28fe85..68a3343fa33d9f 100644
+--- a/packages/components/src/ui/h-stack/h-stack.js
++++ b/packages/components/src/ui/h-stack/component.js
+@@ -2,7 +2,7 @@
+  * Internal dependencies
+  */
+ import { createComponent } from '../utils';
+-import { useHStack } from './use-h-stack';
++import { useHStack } from './hook';
+ 
+ export default createComponent( {
+ 	as: 'div',
+diff --git a/packages/components/src/ui/h-stack/use-h-stack.js b/packages/components/src/ui/h-stack/hook.js
+similarity index 95%
+rename from packages/components/src/ui/h-stack/use-h-stack.js
+rename to packages/components/src/ui/h-stack/hook.js
+index 7c50f6488fa802..d553d4d69e0a3e 100644
+--- a/packages/components/src/ui/h-stack/use-h-stack.js
++++ b/packages/components/src/ui/h-stack/hook.js
+@@ -9,7 +9,7 @@ import { getValidChildren } from '@wp-g2/utils';
+  * Internal dependencies
+  */
+ import { FlexItem, useFlex } from '../flex';
+-import { getAlignmentProps } from './h-stack-utils';
++import { getAlignmentProps } from './utils';
+ 
+ /**
+  *
+diff --git a/packages/components/src/ui/h-stack/index.js b/packages/components/src/ui/h-stack/index.js
+index b52a8c22b4d2c7..52bb18bf77ab6b 100644
+--- a/packages/components/src/ui/h-stack/index.js
++++ b/packages/components/src/ui/h-stack/index.js
+@@ -1,2 +1,2 @@
+-export { default as HStack } from './h-stack';
+-export * from './use-h-stack';
++export { default as HStack } from './component';
++export * from './hook';
+diff --git a/packages/components/src/ui/h-stack/h-stack-utils.js b/packages/components/src/ui/h-stack/utils.js
+similarity index 100%
+rename from packages/components/src/ui/h-stack/h-stack-utils.js
+rename to packages/components/src/ui/h-stack/utils.js
+diff --git a/packages/components/src/ui/text/text.js b/packages/components/src/ui/text/component.js
+similarity index 84%
+rename from packages/components/src/ui/text/text.js
+rename to packages/components/src/ui/text/component.js
+index 3d8b2e1fa0c0c5..cf94e416e6814e 100644
+--- a/packages/components/src/ui/text/text.js
++++ b/packages/components/src/ui/text/component.js
+@@ -2,7 +2,7 @@
+  * Internal dependencies
+  */
+ import { createComponent } from '../utils';
+-import useText from './use-text';
++import useText from './hook';
+ 
+ const Text = createComponent( {
+ 	as: 'span',
+diff --git a/packages/components/src/ui/text/use-text.js b/packages/components/src/ui/text/hook.js
+similarity index 100%
+rename from packages/components/src/ui/text/use-text.js
+rename to packages/components/src/ui/text/hook.js
+diff --git a/packages/components/src/ui/text/index.js b/packages/components/src/ui/text/index.js
+index a130a34ce986de..2341fd018171b0 100644
+--- a/packages/components/src/ui/text/index.js
++++ b/packages/components/src/ui/text/index.js
+@@ -1,2 +1,2 @@
+-export { default as Text } from './text';
+-export { default as useText } from './use-text';
++export { default as Text } from './component';
++export { default as useText } from './hook';
+diff --git a/packages/components/src/ui/text/stories/index.js b/packages/components/src/ui/text/stories/index.js
+index 014dcec8755908..34e7e5c21459c7 100644
+--- a/packages/components/src/ui/text/stories/index.js
++++ b/packages/components/src/ui/text/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import Text from '../text';
++import { Text } from '..';
+ 
+ export default {
+ 	component: Text,
+diff --git a/packages/components/src/ui/text/test/text.js b/packages/components/src/ui/text/test/text.js
+index 31cb96ce992839..4bfaebb7afd00d 100644
+--- a/packages/components/src/ui/text/test/text.js
++++ b/packages/components/src/ui/text/test/text.js
+@@ -7,7 +7,7 @@ import { getFontSize, ui } from '@wp-g2/styles';
+ /**
+  * Internal dependencies
+  */
+-import Text from '../text';
++import { Text } from '..';
+ 
+ describe( 'Text', () => {
+ 	describe( 'snapshot tests', () => {
+diff --git a/packages/components/src/ui/truncate/truncate.js b/packages/components/src/ui/truncate/component.js
+similarity index 95%
+rename from packages/components/src/ui/truncate/truncate.js
+rename to packages/components/src/ui/truncate/component.js
+index 2f22b94525fd0e..98d667cfa38af0 100644
+--- a/packages/components/src/ui/truncate/truncate.js
++++ b/packages/components/src/ui/truncate/component.js
+@@ -2,7 +2,7 @@
+  * Internal dependencies
+  */
+ import { createComponent } from '../utils';
+-import useTruncate from './use-truncate';
++import useTruncate from './hook';
+ 
+ /**
+  * `Truncate` is a typography primitive that trims text content. For almost all cases, it is recommended that `Text`, `Heading`, or `Subheading` is used to render text content. However, `Truncate` is available for custom implementations.
+diff --git a/packages/components/src/ui/truncate/use-truncate.js b/packages/components/src/ui/truncate/hook.js
+similarity index 100%
+rename from packages/components/src/ui/truncate/use-truncate.js
+rename to packages/components/src/ui/truncate/hook.js
+diff --git a/packages/components/src/ui/truncate/index.js b/packages/components/src/ui/truncate/index.js
+index c2471764d88128..0ea1912af03c8b 100644
+--- a/packages/components/src/ui/truncate/index.js
++++ b/packages/components/src/ui/truncate/index.js
+@@ -1,2 +1,2 @@
+-export { default as Truncate } from './truncate';
+-export { default as useTruncate } from './use-truncate';
++export { default as Truncate } from './component';
++export { default as useTruncate } from './hook';
+diff --git a/packages/components/src/ui/truncate/stories/index.js b/packages/components/src/ui/truncate/stories/index.js
+index 7af90b1b8a9e14..c8ba7634895497 100644
+--- a/packages/components/src/ui/truncate/stories/index.js
++++ b/packages/components/src/ui/truncate/stories/index.js
+@@ -6,7 +6,7 @@ import { number } from '@storybook/addon-knobs';
+ /**
+  * Internal dependencies
+  */
+-import Truncate from '../truncate';
++import { Truncate } from '..';
+ 
+ export default {
+ 	component: Truncate,
+diff --git a/packages/components/src/ui/truncate/test/truncate.js b/packages/components/src/ui/truncate/test/truncate.js
+index 01382e9eaac8c4..2e3bab8d9b185b 100644
+--- a/packages/components/src/ui/truncate/test/truncate.js
++++ b/packages/components/src/ui/truncate/test/truncate.js
+@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import Truncate from '../truncate';
++import { Truncate } from '..';
+ 
+ describe( 'props', () => {
+ 	test( 'should render correctly', () => {
+diff --git a/packages/components/src/ui/v-stack/v-stack.js b/packages/components/src/ui/v-stack/component.js
+similarity index 94%
+rename from packages/components/src/ui/v-stack/v-stack.js
+rename to packages/components/src/ui/v-stack/component.js
+index 0f1e4a2c778860..0335eb37711d83 100644
+--- a/packages/components/src/ui/v-stack/v-stack.js
++++ b/packages/components/src/ui/v-stack/component.js
+@@ -2,7 +2,7 @@
+  * Internal dependencies
+  */
+ import { createComponent } from '../utils';
+-import { useVStack } from './use-v-stack';
++import { useVStack } from './hook';
+ 
+ /**
+  * `VStack` (or Vertical Stack) is a layout component that arranges child elements in a vertical line.
+diff --git a/packages/components/src/ui/v-stack/use-v-stack.js b/packages/components/src/ui/v-stack/hook.js
+similarity index 100%
+rename from packages/components/src/ui/v-stack/use-v-stack.js
+rename to packages/components/src/ui/v-stack/hook.js
+diff --git a/packages/components/src/ui/v-stack/index.js b/packages/components/src/ui/v-stack/index.js
+index 780ac6bd4811e2..96f0a2a02fe891 100644
+--- a/packages/components/src/ui/v-stack/index.js
++++ b/packages/components/src/ui/v-stack/index.js
+@@ -1,3 +1,3 @@
+-export { default as VStack } from './v-stack';
++export { default as VStack } from './component';
+ 
+-export * from './use-v-stack';
++export * from './hook';

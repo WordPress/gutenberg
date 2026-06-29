@@ -1,0 +1,383 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c743ebb3dc8a5c..8ee778054d30ab 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,9 +9,10 @@
+ -   Changed `RangeControl` component to not apply `shiftStep` to inputs from its `<input type="range"/>` ([35020](https://github.com/WordPress/gutenberg/pull/35020)).
+ -   Removed `isAction` prop from `Item`. The component will now rely on `onClick` to render as a `button` ([35152](https://github.com/WordPress/gutenberg/pull/35152)).
+ 
+-### New Feature
++### New Features
+ 
+ -   Add an experimental `Navigator` components ([#34904](https://github.com/WordPress/gutenberg/pull/34904)) as a replacement for the previous `Navigation` related components.
++-   Added support for `step="any"` in `NumberControl` and `RangeControl` ([#34542](https://github.com/WordPress/gutenberg/pull/34542)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/number-control/README.md b/packages/components/src/number-control/README.md
+index 9a237c4049df02..2e57f69fbc36c4 100644
+--- a/packages/components/src/number-control/README.md
++++ b/packages/components/src/number-control/README.md
+@@ -81,6 +81,22 @@ The position of the label (`top`, `side`, `bottom`, or `edge`).
+ -   Type: `String`
+ -   Required: No
+ 
++### max
++
++The maximum `value` allowed.
++
++-   Type: `Number`
++-   Required: No
++-   Default: `Infinity`
++
++### min
++
++The minimum `value` allowed.
++
++-   Type: `Number`
++-   Required: No
++-   Default: `-Infinity`
++
+ ### required
+ 
+ If `true` enforces a valid number within the control's min/max range. If `false` allows an empty string as a valid value.
+@@ -99,8 +115,8 @@ Amount to increment by when the `SHIFT` key is held down. This shift value is a
+ 
+ ### step
+ 
+-Amount to increment by when incrementing/decrementing.
++Amount by which the `value` is changed when incrementing/decrementing. It is also a factor in validation as `value` must be a multiple of `step` (offset by `min`, if specified) to be valid. Accepts the special string value `any` that voids the validation constraint and causes stepping actions to increment/decrement by `1`.
+ 
+--   Type: `Number`
++-   Type: `Number | "any"`
+ -   Required: No
+ -   Default: `1`
+diff --git a/packages/components/src/number-control/index.js b/packages/components/src/number-control/index.js
+index 4aa29e17cee79a..00ea6756a1ebab 100644
+--- a/packages/components/src/number-control/index.js
++++ b/packages/components/src/number-control/index.js
+@@ -17,7 +17,6 @@ import { Input } from './styles/number-control-styles';
+ import * as inputControlActionTypes from '../input-control/reducer/actions';
+ import { composeStateReducers } from '../input-control/reducer/reducer';
+ import { add, subtract, roundClamp } from '../utils/math';
+-import { useJumpStep } from '../utils/hooks';
+ import { isValueEmpty } from '../utils/values';
+ 
+ export function NumberControl(
+@@ -40,13 +39,15 @@ export function NumberControl(
+ 	},
+ 	ref
+ ) {
+-	const baseValue = roundClamp( 0, min, max, step );
+-
+-	const jumpStep = useJumpStep( {
+-		step,
+-		shiftStep,
+-		isShiftStepEnabled,
+-	} );
++	const isStepAny = step === 'any';
++	const baseStep = isStepAny ? 1 : parseFloat( step );
++	const baseValue = roundClamp( 0, min, max, baseStep );
++	const constrainValue = ( value, stepOverride ) => {
++		// When step is "any" clamp the value, otherwise round and clamp it
++		return isStepAny
++			? Math.min( max, Math.max( min, value ) )
++			: roundClamp( value, min, max, stepOverride ?? baseStep );
++	};
+ 
+ 	const autoComplete = typeProp === 'number' ? 'off' : null;
+ 	const classes = classNames( 'components-number-control', className );
+@@ -75,8 +76,8 @@ export function NumberControl(
+ 			const enableShift = event.shiftKey && isShiftStepEnabled;
+ 
+ 			const incrementalValue = enableShift
+-				? parseFloat( shiftStep ) * parseFloat( step )
+-				: parseFloat( step );
++				? parseFloat( shiftStep ) * baseStep
++				: baseStep;
+ 			let nextValue = isValueEmpty( currentValue )
+ 				? baseValue
+ 				: currentValue;
+@@ -93,58 +94,55 @@ export function NumberControl(
+ 				nextValue = subtract( nextValue, incrementalValue );
+ 			}
+ 
+-			nextValue = roundClamp( nextValue, min, max, incrementalValue );
+-
+-			state.value = nextValue;
++			state.value = constrainValue(
++				nextValue,
++				enableShift ? incrementalValue : null
++			);
+ 		}
+ 
+ 		/**
+ 		 * Handles drag to update events
+ 		 */
+ 		if ( type === inputControlActionTypes.DRAG && isDragEnabled ) {
+-			const { delta, shiftKey } = payload;
+-			const [ x, y ] = delta;
+-			const modifier = shiftKey
+-				? parseFloat( shiftStep ) * parseFloat( step )
+-				: parseFloat( step );
++			const [ x, y ] = payload.delta;
++			const enableShift = payload.shiftKey && isShiftStepEnabled;
++			const modifier = enableShift
++				? parseFloat( shiftStep ) * baseStep
++				: baseStep;
+ 
+ 			let directionModifier;
+-			let directionBaseValue;
++			let delta;
+ 
+ 			switch ( dragDirection ) {
+ 				case 'n':
+-					directionBaseValue = y;
++					delta = y;
+ 					directionModifier = -1;
+ 					break;
+ 
+ 				case 'e':
+-					directionBaseValue = x;
++					delta = x;
+ 					directionModifier = isRTL() ? -1 : 1;
+ 					break;
+ 
+ 				case 's':
+-					directionBaseValue = y;
++					delta = y;
+ 					directionModifier = 1;
+ 					break;
+ 
+ 				case 'w':
+-					directionBaseValue = x;
++					delta = x;
+ 					directionModifier = isRTL() ? 1 : -1;
+ 					break;
+ 			}
+ 
+-			const distance = directionBaseValue * modifier * directionModifier;
+-			let nextValue;
++			if ( delta !== 0 ) {
++				delta = Math.ceil( Math.abs( delta ) ) * Math.sign( delta );
++				const distance = delta * modifier * directionModifier;
+ 
+-			if ( distance !== 0 ) {
+-				nextValue = roundClamp(
++				state.value = constrainValue(
+ 					add( currentValue, distance ),
+-					min,
+-					max,
+-					modifier
++					enableShift ? modifier : null
+ 				);
+-
+-				state.value = nextValue;
+ 			}
+ 		}
+ 
+@@ -159,7 +157,7 @@ export function NumberControl(
+ 
+ 			state.value = applyEmptyValue
+ 				? currentValue
+-				: roundClamp( currentValue, min, max, step );
++				: constrainValue( currentValue );
+ 		}
+ 
+ 		return state;
+@@ -179,7 +177,7 @@ export function NumberControl(
+ 			min={ min }
+ 			ref={ ref }
+ 			required={ required }
+-			step={ jumpStep }
++			step={ step }
+ 			type={ typeProp }
+ 			value={ valueProp }
+ 			__unstableStateReducer={ composeStateReducers(
+diff --git a/packages/components/src/number-control/stories/index.js b/packages/components/src/number-control/stories/index.js
+index bb9c4d8df02925..c7bb15b41e80d0 100644
+--- a/packages/components/src/number-control/stories/index.js
++++ b/packages/components/src/number-control/stories/index.js
+@@ -32,7 +32,7 @@ function Example() {
+ 		placeholder: text( 'placeholder', 0 ),
+ 		required: boolean( 'required', false ),
+ 		shiftStep: number( 'shiftStep', 10 ),
+-		step: number( 'step', 1 ),
++		step: text( 'step', 1 ),
+ 	};
+ 
+ 	return (
+diff --git a/packages/components/src/number-control/test/index.js b/packages/components/src/number-control/test/index.js
+index 2ac4c008977187..db51a66681c670 100644
+--- a/packages/components/src/number-control/test/index.js
++++ b/packages/components/src/number-control/test/index.js
+@@ -170,6 +170,16 @@ describe( 'NumberControl', () => {
+ 			expect( input.value ).toBe( '-4' );
+ 		} );
+ 
++		it( 'should increment while preserving the decimal value when `step` is “any”', () => {
++			render( <StatefulNumberControl value={ 866.5309 } step="any" /> );
++
++			const input = getInput();
++			input.focus();
++			fireKeyDown( { keyCode: UP } );
++
++			expect( input.value ).toBe( '867.5309' );
++		} );
++
+ 		it( 'should increment by shiftStep on key UP + shift press', () => {
+ 			render( <StatefulNumberControl value={ 5 } shiftStep={ 10 } /> );
+ 
+@@ -180,6 +190,16 @@ describe( 'NumberControl', () => {
+ 			expect( input.value ).toBe( '20' );
+ 		} );
+ 
++		it( 'should increment by shiftStep while preserving the decimal value when `step` is “any”', () => {
++			render( <StatefulNumberControl value={ 857.5309 } step="any" /> );
++
++			const input = getInput();
++			input.focus();
++			fireKeyDown( { keyCode: UP, shiftKey: true } );
++
++			expect( input.value ).toBe( '867.5309' );
++		} );
++
+ 		it( 'should increment by custom shiftStep on key UP + shift press', () => {
+ 			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
+ 
+@@ -254,6 +274,16 @@ describe( 'NumberControl', () => {
+ 			expect( input.value ).toBe( '-6' );
+ 		} );
+ 
++		it( 'should decrement while preserving the decimal value when `step` is “any”', () => {
++			render( <StatefulNumberControl value={ 868.5309 } step="any" /> );
++
++			const input = getInput();
++			input.focus();
++			fireKeyDown( { keyCode: DOWN } );
++
++			expect( input.value ).toBe( '867.5309' );
++		} );
++
+ 		it( 'should decrement by shiftStep on key DOWN + shift press', () => {
+ 			render( <StatefulNumberControl value={ 5 } /> );
+ 
+@@ -264,6 +294,16 @@ describe( 'NumberControl', () => {
+ 			expect( input.value ).toBe( '0' );
+ 		} );
+ 
++		it( 'should decrement by shiftStep while preserving the decimal value when `step` is “any”', () => {
++			render( <StatefulNumberControl value={ 877.5309 } step="any" /> );
++
++			const input = getInput();
++			input.focus();
++			fireKeyDown( { keyCode: DOWN, shiftKey: true } );
++
++			expect( input.value ).toBe( '867.5309' );
++		} );
++
+ 		it( 'should decrement by custom shiftStep on key DOWN + shift press', () => {
+ 			render( <StatefulNumberControl value={ 5 } shiftStep={ 100 } /> );
+ 
+diff --git a/packages/components/src/range-control/README.md b/packages/components/src/range-control/README.md
+index d45529e98bc003..21769fec6afbb1 100644
+--- a/packages/components/src/range-control/README.md
++++ b/packages/components/src/range-control/README.md
+@@ -272,7 +272,7 @@ The value to revert to if the Reset button is clicked (enabled by `allowReset`)
+ 
+ #### showTooltip
+ 
+-Forcing the Tooltip UI to show or hide.
++Forcing the Tooltip UI to show or hide. This is overriden to `false` when `step` is set to the special string value `any`.
+ 
+ -   Type: `Boolean`
+ -   Required: No
+@@ -280,9 +280,9 @@ Forcing the Tooltip UI to show or hide.
+ 
+ #### step
+ 
+-The stepping interval between `min` and `max` values. Step is used both for user interface and validation purposes.
++The minimum amount by which `value` changes. It is also a factor in validation as `value` must be a multiple of `step` (offset by `min`) to be valid. Accepts the special string value `any` that voids the validation constraint and overrides both `withInputField` and `showTooltip` props to `false`.
+ 
+--   Type: `Number`
++-   Type: `Number | "any"`
+ -   Required: No
+ -   Platform: Web
+ 
+@@ -311,7 +311,7 @@ The current value of the range slider.
+ 
+ #### withInputField
+ 
+-Determines if the `input` number field will render next to the RangeControl.
++Determines if the `input` number field will render next to the RangeControl. This is overriden to `false` when `step` is set to the special string value `any`.
+ 
+ -   Type: `Boolean`
+ -   Required: No
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index c7c718df9fa04c..7073862d413000 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -77,6 +77,14 @@ function RangeControl(
+ 		initial: initialPosition,
+ 	} );
+ 	const isResetPendent = useRef( false );
++
++	if ( step === 'any' ) {
++		// The tooltip and number input field are hidden when the step is "any"
++		// because the decimals get too lengthy to fit well.
++		showTooltipProp = false;
++		withInputField = false;
++	}
++
+ 	const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
+ 	const [ isFocused, setIsFocused ] = useState( false );
+ 
+diff --git a/packages/components/src/range-control/rail.js b/packages/components/src/range-control/rail.js
+index cc8fdc33062e7f..34caa88a736228 100644
+--- a/packages/components/src/range-control/rail.js
++++ b/packages/components/src/range-control/rail.js
+@@ -44,6 +44,9 @@ function Marks( {
+ 	step = 1,
+ 	value = 0,
+ } ) {
++	if ( step === 'any' ) {
++		step = 1;
++	}
+ 	const marksData = useMarks( { marks, min, max, step, value } );
+ 
+ 	return (
+diff --git a/packages/components/src/range-control/stories/index.js b/packages/components/src/range-control/stories/index.js
+index 756f6ca1f0e030..febc98b4c8d809 100644
+--- a/packages/components/src/range-control/stories/index.js
++++ b/packages/components/src/range-control/stories/index.js
+@@ -43,7 +43,7 @@ const DefaultExample = () => {
+ 		max: number( 'max', 100 ),
+ 		min: number( 'min', 0 ),
+ 		showTooltip: boolean( 'showTooltip', false ),
+-		step: number( 'step', 1 ),
++		step: text( 'step', 1 ),
+ 		railColor: text( 'railColor', null ),
+ 		trackColor: text( 'trackColor', null ),
+ 		withInputField: boolean( 'withInputField', true ),
+@@ -81,6 +81,10 @@ export const InitialValueZero = () => {
+ 	);
+ };
+ 
++export const withAnyStep = () => {
++	return <RangeControlWithState label="Brightness" step="any" />;
++};
++
+ export const withHelp = () => {
+ 	const label = text( 'Label', 'How many columns should this use?' );
+ 	const help = text(
+@@ -174,6 +178,10 @@ export const marks = () => {
+ 			<h2>Negative Range</h2>
+ 			<Range marks { ...rangeNegative } />
+ 			<Range marks={ marksWithNegatives } { ...rangeNegative } />
++
++			<h2>Any Step</h2>
++			<Range marks { ...{ ...stepInteger, step: 'any' } } />
++			<Range marks={ marksBase } { ...{ ...stepInteger, step: 'any' } } />
+ 		</Wrapper>
+ 	);
+ };

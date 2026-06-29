@@ -1,0 +1,327 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7cab43979de8d6..a135922377fe0b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Enhancements
+ 
+ -   Wrapped `ColorIndicator` in a `forwardRef` call ([#41587](https://github.com/WordPress/gutenberg/pull/41587)).
++-   `ComboboxControl` & `FormTokenField`: Add `__next36pxDefaultSize` flag for larger default size ([#40746](https://github.com/WordPress/gutenberg/pull/40746)).
+ -   `BorderControl`: Improve TypeScript support. ([#41843](https://github.com/WordPress/gutenberg/pull/41843)).
+ 
+ ### Internal
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index d25a5659c188ed..2903b7d3cce2ac 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -22,11 +22,12 @@ import { closeSmall } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
++import { InputWrapperFlex } from './styles';
+ import TokenInput from '../form-token-field/token-input';
+ import SuggestionsList from '../form-token-field/suggestions-list';
+ import BaseControl from '../base-control';
+ import Button from '../button';
+-import { Flex, FlexBlock, FlexItem } from '../flex';
++import { FlexBlock, FlexItem } from '../flex';
+ import withFocusOutside from '../higher-order/with-focus-outside';
+ 
+ const noop = () => {};
+@@ -44,6 +45,7 @@ const DetectOutside = withFocusOutside(
+ );
+ 
+ function ComboboxControl( {
++	__next36pxDefaultSize,
+ 	value,
+ 	label,
+ 	options,
+@@ -225,7 +227,9 @@ function ComboboxControl( {
+ 					tabIndex="-1"
+ 					onKeyDown={ onKeyDown }
+ 				>
+-					<Flex>
++					<InputWrapperFlex
++						__next36pxDefaultSize={ __next36pxDefaultSize }
++					>
+ 						<FlexBlock>
+ 							<TokenInput
+ 								className="components-combobox-control__input"
+@@ -257,7 +261,7 @@ function ComboboxControl( {
+ 								/>
+ 							</FlexItem>
+ 						) }
+-					</Flex>
++					</InputWrapperFlex>
+ 					{ isExpanded && (
+ 						<SuggestionsList
+ 							instanceId={ instanceId }
+diff --git a/packages/components/src/combobox-control/stories/index.js b/packages/components/src/combobox-control/stories/index.js
+index a852004ac3046d..3ba34f74dc8a95 100644
+--- a/packages/components/src/combobox-control/stories/index.js
++++ b/packages/components/src/combobox-control/stories/index.js
+@@ -266,17 +266,17 @@ const mapCountryOption = ( country ) => ( {
+ 
+ const countryOptions = countries.map( mapCountryOption );
+ 
+-function CountryCodeComboboxControl( { allowReset } ) {
++function CountryCodeComboboxControl( args ) {
+ 	const [ value, setValue ] = useState( null );
+ 
+ 	return (
+ 		<>
+ 			<ComboboxControl
++				{ ...args }
+ 				value={ value }
+ 				onChange={ setValue }
+ 				label="Select a country"
+ 				options={ countryOptions }
+-				allowReset={ allowReset }
+ 			/>
+ 			<p>Value: { value }</p>
+ 		</>
+@@ -284,5 +284,6 @@ function CountryCodeComboboxControl( { allowReset } ) {
+ }
+ export const _default = CountryCodeComboboxControl.bind( {} );
+ _default.args = {
++	__next36pxDefaultSize: false,
+ 	allowReset: false,
+ };
+diff --git a/packages/components/src/combobox-control/style.scss b/packages/components/src/combobox-control/style.scss
+index 3eca7ad146e129..4161969e576fed 100644
+--- a/packages/components/src/combobox-control/style.scss
++++ b/packages/components/src/combobox-control/style.scss
+@@ -32,7 +32,7 @@ input.components-combobox-control__input[type="text"] {
+ 	align-items: flex-start;
+ 	width: 100%;
+ 	margin: 0 0 $grid-unit-10 0;
+-	padding: $grid-unit-05;
++	padding: 0;
+ 
+ 	&:focus-within {
+ 		@include input-style__focus();
+diff --git a/packages/components/src/combobox-control/styles.ts b/packages/components/src/combobox-control/styles.ts
+new file mode 100644
+index 00000000000000..6d7164b493e848
+--- /dev/null
++++ b/packages/components/src/combobox-control/styles.ts
+@@ -0,0 +1,27 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css } from '@emotion/react';
++
++/**
++ * Internal dependencies
++ */
++import { Flex } from '../flex';
++import { space } from '../ui/utils/space';
++
++const deprecatedDefaultSize = ( { __next36pxDefaultSize } ) =>
++	! __next36pxDefaultSize &&
++	css`
++		height: 28px; // 30px - 2px vertical borders on parent container
++		padding-left: ${ space( 1 ) };
++		padding-right: ${ space( 1 ) };
++	`;
++
++export const InputWrapperFlex = styled( Flex )`
++	height: 34px; // 36px - 2px vertical borders on parent container
++	padding-left: ${ space( 2 ) };
++	padding-right: ${ space( 2 ) };
++
++	${ deprecatedDefaultSize }
++`;
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 80d45b89a8fd3b..4f213b1bcb0c55 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -30,8 +30,10 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
+  */
+ import Token from './token';
+ import TokenInput from './token-input';
++import { TokensAndInputWrapperFlex } from './styles';
+ import SuggestionsList from './suggestions-list';
+ import type { FormTokenFieldProps, TokenItem } from './types';
++import { FlexItem } from '../flex';
+ 
+ /**
+  * A `FormTokenField` is a field similar to the tags and categories fields in the interim editor chrome,
+@@ -71,6 +73,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		__experimentalExpandOnFocus = false,
+ 		__experimentalValidateInput = () => true,
+ 		__experimentalShowHowTo = true,
++		__next36pxDefaultSize = false,
+ 	} = props;
+ 
+ 	const instanceId = useInstanceId( FormTokenField );
+@@ -566,28 +569,35 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		const termsCount = tokens.length;
+ 
+ 		return (
+-			<Token
+-				key={ 'token-' + _value }
+-				value={ _value }
+-				status={ status }
+-				title={ typeof token !== 'string' ? token.title : undefined }
+-				displayTransform={ displayTransform }
+-				onClickRemove={ onTokenClickRemove }
+-				isBorderless={
+-					( typeof token !== 'string' && token.isBorderless ) ||
+-					isBorderless
+-				}
+-				onMouseEnter={
+-					typeof token !== 'string' ? token.onMouseEnter : undefined
+-				}
+-				onMouseLeave={
+-					typeof token !== 'string' ? token.onMouseLeave : undefined
+-				}
+-				disabled={ 'error' !== status && disabled }
+-				messages={ messages }
+-				termsCount={ termsCount }
+-				termPosition={ termPosition }
+-			/>
++			<FlexItem key={ 'token-' + _value }>
++				<Token
++					value={ _value }
++					status={ status }
++					title={
++						typeof token !== 'string' ? token.title : undefined
++					}
++					displayTransform={ displayTransform }
++					onClickRemove={ onTokenClickRemove }
++					isBorderless={
++						( typeof token !== 'string' && token.isBorderless ) ||
++						isBorderless
++					}
++					onMouseEnter={
++						typeof token !== 'string'
++							? token.onMouseEnter
++							: undefined
++					}
++					onMouseLeave={
++						typeof token !== 'string'
++							? token.onMouseLeave
++							: undefined
++					}
++					disabled={ 'error' !== status && disabled }
++					messages={ messages }
++					termsCount={ termsCount }
++					termPosition={ termPosition }
++				/>
++			</FlexItem>
+ 		);
+ 	}
+ 
+@@ -660,7 +670,16 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 				onMouseDown={ onContainerTouched }
+ 				onTouchStart={ onContainerTouched }
+ 			>
+-				{ renderTokensAndInput() }
++				<TokensAndInputWrapperFlex
++					justify="flex-start"
++					align="center"
++					gap={ 1 }
++					wrap={ true }
++					__next36pxDefaultSize={ __next36pxDefaultSize }
++					hasTokens={ !! value.length }
++				>
++					{ renderTokensAndInput() }
++				</TokensAndInputWrapperFlex>
+ 				{ isExpanded && (
+ 					<SuggestionsList
+ 						instanceId={ instanceId }
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index 4ba684a3d363d3..30048e11ea7706 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -1,14 +1,10 @@
+ .components-form-token-field__input-container {
+ 	@include input-control();
+-	display: flex;
+-	flex-wrap: wrap;
+-	align-items: center;
+ 	width: 100%;
+ 	margin: 0 0 $grid-unit-10 0;
+-	padding: $grid-unit-05*0.5 $grid-unit-05;
++	padding: 0;
+ 	cursor: text;
+ 
+-
+ 	&.is-disabled {
+ 		background: $gray-300;
+ 		border-color: $gray-300;
+@@ -67,7 +63,6 @@
+ .components-form-token-field__token {
+ 	font-size: $default-font-size;
+ 	display: flex;
+-	margin: 2px 4px 2px 0;
+ 	color: $gray-900;
+ 	max-width: 100%;
+ 
+@@ -180,7 +175,7 @@
+ 	@include reduce-motion("transition");
+ 	list-style: none;
+ 	border-top: $border-width solid $gray-700;
+-	margin: $grid-unit-05 (-$grid-unit-05) (-$grid-unit-05);
++	margin: 0;
+ 	padding: 0;
+ }
+ 
+diff --git a/packages/components/src/form-token-field/styles.ts b/packages/components/src/form-token-field/styles.ts
+new file mode 100644
+index 00000000000000..73044d57a95386
+--- /dev/null
++++ b/packages/components/src/form-token-field/styles.ts
+@@ -0,0 +1,32 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css } from '@emotion/react';
++
++/**
++ * Internal dependencies
++ */
++import { Flex } from '../flex';
++import { space } from '../ui/utils/space';
++
++type TokensAndInputWrapperProps = {
++	__next36pxDefaultSize: boolean;
++	hasTokens: boolean;
++};
++
++const deprecatedPaddings = ( {
++	__next36pxDefaultSize,
++	hasTokens,
++}: TokensAndInputWrapperProps ) =>
++	! __next36pxDefaultSize &&
++	css`
++		padding-top: ${ space( hasTokens ? 1 : 0.5 ) };
++		padding-bottom: ${ space( hasTokens ? 1 : 0.5 ) };
++	`;
++
++export const TokensAndInputWrapperFlex = styled( Flex )`
++	padding: 5px ${ space( 1 ) };
++
++	${ deprecatedPaddings }
++`;
+diff --git a/packages/components/src/form-token-field/types.ts b/packages/components/src/form-token-field/types.ts
+index b2952fac935d96..f7e0a11e0e4140 100644
+--- a/packages/components/src/form-token-field/types.ts
++++ b/packages/components/src/form-token-field/types.ts
+@@ -147,6 +147,13 @@ export interface FormTokenFieldProps
+ 	 * @default true
+ 	 */
+ 	__experimentalShowHowTo?: boolean;
++	/**
++	 * Start opting into the larger default height that will become the
++	 * default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next36pxDefaultSize?: boolean;
+ }
+ 
+ export interface SuggestionsListProps< T = string | { value: string } > {

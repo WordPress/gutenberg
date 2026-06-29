@@ -1,0 +1,15 @@
+diff --git a/packages/components/src/panel/style.scss b/packages/components/src/panel/style.scss
+index 404c99fca853ec..f238a32041c567 100644
+--- a/packages/components/src/panel/style.scss
++++ b/packages/components/src/panel/style.scss
+@@ -28,10 +28,6 @@
+ 	&.is-opened {
+ 		padding: $panel-padding;
+ 	}
+-
+-	> .components-button {
+-		color: $dark-gray-900;
+-	}
+ }
+ 
+ .components-panel__header {

@@ -1,0 +1,163 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4ea55262580bd9..4cbb4628c19747 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -  `ColorPalette`, `GradientPicker`, `PaletteEdit`, `ToolsPanel`: add new props to set a custom heading level ([43848](https://github.com/WordPress/gutenberg/pull/43848) and [#47788](https://github.com/WordPress/gutenberg/pull/47788)).
++-   `ColorPalette`: ensure text label contrast checking works with CSS variables ([#47373](https://github.com/WordPress/gutenberg/pull/47373)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index 77e9fb46f48930..f741e35eebef7e 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -10,7 +10,7 @@ import a11yPlugin from 'colord/plugins/a11y';
+  * WordPress dependencies
+  */
+ import { __, sprintf } from '@wordpress/i18n';
+-import { useCallback, useRef, useMemo, forwardRef } from '@wordpress/element';
++import { useCallback, useMemo, useState, forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -177,7 +177,6 @@ function UnforwardedColorPalette(
+ 	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+-	const customColorPaletteRef = useRef< HTMLElement | null >( null );
+ 	const {
+ 		clearable = true,
+ 		colors = [],
+@@ -189,9 +188,17 @@ function UnforwardedColorPalette(
+ 		headingLevel = 2,
+ 		...otherProps
+ 	} = props;
++	const [ normalizedColorValue, setNormalizedColorValue ] = useState( value );
+ 
+ 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
+ 
++	const customColorPaletteCallbackRef = useCallback(
++		( node: HTMLElement | null ) => {
++			setNormalizedColorValue( normalizeColorValue( value, node ) );
++		},
++		[ value ]
++	);
++
+ 	const hasMultipleColorOrigins = isMultiplePaletteArray( colors );
+ 	const buttonLabelName = useMemo(
+ 		() =>
+@@ -206,14 +213,14 @@ function UnforwardedColorPalette(
+ 	const renderCustomColorPicker = () => (
+ 		<DropdownContentWrapper paddingSize="none">
+ 			<ColorPicker
+-				color={ normalizeColorValue( value, customColorPaletteRef ) }
++				color={ normalizedColorValue }
+ 				onChange={ ( color ) => onChange( color ) }
+ 				enableAlpha={ enableAlpha }
+ 			/>
+ 		</DropdownContentWrapper>
+ 	);
+ 
+-	const colordColor = colord( value ?? '' );
++	const colordColor = colord( normalizedColorValue ?? '' );
+ 
+ 	const valueWithoutLeadingHash = value?.startsWith( '#' )
+ 		? value.substring( 1 )
+@@ -252,7 +259,7 @@ function UnforwardedColorPalette(
+ 					renderToggle={ ( { isOpen, onToggle } ) => (
+ 						<Flex
+ 							as={ 'button' }
+-							ref={ customColorPaletteRef }
++							ref={ customColorPaletteCallbackRef }
+ 							justify="space-between"
+ 							align="flex-start"
+ 							className="components-color-palette__custom-color"
+diff --git a/packages/components/src/color-palette/test/utils.ts b/packages/components/src/color-palette/test/utils.ts
+index c65b52739f996f..d862d35be5f52f 100644
+--- a/packages/components/src/color-palette/test/utils.ts
++++ b/packages/components/src/color-palette/test/utils.ts
+@@ -4,6 +4,7 @@
+ import {
+ 	extractColorNameFromCurrentValue,
+ 	showTransparentBackground,
++	normalizeColorValue,
+ } from '../utils';
+ 
+ describe( 'ColorPalette: Utils', () => {
+@@ -32,11 +33,26 @@ describe( 'ColorPalette: Utils', () => {
+ 			expect( showTransparentBackground( 'transparent' ) ).toBe( true );
+ 			expect( showTransparentBackground( '#75757500' ) ).toBe( true );
+ 		} );
+-
+ 		test( 'should return false for non-transparent colors', () => {
+ 			expect( showTransparentBackground( '#FFF' ) ).toBe( false );
+ 			expect( showTransparentBackground( '#757575' ) ).toBe( false );
+ 			expect( showTransparentBackground( '#f5f5f524' ) ).toBe( false ); // 0.14 alpha.
+ 		} );
+ 	} );
++
++	describe( 'normalizeColorValue', () => {
++		test( 'should return the value as is if the color value is not a CSS variable', () => {
++			const element = document.createElement( 'div' );
++			expect( normalizeColorValue( '#ff0000', element ) ).toBe(
++				'#ff0000'
++			);
++		} );
++		test( 'should return the background color computed from a element if the color value is a CSS variable', () => {
++			const element = document.createElement( 'div' );
++			element.style.backgroundColor = '#ff0000';
++			expect( normalizeColorValue( 'var(--red)', element ) ).toBe(
++				'#ff0000'
++			);
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/color-palette/utils.ts b/packages/components/src/color-palette/utils.ts
+index 8a70d25a701e99..1ef7f308d01230 100644
+--- a/packages/components/src/color-palette/utils.ts
++++ b/packages/components/src/color-palette/utils.ts
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import type { RefObject } from 'react';
+ import { colord, extend } from 'colord';
+ import namesPlugin from 'colord/plugins/names';
+ import a11yPlugin from 'colord/plugins/a11y';
+@@ -76,21 +75,27 @@ export const isMultiplePaletteArray = (
+ 	);
+ };
+ 
++/**
++ * Transform a CSS variable used as background color into the color value itself.
++ *
++ * @param value   The color value that may be a CSS variable.
++ * @param element The element for which to get the computed style.
++ * @return The background color value computed from a element.
++ */
+ export const normalizeColorValue = (
+ 	value: string | undefined,
+-	ref: RefObject< HTMLElement > | null
++	element: HTMLElement | null
+ ) => {
+ 	const currentValueIsCssVariable = /^var\(/.test( value ?? '' );
+ 
+-	if ( ! currentValueIsCssVariable || ! ref?.current ) {
++	if ( ! currentValueIsCssVariable || element === null ) {
+ 		return value;
+ 	}
+ 
+-	const { ownerDocument } = ref.current;
++	const { ownerDocument } = element;
+ 	const { defaultView } = ownerDocument;
+-	const computedBackgroundColor = defaultView?.getComputedStyle(
+-		ref.current
+-	).backgroundColor;
++	const computedBackgroundColor =
++		defaultView?.getComputedStyle( element ).backgroundColor;
+ 
+ 	return computedBackgroundColor
+ 		? colord( computedBackgroundColor ).toHex()

@@ -1,0 +1,665 @@
+diff --git a/packages/block-directory/src/components/downloadable-blocks-list/test/index.js b/packages/block-directory/src/components/downloadable-blocks-list/test/index.js
+index 97116c110a6187..f74c838f813c21 100644
+--- a/packages/block-directory/src/components/downloadable-blocks-list/test/index.js
++++ b/packages/block-directory/src/components/downloadable-blocks-list/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -44,14 +44,14 @@ describe( 'DownloadableBlocksList', () => {
+ 		} );
+ 
+ 		it( 'should render plugins items into the list', () => {
+-			const { getAllByRole } = render(
++			render(
+ 				<DownloadableBlocksList
+ 					items={ items }
+ 					onSelect={ jest.fn() }
+ 					onHover={ jest.fn() }
+ 				/>
+ 			);
+-			const downloadableBlocks = getAllByRole( 'option' );
++			const downloadableBlocks = screen.getAllByRole( 'option' );
+ 
+ 			expect( downloadableBlocks ).toHaveLength( items.length );
+ 		} );
+diff --git a/packages/components/src/box-control/test/index.js b/packages/components/src/box-control/test/index.js
+index c98dd3b48d43ac..0bf4b746e4bc3d 100644
+--- a/packages/components/src/box-control/test/index.js
++++ b/packages/components/src/box-control/test/index.js
+@@ -167,19 +167,19 @@ describe( 'BoxControl', () => {
+ 			let state = {};
+ 			const setState = ( newState ) => ( state = newState );
+ 
+-			const { getAllByLabelText, getByLabelText } = render(
++			render(
+ 				<BoxControl
+ 					values={ state }
+ 					onChange={ ( next ) => setState( next ) }
+ 				/>
+ 			);
+ 			const user = setupUser();
+-			const unlink = getByLabelText( /Unlink Sides/ );
++			const unlink = screen.getByLabelText( /Unlink Sides/ );
+ 
+ 			await user.click( unlink );
+ 
+-			const input = getByLabelText( /Top/ );
+-			const select = getAllByLabelText( /Select unit/ )[ 0 ];
++			const input = screen.getByLabelText( /Top/ );
++			const select = screen.getAllByLabelText( /Select unit/ )[ 0 ];
+ 
+ 			await user.type( input, '100px' );
+ 			await user.keyboard( '{Enter}' );
+@@ -199,7 +199,7 @@ describe( 'BoxControl', () => {
+ 			let state = {};
+ 			const setState = ( newState ) => ( state = newState );
+ 
+-			const { getAllByLabelText, getByLabelText } = render(
++			render(
+ 				<BoxControl
+ 					values={ state }
+ 					onChange={ ( next ) => setState( next ) }
+@@ -207,12 +207,12 @@ describe( 'BoxControl', () => {
+ 				/>
+ 			);
+ 			const user = setupUser();
+-			const unlink = getByLabelText( /Unlink Sides/ );
++			const unlink = screen.getByLabelText( /Unlink Sides/ );
+ 
+ 			await user.click( unlink );
+ 
+-			const input = getByLabelText( /Vertical/ );
+-			const select = getAllByLabelText( /Select unit/ )[ 0 ];
++			const input = screen.getByLabelText( /Vertical/ );
++			const select = screen.getAllByLabelText( /Select unit/ )[ 0 ];
+ 
+ 			await user.type( input, '100px' );
+ 			await user.keyboard( '{Enter}' );
+diff --git a/packages/components/src/confirm-dialog/test/index.js b/packages/components/src/confirm-dialog/test/index.js
+index e66584fa0b6de9..d983af9fe4ed69 100644
+--- a/packages/components/src/confirm-dialog/test/index.js
++++ b/packages/components/src/confirm-dialog/test/index.js
+@@ -19,19 +19,19 @@ describe( 'Confirm', () => {
+ 	describe( 'Confirm component', () => {
+ 		describe( 'Structure', () => {
+ 			it( 'should render correctly', () => {
+-				const wrapper = render(
++				render(
+ 					<ConfirmDialog onConfirm={ noop } onCancel={ noop }>
+ 						Are you sure?
+ 					</ConfirmDialog>
+ 				);
+ 
+-				const dialog = wrapper.getByRole( 'dialog' );
++				const dialog = screen.getByRole( 'dialog' );
+ 				const elementsTexts = [ 'Are you sure?', 'OK', 'Cancel' ];
+ 
+ 				expect( dialog ).toBeInTheDocument();
+ 
+ 				elementsTexts.forEach( ( txt ) => {
+-					const el = wrapper.getByText( txt );
++					const el = screen.getByText( txt );
+ 					expect( el ).toBeInTheDocument();
+ 				} );
+ 			} );
+@@ -66,13 +66,13 @@ describe( 'Confirm', () => {
+ 
+ 		describe( 'When uncontrolled', () => {
+ 			it( 'should render', () => {
+-				const wrapper = render(
++				render(
+ 					<ConfirmDialog onConfirm={ noop } onCancel={ noop }>
+ 						Are you sure?
+ 					</ConfirmDialog>
+ 				);
+ 
+-				const confirmDialog = wrapper.getByRole( 'dialog' );
++				const confirmDialog = screen.getByRole( 'dialog' );
+ 
+ 				expect( confirmDialog ).toBeInTheDocument();
+ 			} );
+@@ -80,14 +80,14 @@ describe( 'Confirm', () => {
+ 			it( 'should not render if closed by clicking `OK`, and the `onConfirm` callback should be called', async () => {
+ 				const onConfirm = jest.fn().mockName( 'onConfirm()' );
+ 
+-				const wrapper = render(
++				render(
+ 					<ConfirmDialog onConfirm={ onConfirm }>
+ 						Are you sure?
+ 					</ConfirmDialog>
+ 				);
+ 
+-				const confirmDialog = wrapper.getByRole( 'dialog' );
+-				const button = wrapper.getByText( 'OK' );
++				const confirmDialog = screen.getByRole( 'dialog' );
++				const button = screen.getByText( 'OK' );
+ 
+ 				fireEvent.click( button );
+ 
+@@ -98,14 +98,14 @@ describe( 'Confirm', () => {
+ 			it( 'should not render if closed by clicking `Cancel`, and the `onCancel` callback should be called', async () => {
+ 				const onCancel = jest.fn().mockName( 'onCancel()' );
+ 
+-				const wrapper = render(
++				render(
+ 					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
+ 						Are you sure?
+ 					</ConfirmDialog>
+ 				);
+ 
+-				const confirmDialog = wrapper.getByRole( 'dialog' );
+-				const button = wrapper.getByText( 'Cancel' );
++				const confirmDialog = screen.getByRole( 'dialog' );
++				const button = screen.getByText( 'Cancel' );
+ 
+ 				fireEvent.click( button );
+ 
+@@ -114,14 +114,14 @@ describe( 'Confirm', () => {
+ 			} );
+ 
+ 			it( 'should be dismissable even if an `onCancel` callback is not provided', async () => {
+-				const wrapper = render(
++				render(
+ 					<ConfirmDialog onConfirm={ noop }>
+ 						Are you sure?
+ 					</ConfirmDialog>
+ 				);
+ 
+-				const confirmDialog = wrapper.getByRole( 'dialog' );
+-				const button = wrapper.getByText( 'Cancel' );
++				const confirmDialog = screen.getByRole( 'dialog' );
++				const button = screen.getByText( 'Cancel' );
+ 
+ 				fireEvent.click( button );
+ 
+@@ -131,13 +131,13 @@ describe( 'Confirm', () => {
+ 			it( 'should not render if dialog is closed by clicking the overlay, and the `onCancel` callback should be called', async () => {
+ 				const onCancel = jest.fn().mockName( 'onCancel()' );
+ 
+-				const wrapper = render(
++				render(
+ 					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
+ 						Are you sure?
+ 					</ConfirmDialog>
+ 				);
+ 
+-				const confirmDialog = wrapper.getByRole( 'dialog' );
++				const confirmDialog = screen.getByRole( 'dialog' );
+ 
+ 				//The overlay click is handled by detecting an onBlur from the modal frame.
+ 				fireEvent.blur( confirmDialog );
+@@ -151,13 +151,13 @@ describe( 'Confirm', () => {
+ 			it( 'should not render if dialog is closed by pressing `Escape`, and the `onCancel` callback should be called', async () => {
+ 				const onCancel = jest.fn().mockName( 'onCancel()' );
+ 
+-				const wrapper = render(
++				render(
+ 					<ConfirmDialog onConfirm={ noop } onCancel={ onCancel }>
+ 						Are you sure?
+ 					</ConfirmDialog>
+ 				);
+ 
+-				const confirmDialog = wrapper.getByRole( 'dialog' );
++				const confirmDialog = screen.getByRole( 'dialog' );
+ 
+ 				fireEvent.keyDown( confirmDialog, { keyCode: 27 } );
+ 
+@@ -168,13 +168,13 @@ describe( 'Confirm', () => {
+ 			it( 'should not render if dialog is closed by pressing `Enter`, and the `onConfirm` callback should be called', async () => {
+ 				const onConfirm = jest.fn().mockName( 'onConfirm()' );
+ 
+-				const wrapper = render(
++				render(
+ 					<ConfirmDialog onConfirm={ onConfirm }>
+ 						Are you sure?
+ 					</ConfirmDialog>
+ 				);
+ 
+-				const confirmDialog = wrapper.getByRole( 'dialog' );
++				const confirmDialog = screen.getByRole( 'dialog' );
+ 
+ 				fireEvent.keyDown( confirmDialog, { keyCode: 13 } );
+ 
+@@ -186,7 +186,7 @@ describe( 'Confirm', () => {
+ 
+ 	describe( 'When controlled (isOpen is not `undefined`)', () => {
+ 		it( 'should render when `isOpen` is set to `true`', async () => {
+-			const wrapper = render(
++			render(
+ 				<ConfirmDialog
+ 					isOpen={ true }
+ 					onConfirm={ noop }
+@@ -196,13 +196,13 @@ describe( 'Confirm', () => {
+ 				</ConfirmDialog>
+ 			);
+ 
+-			const confirmDialog = wrapper.getByRole( 'dialog' );
++			const confirmDialog = screen.getByRole( 'dialog' );
+ 
+ 			expect( confirmDialog ).toBeInTheDocument();
+ 		} );
+ 
+ 		it( 'should not render if `isOpen` is set to false', async () => {
+-			const wrapper = render(
++			render(
+ 				<ConfirmDialog
+ 					isOpen={ false }
+ 					onConfirm={ noop }
+@@ -214,7 +214,7 @@ describe( 'Confirm', () => {
+ 
+ 			// `queryByRole` needs to be used here because in this scenario the
+ 			// dialog is never rendered.
+-			const confirmDialog = wrapper.queryByRole( 'dialog' );
++			const confirmDialog = screen.queryByRole( 'dialog' );
+ 
+ 			expect( confirmDialog ).not.toBeInTheDocument();
+ 		} );
+@@ -222,13 +222,13 @@ describe( 'Confirm', () => {
+ 		it( 'should call the `onConfirm` callback if `OK`', async () => {
+ 			const onConfirm = jest.fn().mockName( 'onConfirm()' );
+ 
+-			const wrapper = render(
++			render(
+ 				<ConfirmDialog isOpen={ true } onConfirm={ onConfirm }>
+ 					Are you sure?
+ 				</ConfirmDialog>
+ 			);
+ 
+-			const button = wrapper.getByText( 'OK' );
++			const button = screen.getByText( 'OK' );
+ 
+ 			fireEvent.click( button );
+ 
+@@ -238,7 +238,7 @@ describe( 'Confirm', () => {
+ 		it( 'should call the `onCancel` callback if `Cancel` is clicked', async () => {
+ 			const onCancel = jest.fn().mockName( 'onCancel()' );
+ 
+-			const wrapper = render(
++			render(
+ 				<ConfirmDialog
+ 					isOpen={ true }
+ 					onConfirm={ noop }
+@@ -248,7 +248,7 @@ describe( 'Confirm', () => {
+ 				</ConfirmDialog>
+ 			);
+ 
+-			const button = wrapper.getByText( 'Cancel' );
++			const button = screen.getByText( 'Cancel' );
+ 
+ 			fireEvent.click( button );
+ 
+diff --git a/packages/components/src/focal-point-picker/test/index.js b/packages/components/src/focal-point-picker/test/index.js
+index b90f8e394ba1e3..874b9f139b7dd8 100644
+--- a/packages/components/src/focal-point-picker/test/index.js
++++ b/packages/components/src/focal-point-picker/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { act, fireEvent, render } from '@testing-library/react';
++import { act, fireEvent, render, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -12,14 +12,14 @@ describe( 'FocalPointPicker', () => {
+ 	describe( 'focus and blur', () => {
+ 		let firedDragEnd;
+ 		let firedDrag;
+-		const { getByRole, unmount } = render(
++		const { unmount } = render(
+ 			<Picker
+ 				onChange={ () => {} }
+ 				onDragEnd={ () => ( firedDragEnd = true ) }
+ 				onDrag={ () => ( firedDrag = true ) }
+ 			/>
+ 		);
+-		const dragArea = getByRole( 'button' );
++		const dragArea = screen.getByRole( 'button' );
+ 		fireEvent.mouseDown( dragArea );
+ 		const gainedFocus = dragArea.ownerDocument.activeElement === dragArea;
+ 
+@@ -47,8 +47,8 @@ describe( 'FocalPointPicker', () => {
+ 			events.forEach( ( name ) => {
+ 				handlers[ name ] = ( ...all ) => eventLogger( name, all );
+ 			} );
+-			const { getByRole } = render( <Picker { ...handlers } /> );
+-			const dragArea = getByRole( 'button' );
++			render( <Picker { ...handlers } /> );
++			const dragArea = screen.getByRole( 'button' );
+ 			act( () => {
+ 				fireEvent.mouseDown( dragArea );
+ 				fireEvent.mouseMove( dragArea );
+@@ -66,7 +66,7 @@ describe( 'FocalPointPicker', () => {
+ 		it( 'should allow value altering', async () => {
+ 			const spyChange = jest.fn();
+ 			const spy = jest.fn();
+-			const { getByRole } = render(
++			render(
+ 				<Picker
+ 					value={ { x: 0.25, y: 0.25 } }
+ 					onChange={ spyChange }
+@@ -77,7 +77,7 @@ describe( 'FocalPointPicker', () => {
+ 				/>
+ 			);
+ 			// Click and press arrow up
+-			const dragArea = getByRole( 'button' );
++			const dragArea = screen.getByRole( 'button' );
+ 			act( () => {
+ 				fireEvent.mouseDown( dragArea );
+ 				fireEvent.keyDown( dragArea, { charCode: 0, keyCode: 38 } );
+@@ -92,20 +92,20 @@ describe( 'FocalPointPicker', () => {
+ 
+ 	describe( 'controllability', () => {
+ 		it( 'should update value from props', () => {
+-			const { rerender, getByRole } = render(
++			const { rerender } = render(
+ 				<Picker value={ { x: 0.25, y: 0.5 } } />
+ 			);
+-			const xInput = getByRole( 'spinbutton', { name: 'Left' } );
++			const xInput = screen.getByRole( 'spinbutton', { name: 'Left' } );
+ 			rerender( <Picker value={ { x: 0.93, y: 0.5 } } /> );
+ 			expect( xInput.value ).toBe( '93' );
+ 		} );
+ 		it( 'call onChange with the expected values', async () => {
+ 			const spyChange = jest.fn();
+-			const { getByRole } = render(
++			render(
+ 				<Picker value={ { x: 0.14, y: 0.62 } } onChange={ spyChange } />
+ 			);
+ 			// Click and press arrow up
+-			const dragArea = getByRole( 'button' );
++			const dragArea = screen.getByRole( 'button' );
+ 			act( () => {
+ 				fireEvent.mouseDown( dragArea );
+ 				fireEvent.keyDown( dragArea, { charCode: 0, keyCode: 38 } );
+diff --git a/packages/components/src/higher-order/with-notices/test/index.js b/packages/components/src/higher-order/with-notices/test/index.js
+index 0122f67175bbf9..7168bbb0bb107d 100644
+--- a/packages/components/src/higher-order/with-notices/test/index.js
++++ b/packages/components/src/higher-order/with-notices/test/index.js
+@@ -5,6 +5,7 @@ import {
+ 	act,
+ 	render,
+ 	fireEvent,
++	screen,
+ 	waitForElementToBeRemoved,
+ 	within,
+ } from '@testing-library/react';
+@@ -145,10 +146,11 @@ describe( 'withNotices rendering', () => {
+ 	it( 'should display notices with functioning dismissal triggers', async () => {
+ 		const messages = [ 'Aló!', 'hu dis?', 'Otis' ];
+ 		const notices = noticesFrom( messages );
+-		const { container, getAllByLabelText } = render(
++		const { container } = render(
+ 			<TestComponent notifications={ notices } />
+ 		);
+-		const [ buttonRemoveFirst ] = getAllByLabelText( stockDismissText );
++		const [ buttonRemoveFirst ] =
++			screen.getAllByLabelText( stockDismissText );
+ 		const getRemovalTarget = () =>
+ 			within( container ).getByText(
+ 				// The last item corresponds to the first notice in the DOM.
+diff --git a/packages/components/src/navigable-container/test/menu.js b/packages/components/src/navigable-container/test/menu.js
+index bc6c5ff402e4b4..64170432cb3739 100644
+--- a/packages/components/src/navigable-container/test/menu.js
++++ b/packages/components/src/navigable-container/test/menu.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { fireEvent, render } from '@testing-library/react';
++import { fireEvent, render, screen } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -42,7 +42,7 @@ function fireKeyDown( node, keyCode, shiftKey ) {
+ describe( 'NavigableMenu', () => {
+ 	it( 'vertical: should navigate by up and down', () => {
+ 		let currentIndex = 0;
+-		const { container, getByRole } = render(
++		const { container } = render(
+ 			/*
+ 				Disabled because of our rule restricting literal IDs, preferring
+ 				`withInstanceId`. In this case, it's fine to use literal IDs.
+@@ -77,7 +77,7 @@ describe( 'NavigableMenu', () => {
+ 		// Navigate options.
+ 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+ 			const interaction = fireKeyDown(
+-				getByRole( 'menu' ),
++				screen.getByRole( 'menu' ),
+ 				keyCode,
+ 				false
+ 			);
+@@ -100,7 +100,7 @@ describe( 'NavigableMenu', () => {
+ 
+ 	it( 'vertical: should navigate by up and down, and stop at edges', () => {
+ 		let currentIndex = 0;
+-		const { container, getByRole } = render(
++		const { container } = render(
+ 			/*
+ 				Disabled because of our rule restricting literal IDs, preferring
+ 				`withInstanceId`. In this case, it's fine to use literal IDs.
+@@ -131,7 +131,7 @@ describe( 'NavigableMenu', () => {
+ 		// Navigate options.
+ 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+ 			const interaction = fireKeyDown(
+-				getByRole( 'menu' ),
++				screen.getByRole( 'menu' ),
+ 				keyCode,
+ 				false
+ 			);
+@@ -152,7 +152,7 @@ describe( 'NavigableMenu', () => {
+ 
+ 	it( 'horizontal: should navigate by left and right', () => {
+ 		let currentIndex = 0;
+-		const { container, getByRole } = render(
++		const { container } = render(
+ 			/*
+ 				Disabled because of our rule restricting literal IDs, preferring
+ 				`withInstanceId`. In this case, it's fine to use literal IDs.
+@@ -187,7 +187,7 @@ describe( 'NavigableMenu', () => {
+ 		// Navigate options.
+ 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+ 			const interaction = fireKeyDown(
+-				getByRole( 'menu' ),
++				screen.getByRole( 'menu' ),
+ 				keyCode,
+ 				false
+ 			);
+@@ -210,7 +210,7 @@ describe( 'NavigableMenu', () => {
+ 
+ 	it( 'horizontal: should navigate by left and right, and stop at edges', () => {
+ 		let currentIndex = 0;
+-		const { container, getByRole } = render(
++		const { container } = render(
+ 			/*
+ 				Disabled because of our rule restricting literal IDs, preferring
+ 				`withInstanceId`. In this case, it's fine to use literal IDs.
+@@ -241,7 +241,7 @@ describe( 'NavigableMenu', () => {
+ 		// Navigate options.
+ 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+ 			const interaction = fireKeyDown(
+-				getByRole( 'menu' ),
++				screen.getByRole( 'menu' ),
+ 				keyCode,
+ 				false
+ 			);
+@@ -262,7 +262,7 @@ describe( 'NavigableMenu', () => {
+ 
+ 	it( 'both: should navigate by up/down and left/right', () => {
+ 		let currentIndex = 0;
+-		const { container, getByRole } = render(
++		const { container } = render(
+ 			/*
+ 				Disabled because of our rule restricting literal IDs, preferring
+ 				`withInstanceId`. In this case, it's fine to use literal IDs.
+@@ -285,7 +285,10 @@ describe( 'NavigableMenu', () => {
+ 
+ 		// Navigate options.
+ 		function assertKeyDown( keyCode, expectedActiveIndex, expectedStop ) {
+-			const interaction = fireKeyDown( getByRole( 'menu' ), keyCode );
++			const interaction = fireKeyDown(
++				screen.getByRole( 'menu' ),
++				keyCode
++			);
+ 			expect( currentIndex ).toBe( expectedActiveIndex );
+ 			expect( interaction.stopped ).toBe( expectedStop );
+ 		}
+diff --git a/packages/components/src/slot-fill/test/slot.js b/packages/components/src/slot-fill/test/slot.js
+index 46cee87a85af17..941ba278aadc78 100644
+--- a/packages/components/src/slot-fill/test/slot.js
++++ b/packages/components/src/slot-fill/test/slot.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, fireEvent } from '@testing-library/react';
++import { render, fireEvent, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -95,7 +95,7 @@ describe( 'Slot', () => {
+ 	it( 'calls the functions passed as the Slot’s fillProps in the Fill', () => {
+ 		const onClose = jest.fn();
+ 
+-		const { getByText } = render(
++		render(
+ 			<Provider>
+ 				<Slot name="chicken" fillProps={ { onClose } } />
+ 				<Fill name="chicken">
+@@ -108,7 +108,7 @@ describe( 'Slot', () => {
+ 			</Provider>
+ 		);
+ 
+-		fireEvent.click( getByText( 'Click me' ) );
++		fireEvent.click( screen.getByText( 'Click me' ) );
+ 
+ 		expect( onClose ).toHaveBeenCalledTimes( 1 );
+ 	} );
+@@ -150,7 +150,7 @@ describe( 'Slot', () => {
+ 	} );
+ 
+ 	it( 'should re-render Slot when not bubbling virtually', () => {
+-		const { container, getByRole } = render(
++		const { container } = render(
+ 			<Provider>
+ 				<div>
+ 					<Slot name="egg" />
+@@ -161,7 +161,7 @@ describe( 'Slot', () => {
+ 
+ 		expect( container ).toMatchSnapshot();
+ 
+-		fireEvent.click( getByRole( 'button' ) );
++		fireEvent.click( screen.getByRole( 'button' ) );
+ 
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+diff --git a/packages/components/src/toolbar-group/test/index.js b/packages/components/src/toolbar-group/test/index.js
+index e22e37a46f1949..e6ab3951607557 100644
+--- a/packages/components/src/toolbar-group/test/index.js
++++ b/packages/components/src/toolbar-group/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { fireEvent, render } from '@testing-library/react';
++import { fireEvent, render, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -33,11 +33,9 @@ describe( 'ToolbarGroup', () => {
+ 				},
+ 			];
+ 
+-			const { getByLabelText } = render(
+-				<ToolbarGroup controls={ controls } />
+-			);
++			render( <ToolbarGroup controls={ controls } /> );
+ 
+-			const toolbarButton = getByLabelText( 'WordPress' );
++			const toolbarButton = screen.getByLabelText( 'WordPress' );
+ 			expect( toolbarButton.getAttribute( 'aria-pressed' ) ).toBe(
+ 				'false'
+ 			);
+@@ -55,11 +53,9 @@ describe( 'ToolbarGroup', () => {
+ 				},
+ 			];
+ 
+-			const { getByLabelText } = render(
+-				<ToolbarGroup controls={ controls } />
+-			);
++			render( <ToolbarGroup controls={ controls } /> );
+ 
+-			const toolbarButton = getByLabelText( 'WordPress' );
++			const toolbarButton = screen.getByLabelText( 'WordPress' );
+ 			expect( toolbarButton.getAttribute( 'aria-pressed' ) ).toBe(
+ 				'true'
+ 			);
+@@ -84,11 +80,11 @@ describe( 'ToolbarGroup', () => {
+ 				],
+ 			];
+ 
+-			const { container, getAllByRole } = render(
++			const { container } = render(
+ 				<ToolbarGroup controls={ controls } />
+ 			);
+ 
+-			const buttons = getAllByRole( 'button' );
++			const buttons = screen.getAllByRole( 'button' );
+ 			expect( buttons ).toHaveLength( 2 );
+ 			expect(
+ 				container.querySelector( '.has-left-divider button' )
+@@ -105,11 +101,9 @@ describe( 'ToolbarGroup', () => {
+ 					isActive: true,
+ 				},
+ 			];
+-			const { getByLabelText } = render(
+-				<ToolbarGroup controls={ controls } />
+-			);
++			render( <ToolbarGroup controls={ controls } /> );
+ 
+-			fireEvent.click( getByLabelText( 'WordPress' ) );
++			fireEvent.click( screen.getByLabelText( 'WordPress' ) );
+ 			expect( clickHandler ).toHaveBeenCalledTimes( 1 );
+ 		} );
+ 	} );
+diff --git a/packages/components/src/toolbar/test/index.js b/packages/components/src/toolbar/test/index.js
+index 11fc7d7e4e0842..883fda6d0f0d6c 100644
+--- a/packages/components/src/toolbar/test/index.js
++++ b/packages/components/src/toolbar/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render } from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -12,7 +12,7 @@ import ToolbarButton from '../../toolbar-button';
+ describe( 'Toolbar', () => {
+ 	describe( 'basic rendering', () => {
+ 		it( 'should render a toolbar with toolbar buttons', () => {
+-			const { getByLabelText } = render(
++			render(
+ 				<Toolbar label="blocks">
+ 					<ToolbarButton label="control1" />
+ 					<ToolbarButton label="control2" />
+@@ -20,10 +20,10 @@ describe( 'Toolbar', () => {
+ 			);
+ 
+ 			expect(
+-				getByLabelText( 'control1', { selector: 'button' } )
++				screen.getByLabelText( 'control1', { selector: 'button' } )
+ 			).toBeTruthy();
+ 			expect(
+-				getByLabelText( 'control2', { selector: 'button' } )
++				screen.getByLabelText( 'control2', { selector: 'button' } )
+ 			).toBeTruthy();
+ 		} );
+ 	} );

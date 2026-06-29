@@ -1,0 +1,194 @@
+diff --git a/packages/ui/src/alert-dialog/stories/index.story.tsx b/packages/ui/src/alert-dialog/stories/index.story.tsx
+index d476fbcc96ba79..53c910a8639d62 100644
+--- a/packages/ui/src/alert-dialog/stories/index.story.tsx
++++ b/packages/ui/src/alert-dialog/stories/index.story.tsx
+@@ -117,15 +117,14 @@ export const WithCustomContent: Story = {
+  * you want it above.
+  *
+  * `AlertDialog` reuses `Dialog`'s styles, so the same
+- * `--wp-ui-dialog-z-index` CSS variable controls the z-index of both the
+- * backdrop and the popup. Override it either:
++ * `--wp-ui-dialog-z-index` CSS variable controls the z-index of the alert
++ * dialog's backdrop and popup. Override it either:
+  *
+  * - **Globally**, by setting the variable on `:root` or `body` (raises every
+  *   dialog and alert dialog in the page), or
+  * - **Per instance**, by passing an `AlertDialog.Portal` with a `style` (or
+  *   `className`) to `AlertDialog.Popup`'s `portal` prop. The variable
+- *   cascades from the portal wrapper to the backdrop and the popup, which
+- *   are both rendered inside it.
++ *   cascades from the portal wrapper to everything rendered inside it.
+  *
+  * This story demonstrates the per-instance approach.
+  */
+diff --git a/packages/ui/src/dialog/stories/index.story.tsx b/packages/ui/src/dialog/stories/index.story.tsx
+index bf9a72c2405a2b..e71c6aea316c93 100644
+--- a/packages/ui/src/dialog/stories/index.story.tsx
++++ b/packages/ui/src/dialog/stories/index.story.tsx
+@@ -136,15 +136,14 @@ export const AllSizes: Story = {
+  * create situations where a dialog renders below another popover when you
+  * want it above.
+  *
+- * The `--wp-ui-dialog-z-index` CSS variable controls the z-index of both the
+- * backdrop and the popup. Override it either:
++ * The `--wp-ui-dialog-z-index` CSS variable controls the z-index of the
++ * dialog's backdrop and popup. Override it either:
+  *
+  * - **Globally**, by setting the variable on `:root` or `body` (raises every
+  *   dialog in the page), or
+  * - **Per instance**, by passing a `Dialog.Portal` with a `style` (or
+  *   `className`) to `Dialog.Popup`'s `portal` prop. The variable cascades
+- *   from the portal wrapper to the backdrop and the popup, which are both
+- *   rendered inside it.
++ *   from the portal wrapper to everything rendered inside it.
+  *
+  * This story demonstrates the per-instance approach.
+  */
+diff --git a/packages/ui/src/drawer/stories/index.story.tsx b/packages/ui/src/drawer/stories/index.story.tsx
+index 8920361cbd48c6..5984f7d2efc88f 100644
+--- a/packages/ui/src/drawer/stories/index.story.tsx
++++ b/packages/ui/src/drawer/stories/index.story.tsx
+@@ -263,8 +263,7 @@ function DirectionSelector( {
+  *   drawer in the page), or
+  * - **Per instance**, by passing a `Drawer.Portal` with a `style` (or
+  *   `className`) to `Drawer.Popup`'s `portal` prop. The variable cascades
+- *   from the portal wrapper to everything rendered inside it (backdrop,
+- *   viewport, and popup).
++ *   from the portal wrapper to everything rendered inside it.
+  *
+  * This story demonstrates the per-instance approach.
+  */
+diff --git a/packages/ui/src/form/primitives/select/stories/index.story.tsx b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+index c6b1e927498b5c..438b2a615b6207 100644
+--- a/packages/ui/src/form/primitives/select/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+@@ -252,20 +252,19 @@ export const WithCustomTriggerAndItem: Story = {
+ 
+ /**
+  * Popovers in Gutenberg are managed with explicit z-index values, which can
+- * create situations where a popover renders below another popover, when you
+- * want it to be rendered above.
++ * create situations where a select popup renders below another popover when
++ * you want it above.
+  *
+- * The `--wp-ui-select-z-index` CSS variable is an escape hatch for that
+- * case. Override it either:
++ * The `--wp-ui-select-z-index` CSS variable controls the z-index of the
++ * `Select` positioner. Override it either:
+  *
+  * - **Globally**, by setting the variable on `:root` or `body` (raises every
+- *   `Select` popover in the page),
+- * - **Per instance on the popup**, by setting the variable via `style` on
+- *   `Select.Popup` (as this story does), or
+- * - **Per instance on the portal**, by passing a `Select.Portal` with a
+- *   `style` (or `className`) to `Select.Popup`'s `portal` prop. The
+- *   variable then cascades from the portal wrapper to everything rendered
+- *   inside it.
++ *   `Select` popover in the page), or
++ * - **Per instance**, by passing a `Select.Portal` with a `style` (or
++ *   `className`) to `Select.Popup`'s `portal` prop. The variable cascades
++ *   from the portal wrapper to everything rendered inside it.
++ *
++ * This story demonstrates the per-instance approach.
+  */
+ export const WithCustomZIndex: Story = {
+ 	name: 'With Custom z-index',
+@@ -273,7 +272,13 @@ export const WithCustomZIndex: Story = {
+ 		children: (
+ 			<>
+ 				<Select.Trigger />
+-				<Select.Popup style={ { '--wp-ui-select-z-index': '1000001' } }>
++				<Select.Popup
++					portal={
++						<Select.Portal
++							style={ { '--wp-ui-select-z-index': '9999' } }
++						/>
++					}
++				>
+ 					<Select.Item value="Item 1" />
+ 					<Select.Item value="Item 2" />
+ 				</Select.Popup>
+diff --git a/packages/ui/src/popover/stories/index.story.tsx b/packages/ui/src/popover/stories/index.story.tsx
+index de472f219492f0..4c3839a48c8b82 100644
+--- a/packages/ui/src/popover/stories/index.story.tsx
++++ b/packages/ui/src/popover/stories/index.story.tsx
+@@ -762,20 +762,19 @@ export const CrossIframeWithSlotFill: Story = {
+ 
+ /**
+  * Popovers in Gutenberg are managed with explicit z-index values, which can
+- * create situations where a popover renders below another popover, when you
+- * want it to be rendered above.
++ * create situations where a popover renders below another popover when you
++ * want it above.
+  *
+- * The `--wp-ui-popover-z-index` CSS variable is an escape hatch for that
+- * case. Override it either:
++ * The `--wp-ui-popover-z-index` CSS variable controls the z-index of the
++ * popover's positioner (and its optional backdrop). Override it either:
+  *
+  * - **Globally**, by setting the variable on `:root` or `body` (raises every
+- *   popover in the page),
+- * - **Per instance on the popup**, by setting the variable via `style` on
+- *   `Popover.Popup` (as this story does), or
+- * - **Per instance on the portal**, by passing a `Popover.Portal` with a
+- *   `style` (or `className`) to `Popover.Popup`'s `portal` prop. The
+- *   variable then cascades from the portal wrapper to everything rendered
+- *   inside it.
++ *   popover in the page), or
++ * - **Per instance**, by passing a `Popover.Portal` with a `style` (or
++ *   `className`) to `Popover.Popup`'s `portal` prop. The variable cascades
++ *   from the portal wrapper to everything rendered inside it.
++ *
++ * This story demonstrates the per-instance approach.
+  */
+ export const WithCustomZIndex: Story = {
+ 	name: 'With Custom z-index',
+@@ -783,7 +782,13 @@ export const WithCustomZIndex: Story = {
+ 		children: (
+ 			<>
+ 				<Popover.Trigger>Open Popover</Popover.Trigger>
+-				<Popover.Popup style={ { '--wp-ui-popover-z-index': '9999' } }>
++				<Popover.Popup
++					portal={
++						<Popover.Portal
++							style={ { '--wp-ui-popover-z-index': '9999' } }
++						/>
++					}
++				>
+ 					<Popover.Arrow />
+ 					<Popover.Title
+ 						style={ {
+@@ -793,8 +798,9 @@ export const WithCustomZIndex: Story = {
+ 						Custom z-index
+ 					</Popover.Title>
+ 					<Popover.Description>
+-						This popover&apos;s positioner has z-index: 9999 via the
+-						`--wp-ui-popover-z-index` CSS custom property.
++						This popover renders at `z-index: 9999` via the
++						`--wp-ui-popover-z-index` CSS custom property, set on
++						`Popover.Portal` through the `portal` prop.
+ 					</Popover.Description>
+ 				</Popover.Popup>
+ 			</>
+diff --git a/packages/ui/src/tooltip/stories/index.story.tsx b/packages/ui/src/tooltip/stories/index.story.tsx
+index dc3de402ea6562..8fd651d7cde402 100644
+--- a/packages/ui/src/tooltip/stories/index.story.tsx
++++ b/packages/ui/src/tooltip/stories/index.story.tsx
+@@ -81,14 +81,14 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
+  * create situations where a tooltip renders below another popover when you
+  * want it above.
+  *
+- * The `--wp-ui-tooltip-z-index` CSS variable is an escape hatch for that
+- * case. Override it either:
++ * The `--wp-ui-tooltip-z-index` CSS variable controls the z-index of the
++ * tooltip's positioner. Override it either:
+  *
+  * - **Globally**, by setting the variable on `:root` or `body` (raises every
+  *   tooltip in the page), or
+  * - **Per instance**, by passing a `Tooltip.Portal` with a `style` (or
+  *   `className`) to `Tooltip.Popup`'s `portal` prop. The variable cascades
+- *   from the portal wrapper to the popup rendered inside it.
++ *   from the portal wrapper to everything rendered inside it.
+  *
+  * This story demonstrates the per-instance approach.
+  */

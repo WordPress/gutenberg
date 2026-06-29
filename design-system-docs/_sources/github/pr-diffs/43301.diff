@@ -1,0 +1,26 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e6bba25be6d8cd..2f25031fde7fb3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Bug Fix
+ 
++-   `SelectControl`, `CustomSelectControl`: Truncate long option strings ([#43301](https://github.com/WordPress/gutenberg/pull/43301)).
+ -   `Popover`: fix and improve opening animation ([#43186](https://github.com/WordPress/gutenberg/pull/43186)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index ed56359972fffa..e0976c9f507697 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -137,6 +137,9 @@ export const Select = styled.select< SelectProps >`
+ 		width: 100%;
+ 		max-width: none;
+ 		cursor: pointer;
++		overflow: hidden;
++		white-space: nowrap;
++		text-overflow: ellipsis;
+ 
+ 		${ disabledStyles };
+ 		${ fontSizeStyles };

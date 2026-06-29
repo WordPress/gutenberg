@@ -1,0 +1,117 @@
+diff --git a/packages/components/src/flex/stories/index.js b/packages/components/src/flex/stories/index.js
+index 77f1184259d9c1..1785b72912a944 100644
+--- a/packages/components/src/flex/stories/index.js
++++ b/packages/components/src/flex/stories/index.js
+@@ -6,7 +6,7 @@ import { View } from '../../view';
+ 
+ export default {
+ 	component: Flex,
+-	title: 'G2 Components (Experimental)/Flex',
++	title: 'Components (Experimental)/Flex',
+ };
+ 
+ export const _default = () => {
+diff --git a/packages/components/src/h-stack/stories/index.js b/packages/components/src/h-stack/stories/index.js
+index 2947fe857275cf..a0b672035b51e5 100644
+--- a/packages/components/src/h-stack/stories/index.js
++++ b/packages/components/src/h-stack/stories/index.js
+@@ -6,7 +6,7 @@ import { HStack } from '..';
+ 
+ export default {
+ 	component: HStack,
+-	title: 'G2 Components (Experimental)/HStack',
++	title: 'Components (Experimental)/HStack',
+ };
+ 
+ export const _default = () => {
+diff --git a/packages/components/src/heading/stories/index.js b/packages/components/src/heading/stories/index.js
+index 0025005a772d69..55caec6c8850c2 100644
+--- a/packages/components/src/heading/stories/index.js
++++ b/packages/components/src/heading/stories/index.js
+@@ -5,7 +5,7 @@ import { Heading } from '../';
+ 
+ export default {
+ 	component: Heading,
+-	title: 'G2 Components (Experimental)/Heading',
++	title: 'Components (Experimental)/Heading',
+ };
+ 
+ export const _default = () => {
+diff --git a/packages/components/src/truncate/stories/index.js b/packages/components/src/truncate/stories/index.js
+index c8ba7634895497..0417514d068414 100644
+--- a/packages/components/src/truncate/stories/index.js
++++ b/packages/components/src/truncate/stories/index.js
+@@ -10,7 +10,7 @@ import { Truncate } from '..';
+ 
+ export default {
+ 	component: Truncate,
+-	title: 'G2 Components (Experimental)/Truncate',
++	title: 'Components (Experimental)/Truncate',
+ };
+ 
+ export const _default = () => {
+diff --git a/packages/components/src/ui/context/stories/ComponentsProvider.stories.js b/packages/components/src/ui/context/stories/ComponentsProvider.stories.js
+index 7f5df0ac9cb904..84c2aa30868603 100644
+--- a/packages/components/src/ui/context/stories/ComponentsProvider.stories.js
++++ b/packages/components/src/ui/context/stories/ComponentsProvider.stories.js
+@@ -16,7 +16,7 @@ const useSomeContext = () => useContext( SomeContext );
+ 
+ export default {
+ 	component: ContextSystemProvider,
+-	title: 'G2 Components (Experimental)/ContextSystemProvider',
++	title: 'Components (Experimental)/ContextSystemProvider',
+ };
+ 
+ const outerContext = {
+diff --git a/packages/components/src/ui/control-label/stories/index.js b/packages/components/src/ui/control-label/stories/index.js
+index d4769f1e531426..e22d46cbf70198 100644
+--- a/packages/components/src/ui/control-label/stories/index.js
++++ b/packages/components/src/ui/control-label/stories/index.js
+@@ -5,7 +5,7 @@ import { ControlLabel } from '../index';
+ 
+ export default {
+ 	component: ControlLabel,
+-	title: 'G2 Components (Experimental)/ControlLabel',
++	title: 'Components (Experimental)/ControlLabel',
+ };
+ 
+ export const _default = () => {
+diff --git a/packages/components/src/ui/form-group/stories/index.js b/packages/components/src/ui/form-group/stories/index.js
+index ba693c3825fe4e..804a41ad265f26 100644
+--- a/packages/components/src/ui/form-group/stories/index.js
++++ b/packages/components/src/ui/form-group/stories/index.js
+@@ -16,7 +16,7 @@ const TextInput = ( { id: idProp, ...props } ) => {
+ 
+ export default {
+ 	component: FormGroup,
+-	title: 'G2 Components (Experimental)/FormGroup',
++	title: 'Components (Experimental)/FormGroup',
+ };
+ 
+ export const _default = () => {
+diff --git a/packages/components/src/ui/spinner/stories/index.js b/packages/components/src/ui/spinner/stories/index.js
+index 043caa314fd34e..9cb006d883c1ee 100644
+--- a/packages/components/src/ui/spinner/stories/index.js
++++ b/packages/components/src/ui/spinner/stories/index.js
+@@ -5,7 +5,7 @@ import { Spinner } from '../index';
+ 
+ export default {
+ 	component: Spinner,
+-	title: 'G2 Components (Experimental)/Spinner',
++	title: 'Components (Experimental)/Spinner',
+ };
+ 
+ export const _default = () => {
+diff --git a/packages/components/src/ui/tooltip/stories/index.js b/packages/components/src/ui/tooltip/stories/index.js
+index e216b126def9ea..a0032da0d0ab9b 100644
+--- a/packages/components/src/ui/tooltip/stories/index.js
++++ b/packages/components/src/ui/tooltip/stories/index.js
+@@ -6,7 +6,7 @@ import { Tooltip } from '../index';
+ 
+ export default {
+ 	component: Tooltip,
+-	title: 'G2 Components (Experimental)/Tooltip',
++	title: 'Components (Experimental)/Tooltip',
+ };
+ 
+ export const _default = () => {

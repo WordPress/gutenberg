@@ -1,0 +1,387 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index d9a9a3f0fad038..631f8e45a6ec1d 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -22,17 +22,18 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
+-  -webkit-align-items: normal;
+-  -webkit-box-align: normal;
+-  -ms-flex-align: normal;
+-  align-items: normal;
++  -webkit-align-items: stretch;
++  -webkit-box-align: stretch;
++  -ms-flex-align: stretch;
++  align-items: stretch;
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
+   gap: calc(4px * 1);
+-  -webkit-box-pack: justify;
+-  -webkit-justify-content: space-between;
+-  justify-content: space-between;
++  -webkit-box-pack: center;
++  -ms-flex-pack: center;
++  -webkit-justify-content: center;
++  justify-content: center;
+ }
+ 
+ .emotion-4>* {
+@@ -54,17 +55,18 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
+-  -webkit-align-items: normal;
+-  -webkit-box-align: normal;
+-  -ms-flex-align: normal;
+-  align-items: normal;
++  -webkit-align-items: stretch;
++  -webkit-box-align: stretch;
++  -ms-flex-align: stretch;
++  align-items: stretch;
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
+   gap: calc(4px * 3);
+-  -webkit-box-pack: justify;
+-  -webkit-justify-content: space-between;
+-  justify-content: space-between;
++  -webkit-box-pack: center;
++  -ms-flex-pack: center;
++  -webkit-justify-content: center;
++  justify-content: center;
+ }
+ 
+ .emotion-8>* {
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap b/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap
+index f6ef41cc1be8d0..efbcf7a4aa4a40 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.tsx.snap
+@@ -6,17 +6,18 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
+-  -webkit-align-items: normal;
+-  -webkit-box-align: normal;
+-  -ms-flex-align: normal;
+-  align-items: normal;
++  -webkit-align-items: stretch;
++  -webkit-box-align: stretch;
++  -ms-flex-align: stretch;
++  align-items: stretch;
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
+   gap: calc(4px * 3);
+-  -webkit-box-pack: justify;
+-  -webkit-justify-content: space-between;
+-  justify-content: space-between;
++  -webkit-box-pack: center;
++  -ms-flex-pack: center;
++  -webkit-justify-content: center;
++  justify-content: center;
+ }
+ 
+ .emotion-0>* {
+@@ -103,17 +104,18 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
+-  -webkit-align-items: normal;
+-  -webkit-box-align: normal;
+-  -ms-flex-align: normal;
+-  align-items: normal;
++  -webkit-align-items: stretch;
++  -webkit-box-align: stretch;
++  -ms-flex-align: stretch;
++  align-items: stretch;
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
+   gap: calc(4px * 3);
+-  -webkit-box-pack: justify;
+-  -webkit-justify-content: space-between;
+-  justify-content: space-between;
++  -webkit-box-pack: center;
++  -ms-flex-pack: center;
++  -webkit-justify-content: center;
++  justify-content: center;
+ }
+ 
+ .emotion-0>* {
+diff --git a/packages/components/src/flex/flex/hook.ts b/packages/components/src/flex/flex/hook.ts
+index 2708043f284143..552a4d99d295af 100644
+--- a/packages/components/src/flex/flex/hook.ts
++++ b/packages/components/src/flex/flex/hook.ts
+@@ -40,7 +40,7 @@ function useDeprecatedProps(
+ 
+ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
+ 	const {
+-		align = 'center',
++		align,
+ 		className,
+ 		direction: directionProp = 'row',
+ 		expanded = true,
+@@ -62,7 +62,7 @@ export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
+ 
+ 	const classes = useMemo( () => {
+ 		const base = css( {
+-			alignItems: isColumn ? 'normal' : align,
++			alignItems: align ?? ( isColumn ? 'normal' : 'center' ),
+ 			flexDirection: direction,
+ 			flexWrap: wrap ? 'wrap' : undefined,
+ 			gap: space( gap ),
+diff --git a/packages/components/src/h-stack/README.md b/packages/components/src/h-stack/README.md
+index a0b63c7521fcb1..eb9db50aa5b41f 100644
+--- a/packages/components/src/h-stack/README.md
++++ b/packages/components/src/h-stack/README.md
+@@ -44,8 +44,8 @@ Determines how the child elements are aligned.
+ -   `bottom`: Aligns content to the bottom.
+ -   `bottomLeft`: Aligns content to the bottom/left.
+ -   `bottomRight`: Aligns content to the bottom/right.
+--   `edge`: Aligns content to the edges of the container.
+--   `stretch`: Stretches content to the edges of the container.
++-   `edge`: Justifies content to be evenly spread out up to the main axis edges of the container.
++-   `stretch`: Stretches content to the cross axis edges of the container.
+ 
+ ##### direction
+ 
+diff --git a/packages/components/src/h-stack/types.ts b/packages/components/src/h-stack/types.ts
+index e16a46746162ed..d9fe717eb44ab6 100644
+--- a/packages/components/src/h-stack/types.ts
++++ b/packages/components/src/h-stack/types.ts
+@@ -41,8 +41,8 @@ export type Props = Omit< FlexProps, 'align' | 'gap' > & {
+ 	 * * `bottom`: Aligns content to the bottom.
+ 	 * * `bottomLeft`: Aligns content to the bottom/left.
+ 	 * * `bottomRight`: Aligns content to the bottom/right.
+-	 * * `edge`: Aligns content to the edges of the container.
+-	 * * `stretch`: Stretches content to the edges of the container.
++	 * * `edge`: Justifies content to be evenly spread out up to the main axis edges of the container.
++	 * * `stretch`: Stretches content to the cross axis edges of the container.
+ 	 *
+ 	 * @default 'edge'
+ 	 */
+diff --git a/packages/components/src/h-stack/utils.ts b/packages/components/src/h-stack/utils.ts
+index 3abddd0309f51c..b1413ee2dc8ef4 100644
+--- a/packages/components/src/h-stack/utils.ts
++++ b/packages/components/src/h-stack/utils.ts
+@@ -11,7 +11,7 @@ import { isValueDefined } from '../utils/values';
+ 
+ const H_ALIGNMENTS: Alignments = {
+ 	bottom: { align: 'flex-end', justify: 'center' },
+-	bottomLeft: { align: 'flex-start', justify: 'flex-end' },
++	bottomLeft: { align: 'flex-end', justify: 'flex-start' },
+ 	bottomRight: { align: 'flex-end', justify: 'flex-end' },
+ 	center: { align: 'center', justify: 'center' },
+ 	edge: { align: 'center', justify: 'space-between' },
+@@ -25,13 +25,13 @@ const H_ALIGNMENTS: Alignments = {
+ 
+ const V_ALIGNMENTS: Alignments = {
+ 	bottom: { justify: 'flex-end', align: 'center' },
+-	bottomLeft: { justify: 'flex-start', align: 'flex-end' },
++	bottomLeft: { justify: 'flex-end', align: 'flex-start' },
+ 	bottomRight: { justify: 'flex-end', align: 'flex-end' },
+ 	center: { justify: 'center', align: 'center' },
+ 	edge: { justify: 'space-between', align: 'center' },
+ 	left: { justify: 'center', align: 'flex-start' },
+ 	right: { justify: 'center', align: 'flex-end' },
+-	stretch: { justify: 'stretch' },
++	stretch: { align: 'stretch' },
+ 	top: { justify: 'flex-start', align: 'center' },
+ 	topLeft: { justify: 'flex-start', align: 'flex-start' },
+ 	topRight: { justify: 'flex-start', align: 'flex-end' },
+diff --git a/packages/components/src/v-stack/README.md b/packages/components/src/v-stack/README.md
+index 4b42ac1eb0a0e2..c3ea4e4c0389ca 100644
+--- a/packages/components/src/v-stack/README.md
++++ b/packages/components/src/v-stack/README.md
+@@ -42,8 +42,8 @@ Determines how the child elements are aligned.
+ -   `bottom`: Aligns content to the bottom.
+ -   `bottomLeft`: Aligns content to the bottom/left.
+ -   `bottomRight`: Aligns content to the bottom/right.
+--   `edge`: Aligns content to the edges of the container.
+--   `stretch`: Stretches content to the edges of the container.
++-   `edge`: Justifies content to be evenly spread out up to the main axis edges of the container.
++-   `stretch`: Stretches content to the cross axis edges of the container.
+ 
+ ##### `direction`: `FlexDirection`
+ 
+diff --git a/packages/components/src/v-stack/hook.ts b/packages/components/src/v-stack/hook.ts
+index aeeb5d2546d74d..0196eef36130c5 100644
+--- a/packages/components/src/v-stack/hook.ts
++++ b/packages/components/src/v-stack/hook.ts
+@@ -8,14 +8,16 @@ import type { VStackProps } from './types';
+ export function useVStack(
+ 	props: WordPressComponentProps< VStackProps, 'div' >
+ ) {
+-	const { expanded = false, ...otherProps } = useContextSystem(
+-		props,
+-		'VStack'
+-	);
++	const {
++		expanded = false,
++		alignment = 'stretch',
++		...otherProps
++	} = useContextSystem( props, 'VStack' );
+ 
+ 	const hStackProps = useHStack( {
+ 		direction: 'column',
+ 		expanded,
++		alignment,
+ 		...otherProps,
+ 	} );
+ 
+diff --git a/packages/components/src/v-stack/stories/index.tsx b/packages/components/src/v-stack/stories/index.tsx
+index 46e3100778963e..b0b0ece2d0f9bc 100644
+--- a/packages/components/src/v-stack/stories/index.tsx
++++ b/packages/components/src/v-stack/stories/index.tsx
+@@ -9,11 +9,29 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
+ import { View } from '../../view';
+ import { VStack } from '..';
+ 
++const ALIGNMENTS = {
++	top: 'top',
++	topLeft: 'topLeft',
++	topRight: 'topRight',
++	left: 'left',
++	center: 'center',
++	right: 'right',
++	bottom: 'bottom',
++	bottomLeft: 'bottomLeft',
++	bottomRight: 'bottomRight',
++	edge: 'edge',
++	stretch: 'stretch',
++};
++
+ const meta: ComponentMeta< typeof VStack > = {
+ 	component: VStack,
+ 	title: 'Components (Experimental)/VStack',
+ 	argTypes: {
+-		alignment: { control: { type: 'text' } },
++		alignment: {
++			control: { type: 'select' },
++			options: Object.keys( ALIGNMENTS ),
++			mapping: ALIGNMENTS,
++		},
+ 		as: { control: { type: 'text' } },
+ 		direction: { control: { type: 'text' } },
+ 		justify: { control: { type: 'text' } },
+@@ -28,12 +46,15 @@ export default meta;
+ 
+ const Template: ComponentStory< typeof VStack > = ( props ) => {
+ 	return (
+-		<VStack { ...props }>
+-			<View>One</View>
+-			<View>Two</View>
+-			<View>Three</View>
+-			<View>Four</View>
+-			<View>Five</View>
++		<VStack
++			{ ...props }
++			style={ { background: '#eee', minHeight: '200px' } }
++		>
++			{ [ 'One', 'Two', 'Three', 'Four', 'Five' ].map( ( text ) => (
++				<View key={ text } style={ { background: '#b9f9ff' } }>
++					{ text }
++				</View>
++			) ) }
+ 		</VStack>
+ 	);
+ };
+diff --git a/packages/components/src/v-stack/test/__snapshots__/index.tsx.snap b/packages/components/src/v-stack/test/__snapshots__/index.tsx.snap
+index 9404cbb976b975..fbac33f7dc72c8 100644
+--- a/packages/components/src/v-stack/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/v-stack/test/__snapshots__/index.tsx.snap
+@@ -6,10 +6,10 @@ exports[`props should render alignment 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
+-  -webkit-align-items: normal;
+-  -webkit-box-align: normal;
+-  -ms-flex-align: normal;
+-  align-items: normal;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
+@@ -46,17 +46,18 @@ exports[`props should render correctly 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
+-  -webkit-align-items: normal;
+-  -webkit-box-align: normal;
+-  -ms-flex-align: normal;
+-  align-items: normal;
++  -webkit-align-items: stretch;
++  -webkit-box-align: stretch;
++  -ms-flex-align: stretch;
++  align-items: stretch;
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
+   gap: calc(4px * 2);
+-  -webkit-box-pack: justify;
+-  -webkit-justify-content: space-between;
+-  justify-content: space-between;
++  -webkit-box-pack: center;
++  -ms-flex-pack: center;
++  -webkit-justify-content: center;
++  justify-content: center;
+ }
+ 
+ .emotion-0>* {
+@@ -85,17 +86,18 @@ exports[`props should render spacing 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
+-  -webkit-align-items: normal;
+-  -webkit-box-align: normal;
+-  -ms-flex-align: normal;
+-  align-items: normal;
++  -webkit-align-items: stretch;
++  -webkit-box-align: stretch;
++  -ms-flex-align: stretch;
++  align-items: stretch;
+   -webkit-flex-direction: column;
+   -ms-flex-direction: column;
+   flex-direction: column;
+   gap: calc(4px * 5);
+-  -webkit-box-pack: justify;
+-  -webkit-justify-content: space-between;
+-  justify-content: space-between;
++  -webkit-box-pack: center;
++  -ms-flex-pack: center;
++  -webkit-justify-content: center;
++  justify-content: center;
+ }
+ 
+ .emotion-0>* {
+diff --git a/packages/components/src/v-stack/types.ts b/packages/components/src/v-stack/types.ts
+index 00daf1a4222afb..6b1a01a4fd0885 100644
+--- a/packages/components/src/v-stack/types.ts
++++ b/packages/components/src/v-stack/types.ts
+@@ -8,7 +8,7 @@ import type { CSSProperties } from 'react';
+  */
+ import type { HStackAlignment, Props as HStackProps } from '../h-stack/types';
+ 
+-export type VStackProps = HStackProps & {
++export type VStackProps = Omit< HStackProps, 'alignment' | 'spacing' > & {
+ 	/**
+ 	 * Determines how the child elements are aligned.
+ 	 *
+@@ -21,8 +21,10 @@ export type VStackProps = HStackProps & {
+ 	 * -   `bottom`: Aligns content to the bottom.
+ 	 * -   `bottomLeft`: Aligns content to the bottom/left.
+ 	 * -   `bottomRight`: Aligns content to the bottom/right.
+-	 * -   `edge`: Aligns content to the edges of the container.
+-	 * -   `stretch`: Stretches content to the edges of the container.
++	 * -   `edge`: Justifies content to be evenly spread out up to the main axis edges of the container.
++	 * -   `stretch`: Stretches content to the cross axis edges of the container.
++	 *
++	 * @default 'stretch'
+ 	 */
+ 	alignment?: HStackAlignment | CSSProperties[ 'alignItems' ];
+ 	/**

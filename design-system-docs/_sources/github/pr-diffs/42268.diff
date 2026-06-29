@@ -1,0 +1,351 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index cea14615959fef..e91c3b6232432d 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -101,6 +101,7 @@ module.exports = {
+ 							'isNil',
+ 							'isNumber',
+ 							'isObjectLike',
++							'isString',
+ 							'isUndefined',
+ 							'keyBy',
+ 							'keys',
+diff --git a/packages/block-editor/src/components/colors/with-colors.js b/packages/block-editor/src/components/colors/with-colors.js
+index feca70795771f3..8d887612e4cf11 100644
+--- a/packages/block-editor/src/components/colors/with-colors.js
++++ b/packages/block-editor/src/components/colors/with-colors.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isString, kebabCase, reduce, upperFirst } from 'lodash';
++import { kebabCase, reduce, upperFirst } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -78,7 +78,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
+ 		( colorObject, colorType ) => {
+ 			return {
+ 				...colorObject,
+-				...( isString( colorType )
++				...( typeof colorType === 'string'
+ 					? { [ colorType ]: kebabCase( colorType ) }
+ 					: colorType ),
+ 			};
+diff --git a/packages/blocks/src/api/registration.js b/packages/blocks/src/api/registration.js
+index d36e816c497ff5..0d9d5ce575f39e 100644
+--- a/packages/blocks/src/api/registration.js
++++ b/packages/blocks/src/api/registration.js
+@@ -3,15 +3,7 @@
+ /**
+  * External dependencies
+  */
+-import {
+-	camelCase,
+-	isEmpty,
+-	isObject,
+-	isString,
+-	mapKeys,
+-	pick,
+-	pickBy,
+-} from 'lodash';
++import { camelCase, isEmpty, isObject, mapKeys, pick, pickBy } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -302,7 +294,7 @@ function translateBlockSettingUsingI18nSchema(
+ 	settingValue,
+ 	textdomain
+ ) {
+-	if ( isString( i18nSchema ) && isString( settingValue ) ) {
++	if ( typeof i18nSchema === 'string' && typeof settingValue === 'string' ) {
+ 		// eslint-disable-next-line @wordpress/i18n-no-variables, @wordpress/i18n-text-domain
+ 		return _x( settingValue, i18nSchema, textdomain );
+ 	}
+diff --git a/packages/blocks/src/api/utils.js b/packages/blocks/src/api/utils.js
+index 9ede11d49c5bff..ec5e2ff3bba8cc 100644
+--- a/packages/blocks/src/api/utils.js
++++ b/packages/blocks/src/api/utils.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { every, has, isString, reduce, maxBy } from 'lodash';
++import { every, has, reduce, maxBy } from 'lodash';
+ import { colord, extend } from 'colord';
+ import namesPlugin from 'colord/plugins/names';
+ import a11yPlugin from 'colord/plugins/a11y';
+@@ -75,7 +75,7 @@ export function isUnmodifiedDefaultBlock( block ) {
+ export function isValidIcon( icon ) {
+ 	return (
+ 		!! icon &&
+-		( isString( icon ) ||
++		( typeof icon === 'string' ||
+ 			isValidElement( icon ) ||
+ 			typeof icon === 'function' ||
+ 			icon instanceof Component )
+@@ -126,7 +126,7 @@ export function normalizeIconObject( icon ) {
+  * @return {?Object} Block type.
+  */
+ export function normalizeBlockType( blockTypeOrName ) {
+-	if ( isString( blockTypeOrName ) ) {
++	if ( typeof blockTypeOrName === 'string' ) {
+ 		return getBlockType( blockTypeOrName );
+ 	}
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e49491f2c0b2ec..5da0beec4aa9eb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,8 @@
+ -   `Slot`/`Fill`: Refactor away from Lodash ([#42153](https://github.com/WordPress/gutenberg/pull/42153/)).
+ -   `ComboboxControl`: Refactor away from `_.deburr()` ([#42169](https://github.com/WordPress/gutenberg/pull/42169/)).
+ -   `FormTokenField`: Refactor away from `_.identity()` ([#42215](https://github.com/WordPress/gutenberg/pull/42215/)).
++-   `MenuItem`: Refactor away from `_.isString()` ([#42268](https://github.com/WordPress/gutenberg/pull/42268/)).
++-   `Shortcut`: Refactor away from `_.isString()` ([#42268](https://github.com/WordPress/gutenberg/pull/42268/)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/menu-item/index.js b/packages/components/src/menu-item/index.js
+index 79f129f8caa8e0..7440b3b38ef351 100644
+--- a/packages/components/src/menu-item/index.js
++++ b/packages/components/src/menu-item/index.js
+@@ -3,7 +3,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { isString } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -41,7 +40,7 @@ export function MenuItem( props, ref ) {
+ 		);
+ 	}
+ 
+-	if ( icon && ! isString( icon ) ) {
++	if ( icon && typeof icon !== 'string' ) {
+ 		icon = cloneElement( icon, {
+ 			className: classnames( 'components-menu-items__item-icon', {
+ 				'has-icon-right': iconPosition === 'right',
+diff --git a/packages/components/src/shortcut/index.js b/packages/components/src/shortcut/index.js
+index 7863fa1d574b83..89d2c395cd45e5 100644
+--- a/packages/components/src/shortcut/index.js
++++ b/packages/components/src/shortcut/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isString, isObject } from 'lodash';
++import { isObject } from 'lodash';
+ 
+ /** @typedef {string | { display: string, ariaLabel: string }} Shortcut */
+ /**
+@@ -22,7 +22,7 @@ function Shortcut( { shortcut, className } ) {
+ 	let displayText;
+ 	let ariaLabel;
+ 
+-	if ( isString( shortcut ) ) {
++	if ( typeof shortcut === 'string' ) {
+ 		displayText = shortcut;
+ 	}
+ 
+diff --git a/packages/customize-widgets/src/components/keyboard-shortcut-help-modal/index.js b/packages/customize-widgets/src/components/keyboard-shortcut-help-modal/index.js
+index 77911be2610015..5739af79abcf7f 100644
+--- a/packages/customize-widgets/src/components/keyboard-shortcut-help-modal/index.js
++++ b/packages/customize-widgets/src/components/keyboard-shortcut-help-modal/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { isString } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -37,7 +36,7 @@ const ShortcutList = ( { shortcuts } ) => (
+ 				className="customize-widgets-keyboard-shortcut-help-modal__shortcut"
+ 				key={ index }
+ 			>
+-				{ isString( shortcut ) ? (
++				{ typeof shortcut === 'string' ? (
+ 					<DynamicShortcut name={ shortcut } />
+ 				) : (
+ 					<Shortcut { ...shortcut } />
+diff --git a/packages/edit-post/src/components/keyboard-shortcut-help-modal/index.js b/packages/edit-post/src/components/keyboard-shortcut-help-modal/index.js
+index e5177ef2d03f37..19cf9b4525f194 100644
+--- a/packages/edit-post/src/components/keyboard-shortcut-help-modal/index.js
++++ b/packages/edit-post/src/components/keyboard-shortcut-help-modal/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { isString } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -41,7 +40,7 @@ const ShortcutList = ( { shortcuts } ) => (
+ 				className="edit-post-keyboard-shortcut-help-modal__shortcut"
+ 				key={ index }
+ 			>
+-				{ isString( shortcut ) ? (
++				{ typeof shortcut === 'string' ? (
+ 					<DynamicShortcut name={ shortcut } />
+ 				) : (
+ 					<Shortcut { ...shortcut } />
+diff --git a/packages/edit-site/src/components/global-styles/use-global-styles-output.js b/packages/edit-site/src/components/global-styles/use-global-styles-output.js
+index 9a8ad4f54282b7..2d14c571db41b5 100644
+--- a/packages/edit-site/src/components/global-styles/use-global-styles-output.js
++++ b/packages/edit-site/src/components/global-styles/use-global-styles-output.js
+@@ -6,7 +6,6 @@ import {
+ 	forEach,
+ 	get,
+ 	isEmpty,
+-	isString,
+ 	kebabCase,
+ 	pickBy,
+ 	reduce,
+@@ -185,7 +184,7 @@ function getStylesDeclarations( blockStyles = {} ) {
+ 
+ 			const styleValue = get( blockStyles, pathToValue );
+ 
+-			if ( !! properties && ! isString( styleValue ) ) {
++			if ( !! properties && typeof styleValue !== 'string' ) {
+ 				Object.entries( properties ).forEach( ( entry ) => {
+ 					const [ name, prop ] = entry;
+ 
+diff --git a/packages/edit-site/src/components/global-styles/utils.js b/packages/edit-site/src/components/global-styles/utils.js
+index 833255b624b47c..1e40bb70bdb97a 100644
+--- a/packages/edit-site/src/components/global-styles/utils.js
++++ b/packages/edit-site/src/components/global-styles/utils.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { get, find, isString } from 'lodash';
++import { get, find } from 'lodash';
+ 
+ /* Supporting data. */
+ export const ROOT_BLOCK_NAME = 'root';
+@@ -213,7 +213,7 @@ function getValueFromCustomVariable( features, blockName, variable, path ) {
+ }
+ 
+ export function getValueFromVariable( features, blockName, variable ) {
+-	if ( ! variable || ! isString( variable ) ) {
++	if ( ! variable || typeof variable !== 'string' ) {
+ 		return variable;
+ 	}
+ 	const USER_VALUE_PREFIX = 'var:';
+diff --git a/packages/edit-site/src/components/keyboard-shortcut-help-modal/index.js b/packages/edit-site/src/components/keyboard-shortcut-help-modal/index.js
+index 275282b5ac1d13..fc03e16008e30c 100644
+--- a/packages/edit-site/src/components/keyboard-shortcut-help-modal/index.js
++++ b/packages/edit-site/src/components/keyboard-shortcut-help-modal/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { isString } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -34,7 +33,7 @@ const ShortcutList = ( { shortcuts } ) => (
+ 				className="edit-site-keyboard-shortcut-help-modal__shortcut"
+ 				key={ index }
+ 			>
+-				{ isString( shortcut ) ? (
++				{ typeof shortcut === 'string' ? (
+ 					<DynamicShortcut name={ shortcut } />
+ 				) : (
+ 					<Shortcut { ...shortcut } />
+diff --git a/packages/edit-widgets/src/components/keyboard-shortcut-help-modal/index.js b/packages/edit-widgets/src/components/keyboard-shortcut-help-modal/index.js
+index 51b2a47e5f127b..c33efcbb181676 100644
+--- a/packages/edit-widgets/src/components/keyboard-shortcut-help-modal/index.js
++++ b/packages/edit-widgets/src/components/keyboard-shortcut-help-modal/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { isString } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -37,7 +36,7 @@ const ShortcutList = ( { shortcuts } ) => (
+ 				className="edit-widgets-keyboard-shortcut-help-modal__shortcut"
+ 				key={ index }
+ 			>
+-				{ isString( shortcut ) ? (
++				{ typeof shortcut === 'string' ? (
+ 					<DynamicShortcut name={ shortcut } />
+ 				) : (
+ 					<Shortcut { ...shortcut } />
+diff --git a/packages/editor/src/store/selectors.js b/packages/editor/src/store/selectors.js
+index 17c342b9329738..506a6a1d4c137c 100644
+--- a/packages/editor/src/store/selectors.js
++++ b/packages/editor/src/store/selectors.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { find, get, has, isString, includes, some } from 'lodash';
++import { find, get, has, includes, some } from 'lodash';
+ import createSelector from 'rememo';
+ 
+ /**
+@@ -1605,10 +1605,9 @@ export function __experimentalGetTemplateInfo( state, template ) {
+ 	const { title: defaultTitle, description: defaultDescription } =
+ 		__experimentalGetDefaultTemplateType( state, slug );
+ 
+-	const templateTitle = isString( title ) ? title : title?.rendered;
+-	const templateDescription = isString( description )
+-		? description
+-		: description?.raw;
++	const templateTitle = typeof title === 'string' ? title : title?.rendered;
++	const templateDescription =
++		typeof description === 'string' ? description : description?.raw;
+ 	const templateIcon =
+ 		__experimentalGetDefaultTemplatePartAreas( state ).find(
+ 			( item ) => area === item.area
+diff --git a/packages/list-reusable-blocks/src/utils/import.js b/packages/list-reusable-blocks/src/utils/import.js
+index deee77808ca8c8..84c28b5fcfc80c 100644
+--- a/packages/list-reusable-blocks/src/utils/import.js
++++ b/packages/list-reusable-blocks/src/utils/import.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { isString } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -31,8 +26,8 @@ async function importReusableBlock( file ) {
+ 		parsedContent.__file !== 'wp_block' ||
+ 		! parsedContent.title ||
+ 		! parsedContent.content ||
+-		! isString( parsedContent.title ) ||
+-		! isString( parsedContent.content )
++		typeof parsedContent.title !== 'string' ||
++		typeof parsedContent.content !== 'string'
+ 	) {
+ 		throw new Error( 'Invalid Reusable block JSON file' );
+ 	}
+diff --git a/packages/redux-routine/src/is-action.js b/packages/redux-routine/src/is-action.js
+index f9a430b8b8f9a5..bcabab4e07a88b 100644
+--- a/packages/redux-routine/src/is-action.js
++++ b/packages/redux-routine/src/is-action.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { isPlainObject, isString } from 'lodash';
++import { isPlainObject } from 'lodash';
+ 
+ /* eslint-disable jsdoc/valid-types */
+ /**
+@@ -12,7 +12,7 @@ import { isPlainObject, isString } from 'lodash';
+  * @return {object is import('redux').AnyAction}  Whether object is an action.
+  */
+ export function isAction( object ) {
+-	return isPlainObject( object ) && isString( object.type );
++	return isPlainObject( object ) && typeof object.type === 'string';
+ }
+ 
+ /**

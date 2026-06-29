@@ -1,0 +1,431 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index b0058e29fdae2f..1ca9d91475891d 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1109,6 +1109,12 @@
+ 		"markdown_source": "../packages/components/src/toolbar-button/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "ToolbarDropdownMenu",
++		"slug": "toolbar-dropdown-menu",
++		"markdown_source": "../packages/components/src/toolbar-dropdown-menu/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "ToolbarGroup",
+ 		"slug": "toolbar-group",
+diff --git a/packages/block-editor/src/components/alignment-control/ui.js b/packages/block-editor/src/components/alignment-control/ui.js
+index 6f7603747fa84e..9b6b52042d1156 100644
+--- a/packages/block-editor/src/components/alignment-control/ui.js
++++ b/packages/block-editor/src/components/alignment-control/ui.js
+@@ -7,7 +7,7 @@ import { find } from 'lodash';
+  * WordPress dependencies
+  */
+ import { __, isRTL } from '@wordpress/i18n';
+-import { DropdownMenu, ToolbarGroup } from '@wordpress/components';
++import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
+ import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
+ 
+ const DEFAULT_ALIGNMENT_CONTROLS = [
+@@ -41,7 +41,6 @@ function AlignmentUI( {
+ 	describedBy = __( 'Change text alignment' ),
+ 	isCollapsed = true,
+ 	isToolbar,
+-	isToolbarButton = true,
+ } ) {
+ 	function applyOrUnset( align ) {
+ 		return () => onChange( value === align ? undefined : align );
+@@ -57,8 +56,8 @@ function AlignmentUI( {
+ 		return isRTL() ? alignRight : alignLeft;
+ 	}
+ 
+-	const UIComponent = isToolbar ? ToolbarGroup : DropdownMenu;
+-	const extraProps = isToolbar ? { isCollapsed } : { isToolbarButton };
++	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
++	const extraProps = isToolbar ? { isCollapsed } : {};
+ 
+ 	return (
+ 		<UIComponent
+diff --git a/packages/block-editor/src/components/block-alignment-control/ui.js b/packages/block-editor/src/components/block-alignment-control/ui.js
+index a08f7d1b9ca755..141b6c02b4a77a 100644
+--- a/packages/block-editor/src/components/block-alignment-control/ui.js
++++ b/packages/block-editor/src/components/block-alignment-control/ui.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { DropdownMenu, ToolbarGroup } from '@wordpress/components';
++import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
+ import {
+ 	positionCenter,
+ 	positionLeft,
+@@ -51,7 +51,6 @@ function BlockAlignmentUI( {
+ 	controls,
+ 	isToolbar,
+ 	isCollapsed = true,
+-	isToolbarButton = true,
+ } ) {
+ 	const enabledControls = useAvailableAlignments( controls );
+ 	if ( enabledControls.length === 0 ) {
+@@ -66,8 +65,8 @@ function BlockAlignmentUI( {
+ 	const defaultAlignmentControl =
+ 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
+ 
+-	const UIComponent = isToolbar ? ToolbarGroup : DropdownMenu;
+-	const extraProps = isToolbar ? { isCollapsed } : { isToolbarButton };
++	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
++	const extraProps = isToolbar ? { isCollapsed } : {};
+ 
+ 	return (
+ 		<UIComponent
+diff --git a/packages/block-editor/src/components/block-vertical-alignment-control/ui.js b/packages/block-editor/src/components/block-vertical-alignment-control/ui.js
+index c2e69596deef07..a542cad29eb753 100644
+--- a/packages/block-editor/src/components/block-vertical-alignment-control/ui.js
++++ b/packages/block-editor/src/components/block-vertical-alignment-control/ui.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { _x } from '@wordpress/i18n';
+-import { ToolbarGroup, DropdownMenu } from '@wordpress/components';
++import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
+ 
+ /**
+  * Internal dependencies
+@@ -37,7 +37,6 @@ function BlockVerticalAlignmentUI( {
+ 	controls = DEFAULT_CONTROLS,
+ 	isCollapsed = true,
+ 	isToolbar,
+-	isToolbarButton = true,
+ } ) {
+ 	function applyOrUnset( align ) {
+ 		return () => onChange( value === align ? undefined : align );
+@@ -47,8 +46,8 @@ function BlockVerticalAlignmentUI( {
+ 	const defaultAlignmentControl =
+ 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
+ 
+-	const UIComponent = isToolbar ? ToolbarGroup : DropdownMenu;
+-	const extraProps = isToolbar ? { isCollapsed } : { isToolbarButton };
++	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
++	const extraProps = isToolbar ? { isCollapsed } : {};
+ 
+ 	return (
+ 		<UIComponent
+diff --git a/packages/block-editor/src/components/justify-content-control/ui.js b/packages/block-editor/src/components/justify-content-control/ui.js
+index 5cc173bab0c1db..08c13079c2fcc9 100644
+--- a/packages/block-editor/src/components/justify-content-control/ui.js
++++ b/packages/block-editor/src/components/justify-content-control/ui.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { DropdownMenu, ToolbarGroup } from '@wordpress/components';
++import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
+ import {
+ 	justifyLeft,
+ 	justifyCenter,
+@@ -24,7 +24,6 @@ function JustifyContentUI( {
+ 	value,
+ 	popoverProps,
+ 	isToolbar,
+-	isToolbarButton = true,
+ } ) {
+ 	// If the control is already selected we want a click
+ 	// again on the control to deselect the item, so we
+@@ -69,8 +68,8 @@ function JustifyContentUI( {
+ 		},
+ 	];
+ 
+-	const UIComponent = isToolbar ? ToolbarGroup : DropdownMenu;
+-	const extraProps = isToolbar ? { isCollapsed } : { isToolbarButton };
++	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
++	const extraProps = isToolbar ? { isCollapsed } : {};
+ 
+ 	return (
+ 		<UIComponent
+diff --git a/packages/block-editor/src/components/navigable-toolbar/index.js b/packages/block-editor/src/components/navigable-toolbar/index.js
+index b01220d6461aaf..fda58ba98a45c1 100644
+--- a/packages/block-editor/src/components/navigable-toolbar/index.js
++++ b/packages/block-editor/src/components/navigable-toolbar/index.js
+@@ -62,7 +62,8 @@ function useIsAccessibleToolbar( ref ) {
+ 		if ( ! onlyToolbarItem ) {
+ 			deprecated( 'Using custom components as toolbar controls', {
+ 				since: '5.6',
+-				alternative: 'ToolbarItem or ToolbarButton components',
++				alternative:
++					'ToolbarItem, ToolbarButton or ToolbarDropdownMenu components',
+ 				link:
+ 					'https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols',
+ 			} );
+diff --git a/packages/block-library/src/paragraph/edit.js b/packages/block-library/src/paragraph/edit.js
+index e7f5d0eda47abe..7eda022a95bc92 100644
+--- a/packages/block-library/src/paragraph/edit.js
++++ b/packages/block-library/src/paragraph/edit.js
+@@ -7,7 +7,11 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { __, _x, isRTL } from '@wordpress/i18n';
+-import { DropdownMenu, PanelBody, ToggleControl } from '@wordpress/components';
++import {
++	ToolbarDropdownMenu,
++	PanelBody,
++	ToggleControl,
++} from '@wordpress/components';
+ import {
+ 	AlignmentControl,
+ 	BlockControls,
+@@ -24,8 +28,7 @@ const name = 'core/paragraph';
+ function ParagraphRTLControl( { direction, setDirection } ) {
+ 	return (
+ 		isRTL() && (
+-			<DropdownMenu
+-				isToolbarButton
++			<ToolbarDropdownMenu
+ 				controls={ [
+ 					{
+ 						icon: formatLtr,
+diff --git a/packages/block-library/src/site-title/edit/level-toolbar.js b/packages/block-library/src/site-title/edit/level-toolbar.js
+index eed26b399a2749..442a551afb9906 100644
+--- a/packages/block-library/src/site-title/edit/level-toolbar.js
++++ b/packages/block-library/src/site-title/edit/level-toolbar.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { DropdownMenu } from '@wordpress/components';
++import { ToolbarDropdownMenu } from '@wordpress/components';
+ import { __, sprintf } from '@wordpress/i18n';
+ 
+ /**
+@@ -24,11 +24,10 @@ export default function LevelControl( { level, onChange } ) {
+ 		};
+ 	} );
+ 	return (
+-		<DropdownMenu
++		<ToolbarDropdownMenu
+ 			label={ __( 'Change heading level' ) }
+ 			icon={ <LevelIcon level={ level } /> }
+ 			controls={ allControls }
+-			isToolbarButton
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/dropdown-menu/index.js b/packages/components/src/dropdown-menu/index.js
+index 45f4e67c613c6d..2788d8f8f2355a 100644
+--- a/packages/components/src/dropdown-menu/index.js
++++ b/packages/components/src/dropdown-menu/index.js
+@@ -15,7 +15,6 @@ import { menu } from '@wordpress/icons';
+  * Internal dependencies
+  */
+ import Button from '../button';
+-import ToolbarButton from '../toolbar-button';
+ import Dropdown from '../dropdown';
+ import { NavigableMenu } from '../navigable-container';
+ 
+@@ -50,7 +49,6 @@ function DropdownMenu( {
+ 	menuLabel,
+ 	position,
+ 	noIcons,
+-	isToolbarButton = false,
+ } ) {
+ 	if ( menuLabel ) {
+ 		deprecated( '`menuLabel` prop in `DropdownComponent`', {
+@@ -86,8 +84,6 @@ function DropdownMenu( {
+ 		popoverProps
+ 	);
+ 
+-	const ButtonComponent = isToolbarButton ? ToolbarButton : Button;
+-
+ 	return (
+ 		<Dropdown
+ 			className={ classnames( 'components-dropdown-menu', className ) }
+@@ -117,7 +113,7 @@ function DropdownMenu( {
+ 				);
+ 
+ 				return (
+-					<ButtonComponent
++					<Button
+ 						{ ...mergedToggleProps }
+ 						icon={ icon }
+ 						onClick={ ( event ) => {
+@@ -139,7 +135,7 @@ function DropdownMenu( {
+ 						showTooltip={ toggleProps?.showTooltip ?? true }
+ 					>
+ 						{ mergedToggleProps.children }
+-					</ButtonComponent>
++					</Button>
+ 				);
+ 			} }
+ 			renderContent={ ( props ) => {
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index c37301e3a0206c..a8416af52b3d13 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -111,6 +111,7 @@ export { default as Tip } from './tip';
+ export { default as ToggleControl } from './toggle-control';
+ export { default as Toolbar } from './toolbar';
+ export { default as ToolbarButton } from './toolbar-button';
++export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
+ export { default as __experimentalToolbarContext } from './toolbar-context';
+ export { default as ToolbarGroup } from './toolbar-group';
+ export { default as ToolbarItem } from './toolbar-item';
+diff --git a/packages/components/src/toolbar-dropdown-menu/README.md b/packages/components/src/toolbar-dropdown-menu/README.md
+new file mode 100644
+index 00000000000000..866d98a89177fe
+--- /dev/null
++++ b/packages/components/src/toolbar-dropdown-menu/README.md
+@@ -0,0 +1,106 @@
++# ToolbarDropdownMenu
++
++ToolbarDropdownMenu can be used to add actions to a toolbar, usually inside a [Toolbar](/packages/components/src/toolbar/README.md) or [ToolbarGroup](/packages/components/src/toolbar-group/README.md) when used to create general interfaces. If you're using it to add controls to your custom block, you should consider using [BlockControls](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md).
++
++It has similar features to the [DropdownMenu](/packages/components/src/dropdown-menu/README.md) component. Using `ToolbarDropdownMenu` will ensure that keyboard interactions in a toolbar are consistent with the [WAI-ARIA toolbar pattern](https://www.w3.org/TR/wai-aria-practices/#toolbar).
++
++## Usage
++
++To create general interfaces, you'll want to render ToolbarButton in a [Toolbar](/packages/components/src/toolbar/README.md) component.
++
++```jsx
++import { Toolbar, ToolbarDropdownMenu } from '@wordpress/components';
++import {
++	more,
++	arrowLeft,
++	arrowRight,
++	arrowUp,
++	arrowDown,
++} from '@wordpress/icons';
++
++function MyToolbar() {
++	return (
++		<Toolbar label="Options">
++			<ToolbarDropdownMenu
++				icon={ more }
++				label="Select a direction"
++				controls={ [
++					{
++						title: 'Up',
++						icon: arrowUp,
++						onClick: () => console.log( 'up' ),
++					},
++					{
++						title: 'Right',
++						icon: arrowRight,
++						onClick: () => console.log( 'right' ),
++					},
++					{
++						title: 'Down',
++						icon: arrowDown,
++						onClick: () => console.log( 'down' ),
++					},
++					{
++						title: 'Left',
++						icon: arrowLeft,
++						onClick: () => console.log( 'left' ),
++					},
++				] }
++			/>
++		</Toolbar>
++	);
++}
++```
++
++### Inside BlockControls
++
++If you're working on a custom block and you want to add controls to the block toolbar, you should use [BlockControls](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md) instead.
++
++```jsx
++import { BlockControls } from '@wordpress/block-editor';
++import { Toolbar, ToolbarDropdownMenu } from '@wordpress/components';
++import {
++	more,
++	arrowLeft,
++	arrowRight,
++	arrowUp,
++	arrowDown,
++} from '@wordpress/icons';
++
++function Edit() {
++	return (
++		<BlockControls group="block">
++			<ToolbarDropdownMenu
++				icon={ more }
++				label="Select a direction"
++				controls={ [
++					{
++						title: 'Up',
++						icon: arrowUp,
++						onClick: () => console.log( 'up' ),
++					},
++					{
++						title: 'Right',
++						icon: arrowRight,
++						onClick: () => console.log( 'right' ),
++					},
++					{
++						title: 'Down',
++						icon: arrowDown,
++						onClick: () => console.log( 'down' ),
++					},
++					{
++						title: 'Left',
++						icon: arrowLeft,
++						onClick: () => console.log( 'left' ),
++					},
++				] }
++			/>
++		</BlockControls>
++	);
++}
++```
++
++## Props
++
++This component accepts [the same API of the DropdownMenu](/packages/components/src/dropdown-menu/README.md#props) component.
+diff --git a/packages/components/src/toolbar-dropdown-menu/index.js b/packages/components/src/toolbar-dropdown-menu/index.js
+new file mode 100644
+index 00000000000000..02c19e153a05ad
+--- /dev/null
++++ b/packages/components/src/toolbar-dropdown-menu/index.js
+@@ -0,0 +1,42 @@
++/**
++ * WordPress dependencies
++ */
++import { useContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import ToolbarItem from '../toolbar-item';
++import ToolbarContext from '../toolbar-context';
++import DropdownMenu from '../dropdown-menu';
++
++function ToolbarDropdownMenu( props ) {
++	const accessibleToolbarState = useContext( ToolbarContext );
++
++	if ( ! accessibleToolbarState ) {
++		return <DropdownMenu { ...props } />;
++	}
++
++	// ToobarItem will pass all props to the render prop child, which will pass
++	// all props to the toggle of DrpodownMenu. This means that ToolbarDropdownMenu has the same API as
++	// DrpodownMenu.
++	return (
++		<ToolbarItem>
++			{ ( toolbarItemProps ) => (
++				<DropdownMenu
++					{ ...props }
++					toggleProps={
++						props.toggleProps
++							? {
++									...props.toggleProps,
++									...toolbarItemProps,
++							  }
++							: toolbarItemProps
++					}
++				/>
++			) }
++		</ToolbarItem>
++	);
++}
++
++export default ToolbarDropdownMenu;

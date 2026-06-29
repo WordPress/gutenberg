@@ -1,0 +1,58 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index aeeed9f6473763..fa01193af525e1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `Snackbar`: Snackbar design and motion improvements ([#53248](https://github.com/WordPress/gutenberg/pull/53248))
+ -   `NumberControl`: Add `spinFactor` prop for adjusting the amount by which the spin controls change the value ([#52902](https://github.com/WordPress/gutenberg/pull/52902)).
+ -   `Modal:`: Nuance outside interactions ([#52994](https://github.com/WordPress/gutenberg/pull/52994)).
++-   `Button`: Remove default border from the destructive button ([#53607](https://github.com/WordPress/gutenberg/pull/53607)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 1833dfccbcbbec..b572e96e4335fc 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -186,7 +186,6 @@
+ 		// Only the default variant is styled differently from the non-destructive counterparts.
+ 		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link) {
+ 			color: $alert-red;
+-			box-shadow: inset 0 0 0 $border-width $alert-red;
+ 
+ 			&:hover:not(:disabled) {
+ 				color: darken($alert-red, 20%);
+diff --git a/packages/edit-site/src/components/page-actions/trash-page-menu-item.js b/packages/edit-site/src/components/page-actions/trash-page-menu-item.js
+index cc36af311d58a1..6005465c8fa5f0 100644
+--- a/packages/edit-site/src/components/page-actions/trash-page-menu-item.js
++++ b/packages/edit-site/src/components/page-actions/trash-page-menu-item.js
+@@ -51,7 +51,11 @@ export default function TrashPageMenuItem( { postId, onRemove } ) {
+ 	}
+ 	return (
+ 		<>
+-			<MenuItem onClick={ () => removePage() } isDestructive>
++			<MenuItem
++				onClick={ () => removePage() }
++				isDestructive
++				variant="secondary"
++			>
+ 				{ __( 'Move to Trash' ) }
+ 			</MenuItem>
+ 		</>
+diff --git a/packages/edit-site/src/components/template-actions/index.js b/packages/edit-site/src/components/template-actions/index.js
+index 6e744135df67fe..bce2a008077c66 100644
+--- a/packages/edit-site/src/components/template-actions/index.js
++++ b/packages/edit-site/src/components/template-actions/index.js
+@@ -124,11 +124,7 @@ function DeleteMenuItem( { onRemove, isTemplate } ) {
+ 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+ 	return (
+ 		<>
+-			<MenuItem
+-				isDestructive
+-				isTertiary
+-				onClick={ () => setIsModalOpen( true ) }
+-			>
++			<MenuItem isDestructive onClick={ () => setIsModalOpen( true ) }>
+ 				{ __( 'Delete' ) }
+ 			</MenuItem>
+ 			<ConfirmDialog

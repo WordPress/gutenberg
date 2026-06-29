@@ -1,0 +1,30 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 357ee51ab3ee2f..8f0aa563932a3a 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   Fix TypeScript 5.9 type error in `generate-primitive-tokens` build script caused by `Object.entries` inferring `unknown` values when the key type is a union of string literals ([#75748](https://github.com/WordPress/gutenberg/pull/75748)).
++
+ ### New Features
+ 
+ -   Add `--wpds-cursor-control` design token for interactive non-link elements ([#75697](https://github.com/WordPress/gutenberg/pull/75697)).
+diff --git a/packages/theme/bin/generate-primitive-tokens/index.ts b/packages/theme/bin/generate-primitive-tokens/index.ts
+index 7003088a3173c9..0cccd0909af12a 100644
+--- a/packages/theme/bin/generate-primitive-tokens/index.ts
++++ b/packages/theme/bin/generate-primitive-tokens/index.ts
+@@ -74,7 +74,9 @@ function generatePrimitiveColorTokens() {
+ 			) ) {
+ 				colorJson[ 'wpds-color' ].primitive[ scaleName ][ tokenName ] =
+ 					{
+-						$value: transformColorStringToDTCGValue( tokenValue ),
++						$value: transformColorStringToDTCGValue(
++							tokenValue as string
++						),
+ 					};
+ 			}
+ 		} );

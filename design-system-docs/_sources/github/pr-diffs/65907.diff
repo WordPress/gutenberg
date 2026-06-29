@@ -1,0 +1,417 @@
+diff --git a/package-lock.json b/package-lock.json
+index ccf779f2d67eab..effa60ca992908 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -16,7 +16,7 @@
+ 				"@actions/core": "1.9.1",
+ 				"@actions/github": "5.0.0",
+ 				"@apidevtools/json-schema-ref-parser": "11.6.4",
+-				"@ariakit/test": "^0.4.2",
++				"@ariakit/test": "^0.4.5",
+ 				"@babel/core": "7.25.7",
+ 				"@babel/plugin-syntax-jsx": "7.25.7",
+ 				"@babel/runtime-corejs3": "7.25.7",
+@@ -1432,18 +1432,14 @@
+ 				"url": "https://github.com/sponsors/sindresorhus"
+ 			}
+ 		},
+-		"node_modules/@ariakit/core": {
+-			"version": "0.4.9",
+-			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.9.tgz",
+-			"integrity": "sha512-nV0B/OTK/0iB+P9RC7fudznYZ8eR6rR1F912Zc54e3+wSW5RrRvNOiRxyMrgENidd4R7cCMDw77XJLSBLKgEPQ=="
+-		},
+ 		"node_modules/@ariakit/test": {
+-			"version": "0.4.2",
+-			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.4.2.tgz",
+-			"integrity": "sha512-WXAAiAyTaHV9klntOB81Y+YHyA5iGxy9wXCmjQOfYK5InsuIour+7TVXICUxn2NF0XD6j6OoEJbCVDJ2Y46xEA==",
++			"version": "0.4.5",
++			"resolved": "https://registry.npmjs.org/@ariakit/test/-/test-0.4.5.tgz",
++			"integrity": "sha512-dK9OtI8MeKfdtOiW1auDITnyaelq0O0aUTnolIqJj+RJd8LFai0gi7fQUgrun9CZHJ2wWsEad4vlviGfhfIIhQ==",
+ 			"dev": true,
++			"license": "MIT",
+ 			"dependencies": {
+-				"@ariakit/core": "0.4.9",
++				"@ariakit/core": "0.4.12",
+ 				"@testing-library/dom": "^8.0.0 || ^9.0.0 || ^10.0.0"
+ 			},
+ 			"peerDependencies": {
+@@ -1463,6 +1459,13 @@
+ 				}
+ 			}
+ 		},
++		"node_modules/@ariakit/test/node_modules/@ariakit/core": {
++			"version": "0.4.12",
++			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.12.tgz",
++			"integrity": "sha512-+NNpy88tdP/w9mOBPuDrMTbtapPbo/8yVIzpQB7TAmN0sPh/Cq3nU1f2KCTCIujPmwRvAcMSW9UHOlFmbKEPOA==",
++			"dev": true,
++			"license": "MIT"
++		},
+ 		"node_modules/@aw-web-design/x-default-browser": {
+ 			"version": "1.4.126",
+ 			"resolved": "https://registry.npmjs.org/@aw-web-design/x-default-browser/-/x-default-browser-1.4.126.tgz",
+@@ -49334,9 +49337,10 @@
+ 			}
+ 		},
+ 		"node_modules/use-sync-external-store": {
+-			"version": "1.2.0",
+-			"resolved": "https://registry.npmjs.org/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz",
+-			"integrity": "sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==",
++			"version": "1.2.2",
++			"resolved": "https://registry.npmjs.org/use-sync-external-store/-/use-sync-external-store-1.2.2.tgz",
++			"integrity": "sha512-PElTlVMwpblvbNqQ82d2n6RjStvdSoNe9FG28kNfz3WiXilJm4DdNkEzRhCZuIDwY8U08WVihhGR5iRqAwfDiw==",
++			"license": "MIT",
+ 			"peerDependencies": {
+ 				"react": "^16.8.0 || ^17.0.0 || ^18.0.0"
+ 			}
+@@ -53671,7 +53675,7 @@
+ 			"version": "28.13.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@ariakit/react": "^0.4.10",
++				"@ariakit/react": "^0.4.13",
+ 				"@babel/runtime": "7.25.7",
+ 				"@emotion/cache": "^11.7.1",
+ 				"@emotion/css": "^11.7.1",
+@@ -53726,12 +53730,19 @@
+ 				"react-dom": "^18.0.0"
+ 			}
+ 		},
++		"packages/components/node_modules/@ariakit/core": {
++			"version": "0.4.12",
++			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.12.tgz",
++			"integrity": "sha512-+NNpy88tdP/w9mOBPuDrMTbtapPbo/8yVIzpQB7TAmN0sPh/Cq3nU1f2KCTCIujPmwRvAcMSW9UHOlFmbKEPOA==",
++			"license": "MIT"
++		},
+ 		"packages/components/node_modules/@ariakit/react": {
+-			"version": "0.4.10",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.10.tgz",
+-			"integrity": "sha512-c1+6sNLj57aAXrBZMCVGG+OXeFrPAG0TV1jT7oPJcN/KLRs3aCuO3CCJVep/eKepFzzK01kNRGYX3wPT1TXPNw==",
++			"version": "0.4.13",
++			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.13.tgz",
++			"integrity": "sha512-pTGYgoqCojfyt2xNJ5VQhejxXwwtcP7VDDqcnnVChv7TA2TWWyYerJ5m4oxViI1pgeNqnHZwKlQ79ZipF7W2kQ==",
++			"license": "MIT",
+ 			"dependencies": {
+-				"@ariakit/react-core": "0.4.10"
++				"@ariakit/react-core": "0.4.13"
+ 			},
+ 			"funding": {
+ 				"type": "opencollective",
+@@ -53743,11 +53754,12 @@
+ 			}
+ 		},
+ 		"packages/components/node_modules/@ariakit/react-core": {
+-			"version": "0.4.10",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.10.tgz",
+-			"integrity": "sha512-r6DZmtHBmSoOj848+RpBwdZy/55YxPhMhfH14JIO2OLn1F6iSFkQwR7AAGpIrlYycWJFSF7KrQu50O+SSfFJdQ==",
++			"version": "0.4.13",
++			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.13.tgz",
++			"integrity": "sha512-iIjQeupP9d0pOubOzX4a0UPXbhXbp0ZCduDpkv7+u/pYP/utk/YRECD0M/QpZr6YSeltmDiNxKjdyK8r9Yhv4Q==",
++			"license": "MIT",
+ 			"dependencies": {
+-				"@ariakit/core": "0.4.9",
++				"@ariakit/core": "0.4.12",
+ 				"@floating-ui/dom": "^1.0.0",
+ 				"use-sync-external-store": "^1.2.0"
+ 			},
+@@ -54034,7 +54046,7 @@
+ 			"version": "4.9.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@ariakit/react": "^0.4.10",
++				"@ariakit/react": "^0.4.13",
+ 				"@babel/runtime": "7.25.7",
+ 				"@wordpress/components": "*",
+ 				"@wordpress/compose": "*",
+@@ -54056,12 +54068,19 @@
+ 				"react": "^18.0.0"
+ 			}
+ 		},
++		"packages/dataviews/node_modules/@ariakit/core": {
++			"version": "0.4.12",
++			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.4.12.tgz",
++			"integrity": "sha512-+NNpy88tdP/w9mOBPuDrMTbtapPbo/8yVIzpQB7TAmN0sPh/Cq3nU1f2KCTCIujPmwRvAcMSW9UHOlFmbKEPOA==",
++			"license": "MIT"
++		},
+ 		"packages/dataviews/node_modules/@ariakit/react": {
+-			"version": "0.4.10",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.10.tgz",
+-			"integrity": "sha512-c1+6sNLj57aAXrBZMCVGG+OXeFrPAG0TV1jT7oPJcN/KLRs3aCuO3CCJVep/eKepFzzK01kNRGYX3wPT1TXPNw==",
++			"version": "0.4.13",
++			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.4.13.tgz",
++			"integrity": "sha512-pTGYgoqCojfyt2xNJ5VQhejxXwwtcP7VDDqcnnVChv7TA2TWWyYerJ5m4oxViI1pgeNqnHZwKlQ79ZipF7W2kQ==",
++			"license": "MIT",
+ 			"dependencies": {
+-				"@ariakit/react-core": "0.4.10"
++				"@ariakit/react-core": "0.4.13"
+ 			},
+ 			"funding": {
+ 				"type": "opencollective",
+@@ -54073,11 +54092,12 @@
+ 			}
+ 		},
+ 		"packages/dataviews/node_modules/@ariakit/react-core": {
+-			"version": "0.4.10",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.10.tgz",
+-			"integrity": "sha512-r6DZmtHBmSoOj848+RpBwdZy/55YxPhMhfH14JIO2OLn1F6iSFkQwR7AAGpIrlYycWJFSF7KrQu50O+SSfFJdQ==",
++			"version": "0.4.13",
++			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.4.13.tgz",
++			"integrity": "sha512-iIjQeupP9d0pOubOzX4a0UPXbhXbp0ZCduDpkv7+u/pYP/utk/YRECD0M/QpZr6YSeltmDiNxKjdyK8r9Yhv4Q==",
++			"license": "MIT",
+ 			"dependencies": {
+-				"@ariakit/core": "0.4.9",
++				"@ariakit/core": "0.4.12",
+ 				"@floating-ui/dom": "^1.0.0",
+ 				"use-sync-external-store": "^1.2.0"
+ 			},
+diff --git a/package.json b/package.json
+index 3ddcb981f6f6f7..84425dbd1cff21 100644
+--- a/package.json
++++ b/package.json
+@@ -25,7 +25,7 @@
+ 		"@actions/core": "1.9.1",
+ 		"@actions/github": "5.0.0",
+ 		"@apidevtools/json-schema-ref-parser": "11.6.4",
+-		"@ariakit/test": "^0.4.2",
++		"@ariakit/test": "^0.4.5",
+ 		"@babel/core": "7.25.7",
+ 		"@babel/plugin-syntax-jsx": "7.25.7",
+ 		"@babel/runtime-corejs3": "7.25.7",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index feff5ddc975356..044d37493d157d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   Upgraded `@ariakit/react` (v0.4.13) and `@ariakit/test` (v0.4.5) ([#65907](https://github.com/WordPress/gutenberg/pull/65907)).
++
+ ## 28.13.0 (2024-11-27)
+ 
+ ### Deprecations
+@@ -11,7 +15,7 @@
+ -   `FontSizePicker`: Deprecate 36px default size ([#66920](https://github.com/WordPress/gutenberg/pull/66920)).
+ -   `ComboboxControl`: Deprecate 36px default size ([#66900](https://github.com/WordPress/gutenberg/pull/66900)).
+ -   `ToggleGroupControl`: Deprecate 36px default size ([#66747](https://github.com/WordPress/gutenberg/pull/66747)).
+--   `RangeControl`: Deprecate 36px default size ([#66721](https://github.com/WordPress/gutenberg/pull/66721)). 
++-   `RangeControl`: Deprecate 36px default size ([#66721](https://github.com/WordPress/gutenberg/pull/66721)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index dc62f992c3bb29..75f0d1eb1f2331 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -32,7 +32,7 @@
+ 		"src/**/*.scss"
+ 	],
+ 	"dependencies": {
+-		"@ariakit/react": "^0.4.10",
++		"@ariakit/react": "^0.4.13",
+ 		"@babel/runtime": "7.25.7",
+ 		"@emotion/cache": "^11.7.1",
+ 		"@emotion/css": "^11.7.1",
+diff --git a/packages/components/src/composite/item.tsx b/packages/components/src/composite/item.tsx
+index edbf0b92e039af..4a02f76039a5cf 100644
+--- a/packages/components/src/composite/item.tsx
++++ b/packages/components/src/composite/item.tsx
+@@ -26,23 +26,5 @@ export const CompositeItem = forwardRef<
+ 	// obfuscated to discourage its use outside of the component's internals.
+ 	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
+ 
+-	// If the active item is not connected, Composite may end up in a state
+-	// where none of the items are tabbable. In this case, we force all items to
+-	// be tabbable, so that as soon as an item received focus, it becomes active
+-	// and Composite goes back to working as expected.
+-	const tabbable = Ariakit.useStoreState( store, ( state ) => {
+-		return (
+-			state?.activeId !== null &&
+-			! store?.item( state?.activeId )?.element?.isConnected
+-		);
+-	} );
+-
+-	return (
+-		<Ariakit.CompositeItem
+-			store={ store }
+-			tabbable={ tabbable }
+-			{ ...props }
+-			ref={ ref }
+-		/>
+-	);
++	return <Ariakit.CompositeItem store={ store } { ...props } ref={ ref } />;
+ } );
+diff --git a/packages/components/src/menu/checkbox-item.tsx b/packages/components/src/menu/checkbox-item.tsx
+index b9a9b8105e517e..182c27dfdee305 100644
+--- a/packages/components/src/menu/checkbox-item.tsx
++++ b/packages/components/src/menu/checkbox-item.tsx
+@@ -16,24 +16,20 @@ import type { WordPressComponentProps } from '../context';
+ import { MenuContext } from './context';
+ import type { MenuCheckboxItemProps } from './types';
+ import * as Styled from './styles';
+-import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
+ 
+ export const MenuCheckboxItem = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< MenuCheckboxItemProps, 'div', false >
+ >( function MenuCheckboxItem(
+-	{ suffix, children, onBlur, hideOnClick = false, ...props },
++	{ suffix, children, hideOnClick = false, ...props },
+ 	ref
+ ) {
+-	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
+-	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
+ 	const menuContext = useContext( MenuContext );
+ 
+ 	return (
+ 		<Styled.MenuCheckboxItem
+ 			ref={ ref }
+ 			{ ...props }
+-			{ ...focusVisibleFixProps }
+ 			accessibleWhenDisabled
+ 			hideOnClick={ hideOnClick }
+ 			store={ menuContext?.store }
+diff --git a/packages/components/src/menu/item.tsx b/packages/components/src/menu/item.tsx
+index f8ae670846f55f..6e8c510e4c9c2a 100644
+--- a/packages/components/src/menu/item.tsx
++++ b/packages/components/src/menu/item.tsx
+@@ -10,24 +10,20 @@ import type { WordPressComponentProps } from '../context';
+ import type { MenuItemProps } from './types';
+ import * as Styled from './styles';
+ import { MenuContext } from './context';
+-import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
+ 
+ export const MenuItem = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< MenuItemProps, 'div', false >
+ >( function MenuItem(
+-	{ prefix, suffix, children, onBlur, hideOnClick = true, ...props },
++	{ prefix, suffix, children, hideOnClick = true, ...props },
+ 	ref
+ ) {
+-	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
+-	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
+ 	const menuContext = useContext( MenuContext );
+ 
+ 	return (
+ 		<Styled.MenuItem
+ 			ref={ ref }
+ 			{ ...props }
+-			{ ...focusVisibleFixProps }
+ 			accessibleWhenDisabled
+ 			hideOnClick={ hideOnClick }
+ 			store={ menuContext?.store }
+diff --git a/packages/components/src/menu/radio-item.tsx b/packages/components/src/menu/radio-item.tsx
+index 3848d2062c0c25..45b0039f900e20 100644
+--- a/packages/components/src/menu/radio-item.tsx
++++ b/packages/components/src/menu/radio-item.tsx
+@@ -17,7 +17,6 @@ import { MenuContext } from './context';
+ import type { MenuRadioItemProps } from './types';
+ import * as Styled from './styles';
+ import { SVG, Circle } from '@wordpress/primitives';
+-import { useTemporaryFocusVisibleFix } from './use-temporary-focus-visible-fix';
+ 
+ const radioCheck = (
+ 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+@@ -29,18 +28,15 @@ export const MenuRadioItem = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< MenuRadioItemProps, 'div', false >
+ >( function MenuRadioItem(
+-	{ suffix, children, onBlur, hideOnClick = false, ...props },
++	{ suffix, children, hideOnClick = false, ...props },
+ 	ref
+ ) {
+-	// TODO: Remove when https://github.com/ariakit/ariakit/issues/4083 is fixed
+-	const focusVisibleFixProps = useTemporaryFocusVisibleFix( { onBlur } );
+ 	const menuContext = useContext( MenuContext );
+ 
+ 	return (
+ 		<Styled.MenuRadioItem
+ 			ref={ ref }
+ 			{ ...props }
+-			{ ...focusVisibleFixProps }
+ 			accessibleWhenDisabled
+ 			hideOnClick={ hideOnClick }
+ 			store={ menuContext?.store }
+diff --git a/packages/components/src/menu/use-temporary-focus-visible-fix.ts b/packages/components/src/menu/use-temporary-focus-visible-fix.ts
+deleted file mode 100644
+index 0df13133739609..00000000000000
+--- a/packages/components/src/menu/use-temporary-focus-visible-fix.ts
++++ /dev/null
+@@ -1,22 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState, flushSync } from '@wordpress/element';
+-
+-export function useTemporaryFocusVisibleFix( {
+-	onBlur: onBlurProp,
+-}: {
+-	onBlur?: React.FocusEventHandler< HTMLDivElement >;
+-} ) {
+-	const [ focusVisible, setFocusVisible ] = useState( false );
+-	return {
+-		'data-focus-visible': focusVisible || undefined,
+-		onFocusVisible: () => {
+-			flushSync( () => setFocusVisible( true ) );
+-		},
+-		onBlur: ( ( event ) => {
+-			onBlurProp?.( event );
+-			setFocusVisible( false );
+-		} ) as React.FocusEventHandler< HTMLDivElement >,
+-	};
+-}
+diff --git a/packages/components/src/tabs/tab.tsx b/packages/components/src/tabs/tab.tsx
+index 70f56e52ad2627..8226d0589f08c8 100644
+--- a/packages/components/src/tabs/tab.tsx
++++ b/packages/components/src/tabs/tab.tsx
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import * as Ariakit from '@ariakit/react';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -29,18 +24,6 @@ export const Tab = forwardRef<
+ >( function Tab( { children, tabId, disabled, render, ...otherProps }, ref ) {
+ 	const { store, instanceId } = useTabsContext() ?? {};
+ 
+-	// If the active item is not connected, the tablist may end up in a state
+-	// where none of the tabs are tabbable. In this case, we force all tabs to
+-	// be tabbable, so that as soon as an item received focus, it becomes active
+-	// and Tablist goes back to working as expected.
+-	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+-	const tabbable = Ariakit.useStoreState( store, ( state ) => {
+-		return (
+-			state?.activeId !== null &&
+-			! store?.item( state?.activeId )?.element?.isConnected
+-		);
+-	} );
+-
+ 	if ( ! store ) {
+ 		warning( '`Tabs.Tab` must be wrapped in a `Tabs` component.' );
+ 		return null;
+@@ -55,7 +38,6 @@ export const Tab = forwardRef<
+ 			id={ instancedTabId }
+ 			disabled={ disabled }
+ 			render={ render }
+-			tabbable={ tabbable }
+ 			{ ...otherProps }
+ 		>
+ 			<StyledTabChildren>{ children }</StyledTabChildren>
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index f4d42102731eb2..8fe2e04236725c 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -43,7 +43,7 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@ariakit/react": "^0.4.10",
++		"@ariakit/react": "^0.4.13",
+ 		"@babel/runtime": "7.25.7",
+ 		"@wordpress/components": "*",
+ 		"@wordpress/compose": "*",

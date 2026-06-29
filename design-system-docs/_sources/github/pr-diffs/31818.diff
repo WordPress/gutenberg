@@ -1,0 +1,55 @@
+diff --git a/packages/components/src/mobile/bottom-sheet-text-control/index.native.js b/packages/components/src/mobile/bottom-sheet-text-control/index.native.js
+index c3bcb337d9ad52..db99cf061f4bcb 100644
+--- a/packages/components/src/mobile/bottom-sheet-text-control/index.native.js
++++ b/packages/components/src/mobile/bottom-sheet-text-control/index.native.js
+@@ -74,7 +74,12 @@ const BottomSheetTextControl = ( {
+ 					screen={ label }
+ 					leftButtonOnPress={ goBack }
+ 				/>
+-				<PanelBody style={ horizontalBorderStyle }>
++				<PanelBody
++					style={ [
++						horizontalBorderStyle,
++						styles.textEditorContainer,
++					] }
++				>
+ 					<TextInput
+ 						label={ label }
+ 						onChangeText={ ( text ) => onChangeText( text ) }
+diff --git a/packages/components/src/mobile/bottom-sheet-text-control/styles.scss b/packages/components/src/mobile/bottom-sheet-text-control/styles.scss
+index f50712d403a747..dbc454e2b81b15 100644
+--- a/packages/components/src/mobile/bottom-sheet-text-control/styles.scss
++++ b/packages/components/src/mobile/bottom-sheet-text-control/styles.scss
+@@ -1,12 +1,18 @@
+ .textEditor {
+-	padding: 14px 0;
+-	height: 80px;
++	min-height: 80px;
++	max-height: 200px;
++	padding-top: 0;
++	padding-bottom: 14px;
+ }
+ 
+ .textEditorDark {
+ 	color: $white;
+ }
+ 
++.textEditorContainer {
++	padding-top: 14px;
++}
++
+ .textFooternote {
+ 	padding: 0 16px 24px;
+ }
+diff --git a/packages/react-native-editor/CHANGELOG.md b/packages/react-native-editor/CHANGELOG.md
+index 870492b38bb60f..e9d3b2f3d59ef8 100644
+--- a/packages/react-native-editor/CHANGELOG.md
++++ b/packages/react-native-editor/CHANGELOG.md
+@@ -15,6 +15,7 @@ For each user feature we should also add a importance categorization label  to i
+ -   [*] Add enableCaching param to fetch request on Android [#31186]
+ -   [*] Disabled featured image banner on iOS. [#31681]
+ -   [***] Add reusable blocks to the inserter menu. [#28495]
++-   [*] Bottom-sheet text area: automatically expands/shrinks with text entry. [#31818]
+ 
+ ## 1.52.1
+ 

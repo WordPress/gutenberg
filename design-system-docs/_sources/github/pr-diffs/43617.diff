@@ -1,0 +1,129 @@
+diff --git a/packages/block-editor/src/components/block-popover/index.js b/packages/block-editor/src/components/block-popover/index.js
+index 597f61eb949106..15be18b0a8c82e 100644
+--- a/packages/block-editor/src/components/block-popover/index.js
++++ b/packages/block-editor/src/components/block-popover/index.js
+@@ -66,8 +66,6 @@ function BlockPopover(
+ 			// Render in the old slot if needed for backward compatibility,
+ 			// otherwise render in place (not in the default popover slot).
+ 			__unstableSlotName={ __unstablePopoverSlot || null }
+-			// Observe movement for block animations (especially horizontal).
+-			__unstableObserveElement={ selectedElement }
+ 			__unstableForcePosition
+ 			__unstableShift
+ 			{ ...props }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b8000b2772d714..44988ddab5fd17 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `Popover`: enable auto-updating every animation frame ([#43617](https://github.com/WordPress/gutenberg/pull/43617)).
++
+ ### Internal
+ 
+ -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index c40804e1164e23..67e7c0abc89e90 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -143,7 +143,6 @@ const Popover = (
+ 		expandOnMobile,
+ 		onFocusOutside,
+ 		__unstableSlotName = SLOT_NAME,
+-		__unstableObserveElement,
+ 		__unstableForcePosition = false,
+ 		__unstableShift = false,
+ 		...contentProps
+@@ -374,59 +373,42 @@ const Popover = (
+ 		return autoUpdate(
+ 			resultingReferenceRef,
+ 			refs.floating.current,
+-			update
++			update,
++			{
++				animationFrame: true,
++			}
+ 		);
+ 		// 'reference' and 'refs.floating' are refs and don't need to be listed
+ 		// as dependencies (see https://github.com/WordPress/gutenberg/pull/41612)
+ 		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ anchorRef, anchorRect, getAnchorRect, update ] );
+ 
+-	// This is only needed for a smooth transition when moving blocks.
+-	useLayoutEffect( () => {
+-		if ( ! __unstableObserveElement ) {
+-			return;
+-		}
+-		const observer = new window.MutationObserver( update );
+-		observer.observe( __unstableObserveElement, { attributes: true } );
+-
+-		return () => {
+-			observer.disconnect();
+-		};
+-	}, [ __unstableObserveElement, update ] );
+-
+ 	// If the reference element is in a different ownerDocument (e.g. iFrame),
+ 	// we need to manually update the floating's position as the reference's owner
+ 	// document scrolls. Also update the frame offset if the view resizes.
+ 	useLayoutEffect( () => {
+-		if ( referenceOwnerDocument === document ) {
++		const referenceAndFloatingHaveSameDocument =
++			referenceOwnerDocument === document;
++		const hasFrameElement =
++			!! referenceOwnerDocument?.defaultView?.frameElement;
++
++		if ( referenceAndFloatingHaveSameDocument || ! hasFrameElement ) {
+ 			frameOffsetRef.current = undefined;
+ 			return;
+ 		}
+ 
+ 		const { defaultView } = referenceOwnerDocument;
+ 
+-		referenceOwnerDocument.addEventListener( 'scroll', update );
++		const updateFrameOffset = () => {
++			frameOffsetRef.current = getFrameOffset( referenceOwnerDocument );
++			update();
++		};
++		defaultView.addEventListener( 'resize', updateFrameOffset );
+ 
+-		let updateFrameOffset;
+-		const hasFrameElement =
+-			!! referenceOwnerDocument?.defaultView?.frameElement;
+-		if ( hasFrameElement ) {
+-			updateFrameOffset = () => {
+-				frameOffsetRef.current = getFrameOffset(
+-					referenceOwnerDocument
+-				);
+-				update();
+-			};
+-			updateFrameOffset();
+-			defaultView.addEventListener( 'resize', updateFrameOffset );
+-		}
++		updateFrameOffset();
+ 
+ 		return () => {
+-			referenceOwnerDocument.removeEventListener( 'scroll', update );
+-
+-			if ( updateFrameOffset ) {
+-				defaultView.removeEventListener( 'resize', updateFrameOffset );
+-			}
++			defaultView.removeEventListener( 'resize', updateFrameOffset );
+ 		};
+ 	}, [ referenceOwnerDocument, update ] );
+ 
+diff --git a/packages/components/src/popover/stories/index.js b/packages/components/src/popover/stories/index.js
+index 7e066d77c49cff..cc9b3a8e85ed49 100644
+--- a/packages/components/src/popover/stories/index.js
++++ b/packages/components/src/popover/stories/index.js
+@@ -73,7 +73,6 @@ export default {
+ 			options: AVAILABLE_POSITIONS,
+ 		},
+ 		__unstableSlotName: { control: { type: null } },
+-		__unstableObserveElement: { control: { type: null } },
+ 		__unstableForcePosition: { control: { type: 'boolean' } },
+ 		__unstableShift: { control: { type: 'boolean' } },
+ 	},

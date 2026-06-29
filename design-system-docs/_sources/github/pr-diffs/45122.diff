@@ -1,0 +1,29 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index de3fb83df5c651..e57e932b3f8048 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,10 @@
+ 
+ -   `Button`: Fix RTL alignment for buttons containing an icon and text ([#44787](https://github.com/WordPress/gutenberg/pull/44787)).
+ 
++### Internal
++
++-   `AnglePickerControl`: Set Storybook Label control type to 'text' ([#45122](https://github.com/WordPress/gutenberg/pull/45122)).
++
+ ## 21.3.0 (2022-10-19)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/angle-picker-control/stories/index.js b/packages/components/src/angle-picker-control/stories/index.js
+index 74694459abaac8..9418b1bcd60d0c 100644
+--- a/packages/components/src/angle-picker-control/stories/index.js
++++ b/packages/components/src/angle-picker-control/stories/index.js
+@@ -11,6 +11,9 @@ import AnglePickerControl from '../';
+ export default {
+ 	title: 'Components/AnglePickerControl',
+ 	component: AnglePickerControl,
++	argTypes: {
++		label: { control: { type: 'text' } },
++	},
+ };
+ 
+ const AnglePickerWithState = ( args ) => {

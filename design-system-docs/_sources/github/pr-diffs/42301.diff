@@ -1,0 +1,147 @@
+diff --git a/packages/components/src/flex/flex-block/README.md b/packages/components/src/flex/flex-block/README.md
+index 691f1b0ad33c0e..0ae21c9c0c7e78 100644
+--- a/packages/components/src/flex/flex-block/README.md
++++ b/packages/components/src/flex/flex-block/README.md
+@@ -1,9 +1,5 @@
+ # FlexBlock
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ A layout component to contain items of a fixed width within `Flex`.
+ 
+ ## Usage
+diff --git a/packages/components/src/flex/flex-block/component.js b/packages/components/src/flex/flex-block/component.js
+index d7b03a87e43dfe..2b395128b6effe 100644
+--- a/packages/components/src/flex/flex-block/component.js
++++ b/packages/components/src/flex/flex-block/component.js
+@@ -20,9 +20,15 @@ function FlexBlock( props, forwardedRef ) {
+  *
+  * @example
+  * ```jsx
+- * <Flex>
+- * 	<FlexBlock>...</FlexBlock>
+- * </Flex>
++ * import { Flex, FlexBlock } from '@wordpress/components';
++ *
++ * function Example() {
++ *   return (
++ *     <Flex>
++ *       <FlexBlock>...</FlexBlock>
++ *     </Flex>
++ *   );
++ * }
+  * ```
+  */
+ const ConnectedFlexBlock = contextConnect( FlexBlock, 'FlexBlock' );
+diff --git a/packages/components/src/flex/flex-item/README.md b/packages/components/src/flex/flex-item/README.md
+index 2461abdb0e8d94..5a96af724fece4 100644
+--- a/packages/components/src/flex/flex-item/README.md
++++ b/packages/components/src/flex/flex-item/README.md
+@@ -1,9 +1,5 @@
+ # FlexItem
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ A layout component to contain items of a fixed width within `Flex`.
+ 
+ ## Usage
+diff --git a/packages/components/src/flex/flex-item/component.js b/packages/components/src/flex/flex-item/component.js
+index 0cc72c35a9930b..882bb1fc6cc90e 100644
+--- a/packages/components/src/flex/flex-item/component.js
++++ b/packages/components/src/flex/flex-item/component.js
+@@ -20,9 +20,15 @@ function FlexItem( props, forwardedRef ) {
+  *
+  * @example
+  * ```jsx
+- * <Flex>
+- * 	<FlexItem>...</FlexItem>
+- * </Flex>
++ * import { Flex, FlexItem } from '@wordpress/components';
++ *
++ * function Example() {
++ *   return (
++ *     <Flex>
++ *       <FlexItem>...</FlexItem>
++ *     </Flex>
++ *   );
++ * }
+  * ```
+  */
+ const ConnectedFlexItem = contextConnect( FlexItem, 'FlexItem' );
+diff --git a/packages/components/src/flex/flex/README.md b/packages/components/src/flex/flex/README.md
+index 9fcb9b3b59b0cf..f540877d9ecd7a 100644
+--- a/packages/components/src/flex/flex/README.md
++++ b/packages/components/src/flex/flex/README.md
+@@ -7,11 +7,7 @@
+ `Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
+ 
+ ```jsx
+-import {
+-	Flex,
+-	FlexBlock,
+-	FlexItem,
+-} from '@wordpress/components';
++import { Flex, FlexBlock, FlexItem } from '@wordpress/components';
+ 
+ function Example() {
+ 	return (
+diff --git a/packages/components/src/flex/flex/component.js b/packages/components/src/flex/flex/component.js
+index 348ff9f65d0812..421bec4a0d81ac 100644
+--- a/packages/components/src/flex/flex/component.js
++++ b/packages/components/src/flex/flex/component.js
+@@ -33,27 +33,21 @@ function Flex( props, forwardedRef ) {
+  *
+  * @example
+  * ```jsx
+- * import {
+- * 	__experimentalFlex as Flex,
+- * 	__experimentalFlexBlock as FlexBlock,
+- * 	__experimentalFlexItem as FlexItem,
+- * 	__experimentalText as Text
+- * } from `@wordpress/components`;
++ * import { Flex, FlexBlock, FlexItem } from '@wordpress/components';
+  *
+  * function Example() {
+- * 	return (
+- * 		<Flex>
+- * 			<FlexItem>
+- * 				<Text>Code</Text>
+- * 			</FlexItem>
+- * 			<FlexBlock>
+- * 				<Text>Poetry</Text>
+- * 			</FlexBlock>
+- * 		</Flex>
+- * 	);
++ *   return (
++ *     <Flex>
++ *       <FlexItem>
++ *         <p>Code</p>
++ *       </FlexItem>
++ *       <FlexBlock>
++ *         <p>Poetry</p>
++ *       </FlexBlock>
++ *     </Flex>
++ *   );
+  * }
+  * ```
+- *
+  */
+ const ConnectedFlex = contextConnect( Flex, 'Flex' );
+ 
+diff --git a/packages/components/src/flex/stories/index.js b/packages/components/src/flex/stories/index.js
+index 1785b72912a944..19534fbe43604d 100644
+--- a/packages/components/src/flex/stories/index.js
++++ b/packages/components/src/flex/stories/index.js
+@@ -6,7 +6,7 @@ import { View } from '../../view';
+ 
+ export default {
+ 	component: Flex,
+-	title: 'Components (Experimental)/Flex',
++	title: 'Components/Flex',
+ };
+ 
+ export const _default = () => {

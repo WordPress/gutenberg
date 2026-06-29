@@ -1,0 +1,28 @@
+diff --git a/packages/components/src/modal/index.js b/packages/components/src/modal/index.js
+index 66d3421ee6ff5c..f4a64c289b4e7d 100644
+--- a/packages/components/src/modal/index.js
++++ b/packages/components/src/modal/index.js
+@@ -3,7 +3,7 @@
+  */
+ import { Component, createPortal } from '@wordpress/element';
+ import { withInstanceId } from '@wordpress/compose';
+-import { deprecated } from '@wordpress/deprecated';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/e2e-tests/specs/font-size-picker.test.js b/packages/e2e-tests/specs/font-size-picker.test.js
+index a80a81b46442d3..0fb98caa4f5d29 100644
+--- a/packages/e2e-tests/specs/font-size-picker.test.js
++++ b/packages/e2e-tests/specs/font-size-picker.test.js
+@@ -75,8 +75,8 @@ describe( 'Font Size Picker', () => {
+ 
+ 		// Clear the custom font size input.
+ 		await page.click( '.blocks-font-size .components-range-control__number' );
+-		await pressKeyTimes( 'ArrowRight', 4 );
+-		await pressKeyTimes( 'Backspace', 4 );
++		await pressKeyTimes( 'ArrowRight', 5 );
++		await pressKeyTimes( 'Backspace', 5 );
+ 
+ 		// Ensure content matches snapshot.
+ 		const content = await getEditedPostContent();

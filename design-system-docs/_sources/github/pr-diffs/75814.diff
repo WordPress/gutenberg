@@ -1,0 +1,2166 @@
+diff --git a/.github/setup-node/action.yml b/.github/setup-node/action.yml
+index 28a8d9ca62fd8a..7d630c7b8d84b9 100644
+--- a/.github/setup-node/action.yml
++++ b/.github/setup-node/action.yml
+@@ -16,21 +16,17 @@ runs:
+               check-latest: true
+               cache: npm
+ 
+-        - name: Get Node.js and npm version
+-          id: node-version
++        - name: Install custom npm with linked strategy fix
+           run: |
+-              echo "NODE_VERSION=$(node -v)" >> "$GITHUB_OUTPUT"
++              git clone --depth 1 --branch v11-gb-test https://github.com/manzoorwanijk/npm-cli.git /tmp/npm-cli
++              cd /tmp/npm-cli && node scripts/resetdeps.js
++              NPM_GLOBAL_DIR="$(npm root -g)/npm"
++              rm -rf "$NPM_GLOBAL_DIR"
++              ln -s /tmp/npm-cli "$NPM_GLOBAL_DIR"
++              npm --version
+           shell: bash
+ 
+-        - name: Cache node_modules
+-          id: cache-node_modules
+-          uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+-          with:
+-              path: '**/node_modules'
+-              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
+-
+         - name: Install npm dependencies
+-          if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
+           run: |
+               npm ci
+           shell: bash
+@@ -40,14 +36,3 @@ runs:
+           with:
+               name: npm-logs
+               path: C:\npm\cache\_logs
+-
+-        # On cache hit, we run the post-install script to match the native `npm ci` behavior.
+-        # An example of this is to patch `node_modules` using patch-package.
+-        - name: Post-install
+-          if: ${{ steps.cache-node_modules.outputs.cache-hit == 'true' }}
+-          run: |
+-              # Run the post-install script for the root project.
+-              npm run postinstall
+-              # Run the post-install scripts for workspaces.
+-              npx lerna run postinstall
+-          shell: bash
+diff --git a/.github/workflows/build-plugin-zip.yml b/.github/workflows/build-plugin-zip.yml
+index 60921f4c366fc4..d126821ff9d1a1 100644
+--- a/.github/workflows/build-plugin-zip.yml
++++ b/.github/workflows/build-plugin-zip.yml
+@@ -212,6 +212,15 @@ jobs:
+               if: ${{ ! matrix.IS_GUTENBERG_PLUGIN }}
+               run: jq --tab '.wpPlugin.name = "wp"' package.json > package.json.tmp && mv package.json.tmp package.json
+ 
++            - name: Install custom npm with linked strategy fix
++              run: |
++                  git clone --depth 1 --branch v11-gb-test https://github.com/manzoorwanijk/npm-cli.git /tmp/npm-cli
++                  cd /tmp/npm-cli && node scripts/resetdeps.js
++                  NPM_GLOBAL_DIR="$(npm root -g)/npm"
++                  rm -rf "$NPM_GLOBAL_DIR"
++                  ln -s /tmp/npm-cli "$NPM_GLOBAL_DIR"
++                  npm --version
++
+             - name: Build Gutenberg plugin ZIP file
+               run: ./bin/build-plugin-zip.sh
+               env:
+@@ -485,6 +494,15 @@ jobs:
+                   registry-url: 'https://registry.npmjs.org'
+                   check-latest: true
+ 
++            - name: Install custom npm with linked strategy fix
++              run: |
++                  git clone --depth 1 --branch v11-gb-test https://github.com/manzoorwanijk/npm-cli.git /tmp/npm-cli
++                  cd /tmp/npm-cli && node scripts/resetdeps.js
++                  NPM_GLOBAL_DIR="$(npm root -g)/npm"
++                  rm -rf "$NPM_GLOBAL_DIR"
++                  ln -s /tmp/npm-cli "$NPM_GLOBAL_DIR"
++                  npm --version
++
+             - name: Publish packages to npm ("latest" dist-tag)
+               run: |
+                   cd main
+diff --git a/.github/workflows/bundle-size.yml b/.github/workflows/bundle-size.yml
+index 9052cafd608745..f2de0d2d6d4bd5 100644
+--- a/.github/workflows/bundle-size.yml
++++ b/.github/workflows/bundle-size.yml
+@@ -62,6 +62,15 @@ jobs:
+                   check-latest: true
+                   cache: npm
+ 
++            - name: Install custom npm with linked strategy fix
++              run: |
++                  git clone --depth 1 --branch v11-gb-test https://github.com/manzoorwanijk/npm-cli.git /tmp/npm-cli
++                  cd /tmp/npm-cli && node scripts/resetdeps.js
++                  NPM_GLOBAL_DIR="$(npm root -g)/npm"
++                  rm -rf "$NPM_GLOBAL_DIR"
++                  ln -s /tmp/npm-cli "$NPM_GLOBAL_DIR"
++                  npm --version
++
+             - uses: preactjs/compressed-size-action@66325aad6443cb7cf89c4bfcd414aea2367cda94 # v2.9.1
+               with:
+                   omit-unchanged: true
+diff --git a/.github/workflows/publish-npm-packages.yml b/.github/workflows/publish-npm-packages.yml
+index 36a303cad21cbc..b4a09cb52d8508 100644
+--- a/.github/workflows/publish-npm-packages.yml
++++ b/.github/workflows/publish-npm-packages.yml
+@@ -91,6 +91,15 @@ jobs:
+                   registry-url: 'https://registry.npmjs.org'
+                   check-latest: true
+ 
++            - name: Install custom npm with linked strategy fix
++              run: |
++                  git clone --depth 1 --branch v11-gb-test https://github.com/manzoorwanijk/npm-cli.git /tmp/npm-cli
++                  cd /tmp/npm-cli && node scripts/resetdeps.js
++                  NPM_GLOBAL_DIR="$(npm root -g)/npm"
++                  rm -rf "$NPM_GLOBAL_DIR"
++                  ln -s /tmp/npm-cli "$NPM_GLOBAL_DIR"
++                  npm --version
++
+             - name: Publish development packages to npm ("next" dist-tag)
+               if: ${{ github.event.inputs.release_type == 'development' }}
+               run: |
+diff --git a/.github/workflows/static-checks.yml b/.github/workflows/static-checks.yml
+index 04f1ad8589d95c..4acfb825e3be53 100644
+--- a/.github/workflows/static-checks.yml
++++ b/.github/workflows/static-checks.yml
+@@ -58,8 +58,19 @@ jobs:
+                   node-version: ${{ matrix.node }}
+                   cache: npm
+ 
+-            - name: Pin npm version for consistency
+-              run: npm install -g npm@10
++            - name: Install custom npm with linked strategy fix
++              shell: bash
++              run: |
++                  git clone --depth 1 --branch v11-gb-test https://github.com/manzoorwanijk/npm-cli.git "$RUNNER_TEMP/npm-cli"
++                  cd "$RUNNER_TEMP/npm-cli" && node scripts/resetdeps.js
++                  NPM_GLOBAL_DIR="$(npm root -g)/npm"
++                  rm -rf "$NPM_GLOBAL_DIR"
++                  if [[ "$RUNNER_OS" == "Windows" ]]; then
++                      cp -r "$RUNNER_TEMP/npm-cli" "$NPM_GLOBAL_DIR"
++                  else
++                      ln -s "$RUNNER_TEMP/npm-cli" "$NPM_GLOBAL_DIR"
++                  fi
++                  npm --version
+ 
+             - name: npm install
+               # A "full" install is executed, since `npm ci` does not always exit
+diff --git a/.github/workflows/storybook-check.yml b/.github/workflows/storybook-check.yml
+index 498c16f8eec354..8a996a8187bb2f 100644
+--- a/.github/workflows/storybook-check.yml
++++ b/.github/workflows/storybook-check.yml
+@@ -51,12 +51,19 @@ jobs:
+ 
+             - name: Install test-runner and Playwright dependencies
+               run: |
+-                  npm install --no-save @storybook/test-runner@0.24.2
++                  # storybook and playwright are needed as peer dependencies of @storybook/test-runner
++                  STORYBOOK_VERSION=$(node -p "require('./storybook/package.json').devDependencies.storybook")
++                  npm install --save-dev "storybook@$STORYBOOK_VERSION" @storybook/test-runner@0.24.2 playwright
+                   npx playwright install --with-deps
+ 
+             - name: Serve Storybook and run tests
+               run: |
+-                  npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
+-                  "npx http-server ./storybook/build --port 50240 --silent" \
+-                  "npx wait-on tcp:127.0.0.1:50240 && \
+-                  npx test-storybook --url http://localhost:50240 --config-dir ./storybook"
++                  npx http-server ./storybook/build --port 50240 --silent &
++                  SERVER_PID=$!
++                  # Wait for server to be ready
++                  until curl -sf http://127.0.0.1:50240 > /dev/null 2>&1; do sleep 1; done
++                  # Run tests (kill server on exit)
++                  npx test-storybook --url http://localhost:50240 --config-dir ./storybook
++                  EXIT_CODE=$?
++                  kill $SERVER_PID 2>/dev/null || true
++                  exit $EXIT_CODE
+diff --git a/.npmrc b/.npmrc
+index d8a0a79f294c7b..2cc49eba08cd8d 100644
+--- a/.npmrc
++++ b/.npmrc
+@@ -3,3 +3,4 @@ legacy-peer-deps = true
+ prefer-dedupe = true
+ lockfile-version = 3
+ min-release-age = 1
++install-strategy = "linked"
+diff --git a/package-lock.json b/package-lock.json
+index 2786dfe7ad4798..e61965a77568b0 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -5058,9 +5058,9 @@
+ 			"integrity": "sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A=="
+ 		},
+ 		"node_modules/@mawesome/dependency-audit": {
+-			"version": "0.4.4",
+-			"resolved": "https://registry.npmjs.org/@mawesome/dependency-audit/-/dependency-audit-0.4.4.tgz",
+-			"integrity": "sha512-fnnhA/DItR4N3JAKkpAd2j/JZWXGH+h/ypSE2ClKTKKzm+t/8qJ2yLyc3t3PBieiBef+eMtVpObjk46P7sxRmg==",
++			"version": "0.4.5",
++			"resolved": "https://registry.npmjs.org/@mawesome/dependency-audit/-/dependency-audit-0.4.5.tgz",
++			"integrity": "sha512-zU7XmZpZ0cQhijNvjeQbTAnAI2CRT+4V7t8K52H+qaewBpYgHTB2xh/egMbbTiHNnOrDfqxcEP6cMTuveR7uwg==",
+ 			"dev": true,
+ 			"license": "MIT",
+ 			"dependencies": {
+@@ -11618,7 +11618,6 @@
+ 			"version": "1.58.2",
+ 			"resolved": "https://registry.npmjs.org/@playwright/test/-/test-1.58.2.tgz",
+ 			"integrity": "sha512-akea+6bHYBBfA9uQqSYmlJXn61cTa+jbO87xVLCWbTqbWadRVmhxlXATaOjOgcBaWU4ePo0wB41KMFv3o35IXA==",
+-			"dev": true,
+ 			"license": "Apache-2.0",
+ 			"dependencies": {
+ 				"playwright": "1.58.2"
+@@ -13564,18 +13563,19 @@
+ 			}
+ 		},
+ 		"node_modules/@stylistic/stylelint-plugin": {
+-			"version": "3.0.1",
+-			"resolved": "https://registry.npmjs.org/@stylistic/stylelint-plugin/-/stylelint-plugin-3.0.1.tgz",
+-			"integrity": "sha512-j3mH8HSw2Rob/KJFWZ627w3CQ8gQqVHtzCdPeEffUg5vOgpz4rgrR+Xw2kU0OQCDcdW8Y1nKfdXKKjM5Rn8X0g==",
++			"version": "3.1.3",
++			"resolved": "https://registry.npmjs.org/@stylistic/stylelint-plugin/-/stylelint-plugin-3.1.3.tgz",
++			"integrity": "sha512-85fsmzgsIVmyG3/GFrjuYj6Cz8rAM7IZiPiXCMiSMfoDOC1lOrzrXPDk24WqviAghnPqGpx8b0caK2PuewWGFg==",
++			"license": "MIT",
+ 			"dependencies": {
+-				"@csstools/css-parser-algorithms": "^3.0.0",
+-				"@csstools/css-tokenizer": "^3.0.0",
+-				"@csstools/media-query-list-parser": "^3.0.0",
++				"@csstools/css-parser-algorithms": "^3.0.1",
++				"@csstools/css-tokenizer": "^3.0.1",
++				"@csstools/media-query-list-parser": "^3.0.1",
+ 				"is-plain-object": "^5.0.0",
++				"postcss": "^8.4.41",
+ 				"postcss-selector-parser": "^6.1.2",
+ 				"postcss-value-parser": "^4.2.0",
+-				"style-search": "^0.1.0",
+-				"stylelint": "^16.8.2"
++				"style-search": "^0.1.0"
+ 			},
+ 			"engines": {
+ 				"node": "^18.12 || >=20.9"
+@@ -14549,9 +14549,10 @@
+ 			"license": "MIT"
+ 		},
+ 		"node_modules/@types/estree": {
+-			"version": "1.0.5",
+-			"resolved": "https://registry.npmjs.org/@types/estree/-/estree-1.0.5.tgz",
+-			"integrity": "sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw=="
++			"version": "1.0.9",
++			"resolved": "https://registry.npmjs.org/@types/estree/-/estree-1.0.9.tgz",
++			"integrity": "sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==",
++			"license": "MIT"
+ 		},
+ 		"node_modules/@types/express": {
+ 			"version": "4.17.17",
+@@ -25529,12 +25530,6 @@
+ 				"node": ">=10"
+ 			}
+ 		},
+-		"node_modules/eslint/node_modules/@types/estree": {
+-			"version": "1.0.8",
+-			"resolved": "https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz",
+-			"integrity": "sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==",
+-			"license": "MIT"
+-		},
+ 		"node_modules/eslint/node_modules/acorn": {
+ 			"version": "8.16.0",
+ 			"resolved": "https://registry.npmjs.org/acorn/-/acorn-8.16.0.tgz",
+@@ -34574,9 +34569,9 @@
+ 			"optional": true
+ 		},
+ 		"node_modules/nanoid": {
+-			"version": "3.3.11",
+-			"resolved": "https://registry.npmjs.org/nanoid/-/nanoid-3.3.11.tgz",
+-			"integrity": "sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==",
++			"version": "3.3.15",
++			"resolved": "https://registry.npmjs.org/nanoid/-/nanoid-3.3.15.tgz",
++			"integrity": "sha512-y7Wygv/7mEOvxTuEQDB8StXdMRBWf1kR/tlhAzBRUFkB2jfcLOAxO/SHmOO2zgz1pVgK29/kyupn059/bCHdjA==",
+ 			"funding": [
+ 				{
+ 					"type": "github",
+@@ -38250,7 +38245,6 @@
+ 			"version": "1.58.2",
+ 			"resolved": "https://registry.npmjs.org/playwright/-/playwright-1.58.2.tgz",
+ 			"integrity": "sha512-vA30H8Nvkq/cPBnNw4Q8TWz1EJyqgpuinBcHET0YVJVFldr8JDNiU9LaWAE1KqSkRYazuaBhTpB5ZzShOezQ6A==",
+-			"dev": true,
+ 			"license": "Apache-2.0",
+ 			"dependencies": {
+ 				"playwright-core": "1.58.2"
+@@ -38269,7 +38263,6 @@
+ 			"version": "1.58.2",
+ 			"resolved": "https://registry.npmjs.org/playwright-core/-/playwright-core-1.58.2.tgz",
+ 			"integrity": "sha512-yZkEtftgwS8CsfYo7nm0KE8jsvm6i/PTgVtB8DL726wNf6H2IMsDuxCpJj59KDaxCtSnrWan2AeDqM7JBaultg==",
+-			"dev": true,
+ 			"license": "Apache-2.0",
+ 			"bin": {
+ 				"playwright-core": "cli.js"
+@@ -38311,9 +38304,9 @@
+ 			}
+ 		},
+ 		"node_modules/postcss": {
+-			"version": "8.4.38",
+-			"resolved": "https://registry.npmjs.org/postcss/-/postcss-8.4.38.tgz",
+-			"integrity": "sha512-Wglpdk03BSfXkHoQa3b/oulrotAkwrlLDRSOb9D0bN86FdRyE9lppSp33aHNPgBa0JKCoB+drFLZkQoRRYae5A==",
++			"version": "8.5.15",
++			"resolved": "https://registry.npmjs.org/postcss/-/postcss-8.5.15.tgz",
++			"integrity": "sha512-FfR8sjd4em2T6fb3I2MwAJU7HWVMr9zba+enmQeeWFfCbm+UOC/0X4DS8XtpUTMwWMGbjKYP7xjfNekzyGmB3A==",
+ 			"funding": [
+ 				{
+ 					"type": "opencollective",
+@@ -38330,9 +38323,9 @@
+ 			],
+ 			"license": "MIT",
+ 			"dependencies": {
+-				"nanoid": "^3.3.7",
+-				"picocolors": "^1.0.0",
+-				"source-map-js": "^1.2.0"
++				"nanoid": "^3.3.12",
++				"picocolors": "^1.1.1",
++				"source-map-js": "^1.2.1"
+ 			},
+ 			"engines": {
+ 				"node": "^10 || ^12 || >=14"
+@@ -40293,9 +40286,10 @@
+ 			"integrity": "sha512-0a1F4l73/ZFZOakJnQ3FvkJ2+gSTQWz/r2KE5OdDY0TxPm5h4GkqkWWfM47T7HsbnOtcJVEF4epCVy6u7Q3K+g=="
+ 		},
+ 		"node_modules/resolve-bin": {
+-			"version": "0.4.0",
+-			"resolved": "https://registry.npmjs.org/resolve-bin/-/resolve-bin-0.4.0.tgz",
+-			"integrity": "sha1-RxMiSYkRAa+xmZH+k3ywpfBy5dk=",
++			"version": "1.0.1",
++			"resolved": "https://registry.npmjs.org/resolve-bin/-/resolve-bin-1.0.1.tgz",
++			"integrity": "sha512-4G9C3udcDB1c9qaopB+9dygm2bMyF2LeJ2JHBIc24N7ob+UuSSwX3ID1hQwpDEQep9ZRNdhT//rgEd6xbWA/SA==",
++			"license": "MIT",
+ 			"dependencies": {
+ 				"find-parent-dir": "~0.3.0"
+ 			}
+@@ -43350,34 +43344,6 @@
+ 				"url": "https://github.com/sponsors/sindresorhus"
+ 			}
+ 		},
+-		"node_modules/stylelint/node_modules/postcss": {
+-			"version": "8.4.47",
+-			"resolved": "https://registry.npmjs.org/postcss/-/postcss-8.4.47.tgz",
+-			"integrity": "sha512-56rxCq7G/XfB4EkXq9Egn5GCqugWvDFjafDOThIdMBsI15iqPqR5r15TfSr1YPYeEI19YeaXMCbY6u88Y76GLQ==",
+-			"funding": [
+-				{
+-					"type": "opencollective",
+-					"url": "https://opencollective.com/postcss/"
+-				},
+-				{
+-					"type": "tidelift",
+-					"url": "https://tidelift.com/funding/github/npm/postcss"
+-				},
+-				{
+-					"type": "github",
+-					"url": "https://github.com/sponsors/ai"
+-				}
+-			],
+-			"license": "MIT",
+-			"dependencies": {
+-				"nanoid": "^3.3.7",
+-				"picocolors": "^1.1.0",
+-				"source-map-js": "^1.2.1"
+-			},
+-			"engines": {
+-				"node": "^10 || ^12 || >=14"
+-			}
+-		},
+ 		"node_modules/stylelint/node_modules/postcss-value-parser": {
+ 			"version": "4.2.0",
+ 			"resolved": "https://registry.npmjs.org/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz",
+@@ -45614,45 +45580,6 @@
+ 				"url": "https://github.com/sponsors/jonschlinkert"
+ 			}
+ 		},
+-		"node_modules/vite/node_modules/postcss": {
+-			"version": "8.5.6",
+-			"resolved": "https://registry.npmjs.org/postcss/-/postcss-8.5.6.tgz",
+-			"integrity": "sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==",
+-			"dev": true,
+-			"funding": [
+-				{
+-					"type": "opencollective",
+-					"url": "https://opencollective.com/postcss/"
+-				},
+-				{
+-					"type": "tidelift",
+-					"url": "https://tidelift.com/funding/github/npm/postcss"
+-				},
+-				{
+-					"type": "github",
+-					"url": "https://github.com/sponsors/ai"
+-				}
+-			],
+-			"license": "MIT",
+-			"dependencies": {
+-				"nanoid": "^3.3.11",
+-				"picocolors": "^1.1.1",
+-				"source-map-js": "^1.2.1"
+-			},
+-			"engines": {
+-				"node": "^10 || ^12 || >=14"
+-			}
+-		},
+-		"node_modules/vite/node_modules/source-map-js": {
+-			"version": "1.2.1",
+-			"resolved": "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.1.tgz",
+-			"integrity": "sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==",
+-			"dev": true,
+-			"license": "BSD-3-Clause",
+-			"engines": {
+-				"node": ">=0.10.0"
+-			}
+-		},
+ 		"node_modules/vm-browserify": {
+ 			"version": "1.1.2",
+ 			"resolved": "https://registry.npmjs.org/vm-browserify/-/vm-browserify-1.1.2.tgz",
+@@ -46445,12 +46372,6 @@
+ 			"dev": true,
+ 			"license": "MIT"
+ 		},
+-		"node_modules/webpack/node_modules/@types/estree": {
+-			"version": "1.0.6",
+-			"resolved": "https://registry.npmjs.org/@types/estree/-/estree-1.0.6.tgz",
+-			"integrity": "sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==",
+-			"license": "MIT"
+-		},
+ 		"node_modules/webpack/node_modules/@webassemblyjs/ast": {
+ 			"version": "1.14.1",
+ 			"resolved": "https://registry.npmjs.org/@webassemblyjs/ast/-/ast-1.14.1.tgz",
+@@ -47454,8 +47375,10 @@
+ 				"clsx": "^2.1.1"
+ 			},
+ 			"devDependencies": {
++				"@storybook/react-vite": "^10.4.3",
+ 				"@testing-library/dom": "^10.4.1",
+-				"@testing-library/react": "^16.3.2"
++				"@testing-library/react": "^16.3.2",
++				"@wordpress/icons": "file:../icons"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -47891,6 +47814,7 @@
+ 				"@testing-library/react": "^16.3.2",
+ 				"@testing-library/user-event": "^14.6.1",
+ 				"@types/postcss-prefix-selector": "^1.16.3",
++				"@wordpress/block-library": "file:../block-library",
+ 				"deep-freeze": "^0.0.1"
+ 			},
+ 			"engines": {
+@@ -48056,6 +47980,7 @@
+ 			},
+ 			"devDependencies": {
+ 				"@testing-library/dom": "^10.4.1",
++				"@testing-library/jest-dom": "^6.9.1",
+ 				"@testing-library/react": "^16.3.2",
+ 				"@testing-library/user-event": "^14.6.1",
+ 				"@wordpress/stylelint-tools": "file:../../tools/stylelint",
+@@ -48323,6 +48248,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@ariakit/react": "^0.4.29",
++				"@ariakit/react-utils": "^0.1.2",
+ 				"@date-fns/utc": "^2.1.1",
+ 				"@emotion/cache": "^11.14.0",
+ 				"@emotion/css": "^11.13.5",
+@@ -49923,7 +49849,8 @@
+ 				"glob": "^7.1.2",
+ 				"lodash": "^4.17.21",
+ 				"mini-css-extract-plugin": "^2.9.2",
+-				"mkdirp": "^3.0.1"
++				"mkdirp": "^3.0.1",
++				"webpack": "^5.97.0"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -50040,7 +49967,7 @@
+ 			},
+ 			"peerDependencies": {
+ 				"@playwright/test": ">=1",
+-				"@types/node": "^20.17.10"
++				"@types/node": "^20.19.0"
+ 			}
+ 		},
+ 		"packages/e2e-test-utils-playwright/node_modules/web-vitals": {
+@@ -50057,6 +49984,9 @@
+ 				"@wordpress/interactivity": "file:../interactivity",
+ 				"@wordpress/interactivity-router": "file:../interactivity-router"
+ 			},
++			"devDependencies": {
++				"y-websocket": "^3.0.0"
++			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+ 				"npm": ">=8.19.2"
+@@ -50446,6 +50376,7 @@
+ 				"uuid": "^14.0.0"
+ 			},
+ 			"devDependencies": {
++				"@storybook/react-vite": "^10.4.3",
+ 				"@testing-library/dom": "^10.4.1",
+ 				"@testing-library/react": "^16.3.2",
+ 				"@testing-library/user-event": "^14.6.1",
+@@ -50692,7 +50623,8 @@
+ 			},
+ 			"devDependencies": {
+ 				"@types/eslint": "^9",
+-				"@types/estree": "^1.0.5",
++				"@types/estree": "^1.0.8",
++				"@typescript-eslint/parser": "^8.0.0",
+ 				"eslint": "^10.0.0"
+ 			},
+ 			"engines": {
+@@ -50730,12 +50662,6 @@
+ 				"node": ">=18"
+ 			}
+ 		},
+-		"packages/eslint-plugin/node_modules/@es-joy/jsdoccomment/node_modules/@types/estree": {
+-			"version": "1.0.8",
+-			"resolved": "https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz",
+-			"integrity": "sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==",
+-			"license": "MIT"
+-		},
+ 		"packages/eslint-plugin/node_modules/@types/eslint": {
+ 			"version": "9.6.1",
+ 			"resolved": "https://registry.npmjs.org/@types/eslint/-/eslint-9.6.1.tgz",
+@@ -51678,6 +51604,7 @@
+ 			"version": "0.12.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@babel/runtime": "^7.16.0",
+ 				"@wordpress/api-fetch": "file:../api-fetch",
+ 				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+@@ -51699,6 +51626,7 @@
+ 				"gl-matrix": "^3.4.3"
+ 			},
+ 			"devDependencies": {
++				"@storybook/react-vite": "^10.4.3",
+ 				"@testing-library/dom": "^10.4.1",
+ 				"@testing-library/react": "^16.3.2",
+ 				"@testing-library/user-event": "^14.6.1"
+@@ -51999,6 +51927,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/a11y": "file:../a11y",
++				"@wordpress/base-styles": "file:../base-styles",
+ 				"@wordpress/components": "file:../components",
+ 				"@wordpress/data": "file:../data",
+ 				"clsx": "^2.1.1"
+@@ -52524,7 +52453,9 @@
+ 			"devDependencies": {
+ 				"glob": "^7.1.2",
+ 				"mkdirp": "^3.0.1",
+-				"terser-webpack-plugin": "^5.3.10"
++				"rimraf": "^5.0.10",
++				"terser-webpack-plugin": "^5.3.10",
++				"webpack": "^5.97.0"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -52543,6 +52474,9 @@
+ 				"is-promise": "^4.0.0",
+ 				"rungen": "^0.3.2"
+ 			},
++			"devDependencies": {
++				"redux": "^5.0.1"
++			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+ 				"npm": ">=8.19.2"
+@@ -52561,6 +52495,7 @@
+ 				"@jest/test-result": "^29.6.2",
+ 				"@octokit/types": "^6.34.0",
+ 				"@octokit/webhooks-types": "^5.8.0",
++				"@playwright/test": "^1.58.2",
+ 				"jest-message-util": "^29.6.2"
+ 			},
+ 			"devDependencies": {
+@@ -52727,7 +52662,7 @@
+ 				"puppeteer-core": "^23.10.1",
+ 				"react-refresh": "^0.14.0",
+ 				"read-pkg-up": "^7.0.1",
+-				"resolve-bin": "^0.4.0",
++				"resolve-bin": "^1.0.1",
+ 				"rtlcss": "^4.3.0",
+ 				"sass": "^1.54.0",
+ 				"sass-loader": "^16.0.3",
+@@ -52809,6 +52744,9 @@
+ 				"@wordpress/i18n": "file:../i18n",
+ 				"@wordpress/url": "file:../url"
+ 			},
++			"devDependencies": {
++				"@types/jest": "^29.5.14"
++			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+ 				"npm": ">=8.19.2"
+@@ -52870,7 +52808,7 @@
+ 			"version": "23.41.0",
+ 			"license": "MIT",
+ 			"dependencies": {
+-				"@stylistic/stylelint-plugin": "^3.0.1",
++				"@stylistic/stylelint-plugin": "^3.1.3",
+ 				"@wordpress/theme": "file:../theme",
+ 				"stylelint-config-recommended": "^14.0.1",
+ 				"stylelint-config-recommended-scss": "^14.1.0"
+@@ -53832,6 +53770,8 @@
+ 				"@testing-library/user-event": "^14.6.1",
+ 				"@types/jest": "^29.5.14",
+ 				"@types/node": "^20.19.39",
++				"@wordpress/components": "file:../components",
++				"fast-glob": "^3.2.7",
+ 				"storybook": "^10.4.3"
+ 			},
+ 			"engines": {
+@@ -54395,6 +54335,7 @@
+ 				"@wordpress/a11y": "file:../../packages/a11y",
+ 				"@wordpress/admin-ui": "file:../../packages/admin-ui",
+ 				"@wordpress/api-fetch": "file:../../packages/api-fetch",
++				"@wordpress/base-styles": "file:../../packages/base-styles",
+ 				"@wordpress/components": "file:../../packages/components",
+ 				"@wordpress/connectors": "file:../../packages/connectors",
+ 				"@wordpress/core-data": "file:../../packages/core-data",
+@@ -54950,6 +54891,7 @@
+ 			"version": "0.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
++				"@emotion/babel-plugin": "^11.13.5",
+ 				"@emotion/is-prop-valid": "^1.4.0",
+ 				"@emotion/react": "^11.14.0",
+ 				"@emotion/styled": "^11.14.1",
+@@ -54960,13 +54902,33 @@
+ 				"@types/react": "^18.3.27",
+ 				"@vitejs/plugin-react": "^5.1.2",
+ 				"@wordpress/admin-ui": "file:../packages/admin-ui",
++				"@wordpress/base-styles": "file:../packages/base-styles",
++				"@wordpress/block-editor": "file:../packages/block-editor",
++				"@wordpress/block-library": "file:../packages/block-library",
++				"@wordpress/blocks": "file:../packages/blocks",
++				"@wordpress/components": "file:../packages/components",
++				"@wordpress/compose": "file:../packages/compose",
++				"@wordpress/data": "file:../packages/data",
++				"@wordpress/dataviews": "file:../packages/dataviews",
+ 				"@wordpress/element": "file:../packages/element",
++				"@wordpress/fields": "file:../packages/fields",
++				"@wordpress/format-library": "file:../packages/format-library",
++				"@wordpress/hooks": "file:../packages/hooks",
++				"@wordpress/i18n": "file:../packages/i18n",
+ 				"@wordpress/icons": "file:../packages/icons",
++				"@wordpress/image-cropper": "file:../packages/image-cropper",
++				"@wordpress/keycodes": "file:../packages/keycodes",
++				"@wordpress/media-fields": "file:../packages/media-fields",
++				"@wordpress/postcss-plugins-preset": "file:../packages/postcss-plugins-preset",
++				"@wordpress/primitives": "file:../packages/primitives",
+ 				"@wordpress/private-apis": "file:../packages/private-apis",
+ 				"@wordpress/route": "file:../packages/route",
+ 				"@wordpress/theme": "file:../packages/theme",
+ 				"@wordpress/ui": "file:../packages/ui",
++				"clsx": "^2.1.1",
++				"react": "^18.3.1",
+ 				"react-docgen-typescript": "^2.4.0",
++				"react-dom": "^18.3.1",
+ 				"storybook": "^10.4.3",
+ 				"storybook-addon-tag-badges": "^3.0.4",
+ 				"terser": "^5.37.0",
+@@ -55048,6 +55010,7 @@
+ 			"version": "0.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
++				"@emotion/babel-plugin": "^11.13.5",
+ 				"@playwright/test": "^1.58.2",
+ 				"@storybook/react-vite": "^10.4.3",
+ 				"@types/node": "^20.19.39",
+@@ -55071,6 +55034,7 @@
+ 				"@wordpress/scripts": "file:../../packages/scripts",
+ 				"babel-jest": "^29.7.0",
+ 				"babel-plugin-transform-import-meta": "^2.3.3",
++				"client-zip": "^2.4.5",
+ 				"glob": "^7.1.2",
+ 				"jest": "^29.6.2",
+ 				"jest-environment-jsdom": "^30.2.0",
+@@ -55094,6 +55058,7 @@
+ 				"@typescript/native-preview": "^7.0.0-dev.20260423.1",
+ 				"@wordpress/babel-preset-default": "file:../../packages/babel-preset-default",
+ 				"@wordpress/build": "file:../../packages/wp-build",
++				"@wordpress/element": "file:../../packages/element",
+ 				"@wordpress/react-19": "file:../react-19",
+ 				"@wordpress/scripts": "file:../../packages/scripts",
+ 				"babel-plugin-inline-json-import": "^0.3.2",
+@@ -55114,6 +55079,7 @@
+ 			"devDependencies": {
+ 				"@apidevtools/json-schema-ref-parser": "^11.6.4",
+ 				"@babel/core": "^7.25.7",
++				"@wordpress/docgen": "file:../../packages/docgen",
+ 				"chalk": "^4.1.1",
+ 				"change-case": "^4.1.2",
+ 				"comment-parser": "^1.1.1",
+@@ -55146,6 +55112,7 @@
+ 				"eslint-plugin-testing-library": "^7.16.0",
+ 				"glob": "^7.1.2",
+ 				"globals": "^16.0.0",
++				"react": "^18.3.1",
+ 				"typescript-eslint": "^8.57.1"
+ 			}
+ 		},
+@@ -55223,6 +55190,8 @@
+ 			"version": "1.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
++				"@wordpress/stylelint-config": "file:../../packages/stylelint-config",
++				"@wordpress/theme": "file:../../packages/theme",
+ 				"stylelint-plugin-logical-css": "^1.2.3"
+ 			}
+ 		},
+@@ -55231,7 +55200,7 @@
+ 			"version": "0.0.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+-				"@mawesome/dependency-audit": "^0.4.4",
++				"@mawesome/dependency-audit": "^0.4.5",
+ 				"@wordpress/create-block": "file:../../packages/create-block",
+ 				"@wordpress/scripts": "file:../../packages/scripts",
+ 				"chalk": "^4.1.1",
+diff --git a/package.json b/package.json
+index 3c16469e0edf97..e4d17772a3503c 100644
+--- a/package.json
++++ b/package.json
+@@ -134,7 +134,7 @@
+ 		"other:cherry-pick": "npm run --workspace @wordpress/release-tools cherry-pick --",
+ 		"other:generate-php-sync-issue": "npm run --workspace @wordpress/release-tools generate-php-sync-issue --",
+ 		"other:update-packages:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer update --no-interaction",
+-		"postinstall": "patch-package",
++		"postinstall": "node ./patches/apply-patches.mjs",
+ 		"prepare": "husky install",
+ 		"prepublishOnly": "npm run build",
+ 		"rtc:http": "node ./test/e2e/bin/rtc-dev.mjs --mode=http",
+diff --git a/packages/admin-ui/package.json b/packages/admin-ui/package.json
+index b9efbdbadf8b57..fb2cf88d24486f 100644
+--- a/packages/admin-ui/package.json
++++ b/packages/admin-ui/package.json
+@@ -54,8 +54,10 @@
+ 		"clsx": "^2.1.1"
+ 	},
+ 	"devDependencies": {
++		"@storybook/react-vite": "^10.4.3",
+ 		"@testing-library/dom": "^10.4.1",
+-		"@testing-library/react": "^16.3.2"
++		"@testing-library/react": "^16.3.2",
++		"@wordpress/icons": "file:../icons"
+ 	},
+ 	"peerDependencies": {
+ 		"@types/react": "^18.3.27",
+diff --git a/packages/block-editor/package.json b/packages/block-editor/package.json
+index 4156080b0ccb6e..d6e4c33d74a4b1 100644
+--- a/packages/block-editor/package.json
++++ b/packages/block-editor/package.json
+@@ -118,6 +118,7 @@
+ 		"@testing-library/react": "^16.3.2",
+ 		"@testing-library/user-event": "^14.6.1",
+ 		"@types/postcss-prefix-selector": "^1.16.3",
++		"@wordpress/block-library": "file:../block-library",
+ 		"deep-freeze": "^0.0.1"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/block-editor/src/hooks/test/cross-origin-isolation.js b/packages/block-editor/src/hooks/test/cross-origin-isolation.js
+index c3276700fe523e..43ea3785c41110 100644
+--- a/packages/block-editor/src/hooks/test/cross-origin-isolation.js
++++ b/packages/block-editor/src/hooks/test/cross-origin-isolation.js
+@@ -1,7 +1,3 @@
+-/**
+- * @jest-environment jsdom
+- */
+-
+ describe( 'cross-origin-isolation', () => {
+ 	let originalCrossOriginIsolated;
+ 	let originalBody;
+diff --git a/packages/block-library/package.json b/packages/block-library/package.json
+index 1718434f69246f..a6563ce16acb57 100644
+--- a/packages/block-library/package.json
++++ b/packages/block-library/package.json
+@@ -142,6 +142,7 @@
+ 	},
+ 	"devDependencies": {
+ 		"@testing-library/dom": "^10.4.1",
++		"@testing-library/jest-dom": "^6.9.1",
+ 		"@testing-library/react": "^16.3.2",
+ 		"@testing-library/user-event": "^14.6.1",
+ 		"@wordpress/stylelint-tools": "file:../../tools/stylelint",
+diff --git a/packages/block-library/src/image/test/use-open-image-media-editor-modal.js b/packages/block-library/src/image/test/use-open-image-media-editor-modal.js
+index 25c246bfd22e43..1fad75cd8fa589 100644
+--- a/packages/block-library/src/image/test/use-open-image-media-editor-modal.js
++++ b/packages/block-library/src/image/test/use-open-image-media-editor-modal.js
+@@ -1,7 +1,3 @@
+-/**
+- * @jest-environment jsdom
+- */
+-
+ /**
+  * External dependencies
+  */
+diff --git a/packages/block-library/src/navigation-link/shared/test/controls.js b/packages/block-library/src/navigation-link/shared/test/controls.js
+index 49e04e59fbe328..185fee38fb7d19 100644
+--- a/packages/block-library/src/navigation-link/shared/test/controls.js
++++ b/packages/block-library/src/navigation-link/shared/test/controls.js
+@@ -1,7 +1,3 @@
+-/**
+- * @jest-environment jsdom
+- */
+-
+ /**
+  * External dependencies
+  */
+diff --git a/packages/block-library/src/navigation-link/shared/test/use-entity-binding.js b/packages/block-library/src/navigation-link/shared/test/use-entity-binding.js
+index 7e6b097ba83a21..6bcd96b0c08d92 100644
+--- a/packages/block-library/src/navigation-link/shared/test/use-entity-binding.js
++++ b/packages/block-library/src/navigation-link/shared/test/use-entity-binding.js
+@@ -1,7 +1,3 @@
+-/**
+- * @jest-environment jsdom
+- */
+-
+ /**
+  * External dependencies
+  */
+diff --git a/packages/block-library/src/navigation-link/shared/test/use-handle-link-change.test.js b/packages/block-library/src/navigation-link/shared/test/use-handle-link-change.test.js
+index 910cd212df310e..455167b91aea60 100644
+--- a/packages/block-library/src/navigation-link/shared/test/use-handle-link-change.test.js
++++ b/packages/block-library/src/navigation-link/shared/test/use-handle-link-change.test.js
+@@ -1,7 +1,3 @@
+-/**
+- * @jest-environment jsdom
+- */
+-
+ /**
+  * External dependencies
+  */
+diff --git a/packages/block-library/src/navigation-link/shared/test/use-link-preview.test.js b/packages/block-library/src/navigation-link/shared/test/use-link-preview.test.js
+index 966c8af91ce30a..fa05927161e27f 100644
+--- a/packages/block-library/src/navigation-link/shared/test/use-link-preview.test.js
++++ b/packages/block-library/src/navigation-link/shared/test/use-link-preview.test.js
+@@ -1,7 +1,3 @@
+-/**
+- * @jest-environment jsdom
+- */
+-
+ /**
+  * External dependencies
+  */
+diff --git a/packages/block-library/src/playlist/test/edit.js b/packages/block-library/src/playlist/test/edit.js
+index 31a831f4c2e018..d152089b94f4b3 100644
+--- a/packages/block-library/src/playlist/test/edit.js
++++ b/packages/block-library/src/playlist/test/edit.js
+@@ -1,7 +1,3 @@
+-/**
+- * @jest-environment jsdom
+- */
+-
+ /**
+  * Internal dependencies
+  */
+diff --git a/packages/block-library/src/utils/test/waveform-player.js b/packages/block-library/src/utils/test/waveform-player.js
+index 192f10c0f3ee1d..a9c51274d6652b 100644
+--- a/packages/block-library/src/utils/test/waveform-player.js
++++ b/packages/block-library/src/utils/test/waveform-player.js
+@@ -1,7 +1,3 @@
+-/**
+- * @jest-environment jsdom
+- */
+-
+ /**
+  * External dependencies
+  */
+diff --git a/packages/block-library/src/utils/test/waveform-utils.js b/packages/block-library/src/utils/test/waveform-utils.js
+index 806634f3a98c61..c931ce2347a8e9 100644
+--- a/packages/block-library/src/utils/test/waveform-utils.js
++++ b/packages/block-library/src/utils/test/waveform-utils.js
+@@ -1,7 +1,3 @@
+-/**
+- * @jest-environment jsdom
+- */
+-
+ /**
+  * External dependencies
+  */
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 08beac001cc808..d8c0b414337377 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -51,6 +51,7 @@
+ 	],
+ 	"dependencies": {
+ 		"@ariakit/react": "^0.4.29",
++		"@ariakit/react-utils": "^0.1.2",
+ 		"@date-fns/utc": "^2.1.1",
+ 		"@emotion/cache": "^11.14.0",
+ 		"@emotion/css": "^11.13.5",
+diff --git a/packages/dependency-extraction-webpack-plugin/package.json b/packages/dependency-extraction-webpack-plugin/package.json
+index 326f3af48b37c1..111cbe76f5186a 100644
+--- a/packages/dependency-extraction-webpack-plugin/package.json
++++ b/packages/dependency-extraction-webpack-plugin/package.json
+@@ -46,7 +46,8 @@
+ 		"glob": "^7.1.2",
+ 		"lodash": "^4.17.21",
+ 		"mini-css-extract-plugin": "^2.9.2",
+-		"mkdirp": "^3.0.1"
++		"mkdirp": "^3.0.1",
++		"webpack": "^5.97.0"
+ 	},
+ 	"peerDependencies": {
+ 		"webpack": "^5.0.0"
+diff --git a/packages/dependency-extraction-webpack-plugin/test/__snapshots__/build.js.snap b/packages/dependency-extraction-webpack-plugin/test/__snapshots__/build.js.snap
+index 0ca74d8868adcb..f3f0f995f7fe3a 100644
+--- a/packages/dependency-extraction-webpack-plugin/test/__snapshots__/build.js.snap
++++ b/packages/dependency-extraction-webpack-plugin/test/__snapshots__/build.js.snap
+@@ -155,7 +155,7 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`module-renames\` sh
+ `;
+ 
+ exports[`DependencyExtractionWebpackPlugin modules Webpack \`no-default\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+-"<?php return array('dependencies' => array(), 'version' => 'fcac76462c8a830d8d92', 'type' => 'module');
++"<?php return array('dependencies' => array(), 'version' => 'de0fdf57aa379716f7e3', 'type' => 'module');
+ "
+ `;
+ 
+@@ -265,7 +265,7 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`polyfill-magic-comm
+ exports[`DependencyExtractionWebpackPlugin modules Webpack \`polyfill-magic-comment-minified\` should produce expected output: External modules should match snapshot 1`] = `[]`;
+ 
+ exports[`DependencyExtractionWebpackPlugin modules Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `
+-"<?php return array('dependencies' => array('@wordpress/blob'), 'version' => '8a4fbb1aeaeb24991a36', 'type' => 'module', 'handle' => 'runtime-chunk-single-modules-a');
++"<?php return array('dependencies' => array('@wordpress/blob'), 'version' => 'ca4f2008446c568f6ae0', 'type' => 'module', 'handle' => 'runtime-chunk-single-modules-a');
+ "
+ `;
+ 
+@@ -556,7 +556,7 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`module-renames\` sh
+ `;
+ 
+ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`no-default\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
+-"<?php return array('dependencies' => array(), 'version' => 'be8b28b738de0d6b883a');
++"<?php return array('dependencies' => array(), 'version' => 'b5e0a04ce7c050b80c34');
+ "
+ `;
+ 
+@@ -681,7 +681,7 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`polyfill-magic-comm
+ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`polyfill-magic-comment-minified\` should produce expected output: External modules should match snapshot 1`] = `[]`;
+ 
+ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`runtime-chunk-single\` should produce expected output: Asset file 'a.asset.php' should match snapshot 1`] = `
+-"<?php return array('dependencies' => array('wp-blob'), 'version' => 'cdbe22bb74f37e307523', 'handle' => 'runtime-chunk-single-scripts-a');
++"<?php return array('dependencies' => array('wp-blob'), 'version' => '3d965699198538c4f837', 'handle' => 'runtime-chunk-single-scripts-a');
+ "
+ `;
+ 
+diff --git a/packages/e2e-test-utils-playwright/package.json b/packages/e2e-test-utils-playwright/package.json
+index 0a41c290d105b8..e0f09ad07c0f18 100644
+--- a/packages/e2e-test-utils-playwright/package.json
++++ b/packages/e2e-test-utils-playwright/package.json
+@@ -49,7 +49,7 @@
+ 	},
+ 	"peerDependencies": {
+ 		"@playwright/test": ">=1",
+-		"@types/node": "^20.17.10"
++		"@types/node": "^20.19.0"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/e2e-tests/package.json b/packages/e2e-tests/package.json
+index 31115d0c648d34..0319db8537d9a9 100644
+--- a/packages/e2e-tests/package.json
++++ b/packages/e2e-tests/package.json
+@@ -27,6 +27,9 @@
+ 		"@wordpress/interactivity": "file:../interactivity",
+ 		"@wordpress/interactivity-router": "file:../interactivity-router"
+ 	},
++	"devDependencies": {
++		"y-websocket": "^3.0.0"
++	},
+ 	"peerDependencies": {
+ 		"jest": ">=29",
+ 		"puppeteer-core": ">=23",
+diff --git a/packages/e2e-tests/plugins/rtc-websocket-provider/src/index.js b/packages/e2e-tests/plugins/rtc-websocket-provider/src/index.js
+index d2fde096fe9e0f..ace27e03dddee6 100644
+--- a/packages/e2e-tests/plugins/rtc-websocket-provider/src/index.js
++++ b/packages/e2e-tests/plugins/rtc-websocket-provider/src/index.js
+@@ -7,7 +7,6 @@
+  * window.__gutenbergTestWebSocketSync.rooms that the Playwright fixtures poll.
+  */
+ 
+-// eslint-disable-next-line import/no-extraneous-dependencies -- declared in test/e2e/package.json, only loaded by the WS e2e harness.
+ import { WebsocketProvider } from 'y-websocket';
+ 
+ const TEST_PROVIDER_NAMESPACE = 'gutenberg-test/rtc-websocket-provider';
+diff --git a/packages/editor/package.json b/packages/editor/package.json
+index 2b8bb076ca9e38..5e09b7003b89cb 100644
+--- a/packages/editor/package.json
++++ b/packages/editor/package.json
+@@ -117,6 +117,7 @@
+ 		"uuid": "^14.0.0"
+ 	},
+ 	"devDependencies": {
++		"@storybook/react-vite": "^10.4.3",
+ 		"@testing-library/dom": "^10.4.1",
+ 		"@testing-library/react": "^16.3.2",
+ 		"@testing-library/user-event": "^14.6.1",
+diff --git a/packages/eslint-plugin/configs/recommended-with-formatting.js b/packages/eslint-plugin/configs/recommended-with-formatting.js
+index 50565dd1cafb41..725020a12aa98c 100644
+--- a/packages/eslint-plugin/configs/recommended-with-formatting.js
++++ b/packages/eslint-plugin/configs/recommended-with-formatting.js
+@@ -36,7 +36,9 @@ module.exports = [
+ 		settings: {
+ 			'import/extensions': [ '.js', '.jsx' ],
+ 			'import/resolver': {
+-				typescript: true,
++				[ require.resolve(
++					'eslint-import-resolver-typescript'
++				) ]: true,
+ 			},
+ 		},
+ 		rules: {
+diff --git a/packages/eslint-plugin/configs/recommended.js b/packages/eslint-plugin/configs/recommended.js
+index 66e5507f3b0b18..85e469d3d693b1 100644
+--- a/packages/eslint-plugin/configs/recommended.js
++++ b/packages/eslint-plugin/configs/recommended.js
+@@ -45,9 +45,10 @@ if ( isPackageInstalled( 'typescript' ) ) {
+ 		{
+ 			settings: {
+ 				'import/resolver': {
+-					typescript: {
+-						extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
+-					},
++					[ require.resolve( 'eslint-import-resolver-typescript' ) ]:
++						{
++							extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
++						},
+ 				},
+ 			},
+ 			ignores: [ '**/*.d.ts' ],
+diff --git a/packages/eslint-plugin/package.json b/packages/eslint-plugin/package.json
+index 207fb6243e3614..a55bdf1f29b27f 100644
+--- a/packages/eslint-plugin/package.json
++++ b/packages/eslint-plugin/package.json
+@@ -64,7 +64,8 @@
+ 	},
+ 	"devDependencies": {
+ 		"@types/eslint": "^9",
+-		"@types/estree": "^1.0.5",
++		"@types/estree": "^1.0.8",
++		"@typescript-eslint/parser": "^8.0.0",
+ 		"eslint": "^10.0.0"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/eslint-plugin/rules/no-unsafe-wp-apis.js b/packages/eslint-plugin/rules/no-unsafe-wp-apis.js
+index 75ae9d91ec5047..cf88893a7afb4a 100644
+--- a/packages/eslint-plugin/rules/no-unsafe-wp-apis.js
++++ b/packages/eslint-plugin/rules/no-unsafe-wp-apis.js
+@@ -63,7 +63,10 @@ function makeListener( { allowedImports, context } ) {
+ 				return;
+ 			}
+ 
+-			const importedName = specifierNode.imported.name;
++			const importedName =
++				specifierNode.imported.type === 'Identifier'
++					? specifierNode.imported.name
++					: String( specifierNode.imported.value );
+ 
+ 			if (
+ 				! importedName.startsWith( '__unstable' ) &&
+diff --git a/packages/grid/src/dashboard-grid/test/keyboard-activation.test.tsx b/packages/grid/src/dashboard-grid/test/keyboard-activation.test.tsx
+index e781d335ebe225..245eaf6bb03a54 100644
+--- a/packages/grid/src/dashboard-grid/test/keyboard-activation.test.tsx
++++ b/packages/grid/src/dashboard-grid/test/keyboard-activation.test.tsx
+@@ -1,7 +1,3 @@
+-/**
+- * @jest-environment jsdom
+- */
+-
+ /**
+  * External dependencies
+  */
+diff --git a/packages/grid/src/dashboard-lanes/test/keyboard-activation.test.tsx b/packages/grid/src/dashboard-lanes/test/keyboard-activation.test.tsx
+index 7e1e5cf2366ec4..5f958c5c9d740a 100644
+--- a/packages/grid/src/dashboard-lanes/test/keyboard-activation.test.tsx
++++ b/packages/grid/src/dashboard-lanes/test/keyboard-activation.test.tsx
+@@ -1,7 +1,3 @@
+-/**
+- * @jest-environment jsdom
+- */
+-
+ /**
+  * External dependencies
+  */
+diff --git a/packages/grid/src/dashboard-lanes/test/use-lane-placement.test.tsx b/packages/grid/src/dashboard-lanes/test/use-lane-placement.test.tsx
+index 626bc904f5e634..f130c5f8393c84 100644
+--- a/packages/grid/src/dashboard-lanes/test/use-lane-placement.test.tsx
++++ b/packages/grid/src/dashboard-lanes/test/use-lane-placement.test.tsx
+@@ -1,7 +1,3 @@
+-/**
+- * @jest-environment jsdom
+- */
+-
+ /**
+  * External dependencies
+  */
+diff --git a/packages/media-editor/package.json b/packages/media-editor/package.json
+index 34b8ba31c7a50a..78e810dfc5c861 100644
+--- a/packages/media-editor/package.json
++++ b/packages/media-editor/package.json
+@@ -43,6 +43,7 @@
+ 		"build-module/store/index.mjs"
+ 	],
+ 	"dependencies": {
++		"@babel/runtime": "^7.16.0",
+ 		"@wordpress/api-fetch": "file:../api-fetch",
+ 		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+@@ -64,6 +65,7 @@
+ 		"gl-matrix": "^3.4.3"
+ 	},
+ 	"devDependencies": {
++		"@storybook/react-vite": "^10.4.3",
+ 		"@testing-library/dom": "^10.4.1",
+ 		"@testing-library/react": "^16.3.2",
+ 		"@testing-library/user-event": "^14.6.1"
+diff --git a/packages/media-utils/src/components/media-upload-modal/test/use-upload-status.test.ts b/packages/media-utils/src/components/media-upload-modal/test/use-upload-status.test.ts
+index 51152978c2e470..13392389d70c25 100644
+--- a/packages/media-utils/src/components/media-upload-modal/test/use-upload-status.test.ts
++++ b/packages/media-utils/src/components/media-upload-modal/test/use-upload-status.test.ts
+@@ -1,7 +1,3 @@
+-/**
+- * @jest-environment jsdom
+- */
+-
+ /**
+  * External dependencies
+  */
+diff --git a/packages/notices/package.json b/packages/notices/package.json
+index 845bf585fbaa53..97350b857d02f8 100644
+--- a/packages/notices/package.json
++++ b/packages/notices/package.json
+@@ -49,6 +49,7 @@
+ 	],
+ 	"dependencies": {
+ 		"@wordpress/a11y": "file:../a11y",
++		"@wordpress/base-styles": "file:../base-styles",
+ 		"@wordpress/components": "file:../components",
+ 		"@wordpress/data": "file:../data",
+ 		"clsx": "^2.1.1"
+diff --git a/packages/readable-js-assets-webpack-plugin/package.json b/packages/readable-js-assets-webpack-plugin/package.json
+index 606818f9bdcd7a..6e59130a3187e7 100644
+--- a/packages/readable-js-assets-webpack-plugin/package.json
++++ b/packages/readable-js-assets-webpack-plugin/package.json
+@@ -35,7 +35,9 @@
+ 	"devDependencies": {
+ 		"glob": "^7.1.2",
+ 		"mkdirp": "^3.0.1",
+-		"terser-webpack-plugin": "^5.3.10"
++		"rimraf": "^5.0.10",
++		"terser-webpack-plugin": "^5.3.10",
++		"webpack": "^5.97.0"
+ 	},
+ 	"peerDependencies": {
+ 		"webpack": "^4.8.3 || ^5.0.0"
+diff --git a/packages/redux-routine/package.json b/packages/redux-routine/package.json
+index 37278a5e7ceabc..a40e55aeacd679 100644
+--- a/packages/redux-routine/package.json
++++ b/packages/redux-routine/package.json
+@@ -50,6 +50,9 @@
+ 		"is-promise": "^4.0.0",
+ 		"rungen": "^0.3.2"
+ 	},
++	"devDependencies": {
++		"redux": "^5.0.1"
++	},
+ 	"peerDependencies": {
+ 		"redux": ">=4"
+ 	},
+diff --git a/packages/report-flaky-tests/package.json b/packages/report-flaky-tests/package.json
+index 1b073deb784f60..d21b5d004d1358 100644
+--- a/packages/report-flaky-tests/package.json
++++ b/packages/report-flaky-tests/package.json
+@@ -38,6 +38,7 @@
+ 		"@jest/test-result": "^29.6.2",
+ 		"@octokit/types": "^6.34.0",
+ 		"@octokit/webhooks-types": "^5.8.0",
++		"@playwright/test": "^1.58.2",
+ 		"jest-message-util": "^29.6.2"
+ 	},
+ 	"devDependencies": {
+diff --git a/packages/scripts/package.json b/packages/scripts/package.json
+index b90d56e2c8afd4..a218dbeed19a9d 100644
+--- a/packages/scripts/package.json
++++ b/packages/scripts/package.json
+@@ -80,7 +80,7 @@
+ 		"puppeteer-core": "^23.10.1",
+ 		"react-refresh": "^0.14.0",
+ 		"read-pkg-up": "^7.0.1",
+-		"resolve-bin": "^0.4.0",
++		"resolve-bin": "^1.0.1",
+ 		"rtlcss": "^4.3.0",
+ 		"sass": "^1.54.0",
+ 		"sass-loader": "^16.0.3",
+diff --git a/packages/server-side-render/package.json b/packages/server-side-render/package.json
+index 2f55518f8af880..8b357d31413323 100644
+--- a/packages/server-side-render/package.json
++++ b/packages/server-side-render/package.json
+@@ -54,6 +54,9 @@
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/url": "file:../url"
+ 	},
++	"devDependencies": {
++		"@types/jest": "^29.5.14"
++	},
+ 	"peerDependencies": {
+ 		"@types/react": "^18.3.27",
+ 		"react": "^18.0.0",
+diff --git a/packages/stylelint-config/package.json b/packages/stylelint-config/package.json
+index fa427b02a4fb79..25bd8df7e18250 100644
+--- a/packages/stylelint-config/package.json
++++ b/packages/stylelint-config/package.json
+@@ -41,7 +41,7 @@
+ 		"./package.json": "./package.json"
+ 	},
+ 	"dependencies": {
+-		"@stylistic/stylelint-plugin": "^3.0.1",
++		"@stylistic/stylelint-plugin": "^3.1.3",
+ 		"@wordpress/theme": "file:../theme",
+ 		"stylelint-config-recommended": "^14.0.1",
+ 		"stylelint-config-recommended-scss": "^14.1.0"
+diff --git a/packages/stylelint-config/test/__snapshots__/scss.js.snap b/packages/stylelint-config/test/__snapshots__/scss.js.snap
+index a1abeef86ac963..4c3d6aa802a513 100644
+--- a/packages/stylelint-config/test/__snapshots__/scss.js.snap
++++ b/packages/stylelint-config/test/__snapshots__/scss.js.snap
+@@ -40,8 +40,8 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
+   },
+   {
+     "column": 2,
+-    "endColumn": 3,
+-    "endLine": 12,
++    "endColumn": 1,
++    "endLine": 13,
+     "line": 12,
+     "rule": "scss/at-if-closing-brace-newline-after",
+     "severity": "error",
+@@ -49,8 +49,8 @@ exports[`flags warnings with invalid scss snapshot matches warnings 1`] = `
+   },
+   {
+     "column": 2,
+-    "endColumn": 3,
+-    "endLine": 12,
++    "endColumn": 1,
++    "endLine": 13,
+     "line": 12,
+     "rule": "scss/at-if-closing-brace-space-after",
+     "severity": "error",
+diff --git a/packages/theme/src/types.ts b/packages/theme/src/types.ts
+index 3a68f28e6ebc10..9192e3a230cf9a 100644
+--- a/packages/theme/src/types.ts
++++ b/packages/theme/src/types.ts
+@@ -1,7 +1,16 @@
+-import { type ReactNode } from 'react';
++import { type CSSProperties, type ReactNode } from 'react';
+ 
+ export type CornerRadiusPreset = 'none' | 'subtle' | 'moderate' | 'pronounced';
+ 
++export interface ThemeProviderStyles {
++	resolvedSettings: {
++		color: { primary: string; background: string };
++		cursor: { control: 'default' | 'pointer' } | undefined;
++		cornerRadius: CornerRadiusPreset;
++	};
++	themeProviderStyles: CSSProperties;
++}
++
+ export interface ThemeProviderSettings {
+ 	/**
+ 	 * The set of color options to apply to the theme.
+diff --git a/packages/theme/src/use-theme-provider-styles.ts b/packages/theme/src/use-theme-provider-styles.ts
+index 7e003139582420..309023ecabc85a 100644
+--- a/packages/theme/src/use-theme-provider-styles.ts
++++ b/packages/theme/src/use-theme-provider-styles.ts
+@@ -19,7 +19,7 @@ import {
+ 	type RampResult,
+ } from './color-ramps';
+ import { getColorString } from './color-ramps/lib/color-utils';
+-import type { ThemeProviderProps } from './types';
++import type { ThemeProviderProps, ThemeProviderStyles } from './types';
+ 
+ type Entry = [ string, string ];
+ 
+@@ -168,7 +168,7 @@ export function useThemeProviderStyles( {
+ 	color?: ThemeProviderProps[ 'color' ];
+ 	cursor?: ThemeProviderProps[ 'cursor' ];
+ 	cornerRadius?: ThemeProviderProps[ 'cornerRadius' ];
+-} = {} ) {
++} = {} ): ThemeProviderStyles {
+ 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
+ 
+ 	// Compute settings:
+diff --git a/packages/theme/tsconfig.bin.json b/packages/theme/tsconfig.bin.json
+index ed274e62a24cd3..7701ce1e4303b6 100644
+--- a/packages/theme/tsconfig.bin.json
++++ b/packages/theme/tsconfig.bin.json
+@@ -5,7 +5,8 @@
+ 		"composite": true,
+ 		"rootDir": ".",
+ 		"noEmit": true,
+-		"allowImportingTsExtensions": true
++		"allowImportingTsExtensions": true,
++		"types": [ "style-imports" ]
+ 	},
+ 	"include": [ "bin", "terrazzo.config.ts" ],
+ 	"exclude": [],
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index bb54bbf769e197..a5cf69942957a7 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -66,6 +66,8 @@
+ 		"@testing-library/user-event": "^14.6.1",
+ 		"@types/jest": "^29.5.14",
+ 		"@types/node": "^20.19.39",
++		"@wordpress/components": "file:../components",
++		"fast-glob": "^3.2.7",
+ 		"storybook": "^10.4.3"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/ui/src/utils/use-deprioritized-initial-focus.ts b/packages/ui/src/utils/use-deprioritized-initial-focus.ts
+index c729092a345e8e..9bba162e12de9b 100644
+--- a/packages/ui/src/utils/use-deprioritized-initial-focus.ts
++++ b/packages/ui/src/utils/use-deprioritized-initial-focus.ts
+@@ -86,5 +86,10 @@ export function useDeprioritizedInitialFocus( {
+ 		};
+ 	}
+ 
+-	return { resolvedInitialFocus, popupRef };
++	// Explicit return type to prevent TS from inferring a non-portable
++	// path to a transitive dependency (`@base-ui/utils`).
++	return { resolvedInitialFocus, popupRef } as {
++		resolvedInitialFocus: InitialFocus;
++		popupRef: React.RefObject< HTMLDivElement >;
++	};
+ }
+diff --git a/packages/wp-build/lib/build.mjs b/packages/wp-build/lib/build.mjs
+index 448e9ea498c23d..efa5cc8546cabd 100755
+--- a/packages/wp-build/lib/build.mjs
++++ b/packages/wp-build/lib/build.mjs
+@@ -203,6 +203,8 @@ function getSassOptions( workingDir ) {
+ 			path.join( workingDir, 'node_modules' ),
+ 			// Root node_modules (for npm hoisted deps)
+ 			path.join( ROOT_DIR, 'node_modules' ),
++			// Resolves theme (imported by base-styles' mixins)
++			path.join( PACKAGES_DIR, 'wp-build', 'node_modules' ),
+ 			// For local imports like @use "mixins"
+ 			path.join( PACKAGES_DIR, 'base-styles' ),
+ 		],
+diff --git a/patches/apply-patches.mjs b/patches/apply-patches.mjs
+new file mode 100644
+index 00000000000000..de2eede834e4e0
+--- /dev/null
++++ b/patches/apply-patches.mjs
+@@ -0,0 +1,172 @@
++/* eslint-disable no-console */
++/**
++ * Custom patch applier for npm install-strategy=linked.
++ *
++ * With the linked strategy, dependencies are stored in node_modules/.store/
++ * instead of being nested under consuming packages. patch-package can't find
++ * them at the expected nested paths, so this script locates packages in .store/
++ * and applies patches using the `patch` command.
++ *
++ * patch-package doesn't work well.
++ * @see https://github.com/ds300/patch-package/pull/596
++ */
++
++import fs from 'node:fs';
++import path from 'node:path';
++import { execSync } from 'node:child_process';
++import { fileURLToPath } from 'node:url';
++
++const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
++const patchesDir = __dirname;
++const rootDir = path.join( __dirname, '..' );
++const nodeModulesDir = path.join( rootDir, 'node_modules' );
++const storeDir = path.join( nodeModulesDir, '.store' );
++
++/**
++ * Find a package in the .store directory by name and version.
++ *
++ * @param {string} packageName - Package name (e.g. "lighthouse")
++ * @param {string} version     - Package version (e.g. "12.2.2")
++ * @return {string|null} Path to the package directory, or null if not found.
++ */
++function findInStore( packageName, version ) {
++	if ( ! fs.existsSync( storeDir ) ) {
++		return null;
++	}
++
++	const prefix = `${ packageName }@${ version }-`;
++	const entries = fs.readdirSync( storeDir );
++	const match = entries.find( ( entry ) => entry.startsWith( prefix ) );
++
++	if ( match ) {
++		const pkgPath = path.join(
++			storeDir,
++			match,
++			'node_modules',
++			packageName
++		);
++		if ( fs.existsSync( pkgPath ) ) {
++			return pkgPath;
++		}
++	}
++
++	return null;
++}
++
++/**
++ * Parse a patch filename to extract package name and version.
++ * Format: <package-name>+<version>.patch
++ * Scoped: @scope+name+<version>.patch
++ *
++ * @param {string} filename - The patch filename.
++ * @return {{ packageName: string, version: string }|null} Parsed info or null.
++ */
++function parsePatchFilename( filename ) {
++	const match = filename.match( /^(.+)\+(\d+\.\d+\.\d+.*)\.patch$/ );
++	if ( ! match ) {
++		return null;
++	}
++
++	// Convert + back to / for scoped packages (e.g. @scope+name -> @scope/name)
++	const packageName = match[ 1 ].replace( /\+/g, '/' );
++	return { packageName, version: match[ 2 ] };
++}
++
++// Read all .patch files from the patches directory.
++const patchFiles = fs
++	.readdirSync( patchesDir )
++	.filter( ( f ) => f.endsWith( '.patch' ) );
++
++let hasErrors = false;
++
++for ( const patchFile of patchFiles ) {
++	const parsed = parsePatchFilename( patchFile );
++	if ( ! parsed ) {
++		console.log( `  Skipping ${ patchFile } (could not parse filename)` );
++		continue;
++	}
++
++	const { packageName, version } = parsed;
++
++	// Try the standard node_modules path first (for non-linked installs).
++	let packageDir = path.join( nodeModulesDir, packageName );
++
++	if ( ! fs.existsSync( packageDir ) ) {
++		// Try the .store directory for linked installs.
++		packageDir = findInStore( packageName, version );
++	}
++
++	if ( ! packageDir ) {
++		console.error(
++			`  Error: Could not find ${ packageName }@${ version } in node_modules or .store`
++		);
++		hasErrors = true;
++		continue;
++	}
++
++	// Read the patch and rewrite paths to target the actual package location.
++	const patchPath = path.join( patchesDir, patchFile );
++	let patchContent = fs.readFileSync( patchPath, 'utf8' );
++
++	// The patch has paths like: a/node_modules/<pkg>/file → rewrite to actual location.
++	// Always use forward slashes — git apply rejects backslashes on Windows.
++	const relativePkgDir = path
++		.relative( rootDir, packageDir )
++		.split( path.sep )
++		.join( '/' );
++	const pathPattern = new RegExp(
++		`(a|b)/node_modules/${ packageName.replace(
++			/[.*+?^${}()|[\]\\]/g,
++			'\\$&'
++		) }/`,
++		'g'
++	);
++	patchContent = patchContent.replace(
++		pathPattern,
++		`$1/${ relativePkgDir }/`
++	);
++
++	// Write temp patch and apply it.
++	const tmpPatch = path.join( patchesDir, `.tmp-${ patchFile }` );
++	fs.writeFileSync( tmpPatch, patchContent );
++
++	try {
++		// Check if the patch is already applied (reverse dry-run succeeds).
++		try {
++			execSync(
++				`git apply --check --reverse --ignore-whitespace "${ tmpPatch }"`,
++				{ cwd: rootDir, stdio: 'pipe' }
++			);
++			// If reverse dry-run succeeds, patch is already applied.
++			console.log(
++				`  ✔ ${ patchFile } already applied to ${ packageName }@${ version }`
++			);
++			continue;
++		} catch {
++			// Reverse failed — patch is not yet applied, proceed.
++		}
++
++		execSync( `git apply --ignore-whitespace "${ tmpPatch }"`, {
++			cwd: rootDir,
++			stdio: 'pipe',
++		} );
++		console.log(
++			`  ✔ Applied ${ patchFile } to ${ packageName }@${ version }`
++		);
++	} catch ( error ) {
++		const stderr = error.stderr?.toString() || '';
++		const stdout = error.stdout?.toString() || '';
++		console.error(
++			`  ✖ Failed to apply ${ patchFile }: ${ stderr || stdout }`
++		);
++		hasErrors = true;
++	} finally {
++		fs.unlinkSync( tmpPatch );
++	}
++}
++
++if ( hasErrors ) {
++	process.exit( 1 );
++}
++
++/* eslint-enable no-console */
+diff --git a/routes/connectors-home/package.json b/routes/connectors-home/package.json
+index 8afeb8c604510a..f9d313b19e665a 100644
+--- a/routes/connectors-home/package.json
++++ b/routes/connectors-home/package.json
+@@ -12,6 +12,7 @@
+ 		"@wordpress/a11y": "file:../../packages/a11y",
+ 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
+ 		"@wordpress/api-fetch": "file:../../packages/api-fetch",
++		"@wordpress/base-styles": "file:../../packages/base-styles",
+ 		"@wordpress/components": "file:../../packages/components",
+ 		"@wordpress/connectors": "file:../../packages/connectors",
+ 		"@wordpress/core-data": "file:../../packages/core-data",
+diff --git a/routes/dashboard/hooks/use-dashboard-layout/test/use-dashboard-layout.test.ts b/routes/dashboard/hooks/use-dashboard-layout/test/use-dashboard-layout.test.ts
+index f7dfaec1180588..b0fe4538a4fec6 100644
+--- a/routes/dashboard/hooks/use-dashboard-layout/test/use-dashboard-layout.test.ts
++++ b/routes/dashboard/hooks/use-dashboard-layout/test/use-dashboard-layout.test.ts
+@@ -1,7 +1,3 @@
+-/**
+- * @jest-environment jsdom
+- */
+-
+ /**
+  * External dependencies
+  */
+diff --git a/storybook/main.ts b/storybook/main.ts
+index f75e32ebded71e..e140db43e1c90c 100644
+--- a/storybook/main.ts
++++ b/storybook/main.ts
+@@ -1,4 +1,5 @@
+ import path from 'node:path';
++import { fileURLToPath } from 'node:url';
+ import {
+ 	type InlineConfig,
+ 	type PluginOption,
+@@ -10,6 +11,17 @@ import type { StorybookConfig } from '@storybook/react-vite';
+ import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
+ import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
+ 
++/**
++ * @see https://storybook.js.org/docs/faq#how-do-i-fix-module-resolution-in-special-environments
++ */
++function getAbsolutePath( packageName: string ) {
++	return path.dirname(
++		fileURLToPath(
++			import.meta.resolve( path.join( packageName, 'package.json' ) )
++		)
++	);
++}
++
+ const { NODE_ENV = 'development' } = process.env;
+ 
+ const stories = [
+@@ -46,15 +58,15 @@ const config: StorybookConfig = {
+ 	staticDirs: [ './static' ],
+ 	addons: [
+ 		{
+-			name: '@storybook/addon-docs',
++			name: getAbsolutePath( '@storybook/addon-docs' ),
+ 			options: { configureJSX: true },
+ 		},
+-		'@storybook/addon-a11y',
++		getAbsolutePath( '@storybook/addon-a11y' ),
+ 		import.meta.resolve( './addons/source-link/preset.ts' ),
+-		'storybook-addon-tag-badges',
++		getAbsolutePath( 'storybook-addon-tag-badges' ),
+ 		import.meta.resolve( './addons/design-system-theme/preset.ts' ),
+ 	],
+-	framework: '@storybook/react-vite',
++	framework: getAbsolutePath( '@storybook/react-vite' ),
+ 	features: {
+ 		componentsManifest: NODE_ENV !== 'development',
+ 		// Use experimental TypeScript LanguageService prop extractor for the
+@@ -111,12 +123,14 @@ const config: StorybookConfig = {
+ 	},
+ 	viteFinal: async ( viteConfig ) => {
+ 		return mergeConfig( viteConfig, {
++			// Storybook's Vite builder defaults this to the repo root (process.cwd()), but we want this workspace to be the root for isolated module resolution.
++			root: import.meta.dirname,
+ 			plugins: [
+ 				dsTokenFallbacksJs(),
+ 				react( {
+-					jsxImportSource: '@emotion/react',
++					jsxImportSource: getAbsolutePath( '@emotion/react' ),
+ 					babel: {
+-						plugins: [ '@emotion/babel-plugin' ],
++						plugins: [ getAbsolutePath( '@emotion/babel-plugin' ) ],
+ 					},
+ 				} ) as PluginOption,
+ 				{
+@@ -210,6 +224,17 @@ const config: StorybookConfig = {
+ 					NODE_ENV === 'development'
+ 				),
+ 			},
++			resolve: {
++				/*
++				 * Resolve Storybook packages from this workspace.
++				 */
++				dedupe: [
++					'storybook',
++					'@storybook/addon-a11y',
++					'@storybook/addon-docs',
++					'@storybook/icons',
++				],
++			},
+ 			css: {
+ 				postcss: {
+ 					// Vite bundles its own PostCSS, creating a deep
+diff --git a/storybook/package.json b/storybook/package.json
+index 122bc182424715..26dd219277c06c 100644
+--- a/storybook/package.json
++++ b/storybook/package.json
+@@ -24,6 +24,7 @@
+ 		"./preview": "./preview.jsx"
+ 	},
+ 	"devDependencies": {
++		"@emotion/babel-plugin": "^11.13.5",
+ 		"@emotion/is-prop-valid": "^1.4.0",
+ 		"@emotion/react": "^11.14.0",
+ 		"@emotion/styled": "^11.14.1",
+@@ -34,13 +35,33 @@
+ 		"@types/react": "^18.3.27",
+ 		"@vitejs/plugin-react": "^5.1.2",
+ 		"@wordpress/admin-ui": "file:../packages/admin-ui",
++		"@wordpress/base-styles": "file:../packages/base-styles",
++		"@wordpress/block-editor": "file:../packages/block-editor",
++		"@wordpress/block-library": "file:../packages/block-library",
++		"@wordpress/blocks": "file:../packages/blocks",
++		"@wordpress/components": "file:../packages/components",
++		"@wordpress/compose": "file:../packages/compose",
++		"@wordpress/data": "file:../packages/data",
++		"@wordpress/dataviews": "file:../packages/dataviews",
+ 		"@wordpress/element": "file:../packages/element",
++		"@wordpress/fields": "file:../packages/fields",
++		"@wordpress/format-library": "file:../packages/format-library",
++		"@wordpress/hooks": "file:../packages/hooks",
++		"@wordpress/i18n": "file:../packages/i18n",
+ 		"@wordpress/icons": "file:../packages/icons",
++		"@wordpress/image-cropper": "file:../packages/image-cropper",
++		"@wordpress/keycodes": "file:../packages/keycodes",
++		"@wordpress/media-fields": "file:../packages/media-fields",
++		"@wordpress/postcss-plugins-preset": "file:../packages/postcss-plugins-preset",
++		"@wordpress/primitives": "file:../packages/primitives",
+ 		"@wordpress/private-apis": "file:../packages/private-apis",
+ 		"@wordpress/route": "file:../packages/route",
+ 		"@wordpress/theme": "file:../packages/theme",
+ 		"@wordpress/ui": "file:../packages/ui",
++		"clsx": "^2.1.1",
++		"react": "^18.3.1",
+ 		"react-docgen-typescript": "^2.4.0",
++		"react-dom": "^18.3.1",
+ 		"storybook": "^10.4.3",
+ 		"storybook-addon-tag-badges": "^3.0.4",
+ 		"terser": "^5.37.0",
+diff --git a/test/e2e/specs/editor/various/client-side-media-processing.spec.js b/test/e2e/specs/editor/various/client-side-media-processing.spec.js
+index 1b2487e70c62f4..3ce72de377df04 100644
+--- a/test/e2e/specs/editor/various/client-side-media-processing.spec.js
++++ b/test/e2e/specs/editor/various/client-side-media-processing.spec.js
+@@ -4,7 +4,7 @@
+ const path = require( 'path' );
+ const fs = require( 'fs/promises' );
+ const os = require( 'os' );
+-const { v4: uuid } = require( 'uuid' );
++const { randomUUID } = require( 'crypto' );
+ 
+ /**
+  * WordPress dependencies
+@@ -69,7 +69,7 @@ class MediaProcessingUtils {
+ 		const tmpDirectory = await fs.mkdtemp(
+ 			path.join( os.tmpdir(), 'gutenberg-test-media-' )
+ 		);
+-		const uniqueName = uuid();
++		const uniqueName = randomUUID();
+ 		const extension = path.extname( fileName );
+ 		const tmpFileName = path.join( tmpDirectory, uniqueName + extension );
+ 		await fs.copyFile( path.join( ASSETS_DIR, fileName ), tmpFileName );
+@@ -402,7 +402,7 @@ test.describe( 'Client-side media processing', () => {
+ 		const tmpFiles = [];
+ 
+ 		for ( const file of files ) {
+-			const uniqueName = uuid();
++			const uniqueName = randomUUID();
+ 			const ext = path.extname( file );
+ 			const tmpFile = path.join( tmpDirectory, uniqueName + ext );
+ 			await fs.copyFile( path.join( ASSETS_DIR, file ), tmpFile );
+diff --git a/test/integration/blocks-schema.test.js b/test/integration/blocks-schema.test.js
+index 37137ddd09d211..c75cf573b6a55b 100644
+--- a/test/integration/blocks-schema.test.js
++++ b/test/integration/blocks-schema.test.js
+@@ -12,7 +12,7 @@ import blockSchema from '../../schemas/json/block.json';
+ describe( 'block.json schema', () => {
+ 	const jsonFiles = glob.sync(
+ 		[ 'packages/*/src/**/block.json', '{lib,phpunit,test}/**/block.json' ],
+-		{ onlyFiles: true }
++		{ onlyFiles: true, ignore: [ '**/node_modules/**' ] }
+ 	);
+ 	const ajv = new Ajv();
+ 
+diff --git a/test/integration/theme-schema.test.js b/test/integration/theme-schema.test.js
+index 01c95ddaefadce..828756bc4a6124 100644
+--- a/test/integration/theme-schema.test.js
++++ b/test/integration/theme-schema.test.js
+@@ -12,7 +12,7 @@ import themeSchema from '../../schemas/json/theme.json';
+ describe( 'theme.json schema', () => {
+ 	const jsonFiles = glob.sync(
+ 		[ 'packages/*/src/**/theme.json', '{lib,phpunit,test}/**/theme.json' ],
+-		{ onlyFiles: true }
++		{ onlyFiles: true, ignore: [ '**/node_modules/**' ] }
+ 	);
+ 	const invalidFiles = glob.sync(
+ 		[ 'test/integration/fixtures/schemas/*.json' ],
+diff --git a/test/performance/specs/media-upload.spec.js b/test/performance/specs/media-upload.spec.js
+index c6f0eb1ca70ffb..b738774de0d58b 100644
+--- a/test/performance/specs/media-upload.spec.js
++++ b/test/performance/specs/media-upload.spec.js
+@@ -4,7 +4,7 @@
+ const path = require( 'path' );
+ const fs = require( 'fs/promises' );
+ const os = require( 'os' );
+-const { v4: uuid } = require( 'uuid' );
++const { randomUUID } = require( 'crypto' );
+ 
+ /**
+  * WordPress dependencies
+@@ -36,7 +36,7 @@ async function createTempImage( sourceFile, ext ) {
+ 	const tmpDirectory = await fs.mkdtemp(
+ 		path.join( os.tmpdir(), 'gutenberg-perf-media-' )
+ 	);
+-	const tmpFileName = path.join( tmpDirectory, uuid() + ext );
++	const tmpFileName = path.join( tmpDirectory, randomUUID() + ext );
+ 	await fs.copyFile( path.join( E2E_ASSETS_PATH, sourceFile ), tmpFileName );
+ 	return { tmpFileName, tmpDirectory };
+ }
+@@ -218,7 +218,7 @@ test.describe( 'Media Upload Performance', () => {
+ 				for ( let j = 0; j < 5; j++ ) {
+ 					const tmpFileName = path.join(
+ 						tmpDirectory,
+-						uuid() + '.jpeg'
++						randomUUID() + '.jpeg'
+ 					);
+ 					await fs.copyFile(
+ 						path.join(
+diff --git a/test/storybook-playwright/package.json b/test/storybook-playwright/package.json
+index c3ce8113d4ef8d..5feadf23d13da2 100644
+--- a/test/storybook-playwright/package.json
++++ b/test/storybook-playwright/package.json
+@@ -21,6 +21,7 @@
+ 		"url": "https://github.com/WordPress/gutenberg/issues"
+ 	},
+ 	"devDependencies": {
++		"@emotion/babel-plugin": "^11.13.5",
+ 		"@playwright/test": "^1.58.2",
+ 		"@storybook/react-vite": "^10.4.3",
+ 		"@types/node": "^20.19.39",
+diff --git a/test/unit/jest.config.js b/test/unit/jest.config.js
+index 64deb8b1c504f2..1df8347ed23e6a 100644
+--- a/test/unit/jest.config.js
++++ b/test/unit/jest.config.js
+@@ -36,17 +36,21 @@ process.env.TZ = 'UTC';
+ module.exports = {
+ 	rootDir: '../../',
+ 	moduleNameMapper: {
+-		// Mock @wordpress/vips/worker before the general pattern so it doesn't try to load the real file.
+-		// The worker-code.ts file is auto-generated during full builds and is gitignored.
++		// Specific mappings first (before generic patterns)
+ 		'@wordpress/vips/worker':
+ 			'<rootDir>/test/unit/config/vips-worker-code-stub.js',
+-		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
+-			'packages/$1/src',
+ 		'@wordpress/theme/design-tokens.js':
+ 			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
+ 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
++		// Map deep paths (e.g., @wordpress/block-editor/src/hooks/list-view)
++		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })\\/(.+)$` ]:
++			'packages/$1/$2',
++		// Then map exact package imports (e.g., @wordpress/compose)
++		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
++			'packages/$1/src',
+ 	},
+ 	preset: jestPresetDefaultDir,
++	testEnvironment: require.resolve( 'jest-environment-jsdom' ),
+ 	setupFiles: [
+ 		'<rootDir>/test/unit/config/global-mocks.js',
+ 		'<rootDir>/test/unit/config/gutenberg-env.js',
+@@ -74,7 +78,7 @@ module.exports = {
+ 		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
+ 	},
+ 	transformIgnorePatterns: [
+-		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid|marked)/)',
++		'/node_modules/(?!(\\.store/.+/node_modules/)?(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid|marked)/)',
+ 		'\\.pnp\\.[^\\/]+$',
+ 	],
+ 	snapshotSerializers: [
+@@ -94,7 +98,7 @@ module.exports = {
+ 		'<rootDir>packages/scripts/config/jest-github-actions-reporter/index.js',
+ 		process.env.CI
+ 			? [
+-					'@flakiness/jest',
++					require.resolve( '@flakiness/jest' ),
+ 					{
+ 						flakinessProject: 'WordPress/gutenberg',
+ 						duplicates: 'rename',
+diff --git a/test/unit/package.json b/test/unit/package.json
+index d8de644307d4d5..c4198b2f16c3da 100644
+--- a/test/unit/package.json
++++ b/test/unit/package.json
+@@ -30,6 +30,7 @@
+ 		"@wordpress/scripts": "file:../../packages/scripts",
+ 		"babel-jest": "^29.7.0",
+ 		"babel-plugin-transform-import-meta": "^2.3.3",
++		"client-zip": "^2.4.5",
+ 		"glob": "^7.1.2",
+ 		"jest": "^29.6.2",
+ 		"jest-environment-jsdom": "^30.2.0",
+diff --git a/tools/build-scripts/package.json b/tools/build-scripts/package.json
+index 101d01b8c5acb7..199c657583cd81 100644
+--- a/tools/build-scripts/package.json
++++ b/tools/build-scripts/package.json
+@@ -27,6 +27,7 @@
+ 		"@typescript/native-preview": "^7.0.0-dev.20260423.1",
+ 		"@wordpress/babel-preset-default": "file:../../packages/babel-preset-default",
+ 		"@wordpress/build": "file:../../packages/wp-build",
++		"@wordpress/element": "file:../../packages/element",
+ 		"@wordpress/react-19": "file:../react-19",
+ 		"@wordpress/scripts": "file:../../packages/scripts",
+ 		"babel-plugin-inline-json-import": "^0.3.2",
+diff --git a/tools/docs/package.json b/tools/docs/package.json
+index 663ef5a9b018a6..8c97b1706b7791 100644
+--- a/tools/docs/package.json
++++ b/tools/docs/package.json
+@@ -22,6 +22,7 @@
+ 	"devDependencies": {
+ 		"@apidevtools/json-schema-ref-parser": "^11.6.4",
+ 		"@babel/core": "^7.25.7",
++		"@wordpress/docgen": "file:../../packages/docgen",
+ 		"chalk": "^4.1.1",
+ 		"change-case": "^4.1.2",
+ 		"comment-parser": "^1.1.1",
+diff --git a/tools/docs/update-api-docs.js b/tools/docs/update-api-docs.js
+index d7b162f69194b2..dd6ee6d229a15d 100755
+--- a/tools/docs/update-api-docs.js
++++ b/tools/docs/update-api-docs.js
+@@ -221,14 +221,7 @@ glob.stream( [
+ 					resolve( dirname( file ), path )
+ 				);
+ 				await execa(
+-					join(
+-						__dirname,
+-						'..',
+-						'..',
+-						'node_modules',
+-						'.bin',
+-						'docgen'
+-					),
++					join( __dirname, 'node_modules', '.bin', 'docgen' ),
+ 					[
+ 						sourcePath,
+ 						'--output',
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index b940e5ee33926b..cc89932f845b0a 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -28,6 +28,12 @@ const require = createRequire( import.meta.url );
+ const rootDir = resolve( import.meta.dirname, '../..' );
+ const wpPlugin = require( '@wordpress/eslint-plugin' );
+ 
++// Use the installed React version for linting.
++let reactVersion = 'detect';
++try {
++	reactVersion = require( 'react/package.json' ).version;
++} catch {}
++
+ /**
+  * ESLint v10 forbids redefining a plugin under the same key unless the
+  * reference is strictly identical. Because the @wordpress/eslint-plugin
+@@ -916,4 +922,9 @@ export default dedupePlugins( [
+ 
+ 	// Package-level configs (kept alongside the code they apply to).
+ 	...wpBuildConfig,
++
++	// Use the installed React version for linting, instead of relying on detection.
++	{
++		settings: { react: { version: reactVersion } },
++	},
+ ] );
+diff --git a/tools/eslint/package.json b/tools/eslint/package.json
+index d31ae8f7db5a22..237a85d986e99a 100644
+--- a/tools/eslint/package.json
++++ b/tools/eslint/package.json
+@@ -42,6 +42,7 @@
+ 		"eslint-plugin-testing-library": "^7.16.0",
+ 		"glob": "^7.1.2",
+ 		"globals": "^16.0.0",
++		"react": "^18.3.1",
+ 		"typescript-eslint": "^8.57.1"
+ 	},
+ 	"publishConfig": {
+diff --git a/tools/release/commands/performance.js b/tools/release/commands/performance.js
+index 40abb264892f19..2167d0444ead9a 100644
+--- a/tools/release/commands/performance.js
++++ b/tools/release/commands/performance.js
+@@ -360,7 +360,7 @@ async function runPerformanceTests( branches, options ) {
+ 
+ 	logAtIndent( 2, 'Installing dependencies and building' );
+ 	await runShellScript(
+-		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps"`,
++		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && if [ ! -d /tmp/npm-cli ]; then git clone --depth 1 --branch v11-gb-test https://github.com/manzoorwanijk/npm-cli.git /tmp/npm-cli && cd /tmp/npm-cli && node scripts/resetdeps.js; fi && NPM_GLOBAL_DIR=\\$(npm root -g)/npm && rm -rf \\$NPM_GLOBAL_DIR && ln -s /tmp/npm-cli \\$NPM_GLOBAL_DIR && npm ci && npm run build --workspace @wordpress/e2e-test-utils-playwright && npx playwright install chromium --with-deps"`,
+ 		testRunnerDir
+ 	);
+ 
+@@ -403,7 +403,7 @@ async function runPerformanceTests( branches, options ) {
+ 
+ 		logAtIndent( 3, 'Installing dependencies and building' );
+ 		await runShellScript(
+-			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && (npm run build -- --skip-types || npm run build)"`,
++			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && if [ ! -d /tmp/npm-cli ]; then git clone --depth 1 --branch v11-gb-test https://github.com/manzoorwanijk/npm-cli.git /tmp/npm-cli && cd /tmp/npm-cli && node scripts/resetdeps.js; fi && NPM_GLOBAL_DIR=\\$(npm root -g)/npm && rm -rf \\$NPM_GLOBAL_DIR && ln -s /tmp/npm-cli \\$NPM_GLOBAL_DIR && npm ci && (npm run build -- --skip-types || npm run build)"`,
+ 			buildDir
+ 		);
+ 
+diff --git a/tools/stylelint/package.json b/tools/stylelint/package.json
+index 115cb3d52bf814..8e9017c535122e 100644
+--- a/tools/stylelint/package.json
++++ b/tools/stylelint/package.json
+@@ -23,6 +23,8 @@
+ 		"./config": "./config.js"
+ 	},
+ 	"dependencies": {
++		"@wordpress/stylelint-config": "file:../../packages/stylelint-config",
++		"@wordpress/theme": "file:../../packages/theme",
+ 		"stylelint-plugin-logical-css": "^1.2.3"
+ 	},
+ 	"publishConfig": {
+diff --git a/tools/validation/check-installed-deps.mjs b/tools/validation/check-installed-deps.mjs
+index d78fc8bfb3eda1..02691336c75ec5 100644
+--- a/tools/validation/check-installed-deps.mjs
++++ b/tools/validation/check-installed-deps.mjs
+@@ -5,6 +5,14 @@
+  * `package-lock.json` against `node_modules/.package-lock.json` (npm's hidden
+  * lockfile, written on every install to record the actual installed tree).
+  *
++ * Layout-agnostic: works with both the hoisted (default) and the linked
++ * (`install-strategy=linked`) layouts. Under the linked layout npm stores
++ * packages at `node_modules/.store/<name>@<version>-<hash>/node_modules/<name>`
++ * and symlinks them into place, so lockfile paths no longer line up 1:1 and the
++ * hidden lockfile records no `integrity` fields. We therefore match installed
++ * packages by `name@version` (derived from the path leaf, or the lockfile
++ * `name` field for npm aliases) and compare their `resolved` source.
++ *
+  * Exits non-zero with a hint to run `npm install` if the trees diverge.
+  */
+ 
+@@ -85,6 +93,40 @@ if ( needsCheck ) {
+ 	const lockPkgs = lock.packages || {};
+ 	const hiddenPkgs = hidden.packages || {};
+ 
++	/*
++	 * The package name is the path segment after the final `node_modules/`.
++	 * This keeps the scope (`@scope/name`) and works for both the hoisted
++	 * layout (`node_modules/<name>`) and the linked `.store` layout
++	 * (`node_modules/.store/<name>@<ver>-<hash>/node_modules/<name>`).
++	 */
++	const NM = 'node_modules/';
++	const packageName = ( pkgPath ) => {
++		const i = pkgPath.lastIndexOf( NM );
++		return i === -1 ? pkgPath : pkgPath.slice( i + NM.length );
++	};
++
++	/*
++	 * Build the set of actually-installed packages, keyed by `name@version`
++	 * mapping to the set of `resolved` sources seen for it. Skip symlinks
++	 * (`link: true`, no `version`) — only real, downloaded packages count.
++	 * Under the linked layout the same `name@version` can appear under
++	 * several `.store` hashes (peer-dependency variants); they share a
++	 * `resolved`, so the set collapses to one entry.
++	 */
++	const installedByKey = new Map();
++	for ( const [ pkgPath, info ] of Object.entries( hiddenPkgs ) ) {
++		if ( info.link || ! info.version ) {
++			continue;
++		}
++		const key = `${ packageName( pkgPath ) }@${ info.version }`;
++		let resolvedSet = installedByKey.get( key );
++		if ( ! resolvedSet ) {
++			resolvedSet = new Set();
++			installedByKey.set( key, resolvedSet );
++		}
++		resolvedSet.add( info.resolved );
++	}
++
+ 	const reportedMismatches = [];
+ 	const MAX_REPORTED = 5;
+ 	let totalMismatches = 0;
+@@ -100,22 +142,30 @@ if ( needsCheck ) {
+ 			continue;
+ 		}
+ 
+-		const installed = hiddenPkgs[ pkgPath ];
++		/*
++		 * Optional deps may be skipped by npm on the current platform (e.g.
++		 * macOS-only fsevents on Linux) and extraneous deps aren't part of
++		 * the resolved tree, so neither is expected to be installed.
++		 */
++		if ( info.optional || info.extraneous ) {
++			continue;
++		}
++
++		/*
++		 * `info.name` is set when the install path differs from the real
++		 * package name (npm aliases, e.g. `react-is-18` → `react-is`, or
++		 * `prettier` → `wp-prettier`); fall back to the path leaf otherwise.
++		 */
++		const key = `${ info.name || packageName( pkgPath ) }@${
++			info.version
++		}`;
++		const resolvedSet = installedByKey.get( key );
+ 
+ 		let mismatch;
+-		if ( ! installed ) {
+-			/*
+-			 * Optional deps may be skipped by npm on the current platform
+-			 * (e.g. macOS-only fsevents on Linux). Don't flag them as
+-			 * missing. Real drift on an optional dep would still be caught
+-			 * below as an integrity mismatch.
+-			 */
+-			if ( info.optional ) {
+-				continue;
+-			}
++		if ( ! resolvedSet ) {
+ 			mismatch = `missing: ${ pkgPath }`;
+-		} else if ( installed.integrity !== info.integrity ) {
+-			mismatch = `integrity mismatch: ${ pkgPath }`;
++		} else if ( info.resolved && ! resolvedSet.has( info.resolved ) ) {
++			mismatch = `source mismatch: ${ pkgPath }`;
+ 		}
+ 
+ 		if ( ! mismatch ) {
+diff --git a/tools/validation/package.json b/tools/validation/package.json
+index 7fc106203e1598..ed3d0e9a694abf 100644
+--- a/tools/validation/package.json
++++ b/tools/validation/package.json
+@@ -21,7 +21,7 @@
+ 	},
+ 	"type": "module",
+ 	"devDependencies": {
+-		"@mawesome/dependency-audit": "^0.4.4",
++		"@mawesome/dependency-audit": "^0.4.5",
+ 		"@wordpress/create-block": "file:../../packages/create-block",
+ 		"@wordpress/scripts": "file:../../packages/scripts",
+ 		"chalk": "^4.1.1",
+diff --git a/tools/validation/test-create-block.mjs b/tools/validation/test-create-block.mjs
+index 0d7f2aa3aa477e..2f04c315f29ead 100755
+--- a/tools/validation/test-create-block.mjs
++++ b/tools/validation/test-create-block.mjs
+@@ -55,15 +55,35 @@ function run( command, args, options = {} ) {
+ 	}
+ }
+ 
++/*
++ * Under an isolated install layout, transitive deps are not hoisted to the root `node_modules/`.
++ * `@wordpress/scripts` shells out to webpack, eslint, etc. via `resolve-bin`,
++ * which calls `require.resolve` from its own location in the dep store and
++ * therefore can't see those sibling packages. Adding `packages/scripts/`'s
++ * own `node_modules/` as a `NODE_PATH` fallback lets Node find them.
++ */
++const NODE_PATH = [
++	path.join( ROOT, 'packages/scripts/node_modules' ),
++	process.env.NODE_PATH,
++]
++	.filter( Boolean )
++	.join( path.delimiter );
++
++const VALIDATION_BIN = path.join( __dirname, 'node_modules', '.bin' );
++const ROOT_BIN = path.join( ROOT, 'node_modules', '.bin' );
++
+ /**
+- * Execute a command via `npm exec` and exit on failure.
++ * Execute a binary from this workspace's `node_modules/.bin/` and exit on
++ * failure. Avoids `npm exec`, which can't find bins only installed in
++ * `tools/validation/node_modules/.bin/` (e.g. `wp-create-block`) when invoked
++ * from the repo root under an isolated install.
+  *
+- * @param {string}   bin     Binary to execute (must be in `devDependencies`).
++ * @param {string}   bin     Bin name (must be in this workspace's `devDependencies`).
+  * @param {string[]} args    Command arguments.
+  * @param {Object}   options Spawn options.
+  */
+-function npmExec( bin, args, options = {} ) {
+-	run( 'npm', [ 'exec', '--no', '--', bin, ...args ], options );
++function workspaceBin( bin, args, options = {} ) {
++	run( path.join( VALIDATION_BIN, bin ), args, options );
+ }
+ 
+ /**
+@@ -72,7 +92,10 @@ function npmExec( bin, args, options = {} ) {
+  * @param {...string} args Command arguments forwarded to `wp-scripts`.
+  */
+ function wpScripts( ...args ) {
+-	npmExec( 'wp-scripts', args, { cwd: STATIC_BLOCK } );
++	run( path.join( ROOT_BIN, 'wp-scripts' ), args, {
++		cwd: STATIC_BLOCK,
++		env: { ...process.env, NODE_PATH },
++	} );
+ }
+ 
+ /**
+@@ -135,7 +158,7 @@ process.on( 'SIGTERM', () => process.exit( 1 ) );
+ 
+ // First test block.
+ status( 'Scaffolding Example Static (ES5) block...' );
+-npmExec( 'wp-create-block', [ 'example-static-es5', '-t', 'es5' ], {
++workspaceBin( 'wp-create-block', [ 'example-static-es5', '-t', 'es5' ], {
+ 	cwd: ROOT,
+ } );
+ 
+@@ -144,7 +167,7 @@ expectFileCount( ES5_BLOCK, 'the project root', 1, 8 );
+ 
+ // Second test block.
+ status( 'Scaffolding Example Static block...' );
+-npmExec( 'wp-create-block', [ 'example-static', '--no-wp-scripts' ], {
++workspaceBin( 'wp-create-block', [ 'example-static', '--no-wp-scripts' ], {
+ 	cwd: ROOT,
+ } );
+ 
+diff --git a/tsconfig.base.json b/tsconfig.base.json
+index c49a2bbf1dcafd..32b45de6b02cbd 100644
+--- a/tsconfig.base.json
++++ b/tsconfig.base.json
+@@ -28,7 +28,7 @@
+ 
+ 		"resolveJsonModule": true,
+ 
+-		"typeRoots": [ "./typings", "./node_modules/@types" ],
++		"typeRoots": [ "./typings", "${configDir}/node_modules/@types" ],
+ 		"types": [],
+ 
+ 		"rootDir": "${configDir}/src",

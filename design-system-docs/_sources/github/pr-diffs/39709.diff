@@ -1,0 +1,97 @@
+diff --git a/packages/components/README.md b/packages/components/README.md
+index 64bab2c25b8244..3a5b9c3a642984 100644
+--- a/packages/components/README.md
++++ b/packages/components/README.md
+@@ -31,6 +31,44 @@ Many components include CSS to add style, you will need to add in order to appea
+ 
+ In non-WordPress projects, link to the `build-style/style.css` file directly, it is located at `node_modules/@wordpress/components/build-style/style.css`.
+ 
++### Popovers and Tooltips
++
++_If you're using [`Popover`](/packages/components/src/popover/README.md) or [`Tooltip`](/packages/components/src/tooltip/README.md) components outside of the editor, make sure they are rendered within a `SlotFillProvider` and with a `Popover.Slot` somewhere up the element tree._
++
++By default, the `Popover` component will render inline i.e. within its
++parent to which it should anchor. Depending upon the context in which the
++`Popover` is being consumed, this might lead to incorrect positioning. For
++example, when being nested within another popover.
++
++This issue can be solved by rendering popovers to a specific location in the DOM via the
++`Popover.Slot`. For this to work, you will need your use of the `Popover`
++component and its `Slot` to be wrapped in a [`SlotFill`](/packages/components/src/slot-fill/README.md) provider.
++
++A `Popover` is also used as the underlying mechanism to display `Tooltip` components.
++So the same considerations should be applied to them.
++
++The following example illustrates how you can wrap a component using a
++`Popover` and have those popovers render to a single location in the DOM.
++
++```jsx
++/**
++ * External dependencies
++ */
++import { Popover, SlotFillProvider } from '@wordpress/components';
++
++/**
++ * Internal dependencies
++ */
++import { MyComponentWithPopover } from './my-component';
++
++const Example = () => {
++	<SlotFillProvider>
++		<MyComponentWithPopover />
++		<Popover.Slot>
++	</SlotFillProvider>
++};
++```
++
+ ## Docs & examples
+ 
+ You can browse the components docs and examples at https://wordpress.github.io/gutenberg/
+diff --git a/packages/components/src/border-box-control/border-box-control/README.md b/packages/components/src/border-box-control/border-box-control/README.md
+index 0706d0e20f63d0..5f1783ec12f40f 100644
+--- a/packages/components/src/border-box-control/border-box-control/README.md
++++ b/packages/components/src/border-box-control/border-box-control/README.md
+@@ -60,6 +60,12 @@ const MyBorderBoxControl = () => {
+ };
+ ```
+ 
++If you're using this component outside the editor, you can
++[ensure `Tooltip` positioning](/packages/components/README.md#popovers-and-tooltips)
++for the `BorderBoxControl`'s color and style options, by rendering your
++`BorderBoxControl` with a `Popover.Slot` further up the element tree and within
++a `SlotFillProvider` overall.
++
+ ## Props
+ 
+ ### `colors`: `Array`
+diff --git a/packages/components/src/border-control/border-control/README.md b/packages/components/src/border-control/border-control/README.md
+index 8c5991c68a0091..a4d0f2017f2d65 100644
+--- a/packages/components/src/border-control/border-control/README.md
++++ b/packages/components/src/border-control/border-control/README.md
+@@ -43,6 +43,12 @@ const MyBorderControl = () => {
+ };
+ ```
+ 
++If you're using this component outside the editor, you can
++[ensure `Tooltip` positioning](/packages/components/README.md#popovers-and-tooltips)
++for the `BorderControl`'s color and style options, by rendering your
++`BorderControl` with a `Popover.Slot` further up the element tree and within a
++`SlotFillProvider` overall.
++
+ ## Props
+ 
+ ### `colors`: `Array`
+diff --git a/packages/components/src/color-palette/README.md b/packages/components/src/color-palette/README.md
+index a788a476b504e3..de195ca1fa3954 100644
+--- a/packages/components/src/color-palette/README.md
++++ b/packages/components/src/color-palette/README.md
+@@ -74,3 +74,9 @@ const MyColorPalette = () => {
+ 	);
+ } );
+ ```
++
++If you're using this component outside the editor, you can
++[ensure `Tooltip` positioning](/packages/components/README.md#popovers-and-tooltips)
++for the `ColorPalette`'s color swatches, by rendering your `ColorPalette` with a
++`Popover.Slot` further up the element tree and within a
++`SlotFillProvider` overall.

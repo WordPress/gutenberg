@@ -1,0 +1,31 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index dca3fbfb2d940f..70fbd64b380c64 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `UnitControl`: Fix colors when disabled. ([#62970](https://github.com/WordPress/gutenberg/pull/62970))
+ -   `useUpdateEffect`: Correctly track mounted state in strict mode. ([#62974](https://github.com/WordPress/gutenberg/pull/62974))
++-   `UnitControl`: Fix an issue where keyboard shortcuts unintentionally shift focus on Windows OS. ([#62988](https://github.com/WordPress/gutenberg/pull/62988))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 0bd3dc751f850e..2dd08cc155225f 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -167,11 +167,12 @@ function UnforwardedUnitControl(
+ 	if ( ! disableUnits && isUnitSelectTabbable && units.length ) {
+ 		handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
+ 			props.onKeyDown?.( event );
+-			// Unless the meta key was pressed (to avoid interfering with
+-			// shortcuts, e.g. pastes), moves focus to the unit select if a key
++			// Unless the meta or ctrl key was pressed (to avoid interfering with
++			// shortcuts, e.g. pastes), move focus to the unit select if a key
+ 			// matches the first character of a unit.
+ 			if (
+ 				! event.metaKey &&
++				! event.ctrlKey &&
+ 				reFirstCharacterOfUnits.test( event.key )
+ 			) {
+ 				refInputSuffix.current?.focus();

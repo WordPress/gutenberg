@@ -1,0 +1,198 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ccd91d53f44199..d88c350fe5fee1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   Revert `word-break: break-word` addition ([#76230](https://github.com/WordPress/gutenberg/pull/76230)).
+ -   `VisuallyHidden`: Add `word-break: normal` to prevent text wrapping issues in screen reader content ([#75539](https://github.com/WordPress/gutenberg/pull/75539)).
++-   `DateTimePicker`: Fix error that occurs when selecting a day outside the valid days for a month (e.g. February 30) ([#76400](https://github.com/WordPress/gutenberg/pull/76400)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/date-time/test/utils.test.ts b/packages/components/src/date-time/test/utils.test.ts
+index b855fa9c772913..1d8f45f91b9025 100644
+--- a/packages/components/src/date-time/test/utils.test.ts
++++ b/packages/components/src/date-time/test/utils.test.ts
+@@ -1,17 +1,14 @@
+-/**
+- * External dependencies
+- */
+ import timezoneMock from 'timezone-mock';
+-
+-/**
+- * WordPress dependencies
+- */
+ import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
++import { inputToDate, getDaysInMonth } from '../utils';
+ 
+-/**
+- * Internal dependencies
+- */
+-import { inputToDate } from '../utils';
++describe( 'getDaysInMonth', () => {
++	it( 'should return the number of days in the month', () => {
++		expect( getDaysInMonth( 2026, 0 ) ).toBe( 31 );
++		expect( getDaysInMonth( 2026, 1 ) ).toBe( 28 );
++		expect( getDaysInMonth( 2028, 1 ) ).toBe( 29 );
++	} );
++} );
+ 
+ describe( 'inputToDate', () => {
+ 	let originalSettings: DateSettings;
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index 245446736e8ab9..f7c63865de5149 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -1,18 +1,7 @@
+-/**
+- * External dependencies
+- */
+ import { startOfMinute } from 'date-fns';
+-
+-/**
+- * WordPress dependencies
+- */
+ import { useState, useMemo, useEffect } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import { date as formatDate } from '@wordpress/date';
+-
+-/**
+- * Internal dependencies
+- */
+ import BaseControl from '../../base-control';
+ import { VisuallyHidden } from '../../visually-hidden';
+ import SelectControl from '../../select-control';
+@@ -33,6 +22,7 @@ import {
+ 	buildPadInputStateReducer,
+ 	validateInputElementTarget,
+ 	setInConfiguredTimezone,
++	getDaysInMonth,
+ } from '../utils';
+ import { TIMEZONELESS_FORMAT } from '../constants';
+ import { TimeInput } from './time-input';
+@@ -150,7 +140,7 @@ export function TimePicker( {
+ 			value={ day }
+ 			step={ 1 }
+ 			min={ 1 }
+-			max={ 31 }
++			max={ getDaysInMonth( Number( year ), Number( month ) - 1 ) }
+ 			required
+ 			spinControls="none"
+ 			isPressEnterToChange
+diff --git a/packages/components/src/date-time/time/test/index.tsx b/packages/components/src/date-time/time/test/index.tsx
+index cb0ff6331771db..e206d15418afbb 100644
+--- a/packages/components/src/date-time/time/test/index.tsx
++++ b/packages/components/src/date-time/time/test/index.tsx
+@@ -158,6 +158,75 @@ describe( 'TimePicker', () => {
+ 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T11:59:00' );
+ 	} );
+ 
++	it( 'should call onChange with a bounded day if out of bounds', async () => {
++		const user = userEvent.setup();
++
++		const onChangeSpy = jest.fn();
++
++		render(
++			<TimePicker
++				currentTime="2026-02-05T00:00:00"
++				onChange={ onChangeSpy }
++				is12Hour
++			/>
++		);
++
++		const dayInput = screen.getByLabelText( 'Day' );
++
++		await user.clear( dayInput );
++		await user.type( dayInput, '30' );
++		await user.keyboard( '{Tab}' );
++
++		expect( onChangeSpy ).toHaveBeenCalledWith( '2026-02-28T00:00:00' );
++		expect( dayInput ).toHaveValue( 28 );
++	} );
++
++	it( 'should clamp day when switching months', async () => {
++		const user = userEvent.setup();
++
++		const onChangeSpy = jest.fn();
++
++		render(
++			<TimePicker
++				currentTime="2026-03-31T00:00:00"
++				onChange={ onChangeSpy }
++				is12Hour
++			/>
++		);
++
++		const monthSelect = screen.getByLabelText( 'Month' );
++		const dayInput = screen.getByLabelText( 'Day' );
++
++		await user.selectOptions( monthSelect, '02' );
++
++		expect( onChangeSpy ).toHaveBeenCalledWith( '2026-02-28T00:00:00' );
++		expect( dayInput ).toHaveValue( 28 );
++	} );
++
++	it( 'should clamp day when switching year from leap to non-leap', async () => {
++		const user = userEvent.setup();
++
++		const onChangeSpy = jest.fn();
++
++		render(
++			<TimePicker
++				currentTime="2028-02-29T00:00:00"
++				onChange={ onChangeSpy }
++				is12Hour
++			/>
++		);
++
++		const dayInput = screen.getByLabelText( 'Day' );
++		const yearInput = screen.getByLabelText( 'Year' );
++
++		await user.clear( yearInput );
++		await user.type( yearInput, '2026' );
++		await user.keyboard( '{Tab}' );
++
++		expect( onChangeSpy ).toHaveBeenCalledWith( '2026-02-28T00:00:00' );
++		expect( dayInput ).toHaveValue( 28 );
++	} );
++
+ 	it( 'should switch to PM correctly', async () => {
+ 		const user = userEvent.setup();
+ 
+diff --git a/packages/components/src/date-time/utils.ts b/packages/components/src/date-time/utils.ts
+index 8689b6bf78cb63..61d5bd94c90fb9 100644
+--- a/packages/components/src/date-time/utils.ts
++++ b/packages/components/src/date-time/utils.ts
+@@ -110,6 +110,19 @@ export function buildPadInputStateReducer( pad: number ) {
+ 	};
+ }
+ 
++/**
++ * Returns the number of days in a month.
++ *
++ * @param year  The year
++ * @param month The month, zero-indexed (0-11)
++ *
++ * @return The number of days in the month
++ */
++export const getDaysInMonth = ( year: number, month: number ) =>
++	// Take advantage of JavaScript's built-in date wrapping logic, where day 0
++	// of the next month is interpreted as the last day of the preceding month.
++	new Date( year, month + 1, 0 ).getDate();
++
+ /**
+  * Updates specific date fields in the configured timezone and returns a new
+  * UTC date.
+@@ -139,6 +152,11 @@ export function setInConfiguredTimezone(
+ 		...updates,
+ 	};
+ 
++	// Clamp the day to the last valid day of the month, to avoid producing
++	// invalid date strings (e.g. "2026-02-31").
++	const daysInMonth = getDaysInMonth( values.year, values.month );
++	values.date = Math.min( values.date, daysInMonth );
++
+ 	const year = String( values.year ).padStart( 4, '0' );
+ 	const month = String( values.month + 1 ).padStart( 2, '0' );
+ 	const day = String( values.date ).padStart( 2, '0' );

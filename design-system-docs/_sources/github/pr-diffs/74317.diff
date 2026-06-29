@@ -1,0 +1,2146 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 4cfaec8f0ecc94..71f4aa5f537910 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -430,10 +430,6 @@ module.exports = {
+ 				// Useful to add story descriptions via JSDoc without specifying params,
+ 				// or in TypeScript files where params are likely already documented outside of the JSDoc.
+ 				'jsdoc/require-param': 'off',
+-				// Disable this rule as eslint-plugin-storybook 0.9.0 doesn't recognize the new
+-				// `storybook/test` import path introduced in Storybook 9.
+-				// TODO: Remove this override when we upgrade to eslint-plugin-storybook >= 0.10.0.
+-				'storybook/use-storybook-expect': 'off',
+ 			},
+ 		},
+ 		{
+diff --git a/package-lock.json b/package-lock.json
+index 57b502f7af0990..b8d3f94df6510e 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -60,7 +60,7 @@
+ 				"eslint-plugin-prettier": "5.0.0",
+ 				"eslint-plugin-react-compiler": "19.0.0-beta-0dec889-20241115",
+ 				"eslint-plugin-ssr-friendly": "1.0.6",
+-				"eslint-plugin-storybook": "0.9.0",
++				"eslint-plugin-storybook": "10.1.11",
+ 				"eslint-plugin-testing-library": "6.0.2",
+ 				"execa": "4.0.2",
+ 				"fast-glob": "^3.2.7",
+@@ -12967,16 +12967,6 @@
+ 				"storybook": "^9.1.17"
+ 			}
+ 		},
+-		"node_modules/@storybook/csf": {
+-			"version": "0.0.1",
+-			"resolved": "https://registry.npmjs.org/@storybook/csf/-/csf-0.0.1.tgz",
+-			"integrity": "sha512-USTLkZze5gkel8MYCujSRBVIrUQ3YPBrLOx7GNk/0wttvVtlzWXAq9eLbQ4p/NicGxP+3T7KPEMVV//g+yubpw==",
+-			"dev": true,
+-			"license": "MIT",
+-			"dependencies": {
+-				"lodash": "^4.17.15"
+-			}
+-		},
+ 		"node_modules/@storybook/csf-plugin": {
+ 			"version": "9.1.17",
+ 			"resolved": "https://registry.npmjs.org/@storybook/csf-plugin/-/csf-plugin-9.1.17.tgz",
+@@ -15352,6 +15342,42 @@
+ 				"url": "https://opencollective.com/eslint"
+ 			}
+ 		},
++		"node_modules/@typescript-eslint/project-service": {
++			"version": "8.51.0",
++			"resolved": "https://registry.npmjs.org/@typescript-eslint/project-service/-/project-service-8.51.0.tgz",
++			"integrity": "sha512-Luv/GafO07Z7HpiI7qeEW5NW8HUtZI/fo/kE0YbtQEFpJRUuR0ajcWfCE5bnMvL7QQFrmT/odMe8QZww8X2nfQ==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"@typescript-eslint/tsconfig-utils": "^8.51.0",
++				"@typescript-eslint/types": "^8.51.0",
++				"debug": "^4.3.4"
++			},
++			"engines": {
++				"node": "^18.18.0 || ^20.9.0 || >=21.1.0"
++			},
++			"funding": {
++				"type": "opencollective",
++				"url": "https://opencollective.com/typescript-eslint"
++			},
++			"peerDependencies": {
++				"typescript": ">=4.8.4 <6.0.0"
++			}
++		},
++		"node_modules/@typescript-eslint/project-service/node_modules/@typescript-eslint/types": {
++			"version": "8.51.0",
++			"resolved": "https://registry.npmjs.org/@typescript-eslint/types/-/types-8.51.0.tgz",
++			"integrity": "sha512-TizAvWYFM6sSscmEakjY3sPqGwxZRSywSsPEiuZF6d5GmGD9Gvlsv0f6N8FvAAA0CD06l3rIcWNbsN1e5F/9Ag==",
++			"dev": true,
++			"license": "MIT",
++			"engines": {
++				"node": "^18.18.0 || ^20.9.0 || >=21.1.0"
++			},
++			"funding": {
++				"type": "opencollective",
++				"url": "https://opencollective.com/typescript-eslint"
++			}
++		},
+ 		"node_modules/@typescript-eslint/scope-manager": {
+ 			"version": "5.62.0",
+ 			"resolved": "https://registry.npmjs.org/@typescript-eslint/scope-manager/-/scope-manager-5.62.0.tgz",
+@@ -15368,6 +15394,23 @@
+ 				"url": "https://opencollective.com/typescript-eslint"
+ 			}
+ 		},
++		"node_modules/@typescript-eslint/tsconfig-utils": {
++			"version": "8.51.0",
++			"resolved": "https://registry.npmjs.org/@typescript-eslint/tsconfig-utils/-/tsconfig-utils-8.51.0.tgz",
++			"integrity": "sha512-Qi5bSy/vuHeWyir2C8u/uqGMIlIDu8fuiYWv48ZGlZ/k+PRPHtaAu7erpc7p5bzw2WNNSniuxoMSO4Ar6V9OXw==",
++			"dev": true,
++			"license": "MIT",
++			"engines": {
++				"node": "^18.18.0 || ^20.9.0 || >=21.1.0"
++			},
++			"funding": {
++				"type": "opencollective",
++				"url": "https://opencollective.com/typescript-eslint"
++			},
++			"peerDependencies": {
++				"typescript": ">=4.8.4 <6.0.0"
++			}
++		},
+ 		"node_modules/@typescript-eslint/type-utils": {
+ 			"version": "6.4.1",
+ 			"resolved": "https://registry.npmjs.org/@typescript-eslint/type-utils/-/type-utils-6.4.1.tgz",
+@@ -25521,22 +25564,184 @@
+ 			}
+ 		},
+ 		"node_modules/eslint-plugin-storybook": {
+-			"version": "0.9.0",
+-			"resolved": "https://registry.npmjs.org/eslint-plugin-storybook/-/eslint-plugin-storybook-0.9.0.tgz",
+-			"integrity": "sha512-qOT/2vQBo0VqrG/BhZv8IdSsKQiyzJw+2Wqq+WFCiblI/PfxLSrGkF/buiXF+HumwfsCyBdaC94UhqhmYFmAvA==",
++			"version": "10.1.11",
++			"resolved": "https://registry.npmjs.org/eslint-plugin-storybook/-/eslint-plugin-storybook-10.1.11.tgz",
++			"integrity": "sha512-mbq2r2kK5+AcLl0XDJ3to91JOgzCbHOqj+J3n+FRw6drk+M1boRqMShSoMMm0HdzXPLmlr7iur+qJ5ZuhH6ayQ==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"@typescript-eslint/utils": "^8.8.1"
++			},
++			"peerDependencies": {
++				"eslint": ">=8",
++				"storybook": "^10.1.11"
++			}
++		},
++		"node_modules/eslint-plugin-storybook/node_modules/@typescript-eslint/scope-manager": {
++			"version": "8.51.0",
++			"resolved": "https://registry.npmjs.org/@typescript-eslint/scope-manager/-/scope-manager-8.51.0.tgz",
++			"integrity": "sha512-JhhJDVwsSx4hiOEQPeajGhCWgBMBwVkxC/Pet53EpBVs7zHHtayKefw1jtPaNRXpI9RA2uocdmpdfE7T+NrizA==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"@typescript-eslint/types": "8.51.0",
++				"@typescript-eslint/visitor-keys": "8.51.0"
++			},
++			"engines": {
++				"node": "^18.18.0 || ^20.9.0 || >=21.1.0"
++			},
++			"funding": {
++				"type": "opencollective",
++				"url": "https://opencollective.com/typescript-eslint"
++			}
++		},
++		"node_modules/eslint-plugin-storybook/node_modules/@typescript-eslint/types": {
++			"version": "8.51.0",
++			"resolved": "https://registry.npmjs.org/@typescript-eslint/types/-/types-8.51.0.tgz",
++			"integrity": "sha512-TizAvWYFM6sSscmEakjY3sPqGwxZRSywSsPEiuZF6d5GmGD9Gvlsv0f6N8FvAAA0CD06l3rIcWNbsN1e5F/9Ag==",
++			"dev": true,
++			"license": "MIT",
++			"engines": {
++				"node": "^18.18.0 || ^20.9.0 || >=21.1.0"
++			},
++			"funding": {
++				"type": "opencollective",
++				"url": "https://opencollective.com/typescript-eslint"
++			}
++		},
++		"node_modules/eslint-plugin-storybook/node_modules/@typescript-eslint/typescript-estree": {
++			"version": "8.51.0",
++			"resolved": "https://registry.npmjs.org/@typescript-eslint/typescript-estree/-/typescript-estree-8.51.0.tgz",
++			"integrity": "sha512-1qNjGqFRmlq0VW5iVlcyHBbCjPB7y6SxpBkrbhNWMy/65ZoncXCEPJxkRZL8McrseNH6lFhaxCIaX+vBuFnRng==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"@typescript-eslint/project-service": "8.51.0",
++				"@typescript-eslint/tsconfig-utils": "8.51.0",
++				"@typescript-eslint/types": "8.51.0",
++				"@typescript-eslint/visitor-keys": "8.51.0",
++				"debug": "^4.3.4",
++				"minimatch": "^9.0.4",
++				"semver": "^7.6.0",
++				"tinyglobby": "^0.2.15",
++				"ts-api-utils": "^2.2.0"
++			},
++			"engines": {
++				"node": "^18.18.0 || ^20.9.0 || >=21.1.0"
++			},
++			"funding": {
++				"type": "opencollective",
++				"url": "https://opencollective.com/typescript-eslint"
++			},
++			"peerDependencies": {
++				"typescript": ">=4.8.4 <6.0.0"
++			}
++		},
++		"node_modules/eslint-plugin-storybook/node_modules/@typescript-eslint/utils": {
++			"version": "8.51.0",
++			"resolved": "https://registry.npmjs.org/@typescript-eslint/utils/-/utils-8.51.0.tgz",
++			"integrity": "sha512-11rZYxSe0zabiKaCP2QAwRf/dnmgFgvTmeDTtZvUvXG3UuAdg/GU02NExmmIXzz3vLGgMdtrIosI84jITQOxUA==",
+ 			"dev": true,
+ 			"license": "MIT",
+ 			"dependencies": {
+-				"@storybook/csf": "^0.0.1",
+-				"@typescript-eslint/utils": "^5.62.0",
+-				"requireindex": "^1.2.0",
+-				"ts-dedent": "^2.2.0"
++				"@eslint-community/eslint-utils": "^4.7.0",
++				"@typescript-eslint/scope-manager": "8.51.0",
++				"@typescript-eslint/types": "8.51.0",
++				"@typescript-eslint/typescript-estree": "8.51.0"
++			},
++			"engines": {
++				"node": "^18.18.0 || ^20.9.0 || >=21.1.0"
++			},
++			"funding": {
++				"type": "opencollective",
++				"url": "https://opencollective.com/typescript-eslint"
++			},
++			"peerDependencies": {
++				"eslint": "^8.57.0 || ^9.0.0",
++				"typescript": ">=4.8.4 <6.0.0"
++			}
++		},
++		"node_modules/eslint-plugin-storybook/node_modules/@typescript-eslint/visitor-keys": {
++			"version": "8.51.0",
++			"resolved": "https://registry.npmjs.org/@typescript-eslint/visitor-keys/-/visitor-keys-8.51.0.tgz",
++			"integrity": "sha512-mM/JRQOzhVN1ykejrvwnBRV3+7yTKK8tVANVN3o1O0t0v7o+jqdVu9crPy5Y9dov15TJk/FTIgoUGHrTOVL3Zg==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"@typescript-eslint/types": "8.51.0",
++				"eslint-visitor-keys": "^4.2.1"
++			},
++			"engines": {
++				"node": "^18.18.0 || ^20.9.0 || >=21.1.0"
++			},
++			"funding": {
++				"type": "opencollective",
++				"url": "https://opencollective.com/typescript-eslint"
++			}
++		},
++		"node_modules/eslint-plugin-storybook/node_modules/brace-expansion": {
++			"version": "2.0.2",
++			"resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-2.0.2.tgz",
++			"integrity": "sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==",
++			"dev": true,
++			"license": "MIT",
++			"dependencies": {
++				"balanced-match": "^1.0.0"
++			}
++		},
++		"node_modules/eslint-plugin-storybook/node_modules/eslint-visitor-keys": {
++			"version": "4.2.1",
++			"resolved": "https://registry.npmjs.org/eslint-visitor-keys/-/eslint-visitor-keys-4.2.1.tgz",
++			"integrity": "sha512-Uhdk5sfqcee/9H/rCOJikYz67o0a2Tw2hGRPOG2Y1R2dg7brRe1uG0yaNQDHu+TO/uQPF/5eCapvYSmHUjt7JQ==",
++			"dev": true,
++			"license": "Apache-2.0",
++			"engines": {
++				"node": "^18.18.0 || ^20.9.0 || >=21.1.0"
++			},
++			"funding": {
++				"url": "https://opencollective.com/eslint"
++			}
++		},
++		"node_modules/eslint-plugin-storybook/node_modules/minimatch": {
++			"version": "9.0.5",
++			"resolved": "https://registry.npmjs.org/minimatch/-/minimatch-9.0.5.tgz",
++			"integrity": "sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==",
++			"dev": true,
++			"license": "ISC",
++			"dependencies": {
++				"brace-expansion": "^2.0.1"
+ 			},
+ 			"engines": {
+-				"node": ">= 18"
++				"node": ">=16 || 14 >=14.17"
++			},
++			"funding": {
++				"url": "https://github.com/sponsors/isaacs"
++			}
++		},
++		"node_modules/eslint-plugin-storybook/node_modules/semver": {
++			"version": "7.7.3",
++			"resolved": "https://registry.npmjs.org/semver/-/semver-7.7.3.tgz",
++			"integrity": "sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==",
++			"dev": true,
++			"license": "ISC",
++			"bin": {
++				"semver": "bin/semver.js"
++			},
++			"engines": {
++				"node": ">=10"
++			}
++		},
++		"node_modules/eslint-plugin-storybook/node_modules/ts-api-utils": {
++			"version": "2.3.0",
++			"resolved": "https://registry.npmjs.org/ts-api-utils/-/ts-api-utils-2.3.0.tgz",
++			"integrity": "sha512-6eg3Y9SF7SsAvGzRHQvvc1skDAhwI4YQ32ui1scxD1Ccr0G5qIIbUBT3pFTKX8kmWIQClHobtUdNuaBgwdfdWg==",
++			"dev": true,
++			"license": "MIT",
++			"engines": {
++				"node": ">=18.12"
+ 			},
+ 			"peerDependencies": {
+-				"eslint": ">=6"
++				"typescript": ">=4.8.4"
+ 			}
+ 		},
+ 		"node_modules/eslint-plugin-testing-library": {
+@@ -53099,7 +53304,6 @@
+ 			},
+ 			"devDependencies": {
+ 				"@ariakit/test": "^0.4.7",
+-				"@storybook/react": "9.1.17",
+ 				"timezone-mock": "^1.3.6"
+ 			},
+ 			"engines": {
+@@ -53425,8 +53629,7 @@
+ 				"remove-accents": "^0.5.0"
+ 			},
+ 			"devDependencies": {
+-				"@ariakit/test": "^0.4.7",
+-				"@storybook/react": "9.1.17"
++				"@ariakit/test": "^0.4.7"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -55296,7 +55499,6 @@
+ 				"memize": "^2.1.0"
+ 			},
+ 			"devDependencies": {
+-				"@storybook/react": "9.1.17",
+ 				"@terrazzo/cli": "^0.10.2",
+ 				"@terrazzo/plugin-css": "^0.10.2",
+ 				"@terrazzo/token-tools": "^0.10.2",
+@@ -55337,7 +55539,6 @@
+ 				"clsx": "^2.1.1"
+ 			},
+ 			"devDependencies": {
+-				"@storybook/react": "9.1.17",
+ 				"@wordpress/theme": "file:../theme"
+ 			},
+ 			"engines": {
+diff --git a/package.json b/package.json
+index edf78e143720c0..3b36bd44663bc8 100644
+--- a/package.json
++++ b/package.json
+@@ -83,7 +83,7 @@
+ 		"eslint-plugin-prettier": "5.0.0",
+ 		"eslint-plugin-react-compiler": "19.0.0-beta-0dec889-20241115",
+ 		"eslint-plugin-ssr-friendly": "1.0.6",
+-		"eslint-plugin-storybook": "0.9.0",
++		"eslint-plugin-storybook": "10.1.11",
+ 		"eslint-plugin-testing-library": "6.0.2",
+ 		"execa": "4.0.2",
+ 		"fast-glob": "^3.2.7",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 3a284c49db795b..40eca975f11eb8 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -102,7 +102,6 @@
+ 	},
+ 	"devDependencies": {
+ 		"@ariakit/test": "^0.4.7",
+-		"@storybook/react": "9.1.17",
+ 		"timezone-mock": "^1.3.6"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/components/src/alignment-matrix-control/stories/index.story.tsx b/packages/components/src/alignment-matrix-control/stories/index.story.tsx
+index 651bbb583f9eb5..5b28b19b8c2c4c 100644
+--- a/packages/components/src/alignment-matrix-control/stories/index.story.tsx
++++ b/packages/components/src/alignment-matrix-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/angle-picker-control/stories/index.story.tsx b/packages/components/src/angle-picker-control/stories/index.story.tsx
+index 803ed26100d48e..7ccbdd7c149358 100644
+--- a/packages/components/src/angle-picker-control/stories/index.story.tsx
++++ b/packages/components/src/angle-picker-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/animate/stories/index.story.tsx b/packages/components/src/animate/stories/index.story.tsx
+index c1798b503faa83..dc9737b5afa629 100644
+--- a/packages/components/src/animate/stories/index.story.tsx
++++ b/packages/components/src/animate/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/badge/stories/index.story.tsx b/packages/components/src/badge/stories/index.story.tsx
+index bbe0bef2a79472..2aa109071baed9 100644
+--- a/packages/components/src/badge/stories/index.story.tsx
++++ b/packages/components/src/badge/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/base-control/stories/index.story.tsx b/packages/components/src/base-control/stories/index.story.tsx
+index a115fa489ca1a5..94a6c1214142b4 100644
+--- a/packages/components/src/base-control/stories/index.story.tsx
++++ b/packages/components/src/base-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/border-box-control/stories/index.story.tsx b/packages/components/src/border-box-control/stories/index.story.tsx
+index 3f118ae7cb37cc..304e1499994f74 100644
+--- a/packages/components/src/border-box-control/stories/index.story.tsx
++++ b/packages/components/src/border-box-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import type { ComponentProps } from 'react';
+ 
+ /**
+diff --git a/packages/components/src/border-control/stories/index.story.tsx b/packages/components/src/border-control/stories/index.story.tsx
+index ca8505c01a0ba0..0efd4a28ba0f22 100644
+--- a/packages/components/src/border-control/stories/index.story.tsx
++++ b/packages/components/src/border-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import type { ComponentProps } from 'react';
+ 
+ /**
+diff --git a/packages/components/src/box-control/stories/index.story.tsx b/packages/components/src/box-control/stories/index.story.tsx
+index 83171c5a400bad..297ba24ee96876 100644
+--- a/packages/components/src/box-control/stories/index.story.tsx
++++ b/packages/components/src/box-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/button-group/stories/index.story.tsx b/packages/components/src/button-group/stories/index.story.tsx
+index a2df76004d4385..f44b3e15991fd4 100644
+--- a/packages/components/src/button-group/stories/index.story.tsx
++++ b/packages/components/src/button-group/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/button/stories/e2e/index.story.tsx b/packages/components/src/button/stories/e2e/index.story.tsx
+index d2651e8df1ec18..f1fda103b7201f 100644
+--- a/packages/components/src/button/stories/e2e/index.story.tsx
++++ b/packages/components/src/button/stories/e2e/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { StoryFn, Meta } from '@storybook/react';
++import type { StoryFn, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/button/stories/index.story.tsx b/packages/components/src/button/stories/index.story.tsx
+index 605b56686c702f..6ee9b830b3c01e 100644
+--- a/packages/components/src/button/stories/index.story.tsx
++++ b/packages/components/src/button/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import type { ReactNode } from 'react';
+ 
+ /**
+diff --git a/packages/components/src/calendar/stories/date-calendar.story.tsx b/packages/components/src/calendar/stories/date-calendar.story.tsx
+index 5088165849f881..b5cd55003639bf 100644
+--- a/packages/components/src/calendar/stories/date-calendar.story.tsx
++++ b/packages/components/src/calendar/stories/date-calendar.story.tsx
+@@ -21,7 +21,7 @@ import {
+ 	ar,
+ 	sv,
+ } from 'date-fns/locale';
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/calendar/stories/date-range-calendar.story.tsx b/packages/components/src/calendar/stories/date-range-calendar.story.tsx
+index 435793f7ba4fca..3c62a6e96e6ff8 100644
+--- a/packages/components/src/calendar/stories/date-range-calendar.story.tsx
++++ b/packages/components/src/calendar/stories/date-range-calendar.story.tsx
+@@ -21,7 +21,7 @@ import {
+ 	ar,
+ 	sv,
+ } from 'date-fns/locale';
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/card/stories/index.story.tsx b/packages/components/src/card/stories/index.story.tsx
+index 94ff8de2820a35..a33a6587f2f300 100644
+--- a/packages/components/src/card/stories/index.story.tsx
++++ b/packages/components/src/card/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/checkbox-control/stories/index.story.tsx b/packages/components/src/checkbox-control/stories/index.story.tsx
+index 85e9fd03f09269..06b215c4fe4f64 100644
+--- a/packages/components/src/checkbox-control/stories/index.story.tsx
++++ b/packages/components/src/checkbox-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/circular-option-picker/stories/index.story.tsx b/packages/components/src/circular-option-picker/stories/index.story.tsx
+index 2110b4f8208476..8443162fdb3a19 100644
+--- a/packages/components/src/circular-option-picker/stories/index.story.tsx
++++ b/packages/components/src/circular-option-picker/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/components/src/color-indicator/stories/index.story.tsx b/packages/components/src/color-indicator/stories/index.story.tsx
+index c24c26f5e844b3..76c66bdb5c299e 100644
+--- a/packages/components/src/color-indicator/stories/index.story.tsx
++++ b/packages/components/src/color-indicator/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/color-palette/stories/index.story.tsx b/packages/components/src/color-palette/stories/index.story.tsx
+index e4c4b89d524448..9c4e52fb24f53c 100644
+--- a/packages/components/src/color-palette/stories/index.story.tsx
++++ b/packages/components/src/color-palette/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/color-picker/stories/index.story.tsx b/packages/components/src/color-picker/stories/index.story.tsx
+index 5dec639fc79ea2..62f126f2cd7a02 100644
+--- a/packages/components/src/color-picker/stories/index.story.tsx
++++ b/packages/components/src/color-picker/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/combobox-control/stories/index.story.tsx b/packages/components/src/combobox-control/stories/index.story.tsx
+index d9b19ee3ae3ff1..03e617fb937ec6 100644
+--- a/packages/components/src/combobox-control/stories/index.story.tsx
++++ b/packages/components/src/combobox-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/composite/legacy/stories/index.story.tsx b/packages/components/src/composite/legacy/stories/index.story.tsx
+index 1b8e07e9bbf560..5552f7c7ac28d1 100644
+--- a/packages/components/src/composite/legacy/stories/index.story.tsx
++++ b/packages/components/src/composite/legacy/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/composite/stories/index.story.tsx b/packages/components/src/composite/stories/index.story.tsx
+index 0748abac88560d..df1698606ccd46 100644
+--- a/packages/components/src/composite/stories/index.story.tsx
++++ b/packages/components/src/composite/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/confirm-dialog/stories/index.story.tsx b/packages/components/src/confirm-dialog/stories/index.story.tsx
+index 047876a568ff67..a0adba88acc7f4 100644
+--- a/packages/components/src/confirm-dialog/stories/index.story.tsx
++++ b/packages/components/src/confirm-dialog/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/custom-gradient-picker/stories/index.story.tsx b/packages/components/src/custom-gradient-picker/stories/index.story.tsx
+index c8f15de1cab5e8..fc88d095988858 100644
+--- a/packages/components/src/custom-gradient-picker/stories/index.story.tsx
++++ b/packages/components/src/custom-gradient-picker/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/custom-select-control-v2/stories/index.story.tsx b/packages/components/src/custom-select-control-v2/stories/index.story.tsx
+index 0aee754a98b155..756511b6a018e1 100644
+--- a/packages/components/src/custom-select-control-v2/stories/index.story.tsx
++++ b/packages/components/src/custom-select-control-v2/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/custom-select-control/stories/index.story.tsx b/packages/components/src/custom-select-control/stories/index.story.tsx
+index 7440a59c3e5a64..77f36d828a3a7f 100644
+--- a/packages/components/src/custom-select-control/stories/index.story.tsx
++++ b/packages/components/src/custom-select-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/date-time/stories/date-time.story.tsx b/packages/components/src/date-time/stories/date-time.story.tsx
+index e240b9da470563..6efd108ae82983 100644
+--- a/packages/components/src/date-time/stories/date-time.story.tsx
++++ b/packages/components/src/date-time/stories/date-time.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/date-time/stories/date.story.tsx b/packages/components/src/date-time/stories/date.story.tsx
+index d305edf7a29e1c..8894a859d3480a 100644
+--- a/packages/components/src/date-time/stories/date.story.tsx
++++ b/packages/components/src/date-time/stories/date.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/date-time/stories/time.story.tsx b/packages/components/src/date-time/stories/time.story.tsx
+index d35bdce4377d6f..b614bdd54defaf 100644
+--- a/packages/components/src/date-time/stories/time.story.tsx
++++ b/packages/components/src/date-time/stories/time.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/disabled/stories/index.story.tsx b/packages/components/src/disabled/stories/index.story.tsx
+index 8ae5f730a076aa..27fbcd5244bbe0 100644
+--- a/packages/components/src/disabled/stories/index.story.tsx
++++ b/packages/components/src/disabled/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/divider/stories/index.story.tsx b/packages/components/src/divider/stories/index.story.tsx
+index 754cd009469b11..a6a1c7e9137dd6 100644
+--- a/packages/components/src/divider/stories/index.story.tsx
++++ b/packages/components/src/divider/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/draggable/stories/index.story.tsx b/packages/components/src/draggable/stories/index.story.tsx
+index 26fa1c65eb6f33..2d88c35068f0a5 100644
+--- a/packages/components/src/draggable/stories/index.story.tsx
++++ b/packages/components/src/draggable/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import type { DragEvent } from 'react';
+ import { fn } from 'storybook/test';
+ 
+diff --git a/packages/components/src/drop-zone/stories/index.story.tsx b/packages/components/src/drop-zone/stories/index.story.tsx
+index 0581befbafccb7..c354a6c2f082f4 100644
+--- a/packages/components/src/drop-zone/stories/index.story.tsx
++++ b/packages/components/src/drop-zone/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/dropdown-menu/stories/index.story.tsx b/packages/components/src/dropdown-menu/stories/index.story.tsx
+index 210bea90108e71..652d811593380d 100644
+--- a/packages/components/src/dropdown-menu/stories/index.story.tsx
++++ b/packages/components/src/dropdown-menu/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/dropdown/stories/index.story.tsx b/packages/components/src/dropdown/stories/index.story.tsx
+index 4c38e4adf082c3..3285449b777778 100644
+--- a/packages/components/src/dropdown/stories/index.story.tsx
++++ b/packages/components/src/dropdown/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/duotone-picker/stories/duotone-picker.story.tsx b/packages/components/src/duotone-picker/stories/duotone-picker.story.tsx
+index bf8439c38bb854..a35cd526c604f1 100644
+--- a/packages/components/src/duotone-picker/stories/duotone-picker.story.tsx
++++ b/packages/components/src/duotone-picker/stories/duotone-picker.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/duotone-picker/stories/duotone-swatch.story.tsx b/packages/components/src/duotone-picker/stories/duotone-swatch.story.tsx
+index edcca5114d0260..e8e7176c509861 100644
+--- a/packages/components/src/duotone-picker/stories/duotone-swatch.story.tsx
++++ b/packages/components/src/duotone-picker/stories/duotone-swatch.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/elevation/stories/index.story.tsx b/packages/components/src/elevation/stories/index.story.tsx
+index 10308db49f88d0..b426331381098c 100644
+--- a/packages/components/src/elevation/stories/index.story.tsx
++++ b/packages/components/src/elevation/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/external-link/stories/index.story.tsx b/packages/components/src/external-link/stories/index.story.tsx
+index eb70999413187f..6a9a9e399979b2 100644
+--- a/packages/components/src/external-link/stories/index.story.tsx
++++ b/packages/components/src/external-link/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/flex/stories/index.story.tsx b/packages/components/src/flex/stories/index.story.tsx
+index d8b90c104263be..6512ff85a7b0d8 100644
+--- a/packages/components/src/flex/stories/index.story.tsx
++++ b/packages/components/src/flex/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/focal-point-picker/stories/index.story.tsx b/packages/components/src/focal-point-picker/stories/index.story.tsx
+index 8f92306b51ad97..f7436032311f3f 100644
+--- a/packages/components/src/focal-point-picker/stories/index.story.tsx
++++ b/packages/components/src/focal-point-picker/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/font-size-picker/stories/e2e/index.story.tsx b/packages/components/src/font-size-picker/stories/e2e/index.story.tsx
+index cee44efcac8b34..1f627e25c20aba 100644
+--- a/packages/components/src/font-size-picker/stories/e2e/index.story.tsx
++++ b/packages/components/src/font-size-picker/stories/e2e/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { StoryFn } from '@storybook/react';
++import type { StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/font-size-picker/stories/index.story.tsx b/packages/components/src/font-size-picker/stories/index.story.tsx
+index f77561aa7ba1c1..14dbdcfdf97867 100644
+--- a/packages/components/src/font-size-picker/stories/index.story.tsx
++++ b/packages/components/src/font-size-picker/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/form-file-upload/stories/index.story.tsx b/packages/components/src/form-file-upload/stories/index.story.tsx
+index cec182346c0a72..a5643c0a4f0c36 100644
+--- a/packages/components/src/form-file-upload/stories/index.story.tsx
++++ b/packages/components/src/form-file-upload/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/form-toggle/stories/index.story.tsx b/packages/components/src/form-toggle/stories/index.story.tsx
+index d987860955bdf9..d65d024ae86738 100644
+--- a/packages/components/src/form-toggle/stories/index.story.tsx
++++ b/packages/components/src/form-toggle/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/form-token-field/stories/index.story.tsx b/packages/components/src/form-token-field/stories/index.story.tsx
+index 3b555908f5cd92..382a5571563f74 100644
+--- a/packages/components/src/form-token-field/stories/index.story.tsx
++++ b/packages/components/src/form-token-field/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import type { ComponentProps } from 'react';
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/gradient-picker/stories/index.story.tsx b/packages/components/src/gradient-picker/stories/index.story.tsx
+index 0c7f5a2cec3a4b..10574348d5a58c 100644
+--- a/packages/components/src/gradient-picker/stories/index.story.tsx
++++ b/packages/components/src/gradient-picker/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/grid/stories/index.story.tsx b/packages/components/src/grid/stories/index.story.tsx
+index 8a77668c570164..fd0d99c3b0c1f8 100644
+--- a/packages/components/src/grid/stories/index.story.tsx
++++ b/packages/components/src/grid/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/guide/stories/index.story.tsx b/packages/components/src/guide/stories/index.story.tsx
+index d321ad1cb0509a..ff5345f1184547 100644
+--- a/packages/components/src/guide/stories/index.story.tsx
++++ b/packages/components/src/guide/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/h-stack/stories/e2e/index.story.tsx b/packages/components/src/h-stack/stories/e2e/index.story.tsx
+index 753ac0016dc363..59556074d7421c 100644
+--- a/packages/components/src/h-stack/stories/e2e/index.story.tsx
++++ b/packages/components/src/h-stack/stories/e2e/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { StoryFn, Meta } from '@storybook/react';
++import type { StoryFn, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/h-stack/stories/index.story.tsx b/packages/components/src/h-stack/stories/index.story.tsx
+index 6ac0e5dc18d8d3..40abec8df0b79e 100644
+--- a/packages/components/src/h-stack/stories/index.story.tsx
++++ b/packages/components/src/h-stack/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { StoryFn, Meta } from '@storybook/react';
++import type { StoryFn, Meta } from '@storybook/react-webpack5';
+ /**
+  * Internal dependencies
+  */
+diff --git a/packages/components/src/heading/stories/index.story.tsx b/packages/components/src/heading/stories/index.story.tsx
+index 2596ca0739df70..e6e83da816788b 100644
+--- a/packages/components/src/heading/stories/index.story.tsx
++++ b/packages/components/src/heading/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/icon/stories/index.story.tsx b/packages/components/src/icon/stories/index.story.tsx
+index d1eabf2e98b771..26228fa5a3fd97 100644
+--- a/packages/components/src/icon/stories/index.story.tsx
++++ b/packages/components/src/icon/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/input-control/stories/index.story.tsx b/packages/components/src/input-control/stories/index.story.tsx
+index b3ec1e96e89d08..fd406040eb714c 100644
+--- a/packages/components/src/input-control/stories/index.story.tsx
++++ b/packages/components/src/input-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/item-group/stories/index.story.tsx b/packages/components/src/item-group/stories/index.story.tsx
+index 69166d1cd9dedf..14293973d62e92 100644
+--- a/packages/components/src/item-group/stories/index.story.tsx
++++ b/packages/components/src/item-group/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/keyboard-shortcuts/stories/index.story.tsx b/packages/components/src/keyboard-shortcuts/stories/index.story.tsx
+index 0c8e0f451929a0..930ad33ddfc78b 100644
+--- a/packages/components/src/keyboard-shortcuts/stories/index.story.tsx
++++ b/packages/components/src/keyboard-shortcuts/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/menu-group/stories/index.story.tsx b/packages/components/src/menu-group/stories/index.story.tsx
+index 1e8e03e09d7760..6aa3fa2441ff8f 100644
+--- a/packages/components/src/menu-group/stories/index.story.tsx
++++ b/packages/components/src/menu-group/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/menu-item/stories/index.story.tsx b/packages/components/src/menu-item/stories/index.story.tsx
+index bef548c59d9461..cc1cbefe5c23f3 100644
+--- a/packages/components/src/menu-item/stories/index.story.tsx
++++ b/packages/components/src/menu-item/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/menu-items-choice/stories/index.story.tsx b/packages/components/src/menu-items-choice/stories/index.story.tsx
+index b634eb5becedbf..b41cf9eadd3762 100644
+--- a/packages/components/src/menu-items-choice/stories/index.story.tsx
++++ b/packages/components/src/menu-items-choice/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/menu/stories/index.story.tsx b/packages/components/src/menu/stories/index.story.tsx
+index f8f70c0747a927..1bf9cd592972e8 100644
+--- a/packages/components/src/menu/stories/index.story.tsx
++++ b/packages/components/src/menu/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { StoryObj, Meta } from '@storybook/react';
++import type { StoryObj, Meta } from '@storybook/react-webpack5';
+ import { css } from '@emotion/react';
+ import { fn } from 'storybook/test';
+ 
+diff --git a/packages/components/src/modal/stories/index.story.tsx b/packages/components/src/modal/stories/index.story.tsx
+index 3a7b817458ad28..208b969bfcafa2 100644
+--- a/packages/components/src/modal/stories/index.story.tsx
++++ b/packages/components/src/modal/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { StoryFn, Meta } from '@storybook/react';
++import type { StoryFn, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/navigable-container/stories/navigable-menu.story.tsx b/packages/components/src/navigable-container/stories/navigable-menu.story.tsx
+index e480e30bd8ec36..15943c4dc74fc2 100644
+--- a/packages/components/src/navigable-container/stories/navigable-menu.story.tsx
++++ b/packages/components/src/navigable-container/stories/navigable-menu.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/navigable-container/stories/tabbable-container.story.tsx b/packages/components/src/navigable-container/stories/tabbable-container.story.tsx
+index 44df770877d247..740be566217b57 100644
+--- a/packages/components/src/navigable-container/stories/tabbable-container.story.tsx
++++ b/packages/components/src/navigable-container/stories/tabbable-container.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/navigation/stories/index.story.tsx b/packages/components/src/navigation/stories/index.story.tsx
+index 86a79649f182e7..8cc0aad5a4659f 100644
+--- a/packages/components/src/navigation/stories/index.story.tsx
++++ b/packages/components/src/navigation/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta } from '@storybook/react';
++import type { Meta } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/navigator/stories/index.story.tsx b/packages/components/src/navigator/stories/index.story.tsx
+index 7a71731eff833c..a771c46764be59 100644
+--- a/packages/components/src/navigator/stories/index.story.tsx
++++ b/packages/components/src/navigator/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/notice/stories/index.story.tsx b/packages/components/src/notice/stories/index.story.tsx
+index 1102cd9bb347fb..4aefd33eaede2d 100644
+--- a/packages/components/src/notice/stories/index.story.tsx
++++ b/packages/components/src/notice/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/number-control/stories/index.story.tsx b/packages/components/src/number-control/stories/index.story.tsx
+index 0b03c04c73e471..8f7c1d2443c1e0 100644
+--- a/packages/components/src/number-control/stories/index.story.tsx
++++ b/packages/components/src/number-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/palette-edit/stories/index.story.tsx b/packages/components/src/palette-edit/stories/index.story.tsx
+index e32c24ac920a57..d5e9a3ffd889a9 100644
+--- a/packages/components/src/palette-edit/stories/index.story.tsx
++++ b/packages/components/src/palette-edit/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/panel/stories/index.story.tsx b/packages/components/src/panel/stories/index.story.tsx
+index 9607dfaf275dde..a0e3d0e3551420 100644
+--- a/packages/components/src/panel/stories/index.story.tsx
++++ b/packages/components/src/panel/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/placeholder/stories/index.story.tsx b/packages/components/src/placeholder/stories/index.story.tsx
+index 6698a8fc06d341..33fd1308b19336 100644
+--- a/packages/components/src/placeholder/stories/index.story.tsx
++++ b/packages/components/src/placeholder/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/popover/stories/index.story.tsx b/packages/components/src/popover/stories/index.story.tsx
+index 66f68455008348..277cd3fed74bf2 100644
+--- a/packages/components/src/popover/stories/index.story.tsx
++++ b/packages/components/src/popover/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/progress-bar/stories/index.story.tsx b/packages/components/src/progress-bar/stories/index.story.tsx
+index 110dab79124c62..2faa67d6fc46e3 100644
+--- a/packages/components/src/progress-bar/stories/index.story.tsx
++++ b/packages/components/src/progress-bar/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/query-controls/stories/index.story.tsx b/packages/components/src/query-controls/stories/index.story.tsx
+index a5f07a2507c26b..82cb7075edf21d 100644
+--- a/packages/components/src/query-controls/stories/index.story.tsx
++++ b/packages/components/src/query-controls/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/radio-control/stories/index.story.tsx b/packages/components/src/radio-control/stories/index.story.tsx
+index 7b7bc773f323a9..3efd3231e3bb73 100644
+--- a/packages/components/src/radio-control/stories/index.story.tsx
++++ b/packages/components/src/radio-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/radio-group/stories/index.story.tsx b/packages/components/src/radio-group/stories/index.story.tsx
+index 084077bd593deb..fb2434aae7c708 100644
+--- a/packages/components/src/radio-group/stories/index.story.tsx
++++ b/packages/components/src/radio-group/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/range-control/stories/index.story.tsx b/packages/components/src/range-control/stories/index.story.tsx
+index bd3fee5d5cb855..579659651a58c3 100644
+--- a/packages/components/src/range-control/stories/index.story.tsx
++++ b/packages/components/src/range-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/resizable-box/stories/index.story.tsx b/packages/components/src/resizable-box/stories/index.story.tsx
+index 2241305c5261cd..2f1373cc922647 100644
+--- a/packages/components/src/resizable-box/stories/index.story.tsx
++++ b/packages/components/src/resizable-box/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/responsive-wrapper/stories/index.story.tsx b/packages/components/src/responsive-wrapper/stories/index.story.tsx
+index 5a834b999b715b..080fabadfa5238 100644
+--- a/packages/components/src/responsive-wrapper/stories/index.story.tsx
++++ b/packages/components/src/responsive-wrapper/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/sandbox/stories/index.story.tsx b/packages/components/src/sandbox/stories/index.story.tsx
+index b8f40666d5a92d..d3f4b0f28b939d 100644
+--- a/packages/components/src/sandbox/stories/index.story.tsx
++++ b/packages/components/src/sandbox/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/scroll-lock/stories/index.story.tsx b/packages/components/src/scroll-lock/stories/index.story.tsx
+index b251018f00b38e..9be745fc539f0d 100644
+--- a/packages/components/src/scroll-lock/stories/index.story.tsx
++++ b/packages/components/src/scroll-lock/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import type { ReactNode } from 'react';
+ 
+ /**
+diff --git a/packages/components/src/scrollable/stories/index.story.tsx b/packages/components/src/scrollable/stories/index.story.tsx
+index 425fd549460aa9..a2bed9a4a141f6 100644
+--- a/packages/components/src/scrollable/stories/index.story.tsx
++++ b/packages/components/src/scrollable/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/search-control/stories/index.story.tsx b/packages/components/src/search-control/stories/index.story.tsx
+index d9c9e3d48d5fbf..1a2972ffbb98e7 100644
+--- a/packages/components/src/search-control/stories/index.story.tsx
++++ b/packages/components/src/search-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/select-control/stories/index.story.tsx b/packages/components/src/select-control/stories/index.story.tsx
+index 4cc2862889e95f..2f95172635161e 100644
+--- a/packages/components/src/select-control/stories/index.story.tsx
++++ b/packages/components/src/select-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/shortcut/stories/index.story.tsx b/packages/components/src/shortcut/stories/index.story.tsx
+index b0bd31ac51cf4b..10aface10ae66d 100644
+--- a/packages/components/src/shortcut/stories/index.story.tsx
++++ b/packages/components/src/shortcut/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/slot-fill/stories/index.story.tsx b/packages/components/src/slot-fill/stories/index.story.tsx
+index 95098454711cc9..42869d3807eb03 100644
+--- a/packages/components/src/slot-fill/stories/index.story.tsx
++++ b/packages/components/src/slot-fill/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/snackbar/stories/index.story.tsx b/packages/components/src/snackbar/stories/index.story.tsx
+index 5c24044cc1ae68..7ea87c46753b40 100644
+--- a/packages/components/src/snackbar/stories/index.story.tsx
++++ b/packages/components/src/snackbar/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/snackbar/stories/list.story.tsx b/packages/components/src/snackbar/stories/list.story.tsx
+index 69a4367c485759..c166a776989adb 100644
+--- a/packages/components/src/snackbar/stories/list.story.tsx
++++ b/packages/components/src/snackbar/stories/list.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/spacer/stories/index.story.tsx b/packages/components/src/spacer/stories/index.story.tsx
+index df63f8533516ad..76109995a280e6 100644
+--- a/packages/components/src/spacer/stories/index.story.tsx
++++ b/packages/components/src/spacer/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/spinner/stories/index.story.tsx b/packages/components/src/spinner/stories/index.story.tsx
+index 1dc5879ac41444..a6d8db60576739 100644
+--- a/packages/components/src/spinner/stories/index.story.tsx
++++ b/packages/components/src/spinner/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { StoryFn, Meta } from '@storybook/react';
++import type { StoryFn, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/surface/stories/index.story.tsx b/packages/components/src/surface/stories/index.story.tsx
+index 0a18db11516028..42714d2a946226 100644
+--- a/packages/components/src/surface/stories/index.story.tsx
++++ b/packages/components/src/surface/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/tab-panel/stories/index.story.tsx b/packages/components/src/tab-panel/stories/index.story.tsx
+index dcd6d7db8aa53a..a04fc343dd7883 100644
+--- a/packages/components/src/tab-panel/stories/index.story.tsx
++++ b/packages/components/src/tab-panel/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/tabs/stories/index.story.tsx b/packages/components/src/tabs/stories/index.story.tsx
+index b654360fe538eb..352c2b9c431ead 100644
+--- a/packages/components/src/tabs/stories/index.story.tsx
++++ b/packages/components/src/tabs/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/text-control/stories/index.story.tsx b/packages/components/src/text-control/stories/index.story.tsx
+index f537be3badc5bf..3d63b5e18ab487 100644
+--- a/packages/components/src/text-control/stories/index.story.tsx
++++ b/packages/components/src/text-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/text-highlight/stories/index.story.tsx b/packages/components/src/text-highlight/stories/index.story.tsx
+index f9538b7130095d..ffc4d3f66433b7 100644
+--- a/packages/components/src/text-highlight/stories/index.story.tsx
++++ b/packages/components/src/text-highlight/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/text/stories/index.story.tsx b/packages/components/src/text/stories/index.story.tsx
+index 976e9dd8c4e083..e13e2febf116e6 100644
+--- a/packages/components/src/text/stories/index.story.tsx
++++ b/packages/components/src/text/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/textarea-control/stories/index.story.tsx b/packages/components/src/textarea-control/stories/index.story.tsx
+index fa8147a505c9ef..a055134d0b726d 100644
+--- a/packages/components/src/textarea-control/stories/index.story.tsx
++++ b/packages/components/src/textarea-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/theme/stories/index.story.tsx b/packages/components/src/theme/stories/index.story.tsx
+index 8ef87cbe8ddb41..a1d80e1d6a116c 100644
+--- a/packages/components/src/theme/stories/index.story.tsx
++++ b/packages/components/src/theme/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/tip/stories/index.story.tsx b/packages/components/src/tip/stories/index.story.tsx
+index 3026f2a58fae73..22de1a513fbf81 100644
+--- a/packages/components/src/tip/stories/index.story.tsx
++++ b/packages/components/src/tip/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/toggle-control/stories/index.story.tsx b/packages/components/src/toggle-control/stories/index.story.tsx
+index c82b5972392c7e..95ccb92e37c2cc 100644
+--- a/packages/components/src/toggle-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/toggle-group-control/stories/index.story.tsx b/packages/components/src/toggle-group-control/stories/index.story.tsx
+index 58ab9dd8a038d8..09f29912b7b90a 100644
+--- a/packages/components/src/toggle-group-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-group-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/toolbar/stories/index.story.tsx b/packages/components/src/toolbar/stories/index.story.tsx
+index c879c88a7c8a41..962c1ac1cde3cb 100644
+--- a/packages/components/src/toolbar/stories/index.story.tsx
++++ b/packages/components/src/toolbar/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/tools-panel/stories/index.story.tsx b/packages/components/src/tools-panel/stories/index.story.tsx
+index 0ede4ca58dad57..ebcdaa8edafd59 100644
+--- a/packages/components/src/tools-panel/stories/index.story.tsx
++++ b/packages/components/src/tools-panel/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import styled from '@emotion/styled';
+ import { fn } from 'storybook/test';
+ 
+diff --git a/packages/components/src/tooltip/stories/index.story.tsx b/packages/components/src/tooltip/stories/index.story.tsx
+index e3d21525dd345d..762ed5e486df73 100644
+--- a/packages/components/src/tooltip/stories/index.story.tsx
++++ b/packages/components/src/tooltip/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/tree-grid/stories/index.story.tsx b/packages/components/src/tree-grid/stories/index.story.tsx
+index e7c4d70a760a24..7ee6bd286ac9b1 100644
+--- a/packages/components/src/tree-grid/stories/index.story.tsx
++++ b/packages/components/src/tree-grid/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/tree-select/stories/index.story.tsx b/packages/components/src/tree-select/stories/index.story.tsx
+index 56c5bab568aae1..50854ff7bc9c60 100644
+--- a/packages/components/src/tree-select/stories/index.story.tsx
++++ b/packages/components/src/tree-select/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import type { ComponentProps } from 'react';
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/truncate/stories/index.story.tsx b/packages/components/src/truncate/stories/index.story.tsx
+index 8dcb1f912e7579..ed26badc8372f5 100644
+--- a/packages/components/src/truncate/stories/index.story.tsx
++++ b/packages/components/src/truncate/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/unit-control/stories/index.story.tsx b/packages/components/src/unit-control/stories/index.story.tsx
+index c5ea665c035141..0b2929712c87a5 100644
+--- a/packages/components/src/unit-control/stories/index.story.tsx
++++ b/packages/components/src/unit-control/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ import { fn } from 'storybook/test';
+ 
+ /**
+diff --git a/packages/components/src/v-stack/stories/e2e/index.story.tsx b/packages/components/src/v-stack/stories/e2e/index.story.tsx
+index b11e56684164ad..d7f0df6f85a885 100644
+--- a/packages/components/src/v-stack/stories/e2e/index.story.tsx
++++ b/packages/components/src/v-stack/stories/e2e/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { StoryFn, Meta } from '@storybook/react';
++import type { StoryFn, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/v-stack/stories/index.story.tsx b/packages/components/src/v-stack/stories/index.story.tsx
+index a5b3c7194408ef..d26121f1607f09 100644
+--- a/packages/components/src/v-stack/stories/index.story.tsx
++++ b/packages/components/src/v-stack/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx
+index 1573785463ba8e..31e9a55cae0b17 100644
+--- a/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx
+@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * External dependencies
+  */
+-import type { StoryObj, Meta } from '@storybook/react';
++import type { StoryObj, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx
+index ca37077c0bd4c5..70276d4837cf65 100644
+--- a/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx
+@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * External dependencies
+  */
+-import type { StoryObj, Meta } from '@storybook/react';
++import type { StoryObj, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx
+index 722337a453e8a2..2769fb842b658f 100644
+--- a/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx
+@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * External dependencies
+  */
+-import type { StoryObj, Meta } from '@storybook/react';
++import type { StoryObj, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/validated-form-controls/components/stories/form-token-field.story.tsx b/packages/components/src/validated-form-controls/components/stories/form-token-field.story.tsx
+index 29c048b318b81e..6c1e34c4300bc8 100644
+--- a/packages/components/src/validated-form-controls/components/stories/form-token-field.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/form-token-field.story.tsx
+@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * External dependencies
+  */
+-import type { StoryObj, Meta } from '@storybook/react';
++import type { StoryObj, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx
+index 4150da7b134b9e..37ca8b0fb0943a 100644
+--- a/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx
+@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * External dependencies
+  */
+-import type { StoryObj, Meta } from '@storybook/react';
++import type { StoryObj, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx
+index 0f01d1716daa4c..31637aa70b70a5 100644
+--- a/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx
+@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * External dependencies
+  */
+-import type { StoryObj, Meta } from '@storybook/react';
++import type { StoryObj, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/validated-form-controls/components/stories/overview.story.tsx b/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
+index f60357bbbabc01..59c9c44deaf682 100644
+--- a/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ import { expect, userEvent, waitFor, within } from 'storybook/test';
+ import clsx from 'clsx';
+ 
+diff --git a/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx
+index 4adb9161e880d2..f6b36e6234e140 100644
+--- a/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx
+@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * External dependencies
+  */
+-import type { StoryObj, Meta } from '@storybook/react';
++import type { StoryObj, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx
+index 53d14cdcd61db2..53850a3ab979f7 100644
+--- a/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx
+@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * External dependencies
+  */
+-import type { StoryObj, Meta } from '@storybook/react';
++import type { StoryObj, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx
+index a7032aed1cdf29..e154b8e3a174c3 100644
+--- a/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx
+@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * External dependencies
+  */
+-import type { StoryObj, Meta } from '@storybook/react';
++import type { StoryObj, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx
+index d95ad861efef26..1814b41e1986da 100644
+--- a/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx
+@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * External dependencies
+  */
+-import type { StoryObj, Meta } from '@storybook/react';
++import type { StoryObj, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx
+index 952e9ede438391..bdff6a490c3bab 100644
+--- a/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx
+@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * External dependencies
+  */
+-import type { StoryObj, Meta } from '@storybook/react';
++import type { StoryObj, Meta } from '@storybook/react-webpack5';
+ /**
+  * Internal dependencies
+  */
+diff --git a/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx
+index 188397ef4f6197..70ae0bc5e53642 100644
+--- a/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx
+@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * External dependencies
+  */
+-import type { StoryObj, Meta } from '@storybook/react';
++import type { StoryObj, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx
+index f6daa78b10558d..f94b31ec9c741d 100644
+--- a/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx
+@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
+ /**
+  * External dependencies
+  */
+-import type { StoryObj, Meta } from '@storybook/react';
++import type { StoryObj, Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/view/stories/index.story.tsx b/packages/components/src/view/stories/index.story.tsx
+index 4d5e16408a6f75..e9c49e6abde968 100644
+--- a/packages/components/src/view/stories/index.story.tsx
++++ b/packages/components/src/view/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/visually-hidden/stories/index.story.tsx b/packages/components/src/visually-hidden/stories/index.story.tsx
+index 1c79718ddf6e04..b68a86f1a7ebfa 100644
+--- a/packages/components/src/visually-hidden/stories/index.story.tsx
++++ b/packages/components/src/visually-hidden/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/components/src/z-stack/stories/index.story.tsx b/packages/components/src/z-stack/stories/index.story.tsx
+index faf3c0556bdb76..44b6e4abd50820 100644
+--- a/packages/components/src/z-stack/stories/index.story.tsx
++++ b/packages/components/src/z-stack/stories/index.story.tsx
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import type { CSSProperties } from 'react';
+-import type { Meta, StoryFn } from '@storybook/react';
++import type { Meta, StoryFn } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index e789f46d2d1157..58d2526a280465 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -79,8 +79,7 @@
+ 		"remove-accents": "^0.5.0"
+ 	},
+ 	"devDependencies": {
+-		"@ariakit/test": "^0.4.7",
+-		"@storybook/react": "9.1.17"
++		"@ariakit/test": "^0.4.7"
+ 	},
+ 	"peerDependencies": {
+ 		"react": "^18.0.0",
+diff --git a/packages/dataviews/src/dataviews-picker/stories/index.story.tsx b/packages/dataviews/src/dataviews-picker/stories/index.story.tsx
+index 75528bd41ce5dd..4a36342fb1322c 100644
+--- a/packages/dataviews/src/dataviews-picker/stories/index.story.tsx
++++ b/packages/dataviews/src/dataviews-picker/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta } from '@storybook/react';
++import type { Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/dataviews/src/dataviews/stories/index.story.tsx b/packages/dataviews/src/dataviews/stories/index.story.tsx
+index 019cc6cc79e81f..c4a7b0535180ae 100644
+--- a/packages/dataviews/src/dataviews/stories/index.story.tsx
++++ b/packages/dataviews/src/dataviews/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta } from '@storybook/react';
++import type { Meta } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index 10e377669f4027..c832b7f5887085 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -71,7 +71,6 @@
+ 		"memize": "^2.1.0"
+ 	},
+ 	"devDependencies": {
+-		"@storybook/react": "9.1.17",
+ 		"@terrazzo/cli": "^0.10.2",
+ 		"@terrazzo/plugin-css": "^0.10.2",
+ 		"@terrazzo/token-tools": "^0.10.2",
+diff --git a/packages/theme/src/color-ramps/stories/index.story.tsx b/packages/theme/src/color-ramps/stories/index.story.tsx
+index 2c5903fe7aaa03..394935567c4fc6 100644
+--- a/packages/theme/src/color-ramps/stories/index.story.tsx
++++ b/packages/theme/src/color-ramps/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/theme/src/stories/index.story.tsx b/packages/theme/src/stories/index.story.tsx
+index 3118dff9efb6d5..d2b0a20d334911 100644
+--- a/packages/theme/src/stories/index.story.tsx
++++ b/packages/theme/src/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 1b87aabfaa1007..c5ae8d2265e491 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -50,7 +50,6 @@
+ 		"clsx": "^2.1.1"
+ 	},
+ 	"devDependencies": {
+-		"@storybook/react": "9.1.17",
+ 		"@wordpress/theme": "file:../theme"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/ui/src/badge/stories/index.story.tsx b/packages/ui/src/badge/stories/index.story.tsx
+index bfc1def8a558ef..ad79d7a5966c1a 100644
+--- a/packages/ui/src/badge/stories/index.story.tsx
++++ b/packages/ui/src/badge/stories/index.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/ui/src/box/stories/index.story.tsx b/packages/ui/src/box/stories/index.story.tsx
+index 9a93fe126938e2..6168e188c9e6fc 100644
+--- a/packages/ui/src/box/stories/index.story.tsx
++++ b/packages/ui/src/box/stories/index.story.tsx
+@@ -1,4 +1,4 @@
+-import { type Meta, type StoryObj } from '@storybook/react';
++import { type Meta, type StoryObj } from '@storybook/react-webpack5';
+ import { type PaddingSize } from '@wordpress/theme';
+ import { Box } from '../box';
+ 
+diff --git a/packages/ui/src/form/primitives/field/stories/index.story.tsx b/packages/ui/src/form/primitives/field/stories/index.story.tsx
+index fbdc10605e286a..e83e458071be3f 100644
+--- a/packages/ui/src/form/primitives/field/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/field/stories/index.story.tsx
+@@ -1,4 +1,4 @@
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ import { useId } from '@wordpress/element';
+ import '@wordpress/theme/design-tokens.css';
+ import { Field } from '../../../..';
+diff --git a/packages/ui/src/stack/stories/index.story.tsx b/packages/ui/src/stack/stories/index.story.tsx
+index bb7fcbc624e301..e91d592c9e3667 100644
+--- a/packages/ui/src/stack/stories/index.story.tsx
++++ b/packages/ui/src/stack/stories/index.story.tsx
+@@ -1,4 +1,4 @@
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ import { Stack } from '../index';
+ import { Box } from '../../box';
+ 
+diff --git a/packages/ui/src/visually-hidden/stories/index.story.tsx b/packages/ui/src/visually-hidden/stories/index.story.tsx
+index c40b363d30fb17..696d6360fdf0f9 100644
+--- a/packages/ui/src/visually-hidden/stories/index.story.tsx
++++ b/packages/ui/src/visually-hidden/stories/index.story.tsx
+@@ -1,4 +1,4 @@
+-import type { Meta, StoryObj } from '@storybook/react';
++import type { Meta, StoryObj } from '@storybook/react-webpack5';
+ import { VisuallyHidden } from '../';
+ 
+ const meta: Meta< typeof VisuallyHidden > = {

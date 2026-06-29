@@ -1,0 +1,173 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 53ff933848338c..ce4b473b054564 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ 
+ ### Enhancements
+ 
++-   `Button`: Add Button support for iconPosition top and showDescription. ([#62412](https://github.com/WordPress/gutenberg/pull/62412))
+ -   `PaletteEdit`: use `Item` internally instead of custom styles ([#66164](https://github.com/WordPress/gutenberg/pull/66164)).
+ 
+ ## 28.10.0 (2024-10-16)
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index d458771494a338..0c1d6ce8b9787b 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -140,10 +140,17 @@ An optional additional class name to apply to the rendered button.
+ 
+ #### `description`: `string`
+ 
+-An accessible description for the button.
++A visually hidden accessible description for the button.
+ 
+ -   Required: No
+ 
++#### `showDescription`: `boolean`
++
++Whether to show the accessible description.
++
++-   Required: No
++-   Default: `false`
++
+ #### `disabled`: `boolean`
+ 
+ Whether the button is disabled. If `true`, this will force a `button` element to be rendered, even when an `href` is given.
+@@ -164,7 +171,7 @@ If provided, renders an [Icon](/packages/components/src/icon/README.md) componen
+ 
+ -   Required: No
+ 
+-#### `iconPosition`: `'left' | 'right'`
++#### `iconPosition`: `'left' | 'right' | 'top'`
+ 
+ If provided with `icon`, sets the position of icon relative to the `text`. Available options are `left|right`.
+ 
+diff --git a/packages/components/src/button/index.tsx b/packages/components/src/button/index.tsx
+index 0ab6b24b4dd6aa..a76c049e210d68 100644
+--- a/packages/components/src/button/index.tsx
++++ b/packages/components/src/button/index.tsx
+@@ -112,6 +112,7 @@ export function UnforwardedButton(
+ 		text,
+ 		variant,
+ 		description,
++		showDescription,
+ 		...buttonOrAnchorProps
+ 	} = useDeprecatedProps( props );
+ 
+@@ -161,6 +162,7 @@ export function UnforwardedButton(
+ 		'is-destructive': isDestructive,
+ 		'has-text': !! icon && ( hasChildren || text ),
+ 		'has-icon': !! icon,
++		'has-icon-position-top': iconPosition === 'top',
+ 	} );
+ 
+ 	const trulyDisabled = disabled && ! accessibleWhenDisabled;
+@@ -224,7 +226,7 @@ export function UnforwardedButton(
+ 
+ 	const elementChildren = (
+ 		<>
+-			{ icon && iconPosition === 'left' && (
++			{ icon && ( iconPosition === 'left' || iconPosition === 'top' ) && (
+ 				<Icon icon={ icon } size={ iconSize } />
+ 			) }
+ 			{ text && <>{ text }</> }
+@@ -275,13 +277,15 @@ export function UnforwardedButton(
+ 		  }
+ 		: {};
+ 
++	const DescriptionComponent = showDescription ? 'span' : VisuallyHidden;
++
+ 	return (
+ 		<>
+ 			<Tooltip { ...tooltipProps }>{ element }</Tooltip>
+ 			{ description && (
+-				<VisuallyHidden>
++				<DescriptionComponent className="components-button__description">
+ 					<span id={ descriptionId }>{ description }</span>
+-				</VisuallyHidden>
++				</DescriptionComponent>
+ 			) }
+ 		</>
+ 	);
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 61455a54e26f6b..530578250861ee 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -234,7 +234,6 @@
+ 	/**
+ 	 * Link buttons.
+ 	 */
+-
+ 	&.is-link {
+ 		margin: 0;
+ 		padding: 0;
+@@ -343,6 +342,18 @@
+ 			padding-left: $grid-unit-10;
+ 			gap: $grid-unit-05;
+ 		}
++
++		&.has-icon-position-top {
++			flex-direction: column;
++			height: auto;
++			padding-left: $grid-unit-10;
++			padding-right: $grid-unit-10;
++			white-space: normal;
++
++			&.is-small {
++				line-height: normal;
++			}
++		}
+ 	}
+ 
+ 	// Toggled style.
+@@ -376,6 +387,7 @@
+ 	svg {
+ 		fill: currentColor;
+ 		outline: none;
++		flex-shrink: 0;
+ 
+ 		// Optimizate for high contrast modes.
+ 		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
+@@ -391,6 +403,16 @@
+ 	}
+ }
+ 
++.components-button__description {
++	display: block;
++	margin-top: $grid-unit-10;
++	margin-bottom: 0;
++	font-family: inherit;
++	font-weight: normal;
++	font-size: $default-font-size;
++	color: $gray-700;
++}
++
+ @keyframes components-button__busy-animation {
+ 	0% {
+ 		background-position: 200px 0;
+diff --git a/packages/components/src/button/types.ts b/packages/components/src/button/types.ts
+index 7d67b721a5036d..bfeff94cce85c4 100644
+--- a/packages/components/src/button/types.ts
++++ b/packages/components/src/button/types.ts
+@@ -46,6 +46,12 @@ type BaseButtonProps = {
+ 	 * A visually hidden accessible description for the button.
+ 	 */
+ 	description?: string;
++	/**
++	 * Whether to show the accessible description.
++	 *
++	 * @default false
++	 */
++	showDescription?: boolean;
+ 	/**
+ 	 * If provided, renders an Icon component inside the button.
+ 	 */
+@@ -55,7 +61,7 @@ type BaseButtonProps = {
+ 	 *
+ 	 * @default 'left'
+ 	 */
+-	iconPosition?: 'left' | 'right';
++	iconPosition?: 'left' | 'right' | 'top';
+ 	/**
+ 	 * If provided with `icon`, sets the icon size.
+ 	 * Please refer to the Icon component for more details regarding

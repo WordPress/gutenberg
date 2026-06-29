@@ -1,0 +1,4247 @@
+diff --git a/.stylelintignore b/.stylelintignore
+index a612f149f3a1b3..3a43e2aca901b9 100644
+--- a/.stylelintignore
++++ b/.stylelintignore
+@@ -2,4 +2,5 @@ build
+ build-style
+ node_modules
+ packages/stylelint-config/test
++packages/theme/src/prebuilt
+ packages/theme/src/stylelint-plugins/test/fixtures
+diff --git a/bin/dev.mjs b/bin/dev.mjs
+index 62d932d7ae4195..d19f37f27bb263 100755
+--- a/bin/dev.mjs
++++ b/bin/dev.mjs
+@@ -203,15 +203,15 @@ async function dev() {
+ 		// Wait for wp-build to complete its initial build, then signal ready.
+ 		// Using .then() ensures cleanup handlers are registered before awaiting,
+ 		// so early termination still triggers cleanup.
+-		const onStdoutData = ( data ) => {
++		let isReady = false;
++		buildWatch.stdout.on( 'data', ( data ) => {
+ 			const output = data.toString();
+ 			process.stdout.write( output );
+-			if ( output.includes( 'Watching for changes' ) ) {
+-				buildWatch.stdout.off( 'data', onStdoutData );
++			if ( ! isReady && output.includes( 'Watching for changes' ) ) {
++				isReady = true;
+ 				readyMarkerFile.create();
+ 			}
+-		};
+-		buildWatch.stdout.on( 'data', onStdoutData );
++		} );
+ 
+ 		// Keep the process running
+ 		await new Promise( () => {} );
+diff --git a/docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md b/docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md
+index 8e46690ad59280..e450be5f9dd401 100644
+--- a/docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md
++++ b/docs/how-to-guides/block-tutorial/nested-blocks-inner-blocks.md
+@@ -145,7 +145,7 @@ When defining a direct descendent block, use the `parent` block setting to defin
+ 
+ An example of this is the Comment Author Name block, which is assigned the `ancestor` block setting. This allows the Comment Author Name block to only be available as a nested descendant in its ancestral Comment Template block. Otherwise, the Comment Author Name block will not be available as an option within the block inserter. See [Comment Author Name code for reference](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/comment-author-name).
+ 
+-The `ancestor` relationship allows the Comment Author Name block to be anywhere in the hierarchical tree, and not _just_ a direct child of the parent Comment Template block, while still limiting its availability within the block inserter to only be visible an an option to insert if the Comment Template block is available.
++The `ancestor` relationship allows the Comment Author Name block to be anywhere in the hierarchical tree, and not _just_ a direct child of the parent Comment Template block, while still limiting its availability within the block inserter to only be visible as an option to insert if the Comment Template block is available.
+ 
+ When defining a descendent block, use the `ancestor` block setting. This prevents the nested block from showing in the inserter outside of the InnerBlock it is defined for.
+ 
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 42a0e046a4f3ff..19e857c66fba87 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -2100,7 +2100,7 @@
+ 		"parent": "packages"
+ 	},
+ 	{
+-		"title": "@wordpress/wp-build",
++		"title": "@wordpress/build",
+ 		"slug": "packages-wp-build",
+ 		"markdown_source": "../packages/wp-build/README.md",
+ 		"parent": "packages"
+diff --git a/docs/reference-guides/core-blocks.md b/docs/reference-guides/core-blocks.md
+index 8d0ac5b8e6f376..3788c91bf36e17 100644
+--- a/docs/reference-guides/core-blocks.md
++++ b/docs/reference-guides/core-blocks.md
+@@ -408,8 +408,8 @@ Introduce new sections and organize content to help visitors (and search engines
+ 
+ -	**Name:** core/heading
+ -	**Category:** text
+--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight)
+--	**Attributes:** content, level, levelOptions, placeholder, textAlign
++-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign)
++-	**Attributes:** content, level, levelOptions, placeholder
+ 
+ ## Home Link
+ 
+@@ -520,7 +520,7 @@ Content before this block will be shown in the excerpt on your archives page. ([
+ 
+ -	**Name:** core/more
+ -	**Category:** design
+--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~, ~~multiple~~
++-	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~, ~~multiple~~, ~~visibility~~
+ -	**Attributes:** customText, noTeaser
+ 
+ ## Navigation
+@@ -571,7 +571,7 @@ Separate your content into a multi-page experience. ([Source](https://github.com
+ -	**Name:** core/nextpage
+ -	**Category:** design
+ -	**Parent:** core/post-content
+--	**Supports:** anchor, interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~
++-	**Supports:** anchor, interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~, ~~visibility~~
+ 
+ ## Page List
+ 
+diff --git a/docs/reference-guides/data/data-core-notices.md b/docs/reference-guides/data/data-core-notices.md
+index ca71b8430285d5..b1a2316d19bb82 100644
+--- a/docs/reference-guides/data/data-core-notices.md
++++ b/docs/reference-guides/data/data-core-notices.md
+@@ -4,7 +4,7 @@ Namespace: `core/notices`.
+ 
+ ## Selectors
+ 
+-<!-- START TOKEN(Autogenerated selectors|../../../packages/notices/src/store/selectors.js) -->
++<!-- START TOKEN(Autogenerated selectors|../../../packages/notices/src/store/selectors.ts) -->
+ 
+ ### getNotices
+ 
+@@ -32,18 +32,18 @@ const ExampleComponent = () => {
+ 
+ _Parameters_
+ 
+--   _state_ `Object`: Notices state.
+--   _context_ `?string`: Optional grouping context.
++-   _state_ `Record< string, Array< Notice > >`: Notices state.
++-   _context_ `string`: Optional grouping context.
+ 
+ _Returns_
+ 
+--   `WPNotice[]`: Array of notices.
++-   Array of notices.
+ 
+-<!-- END TOKEN(Autogenerated selectors|../../../packages/notices/src/store/selectors.js) -->
++<!-- END TOKEN(Autogenerated selectors|../../../packages/notices/src/store/selectors.ts) -->
+ 
+ ## Actions
+ 
+-<!-- START TOKEN(Autogenerated actions|../../../packages/notices/src/store/actions.js) -->
++<!-- START TOKEN(Autogenerated actions|../../../packages/notices/src/store/actions.ts) -->
+ 
+ ### createErrorNotice
+ 
+@@ -83,11 +83,11 @@ const ExampleComponent = () => {
+ _Parameters_
+ 
+ -   _content_ `string`: Notice message.
+--   _options_ `[Object]`: Optional notice options.
++-   _options_ `NoticeOptions`: Optional notice options.
+ 
+ _Returns_
+ 
+--   `Object`: Action object.
++-   Action object.
+ 
+ ### createInfoNotice
+ 
+@@ -124,11 +124,11 @@ const ExampleComponent = () => {
+ _Parameters_
+ 
+ -   _content_ `string`: Notice message.
+--   _options_ `[Object]`: Optional notice options.
++-   _options_ `NoticeOptions`: Optional notice options.
+ 
+ _Returns_
+ 
+--   `Object`: Action object.
++-   Action object.
+ 
+ ### createNotice
+ 
+@@ -156,22 +156,13 @@ const ExampleComponent = () => {
+ 
+ _Parameters_
+ 
+--   _status_ `string|undefined`: Notice status ("info" if undefined is passed).
++-   _status_ Notice status ("info" if undefined is passed).
+ -   _content_ `string`: Notice message.
+--   _options_ `[Object]`: Notice options.
+--   _options.context_ `[string]`: Context under which to group notice.
+--   _options.id_ `[string]`: Identifier for notice. Automatically assigned if not specified.
+--   _options.isDismissible_ `[boolean]`: Whether the notice can be dismissed by user.
+--   _options.type_ `[string]`: Type of notice, one of `default`, or `snackbar`.
+--   _options.speak_ `[boolean]`: Whether the notice content should be announced to screen readers.
+--   _options.actions_ `[Array<WPNoticeAction>]`: User actions to be presented with notice.
+--   _options.icon_ `[string]`: An icon displayed with the notice. Only used when type is set to `snackbar`.
+--   _options.explicitDismiss_ `[boolean]`: Whether the notice includes an explicit dismiss button and can't be dismissed by clicking the body of the notice. Only applies when type is set to `snackbar`.
+--   _options.onDismiss_ `[Function]`: Called when the notice is dismissed.
++-   _options_ `NoticeOptions`: Optional notice options.
+ 
+ _Returns_
+ 
+--   `Object`: Action object.
++-   `Extract< ReducerAction, { type: 'CREATE_NOTICE'; } >`: Action object.
+ 
+ ### createSuccessNotice
+ 
+@@ -209,11 +200,11 @@ const ExampleComponent = () => {
+ _Parameters_
+ 
+ -   _content_ `string`: Notice message.
+--   _options_ `[Object]`: Optional notice options.
++-   _options_ `NoticeOptions`: Optional notice options.
+ 
+ _Returns_
+ 
+--   `Object`: Action object.
++-   Action object.
+ 
+ ### createWarningNotice
+ 
+@@ -255,11 +246,11 @@ const ExampleComponent = () => {
+ _Parameters_
+ 
+ -   _content_ `string`: Notice message.
+--   _options_ `[Object]`: Optional notice options.
++-   _options_ `NoticeOptions`: Optional notice options.
+ 
+ _Returns_
+ 
+--   `Object`: Action object.
++-   Action object.
+ 
+ ### removeAllNotices
+ 
+@@ -301,12 +292,12 @@ export const ExampleComponent = () => {
+ 
+ _Parameters_
+ 
+--   _noticeType_ `string`: The context to remove all notices from.
+--   _context_ `string`: The context to remove all notices from.
++-   _noticeType_ The context to remove all notices from.
++-   _context_ `string`: The optional context to remove all notices from.
+ 
+ _Returns_
+ 
+--   `Object`: Action object.
++-   `Extract< ReducerAction, { type: 'REMOVE_ALL_NOTICES'; } >`: Action object.
+ 
+ ### removeNotice
+ 
+@@ -350,11 +341,11 @@ const ExampleComponent = () => {
+ _Parameters_
+ 
+ -   _id_ `string`: Notice unique identifier.
+--   _context_ `[string]`: Optional context (grouping) in which the notice is intended to appear. Defaults to default context.
++-   _context_ `string`: Optional context (grouping) in which the notice is intended to appear. Defaults to 'default' context.
+ 
+ _Returns_
+ 
+--   `Object`: Action object.
++-   `Extract< ReducerAction, { type: 'REMOVE_NOTICE'; } >`: Action object.
+ 
+ ### removeNotices
+ 
+@@ -394,11 +385,11 @@ const ExampleComponent = () => {
+ 
+ _Parameters_
+ 
+--   _ids_ `string[]`: List of unique notice identifiers.
+--   _context_ `[string]`: Optional context (grouping) in which the notices are intended to appear. Defaults to default context.
++-   _ids_ `Array< string >`: List of unique notice identifiers.
++-   _context_ `string`: Optional context (grouping) in which the notices are intended to appear. Defaults to 'default' context.
+ 
+ _Returns_
+ 
+--   `Object`: Action object.
++-   `Extract< ReducerAction, { type: 'REMOVE_NOTICES'; } >`: Action object.
+ 
+-<!-- END TOKEN(Autogenerated actions|../../../packages/notices/src/store/actions.js) -->
++<!-- END TOKEN(Autogenerated actions|../../../packages/notices/src/store/actions.ts) -->
+diff --git a/docs/tool/manifest.js b/docs/tool/manifest.js
+index 569d78bc5bea8a..17f126cfedbee7 100644
+--- a/docs/tool/manifest.js
++++ b/docs/tool/manifest.js
+@@ -40,10 +40,20 @@ function getPackageManifest( packageFolderNames ) {
+ 	return packageFolderNames.reduce( ( manifest, folderName ) => {
+ 		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
+ 		const tocPath = `${ baseRepoUrl }/packages/${ folderName }/docs/toc.json`;
++		const packageJson = require(
++			join(
++				__dirname,
++				'..',
++				'..',
++				'packages',
++				folderName,
++				'package.json'
++			)
++		);
+ 
+ 		// First add any README files to the TOC
+ 		manifest.push( {
+-			title: `@wordpress/${ folderName }`,
++			title: packageJson.name,
+ 			slug: `packages-${ folderName }`,
+ 			markdown_source: path,
+ 			parent: 'packages',
+diff --git a/lib/block-supports/layout.php b/lib/block-supports/layout.php
+index 10b3bade3622ef..aad58ca497b6e2 100644
+--- a/lib/block-supports/layout.php
++++ b/lib/block-supports/layout.php
+@@ -847,6 +847,29 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
+ 
+ 		$gap_value = $block['attrs']['style']['spacing']['blockGap'] ?? null;
+ 
++		/*
++		 * Check for style variation blockGap first.
++		 * Style variations should override block-level and global blockGap values.
++		 */
++		$classes = $block['attrs']['className'] ?? '';
++		if ( ! empty( $classes ) && function_exists( 'gutenberg_get_block_style_variation_name_from_class' ) ) {
++			$variations = gutenberg_get_block_style_variation_name_from_class( $classes );
++
++			if ( $variations ) {
++				$tree       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
++				$theme_json = $tree->get_raw_data();
++
++				foreach ( $variations as $variation ) {
++					$variation_data = $theme_json['styles']['blocks'][ $block['blockName'] ]['variations'][ $variation ] ?? array();
++
++					if ( isset( $variation_data['spacing']['blockGap'] ) ) {
++						$gap_value = $variation_data['spacing']['blockGap'];
++						break; // Use first matching variation with blockGap.
++					}
++				}
++			}
++		}
++
+ 		/*
+ 		 * Skip if gap value contains unsupported characters.
+ 		 * Regex for CSS value borrowed from `safecss_filter_attr`, and used here
+diff --git a/lib/experimental/sync/class-gutenberg-http-signaling-server.php b/lib/experimental/sync/class-gutenberg-http-signaling-server.php
+index 3448e82a4c31d0..0892ae0f5dfac8 100644
+--- a/lib/experimental/sync/class-gutenberg-http-signaling-server.php
++++ b/lib/experimental/sync/class-gutenberg-http-signaling-server.php
+@@ -171,6 +171,8 @@ private static function handle_read_pending_messages( $subscriber_to_messages_pa
+ 		list( $fd, $subscriber_to_messages ) = static::get_contents_and_lock_file( $subscriber_to_messages_path );
+ 		if ( ! $fd ) {
+ 			$retries = isset( $_COOKIE['signaling_server_retries'] ) ? intval( $_COOKIE['signaling_server_retries'] ) : 0;
++			// Clamp retries to avoid unbounded exponential backoff.
++			$retries = max( 0, min( $retries, 10 ) );
+ 			$secure  = ( 'https' === parse_url( home_url(), PHP_URL_SCHEME ) );
+ 			setcookie( 'signaling_server_retries', (string) ( $retries + 1 ), time() + DAY_IN_SECONDS, SITECOOKIEPATH, '', $secure );
+ 			echo 'id: ' . time() . PHP_EOL;
+diff --git a/package-lock.json b/package-lock.json
+index 8d925d7c4c7203..e442fff8f0c507 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -55649,7 +55649,6 @@
+ 			"version": "0.4.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@ariakit/react": "^0.4.15",
+ 				"@base-ui/react": "^1.0.0",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/element": "file:../element",
+diff --git a/packages/block-editor/src/components/block-bindings/attribute-control.js b/packages/block-editor/src/components/block-bindings/attribute-control.js
+index b19be9e80187b9..b92ae3abbfe696 100644
+--- a/packages/block-editor/src/components/block-bindings/attribute-control.js
++++ b/packages/block-editor/src/components/block-bindings/attribute-control.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/block-editor/src/components/block-bindings/source-fields-list.js b/packages/block-editor/src/components/block-bindings/source-fields-list.js
+index 4a869db95028f0..a9fe561751287c 100644
+--- a/packages/block-editor/src/components/block-bindings/source-fields-list.js
++++ b/packages/block-editor/src/components/block-bindings/source-fields-list.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/block-editor/src/components/inner-blocks/use-inner-block-template-sync.js b/packages/block-editor/src/components/inner-blocks/use-inner-block-template-sync.js
+index 505785c87914d7..ee1fa09b550857 100644
+--- a/packages/block-editor/src/components/inner-blocks/use-inner-block-template-sync.js
++++ b/packages/block-editor/src/components/inner-blocks/use-inner-block-template-sync.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/block-editor/src/components/rich-text/index.js b/packages/block-editor/src/components/rich-text/index.js
+index 73e2cadcec3197..52de9bb69d63a2 100644
+--- a/packages/block-editor/src/components/rich-text/index.js
++++ b/packages/block-editor/src/components/rich-text/index.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import clsx from 'clsx';
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/block-editor/src/hooks/block-fields/index.js b/packages/block-editor/src/hooks/block-fields/index.js
+index 10bcd3730a7cbf..15e5451d338d1a 100644
+--- a/packages/block-editor/src/hooks/block-fields/index.js
++++ b/packages/block-editor/src/hooks/block-fields/index.js
+@@ -10,6 +10,7 @@ import {
+ import { createHigherOrderComponent } from '@wordpress/compose';
+ import { DataForm } from '@wordpress/dataviews';
+ import { useContext, useState, useMemo } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+@@ -169,7 +170,25 @@ function denormalizeLinkValue( value, fieldDef ) {
+ 	return result;
+ }
+ 
+-function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
++/**
++ * Component that renders a DataForm for a single block's attributes
++ * @param {Object}   props
++ * @param {string}   props.clientId      The clientId of the block.
++ * @param {Object}   props.blockType     The blockType definition.
++ * @param {Object}   props.attributes    The block's attribute values.
++ * @param {Function} props.setAttributes Action to set the block's attributes.
++ * @param {boolean}  props.isCollapsed   Whether the DataForm is rendered as 'collapsed' with only the first field
++ *                                       displayed by default. When collapsed a dropdown is displayed to allow
++ *                                       displaying additional fields. The block's title is displayed as the title.
++ *                                       The collapsed mode is often used when multiple BlockForms are shown together.
++ */
++function BlockFields( {
++	clientId,
++	blockType,
++	attributes,
++	setAttributes,
++	isCollapsed = false,
++} ) {
+ 	const blockTitle = useBlockDisplayTitle( {
+ 		clientId,
+ 		context: 'list-view',
+@@ -178,9 +197,19 @@ function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
+ 
+ 	const blockTypeFields = blockType?.[ fieldsKey ];
+ 
+-	const [ form, setForm ] = useState( () => {
+-		return blockType?.[ formKey ];
+-	} );
++	const computedForm = useMemo( () => {
++		if ( ! isCollapsed ) {
++			return blockType?.[ formKey ];
++		}
++
++		// For a collapsed form only show the first field by default.
++		return {
++			...blockType?.[ formKey ],
++			fields: [ blockType?.[ formKey ]?.fields?.[ 0 ] ],
++		};
++	}, [ blockType, isCollapsed ] );
++
++	const [ form, setForm ] = useState( computedForm );
+ 
+ 	// Build DataForm fields with proper structure
+ 	const dataFormFields = useMemo( () => {
+@@ -310,21 +339,29 @@ function BlockFields( { clientId, blockType, attributes, setAttributes } ) {
+ 		<div className="block-editor-block-fields__container">
+ 			<div className="block-editor-block-fields__header">
+ 				<HStack spacing={ 1 }>
+-					<BlockIcon
+-						className="block-editor-block-fields__header-icon"
+-						icon={ blockInformation?.icon }
+-					/>
+-					<Truncate
+-						className="block-editor-block-fields__header-title"
+-						numberOfLines={ 1 }
+-					>
+-						{ blockTitle }
+-					</Truncate>
+-					<FieldsDropdownMenu
+-						fields={ dataFormFields }
+-						visibleFields={ form.fields }
+-						onToggleField={ handleToggleField }
+-					/>
++					{ isCollapsed && (
++						<>
++							<BlockIcon
++								className="block-editor-block-fields__header-icon"
++								icon={ blockInformation?.icon }
++							/>
++							<h2 className="block-editor-block-fields__header-title">
++								<Truncate numberOfLines={ 1 }>
++									{ blockTitle }
++								</Truncate>
++							</h2>
++							<FieldsDropdownMenu
++								fields={ dataFormFields }
++								visibleFields={ form.fields }
++								onToggleField={ handleToggleField }
++							/>
++						</>
++					) }
++					{ ! isCollapsed && (
++						<h2 className="block-editor-block-fields__header-title">
++							{ __( 'Content' ) }
++						</h2>
++					) }
+ 				</HStack>
+ 			</div>
+ 			<DataForm
+@@ -370,6 +407,7 @@ const withBlockFields = createHigherOrderComponent(
+ 								<BlockFields
+ 									{ ...props }
+ 									blockType={ blockType }
++									isCollapsed
+ 								/>
+ 							</PrivateInspectorControlsFill>
+ 						)
+diff --git a/packages/block-editor/src/hooks/block-fields/styles.scss b/packages/block-editor/src/hooks/block-fields/styles.scss
+index e4494b67261bc7..83b08d0e881b8d 100644
+--- a/packages/block-editor/src/hooks/block-fields/styles.scss
++++ b/packages/block-editor/src/hooks/block-fields/styles.scss
+@@ -30,4 +30,6 @@
+ 
+ .block-editor-block-fields__header-title {
+ 	flex: 1;
++	// Override the default margin on a h2 element.
++	margin: 0 !important;
+ }
+diff --git a/packages/block-editor/src/store/reducer.js b/packages/block-editor/src/store/reducer.js
+index d98871cd49324b..8b4422b19f85e7 100644
+--- a/packages/block-editor/src/store/reducer.js
++++ b/packages/block-editor/src/store/reducer.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/block-library/src/audio/index.js b/packages/block-library/src/audio/index.js
+index d3bb62a3485884..66c7062692cffa 100644
+--- a/packages/block-library/src/audio/index.js
++++ b/packages/block-library/src/audio/index.js
+@@ -58,7 +58,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
+ 		},
+ 	];
+ 	settings[ formKey ] = {
+-		fields: [ 'audio' ],
++		fields: [ 'audio', 'caption' ],
+ 	};
+ }
+ 
+diff --git a/packages/block-library/src/block-keyboard-shortcuts/index.js b/packages/block-library/src/block-keyboard-shortcuts/index.js
+index f71ab0b2f7c1e0..295bda6441cf38 100644
+--- a/packages/block-library/src/block-keyboard-shortcuts/index.js
++++ b/packages/block-library/src/block-keyboard-shortcuts/index.js
+@@ -54,15 +54,12 @@ function BlockKeyboardShortcuts() {
+ 		const sourceTextAlign =
+ 			attributes.textAlign || attributes.style?.typography?.textAlign;
+ 
+-		// When destination is heading, preserve heading format (textAlign attribute + level)
+-		// When destination is paragraph, use block support format (style.typography.textAlign)
++		// When destination is heading, set the level
+ 		if ( destinationBlockName === 'core/heading' ) {
+ 			newAttributes.level = level;
+-			if ( sourceTextAlign ) {
+-				newAttributes.textAlign = sourceTextAlign;
+-			}
+-		} else if ( sourceTextAlign ) {
+-			// Destination is paragraph
++		}
++
++		if ( sourceTextAlign ) {
+ 			newAttributes.style = {
+ 				typography: {
+ 					textAlign: sourceTextAlign,
+diff --git a/packages/block-library/src/button/index.js b/packages/block-library/src/button/index.js
+index 846808023c9248..4bdbde757bb6fb 100644
+--- a/packages/block-library/src/button/index.js
++++ b/packages/block-library/src/button/index.js
+@@ -69,7 +69,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
+ 		},
+ 	];
+ 	settings[ formKey ] = {
+-		fields: [ 'text' ],
++		fields: [ 'text', 'link' ],
+ 	};
+ }
+ 
+diff --git a/packages/block-library/src/file/index.js b/packages/block-library/src/file/index.js
+index 4257495f0c775f..efe0ae979e3ce9 100644
+--- a/packages/block-library/src/file/index.js
++++ b/packages/block-library/src/file/index.js
+@@ -63,7 +63,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
+ 		},
+ 	];
+ 	settings[ formKey ] = {
+-		fields: [ 'file' ],
++		fields: [ 'file', 'fileName', 'downloadButtonText' ],
+ 	};
+ }
+ 
+diff --git a/packages/block-library/src/heading/block.json b/packages/block-library/src/heading/block.json
+index d9488a3156528d..7bc491e1658b1b 100644
+--- a/packages/block-library/src/heading/block.json
++++ b/packages/block-library/src/heading/block.json
+@@ -8,9 +8,6 @@
+ 	"keywords": [ "title", "subtitle" ],
+ 	"textdomain": "default",
+ 	"attributes": {
+-		"textAlign": {
+-			"type": "string"
+-		},
+ 		"content": {
+ 			"type": "rich-text",
+ 			"source": "rich-text",
+@@ -58,6 +55,7 @@
+ 		"typography": {
+ 			"fontSize": true,
+ 			"lineHeight": true,
++			"textAlign": true,
+ 			"__experimentalFontFamily": true,
+ 			"__experimentalFontStyle": true,
+ 			"__experimentalFontWeight": true,
+diff --git a/packages/block-library/src/heading/deprecated.js b/packages/block-library/src/heading/deprecated.js
+index 76b175ac44fc40..50036ef13897da 100644
+--- a/packages/block-library/src/heading/deprecated.js
++++ b/packages/block-library/src/heading/deprecated.js
+@@ -12,6 +12,11 @@ import {
+ 	useBlockProps,
+ } from '@wordpress/block-editor';
+ 
++/**
++ * Internal dependencies
++ */
++import migrateTextAlignAttributeToBlockSupport from '../utils/migrate-text-align';
++
+ const blockSupports = {
+ 	className: false,
+ 	anchor: true,
+@@ -75,7 +80,9 @@ const v1 = {
+ 		},
+ 	},
+ 	migrate: ( attributes ) =>
+-		migrateCustomColors( migrateTextAlign( attributes ) ),
++		migrateTextAlignAttributeToBlockSupport(
++			migrateCustomColors( migrateTextAlign( attributes ) )
++		),
+ 	save( { attributes } ) {
+ 		const { align, level, content, textColor, customTextColor } =
+ 			attributes;
+@@ -111,7 +118,9 @@ const v2 = {
+ 		},
+ 	},
+ 	migrate: ( attributes ) =>
+-		migrateCustomColors( migrateTextAlign( attributes ) ),
++		migrateTextAlignAttributeToBlockSupport(
++			migrateCustomColors( migrateTextAlign( attributes ) )
++		),
+ 	save( { attributes } ) {
+ 		const { align, content, customTextColor, level, textColor } =
+ 			attributes;
+@@ -149,7 +158,9 @@ const v3 = {
+ 		},
+ 	},
+ 	migrate: ( attributes ) =>
+-		migrateCustomColors( migrateTextAlign( attributes ) ),
++		migrateTextAlignAttributeToBlockSupport(
++			migrateCustomColors( migrateTextAlign( attributes ) )
++		),
+ 	save( { attributes } ) {
+ 		const { align, content, customTextColor, level, textColor } =
+ 			attributes;
+@@ -195,7 +206,10 @@ const v4 = {
+ 	},
+ 	attributes: blockAttributes,
+ 	isEligible: ( { align } ) => TEXT_ALIGN_OPTIONS.includes( align ),
+-	migrate: migrateTextAlign,
++	migrate: ( attributes ) =>
++		migrateTextAlignAttributeToBlockSupport(
++			migrateCustomColors( migrateTextAlign( attributes ) )
++		),
+ 	save( { attributes } ) {
+ 		const { align, content, level } = attributes;
+ 		const TagName = 'h' + level;
+@@ -283,8 +297,107 @@ const v5 = {
+ 			</TagName>
+ 		);
+ 	},
++	migrate: ( attributes ) =>
++		migrateTextAlignAttributeToBlockSupport(
++			migrateCustomColors( migrateTextAlign( attributes ) )
++		),
++};
++
++const v6 = {
++	supports: {
++		align: [ 'wide', 'full' ],
++		anchor: true,
++		className: true,
++		splitting: true,
++		__experimentalBorder: {
++			color: true,
++			radius: true,
++			style: true,
++			width: true,
++		},
++		color: {
++			gradients: true,
++			link: true,
++			__experimentalDefaultControls: {
++				background: true,
++				text: true,
++			},
++		},
++		spacing: {
++			margin: true,
++			padding: true,
++		},
++		typography: {
++			fontSize: true,
++			lineHeight: true,
++			__experimentalFontFamily: true,
++			__experimentalFontStyle: true,
++			__experimentalFontWeight: true,
++			__experimentalLetterSpacing: true,
++			__experimentalTextTransform: true,
++			__experimentalTextDecoration: true,
++			__experimentalWritingMode: true,
++			fitText: true,
++			__experimentalDefaultControls: {
++				fontSize: true,
++			},
++		},
++		__unstablePasteTextInline: true,
++		__experimentalSlashInserter: true,
++		interactivity: {
++			clientNavigation: true,
++		},
++	},
++	attributes: {
++		textAlign: {
++			type: 'string',
++		},
++		content: {
++			type: 'string',
++			source: 'html',
++			selector: 'h1,h2,h3,h4,h5,h6',
++			default: '',
++			role: 'content',
++		},
++		level: {
++			type: 'number',
++			default: 2,
++		},
++		levelOptions: {
++			type: 'array',
++		},
++		placeholder: {
++			type: 'string',
++		},
++	},
++	save( { attributes } ) {
++		const { textAlign, content, level } = attributes;
++		const TagName = 'h' + level;
++
++		const className = clsx( {
++			[ `has-text-align-${ textAlign }` ]: textAlign,
++		} );
++
++		return (
++			<TagName { ...useBlockProps.save( { className } ) }>
++				<RichText.Content value={ content } />
++			</TagName>
++		);
++	},
++	migrate: ( attributes ) =>
++		migrateTextAlignAttributeToBlockSupport(
++			migrateCustomColors( migrateTextAlign( attributes ) )
++		),
++	isEligible( attributes ) {
++		return (
++			!! attributes.textAlign ||
++			!! attributes.className?.match(
++				/\bhas-text-align-(left|center|right)\b/
++			)
++		);
++	},
+ };
+ 
+-const deprecated = [ v5, v4, v3, v2, v1 ];
++const deprecated = [ v6, v5, v4, v3, v2, v1 ];
+ 
+ export default deprecated;
+diff --git a/packages/block-library/src/heading/edit.js b/packages/block-library/src/heading/edit.js
+index 636e200c425b92..71ab835c9796b4 100644
+--- a/packages/block-library/src/heading/edit.js
++++ b/packages/block-library/src/heading/edit.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import clsx from 'clsx';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -10,36 +5,26 @@ import { __ } from '@wordpress/i18n';
+ import { useEffect, Platform } from '@wordpress/element';
+ import { useDispatch, useSelect } from '@wordpress/data';
+ import {
+-	AlignmentControl,
+-	BlockControls,
+ 	RichText,
+ 	useBlockProps,
+ 	store as blockEditorStore,
+-	useBlockEditingMode,
+ } from '@wordpress/block-editor';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { generateAnchor, setAnchor } from './autogenerate-anchors';
++import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+ 
+-function HeadingEdit( {
+-	attributes,
+-	setAttributes,
+-	mergeBlocks,
+-	onReplace,
+-	style,
+-	clientId,
+-} ) {
+-	const { textAlign, content, level, placeholder, anchor } = attributes;
++function HeadingEdit( props ) {
++	const { attributes, setAttributes, mergeBlocks, onReplace, clientId } =
++		props;
++	useDeprecatedTextAlign( props );
++	const { style, content, level, placeholder, anchor } = attributes;
+ 	const tagName = 'h' + level;
+ 	const blockProps = useBlockProps( {
+-		className: clsx( {
+-			[ `has-text-align-${ textAlign }` ]: textAlign,
+-		} ),
+ 		style,
+ 	} );
+-	const blockEditingMode = useBlockEditingMode();
+ 
+ 	const { canGenerateAnchors } = useSelect( ( select ) => {
+ 		const { getGlobalBlockCount, getSettings } = select( blockEditorStore );
+@@ -90,16 +75,6 @@ function HeadingEdit( {
+ 
+ 	return (
+ 		<>
+-			{ blockEditingMode === 'default' && (
+-				<BlockControls group="block">
+-					<AlignmentControl
+-						value={ textAlign }
+-						onChange={ ( nextAlign ) => {
+-							setAttributes( { textAlign: nextAlign } );
+-						} }
+-					/>
+-				</BlockControls>
+-			) }
+ 			<RichText
+ 				identifier="content"
+ 				tagName={ tagName }
+@@ -109,7 +84,6 @@ function HeadingEdit( {
+ 				onReplace={ onReplace }
+ 				onRemove={ () => onReplace( [] ) }
+ 				placeholder={ placeholder || __( 'Heading' ) }
+-				textAlign={ textAlign }
+ 				{ ...( Platform.isNative && { deleteEnter: true } ) } // setup RichText on native mobile to delete the "Enter" key as it's handled by the JS/RN side
+ 				{ ...blockProps }
+ 			/>
+diff --git a/packages/block-library/src/heading/edit.native.js b/packages/block-library/src/heading/edit.native.js
+index 0946fe5a5ad66b..aaad1f02914473 100644
+--- a/packages/block-library/src/heading/edit.native.js
++++ b/packages/block-library/src/heading/edit.native.js
+@@ -32,7 +32,14 @@ function HeadingEdit( {
+ 	style,
+ 	clientId,
+ } ) {
+-	const { textAlign, content, level, placeholder, anchor } = attributes;
++	const {
++		content,
++		level,
++		placeholder,
++		anchor,
++		style: attributesStyle,
++	} = attributes;
++	const textAlign = attributesStyle?.typography?.textAlign;
+ 	const tagName = 'h' + level;
+ 	const blockProps = useBlockProps( {
+ 		className: clsx( {
+@@ -100,7 +107,15 @@ function HeadingEdit( {
+ 				<AlignmentControl
+ 					value={ textAlign }
+ 					onChange={ ( nextAlign ) => {
+-						setAttributes( { textAlign: nextAlign } );
++						setAttributes( {
++							style: {
++								...attributesStyle,
++								typography: {
++									...attributesStyle?.typography,
++									textAlign: nextAlign,
++								},
++							},
++						} );
+ 					} }
+ 				/>
+ 			</BlockControls>
+diff --git a/packages/block-library/src/heading/save.js b/packages/block-library/src/heading/save.js
+index 8ae4fa6afd9f6f..f27c851b28d58d 100644
+--- a/packages/block-library/src/heading/save.js
++++ b/packages/block-library/src/heading/save.js
+@@ -1,23 +1,14 @@
+-/**
+- * External dependencies
+- */
+-import clsx from 'clsx';
+-
+ /**
+  * WordPress dependencies
+  */
+ import { RichText, useBlockProps } from '@wordpress/block-editor';
+ 
+ export default function save( { attributes } ) {
+-	const { textAlign, content, level } = attributes;
++	const { content, level } = attributes;
+ 	const TagName = 'h' + level;
+ 
+-	const className = clsx( {
+-		[ `has-text-align-${ textAlign }` ]: textAlign,
+-	} );
+-
+ 	return (
+-		<TagName { ...useBlockProps.save( { className } ) }>
++		<TagName { ...useBlockProps.save() }>
+ 			<RichText.Content value={ content } />
+ 		</TagName>
+ 	);
+diff --git a/packages/block-library/src/heading/transforms.js b/packages/block-library/src/heading/transforms.js
+index 265ee63567d82b..3554f52ff27387 100644
+--- a/packages/block-library/src/heading/transforms.js
++++ b/packages/block-library/src/heading/transforms.js
+@@ -29,7 +29,13 @@ const transforms = {
+ 						),
+ 						content,
+ 						anchor,
+-						textAlign,
++						...( textAlign && {
++							style: {
++								typography: {
++									textAlign,
++								},
++							},
++						} ),
+ 					} );
+ 				} ),
+ 		},
+@@ -64,7 +70,13 @@ const transforms = {
+ 					textAlign === 'center' ||
+ 					textAlign === 'right'
+ 				) {
+-					attributes.align = textAlign;
++					attributes.style = {
++						...attributes.style,
++						typography: {
++							...attributes.style?.typography,
++							textAlign,
++						},
++					};
+ 				}
+ 
+ 				return createBlock( 'core/heading', attributes );
+@@ -93,7 +105,8 @@ const transforms = {
+ 			blocks: [ 'core/paragraph' ],
+ 			transform: ( attributes ) =>
+ 				attributes.map( ( _attributes ) => {
+-					const { content, textAlign } = _attributes;
++					const { content, style } = _attributes;
++					const textAlign = style?.typography?.textAlign;
+ 					return createBlock( 'core/paragraph', {
+ 						...getTransformedAttributes(
+ 							_attributes,
+diff --git a/packages/block-library/src/image/index.js b/packages/block-library/src/image/index.js
+index fc65703a23c1f7..e8ee1e3404d7d8 100644
+--- a/packages/block-library/src/image/index.js
++++ b/packages/block-library/src/image/index.js
+@@ -106,7 +106,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
+ 		},
+ 	];
+ 	settings[ formKey ] = {
+-		fields: [ 'image' ],
++		fields: [ 'image', 'link', 'caption', 'alt' ],
+ 	};
+ }
+ 
+diff --git a/packages/block-library/src/media-text/index.js b/packages/block-library/src/media-text/index.js
+index 1de8b84e64f026..d50e6eaaceb1e6 100644
+--- a/packages/block-library/src/media-text/index.js
++++ b/packages/block-library/src/media-text/index.js
+@@ -83,7 +83,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
+ 		},
+ 	];
+ 	settings[ formKey ] = {
+-		fields: [ 'media' ],
++		fields: [ 'media', 'link' ],
+ 	};
+ }
+ 
+diff --git a/packages/block-library/src/more/block.json b/packages/block-library/src/more/block.json
+index 01c4b3ce961e50..853c8ee5697d19 100644
+--- a/packages/block-library/src/more/block.json
++++ b/packages/block-library/src/more/block.json
+@@ -23,6 +23,7 @@
+ 		"className": false,
+ 		"html": false,
+ 		"multiple": false,
++		"visibility": false,
+ 		"interactivity": {
+ 			"clientNavigation": true
+ 		}
+diff --git a/packages/block-library/src/navigation-link/index.js b/packages/block-library/src/navigation-link/index.js
+index a232f54299f593..1a36a0a9526fcb 100644
+--- a/packages/block-library/src/navigation-link/index.js
++++ b/packages/block-library/src/navigation-link/index.js
+@@ -112,7 +112,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
+ 		},
+ 	];
+ 	settings[ formKey ] = {
+-		fields: [ 'label' ],
++		fields: [ 'label', 'link' ],
+ 	};
+ }
+ 
+diff --git a/packages/block-library/src/navigation-overlay-close/index.js b/packages/block-library/src/navigation-overlay-close/index.js
+index 9e3beab4f3974a..e8541a8141552b 100644
+--- a/packages/block-library/src/navigation-overlay-close/index.js
++++ b/packages/block-library/src/navigation-overlay-close/index.js
+@@ -13,6 +13,7 @@ import edit from './edit';
+ import metadata from './block.json';
+ import save from './save';
+ import icon from './icon';
++import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../navigation/constants';
+ 
+ const { name } = metadata;
+ 
+@@ -50,7 +51,9 @@ function isWithinOverlay() {
+ 			postId
+ 		);
+ 
+-		return templatePartEntity?.area === 'overlay';
++		return (
++			templatePartEntity?.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
++		);
+ 	}
+ 
+ 	return false;
+diff --git a/packages/block-library/src/navigation-submenu/index.js b/packages/block-library/src/navigation-submenu/index.js
+index 046f959c7223f3..82cf8a6124a3ff 100644
+--- a/packages/block-library/src/navigation-submenu/index.js
++++ b/packages/block-library/src/navigation-submenu/index.js
+@@ -71,7 +71,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
+ 		},
+ 	];
+ 	settings[ formKey ] = {
+-		fields: [ 'label' ],
++		fields: [ 'label', 'link' ],
+ 	};
+ }
+ 
+diff --git a/packages/block-library/src/nextpage/block.json b/packages/block-library/src/nextpage/block.json
+index 62c09f435d7f54..b1e55f7a0935a1 100644
+--- a/packages/block-library/src/nextpage/block.json
++++ b/packages/block-library/src/nextpage/block.json
+@@ -13,6 +13,7 @@
+ 		"customClassName": false,
+ 		"className": false,
+ 		"html": false,
++		"visibility": false,
+ 		"interactivity": {
+ 			"clientNavigation": true
+ 		}
+diff --git a/packages/block-library/src/pullquote/index.js b/packages/block-library/src/pullquote/index.js
+index 764946b3fc20a2..bd6bcf7cc3dc99 100644
+--- a/packages/block-library/src/pullquote/index.js
++++ b/packages/block-library/src/pullquote/index.js
+@@ -54,7 +54,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
+ 		},
+ 	];
+ 	settings[ formKey ] = {
+-		fields: [ 'value' ],
++		fields: [ 'value', 'citation' ],
+ 	};
+ }
+ 
+diff --git a/packages/block-library/src/search/index.js b/packages/block-library/src/search/index.js
+index 983f1706a21625..265f2bb119d8df 100644
+--- a/packages/block-library/src/search/index.js
++++ b/packages/block-library/src/search/index.js
+@@ -50,7 +50,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
+ 		},
+ 	];
+ 	settings[ formKey ] = {
+-		fields: [ 'label' ],
++		fields: [ 'label', 'buttonText', 'placeholder' ],
+ 	};
+ }
+ 
+diff --git a/packages/block-library/src/social-link/index.js b/packages/block-library/src/social-link/index.js
+index 67e98a10b64669..250191d91c7cef 100644
+--- a/packages/block-library/src/social-link/index.js
++++ b/packages/block-library/src/social-link/index.js
+@@ -44,7 +44,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
+ 		},
+ 	];
+ 	settings[ formKey ] = {
+-		fields: [ 'link' ],
++		fields: [ 'link', 'label' ],
+ 	};
+ }
+ 
+diff --git a/packages/block-library/src/table-of-contents/hooks.js b/packages/block-library/src/table-of-contents/hooks.js
+index 14b2ff0f746664..2d4c672c706212 100644
+--- a/packages/block-library/src/table-of-contents/hooks.js
++++ b/packages/block-library/src/table-of-contents/hooks.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/block-library/src/template-part/edit/utils/get-template-part-icon.js b/packages/block-library/src/template-part/edit/utils/get-template-part-icon.js
+index 01d16880a34e89..a8b3cb017cf4b3 100644
+--- a/packages/block-library/src/template-part/edit/utils/get-template-part-icon.js
++++ b/packages/block-library/src/template-part/edit/utils/get-template-part-icon.js
+@@ -12,7 +12,7 @@ import {
+ /**
+  * Helper function to retrieve the corresponding icon by area name or icon name.
+  *
+- * @param {string} areaOrIconName The area name (e.g., 'header', 'overlay') or icon name (e.g., 'menu').
++ * @param {string} areaOrIconName The area name (e.g., 'header', 'navigation-overlay') or icon name (e.g., 'menu').
+  *
+  * @return {Object} The corresponding icon.
+  */
+diff --git a/packages/block-library/src/video/index.js b/packages/block-library/src/video/index.js
+index 3a275c91eaca37..37a1907086d53e 100644
+--- a/packages/block-library/src/video/index.js
++++ b/packages/block-library/src/video/index.js
+@@ -61,7 +61,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
+ 		},
+ 	];
+ 	settings[ formKey ] = {
+-		fields: [ 'video' ],
++		fields: [ 'video', 'caption' ],
+ 	};
+ }
+ 
+diff --git a/packages/blocks/src/api/validation/index.js b/packages/blocks/src/api/validation/index.js
+index d5ac569e15ff09..1044d43e463f87 100644
+--- a/packages/blocks/src/api/validation/index.js
++++ b/packages/blocks/src/api/validation/index.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { Tokenizer } from 'simple-html-tokenizer';
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 04065c23603a38..34e7bd1f635c04 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -54,6 +54,7 @@
+ -   `AnglePickerControl`: Migrate styles from Emotion to a CSS module ([#73786](https://github.com/WordPress/gutenberg/pull/73786)).
+ -   `Menu`: Clean up popover wrappers ([#74207](https://github.com/WordPress/gutenberg/pull/74207)).
+ -   `Button`, `DateCalendar`, `DateRangeCalendar`, `CheckboxControl`, `Panel`, `Placeholder`: Remove outdated vendor prefix properties in CSS ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
++-    Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530)).
+ 
+ ## 30.9.0 (2025-11-26)
+ 
+diff --git a/packages/components/src/context/context-system-provider.js b/packages/components/src/context/context-system-provider.js
+index 7114372e0eb2a5..5ca535bfa22c54 100644
+--- a/packages/components/src/context/context-system-provider.js
++++ b/packages/components/src/context/context-system-provider.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import deepmerge from 'deepmerge';
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ import { isPlainObject } from 'is-plain-object';
+ 
+ /**
+diff --git a/packages/components/src/duotone-picker/duotone-picker.tsx b/packages/components/src/duotone-picker/duotone-picker.tsx
+index a21d12b73a65c4..52f776b57bcb7f 100644
+--- a/packages/components/src/duotone-picker/duotone-picker.tsx
++++ b/packages/components/src/duotone-picker/duotone-picker.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/higher-order/with-fallback-styles/index.tsx b/packages/components/src/higher-order/with-fallback-styles/index.tsx
+index b396094eadd530..cdfd29e7f07470 100644
+--- a/packages/components/src/higher-order/with-fallback-styles/index.tsx
++++ b/packages/components/src/higher-order/with-fallback-styles/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/compose/src/hooks/use-keyboard-shortcut/index.js b/packages/compose/src/hooks/use-keyboard-shortcut/index.js
+index cb571aa5a0e5fa..bf4e007eb9ab42 100644
+--- a/packages/compose/src/hooks/use-keyboard-shortcut/index.js
++++ b/packages/compose/src/hooks/use-keyboard-shortcut/index.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import Mousetrap from 'mousetrap';
+-import 'mousetrap/plugins/global-bind/mousetrap-global-bind';
++import 'mousetrap/plugins/global-bind/mousetrap-global-bind.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/core-data/src/actions.js b/packages/core-data/src/actions.js
+index 89ab8a995fb286..c1e9b1ef7ee653 100644
+--- a/packages/core-data/src/actions.js
++++ b/packages/core-data/src/actions.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ import { v4 as uuid } from 'uuid';
+ 
+ /**
+diff --git a/packages/core-data/src/reducer.js b/packages/core-data/src/reducer.js
+index 83d5f4c5407add..f2acaa34fb8c60 100644
+--- a/packages/core-data/src/reducer.js
++++ b/packages/core-data/src/reducer.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/core-data/src/utils/conservative-map-item.js b/packages/core-data/src/utils/conservative-map-item.js
+index 2a3297b5b32ab8..acf43a7d129cbe 100644
+--- a/packages/core-data/src/utils/conservative-map-item.js
++++ b/packages/core-data/src/utils/conservative-map-item.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * Given the current and next item entity record, returns the minimally "modified"
+diff --git a/packages/core-data/src/utils/crdt-blocks.ts b/packages/core-data/src/utils/crdt-blocks.ts
+index 5177f0f7f0838a..b661921880faac 100644
+--- a/packages/core-data/src/utils/crdt-blocks.ts
++++ b/packages/core-data/src/utils/crdt-blocks.ts
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { v4 as uuidv4 } from 'uuid';
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/core-data/src/utils/crdt.ts b/packages/core-data/src/utils/crdt.ts
+index d7355f9d439855..169d9620433479 100644
+--- a/packages/core-data/src/utils/crdt.ts
++++ b/packages/core-data/src/utils/crdt.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js b/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js
+index f7fef23fa7f386..a8155f5af355c3 100644
+--- a/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js
++++ b/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 2758211c0353e3..6d3146bac506be 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ - Update DataForm stories. [#74196](https://github.com/WordPress/gutenberg/pull/74196)
+ - Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
+ - Add details layout to DataForm validation story. [#74445](https://github.com/WordPress/gutenberg/pull/74445)
++- Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530))
+ 
+ ### Bug Fixes
+ 
+@@ -22,6 +23,7 @@
+ - DataViews: Combined field alignment in table layout. [#73908](https://github.com/WordPress/gutenberg/pull/73908)
+ - DataViews: Fix table row multiselection in Firefox [#73945](https://github.com/WordPress/gutenberg/pull/73945)
+ - DataViews: `filterSortAndPaginate()` will ignore sorting on non-sortable fields [#73950](https://github.com/WordPress/gutenberg/pull/73950)
++- DataViews: Fix locked fields order when toggling visibility in properties section. [#74326](https://github.com/WordPress/gutenberg/pull/74326)
+ 
+ ### Enhancements
+ 
+diff --git a/packages/dataviews/src/components/dataviews-filters/input-widget.tsx b/packages/dataviews/src/components/dataviews-filters/input-widget.tsx
+index 65ed2a4685c880..fa60759f3e981d 100644
+--- a/packages/dataviews/src/components/dataviews-filters/input-widget.tsx
++++ b/packages/dataviews/src/components/dataviews-filters/input-widget.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/dataviews/src/components/dataviews-view-config/properties-section.tsx b/packages/dataviews/src/components/dataviews-view-config/properties-section.tsx
+index dc7bb75db2b6ba..75374da86a58e1 100644
+--- a/packages/dataviews/src/components/dataviews-view-config/properties-section.tsx
++++ b/packages/dataviews/src/components/dataviews-view-config/properties-section.tsx
+@@ -78,41 +78,26 @@ export function PropertiesSection( {
+ 			field: descriptionField,
+ 			isVisibleFlag: 'showDescription',
+ 		},
+-	].filter( ( { field } ) => isDefined( field ) );
++	].filter( ( { field } ) => isDefined( field ) ) as Array< {
++		field: NormalizedField< any >;
++		isVisibleFlag: string;
++	} >;
+ 	const visibleFieldIds = view.fields ?? [];
+ 	const visibleRegularFieldsCount = regularFields.filter( ( f ) =>
+ 		visibleFieldIds.includes( f.id )
+ 	).length;
+ 
+-	let visibleLockedFields = lockedFields.filter(
+-		( { field, isVisibleFlag } ) =>
++	const visibleLockedFields = lockedFields.filter(
++		( { isVisibleFlag } ) =>
+ 			// @ts-expect-error
+-			isDefined( field ) && ( view[ isVisibleFlag ] ?? true )
+-	) as Array< {
+-		field: NormalizedField< any >;
+-		isVisibleFlag: string;
+-	} >;
++			view[ isVisibleFlag ] ?? true
++	);
+ 
+ 	// If only one field (locked or regular) is visible, prevent it from being hidden
+ 	const totalVisibleFields =
+ 		visibleLockedFields.length + visibleRegularFieldsCount;
+-	if ( totalVisibleFields === 1 ) {
+-		if ( visibleLockedFields.length === 1 ) {
+-			visibleLockedFields = visibleLockedFields.map( ( locked ) => ( {
+-				...locked,
+-				field: { ...locked.field, enableHiding: false },
+-			} ) );
+-		}
+-	}
+-
+-	const hiddenLockedFields = lockedFields.filter(
+-		( { field, isVisibleFlag } ) =>
+-			// @ts-expect-error
+-			isDefined( field ) && ! ( view[ isVisibleFlag ] ?? true )
+-	) as Array< {
+-		field: NormalizedField< any >;
+-		isVisibleFlag: string;
+-	} >;
++	const isSingleVisibleLockedField =
++		totalVisibleFields === 1 && visibleLockedFields.length === 1;
+ 
+ 	return (
+ 		<Stack direction="column" className="dataviews-field-control">
+@@ -126,32 +111,23 @@ export function PropertiesSection( {
+ 				className="dataviews-view-config__properties"
+ 			>
+ 				<ItemGroup isBordered isSeparated size="medium">
+-					{ visibleLockedFields.map( ( { field, isVisibleFlag } ) => {
+-						return (
+-							<FieldItem
+-								key={ field.id }
+-								field={ field }
+-								isVisible
+-								onToggleVisibility={ () => {
+-									onChangeView( {
+-										...view,
+-										[ isVisibleFlag ]: false,
+-									} );
+-								} }
+-							/>
+-						);
+-					} ) }
++					{ lockedFields.map( ( { field, isVisibleFlag } ) => {
++						// @ts-expect-error
++						const isVisible = view[ isVisibleFlag ] ?? true;
++						const fieldToRender =
++							isSingleVisibleLockedField && isVisible
++								? { ...field, enableHiding: false }
++								: field;
+ 
+-					{ hiddenLockedFields.map( ( { field, isVisibleFlag } ) => {
+ 						return (
+ 							<FieldItem
+ 								key={ field.id }
+-								field={ field }
+-								isVisible={ false }
++								field={ fieldToRender }
++								isVisible={ isVisible }
+ 								onToggleVisibility={ () => {
+ 									onChangeView( {
+ 										...view,
+-										[ isVisibleFlag ]: true,
++										[ isVisibleFlag ]: ! isVisible,
+ 									} );
+ 								} }
+ 							/>
+@@ -161,11 +137,10 @@ export function PropertiesSection( {
+ 					{ regularFields.map( ( field ) => {
+ 						// Check if this is the last visible field to prevent hiding
+ 						const isVisible = visibleFieldIds.includes( field.id );
+-						const isLastVisible =
+-							totalVisibleFields === 1 && isVisible;
+-						const fieldToRender = isLastVisible
+-							? { ...field, enableHiding: false }
+-							: field;
++						const fieldToRender =
++							totalVisibleFields === 1 && isVisible
++								? { ...field, enableHiding: false }
++								: field;
+ 
+ 						return (
+ 							<FieldItem
+diff --git a/packages/dataviews/src/hooks/use-form-validity.ts b/packages/dataviews/src/hooks/use-form-validity.ts
+index 383364b85e2b48..8d199c50206bbe 100644
+--- a/packages/dataviews/src/hooks/use-form-validity.ts
++++ b/packages/dataviews/src/hooks/use-form-validity.ts
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import deepMerge from 'deepmerge';
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/date/src/index.ts b/packages/date/src/index.ts
+index 4c26c4007999b8..7193ee33f93ffa 100644
+--- a/packages/date/src/index.ts
++++ b/packages/date/src/index.ts
+@@ -4,7 +4,7 @@
+ import type { Moment } from 'moment';
+ import momentLib from 'moment';
+ import 'moment-timezone/moment-timezone';
+-import 'moment-timezone/moment-timezone-utils';
++import 'moment-timezone/moment-timezone-utils.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/dom-ready/src/test/index.test.ts b/packages/dom-ready/src/test/index.test.ts
+index 85a5103216b364..a6c0fee0d47eb8 100644
+--- a/packages/dom-ready/src/test/index.test.ts
++++ b/packages/dom-ready/src/test/index.test.ts
+@@ -3,25 +3,14 @@
+  */
+ import domReady from '../';
+ 
+-/**
+- * In JSDOM, unlike browsers, readyState can be overwritten to simulate different document states.
+- */
+-interface MockDocument extends Document {
+-	readyState: DocumentReadyState;
+-}
+-
+ describe( 'domReady', () => {
+-	beforeAll( () => {
+-		Object.defineProperty( document, 'readyState', {
+-			value: 'loading',
+-			writable: true,
+-		} );
+-	} );
+-
+ 	describe( 'when document readystate is complete', () => {
+ 		it( 'should call the callback.', () => {
+ 			const callback = jest.fn( () => {} );
+-			( document as MockDocument ).readyState = 'complete';
++			Object.defineProperty( document, 'readyState', {
++				get: () => 'complete',
++				configurable: true,
++			} );
+ 			domReady( callback );
+ 			expect( callback ).toHaveBeenCalled();
+ 		} );
+@@ -30,7 +19,10 @@ describe( 'domReady', () => {
+ 	describe( 'when document readystate is interactive', () => {
+ 		it( 'should call the callback.', () => {
+ 			const callback = jest.fn( () => {} );
+-			( document as MockDocument ).readyState = 'interactive';
++			Object.defineProperty( document, 'readyState', {
++				get: () => 'interactive',
++				configurable: true,
++			} );
+ 			domReady( callback );
+ 			expect( callback ).toHaveBeenCalled();
+ 		} );
+@@ -39,7 +31,10 @@ describe( 'domReady', () => {
+ 	describe( 'when document readystate is still loading', () => {
+ 		it( 'should add the callback as an event listener to the DOMContentLoaded event.', () => {
+ 			const addEventListener = jest.fn( () => {} );
+-			( document as MockDocument ).readyState = 'loading';
++			Object.defineProperty( document, 'readyState', {
++				get: () => 'loading',
++				configurable: true,
++			} );
+ 			Object.defineProperty( document, 'addEventListener', {
+ 				value: addEventListener,
+ 			} );
+diff --git a/packages/edit-site/src/components/sidebar-navigation-screen-patterns/index.js b/packages/edit-site/src/components/sidebar-navigation-screen-patterns/index.js
+index e88e7b6093b2cb..e1770bfa81f2ee 100644
+--- a/packages/edit-site/src/components/sidebar-navigation-screen-patterns/index.js
++++ b/packages/edit-site/src/components/sidebar-navigation-screen-patterns/index.js
+@@ -52,11 +52,11 @@ function CategoriesGroup( {
+ 				}
+ 			/>
+ 			{ Object.entries( templatePartAreas ).map(
+-				( [ area, { label, templateParts } ] ) => (
++				( [ area, { label, templateParts, icon } ] ) => (
+ 					<CategoryItem
+ 						key={ area }
+ 						count={ templateParts?.length }
+-						icon={ getTemplatePartIcon( area ) }
++						icon={ getTemplatePartIcon( icon ) }
+ 						label={ label }
+ 						id={ area }
+ 						type={ TEMPLATE_PART_POST_TYPE }
+diff --git a/packages/editor/src/utils/get-template-part-icon.js b/packages/editor/src/utils/get-template-part-icon.js
+index 0519a9975659f8..2aa34556c5eb9f 100644
+--- a/packages/editor/src/utils/get-template-part-icon.js
++++ b/packages/editor/src/utils/get-template-part-icon.js
+@@ -24,7 +24,7 @@ export function getTemplatePartIcon( areaOrIconName ) {
+ 		return footerIcon;
+ 	} else if ( 'sidebar' === areaOrIconName ) {
+ 		return sidebarIcon;
+-	} else if ( 'navigation-overlay' === areaOrIconName ) {
++	} else if ( 'overlay' === areaOrIconName ) {
+ 		// TODO: Replace with a proper overlay icon when available.
+ 		// Using tableColumnAfter as a placeholder.
+ 		return overlayIcon;
+diff --git a/packages/fields/src/components/create-template-part-modal/index.tsx b/packages/fields/src/components/create-template-part-modal/index.tsx
+index 6233217f81ad79..886f3028d56698 100644
+--- a/packages/fields/src/components/create-template-part-modal/index.tsx
++++ b/packages/fields/src/components/create-template-part-modal/index.tsx
+@@ -100,7 +100,7 @@ const getTemplatePartIcon = ( areaOrIconName: string ) => {
+ 		return footerIcon;
+ 	} else if ( 'sidebar' === areaOrIconName ) {
+ 		return sidebarIcon;
+-	} else if ( 'navigation-overlay' === areaOrIconName ) {
++	} else if ( 'overlay' === areaOrIconName ) {
+ 		// TODO: Replace with a proper overlay icon when available.
+ 		// Using tableColumnAfter as a placeholder.
+ 		return overlayIcon;
+diff --git a/packages/global-styles-engine/src/core/equal.ts b/packages/global-styles-engine/src/core/equal.ts
+index d307c10fbeed4e..362bb3f3ac2122 100644
+--- a/packages/global-styles-engine/src/core/equal.ts
++++ b/packages/global-styles-engine/src/core/equal.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/jest-puppeteer-axe/src/index.js b/packages/jest-puppeteer-axe/src/index.ts
+similarity index 61%
+rename from packages/jest-puppeteer-axe/src/index.js
+rename to packages/jest-puppeteer-axe/src/index.ts
+index 89a072f49f7491..263f9dfdb8e4ad 100644
+--- a/packages/jest-puppeteer-axe/src/index.js
++++ b/packages/jest-puppeteer-axe/src/index.ts
+@@ -2,21 +2,17 @@
+  * External dependencies
+  */
+ import AxePuppeteer from '@axe-core/puppeteer';
+-
+-/** @typedef {import('puppeteer-core').Page} Page */
+-
+-/** @typedef {import('axe-core').RunOptions} RunOptions */
+-
+-/** @typedef {import('axe-core').Spec} Spec */
++import type { Page } from 'puppeteer-core';
++import type { RunOptions, Spec, Result, NodeResult } from 'axe-core';
+ 
+ /**
+  * Formats the list of violations object returned by Axe analysis.
+  *
+- * @param {Object} violations The object with the errors found by Axe.
++ * @param {Array<Result>} violations The array with the errors found by Axe.
+  *
+  * @return {string} The user friendly message to display when the matcher fails.
+  */
+-function formatViolations( violations ) {
++function formatViolations( violations: Array< Result > ): string {
+ 	return violations
+ 		.map( ( { help, helpUrl, id, nodes } ) => {
+ 			let output =
+@@ -24,7 +20,7 @@ function formatViolations( violations ) {
+ 				`Help: ${ helpUrl }\n` +
+ 				'Affected Nodes:\n';
+ 
+-			nodes.forEach( ( node ) => {
++			nodes.forEach( ( node: NodeResult ) => {
+ 				if ( node.any.length ) {
+ 					output += `  ${ node.target }\n`;
+ 					output += '    Fix ANY of the following:\n';
+@@ -54,31 +50,47 @@ function formatViolations( violations ) {
+ 		.join( '\n' );
+ }
+ 
++interface AxeTestParams {
++	/**
++	 * CSS selector(s) to include in analysis.
++	 */
++	include?: string | string[];
++	/**
++	 * CSS selector(s) to exclude from analysis.
++	 */
++	exclude?: string | string[];
++	/**
++	 * List of Axe rules to skip from verification.
++	 */
++	disabledRules?: string[];
++	/**
++	 * Options to configure how Axe run operates.
++	 * @see https://github.com/dequelabs/axe-core/blob/HEAD/doc/API.md#options-parameter
++	 */
++	options?: RunOptions;
++	/**
++	 * Axe configuration object.
++	 * @see https://github.com/dequelabs/axe-core/blob/HEAD/doc/API.md#api-name-axeconfigure
++	 */
++	config?: Spec;
++}
++
+ /**
+  * Defines async matcher to check whether a given Puppeteer's page instance passes Axe accessibility tests.
+  *
+  * @see https://www.deque.com/axe/
+  * It is possible to pass optional Axe API options to perform customized check.
+- *
+  * @see https://github.com/dequelabs/axe-core-npm/tree/develop/packages/puppeteer
+  *
+- * @param {Page}          page                 Puppeteer's page instance.
+- * @param {?Object}       params               Optional params that allow better control over Axe API.
+- * @param {?string|Array} params.include       CSS selector(s) to add to the list of elements
+- *                                             to include in analysis.
+- * @param {?string|Array} params.exclude       CSS selector(s) to add to the list of elements
+- *                                             to exclude from analysis.
+- * @param {?Array}        params.disabledRules The list of Axe rules to skip from verification.
+- * @param {?RunOptions}   params.options       A flexible way to configure how Axe run operates,
+- *                                             see https://github.com/dequelabs/axe-core/blob/HEAD/doc/API.md#options-parameter.
+- * @param {?Spec}         params.config        Axe configuration object,
+- *                                             see https://github.com/dequelabs/axe-core/blob/HEAD/doc/API.md#api-name-axeconfigure.
+- *
+- * @return {Object} A matcher object with two keys `pass` and `message`.
++ * @param {import('@jest/expect').MatcherContext} this   Matcher context from Jest.
++ * @param {Page}                                  page   Puppeteer's page instance.
++ * @param {AxeTestParams}                         params Optional params that allow better control over Axe API.
++ * @return A matcher object with two keys `pass` and `message`.
+  */
+ async function toPassAxeTests(
+-	page,
+-	{ include, exclude, disabledRules, options, config } = {}
++	this: jest.MatcherContext,
++	page: Page,
++	{ include, exclude, disabledRules, options, config }: AxeTestParams = {}
+ ) {
+ 	const axe = new AxePuppeteer( page );
+ 
+diff --git a/packages/notices/CHANGELOG.md b/packages/notices/CHANGELOG.md
+index 227d4accc7bb44..19542e9cb1b837 100644
+--- a/packages/notices/CHANGELOG.md
++++ b/packages/notices/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   Improved TypeScript definitions ([#67565](https://github.com/WordPress/gutenberg/pull/67565)).
++
+ ## 5.36.0 (2025-11-26)
+ 
+ ## 5.35.0 (2025-11-12)
+diff --git a/packages/notices/src/index.js b/packages/notices/src/index.ts
+similarity index 100%
+rename from packages/notices/src/index.js
+rename to packages/notices/src/index.ts
+diff --git a/packages/notices/src/store/actions.js b/packages/notices/src/store/actions.ts
+similarity index 65%
+rename from packages/notices/src/store/actions.js
+rename to packages/notices/src/store/actions.ts
+index e78e3059c11f32..ad672b2e2e9388 100644
+--- a/packages/notices/src/store/actions.js
++++ b/packages/notices/src/store/actions.ts
+@@ -2,48 +2,16 @@
+  * Internal dependencies
+  */
+ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
+-
+-/**
+- * @typedef {Object} WPNoticeAction Object describing a user action option associated with a notice.
+- *
+- * @property {string}    label   Message to use as action label.
+- * @property {?string}   url     Optional URL of resource if action incurs
+- *                               browser navigation.
+- * @property {?Function} onClick Optional function to invoke when action is
+- *                               triggered by user.
+- */
++import type { NoticeOptions, ReducerAction } from './types';
+ 
+ let uniqueId = 0;
+ 
+ /**
+  * Returns an action object used in signalling that a notice is to be created.
+  *
+- * @param {string|undefined}      status                       Notice status ("info" if undefined is passed).
+- * @param {string}                content                      Notice message.
+- * @param {Object}                [options]                    Notice options.
+- * @param {string}                [options.context='global']   Context under which to
+- *                                                             group notice.
+- * @param {string}                [options.id]                 Identifier for notice.
+- *                                                             Automatically assigned
+- *                                                             if not specified.
+- * @param {boolean}               [options.isDismissible=true] Whether the notice can
+- *                                                             be dismissed by user.
+- * @param {string}                [options.type='default']     Type of notice, one of
+- *                                                             `default`, or `snackbar`.
+- * @param {boolean}               [options.speak=true]         Whether the notice
+- *                                                             content should be
+- *                                                             announced to screen
+- *                                                             readers.
+- * @param {Array<WPNoticeAction>} [options.actions]            User actions to be
+- *                                                             presented with notice.
+- * @param {string}                [options.icon]               An icon displayed with the notice.
+- *                                                             Only used when type is set to `snackbar`.
+- * @param {boolean}               [options.explicitDismiss]    Whether the notice includes
+- *                                                             an explicit dismiss button and
+- *                                                             can't be dismissed by clicking
+- *                                                             the body of the notice. Only applies
+- *                                                             when type is set to `snackbar`.
+- * @param {Function}              [options.onDismiss]          Called when the notice is dismissed.
++ * @param status  Notice status ("info" if undefined is passed).
++ * @param content Notice message.
++ * @param options Optional notice options.
+  *
+  * @example
+  * ```js
+@@ -64,9 +32,13 @@ let uniqueId = 0;
+  * };
+  * ```
+  *
+- * @return {Object} Action object.
++ * @return Action object.
+  */
+-export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
++export function createNotice(
++	status = DEFAULT_STATUS,
++	content: string,
++	options: NoticeOptions = {}
++): Extract< ReducerAction, { type: 'CREATE_NOTICE' } > {
+ 	const {
+ 		speak = true,
+ 		isDismissible = true,
+@@ -110,8 +82,8 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
+  *
+  * @see createNotice
+  *
+- * @param {string} content   Notice message.
+- * @param {Object} [options] Optional notice options.
++ * @param content Notice message.
++ * @param options Optional notice options.
+  *
+  * @example
+  * ```js
+@@ -137,9 +109,12 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
+  * };
+  * ```
+  *
+- * @return {Object} Action object.
++ * @return Action object.
+  */
+-export function createSuccessNotice( content, options ) {
++export function createSuccessNotice(
++	content: string,
++	options?: NoticeOptions
++) {
+ 	return createNotice( 'success', content, options );
+ }
+ 
+@@ -149,8 +124,8 @@ export function createSuccessNotice( content, options ) {
+  *
+  * @see createNotice
+  *
+- * @param {string} content   Notice message.
+- * @param {Object} [options] Optional notice options.
++ * @param content Notice message.
++ * @param options Optional notice options.
+  *
+  * @example
+  * ```js
+@@ -175,9 +150,9 @@ export function createSuccessNotice( content, options ) {
+  * };
+  *```
+  *
+- * @return {Object} Action object.
++ * @return Action object.
+  */
+-export function createInfoNotice( content, options ) {
++export function createInfoNotice( content: string, options?: NoticeOptions ) {
+ 	return createNotice( 'info', content, options );
+ }
+ 
+@@ -187,8 +162,8 @@ export function createInfoNotice( content, options ) {
+  *
+  * @see createNotice
+  *
+- * @param {string} content   Notice message.
+- * @param {Object} [options] Optional notice options.
++ * @param content Notice message.
++ * @param options Optional notice options.
+  *
+  * @example
+  * ```js
+@@ -216,9 +191,9 @@ export function createInfoNotice( content, options ) {
+  * };
+  * ```
+  *
+- * @return {Object} Action object.
++ * @return Action object.
+  */
+-export function createErrorNotice( content, options ) {
++export function createErrorNotice( content: string, options?: NoticeOptions ) {
+ 	return createNotice( 'error', content, options );
+ }
+ 
+@@ -228,8 +203,8 @@ export function createErrorNotice( content, options ) {
+  *
+  * @see createNotice
+  *
+- * @param {string} content   Notice message.
+- * @param {Object} [options] Optional notice options.
++ * @param content Notice message.
++ * @param options Optional notice options.
+  *
+  * @example
+  * ```js
+@@ -258,18 +233,21 @@ export function createErrorNotice( content, options ) {
+  * };
+  * ```
+  *
+- * @return {Object} Action object.
++ * @return Action object.
+  */
+-export function createWarningNotice( content, options ) {
++export function createWarningNotice(
++	content: string,
++	options?: NoticeOptions
++) {
+ 	return createNotice( 'warning', content, options );
+ }
+ 
+ /**
+  * Returns an action object used in signalling that a notice is to be removed.
+  *
+- * @param {string} id                 Notice unique identifier.
+- * @param {string} [context='global'] Optional context (grouping) in which the notice is
+- *                                    intended to appear. Defaults to default context.
++ * @param id      Notice unique identifier.
++ * @param context Optional context (grouping) in which the notice is
++ *                intended to appear. Defaults to 'default' context.
+  *
+  * @example
+  * ```js
+@@ -303,9 +281,12 @@ export function createWarningNotice( content, options ) {
+  *};
+  * ```
+  *
+- * @return {Object} Action object.
++ * @return Action object.
+  */
+-export function removeNotice( id, context = DEFAULT_CONTEXT ) {
++export function removeNotice(
++	id: string,
++	context: string = DEFAULT_CONTEXT
++): Extract< ReducerAction, { type: 'REMOVE_NOTICE' } > {
+ 	return {
+ 		type: 'REMOVE_NOTICE',
+ 		id,
+@@ -316,8 +297,8 @@ export function removeNotice( id, context = DEFAULT_CONTEXT ) {
+ /**
+  * Removes all notices from a given context. Defaults to the default context.
+  *
+- * @param {string} noticeType The context to remove all notices from.
+- * @param {string} context    The context to remove all notices from.
++ * @param noticeType The context to remove all notices from.
++ * @param context    The optional context to remove all notices from.
+  *
+  * @example
+  * ```js
+@@ -357,12 +338,12 @@ export function removeNotice( id, context = DEFAULT_CONTEXT ) {
+  * };
+  * ```
+  *
+- * @return {Object} 	   Action object.
++ * @return 	   Action object.
+  */
+ export function removeAllNotices(
+ 	noticeType = 'default',
+-	context = DEFAULT_CONTEXT
+-) {
++	context: string = DEFAULT_CONTEXT
++): Extract< ReducerAction, { type: 'REMOVE_ALL_NOTICES' } > {
+ 	return {
+ 		type: 'REMOVE_ALL_NOTICES',
+ 		noticeType,
+@@ -373,9 +354,9 @@ export function removeAllNotices(
+ /**
+  * Returns an action object used in signalling that several notices are to be removed.
+  *
+- * @param {string[]} ids                List of unique notice identifiers.
+- * @param {string}   [context='global'] Optional context (grouping) in which the notices are
+- *                                      intended to appear. Defaults to default context.
++ * @param ids     List of unique notice identifiers.
++ * @param context Optional context (grouping) in which the notices are
++ *                intended to appear. Defaults to 'default' context.
+  * @example
+  * ```js
+  * import { __ } from '@wordpress/i18n';
+@@ -406,9 +387,12 @@ export function removeAllNotices(
+  * 	);
+  * };
+  * ```
+- * @return {Object} Action object.
++ * @return Action object.
+  */
+-export function removeNotices( ids, context = DEFAULT_CONTEXT ) {
++export function removeNotices(
++	ids: Array< string >,
++	context: string = DEFAULT_CONTEXT
++): Extract< ReducerAction, { type: 'REMOVE_NOTICES' } > {
+ 	return {
+ 		type: 'REMOVE_NOTICES',
+ 		ids,
+diff --git a/packages/notices/src/store/constants.js b/packages/notices/src/store/constants.ts
+similarity index 71%
+rename from packages/notices/src/store/constants.js
+rename to packages/notices/src/store/constants.ts
+index 2949bde0577db2..df07e8593e127b 100644
+--- a/packages/notices/src/store/constants.js
++++ b/packages/notices/src/store/constants.ts
+@@ -1,15 +1,16 @@
++/**
++ * Internal dependencies
++ */
++import type { Notice } from './types';
++
+ /**
+  * Default context to use for notice grouping when not otherwise specified. Its
+  * specific value doesn't hold much meaning, but it must be reasonably unique
+  * and, more importantly, referenced consistently in the store implementation.
+- *
+- * @type {string}
+  */
+ export const DEFAULT_CONTEXT = 'global';
+ 
+ /**
+  * Default notice status.
+- *
+- * @type {string}
+  */
+-export const DEFAULT_STATUS = 'info';
++export const DEFAULT_STATUS: Notice[ 'status' ] = 'info';
+diff --git a/packages/notices/src/store/controls.js b/packages/notices/src/store/controls.ts
+similarity index 67%
+rename from packages/notices/src/store/controls.js
+rename to packages/notices/src/store/controls.ts
+index 80c20900dd5f3a..9bc362e52283a1 100644
+--- a/packages/notices/src/store/controls.js
++++ b/packages/notices/src/store/controls.ts
+@@ -4,7 +4,7 @@
+ import { speak } from '@wordpress/a11y';
+ 
+ export default {
+-	SPEAK( action ) {
++	SPEAK( action: { message: string; ariaLive?: 'polite' | 'assertive' } ) {
+ 		speak( action.message, action.ariaLive || 'assertive' );
+ 	},
+ };
+diff --git a/packages/notices/src/store/index.js b/packages/notices/src/store/index.ts
+similarity index 100%
+rename from packages/notices/src/store/index.js
+rename to packages/notices/src/store/index.ts
+diff --git a/packages/notices/src/store/reducer.js b/packages/notices/src/store/reducer.ts
+similarity index 72%
+rename from packages/notices/src/store/reducer.js
+rename to packages/notices/src/store/reducer.ts
+index 5f4d88c04af299..df97de1eb597e5 100644
+--- a/packages/notices/src/store/reducer.js
++++ b/packages/notices/src/store/reducer.ts
+@@ -1,18 +1,22 @@
+ /**
+  * Internal dependencies
+  */
++import type { Notice, ReducerAction } from './types';
+ import onSubKey from './utils/on-sub-key';
+ 
+ /**
+  * Reducer returning the next notices state. The notices state is an object
+  * where each key is a context, its value an array of notice objects.
+  *
+- * @param {Object} state  Current state.
+- * @param {Object} action Dispatched action.
++ * @param state  Current state.
++ * @param action Dispatched action.
+  *
+- * @return {Object} Updated state.
++ * @return Updated state.
+  */
+-const notices = onSubKey( 'context' )( ( state = [], action ) => {
++const notices = onSubKey( 'context' )< Array< Notice >, ReducerAction >( (
++	state = [],
++	action
++) => {
+ 	switch ( action.type ) {
+ 		case 'CREATE_NOTICE':
+ 			// Avoid duplicates on ID.
+@@ -29,9 +33,10 @@ const notices = onSubKey( 'context' )( ( state = [], action ) => {
+ 
+ 		case 'REMOVE_ALL_NOTICES':
+ 			return state.filter( ( { type } ) => type !== action.noticeType );
+-	}
+ 
+-	return state;
++		default:
++			return state;
++	}
+ } );
+ 
+ export default notices;
+diff --git a/packages/notices/src/store/selectors.js b/packages/notices/src/store/selectors.js
+deleted file mode 100644
+index d3cd9d41a0ec06..00000000000000
+--- a/packages/notices/src/store/selectors.js
++++ /dev/null
+@@ -1,73 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { DEFAULT_CONTEXT } from './constants';
+-
+-/** @typedef {import('./actions').WPNoticeAction} WPNoticeAction */
+-
+-/**
+- * The default empty set of notices to return when there are no notices
+- * assigned for a given notices context. This can occur if the getNotices
+- * selector is called without a notice ever having been created for the
+- * context. A shared value is used to ensure referential equality between
+- * sequential selector calls, since otherwise `[] !== []`.
+- *
+- * @type {Array}
+- */
+-const DEFAULT_NOTICES = [];
+-
+-/**
+- * @typedef {Object} WPNotice Notice object.
+- *
+- * @property {string}           id             Unique identifier of notice.
+- * @property {string}           status         Status of notice, one of `success`,
+- *                                             `info`, `error`, or `warning`. Defaults
+- *                                             to `info`.
+- * @property {string}           content        Notice message.
+- * @property {string}           spokenMessage  Audibly announced message text used by
+- *                                             assistive technologies.
+- * @property {string}           __unstableHTML Notice message as raw HTML. Intended to
+- *                                             serve primarily for compatibility of
+- *                                             server-rendered notices, and SHOULD NOT
+- *                                             be used for notices. It is subject to
+- *                                             removal without notice.
+- * @property {boolean}          isDismissible  Whether the notice can be dismissed by
+- *                                             user. Defaults to `true`.
+- * @property {string}           type           Type of notice, one of `default`,
+- *                                             or `snackbar`. Defaults to `default`.
+- * @property {boolean}          speak          Whether the notice content should be
+- *                                             announced to screen readers. Defaults to
+- *                                             `true`.
+- * @property {WPNoticeAction[]} actions        User actions to present with notice.
+- */
+-
+-/**
+- * Returns all notices as an array, optionally for a given context. Defaults to
+- * the global context.
+- *
+- * @param {Object}  state   Notices state.
+- * @param {?string} context Optional grouping context.
+- *
+- * @example
+- *
+- *```js
+- * import { useSelect } from '@wordpress/data';
+- * import { store as noticesStore } from '@wordpress/notices';
+- *
+- * const ExampleComponent = () => {
+- *     const notices = useSelect( ( select ) => select( noticesStore ).getNotices() );
+- *     return (
+- *         <ul>
+- *         { notices.map( ( notice ) => (
+- *             <li key={ notice.ID }>{ notice.content }</li>
+- *         ) ) }
+- *        </ul>
+- *    )
+- * };
+- *```
+- *
+- * @return {WPNotice[]} Array of notices.
+- */
+-export function getNotices( state, context = DEFAULT_CONTEXT ) {
+-	return state[ context ] || DEFAULT_NOTICES;
+-}
+diff --git a/packages/notices/src/store/selectors.ts b/packages/notices/src/store/selectors.ts
+new file mode 100644
+index 00000000000000..d136aff780f0c1
+--- /dev/null
++++ b/packages/notices/src/store/selectors.ts
+@@ -0,0 +1,49 @@
++/**
++ * Internal dependencies
++ */
++import { DEFAULT_CONTEXT } from './constants';
++import type { Notice } from './types';
++
++/**
++ * The default empty set of notices to return when there are no notices
++ * assigned for a given notices context. This can occur if the getNotices
++ * selector is called without a notice ever having been created for the
++ * context. A shared value is used to ensure referential equality between
++ * sequential selector calls, since otherwise `[] !== []`.
++ *
++ */
++const DEFAULT_NOTICES: Array< Notice > = [];
++
++/**
++ * Returns all notices as an array, optionally for a given context. Defaults to
++ * the global context.
++ *
++ * @param state   Notices state.
++ * @param context Optional grouping context.
++ *
++ * @example
++ *
++ *```js
++ * import { useSelect } from '@wordpress/data';
++ * import { store as noticesStore } from '@wordpress/notices';
++ *
++ * const ExampleComponent = () => {
++ *     const notices = useSelect( ( select ) => select( noticesStore ).getNotices() );
++ *     return (
++ *         <ul>
++ *         { notices.map( ( notice ) => (
++ *             <li key={ notice.ID }>{ notice.content }</li>
++ *         ) ) }
++ *        </ul>
++ *    )
++ * };
++ *```
++ *
++ * @return Array of notices.
++ */
++export function getNotices(
++	state: Record< string, Array< Notice > >,
++	context: string = DEFAULT_CONTEXT
++) {
++	return state[ context ] || DEFAULT_NOTICES;
++}
+diff --git a/packages/notices/src/store/test/actions.js b/packages/notices/src/store/test/actions.ts
+similarity index 98%
+rename from packages/notices/src/store/test/actions.js
+rename to packages/notices/src/store/test/actions.ts
+index 37fefc5c3558f4..17fca19b58eaf4 100644
+--- a/packages/notices/src/store/test/actions.js
++++ b/packages/notices/src/store/test/actions.ts
+@@ -16,7 +16,7 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from '../constants';
+ describe( 'actions', () => {
+ 	describe( 'createNotice', () => {
+ 		const id = 'my-id';
+-		const status = 'status';
++		const status = 'success';
+ 		const content = 'my message';
+ 
+ 		it( 'returns an action when options is empty', () => {
+@@ -37,7 +37,7 @@ describe( 'actions', () => {
+ 		} );
+ 
+ 		it( 'normalizes content to string', () => {
+-			const result = createNotice( status, <strong>Hello</strong> );
++			const result = createNotice( status, '<strong>Hello</strong>' );
+ 
+ 			expect( result ).toMatchObject( {
+ 				type: 'CREATE_NOTICE',
+diff --git a/packages/notices/src/store/test/reducer.js b/packages/notices/src/store/test/reducer.ts
+similarity index 99%
+rename from packages/notices/src/store/test/reducer.js
+rename to packages/notices/src/store/test/reducer.ts
+index d807b814a51f47..870b595c17f50a 100644
+--- a/packages/notices/src/store/test/reducer.js
++++ b/packages/notices/src/store/test/reducer.ts
+@@ -18,7 +18,7 @@ import { DEFAULT_CONTEXT } from '../constants';
+ 
+ describe( 'reducer', () => {
+ 	it( 'should default to an empty object', () => {
+-		const state = reducer( undefined, {} );
++		const state = reducer( undefined, { type: '@@UNKNOWN_ACTION' } );
+ 
+ 		expect( state ).toEqual( {} );
+ 	} );
+diff --git a/packages/notices/src/store/test/selectors.js b/packages/notices/src/store/test/selectors.ts
+similarity index 76%
+rename from packages/notices/src/store/test/selectors.js
+rename to packages/notices/src/store/test/selectors.ts
+index b470282d05c08e..eb688309d88e9b 100644
+--- a/packages/notices/src/store/test/selectors.js
++++ b/packages/notices/src/store/test/selectors.ts
+@@ -21,7 +21,12 @@ describe( 'selectors', () => {
+ 				],
+ 			};
+ 
+-			expect( getNotices( state ) ).toEqual( [
++			expect(
++				getNotices(
++					// @ts-expect-error Testing partial state
++					state
++				)
++			).toEqual( [
+ 				{ id: 'b', content: 'message 1' },
+ 				{ id: 'a', content: 'message 2' },
+ 			] );
+@@ -32,9 +37,13 @@ describe( 'selectors', () => {
+ 				foo: [ { id: 'c', content: 'message 3' } ],
+ 			};
+ 
+-			expect( getNotices( state, 'foo' ) ).toEqual( [
+-				{ id: 'c', content: 'message 3' },
+-			] );
++			expect(
++				getNotices(
++					// @ts-expect-error Testing partial state
++					state,
++					'foo'
++				)
++			).toEqual( [ { id: 'c', content: 'message 3' } ] );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/notices/src/store/types.ts b/packages/notices/src/store/types.ts
+new file mode 100644
+index 00000000000000..33c30149862945
+--- /dev/null
++++ b/packages/notices/src/store/types.ts
+@@ -0,0 +1,169 @@
++/**
++ * Object describing a user action option associated with a notice.
++ */
++export type NoticeAction = {
++	/**
++	 * Message to use as action label.
++	 */
++	label: string;
++
++	/**
++	 * Optional URL of resource if action incurs browser navigation.
++	 */
++	url?: string;
++
++	/**
++	 * Optional function to invoke when action is triggered by user.
++	 */
++	onClick?: VoidFunction;
++};
++
++/**
++ * Notice object.
++ */
++export type Notice = {
++	/**
++	 * Unique identifier of notice.
++	 */
++	id: string;
++
++	/**
++	 * Status of notice, one of `success`, `info`, `error`, or `warning`. Defaults to `info`.
++	 */
++	status: 'success' | 'info' | 'error' | 'warning';
++
++	/**
++	 * Notice message.
++	 */
++	content: string;
++
++	/**
++	 * Audibly announced message text used by assistive technologies.
++	 */
++	spokenMessage: string | null;
++
++	/**
++	 * Notice message as raw HTML. Intended to serve primarily for compatibility of server-rendered notices,
++	 * and SHOULD NOT be used for notices. It is subject to removal without notice.
++	 */
++	__unstableHTML?: boolean;
++
++	/**
++	 * Whether the notice can be dismissed by user. Defaults to `true`.
++	 */
++	isDismissible: boolean;
++
++	/**
++	 * Whether the notice includes an explicit dismiss button and can't be dismissed by clicking the body of the notice. Only applies when type is `snackbar`.
++	 */
++	explicitDismiss?: boolean;
++
++	/**
++	 * Called when the notice is dismissed.
++	 */
++	onDismiss?: VoidFunction;
++
++	/**
++	 * Type of notice, one of `default`, or `snackbar`.
++	 *
++	 * @default 'default'
++	 */
++	type: 'default' | 'snackbar' | ( string & {} );
++
++	/**
++	 * User actions to present with notice.
++	 */
++	actions: NoticeAction[];
++
++	/**
++	 * An icon displayed with the notice. Only used when type is `snackbar`.
++	 */
++	icon?: string | null;
++};
++
++export type NoticeOptions = {
++	/**
++	 * Context under which to group notice.
++	 * @default 'global'
++	 */
++	context?: string;
++
++	/**
++	 * Identifier for notice. Automatically assigned if not specified.
++	 */
++	id?: string;
++
++	/**
++	 * Whether the notice can be dismissed by user.
++	 * @default true
++	 */
++	isDismissible?: boolean;
++
++	/**
++	 * Type of notice, one of `default`, or `snackbar`.
++	 * @default 'default'
++	 */
++	type?: 'default' | 'snackbar' | ( string & {} );
++
++	/**
++	 * Whether the notice content should be announced to screen readers.
++	 * @default true
++	 */
++	speak?: boolean;
++
++	/**
++	 * User actions to be presented with notice.
++	 */
++	actions?: NoticeAction[];
++
++	/**
++	 * An icon displayed with the notice. Only used when type is set to `snackbar`.
++	 */
++	icon?: string | null;
++
++	/**
++	 * Whether the notice includes an explicit dismiss button and can't be dismissed by clicking the body of the notice. Only applies when type is set to `snackbar`.
++	 */
++	explicitDismiss?: boolean;
++
++	/**
++	 * Called when the notice is dismissed.
++	 */
++	onDismiss?: VoidFunction;
++
++	/**
++	 * Notice message as raw HTML. Intended to serve primarily for compatibility of server-rendered notices,
++	 * and SHOULD NOT be used for notices. It is subject to removal without notice.
++	 */
++	__unstableHTML?: boolean;
++};
++
++export type ReducerAction =
++	| {
++			type: 'CREATE_NOTICE';
++			context: string;
++			notice: Notice;
++	  }
++	| {
++			type: 'REMOVE_NOTICE';
++			context: string;
++			id: string;
++	  }
++	| {
++			type: 'REMOVE_NOTICES';
++			context: string;
++			ids: Array< string >;
++	  }
++	| {
++			type: 'REMOVE_ALL_NOTICES';
++			context: string;
++			noticeType: string;
++	  }
++	| {
++			/**
++			 * Represents any action not explicitly handled by this reducer,
++			 * allowing TypeScript's discriminated union narrowing to work correctly.
++			 */
++			type: '@@UNKNOWN_ACTION';
++			context?: string;
++	  };
+diff --git a/packages/notices/src/store/utils/on-sub-key.js b/packages/notices/src/store/utils/on-sub-key.ts
+similarity index 67%
+rename from packages/notices/src/store/utils/on-sub-key.js
+rename to packages/notices/src/store/utils/on-sub-key.ts
+index 663c7ea3e779d0..d7f732e4b830d3 100644
+--- a/packages/notices/src/store/utils/on-sub-key.js
++++ b/packages/notices/src/store/utils/on-sub-key.ts
+@@ -1,15 +1,22 @@
++/**
++ * External dependencies
++ */
++import type { Reducer, Action } from 'redux';
++
+ /**
+  * Higher-order reducer creator which creates a combined reducer object, keyed
+  * by a property on the action object.
+  *
+- * @param {string} actionProperty Action property by which to key object.
++ * @param actionProperty Action property by which to key object.
+  *
+- * @return {Function} Higher-order reducer.
++ * @return Higher-order reducer.
+  */
+ export const onSubKey =
+-	( actionProperty ) =>
+-	( reducer ) =>
+-	( state = {}, action ) => {
++	( actionProperty: string ) =>
++	< S, A extends Action & Record< string, any > >(
++		reducer: Reducer< S, A >
++	) =>
++	( state: Record< string, S > = {}, action: A ) => {
+ 		// Retrieve subkey from action. Do not track if undefined; useful for cases
+ 		// where reducer is scoped by action shape.
+ 		const key = action[ actionProperty ];
+diff --git a/packages/shortcode/README.md b/packages/shortcode/README.md
+index b6042ab284fe42..4657736756b739 100644
+--- a/packages/shortcode/README.md
++++ b/packages/shortcode/README.md
+@@ -32,7 +32,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `import('./types').ShortcodeAttrs`: Parsed shortcode attributes.
++-   `ShortcodeAttrs`: Parsed shortcode attributes.
+ 
+ ### default
+ 
+@@ -42,7 +42,7 @@ To access a raw representation of a shortcode, pass an `options` object, contain
+ 
+ _Type_
+ 
+--   `import('./types').shortcode`Shortcode instance.
++-   `Shortcode`
+ 
+ ### fromMatch
+ 
+@@ -52,11 +52,11 @@ Accepts a `match` object from calling `regexp.exec()` on a `RegExp` generated by
+ 
+ _Parameters_
+ 
+--   _match_ `import('./types').Match`: Match array.
++-   _match_ `Match`: Match array.
+ 
+ _Returns_
+ 
+--   `InstanceType<import('./types').shortcode>`: Shortcode instance.
++-   `ShortcodeInstance`: Shortcode instance.
+ 
+ ### next
+ 
+@@ -70,7 +70,7 @@ _Parameters_
+ 
+ _Returns_
+ 
+--   `import('./types').ShortcodeMatch | undefined`: Matched information.
++-   `ShortcodeMatch | undefined`: Matched information.
+ 
+ ### regexp
+ 
+@@ -104,11 +104,11 @@ _Parameters_
+ 
+ -   _tag_ `string`: Shortcode tag.
+ -   _text_ `string`: Text to search.
+--   _callback_ `import('./types').ReplaceCallback`: Function to process the match and return replacement string.
++-   _callback_ `ReplaceCallback`: Function to process the match and return replacement string.
+ 
+ _Returns_
+ 
+--   `string`: Text with shortcodes replaced.
++-   Text with shortcodes replaced.
+ 
+ ### string
+ 
+@@ -120,7 +120,7 @@ Accepts the same `options` as the `shortcode()` constructor, containing a `tag`
+ 
+ _Parameters_
+ 
+--   _options_ `Object`:
++-   _options_ `ShortcodeOptions`: Shortcode options.
+ 
+ _Returns_
+ 
+diff --git a/packages/shortcode/src/index.js b/packages/shortcode/src/index.ts
+similarity index 67%
+rename from packages/shortcode/src/index.js
+rename to packages/shortcode/src/index.ts
+index 4d99086033e957..e5af3a5c06fc5a 100644
+--- a/packages/shortcode/src/index.js
++++ b/packages/shortcode/src/index.ts
+@@ -3,18 +3,34 @@
+  */
+ import memize from 'memize';
+ 
++/**
++ * Internal dependencies
++ */
++import type {
++	ShortcodeAttrs,
++	ShortcodeMatch,
++	ShortcodeOptions,
++	Match,
++	ReplaceCallback,
++	ShortcodeInstance,
++} from './types';
++
+ export * from './types';
+ 
+ /**
+  * Find the next matching shortcode.
+  *
+- * @param {string} tag   Shortcode tag.
+- * @param {string} text  Text to search.
+- * @param {number} index Index to start search from.
++ * @param tag   Shortcode tag.
++ * @param text  Text to search.
++ * @param index Index to start search from.
+  *
+- * @return {import('./types').ShortcodeMatch | undefined} Matched information.
++ * @return Matched information.
+  */
+-export function next( tag, text, index = 0 ) {
++export function next(
++	tag: string,
++	text: string,
++	index: number = 0
++): ShortcodeMatch | undefined {
+ 	const re = regexp( tag );
+ 
+ 	re.lastIndex = index;
+@@ -30,7 +46,7 @@ export function next( tag, text, index = 0 ) {
+ 		return next( tag, text, re.lastIndex );
+ 	}
+ 
+-	const result = {
++	const result: ShortcodeMatch = {
+ 		index: match.index,
+ 		content: match[ 0 ],
+ 		shortcode: fromMatch( match ),
+@@ -54,17 +70,26 @@ export function next( tag, text, index = 0 ) {
+ /**
+  * Replace matching shortcodes in a block of text.
+  *
+- * @param {string}                            tag      Shortcode tag.
+- * @param {string}                            text     Text to search.
+- * @param {import('./types').ReplaceCallback} callback Function to process the match and return
+- *                                                     replacement string.
++ * @param tag      Shortcode tag.
++ * @param text     Text to search.
++ * @param callback Function to process the match and return
++ *                 replacement string.
+  *
+- * @return {string} Text with shortcodes replaced.
++ * @return Text with shortcodes replaced.
+  */
+-export function replace( tag, text, callback ) {
++export function replace(
++	tag: string,
++	text: string,
++	callback: ReplaceCallback
++) {
+ 	return text.replace(
+ 		regexp( tag ),
+-		function ( match, left, $3, attrs, slash, content, closing, right ) {
++		// Let us use spread syntax to capture the arguments object.
++		( ...args: string[] ): string => {
++			const match = args[ 0 ];
++			const left = args[ 1 ];
++			const right = args[ 7 ];
++
+ 			// If both extra brackets exist, the shortcode has been properly
+ 			// escaped.
+ 			if ( left === '[' && right === ']' ) {
+@@ -72,7 +97,7 @@ export function replace( tag, text, callback ) {
+ 			}
+ 
+ 			// Create the match object and pass it through the callback.
+-			const result = callback( fromMatch( arguments ) );
++			const result = callback( fromMatch( args ) );
+ 
+ 			// Make sure to return any of the extra brackets if they weren't used to
+ 			// escape the shortcode.
+@@ -90,12 +115,12 @@ export function replace( tag, text, callback ) {
+  * `tag` string, a string or object of `attrs`, a boolean indicating whether to
+  * format the shortcode using a `single` tag, and a `content` string.
+  *
+- * @param {Object} options
++ * @param options Shortcode options.
+  *
+- * @return {string} String representation of the shortcode.
++ * @return String representation of the shortcode.
+  */
+-export function string( options ) {
+-	return new shortcode( options ).string();
++export function string( options: ShortcodeOptions ): string {
++	return new Shortcode( options ).string();
+ }
+ 
+ /**
+@@ -114,11 +139,11 @@ export function string( options ) {
+  * 6. The closing tag.
+  * 7. An extra `]` to allow for escaping shortcodes with double `[[]]`
+  *
+- * @param {string} tag Shortcode tag.
++ * @param tag Shortcode tag.
+  *
+- * @return {RegExp} Shortcode RegExp.
++ * @return Shortcode RegExp.
+  */
+-export function regexp( tag ) {
++export function regexp( tag: string ): RegExp {
+ 	return new RegExp(
+ 		'\\[(\\[?)(' +
+ 			tag +
+@@ -142,11 +167,11 @@ export function regexp( tag ) {
+  *
+  * @param {string} text Serialised shortcode attributes.
+  *
+- * @return {import('./types').ShortcodeAttrs} Parsed shortcode attributes.
++ * @return {ShortcodeAttrs} Parsed shortcode attributes.
+  */
+-export const attrs = memize( ( text ) => {
+-	const named = {};
+-	const numeric = [];
++export const attrs = memize( ( text: string ): ShortcodeAttrs => {
++	const named: Record< string, string | undefined > = {};
++	const numeric: string[] = [];
+ 
+ 	// This regular expression is reused from `shortcode_parse_atts()` in
+ 	// `wp-includes/shortcodes.php`.
+@@ -197,12 +222,12 @@ export const attrs = memize( ( text ) => {
+  * by `regexp()`. `match` can also be set to the `arguments` from a callback
+  * passed to `regexp.replace()`.
+  *
+- * @param {import('./types').Match} match Match array.
++ * @param match Match array.
+  *
+- * @return {InstanceType<import('./types').shortcode>} Shortcode instance.
++ * @return Shortcode instance.
+  */
+-export function fromMatch( match ) {
+-	let type;
++export function fromMatch( match: Match ): ShortcodeInstance {
++	let type: 'self-closing' | 'closed' | 'single';
+ 
+ 	if ( match[ 4 ] ) {
+ 		type = 'self-closing';
+@@ -212,7 +237,7 @@ export function fromMatch( match ) {
+ 		type = 'single';
+ 	}
+ 
+-	return new shortcode( {
++	return new Shortcode( {
+ 		tag: match[ 2 ],
+ 		attrs: match[ 3 ],
+ 		type,
+@@ -227,13 +252,27 @@ export function fromMatch( match ) {
+  * containing a `tag` string, a string or object of `attrs`, a string indicating
+  * the `type` of the shortcode ('single', 'self-closing', or 'closed'), and a
+  * `content` string.
+- *
+- * @type {import('./types').shortcode} Shortcode instance.
+  */
+-const shortcode = Object.assign(
+-	function ( options ) {
+-		const { tag, attrs: attributes, type, content } = options || {};
+-		Object.assign( this, { tag, type, content } );
++class Shortcode implements ShortcodeInstance {
++	// Instance properties
++	tag: string;
++	type?: 'self-closing' | 'closed' | 'single';
++	content?: string;
++	attrs: ShortcodeAttrs;
++
++	// Static methods
++	static next = next;
++	static replace = replace;
++	static string = string;
++	static regexp = regexp;
++	static attrs = attrs;
++	static fromMatch = fromMatch;
++
++	constructor( options: ShortcodeOptions ) {
++		const { tag, attrs: attributes, type, content } = options;
++		this.tag = tag;
++		this.type = type;
++		this.content = content;
+ 
+ 		// Ensure we have a correctly formatted `attrs` object.
+ 		this.attrs = {
+@@ -245,50 +284,46 @@ const shortcode = Object.assign(
+ 			return;
+ 		}
+ 
+-		const attributeTypes = [ 'named', 'numeric' ];
+-
+ 		// Parse a string of attributes.
+ 		if ( typeof attributes === 'string' ) {
+ 			this.attrs = attrs( attributes );
+ 			// Identify a correctly formatted `attrs` object.
+ 		} else if (
+-			attributes.length === attributeTypes.length &&
+-			attributeTypes.every( ( t, key ) => t === attributes[ key ] )
++			'named' in attributes &&
++			'numeric' in attributes &&
++			attributes.named !== undefined &&
++			attributes.numeric !== undefined
+ 		) {
+-			this.attrs = attributes;
+-			// Handle a flat object of attributes.
++			this.attrs = attributes as ShortcodeAttrs;
++			// Handle a flat object of attributes (e.g., { foo: 'bar', baz: 'qux' }).
+ 		} else {
+ 			Object.entries( attributes ).forEach( ( [ key, value ] ) => {
+-				this.set( key, value );
++				if (
++					typeof value === 'string' ||
++					typeof value === 'undefined'
++				) {
++					this.set( key, value );
++				}
+ 			} );
+ 		}
+-	},
+-	{
+-		next,
+-		replace,
+-		string,
+-		regexp,
+-		attrs,
+-		fromMatch,
+ 	}
+-);
+ 
+-Object.assign( shortcode.prototype, {
+ 	/**
+ 	 * Get a shortcode attribute.
+ 	 *
+ 	 * Automatically detects whether `attr` is named or numeric and routes it
+ 	 * accordingly.
+ 	 *
+-	 * @param {(number|string)} attr Attribute key.
++	 * @param attr Attribute key.
+ 	 *
+-	 * @return {string} Attribute value.
++	 * @return Attribute value.
+ 	 */
+-	get( attr ) {
+-		return this.attrs[ typeof attr === 'number' ? 'numeric' : 'named' ][
+-			attr
+-		];
+-	},
++	get( attr: string | number ): string | undefined {
++		if ( typeof attr === 'number' ) {
++			return this.attrs.numeric[ attr ];
++		}
++		return this.attrs.named[ attr ];
++	}
+ 
+ 	/**
+ 	 * Set a shortcode attribute.
+@@ -296,23 +331,26 @@ Object.assign( shortcode.prototype, {
+ 	 * Automatically detects whether `attr` is named or numeric and routes it
+ 	 * accordingly.
+ 	 *
+-	 * @param {(number|string)} attr  Attribute key.
+-	 * @param {string}          value Attribute value.
++	 * @param attr  Attribute key.
++	 * @param value Attribute value.
+ 	 *
+-	 * @return {InstanceType< import('./types').shortcode >} Shortcode instance.
++	 * @return Shortcode instance.
+ 	 */
+-	set( attr, value ) {
+-		this.attrs[ typeof attr === 'number' ? 'numeric' : 'named' ][ attr ] =
+-			value;
++	set( attr: string | number, value: string ): this {
++		if ( typeof attr === 'number' ) {
++			this.attrs.numeric[ attr ] = value;
++		} else {
++			this.attrs.named[ attr ] = value;
++		}
+ 		return this;
+-	},
++	}
+ 
+ 	/**
+ 	 * Transform the shortcode into a string.
+ 	 *
+-	 * @return {string} String representation of the shortcode.
++	 * @return String representation of the shortcode.
+ 	 */
+-	string() {
++	string(): string {
+ 		let text = '[' + this.tag;
+ 
+ 		this.attrs.numeric.forEach( ( value ) => {
+@@ -344,7 +382,7 @@ Object.assign( shortcode.prototype, {
+ 
+ 		// Add the closing tag.
+ 		return text + '[/' + this.tag + ']';
+-	},
+-} );
++	}
++}
+ 
+-export default shortcode;
++export default Shortcode;
+diff --git a/packages/shortcode/src/test/index.js b/packages/shortcode/src/test/index.ts
+similarity index 94%
+rename from packages/shortcode/src/test/index.js
+rename to packages/shortcode/src/test/index.ts
+index e385dacb0870b0..44380920065025 100644
+--- a/packages/shortcode/src/test/index.js
++++ b/packages/shortcode/src/test/index.ts
+@@ -7,7 +7,7 @@ describe( 'shortcode', () => {
+ 	describe( 'next', () => {
+ 		it( 'should find the shortcode', () => {
+ 			const result = next( 'foo', 'this has the [foo] shortcode' );
+-			expect( result.index ).toBe( 13 );
++			expect( result?.index ).toBe( 13 );
+ 		} );
+ 
+ 		it( 'should find the shortcode with attributes', () => {
+@@ -15,7 +15,7 @@ describe( 'shortcode', () => {
+ 				'foo',
+ 				'this has the [foo param="foo"] shortcode'
+ 			);
+-			expect( result.index ).toBe( 13 );
++			expect( result?.index ).toBe( 13 );
+ 		} );
+ 
+ 		it( 'should not find shortcodes that are not there', () => {
+@@ -33,10 +33,10 @@ describe( 'shortcode', () => {
+ 
+ 		it( 'should find the shortcode when told to start looking beyond the start of the string', () => {
+ 			const result1 = next( 'foo', 'this has the [foo] shortcode', 12 );
+-			expect( result1.index ).toBe( 13 );
++			expect( result1?.index ).toBe( 13 );
+ 
+ 			const result2 = next( 'foo', 'this has the [foo] shortcode', 13 );
+-			expect( result2.index ).toBe( 13 );
++			expect( result2?.index ).toBe( 13 );
+ 
+ 			const result3 = next( 'foo', 'this has the [foo] shortcode', 14 );
+ 			expect( result3 ).toBe( undefined );
+@@ -48,7 +48,7 @@ describe( 'shortcode', () => {
+ 				'this has the [foo] shortcode [foo] twice',
+ 				14
+ 			);
+-			expect( result.index ).toBe( 29 );
++			expect( result?.index ).toBe( 29 );
+ 		} );
+ 
+ 		it( 'should not find escaped shortcodes', () => {
+@@ -66,18 +66,18 @@ describe( 'shortcode', () => {
+ 
+ 		it( 'should find shortcodes that are incorrectly escaped by newlines', () => {
+ 			const result1 = next( 'foo', 'this has the [\n[foo]] shortcode' );
+-			expect( result1.index ).toBe( 15 );
++			expect( result1?.index ).toBe( 15 );
+ 
+ 			const result2 = next( 'foo', 'this has the [[foo]\n] shortcode' );
+-			expect( result2.index ).toBe( 14 );
++			expect( result2?.index ).toBe( 14 );
+ 		} );
+ 
+ 		it( 'should still work when there are not equal amounts of square brackets', () => {
+ 			const result1 = next( 'foo', 'this has the [[foo] shortcode' );
+-			expect( result1.index ).toBe( 14 );
++			expect( result1?.index ).toBe( 14 );
+ 
+ 			const result2 = next( 'foo', 'this has the [foo]] shortcode' );
+-			expect( result2.index ).toBe( 13 );
++			expect( result2?.index ).toBe( 13 );
+ 		} );
+ 
+ 		it( 'should find the second instances of the shortcode when the first one is escaped', () => {
+@@ -85,7 +85,7 @@ describe( 'shortcode', () => {
+ 				'foo',
+ 				'this has the [[foo]] shortcode [foo] twice'
+ 			);
+-			expect( result.index ).toBe( 31 );
++			expect( result?.index ).toBe( 31 );
+ 		} );
+ 
+ 		it( 'should not find shortcodes that are not full matches', () => {
+@@ -221,13 +221,13 @@ describe( 'shortcode', () => {
+ 		} );
+ 
+ 		it( 'should replace shortcode with a number', () => {
+-			const result1 = replace( 'foo', 'hello [foo] world', () => 3 );
++			const result1 = replace( 'foo', 'hello [foo] world', () => '3' );
+ 			expect( result1 ).toBe( 'hello 3 world' );
+ 
+ 			const result2 = replace(
+ 				'foo',
+ 				'hello [foo bar=bar baz="baz" qux]delete me[/foo] world',
+-				() => 4
++				() => '4'
+ 			);
+ 			expect( result2 ).toBe( 'hello 4 world' );
+ 		} );
+diff --git a/packages/shortcode/src/types.ts b/packages/shortcode/src/types.ts
+index 2b9ae084cc31a6..ed578742bdcc4f 100644
+--- a/packages/shortcode/src/types.ts
++++ b/packages/shortcode/src/types.ts
+@@ -13,6 +13,34 @@ export type ShortcodeAttrs = {
+ 	numeric: string[];
+ };
+ 
++/**
++ * Shortcode object.
++ */
++export interface Shortcode {
++	/**
++	 * Shortcode tag.
++	 */
++	tag: string;
++
++	/**
++	 * Shortcode attributes.
++	 */
++	attrs: ShortcodeAttrs;
++
++	/**
++	 * Shortcode content.
++	 */
++	content?: string;
++
++	/**
++	 * Shortcode type: `self-closing`, `closed`, or `single`.
++	 */
++	type?: 'self-closing' | 'closed' | 'single';
++}
++
++/**
++ * Shortcode match result.
++ */
+ export type ShortcodeMatch = {
+ 	/**
+ 	 * Index the shortcode is found at.
+@@ -31,7 +59,7 @@ export type ShortcodeMatch = {
+ };
+ 
+ /**
+- * Shortcode options.
++ * Shortcode options for creating a new shortcode.
+  */
+ export interface ShortcodeOptions {
+ 	/**
+@@ -56,155 +84,51 @@ export interface ShortcodeOptions {
+ }
+ 
+ /**
+- * Shortcode object.
++ * Match array from regexp.exec() or arguments from replace callback.
+  */
+-export interface Shortcode extends ShortcodeOptions {
+-	/**
+-	 * Shortcode attributes.
+-	 */
+-	attrs: ShortcodeAttrs;
+-}
+-
+ export type Match =
+ 	| NonNullable< ReturnType< RegExp[ 'exec' ] > >
+-	| Array< string >;
++	| IArguments
++	| ArrayLike< string >;
+ 
++/**
++ * Callback function for replace operations.
++ */
+ export type ReplaceCallback = ( shortcode: Shortcode ) => string;
+ 
+ /**
+- * WordPress Shortcode instance.
++ * Shortcode instance returned by the constructor.
+  */
+-export interface shortcode {
+-	new ( options: Partial< ShortcodeOptions > ): Shortcode & {
+-		/**
+-		 * Transform the shortcode into a string.
+-		 *
+-		 * @return {string} String representation of the shortcode.
+-		 */
+-		string: () => string;
+-
+-		/**
+-		 * Get a shortcode attribute.
+-		 *
+-		 * Automatically detects whether `attr` is named or numeric and routes it
+-		 * accordingly.
+-		 *
+-		 * @param {(number|string)} attr Attribute key.
+-		 *
+-		 * @return {string} Attribute value.
+-		 */
+-		get: ( attr: string | number ) => string | undefined;
+-
+-		/**
+-		 * Set a shortcode attribute.
+-		 *
+-		 * Automatically detects whether `attr` is named or numeric and routes it
+-		 * accordingly.
+-		 *
+-		 * @param {(number|string)} attr  Attribute key.
+-		 * @param {string}          value Attribute value.
+-		 *
+-		 * @return {InstanceType< shortcode >} Shortcode instance.
+-		 */
+-		set: (
+-			attr: string | number,
+-			value: string
+-		) => InstanceType< shortcode >;
+-	};
+-
+-	/**
+-	 * Parse shortcode attributes.
+-	 *
+-	 * Shortcodes accept many types of attributes. These can chiefly be divided into
+-	 * named and numeric attributes:
+-	 *
+-	 * Named attributes are assigned on a key/value basis, while numeric attributes
+-	 * are treated as an array.
+-	 *
+-	 * Named attributes can be formatted as either `name="value"`, `name='value'`,
+-	 * or `name=value`. Numeric attributes can be formatted as `"value"` or just
+-	 * `value`.
+-	 *
+-	 * @param text Serialised shortcode attributes.
+-	 *
+-	 * @return Parsed shortcode attributes.
+-	 */
+-	attrs: ( text: string ) => ShortcodeAttrs;
+-
+-	/**
+-	 * Generate a Shortcode Object from a RegExp match.
+-	 *
+-	 * Accepts a `match` object from calling `regexp.exec()` on a `RegExp` generated
+-	 * by `regexp()`. `match` can also be set to the `arguments` from a callback
+-	 * passed to `regexp.replace()`.
+-	 *
+-	 * @param match Match array.
+-	 *
+-	 * @return  Shortcode instance.
+-	 */
+-	fromMatch: ( match: Match ) => InstanceType< shortcode >;
+-
++export interface ShortcodeInstance extends Shortcode {
+ 	/**
+-	 * Find the next matching shortcode.
+-	 *
+-	 * @param tag   Shortcode tag.
+-	 * @param text  Text to search.
+-	 * @param index Index to start search from.
++	 * Transform the shortcode into a string.
+ 	 *
+-	 * @return Matched information.
++	 * @return String representation of the shortcode.
+ 	 */
+-	next: (
+-		tag: string,
+-		text: string,
+-		index?: number
+-	) => ShortcodeMatch | undefined;
++	string: () => string;
+ 
+ 	/**
+-	 * Generate a RegExp to identify a shortcode.
+-	 *
+-	 * The base regex is functionally equivalent to the one found in
+-	 * `get_shortcode_regex()` in `wp-includes/shortcodes.php`.
++	 * Get a shortcode attribute.
+ 	 *
+-	 * Capture groups:
++	 * Automatically detects whether `attr` is named or numeric and routes it
++	 * accordingly.
+ 	 *
+-	 * 1. An extra `[` to allow for escaping shortcodes with double `[[]]`
+-	 * 2. The shortcode name
+-	 * 3. The shortcode argument list
+-	 * 4. The self closing `/`
+-	 * 5. The content of a shortcode when it wraps some content.
+-	 * 6. The closing tag.
+-	 * 7. An extra `]` to allow for escaping shortcodes with double `[[]]`
++	 * @param attr Attribute key.
+ 	 *
+-	 * @param tag Shortcode tag.
+-	 *
+-	 * @return Shortcode RegExp.
++	 * @return Attribute value.
+ 	 */
+-	regexp: ( tag: string ) => RegExp;
++	get: ( attr: string | number ) => string | undefined;
+ 
+ 	/**
+-	 * Replace matching shortcodes in a block of text.
+-	 *
+-	 * @param tag      Shortcode tag.
+-	 * @param text     Text to search.
+-	 * @param callback Function to process the match and return
+-	 *                 replacement string.
+-	 *
+-	 * @return Text with shortcodes replaced.
+-	 */
+-	replace: ( tag: string, text: string, callback: ReplaceCallback ) => string;
+-
+-	/**
+-	 * Generate a string from shortcode parameters.
+-	 *
+-	 * Creates a shortcode instance and returns a string.
++	 * Set a shortcode attribute.
+ 	 *
+-	 * Accepts the same `options` as the `shortcode()` constructor, containing a
+-	 * `tag` string, a string or object of `attrs`, a boolean indicating whether to
+-	 * format the shortcode using a `single` tag, and a `content` string.
++	 * Automatically detects whether `attr` is named or numeric and routes it
++	 * accordingly.
+ 	 *
+-	 * @param options
++	 * @param attr  Attribute key.
++	 * @param value Attribute value.
+ 	 *
+-	 * @return  String representation of the shortcode.
++	 * @return Shortcode instance.
+ 	 */
+-	string: ( options: ShortcodeOptions ) => string;
++	set: ( attr: string | number, value: string ) => ShortcodeInstance;
+ }
+diff --git a/packages/shortcode/tsconfig.json b/packages/shortcode/tsconfig.json
+index 2ab16a25d51788..7ff060ab6ce105 100644
+--- a/packages/shortcode/tsconfig.json
++++ b/packages/shortcode/tsconfig.json
+@@ -1,7 +1,4 @@
+ {
+ 	"$schema": "https://json.schemastore.org/tsconfig.json",
+-	"extends": "../../tsconfig.base.json",
+-	"compilerOptions": {
+-		"checkJs": false
+-	}
++	"extends": "../../tsconfig.base.json"
+ }
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 54c6462ace7f00..b222973e4844b8 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -13,4 +13,4 @@
+ -   Add `Field` primitives ([#74190](https://github.com/WordPress/gutenberg/pull/74190)).
+ -   Add `Fieldset` primitives ([#74296](https://github.com/WordPress/gutenberg/pull/74296)).
+ -   Add `Icon` component ([#74311](https://github.com/WordPress/gutenberg/pull/74311)).
+--   Add `Button` component ([#74415](https://github.com/WordPress/gutenberg/pull/74415)).
++-   Add `Button` component ([#74415](https://github.com/WordPress/gutenberg/pull/74415), [#74416](https://github.com/WordPress/gutenberg/pull/74416) ).
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 5e7d16ac178003..f35f30b3644a45 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -43,7 +43,6 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@ariakit/react": "^0.4.15",
+ 		"@base-ui/react": "^1.0.0",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/element": "file:../element",
+diff --git a/packages/ui/src/button/button.tsx b/packages/ui/src/button/button.tsx
+index 61cd897d54503b..c5a53b20ab1ba5 100644
+--- a/packages/ui/src/button/button.tsx
++++ b/packages/ui/src/button/button.tsx
+@@ -1,4 +1,4 @@
+-import { Button as AriakitButton } from '@ariakit/react';
++import { Button as _Button } from '@base-ui/react/button';
+ import clsx from 'clsx';
+ import { speak } from '@wordpress/a11y';
+ import { forwardRef, useEffect } from '@wordpress/element';
+@@ -15,7 +15,7 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
+ 			variant = 'solid',
+ 			size = 'default',
+ 			className,
+-			accessibleWhenDisabled = true,
++			focusableWhenDisabled = true,
+ 			disabled,
+ 			loading,
+ 			loadingAnnouncement = __( 'Loading' ),
+@@ -43,15 +43,15 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
+ 		}, [ loading, loadingAnnouncement ] );
+ 
+ 		return (
+-			<AriakitButton
++			<_Button
+ 				ref={ ref }
+ 				className={ mergedClassName }
+-				accessibleWhenDisabled={ accessibleWhenDisabled }
++				focusableWhenDisabled={ focusableWhenDisabled }
+ 				disabled={ disabled ?? loading }
+ 				{ ...props }
+ 			>
+ 				{ children }
+-			</AriakitButton>
++			</_Button>
+ 		);
+ 	}
+ );
+diff --git a/packages/ui/src/button/stories/index.story.tsx b/packages/ui/src/button/stories/index.story.tsx
+index 49c37adfd9f88d..9f1d99274089f7 100644
+--- a/packages/ui/src/button/stories/index.story.tsx
++++ b/packages/ui/src/button/stories/index.story.tsx
+@@ -62,15 +62,12 @@ export const Neutral: Story = {
+ 	},
+ };
+ 
+-/**
+- * Destructive buttons should be used for high-stakes, irreversible actions.
+- */
+-export const Destructive: Story = {
++export const NeutralOutline: Story = {
+ 	...Default,
+ 	args: {
+ 		...Default.args,
+-		children: 'Permanently delete',
+-		tone: 'destructive',
++		tone: 'neutral',
++		variant: 'outline',
+ 	},
+ };
+ 
+@@ -95,79 +92,61 @@ export const AllTonesAndVariants: Story = {
+ 			<div></div>
+ 			<div style={ { textAlign: 'center' } }>Resting</div>
+ 			<div style={ { textAlign: 'center' } }>Disabled</div>
+-			{ ( [ 'brand', 'neutral', 'destructive' ] as const ).map(
+-				( tone ) => (
+-					<Fragment key={ tone }>
+-						{ (
+-							[
+-								'solid',
+-								'outline',
+-								'minimal',
+-								'unstyled',
+-							] as const
+-						 ).map( ( variant ) => (
+-							<Fragment key={ variant }>
+-								<div
+-									style={ {
+-										paddingInlineEnd: '1rem',
+-										display: 'flex',
+-										alignItems: 'center',
+-									} }
+-								>
+-									{ variant }, { tone }
+-								</div>
+-								<div
+-									style={ {
+-										padding: '0.5rem 1rem',
+-										display: 'flex',
+-										alignItems: 'center',
+-									} }
+-								>
+-									<Button
+-										{ ...args }
+-										tone={ tone }
+-										variant={ variant }
+-									/>
+-								</div>
+-								<div
+-									style={ {
+-										padding: '0.5rem 1rem',
+-										display: 'flex',
+-										alignItems: 'center',
+-									} }
+-								>
+-									<Button
+-										{ ...args }
+-										tone={ tone }
+-										variant={ variant }
+-										// Disabling because this lint rule was meant for the
+-										// `@wordpress/components` Button, but is being applied here.
+-										// TODO: rework the lint rule so that it checks the package
+-										// where the Button comes from.
+-										// eslint-disable-next-line no-restricted-syntax
+-										disabled
+-									/>
+-								</div>
+-							</Fragment>
+-						) ) }
+-					</Fragment>
+-				)
+-			) }
++			{ ( [ 'brand', 'neutral' ] as const ).map( ( tone ) => (
++				<Fragment key={ tone }>
++					{ (
++						[ 'solid', 'outline', 'minimal', 'unstyled' ] as const
++					 ).map( ( variant ) => (
++						<Fragment key={ variant }>
++							<div
++								style={ {
++									paddingInlineEnd: '1rem',
++									display: 'flex',
++									alignItems: 'center',
++								} }
++							>
++								{ variant }, { tone }
++							</div>
++							<div
++								style={ {
++									padding: '0.5rem 1rem',
++									display: 'flex',
++									alignItems: 'center',
++								} }
++							>
++								<Button
++									{ ...args }
++									tone={ tone }
++									variant={ variant }
++								/>
++							</div>
++							<div
++								style={ {
++									padding: '0.5rem 1rem',
++									display: 'flex',
++									alignItems: 'center',
++								} }
++							>
++								<Button
++									{ ...args }
++									tone={ tone }
++									variant={ variant }
++									// Disabling because this lint rule was meant for the
++									// `@wordpress/components` Button, but is being applied here.
++									// TODO: rework the lint rule so that it checks the package
++									// where the Button comes from.
++									// eslint-disable-next-line no-restricted-syntax
++									disabled
++								/>
++							</div>
++						</Fragment>
++					) ) }
++				</Fragment>
++			) ) }
+ 		</div>
+ 	),
+ };
+ 
+-export const LinkStyledAsButton: Story = {
+-	...Default,
+-	args: {
+-		...Default.args,
+-		// Link content passed through `children`
+-		// eslint-disable-next-line jsx-a11y/anchor-has-content
+-		render: <a href="https://example.com" />,
+-		children: 'Link',
+-	},
+-};
+-
+ export const WithIcon: Story = {
+ 	...Default,
+ 	args: {
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+index b68f686b24c5eb..f2ee22e715d735 100644
+--- a/packages/ui/src/button/style.module.css
++++ b/packages/ui/src/button/style.module.css
+@@ -185,39 +185,6 @@
+ 		}
+ 	}
+ 
+-	.is-destructive {
+-		&.is-solid {
+-			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-error-strong);
+-			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-error-strong-active);
+-			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-error-strong-disabled);
+-			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-error-strong);
+-			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-error-strong-active);
+-			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-error-strong-disabled);
+-		}
+-
+-		/* Outline and minimal buttons use the same foreground color */
+-		&.is-outline,
+-		&.is-minimal {
+-			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-error);
+-			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-error-active);
+-			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-error-disabled);
+-		}
+-
+-		&.is-outline {
+-			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-error);
+-			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-error-active);
+-			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-error-disabled);
+-			--wp-ui-button-border-color: var(--wpds-color-stroke-interactive-error);
+-			--wp-ui-button-border-color-active: var(--wpds-color-stroke-interactive-error-active);
+-		}
+-
+-		&.is-minimal {
+-			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-error-weak);
+-			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-error-weak-active);
+-			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-error-weak-disabled);
+-		}
+-	}
+-
+ 	.is-unstyled {
+ 		border: none;
+ 		background: none;
+diff --git a/packages/ui/src/button/test/button.test.tsx b/packages/ui/src/button/test/button.test.tsx
+index 8e93e485d03e28..9b44211e97c1cf 100644
+--- a/packages/ui/src/button/test/button.test.tsx
++++ b/packages/ui/src/button/test/button.test.tsx
+@@ -74,14 +74,18 @@ describe( 'Button', () => {
+ 		expect( button ).not.toHaveAttribute( 'aria-disabled', 'true' );
+ 	} );
+ 
+-	it( 'supports custom render prop while retaining the default accessible when disabled behavior', () => {
++	it( 'supports custom render prop while retaining the default focusable when disabled behavior', () => {
+ 		render(
++			// Disabling because this lint rule was meant for the
++			// `@wordpress/components` Button, but is being applied here.
++			// TODO: rework the lint rule so that it checks the package
++			// where the Button comes from.
+ 			// eslint-disable-next-line jsx-a11y/anchor-has-content, no-restricted-syntax
+-			<Button render={ <a href="/" /> } disabled>
++			<Button render={ <a href="/" /> } nativeButton={ false } disabled>
+ 				Click me
+ 			</Button>
+ 		);
+-		const button = screen.getByRole( 'link', { name: 'Click me' } );
++		const button = screen.getByRole( 'button', { name: 'Click me' } );
+ 
+ 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
+ 	} );
+@@ -93,7 +97,6 @@ describe( 'Button', () => {
+ 				Click me
+ 			</Button>
+ 		);
+-
+ 		expect(
+ 			screen.getByRole( 'button', { name: 'Click me' } )
+ 		).toHaveClass( customClass );
+diff --git a/packages/ui/src/button/types.ts b/packages/ui/src/button/types.ts
+index 232f1d39bfd285..e4e34c96d0473a 100644
+--- a/packages/ui/src/button/types.ts
++++ b/packages/ui/src/button/types.ts
+@@ -1,9 +1,11 @@
+ import { type ReactNode, type HTMLAttributes } from 'react';
+-import { type ButtonProps as AriakitButtonProps } from '@ariakit/react';
+-import { type ComponentProps } from '../utils/types';
++import type { Button as _Button } from '@base-ui/react/button';
++import type { ComponentProps } from '../utils/types';
++
++type _ButtonProps = ComponentProps< typeof _Button >;
+ 
+ export interface ButtonProps
+-	extends Omit< ComponentProps< 'button' >, 'disabled' | 'aria-pressed' > {
++	extends Omit< _ButtonProps, 'disabled' | 'aria-pressed' > {
+ 	/**
+ 	 * The variant of the button. Variants describe the visual style treatment
+ 	 * of the button.
+@@ -13,14 +15,14 @@ export interface ButtonProps
+ 	variant?: 'solid' | 'outline' | 'minimal' | 'unstyled';
+ 
+ 	/**
+-	 * The tone of the button:
++	 * The tone of the button, describing a semantic color intent:
+ 	 *
+ 	 * - `'brand': for the most prominent actions, using the brand colors.
+ 	 * - `'neutral'` for less prominent actions.
+-	 * - `'destructive'`: for high-stakes, irreversible actions.
++	 *
+ 	 * @default "brand"
+ 	 */
+-	tone?: 'brand' | 'neutral' | 'destructive';
++	tone?: 'brand' | 'neutral';
+ 
+ 	/**
+ 	 * The size of the button.
+@@ -43,7 +45,7 @@ export interface ButtonProps
+ 	 *
+ 	 * @default true
+ 	 */
+-	accessibleWhenDisabled?: AriakitButtonProps[ 'accessibleWhenDisabled' ];
++	focusableWhenDisabled?: _ButtonProps[ 'focusableWhenDisabled' ];
+ 
+ 	/**
+ 	 * Indicates the current "pressed" state of toggle buttons. This should only
+diff --git a/packages/wp-build/lib/build.mjs b/packages/wp-build/lib/build.mjs
+index eabd4fe16c3473..447a1a287f93bb 100755
+--- a/packages/wp-build/lib/build.mjs
++++ b/packages/wp-build/lib/build.mjs
+@@ -233,16 +233,12 @@ function momentTimezoneAliasPlugin() {
+ 
+ 			// Cached paths - resolved lazily on first use
+ 			let preBuiltBundlePath;
+-			let momentTimezoneUtilsPath;
+ 			const resolvePaths = () => {
+ 				if ( preBuiltBundlePath ) {
+ 					return;
+ 				}
+ 				preBuiltBundlePath = require.resolve(
+-					'moment-timezone/builds/moment-timezone-with-data-1970-2030'
+-				);
+-				momentTimezoneUtilsPath = require.resolve(
+-					'moment-timezone/moment-timezone-utils.js'
++					'moment-timezone/builds/moment-timezone-with-data-1970-2030.js'
+ 				);
+ 			};
+ 
+@@ -255,17 +251,6 @@ function momentTimezoneAliasPlugin() {
+ 				}
+ 			);
+ 
+-			// For utils, we need to load it but ensure it works with the pre-built bundle.
+-			// The utils file tries to require('./') which would load index.js.
+-			// We need to make sure it gets the pre-built bundle instead.
+-			build.onResolve(
+-				{ filter: /^moment-timezone\/moment-timezone-utils$/ },
+-				() => {
+-					resolvePaths();
+-					return { path: momentTimezoneUtilsPath };
+-				}
+-			);
+-
+ 			// Intercept the require('./') call inside moment-timezone-utils
+ 			// and redirect it to the pre-built bundle.
+ 			build.onResolve( { filter: /^\.\/$/ }, ( args ) => {
+diff --git a/storybook/decorators/with-margin-checker.jsx b/storybook/decorators/with-margin-checker.jsx
+deleted file mode 100644
+index 2ee318ccabcc4b..00000000000000
+--- a/storybook/decorators/with-margin-checker.jsx
++++ /dev/null
+@@ -1,40 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-
+-/**
+- *  A Storybook decorator to show a div before and after the story to check for unwanted margins.
+- */
+-
+-const Bumper = styled.div`
+-	display: flex;
+-	justify-content: center;
+-	align-items: center;
+-	height: 32px;
+-	background-image: repeating-linear-gradient(
+-		45deg,
+-		transparent,
+-		transparent 2px,
+-		#e0e0e0 2px,
+-		#e0e0e0 14px
+-	);
+-	text-transform: uppercase;
+-	font-size: 11px;
+-	font-weight: 500;
+-	color: #757575;
+-`;
+-
+-export const WithMarginChecker = ( Story, context ) => {
+-	if ( context.globals.marginChecker === 'hide' ) {
+-		return <Story { ...context } />;
+-	}
+-
+-	return (
+-		<>
+-			<Bumper>Margin Checker</Bumper>
+-			<Story { ...context } />
+-			<Bumper>Margin Checker</Bumper>
+-		</>
+-	);
+-};
+diff --git a/storybook/decorators/with-theme.jsx b/storybook/decorators/with-theme.jsx
+deleted file mode 100644
+index 083d929a5865a4..00000000000000
+--- a/storybook/decorators/with-theme.jsx
++++ /dev/null
+@@ -1,93 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-import { css } from '@emotion/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import Theme from '../../packages/components/src/theme';
+-
+-const themes = {
+-	default: {},
+-	darkBg: {
+-		accent: '#f7c849',
+-		background: '#1e1e1e',
+-	},
+-	lightGrayBg: {
+-		accent: '#3858e9',
+-		background: '#f0f0f0',
+-	},
+-	classic: {
+-		accent: '#007cba',
+-	},
+-};
+-
+-const backgroundStyles = ( { background } ) => {
+-	if ( background ) {
+-		return css`
+-			background: ${ background };
+-			padding: 20px 20px 8px;
+-			outline: 1px dashed #ccc;
+-			outline-offset: 2px;
+-		`;
+-	}
+-};
+-
+-const BackgroundColorWrapper = styled.div`
+-	${ backgroundStyles }
+-`;
+-
+-const BackgroundIndicator = styled.small`
+-	display: block;
+-	opacity: 0.3;
+-	margin-top: 20px;
+-	font-size: 10px;
+-	color: var( --wp-components-color-foreground );
+-	text-transform: uppercase;
+-	text-align: end;
+-`;
+-
+-const Notice = styled.small`
+-	display: block;
+-	margin-top: 20px;
+-	font-size: 12px;
+-	color: var( --wp-components-color-foreground );
+-`;
+-
+-/**
+- *  A Storybook decorator to show a div before and after the story to check for unwanted margins.
+- */
+-
+-export const WithTheme = ( Story, context ) => {
+-	const selectedTheme = themes[ context.globals.componentsTheme ];
+-	const selectedBackground = selectedTheme.background;
+-
+-	if ( context.componentId === 'components-experimental-theme' ) {
+-		return (
+-			<>
+-				<Story />
+-				{ context.globals.componentsTheme !== 'default' && (
+-					<Notice>
+-						The Theme toolbar addon is disabled for this story. Use
+-						Controls to change the values.
+-					</Notice>
+-				) }
+-			</>
+-		);
+-	}
+-
+-	return (
+-		<BackgroundColorWrapper background={ selectedBackground }>
+-			<Theme { ...themes[ context.globals.componentsTheme ] }>
+-				<Story { ...context } />
+-				{ selectedBackground && (
+-					<BackgroundIndicator>
+-						Themed background { selectedBackground }
+-					</BackgroundIndicator>
+-				) }
+-			</Theme>
+-		</BackgroundColorWrapper>
+-	);
+-};
+diff --git a/storybook/preview.jsx b/storybook/preview.jsx
+index 2b405650209adf..e5d610ac3db1bc 100644
+--- a/storybook/preview.jsx
++++ b/storybook/preview.jsx
+@@ -11,10 +11,8 @@ import {
+  * Internal dependencies
+  */
+ import { WithGlobalCSS } from './decorators/with-global-css';
+-import { WithMarginChecker } from './decorators/with-margin-checker';
+ import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
+ import { WithRTL } from './decorators/with-rtl';
+-import { WithTheme } from './decorators/with-theme';
+ import { WithDesignSystemTheme } from './decorators/with-design-system-theme';
+ 
+ export const globalTypes = {
+@@ -30,20 +28,6 @@ export const globalTypes = {
+ 			],
+ 		},
+ 	},
+-	componentsTheme: {
+-		name: 'Theme',
+-		description: 'Change the components theme. (Work in progress)',
+-		defaultValue: 'default',
+-		toolbar: {
+-			icon: 'paintbrush',
+-			items: [
+-				{ value: 'default', title: 'Default' },
+-				{ value: 'darkBg', title: 'Dark (background)' },
+-				{ value: 'lightGrayBg', title: 'Light gray (background)' },
+-				{ value: 'classic', title: 'Classic (accent)' },
+-			],
+-		},
+-	},
+ 	css: {
+ 		name: 'Global CSS',
+ 		description:
+@@ -61,19 +45,6 @@ export const globalTypes = {
+ 			],
+ 		},
+ 	},
+-	marginChecker: {
+-		name: 'Margin Checker',
+-		description:
+-			'Show a div before and after the component to check for unwanted margins.',
+-		defaultValue: 'hide',
+-		toolbar: {
+-			icon: 'collapse',
+-			items: [
+-				{ value: 'hide', title: 'Hide' },
+-				{ value: 'show', title: 'Show' },
+-			],
+-		},
+-	},
+ 	maxWidthWrapper: {
+ 		name: 'Max-Width Wrapper',
+ 		description: 'Wrap the component in a div with a max-width.',
+@@ -94,10 +65,8 @@ export const globalTypes = {
+ 
+ export const decorators = [
+ 	WithGlobalCSS,
+-	WithMarginChecker,
+ 	WithRTL,
+ 	WithMaxWidthWrapper,
+-	WithTheme,
+ 	WithDesignSystemTheme,
+ ];
+ 
+@@ -105,6 +74,9 @@ export const parameters = {
+ 	controls: {
+ 		sort: 'requiredFirst',
+ 	},
++	backgrounds: {
++		disable: true,
++	},
+ 	docs: {
+ 		controls: {
+ 			sort: 'requiredFirst',
+diff --git a/storybook/stories/docs/introduction.mdx b/storybook/stories/docs/introduction.mdx
+index 7fc63a46417ce4..4118934ff9d95b 100644
+--- a/storybook/stories/docs/introduction.mdx
++++ b/storybook/stories/docs/introduction.mdx
+@@ -1,5 +1,5 @@
+ import { Meta } from '@storybook/addon-docs/blocks';
+-import { RepoIcon } from '@storybook/icons';
++import { JumpToIcon } from '@storybook/icons';
+ import { InlineIcon } from './inline-icon';
+ 
+ <Meta title="Docs/Introduction" name="page" />
+@@ -25,11 +25,9 @@ export default function MyButton() {
+ 
+ ## How this site works
+ 
+-The site shows the individual components in the sidebar and the Canvas on the right. Select the component you’d like to explore, and you’ll see the display on the **Canvas** tab. If the component also has controls/arguments, you can modify them on the **Controls** tab on the lower half of the screen.
++The site shows the components in the sidebar. Each component's entry point is its **Docs** page, which contains the documentation and interactive examples. You can also explore the individual stories (e.g. "Default", "Small") to view a single use case on the **Canvas**, where you can modify the **Controls** for each prop in the panel below.
+ 
+-To view the documentation for each component use the **Docs** menu item in the top toolbar.
+-
+-To view the source code for the component and its stories on GitHub, click the <InlineIcon icon={ RepoIcon } /> View Source Repository button in the top right corner.
++To view the source code for the component and its stories on GitHub, click the <InlineIcon icon={ JumpToIcon } /> (Open source file) button in the top toolbar.
+ 
+ To use it in your local development environment run the following command in the top level Gutenberg directory:
+ 
+diff --git a/test/e2e/specs/editor/blocks/heading.spec.js b/test/e2e/specs/editor/blocks/heading.spec.js
+index 7ffbf6490f0809..884395426507da 100644
+--- a/test/e2e/specs/editor/blocks/heading.spec.js
++++ b/test/e2e/specs/editor/blocks/heading.spec.js
+@@ -265,8 +265,10 @@ test.describe( 'Heading', () => {
+ 				name: 'core/heading',
+ 				attributes: {
+ 					content: 'Heading',
+-					textAlign: 'center',
+ 					level: 4,
++					style: {
++						typography: { textAlign: 'center' },
++					},
+ 				},
+ 			},
+ 		] );
+@@ -298,8 +300,10 @@ test.describe( 'Heading', () => {
+ 				name: 'core/heading',
+ 				attributes: {
+ 					content: 'Paragraph',
+-					textAlign: 'center',
+ 					level: 2,
++					style: {
++						typography: { textAlign: 'center' },
++					},
+ 				},
+ 			},
+ 		] );
+@@ -412,7 +416,7 @@ test.describe( 'Heading', () => {
+ 				);
+ 			} );
+ 
+-			test( 'should preserve the text align attribute', async ( {
++			test( 'should preserve the text align block support', async ( {
+ 				editor,
+ 			} ) => {
+ 				await editor.insertBlock( {
+@@ -425,7 +429,9 @@ test.describe( 'Heading', () => {
+ 				await editor.transformBlockTo( 'core/heading' );
+ 				const headingBlock = ( await editor.getBlocks() )[ 0 ];
+ 				expect( headingBlock.name ).toBe( 'core/heading' );
+-				expect( headingBlock.attributes.textAlign ).toBe( 'right' );
++				expect(
++					headingBlock.attributes.style.typography.textAlign
++				).toBe( 'right' );
+ 			} );
+ 
+ 			test( 'should preserve the metadata attribute', async ( {
+@@ -507,8 +513,8 @@ test.describe( 'Heading', () => {
+ 				await editor.insertBlock( {
+ 					name: 'core/heading',
+ 					attributes: {
+-						textAlign: 'right',
+ 						content: 'initial content',
++						style: { typography: { textAlign: 'right' } },
+ 					},
+ 				} );
+ 				await editor.transformBlockTo( 'core/paragraph' );
+diff --git a/test/e2e/specs/editor/various/splitting-merging.spec.js b/test/e2e/specs/editor/various/splitting-merging.spec.js
+index dcbf989869405b..b0080faf4761e0 100644
+--- a/test/e2e/specs/editor/various/splitting-merging.spec.js
++++ b/test/e2e/specs/editor/various/splitting-merging.spec.js
+@@ -391,7 +391,13 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
+ 		};
+ 		const emptyAlignedHeading = {
+ 			name: 'core/heading',
+-			attributes: { content: '', textAlign: 'center', level: 2 },
++			attributes: {
++				content: '',
++				level: 2,
++				style: {
++					typography: { textAlign: 'center' },
++				},
++			},
+ 			innerBlocks: [],
+ 		};
+ 		const headingWithContent = {
+diff --git a/test/integration/fixtures/blocks/core__heading__deprecated-1.json b/test/integration/fixtures/blocks/core__heading__deprecated-1.json
+index 3a07b26aaf4aa7..ea57307f023f6e 100644
+--- a/test/integration/fixtures/blocks/core__heading__deprecated-1.json
++++ b/test/integration/fixtures/blocks/core__heading__deprecated-1.json
+@@ -5,7 +5,11 @@
+ 		"attributes": {
+ 			"content": "A picture is worth a thousand words, or so the saying goes",
+ 			"level": 3,
+-			"textAlign": "right"
++			"style": {
++				"typography": {
++					"textAlign": "right"
++				}
++			}
+ 		},
+ 		"innerBlocks": []
+ 	}
+diff --git a/test/integration/fixtures/blocks/core__heading__deprecated-1.serialized.html b/test/integration/fixtures/blocks/core__heading__deprecated-1.serialized.html
+index a064b6f60cf049..0a51a3491cf734 100644
+--- a/test/integration/fixtures/blocks/core__heading__deprecated-1.serialized.html
++++ b/test/integration/fixtures/blocks/core__heading__deprecated-1.serialized.html
+@@ -1,3 +1,3 @@
+-<!-- wp:heading {"textAlign":"right","level":3} -->
++<!-- wp:heading {"level":3,"style":{"typography":{"textAlign":"right"}}} -->
+ <h3 class="wp-block-heading has-text-align-right">A picture is worth a thousand words, or so the saying goes</h3>
+ <!-- /wp:heading -->
+diff --git a/test/integration/fixtures/blocks/core__heading__deprecated-4.html b/test/integration/fixtures/blocks/core__heading__deprecated-4.html
+index a58b0045187c12..9cb98d7830a196 100644
+--- a/test/integration/fixtures/blocks/core__heading__deprecated-4.html
++++ b/test/integration/fixtures/blocks/core__heading__deprecated-4.html
+@@ -1,4 +1,3 @@
+ <!-- wp:heading {"textColor":"accent","align":"center"} -->
+ <h2 class="has-accent-color has-text-color has-text-align-center">Text</h2>
+ <!-- /wp:heading -->
+-
+diff --git a/test/integration/fixtures/blocks/core__heading__deprecated-4.json b/test/integration/fixtures/blocks/core__heading__deprecated-4.json
+index 6df62f0a1646a7..fa1c680bac3319 100644
+--- a/test/integration/fixtures/blocks/core__heading__deprecated-4.json
++++ b/test/integration/fixtures/blocks/core__heading__deprecated-4.json
+@@ -6,7 +6,11 @@
+ 			"content": "Text",
+ 			"level": 2,
+ 			"textColor": "accent",
+-			"textAlign": "center"
++			"style": {
++				"typography": {
++					"textAlign": "center"
++				}
++			}
+ 		},
+ 		"innerBlocks": []
+ 	}
+diff --git a/test/integration/fixtures/blocks/core__heading__deprecated-4.serialized.html b/test/integration/fixtures/blocks/core__heading__deprecated-4.serialized.html
+index cc4218e776a73a..7a1759ff5f68a6 100644
+--- a/test/integration/fixtures/blocks/core__heading__deprecated-4.serialized.html
++++ b/test/integration/fixtures/blocks/core__heading__deprecated-4.serialized.html
+@@ -1,3 +1,3 @@
+-<!-- wp:heading {"textAlign":"center","textColor":"accent"} -->
++<!-- wp:heading {"textColor":"accent","style":{"typography":{"textAlign":"center"}}} -->
+ <h2 class="wp-block-heading has-text-align-center has-accent-color has-text-color">Text</h2>
+ <!-- /wp:heading -->
+diff --git a/test/integration/fixtures/blocks/core__heading__deprecated-5.json b/test/integration/fixtures/blocks/core__heading__deprecated-5.json
+index 64c89ad0cd9793..dcb2b63f484bb2 100644
+--- a/test/integration/fixtures/blocks/core__heading__deprecated-5.json
++++ b/test/integration/fixtures/blocks/core__heading__deprecated-5.json
+@@ -3,10 +3,14 @@
+ 		"name": "core/heading",
+ 		"isValid": true,
+ 		"attributes": {
+-			"textAlign": "right",
+ 			"content": "Text",
+ 			"level": 2,
+-			"textColor": "primary"
++			"textColor": "primary",
++			"style": {
++				"typography": {
++					"textAlign": "right"
++				}
++			}
+ 		},
+ 		"innerBlocks": []
+ 	}
+diff --git a/test/integration/fixtures/blocks/core__heading__deprecated-5.serialized.html b/test/integration/fixtures/blocks/core__heading__deprecated-5.serialized.html
+index a81affa226f771..c561e3e87d0d1d 100644
+--- a/test/integration/fixtures/blocks/core__heading__deprecated-5.serialized.html
++++ b/test/integration/fixtures/blocks/core__heading__deprecated-5.serialized.html
+@@ -1,3 +1,3 @@
+-<!-- wp:heading {"textAlign":"right","textColor":"primary"} -->
++<!-- wp:heading {"textColor":"primary","style":{"typography":{"textAlign":"right"}}} -->
+ <h2 class="wp-block-heading has-text-align-right has-primary-color has-text-color">Text</h2>
+ <!-- /wp:heading -->
+diff --git a/test/integration/fixtures/blocks/core__heading__deprecated-6.html b/test/integration/fixtures/blocks/core__heading__deprecated-6.html
+new file mode 100644
+index 00000000000000..a27ffd9816a09d
+--- /dev/null
++++ b/test/integration/fixtures/blocks/core__heading__deprecated-6.html
+@@ -0,0 +1,9 @@
++<!-- wp:heading {"textAlign":"left"} -->
++<h2 class="wp-block-heading has-text-align-left">Heading</h2>
++<!-- /wp:heading -->
++<!-- wp:heading {"textAlign":"center"} -->
++<h2 class="wp-block-heading has-text-align-center">Heading</h2>
++<!-- /wp:heading -->
++<!-- wp:heading {"textAlign":"right"} -->
++<h2 class="wp-block-heading has-text-align-right">Heading</h2>
++<!-- /wp:heading -->
+\ No newline at end of file
+diff --git a/test/integration/fixtures/blocks/core__heading__deprecated-6.json b/test/integration/fixtures/blocks/core__heading__deprecated-6.json
+new file mode 100644
+index 00000000000000..ea9723f5758f92
+--- /dev/null
++++ b/test/integration/fixtures/blocks/core__heading__deprecated-6.json
+@@ -0,0 +1,44 @@
++[
++	{
++		"name": "core/heading",
++		"isValid": true,
++		"attributes": {
++			"content": "Heading",
++			"level": 2,
++			"style": {
++				"typography": {
++					"textAlign": "left"
++				}
++			}
++		},
++		"innerBlocks": []
++	},
++	{
++		"name": "core/heading",
++		"isValid": true,
++		"attributes": {
++			"content": "Heading",
++			"level": 2,
++			"style": {
++				"typography": {
++					"textAlign": "center"
++				}
++			}
++		},
++		"innerBlocks": []
++	},
++	{
++		"name": "core/heading",
++		"isValid": true,
++		"attributes": {
++			"content": "Heading",
++			"level": 2,
++			"style": {
++				"typography": {
++					"textAlign": "right"
++				}
++			}
++		},
++		"innerBlocks": []
++	}
++]
+diff --git a/test/integration/fixtures/blocks/core__heading__deprecated-6.parsed.json b/test/integration/fixtures/blocks/core__heading__deprecated-6.parsed.json
+new file mode 100644
+index 00000000000000..4c3cb05e4a3437
+--- /dev/null
++++ b/test/integration/fixtures/blocks/core__heading__deprecated-6.parsed.json
+@@ -0,0 +1,49 @@
++[
++	{
++		"blockName": "core/heading",
++		"attrs": {
++			"textAlign": "left"
++		},
++		"innerBlocks": [],
++		"innerHTML": "\n<h2 class=\"wp-block-heading has-text-align-left\">Heading</h2>\n",
++		"innerContent": [
++			"\n<h2 class=\"wp-block-heading has-text-align-left\">Heading</h2>\n"
++		]
++	},
++	{
++		"blockName": null,
++		"attrs": {},
++		"innerBlocks": [],
++		"innerHTML": "\n",
++		"innerContent": [ "\n" ]
++	},
++	{
++		"blockName": "core/heading",
++		"attrs": {
++			"textAlign": "center"
++		},
++		"innerBlocks": [],
++		"innerHTML": "\n<h2 class=\"wp-block-heading has-text-align-center\">Heading</h2>\n",
++		"innerContent": [
++			"\n<h2 class=\"wp-block-heading has-text-align-center\">Heading</h2>\n"
++		]
++	},
++	{
++		"blockName": null,
++		"attrs": {},
++		"innerBlocks": [],
++		"innerHTML": "\n",
++		"innerContent": [ "\n" ]
++	},
++	{
++		"blockName": "core/heading",
++		"attrs": {
++			"textAlign": "right"
++		},
++		"innerBlocks": [],
++		"innerHTML": "\n<h2 class=\"wp-block-heading has-text-align-right\">Heading</h2>\n",
++		"innerContent": [
++			"\n<h2 class=\"wp-block-heading has-text-align-right\">Heading</h2>\n"
++		]
++	}
++]
+diff --git a/test/integration/fixtures/blocks/core__heading__deprecated-6.serialized.html b/test/integration/fixtures/blocks/core__heading__deprecated-6.serialized.html
+new file mode 100644
+index 00000000000000..0645edab6decb8
+--- /dev/null
++++ b/test/integration/fixtures/blocks/core__heading__deprecated-6.serialized.html
+@@ -0,0 +1,11 @@
++<!-- wp:heading {"style":{"typography":{"textAlign":"left"}}} -->
++<h2 class="wp-block-heading has-text-align-left">Heading</h2>
++<!-- /wp:heading -->
++
++<!-- wp:heading {"style":{"typography":{"textAlign":"center"}}} -->
++<h2 class="wp-block-heading has-text-align-center">Heading</h2>
++<!-- /wp:heading -->
++
++<!-- wp:heading {"style":{"typography":{"textAlign":"right"}}} -->
++<h2 class="wp-block-heading has-text-align-right">Heading</h2>
++<!-- /wp:heading -->
+diff --git a/test/integration/fixtures/blocks/core__heading_align-textalign.json b/test/integration/fixtures/blocks/core__heading_align-textalign.json
+index d4bd2d918ba7ed..772e846de8802f 100644
+--- a/test/integration/fixtures/blocks/core__heading_align-textalign.json
++++ b/test/integration/fixtures/blocks/core__heading_align-textalign.json
+@@ -3,10 +3,14 @@
+ 		"name": "core/heading",
+ 		"isValid": true,
+ 		"attributes": {
+-			"textAlign": "center",
+ 			"content": "Text",
+ 			"level": 2,
+-			"align": "wide"
++			"align": "wide",
++			"style": {
++				"typography": {
++					"textAlign": "center"
++				}
++			}
+ 		},
+ 		"innerBlocks": []
+ 	}
+diff --git a/test/integration/fixtures/blocks/core__heading_align-textalign.serialized.html b/test/integration/fixtures/blocks/core__heading_align-textalign.serialized.html
+index 3f7fb12335b4b8..11cb955af74fd8 100644
+--- a/test/integration/fixtures/blocks/core__heading_align-textalign.serialized.html
++++ b/test/integration/fixtures/blocks/core__heading_align-textalign.serialized.html
+@@ -1,3 +1,3 @@
+-<!-- wp:heading {"textAlign":"center","align":"wide"} -->
+-<h2 class="wp-block-heading alignwide has-text-align-center">Text</h2>
++<!-- wp:heading {"align":"wide","style":{"typography":{"textAlign":"center"}}} -->
++<h2 class="wp-block-heading has-text-align-center alignwide">Text</h2>
+ <!-- /wp:heading -->
+diff --git a/test/storybook-playwright/specs/hstack.spec.ts b/test/storybook-playwright/specs/hstack.spec.ts
+index f9be20b6c12e0a..88edc6d7a053fa 100644
+--- a/test/storybook-playwright/specs/hstack.spec.ts
++++ b/test/storybook-playwright/specs/hstack.spec.ts
+@@ -39,7 +39,7 @@ const PROP_VALUES_TO_TEST = [
+ test.describe( 'HStack', () => {
+ 	test.beforeEach( async ( { page } ) => {
+ 		await gotoStoryId( page, 'components-experimental-hstack--default', {
+-			decorators: { marginChecker: 'show', customE2EControls: 'show' },
++			decorators: { customE2EControls: 'show' },
+ 		} );
+ 	} );
+ 
+diff --git a/test/storybook-playwright/specs/popover.spec.ts b/test/storybook-playwright/specs/popover.spec.ts
+index 247e61ffc8138a..7a9023d1f9d784 100644
+--- a/test/storybook-playwright/specs/popover.spec.ts
++++ b/test/storybook-playwright/specs/popover.spec.ts
+@@ -12,9 +12,7 @@ test.describe( 'Popover', () => {
+ 	// This isn't a meaningful test, just some example code.
+ 	// We can remove it once we have real tests.
+ 	test( 'should render', async ( { page } ) => {
+-		await gotoStoryId( page, 'components-popover--default', {
+-			decorators: { marginChecker: 'show' },
+-		} );
++		await gotoStoryId( page, 'components-popover--default' );
+ 
+ 		await page.click( 'role=button' );
+ 		const popover = await page.waitForSelector( '.components-popover' );
+diff --git a/test/storybook-playwright/specs/vstack.spec.ts b/test/storybook-playwright/specs/vstack.spec.ts
+index 7a6bad02f79d60..af7be5cec235f4 100644
+--- a/test/storybook-playwright/specs/vstack.spec.ts
++++ b/test/storybook-playwright/specs/vstack.spec.ts
+@@ -39,7 +39,7 @@ const PROP_VALUES_TO_TEST = [
+ test.describe( 'VStack', () => {
+ 	test.beforeEach( async ( { page } ) => {
+ 		await gotoStoryId( page, 'components-experimental-vstack--default', {
+-			decorators: { marginChecker: 'show', customE2EControls: 'show' },
++			decorators: { customE2EControls: 'show' },
+ 		} );
+ 	} );
+ 
+diff --git a/test/storybook-playwright/utils.ts b/test/storybook-playwright/utils.ts
+index 61ab7b3552edd2..f4adab9b0a26a5 100644
+--- a/test/storybook-playwright/utils.ts
++++ b/test/storybook-playwright/utils.ts
+@@ -9,7 +9,6 @@ const STORYBOOK_PORT = '50241';
+ type Decorators = {
+ 	css?: 'none' | 'basic' | 'wordpress';
+ 	direction?: 'ltr' | 'rtl';
+-	marginChecker?: 'show' | 'hide';
+ 	customE2EControls?: 'show' | 'hide';
+ };
+ type Options = { decorators?: Decorators };

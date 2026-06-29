@@ -1,0 +1,53 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6d9c96839257f9..8f83595668e096 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,12 +8,13 @@
+ 
+ ### Enhancements
+ 
++-   `Tooltip`: Make tests faster ([#60897](https://github.com/WordPress/gutenberg/pull/60897)).
+ -   `ExternalLink`: Use unicode arrow instead of svg icon ([#60255](https://github.com/WordPress/gutenberg/pull/60255)).
+ -   `ProgressBar`: Move the indicator width styles from emotion to a CSS variable ([#60388](https://github.com/WordPress/gutenberg/pull/60388)).
+--   `Text`: Add `text-wrap: pretty;` to improve wrapping. ([#60164](https://github.com/WordPress/gutenberg/pull/60164)).
+--   `Navigator`: Navigation to the active path doesn't create a new location history. ([#60561](https://github.com/WordPress/gutenberg/pull/60561))
+--   `FormToggle`: Forwards ref to input. ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
+--   `ToggleControl`: Forwards ref to FormToggle. ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
++-   `Text`: Add `text-wrap: pretty;` to improve wrapping ([#60164](https://github.com/WordPress/gutenberg/pull/60164)).
++-   `Navigator`: Navigation to the active path doesn't create a new location history ([#60561](https://github.com/WordPress/gutenberg/pull/60561))
++-   `FormToggle`: Forwards ref to input ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
++-   `ToggleControl`: Forwards ref to FormToggle ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/tooltip/test/index.tsx b/packages/components/src/tooltip/test/index.tsx
+index 66734b1737053c..50dc83af4b9112 100644
+--- a/packages/components/src/tooltip/test/index.tsx
++++ b/packages/components/src/tooltip/test/index.tsx
+@@ -42,14 +42,6 @@ const hoverOutside = async () => {
+ };
+ 
+ describe( 'Tooltip', () => {
+-	// Wait enough time to make sure that tooltips don't show immediately, ignoring
+-	// the showTimeout delay. For more context, see:
+-	// - https://github.com/WordPress/gutenberg/pull/57345#discussion_r1435167187
+-	// - https://ariakit.org/reference/tooltip-provider#skiptimeout
+-	afterEach( async () => {
+-		await sleep( 300 );
+-	} );
+-
+ 	describe( 'basic behavior', () => {
+ 		it( 'should not render the tooltip if multiple children are passed', async () => {
+ 			render(
+@@ -312,6 +304,11 @@ describe( 'Tooltip', () => {
+ 			// Hover outside of the anchor, tooltip should hide
+ 			await hoverOutside();
+ 			await waitExpectTooltipToHide();
++
++			// Prevent this test from interfering with the next one.
++			// "Tooltips appear instantly if another tooltip has just been hidden."
++			// See: https://github.com/WordPress/gutenberg/pull/57345#discussion_r1435495655
++			await sleep( 3000 );
+ 		} );
+ 
+ 		it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {

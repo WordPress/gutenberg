@@ -1,0 +1,258 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 106863c020c5d9..5447608a3a9eb9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `FormToggle`: fix sass deprecation warning ([#56672](https://github.com/WordPress/gutenberg/pull/56672)).
+ -   `QueryControls`: Add opt-in prop for 40px default size ([#56576](https://github.com/WordPress/gutenberg/pull/56576)).
++-   `CheckboxControl`: Add option to not render label ([#56158](https://github.com/WordPress/gutenberg/pull/56158)).
+ 
+ ## 25.13.0 (2023-11-29)
+ 
+diff --git a/packages/components/src/checkbox-control/README.md b/packages/components/src/checkbox-control/README.md
+index 12f792ea8577bf..66f3cae2be379e 100644
+--- a/packages/components/src/checkbox-control/README.md
++++ b/packages/components/src/checkbox-control/README.md
+@@ -77,11 +77,12 @@ const MyCheckboxControl = () => {
+ The set of props accepted by the component will be specified below.
+ Props not included in this set will be applied to the input element.
+ 
+-#### `label`: `string`
++#### `label`: `string|false`
+ 
+ A label for the input field, that appears at the side of the checkbox.
+ The prop will be rendered as content a label element.
+ If no prop is passed an empty label is rendered.
++If the prop is set to false no label is rendered.
+ 
+ -   Required: No
+ 
+diff --git a/packages/components/src/checkbox-control/index.tsx b/packages/components/src/checkbox-control/index.tsx
+index cd70bb8485ac7e..54a9952d199491 100644
+--- a/packages/components/src/checkbox-control/index.tsx
++++ b/packages/components/src/checkbox-control/index.tsx
+@@ -125,12 +125,14 @@ export function CheckboxControl(
+ 					/>
+ 				) : null }
+ 			</span>
+-			<label
+-				className="components-checkbox-control__label"
+-				htmlFor={ id }
+-			>
+-				{ label }
+-			</label>
++			{ label && (
++				<label
++					className="components-checkbox-control__label"
++					htmlFor={ id }
++				>
++					{ label }
++				</label>
++			) }
+ 		</BaseControl>
+ 	);
+ }
+diff --git a/packages/components/src/checkbox-control/test/__snapshots__/index.tsx.snap b/packages/components/src/checkbox-control/test/__snapshots__/index.tsx.snap
+index 408f18d8c7e770..f3bdccc1ccff6b 100644
+--- a/packages/components/src/checkbox-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/checkbox-control/test/__snapshots__/index.tsx.snap
+@@ -5,14 +5,14 @@ Snapshot Diff:
+ - First value
+ + Second value
+ 
+-@@ -8,17 +8,31 @@
++@@ -8,13 +8,27 @@
+         <span
+           class="components-checkbox-control__input-container"
+         >
+           <input
+             class="components-checkbox-control__input"
+--           id="inspector-checkbox-control-5"
+-+           id="inspector-checkbox-control-6"
++-           id="inspector-checkbox-control-6"
+++           id="inspector-checkbox-control-7"
+             type="checkbox"
+             value="1"
+ +         />
+@@ -31,11 +31,6 @@ Snapshot Diff:
+             />
+ +         </svg>
+         </span>
+-        <label
+-          class="components-checkbox-control__label"
+--         for="inspector-checkbox-control-5"
+-+         for="inspector-checkbox-control-6"
+-        />
+       </div>
+     </div>
+   </div>
+diff --git a/packages/components/src/checkbox-control/test/index.tsx b/packages/components/src/checkbox-control/test/index.tsx
+index 061087fdc09012..55e1447661392e 100644
+--- a/packages/components/src/checkbox-control/test/index.tsx
++++ b/packages/components/src/checkbox-control/test/index.tsx
+@@ -60,6 +60,13 @@ describe( 'CheckboxControl', () => {
+ 			expect( label ).toBeInTheDocument();
+ 		} );
+ 
++		it( 'should not render label element if label is set to false', () => {
++			render( <CheckboxControl label={ false } /> );
++
++			const label = screen.queryByRole( 'label' );
++			expect( label ).not.toBeInTheDocument();
++		} );
++
+ 		it( 'should render a checkbox in an indeterminate state', () => {
+ 			render( <CheckboxControl indeterminate /> );
+ 			expect( getInput() ).toHaveProperty( 'indeterminate', true );
+diff --git a/packages/components/src/checkbox-control/types.ts b/packages/components/src/checkbox-control/types.ts
+index 07ab55493fc661..48a1d02affb700 100644
+--- a/packages/components/src/checkbox-control/types.ts
++++ b/packages/components/src/checkbox-control/types.ts
+@@ -19,9 +19,10 @@ export type CheckboxControlProps = Pick<
+ 	/**
+ 	 * A label for the input field, that appears at the side of the checkbox.
+ 	 * The prop will be rendered as content a label element. If no prop is
+-	 * passed an empty label is rendered.
++	 * passed an empty label is rendered. If the prop is set to false no label
++	 * is rendered.
+ 	 */
+-	label?: string;
++	label?: string | false;
+ 	/**
+ 	 * If checked is true the checkbox will be checked. If checked is false the
+ 	 * checkbox will be unchecked. If no value is passed the checkbox will be
+diff --git a/packages/edit-site/src/components/global-styles/font-library-modal/collection-font-variant.js b/packages/edit-site/src/components/global-styles/font-library-modal/collection-font-variant.js
+index d0e797d78beef0..8c2b36d3adee9f 100644
+--- a/packages/edit-site/src/components/global-styles/font-library-modal/collection-font-variant.js
++++ b/packages/edit-site/src/components/global-styles/font-library-modal/collection-font-variant.js
+@@ -2,15 +2,13 @@
+  * WordPress dependencies
+  */
+ import { CheckboxControl, Flex } from '@wordpress/components';
+-/**
+- * Internal dependencies
+- */
+-import { getFontFaceVariantName } from './utils';
+ 
+ /**
+  * Internal dependencies
+  */
++import { getFontFaceVariantName } from './utils';
+ import FontFaceDemo from './font-demo';
++import { kebabCase } from '../../../../../block-editor/src/utils/object';
+ 
+ function CollectionFontVariant( {
+ 	face,
+@@ -27,18 +25,26 @@ function CollectionFontVariant( {
+ 	};
+ 
+ 	const displayName = font.name + ' ' + getFontFaceVariantName( face );
++	const checkboxId = kebabCase(
++		`${ font.slug }-${ getFontFaceVariantName( face ) }`
++	);
+ 
+ 	return (
+-		<div className="font-library-modal__library-font-variant">
++		<label
++			className="font-library-modal__library-font-variant"
++			htmlFor={ checkboxId }
++		>
+ 			<Flex justify="space-between" align="center" gap="1rem">
+ 				<FontFaceDemo fontFace={ face } text={ displayName } />
+ 				<CheckboxControl
+ 					checked={ selected }
+ 					onChange={ handleToggleActivation }
+ 					__nextHasNoMarginBottom={ true }
++					id={ checkboxId }
++					label={ false }
+ 				/>
+ 			</Flex>
+-		</div>
++		</label>
+ 	);
+ }
+ 
+diff --git a/packages/edit-site/src/components/global-styles/font-library-modal/library-font-variant.js b/packages/edit-site/src/components/global-styles/font-library-modal/library-font-variant.js
+index 32e18c023cecbe..010f3efdbeb91a 100644
+--- a/packages/edit-site/src/components/global-styles/font-library-modal/library-font-variant.js
++++ b/packages/edit-site/src/components/global-styles/font-library-modal/library-font-variant.js
+@@ -3,16 +3,14 @@
+  */
+ import { useContext } from '@wordpress/element';
+ import { CheckboxControl, Flex } from '@wordpress/components';
+-/**
+- * Internal dependencies
+- */
+-import { getFontFaceVariantName } from './utils';
+ 
+ /**
+  * Internal dependencies
+  */
++import { getFontFaceVariantName } from './utils';
+ import { FontLibraryContext } from './context';
+ import FontFaceDemo from './font-demo';
++import { kebabCase } from '../../../../../block-editor/src/utils/object';
+ 
+ function LibraryFontVariant( { face, font } ) {
+ 	const { isFontActivated, toggleActivateFont } =
+@@ -36,18 +34,26 @@ function LibraryFontVariant( { face, font } ) {
+ 	};
+ 
+ 	const displayName = font.name + ' ' + getFontFaceVariantName( face );
++	const checkboxId = kebabCase(
++		`${ font.slug }-${ getFontFaceVariantName( face ) }`
++	);
+ 
+ 	return (
+-		<div className="font-library-modal__library-font-variant">
++		<label
++			className="font-library-modal__library-font-variant"
++			htmlFor={ checkboxId }
++		>
+ 			<Flex justify="space-between" align="center" gap="1rem">
+ 				<FontFaceDemo fontFace={ face } text={ displayName } />
+ 				<CheckboxControl
+ 					checked={ isIstalled }
+ 					onChange={ handleToggleActivation }
+ 					__nextHasNoMarginBottom={ true }
++					id={ checkboxId }
++					label={ false }
+ 				/>
+ 			</Flex>
+-		</div>
++		</label>
+ 	);
+ }
+ 
+diff --git a/test/e2e/specs/site-editor/font-library.spec.js b/test/e2e/specs/site-editor/font-library.spec.js
+index 6aca027a30e788..531398fb495906 100644
+--- a/test/e2e/specs/site-editor/font-library.spec.js
++++ b/test/e2e/specs/site-editor/font-library.spec.js
+@@ -70,5 +70,26 @@ test.describe( 'Font Library', () => {
+ 				page.getByRole( 'heading', { name: 'Fonts' } )
+ 			).toBeVisible();
+ 		} );
++
++		test( 'should show font variant panel when clicking on a font family', async ( {
++			page,
++		} ) => {
++			await page.getByRole( 'button', { name: /styles/i } ).click();
++			await page
++				.getByRole( 'button', { name: /typography styles/i } )
++				.click();
++			await page
++				.getByRole( 'button', {
++					name: /manage fonts/i,
++				} )
++				.click();
++			await page.getByRole( 'button', { name: /system font/i } ).click();
++			await expect(
++				page.getByRole( 'heading', { name: /system font/i } )
++			).toBeVisible();
++			await expect(
++				page.getByRole( 'checkbox', { name: /system font normal/i } )
++			).toBeVisible();
++		} );
+ 	} );
+ } );

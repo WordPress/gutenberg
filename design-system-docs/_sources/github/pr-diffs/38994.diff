@@ -1,0 +1,330 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6e95c817109bbe..a3894dc5dce71e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `ConfirmDialog`: Add support for custom label text on the confirmation and cancelation buttons ([#38994](https://github.com/WordPress/gutenberg/pull/38994))
++
+ ### Bug Fix
+ 
+ -   Normalize `font-family` on `Button`, `ColorPalette`, `ComoboboxControl`, `DateTimePicker`, `FormTokenField`, `InputControl`, `SelectControl`, and `ToggleGroupControl` ([#38969](https://github.com/WordPress/gutenberg/pull/38969)).
+@@ -36,11 +40,11 @@
+ ### Enhancements
+ 
+ -   Update the visual design of the `Spinner` component. ([#37551](https://github.com/WordPress/gutenberg/pull/37551))
+--  `TreeGrid` accessibility enhancements around the expand/collapse functionality. ([#38358](https://github.com/WordPress/gutenberg/pull/38358))
+--  `TreeGrid` accessibility: improve browser support for Left Arrow focus to parent row in child row.  ([#38639](https://github.com/WordPress/gutenberg/pull/38639))
+--  `TreeGrid` accessibility: Add Home/End keys for better keyboard navigation. ([#38679](https://github.com/WordPress/gutenberg/pull/38679))
++-   `TreeGrid` accessibility enhancements around the expand/collapse functionality. ([#38358](https://github.com/WordPress/gutenberg/pull/38358))
++-   `TreeGrid` accessibility: improve browser support for Left Arrow focus to parent row in child row. ([#38639](https://github.com/WordPress/gutenberg/pull/38639))
++-   `TreeGrid` accessibility: Add Home/End keys for better keyboard navigation. ([#38679](https://github.com/WordPress/gutenberg/pull/38679))
+ -   Add `resolvePoint` prop to `FocalPointPicker` to allow updating the value of the picker after a user interaction ([#38247](https://github.com/WordPress/gutenberg/pull/38247))
+--  `TreeGrid`: Allow SHIFT key to be held, and add `onFocusRow` callback to the `TreeGrid` component, fired when focus is shifted from one row to another via Up and Down arrow keys. ([#38314](https://github.com/WordPress/gutenberg/pull/38314))
++-   `TreeGrid`: Allow SHIFT key to be held, and add `onFocusRow` callback to the `TreeGrid` component, fired when focus is shifted from one row to another via Up and Down arrow keys. ([#38314](https://github.com/WordPress/gutenberg/pull/38314))
+ 
+ ### Experimental
+ 
+@@ -53,7 +57,7 @@
+ 
+ -   Refine `ExternalLink` to be same size as the text, to appear more as a glyph than an icon. ([#37859](https://github.com/WordPress/gutenberg/pull/37859))
+ -   Updated `ToolsPanel` header icon to only show "plus" icon when all items are optional and all are currently hidden ([#38262](https://github.com/WordPress/gutenberg/pull/38262))
+--  `TreeGrid`: Fix keyboard navigation for expand/collapse table rows in Firefox ([#37983](https://github.com/WordPress/gutenberg/pull/37983))
++-   `TreeGrid`: Fix keyboard navigation for expand/collapse table rows in Firefox ([#37983](https://github.com/WordPress/gutenberg/pull/37983))
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/confirm-dialog/README.md b/packages/components/src/confirm-dialog/README.md
+index 246b1bcc9638d6..73b9cd17d3a459 100644
+--- a/packages/components/src/confirm-dialog/README.md
++++ b/packages/components/src/confirm-dialog/README.md
+@@ -15,61 +15,58 @@ The dialog is confirmed by clicking the _confirm_ button or by pressing the `Ent
+ ### Uncontrolled mode
+ 
+ Allows the component to be used standalone, just by declaring it as part of another React's component render method:
+-  * It will be automatically open (displayed) upon mounting;
+-  * It will be automatically closed when when clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay);
+-  * `onCancel` is not mandatory but can be passed. Even if passed, the dialog will still be able to close itself.
++
++-   It will be automatically open (displayed) upon mounting;
++-   It will be automatically closed when when clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay);
++-   `onCancel` is not mandatory but can be passed. Even if passed, the dialog will still be able to close itself.
+ 
+ Activating this mode is as simple as omitting the `isOpen` prop. The only mandatory prop, in this case, is the `onConfirm` callback. The message is passed as the `children`. You can pass any JSX you'd like, which allows to further format the message or include sub-component if you'd like:
+ 
+ ```jsx
+-import {
+-  __experimentalConfirmDialog as ConfirmDialog
+-} from '@wordpress/components';
++import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
+ 
+ function Example() {
+-  return (
+-    <ConfirmDialog onConfirm={ () => console.debug(' Confirmed! ') }>
+-      Are you sure? <strong>This action cannot be undone!</strong>
+-    </ConfirmDialog>
+-  );
++	return (
++		<ConfirmDialog onConfirm={ () => console.debug( ' Confirmed! ' ) }>
++			Are you sure? <strong>This action cannot be undone!</strong>
++		</ConfirmDialog>
++	);
+ }
+ ```
+ 
+ ### Controlled mode
+ 
+ Let the parent component control when the dialog is open/closed. It's activated when a boolean value is passed to `isOpen`:
+-  * It will not be automatically closed. You need to let it know when to open/close by updating the value of the `isOpen` prop;
+-  * Both `onConfirm` and the `onCancel` callbacks are mandatory props in this mode;
+-  * You'll want to update the state that controls `isOpen` by updating it from the `onCancel` and `onConfirm` callbacks.
+ 
++-   It will not be automatically closed. You need to let it know when to open/close by updating the value of the `isOpen` prop;
++-   Both `onConfirm` and the `onCancel` callbacks are mandatory props in this mode;
++-   You'll want to update the state that controls `isOpen` by updating it from the `onCancel` and `onConfirm` callbacks.
+ 
+ ```jsx
+-import {
+-  __experimentalConfirmDialog as ConfirmDialog
+-} from '@wordpress/components';
++import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
+ 
+ function Example() {
+-  const [ isOpen, setIsOpen ] = useState( true );
+-
+-  const handleConfirm = () => {
+-    console.debug( 'Confirmed!' );
+-    setIsOpen( false );
+-  }
+-
+-  const handleCancel = () => {
+-    console.debug( 'Cancelled!' );
+-    setIsOpen( false );
+-  }
+-
+-  return (
+-    <ConfirmDialog
+-      isOpen={ isOpen }
+-      onConfirm={ handleConfirm }
+-      onCancel={ handleCancel }
+-    >
+-      Are you sure? <strong>This action cannot be undone!</strong>
+-    </ConfirmDialog>
+-  );
++	const [ isOpen, setIsOpen ] = useState( true );
++
++	const handleConfirm = () => {
++		console.debug( 'Confirmed!' );
++		setIsOpen( false );
++	};
++
++	const handleCancel = () => {
++		console.debug( 'Cancelled!' );
++		setIsOpen( false );
++	};
++
++	return (
++		<ConfirmDialog
++			isOpen={ isOpen }
++			onConfirm={ handleConfirm }
++			onCancel={ handleCancel }
++		>
++			Are you sure? <strong>This action cannot be undone!</strong>
++		</ConfirmDialog>
++	);
+ }
+ ```
+ 
+@@ -82,47 +79,61 @@ Multiple `ConfirmDialog's is an edge case that's currently not officially suppor
+ ```ts
+ type DialogInputEvent =
+ 	| KeyboardEvent< HTMLDivElement >
+-	| MouseEvent< HTMLButtonElement >
++	| MouseEvent< HTMLButtonElement >;
+ ```
+ 
+ ## Props
+ 
+ ### `title`: `string`
+ 
+-- Required: No
++-   Required: No
+ 
+ An optional `title` for the dialog. Setting a title will render it in a title bar at the top of the dialog, making it a bit taller. The bar will also include an `x` close button at the top-right corner.
+ 
+ ### `children`: `React.ReactNode`
+ 
+-- Required: Yes
++-   Required: Yes
+ 
+ The actual message for the dialog. It's passed as children and any valid `ReactNode` is accepted:
+ 
+ ```jsx
+ <ConfirmDialog>
+- Are you sure? <strong>This action cannot be undone!</strong>
++	Are you sure? <strong>This action cannot be undone!</strong>
+ </ConfirmDialog>
+ ```
+ 
+ ### `isOpen`: `boolean`
+ 
+-- Required: No
++-   Required: No
+ 
+ Defines if the dialog is open (displayed) or closed (not rendered/displayed). It also implicitly toggles the controlled mode if set or the uncontrolled mode if it's not set.
+ 
+ ### `onConfirm`: `( event: DialogInputEvent ) => void`
+ 
+-- Required: Yes
++-   Required: Yes
+ 
+ The callback that's called when the user confirms. A confirmation can happen when the `OK` button is clicked or when `Enter` is pressed.
+ 
+ ### `onCancel`: `( event: DialogInputEvent ) => void`
+ 
+-- Required: Only if `isOpen` is not set
++-   Required: Only if `isOpen` is not set
+ 
+ The callback that's called when the user cancels. A cancellation can happen when the `Cancel` button is clicked, when the `ESC` key is pressed, or when a click outside of the dialog focus is detected (i.e. in the overlay).
+ 
+ It's not required if `isOpen` is not set (uncontrolled mode), as the component will take care of closing itself, but you can still pass a callback if something must be done upon cancelling (the component will still close itself in this case).
+ 
+ If `isOpen` is set (controlled mode), then it's required, and you need to set the state that defines `isOpen` to `false` as part of this callback if you want the dialog to close when the user cancels.
++
++### `confirmButtonText`: `string`
++
++-   Required: No
++-   Default: "OK"
++
++The optional custom text to display as the confirmation button's label
++
++### `cancelButtonText`: `string`
++
++-   Required: No
++-   Default: "Cancel"
++
++The optional custom text to display as the cancelation button's label
+diff --git a/packages/components/src/confirm-dialog/component.tsx b/packages/components/src/confirm-dialog/component.tsx
+index 7ba51296dd1d10..2b9f3366d97fcd 100644
+--- a/packages/components/src/confirm-dialog/component.tsx
++++ b/packages/components/src/confirm-dialog/component.tsx
+@@ -35,6 +35,8 @@ function ConfirmDialog(
+ 		onConfirm,
+ 		onCancel,
+ 		children,
++		confirmButtonText,
++		cancelButtonText,
+ 		...otherProps
+ 	} = useContextSystem( props, 'ConfirmDialog' );
+ 
+@@ -75,8 +77,8 @@ function ConfirmDialog(
+ 		[ handleEvent, onConfirm ]
+ 	);
+ 
+-	const cancelLabel = __( 'Cancel' );
+-	const confirmLabel = __( 'OK' );
++	const cancelLabel = cancelButtonText ?? __( 'Cancel' );
++	const confirmLabel = confirmButtonText ?? __( 'OK' );
+ 
+ 	return (
+ 		<>
+diff --git a/packages/components/src/confirm-dialog/stories/index.js b/packages/components/src/confirm-dialog/stories/index.js
+index 8d91b676f2f7e9..9f27ce3e6b94c8 100644
+--- a/packages/components/src/confirm-dialog/stories/index.js
++++ b/packages/components/src/confirm-dialog/stories/index.js
+@@ -25,6 +25,8 @@ export default {
+ 
+ const daText = () =>
+ 	text( 'message', 'Would you like to privately publish the post now?' );
++const daCancelText = () => text( 'cancel button', 'No thanks' );
++const daConfirmText = () => text( 'confirm button', 'Yes please!' );
+ 
+ // Simplest usage: just declare the component with the required `onConfirm` prop.
+ export const _default = () => {
+@@ -40,6 +42,23 @@ export const _default = () => {
+ 	);
+ };
+ 
++export const WithCustomButtonLabels = () => {
++	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
++
++	return (
++		<>
++			<ConfirmDialog
++				onConfirm={ () => setConfirmVal( 'Confirmed!' ) }
++				cancelButtonText={ daCancelText() }
++				confirmButtonText={ daConfirmText() }
++			>
++				{ daText() }
++			</ConfirmDialog>
++			<Heading level={ 1 }>{ confirmVal }</Heading>
++		</>
++	);
++};
++
+ export const WithJSXMessage = () => {
+ 	const [ confirmVal, setConfirmVal ] = useState( "Hasn't confirmed yet" );
+ 
+diff --git a/packages/components/src/confirm-dialog/test/index.js b/packages/components/src/confirm-dialog/test/index.js
+index 5cff6715445eea..e66584fa0b6de9 100644
+--- a/packages/components/src/confirm-dialog/test/index.js
++++ b/packages/components/src/confirm-dialog/test/index.js
+@@ -3,6 +3,7 @@
+  */
+ import {
+ 	render,
++	screen,
+ 	fireEvent,
+ 	waitForElementToBeRemoved,
+ } from '@testing-library/react';
+@@ -34,6 +35,33 @@ describe( 'Confirm', () => {
+ 					expect( el ).toBeInTheDocument();
+ 				} );
+ 			} );
++			it( 'should render correctly with custom button labels', () => {
++				const cancelButtonText = 'No thanks';
++				const confirmButtonText = 'Yes please!';
++				render(
++					<ConfirmDialog
++						onConfirm={ noop }
++						onCancel={ noop }
++						cancelButtonText={ cancelButtonText }
++						confirmButtonText={ confirmButtonText }
++					>
++						Are you sure?
++					</ConfirmDialog>
++				);
++
++				const dialog = screen.getByRole( 'dialog' );
++				const elementsTexts = [ confirmButtonText, cancelButtonText ];
++
++				expect( dialog ).toBeInTheDocument();
++				expect(
++					screen.getByText( 'Are you sure?' )
++				).toBeInTheDocument();
++
++				elementsTexts.forEach( ( txt ) => {
++					const el = screen.getByRole( 'button', { name: txt } );
++					expect( el ).toBeInTheDocument();
++				} );
++			} );
+ 		} );
+ 
+ 		describe( 'When uncontrolled', () => {
+diff --git a/packages/components/src/confirm-dialog/types.ts b/packages/components/src/confirm-dialog/types.ts
+index 69127c39dfa253..73ad03d344a89a 100644
+--- a/packages/components/src/confirm-dialog/types.ts
++++ b/packages/components/src/confirm-dialog/types.ts
+@@ -10,6 +10,8 @@ export type DialogInputEvent =
+ type BaseProps = {
+ 	children: ReactNode;
+ 	onConfirm: ( event: DialogInputEvent ) => void;
++	confirmButtonText?: string;
++	cancelButtonText?: string;
+ };
+ 
+ type ControlledProps = BaseProps & {

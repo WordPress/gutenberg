@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7255888604ed12..8853f4c94e689b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ ### Bug Fixes
+ 
+ -   `BoxControl`: Better respect for the `min` prop in the Range Slider ([#67819](https://github.com/WordPress/gutenberg/pull/67819)).
++-   `FontSizePicker`: Add `display:contents` rule to fix overflowing text in the custom size select. ([#68280](https://github.com/WordPress/gutenberg/pull/68280)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/font-size-picker/styles.ts b/packages/components/src/font-size-picker/styles.ts
+index f47ca41b51eb71..b0e33b5aea3a2e 100644
+--- a/packages/components/src/font-size-picker/styles.ts
++++ b/packages/components/src/font-size-picker/styles.ts
+@@ -16,6 +16,7 @@ export const Container = styled.fieldset`
+ 	border: 0;
+ 	margin: 0;
+ 	padding: 0;
++	display: contents;
+ `;
+ 
+ export const Header = styled( HStack )`

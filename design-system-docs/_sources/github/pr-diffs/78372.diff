@@ -1,0 +1,379 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 1be594d5650c74..ae50ed3b1ec04c 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   Export `getWpCompatOverlaySlot()` so consumers can route their own portals into the compat overlay slot ([#78183](https://github.com/WordPress/gutenberg/pull/78183)).
++-   `Select`, `SelectControl`: Default the popup's portal container to the `@wordpress/ui` compat overlay slot when present, so select popups stack reliably above other overlays in mixed-library compositions. A caller-supplied `Select.Portal` `container` prop continues to take precedence ([#78372](https://github.com/WordPress/gutenberg/pull/78372)).
+ 
+ ## 0.13.0 (2026-05-14)
+ 
+diff --git a/packages/ui/src/form/primitives/select/portal.tsx b/packages/ui/src/form/primitives/select/portal.tsx
+index 88370aa2215e4c..d635ea259946b0 100644
+--- a/packages/ui/src/form/primitives/select/portal.tsx
++++ b/packages/ui/src/form/primitives/select/portal.tsx
+@@ -1,14 +1,23 @@
+ import { Select as _Select } from '@base-ui/react/select';
+ import { forwardRef } from '@wordpress/element';
+ import type { PortalProps } from './types';
++import { getWpCompatOverlaySlot } from '../../../utils/wp-compat-overlay-slot';
+ 
+ /**
+  * Used to apply custom portal behavior to `Select`'s listbox content.
++ * `container` defaults to the `@wordpress/ui` compat overlay slot.
+  */
+-const Portal = forwardRef< HTMLDivElement, PortalProps >(
+-	function SelectPortal( props, ref ) {
+-		return <_Select.Portal ref={ ref } { ...props } />;
+-	}
+-);
++const Portal = forwardRef< HTMLDivElement, PortalProps >( function SelectPortal(
++	{ container, ...restProps },
++	ref
++) {
++	return (
++		<_Select.Portal
++			container={ container ?? getWpCompatOverlaySlot() }
++			{ ...restProps }
++			ref={ ref }
++		/>
++	);
++} );
+ 
+ export { Portal };
+diff --git a/packages/ui/src/form/primitives/select/test/index.test.tsx b/packages/ui/src/form/primitives/select/test/index.test.tsx
+index 3376123835a0dc..0ed0161ef330ec 100644
+--- a/packages/ui/src/form/primitives/select/test/index.test.tsx
++++ b/packages/ui/src/form/primitives/select/test/index.test.tsx
+@@ -1,7 +1,9 @@
+ import { render, screen, within } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ import { createRef } from '@wordpress/element';
++import type { ReactNode } from 'react';
+ import * as Select from '../index';
++import { useEnableWpCompatOverlaySlot } from '../../../../utils/use-enable-wp-compat-overlay-slot';
+ 
+ describe( 'Select', () => {
+ 	it( 'supports object item values', async () => {
+@@ -239,4 +241,108 @@ describe( 'Select', () => {
+ 			expect( positioner ).toContainElement( item );
+ 		} );
+ 	} );
++
++	// Slot is identified by a data attribute, not a user-facing role/text.
++	/* eslint-disable testing-library/no-node-access */
++	describe( 'wp compat overlay slot', () => {
++		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
++
++		// Exercises the public opt-in path rather than poking the flag.
++		function WithSlotEnabled( { children }: { children: ReactNode } ) {
++			useEnableWpCompatOverlaySlot();
++			return <>{ children }</>;
++		}
++
++		afterEach( () => {
++			// The hook is one-way at runtime; reset explicitly between tests.
++			delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
++				.__wpUiCompatOverlaySlotEnabled;
++			document
++				.querySelectorAll( SLOT_SELECTOR )
++				.forEach( ( el ) => el.remove() );
++		} );
++
++		it( 'portals the popup into the slot when the consumer opts in', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<WithSlotEnabled>
++					<Select.Root>
++						<Select.Trigger />
++						<Select.Popup>
++							<Select.Item value="Item 1">Item 1</Select.Item>
++						</Select.Popup>
++					</Select.Root>
++				</WithSlotEnabled>
++			);
++
++			await user.click( screen.getByRole( 'combobox' ) );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++
++			const slot = document.querySelector( SLOT_SELECTOR );
++			expect( slot ).not.toBeNull();
++			expect( slot ).toContainElement( item );
++		} );
++
++		it( 'does not create a slot when the consumer has not opted in (dormant default)', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<Select.Root>
++					<Select.Trigger />
++					<Select.Popup>
++						<Select.Item value="Item 1">Item 1</Select.Item>
++					</Select.Popup>
++				</Select.Root>
++			);
++
++			await user.click( screen.getByRole( 'combobox' ) );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++
++			expect( document.querySelector( SLOT_SELECTOR ) ).toBeNull();
++		} );
++
++		it( 'lets a caller-supplied portal container override the slot', async () => {
++			const user = userEvent.setup();
++			const containerRef = createRef< HTMLDivElement >();
++
++			render(
++				<WithSlotEnabled>
++					<Select.Root>
++						<Select.Trigger />
++						<div
++							ref={ containerRef }
++							data-testid="custom-container"
++						/>
++						<Select.Popup
++							portal={
++								<Select.Portal container={ containerRef } />
++							}
++						>
++							<Select.Item value="Item 1">Item 1</Select.Item>
++						</Select.Popup>
++					</Select.Root>
++				</WithSlotEnabled>
++			);
++
++			await user.click( screen.getByRole( 'combobox' ) );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
++				item
++			);
++		} );
++	} );
++	/* eslint-enable testing-library/no-node-access */
+ } );
+diff --git a/packages/ui/src/form/select-control/test/index.test.tsx b/packages/ui/src/form/select-control/test/index.test.tsx
+index 850d685c4ca726..08c525f518cd93 100644
+--- a/packages/ui/src/form/select-control/test/index.test.tsx
++++ b/packages/ui/src/form/select-control/test/index.test.tsx
+@@ -1,7 +1,9 @@
+ import { act, render, screen } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ import { createRef } from '@wordpress/element';
++import type { ReactNode } from 'react';
+ import { SelectControl } from '../index';
++import { useEnableWpCompatOverlaySlot } from '../../../utils/use-enable-wp-compat-overlay-slot';
+ 
+ describe( 'SelectControl', () => {
+ 	const mockItems = [
+@@ -193,4 +195,66 @@ describe( 'SelectControl', () => {
+ 			expect( formData.get( 'country' ) ).toBe( '' );
+ 		} );
+ 	} );
++
++	// Slot is identified by a data attribute, not a user-facing role/text.
++	/* eslint-disable testing-library/no-node-access */
++	describe( 'wp compat overlay slot', () => {
++		const SLOT_SELECTOR = '[data-wp-compat-overlay-slot]';
++
++		// Exercises the public opt-in path rather than poking the flag.
++		function WithSlotEnabled( { children }: { children: ReactNode } ) {
++			useEnableWpCompatOverlaySlot();
++			return <>{ children }</>;
++		}
++
++		afterEach( () => {
++			// The hook is one-way at runtime; reset explicitly between tests.
++			delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
++				.__wpUiCompatOverlaySlotEnabled;
++			document
++				.querySelectorAll( SLOT_SELECTOR )
++				.forEach( ( el ) => el.remove() );
++		} );
++
++		it( 'portals the popup into the slot when the consumer opts in', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<WithSlotEnabled>
++					<SelectControl label="Country" items={ mockItems } />
++				</WithSlotEnabled>
++			);
++
++			await user.click(
++				screen.getByRole( 'combobox', { name: 'Country' } )
++			);
++
++			const option = await screen.findByRole( 'option', {
++				name: 'Option 1',
++			} );
++			expect( option ).toBeVisible();
++
++			const slot = document.querySelector( SLOT_SELECTOR );
++			expect( slot ).not.toBeNull();
++			expect( slot ).toContainElement( option );
++		} );
++
++		it( 'does not create a slot when the consumer has not opted in (dormant default)', async () => {
++			const user = userEvent.setup();
++
++			render( <SelectControl label="Country" items={ mockItems } /> );
++
++			await user.click(
++				screen.getByRole( 'combobox', { name: 'Country' } )
++			);
++
++			const option = await screen.findByRole( 'option', {
++				name: 'Option 1',
++			} );
++			expect( option ).toBeVisible();
++
++			expect( document.querySelector( SLOT_SELECTOR ) ).toBeNull();
++		} );
++	} );
++	/* eslint-enable testing-library/no-node-access */
+ } );
+diff --git a/storybook/stories/playground/wp-compat-overlay-slot.story.jsx b/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
+index dda4b41b83ac69..476dcda6a71686 100644
+--- a/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
++++ b/storybook/stories/playground/wp-compat-overlay-slot.story.jsx
+@@ -8,18 +8,27 @@ import { useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import * as Tooltip from '../../../packages/ui/src/tooltip';
++import * as Select from '../../../packages/ui/src/form/primitives/select';
++import { SelectControl } from '../../../packages/ui/src/form/select-control';
+ import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
+ 
+-// Cross-library stacking: a `@wordpress/ui` Tooltip inside a
+-// `@wordpress/components` Modal / Popover should sit above the
+-// components-side overlay via the compat overlay slot.
++const selectItems = [
++	{ value: 'option-1', label: 'Option 1' },
++	{ value: 'option-2', label: 'Option 2' },
++	{ value: 'option-3', label: 'Option 3' },
++];
++
++// Cross-library stacking: `@wordpress/ui` overlays (`Tooltip`, `Select`,
++// `SelectControl`) inside a `@wordpress/components` Modal / Popover
++// should sit above the components-side overlay via the compat overlay
++// slot.
+ export default {
+ 	title: 'Playground/Debug fixtures/WP Compat Overlay Slot',
+ 	decorators: [ WithWpCompatOverlaySlot ],
+ };
+ 
+ export const InsideComponentsModal = {
+-	name: 'Tooltip inside @wordpress/components Modal',
++	name: 'Overlays inside @wordpress/components Modal',
+ 	render: function Render() {
+ 		const [ isOpen, setIsOpen ] = useState( false );
+ 		return (
+@@ -33,9 +42,9 @@ export const InsideComponentsModal = {
+ 						onRequestClose={ () => setIsOpen( false ) }
+ 					>
+ 						<p>
+-							The Tooltip below is from `@wordpress/ui`. Hover its
+-							trigger; the tooltip popup should render above this
+-							modal, not behind it.
++							The overlays below are from `@wordpress/ui`. Their
++							popups should render above this modal, not behind
++							it.
+ 						</p>
+ 						<Tooltip.Provider delay={ 0 }>
+ 							<Tooltip.Root>
+@@ -46,6 +55,29 @@ export const InsideComponentsModal = {
+ 								</Tooltip.Popup>
+ 							</Tooltip.Root>
+ 						</Tooltip.Provider>
++
++						<div style={ { marginTop: '1rem' } }>
++							<Select.Root items={ selectItems }>
++								<Select.Trigger aria-label="Select primitive" />
++								<Select.Popup>
++									{ selectItems.map( ( item ) => (
++										<Select.Item
++											key={ item.value }
++											value={ item }
++										>
++											{ item.label }
++										</Select.Item>
++									) ) }
++								</Select.Popup>
++							</Select.Root>
++						</div>
++
++						<div style={ { marginTop: '1rem' } }>
++							<SelectControl
++								label="SelectControl"
++								items={ selectItems }
++							/>
++						</div>
+ 					</Modal>
+ 				) }
+ 			</>
+@@ -54,7 +86,7 @@ export const InsideComponentsModal = {
+ };
+ 
+ export const InsideComponentsPopover = {
+-	name: 'Tooltip inside @wordpress/components Popover',
++	name: 'Overlays inside @wordpress/components Popover',
+ 	render: function Render() {
+ 		const [ anchor, setAnchor ] = useState( null );
+ 		const [ isOpen, setIsOpen ] = useState( false );
+@@ -74,9 +106,8 @@ export const InsideComponentsPopover = {
+ 					>
+ 						<div style={ { padding: '1rem', maxWidth: '20rem' } }>
+ 							<p>
+-								The Tooltip below is from `@wordpress/ui`. Hover
+-								its trigger; the tooltip popup should render
+-								above this popover.
++								The overlays below are from `@wordpress/ui`.
++								Their popups should render above this popover.
+ 							</p>
+ 							<Tooltip.Provider delay={ 0 }>
+ 								<Tooltip.Root>
+@@ -87,6 +118,29 @@ export const InsideComponentsPopover = {
+ 									</Tooltip.Popup>
+ 								</Tooltip.Root>
+ 							</Tooltip.Provider>
++
++							<div style={ { marginTop: '1rem' } }>
++								<Select.Root items={ selectItems }>
++									<Select.Trigger aria-label="Select primitive" />
++									<Select.Popup>
++										{ selectItems.map( ( item ) => (
++											<Select.Item
++												key={ item.value }
++												value={ item }
++											>
++												{ item.label }
++											</Select.Item>
++										) ) }
++									</Select.Popup>
++								</Select.Root>
++							</div>
++
++							<div style={ { marginTop: '1rem' } }>
++								<SelectControl
++									label="SelectControl"
++									items={ selectItems }
++								/>
++							</div>
+ 						</div>
+ 					</Popover>
+ 				) }

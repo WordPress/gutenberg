@@ -1,0 +1,81 @@
+diff --git a/packages/components/src/ui/context/stories/ComponentsProvider.stories.js b/packages/components/src/ui/context/stories/ComponentsProvider.stories.js
+index 0e8d01432d2a35..a3e26eb62762b7 100644
+--- a/packages/components/src/ui/context/stories/ComponentsProvider.stories.js
++++ b/packages/components/src/ui/context/stories/ComponentsProvider.stories.js
+@@ -6,7 +6,8 @@ import { createContext, useContext, memo, useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { Card, CardBody, View } from '../../';
++import { Card, CardBody } from '../../';
++import { View } from '../../../view';
+ import { Text } from '../../../text';
+ import { ContextSystemProvider } from '../index';
+ 
+@@ -40,7 +41,7 @@ const InnerCard = memo( () => {
+ 	return (
+ 		<View style={ { padding: 40 } }>
+ 			<Card>
+-				<CardBody style={ { border: '3px solid green' } }>
++				<CardBody as="div" style={ { border: '3px solid green' } }>
+ 					<InnerContent />
+ 				</CardBody>
+ 			</Card>
+@@ -60,6 +61,9 @@ export const Default = () => {
+ 		CardBody: {
+ 			as: 'a',
+ 			href: 'https://wordpress.org',
++			style: {
++				display: 'block',
++			},
+ 		},
+ 	};
+ 
+diff --git a/packages/components/src/ui/item-group/item-group.tsx b/packages/components/src/ui/item-group/item-group.tsx
+index 94849eb73cc40b..f25f073be335d6 100644
+--- a/packages/components/src/ui/item-group/item-group.tsx
++++ b/packages/components/src/ui/item-group/item-group.tsx
+@@ -1,3 +1,9 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+@@ -10,7 +16,10 @@ import type { Props } from './use-item-group';
+ import { ItemGroupContext, useItemGroupContext } from './context';
+ import { View } from '../../view';
+ 
+-function ItemGroup( props: PolymorphicComponentProps< Props, 'div' > ) {
++function ItemGroup(
++	props: PolymorphicComponentProps< Props, 'div' >,
++	forwardedRef: Ref< any >
++) {
+ 	const { bordered, separated, size: sizeProp, ...otherProps } = useItemGroup(
+ 		props
+ 	);
+@@ -27,7 +36,7 @@ function ItemGroup( props: PolymorphicComponentProps< Props, 'div' > ) {
+ 
+ 	return (
+ 		<ItemGroupContext.Provider value={ contextValue }>
+-			<View { ...otherProps } />
++			<View { ...otherProps } ref={ forwardedRef } />
+ 		</ItemGroupContext.Provider>
+ 	);
+ }
+diff --git a/packages/components/src/ui/scrollable/stories/index.js b/packages/components/src/ui/scrollable/stories/index.js
+index 4c8717d2a9d423..c7559489ff95a5 100644
+--- a/packages/components/src/ui/scrollable/stories/index.js
++++ b/packages/components/src/ui/scrollable/stories/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { View } from '../../../index';
++import { View } from '../../../view';
+ import { Scrollable } from '../index';
+ 
+ export default {

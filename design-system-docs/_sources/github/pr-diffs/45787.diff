@@ -1,0 +1,655 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 878f70a904aa3b..2c17553b489bcb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -50,6 +50,7 @@
+ -   `TabPanel`: Refactor away from `_.find()` ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
+ -   `BottomSheetPickerCell`: Refactor away from `_.find()` for mobile ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
+ -   Refactor global styles context away from `_.find()` for mobile ([#46537](https://github.com/WordPress/gutenberg/pull/46537)).
++-   `Dropdown`: Convert to TypeScript ([#45787](https://github.com/WordPress/gutenberg/pull/45787)).
+ 
+ ### Documentation
+ 
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index 20fe8d41f8142e..146ee37f93ccfa 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -25,9 +25,9 @@ import { StyledLabel } from '../../base-control/styles/base-control-styles';
+ import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
+ 
+ import type { ColorObject, PaletteObject } from '../../color-palette/types';
++import type { DropdownProps as DropdownComponentProps } from '../../dropdown/types';
+ import type { ColorProps, DropdownProps } from '../types';
+ 
+-const noop = () => undefined;
+ const getColorObject = (
+ 	colorValue: CSSProperties[ 'borderColor' ],
+ 	colors: ColorProps[ 'colors' ] | undefined,
+@@ -165,7 +165,9 @@ const BorderControlDropdown = (
+ 		? 'bottom left'
+ 		: undefined;
+ 
+-	const renderToggle = ( { onToggle = noop } ) => (
++	const renderToggle: DropdownComponentProps[ 'renderToggle' ] = ( {
++		onToggle,
++	} ) => (
+ 		<Button
+ 			onClick={ onToggle }
+ 			variant="tertiary"
+@@ -183,8 +185,9 @@ const BorderControlDropdown = (
+ 		</Button>
+ 	);
+ 
+-	// TODO: update types once Dropdown component is refactored to TypeScript.
+-	const renderContent = ( { onClose }: { onClose: () => void } ) => (
++	const renderContent: DropdownComponentProps[ 'renderContent' ] = ( {
++		onClose,
++	} ) => (
+ 		<>
+ 			<DropdownContentWrapper paddingSize="medium">
+ 				<VStack className={ popoverControlsClassName } spacing={ 6 }>
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index 5146e3c8581988..a2d2b530b1ebe2 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -32,6 +32,7 @@ import type {
+ 	SinglePaletteProps,
+ } from './types';
+ import type { WordPressComponentProps } from '../ui/context';
++import type { DropdownProps } from '../dropdown/types';
+ 
+ extend( [ namesPlugin, a11yPlugin ] );
+ 
+@@ -134,7 +135,7 @@ export function CustomColorPickerDropdown( {
+ 	popoverProps: receivedPopoverProps,
+ 	...props
+ }: CustomColorPickerDropdownProps ) {
+-	const popoverProps = useMemo(
++	const popoverProps = useMemo< DropdownProps[ 'popoverProps' ] >(
+ 		() => ( {
+ 			shift: true,
+ 			...( isRenderedInSidebar
+diff --git a/packages/components/src/color-palette/types.ts b/packages/components/src/color-palette/types.ts
+index 2b1be5a35bb678..4fc3192184f34b 100644
+--- a/packages/components/src/color-palette/types.ts
++++ b/packages/components/src/color-palette/types.ts
+@@ -1,12 +1,12 @@
+ /**
+  * External dependencies
+  */
+-import type { CSSProperties, MouseEventHandler, ReactNode } from 'react';
++import type { CSSProperties, ReactNode } from 'react';
+ 
+ /**
+  * Internal dependencies
+  */
+-import type { PopoverProps } from '../popover/types';
++import type { DropdownProps } from '../dropdown/types';
+ 
+ export type ColorObject = {
+ 	name: string;
+@@ -37,15 +37,8 @@ export type MultiplePalettesProps = PaletteProps & {
+ 	colors: PaletteObject[];
+ };
+ 
+-// TODO: should extend `Dropdown`'s props once it gets refactored to TypeScript
+-export type CustomColorPickerDropdownProps = {
++export type CustomColorPickerDropdownProps = DropdownProps & {
+ 	isRenderedInSidebar: boolean;
+-	renderContent: () => ReactNode;
+-	popoverProps?: Omit< PopoverProps, 'children' >;
+-	renderToggle: ( props: {
+-		isOpen: boolean;
+-		onToggle: MouseEventHandler< HTMLButtonElement >;
+-	} ) => ReactNode;
+ };
+ 
+ export type ColorPaletteProps = Pick< PaletteProps, 'onChange' > & {
+diff --git a/packages/components/src/dropdown/README.md b/packages/components/src/dropdown/README.md
+index c3ce8f42818fbe..62482f398e26ca 100644
+--- a/packages/components/src/dropdown/README.md
++++ b/packages/components/src/dropdown/README.md
+@@ -32,96 +32,91 @@ const MyDropdown = () => (
+ 
+ The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
+ 
+-### className
++### `className`: `string`
+ 
+ className of the global container
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-### contentClassName
++### `contentClassName`: `string`
+ 
+ If you want to target the dropdown menu for styling purposes, you need to provide a contentClassName because it's not being rendered as a child of the container node.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-### position
++### `expandOnMobile`: `boolean`
+ 
+-The direction in which the popover should open relative to its parent node. Specify a y- and an x-axis as a space-separated string. Supports `"top"`, `"bottom"` y-axis, and `"left"`, `"center"`, `"right"` x-axis.
++Opt-in prop to show popovers fullscreen on mobile.
+ 
+--   Type: `String`
+ -   Required: No
+--   Default: `"top center"`
+-
+-### renderToggle
+-
+-A callback invoked to render the Dropdown Toggle Button.
+-
+--   Type: `Function`
+--   Required: Yes
++-   Default: `false`
+ 
+-The first argument of the callback is an object containing the following properties:
++### `focusOnMount`: `'firstElement' | boolean`
+ 
+--   `isOpen`: whether the dropdown menu is opened or not
+--   `onToggle`: A function switching the dropdown menu's state from open to closed and vice versa
+--   `onClose`: A function that closes the menu if invoked
++By default, the _first tabbable element_ in the popover will receive focus when it mounts. This is the same as setting this prop to `"firstElement"`.
+ 
+-### renderContent
++Specifying a `true` value will focus the container instead.
+ 
+-A callback invoked to render the content of the dropdown menu. Its first argument is the same as the `renderToggle` prop.
++Specifying a `false` value disables the focus handling entirely (this should only be done when an appropriately accessible substitute behavior exists).
+ 
+--   Type: `Function`
+--   Required: Yes
++-   Required: No
++-   Default: `"firstElement"`
+ 
+-### expandOnMobile
++### `headerTitle`: `string`
+ 
+-Opt-in prop to show popovers fullscreen on mobile.
++Set this to customize the text that is shown in the dropdown's header when it is fullscreen on mobile.
+ 
+--   Type: `Boolean`
+ -   Required: No
+--   Default: `false`
+ 
+-### headerTitle
++### `onClose`: `() => void`
+ 
+-Set this to customize the text that is shown in the dropdown's header when it is fullscreen on mobile.
++A callback invoked when the popover should be closed.
+ 
+--   Type: `String`
+ -   Required: No
+ 
+-### focusOnMount
+-
+-By default, the _first tabbable element_ in the popover will receive focus when it mounts. This is the same as setting this prop to `"firstElement"`.
++### `onToggle`: `( willOpen: boolean ) => void`
+ 
+-Specifying a `true` value will focus the container instead.
++A callback invoked when the state of the popover changes from open to closed and vice versa.
+ 
+-Specifying a `false` value disables the focus handling entirely (this should only be done when an appropriately accessible substitute behavior exists).
++The callback receives a boolean as a parameter. If `true`, the popover will open. If `false`, the popover will close.
+ 
+--   Type: `'firstElement' | boolean`
+ -   Required: No
+--   Default: `"firstElement"`
+ 
+-### popoverProps
++### `popoverProps`: `WordPressComponentProps< Omit< PopoverProps, 'children' > 'div', false	>`
+ 
+ Properties of popoverProps object will be passed as props to the `Popover` component.
+ 
+ Use this object to access properties/features of the `Popover` component that are not already exposed in the `Dropdown` component, e.g.: the ability to have the popover without an arrow.
+ 
+--   Type: `Object`
+ -   Required: No
+ 
+-### onClose
++### `position`: `PopoverProps[ 'position' ]`
+ 
+-A callback invoked when the popover should be closed.
++The direction in which the popover should open relative to its parent node. Specify a y- and an x-axis as a space-separated string. Supports `"top"`, `"bottom"` y-axis, and `"left"`, `"center"`, `"right"` x-axis.
+ 
+--   Type: `Function`
+ -   Required: No
++-   Default: `"top center"`
+ 
+-### onToggle
++### `renderContent`: `( props: CallbackProps ) => ReactNode`
+ 
+-A callback invoked when the state of the popover changes from open to closed and vice versa.
++A callback invoked to render the content of the dropdown menu.
+ 
+-The callback receives a boolean as a parameter. If `true`, the popover will open. If `false`, the popover will close.
++- `isOpen`: whether the dropdown menu is opened or not
++- `onToggle`: A function switching the dropdown menu's state from open to closed and vice versa
++- `onClose`: A function that closes the menu if invoked
++
++-   Required: Yes
++
++### `renderToggle`: `( props: CallbackProps ) => ReactNode`
++
++A callback invoked to render the Dropdown Toggle Button.
++
++Its props are the same as the `renderContent` props.
++
++-   Required: Yes
++
++### `style`: `React.CSSProperties`
++
++The style of the global container
+ 
+--   Type: `Function`
+ -   Required: No
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.tsx
+similarity index 66%
+rename from packages/components/src/dropdown/index.js
+rename to packages/components/src/dropdown/index.tsx
+index 0092256a61225c..f048c6dfcad052 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.tsx
+@@ -1,35 +1,39 @@
+-// @ts-nocheck
+ /**
+  * External dependencies
+  */
+ import classnames from 'classnames';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { useRef, useEffect, useState } from '@wordpress/element';
++import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Popover from '../popover';
++import type { DropdownProps } from './types';
+ 
+-function useObservableState( initialState, onStateChange ) {
++function useObservableState(
++	initialState: boolean,
++	onStateChange?: ( newState: boolean ) => void
++) {
+ 	const [ state, setState ] = useState( initialState );
+ 	return [
+ 		state,
+-		( value ) => {
++		( value: boolean ) => {
+ 			setState( value );
+ 			if ( onStateChange ) {
+ 				onStateChange( value );
+ 			}
+ 		},
+-	];
++	] as const;
+ }
+ 
+-export default function Dropdown( props ) {
+-	const {
++function UnforwardedDropdown(
++	{
+ 		renderContent,
+ 		renderToggle,
+ 		className,
+@@ -42,12 +46,14 @@ export default function Dropdown( props ) {
+ 		onClose,
+ 		onToggle,
+ 		style,
+-	} = props;
++	}: DropdownProps,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	// Use internal state instead of a ref to make sure that the component
+ 	// re-renders when the popover's anchor updates.
+ 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
+-		useState( null );
+-	const containerRef = useRef();
++		useState< HTMLDivElement | null >( null );
++	const containerRef = useRef< HTMLDivElement >();
+ 	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
+ 
+ 	useEffect(
+@@ -70,8 +76,13 @@ export default function Dropdown( props ) {
+ 	 * case a dialog has opened, allowing focus to return when it's dismissed.
+ 	 */
+ 	function closeIfFocusOutside() {
++		if ( ! containerRef.current ) {
++			return;
++		}
++
+ 		const { ownerDocument } = containerRef.current;
+-		const dialog = ownerDocument.activeElement.closest( '[role="dialog"]' );
++		const dialog =
++			ownerDocument?.activeElement?.closest( '[role="dialog"]' );
+ 		if (
+ 			! containerRef.current.contains( ownerDocument.activeElement ) &&
+ 			( ! dialog || dialog.contains( containerRef.current ) )
+@@ -99,11 +110,15 @@ export default function Dropdown( props ) {
+ 	return (
+ 		<div
+ 			className={ classnames( 'components-dropdown', className ) }
+-			ref={ useMergeRefs( [ setFallbackPopoverAnchor, containerRef ] ) }
++			ref={ useMergeRefs( [
++				containerRef,
++				forwardedRef,
++				setFallbackPopoverAnchor,
++			] ) }
+ 			// Some UAs focus the closest focusable parent when the toggle is
+ 			// clicked. Making this div focusable ensures such UAs will focus
+ 			// it and `closeIfFocusOutside` can tell if the toggle was clicked.
+-			tabIndex="-1"
++			tabIndex={ -1 }
+ 			style={ style }
+ 		>
+ 			{ renderToggle( args ) }
+@@ -136,3 +151,32 @@ export default function Dropdown( props ) {
+ 		</div>
+ 	);
+ }
++
++/**
++ * Renders a button that opens a floating content modal when clicked.
++ *
++ * ```jsx
++ * import { Button, Dropdown } from '@wordpress/components';
++ *
++ * const MyDropdown = () => (
++ *   <Dropdown
++ *     className="my-container-class-name"
++ *     contentClassName="my-popover-content-classname"
++ *     position="bottom right"
++ *     renderToggle={ ( { isOpen, onToggle } ) => (
++ *       <Button
++ *         variant="primary"
++ *         onClick={ onToggle }
++ *         aria-expanded={ isOpen }
++ *       >
++ *         Toggle Popover!
++ *       </Button>
++ *     ) }
++ *     renderContent={ () => <div>This is the content of the popover.</div> }
++ *   />
++ * );
++ * ```
++ */
++export const Dropdown = forwardRef( UnforwardedDropdown );
++
++export default Dropdown;
+diff --git a/packages/components/src/dropdown/stories/index.js b/packages/components/src/dropdown/stories/index.tsx
+similarity index 75%
+rename from packages/components/src/dropdown/stories/index.js
+rename to packages/components/src/dropdown/stories/index.tsx
+index 191b03bb07d8be..ff155b6c42b5b9 100644
+--- a/packages/components/src/dropdown/stories/index.js
++++ b/packages/components/src/dropdown/stories/index.tsx
+@@ -1,29 +1,38 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
+ /**
+  * Internal dependencies
+  */
+-import Dropdown from '../';
++import Dropdown from '..';
+ import Button from '../../button';
+ import { DropdownContentWrapper } from '../dropdown-content-wrapper';
+ 
+-export default {
++const meta: ComponentMeta< typeof Dropdown > = {
+ 	title: 'Components/Dropdown',
+ 	component: Dropdown,
+ 	subcomponents: { DropdownContentWrapper },
+ 	argTypes: {
+-		expandOnMobile: { control: { type: 'boolean' } },
+ 		focusOnMount: {
+ 			control: {
+ 				type: 'radio',
+ 				options: [ 'firstElement', true, false ],
+ 			},
+ 		},
+-		headerTitle: { control: { type: 'text' } },
+ 		renderContent: { control: { type: null } },
+ 		renderToggle: { control: { type: null } },
+ 	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++	},
+ };
++export default meta;
+ 
+-const Template = ( args ) => {
++const Template: ComponentStory< typeof Dropdown > = ( args ) => {
+ 	return (
+ 		<div style={ { height: 150 } }>
+ 			<Dropdown { ...args } />
+@@ -31,7 +40,7 @@ const Template = ( args ) => {
+ 	);
+ };
+ 
+-export const Default = Template.bind( {} );
++export const Default: ComponentStory< typeof Dropdown > = Template.bind( {} );
+ Default.args = {
+ 	position: 'bottom right',
+ 	renderToggle: ( { isOpen, onToggle } ) => (
+@@ -46,7 +55,9 @@ Default.args = {
+  * To apply more padding to the dropdown content, use the provided `<DropdownContentWrapper>`
+  * convenience wrapper. A `paddingSize` of `"medium"` is suitable for relatively larger dropdowns (default is `"small"`).
+  */
+-export const WithMorePadding = Template.bind( {} );
++export const WithMorePadding: ComponentStory< typeof Dropdown > = Template.bind(
++	{}
++);
+ WithMorePadding.args = {
+ 	...Default.args,
+ 	renderContent: () => (
+@@ -61,7 +72,9 @@ WithMorePadding.args = {
+  * with a `paddingSize` of `"none"`. This can also serve as a clean foundation to add arbitrary
+  * paddings, for example when child components already have padding on their own.
+  */
+-export const WithNoPadding = Template.bind( {} );
++export const WithNoPadding: ComponentStory< typeof Dropdown > = Template.bind(
++	{}
++);
+ WithNoPadding.args = {
+ 	...Default.args,
+ 	renderContent: () => (
+diff --git a/packages/components/src/dropdown/test/index.js b/packages/components/src/dropdown/test/index.tsx
+similarity index 77%
+rename from packages/components/src/dropdown/test/index.js
+rename to packages/components/src/dropdown/test/index.tsx
+index b4d4f81fde8d1a..32307aceea0617 100644
+--- a/packages/components/src/dropdown/test/index.js
++++ b/packages/components/src/dropdown/test/index.tsx
+@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * Internal dependencies
+  */
+-import Dropdown from '../';
++import Dropdown from '..';
+ 
+ describe( 'Dropdown', () => {
+ 	it( 'should toggle the dropdown properly', async () => {
+@@ -24,14 +24,13 @@ describe( 'Dropdown', () => {
+ 					</button>
+ 				) }
+ 				renderContent={ () => <span>test</span> }
+-				popoverProps={ { 'data-testid': 'popover' } }
+ 			/>
+ 		);
+ 
+ 		const button = screen.getByRole( 'button', { expanded: false } );
+ 
+ 		expect( button ).toBeVisible();
+-		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
++		expect( screen.queryByText( 'test' ) ).not.toBeInTheDocument();
+ 
+ 		await user.click( button );
+ 
+@@ -40,7 +39,7 @@ describe( 'Dropdown', () => {
+ 		).toBeVisible();
+ 
+ 		await waitFor( () =>
+-			expect( screen.getByTestId( 'popover' ) ).toBeVisible()
++			expect( screen.queryByText( 'test' ) ).toBeVisible()
+ 		);
+ 
+ 		// Cleanup remaining effects, like the delayed popover positioning
+@@ -68,21 +67,20 @@ describe( 'Dropdown', () => {
+ 						close
+ 					</button>,
+ 				] }
+-				renderContent={ () => null }
+-				popoverProps={ { 'data-testid': 'popover' } }
++				renderContent={ () => <span>test</span> }
+ 			/>
+ 		);
+ 
+-		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
++		expect( screen.queryByText( 'test' ) ).not.toBeInTheDocument();
+ 
+ 		await user.click( screen.getByRole( 'button', { name: 'Toggle' } ) );
+ 
+ 		await waitFor( () =>
+-			expect( screen.getByTestId( 'popover' ) ).toBeVisible()
++			expect( screen.getByText( 'test' ) ).toBeVisible()
+ 		);
+ 
+ 		await user.click( screen.getByRole( 'button', { name: 'close' } ) );
+ 
+-		expect( screen.queryByTestId( 'popover' ) ).not.toBeInTheDocument();
++		expect( screen.queryByText( 'test' ) ).not.toBeInTheDocument();
+ 	} );
+ } );
+diff --git a/packages/components/src/dropdown/types.ts b/packages/components/src/dropdown/types.ts
+index 573e0b5ee7e017..822c9d4f2bc436 100644
+--- a/packages/components/src/dropdown/types.ts
++++ b/packages/components/src/dropdown/types.ts
+@@ -1,3 +1,20 @@
++/**
++ * External dependencies
++ */
++import type { ComponentPropsWithoutRef, CSSProperties, ReactNode } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type Popover from '../popover';
++import type { PopoverProps } from '../popover/types';
++
++type CallbackProps = {
++	isOpen: boolean;
++	onToggle: () => void;
++	onClose: () => void;
++};
++
+ export type DropdownContentWrapperProps = {
+ 	/**
+ 	 * Amount of padding to apply on the dropdown content.
+@@ -6,3 +23,93 @@ export type DropdownContentWrapperProps = {
+ 	 */
+ 	paddingSize?: 'none' | 'small' | 'medium';
+ };
++
++export type DropdownProps = {
++	/**
++	 * The className of the global container.
++	 */
++	className?: string;
++	/**
++	 * If you want to target the dropdown menu for styling purposes,
++	 * you need to provide a contentClassName because it's not being rendered
++	 * as a child of the container node.
++	 */
++	contentClassName?: string;
++	/**
++	 * Opt-in prop to show popovers fullscreen on mobile.
++	 *
++	 * @default false
++	 */
++	expandOnMobile?: boolean;
++	/**
++	 * By default, the first tabbable element in the popover will receive focus
++	 * when it mounts. This is the same as setting this prop to "firstElement".
++	 * Specifying a true value will focus the container instead.
++	 * Specifying a false value disables the focus handling entirely
++	 * (this should only be done when an appropriately accessible
++	 * substitute behavior exists).
++	 *
++	 * @default 'firstElement'
++	 */
++	focusOnMount?: 'firstElement' | boolean;
++	/**
++	 * Set this to customize the text that is shown in the dropdown's header
++	 * when it is fullscreen on mobile.
++	 */
++	headerTitle?: string;
++	/**
++	 * A callback invoked when the popover should be closed.
++	 */
++	onClose?: () => void;
++	/**
++	 * A callback invoked when the state of the popover changes
++	 * from open to closed and vice versa.
++	 * The callback receives a boolean as a parameter.
++	 * If true, the popover will open.
++	 * If false, the popover will close.
++	 */
++	onToggle?: ( willOpen: boolean ) => void;
++	/**
++	 * Properties of popoverProps object will be passed as props
++	 * to the Popover component.
++	 * Use this object to access properties/features
++	 * of the Popover component that are not already exposed
++	 * in the Dropdown component,
++	 * e.g.: the ability to have the popover without an arrow.
++	 */
++	popoverProps?: Omit<
++		ComponentPropsWithoutRef< typeof Popover >,
++		'children'
++	>;
++	/**
++	 * The direction in which the popover should open
++	 * relative to its parent node.
++	 * Specify a y- and an x-axis as a space-separated string.
++	 * Supports "top", "bottom" y-axis,
++	 * and "left", "center", "right" x-axis.
++	 *
++	 * @default 'top center'
++	 */
++	position?: PopoverProps[ 'position' ];
++	/**
++	 * A callback invoked to render the content of the dropdown menu.
++	 * Its first argument is the same as the renderToggle prop.
++	 */
++	renderContent: ( props: CallbackProps ) => ReactNode;
++	/**
++	 * A callback invoked to render the Dropdown Toggle Button.
++	 *
++	 * The first argument of the callback is an object
++	 * containing the following properties:
++	 *
++	 * - isOpen: whether the dropdown menu is opened or not
++	 * - onToggle: A function switching the dropdown menu's state
++	 * from open to closed and vice versa
++	 * - onClose: A function that closes the menu if invoked
++	 */
++	renderToggle: ( props: CallbackProps ) => ReactNode;
++	/**
++	 * The style of the global container.
++	 */
++	style?: CSSProperties;
++};

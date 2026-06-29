@@ -1,0 +1,168 @@
+diff --git a/docs/manifest-devhub.json b/docs/manifest-devhub.json
+index 10b2c9362e8aef..018d0b175dbece 100644
+--- a/docs/manifest-devhub.json
++++ b/docs/manifest-devhub.json
+@@ -971,6 +971,12 @@
+ 		"markdown_source": "../packages/components/src/tree-select/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "VisuallyHidden",
++		"slug": "visually-hidden",
++		"markdown_source": "../packages/components/src/visually-hidden/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "Data Module Reference",
+ 		"slug": "data",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 8542a86ba9b659..463241f06bf66b 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -62,6 +62,7 @@ export { default as Toolbar } from './toolbar';
+ export { default as ToolbarButton } from './toolbar-button';
+ export { default as Tooltip } from './tooltip';
+ export { default as TreeSelect } from './tree-select';
++export { default as VisuallyHidden } from './visually-hidden';
+ export { default as IsolatedEventContainer } from './isolated-event-container';
+ export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
+ 
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 6365bff68cf568..08fc9961be5e63 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -44,3 +44,4 @@
+ @import "./toolbar/style.scss";
+ @import "./toolbar-button/style.scss";
+ @import "./tooltip/style.scss";
++@import "./visually-hidden/style.scss";
+diff --git a/packages/components/src/visually-hidden/README.md b/packages/components/src/visually-hidden/README.md
+new file mode 100644
+index 00000000000000..1f490f5134af26
+--- /dev/null
++++ b/packages/components/src/visually-hidden/README.md
+@@ -0,0 +1,9 @@
++# VisuallyHidden
++
++A component used to render text intended to be visually hidden, but will show for alternate devices, for example a screen reader.
++
++### Usage
++
++```jsx
++<VisuallyHidden> Show text for screenreader. </VisuallyHidden>
++```
+diff --git a/packages/components/src/visually-hidden/index.js b/packages/components/src/visually-hidden/index.js
+new file mode 100644
+index 00000000000000..b29c954c2cd9e1
+--- /dev/null
++++ b/packages/components/src/visually-hidden/index.js
+@@ -0,0 +1,22 @@
++
++/**
++ * Internal dependencies
++ */
++import { renderAsRenderProps } from './utils';
++
++/**
++ * VisuallyHidden component to render text out non-visually
++ * for use in devices such as a screen reader.
++ */
++function VisuallyHidden( {
++	as = 'div',
++	...props
++} ) {
++	return renderAsRenderProps( {
++		as,
++		className: 'components-visually-hidden',
++		...props,
++	} );
++}
++export default VisuallyHidden;
++
+diff --git a/packages/components/src/visually-hidden/stories/index.js b/packages/components/src/visually-hidden/stories/index.js
+new file mode 100644
+index 00000000000000..03b60ccc334126
+--- /dev/null
++++ b/packages/components/src/visually-hidden/stories/index.js
+@@ -0,0 +1,17 @@
++/**
++ * Internal dependencies
++ */
++import VisuallyHidden from '../';
++
++export default { title: 'VisuallyHidden', component: VisuallyHidden };
++
++export const _default = () => (
++	<>
++		<VisuallyHidden>
++			This should not show.
++		</VisuallyHidden>
++		<div>
++			This text will <VisuallyHidden as="span">but not inline </VisuallyHidden> always show.
++		</div>
++	</>
++);
+diff --git a/packages/components/src/visually-hidden/style.scss b/packages/components/src/visually-hidden/style.scss
+new file mode 100644
+index 00000000000000..02fec4486afa23
+--- /dev/null
++++ b/packages/components/src/visually-hidden/style.scss
+@@ -0,0 +1,30 @@
++.components-visually-hidden {
++	border: 0;
++	clip: rect(1px, 1px, 1px, 1px);
++	-webkit-clip-path: inset(50%);
++	clip-path: inset(50%);
++	height: 1px;
++	margin: -1px;
++	overflow: hidden;
++	padding: 0;
++	position: absolute;
++	width: 1px;
++	word-wrap: normal !important;
++}
++
++.components-visually-hidden:focus {
++	background-color: $light-gray-500;
++	clip: auto !important;
++	clip-path: none;
++	color: #444;
++	display: block;
++	font-size: 1em;
++	height: auto;
++	left: 5px;
++	line-height: normal;
++	padding: 15px 23px 14px;
++	text-decoration: none;
++	top: 5px;
++	width: auto;
++	z-index: 100000;
++}
+diff --git a/packages/components/src/visually-hidden/utils.js b/packages/components/src/visually-hidden/utils.js
+new file mode 100644
+index 00000000000000..07957708090ef0
+--- /dev/null
++++ b/packages/components/src/visually-hidden/utils.js
+@@ -0,0 +1,22 @@
++/**
++ * Utility Functions
++ */
++
++/**
++ * renderAsRenderProps is used to wrap a component and convert
++ * the passed property "as" either a string or component, to the
++ * rendered tag if a string, or component.
++ *
++ * See VisuallyHidden hidden for example.
++ *
++ * @param {string|Component} as A tag or component to render.
++ * @return {Component} The rendered component.
++ */
++function renderAsRenderProps( { as: Component = 'div', ...props } ) {
++	if ( typeof props.children === 'function' ) {
++		return props.children( props );
++	}
++	return <Component { ...props } />;
++}
++
++export { renderAsRenderProps };

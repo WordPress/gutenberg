@@ -1,0 +1,37 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9603d9656d5069..2ca5bec5bf1f9f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -32,6 +32,7 @@
+ 
+ -   ESLint: Stop disabling `react-hooks/exhaustive-deps` rule ([#66324](https://github.com/WordPress/gutenberg/pull/66324)).
+ -   `TabPanel`: Add 40px size prop to tab Button ([#66557](https://github.com/WordPress/gutenberg/pull/66557)).
++-   `Panel`: Add 40px size prop to Button ([#66589](https://github.com/WordPress/gutenberg/pull/66589)).
+ 
+ ## 28.10.0 (2024-10-16)
+ 
+diff --git a/packages/components/src/panel/body.tsx b/packages/components/src/panel/body.tsx
+index bf6b867dccbf45..ee1121ef04f4cb 100644
+--- a/packages/components/src/panel/body.tsx
++++ b/packages/components/src/panel/body.tsx
+@@ -116,6 +116,7 @@ const PanelBodyTitle = forwardRef(
+ 		return (
+ 			<h2 className="components-panel__body-title">
+ 				<Button
++					__next40pxDefaultSize
+ 					className="components-panel__body-toggle"
+ 					aria-expanded={ isOpened }
+ 					ref={ ref }
+diff --git a/packages/editor/src/components/plugin-post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/plugin-post-publish-panel/test/__snapshots__/index.js.snap
+index 5a057456d06aca..b144d525374c96 100644
+--- a/packages/editor/src/components/plugin-post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/plugin-post-publish-panel/test/__snapshots__/index.js.snap
+@@ -10,7 +10,7 @@ exports[`PluginPostPublishPanel renders fill properly 1`] = `
+     >
+       <button
+         aria-expanded="true"
+-        class="components-button components-panel__body-toggle"
++        class="components-button components-panel__body-toggle is-next-40px-default-size"
+         type="button"
+       >
+         <span

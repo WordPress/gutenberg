@@ -1,0 +1,620 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index c2ef0284a99b95..99b40cb945910f 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ 
+ ### Enhancements
+ 
++-   `Dialog`: Add `Dialog.Description` sub-component, expose `onOpenChangeComplete`, skip the backdrop when `modal` is not `true`, use `100dvh` for viewport-based heights so the popup fits the dynamic viewport on mobile, and forward `className` on `Dialog.Title` ([#77194](https://github.com/WordPress/gutenberg/pull/77194)).
+ -   `Dialog`, `Popover`: Upgrade dev-only title validation from mount-only to cleanup-based re-validation, catching conditionally rendered titles ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
+ -   `Link`: Honor `openInNewTab` consistently instead of treating hash links as a special case ([#77422](https://github.com/WordPress/gutenberg/pull/77422)).
+ 
+diff --git a/packages/ui/src/dialog/context.tsx b/packages/ui/src/dialog/context.tsx
+index 1a1d1cef8a25f4..d32c94909290bd 100644
+--- a/packages/ui/src/dialog/context.tsx
++++ b/packages/ui/src/dialog/context.tsx
+@@ -1,3 +1,4 @@
++import type { Dialog as _Dialog } from '@base-ui/react/dialog';
+ import {
+ 	createContext,
+ 	useCallback,
+@@ -8,6 +9,31 @@ import {
+ } from '@wordpress/element';
+ import { useScheduleValidation } from '../utils/use-schedule-validation';
+ 
++// -- Modal context ----------------------------------------------------------
++
++const DialogModalContext =
++	createContext< _Dialog.Root.Props[ 'modal' ] >( true );
++
++export function DialogModalProvider( {
++	modal,
++	children,
++}: {
++	modal: _Dialog.Root.Props[ 'modal' ];
++	children: React.ReactNode;
++} ) {
++	return (
++		<DialogModalContext.Provider value={ modal }>
++			{ children }
++		</DialogModalContext.Provider>
++	);
++}
++
++export function useDialogModal() {
++	return useContext( DialogModalContext );
++}
++
++// -- Validation context (dev-only) ------------------------------------------
++
+ /**
+  * Whether validation is enabled. This is a build-time constant that allows
+  * bundlers to tree-shake all validation code in production builds.
+@@ -88,17 +114,17 @@ function DialogValidationProviderDev( {
+ 		[ scheduleValidation ]
+ 	);
+ 
++	const contextValue = useMemo(
++		() => ( { registerTitle } ),
++		[ registerTitle ]
++	);
++
+ 	// Schedule an initial validation on mount to catch missing titles
+ 	// (when no Title component is rendered, registerTitle is never called).
+ 	useEffect( () => {
+ 		scheduleValidation();
+ 	}, [ scheduleValidation ] );
+ 
+-	const contextValue = useMemo(
+-		() => ( { registerTitle } ),
+-		[ registerTitle ]
+-	);
+-
+ 	return (
+ 		<DialogValidationContext.Provider value={ contextValue }>
+ 			{ children }
+diff --git a/packages/ui/src/dialog/description.tsx b/packages/ui/src/dialog/description.tsx
+new file mode 100644
+index 00000000000000..26cdf3c36ada4d
+--- /dev/null
++++ b/packages/ui/src/dialog/description.tsx
+@@ -0,0 +1,28 @@
++import { Dialog as _Dialog } from '@base-ui/react/dialog';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { Text } from '../text';
++import styles from './style.module.css';
++import type { DescriptionProps } from './types';
++
++/**
++ * Renders an optional paragraph that describes the dialog content.
++ *
++ * The rendered element is linked to the popup via `aria-describedby`.
++ */
++const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
++	function DialogDescription( { className, children, ...props }, ref ) {
++		return (
++			<Text
++				ref={ ref }
++				variant="body-md"
++				render={ <_Dialog.Description { ...props } /> }
++				className={ clsx( styles.description, className ) }
++			>
++				{ children }
++			</Text>
++		);
++	}
++);
++
++export { Description };
+diff --git a/packages/ui/src/dialog/index.ts b/packages/ui/src/dialog/index.ts
+index cd76ce7a5d4f0c..fe245283db524f 100644
+--- a/packages/ui/src/dialog/index.ts
++++ b/packages/ui/src/dialog/index.ts
+@@ -1,5 +1,6 @@
+ import { Action } from './action';
+ import { CloseIcon } from './close-icon';
++import { Description } from './description';
+ import { Footer } from './footer';
+ import { Header } from './header';
+ import { Popup } from './popup';
+@@ -11,6 +12,7 @@ import { Trigger } from './trigger';
+ export {
+ 	Action,
+ 	CloseIcon,
++	Description,
+ 	Footer,
+ 	Header,
+ 	Popup,
+diff --git a/packages/ui/src/dialog/popup.tsx b/packages/ui/src/dialog/popup.tsx
+index a1dc6e9c55716a..1554c42e157d33 100644
+--- a/packages/ui/src/dialog/popup.tsx
++++ b/packages/ui/src/dialog/popup.tsx
+@@ -9,7 +9,7 @@ import {
+ import { unlock } from '../lock-unlock';
+ import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+ import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+-import { DialogValidationProvider } from './context';
++import { DialogValidationProvider, useDialogModal } from './context';
+ import { Portal } from './portal';
+ import styles from './style.module.css';
+ import type { PopupProps } from './types';
+@@ -30,10 +30,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
+ 	{
+ 		className,
+ 		portal,
++		children,
+ 		size = 'medium',
+ 		initialFocus,
+ 		finalFocus,
+-		children,
+ 		...props
+ 	},
+ 	ref
+@@ -43,10 +43,21 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
+ 		deprioritizedAttribute: CLOSE_ICON_ATTR,
+ 	} );
+ 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
++	const modal = useDialogModal();
+ 
+ 	const portalChildren = (
+ 		<>
+-			<_Dialog.Backdrop className={ styles.backdrop } />
++			{ /*
++			 * Only render a backdrop for fully modal dialogs. Non-modal dialogs
++			 * should not dim the page, and `trap-focus` keeps outside pointer
++			 * interactions enabled, so a backdrop would misrepresent that mode.
++			 */ }
++			{ modal === true && (
++				<_Dialog.Backdrop
++					className={ styles.backdrop }
++					data-wp-ui-dialog-backdrop=""
++				/>
++			) }
+ 			<ThemeProvider>
+ 				<_Dialog.Popup
+ 					ref={ mergedRef }
+diff --git a/packages/ui/src/dialog/root.tsx b/packages/ui/src/dialog/root.tsx
+index bd5acb96390902..3cbf9cbcbccfc7 100644
+--- a/packages/ui/src/dialog/root.tsx
++++ b/packages/ui/src/dialog/root.tsx
+@@ -1,14 +1,31 @@
+ import { Dialog as _Dialog } from '@base-ui/react/dialog';
++import { DialogModalProvider } from './context';
+ import type { RootProps } from './types';
+ 
+ /**
+- * Groups the dialog trigger and popup.
++ * An ARIA-compliant dialog that opens on top of the entire page.
+  *
+- * `Dialog` is a collection of React components that combine to render
+- * an ARIA-compliant dialog pattern.
++ * Every dialog must include a `Dialog.Title` component for accessibility — it
++ * serves as both the visible heading and the accessible label for the dialog.
++ *
++ * Always include a visible close button, either `Dialog.CloseIcon` or a clear
++ * dismissing action button. If your dialog has a "Cancel" button in the footer,
++ * the close icon may be redundant and create confusion about what clicking "X"
++ * means.
++ *
++ * Use `Dialog.CloseIcon` for informational dialogs where dismissing is safe and
++ * expected. For dialogs requiring explicit user choice (especially destructive
++ * actions), omit the close icon and rely on footer action buttons like "Cancel"
++ * and "Confirm" instead.
+  */
+-function Root( props: RootProps ) {
+-	return <_Dialog.Root { ...props } />;
++function Root( { modal = true, children, ...props }: RootProps ) {
++	return (
++		<_Dialog.Root modal={ modal } { ...props }>
++			<DialogModalProvider modal={ modal }>
++				{ children }
++			</DialogModalProvider>
++		</_Dialog.Root>
++	);
+ }
+ 
+ export { Root };
+diff --git a/packages/ui/src/dialog/stories/index.story.tsx b/packages/ui/src/dialog/stories/index.story.tsx
+index 09f5d3ae3479dc..035c70a3d03b5f 100644
+--- a/packages/ui/src/dialog/stories/index.story.tsx
++++ b/packages/ui/src/dialog/stories/index.story.tsx
+@@ -12,6 +12,7 @@ const meta: Meta< typeof Dialog.Root > = {
+ 		'Dialog.Popup': Dialog.Popup,
+ 		'Dialog.Header': Dialog.Header,
+ 		'Dialog.Title': Dialog.Title,
++		'Dialog.Description': Dialog.Description,
+ 		'Dialog.CloseIcon': Dialog.CloseIcon,
+ 		'Dialog.Action': Dialog.Action,
+ 		'Dialog.Footer': Dialog.Footer,
+@@ -20,25 +21,6 @@ const meta: Meta< typeof Dialog.Root > = {
+ 		modal: {
+ 			control: 'inline-radio',
+ 			options: [ true, false, 'trap-focus' ],
+-			table: {
+-				defaultValue: { summary: 'true' },
+-				type: {
+-					summary: 'boolean | "trap-focus"',
+-				},
+-			},
+-		},
+-	},
+-	parameters: {
+-		docs: {
+-			description: {
+-				component: `
+-Dialog is a popup that opens on top of the entire page. Every dialog must include a \`Dialog.Title\` component for accessibility — it serves as both the visible heading and the accessible label for the dialog.
+-
+-When using the Dialog component, make sure to always include a visible close button, either \`Dialog.CloseIcon\` or a clear dismissing action button. If your dialog has a "Cancel" button in the footer, the close icon may be redundant and create confusion about what clicking "X" means.
+-
+-Use \`Dialog.CloseIcon\` for informational dialogs where dismissing is safe and expected. For dialogs requiring explicit user choice (especially destructive actions), omit the close icon and rely on footer action buttons like "Cancel" and "Confirm" instead.
+-				`,
+-			},
+ 		},
+ 	},
+ };
+@@ -60,11 +42,11 @@ export const _Default: Story = {
+ 						<Dialog.Title>Welcome</Dialog.Title>
+ 						<Dialog.CloseIcon />
+ 					</Dialog.Header>
+-					<p>
++					<Dialog.Description>
+ 						This dialog demonstrates best practices for
+ 						informational dialogs. It includes a close icon because
+ 						dismissing it is safe and expected.
+-					</p>
++					</Dialog.Description>
+ 					<Dialog.Footer>
+ 						<Dialog.Action>Got it</Dialog.Action>
+ 					</Dialog.Footer>
+diff --git a/packages/ui/src/dialog/style.module.css b/packages/ui/src/dialog/style.module.css
+index f2e8ed65acd887..0d70c6d6d6b0c1 100644
+--- a/packages/ui/src/dialog/style.module.css
++++ b/packages/ui/src/dialog/style.module.css
+@@ -34,6 +34,8 @@
+ 	}
+ 
+ 	.popup {
++		--_viewport-inset: var(--wpds-dimension-padding-2xl);
++
+ 		position: fixed;
+ 		top: 50%;
+ 		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical centering technique used with transform: translate(-50%, -50%) */
+@@ -42,8 +44,8 @@
+ 		transform: translate(-50%, -50%);
+ 		box-sizing: border-box;
+ 		min-width: var(--wpds-dimension-surface-width-sm);
+-		width: calc(100vw - 2 * var(--wpds-dimension-padding-2xl));
+-		max-height: calc(100vh - 2 * var(--wpds-dimension-padding-2xl));
++		width: calc(100vw - 2 * var(--_viewport-inset));
++		max-height: calc(100dvh - 2 * var(--_viewport-inset));
+ 		padding: var(--wpds-dimension-padding-2xl);
+ 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+ 		border-radius: var(--wpds-border-radius-lg);
+@@ -98,7 +100,7 @@
+ 			 * Force full height (full width is already in default styles).
+ 			 * The max-{width,height} properties will make sure some padding is shown.
+ 			 */
+-			height: 100vh;
++			height: 100dvh;
+ 		}
+ 	}
+ 
+@@ -121,6 +123,11 @@
+ 		}
+ 	}
+ 
++	.description {
++		margin-bottom: var(--wpds-dimension-gap-lg);
++		color: var(--wpds-color-fg-content-neutral-weak);
++	}
++
+ 	.footer {
+ 		display: flex;
+ 		justify-content: flex-end;
+diff --git a/packages/ui/src/dialog/test/index.test.tsx b/packages/ui/src/dialog/test/index.test.tsx
+index 140d0effc0a8b4..80526cac1a0958 100644
+--- a/packages/ui/src/dialog/test/index.test.tsx
++++ b/packages/ui/src/dialog/test/index.test.tsx
+@@ -24,6 +24,7 @@ describe( 'Dialog', () => {
+ 		const actionRef = createRef< HTMLButtonElement >();
+ 		const headerRef = createRef< HTMLDivElement >();
+ 		const titleRef = createRef< HTMLHeadingElement >();
++		const descriptionRef = createRef< HTMLParagraphElement >();
+ 		const closeIconRef = createRef< HTMLButtonElement >();
+ 		const footerRef = createRef< HTMLDivElement >();
+ 
+@@ -37,6 +38,9 @@ describe( 'Dialog', () => {
+ 						</Dialog.Title>
+ 						<Dialog.CloseIcon ref={ closeIconRef } />
+ 					</Dialog.Header>
++					<Dialog.Description ref={ descriptionRef }>
++						A test description
++					</Dialog.Description>
+ 					<Dialog.Footer ref={ footerRef }>
+ 						<Dialog.Action ref={ actionRef }>Close</Dialog.Action>
+ 					</Dialog.Footer>
+@@ -58,11 +62,189 @@ describe( 'Dialog', () => {
+ 		// Now that the dialog is open, verify all inner refs
+ 		expect( headerRef.current ).toBeInstanceOf( HTMLDivElement );
+ 		expect( titleRef.current ).toBeInstanceOf( HTMLHeadingElement );
++		expect( descriptionRef.current ).toBeInstanceOf( HTMLParagraphElement );
+ 		expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
+ 		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
+ 		expect( footerRef.current ).toBeInstanceOf( HTMLDivElement );
+ 	} );
+ 
++	it( 'associates Dialog.Description with the popup via aria-describedby', async () => {
++		const user = userEvent.setup();
++		const popupRef = createRef< HTMLDivElement >();
++
++		render(
++			<Dialog.Root>
++				<Dialog.Trigger>Open</Dialog.Trigger>
++				<Dialog.Popup ref={ popupRef }>
++					<Dialog.Title>Title</Dialog.Title>
++					<Dialog.Description>My description</Dialog.Description>
++				</Dialog.Popup>
++			</Dialog.Root>
++		);
++
++		await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++		await waitFor( () => {
++			expect( popupRef.current ).toHaveAccessibleDescription(
++				'My description'
++			);
++		} );
++	} );
++
++	it( 'renders Dialog.Footer and supports render/className props', async () => {
++		const user = userEvent.setup();
++
++		render(
++			<Dialog.Root>
++				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++				<Dialog.Popup>
++					<Dialog.Title>Test Dialog</Dialog.Title>
++					<Dialog.Footer
++						render={ <section data-testid="dialog-footer" /> }
++						className="custom-footer"
++					>
++						<Dialog.Action>Close</Dialog.Action>
++					</Dialog.Footer>
++				</Dialog.Popup>
++			</Dialog.Root>
++		);
++
++		await user.click(
++			screen.getByRole( 'button', { name: 'Open Dialog' } )
++		);
++
++		const footer = await screen.findByTestId( 'dialog-footer' );
++		expect( footer.tagName ).toBe( 'SECTION' );
++		expect( footer ).toHaveClass( 'custom-footer' );
++		expect(
++			screen.getByRole( 'button', { name: 'Close' } )
++		).toBeInTheDocument();
++	} );
++
++	it( 'renders backdrop only when modal is true', async () => {
++		const getBackdrops = () =>
++			// eslint-disable-next-line testing-library/no-node-access -- The backdrop has no semantic role; querying by the stable `data-wp-ui-dialog-backdrop` attribute (mirroring the Dialog close-icon pattern) is more robust than the Base UI role/state it inherits.
++			document.querySelectorAll( '[data-wp-ui-dialog-backdrop]' );
++
++		const view = render(
++			<Dialog.Root open modal>
++				<Dialog.Popup>
++					<Dialog.Title>Modal dialog</Dialog.Title>
++				</Dialog.Popup>
++			</Dialog.Root>
++		);
++
++		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
++		expect( getBackdrops() ).toHaveLength( 1 );
++
++		view.rerender(
++			<Dialog.Root open modal={ false }>
++				<Dialog.Popup>
++					<Dialog.Title>Non modal dialog</Dialog.Title>
++				</Dialog.Popup>
++			</Dialog.Root>
++		);
++		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
++		expect( getBackdrops() ).toHaveLength( 0 );
++
++		view.rerender(
++			<Dialog.Root open modal="trap-focus">
++				<Dialog.Popup>
++					<Dialog.Title>Trap focus dialog</Dialog.Title>
++				</Dialog.Popup>
++			</Dialog.Root>
++		);
++		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
++		expect( getBackdrops() ).toHaveLength( 0 );
++	} );
++
++	it( 'renders the popup across default and explicit size values', async () => {
++		const view = render(
++			<Dialog.Root open>
++				<Dialog.Popup>
++					<Dialog.Title>Default size dialog</Dialog.Title>
++				</Dialog.Popup>
++			</Dialog.Root>
++		);
++
++		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
++
++		for ( const size of [
++			'small',
++			'medium',
++			'large',
++			'stretch',
++			'full',
++		] as const ) {
++			view.rerender(
++				<Dialog.Root open>
++					<Dialog.Popup size={ size }>
++						<Dialog.Title>{ size } dialog</Dialog.Title>
++					</Dialog.Popup>
++				</Dialog.Root>
++			);
++			expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
++		}
++	} );
++
++	it( 'marks Dialog.Action as disabled when loading is true', async () => {
++		render(
++			<Dialog.Root open>
++				<Dialog.Popup>
++					<Dialog.Title>Action states</Dialog.Title>
++					<Dialog.Footer>
++						<Dialog.Action loading>Loading action</Dialog.Action>
++					</Dialog.Footer>
++				</Dialog.Popup>
++			</Dialog.Root>
++		);
++
++		const action = await screen.findByRole( 'button', {
++			name: 'Loading action',
++		} );
++		expect( action ).toHaveAttribute( 'aria-disabled', 'true' );
++	} );
++
++	it( 'marks Dialog.Action as disabled when disabled is true', async () => {
++		render(
++			<Dialog.Root open>
++				<Dialog.Popup>
++					<Dialog.Title>Action states</Dialog.Title>
++					<Dialog.Footer>
++						<Dialog.Action disabled>Disabled action</Dialog.Action>
++					</Dialog.Footer>
++				</Dialog.Popup>
++			</Dialog.Root>
++		);
++
++		const action = await screen.findByRole( 'button', {
++			name: 'Disabled action',
++		} );
++		expect( action ).toHaveAttribute( 'aria-disabled', 'true' );
++	} );
++
++	it( 'lets explicit disabled={ false } override loading on Dialog.Action', async () => {
++		// `Dialog.Action` uses `disabled ?? loading`, so an explicit
++		// `disabled={ false }` wins over an active loading state.
++		render(
++			<Dialog.Root open>
++				<Dialog.Popup>
++					<Dialog.Title>Action states</Dialog.Title>
++					<Dialog.Footer>
++						<Dialog.Action disabled={ false } loading>
++							Explicit not-disabled
++						</Dialog.Action>
++					</Dialog.Footer>
++				</Dialog.Popup>
++			</Dialog.Root>
++		);
++
++		const action = await screen.findByRole( 'button', {
++			name: 'Explicit not-disabled',
++		} );
++		expect( action ).not.toHaveAttribute( 'aria-disabled', 'true' );
++	} );
++
+ 	describe( 'Development mode validation', () => {
+ 		// Suppress console.error from React act() warnings and jsdom
+ 		// unhandled-error logging. Validation errors are caught via
+diff --git a/packages/ui/src/dialog/title.tsx b/packages/ui/src/dialog/title.tsx
+index b2ab1d962cea4e..3611c7eb868e78 100644
+--- a/packages/ui/src/dialog/title.tsx
++++ b/packages/ui/src/dialog/title.tsx
+@@ -1,4 +1,5 @@
+ import { Dialog as _Dialog } from '@base-ui/react/dialog';
++import clsx from 'clsx';
+ import { useMergeRefs } from '@wordpress/compose';
+ import { forwardRef, useEffect, useRef } from '@wordpress/element';
+ import { Text } from '../text';
+@@ -25,7 +26,7 @@ import type { TitleProps } from './types';
+  * ```
+  */
+ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
+-	function DialogTitle( { children, ...props }, forwardedRef ) {
++	function DialogTitle( { children, className, ...props }, forwardedRef ) {
+ 		const validationContext = useDialogValidationContext();
+ 		const internalRef = useRef< HTMLHeadingElement >( null );
+ 		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
+@@ -42,7 +43,7 @@ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
+ 				ref={ mergedRef }
+ 				variant="heading-xl"
+ 				render={ <_Dialog.Title { ...props } /> }
+-				className={ styles.title }
++				className={ clsx( styles.title, className ) }
+ 			>
+ 				{ children }
+ 			</Text>
+diff --git a/packages/ui/src/dialog/types.ts b/packages/ui/src/dialog/types.ts
+index affbb208ac67e5..5ae453134b4e8b 100644
+--- a/packages/ui/src/dialog/types.ts
++++ b/packages/ui/src/dialog/types.ts
+@@ -12,6 +12,7 @@ export interface RootProps
+ 		_Dialog.Root.Props,
+ 		| 'open'
+ 		| 'onOpenChange'
++		| 'onOpenChangeComplete'
+ 		| 'defaultOpen'
+ 		| 'modal'
+ 		| 'disablePointerDismissal'
+@@ -43,7 +44,8 @@ export interface PopupProps
+ 	 * rendered as this portal's children (do not pass `children` on the portal
+ 	 * element; they would be ignored).
+ 	 *
+-	 * When omitted, `Dialog.Popup` uses `Dialog.Portal` with default props.
++	 * When omitted, `Dialog.Popup` uses `Dialog.Portal` with default props,
++	 * rendering the portal in the current document's `<body>`.
+ 	 */
+ 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
+ 
+@@ -51,10 +53,15 @@ export interface PopupProps
+ 	 * Renders the dialog at a preset width (excluding additional padding from
+ 	 * the viewport edges).
+ 	 *
++	 * Height is not directly controlled by `size`: for every value except
++	 * `'full'`, the dialog fits its content up to the viewport height
++	 * (minus the viewport inset) and scrolls internally when it overflows.
++	 * `'full'` stretches the dialog to the available viewport height.
++	 *
+ 	 * - `'small'` — narrow max-width.
+ 	 * - `'medium'` — moderate max-width.
+ 	 * - `'large'` — wide max-width.
+-	 * - `'stretch'` — no max-width, stretches to fill available space.
++	 * - `'stretch'` — no max-width, stretches to fill available width.
+ 	 * - `'full'` — stretches to fill available width and height.
+ 	 *
+ 	 * @default 'medium'
+@@ -94,6 +101,13 @@ export interface TitleProps extends ComponentProps< 'h2' > {
+ 	children?: ReactNode;
+ }
+ 
++export interface DescriptionProps extends ComponentProps< 'p' > {
++	/**
++	 * The description content to be rendered inside the component.
++	 */
++	children?: ReactNode;
++}
++
+ export interface CloseIconProps
+ 	extends Omit<
+ 		ComponentProps< typeof IconButton >,
+diff --git a/packages/ui/src/popover/description.tsx b/packages/ui/src/popover/description.tsx
+index a8bfb2d9e6290d..4ab821cff92309 100644
+--- a/packages/ui/src/popover/description.tsx
++++ b/packages/ui/src/popover/description.tsx
+@@ -9,7 +9,6 @@ import type { DescriptionProps } from './types';
+  * Renders an optional paragraph that describes the popover content.
+  *
+  * The rendered element is linked to the popup via `aria-describedby`.
+- * Uses the `body-md` text variant by default.
+  */
+ const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
+ 	function PopoverDescription( { className, children, ...props }, ref ) {

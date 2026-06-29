@@ -1,0 +1,2539 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f183b3124ab14b..fdec7efa9c918c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,14 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `FormTokenField`: Do not suggest the selected one even if `{ value: string }` is passed ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
++
++### Internal
++
++-   `FormTokenField`: Convert to TypeScirpt and refactor to functional component ([#41216](https://github.com/WordPress/gutenberg/pull/41216)).
++
+ ## 19.12.0 (2022-06-01)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/form-token-field/index.js b/packages/components/src/form-token-field/index.js
+deleted file mode 100644
+index 30128552533fb2..00000000000000
+--- a/packages/components/src/form-token-field/index.js
++++ /dev/null
+@@ -1,725 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import {
+-	last,
+-	take,
+-	clone,
+-	uniq,
+-	map,
+-	difference,
+-	each,
+-	identity,
+-	some,
+-} from 'lodash';
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { __, _n, sprintf } from '@wordpress/i18n';
+-import { Component } from '@wordpress/element';
+-import { withInstanceId } from '@wordpress/compose';
+-import {
+-	BACKSPACE,
+-	ENTER,
+-	UP,
+-	DOWN,
+-	LEFT,
+-	RIGHT,
+-	SPACE,
+-	DELETE,
+-	ESCAPE,
+-} from '@wordpress/keycodes';
+-import isShallowEqual from '@wordpress/is-shallow-equal';
+-
+-/**
+- * Internal dependencies
+- */
+-import Token from './token';
+-import TokenInput from './token-input';
+-import SuggestionsList from './suggestions-list';
+-import withSpokenMessages from '../higher-order/with-spoken-messages';
+-
+-const initialState = {
+-	incompleteTokenValue: '',
+-	inputOffsetFromEnd: 0,
+-	isActive: false,
+-	isExpanded: false,
+-	selectedSuggestionIndex: -1,
+-	selectedSuggestionScroll: false,
+-};
+-
+-class FormTokenField extends Component {
+-	constructor() {
+-		super( ...arguments );
+-		this.state = initialState;
+-		this.onKeyDown = this.onKeyDown.bind( this );
+-		this.onKeyPress = this.onKeyPress.bind( this );
+-		this.onFocus = this.onFocus.bind( this );
+-		this.onBlur = this.onBlur.bind( this );
+-		this.deleteTokenBeforeInput = this.deleteTokenBeforeInput.bind( this );
+-		this.deleteTokenAfterInput = this.deleteTokenAfterInput.bind( this );
+-		this.addCurrentToken = this.addCurrentToken.bind( this );
+-		this.onContainerTouched = this.onContainerTouched.bind( this );
+-		this.renderToken = this.renderToken.bind( this );
+-		this.onTokenClickRemove = this.onTokenClickRemove.bind( this );
+-		this.onSuggestionHovered = this.onSuggestionHovered.bind( this );
+-		this.onSuggestionSelected = this.onSuggestionSelected.bind( this );
+-		this.onInputChange = this.onInputChange.bind( this );
+-		this.bindInput = this.bindInput.bind( this );
+-		this.bindTokensAndInput = this.bindTokensAndInput.bind( this );
+-		this.updateSuggestions = this.updateSuggestions.bind( this );
+-	}
+-
+-	componentDidUpdate( prevProps ) {
+-		// Make sure to focus the input when the isActive state is true.
+-		if ( this.state.isActive && ! this.input.hasFocus() ) {
+-			this.input.focus();
+-		}
+-
+-		const { suggestions, value } = this.props;
+-		const suggestionsDidUpdate = ! isShallowEqual(
+-			suggestions,
+-			prevProps.suggestions
+-		);
+-		if ( suggestionsDidUpdate || value !== prevProps.value ) {
+-			this.updateSuggestions( suggestionsDidUpdate );
+-		}
+-	}
+-
+-	static getDerivedStateFromProps( props, state ) {
+-		if ( ! props.disabled || ! state.isActive ) {
+-			return null;
+-		}
+-
+-		return {
+-			isActive: false,
+-			incompleteTokenValue: '',
+-		};
+-	}
+-
+-	bindInput( ref ) {
+-		this.input = ref;
+-	}
+-
+-	bindTokensAndInput( ref ) {
+-		this.tokensAndInput = ref;
+-	}
+-
+-	onFocus( event ) {
+-		const { __experimentalExpandOnFocus } = this.props;
+-		// If focus is on the input or on the container, set the isActive state to true.
+-		if ( this.input.hasFocus() || event.target === this.tokensAndInput ) {
+-			this.setState( {
+-				isActive: true,
+-				isExpanded:
+-					!! __experimentalExpandOnFocus || this.state.isExpanded,
+-			} );
+-		} else {
+-			/*
+-			 * Otherwise, focus is on one of the token "remove" buttons and we
+-			 * set the isActive state to false to prevent the input to be
+-			 * re-focused, see componentDidUpdate().
+-			 */
+-			this.setState( { isActive: false } );
+-		}
+-
+-		if ( 'function' === typeof this.props.onFocus ) {
+-			this.props.onFocus( event );
+-		}
+-	}
+-
+-	onBlur() {
+-		if ( this.inputHasValidValue() ) {
+-			this.setState( { isActive: false } );
+-		} else {
+-			this.setState( initialState );
+-		}
+-	}
+-
+-	onKeyDown( event ) {
+-		let preventDefault = false;
+-
+-		if ( event.defaultPrevented ) {
+-			return;
+-		}
+-
+-		switch ( event.keyCode ) {
+-			case BACKSPACE:
+-				preventDefault = this.handleDeleteKey(
+-					this.deleteTokenBeforeInput
+-				);
+-				break;
+-			case ENTER:
+-				preventDefault = this.addCurrentToken();
+-				break;
+-			case LEFT:
+-				preventDefault = this.handleLeftArrowKey();
+-				break;
+-			case UP:
+-				preventDefault = this.handleUpArrowKey();
+-				break;
+-			case RIGHT:
+-				preventDefault = this.handleRightArrowKey();
+-				break;
+-			case DOWN:
+-				preventDefault = this.handleDownArrowKey();
+-				break;
+-			case DELETE:
+-				preventDefault = this.handleDeleteKey(
+-					this.deleteTokenAfterInput
+-				);
+-				break;
+-			case SPACE:
+-				if ( this.props.tokenizeOnSpace ) {
+-					preventDefault = this.addCurrentToken();
+-				}
+-				break;
+-			case ESCAPE:
+-				preventDefault = this.handleEscapeKey( event );
+-				break;
+-			default:
+-				break;
+-		}
+-
+-		if ( preventDefault ) {
+-			event.preventDefault();
+-		}
+-	}
+-
+-	onKeyPress( event ) {
+-		let preventDefault = false;
+-		switch ( event.charCode ) {
+-			case 44: // Comma.
+-				preventDefault = this.handleCommaKey();
+-				break;
+-			default:
+-				break;
+-		}
+-
+-		if ( preventDefault ) {
+-			event.preventDefault();
+-		}
+-	}
+-
+-	onContainerTouched( event ) {
+-		// Prevent clicking/touching the tokensAndInput container from blurring
+-		// the input and adding the current token.
+-		if ( event.target === this.tokensAndInput && this.state.isActive ) {
+-			event.preventDefault();
+-		}
+-	}
+-
+-	onTokenClickRemove( event ) {
+-		this.deleteToken( event.value );
+-		this.input.focus();
+-	}
+-
+-	onSuggestionHovered( suggestion ) {
+-		const index = this.getMatchingSuggestions().indexOf( suggestion );
+-
+-		if ( index >= 0 ) {
+-			this.setState( {
+-				selectedSuggestionIndex: index,
+-				selectedSuggestionScroll: false,
+-			} );
+-		}
+-	}
+-
+-	onSuggestionSelected( suggestion ) {
+-		this.addNewToken( suggestion );
+-	}
+-
+-	onInputChange( event ) {
+-		const text = event.value;
+-		const separator = this.props.tokenizeOnSpace ? /[ ,\t]+/ : /[,\t]+/;
+-		const items = text.split( separator );
+-		const tokenValue = last( items ) || '';
+-
+-		if ( items.length > 1 ) {
+-			this.addNewTokens( items.slice( 0, -1 ) );
+-		}
+-
+-		this.setState(
+-			{ incompleteTokenValue: tokenValue },
+-			this.updateSuggestions
+-		);
+-
+-		this.props.onInputChange( tokenValue );
+-	}
+-
+-	handleDeleteKey( deleteToken ) {
+-		let preventDefault = false;
+-		if ( this.input.hasFocus() && this.isInputEmpty() ) {
+-			deleteToken();
+-			preventDefault = true;
+-		}
+-
+-		return preventDefault;
+-	}
+-
+-	handleLeftArrowKey() {
+-		let preventDefault = false;
+-		if ( this.isInputEmpty() ) {
+-			this.moveInputBeforePreviousToken();
+-			preventDefault = true;
+-		}
+-
+-		return preventDefault;
+-	}
+-
+-	handleRightArrowKey() {
+-		let preventDefault = false;
+-		if ( this.isInputEmpty() ) {
+-			this.moveInputAfterNextToken();
+-			preventDefault = true;
+-		}
+-
+-		return preventDefault;
+-	}
+-
+-	handleUpArrowKey() {
+-		this.setState( ( state, props ) => ( {
+-			selectedSuggestionIndex:
+-				( state.selectedSuggestionIndex === 0
+-					? this.getMatchingSuggestions(
+-							state.incompleteTokenValue,
+-							props.suggestions,
+-							props.value,
+-							props.maxSuggestions,
+-							props.saveTransform
+-					  ).length
+-					: state.selectedSuggestionIndex ) - 1,
+-			selectedSuggestionScroll: true,
+-		} ) );
+-
+-		return true; // PreventDefault.
+-	}
+-
+-	handleDownArrowKey() {
+-		this.setState( ( state, props ) => ( {
+-			selectedSuggestionIndex:
+-				( state.selectedSuggestionIndex + 1 ) %
+-				this.getMatchingSuggestions(
+-					state.incompleteTokenValue,
+-					props.suggestions,
+-					props.value,
+-					props.maxSuggestions,
+-					props.saveTransform
+-				).length,
+-			selectedSuggestionScroll: true,
+-		} ) );
+-
+-		return true; // PreventDefault.
+-	}
+-
+-	handleEscapeKey( event ) {
+-		this.setState( {
+-			incompleteTokenValue: event.target.value,
+-			isExpanded: false,
+-			selectedSuggestionIndex: -1,
+-			selectedSuggestionScroll: false,
+-		} );
+-		return true; // PreventDefault.
+-	}
+-
+-	handleCommaKey() {
+-		if ( this.inputHasValidValue() ) {
+-			this.addNewToken( this.state.incompleteTokenValue );
+-		}
+-
+-		return true; // PreventDefault.
+-	}
+-
+-	moveInputToIndex( index ) {
+-		this.setState( ( state, props ) => ( {
+-			inputOffsetFromEnd: props.value.length - Math.max( index, -1 ) - 1,
+-		} ) );
+-	}
+-
+-	moveInputBeforePreviousToken() {
+-		this.setState( ( state, props ) => ( {
+-			inputOffsetFromEnd: Math.min(
+-				state.inputOffsetFromEnd + 1,
+-				props.value.length
+-			),
+-		} ) );
+-	}
+-
+-	moveInputAfterNextToken() {
+-		this.setState( ( state ) => ( {
+-			inputOffsetFromEnd: Math.max( state.inputOffsetFromEnd - 1, 0 ),
+-		} ) );
+-	}
+-
+-	deleteTokenBeforeInput() {
+-		const index = this.getIndexOfInput() - 1;
+-
+-		if ( index > -1 ) {
+-			this.deleteToken( this.props.value[ index ] );
+-		}
+-	}
+-
+-	deleteTokenAfterInput() {
+-		const index = this.getIndexOfInput();
+-
+-		if ( index < this.props.value.length ) {
+-			this.deleteToken( this.props.value[ index ] );
+-			// Update input offset since it's the offset from the last token.
+-			this.moveInputToIndex( index );
+-		}
+-	}
+-
+-	addCurrentToken() {
+-		let preventDefault = false;
+-		const selectedSuggestion = this.getSelectedSuggestion();
+-
+-		if ( selectedSuggestion ) {
+-			this.addNewToken( selectedSuggestion );
+-			preventDefault = true;
+-		} else if ( this.inputHasValidValue() ) {
+-			this.addNewToken( this.state.incompleteTokenValue );
+-			preventDefault = true;
+-		}
+-
+-		return preventDefault;
+-	}
+-
+-	addNewTokens( tokens ) {
+-		const tokensToAdd = uniq(
+-			tokens
+-				.map( this.props.saveTransform )
+-				.filter( Boolean )
+-				.filter( ( token ) => ! this.valueContainsToken( token ) )
+-		);
+-
+-		if ( tokensToAdd.length > 0 ) {
+-			const newValue = clone( this.props.value );
+-			newValue.splice.apply(
+-				newValue,
+-				[ this.getIndexOfInput(), 0 ].concat( tokensToAdd )
+-			);
+-			this.props.onChange( newValue );
+-		}
+-	}
+-
+-	addNewToken( token ) {
+-		const {
+-			__experimentalExpandOnFocus,
+-			__experimentalValidateInput,
+-		} = this.props;
+-		if ( ! __experimentalValidateInput( token ) ) {
+-			this.props.speak(
+-				this.props.messages.__experimentalInvalid,
+-				'assertive'
+-			);
+-			return;
+-		}
+-		this.addNewTokens( [ token ] );
+-		this.props.speak( this.props.messages.added, 'assertive' );
+-
+-		this.setState( {
+-			incompleteTokenValue: '',
+-			selectedSuggestionIndex: -1,
+-			selectedSuggestionScroll: false,
+-			isExpanded: ! __experimentalExpandOnFocus,
+-		} );
+-
+-		if ( this.state.isActive ) {
+-			this.input.focus();
+-		}
+-	}
+-
+-	deleteToken( token ) {
+-		const newTokens = this.props.value.filter( ( item ) => {
+-			return this.getTokenValue( item ) !== this.getTokenValue( token );
+-		} );
+-		this.props.onChange( newTokens );
+-		this.props.speak( this.props.messages.removed, 'assertive' );
+-	}
+-
+-	getTokenValue( token ) {
+-		if ( 'object' === typeof token ) {
+-			return token.value;
+-		}
+-
+-		return token;
+-	}
+-
+-	getMatchingSuggestions(
+-		searchValue = this.state.incompleteTokenValue,
+-		suggestions = this.props.suggestions,
+-		value = this.props.value,
+-		maxSuggestions = this.props.maxSuggestions,
+-		saveTransform = this.props.saveTransform
+-	) {
+-		let match = saveTransform( searchValue );
+-		const startsWithMatch = [];
+-		const containsMatch = [];
+-
+-		if ( match.length === 0 ) {
+-			suggestions = difference( suggestions, value );
+-		} else {
+-			match = match.toLocaleLowerCase();
+-
+-			each( suggestions, ( suggestion ) => {
+-				const index = suggestion.toLocaleLowerCase().indexOf( match );
+-				if ( value.indexOf( suggestion ) === -1 ) {
+-					if ( index === 0 ) {
+-						startsWithMatch.push( suggestion );
+-					} else if ( index > 0 ) {
+-						containsMatch.push( suggestion );
+-					}
+-				}
+-			} );
+-
+-			suggestions = startsWithMatch.concat( containsMatch );
+-		}
+-
+-		return take( suggestions, maxSuggestions );
+-	}
+-
+-	getSelectedSuggestion() {
+-		if ( this.state.selectedSuggestionIndex !== -1 ) {
+-			return this.getMatchingSuggestions()[
+-				this.state.selectedSuggestionIndex
+-			];
+-		}
+-	}
+-
+-	valueContainsToken( token ) {
+-		return some( this.props.value, ( item ) => {
+-			return this.getTokenValue( token ) === this.getTokenValue( item );
+-		} );
+-	}
+-
+-	getIndexOfInput() {
+-		return this.props.value.length - this.state.inputOffsetFromEnd;
+-	}
+-
+-	isInputEmpty() {
+-		return this.state.incompleteTokenValue.length === 0;
+-	}
+-
+-	inputHasValidValue() {
+-		return (
+-			this.props.saveTransform( this.state.incompleteTokenValue ).length >
+-			0
+-		);
+-	}
+-
+-	updateSuggestions( resetSelectedSuggestion = true ) {
+-		const { __experimentalExpandOnFocus } = this.props;
+-		const { incompleteTokenValue } = this.state;
+-
+-		const inputHasMinimumChars = incompleteTokenValue.trim().length > 1;
+-		const matchingSuggestions = this.getMatchingSuggestions(
+-			incompleteTokenValue
+-		);
+-		const hasMatchingSuggestions = matchingSuggestions.length > 0;
+-
+-		const newState = {
+-			isExpanded:
+-				__experimentalExpandOnFocus ||
+-				( inputHasMinimumChars && hasMatchingSuggestions ),
+-		};
+-		if ( resetSelectedSuggestion ) {
+-			newState.selectedSuggestionIndex = -1;
+-			newState.selectedSuggestionScroll = false;
+-		}
+-
+-		this.setState( newState );
+-
+-		if ( inputHasMinimumChars ) {
+-			const { debouncedSpeak } = this.props;
+-
+-			const message = hasMatchingSuggestions
+-				? sprintf(
+-						/* translators: %d: number of results. */
+-						_n(
+-							'%d result found, use up and down arrow keys to navigate.',
+-							'%d results found, use up and down arrow keys to navigate.',
+-							matchingSuggestions.length
+-						),
+-						matchingSuggestions.length
+-				  )
+-				: __( 'No results.' );
+-
+-			debouncedSpeak( message, 'assertive' );
+-		}
+-	}
+-
+-	renderTokensAndInput() {
+-		const components = map( this.props.value, this.renderToken );
+-		components.splice( this.getIndexOfInput(), 0, this.renderInput() );
+-
+-		return components;
+-	}
+-
+-	renderToken( token, index, tokens ) {
+-		const value = this.getTokenValue( token );
+-		const status = token.status ? token.status : undefined;
+-		const termPosition = index + 1;
+-		const termsCount = tokens.length;
+-
+-		return (
+-			<Token
+-				key={ 'token-' + value }
+-				value={ value }
+-				status={ status }
+-				title={ token.title }
+-				displayTransform={ this.props.displayTransform }
+-				onClickRemove={ this.onTokenClickRemove }
+-				isBorderless={ token.isBorderless || this.props.isBorderless }
+-				onMouseEnter={ token.onMouseEnter }
+-				onMouseLeave={ token.onMouseLeave }
+-				disabled={ 'error' !== status && this.props.disabled }
+-				messages={ this.props.messages }
+-				termsCount={ termsCount }
+-				termPosition={ termPosition }
+-			/>
+-		);
+-	}
+-
+-	renderInput() {
+-		const {
+-			autoCapitalize,
+-			autoComplete,
+-			maxLength,
+-			placeholder,
+-			value,
+-			instanceId,
+-		} = this.props;
+-
+-		let props = {
+-			instanceId,
+-			autoCapitalize,
+-			autoComplete,
+-			placeholder: value.length === 0 ? placeholder : '',
+-			ref: this.bindInput,
+-			key: 'input',
+-			disabled: this.props.disabled,
+-			value: this.state.incompleteTokenValue,
+-			onBlur: this.onBlur,
+-			isExpanded: this.state.isExpanded,
+-			selectedSuggestionIndex: this.state.selectedSuggestionIndex,
+-		};
+-
+-		if ( ! ( maxLength && value.length >= maxLength ) ) {
+-			props = { ...props, onChange: this.onInputChange };
+-		}
+-
+-		return <TokenInput { ...props } />;
+-	}
+-
+-	render() {
+-		const {
+-			disabled,
+-			label = __( 'Add item' ),
+-			instanceId,
+-			className,
+-			__experimentalShowHowTo,
+-		} = this.props;
+-		const { isExpanded } = this.state;
+-		const classes = classnames(
+-			className,
+-			'components-form-token-field__input-container',
+-			{
+-				'is-active': this.state.isActive,
+-				'is-disabled': disabled,
+-			}
+-		);
+-
+-		let tokenFieldProps = {
+-			className: 'components-form-token-field',
+-			tabIndex: '-1',
+-		};
+-		const matchingSuggestions = this.getMatchingSuggestions();
+-
+-		if ( ! disabled ) {
+-			tokenFieldProps = Object.assign( {}, tokenFieldProps, {
+-				onKeyDown: this.onKeyDown,
+-				onKeyPress: this.onKeyPress,
+-				onFocus: this.onFocus,
+-			} );
+-		}
+-
+-		// Disable reason: There is no appropriate role which describes the
+-		// input container intended accessible usability.
+-		// TODO: Refactor click detection to use blur to stop propagation.
+-		/* eslint-disable jsx-a11y/no-static-element-interactions */
+-		return (
+-			<div { ...tokenFieldProps }>
+-				<label
+-					htmlFor={ `components-form-token-input-${ instanceId }` }
+-					className="components-form-token-field__label"
+-				>
+-					{ label }
+-				</label>
+-				<div
+-					ref={ this.bindTokensAndInput }
+-					className={ classes }
+-					tabIndex="-1"
+-					onMouseDown={ this.onContainerTouched }
+-					onTouchStart={ this.onContainerTouched }
+-				>
+-					{ this.renderTokensAndInput() }
+-					{ isExpanded && (
+-						<SuggestionsList
+-							instanceId={ instanceId }
+-							match={ this.props.saveTransform(
+-								this.state.incompleteTokenValue
+-							) }
+-							displayTransform={ this.props.displayTransform }
+-							suggestions={ matchingSuggestions }
+-							selectedIndex={ this.state.selectedSuggestionIndex }
+-							scrollIntoView={
+-								this.state.selectedSuggestionScroll
+-							}
+-							onHover={ this.onSuggestionHovered }
+-							onSelect={ this.onSuggestionSelected }
+-						/>
+-					) }
+-				</div>
+-				{ __experimentalShowHowTo && (
+-					<p
+-						id={ `components-form-token-suggestions-howto-${ instanceId }` }
+-						className="components-form-token-field__help"
+-					>
+-						{ this.props.tokenizeOnSpace
+-							? __(
+-									'Separate with commas, spaces, or the Enter key.'
+-							  )
+-							: __( 'Separate with commas or the Enter key.' ) }
+-					</p>
+-				) }
+-			</div>
+-		);
+-		/* eslint-enable jsx-a11y/no-static-element-interactions */
+-	}
+-}
+-
+-FormTokenField.defaultProps = {
+-	suggestions: Object.freeze( [] ),
+-	maxSuggestions: 100,
+-	value: Object.freeze( [] ),
+-	displayTransform: identity,
+-	saveTransform: ( token ) => token.trim(),
+-	onChange: () => {},
+-	onInputChange: () => {},
+-	isBorderless: false,
+-	disabled: false,
+-	tokenizeOnSpace: false,
+-	messages: {
+-		added: __( 'Item added.' ),
+-		removed: __( 'Item removed.' ),
+-		remove: __( 'Remove item' ),
+-		__experimentalInvalid: __( 'Invalid item' ),
+-	},
+-	__experimentalExpandOnFocus: false,
+-	__experimentalValidateInput: () => true,
+-	__experimentalShowHowTo: true,
+-};
+-
+-export default withSpokenMessages( withInstanceId( FormTokenField ) );
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+new file mode 100644
+index 00000000000000..b5845dcd17d694
+--- /dev/null
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -0,0 +1,707 @@
++/**
++ * External dependencies
++ */
++import {
++	last,
++	take,
++	clone,
++	uniq,
++	map,
++	difference,
++	each,
++	identity,
++	some,
++} from 'lodash';
++import classnames from 'classnames';
++import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useEffect, useRef, useState } from '@wordpress/element';
++import { __, _n, sprintf } from '@wordpress/i18n';
++import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
++import { speak } from '@wordpress/a11y';
++import {
++	BACKSPACE,
++	ENTER,
++	UP,
++	DOWN,
++	LEFT,
++	RIGHT,
++	SPACE,
++	DELETE,
++	ESCAPE,
++} from '@wordpress/keycodes';
++import isShallowEqual from '@wordpress/is-shallow-equal';
++
++/**
++ * Internal dependencies
++ */
++import Token from './token';
++import TokenInput from './token-input';
++import SuggestionsList from './suggestions-list';
++import type { FormTokenFieldProps, TokenItem } from './types';
++
++/**
++ * A `FormTokenField` is a field similar to the tags and categories fields in the interim editor chrome,
++ * or the "to" field in Mail on OS X. Tokens can be entered by typing them or selecting them from a list of suggested tokens.
++ *
++ * Up to one hundred suggestions that match what the user has typed so far will be shown from which the user can pick from (auto-complete).
++ * Tokens are separated by the "," character. Suggestions can be selected with the up or down arrows and added with the tab or enter key.
++ *
++ * The `value` property is handled in a manner similar to controlled form components.
++ * See [Forms](http://facebook.github.io/react/docs/forms.html) in the React Documentation for more information.
++ */
++export function FormTokenField( props: FormTokenFieldProps ) {
++	const {
++		autoCapitalize,
++		autoComplete,
++		maxLength,
++		placeholder,
++		label = __( 'Add item' ),
++		className,
++		suggestions = [],
++		maxSuggestions = 100,
++		value = [],
++		displayTransform = identity,
++		saveTransform = ( token ) => token.trim(),
++		onChange = () => {},
++		onInputChange = () => {},
++		onFocus = undefined,
++		isBorderless = false,
++		disabled = false,
++		tokenizeOnSpace = false,
++		messages = {
++			added: __( 'Item added.' ),
++			removed: __( 'Item removed.' ),
++			remove: __( 'Remove item' ),
++			__experimentalInvalid: __( 'Invalid item' ),
++		},
++		__experimentalExpandOnFocus = false,
++		__experimentalValidateInput = () => true,
++		__experimentalShowHowTo = true,
++	} = props;
++
++	const instanceId = useInstanceId( FormTokenField );
++
++	// We reset to these initial values again in the onBlur
++	const [ incompleteTokenValue, setIncompleteTokenValue ] = useState( '' );
++	const [ inputOffsetFromEnd, setInputOffsetFromEnd ] = useState( 0 );
++	const [ isActive, setIsActive ] = useState( false );
++	const [ isExpanded, setIsExpanded ] = useState( false );
++	const [ selectedSuggestionIndex, setSelectedSuggestionIndex ] = useState(
++		-1
++	);
++	const [ selectedSuggestionScroll, setSelectedSuggestionScroll ] = useState(
++		false
++	);
++
++	const prevSuggestions = usePrevious< string[] >( suggestions );
++	const prevValue = usePrevious< ( string | TokenItem )[] >( value );
++
++	const input = useRef< HTMLInputElement >( null );
++	const tokensAndInput = useRef< HTMLInputElement >( null );
++
++	const debouncedSpeak = useDebounce( speak, 500 );
++
++	useEffect( () => {
++		// Make sure to focus the input when the isActive state is true.
++		if ( isActive && ! hasFocus() ) {
++			focus();
++		}
++	}, [ isActive ] );
++
++	useEffect( () => {
++		const suggestionsDidUpdate = ! isShallowEqual(
++			suggestions,
++			prevSuggestions || []
++		);
++
++		if ( suggestionsDidUpdate || value !== prevValue ) {
++			updateSuggestions( suggestionsDidUpdate );
++		}
++
++		// TODO: updateSuggestions() should first be refactored so its actual deps are clearer.
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++	}, [ suggestions, prevSuggestions, value, prevValue ] );
++
++	useEffect( () => {
++		updateSuggestions();
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++	}, [ incompleteTokenValue ] );
++
++	if ( disabled && isActive ) {
++		setIsActive( false );
++		setIncompleteTokenValue( '' );
++	}
++
++	function focus() {
++		input.current?.focus();
++	}
++
++	function hasFocus() {
++		return input.current === input.current?.ownerDocument.activeElement;
++	}
++
++	function onFocusHandler( event: FocusEvent ) {
++		// If focus is on the input or on the container, set the isActive state to true.
++		if ( hasFocus() || event.target === tokensAndInput.current ) {
++			setIsActive( true );
++			setIsExpanded( __experimentalExpandOnFocus || isExpanded );
++		} else {
++			/*
++			 * Otherwise, focus is on one of the token "remove" buttons and we
++			 * set the isActive state to false to prevent the input to be
++			 * re-focused, see componentDidUpdate().
++			 */
++			setIsActive( false );
++		}
++
++		if ( 'function' === typeof onFocus ) {
++			onFocus( event );
++		}
++	}
++
++	function onBlur() {
++		if ( inputHasValidValue() ) {
++			setIsActive( false );
++		} else {
++			// Reset to initial state
++			setIncompleteTokenValue( '' );
++			setInputOffsetFromEnd( 0 );
++			setIsActive( false );
++			setIsExpanded( false );
++			setSelectedSuggestionIndex( -1 );
++			setSelectedSuggestionScroll( false );
++		}
++	}
++
++	function onKeyDown( event: KeyboardEvent ) {
++		let preventDefault = false;
++
++		if ( event.defaultPrevented ) {
++			return;
++		}
++		// TODO: replace to event.code;
++		switch ( event.keyCode ) {
++			case BACKSPACE:
++				preventDefault = handleDeleteKey( deleteTokenBeforeInput );
++				break;
++			case ENTER:
++				preventDefault = addCurrentToken();
++				break;
++			case LEFT:
++				preventDefault = handleLeftArrowKey();
++				break;
++			case UP:
++				preventDefault = handleUpArrowKey();
++				break;
++			case RIGHT:
++				preventDefault = handleRightArrowKey();
++				break;
++			case DOWN:
++				preventDefault = handleDownArrowKey();
++				break;
++			case DELETE:
++				preventDefault = handleDeleteKey( deleteTokenAfterInput );
++				break;
++			case SPACE:
++				if ( tokenizeOnSpace ) {
++					preventDefault = addCurrentToken();
++				}
++				break;
++			case ESCAPE:
++				preventDefault = handleEscapeKey( event );
++				break;
++			default:
++				break;
++		}
++
++		if ( preventDefault ) {
++			event.preventDefault();
++		}
++	}
++
++	function onKeyPress( event: KeyboardEvent ) {
++		let preventDefault = false;
++		// TODO: replace to event.code;
++		switch ( event.charCode ) {
++			case 44: // Comma.
++				preventDefault = handleCommaKey();
++				break;
++			default:
++				break;
++		}
++
++		if ( preventDefault ) {
++			event.preventDefault();
++		}
++	}
++
++	function onContainerTouched( event: MouseEvent | TouchEvent ) {
++		// Prevent clicking/touching the tokensAndInput container from blurring
++		// the input and adding the current token.
++		if ( event.target === tokensAndInput.current && isActive ) {
++			event.preventDefault();
++		}
++	}
++
++	function onTokenClickRemove( event: { value: string } ) {
++		deleteToken( event.value );
++		focus();
++	}
++
++	function onSuggestionHovered( suggestion: string ) {
++		const index = getMatchingSuggestions().indexOf( suggestion );
++
++		if ( index >= 0 ) {
++			setSelectedSuggestionIndex( index );
++			setSelectedSuggestionScroll( false );
++		}
++	}
++
++	function onSuggestionSelected( suggestion: string ) {
++		addNewToken( suggestion );
++	}
++
++	function onInputChangeHandler( event: { value: string } ) {
++		const text = event.value;
++		const separator = tokenizeOnSpace ? /[ ,\t]+/ : /[,\t]+/;
++		const items = text.split( separator );
++		const tokenValue = last( items ) || '';
++
++		if ( items.length > 1 ) {
++			addNewTokens( items.slice( 0, -1 ) );
++		}
++		setIncompleteTokenValue( tokenValue );
++		onInputChange( tokenValue );
++	}
++
++	function handleDeleteKey( _deleteToken: () => void ) {
++		let preventDefault = false;
++		if ( hasFocus() && isInputEmpty() ) {
++			_deleteToken();
++			preventDefault = true;
++		}
++
++		return preventDefault;
++	}
++
++	function handleLeftArrowKey() {
++		let preventDefault = false;
++		if ( isInputEmpty() ) {
++			moveInputBeforePreviousToken();
++			preventDefault = true;
++		}
++
++		return preventDefault;
++	}
++
++	function handleRightArrowKey() {
++		let preventDefault = false;
++		if ( isInputEmpty() ) {
++			moveInputAfterNextToken();
++			preventDefault = true;
++		}
++
++		return preventDefault;
++	}
++
++	function handleUpArrowKey() {
++		setSelectedSuggestionIndex( ( index ) => {
++			return (
++				( index === 0
++					? getMatchingSuggestions(
++							incompleteTokenValue,
++							suggestions,
++							value,
++							maxSuggestions,
++							saveTransform
++					  ).length
++					: index ) - 1
++			);
++		} );
++		setSelectedSuggestionScroll( true );
++
++		return true; // PreventDefault.
++	}
++
++	function handleDownArrowKey() {
++		setSelectedSuggestionIndex( ( index ) => {
++			return (
++				( index + 1 ) %
++				getMatchingSuggestions(
++					incompleteTokenValue,
++					suggestions,
++					value,
++					maxSuggestions,
++					saveTransform
++				).length
++			);
++		} );
++
++		setSelectedSuggestionScroll( true );
++		return true; // PreventDefault.
++	}
++
++	function handleEscapeKey( event: KeyboardEvent ) {
++		if ( event.target instanceof HTMLInputElement ) {
++			setIncompleteTokenValue( event.target.value );
++			setIsExpanded( false );
++			setSelectedSuggestionIndex( -1 );
++			setSelectedSuggestionScroll( false );
++		}
++
++		return true; // PreventDefault.
++	}
++
++	function handleCommaKey() {
++		if ( inputHasValidValue() ) {
++			addNewToken( incompleteTokenValue );
++		}
++
++		return true; // PreventDefault.
++	}
++
++	function moveInputToIndex( index: number ) {
++		setInputOffsetFromEnd( value.length - Math.max( index, -1 ) - 1 );
++	}
++
++	function moveInputBeforePreviousToken() {
++		setInputOffsetFromEnd( ( prevInputOffsetFromEnd ) => {
++			return Math.min( prevInputOffsetFromEnd + 1, value.length );
++		} );
++	}
++
++	function moveInputAfterNextToken() {
++		setInputOffsetFromEnd( ( prevInputOffsetFromEnd ) => {
++			return Math.max( prevInputOffsetFromEnd - 1, 0 );
++		} );
++	}
++
++	function deleteTokenBeforeInput() {
++		const index = getIndexOfInput() - 1;
++
++		if ( index > -1 ) {
++			deleteToken( value[ index ] );
++		}
++	}
++
++	function deleteTokenAfterInput() {
++		const index = getIndexOfInput();
++
++		if ( index < value.length ) {
++			deleteToken( value[ index ] );
++			// Update input offset since it's the offset from the last token.
++			moveInputToIndex( index );
++		}
++	}
++
++	function addCurrentToken() {
++		let preventDefault = false;
++		const selectedSuggestion = getSelectedSuggestion();
++
++		if ( selectedSuggestion ) {
++			addNewToken( selectedSuggestion );
++			preventDefault = true;
++		} else if ( inputHasValidValue() ) {
++			addNewToken( incompleteTokenValue );
++			preventDefault = true;
++		}
++
++		return preventDefault;
++	}
++
++	function addNewTokens( tokens: string[] ) {
++		const tokensToAdd = uniq(
++			tokens
++				.map( saveTransform )
++				.filter( Boolean )
++				.filter( ( token ) => ! valueContainsToken( token ) )
++		);
++
++		if ( tokensToAdd.length > 0 ) {
++			const newValue = clone( value );
++			newValue.splice( getIndexOfInput(), 0, ...tokensToAdd );
++			onChange( newValue );
++		}
++	}
++
++	function addNewToken( token: string ) {
++		if ( ! __experimentalValidateInput( token ) ) {
++			speak( messages.__experimentalInvalid, 'assertive' );
++			return;
++		}
++		addNewTokens( [ token ] );
++		speak( messages.added, 'assertive' );
++
++		setIncompleteTokenValue( '' );
++		setSelectedSuggestionIndex( -1 );
++		setSelectedSuggestionScroll( false );
++		setIsExpanded( ! __experimentalExpandOnFocus );
++
++		if ( isActive ) {
++			focus();
++		}
++	}
++
++	function deleteToken( token: string | TokenItem ) {
++		const newTokens = value.filter( ( item ) => {
++			return getTokenValue( item ) !== getTokenValue( token );
++		} );
++		onChange( newTokens );
++		speak( messages.removed, 'assertive' );
++	}
++
++	function getTokenValue( token: { value: string } | string ) {
++		if ( 'object' === typeof token ) {
++			return token.value;
++		}
++
++		return token;
++	}
++
++	function getMatchingSuggestions(
++		searchValue = incompleteTokenValue,
++		_suggestions = suggestions,
++		_value = value,
++		_maxSuggestions = maxSuggestions,
++		_saveTransform = saveTransform
++	) {
++		let match = _saveTransform( searchValue );
++		const startsWithMatch: string[] = [];
++		const containsMatch: string[] = [];
++		const normalizedValue = _value.map( ( item ) => {
++			if ( typeof item === 'string' ) {
++				return item;
++			}
++			return item.value;
++		} );
++
++		if ( match.length === 0 ) {
++			_suggestions = difference( _suggestions, normalizedValue );
++		} else {
++			match = match.toLocaleLowerCase();
++
++			each( _suggestions, ( suggestion ) => {
++				const index = suggestion.toLocaleLowerCase().indexOf( match );
++				if ( normalizedValue.indexOf( suggestion ) === -1 ) {
++					if ( index === 0 ) {
++						startsWithMatch.push( suggestion );
++					} else if ( index > 0 ) {
++						containsMatch.push( suggestion );
++					}
++				}
++			} );
++
++			_suggestions = startsWithMatch.concat( containsMatch );
++		}
++
++		return take( _suggestions, _maxSuggestions );
++	}
++
++	function getSelectedSuggestion() {
++		if ( selectedSuggestionIndex !== -1 ) {
++			return getMatchingSuggestions()[ selectedSuggestionIndex ];
++		}
++
++		return undefined;
++	}
++
++	function valueContainsToken( token: string ) {
++		return some( value, ( item ) => {
++			return getTokenValue( token ) === getTokenValue( item );
++		} );
++	}
++
++	function getIndexOfInput() {
++		return value.length - inputOffsetFromEnd;
++	}
++
++	function isInputEmpty() {
++		return incompleteTokenValue.length === 0;
++	}
++
++	function inputHasValidValue() {
++		return saveTransform( incompleteTokenValue ).length > 0;
++	}
++
++	function updateSuggestions( resetSelectedSuggestion = true ) {
++		const inputHasMinimumChars = incompleteTokenValue.trim().length > 1;
++		const matchingSuggestions = getMatchingSuggestions(
++			incompleteTokenValue
++		);
++		const hasMatchingSuggestions = matchingSuggestions.length > 0;
++
++		setIsExpanded(
++			__experimentalExpandOnFocus ||
++				( inputHasMinimumChars && hasMatchingSuggestions )
++		);
++
++		if ( resetSelectedSuggestion ) {
++			setSelectedSuggestionIndex( -1 );
++			setSelectedSuggestionScroll( false );
++		}
++
++		if ( inputHasMinimumChars ) {
++			const message = hasMatchingSuggestions
++				? sprintf(
++						/* translators: %d: number of results. */
++						_n(
++							'%d result found, use up and down arrow keys to navigate.',
++							'%d results found, use up and down arrow keys to navigate.',
++							matchingSuggestions.length
++						),
++						matchingSuggestions.length
++				  )
++				: __( 'No results.' );
++
++			debouncedSpeak( message, 'assertive' );
++		}
++	}
++
++	function renderTokensAndInput() {
++		const components = map( value, renderToken );
++		components.splice( getIndexOfInput(), 0, renderInput() );
++
++		return components;
++	}
++
++	function renderToken(
++		token: string | TokenItem,
++		index: number,
++		tokens: ( string | TokenItem )[]
++	) {
++		const _value = getTokenValue( token );
++		const status = typeof token !== 'string' ? token.status : undefined;
++		const termPosition = index + 1;
++		const termsCount = tokens.length;
++
++		return (
++			<Token
++				key={ 'token-' + _value }
++				value={ _value }
++				status={ status }
++				title={ typeof token !== 'string' ? token.title : undefined }
++				displayTransform={ displayTransform }
++				onClickRemove={ onTokenClickRemove }
++				isBorderless={
++					( typeof token !== 'string' && token.isBorderless ) ||
++					isBorderless
++				}
++				onMouseEnter={
++					typeof token !== 'string' ? token.onMouseEnter : undefined
++				}
++				onMouseLeave={
++					typeof token !== 'string' ? token.onMouseLeave : undefined
++				}
++				disabled={ 'error' !== status && disabled }
++				messages={ messages }
++				termsCount={ termsCount }
++				termPosition={ termPosition }
++			/>
++		);
++	}
++
++	function renderInput() {
++		const inputProps = {
++			instanceId,
++			autoCapitalize,
++			autoComplete,
++			placeholder: value.length === 0 ? placeholder : '',
++			key: 'input',
++			disabled,
++			value: incompleteTokenValue,
++			onBlur,
++			isExpanded,
++			selectedSuggestionIndex,
++		};
++
++		return (
++			<TokenInput
++				{ ...inputProps }
++				onChange={
++					! ( maxLength && value.length >= maxLength )
++						? onInputChangeHandler
++						: undefined
++				}
++				ref={ input }
++			/>
++		);
++	}
++
++	const classes = classnames(
++		className,
++		'components-form-token-field__input-container',
++		{
++			'is-active': isActive,
++			'is-disabled': disabled,
++		}
++	);
++
++	let tokenFieldProps = {
++		className: 'components-form-token-field',
++		tabIndex: -1,
++	};
++	const matchingSuggestions = getMatchingSuggestions();
++
++	if ( ! disabled ) {
++		tokenFieldProps = Object.assign( {}, tokenFieldProps, {
++			onKeyDown,
++			onKeyPress,
++			onFocus: onFocusHandler,
++		} );
++	}
++
++	// Disable reason: There is no appropriate role which describes the
++	// input container intended accessible usability.
++	// TODO: Refactor click detection to use blur to stop propagation.
++	/* eslint-disable jsx-a11y/no-static-element-interactions */
++	return (
++		<div { ...tokenFieldProps }>
++			<label
++				htmlFor={ `components-form-token-input-${ instanceId }` }
++				className="components-form-token-field__label"
++			>
++				{ label }
++			</label>
++			<div
++				ref={ tokensAndInput }
++				className={ classes }
++				tabIndex={ -1 }
++				onMouseDown={ onContainerTouched }
++				onTouchStart={ onContainerTouched }
++			>
++				{ renderTokensAndInput() }
++				{ isExpanded && (
++					<SuggestionsList
++						instanceId={ instanceId }
++						match={ saveTransform( incompleteTokenValue ) }
++						displayTransform={ displayTransform }
++						suggestions={ matchingSuggestions }
++						selectedIndex={ selectedSuggestionIndex }
++						scrollIntoView={ selectedSuggestionScroll }
++						onHover={ onSuggestionHovered }
++						onSelect={ onSuggestionSelected }
++					/>
++				) }
++			</div>
++			{ __experimentalShowHowTo && (
++				<p
++					id={ `components-form-token-suggestions-howto-${ instanceId }` }
++					className="components-form-token-field__help"
++				>
++					{ tokenizeOnSpace
++						? __(
++								'Separate with commas, spaces, or the Enter key.'
++						  )
++						: __( 'Separate with commas or the Enter key.' ) }
++				</p>
++			) }
++		</div>
++	);
++	/* eslint-enable jsx-a11y/no-static-element-interactions */
++}
++
++export default FormTokenField;
+diff --git a/packages/components/src/form-token-field/stories/index.js b/packages/components/src/form-token-field/stories/index.js
+deleted file mode 100644
+index 5b8ba8f468600b..00000000000000
+--- a/packages/components/src/form-token-field/stories/index.js
++++ /dev/null
+@@ -1,102 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, text } from '@storybook/addon-knobs';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import FormTokenField from '../';
+-
+-export default {
+-	title: 'Components/FormTokenField',
+-	component: FormTokenField,
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-const continents = [
+-	'Africa',
+-	'America',
+-	'Antarctica',
+-	'Asia',
+-	'Europe',
+-	'Oceania',
+-];
+-
+-const getKnobs = () => ( {
+-	showHowTo: boolean( 'Show how to instructions', true ),
+-	expandOnFocus: boolean( 'Expand on focus', false ),
+-	placeholder: text( 'Placeholder', '' ),
+-	enableValidation: boolean( 'Validate that value is in suggestions', false ),
+-} );
+-
+-const FormTokenFieldExample = () => {
+-	const knobs = getKnobs();
+-	const [ selectedContinents, setSelectedContinents ] = useState( [] );
+-
+-	return (
+-		<FormTokenField
+-			value={ selectedContinents }
+-			suggestions={ continents }
+-			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
+-			label="Type a continent"
+-			placeholder={ knobs.placeholder }
+-			__experimentalExpandOnFocus={ knobs.expandOnFocus }
+-			__experimentalShowHowTo={ knobs.showHowTo }
+-			__experimentalValidateInput={
+-				knobs.enableValidation
+-					? ( newValue ) => continents.includes( newValue )
+-					: () => true
+-			}
+-		/>
+-	);
+-};
+-
+-export const _default = () => {
+-	return <FormTokenFieldExample />;
+-};
+-
+-const FormTokenFieldAsyncExample = () => {
+-	const knobs = getKnobs();
+-	const [ selectedContinents, setSelectedContinents ] = useState( [] );
+-	const [ availableContinents, setAvailableContinents ] = useState( [] );
+-	const searchContinents = ( input ) => {
+-		const timeout = setTimeout( () => {
+-			const available = continents.filter( ( continent ) =>
+-				continent.toLowerCase().includes( input.toLowerCase() )
+-			);
+-			setAvailableContinents( available );
+-		}, 1000 );
+-
+-		return () => clearTimeout( timeout );
+-	};
+-
+-	return (
+-		<FormTokenField
+-			value={ selectedContinents }
+-			suggestions={ availableContinents }
+-			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
+-			onInputChange={ searchContinents }
+-			label="Type a continent"
+-			placeholder={ knobs.placeholder }
+-			__experimentalExpandOnFocus={ knobs.expandOnFocus }
+-			__experimentalShowHowTo={ knobs.showHowTo }
+-			__experimentalValidateInput={
+-				knobs.enableValidation
+-					? ( newValue ) => continents.includes( newValue )
+-					: () => true
+-			}
+-		/>
+-	);
+-};
+-
+-export const _async = () => {
+-	return <FormTokenFieldAsyncExample />;
+-};
+diff --git a/packages/components/src/form-token-field/stories/index.tsx b/packages/components/src/form-token-field/stories/index.tsx
+new file mode 100644
+index 00000000000000..b9b7bd34fcb477
+--- /dev/null
++++ b/packages/components/src/form-token-field/stories/index.tsx
+@@ -0,0 +1,104 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++import type { ComponentProps } from 'react';
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import FormTokenField from '../';
++
++const meta: ComponentMeta< typeof FormTokenField > = {
++	component: FormTokenField,
++	title: 'Components/FormTokenField',
++	argTypes: {
++		value: {
++			control: { type: null },
++		},
++		__experimentalValidateInput: {
++			control: { type: null },
++		},
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const continents = [
++	'Africa',
++	'America',
++	'Antarctica',
++	'Asia',
++	'Europe',
++	'Oceania',
++];
++
++const DefaultTemplate: ComponentStory< typeof FormTokenField > = ( {
++	...args
++} ) => {
++	const [ selectedContinents, setSelectedContinents ] = useState<
++		ComponentProps< typeof FormTokenField >[ 'value' ]
++	>( [] );
++
++	return (
++		<FormTokenField
++			{ ...args }
++			value={ selectedContinents }
++			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
++		/>
++	);
++};
++
++export const Default: ComponentStory<
++	typeof FormTokenField
++> = DefaultTemplate.bind( {} );
++Default.args = {
++	label: 'Type a continent',
++	suggestions: continents,
++};
++
++export const Async: ComponentStory< typeof FormTokenField > = ( {
++	suggestions,
++	...args
++} ) => {
++	const [ selectedContinents, setSelectedContinents ] = useState<
++		ComponentProps< typeof FormTokenField >[ 'value' ]
++	>( [] );
++	const [ availableContinents, setAvailableContinents ] = useState<
++		string[]
++	>( [] );
++
++	const searchContinents = ( input: string ) => {
++		const timeout = setTimeout( () => {
++			const available = ( suggestions || [] ).filter( ( continent ) =>
++				continent.toLowerCase().includes( input.toLowerCase() )
++			);
++			setAvailableContinents( available );
++		}, 1000 );
++
++		return () => clearTimeout( timeout );
++	};
++
++	return (
++		<FormTokenField
++			{ ...args }
++			value={ selectedContinents }
++			suggestions={ availableContinents }
++			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
++			onInputChange={ searchContinents }
++		/>
++	);
++};
++Async.args = {
++	label: 'Type a continent',
++	suggestions: continents,
++};
+diff --git a/packages/components/src/form-token-field/suggestions-list.js b/packages/components/src/form-token-field/suggestions-list.tsx
+similarity index 66%
+rename from packages/components/src/form-token-field/suggestions-list.js
+rename to packages/components/src/form-token-field/suggestions-list.tsx
+index a7a2333344866c..3de8b925f516c2 100644
+--- a/packages/components/src/form-token-field/suggestions-list.js
++++ b/packages/components/src/form-token-field/suggestions-list.tsx
+@@ -4,55 +4,71 @@
+ import { map } from 'lodash';
+ import scrollView from 'dom-scroll-into-view';
+ import classnames from 'classnames';
++import type { MouseEventHandler } from 'react';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { useState } from '@wordpress/element';
+-import { withSafeTimeout, useRefEffect } from '@wordpress/compose';
++import { useRefEffect } from '@wordpress/compose';
+ 
+-const emptyList = Object.freeze( [] );
++/**
++ * Internal dependencies
++ */
++import type { SuggestionsListProps } from './types';
+ 
+-const handleMouseDown = ( e ) => {
++const { setTimeout, clearTimeout } = window;
++
++const handleMouseDown: MouseEventHandler = ( e ) => {
+ 	// By preventing default here, we will not lose focus of <input> when clicking a suggestion.
+ 	e.preventDefault();
+ };
+ 
+-function SuggestionsList( {
++export function SuggestionsList< T extends string | { value: string } >( {
+ 	selectedIndex,
+ 	scrollIntoView,
+-	match = '',
++	match,
+ 	onHover,
+ 	onSelect,
+-	suggestions = emptyList,
++	suggestions = [],
+ 	displayTransform,
+ 	instanceId,
+-	setTimeout,
+-} ) {
++}: SuggestionsListProps< T > ) {
+ 	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
+ 
+-	const listRef = useRefEffect(
++	const listRef = useRefEffect< HTMLUListElement >(
+ 		( listNode ) => {
+ 			// only have to worry about scrolling selected suggestion into view
+ 			// when already expanded.
++			let id: number;
+ 			if (
+ 				selectedIndex > -1 &&
+ 				scrollIntoView &&
+ 				listNode.children[ selectedIndex ]
+ 			) {
+ 				setScrollingIntoView( true );
+-				scrollView( listNode.children[ selectedIndex ], listNode, {
+-					onlyScrollIfNeeded: true,
+-				} );
+-				setTimeout( () => {
++				scrollView(
++					listNode.children[ selectedIndex ] as HTMLLIElement,
++					listNode,
++					{
++						onlyScrollIfNeeded: true,
++					}
++				);
++				id = setTimeout( () => {
+ 					setScrollingIntoView( false );
+ 				}, 100 );
+ 			}
++
++			return () => {
++				if ( id !== undefined ) {
++					clearTimeout( id );
++				}
++			};
+ 		},
+ 		[ selectedIndex, scrollIntoView ]
+ 	);
+ 
+-	const handleHover = ( suggestion ) => {
++	const handleHover = ( suggestion: T ) => {
+ 		return () => {
+ 			if ( ! scrollingIntoView ) {
+ 				onHover?.( suggestion );
+@@ -60,39 +76,38 @@ function SuggestionsList( {
+ 		};
+ 	};
+ 
+-	const handleClick = ( suggestion ) => {
++	const handleClick = ( suggestion: T ) => {
+ 		return () => {
+ 			onSelect?.( suggestion );
+ 		};
+ 	};
+ 
+-	const computeSuggestionMatch = ( suggestion ) => {
+-		const matchText = displayTransform( match || '' ).toLocaleLowerCase();
++	const computeSuggestionMatch = ( suggestion: T ) => {
++		const matchText = displayTransform( match ).toLocaleLowerCase();
+ 		if ( matchText.length === 0 ) {
+ 			return null;
+ 		}
+ 
+-		suggestion = displayTransform( suggestion );
+-		const indexOfMatch = suggestion
++		const transformedSuggestion = displayTransform( suggestion );
++		const indexOfMatch = transformedSuggestion
+ 			.toLocaleLowerCase()
+ 			.indexOf( matchText );
+ 
+ 		return {
+-			suggestionBeforeMatch: suggestion.substring( 0, indexOfMatch ),
+-			suggestionMatch: suggestion.substring(
++			suggestionBeforeMatch: transformedSuggestion.substring(
++				0,
++				indexOfMatch
++			),
++			suggestionMatch: transformedSuggestion.substring(
+ 				indexOfMatch,
+ 				indexOfMatch + matchText.length
+ 			),
+-			suggestionAfterMatch: suggestion.substring(
++			suggestionAfterMatch: transformedSuggestion.substring(
+ 				indexOfMatch + matchText.length
+ 			),
+ 		};
+ 	};
+ 
+-	// We set `tabIndex` here because otherwise Firefox sets focus on this
+-	// div when tabbing off of the input in `TokenField` -- not really sure
+-	// why, since usually a div isn't focusable by default
+-	// TODO does this still apply now that it's a <ul> and not a <div>?
+ 	return (
+ 		<ul
+ 			ref={ listRef }
+@@ -116,8 +131,9 @@ function SuggestionsList( {
+ 						role="option"
+ 						className={ className }
+ 						key={
+-							suggestion?.value
+-								? suggestion.value
++							typeof suggestion === 'object' &&
++							'value' in suggestion
++								? suggestion?.value
+ 								: displayTransform( suggestion )
+ 						}
+ 						onMouseDown={ handleMouseDown }
+@@ -144,4 +160,4 @@ function SuggestionsList( {
+ 	);
+ }
+ 
+-export default withSafeTimeout( SuggestionsList );
++export default SuggestionsList;
+diff --git a/packages/components/src/form-token-field/test/index.js b/packages/components/src/form-token-field/test/index.js
+index 61fe4ccc2fea24..2901f4a8aed2c8 100644
+--- a/packages/components/src/form-token-field/test/index.js
++++ b/packages/components/src/form-token-field/test/index.js
+@@ -10,7 +10,6 @@ import ReactDOM from 'react-dom';
+  */
+ import fixtures from './lib/fixtures';
+ import TokenFieldWrapper from './lib/token-field-wrapper';
+-import TokenInput from '../token-input';
+ 
+ /**
+  * Module variables
+@@ -106,8 +105,9 @@ describe( 'FormTokenField', () => {
+ 				wrapper,
+ 				'components-form-token-field__input'
+ 			);
++
+ 		textInputComponent = () =>
+-			TestUtils.findRenderedComponentWithType( wrapper, TokenInput );
++			TestUtils.findRenderedDOMComponentWithTag( wrapper, 'input' );
+ 		/* eslint-enable react/no-find-dom-node */
+ 		TestUtils.Simulate.focus( textInputElement() );
+ 	}
+@@ -157,7 +157,9 @@ describe( 'FormTokenField', () => {
+ 				isExpanded: true,
+ 			} );
+ 			expect( getSuggestionsText() ).toEqual( [] );
+-			setText( 'th' );
++			act( () => {
++				setText( 'th' );
++			} );
+ 			expect( getSuggestionsText() ).toEqual(
+ 				fixtures.matchingSuggestions.th
+ 			);
+@@ -184,7 +186,9 @@ describe( 'FormTokenField', () => {
+ 			wrapper.setState( {
+ 				isExpanded: true,
+ 			} );
+-			setText( 'so' );
++			act( () => {
++				setText( 'so' );
++			} );
+ 			expect( getSuggestionsText() ).toEqual(
+ 				fixtures.matchingSuggestions.so
+ 			);
+@@ -192,11 +196,18 @@ describe( 'FormTokenField', () => {
+ 
+ 		it( 'should match against the unescaped values of suggestions with special characters', () => {
+ 			setUp();
+-			wrapper.setState( {
+-				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
+-				isExpanded: true,
++
++			act( () => {
++				wrapper.setState( {
++					tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
++					isExpanded: true,
++				} );
++			} );
++
++			act( () => {
++				setText( '& S' );
+ 			} );
+-			setText( '& S' );
++
+ 			expect( getSuggestionsText() ).toEqual(
+ 				fixtures.specialSuggestions.matchAmpersandUnescaped
+ 			);
+@@ -204,11 +215,15 @@ describe( 'FormTokenField', () => {
+ 
+ 		it( 'should match against the unescaped values of suggestions with special characters (including spaces)', () => {
+ 			setUp();
+-			wrapper.setState( {
+-				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
+-				isExpanded: true,
++			act( () => {
++				wrapper.setState( {
++					tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
++					isExpanded: true,
++				} );
++			} );
++			act( () => {
++				setText( 's &' );
+ 			} );
+-			setText( 's &' );
+ 			expect( getSuggestionsText() ).toEqual(
+ 				fixtures.specialSuggestions.matchAmpersandSequence
+ 			);
+@@ -216,10 +231,14 @@ describe( 'FormTokenField', () => {
+ 
+ 		it( 'should not match against the escaped values of suggestions with special characters', () => {
+ 			setUp();
+-			setText( 'amp' );
+-			wrapper.setState( {
+-				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
+-				isExpanded: true,
++			act( () => {
++				setText( 'amp' );
++			} );
++			act( () => {
++				wrapper.setState( {
++					tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
++					isExpanded: true,
++				} );
+ 			} );
+ 			expect( getSuggestionsText() ).toEqual(
+ 				fixtures.specialSuggestions.matchAmpersandEscaped
+@@ -231,7 +250,9 @@ describe( 'FormTokenField', () => {
+ 			wrapper.setState( {
+ 				isExpanded: true,
+ 			} );
+-			setText( '  at  ' );
++			act( () => {
++				setText( '  at  ' );
++			} );
+ 			expect( getSuggestionsText() ).toEqual(
+ 				fixtures.matchingSuggestions.at
+ 			);
+@@ -242,7 +263,9 @@ describe( 'FormTokenField', () => {
+ 			wrapper.setState( {
+ 				isExpanded: true,
+ 			} );
+-			setText( 'th' );
++			act( () => {
++				setText( 'th' );
++			} );
+ 			expect( getSuggestionsText() ).toEqual(
+ 				fixtures.matchingSuggestions.th
+ 			);
+@@ -279,23 +302,29 @@ describe( 'FormTokenField', () => {
+ 
+ 		it( 'should re-render when suggestions prop has changed', () => {
+ 			setUp();
+-			wrapper.setState( {
+-				tokenSuggestions: [],
+-				isExpanded: true,
++			act( () => {
++				wrapper.setState( {
++					tokenSuggestions: [],
++					isExpanded: true,
++				} );
+ 			} );
+ 			expect( getSuggestionsText() ).toEqual( [] );
+-			setText( 'so' );
++			act( () => {
++				setText( 'so' );
++			} );
+ 			expect( getSuggestionsText() ).toEqual( [] );
+-
+-			wrapper.setState( {
+-				tokenSuggestions: fixtures.specialSuggestions.default,
++			act( () => {
++				wrapper.setState( {
++					tokenSuggestions: fixtures.specialSuggestions.default,
++				} );
+ 			} );
+ 			expect( getSuggestionsText() ).toEqual(
+ 				fixtures.matchingSuggestions.so
+ 			);
+-
+-			wrapper.setState( {
+-				tokenSuggestions: [],
++			act( () => {
++				wrapper.setState( {
++					tokenSuggestions: [],
++				} );
+ 			} );
+ 			expect( getSuggestionsText() ).toEqual( [] );
+ 		} );
+@@ -310,18 +339,22 @@ describe( 'FormTokenField', () => {
+ 
+ 		it( 'should not allow adding whitespace tokens with Tab', () => {
+ 			setUp();
+-			setText( '   ' );
++			act( () => {
++				setText( '   ' );
++			} );
+ 			sendKeyDown( keyCodes.tab );
+ 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
+ 		} );
+ 
+ 		it( 'should add a token when Enter pressed', () => {
+ 			setUp();
+-			setText( 'baz' );
++			act( () => {
++				setText( 'baz' );
++			} );
+ 			sendKeyDown( keyCodes.enter );
+ 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar', 'baz' ] );
+ 			const textNode = textInputComponent();
+-			expect( textNode.props.value ).toBe( '' );
++			expect( textNode.value ).toBe( '' );
+ 		} );
+ 
+ 		it( 'should not allow adding blank tokens with Enter', () => {
+diff --git a/packages/components/src/form-token-field/test/lib/token-field-wrapper.js b/packages/components/src/form-token-field/test/lib/token-field-wrapper.tsx
+similarity index 52%
+rename from packages/components/src/form-token-field/test/lib/token-field-wrapper.js
+rename to packages/components/src/form-token-field/test/lib/token-field-wrapper.tsx
+index 653c2fd93de5db..a6b0d26a6dbed9 100644
+--- a/packages/components/src/form-token-field/test/lib/token-field-wrapper.js
++++ b/packages/components/src/form-token-field/test/lib/token-field-wrapper.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import { unescape } from 'lodash';
++import type { ComponentProps } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -12,23 +13,33 @@ import { Component } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import fixtures from './fixtures';
+-import TokenField from '../../';
++import type { FormTokenFieldProps } from '../../types';
++import FormTokenField from '../../';
+ 
+ const {
+ 	specialSuggestions: { default: suggestions },
+ } = fixtures;
+ 
+-function unescapeAndFormatSpaces( str ) {
++function unescapeAndFormatSpaces( str: string ) {
+ 	const nbsp = String.fromCharCode( 160 );
+ 	return unescape( str ).replace( / /g, nbsp );
+ }
+ 
+-class TokenFieldWrapper extends Component {
+-	constructor() {
+-		super( ...arguments );
++class TokenFieldWrapper extends Component<
++	FormTokenFieldProps,
++	{
++		tokenSuggestions: ComponentProps<
++			typeof FormTokenField
++		>[ 'suggestions' ];
++		tokens: ComponentProps< typeof FormTokenField >[ 'value' ];
++		isExpanded: boolean;
++	}
++> {
++	constructor( props: FormTokenFieldProps ) {
++		super( props );
+ 		this.state = {
+ 			tokenSuggestions: suggestions,
+-			tokens: Object.freeze( [ 'foo', 'bar' ] ),
++			tokens: Object.freeze( [ 'foo', 'bar' ] ) as string[],
+ 			isExpanded: false,
+ 		};
+ 		this.onTokensChange = this.onTokensChange.bind( this );
+@@ -36,9 +47,11 @@ class TokenFieldWrapper extends Component {
+ 
+ 	render() {
+ 		return (
+-			<TokenField
++			<FormTokenField
+ 				suggestions={
+-					this.state.isExpanded ? this.state.tokenSuggestions : null
++					this.state.isExpanded
++						? this.state.tokenSuggestions
++						: undefined
+ 				}
+ 				value={ this.state.tokens }
+ 				displayTransform={ unescapeAndFormatSpaces }
+@@ -48,7 +61,9 @@ class TokenFieldWrapper extends Component {
+ 		);
+ 	}
+ 
+-	onTokensChange( value ) {
++	onTokensChange(
++		value: ComponentProps< typeof FormTokenField >[ 'value' ]
++	) {
+ 		this.setState( { tokens: value } );
+ 	}
+ }
+diff --git a/packages/components/src/form-token-field/token-input.js b/packages/components/src/form-token-field/token-input.js
+deleted file mode 100644
+index 2cf93e157cbf8f..00000000000000
+--- a/packages/components/src/form-token-field/token-input.js
++++ /dev/null
+@@ -1,81 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { Component } from '@wordpress/element';
+-
+-class TokenInput extends Component {
+-	constructor() {
+-		super( ...arguments );
+-		this.onChange = this.onChange.bind( this );
+-		this.bindInput = this.bindInput.bind( this );
+-	}
+-
+-	focus() {
+-		this.input.focus();
+-	}
+-
+-	hasFocus() {
+-		return this.input === this.input.ownerDocument.activeElement;
+-	}
+-
+-	bindInput( ref ) {
+-		this.input = ref;
+-	}
+-
+-	onChange( event ) {
+-		this.props.onChange( {
+-			value: event.target.value,
+-		} );
+-	}
+-
+-	render() {
+-		const {
+-			value,
+-			isExpanded,
+-			instanceId,
+-			selectedSuggestionIndex,
+-			className,
+-			onChange,
+-			...props
+-		} = this.props;
+-		const size = value ? value.length + 1 : 0;
+-
+-		return (
+-			<input
+-				ref={ this.bindInput }
+-				id={ `components-form-token-input-${ instanceId }` }
+-				type="text"
+-				{ ...props }
+-				value={ value || '' }
+-				onChange={ onChange ? this.onChange : undefined }
+-				size={ size }
+-				className={ classnames(
+-					className,
+-					'components-form-token-field__input'
+-				) }
+-				autoComplete="off"
+-				role="combobox"
+-				aria-expanded={ isExpanded }
+-				aria-autocomplete="list"
+-				aria-owns={
+-					isExpanded
+-						? `components-form-token-suggestions-${ instanceId }`
+-						: undefined
+-				}
+-				aria-activedescendant={
+-					selectedSuggestionIndex !== -1
+-						? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
+-						: undefined
+-				}
+-				aria-describedby={ `components-form-token-suggestions-howto-${ instanceId }` }
+-			/>
+-		);
+-	}
+-}
+-
+-export default TokenInput;
+diff --git a/packages/components/src/form-token-field/token-input.tsx b/packages/components/src/form-token-field/token-input.tsx
+new file mode 100644
+index 00000000000000..478cce3f3733cc
+--- /dev/null
++++ b/packages/components/src/form-token-field/token-input.tsx
+@@ -0,0 +1,76 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++import type { ChangeEvent, ForwardedRef } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { WordPressComponentProps } from '../ui/context';
++import type { TokenInputProps } from './types';
++
++export function UnForwardedTokenInput(
++	props: WordPressComponentProps< TokenInputProps, 'input', false >,
++	ref: ForwardedRef< HTMLInputElement >
++) {
++	const {
++		value,
++		isExpanded,
++		instanceId,
++		selectedSuggestionIndex,
++		className,
++		onChange,
++		...restProps
++	} = props;
++
++	const size = value ? value.length + 1 : 0;
++
++	const onChangeHandler = ( event: ChangeEvent< HTMLInputElement > ) => {
++		if ( onChange ) {
++			onChange( {
++				value: event.target.value,
++			} );
++		}
++	};
++
++	return (
++		<input
++			ref={ ref }
++			id={ `components-form-token-input-${ instanceId }` }
++			type="text"
++			{ ...restProps }
++			value={ value || '' }
++			onChange={ onChangeHandler }
++			size={ size }
++			className={ classnames(
++				className,
++				'components-form-token-field__input'
++			) }
++			autoComplete="off"
++			role="combobox"
++			aria-expanded={ isExpanded }
++			aria-autocomplete="list"
++			aria-owns={
++				isExpanded
++					? `components-form-token-suggestions-${ instanceId }`
++					: undefined
++			}
++			aria-activedescendant={
++				selectedSuggestionIndex !== -1
++					? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
++					: undefined
++			}
++			aria-describedby={ `components-form-token-suggestions-howto-${ instanceId }` }
++		/>
++	);
++}
++
++export const TokenInput = forwardRef( UnForwardedTokenInput );
++
++export default TokenInput;
+diff --git a/packages/components/src/form-token-field/token.js b/packages/components/src/form-token-field/token.tsx
+similarity index 96%
+rename from packages/components/src/form-token-field/token.js
+rename to packages/components/src/form-token-field/token.tsx
+index fb34d9d20d8cbc..84e5c0b4f491a9 100644
+--- a/packages/components/src/form-token-field/token.js
++++ b/packages/components/src/form-token-field/token.tsx
+@@ -16,6 +16,7 @@ import { closeSmall } from '@wordpress/icons';
+  */
+ import Button from '../button';
+ import { VisuallyHidden } from '../visually-hidden';
++import type { TokenProps } from './types';
+ 
+ export default function Token( {
+ 	value,
+@@ -30,7 +31,7 @@ export default function Token( {
+ 	messages,
+ 	termPosition,
+ 	termsCount,
+-} ) {
++}: TokenProps ) {
+ 	const instanceId = useInstanceId( Token );
+ 	const tokenClasses = classnames( 'components-form-token-field__token', {
+ 		'is-error': 'error' === status,
+diff --git a/packages/components/src/form-token-field/types.ts b/packages/components/src/form-token-field/types.ts
+new file mode 100644
+index 00000000000000..b2952fac935d96
+--- /dev/null
++++ b/packages/components/src/form-token-field/types.ts
+@@ -0,0 +1,178 @@
++/**
++ * External dependencies
++ */
++import type { ComponentPropsWithRef, MouseEventHandler } from 'react';
++
++type Messages = {
++	/**
++	 * The user added a new token.
++	 */
++	added: string;
++	/**
++	 * The user removed an existing token.
++	 */
++	removed: string;
++	/**
++	 * The user focused the button to remove the token.
++	 */
++	remove: string;
++	/**
++	 * The user tried to add a token that didn't pass the validation.
++	 */
++	__experimentalInvalid: string;
++};
++
++export interface TokenItem {
++	/**
++	 *  The value of the token.
++	 */
++	value: string;
++	/**
++	 * One of 'error', 'validating', or 'success'. Applies styles to token.
++	 */
++	status?: 'error' | 'success' | 'validating';
++	/**
++	 * If not falsey, will add a title to the token.
++	 */
++	title?: string;
++	/**
++	 * When true, renders tokens as without a background.
++	 */
++	isBorderless?: boolean;
++	/**
++	 * Function to call when onMouseEnter event triggered on token.
++	 */
++	onMouseEnter?: MouseEventHandler< HTMLSpanElement >;
++	/**
++	 *  Function to call when onMouseLeave is triggered on token.
++	 */
++	onMouseLeave?: MouseEventHandler< HTMLSpanElement >;
++}
++
++export interface FormTokenFieldProps
++	extends Pick<
++		ComponentPropsWithRef< 'input' >,
++		'autoCapitalize' | 'autoComplete' | 'className'
++	> {
++	label?: string;
++	/**
++	 * An array of strings to present to the user as suggested tokens.
++	 */
++	suggestions?: string[];
++	/**
++	 * The maximum number of suggestions to display at a time.
++	 *
++	 * @default 100
++	 */
++	maxSuggestions?: number;
++	/**
++	 * An array of strings or objects to display as tokens in the field.
++	 * If objects are present in the array, they **must** have a property of `value`.
++	 */
++	value?: ( string | TokenItem )[];
++	/**
++	 * Function to call to transform tokens for display.
++	 * (In the editor, this is needed to decode HTML entities embedded in tags
++	 * - otherwise entities like `&` in tag names are double-encoded like `&amp;`,
++	 * once by the REST API and once by React).
++	 */
++	displayTransform?: ( token: string ) => string;
++	/**
++	 * Function to call to transform tokens for saving. The default is to trim the token value.
++	 * This function is also applied when matching suggestions against the current value
++	 * so that matching works correctly with leading or trailing spaces. (In the editor,
++	 * this is needed to remove leading and trailing spaces from tag names, like wp-admin does.
++	 * Otherwise the REST API won't save them.)
++	 *
++	 * @default ( token: string ) => token.trim()
++	 */
++	saveTransform?: ( token: string ) => string;
++	/**
++	 * Function to call when the tokens have changed. An array of new tokens is passed to the callback.
++	 *
++	 */
++	onChange?: ( tokens: ( string | TokenItem )[] ) => void;
++	/**
++	 * Function to call when the users types in the input field. It can be used to trigger autocomplete requests.
++	 *
++	 */
++	onInputChange?: ( input: string ) => void;
++	/**
++	 * Function to call when the TokenField has been focused on. The event is passed to the callback. Useful for analytics.
++	 *
++	 */
++	onFocus?: ( event: FocusEvent ) => void;
++	/**
++	 *  When true, renders tokens as without a background.
++	 */
++	isBorderless?: boolean;
++	/**
++	 * If passed, `TokenField` will disable ability to add new tokens once number of tokens is greater than or equal to `maxLength`.
++	 */
++	maxLength?: number;
++	/**
++	 * When true, tokens are not able to be added or removed.
++	 */
++	disabled?: boolean;
++	/**
++	 * If passed, the `TokenField` input will show a placeholder string if no value tokens are present.
++	 */
++	placeholder?: string;
++	/**
++	 * If true, will add a token when `TokenField` is focused and `space` is pressed.
++	 */
++	tokenizeOnSpace?: boolean;
++	/**
++	 * Allows customizing the messages presented by screen readers in different occasions:
++	 *
++	 * -   `added`: The user added a new token.
++	 * -   `removed`: The user removed an existing token.
++	 * -   `remove` : The user focused the button to remove the token.
++	 * -   `__experimentalInvalid`: The user tried to add a token that didn't pass the validation.
++	 */
++	messages?: Messages;
++	/**
++	 * If true, the suggestions list will be always expanded when the input field has the focus.
++	 */
++	__experimentalExpandOnFocus?: boolean;
++	/**
++	 * If passed, all introduced values will be validated before being added as tokens.
++	 *
++	 * @default () => true
++	 */
++	__experimentalValidateInput?: ( token: string ) => boolean;
++	/**
++	 * If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
++	 *
++	 * @default true
++	 */
++	__experimentalShowHowTo?: boolean;
++}
++
++export interface SuggestionsListProps< T = string | { value: string } > {
++	selectedIndex: number;
++	scrollIntoView: boolean;
++	match: T;
++	onHover: ( suggestion: T ) => void;
++	onSelect: ( suggestion: T ) => void;
++	suggestions: T[];
++	displayTransform: ( value: T ) => string;
++	instanceId: string | number;
++}
++
++export interface TokenProps extends TokenItem {
++	displayTransform: ( value: string ) => string;
++	disabled: boolean;
++	onClickRemove: ( { value }: { value: string } ) => void;
++	messages: Messages;
++	termPosition: number;
++	termsCount: number;
++}
++
++export interface TokenInputProps {
++	isExpanded: boolean;
++	instanceId: string | number;
++	selectedSuggestionIndex: number;
++	onChange?: ( { value }: { value: string } ) => void;
++	value: string;
++}
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 1904cb5da18236..d83c5f2b24fba8 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -6,6 +6,7 @@
+ 		"types": [
+ 			"gutenberg-env",
+ 			"gutenberg-test-env",
++			"dom-scroll-into-view",
+ 			"jest",
+ 			"@testing-library/jest-dom",
+ 			"snapshot-diff",
+@@ -55,6 +56,7 @@
+ 		"src/elevation/**/*",
+ 		"src/flex/**/*",
+ 		"src/form-group/**/*",
++		"src/form-token-field/**/*",
+ 		"src/grid/**/*",
+ 		"src/h-stack/**/*",
+ 		"src/heading/**/*",
+diff --git a/typings/dom-scroll-into-view/index.d.ts b/typings/dom-scroll-into-view/index.d.ts
+new file mode 100644
+index 00000000000000..0b299a71a27fba
+--- /dev/null
++++ b/typings/dom-scroll-into-view/index.d.ts
+@@ -0,0 +1,18 @@
++interface Config {
++	alignWithLeft?: boolean;
++	alignWithTop?: boolean;
++	offsetTop?: number;
++	offsetLeft?: number;
++	offsetBottom?: number;
++	offsetRight?: number;
++	allowHorizontalScroll?: boolean;
++	onlyScrollIfNeeded?: boolean;
++}
++
++declare module 'dom-scroll-into-view' {
++	export default function scrollIntoView(
++		source: HTMLElement,
++		container: HTMLElement,
++		config: Config
++	): void;
++}

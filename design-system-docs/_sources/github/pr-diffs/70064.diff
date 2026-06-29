@@ -1,0 +1,43 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b1544099686548..f625c92bb44fb0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ -   `ToggleGroupControl`: Fix active background for empty string value ([#69969](https://github.com/WordPress/gutenberg/pull/69969)).
+ -   `ItemGroup`: Fix double border in `ItemGroup` when last item is focused ([#70021](https://github.com/WordPress/gutenberg/pull/70021)).
+ -   `__experimentalUseCustomUnits `: Don't mutate 'ALL_CSS_UNITS' default value ([#70037](https://github.com/WordPress/gutenberg/pull/70037)).
++-   `BaseControl`: Fix documentation to clarify that the component doesn't support the `as` prop ([70064](https://github.com/WordPress/gutenberg/pull/70064)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index 2a82c19845e47b..2385f7c3715c16 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -36,13 +36,6 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
+ 
+ Start opting into the new margin-free styles that will become the default in a future version.
+ 
+-### `as`
+-
+- - Type: `"symbol" | "object" | "label" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | ... 516 more ... | ("view" & FunctionComponent<...>)`
+- - Required: No
+-
+-The HTML element or React component to render the component as.
+-
+ ### `className`
+ 
+  - Type: `string`
+diff --git a/packages/components/src/base-control/index.tsx b/packages/components/src/base-control/index.tsx
+index 423636a92cd5f0..a6e386a3e9e5d8 100644
+--- a/packages/components/src/base-control/index.tsx
++++ b/packages/components/src/base-control/index.tsx
+@@ -28,7 +28,7 @@ import { contextConnectWithoutRef, useContextSystem } from '../context';
+ export { useBaseControlProps } from './hooks';
+ 
+ const UnconnectedBaseControl = (
+-	props: WordPressComponentProps< BaseControlProps, null >
++	props: WordPressComponentProps< BaseControlProps, null, false >
+ ) => {
+ 	const {
+ 		__nextHasNoMarginBottom = false,

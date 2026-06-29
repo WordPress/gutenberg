@@ -1,0 +1,71 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a0d4bef9293116..ab79666d241706 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ ### Enhancements
+ 
+ -   `ToolbarButton`: Deprecate `isDisabled` prop and merge with `disabled` ([#63101](https://github.com/WordPress/gutenberg/pull/63101)).
++-   `ToolbarButton`: Always keep focusable when disabled ([#63102](https://github.com/WordPress/gutenberg/pull/63102)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/toolbar/toolbar-button/index.tsx b/packages/components/src/toolbar/toolbar-button/index.tsx
+index 48f385fa1abaff..a8967df75690c0 100644
+--- a/packages/components/src/toolbar/toolbar-button/index.tsx
++++ b/packages/components/src/toolbar/toolbar-button/index.tsx
+@@ -16,7 +16,7 @@ import Button from '../../button';
+ import ToolbarItem from '../toolbar-item';
+ import ToolbarContext from '../toolbar-context';
+ import ToolbarButtonContainer from './toolbar-button-container';
+-import type { ToolbarButtonProps } from './types';
++import type { ToolbarButtonDeprecatedProps, ToolbarButtonProps } from './types';
+ import type { WordPressComponentProps } from '../../context';
+ 
+ function useDeprecatedProps( {
+@@ -30,7 +30,11 @@ function useDeprecatedProps( {
+ }
+ 
+ function UnforwardedToolbarButton(
+-	props: WordPressComponentProps< ToolbarButtonProps, typeof Button, false >,
++	props: Omit<
++		WordPressComponentProps< ToolbarButtonProps, typeof Button, false >,
++		'__experimentalIsFocusable' // ToolbarButton will always be focusable even when disabled.
++	> &
++		ToolbarButtonDeprecatedProps,
+ 	ref: ForwardedRef< any >
+ ) {
+ 	const {
+diff --git a/packages/components/src/toolbar/toolbar-button/types.ts b/packages/components/src/toolbar/toolbar-button/types.ts
+index bcd349c0d89363..59965e66d13472 100644
+--- a/packages/components/src/toolbar/toolbar-button/types.ts
++++ b/packages/components/src/toolbar/toolbar-button/types.ts
+@@ -37,6 +37,16 @@ export type ToolbarButtonProps = {
+ 	title?: string;
+ };
+ 
++export type ToolbarButtonDeprecatedProps = {
++	/**
++	 * Whether to keep the button focusable when disabled.
++	 *
++	 * @deprecated ToolbarButton will always be focusable even when disabled.
++	 * @ignore
++	 */
++	__experimentalIsFocusable?: boolean;
++};
++
+ export type ToolbarButtonContainerProps = {
+ 	/**
+ 	 * Children to be rendered inside the button container.
+diff --git a/packages/components/src/toolbar/toolbar-item/index.tsx b/packages/components/src/toolbar/toolbar-item/index.tsx
+index 2c343eb173a27b..7f4ccb7f659cdc 100644
+--- a/packages/components/src/toolbar/toolbar-item/index.tsx
++++ b/packages/components/src/toolbar/toolbar-item/index.tsx
+@@ -50,6 +50,7 @@ function ToolbarItem(
+ 
+ 	return (
+ 		<Ariakit.ToolbarItem
++			accessibleWhenDisabled
+ 			{ ...allProps }
+ 			store={ accessibleToolbarStore }
+ 			render={ render }

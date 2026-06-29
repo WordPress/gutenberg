@@ -1,0 +1,13 @@
+diff --git a/packages/theme/src/color-ramps/test/index.test.ts b/packages/theme/src/color-ramps/test/index.test.ts
+index c9e87e848009a0..7b53b4b98c0b3c 100644
+--- a/packages/theme/src/color-ramps/test/index.test.ts
++++ b/packages/theme/src/color-ramps/test/index.test.ts
+@@ -15,7 +15,7 @@ const lStops = [ 100, 90, 80, 70, 60, 50, 40, 30, 20, 10 ];
+ const sStops = [ 100, 80, 60, 40, 20, 0 ];
+ const hstops = [ 0, 60, 120, 180, 240, 300 ];
+ 
+-describe( 'buildRamps', () => {
++describe.skip( 'buildRamps', () => {
+ 	it( 'background ramp snapshots', () => {
+ 		const allBgColors = lStops.flatMap( ( l ) =>
+ 			sStops.flatMap( ( s ) =>

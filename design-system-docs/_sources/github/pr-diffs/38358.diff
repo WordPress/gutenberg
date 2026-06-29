@@ -1,0 +1,103 @@
+diff --git a/packages/block-editor/src/components/list-view/block-contents.js b/packages/block-editor/src/components/list-view/block-contents.js
+index 61e221b77f1066..071cd11cd70b29 100644
+--- a/packages/block-editor/src/components/list-view/block-contents.js
++++ b/packages/block-editor/src/components/list-view/block-contents.js
+@@ -26,6 +26,7 @@ const ListViewBlockContents = forwardRef(
+ 			position,
+ 			siblingBlockCount,
+ 			level,
++			isExpanded,
+ 			...props
+ 		},
+ 		ref
+@@ -71,6 +72,7 @@ const ListViewBlockContents = forwardRef(
+ 						draggable={ draggable }
+ 						onDragStart={ onDragStart }
+ 						onDragEnd={ onDragEnd }
++						isExpanded={ isExpanded }
+ 						{ ...props }
+ 					/>
+ 				) }
+diff --git a/packages/block-editor/src/components/list-view/block-select-button.js b/packages/block-editor/src/components/list-view/block-select-button.js
+index 87029cd066cefa..7a7f3b99a1a6d9 100644
+--- a/packages/block-editor/src/components/list-view/block-select-button.js
++++ b/packages/block-editor/src/components/list-view/block-select-button.js
+@@ -36,6 +36,7 @@ function ListViewBlockSelectButton(
+ 		onDragStart,
+ 		onDragEnd,
+ 		draggable,
++		isExpanded,
+ 	},
+ 	ref
+ ) {
+@@ -81,6 +82,7 @@ function ListViewBlockSelectButton(
+ 				onDragEnd={ onDragEnd }
+ 				draggable={ draggable }
+ 				href={ `#block-${ clientId }` }
++				aria-expanded={ isExpanded }
+ 			>
+ 				<ListViewExpander onClick={ onToggleExpanded } />
+ 				<BlockIcon icon={ blockInformation?.icon } showColors />
+diff --git a/packages/block-editor/src/components/list-view/block.js b/packages/block-editor/src/components/list-view/block.js
+index a7746463c5adfd..9aee99e2c2eba7 100644
+--- a/packages/block-editor/src/components/list-view/block.js
++++ b/packages/block-editor/src/components/list-view/block.js
+@@ -185,6 +185,7 @@ function ListViewBlock( {
+ 							ref={ ref }
+ 							tabIndex={ tabIndex }
+ 							onFocus={ onFocus }
++							isExpanded={ isExpanded }
+ 						/>
+ 					</div>
+ 				) }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8924e98e6a2796..adb9f8926cf5f4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ ### Enhancements
+ 
+ -   Update the visual design of the `Spinner` component. ([#37551](https://github.com/WordPress/gutenberg/pull/37551))
++- TreeGrid accessibility enhancements. (#38358)
+ 
+ ## 19.3.0 (2022-01-27)
+ 
+diff --git a/packages/components/src/tree-grid/index.js b/packages/components/src/tree-grid/index.js
+index 62afdb6a9eb7c7..a04c6c266d9bd2 100644
+--- a/packages/components/src/tree-grid/index.js
++++ b/packages/components/src/tree-grid/index.js
+@@ -78,6 +78,11 @@ function TreeGrid(
+ 			const activeRow = activeElement.closest( '[role="row"]' );
+ 			const focusablesInRow = getRowFocusables( activeRow );
+ 			const currentColumnIndex = focusablesInRow.indexOf( activeElement );
++			const canExpandCollapse = 0 === currentColumnIndex;
++			const cannotFocusNextColumn =
++				canExpandCollapse &&
++				activeRow.getAttribute( 'aria-expanded' ) === 'false' &&
++				keyCode === RIGHT;
+ 
+ 			if ( includes( [ LEFT, RIGHT ], keyCode ) ) {
+ 				// Calculate to the next element.
+@@ -91,8 +96,8 @@ function TreeGrid(
+ 					);
+ 				}
+ 
+-				// Focus is either at the left or right edge of the grid.
+-				if ( nextIndex === currentColumnIndex ) {
++				// Focus is at the left most column.
++				if ( canExpandCollapse ) {
+ 					if ( keyCode === LEFT ) {
+ 						// Left:
+ 						// If a row is focused, and it is expanded, collapses the current row.
+@@ -149,7 +154,10 @@ function TreeGrid(
+ 					return;
+ 				}
+ 
+-				// Focus the next element.
++				// Focus the next element. If at most left column and row is collapsed, moving right is not allowed as this will expand. However, if row is collapsed, moving left is allowed.
++				if ( cannotFocusNextColumn ) {
++					return;
++				}
+ 				focusablesInRow[ nextIndex ].focus();
+ 
+ 				// Prevent key use for anything else. This ensures Voiceover

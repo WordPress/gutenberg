@@ -1,0 +1,63 @@
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index e78ad7d8e4524a..2d2a349b3eca13 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -26,6 +26,7 @@ import TokenInput from '../form-token-field/token-input';
+ import SuggestionsList from '../form-token-field/suggestions-list';
+ import BaseControl from '../base-control';
+ import Button from '../button';
++import Spinner from '../spinner';
+ import { Flex, FlexBlock, FlexItem } from '../flex';
+ import withFocusOutside from '../higher-order/with-focus-outside';
+ 
+@@ -51,6 +52,7 @@ function ComboboxControl( {
+ 	help,
+ 	allowReset = true,
+ 	className,
++	isLoading = false,
+ 	messages = {
+ 		selected: __( 'Item selected.' ),
+ 	},
+@@ -218,6 +220,7 @@ function ComboboxControl( {
+ 								onChange={ onInputChange }
+ 							/>
+ 						</FlexBlock>
++						{ isLoading && <Spinner /> }
+ 						{ allowReset && (
+ 							<FlexItem>
+ 								<Button
+diff --git a/packages/components/src/combobox-control/style.scss b/packages/components/src/combobox-control/style.scss
+index 3cb0a8272e65c8..246c42409b09f9 100644
+--- a/packages/components/src/combobox-control/style.scss
++++ b/packages/components/src/combobox-control/style.scss
+@@ -36,6 +36,17 @@ input.components-combobox-control__input[type="text"] {
+ 	&:focus-within {
+ 		@include input-style__focus();
+ 	}
++
++	.components-spinner {
++		margin-top: auto;
++		margin-bottom: auto;
++		margin-right: 2px;
++		margin-left: $grid-unit-30;
++	}
++
++	.components-form-token-field__suggestions-list:empty {
++		border-top: none;
++	}
+ }
+ 
+ .components-combobox-control__reset.components-button {
+diff --git a/packages/editor/src/components/post-author/combobox.js b/packages/editor/src/components/post-author/combobox.js
+index 1f15e8c4ddac2b..b538f021d82c8b 100644
+--- a/packages/editor/src/components/post-author/combobox.js
++++ b/packages/editor/src/components/post-author/combobox.js
+@@ -35,7 +35,7 @@ function PostAuthorCombobox() {
+ 				authorId: getEditedPostAttribute( 'author' ),
+ 				postAuthor: author,
+ 				authors: getAuthors( query ),
+-				isLoading: isResolving( 'core', 'getAuthors', [ query ] ),
++				isLoading: isResolving( 'getAuthors', [ query ] ),
+ 			};
+ 		},
+ 		[ fieldValue ]

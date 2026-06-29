@@ -1,0 +1,105 @@
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 492c4bef0f4e20..7fe4f39cbbc7d1 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -12,7 +12,13 @@ import type { CSSProperties, ReactNode } from 'react';
+ import type { WordPressComponentProps } from '../../context';
+ import { Flex, FlexItem } from '../../flex';
+ import { Text } from '../../text';
+-import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
++import {
++	baseLabelTypography,
++	COLORS,
++	CONFIG,
++	rtl,
++	placeholderStyles,
++} from '../../utils';
+ import type { LabelPosition, Size, PrefixSuffixWrapperProps } from '../types';
+ 
+ type ContainerProps = {
+@@ -283,18 +289,7 @@ export const Input = styled.input< InputProps >`
+ 		${ fontSizeStyles }
+ 		${ sizeStyles }
+ 		${ customPaddings }
+-
+-		&::-webkit-input-placeholder {
+-			color: ${ COLORS.ui.darkGrayPlaceholder };
+-		}
+-
+-		&::-moz-placeholder {
+-			color: ${ COLORS.ui.darkGrayPlaceholder };
+-		}
+-
+-		&:-ms-input-placeholder {
+-			color: ${ COLORS.ui.darkGrayPlaceholder };
+-		}
++		${ placeholderStyles }
+ 
+ 		&[type='email'],
+ 		&[type='url'] {
+diff --git a/packages/components/src/text-control/style.scss b/packages/components/src/text-control/style.scss
+index 476a85afb990d8..80284680f4a84a 100644
+--- a/packages/components/src/text-control/style.scss
++++ b/packages/components/src/text-control/style.scss
+@@ -29,6 +29,19 @@
+ 		padding-left: $grid-unit-15;
+ 		padding-right: $grid-unit-15;
+ 	}
++
++	// Use opacity to work in various editor styles.
++	&::-webkit-input-placeholder {
++		color: $dark-gray-placeholder;
++	}
++
++	&::-moz-placeholder {
++		color: $dark-gray-placeholder;
++	}
++
++	&:-ms-input-placeholder {
++		color: $dark-gray-placeholder;
++	}
+ }
+ 
+ .components-text-control__input[type="email"],
+diff --git a/packages/components/src/utils/placeholder.js b/packages/components/src/utils/placeholder.js
+new file mode 100644
+index 00000000000000..773e8943236aa8
+--- /dev/null
++++ b/packages/components/src/utils/placeholder.js
+@@ -0,0 +1,27 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS } from './colors-values';
++
++export const placeholderStyles = css`
++	&::placeholder {
++		color: ${ COLORS.ui.darkGrayPlaceholder };
++	}
++
++	&::-webkit-input-placeholder {
++		color: ${ COLORS.ui.darkGrayPlaceholder };
++	}
++
++	&::-moz-placeholder {
++		color: ${ COLORS.ui.darkGrayPlaceholder };
++	}
++
++	&:-ms-input-placeholder {
++		color: ${ COLORS.ui.darkGrayPlaceholder };
++	}
++`;
+diff --git a/packages/components/src/utils/style-mixins.js b/packages/components/src/utils/style-mixins.js
+index 46ee1183f59698..724eb698d1cf5d 100644
+--- a/packages/components/src/utils/style-mixins.js
++++ b/packages/components/src/utils/style-mixins.js
+@@ -6,3 +6,4 @@ export { breakpoint } from './breakpoint';
+ export { default as CONFIG } from './config-values';
+ export { COLORS } from './colors-values';
+ export { baseLabelTypography } from './base-label';
++export { placeholderStyles } from './placeholder';

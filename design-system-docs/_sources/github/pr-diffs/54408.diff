@@ -1,0 +1,155 @@
+diff --git a/packages/block-library/src/html/edit.js b/packages/block-library/src/html/edit.js
+index 5cb2b457633b13..3cf2ee08bb68b2 100644
+--- a/packages/block-library/src/html/edit.js
++++ b/packages/block-library/src/html/edit.js
+@@ -8,7 +8,13 @@ import {
+ 	PlainText,
+ 	useBlockProps,
+ } from '@wordpress/block-editor';
+-import { ToolbarButton, Disabled, ToolbarGroup } from '@wordpress/components';
++import {
++	ToolbarButton,
++	Disabled,
++	ToolbarGroup,
++	VisuallyHidden,
++} from '@wordpress/components';
++import { useInstanceId } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -19,6 +25,8 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
+ 	const [ isPreview, setIsPreview ] = useState();
+ 	const isDisabled = useContext( Disabled.Context );
+ 
++	const instanceId = useInstanceId( HTMLEdit, 'html-edit-desc' );
++
+ 	function switchToPreview() {
+ 		setIsPreview( true );
+ 	}
+@@ -27,8 +35,13 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
+ 		setIsPreview( false );
+ 	}
+ 
++	const blockProps = useBlockProps( {
++		className: 'block-library-html__edit',
++		'aria-describedby': isPreview ? instanceId : undefined,
++	} );
++
+ 	return (
+-		<div { ...useBlockProps( { className: 'block-library-html__edit' } ) }>
++		<div { ...blockProps }>
+ 			<BlockControls>
+ 				<ToolbarGroup>
+ 					<ToolbarButton
+@@ -48,10 +61,17 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
+ 				</ToolbarGroup>
+ 			</BlockControls>
+ 			{ isPreview || isDisabled ? (
+-				<Preview
+-					content={ attributes.content }
+-					isSelected={ isSelected }
+-				/>
++				<>
++					<Preview
++						content={ attributes.content }
++						isSelected={ isSelected }
++					/>
++					<VisuallyHidden id={ instanceId }>
++						{ __(
++							'HTML preview is not yet fully accessible. Please switch screen reader to virtualized mode to navigate the below iFrame.'
++						) }
++					</VisuallyHidden>
++				</>
+ 			) : (
+ 				<PlainText
+ 					value={ attributes.content }
+diff --git a/packages/block-library/src/html/preview.js b/packages/block-library/src/html/preview.js
+index 262f6ef626e0a0..4d3fe5f41915a6 100644
+--- a/packages/block-library/src/html/preview.js
++++ b/packages/block-library/src/html/preview.js
+@@ -8,6 +8,7 @@ import {
+ } from '@wordpress/block-editor';
+ import { SandBox } from '@wordpress/components';
+ import { useSelect } from '@wordpress/data';
++import { __ } from '@wordpress/i18n';
+ 
+ // Default styles used to unset some of the styles
+ // that might be inherited from the editor style.
+@@ -32,7 +33,12 @@ export default function HTMLEditPreview( { content, isSelected } ) {
+ 
+ 	return (
+ 		<>
+-			<SandBox html={ content } styles={ styles } />
++			<SandBox
++				html={ content }
++				styles={ styles }
++				title={ __( 'Custom HTML Preview' ) }
++				tabIndex={ -1 }
++			/>
+ 			{ /*
+ 				An overlay is added when the block is not selected in order to register click events.
+ 				Some browsers do not bubble up the clicks from the sandboxed iframe, which makes it
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 93b3f52d6e4915..02457385e8a633 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ -   `DuotonePicker/ColorListPicker`: Adds appropriate labels to 'Duotone Filter' color pickers ([#54468](https://github.com/WordPress/gutenberg/pull/54468)).
+ -   `SearchControl`: support new `40px` and `32px` sizes ([#54548](https://github.com/WordPress/gutenberg/pull/54548)).
+ -   `FormTokenField`: Add `tokenizeOnBlur` prop to add any incompleteTokenValue as a new token when field loses focus ([#54445](https://github.com/WordPress/gutenberg/pull/54445)).
++- `Sandbox`: Add `tabIndex` prop ([#54408](https://github.com/WordPress/gutenberg/pull/54408)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/sandbox/README.md b/packages/components/src/sandbox/README.md
+index 406b54d3de1bdf..33d78454aaacdf 100644
+--- a/packages/components/src/sandbox/README.md
++++ b/packages/components/src/sandbox/README.md
+@@ -53,4 +53,10 @@ The `<title>` of the iframe document.
+ The CSS class name to apply to the `<html>` and `<body>` elements of the iframe.
+ 
+ -   Required: No
+--   Default: ""
+\ No newline at end of file
++-   Default: ""
++
++### `tabIndex`: `HTMLElement[ 'tabIndex' ]`
++
++The `tabindex` the iframe should receive.
++
++-   Required: No
+diff --git a/packages/components/src/sandbox/index.tsx b/packages/components/src/sandbox/index.tsx
+index ecd51e1fc26643..66c2c9cd865634 100644
+--- a/packages/components/src/sandbox/index.tsx
++++ b/packages/components/src/sandbox/index.tsx
+@@ -130,6 +130,7 @@ function SandBox( {
+ 	styles = [],
+ 	scripts = [],
+ 	onFocus,
++	tabIndex,
+ }: SandBoxProps ) {
+ 	const ref = useRef< HTMLIFrameElement >();
+ 	const [ width, setWidth ] = useState( 0 );
+@@ -282,6 +283,7 @@ function SandBox( {
+ 		<iframe
+ 			ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
+ 			title={ title }
++			tabIndex={ tabIndex }
+ 			className="components-sandbox"
+ 			sandbox="allow-scripts allow-same-origin allow-presentation"
+ 			onFocus={ onFocus }
+diff --git a/packages/components/src/sandbox/types.ts b/packages/components/src/sandbox/types.ts
+index 7edc91b938f299..76f98da45c8c63 100644
+--- a/packages/components/src/sandbox/types.ts
++++ b/packages/components/src/sandbox/types.ts
+@@ -31,4 +31,10 @@ export type SandBoxProps = {
+ 	 * The `onFocus` callback for the iframe.
+ 	 */
+ 	onFocus?: React.DOMAttributes< HTMLIFrameElement >[ 'onFocus' ];
++	/**
++	 * The `tabindex` the iframe should receive.
++	 *
++	 * @default 0
++	 */
++	tabIndex?: HTMLElement[ 'tabIndex' ];
+ };

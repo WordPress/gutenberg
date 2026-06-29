@@ -1,0 +1,144 @@
+diff --git a/packages/block-editor/src/components/line-height-control/index.js b/packages/block-editor/src/components/line-height-control/index.js
+index 21042a8cad389c..89071b5671d8d8 100644
+--- a/packages/block-editor/src/components/line-height-control/index.js
++++ b/packages/block-editor/src/components/line-height-control/index.js
+@@ -93,6 +93,50 @@ export default function LineHeightControl( {
+ 	__unstableInputWidth = '60px',
+ } ) {
+ 	const isDefined = isLineHeightDefined( lineHeight );
++
++	const adjustNextValue = ( nextValue, wasTypedOrPasted ) => {
++		// Set the next value without modification if lineHeight has been defined
++		if ( isDefined ) return nextValue;
++
++		/**
++		 * The following logic handles the initial step up/down action
++		 * (from an undefined value state) so that the next values are better suited for
++		 * line-height rendering. For example, the first step up should immediately
++		 * go to 1.6, rather than the normally expected 0.1.
++		 *
++		 * Step up/down actions can be triggered by keydowns of the up/down arrow keys,
++		 * or by clicking the spin buttons.
++		 */
++		switch ( nextValue ) {
++			case `${ STEP }`:
++				// Increment by step value
++				return BASE_DEFAULT_VALUE + STEP;
++			case '0': {
++				// This means the user explicitly input '0', rather than stepped down
++				// from an undefined value state
++				if ( wasTypedOrPasted ) return nextValue;
++				// Decrement by step value
++				return BASE_DEFAULT_VALUE - STEP;
++			}
++			case '':
++				return BASE_DEFAULT_VALUE;
++			default:
++				return nextValue;
++		}
++	};
++
++	const stateReducer = ( state, action ) => {
++		// Be careful when changing this — cross-browser behavior of the
++		// `inputType` field in `input` events are inconsistent.
++		// For example, Firefox emits an input event with inputType="insertReplacementText"
++		// on spin button clicks, while other browsers do not even emit an input event.
++		const wasTypedOrPasted = [ 'insertText', 'insertFromPaste' ].includes(
++			action.payload.event.nativeEvent.inputType
++		);
++		state.value = adjustNextValue( state.value, wasTypedOrPasted );
++		return state;
++	};
++
+ 	const value = isDefined ? lineHeight : RESET_VALUE;
+ 
+ 	if ( ! __nextHasNoMarginBottom ) {
+@@ -117,6 +161,7 @@ export default function LineHeightControl( {
+ 		>
+ 			<NumberControl
+ 				__unstableInputWidth={ __unstableInputWidth }
++				__unstableStateReducer={ stateReducer }
+ 				onChange={ onChange }
+ 				label={ __( 'Line height' ) }
+ 				placeholder={ BASE_DEFAULT_VALUE }
+diff --git a/packages/block-editor/src/components/line-height-control/test/index.js b/packages/block-editor/src/components/line-height-control/test/index.js
+new file mode 100644
+index 00000000000000..c6a16f5db3cad0
+--- /dev/null
++++ b/packages/block-editor/src/components/line-height-control/test/index.js
+@@ -0,0 +1,61 @@
++/**
++ * External dependencies
++ */
++import { fireEvent, render, screen } from '@testing-library/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++import { UP, DOWN } from '@wordpress/keycodes';
++
++/**
++ * Internal dependencies
++ */
++import LineHeightControl from '../';
++import { BASE_DEFAULT_VALUE, STEP } from '../utils';
++
++const ControlledLineHeightControl = () => {
++	const [ value, setValue ] = useState();
++	return (
++		<LineHeightControl
++			value={ value }
++			onChange={ setValue }
++			__nextHasNoMarginBottom={ true }
++		/>
++	);
++};
++
++describe( 'LineHeightControl', () => {
++	it( 'should immediately step up from the default value if up-arrowed from an unset state', () => {
++		render( <ControlledLineHeightControl /> );
++		const input = screen.getByRole( 'spinbutton' );
++		input.focus();
++		fireEvent.keyDown( input, { keyCode: UP } );
++		expect( input ).toHaveValue( BASE_DEFAULT_VALUE + STEP );
++	} );
++
++	it( 'should immediately step down from the default value if down-arrowed from an unset state', () => {
++		render( <ControlledLineHeightControl /> );
++		const input = screen.getByRole( 'spinbutton' );
++		input.focus();
++		fireEvent.keyDown( input, { keyCode: DOWN } );
++		expect( input ).toHaveValue( BASE_DEFAULT_VALUE - STEP );
++	} );
++
++	it( 'should immediately step up from the default value if spin button up was clicked from an unset state', () => {
++		render( <ControlledLineHeightControl /> );
++		const input = screen.getByRole( 'spinbutton' );
++		input.focus();
++		fireEvent.change( input, { target: { value: 0.1 } } ); // simulates click on spin button up
++		expect( input ).toHaveValue( BASE_DEFAULT_VALUE + STEP );
++	} );
++
++	it( 'should immediately step down from the default value if spin button down was clicked from an unset state', () => {
++		render( <ControlledLineHeightControl /> );
++		const input = screen.getByRole( 'spinbutton' );
++		input.focus();
++		fireEvent.change( input, { target: { value: 0 } } ); // simulates click on spin button down
++		expect( input ).toHaveValue( BASE_DEFAULT_VALUE - STEP );
++	} );
++} );
+diff --git a/packages/components/src/input-control/reducer/reducer.ts b/packages/components/src/input-control/reducer/reducer.ts
+index c67c99baeca2f4..618cd5a7ca2345 100644
+--- a/packages/components/src/input-control/reducer/reducer.ts
++++ b/packages/components/src/input-control/reducer/reducer.ts
+@@ -50,6 +50,9 @@ export const composeStateReducers = (
+ ): StateReducer => {
+ 	return ( ...args ) => {
+ 		return fns.reduceRight( ( state, fn ) => {
++			// TODO: Assess whether this can be replaced with a more standard `compose` implementation
++			// like wp.data.compose() (aka lodash flowRight) or Redux compose().
++			// The current implementation only works by functions mutating the original state object.
+ 			const fnState = fn( ...args );
+ 			return isEmpty( fnState ) ? state : { ...state, ...fnState };
+ 		}, {} as InputState );

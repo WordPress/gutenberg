@@ -1,0 +1,86 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 67671070aa2a71..dbaa69f5bf07a0 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -354,20 +354,25 @@ module.exports = {
+ 		},
+ 		{
+ 			files: [ 'packages/components/src/**' ],
+-			excludedFiles: [ 'packages/components/src/utils/colors-values.js' ],
++			excludedFiles: [
++				'packages/components/src/utils/colors-values.js',
++				'packages/components/src/theme/**',
++			],
+ 			rules: {
+ 				'no-restricted-syntax': [
+ 					'error',
+ 					{
+-						selector: 'Literal[value=/--wp-admin-theme-/]',
++						selector:
++							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
+ 						message:
+ 							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+ 					},
+ 					{
+ 						selector:
+-							'TemplateElement[value.cooked=/--wp-admin-theme-/]',
++							// Allow overriding definitions, but not access with var()
++							':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
+ 						message:
+-							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
++							'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+ 					},
+ 				],
+ 			},
+diff --git a/packages/components/.stylelintrc.js b/packages/components/.stylelintrc.js
+index be2035d903731e..2a583a09c16059 100644
+--- a/packages/components/.stylelintrc.js
++++ b/packages/components/.stylelintrc.js
+@@ -4,11 +4,11 @@ module.exports = {
+ 	rules: {
+ 		'declaration-property-value-disallowed-list': [
+ 			{
+-				'/.*/': '/--wp-admin-theme-/',
++				'/.*/': [ '/--wp-admin-theme-/', '/--wp-components-color-/' ],
+ 			},
+ 			{
+ 				message:
+-					'--wp-admin-theme-* variables do not support component theming. Use Sass variables from packages/components/src/utils/theme-variables.scss instead.',
++					'To support component theming and ensure proper fallbacks, use Sass variables from packages/components/src/utils/theme-variables.scss instead.',
+ 			},
+ 		],
+ 	},
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 85be50e8f7642c..ebce7cbd6fdad4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Internal
+ 
+ -   `ColorPicker`: Style without accessing internal `InputControl` classes ([#59069](https://github.com/WordPress/gutenberg/pull/59069)).
++-   Add lint rules for theme color CSS var usage ([#59022](https://github.com/WordPress/gutenberg/pull/59022)).
+ 
+ ## 26.0.1 (2024-02-13)
+ 
+diff --git a/packages/components/src/progress-bar/styles.ts b/packages/components/src/progress-bar/styles.ts
+index 041b2402f0324e..d33b0966d023bf 100644
+--- a/packages/components/src/progress-bar/styles.ts
++++ b/packages/components/src/progress-bar/styles.ts
+@@ -30,7 +30,7 @@ export const Track = styled.div`
+ 	/* Text color at 10% opacity */
+ 	background-color: color-mix(
+ 		in srgb,
+-		var( --wp-components-color-foreground, ${ COLORS.gray[ 900 ] } ),
++		${ COLORS.theme.foreground },
+ 		transparent 90%
+ 	);
+ 	border-radius: ${ CONFIG.radiusBlockUi };
+@@ -52,7 +52,7 @@ export const Indicator = styled.div< {
+ 	/* Text color at 90% opacity */
+ 	background-color: color-mix(
+ 		in srgb,
+-		var( --wp-components-color-foreground, ${ COLORS.gray[ 900 ] } ),
++		${ COLORS.theme.foreground },
+ 		transparent 10%
+ 	);
+ 

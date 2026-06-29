@@ -1,0 +1,259 @@
+diff --git a/package-lock.json b/package-lock.json
+index eeae8be530b922..91a4a2cacc1f01 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -13739,6 +13739,12 @@
+ 				"@types/node": "*"
+ 			}
+ 		},
++		"node_modules/@types/gradient-parser": {
++			"version": "1.1.0",
++			"resolved": "https://registry.npmjs.org/@types/gradient-parser/-/gradient-parser-1.1.0.tgz",
++			"integrity": "sha512-SaEcbgQscHtGJ1QL+ajgDTmmqU2f6T+00jZRcFlVHUW2Asivc84LNUev/UQFyu117AsdyrtI+qpwLvgjJXJxmw==",
++			"license": "MIT"
++		},
+ 		"node_modules/@types/hammerjs": {
+ 			"version": "2.0.45",
+ 			"resolved": "https://registry.npmjs.org/@types/hammerjs/-/hammerjs-2.0.45.tgz",
+@@ -26694,9 +26700,9 @@
+ 			"integrity": "sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ=="
+ 		},
+ 		"node_modules/gradient-parser": {
+-			"version": "1.0.2",
+-			"resolved": "https://registry.npmjs.org/gradient-parser/-/gradient-parser-1.0.2.tgz",
+-			"integrity": "sha512-gR6nY33xC9yJoH4wGLQtZQMXDi6RI3H37ERu7kQCVUzlXjNedpZM7xcA489Opwbq0BSGohtWGsWsntupmxelMg==",
++			"version": "1.1.1",
++			"resolved": "https://registry.npmjs.org/gradient-parser/-/gradient-parser-1.1.1.tgz",
++			"integrity": "sha512-Hu0YfNU+38EsTmnUfLXUKFMXq9yz7htGYpF4x+dlbBhUCvIvzLt0yVLT/gJRmvLKFJdqNFrz4eKkIUjIXSr7Tw==",
+ 			"engines": {
+ 				"node": ">=0.10.0"
+ 			}
+@@ -50226,7 +50232,7 @@
+ 				"@emotion/styled": "^11.6.0",
+ 				"@emotion/utils": "^1.0.0",
+ 				"@floating-ui/react-dom": "2.0.8",
+-				"@types/gradient-parser": "0.1.3",
++				"@types/gradient-parser": "1.1.0",
+ 				"@types/highlight-words-core": "1.2.1",
+ 				"@use-gesture/react": "^10.3.1",
+ 				"@wordpress/a11y": "file:../a11y",
+@@ -50253,7 +50259,7 @@
+ 				"deepmerge": "^4.3.0",
+ 				"fast-deep-equal": "^3.1.3",
+ 				"framer-motion": "^11.1.9",
+-				"gradient-parser": "1.0.2",
++				"gradient-parser": "1.1.1",
+ 				"highlight-words-core": "^1.2.2",
+ 				"is-plain-object": "^5.0.0",
+ 				"memize": "^2.1.0",
+@@ -50273,11 +50279,6 @@
+ 				"react-dom": "^18.0.0"
+ 			}
+ 		},
+-		"packages/components/node_modules/@types/gradient-parser": {
+-			"version": "0.1.3",
+-			"resolved": "https://registry.npmjs.org/@types/gradient-parser/-/gradient-parser-0.1.3.tgz",
+-			"integrity": "sha512-XDbrTSBlQV9nxE1GiDL3FaOPy4G/KaJkhDutBX48Kg8CYZMBARyyDFGCWfWJn4pobmInmwud1xxH7VJMAr0CKQ=="
+-		},
+ 		"packages/components/node_modules/path-to-regexp": {
+ 			"version": "6.3.0",
+ 			"resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-6.3.0.tgz",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 665db3f2d8e292..aea6b4485259bd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancement
++
++-   Upgrade `gradient-parser` to version `1.1.1` to support HSL/HSLA color, CSS variables, and `calc()` expressions ([#71186](https://github.com/WordPress/gutenberg/pull/71186)).
++
+ ## 30.1.0 (2025-08-07)
+ 
+ ### Enhancement
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 2288ae6ea37db5..9d294704f1d21a 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -41,7 +41,7 @@
+ 		"@emotion/styled": "^11.6.0",
+ 		"@emotion/utils": "^1.0.0",
+ 		"@floating-ui/react-dom": "2.0.8",
+-		"@types/gradient-parser": "0.1.3",
++		"@types/gradient-parser": "1.1.0",
+ 		"@types/highlight-words-core": "1.2.1",
+ 		"@use-gesture/react": "^10.3.1",
+ 		"@wordpress/a11y": "file:../a11y",
+@@ -68,7 +68,7 @@
+ 		"deepmerge": "^4.3.0",
+ 		"fast-deep-equal": "^3.1.3",
+ 		"framer-motion": "^11.1.9",
+-		"gradient-parser": "1.0.2",
++		"gradient-parser": "1.1.1",
+ 		"highlight-words-core": "^1.2.2",
+ 		"is-plain-object": "^5.0.0",
+ 		"memize": "^2.1.0",
+diff --git a/packages/components/src/custom-gradient-picker/serializer.ts b/packages/components/src/custom-gradient-picker/serializer.ts
+index 67a315970f8562..a8e59c46dc431e 100644
+--- a/packages/components/src/custom-gradient-picker/serializer.ts
++++ b/packages/components/src/custom-gradient-picker/serializer.ts
+@@ -13,6 +13,17 @@ export function serializeGradientColor( {
+ 	if ( type === 'hex' ) {
+ 		return `#${ value }`;
+ 	}
++	if ( type === 'var' ) {
++		return `var(${ value })`;
++	}
++	if ( type === 'hsl' ) {
++		const [ hue, saturation, lightness ] = value;
++		return `hsl(${ hue },${ saturation }%,${ lightness }%)`;
++	}
++	if ( type === 'hsla' ) {
++		const [ hue, saturation, lightness, alpha ] = value;
++		return `hsla(${ hue },${ saturation }%,${ lightness }%,${ alpha })`;
++	}
+ 	return `${ type }(${ value.join( ',' ) })`;
+ }
+ 
+@@ -23,6 +34,9 @@ export function serializeGradientPosition(
+ 		return '';
+ 	}
+ 	const { value, type } = position;
++	if ( type === 'calc' ) {
++		return `calc(${ value })`;
++	}
+ 	return `${ value }${ type }`;
+ }
+ 
+diff --git a/packages/components/src/custom-gradient-picker/test/serializer.ts b/packages/components/src/custom-gradient-picker/test/serializer.ts
+index 3c14194fc7279f..b4158fb53df45e 100644
+--- a/packages/components/src/custom-gradient-picker/test/serializer.ts
++++ b/packages/components/src/custom-gradient-picker/test/serializer.ts
+@@ -24,6 +24,27 @@ describe( 'It should serialize a gradient', () => {
+ 				value: [ '255', '0', '0' ],
+ 			} )
+ 		).toBe( 'rgb(255,0,0)' );
++
++		expect(
++			serializeGradientColor( {
++				type: 'hsl',
++				value: [ '1', '2', '3' ],
++			} )
++		).toBe( 'hsl(1,2%,3%)' );
++
++		expect(
++			serializeGradientColor( {
++				type: 'hsla',
++				value: [ '1', '2', '3', '0.5' ],
++			} )
++		).toBe( 'hsla(1,2%,3%,0.5)' );
++
++		expect(
++			serializeGradientColor( {
++				type: 'var',
++				value: '--my-color',
++			} as any )
++		).toBe( 'var(--my-color)' );
+ 	} );
+ 
+ 	test( 'serializeGradientPosition', () => {
+@@ -38,6 +59,10 @@ describe( 'It should serialize a gradient', () => {
+ 		expect( serializeGradientPosition( { type: 'px', value: '4' } ) ).toBe(
+ 			'4px'
+ 		);
++
++		expect(
++			serializeGradientPosition( { type: 'calc', value: '50% + 10px' } )
++		).toBe( 'calc(50% + 10px)' );
+ 	} );
+ 
+ 	test( 'serializeGradientColorStop', () => {
+diff --git a/packages/components/src/custom-gradient-picker/utils.ts b/packages/components/src/custom-gradient-picker/utils.ts
+index e52c5220a6e759..dfc2a2a3baf5bb 100644
+--- a/packages/components/src/custom-gradient-picker/utils.ts
++++ b/packages/components/src/custom-gradient-picker/utils.ts
+@@ -108,9 +108,19 @@ export function getStopCssColor( colorStop: gradientParser.ColorStop ) {
+ 			return `#${ colorStop.value }`;
+ 		case 'literal':
+ 			return colorStop.value;
++		case 'var':
++			return `${ colorStop.type }(${ colorStop.value })`;
+ 		case 'rgb':
+ 		case 'rgba':
+ 			return `${ colorStop.type }(${ colorStop.value.join( ',' ) })`;
++		case 'hsl': {
++			const [ hue, saturation, lightness ] = colorStop.value;
++			return `hsl(${ hue },${ saturation }%,${ lightness }%)`;
++		}
++		case 'hsla': {
++			const [ hue, saturation, lightness, alpha ] = colorStop.value;
++			return `hsla(${ hue },${ saturation }%,${ lightness }%,${ alpha })`;
++		}
+ 		default:
+ 			// Should be unreachable if passing an AST from gradient-parser.
+ 			// See https://github.com/rafaelcaricio/gradient-parser#ast.
+diff --git a/packages/components/src/gradient-picker/stories/index.story.tsx b/packages/components/src/gradient-picker/stories/index.story.tsx
+index 7dc5f62df726db..16e460efc0a3a6 100644
+--- a/packages/components/src/gradient-picker/stories/index.story.tsx
++++ b/packages/components/src/gradient-picker/stories/index.story.tsx
+@@ -64,6 +64,18 @@ const GRADIENTS = [
+ 			'linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%)',
+ 		slug: 'cool-to-warm-spectrum',
+ 	},
++	{
++		name: 'HSL blue to purple',
++		gradient:
++			'linear-gradient(135deg,hsl(200, 100%, 50%) 0%,hsl(280, 100%, 60%) 100%)',
++		slug: 'hsl-blue-to-purple',
++	},
++	{
++		name: 'HSLA green to red',
++		gradient:
++			'linear-gradient(135deg,hsla(120, 100%, 40%, 0.85) 0%,hsla(0, 100%, 50%, 0.85) 100%)',
++		slug: 'hsla-green-to-red',
++	},
+ ];
+ 
+ const Template: StoryFn< typeof GradientPicker > = ( {
+@@ -103,3 +115,39 @@ MultipleOrigins.args = {
+ 		{ name: 'Origin 2', gradients: GRADIENTS },
+ 	],
+ };
++
++export const CSSVariables: StoryFn< typeof GradientPicker > = ( args ) => {
++	return (
++		<div
++			style={ {
++				'--red': '#f00',
++				'--yellow': '#ff0',
++				'--blue': '#00f',
++			} }
++		>
++			<Template { ...args } />
++		</div>
++	);
++};
++CSSVariables.args = {
++	...Default.args,
++	gradients: [
++		{
++			name: 'Red to Yellow',
++			gradient:
++				'linear-gradient(135deg,var(--red) 0%,var(--yellow) 100%)',
++			slug: 'red-to-yellow',
++		},
++		{
++			name: 'Yellow to Blue',
++			gradient:
++				'linear-gradient(135deg,var(--yellow) 0%,var(--blue) 100%)',
++			slug: 'yellow-to-blue',
++		},
++		{
++			name: 'Blue to Red',
++			gradient: 'linear-gradient(135deg,var(--blue) 0%,var(--red) 100%)',
++			slug: 'blue-to-red',
++		},
++	],
++};

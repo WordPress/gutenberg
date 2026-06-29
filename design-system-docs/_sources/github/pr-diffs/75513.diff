@@ -1,0 +1,667 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 398b69e96ea3c5..7e9013d23033ac 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -23,6 +23,7 @@
+ -   Update Emotion dependencies to ensure compatibility with React 19 ([#75324](https://github.com/WordPress/gutenberg/pull/75324)).
+ -   Update Testing Library packages used in unit tests ([#75340](https://github.com/WordPress/gutenberg/pull/75340)).
+ -   Clean up type declarations using the `React` namespace ([#75499](https://github.com/WordPress/gutenberg/pull/75499)).
++-   Always specify initial values for `useRef` calls ([#75513](https://github.com/WordPress/gutenberg/pull/75513)).
+ 
+ ## 32.1.0 (2026-01-29)
+ 
+diff --git a/packages/components/src/angle-picker-control/angle-circle.tsx b/packages/components/src/angle-picker-control/angle-circle.tsx
+index ae0538b50f1954..34a5726b4ff9aa 100644
+--- a/packages/components/src/angle-picker-control/angle-circle.tsx
++++ b/packages/components/src/angle-picker-control/angle-circle.tsx
+@@ -29,11 +29,12 @@ function AngleCircle( {
+ 	className,
+ 	...props
+ }: WordPressComponentProps< AngleCircleProps, 'div' > ) {
+-	const angleCircleRef = useRef< HTMLDivElement | null >( null );
+-	const angleCircleCenterRef = useRef<
+-		{ x: number; y: number } | undefined
+-	>();
+-	const previousCursorValueRef = useRef< CSSStyleDeclaration[ 'cursor' ] >();
++	const angleCircleRef = useRef< HTMLDivElement >( null );
++	const angleCircleCenterRef = useRef< { x: number; y: number } >(
++		undefined
++	);
++	const previousCursorValueRef =
++		useRef< CSSStyleDeclaration[ 'cursor' ] >( undefined );
+ 
+ 	const setAngleCircleCenter = () => {
+ 		if ( angleCircleRef.current === null ) {
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index 78be906b64d1f4..a3afb4b54908cd 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -408,7 +408,8 @@ function useLastDifferentValue( value: UseAutocompleteProps[ 'record' ] ) {
+ 
+ export function useAutocompleteProps( options: UseAutocompleteProps ) {
+ 	const ref = useRef< HTMLElement >( null );
+-	const onKeyDownRef = useRef< ( event: KeyboardEvent ) => void >();
++	const onKeyDownRef =
++		useRef< ( event: KeyboardEvent ) => void >( undefined );
+ 	const { record } = options;
+ 	const previousRecord = useLastDifferentValue( record );
+ 	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
+diff --git a/packages/components/src/clipboard-button/index.tsx b/packages/components/src/clipboard-button/index.tsx
+index 2ae55c1ea7d66f..21472dfae8f877 100644
+--- a/packages/components/src/clipboard-button/index.tsx
++++ b/packages/components/src/clipboard-button/index.tsx
+@@ -32,7 +32,7 @@ export default function ClipboardButton( {
+ 		alternative: 'wp.compose.useCopyToClipboard',
+ 	} );
+ 
+-	const timeoutIdRef = useRef< NodeJS.Timeout >();
++	const timeoutIdRef = useRef< NodeJS.Timeout >( undefined );
+ 	const ref = useCopyToClipboard( text, () => {
+ 		onCopy();
+ 		if ( timeoutIdRef.current ) {
+diff --git a/packages/components/src/color-picker/color-copy-button.tsx b/packages/components/src/color-picker/color-copy-button.tsx
+index 8a1a2c83a8c08f..49746ba60f813d 100644
+--- a/packages/components/src/color-picker/color-copy-button.tsx
++++ b/packages/components/src/color-picker/color-copy-button.tsx
+@@ -17,9 +17,7 @@ import type { ColorCopyButtonProps } from './types';
+ export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
+ 	const { color, colorType } = props;
+ 	const [ copiedColor, setCopiedColor ] = useState< string | null >( null );
+-	const copyTimerRef = useRef<
+-		ReturnType< typeof setTimeout > | undefined
+-	>();
++	const copyTimerRef = useRef< ReturnType< typeof setTimeout > >( undefined );
+ 	const copyRef = useCopyToClipboard< HTMLDivElement >(
+ 		() => {
+ 			switch ( colorType ) {
+diff --git a/packages/components/src/confirm-dialog/component.tsx b/packages/components/src/confirm-dialog/component.tsx
+index fbbbed55df3052..dec265c15a3b88 100644
+--- a/packages/components/src/confirm-dialog/component.tsx
++++ b/packages/components/src/confirm-dialog/component.tsx
+@@ -35,8 +35,8 @@ const UnconnectedConfirmDialog = (
+ 
+ 	const cx = useCx();
+ 	const wrapperClassName = cx( styles.wrapper );
+-	const cancelButtonRef = useRef();
+-	const confirmButtonRef = useRef();
++	const cancelButtonRef = useRef< HTMLButtonElement >( null );
++	const confirmButtonRef = useRef< HTMLButtonElement >( null );
+ 
+ 	const [ isOpen, setIsOpen ] = useState< boolean >();
+ 	const [ shouldSelfClose, setShouldSelfClose ] = useState< boolean >();
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+index c11d7e487030d4..38032f503d39b3 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+@@ -129,7 +129,8 @@ function ControlPoints( {
+ 	onStopControlPointChange,
+ 	__experimentalIsRenderedInSidebar,
+ }: ControlPointsProps ) {
+-	const controlPointMoveStateRef = useRef< ControlPointMoveState >();
++	const controlPointMoveStateRef =
++		useRef< ControlPointMoveState >( undefined );
+ 
+ 	const onMouseMove = ( event: MouseEvent ) => {
+ 		if (
+@@ -177,7 +178,7 @@ function ControlPoints( {
+ 	// Adding `cleanEventListeners` to the dependency array below requires the function itself to be wrapped in a `useCallback`
+ 	// This memoization would prevent the event listeners from being properly cleaned.
+ 	// Instead, we'll pass a ref to the function in our `useEffect` so `cleanEventListeners` itself is no longer a dependency.
+-	const cleanEventListenersRef = useRef< () => void >();
++	const cleanEventListenersRef = useRef< () => void >( undefined );
+ 	cleanEventListenersRef.current = cleanEventListeners;
+ 
+ 	useEffect( () => {
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index 33f44dd92af43f..e67793ec4b1c33 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -314,7 +314,7 @@ function Day( {
+ 	onClick,
+ 	onKeyDown,
+ }: DayProps ) {
+-	const ref = useRef< HTMLButtonElement >();
++	const ref = useRef< HTMLButtonElement >( null );
+ 
+ 	// Focus the day when it becomes focusable, e.g. because an arrow key is
+ 	// pressed. Only do this if focus is allowed - this stops us stealing focus
+diff --git a/packages/components/src/dropdown/index.tsx b/packages/components/src/dropdown/index.tsx
+index 3530d3b1e8de23..e88da30c613e13 100644
+--- a/packages/components/src/dropdown/index.tsx
++++ b/packages/components/src/dropdown/index.tsx
+@@ -61,7 +61,7 @@ const UnconnectedDropdown = (
+ 	// re-renders when the popover's anchor updates.
+ 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
+ 		useState< HTMLDivElement | null >( null );
+-	const containerRef = useRef< HTMLDivElement >();
++	const containerRef = useRef< HTMLDivElement >( null );
+ 
+ 	const [ isOpen, setIsOpen ] = useControlledValue( {
+ 		defaultValue: defaultOpen,
+diff --git a/packages/components/src/higher-order/with-notices/test/index.tsx b/packages/components/src/higher-order/with-notices/test/index.tsx
+index 6c0a76b8ec7db7..193e1f55ea4458 100644
+--- a/packages/components/src/higher-order/with-notices/test/index.tsx
++++ b/packages/components/src/higher-order/with-notices/test/index.tsx
+@@ -91,9 +91,9 @@ describe( 'withNotices return type', () => {
+ } );
+ 
+ describe( 'withNotices operations', () => {
+-	let handle: React.MutableRefObject< any >;
++	let handle: React.RefObject< any >;
+ 	const Handle = ( props: any ) => {
+-		handle = useRef();
++		handle = useRef( null );
+ 		return <TestNoticeOperations { ...props } ref={ handle } />;
+ 	};
+ 
+diff --git a/packages/components/src/keyboard-shortcuts/index.tsx b/packages/components/src/keyboard-shortcuts/index.tsx
+index cc6835c56666d8..32073f7d5ce284 100644
+--- a/packages/components/src/keyboard-shortcuts/index.tsx
++++ b/packages/components/src/keyboard-shortcuts/index.tsx
+@@ -61,7 +61,7 @@ function KeyboardShortcuts( {
+ 	bindGlobal,
+ 	eventName,
+ }: KeyboardShortcutsProps ) {
+-	const target = useRef( null );
++	const target = useRef< HTMLDivElement >( null );
+ 
+ 	const element = Object.entries( shortcuts ?? {} ).map(
+ 		( [ shortcut, callback ] ) => (
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 0bca806c646075..9515bd96d7dcfb 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -63,7 +63,7 @@ function UnforwardedModal(
+ 		__experimentalHideHeader = false,
+ 	} = props;
+ 
+-	const ref = useRef< HTMLDivElement >();
++	const ref = useRef< HTMLDivElement >( null );
+ 
+ 	const instanceId = useInstanceId( Modal );
+ 	const headingId = title
+@@ -113,12 +113,13 @@ function UnforwardedModal(
+ 
+ 	// Accessibly isolates/unisolates the modal.
+ 	useEffect( () => {
+-		ariaHelper.modalize( ref.current );
++		ariaHelper.modalize( ref.current! );
+ 		return () => ariaHelper.unmodalize();
+ 	}, [] );
+ 
+ 	// Keeps a fresh ref for the subsequent effect.
+-	const onRequestCloseRef = useRef< ModalProps[ 'onRequestClose' ] >();
++	const onRequestCloseRef =
++		useRef< ModalProps[ 'onRequestClose' ] >( undefined );
+ 	useEffect( () => {
+ 		onRequestCloseRef.current = onRequestClose;
+ 	}, [ onRequestClose ] );
+diff --git a/packages/components/src/modal/use-modal-exit-animation.ts b/packages/components/src/modal/use-modal-exit-animation.ts
+index 729b4f9ea6f86c..3a62654aea4c56 100644
+--- a/packages/components/src/modal/use-modal-exit-animation.ts
++++ b/packages/components/src/modal/use-modal-exit-animation.ts
+@@ -3,12 +3,12 @@
+  */
+ import { useReducedMotion } from '@wordpress/compose';
+ import { useCallback, useRef, useState } from '@wordpress/element';
++import warning from '@wordpress/warning';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { CONFIG } from '../utils';
+-import warning from '@wordpress/warning';
+ 
+ // Animation duration (ms) extracted to JS in order to be used on a setTimeout.
+ const FRAME_ANIMATION_DURATION = CONFIG.transitionDuration;
+@@ -19,7 +19,7 @@ const FRAME_ANIMATION_DURATION_NUMBER = Number.parseInt(
+ const EXIT_ANIMATION_NAME = 'components-modal__disappear-animation';
+ 
+ export function useModalExitAnimation() {
+-	const frameRef = useRef< HTMLDivElement >();
++	const frameRef = useRef< HTMLDivElement >( null );
+ 	const [ isAnimatingOut, setIsAnimatingOut ] = useState( false );
+ 	const isReducedMotion = useReducedMotion();
+ 
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index 85043c5c750e6d..33771d60eb63cc 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -72,7 +72,7 @@ function UnforwardedNumberControl(
+ 			version: '6.3',
+ 		} );
+ 	}
+-	const inputRef = useRef< HTMLInputElement >();
++	const inputRef = useRef< HTMLInputElement >( null );
+ 	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
+ 
+ 	const isStepAny = step === 'any';
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index 557c97deaa8090..0732f8015db562 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -297,7 +297,7 @@ function PaletteEditListView< T extends PaletteElement >( {
+ 	addColorRef,
+ }: PaletteEditListViewProps< T > ) {
+ 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
+-	const elementsReferenceRef = useRef< typeof elements >();
++	const elementsReferenceRef = useRef< T[] >( undefined );
+ 	useEffect( () => {
+ 		elementsReferenceRef.current = elements;
+ 	}, [ elements ] );
+@@ -420,7 +420,7 @@ export function PaletteEdit( {
+ 		[ isGradient, elements ]
+ 	);
+ 
+-	const addColorRef = useRef< HTMLButtonElement | null >( null );
++	const addColorRef = useRef< HTMLButtonElement >( null );
+ 
+ 	return (
+ 		<PaletteEditStyles>
+diff --git a/packages/components/src/panel/body.tsx b/packages/components/src/panel/body.tsx
+index 22d698f9f47344..803b63b71747eb 100644
+--- a/packages/components/src/panel/body.tsx
++++ b/packages/components/src/panel/body.tsx
+@@ -57,7 +57,7 @@ export function UnforwardedPanelBody(
+ 	};
+ 
+ 	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value.
+-	const scrollAfterOpenRef = useRef< boolean | undefined >();
++	const scrollAfterOpenRef = useRef< boolean >( undefined );
+ 	scrollAfterOpenRef.current = scrollAfterOpen;
+ 	// Runs after initial render.
+ 	useUpdateEffect( () => {
+diff --git a/packages/components/src/popover/stories/index.story.tsx b/packages/components/src/popover/stories/index.story.tsx
+index 92499e05e09eee..33e12a2fced9f9 100644
+--- a/packages/components/src/popover/stories/index.story.tsx
++++ b/packages/components/src/popover/stories/index.story.tsx
+@@ -93,7 +93,7 @@ export const Default: StoryObj< typeof Popover > = {
+ 	decorators: [
+ 		( Story ) => {
+ 			const [ isVisible, setIsVisible ] = useState( false );
+-			const buttonRef = useRef< HTMLButtonElement | undefined >();
++			const buttonRef = useRef< HTMLButtonElement >( undefined );
+ 			const toggleVisible = ( event: React.MouseEvent ) => {
+ 				if ( buttonRef.current && event.target !== buttonRef.current ) {
+ 					return;
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index 3daee9584de72f..9afd419b514776 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -122,7 +122,7 @@ function UnforwardedRangeControl(
+ 	const [ showTooltip, setShowTooltip ] = useState( hasTooltip );
+ 	const [ isFocused, setIsFocused ] = useState( false );
+ 
+-	const inputRef = useRef< HTMLInputElement >();
++	const inputRef = useRef< HTMLInputElement >( null );
+ 	const isCurrentlyFocused = inputRef.current?.matches( ':focus' );
+ 	const isThumbFocused = ! disabled && isFocused;
+ 
+diff --git a/packages/components/src/range-control/types.ts b/packages/components/src/range-control/types.ts
+index f6e3e69ff7bc5f..ac8afa2e0c86e6 100644
+--- a/packages/components/src/range-control/types.ts
++++ b/packages/components/src/range-control/types.ts
+@@ -5,7 +5,7 @@ import type {
+ 	CSSProperties,
+ 	FocusEventHandler,
+ 	MouseEventHandler,
+-	MutableRefObject,
++	RefObject,
+ } from 'react';
+ 
+ /**
+@@ -267,7 +267,7 @@ export type ThumbProps = {
+ export type TooltipProps = {
+ 	show?: boolean;
+ 	placement?: string;
+-	inputRef?: MutableRefObject< HTMLElement | undefined >;
++	inputRef?: RefObject< HTMLElement | null >;
+ 	tooltipPlacement?: string;
+ 	value?: ControlledRangeValue;
+ 	renderTooltipContent?: (
+diff --git a/packages/components/src/resizable-box/resize-tooltip/utils.ts b/packages/components/src/resizable-box/resize-tooltip/utils.ts
+index 895f521c80ae22..804a0d3f402c53 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/utils.ts
++++ b/packages/components/src/resizable-box/resize-tooltip/utils.ts
+@@ -82,7 +82,7 @@ export function useResizeLabel( {
+ 	 * This timeout is used with setMoveX and setMoveY to determine of
+ 	 * both width and height values have changed at (roughly) the same time.
+ 	 */
+-	const moveTimeoutRef = useRef< number >();
++	const moveTimeoutRef = useRef< number >( undefined );
+ 
+ 	const debounceUnsetMoveXY = useCallback( () => {
+ 		const unsetMoveXY = () => {
+diff --git a/packages/components/src/sandbox/index.tsx b/packages/components/src/sandbox/index.tsx
+index 5288fea3f7e43e..14c57b42d566ab 100644
+--- a/packages/components/src/sandbox/index.tsx
++++ b/packages/components/src/sandbox/index.tsx
+@@ -134,7 +134,7 @@ function SandBox( {
+ 	onFocus,
+ 	tabIndex,
+ }: SandBoxProps ) {
+-	const ref = useRef< HTMLIFrameElement >();
++	const ref = useRef< HTMLIFrameElement >( null );
+ 	const [ width, setWidth ] = useState( 0 );
+ 	const [ height, setHeight ] = useState( 0 );
+ 
+diff --git a/packages/components/src/snackbar/list.tsx b/packages/components/src/snackbar/list.tsx
+index f97f8cc5db8945..7697cfcc623a69 100644
+--- a/packages/components/src/snackbar/list.tsx
++++ b/packages/components/src/snackbar/list.tsx
+@@ -66,7 +66,7 @@ export function SnackbarList( {
+ 	children,
+ 	onRemove,
+ }: WordPressComponentProps< SnackbarListProps, 'div' > ) {
+-	const listRef = useRef< HTMLDivElement | null >( null );
++	const listRef = useRef< HTMLDivElement >( null );
+ 	const isReducedMotion = useReducedMotion();
+ 	className = clsx( 'components-snackbar-list', className );
+ 	const removeNotice =
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index 041af1adf5e5b5..6e47bff6e80d02 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -114,7 +114,7 @@ function ToggleGroupControlOptionBase(
+ 		ref: forwardedRef,
+ 	};
+ 
+-	const labelRef = useRef< HTMLDivElement | null >( null );
++	const labelRef = useRef< HTMLDivElement >( null );
+ 	useLayoutEffect( () => {
+ 		if ( isPressed && labelRef.current ) {
+ 			toggleGroupControlContext.setSelectedElement( labelRef.current );
+diff --git a/packages/components/src/tree-grid/roving-tab-index-item.tsx b/packages/components/src/tree-grid/roving-tab-index-item.tsx
+index 7723267a575885..fd020483227387 100644
+--- a/packages/components/src/tree-grid/roving-tab-index-item.tsx
++++ b/packages/components/src/tree-grid/roving-tab-index-item.tsx
+@@ -14,7 +14,7 @@ export const RovingTabIndexItem = forwardRef(
+ 		{ children, as: Component, ...props }: RovingTabIndexItemProps,
+ 		forwardedRef: React.ForwardedRef< any >
+ 	) {
+-		const localRef = useRef< any >();
++		const localRef = useRef< any >( null );
+ 		const ref = forwardedRef || localRef;
+ 		// @ts-expect-error - We actually want to throw an error if this is undefined.
+ 		const { lastFocusedElement, setLastFocusedElement } =
+diff --git a/packages/components/src/utils/element-rect.ts b/packages/components/src/utils/element-rect.ts
+index 0f58ea6d7caf54..e578d0b279e777 100644
+--- a/packages/components/src/utils/element-rect.ts
++++ b/packages/components/src/utils/element-rect.ts
+@@ -139,7 +139,7 @@ export function useTrackElementOffsetRect(
+ ) {
+ 	const [ indicatorPosition, setIndicatorPosition ] =
+ 		useState< ElementOffsetRect >( NULL_ELEMENT_OFFSET_RECT );
+-	const intervalRef = useRef< ReturnType< typeof setInterval > >();
++	const intervalRef = useRef< ReturnType< typeof setInterval > >( undefined );
+ 
+ 	const measure = useEvent( () => {
+ 		// Check that the targetElement is still attached to the DOM, in case
+diff --git a/packages/components/src/validated-form-controls/components/stories/overview.story.tsx b/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
+index e956505b920035..bf22c6fb09a7b0 100644
+--- a/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
+@@ -149,7 +149,8 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
+ 				>[ 'customValidity' ]
+ 			>( undefined );
+ 
+-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
++		const timeoutRef =
++			useRef< ReturnType< typeof setTimeout > >( undefined );
+ 
+ 		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 		const debouncedValidate = useCallback(
+diff --git a/packages/compose/src/hooks/use-copy-on-click/index.js b/packages/compose/src/hooks/use-copy-on-click/index.js
+index 69597470343617..59799c2d55d1f7 100644
+--- a/packages/compose/src/hooks/use-copy-on-click/index.js
++++ b/packages/compose/src/hooks/use-copy-on-click/index.js
+@@ -29,7 +29,7 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
+ 	} );
+ 
+ 	/** @type {React.MutableRefObject<Clipboard | undefined>} */
+-	const clipboardRef = useRef();
++	const clipboardRef = useRef( undefined );
+ 	const [ hasCopied, setHasCopied ] = useState( false );
+ 
+ 	useEffect( () => {
+diff --git a/packages/compose/src/hooks/use-dialog/index.ts b/packages/compose/src/hooks/use-dialog/index.ts
+index 1b517478fa0bd2..b839c33dc16053 100644
+--- a/packages/compose/src/hooks/use-dialog/index.ts
++++ b/packages/compose/src/hooks/use-dialog/index.ts
+@@ -66,7 +66,7 @@ type useDialogReturn = [
+  * @param options Dialog Options.
+  */
+ function useDialog( options: DialogOptions ): useDialogReturn {
+-	const currentOptions = useRef< DialogOptions | undefined >();
++	const currentOptions = useRef< DialogOptions >( undefined );
+ 	const { constrainTabbing = options.focusOnMount !== false } = options;
+ 	useEffect( () => {
+ 		currentOptions.current = options;
+diff --git a/packages/compose/src/hooks/use-focus-on-mount/index.js b/packages/compose/src/hooks/use-focus-on-mount/index.js
+index 669a9a076b1a9b..8aa3723a17c598 100644
+--- a/packages/compose/src/hooks/use-focus-on-mount/index.js
++++ b/packages/compose/src/hooks/use-focus-on-mount/index.js
+@@ -49,7 +49,7 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
+ 	};
+ 
+ 	/** @type {React.MutableRefObject<ReturnType<setTimeout> | undefined>} */
+-	const timerIdRef = useRef();
++	const timerIdRef = useRef( undefined );
+ 
+ 	useEffect( () => {
+ 		focusOnMountRef.current = focusOnMount;
+diff --git a/packages/compose/src/hooks/use-focus-outside/index.ts b/packages/compose/src/hooks/use-focus-outside/index.ts
+index 64072de35833b4..f7a9434e7207c8 100644
+--- a/packages/compose/src/hooks/use-focus-outside/index.ts
++++ b/packages/compose/src/hooks/use-focus-outside/index.ts
+@@ -78,7 +78,7 @@ export default function useFocusOutside(
+ 
+ 	const preventBlurCheckRef = useRef( false );
+ 
+-	const blurCheckTimeoutIdRef = useRef< number | undefined >();
++	const blurCheckTimeoutIdRef = useRef< number >( undefined );
+ 
+ 	/**
+ 	 * Cancel a blur check timeout.
+diff --git a/packages/compose/src/hooks/use-previous/index.ts b/packages/compose/src/hooks/use-previous/index.ts
+index 673495320c5040..908ba84fbbfbc1 100644
+--- a/packages/compose/src/hooks/use-previous/index.ts
++++ b/packages/compose/src/hooks/use-previous/index.ts
+@@ -12,7 +12,7 @@ import { useEffect, useRef } from '@wordpress/element';
+  * @return The value from the previous render.
+  */
+ export default function usePrevious< T >( value: T ): T | undefined {
+-	const ref = useRef< T >();
++	const ref = useRef< T >( undefined );
+ 
+ 	// Store current value in ref.
+ 	useEffect( () => {
+diff --git a/packages/compose/src/hooks/use-ref-effect/index.ts b/packages/compose/src/hooks/use-ref-effect/index.ts
+index 89cc3bc2392c21..bab7bc4672eccd 100644
+--- a/packages/compose/src/hooks/use-ref-effect/index.ts
++++ b/packages/compose/src/hooks/use-ref-effect/index.ts
+@@ -31,7 +31,7 @@ export default function useRefEffect< TElement = Node >(
+ 	callback: ( node: TElement ) => ( () => void ) | void,
+ 	dependencies: DependencyList
+ ): RefCallback< TElement | null > {
+-	const cleanupRef = useRef< ( () => void ) | void >();
++	const cleanupRef = useRef< ( () => void ) | void >( undefined );
+ 	return useCallback( ( node: TElement | null ) => {
+ 		if ( node ) {
+ 			cleanupRef.current = callback( node );
+diff --git a/packages/compose/src/hooks/use-resize-observer/use-resize-observer.ts b/packages/compose/src/hooks/use-resize-observer/use-resize-observer.ts
+index 4c1031b9839dc3..4b3d2cb5f96c07 100644
+--- a/packages/compose/src/hooks/use-resize-observer/use-resize-observer.ts
++++ b/packages/compose/src/hooks/use-resize-observer/use-resize-observer.ts
+@@ -18,8 +18,8 @@ export function useResizeObserver< T extends HTMLElement >(
+ ): ( element?: T | null ) => void {
+ 	const callbackEvent = useEvent( callback );
+ 
+-	const observedElementRef = useRef< T | null >();
+-	const resizeObserverRef = useRef< ResizeObserver >();
++	const observedElementRef = useRef< T | null >( null );
++	const resizeObserverRef = useRef< ResizeObserver >( undefined );
+ 	return useEvent( ( element?: T | null ) => {
+ 		if ( element === observedElementRef.current ) {
+ 			return;
+@@ -35,7 +35,7 @@ export function useResizeObserver< T extends HTMLElement >(
+ 		}
+ 
+ 		// Observe new element.
+-		observedElementRef.current = element;
++		observedElementRef.current = element ?? null;
+ 		if ( element ) {
+ 			resizeObserver.observe( element, resizeObserverOptions );
+ 		}
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 4b2cc6e22c6216..d64cc09ffbbe88 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -30,7 +30,8 @@
+ ### Internal
+ 
+ - DataForm: Use public `ColorPicker` component instead of internal `Picker` in color control. [#75394](https://github.com/WordPress/gutenberg/pull/75394)
+-- Update Testing Library packages used in unit tests ([#75340](https://github.com/WordPress/gutenberg/pull/75340))
++- Update Testing Library packages used in unit tests. [#75340](https://github.com/WordPress/gutenberg/pull/75340)
++- Always specify initial values for `useRef` calls. [#75513](https://github.com/WordPress/gutenberg/pull/75513)
+ 
+ ## 11.3.0 (2026-01-29)
+ 
+diff --git a/packages/dataviews/src/components/dataform-controls/datetime.tsx b/packages/dataviews/src/components/dataform-controls/datetime.tsx
+index afad11dfe32f76..52b53af5f91001 100644
+--- a/packages/dataviews/src/components/dataform-controls/datetime.tsx
++++ b/packages/dataviews/src/components/dataform-controls/datetime.tsx
+@@ -56,7 +56,8 @@ function CalendarDateTimeControl< Item >( {
+ 	} );
+ 
+ 	const inputControlRef = useRef< HTMLInputElement >( null );
+-	const validationTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
++	const validationTimeoutRef =
++		useRef< ReturnType< typeof setTimeout > >( undefined );
+ 	const previousFocusRef = useRef< Element | null >( null );
+ 
+ 	const onChangeCallback = useCallback(
+diff --git a/packages/dataviews/src/components/dataviews-bulk-actions/index.tsx b/packages/dataviews/src/components/dataviews-bulk-actions/index.tsx
+index 370635fb3ac25d..57c785b77d0ee3 100644
+--- a/packages/dataviews/src/components/dataviews-bulk-actions/index.tsx
++++ b/packages/dataviews/src/components/dataviews-bulk-actions/index.tsx
+@@ -320,7 +320,7 @@ function FooterContent< Item >( {
+ 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
+ 		null
+ 	);
+-	const footerContentRef = useRef< JSX.Element | null >( null );
++	const footerContentRef = useRef< React.JSX.Element >( undefined );
+ 	const isMobile = useViewportMatch( 'medium', '<' );
+ 
+ 	const bulkActions = useMemo(
+@@ -359,7 +359,7 @@ function FooterContent< Item >( {
+ 	);
+ 	if ( ! actionInProgress ) {
+ 		if ( footerContentRef.current ) {
+-			footerContentRef.current = null;
++			footerContentRef.current = undefined;
+ 		}
+ 		return renderFooterContent(
+ 			data,
+diff --git a/packages/dataviews/src/components/dataviews-layouts/picker-table/index.tsx b/packages/dataviews/src/components/dataviews-layouts/picker-table/index.tsx
+index 1e7cf17a5366fa..25800d159ecdbc 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/picker-table/index.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/picker-table/index.tsx
+@@ -224,7 +224,7 @@ function ViewPickerTable< Item >( {
+ 	const headerMenuRefs = useRef<
+ 		Map< string, { node: HTMLButtonElement; fallback: string } >
+ 	>( new Map() );
+-	const headerMenuToFocusRef = useRef< HTMLButtonElement >();
++	const headerMenuToFocusRef = useRef< HTMLButtonElement >( undefined );
+ 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
+ 		useState< HTMLButtonElement >();
+ 	const isMultiselect = useIsMultiselectPicker( actions ) ?? false;
+diff --git a/packages/dataviews/src/components/dataviews-layouts/table/index.tsx b/packages/dataviews/src/components/dataviews-layouts/table/index.tsx
+index d1646957a20e37..d40d39501f8fce 100644
+--- a/packages/dataviews/src/components/dataviews-layouts/table/index.tsx
++++ b/packages/dataviews/src/components/dataviews-layouts/table/index.tsx
+@@ -290,7 +290,7 @@ function ViewTable< Item >( {
+ 	const headerMenuRefs = useRef<
+ 		Map< string, { node: HTMLButtonElement; fallback: string } >
+ 	>( new Map() );
+-	const headerMenuToFocusRef = useRef< HTMLButtonElement >();
++	const headerMenuToFocusRef = useRef< HTMLButtonElement >( undefined );
+ 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
+ 		useState< HTMLButtonElement >();
+ 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+diff --git a/packages/dataviews/src/dataviews-picker/index.tsx b/packages/dataviews/src/dataviews-picker/index.tsx
+index ad50beca5af0e1..a4b787a05a1352 100644
+--- a/packages/dataviews/src/dataviews-picker/index.tsx
++++ b/packages/dataviews/src/dataviews-picker/index.tsx
+@@ -128,7 +128,7 @@ function DataViewsPicker< Item >( {
+ 	empty,
+ }: DataViewsPickerProps< Item > ) {
+ 	const { infiniteScrollHandler } = paginationInfo;
+-	const containerRef = useRef< HTMLDivElement | null >( null );
++	const containerRef = useRef< HTMLDivElement >( null );
+ 	const [ containerWidth, setContainerWidth ] = useState( 0 );
+ 	const resizeObserverRef = useResizeObserver(
+ 		( resizeObserverEntries: any ) => {
+diff --git a/packages/dataviews/src/dataviews/index.tsx b/packages/dataviews/src/dataviews/index.tsx
+index 0ae54737f9552d..f946b7d5dff271 100644
+--- a/packages/dataviews/src/dataviews/index.tsx
++++ b/packages/dataviews/src/dataviews/index.tsx
+@@ -144,7 +144,7 @@ function DataViews< Item >( {
+ 	onReset,
+ }: DataViewsProps< Item > ) {
+ 	const { infiniteScrollHandler } = paginationInfo;
+-	const containerRef = useRef< HTMLDivElement | null >( null );
++	const containerRef = useRef< HTMLDivElement >( null );
+ 	const [ containerWidth, setContainerWidth ] = useState( 0 );
+ 	const resizeObserverRef = useResizeObserver(
+ 		( resizeObserverEntries: any ) => {
+diff --git a/packages/fields/src/components/media-edit/index.tsx b/packages/fields/src/components/media-edit/index.tsx
+index 8077e1211d519f..df23ed1aa049f0 100644
+--- a/packages/fields/src/components/media-edit/index.tsx
++++ b/packages/fields/src/components/media-edit/index.tsx
+@@ -677,7 +677,7 @@ export default function MediaEdit< Item >( {
+ 	// handler as `setTargetItemId()` would open the modal with stale
+ 	// `value`/`multiple` props. Setting a pending flag defers the open
+ 	// until after the next render when props are up to date.
+-	const openModalRef = useRef< ( () => void ) | null >( null );
++	const openModalRef = useRef< () => void >( undefined );
+ 	const [ pendingOpen, setPendingOpen ] = useState( false );
+ 	const [ blobs, setBlobs ] = useState< string[] >( [] );
+ 	useEffect( () => {
+diff --git a/packages/fields/src/components/media-edit/use-moving-animation.ts b/packages/fields/src/components/media-edit/use-moving-animation.ts
+index ef02c895670bf2..292a52d9975a5a 100644
+--- a/packages/fields/src/components/media-edit/use-moving-animation.ts
++++ b/packages/fields/src/components/media-edit/use-moving-animation.ts
+@@ -30,7 +30,7 @@ export default function useMovingAnimation(
+ 	triggerAnimationOnChange: unknown
+ ) {
+ 	const ref = useRef< HTMLDivElement >( null );
+-	const previousRef = useRef< { top: number; left: number } | null >( null );
++	const previousRef = useRef< { top: number; left: number } >( undefined );
+ 	// Capture position before DOM updates (during render).
+ 	// This runs synchronously during render, before layout effects.
+ 	if ( ref.current ) {
+diff --git a/packages/image-cropper/src/stories/index.story.tsx b/packages/image-cropper/src/stories/index.story.tsx
+index 42852de8e21c83..570afd8e449b18 100644
+--- a/packages/image-cropper/src/stories/index.story.tsx
++++ b/packages/image-cropper/src/stories/index.story.tsx
+@@ -55,7 +55,7 @@ const WithControlsComponent = ( args: ImageCropperProps ) => {
+ 
+ const WithControlsContent = ( args: ImageCropperProps ) => {
+ 	const { cropperState, setCropperState } = useImageCropper();
+-	const containerRef = useRef< HTMLDivElement | null >( null );
++	const containerRef = useRef< HTMLDivElement >( null );
+ 	const { containerStyle, handleOnload } = useHandleOnload( containerRef );
+ 	const handleRotateLeft = useCallback( () => {
+ 		setCropperState( { rotation: cropperState.rotation - 90 } );
+@@ -238,7 +238,9 @@ export const WithControls = {
+  * @param containerRef - The ref to the container element.
+  * @return The container style and the handleOnload function.
+  */
+-function useHandleOnload( containerRef: React.RefObject< HTMLDivElement > ) {
++function useHandleOnload(
++	containerRef: React.RefObject< HTMLDivElement | null >
++) {
+ 	const [ containerStyle, setContainerStyle ] = useState< {
+ 		minHeight?: string;
+ 		minWidth?: string;

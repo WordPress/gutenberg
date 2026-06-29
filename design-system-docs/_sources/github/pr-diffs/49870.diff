@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ca0fdfa789dfb4..f89d5472d75762 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `TreeGrid`: Modify keyboard navigation code to use a data-expanded attribute if aria-expanded is to be controlled outside of the TreeGrid component ([#48461](https://github.com/WordPress/gutenberg/pull/48461)).
++-   `Modal`: Increased border radius ([#49870](https://github.com/WordPress/gutenberg/pull/49870)).
+ 
+ ### Documentation
+ 
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index f434147ecef620..25b4ee2d1bacf8 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -20,7 +20,7 @@
+ 	width: 100%;
+ 	background: $white;
+ 	box-shadow: $shadow-modal;
+-	border-radius: $radius-block-ui;
++	border-radius: $grid-unit-10;
+ 	overflow: hidden;
+ 	// Have the content element fill the vertical space yet not overflow.
+ 	display: flex;

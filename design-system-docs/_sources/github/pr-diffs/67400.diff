@@ -1,0 +1,464 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c58817a420a746..fef1769c19b0f7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,10 @@
+ 
+ -   Add new `Badge` component ([#66555](https://github.com/WordPress/gutenberg/pull/66555)).
+ 
++### Internal
++
++-   `SlotFill`: rewrite the non-portal version to use `observableMap` ([#67400](https://github.com/WordPress/gutenberg/pull/67400)).
++
+ ## 29.0.0 (2024-12-11)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/slot-fill/context.ts b/packages/components/src/slot-fill/context.ts
+index c4839462fbce0c..b1f0718180e9eb 100644
+--- a/packages/components/src/slot-fill/context.ts
++++ b/packages/components/src/slot-fill/context.ts
+@@ -1,20 +1,22 @@
+ /**
+  * WordPress dependencies
+  */
++import { observableMap } from '@wordpress/compose';
+ import { createContext } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+ import type { BaseSlotFillContext } from './types';
+ 
+ const initialValue: BaseSlotFillContext = {
++	slots: observableMap(),
++	fills: observableMap(),
+ 	registerSlot: () => {},
+ 	unregisterSlot: () => {},
+ 	registerFill: () => {},
+ 	unregisterFill: () => {},
+-	getSlot: () => undefined,
+-	getFills: () => [],
+-	subscribe: () => () => {},
++	updateFill: () => {},
+ };
+ export const SlotFillContext = createContext( initialValue );
+ 
+diff --git a/packages/components/src/slot-fill/fill.ts b/packages/components/src/slot-fill/fill.ts
+index 0a31c8276b3f10..0bd1aec8fa3e0e 100644
+--- a/packages/components/src/slot-fill/fill.ts
++++ b/packages/components/src/slot-fill/fill.ts
+@@ -7,31 +7,26 @@ import { useContext, useLayoutEffect, useRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import SlotFillContext from './context';
+-import useSlot from './use-slot';
+ import type { FillComponentProps } from './types';
+ 
+ export default function Fill( { name, children }: FillComponentProps ) {
+ 	const registry = useContext( SlotFillContext );
+-	const slot = useSlot( name );
++	const instanceRef = useRef( {} );
++	const childrenRef = useRef( children );
+ 
+-	const ref = useRef( {
+-		name,
+-		children,
+-	} );
++	useLayoutEffect( () => {
++		childrenRef.current = children;
++	}, [ children ] );
+ 
+ 	useLayoutEffect( () => {
+-		const refValue = ref.current;
+-		refValue.name = name;
+-		registry.registerFill( name, refValue );
+-		return () => registry.unregisterFill( name, refValue );
++		const instance = instanceRef.current;
++		registry.registerFill( name, instance, childrenRef.current );
++		return () => registry.unregisterFill( name, instance );
+ 	}, [ registry, name ] );
+ 
+ 	useLayoutEffect( () => {
+-		ref.current.children = children;
+-		if ( slot ) {
+-			slot.rerender();
+-		}
+-	}, [ slot, children ] );
++		registry.updateFill( name, instanceRef.current, childrenRef.current );
++	} );
+ 
+ 	return null;
+ }
+diff --git a/packages/components/src/slot-fill/provider.tsx b/packages/components/src/slot-fill/provider.tsx
+index e2b98e73e1b707..e5319bc7f33e44 100644
+--- a/packages/components/src/slot-fill/provider.tsx
++++ b/packages/components/src/slot-fill/provider.tsx
+@@ -8,103 +8,102 @@ import { useState } from '@wordpress/element';
+  */
+ import SlotFillContext from './context';
+ import type {
+-	FillComponentProps,
++	FillInstance,
++	FillChildren,
++	BaseSlotInstance,
+ 	BaseSlotFillContext,
+ 	SlotFillProviderProps,
+ 	SlotKey,
+-	Rerenderable,
+ } from './types';
++import { observableMap } from '@wordpress/compose';
+ 
+ function createSlotRegistry(): BaseSlotFillContext {
+-	const slots: Record< SlotKey, Rerenderable > = {};
+-	const fills: Record< SlotKey, FillComponentProps[] > = {};
+-	let listeners: Array< () => void > = [];
+-
+-	function registerSlot( name: SlotKey, slot: Rerenderable ) {
+-		const previousSlot = slots[ name ];
+-		slots[ name ] = slot;
+-		triggerListeners();
+-
+-		// Sometimes the fills are registered after the initial render of slot
+-		// But before the registerSlot call, we need to rerender the slot.
+-		forceUpdateSlot( name );
+-
+-		// If a new instance of a slot is being mounted while another with the
+-		// same name exists, force its update _after_ the new slot has been
+-		// assigned into the instance, such that its own rendering of children
+-		// will be empty (the new Slot will subsume all fills for this name).
+-		if ( previousSlot ) {
+-			previousSlot.rerender();
+-		}
+-	}
+-
+-	function registerFill( name: SlotKey, instance: FillComponentProps ) {
+-		fills[ name ] = [ ...( fills[ name ] || [] ), instance ];
+-		forceUpdateSlot( name );
++	const slots = observableMap< SlotKey, BaseSlotInstance >();
++	const fills = observableMap<
++		SlotKey,
++		{ instance: FillInstance; children: FillChildren }[]
++	>();
++
++	function registerSlot( name: SlotKey, instance: BaseSlotInstance ) {
++		slots.set( name, instance );
+ 	}
+ 
+-	function unregisterSlot( name: SlotKey, instance: Rerenderable ) {
++	function unregisterSlot( name: SlotKey, instance: BaseSlotInstance ) {
+ 		// If a previous instance of a Slot by this name unmounts, do nothing,
+ 		// as the slot and its fills should only be removed for the current
+ 		// known instance.
+-		if ( slots[ name ] !== instance ) {
++		if ( slots.get( name ) !== instance ) {
+ 			return;
+ 		}
+ 
+-		delete slots[ name ];
+-		triggerListeners();
++		slots.delete( name );
+ 	}
+ 
+-	function unregisterFill( name: SlotKey, instance: FillComponentProps ) {
+-		fills[ name ] =
+-			fills[ name ]?.filter( ( fill ) => fill !== instance ) ?? [];
+-		forceUpdateSlot( name );
++	function registerFill(
++		name: SlotKey,
++		instance: FillInstance,
++		children: FillChildren
++	) {
++		fills.set( name, [
++			...( fills.get( name ) || [] ),
++			{ instance, children },
++		] );
+ 	}
+ 
+-	function getSlot( name: SlotKey ): Rerenderable | undefined {
+-		return slots[ name ];
++	function unregisterFill( name: SlotKey, instance: FillInstance ) {
++		const fillsForName = fills.get( name );
++		if ( ! fillsForName ) {
++			return;
++		}
++
++		fills.set(
++			name,
++			fillsForName.filter( ( fill ) => fill.instance !== instance )
++		);
+ 	}
+ 
+-	function getFills(
++	function updateFill(
+ 		name: SlotKey,
+-		slotInstance: Rerenderable
+-	): FillComponentProps[] {
+-		// Fills should only be returned for the current instance of the slot
+-		// in which they occupy.
+-		if ( slots[ name ] !== slotInstance ) {
+-			return [];
++		instance: FillInstance,
++		children: FillChildren
++	) {
++		const fillsForName = fills.get( name );
++		if ( ! fillsForName ) {
++			return;
+ 		}
+-		return fills[ name ];
+-	}
+-
+-	function forceUpdateSlot( name: SlotKey ) {
+-		const slot = getSlot( name );
+ 
+-		if ( slot ) {
+-			slot.rerender();
++		const fillForInstance = fillsForName.find(
++			( f ) => f.instance === instance
++		);
++		if ( ! fillForInstance ) {
++			return;
+ 		}
+-	}
+ 
+-	function triggerListeners() {
+-		listeners.forEach( ( listener ) => listener() );
+-	}
+-
+-	function subscribe( listener: () => void ) {
+-		listeners.push( listener );
++		if ( fillForInstance.children === children ) {
++			return;
++		}
+ 
+-		return () => {
+-			listeners = listeners.filter( ( l ) => l !== listener );
+-		};
++		fills.set(
++			name,
++			fillsForName.map( ( f ) => {
++				if ( f.instance === instance ) {
++					// Replace with new record with updated `children`.
++					return { instance, children };
++				}
++
++				return f;
++			} )
++		);
+ 	}
+ 
+ 	return {
++		slots,
++		fills,
+ 		registerSlot,
+ 		unregisterSlot,
+ 		registerFill,
+ 		unregisterFill,
+-		getSlot,
+-		getFills,
+-		subscribe,
++		updateFill,
+ 	};
+ }
+ 
+diff --git a/packages/components/src/slot-fill/slot.tsx b/packages/components/src/slot-fill/slot.tsx
+index fe4a741ddbfbad..82feaa04199f51 100644
+--- a/packages/components/src/slot-fill/slot.tsx
++++ b/packages/components/src/slot-fill/slot.tsx
+@@ -6,10 +6,10 @@ import type { ReactElement, ReactNode, Key } from 'react';
+ /**
+  * WordPress dependencies
+  */
++import { useObservableValue } from '@wordpress/compose';
+ import {
+ 	useContext,
+ 	useEffect,
+-	useReducer,
+ 	useRef,
+ 	Children,
+ 	cloneElement,
+@@ -32,41 +32,48 @@ function isFunction( maybeFunc: any ): maybeFunc is Function {
+ 	return typeof maybeFunc === 'function';
+ }
+ 
++function addKeysToChildren( children: ReactNode ) {
++	return Children.map( children, ( child, childIndex ) => {
++		if ( ! child || typeof child === 'string' ) {
++			return child;
++		}
++		let childKey: Key = childIndex;
++		if ( typeof child === 'object' && 'key' in child && child?.key ) {
++			childKey = child.key;
++		}
++
++		return cloneElement( child as ReactElement, {
++			key: childKey,
++		} );
++	} );
++}
++
+ function Slot( props: Omit< SlotComponentProps, 'bubblesVirtually' > ) {
+ 	const registry = useContext( SlotFillContext );
+-	const [ , rerender ] = useReducer( () => [], [] );
+-	const ref = useRef( { rerender } );
++	const instanceRef = useRef( {} );
+ 
+ 	const { name, children, fillProps = {} } = props;
+ 
+ 	useEffect( () => {
+-		const refValue = ref.current;
+-		registry.registerSlot( name, refValue );
+-		return () => registry.unregisterSlot( name, refValue );
++		const instance = instanceRef.current;
++		registry.registerSlot( name, instance );
++		return () => registry.unregisterSlot( name, instance );
+ 	}, [ registry, name ] );
+ 
+-	const fills: ReactNode[] = ( registry.getFills( name, ref.current ) ?? [] )
++	let fills = useObservableValue( registry.fills, name ) ?? [];
++	const currentSlot = useObservableValue( registry.slots, name );
++
++	// Fills should only be rendered in the currently registered instance of the slot.
++	if ( currentSlot !== instanceRef.current ) {
++		fills = [];
++	}
++
++	const renderedFills = fills
+ 		.map( ( fill ) => {
+ 			const fillChildren = isFunction( fill.children )
+ 				? fill.children( fillProps )
+ 				: fill.children;
+-			return Children.map( fillChildren, ( child, childIndex ) => {
+-				if ( ! child || typeof child === 'string' ) {
+-					return child;
+-				}
+-				let childKey: Key = childIndex;
+-				if (
+-					typeof child === 'object' &&
+-					'key' in child &&
+-					child?.key
+-				) {
+-					childKey = child.key;
+-				}
+-
+-				return cloneElement( child as ReactElement, {
+-					key: childKey,
+-				} );
+-			} );
++			return addKeysToChildren( fillChildren );
+ 		} )
+ 		.filter(
+ 			// In some cases fills are rendered only when some conditions apply.
+@@ -75,7 +82,13 @@ function Slot( props: Omit< SlotComponentProps, 'bubblesVirtually' > ) {
+ 			( element ) => ! isEmptyElement( element )
+ 		);
+ 
+-	return <>{ isFunction( children ) ? children( fills ) : fills }</>;
++	return (
++		<>
++			{ isFunction( children )
++				? children( renderedFills )
++				: renderedFills }
++		</>
++	);
+ }
+ 
+ export default Slot;
+diff --git a/packages/components/src/slot-fill/types.ts b/packages/components/src/slot-fill/types.ts
+index 6668057323edd9..758f1c8257d548 100644
+--- a/packages/components/src/slot-fill/types.ts
++++ b/packages/components/src/slot-fill/types.ts
+@@ -84,6 +84,10 @@ export type SlotComponentProps =
+ 			style?: never;
+ 	  } );
+ 
++export type FillChildren =
++	| ReactNode
++	| ( ( fillProps: FillProps ) => ReactNode );
++
+ export type FillComponentProps = {
+ 	/**
+ 	 * The name of the slot to fill into.
+@@ -93,7 +97,7 @@ export type FillComponentProps = {
+ 	/**
+ 	 * Children elements or render function.
+ 	 */
+-	children?: ReactNode | ( ( fillProps: FillProps ) => ReactNode );
++	children?: FillChildren;
+ };
+ 
+ export type SlotFillProviderProps = {
+@@ -109,8 +113,8 @@ export type SlotFillProviderProps = {
+ };
+ 
+ export type SlotRef = RefObject< HTMLElement >;
+-export type Rerenderable = { rerender: () => void };
+ export type FillInstance = {};
++export type BaseSlotInstance = {};
+ 
+ export type SlotFillBubblesVirtuallyContext = {
+ 	slots: ObservableMap< SlotKey, { ref: SlotRef; fillProps: FillProps } >;
+@@ -128,14 +132,22 @@ export type SlotFillBubblesVirtuallyContext = {
+ };
+ 
+ export type BaseSlotFillContext = {
+-	registerSlot: ( name: SlotKey, slot: Rerenderable ) => void;
+-	unregisterSlot: ( name: SlotKey, slot: Rerenderable ) => void;
+-	registerFill: ( name: SlotKey, instance: FillComponentProps ) => void;
+-	unregisterFill: ( name: SlotKey, instance: FillComponentProps ) => void;
+-	getSlot: ( name: SlotKey ) => Rerenderable | undefined;
+-	getFills: (
++	slots: ObservableMap< SlotKey, BaseSlotInstance >;
++	fills: ObservableMap<
++		SlotKey,
++		{ instance: FillInstance; children: FillChildren }[]
++	>;
++	registerSlot: ( name: SlotKey, slot: BaseSlotInstance ) => void;
++	unregisterSlot: ( name: SlotKey, slot: BaseSlotInstance ) => void;
++	registerFill: (
++		name: SlotKey,
++		instance: FillInstance,
++		children: FillChildren
++	) => void;
++	unregisterFill: ( name: SlotKey, instance: FillInstance ) => void;
++	updateFill: (
+ 		name: SlotKey,
+-		slotInstance: Rerenderable
+-	) => FillComponentProps[];
+-	subscribe: ( listener: () => void ) => () => void;
++		instance: FillInstance,
++		children: FillChildren
++	) => void;
+ };
+diff --git a/packages/components/src/slot-fill/use-slot.ts b/packages/components/src/slot-fill/use-slot.ts
+deleted file mode 100644
+index 4ab419be1ad2bd..00000000000000
+--- a/packages/components/src/slot-fill/use-slot.ts
++++ /dev/null
+@@ -1,27 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useContext, useSyncExternalStore } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import SlotFillContext from './context';
+-import type { SlotKey } from './types';
+-
+-/**
+- * React hook returning the active slot given a name.
+- *
+- * @param name Slot name.
+- * @return Slot object.
+- */
+-const useSlot = ( name: SlotKey ) => {
+-	const { getSlot, subscribe } = useContext( SlotFillContext );
+-	return useSyncExternalStore(
+-		subscribe,
+-		() => getSlot( name ),
+-		() => getSlot( name )
+-	);
+-};
+-
+-export default useSlot;

@@ -1,0 +1,160 @@
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.tsx b/packages/components/src/autocomplete/autocompleter-ui.tsx
+index c6c1b94deb577e..faf4cd96d3b0be 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.tsx
++++ b/packages/components/src/autocomplete/autocompleter-ui.tsx
+@@ -22,12 +22,12 @@ import { __, _n, sprintf } from '@wordpress/i18n';
+  */
+ import getDefaultUseItems from './get-default-use-items';
+ import Button from '../button';
+-import Popover from '../popover';
+ import { VisuallyHidden } from '../visually-hidden';
+ import { createPortal } from 'react-dom';
+ import type { AutocompleterUIProps, KeyedOption, WPCompleter } from './types';
++import DropdownMenu from '../dropdown-menu';
+ 
+-type ListBoxProps = {
++type DropdownItemsProps = {
+ 	items: KeyedOption[];
+ 	onSelect: ( option: KeyedOption ) => void;
+ 	selectedIndex: number;
+@@ -37,7 +37,7 @@ type ListBoxProps = {
+ 	Component?: React.ElementType;
+ };
+ 
+-function ListBox( {
++function DropdownItems( {
+ 	items,
+ 	onSelect,
+ 	selectedIndex,
+@@ -45,11 +45,10 @@ function ListBox( {
+ 	listBoxId,
+ 	className,
+ 	Component = 'div',
+-}: ListBoxProps ) {
++}: DropdownItemsProps ) {
+ 	return (
+ 		<Component
+ 			id={ listBoxId }
+-			role="listbox"
+ 			className="components-autocomplete__results"
+ 		>
+ 			{ items.map( ( option, index ) => (
+@@ -175,28 +174,37 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
+ 		}
+ 
+ 		return (
+-			<>
+-				<Popover
+-					focusOnMount={ false }
+-					onClose={ onReset }
+-					placement="top-start"
++			<div>
++				<DropdownMenu
++					label={ __( 'Select a block.' ) }
++					defaultOpen
++					icon={ <></> }
+ 					className="components-autocomplete__popover"
+-					anchor={ popoverAnchor }
+ 					ref={ popoverRefs }
++					popoverProps={ {
++						anchor: popoverAnchor,
++						onClose: onReset,
++					} }
++					onClose={ onReset }
++					focusOnMount={ false }
+ 				>
+-					<ListBox
+-						items={ items }
+-						onSelect={ onSelect }
+-						selectedIndex={ selectedIndex }
+-						instanceId={ instanceId }
+-						listBoxId={ listBoxId }
+-						className={ className }
+-					/>
+-				</Popover>
++					{ () => (
++						<>
++							<DropdownItems
++								items={ items }
++								onSelect={ onSelect }
++								selectedIndex={ selectedIndex }
++								instanceId={ instanceId }
++								listBoxId={ listBoxId }
++								className={ className }
++							/>
++						</>
++					) }
++				</DropdownMenu>
+ 				{ contentRef.current &&
+ 					needsA11yCompat &&
+ 					createPortal(
+-						<ListBox
++						<DropdownItems
+ 							items={ items }
+ 							onSelect={ onSelect }
+ 							selectedIndex={ selectedIndex }
+@@ -207,7 +215,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
+ 						/>,
+ 						contentRef.current.ownerDocument.body
+ 					) }
+-			</>
++			</div>
+ 		);
+ 	}
+ 
+diff --git a/packages/components/src/autocomplete/style.scss b/packages/components/src/autocomplete/style.scss
+index 75b219210f42e2..e7da967e69db21 100644
+--- a/packages/components/src/autocomplete/style.scss
++++ b/packages/components/src/autocomplete/style.scss
+@@ -1,6 +1,10 @@
+-.components-autocomplete__popover .components-popover__content {
+-	padding: $grid-unit-10;
+-	min-width: 200px;
++.components-autocomplete__popover {
++	height: 0;
++
++	.components-popover__content {
++		padding: $grid-unit-10;
++		min-width: 200px;
++	}
+ }
+ 
+ .components-autocomplete__result.components-button {
+diff --git a/packages/components/src/dropdown-menu/index.tsx b/packages/components/src/dropdown-menu/index.tsx
+index 0e4501be4839c0..c764d966dbd0e3 100644
+--- a/packages/components/src/dropdown-menu/index.tsx
++++ b/packages/components/src/dropdown-menu/index.tsx
+@@ -53,7 +53,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+ 		disableOpenOnArrowDown = false,
+ 		text,
+ 		noIcons,
+-
++		focusOnMount,
+ 		open,
+ 		defaultOpen,
+ 		onToggle: onToggleProp,
+@@ -212,6 +212,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
+ 			open={ open }
+ 			defaultOpen={ defaultOpen }
+ 			onToggle={ onToggleProp }
++			focusOnMount={ focusOnMount }
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/dropdown-menu/types.ts b/packages/components/src/dropdown-menu/types.ts
+index 7deb08abaa28ec..ee43b43b8360a2 100644
+--- a/packages/components/src/dropdown-menu/types.ts
++++ b/packages/components/src/dropdown-menu/types.ts
+@@ -141,6 +141,12 @@ export type DropdownMenuProps = {
+ 	 * A valid DropdownMenu must specify a `controls` or `children` prop, or both.
+ 	 */
+ 	controls?: DropdownOption[] | DropdownOption[][];
++	/**
++	 * Prop to control whether the dropdown menu should focus on mount.
++	 *
++	 * @default true
++	 */
++	focusOnMount?: boolean;
+ 	/**
+ 	 * The controlled open state of the dropdown menu.
+ 	 * Must be used in conjunction with `onToggle`.

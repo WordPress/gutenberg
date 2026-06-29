@@ -1,0 +1,140 @@
+diff --git a/packages/block-editor/src/components/text-decoration-control/index.js b/packages/block-editor/src/components/text-decoration-control/index.js
+index 44635602c947a5..05f92a8b8e0f66 100644
+--- a/packages/block-editor/src/components/text-decoration-control/index.js
++++ b/packages/block-editor/src/components/text-decoration-control/index.js
+@@ -49,7 +49,7 @@ export default function TextDecorationControl( {
+ 				'block-editor-text-decoration-control',
+ 				className
+ 			) }
+-			__experimentalIsIconGroup
++			__experimentalIsBorderless
+ 			label={ __( 'Decoration' ) }
+ 			value={ value }
+ 			onChange={ onChange }
+diff --git a/packages/block-editor/src/components/text-transform-control/index.js b/packages/block-editor/src/components/text-transform-control/index.js
+index c71c85993f5ac6..f9411f4717d46b 100644
+--- a/packages/block-editor/src/components/text-transform-control/index.js
++++ b/packages/block-editor/src/components/text-transform-control/index.js
+@@ -47,7 +47,7 @@ export default function TextTransformControl( { value, onChange, ...props } ) {
+ 		<ToggleGroupControl
+ 			{ ...props }
+ 			className="block-editor-text-transform-control"
+-			__experimentalIsIconGroup
++			__experimentalIsBorderless
+ 			label={ __( 'Letter case' ) }
+ 			value={ value }
+ 			onChange={ onChange }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5eb01848efc9bb..478d2e300fbfda 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ ### Internal
+ 
+ -   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
++-   `ToggleGroupControl`: Rename `__experimentalIsIconGroup` prop to `__experimentalIsBorderless` ([#43771](https://github.com/WordPress/gutenberg/pull/43771/)).
+ -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
+ -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
+ -   `ToggleControl`: Convert to TypeScript and streamline CSS ([#43717](https://github.com/WordPress/gutenberg/pull/43717)). 
+diff --git a/packages/components/src/toggle-group-control/stories/index.tsx b/packages/components/src/toggle-group-control/stories/index.tsx
+index e6f142c542a7c4..b949531025ca1c 100644
+--- a/packages/components/src/toggle-group-control/stories/index.tsx
++++ b/packages/components/src/toggle-group-control/stories/index.tsx
+@@ -112,16 +112,23 @@ WithTooltip.args = {
+ /**
+  * The `ToggleGroupControlOptionIcon` component can be used for icon options. A `label` is required
+  * on each option for accessibility, which will be shown in a tooltip.
+- *
+- * When using icon options within `ToggleGroupControl`, the `__experimentalIsIconGroup` style is preferred.
+  */
+ export const WithIcons: ComponentStory< typeof ToggleGroupControl > =
+ 	Template.bind( {} );
+ WithIcons.args = {
+ 	...Default.args,
+-	__experimentalIsIconGroup: true,
+ 	children: [
+ 		{ value: 'uppercase', label: 'Uppercase', icon: formatUppercase },
+ 		{ value: 'lowercase', label: 'Lowercase', icon: formatLowercase },
+ 	].map( mapPropsToOptionIconComponent ),
+ };
++
++/**
++ * A borderless style may be preferred in some contexts.
++ */
++export const Borderless: ComponentStory< typeof ToggleGroupControl > =
++	Template.bind( {} );
++Borderless.args = {
++	...WithIcons.args,
++	__experimentalIsBorderless: true,
++};
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+index 484dfa0b24b313..ad25c21a8ae03c 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+@@ -17,7 +17,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
+ 
+ function Example() {
+ 	return (
+-		<ToggleGroupControl __experimentalIsIconGroup>
++		<ToggleGroupControl>
+ 			<ToggleGroupControlOptionIcon
+ 				value="uppercase"
+ 				icon={ formatUppercase }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+index a8fc60000e97df..283ef884b77672 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+@@ -52,7 +52,7 @@ function UnforwardedToggleGroupControlOptionIcon(
+  *
+  * function Example() {
+  *	return (
+- *		<ToggleGroupControl __experimentalIsIconGroup>
++ *		<ToggleGroupControl>
+  *			<ToggleGroupControlOptionIcon
+  *				value="uppercase"
+  *				label="Uppercase"
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 61a072441fae06..1525269fca9932 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -45,7 +45,7 @@ function UnconnectedToggleGroupControl(
+ 		className,
+ 		isAdaptiveWidth = false,
+ 		isBlock = false,
+-		__experimentalIsIconGroup = false,
++		__experimentalIsBorderless = false,
+ 		label,
+ 		hideLabelFromVision = false,
+ 		help,
+@@ -88,11 +88,11 @@ function UnconnectedToggleGroupControl(
+ 		() =>
+ 			cx(
+ 				styles.ToggleGroupControl( { size } ),
+-				! __experimentalIsIconGroup && styles.border,
++				! __experimentalIsBorderless && styles.border,
+ 				isBlock && styles.block,
+ 				className
+ 			),
+-		[ className, cx, isBlock, __experimentalIsIconGroup, size ]
++		[ className, cx, isBlock, __experimentalIsBorderless, size ]
+ 	);
+ 	return (
+ 		<BaseControl
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 525e0a4e4442e2..70c759795d7553 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -100,11 +100,11 @@ export type ToggleGroupControlProps = Omit<
+ 		 */
+ 		isBlock?: boolean;
+ 		/**
+-		 * Style for use with `ToggleGroupControlOptionIcon`s.
++		 * Borderless style that may be preferred in some contexts.
+ 		 *
+ 		 * @default false
+ 		 */
+-		__experimentalIsIconGroup?: boolean; // TODO: Refactor so this can be private
++		__experimentalIsBorderless?: boolean;
+ 		/**
+ 		 * Callback when a segment is selected.
+ 		 */

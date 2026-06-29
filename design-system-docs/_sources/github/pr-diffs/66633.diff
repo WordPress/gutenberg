@@ -1,0 +1,86 @@
+diff --git a/packages/components/src/heading/stories/index.story.tsx b/packages/components/src/heading/stories/index.story.tsx
+index d82a59f08c825b..8777fb2c2e6507 100644
+--- a/packages/components/src/heading/stories/index.story.tsx
++++ b/packages/components/src/heading/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import { Heading } from '..';
+ 
+ const meta: Meta< typeof Heading > = {
+ 	component: Heading,
+-	title: 'Components (Experimental)/Heading',
++	title: 'Components (Experimental)/Typography/Heading',
++	id: 'components-experimental-heading',
+ 	argTypes: {
+ 		as: { control: { type: 'text' } },
+ 		color: { control: { type: 'color' } },
+diff --git a/packages/components/src/text-highlight/stories/index.story.tsx b/packages/components/src/text-highlight/stories/index.story.tsx
+index d54149d8e19d3c..f9538b7130095d 100644
+--- a/packages/components/src/text-highlight/stories/index.story.tsx
++++ b/packages/components/src/text-highlight/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import TextHighlight from '..';
+ 
+ const meta: Meta< typeof TextHighlight > = {
+ 	component: TextHighlight,
+-	title: 'Components/TextHighlight',
++	title: 'Components/Typography/TextHighlight',
++	id: 'components-texthighlight',
+ 	parameters: {
+ 		controls: {
+ 			expanded: true,
+diff --git a/packages/components/src/text/stories/index.story.tsx b/packages/components/src/text/stories/index.story.tsx
+index f762ca3b4e3ff7..92a2c7eb9be3e3 100644
+--- a/packages/components/src/text/stories/index.story.tsx
++++ b/packages/components/src/text/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import { Text } from '../component';
+ 
+ const meta: Meta< typeof Text > = {
+ 	component: Text,
+-	title: 'Components (Experimental)/Text',
++	title: 'Components (Experimental)/Typography/Text',
++	id: 'components-experimental-text',
+ 	argTypes: {
+ 		as: { control: { type: 'text' } },
+ 		color: { control: { type: 'color' } },
+diff --git a/packages/components/src/truncate/stories/index.story.tsx b/packages/components/src/truncate/stories/index.story.tsx
+index 84eaf59edbb3e1..3b06831c59aa07 100644
+--- a/packages/components/src/truncate/stories/index.story.tsx
++++ b/packages/components/src/truncate/stories/index.story.tsx
+@@ -10,7 +10,8 @@ import { Truncate } from '..';
+ 
+ const meta: Meta< typeof Truncate > = {
+ 	component: Truncate,
+-	title: 'Components (Experimental)/Truncate',
++	title: 'Components (Experimental)/Typography/Truncate',
++	id: 'components-experimental-truncate',
+ 	argTypes: {
+ 		children: { control: { type: 'text' } },
+ 		as: { control: { type: 'text' } },
+diff --git a/packages/components/src/visually-hidden/stories/index.story.tsx b/packages/components/src/visually-hidden/stories/index.story.tsx
+index 8abe45a94aab4f..6ebcf9a2e949ce 100644
+--- a/packages/components/src/visually-hidden/stories/index.story.tsx
++++ b/packages/components/src/visually-hidden/stories/index.story.tsx
+@@ -10,7 +10,7 @@ import { VisuallyHidden } from '..';
+ 
+ const meta: Meta< typeof VisuallyHidden > = {
+ 	component: VisuallyHidden,
+-	title: 'Components/Utilities/VisuallyHidden',
++	title: 'Components/Typography/VisuallyHidden',
+ 	id: 'components-visuallyhidden',
+ 	argTypes: {
+ 		children: { control: { type: null } },
+diff --git a/storybook/preview.js b/storybook/preview.js
+index ca90ad99e405de..a045b0c3303d39 100644
+--- a/storybook/preview.js
++++ b/storybook/preview.js
+@@ -135,10 +135,11 @@ export const parameters = {
+ 					'Feedback',
+ 					'Navigation',
+ 					'Overlays',
++					'Typography',
+ 					'Utilities',
+ 				],
+ 				'Components (Experimental)',
+-				[ 'Navigation', 'Overlays' ],
++				[ 'Navigation', 'Overlays', 'Typography' ],
+ 				'Icons',
+ 			],
+ 		},

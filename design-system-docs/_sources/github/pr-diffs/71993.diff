@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index d041586242b90a..12e5864fb81cfa 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -167,7 +167,7 @@
+ 	flex-grow: 1;
+ 	display: flex;
+ 	flex-direction: row;
+-	justify-content: left;
++	justify-content: flex-start;
+ }
+ 
+ .components-modal__header-icon-container {

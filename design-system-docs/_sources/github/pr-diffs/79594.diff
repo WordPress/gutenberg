@@ -1,0 +1,491 @@
+diff --git a/package-lock.json b/package-lock.json
+index 5b3cb0119ce91a..2786dfe7ad4798 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -53630,6 +53630,7 @@
+ 			"dependencies": {
+ 				"@wordpress/compose": "file:../compose",
+ 				"@wordpress/element": "file:../element",
++				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/style-runtime": "file:../style-runtime",
+ 				"colorjs.io": "^0.6.0",
+ 				"memize": "^2.1.0"
+@@ -53816,6 +53817,7 @@
+ 				"@wordpress/icons": "file:../icons",
+ 				"@wordpress/keycodes": "file:../keycodes",
+ 				"@wordpress/primitives": "file:../primitives",
++				"@wordpress/private-apis": "file:../private-apis",
+ 				"@wordpress/style-runtime": "file:../style-runtime",
+ 				"@wordpress/theme": "file:../theme",
+ 				"clsx": "^2.1.1",
+diff --git a/packages/boot/src/components/root/index.tsx b/packages/boot/src/components/root/index.tsx
+index 012fe02e739573..541113fcc20899 100644
+--- a/packages/boot/src/components/root/index.tsx
++++ b/packages/boot/src/components/root/index.tsx
+@@ -20,7 +20,7 @@ import { useState, useEffect, useMemo } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
+ import { Tooltip } from '@wordpress/ui';
+-import { ThemeProvider } from '@wordpress/theme';
++import { privateApis as themePrivateApis } from '@wordpress/theme';
+ 
+ /**
+  * Internal dependencies
+@@ -34,6 +34,7 @@ import type { CanvasData } from '../../store/types';
+ import './style.scss';
+ 
+ const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
++const { ThemeProvider } = unlock( themePrivateApis );
+ 
+ export default function Root() {
+ 	const matches = useMatches();
+diff --git a/packages/boot/src/components/root/single-page.tsx b/packages/boot/src/components/root/single-page.tsx
+index b1854797a62f17..4a27964274d10e 100644
+--- a/packages/boot/src/components/root/single-page.tsx
++++ b/packages/boot/src/components/root/single-page.tsx
+@@ -11,7 +11,7 @@ import { SnackbarNotices } from '@wordpress/notices';
+ import { SlotFillProvider } from '@wordpress/components';
+ import { useMemo } from '@wordpress/element';
+ import { getAdminThemeColors } from '@wordpress/admin-ui';
+-import { ThemeProvider } from '@wordpress/theme';
++import { privateApis as themePrivateApis } from '@wordpress/theme';
+ 
+ /**
+  * Internal dependencies
+@@ -24,6 +24,7 @@ import './style.scss';
+ import useRouteTitle from '../app/use-route-title';
+ 
+ const { useMatches, Outlet } = unlock( routePrivateApis );
++const { ThemeProvider } = unlock( themePrivateApis );
+ 
+ /**
+  * Root component for single page mode (no sidebar).
+diff --git a/packages/edit-site/src/components/layout/index.js b/packages/edit-site/src/components/layout/index.js
+index 06c45454bda07e..ca37f0da20a3e0 100644
+--- a/packages/edit-site/src/components/layout/index.js
++++ b/packages/edit-site/src/components/layout/index.js
+@@ -28,7 +28,7 @@ import {
+ 	privateApis as editorPrivateApis,
+ } from '@wordpress/editor';
+ import { privateApis as routerPrivateApis } from '@wordpress/router';
+-import { ThemeProvider } from '@wordpress/theme';
++import { privateApis as themePrivateApis } from '@wordpress/theme';
+ import { PluginArea } from '@wordpress/plugins';
+ import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
+ import { useDispatch, useSelect } from '@wordpress/data';
+@@ -50,6 +50,7 @@ import SavePanel from '../save-panel';
+ 
+ const { useLocation } = unlock( routerPrivateApis );
+ const { useStyle, UploadProgressSnackbar } = unlock( editorPrivateApis );
++const { ThemeProvider } = unlock( themePrivateApis );
+ 
+ const ANIMATION_DURATION = 0.3;
+ const CONTENT_COLOR = { background: '#ffffff' };
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 5b5284fca98dcd..95fe7a9328a021 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Breaking Changes
++
++-   Remove `ThemeProvider` from the public package exports and restore access through `privateApis` ([#79594](https://github.com/WordPress/gutenberg/pull/79594)).
++
+ ### New Features
+ 
+ -   Export `@wordpress/theme/utils` with a generated `var()` Sass function for compile-time design token fallback injection ([#79470](https://github.com/WordPress/gutenberg/pull/79470)).
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index e6bb0e893bd083..a0ab4379e1f74c 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -87,6 +87,7 @@
+ 	"dependencies": {
+ 		"@wordpress/compose": "file:../compose",
+ 		"@wordpress/element": "file:../element",
++		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/style-runtime": "file:../style-runtime",
+ 		"colorjs.io": "^0.6.0",
+ 		"memize": "^2.1.0"
+diff --git a/packages/theme/src/index.ts b/packages/theme/src/index.ts
+index 0e07af39cd2ab9..638fa24da3870e 100644
+--- a/packages/theme/src/index.ts
++++ b/packages/theme/src/index.ts
+@@ -1,3 +1,4 @@
++export { privateApis } from './private-apis';
+ export type * from './prebuilt/ts/token-types';
+-export { ThemeProvider } from './theme-provider';
++export { type ThemeProvider } from './theme-provider';
+ export type { CornerRadiusPreset } from './types';
+diff --git a/packages/theme/src/lock-unlock.ts b/packages/theme/src/lock-unlock.ts
+new file mode 100644
+index 00000000000000..add4c4108f0e27
+--- /dev/null
++++ b/packages/theme/src/lock-unlock.ts
+@@ -0,0 +1,7 @@
++import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
++
++export const { lock, unlock } =
++	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
++		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
++		'@wordpress/theme'
++	);
+diff --git a/packages/theme/src/private-apis.ts b/packages/theme/src/private-apis.ts
+new file mode 100644
+index 00000000000000..399e3a2ea5f4ba
+--- /dev/null
++++ b/packages/theme/src/private-apis.ts
+@@ -0,0 +1,9 @@
++import { lock } from './lock-unlock';
++import { ThemeProvider } from './theme-provider';
++import { useThemeProviderStyles } from './use-theme-provider-styles';
++
++export const privateApis = {};
++lock( privateApis, {
++	ThemeProvider,
++	useThemeProviderStyles,
++} );
+diff --git a/packages/theme/src/stories/index.story.tsx b/packages/theme/src/stories/index.story.tsx
+index 2e4e69f6bd6a1b..141b9f48877a10 100644
+--- a/packages/theme/src/stories/index.story.tsx
++++ b/packages/theme/src/stories/index.story.tsx
+@@ -22,6 +22,7 @@ const meta: Meta< typeof ThemeProvider > = {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 	},
++	tags: [ 'status-private' ],
+ };
+ export default meta;
+ 
+diff --git a/packages/theme/tsconfig.src.json b/packages/theme/tsconfig.src.json
+index 910a0c8abbf300..2ff4f8d5501eb8 100644
+--- a/packages/theme/tsconfig.src.json
++++ b/packages/theme/tsconfig.src.json
+@@ -10,6 +10,7 @@
+ 	"references": [
+ 		{ "path": "../compose" },
+ 		{ "path": "../element" },
++		{ "path": "../private-apis" },
+ 		{ "path": "../style-runtime" }
+ 	]
+ }
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 657e47f1fdd695..b115d70c11ba46 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Internal
+ 
++-   Restore private API access for `@wordpress/theme`'s `ThemeProvider` ([#79594](https://github.com/WordPress/gutenberg/pull/79594)).
+ -   Enforce CSS Module class selector naming for component-library packages ([#79504](https://github.com/WordPress/gutenberg/pull/79504)).
+ -   Update `@base-ui/react` from `1.5.0` to [`1.6.0`](https://github.com/mui/base-ui/releases/tag/v1.6.0) ([#79408](https://github.com/WordPress/gutenberg/pull/79408)).
+ 
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index afae1075952f56..bb54bbf769e197 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -51,6 +51,7 @@
+ 		"@wordpress/icons": "file:../icons",
+ 		"@wordpress/keycodes": "file:../keycodes",
+ 		"@wordpress/primitives": "file:../primitives",
++		"@wordpress/private-apis": "file:../private-apis",
+ 		"@wordpress/style-runtime": "file:../style-runtime",
+ 		"@wordpress/theme": "file:../theme",
+ 		"clsx": "^2.1.1",
+diff --git a/packages/ui/src/alert-dialog/popup.tsx b/packages/ui/src/alert-dialog/popup.tsx
+index 580bba033a36ac..b2f6a98eceea61 100644
+--- a/packages/ui/src/alert-dialog/popup.tsx
++++ b/packages/ui/src/alert-dialog/popup.tsx
+@@ -3,7 +3,10 @@ import clsx from 'clsx';
+ import { forwardRef, useContext } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+-import { ThemeProvider } from '@wordpress/theme';
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
+ 
+ import { renderSlotWithChildren } from '../utils/render-slot-with-children';
+ import { Button } from '../button';
+@@ -15,6 +18,7 @@ import {
+ 	SCROLL_CONTAINER_ATTR,
+ 	useOverlayScrollStateAttributes,
+ } from '../utils/use-overlay-scroll-state-attributes';
++import { unlock } from '../lock-unlock';
+ import { Stack } from '../stack';
+ import { Text } from '../text';
+ import { AlertDialogContext } from './context';
+@@ -22,6 +26,9 @@ import { Portal } from './portal';
+ import alertDialogStyles from './style.module.css';
+ import type { PopupProps } from './types';
+ 
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
+ const Popup = forwardRef< HTMLDivElement, PopupProps >(
+ 	function AlertDialogPopup(
+ 		{
+diff --git a/packages/ui/src/dialog/popup.tsx b/packages/ui/src/dialog/popup.tsx
+index 2918967412ac4d..b517c07dac9e19 100644
+--- a/packages/ui/src/dialog/popup.tsx
++++ b/packages/ui/src/dialog/popup.tsx
+@@ -2,7 +2,11 @@ import { Dialog as _Dialog } from '@base-ui/react/dialog';
+ import clsx from 'clsx';
+ import { forwardRef } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+-import { ThemeProvider } from '@wordpress/theme';
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
++import { unlock } from '../lock-unlock';
+ import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+ import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
+ import { renderSlotWithChildren } from '../utils/render-slot-with-children';
+@@ -11,6 +15,9 @@ import { Portal } from './portal';
+ import styles from './style.module.css';
+ import type { PopupProps } from './types';
+ 
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
+ const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
+ 
+ /**
+diff --git a/packages/ui/src/drawer/popup.tsx b/packages/ui/src/drawer/popup.tsx
+index 3f193b672dc04e..a151613962901c 100644
+--- a/packages/ui/src/drawer/popup.tsx
++++ b/packages/ui/src/drawer/popup.tsx
+@@ -2,7 +2,11 @@ import { Drawer as _Drawer } from '@base-ui/react/drawer';
+ import clsx from 'clsx';
+ import { forwardRef } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+-import { ThemeProvider } from '@wordpress/theme';
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
++import { unlock } from '../lock-unlock';
+ import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+ import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
+ import { renderSlotWithChildren } from '../utils/render-slot-with-children';
+@@ -11,6 +15,9 @@ import { Portal } from './portal';
+ import styles from './style.module.css';
+ import type { PopupProps } from './types';
+ 
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
+ const CLOSE_ICON_ATTR = 'data-wp-ui-drawer-close-icon';
+ 
+ /**
+diff --git a/packages/ui/src/form/primitives/autocomplete/popup.tsx b/packages/ui/src/form/primitives/autocomplete/popup.tsx
+index bdd11b88483027..001bb90643af9a 100644
+--- a/packages/ui/src/form/primitives/autocomplete/popup.tsx
++++ b/packages/ui/src/form/primitives/autocomplete/popup.tsx
+@@ -1,13 +1,20 @@
+ import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
+ import clsx from 'clsx';
+ import { forwardRef } from '@wordpress/element';
+-import { ThemeProvider } from '@wordpress/theme';
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
++import { unlock } from '../../../lock-unlock';
+ import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
+ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+ import { Portal } from './portal';
+ import { Positioner } from './positioner';
+ import type { AutocompletePopupProps } from './types';
+ 
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
+ export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
+ 	function Popup( { className, portal, positioner, ...restProps }, ref ) {
+ 		const popupContent = (
+diff --git a/packages/ui/src/form/primitives/combobox/popup.tsx b/packages/ui/src/form/primitives/combobox/popup.tsx
+index 82272a7a8cae41..6da83929dfde02 100644
+--- a/packages/ui/src/form/primitives/combobox/popup.tsx
++++ b/packages/ui/src/form/primitives/combobox/popup.tsx
+@@ -1,13 +1,20 @@
+ import { Combobox as _Combobox } from '@base-ui/react/combobox';
+ import clsx from 'clsx';
+ import { forwardRef } from '@wordpress/element';
+-import { ThemeProvider } from '@wordpress/theme';
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
++import { unlock } from '../../../lock-unlock';
+ import { Portal } from './portal';
+ import { Positioner } from './positioner';
+ import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
+ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+ import type { ComboboxPopupProps } from './types';
+ 
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
+ export const Popup = forwardRef< HTMLDivElement, ComboboxPopupProps >(
+ 	function Popup( { className, portal, positioner, ...restProps }, ref ) {
+ 		const popupContent = (
+diff --git a/packages/ui/src/form/primitives/select/popup.tsx b/packages/ui/src/form/primitives/select/popup.tsx
+index dcaba85ae3c166..f7db6f9079e5c0 100644
+--- a/packages/ui/src/form/primitives/select/popup.tsx
++++ b/packages/ui/src/form/primitives/select/popup.tsx
+@@ -1,13 +1,20 @@
+ import { Select as _Select } from '@base-ui/react/select';
+ import clsx from 'clsx';
+ import { forwardRef } from '@wordpress/element';
+-import { ThemeProvider } from '@wordpress/theme';
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
++import { unlock } from '../../../lock-unlock';
+ import { Portal } from './portal';
+ import { Positioner } from './positioner';
+ import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
+ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+ import type { SelectPopupProps } from './types';
+ 
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
+ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
+ 	function Popup(
+ 		{ className, portal, positioner, children, ...restProps },
+diff --git a/packages/ui/src/lock-unlock.ts b/packages/ui/src/lock-unlock.ts
+new file mode 100644
+index 00000000000000..654c14703eec79
+--- /dev/null
++++ b/packages/ui/src/lock-unlock.ts
+@@ -0,0 +1,7 @@
++import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
++
++export const { lock, unlock } =
++	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
++		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
++		'@wordpress/ui'
++	);
+diff --git a/packages/ui/src/popover/popup.tsx b/packages/ui/src/popover/popup.tsx
+index e5b85c24fe22f7..36b6ee4312bb61 100644
+--- a/packages/ui/src/popover/popup.tsx
++++ b/packages/ui/src/popover/popup.tsx
+@@ -2,7 +2,11 @@ import { Popover as _Popover } from '@base-ui/react/popover';
+ import clsx from 'clsx';
+ import { forwardRef } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+-import { ThemeProvider } from '@wordpress/theme';
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
++import { unlock } from '../lock-unlock';
+ import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+ import { renderSlotWithChildren } from '../utils/render-slot-with-children';
+ import { PopoverValidationProvider } from './context';
+@@ -11,6 +15,9 @@ import { Positioner } from './positioner';
+ import styles from './style.module.css';
+ import type { PopupProps } from './types';
+ 
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
+ const CLOSE_ATTR = 'data-wp-ui-popover-close';
+ 
+ /**
+diff --git a/packages/ui/src/tooltip/popup.tsx b/packages/ui/src/tooltip/popup.tsx
+index 0828b54371c87a..e566cce9974bf1 100644
+--- a/packages/ui/src/tooltip/popup.tsx
++++ b/packages/ui/src/tooltip/popup.tsx
+@@ -1,13 +1,20 @@
+ import clsx from 'clsx';
+ import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
+ import { forwardRef } from '@wordpress/element';
+-import { ThemeProvider } from '@wordpress/theme';
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
+ import type { PopupProps } from './types';
++import { unlock } from '../lock-unlock';
+ import { Portal } from './portal';
+ import { Positioner } from './positioner';
+ import { renderSlotWithChildren } from '../utils/render-slot-with-children';
+ import styles from './style.module.css';
+ 
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
+ /*
+  * This should ideally use whatever dark color makes sense, and not be
+  * hardcoded to #1e1e1e. The solutions would be to:
+diff --git a/packages/ui/tsconfig.json b/packages/ui/tsconfig.json
+index cab0201a7b42ec..4060c432adb43b 100644
+--- a/packages/ui/tsconfig.json
++++ b/packages/ui/tsconfig.json
+@@ -17,6 +17,7 @@
+ 		{ "path": "../icons" },
+ 		{ "path": "../keycodes" },
+ 		{ "path": "../primitives" },
++		{ "path": "../private-apis" },
+ 		{ "path": "../style-runtime" },
+ 		{ "path": "../theme" }
+ 	],
+diff --git a/storybook/decorators/with-design-system-theme.tsx b/storybook/decorators/with-design-system-theme.tsx
+index d1eb15524b21c8..0308288daa68e2 100644
+--- a/storybook/decorators/with-design-system-theme.tsx
++++ b/storybook/decorators/with-design-system-theme.tsx
+@@ -1,8 +1,16 @@
+ import type { CornerRadiusPreset } from '@wordpress/theme';
+-import { ThemeProvider } from '@wordpress/theme';
++import { privateApis as themeApis } from '@wordpress/theme';
++import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+ import type { StoryContext } from 'storybook/internal/types';
+ import { storyIdMatchesDesignSystemTheme } from './utils/design-system-theme-story-matchers';
+ 
++const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
++	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
++	'@wordpress/theme'
++);
++
++const { ThemeProvider } = unlock( themeApis );
++
+ /**
+  * Decorator that applies Design System theme based on toolbar selections.
+  *
+diff --git a/storybook/stories/design-system/theme-example-application.story.tsx b/storybook/stories/design-system/theme-example-application.story.tsx
+index 56b7b683540655..215d0dda59e63c 100644
+--- a/storybook/stories/design-system/theme-example-application.story.tsx
++++ b/storybook/stories/design-system/theme-example-application.story.tsx
+@@ -2,7 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { Breadcrumbs, Page } from '@wordpress/admin-ui';
+ import { useState } from '@wordpress/element';
+ import { wordpress } from '@wordpress/icons';
+-import { ThemeProvider, type CornerRadiusPreset } from '@wordpress/theme';
++import type { CornerRadiusPreset } from '@wordpress/theme';
++import { privateApis as themeApis } from '@wordpress/theme';
++import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+ import {
+ 	Badge,
+ 	Button,
+@@ -19,6 +21,13 @@ import {
+ 
+ import { withRouter } from '../../decorators/with-router';
+ 
++const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
++	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
++	'@wordpress/theme'
++);
++
++const { ThemeProvider } = unlock( themeApis );
++
+ const sidebarNavItems = [
+ 	'Dashboard',
+ 	'Posts',

@@ -1,0 +1,208 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 29e8fa28e58da5..1203c94d8745f6 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -118,6 +118,7 @@ module.exports = {
+ 							'keyBy',
+ 							'keys',
+ 							'lowerCase',
++							'mapKeys',
+ 							'maxBy',
+ 							'memoize',
+ 							'negate',
+diff --git a/packages/block-directory/src/store/resolvers.js b/packages/block-directory/src/store/resolvers.js
+index d2b5abcff587c4..cd13ba5ccd7134 100644
+--- a/packages/block-directory/src/store/resolvers.js
++++ b/packages/block-directory/src/store/resolvers.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { camelCase } from 'change-case';
+-import { mapKeys } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -27,7 +26,12 @@ export const getDownloadableBlocks =
+ 				path: `wp/v2/block-directory/search?term=${ filterValue }`,
+ 			} );
+ 			const blocks = results.map( ( result ) =>
+-				mapKeys( result, ( value, key ) => camelCase( key ) )
++				Object.fromEntries(
++					Object.entries( result ).map( ( [ key, value ] ) => [
++						camelCase( key ),
++						value,
++					] )
++				)
+ 			);
+ 
+ 			dispatch( receiveDownloadableBlocks( blocks, filterValue ) );
+diff --git a/packages/block-editor/src/components/rich-text/use-format-types.js b/packages/block-editor/src/components/rich-text/use-format-types.js
+index ff76cc59dd58d3..f798e41ede4dfb 100644
+--- a/packages/block-editor/src/components/rich-text/use-format-types.js
++++ b/packages/block-editor/src/components/rich-text/use-format-types.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { mapKeys } from 'lodash';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -35,7 +30,12 @@ const interactiveContentTags = new Set( [
+ 
+ function prefixSelectKeys( selected, prefix ) {
+ 	if ( typeof selected !== 'object' ) return { [ prefix ]: selected };
+-	return mapKeys( selected, ( value, key ) => `${ prefix }.${ key }` );
++	return Object.fromEntries(
++		Object.entries( selected ).map( ( [ key, value ] ) => [
++			`${ prefix }.${ key }`,
++			value,
++		] )
++	);
+ }
+ 
+ function getPrefixedSelectKeys( selected, prefix ) {
+diff --git a/packages/block-editor/src/store/selectors.js b/packages/block-editor/src/store/selectors.js
+index 10eda555af70dd..030977812dcd4d 100644
+--- a/packages/block-editor/src/store/selectors.js
++++ b/packages/block-editor/src/store/selectors.js
+@@ -10,7 +10,6 @@ import {
+ 	some,
+ 	find,
+ 	filter,
+-	mapKeys,
+ 	orderBy,
+ } from 'lodash';
+ import createSelector from 'rememo';
+@@ -2078,9 +2077,11 @@ export const getBlockTransformItems = createSelector(
+ 			)
+ 			.map( buildBlockTypeTransformItem );
+ 
+-		const itemsByName = mapKeys(
+-			blockTypeTransformItems,
+-			( { name } ) => name
++		const itemsByName = Object.fromEntries(
++			Object.entries( blockTypeTransformItems ).map( ( [ , value ] ) => [
++				value.name,
++				value,
++			] )
+ 		);
+ 
+ 		// Consider unwraping the highest priority.
+diff --git a/packages/blocks/src/api/registration.js b/packages/blocks/src/api/registration.js
+index 819d609e5929f3..9f93b993880be4 100644
+--- a/packages/blocks/src/api/registration.js
++++ b/packages/blocks/src/api/registration.js
+@@ -4,7 +4,7 @@
+  * External dependencies
+  */
+ import { camelCase } from 'change-case';
+-import { isEmpty, mapKeys, pick, pickBy } from 'lodash';
++import { isEmpty, pick, pickBy } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -172,12 +172,14 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
+ 			}
+ 			continue;
+ 		}
+-		serverSideBlockDefinitions[ blockName ] = mapKeys(
+-			pickBy(
+-				definitions[ blockName ],
+-				( value ) => value !== null && value !== undefined
+-			),
+-			( value, key ) => camelCase( key )
++
++		serverSideBlockDefinitions[ blockName ] = Object.fromEntries(
++			Object.entries(
++				pickBy(
++					definitions[ blockName ],
++					( value ) => value !== null && value !== undefined
++				)
++			).map( ( [ key, value ] ) => [ camelCase( key ), value ] )
+ 		);
+ 	}
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ddcd5c725d06b6..0faf0c5d43bde2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   `DateTimePicker`, `TimePicker`, `DatePicker`: Switch from `moment` to `date-fns` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
+ -   `DatePicker`: Switch from `react-dates` to `use-lilius` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
++-   `convertLTRToRTL()`: Refactor away from `_.mapKeys()` ([#43258](https://github.com/WordPress/gutenberg/pull/43258/)).
+ 
+ ## 19.17.0 (2022-08-10)
+ 
+diff --git a/packages/components/src/utils/rtl.js b/packages/components/src/utils/rtl.js
+index f8c7efbda5bf69..457317ee68de70 100644
+--- a/packages/components/src/utils/rtl.js
++++ b/packages/components/src/utils/rtl.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import { css } from '@emotion/react';
+-import { mapKeys } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -57,7 +56,12 @@ function getConvertedKey( key ) {
+  * @return {import('react').CSSProperties} Converted ltr -> rtl styles
+  */
+ export const convertLTRToRTL = ( ltrStyles = {} ) => {
+-	return mapKeys( ltrStyles, ( _value, key ) => getConvertedKey( key ) );
++	return Object.fromEntries(
++		Object.entries( ltrStyles ).map( ( [ key, value ] ) => [
++			getConvertedKey( key ),
++			value,
++		] )
++	);
+ };
+ 
+ /**
+diff --git a/packages/editor/src/hooks/custom-sources-backwards-compatibility.js b/packages/editor/src/hooks/custom-sources-backwards-compatibility.js
+index 2d81807e370348..3d90a19a268070 100644
+--- a/packages/editor/src/hooks/custom-sources-backwards-compatibility.js
++++ b/packages/editor/src/hooks/custom-sources-backwards-compatibility.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { pickBy, mapValues, isEmpty, mapKeys } from 'lodash';
++import { pickBy, mapValues, isEmpty } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -69,17 +69,19 @@ const createWithMetaAttributeSource = ( metaAttributes ) =>
+ 					<BlockEdit
+ 						attributes={ mergedAttributes }
+ 						setAttributes={ ( nextAttributes ) => {
+-							const nextMeta = mapKeys(
+-								// Filter to intersection of keys between the updated
+-								// attributes and those with an associated meta key.
+-								pickBy(
+-									nextAttributes,
+-									( value, key ) => metaAttributes[ key ]
+-								),
+-
+-								// Rename the keys to the expected meta key name.
+-								( value, attributeKey ) =>
+-									metaAttributes[ attributeKey ]
++							const nextMeta = Object.fromEntries(
++								Object.entries(
++									// Filter to intersection of keys between the updated
++									// attributes and those with an associated meta key.
++									pickBy(
++										nextAttributes,
++										( value, key ) => metaAttributes[ key ]
++									)
++								).map( ( [ attributeKey, value ] ) => [
++									// Rename the keys to the expected meta key name.
++									metaAttributes[ attributeKey ],
++									value,
++								] )
+ 							);
+ 
+ 							if ( ! isEmpty( nextMeta ) ) {

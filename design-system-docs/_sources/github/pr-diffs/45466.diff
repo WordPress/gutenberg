@@ -1,0 +1,1060 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4f62b51db7ce74..225c4ccfb2dc99 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ ### Experimental
+ 
+ -   `ToggleGroupControl`: Only show enclosing border when `isBlock` and not `isDeselectable` ([#45492](https://github.com/WordPress/gutenberg/pull/45492)).
++-   `Theme`: Add support for custom `background` color ([#45466](https://github.com/WordPress/gutenberg/pull/45466)).
+ 
+ ## 22.0.0 (2022-11-02)
+ 
+diff --git a/packages/components/src/button/stories/index.js b/packages/components/src/button/stories/index.js
+index 428d1851c66400..569bd845c34253 100644
+--- a/packages/components/src/button/stories/index.js
++++ b/packages/components/src/button/stories/index.js
+@@ -128,6 +128,36 @@ Default.args = {
+ 	children: 'Code is poetry',
+ };
+ 
++export const Primary = Template.bind( {} );
++Primary.args = {
++	...Default.args,
++	variant: 'primary',
++};
++
++export const Secondary = Template.bind( {} );
++Secondary.args = {
++	...Default.args,
++	variant: 'secondary',
++};
++
++export const Tertiary = Template.bind( {} );
++Tertiary.args = {
++	...Default.args,
++	variant: 'tertiary',
++};
++
++export const Link = Template.bind( {} );
++Link.args = {
++	...Default.args,
++	variant: 'link',
++};
++
++export const IsDestructive = Template.bind( {} );
++IsDestructive.args = {
++	...Default.args,
++	isDestructive: true,
++};
++
+ export const Icon = Template.bind( {} );
+ Icon.args = {
+ 	label: 'Code is poetry',
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 29b8d4aa2cba92..0e29df0223c0bb 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -16,7 +16,7 @@
+ 	box-sizing: border-box;
+ 	padding: 6px 12px;
+ 	border-radius: $radius-block-ui;
+-	color: $gray-900;
++	color: $components-color-foreground;
+ 
+ 	&[aria-expanded="true"],
+ 	&:hover {
+@@ -44,7 +44,7 @@
+ 	&.is-primary {
+ 		white-space: nowrap;
+ 		background: $components-color-accent;
+-		color: $white;
++		color: $components-color-accent-inverted;
+ 		text-decoration: none;
+ 		text-shadow: none;
+ 
+@@ -53,17 +53,17 @@
+ 
+ 		&:hover:not(:disabled) {
+ 			background: $components-color-accent-darker-10;
+-			color: $white;
++			color: $components-color-accent-inverted;
+ 		}
+ 
+ 		&:active:not(:disabled) {
+ 			background: $components-color-accent-darker-20;
+ 			border-color: $components-color-accent-darker-20;
+-			color: $white;
++			color: $components-color-accent-inverted;
+ 		}
+ 
+ 		&:focus:not(:disabled) {
+-			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
++			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 		}
+ 
+ 		&:disabled,
+@@ -71,6 +71,7 @@
+ 		&[aria-disabled="true"],
+ 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
+ 		&[aria-disabled="true"]:active:enabled {
++			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+ 			color: rgba($white, 0.4);
+ 			background: $components-color-accent;
+ 			border-color: $components-color-accent;
+@@ -79,7 +80,7 @@
+ 
+ 			&:focus:enabled {
+ 				box-shadow:
+-					0 0 0 $border-width $white,
++					0 0 0 $border-width $components-color-background,
+ 					0 0 0 3px $components-color-accent;
+ 			}
+ 		}
+@@ -87,7 +88,7 @@
+ 		&.is-busy,
+ 		&.is-busy:disabled,
+ 		&.is-busy[aria-disabled="true"] {
+-			color: $white;
++			color: $components-color-accent-inverted;
+ 			background-size: 100px 100%;
+ 			// Disable reason: This function call looks nicer when each argument is on its own line.
+ 			/* stylelint-disable */
+@@ -113,7 +114,7 @@
+ 		outline: 1px solid transparent;
+ 
+ 		&:active:not(:disabled) {
+-			background: $gray-300;
++			background: $components-color-gray-300;
+ 			color: $components-color-accent-darker-10;
+ 			box-shadow: none;
+ 		}
+@@ -126,6 +127,7 @@
+ 		&:disabled,
+ 		&[aria-disabled="true"],
+ 		&[aria-disabled="true"]:hover {
++			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+ 			color: lighten($gray-700, 5%);
+ 			background: lighten($gray-300, 5%);
+ 			transform: none;
+@@ -222,7 +224,7 @@
+ 	}
+ 
+ 	&:not([aria-disabled="true"]):active {
+-		color: inherit;
++		color: $components-color-foreground;
+ 	}
+ 
+ 	&:disabled,
+@@ -242,6 +244,7 @@
+ 		/* stylelint-disable */
+ 		background-image: linear-gradient(
+ 			-45deg,
++			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
+ 			darken($white, 2%) 33%,
+ 			darken($white, 12%) 33%,
+ 			darken($white, 12%) 70%,
+@@ -292,19 +295,19 @@
+ 
+ 	// Toggled style.
+ 	&.is-pressed {
+-		color: $white;
+-		background: $gray-900;
++		color: $components-color-foreground-inverted;
++		background: $components-color-foreground;
+ 
+ 		&:focus:not(:disabled) {
+-			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
++			box-shadow: inset 0 0 0 1px $components-color-background, 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 
+ 			// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 			outline: 2px solid transparent;
+ 		}
+ 
+ 		&:hover:not(:disabled) {
+-			color: $white;
+-			background: $gray-900;
++			color: $components-color-foreground-inverted;
++			background: $components-color-foreground;
+ 		}
+ 	}
+ 
+diff --git a/packages/components/src/theme/README.md b/packages/components/src/theme/README.md
+index a63f8a85db1a20..2cc8487dd687e1 100644
+--- a/packages/components/src/theme/README.md
++++ b/packages/components/src/theme/README.md
+@@ -17,7 +17,7 @@ const Example = () => {
+ 	return (
+ 		<Theme accent="red">
+ 			<Button variant="primary">I'm red</Button>
+-			<Theme accent="blue">
++			<Theme accent="blue" background="black">
+ 				<Button variant="primary">I'm blue</Button>
+ 			</Theme>
+ 		</Theme>
+@@ -29,6 +29,36 @@ const Example = () => {
+ 
+ ### `accent`: `string`
+ 
+-Used to set the accent color (used by components as the primary color). If an accent color is not defined, the default fallback value is the original WP Admin main theme color. No all valid CSS color syntaxes are supported — in particular, keywords (like `'currentcolor'`, `'inherit'`, `'initial'`, `'revert'`, `'unset'`...) and CSS custom properties (e.g. `var(--my-custom-property)`) are _not_ supported values for this property.
++The accent color (used by components as the primary color). If an accent color is not defined, the default fallback value is the original WP Admin main theme color.
++
++Not all valid CSS color syntaxes are supported — in particular, keywords (like `'currentcolor'`, `'inherit'`, `'initial'`, `'revert'`, `'unset'`...) and CSS custom properties (e.g. `var(--my-custom-property)`) are _not_ supported values for this property.
+ 
+ -   Required: No
++
++### `background`: `string`
++
++The background color.  If a component explicitly has a background, it will be this color. Otherwise, this color will simply be used to determine what the foreground colors should be. The actual background color will need to be set on the component's container element. If a background color is not defined, the default fallback value is #fff.
++
++Not all valid CSS color syntaxes are supported — in particular, keywords (like `'currentcolor'`, `'inherit'`, `'initial'`, `'revert'`, `'unset'`...) and CSS custom properties (e.g. `var(--my-custom-property)`) are _not_ supported values for this property.
++
++-   Required: No
++
++## Writing themeable components
++
++If you would like your custom component to be themeable as a child of the `Theme` component, it should use these color variables. (This is a work in progress, and this list of variables may change. We do not recommend using these variables in production at this time.)
++
++-  `--wp-components-color-accent`: The accent color.
++-  `--wp-components-color-accent-darker-10`: A slightly darker version of the accent color.
++-  `--wp-components-color-accent-darker-20`: An even darker version of the accent color.
++-  `--wp-components-color-accent-inverted`: The foreground color when the accent color is the background, for example when placing text on the accent color.
++-  `--wp-components-color-background`: The background color.
++-  `--wp-components-color-foreground`: The foreground color, for example text.
++-  `--wp-components-color-foreground-inverted`: The foreground color when the foreground color is the background, for example when placing text on the foreground color.
++-  Grayscale:
++   -  `--wp-components-color-gray-100`: Used for light gray backgrounds.
++   -  `--wp-components-color-gray-200`: Used sparingly for light borders.
++	 -	`--wp-components-color-gray-300`: Used for most borders.
++	 -	`--wp-components-color-gray-400`
++	 -	`--wp-components-color-gray-600`: Meets 3:1 UI or large text contrast against white.
++	 -	`--wp-components-color-gray-700`: Meets 4.6:1 text contrast against white.
++	 -	`--wp-components-color-gray-800`
+diff --git a/packages/components/src/theme/color-algorithms.ts b/packages/components/src/theme/color-algorithms.ts
+new file mode 100644
+index 00000000000000..c260b4ac5704d5
+--- /dev/null
++++ b/packages/components/src/theme/color-algorithms.ts
+@@ -0,0 +1,138 @@
++/**
++ * External dependencies
++ */
++import { colord, extend } from 'colord';
++import a11yPlugin from 'colord/plugins/a11y';
++import namesPlugin from 'colord/plugins/names';
++
++/**
++ * WordPress dependencies
++ */
++import warning from '@wordpress/warning';
++
++/**
++ * Internal dependencies
++ */
++import type { ThemeInputValues, ThemeOutputValues } from './types';
++import { COLORS } from '../utils';
++
++extend( [ namesPlugin, a11yPlugin ] );
++
++export function generateThemeVariables(
++	inputs: ThemeInputValues
++): ThemeOutputValues {
++	validateInputs( inputs );
++
++	const generatedColors = {
++		...generateAccentDependentColors( inputs.accent ),
++		...generateBackgroundDependentColors( inputs.background ),
++	};
++
++	warnContrastIssues( checkContrasts( inputs, generatedColors ) );
++
++	return { colors: generatedColors };
++}
++
++function validateInputs( inputs: ThemeInputValues ) {
++	for ( const [ key, value ] of Object.entries( inputs ) ) {
++		if ( typeof value !== 'undefined' && ! colord( value ).isValid() ) {
++			warning(
++				`wp.components.Theme: "${ value }" is not a valid color value for the '${ key }' prop.`
++			);
++		}
++	}
++}
++
++export function checkContrasts(
++	inputs: ThemeInputValues,
++	outputs: ThemeOutputValues[ 'colors' ]
++) {
++	const background = inputs.background || COLORS.white;
++	const accent = inputs.accent || '#007cba';
++	const foreground = outputs.foreground || COLORS.gray[ 900 ];
++	const gray = outputs.gray || COLORS.gray;
++
++	return {
++		accent: colord( background ).isReadable( accent )
++			? undefined
++			: `The background color ("${ background }") does not have sufficient contrast against the accent color ("${ accent }").`,
++		foreground: colord( background ).isReadable( foreground )
++			? undefined
++			: `The background color provided ("${ background }") does not have sufficient contrast against the standard foreground colors.`,
++		grays:
++			colord( background ).contrast( gray[ 600 ] ) >= 3 &&
++			colord( background ).contrast( gray[ 700 ] ) >= 4.5
++				? undefined
++				: `The background color provided ("${ background }") cannot generate a set of grayscale foreground colors with sufficient contrast. Try adjusting the color to be lighter or darker.`,
++	};
++}
++
++function warnContrastIssues( issues: ReturnType< typeof checkContrasts > ) {
++	for ( const error of Object.values( issues ) ) {
++		if ( error ) {
++			warning( 'wp.components.Theme: ' + error );
++		}
++	}
++}
++
++function generateAccentDependentColors( accent?: string ) {
++	if ( ! accent ) return {};
++
++	return {
++		accent,
++		accentDarker10: colord( accent ).darken( 0.1 ).toHex(),
++		accentDarker20: colord( accent ).darken( 0.2 ).toHex(),
++		accentInverted: getForegroundForColor( accent ),
++	};
++}
++
++function generateBackgroundDependentColors( background?: string ) {
++	if ( ! background ) return {};
++
++	const foreground = getForegroundForColor( background );
++
++	return {
++		background,
++		foreground,
++		foregroundInverted: getForegroundForColor( foreground ),
++		gray: generateShades( background, foreground ),
++	};
++}
++
++function getForegroundForColor( color: string ) {
++	return colord( color ).isDark() ? COLORS.white : COLORS.gray[ 900 ];
++}
++
++export function generateShades( background: string, foreground: string ) {
++	// How much darkness you need to add to #fff to get the COLORS.gray[n] color
++	const SHADES = {
++		100: 0.06,
++		200: 0.121,
++		300: 0.132,
++		400: 0.2,
++		600: 0.42,
++		700: 0.543,
++		800: 0.821,
++	};
++
++	// Darkness of COLORS.gray[ 900 ], relative to #fff
++	const limit = 0.884;
++
++	const direction = colord( background ).isDark() ? 'lighten' : 'darken';
++
++	// Lightness delta between the background and foreground colors
++	const range =
++		Math.abs(
++			colord( background ).toHsl().l - colord( foreground ).toHsl().l
++		) / 100;
++
++	const result: Record< number, string > = {};
++
++	Object.entries( SHADES ).forEach( ( [ key, value ] ) => {
++		result[ parseInt( key ) ] = colord( background )
++			[ direction ]( ( value / limit ) * range )
++			.toHex();
++	} );
++
++	return result as NonNullable< ThemeOutputValues[ 'colors' ][ 'gray' ] >;
++}
+diff --git a/packages/components/src/theme/index.tsx b/packages/components/src/theme/index.tsx
+index 7504c7d5362909..591da45e7c14d9 100644
+--- a/packages/components/src/theme/index.tsx
++++ b/packages/components/src/theme/index.tsx
+@@ -1,18 +1,16 @@
+ /**
+- * External dependencies
++ * WordPress dependencies
+  */
+-import { colord, extend } from 'colord';
+-import a11yPlugin from 'colord/plugins/a11y';
+-import namesPlugin from 'colord/plugins/names';
++import { useMemo } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import type { ThemeProps } from './types';
+ import type { WordPressComponentProps } from '../ui/context';
+-import { Wrapper } from './styles';
+-
+-extend( [ namesPlugin, a11yPlugin ] );
++import { colorVariables, Wrapper } from './styles';
++import { generateThemeVariables } from './color-algorithms';
++import { useCx } from '../utils';
+ 
+ /**
+  * `Theme` allows defining theme variables for components in the `@wordpress/components` package.
+@@ -36,16 +34,25 @@ extend( [ namesPlugin, a11yPlugin ] );
+  * };
+  * ```
+  */
+-function Theme( props: WordPressComponentProps< ThemeProps, 'div', true > ) {
+-	const { accent } = props;
+-	if ( accent && ! colord( accent ).isValid() ) {
+-		// eslint-disable-next-line no-console
+-		console.warn(
+-			`wp.components.Theme: "${ accent }" is not a valid color value for the 'accent' prop.`
+-		);
+-	}
++function Theme( {
++	accent,
++	background,
++	className,
++	...props
++}: WordPressComponentProps< ThemeProps, 'div', true > ) {
++	const cx = useCx();
++	const classes = useMemo(
++		() =>
++			cx(
++				...colorVariables(
++					generateThemeVariables( { accent, background } )
++				),
++				className
++			),
++		[ accent, background, className, cx ]
++	);
+ 
+-	return <Wrapper { ...props } />;
++	return <Wrapper className={ classes } { ...props } />;
+ }
+ 
+ export default Theme;
+diff --git a/packages/components/src/theme/stories/index.tsx b/packages/components/src/theme/stories/index.tsx
+index 740927be8b00cd..923b4fff4cdacd 100644
+--- a/packages/components/src/theme/stories/index.tsx
++++ b/packages/components/src/theme/stories/index.tsx
+@@ -8,12 +8,15 @@ import type { ComponentMeta, ComponentStory } from '@storybook/react';
+  */
+ import Theme from '../index';
+ import Button from '../../button';
++import { generateThemeVariables, checkContrasts } from '../color-algorithms';
++import { HStack } from '../../h-stack';
+ 
+ const meta: ComponentMeta< typeof Theme > = {
+ 	component: Theme,
+ 	title: 'Components (Experimental)/Theme',
+ 	argTypes: {
+ 		accent: { control: { type: 'color' } },
++		background: { control: { type: 'color' } },
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
+@@ -45,3 +48,67 @@ export const Nested: ComponentStory< typeof Theme > = ( args ) => (
+ Nested.args = {
+ 	accent: 'blue',
+ };
++
++/**
++ * The rest of the required colors are generated based on the given accent and background colors.
++ */
++export const ColorScheme: ComponentStory< typeof Theme > = ( {
++	accent,
++	background,
++} ) => {
++	const { colors } = generateThemeVariables( { accent, background } );
++	const { gray, ...otherColors } = colors;
++	const contrastIssues = Object.entries(
++		checkContrasts( { accent, background }, colors )
++	).filter( ( [ _, error ] ) => !! error );
++
++	const Chip = ( { color, name }: { color: string; name: string } ) => (
++		<HStack justify="flex-start">
++			<div
++				style={ {
++					backgroundColor: color,
++					height: '1.25em',
++					width: 40,
++				} }
++			/>
++			<div style={ { fontSize: 14 } }>{ name }</div>
++		</HStack>
++	);
++
++	return (
++		<>
++			{ Object.entries( otherColors ).map( ( [ key, value ] ) => (
++				<Chip color={ value } name={ key } key={ key } />
++			) ) }
++			{ Object.entries( gray as NonNullable< typeof gray > ).map(
++				( [ key, value ] ) => (
++					<Chip
++						color={ value }
++						name={ `gray ${ key }` }
++						key={ key }
++					/>
++				)
++			) }
++			{ !! contrastIssues.length && (
++				<>
++					<h2>Contrast issues</h2>
++					<ul>
++						{ contrastIssues.map( ( [ key, error ] ) => (
++							<li key={ key }>{ error }</li>
++						) ) }
++					</ul>
++				</>
++			) }
++		</>
++	);
++};
++ColorScheme.args = {
++	accent: '#007cba',
++	background: '#fff',
++};
++ColorScheme.argTypes = {
++	children: { table: { disable: true } },
++};
++ColorScheme.parameters = {
++	docs: { source: { state: 'closed' } },
++};
+diff --git a/packages/components/src/theme/styles.ts b/packages/components/src/theme/styles.ts
+index 770632e0fc9346..650852d3461757 100644
+--- a/packages/components/src/theme/styles.ts
++++ b/packages/components/src/theme/styles.ts
+@@ -1,28 +1,33 @@
+ /**
+  * External dependencies
+  */
+-import { colord } from 'colord';
+ import styled from '@emotion/styled';
+ import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+  */
+-import type { ThemeProps } from './types';
++import type { ThemeOutputValues } from './types';
+ 
+-const accentColor = ( { accent }: ThemeProps ) =>
+-	accent
+-		? css`
+-				--wp-components-color-accent: ${ accent };
+-				--wp-components-color-accent-darker-10: ${ colord( accent )
+-					.darken( 0.1 )
+-					.toHex() };
+-				--wp-components-color-accent-darker-20: ${ colord( accent )
+-					.darken( 0.2 )
+-					.toHex() };
+-		  `
+-		: undefined;
++export const colorVariables = ( { colors }: ThemeOutputValues ) => {
++	const shades = Object.entries( colors.gray || {} )
++		.map( ( [ k, v ] ) => `--wp-components-color-gray-${ k }: ${ v };` )
++		.join( '' );
+ 
+-export const Wrapper = styled.div< ThemeProps >`
+-	${ accentColor }
+-`;
++	return [
++		css`
++			--wp-components-color-accent: ${ colors.accent };
++			--wp-components-color-accent-darker-10: ${ colors.accentDarker10 };
++			--wp-components-color-accent-darker-20: ${ colors.accentDarker20 };
++			--wp-components-color-accent-inverted: ${ colors.accentInverted };
++
++			--wp-components-color-background: ${ colors.background };
++			--wp-components-color-foreground: ${ colors.foreground };
++			--wp-components-color-foreground-inverted: ${ colors.foregroundInverted };
++
++			${ shades }
++		`,
++	];
++};
++
++export const Wrapper = styled.div``;
+diff --git a/packages/components/src/theme/test/color-algorithms.ts b/packages/components/src/theme/test/color-algorithms.ts
+new file mode 100644
+index 00000000000000..f901c8ad83a87b
+--- /dev/null
++++ b/packages/components/src/theme/test/color-algorithms.ts
+@@ -0,0 +1,100 @@
++/**
++ * External dependencies
++ */
++import { colord } from 'colord';
++
++/**
++ * Internal dependencies
++ */
++import { COLORS } from '../../utils';
++
++/**
++ * Internal dependencies
++ */
++import { generateShades, generateThemeVariables } from '../color-algorithms';
++
++describe( 'Theme color algorithms', () => {
++	describe( 'generateThemeVariables', () => {
++		it( 'should allow explicitly undefined values', () => {
++			generateThemeVariables( {
++				accent: undefined,
++				background: undefined,
++			} );
++			expect( console ).not.toHaveWarned();
++		} );
++
++		it( 'should warn if invalid colors are passed', () => {
++			generateThemeVariables( { accent: 'var(--invalid)' } );
++			expect( console ).toHaveWarned();
++		} );
++
++		it( 'should warn if standard foreground colors are not readable against background', () => {
++			generateThemeVariables( { background: '#777' } );
++			expect( console ).toHaveWarnedWith(
++				'wp.components.Theme: The background color provided ("#777") does not have sufficient contrast against the standard foreground colors.'
++			);
++		} );
++
++		it( 'should warn if accent color is not readable against background', () => {
++			generateThemeVariables( { background: '#fefefe' } );
++			expect( console ).not.toHaveWarned();
++
++			generateThemeVariables( {
++				accent: '#000',
++				background: '#fff',
++			} );
++			expect( console ).not.toHaveWarned();
++
++			generateThemeVariables( {
++				accent: '#111',
++				background: '#000',
++			} );
++			expect( console ).toHaveWarnedWith(
++				'wp.components.Theme: The background color ("#000") does not have sufficient contrast against the accent color ("#111").'
++			);
++
++			generateThemeVariables( { background: '#eee' } );
++			expect( console ).toHaveWarnedWith(
++				'wp.components.Theme: The background color ("#eee") does not have sufficient contrast against the accent color ("#007cba").'
++			);
++		} );
++
++		it( 'should warn if a readable grayscale cannot be generated', () => {
++			generateThemeVariables( { background: '#ddd' } );
++			expect( console ).toHaveWarnedWith(
++				'wp.components.Theme: The background color provided ("#ddd") cannot generate a set of grayscale foreground colors with sufficient contrast. Try adjusting the color to be lighter or darker.'
++			);
++		} );
++	} );
++
++	describe( 'generateShades', () => {
++		it( 'should generate the default WP shades when the default WP background/foreground colors are given', () => {
++			const shades = generateShades( '#fff', '#1e1e1e' );
++
++			Object.entries( shades ).forEach( ( [ k, color ] ) => {
++				const key = parseInt( k, 10 ) as keyof typeof shades;
++				const normalizedExpectedColor = colord(
++					COLORS.gray[ key ]
++				).toHex();
++
++				expect( color ).toBe( normalizedExpectedColor );
++			} );
++		} );
++
++		it.each( [
++			[ '#000', '#fff' ], // wide delta
++			[ '#fff', '#000' ], // flipped
++			[ '#eee', '#fff' ], // narrow delta
++		] )( 'should generate unique shades (bg: %s, fg: %s)', ( bg, fg ) => {
++			const shades = generateShades( bg, fg );
++
++			// The darkest and lightest shades should be different from the fg/bg colors
++			expect( colord( shades[ 100 ] ).isEqual( bg ) ).toBe( false );
++			expect( colord( shades[ 800 ] ).isEqual( fg ) ).toBe( false );
++
++			// The shades should be unique
++			const shadeValues = Object.values( shades );
++			expect( shadeValues ).toHaveLength( new Set( shadeValues ).size );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/theme/test/index.tsx b/packages/components/src/theme/test/index.tsx
+index 5c46d6e4964245..9588ecd7718e21 100644
+--- a/packages/components/src/theme/test/index.tsx
++++ b/packages/components/src/theme/test/index.tsx
+@@ -45,23 +45,16 @@ describe( 'Theme', () => {
+ 				inner?.parentElement
+ 			);
+ 
+-			expect(
+-				innerElementStyles.getPropertyValue(
+-					'--wp-components-color-accent'
+-				)
+-			).toBe( '' );
+-
+-			expect(
+-				innerElementStyles.getPropertyValue(
+-					'--wp-components-color-accent-darker-10'
+-				)
+-			).toBe( '' );
+-
+-			expect(
+-				innerElementStyles.getPropertyValue(
+-					'--wp-components-color-accent-darker-20'
+-				)
+-			).toBe( '' );
++			[
++				'--wp-components-color-accent',
++				'--wp-components-color-accent-darker-10',
++				'--wp-components-color-accent-darker-20',
++				'--wp-components-color-accent-inverted',
++			].forEach( ( cssVariable ) => {
++				expect(
++					innerElementStyles.getPropertyValue( cssVariable )
++				).toBe( '' );
++			} );
+ 		} );
+ 
+ 		it( 'it defines the accent color (and its variations) as a CSS variable', () => {
+@@ -77,10 +70,71 @@ describe( 'Theme', () => {
+ 				'--wp-components-color-accent': '#123abc',
+ 				'--wp-components-color-accent-darker-10': '#0e2c8d',
+ 				'--wp-components-color-accent-darker-20': '#091d5f',
++				'--wp-components-color-accent-inverted': '#fff',
++			} );
++		} );
++	} );
++
++	describe( 'background color', () => {
++		it( 'it does not define the background color (and its dependent colors) as a CSS variable when the `background` prop is undefined', () => {
++			render(
++				<Theme>
++					<MyThemableComponent>Inner</MyThemableComponent>
++				</Theme>
++			);
++
++			const inner = screen.getByText( 'Inner' );
++
++			if ( inner?.parentElement === null ) {
++				throw new Error(
++					'Somehow the `Theme` component does not render a DOM element?'
++				);
++			}
++
++			const innerElementStyles = window.getComputedStyle(
++				inner?.parentElement
++			);
++
++			[
++				'--wp-components-color-background',
++				'--wp-components-color-foreground',
++				'--wp-components-color-foreground-inverted',
++				...[ '100', '200', '300', '400', '600', '700', '800' ].map(
++					( shade ) => `--wp-components-color-gray-${ shade }`
++				),
++			].forEach( ( cssVariable ) => {
++				expect(
++					innerElementStyles.getPropertyValue( cssVariable )
++				).toBe( '' );
++			} );
++		} );
++
++		it( 'it defines the background color (and its dependent colors) as a CSS variable', () => {
++			render(
++				<Theme background="#ffffff">
++					<MyThemableComponent>Inner</MyThemableComponent>
++				</Theme>
++			);
++
++			const inner = screen.getByText( 'Inner' );
++
++			expect( inner?.parentElement ).toHaveStyle( {
++				'--wp-components-color-background': '#ffffff',
++				'--wp-components-color-foreground': '#1e1e1e',
++				'--wp-components-color-foreground-inverted': '#fff',
++				'--wp-components-color-gray-100': '#f0f0f0',
++				'--wp-components-color-gray-200': '#e0e0e0',
++				'--wp-components-color-gray-300': '#dddddd',
++				'--wp-components-color-gray-400': '#cccccc',
++				'--wp-components-color-gray-600': '#949494',
++				'--wp-components-color-gray-700': '#757575',
++				'--wp-components-color-gray-800': '#2f2f2f',
+ 			} );
+ 		} );
++	} );
+ 
+-		describe( 'unsupported values', () => {
++	describe( 'unsupported values', () => {
++		describe.each( [ 'accent', 'background' ] )( '%s', ( propName ) => {
+ 			it.each( [
+ 				// Keywords
+ 				'currentcolor',
+@@ -91,9 +145,8 @@ describe( 'Theme', () => {
+ 				'unset',
+ 				// CSS Custom properties
+ 				'var( --my-variable )',
+-			] )( 'should warn when the value is "%s"', ( accentValue ) => {
+-				render( <Theme accent={ accentValue } /> );
+-
++			] )( 'should warn when the value is "%s"', ( value ) => {
++				render( <Theme { ...{ [ propName ]: value } } /> );
+ 				expect( console ).toHaveWarned();
+ 			} );
+ 		} );
+diff --git a/packages/components/src/theme/types.ts b/packages/components/src/theme/types.ts
+index d031bb0fff3496..4e148af4864e47 100644
+--- a/packages/components/src/theme/types.ts
++++ b/packages/components/src/theme/types.ts
+@@ -3,17 +3,57 @@
+  */
+ import type { ReactNode } from 'react';
+ 
+-export type ThemeProps = {
++export type ThemeInputValues = {
+ 	/**
+-	 * Used to set the accent color (used by components as the primary color).
++	 * The accent color (used by components as the primary color).
+ 	 *
+ 	 * If an accent color is not defined, the default fallback value is the original
+-	 * WP Admin main theme color. No all valid CSS color syntaxes are supported —
++	 * WP Admin main theme color. Not all valid CSS color syntaxes are supported —
+ 	 * in particular, keywords (like `'currentcolor'`, `'inherit'`, `'initial'`,
+ 	 * `'revert'`, `'unset'`...) and CSS custom properties (e.g.
+ 	 * `var(--my-custom-property)`) are _not_ supported values for this property.
+ 	 */
+ 	accent?: string;
++	/**
++	 * The background color.
++	 *
++	 * If a component explicitly has a background, it will be this color.
++	 * Otherwise, this color will simply be used to determine what the foreground colors should be.
++	 * The actual background color will need to be set on the component's container element.
++	 *
++	 * If a background color is not defined, the default fallback value is #fff.
++	 * Not all valid CSS color syntaxes are supported —
++	 * in particular, keywords (like `'currentcolor'`, `'inherit'`, `'initial'`,
++	 * `'revert'`, `'unset'`...) and CSS custom properties (e.g.
++	 * `var(--my-custom-property)`) are _not_ supported values for this property.
++	 */
++	background?: string;
++};
++
++export type ThemeOutputValues = {
++	colors: Partial< {
++		accent: string;
++		accentDarker10: string;
++		accentDarker20: string;
++		/** Foreground color to use when accent color is the background. */
++		accentInverted: string;
++		background: string;
++		foreground: string;
++		/** Foreground color to use when foreground color is the background. */
++		foregroundInverted: string;
++		gray: {
++			100: string;
++			200: string;
++			300: string;
++			400: string;
++			600: string;
++			700: string;
++			800: string;
++		};
++	} >;
++};
++
++export type ThemeProps = ThemeInputValues & {
+ 	/**
+ 	 * The children elements.
+ 	 */
+diff --git a/packages/components/src/tooltip/style.scss b/packages/components/src/tooltip/style.scss
+index 9a874246568f6b..30d480c904f81b 100644
+--- a/packages/components/src/tooltip/style.scss
++++ b/packages/components/src/tooltip/style.scss
+@@ -7,11 +7,11 @@
+ }
+ 
+ .components-tooltip .components-popover__content {
+-	background: $gray-900;
++	background: $components-color-foreground; // TODO: Discuss with designers.
+ 	border-radius: $radius-block-ui;
+ 	border-width: 0;
+ 	outline: none;
+-	color: $white;
++	color: $components-color-foreground-inverted;
+ 	white-space: nowrap;
+ 	text-align: center;
+ 	line-height: 1.4;
+diff --git a/packages/components/src/utils/theme-variables.scss b/packages/components/src/utils/theme-variables.scss
+index 9e25f4a8c20b4b..872b42c84368a7 100644
+--- a/packages/components/src/utils/theme-variables.scss
++++ b/packages/components/src/utils/theme-variables.scss
+@@ -6,3 +6,20 @@
+ $components-color-accent: var(--wp-components-color-accent, var(--wp-admin-theme-color, #007cba));
+ $components-color-accent-darker-10: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #006ba1));
+ $components-color-accent-darker-20: var(--wp-components-color-accent-darker-20, var(--wp-admin-theme-color-darker-20, #005a87));
++
++// Used when placing text on the accent color.
++$components-color-accent-inverted: var(--wp-components-color-accent-inverted, $white);
++
++$components-color-background: var(--wp-components-color-background, $white);
++$components-color-foreground: var(--wp-components-color-foreground, $gray-900);
++
++// Used when placing text on the foreground color.
++$components-color-foreground-inverted: var(--wp-components-color-foreground-inverted, $white);
++
++$components-color-gray-100: var(--wp-components-color-gray-100, $gray-100);
++$components-color-gray-200: var(--wp-components-color-gray-200, $gray-200);
++$components-color-gray-300: var(--wp-components-color-gray-300, $gray-300);
++$components-color-gray-400: var(--wp-components-color-gray-400, $gray-400);
++$components-color-gray-600: var(--wp-components-color-gray-600, $gray-600);
++$components-color-gray-700: var(--wp-components-color-gray-700, $gray-700);
++$components-color-gray-800: var(--wp-components-color-gray-800, $gray-800);
+diff --git a/storybook/decorators/with-theme.js b/storybook/decorators/with-theme.js
+index 4c0696f7bfe721..9f11dc63dbaed9 100644
+--- a/storybook/decorators/with-theme.js
++++ b/storybook/decorators/with-theme.js
+@@ -1,28 +1,93 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++import { css } from '@emotion/react';
++
+ /**
+  * Internal dependencies
+  */
+ import Theme from '../../packages/components/src/theme';
+ 
++const themes = {
++	default: {},
++	darkBg: {
++		accent: '#f7c849',
++		background: '#1e1e1e',
++	},
++	lightGrayBg: {
++		accent: '#3858e9',
++		background: '#f0f0f0',
++	},
++	modern: {
++		accent: '#3858e9',
++	},
++};
++
++const backgroundStyles = ( { background } ) => {
++	if ( background ) {
++		return css`
++			background: ${ background };
++			padding: 20px 20px 8px;
++			outline: 1px dashed #ccc;
++			outline-offset: 2px;
++		`;
++	}
++};
++
++const BackgroundColorWrapper = styled.div`
++	${ backgroundStyles }
++`;
++
++const BackgroundIndicator = styled.small`
++	display: block;
++	opacity: 0.3;
++	margin-top: 20px;
++	font-size: 10px;
++	color: var( --wp-components-color-foreground );
++	text-transform: uppercase;
++	text-align: end;
++`;
++
++const Notice = styled.small`
++	display: block;
++	margin-top: 20px;
++	font-size: 12px;
++	color: var( --wp-components-color-foreground );
++`;
++
+ /**
+  *  A Storybook decorator to show a div before and after the story to check for unwanted margins.
+  */
+ 
+ export const WithTheme = ( Story, context ) => {
+-	const themes = {
+-		default: {},
+-		modern: {
+-			accent: '#3858e9',
+-		},
+-		sunrise: {
+-			// This color was chosen intentionally, because for sufficient contrast,
+-			// the foreground text should be black when this orange is used as a background color.
+-			accent: '#dd823b',
+-		},
+-	};
++	const selectedTheme = themes[ context.globals.componentsTheme ];
++	const selectedBackground = selectedTheme.background;
++
++	if ( context.componentId === 'components-experimental-theme' ) {
++		return (
++			<>
++				<Story />
++				{ context.globals.componentsTheme !== 'default' && (
++					<Notice>
++						The Theme toolbar addon is disabled for this story. Use
++						Controls to change the values.
++					</Notice>
++				) }
++			</>
++		);
++	}
+ 
+ 	return (
+-		<Theme { ...themes[ context.globals.componentsTheme ] }>
+-			<Story { ...context } />
+-		</Theme>
++		<BackgroundColorWrapper background={ selectedBackground }>
++			<Theme { ...themes[ context.globals.componentsTheme ] }>
++				<Story { ...context } />
++				{ selectedBackground && (
++					<BackgroundIndicator>
++						Themed background { selectedBackground }
++					</BackgroundIndicator>
++				) }
++			</Theme>
++		</BackgroundColorWrapper>
+ 	);
+ };
+diff --git a/storybook/preview.js b/storybook/preview.js
+index 16e8f71cf53465..7a902af8387837 100644
+--- a/storybook/preview.js
++++ b/storybook/preview.js
+@@ -29,8 +29,9 @@ export const globalTypes = {
+ 			icon: 'paintbrush',
+ 			items: [
+ 				{ value: 'default', title: 'Default' },
+-				{ value: 'modern', title: 'Modern' },
+-				{ value: 'sunrise', title: 'Sunrise' },
++				{ value: 'darkBg', title: 'Dark (background)' },
++				{ value: 'lightGrayBg', title: 'Light gray (background)' },
++				{ value: 'modern', title: 'Modern (accent)' },
+ 			],
+ 		},
+ 	},
+@@ -79,11 +80,11 @@ export const globalTypes = {
+ };
+ 
+ export const decorators = [
+-	WithTheme,
+ 	WithGlobalCSS,
+ 	WithMarginChecker,
+ 	WithRTL,
+ 	WithMaxWidthWrapper,
++	WithTheme,
+ ];
+ 
+ export const parameters = {

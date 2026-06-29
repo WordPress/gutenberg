@@ -1,0 +1,156 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f19e7f7eae7baa..d71f6ba7ce142f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `ColorPalette`: prevent overflow of custom color button background ([#66152](https://github.com/WordPress/gutenberg/pull/66152)).
+ 
++### Enhancements
++
++-   `PaletteEdit`: use `Item` internally instead of custom styles ([#66164](https://github.com/WordPress/gutenberg/pull/66164)).
++
+ ## 28.10.0 (2024-10-16)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index 8bfcb7240b9ea4..570613e5378c10 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -24,7 +24,7 @@ import Button from '../button';
+ import { ColorPicker } from '../color-picker';
+ import { FlexItem } from '../flex';
+ import { HStack } from '../h-stack';
+-import { ItemGroup } from '../item-group';
++import { Item, ItemGroup } from '../item-group';
+ import { VStack } from '../v-stack';
+ import GradientPicker from '../gradient-picker';
+ import ColorPalette from '../color-palette';
+@@ -35,7 +35,6 @@ import {
+ 	PaletteEditStyles,
+ 	PaletteHeading,
+ 	IndicatorStyled,
+-	PaletteItem,
+ 	NameContainer,
+ 	NameInputControl,
+ 	DoneButton,
+@@ -213,7 +212,7 @@ function Option< T extends PaletteElement >( {
+ 	);
+ 
+ 	return (
+-		<PaletteItem ref={ setPopoverAnchor } as="div">
++		<Item ref={ setPopoverAnchor } size="small">
+ 			<HStack justify="flex-start">
+ 				<Button
+ 					onClick={ () => {
+@@ -282,7 +281,7 @@ function Option< T extends PaletteElement >( {
+ 					onClose={ () => setIsEditingColor( false ) }
+ 				/>
+ 			) }
+-		</PaletteItem>
++		</Item>
+ 	);
+ }
+ 
+@@ -309,7 +308,7 @@ function PaletteEditListView< T extends PaletteElement >( {
+ 
+ 	return (
+ 		<VStack spacing={ 3 }>
+-			<ItemGroup isRounded>
++			<ItemGroup isRounded isBordered isSeparated>
+ 				{ elements.map( ( element, index ) => (
+ 					<Option
+ 						isGradient={ isGradient }
+diff --git a/packages/components/src/palette-edit/styles.ts b/packages/components/src/palette-edit/styles.ts
+index ad918d8590cf23..0afe38773fc8e2 100644
+--- a/packages/components/src/palette-edit/styles.ts
++++ b/packages/components/src/palette-edit/styles.ts
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import styled from '@emotion/styled';
+-import { css } from '@emotion/react';
+ 
+ /**
+  * Internal dependencies
+@@ -10,7 +9,7 @@ import { css } from '@emotion/react';
+ import Button from '../button';
+ import { Heading } from '../heading';
+ import { space } from '../utils/space';
+-import { COLORS, CONFIG, font } from '../utils';
++import { COLORS, CONFIG } from '../utils';
+ import { View } from '../view';
+ import InputControl from '../input-control';
+ import {
+@@ -42,71 +41,6 @@ export const NameInputControl = styled( InputControl )`
+ 	}
+ `;
+ 
+-const buttonStyleReset = ( {
+-	as,
+-}: {
+-	as: React.ComponentProps< typeof View >[ 'as' ];
+-} ) => {
+-	if ( as === 'button' ) {
+-		return css`
+-			display: flex;
+-			align-items: center;
+-			width: 100%;
+-			appearance: none;
+-			background: transparent;
+-			border: none;
+-			border-radius: 0;
+-			padding: 0;
+-			cursor: pointer;
+-
+-			&:hover {
+-				color: ${ COLORS.theme.accent };
+-			}
+-		`;
+-	}
+-	return null;
+-};
+-
+-export const PaletteItem = styled( View )`
+-	${ buttonStyleReset }
+-
+-	padding-block: 3px;
+-	padding-inline-start: ${ space( 3 ) };
+-	border: 1px solid ${ CONFIG.surfaceBorderColor };
+-	border-bottom-color: transparent;
+-	font-size: ${ font( 'default.fontSize' ) };
+-
+-	&:focus-visible {
+-		border-color: transparent;
+-		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+-			${ COLORS.theme.accent };
+-		// Windows high contrast mode.
+-		outline: 2px solid transparent;
+-		outline-offset: 0;
+-	}
+-
+-	border-top-left-radius: ${ CONFIG.radiusSmall };
+-	border-top-right-radius: ${ CONFIG.radiusSmall };
+-
+-	& + & {
+-		border-top-left-radius: 0;
+-		border-top-right-radius: 0;
+-	}
+-
+-	&:last-child {
+-		border-bottom-left-radius: ${ CONFIG.radiusSmall };
+-		border-bottom-right-radius: ${ CONFIG.radiusSmall };
+-		border-bottom-color: ${ CONFIG.surfaceBorderColor };
+-	}
+-
+-	&.is-selected + & {
+-		border-top-color: transparent;
+-	}
+-	&.is-selected {
+-		border-color: ${ COLORS.theme.accent };
+-	}
+-`;
+-
+ export const NameContainer = styled.div`
+ 	line-height: ${ space( 8 ) };
+ 	margin-left: ${ space( 2 ) };

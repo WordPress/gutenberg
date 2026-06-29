@@ -1,0 +1,399 @@
+diff --git a/packages/theme/bin/terrazzo-plugin-ds-tokens-docs/index.ts b/packages/theme/bin/terrazzo-plugin-ds-tokens-docs/index.ts
+index 0e15c5a36a7283..dc91b3b05556ef 100644
+--- a/packages/theme/bin/terrazzo-plugin-ds-tokens-docs/index.ts
++++ b/packages/theme/bin/terrazzo-plugin-ds-tokens-docs/index.ts
+@@ -43,8 +43,18 @@ export default function pluginDsTokenDocs( {
+ 
+ 				// Group by category
+ 				semanticTokens[ group ] ??= {};
+-				semanticTokens[ group ][ token.localID ] =
+-					token.token.$description ?? 'N/A';
++
++				// Composite tokens (e.g. typography) expand into multiple CSS variables
++				if ( typeof token.value === 'object' && token.value !== null ) {
++					for ( const prop of Object.keys( token.value ) ) {
++						const expandedId = `${ token.localID }-${ prop }`;
++						semanticTokens[ group ][ expandedId ] =
++							token.token.$description ?? 'N/A';
++					}
++				} else {
++					semanticTokens[ group ][ token.localID ] =
++						token.token.$description ?? 'N/A';
++				}
+ 			}
+ 
+ 			function tokensToMdTable( tokens: TokensMap ) {
+diff --git a/packages/theme/bin/terrazzo-plugin-known-wpds-css-variables/index.ts b/packages/theme/bin/terrazzo-plugin-known-wpds-css-variables/index.ts
+index 9f203ae1093ee2..e8903e2a46a09d 100644
+--- a/packages/theme/bin/terrazzo-plugin-known-wpds-css-variables/index.ts
++++ b/packages/theme/bin/terrazzo-plugin-known-wpds-css-variables/index.ts
+@@ -27,8 +27,18 @@ export default function pluginKnownWpdsCssVariables( {
+ 					continue;
+ 				}
+ 
+-				tokensToExport[ token.localID ] ??= {};
+-				tokensToExport[ token.localID ][ token.mode ] = token.value;
++				// Composite tokens (e.g. typography) expand into multiple CSS variables
++				if ( typeof token.value === 'object' && token.value !== null ) {
++					for ( const prop of Object.keys( token.value ) ) {
++						const expandedId = `${ token.localID }-${ prop }`;
++						tokensToExport[ expandedId ] ??= {};
++						tokensToExport[ expandedId ][ token.mode ] =
++							token.value[ prop ];
++					}
++				} else {
++					tokensToExport[ token.localID ] ??= {};
++					tokensToExport[ token.localID ][ token.mode ] = token.value;
++				}
+ 			}
+ 
+ 			outputFile(
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index 3424407d79bef8..c379201cbbad1f 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -142,22 +142,58 @@ Do not edit directly.
+ 
+ ### Typography
+ 
+-| Variable name                 | Description                                  |
+-| ----------------------------- | -------------------------------------------- |
+-| `--wpds-font-family-heading`  | Headings font family                         |
+-| `--wpds-font-family-body`     | Body font family                             |
+-| `--wpds-font-family-mono`     | Monospace font family                        |
+-| `--wpds-font-size-xs`         | Extra small font size                        |
+-| `--wpds-font-size-sm`         | Small font size                              |
+-| `--wpds-font-size-md`         | Medium font size                             |
+-| `--wpds-font-size-lg`         | Large font size                              |
+-| `--wpds-font-size-xl`         | Extra large font size                        |
+-| `--wpds-font-size-2xl`        | 2X large font size                           |
+-| `--wpds-font-line-height-xs`  | Extra small line height                      |
+-| `--wpds-font-line-height-sm`  | Small line height                            |
+-| `--wpds-font-line-height-md`  | Medium line height                           |
+-| `--wpds-font-line-height-lg`  | Large line height                            |
+-| `--wpds-font-line-height-xl`  | Extra large line height                      |
+-| `--wpds-font-line-height-2xl` | 2X large line height                         |
+-| `--wpds-font-weight-regular`  | Regular font weight for body text            |
+-| `--wpds-font-weight-medium`   | Medium font weight for emphasis and headings |
++| Variable name                         | Description                                           |
++| ------------------------------------- | ----------------------------------------------------- |
++| `--wpds-font-family-heading`          | Headings font family                                  |
++| `--wpds-font-family-body`             | Body font family                                      |
++| `--wpds-font-family-mono`             | Monospace font family                                 |
++| `--wpds-font-size-xs`                 | Extra small font size                                 |
++| `--wpds-font-size-sm`                 | Small font size                                       |
++| `--wpds-font-size-md`                 | Medium font size                                      |
++| `--wpds-font-size-lg`                 | Large font size                                       |
++| `--wpds-font-size-xl`                 | Extra large font size                                 |
++| `--wpds-font-size-2xl`                | 2X large font size                                    |
++| `--wpds-font-line-height-xs`          | Extra small line height                               |
++| `--wpds-font-line-height-sm`          | Small line height                                     |
++| `--wpds-font-line-height-md`          | Medium line height                                    |
++| `--wpds-font-line-height-lg`          | Large line height                                     |
++| `--wpds-font-line-height-xl`          | Extra large line height                               |
++| `--wpds-font-line-height-2xl`         | 2X large line height                                  |
++| `--wpds-font-weight-regular`          | Regular font weight for body text                     |
++| `--wpds-font-weight-medium`           | Medium font weight for emphasis and headings          |
++| `--wpds-font-heading-2xl-font-family` | Extra large heading for hero sections                 |
++| `--wpds-font-heading-2xl-font-size`   | Extra large heading for hero sections                 |
++| `--wpds-font-heading-2xl-font-weight` | Extra large heading for hero sections                 |
++| `--wpds-font-heading-2xl-line-height` | Extra large heading for hero sections                 |
++| `--wpds-font-heading-xl-font-family`  | Large heading for page titles                         |
++| `--wpds-font-heading-xl-font-size`    | Large heading for page titles                         |
++| `--wpds-font-heading-xl-font-weight`  | Large heading for page titles                         |
++| `--wpds-font-heading-xl-line-height`  | Large heading for page titles                         |
++| `--wpds-font-heading-lg-font-family`  | Medium-large heading for section titles               |
++| `--wpds-font-heading-lg-font-size`    | Medium-large heading for section titles               |
++| `--wpds-font-heading-lg-font-weight`  | Medium-large heading for section titles               |
++| `--wpds-font-heading-lg-line-height`  | Medium-large heading for section titles               |
++| `--wpds-font-heading-md-font-family`  | Medium heading for subsections                        |
++| `--wpds-font-heading-md-font-size`    | Medium heading for subsections                        |
++| `--wpds-font-heading-md-font-weight`  | Medium heading for subsections                        |
++| `--wpds-font-heading-md-line-height`  | Medium heading for subsections                        |
++| `--wpds-font-heading-sm-font-family`  | Small heading for labels and minor headings           |
++| `--wpds-font-heading-sm-font-size`    | Small heading for labels and minor headings           |
++| `--wpds-font-heading-sm-font-weight`  | Small heading for labels and minor headings           |
++| `--wpds-font-heading-sm-line-height`  | Small heading for labels and minor headings           |
++| `--wpds-font-body-xl-font-family`     | Large body text for lead paragraphs and introductions |
++| `--wpds-font-body-xl-font-size`       | Large body text for lead paragraphs and introductions |
++| `--wpds-font-body-xl-font-weight`     | Large body text for lead paragraphs and introductions |
++| `--wpds-font-body-xl-line-height`     | Large body text for lead paragraphs and introductions |
++| `--wpds-font-body-lg-font-family`     | Comfortable body text for extended reading            |
++| `--wpds-font-body-lg-font-size`       | Comfortable body text for extended reading            |
++| `--wpds-font-body-lg-font-weight`     | Comfortable body text for extended reading            |
++| `--wpds-font-body-lg-line-height`     | Comfortable body text for extended reading            |
++| `--wpds-font-body-md-font-family`     | Default body text for general content                 |
++| `--wpds-font-body-md-font-size`       | Default body text for general content                 |
++| `--wpds-font-body-md-font-weight`     | Default body text for general content                 |
++| `--wpds-font-body-md-line-height`     | Default body text for general content                 |
++| `--wpds-font-body-sm-font-family`     | Small body text for help text and secondary content   |
++| `--wpds-font-body-sm-font-size`       | Small body text for help text and secondary content   |
++| `--wpds-font-body-sm-font-weight`     | Small body text for help text and secondary content   |
++| `--wpds-font-body-sm-line-height`     | Small body text for help text and secondary content   |
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index e18ad8bcc8b200..221a219a9543d4 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -120,11 +120,119 @@
+ 		0 6px 6px 0 #00000008, 0 8px 8px 0 #00000005; /* For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. */
+ 	--wpds-elevation-x-small: 0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005,
+ 		0 3px 3px 0 #00000005, 0 4px 4px 0 #00000003; /* For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame. */
++	--wpds-font-body-lg-font-family: var(
++		--wpds-font-family-body
++	); /* Comfortable body text for extended reading */
++	--wpds-font-body-lg-font-size: var(
++		--wpds-font-size-lg
++	); /* Comfortable body text for extended reading */
++	--wpds-font-body-lg-font-weight: var(
++		--wpds-font-weight-regular
++	); /* Comfortable body text for extended reading */
++	--wpds-font-body-lg-line-height: var(
++		--wpds-font-line-height-md
++	); /* Comfortable body text for extended reading */
++	--wpds-font-body-md-font-family: var(
++		--wpds-font-family-body
++	); /* Default body text for general content */
++	--wpds-font-body-md-font-size: var(
++		--wpds-font-size-md
++	); /* Default body text for general content */
++	--wpds-font-body-md-font-weight: var(
++		--wpds-font-weight-regular
++	); /* Default body text for general content */
++	--wpds-font-body-md-line-height: var(
++		--wpds-font-line-height-sm
++	); /* Default body text for general content */
++	--wpds-font-body-sm-font-family: var(
++		--wpds-font-family-body
++	); /* Small body text for help text and secondary content */
++	--wpds-font-body-sm-font-size: var(
++		--wpds-font-size-sm
++	); /* Small body text for help text and secondary content */
++	--wpds-font-body-sm-font-weight: var(
++		--wpds-font-weight-regular
++	); /* Small body text for help text and secondary content */
++	--wpds-font-body-sm-line-height: var(
++		--wpds-font-line-height-xs
++	); /* Small body text for help text and secondary content */
++	--wpds-font-body-xl-font-family: var(
++		--wpds-font-family-body
++	); /* Large body text for lead paragraphs and introductions */
++	--wpds-font-body-xl-font-size: var(
++		--wpds-font-size-xl
++	); /* Large body text for lead paragraphs and introductions */
++	--wpds-font-body-xl-font-weight: var(
++		--wpds-font-weight-regular
++	); /* Large body text for lead paragraphs and introductions */
++	--wpds-font-body-xl-line-height: var(
++		--wpds-font-line-height-xl
++	); /* Large body text for lead paragraphs and introductions */
+ 	--wpds-font-family-body: -apple-system, system-ui, 'Segoe UI', 'Roboto',
+ 		'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif; /* Body font family */
+ 	--wpds-font-family-heading: -apple-system, system-ui, 'Segoe UI', 'Roboto',
+ 		'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif; /* Headings font family */
+ 	--wpds-font-family-mono: 'Menlo', 'Consolas', monaco, monospace; /* Monospace font family */
++	--wpds-font-heading-2xl-font-family: var(
++		--wpds-font-family-heading
++	); /* Extra large heading for hero sections */
++	--wpds-font-heading-2xl-font-size: var(
++		--wpds-font-size-2xl
++	); /* Extra large heading for hero sections */
++	--wpds-font-heading-2xl-font-weight: var(
++		--wpds-font-weight-medium
++	); /* Extra large heading for hero sections */
++	--wpds-font-heading-2xl-line-height: var(
++		--wpds-font-line-height-2xl
++	); /* Extra large heading for hero sections */
++	--wpds-font-heading-lg-font-family: var(
++		--wpds-font-family-heading
++	); /* Medium-large heading for section titles */
++	--wpds-font-heading-lg-font-size: var(
++		--wpds-font-size-lg
++	); /* Medium-large heading for section titles */
++	--wpds-font-heading-lg-font-weight: var(
++		--wpds-font-weight-medium
++	); /* Medium-large heading for section titles */
++	--wpds-font-heading-lg-line-height: var(
++		--wpds-font-line-height-sm
++	); /* Medium-large heading for section titles */
++	--wpds-font-heading-md-font-family: var(
++		--wpds-font-family-heading
++	); /* Medium heading for subsections */
++	--wpds-font-heading-md-font-size: var(
++		--wpds-font-size-md
++	); /* Medium heading for subsections */
++	--wpds-font-heading-md-font-weight: var(
++		--wpds-font-weight-medium
++	); /* Medium heading for subsections */
++	--wpds-font-heading-md-line-height: var(
++		--wpds-font-line-height-sm
++	); /* Medium heading for subsections */
++	--wpds-font-heading-sm-font-family: var(
++		--wpds-font-family-heading
++	); /* Small heading for labels and minor headings */
++	--wpds-font-heading-sm-font-size: var(
++		--wpds-font-size-xs
++	); /* Small heading for labels and minor headings */
++	--wpds-font-heading-sm-font-weight: var(
++		--wpds-font-weight-medium
++	); /* Small heading for labels and minor headings */
++	--wpds-font-heading-sm-line-height: var(
++		--wpds-font-line-height-xs
++	); /* Small heading for labels and minor headings */
++	--wpds-font-heading-xl-font-family: var(
++		--wpds-font-family-heading
++	); /* Large heading for page titles */
++	--wpds-font-heading-xl-font-size: var(
++		--wpds-font-size-xl
++	); /* Large heading for page titles */
++	--wpds-font-heading-xl-font-weight: var(
++		--wpds-font-weight-medium
++	); /* Large heading for page titles */
++	--wpds-font-heading-xl-line-height: var(
++		--wpds-font-line-height-md
++	); /* Large heading for page titles */
+ 	--wpds-font-line-height-2xl: 40px; /* 2X large line height */
+ 	--wpds-font-line-height-lg: 28px; /* Large line height */
+ 	--wpds-font-line-height-md: 24px; /* Medium line height */
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index 77685322fcfb48..2898e0747515a2 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -134,4 +134,40 @@ export default [
+ 	'--wpds-font-line-height-2xl',
+ 	'--wpds-font-weight-regular',
+ 	'--wpds-font-weight-medium',
++	'--wpds-font-heading-2xl-font-family',
++	'--wpds-font-heading-2xl-font-size',
++	'--wpds-font-heading-2xl-font-weight',
++	'--wpds-font-heading-2xl-line-height',
++	'--wpds-font-heading-xl-font-family',
++	'--wpds-font-heading-xl-font-size',
++	'--wpds-font-heading-xl-font-weight',
++	'--wpds-font-heading-xl-line-height',
++	'--wpds-font-heading-lg-font-family',
++	'--wpds-font-heading-lg-font-size',
++	'--wpds-font-heading-lg-font-weight',
++	'--wpds-font-heading-lg-line-height',
++	'--wpds-font-heading-md-font-family',
++	'--wpds-font-heading-md-font-size',
++	'--wpds-font-heading-md-font-weight',
++	'--wpds-font-heading-md-line-height',
++	'--wpds-font-heading-sm-font-family',
++	'--wpds-font-heading-sm-font-size',
++	'--wpds-font-heading-sm-font-weight',
++	'--wpds-font-heading-sm-line-height',
++	'--wpds-font-body-xl-font-family',
++	'--wpds-font-body-xl-font-size',
++	'--wpds-font-body-xl-font-weight',
++	'--wpds-font-body-xl-line-height',
++	'--wpds-font-body-lg-font-family',
++	'--wpds-font-body-lg-font-size',
++	'--wpds-font-body-lg-font-weight',
++	'--wpds-font-body-lg-line-height',
++	'--wpds-font-body-md-font-family',
++	'--wpds-font-body-md-font-size',
++	'--wpds-font-body-md-font-weight',
++	'--wpds-font-body-md-line-height',
++	'--wpds-font-body-sm-font-family',
++	'--wpds-font-body-sm-font-size',
++	'--wpds-font-body-sm-font-weight',
++	'--wpds-font-body-sm-line-height',
+ ];
+diff --git a/packages/theme/tokens/typography.json b/packages/theme/tokens/typography.json
+index 33fa12fc5484d7..fe04bcd08a5a62 100644
+--- a/packages/theme/tokens/typography.json
++++ b/packages/theme/tokens/typography.json
+@@ -108,6 +108,93 @@
+ 			"$extensions": {
+ 				"com.figma.scopes": [ "FONT_WEIGHT" ]
+ 			}
++		},
++		"heading": {
++			"$type": "typography",
++			"2xl": {
++				"$value": {
++					"fontFamily": "{wpds-font.family.heading}",
++					"fontSize": "{wpds-font.size.2xl}",
++					"fontWeight": "{wpds-font.weight.medium}",
++					"lineHeight": "{wpds-font.line-height.2xl}"
++				},
++				"$description": "Extra large heading for hero sections"
++			},
++			"xl": {
++				"$value": {
++					"fontFamily": "{wpds-font.family.heading}",
++					"fontSize": "{wpds-font.size.xl}",
++					"fontWeight": "{wpds-font.weight.medium}",
++					"lineHeight": "{wpds-font.line-height.md}"
++				},
++				"$description": "Large heading for page titles"
++			},
++			"lg": {
++				"$value": {
++					"fontFamily": "{wpds-font.family.heading}",
++					"fontSize": "{wpds-font.size.lg}",
++					"fontWeight": "{wpds-font.weight.medium}",
++					"lineHeight": "{wpds-font.line-height.sm}"
++				},
++				"$description": "Medium-large heading for section titles"
++			},
++			"md": {
++				"$value": {
++					"fontFamily": "{wpds-font.family.heading}",
++					"fontSize": "{wpds-font.size.md}",
++					"fontWeight": "{wpds-font.weight.medium}",
++					"lineHeight": "{wpds-font.line-height.sm}"
++				},
++				"$description": "Medium heading for subsections"
++			},
++			"sm": {
++				"$value": {
++					"fontFamily": "{wpds-font.family.heading}",
++					"fontSize": "{wpds-font.size.xs}",
++					"fontWeight": "{wpds-font.weight.medium}",
++					"lineHeight": "{wpds-font.line-height.xs}"
++				},
++				"$description": "Small heading for labels and minor headings"
++			}
++		},
++		"body": {
++			"$type": "typography",
++			"xl": {
++				"$value": {
++					"fontFamily": "{wpds-font.family.body}",
++					"fontSize": "{wpds-font.size.xl}",
++					"fontWeight": "{wpds-font.weight.regular}",
++					"lineHeight": "{wpds-font.line-height.xl}"
++				},
++				"$description": "Large body text for lead paragraphs and introductions"
++			},
++			"lg": {
++				"$value": {
++					"fontFamily": "{wpds-font.family.body}",
++					"fontSize": "{wpds-font.size.lg}",
++					"fontWeight": "{wpds-font.weight.regular}",
++					"lineHeight": "{wpds-font.line-height.md}"
++				},
++				"$description": "Comfortable body text for extended reading"
++			},
++			"md": {
++				"$value": {
++					"fontFamily": "{wpds-font.family.body}",
++					"fontSize": "{wpds-font.size.md}",
++					"fontWeight": "{wpds-font.weight.regular}",
++					"lineHeight": "{wpds-font.line-height.sm}"
++				},
++				"$description": "Default body text for general content"
++			},
++			"sm": {
++				"$value": {
++					"fontFamily": "{wpds-font.family.body}",
++					"fontSize": "{wpds-font.size.sm}",
++					"fontWeight": "{wpds-font.weight.regular}",
++					"lineHeight": "{wpds-font.line-height.xs}"
++				},
++				"$description": "Small body text for help text and secondary content"
++			}
+ 		}
+ 	}
+ }

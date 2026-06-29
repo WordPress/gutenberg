@@ -1,0 +1,35 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a7c0ea58712ada..528f0a5616d39a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `ConfirmDialog`: Add `__next40pxDefaultSize` to buttons ([#58421](https://github.com/WordPress/gutenberg/pull/58421)).
++
+ ### Bug Fix
+ 
+ -   `Placeholder`: Fix Placeholder component padding when body text font size is changed ([#58323](https://github.com/WordPress/gutenberg/pull/58323)).
+diff --git a/packages/components/src/confirm-dialog/component.tsx b/packages/components/src/confirm-dialog/component.tsx
+index 750e7030de13cd..6fc03ffa73373e 100644
+--- a/packages/components/src/confirm-dialog/component.tsx
++++ b/packages/components/src/confirm-dialog/component.tsx
+@@ -96,6 +96,7 @@ const UnconnectedConfirmDialog = (
+ 						<Text>{ children }</Text>
+ 						<Flex direction="row" justify="flex-end">
+ 							<Button
++								__next40pxDefaultSize
+ 								ref={ cancelButtonRef }
+ 								variant="tertiary"
+ 								onClick={ handleEvent( onCancel ) }
+@@ -103,6 +104,7 @@ const UnconnectedConfirmDialog = (
+ 								{ cancelLabel }
+ 							</Button>
+ 							<Button
++								__next40pxDefaultSize
+ 								ref={ confirmButtonRef }
+ 								variant="primary"
+ 								onClick={ handleEvent( onConfirm ) }

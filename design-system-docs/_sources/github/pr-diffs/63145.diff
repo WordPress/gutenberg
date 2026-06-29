@@ -1,0 +1,196 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7cef1112b6a7c9..0509376d90f22b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ 
+ ### Enhancements
+ 
++-   `TimeInput`: Expose as subcomponent of `TimePicker` ([#63145](https://github.com/WordPress/gutenberg/pull/63145)).
+ -   `RadioControl`: add support for option help text ([#63751](https://github.com/WordPress/gutenberg/pull/63751)).
+ 
+ ### Internal
+diff --git a/packages/components/src/date-time/index.ts b/packages/components/src/date-time/index.ts
+index 8335366bcbb73b..a103bac0d30efb 100644
+--- a/packages/components/src/date-time/index.ts
++++ b/packages/components/src/date-time/index.ts
+@@ -3,8 +3,7 @@
+  */
+ import { default as DatePicker } from './date';
+ import { default as TimePicker } from './time';
+-import { default as TimeInput } from './time-input';
+ import { default as DateTimePicker } from './date-time';
+ 
+-export { DatePicker, TimePicker, TimeInput };
++export { DatePicker, TimePicker };
+ export default DateTimePicker;
+diff --git a/packages/components/src/date-time/stories/time-input.story.tsx b/packages/components/src/date-time/stories/time-input.story.tsx
+deleted file mode 100644
+index c74d886e82477c..00000000000000
+--- a/packages/components/src/date-time/stories/time-input.story.tsx
++++ /dev/null
+@@ -1,36 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { Meta, StoryFn } from '@storybook/react';
+-import { action } from '@storybook/addon-actions';
+-
+-/**
+- * Internal dependencies
+- */
+-import { TimeInput } from '../time-input';
+-
+-const meta: Meta< typeof TimeInput > = {
+-	title: 'Components/TimeInput',
+-	component: TimeInput,
+-	argTypes: {
+-		onChange: { action: 'onChange', control: { type: null } },
+-	},
+-	tags: [ 'status-wip' ],
+-	parameters: {
+-		controls: { expanded: true },
+-		docs: { canvas: { sourceState: 'shown' } },
+-	},
+-	args: {
+-		onChange: action( 'onChange' ),
+-	},
+-};
+-export default meta;
+-
+-const Template: StoryFn< typeof TimeInput > = ( args ) => {
+-	return <TimeInput { ...args } />;
+-};
+-
+-export const Default: StoryFn< typeof TimeInput > = Template.bind( {} );
+-Default.args = {
+-	label: 'Time',
+-};
+diff --git a/packages/components/src/date-time/stories/time.story.tsx b/packages/components/src/date-time/stories/time.story.tsx
+index c48b8fb1d15922..947b5bd64d5eb1 100644
+--- a/packages/components/src/date-time/stories/time.story.tsx
++++ b/packages/components/src/date-time/stories/time.story.tsx
+@@ -16,6 +16,8 @@ import TimePicker from '../time';
+ const meta: Meta< typeof TimePicker > = {
+ 	title: 'Components/TimePicker',
+ 	component: TimePicker,
++	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++	subcomponents: { 'TimePicker.TimeInput': TimePicker.TimeInput },
+ 	argTypes: {
+ 		currentTime: { control: 'date' },
+ 		onChange: { action: 'onChange', control: { type: null } },
+@@ -49,3 +51,18 @@ const Template: StoryFn< typeof TimePicker > = ( {
+ };
+ 
+ export const Default: StoryFn< typeof TimePicker > = Template.bind( {} );
++
++const TimeInputTemplate: StoryFn< typeof TimePicker.TimeInput > = ( args ) => {
++	return <TimePicker.TimeInput { ...args } />;
++};
++
++/**
++ * The time input can be used in isolation as `<TimePicker.TimeInput />`. In this case, the `value` will be passed
++ * as an object in 24-hour format (`{ hours: number, minutes: number }`).
++ */
++export const TimeInput = TimeInputTemplate.bind( {} );
++TimeInput.args = {
++	label: 'Time',
++};
++// Hide TimePicker controls because they don't apply to TimeInput
++TimeInput.parameters = { controls: { include: [] } };
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index e2877a1ded5e1f..809376d99d3036 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -32,7 +32,7 @@ import {
+ 	validateInputElementTarget,
+ } from '../utils';
+ import { TIMEZONELESS_FORMAT } from '../constants';
+-import { TimeInput } from '../time-input';
++import { TimeInput } from './time-input';
+ 
+ const VALID_DATE_ORDERS = [ 'dmy', 'mdy', 'ymd' ];
+ 
+@@ -252,4 +252,29 @@ export function TimePicker( {
+ 	);
+ }
+ 
++/**
++ * A component to input a time.
++ *
++ * Values are passed as an object in 24-hour format (`{ hours: number, minutes: number }`).
++ *
++ * ```jsx
++ * import { TimePicker } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyTimeInput = () => {
++ * 	const [ time, setTime ] = useState( { hours: 13, minutes: 30 } );
++ *
++ * 	return (
++ * 		<TimePicker.TimeInput
++ * 			value={ time }
++ * 			onChange={ setTime }
++ * 			label="Time"
++ * 		/>
++ * 	);
++ * };
++ * ```
++ */
++TimePicker.TimeInput = TimeInput;
++Object.assign( TimePicker.TimeInput, { displayName: 'TimePicker.TimeInput' } );
++
+ export default TimePicker;
+diff --git a/packages/components/src/date-time/time/styles.ts b/packages/components/src/date-time/time/styles.ts
+index bba0cc500e0c8a..066c8fb1d1d3cd 100644
+--- a/packages/components/src/date-time/time/styles.ts
++++ b/packages/components/src/date-time/time/styles.ts
+@@ -62,6 +62,7 @@ export const HoursInput = styled( NumberControl )`
+ export const TimeSeparator = styled.span`
+ 	border-top: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 700 ] };
+ 	border-bottom: ${ CONFIG.borderWidth } solid ${ COLORS.gray[ 700 ] };
++	font-size: ${ CONFIG.fontSize };
+ 	line-height: calc(
+ 		${ CONFIG.controlHeight } - ${ CONFIG.borderWidth } * 2
+ 	);
+diff --git a/packages/components/src/date-time/time-input/index.tsx b/packages/components/src/date-time/time/time-input/index.tsx
+similarity index 91%
+rename from packages/components/src/date-time/time-input/index.tsx
+rename to packages/components/src/date-time/time/time-input/index.tsx
+index bfac1e2b604c23..b4421c601b1d6d 100644
+--- a/packages/components/src/date-time/time-input/index.tsx
++++ b/packages/components/src/date-time/time/time-input/index.tsx
+@@ -18,20 +18,20 @@ import {
+ 	HoursInput,
+ 	MinutesInput,
+ 	Fieldset,
+-} from '../time/styles';
+-import { HStack } from '../../h-stack';
+-import Button from '../../button';
+-import ButtonGroup from '../../button-group';
++} from '../styles';
++import { HStack } from '../../../h-stack';
++import Button from '../../../button';
++import ButtonGroup from '../../../button-group';
+ import {
+ 	from12hTo24h,
+ 	from24hTo12h,
+ 	buildPadInputStateReducer,
+ 	validateInputElementTarget,
+-} from '../utils';
+-import type { TimeInputProps } from '../types';
+-import type { InputChangeCallback } from '../../input-control/types';
+-import { useControlledValue } from '../../utils';
+-import BaseControl from '../../base-control';
++} from '../../utils';
++import type { TimeInputProps } from '../../types';
++import type { InputChangeCallback } from '../../../input-control/types';
++import { useControlledValue } from '../../../utils';
++import BaseControl from '../../../base-control';
+ 
+ export function TimeInput( {
+ 	value: valueProp,
+diff --git a/packages/components/src/date-time/time-input/test/index.tsx b/packages/components/src/date-time/time/time-input/test/index.tsx
+similarity index 100%
+rename from packages/components/src/date-time/time-input/test/index.tsx
+rename to packages/components/src/date-time/time/time-input/test/index.tsx

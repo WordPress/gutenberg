@@ -1,0 +1,224 @@
+diff --git a/package-lock.json b/package-lock.json
+index 96e1b64945f41e..f3a10c043bf102 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -13303,6 +13303,7 @@
+ 			"version": "file:packages/compose",
+ 			"requires": {
+ 				"@babel/runtime": "^7.13.10",
++				"@types/lodash": "4.14.149",
+ 				"@types/mousetrap": "^1.6.8",
+ 				"@wordpress/deprecated": "file:packages/deprecated",
+ 				"@wordpress/dom": "file:packages/dom",
+@@ -13315,6 +13316,13 @@
+ 				"mousetrap": "^1.6.5",
+ 				"react-resize-aware": "^3.1.0",
+ 				"use-memo-one": "^1.1.1"
++			},
++			"dependencies": {
++				"@types/lodash": {
++					"version": "4.14.149",
++					"resolved": "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.149.tgz",
++					"integrity": "sha512-ijGqzZt/b7BfzcK9vTrS6MFljQRPn5BFWOx8oE0GYxribu6uV+aA9zZuXI1zc/etK9E8nrgdoF2+LgUw7+9tJQ=="
++				}
+ 			}
+ 		},
+ 		"@wordpress/core-data": {
+diff --git a/packages/components/src/ui/context/context-system-provider.js b/packages/components/src/ui/context/context-system-provider.js
+index 739ec9beeb8c9c..730468fb3c21e8 100644
+--- a/packages/components/src/ui/context/context-system-provider.js
++++ b/packages/components/src/ui/context/context-system-provider.js
+@@ -13,11 +13,7 @@ import {
+ 	useState,
+ 	memo,
+ } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useIsomorphicLayoutEffect } from '../utils';
++import { useIsomorphicLayoutEffect } from '@wordpress/compose';
+ 
+ export const ComponentsContext = createContext(
+ 	/** @type {Record<string, any>} */ ( {} )
+diff --git a/packages/components/src/ui/form-group/use-form-group.js b/packages/components/src/ui/form-group/use-form-group.js
+index 27ea0b4f96d018..92e7708829d12d 100644
+--- a/packages/components/src/ui/form-group/use-form-group.js
++++ b/packages/components/src/ui/form-group/use-form-group.js
+@@ -3,12 +3,16 @@
+  */
+ import { cx } from 'emotion';
+ 
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
++
+ /**
+  * Internal dependencies
+  */
+ import { useContextSystem } from '../context';
+ import * as styles from './form-group-styles';
+-import { useInstanceId } from '../utils';
+ 
+ /**
+  * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupProps, 'div'>} props
+diff --git a/packages/components/src/ui/popover/utils.js b/packages/components/src/ui/popover/utils.js
+index 48cfedca5123d7..142a38e4bee5e1 100644
+--- a/packages/components/src/ui/popover/utils.js
++++ b/packages/components/src/ui/popover/utils.js
+@@ -5,9 +5,9 @@ import { noop } from 'lodash';
+ import useResizeAware from 'react-resize-aware';
+ 
+ /**
+- * Internal dependencies
++ * WordPress dependencies
+  */
+-import { useIsomorphicLayoutEffect } from '../utils';
++import { useIsomorphicLayoutEffect } from '@wordpress/compose';
+ 
+ export function usePopoverResizeUpdater( { onResize = noop } ) {
+ 	const [ resizeListener, sizes ] = useResizeAware();
+diff --git a/packages/components/src/ui/utils/index.js b/packages/components/src/ui/utils/index.js
+index b882387ec93704..26e05b9d84d7db 100644
+--- a/packages/components/src/ui/utils/index.js
++++ b/packages/components/src/ui/utils/index.js
+@@ -1,4 +1,2 @@
+ export { getOptimalTextShade } from './colors';
+ export { createComponent } from './create-component';
+-export { useInstanceId } from './use-instance-id';
+-export { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect';
+diff --git a/packages/components/src/ui/utils/use-instance-id.js b/packages/components/src/ui/utils/use-instance-id.js
+deleted file mode 100644
+index 882334327d77f5..00000000000000
+--- a/packages/components/src/ui/utils/use-instance-id.js
++++ /dev/null
+@@ -1,42 +0,0 @@
+-/**
+- * Duplicated from @wordpress/compose to enable TypeScript support for ui/* files.
+- */
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useMemo } from '@wordpress/element';
+-
+-/**
+- * @type {WeakMap<any, number>}
+- */
+-const instanceMap = new WeakMap();
+-
+-/**
+- * Creates a new id for a given object.
+- *
+- * @param {unknown} object Object reference to create an id for.
+- * @return {number} The instance id (index).
+- */
+-function createId( object ) {
+-	const instances = instanceMap.get( object ) || 0;
+-	instanceMap.set( object, instances + 1 );
+-	return instances;
+-}
+-
+-/**
+- * Provides a unique instance ID.
+- *
+- * @param {Object}          object           Object reference to create an id for.
+- * @param {string}          prefix           Prefix for the unique id.
+- * @param {string | number} [preferredId=''] Default ID to use.
+- * @return {string | number} The unique instance id.
+- */
+-export function useInstanceId( object, prefix, preferredId = '' ) {
+-	return useMemo( () => {
+-		if ( preferredId ) return preferredId;
+-		const id = createId( object );
+-
+-		return prefix ? `${ prefix }-${ id }` : id;
+-	}, [ object ] );
+-}
+diff --git a/packages/components/src/ui/utils/use-isomorphic-layout-effect.js b/packages/components/src/ui/utils/use-isomorphic-layout-effect.js
+deleted file mode 100644
+index c21c20bb9b8cc9..00000000000000
+--- a/packages/components/src/ui/utils/use-isomorphic-layout-effect.js
++++ /dev/null
+@@ -1,10 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useEffect, useLayoutEffect } from '@wordpress/element';
+-
+-/**
+- * Copied from `@wordpress/compose` in order for us to be able to maintain all the types for the ui folder
+- */
+-export const useIsomorphicLayoutEffect =
+-	typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 608d7bebb1c986..4b831d54dbaa29 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -6,6 +6,7 @@
+ 		"types": [ "gutenberg-env" ]
+ 	},
+ 	"references": [
++		{ "path": "../compose" },
+ 		{ "path": "../deprecated" },
+ 		{ "path": "../dom" },
+ 		{ "path": "../element" },
+diff --git a/packages/compose/README.md b/packages/compose/README.md
+index d960fa94be6a65..29d6b05e5e3acc 100644
+--- a/packages/compose/README.md
++++ b/packages/compose/README.md
+@@ -273,7 +273,7 @@ _Parameters_
+ 
+ -   _object_ `object`: Object reference to create an id for.
+ -   _prefix_ `[string]`: Prefix for the unique id.
+--   _preferredId_ `[string]`: Default ID to use.
++-   _preferredId_ `[string | number]`: Default ID to use.
+ 
+ _Returns_
+ 
+diff --git a/packages/compose/package.json b/packages/compose/package.json
+index 535b4f5c39c70e..c556725b4bdb38 100644
+--- a/packages/compose/package.json
++++ b/packages/compose/package.json
+@@ -30,6 +30,7 @@
+ 	"sideEffects": false,
+ 	"dependencies": {
+ 		"@babel/runtime": "^7.13.10",
++		"@types/lodash": "4.14.149",
+ 		"@types/mousetrap": "^1.6.8",
+ 		"@wordpress/deprecated": "file:../deprecated",
+ 		"@wordpress/dom": "file:../dom",
+diff --git a/packages/compose/src/higher-order/compose.js b/packages/compose/src/higher-order/compose.ts
+similarity index 100%
+rename from packages/compose/src/higher-order/compose.js
+rename to packages/compose/src/higher-order/compose.ts
+diff --git a/packages/compose/src/hooks/use-instance-id/index.js b/packages/compose/src/hooks/use-instance-id/index.js
+index 30dcc6d4d4c932..aa08a148b24b36 100644
+--- a/packages/compose/src/hooks/use-instance-id/index.js
++++ b/packages/compose/src/hooks/use-instance-id/index.js
+@@ -26,9 +26,9 @@ function createId( object ) {
+ /**
+  * Provides a unique instance ID.
+  *
+- * @param {object} object           Object reference to create an id for.
+- * @param {string} [prefix]         Prefix for the unique id.
+- * @param {string} [preferredId=''] Default ID to use.
++ * @param {object}          object           Object reference to create an id for.
++ * @param {string}          [prefix]         Prefix for the unique id.
++ * @param {string | number} [preferredId=''] Default ID to use.
+  * @return {string | number} The unique instance id.
+  */
+ export default function useInstanceId( object, prefix, preferredId = '' ) {
+diff --git a/packages/compose/tsconfig.json b/packages/compose/tsconfig.json
+index b64b8f51e7862c..f54010dabab043 100644
+--- a/packages/compose/tsconfig.json
++++ b/packages/compose/tsconfig.json
+@@ -9,6 +9,7 @@
+ 		{ "path": "../element" },
+ 		{ "path": "../priority-queue" },
+ 		{ "path": "../dom" },
++		{ "path": "../is-shallow-equal" },
+ 		{ "path": "../keycodes" }
+ 	],
+ 	"include": [

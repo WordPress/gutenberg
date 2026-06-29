@@ -1,0 +1,57 @@
+diff --git a/packages/components/src/font-size-picker/font-size-picker-select.tsx b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+index 0d3681f39d5a97..9be3c09d93b845 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-select.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+@@ -26,7 +26,32 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
+ 		DEFAULT_OPTION,
+ 		...fontSizes.map( ( fontSize ) => {
+ 			let hint;
+-			if ( isSimpleCssValue( fontSize.size ) ) {
++			if ( fontSize.fluid ) {
++				const hasMin = isSimpleCssValue( fontSize.fluid.min ?? '' );
++				const hasMax = isSimpleCssValue( fontSize.fluid.max ?? '' );
++
++				if ( hasMin && hasMax ) {
++					hint = sprintf(
++						// translators: 1: the minimum fluid font size value, 2: the maximum fluid font size value.
++						__( 'Fluid (%1$s - %2$s)' ),
++						fontSize.fluid.min,
++						fontSize.fluid.max
++					);
++				} else if ( hasMin ) {
++					hint = sprintf(
++						// translators: %s: the minimum fluid font size value.
++						__( 'Fluid ( >= %s)' ),
++						fontSize.fluid.min
++					);
++				} else if ( hasMax ) {
++					hint = sprintf(
++						// translators: %s: the maximum fluid font size value.
++						__( 'Fluid ( <= %s)' ),
++						fontSize.fluid.max
++					);
++				}
++			}
++			if ( ! hint && isSimpleCssValue( fontSize.size ) ) {
+ 				hint = String( fontSize.size );
+ 			}
+ 			return {
+diff --git a/packages/components/src/font-size-picker/types.ts b/packages/components/src/font-size-picker/types.ts
+index 04964e05d45d55..2a0c5b906204a0 100644
+--- a/packages/components/src/font-size-picker/types.ts
++++ b/packages/components/src/font-size-picker/types.ts
+@@ -96,6 +96,14 @@ export type FontSize = {
+ 	 * size. Used for the class generation process.
+ 	 */
+ 	slug: string;
++	/**
++	 * The `fluid` property is an optional object specifying min and max values for
++	 * fluid font sizes.
++	 */
++	fluid?: {
++		min?: string | number;
++		max?: string | number;
++	};
+ };
+ 
+ export type FontSizePickerSelectProps = Pick<

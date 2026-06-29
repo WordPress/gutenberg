@@ -1,0 +1,73 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c346db1a3769ea..dfa783103c8ba4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ 
+ -   `Autocomplete`: Stabilize rendering of autocomplete items ([#61877](https://github.com/WordPress/gutenberg/pull/61877)).
+ -   `TabPanel`: Make the the focus styles consistent with `Tabs`. ([#61317](https://github.com/WordPress/gutenberg/pull/61317)).
++-   `InputControl`: Fixed z-index issue where slider dots appeared in front of the Appearance dropdown. ([#61937](https://github.com/WordPress/gutenberg/pull/61937))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index ab4e87ef5a99f4..73c8ebcfb49276 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -47,10 +47,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   min-height: 0;
+ }
+ 
+-.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) {
+-  z-index: 1;
+-}
+-
+ .emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) .emotion-25 {
+   border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+@@ -330,10 +326,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   min-height: 0;
+ }
+ 
+-.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) {
+-  z-index: 1;
+-}
+-
+ .emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) .emotion-25 {
+   border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+@@ -623,10 +615,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   min-height: 0;
+ }
+ 
+-.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) {
+-  z-index: 1;
+-}
+-
+ .emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) .emotion-25 {
+   border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+@@ -928,10 +916,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   min-height: 0;
+ }
+ 
+-.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) {
+-  z-index: 1;
+-}
+-
+ .emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) .emotion-25 {
+   border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+   box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 3192141a8ac0b1..ddfad620b91244 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -83,8 +83,6 @@ export const Root = styled( Flex )`
+ 
+ 	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
+ 	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
+-		z-index: 1;
+-
+ 		${ BackdropUI } {
+ 			border-color: ${ COLORS.ui.borderFocus };
+ 			box-shadow: ${ CONFIG.controlBoxShadowFocus };

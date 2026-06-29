@@ -1,0 +1,401 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 956cf975f4588d..22b569a0383cd7 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ 
+ ### Enhancements
+ 
++-   `CollapsibleCard`: Include the card title in the toggle button's accessible label so multiple collapsible cards on the same page are distinguishable by screen reader users ([#76329](https://github.com/WordPress/gutenberg/pull/76329)).
+ -   `Notice`: Improve narrow layout by letting description and actions span the icon column when a title is present ([#76202](https://github.com/WordPress/gutenberg/pull/76202)).
+ 
+ ## 0.8.0 (2026-03-04)
+diff --git a/packages/ui/src/card/context.ts b/packages/ui/src/card/context.ts
+new file mode 100644
+index 00000000000000..bfd7248ed4134e
+--- /dev/null
++++ b/packages/ui/src/card/context.ts
+@@ -0,0 +1,8 @@
++import { createContext } from '@wordpress/element';
++
++export const TitleTextContext = createContext<
++	| {
++			setTitleText: ( text: string | undefined ) => void;
++	  }
++	| undefined
++>( undefined );
+diff --git a/packages/ui/src/card/title.tsx b/packages/ui/src/card/title.tsx
+index fb6d14bd1642e7..ca4b5a384678d5 100644
+--- a/packages/ui/src/card/title.tsx
++++ b/packages/ui/src/card/title.tsx
+@@ -1,20 +1,68 @@
+ import { mergeProps, useRender } from '@base-ui/react';
+-import { forwardRef } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
++import {
++	forwardRef,
++	useContext,
++	useLayoutEffect,
++	useRef,
++} from '@wordpress/element';
++import { TitleTextContext } from './context';
+ import styles from './style.module.css';
+ import type { TitleProps } from './types';
+ 
++/**
++ * Syncs the rendered text content of the given element to the nearest
++ * TitleTextContext (used by CollapsibleCard to build the trigger's
++ * accessible label). No-ops when rendered outside a CollapsibleCard.
++ *
++ * Runs on every render so the label stays current if children change
++ * dynamically. The cost is a single `textContent` read plus a bail-out
++ * `setState` when the value hasn't changed — skipped entirely when
++ * there is no context provider (i.e. the common non-collapsible case).
++ */
++function useSyncTitleText( ref: React.RefObject< HTMLElement | null > ) {
++	const titleTextContext = useContext( TitleTextContext );
++
++	useLayoutEffect( () => {
++		if ( ! titleTextContext ) {
++			return;
++		}
++
++		const text = ref.current?.textContent?.trim() || undefined;
++		titleTextContext.setTitleText( text );
++	} );
++
++	// Unmount-only cleanup — kept separate from the per-render sync
++	// above to avoid transiently clearing the value between runs.
++	useLayoutEffect( () => {
++		if ( ! titleTextContext ) {
++			return;
++		}
++
++		return () => titleTextContext.setTitleText( undefined );
++	}, [ titleTextContext ] );
++}
++
+ /**
+  * The title for a card. Renders as a `<div>` by default — use the `render`
+  * prop to swap in a semantic heading element when appropriate.
+  */
+ export const Title = forwardRef< HTMLDivElement, TitleProps >(
+-	function CardTitle( { render, ...props }, ref ) {
++	function CardTitle( { render, ...restProps }, forwardedRef ) {
++		const internalRef = useRef< HTMLElement >( null );
++		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
++
++		useSyncTitleText( internalRef );
++
+ 		const element = useRender( {
+ 			defaultTagName: 'div',
+ 			render,
+-			ref,
++			ref: mergedRef,
+ 			// TODO: use `Text` component instead, when ready
+-			props: mergeProps< 'div' >( { className: styles.title }, props ),
++			props: mergeProps< 'div' >(
++				{ className: styles.title },
++				restProps
++			),
+ 		} );
+ 
+ 		return element;
+diff --git a/packages/ui/src/collapsible-card/header.tsx b/packages/ui/src/collapsible-card/header.tsx
+index a017bd29d8505f..1ea9bdd0af6f84 100644
+--- a/packages/ui/src/collapsible-card/header.tsx
++++ b/packages/ui/src/collapsible-card/header.tsx
+@@ -1,14 +1,56 @@
+ import { Collapsible } from '@base-ui/react/collapsible';
+ import clsx from 'clsx';
+-import type { MouseEvent } from 'react';
+-import { forwardRef, useCallback, useRef } from '@wordpress/element';
+-import { __ } from '@wordpress/i18n';
++import type { MouseEvent, ReactNode } from 'react';
++import {
++	forwardRef,
++	useCallback,
++	useLayoutEffect,
++	useMemo,
++	useRef,
++	useState,
++} from '@wordpress/element';
++import { __, sprintf } from '@wordpress/i18n';
+ import { chevronDown, chevronUp } from '@wordpress/icons';
+ import * as Card from '../card';
++import { TitleTextContext } from '../card/context';
+ import { IconButton } from '../icon-button';
+ import styles from './style.module.css';
+ import type { HeaderProps } from './types';
+ 
++/**
++ * Tracks the title text from a Card.Title child (via TitleTextContext) and
++ * falls back to the full header content text when no Card.Title is present.
++ * Returns the context provider value, a ref for the header content wrapper,
++ * and the composed trigger label.
++ */
++function useTriggerLabel( children: ReactNode ) {
++	const headerContentRef = useRef< HTMLDivElement >( null );
++	const [ titleText, setTitleText ] = useState< string >();
++	const [ headerText, setHeaderText ] = useState< string >();
++	const titleTextContextValue = useMemo( () => ( { setTitleText } ), [] );
++
++	// Fallback: read the header content's text when no Card.Title is
++	// present. `children` is listed as a dependency so the label
++	// re-syncs when the header content changes.
++	useLayoutEffect( () => {
++		if ( titleText === undefined ) {
++			const text = headerContentRef.current?.textContent?.trim();
++			setHeaderText( text || undefined );
++		}
++	}, [ titleText, children ] );
++
++	const identifierText = titleText ?? headerText;
++	const triggerLabel = identifierText
++		? sprintf(
++				/* translators: %s: title of the card being expanded or collapsed */
++				__( 'Expand or collapse %s' ),
++				identifierText
++		  )
++		: __( 'Expand or collapse' );
++
++	return { titleTextContextValue, headerContentRef, triggerLabel };
++}
++
+ /**
+  * The header of a collapsible card. Always visible, and acts as the
+  * toggle trigger — clicking anywhere on it expands or collapses the
+@@ -24,6 +66,8 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
+ 		ref
+ 	) {
+ 		const triggerRef = useRef< HTMLButtonElement >( null );
++		const { titleTextContextValue, headerContentRef, triggerLabel } =
++			useTriggerLabel( children );
+ 
+ 		const handleHeaderClick = useCallback(
+ 			( event: MouseEvent< HTMLDivElement > ) => {
+@@ -48,14 +92,21 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
+ 				onClick={ handleHeaderClick }
+ 				{ ...restProps }
+ 			>
+-				<div className={ styles[ 'header-content' ] }>{ children }</div>
++				<TitleTextContext.Provider value={ titleTextContextValue }>
++					<div
++						ref={ headerContentRef }
++						className={ styles[ 'header-content' ] }
++					>
++						{ children }
++					</div>
++				</TitleTextContext.Provider>
+ 				<div className={ styles[ 'header-trigger-wrapper' ] }>
+ 					<Collapsible.Trigger
+ 						ref={ triggerRef }
+ 						render={ ( props, state ) => (
+ 							<IconButton
+ 								{ ...props }
+-								label={ __( 'Expand or collapse card' ) }
++								label={ triggerLabel }
+ 								icon={ state.open ? chevronUp : chevronDown }
+ 								variant="minimal"
+ 								tone="neutral"
+diff --git a/packages/ui/src/collapsible-card/stories/index.story.tsx b/packages/ui/src/collapsible-card/stories/index.story.tsx
+index 97b0b19b3f2507..0501aa1204a0dd 100644
+--- a/packages/ui/src/collapsible-card/stories/index.story.tsx
++++ b/packages/ui/src/collapsible-card/stories/index.story.tsx
+@@ -105,6 +105,49 @@ export const Disabled: Story = {
+ 	},
+ };
+ 
++/**
++ * Multiple collapsible cards in a vertical stack. Each toggle button
++ * derives its accessible name from the card's title, so screen reader
++ * users can distinguish between them.
++ */
++export const MultipleCards: Story = {
++	argTypes: { open: { control: false } },
++	render: ( { open: _open, ...restArgs } ) => (
++		<div
++			style={ {
++				display: 'flex',
++				flexDirection: 'column',
++				gap: 'var( --wpds-dimension-gap-lg )',
++			} }
++		>
++			<CollapsibleCard.Root { ...restArgs }>
++				<CollapsibleCard.Header>
++					<Card.Title>General settings</Card.Title>
++				</CollapsibleCard.Header>
++				<CollapsibleCard.Content>
++					<Text>Configure your general preferences here.</Text>
++				</CollapsibleCard.Content>
++			</CollapsibleCard.Root>
++			<CollapsibleCard.Root { ...restArgs }>
++				<CollapsibleCard.Header>
++					<Card.Title>Privacy</Card.Title>
++				</CollapsibleCard.Header>
++				<CollapsibleCard.Content>
++					<Text>Manage your privacy options.</Text>
++				</CollapsibleCard.Content>
++			</CollapsibleCard.Root>
++			<CollapsibleCard.Root { ...restArgs }>
++				<CollapsibleCard.Header>
++					<Card.Title>Notifications</Card.Title>
++				</CollapsibleCard.Header>
++				<CollapsibleCard.Content>
++					<Text>Choose which notifications you receive.</Text>
++				</CollapsibleCard.Content>
++			</CollapsibleCard.Root>
++		</div>
++	),
++};
++
+ /**
+  * Visual comparison: a `CollapsibleCard` (open) next to a regular `Card`
+  * to verify identical spacing and layout.
+diff --git a/packages/ui/src/collapsible-card/test/index.test.tsx b/packages/ui/src/collapsible-card/test/index.test.tsx
+index 6c2004807c4229..106991141128dc 100644
+--- a/packages/ui/src/collapsible-card/test/index.test.tsx
++++ b/packages/ui/src/collapsible-card/test/index.test.tsx
+@@ -87,23 +87,19 @@ describe( 'CollapsibleCard', () => {
+ 				</CollapsibleCard.Root>
+ 			);
+ 
++			const trigger = screen.getByRole( 'button', {
++				name: 'Expand or collapse Title',
++			} );
++
+ 			expect(
+ 				screen.queryByText( 'Toggle content' )
+ 			).not.toBeInTheDocument();
+ 
+-			await user.click(
+-				screen.getByRole( 'button', {
+-					name: 'Expand or collapse card',
+-				} )
+-			);
++			await user.click( trigger );
+ 
+ 			expect( screen.getByText( 'Toggle content' ) ).toBeVisible();
+ 
+-			await user.click(
+-				screen.getByRole( 'button', {
+-					name: 'Expand or collapse card',
+-				} )
+-			);
++			await user.click( trigger );
+ 
+ 			expect(
+ 				screen.queryByText( 'Toggle content' )
+@@ -152,7 +148,7 @@ describe( 'CollapsibleCard', () => {
+ 
+ 			await user.click(
+ 				screen.getByRole( 'button', {
+-					name: 'Expand or collapse card',
++					name: 'Expand or collapse Title',
+ 				} )
+ 			);
+ 
+@@ -179,7 +175,7 @@ describe( 'CollapsibleCard', () => {
+ 
+ 			await user.click(
+ 				screen.getByRole( 'button', {
+-					name: 'Expand or collapse card',
++					name: 'Expand or collapse Title',
+ 				} )
+ 			);
+ 
+@@ -187,19 +183,90 @@ describe( 'CollapsibleCard', () => {
+ 		} );
+ 	} );
+ 
+-	describe( 'trigger', () => {
+-		it( 'renders a toggle button', () => {
++	describe( 'trigger accessible label', () => {
++		it( 'includes the Card.Title text in the trigger label', () => {
+ 			render(
+ 				<CollapsibleCard.Root>
+ 					<CollapsibleCard.Header>
+-						<Card.Title>Title</Card.Title>
++						<Card.Title>Settings</Card.Title>
+ 					</CollapsibleCard.Header>
+ 				</CollapsibleCard.Root>
+ 			);
+ 
+ 			expect(
+ 				screen.getByRole( 'button', {
+-					name: 'Expand or collapse card',
++					name: 'Expand or collapse Settings',
++				} )
++			).toBeVisible();
++		} );
++
++		it( 'uses a static label that does not change when toggled', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header>
++						<Card.Title>Settings</Card.Title>
++					</CollapsibleCard.Header>
++					<CollapsibleCard.Content>
++						<p>Content</p>
++					</CollapsibleCard.Content>
++				</CollapsibleCard.Root>
++			);
++
++			const trigger = screen.getByRole( 'button', {
++				name: 'Expand or collapse Settings',
++			} );
++			expect( trigger ).toHaveAttribute( 'aria-expanded', 'false' );
++
++			await user.click( trigger );
++
++			expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
++			expect( trigger ).toHaveAccessibleName(
++				'Expand or collapse Settings'
++			);
++		} );
++
++		it( 'falls back to header content when no Card.Title is used', () => {
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header>
++						<span>Plain header text</span>
++					</CollapsibleCard.Header>
++				</CollapsibleCard.Root>
++			);
++
++			expect(
++				screen.getByRole( 'button', {
++					name: 'Expand or collapse Plain header text',
++				} )
++			).toBeVisible();
++		} );
++
++		it( 'produces unique labels for multiple cards', () => {
++			render(
++				<>
++					<CollapsibleCard.Root>
++						<CollapsibleCard.Header>
++							<Card.Title>General</Card.Title>
++						</CollapsibleCard.Header>
++					</CollapsibleCard.Root>
++					<CollapsibleCard.Root>
++						<CollapsibleCard.Header>
++							<Card.Title>Privacy</Card.Title>
++						</CollapsibleCard.Header>
++					</CollapsibleCard.Root>
++				</>
++			);
++
++			expect(
++				screen.getByRole( 'button', {
++					name: 'Expand or collapse General',
++				} )
++			).toBeVisible();
++			expect(
++				screen.getByRole( 'button', {
++					name: 'Expand or collapse Privacy',
+ 				} )
+ 			).toBeVisible();
+ 		} );

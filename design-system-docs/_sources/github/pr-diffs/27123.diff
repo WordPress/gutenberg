@@ -1,0 +1,259 @@
+diff --git a/packages/block-library/src/file/edit.js b/packages/block-library/src/file/edit.js
+index 488f9581ef3e03..3307d6959ccfe0 100644
+--- a/packages/block-library/src/file/edit.js
++++ b/packages/block-library/src/file/edit.js
+@@ -8,7 +8,7 @@ import classnames from 'classnames';
+  */
+ import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+ import {
+-	__unstableUseAnimate as useAnimate,
++	__unstableGetAnimateClassName as getAnimateClassName,
+ 	withNotices,
+ 	ToolbarGroup,
+ 	ToolbarButton,
+@@ -129,7 +129,7 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
+ 
+ 	const blockProps = useBlockProps( {
+ 		className: classnames(
+-			useAnimate( { type: isBlobURL( href ) ? 'loading' : null } ),
++			isBlobURL( href ) && getAnimateClassName( { type: 'loading' } ),
+ 			{
+ 				'is-transient': isBlobURL( href ),
+ 			}
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 67379981172f2c..f36f609d703c60 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,8 +2,6 @@
+ 
+ ## Unreleased
+ 
+-- Introduce `Navigation` component as `__experimentalNavigation` for displaying a hierarchy of items.
+-
+ ### Breaking Change
+ 
+ - Introduce support for other units and advanced CSS properties on `FontSizePicker`. Provided the value passed to the `FontSizePicker` is a string or one of the size options passed is a string, onChange will start to be called with a string value instead of a number. On WordPress usage, font size options are now automatically converted to strings with the default "px" unit added.
+diff --git a/packages/components/src/animate/index.js b/packages/components/src/animate/index.js
+index 2eeed8e7be1306..95fba645fd1782 100644
+--- a/packages/components/src/animate/index.js
++++ b/packages/components/src/animate/index.js
+@@ -3,11 +3,37 @@
+  */
+ import classnames from 'classnames';
+ 
++/**
++ * @typedef {'top' | 'top left' | 'top right' | 'middle' | 'middle left' | 'middle right' | 'bottom' | 'bottom left' | 'bottom right'} AppearOrigin
++ * @typedef {'left' | 'right'} SlideInOrigin
++ * @typedef {{ type: 'appear'; origin?: AppearOrigin }} AppearOptions
++ * @typedef {{ type: 'slide-in'; origin?: SlideInOrigin }} SlideInOptions
++ * @typedef {{ type: 'loading'; }} LoadingOptions
++ * @typedef {AppearOptions | SlideInOptions | LoadingOptions} GetAnimateOptions
++ */
++
++/* eslint-disable jsdoc/valid-types */
++/**
++ * @param {GetAnimateOptions['type']} type The animation type
++ * @return {'top' | 'left'} Default origin
++ */
+ function getDefaultOrigin( type ) {
+ 	return type === 'appear' ? 'top' : 'left';
+ }
++/* eslint-enable jsdoc/valid-types */
++
++/**
++ * @param {GetAnimateOptions} options
++ *
++ * @return {string | void} ClassName that applies the animations
++ */
++export function getAnimateClassName( options ) {
++	if ( options.type === 'loading' ) {
++		return classnames( 'components-animate__loading' );
++	}
++
++	const { type, origin = getDefaultOrigin( type ) } = options;
+ 
+-export function useAnimate( { type, origin = getDefaultOrigin( type ) } ) {
+ 	if ( type === 'appear' ) {
+ 		const [ yAxis, xAxis = 'center' ] = origin.split( ' ' );
+ 		return classnames( 'components-animate__appear', {
+@@ -22,14 +48,11 @@ export function useAnimate( { type, origin = getDefaultOrigin( type ) } ) {
+ 			'is-from-' + origin
+ 		);
+ 	}
+-
+-	if ( type === 'loading' ) {
+-		return classnames( 'components-animate__loading' );
+-	}
+ }
+ 
++// @ts-ignore Reason: Planned for deprecation
+ export default function Animate( { type, options = {}, children } ) {
+ 	return children( {
+-		className: useAnimate( { type, ...options } ),
++		className: getAnimateClassName( { type, ...options } ),
+ 	} );
+ }
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 696659ec71103b..a0295efca72e64 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -14,7 +14,7 @@ export {
+ export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
+ export {
+ 	default as Animate,
+-	useAnimate as __unstableUseAnimate,
++	getAnimateClassName as __unstableGetAnimateClassName,
+ } from './animate';
+ export { default as AnglePickerControl } from './angle-picker-control';
+ export { default as Autocomplete } from './autocomplete';
+diff --git a/packages/components/src/navigation/index.js b/packages/components/src/navigation/index.js
+index 137f031e78f7e0..859a20319ccec3 100644
+--- a/packages/components/src/navigation/index.js
++++ b/packages/components/src/navigation/index.js
+@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useAnimate } from '../animate';
++import { getAnimateClassName } from '../animate';
+ import { ROOT_MENU } from './constants';
+ import { NavigationContext } from './context';
+ import { NavigationUI } from './styles/navigation-styles';
+@@ -63,7 +63,7 @@ export default function Navigation( {
+ 	};
+ 
+ 	const classes = classnames( 'components-navigation', className );
+-	const animateClassName = useAnimate( {
++	const animateClassName = getAnimateClassName( {
+ 		type: 'slide-in',
+ 		origin: slideOrigin,
+ 	} );
+diff --git a/packages/components/src/navigation/menu/menu-title.js b/packages/components/src/navigation/menu/menu-title.js
+index b249bbeb3a3850..7d36f01cf85d19 100644
+--- a/packages/components/src/navigation/menu/menu-title.js
++++ b/packages/components/src/navigation/menu/menu-title.js
+@@ -8,7 +8,7 @@ import { Icon, search as searchIcon } from '@wordpress/icons';
+ /**
+  * Internal dependencies
+  */
+-import Animate from '../../animate';
++import { getAnimateClassName } from '../../animate';
+ import Button from '../../button';
+ import MenuTitleSearch from './menu-title-search';
+ import {
+@@ -82,18 +82,19 @@ export default function NavigationMenuTitle( {
+ 			) }
+ 
+ 			{ isSearching && (
+-				<Animate type="slide-in" options={ { origin: 'left' } }>
+-					{ ( { className: animateClassName } ) => (
+-						<div className={ animateClassName }>
+-							<MenuTitleSearch
+-								onCloseSearch={ onCloseSearch }
+-								onSearch={ onSearch }
+-								search={ search }
+-								title={ title }
+-							/>
+-						</div>
+-					) }
+-				</Animate>
++				<div
++					className={ getAnimateClassName( {
++						type: 'slide-in',
++						origin: 'left',
++					} ) }
++				>
++					<MenuTitleSearch
++						onCloseSearch={ onCloseSearch }
++						onSearch={ onSearch }
++						search={ search }
++						title={ title }
++					/>
++				</div>
+ 			) }
+ 		</MenuTitleUI>
+ 	);
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index a71c6cc6ad895f..f2051a7d839e7e 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -29,7 +29,7 @@ import Button from '../button';
+ import ScrollLock from '../scroll-lock';
+ import IsolatedEventContainer from '../isolated-event-container';
+ import { Slot, Fill, useSlot } from '../slot-fill';
+-import { useAnimate } from '../animate';
++import { getAnimateClassName } from '../animate';
+ 
+ const FocusManaged = withConstrainedTabbing(
+ 	withFocusReturn( ( { children } ) => children )
+@@ -529,10 +529,13 @@ const Popover = ( {
+ 		onClickOutside( clickEvent );
+ 	}
+ 
+-	const animateClassName = useAnimate( {
+-		type: animate && animateOrigin ? 'appear' : null,
+-		origin: animateOrigin,
+-	} );
++	/** @type {false | string} */
++	const animateClassName =
++		Boolean( animate && animateOrigin ) &&
++		getAnimateClassName( {
++			type: 'appear',
++			origin: animateOrigin,
++		} );
+ 
+ 	// Disable reason: We care to capture the _bubbled_ events from inputs
+ 	// within popover as inferring close intent.
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index b2a6831377bdad..c697cb71d98c17 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -11,6 +11,7 @@
+ 		{ "path": "../primitives" }
+ 	],
+ 	"include": [
++		"src/animate/**/*",
+ 		"src/base-control/**/*",
+ 		"src/dashicon/**/*",
+ 		"src/tip/**/*",
+diff --git a/packages/editor/src/components/post-saved-state/index.js b/packages/editor/src/components/post-saved-state/index.js
+index c3a0bf0c15c452..c24ac511c3bc74 100644
+--- a/packages/editor/src/components/post-saved-state/index.js
++++ b/packages/editor/src/components/post-saved-state/index.js
+@@ -7,7 +7,7 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import {
+-	__unstableUseAnimate as useAnimate,
++	__unstableGetAnimateClassName as getAnimateClassName,
+ 	Button,
+ } from '@wordpress/components';
+ import { usePrevious, useViewportMatch } from '@wordpress/compose';
+@@ -100,18 +100,21 @@ export default function PostSavedState( {
+ 		return () => clearTimeout( timeoutId );
+ 	}, [ isSaving ] );
+ 
+-	const animateClassName = useAnimate( { type: 'loading' } );
+-
+ 	if ( isSaving ) {
+ 		// TODO: Classes generation should be common across all return
+ 		// paths of this function, including proper naming convention for
+ 		// the "Save Draft" button.
+-		const classes = classnames( 'editor-post-saved-state', 'is-saving', {
+-			'is-autosaving': isAutosaving,
+-		} );
++		const classes = classnames(
++			'editor-post-saved-state',
++			'is-saving',
++			getAnimateClassName( { type: 'loading' } ),
++			{
++				'is-autosaving': isAutosaving,
++			}
++		);
+ 
+ 		return (
+-			<span className={ classnames( classes, animateClassName ) }>
++			<span className={ classes }>
+ 				<Icon icon={ cloud } />
+ 				{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
+ 			</span>

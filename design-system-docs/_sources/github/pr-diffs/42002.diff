@@ -1,0 +1,90 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d3b0de1e7d88b9..10273b37f602fd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ 
+ ### Internal
+ 
++-   `ColorPicker`: Clean up implementation of 40px size ([#42002](https://github.com/WordPress/gutenberg/pull/42002/)).
+ -   `Divider`: Complete TypeScript migration ([#41991](https://github.com/WordPress/gutenberg/pull/41991)).
+ -   `Divider`, `Flex`, `Spacer`: Improve documentation for the `SpaceInput` prop ([#42376](https://github.com/WordPress/gutenberg/pull/42376)).
+ -   `Elevation`: Convert to TypeScript ([#42302](https://github.com/WordPress/gutenberg/pull/42302)).
+diff --git a/packages/components/src/color-picker/hex-input.tsx b/packages/components/src/color-picker/hex-input.tsx
+index e1453a94ac9925..b7c7032b284511 100644
+--- a/packages/components/src/color-picker/hex-input.tsx
++++ b/packages/components/src/color-picker/hex-input.tsx
+@@ -53,7 +53,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+ 			prefix={
+ 				<Spacer
+ 					as={ Text }
+-					marginLeft={ space( 3.5 ) }
++					marginLeft={ space( 4 ) }
+ 					color={ COLORS.ui.theme }
+ 					lineHeight={ 1 }
+ 				>
+@@ -65,6 +65,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+ 			maxLength={ enableAlpha ? 9 : 7 }
+ 			label={ __( 'Hex color' ) }
+ 			hideLabelFromVision
++			size="__unstable-large"
+ 			__unstableStateReducer={ stateReducer }
+ 			__unstableInputWidth="9em"
+ 		/>
+diff --git a/packages/components/src/color-picker/input-with-slider.tsx b/packages/components/src/color-picker/input-with-slider.tsx
+index 8b86f626fdc01c..ca0376119f9463 100644
+--- a/packages/components/src/color-picker/input-with-slider.tsx
++++ b/packages/components/src/color-picker/input-with-slider.tsx
+@@ -37,7 +37,7 @@ export const InputWithSlider = ( {
+ 				prefix={
+ 					<Spacer
+ 						as={ Text }
+-						paddingLeft={ space( 3.5 ) }
++						paddingLeft={ space( 4 ) }
+ 						color={ COLORS.ui.theme }
+ 						lineHeight={ 1 }
+ 					>
+@@ -45,6 +45,7 @@ export const InputWithSlider = ( {
+ 					</Spacer>
+ 				}
+ 				hideHTMLArrows
++				size="__unstable-large"
+ 			/>
+ 			<RangeControl
+ 				label={ label }
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index 17c44df6f0c184..d234f6fbb3c5d0 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -17,7 +17,6 @@ import { HStack } from '../h-stack';
+ import {
+ 	BackdropUI,
+ 	Container as InputControlContainer,
+-	Input,
+ } from '../input-control/styles/input-control-styles';
+ import CONFIG from '../utils/config-values';
+ 
+@@ -44,14 +43,6 @@ export const RangeControl = styled( InnerRangeControl )`
+ 	}
+ `;
+ 
+-// All inputs should be the same height so this should be changed at the component level.
+-// That involves changing heights of multiple input types probably buttons too etc.
+-// So until that is done we are already using the new height on the color picker so it matches the mockups.
+-const inputHeightStyle = `
+-&&& ${ Input } {
+-	height: 40px;
+-}`;
+-
+ // Make the Hue circle picker not go out of the bar.
+ const interactiveHueStyles = `
+ .react-colorful__interactive {
+@@ -125,8 +116,6 @@ export const ColorfulWrapper = styled.div`
+ 	${ StyledField } {
+ 		margin-bottom: 0;
+ 	}
+-
+-	${ inputHeightStyle }
+ `;
+ 
+ export const CopyButton = styled( Button )`

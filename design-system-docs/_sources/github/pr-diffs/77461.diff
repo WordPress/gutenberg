@@ -1,0 +1,27 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 99b40cb945910f..79c65bcd0c5bf7 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ 
+ -   `Link`: Fix text decoration on the `unstyled` variant when `openInNewTab` is enabled, and simplify new-tab icon markup ([#77420](https://github.com/WordPress/gutenberg/pull/77420)).
+ -   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: Fix broken focus-trap caused by ThemeProvider's `display: contents` and Base UI's `checkVisibility()` ([#77381](https://github.com/WordPress/gutenberg/pull/77381)).
++-   `Text`: Apply both heading and paragraph CSS defenses regardless of variant, so the correct defense kicks in based on the rendered element rather than the typographic variant ([#77461](https://github.com/WordPress/gutenberg/pull/77461)).
+ -   `CollapsibleCard`: Fix missing keyboard focus ring on the header chevron icon when rendered inside wp-admin ([#77468](https://github.com/WordPress/gutenberg/pull/77468)).
+ -   `Tabs`: Fix missing keyboard focus ring on the panel in Windows High Contrast mode when rendered inside wp-admin ([#77469](https://github.com/WordPress/gutenberg/pull/77469)).
+ 
+diff --git a/packages/ui/src/text/text.tsx b/packages/ui/src/text/text.tsx
+index aaee306f38c037..c2c36e8691fab0 100644
+--- a/packages/ui/src/text/text.tsx
++++ b/packages/ui/src/text/text.tsx
+@@ -20,8 +20,8 @@ export const Text = forwardRef< HTMLSpanElement, TextProps >( function Text(
+ 		props: mergeProps< 'span' >( props, {
+ 			className: clsx(
+ 				styles.text,
+-				variant.startsWith( 'heading-' ) && defenseStyles.heading,
+-				variant.startsWith( 'body-' ) && defenseStyles.p,
++				defenseStyles.heading,
++				defenseStyles.p,
+ 				styles[ variant ],
+ 				className
+ 			),

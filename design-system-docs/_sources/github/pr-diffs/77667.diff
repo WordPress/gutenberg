@@ -1,0 +1,104 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 357d3003c1da49..3c6db28a73898a 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -24,6 +24,7 @@
+ -   Remove the transitive peer dependency on `date-fns` / `@date-fns/tz` ([#77520](https://github.com/WordPress/gutenberg/pull/77520)), resolving [#77395](https://github.com/WordPress/gutenberg/issues/77395).
+ -   `Text`: Apply both heading and paragraph CSS defenses regardless of variant, so the correct defense kicks in based on the rendered element rather than the typographic variant ([#77461](https://github.com/WordPress/gutenberg/pull/77461)).
+ -   `CollapsibleCard`: Fix missing keyboard focus ring on the header chevron icon when rendered inside wp-admin ([#77468](https://github.com/WordPress/gutenberg/pull/77468)).
++-   `CollapsibleCard`: Prevent the focus ring of focusable descendants from being clipped by the panel's overflow once the panel is fully expanded ([#77667](https://github.com/WordPress/gutenberg/pull/77667)).
+ -   `Tabs`: Fix missing keyboard focus ring on the panel in Windows High Contrast mode when rendered inside wp-admin ([#77469](https://github.com/WordPress/gutenberg/pull/77469)).
+ 
+ ### Enhancements
+diff --git a/packages/ui/src/collapsible-card/content.tsx b/packages/ui/src/collapsible-card/content.tsx
+index ac25fd74f2a2f5..7dc4fecd66baaa 100644
+--- a/packages/ui/src/collapsible-card/content.tsx
++++ b/packages/ui/src/collapsible-card/content.tsx
+@@ -17,7 +17,18 @@ export const Content = forwardRef< HTMLDivElement, ContentProps >(
+ 		return (
+ 			<Collapsible.Panel
+ 				ref={ ref }
+-				className={ clsx( styles.content, className ) }
++				// @ts-expect-error Base UI supports the callback-style
++				// version of the `className` prop, but we're purposefully
++				// not advertising it in our `@wordpress/ui` re-export.
++				className={ ( state ) =>
++					clsx(
++						styles.content,
++						state.open &&
++							state.transitionStatus === 'idle' &&
++							styles.overflowVisible,
++						className
++					)
++				}
+ 				hiddenUntilFound={ hiddenUntilFound }
+ 				{ ...restProps }
+ 			>
+diff --git a/packages/ui/src/collapsible-card/style.module.css b/packages/ui/src/collapsible-card/style.module.css
+index bfb5cc3717df30..d52e78ad85c8ee 100644
+--- a/packages/ui/src/collapsible-card/style.module.css
++++ b/packages/ui/src/collapsible-card/style.module.css
+@@ -28,7 +28,7 @@
+ 	}
+ 
+ 	.header-trigger {
+-		@media not (prefers-reduced-motion) {
++		@media not ( prefers-reduced-motion ) {
+ 			transition: rotate 0.15s ease-out;
+ 		}
+ 	}
+@@ -44,9 +44,18 @@
+ 
+ 	.content {
+ 		height: var(--collapsible-panel-height);
+-		overflow: hidden;
+ 		margin-block-start: var(--wp-ui-card-header-content-margin);
+ 
++		/* Clip while collapsed or transitioning so the panel collapses
++		   cleanly. The `overflowVisible` class is set once the open
++		   transition has settled, dropping the clip so descendant
++		   focus rings aren't cut off. */
++		overflow: hidden;
++
++		&.overflowVisible {
++			overflow: visible;
++		}
++
+ 		&[hidden]:not([hidden="until-found"]) {
+ 			display: none;
+ 		}
+@@ -56,15 +65,18 @@
+ 			height: 0;
+ 		}
+ 
+-		@media not (prefers-reduced-motion) {
++		@media not ( prefers-reduced-motion ) {
+ 			transition: all 150ms ease-out;
+ 		}
+ 	}
+-
+ }
+ 
+ @layer wp-ui-compositions {
+ 	.content-inner {
++		/* Card.Content's `.header + .content` selector doesn't match here
++		   because Collapsible.Panel sits between Card.Header and Card.Content.
++		   Re-apply the zero top padding manually so the header/content gap
++		   matches Card. */
+ 		padding-block-start: 0;
+ 	}
+ 
+diff --git a/routes/experiments-home/style.scss b/routes/experiments-home/style.scss
+index 08f63fddeabd61..b0a9195d3fd8f6 100644
+--- a/routes/experiments-home/style.scss
++++ b/routes/experiments-home/style.scss
+@@ -4,9 +4,4 @@
+ 	padding: $grid-unit-30;
+ 	max-width: 680px;
+ 	margin: 0 auto;
+-
+-	// Avoid clipping the first toggle's focus ring by the card's overflow.
+-	.dataforms-layouts-regular__field:first-child {
+-		padding-top: $grid-unit-05;
+-	}
+ }

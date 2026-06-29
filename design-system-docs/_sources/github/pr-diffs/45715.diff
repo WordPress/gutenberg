@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c363ddaca6285a..e75a9d2e864bf5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ 
+ ### Internal
+ 
++-   `ToolsPanel`: Update to fix `exhaustive-deps` eslint rule ([#45715](https://github.com/WordPress/gutenberg/pull/45715)).
+ -   `PaletteEditListView`: Update to ignore `exhaustive-deps` eslint rule ([#45467](https://github.com/WordPress/gutenberg/pull/45467)).
+ -   `Popover`: Update to pass `exhaustive-deps` eslint rule ([#45656](https://github.com/WordPress/gutenberg/pull/45656)).
+ -   `Flex`: Update to pass `exhaustive-deps` eslint rule ([#45528](https://github.com/WordPress/gutenberg/pull/45528)).
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index 4e0db5b9881d3e..dcc6c6416e0ce9 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -130,6 +130,7 @@ export function useToolsPanelItem(
+ 	}, [
+ 		hasMatchingPanel,
+ 		isMenuItemChecked,
++		isRegistered,
+ 		isResetting,
+ 		isValueSet,
+ 		wasMenuItemChecked,

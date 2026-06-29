@@ -1,0 +1,29 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2e47db6c778689..c57f3b01d58256 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,9 @@
+ -   `ColorPalette`, `BorderBox`, `BorderBoxControl`: polish and DRY prop types, add default values ([#45463](https://github.com/WordPress/gutenberg/pull/45463)).
+ -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
+ 
++### Internal
++-   `AnglePickerControl`: remove `:focus-visible' outline on `CircleOutlineWrapper` ([#45758](https://github.com/WordPress/gutenberg/pull/45758))
++
+ ### Bug Fix
+ 
+ -   `FormTokenField`: Fix duplicate input in IME composition ([#45607](https://github.com/WordPress/gutenberg/pull/45607)).
+diff --git a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
+index 1a7ed713d72f18..29b38850c055f4 100644
+--- a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
++++ b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.js
+@@ -42,6 +42,10 @@ export const CircleIndicatorWrapper = styled.div`
+ 	position: relative;
+ 	width: 100%;
+ 	height: 100%;
++
++	:focus-visible {
++		outline: none;
++	}
+ `;
+ 
+ export const CircleIndicator = styled.div`

@@ -1,0 +1,141 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f204ea25751932..a21c47eb3b9916 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,9 @@
+ 
+ -   `SandBox`: Fix the cleanup method in useEffect ([#53796](https://github.com/WordPress/gutenberg/pull/53796)).
+ 
++### Internal
++-   `SlotFill`: Do not render children when using `<Slot bubblesVirtually />`. ([#53272](https://github.com/WordPress/gutenberg/pull/53272))
++
+ ### Enhancements
+ 
+ -   `ProgressBar`: Add transition to determinate indicator ([#53877](https://github.com/WordPress/gutenberg/pull/53877)).
+@@ -46,7 +49,6 @@
+ 
+ -   `ColorPalette`, `BorderControl`: Don't hyphenate hex value in `aria-label` ([#52932](https://github.com/WordPress/gutenberg/pull/52932)).
+ -   `MenuItemsChoice`, `MenuItem`: Support a `disabled` prop on a menu item ([#52737](https://github.com/WordPress/gutenberg/pull/52737)).
+--   `TabPanel`: Introduce a new version of `TabPanel` with updated internals and improved adherence to ARIA guidance on `tabpanel` focus behavior while maintaining the same functionality and API surface.([#52133](https://github.com/WordPress/gutenberg/pull/52133)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/slot-fill/README.md b/packages/components/src/slot-fill/README.md
+index ccd4675588c239..a04416bdee50d9 100644
+--- a/packages/components/src/slot-fill/README.md
++++ b/packages/components/src/slot-fill/README.md
+@@ -70,7 +70,7 @@ Both `Slot` and `Fill` accept a `name` string prop, where a `Slot` with a given
+ 
+ `Slot` with `bubblesVirtually` set to true also accept an optional `className` to add to the slot container.
+ 
+-`Slot` accepts an optional `children` function prop, which takes `fills` as a param. It allows you to perform additional processing and wrap `fills` conditionally.
++`Slot` **without** `bubblesVirtually` accepts an optional `children` function prop, which takes `fills` as a param. It allows you to perform additional processing and wrap `fills` conditionally.
+ 
+ _Example_:
+ 
+@@ -103,14 +103,14 @@ const ToolbarItem = () => (
+ 	</Fill>
+ );
+ 
+-const Toolbar = () => 
+-	const hideToolbar() => {
++const Toolbar = () => {
++	const hideToolbar = () => {
+ 		console.log( 'Hide toolbar' );
+-	}
++	};
+ 	return (
+ 		<div className="toolbar">
+ 			<Slot fillProps={ { hideToolbar } } />
+ 		</div>
+ 	);
+-);
++};
+ ```
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot.js b/packages/components/src/slot-fill/bubbles-virtually/slot.js
+index ef7ad56cc68bac..be6fde0c8e6b7b 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot.js
+@@ -13,12 +13,20 @@ import { useMergeRefs } from '@wordpress/compose';
+ /**
+  * Internal dependencies
+  */
++import { View } from '../../view';
+ import SlotFillContext from './slot-fill-context';
+ 
+-function Slot(
+-	{ name, fillProps = {}, as: Component = 'div', ...props },
+-	forwardedRef
+-) {
++function Slot( props, forwardedRef ) {
++	const {
++		name,
++		fillProps = {},
++		as,
++		// `children` is not allowed. However, if it is passed,
++		// it will be displayed as is, so remove `children`.
++		children,
++		...restProps
++	} = props;
++
+ 	const { registerSlot, unregisterSlot, ...registry } =
+ 		useContext( SlotFillContext );
+ 	const ref = useRef();
+@@ -41,7 +49,11 @@ function Slot(
+ 	} );
+ 
+ 	return (
+-		<Component ref={ useMergeRefs( [ forwardedRef, ref ] ) } { ...props } />
++		<View
++			as={ as }
++			ref={ useMergeRefs( [ forwardedRef, ref ] ) }
++			{ ...restProps }
++		/>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap b/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
+index d57954b0444f9b..b9379eda7171a2 100644
+--- a/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
++++ b/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
+@@ -42,12 +42,16 @@ exports[`Slot bubblesVirtually true should subsume another slot by the same name
+   <div
+     data-position="first"
+   >
+-    <div />
++    <div
++      class="emotion-0 emotion-1"
++    />
+   </div>
+   <div
+     data-position="second"
+   >
+-    <div>
++    <div
++      class="emotion-0 emotion-1"
++    >
+       Content
+     </div>
+   </div>
+@@ -62,7 +66,9 @@ exports[`Slot bubblesVirtually true should subsume another slot by the same name
+   <div
+     data-position="second"
+   >
+-    <div>
++    <div
++      class="emotion-0 emotion-1"
++    >
+       Content
+     </div>
+   </div>
+@@ -187,7 +193,9 @@ exports[`Slot should render in expected order when fills unmounted 1`] = `
+ exports[`Slot should warn without a Provider 1`] = `
+ <div>
+   <div>
+-    <div />
++    <div
++      class="emotion-0 emotion-1"
++    />
+   </div>
+ </div>
+ `;

@@ -1,0 +1,416 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a71b5a0ddef35f..8ecbf1528d6f08 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ 
+ -   `TimeInput`: Expose as subcomponent of `TimePicker` ([#63145](https://github.com/WordPress/gutenberg/pull/63145)).
+ -   `RadioControl`: add support for option help text ([#63751](https://github.com/WordPress/gutenberg/pull/63751)).
++-   `SelectControl`: Infer `value` type from `options` ([#64069](https://github.com/WordPress/gutenberg/pull/64069)).
+ -   `Guide`: Add `__next40pxDefaultSize` to buttons ([#64181](https://github.com/WordPress/gutenberg/pull/64181)).
+ -   `SelectControl`: Pass through `options` props ([#64211](https://github.com/WordPress/gutenberg/pull/64211)).
+ 
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index 809376d99d3036..5f706d69190095 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -77,10 +77,28 @@ export function TimePicker( {
+ 		);
+ 	}, [ currentTime ] );
+ 
++	const monthOptions = [
++		{ value: '01', label: __( 'January' ) },
++		{ value: '02', label: __( 'February' ) },
++		{ value: '03', label: __( 'March' ) },
++		{ value: '04', label: __( 'April' ) },
++		{ value: '05', label: __( 'May' ) },
++		{ value: '06', label: __( 'June' ) },
++		{ value: '07', label: __( 'July' ) },
++		{ value: '08', label: __( 'August' ) },
++		{ value: '09', label: __( 'September' ) },
++		{ value: '10', label: __( 'October' ) },
++		{ value: '11', label: __( 'November' ) },
++		{ value: '12', label: __( 'December' ) },
++	] as const;
++
+ 	const { day, month, year, minutes, hours } = useMemo(
+ 		() => ( {
+ 			day: format( date, 'dd' ),
+-			month: format( date, 'MM' ),
++			month: format(
++				date,
++				'MM'
++			) as ( typeof monthOptions )[ number ][ 'value' ],
+ 			year: format( date, 'yyyy' ),
+ 			minutes: format( date, 'mm' ),
+ 			hours: format( date, 'HH' ),
+@@ -146,20 +164,7 @@ export function TimePicker( {
+ 				__next40pxDefaultSize
+ 				__nextHasNoMarginBottom
+ 				value={ month }
+-				options={ [
+-					{ value: '01', label: __( 'January' ) },
+-					{ value: '02', label: __( 'February' ) },
+-					{ value: '03', label: __( 'March' ) },
+-					{ value: '04', label: __( 'April' ) },
+-					{ value: '05', label: __( 'May' ) },
+-					{ value: '06', label: __( 'June' ) },
+-					{ value: '07', label: __( 'July' ) },
+-					{ value: '08', label: __( 'August' ) },
+-					{ value: '09', label: __( 'September' ) },
+-					{ value: '10', label: __( 'October' ) },
+-					{ value: '11', label: __( 'November' ) },
+-					{ value: '12', label: __( 'December' ) },
+-				] }
++				options={ monthOptions }
+ 				onChange={ ( value ) => {
+ 					const newDate = setMonth( date, Number( value ) - 1 );
+ 					setDate( newDate );
+diff --git a/packages/components/src/query-controls/index.tsx b/packages/components/src/query-controls/index.tsx
+index de53c63a9b8a82..3557335ebac5a0 100644
+--- a/packages/components/src/query-controls/index.tsx
++++ b/packages/components/src/query-controls/index.tsx
+@@ -85,7 +85,11 @@ export function QueryControls( {
+ 						__next40pxDefaultSize={ __next40pxDefaultSize }
+ 						key="query-controls-order-select"
+ 						label={ __( 'Order by' ) }
+-						value={ `${ orderBy }/${ order }` }
++						value={
++							orderBy === undefined || order === undefined
++								? undefined
++								: `${ orderBy }/${ order }`
++						}
+ 						options={ [
+ 							{
+ 								label: __( 'Newest to oldest' ),
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 874b6ace1ea949..8a3b6bda68a160 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -42,8 +42,8 @@ function SelectOptions( {
+ 	} );
+ }
+ 
+-function UnforwardedSelectControl(
+-	props: WordPressComponentProps< SelectControlProps, 'select', false >,
++function UnforwardedSelectControl< V extends string >(
++	props: WordPressComponentProps< SelectControlProps< V >, 'select', false >,
+ 	ref: React.ForwardedRef< HTMLSelectElement >
+ ) {
+ 	const {
+@@ -82,12 +82,14 @@ function UnforwardedSelectControl(
+ 			const selectedOptions = Array.from( event.target.options ).filter(
+ 				( { selected } ) => selected
+ 			);
+-			const newValues = selectedOptions.map( ( { value } ) => value );
++			const newValues = selectedOptions.map(
++				( { value } ) => value as V
++			);
+ 			props.onChange?.( newValues, { event } );
+ 			return;
+ 		}
+ 
+-		props.onChange?.( event.target.value, { event } );
++		props.onChange?.( event.target.value as V, { event } );
+ 	};
+ 
+ 	const classes = clsx( 'components-select-control', className );
+@@ -164,6 +166,14 @@ function UnforwardedSelectControl(
+  * };
+  * ```
+  */
+-export const SelectControl = forwardRef( UnforwardedSelectControl );
++export const SelectControl = forwardRef( UnforwardedSelectControl ) as <
++	V extends string,
++>(
++	props: WordPressComponentProps<
++		SelectControlProps< V >,
++		'select',
++		false
++	> & { ref?: React.Ref< HTMLSelectElement > }
++) => React.JSX.Element | null;
+ 
+ export default SelectControl;
+diff --git a/packages/components/src/select-control/test/select-control.tsx b/packages/components/src/select-control/test/select-control.tsx
+index f2da74d9a6e911..0e8a6891087043 100644
+--- a/packages/components/src/select-control/test/select-control.tsx
++++ b/packages/components/src/select-control/test/select-control.tsx
+@@ -100,4 +100,129 @@ describe( 'SelectControl', () => {
+ 			screen.getByRole( 'option', { name: 'Aria label' } )
+ 		).toBeInTheDocument();
+ 	} );
++
++	/* eslint-disable jest/expect-expect */
++	describe( 'static typing', () => {
++		describe( 'single', () => {
++			it( 'should infer the value type from available `options`, but not the `value` or `onChange` prop', () => {
++				const onChange: ( value: 'foo' | 'bar' ) => void = () => {};
++
++				<SelectControl
++					value="narrow"
++					options={ [
++						{
++							value: 'narrow',
++							label: 'Narrow',
++						},
++						{
++							value: 'value',
++							label: 'Value',
++						},
++					] }
++					// @ts-expect-error onChange type is not compatible with inferred value type
++					onChange={ onChange }
++				/>;
++
++				<SelectControl
++					// @ts-expect-error "string" is not "narrow" or "value"
++					value="string"
++					options={ [
++						{
++							value: 'narrow',
++							label: 'Narrow',
++						},
++						{
++							value: 'value',
++							label: 'Value',
++						},
++					] }
++					// @ts-expect-error "string" is not "narrow" or "value"
++					onChange={ ( value ) => value === 'string' }
++				/>;
++			} );
++
++			it( 'should accept an explicit type argument', () => {
++				<SelectControl< 'narrow' | 'value' >
++					// @ts-expect-error "string" is not "narrow" or "value"
++					value="string"
++					options={ [
++						{
++							value: 'narrow',
++							label: 'Narrow',
++						},
++						{
++							// @ts-expect-error "string" is not "narrow" or "value"
++							value: 'string',
++							label: 'String',
++						},
++					] }
++				/>;
++			} );
++		} );
++
++		describe( 'multiple', () => {
++			it( 'should infer the value type from available `options`, but not the `value` or `onChange` prop', () => {
++				const onChange: (
++					value: ( 'foo' | 'bar' )[]
++				) => void = () => {};
++
++				<SelectControl
++					multiple
++					value={ [ 'narrow' ] }
++					options={ [
++						{
++							value: 'narrow',
++							label: 'Narrow',
++						},
++						{
++							value: 'value',
++							label: 'Value',
++						},
++					] }
++					// @ts-expect-error onChange type is not compatible with inferred value type
++					onChange={ onChange }
++				/>;
++
++				<SelectControl
++					multiple
++					// @ts-expect-error "string" is not "narrow" or "value"
++					value={ [ 'string' ] }
++					options={ [
++						{
++							value: 'narrow',
++							label: 'Narrow',
++						},
++						{
++							value: 'value',
++							label: 'Value',
++						},
++					] }
++					onChange={ ( value ) =>
++						// @ts-expect-error "string" is not "narrow" or "value"
++						value.forEach( ( v ) => v === 'string' )
++					}
++				/>;
++			} );
++
++			it( 'should accept an explicit type argument', () => {
++				<SelectControl< 'narrow' | 'value' >
++					multiple
++					// @ts-expect-error "string" is not "narrow" or "value"
++					value={ [ 'string' ] }
++					options={ [
++						{
++							value: 'narrow',
++							label: 'Narrow',
++						},
++						{
++							// @ts-expect-error "string" is not "narrow" or "value"
++							value: 'string',
++							label: 'String',
++						},
++					] }
++				/>;
++			} );
++		} );
++	} );
++	/* eslint-enable jest/expect-expect */
+ } );
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+index a5d0d740c593cc..4e7211ab9abfb2 100644
+--- a/packages/components/src/select-control/types.ts
++++ b/packages/components/src/select-control/types.ts
+@@ -9,7 +9,7 @@ import type { ChangeEvent, ReactNode } from 'react';
+ import type { InputBaseProps } from '../input-control/types';
+ import type { BaseControlProps } from '../base-control/types';
+ 
+-type SelectControlBaseProps = Pick<
++type SelectControlBaseProps< V extends string > = Pick<
+ 	InputBaseProps,
+ 	| '__next36pxDefaultSize'
+ 	| '__next40pxDefaultSize'
+@@ -27,7 +27,7 @@ type SelectControlBaseProps = Pick<
+ 		 * each with a `label` and `value` property, as well as any other
+ 		 * `<option>` attributes.
+ 		 */
+-		options?: ( {
++		options?: readonly ( {
+ 			/**
+ 			 * The label to be shown to the user.
+ 			 */
+@@ -36,7 +36,7 @@ type SelectControlBaseProps = Pick<
+ 			 * The internal value used to choose the selected value.
+ 			 * This is also the value passed to `onChange` when the option is selected.
+ 			 */
+-			value: string;
++			value: V;
+ 		} & Omit<
+ 			React.OptionHTMLAttributes< HTMLOptionElement >,
+ 			'label' | 'value'
+@@ -54,60 +54,62 @@ type SelectControlBaseProps = Pick<
+ 		variant?: 'default' | 'minimal';
+ 	};
+ 
+-export type SelectControlSingleSelectionProps = SelectControlBaseProps & {
+-	/**
+-	 * If this property is added, multiple values can be selected. The `value` passed should be an array.
+-	 *
+-	 * In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
+-	 *
+-	 * @default false
+-	 */
+-	multiple?: false;
+-	/**
+-	 * The value of the selected option.
+-	 *
+-	 * If `multiple` is true, the `value` should be an array with the values of the selected options.
+-	 */
+-	value?: string;
+-	/**
+-	 * A function that receives the value of the new option that is being selected as input.
+-	 *
+-	 * If `multiple` is `true`, the value received is an array of the selected value.
+-	 * Otherwise, the value received is a single value with the new selected value.
+-	 */
+-	onChange?: (
+-		value: string,
+-		extra?: { event?: ChangeEvent< HTMLSelectElement > }
+-	) => void;
+-};
++export type SelectControlSingleSelectionProps< V extends string = string > =
++	SelectControlBaseProps< V > & {
++		/**
++		 * If this property is added, multiple values can be selected. The `value` passed should be an array.
++		 *
++		 * In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
++		 *
++		 * @default false
++		 */
++		multiple?: false;
++		/**
++		 * The value of the selected option.
++		 *
++		 * If `multiple` is true, the `value` should be an array with the values of the selected options.
++		 */
++		value?: NoInfer< V >;
++		/**
++		 * A function that receives the value of the new option that is being selected as input.
++		 *
++		 * If `multiple` is `true`, the value received is an array of the selected value.
++		 * Otherwise, the value received is a single value with the new selected value.
++		 */
++		onChange?: (
++			value: NoInfer< V >,
++			extra?: { event?: ChangeEvent< HTMLSelectElement > }
++		) => void;
++	};
+ 
+-export type SelectControlMultipleSelectionProps = SelectControlBaseProps & {
+-	/**
+-	 * If this property is added, multiple values can be selected. The `value` passed should be an array.
+-	 *
+-	 * In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
+-	 *
+-	 * @default false
+-	 */
+-	multiple: true;
+-	/**
+-	 * The value of the selected option.
+-	 *
+-	 * If `multiple` is true, the `value` should be an array with the values of the selected options.
+-	 */
+-	value?: string[];
+-	/**
+-	 * A function that receives the value of the new option that is being selected as input.
+-	 *
+-	 * If `multiple` is `true`, the value received is an array of the selected value.
+-	 * Otherwise, the value received is a single value with the new selected value.
+-	 */
+-	onChange?: (
+-		value: string[],
+-		extra?: { event?: ChangeEvent< HTMLSelectElement > }
+-	) => void;
+-};
++export type SelectControlMultipleSelectionProps< V extends string > =
++	SelectControlBaseProps< V > & {
++		/**
++		 * If this property is added, multiple values can be selected. The `value` passed should be an array.
++		 *
++		 * In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
++		 *
++		 * @default false
++		 */
++		multiple: true;
++		/**
++		 * The value of the selected option.
++		 *
++		 * If `multiple` is true, the `value` should be an array with the values of the selected options.
++		 */
++		value?: NoInfer< V >[];
++		/**
++		 * A function that receives the value of the new option that is being selected as input.
++		 *
++		 * If `multiple` is `true`, the value received is an array of the selected value.
++		 * Otherwise, the value received is a single value with the new selected value.
++		 */
++		onChange?: (
++			value: NoInfer< V >[],
++			extra?: { event?: ChangeEvent< HTMLSelectElement > }
++		) => void;
++	};
+ 
+-export type SelectControlProps =
+-	| SelectControlSingleSelectionProps
+-	| SelectControlMultipleSelectionProps;
++export type SelectControlProps< V extends string = string > =
++	| SelectControlSingleSelectionProps< V >
++	| SelectControlMultipleSelectionProps< V >;

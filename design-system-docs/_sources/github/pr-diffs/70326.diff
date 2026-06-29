@@ -1,0 +1,136 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f1703404fd8d55..24629cbde59cbf 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,10 @@
+ 
+ -   `TextControl`: Improve theming support ([#70910](https://github.com/WordPress/gutenberg/pull/70910)).
+ 
++### Internal
++
++-	`RangeControl`: Add placement prop to replace position ([#70326](https://github.com/WordPress/gutenberg/pull/70326)).
++
+ ## 30.0.0 (2025-07-23)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index 1ef761622524f5..deeb17738e5bc0 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -314,7 +314,7 @@ function UnforwardedRangeControl(
+ 						<SimpleTooltip
+ 							className="components-range-control__tooltip"
+ 							inputRef={ inputRef }
+-							tooltipPosition="bottom"
++							tooltipPlacement="bottom"
+ 							renderTooltipContent={ renderTooltipContent }
+ 							show={ isCurrentlyFocused || showTooltip }
+ 							style={ offsetStyle }
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index c86c57800cac46..36d48a6e90ea5e 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -283,8 +283,8 @@ const tooltipShow = ( { show }: TooltipProps ) => {
+ 	`;
+ };
+ 
+-const tooltipPosition = ( { position }: TooltipProps ) => {
+-	const isBottom = position === 'bottom';
++const tooltipPlacement = ( { placement }: TooltipProps ) => {
++	const isBottom = placement === 'bottom';
+ 
+ 	if ( isBottom ) {
+ 		return css`
+@@ -312,7 +312,7 @@ export const Tooltip = styled.span< TooltipProps >`
+ 
+ 	${ tooltipShow };
+ 
+-	${ tooltipPosition };
++	${ tooltipPlacement };
+ 	${ rtl(
+ 		{ transform: 'translateX(-50%)' },
+ 		{ transform: 'translateX(50%)' }
+diff --git a/packages/components/src/range-control/tooltip.tsx b/packages/components/src/range-control/tooltip.tsx
+index 4156c026464347..c35d321b860ebf 100644
+--- a/packages/components/src/range-control/tooltip.tsx
++++ b/packages/components/src/range-control/tooltip.tsx
+@@ -22,7 +22,7 @@ export default function SimpleTooltip(
+ 	const {
+ 		className,
+ 		inputRef,
+-		tooltipPosition,
++		tooltipPlacement,
+ 		show = false,
+ 		style = {},
+ 		value = 0,
+@@ -30,7 +30,7 @@ export default function SimpleTooltip(
+ 		zIndex = 100,
+ 		...restProps
+ 	} = props;
+-	const position = useTooltipPosition( { inputRef, tooltipPosition } );
++	const placement = useTooltipPlacement( { inputRef, tooltipPlacement } );
+ 	const classes = clsx( 'components-simple-tooltip', className );
+ 	const styles = {
+ 		...style,
+@@ -42,7 +42,7 @@ export default function SimpleTooltip(
+ 			{ ...restProps }
+ 			aria-hidden="false"
+ 			className={ classes }
+-			position={ position }
++			placement={ placement }
+ 			show={ show }
+ 			role="tooltip"
+ 			style={ styles }
+@@ -52,26 +52,26 @@ export default function SimpleTooltip(
+ 	);
+ }
+ 
+-function useTooltipPosition( { inputRef, tooltipPosition }: TooltipProps ) {
+-	const [ position, setPosition ] = useState< string >();
++function useTooltipPlacement( { inputRef, tooltipPlacement }: TooltipProps ) {
++	const [ placement, setPlacement ] = useState< string >();
+ 
+-	const setTooltipPosition = useCallback( () => {
++	const setTooltipPlacement = useCallback( () => {
+ 		if ( inputRef && inputRef.current ) {
+-			setPosition( tooltipPosition );
++			setPlacement( tooltipPlacement );
+ 		}
+-	}, [ tooltipPosition, inputRef ] );
++	}, [ tooltipPlacement, inputRef ] );
+ 
+ 	useEffect( () => {
+-		setTooltipPosition();
+-	}, [ setTooltipPosition ] );
++		setTooltipPlacement();
++	}, [ setTooltipPlacement ] );
+ 
+ 	useEffect( () => {
+-		window.addEventListener( 'resize', setTooltipPosition );
++		window.addEventListener( 'resize', setTooltipPlacement );
+ 
+ 		return () => {
+-			window.removeEventListener( 'resize', setTooltipPosition );
++			window.removeEventListener( 'resize', setTooltipPlacement );
+ 		};
+ 	} );
+ 
+-	return position;
++	return placement;
+ }
+diff --git a/packages/components/src/range-control/types.ts b/packages/components/src/range-control/types.ts
+index e4792296f83144..33b8d7d6f23873 100644
+--- a/packages/components/src/range-control/types.ts
++++ b/packages/components/src/range-control/types.ts
+@@ -269,9 +269,9 @@ export type ThumbProps = {
+ 
+ export type TooltipProps = {
+ 	show?: boolean;
+-	position?: string;
++	placement?: string;
+ 	inputRef?: MutableRefObject< HTMLElement | undefined >;
+-	tooltipPosition?: string;
++	tooltipPlacement?: string;
+ 	value?: ControlledRangeValue;
+ 	renderTooltipContent?: (
+ 		value?: ControlledRangeValue

@@ -1,0 +1,42 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ba0d68d5c12c09..45f99c71af58ac 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -30,6 +30,7 @@
+ ### Internal
+ 
+ -   ESLint: Stop disabling `react-hooks/exhaustive-deps` rule ([#66324](https://github.com/WordPress/gutenberg/pull/66324)).
++-   `TabPanel`: Add 40px size prop to tab Button ([#66557](https://github.com/WordPress/gutenberg/pull/66557)).
+ 
+ ## 28.10.0 (2024-10-16)
+ 
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index f9db745b424260..be06b42fcd013f 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -220,6 +220,7 @@ const UnforwardedTabPanel = (
+ 							) }-view` }
+ 							render={
+ 								<Button
++									__next40pxDefaultSize
+ 									icon={ tab.icon }
+ 									label={ tab.icon && tab.title }
+ 									showTooltip={ !! tab.icon }
+diff --git a/packages/components/src/tab-panel/style.scss b/packages/components/src/tab-panel/style.scss
+index 229b32c7477e87..b54f7af1bf4ded 100644
+--- a/packages/components/src/tab-panel/style.scss
++++ b/packages/components/src/tab-panel/style.scss
+@@ -7,12 +7,10 @@
+ 	}
+ }
+ 
+-// This tab style CSS is duplicated verbatim in
+-// /packages/edit-post/src/components/sidebar/settings-header/style.scss
+ .components-tab-panel__tabs-item {
+ 	position: relative;
+ 	border-radius: 0;
+-	height: $grid-unit-60;
++	height: $grid-unit-60 !important; // https://github.com/WordPress/gutenberg/pull/65075#discussion_r1746282734
+ 	background: transparent;
+ 	border: none;
+ 	box-shadow: none;

@@ -1,0 +1,40 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 02e1fde1b85cba..5f7665a2cb2336 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,7 @@
+ -   `ToolsPanel`: Remove line-height workaround for control labels ([#73892](https://github.com/WordPress/gutenberg/pull/73892)).
+ -   `Notice`: Add right margin to content only when dismissible ([#73905](https://github.com/WordPress/gutenberg/pull/73905)).
+ -   `Popover`: Update animation, also affecting `Autocomplete`, `BorderControl`, `CircularOptionPicker`, `ColorPalette`, `Dropdown`, `DropdownMenu`, and `PaletteEdit` ([#74082](https://github.com/WordPress/gutenberg/pull/74082)).
++-   `Autocomplete`: Add offset to popover ([#74084](https://github.com/WordPress/gutenberg/pull/74084)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.tsx b/packages/components/src/autocomplete/autocompleter-ui.tsx
+index dbbbe724113d7c..6960042a6834b1 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.tsx
++++ b/packages/components/src/autocomplete/autocompleter-ui.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import clsx from 'clsx';
++import { createPortal } from 'react-dom';
+ 
+ /**
+  * WordPress dependencies
+@@ -24,7 +25,6 @@ import getDefaultUseItems from './get-default-use-items';
+ import Button from '../button';
+ import Popover from '../popover';
+ import { VisuallyHidden } from '../visually-hidden';
+-import { createPortal } from 'react-dom';
+ import type { AutocompleterUIProps, KeyedOption, WPCompleter } from './types';
+ 
+ type ListBoxProps = {
+@@ -177,6 +177,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
+ 		return (
+ 			<>
+ 				<Popover
++					offset={ 8 }
+ 					focusOnMount={ false }
+ 					onClose={ onReset }
+ 					placement="top-start"

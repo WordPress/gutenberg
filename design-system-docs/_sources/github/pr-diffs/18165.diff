@@ -1,0 +1,64 @@
+diff --git a/packages/components/src/base-control/index.js b/packages/components/src/base-control/index.js
+index 3abe25ee062823..097b9f7efd685b 100644
+--- a/packages/components/src/base-control/index.js
++++ b/packages/components/src/base-control/index.js
+@@ -3,14 +3,21 @@
+  */
+ import classnames from 'classnames';
+ 
++/**
++ * Internal dependencies
++ */
++import VisuallyHidden from '../visually-hidden';
++
+ function BaseControl( { id, label, hideLabelFromVision, help, className, children } ) {
+ 	return (
+ 		<div className={ classnames( 'components-base-control', className ) }>
+ 			<div className="components-base-control__field">
+-				{ label && id && <label
+-					className={ classnames( 'components-base-control__label', { 'screen-reader-text': hideLabelFromVision } ) }
+-					htmlFor={ id }>{ label }
+-				</label> }
++				{ label && id && hideLabelFromVision && <VisuallyHidden
++					as="label"
++					htmlFor={ id }>{ label }</VisuallyHidden> }
++				{ label && id && ! hideLabelFromVision && <label
++					className="components-base-control__label"
++					htmlFor={ id }>{ label }</label> }
+ 				{ label && ! id && <BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel> }
+ 				{ children }
+ 			</div>
+diff --git a/packages/components/src/form-token-field/token.js b/packages/components/src/form-token-field/token.js
+index 93af65a064fd8a..0e83faa1733093 100644
+--- a/packages/components/src/form-token-field/token.js
++++ b/packages/components/src/form-token-field/token.js
+@@ -14,6 +14,7 @@ import { __, sprintf } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import IconButton from '../icon-button';
++import VisuallyHidden from '../visually-hidden';
+ 
+ function Token( {
+ 	value,
+@@ -60,7 +61,7 @@ function Token( {
+ 				className="components-form-token-field__token-text"
+ 				id={ `components-form-token-field__token-text-${ instanceId }` }
+ 			>
+-				<span className="screen-reader-text">{ termPositionAndCount }</span>
++				<VisuallyHidden as="span">{ termPositionAndCount }</VisuallyHidden>
+ 				<span aria-hidden="true">{ transformedValue }</span>
+ 			</span>
+ 
+diff --git a/packages/e2e-tests/specs/editor/various/taxonomies.test.js b/packages/e2e-tests/specs/editor/various/taxonomies.test.js
+index 4ed0ef3945fe61..f68343dcb2866f 100644
+--- a/packages/e2e-tests/specs/editor/various/taxonomies.test.js
++++ b/packages/e2e-tests/specs/editor/various/taxonomies.test.js
+@@ -16,7 +16,7 @@ import {
+ /**
+  * Module constants
+  */
+-const TAG_TOKEN_SELECTOR = '.components-form-token-field__token-text span:not(.screen-reader-text)';
++const TAG_TOKEN_SELECTOR = '.components-form-token-field__token-text span:not(.components-visually-hidden)';
+ 
+ describe( 'Taxonomies', () => {
+ 	const canCreatTermInTaxonomy = ( taxonomy ) => {

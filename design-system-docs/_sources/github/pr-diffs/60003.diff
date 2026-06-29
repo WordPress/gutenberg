@@ -1,0 +1,51 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 638c5d2b16c83d..cf30aff19c503b 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -737,12 +737,6 @@
+ 		"markdown_source": "../packages/components/src/confirm-dialog/README.md",
+ 		"parent": "components"
+ 	},
+-	{
+-		"title": "CustomSelectControlV2",
+-		"slug": "custom-select-control-v2",
+-		"markdown_source": "../packages/components/src/custom-select-control-v2/README.md",
+-		"parent": "components"
+-	},
+ 	{
+ 		"title": "CustomSelectControl",
+ 		"slug": "custom-select-control",
+@@ -1199,12 +1193,6 @@
+ 		"markdown_source": "../packages/components/src/tab-panel/README.md",
+ 		"parent": "components"
+ 	},
+-	{
+-		"title": "Tabs",
+-		"slug": "tabs",
+-		"markdown_source": "../packages/components/src/tabs/README.md",
+-		"parent": "components"
+-	},
+ 	{
+ 		"title": "TextControl",
+ 		"slug": "text-control",
+diff --git a/docs/tool/manifest.js b/docs/tool/manifest.js
+index ced8866edd5a4e..2b799aab7983a6 100644
+--- a/docs/tool/manifest.js
++++ b/docs/tool/manifest.js
+@@ -8,13 +8,15 @@ const { join } = require( 'path' );
+ 
+ const baseRepoUrl = '..';
+ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
+-	// Don't expose documentation for mobile only and G2 components just yet.
++	// Don't expose documentation for mobile only and private components just yet.
+ 	ignore: [
+ 		'**/src/mobile/**/README.md',
+ 		'packages/components/src/theme/README.md',
+ 		'packages/components/src/view/README.md',
+ 		'packages/components/src/dropdown-menu-v2/README.md',
+ 		'packages/components/src/progress-bar/README.md',
++		'packages/components/src/tabs/README.md',
++		'packages/components/src/custom-select-control-v2/README.md',
+ 	],
+ } );
+ const packagePaths = glob( 'packages/*/package.json' )

@@ -1,0 +1,488 @@
+diff --git a/packages/boot/src/components/canvas/back-button.scss b/packages/boot/src/components/canvas/back-button.scss
+index 6f3c4820d964d7..64d12c1bbd76c9 100644
+--- a/packages/boot/src/components/canvas/back-button.scss
++++ b/packages/boot/src/components/canvas/back-button.scss
+@@ -32,9 +32,9 @@
+ 
+ 	&:focus:not(:active) {
+ 		outline:
+-			var(--wpds-border-width-interactive-focus) solid
++			var(--wpds-border-width-focus) solid
+ 			var(--wpds-color-stroke-focus-brand);
+-		outline-offset: calc(-1 * var(--wpds-border-width-interactive-focus));
++		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+ 	}
+ }
+ 
+diff --git a/packages/boot/src/components/navigation/navigation-item/style.scss b/packages/boot/src/components/navigation/navigation-item/style.scss
+index 6244fa3d91dc93..0416593a1da9e8 100644
+--- a/packages/boot/src/components/navigation/navigation-item/style.scss
++++ b/packages/boot/src/components/navigation/navigation-item/style.scss
+@@ -19,7 +19,7 @@
+ 	}
+ 
+ 	// Rounded focus ring
+-	border-radius: var(--wpds-border-radius-surface-sm, 2px);
++	border-radius: var(--wpds-border-radius-sm, 2px);
+ 
+ 	&.active,
+ 	&:hover,
+diff --git a/packages/boot/src/components/site-hub/style.scss b/packages/boot/src/components/site-hub/style.scss
+index 429e3d6e0cf259..cab5628f7fdf21 100644
+--- a/packages/boot/src/components/site-hub/style.scss
++++ b/packages/boot/src/components/site-hub/style.scss
+@@ -45,9 +45,9 @@
+ 
+ 	&:focus:not(:active) {
+ 		outline:
+-			var(--wpds-border-width-interactive-focus, 2px) solid
++			var(--wpds-border-width-focus, 2px) solid
+ 			var(--wpds-color-stroke-focus-brand, #0073aa);
+-		outline-offset: calc(-1 * var(--wpds-border-width-interactive-focus, 2px));
++		outline-offset: calc(-1 * var(--wpds-border-width-focus, 2px));
+ 	}
+ }
+ 
+diff --git a/packages/boot/src/components/site-icon-link/style.scss b/packages/boot/src/components/site-icon-link/style.scss
+index da0d3980960c58..db403792faea4f 100644
+--- a/packages/boot/src/components/site-icon-link/style.scss
++++ b/packages/boot/src/components/site-icon-link/style.scss
+@@ -17,8 +17,8 @@ $header-height: variables.$header-height;
+ 
+ 	&:focus:not(:active) {
+ 		outline:
+-			var(--wpds-border-width-interactive-focus, 2px) solid
++			var(--wpds-border-width-focus, 2px) solid
+ 			var(--wpds-color-stroke-focus-brand, #0073aa);
+-		outline-offset: calc(-1 * var(--wpds-border-width-interactive-focus, 2px));
++		outline-offset: calc(-1 * var(--wpds-border-width-focus, 2px));
+ 	}
+ }
+diff --git a/packages/boot/src/components/site-icon/style.scss b/packages/boot/src/components/site-icon/style.scss
+index e111efbcad6a0c..616ec52ff756ef 100644
+--- a/packages/boot/src/components/site-icon/style.scss
++++ b/packages/boot/src/components/site-icon/style.scss
+@@ -15,5 +15,5 @@
+ 	height: variables.$grid-unit-40;
+ 	object-fit: cover;
+ 	aspect-ratio: 1 / 1;
+-	border-radius: var(--wpds-border-radius-surface-md, 4px);
++	border-radius: var(--wpds-border-radius-md, 4px);
+ }
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 77ea2842cfdca5..e20967d6843c08 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -6,6 +6,17 @@
+ 
+ ### Breaking changes
+ 
++-   Renamed border tokens to remove the `surface` segment from token names ([#74617](https://github.com/WordPress/gutenberg/pull/74617)):
++		- `--wpds-border-radius-surface-xs`: use `--wpds-border-radius-xs` instead.
++		- `--wpds-border-radius-surface-sm`: use `--wpds-border-radius-sm` instead.
++		- `--wpds-border-radius-surface-md`: use `--wpds-border-radius-md` instead.
++		- `--wpds-border-radius-surface-lg`: use `--wpds-border-radius-lg` instead.
++		- `--wpds-border-width-surface-xs`: use `--wpds-border-width-xs` instead.
++		- `--wpds-border-width-surface-sm`: use `--wpds-border-width-sm` instead.
++		- `--wpds-border-width-surface-md`: use `--wpds-border-width-md` instead.
++		- `--wpds-border-width-surface-lg`: use `--wpds-border-width-lg` instead.
++		- `--wpds-border-width-interactive-focus`: use `--wpds-border-width-focus` instead.
++
+ -   Removed the following tokens ([#74470](https://github.com/WordPress/gutenberg/pull/74470)):
+ 		- `--wpds-color-bg-interactive-neutral`: use `--wpds-color-bg-interactive-neutral-weak` instead.
+ 		- `--wpds-color-bg-interactive-neutral-active`: use `--wpds-color-bg-interactive-neutral-weak-active` instead.
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index 3424407d79bef8..a256281ad1be83 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -9,17 +9,17 @@ Do not edit directly.
+ 
+ ### Border
+ 
+-| Variable name                           | Description                     |
+-| --------------------------------------- | ------------------------------- |
+-| `--wpds-border-radius-surface-xs`       | Extra small radius for surfaces |
+-| `--wpds-border-radius-surface-sm`       | Small radius for surfaces       |
+-| `--wpds-border-radius-surface-md`       | Medium radius for surfaces      |
+-| `--wpds-border-radius-surface-lg`       | Large radius for surfaces       |
+-| `--wpds-border-width-surface-xs`        | Extra small width for surfaces  |
+-| `--wpds-border-width-surface-sm`        | Small width for surfaces        |
+-| `--wpds-border-width-surface-md`        | Medium width for surfaces       |
+-| `--wpds-border-width-surface-lg`        | Large width for surfaces        |
+-| `--wpds-border-width-interactive-focus` | Border width for focus ring     |
++| Variable name               | Description                 |
++| --------------------------- | --------------------------- |
++| `--wpds-border-radius-xs`   | Extra small radius          |
++| `--wpds-border-radius-sm`   | Small radius                |
++| `--wpds-border-radius-md`   | Medium radius               |
++| `--wpds-border-radius-lg`   | Large radius                |
++| `--wpds-border-width-xs`    | Extra small width           |
++| `--wpds-border-width-sm`    | Small width                 |
++| `--wpds-border-width-md`    | Medium width                |
++| `--wpds-border-width-lg`    | Large width                 |
++| `--wpds-border-width-focus` | Border width for focus ring |
+ 
+ ### Color
+ 
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index e18ad8bcc8b200..f420be9c7d910d 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -3,15 +3,15 @@
+  * ------------------------------------------- */
+ 
+ :root {
+-	--wpds-border-radius-surface-lg: 8px; /* Large radius for surfaces */
+-	--wpds-border-radius-surface-md: 4px; /* Medium radius for surfaces */
+-	--wpds-border-radius-surface-sm: 2px; /* Small radius for surfaces */
+-	--wpds-border-radius-surface-xs: 1px; /* Extra small radius for surfaces */
+-	--wpds-border-width-interactive-focus: 2px; /* Border width for focus ring */
+-	--wpds-border-width-surface-lg: 8px; /* Large width for surfaces */
+-	--wpds-border-width-surface-md: 4px; /* Medium width for surfaces */
+-	--wpds-border-width-surface-sm: 2px; /* Small width for surfaces */
+-	--wpds-border-width-surface-xs: 1px; /* Extra small width for surfaces */
++	--wpds-border-radius-lg: 8px; /* Large radius */
++	--wpds-border-radius-md: 4px; /* Medium radius */
++	--wpds-border-radius-sm: 2px; /* Small radius */
++	--wpds-border-radius-xs: 1px; /* Extra small radius */
++	--wpds-border-width-focus: 2px; /* Border width for focus ring */
++	--wpds-border-width-lg: 8px; /* Large width */
++	--wpds-border-width-md: 4px; /* Medium width */
++	--wpds-border-width-sm: 2px; /* Small width */
++	--wpds-border-width-xs: 1px; /* Extra small width */
+ 	--wpds-color-bg-interactive-brand-strong: #3858e9; /* Background color for interactive elements with brand tone and strong emphasis. */
+ 	--wpds-color-bg-interactive-brand-strong-active: #2e49d9; /* Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active. */
+ 	--wpds-color-bg-interactive-brand-weak: #00000000; /* Background color for interactive elements with brand tone and weak emphasis. */
+@@ -186,6 +186,6 @@
+ 
+ @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {
+ 	:root {
+-		--wpds-border-width-interactive-focus: 1.5px; /* Border width for focus ring */
++		--wpds-border-width-focus: 1.5px; /* Border width for focus ring */
+ 	}
+ }
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index 77685322fcfb48..53afbadde48356 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -4,15 +4,15 @@
+  */
+ 
+ export default [
+-	'--wpds-border-radius-surface-xs',
+-	'--wpds-border-radius-surface-sm',
+-	'--wpds-border-radius-surface-md',
+-	'--wpds-border-radius-surface-lg',
+-	'--wpds-border-width-surface-xs',
+-	'--wpds-border-width-surface-sm',
+-	'--wpds-border-width-surface-md',
+-	'--wpds-border-width-surface-lg',
+-	'--wpds-border-width-interactive-focus',
++	'--wpds-border-radius-xs',
++	'--wpds-border-radius-sm',
++	'--wpds-border-radius-md',
++	'--wpds-border-radius-lg',
++	'--wpds-border-width-xs',
++	'--wpds-border-width-sm',
++	'--wpds-border-width-md',
++	'--wpds-border-width-lg',
++	'--wpds-border-width-focus',
+ 	'--wpds-color-bg-surface-neutral',
+ 	'--wpds-color-bg-surface-neutral-strong',
+ 	'--wpds-color-bg-surface-neutral-weak',
+diff --git a/packages/theme/src/prebuilt/ts/token-types.ts b/packages/theme/src/prebuilt/ts/token-types.ts
+index 19b4866adfdde4..44bff5be0caff6 100644
+--- a/packages/theme/src/prebuilt/ts/token-types.ts
++++ b/packages/theme/src/prebuilt/ts/token-types.ts
+@@ -21,7 +21,7 @@ export type BorderRadiusSize = 'xs' | 'sm' | 'md' | 'lg';
+ /**
+  * Size scale for border width tokens.
+  */
+-export type BorderWidthSize = 'xs' | 'sm' | 'md' | 'lg';
++export type BorderWidthSize = 'xs' | 'sm' | 'md' | 'lg' | 'focus';
+ 
+ /**
+  * Target elements that tokens can be applied to.
+diff --git a/packages/theme/src/stylelint-plugins/test/fixtures/no-unknown-ds-tokens-valid.css b/packages/theme/src/stylelint-plugins/test/fixtures/no-unknown-ds-tokens-valid.css
+index 12ba5c35aecbcf..9dbaac006a9fef 100644
+--- a/packages/theme/src/stylelint-plugins/test/fixtures/no-unknown-ds-tokens-valid.css
++++ b/packages/theme/src/stylelint-plugins/test/fixtures/no-unknown-ds-tokens-valid.css
+@@ -2,7 +2,7 @@
+ .example {
+ 	background-color: var(--wpds-color-bg-surface-neutral);
+ 	color: var(--wpds-color-fg-content-neutral);
+-	border-radius: var(--wpds-border-radius-surface-sm);
++	border-radius: var(--wpds-border-radius-sm);
+ 	padding: var(--wpds-dimension-padding-surface-md);
+ }
+ 
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index 2ec387c8dc4e21..c620faa042d029 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -114,12 +114,12 @@ export default defineConfig( {
+ 				{
+ 					name: 'BorderRadiusSize',
+ 					description: 'Size scale for border radius tokens.',
+-					patterns: [ /^wpds-border\.radius\.[^.]+\.([^.]+)$/ ],
++					patterns: [ /^wpds-border\.radius\.([^.]+)$/ ],
+ 				},
+ 				{
+ 					name: 'BorderWidthSize',
+ 					description: 'Size scale for border width tokens.',
+-					patterns: [ /^wpds-border\.width\.surface\.([^.]+)$/ ],
++					patterns: [ /^wpds-border\.width\.([^.]+)$/ ],
+ 				},
+ 				{
+ 					name: 'Target',
+diff --git a/packages/theme/tokens/border.json b/packages/theme/tokens/border.json
+index 60634fd8cf2e6d..32ad528543546a 100644
+--- a/packages/theme/tokens/border.json
++++ b/packages/theme/tokens/border.json
+@@ -2,69 +2,63 @@
+ 	"wpds-border": {
+ 		"$type": "dimension",
+ 		"radius": {
+-			"surface": {
+-				"xs": {
+-					"$value": { "value": 1, "unit": "px" },
+-					"$description": "Extra small radius for surfaces"
+-				},
+-				"sm": {
+-					"$value": { "value": 2, "unit": "px" },
+-					"$description": "Small radius for surfaces"
+-				},
+-				"md": {
+-					"$value": { "value": 4, "unit": "px" },
+-					"$description": "Medium radius for surfaces"
+-				},
+-				"lg": {
+-					"$value": { "value": 8, "unit": "px" },
+-					"$description": "Large radius for surfaces"
+-				}
++			"xs": {
++				"$value": { "value": 1, "unit": "px" },
++				"$description": "Extra small radius"
++			},
++			"sm": {
++				"$value": { "value": 2, "unit": "px" },
++				"$description": "Small radius"
++			},
++			"md": {
++				"$value": { "value": 4, "unit": "px" },
++				"$description": "Medium radius"
++			},
++			"lg": {
++				"$value": { "value": 8, "unit": "px" },
++				"$description": "Large radius"
+ 			},
+ 			"$extensions": {
+ 				"com.figma.scopes": [ "CORNER_RADIUS" ]
+ 			}
+ 		},
+ 		"width": {
+-			"surface": {
+-				"xs": {
+-					"$value": { "value": 1, "unit": "px" },
+-					"$description": "Extra small width for surfaces",
+-					"$extensions": {
+-						"com.figma.scopes": [ "STROKE_FLOAT" ]
+-					}
+-				},
+-				"sm": {
+-					"$value": { "value": 2, "unit": "px" },
+-					"$description": "Small width for surfaces",
+-					"$extensions": {
+-						"com.figma.scopes": [ "STROKE_FLOAT" ]
+-					}
+-				},
+-				"md": {
+-					"$value": { "value": 4, "unit": "px" },
+-					"$description": "Medium width for surfaces",
+-					"$extensions": {
+-						"com.figma.scopes": [ "STROKE_FLOAT" ]
+-					}
+-				},
+-				"lg": {
+-					"$value": { "value": 8, "unit": "px" },
+-					"$description": "Large width for surfaces",
+-					"$extensions": {
+-						"com.figma.scopes": [ "STROKE_FLOAT" ]
+-					}
++			"xs": {
++				"$value": { "value": 1, "unit": "px" },
++				"$description": "Extra small width",
++				"$extensions": {
++					"com.figma.scopes": [ "STROKE_FLOAT" ]
++				}
++			},
++			"sm": {
++				"$value": { "value": 2, "unit": "px" },
++				"$description": "Small width",
++				"$extensions": {
++					"com.figma.scopes": [ "STROKE_FLOAT" ]
++				}
++			},
++			"md": {
++				"$value": { "value": 4, "unit": "px" },
++				"$description": "Medium width",
++				"$extensions": {
++					"com.figma.scopes": [ "STROKE_FLOAT" ]
++				}
++			},
++			"lg": {
++				"$value": { "value": 8, "unit": "px" },
++				"$description": "Large width",
++				"$extensions": {
++					"com.figma.scopes": [ "STROKE_FLOAT" ]
+ 				}
+ 			},
+-			"interactive": {
+-				"focus": {
+-					"$value": { "value": 2, "unit": "px" },
+-					"$description": "Border width for focus ring",
+-					"$extensions": {
+-						"mode": {
+-							"high-dpi": { "value": 1.5, "unit": "px" }
+-						},
+-						"com.figma.scopes": [ "STROKE_FLOAT" ]
+-					}
++			"focus": {
++				"$value": { "value": 2, "unit": "px" },
++				"$description": "Border width for focus ring",
++				"$extensions": {
++					"mode": {
++						"high-dpi": { "value": 1.5, "unit": "px" }
++					},
++					"com.figma.scopes": [ "STROKE_FLOAT" ]
+ 				}
+ 			}
+ 		}
+diff --git a/packages/theme/tokens/modes/border.high-dpi.json b/packages/theme/tokens/modes/border.high-dpi.json
+index fafbac21ded55b..189c6d2a5bd643 100644
+--- a/packages/theme/tokens/modes/border.high-dpi.json
++++ b/packages/theme/tokens/modes/border.high-dpi.json
+@@ -1,13 +1,11 @@
+ {
+ 	"wpds-border": {
+ 		"width": {
+-			"interactive": {
+-				"focus": {
+-					"$type": "dimension",
+-					"$value": {
+-						"value": 1.5,
+-						"unit": "px"
+-					}
++			"focus": {
++				"$type": "dimension",
++				"$value": {
++					"value": 1.5,
++					"unit": "px"
+ 				}
+ 			}
+ 		}
+diff --git a/packages/ui/src/box/box.tsx b/packages/ui/src/box/box.tsx
+index 10c8ea89255895..aab1d1fecb78cb 100644
+--- a/packages/ui/src/box/box.tsx
++++ b/packages/ui/src/box/box.tsx
+@@ -96,11 +96,11 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
+ 	}
+ 
+ 	if ( borderRadius ) {
+-		style.borderRadius = `var(--wpds-border-radius-${ target }-${ borderRadius }, var(--wpds-border-radius-surface-${ borderRadius }))`;
++		style.borderRadius = `var(--wpds-border-radius-${ target }-${ borderRadius }, var(--wpds-border-radius-${ borderRadius }))`;
+ 	}
+ 
+ 	if ( borderWidth ) {
+-		style.borderWidth = `var(--wpds-border-width-${ target }-${ borderWidth }, var(--wpds-border-width-surface-${ borderWidth }))`;
++		style.borderWidth = `var(--wpds-border-width-${ target }-${ borderWidth }, var(--wpds-border-width-${ borderWidth }))`;
+ 		style.borderStyle = 'solid';
+ 	}
+ 
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+index ca05c69bd2f13a..ed1aad330b5704 100644
+--- a/packages/ui/src/button/style.module.css
++++ b/packages/ui/src/button/style.module.css
+@@ -39,7 +39,7 @@
+ 		border-style: solid;
+ 		border-width: 1px;
+ 		border-color: var(--wp-ui-button-border-color);
+-		border-radius: var(--wpds-border-radius-surface-sm);
++		border-radius: var(--wpds-border-radius-sm);
+ 		background-color: var(--wp-ui-button-background-color);
+ 		background-clip: padding-box;
+ 		font-family: var(--wpds-font-family-body);
+@@ -102,7 +102,7 @@
+ 			height: var(--wp-ui-button-font-size);
+ 			aspect-ratio: 1;
+ 
+-			border: var(--wpds-border-width-interactive-focus) solid;
++			border: var(--wpds-border-width-focus) solid;
+ 			border-block-start-color: var(--wp-ui-button-foreground-color);
+ 			border-inline-end-color: var(--wp-ui-button-foreground-color);
+ 			border-block-end-color: transparent;
+diff --git a/packages/ui/src/form/primitives/input-layout/style.module.css b/packages/ui/src/form/primitives/input-layout/style.module.css
+index 0169d86db5b662..b52c878752235b 100644
+--- a/packages/ui/src/form/primitives/input-layout/style.module.css
++++ b/packages/ui/src/form/primitives/input-layout/style.module.css
+@@ -8,10 +8,10 @@
+ 		display: flex;
+ 		height: 40px;
+ 		background-color: var(--wpds-color-bg-interactive-neutral-weak);
+-		border-width: var(--wpds-border-width-surface-xs);
++		border-width: var(--wpds-border-width-xs);
+ 		border-style: solid;
+ 		border-color: var(--wpds-color-stroke-interactive-neutral);
+-		border-radius: var(--wpds-border-radius-surface-sm);
++		border-radius: var(--wpds-border-radius-sm);
+ 		font-family: var(--wpds-font-family-body);
+ 		font-size: max(var(--wpds-font-size-md), 16px); /* avoid mobile zoom */
+ 		line-height: 1;
+diff --git a/packages/ui/src/tooltip/style.module.css b/packages/ui/src/tooltip/style.module.css
+index 385fd3f24586eb..db295a88bc9b63 100644
+--- a/packages/ui/src/tooltip/style.module.css
++++ b/packages/ui/src/tooltip/style.module.css
+@@ -10,7 +10,7 @@
+ 		padding:
+ 			var(--wpds-dimension-padding-surface-2xs)
+ 			var(--wpds-dimension-padding-surface-xs);
+-		border-radius: var(--wpds-border-radius-surface-sm);
++		border-radius: var(--wpds-border-radius-sm);
+ 		font-family: var(--wpds-font-family-body);
+ 		font-size: var(--wpds-font-size-sm);
+ 		line-height: 1.4; /* TODO: use DS token for line height */
+diff --git a/packages/ui/src/utils/css/focus.module.css b/packages/ui/src/utils/css/focus.module.css
+index 57e2b610e49e4c..9a48e96826a460 100644
+--- a/packages/ui/src/utils/css/focus.module.css
++++ b/packages/ui/src/utils/css/focus.module.css
+@@ -25,7 +25,7 @@
+ 	.outset-ring--focus-within:focus-within,
+ 	.outset-ring--focus-within-except-active:focus-within:not(:has(:active)),
+ 	.outset-ring--focus-within-visible:focus-within:has(:focus-visible) {
+-		outline-width: var(--wpds-border-width-interactive-focus);
++		outline-width: var(--wpds-border-width-focus);
+ 		outline-color: var(--wpds-color-stroke-focus-brand);
+ 	}
+ }
+diff --git a/packages/ui/src/utils/css/item-popup.module.css b/packages/ui/src/utils/css/item-popup.module.css
+index 69fec88d07f2d0..b41a8c7e1cfe14 100644
+--- a/packages/ui/src/utils/css/item-popup.module.css
++++ b/packages/ui/src/utils/css/item-popup.module.css
+@@ -12,7 +12,7 @@
+ 		max-height: min(var(--available-height), 480px, 60dvh);
+ 		min-width: var(--anchor-width);
+ 		max-width: var(--available-width);
+-		border-radius: var(--wpds-border-radius-surface-md);
++		border-radius: var(--wpds-border-radius-md);
+ 		border: 1px solid var(--wpds-color-stroke-surface-neutral);
+ 		box-shadow: var(--wpds-elevation-medium);
+ 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+@@ -61,7 +61,7 @@
+ 		justify-content: flex-start;
+ 		gap: var(--wpds-dimension-gap-2xs);
+ 		min-height: var(--wp-ui-popup-item-height);
+-		border-radius: var(--wpds-border-radius-surface-sm);
++		border-radius: var(--wpds-border-radius-sm);
+ 		user-select: none;
+ 		margin-inline: var(--wp-ui-popup-padding);
+ 		padding-block: var(--wp-ui-popup-item-padding-block);

@@ -1,0 +1,40 @@
+diff --git a/packages/base-styles/CHANGELOG.md b/packages/base-styles/CHANGELOG.md
+index b3e7554b1fda11..50d1660fc3cc41 100644
+--- a/packages/base-styles/CHANGELOG.md
++++ b/packages/base-styles/CHANGELOG.md
+@@ -4,7 +4,8 @@
+ 
+ ### Breaking Changes
+ 
+--   Remove the following entries from the `z-index()` helper ([#78315](https://github.com/WordPress/gutenberg/pull/78315)):
++-   Remove the following entries from the `z-index()` helper ([#78315](https://github.com/WordPress/gutenberg/pull/78315), [#78362](https://github.com/WordPress/gutenberg/pull/78362)):
++    -   `.components-modal__header`
+     -   `.dataviews-footer`
+     -   `.dataviews-view-grid__card .dataviews-selection-checkbox`
+     -   `.dataviews-view-table thead`
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index ad2c022733b147..cfb849eca087bc 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -7,7 +7,6 @@
+ $z-layers: (
+ 	".block-editor-block-list__block.is-selected": 20,
+ 
+-	".components-modal__header": 10,
+ 	".edit-post-layout__footer": 30,
+ 	".interface-interface-skeleton__header": 30,
+ 	".interface-interface-skeleton__content": 20,
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index 0d72caf367b4ff..52fd11f0e3e563 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -200,7 +200,8 @@
+ 	align-items: center;
+ 	height: $header-height + $grid-unit-10; // 72px
+ 	width: 100%;
+-	z-index: z-index(".components-modal__header");
++	// Stack above modal content that may overlap the header.
++	z-index: 10;
+ 	position: absolute;
+ 	top: 0;
+ 	left: 0;

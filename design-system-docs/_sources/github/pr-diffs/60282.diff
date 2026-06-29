@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d943753afff82e..f5116fae634c9e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fix
+ 
+ -   `InputControl`: Ignore IME events when `isPressEnterToChange` is enabled ([#60090](https://github.com/WordPress/gutenberg/pull/60090)).
++-   `TextControl`: Apply zero margin to input element ([#60282](https://github.com/WordPress/gutenberg/pull/60282)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/text-control/style.scss b/packages/components/src/text-control/style.scss
+index e9f5a79fbe490c..1e8477b255b9b1 100644
+--- a/packages/components/src/text-control/style.scss
++++ b/packages/components/src/text-control/style.scss
+@@ -14,6 +14,8 @@
+ .components-text-control__input[type="number"] {
+ 	width: 100%;
+ 	height: $grid-unit-40;
++	// Override input style margin in WP forms.css.
++	margin: 0;
+ 	@include input-control;
+ 
+ 	&.is-next-40px-default-size {

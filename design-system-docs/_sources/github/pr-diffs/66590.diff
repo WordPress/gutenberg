@@ -1,0 +1,52 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1f612bfae6597e..c4dc5e3a57b930 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `PaletteEdit`: Add appropriate size props to Buttons ([#66590](https://github.com/WordPress/gutenberg/pull/66590)).
++
+ ### Internal
+ 
+ -   `Snackbar`: Use link variant for action Button ([#66560](https://github.com/WordPress/gutenberg/pull/66560)).
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index 570613e5378c10..a58ecbb685e514 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -215,6 +215,7 @@ function Option< T extends PaletteElement >( {
+ 		<Item ref={ setPopoverAnchor } size="small">
+ 			<HStack justify="flex-start">
+ 				<Button
++					size="small"
+ 					onClick={ () => {
+ 						setIsEditingColor( true );
+ 					} }
+@@ -501,6 +502,7 @@ export function PaletteEdit( {
+ 										<NavigableMenu role="menu">
+ 											{ ! isEditing && (
+ 												<Button
++													__next40pxDefaultSize
+ 													variant="tertiary"
+ 													onClick={ () => {
+ 														setIsEditing( true );
+@@ -513,6 +515,7 @@ export function PaletteEdit( {
+ 											) }
+ 											{ ! canOnlyChangeValues && (
+ 												<Button
++													__next40pxDefaultSize
+ 													variant="tertiary"
+ 													onClick={ () => {
+ 														setEditingElement(
+@@ -535,6 +538,8 @@ export function PaletteEdit( {
+ 											) }
+ 											{ canReset && (
+ 												<Button
++													__next40pxDefaultSize
++													className="components-palette-edit__menu-button"
+ 													variant="tertiary"
+ 													onClick={ () => {
+ 														setEditingElement(

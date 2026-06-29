@@ -1,0 +1,334 @@
+diff --git a/packages/icons/src/index.js b/packages/icons/src/index.js
+index ec4be6602653d5..9126efadfb0b56 100644
+--- a/packages/icons/src/index.js
++++ b/packages/icons/src/index.js
+@@ -39,6 +39,9 @@ export { default as comment } from './library/comment';
+ export { default as controlsRepeat } from './library/controls-repeat';
+ export { default as cover } from './library/cover';
+ export { default as create } from './library/create';
++export { default as currencyDollar } from './library/currency-dollar';
++export { default as currencyEuro } from './library/currency-euro';
++export { default as currencyPound } from './library/currency-pound';
+ export { default as desktop } from './library/desktop';
+ export { default as external } from './library/external';
+ export { default as file } from './library/file';
+@@ -57,6 +60,8 @@ export { default as grid } from './library/grid';
+ export { default as group } from './library/group';
+ export { default as heading } from './library/heading';
+ export { default as help } from './library/help';
++export { default as inbox } from './library/inbox';
++export { default as institution } from './library/institution';
+ export { default as html } from './library/html';
+ export { default as image } from './library/image';
+ export { default as info } from './library/info';
+@@ -81,6 +86,8 @@ export { default as navigation } from './library/navigation';
+ export { default as pageBreak } from './library/page-break';
+ export { default as page } from './library/page';
+ export { default as paragraph } from './library/paragraph';
++export { default as payment } from './library/payment';
++export { default as percent } from './library/percent';
+ export { default as positionCenter } from './library/position-center';
+ export { default as positionLeft } from './library/position-left';
+ export { default as positionRight } from './library/position-right';
+@@ -92,10 +99,12 @@ export { default as plusCircle } from './library/plus-circle';
+ export { default as plus } from './library/plus';
+ export { default as postList } from './library/post-list';
+ export { default as preformatted } from './library/preformatted';
++export { default as box } from './library/box';
+ export { default as pullLeft } from './library/pull-left';
+ export { default as pullRight } from './library/pull-right';
+ export { default as pullquote } from './library/pullquote';
+ export { default as quote } from './library/quote';
++export { default as receipt } from './library/receipt';
+ export { default as redo } from './library/redo';
+ export { default as replace } from './library/replace';
+ export { default as resizeCornerNE } from './library/resize-corner-n-e';
+@@ -104,10 +113,12 @@ export { default as search } from './library/search';
+ export { default as separator } from './library/separator';
+ export { default as share } from './library/share';
+ export { default as shortcode } from './library/shortcode';
++export { default as star } from './library/star';
+ export { default as starEmpty } from './library/star-empty';
+ export { default as starFilled } from './library/star-filled';
+ export { default as starHalf } from './library/star-half';
+ export { default as stretchFullWidth } from './library/stretch-full-width';
++export { default as shipping } from './library/shipping';
+ export { default as stretchWide } from './library/stretch-wide';
+ export { default as tableColumnAfter } from './library/table-column-after';
+ export { default as tableColumnBefore } from './library/table-column-before';
+diff --git a/packages/icons/src/library/box.js b/packages/icons/src/library/box.js
+new file mode 100644
+index 00000000000000..c2908c5a8adb38
+--- /dev/null
++++ b/packages/icons/src/library/box.js
+@@ -0,0 +1,16 @@
++/**
++ * WordPress dependencies
++ */
++import { Path, SVG } from '@wordpress/primitives';
++
++const box = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path
++			fill-rule="evenodd"
++			d="M5 5.5h14a.5.5 0 01.5.5v1.5a.5.5 0 01-.5.5H5a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM4 9.232A2 2 0 013 7.5V6a2 2 0 012-2h14a2 2 0 012 2v1.5a2 2 0 01-1 1.732V18a2 2 0 01-2 2H6a2 2 0 01-2-2V9.232zm1.5.268V18a.5.5 0 00.5.5h12a.5.5 0 00.5-.5V9.5h-13z"
++			clip-rule="evenodd"
++		/>
++	</SVG>
++);
++
++export default box;
+diff --git a/packages/icons/src/library/currency-dollar.js b/packages/icons/src/library/currency-dollar.js
+new file mode 100644
+index 00000000000000..a93d2037346390
+--- /dev/null
++++ b/packages/icons/src/library/currency-dollar.js
+@@ -0,0 +1,12 @@
++/**
++ * WordPress dependencies
++ */
++import { Path, SVG } from '@wordpress/primitives';
++
++const currencyDollar = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path d="M3.25 12a8.75 8.75 0 1117.5 0 8.75 8.75 0 01-17.5 0zM12 4.75a7.25 7.25 0 100 14.5 7.25 7.25 0 000-14.5zm-1.338 4.877c-.314.22-.412.452-.412.623 0 .171.098.403.412.623.312.218.783.377 1.338.377.825 0 1.605.233 2.198.648.59.414 1.052 1.057 1.052 1.852 0 .795-.461 1.438-1.052 1.852-.41.286-.907.486-1.448.582v.316a.75.75 0 01-1.5 0v-.316a3.64 3.64 0 01-1.448-.582c-.59-.414-1.052-1.057-1.052-1.852a.75.75 0 011.5 0c0 .171.098.403.412.623.312.218.783.377 1.338.377s1.026-.159 1.338-.377c.314-.22.412-.452.412-.623 0-.171-.098-.403-.412-.623-.312-.218-.783-.377-1.338-.377-.825 0-1.605-.233-2.198-.648-.59-.414-1.052-1.057-1.052-1.852 0-.795.461-1.438 1.052-1.852a3.64 3.64 0 011.448-.582V7.5a.75.75 0 011.5 0v.316c.54.096 1.039.296 1.448.582.59.414 1.052 1.057 1.052 1.852a.75.75 0 01-1.5 0c0-.171-.098-.403-.412-.623-.312-.218-.783-.377-1.338-.377s-1.026.159-1.338.377z" />
++	</SVG>
++);
++
++export default currencyDollar;
+diff --git a/packages/icons/src/library/currency-euro.js b/packages/icons/src/library/currency-euro.js
+new file mode 100644
+index 00000000000000..9522211027175e
+--- /dev/null
++++ b/packages/icons/src/library/currency-euro.js
+@@ -0,0 +1,12 @@
++/**
++ * WordPress dependencies
++ */
++import { Path, SVG } from '@wordpress/primitives';
++
++const currencyEuro = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path d="M12 3.25a8.75 8.75 0 100 17.5 8.75 8.75 0 000-17.5zM4.75 12a7.25 7.25 0 1114.5 0 7.25 7.25 0 01-14.5 0zm9.195 1.944a2.75 2.75 0 01-4.066-.194h.621a.75.75 0 000-1.5H9.262a2.767 2.767 0 010-.5H11.5a.75.75 0 000-1.5H9.88a2.75 2.75 0 014.066-.194.75.75 0 001.06-1.061 4.25 4.25 0 00-6.88 1.255H7.5a.75.75 0 000 1.5h.258c-.01.166-.01.334 0 .5H7.5a.75.75 0 000 1.5h.626a4.25 4.25 0 006.88 1.255.75.75 0 00-1.06-1.06z" />
++	</SVG>
++);
++
++export default currencyEuro;
+diff --git a/packages/icons/src/library/currency-pound.js b/packages/icons/src/library/currency-pound.js
+new file mode 100644
+index 00000000000000..d2ab8494f3c5b3
+--- /dev/null
++++ b/packages/icons/src/library/currency-pound.js
+@@ -0,0 +1,15 @@
++/**
++ * WordPress dependencies
++ */
++import { Path, SVG } from '@wordpress/primitives';
++
++const currencyPound = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path
++			fill-rule="evenodd"
++			d="M3.25 12a8.75 8.75 0 1117.5 0 8.75 8.75 0 01-17.5 0zM12 4.75a7.25 7.25 0 100 14.5 7.25 7.25 0 000-14.5zm.25 4c-.787 0-1.425.638-1.425 1.425 0 .058.014.147.069.3.04.113.088.223.147.36a26.094 26.094 0 01.173.415H12.5a.75.75 0 010 1.5h-.953c.002.047.003.095.003.144 0 .617-.236 1.168-.511 1.606h3.386a.75.75 0 010 1.5H9.35a.75.75 0 01-.452-1.349l.007-.005a4.417 4.417 0 00.596-.581c.328-.39.549-.806.549-1.171 0-.05-.002-.097-.004-.144H9.5a.75.75 0 010-1.5h.088a5.875 5.875 0 01-.106-.27 2.382 2.382 0 01-.157-.805 2.925 2.925 0 015.637-1.097.75.75 0 01-1.39.563 1.426 1.426 0 00-1.322-.891zm-3.35 5.9l.45.6-.45-.6z"
++		/>
++	</SVG>
++);
++
++export default currencyPound;
+diff --git a/packages/icons/src/library/inbox.js b/packages/icons/src/library/inbox.js
+new file mode 100644
+index 00000000000000..41b3cf33448cff
+--- /dev/null
++++ b/packages/icons/src/library/inbox.js
+@@ -0,0 +1,16 @@
++/**
++ * WordPress dependencies
++ */
++import { Path, SVG } from '@wordpress/primitives';
++
++const inbox = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path
++			fill-rule="evenodd"
++			d="M6 5.5h12a.5.5 0 01.5.5v7H14a2 2 0 11-4 0H5.5V6a.5.5 0 01.5-.5zm-.5 9V18a.5.5 0 00.5.5h12a.5.5 0 00.5-.5v-3.5h-3.337a3.5 3.5 0 01-6.326 0H5.5zM4 13V6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2v-5z"
++			clip-rule="evenodd"
++		/>
++	</SVG>
++);
++
++export default inbox;
+diff --git a/packages/icons/src/library/institution.js b/packages/icons/src/library/institution.js
+new file mode 100644
+index 00000000000000..76cb54b6f188a9
+--- /dev/null
++++ b/packages/icons/src/library/institution.js
+@@ -0,0 +1,16 @@
++/**
++ * WordPress dependencies
++ */
++import { Path, SVG } from '@wordpress/primitives';
++
++const institute = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path
++			fill-rule="evenodd"
++			d="M18.646 9H20V8l-1-.5L12 4 5 7.5 4 8v1h14.646zm-3-1.5L12 5.677 8.354 7.5h7.292zm-7.897 9.44v-6.5h-1.5v6.5h1.5zm5-6.5v6.5h-1.5v-6.5h1.5zm5 0v6.5h-1.5v-6.5h1.5zm2.252 8.81c0 .414-.334.75-.748.75H4.752a.75.75 0 010-1.5h14.5a.75.75 0 01.749.75z"
++			clip-rule="evenodd"
++		/>
++	</SVG>
++);
++
++export default institute;
+diff --git a/packages/icons/src/library/page.js b/packages/icons/src/library/page.js
+index 65a2d571293abc..9f5338f46aea2b 100644
+--- a/packages/icons/src/library/page.js
++++ b/packages/icons/src/library/page.js
+@@ -4,8 +4,8 @@
+ import { SVG, Path } from '@wordpress/primitives';
+ 
+ const page = (
+-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24">
+-		<Path d="M6 15V2h10v13H6zm-1 1h8v2H3V5h2v11z" />
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path d="M7 5.5h10a.5.5 0 01.5.5v12a.5.5 0 01-.5.5H7a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5zM17 4H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2zm-1 3.75H8v1.5h8v-1.5zM8 11h8v1.5H8V11zm6 3.25H8v1.5h6v-1.5z" />
+ 	</SVG>
+ );
+ 
+diff --git a/packages/icons/src/library/payment.js b/packages/icons/src/library/payment.js
+new file mode 100644
+index 00000000000000..771668ccd0035c
+--- /dev/null
++++ b/packages/icons/src/library/payment.js
+@@ -0,0 +1,16 @@
++/**
++ * WordPress dependencies
++ */
++import { Path, SVG } from '@wordpress/primitives';
++
++const payment = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path
++			fill-rule="evenodd"
++			d="M5.5 9.5v-2h13v2h-13zm0 3v4h13v-4h-13zM4 7a1 1 0 011-1h14a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1V7z"
++			clip-rule="evenodd"
++		/>
++	</SVG>
++);
++
++export default payment;
+diff --git a/packages/icons/src/library/percent.js b/packages/icons/src/library/percent.js
+new file mode 100644
+index 00000000000000..663eb4e10b1855
+--- /dev/null
++++ b/packages/icons/src/library/percent.js
+@@ -0,0 +1,16 @@
++/**
++ * WordPress dependencies
++ */
++import { Path, SVG } from '@wordpress/primitives';
++
++const percent = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path
++			fill-rule="evenodd"
++			d="M6.5 8a1.5 1.5 0 103 0 1.5 1.5 0 00-3 0zM8 5a3 3 0 100 6 3 3 0 000-6zm6.5 11a1.5 1.5 0 103 0 1.5 1.5 0 00-3 0zm1.5-3a3 3 0 100 6 3 3 0 000-6zM5.47 17.41a.75.75 0 001.06 1.06L18.47 6.53a.75.75 0 10-1.06-1.06L5.47 17.41z"
++			clip-rule="evenodd"
++		/>
++	</SVG>
++);
++
++export default percent;
+diff --git a/packages/icons/src/library/receipt.js b/packages/icons/src/library/receipt.js
+new file mode 100644
+index 00000000000000..7db4280a882ef4
+--- /dev/null
++++ b/packages/icons/src/library/receipt.js
+@@ -0,0 +1,16 @@
++/**
++ * WordPress dependencies
++ */
++import { Path, SVG } from '@wordpress/primitives';
++
++const receipt = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path
++			fill-rule="evenodd"
++			d="M16.83 6.342l.602.3.625-.25.443-.176v12.569l-.443-.178-.625-.25-.603.301-1.444.723-2.41-.804-.475-.158-.474.158-2.41.803-1.445-.722-.603-.3-.625.25-.443.177V6.215l.443.178.625.25.603-.301 1.444-.722 2.41.803.475.158.474-.158 2.41-.803 1.445.722zM20 4l-1.5.6-1 .4-2-1-3 1-3-1-2 1-1-.4L5 4v17l1.5-.6 1-.4 2 1 3-1 3 1 2-1 1 .4 1.5.6V4zm-3.5 6.25v-1.5h-8v1.5h8zm0 3v-1.5h-8v1.5h8zm-8 3v-1.5h8v1.5h-8z"
++			clip-rule="evenodd"
++		/>
++	</SVG>
++);
++
++export default receipt;
+diff --git a/packages/icons/src/library/shipping.js b/packages/icons/src/library/shipping.js
+new file mode 100644
+index 00000000000000..71c6c364aa4b3c
+--- /dev/null
++++ b/packages/icons/src/library/shipping.js
+@@ -0,0 +1,12 @@
++/**
++ * WordPress dependencies
++ */
++import { Path, SVG } from '@wordpress/primitives';
++
++const shipping = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path d="M3 6.75C3 5.784 3.784 5 4.75 5H15V7.313l.05.027 5.056 2.73.394.212v3.468a1.75 1.75 0 01-1.75 1.75h-.012a2.5 2.5 0 11-4.975 0H9.737a2.5 2.5 0 11-4.975 0H3V6.75zM13.5 14V6.5H4.75a.25.25 0 00-.25.25V14h.965a2.493 2.493 0 011.785-.75c.7 0 1.332.287 1.785.75H13.5zm4.535 0h.715a.25.25 0 00.25-.25v-2.573l-4-2.16v4.568a2.487 2.487 0 011.25-.335c.7 0 1.332.287 1.785.75zM6.282 15.5a1.002 1.002 0 00.968 1.25 1 1 0 10-.968-1.25zm9 0a1 1 0 101.937.498 1 1 0 00-1.938-.498z" />
++	</SVG>
++);
++
++export default shipping;
+diff --git a/packages/icons/src/library/star.js b/packages/icons/src/library/star.js
+new file mode 100644
+index 00000000000000..ad5546e5dcfe2b
+--- /dev/null
++++ b/packages/icons/src/library/star.js
+@@ -0,0 +1,12 @@
++/**
++ * WordPress dependencies
++ */
++import { Path, SVG } from '@wordpress/primitives';
++
++const star = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path d="M11.776 4.454a.25.25 0 01.448 0l2.069 4.192a.25.25 0 00.188.137l4.626.672a.25.25 0 01.139.426l-3.348 3.263a.25.25 0 00-.072.222l.79 4.607a.25.25 0 01-.362.263l-4.138-2.175a.25.25 0 00-.232 0l-4.138 2.175a.25.25 0 01-.363-.263l.79-4.607a.25.25 0 00-.071-.222L4.754 9.881a.25.25 0 01.139-.426l4.626-.672a.25.25 0 00.188-.137l2.069-4.192z" />
++	</SVG>
++);
++
++export default star;
+diff --git a/packages/icons/src/library/trending-down.js b/packages/icons/src/library/trending-down.js
+new file mode 100644
+index 00000000000000..c0104041b8b8c8
+--- /dev/null
++++ b/packages/icons/src/library/trending-down.js
+@@ -0,0 +1,12 @@
++/**
++ * WordPress dependencies
++ */
++import { SVG, Path } from '@wordpress/primitives';
++
++const trendingDown = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path d="M4.195 8.245a.75.75 0 011.06-.05l5.004 4.55 4.025-3.521L19 13.939V10.75h1.5v5.75h-5.75V15h3.19l-3.724-3.723-3.975 3.478-5.995-5.45a.75.75 0 01-.051-1.06z" />
++	</SVG>
++);
++
++export default trendingDown;
+diff --git a/packages/icons/src/library/trending-up.js b/packages/icons/src/library/trending-up.js
+new file mode 100644
+index 00000000000000..ab1a5e53d1581a
+--- /dev/null
++++ b/packages/icons/src/library/trending-up.js
+@@ -0,0 +1,12 @@
++/**
++ * WordPress dependencies
++ */
++import { SVG, Path } from '@wordpress/primitives';
++
++const trendingUp = (
++	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
++		<Path d="M3.445 16.505a.75.75 0 001.06.05l5.005-4.55 4.024 3.521 4.716-4.715V14h1.5V8.25H14v1.5h3.19l-3.724 3.723L9.49 9.995l-5.995 5.45a.75.75 0 00-.05 1.06z" />
++	</SVG>
++);
++
++export default trendingUp;

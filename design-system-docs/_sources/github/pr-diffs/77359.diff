@@ -1,0 +1,38 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index db1fbacf5e33c8..486664b135fb3c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Popover`: Reset `will-change` after positioning to fix blurry rendering on certain GPUs ([#77359](https://github.com/WordPress/gutenberg/pull/77359)).
+ -   `CheckboxControl`: Fix disabled styles [#77132](https://github.com/WordPress/gutenberg/pull/77132).
+ -   `FormTokenField`: Fix disabled styles. [#77137](https://github.com/WordPress/gutenberg/pull/77137)
+ -   `Textarea`: Fix disabled styles [#77129](https://github.com/WordPress/gutenberg/pull/77129).
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index 50b9788e48e518..9ef8969e2cfdb9 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -15,6 +15,12 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
+ 	z-index: z-index(".components-popover");
+ 	will-change: transform;
+ 
++	// Once placed, drop the compositing hint so the browser doesn't
++	// render the content on a blurry layer (Chrome on certain GPUs).
++	&.is-positioned {
++		will-change: auto;
++	}
++
+ 	&.is-expanded {
+ 		position: fixed;
+ 		top: 0;
+@@ -47,7 +53,7 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
+ 
+ 	.components-popover.is-expanded & {
+ 		position: static;
+-		height: calc(100% - #{ $panel-header-height });
++		height: calc(100% - #{$panel-header-height});
+ 		overflow-y: visible;
+ 		width: auto;
+ 		box-shadow: $shadow-popover-border-top-only;

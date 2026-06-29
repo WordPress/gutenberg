@@ -1,0 +1,252 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c7c1a515a64cec..a8dd57900cfae1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -32,6 +32,7 @@
+ -   `InputControl`, `NumberControl`, `UnitControl`, `SelectControl`, `TreeSelect`: Add `compact` size variant ([#57398](https://github.com/WordPress/gutenberg/pull/57398)).
+ -   `ToggleGroupControl`: Update button size in large variant to be 32px ([#57338](https://github.com/WordPress/gutenberg/pull/57338)).
+ -   `Tooltip`: improve unit tests ([#57345](https://github.com/WordPress/gutenberg/pull/57345)).
++-   `Tooltip`: no-op when nested inside other `Tooltip` components ([#57202](https://github.com/WordPress/gutenberg/pull/57202)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/tooltip/README.md b/packages/components/src/tooltip/README.md
+index 9b214e8fc6b00e..ef2cd35d25543e 100644
+--- a/packages/components/src/tooltip/README.md
++++ b/packages/components/src/tooltip/README.md
+@@ -16,6 +16,10 @@ const MyTooltip = () => (
+ );
+ ```
+ 
++### Nested tooltips
++
++In case one or more `Tooltip` components are rendered inside another `Tooltip` component, only the tooltip associated to the outermost `Tooltip` component will be rendered in the browser and shown to the user appropriately. The rest of the nested `Tooltip` components will simply no-op and pass-through their anchor.
++
+ ## Props
+ 
+ The component accepts the following props:
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index 817d6d18812ee4..1e652d9a42dbb4 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -8,22 +8,37 @@ import * as Ariakit from '@ariakit/react';
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { Children } from '@wordpress/element';
++import { Children, cloneElement } from '@wordpress/element';
+ import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+  */
+-import type { TooltipProps } from './types';
++import type { TooltipProps, TooltipInternalContext } from './types';
+ import Shortcut from '../shortcut';
+ import { positionToPlacement } from '../popover/utils';
++import {
++	contextConnect,
++	useContextSystem,
++	ContextSystemProvider,
++} from '../context';
++import type { WordPressComponentProps } from '../context';
+ 
+ /**
+  * Time over anchor to wait before showing tooltip
+  */
+ export const TOOLTIP_DELAY = 700;
+ 
+-function Tooltip( props: TooltipProps ) {
++const CONTEXT_VALUE = {
++	Tooltip: {
++		isNestedInTooltip: true,
++	},
++};
++
++function UnconnectedTooltip(
++	props: WordPressComponentProps< TooltipProps, 'div', false >,
++	ref: React.ForwardedRef< any >
++) {
+ 	const {
+ 		children,
+ 		delay = TOOLTIP_DELAY,
+@@ -32,7 +47,15 @@ function Tooltip( props: TooltipProps ) {
+ 		position,
+ 		shortcut,
+ 		text,
+-	} = props;
++
++		// From Internal Context system
++		isNestedInTooltip,
++
++		...restProps
++	} = useContextSystem< typeof props & TooltipInternalContext >(
++		props,
++		'Tooltip'
++	);
+ 
+ 	const baseId = useInstanceId( Tooltip, 'tooltip' );
+ 	const describedById = text || shortcut ? baseId : undefined;
+@@ -43,7 +66,7 @@ function Tooltip( props: TooltipProps ) {
+ 		if ( 'development' === process.env.NODE_ENV ) {
+ 			// eslint-disable-next-line no-console
+ 			console.error(
+-				'Tooltip should be called with only a single child element.'
++				'wp-components.Tooltip should be called with only a single child element.'
+ 			);
+ 		}
+ 	}
+@@ -64,24 +87,37 @@ function Tooltip( props: TooltipProps ) {
+ 	}
+ 	computedPlacement = computedPlacement || 'bottom';
+ 
+-	const tooltipStore = Ariakit.useTooltipStore( {
++	// Removing the `Ariakit` namespace from the hook name allows ESLint to
++	// properly identify the hook, and apply the correct linting rules.
++	const useAriakitTooltipStore = Ariakit.useTooltipStore;
++	const tooltipStore = useAriakitTooltipStore( {
+ 		placement: computedPlacement,
+ 		showTimeout: delay,
+ 	} );
+ 
++	if ( isNestedInTooltip ) {
++		return isOnlyChild
++			? cloneElement( children, {
++					...restProps,
++					ref,
++			  } )
++			: children;
++	}
++
+ 	return (
+-		<>
++		<ContextSystemProvider value={ CONTEXT_VALUE }>
+ 			<Ariakit.TooltipAnchor
+ 				onClick={ hideOnClick ? tooltipStore.hide : undefined }
+ 				store={ tooltipStore }
+ 				render={ isOnlyChild ? children : undefined }
++				ref={ ref }
+ 			>
+ 				{ isOnlyChild ? undefined : children }
+ 			</Ariakit.TooltipAnchor>
+ 			{ isOnlyChild && ( text || shortcut ) && (
+ 				<Ariakit.Tooltip
++					{ ...restProps }
+ 					unmountOnHide
+-					className="components-tooltip"
+ 					gutter={ 4 }
+ 					id={ describedById }
+ 					overflowPadding={ 0.5 }
+@@ -98,8 +134,10 @@ function Tooltip( props: TooltipProps ) {
+ 					) }
+ 				</Ariakit.Tooltip>
+ 			) }
+-		</>
++		</ContextSystemProvider>
+ 	);
+ }
+ 
++export const Tooltip = contextConnect( UnconnectedTooltip, 'Tooltip' );
++
+ export default Tooltip;
+diff --git a/packages/components/src/tooltip/stories/index.story.tsx b/packages/components/src/tooltip/stories/index.story.tsx
+index 760f3dcc23e2fd..b006bc03aced96 100644
+--- a/packages/components/src/tooltip/stories/index.story.tsx
++++ b/packages/components/src/tooltip/stories/index.story.tsx
+@@ -30,7 +30,7 @@ const meta: Meta< typeof Tooltip > = {
+ 				'bottom right',
+ 			],
+ 		},
+-		shortcut: { control: { type: 'text' } },
++		shortcut: { control: { type: 'object' } },
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
+@@ -57,3 +57,20 @@ KeyboardShortcut.args = {
+ 		ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
+ 	},
+ };
++
++/**
++ * In case one or more `Tooltip` components are rendered inside another
++ * `Tooltip` component, only the tooltip associated to the outermost `Tooltip`
++ * component will be rendered in the browser and shown to the user
++ * appropriately. The rest of the nested `Tooltip` components will simply no-op
++ * and pass-through their anchor.
++ */
++export const Nested: StoryFn< typeof Tooltip > = Template.bind( {} );
++Nested.args = {
++	children: (
++		<Tooltip text="Nested tooltip text (that will never show)">
++			<Button variant="primary">Tooltip Anchor</Button>
++		</Tooltip>
++	),
++	text: 'Outer tooltip text',
++};
+diff --git a/packages/components/src/tooltip/test/index.tsx b/packages/components/src/tooltip/test/index.tsx
+index cbe144cfa53d4d..ed6f7b5f7b4a14 100644
+--- a/packages/components/src/tooltip/test/index.tsx
++++ b/packages/components/src/tooltip/test/index.tsx
+@@ -436,4 +436,50 @@ describe( 'Tooltip', () => {
+ 			await waitExpectTooltipToHide();
+ 		} );
+ 	} );
++
++	describe( 'nested', () => {
++		it( 'should render the outer tooltip and ignore nested tooltips', async () => {
++			render(
++				<Tooltip text="Outer tooltip">
++					<Tooltip text="Middle tooltip">
++						<Tooltip text="Inner tooltip">
++							<Button>Tooltip anchor</Button>
++						</Tooltip>
++					</Tooltip>
++				</Tooltip>
++			);
++
++			// Hover the anchor. Only the outer tooltip should show.
++			await hover(
++				screen.getByRole( 'button', {
++					name: 'Tooltip anchor',
++				} )
++			);
++
++			await waitFor( () =>
++				expect(
++					screen.getByRole( 'tooltip', { name: 'Outer tooltip' } )
++				).toBeVisible()
++			);
++			expect(
++				screen.queryByRole( 'tooltip', { name: 'Middle tooltip' } )
++			).not.toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'tooltip', { name: 'Inner tooltip' } )
++			).not.toBeInTheDocument();
++			expect(
++				screen.getByRole( 'button', {
++					description: 'Outer tooltip',
++				} )
++			).toBeVisible();
++
++			// Hover outside of the anchor, tooltip should hide
++			await hoverOutside();
++			await waitFor( () =>
++				expect(
++					screen.queryByRole( 'tooltip', { name: 'Outer tooltip' } )
++				).not.toBeInTheDocument()
++			);
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/tooltip/types.ts b/packages/components/src/tooltip/types.ts
+index 8708ae7005f5b3..3d28a1a0e96c67 100644
+--- a/packages/components/src/tooltip/types.ts
++++ b/packages/components/src/tooltip/types.ts
+@@ -59,3 +59,7 @@ export type TooltipProps = {
+ 	 */
+ 	text?: string;
+ };
++
++export type TooltipInternalContext = {
++	isNestedInTooltip?: boolean;
++};

@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 92ce15dc425f6d..20f02c0f725025 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ 
+ -   `BoxControl`: Update design ([#56665](https://github.com/WordPress/gutenberg/pull/56665)).
+ -   `CustomSelect`: adjust `renderSelectedValue` to fix sizing ([#57865](https://github.com/WordPress/gutenberg/pull/57865)).
++-   `Theme`: Set `color` on wrapper div ([#58095](https://github.com/WordPress/gutenberg/pull/58095)).
+ 
+ ## 25.15.0 (2024-01-10)
+ 
+diff --git a/packages/components/src/theme/styles.ts b/packages/components/src/theme/styles.ts
+index 650852d3461757..948c2d586649fb 100644
+--- a/packages/components/src/theme/styles.ts
++++ b/packages/components/src/theme/styles.ts
+@@ -30,4 +30,6 @@ export const colorVariables = ( { colors }: ThemeOutputValues ) => {
+ 	];
+ };
+ 
+-export const Wrapper = styled.div``;
++export const Wrapper = styled.div`
++	color: var( --wp-components-color-foreground, currentColor );
++`;

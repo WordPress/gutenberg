@@ -1,0 +1,215 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 86033f9413f1cb..c2608e5f4b33e5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fix
+ 
+ -   `BorderControl`: Ensure box-sizing is reset for the control ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
++-   `InputControl`: Fix acceptance of falsy values in controlled updates ([#42484](https://github.com/WordPress/gutenberg/pull/42484/)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/input-control/reducer/actions.ts b/packages/components/src/input-control/reducer/actions.ts
+index d66eb5778aad8c..374d53433d3724 100644
+--- a/packages/components/src/input-control/reducer/actions.ts
++++ b/packages/components/src/input-control/reducer/actions.ts
+@@ -10,6 +10,7 @@ import type { DragProps } from '../types';
+ 
+ export const CHANGE = 'CHANGE';
+ export const COMMIT = 'COMMIT';
++export const CONTROL = 'CONTROL';
+ export const DRAG_END = 'DRAG_END';
+ export const DRAG_START = 'DRAG_START';
+ export const DRAG = 'DRAG';
+@@ -23,7 +24,7 @@ interface EventPayload {
+ 	event?: SyntheticEvent;
+ }
+ 
+-interface Action< Type, ExtraPayload = {} > {
++export interface Action< Type = string, ExtraPayload = {} > {
+ 	type: Type;
+ 	payload: EventPayload & ExtraPayload;
+ }
+@@ -34,6 +35,7 @@ interface ValuePayload {
+ 
+ export type ChangeAction = Action< typeof CHANGE, ValuePayload >;
+ export type CommitAction = Action< typeof COMMIT, ValuePayload >;
++export type ControlAction = Action< typeof CONTROL, ValuePayload >;
+ export type PressUpAction = Action< typeof PRESS_UP >;
+ export type PressDownAction = Action< typeof PRESS_DOWN >;
+ export type PressEnterAction = Action< typeof PRESS_ENTER >;
+diff --git a/packages/components/src/input-control/reducer/reducer.ts b/packages/components/src/input-control/reducer/reducer.ts
+index 9d9d4787ecae0a..acd95d2664342f 100644
+--- a/packages/components/src/input-control/reducer/reducer.ts
++++ b/packages/components/src/input-control/reducer/reducer.ts
+@@ -39,22 +39,32 @@ function mergeInitialState(
+ }
+ 
+ /**
+- * Creates a reducer that opens the channel for external state subscription
+- * and modification.
++ * Creates the base reducer which may be coupled to a specializing reducer.
++ * As its final step, for all actions other than CONTROL, the base reducer
++ * passes the state and action on through the specializing reducer. The
++ * exception for CONTROL actions is because they represent controlled updates
++ * from props and no case has yet presented for their specialization.
+  *
+- * This technique uses the "stateReducer" design pattern:
+- * https://kentcdodds.com/blog/the-state-reducer-pattern/
+- *
+- * @param  composedStateReducers A custom reducer that can subscribe and modify state.
++ * @param  composedStateReducers A reducer to specialize state changes.
+  * @return The reducer.
+  */
+ function inputControlStateReducer(
+ 	composedStateReducers: StateReducer
+-): StateReducer {
++): StateReducer< actions.ControlAction > {
+ 	return ( state, action ) => {
+ 		const nextState = { ...state };
+ 
+ 		switch ( action.type ) {
++			/*
++			 * Controlled updates
++			 */
++			case actions.CONTROL:
++				nextState.value = action.payload.value;
++				nextState.isDirty = false;
++				nextState._event = undefined;
++				// Returns immediately to avoid invoking additional reducers.
++				return nextState;
++
+ 			/**
+ 			 * Keyboard events
+ 			 */
+@@ -140,7 +150,7 @@ export function useInputControlStateReducer(
+ 	initialState: Partial< InputState > = initialInputControlState,
+ 	onChangeHandler: InputChangeCallback
+ ) {
+-	const [ state, dispatch ] = useReducer< StateReducer >(
++	const [ state, dispatch ] = useReducer(
+ 		inputControlStateReducer( stateReducer ),
+ 		mergeInitialState( initialState )
+ 	);
+@@ -188,10 +198,15 @@ export function useInputControlStateReducer(
+ 
+ 	const currentState = useRef( state );
+ 	const refProps = useRef( { value: initialState.value, onChangeHandler } );
++
++	// Freshens refs to props and state so that subsequent effects have access
++	// to their latest values without their changes causing effect runs.
+ 	useLayoutEffect( () => {
+ 		currentState.current = state;
+ 		refProps.current = { value: initialState.value, onChangeHandler };
+ 	} );
++
++	// Propagates the latest state through onChange.
+ 	useLayoutEffect( () => {
+ 		if (
+ 			currentState.current._event !== undefined &&
+@@ -205,14 +220,16 @@ export function useInputControlStateReducer(
+ 			} );
+ 		}
+ 	}, [ state.value, state.isDirty ] );
++
++	// Updates the state from props.
+ 	useLayoutEffect( () => {
+ 		if (
+ 			initialState.value !== currentState.current.value &&
+ 			! currentState.current.isDirty
+ 		) {
+ 			dispatch( {
+-				type: actions.RESET,
+-				payload: { value: initialState.value },
++				type: actions.CONTROL,
++				payload: { value: initialState.value ?? '' },
+ 			} );
+ 		}
+ 	}, [ initialState.value ] );
+diff --git a/packages/components/src/input-control/reducer/state.ts b/packages/components/src/input-control/reducer/state.ts
+index 2ca9edaa27b200..3ebb24669a3424 100644
+--- a/packages/components/src/input-control/reducer/state.ts
++++ b/packages/components/src/input-control/reducer/state.ts
+@@ -6,7 +6,7 @@ import type { Reducer, SyntheticEvent } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { InputAction } from './actions';
++import type { Action, InputAction } from './actions';
+ 
+ export interface InputState {
+ 	_event?: SyntheticEvent;
+@@ -19,7 +19,12 @@ export interface InputState {
+ 	value?: string;
+ }
+ 
+-export type StateReducer = Reducer< InputState, InputAction >;
++export type StateReducer< SpecializedAction = {} > = Reducer<
++	InputState,
++	SpecializedAction extends Action
++		? InputAction | SpecializedAction
++		: InputAction
++>;
+ 
+ export const initialStateReducer: StateReducer = ( state: InputState ) => state;
+ 
+diff --git a/packages/components/src/input-control/test/index.js b/packages/components/src/input-control/test/index.js
+index ebdf97ee8d7a38..301d5759c0664d 100644
+--- a/packages/components/src/input-control/test/index.js
++++ b/packages/components/src/input-control/test/index.js
+@@ -85,9 +85,10 @@ describe( 'InputControl', () => {
+ 			expect( spy ).toHaveBeenLastCalledWith( 'Hello there' );
+ 		} );
+ 
+-		it( 'should work as a controlled component', async () => {
++		it( 'should work as a controlled component given normal, falsy or nullish values', async () => {
+ 			const user = setupUser();
+ 			const spy = jest.fn();
++			const heldKeySet = new Set();
+ 			const Example = () => {
+ 				const [ state, setState ] = useState( 'one' );
+ 				const onChange = ( value ) => {
+@@ -95,13 +96,21 @@ describe( 'InputControl', () => {
+ 					spy( value );
+ 				};
+ 				const onKeyDown = ( { key } ) => {
+-					if ( key === 'Escape' ) setState( 'three' );
++					heldKeySet.add( key );
++					if ( key === 'Escape' ) {
++						if ( heldKeySet.has( 'Meta' ) ) setState( 'qux' );
++						else if ( heldKeySet.has( 'Alt' ) )
++							setState( undefined );
++						else setState( '' );
++					}
+ 				};
++				const onKeyUp = ( { key } ) => heldKeySet.delete( key );
+ 				return (
+ 					<InputControl
+ 						value={ state }
+ 						onChange={ onChange }
+ 						onKeyDown={ onKeyDown }
++						onKeyUp={ onKeyUp }
+ 					/>
+ 				);
+ 			};
+@@ -109,10 +118,17 @@ describe( 'InputControl', () => {
+ 			const input = getInput();
+ 
+ 			await user.type( input, '2' );
+-			// Make a controlled update.
++			// Make a controlled update with a falsy value.
+ 			await user.keyboard( '{Escape}' );
++			expect( input ).toHaveValue( '' );
+ 
+-			expect( input ).toHaveValue( 'three' );
++			// Make a controlled update with a normal value.
++			await user.keyboard( '{Meta>}{Escape}{/Meta}' );
++			expect( input ).toHaveValue( 'qux' );
++
++			// Make a controlled update with a nullish value.
++			await user.keyboard( '{Alt>}{Escape}{/Alt}' );
++			expect( input ).toHaveValue( '' );
+ 			/*
+ 			 * onChange called only once. onChange is not called when a
+ 			 * parent component explicitly passed a (new value) change down to

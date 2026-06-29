@@ -1,0 +1,1929 @@
+diff --git a/package-lock.json b/package-lock.json
+index 0ad5466ceb1068..46bad766de3ed6 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -15260,6 +15260,11 @@
+ 				"@types/node": "*"
+ 			}
+ 		},
++		"@types/gradient-parser": {
++			"version": "0.1.2",
++			"resolved": "https://registry.npmjs.org/@types/gradient-parser/-/gradient-parser-0.1.2.tgz",
++			"integrity": "sha512-e2s1svCYJY8JDr2t/OoB/H4aWZy4sXUOAZ0NdSSHjKACw1jeU54gf4xj38di0AgVIObgzN1JSikJ5oSo3vxwgA=="
++		},
+ 		"@types/hammerjs": {
+ 			"version": "2.0.41",
+ 			"resolved": "https://registry.npmjs.org/@types/hammerjs/-/hammerjs-2.0.41.tgz",
+diff --git a/package.json b/package.json
+index 16b1e5478354cd..f3bba32b7a50a0 100644
+--- a/package.json
++++ b/package.json
+@@ -22,6 +22,7 @@
+ 		"IS_GUTENBERG_PLUGIN": true
+ 	},
+ 	"dependencies": {
++		"@types/gradient-parser": "0.1.2",
+ 		"@wordpress/a11y": "file:packages/a11y",
+ 		"@wordpress/annotations": "file:packages/annotations",
+ 		"@wordpress/api-fetch": "file:packages/api-fetch",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eae4f3355741a0..ef5a7bcccdb468 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `CustomGradientPicker`: Convert to TypeScript ([#48929](https://github.com/WordPress/gutenberg/pull/48929)).
++
+ ## 23.6.0 (2023-03-15)
+ 
+ ### Enhancements
+@@ -12,8 +16,8 @@
+ 
+ ### Bug Fix
+ 
+--  `ResponsiveWrapper`: use `aspect-ratio` CSS prop, add support for `SVG` elements ([#48573](https://github.com/WordPress/gutenberg/pull/48573).
+--  `ResizeTooltip`: Use `default.fontFamily` on tooltip ([#48805](https://github.com/WordPress/gutenberg/pull/48805).
++-   `ResponsiveWrapper`: use `aspect-ratio` CSS prop, add support for `SVG` elements ([#48573](https://github.com/WordPress/gutenberg/pull/48573).
++-   `ResizeTooltip`: Use `default.fontFamily` on tooltip ([#48805](https://github.com/WordPress/gutenberg/pull/48805).
+ 
+ ### Internal
+ 
+@@ -37,7 +41,7 @@
+ 
+ ### Enhancements
+ 
+--  `ToolsPanel`: Separate reset all filter registration from items registration and support global resets ([#48123](https://github.com/WordPress/gutenberg/pull/48123)).
++-   `ToolsPanel`: Separate reset all filter registration from items registration and support global resets ([#48123](https://github.com/WordPress/gutenberg/pull/48123)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/custom-gradient-picker/constants.js b/packages/components/src/custom-gradient-picker/constants.ts
+similarity index 96%
+rename from packages/components/src/custom-gradient-picker/constants.js
+rename to packages/components/src/custom-gradient-picker/constants.ts
+index 9924ff2b3d6860..842aea9dcb638d 100644
+--- a/packages/components/src/custom-gradient-picker/constants.js
++++ b/packages/components/src/custom-gradient-picker/constants.ts
+@@ -10,8 +10,8 @@ export const DEFAULT_LINEAR_GRADIENT_ANGLE = 180;
+ 
+ export const HORIZONTAL_GRADIENT_ORIENTATION = {
+ 	type: 'angular',
+-	value: 90,
+-};
++	value: '90',
++} as const;
+ 
+ export const GRADIENT_OPTIONS = [
+ 	{ value: 'linear-gradient', label: __( 'Linear' ) },
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/constants.js b/packages/components/src/custom-gradient-picker/gradient-bar/constants.ts
+similarity index 100%
+rename from packages/components/src/custom-gradient-picker/gradient-bar/constants.js
+rename to packages/components/src/custom-gradient-picker/gradient-bar/constants.ts
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.js b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+similarity index 56%
+rename from packages/components/src/custom-gradient-picker/gradient-bar/control-points.js
+rename to packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+index 6b964d047b2a59..e761df24823b99 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/control-points.js
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx
+@@ -1,5 +1,3 @@
+-// @ts-nocheck
+-
+ /**
+  * External dependencies
+  */
+@@ -36,8 +34,21 @@ import {
+ 	MINIMUM_SIGNIFICANT_MOVE,
+ 	KEYBOARD_CONTROL_POINT_VARIATION,
+ } from './constants';
++import type { WordPressComponentProps } from '../../ui/context';
++import type {
++	ControlPointButtonProps,
++	ControlPointMoveState,
++	ControlPointsProps,
++	InsertPointProps,
++} from '../types';
++import type { CustomColorPickerDropdownProps } from '../../color-palette/types';
+ 
+-function ControlPointButton( { isOpen, position, color, ...additionalProps } ) {
++function ControlPointButton( {
++	isOpen,
++	position,
++	color,
++	...additionalProps
++}: WordPressComponentProps< ControlPointButtonProps, 'button', true > ) {
+ 	const instanceId = useInstanceId( ControlPointButton );
+ 	const descriptionId = `components-custom-gradient-picker__control-point-button-description-${ instanceId }`;
+ 	return (
+@@ -75,13 +86,14 @@ function GradientColorPickerDropdown( {
+ 	isRenderedInSidebar,
+ 	className,
+ 	...props
+-} ) {
++}: CustomColorPickerDropdownProps ) {
+ 	// Open the popover below the gradient control/insertion point
+ 	const popoverProps = useMemo(
+-		() => ( {
+-			placement: 'bottom',
+-			offset: 8,
+-		} ),
++		() =>
++			( {
++				placement: 'bottom',
++				offset: 8,
++			} as const ),
+ 		[]
+ 	);
+ 
+@@ -110,16 +122,25 @@ function ControlPoints( {
+ 	onStartControlPointChange,
+ 	onStopControlPointChange,
+ 	__experimentalIsRenderedInSidebar,
+-} ) {
+-	const controlPointMoveState = useRef();
++}: ControlPointsProps ) {
++	const controlPointMoveState = useRef< ControlPointMoveState >();
++
++	const onMouseMove = ( event: MouseEvent ) => {
++		if (
++			controlPointMoveState.current === undefined ||
++			gradientPickerDomRef.current === null
++		) {
++			return;
++		}
+ 
+-	const onMouseMove = ( event ) => {
+ 		const relativePosition = getHorizontalRelativeGradientPosition(
+ 			event.clientX,
+ 			gradientPickerDomRef.current
+ 		);
++
+ 		const { initialPosition, index, significantMoveHappened } =
+ 			controlPointMoveState.current;
++
+ 		if (
+ 			! significantMoveHappened &&
+ 			Math.abs( initialPosition - relativePosition ) >=
+@@ -150,142 +171,158 @@ function ControlPoints( {
+ 	// Adding `cleanEventListeners` to the dependency array below requires the function itself to be wrapped in a `useCallback`
+ 	// This memoization would prevent the event listeners from being properly cleaned.
+ 	// Instead, we'll pass a ref to the function in our `useEffect` so `cleanEventListeners` itself is no longer a dependency.
+-	const cleanEventListenersRef = useRef();
++	const cleanEventListenersRef = useRef< () => void >();
+ 	cleanEventListenersRef.current = cleanEventListeners;
+ 
+ 	useEffect( () => {
+ 		return () => {
+-			cleanEventListenersRef.current();
++			cleanEventListenersRef.current?.();
+ 		};
+ 	}, [] );
+ 
+-	return controlPoints.map( ( point, index ) => {
+-		const initialPosition = point?.position;
+-		return (
+-			ignoreMarkerPosition !== initialPosition && (
+-				<GradientColorPickerDropdown
+-					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
+-					key={ index }
+-					onClose={ onStopControlPointChange }
+-					renderToggle={ ( { isOpen, onToggle } ) => (
+-						<ControlPointButton
++	return (
++		<>
++			{ controlPoints.map( ( point, index ) => {
++				const initialPosition = point?.position;
++				return (
++					ignoreMarkerPosition !== initialPosition && (
++						<GradientColorPickerDropdown
++							isRenderedInSidebar={
++								__experimentalIsRenderedInSidebar
++							}
+ 							key={ index }
+-							onClick={ () => {
+-								if (
+-									controlPointMoveState.current &&
+-									controlPointMoveState.current
+-										.significantMoveHappened
+-								) {
+-									return;
+-								}
+-								if ( isOpen ) {
+-									onStopControlPointChange();
+-								} else {
+-									onStartControlPointChange();
+-								}
+-								onToggle();
+-							} }
+-							onMouseDown={ () => {
+-								if ( window && window.addEventListener ) {
+-									controlPointMoveState.current = {
+-										initialPosition,
+-										index,
+-										significantMoveHappened: false,
+-										listenersActivated: true,
+-									};
+-									onStartControlPointChange();
+-									window.addEventListener(
+-										'mousemove',
+-										onMouseMove
+-									);
+-									window.addEventListener(
+-										'mouseup',
+-										cleanEventListeners
+-									);
+-								}
+-							} }
+-							onKeyDown={ ( event ) => {
+-								if ( event.code === 'ArrowLeft' ) {
+-									// Stop propagation of the key press event to avoid focus moving
+-									// to another editor area.
+-									event.stopPropagation();
+-									onChange(
+-										updateControlPointPosition(
+-											controlPoints,
+-											index,
+-											clampPercent(
+-												point.position -
+-													KEYBOARD_CONTROL_POINT_VARIATION
+-											)
+-										)
+-									);
+-								} else if ( event.code === 'ArrowRight' ) {
+-									// Stop propagation of the key press event to avoid focus moving
+-									// to another editor area.
+-									event.stopPropagation();
+-									onChange(
+-										updateControlPointPosition(
+-											controlPoints,
+-											index,
+-											clampPercent(
+-												point.position +
+-													KEYBOARD_CONTROL_POINT_VARIATION
+-											)
+-										)
+-									);
+-								}
+-							} }
+-							isOpen={ isOpen }
+-							position={ point.position }
+-							color={ point.color }
+-						/>
+-					) }
+-					renderContent={ ( { onClose } ) => (
+-						<>
+-							<ColorPicker
+-								enableAlpha={ ! disableAlpha }
+-								color={ point.color }
+-								onChange={ ( color ) => {
+-									onChange(
+-										updateControlPointColor(
+-											controlPoints,
+-											index,
+-											colord( color ).toRgbString()
+-										)
+-									);
+-								} }
+-							/>
+-							{ ! disableRemove && controlPoints.length > 2 && (
+-								<HStack
+-									className="components-custom-gradient-picker__remove-control-point-wrapper"
+-									alignment="center"
+-								>
+-									<Button
+-										onClick={ () => {
++							onClose={ onStopControlPointChange }
++							renderToggle={ ( { isOpen, onToggle } ) => (
++								<ControlPointButton
++									key={ index }
++									onClick={ () => {
++										if (
++											controlPointMoveState.current &&
++											controlPointMoveState.current
++												.significantMoveHappened
++										) {
++											return;
++										}
++										if ( isOpen ) {
++											onStopControlPointChange();
++										} else {
++											onStartControlPointChange();
++										}
++										onToggle();
++									} }
++									onMouseDown={ () => {
++										if (
++											window &&
++											window.addEventListener
++										) {
++											controlPointMoveState.current = {
++												initialPosition,
++												index,
++												significantMoveHappened: false,
++												listenersActivated: true,
++											};
++											onStartControlPointChange();
++											window.addEventListener(
++												'mousemove',
++												onMouseMove
++											);
++											window.addEventListener(
++												'mouseup',
++												cleanEventListeners
++											);
++										}
++									} }
++									onKeyDown={ ( event ) => {
++										if ( event.code === 'ArrowLeft' ) {
++											// Stop propagation of the key press event to avoid focus moving
++											// to another editor area.
++											event.stopPropagation();
+ 											onChange(
+-												removeControlPoint(
++												updateControlPointPosition(
+ 													controlPoints,
+-													index
++													index,
++													clampPercent(
++														point.position -
++															KEYBOARD_CONTROL_POINT_VARIATION
++													)
++												)
++											);
++										} else if (
++											event.code === 'ArrowRight'
++										) {
++											// Stop propagation of the key press event to avoid focus moving
++											// to another editor area.
++											event.stopPropagation();
++											onChange(
++												updateControlPointPosition(
++													controlPoints,
++													index,
++													clampPercent(
++														point.position +
++															KEYBOARD_CONTROL_POINT_VARIATION
++													)
++												)
++											);
++										}
++									} }
++									isOpen={ isOpen }
++									position={ point.position }
++									color={ point.color }
++								/>
++							) }
++							renderContent={ ( { onClose } ) => (
++								<>
++									<ColorPicker
++										enableAlpha={ ! disableAlpha }
++										color={ point.color }
++										onChange={ ( color ) => {
++											onChange(
++												updateControlPointColor(
++													controlPoints,
++													index,
++													colord(
++														color
++													).toRgbString()
+ 												)
+ 											);
+-											onClose();
+ 										} }
+-										variant="link"
+-									>
+-										{ __( 'Remove Control Point' ) }
+-									</Button>
+-								</HStack>
++									/>
++									{ ! disableRemove &&
++										controlPoints.length > 2 && (
++											<HStack
++												className="components-custom-gradient-picker__remove-control-point-wrapper"
++												alignment="center"
++											>
++												<Button
++													onClick={ () => {
++														onChange(
++															removeControlPoint(
++																controlPoints,
++																index
++															)
++														);
++														onClose();
++													} }
++													variant="link"
++												>
++													{ __(
++														'Remove Control Point'
++													) }
++												</Button>
++											</HStack>
++										) }
++								</>
+ 							) }
+-						</>
+-					) }
+-					style={ {
+-						left: `${ point.position }%`,
+-						transform: 'translateX( -50% )',
+-					} }
+-				/>
+-			)
+-		);
+-	} );
++							style={ {
++								left: `${ point.position }%`,
++								transform: 'translateX( -50% )',
++							} }
++						/>
++					)
++				);
++			} ) }
++		</>
++	);
+ }
+ 
+ function InsertPoint( {
+@@ -296,7 +333,7 @@ function InsertPoint( {
+ 	insertPosition,
+ 	disableAlpha,
+ 	__experimentalIsRenderedInSidebar,
+-} ) {
++}: InsertPointProps ) {
+ 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
+ 	return (
+ 		<GradientColorPickerDropdown
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/index.js b/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
+similarity index 85%
+rename from packages/components/src/custom-gradient-picker/gradient-bar/index.js
+rename to packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
+index 19b5746847e4b8..225a5fb75754dd 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/index.js
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/index.tsx
+@@ -1,5 +1,3 @@
+-// @ts-nocheck
+-
+ /**
+  * External dependencies
+  */
+@@ -16,8 +14,18 @@ import { useRef, useReducer } from '@wordpress/element';
+ import ControlPoints from './control-points';
+ import { getHorizontalRelativeGradientPosition } from './utils';
+ import { MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT } from './constants';
++import type {
++	CustomGradientBarProps,
++	CustomGradientBarReducerState,
++	CustomGradientBarReducerAction,
++	CustomGradientBarIdleState,
++} from '../types';
++import type { MouseEventHandler } from 'react';
+ 
+-function customGradientBarReducer( state, action ) {
++const customGradientBarReducer = (
++	state: CustomGradientBarReducerState,
++	action: CustomGradientBarReducerAction
++): CustomGradientBarReducerState => {
+ 	switch ( action.type ) {
+ 		case 'MOVE_INSERTER':
+ 			if ( state.id === 'IDLE' || state.id === 'MOVING_INSERTER' ) {
+@@ -65,8 +73,10 @@ function customGradientBarReducer( state, action ) {
+ 			break;
+ 	}
+ 	return state;
+-}
+-const customGradientBarReducerInitialState = { id: 'IDLE' };
++};
++const customGradientBarReducerInitialState: CustomGradientBarIdleState = {
++	id: 'IDLE',
++};
+ 
+ export default function CustomGradientBar( {
+ 	background,
+@@ -75,15 +85,21 @@ export default function CustomGradientBar( {
+ 	onChange,
+ 	disableInserter = false,
+ 	disableAlpha = false,
+-	__experimentalIsRenderedInSidebar,
+-} ) {
+-	const gradientMarkersContainerDomRef = useRef();
++	__experimentalIsRenderedInSidebar = false,
++}: CustomGradientBarProps ) {
++	const gradientMarkersContainerDomRef = useRef< HTMLDivElement >( null );
+ 
+ 	const [ gradientBarState, gradientBarStateDispatch ] = useReducer(
+ 		customGradientBarReducer,
+ 		customGradientBarReducerInitialState
+ 	);
+-	const onMouseEnterAndMove = ( event ) => {
++	const onMouseEnterAndMove: MouseEventHandler< HTMLDivElement > = (
++		event
++	) => {
++		if ( ! gradientMarkersContainerDomRef.current ) {
++			return;
++		}
++
+ 		const insertPosition = getHorizontalRelativeGradientPosition(
+ 			event.clientX,
+ 			gradientMarkersContainerDomRef.current
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/test/utils.js b/packages/components/src/custom-gradient-picker/gradient-bar/test/utils.ts
+similarity index 50%
+rename from packages/components/src/custom-gradient-picker/gradient-bar/test/utils.js
+rename to packages/components/src/custom-gradient-picker/gradient-bar/test/utils.ts
+index 525d075a0fd0a7..01396d94f0581d 100644
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/test/utils.js
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/test/utils.ts
+@@ -5,38 +5,54 @@ import { getHorizontalRelativeGradientPosition } from '../utils';
+ 
+ describe( 'getHorizontalRelativeGradientPosition', () => {
+ 	it( 'should return relative percentage position', () => {
+-		const containerElement = {
+-			getBoundingClientRect: () => ( {
+-				x: 0,
+-				width: 1000,
+-			} ),
+-		};
++		jest.spyOn(
++			window.HTMLElement.prototype,
++			'getBoundingClientRect'
++		).mockImplementationOnce(
++			() =>
++				( {
++					x: 0,
++					width: 1000,
++				} as DOMRect )
++		);
+ 
++		const containerElement = document.createElement( 'div' );
+ 		expect(
+ 			getHorizontalRelativeGradientPosition( 500, containerElement )
+ 		).toBe( 50 );
+ 	} );
+ 
+ 	it( 'should subtract the x position of the container from the mouse position', () => {
+-		const containerElement = {
+-			getBoundingClientRect: () => ( {
+-				x: 50,
+-				width: 1000,
+-			} ),
+-		};
++		jest.spyOn(
++			window.HTMLElement.prototype,
++			'getBoundingClientRect'
++		).mockImplementationOnce(
++			() =>
++				( {
++					x: 50,
++					width: 1000,
++				} as DOMRect )
++		);
+ 
++		const containerElement = document.createElement( 'div' );
+ 		expect(
+ 			getHorizontalRelativeGradientPosition( 550, containerElement )
+ 		).toBe( 50 );
+ 	} );
+ 
+ 	it( 'should clamp to a whole percentage number', () => {
+-		const containerElement = {
+-			getBoundingClientRect: () => ( {
+-				x: 0,
+-				width: 1000,
+-			} ),
+-		};
++		jest.spyOn(
++			window.HTMLElement.prototype,
++			'getBoundingClientRect'
++		).mockImplementationOnce(
++			() =>
++				( {
++					x: 0,
++					width: 1000,
++				} as DOMRect )
++		);
++
++		const containerElement = document.createElement( 'div' );
+ 
+ 		expect(
+ 			getHorizontalRelativeGradientPosition( 333, containerElement )
+@@ -44,12 +60,17 @@ describe( 'getHorizontalRelativeGradientPosition', () => {
+ 	} );
+ 
+ 	it( 'should clamp to zero when mouse position is less the x position', () => {
+-		const containerElement = {
+-			getBoundingClientRect: () => ( {
+-				x: 50,
+-				width: 1000,
+-			} ),
+-		};
++		jest.spyOn(
++			window.HTMLElement.prototype,
++			'getBoundingClientRect'
++		).mockImplementationOnce(
++			() =>
++				( {
++					x: 50,
++					width: 1000,
++				} as DOMRect )
++		);
++		const containerElement = document.createElement( 'div' );
+ 
+ 		expect(
+ 			getHorizontalRelativeGradientPosition( 2, containerElement )
+@@ -57,12 +78,18 @@ describe( 'getHorizontalRelativeGradientPosition', () => {
+ 	} );
+ 
+ 	it( 'should clamp to 100 when mouse position is greater than width', () => {
+-		const containerElement = {
+-			getBoundingClientRect: () => ( {
+-				x: 0,
+-				width: 1000,
+-			} ),
+-		};
++		jest.spyOn(
++			window.HTMLElement.prototype,
++			'getBoundingClientRect'
++		).mockImplementationOnce(
++			() =>
++				( {
++					x: 50,
++					width: 1000,
++				} as DOMRect )
++		);
++
++		const containerElement = document.createElement( 'div' );
+ 
+ 		expect(
+ 			getHorizontalRelativeGradientPosition( 1500, containerElement )
+@@ -70,7 +97,7 @@ describe( 'getHorizontalRelativeGradientPosition', () => {
+ 	} );
+ 
+ 	it( 'should return undefined if no containerElement is provided', () => {
+-		const containerElement = undefined;
++		const containerElement = null;
+ 
+ 		expect(
+ 			getHorizontalRelativeGradientPosition( 1500, containerElement )
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/utils.js b/packages/components/src/custom-gradient-picker/gradient-bar/utils.js
+deleted file mode 100644
+index 24b552e0c149fd..00000000000000
+--- a/packages/components/src/custom-gradient-picker/gradient-bar/utils.js
++++ /dev/null
+@@ -1,189 +0,0 @@
+-// @ts-nocheck
+-
+-/**
+- * Internal dependencies
+- */
+-import { MINIMUM_DISTANCE_BETWEEN_POINTS } from './constants';
+-
+-/**
+- * Control point for the gradient bar.
+- *
+- * @typedef {Object} ControlPoint
+- * @property {string} color    Color of the control point.
+- * @property {number} position Integer position of the control point as a percentage.
+- */
+-
+-/**
+- * Color as parsed from the gradient by gradient-parser.
+- *
+- * @typedef {Object} Color
+- * @property {string} r   Red component.
+- * @property {string} g   Green component.
+- * @property {string} b   Green component.
+- * @property {string} [a] Optional alpha component.
+- */
+-
+-/**
+- * Clamps a number between 0 and 100.
+- *
+- * @param {number} value Value to clamp.
+- *
+- * @return {number} Value clamped between 0 and 100.
+- */
+-export function clampPercent( value ) {
+-	return Math.max( 0, Math.min( 100, value ) );
+-}
+-
+-/**
+- * Check if a control point is overlapping with another.
+- *
+- * @param {ControlPoint[]} value        Array of control points.
+- * @param {number}         initialIndex Index of the position to test.
+- * @param {number}         newPosition  New position of the control point.
+- * @param {number}         minDistance  Distance considered to be overlapping.
+- *
+- * @return {boolean} True if the point is overlapping.
+- */
+-export function isOverlapping(
+-	value,
+-	initialIndex,
+-	newPosition,
+-	minDistance = MINIMUM_DISTANCE_BETWEEN_POINTS
+-) {
+-	const initialPosition = value[ initialIndex ].position;
+-	const minPosition = Math.min( initialPosition, newPosition );
+-	const maxPosition = Math.max( initialPosition, newPosition );
+-
+-	return value.some( ( { position }, index ) => {
+-		return (
+-			index !== initialIndex &&
+-			( Math.abs( position - newPosition ) < minDistance ||
+-				( minPosition < position && position < maxPosition ) )
+-		);
+-	} );
+-}
+-
+-/**
+- * Adds a control point from an array and returns the new array.
+- *
+- * @param {ControlPoint[]} points   Array of control points.
+- * @param {number}         position Position to insert the new point.
+- * @param {Color}          color    Color to update the control point at index.
+- *
+- * @return {ControlPoint[]} New array of control points.
+- */
+-export function addControlPoint( points, position, color ) {
+-	const nextIndex = points.findIndex(
+-		( point ) => point.position > position
+-	);
+-	const newPoint = { color, position };
+-	const newPoints = points.slice();
+-	newPoints.splice( nextIndex - 1, 0, newPoint );
+-	return newPoints;
+-}
+-
+-/**
+- * Removes a control point from an array and returns the new array.
+- *
+- * @param {ControlPoint[]} points Array of control points.
+- * @param {number}         index  Index to remove.
+- *
+- * @return {ControlPoint[]} New array of control points.
+- */
+-export function removeControlPoint( points, index ) {
+-	return points.filter( ( point, pointIndex ) => {
+-		return pointIndex !== index;
+-	} );
+-}
+-
+-/**
+- * Updates a control point from an array and returns the new array.
+- *
+- * @param {ControlPoint[]} points   Array of control points.
+- * @param {number}         index    Index to update.
+- * @param {ControlPoint[]} newPoint New control point to replace the index.
+- *
+- * @return {ControlPoint[]} New array of control points.
+- */
+-export function updateControlPoint( points, index, newPoint ) {
+-	const newValue = points.slice();
+-	newValue[ index ] = newPoint;
+-	return newValue;
+-}
+-
+-/**
+- * Updates the position of a control point from an array and returns the new array.
+- *
+- * @param {ControlPoint[]} points      Array of control points.
+- * @param {number}         index       Index to update.
+- * @param {number}         newPosition Position to move the control point at index.
+- *
+- * @return {ControlPoint[]} New array of control points.
+- */
+-export function updateControlPointPosition( points, index, newPosition ) {
+-	if ( isOverlapping( points, index, newPosition ) ) {
+-		return points;
+-	}
+-	const newPoint = {
+-		...points[ index ],
+-		position: newPosition,
+-	};
+-	return updateControlPoint( points, index, newPoint );
+-}
+-
+-/**
+- * Updates the position of a control point from an array and returns the new array.
+- *
+- * @param {ControlPoint[]} points   Array of control points.
+- * @param {number}         index    Index to update.
+- * @param {Color}          newColor Color to update the control point at index.
+- *
+- * @return {ControlPoint[]} New array of control points.
+- */
+-export function updateControlPointColor( points, index, newColor ) {
+-	const newPoint = {
+-		...points[ index ],
+-		color: newColor,
+-	};
+-	return updateControlPoint( points, index, newPoint );
+-}
+-
+-/**
+- * Updates the position of a control point from an array and returns the new array.
+- *
+- * @param {ControlPoint[]} points   Array of control points.
+- * @param {number}         position Position of the color stop.
+- * @param {string}         newColor Color to update the control point at index.
+- *
+- * @return {ControlPoint[]} New array of control points.
+- */
+-export function updateControlPointColorByPosition(
+-	points,
+-	position,
+-	newColor
+-) {
+-	const index = points.findIndex( ( point ) => point.position === position );
+-	return updateControlPointColor( points, index, newColor );
+-}
+-
+-/**
+- * Gets the horizontal coordinate when dragging a control point with the mouse.
+- *
+- * @param {number}  mouseXCoordinate Horizontal coordinate of the mouse position.
+- * @param {Element} containerElement Container for the gradient picker.
+- *
+- * @return {number | undefined} Whole number percentage from the left.
+- */
+-export function getHorizontalRelativeGradientPosition(
+-	mouseXCoordinate,
+-	containerElement
+-) {
+-	if ( ! containerElement ) {
+-		return;
+-	}
+-	const { x, width } = containerElement.getBoundingClientRect();
+-	const absolutePositionValue = mouseXCoordinate - x;
+-	return Math.round(
+-		clampPercent( ( absolutePositionValue * 100 ) / width )
+-	);
+-}
+diff --git a/packages/components/src/custom-gradient-picker/gradient-bar/utils.ts b/packages/components/src/custom-gradient-picker/gradient-bar/utils.ts
+new file mode 100644
+index 00000000000000..88daf2b2c19d6c
+--- /dev/null
++++ b/packages/components/src/custom-gradient-picker/gradient-bar/utils.ts
+@@ -0,0 +1,193 @@
++/**
++ * Internal dependencies
++ */
++import { MINIMUM_DISTANCE_BETWEEN_POINTS } from './constants';
++import type { ControlPoint } from '../types';
++
++/**
++ * Clamps a number between 0 and 100.
++ *
++ * @param value Value to clamp.
++ *
++ * @return Value clamped between 0 and 100.
++ */
++export function clampPercent( value: number ) {
++	return Math.max( 0, Math.min( 100, value ) );
++}
++
++/**
++ * Check if a control point is overlapping with another.
++ *
++ * @param value        Array of control points.
++ * @param initialIndex Index of the position to test.
++ * @param newPosition  New position of the control point.
++ * @param minDistance  Distance considered to be overlapping.
++ *
++ * @return True if the point is overlapping.
++ */
++export function isOverlapping(
++	value: ControlPoint[],
++	initialIndex: number,
++	newPosition: number,
++	minDistance: number = MINIMUM_DISTANCE_BETWEEN_POINTS
++) {
++	const initialPosition = value[ initialIndex ].position;
++	const minPosition = Math.min( initialPosition, newPosition );
++	const maxPosition = Math.max( initialPosition, newPosition );
++
++	return value.some( ( { position }, index ) => {
++		return (
++			index !== initialIndex &&
++			( Math.abs( position - newPosition ) < minDistance ||
++				( minPosition < position && position < maxPosition ) )
++		);
++	} );
++}
++
++/**
++ * Adds a control point from an array and returns the new array.
++ *
++ * @param points   Array of control points.
++ * @param position Position to insert the new point.
++ * @param color    Color to update the control point at index.
++ *
++ * @return New array of control points.
++ */
++export function addControlPoint(
++	points: ControlPoint[],
++	position: number,
++	color: ControlPoint[ 'color' ]
++) {
++	const nextIndex = points.findIndex(
++		( point ) => point.position > position
++	);
++	const newPoint = { color, position };
++	const newPoints = points.slice();
++	newPoints.splice( nextIndex - 1, 0, newPoint );
++	return newPoints;
++}
++
++/**
++ * Removes a control point from an array and returns the new array.
++ *
++ * @param points Array of control points.
++ * @param index  Index to remove.
++ *
++ * @return New array of control points.
++ */
++export function removeControlPoint( points: ControlPoint[], index: number ) {
++	return points.filter( ( _point, pointIndex ) => {
++		return pointIndex !== index;
++	} );
++}
++/**
++ * Updates a control point from an array and returns the new array.
++ *
++ * @param points   Array of control points.
++ * @param index    Index to update.
++ * @param newPoint New control point to replace the index.
++ *
++ * @return New array of control points.
++ */
++export function updateControlPoint(
++	points: ControlPoint[],
++	index: number,
++	newPoint: ControlPoint
++) {
++	const newValue = points.slice();
++	newValue[ index ] = newPoint;
++	return newValue;
++}
++
++/**
++ * Updates the position of a control point from an array and returns the new array.
++ *
++ * @param points      Array of control points.
++ * @param index       Index to update.
++ * @param newPosition Position to move the control point at index.
++ *
++ * @return New array of control points.
++ */
++export function updateControlPointPosition(
++	points: ControlPoint[],
++	index: number,
++	newPosition: ControlPoint[ 'position' ]
++) {
++	if ( isOverlapping( points, index, newPosition ) ) {
++		return points;
++	}
++	const newPoint = {
++		...points[ index ],
++		position: newPosition,
++	};
++	return updateControlPoint( points, index, newPoint );
++}
++
++/**
++ * Updates the position of a control point from an array and returns the new array.
++ *
++ * @param points   Array of control points.
++ * @param index    Index to update.
++ * @param newColor Color to update the control point at index.
++ *
++ * @return New array of control points.
++ */
++export function updateControlPointColor(
++	points: ControlPoint[],
++	index: number,
++	newColor: ControlPoint[ 'color' ]
++) {
++	const newPoint = {
++		...points[ index ],
++		color: newColor,
++	};
++	return updateControlPoint( points, index, newPoint );
++}
++
++/**
++ * Updates the position of a control point from an array and returns the new array.
++ *
++ * @param points   Array of control points.
++ * @param position Position of the color stop.
++ * @param newColor Color to update the control point at index.
++ *
++ * @return New array of control points.
++ */
++export function updateControlPointColorByPosition(
++	points: ControlPoint[],
++	position: ControlPoint[ 'position' ],
++	newColor: ControlPoint[ 'color' ]
++) {
++	const index = points.findIndex( ( point ) => point.position === position );
++	return updateControlPointColor( points, index, newColor );
++}
++
++/**
++ * Gets the horizontal coordinate when dragging a control point with the mouse.
++ *
++ * @param mouseXcoordinate Horizontal coordinate of the mouse position.
++ * @param containerElement Container for the gradient picker.
++ *
++ * @return Whole number percentage from the left.
++ */
++export function getHorizontalRelativeGradientPosition(
++	mouseXcoordinate: number,
++	containerElement: HTMLDivElement
++): number;
++export function getHorizontalRelativeGradientPosition(
++	mouseXcoordinate: number,
++	containerElement: null
++): undefined;
++export function getHorizontalRelativeGradientPosition(
++	mouseXCoordinate: number,
++	containerElement: HTMLDivElement | null
++) {
++	if ( ! containerElement ) {
++		return;
++	}
++	const { x, width } = containerElement.getBoundingClientRect();
++	const absolutePositionValue = mouseXCoordinate - x;
++	return Math.round(
++		clampPercent( ( absolutePositionValue * 100 ) / width )
++	);
++}
+diff --git a/packages/components/src/custom-gradient-picker/index.js b/packages/components/src/custom-gradient-picker/index.tsx
+similarity index 68%
+rename from packages/components/src/custom-gradient-picker/index.js
+rename to packages/components/src/custom-gradient-picker/index.tsx
+index db47f25c88d948..5be6bdc8f5c125 100644
+--- a/packages/components/src/custom-gradient-picker/index.js
++++ b/packages/components/src/custom-gradient-picker/index.tsx
+@@ -1,9 +1,8 @@
+-// @ts-nocheck
+-
+ /**
+  * External dependencies
+  */
+ import classnames from 'classnames';
++import type gradientParser from 'gradient-parser';
+ 
+ /**
+  * WordPress dependencies
+@@ -36,17 +35,26 @@ import {
+ 	AccessoryWrapper,
+ 	SelectWrapper,
+ } from './styles/custom-gradient-picker-styles';
++import type {
++	CustomGradientPickerProps,
++	GradientAnglePickerProps,
++	GradientTypePickerProps,
++} from './types';
+ 
+-const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
++const GradientAnglePicker = ( {
++	gradientAST,
++	hasGradient,
++	onChange,
++}: GradientAnglePickerProps ) => {
+ 	const angle =
+ 		gradientAST?.orientation?.value ?? DEFAULT_LINEAR_GRADIENT_ANGLE;
+-	const onAngleChange = ( newAngle ) => {
++	const onAngleChange = ( newAngle: number ) => {
+ 		onChange(
+ 			serializeGradient( {
+ 				...gradientAST,
+ 				orientation: {
+ 					type: 'angular',
+-					value: newAngle,
++					value: `${ newAngle }`,
+ 				},
+ 			} )
+ 		);
+@@ -60,17 +68,22 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
+ 	);
+ };
+ 
+-const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
++const GradientTypePicker = ( {
++	gradientAST,
++	hasGradient,
++	onChange,
++}: GradientTypePickerProps ) => {
+ 	const { type } = gradientAST;
++
+ 	const onSetLinearGradient = () => {
+ 		onChange(
+ 			serializeGradient( {
+ 				...gradientAST,
+-				...( gradientAST.orientation
+-					? {}
+-					: { orientation: HORIZONTAL_GRADIENT_ORIENTATION } ),
++				orientation: gradientAST.orientation
++					? undefined
++					: HORIZONTAL_GRADIENT_ORIENTATION,
+ 				type: 'linear-gradient',
+-			} )
++			} as gradientParser.LinearGradientNode )
+ 		);
+ 	};
+ 
+@@ -84,7 +97,7 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
+ 		);
+ 	};
+ 
+-	const handleOnChange = ( next ) => {
++	const handleOnChange = ( next: string ) => {
+ 		if ( next === 'linear-gradient' ) {
+ 			onSetLinearGradient();
+ 		}
+@@ -102,30 +115,57 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
+ 			onChange={ handleOnChange }
+ 			options={ GRADIENT_OPTIONS }
+ 			size="__unstable-large"
+-			value={ hasGradient && type }
++			value={ hasGradient ? type : undefined }
+ 		/>
+ 	);
+ };
+ 
+-export default function CustomGradientPicker( {
++/**
++ * CustomGradientPicker is a React component that renders a UI for specifying
++ * linear or radial gradients. Radial gradients are displayed in the picker as
++ * a slice of the gradient from the center to the outside.
++ *
++ * ```jsx
++ * import { CustomGradientPicker } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyCustomGradientPicker = () => {
++ *   const [ gradient, setGradient ] = useState();
++ *
++ *   return (
++ *     <CustomGradientPicker
++ *			value={ gradient }
++ *			onChange={ setGradient }
++ *     />
++ *   );
++ * };
++ * ```
++ */
++export function CustomGradientPicker( {
+ 	/** Start opting into the new margin-free styles that will become the default in a future version. */
+ 	__nextHasNoMargin = false,
+ 	value,
+ 	onChange,
+-	__experimentalIsRenderedInSidebar,
+-} ) {
+-	const gradientAST = getGradientAstWithDefault( value );
++	__experimentalIsRenderedInSidebar = false,
++}: CustomGradientPickerProps ) {
++	const { gradientAST, gradientAstValue } =
++		getGradientAstWithDefault( value );
+ 	// On radial gradients the bar should display a linear gradient.
+ 	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
+ 	// On liner gradients the bar represents the color stops from left to right independently of the angle.
+ 	const background = getLinearGradientRepresentation( gradientAST );
+-	const hasGradient = gradientAST.value !== DEFAULT_GRADIENT;
++	const hasGradient = gradientAstValue !== DEFAULT_GRADIENT;
+ 	// Control points color option may be hex from presets, custom colors will be rgb.
+ 	// The position should always be a percentage.
+-	const controlPoints = gradientAST.colorStops.map( ( colorStop ) => ( {
+-		color: getStopCssColor( colorStop ),
+-		position: parseInt( colorStop.length.value ),
+-	} ) );
++	const controlPoints = gradientAST.colorStops.map( ( colorStop ) => {
++		return {
++			color: getStopCssColor( colorStop ),
++			// Although it's already been checked by `hasUnsupportedLength` in `getGradientAstWithDefault`,
++			// TypeScript doesn't know that `colorStop.length` is not undefined here.
++			// @ts-expect-error
++			position: parseInt( colorStop.length.value ),
++		};
++	} );
+ 
+ 	if ( ! __nextHasNoMargin ) {
+ 		deprecated(
+@@ -187,3 +227,5 @@ export default function CustomGradientPicker( {
+ 		</VStack>
+ 	);
+ }
++
++export default CustomGradientPicker;
+diff --git a/packages/components/src/custom-gradient-picker/serializer.js b/packages/components/src/custom-gradient-picker/serializer.js
+deleted file mode 100644
+index 934cf392ddd1e3..00000000000000
+--- a/packages/components/src/custom-gradient-picker/serializer.js
++++ /dev/null
+@@ -1,48 +0,0 @@
+-// @ts-nocheck
+-
+-export function serializeGradientColor( { type, value } ) {
+-	if ( type === 'literal' ) {
+-		return value;
+-	}
+-	if ( type === 'hex' ) {
+-		return `#${ value }`;
+-	}
+-	return `${ type }(${ value.join( ',' ) })`;
+-}
+-
+-export function serializeGradientPosition( position ) {
+-	if ( ! position ) {
+-		return '';
+-	}
+-	const { value, type } = position;
+-	return `${ value }${ type }`;
+-}
+-
+-export function serializeGradientColorStop( { type, value, length } ) {
+-	return `${ serializeGradientColor( {
+-		type,
+-		value,
+-	} ) } ${ serializeGradientPosition( length ) }`;
+-}
+-
+-export function serializeGradientOrientation( orientation ) {
+-	if ( ! orientation || orientation.type !== 'angular' ) {
+-		return;
+-	}
+-	return `${ orientation.value }deg`;
+-}
+-
+-export function serializeGradient( { type, orientation, colorStops } ) {
+-	const serializedOrientation = serializeGradientOrientation( orientation );
+-	const serializedColorStops = colorStops
+-		.sort( ( colorStop1, colorStop2 ) => {
+-			return (
+-				( colorStop1?.length?.value ?? 0 ) -
+-				( colorStop2?.length?.value ?? 0 )
+-			);
+-		} )
+-		.map( serializeGradientColorStop );
+-	return `${ type }(${ [ serializedOrientation, ...serializedColorStops ]
+-		.filter( Boolean )
+-		.join( ',' ) })`;
+-}
+diff --git a/packages/components/src/custom-gradient-picker/serializer.ts b/packages/components/src/custom-gradient-picker/serializer.ts
+new file mode 100644
+index 00000000000000..226348dadc66c1
+--- /dev/null
++++ b/packages/components/src/custom-gradient-picker/serializer.ts
+@@ -0,0 +1,82 @@
++/**
++ * External dependencies
++ */
++import type gradientParser from 'gradient-parser';
++/**
++ * Internal dependencies
++ */
++import type { ColorStopTypeAndValue } from './types';
++
++export function serializeGradientColor( {
++	type,
++	value,
++}: ColorStopTypeAndValue ) {
++	if ( type === 'literal' ) {
++		return value;
++	}
++	if ( type === 'hex' ) {
++		return `#${ value }`;
++	}
++	return `${ type }(${ value.join( ',' ) })`;
++}
++
++export function serializeGradientPosition(
++	position: gradientParser.ColorStop[ 'length' ]
++) {
++	if ( ! position ) {
++		return '';
++	}
++	const { value, type } = position;
++	return `${ value }${ type }`;
++}
++
++export function serializeGradientColorStop( {
++	type,
++	value,
++	length,
++}: gradientParser.ColorStop ) {
++	return `${ serializeGradientColor( {
++		type,
++		value,
++	} as ColorStopTypeAndValue ) } ${ serializeGradientPosition( length ) }`;
++}
++
++export function serializeGradientOrientation(
++	orientation: gradientParser.GradientNode[ 'orientation' ]
++) {
++	if (
++		Array.isArray( orientation ) ||
++		! orientation ||
++		orientation.type !== 'angular'
++	) {
++		return;
++	}
++	return `${ orientation.value }deg`;
++}
++
++export function serializeGradient( {
++	type,
++	orientation,
++	colorStops,
++}: gradientParser.GradientNode ) {
++	const serializedOrientation = serializeGradientOrientation( orientation );
++	const serializedColorStops = colorStops
++		.sort( ( colorStop1, colorStop2 ) => {
++			const getNumericStopValue = (
++				colorStop: gradientParser.ColorStop
++			) => {
++				return colorStop?.length?.value === undefined
++					? 0
++					: parseInt( colorStop.length.value );
++			};
++
++			return (
++				getNumericStopValue( colorStop1 ) -
++				getNumericStopValue( colorStop2 )
++			);
++		} )
++		.map( serializeGradientColorStop );
++	return `${ type }(${ [ serializedOrientation, ...serializedColorStops ]
++		.filter( Boolean )
++		.join( ',' ) })`;
++}
+diff --git a/packages/components/src/custom-gradient-picker/stories/index.js b/packages/components/src/custom-gradient-picker/stories/index.js
+deleted file mode 100644
+index 9e56d1534955d0..00000000000000
+--- a/packages/components/src/custom-gradient-picker/stories/index.js
++++ /dev/null
+@@ -1,33 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import CustomGradientPicker from '../';
+-
+-export default {
+-	title: 'Components/CustomGradientPicker',
+-	component: CustomGradientPicker,
+-	argTypes: {
+-		__nextHasNoMargin: { control: { type: 'boolean' } },
+-	},
+-};
+-
+-const CustomGradientPickerWithState = ( props ) => {
+-	const [ gradient, setGradient ] = useState();
+-	return (
+-		<CustomGradientPicker
+-			{ ...props }
+-			value={ gradient }
+-			onChange={ setGradient }
+-		/>
+-	);
+-};
+-
+-export const Default = CustomGradientPickerWithState.bind( {} );
+-Default.args = {
+-	__nextHasNoMargin: true,
+-};
+diff --git a/packages/components/src/custom-gradient-picker/stories/index.tsx b/packages/components/src/custom-gradient-picker/stories/index.tsx
+new file mode 100644
+index 00000000000000..3648db3abe571e
+--- /dev/null
++++ b/packages/components/src/custom-gradient-picker/stories/index.tsx
+@@ -0,0 +1,45 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import CustomGradientPicker from '../';
++
++const meta: ComponentMeta< typeof CustomGradientPicker > = {
++	title: 'Components/CustomGradientPicker',
++	component: CustomGradientPicker,
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const CustomGradientPickerWithState: ComponentStory<
++	typeof CustomGradientPicker
++> = ( { onChange, ...props } ) => {
++	const [ gradient, setGradient ] = useState< string >();
++	return (
++		<CustomGradientPicker
++			{ ...props }
++			value={ gradient }
++			onChange={ ( newGradient ) => {
++				setGradient( newGradient );
++				onChange( newGradient );
++			} }
++		/>
++	);
++};
++
++export const Default = CustomGradientPickerWithState.bind( {} );
++Default.args = {
++	__nextHasNoMargin: true,
++};
+diff --git a/packages/components/src/custom-gradient-picker/styles/custom-gradient-picker-styles.js b/packages/components/src/custom-gradient-picker/styles/custom-gradient-picker-styles.tsx
+similarity index 100%
+rename from packages/components/src/custom-gradient-picker/styles/custom-gradient-picker-styles.js
+rename to packages/components/src/custom-gradient-picker/styles/custom-gradient-picker-styles.tsx
+diff --git a/packages/components/src/custom-gradient-picker/test/serializer.js b/packages/components/src/custom-gradient-picker/test/serializer.ts
+similarity index 56%
+rename from packages/components/src/custom-gradient-picker/test/serializer.js
+rename to packages/components/src/custom-gradient-picker/test/serializer.ts
+index 3b11e41f7c91d3..3c14194fc7279f 100644
+--- a/packages/components/src/custom-gradient-picker/test/serializer.js
++++ b/packages/components/src/custom-gradient-picker/test/serializer.ts
+@@ -12,24 +12,30 @@ import {
+ describe( 'It should serialize a gradient', () => {
+ 	test( 'serializeGradientColor', () => {
+ 		expect(
+-			serializeGradientColor( { type: 'rgba', value: [ 1, 2, 3, 0.5 ] } )
++			serializeGradientColor( {
++				type: 'rgba',
++				value: [ '1', '2', '3', '0.5' ],
++			} )
+ 		).toBe( 'rgba(1,2,3,0.5)' );
+ 
+ 		expect(
+-			serializeGradientColor( { type: 'rgb', value: [ 255, 0, 0 ] } )
++			serializeGradientColor( {
++				type: 'rgb',
++				value: [ '255', '0', '0' ],
++			} )
+ 		).toBe( 'rgb(255,0,0)' );
+ 	} );
+ 
+ 	test( 'serializeGradientPosition', () => {
+-		expect( serializeGradientPosition( { type: '%', value: 70 } ) ).toBe(
++		expect( serializeGradientPosition( { type: '%', value: '70' } ) ).toBe(
+ 			'70%'
+ 		);
+ 
+-		expect( serializeGradientPosition( { type: '%', value: 0 } ) ).toBe(
++		expect( serializeGradientPosition( { type: '%', value: '0' } ) ).toBe(
+ 			'0%'
+ 		);
+ 
+-		expect( serializeGradientPosition( { type: 'px', value: 4 } ) ).toBe(
++		expect( serializeGradientPosition( { type: 'px', value: '4' } ) ).toBe(
+ 			'4px'
+ 		);
+ 	} );
+@@ -38,35 +44,35 @@ describe( 'It should serialize a gradient', () => {
+ 		expect(
+ 			serializeGradientColorStop( {
+ 				type: 'rgba',
+-				value: [ 1, 2, 3, 0.5 ],
+-				length: { type: '%', value: 70 },
++				value: [ '1', '2', '3', '0.5' ],
++				length: { type: '%', value: '70' },
+ 			} )
+ 		).toBe( 'rgba(1,2,3,0.5) 70%' );
+ 
+ 		expect(
+ 			serializeGradientColorStop( {
+ 				type: 'rgb',
+-				value: [ 255, 0, 0 ],
+-				length: { type: '%', value: 0 },
++				value: [ '255', '0', '0' ],
++				length: { type: '%', value: '0' },
+ 			} )
+ 		).toBe( 'rgb(255,0,0) 0%' );
+ 
+ 		expect(
+ 			serializeGradientColorStop( {
+ 				type: 'rgba',
+-				value: [ 1, 2, 3, 0.5 ],
+-				length: { type: 'px', value: 100 },
++				value: [ '1', '2', '3', '0.5' ],
++				length: { type: 'px', value: '100' },
+ 			} )
+ 		).toBe( 'rgba(1,2,3,0.5) 100px' );
+ 	} );
+ 
+ 	test( 'serializeGradientOrientation', () => {
+ 		expect(
+-			serializeGradientOrientation( { type: 'angular', value: 40 } )
++			serializeGradientOrientation( { type: 'angular', value: '40' } )
+ 		).toBe( '40deg' );
+ 
+ 		expect(
+-			serializeGradientOrientation( { type: 'angular', value: 0 } )
++			serializeGradientOrientation( { type: 'angular', value: '0' } )
+ 		).toBe( '0deg' );
+ 	} );
+ 
+@@ -74,17 +80,17 @@ describe( 'It should serialize a gradient', () => {
+ 		expect(
+ 			serializeGradient( {
+ 				type: 'linear-gradient',
+-				orientation: { type: 'angular', value: 40 },
++				orientation: { type: 'angular', value: '40' },
+ 				colorStops: [
+ 					{
+ 						type: 'rgba',
+-						value: [ 1, 2, 3, 0.5 ],
+-						length: { type: '%', value: 70 },
++						value: [ '1', '2', '3', '0.5' ],
++						length: { type: '%', value: '70' },
+ 					},
+ 					{
+ 						type: 'rgba',
+-						value: [ 255, 1, 1, 0.9 ],
+-						length: { type: '%', value: 40 },
++						value: [ '255', '1', '1', '0.9' ],
++						length: { type: '%', value: '40' },
+ 					},
+ 				],
+ 			} )
+@@ -98,13 +104,13 @@ describe( 'It should serialize a gradient', () => {
+ 				colorStops: [
+ 					{
+ 						type: 'rgba',
+-						value: [ 1, 2, 3, 0.5 ],
+-						length: { type: '%', value: 70 },
++						value: [ '1', '2', '3', '0.5' ],
++						length: { type: '%', value: '70' },
+ 					},
+ 					{
+ 						type: 'rgba',
+-						value: [ 255, 1, 1, 0.9 ],
+-						length: { type: '%', value: 40 },
++						value: [ '255', '1', '1', '0.9' ],
++						length: { type: '%', value: '40' },
+ 					},
+ 				],
+ 			} )
+@@ -117,12 +123,12 @@ describe( 'It should serialize a gradient', () => {
+ 					{
+ 						type: 'hex',
+ 						value: '000',
+-						length: { type: '%', value: 70 },
++						length: { type: '%', value: '70' },
+ 					},
+ 					{
+ 						type: 'hex',
+ 						value: 'fff',
+-						length: { type: '%', value: 40 },
++						length: { type: '%', value: '40' },
+ 					},
+ 				],
+ 			} )
+@@ -131,27 +137,27 @@ describe( 'It should serialize a gradient', () => {
+ 		expect(
+ 			serializeGradient( {
+ 				type: 'linear-gradient',
+-				orientation: { type: 'angular', value: 0 },
++				orientation: { type: 'angular', value: '0' },
+ 				colorStops: [
+ 					{
+ 						type: 'rgba',
+-						value: [ 1, 2, 3, 0.5 ],
+-						length: { type: '%', value: 0 },
++						value: [ '1', '2', '3', '0.5' ],
++						length: { type: '%', value: '0' },
+ 					},
+ 					{
+ 						type: 'rgba',
+-						value: [ 255, 1, 1, 0.9 ],
+-						length: { type: '%', value: 40 },
++						value: [ '255', '1', '1', '0.9' ],
++						length: { type: '%', value: '40' },
+ 					},
+ 					{
+ 						type: 'rgba',
+-						value: [ 1, 2, 3, 0.5 ],
+-						length: { type: '%', value: 100 },
++						value: [ '1', '2', '3', '0.5' ],
++						length: { type: '%', value: '100' },
+ 					},
+ 					{
+ 						type: 'rgba',
+-						value: [ 10, 20, 30, 0.5 ],
+-						length: { type: '%', value: 20 },
++						value: [ '10', '20', '30', '0.5' ],
++						length: { type: '%', value: '20' },
+ 					},
+ 				],
+ 			} )
+diff --git a/packages/components/src/custom-gradient-picker/types.ts b/packages/components/src/custom-gradient-picker/types.ts
+new file mode 100644
+index 00000000000000..93407fd77ddcf8
+--- /dev/null
++++ b/packages/components/src/custom-gradient-picker/types.ts
+@@ -0,0 +1,137 @@
++/**
++ * External dependencies
++ */
++import type gradientParser from 'gradient-parser';
++
++export type CustomGradientPickerProps = {
++	/**
++	 * Start opting in to the new margin-free styles that will become the default
++	 * in a future version, currently scheduled to be WordPress 6.4. (The prop
++	 * can be safely removed once this happens.)
++	 *
++	 * @default false
++	 */
++	__nextHasNoMargin?: boolean;
++	/**
++	 * The current value of the gradient. Pass a css gradient string (See default value for example).
++	 * Optionally pass in a `null` value to specify no gradient is currently selected.
++	 *
++	 * @default 'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)'
++	 */
++	value?: string | null;
++	/**
++	 * The function called when a new gradient has been defined. It is passed to
++	 * the `currentGradient` as an argument.
++	 */
++	onChange: ( currentGradient: string ) => void;
++	/**
++	 * Whether this is rendered in the sidebar.
++	 *
++	 * @default false
++	 */
++	__experimentalIsRenderedInSidebar?: boolean;
++};
++
++export type GradientAnglePickerProps = {
++	gradientAST:
++		| gradientParser.LinearGradientNode
++		| gradientParser.RepeatingLinearGradientNode;
++	hasGradient: boolean;
++	onChange: ( gradient: string ) => void;
++};
++
++export type GradientTypePickerProps = {
++	gradientAST: gradientParser.GradientNode;
++	hasGradient: boolean;
++	onChange: ( gradient: string ) => void;
++};
++
++export type ControlPoint = { color: string; position: number };
++
++// When dealing with unions of objects, using `Pick` will result
++// in a new type where each desired prop is a union of the values for that prop
++// across all of the original union members. This does not maintain the specific
++// combinations of props present in the original union.
++// To avoid this, the `DistributivePick` type will
++// "distribute" the `Pick` across the union. This allows the `Pick`
++// to act on each member individually, maintaining the relationships between the
++// resulting props.
++// https://stackoverflow.com/questions/57103834/typescript-omit-a-property-from-all-interfaces-in-a-union-but-keep-the-union-s
++type DistributivePick< T, K extends keyof T > = T extends any
++	? Pick< T, K >
++	: never;
++
++export type ColorStopTypeAndValue = DistributivePick<
++	gradientParser.ColorStop,
++	'type' | 'value'
++>;
++
++export type CustomGradientBarProps = {
++	background: React.CSSProperties[ 'background' ];
++	hasGradient: boolean;
++	value: ControlPoint[];
++	onChange: ( newControlPoints: ControlPoint[] ) => void;
++	disableInserter?: boolean;
++	disableAlpha?: boolean;
++	__experimentalIsRenderedInSidebar?: boolean;
++};
++
++export type CustomGradientBarIdleState = { id: 'IDLE' };
++type CustomGradientBarMovingInserterState = {
++	id: 'MOVING_INSERTER';
++	insertPosition: number;
++};
++type CustomGradientBarInsertingControlPointState = {
++	id: 'INSERTING_CONTROL_POINT';
++	insertPosition: number;
++};
++type CustomGradientBarMovingControlPointState = { id: 'MOVING_CONTROL_POINT' };
++
++export type CustomGradientBarReducerState =
++	| CustomGradientBarIdleState
++	| CustomGradientBarMovingInserterState
++	| CustomGradientBarInsertingControlPointState
++	| CustomGradientBarMovingControlPointState;
++
++export type CustomGradientBarReducerAction =
++	| { type: 'MOVE_INSERTER'; insertPosition: number }
++	| { type: 'STOP_INSERTER_MOVE' }
++	| { type: 'OPEN_INSERTER' }
++	| { type: 'CLOSE_INSERTER' }
++	| { type: 'START_CONTROL_CHANGE' }
++	| { type: 'STOP_CONTROL_CHANGE' };
++
++export type ControlPointButtonProps = {
++	isOpen: boolean;
++	position: ControlPoint[ 'position' ];
++	color: string;
++};
++
++export type ControlPointsProps = {
++	disableRemove: boolean;
++	disableAlpha: boolean;
++	gradientPickerDomRef: React.RefObject< HTMLDivElement >;
++	ignoreMarkerPosition?: number;
++	value: ControlPoint[];
++	onChange: ( controlPoints: ControlPoint[] ) => void;
++	onStartControlPointChange: () => void;
++	onStopControlPointChange: () => void;
++	__experimentalIsRenderedInSidebar: boolean;
++};
++
++export type ControlPointMoveState = {
++	initialPosition: number;
++	index: number;
++	significantMoveHappened: boolean;
++	listenersActivated: boolean;
++};
++
++export type InsertPointProps = {
++	value: ControlPoint[];
++	onChange: ( controlPoints: ControlPoint[] ) => void;
++	onOpenInserter: () => void;
++	onCloseInserter: () => void;
++	insertPosition: number;
++	disableAlpha: boolean;
++	__experimentalIsRenderedInSidebar: boolean;
++};
+diff --git a/packages/components/src/custom-gradient-picker/utils.js b/packages/components/src/custom-gradient-picker/utils.ts
+similarity index 61%
+rename from packages/components/src/custom-gradient-picker/utils.js
+rename to packages/components/src/custom-gradient-picker/utils.ts
+index 69d8223fbdb877..f90420e9a222be 100644
+--- a/packages/components/src/custom-gradient-picker/utils.js
++++ b/packages/components/src/custom-gradient-picker/utils.ts
+@@ -1,5 +1,3 @@
+-// @ts-nocheck
+-
+ /**
+  * External dependencies
+  */
+@@ -16,10 +14,13 @@ import {
+ 	DIRECTIONAL_ORIENTATION_ANGLE_MAP,
+ } from './constants';
+ import { serializeGradient } from './serializer';
++import type { ControlPoint } from './types';
+ 
+ extend( [ namesPlugin ] );
+ 
+-export function getLinearGradientRepresentation( gradientAST ) {
++export function getLinearGradientRepresentation(
++	gradientAST: gradientParser.GradientNode
++) {
+ 	return serializeGradient( {
+ 		type: 'linear-gradient',
+ 		orientation: HORIZONTAL_GRADIENT_ORIENTATION,
+@@ -27,29 +28,36 @@ export function getLinearGradientRepresentation( gradientAST ) {
+ 	} );
+ }
+ 
+-function hasUnsupportedLength( item ) {
++function hasUnsupportedLength( item: gradientParser.ColorStop ) {
+ 	return item.length === undefined || item.length.type !== '%';
+ }
+ 
+-export function getGradientAstWithDefault( value ) {
++export function getGradientAstWithDefault( value?: string | null ) {
+ 	// gradientAST will contain the gradient AST as parsed by gradient-parser npm module.
+ 	// More information of its structure available at https://www.npmjs.com/package/gradient-parser#ast.
+-	let gradientAST;
++	let gradientAST: gradientParser.GradientNode;
++	let gradientAstValue: string | undefined;
++
++	const valueToParse = value ?? DEFAULT_GRADIENT;
+ 
+ 	try {
+-		gradientAST = gradientParser.parse( value )[ 0 ];
+-		gradientAST.value = value;
++		gradientAST = gradientParser.parse( valueToParse )[ 0 ];
++		gradientAstValue = valueToParse;
+ 	} catch ( error ) {
+ 		gradientAST = gradientParser.parse( DEFAULT_GRADIENT )[ 0 ];
+-		gradientAST.value = DEFAULT_GRADIENT;
++		gradientAstValue = DEFAULT_GRADIENT;
+ 	}
+ 
+-	if ( gradientAST.orientation?.type === 'directional' ) {
+-		gradientAST.orientation.type = 'angular';
+-		gradientAST.orientation.value =
+-			DIRECTIONAL_ORIENTATION_ANGLE_MAP[
++	if (
++		! Array.isArray( gradientAST.orientation ) &&
++		gradientAST.orientation?.type === 'directional'
++	) {
++		gradientAST.orientation = {
++			type: 'angular',
++			value: DIRECTIONAL_ORIENTATION_ANGLE_MAP[
+ 				gradientAST.orientation.value
+-			].toString();
++			].toString(),
++		};
+ 	}
+ 
+ 	if ( gradientAST.colorStops.some( hasUnsupportedLength ) ) {
+@@ -57,19 +65,19 @@ export function getGradientAstWithDefault( value ) {
+ 		const step = 100 / ( colorStops.length - 1 );
+ 		colorStops.forEach( ( stop, index ) => {
+ 			stop.length = {
+-				value: step * index,
++				value: `${ step * index }`,
+ 				type: '%',
+ 			};
+ 		} );
+-		gradientAST.value = serializeGradient( gradientAST );
++		gradientAstValue = serializeGradient( gradientAST );
+ 	}
+ 
+-	return gradientAST;
++	return { gradientAST, gradientAstValue };
+ }
+ 
+ export function getGradientAstWithControlPoints(
+-	gradientAST,
+-	newControlPoints
++	gradientAST: gradientParser.GradientNode,
++	newControlPoints: ControlPoint[]
+ ) {
+ 	return {
+ 		...gradientAST,
+@@ -81,13 +89,16 @@ export function getGradientAstWithControlPoints(
+ 					value: position?.toString(),
+ 				},
+ 				type: a < 1 ? 'rgba' : 'rgb',
+-				value: a < 1 ? [ r, g, b, a ] : [ r, g, b ],
++				value:
++					a < 1
++						? [ `${ r }`, `${ g }`, `${ b }`, `${ a }` ]
++						: [ `${ r }`, `${ g }`, `${ b }` ],
+ 			};
+ 		} ),
+-	};
++	} as gradientParser.GradientNode;
+ }
+ 
+-export function getStopCssColor( colorStop ) {
++export function getStopCssColor( colorStop: gradientParser.ColorStop ) {
+ 	switch ( colorStop.type ) {
+ 		case 'hex':
+ 			return `#${ colorStop.value }`;
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index 7882950431bbab..9b54c5ed0c14c8 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -133,7 +133,7 @@ function ColorPickerPopover< T extends Color | Gradient >( {
+ 						__nextHasNoMargin
+ 						__experimentalIsRenderedInSidebar
+ 						value={ element.gradient }
+-						onChange={ ( newGradient: Gradient[ 'gradient' ] ) => {
++						onChange={ ( newGradient ) => {
+ 							onChange( {
+ 								...element,
+ 								gradient: newGradient,
+diff --git a/packages/components/src/palette-edit/types.ts b/packages/components/src/palette-edit/types.ts
+index 5513b945537784..d5e0384c324c45 100644
+--- a/packages/components/src/palette-edit/types.ts
++++ b/packages/components/src/palette-edit/types.ts
+@@ -16,7 +16,7 @@ export type Color = {
+ };
+ 
+ export type Gradient = {
+-	gradient: string;
++	gradient?: string;
+ 	name: string;
+ 	slug: string;
+ 	color?: never;

@@ -1,0 +1,387 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eccd9e639e5f20..f1d39e27b9d715 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -3,7 +3,7 @@
+ ## Unreleased
+ 
+ ### Bug Fix
+-
++-   `PaletteEdit`: ensure number changes to custom names are classes as non-default ([#56932](https://github.com/WordPress/gutenberg/pull/56932)).
+ -   `FontSizePicker`: Use Button API for keeping focus on reset ([#57221](https://github.com/WordPress/gutenberg/pull/57221)).
+ -   `FontSizePicker`: Fix Reset button focus loss ([#57196](https://github.com/WordPress/gutenberg/pull/57196)).
+ -   `PaletteEdit`: Consider digits when generating kebab-cased slug ([#56713](https://github.com/WordPress/gutenberg/pull/56713)).
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index ceadceca1a239d..a029586a039f64 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -61,6 +61,7 @@ import type {
+ } from './types';
+ 
+ export const DEFAULT_COLOR = '#000';
++const EMPTY_ARRAY: Color[] = [];
+ 
+ function NameInput( { value, onChange, label }: NameInputProps ) {
+ 	return (
+@@ -69,12 +70,13 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
+ 			hideLabelFromVision
+ 			value={ value }
+ 			onChange={ onChange }
++			placeholder={ __( 'Enter a name' ) }
+ 		/>
+ 	);
+ }
+ 
+ /**
+- * Returns a temporary name for a palette item in the format "Color + id".
++ * Returns a temporary id for a palette item in the format "slugPrefix + color- + id".
+  * To ensure there are no duplicate ids, this function checks all slugs for temporary names.
+  * It expects slugs to be in the format: slugPrefix + color- + number.
+  * It then sets the id component of the new name based on the incremented id of the highest existing slug id.
+@@ -82,11 +84,11 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
+  * @param elements   An array of color palette items.
+  * @param slugPrefix The slug prefix used to match the element slug.
+  *
+- * @return A unique name for a palette item.
++ * @return A unique id for a palette item.
+  */
+-export function getNameForPosition(
++export function getIdForPosition(
+ 	elements: PaletteElement[],
+-	slugPrefix: string
++	slugPrefix?: string
+ ) {
+ 	const temporaryNameRegex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
+ 	const position = elements.reduce( ( previousValue, currentValue ) => {
+@@ -102,11 +104,7 @@ export function getNameForPosition(
+ 		return previousValue;
+ 	}, 1 );
+ 
+-	return sprintf(
+-		/* translators: %s: is a temporary id for a custom color */
+-		__( 'Color %s' ),
+-		position
+-	);
++	return `${ slugPrefix }color-${ position }`;
+ }
+ 
+ function ColorPickerPopover< T extends Color | Gradient >( {
+@@ -209,7 +207,10 @@ function Option< T extends Color | Gradient >( {
+ 						},
+ 				  } ) }
+ 		>
+-			<HStack justify="flex-start">
++			<HStack
++				justify="flex-start"
++				className="components-palette-edit__item-column"
++			>
+ 				<FlexItem>
+ 					<IndicatorStyled
+ 						style={ { background: value, color: 'transparent' } }
+@@ -224,15 +225,18 @@ function Option< T extends Color | Gradient >( {
+ 									: __( 'Color name' )
+ 							}
+ 							value={ element.name }
+-							onChange={ ( nextName?: string ) =>
++							onChange={ ( nextName?: string ) => {
++								if ( ! nextName ) {
++									return;
++								}
+ 								onChange( {
+ 									...element,
+ 									name: nextName,
+ 									slug:
+ 										slugPrefix +
+ 										kebabCase( nextName ?? '' ),
+-								} )
+-							}
++								} );
++							} }
+ 						/>
+ 					) : (
+ 						<NameContainer>{ element.name }</NameContainer>
+@@ -262,17 +266,17 @@ function Option< T extends Color | Gradient >( {
+ }
+ 
+ /**
+- * Checks if a color or gradient is a temporary element by testing against default values.
++ * Checks if a color or gradient is a default element by testing against default values.
+  */
+-export function isTemporaryElement(
++export function isDefaultElement(
+ 	slugPrefix: string,
+-	{ slug, color, gradient }: Color | Gradient
+-): Boolean {
++	{ slug, name, color, gradient }: Color | Gradient
++): boolean {
+ 	const regex = new RegExp( `^${ slugPrefix }color-([\\d]+)$` );
+ 
+ 	// If the slug matches the temporary name regex,
+ 	// check if the color or gradient matches the default value.
+-	if ( regex.test( slug ) ) {
++	if ( ! name && regex.test( slug ) ) {
+ 		// The order is important as gradient elements
+ 		// contain a color property.
+ 		if ( !! gradient ) {
+@@ -302,16 +306,38 @@ function PaletteEditListView< T extends Color | Gradient >( {
+ 	useEffect( () => {
+ 		elementsReference.current = elements;
+ 	}, [ elements ] );
++
++	// On unmount, remove nameless elements with the default color.
+ 	useEffect( () => {
+ 		return () => {
++			// If there are elements with the default color, remove them.
++			// If there are elements with non-default color and no name, update name.
+ 			if (
+-				elementsReference.current?.some( ( element ) =>
+-					isTemporaryElement( slugPrefix, element )
+-				)
++				elementsReference.current?.some( ( element ) => {
++					const isDefault = isDefaultElement( slugPrefix, element );
++					return isDefault || ( ! element.name && ! isDefault );
++				} )
+ 			) {
+-				const newElements = elementsReference.current.filter(
+-					( element ) => ! isTemporaryElement( slugPrefix, element )
+-				);
++				const newElements = elementsReference.current
++					.filter(
++						( element ) => ! isDefaultElement( slugPrefix, element )
++					)
++					.map( ( element, index ) => {
++						element.name =
++							element?.name ||
++							( !! element.gradient
++								? sprintf(
++										/* translators: %s: is a temporary id for a custom gradient */
++										__( 'Gradient %s' ),
++										index + 1
++								  )
++								: sprintf(
++										/* translators: %s: is a temporary id for a custom color */
++										__( 'Color %s' ),
++										index + 1
++								  ) );
++						return element;
++					} );
+ 				onChange( newElements.length ? newElements : undefined );
+ 			}
+ 		};
+@@ -337,16 +363,13 @@ function PaletteEditListView< T extends Color | Gradient >( {
+ 							}
+ 						} }
+ 						onChange={ ( newElement ) => {
+-							debounceOnChange(
+-								elements.map(
+-									( currentElement, currentIndex ) => {
+-										if ( currentIndex === index ) {
+-											return newElement;
+-										}
+-										return currentElement;
+-									}
+-								)
++							const newElements = elements.map(
++								( currentElement, currentIndex ) =>
++									currentIndex === index
++										? newElement
++										: currentElement
+ 							);
++							debounceOnChange( newElements );
+ 						} }
+ 						onRemove={ () => {
+ 							setEditingElement( null );
+@@ -377,8 +400,6 @@ function PaletteEditListView< T extends Color | Gradient >( {
+ 	);
+ }
+ 
+-const EMPTY_ARRAY: Color[] = [];
+-
+ /**
+  * Allows editing a palette of colors or gradients.
+  *
+@@ -474,8 +495,8 @@ export function PaletteEdit( {
+ 									: __( 'Add color' )
+ 							}
+ 							onClick={ () => {
+-								const tempOptionName = getNameForPosition(
+-									elements,
++								const tempOptionId = getIdForPosition(
++									elements || [],
+ 									slugPrefix
+ 								);
+ 
+@@ -484,10 +505,8 @@ export function PaletteEdit( {
+ 										...gradients,
+ 										{
+ 											gradient: DEFAULT_GRADIENT,
+-											name: tempOptionName,
+-											slug:
+-												slugPrefix +
+-												kebabCase( tempOptionName ),
++											name: '',
++											slug: tempOptionId,
+ 										},
+ 									] );
+ 								} else {
+@@ -495,10 +514,8 @@ export function PaletteEdit( {
+ 										...colors,
+ 										{
+ 											color: DEFAULT_COLOR,
+-											name: tempOptionName,
+-											slug:
+-												slugPrefix +
+-												kebabCase( tempOptionName ),
++											name: '',
++											slug: tempOptionId,
+ 										},
+ 									] );
+ 								}
+diff --git a/packages/components/src/palette-edit/style.scss b/packages/components/src/palette-edit/style.scss
+index d73c7ff46cc3c0..430f384507dc67 100644
+--- a/packages/components/src/palette-edit/style.scss
++++ b/packages/components/src/palette-edit/style.scss
+@@ -7,3 +7,7 @@
+ 		width: 100%;
+ 	}
+ }
++.components-palette-edit__item-column {
++	// Height of PaletteItem component input + padding.
++	min-height: $grid-unit-30 + 6;
++}
+diff --git a/packages/components/src/palette-edit/test/index.tsx b/packages/components/src/palette-edit/test/index.tsx
+index 1a0b2fdaaab3fb..adc1510b398010 100644
+--- a/packages/components/src/palette-edit/test/index.tsx
++++ b/packages/components/src/palette-edit/test/index.tsx
+@@ -7,8 +7,8 @@ import { render, fireEvent, screen } from '@testing-library/react';
+  * Internal dependencies
+  */
+ import PaletteEdit, {
+-	getNameForPosition,
+-	isTemporaryElement,
++	getIdForPosition,
++	isDefaultElement,
+ 	DEFAULT_COLOR,
+ } from '..';
+ import type { PaletteElement } from '../types';
+@@ -19,8 +19,8 @@ describe( 'getNameForPosition', () => {
+ 		const slugPrefix = 'test-';
+ 		const elements: PaletteElement[] = [];
+ 
+-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
+-			'Color 1'
++		expect( getIdForPosition( elements, slugPrefix ) ).toEqual(
++			'test-color-1'
+ 		);
+ 	} );
+ 
+@@ -34,8 +34,8 @@ describe( 'getNameForPosition', () => {
+ 			},
+ 		];
+ 
+-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
+-			'Color 2'
++		expect( getIdForPosition( elements, slugPrefix ) ).toEqual(
++			'test-color-2'
+ 		);
+ 	} );
+ 
+@@ -49,8 +49,8 @@ describe( 'getNameForPosition', () => {
+ 			},
+ 		];
+ 
+-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
+-			'Color 1'
++		expect( getIdForPosition( elements, slugPrefix ) ).toEqual(
++			'test-color-1'
+ 		);
+ 	} );
+ 
+@@ -79,16 +79,16 @@ describe( 'getNameForPosition', () => {
+ 			},
+ 		];
+ 
+-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
+-			'Color 151'
++		expect( getIdForPosition( elements, slugPrefix ) ).toEqual(
++			'test-color-151'
+ 		);
+ 	} );
+ } );
+ 
+-describe( 'isTemporaryElement', () => {
++describe( 'isDefaultElement', () => {
+ 	[
+ 		{
+-			message: 'identifies temporary color',
++			message: 'identify temporary color',
+ 			slug: 'test-',
+ 			obj: {
+ 				name: '',
+@@ -98,7 +98,7 @@ describe( 'isTemporaryElement', () => {
+ 			expected: true,
+ 		},
+ 		{
+-			message: 'identifies temporary gradient',
++			message: 'identify default gradient',
+ 			slug: 'test-',
+ 			obj: {
+ 				name: '',
+@@ -108,7 +108,7 @@ describe( 'isTemporaryElement', () => {
+ 			expected: true,
+ 		},
+ 		{
+-			message: 'identifies custom color slug',
++			message: 'identify custom color slug',
+ 			slug: 'test-',
+ 			obj: {
+ 				name: '',
+@@ -118,7 +118,7 @@ describe( 'isTemporaryElement', () => {
+ 			expected: false,
+ 		},
+ 		{
+-			message: 'identifies custom color value',
++			message: 'identify custom color value',
+ 			slug: 'test-',
+ 			obj: {
+ 				name: '',
+@@ -128,7 +128,7 @@ describe( 'isTemporaryElement', () => {
+ 			expected: false,
+ 		},
+ 		{
+-			message: 'identifies custom gradient slug',
++			message: 'identify custom gradient slug',
+ 			slug: 'test-',
+ 			obj: {
+ 				name: '',
+@@ -138,7 +138,7 @@ describe( 'isTemporaryElement', () => {
+ 			expected: false,
+ 		},
+ 		{
+-			message: 'identifies custom gradient value',
++			message: 'identify custom gradient value',
+ 			slug: 'test-',
+ 			obj: {
+ 				name: '',
+@@ -149,7 +149,7 @@ describe( 'isTemporaryElement', () => {
+ 		},
+ 	].forEach( ( { message, slug, obj, expected } ) => {
+ 		it( `should ${ message }`, () => {
+-			expect( isTemporaryElement( slug, obj ) ).toBe( expected );
++			expect( isDefaultElement( slug, obj ) ).toBe( expected );
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/palette-edit/types.ts b/packages/components/src/palette-edit/types.ts
+index 1cc0611628c2f4..3bdb97a43f31d4 100644
+--- a/packages/components/src/palette-edit/types.ts
++++ b/packages/components/src/palette-edit/types.ts
+@@ -127,7 +127,7 @@ export type OptionProps< T extends Color | Gradient > = {
+ 
+ export type PaletteEditListViewProps< T extends Color | Gradient > = {
+ 	elements: T[];
+-	onChange: ( newElements?: T[] ) => void;
++	onChange: ( newElements: T[] | undefined ) => void;
+ 	isGradient: T extends Gradient ? true : false;
+ 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
+ 	editingElement?: EditingElement;

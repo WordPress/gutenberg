@@ -1,0 +1,374 @@
+diff --git a/packages/base-styles/_mixins.scss b/packages/base-styles/_mixins.scss
+index d8b145a2b13dd4..f8ea78b28b3cb3 100644
+--- a/packages/base-styles/_mixins.scss
++++ b/packages/base-styles/_mixins.scss
+@@ -221,22 +221,6 @@
+  * Styles that are reused verbatim in a few places
+  */
+ 
+-@mixin snackbar-container() {
+-	position: fixed;
+-	bottom: 24px;
+-	left: 0;
+-	right: 0;
+-	padding-inline: 16px;
+-	box-sizing: border-box;
+-	display: flex;
+-	flex-direction: column;
+-	pointer-events: none;
+-
+-	.components-snackbar {
+-		margin-inline: auto;
+-	}
+-}
+-
+ // These are additional styles for all captions, when the theme opts in to block styles.
+ @mixin caption-style() {
+ 	margin-top: 0.5em;
+diff --git a/packages/boot/src/components/root/index.tsx b/packages/boot/src/components/root/index.tsx
+index 275e8e622d2259..21b7b19d19e4d5 100644
+--- a/packages/boot/src/components/root/index.tsx
++++ b/packages/boot/src/components/root/index.tsx
+@@ -14,9 +14,10 @@ import {
+ 	__unstableAnimatePresence as AnimatePresence,
+ 	Button,
+ 	SlotFillProvider,
++	privateApis as componentsPrivateApis,
+ } from '@wordpress/components';
+ import { menu } from '@wordpress/icons';
+-import { useState, useEffect } from '@wordpress/element';
++import { createPortal, useState, useEffect } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ import { Page } from '@wordpress/admin-ui';
+ 
+@@ -33,6 +34,9 @@ import './style.scss';
+ import { UserThemeProvider } from '../user-theme-provider';
+ 
+ const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
++const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
++	componentsPrivateApis
++);
+ 
+ export default function Root() {
+ 	const matches = useMatches();
+@@ -68,7 +72,10 @@ export default function Root() {
+ 						} ) }
+ 					>
+ 						<SavePanel />
+-						<SnackbarNotices className="boot-notices__snackbar" />
++						{ createPortal(
++							<SnackbarNotices className="boot-notices__snackbar" />,
++							getOverlayLegacySlot()
++						) }
+ 						{ isMobileViewport && (
+ 							<Page.SidebarToggleFill>
+ 								<Button
+diff --git a/packages/boot/src/components/root/single-page.tsx b/packages/boot/src/components/root/single-page.tsx
+index 50369a7e18ec8e..e31816d2f80dd8 100644
+--- a/packages/boot/src/components/root/single-page.tsx
++++ b/packages/boot/src/components/root/single-page.tsx
+@@ -8,7 +8,11 @@ import clsx from 'clsx';
+  */
+ import { privateApis as routePrivateApis } from '@wordpress/route';
+ import { SnackbarNotices } from '@wordpress/notices';
+-import { SlotFillProvider } from '@wordpress/components';
++import {
++	SlotFillProvider,
++	privateApis as componentsPrivateApis,
++} from '@wordpress/components';
++import { createPortal } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -22,6 +26,9 @@ import useRouteTitle from '../app/use-route-title';
+ import { UserThemeProvider } from '../user-theme-provider';
+ 
+ const { useMatches, Outlet } = unlock( routePrivateApis );
++const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
++	componentsPrivateApis
++);
+ 
+ /**
+  * Root component for single page mode (no sidebar).
+@@ -54,7 +61,10 @@ export default function RootSinglePage() {
+ 						) }
+ 					>
+ 						<SavePanel />
+-						<SnackbarNotices className="boot-notices__snackbar" />
++						{ createPortal(
++							<SnackbarNotices className="boot-notices__snackbar" />,
++							getOverlayLegacySlot()
++						) }
+ 						<div className="boot-layout__surfaces">
+ 							<UserThemeProvider color={ { bg: '#ffffff' } }>
+ 								<Outlet />
+diff --git a/packages/boot/src/style.scss b/packages/boot/src/style.scss
+index b4b3569db32f61..1f77b98d884f97 100644
+--- a/packages/boot/src/style.scss
++++ b/packages/boot/src/style.scss
+@@ -29,6 +29,3 @@
+ 	}
+ }
+ 
+-.boot-layout .boot-notices__snackbar {
+-	@include snackbar-container();
+-}
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3b5950870a7009..c1a9d4d1f9e7f5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ ### Breaking Changes
+ 
+ -   `ExternalLink`: No longer adds `noreferrer` to the `rel` attribute. `noopener` is still applied. Consumers relying on the previous behavior should pass `rel="noopener noreferrer"` explicitly ([#26968](https://github.com/WordPress/gutenberg/pull/26968)).
++-   The `snackbar-container()` SCSS mixin in `@wordpress/base-styles/mixins` has been removed. Its rules are now baked into `.components-snackbar-list`. Plugins that called `@include snackbar-container()` should target `.components-snackbar-list` directly or inline the equivalent positioning.
+ 
+ ### Internal
+ 
+@@ -23,6 +24,7 @@
+ -   `Popover`: Render the fallback container inside the new overlay legacy slot. The popover's per-class z-index is preserved and now stacks relative to the slot.
+ -   `Modal`: Portal modals into the overlay legacy slot. Update the aria-helper to walk up from the modal so siblings of the slot wrapper (and outer modals when nested) continue to be aria-hidden.
+ -   `Tooltip`, `Menu`, `CustomSelectControl` v2: Pass `portalElement={ getOverlayLegacySlot }` so each Ariakit-backed overlay portals into the overlay legacy slot. Per-overlay z-indexes are unchanged.
++-   `SnackbarList`: Bake the previously-mixin-only positioning (`position: fixed; bottom; padding-inline; pointer-events: none;`) into `.components-snackbar-list` directly so the list self-positions whether portaled or rendered inline.
+ -   `NavigableContainer`: Refactor from class component to function component with hooks ([#77171](https://github.com/WordPress/gutenberg/pull/77171)).
+ -   `Menu`: Refactor `Menu.Popover` to use Ariakit’s `render` prop, wrapping content in `MenuMotionRoot` (motion styles) and `MenuSurface` (panel layout and `variant` chrome) ([#77460](https://github.com/WordPress/gutenberg/pull/77460)).
+ -   Fix types for TypeScript 7.0 ([#77177](https://github.com/WordPress/gutenberg/pull/77177)).
+diff --git a/packages/components/src/snackbar/style.scss b/packages/components/src/snackbar/style.scss
+index 554ea4b871a0b9..ba77bfb8250823 100644
+--- a/packages/components/src/snackbar/style.scss
++++ b/packages/components/src/snackbar/style.scss
+@@ -76,15 +76,30 @@
+ }
+ 
+ .components-snackbar-list {
+-	position: absolute;
++	// Self-positioning at the viewport bottom. Previously these styles came
++	// from the `snackbar-container()` mixin applied to a shell wrapper class
++	// (e.g. `.edit-post-layout__snackbar`). Baking them in lets the list
++	// render correctly whether it is portaled into the overlay legacy slot
++	// or rendered inline by other consumers.
++	position: fixed;
++	bottom: $grid-unit-30;
++	left: 0;
++	right: 0;
+ 	z-index: z-index(".components-snackbar-list");
++	padding-inline: $grid-unit-20;
+ 	width: 100%;
+ 	box-sizing: border-box;
++	display: flex;
++	flex-direction: column;
+ 
+ 	// Disable pointer events, so that clicking this area
+ 	// outside of an individual notice still allows the UI
+ 	// underneath to be clicked.
+ 	pointer-events: none;
++
++	.components-snackbar {
++		margin-inline: auto;
++	}
+ }
+ 
+ .components-snackbar-list__notice-container {
+diff --git a/packages/edit-post/src/components/layout/index.js b/packages/edit-post/src/components/layout/index.js
+index 0d2a3b464f973f..ef244ff2b8e9f4 100644
+--- a/packages/edit-post/src/components/layout/index.js
++++ b/packages/edit-post/src/components/layout/index.js
+@@ -23,6 +23,7 @@ import { getLayoutStyles } from '@wordpress/global-styles-engine';
+ import { PluginArea } from '@wordpress/plugins';
+ import { __, sprintf } from '@wordpress/i18n';
+ import {
++	createPortal,
+ 	useCallback,
+ 	useMemo,
+ 	useId,
+@@ -72,7 +73,8 @@ import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initializat
+ 
+ const { useCommandContext } = unlock( commandsPrivateApis );
+ /** @type {{} & {useDrag: import('@use-gesture/react').useDrag}} */
+-const { useDrag } = unlock( componentsPrivateApis );
++const { useDrag, __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } =
++	unlock( componentsPrivateApis );
+ const { Editor, FullscreenMode } = unlock( editorPrivateApis );
+ const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
+ const DESIGN_POST_TYPES = [
+@@ -619,7 +621,10 @@ function Layout( {
+ 						<PluginArea onError={ onPluginAreaError } />
+ 						<PostEditorMoreMenu />
+ 						{ backButton }
+-						<SnackbarNotices className="edit-post-layout__snackbar" />
++						{ createPortal(
++							<SnackbarNotices className="edit-post-layout__snackbar" />,
++							getOverlayLegacySlot()
++						) }
+ 					</Editor>
+ 				</div>
+ 			</ErrorBoundary>
+diff --git a/packages/edit-post/src/components/layout/style.scss b/packages/edit-post/src/components/layout/style.scss
+index c4d9800a386ee2..ae629bf2847dc4 100644
+--- a/packages/edit-post/src/components/layout/style.scss
++++ b/packages/edit-post/src/components/layout/style.scss
+@@ -120,6 +120,3 @@
+ 	isolation: isolate;
+ }
+ 
+-.edit-post-layout__snackbar {
+-	@include snackbar-container();
+-}
+diff --git a/packages/edit-site/src/components/layout/index.js b/packages/edit-site/src/components/layout/index.js
+index 2b706e1160452f..cad81f482fc485 100644
+--- a/packages/edit-site/src/components/layout/index.js
++++ b/packages/edit-site/src/components/layout/index.js
+@@ -12,6 +12,7 @@ import {
+ 	__unstableAnimatePresence as AnimatePresence,
+ 	__unstableUseNavigateRegions as useNavigateRegions,
+ 	SlotFillProvider,
++	privateApis as componentsPrivateApis,
+ } from '@wordpress/components';
+ import {
+ 	useReducedMotion,
+@@ -20,7 +21,7 @@ import {
+ 	usePrevious,
+ } from '@wordpress/compose';
+ import { __, sprintf } from '@wordpress/i18n';
+-import { useState, useRef, useEffect } from '@wordpress/element';
++import { createPortal, useState, useRef, useEffect } from '@wordpress/element';
+ import {
+ 	UnsavedChangesWarning,
+ 	ErrorBoundary,
+@@ -47,6 +48,9 @@ import SavePanel from '../save-panel';
+ 
+ const { useLocation } = unlock( routerPrivateApis );
+ const { useStyle } = unlock( editorPrivateApis );
++const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
++	componentsPrivateApis
++);
+ 
+ const ANIMATION_DURATION = 0.3;
+ 
+@@ -156,7 +160,10 @@ function Layout() {
+ 						</NavigableRegion>
+ 					) }
+ 
+-					<SnackbarNotices className="edit-site-layout__snackbar" />
++					{ createPortal(
++						<SnackbarNotices className="edit-site-layout__snackbar" />,
++						getOverlayLegacySlot()
++					) }
+ 
+ 					{ isMobileViewport && areas.mobile && (
+ 						<div className="edit-site-layout__mobile">
+diff --git a/packages/edit-site/src/components/layout/style.scss b/packages/edit-site/src/components/layout/style.scss
+index 540e26aaa41056..4319a7df5f1212 100644
+--- a/packages/edit-site/src/components/layout/style.scss
++++ b/packages/edit-site/src/components/layout/style.scss
+@@ -273,6 +273,3 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
+ 	}
+ }
+ 
+-.edit-site-layout__snackbar {
+-	@include snackbar-container();
+-}
+diff --git a/packages/edit-widgets/src/components/notices/index.js b/packages/edit-widgets/src/components/notices/index.js
+index 3605fb0e300600..200ded4596932b 100644
+--- a/packages/edit-widgets/src/components/notices/index.js
++++ b/packages/edit-widgets/src/components/notices/index.js
+@@ -2,6 +2,17 @@
+  * WordPress dependencies
+  */
+ import { InlineNotices, SnackbarNotices } from '@wordpress/notices';
++import { createPortal } from '@wordpress/element';
++import { privateApis as componentsPrivateApis } from '@wordpress/components';
++
++/**
++ * Internal dependencies
++ */
++import { unlock } from '../../lock-unlock';
++
++const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
++	componentsPrivateApis
++);
+ 
+ function Notices() {
+ 	return (
+@@ -10,7 +21,10 @@ function Notices() {
+ 				pinnedNoticesClassName="edit-widgets-notices__pinned"
+ 				dismissibleNoticesClassName="edit-widgets-notices__dismissible"
+ 			/>
+-			<SnackbarNotices className="edit-widgets-notices__snackbar" />
++			{ createPortal(
++				<SnackbarNotices className="edit-widgets-notices__snackbar" />,
++				getOverlayLegacySlot()
++			) }
+ 		</>
+ 	);
+ }
+diff --git a/packages/edit-widgets/src/components/notices/style.scss b/packages/edit-widgets/src/components/notices/style.scss
+deleted file mode 100644
+index 4c7a7bea2d1b4c..00000000000000
+--- a/packages/edit-widgets/src/components/notices/style.scss
++++ /dev/null
+@@ -1,7 +0,0 @@
+-@use "@wordpress/base-styles/mixins" as *;
+-@use "@wordpress/base-styles/variables" as *;
+-
+-.edit-widgets-notices__snackbar {
+-	@include snackbar-container();
+-}
+-
+diff --git a/packages/edit-widgets/src/style.scss b/packages/edit-widgets/src/style.scss
+index a219bf2ebc17ff..19077821d435ac 100644
+--- a/packages/edit-widgets/src/style.scss
++++ b/packages/edit-widgets/src/style.scss
+@@ -8,7 +8,6 @@
+ @use "./components/header/style.scss" as *;
+ @use "./components/keyboard-shortcut-help-modal/style.scss" as *;
+ @use "./components/sidebar/style.scss" as *;
+-@use "./components/notices/style.scss" as *;
+ @use "./components/layout/style.scss" as *;
+ @use "./components/more-menu/style.scss" as *;
+ @use "./components/welcome-guide/style.scss" as *;
+diff --git a/packages/media-editor/src/components/media-editor-modal/style.scss b/packages/media-editor/src/components/media-editor-modal/style.scss
+index 58f4e25ae2e558..bb743189a52e91 100644
+--- a/packages/media-editor/src/components/media-editor-modal/style.scss
++++ b/packages/media-editor/src/components/media-editor-modal/style.scss
+@@ -113,15 +113,10 @@
+ 	}
+ }
+ 
+-// `<SnackbarNotices>` renders `.components-snackbar-list` with
+-// `position: absolute; width: 100%`. Portaled to `<body>` it has no
+-// positioned ancestor, so it collapses to a 0-size box at the document
+-// origin and would also be painted under the modal overlay since both
+-// share the default snackbar z-index. `snackbar-container` fixes the
+-// list to the viewport bottom; the elevated z-index (registered in
+-// base-styles) lifts it above the modal overlay and any popovers that
+-// may open inside the modal.
++// `<SnackbarNotices>` renders `.components-snackbar-list`, which now
++// self-positions at the viewport bottom. The elevated z-index here
++// lifts the list above the modal overlay and any popovers that may
++// open inside the modal.
+ .media-editor-modal__snackbar {
+-	@include snackbar-container();
+ 	z-index: z-index(".components-snackbar-list.media-editor-modal__snackbar");
+ }
+diff --git a/packages/media-utils/src/components/media-upload-modal/style.scss b/packages/media-utils/src/components/media-upload-modal/style.scss
+index 29f7b67f5988d1..5d9fc9df066601 100644
+--- a/packages/media-utils/src/components/media-upload-modal/style.scss
++++ b/packages/media-utils/src/components/media-upload-modal/style.scss
+@@ -1,6 +1,5 @@
+ @use "@wordpress/base-styles/variables" as *;
+ @use "@wordpress/base-styles/colors" as *;
+-@use "@wordpress/base-styles/mixins" as *;
+ 
+ .media-upload-modal {
+ 	.components-modal__header {
+@@ -58,7 +57,8 @@
+ }
+ 
+ .media-upload-modal__snackbar {
+-	@include snackbar-container();
++	// `.components-snackbar-list` self-positions at the viewport bottom;
++	// only the elevated z-index and transform overrides remain here.
+ 	z-index: 200000;
+ 
+ 	// Override the transform and transform-origin applied by the Snackbar component

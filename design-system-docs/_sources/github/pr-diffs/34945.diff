@@ -1,0 +1,121 @@
+diff --git a/packages/components/src/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/styles.ts
+index a5963eadc3c473..3ae22c31ae44af 100644
+--- a/packages/components/src/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/styles.ts
+@@ -68,7 +68,7 @@ export const buttonView = css`
+ 	background: transparent;
+ 	border: none;
+ 	border-radius: ${ CONFIG.controlBorderRadius };
+-	color: ${ COLORS.gray[ 700 ] };
++	color: ${ COLORS.ui.label };
+ 	cursor: pointer;
+ 	display: flex;
+ 	height: 100%;
+@@ -98,13 +98,13 @@ export const buttonActive = css`
+ 	color: ${ COLORS.white };
+ `;
+ 
++export const buttonDisabled = css`
++	color: ${ COLORS.ui.textDisabled };
++`;
++
+ export const ButtonContentView = styled.div`
+ 	font-size: ${ CONFIG.fontSize };
+ 	line-height: 1;
+-	position: absolute;
+-	top: 50%;
+-	left: 50%;
+-	transform: translate( -50%, -50% );
+ `;
+ 
+ export const SeparatorView = styled.div`
+@@ -122,14 +122,6 @@ export const separatorActive = css`
+ 	background: transparent;
+ `;
+ 
+-export const LabelPlaceholderView = styled.div`
+-	font-size: ${ CONFIG.fontSize };
+-	font-weight: bold;
+-	height: 0;
+-	overflow: hidden;
+-	visibility: hidden;
+-`;
+-
+ export const medium = css`
+ 	min-height: ${ CONFIG.controlHeight };
+ `;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx b/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx
+index a2ec9f67a576d9..90c1e2c3fc5603 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-backdrop.tsx
+@@ -27,17 +27,12 @@ function ToggleGroupControlBackdrop( {
+ 		 * Workaround for Reakit
+ 		 */
+ 		const targetNode = containerNode.querySelector(
+-			`[data-value="${ state }"]`
+-		);
++			'[data-active="true"]'
++		) as HTMLElement;
+ 		if ( ! targetNode ) return;
+ 
+-		const { x: parentX } = containerNode.getBoundingClientRect();
+-		const { width: offsetWidth, x } = targetNode.getBoundingClientRect();
+-		const borderWidth = 1;
+-		const offsetLeft = x - parentX - borderWidth;
+-
+-		setLeft( offsetLeft );
+-		setWidth( offsetWidth );
++		setLeft( targetNode.offsetLeft );
++		setWidth( targetNode.offsetWidth );
+ 
+ 		let requestId: number;
+ 		if ( ! canAnimate ) {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-button.tsx b/packages/components/src/toggle-group-control/toggle-group-control-button.tsx
+index 8fdce889c50993..d790ff017915be 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-button.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-button.tsx
+@@ -16,12 +16,7 @@ import * as styles from './styles';
+ import type { ToggleGroupControlButtonProps } from './types';
+ import { useCx } from '../utils/hooks';
+ 
+-const {
+-	ButtonContentView,
+-	LabelPlaceholderView,
+-	LabelView,
+-	SeparatorView,
+-} = styles;
++const { ButtonContentView, LabelView, SeparatorView } = styles;
+ 
+ function ToggleGroupControlButton( {
+ 	className,
+@@ -38,7 +33,7 @@ function ToggleGroupControlButton( {
+ 	const classes = cx(
+ 		styles.buttonView,
+ 		className,
+-		isActive && styles.buttonActive
++		props.disabled ? styles.buttonDisabled : isActive && styles.buttonActive
+ 	);
+ 	return (
+ 		<LabelView className={ labelViewClasses } data-active={ isActive }>
+@@ -52,9 +47,6 @@ function ToggleGroupControlButton( {
+ 				value={ value }
+ 			>
+ 				<ButtonContentView>{ label }</ButtonContentView>
+-				<LabelPlaceholderView aria-hidden>
+-					{ label }
+-				</LabelPlaceholderView>
+ 			</Radio>
+ 			<ToggleGroupControlSeparator isActive={ ! showSeparator } />
+ 		</LabelView>
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 801297ba064bb8..e8a7aef44d294a 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -83,6 +83,7 @@ export type ToggleGroupControlButtonProps = {
+ 	showSeparator?: boolean;
+ 	value?: ReactText;
+ 	state?: any;
++	disabled?: boolean;
+ };
+ 
+ export type ToggleGroupControlBackdropProps = {

@@ -1,0 +1,409 @@
+diff --git a/bin/packages/check-build-type-declaration-files.js b/bin/packages/check-build-type-declaration-files.js
+index 39643eb26c2aeb..1696313c33f34e 100644
+--- a/bin/packages/check-build-type-declaration-files.js
++++ b/bin/packages/check-build-type-declaration-files.js
+@@ -70,7 +70,7 @@ async function getDecFile( packagePath ) {
+ async function typecheckDeclarations( file ) {
+ 	return new Promise( ( resolve, reject ) => {
+ 		exec(
+-			`npx tsc --target esnext --moduleResolution node --noEmit --skipLibCheck "${ file }"`,
++			`npx tsc --ignoreConfig --target esnext --moduleResolution bundler --noEmit --skipLibCheck "${ file }"`,
+ 			( error, stdout, stderr ) => {
+ 				if ( error ) {
+ 					reject( { file, error, stderr, stdout } );
+diff --git a/package-lock.json b/package-lock.json
+index 8ab1e6e1c17f04..5eb3a53e148aef 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -98,7 +98,7 @@
+ 				"sprintf-js": "1.1.1",
+ 				"style-loader": "3.2.1",
+ 				"stylelint-plugin-logical-css": "^1.2.3",
+-				"typescript": "5.9.3",
++				"typescript": "6.0.2",
+ 				"uuid": "9.0.1",
+ 				"wait-on": "8.0.1"
+ 			},
+@@ -38901,6 +38901,20 @@
+ 				"node": ">=8"
+ 			}
+ 		},
++		"node_modules/lerna/node_modules/typescript": {
++			"version": "5.9.3",
++			"resolved": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
++			"integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
++			"dev": true,
++			"license": "Apache-2.0",
++			"bin": {
++				"tsc": "bin/tsc",
++				"tsserver": "bin/tsserver"
++			},
++			"engines": {
++				"node": ">=14.17"
++			}
++		},
+ 		"node_modules/lerna/node_modules/universal-user-agent": {
+ 			"version": "6.0.1",
+ 			"resolved": "https://registry.npmjs.org/universal-user-agent/-/universal-user-agent-6.0.1.tgz",
+@@ -54166,9 +54180,9 @@
+ 			}
+ 		},
+ 		"node_modules/typescript": {
+-			"version": "5.9.3",
+-			"resolved": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+-			"integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
++			"version": "6.0.2",
++			"resolved": "https://registry.npmjs.org/typescript/-/typescript-6.0.2.tgz",
++			"integrity": "sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ==",
+ 			"dev": true,
+ 			"license": "Apache-2.0",
+ 			"bin": {
+diff --git a/package.json b/package.json
+index 3ad2981e48c2d7..050015d815fe8e 100644
+--- a/package.json
++++ b/package.json
+@@ -120,7 +120,7 @@
+ 		"sprintf-js": "1.1.1",
+ 		"style-loader": "3.2.1",
+ 		"stylelint-plugin-logical-css": "^1.2.3",
+-		"typescript": "5.9.3",
++		"typescript": "6.0.2",
+ 		"uuid": "9.0.1",
+ 		"wait-on": "8.0.1"
+ 	},
+diff --git a/packages/boot/tsconfig.json b/packages/boot/tsconfig.json
+index d2e2461c32efd7..39d7212eed52e4 100644
+--- a/packages/boot/tsconfig.json
++++ b/packages/boot/tsconfig.json
+@@ -2,6 +2,7 @@
+ 	"$schema": "https://json.schemastore.org/tsconfig.json",
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
++		"types": [ "style-imports" ],
+ 		"checkJs": false
+ 	},
+ 	"references": [
+diff --git a/packages/components/src/alignment-matrix-control/README.md b/packages/components/src/alignment-matrix-control/README.md
+index 8ba9f6378c1852..39a5b90af8841a 100644
+--- a/packages/components/src/alignment-matrix-control/README.md
++++ b/packages/components/src/alignment-matrix-control/README.md
+@@ -43,7 +43,7 @@ underlying `grid` widget.
+ 
+ ### `onChange`
+ 
+- - Type: `(newValue: AlignmentMatrixControlValue) => void`
++ - Type: `((newValue: AlignmentMatrixControlValue) => void)`
+  - Required: No
+ 
+ A function that receives the updated alignment value.
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index c67c795addbf4d..7197ffa8a95302 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -77,7 +77,7 @@ If provided, renders `a` instead of `button`.
+ 
+ ### `icon`
+ 
+- - Type: `IconType`
++ - Type: `IconType | null`
+  - Required: No
+ 
+ If provided, renders an Icon component inside the button.
+diff --git a/packages/components/src/calendar/utils/use-localization-props.ts b/packages/components/src/calendar/utils/use-localization-props.ts
+index f6780beb613895..7ad0eb059b5b54 100644
+--- a/packages/components/src/calendar/utils/use-localization-props.ts
++++ b/packages/components/src/calendar/utils/use-localization-props.ts
+@@ -10,10 +10,9 @@ import type { Modifiers, BaseProps } from '../types';
+ 
+ function isLocaleRTL( localeCode: string ) {
+ 	const localeObj = new Intl.Locale( localeCode );
+-	if ( 'getTextInfo' in localeObj ) {
+-		// @ts-expect-error - getTextInfo is not typed yet
+-		// see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/getTextInfo
+-		return localeObj.getTextInfo().direction === 'rtl';
++	const direction = localeObj.getTextInfo?.().direction;
++	if ( direction ) {
++		return direction === 'rtl';
+ 	}
+ 	return [
+ 		'ar', // Arabic
+diff --git a/packages/components/src/form-file-upload/README.md b/packages/components/src/form-file-upload/README.md
+index 74e6e369383383..ace5a9e8512def 100644
+--- a/packages/components/src/form-file-upload/README.md
++++ b/packages/components/src/form-file-upload/README.md
+@@ -48,7 +48,7 @@ Children are passed as children of `Button`.
+ 
+ ### `icon`
+ 
+- - Type: `IconType`
++ - Type: `IconType | null`
+  - Required: No
+ 
+ The icon to render in the default button.
+@@ -65,7 +65,7 @@ Whether to allow multiple selection of files or not.
+ 
+ ### `onChange`
+ 
+- - Type: `ChangeEventHandler<HTMLInputElement>`
++ - Type: `ChangeEventHandler<HTMLInputElement> | undefined`
+  - Required: Yes
+ 
+ Callback function passed directly to the `input` file element.
+@@ -95,7 +95,7 @@ an empty string in the `onClick` function.
+ 
+ ### `render`
+ 
+- - Type: `(arg: { openFileDialog: () => void; }) => ReactNode`
++ - Type: `((arg: { openFileDialog: () => void; }) => ReactNode)`
+  - Required: No
+ 
+ Optional callback function used to render the UI.
+diff --git a/packages/components/src/gradient-picker/README.md b/packages/components/src/gradient-picker/README.md
+index 275c46ec5958c9..e97654e0f2be92 100644
+--- a/packages/components/src/gradient-picker/README.md
++++ b/packages/components/src/gradient-picker/README.md
+@@ -141,7 +141,7 @@ Only used when `asButtons` is not true.
+ 
+ ### `onChange`
+ 
+- - Type: `(currentGradient: string) => void`
++ - Type: `(currentGradient: string | undefined) => void`
+  - Required: Yes
+ 
+ The function called when a new gradient has been defined. It is passed to
+@@ -149,7 +149,7 @@ the `currentGradient` as an argument.
+ 
+ ### `value`
+ 
+- - Type: `string`
++ - Type: `string | null`
+  - Required: No
+  - Default: `'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)'`
+ 
+diff --git a/packages/components/src/icon/README.md b/packages/components/src/icon/README.md
+index 2c9726dbcf5418..91628b5486f7c6 100644
+--- a/packages/components/src/icon/README.md
++++ b/packages/components/src/icon/README.md
+@@ -16,7 +16,7 @@ import { wordpress } from '@wordpress/icons';
+ 
+ ### `icon`
+ 
+- - Type: `IconType`
++ - Type: `IconType | null`
+  - Required: No
+  - Default: `null`
+ 
+diff --git a/packages/components/src/menu/README.md b/packages/components/src/menu/README.md
+index 12f120b871f85d..79274fe60e40e0 100644
+--- a/packages/components/src/menu/README.md
++++ b/packages/components/src/menu/README.md
+@@ -19,7 +19,7 @@ component, and the `Menu.Popover` component.
+ 
+ ### `as`
+ 
+- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | "canvas" | ... 516 more ... | ("view" & FunctionComponent<...>)`
++ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | "canvas" | ... 517 more ...`
+  - Required: No
+ 
+ The HTML element or React component to render the component as.
+@@ -57,7 +57,7 @@ override the `defaultOpen` prop.
+ 
+ ### `onOpenChange`
+ 
+- - Type: `(open: boolean) => void`
++ - Type: `((open: boolean) => void)`
+  - Required: No
+ 
+ A callback that gets called when the `open` state changes.
+diff --git a/packages/components/src/tabs/README.md b/packages/components/src/tabs/README.md
+index 7f5f3219adfd1e..0307e76ae8d2fe 100644
+--- a/packages/components/src/tabs/README.md
++++ b/packages/components/src/tabs/README.md
+@@ -19,7 +19,7 @@ It is responsible for managing the state of the tabs, and rendering one instance
+ 
+ ### `activeTabId`
+ 
+- - Type: `string`
++ - Type: `string | null`
+  - Required: No
+ 
+ The current active tab `id`. The active tab is the tab element within the
+@@ -42,7 +42,7 @@ components as there are `Tabs.Tab` components.
+ 
+ ### `defaultTabId`
+ 
+- - Type: `string`
++ - Type: `string | null`
+  - Required: No
+ 
+ The id of the tab whose panel is currently visible.
+@@ -56,7 +56,7 @@ provided (meaning the component will be used in "controlled" mode).
+ 
+ ### `defaultActiveTabId`
+ 
+- - Type: `string`
++ - Type: `string | null`
+  - Required: No
+ 
+ The tab id that should be active by default when the composite widget is
+@@ -69,14 +69,14 @@ provided.
+ 
+ ### `onSelect`
+ 
+- - Type: `(selectedId: string) => void`
++ - Type: `((selectedId: string | null) => void)`
+  - Required: No
+ 
+ The function called when the `selectedTabId` changes.
+ 
+ ### `onActiveTabIdChange`
+ 
+- - Type: `(activeId: string) => void`
++ - Type: `((activeId: string | null) => void)`
+  - Required: No
+ 
+ A callback that gets called when the `activeTabId` state changes.
+@@ -107,7 +107,7 @@ for more info.
+ 
+ ### `selectedTabId`
+ 
+- - Type: `string`
++ - Type: `string | null`
+  - Required: No
+ 
+ The id of the tab whose panel is currently visible.
+diff --git a/packages/components/src/tree-select/README.md b/packages/components/src/tree-select/README.md
+index 35764329ece342..bfd0a5940fe2ff 100644
+--- a/packages/components/src/tree-select/README.md
++++ b/packages/components/src/tree-select/README.md
+@@ -118,7 +118,7 @@ If this property is added, an option will be added with this label to represent
+ 
+ ### `onChange`
+ 
+- - Type: `(value: string, extra?: { event?: ChangeEvent<HTMLSelectElement>; }) => void`
++ - Type: `((value: string, extra?: { event?: ChangeEvent<HTMLSelectElement>; }) => void) | undefined`
+  - Required: No
+ 
+ A function that receives the value of the new option that is being selected as input.
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index f642acd4957ad4..5ffbacc28763e1 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -5,8 +5,8 @@
+ 		"types": [
+ 			"gutenberg-env",
+ 			"gutenberg-test-env",
+-			"css-modules",
+-			"jest"
++			"jest",
++			"style-imports"
+ 		]
+ 	},
+ 	"references": [
+diff --git a/packages/dataviews/tsconfig.json b/packages/dataviews/tsconfig.json
+index ce1873b457df4e..637057d383d1e3 100644
+--- a/packages/dataviews/tsconfig.json
++++ b/packages/dataviews/tsconfig.json
+@@ -2,7 +2,12 @@
+ 	"$schema": "https://json.schemastore.org/tsconfig.json",
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
+-		"types": [ "gutenberg-env", "gutenberg-test-env", "jest" ]
++		"types": [
++			"gutenberg-env",
++			"gutenberg-test-env",
++			"jest",
++			"style-imports"
++		]
+ 	},
+ 	"references": [
+ 		{ "path": "../components" },
+diff --git a/packages/editor/tsconfig.json b/packages/editor/tsconfig.json
+index d82133021fe8a9..61ed373e731e9a 100644
+--- a/packages/editor/tsconfig.json
++++ b/packages/editor/tsconfig.json
+@@ -2,6 +2,7 @@
+ 	"$schema": "https://json.schemastore.org/tsconfig.json",
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
++		"types": [ "style-imports" ],
+ 		"checkJs": false
+ 	},
+ 	"references": [
+diff --git a/packages/image-cropper/tsconfig.json b/packages/image-cropper/tsconfig.json
+index 2bcf2ed3abfb44..7e210eebb87fb7 100644
+--- a/packages/image-cropper/tsconfig.json
++++ b/packages/image-cropper/tsconfig.json
+@@ -2,6 +2,7 @@
+ 	"$schema": "https://json.schemastore.org/tsconfig.json",
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
++		"types": [ "style-imports" ],
+ 		"checkJs": false
+ 	},
+ 	"references": [
+diff --git a/packages/lazy-editor/tsconfig.json b/packages/lazy-editor/tsconfig.json
+index 98b80d3f4b84d8..183f17c8b67668 100644
+--- a/packages/lazy-editor/tsconfig.json
++++ b/packages/lazy-editor/tsconfig.json
+@@ -2,6 +2,7 @@
+ 	"$schema": "https://json.schemastore.org/tsconfig.json",
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
++		"types": [ "style-imports" ],
+ 		"checkJs": false
+ 	},
+ 	"references": [
+diff --git a/packages/notices/tsconfig.json b/packages/notices/tsconfig.json
+index 62c3884c11197d..8cd3feddf568a7 100644
+--- a/packages/notices/tsconfig.json
++++ b/packages/notices/tsconfig.json
+@@ -2,7 +2,7 @@
+ 	"$schema": "https://json.schemastore.org/tsconfig.json",
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
+-		"types": [ "gutenberg-env" ],
++		"types": [ "gutenberg-env", "style-imports" ],
+ 		"checkJs": false
+ 	},
+ 	"references": [
+diff --git a/packages/theme/tsconfig.src.json b/packages/theme/tsconfig.src.json
+index 3f593c8d8f5a21..92744233c7d32e 100644
+--- a/packages/theme/tsconfig.src.json
++++ b/packages/theme/tsconfig.src.json
+@@ -3,7 +3,7 @@
+ 	"extends": "../../tsconfig.base.json",
+ 	"compilerOptions": {
+ 		"moduleResolution": "bundler",
+-		"types": [ "css-modules" ]
++		"types": [ "style-imports" ]
+ 	},
+ 	"files": [ "global.d.ts" ],
+ 	"references": [ { "path": "../element" }, { "path": "../private-apis" } ]
+diff --git a/tsconfig.base.json b/tsconfig.base.json
+index e8ed12c96dfc88..c2cf493b9edcc0 100644
+--- a/tsconfig.base.json
++++ b/tsconfig.base.json
+@@ -26,8 +26,6 @@
+ 		/* Module Resolution Options */
+ 		"moduleResolution": "bundler",
+ 
+-		/* This needs to be false so our types are possible to consume without setting this */
+-		"esModuleInterop": false,
+ 		"resolveJsonModule": true,
+ 
+ 		"typeRoots": [ "./typings", "./node_modules/@types" ],
+diff --git a/typings/css-modules/index.d.ts b/typings/style-imports/index.d.ts
+similarity index 80%
+rename from typings/css-modules/index.d.ts
+rename to typings/style-imports/index.d.ts
+index a06b94f9890ad2..42171ccf601ce5 100644
+--- a/typings/css-modules/index.d.ts
++++ b/typings/style-imports/index.d.ts
+@@ -7,3 +7,6 @@ declare module '*.module.scss' {
+ 	const classes: { [ key: string ]: string };
+ 	export default classes;
+ }
++
++declare module '*.css';
++declare module '*.scss';

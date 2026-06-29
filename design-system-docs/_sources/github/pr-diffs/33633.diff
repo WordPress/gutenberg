@@ -1,0 +1,220 @@
+diff --git a/packages/components/src/higher-order/navigate-regions/index.js b/packages/components/src/higher-order/navigate-regions/index.js
+index db9fc877e9467e..ca8cc47361d13c 100644
+--- a/packages/components/src/higher-order/navigate-regions/index.js
++++ b/packages/components/src/higher-order/navigate-regions/index.js
+@@ -1,19 +1,39 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useCallback, useState, useRef, useEffect } from '@wordpress/element';
++import { useState, useRef } from '@wordpress/element';
+ import {
+ 	createHigherOrderComponent,
+-	useKeyboardShortcut,
++	useRefEffect,
++	useMergeRefs,
+ } from '@wordpress/compose';
+-import { rawShortcut } from '@wordpress/keycodes';
++import { isKeyboardEvent } from '@wordpress/keycodes';
+ 
+ const defaultShortcuts = {
+-	previous: [ 'ctrl+shift+`', rawShortcut.access( 'p' ) ],
+-	next: [ 'ctrl+`', rawShortcut.access( 'n' ) ],
++	previous: [
++		{
++			modifier: 'ctrlShift',
++			character: '`',
++		},
++		{
++			modifier: 'access',
++			character: 'p',
++		},
++	],
++	next: [
++		{
++			modifier: 'ctrl',
++			character: '`',
++		},
++		{
++			modifier: 'access',
++			character: 'n',
++		},
++	],
+ };
+ 
+-export function useNavigateRegions( ref, shortcuts = defaultShortcuts ) {
++export function useNavigateRegions( shortcuts = defaultShortcuts ) {
++	const ref = useRef();
+ 	const [ isFocusingRegions, setIsFocusingRegions ] = useState( false );
+ 
+ 	function focusRegion( offset ) {
+@@ -37,42 +57,48 @@ export function useNavigateRegions( ref, shortcuts = defaultShortcuts ) {
+ 		nextRegion.focus();
+ 		setIsFocusingRegions( true );
+ 	}
+-	const focusPrevious = useCallback( () => focusRegion( -1 ), [] );
+-	const focusNext = useCallback( () => focusRegion( 1 ), [] );
+ 
+-	useKeyboardShortcut( shortcuts.previous, focusPrevious, {
+-		bindGlobal: true,
+-	} );
+-	useKeyboardShortcut( shortcuts.next, focusNext, { bindGlobal: true } );
++	const clickRef = useRefEffect(
++		( element ) => {
++			function onClick() {
++				setIsFocusingRegions( false );
++			}
+ 
+-	useEffect( () => {
+-		function onClick() {
+-			setIsFocusingRegions( false );
+-		}
+-
+-		ref.current.addEventListener( 'click', onClick );
++			element.addEventListener( 'click', onClick );
+ 
+-		return () => {
+-			ref.current?.removeEventListener( 'click', onClick );
+-		};
+-	}, [ setIsFocusingRegions ] );
++			return () => {
++				element.removeEventListener( 'click', onClick );
++			};
++		},
++		[ setIsFocusingRegions ]
++	);
+ 
+-	if ( ! isFocusingRegions ) {
+-		return;
+-	}
+-
+-	return 'is-focusing-regions';
++	return {
++		ref: useMergeRefs( [ ref, clickRef ] ),
++		className: isFocusingRegions ? 'is-focusing-regions' : '',
++		onKeyDown( event ) {
++			if (
++				shortcuts.previous.some( ( { modifier, character } ) => {
++					return isKeyboardEvent[ modifier ]( event, character );
++				} )
++			) {
++				focusRegion( -1 );
++			} else if (
++				shortcuts.next.some( ( { modifier, character } ) => {
++					return isKeyboardEvent[ modifier ]( event, character );
++				} )
++			) {
++				focusRegion( 1 );
++			}
++		},
++	};
+ }
+ 
+ export default createHigherOrderComponent(
+-	( Component ) => ( { shortcuts, ...props } ) => {
+-		const ref = useRef();
+-		const className = useNavigateRegions( ref, shortcuts );
+-		return (
+-			<div ref={ ref } className={ className }>
+-				<Component { ...props } />
+-			</div>
+-		);
+-	},
++	( Component ) => ( { shortcuts, ...props } ) => (
++		<div { ...useNavigateRegions( shortcuts ) }>
++			<Component { ...props } />
++		</div>
++	),
+ 	'navigateRegions'
+ );
+diff --git a/packages/e2e-tests/specs/editor/various/a11y.test.js b/packages/e2e-tests/specs/editor/various/a11y.test.js
+index a25b5d9760c3ce..1c7e9fe76b4c98 100644
+--- a/packages/e2e-tests/specs/editor/various/a11y.test.js
++++ b/packages/e2e-tests/specs/editor/various/a11y.test.js
+@@ -15,7 +15,7 @@ describe( 'a11y', () => {
+ 	} );
+ 
+ 	it( 'tabs header bar', async () => {
+-		await pressKeyWithModifier( 'ctrl', '~' );
++		await pressKeyWithModifier( 'ctrl', '`' );
+ 
+ 		await page.keyboard.press( 'Tab' );
+ 
+diff --git a/packages/edit-post/src/components/layout/index.js b/packages/edit-post/src/components/layout/index.js
+index 51311d59ea7b6e..202f9648d95179 100644
+--- a/packages/edit-post/src/components/layout/index.js
++++ b/packages/edit-post/src/components/layout/index.js
+@@ -112,12 +112,10 @@ function Layout( { styles } ) {
+ 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+ 			previousShortcut: select(
+ 				keyboardShortcutsStore
+-			).getAllShortcutRawKeyCombinations(
+-				'core/edit-post/previous-region'
+-			),
++			).getAllShortcutKeyCombinations( 'core/edit-post/previous-region' ),
+ 			nextShortcut: select(
+ 				keyboardShortcutsStore
+-			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
++			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
+ 			showIconLabels: select( editPostStore ).isFeatureActive(
+ 				'showIconLabels'
+ 			),
+diff --git a/packages/edit-widgets/src/components/layout/interface.js b/packages/edit-widgets/src/components/layout/interface.js
+index 6cf1df2b5d3cb4..4ac2dfb939fade 100644
+--- a/packages/edit-widgets/src/components/layout/interface.js
++++ b/packages/edit-widgets/src/components/layout/interface.js
+@@ -65,14 +65,12 @@ function Interface( { blockEditorSettings } ) {
+ 			).__unstableIsFeatureActive( 'showBlockBreadcrumbs' ),
+ 			previousShortcut: select(
+ 				keyboardShortcutsStore
+-			).getAllShortcutRawKeyCombinations(
++			).getAllShortcutKeyCombinations(
+ 				'core/edit-widgets/previous-region'
+ 			),
+ 			nextShortcut: select(
+ 				keyboardShortcutsStore
+-			).getAllShortcutRawKeyCombinations(
+-				'core/edit-widgets/next-region'
+-			),
++			).getAllShortcutKeyCombinations( 'core/edit-widgets/next-region' ),
+ 		} ),
+ 		[]
+ 	);
+diff --git a/packages/interface/src/components/interface-skeleton/index.js b/packages/interface/src/components/interface-skeleton/index.js
+index 26bf20681f659a..1f4c020dd7cf8f 100644
+--- a/packages/interface/src/components/interface-skeleton/index.js
++++ b/packages/interface/src/components/interface-skeleton/index.js
+@@ -9,7 +9,7 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { forwardRef, useEffect, useRef } from '@wordpress/element';
++import { forwardRef, useEffect } from '@wordpress/element';
+ import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import { useMergeRefs } from '@wordpress/compose';
+@@ -44,8 +44,7 @@ function InterfaceSkeleton(
+ 	},
+ 	ref
+ ) {
+-	const fallbackRef = useRef();
+-	const regionsClassName = useNavigateRegions( fallbackRef, shortcuts );
++	const navigateRegionsProps = useNavigateRegions( shortcuts );
+ 
+ 	useHTMLClass( 'interface-interface-skeleton__html-container' );
+ 
+@@ -70,11 +69,12 @@ function InterfaceSkeleton(
+ 
+ 	return (
+ 		<div
+-			ref={ useMergeRefs( [ ref, fallbackRef ] ) }
++			{ ...navigateRegionsProps }
++			ref={ useMergeRefs( [ ref, navigateRegionsProps.ref ] ) }
+ 			className={ classnames(
+ 				className,
+ 				'interface-interface-skeleton',
+-				regionsClassName,
++				navigateRegionsProps.className,
+ 				!! footer && 'has-footer'
+ 			) }
+ 		>

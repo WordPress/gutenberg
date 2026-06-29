@@ -1,0 +1,24 @@
+diff --git a/packages/block-editor/src/components/block-heading-level-dropdown/index.js b/packages/block-editor/src/components/block-heading-level-dropdown/index.js
+index 71cb2ede989b5b..6b9bad09978a50 100644
+--- a/packages/block-editor/src/components/block-heading-level-dropdown/index.js
++++ b/packages/block-editor/src/components/block-heading-level-dropdown/index.js
+@@ -40,12 +40,18 @@ export default function HeadingLevelDropdown( {
+ 	value,
+ 	onChange,
+ } ) {
++	const validOptions = options
++		.filter(
++			( option ) => option === 0 || HEADING_LEVELS.includes( option )
++		)
++		.sort( ( a, b ) => a - b ); // Sorts numerically in ascending order;
++
+ 	return (
+ 		<ToolbarDropdownMenu
+ 			popoverProps={ POPOVER_PROPS }
+ 			icon={ <HeadingLevelIcon level={ value } /> }
+ 			label={ __( 'Change level' ) }
+-			controls={ options.map( ( targetLevel ) => {
++			controls={ validOptions.map( ( targetLevel ) => {
+ 				const isActive = targetLevel === value;
+ 				return {
+ 					icon: <HeadingLevelIcon level={ targetLevel } />,

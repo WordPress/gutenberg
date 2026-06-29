@@ -1,0 +1,42 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 40d271cc869b63..37b529d7f697c1 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ -   `Tabs`: Replace hardcoded font values with design tokens on tab buttons ([#75537](https://github.com/WordPress/gutenberg/pull/75537)).
+ -   `Field`: Fix default gap spacing ([#75446](https://github.com/WordPress/gutenberg/pull/75446)).
+ -   `Button`: Fix disabled styles while `focusableWhenDisabled={false}` ([#75568](https://github.com/WordPress/gutenberg/pull/75568)).
++-   `IconButton`: make icon always `24px` regardless of `size` prop ([#75677](https://github.com/WordPress/gutenberg/pull/75677)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/ui/src/icon-button/icon-button.tsx b/packages/ui/src/icon-button/icon-button.tsx
+index 2979fad9394c0e..bbcc4100330a25 100644
+--- a/packages/ui/src/icon-button/icon-button.tsx
++++ b/packages/ui/src/icon-button/icon-button.tsx
+@@ -43,7 +43,8 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
+ 					>
+ 						<Icon
+ 							icon={ icon }
+-							size={ size === 'small' ? 22 : 24 }
++							size={ 24 }
++							className={ styles.icon }
+ 						/>
+ 					</Tooltip.Trigger>
+ 					<Tooltip.Popup>
+diff --git a/packages/ui/src/icon-button/style.module.css b/packages/ui/src/icon-button/style.module.css
+index a02a972a6f46a7..9618d779516c63 100644
+--- a/packages/ui/src/icon-button/style.module.css
++++ b/packages/ui/src/icon-button/style.module.css
+@@ -6,4 +6,11 @@
+ 		--wp-ui-button-padding-inline: 0;
+ 		--wp-ui-button-min-width: unset;
+ 	}
++
++	.icon {
++		/* Compensate for the button's 1px border so the icon extends
++			 edge-to-edge and doesn't inflate the button's dimensions
++			 (e.g. 24px icon inside a 24px-tall small button). */
++		margin: -1px;
++	}
+ }

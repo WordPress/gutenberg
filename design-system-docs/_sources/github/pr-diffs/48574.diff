@@ -1,0 +1,45 @@
+diff --git a/packages/block-editor/CHANGELOG.md b/packages/block-editor/CHANGELOG.md
+index 17a8fcb5b872ce..8990d187204628 100644
+--- a/packages/block-editor/CHANGELOG.md
++++ b/packages/block-editor/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `SpacingSizesControl`: fix white dot on thumb ([#48574](https://github.com/WordPress/gutenberg/pull/48574)).
++
+ ## 11.4.0 (2023-02-15)
+ 
+ ### Bug Fix
+diff --git a/packages/block-editor/src/components/spacing-sizes-control/style.scss b/packages/block-editor/src/components/spacing-sizes-control/style.scss
+index 4b60a744bfd90b..2019b6d34d2754 100644
+--- a/packages/block-editor/src/components/spacing-sizes-control/style.scss
++++ b/packages/block-editor/src/components/spacing-sizes-control/style.scss
+@@ -126,7 +126,7 @@
+ 		}
+ 	}
+ 
+-	[class*="ThumbWrapper-thumbColor"] {
++	.components-range-control__thumb-wrapper {
+ 		z-index: 3;
+ 	}
+ 
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index cec69ac1dfa697..0d57dd8d235c21 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -269,7 +269,11 @@ function UnforwardedRangeControl< IconProps = unknown >(
+ 						style={ { width: fillValueOffset } }
+ 						trackColor={ trackColor }
+ 					/>
+-					<ThumbWrapper style={ offsetStyle } disabled={ disabled }>
++					<ThumbWrapper
++						className="components-range-control__thumb-wrapper"
++						style={ offsetStyle }
++						disabled={ disabled }
++					>
+ 						<Thumb
+ 							aria-hidden={ true }
+ 							isFocused={ isThumbFocused }

@@ -1,0 +1,352 @@
+diff --git a/package-lock.json b/package-lock.json
+index 7e8ab731773fe4..789bab7d5bb010 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -32,7 +32,7 @@
+ 				"@inquirer/prompts": "7.2.0",
+ 				"@octokit/rest": "16.26.0",
+ 				"@testing-library/jest-dom": "6.9.1",
+-				"@types/node": "^20.17.10",
++				"@types/node": "^20.19.39",
+ 				"@types/prettier": "2.4.4",
+ 				"@types/react": "^18.3.27",
+ 				"@types/react-dom": "^18.3.1",
+@@ -18356,12 +18356,12 @@
+ 			}
+ 		},
+ 		"node_modules/@types/node": {
+-			"version": "20.17.10",
+-			"resolved": "https://registry.npmjs.org/@types/node/-/node-20.17.10.tgz",
+-			"integrity": "sha512-/jrvh5h6NXhEauFFexRin69nA0uHJ5gwk4iDivp/DeoEua3uwCUto6PC86IpRITBOs4+6i2I56K5x5b6WYGXHA==",
++			"version": "20.19.39",
++			"resolved": "https://registry.npmjs.org/@types/node/-/node-20.19.39.tgz",
++			"integrity": "sha512-orrrD74MBUyK8jOAD/r0+lfa1I2MO6I+vAkmAWzMYbCcgrN4lCrmK52gRFQq/JRxfYPfonkr4b0jcY7Olqdqbw==",
+ 			"license": "MIT",
+ 			"dependencies": {
+-				"undici-types": "~6.19.2"
++				"undici-types": "~6.21.0"
+ 			}
+ 		},
+ 		"node_modules/@types/node-forge": {
+@@ -54103,9 +54103,9 @@
+ 			}
+ 		},
+ 		"node_modules/undici-types": {
+-			"version": "6.19.8",
+-			"resolved": "https://registry.npmjs.org/undici-types/-/undici-types-6.19.8.tgz",
+-			"integrity": "sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==",
++			"version": "6.21.0",
++			"resolved": "https://registry.npmjs.org/undici-types/-/undici-types-6.21.0.tgz",
++			"integrity": "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==",
+ 			"license": "MIT"
+ 		},
+ 		"node_modules/unherit": {
+@@ -58746,7 +58746,7 @@
+ 			"devDependencies": {
+ 				"@jest/globals": "^30.2.0",
+ 				"@types/jest": "^29.5.14",
+-				"@types/node": "^20.19.0",
++				"@types/node": "^20.19.39",
+ 				"deep-freeze": "0.0.1"
+ 			},
+ 			"engines": {
+@@ -59464,13 +59464,6 @@
+ 				"node": ">=8"
+ 			}
+ 		},
+-		"packages/core-data/node_modules/undici-types": {
+-			"version": "6.21.0",
+-			"resolved": "https://registry.npmjs.org/undici-types/-/undici-types-6.21.0.tgz",
+-			"integrity": "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==",
+-			"dev": true,
+-			"license": "MIT"
+-		},
+ 		"packages/core-data/node_modules/uuid": {
+ 			"version": "14.0.0",
+ 			"resolved": "https://registry.npmjs.org/uuid/-/uuid-14.0.0.tgz",
+@@ -59860,7 +59853,8 @@
+ 				"web-vitals": "^4.2.1"
+ 			},
+ 			"devDependencies": {
+-				"@types/mime": "2.0.3"
++				"@types/mime": "2.0.3",
++				"@types/node": "^20.19.39"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -61067,6 +61061,7 @@
+ 				"semver": "^7.3.5"
+ 			},
+ 			"devDependencies": {
++				"@types/node": "^20.19.39",
+ 				"@types/npm-package-arg": "6.1.1",
+ 				"@types/semver": "7.3.8"
+ 			},
+@@ -61371,7 +61366,7 @@
+ 			"version": "4.45.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+-				"@types/node": "^20.17.10"
++				"@types/node": "^20.19.39"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -61434,7 +61429,7 @@
+ 				"@octokit/webhooks-types": "5.8.0"
+ 			},
+ 			"devDependencies": {
+-				"@types/node": "^20.17.10"
++				"@types/node": "^20.19.39"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -62195,7 +62190,7 @@
+ 			},
+ 			"devDependencies": {
+ 				"@jest/globals": "^30.2.0",
+-				"@types/node": "^20.17.10"
++				"@types/node": "^20.19.39"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -62958,7 +62953,7 @@
+ 				"@terrazzo/token-tools": "^2.0.3",
+ 				"@testing-library/jest-dom": "^6.9.1",
+ 				"@types/jest": "^29.5.14",
+-				"@types/node": "^20.17.10",
++				"@types/node": "^20.19.39",
+ 				"esbuild": "^0.27.2",
+ 				"esbuild-esm-loader": "^0.3.3",
+ 				"storybook": "^10.2.8"
+@@ -63058,7 +63053,7 @@
+ 				"@storybook/react-vite": "^10.2.8",
+ 				"@testing-library/jest-dom": "^6.9.1",
+ 				"@types/jest": "^29.5.14",
+-				"@types/node": "^20.17.10",
++				"@types/node": "^20.19.39",
+ 				"storybook": "^10.2.8"
+ 			},
+ 			"engines": {
+@@ -63078,7 +63073,7 @@
+ 				"@wordpress/is-shallow-equal": "file:../is-shallow-equal"
+ 			},
+ 			"devDependencies": {
+-				"@types/node": "^20.17.10"
++				"@types/node": "^20.19.39"
+ 			},
+ 			"engines": {
+ 				"node": ">=18.12.0",
+@@ -63336,7 +63331,7 @@
+ 				"wp-build": "lib/build.mjs"
+ 			},
+ 			"devDependencies": {
+-				"@types/node": "^20.17.10"
++				"@types/node": "^20.19.39"
+ 			},
+ 			"engines": {
+ 				"node": ">=20.10.0",
+@@ -63820,6 +63815,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+ 				"@playwright/test": "^1.58.2",
++				"@types/node": "^20.19.39",
+ 				"@wordpress/e2e-test-utils-playwright": "file:../../packages/e2e-test-utils-playwright",
+ 				"@wordpress/scripts": "file:../../packages/scripts",
+ 				"filenamify": "^4.2.0"
+@@ -63850,7 +63846,7 @@
+ 			"license": "GPL-2.0-or-later",
+ 			"devDependencies": {
+ 				"@playwright/test": "^1.58.2",
+-				"@types/node": "^20.17.10",
++				"@types/node": "^20.19.39",
+ 				"@wordpress/e2e-test-utils-playwright": "file:../../packages/e2e-test-utils-playwright",
+ 				"@wordpress/scripts": "file:../../packages/scripts"
+ 			}
+@@ -63862,6 +63858,7 @@
+ 			"devDependencies": {
+ 				"@playwright/test": "^1.58.2",
+ 				"@storybook/react-vite": "^10.1.11",
++				"@types/node": "^20.19.39",
+ 				"@wordpress/element": "file:../../packages/element",
+ 				"@wordpress/storybook": "file:../../storybook",
+ 				"storybook": "^10.1.11"
+diff --git a/package.json b/package.json
+index 341d0e773ecc81..4989359e2a979e 100644
+--- a/package.json
++++ b/package.json
+@@ -55,7 +55,7 @@
+ 		"@inquirer/prompts": "7.2.0",
+ 		"@octokit/rest": "16.26.0",
+ 		"@testing-library/jest-dom": "6.9.1",
+-		"@types/node": "^20.17.10",
++		"@types/node": "^20.19.39",
+ 		"@types/prettier": "2.4.4",
+ 		"@types/react": "^18.3.27",
+ 		"@types/react-dom": "^18.3.1",
+diff --git a/packages/core-data/package.json b/packages/core-data/package.json
+index b86dc24f241008..95535cee4d49c9 100644
+--- a/packages/core-data/package.json
++++ b/packages/core-data/package.json
+@@ -74,7 +74,7 @@
+ 	"devDependencies": {
+ 		"@jest/globals": "^30.2.0",
+ 		"@types/jest": "^29.5.14",
+-		"@types/node": "^20.19.0",
++		"@types/node": "^20.19.39",
+ 		"deep-freeze": "0.0.1"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/e2e-test-utils-playwright/package.json b/packages/e2e-test-utils-playwright/package.json
+index b87e9e04f374c4..d3dffb0812e748 100644
+--- a/packages/e2e-test-utils-playwright/package.json
++++ b/packages/e2e-test-utils-playwright/package.json
+@@ -45,7 +45,8 @@
+ 		"web-vitals": "^4.2.1"
+ 	},
+ 	"devDependencies": {
+-		"@types/mime": "2.0.3"
++		"@types/mime": "2.0.3",
++		"@types/node": "^20.19.39"
+ 	},
+ 	"peerDependencies": {
+ 		"@playwright/test": ">=1",
+diff --git a/packages/lazy-import/package.json b/packages/lazy-import/package.json
+index 19814a31bd3ae9..7c4c5e8b2bfb42 100644
+--- a/packages/lazy-import/package.json
++++ b/packages/lazy-import/package.json
+@@ -34,6 +34,7 @@
+ 		"semver": "^7.3.5"
+ 	},
+ 	"devDependencies": {
++		"@types/node": "^20.19.39",
+ 		"@types/npm-package-arg": "6.1.1",
+ 		"@types/semver": "7.3.8"
+ 	},
+diff --git a/packages/prettier-config/package.json b/packages/prettier-config/package.json
+index 6f77eba541d82d..0e345bdfe76667 100644
+--- a/packages/prettier-config/package.json
++++ b/packages/prettier-config/package.json
+@@ -33,7 +33,7 @@
+ 	},
+ 	"types": "build-types",
+ 	"devDependencies": {
+-		"@types/node": "^20.17.10"
++		"@types/node": "^20.19.39"
+ 	},
+ 	"peerDependencies": {
+ 		"prettier": ">=3"
+diff --git a/packages/project-management-automation/package.json b/packages/project-management-automation/package.json
+index dadd6421fb43a9..353d89f42c8a75 100644
+--- a/packages/project-management-automation/package.json
++++ b/packages/project-management-automation/package.json
+@@ -38,7 +38,7 @@
+ 		"@octokit/webhooks-types": "5.8.0"
+ 	},
+ 	"devDependencies": {
+-		"@types/node": "^20.17.10"
++		"@types/node": "^20.19.39"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/sync/package.json b/packages/sync/package.json
+index 0fbd9de8a2579c..147a1fafedf433 100644
+--- a/packages/sync/package.json
++++ b/packages/sync/package.json
+@@ -56,7 +56,7 @@
+ 	},
+ 	"devDependencies": {
+ 		"@jest/globals": "^30.2.0",
+-		"@types/node": "^20.17.10"
++		"@types/node": "^20.19.39"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/theme/package.json b/packages/theme/package.json
+index c629b703feedaa..abebf3e3b7f4ac 100644
+--- a/packages/theme/package.json
++++ b/packages/theme/package.json
+@@ -96,7 +96,7 @@
+ 		"@terrazzo/token-tools": "^2.0.3",
+ 		"@testing-library/jest-dom": "^6.9.1",
+ 		"@types/jest": "^29.5.14",
+-		"@types/node": "^20.17.10",
++		"@types/node": "^20.19.39",
+ 		"esbuild": "^0.27.2",
+ 		"esbuild-esm-loader": "^0.3.3",
+ 		"storybook": "^10.2.8"
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index faea05f8b53e4a..1dc580b28fbcae 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -61,7 +61,7 @@
+ 		"@storybook/react-vite": "^10.2.8",
+ 		"@testing-library/jest-dom": "^6.9.1",
+ 		"@types/jest": "^29.5.14",
+-		"@types/node": "^20.17.10",
++		"@types/node": "^20.19.39",
+ 		"storybook": "^10.2.8"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/undo-manager/package.json b/packages/undo-manager/package.json
+index f62e171d3a532c..ad9343b3a1ffd3 100644
+--- a/packages/undo-manager/package.json
++++ b/packages/undo-manager/package.json
+@@ -48,7 +48,7 @@
+ 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal"
+ 	},
+ 	"devDependencies": {
+-		"@types/node": "^20.17.10"
++		"@types/node": "^20.19.39"
+ 	},
+ 	"publishConfig": {
+ 		"access": "public"
+diff --git a/packages/wp-build/package.json b/packages/wp-build/package.json
+index eba950e2cc925a..8434bc36f2628b 100644
+--- a/packages/wp-build/package.json
++++ b/packages/wp-build/package.json
+@@ -52,7 +52,7 @@
+ 		"sass-embedded": "^1.97.2"
+ 	},
+ 	"devDependencies": {
+-		"@types/node": "^20.17.10"
++		"@types/node": "^20.19.39"
+ 	},
+ 	"peerDependencies": {
+ 		"@wordpress/boot": ">=0.3.0 <1.0.0",
+diff --git a/test/e2e/package.json b/test/e2e/package.json
+index 20f844d6ed1bbf..e43199172d1459 100644
+--- a/test/e2e/package.json
++++ b/test/e2e/package.json
+@@ -22,6 +22,7 @@
+ 	},
+ 	"devDependencies": {
+ 		"@playwright/test": "^1.58.2",
++		"@types/node": "^20.19.39",
+ 		"@wordpress/e2e-test-utils-playwright": "file:../../packages/e2e-test-utils-playwright",
+ 		"@wordpress/scripts": "file:../../packages/scripts",
+ 		"filenamify": "^4.2.0"
+diff --git a/test/performance/package.json b/test/performance/package.json
+index c7385197969378..f3ff9d67bd4636 100644
+--- a/test/performance/package.json
++++ b/test/performance/package.json
+@@ -22,7 +22,7 @@
+ 	},
+ 	"devDependencies": {
+ 		"@playwright/test": "^1.58.2",
+-		"@types/node": "^20.17.10",
++		"@types/node": "^20.19.39",
+ 		"@wordpress/e2e-test-utils-playwright": "file:../../packages/e2e-test-utils-playwright",
+ 		"@wordpress/scripts": "file:../../packages/scripts"
+ 	},
+diff --git a/test/storybook-playwright/package.json b/test/storybook-playwright/package.json
+index e7a14c478e9e83..7b9735b0b5b9a6 100644
+--- a/test/storybook-playwright/package.json
++++ b/test/storybook-playwright/package.json
+@@ -23,6 +23,7 @@
+ 	"devDependencies": {
+ 		"@playwright/test": "^1.58.2",
+ 		"@storybook/react-vite": "^10.1.11",
++		"@types/node": "^20.19.39",
+ 		"@wordpress/element": "file:../../packages/element",
+ 		"@wordpress/storybook": "file:../../storybook",
+ 		"storybook": "^10.1.11"

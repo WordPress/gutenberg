@@ -1,0 +1,376 @@
+diff --git a/packages/block-editor/src/components/font-appearance-control/style.scss b/packages/block-editor/src/components/font-appearance-control/style.scss
+index d99a54cd24e079..d9af9f29a456c8 100644
+--- a/packages/block-editor/src/components/font-appearance-control/style.scss
++++ b/packages/block-editor/src/components/font-appearance-control/style.scss
+@@ -1,6 +1,4 @@
+ .components-font-appearance-control {
+-	margin-bottom: 24px;
+-
+ 	ul {
+ 		li {
+ 			color: $gray-900;
+diff --git a/packages/block-editor/src/components/font-family/index.js b/packages/block-editor/src/components/font-family/index.js
+index 7316a70df15da6..8d49de5bf0b168 100644
+--- a/packages/block-editor/src/components/font-family/index.js
++++ b/packages/block-editor/src/components/font-family/index.js
+@@ -40,7 +40,7 @@ export default function FontFamilyControl( {
+ 	];
+ 	return (
+ 		<SelectControl
+-			label={ __( 'Font family' ) }
++			label={ __( 'Font' ) }
+ 			options={ options }
+ 			value={ value }
+ 			onChange={ onChange }
+diff --git a/packages/block-editor/src/hooks/typography.scss b/packages/block-editor/src/hooks/typography.scss
+index a9beccdce5c23f..7d7d44c24b4e2a 100644
+--- a/packages/block-editor/src/hooks/typography.scss
++++ b/packages/block-editor/src/hooks/typography.scss
+@@ -1,5 +1,4 @@
+ .typography-block-support-panel {
+-	.components-font-appearance-control,
+ 	.components-font-size-picker__controls,
+ 	.block-editor-text-decoration-control__buttons,
+ 	.block-editor-text-transform-control__buttons {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 43b9b030d47b00..f706499a277e73 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `SelectControl`, `CustomSelectControl`: Truncate long option strings ([#43301](https://github.com/WordPress/gutenberg/pull/43301)).
+ -   `Popover`: fix and improve opening animation ([#43186](https://github.com/WordPress/gutenberg/pull/43186)).
+ -   `Popover`: fix incorrect deps in hooks resulting in incorrect positioning after calling `update` ([#43267](https://github.com/WordPress/gutenberg/pull/43267/)).
++-   `FontSizePicker`: Fix excessive margin between label and input ([#43304](https://github.com/WordPress/gutenberg/pull/43304)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 8c9222ebf2634e..74f0f8f90bffce 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -32,6 +32,7 @@ import {
+ 	CUSTOM_FONT_SIZE,
+ } from './utils';
+ import { VStack } from '../v-stack';
++import { HStack } from '../h-stack';
+ 
+ // This conditional is needed to maintain the spacing before the slider in the `withSlider` case.
+ const MaybeVStack = ( { __nextHasNoMarginBottom, children } ) =>
+@@ -140,42 +141,33 @@ function FontSizePicker(
+ 	return (
+ 		<fieldset className={ baseClassName } { ...( ref ? {} : { ref } ) }>
+ 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
+-			<Flex
+-				justify="space-between"
+-				className={ `${ baseClassName }__header` }
+-			>
+-				<FlexItem>
+-					<BaseControl.VisualLabel>
+-						{ __( 'Size' ) }
+-						{ headerHint && (
+-							<span
+-								className={ `${ baseClassName }__header__hint` }
+-							>
+-								{ headerHint }
+-							</span>
+-						) }
+-					</BaseControl.VisualLabel>
+-				</FlexItem>
++			<HStack className={ `${ baseClassName }__header` }>
++				<BaseControl.VisualLabel>
++					{ __( 'Size' ) }
++					{ headerHint && (
++						<span className={ `${ baseClassName }__header__hint` }>
++							{ headerHint }
++						</span>
++					) }
++				</BaseControl.VisualLabel>
+ 				{ ! disableCustomFontSizes && (
+-					<FlexItem>
+-						<Button
+-							label={
+-								showCustomValueControl
+-									? __( 'Use size preset' )
+-									: __( 'Set custom size' )
+-							}
+-							icon={ settings }
+-							onClick={ () => {
+-								setShowCustomValueControl(
+-									! showCustomValueControl
+-								);
+-							} }
+-							isPressed={ showCustomValueControl }
+-							isSmall
+-						/>
+-					</FlexItem>
++					<Button
++						label={
++							showCustomValueControl
++								? __( 'Use size preset' )
++								: __( 'Set custom size' )
++						}
++						icon={ settings }
++						onClick={ () => {
++							setShowCustomValueControl(
++								! showCustomValueControl
++							);
++						} }
++						isPressed={ showCustomValueControl }
++						isSmall
++					/>
+ 				) }
+-			</Flex>
++			</HStack>
+ 			<MaybeVStack __nextHasNoMarginBottom={ __nextHasNoMarginBottom }>
+ 				<div
+ 					className={ classNames( `${ baseClassName }__controls`, {
+diff --git a/packages/components/src/font-size-picker/style.scss b/packages/components/src/font-size-picker/style.scss
+index 85a2ee16c574fb..e19342aabf3190 100644
+--- a/packages/components/src/font-size-picker/style.scss
++++ b/packages/components/src/font-size-picker/style.scss
+@@ -4,6 +4,10 @@
+ 		color: $gray-700;
+ 	}
+ 
++	.components-base-control__label {
++		margin-bottom: 0;
++	}
++
+ 	// This button is inheriting padding and min-width.
+ 	// @todo: we should refactor it to not need to unset this.
+ 	.components-button.is-small.has-icon:not(.has-text) {
+diff --git a/packages/edit-site/src/components/global-styles/style.scss b/packages/edit-site/src/components/global-styles/style.scss
+index ed72bfb1fde31f..1f203c348b25ec 100644
+--- a/packages/edit-site/src/components/global-styles/style.scss
++++ b/packages/edit-site/src/components/global-styles/style.scss
+@@ -21,8 +21,9 @@
+ 	border-radius: $radius-block-ui;
+ }
+ 
+-.edit-site-typography-panel__half-width-control {
+-	width: calc((100% - #{$grid-unit-30}) / 2);
++.edit-site-typography-panel__full-width-control {
++	grid-column: 1 / -1;
++	max-width: 100%;
+ }
+ 
+ .edit-site-global-styles-screen-heading-color,
+diff --git a/packages/edit-site/src/components/global-styles/typography-panel.js b/packages/edit-site/src/components/global-styles/typography-panel.js
+index 02453d5a8f3943..1ad4f99b106cff 100644
+--- a/packages/edit-site/src/components/global-styles/typography-panel.js
++++ b/packages/edit-site/src/components/global-styles/typography-panel.js
+@@ -10,9 +10,9 @@ import {
+ import {
+ 	PanelBody,
+ 	FontSizePicker,
+-	__experimentalSpacer as Spacer,
+ 	__experimentalToggleGroupControl as ToggleGroupControl,
+ 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
++	__experimentalGrid as Grid,
+ } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import { useState } from '@wordpress/element';
+@@ -144,108 +144,111 @@ export default function TypographyPanel( { name, element } ) {
+ 			>
+ 				Aa
+ 			</div>
+-			{ element === 'heading' && (
+-				<div>
+-					<h4>{ __( 'Select heading level' ) }</h4>
+-					<ToggleGroupControl
+-						label={ __( 'Select heading level' ) }
+-						hideLabelFromVision={ true }
+-						value={ selectedLevel }
+-						onChange={ setCurrentTab }
+-						isBlock
+-						size="__unstable-large"
+-					>
+-						<ToggleGroupControlOption
+-							value="heading"
+-							/* translators: 'All' refers to selecting all heading levels 
++			<Grid columns={ 2 }>
++				{ element === 'heading' && (
++					<div className="edit-site-typography-panel__full-width-control">
++						<ToggleGroupControl
++							label={ __( 'Select heading level' ) }
++							hideLabelFromVision
++							value={ selectedLevel }
++							onChange={ setCurrentTab }
++							isBlock
++							size="__unstable-large"
++							__nextHasNoMarginBottom
++						>
++							<ToggleGroupControlOption
++								value="heading"
++								/* translators: 'All' refers to selecting all heading levels 
+ 							and applying the same style to h1-h6. */
+-							label={ __( 'All' ) }
+-						/>
+-						<ToggleGroupControlOption
+-							value="h1"
+-							label={ __( 'H1' ) }
+-						/>
+-						<ToggleGroupControlOption
+-							value="h2"
+-							label={ __( 'H2' ) }
+-						/>
+-						<ToggleGroupControlOption
+-							value="h3"
+-							label={ __( 'H3' ) }
+-						/>
+-						<ToggleGroupControlOption
+-							value="h4"
+-							label={ __( 'H4' ) }
+-						/>
+-						<ToggleGroupControlOption
+-							value="h5"
+-							label={ __( 'H5' ) }
+-						/>
+-						<ToggleGroupControlOption
+-							value="h6"
+-							label={ __( 'H6' ) }
++								label={ __( 'All' ) }
++							/>
++							<ToggleGroupControlOption
++								value="h1"
++								label={ __( 'H1' ) }
++							/>
++							<ToggleGroupControlOption
++								value="h2"
++								label={ __( 'H2' ) }
++							/>
++							<ToggleGroupControlOption
++								value="h3"
++								label={ __( 'H3' ) }
++							/>
++							<ToggleGroupControlOption
++								value="h4"
++								label={ __( 'H4' ) }
++							/>
++							<ToggleGroupControlOption
++								value="h5"
++								label={ __( 'H5' ) }
++							/>
++							<ToggleGroupControlOption
++								value="h6"
++								label={ __( 'H6' ) }
++							/>
++						</ToggleGroupControl>
++					</div>
++				) }
++				{ supports.includes( 'fontFamily' ) && (
++					<div className="edit-site-typography-panel__full-width-control">
++						<FontFamilyControl
++							fontFamilies={ fontFamilies }
++							value={ fontFamily }
++							onChange={ setFontFamily }
++							size="__unstable-large"
++							__nextHasNoMarginBottom
+ 						/>
+-					</ToggleGroupControl>
+-				</div>
+-			) }
+-			{ supports.includes( 'fontFamily' ) && (
+-				<FontFamilyControl
+-					fontFamilies={ fontFamilies }
+-					value={ fontFamily }
+-					onChange={ setFontFamily }
+-					size="__unstable-large"
+-				/>
+-			) }
+-			{ hasFontSizeEnabled && (
+-				<FontSizePicker
+-					value={ fontSize }
+-					onChange={ setFontSize }
+-					fontSizes={ fontSizes }
+-					disableCustomFontSizes={ disableCustomFontSizes }
+-					size="__unstable-large"
+-				/>
+-			) }
+-			{ hasLineHeightEnabled && (
+-				<div className="edit-site-typography-panel__half-width-control">
+-					<Spacer marginBottom={ 6 }>
+-						<LineHeightControl
+-							__nextHasNoMarginBottom={ true }
+-							__unstableInputWidth="auto"
+-							value={ lineHeight }
+-							onChange={ setLineHeight }
++					</div>
++				) }
++				{ hasFontSizeEnabled && (
++					<div className="edit-site-typography-panel__full-width-control">
++						<FontSizePicker
++							value={ fontSize }
++							onChange={ setFontSize }
++							fontSizes={ fontSizes }
++							disableCustomFontSizes={ disableCustomFontSizes }
+ 							size="__unstable-large"
++							__nextHasNoMarginBottom
+ 						/>
+-					</Spacer>
+-				</div>
+-			) }
+-			{ hasAppearanceControl && (
+-				<FontAppearanceControl
+-					value={ {
+-						fontStyle,
+-						fontWeight,
+-					} }
+-					onChange={ ( {
+-						fontStyle: newFontStyle,
+-						fontWeight: newFontWeight,
+-					} ) => {
+-						setFontStyle( newFontStyle );
+-						setFontWeight( newFontWeight );
+-					} }
+-					hasFontStyles={ hasFontStyles }
+-					hasFontWeights={ hasFontWeights }
+-					size="__unstable-large"
+-				/>
+-			) }
+-			{ hasLetterSpacingControl && (
+-				<div className="edit-site-typography-panel__half-width-control">
++					</div>
++				) }
++				{ hasAppearanceControl && (
++					<FontAppearanceControl
++						value={ {
++							fontStyle,
++							fontWeight,
++						} }
++						onChange={ ( {
++							fontStyle: newFontStyle,
++							fontWeight: newFontWeight,
++						} ) => {
++							setFontStyle( newFontStyle );
++							setFontWeight( newFontWeight );
++						} }
++						hasFontStyles={ hasFontStyles }
++						hasFontWeights={ hasFontWeights }
++						size="__unstable-large"
++						__nextHasNoMarginBottom
++					/>
++				) }
++				{ hasLineHeightEnabled && (
++					<LineHeightControl
++						__nextHasNoMarginBottom
++						__unstableInputWidth="auto"
++						value={ lineHeight }
++						onChange={ setLineHeight }
++						size="__unstable-large"
++					/>
++				) }
++				{ hasLetterSpacingControl && (
+ 					<LetterSpacingControl
+ 						value={ letterSpacing }
+ 						onChange={ setLetterSpacing }
+ 						size="__unstable-large"
+ 						__unstableInputWidth="auto"
+ 					/>
+-				</div>
+-			) }
++				) }
++			</Grid>
+ 		</PanelBody>
+ 	);
+ }

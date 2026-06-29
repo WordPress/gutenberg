@@ -1,0 +1,337 @@
+diff --git a/packages/block-editor/src/components/block-bindings/attribute-control.js b/packages/block-editor/src/components/block-bindings/attribute-control.js
+index b19be9e80187b9..b92ae3abbfe696 100644
+--- a/packages/block-editor/src/components/block-bindings/attribute-control.js
++++ b/packages/block-editor/src/components/block-bindings/attribute-control.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/block-editor/src/components/block-bindings/source-fields-list.js b/packages/block-editor/src/components/block-bindings/source-fields-list.js
+index 4a869db95028f0..a9fe561751287c 100644
+--- a/packages/block-editor/src/components/block-bindings/source-fields-list.js
++++ b/packages/block-editor/src/components/block-bindings/source-fields-list.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/block-editor/src/components/inner-blocks/use-inner-block-template-sync.js b/packages/block-editor/src/components/inner-blocks/use-inner-block-template-sync.js
+index 505785c87914d7..ee1fa09b550857 100644
+--- a/packages/block-editor/src/components/inner-blocks/use-inner-block-template-sync.js
++++ b/packages/block-editor/src/components/inner-blocks/use-inner-block-template-sync.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/block-editor/src/components/rich-text/index.js b/packages/block-editor/src/components/rich-text/index.js
+index 73e2cadcec3197..52de9bb69d63a2 100644
+--- a/packages/block-editor/src/components/rich-text/index.js
++++ b/packages/block-editor/src/components/rich-text/index.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import clsx from 'clsx';
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/block-editor/src/store/reducer.js b/packages/block-editor/src/store/reducer.js
+index d98871cd49324b..8b4422b19f85e7 100644
+--- a/packages/block-editor/src/store/reducer.js
++++ b/packages/block-editor/src/store/reducer.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/block-library/src/table-of-contents/hooks.js b/packages/block-library/src/table-of-contents/hooks.js
+index 14b2ff0f746664..2d4c672c706212 100644
+--- a/packages/block-library/src/table-of-contents/hooks.js
++++ b/packages/block-library/src/table-of-contents/hooks.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/blocks/src/api/validation/index.js b/packages/blocks/src/api/validation/index.js
+index d5ac569e15ff09..1044d43e463f87 100644
+--- a/packages/blocks/src/api/validation/index.js
++++ b/packages/blocks/src/api/validation/index.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { Tokenizer } from 'simple-html-tokenizer';
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 04065c23603a38..34e7bd1f635c04 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -54,6 +54,7 @@
+ -   `AnglePickerControl`: Migrate styles from Emotion to a CSS module ([#73786](https://github.com/WordPress/gutenberg/pull/73786)).
+ -   `Menu`: Clean up popover wrappers ([#74207](https://github.com/WordPress/gutenberg/pull/74207)).
+ -   `Button`, `DateCalendar`, `DateRangeCalendar`, `CheckboxControl`, `Panel`, `Placeholder`: Remove outdated vendor prefix properties in CSS ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
++-    Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530)).
+ 
+ ## 30.9.0 (2025-11-26)
+ 
+diff --git a/packages/components/src/context/context-system-provider.js b/packages/components/src/context/context-system-provider.js
+index 7114372e0eb2a5..5ca535bfa22c54 100644
+--- a/packages/components/src/context/context-system-provider.js
++++ b/packages/components/src/context/context-system-provider.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import deepmerge from 'deepmerge';
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ import { isPlainObject } from 'is-plain-object';
+ 
+ /**
+diff --git a/packages/components/src/duotone-picker/duotone-picker.tsx b/packages/components/src/duotone-picker/duotone-picker.tsx
+index a21d12b73a65c4..52f776b57bcb7f 100644
+--- a/packages/components/src/duotone-picker/duotone-picker.tsx
++++ b/packages/components/src/duotone-picker/duotone-picker.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/src/higher-order/with-fallback-styles/index.tsx b/packages/components/src/higher-order/with-fallback-styles/index.tsx
+index b396094eadd530..cdfd29e7f07470 100644
+--- a/packages/components/src/higher-order/with-fallback-styles/index.tsx
++++ b/packages/components/src/higher-order/with-fallback-styles/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/compose/src/hooks/use-keyboard-shortcut/index.js b/packages/compose/src/hooks/use-keyboard-shortcut/index.js
+index cb571aa5a0e5fa..bf4e007eb9ab42 100644
+--- a/packages/compose/src/hooks/use-keyboard-shortcut/index.js
++++ b/packages/compose/src/hooks/use-keyboard-shortcut/index.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import Mousetrap from 'mousetrap';
+-import 'mousetrap/plugins/global-bind/mousetrap-global-bind';
++import 'mousetrap/plugins/global-bind/mousetrap-global-bind.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/core-data/src/actions.js b/packages/core-data/src/actions.js
+index 89ab8a995fb286..c1e9b1ef7ee653 100644
+--- a/packages/core-data/src/actions.js
++++ b/packages/core-data/src/actions.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ import { v4 as uuid } from 'uuid';
+ 
+ /**
+diff --git a/packages/core-data/src/reducer.js b/packages/core-data/src/reducer.js
+index 83d5f4c5407add..f2acaa34fb8c60 100644
+--- a/packages/core-data/src/reducer.js
++++ b/packages/core-data/src/reducer.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/core-data/src/utils/conservative-map-item.js b/packages/core-data/src/utils/conservative-map-item.js
+index 2a3297b5b32ab8..acf43a7d129cbe 100644
+--- a/packages/core-data/src/utils/conservative-map-item.js
++++ b/packages/core-data/src/utils/conservative-map-item.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * Given the current and next item entity record, returns the minimally "modified"
+diff --git a/packages/core-data/src/utils/crdt-blocks.ts b/packages/core-data/src/utils/crdt-blocks.ts
+index 5177f0f7f0838a..b661921880faac 100644
+--- a/packages/core-data/src/utils/crdt-blocks.ts
++++ b/packages/core-data/src/utils/crdt-blocks.ts
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { v4 as uuidv4 } from 'uuid';
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/core-data/src/utils/crdt.ts b/packages/core-data/src/utils/crdt.ts
+index d7355f9d439855..169d9620433479 100644
+--- a/packages/core-data/src/utils/crdt.ts
++++ b/packages/core-data/src/utils/crdt.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js b/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js
+index f7fef23fa7f386..a8155f5af355c3 100644
+--- a/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js
++++ b/packages/customize-widgets/src/components/sidebar-block-editor/use-sidebar-block-editor.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 2758211c0353e3..b2ddc90f6a2b39 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ - Update DataForm stories. [#74196](https://github.com/WordPress/gutenberg/pull/74196)
+ - Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
+ - Add details layout to DataForm validation story. [#74445](https://github.com/WordPress/gutenberg/pull/74445)
++- Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530))
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/dataviews/src/components/dataviews-filters/input-widget.tsx b/packages/dataviews/src/components/dataviews-filters/input-widget.tsx
+index 65ed2a4685c880..fa60759f3e981d 100644
+--- a/packages/dataviews/src/components/dataviews-filters/input-widget.tsx
++++ b/packages/dataviews/src/components/dataviews-filters/input-widget.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/dataviews/src/hooks/use-form-validity.ts b/packages/dataviews/src/hooks/use-form-validity.ts
+index 383364b85e2b48..8d199c50206bbe 100644
+--- a/packages/dataviews/src/hooks/use-form-validity.ts
++++ b/packages/dataviews/src/hooks/use-form-validity.ts
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import deepMerge from 'deepmerge';
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/date/src/index.ts b/packages/date/src/index.ts
+index 4c26c4007999b8..7193ee33f93ffa 100644
+--- a/packages/date/src/index.ts
++++ b/packages/date/src/index.ts
+@@ -4,7 +4,7 @@
+ import type { Moment } from 'moment';
+ import momentLib from 'moment';
+ import 'moment-timezone/moment-timezone';
+-import 'moment-timezone/moment-timezone-utils';
++import 'moment-timezone/moment-timezone-utils.js';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/global-styles-engine/src/core/equal.ts b/packages/global-styles-engine/src/core/equal.ts
+index d307c10fbeed4e..362bb3f3ac2122 100644
+--- a/packages/global-styles-engine/src/core/equal.ts
++++ b/packages/global-styles-engine/src/core/equal.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import fastDeepEqual from 'fast-deep-equal/es6';
++import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+ 
+ /**
+  * Internal dependencies
+diff --git a/packages/wp-build/lib/build.mjs b/packages/wp-build/lib/build.mjs
+index eabd4fe16c3473..447a1a287f93bb 100755
+--- a/packages/wp-build/lib/build.mjs
++++ b/packages/wp-build/lib/build.mjs
+@@ -233,16 +233,12 @@ function momentTimezoneAliasPlugin() {
+ 
+ 			// Cached paths - resolved lazily on first use
+ 			let preBuiltBundlePath;
+-			let momentTimezoneUtilsPath;
+ 			const resolvePaths = () => {
+ 				if ( preBuiltBundlePath ) {
+ 					return;
+ 				}
+ 				preBuiltBundlePath = require.resolve(
+-					'moment-timezone/builds/moment-timezone-with-data-1970-2030'
+-				);
+-				momentTimezoneUtilsPath = require.resolve(
+-					'moment-timezone/moment-timezone-utils.js'
++					'moment-timezone/builds/moment-timezone-with-data-1970-2030.js'
+ 				);
+ 			};
+ 
+@@ -255,17 +251,6 @@ function momentTimezoneAliasPlugin() {
+ 				}
+ 			);
+ 
+-			// For utils, we need to load it but ensure it works with the pre-built bundle.
+-			// The utils file tries to require('./') which would load index.js.
+-			// We need to make sure it gets the pre-built bundle instead.
+-			build.onResolve(
+-				{ filter: /^moment-timezone\/moment-timezone-utils$/ },
+-				() => {
+-					resolvePaths();
+-					return { path: momentTimezoneUtilsPath };
+-				}
+-			);
+-
+ 			// Intercept the require('./') call inside moment-timezone-utils
+ 			// and redirect it to the pre-built bundle.
+ 			build.onResolve( { filter: /^\.\/$/ }, ( args ) => {

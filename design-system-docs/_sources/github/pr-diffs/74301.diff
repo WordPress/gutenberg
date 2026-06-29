@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f6b48b226d09cd..c79131b6b1b1eb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -48,6 +48,7 @@
+ -   `DatePicker`: Fix missing scheduled events and current date indicators. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
+ -   `DatePicker`: Fix handling of `currentDate` when passed values as Date or timestamp. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
+ -   `Popover`: Fix bug where clicking outside nested popovers only closed the inner one. ([#74340](https://github.com/WordPress/gutenberg/pull/74340))
++-   `InputControl`: Allow label to wrap for long labels/translations. ([#74301](https://github.com/WordPress/gutenberg/pull/74301)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 492c4bef0f4e20..3ab4438f632572 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -314,10 +314,6 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
+ 		padding-bottom: 0;
+ 		max-width: 100%;
+ 		z-index: 1;
+-
+-		overflow: hidden;
+-		text-overflow: ellipsis;
+-		white-space: nowrap;
+ 	}
+ `;
+ 

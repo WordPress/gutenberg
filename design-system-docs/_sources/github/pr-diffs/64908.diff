@@ -1,0 +1,92 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ce3fd808e7ed89..346ba3991d3ea3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -24,6 +24,15 @@
+ -   `UnitControl`: Update unit select styles ([#64712](https://github.com/WordPress/gutenberg/pull/64712)).
+ -   `InputControl`: Add variants to prefix/suffix wrappers ([#64824](https://github.com/WordPress/gutenberg/pull/64824)).
+ -   `Navigator`: remove location history, simplify internal logic ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
++-   Tighten gap between the main control and the prefix/suffix slot for the following components ([#64908](https://github.com/WordPress/gutenberg/pull/64908)).
++    -   `InputControl`
++    -   `NumberControl`
++    -   `SelectControl`
++    -   `TreeSelect`
++    -   `UnitControl`
++    -   Contains internal visual changes from this PR:
++        -   `AnglePickerControl`
++        -   `ColorPicker`
+ -   Decrease horizontal padding from 16px to 12px on the following components, when in the 40px default size ([#64708](https://github.com/WordPress/gutenberg/pull/64708)).
+     -   `AnglePickerControl`
+     -   `ColorPicker` (on the inputs)
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 5fe2abce1b4117..e2c96eaa9ffc0d 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -18,6 +18,7 @@ import { contextConnect } from '../../context';
+ import { useBorderControl } from './hook';
+ 
+ import type { BorderControlProps, LabelProps } from '../types';
++import { Spacer } from '../../spacer';
+ 
+ const BorderLabel = ( props: LabelProps ) => {
+ 	const { label, hideLabelFromVision } = props;
+@@ -75,22 +76,28 @@ const UnconnectedBorderControl = (
+ 			<HStack spacing={ 4 } className={ innerWrapperClassName }>
+ 				<UnitControl
+ 					prefix={
+-						<BorderControlDropdown
+-							border={ border }
+-							colors={ colors }
+-							__unstablePopoverProps={ __unstablePopoverProps }
+-							disableCustomColors={ disableCustomColors }
+-							enableAlpha={ enableAlpha }
+-							enableStyle={ enableStyle }
+-							isStyleSettable={ isStyleSettable }
+-							onChange={ onBorderChange }
+-							previousStyleSelection={ previousStyleSelection }
+-							showDropdownHeader={ showDropdownHeader }
+-							__experimentalIsRenderedInSidebar={
+-								__experimentalIsRenderedInSidebar
+-							}
+-							size={ size }
+-						/>
++						<Spacer marginRight={ 1 } marginBottom={ 0 }>
++							<BorderControlDropdown
++								border={ border }
++								colors={ colors }
++								__unstablePopoverProps={
++									__unstablePopoverProps
++								}
++								disableCustomColors={ disableCustomColors }
++								enableAlpha={ enableAlpha }
++								enableStyle={ enableStyle }
++								isStyleSettable={ isStyleSettable }
++								onChange={ onBorderChange }
++								previousStyleSelection={
++									previousStyleSelection
++								}
++								showDropdownHeader={ showDropdownHeader }
++								__experimentalIsRenderedInSidebar={
++									__experimentalIsRenderedInSidebar
++								}
++								size={ size }
++							/>
++						</Spacer>
+ 					}
+ 					label={ __( 'Border width' ) }
+ 					hideLabelFromVision
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index a5a9e054bc37d8..fd0fc0a5c45536 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -100,8 +100,8 @@ export function UnforwardedInputControl(
+ 					isPressEnterToChange={ isPressEnterToChange }
+ 					onKeyDown={ onKeyDown }
+ 					onValidate={ onValidate }
+-					paddingInlineStart={ prefix ? space( 2 ) : undefined }
+-					paddingInlineEnd={ suffix ? space( 2 ) : undefined }
++					paddingInlineStart={ prefix ? space( 1 ) : undefined }
++					paddingInlineEnd={ suffix ? space( 1 ) : undefined }
+ 					ref={ ref }
+ 					size={ size }
+ 					stateReducer={ stateReducer }

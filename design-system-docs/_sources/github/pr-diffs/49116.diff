@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3be2e8f6a8cbcb..07b3a96627fbd9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,10 @@
+ -   `CustomGradientPicker`: improve initial state UI ([#49146](https://github.com/WordPress/gutenberg/pull/49146)).
+ -	`AnglePickerControl`: Style to better fit in narrow contexts and improve RTL layout ([#49046](https://github.com/WordPress/gutenberg/pull/49046)).
+ 
++### Bug Fix
++
++-  `InputControl`: Fix misaligned textarea input control ([#49116](https://github.com/WordPress/gutenberg/pull/49116)).
++
+ ## 23.6.0 (2023-03-15)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/utils/input/input-control.js b/packages/components/src/utils/input/input-control.js
+index c550a558d6d4e2..8af838247d9c25 100644
+--- a/packages/components/src/utils/input/input-control.js
++++ b/packages/components/src/utils/input/input-control.js
+@@ -12,6 +12,7 @@ import { COLORS } from '../colors-values';
+ import { breakpoint } from '../breakpoint';
+ 
+ export const inputControl = css`
++	display: block;
+ 	font-family: ${ font( 'default.fontFamily' ) };
+ 	padding: 6px 8px;
+ 	${ inputStyleNeutral };

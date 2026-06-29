@@ -1,0 +1,395 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 439c45a312d966..fb5e36f1fb6e61 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Experimental
+ 
+ -   `Tabs`: Add `focusable` prop to the `Tabs.TabPanel` sub-component ([#55287](https://github.com/WordPress/gutenberg/pull/55287))
++-   `Tabs`: Update sub-components to accept relevant HTML element props ([#55860](https://github.com/WordPress/gutenberg/pull/55860))
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/tabs/README.md b/packages/components/src/tabs/README.md
+index 8fb4e0e73caec2..423216e940584d 100644
+--- a/packages/components/src/tabs/README.md
++++ b/packages/components/src/tabs/README.md
+@@ -159,19 +159,6 @@ The children elements, which should be a series of `Tabs.TabPanel` components.
+ 
+ -   Required: No
+ 
+-###### `className`: `string`
+-
+-The class name to apply to the tablist.
+-
+--   Required: No
+--   Default: ''
+-
+-###### `style`: `React.CSSProperties`
+-
+-Custom CSS styles for the tablist.
+-
+-- Required: No
+-
+ #### Tab
+ 
+ ##### Props
+@@ -182,24 +169,12 @@ The id of the tab, which is prepended with the `Tabs` instance ID.
+ 
+ - Required: Yes
+ 
+-###### `style`: `React.CSSProperties`
+-
+-Custom CSS styles for the tab.
+-
+-- Required: No
+-
+ ###### `children`: `React.ReactNode`
+ 
+ The children elements, generally the text to display on the tab.
+ 
+ - Required: No
+ 
+-###### `className`: `string`
+-
+-The class name to apply to the tab.
+-
+-- Required: No
+-
+ ###### `disabled`: `boolean`
+ 
+ Determines if the tab button should be disabled.
+@@ -229,18 +204,6 @@ The id of the tabpanel, which is combined with the `Tabs` instance ID and the su
+ 
+ - Required: Yes
+ 
+-###### `className`: `string`
+-
+-The class name to apply to the tabpanel.
+-
+-- Required: No
+-
+-###### `style`: `React.CSSProperties`
+-
+-Custom CSS styles for the tab.
+-
+-- Required: No
+-
+ ###### `focusable`: `boolean`
+ 
+ Determines whether or not the tabpanel element should be focusable. If `false`, pressing the tab key will skip over the tabpanel, and instead focus on the first focusable element in the panel (if there is one).
+diff --git a/packages/components/src/tabs/tab.tsx b/packages/components/src/tabs/tab.tsx
+index 75b3df1c1ba01e..03e5d80871c56a 100644
+--- a/packages/components/src/tabs/tab.tsx
++++ b/packages/components/src/tabs/tab.tsx
+@@ -11,11 +11,12 @@ import type { TabProps } from './types';
+ import warning from '@wordpress/warning';
+ import { TabsContext } from './context';
+ import { Tab as StyledTab } from './styles';
++import type { WordPressComponentProps } from '../context';
+ 
+-export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
+-	{ children, id, className, disabled, render, style },
+-	ref
+-) {
++export const Tab = forwardRef<
++	HTMLButtonElement,
++	WordPressComponentProps< TabProps, 'button', false >
++>( function Tab( { children, id, disabled, render, ...otherProps }, ref ) {
+ 	const context = useContext( TabsContext );
+ 	if ( ! context ) {
+ 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
+@@ -28,10 +29,9 @@ export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
+ 			ref={ ref }
+ 			store={ store }
+ 			id={ instancedTabId }
+-			className={ className }
+-			style={ style }
+ 			disabled={ disabled }
+ 			render={ render }
++			{ ...otherProps }
+ 		>
+ 			{ children }
+ 		</StyledTab>
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index 02255fefd20827..7a53115910796c 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -16,25 +16,26 @@ import { forwardRef } from '@wordpress/element';
+ import type { TabListProps } from './types';
+ import { useTabsContext } from './context';
+ import { TabListWrapper } from './styles';
++import type { WordPressComponentProps } from '../context';
+ 
+-export const TabList = forwardRef< HTMLDivElement, TabListProps >(
+-	function TabList( { children, className, style }, ref ) {
+-		const context = useTabsContext();
+-		if ( ! context ) {
+-			warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
+-			return null;
+-		}
+-		const { store } = context;
+-		return (
+-			<Ariakit.TabList
+-				ref={ ref }
+-				style={ style }
+-				store={ store }
+-				className={ className }
+-				render={ <TabListWrapper /> }
+-			>
+-				{ children }
+-			</Ariakit.TabList>
+-		);
++export const TabList = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< TabListProps, 'div', false >
++>( function TabList( { children, ...otherProps }, ref ) {
++	const context = useTabsContext();
++	if ( ! context ) {
++		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
++		return null;
+ 	}
+-);
++	const { store } = context;
++	return (
++		<Ariakit.TabList
++			ref={ ref }
++			store={ store }
++			render={ <TabListWrapper /> }
++			{ ...otherProps }
++		>
++			{ children }
++		</Ariakit.TabList>
++	);
++} );
+diff --git a/packages/components/src/tabs/tabpanel.tsx b/packages/components/src/tabs/tabpanel.tsx
+index b5339141a56eca..f477d1d3b4b437 100644
+--- a/packages/components/src/tabs/tabpanel.tsx
++++ b/packages/components/src/tabs/tabpanel.tsx
+@@ -16,30 +16,28 @@ import { TabPanel as StyledTabPanel } from './styles';
+ 
+ import warning from '@wordpress/warning';
+ import { TabsContext } from './context';
++import type { WordPressComponentProps } from '../context';
+ 
+-export const TabPanel = forwardRef< HTMLDivElement, TabPanelProps >(
+-	function TabPanel(
+-		{ children, id, className, style, focusable = true },
+-		ref
+-	) {
+-		const context = useContext( TabsContext );
+-		if ( ! context ) {
+-			warning( '`Tabs.TabPanel` must be wrapped in a `Tabs` component.' );
+-			return null;
+-		}
+-		const { store, instanceId } = context;
+-
+-		return (
+-			<StyledTabPanel
+-				focusable={ focusable }
+-				ref={ ref }
+-				style={ style }
+-				store={ store }
+-				id={ `${ instanceId }-${ id }-view` }
+-				className={ className }
+-			>
+-				{ children }
+-			</StyledTabPanel>
+-		);
++export const TabPanel = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< TabPanelProps, 'div', false >
++>( function TabPanel( { children, id, focusable = true, ...otherProps }, ref ) {
++	const context = useContext( TabsContext );
++	if ( ! context ) {
++		warning( '`Tabs.TabPanel` must be wrapped in a `Tabs` component.' );
++		return null;
+ 	}
+-);
++	const { store, instanceId } = context;
++
++	return (
++		<StyledTabPanel
++			ref={ ref }
++			store={ store }
++			id={ `${ instanceId }-${ id }-view` }
++			focusable={ focusable }
++			{ ...otherProps }
++		>
++			{ children }
++		</StyledTabPanel>
++	);
++} );
+diff --git a/packages/components/src/tabs/test/index.tsx b/packages/components/src/tabs/test/index.tsx
+index 67b7bf588e74e8..d2a035e436c194 100644
+--- a/packages/components/src/tabs/test/index.tsx
++++ b/packages/components/src/tabs/test/index.tsx
+@@ -7,7 +7,6 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * WordPress dependencies
+  */
+-import { wordpress, category, media } from '@wordpress/icons';
+ import { useState } from '@wordpress/element';
+ 
+ /**
+@@ -15,7 +14,6 @@ import { useState } from '@wordpress/element';
+  */
+ import Tabs from '..';
+ import type { TabsProps } from '../types';
+-import type { IconType } from '../../icon';
+ 
+ type Tab = {
+ 	id: string;
+@@ -23,7 +21,6 @@ type Tab = {
+ 	content: React.ReactNode;
+ 	tab: {
+ 		className?: string;
+-		icon?: IconType;
+ 		disabled?: boolean;
+ 	};
+ 	tabpanel?: {
+@@ -36,19 +33,19 @@ const TABS: Tab[] = [
+ 		id: 'alpha',
+ 		title: 'Alpha',
+ 		content: 'Selected tab: Alpha',
+-		tab: { className: 'alpha-class', icon: wordpress },
++		tab: { className: 'alpha-class' },
+ 	},
+ 	{
+ 		id: 'beta',
+ 		title: 'Beta',
+ 		content: 'Selected tab: Beta',
+-		tab: { className: 'beta-class', icon: category },
++		tab: { className: 'beta-class' },
+ 	},
+ 	{
+ 		id: 'gamma',
+ 		title: 'Gamma',
+ 		content: 'Selected tab: Gamma',
+-		tab: { className: 'gamma-class', icon: media },
++		tab: { className: 'gamma-class' },
+ 	},
+ ];
+ 
+@@ -58,17 +55,15 @@ const TABS_WITH_DELTA: Tab[] = [
+ 		id: 'delta',
+ 		title: 'Delta',
+ 		content: 'Selected tab: Delta',
+-		tab: { className: 'delta-class', icon: media },
++		tab: { className: 'delta-class' },
+ 	},
+ ];
+ 
+ const UncontrolledTabs = ( {
+ 	tabs,
+-	showTabIcons = false,
+ 	...props
+ }: Omit< TabsProps, 'children' > & {
+ 	tabs: Tab[];
+-	showTabIcons?: boolean;
+ } ) => {
+ 	return (
+ 		<Tabs { ...props }>
+@@ -79,9 +74,8 @@ const UncontrolledTabs = ( {
+ 						id={ tabObj.id }
+ 						className={ tabObj.tab.className }
+ 						disabled={ tabObj.tab.disabled }
+-						icon={ showTabIcons ? tabObj.tab.icon : undefined }
+ 					>
+-						{ showTabIcons ? null : tabObj.title }
++						{ tabObj.title }
+ 					</Tabs.Tab>
+ 				) ) }
+ 			</Tabs.TabList>
+@@ -100,11 +94,9 @@ const UncontrolledTabs = ( {
+ 
+ const ControlledTabs = ( {
+ 	tabs,
+-	showTabIcons = false,
+ 	...props
+ }: Omit< TabsProps, 'children' > & {
+ 	tabs: Tab[];
+-	showTabIcons?: boolean;
+ } ) => {
+ 	const [ selectedTabId, setSelectedTabId ] = useState<
+ 		string | undefined | null
+@@ -126,9 +118,8 @@ const ControlledTabs = ( {
+ 						id={ tabObj.id }
+ 						className={ tabObj.tab.className }
+ 						disabled={ tabObj.tab.disabled }
+-						icon={ showTabIcons ? tabObj.tab.icon : undefined }
+ 					>
+-						{ showTabIcons ? null : tabObj.title }
++						{ tabObj.title }
+ 					</Tabs.Tab>
+ 				) ) }
+ 			</Tabs.TabList>
+diff --git a/packages/components/src/tabs/types.ts b/packages/components/src/tabs/types.ts
+index 9874fe6cb6ccfa..8b071937410919 100644
+--- a/packages/components/src/tabs/types.ts
++++ b/packages/components/src/tabs/types.ts
+@@ -4,11 +4,6 @@
+ // eslint-disable-next-line no-restricted-imports
+ import type * as Ariakit from '@ariakit/react';
+ 
+-/**
+- * Internal dependencies
+- */
+-import type { IconType } from '../icon';
+-
+ export type TabsContextProps =
+ 	| {
+ 			/**
+@@ -78,14 +73,6 @@ export type TabListProps = {
+ 	 * The children elements, which should be a series of `Tabs.TabPanel` components.
+ 	 */
+ 	children?: React.ReactNode;
+-	/**
+-	 * The class name to apply to the tablist.
+-	 */
+-	className?: string;
+-	/**
+-	 * Custom CSS styles for the rendered tablist.
+-	 */
+-	style?: React.CSSProperties;
+ };
+ 
+ export type TabProps = {
+@@ -93,22 +80,10 @@ export type TabProps = {
+ 	 * The id of the tab, which is prepended with the `Tabs` instanceId.
+ 	 */
+ 	id: string;
+-	/**
+-	 * Custom CSS styles for the tab.
+-	 */
+-	style?: React.CSSProperties;
+ 	/**
+ 	 * The children elements, generally the text to display on the tab.
+ 	 */
+ 	children?: React.ReactNode;
+-	/**
+-	 * The class name to apply to the tab button.
+-	 */
+-	className?: string;
+-	/**
+-	 * The icon used for the tab button.
+-	 */
+-	icon?: IconType;
+ 	/**
+ 	 * Determines if the tab button should be disabled.
+ 	 *
+@@ -131,14 +106,6 @@ export type TabPanelProps = {
+ 	 * A unique identifier for the tabpanel, which is used to generate a unique `id` for the underlying element.
+ 	 */
+ 	id: string;
+-	/**
+-	 * The class name to apply to the tabpanel.
+-	 */
+-	className?: string;
+-	/**
+-	 * Custom CSS styles for the rendered `TabPanel` component.
+-	 */
+-	style?: React.CSSProperties;
+ 	/**
+ 	 * Determines whether or not the tabpanel element should be focusable.
+ 	 * If `false`, pressing the tab key will skip over the tabpanel, and instead

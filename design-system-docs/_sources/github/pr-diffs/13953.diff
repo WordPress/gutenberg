@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/drop-zone/provider.js b/packages/components/src/drop-zone/provider.js
+index 5e77c74d5b9580..43fc3d76c562c6 100644
+--- a/packages/components/src/drop-zone/provider.js
++++ b/packages/components/src/drop-zone/provider.js
+@@ -172,7 +172,7 @@ class DropZoneProvider extends Component {
+ 		}
+ 
+ 		// Notifying the dropzones
+-		toUpdate.map( ( dropZone ) => {
++		toUpdate.forEach( ( dropZone ) => {
+ 			const index = this.dropZones.indexOf( dropZone );
+ 			const isDraggingOverDropZone = index === hoveredDropZoneIndex;
+ 			dropZone.setState( {

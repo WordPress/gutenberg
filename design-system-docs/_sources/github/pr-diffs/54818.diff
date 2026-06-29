@@ -1,0 +1,191 @@
+diff --git a/package-lock.json b/package-lock.json
+index e8f8f296c214f3..8f7616dd1e5563 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -328,41 +328,6 @@
+ 				"node": ">=6.0.0"
+ 			}
+ 		},
+-		"node_modules/@ariakit/core": {
+-			"version": "0.2.7",
+-			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.2.7.tgz",
+-			"integrity": "sha512-Hs0N1EMYq88WW4v9xnSIHNR38TvbQuoUX6FYFmeLCZSTIXQBiET7lr1DQXwOOmdEtRtlxQ5HsxbTkxeOkPv+eg=="
+-		},
+-		"node_modules/@ariakit/react": {
+-			"version": "0.2.12",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.2.12.tgz",
+-			"integrity": "sha512-4rAgMyUURHW78EKgRCanhyRUtsiYCOxO65BBHF4mg3tZsDeOvu9kBG5IAXX8mUgakTcyr0EKXuOtGThaj7gobA==",
+-			"dependencies": {
+-				"@ariakit/react-core": "0.2.12"
+-			},
+-			"funding": {
+-				"type": "opencollective",
+-				"url": "https://opencollective.com/ariakit"
+-			},
+-			"peerDependencies": {
+-				"react": "^17.0.0 || ^18.0.0",
+-				"react-dom": "^17.0.0 || ^18.0.0"
+-			}
+-		},
+-		"node_modules/@ariakit/react-core": {
+-			"version": "0.2.12",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.2.12.tgz",
+-			"integrity": "sha512-3KSKlX10nnhCvjsbPW0CAnqG+6grryfwnMkeJJ/h34FSV7hEfUMexmIjKBVZyfBG08Xj8NjSK8kkx9c3ChkXeA==",
+-			"dependencies": {
+-				"@ariakit/core": "0.2.7",
+-				"@floating-ui/dom": "^1.0.0",
+-				"use-sync-external-store": "^1.2.0"
+-			},
+-			"peerDependencies": {
+-				"react": "^17.0.0 || ^18.0.0",
+-				"react-dom": "^17.0.0 || ^18.0.0"
+-			}
+-		},
+ 		"node_modules/@aw-web-design/x-default-browser": {
+ 			"version": "1.4.126",
+ 			"resolved": "https://registry.npmjs.org/@aw-web-design/x-default-browser/-/x-default-browser-1.4.126.tgz",
+@@ -56219,7 +56184,7 @@
+ 			"version": "25.8.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@ariakit/react": "^0.2.12",
++				"@ariakit/react": "^0.3.3",
+ 				"@babel/runtime": "^7.16.0",
+ 				"@emotion/cache": "^11.7.1",
+ 				"@emotion/css": "^11.7.1",
+@@ -56277,6 +56242,41 @@
+ 				"react-dom": "^18.0.0"
+ 			}
+ 		},
++		"packages/components/node_modules/@ariakit/core": {
++			"version": "0.3.2",
++			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.3.2.tgz",
++			"integrity": "sha512-hTiYCMsezqOH1y1KNNbRv58oQvbxAZlbYPhFG0XbTHd+tJQkHgtpezLBbJc4U/YjnhA95EAS6Zfa2xwj+EEbKg=="
++		},
++		"packages/components/node_modules/@ariakit/react": {
++			"version": "0.3.3",
++			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.3.3.tgz",
++			"integrity": "sha512-MdwdbxuII4SpOz/noRoE5m9ZAFRqGmHqNi9a7FDCmaGP0JNE36G8aFwijvBkh3CrRKL65+AHxZIUmkJUztijFQ==",
++			"dependencies": {
++				"@ariakit/react-core": "0.3.3"
++			},
++			"funding": {
++				"type": "opencollective",
++				"url": "https://opencollective.com/ariakit"
++			},
++			"peerDependencies": {
++				"react": "^17.0.0 || ^18.0.0",
++				"react-dom": "^17.0.0 || ^18.0.0"
++			}
++		},
++		"packages/components/node_modules/@ariakit/react-core": {
++			"version": "0.3.3",
++			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.3.3.tgz",
++			"integrity": "sha512-ca2NbUNRrBoLpLMiTnGDivoHzXKH25QWcNEmO6Sm5bctL0LOSGvm9bU7tBn6nD+bZNk8yXV1YnNtKba/retENA==",
++			"dependencies": {
++				"@ariakit/core": "0.3.2",
++				"@floating-ui/dom": "^1.0.0",
++				"use-sync-external-store": "^1.2.0"
++			},
++			"peerDependencies": {
++				"react": "^17.0.0 || ^18.0.0",
++				"react-dom": "^17.0.0 || ^18.0.0"
++			}
++		},
+ 		"packages/components/node_modules/@floating-ui/react-dom": {
+ 			"version": "2.0.1",
+ 			"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.0.1.tgz",
+@@ -58113,29 +58113,6 @@
+ 				"@jridgewell/trace-mapping": "^0.3.9"
+ 			}
+ 		},
+-		"@ariakit/core": {
+-			"version": "0.2.7",
+-			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.2.7.tgz",
+-			"integrity": "sha512-Hs0N1EMYq88WW4v9xnSIHNR38TvbQuoUX6FYFmeLCZSTIXQBiET7lr1DQXwOOmdEtRtlxQ5HsxbTkxeOkPv+eg=="
+-		},
+-		"@ariakit/react": {
+-			"version": "0.2.12",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.2.12.tgz",
+-			"integrity": "sha512-4rAgMyUURHW78EKgRCanhyRUtsiYCOxO65BBHF4mg3tZsDeOvu9kBG5IAXX8mUgakTcyr0EKXuOtGThaj7gobA==",
+-			"requires": {
+-				"@ariakit/react-core": "0.2.12"
+-			}
+-		},
+-		"@ariakit/react-core": {
+-			"version": "0.2.12",
+-			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.2.12.tgz",
+-			"integrity": "sha512-3KSKlX10nnhCvjsbPW0CAnqG+6grryfwnMkeJJ/h34FSV7hEfUMexmIjKBVZyfBG08Xj8NjSK8kkx9c3ChkXeA==",
+-			"requires": {
+-				"@ariakit/core": "0.2.7",
+-				"@floating-ui/dom": "^1.0.0",
+-				"use-sync-external-store": "^1.2.0"
+-			}
+-		},
+ 		"@aw-web-design/x-default-browser": {
+ 			"version": "1.4.126",
+ 			"resolved": "https://registry.npmjs.org/@aw-web-design/x-default-browser/-/x-default-browser-1.4.126.tgz",
+@@ -69494,7 +69471,7 @@
+ 		"@wordpress/components": {
+ 			"version": "file:packages/components",
+ 			"requires": {
+-				"@ariakit/react": "^0.2.12",
++				"@ariakit/react": "^0.3.3",
+ 				"@babel/runtime": "^7.16.0",
+ 				"@emotion/cache": "^11.7.1",
+ 				"@emotion/css": "^11.7.1",
+@@ -69545,6 +69522,29 @@
+ 				"valtio": "1.7.0"
+ 			},
+ 			"dependencies": {
++				"@ariakit/core": {
++					"version": "0.3.2",
++					"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.3.2.tgz",
++					"integrity": "sha512-hTiYCMsezqOH1y1KNNbRv58oQvbxAZlbYPhFG0XbTHd+tJQkHgtpezLBbJc4U/YjnhA95EAS6Zfa2xwj+EEbKg=="
++				},
++				"@ariakit/react": {
++					"version": "0.3.3",
++					"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.3.3.tgz",
++					"integrity": "sha512-MdwdbxuII4SpOz/noRoE5m9ZAFRqGmHqNi9a7FDCmaGP0JNE36G8aFwijvBkh3CrRKL65+AHxZIUmkJUztijFQ==",
++					"requires": {
++						"@ariakit/react-core": "0.3.3"
++					}
++				},
++				"@ariakit/react-core": {
++					"version": "0.3.3",
++					"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.3.3.tgz",
++					"integrity": "sha512-ca2NbUNRrBoLpLMiTnGDivoHzXKH25QWcNEmO6Sm5bctL0LOSGvm9bU7tBn6nD+bZNk8yXV1YnNtKba/retENA==",
++					"requires": {
++						"@ariakit/core": "0.3.2",
++						"@floating-ui/dom": "^1.0.0",
++						"use-sync-external-store": "^1.2.0"
++					}
++				},
+ 				"@floating-ui/react-dom": {
+ 					"version": "2.0.1",
+ 					"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.0.1.tgz",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index dbcdd8ca475572..5aac419d20932e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ 
+ ### Internal
+ 
++-   Update `@ariakit/react` to version `0.3.3` ([#54818](https://github.com/WordPress/gutenberg/pull/54818))
+ -   `Tooltip`, `Shortcut`: Remove unused `ui/` components from the codebase ([#54573](https://github.com/WordPress/gutenberg/pull/54573))
+ -   Refactor ariakit usages to use the `render` prop instead of `as` and to use the namespace import ([#54696](https://github.com/WordPress/gutenberg/pull/54696)).
+ -   Update `uuid` package to 9.0.1 ([#54725](https://github.com/WordPress/gutenberg/pull/54725)).
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 6e7e2a2366c07d..805b105e4934d7 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -30,7 +30,7 @@
+ 	],
+ 	"types": "build-types",
+ 	"dependencies": {
+-		"@ariakit/react": "^0.2.12",
++		"@ariakit/react": "^0.3.3",
+ 		"@babel/runtime": "^7.16.0",
+ 		"@emotion/cache": "^11.7.1",
+ 		"@emotion/css": "^11.7.1",

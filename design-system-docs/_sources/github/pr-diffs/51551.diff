@@ -1,0 +1,1573 @@
+diff --git a/package-lock.json b/package-lock.json
+index 2b110762c27be6..58401b49b3bf05 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -7566,6 +7566,147 @@
+ 				"@radix-ui/react-compose-refs": "1.0.0"
+ 			}
+ 		},
++		"@radix-ui/react-tabs": {
++			"version": "1.0.4",
++			"resolved": "https://registry.npmjs.org/@radix-ui/react-tabs/-/react-tabs-1.0.4.tgz",
++			"integrity": "sha512-egZfYY/+wRNCflXNHx+dePvnz9FbmssDTJBtgRfDY7e8SE5oIo3Py2eCB1ckAbh1Q7cQ/6yJZThJ++sgbxibog==",
++			"requires": {
++				"@babel/runtime": "^7.13.10",
++				"@radix-ui/primitive": "1.0.1",
++				"@radix-ui/react-context": "1.0.1",
++				"@radix-ui/react-direction": "1.0.1",
++				"@radix-ui/react-id": "1.0.1",
++				"@radix-ui/react-presence": "1.0.1",
++				"@radix-ui/react-primitive": "1.0.3",
++				"@radix-ui/react-roving-focus": "1.0.4",
++				"@radix-ui/react-use-controllable-state": "1.0.1"
++			},
++			"dependencies": {
++				"@radix-ui/primitive": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/primitive/-/primitive-1.0.1.tgz",
++					"integrity": "sha512-yQ8oGX2GVsEYMWGxcovu1uGWPCxV5BFfeeYxqPmuAzUyLT9qmaMXSAhXpb0WrspIeqYzdJpkh2vHModJPgRIaw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10"
++					}
++				},
++				"@radix-ui/react-collection": {
++					"version": "1.0.3",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-collection/-/react-collection-1.0.3.tgz",
++					"integrity": "sha512-3SzW+0PW7yBBoQlT8wNcGtaxaD0XSu0uLUFgrtHY08Acx05TaHaOmVLR73c0j/cqpDy53KBMO7s0dx2wmOIDIA==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-compose-refs": "1.0.1",
++						"@radix-ui/react-context": "1.0.1",
++						"@radix-ui/react-primitive": "1.0.3",
++						"@radix-ui/react-slot": "1.0.2"
++					}
++				},
++				"@radix-ui/react-compose-refs": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-compose-refs/-/react-compose-refs-1.0.1.tgz",
++					"integrity": "sha512-fDSBgd44FKHa1FRMU59qBMPFcl2PZE+2nmqunj+BWFyYYjnhIDWL2ItDs3rrbJDQOtzt5nIebLCQc4QRfz6LJw==",
++					"requires": {
++						"@babel/runtime": "^7.13.10"
++					}
++				},
++				"@radix-ui/react-context": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-context/-/react-context-1.0.1.tgz",
++					"integrity": "sha512-ebbrdFoYTcuZ0v4wG5tedGnp9tzcV8awzsxYph7gXUyvnNLuTIcCk1q17JEbnVhXAKG9oX3KtchwiMIAYp9NLg==",
++					"requires": {
++						"@babel/runtime": "^7.13.10"
++					}
++				},
++				"@radix-ui/react-direction": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-direction/-/react-direction-1.0.1.tgz",
++					"integrity": "sha512-RXcvnXgyvYvBEOhCBuddKecVkoMiI10Jcm5cTI7abJRAHYfFxeu+FBQs/DvdxSYucxR5mna0dNsL6QFlds5TMA==",
++					"requires": {
++						"@babel/runtime": "^7.13.10"
++					}
++				},
++				"@radix-ui/react-id": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-id/-/react-id-1.0.1.tgz",
++					"integrity": "sha512-tI7sT/kqYp8p96yGWY1OAnLHrqDgzHefRBKQ2YAkBS5ja7QLcZ9Z/uY7bEjPUatf8RomoXM8/1sMj1IJaE5UzQ==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-use-layout-effect": "1.0.1"
++					}
++				},
++				"@radix-ui/react-presence": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-presence/-/react-presence-1.0.1.tgz",
++					"integrity": "sha512-UXLW4UAbIY5ZjcvzjfRFo5gxva8QirC9hF7wRE4U5gz+TP0DbRk+//qyuAQ1McDxBt1xNMBTaciFGvEmJvAZCg==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-compose-refs": "1.0.1",
++						"@radix-ui/react-use-layout-effect": "1.0.1"
++					}
++				},
++				"@radix-ui/react-primitive": {
++					"version": "1.0.3",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-primitive/-/react-primitive-1.0.3.tgz",
++					"integrity": "sha512-yi58uVyoAcK/Nq1inRY56ZSjKypBNKTa/1mcL8qdl6oJeEaDbOldlzrGn7P6Q3Id5d+SYNGc5AJgc4vGhjs5+g==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-slot": "1.0.2"
++					}
++				},
++				"@radix-ui/react-roving-focus": {
++					"version": "1.0.4",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-roving-focus/-/react-roving-focus-1.0.4.tgz",
++					"integrity": "sha512-2mUg5Mgcu001VkGy+FfzZyzbmuUWzgWkj3rvv4yu+mLw03+mTzbxZHvfcGyFp2b8EkQeMkpRQ5FiA2Vr2O6TeQ==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/primitive": "1.0.1",
++						"@radix-ui/react-collection": "1.0.3",
++						"@radix-ui/react-compose-refs": "1.0.1",
++						"@radix-ui/react-context": "1.0.1",
++						"@radix-ui/react-direction": "1.0.1",
++						"@radix-ui/react-id": "1.0.1",
++						"@radix-ui/react-primitive": "1.0.3",
++						"@radix-ui/react-use-callback-ref": "1.0.1",
++						"@radix-ui/react-use-controllable-state": "1.0.1"
++					}
++				},
++				"@radix-ui/react-slot": {
++					"version": "1.0.2",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.0.2.tgz",
++					"integrity": "sha512-YeTpuq4deV+6DusvVUW4ivBgnkHwECUu0BiN43L5UCDFgdhsRUWAghhTF5MbvNTPzmiFOx90asDSUjWuCNapwg==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-compose-refs": "1.0.1"
++					}
++				},
++				"@radix-ui/react-use-callback-ref": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-use-callback-ref/-/react-use-callback-ref-1.0.1.tgz",
++					"integrity": "sha512-D94LjX4Sp0xJFVaoQOd3OO9k7tpBYNOXdVhkltUbGv2Qb9OXdrg/CpsjlZv7ia14Sylv398LswWBVVu5nqKzAQ==",
++					"requires": {
++						"@babel/runtime": "^7.13.10"
++					}
++				},
++				"@radix-ui/react-use-controllable-state": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-use-controllable-state/-/react-use-controllable-state-1.0.1.tgz",
++					"integrity": "sha512-Svl5GY5FQeN758fWKrjM6Qb7asvXeiZltlT4U2gVfl8Gx5UAv2sMR0LWo8yhsIZh2oQ0eFdZ59aoOOMV7b47VA==",
++					"requires": {
++						"@babel/runtime": "^7.13.10",
++						"@radix-ui/react-use-callback-ref": "1.0.1"
++					}
++				},
++				"@radix-ui/react-use-layout-effect": {
++					"version": "1.0.1",
++					"resolved": "https://registry.npmjs.org/@radix-ui/react-use-layout-effect/-/react-use-layout-effect-1.0.1.tgz",
++					"integrity": "sha512-v/5RegiJWYdoCvMnITBkNNx6bCj20fiaJnWtRkU18yITptraXjffz5Qbn05uOiQnOvi+dbkznkoaMltz1GnszQ==",
++					"requires": {
++						"@babel/runtime": "^7.13.10"
++					}
++				}
++			}
++		},
+ 		"@radix-ui/react-use-callback-ref": {
+ 			"version": "1.0.0",
+ 			"resolved": "https://registry.npmjs.org/@radix-ui/react-use-callback-ref/-/react-use-callback-ref-1.0.0.tgz",
+@@ -17423,6 +17564,7 @@
+ 				"@emotion/utils": "^1.0.0",
+ 				"@floating-ui/react-dom": "1.0.0",
+ 				"@radix-ui/react-dropdown-menu": "^2.0.4",
++				"@radix-ui/react-tabs": "^1.0.4",
+ 				"@use-gesture/react": "^10.2.24",
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
+@@ -29267,7 +29409,7 @@
+ 		"co": {
+ 			"version": "4.6.0",
+ 			"resolved": "https://registry.npmjs.org/co/-/co-4.6.0.tgz",
+-			"integrity": "sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==",
++			"integrity": "sha1-bqa989hTrlTMuOR7+gvz+QMfsYQ=",
+ 			"dev": true
+ 		},
+ 		"code-point-at": {
+diff --git a/package.json b/package.json
+index 0c4e3dd5f013e8..7879161de31af6 100644
+--- a/package.json
++++ b/package.json
+@@ -22,6 +22,7 @@
+ 		"IS_GUTENBERG_PLUGIN": true
+ 	},
+ 	"dependencies": {
++		"@radix-ui/react-tabs": "1.0.4",
+ 		"@types/gradient-parser": "0.1.2",
+ 		"@wordpress/a11y": "file:packages/a11y",
+ 		"@wordpress/annotations": "file:packages/annotations",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2759cc629a336e..2bb418f1bb61f4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,9 @@
+ -   `Popover`: Allow legitimate 0 positions to update popover position ([#51320](https://github.com/WordPress/gutenberg/pull/51320)).
+ -   `Button`: Remove unnecessary margin from dashicon ([#51395](https://github.com/WordPress/gutenberg/pull/51395)).
+ 
++### Experimental
++-   `Tabs`: Create a new version of `TabPanel` with updated internals, while maintaining the same functionality and API surface  ([#51551](https://github.com/WordPress/gutenberg/pull/51551)).
++
+ ### Internal
+ 
+ -   `ClipboardButton`: Convert to TypeScript ([#51334](https://github.com/WordPress/gutenberg/pull/51334)).
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 7e4925bd4fcc63..2bd3bd20fa16aa 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -40,6 +40,7 @@
+ 		"@emotion/utils": "^1.0.0",
+ 		"@floating-ui/react-dom": "1.0.0",
+ 		"@radix-ui/react-dropdown-menu": "^2.0.4",
++		"@radix-ui/react-tabs": "^1.0.4",
+ 		"@use-gesture/react": "^10.2.24",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+diff --git a/packages/components/src/tab-panel/stories/index.tsx b/packages/components/src/tab-panel/stories/index.tsx
+index 07c076e1ce621a..2e140e139e653a 100644
+--- a/packages/components/src/tab-panel/stories/index.tsx
++++ b/packages/components/src/tab-panel/stories/index.tsx
+@@ -96,3 +96,19 @@ WithTabIconsAndTooltips.args = {
+ 		},
+ 	],
+ };
++
++export const ManualActivation = Template.bind( {} );
++ManualActivation.args = {
++	children: ( tab ) => <p>Selected tab: { tab.title }</p>,
++	tabs: [
++		{
++			name: 'tab1',
++			title: 'Tab 1',
++		},
++		{
++			name: 'tab2',
++			title: 'Tab 2',
++		},
++	],
++	selectOnMove: false,
++};
+diff --git a/packages/components/src/tabs/index.tsx b/packages/components/src/tabs/index.tsx
+new file mode 100644
+index 00000000000000..8c377d5a462c20
+--- /dev/null
++++ b/packages/components/src/tabs/index.tsx
+@@ -0,0 +1,249 @@
++/**
++ * External dependencies
++ */
++import * as RadixTabs from '@radix-ui/react-tabs';
++import cx from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import {
++	useState,
++	useEffect,
++	useLayoutEffect,
++	useCallback,
++	useRef,
++} from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../button';
++import type { TabPanelProps } from '../tab-panel/types';
++
++type Tab = TabPanelProps[ 'tabs' ][ number ];
++
++const disabledTabProps = {
++	'aria-disabled': true,
++	onClick: ( event: React.MouseEvent ) => {
++		event.preventDefault();
++		event.stopPropagation();
++	},
++	onMouseDown: ( event: React.MouseEvent ) => {
++		event.preventDefault();
++		event.stopPropagation();
++	},
++};
++
++const getTab = (
++	tabs: TabPanelProps[ 'tabs' ],
++	currentTab: Tab,
++	offset: 1 | -1
++) => {
++	const currentIndex = tabs.indexOf( currentTab );
++	if ( currentIndex === -1 ) {
++		return;
++	}
++	const nextIndex = ( tabs.length + currentIndex + offset ) % tabs.length;
++
++	return tabs[ nextIndex ];
++};
++const getNextTab = ( tabs: TabPanelProps[ 'tabs' ], currentTab: Tab ) => {
++	return getTab( tabs, currentTab, 1 );
++};
++const getPreviousTab = ( tabs: TabPanelProps[ 'tabs' ], currentTab: Tab ) => {
++	return getTab( tabs, currentTab, -1 );
++};
++
++const keyToGetTab: Record< string, typeof getPreviousTab | typeof getNextTab > =
++	{
++		ArrowLeft: getPreviousTab,
++		ArrowUp: getPreviousTab,
++		ArrowRight: getNextTab,
++		ArrowDown: getNextTab,
++	};
++
++/**
++ * Tabs is an ARIA-compliant tabpanel.
++ *
++ * Tabs organizes content across different screens, data sets, and interactions.
++ * It has two sections: a list of tabs, and the view to show when tabs are chosen.
++ *
++ * ```jsx
++ * import { Tabs } from '@wordpress/components';
++ *
++ * const onSelect = ( tabName ) => {
++ *   console.log( 'Selecting tab', tabName );
++ * };
++ *
++ * const MyTabs = () => (
++ *   <Tabs
++ *     className="my-tabs"
++ *     activeClass="active-tab"
++ *     onSelect={ onSelect }
++ *     tabs={ [
++ *       {
++ *         name: 'tab1',
++ *         title: 'Tab 1',
++ *         className: 'tab-one',
++ *       },
++ *       {
++ *         name: 'tab2',
++ *         title: 'Tab 2',
++ *         className: 'tab-two',
++ *       },
++ *     ] }
++ *   >
++ *     { ( tab ) => <p>{ tab.title }</p> }
++ *   </Tabs>
++ * );
++ * ```
++ */
++
++export const Tabs = ( props: TabPanelProps ) => {
++	const {
++		tabs,
++		children,
++		onSelect,
++		className,
++		orientation = 'horizontal',
++		selectOnMove = true,
++		initialTabName,
++		activeClass = 'is-active',
++	} = props;
++
++	const [ selectedTabName, setSelectedTabName ] = useState< string >();
++
++	const selectedTab = tabs.find( ( { name } ) => name === selectedTabName );
++
++	const selectTab = useCallback(
++		( tabValue: string ) => {
++			const newTab = tabs.find( ( t ) => t.name === tabValue );
++			if ( newTab?.disabled || newTab === selectedTab ) {
++				return;
++			}
++
++			setSelectedTabName( tabValue );
++			onSelect?.( tabValue );
++		},
++		[ onSelect, tabs, selectedTab ]
++	);
++
++	const nextTabToBeAutomaticallyActivated = useRef< Tab >();
++
++	// Handle selecting the initial tab.
++	useLayoutEffect( () => {
++		// If there's a selected tab, don't override it.
++		if ( selectedTab ) {
++			return;
++		}
++		const initialTab = tabs.find( ( tab ) => tab.name === initialTabName );
++		// Wait for the denoted initial tab to be declared before making a
++		// selection. This ensures that if a tab is declared lazily it can
++		// still receive initial selection.
++		if ( initialTabName && ! initialTab ) {
++			return;
++		}
++		if ( initialTab && ! initialTab.disabled ) {
++			// Select the initial tab if it's not disabled.
++			selectTab( initialTab.name );
++		} else {
++			// Fallback to the first enabled tab when the initial tab is
++			// disabled or it can't be found.
++			const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
++			if ( firstEnabledTab ) selectTab( firstEnabledTab.name );
++		}
++	}, [ tabs, selectedTab, initialTabName, selectTab ] );
++
++	// Handle the currently selected tab becoming disabled.
++	useEffect( () => {
++		// This effect only runs when the selected tab is defined and becomes disabled.
++		if ( ! selectedTab?.disabled ) {
++			return;
++		}
++		const firstEnabledTab = tabs.find( ( tab ) => ! tab.disabled );
++		// If the currently selected tab becomes disabled, select the first enabled tab.
++		// (if there is one).
++		if ( firstEnabledTab ) {
++			selectTab( firstEnabledTab.name );
++		}
++	}, [ tabs, selectedTab?.disabled, selectTab ] );
++
++	return (
++		<RadixTabs.Root
++			className={ className }
++			value={ selectedTab?.name }
++			onValueChange={ selectTab }
++			orientation={ orientation }
++			activationMode={ 'manual' }
++		>
++			<RadixTabs.TabsList
++				className={ 'components-tab-panel__tabs' }
++				tabIndex={ undefined }
++			>
++				{ tabs.map( ( tab ) => (
++					<RadixTabs.Trigger
++						key={ tab.name }
++						value={ tab.name }
++						className={ cx(
++							'components-tab-panel__tabs-item',
++							tab.className,
++							{ [ activeClass ]: tab.name === selectedTabName }
++						) }
++						tabIndex={
++							selectedTab?.name === tab.name ? undefined : -1
++						}
++						asChild
++						onKeyDown={ ( event ) => {
++							const getTabFunction = keyToGetTab[ event.key ];
++
++							if ( ! getTabFunction ) {
++								nextTabToBeAutomaticallyActivated.current =
++									undefined;
++								return;
++							}
++
++							nextTabToBeAutomaticallyActivated.current =
++								getTabFunction( tabs, tab );
++						} }
++						onFocus={ () => {
++							if (
++								selectOnMove &&
++								tab ===
++									nextTabToBeAutomaticallyActivated.current
++							) {
++								selectTab(
++									nextTabToBeAutomaticallyActivated.current
++										.name
++								);
++								nextTabToBeAutomaticallyActivated.current =
++									undefined;
++							}
++						} }
++						{ ...( tab.disabled ? disabledTabProps : null ) }
++					>
++						<Button
++							icon={ tab.icon }
++							label={ tab.icon && tab.title }
++							showTooltip={ !! tab.icon }
++						>
++							{ ! tab.icon && tab.title }
++						</Button>
++					</RadixTabs.Trigger>
++				) ) }
++			</RadixTabs.TabsList>
++			{ tabs.map( ( tab ) => (
++				<RadixTabs.Content
++					key={ tab.name }
++					className={ 'components-tab-panel__tab-content' }
++					value={ tab.name }
++					tabIndex={ undefined }
++				>
++					{ children( tab ) }
++				</RadixTabs.Content>
++			) ) }
++		</RadixTabs.Root>
++	);
++};
++
++export default Tabs;
+diff --git a/packages/components/src/tabs/stories/index.tsx b/packages/components/src/tabs/stories/index.tsx
+new file mode 100644
+index 00000000000000..82ca8ccf1945c3
+--- /dev/null
++++ b/packages/components/src/tabs/stories/index.tsx
+@@ -0,0 +1,117 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { wordpress, more, link } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import Tabs from '..';
++import Popover from '../../popover';
++import { Provider as SlotFillProvider } from '../../slot-fill';
++
++const meta: ComponentMeta< typeof Tabs > = {
++	title: 'Components/Tabs',
++	component: Tabs,
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof Tabs > = ( props ) => {
++	return <Tabs { ...props } />;
++};
++
++export const Default = Template.bind( {} );
++Default.args = {
++	children: ( tab ) => <p>Selected tab: { tab.title }</p>,
++	tabs: [
++		{
++			name: 'tab1',
++			title: 'Tab 1',
++		},
++		{
++			name: 'tab2',
++			title: 'Tab 2',
++		},
++	],
++};
++
++export const DisabledTab = Template.bind( {} );
++DisabledTab.args = {
++	children: ( tab ) => <p>Selected tab: { tab.title }</p>,
++	tabs: [
++		{
++			name: 'tab1',
++			title: 'Tab 1',
++			disabled: true,
++		},
++		{
++			name: 'tab2',
++			title: 'Tab 2',
++		},
++		{
++			name: 'tab3',
++			title: 'Tab 3',
++		},
++	],
++};
++
++// SlotFillTemplate is used to ensure the icon's tooltips are not rendered
++// inline, as that would cause them to inherit the tab's opacity.
++const SlotFillTemplate: ComponentStory< typeof Tabs > = ( props ) => {
++	return (
++		<SlotFillProvider>
++			<Tabs { ...props } />
++			{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
++			<Popover.Slot />
++		</SlotFillProvider>
++	);
++};
++
++export const WithTabIconsAndTooltips = SlotFillTemplate.bind( {} );
++WithTabIconsAndTooltips.args = {
++	children: ( tab ) => <p>Selected tab: { tab.title }</p>,
++	tabs: [
++		{
++			name: 'tab1',
++			title: 'Tab 1',
++			icon: wordpress,
++		},
++		{
++			name: 'tab2',
++			title: 'Tab 2',
++			icon: link,
++			disabled: true,
++		},
++		{
++			name: 'tab3',
++			title: 'Tab 3',
++			icon: more,
++		},
++	],
++};
++
++export const ManualActivation = Template.bind( {} );
++ManualActivation.args = {
++	children: ( tab ) => <p>Selected tab: { tab.title }</p>,
++	tabs: [
++		{
++			name: 'tab1',
++			title: 'Tab 1',
++		},
++		{
++			name: 'tab2',
++			title: 'Tab 2',
++		},
++	],
++	selectOnMove: false,
++};
+diff --git a/packages/components/src/tabs/test/index.tsx b/packages/components/src/tabs/test/index.tsx
+new file mode 100644
+index 00000000000000..43b691ae47e5dd
+--- /dev/null
++++ b/packages/components/src/tabs/test/index.tsx
+@@ -0,0 +1,958 @@
++/**
++ * External dependencies
++ */
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * WordPress dependencies
++ */
++import { wordpress, category, media } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import TabPanel from '..';
++import Popover from '../../popover';
++import { Provider as SlotFillProvider } from '../../slot-fill';
++
++const TABS = [
++	{
++		name: 'alpha',
++		title: 'Alpha',
++		className: 'alpha-class',
++	},
++	{
++		name: 'beta',
++		title: 'Beta',
++		className: 'beta-class',
++	},
++	{
++		name: 'gamma',
++		title: 'Gamma',
++		className: 'gamma-class',
++	},
++];
++
++const getSelectedTab = () => screen.getByRole( 'tab', { selected: true } );
++
++let originalGetClientRects: () => DOMRectList;
++
++describe.each( [
++	[ 'uncontrolled', TabPanel ],
++	// The controlled component tests will be added once we certify the
++	// uncontrolled component's behaviour on trunk.
++	// [ 'controlled', TabPanel ],
++] )( 'TabPanel %s', ( ...modeAndComponent ) => {
++	const [ , Component ] = modeAndComponent;
++
++	beforeAll( () => {
++		originalGetClientRects = window.HTMLElement.prototype.getClientRects;
++		// Mocking `getClientRects()` is necessary to pass a check performed by
++		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
++		// from the `@wordpress/dom` package.
++		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
++		window.HTMLElement.prototype.getClientRects = function () {
++			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
++		};
++	} );
++
++	afterAll( () => {
++		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
++	} );
++
++	describe( 'Accessibility and semantics', () => {
++		test( 'should use the correct aria attributes', () => {
++			const panelRenderFunction = jest.fn();
++
++			render(
++				<Component tabs={ TABS } children={ panelRenderFunction } />
++			);
++
++			const tabList = screen.getByRole( 'tablist' );
++			const allTabs = screen.getAllByRole( 'tab' );
++			const selectedTabPanel = screen.getByRole( 'tabpanel' );
++
++			expect( tabList ).toBeVisible();
++			expect( tabList ).toHaveAttribute(
++				'aria-orientation',
++				'horizontal'
++			);
++
++			expect( allTabs ).toHaveLength( TABS.length );
++
++			// The selected `tab` aria-controls the active `tabpanel`,
++			// which is `aria-labelledby` the selected `tab`.
++			expect( selectedTabPanel ).toBeVisible();
++			expect( allTabs[ 0 ] ).toHaveAttribute(
++				'aria-controls',
++				selectedTabPanel.getAttribute( 'id' )
++			);
++			expect( selectedTabPanel ).toHaveAttribute(
++				'aria-labelledby',
++				allTabs[ 0 ].getAttribute( 'id' )
++			);
++		} );
++
++		test( 'should display a tooltip when hovering tabs provided with an icon', async () => {
++			const user = userEvent.setup();
++
++			const panelRenderFunction = jest.fn();
++
++			const TABS_WITH_ICON = [
++				{ ...TABS[ 0 ], icon: wordpress },
++				{ ...TABS[ 1 ], icon: category },
++				{ ...TABS[ 2 ], icon: media },
++			];
++
++			render(
++				// In order for the tooltip to display properly, there needs to be
++				// `Popover.Slot` in which the `Popover` renders outside of the
++				// `TabPanel` component, otherwise the tooltip renders inline.
++				<SlotFillProvider>
++					<Component
++						tabs={ TABS_WITH_ICON }
++						children={ panelRenderFunction }
++					/>
++					{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
++					<Popover.Slot />
++				</SlotFillProvider>
++			);
++
++			const allTabs = screen.getAllByRole( 'tab' );
++
++			for ( let i = 0; i < allTabs.length; i++ ) {
++				expect(
++					screen.queryByText( TABS_WITH_ICON[ i ].title )
++				).not.toBeInTheDocument();
++
++				await user.hover( allTabs[ i ] );
++
++				await waitFor( () =>
++					expect(
++						screen.getByText( TABS_WITH_ICON[ i ].title )
++					).toBeVisible()
++				);
++
++				await user.unhover( allTabs[ i ] );
++			}
++		} );
++
++		test( 'should display a tooltip when moving the selection via the keyboard on tabs provided with an icon', async () => {
++			const user = userEvent.setup();
++
++			const mockOnSelect = jest.fn();
++			const panelRenderFunction = jest.fn();
++
++			const TABS_WITH_ICON = [
++				{ ...TABS[ 0 ], icon: wordpress },
++				{ ...TABS[ 1 ], icon: category },
++				{ ...TABS[ 2 ], icon: media },
++			];
++
++			render(
++				// In order for the tooltip to display properly, there needs to be
++				// `Popover.Slot` in which the `Popover` renders outside of the
++				// `TabPanel` component, otherwise the tooltip renders inline.
++				<SlotFillProvider>
++					<Component
++						tabs={ TABS_WITH_ICON }
++						children={ panelRenderFunction }
++						onSelect={ mockOnSelect }
++					/>
++					{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
++					<Popover.Slot />
++				</SlotFillProvider>
++			);
++
++			expect( getSelectedTab() ).not.toHaveTextContent( 'Alpha' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
++			await expect( getSelectedTab() ).not.toHaveFocus();
++
++			// Tab to focus the tablist. Make sure alpha is focused, and that the
++			// corresponding tooltip is shown.
++			expect( screen.queryByText( 'Alpha' ) ).not.toBeInTheDocument();
++			await user.keyboard( '[Tab]' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++			expect( screen.getByText( 'Alpha' ) ).toBeInTheDocument();
++			await expect( getSelectedTab() ).toHaveFocus();
++
++			// Move selection with arrow keys. Make sure beta is focused, and that
++			// the corresponding tooltip is shown.
++			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
++			await user.keyboard( '[ArrowRight]' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
++			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
++			await expect( getSelectedTab() ).toHaveFocus();
++
++			// Move selection with arrow keys. Make sure gamma is focused, and that
++			// the corresponding tooltip is shown.
++			expect( screen.queryByText( 'Gamma' ) ).not.toBeInTheDocument();
++			await user.keyboard( '[ArrowRight]' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
++			expect( screen.getByText( 'Gamma' ) ).toBeInTheDocument();
++			await expect( getSelectedTab() ).toHaveFocus();
++
++			// Move selection with arrow keys. Make sure beta is focused, and that
++			// the corresponding tooltip is shown.
++			expect( screen.queryByText( 'Beta' ) ).not.toBeInTheDocument();
++			await user.keyboard( '[ArrowLeft]' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
++			expect( screen.getByText( 'Beta' ) ).toBeInTheDocument();
++			await expect( getSelectedTab() ).toHaveFocus();
++		} );
++	} );
++
++	describe( 'Without `initialTabName`', () => {
++		it( 'should render first tab', async () => {
++			const panelRenderFunction = jest.fn();
++
++			render(
++				<Component tabs={ TABS } children={ panelRenderFunction } />
++			);
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			expect(
++				screen.getByRole( 'tabpanel', { name: 'Alpha' } )
++			).toBeInTheDocument();
++		} );
++
++		it( 'should fall back to first enabled tab if the active tab is removed', async () => {
++			const mockOnSelect = jest.fn();
++			const { rerender } = render(
++				<Component
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			rerender(
++				<Component
++					tabs={ TABS.slice( 1 ) /* remove alpha */ }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++		} );
++	} );
++
++	describe( 'With `initialTabName`', () => {
++		it( 'should render the tab set by initialTabName prop', () => {
++			render(
++				<Component
++					initialTabName="beta"
++					tabs={ TABS }
++					children={ () => undefined }
++				/>
++			);
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++		} );
++
++		it( 'should not select a tab when `initialTabName` does not match any known tab', () => {
++			render(
++				<Component
++					initialTabName="does-not-exist"
++					tabs={ TABS }
++					children={ () => undefined }
++				/>
++			);
++
++			// No tab should be selected i.e. it doesn't fall back to first tab.
++			expect(
++				screen.queryByRole( 'tab', { selected: true } )
++			).not.toBeInTheDocument();
++
++			// No tabpanel should be rendered either
++			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
++		} );
++		it( 'should not change tabs when initialTabName is changed', () => {
++			const { rerender } = render(
++				<Component
++					initialTabName="beta"
++					tabs={ TABS }
++					children={ () => undefined }
++				/>
++			);
++
++			rerender(
++				<Component
++					initialTabName="alpha"
++					tabs={ TABS }
++					children={ () => undefined }
++				/>
++			);
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++		} );
++
++		it( 'should fall back to the tab associated to `initialTabName` if the currently active tab is removed', async () => {
++			const user = userEvent.setup();
++			const mockOnSelect = jest.fn();
++
++			const { rerender } = render(
++				<Component
++					initialTabName="gamma"
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
++
++			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
++
++			rerender(
++				<Component
++					initialTabName="gamma"
++					tabs={ TABS.slice( 1 ) } // Remove alpha
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
++		} );
++
++		it( 'should have no active tabs when the tab associated to `initialTabName` is removed while being the active tab', () => {
++			const mockOnSelect = jest.fn();
++
++			const { rerender } = render(
++				<Component
++					initialTabName="gamma"
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
++
++			rerender(
++				<Component
++					initialTabName="gamma"
++					tabs={ TABS.slice( 0, 2 ) } // Remove gamma
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			expect( screen.getAllByRole( 'tab' ) ).toHaveLength( 2 );
++			expect(
++				screen.queryByRole( 'tab', { selected: true } )
++			).not.toBeInTheDocument();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++		} );
++
++		it( 'waits for the tab with the `initialTabName` to be present in the `tabs` array before selecting it', () => {
++			const mockOnSelect = jest.fn();
++			const { rerender } = render(
++				<Component
++					initialTabName="delta"
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			// There should be no selected tab yet.
++			expect(
++				screen.queryByRole( 'tab', { selected: true } )
++			).not.toBeInTheDocument();
++
++			rerender(
++				<Component
++					initialTabName="delta"
++					tabs={ [
++						{
++							name: 'delta',
++							title: 'Delta',
++							className: 'delta-class',
++						},
++						...TABS,
++					] }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Delta' );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'delta' );
++		} );
++	} );
++
++	describe( 'Disabled Tab', () => {
++		it( 'should disable the tab when `disabled` is `true`', async () => {
++			const user = userEvent.setup();
++			const mockOnSelect = jest.fn();
++
++			render(
++				<Component
++					tabs={ [
++						...TABS,
++						{
++							name: 'delta',
++							title: 'Delta',
++							className: 'delta-class',
++							disabled: true,
++						},
++					] }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			expect(
++				screen.getByRole( 'tab', { name: 'Delta' } )
++			).toHaveAttribute( 'aria-disabled', 'true' );
++
++			// onSelect gets called on the initial render.
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++
++			// onSelect should not be called since the disabled tab is
++			// highlighted, but not selected.
++			await user.keyboard( '[ArrowLeft]' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++		} );
++
++		it( 'should select first enabled tab when the initial tab is disabled', () => {
++			const mockOnSelect = jest.fn();
++
++			const { rerender } = render(
++				<Component
++					// Disable alpha
++					tabs={ TABS.map( ( tab ) => {
++						if ( tab.name !== 'alpha' ) {
++							return tab;
++						}
++						return { ...tab, disabled: true };
++					} ) }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			// As alpha (first tab) is disabled,
++			// the first enabled tab should be gamma.
++			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++
++			// Re-enable all tabs
++			rerender(
++				<Component
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			// Even if the initial tab becomes enabled again, the selected tab doesn't
++			// change.
++			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++		} );
++
++		it( 'should select first enabled tab when the tab associated to `initialTabName` is disabled', () => {
++			const mockOnSelect = jest.fn();
++
++			const { rerender } = render(
++				<Component
++					tabs={ TABS.map( ( tab ) => {
++						if ( tab.name === 'gamma' ) {
++							return tab;
++						}
++						return { ...tab, disabled: true };
++					} ) }
++					initialTabName="beta"
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			// As alpha (first tab), and beta (the initial tab), are both
++			// disabled the first enabled tab should be gamma.
++			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
++
++			// Re-enable all tabs
++			rerender(
++				<Component
++					tabs={ TABS }
++					initialTabName="beta"
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			// Even if the initial tab becomes enabled again, the selected tab doesn't
++			// change.
++			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
++		} );
++
++		it( 'should select the first enabled tab when the selected tab becomes disabled', () => {
++			const mockOnSelect = jest.fn();
++			const { rerender } = render(
++				<Component
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
++
++			rerender(
++				<Component
++					tabs={ TABS.map( ( tab ) => {
++						if ( tab.name === 'alpha' ) {
++							return { ...tab, disabled: true };
++						}
++						return tab;
++					} ) }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
++
++			rerender(
++				<Component
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
++		} );
++
++		it( 'should select the first enabled tab when the tab associated to `initialTabName` becomes disabled while being the active tab', () => {
++			const mockOnSelect = jest.fn();
++
++			const { rerender } = render(
++				<Component
++					initialTabName="gamma"
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
++
++			rerender(
++				<Component
++					initialTabName="gamma"
++					tabs={ [
++						TABS[ 0 ],
++						TABS[ 1 ],
++						{ ...TABS[ 2 ], disabled: true },
++					] } // Disable gamma
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
++
++			rerender(
++				<Component
++					initialTabName="gamma"
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
++		} );
++	} );
++
++	describe( 'Tab Activation', () => {
++		it( 'defaults to automatic tab activation (pointer clicks)', async () => {
++			const user = userEvent.setup();
++			const panelRenderFunction = jest.fn();
++			const mockOnSelect = jest.fn();
++
++			render(
++				<Component
++					tabs={ TABS }
++					children={ panelRenderFunction }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			// Alpha is the initially selected tab
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			expect(
++				screen.getByRole( 'tabpanel', { name: 'Alpha' } )
++			).toBeInTheDocument();
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
++
++			// Click on Beta, make sure beta is the selected tab
++			await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++			expect(
++				screen.getByRole( 'tabpanel', { name: 'Beta' } )
++			).toBeInTheDocument();
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
++
++			// Click on Alpha, make sure beta is the selected tab
++			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
++
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			expect(
++				screen.getByRole( 'tabpanel', { name: 'Alpha' } )
++			).toBeInTheDocument();
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
++		} );
++
++		it( 'defaults to automatic tab activation (arrow keys)', async () => {
++			const user = userEvent.setup();
++			const mockOnSelect = jest.fn();
++
++			render(
++				<Component
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			// onSelect gets called on the initial render.
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++
++			// Tab to focus the tablist. Make sure alpha is focused.
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			await expect( getSelectedTab() ).not.toHaveFocus();
++			await user.keyboard( '[Tab]' );
++			await expect( getSelectedTab() ).toHaveFocus();
++
++			// Navigate forward with arrow keys and make sure the Beta tab is
++			// selected automatically.
++			await user.keyboard( '[ArrowRight]' );
++			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++			await expect( getSelectedTab() ).toHaveFocus();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
++
++			// Navigate backwards with arrow keys. Make sure alpha is
++			// selected automatically.
++			await user.keyboard( '[ArrowLeft]' );
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			await expect( getSelectedTab() ).toHaveFocus();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
++		} );
++
++		it( 'wraps around the last/first tab when using arrow keys', async () => {
++			const user = userEvent.setup();
++			const mockOnSelect = jest.fn();
++
++			render(
++				<Component
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			// onSelect gets called on the initial render.
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++
++			// Tab to focus the tablist. Make sure Alpha is focused.
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			await expect( getSelectedTab() ).not.toHaveFocus();
++			await user.keyboard( '[Tab]' );
++			await expect( getSelectedTab() ).toHaveFocus();
++
++			// Navigate backwards with arrow keys and make sure that the Gamma tab
++			// (the last tab) is selected automatically.
++			await user.keyboard( '[ArrowLeft]' );
++			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
++			await expect( getSelectedTab() ).toHaveFocus();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
++
++			// Navigate forward with arrow keys. Make sure alpha (the first tab) is
++			// selected automatically.
++			await user.keyboard( '[ArrowRight]' );
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			await expect( getSelectedTab() ).toHaveFocus();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
++		} );
++
++		it( 'should not move tab selection when pressing the up/down arrow keys, unless the orientation is changed to `vertical`', async () => {
++			const user = userEvent.setup();
++			const mockOnSelect = jest.fn();
++
++			const { rerender } = render(
++				<Component
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			// onSelect gets called on the initial render.
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++
++			// Tab to focus the tablist. Make sure alpha is focused.
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			await expect( getSelectedTab() ).not.toHaveFocus();
++			await user.keyboard( '[Tab]' );
++			await expect( getSelectedTab() ).toHaveFocus();
++
++			// Press the arrow up key, nothing happens.
++			await user.keyboard( '[ArrowUp]' );
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			await expect( getSelectedTab() ).toHaveFocus();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
++
++			// Press the arrow down key, nothing happens
++			await user.keyboard( '[ArrowDown]' );
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			await expect( getSelectedTab() ).toHaveFocus();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
++
++			// Change orientation to `vertical`. When the orientation is vertical,
++			// left/right arrow keys are replaced by up/down arrow keys.
++			rerender(
++				<Component
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++					orientation="vertical"
++				/>
++			);
++
++			expect( screen.getByRole( 'tablist' ) ).toHaveAttribute(
++				'aria-orientation',
++				'vertical'
++			);
++
++			// Make sure alpha is still focused.
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			await expect( getSelectedTab() ).toHaveFocus();
++
++			// Navigate forward with arrow keys and make sure the Beta tab is
++			// selected automatically.
++			await user.keyboard( '[ArrowDown]' );
++			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++			await expect( getSelectedTab() ).toHaveFocus();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
++
++			// Navigate backwards with arrow keys. Make sure alpha is
++			// selected automatically.
++			await user.keyboard( '[ArrowUp]' );
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			await expect( getSelectedTab() ).toHaveFocus();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
++
++			// Navigate backwards with arrow keys. Make sure alpha is
++			// selected automatically.
++			await user.keyboard( '[ArrowUp]' );
++			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
++			await expect( getSelectedTab() ).toHaveFocus();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 4 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
++
++			// Navigate backwards with arrow keys. Make sure alpha is
++			// selected automatically.
++			await user.keyboard( '[ArrowDown]' );
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			await expect( getSelectedTab() ).toHaveFocus();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 5 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
++		} );
++
++		it( 'should move focus on a tab even if disabled with arrow key, but not with pointer clicks', async () => {
++			const user = userEvent.setup();
++			const mockOnSelect = jest.fn();
++
++			render(
++				<Component
++					tabs={ [
++						...TABS,
++						{
++							name: 'delta',
++							title: 'Delta',
++							className: 'delta-class',
++							disabled: true,
++						},
++					] }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++				/>
++			);
++
++			// onSelect gets called on the initial render.
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++
++			// Tab to focus the tablist. Make sure Alpha is focused.
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			await expect( getSelectedTab() ).not.toHaveFocus();
++			await user.keyboard( '[Tab]' );
++			await expect( getSelectedTab() ).toHaveFocus();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++
++			// Press the right arrow key three times. Since the delta tab is disabled:
++			// - it won't be selected. The gamma tab will be selected instead, since
++			//   it was the tab that was last selected before delta. Therefore, the
++			//   `mockOnSelect` function gets called only twice (and not three times)
++			// - it will receive focus, when using arrow keys
++			await user.keyboard( '[ArrowRight][ArrowRight][ArrowRight]' );
++			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
++			await expect(
++				screen.getByRole( 'tab', { name: 'Delta' } )
++			).toHaveFocus();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
++
++			// Navigate backwards with arrow keys. The gamma tab receives focus.
++			// The `mockOnSelect` callback doesn't fire, since the gamma tab was
++			// already selected.
++			await user.keyboard( '[ArrowLeft]' );
++			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
++			await expect( getSelectedTab() ).toHaveFocus();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
++
++			// Click on the disabled tab. Compared to using arrow keys to move the
++			// focus, disabled tabs ignore pointer clicks — and therefore, they don't
++			// receive focus, nor they cause the `mockOnSelect` function to fire.
++			await user.click( screen.getByRole( 'tab', { name: 'Delta' } ) );
++			expect( getSelectedTab() ).toHaveTextContent( 'Gamma' );
++			await expect( getSelectedTab() ).toHaveFocus();
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
++		} );
++
++		it( 'switches to manual tab activation when the `selectOnMove` prop is set to `false`', async () => {
++			const user = userEvent.setup();
++			const mockOnSelect = jest.fn();
++
++			render(
++				<Component
++					tabs={ TABS }
++					children={ () => undefined }
++					onSelect={ mockOnSelect }
++					selectOnMove={ false }
++				/>
++			);
++
++			// onSelect gets called on the initial render with the default
++			// selected tab.
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++
++			// Click on Alpha and make sure it is selected.
++			// onSelect shouldn't fire since the selected tab didn't change.
++			await user.click( screen.getByRole( 'tab', { name: 'Alpha' } ) );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
++
++			// Navigate forward with arrow keys. Make sure Beta is focused, but
++			// that the tab selection happens only when pressing the spacebar
++			// or enter key.
++			await user.keyboard( '[ArrowRight]' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 1 );
++			expect( screen.getByRole( 'tab', { name: 'Beta' } ) ).toHaveFocus();
++
++			await user.keyboard( '[Enter]' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
++
++			// Navigate forward with arrow keys. Make sure Gamma (last tab) is
++			// focused, but that tab selection happens only when pressing the
++			// spacebar or enter key.
++			await user.keyboard( '[ArrowRight]' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 2 );
++			expect(
++				screen.getByRole( 'tab', { name: 'Gamma' } )
++			).toHaveFocus();
++
++			await user.keyboard( '[Space]' );
++			expect( mockOnSelect ).toHaveBeenCalledTimes( 3 );
++			expect( mockOnSelect ).toHaveBeenLastCalledWith( 'gamma' );
++		} );
++	} );
++
++	describe( 'Tab Attributes', () => {
++		it( "should apply the tab's `className` to the tab button", () => {
++			render( <Component tabs={ TABS } children={ () => undefined } /> );
++
++			expect( screen.getByRole( 'tab', { name: 'Alpha' } ) ).toHaveClass(
++				'alpha-class'
++			);
++			expect( screen.getByRole( 'tab', { name: 'Beta' } ) ).toHaveClass(
++				'beta-class'
++			);
++			expect( screen.getByRole( 'tab', { name: 'Gamma' } ) ).toHaveClass(
++				'gamma-class'
++			);
++		} );
++
++		it( 'should apply the `activeClass` to the selected tab', async () => {
++			const user = userEvent.setup();
++			const activeClass = 'my-active-tab';
++
++			render(
++				<Component
++					activeClass={ activeClass }
++					tabs={ TABS }
++					children={ () => undefined }
++				/>
++			);
++
++			// Make sure that only the selected tab has the active class
++			expect( getSelectedTab() ).toHaveTextContent( 'Alpha' );
++			expect( getSelectedTab() ).toHaveClass( activeClass );
++			screen
++				.getAllByRole( 'tab', { selected: false } )
++				.forEach( ( unselectedTab ) => {
++					expect( unselectedTab ).not.toHaveClass( activeClass );
++				} );
++
++			// Click the 'Beta' tab
++			await user.click( screen.getByRole( 'tab', { name: 'Beta' } ) );
++
++			// Make sure that only the selected tab has the active class
++			expect( getSelectedTab() ).toHaveTextContent( 'Beta' );
++			expect( getSelectedTab() ).toHaveClass( activeClass );
++			screen
++				.getAllByRole( 'tab', { selected: false } )
++				.forEach( ( unselectedTab ) => {
++					expect( unselectedTab ).not.toHaveClass( activeClass );
++				} );
++		} );
++	} );
++} );

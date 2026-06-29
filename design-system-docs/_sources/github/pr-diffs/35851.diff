@@ -1,0 +1,101 @@
+diff --git a/packages/components/src/heading/test/__snapshots__/index.js.snap b/packages/components/src/heading/test/__snapshots__/index.js.snap
+index 06d18dafe673e1..962b4d08654af0 100644
+--- a/packages/components/src/heading/test/__snapshots__/index.js.snap
++++ b/packages/components/src/heading/test/__snapshots__/index.js.snap
+@@ -2,7 +2,7 @@
+ 
+ exports[`props should render correctly 1`] = `
+ .emotion-0 {
+-  color: #000;
++  color: #1e1e1e;
+   line-height: 1.2;
+   margin: 0;
+   color: #050505;
+diff --git a/packages/components/src/text/styles.js b/packages/components/src/text/styles.js
+index ac7db34c0aa0a1..637a64f8c9dd31 100644
+--- a/packages/components/src/text/styles.js
++++ b/packages/components/src/text/styles.js
+@@ -9,7 +9,7 @@ import { css } from '@emotion/react';
+ import { COLORS, CONFIG } from '../utils';
+ 
+ export const Text = css`
+-	color: ${ COLORS.black };
++	color: ${ COLORS.darkGray.primary };
+ 	line-height: ${ CONFIG.fontLineHeightBase };
+ 	margin: 0;
+ `;
+diff --git a/packages/components/src/text/test/__snapshots__/index.js.snap b/packages/components/src/text/test/__snapshots__/index.js.snap
+index 41cdd09bfdf66d..054a5522837431 100644
+--- a/packages/components/src/text/test/__snapshots__/index.js.snap
++++ b/packages/components/src/text/test/__snapshots__/index.js.snap
+@@ -2,7 +2,7 @@
+ 
+ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = `
+ .emotion-0 {
+-  color: #000;
++  color: #1e1e1e;
+   line-height: 1.2;
+   margin: 0;
+   font-size: calc((13 / 13) * 13px);
+@@ -30,7 +30,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] =
+ 
+ exports[`Text snapshot tests should render correctly 1`] = `
+ .emotion-0 {
+-  color: #000;
++  color: #1e1e1e;
+   line-height: 1.2;
+   margin: 0;
+   font-size: calc((13 / 13) * 13px);
+diff --git a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+index 0ce3927c507d51..d0582df5cde06a 100644
+--- a/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/control-label/test/__snapshots__/index.js.snap
+@@ -14,7 +14,7 @@ exports[`props should render correctly 1`] = `
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+-  color: #000;
++  color: #1e1e1e;
+   line-height: 1.2;
+   margin: 0;
+   font-size: calc((13 / 13) * 13px);
+@@ -56,7 +56,7 @@ exports[`props should render no truncate 1`] = `
+   padding-top: calc((36px - calc(13px * 1.2)) / 2);
+   padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+   padding-top: calc((36px - calc(13px * 1.2)) / 2);
+-  color: #000;
++  color: #1e1e1e;
+   line-height: 1.2;
+   margin: 0;
+   font-size: calc((13 / 13) * 13px);
+@@ -102,7 +102,7 @@ exports[`props should render size 1`] = `
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+-  color: #000;
++  color: #1e1e1e;
+   line-height: 1.2;
+   margin: 0;
+   font-size: calc((13 / 13) * 13px);
+diff --git a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+index 14c22f888ba712..b0df52ceb94f04 100644
+--- a/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/ui/form-group/test/__snapshots__/index.js.snap
+@@ -14,7 +14,7 @@ exports[`props should render alignLabel 1`] = `
+   padding-top: calc((36px - calc(13px * 1.2)) / 2);
+   padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+   padding-top: calc((36px - calc(13px * 1.2)) / 2);
+-  color: #000;
++  color: #1e1e1e;
+   line-height: 1.2;
+   margin: 0;
+   font-size: calc((13 / 13) * 13px);
+@@ -72,7 +72,7 @@ exports[`props should render vertically 1`] = `
+   padding-top: calc((36px - calc(13px * 1.2)) / 2);
+   padding-bottom: calc((36px - calc(13px * 1.2)) / 2);
+   padding-top: calc((36px - calc(13px * 1.2)) / 2);
+-  color: #000;
++  color: #1e1e1e;
+   line-height: 1.2;
+   margin: 0;
+   font-size: calc((13 / 13) * 13px);

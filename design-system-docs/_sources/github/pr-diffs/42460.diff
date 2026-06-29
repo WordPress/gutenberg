@@ -1,0 +1,211 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5845aba6df6a77..9a37d3f95fd0da 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,8 +2,9 @@
+ 
+ ## Unreleased
+ 
+-## Bug Fix
++### Bug Fix
+ 
++-   `CustomSelectControl`: Fix font size and hover/focus style inconsistencies with `SelectControl` ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
+ -   `AnglePickerControl`: Fix gap between elements in RTL mode ([#42534](https://github.com/WordPress/gutenberg/pull/42534)).
+ 
+ ### Enhancements
+@@ -12,6 +13,8 @@
+ -   `BaseControl`: Set zero padding on `StyledLabel` to ensure cross-browser styling ([#42348](https://github.com/WordPress/gutenberg/pull/42348/)).
+ -   `SelectControl`: Add flag for larger default size ([#42456](https://github.com/WordPress/gutenberg/pull/42456/)).
+ -   `UnitControl`: Update unit select's focus styles to match input's ([#42383](https://github.com/WordPress/gutenberg/pull/42383)).
++-   `CustomSelectControl`: Add size variants ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
++-   `CustomSelectControl`: Add flag to opt in to unconstrained width ([#42460](https://github.com/WordPress/gutenberg/pull/42460/)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index 3e5904268857a4..c830e6bea999a0 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -9,12 +9,14 @@ import classnames from 'classnames';
+  */
+ import { Icon, check, chevronDown } from '@wordpress/icons';
+ import { __, sprintf } from '@wordpress/i18n';
+-import { useCallback } from '@wordpress/element';
++import { useCallback, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { Button, VisuallyHidden } from '../';
++import { VisuallyHidden } from '../';
++import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
++import InputBase from '../input-control/input-base';
+ 
+ const itemToString = ( item ) => item?.name;
+ // This is needed so that in Windows, where
+@@ -58,12 +60,16 @@ const stateReducer = (
+ export default function CustomSelectControl( {
+ 	/** Start opting into the larger default height that will become the default size in a future version. */
+ 	__next36pxDefaultSize = false,
++	/** Start opting into the unconstrained width that will become the default in a future version. */
++	__nextUnconstrainedWidth = false,
+ 	className,
+ 	hideLabelFromVision,
+ 	label,
+ 	describedBy,
+ 	options: items,
+ 	onChange: onSelectedItemChange,
++	/** @type {import('../select-control/types').SelectControlProps.size} */
++	size = 'default',
+ 	value: _selectedItem,
+ } ) {
+ 	const {
+@@ -85,6 +91,8 @@ export default function CustomSelectControl( {
+ 		stateReducer,
+ 	} );
+ 
++	const [ isFocused, setIsFocused ] = useState( false );
++
+ 	function getDescribedBy() {
+ 		if ( describedBy ) {
+ 			return describedBy;
+@@ -138,31 +146,41 @@ export default function CustomSelectControl( {
+ 					{ label }
+ 				</label>
+ 			) }
+-			<Button
+-				{ ...getToggleButtonProps( {
+-					// This is needed because some speech recognition software don't support `aria-labelledby`.
+-					'aria-label': label,
+-					'aria-labelledby': undefined,
+-					className: classnames(
+-						'components-custom-select-control__button',
+-						{ 'is-next-36px-default-size': __next36pxDefaultSize }
+-					),
+-					isSmall: ! __next36pxDefaultSize,
+-					describedBy: getDescribedBy(),
+-				} ) }
++			<InputBase
++				isFocused={ isOpen || isFocused }
++				__unstableInputWidth={
++					__nextUnconstrainedWidth ? undefined : 'auto'
++				}
++				labelPosition={ __nextUnconstrainedWidth ? undefined : 'top' }
+ 			>
+-				{ itemToString( selectedItem ) }
+-				<Icon
+-					icon={ chevronDown }
+-					className={ classnames(
+-						'components-custom-select-control__button-icon',
+-						{
+-							'is-next-36px-default-size': __next36pxDefaultSize,
+-						}
+-					) }
+-					size={ 18 }
+-				/>
+-			</Button>
++				<SelectControlSelect
++					as="button"
++					onFocus={ () => setIsFocused( true ) }
++					onBlur={ () => setIsFocused( false ) }
++					selectSize={ size }
++					__next36pxDefaultSize={ __next36pxDefaultSize }
++					{ ...getToggleButtonProps( {
++						// This is needed because some speech recognition software don't support `aria-labelledby`.
++						'aria-label': label,
++						'aria-labelledby': undefined,
++						className: classnames(
++							'components-custom-select-control__button',
++							{
++								'is-next-unconstrained-width':
++									__nextUnconstrainedWidth,
++							}
++						),
++						describedBy: getDescribedBy(),
++					} ) }
++				>
++					{ itemToString( selectedItem ) }
++					<Icon
++						icon={ chevronDown }
++						className="components-custom-select-control__button-icon"
++						size={ 18 }
++					/>
++				</SelectControlSelect>
++			</InputBase>
+ 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+ 			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
+ 				{ isOpen &&
+diff --git a/packages/components/src/custom-select-control/stories/index.js b/packages/components/src/custom-select-control/stories/index.js
+index 0c3e365b681db9..f698306be4f8fe 100644
+--- a/packages/components/src/custom-select-control/stories/index.js
++++ b/packages/components/src/custom-select-control/stories/index.js
+@@ -7,8 +7,13 @@ export default {
+ 	title: 'Components/CustomSelectControl',
+ 	component: CustomSelectControl,
+ 	argTypes: {
+-		__next36pxDefaultSize: {
+-			control: { type: 'boolean' },
++		__next36pxDefaultSize: { control: { type: 'boolean' } },
++		__nextUnconstrainedWidth: { control: { type: 'boolean' } },
++		size: {
++			control: {
++				type: 'radio',
++				options: [ 'small', 'default', '__unstable-large' ],
++			},
+ 		},
+ 	},
+ };
+diff --git a/packages/components/src/custom-select-control/style.scss b/packages/components/src/custom-select-control/style.scss
+index 1171ae8efd396c..1130763451a630 100644
+--- a/packages/components/src/custom-select-control/style.scss
++++ b/packages/components/src/custom-select-control/style.scss
+@@ -8,45 +8,20 @@
+ }
+ 
+ .components-custom-select-control__button {
+-	border: 1px solid $gray-700;
+-	border-radius: $radius-block-ui;
+-	min-width: 130px;
+ 	position: relative;
+ 	text-align: left;
++	outline: 0; // focus ring is handled elsewhere
+ 
+-	&:not(.is-next-36px-default-size) {
+-		min-height: 30px;
+-	}
+-
+-	// For all button sizes allow sufficient space for the
+-	// dropdown "arrow" icon to display.
+-	&.components-custom-select-control__button {
+-		// TODO: Some of these can be removed after some internal inconsistencies are addressed, such as the chevron
+-		// (https://github.com/WordPress/gutenberg/issues/39400) and Button padding (https://github.com/WordPress/gutenberg/issues/39431)
+-		padding-left: $grid-unit-20;
+-		padding-right: $icon-size + $grid-unit-10;
+-
+-		&:not(.is-next-36px-default-size) {
+-			padding-left: $grid-unit-10;
+-			padding-right: $icon-size;
+-		}
+-	}
+-
+-	&:focus:not(:disabled) {
+-		border-color: var(--wp-admin-theme-color);
+-		box-shadow: 0 0 0 ($border-width-focus - $border-width) var(--wp-admin-theme-color);
++	&:not(.is-next-unconstrained-width) {
++		min-width: 130px;
+ 	}
+ 
+ 	.components-custom-select-control__button-icon {
+ 		height: 100%;
+ 		padding: 0;
+ 		position: absolute;
+-		right: $grid-unit-10;
++		right: $grid-unit-05;
+ 		top: 0;
+-
+-		&:not(.is-next-36px-default-size) {
+-			right: $grid-unit-05;
+-		}
+ 	}
+ }
+ 

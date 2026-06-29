@@ -1,0 +1,1197 @@
+diff --git a/packages/block-editor/src/components/autocomplete/index.js b/packages/block-editor/src/components/autocomplete/index.js
+index e53639108dc68c..9584f658e0a448 100644
+--- a/packages/block-editor/src/components/autocomplete/index.js
++++ b/packages/block-editor/src/components/autocomplete/index.js
+@@ -3,7 +3,7 @@
+  */
+ import { applyFilters, hasFilter } from '@wordpress/hooks';
+ import {
+-	Autocomplete,
++	Autocomplete as WCAutocomplete,
+ 	__unstableUseAutocompleteProps as useAutocompleteProps,
+ } from '@wordpress/components';
+ import { useMemo } from '@wordpress/element';
+@@ -68,7 +68,9 @@ export function useBlockEditorAutocompleteProps( props ) {
+  * @type {React.FC}
+  */
+ function BlockEditorAutocomplete( props ) {
+-	return <Autocomplete { ...props } completers={ useCompleters( props ) } />;
++	return (
++		<WCAutocomplete { ...props } completers={ useCompleters( props ) } />
++	);
+ }
+ 
+ /**
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index de7c5f4d251de7..94eaaf9c71c931 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ ### New Features
+ 
+ -   Add `Drawer` primitive ([#76690](https://github.com/WordPress/gutenberg/pull/76690)).
++-   Add `Autocomplete` primitive ([#77642](https://github.com/WordPress/gutenberg/pull/77642)).
+ 
+ ### Documentation
+ 
+@@ -30,6 +31,7 @@
+ -   `Dialog`: `Dialog.Header` and `Dialog.Footer` now default to `<header>` and `<footer>` elements for richer landmark semantics. Their `ref` type widens from `HTMLDivElement` to `HTMLElement`; pass `render` to opt out of the default tag ([#76690](https://github.com/WordPress/gutenberg/pull/76690)).
+ -   `Dialog`, `Popover`: Upgrade dev-only title validation from mount-only to cleanup-based re-validation, catching conditionally rendered titles ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
+ -   `Link`: Honor `openInNewTab` consistently instead of treating hash links as a special case ([#77422](https://github.com/WordPress/gutenberg/pull/77422)).
++-   `Select`: Tighten spacing after checkmark when `Select.Item` is `size="small"` ([#77642](https://github.com/WordPress/gutenberg/pull/77642)).
+ -   `Dialog`, `Drawer`, `Popover`: Align title and description colors across all three overlay primitives. Title color is now authored explicitly (resilient to global CSS defenses), and description color now inherits from the popup foreground token instead of overriding to the weak variant ([#77692](https://github.com/WordPress/gutenberg/pull/77692)).
+ 
+ ### Internal
+diff --git a/packages/ui/src/form/primitives/autocomplete/clear.tsx b/packages/ui/src/form/primitives/autocomplete/clear.tsx
+new file mode 100644
+index 00000000000000..a0abe61e6c9253
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/clear.tsx
+@@ -0,0 +1,35 @@
++import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import { forwardRef } from '@wordpress/element';
++import { closeSmall } from '@wordpress/icons';
++import { __ } from '@wordpress/i18n';
++import { IconButton } from '../../../icon-button';
++import type { AutocompleteClearProps } from './types';
++
++const DEFAULT_RENDER = ( {
++	'aria-label': ariaLabel = __( 'Clear' ),
++	...props
++}: AutocompleteClearProps ) => (
++	<IconButton
++		icon={ closeSmall }
++		size="small"
++		variant="minimal"
++		tone="neutral"
++		label={ ariaLabel }
++		{ ...props }
++	/>
++);
++
++/**
++ * A button that clears the input value.
++ */
++export const Clear = forwardRef< HTMLButtonElement, AutocompleteClearProps >(
++	function Clear( { render = DEFAULT_RENDER, ...restProps }, ref ) {
++		return (
++			<_Autocomplete.Clear
++				ref={ ref }
++				render={ render }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/autocomplete/collection.tsx b/packages/ui/src/form/primitives/autocomplete/collection.tsx
+new file mode 100644
+index 00000000000000..d1b974d4dd832c
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/collection.tsx
+@@ -0,0 +1,13 @@
++import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import type { AutocompleteCollectionProps } from './types';
++
++export function Collection( {
++	children,
++	...restProps
++}: AutocompleteCollectionProps ) {
++	return (
++		<_Autocomplete.Collection { ...restProps }>
++			{ children }
++		</_Autocomplete.Collection>
++	);
++}
+diff --git a/packages/ui/src/form/primitives/autocomplete/empty.tsx b/packages/ui/src/form/primitives/autocomplete/empty.tsx
+new file mode 100644
+index 00000000000000..24c86d36393362
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/empty.tsx
+@@ -0,0 +1,17 @@
++import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import type { AutocompleteEmptyProps } from './types';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++
++export const Empty = forwardRef< HTMLDivElement, AutocompleteEmptyProps >(
++	function Empty( { className, ...restProps }, ref ) {
++		return (
++			<_Autocomplete.Empty
++				className={ clsx( itemPopupStyles.empty, className ) }
++				ref={ ref }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/autocomplete/index.ts b/packages/ui/src/form/primitives/autocomplete/index.ts
+new file mode 100644
+index 00000000000000..99df32900cda13
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/index.ts
+@@ -0,0 +1,12 @@
++export { Clear } from './clear';
++export { Collection } from './collection';
++export { Empty } from './empty';
++export { InputGroup } from './input-group';
++export { Input } from './input';
++export { Item } from './item';
++export { List } from './list';
++export { ListBody } from './list-body';
++export { Portal } from './portal';
++export { Popup } from './popup';
++export { Root } from './root';
++export { Value } from './value';
+diff --git a/packages/ui/src/form/primitives/autocomplete/input-group.tsx b/packages/ui/src/form/primitives/autocomplete/input-group.tsx
+new file mode 100644
+index 00000000000000..3751190fd41211
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/input-group.tsx
+@@ -0,0 +1,16 @@
++import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import { forwardRef } from '@wordpress/element';
++import type { AutocompleteInputGroupProps } from './types';
++
++/**
++ * Wrapper around `Autocomplete.Input` that defines the visual control
++ * boundary when the input is composed with prefix/suffix slots or other
++ * elements. Without this wrapper, the popup anchors to the bare `<input>`
++ * instead of the full control. Also adds `role="group"`.
++ */
++export const InputGroup = forwardRef<
++	HTMLDivElement,
++	AutocompleteInputGroupProps
++>( function InputGroup( props, ref ) {
++	return <_Autocomplete.InputGroup ref={ ref } { ...props } />;
++} );
+diff --git a/packages/ui/src/form/primitives/autocomplete/input.tsx b/packages/ui/src/form/primitives/autocomplete/input.tsx
+new file mode 100644
+index 00000000000000..195cba1b6b47ea
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/input.tsx
+@@ -0,0 +1,20 @@
++import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import { forwardRef } from '@wordpress/element';
++import { Input as InputPrimitive } from '../input';
++import type { AutocompleteInputProps } from './types';
++
++const DEFAULT_RENDER = ( props: AutocompleteInputProps ) => (
++	<InputPrimitive { ...props } />
++);
++
++export const Input = forwardRef< HTMLInputElement, AutocompleteInputProps >(
++	function Input( { render = DEFAULT_RENDER, ...restProps }, ref ) {
++		return (
++			<_Autocomplete.Input
++				ref={ ref }
++				render={ render }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/autocomplete/item.tsx b/packages/ui/src/form/primitives/autocomplete/item.tsx
+new file mode 100644
+index 00000000000000..793f4a3781785c
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/item.tsx
+@@ -0,0 +1,24 @@
++import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++import resetStyles from '../../../utils/css/resets.module.css';
++import type { AutocompleteItemProps } from './types';
++
++export const Item = forwardRef< HTMLDivElement, AutocompleteItemProps >(
++	function Item( { className, children, ...restProps }, ref ) {
++		return (
++			<_Autocomplete.Item
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					itemPopupStyles.item,
++					className
++				) }
++				ref={ ref }
++				{ ...restProps }
++			>
++				{ children }
++			</_Autocomplete.Item>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/autocomplete/list-body.tsx b/packages/ui/src/form/primitives/autocomplete/list-body.tsx
+new file mode 100644
+index 00000000000000..7ca574ed86d306
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/list-body.tsx
+@@ -0,0 +1,23 @@
++import { mergeProps, useRender } from '@base-ui/react';
++import { forwardRef } from '@wordpress/element';
++import type { AutocompleteListBodyProps } from './types';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++
++/**
++ * A layout container for the main scrolling area in the `List`, for holding `Item`s.
++ */
++export const ListBody = forwardRef< HTMLDivElement, AutocompleteListBodyProps >(
++	function ListBody( { render, ...props }, ref ) {
++		const element = useRender( {
++			defaultTagName: 'div',
++			render,
++			ref,
++			props: mergeProps< 'div' >(
++				{ className: itemPopupStyles[ 'list-scrollable-container' ] },
++				props
++			),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/form/primitives/autocomplete/list.tsx b/packages/ui/src/form/primitives/autocomplete/list.tsx
+new file mode 100644
+index 00000000000000..63ca67200732f9
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/list.tsx
+@@ -0,0 +1,17 @@
++import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import type { AutocompleteListProps } from './types';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++
++export const List = forwardRef< HTMLDivElement, AutocompleteListProps >(
++	function List( { className, ...restProps }, ref ) {
++		return (
++			<_Autocomplete.List
++				className={ clsx( itemPopupStyles.list, className ) }
++				ref={ ref }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/autocomplete/popup.tsx b/packages/ui/src/form/primitives/autocomplete/popup.tsx
+new file mode 100644
+index 00000000000000..9ce6bdd25ef20a
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/popup.tsx
+@@ -0,0 +1,42 @@
++import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
++import { unlock } from '../../../lock-unlock';
++import { renderPortalWithChildren } from '../../../utils/render-portal-with-children';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++import resetStyles from '../../../utils/css/resets.module.css';
++import styles from './style.module.css';
++import { Portal } from './portal';
++import type { AutocompletePopupProps } from './types';
++import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
++
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
++export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
++	function Popup( { className, portal, ...restProps }, ref ) {
++		const portalChildren = (
++			<_Autocomplete.Positioner
++				{ ...ITEM_POPUP_POSITIONER_PROPS }
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					styles.positioner
++				) }
++			>
++				<ThemeProvider>
++					<_Autocomplete.Popup
++						ref={ ref }
++						className={ clsx( itemPopupStyles.popup, className ) }
++						{ ...restProps }
++					/>
++				</ThemeProvider>
++			</_Autocomplete.Positioner>
++		);
++
++		return renderPortalWithChildren( portal, <Portal />, portalChildren );
++	}
++);
+diff --git a/packages/ui/src/form/primitives/autocomplete/portal.tsx b/packages/ui/src/form/primitives/autocomplete/portal.tsx
+new file mode 100644
+index 00000000000000..631837cb5eb051
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/portal.tsx
+@@ -0,0 +1,16 @@
++import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import { forwardRef } from '@wordpress/element';
++import type { PortalProps } from './types';
++
++/**
++ * Root element that portals `Autocomplete` popup content. Pass to
++ * `Autocomplete.Popup`'s `portal` prop. When `portal` is omitted,
++ * `Autocomplete.Popup` uses this component with default props.
++ */
++const Portal = forwardRef< HTMLDivElement, PortalProps >(
++	function AutocompletePortal( props, ref ) {
++		return <_Autocomplete.Portal ref={ ref } { ...props } />;
++	}
++);
++
++export { Portal };
+diff --git a/packages/ui/src/form/primitives/autocomplete/root.tsx b/packages/ui/src/form/primitives/autocomplete/root.tsx
+new file mode 100644
+index 00000000000000..2dd0d8b4d9fde4
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/root.tsx
+@@ -0,0 +1,11 @@
++import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import type { AutocompleteRootProps } from './types';
++
++/**
++ * Low-level primitive for an autocomplete input that suggests options as
++ * you type. Unlike `Combobox`, the input can contain free-form text and
++ * suggestions only optionally autocomplete the text.
++ */
++export function Root( props: AutocompleteRootProps ) {
++	return <_Autocomplete.Root { ...props } />;
++}
+diff --git a/packages/ui/src/form/primitives/autocomplete/stories/fixtures.ts b/packages/ui/src/form/primitives/autocomplete/stories/fixtures.ts
+new file mode 100644
+index 00000000000000..0f879ce035bf72
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/stories/fixtures.ts
+@@ -0,0 +1,35 @@
++export interface FixtureItem {
++	id: string;
++	value: string;
++}
++
++export const COMMANDS: FixtureItem[] = [
++	{ id: 'c1', value: 'Add new page' },
++	{ id: 'c2', value: 'Add new post' },
++	{ id: 'c3', value: 'Edit site' },
++	{ id: 'c4', value: 'View site' },
++	{ id: 'c5', value: 'Manage plugins' },
++	{ id: 'c6', value: 'Manage users' },
++	{ id: 'c7', value: 'Open settings' },
++	{ id: 'c8', value: 'Toggle dark mode' },
++];
++
++export const USERS: FixtureItem[] = [
++	{ id: 'm1', value: 'alice' },
++	{ id: 'm2', value: 'bob' },
++	{ id: 'm3', value: 'carol' },
++	{ id: 'm4', value: 'dave' },
++	{ id: 'm5', value: 'eve' },
++	{ id: 'm6', value: 'frank' },
++	{ id: 'm7', value: 'grace' },
++];
++
++export const URLS: FixtureItem[] = [
++	{ id: 'u1', value: 'wordpress.org' },
++	{ id: 'u2', value: 'developer.wordpress.org/plugins/' },
++	{ id: 'u3', value: 'developer.wordpress.org/themes/' },
++	{ id: 'u4', value: 'developer.wordpress.org/block-editor/' },
++	{ id: 'u5', value: 'github.com/WordPress/gutenberg' },
++	{ id: 'u6', value: 'make.wordpress.org/core/' },
++	{ id: 'u7', value: 'make.wordpress.org/design/' },
++];
+diff --git a/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx b/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..33885311302f7c
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/stories/index.story.tsx
+@@ -0,0 +1,437 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { useRef, useState } from '@wordpress/element';
++import { search } from '@wordpress/icons';
++import * as Autocomplete from '../index';
++import { Icon } from '../../../../icon';
++import { Input } from '../../input';
++import { InputLayout } from '../../input-layout';
++import { Textarea } from '../../textarea';
++import { COMMANDS, URLS, USERS, type FixtureItem } from './fixtures';
++
++const meta: Meta< typeof Autocomplete.Root > = {
++	title: 'Design System/Components/Form/Primitives/Autocomplete',
++	component: Autocomplete.Root,
++	subcomponents: {
++		Popup: Autocomplete.Popup,
++		Input: Autocomplete.Input,
++		InputGroup: Autocomplete.InputGroup,
++		List: Autocomplete.List,
++		ListBody: Autocomplete.ListBody,
++		Collection: Autocomplete.Collection,
++		Item: Autocomplete.Item,
++		Value: Autocomplete.Value,
++		Empty: Autocomplete.Empty,
++		Clear: Autocomplete.Clear,
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof Autocomplete.Root >;
++
++/**
++ * The input accepts free-form text while suggesting matching items.
++ */
++export const Default: Story = {
++	args: {
++		items: URLS,
++		children: (
++			<>
++				<Autocomplete.Input placeholder="Enter a URL" type="url" />
++				<Autocomplete.Popup>
++					<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
++					<Autocomplete.List>
++						<Autocomplete.ListBody>
++							<Autocomplete.Collection>
++								{ ( item: FixtureItem ) => (
++									<Autocomplete.Item
++										key={ item.id }
++										value={ item }
++									>
++										{ item.value }
++									</Autocomplete.Item>
++								) }
++							</Autocomplete.Collection>
++						</Autocomplete.ListBody>
++					</Autocomplete.List>
++				</Autocomplete.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * Controls the popup so it only opens when there is at least one match.
++ */
++export const OpenOnlyOnMatch: Story = {
++	render: function Template( args ) {
++		const [ open, setOpen ] = useState( false );
++		const [ filteredItems, setFilteredItems ] = useState( URLS );
++
++		return (
++			<Autocomplete.Root
++				{ ...args }
++				items={ URLS }
++				open={ open }
++				onOpenChange={ ( nextOpen ) => {
++					setOpen( nextOpen && filteredItems.length > 0 );
++				} }
++				onValueChange={ ( value ) => {
++					const matches = URLS.filter( ( bookmark ) =>
++						bookmark.value
++							.toLowerCase()
++							.includes( value.toLowerCase() )
++					);
++					setFilteredItems( matches );
++					setOpen( value.length > 0 && matches.length > 0 );
++				} }
++				filteredItems={ filteredItems }
++			>
++				<Autocomplete.Input placeholder="Enter a URL" type="url" />
++				<Autocomplete.Popup>
++					<Autocomplete.List>
++						<Autocomplete.ListBody>
++							<Autocomplete.Collection>
++								{ ( item: FixtureItem ) => (
++									<Autocomplete.Item
++										key={ item.id }
++										value={ item }
++									>
++										{ item.value }
++									</Autocomplete.Item>
++								) }
++							</Autocomplete.Collection>
++						</Autocomplete.ListBody>
++					</Autocomplete.List>
++				</Autocomplete.Popup>
++			</Autocomplete.Root>
++		);
++	},
++};
++
++export const AsyncItems: Story = {
++	render: function Template( args ) {
++		const [ query, setQuery ] = useState( '' );
++		const [ loading, setLoading ] = useState( false );
++		const [ results, setResults ] = useState< typeof URLS >( [] );
++
++		return (
++			<Autocomplete.Root
++				{ ...args }
++				items={ results }
++				value={ query }
++				onValueChange={ ( newValue ) => {
++					setQuery( newValue );
++					setLoading( true );
++					setTimeout( () => {
++						setResults(
++							URLS.filter( ( item ) =>
++								item.value
++									.toLowerCase()
++									.includes( newValue.toLowerCase() )
++							)
++						);
++						setLoading( false );
++					}, 500 );
++				} }
++			>
++				<Autocomplete.Input placeholder="Enter a URL" type="url" />
++				<Autocomplete.Popup>
++					<Autocomplete.Empty>
++						{ loading ? 'Loading...' : 'No matching items.' }
++					</Autocomplete.Empty>
++					<Autocomplete.List>
++						<Autocomplete.ListBody>
++							<Autocomplete.Collection>
++								{ ( item: FixtureItem ) => (
++									<Autocomplete.Item
++										key={ item.id }
++										value={ item }
++									>
++										{ item.value }
++									</Autocomplete.Item>
++								) }
++							</Autocomplete.Collection>
++						</Autocomplete.ListBody>
++					</Autocomplete.List>
++				</Autocomplete.Popup>
++			</Autocomplete.Root>
++		);
++	},
++};
++
++/**
++ * The suggestion list can be rendered inline by enabling `inline` and `open`.
++ */
++export const Inline: Story = {
++	args: {
++		items: COMMANDS,
++		inline: true,
++		open: true,
++	},
++	render: function Template( args ) {
++		const [ value, setValue ] = useState( '' );
++
++		return (
++			<Autocomplete.Root
++				{ ...args }
++				value={ value }
++				onValueChange={ setValue }
++			>
++				<Autocomplete.Input placeholder="Type a command" />
++				<div
++					style={ {
++						minHeight: '200px',
++						maxHeight: '200px',
++						marginTop: 8,
++						overflow: 'auto',
++					} }
++				>
++					<Autocomplete.Empty>No commands found.</Autocomplete.Empty>
++					<Autocomplete.List>
++						<Autocomplete.Collection>
++							{ ( command: FixtureItem ) => (
++								<Autocomplete.Item
++									key={ command.id }
++									value={ command }
++								>
++									{ command.value }
++								</Autocomplete.Item>
++							) }
++						</Autocomplete.Collection>
++					</Autocomplete.List>
++				</div>
++			</Autocomplete.Root>
++		);
++	},
++};
++
++export const WithSearchIconAndClearButton: Story = {
++	args: {
++		items: URLS,
++		children: (
++			<>
++				<Autocomplete.InputGroup>
++					<Autocomplete.Input
++						placeholder="Search URLs"
++						type="url"
++						render={
++							<Input
++								prefix={
++									<InputLayout.Slot padding="minimal">
++										<Icon icon={ search } />
++									</InputLayout.Slot>
++								}
++								suffix={
++									<InputLayout.Slot padding="minimal">
++										<Autocomplete.Clear />
++									</InputLayout.Slot>
++								}
++							/>
++						}
++					/>
++				</Autocomplete.InputGroup>
++				<Autocomplete.Popup>
++					<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
++					<Autocomplete.List>
++						<Autocomplete.ListBody>
++							<Autocomplete.Collection>
++								{ ( item: FixtureItem ) => (
++									<Autocomplete.Item
++										key={ item.id }
++										value={ item }
++									>
++										{ item.value }
++									</Autocomplete.Item>
++								) }
++							</Autocomplete.Collection>
++						</Autocomplete.ListBody>
++					</Autocomplete.List>
++				</Autocomplete.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * Experimental: Textarea with inline autocomplete triggered by `@`.
++ */
++export const TextareaInlineAutocomplete: Story = {
++	render: function Template() {
++		const textareaRef = useRef< HTMLTextAreaElement >( null );
++		const [ value, setValue ] = useState( '' );
++		const [ open, setOpen ] = useState( false );
++		const [ filteredItems, setFilteredItems ] = useState< FixtureItem[] >(
++			[]
++		);
++		const triggerInfo = useRef< {
++			offset: number;
++			query: string;
++		} | null >( null );
++
++		function findTrigger( text: string, caretPos: number ) {
++			const textBeforeCaret = text.slice( 0, caretPos );
++			const triggerIndex = textBeforeCaret.lastIndexOf( '@' );
++			if ( triggerIndex < 0 ) {
++				return null;
++			}
++
++			const query = textBeforeCaret.slice( triggerIndex + 1 );
++			if ( /\s/.test( query ) ) {
++				return null;
++			}
++			if ( triggerIndex > 0 && ! /\s/.test( text[ triggerIndex - 1 ] ) ) {
++				return null;
++			}
++
++			return { offset: triggerIndex, query };
++		}
++
++		function handleValueChange(
++			newValue: string,
++			details: { reason: string }
++		) {
++			const trigger = triggerInfo.current;
++
++			if ( details.reason === 'item-press' && trigger ) {
++				const before = value.slice( 0, trigger.offset );
++				const afterEndPos = trigger.offset + 1 + trigger.query.length;
++				const after = value.slice( afterEndPos );
++				const needsSpace = after.length > 0 && after[ 0 ] !== ' ';
++				const inserted = `@${ newValue }${ needsSpace ? ' ' : '' }`;
++				const fullValue = before + inserted + after;
++
++				setValue( fullValue );
++				triggerInfo.current = null;
++				setOpen( false );
++
++				const caretPos = before.length + inserted.length;
++				requestAnimationFrame( () => {
++					textareaRef.current?.setSelectionRange(
++						caretPos,
++						caretPos
++					);
++					textareaRef.current?.focus();
++				} );
++				return;
++			}
++
++			setValue( newValue );
++
++			const textarea = textareaRef.current;
++			if ( ! textarea ) {
++				return;
++			}
++
++			const caretPos = textarea.selectionStart ?? 0;
++			const detected = findTrigger( newValue, caretPos );
++
++			if ( detected ) {
++				triggerInfo.current = detected;
++				const matches = USERS.filter( ( user ) =>
++					user.value
++						.toLowerCase()
++						.startsWith( detected.query.toLowerCase() )
++				);
++				setFilteredItems( matches );
++				setOpen( matches.length > 0 );
++			} else {
++				triggerInfo.current = null;
++				setOpen( false );
++			}
++		}
++
++		return (
++			<Autocomplete.Root
++				items={ USERS }
++				value={ value }
++				onValueChange={ handleValueChange }
++				filteredItems={ filteredItems }
++				open={ open }
++				onOpenChange={ ( nextOpen ) => {
++					if ( ! nextOpen ) {
++						setOpen( false );
++						triggerInfo.current = null;
++					}
++				} }
++				mode="none"
++				openOnInputClick={ false }
++				autoHighlight
++			>
++				<Autocomplete.Input
++					render={
++						<Textarea
++							ref={ textareaRef }
++							placeholder="Type @ to mention someone"
++						/>
++					}
++				/>
++				<Autocomplete.Popup>
++					<Autocomplete.List>
++						<Autocomplete.ListBody>
++							<Autocomplete.Collection>
++								{ ( item: FixtureItem ) => (
++									<Autocomplete.Item
++										key={ item.id }
++										value={ item }
++									>
++										{ item.value }
++									</Autocomplete.Item>
++								) }
++							</Autocomplete.Collection>
++						</Autocomplete.ListBody>
++					</Autocomplete.List>
++				</Autocomplete.Popup>
++			</Autocomplete.Root>
++		);
++	},
++};
++
++/**
++ * Popovers in Gutenberg are managed with explicit z-index values, which can
++ * create situations where an autocomplete popup renders below another popover
++ * when you want it above.
++ *
++ * The `--wp-ui-autocomplete-z-index` CSS variable controls the z-index of the
++ * `Autocomplete` positioner. Override it either:
++ *
++ * - **Globally**, by setting the variable on `:root` or `body` (raises every
++ *   `Autocomplete` popup in the page), or
++ * - **Per instance**, by passing an `Autocomplete.Portal` with a `style` (or
++ *   `className`) to `Autocomplete.Popup`'s `portal` prop. The variable cascades
++ *   from the portal wrapper to everything rendered inside it.
++ *
++ * This story demonstrates the per-instance approach.
++ */
++export const WithCustomZIndex: Story = {
++	name: 'With Custom z-index',
++	args: {
++		items: URLS,
++		children: (
++			<>
++				<Autocomplete.Input placeholder="Enter a URL" type="url" />
++				<Autocomplete.Popup
++					portal={
++						<Autocomplete.Portal
++							style={ { '--wp-ui-autocomplete-z-index': '9999' } }
++						/>
++					}
++				>
++					<Autocomplete.List>
++						<Autocomplete.ListBody>
++							<Autocomplete.Collection>
++								{ ( item: FixtureItem ) => (
++									<Autocomplete.Item
++										key={ item.id }
++										value={ item }
++									>
++										{ item.value }
++									</Autocomplete.Item>
++								) }
++							</Autocomplete.Collection>
++						</Autocomplete.ListBody>
++					</Autocomplete.List>
++				</Autocomplete.Popup>
++			</>
++		),
++	},
++};
+diff --git a/packages/ui/src/form/primitives/autocomplete/style.module.css b/packages/ui/src/form/primitives/autocomplete/style.module.css
+new file mode 100644
+index 00000000000000..18cd3eaa2befc2
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/style.module.css
+@@ -0,0 +1,7 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.positioner {
++		z-index: var(--wp-ui-autocomplete-z-index, initial);
++	}
++}
+diff --git a/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx b/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx
+new file mode 100644
+index 00000000000000..ce8d0d42708711
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/test/index.test.tsx
+@@ -0,0 +1,162 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { createRef } from '@wordpress/element';
++import * as Autocomplete from '../index';
++
++const ITEMS = [
++	{ id: '1', value: 'Item 1' },
++	{ id: '2', value: 'Item 2' },
++	{ id: '3', value: 'Item 3' },
++];
++
++describe( 'Autocomplete', () => {
++	it( 'forwards ref', async () => {
++		const user = userEvent.setup();
++		const inputGroupRef = createRef< HTMLDivElement >();
++		const inputRef = createRef< HTMLInputElement >();
++		const popupRef = createRef< HTMLDivElement >();
++		const listRef = createRef< HTMLDivElement >();
++		const listBodyRef = createRef< HTMLDivElement >();
++		const itemRef = createRef< HTMLDivElement >();
++		const clearRef = createRef< HTMLButtonElement >();
++		const emptyRef = createRef< HTMLDivElement >();
++
++		render(
++			<Autocomplete.Root items={ ITEMS }>
++				<Autocomplete.InputGroup ref={ inputGroupRef }>
++					<Autocomplete.Input ref={ inputRef } placeholder="Search" />
++				</Autocomplete.InputGroup>
++				<Autocomplete.Popup ref={ popupRef }>
++					<Autocomplete.Empty ref={ emptyRef }>
++						No results found.
++					</Autocomplete.Empty>
++					<Autocomplete.List ref={ listRef }>
++						<Autocomplete.ListBody ref={ listBodyRef }>
++							<Autocomplete.Collection>
++								{ ( item ) => (
++									<Autocomplete.Item
++										key={ item.id }
++										ref={
++											item.id === '1'
++												? itemRef
++												: undefined
++										}
++										value={ item }
++									>
++										{ item.value }
++									</Autocomplete.Item>
++								) }
++							</Autocomplete.Collection>
++						</Autocomplete.ListBody>
++					</Autocomplete.List>
++					<Autocomplete.Clear ref={ clearRef } />
++				</Autocomplete.Popup>
++			</Autocomplete.Root>
++		);
++
++		expect( inputGroupRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( inputRef.current ).toBeInstanceOf( HTMLInputElement );
++
++		await user.type( inputRef.current!, 'Item' );
++
++		await waitFor( () => {
++			expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++		} );
++		expect( listRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( listBodyRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
++		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++
++	describe( 'portal', () => {
++		it( 'should render inside the portal container when a custom target is provided', async () => {
++			const user = userEvent.setup();
++			const containerRef = createRef< HTMLDivElement >();
++
++			render(
++				<div data-testid="wrapper">
++					<Autocomplete.Root items={ ITEMS }>
++						<Autocomplete.Input placeholder="Search" />
++						<div
++							ref={ containerRef }
++							data-testid="custom-container"
++						/>
++						<Autocomplete.Popup
++							portal={
++								<Autocomplete.Portal
++									container={ containerRef }
++								/>
++							}
++						>
++							<Autocomplete.List>
++								<Autocomplete.ListBody>
++									<Autocomplete.Collection>
++										{ ( item ) => (
++											<Autocomplete.Item
++												key={ item.id }
++												value={ item }
++											>
++												{ item.value }
++											</Autocomplete.Item>
++										) }
++									</Autocomplete.Collection>
++								</Autocomplete.ListBody>
++							</Autocomplete.List>
++						</Autocomplete.Popup>
++					</Autocomplete.Root>
++				</div>
++			);
++
++			await user.type( screen.getByRole( 'combobox' ), 'Item 1' );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++
++			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
++				item
++			);
++		} );
++
++		it( 'should render with a portal by default', async () => {
++			const user = userEvent.setup();
++
++			render(
++				<div data-testid="wrapper">
++					<Autocomplete.Root items={ ITEMS }>
++						<Autocomplete.Input placeholder="Search" />
++						<Autocomplete.Popup>
++							<Autocomplete.List>
++								<Autocomplete.ListBody>
++									<Autocomplete.Collection>
++										{ ( item ) => (
++											<Autocomplete.Item
++												key={ item.id }
++												value={ item }
++											>
++												{ item.value }
++											</Autocomplete.Item>
++										) }
++									</Autocomplete.Collection>
++								</Autocomplete.ListBody>
++							</Autocomplete.List>
++						</Autocomplete.Popup>
++					</Autocomplete.Root>
++				</div>
++			);
++
++			await user.type( screen.getByRole( 'combobox' ), 'Item 1' );
++
++			const item = await screen.findByRole( 'option', {
++				name: 'Item 1',
++			} );
++			expect( item ).toBeVisible();
++
++			expect( screen.getByTestId( 'wrapper' ) ).not.toContainElement(
++				item
++			);
++		} );
++	} );
++} );
+diff --git a/packages/ui/src/form/primitives/autocomplete/types.ts b/packages/ui/src/form/primitives/autocomplete/types.ts
+new file mode 100644
+index 00000000000000..89e5923682767d
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/types.ts
+@@ -0,0 +1,74 @@
++import type { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import type { ComponentPropsWithoutRef, ReactElement } from 'react';
++import type { ComponentProps } from '../../../utils/types';
++
++export type AutocompleteCollectionProps = _Autocomplete.Collection.Props;
++
++export type PortalProps = ComponentPropsWithoutRef<
++	typeof _Autocomplete.Portal
++>;
++
++export type AutocompleteClearProps = ComponentProps<
++	typeof _Autocomplete.Clear
++> & {
++	children?: React.ReactNode;
++};
++
++export type AutocompleteEmptyProps = ComponentProps<
++	typeof _Autocomplete.Empty
++> & {
++	children?: React.ReactNode;
++};
++
++export type AutocompleteInputProps = Omit<
++	ComponentProps< typeof _Autocomplete.Input >,
++	'size'
++>;
++
++export type AutocompleteInputGroupProps = ComponentProps<
++	typeof _Autocomplete.InputGroup
++> & {
++	children?: React.ReactNode;
++};
++
++export type AutocompleteItemProps = ComponentProps<
++	typeof _Autocomplete.Item
++> & {
++	children?: React.ReactNode;
++};
++
++export type AutocompleteListProps = ComponentProps<
++	typeof _Autocomplete.List
++> & {
++	children?: _Autocomplete.List.Props[ 'children' ];
++};
++
++export type AutocompleteListBodyProps = ComponentProps< 'div' > & {
++	children?: React.ReactNode;
++};
++
++export type AutocompletePopupProps = ComponentProps<
++	typeof _Autocomplete.Popup
++> & {
++	children?: React.ReactNode;
++	/**
++	 * Optional portal element, typically `<Autocomplete.Portal />` with custom
++	 * `container`. When omitted, `Autocomplete.Popup` uses
++	 * `Autocomplete.Portal` with default props. Do not pass `children` on the
++	 * portal element; they would be ignored.
++	 */
++	portal?: ReactElement< Omit< PortalProps, 'children' > >;
++};
++
++export type AutocompleteRootProps = ComponentProps<
++	typeof _Autocomplete.Root
++> & {
++	children?: React.ReactNode;
++};
++
++export type AutocompleteValueProps = {
++	/**
++	 * Can be used to override the current value of the autocomplete.
++	 */
++	children?: _Autocomplete.Value.Props[ 'children' ];
++};
+diff --git a/packages/ui/src/form/primitives/autocomplete/value.tsx b/packages/ui/src/form/primitives/autocomplete/value.tsx
+new file mode 100644
+index 00000000000000..cba086b33350d3
+--- /dev/null
++++ b/packages/ui/src/form/primitives/autocomplete/value.tsx
+@@ -0,0 +1,6 @@
++import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
++import type { AutocompleteValueProps } from './types';
++
++export function Value( props: AutocompleteValueProps ) {
++	return <_Autocomplete.Value { ...props } />;
++}
+diff --git a/packages/ui/src/form/primitives/index.ts b/packages/ui/src/form/primitives/index.ts
+index 4e6973efd0b084..b8cdf7d6eb8ed4 100644
+--- a/packages/ui/src/form/primitives/index.ts
++++ b/packages/ui/src/form/primitives/index.ts
+@@ -1,3 +1,4 @@
++export * as Autocomplete from './autocomplete';
+ export * as Field from './field';
+ export * as Fieldset from './fieldset';
+ export { Input } from './input';
+diff --git a/packages/ui/src/form/primitives/select/item.tsx b/packages/ui/src/form/primitives/select/item.tsx
+index cf600268f22404..294e4130d0c637 100644
+--- a/packages/ui/src/form/primitives/select/item.tsx
++++ b/packages/ui/src/form/primitives/select/item.tsx
+@@ -27,7 +27,6 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
+ 				<Icon
+ 					icon={ check }
+ 					className={ clsx(
+-						itemPopupStyles[ 'item-indicator' ],
+ 						itemPopupStyles[ 'item-indicator-icon' ]
+ 					) }
+ 					size={ size === 'small' ? 20 : 24 }
+diff --git a/packages/ui/src/utils/css/item-popup.module.css b/packages/ui/src/utils/css/item-popup.module.css
+index 217bf45c176821..feb1a954677215 100644
+--- a/packages/ui/src/utils/css/item-popup.module.css
++++ b/packages/ui/src/utils/css/item-popup.module.css
+@@ -55,8 +55,7 @@
+ 		--wp-ui-popup-item-padding-inline: 12px;
+ 		--wp-ui-popup-item-padding-block: 4px;
+ 
+-		display: grid;
+-		grid-template-columns: 24px 1fr;
++		display: flex;
+ 		align-items: center;
+ 		justify-content: flex-start;
+ 		gap: var(--wpds-dimension-gap-xs);
+@@ -106,23 +105,22 @@
+ 		}
+ 	}
+ 
+-	.item-indicator {
+-		justify-self: center;
++	.item-indicator-icon {
++		flex-shrink: 0;
+ 	}
+ 
+-	.empty {
++	/* Only style when there is content, because otherwise the element would block clicks
++	on the .list beneath it (both share grid-area: main and overlap). */
++	.empty:not(:empty) {
+ 		--wp-ui-popup-empty-min-height: 40px;
+ 		--wp-ui-popup-empty-padding-inline: 12px;
+ 
+ 		grid-area: main;
+ 		display: flex;
+ 		align-items: center;
++		min-height: var(--wp-ui-popup-empty-min-height);
+ 		padding-inline: var(--wp-ui-popup-empty-padding-inline);
+ 		color: var(--wpds-color-fg-content-neutral-weak);
+-
+-		&:not(:empty) {
+-			min-height: var(--wp-ui-popup-empty-min-height);
+-		}
+ 	}
+ 
+ }
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index b8d56c597c87fe..f43fa2f6833294 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -258,6 +258,8 @@ export default dedupePlugins( [
+ 				{
+ 					'@wordpress/components': {
+ 						__experimentalText: 'WCText',
++						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
++						Autocomplete: 'WCAutocomplete',
+ 						Badge: 'WCBadge',
+ 					},
+ 				},

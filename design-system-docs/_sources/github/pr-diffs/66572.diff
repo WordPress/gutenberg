@@ -1,0 +1,165 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5fd48336f956c1..4b0da1d669ece2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Deprecations
++
++-   `Radio`: Deprecate 36px default size ([#66572](https://github.com/WordPress/gutenberg/pull/66572)).
++
+ ### Enhancements
+ 
+ -   `MenuItem`: Add 40px size prop on Button ([#66596](https://github.com/WordPress/gutenberg/pull/66596)).
+diff --git a/packages/components/src/radio-group/README.md b/packages/components/src/radio-group/README.md
+index 1c24d49f1169d5..78cff485597279 100644
+--- a/packages/components/src/radio-group/README.md
++++ b/packages/components/src/radio-group/README.md
+@@ -57,10 +57,10 @@ const MyControlledRadioRadioGroup = () => {
+ 	const [ checked, setChecked ] = useState( '25' );
+ 	return (
+ 		<RadioGroup label="Width" onChange={ setChecked } checked={ checked }>
+-			<Radio value="25">25%</Radio>
+-			<Radio value="50">50%</Radio>
+-			<Radio value="75">75%</Radio>
+-			<Radio value="100">100%</Radio>
++			<Radio __next40pxDefaultSize value="25">25%</Radio>
++			<Radio __next40pxDefaultSize value="50">50%</Radio>
++			<Radio __next40pxDefaultSize value="75">75%</Radio>
++			<Radio __next40pxDefaultSize value="100">100%</Radio>
+ 		</RadioGroup>
+ 	);
+ };
+@@ -80,10 +80,10 @@ import {
+ const MyUncontrolledRadioRadioGroup = () => {
+ 	return (
+ 		<RadioGroup label="Width" defaultChecked="25">
+-			<Radio value="25">25%</Radio>
+-			<Radio value="50">50%</Radio>
+-			<Radio value="75">75%</Radio>
+-			<Radio value="100">100%</Radio>
++			<Radio __next40pxDefaultSize value="25">25%</Radio>
++			<Radio __next40pxDefaultSize value="50">50%</Radio>
++			<Radio __next40pxDefaultSize value="75">75%</Radio>
++			<Radio __next40pxDefaultSize value="100">100%</Radio>
+ 		</RadioGroup>
+ 	);
+ };
+diff --git a/packages/components/src/radio-group/radio.tsx b/packages/components/src/radio-group/radio.tsx
+index 50a5a2647b39d5..782a737b6ba28a 100644
+--- a/packages/components/src/radio-group/radio.tsx
++++ b/packages/components/src/radio-group/radio.tsx
+@@ -16,6 +16,7 @@ import Button from '../button';
+ import { RadioGroupContext } from './context';
+ import type { WordPressComponentProps } from '../context';
+ import type { RadioProps } from './types';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ function UnforwardedRadio(
+ 	{
+@@ -30,6 +31,12 @@ function UnforwardedRadio(
+ 	const selectedValue = useStoreState( store, 'value' );
+ 	const isChecked = selectedValue !== undefined && selectedValue === value;
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'Radio',
++		size: undefined,
++		__next40pxDefaultSize: props.__next40pxDefaultSize,
++	} );
++
+ 	return (
+ 		<Ariakit.Radio
+ 			disabled={ disabled }
+diff --git a/packages/components/src/radio-group/stories/index.story.tsx b/packages/components/src/radio-group/stories/index.story.tsx
+index d9cf34c93b2ed1..a19fb077e7ec46 100644
+--- a/packages/components/src/radio-group/stories/index.story.tsx
++++ b/packages/components/src/radio-group/stories/index.story.tsx
+@@ -28,7 +28,13 @@ const meta: Meta< typeof RadioGroup > = {
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
+ 		controls: { expanded: true },
+-		docs: { canvas: { sourceState: 'shown' } },
++		docs: {
++			canvas: { sourceState: 'shown' },
++			description: {
++				component:
++					'This component is deprecated. Use `RadioControl` or `ToggleGroupControl` instead.',
++			},
++		},
+ 	},
+ };
+ export default meta;
+@@ -44,9 +50,15 @@ Default.args = {
+ 	defaultChecked: 'option2',
+ 	children: (
+ 		<>
+-			<Radio value="option1">Option 1</Radio>
+-			<Radio value="option2">Option 2</Radio>
+-			<Radio value="option3">Option 3</Radio>
++			<Radio __next40pxDefaultSize value="option1">
++				Option 1
++			</Radio>
++			<Radio __next40pxDefaultSize value="option2">
++				Option 2
++			</Radio>
++			<Radio __next40pxDefaultSize value="option3">
++				Option 3
++			</Radio>
+ 		</>
+ 	),
+ };
+diff --git a/packages/components/src/radio-group/types.ts b/packages/components/src/radio-group/types.ts
+index 6422cf4b275f00..c72917a33faa4c 100644
+--- a/packages/components/src/radio-group/types.ts
++++ b/packages/components/src/radio-group/types.ts
+@@ -1,3 +1,8 @@
++/**
++ * Internal dependencies
++ */
++import type { ButtonProps } from '../button/types';
++
+ export type RadioGroupProps = {
+ 	/**
+ 	 * Accessible label for the radio group
+@@ -27,7 +32,7 @@ export type RadioGroupProps = {
+ 	children: React.ReactNode;
+ };
+ 
+-export type RadioProps = {
++export type RadioProps = Pick< ButtonProps, '__next40pxDefaultSize' > & {
+ 	/**
+ 	 * The actual value of the radio element.
+ 	 */
+diff --git a/packages/components/src/utils/deprecated-36px-size.ts b/packages/components/src/utils/deprecated-36px-size.ts
+index e28e9eebb31a99..be5baa2515637c 100644
+--- a/packages/components/src/utils/deprecated-36px-size.ts
++++ b/packages/components/src/utils/deprecated-36px-size.ts
+@@ -10,9 +10,12 @@ export function maybeWarnDeprecated36pxSize( {
+ }: {
+ 	componentName: string;
+ 	__next40pxDefaultSize: boolean | undefined;
+-	size: string;
++	size: string | undefined;
+ } ) {
+-	if ( __next40pxDefaultSize || size !== 'default' ) {
++	if (
++		__next40pxDefaultSize ||
++		( size !== undefined && size !== 'default' )
++	) {
+ 		return;
+ 	}
+ 
+diff --git a/packages/editor/src/components/create-template-part-modal/index.js b/packages/editor/src/components/create-template-part-modal/index.js
+index 63e3830295c379..5d594cd646cc10 100644
+--- a/packages/editor/src/components/create-template-part-modal/index.js
++++ b/packages/editor/src/components/create-template-part-modal/index.js
+@@ -158,6 +158,7 @@ export function CreateTemplatePartModalContents( {
+ 						{ templatePartAreas.map(
+ 							( { icon, label, area: value, description } ) => (
+ 								<Radio
++									__next40pxDefaultSize
+ 									key={ label }
+ 									value={ value }
+ 									className="editor-create-template-part-modal__area-radio"

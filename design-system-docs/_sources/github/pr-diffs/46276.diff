@@ -1,0 +1,569 @@
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index 95156a967d30cf..6ae833adde1c2e 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -11,7 +11,6 @@ $z-layers: (
+ 	".components-form-toggle__input": 1,
+ 	".edit-post-text-editor__toolbar": 1,
+ 	".edit-site-code-editor__toolbar": 1,
+-	".edit-post-sidebar__panel-tab.is-active": 1,
+ 
+ 	// These next three share a stacking context
+ 	".block-library-template-part__selection-search": 1, // higher sticky element
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d20f381aa8fe9f..95998e37dda2dd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ ### Enhancements
+ 
++-   `TabPanel`: Simplify tab-focus style. ([#46276](https://github.com/WordPress/gutenberg/pull/46276)).
+ -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
+ -   `InputControl`, `NumberControl`, `UnitControl`: Add `help` prop for additional description ([#45931](https://github.com/WordPress/gutenberg/pull/45931)).
+ -   `BorderControl`, `ColorPicker` & `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom` ([#45985](https://github.com/WordPress/gutenberg/pull/45985)).
+diff --git a/packages/components/src/tab-panel/style.scss b/packages/components/src/tab-panel/style.scss
+index 6a796b93015771..dd22a54178190a 100644
+--- a/packages/components/src/tab-panel/style.scss
++++ b/packages/components/src/tab-panel/style.scss
+@@ -7,57 +7,69 @@
+ 	}
+ }
+ 
++// This tab style CSS is duplicated verbatim in
++// /packages/edit-post/src/components/sidebar/settings-header/style.scss
+ .components-tab-panel__tabs-item {
++	position: relative;
++	border-radius: 0;
++	height: $grid-unit-60;
+ 	background: transparent;
+ 	border: none;
+ 	box-shadow: none;
+-	border-radius: 0;
+ 	cursor: pointer;
+-	height: $grid-unit-60;
+ 	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+ 	margin-left: 0;
+ 	font-weight: 500;
+-	transition: box-shadow 0.1s linear;
+-	box-sizing: border-box;
+ 
+-	// This pseudo-element "duplicates" the tab label and sets the text to bold.
+-	// This ensures that the tab doesn't change width when selected.
+-	// See: https://github.com/WordPress/gutenberg/pull/9793
++	&:focus:not(:disabled) {
++		position: relative;
++		box-shadow: none;
++	}
++
++	// Tab indicator
+ 	&::after {
+-		content: attr(data-label);
+-		display: block;
+-		height: 0;
+-		overflow: hidden;
+-		speak: none;
+-		visibility: hidden;
++		content: "";
++		position: absolute;
++		right: 0;
++		bottom: 0;
++		left: 0;
++		pointer-events: none;
++
++		// Draw the indicator.
++		background: $components-color-accent;
++		height: calc(0 * var(--wp-admin-border-width-focus));
++		border-radius: 0;
++
++		// Animation
++		transition: all 0.1s linear;
++		@include reduce-motion("transition");
+ 	}
+ 
+-	&:focus:not(:disabled) {
+-		box-shadow: inset 0 var(--wp-admin-border-width-focus) $components-color-accent;
++	// Active.
++	&.is-active::after {
++		height: calc(1 * var(--wp-admin-border-width-focus));
+ 	}
+ 
+-	&.is-active {
+-		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) transparent, inset 0 0 -$border-width-tab 0 0 $components-color-accent;
+-		position: relative;
++	// Focus.
++	&::before {
++		content: "";
++		position: absolute;
++		top: $grid-unit-15;
++		right: $grid-unit-15;
++		bottom: $grid-unit-15;
++		left: $grid-unit-15;
++		pointer-events: none;
+ 
+-		// This border appears in Windows High Contrast mode instead of the box-shadow.
+-		&::before {
+-			content: "";
+-			position: absolute;
+-			top: 0;
+-			bottom: 1px;
+-			right: 0;
+-			left: 0;
+-			border-bottom: $border-width-tab solid transparent;
+-		}
+-	}
++		// Draw the indicator.
++		box-shadow: 0 0 0 0 transparent;
++		border-radius: $radius-block-ui;
+ 
+-	&:focus {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
++		// Animation
++		transition: all 0.1s linear;
++		@include reduce-motion("transition");
+ 	}
+ 
+-	&.is-active:focus {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent, inset 0 -#{$border-width-tab * 2} 0 0 $components-color-accent;
++	&:focus-visible::before {
++		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 	}
+ }
+diff --git a/packages/edit-navigation/src/components/sidebar/style.scss b/packages/edit-navigation/src/components/sidebar/style.scss
+index 55ca7f363fa215..09f738bb230056 100644
+--- a/packages/edit-navigation/src/components/sidebar/style.scss
++++ b/packages/edit-navigation/src/components/sidebar/style.scss
+@@ -25,57 +25,71 @@
+ 	}
+ }
+ 
++
++// This tab style CSS is duplicated verbatim in
++// /packages/components/src/tab-panel/style.scss
+ .components-button.edit-navigation-sidebar__panel-tab {
++	position: relative;
+ 	border-radius: 0;
+ 	height: $grid-unit-60;
+ 	background: transparent;
+ 	border: none;
+ 	box-shadow: none;
+ 	cursor: pointer;
+-	display: inline-block;
+-	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
++	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+ 	margin-left: 0;
+ 	font-weight: 500;
+ 
+-	// This pseudo-element "duplicates" the tab label and sets the text to bold.
+-	// This ensures that the tab doesn't change width when selected.
+-	// See: https://github.com/WordPress/gutenberg/pull/9793
++	&:focus:not(:disabled) {
++		position: relative;
++		box-shadow: none;
++	}
++
++	// Tab indicator
+ 	&::after {
+-		content: attr(data-label);
+-		display: block;
+-		font-weight: 600;
+-		height: 0;
+-		overflow: hidden;
+-		speak: none;
+-		visibility: hidden;
++		content: "";
++		position: absolute;
++		right: 0;
++		bottom: 0;
++		left: 0;
++		pointer-events: none;
++
++		// Draw the indicator.
++		background: var(--wp-admin-theme-color);
++		height: calc(0 * var(--wp-admin-border-width-focus));
++		border-radius: 0;
++
++		// Animation
++		transition: all 0.1s linear;
++		@include reduce-motion("transition");
+ 	}
+ 
+-	&.is-active {
+-		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) transparent, inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
+-		position: relative;
+-		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
+-
+-		// This border appears in Windows High Contrast mode instead of the box-shadow.
+-		&::before {
+-			content: "";
+-			position: absolute;
+-			top: 0;
+-			bottom: 1px;
+-			right: 0;
+-			left: 0;
+-			border-bottom: $border-width-tab solid transparent;
+-		}
++	// Active.
++	&.is-active::after {
++		height: calc(1 * var(--wp-admin-border-width-focus));
+ 	}
+ 
+-	&:focus {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+-		position: relative;
+-		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
++	// Focus.
++	&::before {
++		content: "";
++		position: absolute;
++		top: $grid-unit-15;
++		right: $grid-unit-15;
++		bottom: $grid-unit-15;
++		left: $grid-unit-15;
++		pointer-events: none;
++
++		// Draw the indicator.
++		box-shadow: 0 0 0 0 transparent;
++		border-radius: $radius-block-ui;
++
++		// Animation
++		transition: all 0.1s linear;
++		@include reduce-motion("transition");
+ 	}
+ 
+-	&.is-active:focus {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
++	&:focus-visible::before {
++		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+ 	}
+ }
+ 
+diff --git a/packages/edit-post/src/components/sidebar/settings-header/style.scss b/packages/edit-post/src/components/sidebar/settings-header/style.scss
+index eefbb56ca24172..53aeb2c1c2439c 100644
+--- a/packages/edit-post/src/components/sidebar/settings-header/style.scss
++++ b/packages/edit-post/src/components/sidebar/settings-header/style.scss
+@@ -1,53 +1,66 @@
++// This tab style CSS is duplicated verbatim in
++// /packages/components/src/tab-panel/style.scss
+ .components-button.edit-post-sidebar__panel-tab {
++	position: relative;
+ 	border-radius: 0;
+ 	height: $grid-unit-60;
+ 	background: transparent;
+ 	border: none;
+ 	box-shadow: none;
+ 	cursor: pointer;
+-	display: inline-block;
+-	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
++	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+ 	margin-left: 0;
+ 	font-weight: 500;
+ 
+-	// This pseudo-element "duplicates" the tab label and sets the text to bold.
+-	// This ensures that the tab doesn't change width when selected.
+-	// See: https://github.com/WordPress/gutenberg/pull/9793
++	&:focus:not(:disabled) {
++		position: relative;
++		box-shadow: none;
++	}
++
++	// Tab indicator
+ 	&::after {
+-		content: attr(data-label);
+-		display: block;
+-		font-weight: 600;
+-		height: 0;
+-		overflow: hidden;
+-		speak: none;
+-		visibility: hidden;
++		content: "";
++		position: absolute;
++		right: 0;
++		bottom: 0;
++		left: 0;
++		pointer-events: none;
++
++		// Draw the indicator.
++		background: var(--wp-admin-theme-color);
++		height: calc(0 * var(--wp-admin-border-width-focus));
++		border-radius: 0;
++
++		// Animation
++		transition: all 0.1s linear;
++		@include reduce-motion("transition");
+ 	}
+ 
+-	&.is-active {
+-		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) transparent, inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
+-		position: relative;
+-		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
+-
+-		// This border appears in Windows High Contrast mode instead of the box-shadow.
+-		&::before {
+-			content: "";
+-			position: absolute;
+-			top: 0;
+-			bottom: 1px;
+-			right: 0;
+-			left: 0;
+-			border-bottom: $border-width-tab solid transparent;
+-		}
++	// Active.
++	&.is-active::after {
++		height: calc(1 * var(--wp-admin-border-width-focus));
+ 	}
+ 
+-	&:focus {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+-		position: relative;
+-		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
++	// Focus.
++	&::before {
++		content: "";
++		position: absolute;
++		top: $grid-unit-15;
++		right: $grid-unit-15;
++		bottom: $grid-unit-15;
++		left: $grid-unit-15;
++		pointer-events: none;
++
++		// Draw the indicator.
++		box-shadow: 0 0 0 0 transparent;
++		border-radius: $radius-block-ui;
++
++		// Animation
++		transition: all 0.1s linear;
++		@include reduce-motion("transition");
+ 	}
+ 
+-	&.is-active:focus {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 -#{$border-width-tab * 2} 0 0 var(--wp-admin-theme-color);
++	&:focus-visible::before {
++		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+ 	}
+ }
+diff --git a/packages/edit-site/src/components/sidebar-edit-mode/settings-header/style.scss b/packages/edit-site/src/components/sidebar-edit-mode/settings-header/style.scss
+index 7cc1819cb1f288..fdd51ddbb84add 100644
+--- a/packages/edit-site/src/components/sidebar-edit-mode/settings-header/style.scss
++++ b/packages/edit-site/src/components/sidebar-edit-mode/settings-header/style.scss
+@@ -25,56 +25,69 @@
+ 	}
+ }
+ 
++// This tab style CSS is duplicated verbatim in
++// /packages/components/src/tab-panel/style.scss
+ .components-button.edit-site-sidebar-edit-mode__panel-tab {
++	position: relative;
+ 	border-radius: 0;
+ 	height: $grid-unit-60;
+ 	background: transparent;
+ 	border: none;
+ 	box-shadow: none;
+ 	cursor: pointer;
+-	display: inline-block;
+-	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
++	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+ 	margin-left: 0;
+ 	font-weight: 500;
+ 
+-	// This pseudo-element "duplicates" the tab label and sets the text to bold.
+-	// This ensures that the tab doesn't change width when selected.
+-	// See: https://github.com/WordPress/gutenberg/pull/9793
+-	&::after {
+-		content: attr(data-label);
+-		display: block;
+-		font-weight: 600;
+-		height: 0;
+-		overflow: hidden;
+-		speak: none;
+-		visibility: hidden;
++	&:focus:not(:disabled) {
++		position: relative;
++		box-shadow: none;
+ 	}
+ 
+-	&.is-active {
+-		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) transparent, inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
+-		position: relative;
+-		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
++	// Tab indicator
++	&::after {
++		content: "";
++		position: absolute;
++		right: 0;
++		bottom: 0;
++		left: 0;
++		pointer-events: none;
+ 
+-		// This border appears in Windows High Contrast mode instead of the box-shadow.
+-		&::before {
+-			content: "";
+-			position: absolute;
+-			top: 0;
+-			bottom: 1px;
+-			right: 0;
+-			left: 0;
+-			border-bottom: $border-width-tab solid transparent;
+-		}
++		// Draw the indicator.
++		background: var(--wp-admin-theme-color);
++		height: calc(0 * var(--wp-admin-border-width-focus));
++		border-radius: 0;
++
++		// Animation
++		transition: all 0.1s linear;
++		@include reduce-motion("transition");
+ 	}
+ 
+-	&:focus {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+-		position: relative;
+-		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
++	// Active.
++	&.is-active::after {
++		height: calc(1 * var(--wp-admin-border-width-focus));
++	}
++
++	// Focus.
++	&::before {
++		content: "";
++		position: absolute;
++		top: $grid-unit-15;
++		right: $grid-unit-15;
++		bottom: $grid-unit-15;
++		left: $grid-unit-15;
++		pointer-events: none;
++
++		// Draw the indicator.
++		box-shadow: 0 0 0 0 transparent;
++		border-radius: $radius-block-ui;
++
++		// Animation
++		transition: all 0.1s linear;
++		@include reduce-motion("transition");
+ 	}
+ 
+-	&.is-active:focus {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
++	&:focus-visible::before {
++		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+ 	}
+ }
+diff --git a/packages/edit-widgets/src/components/sidebar/style.scss b/packages/edit-widgets/src/components/sidebar/style.scss
+index 823f166411fd0f..6b159ceb0a52d7 100644
+--- a/packages/edit-widgets/src/components/sidebar/style.scss
++++ b/packages/edit-widgets/src/components/sidebar/style.scss
+@@ -21,59 +21,74 @@
+ 	}
+ }
+ 
++// This tab style CSS is duplicated verbatim in
++// /packages/components/src/tab-panel/style.scss
+ .components-button.edit-widgets-sidebar__panel-tab {
++	position: relative;
+ 	border-radius: 0;
+-	height: 50px - $border-width;
++	height: $grid-unit-60;
+ 	background: transparent;
+ 	border: none;
+ 	box-shadow: none;
+ 	cursor: pointer;
+-	display: inline-block;
+-	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
++	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+ 	margin-left: 0;
+-	font-weight: 400;
+-	color: $gray-900;
++	font-weight: 500;
+ 
+-	// This pseudo-element "duplicates" the tab label and sets the text to bold.
+-	// This ensures that the tab doesn't change width when selected.
+-	// See: https://github.com/WordPress/gutenberg/pull/9793
+-	&::after {
+-		content: attr(data-label);
+-		display: block;
+-		font-weight: 600;
+-		height: 0;
+-		overflow: hidden;
+-		speak: none;
+-		visibility: hidden;
++	&:focus:not(:disabled) {
++		position: relative;
++		box-shadow: none;
+ 	}
+ 
+-	&.is-active {
+-		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) transparent, inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
+-		font-weight: 600;
+-		position: relative;
++	// Tab indicator
++	&::after {
++		content: "";
++		position: absolute;
++		right: 0;
++		bottom: 0;
++		left: 0;
++		pointer-events: none;
+ 
+-		// This border appears in Windows High Contrast mode instead of the box-shadow.
+-		&::before {
+-			content: "";
+-			position: absolute;
+-			top: 0;
+-			bottom: 1px;
+-			right: 0;
+-			left: 0;
+-			border-bottom: $border-width-tab solid transparent;
+-		}
++		// Draw the indicator.
++		background: var(--wp-admin-theme-color);
++		height: calc(0 * var(--wp-admin-border-width-focus));
++		border-radius: 0;
++
++		// Animation
++		transition: all 0.1s linear;
++		@include reduce-motion("transition");
+ 	}
+ 
+-	&:focus {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
++	// Active.
++	&.is-active::after {
++		height: calc(1 * var(--wp-admin-border-width-focus));
+ 	}
+ 
+-	&.is-active:focus {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
++	// Focus.
++	&::before {
++		content: "";
++		position: absolute;
++		top: $grid-unit-15;
++		right: $grid-unit-15;
++		bottom: $grid-unit-15;
++		left: $grid-unit-15;
++		pointer-events: none;
++
++		// Draw the indicator.
++		box-shadow: 0 0 0 0 transparent;
++		border-radius: $radius-block-ui;
++
++		// Animation
++		transition: all 0.1s linear;
++		@include reduce-motion("transition");
++	}
++
++	&:focus-visible::before {
++		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+ 	}
+ }
+ 
++
+ .edit-widgets-widget-areas__top-container {
+ 	display: flex;
+ 	padding: $grid-unit-20;

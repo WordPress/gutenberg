@@ -1,0 +1,195 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f1b6ba3341de60..da44a5837bb816 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -59,6 +59,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `RangeControl`: disable reset button when the current value is equal to the reset value ([#64579](https://github.com/WordPress/gutenberg/pull/64579)).
+ -   `RangeControl`: tweak mark and label absolute positioning ([#64487](https://github.com/WordPress/gutenberg/pull/64487)).
+ 
+ ### Internal
+diff --git a/packages/components/src/range-control/index.tsx b/packages/components/src/range-control/index.tsx
+index 20d9712df9c251..c9fbdc0055c855 100644
+--- a/packages/components/src/range-control/index.tsx
++++ b/packages/components/src/range-control/index.tsx
+@@ -41,6 +41,25 @@ import { space } from '../utils/space';
+ 
+ const noop = () => {};
+ 
++/**
++ * Computes the value that `RangeControl` should reset to when pressing
++ * the reset button.
++ */
++function computeResetValue( {
++	resetFallbackValue,
++	initialPosition,
++}: Pick< RangeControlProps, 'resetFallbackValue' | 'initialPosition' > ) {
++	if ( resetFallbackValue !== undefined ) {
++		return ! Number.isNaN( resetFallbackValue ) ? resetFallbackValue : null;
++	}
++
++	if ( initialPosition !== undefined ) {
++		return ! Number.isNaN( initialPosition ) ? initialPosition : null;
++	}
++
++	return null;
++}
++
+ function UnforwardedRangeControl(
+ 	props: WordPressComponentProps< RangeControlProps, 'input', false >,
+ 	forwardedRef: ForwardedRef< HTMLInputElement >
+@@ -166,13 +185,12 @@ function UnforwardedRangeControl(
+ 	};
+ 
+ 	const handleOnReset = () => {
+-		let resetValue: number | null = parseFloat( `${ resetFallbackValue }` );
+-		let onChangeResetValue: number | undefined = resetValue;
+-
+-		if ( isNaN( resetValue ) ) {
+-			resetValue = null;
+-			onChangeResetValue = undefined;
+-		}
++		// Reset to `resetFallbackValue` if defined, otherwise set internal value
++		// to `null` — which, if propagated to the `value` prop, will cause
++		// the value to be reset to the `initialPosition` prop if defined.
++		const resetValue = Number.isNaN( resetFallbackValue )
++			? null
++			: resetFallbackValue ?? null;
+ 
+ 		setValue( resetValue );
+ 
+@@ -189,7 +207,7 @@ function UnforwardedRangeControl(
+ 		 * preserve the undefined callback argument, except when a
+ 		 * resetFallbackValue is defined.
+ 		 */
+-		onChange( onChangeResetValue );
++		onChange( resetValue ?? undefined );
+ 	};
+ 
+ 	const handleShowTooltip = () => setShowTooltip( true );
+@@ -210,6 +228,7 @@ function UnforwardedRangeControl(
+ 	const offsetStyle = {
+ 		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
+ 	};
++
+ 	return (
+ 		<BaseControl
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+@@ -329,7 +348,17 @@ function UnforwardedRangeControl(
+ 							className="components-range-control__reset"
+ 							// If the RangeControl itself is disabled, the reset button shouldn't be in the tab sequence.
+ 							accessibleWhenDisabled={ ! disabled }
+-							disabled={ disabled || value === undefined }
++							// The reset button should be disabled if RangeControl itself is disabled,
++							// or if the current `value` is equal to the value that would be currently
++							// assigned when clicking the button.
++							disabled={
++								disabled ||
++								value ===
++									computeResetValue( {
++										resetFallbackValue,
++										initialPosition,
++									} )
++							}
+ 							variant="secondary"
+ 							size="small"
+ 							onClick={ handleOnReset }
+diff --git a/packages/components/src/range-control/test/index.tsx b/packages/components/src/range-control/test/index.tsx
+index a4c5d8c6f2bc7f..3ce741867d0dbc 100644
+--- a/packages/components/src/range-control/test/index.tsx
++++ b/packages/components/src/range-control/test/index.tsx
+@@ -298,14 +298,37 @@ describe( 'RangeControl', () => {
+ 	} );
+ 
+ 	describe( 'reset', () => {
+-		it( 'should reset to a custom fallback value, defined by a parent component', () => {
++		it( 'should clear the input value when clicking the reset button', () => {
++			const spy = jest.fn();
++			render( <RangeControl allowReset onChange={ spy } /> );
++
++			const resetButton = getResetButton();
++			const rangeInput = getRangeInput();
++			const numberInput = getNumberInput();
++
++			fireChangeEvent( numberInput, '14' );
++
++			expect( rangeInput.value ).toBe( '14' );
++			expect( numberInput.value ).toBe( '14' );
++			expect( spy ).toHaveBeenCalledWith( 14 );
++
++			fireEvent.click( resetButton );
++
++			// range input resets to min + (max-min)/2
++			expect( rangeInput.value ).toBe( '50' );
++			expect( numberInput.value ).toBe( '' );
++			expect( spy ).toHaveBeenCalledWith( undefined );
++
++			expect( resetButton ).toHaveAttribute( 'aria-disabled', 'true' );
++		} );
++
++		it( 'should reset to the `initialPosition` value when clicking the reset button', () => {
+ 			const spy = jest.fn();
+ 			render(
+ 				<RangeControl
+-					initialPosition={ 10 }
+ 					allowReset
++					initialPosition={ 23 }
+ 					onChange={ spy }
+-					resetFallbackValue={ 33 }
+ 				/>
+ 			);
+ 
+@@ -313,21 +336,29 @@ describe( 'RangeControl', () => {
+ 			const rangeInput = getRangeInput();
+ 			const numberInput = getNumberInput();
+ 
++			fireChangeEvent( numberInput, '14' );
++
++			expect( rangeInput.value ).toBe( '14' );
++			expect( numberInput.value ).toBe( '14' );
++			expect( spy ).toHaveBeenCalledWith( 14 );
++
+ 			fireEvent.click( resetButton );
+ 
+-			expect( rangeInput.value ).toBe( '33' );
+-			expect( numberInput.value ).toBe( '33' );
+-			expect( spy ).toHaveBeenCalledWith( 33 );
++			expect( rangeInput.value ).toBe( '23' );
++			expect( numberInput.value ).toBe( '23' );
++			expect( spy ).toHaveBeenCalledWith( undefined );
++
++			expect( resetButton ).toHaveAttribute( 'aria-disabled', 'true' );
+ 		} );
+ 
+-		it( 'should reset to a 50% of min/max value, of no initialPosition or value is defined', () => {
++		it( 'should reset to the `resetFallbackValue` value when clicking the reset button', () => {
++			const spy = jest.fn();
+ 			render(
+ 				<RangeControl
+-					initialPosition={ undefined }
+-					min={ 0 }
+-					max={ 100 }
++					initialPosition={ 10 }
+ 					allowReset
+-					resetFallbackValue={ undefined }
++					onChange={ spy }
++					resetFallbackValue={ 33 }
+ 				/>
+ 			);
+ 
+@@ -337,8 +368,11 @@ describe( 'RangeControl', () => {
+ 
+ 			fireEvent.click( resetButton );
+ 
+-			expect( rangeInput.value ).toBe( '50' );
+-			expect( numberInput.value ).toBe( '' );
++			expect( rangeInput.value ).toBe( '33' );
++			expect( numberInput.value ).toBe( '33' );
++			expect( spy ).toHaveBeenCalledWith( 33 );
++
++			expect( resetButton ).toHaveAttribute( 'aria-disabled', 'true' );
+ 		} );
+ 	} );
+ } );

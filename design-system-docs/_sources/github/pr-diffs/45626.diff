@@ -1,0 +1,34 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 89dfebc110c0ea..0ae877646abdab 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Bug Fix
+ 
+ -   `FormTokenField`: Fix duplicate input in IME composition ([#45607](https://github.com/WordPress/gutenberg/pull/45607)).
++-   `Autocomplete`: Check key events more strictly in IME composition ([#45626](https://github.com/WordPress/gutenberg/pull/45626)).
+ -   `Autocomplete`: Fix unexpected block insertion during IME composition ([#45510](https://github.com/WordPress/gutenberg/pull/45510)).
+ -   `Icon`: Making size prop work for icon components using dash icon strings ([#45593](https://github.com/WordPress/gutenberg/pull/45593))
+ -   `ToolsPanelItem`: Prevent unintended calls to onDeselect when parent panel is remounted and item is rendered via SlotFill ([#45673](https://github.com/WordPress/gutenberg/pull/45673))
+diff --git a/packages/components/src/autocomplete/index.js b/packages/components/src/autocomplete/index.js
+index 862dc4225ecd1a..f96bd01750c01d 100644
+--- a/packages/components/src/autocomplete/index.js
++++ b/packages/components/src/autocomplete/index.js
+@@ -220,7 +220,16 @@ function useAutocomplete( {
+ 		if ( filteredOptions.length === 0 ) {
+ 			return;
+ 		}
+-		if ( event.defaultPrevented ) {
++
++		if (
++			event.defaultPrevented ||
++			// Ignore keydowns from IMEs
++			event.isComposing ||
++			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
++			// is `isComposing=false`, even though it's technically still part of the composition.
++			// These can only be detected by keyCode.
++			event.keyCode === 229
++		) {
+ 			return;
+ 		}
+ 		switch ( event.key ) {

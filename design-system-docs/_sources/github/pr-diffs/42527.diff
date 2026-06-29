@@ -1,0 +1,137 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d2da776b33961b..06db099755caf8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -34,6 +34,9 @@
+ -   `ColorPalette`: Refactor away from `_.uniq()` ([#43330](https://github.com/WordPress/gutenberg/pull/43330/)).
+ -   `Guide`: Refactor away from `_.times()` ([#43374](https://github.com/WordPress/gutenberg/pull/43374/)).
+ 
++### Experimental
++-   `FormTokenField`: add `__experimentalAutoSelectFirstMatch` prop to auto select the first matching suggestion on typing ([#42527](https://github.com/WordPress/gutenberg/pull/42527/)).
++
+ ## 19.17.0 (2022-08-10)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/form-token-field/README.md b/packages/components/src/form-token-field/README.md
+index 2df2ad3c501759..3b5bd7e46bf21e 100644
+--- a/packages/components/src/form-token-field/README.md
++++ b/packages/components/src/form-token-field/README.md
+@@ -60,6 +60,7 @@ The `value` property is handled in a manner similar to controlled form component
+ -   `__experimentalExpandOnFocus` - If true, the suggestions list will be always expanded when the input field has the focus.
+ -   `__experimentalShowHowTo` - If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
+ -   `__experimentalValidateInput` - If passed, all introduced values will be validated before being added as tokens.
++-   `__experimentalAutoSelectFirstMatch` - If true, the select the first matching suggestion when the user presses the Enter key (or space when tokenizeOnSpace is true).
+ 
+ ## Usage
+ 
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 12bfa781ed6117..06982a6a86df6c 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -78,6 +78,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		__experimentalValidateInput = () => true,
+ 		__experimentalShowHowTo = true,
+ 		__next36pxDefaultSize = false,
++		__experimentalAutoSelectFirstMatch = false,
+ 	} = props;
+ 
+ 	const instanceId = useInstanceId( FormTokenField );
+@@ -538,8 +539,17 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		);
+ 
+ 		if ( resetSelectedSuggestion ) {
+-			setSelectedSuggestionIndex( -1 );
+-			setSelectedSuggestionScroll( false );
++			if (
++				__experimentalAutoSelectFirstMatch &&
++				inputHasMinimumChars &&
++				hasMatchingSuggestions
++			) {
++				setSelectedSuggestionIndex( 0 );
++				setSelectedSuggestionScroll( true );
++			} else {
++				setSelectedSuggestionIndex( -1 );
++				setSelectedSuggestionScroll( false );
++			}
+ 		}
+ 
+ 		if ( inputHasMinimumChars ) {
+diff --git a/packages/components/src/form-token-field/stories/index.tsx b/packages/components/src/form-token-field/stories/index.tsx
+index 54a4467a791eb5..d4af7209132da2 100644
+--- a/packages/components/src/form-token-field/stories/index.tsx
++++ b/packages/components/src/form-token-field/stories/index.tsx
+@@ -102,6 +102,14 @@ Async.args = {
+ 	suggestions: continents,
+ };
+ 
++export const DropdownSelector: ComponentStory< typeof FormTokenField > =
++	DefaultTemplate.bind( {} );
++DropdownSelector.args = {
++	...Default.args,
++	__experimentalExpandOnFocus: true,
++	__experimentalAutoSelectFirstMatch: true,
++};
++
+ /**
+  * The rendered output of each suggestion can be customized by passing a
+  * render function to the `__experimentalRenderItem` prop. (This is still an experimental feature
+diff --git a/packages/components/src/form-token-field/test/index.js b/packages/components/src/form-token-field/test/index.js
+index 1b301a2bb607b7..417e8ef08946bc 100644
+--- a/packages/components/src/form-token-field/test/index.js
++++ b/packages/components/src/form-token-field/test/index.js
+@@ -396,6 +396,37 @@ describe( 'FormTokenField', () => {
+ 			sendKeyDown( keyCodes.enter );
+ 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
+ 		} );
++
++		it( 'should automatically select the first matching suggestions when __experimentalAutoSelectFirstMatch is set to true', () => {
++			setUp( { __experimentalAutoSelectFirstMatch: true } );
++
++			wrapper.setState( {
++				isExpanded: true,
++			} );
++
++			expect( getSuggestionsText() ).toEqual( [] );
++
++			const searchText = 'so';
++
++			act( () => {
++				setText( searchText );
++			} );
++
++			const expectedFirstMatchTokens =
++				fixtures.matchingSuggestions[ searchText ][ 0 ];
++
++			expect( getSelectedSuggestion() ).toEqual(
++				expectedFirstMatchTokens
++			);
++
++			sendKeyDown( keyCodes.enter );
++
++			expect( wrapper.state.tokens ).toEqual( [
++				'foo',
++				'bar',
++				expectedFirstMatchTokens.join( '' ),
++			] );
++		} );
+ 	} );
+ 
+ 	describe( 'removing tokens', () => {
+diff --git a/packages/components/src/form-token-field/types.ts b/packages/components/src/form-token-field/types.ts
+index 8a032700b411a1..bdc67d725489b4 100644
+--- a/packages/components/src/form-token-field/types.ts
++++ b/packages/components/src/form-token-field/types.ts
+@@ -158,6 +158,13 @@ export interface FormTokenFieldProps
+ 	 * @default false
+ 	 */
+ 	__next36pxDefaultSize?: boolean;
++	/**
++	 * If true, the select the first matching suggestion when the user presses
++	 * the Enter key (or space when tokenizeOnSpace is true).
++	 *
++	 * @default false
++	 */
++	__experimentalAutoSelectFirstMatch?: boolean;
+ 	/**
+ 	 * Custom renderer for suggestions.
+ 	 */

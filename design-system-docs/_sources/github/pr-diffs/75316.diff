@@ -1,0 +1,235 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3f00d36c8c882e..42a1654ac6f28b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ ### Internal
+ 
+ -   Expose `useDrag` from `@use-gesture/react` package via private API's ([#66735](https://github.com/WordPress/gutenberg/pull/66735)).
++-   `Disabled`, `Modal`, `Popover`, `Tooltip`: Move context code to separate files to help docgen prop extraction ([#75316](https://github.com/WordPress/gutenberg/pull/75316)).
+ -   Update Emotion dependencies to ensure compatibility with React 19 ([#75324](https://github.com/WordPress/gutenberg/pull/75324)).
+ 
+ ## 32.1.0 (2026-01-29)
+diff --git a/packages/components/src/disabled/context.ts b/packages/components/src/disabled/context.ts
+new file mode 100644
+index 00000000000000..cdd4c6018d3d5c
+--- /dev/null
++++ b/packages/components/src/disabled/context.ts
+@@ -0,0 +1,6 @@
++import { createContext } from '@wordpress/element';
++
++const Context = createContext< boolean >( false );
++Context.displayName = 'DisabledContext';
++
++export default Context;
+diff --git a/packages/components/src/disabled/index.tsx b/packages/components/src/disabled/index.tsx
+index 2b7bb23e1baed2..d66d5b2ef713e5 100644
+--- a/packages/components/src/disabled/index.tsx
++++ b/packages/components/src/disabled/index.tsx
+@@ -1,18 +1,8 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+ import { disabledStyles } from './styles/disabled-styles';
+ import type { DisabledProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ import { useCx } from '../utils';
+-
+-const Context = createContext< boolean >( false );
+-Context.displayName = 'DisabledContext';
++import Context from './context';
+ 
+ const { Consumer, Provider } = Context;
+ 
+diff --git a/packages/components/src/modal/context.ts b/packages/components/src/modal/context.ts
+new file mode 100644
+index 00000000000000..5826a15ffedc66
+--- /dev/null
++++ b/packages/components/src/modal/context.ts
+@@ -0,0 +1,9 @@
++import { createContext } from '@wordpress/element';
++import type { ModalProps } from './types';
++
++// Used to track and dismiss the prior modal when another opens unless nested.
++export type Dismissers = Set<
++	React.RefObject< ModalProps[ 'onRequestClose' ] | undefined >
++>;
++export const ModalContext = createContext< Dismissers >( new Set() );
++ModalContext.displayName = 'ModalContext';
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 7572ee2e1f7077..0bca806c646075 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -1,11 +1,4 @@
+-/**
+- * External dependencies
+- */
+ import clsx from 'clsx';
+-
+-/**
+- * WordPress dependencies
+- */
+ import {
+ 	createPortal,
+ 	useCallback,
+@@ -14,7 +7,6 @@ import {
+ 	useState,
+ 	forwardRef,
+ 	useLayoutEffect,
+-	createContext,
+ 	useContext,
+ } from '@wordpress/element';
+ import {
+@@ -27,10 +19,6 @@ import {
+ import { __ } from '@wordpress/i18n';
+ import { close } from '@wordpress/icons';
+ import { getScrollContainer } from '@wordpress/dom';
+-
+-/**
+- * Internal dependencies
+- */
+ import * as ariaHelper from './aria-helper';
+ import Button from '../button';
+ import StyleProvider from '../style-provider';
+@@ -38,13 +26,7 @@ import type { ModalProps } from './types';
+ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ import { Spacer } from '../spacer';
+ import { useModalExitAnimation } from './use-modal-exit-animation';
+-
+-// Used to track and dismiss the prior modal when another opens unless nested.
+-type Dismissers = Set<
+-	React.RefObject< ModalProps[ 'onRequestClose' ] | undefined >
+->;
+-const ModalContext = createContext< Dismissers >( new Set() );
+-ModalContext.displayName = 'ModalContext';
++import { ModalContext, type Dismissers } from './context';
+ 
+ // Used to track body class names applied while modals are open.
+ const bodyOpenClasses = new Map< string, number >();
+diff --git a/packages/components/src/popover/context.ts b/packages/components/src/popover/context.ts
+new file mode 100644
+index 00000000000000..104db7da214086
+--- /dev/null
++++ b/packages/components/src/popover/context.ts
+@@ -0,0 +1,4 @@
++import { createContext } from '@wordpress/element';
++
++export const slotNameContext = createContext< string | undefined >( undefined );
++slotNameContext.displayName = '__unstableSlotNameContext';
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 393b0744c6ac6d..3acc818ff35d08 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -1,6 +1,3 @@
+-/**
+- * External dependencies
+- */
+ import type { ForwardedRef, SyntheticEvent, RefCallback } from 'react';
+ import clsx from 'clsx';
+ import {
+@@ -15,15 +12,10 @@ import {
+ } from '@floating-ui/react-dom';
+ import type { HTMLMotionProps, MotionProps } from 'framer-motion';
+ import { motion } from 'framer-motion';
+-
+-/**
+- * WordPress dependencies
+- */
+ import {
+ 	useRef,
+ 	useLayoutEffect,
+ 	forwardRef,
+-	createContext,
+ 	useContext,
+ 	useMemo,
+ 	useState,
+@@ -40,10 +32,6 @@ import { close } from '@wordpress/icons';
+ import deprecated from '@wordpress/deprecated';
+ import { Path, SVG } from '@wordpress/primitives';
+ import { __ } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+ import Button from '../button';
+ import ScrollLock from '../scroll-lock';
+ import { Slot, Fill, useSlot } from '../slot-fill';
+@@ -101,8 +89,7 @@ const ArrowTriangle = () => (
+ 	</SVG>
+ );
+ 
+-const slotNameContext = createContext< string | undefined >( undefined );
+-slotNameContext.displayName = '__unstableSlotNameContext';
++import { slotNameContext } from './context';
+ 
+ const fallbackContainerClassname = 'components-popover__fallback-container';
+ const getPopoverFallbackContainer = () => {
+diff --git a/packages/components/src/tooltip/context.ts b/packages/components/src/tooltip/context.ts
+new file mode 100644
+index 00000000000000..04ed059b8b0282
+--- /dev/null
++++ b/packages/components/src/tooltip/context.ts
+@@ -0,0 +1,8 @@
++import { createContext } from '@wordpress/element';
++import type { TooltipInternalContext as TooltipInternalContextType } from './types';
++
++export const TooltipInternalContext =
++	createContext< TooltipInternalContextType >( {
++		isNestedInTooltip: false,
++	} );
++TooltipInternalContext.displayName = 'TooltipInternalContext';
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index d29960945887c5..c67c7889bd0d0d 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -1,36 +1,17 @@
+-/**
+- * External dependencies
+- */
+ import * as Ariakit from '@ariakit/react';
+ import clsx from 'clsx';
+-
+-/**
+- * WordPress dependencies
+- */
+ import { useInstanceId } from '@wordpress/compose';
+ import {
+ 	Children,
+ 	useContext,
+-	createContext,
+ 	forwardRef,
+ 	cloneElement,
+ } from '@wordpress/element';
+ import deprecated from '@wordpress/deprecated';
+-
+-/**
+- * Internal dependencies
+- */
+-import type {
+-	TooltipProps,
+-	TooltipInternalContext as TooltipInternalContextType,
+-} from './types';
++import type { TooltipProps } from './types';
+ import Shortcut from '../shortcut';
+ import { positionToPlacement } from '../popover/utils';
+-
+-const TooltipInternalContext = createContext< TooltipInternalContextType >( {
+-	isNestedInTooltip: false,
+-} );
+-TooltipInternalContext.displayName = 'TooltipInternalContext';
++import { TooltipInternalContext } from './context';
+ 
+ /**
+  * Time over anchor to wait before showing tooltip
+@@ -158,6 +139,5 @@ function UnforwardedTooltip(
+ 	);
+ }
+ export const Tooltip = forwardRef( UnforwardedTooltip );
+-Tooltip.displayName = 'Tooltip';
+ 
+ export default Tooltip;

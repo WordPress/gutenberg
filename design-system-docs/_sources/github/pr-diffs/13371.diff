@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/notice/style.scss b/packages/components/src/notice/style.scss
+index b9f182374e2e41..31b364c7e21a6c 100644
+--- a/packages/components/src/notice/style.scss
++++ b/packages/components/src/notice/style.scss
+@@ -26,7 +26,7 @@
+ }
+ 
+ .components-notice__content {
+-	margin: 1em 0;
++	margin: 1em #{ $icon-button-size-small + $border-width } 1em 0;
+ }
+ 
+ .components-notice__action.components-button {

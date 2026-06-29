@@ -1,0 +1,43 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 710c1b44e8d1ac..6177779d7feaec 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   Revert `word-break: break-word` addition ([#76230](https://github.com/WordPress/gutenberg/pull/76230)).
+ -   `VisuallyHidden`: Add `word-break: normal` to prevent text wrapping issues in screen reader content ([#75539](https://github.com/WordPress/gutenberg/pull/75539)).
+ -   `DateTimePicker`: Fix error that occurs when selecting a day outside the valid days for a month (e.g. February 30) ([#76400](https://github.com/WordPress/gutenberg/pull/76400)).
++-   `Button`: fix focus styles in High Contrast (forced colors) mode ([#76719](https://github.com/WordPress/gutenberg/pull/76719)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 38e328eed82c04..6c00d8b4709f4d 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -48,11 +48,6 @@
+ 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 	}
+ 
+-	// Windows High Contrast mode will show this outline, but not the box-shadow.
+-	&:focus {
+-		outline: 3px solid transparent;
+-	}
+-
+ 	/**
+ 	 * Primary button style.
+ 	 */
+@@ -276,6 +271,14 @@
+ 		}
+ 	}
+ 
++	// Windows High Contrast mode will show this outline, but not the box-shadow.
++	// This rule is placed after variant outline declarations (e.g. is-primary,
++	// is-secondary, is-tertiary) to ensure it wins by source order at the same
++	// specificity, while not using `:not(:active)` to avoid outline flicker.
++	&:focus {
++		outline: 3px solid transparent;
++	}
++
+ 	&:not(:disabled, [aria-disabled="true"]):active {
+ 		color: $components-color-foreground;
+ 	}

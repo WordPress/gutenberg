@@ -1,0 +1,92 @@
+diff --git a/packages/components/src/focal-point-picker/focal-point.js b/packages/components/src/focal-point-picker/focal-point.js
+index 119ca25f61258a..75bc53a7306e4d 100644
+--- a/packages/components/src/focal-point-picker/focal-point.js
++++ b/packages/components/src/focal-point-picker/focal-point.js
+@@ -1,26 +1,24 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+ /**
+  * Internal dependencies
+  */
+ import {
+-	PointerIconSVG,
++	FocalPointWrapper,
+ 	PointerIconPathFill,
+ 	PointerIconPathOutline,
+-	FocalPointWrapper,
++	PointerIconSVG,
+ } from './styles/focal-point-style';
+ 
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
+ export default function FocalPoint( {
+ 	coordinates = { left: '50%', top: '50%' },
+-	isDragging = false,
+ 	...props
+ } ) {
+ 	const classes = classnames(
+-		'components-focal-point-picker__icon_container',
+-		isDragging && 'is-dragging'
++		'components-focal-point-picker__icon_container'
+ 	);
+ 
+ 	const style = {
+diff --git a/packages/components/src/focal-point-picker/index.js b/packages/components/src/focal-point-picker/index.js
+index 0452d43451d1ea..6213e79dd19456 100644
+--- a/packages/components/src/focal-point-picker/index.js
++++ b/packages/components/src/focal-point-picker/index.js
+@@ -52,6 +52,14 @@ export class FocalPointPicker extends Component {
+ 	componentDidMount() {
+ 		document.addEventListener( 'mouseup', this.handleOnMouseUp );
+ 		window.addEventListener( 'resize', this.updateBounds );
++
++		/*
++		 * Set initial bound values.
++		 *
++		 * This is necessary for Safari:
++		 * https://github.com/WordPress/gutenberg/issues/25814
++		 */
++		this.updateBounds();
+ 	}
+ 	componentDidUpdate( prevProps ) {
+ 		if ( prevProps.url !== this.props.url ) {
+@@ -59,7 +67,7 @@ export class FocalPointPicker extends Component {
+ 				isDragging: false,
+ 			} );
+ 		}
+-		/**
++		/*
+ 		 * Handles cases where the incoming value changes.
+ 		 * An example is the values resetting based on an UNDO action.
+ 		 */
+@@ -173,6 +181,9 @@ export class FocalPointPicker extends Component {
+ 
+ 		if ( ! isDragging ) return;
+ 
++		// Prevents text-selection when dragging.
++		event.preventDefault();
++
+ 		const { shiftKey } = event;
+ 		const pickerDimensions = this.pickerDimensions();
+ 		const cursorPosition = {
+diff --git a/packages/components/src/input-control/utils.js b/packages/components/src/input-control/utils.js
+index cb1049f56f0600..bc40ef2f13f958 100644
+--- a/packages/components/src/input-control/utils.js
++++ b/packages/components/src/input-control/utils.js
+@@ -41,10 +41,8 @@ export function useDragCursor( isDragging, dragDirection ) {
+ 	useEffect( () => {
+ 		if ( isDragging ) {
+ 			document.documentElement.style.cursor = dragCursor;
+-			document.documentElement.style.pointerEvents = 'none';
+ 		} else {
+ 			document.documentElement.style.cursor = null;
+-			document.documentElement.style.pointerEvents = null;
+ 		}
+ 	}, [ isDragging ] );
+ 

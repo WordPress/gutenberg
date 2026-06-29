@@ -1,0 +1,52 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9787549b84f31a..a0220d449aaa68 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -30,6 +30,7 @@
+ -   `BoxControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
+ -   `RadioControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
+ -   `SelectControl`: Refactor away from `_.isEmpty()` ([#42468](https://github.com/WordPress/gutenberg/pull/42468)).
++-   `ComboboxControl`: Replace `keyboardEvent.keyCode` with `keyboardEvent.code`([#42569](https://github.com/WordPress/gutenberg/pull/42569)).
+ 
+ ## 19.15.0 (2022-07-13)
+ 
+diff --git a/packages/components/src/combobox-control/index.js b/packages/components/src/combobox-control/index.js
+index ac272f11160312..2440296865c746 100644
+--- a/packages/components/src/combobox-control/index.js
++++ b/packages/components/src/combobox-control/index.js
+@@ -16,7 +16,6 @@ import {
+ 	useEffect,
+ } from '@wordpress/element';
+ import { useInstanceId } from '@wordpress/compose';
+-import { ENTER, UP, DOWN, ESCAPE } from '@wordpress/keycodes';
+ import { speak } from '@wordpress/a11y';
+ import { closeSmall } from '@wordpress/icons';
+ 
+@@ -119,22 +118,22 @@ function ComboboxControl( {
+ 			return;
+ 		}
+ 
+-		switch ( event.keyCode ) {
+-			case ENTER:
++		switch ( event.code ) {
++			case 'Enter':
+ 				if ( selectedSuggestion ) {
+ 					onSuggestionSelected( selectedSuggestion );
+ 					preventDefault = true;
+ 				}
+ 				break;
+-			case UP:
++			case 'ArrowUp':
+ 				handleArrowNavigation( -1 );
+ 				preventDefault = true;
+ 				break;
+-			case DOWN:
++			case 'ArrowDown':
+ 				handleArrowNavigation( 1 );
+ 				preventDefault = true;
+ 				break;
+-			case ESCAPE:
++			case 'Escape':
+ 				setIsExpanded( false );
+ 				setSelectedSuggestion( null );
+ 				preventDefault = true;

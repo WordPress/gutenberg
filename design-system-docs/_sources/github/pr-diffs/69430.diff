@@ -1,0 +1,209 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8d1dc8553ee8ed..6cbb61df763f14 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `Notice`: Fix notice component spacing issue when actions are present. ([#69430](https://github.com/WordPress/gutenberg/pull/69430))
++
+ ## 30.9.0 (2025-11-26)
+ 
+ ### Bug Fixes
+@@ -21,7 +25,6 @@
+ -   `NumberControl`: Fix crash when min prop is string and step prop contains decimal ([#73107](https://github.com/WordPress/gutenberg/pull/73107)).
+ -   `Modal`: Fix full-screen modal height to allow contents to scroll properly ([#73150](https://github.com/WordPress/gutenberg/pull/73150)).
+ 
+-
+ ### Internal
+ 
+ -   `Modal`: Add a classname to simplify full height content modal styling ([#73108](https://github.com/WordPress/gutenberg/pull/73108)).
+diff --git a/packages/components/src/notice/index.tsx b/packages/components/src/notice/index.tsx
+index 6f3ca94d4f734a..ce08d3ccd2e75c 100644
+--- a/packages/components/src/notice/index.tsx
++++ b/packages/components/src/notice/index.tsx
+@@ -111,53 +111,60 @@ function Notice( {
+ 			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
+ 			<div className="components-notice__content">
+ 				{ children }
+-				<div className="components-notice__actions">
+-					{ actions.map(
+-						(
+-							{
+-								className: buttonCustomClasses,
+-								label,
+-								isPrimary,
+-								variant,
+-								noDefaultClasses = false,
+-								onClick,
+-								url,
+-							}: NoticeAction &
+-								// `isPrimary` is a legacy prop included for
+-								// backcompat, but `variant` should be used
+-								// instead.
+-								Pick< DeprecatedButtonProps, 'isPrimary' >,
+-							index
+-						) => {
+-							let computedVariant = variant;
+-							if ( variant !== 'primary' && ! noDefaultClasses ) {
+-								computedVariant = ! url ? 'secondary' : 'link';
+-							}
+-							if (
+-								typeof computedVariant === 'undefined' &&
+-								isPrimary
+-							) {
+-								computedVariant = 'primary';
+-							}
++				{ actions.length > 0 && (
++					<div className="components-notice__actions">
++						{ actions.map(
++							(
++								{
++									className: buttonCustomClasses,
++									label,
++									isPrimary,
++									variant,
++									noDefaultClasses = false,
++									onClick,
++									url,
++								}: NoticeAction &
++									// `isPrimary` is a legacy prop included for
++									// backcompat, but `variant` should be used
++									// instead.
++									Pick< DeprecatedButtonProps, 'isPrimary' >,
++								index
++							) => {
++								let computedVariant = variant;
++								if (
++									variant !== 'primary' &&
++									! noDefaultClasses
++								) {
++									computedVariant = ! url
++										? 'secondary'
++										: 'link';
++								}
++								if (
++									typeof computedVariant === 'undefined' &&
++									isPrimary
++								) {
++									computedVariant = 'primary';
++								}
+ 
+-							return (
+-								<Button
+-									__next40pxDefaultSize
+-									key={ index }
+-									href={ url }
+-									variant={ computedVariant }
+-									onClick={ url ? undefined : onClick }
+-									className={ clsx(
+-										'components-notice__action',
+-										buttonCustomClasses
+-									) }
+-								>
+-									{ label }
+-								</Button>
+-							);
+-						}
+-					) }
+-				</div>
++								return (
++									<Button
++										__next40pxDefaultSize
++										key={ index }
++										href={ url }
++										variant={ computedVariant }
++										onClick={ url ? undefined : onClick }
++										className={ clsx(
++											'components-notice__action',
++											buttonCustomClasses
++										) }
++									>
++										{ label }
++									</Button>
++								);
++							}
++						) }
++					</div>
++				) }
+ 			</div>
+ 			{ isDismissible && (
+ 				<Button
+diff --git a/packages/components/src/notice/stories/index.story.tsx b/packages/components/src/notice/stories/index.story.tsx
+index 81e5767ca756a4..3040cee72f8aeb 100644
+--- a/packages/components/src/notice/stories/index.story.tsx
++++ b/packages/components/src/notice/stories/index.story.tsx
+@@ -89,7 +89,7 @@ WithActions.args = {
+ };
+ 
+ export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
+-	const exampleNotices = [
++	const exampleNotices: NoticeListProps[ 'notices' ] = [
+ 		{
+ 			id: 'second-notice',
+ 			content: 'second notice content',
+@@ -97,6 +97,22 @@ export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
+ 		{
+ 			id: 'first-notice',
+ 			content: 'first notice content',
++			actions: [
++				{
++					label: 'Click me!',
++					onClick: () => {},
++					variant: 'primary',
++				},
++				{
++					label: 'Or click me instead!',
++					onClick: () => {},
++				},
++				{
++					label: 'Or visit a link for more info',
++					url: 'https://wordpress.org',
++					variant: 'link',
++				},
++			],
+ 		},
+ 	];
+ 	const [ notices, setNotices ] = useState( exampleNotices );
+diff --git a/packages/components/src/notice/style.scss b/packages/components/src/notice/style.scss
+index b12adc1f473f10..2f65012bd88f05 100644
+--- a/packages/components/src/notice/style.scss
++++ b/packages/components/src/notice/style.scss
+@@ -41,20 +41,9 @@
+ .components-notice__actions {
+ 	display: flex;
+ 	flex-wrap: wrap;
+-}
+-
+-.components-notice__action.components-button {
+-	&,
+-	&.is-link {
+-		margin-left: $grid-unit-15;
+-	}
+-	&.is-secondary {
+-		vertical-align: initial;
+-	}
+-
+-	// When it has better support, this can be replaced
+-	// with column-gap since these are flex items.
+-	margin-right: $grid-unit-10;
++	align-items: center;
++	gap: $grid-unit-15;
++	margin-top: $grid-unit-15;
+ }
+ 
+ .components-notice__dismiss {
+@@ -86,10 +75,4 @@
+ 		margin-bottom: $grid-unit-15;
+ 		line-height: 2;
+ 	}
+-
+-	.components-notice__action.components-button {
+-		display: block;
+-		margin-left: 0;
+-		margin-top: $grid-unit-10;
+-	}
+ }

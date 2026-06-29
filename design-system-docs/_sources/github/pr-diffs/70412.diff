@@ -1,0 +1,35 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c0c1a39a5f8e45..722c4ed861768f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `Menu`: Remove `cursor: not-allowed` and added pointer styles to menu ([#70412](https://github.com/WordPress/gutenberg/pull/70412))
++
+ ### Breaking Changes
+ 
+ -   `ExternalLink`: No longer adds `noreferrer` to the `rel` attribute. `noopener` is still applied. Consumers relying on the previous behavior should pass `rel="noopener noreferrer"` explicitly ([#26968](https://github.com/WordPress/gutenberg/pull/26968)).
+diff --git a/packages/components/src/menu/styles.ts b/packages/components/src/menu/styles.ts
+index f686feea729633..e96270664447c8 100644
+--- a/packages/components/src/menu/styles.ts
++++ b/packages/components/src/menu/styles.ts
+@@ -114,6 +114,7 @@ export const Menu = styled( Ariakit.Menu )< Pick< ContextProps, 'variant' > >`
+ 
+ const baseItem = css`
+ 	all: unset;
++	cursor: pointer;
+ 
+ 	position: relative;
+ 	min-height: ${ space( 8 ) };
+@@ -157,7 +158,6 @@ const baseItem = css`
+ 
+ 	&[aria-disabled='true'] {
+ 		color: ${ COLORS.ui.textDisabled };
+-		cursor: not-allowed;
+ 	}
+ 
+ 	/* Active item (including hover) */

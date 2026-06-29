@@ -1,0 +1,619 @@
+diff --git a/packages/block-editor/src/components/border-radius-control/index.js b/packages/block-editor/src/components/border-radius-control/index.js
+index 32c32c1258f22c..f848efca0e688b 100644
+--- a/packages/block-editor/src/components/border-radius-control/index.js
++++ b/packages/block-editor/src/components/border-radius-control/index.js
+@@ -2,6 +2,7 @@
+  * WordPress dependencies
+  */
+ import {
++	BaseControl,
+ 	RangeControl,
+ 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+ 	__experimentalUseCustomUnits as useCustomUnits,
+@@ -70,7 +71,9 @@ export default function BorderRadiusControl( { onChange, values } ) {
+ 
+ 	return (
+ 		<fieldset className="components-border-radius-control">
+-			<legend>{ __( 'Radius' ) }</legend>
++			<BaseControl.VisualLabel as="legend">
++				{ __( 'Radius' ) }
++			</BaseControl.VisualLabel>
+ 			<div className="components-border-radius-control__wrapper">
+ 				{ isLinked ? (
+ 					<>
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 928f152b0d79c9..594247831109d1 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -43,8 +43,13 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+ }
+ 
+ .emotion-6 {
++  font-size: 11px;
++  font-weight: 500;
++  line-height: 1.4;
++  text-transform: uppercase;
+   display: inline-block;
+   margin-bottom: calc(4px * 2);
++  padding: 0;
+ }
+ 
+ .emotion-8 {
+diff --git a/packages/block-editor/src/components/text-decoration-control/index.js b/packages/block-editor/src/components/text-decoration-control/index.js
+index 6e8695ca050811..9edfb9b4a0195c 100644
+--- a/packages/block-editor/src/components/text-decoration-control/index.js
++++ b/packages/block-editor/src/components/text-decoration-control/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { Button } from '@wordpress/components';
++import { BaseControl, Button } from '@wordpress/components';
+ import { formatStrikethrough, formatUnderline } from '@wordpress/icons';
+ import { __ } from '@wordpress/i18n';
+ 
+@@ -30,7 +30,9 @@ const TEXT_DECORATIONS = [
+ export default function TextDecorationControl( { value, onChange } ) {
+ 	return (
+ 		<fieldset className="block-editor-text-decoration-control">
+-			<legend>{ __( 'Decoration' ) }</legend>
++			<BaseControl.VisualLabel as="legend">
++				{ __( 'Decoration' ) }
++			</BaseControl.VisualLabel>
+ 			<div className="block-editor-text-decoration-control__buttons">
+ 				{ TEXT_DECORATIONS.map( ( textDecoration ) => {
+ 					return (
+diff --git a/packages/block-editor/src/components/text-transform-control/index.js b/packages/block-editor/src/components/text-transform-control/index.js
+index 262484d843a3b3..6d85ae7b421b7a 100644
+--- a/packages/block-editor/src/components/text-transform-control/index.js
++++ b/packages/block-editor/src/components/text-transform-control/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { Button } from '@wordpress/components';
++import { BaseControl, Button } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import {
+ 	formatCapitalize,
+@@ -39,7 +39,9 @@ const TEXT_TRANSFORMS = [
+ export default function TextTransformControl( { value, onChange } ) {
+ 	return (
+ 		<fieldset className="block-editor-text-transform-control">
+-			<legend>{ __( 'Letter case' ) }</legend>
++			<BaseControl.VisualLabel as="legend">
++				{ __( 'Letter case' ) }
++			</BaseControl.VisualLabel>
+ 			<div className="block-editor-text-transform-control__buttons">
+ 				{ TEXT_TRANSFORMS.map( ( textTransform ) => {
+ 					return (
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 26820e2267a062..181423d3eb6a17 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ 
+ -   Add `box-sizing` reset style mixin to utils ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
+ -   `ResizableBox`: Make tooltip background match `Tooltip` component's ([#42800](https://github.com/WordPress/gutenberg/pull/42800)).
++-   Update control labels to the new uppercase styles ([#42789](https://github.com/WordPress/gutenberg/pull/42789)).
+ -   `UnitControl`: Update unit dropdown design for the large size variant ([#42000](https://github.com/WordPress/gutenberg/pull/42000)).
+ -   `BaseControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
+ 
+diff --git a/packages/components/src/base-control/index.tsx b/packages/components/src/base-control/index.tsx
+index ab2af8858dbaae..122577fdeba62c 100644
+--- a/packages/components/src/base-control/index.tsx
++++ b/packages/components/src/base-control/index.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import type { FunctionComponent } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -16,6 +15,7 @@ import {
+ 	StyledHelp,
+ 	StyledVisualLabel,
+ } from './styles/base-control-styles';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+ /**
+  * `BaseControl` is a component used to generate labels and help text for components handling user inputs.
+@@ -104,12 +104,14 @@ export const BaseControl = ( {
+  * 	</BaseControl>
+  * );
+  */
+-export const VisualLabel: FunctionComponent< BaseControlVisualLabelProps > = ( {
++export const VisualLabel = ( {
+ 	className,
+ 	children,
+-} ) => {
++	...props
++}: WordPressComponentProps< BaseControlVisualLabelProps, 'span' > ) => {
+ 	return (
+ 		<StyledVisualLabel
++			{ ...props }
+ 			className={ classnames(
+ 				'components-base-control__label',
+ 				className
+diff --git a/packages/components/src/base-control/stories/index.tsx b/packages/components/src/base-control/stories/index.tsx
+index 635d7cadb04a0c..edc850f760745f 100644
+--- a/packages/components/src/base-control/stories/index.tsx
++++ b/packages/components/src/base-control/stories/index.tsx
+@@ -60,6 +60,7 @@ WithHelpText.args = {
+ export const WithVisualLabel: ComponentStory< typeof BaseControl > = (
+ 	props
+ ) => {
++	// @ts-expect-error - Unclear how to fix, see also https://github.com/WordPress/gutenberg/pull/39468#discussion_r827150516
+ 	BaseControl.VisualLabel.displayName = 'BaseControl.VisualLabel';
+ 
+ 	return (
+diff --git a/packages/components/src/base-control/styles/base-control-styles.ts b/packages/components/src/base-control/styles/base-control-styles.ts
+index 7ffa0a05b20c0c..ca8c45159ecc8f 100644
+--- a/packages/components/src/base-control/styles/base-control-styles.ts
++++ b/packages/components/src/base-control/styles/base-control-styles.ts
+@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
+ /**
+  * Internal dependencies
+  */
+-import { font, COLORS, boxSizingReset } from '../../utils';
++import { baseLabelTypography, boxSizingReset, font, COLORS } from '../../utils';
+ import { space } from '../../ui/utils/space';
+ 
+ export const Wrapper = styled.div`
+@@ -35,12 +35,10 @@ export const StyledField = styled.div`
+ `;
+ 
+ const labelStyles = css`
++	${ baseLabelTypography };
++
+ 	display: inline-block;
+ 	margin-bottom: ${ space( 2 ) };
+-`;
+-
+-export const StyledLabel = styled.label`
+-	${ labelStyles }
+ 	/**
+ 	 * Removes Chrome/Safari/Firefox user agent stylesheet padding from
+ 	 * StyledLabel when it is rendered as a legend.
+@@ -48,6 +46,10 @@ export const StyledLabel = styled.label`
+ 	padding: 0;
+ `;
+ 
++export const StyledLabel = styled.label`
++	${ labelStyles }
++`;
++
+ const deprecatedMarginHelp = ( { __nextHasNoMarginBottom = false } ) => {
+ 	return (
+ 		! __nextHasNoMarginBottom &&
+diff --git a/packages/components/src/base-control/types.ts b/packages/components/src/base-control/types.ts
+index 0cefb33db0ec90..490163d92e889c 100644
+--- a/packages/components/src/base-control/types.ts
++++ b/packages/components/src/base-control/types.ts
+@@ -37,6 +37,5 @@ export type BaseControlProps = {
+ };
+ 
+ export type BaseControlVisualLabelProps = {
+-	className?: string;
+ 	children: ReactNode;
+ };
+diff --git a/packages/components/src/box-control/index.js b/packages/components/src/box-control/index.js
+index a8411ba9a1af30..6693b59af944eb 100644
+--- a/packages/components/src/box-control/index.js
++++ b/packages/components/src/box-control/index.js
+@@ -8,13 +8,13 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
++import { BaseControl } from '../base-control';
+ import Button from '../button';
+ import { FlexItem, FlexBlock } from '../flex';
+ import AllInputControl from './all-input-control';
+ import InputControls from './input-controls';
+ import AxialInputControls from './axial-input-controls';
+ import BoxControlIcon from './icon';
+-import { Text } from '../text';
+ import LinkedButton from './linked-button';
+ import {
+ 	Root,
+@@ -120,12 +120,9 @@ export default function BoxControl( {
+ 		<Root id={ id } role="group" aria-labelledby={ headingId }>
+ 			<Header className="component-box-control__header">
+ 				<FlexItem>
+-					<Text
+-						id={ headingId }
+-						className="component-box-control__label"
+-					>
++					<BaseControl.VisualLabel id={ headingId }>
+ 						{ label }
+-					</Text>
++					</BaseControl.VisualLabel>
+ 				</FlexItem>
+ 				{ allowReset && (
+ 					<FlexItem>
+diff --git a/packages/components/src/box-control/styles/box-control-styles.js b/packages/components/src/box-control/styles/box-control-styles.js
+index 14238f0a5e6647..1aa2c995a8235d 100644
+--- a/packages/components/src/box-control/styles/box-control-styles.js
++++ b/packages/components/src/box-control/styles/box-control-styles.js
+@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
+  */
+ import { Flex } from '../../flex';
+ import BaseUnitControl from '../../unit-control';
+-import { COLORS, rtl } from '../../utils';
++import { rtl } from '../../utils';
+ 
+ export const Root = styled.div`
+ 	box-sizing: border-box;
+@@ -18,7 +18,6 @@ export const Root = styled.div`
+ `;
+ 
+ export const Header = styled( Flex )`
+-	color: ${ COLORS.ui.label };
+ 	margin-bottom: 8px;
+ `;
+ 
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index e2cf0f377d4b88..10d15992566aa6 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -106,15 +106,3 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ 		}
+ 	}
+ }
+-
+-// All these styles should be made generic and changed on the inputs for all components.
+-.components-custom-gradient-picker {
+-	.components-input-control__label {
+-		line-height: 1;
+-	}
+-	label {
+-		text-transform: uppercase;
+-		font-size: 11px;
+-		font-weight: 500;
+-	}
+-}
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index c830e6bea999a0..1f3a2bf7804138 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -17,6 +17,7 @@ import { useCallback, useState } from '@wordpress/element';
+ import { VisuallyHidden } from '../';
+ import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
+ import InputBase from '../input-control/input-base';
++import { StyledLabel } from '../base-control/styles/base-control-styles';
+ 
+ const itemToString = ( item ) => item?.name;
+ // This is needed so that in Windows, where
+@@ -138,13 +139,13 @@ export default function CustomSelectControl( {
+ 				</VisuallyHidden>
+ 			) : (
+ 				/* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */
+-				<label
++				<StyledLabel
+ 					{ ...getLabelProps( {
+ 						className: 'components-custom-select-control__label',
+ 					} ) }
+ 				>
+ 					{ label }
+-				</label>
++				</StyledLabel>
+ 			) }
+ 			<InputBase
+ 				isFocused={ isOpen || isFocused }
+diff --git a/packages/components/src/custom-select-control/style.scss b/packages/components/src/custom-select-control/style.scss
+index 507983f20ee2c4..4edeb56d4290f3 100644
+--- a/packages/components/src/custom-select-control/style.scss
++++ b/packages/components/src/custom-select-control/style.scss
+@@ -3,11 +3,6 @@
+ 	font-size: $default-font-size;
+ }
+ 
+-.components-custom-select-control__label {
+-	display: block;
+-	margin-bottom: $grid-unit-10;
+-}
+-
+ .components-custom-select-control__button {
+ 	position: relative;
+ 	text-align: left;
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index b7a50288168746..33c86948856f64 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
++import BaseControl from '../../base-control';
+ import Button from '../../button';
+ import ButtonGroup from '../../button-group';
+ import TimeZone from './timezone';
+@@ -19,7 +20,6 @@ import type { TimePickerProps } from '../types';
+ import {
+ 	Wrapper,
+ 	Fieldset,
+-	Legend,
+ 	HoursInput,
+ 	TimeSeparator,
+ 	MinutesInput,
+@@ -220,11 +220,12 @@ export function TimePicker( {
+ 			className="components-datetime__time" // Unused, for backwards compatibility.
+ 		>
+ 			<Fieldset>
+-				<Legend
++				<BaseControl.VisualLabel
++					as="legend"
+ 					className="components-datetime__time-legend" // Unused, for backwards compatibility.
+ 				>
+ 					{ __( 'Time' ) }
+-				</Legend>
++				</BaseControl.VisualLabel>
+ 				<HStack
+ 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
+ 				>
+@@ -309,11 +310,12 @@ export function TimePicker( {
+ 				</HStack>
+ 			</Fieldset>
+ 			<Fieldset>
+-				<Legend
++				<BaseControl.VisualLabel
++					as="legend"
+ 					className="components-datetime__time-legend" // Unused, for backwards compatibility.
+ 				>
+ 					{ __( 'Date' ) }
+-				</Legend>
++				</BaseControl.VisualLabel>
+ 				<HStack
+ 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
+ 				>
+diff --git a/packages/components/src/date-time/time/styles.ts b/packages/components/src/date-time/time/styles.ts
+index 1e7de446bdc286..68c59d08873922 100644
+--- a/packages/components/src/date-time/time/styles.ts
++++ b/packages/components/src/date-time/time/styles.ts
+@@ -31,11 +31,6 @@ export const Fieldset = styled.fieldset`
+ 	}
+ `;
+ 
+-export const Legend = styled.legend`
+-	margin-bottom: ${ space( 2 ) };
+-	padding: 0;
+-`;
+-
+ export const TimeWrapper = styled.div`
+ 	direction: ltr;
+ 	display: flex;
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 816d94127853c1..06bfe4286f0dcf 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -8,6 +8,7 @@ import { useState, useMemo, forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
++import { BaseControl } from '../base-control';
+ import Button from '../button';
+ import RangeControl from '../range-control';
+ import { Flex, FlexItem } from '../flex';
+@@ -131,12 +132,16 @@ function FontSizePicker(
+ 				className={ `${ baseClassName }__header` }
+ 			>
+ 				<FlexItem>
+-					{ __( 'Size' ) }
+-					{ headerHint && (
+-						<span className={ `${ baseClassName }__header__hint` }>
+-							{ headerHint }
+-						</span>
+-					) }
++					<BaseControl.VisualLabel>
++						{ __( 'Size' ) }
++						{ headerHint && (
++							<span
++								className={ `${ baseClassName }__header__hint` }
++							>
++								{ headerHint }
++							</span>
++						) }
++					</BaseControl.VisualLabel>
+ 				</FlexItem>
+ 				{ ! disableCustomFontSizes && (
+ 					<FlexItem>
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index eb96daa8fd6f24..2d070cec1850a3 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -34,6 +34,7 @@ import { TokensAndInputWrapperFlex } from './styles';
+ import SuggestionsList from './suggestions-list';
+ import type { FormTokenFieldProps, TokenItem } from './types';
+ import { FlexItem } from '../flex';
++import { StyledLabel } from '../base-control/styles/base-control-styles';
+ 
+ const identity = ( value: string ) => value;
+ 
+@@ -659,12 +660,12 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 	/* eslint-disable jsx-a11y/no-static-element-interactions */
+ 	return (
+ 		<div { ...tokenFieldProps }>
+-			<label
++			<StyledLabel
+ 				htmlFor={ `components-form-token-input-${ instanceId }` }
+ 				className="components-form-token-field__label"
+ 			>
+ 				{ label }
+-			</label>
++			</StyledLabel>
+ 			<div
+ 				ref={ tokensAndInput }
+ 				className={ classes }
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index 30048e11ea7706..b56cc1c3620221 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -48,11 +48,6 @@
+ 	}
+ }
+ 
+-.components-form-token-field__label {
+-	display: inline-block;
+-	margin-bottom: $grid-unit-10;
+-}
+-
+ .components-form-token-field__help {
+ 	font-size: $helptext-font-size;
+ 	font-style: normal;
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index a7fb7ecc7fa544..1fa5dfdbd82e22 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -11,7 +11,7 @@ import type { CSSProperties, ReactNode } from 'react';
+ import type { WordPressComponentProps } from '../../ui/context';
+ import { Flex, FlexItem } from '../../flex';
+ import { Text } from '../../text';
+-import { COLORS, rtl } from '../../utils';
++import { baseLabelTypography, COLORS, rtl } from '../../utils';
+ import type { LabelPosition, Size } from '../types';
+ import { space } from '../../ui/utils/space';
+ 
+@@ -272,6 +272,8 @@ const labelMargin = ( {
+ 
+ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
+ 	&&& {
++		${ baseLabelTypography };
++
+ 		box-sizing: border-box;
+ 		display: block;
+ 		padding-top: 0;
+diff --git a/packages/components/src/placeholder/style.scss b/packages/components/src/placeholder/style.scss
+index d74fd7cdde9bb0..714c1570fe8f60 100644
+--- a/packages/components/src/placeholder/style.scss
++++ b/packages/components/src/placeholder/style.scss
+@@ -27,10 +27,6 @@
+ 	box-shadow: inset 0 0 0 $border-width $gray-900;
+ 	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
+ 
+-	.components-base-control__label {
+-		font-size: $default-font-size;
+-	}
+-
+ 	&.has-illustration {
+ 		background: none;
+ 		border: none;
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+index 08c39633a301a3..f0895c36936caa 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+@@ -22,8 +22,13 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ }
+ 
+ .emotion-4 {
++  font-size: 11px;
++  font-weight: 500;
++  line-height: 1.4;
++  text-transform: uppercase;
+   display: inline-block;
+   margin-bottom: calc(4px * 2);
++  padding: 0;
+ }
+ 
+ .emotion-6 {
+@@ -282,8 +287,13 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+ }
+ 
+ .emotion-4 {
++  font-size: 11px;
++  font-weight: 500;
++  line-height: 1.4;
++  text-transform: uppercase;
+   display: inline-block;
+   margin-bottom: calc(4px * 2);
++  padding: 0;
+ }
+ 
+ .emotion-6 {
+diff --git a/packages/components/src/tools-panel/styles.ts b/packages/components/src/tools-panel/styles.ts
+index 6dec56f1b59685..ec4084170f714c 100644
+--- a/packages/components/src/tools-panel/styles.ts
++++ b/packages/components/src/tools-panel/styles.ts
+@@ -9,7 +9,6 @@ import { css } from '@emotion/react';
+ import {
+ 	StyledField as BaseControlField,
+ 	StyledHelp as BaseControlHelp,
+-	StyledLabel as BaseControlLabel,
+ 	Wrapper as BaseControlWrapper,
+ } from '../base-control/styles/base-control-styles';
+ import { LabelWrapper } from '../input-control/styles/input-control-styles';
+@@ -133,18 +132,6 @@ export const ToolsPanelItem = css`
+ 			line-height: 1.4em;
+ 		}
+ 	}
+-
+-	/**
+-	 * The targeting of .components-custom-select-control__label here is a
+-	 * temporary measure only.
+-	 *
+-	 * It should be replaced once CustomSelectControl component has been
+-	 * refactored and can be targeted via component interpolation.
+-	 */
+-	.components-custom-select-control__label,
+-	${ BaseControlLabel } {
+-		line-height: 1.4em;
+-	}
+ `;
+ 
+ export const ToolsPanelItemPlaceholder = css`
+diff --git a/packages/components/src/tools-panel/test/__snapshots__/index.js.snap b/packages/components/src/tools-panel/test/__snapshots__/index.js.snap
+index 395f3820e1eabb..f50435d596453e 100644
+--- a/packages/components/src/tools-panel/test/__snapshots__/index.js.snap
++++ b/packages/components/src/tools-panel/test/__snapshots__/index.js.snap
+@@ -105,11 +105,6 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
+   line-height: 1.4em;
+ }
+ 
+-.emotion-6 .components-custom-select-control__label,
+-.emotion-6 .ej5x27r2 {
+-  line-height: 1.4em;
+-}
+-
+ .emotion-8 {
+   grid-column: 1/-1;
+ }
+@@ -137,11 +132,6 @@ exports[`ToolsPanel first and last panel items should apply first/last classes t
+   line-height: 1.4em;
+ }
+ 
+-.emotion-8 .components-custom-select-control__label,
+-.emotion-8 .ej5x27r2 {
+-  line-height: 1.4em;
+-}
+-
+ <div>
+   <div
+     class="components-grid components-tools-panel emotion-0 emotion-1"
+diff --git a/packages/components/src/utils/base-label.ts b/packages/components/src/utils/base-label.ts
+new file mode 100644
+index 00000000000000..e9c241bf2e7351
+--- /dev/null
++++ b/packages/components/src/utils/base-label.ts
+@@ -0,0 +1,13 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++
++// This is a very low-level mixin which you shouldn't have to use directly.
++// Try to use BaseControl's StyledLabel or BaseControl.VisualLabel if you can.
++export const baseLabelTypography = css`
++	font-size: 11px;
++	font-weight: 500;
++	line-height: 1.4;
++	text-transform: uppercase;
++`;
+diff --git a/packages/components/src/utils/style-mixins.js b/packages/components/src/utils/style-mixins.js
+index a2827af3412783..c858e8731fc523 100644
+--- a/packages/components/src/utils/style-mixins.js
++++ b/packages/components/src/utils/style-mixins.js
+@@ -6,3 +6,4 @@ export { font } from './font';
+ export { breakpoint } from './breakpoint';
+ export { default as CONFIG } from './config-values';
+ export { COLORS } from './colors-values';
++export { baseLabelTypography } from './base-label';

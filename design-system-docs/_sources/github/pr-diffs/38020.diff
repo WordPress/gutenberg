@@ -1,0 +1,54 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7396665b133fcc..3d1a25daa8bd3f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fix
+ 
+ -   Components: Fix `Slot`/`Fill` Emotion `StyleProvider` ([#38237](https://github.com/WordPress/gutenberg/pull/38237))
++-   Reduce height and min-width of the reset button on `ComboBoxControl` for consistency. ([#38020](https://github.com/WordPress/gutenberg/pull/38020))
+ 
+ ## 19.3.0 (2022-01-27)
+ 
+diff --git a/packages/components/src/combobox-control/stories/index.js b/packages/components/src/combobox-control/stories/index.js
+index 76bdaf90c026b0..a852004ac3046d 100644
+--- a/packages/components/src/combobox-control/stories/index.js
++++ b/packages/components/src/combobox-control/stories/index.js
+@@ -266,7 +266,7 @@ const mapCountryOption = ( country ) => ( {
+ 
+ const countryOptions = countries.map( mapCountryOption );
+ 
+-function CountryCodeComboboxControl() {
++function CountryCodeComboboxControl( { allowReset } ) {
+ 	const [ value, setValue ] = useState( null );
+ 
+ 	return (
+@@ -276,9 +276,13 @@ function CountryCodeComboboxControl() {
+ 				onChange={ setValue }
+ 				label="Select a country"
+ 				options={ countryOptions }
++				allowReset={ allowReset }
+ 			/>
+ 			<p>Value: { value }</p>
+ 		</>
+ 	);
+ }
+-export const _default = () => <CountryCodeComboboxControl />;
++export const _default = CountryCodeComboboxControl.bind( {} );
++_default.args = {
++	allowReset: false,
++};
+diff --git a/packages/components/src/combobox-control/style.scss b/packages/components/src/combobox-control/style.scss
+index 3cb0a8272e65c8..51004a533b4305 100644
+--- a/packages/components/src/combobox-control/style.scss
++++ b/packages/components/src/combobox-control/style.scss
+@@ -40,7 +40,7 @@ input.components-combobox-control__input[type="text"] {
+ 
+ .components-combobox-control__reset.components-button {
+ 	display: flex;
+-	height: $grid-unit-30;
+-	min-width: $grid-unit-30;
++	height: $grid-unit-20;
++	min-width: $grid-unit-20;
+ 	padding: 0;
+ }

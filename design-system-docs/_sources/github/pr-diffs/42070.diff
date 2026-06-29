@@ -1,0 +1,67 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 1d230498bc2578..7422ad432c63ab 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -110,6 +110,7 @@ module.exports = {
+ 							'partialRight',
+ 							'random',
+ 							'reject',
++							'repeat',
+ 							'reverse',
+ 							'size',
+ 							'stubFalse',
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a49dcd8b275150..c7621061b29ab4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Internal
+ 
+ -   `TextHighlight`: Convert to TypeScript ([#41698](https://github.com/WordPress/gutenberg/pull/41698)).
++-   `TreeSelect`: Refactor away from `_.repeat()` ([#42070](https://github.com/WordPress/gutenberg/pull/42070/)).
+ 
+ ## 19.14.0 (2022-06-29)
+ 
+diff --git a/packages/components/src/tree-select/index.tsx b/packages/components/src/tree-select/index.tsx
+index d91fa20b4bcfd1..673f6f34ad7282 100644
+--- a/packages/components/src/tree-select/index.tsx
++++ b/packages/components/src/tree-select/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { unescape as unescapeString, repeat, flatMap, compact } from 'lodash';
++import { unescape as unescapeString, flatMap, compact } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -18,7 +18,7 @@ function getSelectOptions( tree: Tree[], level = 0 ): SelectOptions {
+ 		{
+ 			value: treeNode.id,
+ 			label:
+-				repeat( '\u00A0', level * 3 ) + unescapeString( treeNode.name ),
++				'\u00A0'.repeat( level * 3 ) + unescapeString( treeNode.name ),
+ 		},
+ 		...getSelectOptions( treeNode.children || [], level + 1 ),
+ 	] );
+diff --git a/packages/editor/src/components/page-attributes/parent.js b/packages/editor/src/components/page-attributes/parent.js
+index 9d298d86393711..c0bfaaf38f1df7 100644
+--- a/packages/editor/src/components/page-attributes/parent.js
++++ b/packages/editor/src/components/page-attributes/parent.js
+@@ -5,7 +5,6 @@ import {
+ 	get,
+ 	unescape as unescapeString,
+ 	debounce,
+-	repeat,
+ 	find,
+ 	deburr,
+ } from 'lodash';
+@@ -98,7 +97,7 @@ export function PageAttributesParent() {
+ 				{
+ 					value: treeNode.id,
+ 					label:
+-						repeat( '— ', level ) + unescapeString( treeNode.name ),
++						'— '.repeat( level ) + unescapeString( treeNode.name ),
+ 					rawName: treeNode.name,
+ 				},
+ 				...getOptionsFromTree( treeNode.children || [], level + 1 ),

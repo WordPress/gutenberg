@@ -1,0 +1,1554 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 79569225825084..1f510c80fcfbe8 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -245,7 +245,7 @@ module.exports = {
+ 				'packages/*/src/**/*.[tj]s?(x)',
+ 				'storybook/stories/**/*.[tj]s?(x)',
+ 			],
+-			excludedFiles: [ '**/*.native.js' ],
++			excludedFiles: [ '**/*.@(android|ios|native).[tj]s?(x)' ],
+ 			rules: {
+ 				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+ 				'@wordpress/components-no-unsafe-button-disabled': 'error',
+@@ -255,7 +255,7 @@ module.exports = {
+ 			files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
+ 			excludedFiles: [
+ 				'packages/*/src/**/@(test|stories)/**',
+-				'**/*.@(native|ios|android).js',
++				'**/*.@(android|ios|native).[tj]s?(x)',
+ 			],
+ 			rules: {
+ 				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+@@ -413,15 +413,16 @@ module.exports = {
+ 			// `checkLocalImports` flag, which adds the linting also to relative
+ 			// imports.
+ 			files: [ 'packages/components/src/**' ],
++			excludedFiles: [ '**/*.@(android|ios|native).[tj]s?(x)' ],
+ 			rules: {
+ 				'@wordpress/components-no-unsafe-button-disabled': [
+ 					'error',
+ 					{ checkLocalImports: true },
+ 				],
+-				// '@wordpress/components-no-missing-40px-size-prop': [
+-				// 	'error',
+-				// 	{ checkLocalImports: true },
+-				// ],
++				'@wordpress/components-no-missing-40px-size-prop': [
++					'error',
++					{ checkLocalImports: true },
++				],
+ 			},
+ 		},
+ 		{
+diff --git a/packages/components/src/base-control/stories/index.story.tsx b/packages/components/src/base-control/stories/index.story.tsx
+index a1dfb1303444fa..e0772550a1390f 100644
+--- a/packages/components/src/base-control/stories/index.story.tsx
++++ b/packages/components/src/base-control/stories/index.story.tsx
+@@ -64,7 +64,9 @@ export const WithVisualLabel: StoryFn< typeof BaseControl > = ( props ) => {
+ 		<BaseControl { ...props }>
+ 			<BaseControl.VisualLabel>Visual label</BaseControl.VisualLabel>
+ 			<div>
+-				<Button variant="secondary">Select an author</Button>
++				<Button __next40pxDefaultSize variant="secondary">
++					Select an author
++				</Button>
+ 			</div>
+ 		</BaseControl>
+ 	);
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index 94e1728076b181..719ac2206ef657 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -75,6 +75,9 @@ const BorderBoxControlSplitControls = (
+ 	return (
+ 		<Grid { ...otherProps } ref={ mergedRef } gap={ 3 }>
+ 			<BorderBoxControlVisualizer value={ value } size={ size } />
++
++			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
++			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+ 			<BorderControl
+ 				className={ centeredClassName }
+ 				hideLabelFromVision
+@@ -84,6 +87,8 @@ const BorderBoxControlSplitControls = (
+ 				value={ value?.top }
+ 				{ ...sharedBorderControlProps }
+ 			/>
++			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
++			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+ 			<BorderControl
+ 				hideLabelFromVision
+ 				label={ __( 'Left border' ) }
+@@ -92,6 +97,8 @@ const BorderBoxControlSplitControls = (
+ 				value={ value?.left }
+ 				{ ...sharedBorderControlProps }
+ 			/>
++			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
++			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+ 			<BorderControl
+ 				className={ rightAlignedClassName }
+ 				hideLabelFromVision
+@@ -101,6 +108,8 @@ const BorderBoxControlSplitControls = (
+ 				value={ value?.right }
+ 				{ ...sharedBorderControlProps }
+ 			/>
++			{ /* Disable reason: BorderControl's size is being controlled via the `size` prop by the parent component  */ }
++			{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+ 			<BorderControl
+ 				className={ centeredClassName }
+ 				hideLabelFromVision
+diff --git a/packages/components/src/border-box-control/stories/index.story.tsx b/packages/components/src/border-box-control/stories/index.story.tsx
+index 52575b5137b521..113c8b352603df 100644
+--- a/packages/components/src/border-box-control/stories/index.story.tsx
++++ b/packages/components/src/border-box-control/stories/index.story.tsx
+@@ -53,6 +53,7 @@ const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
+ 	return (
+ 		<>
+ 			<BorderBoxControl
++				__next40pxDefaultSize
+ 				{ ...otherProps }
+ 				onChange={ onChangeMerged }
+ 				value={ borders }
+@@ -71,6 +72,7 @@ const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
+ 				convenience.
+ 			</p>
+ 			<Button
++				__next40pxDefaultSize
+ 				variant="primary"
+ 				onClick={ () => onChangeMerged( undefined ) }
+ 			>
+diff --git a/packages/components/src/border-box-control/test/index.tsx b/packages/components/src/border-box-control/test/index.tsx
+index 74501f7fccc7ac..61d733cd3a812f 100644
+--- a/packages/components/src/border-box-control/test/index.tsx
++++ b/packages/components/src/border-box-control/test/index.tsx
+@@ -1,6 +1,7 @@
+ /**
+  * External dependencies
+  */
++import type { ComponentProps } from 'react';
+ import { render, screen, waitFor } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+@@ -44,16 +45,23 @@ const props = {
+ 		props.value = newValue;
+ 	} ),
+ 	value: undefined,
+-	__next40pxDefaultSize: true,
+ };
+ 
+ const toggleLabelRegex = /Border color( and style)* picker/;
+ const colorPickerRegex = /Border color picker/;
+ 
++function TestBorderBoxControl(
++	restProps: ComponentProps< typeof BorderBoxControl >
++) {
++	return (
++		<BorderBoxControl __next40pxDefaultSize { ...props } { ...restProps } />
++	);
++}
++
+ describe( 'BorderBoxControl', () => {
+ 	describe( 'Linked view rendering', () => {
+ 		it( 'should render correctly when no value provided', () => {
+-			render( <BorderBoxControl { ...props } /> );
++			render( <TestBorderBoxControl { ...props } /> );
+ 
+ 			const label = screen.getByText( props.label );
+ 			const colorButton = screen.getByLabelText( toggleLabelRegex );
+@@ -78,7 +86,7 @@ describe( 'BorderBoxControl', () => {
+ 		} );
+ 
+ 		it( 'should hide label', () => {
+-			render( <BorderBoxControl { ...props } hideLabelFromVision /> );
++			render( <TestBorderBoxControl { ...props } hideLabelFromVision /> );
+ 
+ 			const label = screen.getByText( props.label );
+ 
+@@ -92,7 +100,9 @@ describe( 'BorderBoxControl', () => {
+ 		} );
+ 
+ 		it( 'should show correct width value when flat border value provided', () => {
+-			render( <BorderBoxControl { ...props } value={ defaultBorder } /> );
++			render(
++				<TestBorderBoxControl { ...props } value={ defaultBorder } />
++			);
+ 
+ 			const widthInput = screen.getByRole( 'spinbutton', {
+ 				name: 'Border width',
+@@ -103,7 +113,7 @@ describe( 'BorderBoxControl', () => {
+ 
+ 		it( 'should show correct width value when consistent split borders provided', () => {
+ 			render(
+-				<BorderBoxControl { ...props } value={ defaultBorders } />
++				<TestBorderBoxControl { ...props } value={ defaultBorders } />
+ 			);
+ 
+ 			const widthInput = screen.getByRole( 'spinbutton', {
+@@ -116,7 +126,9 @@ describe( 'BorderBoxControl', () => {
+ 		it( 'should render placeholder and omit unit select when border values are mixed', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <BorderBoxControl { ...props } value={ mixedBorders } /> );
++			render(
++				<TestBorderBoxControl { ...props } value={ mixedBorders } />
++			);
+ 
+ 			// There are 4 inputs when in unlinked mode (top/right/bottom/left)
+ 			expect(
+@@ -155,7 +167,7 @@ describe( 'BorderBoxControl', () => {
+ 
+ 			// Render control with mixed border values but consistent widths.
+ 			render(
+-				<BorderBoxControl
++				<TestBorderBoxControl
+ 					{ ...props }
+ 					value={ {
+ 						top: { color: 'red', width: '5px', style: 'solid' },
+@@ -193,7 +205,9 @@ describe( 'BorderBoxControl', () => {
+ 		it( 'should omit style options when requested', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <BorderBoxControl { ...props } enableStyle={ false } /> );
++			render(
++				<TestBorderBoxControl { ...props } enableStyle={ false } />
++			);
+ 
+ 			const colorButton = screen.getByLabelText( colorPickerRegex );
+ 			await user.click( colorButton );
+@@ -220,7 +234,9 @@ describe( 'BorderBoxControl', () => {
+ 
+ 	describe( 'Split view rendering', () => {
+ 		it( 'should render split view by default when mixed values provided', () => {
+-			render( <BorderBoxControl { ...props } value={ mixedBorders } /> );
++			render(
++				<TestBorderBoxControl { ...props } value={ mixedBorders } />
++			);
+ 
+ 			const colorButtons = screen.getAllByLabelText( toggleLabelRegex );
+ 			const widthInputs = screen.getAllByRole( 'spinbutton', {
+@@ -242,7 +258,9 @@ describe( 'BorderBoxControl', () => {
+ 		} );
+ 
+ 		it( 'should render correct width values in appropriate inputs', () => {
+-			render( <BorderBoxControl { ...props } value={ mixedBorders } /> );
++			render(
++				<TestBorderBoxControl { ...props } value={ mixedBorders } />
++			);
+ 
+ 			const widthInputs = screen.getAllByRole( 'spinbutton', {
+ 				name: 'Border width',
+@@ -258,7 +276,7 @@ describe( 'BorderBoxControl', () => {
+ 			const user = userEvent.setup();
+ 
+ 			render(
+-				<BorderBoxControl { ...props } value={ defaultBorders } />
++				<TestBorderBoxControl { ...props } value={ defaultBorders } />
+ 			);
+ 
+ 			await user.click(
+@@ -283,7 +301,7 @@ describe( 'BorderBoxControl', () => {
+ 				const user = userEvent.setup();
+ 
+ 				render(
+-					<BorderBoxControl { ...props } enableStyle={ false } />
++					<TestBorderBoxControl { ...props } enableStyle={ false } />
+ 				);
+ 
+ 				await user.click(
+@@ -318,7 +336,10 @@ describe( 'BorderBoxControl', () => {
+ 				const user = userEvent.setup();
+ 
+ 				render(
+-					<BorderBoxControl { ...props } value={ { width: '1px' } } />
++					<TestBorderBoxControl
++						{ ...props }
++						value={ { width: '1px' } }
++					/>
+ 				);
+ 
+ 				await user.clear(
+@@ -332,7 +353,10 @@ describe( 'BorderBoxControl', () => {
+ 				const user = userEvent.setup();
+ 
+ 				render(
+-					<BorderBoxControl { ...props } value={ defaultBorder } />
++					<TestBorderBoxControl
++						{ ...props }
++						value={ defaultBorder }
++					/>
+ 				);
+ 
+ 				const widthInput = screen.getByRole( 'spinbutton', {
+@@ -351,7 +375,7 @@ describe( 'BorderBoxControl', () => {
+ 				const user = userEvent.setup();
+ 
+ 				render(
+-					<BorderBoxControl
++					<TestBorderBoxControl
+ 						{ ...props }
+ 						value={ {
+ 							top: { color: '#72aee6' },
+@@ -384,7 +408,10 @@ describe( 'BorderBoxControl', () => {
+ 				const user = userEvent.setup();
+ 
+ 				render(
+-					<BorderBoxControl { ...props } value={ defaultBorders } />
++					<TestBorderBoxControl
++						{ ...props }
++						value={ defaultBorders }
++					/>
+ 				);
+ 
+ 				const widthInput = screen.getByRole( 'spinbutton', {
+@@ -403,7 +430,7 @@ describe( 'BorderBoxControl', () => {
+ 				const user = userEvent.setup();
+ 
+ 				render(
+-					<BorderBoxControl
++					<TestBorderBoxControl
+ 						{ ...props }
+ 						value={ {
+ 							top: { width: '1px' },
+@@ -425,7 +452,7 @@ describe( 'BorderBoxControl', () => {
+ 				const user = userEvent.setup();
+ 
+ 				render(
+-					<BorderBoxControl
++					<TestBorderBoxControl
+ 						{ ...props }
+ 						value={ {
+ 							top: { ...defaultBorder, width: '1px' },
+@@ -464,7 +491,9 @@ describe( 'BorderBoxControl', () => {
+ 					left: { ...defaultBorder, width: '4px' },
+ 				};
+ 
+-				render( <BorderBoxControl { ...props } value={ borders } /> );
++				render(
++					<TestBorderBoxControl { ...props } value={ borders } />
++				);
+ 
+ 				const widthInput = screen.getAllByRole( 'spinbutton', {
+ 					name: 'Border width',
+@@ -488,7 +517,9 @@ describe( 'BorderBoxControl', () => {
+ 					left: { ...defaultBorder, width: '1px' },
+ 				};
+ 
+-				render( <BorderBoxControl { ...props } value={ borders } /> );
++				render(
++					<TestBorderBoxControl { ...props } value={ borders } />
++				);
+ 
+ 				const widthInput = screen.getAllByRole( 'spinbutton', {
+ 					name: 'Border width',
+diff --git a/packages/components/src/border-control/stories/index.story.tsx b/packages/components/src/border-control/stories/index.story.tsx
+index 273786503c9226..28406cdc7623d8 100644
+--- a/packages/components/src/border-control/stories/index.story.tsx
++++ b/packages/components/src/border-control/stories/index.story.tsx
+@@ -82,6 +82,7 @@ const Template: StoryFn< typeof BorderControl > = ( {
+ 
+ 	return (
+ 		<BorderControl
++			__next40pxDefaultSize
+ 			onChange={ onChangeMerged }
+ 			value={ border }
+ 			{ ...props }
+diff --git a/packages/components/src/border-control/test/index.js b/packages/components/src/border-control/test/index.js
+index c3e3987ed13517..dc697fffca19ca 100644
+--- a/packages/components/src/border-control/test/index.js
++++ b/packages/components/src/border-control/test/index.js
+@@ -37,7 +37,6 @@ function createProps( customProps ) {
+ 			props.value = newValue;
+ 		} ),
+ 		value: defaultBorder,
+-		__next40pxDefaultSize: true,
+ 		...customProps,
+ 	};
+ 	return props;
+@@ -77,11 +76,15 @@ const getWidthInput = () => {
+ 	return screen.getByRole( 'spinbutton', { name: 'Border width' } );
+ };
+ 
++function TestBorderControl( restProps ) {
++	return <BorderControl __next40pxDefaultSize { ...restProps } />;
++}
++
+ describe( 'BorderControl', () => {
+ 	describe( 'basic rendering', () => {
+ 		it( 'should render standard border control', () => {
+ 			const props = createProps();
+-			render( <BorderControl { ...props } /> );
++			render( <TestBorderControl { ...props } /> );
+ 
+ 			const label = screen.getByText( props.label );
+ 			const colorButton = screen.getByLabelText( toggleLabelRegex );
+@@ -102,7 +105,7 @@ describe( 'BorderControl', () => {
+ 
+ 		it( 'should hide label', () => {
+ 			const props = createProps( { hideLabelFromVision: true } );
+-			render( <BorderControl { ...props } /> );
++			render( <TestBorderControl { ...props } /> );
+ 			const label = screen.getByText( props.label );
+ 
+ 			// As visually hidden labels are still included in the document
+@@ -116,7 +119,7 @@ describe( 'BorderControl', () => {
+ 
+ 		it( 'should render with slider', () => {
+ 			const props = createProps( { withSlider: true } );
+-			render( <BorderControl { ...props } /> );
++			render( <TestBorderControl { ...props } /> );
+ 
+ 			const slider = getSliderInput();
+ 			expect( slider ).toBeInTheDocument();
+@@ -124,7 +127,7 @@ describe( 'BorderControl', () => {
+ 
+ 		it( 'should render placeholder in UnitControl', () => {
+ 			const props = createProps( { placeholder: 'Mixed' } );
+-			render( <BorderControl { ...props } /> );
++			render( <TestBorderControl { ...props } /> );
+ 
+ 			const widthInput = getWidthInput();
+ 			expect( widthInput ).toHaveAttribute( 'placeholder', 'Mixed' );
+@@ -133,7 +136,7 @@ describe( 'BorderControl', () => {
+ 		it( 'should render color and style popover', async () => {
+ 			const user = userEvent.setup();
+ 			const props = createProps();
+-			render( <BorderControl { ...props } /> );
++			render( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 
+ 			const customColorPicker = getButton( /Custom color picker/ );
+@@ -160,7 +163,7 @@ describe( 'BorderControl', () => {
+ 		it( 'should not render style options when opted out of', async () => {
+ 			const user = userEvent.setup();
+ 			const props = createProps( { enableStyle: false } );
+-			render( <BorderControl { ...props } /> );
++			render( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 
+ 			const styleLabel = screen.queryByText( 'Style' );
+@@ -179,7 +182,7 @@ describe( 'BorderControl', () => {
+ 		describe( 'with style selection enabled', () => {
+ 			it( 'should include both color and style in label', () => {
+ 				const props = createProps( { value: undefined } );
+-				render( <BorderControl { ...props } /> );
++				render( <TestBorderControl { ...props } /> );
+ 
+ 				expect(
+ 					screen.getByLabelText( 'Border color and style picker.' )
+@@ -188,7 +191,7 @@ describe( 'BorderControl', () => {
+ 
+ 			it( 'should correctly describe named color selection', () => {
+ 				const props = createProps( { value: { color: '#72aee6' } } );
+-				render( <BorderControl { ...props } /> );
++				render( <TestBorderControl { ...props } /> );
+ 
+ 				expect(
+ 					screen.getByLabelText(
+@@ -199,7 +202,7 @@ describe( 'BorderControl', () => {
+ 
+ 			it( 'should correctly describe custom color selection', () => {
+ 				const props = createProps( { value: { color: '#4b1d80' } } );
+-				render( <BorderControl { ...props } /> );
++				render( <TestBorderControl { ...props } /> );
+ 
+ 				expect(
+ 					screen.getByLabelText(
+@@ -212,7 +215,7 @@ describe( 'BorderControl', () => {
+ 				const props = createProps( {
+ 					value: { color: '#72aee6', style: 'dotted' },
+ 				} );
+-				render( <BorderControl { ...props } /> );
++				render( <TestBorderControl { ...props } /> );
+ 
+ 				expect(
+ 					screen.getByLabelText(
+@@ -225,7 +228,7 @@ describe( 'BorderControl', () => {
+ 				const props = createProps( {
+ 					value: { color: '#4b1d80', style: 'dashed' },
+ 				} );
+-				render( <BorderControl { ...props } /> );
++				render( <TestBorderControl { ...props } /> );
+ 
+ 				expect(
+ 					screen.getByLabelText(
+@@ -241,7 +244,7 @@ describe( 'BorderControl', () => {
+ 					value: undefined,
+ 					enableStyle: false,
+ 				} );
+-				render( <BorderControl { ...props } /> );
++				render( <TestBorderControl { ...props } /> );
+ 
+ 				expect(
+ 					screen.getByLabelText( 'Border color picker.' )
+@@ -253,7 +256,7 @@ describe( 'BorderControl', () => {
+ 					value: { color: '#72aee6' },
+ 					enableStyle: false,
+ 				} );
+-				render( <BorderControl { ...props } /> );
++				render( <TestBorderControl { ...props } /> );
+ 
+ 				expect(
+ 					screen.getByLabelText(
+@@ -267,7 +270,7 @@ describe( 'BorderControl', () => {
+ 					value: { color: '#4b1d80' },
+ 					enableStyle: false,
+ 				} );
+-				render( <BorderControl { ...props } /> );
++				render( <TestBorderControl { ...props } /> );
+ 
+ 				expect(
+ 					screen.getByLabelText(
+@@ -281,7 +284,7 @@ describe( 'BorderControl', () => {
+ 	describe( 'onChange handling', () => {
+ 		it( 'should update width with slider value', () => {
+ 			const props = createProps( { withSlider: true } );
+-			const { rerender } = render( <BorderControl { ...props } /> );
++			const { rerender } = render( <TestBorderControl { ...props } /> );
+ 
+ 			const slider = getSliderInput();
+ 			// As per [1], it is not currently possible to reasonably
+@@ -295,7 +298,7 @@ describe( 'BorderControl', () => {
+ 				width: '5px',
+ 			} );
+ 
+-			rerender( <BorderControl { ...props } /> );
++			rerender( <TestBorderControl { ...props } /> );
+ 			const widthInput = getWidthInput();
+ 
+ 			expect( widthInput.value ).toEqual( '5' );
+@@ -304,7 +307,7 @@ describe( 'BorderControl', () => {
+ 		it( 'should update color selection', async () => {
+ 			const user = userEvent.setup();
+ 			const props = createProps();
+-			render( <BorderControl { ...props } /> );
++			render( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 			await user.click( getColorOption( 'Green' ) );
+ 
+@@ -317,7 +320,7 @@ describe( 'BorderControl', () => {
+ 		it( 'should clear color selection when toggling swatch off', async () => {
+ 			const user = userEvent.setup();
+ 			const props = createProps();
+-			render( <BorderControl { ...props } /> );
++			render( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 			await user.click( getColorOption( 'Blue' ) );
+ 
+@@ -330,7 +333,7 @@ describe( 'BorderControl', () => {
+ 		it( 'should update style selection', async () => {
+ 			const user = userEvent.setup();
+ 			const props = createProps();
+-			render( <BorderControl { ...props } /> );
++			render( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 			await user.click( getButton( 'Dashed' ) );
+ 
+@@ -343,7 +346,7 @@ describe( 'BorderControl', () => {
+ 		it( 'should take no action when color and style popover is closed', async () => {
+ 			const user = userEvent.setup();
+ 			const props = createProps();
+-			render( <BorderControl { ...props } /> );
++			render( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 			await user.keyboard( 'Escape' );
+ 
+@@ -353,7 +356,7 @@ describe( 'BorderControl', () => {
+ 		it( 'should reset color and style only when popover reset button clicked', async () => {
+ 			const user = userEvent.setup();
+ 			const props = createProps();
+-			render( <BorderControl { ...props } /> );
++			render( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 			await user.click( getButton( 'Reset' ) );
+ 
+@@ -367,9 +370,9 @@ describe( 'BorderControl', () => {
+ 		it( 'should sanitize border when width and color are undefined', async () => {
+ 			const user = userEvent.setup();
+ 			const props = createProps();
+-			const { rerender } = render( <BorderControl { ...props } /> );
++			const { rerender } = render( <TestBorderControl { ...props } /> );
+ 			await user.clear( getWidthInput() );
+-			rerender( <BorderControl { ...props } /> );
++			rerender( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 			await user.click( getColorOption( 'Blue' ) );
+ 
+@@ -381,9 +384,9 @@ describe( 'BorderControl', () => {
+ 			const props = createProps( {
+ 				shouldSanitizeBorder: false,
+ 			} );
+-			const { rerender } = render( <BorderControl { ...props } /> );
++			const { rerender } = render( <TestBorderControl { ...props } /> );
+ 			await user.clear( getWidthInput() );
+-			rerender( <BorderControl { ...props } /> );
++			rerender( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 			await user.click( getColorOption( 'Blue' ) );
+ 
+@@ -397,7 +400,7 @@ describe( 'BorderControl', () => {
+ 		it( 'should clear color and set style to `none` when setting zero width', async () => {
+ 			const user = userEvent.setup();
+ 			const props = createProps();
+-			render( <BorderControl { ...props } /> );
++			render( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 			await user.click( getColorOption( 'Green' ) );
+ 			await user.click( getButton( 'Dotted' ) );
+@@ -416,12 +419,12 @@ describe( 'BorderControl', () => {
+ 		it( 'should reselect color and style selections when changing to non-zero width', async () => {
+ 			const user = userEvent.setup();
+ 			const props = createProps();
+-			const { rerender } = render( <BorderControl { ...props } /> );
++			const { rerender } = render( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 			await user.click( getColorOption( 'Green' ) );
+-			rerender( <BorderControl { ...props } /> );
++			rerender( <TestBorderControl { ...props } /> );
+ 			await user.click( getButton( 'Dotted' ) );
+-			rerender( <BorderControl { ...props } /> );
++			rerender( <TestBorderControl { ...props } /> );
+ 			const widthInput = getWidthInput();
+ 			await user.type( widthInput, '0', {
+ 				initialSelectionStart: 0,
+@@ -442,7 +445,7 @@ describe( 'BorderControl', () => {
+ 		it( 'should set a non-zero width when applying color to zero width border', async () => {
+ 			const user = userEvent.setup();
+ 			const props = createProps( { value: undefined } );
+-			const { rerender } = render( <BorderControl { ...props } /> );
++			const { rerender } = render( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 			await user.click( getColorOption( 'Yellow' ) );
+ 
+@@ -454,7 +457,7 @@ describe( 'BorderControl', () => {
+ 
+ 			await user.type( getWidthInput(), '0' );
+ 
+-			rerender( <BorderControl { ...props } /> );
++			rerender( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 			await user.click( getColorOption( 'Green' ) );
+ 
+@@ -471,7 +474,7 @@ describe( 'BorderControl', () => {
+ 				value: undefined,
+ 				shouldSanitizeBorder: false,
+ 			} );
+-			const { rerender } = render( <BorderControl { ...props } /> );
++			const { rerender } = render( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 			await user.click( getButton( 'Dashed' ) );
+ 
+@@ -483,7 +486,7 @@ describe( 'BorderControl', () => {
+ 
+ 			await user.type( getWidthInput(), '0' );
+ 
+-			rerender( <BorderControl { ...props } /> );
++			rerender( <TestBorderControl { ...props } /> );
+ 			await openPopover( user );
+ 			await user.click( getButton( 'Dotted' ) );
+ 
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index c5bf28a13de3ad..9d37558d2b2408 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -188,6 +188,8 @@ function BoxControl( {
+ 			</BaseControl.VisualLabel>
+ 			{ isLinked && (
+ 				<InputWrapper>
++					{ /* Disable reason: the parent component is handling the __next40pxDefaultSize prop */ }
++					{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+ 					<InputControl side="all" { ...inputControlProps } />
+ 				</InputWrapper>
+ 			) }
+@@ -203,6 +205,8 @@ function BoxControl( {
+ 			{ ! isLinked &&
+ 				splitOnAxis &&
+ 				[ 'vertical', 'horizontal' ].map( ( axis ) => (
++					// Disable reason: the parent component is handling the __next40pxDefaultSize prop
++					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+ 					<InputControl
+ 						key={ axis }
+ 						side={ axis as 'horizontal' | 'vertical' }
+@@ -212,6 +216,8 @@ function BoxControl( {
+ 			{ ! isLinked &&
+ 				! splitOnAxis &&
+ 				Array.from( sidesToRender ).map( ( axis ) => (
++					// Disable reason: the parent component is handling the __next40pxDefaultSize prop
++					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+ 					<InputControl
+ 						key={ axis }
+ 						side={ axis }
+diff --git a/packages/components/src/box-control/stories/index.story.tsx b/packages/components/src/box-control/stories/index.story.tsx
+index 5701e2001c602d..387e5604af7877 100644
+--- a/packages/components/src/box-control/stories/index.story.tsx
++++ b/packages/components/src/box-control/stories/index.story.tsx
+@@ -31,7 +31,7 @@ const meta: Meta< typeof BoxControl > = {
+ export default meta;
+ 
+ const TemplateUncontrolled: StoryFn< typeof BoxControl > = ( props ) => {
+-	return <BoxControl { ...props } />;
++	return <BoxControl __next40pxDefaultSize { ...props } />;
+ };
+ 
+ const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
+@@ -39,6 +39,7 @@ const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
+ 
+ 	return (
+ 		<BoxControl
++			__next40pxDefaultSize
+ 			values={ values }
+ 			{ ...props }
+ 			onChange={ ( nextValue ) => {
+diff --git a/packages/components/src/button-group/stories/index.story.tsx b/packages/components/src/button-group/stories/index.story.tsx
+index efd1d5114c5b6e..30ce197d80da61 100644
+--- a/packages/components/src/button-group/stories/index.story.tsx
++++ b/packages/components/src/button-group/stories/index.story.tsx
+@@ -33,8 +33,10 @@ export const Default: StoryObj< typeof ButtonGroup > = {
+ 	args: {
+ 		children: (
+ 			<>
+-				<Button variant="primary">Button 1</Button>
+-				<Button>Button 2</Button>
++				<Button __next40pxDefaultSize variant="primary">
++					Button 1
++				</Button>
++				<Button __next40pxDefaultSize>Button 2</Button>
+ 			</>
+ 		),
+ 	},
+diff --git a/packages/components/src/button/deprecated.tsx b/packages/components/src/button/deprecated.tsx
+index 5d39e53c1008c1..307f1ca7901679 100644
+--- a/packages/components/src/button/deprecated.tsx
++++ b/packages/components/src/button/deprecated.tsx
+@@ -33,6 +33,8 @@ function UnforwardedIconButton(
+ 	} );
+ 
+ 	return (
++		// Disable reason: the parent component is taking care of the __next40pxDefaultSize prop.
++		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+ 		<Button
+ 			{ ...props }
+ 			ref={ ref }
+diff --git a/packages/components/src/button/stories/e2e/index.story.tsx b/packages/components/src/button/stories/e2e/index.story.tsx
+index 4430897c402a59..9a03245bc2ef08 100644
+--- a/packages/components/src/button/stories/e2e/index.story.tsx
++++ b/packages/components/src/button/stories/e2e/index.story.tsx
+@@ -53,6 +53,7 @@ export const VariantStates: StoryFn< typeof Button > = (
+ 				{ variants.map( ( variant ) => (
+ 					<td key={ variant ?? 'undefined' } style={ { padding: 4 } }>
+ 						<Button
++							__next40pxDefaultSize
+ 							{ ...props }
+ 							variant={ variant }
+ 							{ ...buttonProps }
+@@ -149,13 +150,16 @@ Icon.args = {
+ export const Dashicons: StoryFn< typeof Button > = ( props ) => {
+ 	return (
+ 		<div style={ { display: 'flex', gap: 8 } }>
+-			<Button { ...props } />
+-			<Button { ...props }>Children</Button>
+-			<Button { ...props } iconPosition="right">
++			<Button __next40pxDefaultSize { ...props } />
++			<Button __next40pxDefaultSize { ...props }>
++				Children
++			</Button>
++			<Button __next40pxDefaultSize { ...props } iconPosition="right">
+ 				Children (icon right)
+ 			</Button>
+-			<Button { ...props } text="Text" />
++			<Button __next40pxDefaultSize { ...props } text="Text" />
+ 			<Button
++				__next40pxDefaultSize
+ 				{ ...props }
+ 				text="Text (icon right)"
+ 				iconPosition="right"
+diff --git a/packages/components/src/button/stories/index.story.tsx b/packages/components/src/button/stories/index.story.tsx
+index 9d38a06086c518..63759ea7929808 100644
+--- a/packages/components/src/button/stories/index.story.tsx
++++ b/packages/components/src/button/stories/index.story.tsx
+@@ -57,7 +57,7 @@ const meta: Meta< typeof Button > = {
+ export default meta;
+ 
+ const Template: StoryFn< typeof Button > = ( props ) => {
+-	return <Button { ...props }></Button>;
++	return <Button __next40pxDefaultSize { ...props }></Button>;
+ };
+ 
+ export const Default = Template.bind( {} );
+@@ -126,9 +126,13 @@ export const GroupedIcons = () => {
+ 
+ 	return (
+ 		<GroupContainer>
+-			<Button icon={ formatBold } label="Bold" />
+-			<Button icon={ formatItalic } label="Italic" />
+-			<Button icon={ link } label="Link" />
++			<Button __next40pxDefaultSize icon={ formatBold } label="Bold" />
++			<Button
++				__next40pxDefaultSize
++				icon={ formatItalic }
++				label="Italic"
++			/>
++			<Button __next40pxDefaultSize icon={ link } label="Link" />
+ 		</GroupContainer>
+ 	);
+ };
+diff --git a/packages/components/src/card/stories/index.story.tsx b/packages/components/src/card/stories/index.story.tsx
+index 1f52160598d3a2..9ff67298205fbf 100644
+--- a/packages/components/src/card/stories/index.story.tsx
++++ b/packages/components/src/card/stories/index.story.tsx
+@@ -66,7 +66,9 @@ export const Default: StoryObj< typeof Card > = {
+ 				</CardMedia>
+ 				<CardFooter>
+ 					<Text>CardFooter</Text>
+-					<Button variant="secondary">Action Button</Button>
++					<Button __next40pxDefaultSize variant="secondary">
++						Action Button
++					</Button>
+ 				</CardFooter>
+ 			</>
+ 		),
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+index 8b01bae9173e64..88f5ffc2706e79 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+@@ -31,6 +31,7 @@ function UnforwardedOptionAsButton(
+ 	const { isPressed, label, ...additionalProps } = props;
+ 	return (
+ 		<Button
++			__next40pxDefaultSize
+ 			{ ...additionalProps }
+ 			aria-pressed={ isPressed }
+ 			ref={ forwardedRef }
+@@ -67,6 +68,7 @@ function UnforwardedOptionAsOption(
+ 		<Composite.Item
+ 			render={
+ 				<Button
++					__next40pxDefaultSize
+ 					{ ...additionalProps }
+ 					role="option"
+ 					aria-selected={ !! isSelected }
+@@ -97,7 +99,6 @@ export function Option( {
+ 	const commonProps = {
+ 		id,
+ 		className: 'components-circular-option-picker__option',
+-		__next40pxDefaultSize: true,
+ 		...additionalProps,
+ 	};
+ 
+diff --git a/packages/components/src/clipboard-button/index.tsx b/packages/components/src/clipboard-button/index.tsx
+index 492ab64b7290e2..2ae55c1ea7d66f 100644
+--- a/packages/components/src/clipboard-button/index.tsx
++++ b/packages/components/src/clipboard-button/index.tsx
+@@ -65,6 +65,8 @@ export default function ClipboardButton( {
+ 	};
+ 
+ 	return (
++		// Disable reasons: the parent component takes care of the __next40pxDefaultSize prop.
++		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+ 		<Button
+ 			{ ...buttonProps }
+ 			className={ classes }
+diff --git a/packages/components/src/clipboard-button/types.ts b/packages/components/src/clipboard-button/types.ts
+index 7987230598fbbb..fb9f1aa72c711a 100644
+--- a/packages/components/src/clipboard-button/types.ts
++++ b/packages/components/src/clipboard-button/types.ts
+@@ -8,4 +8,5 @@ export interface ClipboardButtonProps {
+ 	onCopy: () => void;
+ 	onFinishCopy?: () => void;
+ 	text: string;
++	__next40pxDefaultSize?: boolean;
+ }
+diff --git a/packages/components/src/combobox-control/stories/index.story.tsx b/packages/components/src/combobox-control/stories/index.story.tsx
+index 8822e3277af338..20986552270d09 100644
+--- a/packages/components/src/combobox-control/stories/index.story.tsx
++++ b/packages/components/src/combobox-control/stories/index.story.tsx
+@@ -69,6 +69,7 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
+ 	return (
+ 		<>
+ 			<ComboboxControl
++				__next40pxDefaultSize
+ 				{ ...args }
+ 				value={ value }
+ 				onChange={ ( ...changeArgs ) => {
+diff --git a/packages/components/src/confirm-dialog/stories/index.story.tsx b/packages/components/src/confirm-dialog/stories/index.story.tsx
+index 49a58e93f6eb05..9c0ef4d1df88d3 100644
+--- a/packages/components/src/confirm-dialog/stories/index.story.tsx
++++ b/packages/components/src/confirm-dialog/stories/index.story.tsx
+@@ -58,7 +58,11 @@ const Template: StoryFn< typeof ConfirmDialog > = ( {
+ 
+ 	return (
+ 		<>
+-			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
++			<Button
++				__next40pxDefaultSize
++				variant="primary"
++				onClick={ () => setIsOpen( true ) }
++			>
+ 				Open ConfirmDialog
+ 			</Button>
+ 
+diff --git a/packages/components/src/custom-select-control/stories/index.story.tsx b/packages/components/src/custom-select-control/stories/index.story.tsx
+index 2144bf9da90f7a..05df59bf362a42 100644
+--- a/packages/components/src/custom-select-control/stories/index.story.tsx
++++ b/packages/components/src/custom-select-control/stories/index.story.tsx
+@@ -57,6 +57,7 @@ const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
+ 
+ 	return (
+ 		<CustomSelectControl
++			__next40pxDefaultSize
+ 			{ ...props }
+ 			onChange={ onChange }
+ 			value={ value }
+diff --git a/packages/components/src/dropdown/stories/index.story.tsx b/packages/components/src/dropdown/stories/index.story.tsx
+index e64ccbb77ed034..bed896fd09416f 100644
+--- a/packages/components/src/dropdown/stories/index.story.tsx
++++ b/packages/components/src/dropdown/stories/index.story.tsx
+@@ -49,6 +49,7 @@ export const Default: StoryObj< typeof Dropdown > = {
+ 	args: {
+ 		renderToggle: ( { isOpen, onToggle } ) => (
+ 			<Button
++				__next40pxDefaultSize
+ 				onClick={ onToggle }
+ 				aria-expanded={ isOpen }
+ 				variant="primary"
+diff --git a/packages/components/src/font-size-picker/stories/e2e/index.story.tsx b/packages/components/src/font-size-picker/stories/e2e/index.story.tsx
+index 2955513f95a510..62ec7c17a6ebe1 100644
+--- a/packages/components/src/font-size-picker/stories/e2e/index.story.tsx
++++ b/packages/components/src/font-size-picker/stories/e2e/index.story.tsx
+@@ -25,6 +25,7 @@ const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
+ 	const [ fontSize, setFontSize ] = useState( value );
+ 	return (
+ 		<FontSizePicker
++			__next40pxDefaultSize
+ 			{ ...props }
+ 			value={ fontSize }
+ 			onChange={ setFontSize }
+@@ -35,6 +36,7 @@ const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
+ export const Default: StoryFn< typeof FontSizePicker > =
+ 	FontSizePickerWithState.bind( {} );
+ Default.args = {
++	__next40pxDefaultSize: true,
+ 	fontSizes: [
+ 		{
+ 			name: 'Small',
+diff --git a/packages/components/src/font-size-picker/stories/index.story.tsx b/packages/components/src/font-size-picker/stories/index.story.tsx
+index 1b875447f7c5c4..e283ca6b01fd68 100644
+--- a/packages/components/src/font-size-picker/stories/index.story.tsx
++++ b/packages/components/src/font-size-picker/stories/index.story.tsx
+@@ -42,6 +42,7 @@ const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
+ 	const [ fontSize, setFontSize ] = useState( value );
+ 	return (
+ 		<FontSizePicker
++			__next40pxDefaultSize
+ 			{ ...props }
+ 			value={ fontSize }
+ 			onChange={ ( nextValue ) => {
+diff --git a/packages/components/src/form-file-upload/index.tsx b/packages/components/src/form-file-upload/index.tsx
+index 5e1466cf9c79d2..afd854bc48ef67 100644
+--- a/packages/components/src/form-file-upload/index.tsx
++++ b/packages/components/src/form-file-upload/index.tsx
+@@ -54,6 +54,8 @@ export function FormFileUpload( {
+ 	const ui = render ? (
+ 		render( { openFileDialog } )
+ 	) : (
++		// Disable reason: the parent component already takes care of the `__next40pxDefaultSize` prop.
++		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+ 		<Button onClick={ openFileDialog } { ...props }>
+ 			{ children }
+ 		</Button>
+diff --git a/packages/components/src/form-file-upload/stories/index.story.tsx b/packages/components/src/form-file-upload/stories/index.story.tsx
+index ac346a648c7e77..b16bba9aeddd5d 100644
+--- a/packages/components/src/form-file-upload/stories/index.story.tsx
++++ b/packages/components/src/form-file-upload/stories/index.story.tsx
+@@ -30,7 +30,7 @@ const meta: Meta< typeof FormFileUpload > = {
+ export default meta;
+ 
+ const Template: StoryFn< typeof FormFileUpload > = ( props ) => {
+-	return <FormFileUpload { ...props } />;
++	return <FormFileUpload __next40pxDefaultSize { ...props } />;
+ };
+ 
+ export const Default = Template.bind( {} );
+diff --git a/packages/components/src/form-token-field/stories/index.story.tsx b/packages/components/src/form-token-field/stories/index.story.tsx
+index ffadb86648b968..1b28d63ec7aa6e 100644
+--- a/packages/components/src/form-token-field/stories/index.story.tsx
++++ b/packages/components/src/form-token-field/stories/index.story.tsx
+@@ -50,6 +50,7 @@ const DefaultTemplate: StoryFn< typeof FormTokenField > = ( { ...args } ) => {
+ 
+ 	return (
+ 		<FormTokenField
++			__next40pxDefaultSize
+ 			{ ...args }
+ 			value={ selectedContinents }
+ 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
+@@ -90,6 +91,7 @@ export const Async: StoryFn< typeof FormTokenField > = ( {
+ 
+ 	return (
+ 		<FormTokenField
++			__next40pxDefaultSize
+ 			{ ...args }
+ 			value={ selectedContinents }
+ 			suggestions={ availableContinents }
+diff --git a/packages/components/src/guide/stories/index.story.tsx b/packages/components/src/guide/stories/index.story.tsx
+index c4205892f04a45..910a7a47988f29 100644
+--- a/packages/components/src/guide/stories/index.story.tsx
++++ b/packages/components/src/guide/stories/index.story.tsx
+@@ -35,7 +35,11 @@ const Template: StoryFn< typeof Guide > = ( { onFinish, ...props } ) => {
+ 
+ 	return (
+ 		<>
+-			<Button variant="secondary" onClick={ openGuide }>
++			<Button
++				__next40pxDefaultSize
++				variant="secondary"
++				onClick={ openGuide }
++			>
+ 				Open Guide
+ 			</Button>
+ 			{ isOpen && (
+diff --git a/packages/components/src/input-control/stories/index.story.tsx b/packages/components/src/input-control/stories/index.story.tsx
+index 1abac9280315d1..ed535b1c4b0ad0 100644
+--- a/packages/components/src/input-control/stories/index.story.tsx
++++ b/packages/components/src/input-control/stories/index.story.tsx
+@@ -45,7 +45,7 @@ const meta: Meta< typeof InputControl > = {
+ export default meta;
+ 
+ const Template: StoryFn< typeof InputControl > = ( args ) => (
+-	<InputControl { ...args } />
++	<InputControl __next40pxDefaultSize { ...args } />
+ );
+ 
+ export const Default = Template.bind( {} );
+@@ -123,6 +123,7 @@ export const ShowPassword: StoryFn< typeof InputControl > = ( args ) => {
+ 	const [ visible, setVisible ] = useState( false );
+ 	return (
+ 		<InputControl
++			__next40pxDefaultSize
+ 			type={ visible ? 'text' : 'password' }
+ 			suffix={
+ 				<InputControlSuffixWrapper variant="control">
+diff --git a/packages/components/src/menu/stories/index.story.tsx b/packages/components/src/menu/stories/index.story.tsx
+index be07a97086fc09..d53b8e436a4aab 100644
+--- a/packages/components/src/menu/stories/index.story.tsx
++++ b/packages/components/src/menu/stories/index.story.tsx
+@@ -666,7 +666,10 @@ export const InsideModal: StoryObj< typeof Menu > = {
+ 								</Menu>
+ 							</Menu.Popover>
+ 						</Menu>
+-						<Button onClick={ () => setModalOpen( false ) }>
++						<Button
++							__next40pxDefaultSize
++							onClick={ () => setModalOpen( false ) }
++						>
+ 							Close modal
+ 						</Button>
+ 					</Modal>
+diff --git a/packages/components/src/modal/stories/index.story.tsx b/packages/components/src/modal/stories/index.story.tsx
+index b508fba42e503c..dcfd8debd28b28 100644
+--- a/packages/components/src/modal/stories/index.story.tsx
++++ b/packages/components/src/modal/stories/index.story.tsx
+@@ -58,7 +58,11 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
+ 
+ 	return (
+ 		<>
+-			<Button variant="secondary" onClick={ openModal }>
++			<Button
++				__next40pxDefaultSize
++				variant="secondary"
++				onClick={ openModal }
++			>
+ 				Open Modal
+ 			</Button>
+ 			{ isOpen && (
+@@ -80,7 +84,11 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
+ 						style={ { marginBottom: '20px' } }
+ 					/>
+ 
+-					<Button variant="secondary" onClick={ closeModal }>
++					<Button
++						__next40pxDefaultSize
++						variant="secondary"
++						onClick={ closeModal }
++					>
+ 						Close Modal
+ 					</Button>
+ 				</Modal>
+diff --git a/packages/components/src/navigation/stories/utils/controlled-state.tsx b/packages/components/src/navigation/stories/utils/controlled-state.tsx
+index 9eb682ec0cb6c7..f97a34c079c52a 100644
+--- a/packages/components/src/navigation/stories/utils/controlled-state.tsx
++++ b/packages/components/src/navigation/stories/utils/controlled-state.tsx
+@@ -32,6 +32,7 @@ export const ControlledStateStory: StoryFn< typeof Navigation > = ( {
+ 		children: React.ReactNode;
+ 	} ) => (
+ 		<Button
++			__next40pxDefaultSize
+ 			href={ href }
+ 			// Since we're not actually navigating pages, simulate it with onClick.
+ 			onClick={
+@@ -121,6 +122,7 @@ export const ControlledStateStory: StoryFn< typeof Navigation > = ( {
+ 				</p>
+ 				<p>
+ 					<Button
++						__next40pxDefaultSize
+ 						variant="secondary"
+ 						onClick={ () => {
+ 							setActiveMenu( 'nested-sub-menu' );
+@@ -131,6 +133,7 @@ export const ControlledStateStory: StoryFn< typeof Navigation > = ( {
+ 				</p>
+ 				<p>
+ 					<Button
++						__next40pxDefaultSize
+ 						variant="secondary"
+ 						onClick={ () => {
+ 							setActiveItem( 'child-2' );
+diff --git a/packages/components/src/navigator/stories/index.story.tsx b/packages/components/src/navigator/stories/index.story.tsx
+index d16fba7b2b4033..0ca352a2febaf9 100644
+--- a/packages/components/src/navigator/stories/index.story.tsx
++++ b/packages/components/src/navigator/stories/index.story.tsx
+@@ -141,6 +141,7 @@ const NavigatorButtonWithSkipFocus = ( {
+ 
+ 	return (
+ 		<Button
++			__next40pxDefaultSize
+ 			{ ...props }
+ 			style={ {
+ 				marginInline: '8px',
+diff --git a/packages/components/src/number-control/stories/index.story.tsx b/packages/components/src/number-control/stories/index.story.tsx
+index 6c96c7ee69844c..8a62b2114ad439 100644
+--- a/packages/components/src/number-control/stories/index.story.tsx
++++ b/packages/components/src/number-control/stories/index.story.tsx
+@@ -44,6 +44,7 @@ const Template: StoryFn< typeof NumberControl > = ( {
+ 	return (
+ 		<>
+ 			<NumberControl
++				__next40pxDefaultSize
+ 				{ ...props }
+ 				value={ value }
+ 				onChange={ ( v, extra ) => {
+diff --git a/packages/components/src/popover/stories/index.story.tsx b/packages/components/src/popover/stories/index.story.tsx
+index 5adb26c5db08a5..6933dfc997d800 100644
+--- a/packages/components/src/popover/stories/index.story.tsx
++++ b/packages/components/src/popover/stories/index.story.tsx
+@@ -114,6 +114,7 @@ export const Default: StoryObj< typeof Popover > = {
+ 					} }
+ 				>
+ 					<Button
++						__next40pxDefaultSize
+ 						variant="secondary"
+ 						onClick={ toggleVisible }
+ 						ref={ buttonRef }
+@@ -209,6 +210,7 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
+ 				<div style={ { padding: '20px' } }>
+ 					<div>
+ 						<Button
++							__next40pxDefaultSize
+ 							variant="primary"
+ 							onClick={ increase }
+ 							style={ {
+@@ -218,7 +220,11 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
+ 							Increase Size
+ 						</Button>
+ 
+-						<Button variant="primary" onClick={ decrease }>
++						<Button
++							__next40pxDefaultSize
++							variant="primary"
++							onClick={ decrease }
++						>
+ 							Decrease Size
+ 						</Button>
+ 					</div>
+@@ -302,6 +308,7 @@ export const WithCloseHandlers: StoryObj< typeof Popover > = {
+ 				} }
+ 			>
+ 				<Button
++					__next40pxDefaultSize
+ 					variant="secondary"
+ 					onClick={ toggleVisible }
+ 					ref={ buttonRef }
+diff --git a/packages/components/src/radio-group/radio.tsx b/packages/components/src/radio-group/radio.tsx
+index 4c54e0694f4bde..ac864d181b5155 100644
+--- a/packages/components/src/radio-group/radio.tsx
++++ b/packages/components/src/radio-group/radio.tsx
+@@ -43,6 +43,8 @@ function UnforwardedRadio(
+ 			ref={ ref }
+ 			value={ value }
+ 			render={
++				// Disable: the parent component already takes care of the `__next40pxDefaultSize` prop.
++				// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+ 				<Button
+ 					variant={ isChecked ? 'primary' : 'secondary' }
+ 					{ ...props }
+diff --git a/packages/components/src/range-control/stories/index.story.tsx b/packages/components/src/range-control/stories/index.story.tsx
+index 1584d4a900ee04..9dc659856aa4cc 100644
+--- a/packages/components/src/range-control/stories/index.story.tsx
++++ b/packages/components/src/range-control/stories/index.story.tsx
+@@ -66,6 +66,7 @@ const Template: StoryFn< typeof RangeControl > = ( { onChange, ...args } ) => {
+ 
+ 	return (
+ 		<RangeControl
++			__next40pxDefaultSize
+ 			{ ...args }
+ 			value={ value }
+ 			onChange={ ( v ) => {
+@@ -100,6 +101,7 @@ export const WithAnyStep: StoryFn< typeof RangeControl > = ( {
+ 	return (
+ 		<>
+ 			<RangeControl
++				__next40pxDefaultSize
+ 				{ ...args }
+ 				value={ value }
+ 				onChange={ ( v ) => {
+@@ -130,6 +132,7 @@ const MarkTemplate: StoryFn< typeof RangeControl > = ( {
+ 		<>
+ 			<h2>{ label }</h2>
+ 			<RangeControl
++				__next40pxDefaultSize
+ 				{ ...args }
+ 				label="Automatic marks"
+ 				marks
+@@ -140,6 +143,7 @@ const MarkTemplate: StoryFn< typeof RangeControl > = ( {
+ 				value={ automaticValue }
+ 			/>
+ 			<RangeControl
++				__next40pxDefaultSize
+ 				{ ...args }
+ 				label="Custom marks"
+ 				onChange={ ( v ) => {
+diff --git a/packages/components/src/scroll-lock/stories/index.story.tsx b/packages/components/src/scroll-lock/stories/index.story.tsx
+index b7cbc0a63648dc..a77f5a9dd71127 100644
+--- a/packages/components/src/scroll-lock/stories/index.story.tsx
++++ b/packages/components/src/scroll-lock/stories/index.story.tsx
+@@ -81,7 +81,11 @@ export const Default: StoryFn< typeof ScrollLock > = () => {
+ 						this &quot;scroll bleed&quot; from happening.
+ 					</div>
+ 					<ToggleContainer>
+-						<Button variant="primary" onClick={ toggleLock }>
++						<Button
++							__next40pxDefaultSize
++							variant="primary"
++							onClick={ toggleLock }
++						>
+ 							Toggle Scroll Lock
+ 						</Button>
+ 						{ isScrollLocked && <ScrollLock /> }
+diff --git a/packages/components/src/select-control/stories/index.story.tsx b/packages/components/src/select-control/stories/index.story.tsx
+index 25673e72afde13..9190c489791f77 100644
+--- a/packages/components/src/select-control/stories/index.story.tsx
++++ b/packages/components/src/select-control/stories/index.story.tsx
+@@ -42,6 +42,7 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
+ 	if ( props.multiple ) {
+ 		return (
+ 			<SelectControl
++				__next40pxDefaultSize
+ 				{ ...props }
+ 				multiple
+ 				value={ selection }
+@@ -55,6 +56,7 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
+ 
+ 	return (
+ 		<SelectControl
++			__next40pxDefaultSize
+ 			{ ...props }
+ 			multiple={ false }
+ 			value={ selection?.[ 0 ] }
+diff --git a/packages/components/src/tabs/stories/index.story.tsx b/packages/components/src/tabs/stories/index.story.tsx
+index 02a6e404605934..46753d41bc28db 100644
+--- a/packages/components/src/tabs/stories/index.story.tsx
++++ b/packages/components/src/tabs/stories/index.story.tsx
+@@ -65,7 +65,9 @@ const Template: StoryFn< typeof Tabs > = ( props ) => {
+ 					Instead, the [Tab] key will move focus to the first
+ 					focusable element within the panel.
+ 				</p>
+-				<Button variant="primary">I&apos;m a button!</Button>
++				<Button __next40pxDefaultSize variant="primary">
++					I&apos;m a button!
++				</Button>
+ 			</Tabs.TabPanel>
+ 		</Tabs>
+ 	);
+@@ -118,6 +120,7 @@ export const SizeAndOverflowPlayground: StoryFn< typeof Tabs > = ( props ) => {
+ 				</ul>
+ 			</div>
+ 			<Button
++				__next40pxDefaultSize
+ 				style={ { marginBottom: '1rem' } }
+ 				variant="primary"
+ 				onClick={ () => setFullWidth( ! fullWidth ) }
+@@ -332,6 +335,7 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
+ 								<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
+ 							</Tabs.TabList>
+ 							<Button
++								__next40pxDefaultSize
+ 								variant="tertiary"
+ 								style={ {
+ 									marginLeft: 'auto',
+@@ -354,7 +358,11 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
+ 					</Tabs>
+ 				</div>
+ 			) : (
+-				<Button variant="tertiary" onClick={ () => setIsOpen( true ) }>
++				<Button
++					__next40pxDefaultSize
++					variant="tertiary"
++					onClick={ () => setIsOpen( true ) }
++				>
+ 					Open Tabs
+ 				</Button>
+ 			) }
+diff --git a/packages/components/src/text-control/stories/index.story.tsx b/packages/components/src/text-control/stories/index.story.tsx
+index b0e0a8745761fe..b4bbe12e9314bb 100644
+--- a/packages/components/src/text-control/stories/index.story.tsx
++++ b/packages/components/src/text-control/stories/index.story.tsx
+@@ -40,6 +40,7 @@ const DefaultTemplate: StoryFn< typeof TextControl > = ( {
+ 
+ 	return (
+ 		<TextControl
++			__next40pxDefaultSize
+ 			{ ...args }
+ 			value={ value }
+ 			onChange={ ( v ) => {
+diff --git a/packages/components/src/theme/stories/index.story.tsx b/packages/components/src/theme/stories/index.story.tsx
+index f5f72a13cb4815..e835978d800e7d 100644
+--- a/packages/components/src/theme/stories/index.story.tsx
++++ b/packages/components/src/theme/stories/index.story.tsx
+@@ -29,7 +29,9 @@ export default meta;
+ 
+ const Template: StoryFn< typeof Theme > = ( args ) => (
+ 	<Theme { ...args }>
+-		<Button variant="primary">Hello</Button>
++		<Button __next40pxDefaultSize variant="primary">
++			Hello
++		</Button>
+ 	</Theme>
+ );
+ 
+@@ -38,10 +40,12 @@ Default.args = {};
+ 
+ export const Nested: StoryFn< typeof Theme > = ( args ) => (
+ 	<Theme accent="crimson">
+-		<Button variant="primary">Outer theme (hardcoded)</Button>
++		<Button __next40pxDefaultSize variant="primary">
++			Outer theme (hardcoded)
++		</Button>
+ 
+ 		<Theme { ...args }>
+-			<Button variant="primary">
++			<Button __next40pxDefaultSize variant="primary">
+ 				Inner theme (set via Storybook controls)
+ 			</Button>
+ 		</Theme>
+diff --git a/packages/components/src/tooltip/stories/index.story.tsx b/packages/components/src/tooltip/stories/index.story.tsx
+index a0e8c931c0baea..552d81b8ef360a 100644
+--- a/packages/components/src/tooltip/stories/index.story.tsx
++++ b/packages/components/src/tooltip/stories/index.story.tsx
+@@ -46,13 +46,21 @@ const Template: StoryFn< typeof Tooltip > = ( props ) => (
+ 
+ export const Default: StoryFn< typeof Tooltip > = Template.bind( {} );
+ Default.args = {
+-	children: <Button variant="primary">Tooltip Anchor</Button>,
++	children: (
++		<Button __next40pxDefaultSize variant="primary">
++			Tooltip Anchor
++		</Button>
++	),
+ 	text: 'Tooltip Text',
+ };
+ 
+ export const KeyboardShortcut = Template.bind( {} );
+ KeyboardShortcut.args = {
+-	children: <Button variant="secondary">Keyboard Shortcut</Button>,
++	children: (
++		<Button __next40pxDefaultSize variant="secondary">
++			Keyboard Shortcut
++		</Button>
++	),
+ 	shortcut: {
+ 		display: '⇧⌘,',
+ 		ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
+@@ -70,7 +78,9 @@ export const Nested: StoryFn< typeof Tooltip > = Template.bind( {} );
+ Nested.args = {
+ 	children: (
+ 		<Tooltip text="Nested tooltip text (that will never show)">
+-			<Button variant="primary">Tooltip Anchor</Button>
++			<Button __next40pxDefaultSize variant="primary">
++				Tooltip Anchor
++			</Button>
+ 		</Tooltip>
+ 	),
+ 	text: 'Outer tooltip text',
+diff --git a/packages/components/src/tree-grid/stories/index.story.tsx b/packages/components/src/tree-grid/stories/index.story.tsx
+index 197a10f5cff35c..c532267812788e 100644
+--- a/packages/components/src/tree-grid/stories/index.story.tsx
++++ b/packages/components/src/tree-grid/stories/index.story.tsx
+@@ -104,7 +104,11 @@ const Rows = ( {
+ 								{ ( props ) => (
+ 									<>
+ 										<Descender level={ level } />
+-										<Button variant="primary" { ...props }>
++										<Button
++											__next40pxDefaultSize
++											variant="primary"
++											{ ...props }
++										>
+ 											{ item.name }
+ 										</Button>
+ 									</>
+diff --git a/packages/components/src/tree-select/index.tsx b/packages/components/src/tree-select/index.tsx
+index 5b32ebfe07b26a..1068fbb67c7583 100644
+--- a/packages/components/src/tree-select/index.tsx
++++ b/packages/components/src/tree-select/index.tsx
+@@ -99,6 +99,8 @@ export function TreeSelect( props: TreeSelectProps ) {
+ 	} );
+ 
+ 	return (
++		// Disable reason: the parent component already takes case of the `__next40pxDefaultSize` prop.
++		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+ 		<SelectControl
+ 			__shouldNotWarnDeprecated36pxSize
+ 			{ ...{ label, options, onChange } }
+diff --git a/packages/components/src/tree-select/stories/index.story.tsx b/packages/components/src/tree-select/stories/index.story.tsx
+index d7d182b75cf514..c0335acbc94e12 100644
+--- a/packages/components/src/tree-select/stories/index.story.tsx
++++ b/packages/components/src/tree-select/stories/index.story.tsx
+@@ -40,6 +40,7 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
+ 
+ 	return (
+ 		<TreeSelect
++			__next40pxDefaultSize
+ 			{ ...props }
+ 			onChange={ setSelection }
+ 			selectedId={ selection }
+diff --git a/packages/components/src/unit-control/stories/index.story.tsx b/packages/components/src/unit-control/stories/index.story.tsx
+index 13496928d63ac4..75912c06612945 100644
+--- a/packages/components/src/unit-control/stories/index.story.tsx
++++ b/packages/components/src/unit-control/stories/index.story.tsx
+@@ -51,6 +51,7 @@ const DefaultTemplate: StoryFn< typeof UnitControl > = ( {
+ 
+ 	return (
+ 		<UnitControl
++			__next40pxDefaultSize
+ 			{ ...args }
+ 			value={ value }
+ 			onChange={ ( v, extra ) => {
+@@ -118,6 +119,7 @@ export const WithCustomUnits: StoryFn< typeof UnitControl > = ( {
+ 
+ 	return (
+ 		<UnitControl
++			__next40pxDefaultSize
+ 			{ ...args }
+ 			value={ value }
+ 			onChange={ ( v, extra ) => {
+diff --git a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+index 88e0b6890ca94d..1d0f74fe983056 100644
+--- a/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/__tests__/components-no-missing-40px-size-prop.js
+@@ -90,6 +90,13 @@ ruleTester.run( 'components-no-missing-40px-size-prop', rule, {
+ 				<Button size={buttonSize} />
+ 			`,
+ 		},
++		// Button with variant="link" (doesn't need __next40pxDefaultSize)
++		{
++			code: `
++				import { Button } from '@wordpress/components';
++				<Button variant="link" />
++			`,
++		},
+ 		// Non-targeted component (should not be checked)
+ 		{
+ 			code: `
+diff --git a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+index 7e6786478b880a..059df6548faf2e 100644
+--- a/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
++++ b/packages/eslint-plugin/rules/components-no-missing-40px-size-prop.js
+@@ -16,19 +16,23 @@ const COMPONENTS_REQUIRING_40PX = new Set( [
+ 	'BorderControl',
+ 	'BoxControl',
+ 	'Button',
++	'ClipboardButton',
+ 	'ComboboxControl',
+ 	'CustomSelectControl',
+ 	'FontAppearanceControl',
+ 	'FontFamilyControl',
+ 	'FontSizePicker',
+ 	'FormTokenField',
++	'IconButton',
+ 	'InputControl',
+ 	'LetterSpacingControl',
+ 	'LineHeightControl',
+ 	'NumberControl',
++	'Radio',
+ 	'RangeControl',
+ 	'SelectControl',
+ 	'TextControl',
++	'TreeSelect',
+ 	'ToggleGroupControl',
+ 	'UnitControl',
+ ] );
+@@ -179,6 +183,37 @@ module.exports = {
+ 			);
+ 		}
+ 
++		/**
++		 * Check if the `variant` prop has the value "link".
++		 * Button with variant="link" doesn't need __next40pxDefaultSize.
++		 *
++		 * @param {Array} attributes - JSX attributes array
++		 * @return {boolean} Whether variant is "link"
++		 */
++		function hasLinkVariant( attributes ) {
++			const variantAttr = attributes.find(
++				( a ) =>
++					a.type === 'JSXAttribute' &&
++					a.name &&
++					a.name.name === 'variant'
++			);
++
++			if ( ! variantAttr ) {
++				return false;
++			}
++
++			// String value like `variant="link"`
++			if (
++				variantAttr.value &&
++				variantAttr.value.type === 'Literal' &&
++				variantAttr.value.value === 'link'
++			) {
++				return true;
++			}
++
++			return false;
++		}
++
+ 		return {
+ 			ImportDeclaration( node ) {
+ 				const source = node.source.value;
+@@ -215,6 +250,14 @@ module.exports = {
+ 								inferComponentNameFromPath( source );
+ 							if ( inferredName ) {
+ 								trackedImports.set( localName, inferredName );
++								return;
++							}
++
++							// Support patterns like `import ClipboardButton from '.';`
++							// (common in component folder examples/tests).
++							// If the local name matches a tracked component, treat it as such.
++							if ( ALL_TRACKED_COMPONENTS.has( localName ) ) {
++								trackedImports.set( localName, localName );
+ 							}
+ 						}
+ 					} );
+@@ -263,6 +306,14 @@ module.exports = {
+ 					return;
+ 				}
+ 
++				// Button with variant="link" doesn't need __next40pxDefaultSize
++				if (
++					importedName === 'Button' &&
++					hasLinkVariant( attributes )
++				) {
++					return;
++				}
++
+ 				context.report( {
+ 					node,
+ 					messageId: 'missingProp',

@@ -1,0 +1,201 @@
+diff --git a/packages/components/src/animate/index.js b/packages/components/src/animate/index.js
+index 95fba645fd1782..66895f3f6eaed1 100644
+--- a/packages/components/src/animate/index.js
++++ b/packages/components/src/animate/index.js
+@@ -48,6 +48,10 @@ export function getAnimateClassName( options ) {
+ 			'is-from-' + origin
+ 		);
+ 	}
++
++	if ( type === 'slide-out' ) {
++		return classnames( 'components-animate__slide-out', 'is-to-' + origin );
++	}
+ }
+ 
+ // @ts-ignore Reason: Planned for deprecation
+diff --git a/packages/components/src/animate/style.scss b/packages/components/src/animate/style.scss
+index 1d64423e42f1f0..6e56f7de9f8312 100644
+--- a/packages/components/src/animate/style.scss
++++ b/packages/components/src/animate/style.scss
+@@ -48,6 +48,26 @@
+ 	}
+ }
+ 
++.components-animate__slide-out {
++	animation: components-animate__slide-out-animation 0.1s cubic-bezier(0, 0, 0.2, 1);
++	animation-fill-mode: forwards;
++	@include reduce-motion("animation");
++
++	&.is-to-left {
++		transform: translateX(-100%);
++	}
++
++	&.is-to-right {
++		transform: translateX(100%);
++	}
++}
++
++@keyframes components-animate__slide-out-animation {
++	0% {
++		transform: translateX(0%);
++	}
++}
++
+ .components-animate__loading {
+ 	animation: components-animate__loading 1.6s ease-in-out infinite;
+ }
+diff --git a/packages/components/src/navigation/index.js b/packages/components/src/navigation/index.js
+index 8f9f2bba506c36..31e80d0860e7c9 100644
+--- a/packages/components/src/navigation/index.js
++++ b/packages/components/src/navigation/index.js
+@@ -19,6 +19,40 @@ import { NavigationContext } from './context';
+ import { NavigationUI } from './styles/navigation-styles';
+ import { useCreateNavigationTree } from './use-create-navigation-tree';
+ 
++function MenuIndex( {
++	activeItem,
++	children,
++	className,
++	menu,
++	onAnimationEnd,
++	onMenuChange,
++	isPresentational,
++} ) {
++	const navigationTree = useCreateNavigationTree();
++	const context = {
++		activeItem,
++		activeMenu: menu,
++		setActiveMenu: ( menuId, slideOrigin ) => {
++			if ( navigationTree.getMenu( menuId ) ) {
++				onMenuChange( menuId, slideOrigin );
++			}
++		},
++		navigationTree,
++	};
++	return (
++		<div
++			aria-hidden={ isPresentational }
++			className={ className || '' }
++			key={ menu }
++			onAnimationEnd={ onAnimationEnd }
++		>
++			<NavigationContext.Provider value={ context }>
++				{ children }
++			</NavigationContext.Provider>
++		</div>
++	);
++}
++
+ export default function Navigation( {
+ 	activeItem,
+ 	activeMenu = ROOT_MENU,
+@@ -28,17 +62,26 @@ export default function Navigation( {
+ } ) {
+ 	const [ menu, setMenu ] = useState( activeMenu );
+ 	const [ slideOrigin, setSlideOrigin ] = useState();
+-	const navigationTree = useCreateNavigationTree();
+ 	const defaultSlideOrigin = isRTL() ? 'right' : 'left';
++	const [ previous, setPrevious ] = useState();
+ 
+-	const setActiveMenu = ( menuId, slideInOrigin = defaultSlideOrigin ) => {
+-		if ( ! navigationTree.getMenu( menuId ) ) {
+-			return;
+-		}
+-
++	const changeMenu = ( menuId, slideInOrigin = defaultSlideOrigin ) => {
+ 		setSlideOrigin( slideInOrigin );
+ 		setMenu( menuId );
+ 		onActivateMenu( menuId );
++		if ( isMounted.current ) {
++			rootRef.current.style.overflow = 'hidden';
++			const props = {
++				...active.props,
++				className: getAnimateClassName( {
++					type: 'slide-out',
++					origin: slideInOrigin,
++				} ),
++				isPresentational: true,
++				onAnimationEnd: () => setPrevious( null ),
++			};
++			setPrevious( <MenuIndex { ...props } /> );
++		}
+ 	};
+ 
+ 	// Used to prevent the sliding animation on mount
+@@ -51,35 +94,35 @@ export default function Navigation( {
+ 
+ 	useEffect( () => {
+ 		if ( activeMenu !== menu ) {
+-			setActiveMenu( activeMenu );
++			changeMenu( activeMenu );
+ 		}
+ 	}, [ activeMenu ] );
+ 
+-	const context = {
+-		activeItem,
+-		activeMenu: menu,
+-		setActiveMenu,
+-		navigationTree,
+-	};
+-
+ 	const classes = classnames( 'components-navigation', className );
+ 	const animateClassName = getAnimateClassName( {
+ 		type: 'slide-in',
+ 		origin: slideOrigin,
+ 	} );
+ 
++	const active = (
++		<MenuIndex
++			activeItem={ activeItem }
++			children={ children }
++			className={ isMounted.current && slideOrigin && animateClassName }
++			menu={ menu }
++			onAnimationEnd={ () => {
++				rootRef.current.style.overflow = 'visible';
++			} }
++			onMenuChange={ changeMenu }
++		/>
++	);
++
++	const rootRef = useRef();
++
+ 	return (
+-		<NavigationUI className={ classes }>
+-			<div
+-				key={ menu }
+-				className={ classnames( {
+-					[ animateClassName ]: isMounted.current && slideOrigin,
+-				} ) }
+-			>
+-				<NavigationContext.Provider value={ context }>
+-					{ children }
+-				</NavigationContext.Provider>
+-			</div>
++		<NavigationUI className={ classes } ref={ rootRef }>
++			{ active }
++			{ previous }
+ 		</NavigationUI>
+ 	);
+ }
+diff --git a/packages/components/src/navigation/styles/navigation-styles.js b/packages/components/src/navigation/styles/navigation-styles.js
+index 862579cc54b48d..e6f867f02be8f4 100644
+--- a/packages/components/src/navigation/styles/navigation-styles.js
++++ b/packages/components/src/navigation/styles/navigation-styles.js
+@@ -21,8 +21,15 @@ export const NavigationUI = styled.div`
+ 	background-color: ${ G2.darkGray.primary };
+ 	box-sizing: border-box;
+ 	color: #f0f0f0;
+-	padding: 0 ${ space( 2 ) };
+-	overflow: hidden;
++	display: grid;
++	grid-template: 1fr/1fr;
++	> * {
++		padding: 0 ${ space( 2 ) };
++		grid-area: 1/1;
++	}
++	> .components-animate__slide-out {
++		pointer-events: none;
++	}
+ `;
+ 
+ export const MenuUI = styled.div`

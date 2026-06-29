@@ -1,0 +1,26 @@
+diff --git a/package-lock.json b/package-lock.json
+index 498a841f109abc..74622d7a1a8411 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -17444,7 +17444,7 @@
+ 				"@emotion/serialize": "^1.0.2",
+ 				"@emotion/styled": "^11.6.0",
+ 				"@emotion/utils": "^1.0.0",
+-				"@floating-ui/react-dom": "^1.0.0",
++				"@floating-ui/react-dom": "1.0.0",
+ 				"@use-gesture/react": "^10.2.6",
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 36693bbdac619c..88a48868150637 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -36,7 +36,7 @@
+ 		"@emotion/serialize": "^1.0.2",
+ 		"@emotion/styled": "^11.6.0",
+ 		"@emotion/utils": "^1.0.0",
+-		"@floating-ui/react-dom": "^1.0.0",
++		"@floating-ui/react-dom": "1.0.0",
+ 		"@use-gesture/react": "^10.2.6",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",

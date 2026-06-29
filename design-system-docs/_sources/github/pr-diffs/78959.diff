@@ -1,0 +1,5159 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index d604731966d362..b09c514bfb90f1 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -4,11 +4,12 @@
+ 
+ ### Breaking Changes
+ 
+--   Revert React back to v18 [#78940](https://github.com/WordPress/gutenberg/pull/78940).
++-   Update CSS cascade layers from flat list to nested, replacing `wp-ui-utilities`, `wp-ui-components`, `wp-ui-compositions`, and `wp-ui-overrides` with a single layer `wp-ui` ([#78959](https://github.com/WordPress/gutenberg/pull/78959)).
++-   Revert React back to v18 ([#78940](https://github.com/WordPress/gutenberg/pull/78940)).
+ 
+ ### Code Quality
+ 
+--   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
++-   Add missing `@types/react` dependency ([#78882](https://github.com/WordPress/gutenberg/pull/78882)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/ui/CONTRIBUTING.md b/packages/ui/CONTRIBUTING.md
+index a1c062c65b3950..00fce021a4b8f5 100644
+--- a/packages/ui/CONTRIBUTING.md
++++ b/packages/ui/CONTRIBUTING.md
+@@ -255,34 +255,42 @@ High-level wrappers that hide `Popup` (for example `IconButton`, which renders a
+ 
+ We use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) to ensure an expected order of precedence in style resolution. All component stylesheets must follow this layering approach to maintain consistency and prevent specificity conflicts.
+ 
+-Every component stylesheet must include the layer definition at the top and wrap all styles within the appropriate layer:
++Every component stylesheet must include the layer definition in the top-level `wp-ui` layer and wrap all styles within the appropriate layer:
+ 
+ ```css
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.stack {
+-		display: flex;
++	@layer components {
++		.stack {
++			display: flex;
++		}
+ 	}
+ }
+ ```
+ 
+ #### CSS Layer Hierarchy
+ 
+--   **`wp-ui-utilities`** - Shared utility styles (box-sizing, focus rings, resets) that apply before component styles
+--   **`wp-ui-components`** - Default styles for design system components (`.stack`, etc.)
+--   **`wp-ui-compositions`** - Internal compositions that extend base components
+--   **`wp-ui-overrides`** - Last-resort styles to override default rules
++All sub-layers are nested within the top-level `wp-ui` layer:
++
++-   **`utilities`** - Shared utility styles (box-sizing, focus rings, resets) that apply before component styles
++-   **`components`** - Default styles for design system components (`.stack`, etc.)
++-   **`compositions`** - Internal compositions that extend base components
++-   **`overrides`** - Last-resort styles to override default rules
+ 
+ A rule that overrides a primitive defined in another stylesheet (e.g. a shared class from `overlay-chrome.module.css`) must live in a **higher** layer than that primitive — typically `wp-ui-compositions`. Placing both in the same layer leaves the conflict to be resolved by `<style>` injection order, which is not deterministic and can flip when an unrelated component lazy-loads (its own copy of the shared stylesheet re-orders the tags). The layer hierarchy is what guarantees the override wins.
+ 
+-When the override also `composes` the primitive it extends, keep the override in `wp-ui-compositions` (the `composes` does not change its layer) and let `composes` bind the two classes together so the base can never be applied without the override:
++When the override also `composes` the primitive it extends, keep the override in `wp-ui.compositions` (the `composes` does not change its layer) and let `composes` bind the two classes together so the base can never be applied without the override:
+ 
+ ```css
+-@layer wp-ui-compositions {
+-	.footer-column {
+-		composes: footer from "../utils/css/overlay-chrome.module.css";
+-		flex-direction: column;
++@layer wp-ui {
++	/* ... */
++
++	@layer compositions {
++		.footer-column {
++			composes: footer from '../utils/css/overlay-chrome.module.css';
++			flex-direction: column;
++		}
+ 	}
+ }
+ ```
+diff --git a/packages/ui/README.md b/packages/ui/README.md
+index dbe5d5919ceb5e..4d32d3b6a7e140 100644
+--- a/packages/ui/README.md
++++ b/packages/ui/README.md
+@@ -46,7 +46,7 @@ import '@wordpress/theme/design-tokens.css';
+ 
+ This stylesheet is universal and does not have a separate RTL version.
+ 
+-Also, to ensure that portaled popovers appear correctly, add these isolation styles to your application's layout root element:
++To ensure that portaled popovers appear correctly, add these isolation styles to your application's layout root element:
+ 
+ ```css
+ .root {
+@@ -54,7 +54,7 @@ Also, to ensure that portaled popovers appear correctly, add these isolation sty
+ }
+ ```
+ 
+-Finally, in order to support overlay elements such as backdrops to correctly cover the whole browser viewport even when scrolled, add the following style to your global styles:
++In order to support overlay elements such as backdrops to correctly cover the whole browser viewport even when scrolled, add the following style to your global styles:
+ 
+ ```css
+ body {
+@@ -62,6 +62,14 @@ body {
+ }
+ ```
+ 
++Components in this package use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) when defining their styles, which can conflict in some applications which apply styles on bare element selectors (for example, `input { border-color: #aaa; }`). You should avoid these kinds of bare element selector styling if you can, preferring CSS classes instead where possible.
++
++If you need to customize the cascade layer order relative to your own CSS cascade layers, the component styles are scoped under the `wp-ui` layer, which you can use when defining your own layer order:
++
++```css
++@layer wp-ui, example-app;
++```
++
+ #### Mixing with `@wordpress/components`
+ 
+ If your app pairs `@wordpress/ui` with `@wordpress/components` overlays and bundles both packages directly (i.e. without relying on the `window.wp.components` global exposed by WordPress's script-loader), call `useEnableWpCompatOverlaySlot()` once from a long-lived root component:
+diff --git a/packages/ui/src/alert-dialog/style.module.css b/packages/ui/src/alert-dialog/style.module.css
+index de2f131d02c5d8..581a32d3efa91e 100644
+--- a/packages/ui/src/alert-dialog/style.module.css
++++ b/packages/ui/src/alert-dialog/style.module.css
+@@ -1,37 +1,39 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.error-message {
+-		align-self: flex-end;
+-		color: var(--wpds-color-fg-content-error);
++	@layer components {
++		.error-message {
++			align-self: flex-end;
++			color: var(--wpds-color-fg-content-error);
++		}
+ 	}
+-}
+ 
+-@layer wp-ui-compositions {
+-	/*
+-	 * AlertDialog stacks an actions row and an optional error message in
+-	 * its footer. `composes` the shared `.footer` so the chrome padding +
+-	 * separator are inherited, then overrides the row layout to a column.
+-	 *
+-	 * The override lives in `wp-ui-compositions` (a higher layer than the
+-	 * composed `.footer`, which sits in `wp-ui-components`) so it always
+-	 * wins regardless of stylesheet injection order. `composes` keeps the
+-	 * two classes bound together so the base styles can never be applied
+-	 * without this override.
+-	 */
+-	.footer-column {
+-		composes: footer from "../utils/css/overlay-chrome.module.css";
++	@layer compositions {
++		/*
++		 * AlertDialog stacks an actions row and an optional error message in
++		 * its footer. `composes` the shared `.footer` so the chrome padding +
++		 * separator are inherited, then overrides the row layout to a column.
++		 *
++		 * The override lives in `wp-ui.compositions` (a higher layer than the
++		 * composed `.footer`, which sits in `wp-ui-components`) so it always
++		 * wins regardless of stylesheet injection order. `composes` keeps the
++		 * two classes bound together so the base styles can never be applied
++		 * without this override.
++		 */
++		.footer-column {
++			composes: footer from "../utils/css/overlay-chrome.module.css";
+ 
+-		flex-direction: column;
+-		align-items: stretch;
+-		justify-content: flex-start;
+-		gap: var(--wpds-dimension-gap-md);
+-	}
++			flex-direction: column;
++			align-items: stretch;
++			justify-content: flex-start;
++			gap: var(--wpds-dimension-gap-md);
++		}
+ 
+-	.irreversible-action {
+-		--wp-ui-button-background-color: var(--wpds-color-bg-interactive-error-strong);
+-		--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-error-strong-active);
+-		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-error-strong);
+-		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-error-strong-active);
++		.irreversible-action {
++			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-error-strong);
++			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-error-strong-active);
++			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-error-strong);
++			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-error-strong-active);
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/badge/style.module.css b/packages/ui/src/badge/style.module.css
+index 1708306c69e9b9..c9519049cea069 100644
+--- a/packages/ui/src/badge/style.module.css
++++ b/packages/ui/src/badge/style.module.css
+@@ -1,47 +1,49 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+-
+-@layer wp-ui-components {
+-	.badge {
+-		padding-inline: var(--wpds-dimension-padding-sm);
+-		padding-block: var(--wpds-dimension-padding-xs);
+-		border-radius: var(--wpds-border-radius-lg);
+-	}
+-
+-	.is-high-intent {
+-		background-color: var(--wpds-color-bg-surface-error);
+-		color: var(--wpds-color-fg-content-error);
+-	}
+-
+-	.is-medium-intent {
+-		background-color: var(--wpds-color-bg-surface-warning);
+-		color: var(--wpds-color-fg-content-warning);
+-	}
+-
+-	.is-low-intent {
+-		background-color: var(--wpds-color-bg-surface-caution);
+-		color: var(--wpds-color-fg-content-caution);
+-	}
+-
+-	.is-stable-intent {
+-		background-color: var(--wpds-color-bg-surface-success);
+-		color: var(--wpds-color-fg-content-success);
+-	}
+-
+-	.is-informational-intent {
+-		background-color: var(--wpds-color-bg-surface-info);
+-		color: var(--wpds-color-fg-content-info);
+-	}
+-
+-	.is-draft-intent {
+-		background-color: var(--wpds-color-bg-surface-neutral-weak);
+-		color: var(--wpds-color-fg-content-neutral);
+-	}
+-
+-	.is-none-intent {
+-		background-color: var(--wpds-color-bg-surface-neutral-strong);
+-		color: var(--wpds-color-fg-content-neutral);
+-		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+-		padding-block: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
+-		padding-inline: calc(var(--wpds-dimension-padding-sm) - var(--wpds-border-width-xs));
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
++
++	@layer components {
++		.badge {
++			padding-inline: var(--wpds-dimension-padding-sm);
++			padding-block: var(--wpds-dimension-padding-xs);
++			border-radius: var(--wpds-border-radius-lg);
++		}
++
++		.is-high-intent {
++			background-color: var(--wpds-color-bg-surface-error);
++			color: var(--wpds-color-fg-content-error);
++		}
++
++		.is-medium-intent {
++			background-color: var(--wpds-color-bg-surface-warning);
++			color: var(--wpds-color-fg-content-warning);
++		}
++
++		.is-low-intent {
++			background-color: var(--wpds-color-bg-surface-caution);
++			color: var(--wpds-color-fg-content-caution);
++		}
++
++		.is-stable-intent {
++			background-color: var(--wpds-color-bg-surface-success);
++			color: var(--wpds-color-fg-content-success);
++		}
++
++		.is-informational-intent {
++			background-color: var(--wpds-color-bg-surface-info);
++			color: var(--wpds-color-fg-content-info);
++		}
++
++		.is-draft-intent {
++			background-color: var(--wpds-color-bg-surface-neutral-weak);
++			color: var(--wpds-color-fg-content-neutral);
++		}
++
++		.is-none-intent {
++			background-color: var(--wpds-color-bg-surface-neutral-strong);
++			color: var(--wpds-color-fg-content-neutral);
++			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
++			padding-block: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
++			padding-inline: calc(var(--wpds-dimension-padding-sm) - var(--wpds-border-width-xs));
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+index a4c1e510c2c74c..975e451a0e86b1 100644
+--- a/packages/ui/src/button/style.module.css
++++ b/packages/ui/src/button/style.module.css
+@@ -1,261 +1,263 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
++
++	@layer components {
++		.button,
++		.is-unstyled {
++			appearance: none;
++			padding: 0;
++		}
+ 
+-@layer wp-ui-components {
+-	.button,
+-	.is-unstyled {
+-		appearance: none;
+-		padding: 0;
+-	}
++		.button {
++			/* Internal variables */
++			--wp-ui-button-font-weight: 499;
+ 
+-	.button {
+-		/* Internal variables */
+-		--wp-ui-button-font-weight: 499;
+-
+-		--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand-strong);
+-		--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-strong-active);
+-		--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
+-		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand-strong);
+-		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-strong-active);
+-		--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
+-		--wp-ui-button-padding-block: var(--wpds-dimension-padding-xs);
+-		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-md);
+-		--wp-ui-button-height: 40px;
+-		--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
+-		--wp-ui-button-font-size: var(--wpds-typography-font-size-md);
+-		--wp-ui-button-min-width: calc(4ch + 2 * var(--wp-ui-button-padding-inline));
+-		/* Icons are rendered as 24px but need to occupy a 16px footprint */
+-		/* TODO: replace hardcoded values with DS size tokens once available */
+-		--wp-ui-button-icon-margin: calc((16px - 24px) / 2);
+-
+-		/* by default, borders have the same color as the background */
+-		--wp-ui-button-border-color: var(--wp-ui-button-background-color);
+-		--wp-ui-button-border-color-active: var(--wp-ui-button-background-color-active);
+-		--wp-ui-button-border-color-disabled: var(--wp-ui-button-background-color-disabled);
+-
+-		--_gcd-button-font-family: var(--wpds-typography-font-family-body);
+-		--_gcd-button-font-size: var(--wp-ui-button-font-size);
+-		--_gcd-button-font-weight: var(--wp-ui-button-font-weight);
+-
+-		/* Styles */
+-		position: relative;
+-		display: inline-flex;
+-		justify-content: center;
+-		align-items: center;
+-		gap: var(--wpds-dimension-gap-sm);
+-		aspect-ratio: var(--wp-ui-button-aspect-ratio);
+-		min-width: var(--wp-ui-button-min-width);
+-		max-width: 100%;
+-		min-height: var(--wp-ui-button-height);
+-		padding-block: var(--wp-ui-button-padding-block);
+-		padding-inline: var(--wp-ui-button-padding-inline);
+-		border-style: solid;
+-		border-width: 1px;
+-		border-color: var(--wp-ui-button-border-color);
+-		border-radius: var(--wpds-border-radius-sm);
+-		background-color: var(--wp-ui-button-background-color);
+-		background-clip: padding-box;
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wp-ui-button-font-size);
+-		font-weight: var(--wp-ui-button-font-weight);
+-		line-height: var(--wpds-typography-line-height-sm);
+-		text-align: center;
+-		text-decoration: none;
+-		color: var(--wp-ui-button-foreground-color);
+-		overflow-wrap: anywhere;
+-
+-		&:not([data-disabled]) {
+-			cursor: var(--wpds-cursor-control);
+-		}
++			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand-strong);
++			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-strong-active);
++			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
++			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand-strong);
++			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-strong-active);
++			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
++			--wp-ui-button-padding-block: var(--wpds-dimension-padding-xs);
++			--wp-ui-button-padding-inline: var(--wpds-dimension-padding-md);
++			--wp-ui-button-height: 40px;
++			--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
++			--wp-ui-button-font-size: var(--wpds-typography-font-size-md);
++			--wp-ui-button-min-width: calc(4ch + 2 * var(--wp-ui-button-padding-inline));
++			/* Icons are rendered as 24px but need to occupy a 16px footprint */
++			/* TODO: replace hardcoded values with DS size tokens once available */
++			--wp-ui-button-icon-margin: calc((16px - 24px) / 2);
++
++			/* by default, borders have the same color as the background */
++			--wp-ui-button-border-color: var(--wp-ui-button-background-color);
++			--wp-ui-button-border-color-active: var(--wp-ui-button-background-color-active);
++			--wp-ui-button-border-color-disabled: var(--wp-ui-button-background-color-disabled);
++
++			--_gcd-button-font-family: var(--wpds-typography-font-family-body);
++			--_gcd-button-font-size: var(--wp-ui-button-font-size);
++			--_gcd-button-font-weight: var(--wp-ui-button-font-weight);
++
++			/* Styles */
++			position: relative;
++			display: inline-flex;
++			justify-content: center;
++			align-items: center;
++			gap: var(--wpds-dimension-gap-sm);
++			aspect-ratio: var(--wp-ui-button-aspect-ratio);
++			min-width: var(--wp-ui-button-min-width);
++			max-width: 100%;
++			min-height: var(--wp-ui-button-height);
++			padding-block: var(--wp-ui-button-padding-block);
++			padding-inline: var(--wp-ui-button-padding-inline);
++			border-style: solid;
++			border-width: 1px;
++			border-color: var(--wp-ui-button-border-color);
++			border-radius: var(--wpds-border-radius-sm);
++			background-color: var(--wp-ui-button-background-color);
++			background-clip: padding-box;
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wp-ui-button-font-size);
++			font-weight: var(--wp-ui-button-font-weight);
++			line-height: var(--wpds-typography-line-height-sm);
++			text-align: center;
++			text-decoration: none;
++			color: var(--wp-ui-button-foreground-color);
++			overflow-wrap: anywhere;
++
++			&:not([data-disabled]) {
++				cursor: var(--wpds-cursor-control);
++			}
+ 
+-		@media not ( prefers-reduced-motion ) {
+-			transition: color 0.1s ease-out;
++			@media not ( prefers-reduced-motion ) {
++				transition: color 0.1s ease-out;
+ 
+-			* {
+-				transition: opacity 0.1s ease-out;
++				* {
++					transition: opacity 0.1s ease-out;
++				}
+ 			}
+-		}
+ 
+-		/* Use pointer cursor for buttons that are links */
+-		&[href] {
+-			/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Links should always use pointer. */
+-			cursor: pointer;
+-		}
++			/* Use pointer cursor for buttons that are links */
++			&[href] {
++				/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Links should always use pointer. */
++				cursor: pointer;
++			}
+ 
+-		/* Make sure that links rendered as children of `Button` use button styles */
+-		*[href] {
+-			color: inherit;
+-			text-decoration: inherit;
+-		}
++			/* Make sure that links rendered as children of `Button` use button styles */
++			*[href] {
++				color: inherit;
++				text-decoration: inherit;
++			}
+ 
+-		/* States — use property declarations (not variable reassignment) so that
+-		   higher CSS layers can safely override the custom property values without
+-		   breaking state handling. */
+-		&:not([data-disabled]):is(:hover, :active, :focus) {
+-			/* hover/active/focus states apply when the button is not disabled. A non
+-			disabled, loading button will have hover/active/focus styles */
+-			background-color: var(--wp-ui-button-background-color-active);
+-			color: var(--wp-ui-button-foreground-color-active);
+-			border-color: var(--wp-ui-button-border-color-active);
+-		}
++			/* States — use property declarations (not variable reassignment) so that
++			   higher CSS layers can safely override the custom property values without
++			   breaking state handling. */
++			&:not([data-disabled]):is(:hover, :active, :focus) {
++				/* hover/active/focus states apply when the button is not disabled. A non
++				disabled, loading button will have hover/active/focus styles */
++				background-color: var(--wp-ui-button-background-color-active);
++				color: var(--wp-ui-button-foreground-color-active);
++				border-color: var(--wp-ui-button-border-color-active);
++			}
++
++			&[data-disabled]:not(.is-loading) {
++				/* A loading button, even when disabled, won't "look" disabled */
++				background-color: var(--wp-ui-button-background-color-disabled);
++				color: var(--wp-ui-button-foreground-color-disabled);
++				border-color: var(--wp-ui-button-border-color-disabled);
+ 
+-		&[data-disabled]:not(.is-loading) {
+-			/* A loading button, even when disabled, won't "look" disabled */
+-			background-color: var(--wp-ui-button-background-color-disabled);
+-			color: var(--wp-ui-button-foreground-color-disabled);
+-			border-color: var(--wp-ui-button-border-color-disabled);
++				@media ( forced-colors: active ) {
++					border-color: GrayText;
++					color: GrayText;
++				}
++			}
+ 
+-			@media ( forced-colors: active ) {
+-				border-color: GrayText;
+-				color: GrayText;
++			/* Loading spinner — not animated and hidden unless in loading state */
++			&::before {
++				content: "";
++				position: absolute;
++				top: 50%;
++				inset-inline-start: 50%;
++				transform: translate(-50%, -50%);
++
++				display: block;
++				box-sizing: border-box;
++				height: var(--wp-ui-button-font-size);
++				aspect-ratio: 1;
++
++				border: var(--wpds-border-width-focus) solid;
++				border-block-start-color: var(--wp-ui-button-foreground-color);
++				border-inline-end-color: var(--wp-ui-button-foreground-color);
++				border-block-end-color: transparent;
++				border-inline-start-color: transparent;
++				border-radius: 50%;
++
++				pointer-events: none;
++				opacity: 0;
++
++				@media not ( prefers-reduced-motion ) {
++					transition: opacity 0.1s ease-out;
++				}
+ 			}
+ 		}
+ 
+-		/* Loading spinner — not animated and hidden unless in loading state */
+-		&::before {
+-			content: "";
+-			position: absolute;
+-			top: 50%;
+-			inset-inline-start: 50%;
+-			transform: translate(-50%, -50%);
+-
+-			display: block;
+-			box-sizing: border-box;
+-			height: var(--wp-ui-button-font-size);
+-			aspect-ratio: 1;
+-
+-			border: var(--wpds-border-width-focus) solid;
+-			border-block-start-color: var(--wp-ui-button-foreground-color);
+-			border-inline-end-color: var(--wp-ui-button-foreground-color);
+-			border-block-end-color: transparent;
+-			border-inline-start-color: transparent;
+-			border-radius: 50%;
+-
+-			pointer-events: none;
+-			opacity: 0;
++		.is-small {
++			--wp-ui-button-padding-block: 0;
++			--wp-ui-button-padding-inline: var(--wpds-dimension-padding-sm);
++			--wp-ui-button-height: 24px;
++		}
+ 
+-			@media not ( prefers-reduced-motion ) {
+-				transition: opacity 0.1s ease-out;
+-			}
++		.icon {
++			margin: var(--wp-ui-button-icon-margin);
+ 		}
+-	}
+ 
+-	.is-small {
+-		--wp-ui-button-padding-block: 0;
+-		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-sm);
+-		--wp-ui-button-height: 24px;
+-	}
++		/* Variants (`tone` + `variant`) overrides compared to default styles */
+ 
+-	.icon {
+-		margin: var(--wp-ui-button-icon-margin);
+-	}
++		/* All outline buttons have a border */
++		.is-brand {
++			/* no need to redefine variables for .is-brand.is-solid as it's the default variant */
+ 
+-	/* Variants (`tone` + `variant`) overrides compared to default styles */
++			/* Outline and minimal buttons use the same foreground color */
++			&.is-outline,
++			&.is-minimal {
++				--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand);
++				--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-active);
++				--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-disabled);
++			}
+ 
+-	/* All outline buttons have a border */
+-	.is-brand {
+-		/* no need to redefine variables for .is-brand.is-solid as it's the default variant */
++			&.is-outline {
++				--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand-weak);
++				--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-weak-active);
++				--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
++				--wp-ui-button-border-color: var(--wpds-color-stroke-interactive-brand);
++				--wp-ui-button-border-color-active: var(--wpds-color-stroke-interactive-brand-active);
++				--wp-ui-button-border-color-disabled: var(--wpds-color-stroke-interactive-neutral-disabled);
++			}
+ 
+-		/* Outline and minimal buttons use the same foreground color */
+-		&.is-outline,
+-		&.is-minimal {
+-			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand);
+-			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-active);
+-			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-disabled);
++			&.is-minimal {
++				--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand-weak);
++				--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-weak-active);
++				--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
++			}
+ 		}
+ 
+-		&.is-outline {
+-			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand-weak);
+-			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-weak-active);
+-			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+-			--wp-ui-button-border-color: var(--wpds-color-stroke-interactive-brand);
+-			--wp-ui-button-border-color-active: var(--wpds-color-stroke-interactive-brand-active);
+-			--wp-ui-button-border-color-disabled: var(--wpds-color-stroke-interactive-neutral-disabled);
+-		}
++		.is-neutral {
++			/* Solid and pressed minimal share the strong appearance */
++			&.is-solid,
++			&.is-minimal[aria-pressed="true"] {
++				--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-strong);
++				--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-strong-active);
++				--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
++				--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral-strong);
++				--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-strong-active);
++				--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
++			}
+ 
+-		&.is-minimal {
+-			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand-weak);
+-			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-weak-active);
+-			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+-		}
+-	}
++			/* Outline and unpressed minimal buttons use the same foreground color */
++			&.is-outline,
++			&.is-minimal:not([aria-pressed="true"]) {
++				--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral);
++				--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-active);
++				--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-disabled);
++			}
+ 
+-	.is-neutral {
+-		/* Solid and pressed minimal share the strong appearance */
+-		&.is-solid,
+-		&.is-minimal[aria-pressed="true"] {
+-			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-strong);
+-			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-strong-active);
+-			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
+-			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral-strong);
+-			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-strong-active);
+-			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
+-		}
++			&.is-outline {
++				--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-weak);
++				--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-weak-active);
++				--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
++				--wp-ui-button-border-color: var(--wpds-color-stroke-interactive-neutral);
++				--wp-ui-button-border-color-active: var(--wpds-color-stroke-interactive-neutral-active);
++				--wp-ui-button-border-color-disabled: var(--wpds-color-stroke-interactive-neutral-disabled);
++			}
+ 
+-		/* Outline and unpressed minimal buttons use the same foreground color */
+-		&.is-outline,
+-		&.is-minimal:not([aria-pressed="true"]) {
+-			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral);
+-			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-active);
+-			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-disabled);
++			&.is-minimal:not([aria-pressed="true"]) {
++				--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-weak);
++				--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-weak-active);
++				--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
++			}
+ 		}
+ 
+-		&.is-outline {
+-			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-weak);
+-			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-weak-active);
+-			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+-			--wp-ui-button-border-color: var(--wpds-color-stroke-interactive-neutral);
+-			--wp-ui-button-border-color-active: var(--wpds-color-stroke-interactive-neutral-active);
+-			--wp-ui-button-border-color-disabled: var(--wpds-color-stroke-interactive-neutral-disabled);
++		.is-unstyled {
++			min-width: unset;
++			border: none;
++			background: none;
+ 		}
+ 
+-		&.is-minimal:not([aria-pressed="true"]) {
+-			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-weak);
+-			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-weak-active);
+-			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
++		.is-compact {
++			--wp-ui-button-height: 32px;
+ 		}
+-	}
+-
+-	.is-unstyled {
+-		min-width: unset;
+-		border: none;
+-		background: none;
+-	}
+-
+-	.is-compact {
+-		--wp-ui-button-height: 32px;
+-	}
+-
+-	.is-loading {
+-		color: transparent;
+ 
+-		/* Keep text transparent when a loading button is hovered — needed because
+-		 the hover state now sets `color` as a property declaration. */
+-		&:not([data-disabled]):is(:hover, :active, :focus) {
++		.is-loading {
+ 			color: transparent;
+-		}
+ 
+-		* {
+-			opacity: 0;
+-		}
++			/* Keep text transparent when a loading button is hovered — needed because
++			 the hover state now sets `color` as a property declaration. */
++			&:not([data-disabled]):is(:hover, :active, :focus) {
++				color: transparent;
++			}
+ 
+-		&::before {
+-			transition-delay: 0.05s;
+-			opacity: 1;
++			* {
++				opacity: 0;
++			}
+ 
+-			@media not ( prefers-reduced-motion ) {
+-				animation: loading-animation 1s linear infinite;
++			&::before {
++				transition-delay: 0.05s;
++				opacity: 1;
++
++				@media not ( prefers-reduced-motion ) {
++					animation: loading-animation 1s linear infinite;
++				}
+ 			}
+ 		}
+-	}
+-
+-}
+ 
+-@keyframes loading-animation {
+-	0% {
+-		transform: translate(-50%, -50%) rotate(0deg);
+ 	}
+ 
+-	100% {
+-		transform: translate(-50%, -50%) rotate(360deg);
++	@keyframes loading-animation {
++		0% {
++			transform: translate(-50%, -50%) rotate(0deg);
++		}
++
++		100% {
++			transform: translate(-50%, -50%) rotate(360deg);
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/card/style.module.css b/packages/ui/src/card/style.module.css
+index 33c18496bdbf30..294de8e7de768a 100644
+--- a/packages/ui/src/card/style.module.css
++++ b/packages/ui/src/card/style.module.css
+@@ -1,57 +1,59 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+-
+-@layer wp-ui-components {
+-	.root {
+-		--wp-ui-card-padding: var(--wpds-dimension-padding-2xl);
+-		--wp-ui-card-header-content-gap: var(--wpds-dimension-gap-xl);
+-		--wp-ui-card-header-content-margin: calc(var(--wp-ui-card-header-content-gap) - var(--wp-ui-card-padding));
+-
+-		display: flex;
+-		flex-direction: column;
+-		border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+-		border-radius: var(--wpds-border-radius-lg);
+-		overflow: clip;
+-		background-color: var(--wpds-color-bg-surface-neutral-strong);
+-		color: var(--wpds-color-fg-content-neutral);
+-	}
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
++
++	@layer components {
++		.root {
++			--wp-ui-card-padding: var(--wpds-dimension-padding-2xl);
++			--wp-ui-card-header-content-gap: var(--wpds-dimension-gap-xl);
++			--wp-ui-card-header-content-margin: calc(var(--wp-ui-card-header-content-gap) - var(--wp-ui-card-padding));
++
++			display: flex;
++			flex-direction: column;
++			border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
++			border-radius: var(--wpds-border-radius-lg);
++			overflow: clip;
++			background-color: var(--wpds-color-bg-surface-neutral-strong);
++			color: var(--wpds-color-fg-content-neutral);
++		}
+ 
+-	/* Padding is applied to the individual header/content elements to enable
+-	 * the higher-level `CollapsibleCard` component to be fully clickable
+-	 * to expand/collapse the card.
+-	*/
+-	.header,
+-	.content {
+-		padding: var(--wp-ui-card-padding);
++		/* Padding is applied to the individual header/content elements to enable
++		 * the higher-level `CollapsibleCard` component to be fully clickable
++		 * to expand/collapse the card.
++		*/
++		.header,
++		.content {
++			padding: var(--wp-ui-card-padding);
++
++			&:not(:first-child):not(:last-child) {
++				padding-block-end: 0;
++			}
++		}
+ 
+-		&:not(:first-child):not(:last-child) {
+-			padding-block-end: 0;
++		/* Custom vertical gap between header and content */
++		.header + .content {
++			padding-block-start: 0;
++			margin-block-start: var(--wp-ui-card-header-content-margin);
+ 		}
+-	}
+ 
+-	/* Custom vertical gap between header and content */
+-	.header + .content {
+-		padding-block-start: 0;
+-		margin-block-start: var(--wp-ui-card-header-content-margin);
+-	}
++		.fullbleed {
++			margin-inline: calc(-1 * var(--wp-ui-card-padding));
++			width: calc(100% + 2 * var(--wp-ui-card-padding));
++		}
+ 
+-	.fullbleed {
+-		margin-inline: calc(-1 * var(--wp-ui-card-padding));
+-		width: calc(100% + 2 * var(--wp-ui-card-padding));
+-	}
++		/*
++		 * When FullBleed sits at the start of the first *root* card section, extend
++		 * it flush to the card's top edge. Must use `.root >` so `Card.Content`
++		 * nested inside `CollapsibleCard`'s panel is not treated as `:first-child`
++		 * (which would pull FullBleed up into the header gap).
++		 */
++		.root > :is(.header, .content):first-child > .fullbleed:first-child {
++			margin-block-start: calc(-1 * var(--wp-ui-card-padding));
++		}
+ 
+-	/*
+-	 * When FullBleed sits at the start of the first *root* card section, extend
+-	 * it flush to the card's top edge. Must use `.root >` so `Card.Content`
+-	 * nested inside `CollapsibleCard`'s panel is not treated as `:first-child`
+-	 * (which would pull FullBleed up into the header gap).
+-	 */
+-	.root > :is(.header, .content):first-child > .fullbleed:first-child {
+-		margin-block-start: calc(-1 * var(--wp-ui-card-padding));
+-	}
++		/* When FullBleed sits at the end of the last card section, extend it flush to the card's bottom edge. */
++		:is(.header, .content):last-child > .fullbleed:last-child {
++			margin-block-end: calc(-1 * var(--wp-ui-card-padding));
++		}
+ 
+-	/* When FullBleed sits at the end of the last card section, extend it flush to the card's bottom edge. */
+-	:is(.header, .content):last-child > .fullbleed:last-child {
+-		margin-block-end: calc(-1 * var(--wp-ui-card-padding));
+ 	}
+-
+ }
+diff --git a/packages/ui/src/collapsible-card/style.module.css b/packages/ui/src/collapsible-card/style.module.css
+index b61f7ddcc1e199..6019f0a4a7d155 100644
+--- a/packages/ui/src/collapsible-card/style.module.css
++++ b/packages/ui/src/collapsible-card/style.module.css
+@@ -1,114 +1,116 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+-
+-@layer wp-ui-components {
+-	/*
+-	 * Style overrides for the outer wrapper rendered by `CollapsibleCard.Header`
+-	 * (defaults to `<div>`, but consumers can opt into a heading level via
+-	 * `render={ <h2 /> }` etc.). Combined with `defenseStyles.heading` so that,
+-	 * when the wrapper renders as an h1–h6, the unlayered defense class beats
+-	 * wp-admin's bare `h2`/`h3`/etc. selectors. Keeps the wrapper visually
+-	 * transparent so UA and host stylesheets don't bleed into the inner
+-	 * trigger.
+-	 */
+-	.heading-wrapper {
+-		--_gcd-heading-color: inherit;
+-		--_gcd-heading-font-size: inherit;
+-		--_gcd-heading-font-weight: inherit;
+-		--_gcd-heading-margin: 0;
+-
+-		/* Properties not covered by the defense file. */
+-		font-family: inherit;
+-		line-height: inherit;
+-	}
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
++
++	@layer components {
++		/*
++		 * Style overrides for the outer wrapper rendered by `CollapsibleCard.Header`
++		 * (defaults to `<div>`, but consumers can opt into a heading level via
++		 * `render={ <h2 /> }` etc.). Combined with `defenseStyles.heading` so that,
++		 * when the wrapper renders as an h1–h6, the unlayered defense class beats
++		 * wp-admin's bare `h2`/`h3`/etc. selectors. Keeps the wrapper visually
++		 * transparent so UA and host stylesheets don't bleed into the inner
++		 * trigger.
++		 */
++		.heading-wrapper {
++			--_gcd-heading-color: inherit;
++			--_gcd-heading-font-size: inherit;
++			--_gcd-heading-font-weight: inherit;
++			--_gcd-heading-margin: 0;
++
++			/* Properties not covered by the defense file. */
++			font-family: inherit;
++			line-height: inherit;
++		}
+ 
+-	.header-content {
+-		flex: 1;
+-		min-width: 0;
+-	}
++		.header-content {
++			flex: 1;
++			min-width: 0;
++		}
+ 
+-	.header-trigger-positioner {
+-		flex-shrink: 0;
+-		align-self: center;
+-		/* Prevent the trigger from making the header taller than its content,
+-		   preserving the same metrics between `Card` and `CollapsibleCard`. */
+-		max-height: 0;
+-		overflow: visible;
+-	}
++		.header-trigger-positioner {
++			flex-shrink: 0;
++			align-self: center;
++			/* Prevent the trigger from making the header taller than its content,
++			   preserving the same metrics between `Card` and `CollapsibleCard`. */
++			max-height: 0;
++			overflow: visible;
++		}
+ 
+-	.header-trigger-wrapper {
+-		display: flex;
++		.header-trigger-wrapper {
++			display: flex;
+ 
+-		/* Offset by half the button's own height so it visually centers
+-		   at the wrapper's midpoint (which `align-self: center` places at
+-		   the vertical center of the header). */
+-		translate: 0 -50%;
++			/* Offset by half the button's own height so it visually centers
++			   at the wrapper's midpoint (which `align-self: center` places at
++			   the vertical center of the header). */
++			translate: 0 -50%;
+ 
+-		/* For an outline that looks like `IconButton`'s */
+-		border-radius: var(--wpds-border-radius-sm);
+-	}
++			/* For an outline that looks like `IconButton`'s */
++			border-radius: var(--wpds-border-radius-sm);
++		}
+ 
+-	.header-trigger {
+-		@media not ( prefers-reduced-motion ) {
+-			transition: rotate 0.15s ease-out;
++		.header-trigger {
++			@media not ( prefers-reduced-motion ) {
++				transition: rotate 0.15s ease-out;
++			}
+ 		}
+-	}
+ 
+-	.header[data-panel-open] .header-trigger {
+-		rotate: 180deg;
+-	}
++		.header[data-panel-open] .header-trigger {
++			rotate: 180deg;
++		}
+ 
+-	/* Simulate disabled button styles */
+-	.header[data-disabled] .header-trigger {
+-		color: var(--wpds-color-fg-interactive-neutral-disabled);
+-	}
++		/* Simulate disabled button styles */
++		.header[data-disabled] .header-trigger {
++			color: var(--wpds-color-fg-interactive-neutral-disabled);
++		}
+ 
+-	.content {
+-		height: var(--collapsible-panel-height);
+-		margin-block-start: var(--wp-ui-card-header-content-margin);
++		.content {
++			height: var(--collapsible-panel-height);
++			margin-block-start: var(--wp-ui-card-header-content-margin);
+ 
+-		/* Clip while collapsed or transitioning so the panel collapses
+-		   cleanly. The `overflowVisible` class is set once the open
+-		   transition has settled, dropping the clip so descendant
+-		   focus rings aren't cut off. */
+-		overflow: hidden;
++			/* Clip while collapsed or transitioning so the panel collapses
++			   cleanly. The `overflowVisible` class is set once the open
++			   transition has settled, dropping the clip so descendant
++			   focus rings aren't cut off. */
++			overflow: hidden;
+ 
+-		&.overflowVisible {
+-			overflow: visible;
+-		}
++			&.overflowVisible {
++				overflow: visible;
++			}
+ 
+-		&[hidden]:not([hidden="until-found"]) {
+-			display: none;
+-		}
++			&[hidden]:not([hidden="until-found"]) {
++				display: none;
++			}
+ 
+-		&[data-starting-style],
+-		&[data-ending-style] {
+-			height: 0;
+-		}
++			&[data-starting-style],
++			&[data-ending-style] {
++				height: 0;
++			}
+ 
+-		@media not ( prefers-reduced-motion ) {
+-			transition: all 150ms ease-out;
++			@media not ( prefers-reduced-motion ) {
++				transition: all 150ms ease-out;
++			}
+ 		}
+ 	}
+-}
+ 
+-@layer wp-ui-compositions {
+-	.content-inner {
+-		/* Card.Content's `.header + .content` selector doesn't match here
+-		   because Collapsible.Panel sits between Card.Header and Card.Content.
+-		   Re-apply the zero top padding manually so the header/content gap
+-		   matches Card. */
+-		padding-block-start: 0;
+-	}
++	@layer compositions {
++		.content-inner {
++			/* Card.Content's `.header + .content` selector doesn't match here
++			   because Collapsible.Panel sits between Card.Header and Card.Content.
++			   Re-apply the zero top padding manually so the header/content gap
++			   matches Card. */
++			padding-block-start: 0;
++		}
+ 
+-	.header {
+-		display: flex;
+-		flex-direction: row;
+-		align-items: stretch;
+-		gap: var(--wpds-dimension-gap-sm);
+-		outline: none;
++		.header {
++			display: flex;
++			flex-direction: row;
++			align-items: stretch;
++			gap: var(--wpds-dimension-gap-sm);
++			outline: none;
+ 
+-		&:not([data-disabled]) {
+-			cursor: var(--wpds-cursor-control);
++			&:not([data-disabled]) {
++				cursor: var(--wpds-cursor-control);
++			}
+ 		}
+ 	}
+ }
+diff --git a/packages/ui/src/dialog/style.module.css b/packages/ui/src/dialog/style.module.css
+index 3dd4ee3b681b75..67c0edff87a2db 100644
+--- a/packages/ui/src/dialog/style.module.css
++++ b/packages/ui/src/dialog/style.module.css
+@@ -1,164 +1,166 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+-
+-@layer wp-ui-components {
+-	.backdrop {
+-		position: fixed;
+-		inset: 0;
+-		z-index: var(--wp-ui-dialog-z-index, initial);
+-		background-color: rgba(0, 0, 0, 0.35);
+-
+-		&[data-starting-style],
+-		&[data-ending-style] {
+-			opacity: 0;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
++
++	@layer components {
++		.backdrop {
++			position: fixed;
++			inset: 0;
++			z-index: var(--wp-ui-dialog-z-index, initial);
++			background-color: rgba(0, 0, 0, 0.35);
++
++			&[data-starting-style],
++			&[data-ending-style] {
++				opacity: 0;
++			}
++
++			&[data-open] {
++				opacity: 1;
++			}
++
++			@media not (prefers-reduced-motion) {
++				transition: opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle);
++			}
+ 		}
+ 
+-		&[data-open] {
+-			opacity: 1;
++		/*
++		 * The popup is a flex column that lays out three regions — header,
++		 * content, footer — as siblings. The middle `.content` region owns the
++		 * scroll; the popup itself clips to its rounded border. See
++		 * `overlay-chrome.module.css` for the shared chrome/content primitives.
++		 */
++		.popup {
++			--viewport-inset: var(--wpds-dimension-padding-2xl);
++
++			position: fixed;
++			top: 50%;
++			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical centering technique used with transform: translate(-50%, -50%) */
++			left: 50%;
++			z-index: var(--wp-ui-dialog-z-index, initial);
++			transform: translate(-50%, -50%);
++			box-sizing: border-box;
++			display: flex;
++			flex-direction: column;
++			min-width: var(--wpds-dimension-surface-width-sm);
++			width: calc(100vw - 2 * var(--viewport-inset));
++			max-height: calc(100dvh - 2 * var(--viewport-inset));
++			background-color: var(--wpds-color-bg-surface-neutral-strong);
++			border-radius: var(--wpds-border-radius-lg);
++			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
++			box-shadow: var(--wpds-elevation-lg);
++			overflow: hidden;
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wpds-typography-font-size-md);
++			line-height: var(--wpds-typography-line-height-md);
++			color: var(--wpds-color-fg-content-neutral);
++
++			&[data-starting-style],
++			&[data-ending-style] {
++				opacity: 0;
++				transform: translate(-50%, -50%) scale(0.9);
++			}
++
++			@media not (prefers-reduced-motion) {
++				transition:
++					opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive),
++					transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive);
++			}
++
++			@media (min-width: 480px) {
++				min-width: var(--wpds-dimension-surface-width-md);
++			}
++
++			&.is-small {
++				max-width: var(--wpds-dimension-surface-width-md);
++			}
++
++			&.is-medium {
++				max-width: var(--wpds-dimension-surface-width-lg);
++			}
++
++			&.is-large {
++				max-width: var(--wpds-dimension-surface-width-2xl);
++			}
++
++			&.is-stretch {
++				/* The dialog stretches to fill available width. */
++				max-width: none;
++			}
++
++			&.is-full {
++				/*
++				 * Force full height (full width is already in default styles).
++				 * The max-{width,height} properties will make sure some padding is shown.
++				 */
++				height: 100dvh;
++			}
+ 		}
+ 
+-		@media not (prefers-reduced-motion) {
+-			transition: opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle);
+-		}
+-	}
+-
+-	/*
+-	 * The popup is a flex column that lays out three regions — header,
+-	 * content, footer — as siblings. The middle `.content` region owns the
+-	 * scroll; the popup itself clips to its rounded border. See
+-	 * `overlay-chrome.module.css` for the shared chrome/content primitives.
+-	 */
+-	.popup {
+-		--viewport-inset: var(--wpds-dimension-padding-2xl);
+-
+-		position: fixed;
+-		top: 50%;
+-		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical centering technique used with transform: translate(-50%, -50%) */
+-		left: 50%;
+-		z-index: var(--wp-ui-dialog-z-index, initial);
+-		transform: translate(-50%, -50%);
+-		box-sizing: border-box;
+-		display: flex;
+-		flex-direction: column;
+-		min-width: var(--wpds-dimension-surface-width-sm);
+-		width: calc(100vw - 2 * var(--viewport-inset));
+-		max-height: calc(100dvh - 2 * var(--viewport-inset));
+-		background-color: var(--wpds-color-bg-surface-neutral-strong);
+-		border-radius: var(--wpds-border-radius-lg);
+-		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+-		box-shadow: var(--wpds-elevation-lg);
+-		overflow: hidden;
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-md);
+-		line-height: var(--wpds-typography-line-height-md);
+-		color: var(--wpds-color-fg-content-neutral);
+-
+-		&[data-starting-style],
+-		&[data-ending-style] {
+-			opacity: 0;
+-			transform: translate(-50%, -50%) scale(0.9);
++		/*
++		 * When a backdrop is rendered alongside the popup (modal mode),
++		 * hide the regular-mode border. The backdrop already provides
++		 * visual containment, so the border becomes redundant noise.
++		 * `transparent` (not `none`) keeps popup geometry identical
++		 * across modal/non-modal — `box-sizing: border-box` absorbs the
++		 * 1px into the existing box.
++		 */
++		.backdrop ~ * .popup {
++			border-color: transparent;
+ 		}
+ 
+-		@media not (prefers-reduced-motion) {
+-			transition:
+-				opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive),
+-				transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive);
++		/*
++		 * Forced-colors mode strips `box-shadow` and substitutes
++		 * `background-color` with `Canvas` (the page background), so the
++		 * boundary depends entirely on the border. Set `CanvasText`
++		 * explicitly for both modal and non-modal popups: `transparent`
++		 * is not substituted by the UA, and being explicit also removes
++		 * any reliance on UA color-substitution behavior for the
++		 * non-modal case.
++		 */
++		@media (forced-colors: active) {
++			.popup,
++			.backdrop ~ * .popup {
++				border-color: CanvasText;
++			}
+ 		}
+ 
+-		@media (min-width: 480px) {
+-			min-width: var(--wpds-dimension-surface-width-md);
++		/*
++		 * Chrome + content primitives are centralized in
++		 * `overlay-chrome.module.css` and shared with `drawer/style.module.css`
++		 * and `alert-dialog/popup.tsx`. Separator coloring and the modal
++		 * overscroll rule live there as well, keyed off the
++		 * `data-wp-ui-overlay-scroll-container` attribute that
++		 * `useOverlayScrollStateAttributes` sets on the scroll container.
++		 */
++		.header {
++			composes: header from "../utils/css/overlay-chrome.module.css";
+ 		}
+ 
+-		&.is-small {
+-			max-width: var(--wpds-dimension-surface-width-md);
++		.footer {
++			composes: footer from "../utils/css/overlay-chrome.module.css";
+ 		}
+ 
+-		&.is-medium {
+-			max-width: var(--wpds-dimension-surface-width-lg);
++		.title {
++			composes: title from "../utils/css/overlay-chrome.module.css";
+ 		}
+ 
+-		&.is-large {
+-			max-width: var(--wpds-dimension-surface-width-2xl);
++		.content {
++			composes: content from "../utils/css/overlay-chrome.module.css";
+ 		}
+ 
+-		&.is-stretch {
+-			/* The dialog stretches to fill available width. */
+-			max-width: none;
++		/*
++		 * Push the close icon to the inline end even when the title is taken out
++		 * of flow (e.g. wrapped in `VisuallyHidden`, which sets `position:
++		 * absolute`). In that case `.title`'s `margin-inline-end: auto` is a
++		 * no-op because the title no longer participates in the flex layout, so
++		 * we also anchor the close icon itself.
++		 */
++		.header [data-wp-ui-dialog-close-icon] {
++			margin-inline-start: auto;
+ 		}
+ 
+-		&.is-full {
+-			/*
+-			 * Force full height (full width is already in default styles).
+-			 * The max-{width,height} properties will make sure some padding is shown.
+-			 */
+-			height: 100dvh;
++		.description {
++			margin-bottom: var(--wpds-dimension-gap-lg);
+ 		}
+-	}
+-
+-	/*
+-	 * When a backdrop is rendered alongside the popup (modal mode),
+-	 * hide the regular-mode border. The backdrop already provides
+-	 * visual containment, so the border becomes redundant noise.
+-	 * `transparent` (not `none`) keeps popup geometry identical
+-	 * across modal/non-modal — `box-sizing: border-box` absorbs the
+-	 * 1px into the existing box.
+-	 */
+-	.backdrop ~ * .popup {
+-		border-color: transparent;
+-	}
+-
+-	/*
+-	 * Forced-colors mode strips `box-shadow` and substitutes
+-	 * `background-color` with `Canvas` (the page background), so the
+-	 * boundary depends entirely on the border. Set `CanvasText`
+-	 * explicitly for both modal and non-modal popups: `transparent`
+-	 * is not substituted by the UA, and being explicit also removes
+-	 * any reliance on UA color-substitution behavior for the
+-	 * non-modal case.
+-	 */
+-	@media (forced-colors: active) {
+-		.popup,
+-		.backdrop ~ * .popup {
+-			border-color: CanvasText;
+-		}
+-	}
+ 
+-	/*
+-	 * Chrome + content primitives are centralized in
+-	 * `overlay-chrome.module.css` and shared with `drawer/style.module.css`
+-	 * and `alert-dialog/popup.tsx`. Separator coloring and the modal
+-	 * overscroll rule live there as well, keyed off the
+-	 * `data-wp-ui-overlay-scroll-container` attribute that
+-	 * `useOverlayScrollStateAttributes` sets on the scroll container.
+-	 */
+-	.header {
+-		composes: header from "../utils/css/overlay-chrome.module.css";
+ 	}
+-
+-	.footer {
+-		composes: footer from "../utils/css/overlay-chrome.module.css";
+-	}
+-
+-	.title {
+-		composes: title from "../utils/css/overlay-chrome.module.css";
+-	}
+-
+-	.content {
+-		composes: content from "../utils/css/overlay-chrome.module.css";
+-	}
+-
+-	/*
+-	 * Push the close icon to the inline end even when the title is taken out
+-	 * of flow (e.g. wrapped in `VisuallyHidden`, which sets `position:
+-	 * absolute`). In that case `.title`'s `margin-inline-end: auto` is a
+-	 * no-op because the title no longer participates in the flex layout, so
+-	 * we also anchor the close icon itself.
+-	 */
+-	.header [data-wp-ui-dialog-close-icon] {
+-		margin-inline-start: auto;
+-	}
+-
+-	.description {
+-		margin-bottom: var(--wpds-dimension-gap-lg);
+-	}
+-
+ }
+diff --git a/packages/ui/src/drawer/style.module.css b/packages/ui/src/drawer/style.module.css
+index 0b4e85785d61b7..9a7abee900e099 100644
+--- a/packages/ui/src/drawer/style.module.css
++++ b/packages/ui/src/drawer/style.module.css
+@@ -1,344 +1,346 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+-
+-@layer wp-ui-components {
+-	.backdrop {
+-		--backdrop-opacity: 0.35;
+-		position: fixed;
+-		inset: 0;
+-		z-index: var(--wp-ui-drawer-z-index, initial);
+-		min-height: 100dvh;
+-		background-color: rgb(0, 0, 0);
+-		opacity: calc(var(--backdrop-opacity) * (1 - var(--drawer-swipe-progress)));
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
++
++	@layer components {
++		.backdrop {
++			--backdrop-opacity: 0.35;
++			position: fixed;
++			inset: 0;
++			z-index: var(--wp-ui-drawer-z-index, initial);
++			min-height: 100dvh;
++			background-color: rgb(0, 0, 0);
++			opacity: calc(var(--backdrop-opacity) * (1 - var(--drawer-swipe-progress)));
+ 
+-		/*
+-		 * WebKit/iOS Safari workaround: use absolute positioning so the
+-		 * backdrop tracks the visible viewport instead of the layout one.
+-		 */
+-		@supports (-webkit-touch-callout: none) {
+-			position: absolute;
+-		}
+-
+-		&[data-starting-style],
+-		&[data-ending-style] {
+-			opacity: 0;
+-		}
+-
+-		@media not (prefers-reduced-motion) {
+ 			/*
+-			 * The duration and easing are intentionally different from
+-			 * Dialog's backdrop: they match the popup's slide-in/out so the
+-			 * two surfaces transition together. The ending-style duration is
+-			 * further scaled by `--drawer-swipe-strength` so the backdrop
+-			 * fades in lockstep with a swipe-dismissed popup.
++			 * WebKit/iOS Safari workaround: use absolute positioning so the
++			 * backdrop tracks the visible viewport instead of the layout one.
+ 			 */
+-			transition: opacity 450ms cubic-bezier(0.32, 0.72, 0, 1);
++			@supports (-webkit-touch-callout: none) {
++				position: absolute;
++			}
+ 
++			&[data-starting-style],
+ 			&[data-ending-style] {
+-				pointer-events: none;
+-				transition-duration: calc(var(--drawer-swipe-strength) * 400ms);
++				opacity: 0;
+ 			}
+ 
+-			&[data-swiping] {
+-				transition-duration: 0ms;
++			@media not (prefers-reduced-motion) {
++				/*
++				 * The duration and easing are intentionally different from
++				 * Dialog's backdrop: they match the popup's slide-in/out so the
++				 * two surfaces transition together. The ending-style duration is
++				 * further scaled by `--drawer-swipe-strength` so the backdrop
++				 * fades in lockstep with a swipe-dismissed popup.
++				 */
++				transition: opacity 450ms cubic-bezier(0.32, 0.72, 0, 1);
++
++				&[data-ending-style] {
++					pointer-events: none;
++					transition-duration: calc(var(--drawer-swipe-strength) * 400ms);
++				}
++
++				&[data-swiping] {
++					transition-duration: 0ms;
++				}
+ 			}
+ 		}
+-	}
+ 
+-	.viewport {
+-		position: fixed;
+-		inset: 0;
+-		z-index: var(--wp-ui-drawer-z-index, initial);
+-		pointer-events: none;
+-	}
+-
+-	/*
+-	 * The popup is a flex column laying out three regions — header, content,
+-	 * footer — as siblings. Scrolling lives on `Drawer.Content` (which wraps
+-	 * Base UI's `_Drawer.Content`), not the popup. `overflow: hidden` clips
+-	 * content to the rounded border; transform-based swipe animations are
+-	 * unaffected by it. See `overlay-chrome.module.css` for the shared
+-	 * chrome/content primitives.
+-	 */
+-	.popup {
+-		--viewport-inset: var(--wpds-dimension-padding-2xl);
+-
+-		position: fixed;
+-		z-index: var(--wp-ui-drawer-z-index, initial);
+-		box-sizing: border-box;
+-		display: flex;
+-		flex-direction: column;
+-		outline: 0;
+-		overflow: hidden;
+-		pointer-events: auto;
+-		background-color: var(--wpds-color-bg-surface-neutral-strong);
+-		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+-		box-shadow: var(--wpds-elevation-lg);
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-md);
+-		line-height: var(--wpds-typography-line-height-md);
+-		color: var(--wpds-color-fg-content-neutral);
+-		touch-action: auto;
+-
+-		/*
+-		 * Hint compositing while the popup is in motion (opening, swiping,
+-		 * or closing). Scoping `will-change` to these states avoids
+-		 * retaining a transform layer while the drawer is fully idle.
+-		 *
+-		 * Limited to `transform` because that's the only animated property
+-		 * the compositor can take off the main thread; `box-shadow` (also
+-		 * transitioned below) is repainted on the main thread regardless,
+-		 * so listing it here would just bloat the layer.
+-		 */
+-		&[data-open],
+-		&[data-swiping],
+-		&[data-ending-style] {
+-			will-change: transform;
++		.viewport {
++			position: fixed;
++			inset: 0;
++			z-index: var(--wp-ui-drawer-z-index, initial);
++			pointer-events: none;
+ 		}
+ 
+ 		/*
+-		 * Drop the elevation shadow while the popup is offscreen
+-		 * (`[data-starting-style]` and `[data-ending-style]` translate the
+-		 * popup fully past the viewport edge). The shadow's blur radius
+-		 * would otherwise bleed back into the viewport at the screen edge,
+-		 * appearing as a faint halo at mount/unmount instead of fading
+-		 * with the slide. `box-shadow: none` interpolates against the
+-		 * resolved token value as a list of zero-shadow layers.
+-		 *
+-		 * Kept outside the `prefers-reduced-motion` guard below so the
+-		 * popup still mounts / unmounts without a stray shadow when
+-		 * transitions are disabled — the value flips instantly to `none`
+-		 * at the offscreen states, matching the instantaneous transform.
++		 * The popup is a flex column laying out three regions — header, content,
++		 * footer — as siblings. Scrolling lives on `Drawer.Content` (which wraps
++		 * Base UI's `_Drawer.Content`), not the popup. `overflow: hidden` clips
++		 * content to the rounded border; transform-based swipe animations are
++		 * unaffected by it. See `overlay-chrome.module.css` for the shared
++		 * chrome/content primitives.
+ 		 */
+-		&[data-starting-style],
+-		&[data-ending-style] {
+-			box-shadow: none;
+-		}
+-
+-		@media not (prefers-reduced-motion) {
+-			transition:
+-				transform 450ms cubic-bezier(0.32, 0.72, 0, 1),
+-				box-shadow 450ms cubic-bezier(0.32, 0.72, 0, 1);
++		.popup {
++			--viewport-inset: var(--wpds-dimension-padding-2xl);
++
++			position: fixed;
++			z-index: var(--wp-ui-drawer-z-index, initial);
++			box-sizing: border-box;
++			display: flex;
++			flex-direction: column;
++			outline: 0;
++			overflow: hidden;
++			pointer-events: auto;
++			background-color: var(--wpds-color-bg-surface-neutral-strong);
++			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
++			box-shadow: var(--wpds-elevation-lg);
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wpds-typography-font-size-md);
++			line-height: var(--wpds-typography-line-height-md);
++			color: var(--wpds-color-fg-content-neutral);
++			touch-action: auto;
+ 
++			/*
++			 * Hint compositing while the popup is in motion (opening, swiping,
++			 * or closing). Scoping `will-change` to these states avoids
++			 * retaining a transform layer while the drawer is fully idle.
++			 *
++			 * Limited to `transform` because that's the only animated property
++			 * the compositor can take off the main thread; `box-shadow` (also
++			 * transitioned below) is repainted on the main thread regardless,
++			 * so listing it here would just bloat the layer.
++			 */
++			&[data-open],
++			&[data-swiping],
+ 			&[data-ending-style] {
+-				transition-duration: calc(var(--drawer-swipe-strength) * 400ms);
++				will-change: transform;
+ 			}
+ 
+-			&[data-swiping] {
+-				transition-duration: 0ms;
++			/*
++			 * Drop the elevation shadow while the popup is offscreen
++			 * (`[data-starting-style]` and `[data-ending-style]` translate the
++			 * popup fully past the viewport edge). The shadow's blur radius
++			 * would otherwise bleed back into the viewport at the screen edge,
++			 * appearing as a faint halo at mount/unmount instead of fading
++			 * with the slide. `box-shadow: none` interpolates against the
++			 * resolved token value as a list of zero-shadow layers.
++			 *
++			 * Kept outside the `prefers-reduced-motion` guard below so the
++			 * popup still mounts / unmounts without a stray shadow when
++			 * transitions are disabled — the value flips instantly to `none`
++			 * at the offscreen states, matching the instantaneous transform.
++			 */
++			&[data-starting-style],
++			&[data-ending-style] {
++				box-shadow: none;
+ 			}
+-		}
+ 
+-		/*
+-		 * TODO: should top/bottom sides use different tokens for the height
+-		 * of the popup, compared to the width?
+-		 */
+-		&.is-small {
+-			--popup-size: var(--wpds-dimension-surface-width-sm);
+-		}
++			@media not (prefers-reduced-motion) {
++				transition:
++					transform 450ms cubic-bezier(0.32, 0.72, 0, 1),
++					box-shadow 450ms cubic-bezier(0.32, 0.72, 0, 1);
+ 
+-		&.is-medium {
+-			--popup-size: var(--wpds-dimension-surface-width-md);
+-		}
++				&[data-ending-style] {
++					transition-duration: calc(var(--drawer-swipe-strength) * 400ms);
++				}
+ 
+-		&.is-large {
+-			--popup-size: var(--wpds-dimension-surface-width-lg);
+-		}
+-
+-		&.is-stretch {
+-			--popup-size: var(--stretch-size);
+-		}
++				&[data-swiping] {
++					transition-duration: 0ms;
++				}
++			}
+ 
+-		&.is-auto {
+-			--popup-size: auto;
+-		}
++			/*
++			 * TODO: should top/bottom sides use different tokens for the height
++			 * of the popup, compared to the width?
++			 */
++			&.is-small {
++				--popup-size: var(--wpds-dimension-surface-width-sm);
++			}
+ 
+-		&[data-swiping] {
+-			user-select: none;
+-		}
++			&.is-medium {
++				--popup-size: var(--wpds-dimension-surface-width-md);
++			}
+ 
+-		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+-		&[data-swipe-direction="left"] {
+-			--stretch-size: calc(100vw - var(--viewport-inset));
++			&.is-large {
++				--popup-size: var(--wpds-dimension-surface-width-lg);
++			}
+ 
+-			top: 0;
+-			bottom: 0;
+-			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+-			left: 0;
+-			width: var(--popup-size);
+-			max-width: calc(100vw - var(--viewport-inset));
+-			border-start-end-radius: var(--wpds-border-radius-lg);
+-			border-end-end-radius: var(--wpds-border-radius-lg);
+-			transform: translateX(var(--drawer-swipe-movement-x));
++			&.is-stretch {
++				--popup-size: var(--stretch-size);
++			}
+ 
+-			&[data-starting-style],
+-			&[data-ending-style] {
+-				transform: translateX(-100%);
++			&.is-auto {
++				--popup-size: auto;
+ 			}
+-		}
+ 
+-		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+-		&[data-swipe-direction="right"] {
+-			--stretch-size: calc(100vw - var(--viewport-inset));
++			&[data-swiping] {
++				user-select: none;
++			}
+ 
+-			top: 0;
+-			bottom: 0;
+ 			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+-			right: 0;
+-			width: var(--popup-size);
+-			max-width: calc(100vw - var(--viewport-inset));
+-			border-start-start-radius: var(--wpds-border-radius-lg);
+-			border-end-start-radius: var(--wpds-border-radius-lg);
+-			transform: translateX(var(--drawer-swipe-movement-x));
+-
+-			&[data-starting-style],
+-			&[data-ending-style] {
+-				transform: translateX(100%);
++			&[data-swipe-direction="left"] {
++				--stretch-size: calc(100vw - var(--viewport-inset));
++
++				top: 0;
++				bottom: 0;
++				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
++				left: 0;
++				width: var(--popup-size);
++				max-width: calc(100vw - var(--viewport-inset));
++				border-start-end-radius: var(--wpds-border-radius-lg);
++				border-end-end-radius: var(--wpds-border-radius-lg);
++				transform: translateX(var(--drawer-swipe-movement-x));
++
++				&[data-starting-style],
++				&[data-ending-style] {
++					transform: translateX(-100%);
++				}
+ 			}
+-		}
+ 
+-		&[data-swipe-direction="down"] {
+-			--stretch-size: calc(100dvh - var(--viewport-inset));
+-
+-			bottom: 0;
+-			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+-			left: 0;
+ 			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+-			right: 0;
+-			height: var(--popup-size);
+-			max-height: calc(100dvh - var(--viewport-inset));
+-			border-start-start-radius: var(--wpds-border-radius-lg);
+-			border-start-end-radius: var(--wpds-border-radius-lg);
+-			transform: translateY(var(--drawer-swipe-movement-y));
+-
+-			&[data-starting-style],
+-			&[data-ending-style] {
+-				transform: translateY(100%);
++			&[data-swipe-direction="right"] {
++				--stretch-size: calc(100vw - var(--viewport-inset));
++
++				top: 0;
++				bottom: 0;
++				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
++				right: 0;
++				width: var(--popup-size);
++				max-width: calc(100vw - var(--viewport-inset));
++				border-start-start-radius: var(--wpds-border-radius-lg);
++				border-end-start-radius: var(--wpds-border-radius-lg);
++				transform: translateX(var(--drawer-swipe-movement-x));
++
++				&[data-starting-style],
++				&[data-ending-style] {
++					transform: translateX(100%);
++				}
+ 			}
+-		}
+-
+-		&[data-swipe-direction="up"] {
+-			--stretch-size: calc(100dvh - var(--viewport-inset));
+ 
+-			top: 0;
+-			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+-			left: 0;
+-			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+-			right: 0;
+-			height: var(--popup-size);
+-			max-height: calc(100dvh - var(--viewport-inset));
+-			border-end-start-radius: var(--wpds-border-radius-lg);
+-			border-end-end-radius: var(--wpds-border-radius-lg);
+-			transform: translateY(var(--drawer-swipe-movement-y));
++			&[data-swipe-direction="down"] {
++				--stretch-size: calc(100dvh - var(--viewport-inset));
++
++				bottom: 0;
++				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
++				left: 0;
++				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
++				right: 0;
++				height: var(--popup-size);
++				max-height: calc(100dvh - var(--viewport-inset));
++				border-start-start-radius: var(--wpds-border-radius-lg);
++				border-start-end-radius: var(--wpds-border-radius-lg);
++				transform: translateY(var(--drawer-swipe-movement-y));
++
++				&[data-starting-style],
++				&[data-ending-style] {
++					transform: translateY(100%);
++				}
++			}
+ 
+-			&[data-starting-style],
+-			&[data-ending-style] {
+-				transform: translateY(-100%);
++			&[data-swipe-direction="up"] {
++				--stretch-size: calc(100dvh - var(--viewport-inset));
++
++				top: 0;
++				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
++				left: 0;
++				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
++				right: 0;
++				height: var(--popup-size);
++				max-height: calc(100dvh - var(--viewport-inset));
++				border-end-start-radius: var(--wpds-border-radius-lg);
++				border-end-end-radius: var(--wpds-border-radius-lg);
++				transform: translateY(var(--drawer-swipe-movement-y));
++
++				&[data-starting-style],
++				&[data-ending-style] {
++					transform: translateY(-100%);
++				}
+ 			}
+ 		}
+-	}
+ 
+-	/*
+-	 * When a backdrop is rendered alongside the popup (modal mode),
+-	 * hide the regular-mode border. The backdrop already provides
+-	 * visual containment, so the border becomes redundant noise.
+-	 * `transparent` (not `none`) keeps popup geometry identical
+-	 * across modal/non-modal — `box-sizing: border-box` absorbs the
+-	 * 1px into the existing box.
+-	 */
+-	.backdrop ~ * .popup {
+-		border-color: transparent;
+-	}
+-
+-	/*
+-	 * Forced-colors mode strips `box-shadow` and substitutes
+-	 * `background-color` with `Canvas` (the page background), so the
+-	 * boundary depends entirely on the border. Set `CanvasText`
+-	 * explicitly for both modal and non-modal popups: `transparent`
+-	 * is not substituted by the UA, and being explicit also removes
+-	 * any reliance on UA color-substitution behavior for the
+-	 * non-modal case.
+-	 */
+-	@media (forced-colors: active) {
+-		.popup,
++		/*
++		 * When a backdrop is rendered alongside the popup (modal mode),
++		 * hide the regular-mode border. The backdrop already provides
++		 * visual containment, so the border becomes redundant noise.
++		 * `transparent` (not `none`) keeps popup geometry identical
++		 * across modal/non-modal — `box-sizing: border-box` absorbs the
++		 * 1px into the existing box.
++		 */
+ 		.backdrop ~ * .popup {
+-			border-color: CanvasText;
++			border-color: transparent;
+ 		}
+-	}
+ 
+-	/*
+-	 * Chrome + content primitives are centralized in
+-	 * `overlay-chrome.module.css` and shared with `dialog/style.module.css`
+-	 * and `alert-dialog/popup.tsx`. Separator coloring and the modal
+-	 * overscroll rule live there too, keyed off the
+-	 * `data-wp-ui-overlay-scroll-container` attribute set on `.content` by
+-	 * `useOverlayScrollStateAttributes`.
+-	 *
+-	 * For up/down drawers Base UI's swipe-dismiss-on-scroll-edge logic
+-	 * discovers the scrollable element by walking up from the touch target,
+-	 * so moving scroll ownership from the popup onto `.content` remains
+-	 * transparent to the gesture handling.
+-	 */
+-	.header {
+-		composes: header from "../utils/css/overlay-chrome.module.css";
+-	}
++		/*
++		 * Forced-colors mode strips `box-shadow` and substitutes
++		 * `background-color` with `Canvas` (the page background), so the
++		 * boundary depends entirely on the border. Set `CanvasText`
++		 * explicitly for both modal and non-modal popups: `transparent`
++		 * is not substituted by the UA, and being explicit also removes
++		 * any reliance on UA color-substitution behavior for the
++		 * non-modal case.
++		 */
++		@media (forced-colors: active) {
++			.popup,
++			.backdrop ~ * .popup {
++				border-color: CanvasText;
++			}
++		}
+ 
+-	.footer {
+-		composes: footer from "../utils/css/overlay-chrome.module.css";
+-	}
++		/*
++		 * Chrome + content primitives are centralized in
++		 * `overlay-chrome.module.css` and shared with `dialog/style.module.css`
++		 * and `alert-dialog/popup.tsx`. Separator coloring and the modal
++		 * overscroll rule live there too, keyed off the
++		 * `data-wp-ui-overlay-scroll-container` attribute set on `.content` by
++		 * `useOverlayScrollStateAttributes`.
++		 *
++		 * For up/down drawers Base UI's swipe-dismiss-on-scroll-edge logic
++		 * discovers the scrollable element by walking up from the touch target,
++		 * so moving scroll ownership from the popup onto `.content` remains
++		 * transparent to the gesture handling.
++		 */
++		.header {
++			composes: header from "../utils/css/overlay-chrome.module.css";
++		}
+ 
+-	.title {
+-		composes: title from "../utils/css/overlay-chrome.module.css";
+-	}
++		.footer {
++			composes: footer from "../utils/css/overlay-chrome.module.css";
++		}
+ 
+-	.content {
+-		composes: content from "../utils/css/overlay-chrome.module.css";
+-	}
++		.title {
++			composes: title from "../utils/css/overlay-chrome.module.css";
++		}
+ 
+-	/*
+-	 * Push the close icon to the inline end even when the title is taken out
+-	 * of flow (e.g. wrapped in `VisuallyHidden`, which sets `position:
+-	 * absolute`). In that case `.title`'s `margin-inline-end: auto` is a
+-	 * no-op because the title no longer participates in the flex layout, so
+-	 * we also anchor the close icon itself.
+-	 */
+-	.header [data-wp-ui-drawer-close-icon] {
+-		margin-inline-start: auto;
+-	}
++		.content {
++			composes: content from "../utils/css/overlay-chrome.module.css";
++		}
+ 
+-	/*
+-	 * Safe-area insets. The popup is anchored to a physical edge regardless
+-	 * of writing direction (see `left: 0` / `right: 0` on `.popup` above),
+-	 * so `env(safe-area-inset-*)` — which is already physical — is paired
+-	 * with matching physical padding properties.
+-	 *
+-	 * For left/right drawers the inset lives on the scroll container itself.
+-	 * For up/down drawers it lives on the chrome that occupies the popup's
+-	 * anchored edge (pinned case); when that edge has no chrome sibling,
+-	 * the scroll container carries the padding instead.
+-	 */
+-	.popup[data-swipe-direction="left"] .content {
+-		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
+-		padding-left: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-left));
+-	}
++		/*
++		 * Push the close icon to the inline end even when the title is taken out
++		 * of flow (e.g. wrapped in `VisuallyHidden`, which sets `position:
++		 * absolute`). In that case `.title`'s `margin-inline-end: auto` is a
++		 * no-op because the title no longer participates in the flex layout, so
++		 * we also anchor the close icon itself.
++		 */
++		.header [data-wp-ui-drawer-close-icon] {
++			margin-inline-start: auto;
++		}
+ 
+-	.popup[data-swipe-direction="right"] .content {
+-		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
+-		padding-right: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-right));
+-	}
++		/*
++		 * Safe-area insets. The popup is anchored to a physical edge regardless
++		 * of writing direction (see `left: 0` / `right: 0` on `.popup` above),
++		 * so `env(safe-area-inset-*)` — which is already physical — is paired
++		 * with matching physical padding properties.
++		 *
++		 * For left/right drawers the inset lives on the scroll container itself.
++		 * For up/down drawers it lives on the chrome that occupies the popup's
++		 * anchored edge (pinned case); when that edge has no chrome sibling,
++		 * the scroll container carries the padding instead.
++		 */
++		.popup[data-swipe-direction="left"] .content {
++			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
++			padding-left: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-left));
++		}
+ 
+-	.popup[data-swipe-direction="up"] > .header {
+-		padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
+-	}
++		.popup[data-swipe-direction="right"] .content {
++			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
++			padding-right: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-right));
++		}
+ 
+-	.popup[data-swipe-direction="down"] > .footer {
+-		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
+-	}
++		.popup[data-swipe-direction="up"] > .header {
++			padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
++		}
+ 
+-	.popup[data-swipe-direction="up"] > .content:first-child {
+-		padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
+-	}
++		.popup[data-swipe-direction="down"] > .footer {
++			padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
++		}
+ 
+-	.popup[data-swipe-direction="down"] > .content:last-child {
+-		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
++		.popup[data-swipe-direction="up"] > .content:first-child {
++			padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
++		}
++
++		.popup[data-swipe-direction="down"] > .content:last-child {
++			padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/empty-state/style.module.css b/packages/ui/src/empty-state/style.module.css
+index e6081ff437124f..00fb61380d0c52 100644
+--- a/packages/ui/src/empty-state/style.module.css
++++ b/packages/ui/src/empty-state/style.module.css
+@@ -1,53 +1,55 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.root {
+-		display: flex;
+-		flex-direction: column;
+-		align-items: center;
+-		text-align: center;
+-		max-width: var(--wpds-dimension-surface-width-sm);
+-		gap: var(--wpds-dimension-gap-xs);
+-		font-family: var(--wpds-typography-font-family-body);
+-		color: var(--wpds-color-fg-content-neutral);
+-		text-wrap: balance;
+-	}
++	@layer components {
++		.root {
++			display: flex;
++			flex-direction: column;
++			align-items: center;
++			text-align: center;
++			max-width: var(--wpds-dimension-surface-width-sm);
++			gap: var(--wpds-dimension-gap-xs);
++			font-family: var(--wpds-typography-font-family-body);
++			color: var(--wpds-color-fg-content-neutral);
++			text-wrap: balance;
++		}
+ 
+-	.visual {
+-		display: flex;
+-		margin-block-end: var(--wpds-dimension-gap-xs);
+-		align-items: center;
+-		justify-content: center;
+-		color: var(--wpds-color-fg-content-neutral-weak);
+-		line-height: 1;
+-	}
++		.visual {
++			display: flex;
++			margin-block-end: var(--wpds-dimension-gap-xs);
++			align-items: center;
++			justify-content: center;
++			color: var(--wpds-color-fg-content-neutral-weak);
++			line-height: 1;
++		}
+ 
+-	.icon {
+-		padding: var(--wpds-dimension-padding-xs);
+-		border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+-		border-radius: 50%;
+-		background-color: var(--wpds-color-bg-surface-neutral-weak);
+-	}
++		.icon {
++			padding: var(--wpds-dimension-padding-xs);
++			border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
++			border-radius: 50%;
++			background-color: var(--wpds-color-bg-surface-neutral-weak);
++		}
+ 
+-	.title {
+-		margin: 0;
+-	}
++		.title {
++			margin: 0;
++		}
+ 
+-	.description {
+-		margin: 0;
+-		color: var(--wpds-color-fg-content-neutral-weak);
+-	}
++		.description {
++			margin: 0;
++			color: var(--wpds-color-fg-content-neutral-weak);
++		}
+ 
+-	.actions {
+-		display: flex;
+-		margin-block-start: var(--wpds-dimension-gap-md);
+-		flex-direction: column;
+-		gap: var(--wpds-dimension-gap-xs);
+-		align-items: center;
++		.actions {
++			display: flex;
++			margin-block-start: var(--wpds-dimension-gap-md);
++			flex-direction: column;
++			gap: var(--wpds-dimension-gap-xs);
++			align-items: center;
+ 
+-		@media (min-width: 480px) {
+-			flex-direction: row;
+-			justify-content: center;
++			@media (min-width: 480px) {
++				flex-direction: row;
++				justify-content: center;
++			}
+ 		}
+ 	}
+ }
+diff --git a/packages/ui/src/form/primitives/autocomplete/style.module.css b/packages/ui/src/form/primitives/autocomplete/style.module.css
+index 18cd3eaa2befc2..90283140e7459e 100644
+--- a/packages/ui/src/form/primitives/autocomplete/style.module.css
++++ b/packages/ui/src/form/primitives/autocomplete/style.module.css
+@@ -1,7 +1,9 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.positioner {
+-		z-index: var(--wp-ui-autocomplete-z-index, initial);
++	@layer components {
++		.positioner {
++			z-index: var(--wp-ui-autocomplete-z-index, initial);
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/form/primitives/combobox/style.module.css b/packages/ui/src/form/primitives/combobox/style.module.css
+index fc1cb702c2fb3d..2d820fb263d6f3 100644
+--- a/packages/ui/src/form/primitives/combobox/style.module.css
++++ b/packages/ui/src/form/primitives/combobox/style.module.css
+@@ -1,70 +1,72 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.positioner {
+-		z-index: var(--wp-ui-combobox-z-index, initial);
+-	}
++	@layer components {
++		.positioner {
++			z-index: var(--wp-ui-combobox-z-index, initial);
++		}
+ 
+-	.chip {
+-		--wp-ui-combobox-chip-content-padding-inline-start: var(--wpds-dimension-padding-sm);
++		.chip {
++			--wp-ui-combobox-chip-content-padding-inline-start: var(--wpds-dimension-padding-sm);
+ 
+-		overflow: hidden;
+-		display: flex;
+-		align-items: center;
+-		min-height: 24px;
+-		border: 1px solid var(--wpds-color-stroke-interactive-neutral);
+-		border-radius: 12px;
+-		background-color: var(--wpds-color-bg-interactive-neutral-weak);
+-		font-size: var(--wpds-typography-font-size-md);
+-		color: var(--wpds-color-fg-interactive-neutral);
+-		cursor: default;
++			overflow: hidden;
++			display: flex;
++			align-items: center;
++			min-height: 24px;
++			border: 1px solid var(--wpds-color-stroke-interactive-neutral);
++			border-radius: 12px;
++			background-color: var(--wpds-color-bg-interactive-neutral-weak);
++			font-size: var(--wpds-typography-font-size-md);
++			color: var(--wpds-color-fg-interactive-neutral);
++			cursor: default;
+ 
+-		&:not([data-disabled]):has(button:not(:disabled, [aria-disabled="true"]):hover),
+-		&:not([data-disabled]):focus {
+-			background-color: var(--wpds-color-bg-interactive-neutral-weak-active);
+-			border-color: var(--wpds-color-stroke-interactive-neutral-active);
+-			outline: none;
+-			color: var(--wpds-color-fg-interactive-neutral-active);
++			&:not([data-disabled]):has(button:not(:disabled, [aria-disabled="true"]):hover),
++			&:not([data-disabled]):focus {
++				background-color: var(--wpds-color-bg-interactive-neutral-weak-active);
++				border-color: var(--wpds-color-stroke-interactive-neutral-active);
++				outline: none;
++				color: var(--wpds-color-fg-interactive-neutral-active);
+ 
+-			@media ( forced-colors: active ) {
+-				background-color: SelectedItem;
++				@media ( forced-colors: active ) {
++					background-color: SelectedItem;
++				}
+ 			}
+-		}
+ 
+-		&[data-disabled] {
+-			background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+-			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+-			color: var(--wpds-color-fg-interactive-neutral-disabled);
++			&[data-disabled] {
++				background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
++				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
++				color: var(--wpds-color-fg-interactive-neutral-disabled);
+ 
+-			@media ( forced-colors: active ) {
+-				border-color: GrayText;
+-				color: GrayText;
++				@media ( forced-colors: active ) {
++					border-color: GrayText;
++					color: GrayText;
++				}
+ 			}
+-		}
+ 
+-		&:has(.chip-prefix) {
+-			--wp-ui-combobox-chip-content-padding-inline-start: var(--wpds-dimension-padding-xs);
++			&:has(.chip-prefix) {
++				--wp-ui-combobox-chip-content-padding-inline-start: var(--wpds-dimension-padding-xs);
++			}
+ 		}
+-	}
+ 
+-	.chip-prefix {
+-		display: flex;
+-		justify-content: center;
+-		align-items: center;
+-		margin-inline-start: 1px;
+-		width: 20px;
+-		height: 20px;
+-		border-radius: 50%;
+-		overflow: hidden;
+-		flex-shrink: 0;
+-	}
++		.chip-prefix {
++			display: flex;
++			justify-content: center;
++			align-items: center;
++			margin-inline-start: 1px;
++			width: 20px;
++			height: 20px;
++			border-radius: 50%;
++			overflow: hidden;
++			flex-shrink: 0;
++		}
+ 
+-	.chip-content {
+-		padding-inline-start: var(--wp-ui-combobox-chip-content-padding-inline-start);
+-		padding-block: var(--wpds-dimension-padding-xs);
+-	}
++		.chip-content {
++			padding-inline-start: var(--wp-ui-combobox-chip-content-padding-inline-start);
++			padding-block: var(--wpds-dimension-padding-xs);
++		}
+ 
+-	.chip-remove {
+-		border: none; /* suppress border when in forced-colors mode */
++		.chip-remove {
++			border: none; /* suppress border when in forced-colors mode */
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/form/primitives/fieldset/style.module.css b/packages/ui/src/form/primitives/fieldset/style.module.css
+index 4eb611641f6551..9ac0c1c1de6796 100644
+--- a/packages/ui/src/form/primitives/fieldset/style.module.css
++++ b/packages/ui/src/form/primitives/fieldset/style.module.css
+@@ -1,12 +1,14 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.root {
+-		display: flex;
+-		flex-direction: column;
+-		gap: var(--wpds-dimension-gap-xs);
+-		border: 0;
+-		margin: 0;
+-		padding: 0;
++	@layer components {
++		.root {
++			display: flex;
++			flex-direction: column;
++			gap: var(--wpds-dimension-gap-xs);
++			border: 0;
++			margin: 0;
++			padding: 0;
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/form/primitives/input-layout/style.module.css b/packages/ui/src/form/primitives/input-layout/style.module.css
+index 7d44d1b3a45914..ea0083008de647 100644
+--- a/packages/ui/src/form/primitives/input-layout/style.module.css
++++ b/packages/ui/src/form/primitives/input-layout/style.module.css
+@@ -1,84 +1,86 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.input-layout {
+-		--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-md);
++	@layer components {
++		.input-layout {
++			--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-md);
+ 
+-		display: flex;
+-		height: 40px;
+-		background-color: var(--wpds-color-bg-interactive-neutral-weak);
+-		border-width: var(--wpds-border-width-xs);
+-		border-style: solid;
+-		border-color: var(--wpds-color-stroke-interactive-neutral);
+-		border-radius: var(--wpds-border-radius-sm);
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: max(var(--wpds-typography-font-size-md), 16px); /* avoid mobile zoom */
+-		line-height: 1;
+-		color: var(--wpds-color-fg-interactive-neutral);
++			display: flex;
++			height: 40px;
++			background-color: var(--wpds-color-bg-interactive-neutral-weak);
++			border-width: var(--wpds-border-width-xs);
++			border-style: solid;
++			border-color: var(--wpds-color-stroke-interactive-neutral);
++			border-radius: var(--wpds-border-radius-sm);
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: max(var(--wpds-typography-font-size-md), 16px); /* avoid mobile zoom */
++			line-height: 1;
++			color: var(--wpds-color-fg-interactive-neutral);
+ 
+-		@media (min-width: 600px) {
+-			font-size: var(--wpds-typography-font-size-md);
+-		}
++			@media (min-width: 600px) {
++				font-size: var(--wpds-typography-font-size-md);
++			}
+ 
+-		&.is-size-compact {
+-			--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-sm);
+-			height: 32px;
+-		}
++			&.is-size-compact {
++				--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-sm);
++				height: 32px;
++			}
+ 
+-		&.is-size-small {
+-			--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-sm);
+-			height: 24px;
+-		}
++			&.is-size-small {
++				--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-sm);
++				height: 24px;
++			}
+ 
+-		&.is-disabled,
+-		&:has([data-can-disable-input-layout][data-disabled]) {
+-			background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+-			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+-			color: var(--wpds-color-fg-interactive-neutral-disabled);
++			&.is-disabled,
++			&:has([data-can-disable-input-layout][data-disabled]) {
++				background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
++				border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
++				color: var(--wpds-color-fg-interactive-neutral-disabled);
+ 
+-			@media (forced-colors: active) {
+-				border-color: GrayText;
+-				color: GrayText;
++				@media (forced-colors: active) {
++					border-color: GrayText;
++					color: GrayText;
++				}
+ 			}
+-		}
+ 
+-		&.is-borderless {
+-			border-color: transparent;
+-		}
++			&.is-borderless {
++				border-color: transparent;
++			}
+ 
+-		/* Don't show focus ring when the focus is in the prefix or suffix slots */
+-		&:has(.input-layout-slot:focus-within) {
+-			outline: none;
+-		}
++			/* Don't show focus ring when the focus is in the prefix or suffix slots */
++			&:has(.input-layout-slot:focus-within) {
++				outline: none;
++			}
+ 
+-		&:hover:not(.is-disabled, :has([data-can-disable-input-layout][data-disabled]), .is-borderless) {
+-			border-color: var(--wpds-color-stroke-interactive-neutral-active);
++			&:hover:not(.is-disabled, :has([data-can-disable-input-layout][data-disabled]), .is-borderless) {
++				border-color: var(--wpds-color-stroke-interactive-neutral-active);
++			}
+ 		}
+-	}
+ 
+-	.slot-wrapper {
+-		display: contents;
+-	}
++		.slot-wrapper {
++			display: contents;
++		}
+ 
+-	.input-layout-slot {
+-		display: flex;
+-		align-items: center;
++		.input-layout-slot {
++			display: flex;
++			align-items: center;
+ 
+-		&.is-padding-minimal {
+-			--wp-ui-input-layout-prefix-padding-start:
+-				calc(var(--wp-ui-input-layout-padding-inline) -
+-				var(--wpds-dimension-padding-xs));
+-			--wp-ui-input-layout-suffix-padding-end:
+-				calc(var(--wp-ui-input-layout-padding-inline) -
+-				var(--wpds-dimension-padding-xs));
+-		}
++			&.is-padding-minimal {
++				--wp-ui-input-layout-prefix-padding-start:
++					calc(var(--wp-ui-input-layout-padding-inline) -
++					var(--wpds-dimension-padding-xs));
++				--wp-ui-input-layout-suffix-padding-end:
++					calc(var(--wp-ui-input-layout-padding-inline) -
++					var(--wpds-dimension-padding-xs));
++			}
+ 
+-		[data-slot-type="prefix"] & {
+-			padding-inline-start: var(--wp-ui-input-layout-prefix-padding-start, var(--wp-ui-input-layout-padding-inline));
+-		}
++			[data-slot-type="prefix"] & {
++				padding-inline-start: var(--wp-ui-input-layout-prefix-padding-start, var(--wp-ui-input-layout-padding-inline));
++			}
+ 
+-		[data-slot-type="suffix"] & {
+-			padding-inline-end: var(--wp-ui-input-layout-suffix-padding-end, var(--wp-ui-input-layout-padding-inline));
++			[data-slot-type="suffix"] & {
++				padding-inline-end: var(--wp-ui-input-layout-suffix-padding-end, var(--wp-ui-input-layout-padding-inline));
++			}
+ 		}
+ 	}
+ }
+diff --git a/packages/ui/src/form/primitives/input/style.module.css b/packages/ui/src/form/primitives/input/style.module.css
+index 95aff7f34ebab6..f19ab672b7ac75 100644
+--- a/packages/ui/src/form/primitives/input/style.module.css
++++ b/packages/ui/src/form/primitives/input/style.module.css
+@@ -1,38 +1,40 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.input {
+-		--_gcd-input-padding:
+-			var(--wp-ui-input-padding-block, 0)
+-			var(--wp-ui-input-layout-padding-inline, 0);
++	@layer components {
++		.input {
++			--_gcd-input-padding:
++				var(--wp-ui-input-padding-block, 0)
++				var(--wp-ui-input-layout-padding-inline, 0);
+ 
+-		padding-block: var(--wp-ui-input-padding-block, 0);
+-		padding-inline: var(--wp-ui-input-layout-padding-inline, 0);
+-		width: 100%;
+-		background: transparent;
+-		border: none;
+-		outline: none;
+-		color: var(--wpds-color-fg-interactive-neutral);
+-		font-family: inherit;
+-		font-size: inherit;
+-		line-height: inherit;
++			padding-block: var(--wp-ui-input-padding-block, 0);
++			padding-inline: var(--wp-ui-input-layout-padding-inline, 0);
++			width: 100%;
++			background: transparent;
++			border: none;
++			outline: none;
++			color: var(--wpds-color-fg-interactive-neutral);
++			font-family: inherit;
++			font-size: inherit;
++			line-height: inherit;
+ 
+-		&::placeholder {
+-			color: var(--wpds-color-fg-interactive-neutral-disabled);
+-		}
++			&::placeholder {
++				color: var(--wpds-color-fg-interactive-neutral-disabled);
++			}
+ 
+-		&:disabled,
+-		&[aria-disabled="true"] {
+-			color: var(--wpds-color-fg-interactive-neutral-disabled);
++			&:disabled,
++			&[aria-disabled="true"] {
++				color: var(--wpds-color-fg-interactive-neutral-disabled);
+ 
+-			@media ( forced-colors: active ) {
+-				color: GrayText;
++				@media ( forced-colors: active ) {
++					color: GrayText;
++				}
+ 			}
+-		}
+ 
+-		&[type="email"],
+-		&[type="url"] {
+-			direction: ltr; /* maintain LTR in RTL languages */
++			&[type="email"],
++			&[type="url"] {
++				direction: ltr; /* maintain LTR in RTL languages */
++			}
+ 		}
+ 	}
+ }
+diff --git a/packages/ui/src/form/primitives/select/style.module.css b/packages/ui/src/form/primitives/select/style.module.css
+index d1903695dfbb93..cef26c835161d2 100644
+--- a/packages/ui/src/form/primitives/select/style.module.css
++++ b/packages/ui/src/form/primitives/select/style.module.css
+@@ -1,7 +1,9 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.positioner {
+-		z-index: var(--wp-ui-select-z-index, initial);
++	@layer components {
++		.positioner {
++			z-index: var(--wp-ui-select-z-index, initial);
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/form/primitives/textarea/style.module.css b/packages/ui/src/form/primitives/textarea/style.module.css
+index 7447d1f290b32d..3f9cb743b564f3 100644
+--- a/packages/ui/src/form/primitives/textarea/style.module.css
++++ b/packages/ui/src/form/primitives/textarea/style.module.css
+@@ -1,22 +1,24 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.wrapper {
+-		--wp-ui-textarea-min-height: 40px;
+-	}
++	@layer components {
++		.wrapper {
++			--wp-ui-textarea-min-height: 40px;
++		}
+ 
+-	.textarea {
+-		/* Prevents users from resizing the textarea below this height. */
+-		min-height: calc(var(--wp-ui-textarea-min-height) - 2px);
+-		resize: block;
++		.textarea {
++			/* Prevents users from resizing the textarea below this height. */
++			min-height: calc(var(--wp-ui-textarea-min-height) - 2px);
++			resize: block;
++		}
+ 	}
+-}
+ 
+-@layer wp-ui-compositions {
+-	.wrapper {
+-		--wp-ui-input-padding-block: 9.9px;
++	@layer compositions {
++		.wrapper {
++			--wp-ui-input-padding-block: 9.9px;
+ 
+-		height: auto;
+-		line-height: 1.4; /* TODO: Use variable */
++			height: auto;
++			line-height: 1.4; /* TODO: Use variable */
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/icon-button/style.module.css b/packages/ui/src/icon-button/style.module.css
+index 9618d779516c63..12319e0b83d6be 100644
+--- a/packages/ui/src/icon-button/style.module.css
++++ b/packages/ui/src/icon-button/style.module.css
+@@ -1,16 +1,18 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-compositions {
+-	.icon-button {
+-		--wp-ui-button-aspect-ratio: 1;
+-		--wp-ui-button-padding-inline: 0;
+-		--wp-ui-button-min-width: unset;
+-	}
++	@layer compositions {
++		.icon-button {
++			--wp-ui-button-aspect-ratio: 1;
++			--wp-ui-button-padding-inline: 0;
++			--wp-ui-button-min-width: unset;
++		}
+ 
+-	.icon {
+-		/* Compensate for the button's 1px border so the icon extends
+-			 edge-to-edge and doesn't inflate the button's dimensions
+-			 (e.g. 24px icon inside a 24px-tall small button). */
+-		margin: -1px;
++		.icon {
++			/* Compensate for the button's 1px border so the icon extends
++				 edge-to-edge and doesn't inflate the button's dimensions
++				 (e.g. 24px icon inside a 24px-tall small button). */
++			margin: -1px;
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/link/style.module.css b/packages/ui/src/link/style.module.css
+index 11476c785d3458..b72352e511ceb4 100644
+--- a/packages/ui/src/link/style.module.css
++++ b/packages/ui/src/link/style.module.css
+@@ -1,67 +1,69 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.link {
+-		text-underline-offset: 0.2em;
+-		text-decoration-thickness: from-font;
+-	}
++	@layer components {
++		.link {
++			text-underline-offset: 0.2em;
++			text-decoration-thickness: from-font;
++		}
+ 
+-	/* Brand tone */
+-	.is-brand,
+-	.is-brand:visited {
+-		--_gcd-a-color: var(--wpds-color-fg-interactive-brand);
++		/* Brand tone */
++		.is-brand,
++		.is-brand:visited {
++			--_gcd-a-color: var(--wpds-color-fg-interactive-brand);
+ 
+-		color: var(--wpds-color-fg-interactive-brand);
+-	}
++			color: var(--wpds-color-fg-interactive-brand);
++		}
+ 
+-	.is-brand:hover,
+-	.is-brand:active {
+-		--_gcd-a-color: var(--wpds-color-fg-interactive-brand-active);
++		.is-brand:hover,
++		.is-brand:active {
++			--_gcd-a-color: var(--wpds-color-fg-interactive-brand-active);
+ 
+-		color: var(--wpds-color-fg-interactive-brand-active);
+-	}
++			color: var(--wpds-color-fg-interactive-brand-active);
++		}
+ 
+-	/* Neutral tone */
+-	.is-neutral,
+-	.is-neutral:visited {
+-		--_gcd-a-color: var(--wpds-color-fg-interactive-neutral);
++		/* Neutral tone */
++		.is-neutral,
++		.is-neutral:visited {
++			--_gcd-a-color: var(--wpds-color-fg-interactive-neutral);
+ 
+-		color: var(--wpds-color-fg-interactive-neutral);
+-		text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
+-	}
++			color: var(--wpds-color-fg-interactive-neutral);
++			text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
++		}
+ 
+-	.is-neutral:hover,
+-	.is-neutral:active {
+-		--_gcd-a-color: var(--wpds-color-fg-interactive-neutral-active);
++		.is-neutral:hover,
++		.is-neutral:active {
++			--_gcd-a-color: var(--wpds-color-fg-interactive-neutral-active);
+ 
+-		color: var(--wpds-color-fg-interactive-neutral-active);
+-	}
++			color: var(--wpds-color-fg-interactive-neutral-active);
++		}
+ 
+-	/* Unstyled variant */
+-	.is-unstyled {
+-		--_gcd-a-color: inherit;
++		/* Unstyled variant */
++		.is-unstyled {
++			--_gcd-a-color: inherit;
+ 
+-		color: inherit;
+-		text-decoration: none;
+-	}
++			color: inherit;
++			text-decoration: none;
++		}
+ 
+-	/* Link icon pattern — arrow rendered via ::after pseudo-element to avoid
+-	 * Twemoji replacement and text-selection issues. The icon is an
+-	 * inline-block so the link underline stays scoped to the text. */
++		/* Link icon pattern — arrow rendered via ::after pseudo-element to avoid
++		 * Twemoji replacement and text-selection issues. The icon is an
++		 * inline-block so the link underline stays scoped to the text. */
+ 
+-	.link-icon {
+-		line-height: 1;
+-		display: inline-block;
+-		margin-inline-start: var(--wpds-dimension-padding-xs);
+-		font-weight: var(--wpds-typography-font-weight-regular);
+-		text-decoration: none;
+-	}
++		.link-icon {
++			line-height: 1;
++			display: inline-block;
++			margin-inline-start: var(--wpds-dimension-padding-xs);
++			font-weight: var(--wpds-typography-font-weight-regular);
++			text-decoration: none;
++		}
+ 
+-	.link-icon::after {
+-		content: "\2197";
+-	}
++		.link-icon::after {
++			content: "\2197";
++		}
+ 
+-	.link-icon:dir(rtl)::after {
+-		content: "\2196";
++		.link-icon:dir(rtl)::after {
++			content: "\2196";
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/notice/style.module.css b/packages/ui/src/notice/style.module.css
+index 8d319cff874503..5b7ca10744457f 100644
+--- a/packages/ui/src/notice/style.module.css
++++ b/packages/ui/src/notice/style.module.css
+@@ -1,134 +1,136 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+-
+-@layer wp-ui-components {
+-	.notice {
+-		--icon-height: 24px;
+-		--text-vertical-padding: calc((var(--icon-height) - var(--wpds-typography-line-height-sm)) / 2);
+-
+-		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-neutral-weak);
+-		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-neutral);
+-		--wp-ui-notice-text-color: var(--wpds-color-fg-content-neutral);
+-		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-neutral);
+-
+-		container-type: inline-size;
+-		display: grid;
+-		align-items: start;
+-		grid-template-columns: auto 1fr auto;
+-		padding: var(--wpds-dimension-padding-md);
+-		border: 1px solid var(--wp-ui-notice-border-color);
+-		border-radius: var(--wpds-border-radius-lg);
+-		background-color: var(--wp-ui-notice-background-color);
+-	}
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
++
++	@layer components {
++		.notice {
++			--icon-height: 24px;
++			--text-vertical-padding: calc((var(--icon-height) - var(--wpds-typography-line-height-sm)) / 2);
++
++			--wp-ui-notice-background-color: var(--wpds-color-bg-surface-neutral-weak);
++			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-neutral);
++			--wp-ui-notice-text-color: var(--wpds-color-fg-content-neutral);
++			--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-neutral);
++
++			container-type: inline-size;
++			display: grid;
++			align-items: start;
++			grid-template-columns: auto 1fr auto;
++			padding: var(--wpds-dimension-padding-md);
++			border: 1px solid var(--wp-ui-notice-border-color);
++			border-radius: var(--wpds-border-radius-lg);
++			background-color: var(--wp-ui-notice-background-color);
++		}
+ 
+-	.icon {
+-		grid-row: 1;
+-		grid-column: 1;
+-		margin-inline-end: var(--wpds-dimension-gap-xs);
+-		color: var(--wp-ui-notice-decorative-icon-color);
+-	}
++		.icon {
++			grid-row: 1;
++			grid-column: 1;
++			margin-inline-end: var(--wpds-dimension-gap-xs);
++			color: var(--wp-ui-notice-decorative-icon-color);
++		}
+ 
+-	.title {
+-		grid-column: 2;
++		.title {
++			grid-column: 2;
+ 
+-		padding-block: var(--text-vertical-padding);
++			padding-block: var(--text-vertical-padding);
+ 
+-		color: var(--wp-ui-notice-text-color);
+-	}
++			color: var(--wp-ui-notice-text-color);
++		}
+ 
+-	.description {
+-		grid-column: 2;
++		.description {
++			grid-column: 2;
+ 
+-		padding-block: var(--text-vertical-padding);
++			padding-block: var(--text-vertical-padding);
+ 
+-		text-wrap: pretty;
+-		color: var(--wp-ui-notice-text-color);
+-	}
++			text-wrap: pretty;
++			color: var(--wp-ui-notice-text-color);
++		}
+ 
+-	.actions {
+-		grid-column: 2;
++		.actions {
++			grid-column: 2;
+ 
+-		display: flex;
+-		gap: var(--wpds-dimension-gap-md);
+-		flex-wrap: wrap;
+-	}
++			display: flex;
++			gap: var(--wpds-dimension-gap-md);
++			flex-wrap: wrap;
++		}
+ 
+-	/* If .actions is not the only content, add top margin to match design specs */
+-	.notice:has(.title) .actions,
+-	.notice:has(.description) .actions {
+-		margin-block-start: var(--wpds-dimension-gap-sm);
+-	}
++		/* If .actions is not the only content, add top margin to match design specs */
++		.notice:has(.title) .actions,
++		.notice:has(.description) .actions {
++			margin-block-start: var(--wpds-dimension-gap-sm);
++		}
+ 
+-	.action-button {
+-		flex-shrink: 0;
+-	}
++		.action-button {
++			flex-shrink: 0;
++		}
+ 
+-	.action-link {
+-		flex-shrink: 0;
++		.action-link {
++			flex-shrink: 0;
+ 
+-		/* Add more horizontal space when following another action link/button */
+-		&:not(:first-child) {
+-			margin-inline-start: var(--wpds-dimension-gap-xs);
+-		}
++			/* Add more horizontal space when following another action link/button */
++			&:not(:first-child) {
++				margin-inline-start: var(--wpds-dimension-gap-xs);
++			}
+ 
+-		/* Add more horizontal space when followed by another action link/button */
+-		&:not(:last-child) {
+-			margin-inline-end: var(--wpds-dimension-gap-xs);
++			/* Add more horizontal space when followed by another action link/button */
++			&:not(:last-child) {
++				margin-inline-end: var(--wpds-dimension-gap-xs);
++			}
+ 		}
+-	}
+ 
+-	.close-icon {
+-		grid-column: 3;
+-		grid-row: 1;
+-		margin-inline-start: var(--wpds-dimension-gap-xs);
+-	}
++		.close-icon {
++			grid-column: 3;
++			grid-row: 1;
++			margin-inline-start: var(--wpds-dimension-gap-xs);
++		}
+ 
+-	.is-info {
+-		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-info-weak);
+-		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-info);
+-		--wp-ui-notice-text-color: var(--wpds-color-fg-content-info);
+-		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-info-weak);
+-	}
++		.is-info {
++			--wp-ui-notice-background-color: var(--wpds-color-bg-surface-info-weak);
++			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-info);
++			--wp-ui-notice-text-color: var(--wpds-color-fg-content-info);
++			--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-info-weak);
++		}
+ 
+-	.is-warning {
+-		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-warning-weak);
+-		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-warning);
+-		--wp-ui-notice-text-color: var(--wpds-color-fg-content-warning);
+-		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-warning-weak);
+-	}
++		.is-warning {
++			--wp-ui-notice-background-color: var(--wpds-color-bg-surface-warning-weak);
++			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-warning);
++			--wp-ui-notice-text-color: var(--wpds-color-fg-content-warning);
++			--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-warning-weak);
++		}
+ 
+-	.is-success {
+-		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-success-weak);
+-		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-success);
+-		--wp-ui-notice-text-color: var(--wpds-color-fg-content-success);
+-		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-success-weak);
+-	}
++		.is-success {
++			--wp-ui-notice-background-color: var(--wpds-color-bg-surface-success-weak);
++			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-success);
++			--wp-ui-notice-text-color: var(--wpds-color-fg-content-success);
++			--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-success-weak);
++		}
+ 
+-	.is-error {
+-		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-error-weak);
+-		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-error);
+-		--wp-ui-notice-text-color: var(--wpds-color-fg-content-error);
+-		--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-error-weak);
+-	}
++		.is-error {
++			--wp-ui-notice-background-color: var(--wpds-color-bg-surface-error-weak);
++			--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-error);
++			--wp-ui-notice-text-color: var(--wpds-color-fg-content-error);
++			--wp-ui-notice-decorative-icon-color: var(--wpds-color-fg-content-error-weak);
++		}
+ 
+-	/* Matches --wpds-dimension-surface-width-sm (container queries don't support custom properties). */
+-	@container (max-width: 320px) {
+-		.notice:has(.title) .description,
+-		.notice:has(.title) .actions {
+-			grid-column: 1 / 3;
++		/* Matches --wpds-dimension-surface-width-sm (container queries don't support custom properties). */
++		@container (max-width: 320px) {
++			.notice:has(.title) .description,
++			.notice:has(.title) .actions {
++				grid-column: 1 / 3;
++			}
+ 		}
+ 	}
+-}
+ 
+-@layer wp-ui-compositions {
+-	/* Override `Text` margin */
+-	.action-link {
+-		margin-block: auto;
+-	}
++	@layer compositions {
++		/* Override `Text` margin */
++		.action-link {
++			margin-block: auto;
++		}
+ 
+-	/* Add partial transparency to CloseIcon and outline/minimal ActionButton
+-	 * for a better look over tinted backgrounds */
+-	.close-icon,
+-	.action-button:is(.is-action-button-outline, .is-action-button-minimal) {
+-		--wp-ui-button-background-color-active: color-mix(in srgb, transparent 50%, var(--wpds-color-bg-interactive-neutral-weak-active));
++		/* Add partial transparency to CloseIcon and outline/minimal ActionButton
++		 * for a better look over tinted backgrounds */
++		.close-icon,
++		.action-button:is(.is-action-button-outline, .is-action-button-minimal) {
++			--wp-ui-button-background-color-active: color-mix(in srgb, transparent 50%, var(--wpds-color-bg-interactive-neutral-weak-active));
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/popover/style.module.css b/packages/ui/src/popover/style.module.css
+index 972488db66649a..15269dd39de939 100644
+--- a/packages/ui/src/popover/style.module.css
++++ b/packages/ui/src/popover/style.module.css
+@@ -1,93 +1,95 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.positioner {
+-		z-index: var(--wp-ui-popover-z-index, initial);
+-	}
+-
+-	.popup {
+-		background-color: var(--wpds-color-bg-surface-neutral-strong);
+-		padding: var(--wpds-dimension-padding-lg);
+-		border-radius: var(--wpds-border-radius-md);
+-		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+-		box-shadow: var(--wpds-elevation-md);
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-md);
+-		line-height: var(--wpds-typography-line-height-md);
+-		color: var(--wpds-color-fg-content-neutral);
+-		outline: 0;
+-	}
++	@layer components {
++		.positioner {
++			z-index: var(--wp-ui-popover-z-index, initial);
++		}
+ 
+-	/*
+-	 * When a backdrop is rendered alongside the popup, hide the
+-	 * regular-mode border. The backdrop already provides visual
+-	 * containment, so the border becomes redundant noise.
+-	 * `transparent` (not `none`) keeps popup geometry identical
+-	 * regardless of the `backdrop` prop — `box-sizing: border-box`
+-	 * absorbs the 1px into the existing box.
+-	 */
+-	.backdrop ~ * .popup {
+-		border-color: transparent;
+-	}
++		.popup {
++			background-color: var(--wpds-color-bg-surface-neutral-strong);
++			padding: var(--wpds-dimension-padding-lg);
++			border-radius: var(--wpds-border-radius-md);
++			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
++			box-shadow: var(--wpds-elevation-md);
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wpds-typography-font-size-md);
++			line-height: var(--wpds-typography-line-height-md);
++			color: var(--wpds-color-fg-content-neutral);
++			outline: 0;
++		}
+ 
+-	/*
+-	 * Forced-colors mode strips `box-shadow` and substitutes
+-	 * `background-color` with `Canvas` (the page background), so the
+-	 * boundary depends entirely on the border. Set `CanvasText`
+-	 * explicitly for both backdrop and non-backdrop popups:
+-	 * `transparent` is not substituted by the UA, and being
+-	 * explicit also removes any reliance on UA color-substitution
+-	 * behavior for the non-backdrop case.
+-	 */
+-	@media (forced-colors: active) {
+-		.popup,
++		/*
++		 * When a backdrop is rendered alongside the popup, hide the
++		 * regular-mode border. The backdrop already provides visual
++		 * containment, so the border becomes redundant noise.
++		 * `transparent` (not `none`) keeps popup geometry identical
++		 * regardless of the `backdrop` prop — `box-sizing: border-box`
++		 * absorbs the 1px into the existing box.
++		 */
+ 		.backdrop ~ * .popup {
+-			border-color: CanvasText;
++			border-color: transparent;
+ 		}
+-	}
+-
+-	.arrow {
+-		display: flex;
+ 
+-		&[data-side="top"] {
+-			bottom: -8px;
+-			rotate: 180deg;
++		/*
++		 * Forced-colors mode strips `box-shadow` and substitutes
++		 * `background-color` with `Canvas` (the page background), so the
++		 * boundary depends entirely on the border. Set `CanvasText`
++		 * explicitly for both backdrop and non-backdrop popups:
++		 * `transparent` is not substituted by the UA, and being
++		 * explicit also removes any reliance on UA color-substitution
++		 * behavior for the non-backdrop case.
++		 */
++		@media (forced-colors: active) {
++			.popup,
++			.backdrop ~ * .popup {
++				border-color: CanvasText;
++			}
+ 		}
+ 
+-		&[data-side="bottom"] {
+-			top: -8px;
+-			rotate: 0deg;
+-		}
++		.arrow {
++			display: flex;
+ 
+-		&[data-side="left"] {
+-			inset-inline-end: -13px;
+-			rotate: 90deg;
+-		}
++			&[data-side="top"] {
++				bottom: -8px;
++				rotate: 180deg;
++			}
+ 
+-		&[data-side="right"] {
+-			inset-inline-start: -13px;
+-			rotate: -90deg;
++			&[data-side="bottom"] {
++				top: -8px;
++				rotate: 0deg;
++			}
++
++			&[data-side="left"] {
++				inset-inline-end: -13px;
++				rotate: 90deg;
++			}
++
++			&[data-side="right"] {
++				inset-inline-start: -13px;
++				rotate: -90deg;
++			}
+ 		}
+-	}
+ 
+-	.arrow-fill {
+-		fill: var(--wpds-color-bg-surface-neutral-strong);
+-	}
++		.arrow-fill {
++			fill: var(--wpds-color-bg-surface-neutral-strong);
++		}
+ 
+-	.arrow-stroke {
+-		fill: var(--wpds-color-stroke-surface-neutral);
+-	}
++		.arrow-stroke {
++			fill: var(--wpds-color-stroke-surface-neutral);
++		}
+ 
+-	.title {
+-		color: var(--wpds-color-fg-content-neutral);
+-		--_gcd-heading-color: var(--wpds-color-fg-content-neutral);
+-	}
++		.title {
++			color: var(--wpds-color-fg-content-neutral);
++			--_gcd-heading-color: var(--wpds-color-fg-content-neutral);
++		}
+ 
+-	.backdrop {
+-		position: fixed;
+-		inset: 0;
+-		z-index: var(--wp-ui-popover-z-index, initial);
+-		/* TODO: Replace with a WPDS overlay/scrim token when one exists. */
+-		background-color: rgba(0, 0, 0, 0.15);
++		.backdrop {
++			position: fixed;
++			inset: 0;
++			z-index: var(--wp-ui-popover-z-index, initial);
++			/* TODO: Replace with a WPDS overlay/scrim token when one exists. */
++			background-color: rgba(0, 0, 0, 0.15);
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/stack/style.module.css b/packages/ui/src/stack/style.module.css
+index 9bcb7a365a5a30..ea9df6854b8cd8 100644
+--- a/packages/ui/src/stack/style.module.css
++++ b/packages/ui/src/stack/style.module.css
+@@ -1,7 +1,9 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.stack {
+-		display: flex;
++	@layer components {
++		.stack {
++			display: flex;
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/tabs/style.module.css b/packages/ui/src/tabs/style.module.css
+index 245205570c8ce4..1d7283c06095d8 100644
+--- a/packages/ui/src/tabs/style.module.css
++++ b/packages/ui/src/tabs/style.module.css
+@@ -1,252 +1,254 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+-
+-@layer wp-ui-components {
+-	.tablist {
+-		display: flex;
+-		align-items: stretch;
+-		overflow-inline: auto;
+-		overscroll-behavior-inline: none;
+-
+-		--direction-factor: 1;
+-		--direction-start: left;
+-		--direction-end: right;
+-
+-		&:dir(rtl) {
+-			--direction-factor: -1;
+-			--direction-start: right;
+-			--direction-end: left;
+-		}
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
++
++	@layer components {
++		.tablist {
++			display: flex;
++			align-items: stretch;
++			overflow-inline: auto;
++			overscroll-behavior-inline: none;
++
++			--direction-factor: 1;
++			--direction-start: left;
++			--direction-end: right;
++
++			&:dir(rtl) {
++				--direction-factor: -1;
++				--direction-start: right;
++				--direction-end: left;
++			}
+ 
+-		position: relative;
++			position: relative;
+ 
+-		&[data-orientation="horizontal"] {
+-			--fade-width: 4rem;
+-			--fade-gradient-base: transparent 0%, #000 var(--fade-width);
+-			--fade-gradient-composed: var(--fade-gradient-base), #000 60%, transparent 50%;
++			&[data-orientation="horizontal"] {
++				--fade-width: 4rem;
++				--fade-gradient-base: transparent 0%, #000 var(--fade-width);
++				--fade-gradient-composed: var(--fade-gradient-base), #000 60%, transparent 50%;
+ 
+-			width: fit-content;
++				width: fit-content;
+ 
+-			&.is-overflowing-first {
+-				mask-image: linear-gradient(to var(--direction-end), var(--fade-gradient-base));
+-			}
++				&.is-overflowing-first {
++					mask-image: linear-gradient(to var(--direction-end), var(--fade-gradient-base));
++				}
+ 
+-			&.is-overflowing-last {
+-				mask-image: linear-gradient(to var(--direction-start), var(--fade-gradient-base));
+-			}
++				&.is-overflowing-last {
++					mask-image: linear-gradient(to var(--direction-start), var(--fade-gradient-base));
++				}
+ 
+-			&.is-overflowing-first.is-overflowing-last {
+-				mask-image:
+-					linear-gradient(to right, var(--fade-gradient-composed)),
+-					linear-gradient(to left, var(--fade-gradient-composed));
++				&.is-overflowing-first.is-overflowing-last {
++					mask-image:
++						linear-gradient(to right, var(--fade-gradient-composed)),
++						linear-gradient(to left, var(--fade-gradient-composed));
++				}
++
++				&.is-minimal-variant {
++					gap: 1rem;
++				}
+ 			}
+ 
+-			&.is-minimal-variant {
+-				gap: 1rem;
++			&[data-orientation="vertical"] {
++				flex-direction: column;
+ 			}
+ 		}
+ 
+-		&[data-orientation="vertical"] {
+-			flex-direction: column;
+-		}
+-	}
++		.indicator {
++			@media not ( prefers-reduced-motion ) {
++				transition-property:
++					translate,
++					width,
++					height,
++					border-radius,
++					border-block;
++				transition-duration: 0.2s;
++				transition-timing-function: ease-out;
++			}
+ 
+-	.indicator {
+-		@media not ( prefers-reduced-motion ) {
+-			transition-property:
+-				translate,
+-				width,
+-				height,
+-				border-radius,
+-				border-block;
+-			transition-duration: 0.2s;
+-			transition-timing-function: ease-out;
+-		}
++			position: absolute;
++			pointer-events: none;
+ 
+-		position: absolute;
+-		pointer-events: none;
++			/* Windows high contrast mode. */
++			outline: 2px solid transparent;
++			outline-offset: -1px;
+ 
+-		/* Windows high contrast mode. */
+-		outline: 2px solid transparent;
+-		outline-offset: -1px;
++			&[data-orientation="horizontal"] {
++				z-index: 1;
++				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical properties are necessary for the indicator to work as expected. */
++				left: 0;
++				bottom: 0;
++				height: var(--wpds-border-width-focus);
+ 
+-		&[data-orientation="horizontal"] {
+-			z-index: 1;
+-			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical properties are necessary for the indicator to work as expected. */
+-			left: 0;
+-			bottom: 0;
+-			height: var(--wpds-border-width-focus);
+-
+-			width: var(--active-tab-width);
+-			translate: var(--active-tab-left) 0;
+-			background-color: var(--wpds-color-stroke-interactive-neutral-strong);
+-		}
++				width: var(--active-tab-width);
++				translate: var(--active-tab-left) 0;
++				background-color: var(--wpds-color-stroke-interactive-neutral-strong);
++			}
+ 
+-		&[data-orientation="vertical"] {
+-			z-index: 0;
+-			border-radius: var(--wpds-border-radius-sm);
+-			top: 0;
+-			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical properties are necessary for the indicator to work as expected. */
+-			left: 50%;
+-			width: 100%;
+-			height: var(--active-tab-height);
+-			translate: -50% var(--active-tab-top);
+-			background-color: var(--wpds-color-bg-interactive-neutral-weak-active);
+-		}
++			&[data-orientation="vertical"] {
++				z-index: 0;
++				border-radius: var(--wpds-border-radius-sm);
++				top: 0;
++				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical properties are necessary for the indicator to work as expected. */
++				left: 50%;
++				width: 100%;
++				height: var(--active-tab-height);
++				translate: -50% var(--active-tab-top);
++				background-color: var(--wpds-color-bg-interactive-neutral-weak-active);
++			}
+ 
+-		.tablist[data-select-on-move="true"]:has(:focus-visible)
+-		&[data-orientation="vertical"] {
+-			box-sizing: border-box;
+-			border:
+-				var(--wpds-border-width-focus) solid
+-				var(--wpds-color-stroke-focus-brand);
++			.tablist[data-select-on-move="true"]:has(:focus-visible)
++			&[data-orientation="vertical"] {
++				box-sizing: border-box;
++				border:
++					var(--wpds-border-width-focus) solid
++					var(--wpds-color-stroke-focus-brand);
++			}
+ 		}
+-	}
+ 
+-	.tab {
+-		/* Resets */
+-		border-radius: 0;
+-		background: transparent;
+-		border: none;
+-		box-shadow: none;
+-		outline: none; /* Focus ring applied to the ::after pseudo-element */
+-		padding: 0;
++		.tab {
++			/* Resets */
++			border-radius: 0;
++			background: transparent;
++			border: none;
++			box-shadow: none;
++			outline: none; /* Focus ring applied to the ::after pseudo-element */
++			padding: 0;
+ 
+-		/* Positioning */
+-		z-index: 1;
+-		flex: 1 0 auto;
+-		position: relative;
+-		display: flex;
+-		align-items: center;
++			/* Positioning */
++			z-index: 1;
++			flex: 1 0 auto;
++			position: relative;
++			display: flex;
++			align-items: center;
+ 
+-		/* Appearance */
+-		cursor: var(--wpds-cursor-control);
++			/* Appearance */
++			cursor: var(--wpds-cursor-control);
+ 
+-		/* Typography */
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-md);
+-		white-space: nowrap;
++			/* Typography */
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wpds-typography-font-size-md);
++			white-space: nowrap;
+ 
+-		/* Characters in some languages (e.g. Japanese) may have a native higher line-height. */
++			/* Characters in some languages (e.g. Japanese) may have a native higher line-height. */
+ 
+-		line-height: 1.2;
+-		font-weight: 400;
+-		color: var(--wpds-color-fg-interactive-neutral);
++			line-height: 1.2;
++			font-weight: 400;
++			color: var(--wpds-color-fg-interactive-neutral);
+ 
+-		&[data-disabled] {
+-			cursor: default;
+-			color: var(--wpds-color-fg-interactive-neutral-disabled);
++			&[data-disabled] {
++				cursor: default;
++				color: var(--wpds-color-fg-interactive-neutral-disabled);
+ 
+-			@media ( forced-colors: active ) {
+-				color: GrayText;
++				@media ( forced-colors: active ) {
++					color: GrayText;
++				}
+ 			}
+-		}
+-
+-		&:not([data-disabled]):is(:hover, :focus-visible) {
+-			color: var(--wpds-color-fg-interactive-neutral-active);
+-		}
+-
+-		/* Focus indicator. */
+-		&::after {
+-			position: absolute;
+-			z-index: -1;
+-			pointer-events: none;
+ 
+-			/* Outline works for Windows high contrast mode as well. */
+-			outline:
+-				var(--wpds-border-width-focus) solid
+-				var(--wpds-color-stroke-focus-brand);
+-			border-radius: var(--wpds-border-radius-sm);
+-
+-			/* Animation */
+-			opacity: 0;
++			&:not([data-disabled]):is(:hover, :focus-visible) {
++				color: var(--wpds-color-fg-interactive-neutral-active);
++			}
+ 
+-			@media not ( prefers-reduced-motion ) {
+-				transition: opacity 0.1s linear;
++			/* Focus indicator. */
++			&::after {
++				position: absolute;
++				z-index: -1;
++				pointer-events: none;
++
++				/* Outline works for Windows high contrast mode as well. */
++				outline:
++					var(--wpds-border-width-focus) solid
++					var(--wpds-color-stroke-focus-brand);
++				border-radius: var(--wpds-border-radius-sm);
++
++				/* Animation */
++				opacity: 0;
++
++				@media not ( prefers-reduced-motion ) {
++					transition: opacity 0.1s linear;
++				}
+ 			}
+-		}
+ 
+-		&:focus-visible::after {
+-			opacity: 1;
+-		}
++			&:focus-visible::after {
++				opacity: 1;
++			}
+ 
+-		[data-orientation="horizontal"] & {
+-			padding-inline: var(--wpds-dimension-padding-lg);
+-			height: 48px; /* TODO: use semantic size/height tokens when available */
+-			scroll-margin: 24px;
++			[data-orientation="horizontal"] & {
++				padding-inline: var(--wpds-dimension-padding-lg);
++				height: 48px; /* TODO: use semantic size/height tokens when available */
++				scroll-margin: 24px;
+ 
+-			&::after {
+-				content: "";
+-				inset: var(--wpds-dimension-padding-md);
++				&::after {
++					content: "";
++					inset: var(--wpds-dimension-padding-md);
++				}
+ 			}
+-		}
+-
+-		.is-minimal-variant[data-orientation="horizontal"] & {
+-			padding-inline: 0;
+ 
+-			&::after {
+-				/*
+-				 * Prevent clipping the focus ring at the tablist edge.
+-				 * Use rounding, as the focus ring width may have sub-pixel values
+-				 * depending on the screen pixel ratio.
+-				 */
+-				inset-inline: round(up, var(--wpds-border-width-focus), 1px);
++			.is-minimal-variant[data-orientation="horizontal"] & {
++				padding-inline: 0;
++
++				&::after {
++					/*
++					 * Prevent clipping the focus ring at the tablist edge.
++					 * Use rounding, as the focus ring width may have sub-pixel values
++					 * depending on the screen pixel ratio.
++					 */
++					inset-inline: round(up, var(--wpds-border-width-focus), 1px);
++				}
+ 			}
+-		}
+ 
+-		[data-orientation="vertical"] & {
+-			padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
+-			min-height: 40px;  /* TODO: use semantic size/height tokens when available */
+-		}
++			[data-orientation="vertical"] & {
++				padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
++				min-height: 40px;  /* TODO: use semantic size/height tokens when available */
++			}
+ 
+-		[data-orientation="vertical"][data-select-on-move="false"] &::after {
+-			content: "";
+-			inset: var(--wpds-border-width-focus); /* TODO: Use or create new control/interactive padding token */
++			[data-orientation="vertical"][data-select-on-move="false"] &::after {
++				content: "";
++				inset: var(--wpds-border-width-focus); /* TODO: Use or create new control/interactive padding token */
++			}
+ 		}
+-	}
+ 
+-	.tab-children {
+-		flex-grow: 1;
++		.tab-children {
++			flex-grow: 1;
+ 
+-		display: flex;
+-		align-items: center;
++			display: flex;
++			align-items: center;
+ 
+-		[data-orientation="horizontal"] & {
+-			justify-content: center;
+-		}
++			[data-orientation="horizontal"] & {
++				justify-content: center;
++			}
+ 
+-		[data-orientation="vertical"] & {
+-			justify-content: start;
++			[data-orientation="vertical"] & {
++				justify-content: start;
++			}
+ 		}
+-	}
+ 
+-	.tab-chevron {
+-		flex-shrink: 0;
+-		margin-inline-end: calc(var(--wpds-dimension-gap-xs) * -1);
++		.tab-chevron {
++			flex-shrink: 0;
++			margin-inline-end: calc(var(--wpds-dimension-gap-xs) * -1);
+ 
+-		[data-orientation="horizontal"] & {
+-			display: none;
+-		}
+-		opacity: 0;
++			[data-orientation="horizontal"] & {
++				display: none;
++			}
++			opacity: 0;
+ 
+-		[role="tab"]:is([aria-selected="true"], :focus-visible, :hover) & {
+-			opacity: 1;
+-		}
++			[role="tab"]:is([aria-selected="true"], :focus-visible, :hover) & {
++				opacity: 1;
++			}
+ 
+-		/*
+-		 * The chevron is transitioned into existence when selectOnMove is enabled,
+-		 * because otherwise it looks jarring, as it shows up outside of the focus
+-		 * indicator that's being animated at the same time.
+-		 */
+-		@media not ( prefers-reduced-motion ) {
+-			[data-select-on-move="true"]
+-			[role="tab"]:is([aria-selected="true"])
+-			& {
+-				transition: opacity 0.15s 0.15s linear;
++			/*
++			 * The chevron is transitioned into existence when selectOnMove is enabled,
++			 * because otherwise it looks jarring, as it shows up outside of the focus
++			 * indicator that's being animated at the same time.
++			 */
++			@media not ( prefers-reduced-motion ) {
++				[data-select-on-move="true"]
++				[role="tab"]:is([aria-selected="true"])
++				& {
++					transition: opacity 0.15s 0.15s linear;
++				}
+ 			}
+-		}
+ 
+-		&:dir(rtl) {
+-			rotate: 180deg;
++			&:dir(rtl) {
++				rotate: 180deg;
++			}
+ 		}
+ 	}
+ }
+diff --git a/packages/ui/src/text/style.module.css b/packages/ui/src/text/style.module.css
+index cc330b726bb6de..0c56a55b6cc543 100644
+--- a/packages/ui/src/text/style.module.css
++++ b/packages/ui/src/text/style.module.css
+@@ -1,118 +1,120 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+-
+-@layer wp-ui-components {
+-	.text {
+-		margin: 0;
+-	}
+-
+-	/* Text variants can render as either paragraphs or headings, so each variant
+-	   provides values for both element-specific CSS defenses. */
+-	.heading-2xl {
+-		--_gcd-heading-font-size: var(--wpds-typography-font-size-2xl);
+-		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
+-		--_gcd-p-font-size: var(--wpds-typography-font-size-2xl);
+-		--_gcd-p-line-height: var(--wpds-typography-line-height-2xl);
+-
+-		font-family: var(--wpds-typography-font-family-heading);
+-		font-size: var(--wpds-typography-font-size-2xl);
+-		line-height: var(--wpds-typography-line-height-2xl);
+-		font-weight: var(--wpds-typography-font-weight-medium);
+-	}
+-
+-	.heading-xl {
+-		--_gcd-heading-font-size: var(--wpds-typography-font-size-xl);
+-		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
+-		--_gcd-p-font-size: var(--wpds-typography-font-size-xl);
+-		--_gcd-p-line-height: var(--wpds-typography-line-height-md);
+-
+-		font-family: var(--wpds-typography-font-family-heading);
+-		font-size: var(--wpds-typography-font-size-xl);
+-		line-height: var(--wpds-typography-line-height-md);
+-		font-weight: var(--wpds-typography-font-weight-medium);
+-	}
+-
+-	.heading-lg {
+-		--_gcd-heading-font-size: var(--wpds-typography-font-size-lg);
+-		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
+-		--_gcd-p-font-size: var(--wpds-typography-font-size-lg);
+-		--_gcd-p-line-height: var(--wpds-typography-line-height-sm);
+-
+-		font-family: var(--wpds-typography-font-family-heading);
+-		font-size: var(--wpds-typography-font-size-lg);
+-		line-height: var(--wpds-typography-line-height-sm);
+-		font-weight: var(--wpds-typography-font-weight-medium);
+-	}
+-
+-	.heading-md {
+-		--_gcd-heading-font-size: var(--wpds-typography-font-size-md);
+-		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
+-		--_gcd-p-font-size: var(--wpds-typography-font-size-md);
+-		--_gcd-p-line-height: var(--wpds-typography-line-height-sm);
+-
+-		font-family: var(--wpds-typography-font-family-heading);
+-		font-size: var(--wpds-typography-font-size-md);
+-		line-height: var(--wpds-typography-line-height-sm);
+-		font-weight: var(--wpds-typography-font-weight-medium);
+-	}
+-
+-	.heading-sm {
+-		--_gcd-heading-font-size: var(--wpds-typography-font-size-xs);
+-		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
+-		--_gcd-p-font-size: var(--wpds-typography-font-size-xs);
+-		--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
+-
+-		font-family: var(--wpds-typography-font-family-heading);
+-		font-size: var(--wpds-typography-font-size-xs);
+-		line-height: var(--wpds-typography-line-height-xs);
+-		font-weight: var(--wpds-typography-font-weight-medium);
+-		text-transform: uppercase;
+-	}
+-
+-	.body-xl {
+-		--_gcd-heading-font-size: var(--wpds-typography-font-size-xl);
+-		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
+-		--_gcd-p-font-size: var(--wpds-typography-font-size-xl);
+-		--_gcd-p-line-height: var(--wpds-typography-line-height-xl);
+-
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-xl);
+-		line-height: var(--wpds-typography-line-height-xl);
+-		font-weight: var(--wpds-typography-font-weight-regular);
+-	}
+-
+-	.body-lg {
+-		--_gcd-heading-font-size: var(--wpds-typography-font-size-lg);
+-		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
+-		--_gcd-p-font-size: var(--wpds-typography-font-size-lg);
+-		--_gcd-p-line-height: var(--wpds-typography-line-height-md);
+-
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-lg);
+-		line-height: var(--wpds-typography-line-height-md);
+-		font-weight: var(--wpds-typography-font-weight-regular);
+-	}
+-
+-	.body-md {
+-		--_gcd-heading-font-size: var(--wpds-typography-font-size-md);
+-		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
+-		--_gcd-p-font-size: var(--wpds-typography-font-size-md);
+-		--_gcd-p-line-height: var(--wpds-typography-line-height-sm);
+-
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-md);
+-		line-height: var(--wpds-typography-line-height-sm);
+-		font-weight: var(--wpds-typography-font-weight-regular);
+-	}
+-
+-	.body-sm {
+-		--_gcd-heading-font-size: var(--wpds-typography-font-size-sm);
+-		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
+-		--_gcd-p-font-size: var(--wpds-typography-font-size-sm);
+-		--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
+-
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-sm);
+-		line-height: var(--wpds-typography-line-height-xs);
+-		font-weight: var(--wpds-typography-font-weight-regular);
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
++
++	@layer components {
++		.text {
++			margin: 0;
++		}
++
++		/* Text variants can render as either paragraphs or headings, so each variant
++		   provides values for both element-specific CSS defenses. */
++		.heading-2xl {
++			--_gcd-heading-font-size: var(--wpds-typography-font-size-2xl);
++			--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
++			--_gcd-p-font-size: var(--wpds-typography-font-size-2xl);
++			--_gcd-p-line-height: var(--wpds-typography-line-height-2xl);
++
++			font-family: var(--wpds-typography-font-family-heading);
++			font-size: var(--wpds-typography-font-size-2xl);
++			line-height: var(--wpds-typography-line-height-2xl);
++			font-weight: var(--wpds-typography-font-weight-medium);
++		}
++
++		.heading-xl {
++			--_gcd-heading-font-size: var(--wpds-typography-font-size-xl);
++			--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
++			--_gcd-p-font-size: var(--wpds-typography-font-size-xl);
++			--_gcd-p-line-height: var(--wpds-typography-line-height-md);
++
++			font-family: var(--wpds-typography-font-family-heading);
++			font-size: var(--wpds-typography-font-size-xl);
++			line-height: var(--wpds-typography-line-height-md);
++			font-weight: var(--wpds-typography-font-weight-medium);
++		}
++
++		.heading-lg {
++			--_gcd-heading-font-size: var(--wpds-typography-font-size-lg);
++			--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
++			--_gcd-p-font-size: var(--wpds-typography-font-size-lg);
++			--_gcd-p-line-height: var(--wpds-typography-line-height-sm);
++
++			font-family: var(--wpds-typography-font-family-heading);
++			font-size: var(--wpds-typography-font-size-lg);
++			line-height: var(--wpds-typography-line-height-sm);
++			font-weight: var(--wpds-typography-font-weight-medium);
++		}
++
++		.heading-md {
++			--_gcd-heading-font-size: var(--wpds-typography-font-size-md);
++			--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
++			--_gcd-p-font-size: var(--wpds-typography-font-size-md);
++			--_gcd-p-line-height: var(--wpds-typography-line-height-sm);
++
++			font-family: var(--wpds-typography-font-family-heading);
++			font-size: var(--wpds-typography-font-size-md);
++			line-height: var(--wpds-typography-line-height-sm);
++			font-weight: var(--wpds-typography-font-weight-medium);
++		}
++
++		.heading-sm {
++			--_gcd-heading-font-size: var(--wpds-typography-font-size-xs);
++			--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
++			--_gcd-p-font-size: var(--wpds-typography-font-size-xs);
++			--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
++
++			font-family: var(--wpds-typography-font-family-heading);
++			font-size: var(--wpds-typography-font-size-xs);
++			line-height: var(--wpds-typography-line-height-xs);
++			font-weight: var(--wpds-typography-font-weight-medium);
++			text-transform: uppercase;
++		}
++
++		.body-xl {
++			--_gcd-heading-font-size: var(--wpds-typography-font-size-xl);
++			--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
++			--_gcd-p-font-size: var(--wpds-typography-font-size-xl);
++			--_gcd-p-line-height: var(--wpds-typography-line-height-xl);
++
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wpds-typography-font-size-xl);
++			line-height: var(--wpds-typography-line-height-xl);
++			font-weight: var(--wpds-typography-font-weight-regular);
++		}
++
++		.body-lg {
++			--_gcd-heading-font-size: var(--wpds-typography-font-size-lg);
++			--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
++			--_gcd-p-font-size: var(--wpds-typography-font-size-lg);
++			--_gcd-p-line-height: var(--wpds-typography-line-height-md);
++
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wpds-typography-font-size-lg);
++			line-height: var(--wpds-typography-line-height-md);
++			font-weight: var(--wpds-typography-font-weight-regular);
++		}
++
++		.body-md {
++			--_gcd-heading-font-size: var(--wpds-typography-font-size-md);
++			--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
++			--_gcd-p-font-size: var(--wpds-typography-font-size-md);
++			--_gcd-p-line-height: var(--wpds-typography-line-height-sm);
++
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wpds-typography-font-size-md);
++			line-height: var(--wpds-typography-line-height-sm);
++			font-weight: var(--wpds-typography-font-weight-regular);
++		}
++
++		.body-sm {
++			--_gcd-heading-font-size: var(--wpds-typography-font-size-sm);
++			--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
++			--_gcd-p-font-size: var(--wpds-typography-font-size-sm);
++			--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
++
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wpds-typography-font-size-sm);
++			line-height: var(--wpds-typography-line-height-xs);
++			font-weight: var(--wpds-typography-font-weight-regular);
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/tooltip/style.module.css b/packages/ui/src/tooltip/style.module.css
+index 71e6f04f0b595f..88a0bdc565866c 100644
+--- a/packages/ui/src/tooltip/style.module.css
++++ b/packages/ui/src/tooltip/style.module.css
+@@ -1,32 +1,34 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.positioner {
+-		z-index: var(--wp-ui-tooltip-z-index, initial);
+-	}
++	@layer components {
++		.positioner {
++			z-index: var(--wp-ui-tooltip-z-index, initial);
++		}
+ 
+-	.popup {
+-		background-color: var(--wpds-color-bg-surface-neutral-strong);
+-		padding:
+-			var(--wpds-dimension-padding-xs)
+-			var(--wpds-dimension-padding-sm);
+-		border-radius: var(--wpds-border-radius-md);
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-sm);
+-		line-height: 1.4; /* TODO: use DS token for line height */
+-		color: var(--wpds-color-fg-content-neutral);
+-		box-shadow: var(--wpds-elevation-sm);
++		.popup {
++			background-color: var(--wpds-color-bg-surface-neutral-strong);
++			padding:
++				var(--wpds-dimension-padding-xs)
++				var(--wpds-dimension-padding-sm);
++			border-radius: var(--wpds-border-radius-md);
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wpds-typography-font-size-sm);
++			line-height: 1.4; /* TODO: use DS token for line height */
++			color: var(--wpds-color-fg-content-neutral);
++			box-shadow: var(--wpds-elevation-sm);
+ 
+-		/*
+-		 * Forced-colors mode strips `box-shadow` and replaces the
+-		 * `background-color` with `Canvas`, so the tooltip would merge
+-		 * into the page. A 1px `CanvasText` border restores the edge.
+-		 * The popup inherits `box-sizing: border-box` from the
+-		 * positioner (via the shared `.box-sizing` reset utility), so
+-		 * the 1px is absorbed and non-FC layout is unchanged.
+-		 */
+-		@media ( forced-colors: active ) {
+-			border: 1px solid CanvasText;
++			/*
++			 * Forced-colors mode strips `box-shadow` and replaces the
++			 * `background-color` with `Canvas`, so the tooltip would merge
++			 * into the page. A 1px `CanvasText` border restores the edge.
++			 * The popup inherits `box-sizing: border-box` from the
++			 * positioner (via the shared `.box-sizing` reset utility), so
++			 * the 1px is absorbed and non-FC layout is unchanged.
++			 */
++			@media ( forced-colors: active ) {
++				border: 1px solid CanvasText;
++			}
+ 		}
+ 	}
+ }
+diff --git a/packages/ui/src/utils/css/dropdown-motion.module.css b/packages/ui/src/utils/css/dropdown-motion.module.css
+index f6e7a8a71a7fc8..9f08fb6b3067b7 100644
+--- a/packages/ui/src/utils/css/dropdown-motion.module.css
++++ b/packages/ui/src/utils/css/dropdown-motion.module.css
+@@ -1,47 +1,49 @@
+-/*
+- * Motion configuration for dropdown-like popovers.
+- * Keep constants in sync with: packages/components/src/utils/dropdown-motion.ts
+- */
++@layer wp-ui {
++	/*
++	 * Motion configuration for dropdown-like popovers.
++	 * Keep constants in sync with: packages/components/src/utils/dropdown-motion.ts
++	 */
+ 
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-utilities {
+-	.dropdown-motion {
+-		--wp-ui-dropdown-slide-distance: 4px;
+-		--wp-ui-dropdown-slide-duration: var(--wpds-motion-duration-md);
+-		--wp-ui-dropdown-slide-easing: var(--wpds-motion-easing-expressive);
+-		--wp-ui-dropdown-fade-duration: var(--wpds-motion-duration-sm);
+-		--wp-ui-dropdown-fade-easing: linear;
++	@layer utilities {
++		.dropdown-motion {
++			--wp-ui-dropdown-slide-distance: 4px;
++			--wp-ui-dropdown-slide-duration: var(--wpds-motion-duration-md);
++			--wp-ui-dropdown-slide-easing: var(--wpds-motion-easing-expressive);
++			--wp-ui-dropdown-fade-duration: var(--wpds-motion-duration-sm);
++			--wp-ui-dropdown-fade-easing: linear;
+ 
+-		@media not ( prefers-reduced-motion ) {
+-			transition-property: transform, opacity;
+-			transition-duration:
+-				var(--wp-ui-dropdown-slide-duration),
+-				var(--wp-ui-dropdown-fade-duration);
+-			transition-timing-function:
+-				var(--wp-ui-dropdown-slide-easing),
+-				var(--wp-ui-dropdown-fade-easing);
+-			will-change: transform, opacity;
+-		}
++			@media not ( prefers-reduced-motion ) {
++				transition-property: transform, opacity;
++				transition-duration:
++					var(--wp-ui-dropdown-slide-duration),
++					var(--wp-ui-dropdown-fade-duration);
++				transition-timing-function:
++					var(--wp-ui-dropdown-slide-easing),
++					var(--wp-ui-dropdown-fade-easing);
++				will-change: transform, opacity;
++			}
+ 
+-		opacity: 0;
++			opacity: 0;
+ 
+-		&[data-side="bottom"] {
+-			transform: translateY(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
+-		}
+-		&[data-side="top"] {
+-			transform: translateY(var(--wp-ui-dropdown-slide-distance));
+-		}
+-		&[data-side="left"] {
+-			transform: translateX(var(--wp-ui-dropdown-slide-distance));
+-		}
+-		&[data-side="right"] {
+-			transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
+-		}
++			&[data-side="bottom"] {
++				transform: translateY(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
++			}
++			&[data-side="top"] {
++				transform: translateY(var(--wp-ui-dropdown-slide-distance));
++			}
++			&[data-side="left"] {
++				transform: translateX(var(--wp-ui-dropdown-slide-distance));
++			}
++			&[data-side="right"] {
++				transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
++			}
+ 
+-		&[data-open]:not([data-starting-style]) {
+-			opacity: 1;
+-			transform: translate(0);
++			&[data-open]:not([data-starting-style]) {
++				opacity: 1;
++				transform: translate(0);
++			}
+ 		}
+ 	}
+ }
+diff --git a/packages/ui/src/utils/css/field.module.css b/packages/ui/src/utils/css/field.module.css
+index 7456982f0585a4..1cc9a9b2698cd1 100644
+--- a/packages/ui/src/utils/css/field.module.css
++++ b/packages/ui/src/utils/css/field.module.css
+@@ -1,30 +1,32 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-utilities {
+-	.label {
+-		--wp-ui-field-label-line-height: var(--wpds-typography-line-height-xs);
++	@layer utilities {
++		.label {
++			--wp-ui-field-label-line-height: var(--wpds-typography-line-height-xs);
+ 
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-xs);
+-		line-height: var(--wp-ui-field-label-line-height);
+-		font-weight: var(--wpds-typography-font-weight-medium);
+-		text-transform: uppercase;
+-		color: var(--wpds-color-fg-content-neutral);
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wpds-typography-font-size-xs);
++			line-height: var(--wp-ui-field-label-line-height);
++			font-weight: var(--wpds-typography-font-weight-medium);
++			text-transform: uppercase;
++			color: var(--wpds-color-fg-content-neutral);
+ 
+-		&.is-plain {
+-			font-size: var(--wpds-typography-font-size-md);
+-			text-transform: none;
++			&.is-plain {
++				font-size: var(--wpds-typography-font-size-md);
++				text-transform: none;
++			}
+ 		}
+-	}
+ 
+-	.description {
+-		--_gcd-p-font-size: var(--wpds-typography-font-size-sm);
+-		--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
+-		--_gcd-p-margin: 0;
++		.description {
++			--_gcd-p-font-size: var(--wpds-typography-font-size-sm);
++			--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
++			--_gcd-p-margin: 0;
+ 
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-sm);
+-		line-height: var(--wpds-typography-line-height-xs);
+-		color: var(--wpds-color-fg-content-neutral-weak);
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wpds-typography-font-size-sm);
++			line-height: var(--wpds-typography-line-height-xs);
++			color: var(--wpds-color-fg-content-neutral-weak);
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/utils/css/focus.module.css b/packages/ui/src/utils/css/focus.module.css
+index b8834f98bbddba..f4df21e4379abb 100644
+--- a/packages/ui/src/utils/css/focus.module.css
++++ b/packages/ui/src/utils/css/focus.module.css
+@@ -1,35 +1,37 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-utilities {
+-	.outset-ring--focus,
+-	.outset-ring--focus-except-active,
+-	.outset-ring--focus-visible,
+-	.outset-ring--focus-within,
+-	.outset-ring--focus-within-except-active,
+-	.outset-ring--focus-within-visible,
+-	.outset-ring--focus-parent-visible {
+-		@media not ( prefers-reduced-motion ) {
+-			--_gcd-a-transition: outline 0.1s ease-out;
++	@layer utilities {
++		.outset-ring--focus,
++		.outset-ring--focus-except-active,
++		.outset-ring--focus-visible,
++		.outset-ring--focus-within,
++		.outset-ring--focus-within-except-active,
++		.outset-ring--focus-within-visible,
++		.outset-ring--focus-parent-visible {
++			@media not ( prefers-reduced-motion ) {
++				--_gcd-a-transition: outline 0.1s ease-out;
+ 
+-			transition: outline 0.1s ease-out;
+-		}
++				transition: outline 0.1s ease-out;
++			}
+ 
+-		/* Outline width must be kept at 0 even with a transparent color,
+-		or else the outline will be visible in forced-colors mode. */
+-		outline: 0 solid transparent;
+-		outline-offset: 1px;
+-	}
++			/* Outline width must be kept at 0 even with a transparent color,
++			or else the outline will be visible in forced-colors mode. */
++			outline: 0 solid transparent;
++			outline-offset: 1px;
++		}
+ 
+-	.outset-ring--focus:focus,
+-	.outset-ring--focus-except-active:focus:not(:active),
+-	.outset-ring--focus-visible:focus-visible,
+-	.outset-ring--focus-within:focus-within,
+-	.outset-ring--focus-within-except-active:focus-within:not(:has(:active)),
+-	.outset-ring--focus-within-visible:focus-within:has(:focus-visible),
+-	:focus-visible .outset-ring--focus-parent-visible {
+-		--_gcd-a-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+-		--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
++		.outset-ring--focus:focus,
++		.outset-ring--focus-except-active:focus:not(:active),
++		.outset-ring--focus-visible:focus-visible,
++		.outset-ring--focus-within:focus-within,
++		.outset-ring--focus-within-except-active:focus-within:not(:has(:active)),
++		.outset-ring--focus-within-visible:focus-within:has(:focus-visible),
++		:focus-visible .outset-ring--focus-parent-visible {
++			--_gcd-a-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
++			--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
+ 
+-		outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
++			outline: var(--wpds-border-width-focus) solid var(--wpds-color-stroke-focus-brand);
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/utils/css/item-popup.module.css b/packages/ui/src/utils/css/item-popup.module.css
+index 5f9a7e59aa6af4..c47f6376d3884c 100644
+--- a/packages/ui/src/utils/css/item-popup.module.css
++++ b/packages/ui/src/utils/css/item-popup.module.css
+@@ -1,132 +1,134 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+-
+-@layer wp-ui-utilities {
+-	.popup {
+-		composes: dropdown-motion from "./dropdown-motion.module.css";
+-
+-		--wp-ui-popup-padding: var(--wpds-dimension-padding-xs);
+-
+-		display: grid;
+-		grid-template-rows: auto minmax(0, 1fr);
+-		grid-template-areas: "header" "main";
+-		max-height: min(var(--available-height), 480px, 60dvh);
+-		min-width: var(--anchor-width);
+-		max-width: var(--available-width);
+-		border-radius: var(--wpds-border-radius-md);
+-		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+-		box-shadow: var(--wpds-elevation-md);
+-		background-color: var(--wpds-color-bg-surface-neutral-strong);
+-	}
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
++
++	@layer utilities {
++		.popup {
++			composes: dropdown-motion from "./dropdown-motion.module.css";
++
++			--wp-ui-popup-padding: var(--wpds-dimension-padding-xs);
++
++			display: grid;
++			grid-template-rows: auto minmax(0, 1fr);
++			grid-template-areas: "header" "main";
++			max-height: min(var(--available-height), 480px, 60dvh);
++			min-width: var(--anchor-width);
++			max-width: var(--available-width);
++			border-radius: var(--wpds-border-radius-md);
++			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
++			box-shadow: var(--wpds-elevation-md);
++			background-color: var(--wpds-color-bg-surface-neutral-strong);
++		}
+ 
+-	.list {
+-		display: grid;
+-		grid-area: main;
+-		grid-template-rows: minmax(0, 1fr) auto;
+-		grid-template-areas: "scrollable" "footer";
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-md);
+-		line-height: var(--wpds-typography-line-height-sm);
+-		color: var(--wpds-color-fg-interactive-neutral);
+-	}
++		.list {
++			display: grid;
++			grid-area: main;
++			grid-template-rows: minmax(0, 1fr) auto;
++			grid-template-areas: "scrollable" "footer";
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wpds-typography-font-size-md);
++			line-height: var(--wpds-typography-line-height-sm);
++			color: var(--wpds-color-fg-interactive-neutral);
++		}
+ 
+-	.list-scrollable-container {
+-		overflow-block: auto;
+-		overscroll-behavior: contain;
+-		grid-area: scrollable;
+-		scroll-padding-block: var(--wp-ui-popup-padding);
++		.list-scrollable-container {
++			overflow-block: auto;
++			overscroll-behavior: contain;
++			grid-area: scrollable;
++			scroll-padding-block: var(--wp-ui-popup-padding);
+ 
+-		&:not(:empty) {
+-			padding-block: var(--wp-ui-popup-padding);
++			&:not(:empty) {
++				padding-block: var(--wp-ui-popup-padding);
++			}
+ 		}
+-	}
+ 
+-	.list-footer {
+-		grid-area: footer;
+-		padding-block: var(--wp-ui-popup-padding);
++		.list-footer {
++			grid-area: footer;
++			padding-block: var(--wp-ui-popup-padding);
+ 
+-		.list-scrollable-container:not(:empty) + & {
+-			border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
++			.list-scrollable-container:not(:empty) + & {
++				border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
++			}
+ 		}
+-	}
+ 
+-	.item {
+-		--wp-ui-popup-item-height: 40px;
+-		--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-md);
+-		--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
+-
+-		display: flex;
+-		align-items: center;
+-		justify-content: flex-start;
+-		gap: var(--wpds-dimension-gap-xs);
+-		min-height: var(--wp-ui-popup-item-height);
+-		border-radius: var(--wpds-border-radius-sm);
+-		user-select: none;
+-		margin-inline: var(--wp-ui-popup-padding);
+-		padding-block: var(--wp-ui-popup-item-padding-block);
+-
+-		/* Optically adjust the prefix icon to a more balanced position. */
+-		padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - var(--wpds-dimension-padding-xs));
+-		padding-inline-end: var(--wp-ui-popup-item-padding-inline);
+-
+-		&:not([data-disabled]) {
+-			cursor: var(--wpds-cursor-control);
+-		}
++		.item {
++			--wp-ui-popup-item-height: 40px;
++			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-md);
++			--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
++
++			display: flex;
++			align-items: center;
++			justify-content: flex-start;
++			gap: var(--wpds-dimension-gap-xs);
++			min-height: var(--wp-ui-popup-item-height);
++			border-radius: var(--wpds-border-radius-sm);
++			user-select: none;
++			margin-inline: var(--wp-ui-popup-padding);
++			padding-block: var(--wp-ui-popup-item-padding-block);
++
++			/* Optically adjust the prefix icon to a more balanced position. */
++			padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - var(--wpds-dimension-padding-xs));
++			padding-inline-end: var(--wp-ui-popup-item-padding-inline);
++
++			&:not([data-disabled]) {
++				cursor: var(--wpds-cursor-control);
++			}
+ 
+-		&.is-size-compact {
+-			--wp-ui-popup-item-height: 32px;
+-			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
+-		}
++			&.is-size-compact {
++				--wp-ui-popup-item-height: 32px;
++				--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
++			}
+ 
+-		&.is-size-small {
+-			--wp-ui-popup-item-height: 24px;
+-			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
+-			--wp-ui-popup-item-padding-block: 2px;
+-		}
++			&.is-size-small {
++				--wp-ui-popup-item-height: 24px;
++				--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
++				--wp-ui-popup-item-padding-block: 2px;
++			}
+ 
+-		&:not([data-selected]) {
+-			.item-indicator-icon {
+-				opacity: 0;
++			&:not([data-selected]) {
++				.item-indicator-icon {
++					opacity: 0;
++				}
+ 			}
+-		}
+ 
+-		&[data-highlighted]:not([aria-disabled="true"]) {
+-			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
+-			color: var(--wpds-color-fg-interactive-neutral);
+-			outline: none; /* Disable user agent focus ring */
++			&[data-highlighted]:not([aria-disabled="true"]) {
++				background-color: var(--wpds-color-bg-interactive-brand-weak-active);
++				color: var(--wpds-color-fg-interactive-neutral);
++				outline: none; /* Disable user agent focus ring */
+ 
+-			@media ( forced-colors: active ) {
+-				outline: 1px solid Highlight;
++				@media ( forced-colors: active ) {
++					outline: 1px solid Highlight;
++				}
+ 			}
+-		}
+ 
+-		&[aria-disabled="true"] {
+-			color: var(--wpds-color-fg-interactive-neutral-disabled);
++			&[aria-disabled="true"] {
++				color: var(--wpds-color-fg-interactive-neutral-disabled);
+ 
+-			@media ( forced-colors: active ) {
+-				color: GrayText;
++				@media ( forced-colors: active ) {
++					color: GrayText;
++				}
+ 			}
+ 		}
+-	}
+ 
+-	.item-icon {
+-		flex-shrink: 0;
+-	}
++		.item-icon {
++			flex-shrink: 0;
++		}
+ 
+-	/* Only style when there is content, because otherwise the element would block clicks
+-	on the .list beneath it (both share grid-area: main and overlap). */
+-	.empty:not(:empty) {
+-		--wp-ui-popup-empty-min-height: 40px;
+-		--wp-ui-popup-empty-padding-inline: var(--wpds-dimension-padding-md);
+-
+-		grid-area: main;
+-		display: flex;
+-		align-items: center;
+-		min-height: var(--wp-ui-popup-empty-min-height);
+-		padding-inline: var(--wp-ui-popup-empty-padding-inline);
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-md);
+-		line-height: var(--wpds-typography-line-height-sm);
+-		color: var(--wpds-color-fg-content-neutral-weak);
+-	}
++		/* Only style when there is content, because otherwise the element would block clicks
++		on the .list beneath it (both share grid-area: main and overlap). */
++		.empty:not(:empty) {
++			--wp-ui-popup-empty-min-height: 40px;
++			--wp-ui-popup-empty-padding-inline: var(--wpds-dimension-padding-md);
++
++			grid-area: main;
++			display: flex;
++			align-items: center;
++			min-height: var(--wp-ui-popup-empty-min-height);
++			padding-inline: var(--wp-ui-popup-empty-padding-inline);
++			font-family: var(--wpds-typography-font-family-body);
++			font-size: var(--wpds-typography-font-size-md);
++			line-height: var(--wpds-typography-line-height-sm);
++			color: var(--wpds-color-fg-content-neutral-weak);
++		}
+ 
++	}
+ }
+diff --git a/packages/ui/src/utils/css/overlay-chrome.module.css b/packages/ui/src/utils/css/overlay-chrome.module.css
+index a3984214981eee..eb1a20136db720 100644
+--- a/packages/ui/src/utils/css/overlay-chrome.module.css
++++ b/packages/ui/src/utils/css/overlay-chrome.module.css
+@@ -1,239 +1,241 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+-
+-@layer wp-ui-components {
+-	/*
+-	 * Shared chrome + scroll-container primitives for overlay popups
+-	 * (Dialog, AlertDialog, Drawer).
+-	 *
+-	 * Layout model: the popup is a vertical flex column with three regions
+-	 * — `.header`, `.content`, `.footer`. Only `.content` scrolls; the
+-	 * chrome sits at the popup's block-axis edges as natural flex siblings.
+-	 *
+-	 * Sticky opt-out for `Dialog` / `Drawer` is expressed in the DOM by
+-	 * placing `Dialog.Header` / `Dialog.Footer` (or the Drawer equivalents)
+-	 * inside `Dialog.Content` / `Drawer.Content` so they scroll with the
+-	 * body; AlertDialog exposes the same choice via `stickyHeader` /
+-	 * `stickyFooter` props, since it owns its internal DOM.
+-	 */
+-
+-	/*
+-	 * Chrome: flex row, no background (the popup already paints it), no
+-	 * sticky positioning. Block-axis padding is asymmetric: the outer
+-	 * side (popup edge) uses `padding-2xl` to match the inset that used
+-	 * to live on the popup; the inner side (toward `.content`) uses the
+-	 * tokenized `gap-lg` in full.
+-	 *
+-	 * No separator border here — the base chrome has none. The pinned
+-	 * case (where a separator is needed) adds a `border-block-*: 1px
+-	 * solid transparent` on the inner side and subtracts 1px from that
+-	 * same padding so the chrome's overall border-box height stays
+-	 * identical to the non-pinned case. See the `:has(~ .content)` /
+-	 * `.content ~` rules below.
+-	 *
+-	 * `min-height` on `.header` keeps the header footprint stable whether
+-	 * or not a close icon is rendered (notably the AlertDialog case, which
+-	 * has no close button).
+-	 */
+-	.header {
+-		display: flex;
+-		align-items: center;
+-		gap: var(--wpds-dimension-gap-sm);
+-		padding-block: var(--wpds-dimension-padding-2xl) var(--wpds-dimension-gap-lg);
+-		padding-inline: var(--wpds-dimension-padding-2xl);
+-		/* TODO: refactor to a DS element size token when available. */
+-		min-height: 32px;
+-	}
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-	.footer {
+-		display: flex;
+-		justify-content: flex-end;
+-		align-items: center;
+-		gap: var(--wpds-dimension-gap-sm);
+-		padding-block: var(--wpds-dimension-gap-lg) var(--wpds-dimension-padding-2xl);
+-		padding-inline: var(--wpds-dimension-padding-2xl);
+-	}
++	@layer components {
++		/*
++		 * Shared chrome + scroll-container primitives for overlay popups
++		 * (Dialog, AlertDialog, Drawer).
++		 *
++		 * Layout model: the popup is a vertical flex column with three regions
++		 * — `.header`, `.content`, `.footer`. Only `.content` scrolls; the
++		 * chrome sits at the popup's block-axis edges as natural flex siblings.
++		 *
++		 * Sticky opt-out for `Dialog` / `Drawer` is expressed in the DOM by
++		 * placing `Dialog.Header` / `Dialog.Footer` (or the Drawer equivalents)
++		 * inside `Dialog.Content` / `Drawer.Content` so they scroll with the
++		 * body; AlertDialog exposes the same choice via `stickyHeader` /
++		 * `stickyFooter` props, since it owns its internal DOM.
++		 */
+ 
+-	/*
+-	 * Overlay heading defaults: anchor the title to the inline start and
+-	 * set the neutral text color explicitly. `--_gcd-heading-color` and
+-	 * `--_gcd-heading-margin` defend against the heading-reset rules in
+-	 * `global-css-defense.module.css`, which would otherwise take over a
+-	 * `<h2>` rendered via `Text`.
+-	 */
+-	.title {
+-		color: var(--wpds-color-fg-content-neutral);
+-		--_gcd-heading-color: var(--wpds-color-fg-content-neutral);
+-
+-		margin-inline-end: auto;
+-		--_gcd-heading-margin: 0 auto 0 0;
+-
+-		&:dir(rtl) {
+-			--_gcd-heading-margin: 0 0 0 auto;
++		/*
++		 * Chrome: flex row, no background (the popup already paints it), no
++		 * sticky positioning. Block-axis padding is asymmetric: the outer
++		 * side (popup edge) uses `padding-2xl` to match the inset that used
++		 * to live on the popup; the inner side (toward `.content`) uses the
++		 * tokenized `gap-lg` in full.
++		 *
++		 * No separator border here — the base chrome has none. The pinned
++		 * case (where a separator is needed) adds a `border-block-*: 1px
++		 * solid transparent` on the inner side and subtracts 1px from that
++		 * same padding so the chrome's overall border-box height stays
++		 * identical to the non-pinned case. See the `:has(~ .content)` /
++		 * `.content ~` rules below.
++		 *
++		 * `min-height` on `.header` keeps the header footprint stable whether
++		 * or not a close icon is rendered (notably the AlertDialog case, which
++		 * has no close button).
++		 */
++		.header {
++			display: flex;
++			align-items: center;
++			gap: var(--wpds-dimension-gap-sm);
++			padding-block: var(--wpds-dimension-padding-2xl) var(--wpds-dimension-gap-lg);
++			padding-inline: var(--wpds-dimension-padding-2xl);
++			/* TODO: refactor to a DS element size token when available. */
++			min-height: 32px;
+ 		}
+-	}
+ 
+-	/*
+-	 * Scroll container. `flex: 1 1 auto` + `min-block-size: 0` lets it
+-	 * shrink below its content size so `overflow-block: auto` can actually
+-	 * show a scrollbar when content exceeds the available space. Default
+-	 * padding is `padding-2xl` on all sides; the yield rules below strip
+-	 * block padding when chrome occupies that edge.
+-	 *
+-	 * Scrolling is intentionally block-axis-only. `overflow-inline: hidden`
+-	 * clips wide content instead of introducing a horizontal scrollbar:
+-	 * the sibling chrome doesn't scroll inline, the popup edge already
+-	 * clips, and `useOverlayScrollStateAttributes` only tracks block-axis
+-	 * overflow (tabindex + separator state). Overlay consumers should
+-	 * constrain content width rather than rely on horizontal scroll.
+-	 */
+-	.content {
+-		flex: 1 1 auto;
+-		min-block-size: 0;
+-		overflow-block: auto;
+-		overflow-inline: hidden;
+-		padding: var(--wpds-dimension-padding-2xl);
++		.footer {
++			display: flex;
++			justify-content: flex-end;
++			align-items: center;
++			gap: var(--wpds-dimension-gap-sm);
++			padding-block: var(--wpds-dimension-gap-lg) var(--wpds-dimension-padding-2xl);
++			padding-inline: var(--wpds-dimension-padding-2xl);
++		}
+ 
+ 		/*
+-		 * The shared `outset-ring--focus-visible` utility (composed by
+-		 * the Content components) uses an `outline-offset` of `+1px`,
+-		 * which for this scroll container would put the ring outside
+-		 * the popup's rounded corners and have it clipped by the
+-		 * popup's `overflow: hidden`. Inset the ring by the focus
+-		 * width instead, so it sits flush inside the content box.
++		 * Overlay heading defaults: anchor the title to the inline start and
++		 * set the neutral text color explicitly. `--_gcd-heading-color` and
++		 * `--_gcd-heading-margin` defend against the heading-reset rules in
++		 * `global-css-defense.module.css`, which would otherwise take over a
++		 * `<h2>` rendered via `Text`.
++		 */
++		.title {
++			color: var(--wpds-color-fg-content-neutral);
++			--_gcd-heading-color: var(--wpds-color-fg-content-neutral);
++
++			margin-inline-end: auto;
++			--_gcd-heading-margin: 0 auto 0 0;
++
++			&:dir(rtl) {
++				--_gcd-heading-margin: 0 0 0 auto;
++			}
++		}
++
++		/*
++		 * Scroll container. `flex: 1 1 auto` + `min-block-size: 0` lets it
++		 * shrink below its content size so `overflow-block: auto` can actually
++		 * show a scrollbar when content exceeds the available space. Default
++		 * padding is `padding-2xl` on all sides; the yield rules below strip
++		 * block padding when chrome occupies that edge.
+ 		 *
+-		 * The shared utility's transition shorthand (`transition:
+-		 * outline …`) only animates outline-color and outline-width,
+-		 * not outline-offset, so the negative offset applied here is
+-		 * static — visually, the ring still fades in/out via color
+-		 * change while the offset stays put.
++		 * Scrolling is intentionally block-axis-only. `overflow-inline: hidden`
++		 * clips wide content instead of introducing a horizontal scrollbar:
++		 * the sibling chrome doesn't scroll inline, the popup edge already
++		 * clips, and `useOverlayScrollStateAttributes` only tracks block-axis
++		 * overflow (tabindex + separator state). Overlay consumers should
++		 * constrain content width rather than rely on horizontal scroll.
+ 		 */
+-		&:focus-visible {
+-			outline-offset: calc(var(--wpds-border-width-focus) * -1);
++		.content {
++			flex: 1 1 auto;
++			min-block-size: 0;
++			overflow-block: auto;
++			overflow-inline: hidden;
++			padding: var(--wpds-dimension-padding-2xl);
++
++			/*
++			 * The shared `outset-ring--focus-visible` utility (composed by
++			 * the Content components) uses an `outline-offset` of `+1px`,
++			 * which for this scroll container would put the ring outside
++			 * the popup's rounded corners and have it clipped by the
++			 * popup's `overflow: hidden`. Inset the ring by the focus
++			 * width instead, so it sits flush inside the content box.
++			 *
++			 * The shared utility's transition shorthand (`transition:
++			 * outline …`) only animates outline-color and outline-width,
++			 * not outline-offset, so the negative offset applied here is
++			 * static — visually, the ring still fades in/out via color
++			 * change while the offset stays put.
++			 */
++			&:focus-visible {
++				outline-offset: calc(var(--wpds-border-width-focus) * -1);
++			}
+ 		}
+-	}
+ 
+-	/*
+-	 * Pinned chrome: reserve 1px on the inner side for the separator
+-	 * border and subtract that same 1px from the adjacent padding. Net
+-	 * effect on block-axis height is zero — the chrome's overall
+-	 * border-box matches the non-pinned case — while the border provides
+-	 * a fixed slot that the scroll-state rules below colorize.
+-	 *
+-	 * `.content` then drops its matching block-axis padding on that
+-	 * edge, because the chrome already supplies the popup-edge
+-	 * `padding-2xl` + inner `gap-lg`.
+-	 *
+-	 * Sibling relationships intentionally use the general-sibling
+-	 * combinator (`~`) and `:has(~ …)` instead of the adjacent
+-	 * combinator, so an extra element between header / content / footer
+-	 * (custom wrappers, an a11y live region, etc.) doesn't silently
+-	 * break the pinned layout. The expected DOM shape is still
+-	 * header → content → footer; additional siblings in between are
+-	 * tolerated.
+-	 */
+-	.header:has(~ .content) {
+-		padding-block-end: calc(var(--wpds-dimension-gap-lg) - 1px);
+-		border-block-end: 1px solid transparent;
+-	}
++		/*
++		 * Pinned chrome: reserve 1px on the inner side for the separator
++		 * border and subtract that same 1px from the adjacent padding. Net
++		 * effect on block-axis height is zero — the chrome's overall
++		 * border-box matches the non-pinned case — while the border provides
++		 * a fixed slot that the scroll-state rules below colorize.
++		 *
++		 * `.content` then drops its matching block-axis padding on that
++		 * edge, because the chrome already supplies the popup-edge
++		 * `padding-2xl` + inner `gap-lg`.
++		 *
++		 * Sibling relationships intentionally use the general-sibling
++		 * combinator (`~`) and `:has(~ …)` instead of the adjacent
++		 * combinator, so an extra element between header / content / footer
++		 * (custom wrappers, an a11y live region, etc.) doesn't silently
++		 * break the pinned layout. The expected DOM shape is still
++		 * header → content → footer; additional siblings in between are
++		 * tolerated.
++		 */
++		.header:has(~ .content) {
++			padding-block-end: calc(var(--wpds-dimension-gap-lg) - 1px);
++			border-block-end: 1px solid transparent;
++		}
+ 
+-	.header ~ .content {
+-		padding-block-start: 0;
+-	}
++		.header ~ .content {
++			padding-block-start: 0;
++		}
+ 
+-	.content ~ .footer {
+-		padding-block-start: calc(var(--wpds-dimension-gap-lg) - 1px);
+-		border-block-start: 1px solid transparent;
+-	}
++		.content ~ .footer {
++			padding-block-start: calc(var(--wpds-dimension-gap-lg) - 1px);
++			border-block-start: 1px solid transparent;
++		}
+ 
+-	.content:has(~ .footer) {
+-		padding-block-end: 0;
+-	}
++		.content:has(~ .footer) {
++			padding-block-end: 0;
++		}
+ 
+-	/*
+-	 * Non-pinned case: when `.header` / `.footer` live inside `.content`
+-	 * (scrolls with body). The scroll container already supplies the
+-	 * inline popup-edge padding, so nested chrome always collapses its
+-	 * own `padding-inline` regardless of its position inside `.content`
+-	 * (no `:first-child` / `:last-child` guard). Block-axis padding is
+-	 * only collapsed at the scroll edges — the `:first-child` /
+-	 * `:last-child` rules keep the body's `gap-lg` visual separation
+-	 * between the chrome and any preceding / following siblings inside
+-	 * `.content`. No border — the separator is specific to the pinned
+-	 * case.
+-	 *
+-	 * Each rule is duplicated with `> [data-drawer-content] >` so it
+-	 * also fires for `Drawer`, where `Drawer.Content` renders an outer
+-	 * wrapper around Base UI's `_Drawer.Content` marker (so the popup-
+-	 * edge gutter falls outside `[data-drawer-content]` and stays
+-	 * mouse-draggable for swipe-dismiss). The marker is a transparent
+-	 * one-level wrapper, so mirroring each direct-child rule one level
+-	 * deeper through it preserves the same intent: chrome sitting at
+-	 * the scroll body's true visual edge collapses its popup-edge
+-	 * padding; chrome wrapped in arbitrary consumer-supplied
+-	 * intermediate elements keeps its own padding. `Dialog` and
+-	 * `AlertDialog` have no such wrapper, so the `[data-drawer-content]`
+-	 * variants never match for them.
+-	 */
+-	.content > .header,
+-	.content > [data-drawer-content] > .header {
+-		padding-inline: 0;
+-	}
++		/*
++		 * Non-pinned case: when `.header` / `.footer` live inside `.content`
++		 * (scrolls with body). The scroll container already supplies the
++		 * inline popup-edge padding, so nested chrome always collapses its
++		 * own `padding-inline` regardless of its position inside `.content`
++		 * (no `:first-child` / `:last-child` guard). Block-axis padding is
++		 * only collapsed at the scroll edges — the `:first-child` /
++		 * `:last-child` rules keep the body's `gap-lg` visual separation
++		 * between the chrome and any preceding / following siblings inside
++		 * `.content`. No border — the separator is specific to the pinned
++		 * case.
++		 *
++		 * Each rule is duplicated with `> [data-drawer-content] >` so it
++		 * also fires for `Drawer`, where `Drawer.Content` renders an outer
++		 * wrapper around Base UI's `_Drawer.Content` marker (so the popup-
++		 * edge gutter falls outside `[data-drawer-content]` and stays
++		 * mouse-draggable for swipe-dismiss). The marker is a transparent
++		 * one-level wrapper, so mirroring each direct-child rule one level
++		 * deeper through it preserves the same intent: chrome sitting at
++		 * the scroll body's true visual edge collapses its popup-edge
++		 * padding; chrome wrapped in arbitrary consumer-supplied
++		 * intermediate elements keeps its own padding. `Dialog` and
++		 * `AlertDialog` have no such wrapper, so the `[data-drawer-content]`
++		 * variants never match for them.
++		 */
++		.content > .header,
++		.content > [data-drawer-content] > .header {
++			padding-inline: 0;
++		}
+ 
+-	.content > .header:first-child,
+-	.content > [data-drawer-content] > .header:first-child {
+-		padding-block-start: 0;
+-	}
++		.content > .header:first-child,
++		.content > [data-drawer-content] > .header:first-child {
++			padding-block-start: 0;
++		}
+ 
+-	.content > .footer,
+-	.content > [data-drawer-content] > .footer {
+-		padding-inline: 0;
+-	}
++		.content > .footer,
++		.content > [data-drawer-content] > .footer {
++			padding-inline: 0;
++		}
+ 
+-	.content > .footer:last-child,
+-	.content > [data-drawer-content] > .footer:last-child {
+-		padding-block-end: 0;
+-	}
++		.content > .footer:last-child,
++		.content > [data-drawer-content] > .footer:last-child {
++			padding-block-end: 0;
++		}
+ 
+-	/*
+-	 * Separator coloring. The transparent border on the pinned chrome is
+-	 * colorized when the adjacent scroll container reports off-screen
+-	 * content in that direction. Toggling the color (not the border's
+-	 * existence) means no layout shift on scroll.
+-	 *
+-	 * `useOverlayScrollStateAttributes` owns the
+-	 * `data-wp-ui-overlay-scrolled-from-*` toggles, so CSS handles the
+-	 * visual state without React re-rendering on scroll.
+-	 *
+-	 * Forced-colors note: `border-color: transparent` is preserved as-is
+-	 * in forced-colors mode per spec, so the default (non-scrolled)
+-	 * state stays invisible. When the color toggles to a token value
+-	 * below, the UA substitutes a system color (typically `CanvasText`),
+-	 * so the separator remains visible in forced-colors mode without
+-	 * any additional rules.
+-	 */
+-	.header:has(~ [data-wp-ui-overlay-scroll-container][data-wp-ui-overlay-scrolled-from-top]) {
+-		border-block-end-color: var(--wpds-color-stroke-surface-neutral);
+-	}
++		/*
++		 * Separator coloring. The transparent border on the pinned chrome is
++		 * colorized when the adjacent scroll container reports off-screen
++		 * content in that direction. Toggling the color (not the border's
++		 * existence) means no layout shift on scroll.
++		 *
++		 * `useOverlayScrollStateAttributes` owns the
++		 * `data-wp-ui-overlay-scrolled-from-*` toggles, so CSS handles the
++		 * visual state without React re-rendering on scroll.
++		 *
++		 * Forced-colors note: `border-color: transparent` is preserved as-is
++		 * in forced-colors mode per spec, so the default (non-scrolled)
++		 * state stays invisible. When the color toggles to a token value
++		 * below, the UA substitutes a system color (typically `CanvasText`),
++		 * so the separator remains visible in forced-colors mode without
++		 * any additional rules.
++		 */
++		.header:has(~ [data-wp-ui-overlay-scroll-container][data-wp-ui-overlay-scrolled-from-top]) {
++			border-block-end-color: var(--wpds-color-stroke-surface-neutral);
++		}
+ 
+-	[data-wp-ui-overlay-scroll-container][data-wp-ui-overlay-scrolled-from-bottom] ~ .footer {
+-		border-block-start-color: var(--wpds-color-stroke-surface-neutral);
+-	}
++		[data-wp-ui-overlay-scroll-container][data-wp-ui-overlay-scrolled-from-bottom] ~ .footer {
++			border-block-start-color: var(--wpds-color-stroke-surface-neutral);
++		}
+ 
+-	/*
+-	 * `overscroll-behavior: contain` stops scroll chaining from the overlay
+-	 * to whatever sits behind it. We only want that when the overlay is
+-	 * modal: a non-modal overlay lets the page underneath remain
+-	 * interactive, and chaining scroll to the page there is the intuitive
+-	 * behavior.
+-	 *
+-	 * `data-wp-ui-overlay-modal` is toggled on the popup by each component
+-	 * (Dialog / Drawer mirror their `modal` prop; AlertDialog is always
+-	 * modal). The scroll container always lives inside the popup —
+-	 * `Dialog.Content` / `Drawer.Content` for the public API, or an
+-	 * internal container for AlertDialog — so a single descendant
+-	 * selector anchored at the modal popup covers all three.
+-	 */
+-	[data-wp-ui-overlay-modal] [data-wp-ui-overlay-scroll-container] {
+-		overscroll-behavior: contain;
++		/*
++		 * `overscroll-behavior: contain` stops scroll chaining from the overlay
++		 * to whatever sits behind it. We only want that when the overlay is
++		 * modal: a non-modal overlay lets the page underneath remain
++		 * interactive, and chaining scroll to the page there is the intuitive
++		 * behavior.
++		 *
++		 * `data-wp-ui-overlay-modal` is toggled on the popup by each component
++		 * (Dialog / Drawer mirror their `modal` prop; AlertDialog is always
++		 * modal). The scroll container always lives inside the popup —
++		 * `Dialog.Content` / `Drawer.Content` for the public API, or an
++		 * internal container for AlertDialog — so a single descendant
++		 * selector anchored at the modal popup covers all three.
++		 */
++		[data-wp-ui-overlay-modal] [data-wp-ui-overlay-scroll-container] {
++			overscroll-behavior: contain;
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/utils/css/resets.module.css b/packages/ui/src/utils/css/resets.module.css
+index 4c003ee93f30ed..8dd4b540d990db 100644
+--- a/packages/ui/src/utils/css/resets.module.css
++++ b/packages/ui/src/utils/css/resets.module.css
+@@ -1,13 +1,15 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-utilities {
+-	.box-sizing {
+-		box-sizing: border-box;
++	@layer utilities {
++		.box-sizing {
++			box-sizing: border-box;
+ 
+-		*,
+-		*::before,
+-		*::after {
+-			box-sizing: inherit;
++			*,
++			*::before,
++			*::after {
++				box-sizing: inherit;
++			}
+ 		}
+ 	}
+ }
+diff --git a/packages/ui/src/utils/css/select-trigger.module.css b/packages/ui/src/utils/css/select-trigger.module.css
+index bb46e067c6d955..a2296889e06a43 100644
+--- a/packages/ui/src/utils/css/select-trigger.module.css
++++ b/packages/ui/src/utils/css/select-trigger.module.css
+@@ -1,63 +1,65 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-utilities {
+-	.trigger-wrapper {
+-		&.is-minimal {
+-			width: fit-content;
++	@layer utilities {
++		.trigger-wrapper {
++			&.is-minimal {
++				width: fit-content;
++			}
+ 		}
+-	}
+ 
+-	.trigger {
+-		display: flex;
+-		justify-content: space-between;
+-		align-items: center;
+-		gap: var(--wpds-dimension-gap-xs);
+-		width: 100%;
+-		padding-block: 4px;
+-
+-		/* Optically adjust the caret to a more balanced position. */
+-		padding-inline-start: var(--wp-ui-input-layout-padding-inline);
+-		padding-inline-end: calc(var(--wp-ui-input-layout-padding-inline) - 4px);
+-
+-		background-color: transparent;
+-		border: none;
+-		color: var(--wpds-color-fg-interactive-neutral);
+-		font-family: inherit;
+-		font-size: inherit;
+-		line-height: 1.4;
+-		text-align: start;
+-		user-select: none;
+-
+-		&:not([data-disabled]) {
+-			cursor: var(--wpds-cursor-control);
+-		}
++		.trigger {
++			display: flex;
++			justify-content: space-between;
++			align-items: center;
++			gap: var(--wpds-dimension-gap-xs);
++			width: 100%;
++			padding-block: 4px;
+ 
+-		&.is-minimal {
+-			width: auto;
+-		}
++			/* Optically adjust the caret to a more balanced position. */
++			padding-inline-start: var(--wp-ui-input-layout-padding-inline);
++			padding-inline-end: calc(var(--wp-ui-input-layout-padding-inline) - 4px);
+ 
+-		&:focus {
+-			outline: none; /* handled by InputLayout component */
+-		}
++			background-color: transparent;
++			border: none;
++			color: var(--wpds-color-fg-interactive-neutral);
++			font-family: inherit;
++			font-size: inherit;
++			line-height: 1.4;
++			text-align: start;
++			user-select: none;
++
++			&:not([data-disabled]) {
++				cursor: var(--wpds-cursor-control);
++			}
+ 
+-		&[data-disabled] {
+-			background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+-			color: var(--wpds-color-fg-interactive-neutral-disabled);
++			&.is-minimal {
++				width: auto;
++			}
++
++			&:focus {
++				outline: none; /* handled by InputLayout component */
++			}
++
++			&[data-disabled] {
++				background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
++				color: var(--wpds-color-fg-interactive-neutral-disabled);
++			}
+ 		}
+-	}
+ 
+-	.trigger-value {
+-		overflow: hidden;
+-		text-overflow: ellipsis;
+-		white-space: nowrap;
++		.trigger-value {
++			overflow: hidden;
++			text-overflow: ellipsis;
++			white-space: nowrap;
+ 
+-		/* Supports placeholder styling for both Select and Combobox triggers. */
+-		.trigger[data-placeholder] & {
+-			color: var(--wpds-color-fg-interactive-neutral-disabled);
++			/* Supports placeholder styling for both Select and Combobox triggers. */
++			.trigger[data-placeholder] & {
++				color: var(--wpds-color-fg-interactive-neutral-disabled);
++			}
+ 		}
+-	}
+ 
+-	.trigger-caret {
+-		flex: 0 0 auto;
++		.trigger-caret {
++			flex: 0 0 auto;
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/utils/css/wp-compat-overlay-slot.module.css b/packages/ui/src/utils/css/wp-compat-overlay-slot.module.css
+index 17237b386a3792..ff714a956eaa05 100644
+--- a/packages/ui/src/utils/css/wp-compat-overlay-slot.module.css
++++ b/packages/ui/src/utils/css/wp-compat-overlay-slot.module.css
+@@ -1,11 +1,9 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+-
+ /*
+  * Compat overlay slot — body-level positioned container that hosts
+  * `@wordpress/ui` overlays so they reliably stack in mixed-library
+  * compositions. See `getWpCompatOverlaySlot()` for the runtime side.
+  *
+- * The `.slot` rule is authored unlayered (outside `@layer wp-ui-*`) so the
++ * The `.slot` rule is authored unlayered (outside `@layer wp-ui`) so the
+  * slot's z-index and positioning win against any `@layer`-scoped rule.
+  */
+ 
+@@ -24,12 +22,16 @@
+ 	pointer-events: none;
+ }
+ 
+-/*
+- * Re-enable interaction for portaled overlays. Placed in the lowest layer
+- * so any consumer can override with a higher-layer (or unlayered) rule.
+- */
+-@layer wp-ui-utilities {
+-	.slot > * {
+-		pointer-events: auto;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
++
++	/*
++	 * Re-enable interaction for portaled overlays. Placed in the lowest layer
++	 * so any consumer can override with a higher-layer (or unlayered) rule.
++	 */
++	@layer utilities {
++		.slot > * {
++			pointer-events: auto;
++		}
+ 	}
+ }
+diff --git a/packages/ui/src/visually-hidden/style.module.css b/packages/ui/src/visually-hidden/style.module.css
+index bee6e1abeb9360..f04449f8645e1d 100644
+--- a/packages/ui/src/visually-hidden/style.module.css
++++ b/packages/ui/src/visually-hidden/style.module.css
+@@ -1,16 +1,18 @@
+-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++@layer wp-ui {
++	@layer utilities, components, compositions, overrides;
+ 
+-@layer wp-ui-components {
+-	.visually-hidden {
+-		border: 0;
+-		clip-path: inset(50%);
+-		height: 1px;
+-		margin: -1px;
+-		overflow: hidden;
+-		padding: 0;
+-		position: absolute;
+-		width: 1px;
+-		word-wrap: normal;
+-		word-break: normal;
++	@layer components {
++		.visually-hidden {
++			border: 0;
++			clip-path: inset(50%);
++			height: 1px;
++			margin: -1px;
++			overflow: hidden;
++			padding: 0;
++			position: absolute;
++			width: 1px;
++			word-wrap: normal;
++			word-break: normal;
++		}
+ 	}
+ }
+diff --git a/widgets/quick-draft/components/saved-post/saved-post.module.css b/widgets/quick-draft/components/saved-post/saved-post.module.css
+index 55d3c333172919..c7e2dfc14d981d 100644
+--- a/widgets/quick-draft/components/saved-post/saved-post.module.css
++++ b/widgets/quick-draft/components/saved-post/saved-post.module.css
+@@ -14,7 +14,7 @@
+  * The "Continue editing" action is a `Button` rendered as a `Link`
+  * (polymorphic `render`). `@wordpress/ui` Button exposes no color/tone prop
+  * that reaches the rendered anchor, so the brand-strong link color is set
+- * here; the unlayered module class wins over `@layer wp-ui-components`. Drop
++ * here; the unlayered module class wins over `@layer wp-ui`. Drop
+  * once Button exposes a color API for the rendered element, or once a
+  * dedicated link component lands (https://github.com/WordPress/gutenberg/issues/77098).
+  */

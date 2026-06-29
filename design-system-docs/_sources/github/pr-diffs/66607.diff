@@ -1,0 +1,73 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c4dc5e3a57b930..e0b6a6d071e130 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Enhancements
+ 
++-   `Guide`: Use small size button for page controls ([#66607](https://github.com/WordPress/gutenberg/pull/66607)).
+ -   `PaletteEdit`: Add appropriate size props to Buttons ([#66590](https://github.com/WordPress/gutenberg/pull/66590)).
+ 
+ ### Internal
+diff --git a/packages/components/src/guide/page-control.tsx b/packages/components/src/guide/page-control.tsx
+index 468670c6ad9b9b..80b0a641c2a430 100644
+--- a/packages/components/src/guide/page-control.tsx
++++ b/packages/components/src/guide/page-control.tsx
+@@ -27,6 +27,7 @@ export default function PageControl( {
+ 					aria-current={ page === currentPage ? 'step' : undefined }
+ 				>
+ 					<Button
++						size="small"
+ 						key={ page }
+ 						icon={ <PageControlIcon /> }
+ 						aria-label={ sprintf(
+diff --git a/packages/components/src/guide/style.scss b/packages/components/src/guide/style.scss
+index 073bfc06843075..df52d5325f3fbf 100644
+--- a/packages/components/src/guide/style.scss
++++ b/packages/components/src/guide/style.scss
+@@ -34,7 +34,7 @@
+ 		}
+ 	}
+ 
+-	&__container {
++	.components-guide__container {
+ 		display: flex;
+ 		flex-direction: column;
+ 		justify-content: space-between;
+@@ -42,7 +42,7 @@
+ 		min-height: 100%;
+ 	}
+ 
+-	&__page {
++	.components-guide__page {
+ 		display: flex;
+ 		flex-direction: column;
+ 		justify-content: center;
+@@ -53,7 +53,7 @@
+ 		}
+ 	}
+ 
+-	&__footer {
++	.components-guide__footer {
+ 		align-content: center;
+ 		display: flex;
+ 		height: $button-size;
+@@ -64,7 +64,7 @@
+ 		width: 100%;
+ 	}
+ 
+-	&__page-control {
++	.components-guide__page-control {
+ 		margin: 0;
+ 		text-align: center;
+ 
+@@ -74,8 +74,6 @@
+ 		}
+ 
+ 		.components-button {
+-			height: 30px;
+-			min-width: 20px;
+ 			margin: -6px 0;
+ 			color: $gray-200;
+ 		}

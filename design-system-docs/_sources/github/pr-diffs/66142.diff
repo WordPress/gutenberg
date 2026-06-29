@@ -1,0 +1,58 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 48113f874af3a2..47b1c3dca6d662 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,8 @@
+ 
+ -   `Modal`: Modal dialog small improvement for elementShouldBeHidden ([#65941](https://github.com/WordPress/gutenberg/pull/65941)).
+ -   `Tabs`: revamped vertical orientation styles ([#65387](https://github.com/WordPress/gutenberg/pull/65387)).
++-   `ComboboxControl`: display `No items found` when there are no matches found ([#66142](https://github.com/WordPress/gutenberg/pull/66142)) 
++-   `FormTokenField`: display `No items found` when there are no matches found. This occurs when the `__experimentalExpandOnFocus` prop is enabled ([#66142](https://github.com/WordPress/gutenberg/pull/66142)) 
+ 
+ ## 28.9.0 (2024-10-03)
+ 
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index cf5cc5b63e2227..51f9e24ea0d4f2 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -173,7 +173,6 @@
+ 	padding: $grid-unit-10 $grid-unit-15;
+ 	min-height: $button-size-compact;
+ 	margin: 0;
+-	cursor: pointer;
+ 	box-sizing: border-box;
+ 
+ 	&.is-selected {
+@@ -189,4 +188,8 @@
+ 			background-color: $components-color-accent-transparent-40;
+ 		}
+ 	}
++
++	&:not(.is-empty) {
++		cursor: pointer;
++	}
+ }
+diff --git a/packages/components/src/form-token-field/suggestions-list.tsx b/packages/components/src/form-token-field/suggestions-list.tsx
+index 43a9b87c2030b3..1339e0cc189e38 100644
+--- a/packages/components/src/form-token-field/suggestions-list.tsx
++++ b/packages/components/src/form-token-field/suggestions-list.tsx
+@@ -8,6 +8,7 @@ import type { MouseEventHandler, ReactNode } from 'react';
+  * WordPress dependencies
+  */
+ import { useRefEffect } from '@wordpress/compose';
++import { __ } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+@@ -156,6 +157,11 @@ export function SuggestionsList<
+ 				);
+ 				/* eslint-enable jsx-a11y/click-events-have-key-events */
+ 			} ) }
++			{ suggestions.length === 0 && (
++				<li className="components-form-token-field__suggestion is-empty">
++					{ __( 'No items found' ) }
++				</li>
++			) }
+ 		</ul>
+ 	);
+ }

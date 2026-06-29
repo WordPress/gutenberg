@@ -1,0 +1,51 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 67152620600551..407b23e46fae5c 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -14,6 +14,10 @@
+ -   `Select`, `SelectControl`: Default the popup's portal container to the `@wordpress/ui` compat overlay slot when present, so select popups stack reliably above other overlays in mixed-library compositions. A caller-supplied `Select.Portal` `container` prop continues to take precedence ([#78372](https://github.com/WordPress/gutenberg/pull/78372)).
+ -   `Autocomplete`: Default the popup's portal container to the `@wordpress/ui` compat overlay slot when present, so autocomplete popups stack reliably above other overlays in mixed-library compositions. A caller-supplied `Autocomplete.Portal` `container` prop continues to take precedence ([#78375](https://github.com/WordPress/gutenberg/pull/78375)).
+ 
++### Bug Fixes
++
++-   Apply shared item popup typography to inline lists and empty states ([#78403](https://github.com/WordPress/gutenberg/pull/78403)).
++
+ ## 0.13.0 (2026-05-14)
+ 
+ ### Breaking Changes
+diff --git a/packages/ui/src/utils/css/item-popup.module.css b/packages/ui/src/utils/css/item-popup.module.css
+index 234ab5e81c6c01..7b966d45ab4e37 100644
+--- a/packages/ui/src/utils/css/item-popup.module.css
++++ b/packages/ui/src/utils/css/item-popup.module.css
+@@ -16,10 +16,6 @@
+ 		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+ 		box-shadow: var(--wpds-elevation-md);
+ 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+-		font-family: var(--wpds-typography-font-family-body);
+-		font-size: var(--wpds-typography-font-size-md);
+-		line-height: 1.4;
+-		color: var(--wpds-color-fg-interactive-neutral);
+ 	}
+ 
+ 	.list {
+@@ -27,6 +23,10 @@
+ 		grid-area: main;
+ 		grid-template-rows: minmax(0, 1fr) auto;
+ 		grid-template-areas: "scrollable" "footer";
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-md);
++		line-height: var(--wpds-typography-line-height-sm);
++		color: var(--wpds-color-fg-interactive-neutral);
+ 	}
+ 
+ 	.list-scrollable-container {
+@@ -124,6 +124,9 @@
+ 		align-items: center;
+ 		min-height: var(--wp-ui-popup-empty-min-height);
+ 		padding-inline: var(--wp-ui-popup-empty-padding-inline);
++		font-family: var(--wpds-typography-font-family-body);
++		font-size: var(--wpds-typography-font-size-md);
++		line-height: var(--wpds-typography-line-height-sm);
+ 		color: var(--wpds-color-fg-content-neutral-weak);
+ 	}
+ 

@@ -1,0 +1,463 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 852c1ef5b7e662..80d7fc93d22071 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -25,6 +25,7 @@
+ -   `DateTimePicker`: Update `moment` to 2.26.0 and update `react-date` typings ([#41266](https://github.com/WordPress/gutenberg/pull/41266)).
+ -   `TextareaControl`: Convert to TypeScript ([#41215](https://github.com/WordPress/gutenberg/pull/41215)).
+ -   `BoxControl`: Update unit tests to use `@testing-library/user-event` ([#41422](https://github.com/WordPress/gutenberg/pull/41422)).
++-   `Surface`: Convert to TypeScript ([#41212](https://github.com/WordPress/gutenberg/pull/41212)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/card/types.ts b/packages/components/src/card/types.ts
+index aaa20739ed1fb6..f95b45d3647507 100644
+--- a/packages/components/src/card/types.ts
++++ b/packages/components/src/card/types.ts
+@@ -6,7 +6,7 @@ import type { CSSProperties } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { Props as SurfaceProps } from '../surface/types';
++import type { SurfaceProps } from '../surface/types';
+ 
+ type DeprecatedSizeOptions = 'extraSmall';
+ export type SizeOptions = 'xSmall' | 'small' | 'medium' | 'large';
+diff --git a/packages/components/src/surface/README.md b/packages/components/src/surface/README.md
+index db683a1c177388..6f0d83ecb9cc9f 100644
+--- a/packages/components/src/surface/README.md
++++ b/packages/components/src/surface/README.md
+@@ -13,7 +13,7 @@ In the example below, notice how the `Surface` renders in white (or dark gray if
+ ```jsx
+ import {
+ 	__experimentalSurface as Surface,
+-	__experimentalText as Text
++	__experimentalText as Text,
+ } from '@wordpress/components';
+ 
+ function Example() {
+@@ -27,46 +27,46 @@ function Example() {
+ 
+ ## Props
+ 
+-### `backgroundSize`: number
++### `backgroundSize`: `number`
+ 
+-- Required: No
+-- Default: `12`
++-   Required: No
++-   Default: `12`
+ 
+ Determines the grid size for "dotted" and "grid" variants.
+ 
+ ### `borderBottom`: `boolean`
+ 
+-- Required: No
+-- Default: `false`
++-   Required: No
++-   Default: `false`
+ 
+ Renders a bottom border.
+ 
+ ### `borderLeft`: `boolean`
+ 
+-- Required: No
+-- Default: `false`
++-   Required: No
++-   Default: `false`
+ 
+ Renders a left border.
+ 
+ ### `borderRight`: `boolean`
+ 
+-- Required: No
+-- Default: `false`
++-   Required: No
++-   Default: `false`
+ 
+ Renders a right border.
+ 
+ ### `borderTop`: `boolean`
+ 
+-- Required: No
+-- Default: `false`
++-   Required: No
++-   Default: `false`
+ 
+ Renders a top border.
+ 
+ ### `variant`: `string`
+ 
+-- Required: No
+-- Default: `false`
+-- Allowed values: `primary`, `secondary`, `tertiary`, `dotted`, `grid`
++-   Required: No
++-   Default: `false`
++-   Allowed values: `primary`, `secondary`, `tertiary`, `dotted`, `grid`
+ 
+ Modifies the background color of `Surface`.
+ 
+diff --git a/packages/components/src/surface/component.js b/packages/components/src/surface/component.tsx
+similarity index 63%
+rename from packages/components/src/surface/component.js
+rename to packages/components/src/surface/component.tsx
+index aede1ee546876c..5b86494c991f5d 100644
+--- a/packages/components/src/surface/component.js
++++ b/packages/components/src/surface/component.tsx
+@@ -1,15 +1,21 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
+ /**
+  * Internal dependencies
+  */
+ import { contextConnect } from '../ui/context';
+ import { View } from '../view';
+ import { useSurface } from './hook';
++import type { SurfaceProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+-/**
+- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').ForwardedRef<any>}                                               forwardedRef
+- */
+-function Surface( props, forwardedRef ) {
++function UnconnectedSurface(
++	props: WordPressComponentProps< SurfaceProps, 'div' >,
++	forwardedRef: ForwardedRef< any >
++) {
+ 	const surfaceProps = useSurface( props );
+ 
+ 	return <View { ...surfaceProps } ref={ forwardedRef } />;
+@@ -35,6 +41,6 @@ function Surface( props, forwardedRef ) {
+  * }
+  * ```
+  */
+-const ConnectedSurface = contextConnect( Surface, 'Surface' );
++export const Surface = contextConnect( UnconnectedSurface, 'Surface' );
+ 
+-export default ConnectedSurface;
++export default Surface;
+diff --git a/packages/components/src/surface/hook.js b/packages/components/src/surface/hook.ts
+similarity index 72%
+rename from packages/components/src/surface/hook.js
+rename to packages/components/src/surface/hook.ts
+index 7a5902b5b9197d..3cad00d4a7f69f 100644
+--- a/packages/components/src/surface/hook.js
++++ b/packages/components/src/surface/hook.ts
+@@ -9,11 +9,12 @@ import { useMemo } from '@wordpress/element';
+ import { useContextSystem } from '../ui/context';
+ import * as styles from './styles';
+ import { useCx } from '../utils/hooks/use-cx';
++import type { SurfaceProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+-/**
+- * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+- */
+-export function useSurface( props ) {
++export function useSurface(
++	props: WordPressComponentProps< SurfaceProps, 'div' >
++) {
+ 	const {
+ 		backgroundSize = 12,
+ 		borderBottom = false,
+@@ -28,14 +29,14 @@ export function useSurface( props ) {
+ 	const cx = useCx();
+ 
+ 	const classes = useMemo( () => {
+-		const sx = {};
+-
+-		sx.borders = styles.getBorders( {
+-			borderBottom,
+-			borderLeft,
+-			borderRight,
+-			borderTop,
+-		} );
++		const sx = {
++			borders: styles.getBorders( {
++				borderBottom,
++				borderLeft,
++				borderRight,
++				borderTop,
++			} ),
++		};
+ 
+ 		return cx(
+ 			styles.Surface,
+diff --git a/packages/components/src/surface/index.js b/packages/components/src/surface/index.ts
+similarity index 100%
+rename from packages/components/src/surface/index.js
+rename to packages/components/src/surface/index.ts
+diff --git a/packages/components/src/surface/stories/index.js b/packages/components/src/surface/stories/index.js
+deleted file mode 100644
+index dfb7790d19a77b..00000000000000
+--- a/packages/components/src/surface/stories/index.js
++++ /dev/null
+@@ -1,46 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, number, select } from '@storybook/addon-knobs';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Surface } from '../';
+-import { Text } from '../../text';
+-
+-export default {
+-	component: Surface,
+-	title: 'Components (Experimental)/Surface',
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-const variantOptions = {
+-	default: 'default',
+-	secondary: 'secondary',
+-	tertiary: 'tertiary',
+-	dotted: 'dotted',
+-	grid: 'grid',
+-};
+-
+-export const _default = () => {
+-	const props = {
+-		backgroundSize: number( 'backgroundSize', 12 ),
+-		borderTop: boolean( 'borderTop', false ),
+-		borderBottom: boolean( 'borderBottom', false ),
+-		borderLeft: boolean( 'borderLeft', false ),
+-		borderRight: boolean( 'borderRight', false ),
+-		variant: select( 'variant', variantOptions, 'default' ),
+-	};
+-
+-	return (
+-		<Surface
+-			{ ...props }
+-			style={ { padding: 20, maxWidth: 400, margin: '20vh auto' } }
+-		>
+-			<Text>Surface</Text>
+-		</Surface>
+-	);
+-};
+diff --git a/packages/components/src/surface/stories/index.tsx b/packages/components/src/surface/stories/index.tsx
+new file mode 100644
+index 00000000000000..aa26cf29882f86
+--- /dev/null
++++ b/packages/components/src/surface/stories/index.tsx
+@@ -0,0 +1,40 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { Surface } from '..';
++import { Text } from '../../text';
++
++const meta: ComponentMeta< typeof Surface > = {
++	component: Surface,
++	title: 'Components (Experimental)/Surface',
++	argTypes: {
++		children: { control: { type: null } },
++		as: { control: { type: 'text' } },
++	},
++	parameters: {
++		controls: {
++			expanded: true,
++		},
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof Surface > = ( args ) => {
++	return (
++		<Surface
++			{ ...args }
++			style={ { padding: 20, maxWidth: 400, margin: '20vh auto' } }
++		>
++			<Text>Code is Poetry</Text>
++		</Surface>
++	);
++};
++
++export const Default: ComponentStory< typeof Surface > = Template.bind( {} );
++Default.args = {};
+diff --git a/packages/components/src/surface/styles.js b/packages/components/src/surface/styles.ts
+similarity index 66%
+rename from packages/components/src/surface/styles.js
+rename to packages/components/src/surface/styles.ts
+index cf1689f08c362c..cf78448b67d2d1 100644
+--- a/packages/components/src/surface/styles.js
++++ b/packages/components/src/surface/styles.ts
+@@ -7,6 +7,7 @@ import { css } from '@emotion/react';
+  * Internal dependencies
+  */
+ import { CONFIG, COLORS } from '../utils';
++import type { SurfaceVariant, SurfaceProps } from './types';
+ 
+ export const Surface = css`
+ 	background-color: ${ CONFIG.surfaceColor };
+@@ -18,19 +19,15 @@ export const background = css`
+ 	background-color: ${ CONFIG.surfaceBackgroundColor };
+ `;
+ 
+-/**
+- * @param {Object}  props
+- * @param {boolean} [props.borderBottom]
+- * @param {boolean} [props.borderLeft]
+- * @param {boolean} [props.borderRight]
+- * @param {boolean} [props.borderTop]
+- */
+ export function getBorders( {
+ 	borderBottom,
+ 	borderLeft,
+ 	borderRight,
+ 	borderTop,
+-} ) {
++}: Pick<
++	SurfaceProps,
++	'borderBottom' | 'borderLeft' | 'borderRight' | 'borderTop'
++> ) {
+ 	const borderStyle = `1px solid ${ CONFIG.surfaceBorderColor }`;
+ 
+ 	return css( {
+@@ -51,16 +48,10 @@ export const tertiary = css`
+ 	background: ${ CONFIG.surfaceBackgroundTertiaryColor };
+ `;
+ 
+-/**
+- * @param {string} surfaceBackgroundSize
+- */
+-const customBackgroundSize = ( surfaceBackgroundSize ) =>
++const customBackgroundSize = ( surfaceBackgroundSize: string ) =>
+ 	[ surfaceBackgroundSize, surfaceBackgroundSize ].join( ' ' );
+ 
+-/**
+- * @param {string} surfaceBackgroundSizeDotted
+- */
+-const dottedBackground1 = ( surfaceBackgroundSizeDotted ) =>
++const dottedBackground1 = ( surfaceBackgroundSizeDotted: string ) =>
+ 	[
+ 		'90deg',
+ 		[ CONFIG.surfaceBackgroundColor, surfaceBackgroundSizeDotted ].join(
+@@ -69,10 +60,7 @@ const dottedBackground1 = ( surfaceBackgroundSizeDotted ) =>
+ 		'transparent 1%',
+ 	].join( ',' );
+ 
+-/**
+- * @param {string} surfaceBackgroundSizeDotted
+- */
+-const dottedBackground2 = ( surfaceBackgroundSizeDotted ) =>
++const dottedBackground2 = ( surfaceBackgroundSizeDotted: string ) =>
+ 	[
+ 		[ CONFIG.surfaceBackgroundColor, surfaceBackgroundSizeDotted ].join(
+ 			' '
+@@ -80,10 +68,7 @@ const dottedBackground2 = ( surfaceBackgroundSizeDotted ) =>
+ 		'transparent 1%',
+ 	].join( ',' );
+ 
+-/**
+- * @param {string} surfaceBackgroundSizeDotted
+- */
+-const dottedBackgroundCombined = ( surfaceBackgroundSizeDotted ) =>
++const dottedBackgroundCombined = ( surfaceBackgroundSizeDotted: string ) =>
+ 	[
+ 		`linear-gradient( ${ dottedBackground1(
+ 			surfaceBackgroundSizeDotted
+@@ -94,14 +79,9 @@ const dottedBackgroundCombined = ( surfaceBackgroundSizeDotted ) =>
+ 		CONFIG.surfaceBorderBoldColor,
+ 	].join( ',' );
+ 
+-/**
+- *
+- * @param {string} surfaceBackgroundSize
+- * @param {string} surfaceBackgroundSizeDotted
+- */
+ export const getDotted = (
+-	surfaceBackgroundSize,
+-	surfaceBackgroundSizeDotted
++	surfaceBackgroundSize: string,
++	surfaceBackgroundSizeDotted: string
+ ) => css`
+ 	background: ${ dottedBackgroundCombined( surfaceBackgroundSizeDotted ) };
+ 	background-size: ${ customBackgroundSize( surfaceBackgroundSize ) };
+@@ -123,11 +103,7 @@ const gridBackgroundCombined = [
+ 	`linear-gradient( ${ gridBackground2 } )`,
+ ].join( ',' );
+ 
+-/**
+- * @param {string} surfaceBackgroundSize
+- * @return {import('@emotion/react').SerializedStyles} CSS.
+- */
+-export const getGrid = ( surfaceBackgroundSize ) => {
++export const getGrid = ( surfaceBackgroundSize: string ) => {
+ 	return css`
+ 		background: ${ CONFIG.surfaceBackgroundColor };
+ 		background-image: ${ gridBackgroundCombined };
+@@ -135,15 +111,10 @@ export const getGrid = ( surfaceBackgroundSize ) => {
+ 	`;
+ };
+ 
+-/**
+- * @param {'dotted' | 'grid' | 'primary' | 'secondary' | 'tertiary'} variant
+- * @param {string}                                                   surfaceBackgroundSize
+- * @param {string}                                                   surfaceBackgroundSizeDotted
+- */
+ export const getVariant = (
+-	variant,
+-	surfaceBackgroundSize,
+-	surfaceBackgroundSizeDotted
++	variant: SurfaceVariant,
++	surfaceBackgroundSize: string,
++	surfaceBackgroundSizeDotted: string
+ ) => {
+ 	switch ( variant ) {
+ 		case 'dotted': {
+diff --git a/packages/components/src/surface/test/__snapshots__/index.js.snap b/packages/components/src/surface/test/__snapshots__/index.tsx.snap
+similarity index 100%
+rename from packages/components/src/surface/test/__snapshots__/index.js.snap
+rename to packages/components/src/surface/test/__snapshots__/index.tsx.snap
+diff --git a/packages/components/src/surface/test/index.js b/packages/components/src/surface/test/index.tsx
+similarity index 94%
+rename from packages/components/src/surface/test/index.js
+rename to packages/components/src/surface/test/index.tsx
+index fb2a4eaa9598d7..44c2f1fac785e7 100644
+--- a/packages/components/src/surface/test/index.js
++++ b/packages/components/src/surface/test/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import { render } from '@testing-library/react';
++import type { RenderResult } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+@@ -9,7 +10,7 @@ import { render } from '@testing-library/react';
+ import { Surface } from '../index';
+ 
+ describe( 'props', () => {
+-	let base;
++	let base: RenderResult;
+ 	beforeEach( () => {
+ 		base = render( <Surface>Surface</Surface> );
+ 	} );
+diff --git a/packages/components/src/surface/types.ts b/packages/components/src/surface/types.ts
+index 2d7eece2e45b56..d2f7a0f5242d74 100644
+--- a/packages/components/src/surface/types.ts
++++ b/packages/components/src/surface/types.ts
+@@ -5,7 +5,7 @@ export type SurfaceVariant =
+ 	| 'dotted'
+ 	| 'grid';
+ 
+-export type Props = {
++export type SurfaceProps = {
+ 	/**
+ 	 * Determines the grid size for "dotted" and "grid" variants.
+ 	 *

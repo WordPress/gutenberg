@@ -1,0 +1,244 @@
+diff --git a/package-lock.json b/package-lock.json
+index 513ed45ec9f824..2c6647a166edcd 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -100,6 +100,29 @@
+ 			"integrity": "sha512-+u76oB43nOHrF4DDWRLWDCtci7f3QJoEBigemIdIeTi1ODqjx6Tad9NCVnPRwewWlKkVab5PlK8DCtPTyX7S8g==",
+ 			"dev": true
+ 		},
++		"@ariakit/core": {
++			"version": "0.2.6",
++			"resolved": "https://registry.npmjs.org/@ariakit/core/-/core-0.2.6.tgz",
++			"integrity": "sha512-83r2YmLvHLsV2NoclM5sfpLXfJ9S3R4lQIZK5Iad/KdfuFolvtVKPVrLW9OGoD1D4OuLxO1PgYKZEDPH0a1TjQ=="
++		},
++		"@ariakit/react": {
++			"version": "0.2.10",
++			"resolved": "https://registry.npmjs.org/@ariakit/react/-/react-0.2.10.tgz",
++			"integrity": "sha512-T0ftSgAuEXzA5MvurSWALfJBhTHzEgkXTDWEBTOkSzR5nxilPU/80UgA7dKHi4SGA3wUXIIMjRb42Djk3Qi9pQ==",
++			"requires": {
++				"@ariakit/react-core": "0.2.10"
++			}
++		},
++		"@ariakit/react-core": {
++			"version": "0.2.10",
++			"resolved": "https://registry.npmjs.org/@ariakit/react-core/-/react-core-0.2.10.tgz",
++			"integrity": "sha512-/MBX9ToIBQUR//uaOs1XzLz+Zq7ECMQmr670mXiDg3L9bu0siQKP3vD2Fl8RDRWMEMOk6+0Utr3Fm49hYlg24g==",
++			"requires": {
++				"@ariakit/core": "0.2.6",
++				"@floating-ui/dom": "^1.0.0",
++				"use-sync-external-store": "^1.2.0"
++			}
++		},
+ 		"@axe-core/puppeteer": {
+ 			"version": "4.0.0",
+ 			"resolved": "https://registry.npmjs.org/@axe-core/puppeteer/-/puppeteer-4.0.0.tgz",
+@@ -17391,6 +17414,7 @@
+ 		"@wordpress/components": {
+ 			"version": "file:packages/components",
+ 			"requires": {
++				"@ariakit/react": "^0.2.10",
+ 				"@babel/runtime": "^7.16.0",
+ 				"@emotion/cache": "^11.7.1",
+ 				"@emotion/css": "^11.7.1",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 629513035d62ad..9336a98ac9ca9f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ ### Internal
+ 
+ -   `ClipboardButton`: Convert to TypeScript ([#51334](https://github.com/WordPress/gutenberg/pull/51334)).
++-   `Toolbar`: Replace `reakit` dependency with `@ariakit/react` ([#51623](https://github.com/WordPress/gutenberg/pull/51623)).
+ 
+ ## 25.1.0 (2023-06-07)
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 92bcc6d749e05f..7e4925bd4fcc63 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -30,6 +30,7 @@
+ 	],
+ 	"types": "build-types",
+ 	"dependencies": {
++		"@ariakit/react": "^0.2.10",
+ 		"@babel/runtime": "^7.16.0",
+ 		"@emotion/cache": "^11.7.1",
+ 		"@emotion/css": "^11.7.1",
+diff --git a/packages/components/src/toolbar/stories/index.tsx b/packages/components/src/toolbar/stories/index.tsx
+index 17a8e64111eb23..4d1df2d64bf7b2 100644
+--- a/packages/components/src/toolbar/stories/index.tsx
++++ b/packages/components/src/toolbar/stories/index.tsx
+@@ -82,9 +82,6 @@ Default.args = {
+ 			</ToolbarGroup>
+ 			<ToolbarGroup>
+ 				<ToolbarItem>
+-					{ /* There is an issue here with TS not recognizing the
+-					 * `RenderProp` being passed.
+-					 * @ts-expect-error */ }
+ 					{ ( toggleProps ) => (
+ 						<DropdownMenu
+ 							icon={ alignLeft }
+diff --git a/packages/components/src/toolbar/toolbar-context/index.ts b/packages/components/src/toolbar/toolbar-context/index.ts
+index 17674798edc31c..462c3c83b46a87 100644
+--- a/packages/components/src/toolbar/toolbar-context/index.ts
++++ b/packages/components/src/toolbar/toolbar-context/index.ts
+@@ -1,15 +1,13 @@
+ /**
+  * External dependencies
+  */
+-import type { ToolbarStateReturn } from 'reakit/Toolbar';
++import type { ToolbarStore } from '@ariakit/react/toolbar';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { createContext } from '@wordpress/element';
+ 
+-const ToolbarContext = createContext< ToolbarStateReturn | undefined >(
+-	undefined
+-);
++const ToolbarContext = createContext< ToolbarStore | undefined >( undefined );
+ 
+ export default ToolbarContext;
+diff --git a/packages/components/src/toolbar/toolbar-item/index.tsx b/packages/components/src/toolbar/toolbar-item/index.tsx
+index 6fc9bf01009672..ccfe5084545577 100644
+--- a/packages/components/src/toolbar/toolbar-item/index.tsx
++++ b/packages/components/src/toolbar/toolbar-item/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { ToolbarItem as BaseToolbarItem } from 'reakit/Toolbar';
++import { ToolbarItem as BaseToolbarItem } from '@ariakit/react/toolbar';
+ import type { ForwardedRef } from 'react';
+ 
+ /**
+@@ -14,18 +14,16 @@ import warning from '@wordpress/warning';
+  * Internal dependencies
+  */
+ import ToolbarContext from '../toolbar-context';
++import type { ToolbarItemProps } from './types';
+ 
+ function ToolbarItem(
+-	{
+-		children,
+-		as: Component,
+-		...props
+-	}: React.ComponentPropsWithoutRef< typeof BaseToolbarItem >,
++	{ children, as: Component, ...props }: ToolbarItemProps,
+ 	ref: ForwardedRef< any >
+ ) {
+-	const accessibleToolbarState = useContext( ToolbarContext );
++	const accessibleToolbarStore = useContext( ToolbarContext );
++	const isRenderProp = typeof children === 'function';
+ 
+-	if ( typeof children !== 'function' && ! Component ) {
++	if ( ! isRenderProp && ! Component ) {
+ 		warning(
+ 			'`ToolbarItem` is a generic headless component. You must pass either a `children` prop as a function or an `as` prop as a component. ' +
+ 				'See https://developer.wordpress.org/block-editor/components/toolbar-item/'
+@@ -35,24 +33,24 @@ function ToolbarItem(
+ 
+ 	const allProps = { ...props, ref, 'data-toolbar-item': true };
+ 
+-	if ( ! accessibleToolbarState ) {
++	if ( ! accessibleToolbarStore ) {
+ 		if ( Component ) {
+ 			return <Component { ...allProps }>{ children }</Component>;
+ 		}
+-		if ( typeof children !== 'function' ) {
++		if ( ! isRenderProp ) {
+ 			return null;
+ 		}
+ 		return children( allProps );
+ 	}
+ 
++	const render = isRenderProp ? children : Component && <Component />;
++
+ 	return (
+ 		<BaseToolbarItem
+-			{ ...accessibleToolbarState }
+ 			{ ...allProps }
+-			as={ Component }
+-		>
+-			{ children }
+-		</BaseToolbarItem>
++			store={ accessibleToolbarStore }
++			render={ render }
++		/>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/toolbar/toolbar-item/types.ts b/packages/components/src/toolbar/toolbar-item/types.ts
+new file mode 100644
+index 00000000000000..a285afea2c6dae
+--- /dev/null
++++ b/packages/components/src/toolbar/toolbar-item/types.ts
+@@ -0,0 +1,27 @@
++/**
++ * External dependencies
++ */
++import type {
++	ReactElement,
++	ReactNode,
++	ElementType,
++	HTMLAttributes,
++	RefAttributes,
++} from 'react';
++
++export type ToolbarItemProps = Omit< HTMLAttributes< any >, 'children' > & {
++	/**
++	 * Component type that will be used to render the toolbar item.
++	 */
++	as?: ElementType;
++	/**
++	 * A function that receives the props that should be spread onto the element
++	 * that will be rendered as a toolbar item. If the `as` prop is not provided,
++	 * this prop will accept a ReactNode instead.
++	 */
++	children?:
++		| ReactNode
++		| ( (
++				props: HTMLAttributes< any > & RefAttributes< any >
++		  ) => ReactElement | null );
++};
+diff --git a/packages/components/src/toolbar/toolbar/toolbar-container.tsx b/packages/components/src/toolbar/toolbar/toolbar-container.tsx
+index 496fb9281651fa..f27b443fdce309 100644
+--- a/packages/components/src/toolbar/toolbar/toolbar-container.tsx
++++ b/packages/components/src/toolbar/toolbar/toolbar-container.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { useToolbarState, Toolbar } from 'reakit/Toolbar';
++import { useToolbarStore, Toolbar } from '@ariakit/react/toolbar';
+ import type { ForwardedRef } from 'react';
+ 
+ /**
+@@ -21,22 +21,18 @@ function UnforwardedToolbarContainer(
+ 	{ label, ...props }: WordPressComponentProps< ToolbarProps, 'div', false >,
+ 	ref: ForwardedRef< any >
+ ) {
+-	// https://reakit.io/docs/basic-concepts/#state-hooks
+-	// Passing baseId for server side rendering (which includes snapshots)
+-	// If an id prop is passed to Toolbar, toolbar items will use it as a base for their ids
+-	const toolbarState = useToolbarState( {
+-		loop: true,
+-		baseId: props.id,
++	const toolbarStore = useToolbarStore( {
++		focusLoop: true,
+ 		rtl: isRTL(),
+ 	} );
+ 
+ 	return (
+ 		// This will provide state for `ToolbarButton`'s
+-		<ToolbarContext.Provider value={ toolbarState }>
++		<ToolbarContext.Provider value={ toolbarStore }>
+ 			<Toolbar
+ 				ref={ ref }
+ 				aria-label={ label }
+-				{ ...toolbarState }
++				store={ toolbarStore }
+ 				{ ...props }
+ 			/>
+ 		</ToolbarContext.Provider>

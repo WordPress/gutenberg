@@ -1,0 +1,135 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6ce2f99fab99f8..eae50161fe6204 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,10 @@
+ -   `DropdownMenuV2`: Restore accent color themability ([#58130](https://github.com/WordPress/gutenberg/pull/58130)).
+ -   Expand theming support in the `COLORS` variable object ([#58097](https://github.com/WordPress/gutenberg/pull/58097)).
+ 
++### Enhancements
++
++-   `CheckboxControl`: Remove ability for label prop to be false ([#58339](https://github.com/WordPress/gutenberg/pull/58339)).
++
+ ## 25.16.0 (2024-01-24)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/checkbox-control/README.md b/packages/components/src/checkbox-control/README.md
+index 8044cef0535eaf..e89ee489feca99 100644
+--- a/packages/components/src/checkbox-control/README.md
++++ b/packages/components/src/checkbox-control/README.md
+@@ -69,12 +69,11 @@ const MyCheckboxControl = () => {
+ The set of props accepted by the component will be specified below.
+ Props not included in this set will be applied to the input element.
+ 
+-#### `label`: `string|false`
++#### `label`: `string`
+ 
+ A label for the input field, that appears at the side of the checkbox.
+ The prop will be rendered as content a label element.
+ If no prop is passed an empty label is rendered.
+-If the prop is set to false no label is rendered.
+ 
+ -   Required: No
+ 
+diff --git a/packages/components/src/checkbox-control/test/index.tsx b/packages/components/src/checkbox-control/test/index.tsx
+index 55e1447661392e..411d20e820d3c7 100644
+--- a/packages/components/src/checkbox-control/test/index.tsx
++++ b/packages/components/src/checkbox-control/test/index.tsx
+@@ -60,8 +60,8 @@ describe( 'CheckboxControl', () => {
+ 			expect( label ).toBeInTheDocument();
+ 		} );
+ 
+-		it( 'should not render label element if label is set to false', () => {
+-			render( <CheckboxControl label={ false } /> );
++		it( 'should not render label element if label is not set', () => {
++			render( <CheckboxControl /> );
+ 
+ 			const label = screen.queryByRole( 'label' );
+ 			expect( label ).not.toBeInTheDocument();
+diff --git a/packages/components/src/checkbox-control/types.ts b/packages/components/src/checkbox-control/types.ts
+index 48a1d02affb700..07ab55493fc661 100644
+--- a/packages/components/src/checkbox-control/types.ts
++++ b/packages/components/src/checkbox-control/types.ts
+@@ -19,10 +19,9 @@ export type CheckboxControlProps = Pick<
+ 	/**
+ 	 * A label for the input field, that appears at the side of the checkbox.
+ 	 * The prop will be rendered as content a label element. If no prop is
+-	 * passed an empty label is rendered. If the prop is set to false no label
+-	 * is rendered.
++	 * passed an empty label is rendered.
+ 	 */
+-	label?: string | false;
++	label?: string;
+ 	/**
+ 	 * If checked is true the checkbox will be checked. If checked is false the
+ 	 * checkbox will be unchecked. If no value is passed the checkbox will be
+diff --git a/packages/edit-site/src/components/global-styles/font-library-modal/collection-font-variant.js b/packages/edit-site/src/components/global-styles/font-library-modal/collection-font-variant.js
+index ab090a0cd0b4db..0db8932a98e34d 100644
+--- a/packages/edit-site/src/components/global-styles/font-library-modal/collection-font-variant.js
++++ b/packages/edit-site/src/components/global-styles/font-library-modal/collection-font-variant.js
+@@ -35,21 +35,23 @@ function CollectionFontVariant( {
+ 	);
+ 
+ 	return (
+-		<label
+-			className="font-library-modal__library-font-variant"
+-			htmlFor={ checkboxId }
+-		>
++		<div className="font-library-modal__library-font-variant">
+ 			<Flex justify="flex-start" align="center" gap="1rem">
+ 				<CheckboxControl
+ 					checked={ selected }
+ 					onChange={ handleToggleActivation }
+ 					__nextHasNoMarginBottom={ true }
+ 					id={ checkboxId }
+-					label={ false }
+ 				/>
+-				<FontFaceDemo fontFace={ face } text={ displayName } />
++				<label htmlFor={ checkboxId }>
++					<FontFaceDemo
++						fontFace={ face }
++						text={ displayName }
++						onClick={ handleToggleActivation }
++					/>
++				</label>
+ 			</Flex>
+-		</label>
++		</div>
+ 	);
+ }
+ 
+diff --git a/packages/edit-site/src/components/global-styles/font-library-modal/library-font-variant.js b/packages/edit-site/src/components/global-styles/font-library-modal/library-font-variant.js
+index cc62a85193669b..f58eccd2b6ec2d 100644
+--- a/packages/edit-site/src/components/global-styles/font-library-modal/library-font-variant.js
++++ b/packages/edit-site/src/components/global-styles/font-library-modal/library-font-variant.js
+@@ -45,21 +45,23 @@ function LibraryFontVariant( { face, font } ) {
+ 	);
+ 
+ 	return (
+-		<label
+-			className="font-library-modal__library-font-variant"
+-			htmlFor={ checkboxId }
+-		>
++		<div className="font-library-modal__library-font-variant">
+ 			<Flex justify="flex-start" align="center" gap="1rem">
+ 				<CheckboxControl
+ 					checked={ isInstalled }
+ 					onChange={ handleToggleActivation }
+ 					__nextHasNoMarginBottom={ true }
+ 					id={ checkboxId }
+-					label={ false }
+ 				/>
+-				<FontFaceDemo fontFace={ face } text={ displayName } />
++				<label htmlFor={ checkboxId }>
++					<FontFaceDemo
++						fontFace={ face }
++						text={ displayName }
++						onClick={ handleToggleActivation }
++					/>
++				</label>
+ 			</Flex>
+-		</label>
++		</div>
+ 	);
+ }
+ 

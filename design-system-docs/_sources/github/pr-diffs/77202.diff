@@ -1,0 +1,207 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 2e1eccbcf69b31..9a0b7fbee64e6c 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -41,12 +41,12 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+ }
+ 
+ .emotion-6 {
+-  font-size: 11px;
+-  font-weight: 499;
++  font-size: 13px;
++  font-weight: normal;
+   line-height: 1.4;
+-  text-transform: uppercase;
+   display: block;
+   margin-bottom: calc(4px * 2);
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   padding: 0;
+ }
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8f5f7399830597..7f50dc24156ee5 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `BaseControl`, `InputControl`: Standardize label styles from uppercase to sentence case, using design system type tokens ([#77202](https://github.com/WordPress/gutenberg/pull/77202)).
++
+ ### Bug Fixes
+ 
+ -   `RadioControl`: Add `role="radiogroup"` to the wrapping `fieldset` element ([#76745](https://github.com/WordPress/gutenberg/pull/76745)).
+diff --git a/packages/components/src/base-control/styles/base-control-styles.ts b/packages/components/src/base-control/styles/base-control-styles.ts
+index 773e83908d492d..ed0577f40a6fb9 100644
+--- a/packages/components/src/base-control/styles/base-control-styles.ts
++++ b/packages/components/src/base-control/styles/base-control-styles.ts
+@@ -28,6 +28,7 @@ const labelStyles = css`
+ 
+ 	display: block;
+ 	margin-bottom: ${ space( 2 ) };
++	color: ${ COLORS.theme.foreground };
+ 	/**
+ 	 * Removes Chrome/Safari/Firefox user agent stylesheet padding from
+ 	 * StyledLabel when it is rendered as a legend.
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 3ab4438f632572..be55203cced885 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -314,6 +314,7 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
+ 		padding-bottom: 0;
+ 		max-width: 100%;
+ 		z-index: 1;
++		color: ${ COLORS.theme.foreground };
+ 	}
+ `;
+ 
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index aad6df281eeddd..7cfabe7885d7f4 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -25,12 +25,12 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+ }
+ 
+ .emotion-6 {
+-  font-size: 11px;
+-  font-weight: 499;
++  font-size: 13px;
++  font-weight: normal;
+   line-height: 1.4;
+-  text-transform: uppercase;
+   display: block;
+   margin-bottom: calc(4px * 2);
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   padding: 0;
+ }
+ 
+@@ -366,12 +366,12 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+ }
+ 
+ .emotion-6 {
+-  font-size: 11px;
+-  font-weight: 499;
++  font-size: 13px;
++  font-weight: normal;
+   line-height: 1.4;
+-  text-transform: uppercase;
+   display: block;
+   margin-bottom: calc(4px * 2);
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   padding: 0;
+ }
+ 
+@@ -615,12 +615,12 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+ }
+ 
+ .emotion-6 {
+-  font-size: 11px;
+-  font-weight: 499;
++  font-size: 13px;
++  font-weight: normal;
+   line-height: 1.4;
+-  text-transform: uppercase;
+   display: block;
+   margin-bottom: calc(4px * 2);
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   padding: 0;
+ }
+ 
+@@ -950,12 +950,12 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+ }
+ 
+ .emotion-6 {
+-  font-size: 11px;
+-  font-weight: 499;
++  font-size: 13px;
++  font-weight: normal;
+   line-height: 1.4;
+-  text-transform: uppercase;
+   display: block;
+   margin-bottom: calc(4px * 2);
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   padding: 0;
+ }
+ 
+diff --git a/packages/components/src/utils/base-label.ts b/packages/components/src/utils/base-label.ts
+index 2208891d8131e3..8606559168fb6d 100644
+--- a/packages/components/src/utils/base-label.ts
++++ b/packages/components/src/utils/base-label.ts
+@@ -11,8 +11,7 @@ import CONFIG from './config-values.js';
+ // This is a very low-level mixin which you shouldn't have to use directly.
+ // Try to use BaseControl's StyledLabel or BaseControl.VisualLabel if you can.
+ export const baseLabelTypography = css`
+-	font-size: 11px;
+-	font-weight: ${ CONFIG.fontWeightMedium };
++	font-size: ${ CONFIG.fontSize };
++	font-weight: ${ CONFIG.fontWeight };
+ 	line-height: 1.4;
+-	text-transform: uppercase;
+ `;
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index f74de60f765c69..323a8bcd1f9d7c 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++- DataForm: Standardize panel label styles from capitalize to sentence case, matching updated BaseControl labels ([#77202](https://github.com/WordPress/gutenberg/pull/77202)).
++
+ ### Breaking Changes
+ 
+ - DataViews: Use intersectionObserver to improve performance by unloading invisible items. Change how infinite scroll is enabled to require only 2 view properties: `infiniteScrollEnabled` and `startPosition`. [#74378](https://github.com/WordPress/gutenberg/pull/74378)
+diff --git a/packages/dataviews/src/components/dataform-layouts/panel/style.scss b/packages/dataviews/src/components/dataform-layouts/panel/style.scss
+index 819bc4b9580677..3013d7fa3a8640 100644
+--- a/packages/dataviews/src/components/dataform-layouts/panel/style.scss
++++ b/packages/dataviews/src/components/dataform-layouts/panel/style.scss
+@@ -91,8 +91,7 @@
+ 	align-items: center;
+ 	line-height: $grid-unit-05 * 5;
+ 	hyphens: auto;
+-	color: $gray-700;
+-	text-transform: capitalize;
++	color: $gray-900;
+ 
+ 	.components-base-control__label {
+ 		display: inline;
+diff --git a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+index 49cd25aee42c4f..4c28e2cb4483ca 100644
+--- a/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
++++ b/packages/editor/src/components/post-publish-panel/test/__snapshots__/index.js.snap
+@@ -18,12 +18,12 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
+ }
+ 
+ .emotion-4 {
+-  font-size: 11px;
+-  font-weight: 499;
++  font-size: 13px;
++  font-weight: normal;
+   line-height: 1.4;
+-  text-transform: uppercase;
+   display: block;
+   margin-bottom: calc(4px * 2);
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   padding: 0;
+ }
+ 
+@@ -245,12 +245,12 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
+ }
+ 
+ .emotion-4 {
+-  font-size: 11px;
+-  font-weight: 499;
++  font-size: 13px;
++  font-weight: normal;
+   line-height: 1.4;
+-  text-transform: uppercase;
+   display: block;
+   margin-bottom: calc(4px * 2);
++  color: var(--wp-components-color-foreground, #1e1e1e);
+   padding: 0;
+ }
+ 

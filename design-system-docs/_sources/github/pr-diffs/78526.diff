@@ -1,0 +1,65 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 851f21f436e823..6f1a359de25515 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `IconButton`: Default `focusableWhenDisabled` to `true`, matching `Button` ([#78526](https://github.com/WordPress/gutenberg/pull/78526)).
+ -   `Button`: Do not show the interactive cursor when disabled ([#78479](https://github.com/WordPress/gutenberg/pull/78479)).
+ -   `Autocomplete`: Fix the TypeScript prop types for the `Root` and `Value` primitives ([#78450](https://github.com/WordPress/gutenberg/pull/78450)).
+ -   Apply shared item popup typography to inline lists and empty states ([#78403](https://github.com/WordPress/gutenberg/pull/78403)).
+diff --git a/packages/ui/src/icon-button/icon-button.tsx b/packages/ui/src/icon-button/icon-button.tsx
+index 8032f765fa7b61..8ed7de1577eea1 100644
+--- a/packages/ui/src/icon-button/icon-button.tsx
++++ b/packages/ui/src/icon-button/icon-button.tsx
+@@ -18,7 +18,7 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
+ 			// Prevent accidental forwarding of `children`
+ 			children: _children,
+ 			disabled,
+-			focusableWhenDisabled,
++			focusableWhenDisabled = true,
+ 			icon,
+ 			size,
+ 			shortcut,
+diff --git a/packages/ui/src/icon-button/test/index.test.tsx b/packages/ui/src/icon-button/test/index.test.tsx
+index fbea57b4af449b..efbec95af18755 100644
+--- a/packages/ui/src/icon-button/test/index.test.tsx
++++ b/packages/ui/src/icon-button/test/index.test.tsx
+@@ -37,7 +37,14 @@ describe( 'IconButton', () => {
+ 		it( 'does not show tooltip when truly disabled', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <IconButton label="Save" icon={ <svg /> } disabled /> );
++			render(
++				<IconButton
++					label="Save"
++					icon={ <svg /> }
++					disabled
++					focusableWhenDisabled={ false }
++				/>
++			);
+ 
+ 			const button = screen.getByRole( 'button', { name: 'Save' } );
+ 			await user.hover( button );
+@@ -45,17 +52,10 @@ describe( 'IconButton', () => {
+ 			expect( screen.queryByText( 'Save' ) ).not.toBeInTheDocument();
+ 		} );
+ 
+-		it( 'shows tooltip when focusably disabled', async () => {
++		it( 'shows tooltip when disabled by default', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render(
+-				<IconButton
+-					label="Save"
+-					icon={ <svg /> }
+-					disabled
+-					focusableWhenDisabled
+-				/>
+-			);
++			render( <IconButton label="Save" icon={ <svg /> } disabled /> );
+ 
+ 			const button = screen.getByRole( 'button', { name: 'Save' } );
+ 			await user.hover( button );

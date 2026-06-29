@@ -1,0 +1,42 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 001b2d0b4230e9..34522f79572652 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fixes
+ 
+ -   `ToolsPanel`: atomic one-step state update when (un)registering panels ([#65564](https://github.com/WordPress/gutenberg/pull/65564)).
++-   `Navigator`: fix `isInitial` logic ([#65527](https://github.com/WordPress/gutenberg/pull/65527)).
+ 
+ ## 28.8.0 (2024-09-19)
+ 
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index ebcb247c574830..01254b743f87d0 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -66,7 +66,7 @@ function goTo(
+ 	options: NavigateOptions = {}
+ ) {
+ 	const { focusSelectors } = state;
+-	const currentLocation = { ...state.currentLocation, isInitial: false };
++	const currentLocation = { ...state.currentLocation };
+ 
+ 	const {
+ 		// Default assignments
+@@ -114,6 +114,7 @@ function goTo(
+ 	return {
+ 		currentLocation: {
+ 			...restOptions,
++			isInitial: false,
+ 			path,
+ 			isBack,
+ 			hasRestoredFocus: false,
+@@ -129,7 +130,7 @@ function goToParent(
+ 	options: NavigateToParentOptions = {}
+ ) {
+ 	const { screens, focusSelectors } = state;
+-	const currentLocation = { ...state.currentLocation, isInitial: false };
++	const currentLocation = { ...state.currentLocation };
+ 	const currentPath = currentLocation.path;
+ 	if ( currentPath === undefined ) {
+ 		return { currentLocation, focusSelectors };

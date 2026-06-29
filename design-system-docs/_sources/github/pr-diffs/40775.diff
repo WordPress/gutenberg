@@ -1,0 +1,786 @@
+diff --git a/package-lock.json b/package-lock.json
+index f836c69f0400f3..e4637e13c23dc5 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -16305,6 +16305,16 @@
+ 				}
+ 			}
+ 		},
++		"@types/react-dates": {
++			"version": "17.1.10",
++			"resolved": "https://registry.npmjs.org/@types/react-dates/-/react-dates-17.1.10.tgz",
++			"integrity": "sha512-vMMO4bw88PJ5yLfeo1WR0peR7hkYIsso1wGLiO5Xkpcb/B86LK2P1l3YbNWXD1M7BqFekezkuWaO1qKGf8uX4Q==",
++			"dev": true,
++			"requires": {
++				"@types/react": "*",
++				"moment": ">=2.17.1"
++			}
++		},
+ 		"@types/react-dom": {
+ 			"version": "17.0.11",
+ 			"resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-17.0.11.tgz",
+diff --git a/package.json b/package.json
+index 123da1ec51229d..1656862823c5a8 100755
+--- a/package.json
++++ b/package.json
+@@ -122,6 +122,7 @@
+ 		"@types/npm-package-arg": "6.1.1",
+ 		"@types/prettier": "2.4.4",
+ 		"@types/qs": "6.9.7",
++		"@types/react-dates": "17.1.10",
+ 		"@types/requestidlecallback": "0.3.4",
+ 		"@types/semver": "7.3.8",
+ 		"@types/sprintf-js": "1.1.2",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 00994b4d9dd5b4..ecb21284e5d81d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ - `BorderControl` now only displays the reset button in its popover when selections have already been made. [#40917](https://github.com/WordPress/gutenberg/pull/40917)
+ 
++### Internal
++
++-   `DateTimePicker`: Convert to TypeScript ([#40775](https://github.com/WordPress/gutenberg/pull/40775)).
++
+ ## 19.10.0 (2022-05-04)
+ 
+ ### Internal
+diff --git a/packages/components/src/button-group/index.js b/packages/components/src/button-group/index.js
+index 2ef2b5e94c6018..cdd4343d776ed5 100644
+--- a/packages/components/src/button-group/index.js
++++ b/packages/components/src/button-group/index.js
+@@ -1,3 +1,4 @@
++// @ts-nocheck
+ /**
+  * External dependencies
+  */
+@@ -8,10 +9,13 @@ import classnames from 'classnames';
+  */
+ import { forwardRef } from '@wordpress/element';
+ 
+-function ButtonGroup( { className, ...props }, ref ) {
++function ButtonGroup( props, ref ) {
++	const { className, ...restProps } = props;
+ 	const classes = classnames( 'components-button-group', className );
+ 
+-	return <div ref={ ref } role="group" className={ classes } { ...props } />;
++	return (
++		<div ref={ ref } role="group" className={ classes } { ...restProps } />
++	);
+ }
+ 
+ export default forwardRef( ButtonGroup );
+diff --git a/packages/components/src/date-time/README.md b/packages/components/src/date-time/README.md
+index a3567c27198800..6c2cddd62841ad 100644
+--- a/packages/components/src/date-time/README.md
++++ b/packages/components/src/date-time/README.md
+@@ -35,22 +35,20 @@ const MyDateTimePicker = () => {
+ 
+ The component accepts the following props:
+ 
+-### currentDate
++### `currentDate`: `Date | string | number | null`
+ 
+ The current date and time at initialization. Optionally pass in a `null` value to specify no date is currently selected.
+ 
+--   Type: `string`
+ -   Required: No
+ -   Default: today's date
+ 
+-### onChange
++### `onChange`: `( date: string | null ) => void`
+ 
+ The function called when a new date or time has been selected. It is passed the `currentDate` as an argument.
+ 
+--   Type: `Function`
+--   Required: Yes
++-   Required: No
+ 
+-### is12Hour
++### `is12Hour`: `boolean`
+ 
+ Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed and the time format is assumed to be `MM-DD-YYYY` (as opposed to the default format `DD-MM-YYYY`).
+ 
+@@ -58,16 +56,21 @@ Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is display
+ -   Required: No
+ -   Default: false
+ 
+-### isInvalidDate
++### `isInvalidDate`: `( date: Date ) => boolean`
+ 
+ A callback function which receives a Date object representing a day as an argument, and should return a Boolean to signify if the day is valid or not.
+ 
+--   Type: `Function`
+ -   Required: No
+ 
+-### onMonthPreviewed
++### `onMonthPreviewed`: `( date: Date ) => void`
+ 
+ A callback invoked when selecting the previous/next month in the date picker. The callback receives the new month date in the ISO format as an argument.
+ 
+--   Type: `Function`
++-   Required: No
++
++### `events`: `{ date: Date }[]`
++
++List of events to show in the date picker. Each event will appear as a dot on the day of the event.
++
++-   Type: `Array`
+ -   Required: No
+diff --git a/packages/components/src/date-time/date.js b/packages/components/src/date-time/date.tsx
+similarity index 73%
+rename from packages/components/src/date-time/date.js
+rename to packages/components/src/date-time/date.tsx
+index fd6869ac843339..fffba036a3a8ce 100644
+--- a/packages/components/src/date-time/date.js
++++ b/packages/components/src/date-time/date.tsx
+@@ -3,10 +3,17 @@
+  */
+ import moment from 'moment';
+ import classnames from 'classnames';
+-
+-// react-dates doesn't tree-shake correctly, so we import from the individual
+-// component here, to avoid including too much of the library
+-import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
++import type { Moment } from 'moment';
++import { noop } from 'lodash';
++
++// `react-dates` doesn't tree-shake correctly, so we import from the individual
++// component here.
++// @ts-expect-error TypeScript won't find any type declarations at
++// `react-dates/lib/components/DayPickerSingleDateController` as they're located
++// at `react-dates`.
++import UntypedDayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
++import type { DayPickerSingleDateController } from 'react-dates';
++const TypedDayPickerSingleDateController = UntypedDayPickerSingleDateController as DayPickerSingleDateController;
+ 
+ /**
+  * WordPress dependencies
+@@ -18,15 +25,13 @@ import { isRTL, _n, sprintf } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import { getMomentDate } from './utils';
++import type { DatePickerDayProps, DatePickerProps } from './types';
+ 
+-/**
+- * Module Constants
+- */
+ const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+ const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
+ 
+-function DatePickerDay( { day, events = [] } ) {
+-	const ref = useRef();
++function DatePickerDay( { day, events = [] }: DatePickerDayProps ) {
++	const ref = useRef< HTMLDivElement >( null );
+ 
+ 	/*
+ 	 * a11y hack to make the `There is/are n events` string
+@@ -36,7 +41,7 @@ function DatePickerDay( { day, events = [] } ) {
+ 	 */
+ 	useEffect( () => {
+ 		// Bail when no parent node.
+-		if ( ! ref?.current?.parentNode ) {
++		if ( ! ( ref?.current?.parentNode instanceof Element ) ) {
+ 			return;
+ 		}
+ 
+@@ -81,9 +86,9 @@ function DatePicker( {
+ 	events,
+ 	isInvalidDate,
+ 	onMonthPreviewed,
+-} ) {
+-	const nodeRef = useRef();
+-	const onMonthPreviewedHandler = ( newMonthDate ) => {
++}: DatePickerProps ) {
++	const nodeRef = useRef< HTMLDivElement >( null );
++	const onMonthPreviewedHandler = ( newMonthDate: Moment ) => {
+ 		onMonthPreviewed?.( newMonthDate.toISOString() );
+ 		keepFocusInside();
+ 	};
+@@ -111,7 +116,7 @@ function DatePicker( {
+ 			const focusRegion = nodeRef.current.querySelector(
+ 				'.DayPicker_focusRegion'
+ 			);
+-			if ( ! focusRegion ) {
++			if ( ! ( focusRegion instanceof HTMLElement ) ) {
+ 				return;
+ 			}
+ 			// Keep the focus on focus region.
+@@ -119,7 +124,11 @@ function DatePicker( {
+ 		}
+ 	};
+ 
+-	const onChangeMoment = ( newDate ) => {
++	const onChangeMoment = ( newDate: Moment | null ) => {
++		if ( ! newDate ) {
++			return;
++		}
++
+ 		// If currentDate is null, use now as momentTime to designate hours, minutes, seconds.
+ 		const momentDate = currentDate ? moment( currentDate ) : moment();
+ 		const momentTime = {
+@@ -128,13 +137,13 @@ function DatePicker( {
+ 			seconds: 0,
+ 		};
+ 
+-		onChange( newDate.set( momentTime ).format( TIMEZONELESS_FORMAT ) );
++		onChange?.( newDate.set( momentTime ).format( TIMEZONELESS_FORMAT ) );
+ 
+ 		// Keep focus on the date picker.
+ 		keepFocusInside();
+ 	};
+ 
+-	const getEventsPerDay = ( day ) => {
++	const getEventsPerDay = ( day: Moment ) => {
+ 		if ( ! events?.length ) {
+ 			return [];
+ 		}
+@@ -148,7 +157,7 @@ function DatePicker( {
+ 
+ 	return (
+ 		<div className="components-datetime__date" ref={ nodeRef }>
+-			<DayPickerSingleDateController
++			<TypedDayPickerSingleDateController
+ 				date={ momentDate }
+ 				daySize={ 30 }
+ 				focused
+@@ -166,7 +175,7 @@ function DatePicker( {
+ 				dayAriaLabelFormat={ ARIAL_LABEL_TIME_FORMAT }
+ 				isRTL={ isRTL() }
+ 				isOutsideRange={ ( date ) => {
+-					return isInvalidDate && isInvalidDate( date.toDate() );
++					return !! isInvalidDate && isInvalidDate( date.toDate() );
+ 				} }
+ 				onPrevMonthClick={ onMonthPreviewedHandler }
+ 				onNextMonthClick={ onMonthPreviewedHandler }
+@@ -176,6 +185,7 @@ function DatePicker( {
+ 						events={ getEventsPerDay( day ) }
+ 					/>
+ 				) }
++				onFocusChange={ noop }
+ 			/>
+ 		</div>
+ 	);
+diff --git a/packages/components/src/date-time/index.js b/packages/components/src/date-time/index.tsx
+similarity index 80%
+rename from packages/components/src/date-time/index.js
+rename to packages/components/src/date-time/index.tsx
+index 2623b72d28244d..9801d4c9407fad 100644
+--- a/packages/components/src/date-time/index.js
++++ b/packages/components/src/date-time/index.tsx
+@@ -5,6 +5,7 @@
+ // See: https://github.com/airbnb/react-dates#initialize
+ import 'react-dates/initialize';
+ import { noop } from 'lodash';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+@@ -18,10 +19,11 @@ import { __, _x } from '@wordpress/i18n';
+ import Button from '../button';
+ import { default as DatePicker } from './date';
+ import { default as TimePicker } from './time';
++import type { DateTimePickerProps } from './types';
+ 
+ export { DatePicker, TimePicker };
+ 
+-function DateTimePicker(
++function UnforwardedDateTimePicker(
+ 	{
+ 		currentDate,
+ 		is12Hour,
+@@ -29,8 +31,8 @@ function DateTimePicker(
+ 		onMonthPreviewed = noop,
+ 		onChange,
+ 		events,
+-	},
+-	ref
++	}: DateTimePickerProps,
++	ref: ForwardedRef< any >
+ ) {
+ 	const [ calendarHelpIsVisible, setCalendarHelpIsVisible ] = useState(
+ 		false
+@@ -148,7 +150,7 @@ function DateTimePicker(
+ 					<Button
+ 						className="components-datetime__date-reset-button"
+ 						variant="link"
+-						onClick={ () => onChange( null ) }
++						onClick={ () => onChange?.( null ) }
+ 					>
+ 						{ __( 'Reset' ) }
+ 					</Button>
+@@ -167,4 +169,29 @@ function DateTimePicker(
+ 	);
+ }
+ 
+-export default forwardRef( DateTimePicker );
++/**
++ * DateTimePicker is a React component that renders a calendar and clock for
++ * date and time selection. The calendar and clock components can be accessed
++ * individually using the `DatePicker` and `TimePicker` components respectively.
++ *
++ * @example
++ * ```jsx
++ * import { DateTimePicker } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyDateTimePicker = () => {
++ *   const [ date, setDate ] = useState( new Date() );
++ *
++ *   return (
++ *     <DateTimePicker
++ *       currentDate={ date }
++ *       onChange={ ( newDate ) => setDate( newDate ) }
++ *       is12Hour={ true }
++ *     />
++ *   );
++ * };
++ * ```
++ */
++export const DateTimePicker = forwardRef( UnforwardedDateTimePicker );
++
++export default DateTimePicker;
+diff --git a/packages/components/src/date-time/time.js b/packages/components/src/date-time/time.tsx
+similarity index 74%
+rename from packages/components/src/date-time/time.js
+rename to packages/components/src/date-time/time.tsx
+index 3fc7da4fe3970f..10b673b7c83d87 100644
+--- a/packages/components/src/date-time/time.js
++++ b/packages/components/src/date-time/time.tsx
+@@ -4,6 +4,8 @@
+ import classnames from 'classnames';
+ import { isInteger } from 'lodash';
+ import moment from 'moment';
++import type { FocusEvent } from 'react';
++import type { Moment } from 'moment';
+ 
+ /**
+  * WordPress dependencies
+@@ -22,25 +24,18 @@ import { __ } from '@wordpress/i18n';
+ import Button from '../button';
+ import ButtonGroup from '../button-group';
+ import TimeZone from './timezone';
++import type { WordPressComponentProps } from '../ui/context';
++import type { UpdateOnBlurAsIntegerFieldProps, TimePickerProps } from './types';
+ 
+-/**
+- * Module Constants
+- */
+ const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+ 
+-function from12hTo24h( hours, isPm ) {
++function from12hTo24h( hours: number, isPm: boolean ) {
+ 	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
+ }
+ 
+ /**
+- * <UpdateOnBlurAsIntegerField>
+- * A shared component to parse, validate, and handle remounting of the underlying form field element like <input> and <select>.
+- *
+- * @param {Object}        props             Component props.
+- * @param {string}        props.as          Render the component as specific element tag, defaults to "input".
+- * @param {number|string} props.value       The default value of the component which will be parsed to integer.
+- * @param {Function}      props.onUpdate    Call back when blurred and validated.
+- * @param {string}        [props.className]
++ * A shared component to parse, validate, and handle remounting of the
++ * underlying form field element like <input> and <select>.
+  */
+ function UpdateOnBlurAsIntegerField( {
+ 	as,
+@@ -48,11 +43,11 @@ function UpdateOnBlurAsIntegerField( {
+ 	onUpdate,
+ 	className,
+ 	...props
+-} ) {
+-	function handleBlur( event ) {
++}: WordPressComponentProps< UpdateOnBlurAsIntegerFieldProps, 'input', true > ) {
++	function handleBlur( event: FocusEvent< HTMLInputElement > ) {
+ 		const { target } = event;
+ 
+-		if ( value === target.value ) {
++		if ( String( value ) === target.value ) {
+ 			return;
+ 		}
+ 
+@@ -65,10 +60,10 @@ function UpdateOnBlurAsIntegerField( {
+ 			( typeof props.min !== 'undefined' && parsedValue < props.min )
+ 		) {
+ 			// If validation failed, reset the value to the previous valid value.
+-			target.value = value;
++			target.value = String( value );
+ 		} else {
+ 			// Otherwise, it's valid, call onUpdate.
+-			onUpdate( target.name, parsedValue );
++			onUpdate( parsedValue );
+ 		}
+ 	}
+ 
+@@ -85,20 +80,14 @@ function UpdateOnBlurAsIntegerField( {
+ 	} );
+ }
+ 
+-/**
+- * <TimePicker>
+- *
+- * @typedef {Date|string|number} WPValidDateTimeFormat
+- *
+- * @param {Object}                props             Component props.
+- * @param {boolean}               props.is12Hour    Should the time picker showed in 12 hour format or 24 hour format.
+- * @param {WPValidDateTimeFormat} props.currentTime The initial current time the time picker should render.
+- * @param {Function}              props.onChange    Callback function when the date changed.
+- */
+-export function TimePicker( { is12Hour, currentTime, onChange } ) {
++export function TimePicker( {
++	is12Hour,
++	currentTime,
++	onChange,
++}: TimePickerProps ) {
+ 	const [ date, setDate ] = useState( () =>
+ 		// Truncate the date at the minutes, see: #15495.
+-		moment( currentTime ).startOf( 'minutes' )
++		currentTime ? moment( currentTime ).startOf( 'minutes' ) : moment()
+ 	);
+ 
+ 	// Reset the state when currentTime changed.
+@@ -115,7 +104,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
+ 			year: date.format( 'YYYY' ),
+ 			minutes: date.format( 'mm' ),
+ 			hours: date.format( is12Hour ? 'hh' : 'HH' ),
+-			am: date.format( 'H' ) <= 11 ? 'AM' : 'PM',
++			am: Number( date.format( 'H' ) ) <= 11 ? 'AM' : 'PM',
+ 		} ),
+ 		[ date, is12Hour ]
+ 	);
+@@ -124,28 +113,30 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
+ 	 * Function that sets the date state and calls the onChange with a new date.
+ 	 * The date is truncated at the minutes.
+ 	 *
+-	 * @param {Object} newDate The date object.
++	 * @param {Moment} newDate The date object.
+ 	 */
+-	function changeDate( newDate ) {
++	function changeDate( newDate: Moment ) {
+ 		setDate( newDate );
+-		onChange( newDate.format( TIMEZONELESS_FORMAT ) );
++		onChange?.( newDate.format( TIMEZONELESS_FORMAT ) );
+ 	}
+ 
+-	function update( name, value ) {
+-		// If the 12-hour format is being used and the 'PM' period is selected, then
+-		// the incoming value (which ranges 1-12) should be increased by 12 to match
+-		// the expected 24-hour format.
+-		let adjustedValue = value;
+-		if ( name === 'hours' && is12Hour ) {
+-			adjustedValue = from12hTo24h( value, am === 'PM' );
+-		}
++	function update( name: 'date' | 'month' | 'year' | 'hours' | 'minutes' ) {
++		return ( value: number ) => {
++			// If the 12-hour format is being used and the 'PM' period is selected, then
++			// the incoming value (which ranges 1-12) should be increased by 12 to match
++			// the expected 24-hour format.
++			let adjustedValue = value;
++			if ( name === 'hours' && is12Hour ) {
++				adjustedValue = from12hTo24h( value, am === 'PM' );
++			}
+ 
+-		// Clone the date and call the specific setter function according to `name`.
+-		const newDate = date.clone()[ name ]( adjustedValue );
+-		changeDate( newDate );
++			// Clone the date and call the specific setter function according to `name`.
++			const newDate = date.clone()[ name ]( adjustedValue );
++			changeDate( newDate );
++		};
+ 	}
+ 
+-	function updateAmPm( value ) {
++	function updateAmPm( value: 'AM' | 'PM' ) {
+ 		return () => {
+ 			if ( am === value ) {
+ 				return;
+@@ -173,7 +164,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
+ 				step={ 1 }
+ 				min={ 1 }
+ 				max={ 31 }
+-				onUpdate={ update }
++				onUpdate={ update( 'date' ) }
+ 			/>
+ 		</div>
+ 	);
+@@ -187,7 +178,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
+ 				name="month"
+ 				value={ month }
+ 				// The value starts from 0, so we have to -1 when setting month.
+-				onUpdate={ ( key, value ) => update( key, value - 1 ) }
++				onUpdate={ ( value ) => update( 'month' )( value - 1 ) }
+ 			>
+ 				<option value="01">{ __( 'January' ) }</option>
+ 				<option value="02">{ __( 'February' ) }</option>
+@@ -236,7 +227,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
+ 							min={ 0 }
+ 							max={ 9999 }
+ 							value={ year }
+-							onUpdate={ update }
++							onUpdate={ update( 'year' ) }
+ 						/>
+ 					</div>
+ 				</div>
+@@ -257,7 +248,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
+ 							min={ is12Hour ? 1 : 0 }
+ 							max={ is12Hour ? 12 : 23 }
+ 							value={ hours }
+-							onUpdate={ update }
++							onUpdate={ update( 'hours' ) }
+ 						/>
+ 						<span
+ 							className="components-datetime__time-separator"
+@@ -274,7 +265,7 @@ export function TimePicker( { is12Hour, currentTime, onChange } ) {
+ 							min={ 0 }
+ 							max={ 59 }
+ 							value={ minutes }
+-							onUpdate={ update }
++							onUpdate={ update( 'minutes' ) }
+ 						/>
+ 					</div>
+ 					{ is12Hour && (
+diff --git a/packages/components/src/date-time/timezone.js b/packages/components/src/date-time/timezone.tsx
+similarity index 88%
+rename from packages/components/src/date-time/timezone.js
+rename to packages/components/src/date-time/timezone.tsx
+index 03bbedf3b45cde..34592699d06052 100644
+--- a/packages/components/src/date-time/timezone.js
++++ b/packages/components/src/date-time/timezone.tsx
+@@ -10,7 +10,8 @@ import { __experimentalGetSettings as getDateSettings } from '@wordpress/date';
+ import Tooltip from '../tooltip';
+ 
+ /**
+- * Displays timezone information when user timezone is different from site timezone.
++ * Displays timezone information when user timezone is different from site
++ * timezone.
+  */
+ const TimeZone = () => {
+ 	const { timezone } = getDateSettings();
+@@ -24,9 +25,9 @@ const TimeZone = () => {
+ 		return null;
+ 	}
+ 
+-	const offsetSymbol = timezone.offset >= 0 ? '+' : '';
++	const offsetSymbol = Number( timezone.offset ) >= 0 ? '+' : '';
+ 	const zoneAbbr =
+-		'' !== timezone.abbr && isNaN( timezone.abbr )
++		'' !== timezone.abbr && isNaN( Number( timezone.abbr ) )
+ 			? timezone.abbr
+ 			: `UTC${ offsetSymbol }${ timezone.offset }`;
+ 
+diff --git a/packages/components/src/date-time/types.ts b/packages/components/src/date-time/types.ts
+new file mode 100644
+index 00000000000000..7ceddca3e70d25
+--- /dev/null
++++ b/packages/components/src/date-time/types.ts
+@@ -0,0 +1,110 @@
++/**
++ * External dependencies
++ */
++import type { Moment } from 'moment';
++import type { ReactNode } from 'react';
++
++export type UpdateOnBlurAsIntegerFieldProps = {
++	/**
++	 * The value of the integer field.
++	 */
++	value: number | string;
++
++	/**
++	 * Called when the field is changed.
++	 */
++	onUpdate: ( value: number ) => void;
++
++	/**
++	 * Children to render inside the field.
++	 */
++	children?: ReactNode;
++};
++
++export type DateTimeString = string;
++
++export type ValidDateTimeInput = Date | string | number | null;
++
++export type TimePickerProps = {
++	/**
++	 * The initial current time the time picker should render.
++	 */
++	currentTime?: ValidDateTimeInput;
++
++	/**
++	 * Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is
++	 * displayed and the time format is assumed to be `MM-DD-YYYY` (as opposed
++	 * to the default format `DD-MM-YYYY`).
++	 */
++	is12Hour?: boolean;
++
++	/**
++	 * The function called when a new time has been selected. It is passed the
++	 * time as an argument.
++	 */
++	onChange?: ( time: DateTimeString ) => void;
++};
++
++export type DatePickerEvent = {
++	/**
++	 * The date of the event.
++	 */
++	date: Date;
++};
++
++export type DatePickerDayProps = {
++	/**
++	 * The day to display.
++	 */
++	day: Moment;
++
++	/**
++	 * List of events to show on this day.
++	 *
++	 * @default []
++	 */
++	events?: DatePickerEvent[];
++};
++
++export type DatePickerProps = {
++	/**
++	 * The current date and time at initialization. Optionally pass in a `null`
++	 * value to specify no date is currently selected.
++	 */
++	currentDate?: ValidDateTimeInput;
++
++	/**
++	 * The function called when a new date has been selected. It is passed the
++	 * date as an argument.
++	 */
++	onChange?: ( date: DateTimeString ) => void;
++
++	/**
++	 * A callback function which receives a Date object representing a day as an
++	 * argument, and should return a Boolean to signify if the day is valid or
++	 * not.
++	 */
++	isInvalidDate?: ( date: Date ) => boolean;
++
++	/**
++	 * A callback invoked when selecting the previous/next month in the date
++	 * picker. The callback receives the new month date in the ISO format as an
++	 * argument.
++	 */
++	onMonthPreviewed?: ( date: DateTimeString ) => void;
++
++	/**
++	 * List of events to show in the date picker. Each event will appear as a
++	 * dot on the day of the event.
++	 */
++	events?: DatePickerEvent[];
++};
++
++export type DateTimePickerProps = DatePickerProps &
++	TimePickerProps & {
++		/**
++		 * The function called when a new date or time has been selected. It is
++		 * passed the date and time as an argument.
++		 */
++		onChange?: ( date: DateTimeString | null ) => void;
++	};
+diff --git a/packages/components/src/date-time/utils.js b/packages/components/src/date-time/utils.js
+deleted file mode 100644
+index 857b831ebb17ac..00000000000000
+--- a/packages/components/src/date-time/utils.js
++++ /dev/null
+@@ -1,18 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import moment from 'moment';
+-
+-/**
+- * Create a Moment object from a date string. With no date supplied, default to a Moment
+- * object representing now. If a null value is passed, return a null value.
+- *
+- * @param {?string} date Date representing the currently selected date or null to signify no selection.
+- * @return {?moment.Moment} Moment object for selected date or null.
+- */
+-export const getMomentDate = ( date ) => {
+-	if ( null === date ) {
+-		return null;
+-	}
+-	return date ? moment( date ) : moment();
+-};
+diff --git a/packages/components/src/date-time/utils.ts b/packages/components/src/date-time/utils.ts
+new file mode 100644
+index 00000000000000..d222b79254148d
+--- /dev/null
++++ b/packages/components/src/date-time/utils.ts
+@@ -0,0 +1,25 @@
++/**
++ * External dependencies
++ */
++import moment from 'moment';
++
++/**
++ * Internal dependencies
++ */
++import type { ValidDateTimeInput } from './types';
++
++/**
++ * Create a Moment object from a date string. With no date supplied, default to
++ * a Moment object representing now. If a null value is passed, return a null
++ * value.
++ *
++ * @param {ValidDateTimeInput} [date] Date representing the currently selected
++ *                                    date or null to signify no selection.
++ * @return {?moment.Moment} Moment object for selected date or null.
++ */
++export const getMomentDate = ( date: ValidDateTimeInput | undefined ) => {
++	if ( null === date ) {
++		return null;
++	}
++	return date ? moment( date ) : moment();
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 8ed3f765309818..eeaeebf7d31d35 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -17,6 +17,7 @@
+ 	},
+ 	"references": [
+ 		{ "path": "../compose" },
++		{ "path": "../date" },
+ 		{ "path": "../deprecated" },
+ 		{ "path": "../dom" },
+ 		{ "path": "../element" },
+@@ -35,6 +36,7 @@
+ 		"src/border-box-control/**/*",
+ 		"src/border-control/**/*",
+ 		"src/button/**/*",
++		"src/button-group/**/*",
+ 		"src/card/**/*",
+ 		"src/circular-option-picker/**/*",
+ 		"src/color-indicator/**/*",
+@@ -42,6 +44,7 @@
+ 		"src/color-picker/**/*",
+ 		"src/confirm-dialog/**/*",
+ 		"src/dashicon/**/*",
++		"src/date-time/**/*",
+ 		"src/disabled/**/*",
+ 		"src/divider/**/*",
+ 		"src/draggable/**/*",
+diff --git a/packages/date/src/index.js b/packages/date/src/index.js
+index 3e337743781b0a..3c70855dec4a26 100644
+--- a/packages/date/src/index.js
++++ b/packages/date/src/index.js
+@@ -198,7 +198,7 @@ export function setSettings( dateSettings ) {
+ /**
+  * Returns the currently defined date settings.
+  *
+- * @return {Object} Settings, including locale data.
++ * @return {DateSettings} Settings, including locale data.
+  */
+ export function __experimentalGetSettings() {
+ 	return settings;

@@ -1,0 +1,66 @@
+diff --git a/packages/ui/src/popover/style.module.css b/packages/ui/src/popover/style.module.css
+index 5696745370e184..8be6108c17e021 100644
+--- a/packages/ui/src/popover/style.module.css
++++ b/packages/ui/src/popover/style.module.css
+@@ -116,10 +116,11 @@
+ 			z-index: var(--wp-ui-popover-z-index, initial);
+ 			/* TODO: Replace with a WPDS overlay/scrim token when one exists. */
+ 			background-color: rgba(0, 0, 0, 0.15);
+-			opacity: 0;
++			opacity: 1;
+ 
+-			&[data-open]:not([data-starting-style]):not([data-ending-style]) {
+-				opacity: 1;
++			&[data-starting-style],
++			&[data-ending-style] {
++				opacity: 0;
+ 			}
+ 
+ 			@media not (prefers-reduced-motion) {
+diff --git a/packages/ui/src/utils/css/dropdown-motion.module.css b/packages/ui/src/utils/css/dropdown-motion.module.css
+index 9f08fb6b3067b7..5000a8cc58cb0b 100644
+--- a/packages/ui/src/utils/css/dropdown-motion.module.css
++++ b/packages/ui/src/utils/css/dropdown-motion.module.css
+@@ -25,24 +25,32 @@
+ 				will-change: transform, opacity;
+ 			}
+ 
+-			opacity: 0;
++			opacity: 1;
++			transform: translate(0);
+ 
+-			&[data-side="bottom"] {
++			&[data-starting-style],
++			&[data-ending-style] {
++				opacity: 0;
++			}
++
++			&[data-side="bottom"][data-starting-style],
++			&[data-side="bottom"][data-ending-style] {
+ 				transform: translateY(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
+ 			}
+-			&[data-side="top"] {
++
++			&[data-side="top"][data-starting-style],
++			&[data-side="top"][data-ending-style] {
+ 				transform: translateY(var(--wp-ui-dropdown-slide-distance));
+ 			}
+-			&[data-side="left"] {
++
++			&[data-side="left"][data-starting-style],
++			&[data-side="left"][data-ending-style] {
+ 				transform: translateX(var(--wp-ui-dropdown-slide-distance));
+ 			}
+-			&[data-side="right"] {
+-				transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
+-			}
+ 
+-			&[data-open]:not([data-starting-style]) {
+-				opacity: 1;
+-				transform: translate(0);
++			&[data-side="right"][data-starting-style],
++			&[data-side="right"][data-ending-style] {
++				transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
+ 			}
+ 		}
+ 	}

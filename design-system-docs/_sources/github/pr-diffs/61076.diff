@@ -1,0 +1,41 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..600ecf768baa68 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `DropdownMenuV2`: Remove "experimental" designation ([#61076](https://github.com/WordPress/gutenberg/pull/61076)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/dropdown-menu-v2/stories/index.story.tsx b/packages/components/src/dropdown-menu-v2/stories/index.story.tsx
+index 11f3c8fb1a6b1b..39b10f6c07ded5 100644
+--- a/packages/components/src/dropdown-menu-v2/stories/index.story.tsx
++++ b/packages/components/src/dropdown-menu-v2/stories/index.story.tsx
+@@ -32,7 +32,7 @@ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+ import { ContextSystemProvider } from '../../context';
+ 
+ const meta: Meta< typeof DropdownMenu > = {
+-	title: 'Components (Experimental)/DropdownMenu V2',
++	title: 'Components/DropdownMenu V2',
+ 	component: DropdownMenu,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..23b6e81459bcae 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'dropdownmenu-v2',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

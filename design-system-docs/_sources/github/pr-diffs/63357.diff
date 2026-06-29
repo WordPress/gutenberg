@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7b0c17a67bc40e..e92926bbbe5cec 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,7 +5,8 @@
+ ### Internal
+ 
+ -   `CustomSelectControl`: switch to ariakit-based implementation ([#63258](https://github.com/WordPress/gutenberg/pull/63258)).
+--   `CustomSelectControl`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
++-   `CustomSelectControlV2`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
++-   `CustomSelectControlV2`: do not flip popover if legacy adapter. ([#63357](https://github.com/WordPress/gutenberg/pull/63357)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index 42fada7d7554aa..e925038812fa73 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -145,6 +145,8 @@ function _CustomSelect(
+ 					sameWidth
+ 					slide={ false }
+ 					onKeyDown={ onSelectPopoverKeyDown }
++					// Match legacy behavior
++					flip={ ! isLegacy }
+ 				>
+ 					<CustomSelectContext.Provider value={ contextValue }>
+ 						{ children }

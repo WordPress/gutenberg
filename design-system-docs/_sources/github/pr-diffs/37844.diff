@@ -1,0 +1,118 @@
+diff --git a/packages/block-editor/src/components/border-radius-control/style.scss b/packages/block-editor/src/components/border-radius-control/style.scss
+index 4cfeaaeb6fc739..becab0d9de11e5 100644
+--- a/packages/block-editor/src/components/border-radius-control/style.scss
++++ b/packages/block-editor/src/components/border-radius-control/style.scss
+@@ -2,7 +2,7 @@
+ 	margin-bottom: $grid-unit-15;
+ 
+ 	legend {
+-		padding-bottom: $grid-unit-05;
++		margin-bottom: $grid-unit-10;
+ 	}
+ 
+ 	.components-border-radius-control__wrapper {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 876c46b448ce33..40167b857808ad 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fix
+ 
++-   Update label spacing for the `BoxControl`, `CustomGradientPicker`, `FormTokenField`, `InputControl`, and `ToolsPanel` components to use a bottom margin of `8px` for consistency. ([#37844](https://github.com/WordPress/gutenberg/pull/37844))
+ -   Add missing styles to the `BaseControl.VisualLabel` component. ([#37747](https://github.com/WordPress/gutenberg/pull/37747))
+ 
+ ## 19.2.0 (2022-01-04)
+diff --git a/packages/components/src/box-control/styles/box-control-styles.js b/packages/components/src/box-control/styles/box-control-styles.js
+index ffec57a3ba82c7..14238f0a5e6647 100644
+--- a/packages/components/src/box-control/styles/box-control-styles.js
++++ b/packages/components/src/box-control/styles/box-control-styles.js
+@@ -19,7 +19,7 @@ export const Root = styled.div`
+ 
+ export const Header = styled( Flex )`
+ 	color: ${ COLORS.ui.label };
+-	padding-bottom: 8px;
++	margin-bottom: 8px;
+ `;
+ 
+ export const HeaderControlWrapper = styled( Flex )`
+diff --git a/packages/components/src/custom-gradient-picker/style.scss b/packages/components/src/custom-gradient-picker/style.scss
+index 4b4daff76ce309..4d0a0ade3567b1 100644
+--- a/packages/components/src/custom-gradient-picker/style.scss
++++ b/packages/components/src/custom-gradient-picker/style.scss
+@@ -113,7 +113,6 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
+ .components-custom-gradient-picker {
+ 	.components-input-control__label {
+ 		line-height: 1;
+-		padding-bottom: $grid-unit-10 !important;
+ 	}
+ 	label {
+ 		text-transform: uppercase;
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index 8cd31d6420d7e9..278cf7daba79da 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -53,7 +53,7 @@
+ 
+ .components-form-token-field__label {
+ 	display: inline-block;
+-	margin-bottom: $grid-unit-05;
++	margin-bottom: $grid-unit-10;
+ }
+ 
+ .components-form-token-field__help {
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index dac503b85fdc07..ac9e1b81998c59 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -228,18 +228,18 @@ export const Input = styled.input< InputProps >`
+ 	}
+ `;
+ 
+-const labelPadding = ( {
++const labelMargin = ( {
+ 	labelPosition,
+ }: {
+ 	labelPosition?: LabelPosition;
+ } ) => {
+-	let paddingBottom = 4;
++	let marginBottom = 8;
+ 
+ 	if ( labelPosition === 'edge' || labelPosition === 'side' ) {
+-		paddingBottom = 0;
++		marginBottom = 0;
+ 	}
+ 
+-	return css( { paddingTop: 0, paddingBottom } );
++	return css( { marginTop: 0, marginRight: 0, marginBottom, marginLeft: 0 } );
+ };
+ 
+ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
+@@ -247,11 +247,12 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
+ 		box-sizing: border-box;
+ 		color: currentColor;
+ 		display: block;
+-		margin: 0;
++		padding-top: 0;
++		padding-bottom: 0;
+ 		max-width: 100%;
+ 		z-index: 1;
+ 
+-		${ labelPadding }
++		${ labelMargin }
+ 		overflow: hidden;
+ 		text-overflow: ellipsis;
+ 		white-space: nowrap;
+diff --git a/packages/components/src/tools-panel/styles.ts b/packages/components/src/tools-panel/styles.ts
+index 0819ca0c53116f..3c55af733279bf 100644
+--- a/packages/components/src/tools-panel/styles.ts
++++ b/packages/components/src/tools-panel/styles.ts
+@@ -130,8 +130,6 @@ export const ToolsPanelItem = css`
+ 	 */
+ 	&& ${ LabelWrapper } {
+ 		label {
+-			margin-bottom: ${ space( 2 ) };
+-			padding-bottom: 0;
+ 			line-height: 1.4em;
+ 		}
+ 	}

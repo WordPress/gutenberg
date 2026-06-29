@@ -1,0 +1,201 @@
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index 7b20ced34734d9..9d6ea6bca46150 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -48,6 +48,14 @@ If true, the label will only be visible to screen readers.
+ - Type: `Boolean`
+ - Required: No
+ 
++### as
++
++Can render the component as another DOM element tagName. Rendering `BaseControl` as a `fieldset` will change the inner `label` elements to `legend`. By default, `BaseControl` renders as a `div`.
++
++- Type: `String`
++- Required: No
++
++
+ ### help
+ 
+ If this property is added, a help text will be generated using help property as the content.
+diff --git a/packages/components/src/base-control/index.js b/packages/components/src/base-control/index.js
+index 00c24d7a4d1f4c..20017431c4a1d1 100644
+--- a/packages/components/src/base-control/index.js
++++ b/packages/components/src/base-control/index.js
+@@ -6,9 +6,10 @@ import classnames from 'classnames';
+ /**
+  * Internal dependencies
+  */
+-import VisuallyHidden from '../visually-hidden';
++import VisualLabel from './visual-label';
+ 
+ function BaseControl( {
++	as = 'div',
+ 	id,
+ 	label,
+ 	hideLabelFromVision,
+@@ -16,32 +17,26 @@ function BaseControl( {
+ 	className,
+ 	children,
+ } ) {
++	const isFieldSet = as === 'fieldset';
++
++	const WrapperComponent = as;
++	const LabelComponent = id ? 'label' : 'span';
++	const VisualLabelComponent = isFieldSet ? 'legend' : LabelComponent;
++
+ 	return (
+-		<div className={ classnames( 'components-base-control', className ) }>
++		<WrapperComponent
++			className={ classnames( 'components-base-control', className ) }
++		>
+ 			<div className="components-base-control__field">
+-				{ label &&
+-					id &&
+-					( hideLabelFromVision ? (
+-						<VisuallyHidden as="label" htmlFor={ id }>
+-							{ label }
+-						</VisuallyHidden>
+-					) : (
+-						<label
+-							className="components-base-control__label"
+-							htmlFor={ id }
+-						>
+-							{ label }
+-						</label>
+-					) ) }
+-				{ label &&
+-					! id &&
+-					( hideLabelFromVision ? (
+-						<VisuallyHidden as="label">{ label }</VisuallyHidden>
+-					) : (
+-						<BaseControl.VisualLabel>
+-							{ label }
+-						</BaseControl.VisualLabel>
+-					) ) }
++				{ label && (
++					<VisualLabel
++						as={ VisualLabelComponent }
++						hideLabelFromVision={ hideLabelFromVision }
++						htmlFor={ id }
++					>
++						{ label }
++					</VisualLabel>
++				) }
+ 				{ children }
+ 			</div>
+ 			{ !! help && (
+@@ -52,13 +47,10 @@ function BaseControl( {
+ 					{ help }
+ 				</p>
+ 			) }
+-		</div>
++		</WrapperComponent>
+ 	);
+ }
+ 
+-BaseControl.VisualLabel = ( { className, children } ) => {
+-	className = classnames( 'components-base-control__label', className );
+-	return <span className={ className }>{ children }</span>;
+-};
++BaseControl.VisualLabel = VisualLabel;
+ 
+ export default BaseControl;
+diff --git a/packages/components/src/base-control/stories/index.js b/packages/components/src/base-control/stories/index.js
+index ba2540d15cf4fd..d192ed9cf3c94b 100644
+--- a/packages/components/src/base-control/stories/index.js
++++ b/packages/components/src/base-control/stories/index.js
+@@ -29,3 +29,26 @@ export const _default = () => {
+ 		</BaseControl>
+ 	);
+ };
++
++export const fieldset = () => {
++	const id = text( 'Id', 'fieldset-1' );
++	const radioId1 = 'public';
++	const radioId2 = 'private';
++	const radioId3 = 'password';
++
++	return (
++		<BaseControl label="Post visibility" as="fieldset" id={ id }>
++			<input type="radio" id={ radioId1 } name="post-visibility" />
++			<label htmlFor={ radioId1 }>Public</label>
++			<br />
++
++			<input type="radio" id={ radioId2 } name="post-visibility" />
++			<label htmlFor={ radioId2 }>Private</label>
++			<br />
++
++			<input type="radio" id={ radioId3 } name="post-visibility" />
++			<label htmlFor={ radioId3 }>Password Protected</label>
++			<br />
++		</BaseControl>
++	);
++};
+diff --git a/packages/components/src/base-control/style.scss b/packages/components/src/base-control/style.scss
+index bbdb59169d3776..e7be934fa4e491 100644
+--- a/packages/components/src/base-control/style.scss
++++ b/packages/components/src/base-control/style.scss
+@@ -1,6 +1,8 @@
+ .components-base-control {
++	border: none;
+ 	font-family: $default-font;
+ 	font-size: $default-font-size;
++	padding: 0;
+ 
+ 	.components-base-control__field {
+ 		margin-bottom: $grid-unit-10;
+diff --git a/packages/components/src/base-control/visual-label.js b/packages/components/src/base-control/visual-label.js
+new file mode 100644
+index 00000000000000..4d33e73402b1c8
+--- /dev/null
++++ b/packages/components/src/base-control/visual-label.js
+@@ -0,0 +1,37 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * Internal dependencies
++ */
++import VisuallyHidden from '../visually-hidden';
++
++export default function BaseControlVisualLabel( {
++	as = 'span',
++	className,
++	children,
++	htmlFor: htmlForProp,
++	hideLabelFromVision = false,
++} ) {
++	const showFor = as === 'label';
++	const htmlFor = showFor ? htmlForProp : undefined;
++
++	if ( hideLabelFromVision ) {
++		return (
++			<VisuallyHidden as="label" htmlFor={ htmlFor }>
++				{ children }
++			</VisuallyHidden>
++		);
++	}
++
++	const classes = classnames( 'components-base-control__label', className );
++	const Component = as;
++
++	return (
++		<Component className={ classes } htmlFor={ htmlFor }>
++			{ children }
++		</Component>
++	);
++}
+diff --git a/packages/components/src/radio-control/index.js b/packages/components/src/radio-control/index.js
+index fcb167b07be249..83dcbc29040a29 100644
+--- a/packages/components/src/radio-control/index.js
++++ b/packages/components/src/radio-control/index.js
+@@ -29,6 +29,7 @@ export default function RadioControl( {
+ 	return (
+ 		! isEmpty( options ) && (
+ 			<BaseControl
++				as="fieldset"
+ 				label={ label }
+ 				id={ id }
+ 				help={ help }

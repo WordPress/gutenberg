@@ -1,0 +1,165 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f2df4dce334bc4..19edc822068e58 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   Stop using deprecated `event.keyCode` in favor of `event.key` for keyboard events in `UnitControl` and `InputControl`.  ([#39360](https://github.com/WordPress/gutenberg/pull/39360))
+ -   `ColorPalette`: refine custom color button's label. ([#39386](https://github.com/WordPress/gutenberg/pull/39386))
+ -   `FocalPointPicker`: stop using `UnitControl`'s deprecated `unit` prop ([#39504](https://github.com/WordPress/gutenberg/pull/39504)).
++-   `CheckboxControl`: Add support for the `indeterminate` state ([#39462](https://github.com/WordPress/gutenberg/pull/39462)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/checkbox-control/index.js b/packages/components/src/checkbox-control/index.js
+index 1a5ac7e2b8723d..d5c3506a06d5c8 100644
+--- a/packages/components/src/checkbox-control/index.js
++++ b/packages/components/src/checkbox-control/index.js
+@@ -6,9 +6,10 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { useInstanceId } from '@wordpress/compose';
++import { useState } from '@wordpress/element';
++import { useInstanceId, useRefEffect } from '@wordpress/compose';
+ import deprecated from '@wordpress/deprecated';
+-import { Icon, check } from '@wordpress/icons';
++import { Icon, check, reset } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+@@ -20,6 +21,7 @@ export default function CheckboxControl( {
+ 	className,
+ 	heading,
+ 	checked,
++	indeterminate,
+ 	help,
+ 	onChange,
+ 	...props
+@@ -31,6 +33,27 @@ export default function CheckboxControl( {
+ 		} );
+ 	}
+ 
++	const [ showCheckedIcon, setShowCheckedIcon ] = useState( false );
++	const [ showIndeterminateIcon, setShowIndeterminateIcon ] = useState(
++		false
++	);
++
++	// Run the following callback everytime the `ref` (and the additional
++	// dependencies) change.
++	const ref = useRefEffect(
++		( node ) => {
++			if ( ! node ) {
++				return;
++			}
++
++			// It cannot be set using an HTML attribute.
++			node.indeterminate = !! indeterminate;
++
++			setShowCheckedIcon( node.matches( ':checked' ) );
++			setShowIndeterminateIcon( node.matches( ':indeterminate' ) );
++		},
++		[ checked, indeterminate ]
++	);
+ 	const instanceId = useInstanceId( CheckboxControl );
+ 	const id = `inspector-checkbox-control-${ instanceId }`;
+ 	const onChangeValue = ( event ) => onChange( event.target.checked );
+@@ -44,6 +67,7 @@ export default function CheckboxControl( {
+ 		>
+ 			<span className="components-checkbox-control__input-container">
+ 				<input
++					ref={ ref }
+ 					id={ id }
+ 					className="components-checkbox-control__input"
+ 					type="checkbox"
+@@ -53,7 +77,14 @@ export default function CheckboxControl( {
+ 					aria-describedby={ !! help ? id + '__help' : undefined }
+ 					{ ...props }
+ 				/>
+-				{ checked ? (
++				{ showIndeterminateIcon ? (
++					<Icon
++						icon={ reset }
++						className="components-checkbox-control__indeterminate"
++						role="presentation"
++					/>
++				) : null }
++				{ showCheckedIcon ? (
+ 					<Icon
+ 						icon={ check }
+ 						className="components-checkbox-control__checked"
+diff --git a/packages/components/src/checkbox-control/stories/index.js b/packages/components/src/checkbox-control/stories/index.js
+index 652b7e21908288..f70ac4323abfc2 100644
+--- a/packages/components/src/checkbox-control/stories/index.js
++++ b/packages/components/src/checkbox-control/stories/index.js
+@@ -45,3 +45,47 @@ export const all = () => {
+ 
+ 	return <CheckboxControlWithState label={ label } help={ help } checked />;
+ };
++
++export const Indeterminate = () => {
++	const [ fruits, setFruits ] = useState( { apple: false, orange: false } );
++
++	const isAllChecked = Object.values( fruits ).every( Boolean );
++	const isIndeterminate =
++		Object.values( fruits ).some( Boolean ) && ! isAllChecked;
++
++	return (
++		<>
++			<CheckboxControl
++				label="Select All"
++				checked={ isAllChecked }
++				indeterminate={ isIndeterminate }
++				onChange={ ( newValue ) =>
++					setFruits( {
++						apple: newValue,
++						orange: newValue,
++					} )
++				}
++			/>
++			<CheckboxControl
++				label="Apple"
++				checked={ fruits.apple }
++				onChange={ ( apple ) =>
++					setFruits( ( prevState ) => ( {
++						...prevState,
++						apple,
++					} ) )
++				}
++			/>
++			<CheckboxControl
++				label="Orange"
++				checked={ fruits.orange }
++				onChange={ ( orange ) =>
++					setFruits( ( prevState ) => ( {
++						...prevState,
++						orange,
++					} ) )
++				}
++			/>
++		</>
++	);
++};
+diff --git a/packages/components/src/checkbox-control/style.scss b/packages/components/src/checkbox-control/style.scss
+index 5b0996e0dad50a..a9fac4381fb63e 100644
+--- a/packages/components/src/checkbox-control/style.scss
++++ b/packages/components/src/checkbox-control/style.scss
+@@ -33,7 +33,8 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
+ 		outline: 2px solid transparent;
+ 	}
+ 
+-	&:checked {
++	&:checked,
++	&:indeterminate {
+ 		background: var(--wp-admin-theme-color);
+ 		border-color: var(--wp-admin-theme-color);
+ 
+@@ -62,7 +63,8 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
+ 	}
+ }
+ 
+-svg.components-checkbox-control__checked {
++svg.components-checkbox-control__checked,
++svg.components-checkbox-control__indeterminate {
+ 	fill: $white;
+ 	cursor: pointer;
+ 	position: absolute;

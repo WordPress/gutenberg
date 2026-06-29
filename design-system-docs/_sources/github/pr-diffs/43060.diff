@@ -1,0 +1,631 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 37dd824c6b6247..6b140050d03bcd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,8 @@
+ 
+ ### Enhancements
+ 
++-   `ToggleGroupControlOptionIcon`: Maintain square proportions ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
++-   `ToggleGroupControlOptionIcon`: Add a required `label` prop so the button is always accessibly labeled. Also removes `showTooltip` from the accepted prop types, as the tooltip will now always be shown.  ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
+ -   `SelectControl`, `CustomSelectControl`: Refresh and refactor chevron down icon ([#42962](https://github.com/WordPress/gutenberg/pull/42962)).
+ -   `FontSizePicker`: Add large size variant ([#42716](https://github.com/WordPress/gutenberg/pull/42716/)).
+ -   `Popover`: tidy up code, add more comments ([#42944](https://github.com/WordPress/gutenberg/pull/42944)).
+@@ -30,6 +32,7 @@
+ 
+ ### Internal
+ 
++-   `ToggleGroupControl`: Add `__experimentalIsIconGroup` prop ([#43060](https://github.com/WordPress/gutenberg/pull/43060/)).
+ -   `Flex`, `FlexItem`, `FlexBlock`: Convert to TypeScript ([#42537](https://github.com/WordPress/gutenberg/pull/42537)).
+ -   `InputControl`: Fix incorrect `size` prop passing ([#42793](https://github.com/WordPress/gutenberg/pull/42793)).
+ -   `Placeholder`: Convert to TypeScript ([#42990](https://github.com/WordPress/gutenberg/pull/42990)).
+diff --git a/packages/components/src/toggle-group-control/stories/index.js b/packages/components/src/toggle-group-control/stories/index.js
+index 8299fc70f11661..a16d094eae4cf8 100644
+--- a/packages/components/src/toggle-group-control/stories/index.js
++++ b/packages/components/src/toggle-group-control/stories/index.js
+@@ -23,9 +23,11 @@ import Button from '../../button';
+ export default {
+ 	component: ToggleGroupControl,
+ 	title: 'Components (Experimental)/ToggleGroupControl',
++	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
+ 	argTypes: {
++		__experimentalIsIconGroup: { control: { type: 'boolean' } },
+ 		size: {
+-			control: 'select',
++			control: 'radio',
+ 			options: [ 'default', '__unstable-large' ],
+ 		},
+ 	},
+@@ -138,6 +140,10 @@ WithAriaLabel.args = {
+ 	],
+ };
+ 
++/**
++ * The `<ToggleGroupControlOptionIcon>` component can be used for icon options.
++ * In this case, the `__experimentalIsIconGroup` style is preferred.
++ */
+ export const WithIcons = ( props ) => {
+ 	const [ state, setState ] = useState();
+ 	return (
+@@ -151,20 +157,19 @@ export const WithIcons = ( props ) => {
+ 			<ToggleGroupControlOptionIcon
+ 				value="uppercase"
+ 				icon={ formatUppercase }
+-				showTooltip={ true }
+-				aria-label="Uppercase"
++				label="Uppercase"
+ 			/>
+ 			<ToggleGroupControlOptionIcon
+ 				value="lowercase"
+ 				icon={ formatLowercase }
+-				showTooltip={ true }
+-				aria-label="Lowercase"
++				label="Lowercase"
+ 			/>
+ 		</ToggleGroupControl>
+ 	);
+ };
+ WithIcons.args = {
+ 	...Default.args,
++	__experimentalIsIconGroup: true,
+ };
+ 
+ export const WithReset = ( props ) => {
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+similarity index 96%
+rename from packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+rename to packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index f0895c36936caa..91fa420c5d078f 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -33,8 +33,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ 
+ .emotion-6 {
+   background: #fff;
+-  border: 1px solid;
+-  border-color: #757575;
++  border: 1px solid transparent;
+   border-radius: 2px;
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+@@ -46,6 +45,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+   -webkit-transition: -webkit-transform 100ms linear;
+   transition: transform 100ms linear;
+   min-height: 36px;
++  border-color: #757575;
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+@@ -54,10 +54,6 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+   }
+ }
+ 
+-.emotion-6:hover {
+-  border-color: #757575;
+-}
+-
+ .emotion-6:focus-within {
+   border-color: var( --wp-admin-theme-color-darker-10, #007cba);
+   box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #00669b);
+@@ -65,6 +61,10 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+   z-index: 1;
+ }
+ 
++.emotion-6:hover {
++  border-color: #757575;
++}
++
+ .emotion-8 {
+   background: #1e1e1e;
+   border-radius: 2px;
+@@ -152,14 +152,20 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+ }
+ 
+ .emotion-13 {
++  width: 30px;
++  padding-left: 0;
++  padding-right: 0;
++}
++
++.emotion-14 {
+   color: #fff;
+ }
+ 
+-.emotion-13:active {
++.emotion-14:active {
+   background: transparent;
+ }
+ 
+-.emotion-14 {
++.emotion-15 {
+   font-size: 13px;
+   line-height: 1;
+ }
+@@ -201,7 +207,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+         <button
+           aria-checked="true"
+           aria-label="Uppercase"
+-          class="emotion-12 components-toggle-group-control-option-base emotion-13"
++          class="emotion-12 emotion-13 components-toggle-group-control-option-base emotion-14"
+           data-value="uppercase"
+           data-wp-c16t="true"
+           data-wp-component="ToggleGroupControlOptionBase"
+@@ -210,7 +216,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+           tabindex="0"
+         >
+           <div
+-            class="emotion-14 emotion-15"
++            class="emotion-15 emotion-16"
+           >
+             <svg
+               aria-hidden="true"
+@@ -234,7 +240,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+         <button
+           aria-checked="false"
+           aria-label="Lowercase"
+-          class="emotion-12 components-toggle-group-control-option-base"
++          class="emotion-12 emotion-13 components-toggle-group-control-option-base"
+           data-value="lowercase"
+           data-wp-c16t="true"
+           data-wp-component="ToggleGroupControlOptionBase"
+@@ -243,7 +249,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+           tabindex="-1"
+         >
+           <div
+-            class="emotion-14 emotion-15"
++            class="emotion-15 emotion-16"
+           >
+             <svg
+               aria-hidden="true"
+@@ -298,8 +304,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+ 
+ .emotion-6 {
+   background: #fff;
+-  border: 1px solid;
+-  border-color: #757575;
++  border: 1px solid transparent;
+   border-radius: 2px;
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+@@ -311,6 +316,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+   -webkit-transition: -webkit-transform 100ms linear;
+   transition: transform 100ms linear;
+   min-height: 36px;
++  border-color: #757575;
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+@@ -319,10 +325,6 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+   }
+ }
+ 
+-.emotion-6:hover {
+-  border-color: #757575;
+-}
+-
+ .emotion-6:focus-within {
+   border-color: var( --wp-admin-theme-color-darker-10, #007cba);
+   box-shadow: 0 0 0 0.5px var( --wp-admin-theme-color, #00669b);
+@@ -330,6 +332,10 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+   z-index: 1;
+ }
+ 
++.emotion-6:hover {
++  border-color: #757575;
++}
++
+ .emotion-8 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+diff --git a/packages/components/src/toggle-group-control/test/index.js b/packages/components/src/toggle-group-control/test/index.tsx
+similarity index 97%
+rename from packages/components/src/toggle-group-control/test/index.js
+rename to packages/components/src/toggle-group-control/test/index.tsx
+index 80af2ef3c9bf09..b6f2d9a5be49dc 100644
+--- a/packages/components/src/toggle-group-control/test/index.js
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -59,14 +59,12 @@ describe( 'ToggleGroupControl', () => {
+ 					<ToggleGroupControlOptionIcon
+ 						value="uppercase"
+ 						icon={ formatUppercase }
+-						showTooltip={ true }
+-						aria-label="Uppercase"
++						label="Uppercase"
+ 					/>
+ 					<ToggleGroupControlOptionIcon
+ 						value="lowercase"
+ 						icon={ formatLowercase }
+-						showTooltip={ true }
+-						aria-label="Lowercase"
++						label="Lowercase"
+ 					/>
+ 				</ToggleGroupControl>
+ 			);
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index e1520e4ac58265..9b87dd7f98bdf2 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -60,8 +60,10 @@ function ToggleGroupControlOptionBase(
+ 	const {
+ 		className,
+ 		isBlock = false,
++		isIcon = false,
+ 		value,
+ 		children,
++		size = 'default',
+ 		showTooltip = false,
+ 		...radioProps
+ 	} = {
+@@ -74,6 +76,7 @@ function ToggleGroupControlOptionBase(
+ 	const labelViewClasses = cx( isBlock && styles.labelBlock );
+ 	const classes = cx(
+ 		styles.buttonView,
++		isIcon && styles.isIcon( { size } ),
+ 		className,
+ 		isActive && styles.buttonActive
+ 	);
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+index 6c40f8861cfa66..da2cc709f50454 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import { CONFIG, COLORS, reduceMotion } from '../../utils';
++import type { ToggleGroupControlProps } from '../types';
+ 
+ export const LabelView = styled.div`
+ 	display: inline-flex;
+@@ -69,3 +70,20 @@ export const ButtonContentView = styled.div`
+ export const separatorActive = css`
+ 	background: transparent;
+ `;
++
++export const isIcon = ( {
++	size,
++}: {
++	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
++} ) => {
++	const iconButtonSizes = {
++		default: '30px',
++		'__unstable-large': '34px',
++	};
++
++	return css`
++		width: ${ iconButtonSizes[ size ] };
++		padding-left: 0;
++		padding-right: 0;
++	`;
++};
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+index 0d5da7dcef8c78..484dfa0b24b313 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+@@ -17,18 +17,16 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
+ 
+ function Example() {
+ 	return (
+-		<ToggleGroupControl label="my label" value="lowercase" isBlock>
++		<ToggleGroupControl __experimentalIsIconGroup>
+ 			<ToggleGroupControlOptionIcon
+ 				value="uppercase"
+ 				icon={ formatUppercase }
+-				showTooltip={ true }
+-				aria-label="Uppercase"
++				label="Uppercase"
+ 			/>
+ 			<ToggleGroupControlOptionIcon
+ 				value="lowercase"
+ 				icon={ formatLowercase }
+-				showTooltip={ true }
+-				aria-label="Lowercase"
++				label="Lowercase"
+ 			/>
+ 		</ToggleGroupControl>
+ 	);
+@@ -49,8 +47,8 @@ Icon displayed as the content of the option. Usually one of the icons from the `
+ 
+ -   Required: Yes
+ 
+-### `showTooltip`: `boolean`
++### `label`: `string`
+ 
+-Whether to show a tooltip when hovering over the option. The tooltip will only show if a label for it is provided using the `aria-label` prop.
++The text to accessibly label the icon option. Will also be shown in a tooltip.
+ 
+--   Required: No
++-   Required: Yes
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+index b39af225827b5a..a8fc60000e97df 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+@@ -1,3 +1,13 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+@@ -6,16 +16,23 @@ import type { ToggleGroupControlOptionIconProps } from '../types';
+ import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
+ import Icon from '../../icon';
+ 
+-export default function ToggleGroupControlOptionIcon(
++function UnforwardedToggleGroupControlOptionIcon(
+ 	props: WordPressComponentProps<
+ 		ToggleGroupControlOptionIconProps,
+ 		'button',
+ 		false
+-	>
++	>,
++	ref: ForwardedRef< any >
+ ) {
+-	const { icon, ...restProps } = props;
++	const { icon, label, ...restProps } = props;
+ 	return (
+-		<ToggleGroupControlOptionBase { ...restProps }>
++		<ToggleGroupControlOptionBase
++			{ ...restProps }
++			isIcon
++			aria-label={ label }
++			showTooltip
++			ref={ ref }
++		>
+ 			<Icon icon={ icon } />
+ 		</ToggleGroupControlOptionBase>
+ 	);
+@@ -25,7 +42,6 @@ export default function ToggleGroupControlOptionIcon(
+  * `ToggleGroupControlOptionIcon` is a form component which is meant to be used as a
+  * child of `ToggleGroupControl` and displays an icon.
+  *
+- * @example
+  * ```jsx
+  *
+  * import {
+@@ -36,17 +52,24 @@ export default function ToggleGroupControlOptionIcon(
+  *
+  * function Example() {
+  *	return (
+- *		<ToggleGroupControl label="my label" value="vertical" isBlock>
++ *		<ToggleGroupControl __experimentalIsIconGroup>
+  *			<ToggleGroupControlOptionIcon
+  *				value="uppercase"
++ *				label="Uppercase"
+  *				icon={ formatUppercase }
+  *			/>
+  *			<ToggleGroupControlOptionIcon
+  *				value="lowercase"
++ *				label="Lowercase"
+  *				icon={ formatLowercase }
+  *			/>
+  *		</ToggleGroupControl>
+  *	);
+  * }
+- ** ```
++ * ```
+  */
++export const ToggleGroupControlOptionIcon = forwardRef(
++	UnforwardedToggleGroupControlOptionIcon
++);
++
++export default ToggleGroupControlOptionIcon;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+index f6c3bf9f5c4e9f..52d85d08be8f59 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+@@ -1,3 +1,13 @@
++/**
++ * External dependencies
++ */
++import type { ForwardedRef } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+@@ -5,12 +15,13 @@ import type { WordPressComponentProps } from '../../ui/context';
+ import type { ToggleGroupControlOptionProps } from '../types';
+ import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
+ 
+-export default function ToggleGroupControlOption(
++function UnforwardedToggleGroupControlOption(
+ 	props: WordPressComponentProps<
+ 		ToggleGroupControlOptionProps,
+ 		'button',
+ 		false
+-	>
++	>,
++	ref: ForwardedRef< any >
+ ) {
+ 	const { label, ...restProps } = props;
+ 	const optionLabel = restProps[ 'aria-label' ] || label;
+@@ -18,6 +29,7 @@ export default function ToggleGroupControlOption(
+ 		<ToggleGroupControlOptionBase
+ 			{ ...restProps }
+ 			aria-label={ optionLabel }
++			ref={ ref }
+ 		>
+ 			{ label }
+ 		</ToggleGroupControlOptionBase>
+@@ -28,7 +40,6 @@ export default function ToggleGroupControlOption(
+  * `ToggleGroupControlOption` is a form component and is meant to be used as a
+  * child of `ToggleGroupControl`.
+  *
+- * @example
+  * ```jsx
+  * import {
+  *   __experimentalToggleGroupControl as ToggleGroupControl,
+@@ -45,3 +56,8 @@ export default function ToggleGroupControlOption(
+  * }
+  * ```
+  */
++export const ToggleGroupControlOption = forwardRef(
++	UnforwardedToggleGroupControlOption
++);
++
++export default ToggleGroupControlOption;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 8d928b0a6b5e7b..09ef6ea6925d90 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -43,6 +43,7 @@ function ToggleGroupControl(
+ 		className,
+ 		isAdaptiveWidth = false,
+ 		isBlock = false,
++		__experimentalIsIconGroup = false,
+ 		label,
+ 		hideLabelFromVision = false,
+ 		help,
+@@ -85,15 +86,16 @@ function ToggleGroupControl(
+ 		() =>
+ 			cx(
+ 				styles.ToggleGroupControl( { size } ),
++				! __experimentalIsIconGroup && styles.border,
+ 				isBlock && styles.block,
+ 				className
+ 			),
+-		[ className, cx, isBlock, size ]
++		[ className, cx, isBlock, __experimentalIsIconGroup, size ]
+ 	);
+ 	return (
+ 		<BaseControl help={ help }>
+ 			<ToggleGroupControlContext.Provider
+-				value={ { ...radio, isBlock: ! isAdaptiveWidth } }
++				value={ { ...radio, isBlock: ! isAdaptiveWidth, size } }
+ 			>
+ 				{ ! hideLabelFromVision && (
+ 					<div>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+index f977b755b7c787..5d92004603778f 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -16,8 +16,7 @@ export const ToggleGroupControl = ( {
+ 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
+ } ) => css`
+ 	background: ${ COLORS.ui.background };
+-	border: 1px solid;
+-	border-color: ${ COLORS.ui.border };
++	border: 1px solid transparent;
+ 	border-radius: ${ CONFIG.controlBorderRadius };
+ 	display: inline-flex;
+ 	min-width: 0;
+@@ -28,10 +27,6 @@ export const ToggleGroupControl = ( {
+ 
+ 	${ toggleGroupControlSize( size ) }
+ 
+-	&:hover {
+-		border-color: ${ COLORS.ui.borderHover };
+-	}
+-
+ 	&:focus-within {
+ 		border-color: ${ COLORS.ui.borderFocus };
+ 		box-shadow: ${ CONFIG.controlBoxShadowFocus };
+@@ -40,6 +35,14 @@ export const ToggleGroupControl = ( {
+ 	}
+ `;
+ 
++export const border = css`
++	border-color: ${ COLORS.ui.border };
++
++	&:hover {
++		border-color: ${ COLORS.ui.borderHover };
++	}
++`;
++
+ export const toggleGroupControlSize = (
+ 	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
+ ) => {
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index b77779b0138047..66ad2b56338ab0 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -12,6 +12,12 @@ import type { FormElementProps } from '../utils/types';
+ 
+ export type ToggleGroupControlOptionBaseProps = {
+ 	children: ReactNode;
++	/**
++	 * Style the option as an icon option.
++	 *
++	 * @default false
++	 */
++	isIcon?: boolean;
+ 	value: ReactText;
+ 	/**
+ 	 * Whether to display a Tooltip for the control option. If set to `true`, the tooltip will
+@@ -22,20 +28,24 @@ export type ToggleGroupControlOptionBaseProps = {
+ 	showTooltip?: boolean;
+ };
+ 
+-export type ToggleGroupControlOptionIconProps = Omit<
++export type ToggleGroupControlOptionIconProps = Pick<
+ 	ToggleGroupControlOptionBaseProps,
+-	'children'
++	'value'
+ > & {
+ 	/**
+ 	 * Icon displayed as the content of the option. Usually one of the icons from
+ 	 * the `@wordpress/icons` package, or a custom React `<svg>` icon.
+ 	 */
+ 	icon: JSX.Element;
++	/**
++	 * The text to accessibly label the icon option. Will also be shown in a tooltip.
++	 */
++	label: string;
+ };
+ 
+-export type ToggleGroupControlOptionProps = Omit<
++export type ToggleGroupControlOptionProps = Pick<
+ 	ToggleGroupControlOptionBaseProps,
+-	'children'
++	'value' | 'showTooltip'
+ > & {
+ 	/**
+ 	 * Label for the option. If needed, the `aria-label` prop can be used in addition
+@@ -87,6 +97,12 @@ export type ToggleGroupControlProps = Omit<
+ 	 * @default false
+ 	 */
+ 	isBlock?: boolean;
++	/**
++	 * Style for use with `ToggleGroupControlOptionIcon`s.
++	 *
++	 * @default false
++	 */
++	__experimentalIsIconGroup?: boolean; // TODO: Refactor so this can be private
+ 	/**
+ 	 * Callback when a segment is selected.
+ 	 */
+@@ -112,14 +128,15 @@ export type ToggleGroupControlProps = Omit<
+ 	size?: 'default' | '__unstable-large';
+ };
+ 
+-export type ToggleGroupControlContextProps = RadioStateReturn & {
+-	/**
+-	 * Renders `ToggleGroupControl` as a (CSS) block element.
+-	 *
+-	 * @default false
+-	 */
+-	isBlock?: boolean;
+-};
++export type ToggleGroupControlContextProps = RadioStateReturn &
++	Pick< ToggleGroupControlProps, 'size' > & {
++		/**
++		 * Renders `ToggleGroupControl` as a (CSS) block element.
++		 *
++		 * @default false
++		 */
++		isBlock?: boolean;
++	};
+ 
+ export type ToggleGroupControlBackdropProps = {
+ 	containerRef: MutableRefObject< HTMLElement | undefined >;

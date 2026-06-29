@@ -1,0 +1,257 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 628a16ac2791f2..6d004e1bea083a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `BoxControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#42094](https://github.com/WordPress/gutenberg/pull/42094)).
+ 
++### Enhancement
++
++-   `ToggleGroupControl`: Add large size variant ([#42008](https://github.com/WordPress/gutenberg/pull/42008/)).
++
+ ### Internal
+ 
+ -   `Grid`: Convert to TypeScript ([#41923](https://github.com/WordPress/gutenberg/pull/41923)).
+diff --git a/packages/components/src/toggle-group-control/stories/index.js b/packages/components/src/toggle-group-control/stories/index.js
+index 797418b3cf80cd..8299fc70f11661 100644
+--- a/packages/components/src/toggle-group-control/stories/index.js
++++ b/packages/components/src/toggle-group-control/stories/index.js
+@@ -23,6 +23,12 @@ import Button from '../../button';
+ export default {
+ 	component: ToggleGroupControl,
+ 	title: 'Components (Experimental)/ToggleGroupControl',
++	argTypes: {
++		size: {
++			control: 'select',
++			options: [ 'default', '__unstable-large' ],
++		},
++	},
+ 	parameters: {
+ 		knobs: { disable: false },
+ 	},
+@@ -33,7 +39,7 @@ const KNOBS_GROUPS = {
+ 	ToggleGroupControlOption: 'ToggleGroupControlOption',
+ };
+ 
+-const _default = ( { options } ) => {
++const _default = ( { options, ...props } ) => {
+ 	const [ value, setValue ] = useState( options[ 0 ].value );
+ 	const label = text(
+ 		`${ KNOBS_GROUPS.ToggleGroupControl }: label`,
+@@ -87,6 +93,7 @@ const _default = ( { options } ) => {
+ 	return (
+ 		<View>
+ 			<ToggleGroupControl
++				{ ...props }
+ 				onChange={ setValue }
+ 				value={ value }
+ 				label={ label }
+@@ -109,6 +116,7 @@ Default.args = {
+ 		{ value: 'right', label: 'Right' },
+ 		{ value: 'justify', label: 'Justify' },
+ 	],
++	size: 'default',
+ };
+ 
+ export const WithTooltip = _default.bind( {} );
+@@ -130,10 +138,11 @@ WithAriaLabel.args = {
+ 	],
+ };
+ 
+-export const WithIcons = () => {
++export const WithIcons = ( props ) => {
+ 	const [ state, setState ] = useState();
+ 	return (
+ 		<ToggleGroupControl
++			{ ...props }
+ 			onChange={ setState }
+ 			value={ state }
+ 			label={ 'With icons' }
+@@ -154,8 +163,11 @@ export const WithIcons = () => {
+ 		</ToggleGroupControl>
+ 	);
+ };
++WithIcons.args = {
++	...Default.args,
++};
+ 
+-export const WithReset = () => {
++export const WithReset = ( props ) => {
+ 	const [ alignState, setAlignState ] = useState();
+ 	const aligns = [ 'Left', 'Center', 'Right' ];
+ 	const alignOptions = aligns.map( ( key, index ) => (
+@@ -172,6 +184,7 @@ export const WithReset = () => {
+ 	return (
+ 		<View>
+ 			<ToggleGroupControl
++				{ ...props }
+ 				onChange={ setAlignState }
+ 				value={ alignState }
+ 				label={ 'Toggle Group Control' }
+@@ -185,3 +198,6 @@ export const WithReset = () => {
+ 		</View>
+ 	);
+ };
++WithReset.args = {
++	...Default.args,
++};
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+index 25b38d19434425..64c1e6833c0c1e 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+@@ -28,12 +28,12 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+   display: -webkit-inline-flex;
+   display: -ms-inline-flexbox;
+   display: inline-flex;
+-  min-height: 36px;
+   min-width: 0;
+   padding: 2px;
+   position: relative;
+   -webkit-transition: -webkit-transform 100ms linear;
+   transition: transform 100ms linear;
++  min-height: 36px;
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+@@ -167,7 +167,7 @@ exports[`ToggleGroupControl should render correctly with icons 1`] = `
+     </div>
+     <div
+       aria-label="Test Toggle Group Control"
+-      class="medium components-toggle-group-control emotion-6 emotion-7"
++      class="components-toggle-group-control emotion-6 emotion-7"
+       data-wp-c16t="true"
+       data-wp-component="ToggleGroupControl"
+       id="toggle-group-control-1"
+@@ -281,12 +281,12 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+   display: -webkit-inline-flex;
+   display: -ms-inline-flexbox;
+   display: inline-flex;
+-  min-height: 36px;
+   min-width: 0;
+   padding: 2px;
+   position: relative;
+   -webkit-transition: -webkit-transform 100ms linear;
+   transition: transform 100ms linear;
++  min-height: 36px;
+ }
+ 
+ @media ( prefers-reduced-motion: reduce ) {
+@@ -393,7 +393,7 @@ exports[`ToggleGroupControl should render correctly with text options 1`] = `
+     </div>
+     <div
+       aria-label="Test Toggle Group Control"
+-      class="medium components-toggle-group-control emotion-6 emotion-7"
++      class="components-toggle-group-control emotion-6 emotion-7"
+       data-wp-c16t="true"
+       data-wp-component="ToggleGroupControl"
+       id="toggle-group-control-0"
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+index 0ae743fa7aa9eb..6c40f8861cfa66 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+@@ -69,7 +69,3 @@ export const ButtonContentView = styled.div`
+ export const separatorActive = css`
+ 	background: transparent;
+ `;
+-
+-export const medium = css`
+-	min-height: ${ CONFIG.controlHeight };
+-`;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index a7727ccaf06670..8d928b0a6b5e7b 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -47,6 +47,7 @@ function ToggleGroupControl(
+ 		hideLabelFromVision = false,
+ 		help,
+ 		onChange = noop,
++		size = 'default',
+ 		value,
+ 		children,
+ 		...otherProps
+@@ -83,12 +84,11 @@ function ToggleGroupControl(
+ 	const classes = useMemo(
+ 		() =>
+ 			cx(
+-				styles.ToggleGroupControl,
++				styles.ToggleGroupControl( { size } ),
+ 				isBlock && styles.block,
+-				'medium',
+ 				className
+ 			),
+-		[ className, cx, isBlock ]
++		[ className, cx, isBlock, size ]
+ 	);
+ 	return (
+ 		<BaseControl help={ help }>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+index 0bc2039d507729..f977b755b7c787 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -8,19 +8,26 @@ import styled from '@emotion/styled';
+  * Internal dependencies
+  */
+ import { CONFIG, COLORS, reduceMotion } from '../../utils';
++import type { ToggleGroupControlProps } from '../types';
+ 
+-export const ToggleGroupControl = css`
++export const ToggleGroupControl = ( {
++	size,
++}: {
++	size: NonNullable< ToggleGroupControlProps[ 'size' ] >;
++} ) => css`
+ 	background: ${ COLORS.ui.background };
+ 	border: 1px solid;
+ 	border-color: ${ COLORS.ui.border };
+ 	border-radius: ${ CONFIG.controlBorderRadius };
+ 	display: inline-flex;
+-	min-height: ${ CONFIG.controlHeight };
+ 	min-width: 0;
+ 	padding: 2px;
+ 	position: relative;
+ 	transition: transform ${ CONFIG.transitionDurationFastest } linear;
+ 	${ reduceMotion( 'transition' ) }
++
++	${ toggleGroupControlSize( size ) }
++
+ 	&:hover {
+ 		border-color: ${ COLORS.ui.borderHover };
+ 	}
+@@ -33,6 +40,19 @@ export const ToggleGroupControl = css`
+ 	}
+ `;
+ 
++export const toggleGroupControlSize = (
++	size: NonNullable< ToggleGroupControlProps[ 'size' ] >
++) => {
++	const heights = {
++		default: '36px',
++		'__unstable-large': '40px',
++	};
++
++	return css`
++		min-height: ${ heights[ size ] };
++	`;
++};
++
+ export const block = css`
+ 	display: flex;
+ 	width: 100%;
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 39f9f87af68695..b77779b0138047 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -104,6 +104,12 @@ export type ToggleGroupControlProps = Omit<
+ 	 * using help property as the content.
+ 	 */
+ 	help?: ReactNode;
++	/**
++	 * The size variant of the control.
++	 *
++	 * @default 'default'
++	 */
++	size?: 'default' | '__unstable-large';
+ };
+ 
+ export type ToggleGroupControlContextProps = RadioStateReturn & {

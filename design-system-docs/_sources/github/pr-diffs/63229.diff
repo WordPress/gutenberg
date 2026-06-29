@@ -1,0 +1,49 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index dd3dce8eadf841..5ea68a20cf5706 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -36,6 +36,7 @@
+ -   `CustomSelectControlV2`: keep legacy arrow down behavior only for legacy wrapper. ([#62919](https://github.com/WordPress/gutenberg/pull/62919))
+ -   `CustomSelectControlV2`: fix trigger button font size. ([#63131](https://github.com/WordPress/gutenberg/pull/63131))
+ -   `CustomSelectControlV2`: fix labelling with a visually hidden label. ([#63137](https://github.com/WordPress/gutenberg/pull/63137))
++-   `CustomSelectControlV2`: allow checkmark wrapper to collapse when not shown. ([#63229](https://github.com/WordPress/gutenberg/pull/63229))
+ -   Extract `TimeInput` component from `TimePicker` ([#60613](https://github.com/WordPress/gutenberg/pull/60613)).
+ -   `TimeInput`: Add `label` prop ([#63106](https://github.com/WordPress/gutenberg/pull/63106)).
+ -   Method style type signatures have been changed to function style ([#62718](https://github.com/WordPress/gutenberg/pull/62718)).
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index 22ebd6ffdf92a2..21b093ac69b64a 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -150,13 +150,6 @@ export const SelectItem = styled( Ariakit.SelectItem )(
+ 	`
+ );
+ 
+-export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
+-	display: flex;
+-	align-items: center;
+-	margin-inline-start: ${ space( 2 ) };
+-	font-size: 24px; // Size of checkmark icon
+-`;
+-
+ const truncateStyles = css`
+ 	overflow: hidden;
+ 	text-overflow: ellipsis;
+@@ -188,3 +181,18 @@ export const WithHintItemHint = styled.span`
+ 	padding-inline-end: ${ space( 1 ) };
+ 	margin-block: ${ space( 1 ) };
+ `;
++
++export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
++	display: flex;
++	align-items: center;
++	margin-inline-start: ${ space( 2 ) };
++
++	// Since the checkmark's dimensions are applied with 'em' units, setting a
++	// font size of 0 allows the space reserved for the checkmark to collapse for
++	// items that are not selected or that don't have an associated item hint.
++	font-size: 0;
++	${ WithHintItemWrapper } ~ &,
++	&:not(:empty) {
++		font-size: 24px; // Size of checkmark icon
++	}
++`;

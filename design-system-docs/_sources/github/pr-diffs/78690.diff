@@ -1,0 +1,1917 @@
+diff --git a/docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md b/docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md
+index 2d4ae6d6bc82c0..24932ab0a97914 100644
+--- a/docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md
++++ b/docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md
+@@ -82,17 +82,20 @@ export default function Edit() {
+ }
+ ```
+ 
+-### Using useRefEffect (recommended)
++### Using a ref callback with cleanup (recommended)
+ 
+-If you attach event handlers, remember that the `useEffect` callback will not be called if the ref changes, so it is good practice to use the new `useRefEffect` API, which *will* call the given callback if the ref changes in addition to any dependencies passed.
++If you attach event handlers, remember that the `useEffect` callback will not be called if the ref changes, so it is good practice to use a ref callback that returns a cleanup function. With React 19's native ref callback cleanup pattern, you can pass a `useCallback`-wrapped ref callback directly: the callback is invoked when the element is attached, and the returned cleanup function runs when the element changes, dependencies change, or the component unmounts.
+ 
+ ```javascript
+ import { __ } from '@wordpress/i18n';
+ import { useBlockProps } from '@wordpress/block-editor';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ 
+ export default function Edit() {
+-	const ref = useRefEffect( ( element ) => {
++	const ref = useCallback( ( element ) => {
++		if ( ! element ) {
++			return;
++		}
+ 		const { ownerDocument } = element;
+ 		const { defaultView } = ownerDocument;
+ 		defaultView.addEventListener( ... );
+@@ -118,11 +121,14 @@ For the editor, scripts such as jQuery are loaded in the parent window (admin pa
+ ```javascript
+ import { __ } from '@wordpress/i18n';
+ import { useBlockProps } from '@wordpress/block-editor';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ import jQuery from 'jquery';
+ 
+ export default function Edit() {
+-	const ref = useRefEffect( ( element ) => {
++	const ref = useCallback( ( element ) => {
++		if ( ! element ) {
++			return;
++		}
+ 		jQuery( element ).masonry( … );
+ 		return () => {
+ 			jQuery( element ).masonry( 'destroy' );
+@@ -148,11 +154,14 @@ In the meantime, you can use the script that is loaded inside the iframe. We've
+ ```javascript
+ import { __ } from '@wordpress/i18n';
+ import { useBlockProps } from '@wordpress/block-editor';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ import jQuery from 'jquery';
+ 
+ export default function Edit() {
+-	const ref = useRefEffect( ( element ) => {
++	const ref = useCallback( ( element ) => {
++		if ( ! element ) {
++			return;
++		}
+ 		const { ownerDocument } = element;
+ 		const { defaultView } = ownerDocument;
+ 
+@@ -167,7 +176,7 @@ export default function Edit() {
+ 		return () => {
+ 			defaultView.jQuery( element ).masonry( 'destroy' );
+ 		}
+-	} );
++	}, [] );
+ 
+ 	const blockProps = useBlockProps( { ref } );
+ 
+diff --git a/packages/block-editor/src/components/block-list/block.js b/packages/block-editor/src/components/block-list/block.js
+index 9ba7029dc84a8b..34ad1d1f6f75af 100644
+--- a/packages/block-editor/src/components/block-list/block.js
++++ b/packages/block-editor/src/components/block-list/block.js
+@@ -6,7 +6,13 @@ import clsx from 'clsx';
+ /**
+  * WordPress dependencies
+  */
+-import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
++import {
++	memo,
++	RawHTML,
++	useCallback,
++	useContext,
++	useMemo,
++} from '@wordpress/element';
+ import {
+ 	getBlockType,
+ 	getSaveContent,
+@@ -23,7 +29,7 @@ import {
+ } from '@wordpress/blocks';
+ import { withFilters } from '@wordpress/components';
+ import { withDispatch, useSelect } from '@wordpress/data';
+-import { compose, useRefEffect } from '@wordpress/compose';
++import { compose } from '@wordpress/compose';
+ import { safeHTML } from '@wordpress/dom';
+ 
+ /**
+@@ -741,12 +747,13 @@ function BlockListBlockProvider( props ) {
+ 		[ clientId, rootClientId ]
+ 	);
+ 
+-	const defaultViewRef = useRefEffect( ( element ) => {
+-		if ( element ) {
+-			const { ownerDocument } = element;
+-			const { defaultView } = ownerDocument;
+-			defaultViewRef.current = defaultView;
++	const defaultViewRef = useCallback( ( element ) => {
++		if ( ! element ) {
++			return;
+ 		}
++		const { ownerDocument } = element;
++		const { defaultView } = ownerDocument;
++		defaultViewRef.current = defaultView;
+ 	}, [] );
+ 
+ 	// Use block visibility hook with data from existing useSelect to avoid extra subscription
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/index.js b/packages/block-editor/src/components/block-list/use-block-props/index.js
+index 5a94135a8e0b09..aadb95813dd1eb 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/index.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/index.js
+@@ -6,10 +6,10 @@ import clsx from 'clsx';
+ /**
+  * WordPress dependencies
+  */
+-import { useContext } from '@wordpress/element';
++import { useCallback, useContext } from '@wordpress/element';
+ import { __, sprintf } from '@wordpress/i18n';
+ import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
+-import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
++import { useMergeRefs, useDisabled } from '@wordpress/compose';
+ import warning from '@wordpress/warning';
+ 
+ /**
+@@ -107,12 +107,13 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
+ 		deviceType,
+ 	} = useContext( PrivateBlockContext );
+ 
+-	const defaultViewRef = useRefEffect( ( element ) => {
+-		if ( element ) {
+-			const { ownerDocument } = element;
+-			const { defaultView } = ownerDocument;
+-			defaultViewRef.current = defaultView;
++	const defaultViewRef = useCallback( ( element ) => {
++		if ( ! element ) {
++			return;
+ 		}
++		const { ownerDocument } = element;
++		const { defaultView } = ownerDocument;
++		defaultViewRef.current = defaultView;
+ 	}, [] );
+ 
+ 	// translators: %s: Type of block (i.e. Text, Image etc)
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/use-block-refs.js b/packages/block-editor/src/components/block-list/use-block-props/use-block-refs.js
+index 16fd3ff1ca81dd..28ab1e3b6462f7 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/use-block-refs.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/use-block-refs.js
+@@ -1,8 +1,12 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useContext, useState, useLayoutEffect } from '@wordpress/element';
+-import { useRefEffect } from '@wordpress/compose';
++import {
++	useCallback,
++	useContext,
++	useState,
++	useLayoutEffect,
++} from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -21,8 +25,11 @@ import { BlockRefs } from '../../provider/block-refs-provider';
+  */
+ export function useBlockRefProvider( clientId ) {
+ 	const { refsMap } = useContext( BlockRefs );
+-	return useRefEffect(
++	return useCallback(
+ 		( element ) => {
++			if ( ! element ) {
++				return;
++			}
+ 			refsMap.set( clientId, element );
+ 			return () => refsMap.delete( clientId );
+ 		},
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/use-firefox-draggable-compatibility.js b/packages/block-editor/src/components/block-list/use-block-props/use-firefox-draggable-compatibility.js
+index 40414b28559365..8e70744c209c83 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/use-firefox-draggable-compatibility.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/use-firefox-draggable-compatibility.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ 
+ const nodesByDocument = new Map();
+ 
+@@ -77,7 +77,10 @@ function down( event ) {
+  * @return {Function} Cleanup function.
+  */
+ export function useFirefoxDraggableCompatibility() {
+-	return useRefEffect( ( node ) => {
++	return useCallback( ( node ) => {
++		if ( ! node ) {
++			return;
++		}
+ 		add( node.ownerDocument, node );
+ 		return () => {
+ 			remove( node.ownerDocument, node );
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js b/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js
+index 02d366b7d5cd9a..bd671db43e9b3a 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js
+@@ -2,10 +2,8 @@
+  * WordPress dependencies
+  */
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import {
+-	useRefEffect,
+-	privateApis as composePrivateApis,
+-} from '@wordpress/compose';
++import { privateApis as composePrivateApis } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -25,8 +23,11 @@ export function useFocusHandler( clientId ) {
+ 	const { isBlockSelected } = useSelect( blockEditorStore );
+ 	const { selectBlock, selectionChange } = useDispatch( blockEditorStore );
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
++			if ( ! node ) {
++				return;
++			}
+ 			/**
+ 			 * Marks the block as selected when focused and not already
+ 			 * selected. This specifically handles the case where block does not
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/use-intersection-observer.js b/packages/block-editor/src/components/block-list/use-block-props/use-intersection-observer.js
+index 64af191c2334b8..24d29269bc5e1d 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/use-intersection-observer.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/use-intersection-observer.js
+@@ -1,8 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
+-import { useContext } from '@wordpress/element';
++import { useCallback, useContext } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -11,8 +10,11 @@ import { IntersectionObserver } from '../';
+ 
+ export function useIntersectionObserver() {
+ 	const observer = useContext( IntersectionObserver );
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
++			if ( ! node ) {
++				return;
++			}
+ 			if ( observer ) {
+ 				observer.observe( node );
+ 				return () => {
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/use-is-hovered.js b/packages/block-editor/src/components/block-list/use-block-props/use-is-hovered.js
+index 01c03c45872792..bcdfab3971e143 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/use-is-hovered.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/use-is-hovered.js
+@@ -1,10 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	useRefEffect,
+-	privateApis as composePrivateApis,
+-} from '@wordpress/compose';
++import { privateApis as composePrivateApis } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -23,9 +21,9 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
+  * @return {Function} Ref callback.
+  */
+ export function useIsHovered( { isEnabled = true } = {} ) {
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
+-			if ( ! isEnabled ) {
++			if ( ! node || ! isEnabled ) {
+ 				return;
+ 			}
+ 
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/use-scroll-into-view.js b/packages/block-editor/src/components/block-list/use-block-props/use-scroll-into-view.js
+index 6301dac2c2108e..ece8a3e6ca4db6 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/use-scroll-into-view.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/use-scroll-into-view.js
+@@ -1,12 +1,16 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useReducedMotion, useRefEffect } from '@wordpress/compose';
++import { useReducedMotion } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ 
+ export function useScrollIntoView( { isSelected } ) {
+ 	const prefersReducedMotion = useReducedMotion();
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
++			if ( ! node ) {
++				return;
++			}
+ 			if ( isSelected ) {
+ 				const { ownerDocument } = node;
+ 				const { defaultView } = ownerDocument;
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/use-selected-block-event-handlers.js b/packages/block-editor/src/components/block-list/use-block-props/use-selected-block-event-handlers.js
+index 71c512cc3bf4df..bca4e54cc78088 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/use-selected-block-event-handlers.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/use-selected-block-event-handlers.js
+@@ -5,7 +5,7 @@ import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
+ import { isTextField } from '@wordpress/dom';
+ import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -43,9 +43,9 @@ export function useEventHandlers( { clientId, isSelected } ) {
+ 		editContentOnlySection,
+ 	} = unlock( useDispatch( blockEditorStore ) );
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
+-			if ( ! isSelected ) {
++			if ( ! node || ! isSelected ) {
+ 				return;
+ 			}
+ 
+diff --git a/packages/block-editor/src/components/block-list/use-in-between-inserter.js b/packages/block-editor/src/components/block-list/use-in-between-inserter.js
+index 6f98d8a71f8234..8fe6ff3107a92f 100644
+--- a/packages/block-editor/src/components/block-list/use-in-between-inserter.js
++++ b/packages/block-editor/src/components/block-list/use-in-between-inserter.js
+@@ -1,9 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { useContext } from '@wordpress/element';
++import { useCallback, useContext } from '@wordpress/element';
+ import { isRTL } from '@wordpress/i18n';
+ 
+ /**
+@@ -39,9 +38,9 @@ export function useInBetweenInserter() {
+ 	const { showInsertionPoint, hideInsertionPoint } =
+ 		useDispatch( blockEditorStore );
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
+-			if ( isInBetweenInserterDisabled ) {
++			if ( ! node || isInBetweenInserterDisabled ) {
+ 				return;
+ 			}
+ 
+diff --git a/packages/block-editor/src/components/block-popover/use-popover-scroll.js b/packages/block-editor/src/components/block-popover/use-popover-scroll.js
+index 2d3158e57d0ba7..280186afaebf8c 100644
+--- a/packages/block-editor/src/components/block-popover/use-popover-scroll.js
++++ b/packages/block-editor/src/components/block-popover/use-popover-scroll.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ import { getScrollContainer } from '@wordpress/dom';
+ 
+ const scrollContainerCache = new WeakMap();
+@@ -14,8 +14,11 @@ const scrollContainerCache = new WeakMap();
+  * @param {Object} contentRef
+  */
+ function usePopoverScroll( contentRef ) {
+-	const effect = useRefEffect(
++	const effect = useCallback(
+ 		( node ) => {
++			if ( ! node ) {
++				return;
++			}
+ 			function onWheel( event ) {
+ 				const { deltaX, deltaY, target } = event;
+ 				const contentEl = contentRef.current;
+diff --git a/packages/block-editor/src/components/block-preview/auto.js b/packages/block-editor/src/components/block-preview/auto.js
+index 835f379c09b987..3d151480d7f314 100644
+--- a/packages/block-editor/src/components/block-preview/auto.js
++++ b/packages/block-editor/src/components/block-preview/auto.js
+@@ -1,9 +1,9 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useResizeObserver, useRefEffect } from '@wordpress/compose';
++import { useResizeObserver } from '@wordpress/compose';
+ import { useSelect } from '@wordpress/data';
+-import { memo, useMemo } from '@wordpress/element';
++import { memo, useCallback, useMemo } from '@wordpress/element';
+ import { Disabled } from '@wordpress/components';
+ 
+ /**
+@@ -75,7 +75,10 @@ function ScaledBlockPreview( {
+ 			} }
+ 		>
+ 			<Iframe
+-				contentRef={ useRefEffect( ( bodyElement ) => {
++				contentRef={ useCallback( ( bodyElement ) => {
++					if ( ! bodyElement ) {
++						return;
++					}
+ 					const {
+ 						ownerDocument: { documentElement },
+ 					} = bodyElement;
+diff --git a/packages/block-editor/src/components/block-selection-clearer/index.js b/packages/block-editor/src/components/block-selection-clearer/index.js
+index f1c292ee237024..2650d863799fe4 100644
+--- a/packages/block-editor/src/components/block-selection-clearer/index.js
++++ b/packages/block-editor/src/components/block-selection-clearer/index.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -22,9 +22,9 @@ export function useBlockSelectionClearer() {
+ 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+ 	const { clearBlockSelection: isEnabled } = getSettings();
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
+-			if ( ! isEnabled ) {
++			if ( ! node || ! isEnabled ) {
+ 				return;
+ 			}
+ 
+diff --git a/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js b/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
+index df016e73c29d45..c524bfe1e23f81 100644
+--- a/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
++++ b/packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js
+@@ -1,7 +1,6 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
+ import { useSelect } from '@wordpress/data';
+ import { getScrollContainer } from '@wordpress/dom';
+ import {
+@@ -142,7 +141,10 @@ export default function useBlockToolbarPopoverProps( {
+ 		)
+ 	);
+ 
+-	const popoverRef = useRefEffect( ( popoverNode ) => {
++	const popoverRef = useCallback( ( popoverNode ) => {
++		if ( ! popoverNode ) {
++			return;
++		}
+ 		setToolbarHeight( popoverNode.offsetHeight );
+ 	}, [] );
+ 
+diff --git a/packages/block-editor/src/components/iframe/index.js b/packages/block-editor/src/components/iframe/index.js
+index fe7fd6799b7eae..edee90aec01570 100644
+--- a/packages/block-editor/src/components/iframe/index.js
++++ b/packages/block-editor/src/components/iframe/index.js
+@@ -6,9 +6,14 @@ import clsx from 'clsx';
+ /**
+  * WordPress dependencies
+  */
+-import { useState, createPortal, forwardRef } from '@wordpress/element';
++import {
++	useState,
++	createPortal,
++	forwardRef,
++	useCallback,
++} from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+-import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
++import { useMergeRefs, useDisabled } from '@wordpress/compose';
+ import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
+ import { useSelect } from '@wordpress/data';
+ 
+@@ -62,7 +67,10 @@ function bubbleEvent( event, Constructor, frame ) {
+  * @param {Document} iframeDocument Document to attach listeners to.
+  */
+ function useBubbleEvents( iframeDocument ) {
+-	return useRefEffect( () => {
++	return useCallback( ( node ) => {
++		if ( ! node ) {
++			return;
++		}
+ 		const { defaultView } = iframeDocument;
+ 		if ( ! defaultView ) {
+ 			return;
+@@ -156,7 +164,10 @@ function Iframe( {
+ 	const [ bodyClasses, setBodyClasses ] = useState( [] );
+ 	const [ before, writingFlowRef, after ] = useWritingFlow();
+ 
+-	const setRef = useRefEffect( ( node ) => {
++	const setRef = useCallback( ( node ) => {
++		if ( ! node ) {
++			return;
++		}
+ 		let iFrameDocument;
+ 		// Prevent the default browser action for files dropped outside of dropzones.
+ 		function preventFileDropDefault( event ) {
+@@ -282,8 +293,11 @@ function Iframe( {
+ 	// When an iframe element is moved in the DOM, like when reordering a list,
+ 	// its `window` object is destroyed and recreated, and the `defaultView` field is
+ 	// briefly `null`. We need to guard for such calls of the ref callbacks.
+-	const bodyRef = useRefEffect(
++	const bodyRef = useCallback(
+ 		( node ) => {
++			if ( ! node ) {
++				return;
++			}
+ 			if ( node.ownerDocument.defaultView ) {
+ 				unguardedBodyRef( node );
+ 				return () => unguardedBodyRef( null );
+diff --git a/packages/block-editor/src/components/list-view/use-clipboard-handler.js b/packages/block-editor/src/components/list-view/use-clipboard-handler.js
+index e7c3026e70f090..535a5b12ab85cc 100644
+--- a/packages/block-editor/src/components/list-view/use-clipboard-handler.js
++++ b/packages/block-editor/src/components/list-view/use-clipboard-handler.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -30,7 +30,10 @@ export default function useClipboardHandler( { selectBlock } ) {
+ 		useDispatch( blockEditorStore );
+ 	const notifyCopy = useNotifyCopy();
+ 
+-	return useRefEffect( ( node ) => {
++	return useCallback( ( node ) => {
++		if ( ! node ) {
++			return;
++		}
+ 		function updateFocusAndSelection( focusClientId, shouldSelectBlock ) {
+ 			if ( shouldSelectBlock ) {
+ 				selectBlock( undefined, focusClientId, null, null );
+diff --git a/packages/block-editor/src/components/observe-typing/index.js b/packages/block-editor/src/components/observe-typing/index.js
+index b43bbf1b01fcf1..e90c5f15125f76 100644
+--- a/packages/block-editor/src/components/observe-typing/index.js
++++ b/packages/block-editor/src/components/observe-typing/index.js
+@@ -1,9 +1,10 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect, useMergeRefs } from '@wordpress/compose';
++import { useMergeRefs } from '@wordpress/compose';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { isTextField } from '@wordpress/dom';
++import { useCallback } from '@wordpress/element';
+ import {
+ 	UP,
+ 	RIGHT,
+@@ -59,9 +60,9 @@ export function useMouseMoveTypingReset() {
+ 	);
+ 	const { stopTyping } = useDispatch( blockEditorStore );
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
+-			if ( ! isTyping ) {
++			if ( ! node || ! isTyping ) {
+ 				return;
+ 			}
+ 
+@@ -122,8 +123,11 @@ export function useTypingObserver() {
+ 	const { startTyping, stopTyping } = useDispatch( blockEditorStore );
+ 
+ 	const ref1 = useMouseMoveTypingReset();
+-	const ref2 = useRefEffect(
++	const ref2 = useCallback(
+ 		( node ) => {
++			if ( ! node ) {
++				return;
++			}
+ 			// Listeners to stop typing should only be added when typing.
+ 			// Listeners to start typing should only be added when not typing.
+ 			if ( isTyping ) {
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/index.js b/packages/block-editor/src/components/rich-text/event-listeners/index.js
+index 4ec67d8f30af97..33a299ad3abd69 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/index.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/index.js
+@@ -1,8 +1,12 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo, useRef, useInsertionEffect } from '@wordpress/element';
+-import { useRefEffect } from '@wordpress/compose';
++import {
++	useCallback,
++	useMemo,
++	useRef,
++	useInsertionEffect,
++} from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -43,9 +47,9 @@ export function useEventListeners( props ) {
+ 		[ propsRef ]
+ 	);
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( element ) => {
+-			if ( ! props.isSelected ) {
++			if ( ! element || ! props.isSelected ) {
+ 				return;
+ 			}
+ 			const cleanups = refEffects.map( ( effect ) => effect( element ) );
+diff --git a/packages/block-editor/src/components/typewriter/index.js b/packages/block-editor/src/components/typewriter/index.js
+index 76a6870788c80a..a824a8a3d3e1c4 100644
+--- a/packages/block-editor/src/components/typewriter/index.js
++++ b/packages/block-editor/src/components/typewriter/index.js
+@@ -1,9 +1,9 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
+ import { computeCaretRect, getScrollContainer } from '@wordpress/dom';
+ import { useSelect } from '@wordpress/data';
++import { useCallback } from '@wordpress/element';
+ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+ 
+ /**
+@@ -21,9 +21,9 @@ export function useTypewriter() {
+ 		[]
+ 	);
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
+-			if ( ! hasSelectedBlock ) {
++			if ( ! node || ! hasSelectedBlock ) {
+ 				return;
+ 			}
+ 
+diff --git a/packages/block-editor/src/components/use-flash-editable-blocks/index.js b/packages/block-editor/src/components/use-flash-editable-blocks/index.js
+index 34386ea8eadf3b..fcdec8bbacbeda 100644
+--- a/packages/block-editor/src/components/use-flash-editable-blocks/index.js
++++ b/packages/block-editor/src/components/use-flash-editable-blocks/index.js
+@@ -1,8 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
+ import { useSelect } from '@wordpress/data';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -16,9 +16,9 @@ export function useFlashEditableBlocks( {
+ } = {} ) {
+ 	const { getEnabledClientIdsTree } = unlock( useSelect( blockEditorStore ) );
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( element ) => {
+-			if ( ! isEnabled ) {
++			if ( ! element || ! isEnabled ) {
+ 				return;
+ 			}
+ 
+diff --git a/packages/block-editor/src/components/writing-flow/index.js b/packages/block-editor/src/components/writing-flow/index.js
+index 60aa510e386828..cb85acd6ebf7e4 100644
+--- a/packages/block-editor/src/components/writing-flow/index.js
++++ b/packages/block-editor/src/components/writing-flow/index.js
+@@ -8,8 +8,8 @@ import clsx from 'clsx';
+  */
+ import { useSelect } from '@wordpress/data';
+ import { __ } from '@wordpress/i18n';
+-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+-import { forwardRef } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
++import { forwardRef, useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -46,8 +46,11 @@ export function useWritingFlow() {
+ 			useSelectAll(),
+ 			useArrowNav(),
+ 			usePreviewModeNav(),
+-			useRefEffect(
++			useCallback(
+ 				( node ) => {
++					if ( ! node ) {
++						return;
++					}
+ 					node.tabIndex = 0;
+ 					node.dataset.hasMultiSelection = hasMultiSelection;
+ 
+diff --git a/packages/block-editor/src/components/writing-flow/use-arrow-nav.js b/packages/block-editor/src/components/writing-flow/use-arrow-nav.js
+index e7f0176f8620ab..866c054a72a415 100644
+--- a/packages/block-editor/src/components/writing-flow/use-arrow-nav.js
++++ b/packages/block-editor/src/components/writing-flow/use-arrow-nav.js
+@@ -13,7 +13,7 @@ import {
+ } from '@wordpress/dom';
+ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+ import { useDispatch, useSelect } from '@wordpress/data';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -172,7 +172,10 @@ export default function useArrowNav() {
+ 		__unstableIsFullySelected,
+ 	} = useSelect( blockEditorStore );
+ 	const { selectBlock } = useDispatch( blockEditorStore );
+-	return useRefEffect( ( node ) => {
++	return useCallback( ( node ) => {
++		if ( ! node ) {
++			return;
++		}
+ 		// Here a DOMRect is stored while moving the caret vertically so
+ 		// vertical position of the start position can be restored. This is to
+ 		// recreate browser behaviour across blocks.
+diff --git a/packages/block-editor/src/components/writing-flow/use-click-selection.js b/packages/block-editor/src/components/writing-flow/use-click-selection.js
+index 104e78b47b6ff5..dc8ce3df28b4fb 100644
+--- a/packages/block-editor/src/components/writing-flow/use-click-selection.js
++++ b/packages/block-editor/src/components/writing-flow/use-click-selection.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -14,8 +14,11 @@ export default function useClickSelection() {
+ 	const { selectBlock } = useDispatch( blockEditorStore );
+ 	const { isSelectionEnabled, getBlockSelectionStart, hasMultiSelection } =
+ 		useSelect( blockEditorStore );
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
++			if ( ! node ) {
++				return;
++			}
+ 			function onMouseDown( event ) {
+ 				// The main button.
+ 				// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+diff --git a/packages/block-editor/src/components/writing-flow/use-clipboard-handler.js b/packages/block-editor/src/components/writing-flow/use-clipboard-handler.js
+index f97566f983faf2..9867fdfff0d1be 100644
+--- a/packages/block-editor/src/components/writing-flow/use-clipboard-handler.js
++++ b/packages/block-editor/src/components/writing-flow/use-clipboard-handler.js
+@@ -13,7 +13,7 @@ import {
+ 	documentHasUncollapsedSelection,
+ } from '@wordpress/dom';
+ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -48,7 +48,10 @@ export default function useClipboardHandler() {
+ 	} = useDispatch( blockEditorStore );
+ 	const notifyCopy = useNotifyCopy();
+ 
+-	return useRefEffect( ( node ) => {
++	return useCallback( ( node ) => {
++		if ( ! node ) {
++			return;
++		}
+ 		function handler( event ) {
+ 			if ( event.defaultPrevented ) {
+ 				// This was likely already handled in rich-text/use-paste-handler.js.
+diff --git a/packages/block-editor/src/components/writing-flow/use-drag-selection.js b/packages/block-editor/src/components/writing-flow/use-drag-selection.js
+index 979397c0ce072f..45c798abc26942 100644
+--- a/packages/block-editor/src/components/writing-flow/use-drag-selection.js
++++ b/packages/block-editor/src/components/writing-flow/use-drag-selection.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -36,8 +36,11 @@ export default function useDragSelection() {
+ 		isDraggingBlocks,
+ 		isMultiSelecting,
+ 	} = useSelect( blockEditorStore );
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
++			if ( ! node ) {
++				return;
++			}
+ 			const { ownerDocument } = node;
+ 			const { defaultView } = ownerDocument;
+ 
+diff --git a/packages/block-editor/src/components/writing-flow/use-input.js b/packages/block-editor/src/components/writing-flow/use-input.js
+index 14e812b3d865ed..f092e527b88a25 100644
+--- a/packages/block-editor/src/components/writing-flow/use-input.js
++++ b/packages/block-editor/src/components/writing-flow/use-input.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
+ import {
+ 	createBlock,
+@@ -43,7 +43,10 @@ export default function useInput() {
+ 		__unstableMarkAutomaticChange,
+ 	} = useDispatch( blockEditorStore );
+ 
+-	return useRefEffect( ( node ) => {
++	return useCallback( ( node ) => {
++		if ( ! node ) {
++			return;
++		}
+ 		function onBeforeInput( event ) {
+ 			// If writing flow is editable, NEVER allow the browser to alter the
+ 			// DOM. This will cause React errors (and the DOM should only be
+diff --git a/packages/block-editor/src/components/writing-flow/use-multi-selection.js b/packages/block-editor/src/components/writing-flow/use-multi-selection.js
+index ab5ac662697945..1f7e39d1b62db0 100644
+--- a/packages/block-editor/src/components/writing-flow/use-multi-selection.js
++++ b/packages/block-editor/src/components/writing-flow/use-multi-selection.js
+@@ -1,8 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
+ import { useSelect } from '@wordpress/data';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -43,8 +43,11 @@ export default function useMultiSelection() {
+ 	 * When the component updates, and there is multi selection, we need to
+ 	 * select the entire block contents.
+ 	 */
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
++			if ( ! node ) {
++				return;
++			}
+ 			const { ownerDocument } = node;
+ 			const { defaultView } = ownerDocument;
+ 
+diff --git a/packages/block-editor/src/components/writing-flow/use-preview-mode-nav.js b/packages/block-editor/src/components/writing-flow/use-preview-mode-nav.js
+index ae7481bc879ece..5506a7ff1d4027 100644
+--- a/packages/block-editor/src/components/writing-flow/use-preview-mode-nav.js
++++ b/packages/block-editor/src/components/writing-flow/use-preview-mode-nav.js
+@@ -1,8 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
+ import { useSelect } from '@wordpress/data';
++import { useCallback } from '@wordpress/element';
+ import { TAB, UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+ 
+ /**
+@@ -22,9 +22,9 @@ export function usePreviewModeNav() {
+ 		[]
+ 	);
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
+-			if ( ! isPreviewMode ) {
++			if ( ! node || ! isPreviewMode ) {
+ 				return;
+ 			}
+ 
+diff --git a/packages/block-editor/src/components/writing-flow/use-select-all.js b/packages/block-editor/src/components/writing-flow/use-select-all.js
+index 1ef4cbbd33bc1e..1057aeb64b2ee9 100644
+--- a/packages/block-editor/src/components/writing-flow/use-select-all.js
++++ b/packages/block-editor/src/components/writing-flow/use-select-all.js
+@@ -4,7 +4,7 @@
+ import { isEntirelySelected } from '@wordpress/dom';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -18,7 +18,10 @@ export default function useSelectAll() {
+ 	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
+ 	const isMatch = useShortcutEventMatch();
+ 
+-	return useRefEffect( ( node ) => {
++	return useCallback( ( node ) => {
++		if ( ! node ) {
++			return;
++		}
+ 		function onKeyDown( event ) {
+ 			if ( ! isMatch( 'core/block-editor/select-all', event ) ) {
+ 				return;
+diff --git a/packages/block-editor/src/components/writing-flow/use-selection-observer.js b/packages/block-editor/src/components/writing-flow/use-selection-observer.js
+index a0efc8c6f158e6..4f6fa7b7293cc9 100644
+--- a/packages/block-editor/src/components/writing-flow/use-selection-observer.js
++++ b/packages/block-editor/src/components/writing-flow/use-selection-observer.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ import { create } from '@wordpress/rich-text';
+ import { isSelectionForward } from '@wordpress/dom';
+ 
+@@ -109,8 +109,11 @@ export default function useSelectionObserver() {
+ 		useDispatch( blockEditorStore );
+ 	const { getBlockParents, getBlockSelectionStart, isMultiSelecting } =
+ 		useSelect( blockEditorStore );
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
++			if ( ! node ) {
++				return;
++			}
+ 			const { ownerDocument } = node;
+ 			const { defaultView } = ownerDocument;
+ 
+diff --git a/packages/block-editor/src/components/writing-flow/use-tab-nav.js b/packages/block-editor/src/components/writing-flow/use-tab-nav.js
+index 339fe4de980580..7e15a94b720e33 100644
+--- a/packages/block-editor/src/components/writing-flow/use-tab-nav.js
++++ b/packages/block-editor/src/components/writing-flow/use-tab-nav.js
+@@ -4,8 +4,8 @@
+ import { focus, isFormElement } from '@wordpress/dom';
+ import { TAB } from '@wordpress/keycodes';
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { useRefEffect, useMergeRefs } from '@wordpress/compose';
+-import { useRef } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
++import { useCallback, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -108,7 +108,10 @@ export default function useTabNav() {
+ 		/>
+ 	);
+ 
+-	const ref = useRefEffect( ( node ) => {
++	const ref = useCallback( ( node ) => {
++		if ( ! node ) {
++			return;
++		}
+ 		function onKeyDown( event ) {
+ 			if ( event.defaultPrevented ) {
+ 				return;
+diff --git a/packages/block-library/src/button/edit.js b/packages/block-library/src/button/edit.js
+index f87e362dc619c3..5645117edd355f 100644
+--- a/packages/block-library/src/button/edit.js
++++ b/packages/block-library/src/button/edit.js
+@@ -1,6 +1,7 @@
+ import clsx from 'clsx';
+ import { __, sprintf } from '@wordpress/i18n';
+ import {
++	useCallback,
+ 	useEffect,
+ 	useState,
+ 	useRef,
+@@ -41,7 +42,6 @@ import {
+ } from '@wordpress/blocks';
+ import {
+ 	useMergeRefs,
+-	useRefEffect,
+ 	privateApis as composePrivateApis,
+ } from '@wordpress/compose';
+ import { useSelect, useDispatch } from '@wordpress/data';
+@@ -69,7 +69,10 @@ function useEnter( props ) {
+ 		useSelect( blockEditorStore );
+ 	const propsRef = useRef( props );
+ 	propsRef.current = props;
+-	return useRefEffect( ( element ) => {
++	return useCallback( ( element ) => {
++		if ( ! element ) {
++			return;
++		}
+ 		function onKeyDown( event ) {
+ 			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
+ 				return;
+diff --git a/packages/block-library/src/list-item/hooks/use-enter.js b/packages/block-library/src/list-item/hooks/use-enter.js
+index 3dd1f25c209336..0480404ce71b11 100644
+--- a/packages/block-library/src/list-item/hooks/use-enter.js
++++ b/packages/block-library/src/list-item/hooks/use-enter.js
+@@ -6,11 +6,8 @@ import {
+ 	getDefaultBlockName,
+ 	cloneBlock,
+ } from '@wordpress/blocks';
+-import { useRef } from '@wordpress/element';
+-import {
+-	useRefEffect,
+-	privateApis as composePrivateApis,
+-} from '@wordpress/compose';
++import { useCallback, useRef } from '@wordpress/element';
++import { privateApis as composePrivateApis } from '@wordpress/compose';
+ import { ENTER } from '@wordpress/keycodes';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+@@ -30,7 +27,10 @@ export default function useEnter( props ) {
+ 	const propsRef = useRef( props );
+ 	propsRef.current = props;
+ 	const outdentListItem = useOutdentListItem();
+-	return useRefEffect( ( element ) => {
++	return useCallback( ( element ) => {
++		if ( ! element ) {
++			return;
++		}
+ 		function onKeyDown( event ) {
+ 			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
+ 				return;
+diff --git a/packages/block-library/src/list-item/hooks/use-space.js b/packages/block-library/src/list-item/hooks/use-space.js
+index 25ed715b372d71..a8d7e2fb7450f5 100644
+--- a/packages/block-library/src/list-item/hooks/use-space.js
++++ b/packages/block-library/src/list-item/hooks/use-space.js
+@@ -1,10 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	useRefEffect,
+-	privateApis as composePrivateApis,
+-} from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
++import { privateApis as composePrivateApis } from '@wordpress/compose';
+ import { SPACE, TAB } from '@wordpress/keycodes';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+ import { useSelect } from '@wordpress/data';
+@@ -24,8 +22,11 @@ export default function useSpace( clientId ) {
+ 	const indentListItem = useIndentListItem( clientId );
+ 	const outdentListItem = useOutdentListItem();
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( element ) => {
++			if ( ! element ) {
++				return;
++			}
+ 			function onKeyDown( event ) {
+ 				const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
+ 
+diff --git a/packages/block-library/src/paragraph/use-enter.js b/packages/block-library/src/paragraph/use-enter.js
+index 496299911be1f3..f70b348ad78b40 100644
+--- a/packages/block-library/src/paragraph/use-enter.js
++++ b/packages/block-library/src/paragraph/use-enter.js
+@@ -1,11 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRef } from '@wordpress/element';
+-import {
+-	useRefEffect,
+-	privateApis as composePrivateApis,
+-} from '@wordpress/compose';
++import { useCallback, useRef } from '@wordpress/element';
++import { privateApis as composePrivateApis } from '@wordpress/compose';
+ import { ENTER } from '@wordpress/keycodes';
+ import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+@@ -37,7 +34,10 @@ export function useOnEnter( props ) {
+ 	} = useSelect( blockEditorStore );
+ 	const propsRef = useRef( props );
+ 	propsRef.current = props;
+-	return useRefEffect( ( element ) => {
++	return useCallback( ( element ) => {
++		if ( ! element ) {
++			return;
++		}
+ 		function onKeyDown( event ) {
+ 			if ( event.defaultPrevented ) {
+ 				return;
+diff --git a/packages/block-library/src/utils/waveform-player.js b/packages/block-library/src/utils/waveform-player.js
+index d51db5da5009e5..80f11ec2937ecc 100644
+--- a/packages/block-library/src/utils/waveform-player.js
++++ b/packages/block-library/src/utils/waveform-player.js
+@@ -1,8 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRef } from '@wordpress/element';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -24,17 +23,17 @@ import { initWaveformPlayer } from './waveform-utils';
+  * @return {Element} The WaveformPlayer element.
+  */
+ export function WaveformPlayer( { src, title, artist, image, onEnded } ) {
+-	// Store onEnded in a ref so it doesn't need to be a useRefEffect dependency.
++	// Store onEnded in a ref so it doesn't need to be a useCallback dependency.
+ 	// The callback changes reference on every render (its dependency chain
+-	// includes an unstable array), which would cause useRefEffect to destroy
++	// includes an unstable array), which would cause useCallback to destroy
+ 	// and recreate the entire player on every re-render, making it disappear
+ 	// during editor resizes.
+ 	const onEndedRef = useRef( onEnded );
+ 	onEndedRef.current = onEnded;
+ 
+-	const ref = useRefEffect(
++	const ref = useCallback(
+ 		( element ) => {
+-			if ( ! src ) {
++			if ( ! element || ! src ) {
+ 				return;
+ 			}
+ 
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.tsx b/packages/components/src/autocomplete/autocompleter-ui.tsx
+index b2e742ba00bf41..4c12e58589334b 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.tsx
++++ b/packages/components/src/autocomplete/autocompleter-ui.tsx
+@@ -8,13 +8,14 @@ import { createPortal } from 'react-dom';
+  * WordPress dependencies
+  */
+ import {
++	useCallback,
+ 	useLayoutEffect,
+ 	useRef,
+ 	useEffect,
+ 	useState,
+ } from '@wordpress/element';
+ import { useAnchor } from '@wordpress/rich-text';
+-import { useDebounce, useMergeRefs, useRefEffect } from '@wordpress/compose';
++import { useDebounce, useMergeRefs } from '@wordpress/compose';
+ import { speak } from '@wordpress/a11y';
+ import { __, _n, sprintf } from '@wordpress/i18n';
+ 
+@@ -105,9 +106,9 @@ export function AutocompleterUI( {
+ 	const popoverRef = useRef< HTMLElement >( null );
+ 	const popoverRefs = useMergeRefs( [
+ 		popoverRef,
+-		useRefEffect(
+-			( node ) => {
+-				if ( ! contentRef.current ) {
++		useCallback(
++			( node: HTMLElement | null ) => {
++				if ( ! node || ! contentRef.current ) {
+ 					return;
+ 				}
+ 
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index cfeeb0f58f426c..40ccf5dd2afe94 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -3,6 +3,7 @@
+  */
+ import {
+ 	renderToString,
++	useCallback,
+ 	useEffect,
+ 	useMemo,
+ 	useReducer,
+@@ -11,7 +12,6 @@ import {
+ import {
+ 	useInstanceId,
+ 	useMergeRefs,
+-	useRefEffect,
+ 	privateApis as composePrivateApis,
+ } from '@wordpress/compose';
+ import {
+@@ -397,7 +397,10 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
+ 
+ 	const mergedRefs = useMergeRefs( [
+ 		ref,
+-		useRefEffect( ( element: HTMLElement ) => {
++		useCallback( ( element: HTMLElement | null ) => {
++			if ( ! element ) {
++				return;
++			}
+ 			function _onKeyDown( event: Event ) {
+ 				onKeyDownRef.current?.( event as KeyboardEvent );
+ 			}
+diff --git a/packages/components/src/checkbox-control/index.tsx b/packages/components/src/checkbox-control/index.tsx
+index 729f40db4d8906..d4e86d0801b40f 100644
+--- a/packages/components/src/checkbox-control/index.tsx
++++ b/packages/components/src/checkbox-control/index.tsx
+@@ -7,8 +7,8 @@ import type { ChangeEvent } from 'react';
+ /**
+  * WordPress dependencies
+  */
+-import { useState } from '@wordpress/element';
+-import { useInstanceId, useRefEffect } from '@wordpress/compose';
++import { useCallback, useState } from '@wordpress/element';
++import { useInstanceId } from '@wordpress/compose';
+ import deprecated from '@wordpress/deprecated';
+ import { Icon, check, reset } from '@wordpress/icons';
+ 
+@@ -71,8 +71,8 @@ export function CheckboxControl(
+ 
+ 	// Run the following callback every time the `ref` (and the additional
+ 	// dependencies) change.
+-	const ref = useRefEffect< HTMLInputElement >(
+-		( node ) => {
++	const ref = useCallback(
++		( node: HTMLInputElement | null ) => {
+ 			if ( ! node ) {
+ 				return;
+ 			}
+diff --git a/packages/components/src/form-token-field/suggestions-list.tsx b/packages/components/src/form-token-field/suggestions-list.tsx
+index 889a2b69a91694..a635b994dcebb6 100644
+--- a/packages/components/src/form-token-field/suggestions-list.tsx
++++ b/packages/components/src/form-token-field/suggestions-list.tsx
+@@ -7,7 +7,7 @@ import type { MouseEventHandler, ReactNode } from 'react';
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+@@ -33,8 +33,11 @@ export function SuggestionsList<
+ 	instanceId,
+ 	__experimentalRenderItem,
+ }: SuggestionsListProps< T > ) {
+-	const listRef = useRefEffect< HTMLUListElement >(
+-		( listNode ) => {
++	const listRef = useCallback(
++		( listNode: HTMLUListElement | null ) => {
++			if ( ! listNode ) {
++				return;
++			}
+ 			// only have to worry about scrolling selected suggestion into view
+ 			// when already expanded.
+ 			if (
+diff --git a/packages/components/src/higher-order/navigate-regions/index.tsx b/packages/components/src/higher-order/navigate-regions/index.tsx
+index 432de1fad5087d..1ce5e79dcb675c 100644
+--- a/packages/components/src/higher-order/navigate-regions/index.tsx
++++ b/packages/components/src/higher-order/navigate-regions/index.tsx
+@@ -1,12 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useState, useRef } from '@wordpress/element';
+-import {
+-	createHigherOrderComponent,
+-	useRefEffect,
+-	useMergeRefs,
+-} from '@wordpress/compose';
++import { useCallback, useState, useRef } from '@wordpress/element';
++import { createHigherOrderComponent, useMergeRefs } from '@wordpress/compose';
+ import { isKeyboardEvent } from '@wordpress/keycodes';
+ import type { WPKeycodeModifier } from '@wordpress/keycodes';
+ 
+@@ -75,8 +71,11 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
+ 		setIsFocusingRegions( true );
+ 	}
+ 
+-	const clickRef = useRefEffect(
+-		( element ) => {
++	const clickRef = useCallback(
++		( element: HTMLElement | null ) => {
++			if ( ! element ) {
++				return;
++			}
+ 			function onClick() {
+ 				setIsFocusingRegions( false );
+ 			}
+diff --git a/packages/compose/CHANGELOG.md b/packages/compose/CHANGELOG.md
+index 54ce1ee5e43fa6..0cd8c4f76789fc 100644
+--- a/packages/compose/CHANGELOG.md
++++ b/packages/compose/CHANGELOG.md
+@@ -16,6 +16,10 @@
+ 
+ -   `useMergeRefs`: Support cleanup functions returned by inner ref callbacks (React 19 ref callback cleanup pattern). Inner refs that return a cleanup have it invoked at teardown instead of being called with `null`.
+ 
++### Deprecations
++
++-   `useRefEffect`: Deprecated in favor of `useCallback` with a returned cleanup function (React 19's native ref callback cleanup pattern).
++
+ ### Bug Fixes
+ 
+ -   `useCopyToClipboard`: Call the `onSuccess` callback even when the trigger node unmounts before the copy resolves ([#78387](https://github.com/WordPress/gutenberg/pull/78387)).
+diff --git a/packages/compose/README.md b/packages/compose/README.md
+index 7428c40abd9efd..07e4f0fabe605b 100644
+--- a/packages/compose/README.md
++++ b/packages/compose/README.md
+@@ -513,10 +513,16 @@ _Returns_
+ 
+ ### useRefEffect
+ 
++> **Deprecated** since WordPress 7.1.0. Use `useCallback` with a returned cleanup function (React 19's ref callback cleanup pattern) instead.
++
+ Effect-like ref callback. Just like with `useEffect`, this allows you to return a cleanup function to be run if the ref changes or one of the dependencies changes. The ref is provided as an argument to the callback functions. The main difference between this and `useEffect` is that the `useEffect` callback is not called when the ref changes, but this is. Pass the returned ref callback as the component's ref and merge multiple refs with `useMergeRefs`.
+ 
+ It's worth noting that if the dependencies array is empty, there's not strictly a need to clean up event handlers for example, because the node is to be removed. It _is_ necessary if you add dependencies because the ref callback will be called multiple times for the same node.
+ 
++_Related_
++
++-   <https://react.dev/reference/react/useCallback#ref-callback-cleanup>
++
+ _Parameters_
+ 
+ -   _callback_ `( node: TElement ) => ( () => void ) | void`: Callback with ref as argument.
+diff --git a/packages/compose/src/hooks/use-constrained-tabbing/index.js b/packages/compose/src/hooks/use-constrained-tabbing/index.js
+index 6ea6a810a91ec7..3d390bd5c02f3f 100644
+--- a/packages/compose/src/hooks/use-constrained-tabbing/index.js
++++ b/packages/compose/src/hooks/use-constrained-tabbing/index.js
+@@ -2,11 +2,7 @@
+  * WordPress dependencies
+  */
+ import { focus } from '@wordpress/dom';
+-
+-/**
+- * Internal dependencies
+- */
+-import useRefEffect from '../use-ref-effect';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * In Dialogs/modals, the tabbing must be constrained to the content of
+@@ -30,7 +26,11 @@ import useRefEffect from '../use-ref-effect';
+  * ```
+  */
+ function useConstrainedTabbing() {
+-	return useRefEffect( ( /** @type {HTMLElement} */ node ) => {
++	return useCallback( ( /** @type {HTMLElement | null} */ node ) => {
++		if ( ! node ) {
++			return;
++		}
++		const element = node;
+ 		function onKeyDown( /** @type {KeyboardEvent} */ event ) {
+ 			const { key, shiftKey, target } = event;
+ 
+@@ -61,7 +61,7 @@ function useConstrainedTabbing() {
+ 			// If the element that is about to receive focus is inside the
+ 			// area, rely on native browsers behavior and let tabbing follow
+ 			// the native tab sequence.
+-			if ( node.contains( nextElement ) ) {
++			if ( element.contains( nextElement ) ) {
+ 				return;
+ 			}
+ 
+@@ -70,21 +70,21 @@ function useConstrainedTabbing() {
+ 			// the area, depending on the direction. Without preventing default
+ 			// behaviour, the browser will then move focus to the next element.
+ 			const domAction = shiftKey ? 'append' : 'prepend';
+-			const { ownerDocument } = node;
++			const { ownerDocument } = element;
+ 			const trap = ownerDocument.createElement( 'div' );
+ 
+ 			trap.tabIndex = -1;
+-			node[ domAction ]( trap );
++			element[ domAction ]( trap );
+ 
+ 			// Remove itself when the trap loses focus.
+-			trap.addEventListener( 'blur', () => node.removeChild( trap ) );
++			trap.addEventListener( 'blur', () => element.removeChild( trap ) );
+ 
+ 			trap.focus();
+ 		}
+ 
+-		node.addEventListener( 'keydown', onKeyDown );
++		element.addEventListener( 'keydown', onKeyDown );
+ 		return () => {
+-			node.removeEventListener( 'keydown', onKeyDown );
++			element.removeEventListener( 'keydown', onKeyDown );
+ 		};
+ 	}, [] );
+ }
+diff --git a/packages/compose/src/hooks/use-copy-to-clipboard/index.ts b/packages/compose/src/hooks/use-copy-to-clipboard/index.ts
+index a194615b0f338e..573e155a0c215b 100644
+--- a/packages/compose/src/hooks/use-copy-to-clipboard/index.ts
++++ b/packages/compose/src/hooks/use-copy-to-clipboard/index.ts
+@@ -1,14 +1,9 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRef, useLayoutEffect } from '@wordpress/element';
++import { useCallback, useRef, useLayoutEffect } from '@wordpress/element';
+ import type { MutableRefObject, RefCallback } from 'react';
+ 
+-/**
+- * Internal dependencies
+- */
+-import useRefEffect from '../use-ref-effect';
+-
+ /**
+  * Copies text to the clipboard using the Clipboard API when available,
+  * with a fallback for non-secure contexts (e.g. HTTP) and older browsers.
+@@ -91,7 +86,10 @@ export default function useCopyToClipboard< T extends HTMLElement >(
+ ): RefCallback< T > {
+ 	const textRef = useUpdatedRef( text );
+ 	const onSuccessRef = useUpdatedRef( onSuccess );
+-	return useRefEffect( ( node ) => {
++	return useCallback( ( node: T | null ) => {
++		if ( ! node ) {
++			return;
++		}
+ 		// Tracks whether the node is still mounted when the Promise resolves.
+ 		let isActive = true;
+ 		const handleClick = async () => {
+diff --git a/packages/compose/src/hooks/use-disabled/index.ts b/packages/compose/src/hooks/use-disabled/index.ts
+index fc3b0ab552b8db..80040379c2d948 100644
+--- a/packages/compose/src/hooks/use-disabled/index.ts
++++ b/packages/compose/src/hooks/use-disabled/index.ts
+@@ -1,8 +1,12 @@
++/**
++ * WordPress dependencies
++ */
++import { useCallback } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+ import { debounce } from '../../utils/debounce';
+-import useRefEffect from '../use-ref-effect';
+ 
+ /**
+  * In some circumstances, such as block previews, all focusable DOM elements
+@@ -33,9 +37,9 @@ import useRefEffect from '../use-ref-effect';
+ export default function useDisabled( {
+ 	isDisabled: isDisabledProp = false,
+ } = {} ) {
+-	return useRefEffect(
+-		( node ) => {
+-			if ( isDisabledProp ) {
++	return useCallback(
++		( node: HTMLElement | null ) => {
++			if ( ! node || isDisabledProp ) {
+ 				return;
+ 			}
+ 
+diff --git a/packages/compose/src/hooks/use-drop-zone/index.js b/packages/compose/src/hooks/use-drop-zone/index.js
+index 8fa7799361e329..c8b5f38ba89ecf 100644
+--- a/packages/compose/src/hooks/use-drop-zone/index.js
++++ b/packages/compose/src/hooks/use-drop-zone/index.js
+@@ -1,7 +1,11 @@
++/**
++ * WordPress dependencies
++ */
++import { useCallback } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+-import useRefEffect from '../use-ref-effect';
+ import useEvent from '../use-event';
+ 
+ /**
+@@ -36,9 +40,9 @@ export default function useDropZone( {
+ 	const onDragEndEvent = useEvent( _onDragEnd );
+ 	const onDragOverEvent = useEvent( _onDragOver );
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( elem ) => {
+-			if ( isDisabled ) {
++			if ( ! elem || isDisabled ) {
+ 				return;
+ 			}
+ 
+diff --git a/packages/compose/src/hooks/use-focus-on-mount/index.ts b/packages/compose/src/hooks/use-focus-on-mount/index.ts
+index ecf348f7e741a2..614da3d2b07bad 100644
+--- a/packages/compose/src/hooks/use-focus-on-mount/index.ts
++++ b/packages/compose/src/hooks/use-focus-on-mount/index.ts
+@@ -1,6 +1,5 @@
+ import { focus } from '@wordpress/dom';
+-import { useEffect, useRef } from '@wordpress/element';
+-import useRefEffect from '../use-ref-effect';
++import { useCallback, useEffect, useRef } from '@wordpress/element';
+ 
+ /**
+  * Determines focus behavior when the element mounts.
+@@ -49,8 +48,8 @@ export function useFocusOnMount(
+ 		focusOnMountRef.current = focusOnMount;
+ 	}, [ focusOnMount ] );
+ 
+-	return useRefEffect< HTMLElement >( ( node ) => {
+-		if ( focusOnMountRef.current === false ) {
++	return useCallback( ( node: HTMLElement | null ) => {
++		if ( ! node || focusOnMountRef.current === false ) {
+ 			return;
+ 		}
+ 
+diff --git a/packages/compose/src/hooks/use-focusable-iframe/index.ts b/packages/compose/src/hooks/use-focusable-iframe/index.ts
+index 31024bd8246d12..8d99cfbc7c0d97 100644
+--- a/packages/compose/src/hooks/use-focusable-iframe/index.ts
++++ b/packages/compose/src/hooks/use-focusable-iframe/index.ts
+@@ -4,9 +4,9 @@
+ import type { RefCallback } from 'react';
+ 
+ /**
+- * Internal dependencies
++ * WordPress dependencies
+  */
+-import useRefEffect from '../use-ref-effect';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Dispatches a bubbling focus event when the iframe receives focus. Use
+@@ -15,7 +15,10 @@ import useRefEffect from '../use-ref-effect';
+  * @return Ref to pass to the iframe.
+  */
+ export default function useFocusableIframe(): RefCallback< HTMLIFrameElement > {
+-	return useRefEffect( ( element ) => {
++	return useCallback( ( element: HTMLIFrameElement | null ) => {
++		if ( ! element ) {
++			return;
++		}
+ 		const { ownerDocument } = element;
+ 		if ( ! ownerDocument ) {
+ 			return;
+diff --git a/packages/compose/src/hooks/use-ref-effect/index.ts b/packages/compose/src/hooks/use-ref-effect/index.ts
+index bab7bc4672eccd..0b945115708457 100644
+--- a/packages/compose/src/hooks/use-ref-effect/index.ts
++++ b/packages/compose/src/hooks/use-ref-effect/index.ts
+@@ -7,6 +7,7 @@ import type { DependencyList, RefCallback } from 'react';
+  * WordPress dependencies
+  */
+ import { useCallback, useRef } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Effect-like ref callback. Just like with `useEffect`, this allows you to
+@@ -22,15 +23,25 @@ import { useCallback, useRef } from '@wordpress/element';
+  * to be removed. It *is* necessary if you add dependencies because the ref
+  * callback will be called multiple times for the same node.
+  *
+- * @param callback     Callback with ref as argument.
+- * @param dependencies Dependencies of the callback.
++ * @deprecated since WordPress 7.1.0. Use `useCallback` with a returned cleanup
++ *             function (React 19's ref callback cleanup pattern) instead.
++ * @see        https://react.dev/reference/react/useCallback#ref-callback-cleanup
+  *
+- * @return Ref callback.
++ * @param      callback     Callback with ref as argument.
++ * @param      dependencies Dependencies of the callback.
++ *
++ * @return     Ref callback.
+  */
+ export default function useRefEffect< TElement = Node >(
+ 	callback: ( node: TElement ) => ( () => void ) | void,
+ 	dependencies: DependencyList
+ ): RefCallback< TElement | null > {
++	deprecated( 'wp.compose.useRefEffect', {
++		since: '7.1',
++		alternative: 'useCallback',
++		link: 'https://react.dev/reference/react/useCallback#ref-callback-cleanup',
++	} );
++
+ 	const cleanupRef = useRef< ( () => void ) | void >( undefined );
+ 	return useCallback( ( node: TElement | null ) => {
+ 		if ( node ) {
+diff --git a/packages/compose/src/hooks/use-ref-effect/test/index.tsx b/packages/compose/src/hooks/use-ref-effect/test/index.tsx
+new file mode 100644
+index 00000000000000..1067b20f0dc277
+--- /dev/null
++++ b/packages/compose/src/hooks/use-ref-effect/test/index.tsx
+@@ -0,0 +1,34 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * WordPress dependencies
++ */
++import deprecated from '@wordpress/deprecated';
++
++/**
++ * Internal dependencies
++ */
++import useRefEffect from '../';
++
++jest.mock( '@wordpress/deprecated' );
++
++describe( 'useRefEffect', () => {
++	const TestComponent = () => {
++		const ref = useRefEffect( () => {}, [] );
++		return <div ref={ ref } />;
++	};
++
++	it( 'should call deprecated when the hook is used', () => {
++		jest.mocked( deprecated ).mockClear();
++		render( <TestComponent /> );
++
++		expect( deprecated ).toHaveBeenCalledWith( 'wp.compose.useRefEffect', {
++			since: '7.1',
++			alternative: 'useCallback',
++			link: 'https://react.dev/reference/react/useCallback#ref-callback-cleanup',
++		} );
++	} );
++} );
+diff --git a/packages/e2e-tests/plugins/iframed-block/editor.js b/packages/e2e-tests/plugins/iframed-block/editor.js
+index 547ecd65301f7b..2e8716a52c4278 100644
+--- a/packages/e2e-tests/plugins/iframed-block/editor.js
++++ b/packages/e2e-tests/plugins/iframed-block/editor.js
+@@ -1,13 +1,15 @@
+-( ( { wp: { element, blocks, blockEditor, compose }, jQuery: $ } ) => {
+-	const { createElement: el } = element;
++( ( { wp: { element, blocks, blockEditor }, jQuery: $ } ) => {
++	const { createElement: el, useCallback } = element;
+ 	const { registerBlockType } = blocks;
+ 	const { useBlockProps } = blockEditor;
+-	const { useRefEffect } = compose;
+ 
+ 	registerBlockType( 'test/iframed-block', {
+ 		apiVersion: 3,
+ 		edit: function Edit() {
+-			const ref = useRefEffect( ( node ) => {
++			const ref = useCallback( ( node ) => {
++				if ( ! node ) {
++					return;
++				}
+ 				$( node ).test();
+ 			}, [] );
+ 			return el( 'p', useBlockProps( { ref } ), 'Iframed Block (edit)' );
+diff --git a/packages/e2e-tests/plugins/iframed-masonry-block/editor.js b/packages/e2e-tests/plugins/iframed-masonry-block/editor.js
+index f481ad54b6ac60..3ee41f56d18d84 100644
+--- a/packages/e2e-tests/plugins/iframed-masonry-block/editor.js
++++ b/packages/e2e-tests/plugins/iframed-masonry-block/editor.js
+@@ -1,8 +1,7 @@
+-( ( { wp: { element, blocks, blockEditor, compose } } ) => {
+-	const { createElement: el } = element;
++( ( { wp: { element, blocks, blockEditor } } ) => {
++	const { createElement: el, useCallback } = element;
+ 	const { registerBlockType } = blocks;
+ 	const { useBlockProps } = blockEditor;
+-	const { useRefEffect } = compose;
+ 
+ 	const content = [
+ 		el( 'div', { className: 'grid-item' } ),
+@@ -39,7 +38,10 @@
+ 	registerBlockType( 'test/iframed-masonry-block', {
+ 		apiVersion: 3,
+ 		edit: function Edit() {
+-			const ref = useRefEffect( ( node ) => {
++			const ref = useCallback( ( node ) => {
++				if ( ! node ) {
++					return;
++				}
+ 				const { ownerDocument } = node;
+ 				const { defaultView } = ownerDocument;
+ 
+@@ -54,7 +56,7 @@
+ 				return () => {
+ 					masonry.destroy();
+ 				};
+-			} );
++			}, [] );
+ 			return el( 'div', useBlockProps( { ref } ), ...content );
+ 		},
+ 		save: function Save() {
+diff --git a/packages/edit-post/src/components/layout/index.js b/packages/edit-post/src/components/layout/index.js
+index e49f53fa6717fa..f00420bc7ebf63 100644
+--- a/packages/edit-post/src/components/layout/index.js
++++ b/packages/edit-post/src/components/layout/index.js
+@@ -46,7 +46,6 @@ import {
+ import {
+ 	useMediaQuery,
+ 	useMergeRefs,
+-	useRefEffect,
+ 	useViewportMatch,
+ } from '@wordpress/compose';
+ // eslint-disable-next-line @wordpress/use-recommended-components -- `Tooltip` is not yet on the recommended `@wordpress/ui` allow-list; landing as a migration step ahead of the wider rollout.
+@@ -155,7 +154,10 @@ function MetaBoxesMain( { isLegacy } ) {
+ 	// Keeps the resizable area’s size constraints updated taking into account
+ 	// editor notices. The constraints are also used to derive the value for the
+ 	// aria-valuenow attribute on the separator.
+-	const effectSizeConstraints = useRefEffect( ( node ) => {
++	const effectSizeConstraints = useCallback( ( node ) => {
++		if ( ! node ) {
++			return;
++		}
+ 		const container = node.closest(
+ 			'.interface-interface-skeleton__content'
+ 		);
+diff --git a/packages/editor/src/components/post-revisions-preview/diff-markers.js b/packages/editor/src/components/post-revisions-preview/diff-markers.js
+index e1d074f5fefc15..0ecccb158de865 100644
+--- a/packages/editor/src/components/post-revisions-preview/diff-markers.js
++++ b/packages/editor/src/components/post-revisions-preview/diff-markers.js
+@@ -8,7 +8,7 @@ import {
+ 	useCallback,
+ 	useEffect,
+ } from '@wordpress/element';
+-import { useRefEffect, useMergeRefs } from '@wordpress/compose';
++import { useMergeRefs } from '@wordpress/compose';
+ import { useSelect } from '@wordpress/data';
+ import {
+ 	privateApis as blockEditorPrivateApis,
+@@ -137,7 +137,10 @@ export function useDiffMarkers() {
+ 		subscribersRef.current.add( callback );
+ 		return () => subscribersRef.current.delete( callback );
+ 	}, [] );
+-	const contentRef = useRefEffect( ( element ) => {
++	const contentRef = useCallback( ( element ) => {
++		if ( ! element ) {
++			return;
++		}
+ 		const { ownerDocument } = element;
+ 		const { defaultView } = ownerDocument;
+ 		const resizeObserver = new defaultView.ResizeObserver( () => {
+diff --git a/packages/editor/src/components/visual-editor/use-edit-content-only-section-exit.js b/packages/editor/src/components/visual-editor/use-edit-content-only-section-exit.js
+index f51fd1469cdccf..893ef3341408b4 100644
+--- a/packages/editor/src/components/visual-editor/use-edit-content-only-section-exit.js
++++ b/packages/editor/src/components/visual-editor/use-edit-content-only-section-exit.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+ 
+ /**
+@@ -22,8 +22,11 @@ export function useEditContentOnlySectionExit() {
+ 		useDispatch( blockEditorStore )
+ 	);
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
++			if ( ! node ) {
++				return;
++			}
+ 			function onClick( event ) {
+ 				const editedContentOnlySection = getEditedContentOnlySection();
+ 				if ( ! editedContentOnlySection ) {
+diff --git a/packages/editor/src/components/visual-editor/use-padding-appender.js b/packages/editor/src/components/visual-editor/use-padding-appender.js
+index 1588f0a3b82e65..90f587f8f98419 100644
+--- a/packages/editor/src/components/visual-editor/use-padding-appender.js
++++ b/packages/editor/src/components/visual-editor/use-padding-appender.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useRegistry } from '@wordpress/data';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+ 
+@@ -13,8 +13,11 @@ const CSS =
+ 
+ export function usePaddingAppender( enabled ) {
+ 	const registry = useRegistry();
+-	const effect = useRefEffect(
++	const effect = useCallback(
+ 		( node ) => {
++			if ( ! node ) {
++				return;
++			}
+ 			function onMouseDown( event ) {
+ 				if (
+ 					event.target !== node &&
+diff --git a/packages/editor/src/components/visual-editor/use-select-nearest-editable-block.js b/packages/editor/src/components/visual-editor/use-select-nearest-editable-block.js
+index 5cc84cb7fb5037..31f19db7f4021d 100644
+--- a/packages/editor/src/components/visual-editor/use-select-nearest-editable-block.js
++++ b/packages/editor/src/components/visual-editor/use-select-nearest-editable-block.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+ 
+@@ -30,9 +30,9 @@ export default function useSelectNearestEditableBlock( {
+ 	);
+ 	const { selectBlock } = useDispatch( blockEditorStore );
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( element ) => {
+-			if ( ! isEnabled ) {
++			if ( ! element || ! isEnabled ) {
+ 				return;
+ 			}
+ 
+diff --git a/packages/editor/src/components/visual-editor/use-zoom-out-mode-exit.js b/packages/editor/src/components/visual-editor/use-zoom-out-mode-exit.js
+index 5a2bb49dbb832e..4cd34f62bff87b 100644
+--- a/packages/editor/src/components/visual-editor/use-zoom-out-mode-exit.js
++++ b/packages/editor/src/components/visual-editor/use-zoom-out-mode-exit.js
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { useRefEffect } from '@wordpress/compose';
++import { useCallback } from '@wordpress/element';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+ 
+ /**
+@@ -17,8 +17,11 @@ export function useZoomOutModeExit() {
+ 	const { getSettings, isZoomOut } = unlock( useSelect( blockEditorStore ) );
+ 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( node ) => {
++			if ( ! node ) {
++				return;
++			}
+ 			function onDoubleClick( event ) {
+ 				if ( ! isZoomOut() ) {
+ 					return;
+diff --git a/packages/rich-text/src/hook/event-listeners/index.js b/packages/rich-text/src/hook/event-listeners/index.js
+index d4f760abdc735a..2ee49511b54837 100644
+--- a/packages/rich-text/src/hook/event-listeners/index.js
++++ b/packages/rich-text/src/hook/event-listeners/index.js
+@@ -1,8 +1,12 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useMemo, useRef, useInsertionEffect } from '@wordpress/element';
+-import { useRefEffect } from '@wordpress/compose';
++import {
++	useCallback,
++	useMemo,
++	useRef,
++	useInsertionEffect,
++} from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -35,8 +39,11 @@ export function useEventListeners( props ) {
+ 		[ propsRef ]
+ 	);
+ 
+-	return useRefEffect(
++	return useCallback(
+ 		( element ) => {
++			if ( ! element ) {
++				return;
++			}
+ 			const cleanups = refEffects.map( ( effect ) => effect( element ) );
+ 			return () => {
+ 				cleanups.forEach( ( cleanup ) => cleanup() );
+diff --git a/packages/rich-text/src/hook/index.js b/packages/rich-text/src/hook/index.js
+index c114af516d10c8..f9860e143c060e 100644
+--- a/packages/rich-text/src/hook/index.js
++++ b/packages/rich-text/src/hook/index.js
+@@ -1,8 +1,13 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
+-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
++import {
++	useCallback,
++	useRef,
++	useLayoutEffect,
++	useReducer,
++} from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
+ import { useRegistry } from '@wordpress/data';
+ import deprecated from '@wordpress/deprecated';
+ 
+@@ -217,10 +222,16 @@ function useRichTextBase( {
+ 			onSelectionChange,
+ 			forceRender,
+ 		} ),
+-		useRefEffect( () => {
+-			applyFromProps();
+-			didMountRef.current = true;
+-		}, [ placeholder, ...__unstableDependencies ] ),
++		useCallback(
++			( node ) => {
++				if ( ! node ) {
++					return;
++				}
++				applyFromProps();
++				didMountRef.current = true;
++			},
++			[ placeholder, ...__unstableDependencies ]
++		),
+ 	] );
+ 
+ 	return {
+diff --git a/packages/widgets/src/blocks/legacy-widget/edit/preview.js b/packages/widgets/src/blocks/legacy-widget/edit/preview.js
+index 92388e5e54f3f6..0658096026f0bc 100644
+--- a/packages/widgets/src/blocks/legacy-widget/edit/preview.js
++++ b/packages/widgets/src/blocks/legacy-widget/edit/preview.js
+@@ -6,8 +6,7 @@ import clsx from 'clsx';
+ /**
+  * WordPress dependencies
+  */
+-import { useRefEffect } from '@wordpress/compose';
+-import { useEffect, useState } from '@wordpress/element';
++import { useCallback, useEffect, useState } from '@wordpress/element';
+ import { Disabled, Placeholder, Spinner } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
+ import apiFetch from '@wordpress/api-fetch';
+@@ -48,8 +47,11 @@ export default function Preview( { idBase, instance, isVisible } ) {
+ 	}, [ idBase, instance ] );
+ 
+ 	// Resize the iframe on either the load event, or when the iframe becomes visible.
+-	const ref = useRefEffect(
++	const ref = useCallback(
+ 		( iframe ) => {
++			if ( ! iframe ) {
++				return;
++			}
+ 			// Only set height if the iframe is loaded,
+ 			// or it will grow to an unexpected large height in Safari if it's hidden initially.
+ 			if ( ! isLoaded ) {

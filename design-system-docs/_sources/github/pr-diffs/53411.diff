@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 10e1d6d37d60ac..5e98dd937b6034 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ ### Bug Fix
+ 
+ -   `Modal`: Fix loss of focus when clicking outside ([#52653](https://github.com/WordPress/gutenberg/pull/52653)).
++-   `Button`: add `:disabled` selector to reset hover color for disabled buttons ([#53411](https://github.com/WordPress/gutenberg/pull/53411)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index a450ef60b46afd..1833dfccbcbbec 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -28,6 +28,7 @@
+ 	}
+ 
+ 	// Unset some hovers, instead of adding :not specificity.
++	&:disabled:hover,
+ 	&[aria-disabled="true"]:hover {
+ 		color: initial;
+ 	}

@@ -1,0 +1,15 @@
+diff --git a/packages/components/src/custom-select-control/stories/index.js b/packages/components/src/custom-select-control/stories/index.js
+index 68f179864f86d5..f7075afb0026be 100644
+--- a/packages/components/src/custom-select-control/stories/index.js
++++ b/packages/components/src/custom-select-control/stories/index.js
+@@ -10,9 +10,9 @@ export default {
+ 		__next36pxDefaultSize: { control: { type: 'boolean' } },
+ 		__experimentalShowSelectedHint: { control: { type: 'boolean' } },
+ 		size: {
++			options: [ 'small', 'default', '__unstable-large' ],
+ 			control: {
+ 				type: 'radio',
+-				options: [ 'small', 'default', '__unstable-large' ],
+ 			},
+ 		},
+ 	},

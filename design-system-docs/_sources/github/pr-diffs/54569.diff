@@ -1,0 +1,198 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7314e7ecdce49f..82cd74a6b758d0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -38,6 +38,7 @@
+ -   `Popover`: Remove `scroll` and `resize` listeners for iframe overflow parents and rely on recently added native Floating UI support ([#54286](https://github.com/WordPress/gutenberg/pull/54286)).
+ -   `Button`: Update documentation to remove the button `focus` prop ([#54397](https://github.com/WordPress/gutenberg/pull/54397)).
+ -   `Toolbar/ToolbarGroup`: Convert component to TypeScript ([#54317](https://github.com/WordPress/gutenberg/pull/54317)).
++-   `Modal`: add more unit tests ([#54569](https://github.com/WordPress/gutenberg/pull/54569)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/confirm-dialog/test/index.js b/packages/components/src/confirm-dialog/test/index.js
+index 4aecd43f570861..adf19b292898f8 100644
+--- a/packages/components/src/confirm-dialog/test/index.js
++++ b/packages/components/src/confirm-dialog/test/index.js
+@@ -1,13 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import {
+-	render,
+-	screen,
+-	fireEvent,
+-	waitForElementToBeRemoved,
+-	waitFor,
+-} from '@testing-library/react';
++import { render, screen } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+ /**
+@@ -137,6 +131,7 @@ describe( 'Confirm', () => {
+ 			} );
+ 
+ 			it( 'should not render if dialog is closed by clicking the overlay, and the `onCancel` callback should be called', async () => {
++				const user = userEvent.setup();
+ 				const onCancel = jest.fn().mockName( 'onCancel()' );
+ 
+ 				render(
+@@ -147,11 +142,9 @@ describe( 'Confirm', () => {
+ 
+ 				const confirmDialog = screen.getByRole( 'dialog' );
+ 
+-				//The overlay click is handled by detecting an onBlur from the modal frame.
+-				// TODO: replace with `@testing-library/user-event`
+-				fireEvent.blur( confirmDialog );
+-
+-				await waitForElementToBeRemoved( confirmDialog );
++				// Disable reason: Semantic queries can’t reach the overlay.
++				// eslint-disable-next-line testing-library/no-node-access
++				await user.click( confirmDialog.parentElement );
+ 
+ 				expect( confirmDialog ).not.toBeInTheDocument();
+ 				expect( onCancel ).toHaveBeenCalled();
+@@ -315,6 +308,7 @@ describe( 'Confirm', () => {
+ 		} );
+ 
+ 		it( 'should call the `onCancel` callback if the overlay is clicked', async () => {
++			const user = userEvent.setup();
+ 			const onCancel = jest.fn().mockName( 'onCancel()' );
+ 
+ 			render(
+@@ -329,13 +323,11 @@ describe( 'Confirm', () => {
+ 
+ 			const confirmDialog = screen.getByRole( 'dialog' );
+ 
+-			//The overlay click is handled by detecting an onBlur from the modal frame.
+-			// TODO: replace with `@testing-library/user-event`
+-			fireEvent.blur( confirmDialog );
++			// Disable reason: Semantic queries can’t reach the overlay.
++			// eslint-disable-next-line testing-library/no-node-access
++			await user.click( confirmDialog.parentElement );
+ 
+-			// Wait for a DOM side effect here, so that the `queueBlurCheck` in the
+-			// `useFocusOutside` hook properly executes its timeout task.
+-			await waitFor( () => expect( onCancel ).toHaveBeenCalled() );
++			expect( onCancel ).toHaveBeenCalled();
+ 		} );
+ 
+ 		it( 'should call the `onCancel` callback if the `Escape` key is pressed', async () => {
+diff --git a/packages/components/src/modal/test/index.tsx b/packages/components/src/modal/test/index.tsx
+index c2ab277f721570..d3bd6aea888132 100644
+--- a/packages/components/src/modal/test/index.tsx
++++ b/packages/components/src/modal/test/index.tsx
+@@ -116,6 +116,113 @@ describe( 'Modal', () => {
+ 		expect( opener ).toHaveFocus();
+ 	} );
+ 
++	it( 'should request closing of any non nested modal when opened', async () => {
++		const user = userEvent.setup();
++		const onRequestClose = jest.fn();
++
++		const DismissAdjacent = () => {
++			const [ isShown, setIsShown ] = useState( false );
++			return (
++				<>
++					<Modal onRequestClose={ onRequestClose }>
++						<button onClick={ () => setIsShown( true ) }>💥</button>
++					</Modal>
++					{ isShown && (
++						<Modal onRequestClose={ () => setIsShown( false ) }>
++							<p>Adjacent modal content</p>
++						</Modal>
++					) }
++				</>
++			);
++		};
++		render( <DismissAdjacent /> );
++
++		await user.click( screen.getByRole( 'button', { name: '💥' } ) );
++		expect( onRequestClose ).toHaveBeenCalled();
++	} );
++
++	it( 'should support nested modals', async () => {
++		const user = userEvent.setup();
++		const onRequestClose = jest.fn();
++
++		const NestSupport = () => {
++			const [ isShown, setIsShown ] = useState( false );
++			return (
++				<>
++					<Modal onRequestClose={ onRequestClose }>
++						<button onClick={ () => setIsShown( true ) }>🪆</button>
++						{ isShown && (
++							<Modal onRequestClose={ () => setIsShown( false ) }>
++								<p>Nested modal content</p>
++							</Modal>
++						) }
++					</Modal>
++				</>
++			);
++		};
++		render( <NestSupport /> );
++
++		await user.click( screen.getByRole( 'button', { name: '🪆' } ) );
++		expect( onRequestClose ).not.toHaveBeenCalled();
++	} );
++
++	// TODO enable once nested modals hide outer modals.
++	it.skip( 'should accessibly hide and show siblings including outer modals', async () => {
++		const user = userEvent.setup();
++
++		const AriaDemo = () => {
++			const [ isOuterShown, setIsOuterShown ] = useState( false );
++			const [ isInnerShown, setIsInnerShown ] = useState( false );
++			return (
++				<>
++					<button onClick={ () => setIsOuterShown( true ) }>
++						Start
++					</button>
++					{ isOuterShown && (
++						<Modal
++							onRequestClose={ () => setIsOuterShown( false ) }
++						>
++							<button onClick={ () => setIsInnerShown( true ) }>
++								Nest
++							</button>
++							{ isInnerShown && (
++								<Modal
++									onRequestClose={ () =>
++										setIsInnerShown( false )
++									}
++								>
++									<p>Nested modal content</p>
++								</Modal>
++							) }
++						</Modal>
++					) }
++				</>
++			);
++		};
++		const { container } = render( <AriaDemo /> );
++
++		// Opens outer modal > hides container.
++		await user.click( screen.getByRole( 'button', { name: 'Start' } ) );
++		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
++
++		// Disable reason: No semantic query can reach the overlay.
++		// eslint-disable-next-line testing-library/no-node-access
++		const outer = screen.getByRole( 'dialog' ).parentElement!;
++
++		// Opens inner modal > hides outer modal.
++		await user.click( screen.getByRole( 'button', { name: 'Nest' } ) );
++		expect( outer ).toHaveAttribute( 'aria-hidden', 'true' );
++
++		// Closes inner modal > Unhides outer modal and container stays hidden.
++		await user.keyboard( '[Escape]' );
++		expect( outer ).not.toHaveAttribute( 'aria-hidden' );
++		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
++
++		// Closes outer modal > Unhides container.
++		await user.keyboard( '[Escape]' );
++		expect( container ).not.toHaveAttribute( 'aria-hidden' );
++	} );
++
+ 	it( 'should render `headerActions` React nodes', async () => {
+ 		render(
+ 			<Modal

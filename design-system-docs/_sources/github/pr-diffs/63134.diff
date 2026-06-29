@@ -1,0 +1,114 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 289a1b3f99f6a4..4b6444dd970250 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -41,6 +41,7 @@
+ -   Extract `TimeInput` component from `TimePicker` ([#60613](https://github.com/WordPress/gutenberg/pull/60613)).
+ -   `TimeInput`: Add `label` prop ([#63106](https://github.com/WordPress/gutenberg/pull/63106)).
+ -   Method style type signatures have been changed to function style ([#62718](https://github.com/WordPress/gutenberg/pull/62718)).
++-   `FontSizePicker`: use CustomSelectControl V2 legacy adapter ([#63134](https://github.com/WordPress/gutenberg/pull/63134)).
+ 
+ ## 28.2.0 (2024-06-26)
+ 
+diff --git a/packages/components/src/font-size-picker/font-size-picker-select.tsx b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+index c5dca6bdb37a04..3f0b7a0e54074a 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-select.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-select.tsx
+@@ -6,7 +6,7 @@ import { __, sprintf } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import CustomSelectControl from '../custom-select-control';
++import CustomSelectControl from '../custom-select-control-v2/legacy-component';
+ import { parseQuantityAndUnitFromRawValue } from '../unit-control';
+ import type {
+ 	FontSizePickerSelectProps,
+diff --git a/packages/components/src/font-size-picker/test/index.tsx b/packages/components/src/font-size-picker/test/index.tsx
+index 9bb3b2d8677b69..620d782e3abceb 100644
+--- a/packages/components/src/font-size-picker/test/index.tsx
++++ b/packages/components/src/font-size-picker/test/index.tsx
+@@ -94,7 +94,7 @@ describe( 'FontSizePicker', () => {
+ 			const user = userEvent.setup();
+ 			render( <FontSizePicker fontSizes={ fontSizes } /> );
+ 			await user.click(
+-				screen.getByRole( 'button', { name: 'Font size' } )
++				screen.getByRole( 'combobox', { name: 'Font size' } )
+ 			);
+ 			const options = screen.getAllByRole( 'option' );
+ 			expect( options ).toHaveLength( 8 );
+@@ -148,7 +148,7 @@ describe( 'FontSizePicker', () => {
+ 					/>
+ 				);
+ 				await user.click(
+-					screen.getByRole( 'button', { name: 'Font size' } )
++					screen.getByRole( 'combobox', { name: 'Font size' } )
+ 				);
+ 				await user.click(
+ 					screen.getByRole( 'option', { name: option } )
+@@ -200,7 +200,7 @@ describe( 'FontSizePicker', () => {
+ 			const user = userEvent.setup();
+ 			render( <FontSizePicker fontSizes={ fontSizes } /> );
+ 			await user.click(
+-				screen.getByRole( 'button', { name: 'Font size' } )
++				screen.getByRole( 'combobox', { name: 'Font size' } )
+ 			);
+ 			const options = screen.getAllByRole( 'option' );
+ 			expect( options ).toHaveLength( 8 );
+@@ -225,7 +225,7 @@ describe( 'FontSizePicker', () => {
+ 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
+ 				);
+ 				expect(
+-					screen.getByRole( 'button', { name: 'Font size' } )
++					screen.getByRole( 'combobox', { name: 'Font size' } )
+ 				).toHaveTextContent( option );
+ 			}
+ 		);
+@@ -291,7 +291,7 @@ describe( 'FontSizePicker', () => {
+ 					/>
+ 				);
+ 				await user.click(
+-					screen.getByRole( 'button', { name: 'Font size' } )
++					screen.getByRole( 'combobox', { name: 'Font size' } )
+ 				);
+ 				await user.click(
+ 					screen.getByRole( 'option', { name: option } )
+@@ -509,7 +509,7 @@ describe( 'FontSizePicker', () => {
+ 				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
+ 			);
+ 			await user.click(
+-				screen.getByRole( 'button', { name: 'Font size' } )
++				screen.getByRole( 'combobox', { name: 'Font size' } )
+ 			);
+ 			await user.click(
+ 				screen.getByRole( 'option', { name: 'Custom' } )
+diff --git a/test/e2e/specs/editor/various/font-size-picker.spec.js b/test/e2e/specs/editor/various/font-size-picker.spec.js
+index 544e5d64863fe1..597b458d682e84 100644
+--- a/test/e2e/specs/editor/various/font-size-picker.spec.js
++++ b/test/e2e/specs/editor/various/font-size-picker.spec.js
+@@ -144,7 +144,7 @@ test.describe( 'Font Size Picker', () => {
+ 				.click();
+ 			await page.keyboard.type( 'Paragraph to be made "large"' );
+ 			await page.click(
+-				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
++				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
+ 			);
+ 			await pageUtils.pressKeys( 'ArrowDown', { times: 4 } );
+ 			await page.keyboard.press( 'Enter' );
+@@ -168,7 +168,7 @@ test.describe( 'Font Size Picker', () => {
+ 				'Paragraph with font size reset using tools panel menu'
+ 			);
+ 			await page.click(
+-				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
++				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
+ 			);
+ 			await pageUtils.pressKeys( 'ArrowDown', { times: 3 } );
+ 			await page.keyboard.press( 'Enter' );
+@@ -201,7 +201,7 @@ test.describe( 'Font Size Picker', () => {
+ 				'Paragraph with font size reset using input field'
+ 			);
+ 			await page.click(
+-				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
++				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
+ 			);
+ 			await pageUtils.pressKeys( 'ArrowDown', { times: 2 } );
+ 			await page.keyboard.press( 'Enter' );

@@ -1,0 +1,79 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 113a532082cff2..b9197abed71139 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Bug Fixes
+ 
+ -   `Card`: Add `overflow: clip` to `Card.Root` to prevent child content from overflowing rounded corners ([#76678](https://github.com/WordPress/gutenberg/pull/76678)).
++-   `CollapsibleCard`: do not animate the focus ring when expanding/collapsing the card ([#76459](https://github.com/WordPress/gutenberg/pull/76459)).
+ 
+ ### Internal
+ 
+diff --git a/packages/ui/src/collapsible-card/header.tsx b/packages/ui/src/collapsible-card/header.tsx
+index a1dbb0add52878..fdb7d88a8705e1 100644
+--- a/packages/ui/src/collapsible-card/header.tsx
++++ b/packages/ui/src/collapsible-card/header.tsx
+@@ -35,17 +35,23 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
+ 				nativeButton={ false }
+ 			>
+ 				<div className={ styles[ 'header-content' ] }>{ children }</div>
+-				<div className={ styles[ 'header-trigger-wrapper' ] }>
+-					<Icon
+-						icon={ chevronDown }
++				<div
++					className={ clsx( styles[ 'header-trigger-positioner' ] ) }
++				>
++					<div
+ 						className={ clsx(
+-							styles[ 'header-trigger' ],
++							styles[ 'header-trigger-wrapper' ],
+ 							// While the interactive trigger element is the whole header,
+ 							// the focus ring will be displayed only on the icon to visually
+ 							// emulate it being the button.
+ 							focusStyles[ 'outset-ring--focus-parent-visible' ]
+ 						) }
+-					/>
++					>
++						<Icon
++							icon={ chevronDown }
++							className={ styles[ 'header-trigger' ] }
++						/>
++					</div>
+ 				</div>
+ 			</Collapsible.Trigger>
+ 		);
+diff --git a/packages/ui/src/collapsible-card/style.module.css b/packages/ui/src/collapsible-card/style.module.css
+index 168490e44176bc..bfb5cc3717df30 100644
+--- a/packages/ui/src/collapsible-card/style.module.css
++++ b/packages/ui/src/collapsible-card/style.module.css
+@@ -6,7 +6,7 @@
+ 		min-width: 0;
+ 	}
+ 
+-	.header-trigger-wrapper {
++	.header-trigger-positioner {
+ 		flex-shrink: 0;
+ 		align-self: center;
+ 		/* Prevent the trigger from making the header taller than its content,
+@@ -15,7 +15,9 @@
+ 		overflow: visible;
+ 	}
+ 
+-	.header-trigger {
++	.header-trigger-wrapper {
++		display: flex;
++
+ 		/* Offset by half the button's own height so it visually centers
+ 		   at the wrapper's midpoint (which `align-self: center` places at
+ 		   the vertical center of the header). */
+@@ -23,7 +25,9 @@
+ 
+ 		/* For an outline that looks like `IconButton`'s */
+ 		border-radius: var(--wpds-border-radius-sm);
++	}
+ 
++	.header-trigger {
+ 		@media not (prefers-reduced-motion) {
+ 			transition: rotate 0.15s ease-out;
+ 		}

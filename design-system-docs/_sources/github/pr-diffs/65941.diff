@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6d3714d9cb5db6..48113f874af3a2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ 
+ ### Enhancements
+ 
++-   `Modal`: Modal dialog small improvement for elementShouldBeHidden ([#65941](https://github.com/WordPress/gutenberg/pull/65941)).
+ -   `Tabs`: revamped vertical orientation styles ([#65387](https://github.com/WordPress/gutenberg/pull/65387)).
+ 
+ ## 28.9.0 (2024-10-03)
+diff --git a/packages/components/src/modal/aria-helper.ts b/packages/components/src/modal/aria-helper.ts
+index 6a1d39c0a4ed31..bd11fb71253e1e 100644
+--- a/packages/components/src/modal/aria-helper.ts
++++ b/packages/components/src/modal/aria-helper.ts
+@@ -47,6 +47,7 @@ export function elementShouldBeHidden( element: Element ) {
+ 	const role = element.getAttribute( 'role' );
+ 	return ! (
+ 		element.tagName === 'SCRIPT' ||
++		element.hasAttribute( 'hidden' ) ||
+ 		element.hasAttribute( 'aria-hidden' ) ||
+ 		element.hasAttribute( 'aria-live' ) ||
+ 		( role && LIVE_REGION_ARIA_ROLES.has( role ) )

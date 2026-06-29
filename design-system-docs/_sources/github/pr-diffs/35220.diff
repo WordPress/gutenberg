@@ -1,0 +1,3870 @@
+diff --git a/packages/components/src/color-edit/index.js b/packages/components/src/color-edit/index.js
+index 85926eddbe69b3..e548a5c8c03c30 100644
+--- a/packages/components/src/color-edit/index.js
++++ b/packages/components/src/color-edit/index.js
+@@ -16,7 +16,7 @@ import { edit, close, chevronDown, chevronUp, plus } from '@wordpress/icons';
+  */
+ import Dropdown from '../dropdown';
+ import CircularOptionPicker from '../circular-option-picker';
+-import ColorPicker from '../color-picker';
++import { ColorPicker } from '../color-picker';
+ import Button from '../button';
+ import TextControl from '../text-control';
+ import BaseControl from '../base-control';
+diff --git a/packages/components/src/color-palette/index.js b/packages/components/src/color-palette/index.js
+index 67130f70840d4a..c3e503edd58dd1 100644
+--- a/packages/components/src/color-palette/index.js
++++ b/packages/components/src/color-palette/index.js
+@@ -15,7 +15,7 @@ import { useCallback, useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import ColorPicker from '../color-picker';
++import { ColorPicker } from '../color-picker';
+ import CircularOptionPicker from '../circular-option-picker';
+ 
+ extend( [ namesPlugin, a11yPlugin ] );
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.js.snap b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+index 55ce05c15b7eea..fa0b4d2f0f7cd6 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+@@ -1,89 +1,18 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`] = `
+-<div
+-  className="components-color-picker is-alpha-disabled"
+->
+-  <div
+-    className="components-color-picker__saturation"
+-  >
+-    <Pure(WithInstanceId(Saturation))
+-      hsl={
+-        Object {
+-          "a": 1,
+-          "h": 0,
+-          "l": 50,
+-          "s": 100,
+-        }
+-      }
+-      hsv={
+-        Object {
+-          "a": 1,
+-          "h": 0,
+-          "s": 100,
+-          "v": 100,
+-        }
+-      }
+-      onChange={[Function]}
+-    />
+-  </div>
+-  <div
+-    className="components-color-picker__body"
+-  >
+-    <div
+-      className="components-color-picker__controls"
+-    >
+-      <div
+-        className="components-color-picker__swatch"
+-      >
+-        <div
+-          className="components-color-picker__active"
+-          style={
+-            Object {
+-              "backgroundColor": "rgb(255, 0, 0)",
+-            }
+-          }
+-        />
+-      </div>
+-      <div
+-        className="components-color-picker__toggles"
+-      >
+-        <Pure(WithInstanceId(Hue))
+-          hsl={
+-            Object {
+-              "a": 1,
+-              "h": 0,
+-              "l": 50,
+-              "s": 100,
+-            }
+-          }
+-          onChange={[Function]}
+-        />
+-      </div>
+-    </div>
+-    <Inputs
+-      disableAlpha={true}
+-      hex="#ff0000"
+-      hsl={
+-        Object {
+-          "a": 1,
+-          "h": 0,
+-          "l": 50,
+-          "s": 100,
+-        }
+-      }
+-      onChange={[Function]}
+-      rgb={
+-        Object {
+-          "a": 1,
+-          "b": 0,
+-          "g": 0,
+-          "r": 255,
+-        }
+-      }
+-    />
+-  </div>
+-</div>
++<ColorPicker
++  color={
++    Object {
++      "a": 1,
++      "h": 0,
++      "l": 0.5,
++      "s": 1,
++    }
++  }
++  enableAlpha={false}
++  onChange={[Function]}
++/>
+ `;
+ 
+ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] = `
+diff --git a/packages/components/src/color-picker/README.md b/packages/components/src/color-picker/README.md
+index b5968306916721..efe8728d22bd69 100644
+--- a/packages/components/src/color-picker/README.md
++++ b/packages/components/src/color-picker/README.md
+@@ -1,24 +1,53 @@
+ # ColorPicker
+ 
+-Accessible color picker.
+-
+-_Parts of the source code were derived and modified from [react-color](https://github.com/casesandberg/react-color/), released under the MIT license._
++`ColorPicker` is a color picking component based on `react-colorful`. It lets you pick a color visually or by manipulating the individual RGB(A), HSL(A) and Hex(8) color values.
+ 
+ ## Usage
+ 
+ ```jsx
+-import { ColorPicker } from '@wordpress/components';
+-import { useState } from '@wordpress/element';
+-
+-const MyColorPicker = () => {
+-	const [ color, setColor ] = useState( '#f00' );
++import { ColorPicker } from '@wordpress/components/ui';
+ 
++function Example() {
++	const [color, setColor] = useState();
+ 	return (
+ 		<ColorPicker
+-			color={ color }
+-			onChangeComplete={ ( value ) => setColor( value.hex ) }
+-			disableAlpha
++			color={color}
++			onChange={setColor}
++			enableAlpha
++			defaultValue="#000"
+ 		/>
+ 	);
+-};
++}
+ ```
++
++## Props
++
++### `color`
++
++**Type**: `string`
++
++The current color value to display in the picker. Must be a hex or hex8 string.
++
++### `onChange`
++
++**Type**: `(hex8Color: string) => void`
++
++Fired when the color changes. Always passes a hex8 color string.
++
++### `enableAlpha`
++
++**Type**: `boolean`
++
++Defaults to `false`. When `true` the color picker will display the alpha channel both in the bottom inputs as well as in the color picker itself.
++
++### `defaultValue`
++
++**Type**: `string | undefined`
++
++An optional default value to use for the color picker.
++
++### `copyFormat`
++
++**Type**: `'hex' | 'hsl' | 'rgb' | undefined`
++
++The format to copy when clicking the displayed color format.
+diff --git a/packages/components/src/color-picker/alpha.js b/packages/components/src/color-picker/alpha.js
+deleted file mode 100644
+index 998704ce0f1e4d..00000000000000
+--- a/packages/components/src/color-picker/alpha.js
++++ /dev/null
+@@ -1,194 +0,0 @@
+-/**
+- * Parts of this source were derived and modified from react-color,
+- * released under the MIT license.
+- *
+- * https://github.com/casesandberg/react-color/
+- *
+- * Copyright (c) 2015 Case Sandberg
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to deal
+- * in the Software without restriction, including without limitation the rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+- * THE SOFTWARE.
+- */
+-
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { __ } from '@wordpress/i18n';
+-import { Component, createRef } from '@wordpress/element';
+-import {
+-	TAB,
+-	UP,
+-	DOWN,
+-	RIGHT,
+-	LEFT,
+-	PAGEUP,
+-	PAGEDOWN,
+-	HOME,
+-	END,
+-} from '@wordpress/keycodes';
+-import { pure } from '@wordpress/compose';
+-
+-/**
+- * Internal dependencies
+- */
+-import { calculateAlphaChange } from './utils';
+-
+-export class Alpha extends Component {
+-	constructor() {
+-		super( ...arguments );
+-
+-		this.container = createRef();
+-		this.increase = this.increase.bind( this );
+-		this.decrease = this.decrease.bind( this );
+-		this.handleChange = this.handleChange.bind( this );
+-		this.handleMouseDown = this.handleMouseDown.bind( this );
+-		this.handleMouseUp = this.handleMouseUp.bind( this );
+-		this.handleKeyDown = this.handleKeyDown.bind( this );
+-	}
+-
+-	componentWillUnmount() {
+-		this.unbindEventListeners();
+-	}
+-
+-	increase( amount = 0.01 ) {
+-		const { hsl, onChange = noop } = this.props;
+-		amount = parseInt( amount * 100, 10 );
+-		const change = {
+-			h: hsl.h,
+-			s: hsl.s,
+-			l: hsl.l,
+-			a: ( parseInt( hsl.a * 100, 10 ) + amount ) / 100,
+-			source: 'rgb',
+-		};
+-		onChange( change );
+-	}
+-
+-	decrease( amount = 0.01 ) {
+-		const { hsl, onChange = noop } = this.props;
+-		const intValue =
+-			parseInt( hsl.a * 100, 10 ) - parseInt( amount * 100, 10 );
+-		const change = {
+-			h: hsl.h,
+-			s: hsl.s,
+-			l: hsl.l,
+-			a: hsl.a <= amount ? 0 : intValue / 100,
+-			source: 'rgb',
+-		};
+-		onChange( change );
+-	}
+-
+-	handleChange( e ) {
+-		const { onChange = noop } = this.props;
+-		const change = calculateAlphaChange(
+-			e,
+-			this.props,
+-			this.container.current
+-		);
+-		if ( change ) {
+-			onChange( change, e );
+-		}
+-	}
+-
+-	handleMouseDown( e ) {
+-		this.handleChange( e );
+-		window.addEventListener( 'mousemove', this.handleChange );
+-		window.addEventListener( 'mouseup', this.handleMouseUp );
+-	}
+-
+-	handleMouseUp() {
+-		this.unbindEventListeners();
+-	}
+-
+-	unbindEventListeners() {
+-		window.removeEventListener( 'mousemove', this.handleChange );
+-		window.removeEventListener( 'mouseup', this.handleMouseUp );
+-	}
+-
+-	handleKeyDown( event ) {
+-		const { keyCode, shiftKey } = event;
+-		const shortcuts = {
+-			[ UP ]: () => this.increase( shiftKey ? 0.1 : 0.01 ),
+-			[ RIGHT ]: () => this.increase( shiftKey ? 0.1 : 0.01 ),
+-			[ PAGEUP ]: () => this.increase( 0.1 ),
+-			[ END ]: () => this.increase( 1 ),
+-			[ DOWN ]: () => this.decrease( shiftKey ? 0.1 : 0.01 ),
+-			[ LEFT ]: () => this.decrease( shiftKey ? 0.1 : 0.01 ),
+-			[ PAGEDOWN ]: () => this.decrease( 0.1 ),
+-			[ HOME ]: () => this.decrease( 1 ),
+-		};
+-
+-		for ( const code in shortcuts ) {
+-			if ( code === String( keyCode ) ) {
+-				shortcuts[ keyCode ]();
+-			}
+-		}
+-
+-		if ( keyCode !== TAB ) {
+-			event.preventDefault();
+-		}
+-	}
+-
+-	render() {
+-		const { rgb } = this.props;
+-		const rgbString = `${ rgb.r },${ rgb.g },${ rgb.b }`;
+-		const gradient = {
+-			background: `linear-gradient(to right, rgba(${ rgbString }, 0) 0%, rgba(${ rgbString }, 1) 100%)`,
+-		};
+-		const pointerLocation = { left: `${ rgb.a * 100 }%` };
+-
+-		return (
+-			<div className="components-color-picker__alpha">
+-				<div
+-					className="components-color-picker__alpha-gradient"
+-					style={ gradient }
+-				/>
+-				{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
+-				<div
+-					className="components-color-picker__alpha-bar"
+-					ref={ this.container }
+-					onMouseDown={ this.handleMouseDown }
+-					onTouchMove={ this.handleChange }
+-					onTouchStart={ this.handleChange }
+-				>
+-					<div
+-						tabIndex="0"
+-						role="slider"
+-						aria-valuemax="1"
+-						aria-valuemin="0"
+-						aria-valuenow={ rgb.a }
+-						aria-orientation="horizontal"
+-						aria-label={ __(
+-							'Alpha value, from 0 (transparent) to 1 (fully opaque).'
+-						) }
+-						className="components-color-picker__alpha-pointer"
+-						style={ pointerLocation }
+-						onKeyDown={ this.handleKeyDown }
+-					/>
+-				</div>
+-				{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
+-			</div>
+-		);
+-	}
+-}
+-
+-export default pure( Alpha );
+diff --git a/packages/components/src/ui/color-picker/color-display.tsx b/packages/components/src/color-picker/color-display.tsx
+similarity index 95%
+rename from packages/components/src/ui/color-picker/color-display.tsx
+rename to packages/components/src/color-picker/color-display.tsx
+index 16a83aa1941d62..7928ec372df285 100644
+--- a/packages/components/src/ui/color-picker/color-display.tsx
++++ b/packages/components/src/color-picker/color-display.tsx
+@@ -13,11 +13,11 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import { Text } from '../../text';
+-import { Flex, FlexItem } from '../../flex';
+-import { Tooltip } from '../tooltip';
++import { Text } from '../text';
++import { Flex, FlexItem } from '../flex';
++import { Tooltip } from '../ui/tooltip';
+ import type { ColorType } from './types';
+-import { space } from '../utils/space';
++import { space } from '../ui/utils/space';
+ 
+ interface ColorDisplayProps {
+ 	color: ColorFormats.HSLA;
+diff --git a/packages/components/src/ui/color-picker/color-input.tsx b/packages/components/src/color-picker/color-input.tsx
+similarity index 100%
+rename from packages/components/src/ui/color-picker/color-input.tsx
+rename to packages/components/src/color-picker/color-input.tsx
+diff --git a/packages/components/src/ui/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+similarity index 95%
+rename from packages/components/src/ui/color-picker/component.tsx
+rename to packages/components/src/color-picker/component.tsx
+index 984ef6d30b39fb..a057f51adf21f4 100644
+--- a/packages/components/src/ui/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -20,9 +20,9 @@ import {
+ 	useContextSystem,
+ 	contextConnect,
+ 	WordPressComponentProps,
+-} from '../context';
+-import { HStack } from '../../h-stack';
+-import { Spacer } from '../../spacer';
++} from '../ui/context';
++import { HStack } from '../h-stack';
++import { Spacer } from '../spacer';
+ import {
+ 	ColorfulWrapper,
+ 	SelectControl,
+@@ -32,7 +32,7 @@ import {
+ import { ColorDisplay } from './color-display';
+ import { ColorInput } from './color-input';
+ import { Picker } from './picker';
+-import { useControlledValue } from '../../utils/hooks';
++import { useControlledValue } from '../utils/hooks';
+ 
+ import type { ColorType } from './types';
+ 
+diff --git a/packages/components/src/ui/color-picker/hex-input.tsx b/packages/components/src/color-picker/hex-input.tsx
+similarity index 91%
+rename from packages/components/src/ui/color-picker/hex-input.tsx
+rename to packages/components/src/color-picker/hex-input.tsx
+index 8891decf133d90..e0de70a4f72188 100644
+--- a/packages/components/src/ui/color-picker/hex-input.tsx
++++ b/packages/components/src/color-picker/hex-input.tsx
+@@ -11,9 +11,9 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import { Text } from '../../text';
+-import { Spacer } from '../../spacer';
+-import { space } from '../utils/space';
++import { Text } from '../text';
++import { Spacer } from '../spacer';
++import { space } from '../ui/utils/space';
+ import { ColorHexInputControl } from './styles';
+ 
+ interface HexInputProps {
+diff --git a/packages/components/src/ui/color-picker/hsl-input.tsx b/packages/components/src/color-picker/hsl-input.tsx
+similarity index 100%
+rename from packages/components/src/ui/color-picker/hsl-input.tsx
+rename to packages/components/src/color-picker/hsl-input.tsx
+diff --git a/packages/components/src/color-picker/hue.js b/packages/components/src/color-picker/hue.js
+deleted file mode 100644
+index b2441f7214a760..00000000000000
+--- a/packages/components/src/color-picker/hue.js
++++ /dev/null
+@@ -1,192 +0,0 @@
+-/**
+- * Parts of this source were derived and modified from react-color,
+- * released under the MIT license.
+- *
+- * https://github.com/casesandberg/react-color/
+- *
+- * Copyright (c) 2015 Case Sandberg
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to deal
+- * in the Software without restriction, including without limitation the rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+- * THE SOFTWARE.
+- */
+-
+-/**
+- * External dependencies
+- */
+-import { noop } from 'lodash';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { compose, pure, withInstanceId } from '@wordpress/compose';
+-import { __ } from '@wordpress/i18n';
+-import { Component, createRef } from '@wordpress/element';
+-import {
+-	TAB,
+-	UP,
+-	DOWN,
+-	RIGHT,
+-	LEFT,
+-	PAGEUP,
+-	PAGEDOWN,
+-	HOME,
+-	END,
+-} from '@wordpress/keycodes';
+-
+-/**
+- * Internal dependencies
+- */
+-import { calculateHueChange } from './utils';
+-import { VisuallyHidden } from '../visually-hidden';
+-
+-export class Hue extends Component {
+-	constructor() {
+-		super( ...arguments );
+-
+-		this.container = createRef();
+-		this.increase = this.increase.bind( this );
+-		this.decrease = this.decrease.bind( this );
+-		this.handleChange = this.handleChange.bind( this );
+-		this.handleMouseDown = this.handleMouseDown.bind( this );
+-		this.handleMouseUp = this.handleMouseUp.bind( this );
+-		this.handleKeyDown = this.handleKeyDown.bind( this );
+-	}
+-
+-	componentWillUnmount() {
+-		this.unbindEventListeners();
+-	}
+-
+-	increase( amount = 1 ) {
+-		const { hsl, onChange = noop } = this.props;
+-		const change = {
+-			h: hsl.h + amount >= 359 ? 359 : hsl.h + amount,
+-			s: hsl.s,
+-			l: hsl.l,
+-			a: hsl.a,
+-			source: 'rgb',
+-		};
+-		onChange( change );
+-	}
+-
+-	decrease( amount = 1 ) {
+-		const { hsl, onChange = noop } = this.props;
+-		const change = {
+-			h: hsl.h <= amount ? 0 : hsl.h - amount,
+-			s: hsl.s,
+-			l: hsl.l,
+-			a: hsl.a,
+-			source: 'rgb',
+-		};
+-		onChange( change );
+-	}
+-
+-	handleChange( e ) {
+-		const { onChange = noop } = this.props;
+-		const change = calculateHueChange(
+-			e,
+-			this.props,
+-			this.container.current
+-		);
+-		if ( change ) {
+-			onChange( change, e );
+-		}
+-	}
+-
+-	handleMouseDown( e ) {
+-		this.handleChange( e );
+-		window.addEventListener( 'mousemove', this.handleChange );
+-		window.addEventListener( 'mouseup', this.handleMouseUp );
+-	}
+-
+-	handleMouseUp() {
+-		this.unbindEventListeners();
+-	}
+-
+-	unbindEventListeners() {
+-		window.removeEventListener( 'mousemove', this.handleChange );
+-		window.removeEventListener( 'mouseup', this.handleMouseUp );
+-	}
+-
+-	handleKeyDown( event ) {
+-		const { keyCode, shiftKey } = event;
+-		const shortcuts = {
+-			[ UP ]: () => this.increase( shiftKey ? 10 : 1 ),
+-			[ RIGHT ]: () => this.increase( shiftKey ? 10 : 1 ),
+-			[ PAGEUP ]: () => this.increase( 10 ),
+-			[ END ]: () => this.increase( 359 ),
+-			[ DOWN ]: () => this.decrease( shiftKey ? 10 : 1 ),
+-			[ LEFT ]: () => this.decrease( shiftKey ? 10 : 1 ),
+-			[ PAGEDOWN ]: () => this.decrease( 10 ),
+-			[ HOME ]: () => this.decrease( 359 ),
+-		};
+-
+-		for ( const code in shortcuts ) {
+-			if ( code === String( keyCode ) ) {
+-				shortcuts[ keyCode ]();
+-			}
+-		}
+-
+-		if ( keyCode !== TAB ) {
+-			event.preventDefault();
+-		}
+-	}
+-
+-	render() {
+-		const { hsl = {}, instanceId } = this.props;
+-		const pointerLocation = { left: `${ ( hsl.h * 100 ) / 360 }%` };
+-
+-		return (
+-			<div className="components-color-picker__hue">
+-				<div className="components-color-picker__hue-gradient" />
+-				{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
+-				<div
+-					className="components-color-picker__hue-bar"
+-					ref={ this.container }
+-					onMouseDown={ this.handleMouseDown }
+-					onTouchMove={ this.handleChange }
+-					onTouchStart={ this.handleChange }
+-				>
+-					<div
+-						tabIndex="0"
+-						role="slider"
+-						aria-valuemax="1"
+-						aria-valuemin="359"
+-						aria-valuenow={ hsl.h }
+-						aria-orientation="horizontal"
+-						aria-label={ __(
+-							'Hue value in degrees, from 0 to 359.'
+-						) }
+-						aria-describedby={ `components-color-picker__hue-description-${ instanceId }` }
+-						className="components-color-picker__hue-pointer"
+-						style={ pointerLocation }
+-						onKeyDown={ this.handleKeyDown }
+-					/>
+-					<VisuallyHidden
+-						as="p"
+-						id={ `components-color-picker__hue-description-${ instanceId }` }
+-					>
+-						{ __( 'Move the arrow left or right to change hue.' ) }
+-					</VisuallyHidden>
+-				</div>
+-				{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
+-			</div>
+-		);
+-	}
+-}
+-
+-export default compose( pure, withInstanceId )( Hue );
+diff --git a/packages/components/src/color-picker/index.js b/packages/components/src/color-picker/index.js
+deleted file mode 100644
+index 010713aa35f413..00000000000000
+--- a/packages/components/src/color-picker/index.js
++++ /dev/null
+@@ -1,264 +0,0 @@
+-/**
+- * Parts of this source were derived and modified from react-color,
+- * released under the MIT license.
+- *
+- * https://github.com/casesandberg/react-color/
+- *
+- * Copyright (c) 2015 Case Sandberg
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to deal
+- * in the Software without restriction, including without limitation the rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+- * THE SOFTWARE.
+- */
+-
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-import { debounce, noop, partial } from 'lodash';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { Component } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import Alpha from './alpha';
+-import Hue from './hue';
+-import Inputs from './inputs';
+-import Saturation from './saturation';
+-import { colorToState, simpleCheckForValidColor, isValidHex } from './utils';
+-
+-const toLowerCase = ( value ) => String( value ).toLowerCase();
+-const isValueEmpty = ( data ) => {
+-	if ( data.source === 'hex' && data.hex === undefined ) {
+-		return true;
+-	}
+-
+-	if (
+-		data.source === 'hsl' &&
+-		( data.h === undefined || data.s === undefined || data.l === undefined )
+-	) {
+-		return true;
+-	}
+-
+-	/**
+-	 * Check that if source is `rgb`:
+-	 * `r`, `g` or `b` properties are not undefined
+-	 * OR (||) `h`, `s`, `v` or `a` properties are not undefined
+-	 * OR (||) `h`, `s`, `l` or `a` properties are not undefined
+-	 *
+-	 * before it was checking with NOT(!) statement witch for `0` (bool|int) values returns `true`
+-	 * this is a typecasting issue only visible for hex values that derive from #000000
+-	 */
+-	return (
+-		data.source === 'rgb' &&
+-		( data.r === undefined ||
+-			data.g === undefined ||
+-			data.b === undefined ) &&
+-		( data.h === undefined ||
+-			data.s === undefined ||
+-			data.v === undefined ||
+-			data.a === undefined ) &&
+-		( data.h === undefined ||
+-			data.s === undefined ||
+-			data.l === undefined ||
+-			data.a === undefined )
+-	);
+-};
+-
+-const isValidColor = ( colors ) =>
+-	colors.hex ? isValidHex( colors.hex ) : simpleCheckForValidColor( colors );
+-
+-/**
+- * Function that creates the new color object
+- * from old data and the new value.
+- *
+- * @param {Object}        oldColors          The old color object.
+- * @param {string}        oldColors.hex
+- * @param {Object}        oldColors.rgb
+- * @param {number}        oldColors.rgb.r
+- * @param {number}        oldColors.rgb.g
+- * @param {number}        oldColors.rgb.b
+- * @param {number}        oldColors.rgb.a
+- * @param {Object}        oldColors.hsl
+- * @param {number}        oldColors.hsl.h
+- * @param {number}        oldColors.hsl.s
+- * @param {number}        oldColors.hsl.l
+- * @param {number}        oldColors.hsl.a
+- * @param {string}        oldColors.draftHex Same format as oldColors.hex
+- * @param {Object}        oldColors.draftRgb Same format as oldColors.rgb
+- * @param {Object}        oldColors.draftHsl Same format as oldColors.hsl
+- * @param {Object}        data               Data containing the new value to update.
+- * @param {Object}        data.source        One of `hex`, `rgb`, `hsl`.
+- * @param {string|number} data.value         Value to update.
+- * @param {string}        data.valueKey      Depends on `data.source` values:
+- *                                           - when source = `rgb`, valuKey can be `r`, `g`, `b`, or `a`.
+- *                                           - when source = `hsl`, valuKey can be `h`, `s`, `l`, or `a`.
+- * @return {Object} A new color object for a specific source. For example:
+- * { source: 'rgb', r: 1, g: 2, b:3, a:0 }
+- */
+-const dataToColors = ( oldColors, { source, valueKey, value } ) => {
+-	if ( source === 'hex' ) {
+-		return {
+-			source,
+-			[ source ]: value,
+-		};
+-	}
+-	return {
+-		source,
+-		...{ ...oldColors[ source ], ...{ [ valueKey ]: value } },
+-	};
+-};
+-
+-export default class ColorPicker extends Component {
+-	constructor( { color = '0071a1' } ) {
+-		super( ...arguments );
+-		const colors = colorToState( color );
+-		this.state = {
+-			...colors,
+-			draftHex: toLowerCase( colors.hex ),
+-			draftRgb: colors.rgb,
+-			draftHsl: colors.hsl,
+-		};
+-		this.commitValues = this.commitValues.bind( this );
+-		this.setDraftValues = this.setDraftValues.bind( this );
+-		this.resetDraftValues = this.resetDraftValues.bind( this );
+-		this.handleInputChange = this.handleInputChange.bind( this );
+-	}
+-
+-	commitValues( data ) {
+-		const { oldHue, onChangeComplete = noop } = this.props;
+-
+-		if ( isValidColor( data ) ) {
+-			const colors = colorToState( data, data.h || oldHue );
+-			this.setState(
+-				{
+-					...colors,
+-					draftHex: toLowerCase( colors.hex ),
+-					draftHsl: colors.hsl,
+-					draftRgb: colors.rgb,
+-				},
+-				debounce( partial( onChangeComplete, colors ), 100 )
+-			);
+-		}
+-	}
+-
+-	resetDraftValues() {
+-		this.setState( {
+-			draftHex: this.state.hex,
+-			draftHsl: this.state.hsl,
+-			draftRgb: this.state.rgb,
+-		} );
+-	}
+-
+-	setDraftValues( data ) {
+-		switch ( data.source ) {
+-			case 'hex':
+-				this.setState( { draftHex: toLowerCase( data.hex ) } );
+-				break;
+-			case 'rgb':
+-				this.setState( { draftRgb: data } );
+-				break;
+-			case 'hsl':
+-				this.setState( { draftHsl: data } );
+-				break;
+-		}
+-	}
+-
+-	handleInputChange( data ) {
+-		switch ( data.state ) {
+-			case 'reset':
+-				this.resetDraftValues();
+-				break;
+-			case 'commit':
+-				const colors = dataToColors( this.state, data );
+-				if ( ! isValueEmpty( colors ) ) {
+-					this.commitValues( colors );
+-				}
+-				break;
+-			case 'draft':
+-				this.setDraftValues( dataToColors( this.state, data ) );
+-				break;
+-		}
+-	}
+-
+-	render() {
+-		const { className, disableAlpha } = this.props;
+-		const {
+-			color,
+-			hsl,
+-			hsv,
+-			rgb,
+-			draftHex,
+-			draftHsl,
+-			draftRgb,
+-		} = this.state;
+-		const classes = classnames( className, {
+-			'components-color-picker': true,
+-			'is-alpha-disabled': disableAlpha,
+-			'is-alpha-enabled': ! disableAlpha,
+-		} );
+-
+-		return (
+-			<div className={ classes }>
+-				<div className="components-color-picker__saturation">
+-					<Saturation
+-						hsl={ hsl }
+-						hsv={ hsv }
+-						onChange={ this.commitValues }
+-					/>
+-				</div>
+-
+-				<div className="components-color-picker__body">
+-					<div className="components-color-picker__controls">
+-						<div className="components-color-picker__swatch">
+-							<div
+-								className="components-color-picker__active"
+-								style={ {
+-									backgroundColor:
+-										color && color.toRgbString(),
+-								} }
+-							/>
+-						</div>
+-
+-						<div className="components-color-picker__toggles">
+-							<Hue hsl={ hsl } onChange={ this.commitValues } />
+-							{ disableAlpha ? null : (
+-								<Alpha
+-									rgb={ rgb }
+-									hsl={ hsl }
+-									onChange={ this.commitValues }
+-								/>
+-							) }
+-						</div>
+-					</div>
+-
+-					<Inputs
+-						rgb={ draftRgb }
+-						hsl={ draftHsl }
+-						hex={ draftHex }
+-						onChange={ this.handleInputChange }
+-						disableAlpha={ disableAlpha }
+-					/>
+-				</div>
+-			</div>
+-		);
+-	}
+-}
+diff --git a/packages/components/src/color-picker/index.native.js b/packages/components/src/color-picker/index.native.js
+index 72bf60d19d5a25..c740d73a648971 100644
+--- a/packages/components/src/color-picker/index.native.js
++++ b/packages/components/src/color-picker/index.native.js
+@@ -205,4 +205,4 @@ function ColorPicker( {
+ 	);
+ }
+ 
+-export default ColorPicker;
++export { ColorPicker };
+diff --git a/packages/components/src/ui/color-picker/index.ts b/packages/components/src/color-picker/index.ts
+similarity index 66%
+rename from packages/components/src/ui/color-picker/index.ts
+rename to packages/components/src/color-picker/index.ts
+index de5f98ce4ebc0a..876ebb6af499fd 100644
+--- a/packages/components/src/ui/color-picker/index.ts
++++ b/packages/components/src/color-picker/index.ts
+@@ -1 +1,4 @@
++/**
++ * Internal dependencies
++ */
+ export { LegacyAdapter as ColorPicker } from './legacy-adapter';
+diff --git a/packages/components/src/ui/color-picker/input-with-slider.tsx b/packages/components/src/color-picker/input-with-slider.tsx
+similarity index 86%
+rename from packages/components/src/ui/color-picker/input-with-slider.tsx
+rename to packages/components/src/color-picker/input-with-slider.tsx
+index cbccd3d6cf76c5..a38f600a8bf63b 100644
+--- a/packages/components/src/ui/color-picker/input-with-slider.tsx
++++ b/packages/components/src/color-picker/input-with-slider.tsx
+@@ -1,10 +1,10 @@
+ /**
+  * Internal dependencies
+  */
+-import { HStack } from '../../h-stack';
+-import { Text } from '../../text';
+-import { Spacer } from '../../spacer';
+-import { space } from '../utils/space';
++import { HStack } from '../h-stack';
++import { Text } from '../text';
++import { Spacer } from '../spacer';
++import { space } from '../ui/utils/space';
+ import { RangeControl, NumberControlWrapper } from './styles';
+ 
+ interface InputWithSliderProps {
+diff --git a/packages/components/src/color-picker/inputs.js b/packages/components/src/color-picker/inputs.js
+deleted file mode 100644
+index eb649795047da3..00000000000000
+--- a/packages/components/src/color-picker/inputs.js
++++ /dev/null
+@@ -1,305 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { omit } from 'lodash';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { speak } from '@wordpress/a11y';
+-import { __ } from '@wordpress/i18n';
+-import { Component } from '@wordpress/element';
+-import { DOWN, ENTER, UP } from '@wordpress/keycodes';
+-import { pure } from '@wordpress/compose';
+-import { chevronDown } from '@wordpress/icons';
+-
+-/**
+- * Internal dependencies
+- */
+-import Button from '../button';
+-import TextControl from '../text-control';
+-import { VisuallyHidden } from '../visually-hidden';
+-import { isValidHex } from './utils';
+-
+-/* Wrapper for TextControl, only used to handle intermediate state while typing. */
+-export class Input extends Component {
+-	constructor() {
+-		super( ...arguments );
+-		this.handleBlur = this.handleBlur.bind( this );
+-		this.handleChange = this.handleChange.bind( this );
+-		this.handleKeyDown = this.handleKeyDown.bind( this );
+-	}
+-
+-	handleBlur() {
+-		const { value, valueKey, onChange, source } = this.props;
+-		onChange( {
+-			source,
+-			state: 'commit',
+-			value,
+-			valueKey,
+-		} );
+-	}
+-
+-	handleChange( value ) {
+-		const { valueKey, onChange, source } = this.props;
+-		if ( value.length > 4 && isValidHex( value ) ) {
+-			onChange( {
+-				source,
+-				state: 'commit',
+-				value,
+-				valueKey,
+-			} );
+-		} else {
+-			onChange( {
+-				source,
+-				state: 'draft',
+-				value,
+-				valueKey,
+-			} );
+-		}
+-	}
+-
+-	handleKeyDown( { keyCode } ) {
+-		if ( keyCode !== ENTER && keyCode !== UP && keyCode !== DOWN ) {
+-			return;
+-		}
+-		const { value, valueKey, onChange, source } = this.props;
+-		onChange( {
+-			source,
+-			state: 'commit',
+-			value,
+-			valueKey,
+-		} );
+-	}
+-
+-	render() {
+-		const { label, value, ...props } = this.props;
+-		return (
+-			<TextControl
+-				className="components-color-picker__inputs-field"
+-				label={ label }
+-				value={ value }
+-				onChange={ ( newValue ) => this.handleChange( newValue ) }
+-				onBlur={ this.handleBlur }
+-				onKeyDown={ this.handleKeyDown }
+-				{ ...omit( props, [ 'onChange', 'valueKey', 'source' ] ) }
+-			/>
+-		);
+-	}
+-}
+-
+-const PureButton = pure( Button );
+-
+-export class Inputs extends Component {
+-	constructor( { hsl } ) {
+-		super( ...arguments );
+-
+-		const view = hsl.a === 1 ? 'hex' : 'rgb';
+-		this.state = { view };
+-
+-		this.toggleViews = this.toggleViews.bind( this );
+-		this.resetDraftValues = this.resetDraftValues.bind( this );
+-		this.handleChange = this.handleChange.bind( this );
+-		this.normalizeValue = this.normalizeValue.bind( this );
+-	}
+-
+-	static getDerivedStateFromProps( props, state ) {
+-		if ( props.hsl.a !== 1 && state.view === 'hex' ) {
+-			return { view: 'rgb' };
+-		}
+-		return null;
+-	}
+-
+-	toggleViews() {
+-		if ( this.state.view === 'hex' ) {
+-			this.setState( { view: 'rgb' }, this.resetDraftValues );
+-
+-			speak( __( 'RGB mode active' ) );
+-		} else if ( this.state.view === 'rgb' ) {
+-			this.setState( { view: 'hsl' }, this.resetDraftValues );
+-
+-			speak( __( 'Hue/saturation/lightness mode active' ) );
+-		} else if ( this.state.view === 'hsl' ) {
+-			if ( this.props.hsl.a === 1 ) {
+-				this.setState( { view: 'hex' }, this.resetDraftValues );
+-
+-				speak( __( 'Hex color mode active' ) );
+-			} else {
+-				this.setState( { view: 'rgb' }, this.resetDraftValues );
+-
+-				speak( __( 'RGB mode active' ) );
+-			}
+-		}
+-	}
+-
+-	resetDraftValues() {
+-		return this.props.onChange( {
+-			state: 'reset',
+-		} );
+-	}
+-
+-	normalizeValue( valueKey, value ) {
+-		if ( valueKey !== 'a' ) {
+-			return value;
+-		}
+-
+-		if ( value < 0 ) {
+-			return 0;
+-		} else if ( value > 1 ) {
+-			return 1;
+-		}
+-		return Math.round( value * 100 ) / 100;
+-	}
+-
+-	handleChange( { source, state, value, valueKey } ) {
+-		this.props.onChange( {
+-			source,
+-			state,
+-			valueKey,
+-			value: this.normalizeValue( valueKey, value ),
+-		} );
+-	}
+-
+-	renderFields() {
+-		const { disableAlpha = false } = this.props;
+-		if ( this.state.view === 'hex' ) {
+-			return (
+-				<div className="components-color-picker__inputs-fields">
+-					<Input
+-						source={ this.state.view }
+-						label={ __( 'Color value in hexadecimal' ) }
+-						valueKey="hex"
+-						value={ this.props.hex }
+-						onChange={ this.handleChange }
+-					/>
+-				</div>
+-			);
+-		} else if ( this.state.view === 'rgb' ) {
+-			const legend = disableAlpha
+-				? __( 'Color value in RGB' )
+-				: __( 'Color value in RGBA' );
+-			return (
+-				<fieldset>
+-					<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
+-					<div className="components-color-picker__inputs-fields">
+-						<Input
+-							source={ this.state.view }
+-							label="r"
+-							valueKey="r"
+-							value={ this.props.rgb.r }
+-							onChange={ this.handleChange }
+-							type="number"
+-							min="0"
+-							max="255"
+-						/>
+-						<Input
+-							source={ this.state.view }
+-							label="g"
+-							valueKey="g"
+-							value={ this.props.rgb.g }
+-							onChange={ this.handleChange }
+-							type="number"
+-							min="0"
+-							max="255"
+-						/>
+-						<Input
+-							source={ this.state.view }
+-							label="b"
+-							valueKey="b"
+-							value={ this.props.rgb.b }
+-							onChange={ this.handleChange }
+-							type="number"
+-							min="0"
+-							max="255"
+-						/>
+-						{ disableAlpha ? null : (
+-							<Input
+-								source={ this.state.view }
+-								label="a"
+-								valueKey="a"
+-								value={ this.props.rgb.a }
+-								onChange={ this.handleChange }
+-								type="number"
+-								min="0"
+-								max="1"
+-								step="0.01"
+-							/>
+-						) }
+-					</div>
+-				</fieldset>
+-			);
+-		} else if ( this.state.view === 'hsl' ) {
+-			const legend = disableAlpha
+-				? __( 'Color value in HSL' )
+-				: __( 'Color value in HSLA' );
+-			return (
+-				<fieldset>
+-					<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
+-					<div className="components-color-picker__inputs-fields">
+-						<Input
+-							source={ this.state.view }
+-							label="h"
+-							valueKey="h"
+-							value={ this.props.hsl.h }
+-							onChange={ this.handleChange }
+-							type="number"
+-							min="0"
+-							max="359"
+-						/>
+-						<Input
+-							source={ this.state.view }
+-							label="s"
+-							valueKey="s"
+-							value={ this.props.hsl.s }
+-							onChange={ this.handleChange }
+-							type="number"
+-							min="0"
+-							max="100"
+-						/>
+-						<Input
+-							source={ this.state.view }
+-							label="l"
+-							valueKey="l"
+-							value={ this.props.hsl.l }
+-							onChange={ this.handleChange }
+-							type="number"
+-							min="0"
+-							max="100"
+-						/>
+-						{ disableAlpha ? null : (
+-							<Input
+-								source={ this.state.view }
+-								label="a"
+-								valueKey="a"
+-								value={ this.props.hsl.a }
+-								onChange={ this.handleChange }
+-								type="number"
+-								min="0"
+-								max="1"
+-								step="0.05"
+-							/>
+-						) }
+-					</div>
+-				</fieldset>
+-			);
+-		}
+-	}
+-
+-	render() {
+-		return (
+-			<div className="components-color-picker__inputs-wrapper">
+-				{ this.renderFields() }
+-				<div className="components-color-picker__inputs-toggle-wrapper">
+-					<PureButton
+-						className="components-color-picker__inputs-toggle"
+-						icon={ chevronDown }
+-						label={ __( 'Change color format' ) }
+-						onClick={ this.toggleViews }
+-					/>
+-				</div>
+-			</div>
+-		);
+-	}
+-}
+-
+-export default Inputs;
+diff --git a/packages/components/src/ui/color-picker/legacy-adapter.tsx b/packages/components/src/color-picker/legacy-adapter.tsx
+similarity index 100%
+rename from packages/components/src/ui/color-picker/legacy-adapter.tsx
+rename to packages/components/src/color-picker/legacy-adapter.tsx
+diff --git a/packages/components/src/ui/color-picker/picker.tsx b/packages/components/src/color-picker/picker.tsx
+similarity index 100%
+rename from packages/components/src/ui/color-picker/picker.tsx
+rename to packages/components/src/color-picker/picker.tsx
+diff --git a/packages/components/src/ui/color-picker/rgb-input.tsx b/packages/components/src/color-picker/rgb-input.tsx
+similarity index 100%
+rename from packages/components/src/ui/color-picker/rgb-input.tsx
+rename to packages/components/src/color-picker/rgb-input.tsx
+diff --git a/packages/components/src/color-picker/saturation.js b/packages/components/src/color-picker/saturation.js
+deleted file mode 100644
+index 56705dd0f35a42..00000000000000
+--- a/packages/components/src/color-picker/saturation.js
++++ /dev/null
+@@ -1,201 +0,0 @@
+-/**
+- * Parts of this source were derived and modified from react-color,
+- * released under the MIT license.
+- *
+- * https://github.com/casesandberg/react-color/
+- *
+- * Copyright (c) 2015 Case Sandberg
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to deal
+- * in the Software without restriction, including without limitation the rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+- * THE SOFTWARE.
+- */
+-
+-/**
+- * External dependencies
+- */
+-import { clamp, noop, throttle } from 'lodash';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { __ } from '@wordpress/i18n';
+-import { Component, createRef } from '@wordpress/element';
+-import {
+-	TAB,
+-	UP,
+-	DOWN,
+-	RIGHT,
+-	LEFT,
+-	PAGEUP,
+-	PAGEDOWN,
+-	HOME,
+-	END,
+-} from '@wordpress/keycodes';
+-import { compose, pure, withInstanceId } from '@wordpress/compose';
+-
+-/**
+- * Internal dependencies
+- */
+-import { calculateSaturationChange } from './utils';
+-import Button from '../button';
+-import { VisuallyHidden } from '../visually-hidden';
+-
+-export class Saturation extends Component {
+-	constructor( props ) {
+-		super( props );
+-
+-		this.throttle = throttle( ( fn, data, e ) => {
+-			fn( data, e );
+-		}, 50 );
+-
+-		this.container = createRef();
+-		this.saturate = this.saturate.bind( this );
+-		this.brighten = this.brighten.bind( this );
+-		this.handleChange = this.handleChange.bind( this );
+-		this.handleMouseDown = this.handleMouseDown.bind( this );
+-		this.handleMouseUp = this.handleMouseUp.bind( this );
+-		this.handleKeyDown = this.handleKeyDown.bind( this );
+-	}
+-
+-	componentWillUnmount() {
+-		this.throttle.cancel();
+-		this.unbindEventListeners();
+-	}
+-
+-	saturate( amount = 0.01 ) {
+-		const { hsv, onChange = noop } = this.props;
+-		const intSaturation = clamp(
+-			hsv.s + Math.round( amount * 100 ),
+-			0,
+-			100
+-		);
+-		const change = {
+-			h: hsv.h,
+-			s: intSaturation,
+-			v: hsv.v,
+-			a: hsv.a,
+-			source: 'rgb',
+-		};
+-
+-		onChange( change );
+-	}
+-
+-	brighten( amount = 0.01 ) {
+-		const { hsv, onChange = noop } = this.props;
+-		const intValue = clamp( hsv.v + Math.round( amount * 100 ), 0, 100 );
+-		const change = {
+-			h: hsv.h,
+-			s: hsv.s,
+-			v: intValue,
+-			a: hsv.a,
+-			source: 'rgb',
+-		};
+-
+-		onChange( change );
+-	}
+-
+-	handleChange( e ) {
+-		const { onChange = noop } = this.props;
+-		const change = calculateSaturationChange(
+-			e,
+-			this.props,
+-			this.container.current
+-		);
+-		this.throttle( onChange, change, e );
+-	}
+-
+-	handleMouseDown( e ) {
+-		this.handleChange( e );
+-		window.addEventListener( 'mousemove', this.handleChange );
+-		window.addEventListener( 'mouseup', this.handleMouseUp );
+-	}
+-
+-	handleMouseUp() {
+-		this.unbindEventListeners();
+-	}
+-
+-	unbindEventListeners() {
+-		window.removeEventListener( 'mousemove', this.handleChange );
+-		window.removeEventListener( 'mouseup', this.handleMouseUp );
+-	}
+-
+-	handleKeyDown( event ) {
+-		const { keyCode, shiftKey } = event;
+-		const shortcuts = {
+-			[ UP ]: () => this.brighten( shiftKey ? 0.1 : 0.01 ),
+-			[ PAGEUP ]: () => this.brighten( 1 ),
+-			[ DOWN ]: () => this.brighten( shiftKey ? -0.1 : -0.01 ),
+-			[ PAGEDOWN ]: () => this.brighten( -1 ),
+-			[ RIGHT ]: () => this.saturate( shiftKey ? 0.1 : 0.01 ),
+-			[ END ]: () => this.saturate( 1 ),
+-			[ LEFT ]: () => this.saturate( shiftKey ? -0.1 : -0.01 ),
+-			[ HOME ]: () => this.saturate( -1 ),
+-		};
+-
+-		for ( const code in shortcuts ) {
+-			if ( code === String( keyCode ) ) {
+-				shortcuts[ keyCode ]();
+-			}
+-		}
+-
+-		if ( keyCode !== TAB ) {
+-			event.preventDefault();
+-		}
+-	}
+-
+-	render() {
+-		const { hsv, hsl, instanceId } = this.props;
+-		const pointerLocation = {
+-			top: `${ -hsv.v + 100 }%`,
+-			left: `${ hsv.s }%`,
+-		};
+-
+-		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+-		return (
+-			<div
+-				style={ { background: `hsl(${ hsl.h },100%, 50%)` } }
+-				className="components-color-picker__saturation-color"
+-				ref={ this.container }
+-				onMouseDown={ this.handleMouseDown }
+-				onTouchMove={ this.handleChange }
+-				onTouchStart={ this.handleChange }
+-				role="application"
+-			>
+-				<div className="components-color-picker__saturation-white" />
+-				<div className="components-color-picker__saturation-black" />
+-				<Button
+-					aria-label={ __( 'Choose a shade' ) }
+-					aria-describedby={ `color-picker-saturation-${ instanceId }` }
+-					className="components-color-picker__saturation-pointer"
+-					style={ pointerLocation }
+-					onKeyDown={ this.handleKeyDown }
+-				/>
+-				<VisuallyHidden
+-					id={ `color-picker-saturation-${ instanceId }` }
+-				>
+-					{ __(
+-						'Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.'
+-					) }
+-				</VisuallyHidden>
+-			</div>
+-		);
+-		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
+-	}
+-}
+-
+-export default compose( pure, withInstanceId )( Saturation );
+diff --git a/packages/components/src/color-picker/stories/index.js b/packages/components/src/color-picker/stories/index.js
+index 67bbc93d10c1be..1ee9baa7d5be8c 100644
+--- a/packages/components/src/color-picker/stories/index.js
++++ b/packages/components/src/color-picker/stories/index.js
+@@ -1,3 +1,9 @@
++/**
++ * External dependencies
++ */
++import { boolean, select } from '@storybook/addon-knobs';
++import colorize from 'tinycolor2';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -6,25 +12,70 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import ColorPicker from '../';
++import { ColorPicker } from '..';
++import { Flex } from '../../flex';
++import { Spacer } from '../../spacer';
++import { space } from '../../ui/utils/space';
++
++export default {
++	component: ColorPicker,
++	title: 'Components/ColorPicker',
++};
++
++const PROP_UNSET = 'unset';
+ 
+-export default { title: 'Components/ColorPicker', component: ColorPicker };
++const Example = () => {
++	const [ color, setColor ] = useState( undefined );
++	const props = {
++		enableAlpha: boolean( 'enableAlpha', false ),
++		copyFormat: select(
++			'copyFormat',
++			[ PROP_UNSET, 'rgb', 'hsl', 'hex' ],
++			PROP_UNSET
++		),
++	};
++
++	if ( props.copyFormat === PROP_UNSET ) {
++		delete props.copyFormat;
++	}
+ 
+-const ColorPickerWithState = ( { ...props } ) => {
+-	const [ color, setColor ] = useState( '#f00' );
+ 	return (
+-		<ColorPicker
+-			{ ...props }
+-			color={ color }
+-			onChangeComplete={ ( value ) => setColor( value.hex ) }
+-		/>
++		<Flex
++			as={ Spacer }
++			gap={ space( 2 ) }
++			justify="space-around"
++			align="flex-start"
++			marginTop={ space( 10 ) }
++		>
++			<ColorPicker { ...props } color={ color } onChange={ setColor } />
++			<div style={ { width: 200, textAlign: 'center' } }>
++				{ colorize( color ).toHslString() }
++			</div>
++			<ColorPicker { ...props } color={ color } onChange={ setColor } />
++		</Flex>
+ 	);
+ };
+ 
+ export const _default = () => {
+-	return <ColorPickerWithState disableAlpha />;
++	return <Example />;
+ };
+ 
+-export const alphaEnabled = () => {
+-	return <ColorPickerWithState disableAlpha={ false } />;
++const LegacyExample = () => {
++	const [ legacyColor, setLegacyColor ] = useState( '#fff' );
++	const legacyProps = {
++		color: legacyColor,
++		onChangeComplete: setLegacyColor,
++		disableAlpha: boolean( 'disableAlpha', true ),
++	};
++
++	return (
++		<Flex align="flex-start" justify="flex-start">
++			<ColorPicker { ...legacyProps } />
++			<pre style={ { width: '20em' } }>
++				{ JSON.stringify( legacyColor, undefined, 4 ) }
++			</pre>
++		</Flex>
++	);
+ };
++
++export const legacy = () => <LegacyExample />;
+diff --git a/packages/components/src/color-picker/style.scss b/packages/components/src/color-picker/style.scss
+deleted file mode 100644
+index a3addf76d2f42c..00000000000000
+--- a/packages/components/src/color-picker/style.scss
++++ /dev/null
+@@ -1,269 +0,0 @@
+-/**
+- * Parts of this source were derived and modified from react-color,
+- * released under the MIT license.
+- *
+- * https://github.com/casesandberg/react-color/
+- *
+- * Copyright (c) 2015 Case Sandberg
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to deal
+- * in the Software without restriction, including without limitation the rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+- * THE SOFTWARE.
+- */
+-
+-.components-color-picker {
+-	width: 100%;
+-
+-	* {
+-		box-sizing: border-box;
+-	}
+-}
+-
+-.components-color-picker__saturation {
+-	width: 100%;
+-	padding-bottom: 55%;
+-	position: relative;
+-}
+-
+-.components-color-picker__body {
+-	padding: $grid-unit-20 $grid-unit-20 #{ $grid-unit-05 * 3 };
+-}
+-
+-.components-color-picker__controls {
+-	display: flex;
+-}
+-
+-.components-color-picker__saturation-pointer,
+-.components-color-picker__hue-pointer,
+-.components-color-picker__alpha-pointer {
+-	padding: 0;
+-	position: absolute;
+-	cursor: pointer;
+-	box-shadow: none;
+-	border: none;
+-}
+-
+-/* CURRENT COLOR COMPONENT */
+-.components-color-picker__swatch {
+-	margin-right: 8px;
+-	width: 32px;
+-	height: 32px;
+-	border-radius: 50%;
+-	position: relative;
+-	overflow: hidden;
+-	background-image:
+-		linear-gradient(45deg, #ddd 25%, transparent 25%),
+-		linear-gradient(-45deg, #ddd 25%, transparent 25%),
+-		linear-gradient(45deg, transparent 75%, #ddd 75%),
+-		linear-gradient(-45deg, transparent 75%, #ddd 75%);
+-	background-size: 10px 10px;
+-	background-position: 0 0, 0 5px, 5px -5px, -5px 0;
+-
+-	.is-alpha-disabled & {
+-		width: 12px;
+-		height: 12px;
+-		margin-top: 0;
+-	}
+-}
+-
+-.components-color-picker__active {
+-	position: absolute;
+-	top: 0;
+-	left: 0;
+-	right: 0;
+-	bottom: 0;
+-	border-radius: 50%;
+-	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+-	z-index: 2;
+-}
+-
+-/* SATURATION COMPONENT */
+-.components-color-picker__saturation-color,
+-.components-color-picker__saturation-white,
+-.components-color-picker__saturation-black {
+-	position: absolute;
+-	top: 0;
+-	left: 0;
+-	right: 0;
+-	bottom: 0;
+-}
+-
+-.components-color-picker__saturation-color {
+-	overflow: visible;
+-}
+-
+-.components-color-picker__saturation-white {
+-	/*rtl:ignore*/
+-	background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
+-}
+-
+-.components-color-picker__saturation-black {
+-	background: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
+-}
+-
+-// Needs specificity.
+-.components-button.components-color-picker__saturation-pointer {
+-	width: 14px;
+-	height: 14px;
+-	padding: 0;
+-	border-radius: 50%;
+-	background-color: transparent;
+-	transform: translate(-50%, -50%);
+-
+-	box-shadow:
+-		0 0 0 1px $white,
+-		inset 0 0 0 1px $black,
+-		0 0 0 2px $black;
+-
+-	&:focus:not(:disabled) {
+-		box-shadow:
+-			0 0 0 2px $white,
+-			inset 0 0 0 1px $black,
+-			0 0 0 3px $black;
+-	}
+-}
+-
+-/* HUE & ALPHA BARS */
+-.components-color-picker__toggles {
+-	flex: 1;
+-}
+-
+-.components-color-picker__alpha {
+-	background-image:
+-		linear-gradient(45deg, #ddd 25%, transparent 25%),
+-		linear-gradient(-45deg, #ddd 25%, transparent 25%),
+-		linear-gradient(45deg, transparent 75%, #ddd 75%),
+-		linear-gradient(-45deg, transparent 75%, #ddd 75%);
+-	background-size: 10px 10px;
+-	background-position: 0 0, 0 5px, 5px -5px, -5px 0;
+-}
+-
+-.components-color-picker__hue-gradient,
+-.components-color-picker__alpha-gradient {
+-	position: absolute;
+-	top: 0;
+-	left: 0;
+-	right: 0;
+-	bottom: 0;
+-}
+-
+-.components-color-picker__hue,
+-.components-color-picker__alpha {
+-	height: 12px;
+-	position: relative;
+-}
+-
+-.is-alpha-enabled .components-color-picker__hue {
+-	margin-bottom: 8px;
+-}
+-
+-.components-color-picker__hue-bar,
+-.components-color-picker__alpha-bar {
+-	position: relative;
+-	margin: 0 3px;
+-	height: 100%;
+-	padding: 0 2px;
+-}
+-
+-.components-color-picker__hue-gradient {
+-	/*rtl:ignore*/
+-	background: linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%);
+-}
+-
+-.components-color-picker__hue-pointer,
+-.components-color-picker__alpha-pointer {
+-	/*rtl:ignore*/
+-	left: 0;
+-	width: 14px;
+-	height: 14px;
+-	border-radius: 50%;
+-	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.37);
+-	background: #fff;
+-	transform: translate(-7px, -1px);
+-}
+-
+-.components-color-picker__hue-pointer,
+-.components-color-picker__saturation-pointer {
+-	transition: box-shadow 0.1s linear;
+-	@include reduce-motion("transition");
+-}
+-
+-.components-color-picker__saturation-pointer:focus {
+-	box-shadow:
+-		0 0 0 2px #fff,
+-		0 0 0 4px var(--wp-admin-theme-color),
+-		0 0 5px 0 var(--wp-admin-theme-color),
+-		inset 0 0 1px 1px rgba(0, 0, 0, 0.3),
+-		0 0 1px 2px rgba(0, 0, 0, 0.4);
+-}
+-
+-.components-color-picker__hue-pointer:focus,
+-.components-color-picker__alpha-pointer:focus {
+-	border-color: var(--wp-admin-theme-color);
+-	box-shadow:
+-		0 0 0 2px var(--wp-admin-theme-color),
+-		0 0 3px 0 var(--wp-admin-theme-color);
+-	outline: 2px solid transparent;
+-	outline-offset: -2px;
+-}
+-
+-/* INPUTS COMPONENT */
+-.components-color-picker__inputs-wrapper {
+-	margin: 0 -4px;
+-	padding-top: 16px;
+-	display: flex;
+-	align-items: flex-end;
+-	min-width: 255px;
+-
+-	fieldset {
+-		flex: 1;
+-		border: none;
+-		margin: 0;
+-		padding: 0;
+-	}
+-
+-	.components-color-picker__inputs-fields .components-text-control__input[type="number"] {
+-		padding: 6px 3px;
+-		margin: 0;
+-	}
+-}
+-
+-.components-color-picker__inputs-field {
+-	width: 100%;
+-}
+-
+-.components-color-picker__inputs-fields {
+-	display: flex;
+-	/*rtl:ignore*/
+-	direction: ltr;
+-	flex-grow: 1;
+-	margin-right: 4px;
+-
+-	.components-base-control + .components-base-control {
+-		margin-top: 0;
+-	}
+-
+-	.components-base-control__field {
+-		margin: 0 2px;
+-	}
+-}
+-
+-
+-.components-color-picker__inputs-toggle {
+-	height: 30px;
+-	padding: 0 5px;
+-}
+diff --git a/packages/components/src/ui/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+similarity index 82%
+rename from packages/components/src/ui/color-picker/styles.ts
+rename to packages/components/src/color-picker/styles.ts
+index 891ca06191b5b4..4d80b8761d20b3 100644
+--- a/packages/components/src/ui/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -6,19 +6,19 @@ import styled from '@emotion/styled';
+ /**
+  * Internal dependencies
+  */
+-import NumberControl from '../../number-control';
+-import InnerSelectControl from '../../select-control';
+-import InnerRangeControl from '../../range-control';
+-import { StyledField } from '../../base-control/styles/base-control-styles';
+-import { space } from '../utils/space';
+-import Button from '../../button';
++import NumberControl from '../number-control';
++import InnerSelectControl from '../select-control';
++import InnerRangeControl from '../range-control';
++import { StyledField } from '../base-control/styles/base-control-styles';
++import { space } from '../ui/utils/space';
++import Button from '../button';
+ import {
+ 	BackdropUI,
+ 	Container as InputControlContainer,
+ 	Input,
+-} from '../../input-control/styles/input-control-styles';
+-import InputControl from '../../input-control';
+-import CONFIG from '../../utils/config-values';
++} from '../input-control/styles/input-control-styles';
++import InputControl from '../input-control';
++import CONFIG from '../utils/config-values';
+ 
+ export const NumberControlWrapper = styled( NumberControl )`
+ 	${ InputControlContainer } {
+@@ -112,7 +112,7 @@ export const ColorfulWrapper = styled.div`
+ `;
+ 
+ export const DetailsControlButton = styled( Button )`
+-	&&&& {
++	&&&&& {
+ 		min-width: ${ space( 6 ) };
+ 		padding: 0;
+ 	}
+diff --git a/packages/components/src/color-picker/test/__snapshots__/index.js.snap b/packages/components/src/color-picker/test/__snapshots__/index.js.snap
+deleted file mode 100644
+index e273ce72527815..00000000000000
+--- a/packages/components/src/color-picker/test/__snapshots__/index.js.snap
++++ /dev/null
+@@ -1,813 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`ColorPicker should commit changes to all views on blur 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -10,38 +10,38 @@
+-        onTouchMove={[Function bound handleChange]}
+-        onTouchStart={[Function bound handleChange]}
+-        role="application"
+-        style={
+-          Object {
+--           "background": "hsl(210,100%, 50%)",
+-+           "background": "hsl(0,100%, 50%)",
+-          }
+-        }
+-      >
+-        <div
+-          className="components-color-picker__saturation-white"
+-        />
+-        <div
+-          className="components-color-picker__saturation-black"
+-        />
+-        <button
+--         aria-describedby="color-picker-saturation-4"
+-+         aria-describedby="color-picker-saturation-3"
+-          aria-label="Choose a shade"
+-          className="components-button components-color-picker__saturation-pointer"
+-          onKeyDown={[Function bound handleKeyDown]}
+-          style={
+-            Object {
+--             "left": "17%",
+--             "top": "20%",
+-+             "left": "0%",
+-+             "top": "0%",
+-            }
+-          }
+-          type="button"
+-        />
+-        <div
+-          className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+-          data-wp-c16t={true}
+-          data-wp-component="VisuallyHidden"
+--         id="color-picker-saturation-4"
+-+         id="color-picker-saturation-3"
+-          style={
+-            Object {
+-              "WebkitClipPath": "inset( 50% )",
+-              "border": 0,
+-              "clip": "rect(1px, 1px, 1px, 1px)",
+-@@ -71,11 +71,11 @@
+-        >
+-          <div
+-            className="components-color-picker__active"
+-            style={
+-              Object {
+--               "backgroundColor": "rgb(170, 187, 204)",
+-+               "backgroundColor": "rgb(255, 255, 255)",
+-              }
+-            }
+-          />
+-        </div>
+-        <div
+-@@ -92,31 +92,31 @@
+-              onMouseDown={[Function bound handleMouseDown]}
+-              onTouchMove={[Function bound handleChange]}
+-              onTouchStart={[Function bound handleChange]}
+-            >
+-              <div
+--               aria-describedby="components-color-picker__hue-description-4"
+-+               aria-describedby="components-color-picker__hue-description-3"
+-                aria-label="Hue value in degrees, from 0 to 359."
+-                aria-orientation="horizontal"
+-                aria-valuemax="1"
+-                aria-valuemin="359"
+--               aria-valuenow={210}
+-+               aria-valuenow={0}
+-                className="components-color-picker__hue-pointer"
+-                onKeyDown={[Function bound handleKeyDown]}
+-                role="slider"
+-                style={
+-                  Object {
+--                   "left": "58.333333333333336%",
+-+                   "left": "0%",
+-                  }
+-                }
+-                tabIndex="0"
+-              />
+-              <p
+-                className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+-                data-wp-c16t={true}
+-                data-wp-component="VisuallyHidden"
+--               id="components-color-picker__hue-description-4"
+-+               id="components-color-picker__hue-description-3"
+-                style={
+-                  Object {
+-                    "WebkitClipPath": "inset( 50% )",
+-                    "border": 0,
+-                    "clip": "rect(1px, 1px, 1px, 1px)",
+-@@ -149,22 +149,22 @@
+-            <div
+-              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
+-            >
+-              <label
+-                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
+--               htmlFor="inspector-text-control-4"
+-+               htmlFor="inspector-text-control-3"
+-              >
+-                Color value in hexadecimal
+-              </label>
+-              <input
+-                className="components-text-control__input"
+--               id="inspector-text-control-4"
+-+               id="inspector-text-control-3"
+-                onBlur={[Function bound handleBlur]}
+-                onChange={[Function onChangeValue]}
+-                onKeyDown={[Function bound handleKeyDown]}
+-                type="text"
+--               value="#aabbcc"
+-+               value="#ffffff"
+-              />
+-            </div>
+-          </div>
+-        </div>
+-        <div
+-`;
+-
+-exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -10,38 +10,38 @@
+-        onTouchMove={[Function bound handleChange]}
+-        onTouchStart={[Function bound handleChange]}
+-        role="application"
+-        style={
+-          Object {
+--           "background": "hsl(210,100%, 50%)",
+-+           "background": "hsl(0,100%, 50%)",
+-          }
+-        }
+-      >
+-        <div
+-          className="components-color-picker__saturation-white"
+-        />
+-        <div
+-          className="components-color-picker__saturation-black"
+-        />
+-        <button
+--         aria-describedby="color-picker-saturation-8"
+-+         aria-describedby="color-picker-saturation-7"
+-          aria-label="Choose a shade"
+-          className="components-button components-color-picker__saturation-pointer"
+-          onKeyDown={[Function bound handleKeyDown]}
+-          style={
+-            Object {
+--             "left": "17%",
+--             "top": "20%",
+-+             "left": "0%",
+-+             "top": "0%",
+-            }
+-          }
+-          type="button"
+-        />
+-        <div
+-          className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+-          data-wp-c16t={true}
+-          data-wp-component="VisuallyHidden"
+--         id="color-picker-saturation-8"
+-+         id="color-picker-saturation-7"
+-          style={
+-            Object {
+-              "WebkitClipPath": "inset( 50% )",
+-              "border": 0,
+-              "clip": "rect(1px, 1px, 1px, 1px)",
+-@@ -71,11 +71,11 @@
+-        >
+-          <div
+-            className="components-color-picker__active"
+-            style={
+-              Object {
+--               "backgroundColor": "rgb(170, 187, 204)",
+-+               "backgroundColor": "rgb(255, 255, 255)",
+-              }
+-            }
+-          />
+-        </div>
+-        <div
+-@@ -92,31 +92,31 @@
+-              onMouseDown={[Function bound handleMouseDown]}
+-              onTouchMove={[Function bound handleChange]}
+-              onTouchStart={[Function bound handleChange]}
+-            >
+-              <div
+--               aria-describedby="components-color-picker__hue-description-8"
+-+               aria-describedby="components-color-picker__hue-description-7"
+-                aria-label="Hue value in degrees, from 0 to 359."
+-                aria-orientation="horizontal"
+-                aria-valuemax="1"
+-                aria-valuemin="359"
+--               aria-valuenow={210}
+-+               aria-valuenow={0}
+-                className="components-color-picker__hue-pointer"
+-                onKeyDown={[Function bound handleKeyDown]}
+-                role="slider"
+-                style={
+-                  Object {
+--                   "left": "58.333333333333336%",
+-+                   "left": "0%",
+-                  }
+-                }
+-                tabIndex="0"
+-              />
+-              <p
+-                className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+-                data-wp-c16t={true}
+-                data-wp-component="VisuallyHidden"
+--               id="components-color-picker__hue-description-8"
+-+               id="components-color-picker__hue-description-7"
+-                style={
+-                  Object {
+-                    "WebkitClipPath": "inset( 50% )",
+-                    "border": 0,
+-                    "clip": "rect(1px, 1px, 1px, 1px)",
+-@@ -149,22 +149,22 @@
+-            <div
+-              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
+-            >
+-              <label
+-                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
+--               htmlFor="inspector-text-control-8"
+-+               htmlFor="inspector-text-control-7"
+-              >
+-                Color value in hexadecimal
+-              </label>
+-              <input
+-                className="components-text-control__input"
+--               id="inspector-text-control-8"
+-+               id="inspector-text-control-7"
+-                onBlur={[Function bound handleBlur]}
+-                onChange={[Function onChangeValue]}
+-                onKeyDown={[Function bound handleKeyDown]}
+-                type="text"
+--               value="#aabbcc"
+-+               value="#ffffff"
+-              />
+-            </div>
+-          </div>
+-        </div>
+-        <div
+-`;
+-
+-exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -10,38 +10,38 @@
+-        onTouchMove={[Function bound handleChange]}
+-        onTouchStart={[Function bound handleChange]}
+-        role="application"
+-        style={
+-          Object {
+--           "background": "hsl(210,100%, 50%)",
+-+           "background": "hsl(0,100%, 50%)",
+-          }
+-        }
+-      >
+-        <div
+-          className="components-color-picker__saturation-white"
+-        />
+-        <div
+-          className="components-color-picker__saturation-black"
+-        />
+-        <button
+--         aria-describedby="color-picker-saturation-10"
+-+         aria-describedby="color-picker-saturation-9"
+-          aria-label="Choose a shade"
+-          className="components-button components-color-picker__saturation-pointer"
+-          onKeyDown={[Function bound handleKeyDown]}
+-          style={
+-            Object {
+--             "left": "17%",
+--             "top": "20%",
+-+             "left": "0%",
+-+             "top": "0%",
+-            }
+-          }
+-          type="button"
+-        />
+-        <div
+-          className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+-          data-wp-c16t={true}
+-          data-wp-component="VisuallyHidden"
+--         id="color-picker-saturation-10"
+-+         id="color-picker-saturation-9"
+-          style={
+-            Object {
+-              "WebkitClipPath": "inset( 50% )",
+-              "border": 0,
+-              "clip": "rect(1px, 1px, 1px, 1px)",
+-@@ -71,11 +71,11 @@
+-        >
+-          <div
+-            className="components-color-picker__active"
+-            style={
+-              Object {
+--               "backgroundColor": "rgb(170, 187, 204)",
+-+               "backgroundColor": "rgb(255, 255, 255)",
+-              }
+-            }
+-          />
+-        </div>
+-        <div
+-@@ -92,31 +92,31 @@
+-              onMouseDown={[Function bound handleMouseDown]}
+-              onTouchMove={[Function bound handleChange]}
+-              onTouchStart={[Function bound handleChange]}
+-            >
+-              <div
+--               aria-describedby="components-color-picker__hue-description-10"
+-+               aria-describedby="components-color-picker__hue-description-9"
+-                aria-label="Hue value in degrees, from 0 to 359."
+-                aria-orientation="horizontal"
+-                aria-valuemax="1"
+-                aria-valuemin="359"
+--               aria-valuenow={210}
+-+               aria-valuenow={0}
+-                className="components-color-picker__hue-pointer"
+-                onKeyDown={[Function bound handleKeyDown]}
+-                role="slider"
+-                style={
+-                  Object {
+--                   "left": "58.333333333333336%",
+-+                   "left": "0%",
+-                  }
+-                }
+-                tabIndex="0"
+-              />
+-              <p
+-                className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+-                data-wp-c16t={true}
+-                data-wp-component="VisuallyHidden"
+--               id="components-color-picker__hue-description-10"
+-+               id="components-color-picker__hue-description-9"
+-                style={
+-                  Object {
+-                    "WebkitClipPath": "inset( 50% )",
+-                    "border": 0,
+-                    "clip": "rect(1px, 1px, 1px, 1px)",
+-@@ -149,22 +149,22 @@
+-            <div
+-              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
+-            >
+-              <label
+-                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
+--               htmlFor="inspector-text-control-10"
+-+               htmlFor="inspector-text-control-9"
+-              >
+-                Color value in hexadecimal
+-              </label>
+-              <input
+-                className="components-text-control__input"
+--               id="inspector-text-control-10"
+-+               id="inspector-text-control-9"
+-                onBlur={[Function bound handleBlur]}
+-                onChange={[Function onChangeValue]}
+-                onKeyDown={[Function bound handleKeyDown]}
+-                type="text"
+--               value="#aabbcc"
+-+               value="#ffffff"
+-              />
+-            </div>
+-          </div>
+-        </div>
+-        <div
+-`;
+-
+-exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -10,38 +10,38 @@
+-        onTouchMove={[Function bound handleChange]}
+-        onTouchStart={[Function bound handleChange]}
+-        role="application"
+-        style={
+-          Object {
+--           "background": "hsl(210,100%, 50%)",
+-+           "background": "hsl(0,100%, 50%)",
+-          }
+-        }
+-      >
+-        <div
+-          className="components-color-picker__saturation-white"
+-        />
+-        <div
+-          className="components-color-picker__saturation-black"
+-        />
+-        <button
+--         aria-describedby="color-picker-saturation-6"
+-+         aria-describedby="color-picker-saturation-5"
+-          aria-label="Choose a shade"
+-          className="components-button components-color-picker__saturation-pointer"
+-          onKeyDown={[Function bound handleKeyDown]}
+-          style={
+-            Object {
+--             "left": "17%",
+--             "top": "20%",
+-+             "left": "0%",
+-+             "top": "0%",
+-            }
+-          }
+-          type="button"
+-        />
+-        <div
+-          className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+-          data-wp-c16t={true}
+-          data-wp-component="VisuallyHidden"
+--         id="color-picker-saturation-6"
+-+         id="color-picker-saturation-5"
+-          style={
+-            Object {
+-              "WebkitClipPath": "inset( 50% )",
+-              "border": 0,
+-              "clip": "rect(1px, 1px, 1px, 1px)",
+-@@ -71,11 +71,11 @@
+-        >
+-          <div
+-            className="components-color-picker__active"
+-            style={
+-              Object {
+--               "backgroundColor": "rgb(170, 187, 204)",
+-+               "backgroundColor": "rgb(255, 255, 255)",
+-              }
+-            }
+-          />
+-        </div>
+-        <div
+-@@ -92,31 +92,31 @@
+-              onMouseDown={[Function bound handleMouseDown]}
+-              onTouchMove={[Function bound handleChange]}
+-              onTouchStart={[Function bound handleChange]}
+-            >
+-              <div
+--               aria-describedby="components-color-picker__hue-description-6"
+-+               aria-describedby="components-color-picker__hue-description-5"
+-                aria-label="Hue value in degrees, from 0 to 359."
+-                aria-orientation="horizontal"
+-                aria-valuemax="1"
+-                aria-valuemin="359"
+--               aria-valuenow={210}
+-+               aria-valuenow={0}
+-                className="components-color-picker__hue-pointer"
+-                onKeyDown={[Function bound handleKeyDown]}
+-                role="slider"
+-                style={
+-                  Object {
+--                   "left": "58.333333333333336%",
+-+                   "left": "0%",
+-                  }
+-                }
+-                tabIndex="0"
+-              />
+-              <p
+-                className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+-                data-wp-c16t={true}
+-                data-wp-component="VisuallyHidden"
+--               id="components-color-picker__hue-description-6"
+-+               id="components-color-picker__hue-description-5"
+-                style={
+-                  Object {
+-                    "WebkitClipPath": "inset( 50% )",
+-                    "border": 0,
+-                    "clip": "rect(1px, 1px, 1px, 1px)",
+-@@ -149,22 +149,22 @@
+-            <div
+-              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
+-            >
+-              <label
+-                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
+--               htmlFor="inspector-text-control-6"
+-+               htmlFor="inspector-text-control-5"
+-              >
+-                Color value in hexadecimal
+-              </label>
+-              <input
+-                className="components-text-control__input"
+--               id="inspector-text-control-6"
+-+               id="inspector-text-control-5"
+-                onBlur={[Function bound handleBlur]}
+-                onChange={[Function onChangeValue]}
+-                onKeyDown={[Function bound handleKeyDown]}
+-                type="text"
+--               value="#aabbcc"
+-+               value="#ffffff"
+-              />
+-            </div>
+-          </div>
+-        </div>
+-        <div
+-`;
+-
+-exports[`ColorPicker should only update input view for draft changes 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -21,11 +21,11 @@
+-        />
+-        <div
+-          className="components-color-picker__saturation-black"
+-        />
+-        <button
+--         aria-describedby="color-picker-saturation-2"
+-+         aria-describedby="color-picker-saturation-1"
+-          aria-label="Choose a shade"
+-          className="components-button components-color-picker__saturation-pointer"
+-          onKeyDown={[Function bound handleKeyDown]}
+-          style={
+-            Object {
+-@@ -37,11 +37,11 @@
+-        />
+-        <div
+-          className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+-          data-wp-c16t={true}
+-          data-wp-component="VisuallyHidden"
+--         id="color-picker-saturation-2"
+-+         id="color-picker-saturation-1"
+-          style={
+-            Object {
+-              "WebkitClipPath": "inset( 50% )",
+-              "border": 0,
+-              "clip": "rect(1px, 1px, 1px, 1px)",
+-@@ -92,11 +92,11 @@
+-              onMouseDown={[Function bound handleMouseDown]}
+-              onTouchMove={[Function bound handleChange]}
+-              onTouchStart={[Function bound handleChange]}
+-            >
+-              <div
+--               aria-describedby="components-color-picker__hue-description-2"
+-+               aria-describedby="components-color-picker__hue-description-1"
+-                aria-label="Hue value in degrees, from 0 to 359."
+-                aria-orientation="horizontal"
+-                aria-valuemax="1"
+-                aria-valuemin="359"
+-                aria-valuenow={0}
+-@@ -112,11 +112,11 @@
+-              />
+-              <p
+-                className="components-visually-hidden css-1mm2cvy-View em57xhy0"
+-                data-wp-c16t={true}
+-                data-wp-component="VisuallyHidden"
+--               id="components-color-picker__hue-description-2"
+-+               id="components-color-picker__hue-description-1"
+-                style={
+-                  Object {
+-                    "WebkitClipPath": "inset( 50% )",
+-                    "border": 0,
+-                    "clip": "rect(1px, 1px, 1px, 1px)",
+-@@ -149,22 +149,22 @@
+-            <div
+-              className="components-base-control__field css-igk9ll-StyledField e1puf3u2"
+-            >
+-              <label
+-                className="components-base-control__label css-13ck15n-StyledLabel e1puf3u1"
+--               htmlFor="inspector-text-control-2"
+-+               htmlFor="inspector-text-control-1"
+-              >
+-                Color value in hexadecimal
+-              </label>
+-              <input
+-                className="components-text-control__input"
+--               id="inspector-text-control-2"
+-+               id="inspector-text-control-1"
+-                onBlur={[Function bound handleBlur]}
+-                onChange={[Function onChangeValue]}
+-                onKeyDown={[Function bound handleKeyDown]}
+-                type="text"
+--               value="#abc"
+-+               value="#ffffff"
+-              />
+-            </div>
+-          </div>
+-        </div>
+-        <div
+-`;
+-
+-exports[`ColorPicker should render color picker 1`] = `
+-.emotion-4 {
+-  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+-  font-size: 13px;
+-}
+-
+-.emotion-6 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+-.components-panel__row .emotion-6 {
+-  margin-bottom: inherit;
+-}
+-
+-.emotion-8 {
+-  display: inline-block;
+-  margin-bottom: calc(4px * 2);
+-}
+-
+-<div
+-  className="components-color-picker is-alpha-disabled"
+->
+-  <div
+-    className="components-color-picker__saturation"
+-  >
+-    <div
+-      className="components-color-picker__saturation-color"
+-      onMouseDown={[Function]}
+-      onTouchMove={[Function]}
+-      onTouchStart={[Function]}
+-      role="application"
+-      style={
+-        Object {
+-          "background": "hsl(0,100%, 50%)",
+-        }
+-      }
+-    >
+-      <div
+-        className="components-color-picker__saturation-white"
+-      />
+-      <div
+-        className="components-color-picker__saturation-black"
+-      />
+-      <button
+-        aria-describedby="color-picker-saturation-0"
+-        aria-label="Choose a shade"
+-        className="components-button components-color-picker__saturation-pointer"
+-        onKeyDown={[Function]}
+-        style={
+-          Object {
+-            "left": "0%",
+-            "top": "0%",
+-          }
+-        }
+-        type="button"
+-      />
+-      <div
+-        className="components-visually-hidden emotion-0 emotion-1"
+-        data-wp-c16t={true}
+-        data-wp-component="VisuallyHidden"
+-        id="color-picker-saturation-0"
+-        style={
+-          Object {
+-            "WebkitClipPath": "inset( 50% )",
+-            "border": 0,
+-            "clip": "rect(1px, 1px, 1px, 1px)",
+-            "clipPath": "inset( 50% )",
+-            "height": "1px",
+-            "margin": "-1px",
+-            "overflow": "hidden",
+-            "padding": 0,
+-            "position": "absolute",
+-            "width": "1px",
+-            "wordWrap": "normal",
+-          }
+-        }
+-      >
+-        Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
+-      </div>
+-    </div>
+-  </div>
+-  <div
+-    className="components-color-picker__body"
+-  >
+-    <div
+-      className="components-color-picker__controls"
+-    >
+-      <div
+-        className="components-color-picker__swatch"
+-      >
+-        <div
+-          className="components-color-picker__active"
+-          style={
+-            Object {
+-              "backgroundColor": "rgb(255, 255, 255)",
+-            }
+-          }
+-        />
+-      </div>
+-      <div
+-        className="components-color-picker__toggles"
+-      >
+-        <div
+-          className="components-color-picker__hue"
+-        >
+-          <div
+-            className="components-color-picker__hue-gradient"
+-          />
+-          <div
+-            className="components-color-picker__hue-bar"
+-            onMouseDown={[Function]}
+-            onTouchMove={[Function]}
+-            onTouchStart={[Function]}
+-          >
+-            <div
+-              aria-describedby="components-color-picker__hue-description-0"
+-              aria-label="Hue value in degrees, from 0 to 359."
+-              aria-orientation="horizontal"
+-              aria-valuemax="1"
+-              aria-valuemin="359"
+-              aria-valuenow={0}
+-              className="components-color-picker__hue-pointer"
+-              onKeyDown={[Function]}
+-              role="slider"
+-              style={
+-                Object {
+-                  "left": "0%",
+-                }
+-              }
+-              tabIndex="0"
+-            />
+-            <p
+-              className="components-visually-hidden emotion-0 emotion-1"
+-              data-wp-c16t={true}
+-              data-wp-component="VisuallyHidden"
+-              id="components-color-picker__hue-description-0"
+-              style={
+-                Object {
+-                  "WebkitClipPath": "inset( 50% )",
+-                  "border": 0,
+-                  "clip": "rect(1px, 1px, 1px, 1px)",
+-                  "clipPath": "inset( 50% )",
+-                  "height": "1px",
+-                  "margin": "-1px",
+-                  "overflow": "hidden",
+-                  "padding": 0,
+-                  "position": "absolute",
+-                  "width": "1px",
+-                  "wordWrap": "normal",
+-                }
+-              }
+-            >
+-              Move the arrow left or right to change hue.
+-            </p>
+-          </div>
+-        </div>
+-      </div>
+-    </div>
+-    <div
+-      className="components-color-picker__inputs-wrapper"
+-    >
+-      <div
+-        className="components-color-picker__inputs-fields"
+-      >
+-        <div
+-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
+-        >
+-          <div
+-            className="components-base-control__field emotion-6 emotion-7"
+-          >
+-            <label
+-              className="components-base-control__label emotion-8 emotion-9"
+-              htmlFor="inspector-text-control-0"
+-            >
+-              Color value in hexadecimal
+-            </label>
+-            <input
+-              className="components-text-control__input"
+-              id="inspector-text-control-0"
+-              onBlur={[Function]}
+-              onChange={[Function]}
+-              onKeyDown={[Function]}
+-              type="text"
+-              value="#ffffff"
+-            />
+-          </div>
+-        </div>
+-      </div>
+-      <div
+-        className="components-color-picker__inputs-toggle-wrapper"
+-      >
+-        <button
+-          aria-describedby={null}
+-          aria-label="Change color format"
+-          className="components-button components-color-picker__inputs-toggle has-icon"
+-          onBlur={[Function]}
+-          onClick={[Function]}
+-          onFocus={[Function]}
+-          onMouseDown={[Function]}
+-          onMouseEnter={[Function]}
+-          onMouseLeave={[Function]}
+-          type="button"
+-        >
+-          <svg
+-            aria-hidden={true}
+-            focusable={false}
+-            height={24}
+-            role="img"
+-            viewBox="0 0 24 24"
+-            width={24}
+-            xmlns="http://www.w3.org/2000/svg"
+-          >
+-            <path
+-              d="M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z"
+-            />
+-          </svg>
+-        </button>
+-      </div>
+-    </div>
+-  </div>
+-</div>
+-`;
+diff --git a/packages/components/src/color-picker/test/index.js b/packages/components/src/color-picker/test/index.js
+index 11244c8a27e67a..503d5ffa66e8f4 100644
+--- a/packages/components/src/color-picker/test/index.js
++++ b/packages/components/src/color-picker/test/index.js
+@@ -1,118 +1,168 @@
+ /**
+  * External dependencies
+  */
+-import TestRenderer from 'react-test-renderer';
++import { render, fireEvent } from '@testing-library/react';
+ 
+ /**
+- * WordPress dependencies
++ * Internal dependencies
+  */
+-import { DOWN, ENTER, UP } from '@wordpress/keycodes';
++import { ColorPicker } from '..';
+ 
+ /**
+- * Internal dependencies
++ * Ordinarily we'd try to select the compnoent by role but the silder role appears
++ * on several elements and we'd end up encoding assumptions about order when
++ * trying to select the appropriate element. We might as well just use the classname
++ * on the container which will be more durable if, for example, the order changes.
++ *
++ * @param {HTMLElement} container
++ * @return {HTMLElement} The saturation element
+  */
+-import ColorPicker from '../';
++function getSaturation( container ) {
++	return container.querySelector(
++		'.react-colorful__saturation .react-colorful__interactive'
++	);
++}
++
++// Fix to pass `pageX` and `pageY`
++// See https://github.com/testing-library/react-testing-library/issues/268
++class FakeMouseEvent extends window.MouseEvent {
++	constructor( type, values = {} ) {
++		super( type, { buttons: 1, bubbles: true, ...values } );
++
++		Object.assign( this, {
++			pageX: values.pageX || 0,
++			pageY: values.pageY || 0,
++		} );
++	}
++}
++
++function moveReactColorfulSlider( sliderElement, from, to ) {
++	fireEvent( sliderElement, new FakeMouseEvent( 'mousedown', from ) );
++	fireEvent( sliderElement, new FakeMouseEvent( 'mousemove', to ) );
++}
++
++const sleep = ( ms ) => {
++	const promise = new Promise( ( resolve ) => setTimeout( resolve, ms ) );
++	jest.advanceTimersByTime( ms + 1 );
++	return promise;
++};
++
++const hslMatcher = expect.objectContaining( {
++	h: expect.any( Number ),
++	s: expect.any( Number ),
++	l: expect.any( Number ),
++} );
++
++const hslaMatcher = expect.objectContaining( {
++	h: expect.any( Number ),
++	s: expect.any( Number ),
++	l: expect.any( Number ),
++	a: expect.any( Number ),
++} );
++
++const legacyColorMatcher = {
++	color: expect.anything(),
++	hex: expect.any( String ),
++	hsl: hslaMatcher,
++	hsv: expect.objectContaining( {
++		h: expect.any( Number ),
++		s: expect.any( Number ),
++		v: expect.any( Number ),
++		a: expect.any( Number ),
++	} ),
++	rgb: expect.objectContaining( {
++		r: expect.any( Number ),
++		g: expect.any( Number ),
++		b: expect.any( Number ),
++		a: expect.any( Number ),
++	} ),
++	oldHue: expect.any( Number ),
++	source: 'hex',
++};
+ 
+ describe( 'ColorPicker', () => {
+-	const color = '#FFF';
+-	let base;
++	describe( 'legacy props', () => {
++		it( 'should fire onChangeComplete with the legacy color format', async () => {
++			const onChangeComplete = jest.fn();
++			const color = '#fff';
+ 
+-	beforeEach( () => {
+-		base = TestRenderer.create(
+-			<ColorPicker
+-				color={ color }
+-				onChangeComplete={ () => {} }
+-				disableAlpha
+-			/>
+-		);
+-	} );
++			const { container } = render(
++				<ColorPicker
++					onChangeComplete={ onChangeComplete }
++					color={ color }
++				/>
++			);
+ 
+-	test( 'should render color picker', () => {
+-		expect( base.toJSON() ).toMatchSnapshot();
+-	} );
++			const saturation = getSaturation( container );
++			moveReactColorfulSlider(
++				saturation,
++				{ pageX: 0, pageY: 0 },
++				{ pageX: 10, pageY: 10 }
++			);
+ 
+-	test( 'should only update input view for draft changes', () => {
+-		const testRenderer = TestRenderer.create(
+-			<ColorPicker
+-				color={ color }
+-				onChangeComplete={ () => {} }
+-				disableAlpha
+-			/>
+-		);
+-		testRenderer.root
+-			.findByType( 'input' )
+-			.props.onChange( { target: { value: '#ABC' } } );
++			// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
++			await sleep( 1 );
+ 
+-		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
++			expect( onChangeComplete ).toHaveBeenCalledWith(
++				legacyColorMatcher
++			);
++		} );
+ 	} );
+ 
+-	test( 'should commit changes to all views on blur', () => {
+-		const testRenderer = TestRenderer.create(
+-			<ColorPicker
+-				color={ color }
+-				onChangeComplete={ () => {} }
+-				disableAlpha
+-			/>
+-		);
+-		testRenderer.root
+-			.findByType( 'input' )
+-			.props.onChange( { target: { value: '#ABC' } } );
+-		testRenderer.root.findByType( 'input' ).props.onBlur();
++	it( 'should fire onChange with the HSLA value', async () => {
++		const onChange = jest.fn();
++		const color = {
++			h: 125,
++			s: 0.2,
++			l: 0.5,
++			a: 0.5,
++		};
+ 
+-		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
+-	} );
++		const { container } = render(
++			<ColorPicker onChange={ onChange } color={ color } enableAlpha />
++		);
+ 
+-	test( 'should commit changes to all views on keyDown = UP', () => {
+-		const testRenderer = TestRenderer.create(
+-			<ColorPicker
+-				color={ color }
+-				onChangeComplete={ () => {} }
+-				disableAlpha
+-			/>
++		const saturation = getSaturation( container );
++		moveReactColorfulSlider(
++			saturation,
++			{ pageX: 0, pageY: 0 },
++			{ pageX: 10, pageY: 10 }
+ 		);
+-		testRenderer.root
+-			.findByType( 'input' )
+-			.props.onChange( { target: { value: '#ABC' } } );
+-		testRenderer.root
+-			.findByType( 'input' )
+-			.props.onKeyDown( { keyCode: UP } );
+-
+-		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
++
++		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
++		await sleep( 1 );
++
++		expect( onChange ).toHaveBeenCalledWith( hslaMatcher );
+ 	} );
+ 
+-	test( 'should commit changes to all views on keyDown = DOWN', () => {
+-		const testRenderer = TestRenderer.create(
++	it( 'should fire onChange with the HSL value', async () => {
++		const onChange = jest.fn();
++		const color = {
++			h: 125,
++			s: 0.2,
++			l: 0.5,
++			// add alpha to prove it's ignored
++			a: 0.5,
++		};
++
++		const { container } = render(
+ 			<ColorPicker
++				onChange={ onChange }
+ 				color={ color }
+-				onChangeComplete={ () => {} }
+-				disableAlpha
++				enableAlpha={ false }
+ 			/>
+ 		);
+-		testRenderer.root
+-			.findByType( 'input' )
+-			.props.onChange( { target: { value: '#ABC' } } );
+-		testRenderer.root
+-			.findByType( 'input' )
+-			.props.onKeyDown( { keyCode: DOWN } );
+-
+-		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
+-	} );
+ 
+-	test( 'should commit changes to all views on keyDown = ENTER', () => {
+-		const testRenderer = TestRenderer.create(
+-			<ColorPicker
+-				color={ color }
+-				onChangeComplete={ () => {} }
+-				disableAlpha
+-			/>
++		const saturation = getSaturation( container );
++		moveReactColorfulSlider(
++			saturation,
++			{ pageX: 0, pageY: 0 },
++			{ pageX: 10, pageY: 10 }
+ 		);
+-		testRenderer.root
+-			.findByType( 'input' )
+-			.props.onChange( { target: { value: '#ABC' } } );
+-		testRenderer.root
+-			.findByType( 'input' )
+-			.props.onKeyDown( { keyCode: ENTER } );
+-
+-		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
++
++		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
++		await sleep( 1 );
++
++		expect( onChange ).toHaveBeenCalledWith( hslMatcher );
+ 	} );
+ } );
+diff --git a/packages/components/src/color-picker/test/input.js b/packages/components/src/color-picker/test/input.js
+deleted file mode 100644
+index 7598811f5af851..00000000000000
+--- a/packages/components/src/color-picker/test/input.js
++++ /dev/null
+@@ -1,174 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import TestRenderer from 'react-test-renderer';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { DOWN, ENTER, SPACE, UP } from '@wordpress/keycodes';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Input } from '../inputs';
+-
+-describe( 'Input', () => {
+-	describe( 'calls onChange prop with commit state', () => {
+-		test( 'onKeyDown = ENTER', () => {
+-			const onChange = jest.fn();
+-			const testInstance = TestRenderer.create(
+-				<Input
+-					source="rgb"
+-					label={ 'Color value in hexadecimal' }
+-					valueKey="hex"
+-					value={ '#fff' }
+-					onChange={ onChange }
+-				/>
+-			).root;
+-			testInstance
+-				.findByType( 'input' )
+-				.props.onKeyDown( { keyCode: ENTER } );
+-			expect( onChange ).toHaveBeenCalledTimes( 1 );
+-			expect( onChange ).toHaveBeenCalledWith( {
+-				source: 'rgb',
+-				state: 'commit',
+-				value: '#fff',
+-				valueKey: 'hex',
+-			} );
+-		} );
+-
+-		test( 'onKeyDown = UP', () => {
+-			const onChange = jest.fn();
+-			const testInstance = TestRenderer.create(
+-				<Input
+-					source="rgb"
+-					label={ 'Color value in hexadecimal' }
+-					valueKey="hex"
+-					value={ '#fff' }
+-					onChange={ onChange }
+-				/>
+-			).root;
+-			testInstance
+-				.findByType( 'input' )
+-				.props.onKeyDown( { keyCode: UP } );
+-			expect( onChange ).toHaveBeenCalledTimes( 1 );
+-			expect( onChange ).toHaveBeenCalledWith( {
+-				source: 'rgb',
+-				state: 'commit',
+-				value: '#fff',
+-				valueKey: 'hex',
+-			} );
+-		} );
+-
+-		test( 'onKeyDown = DOWN', () => {
+-			const onChange = jest.fn();
+-			const testInstance = TestRenderer.create(
+-				<Input
+-					source="rgb"
+-					label={ 'Color value in hexadecimal' }
+-					valueKey="hex"
+-					value={ '#fff' }
+-					onChange={ onChange }
+-				/>
+-			).root;
+-			testInstance
+-				.findByType( 'input' )
+-				.props.onKeyDown( { keyCode: DOWN } );
+-			expect( onChange ).toHaveBeenCalledTimes( 1 );
+-			expect( onChange ).toHaveBeenCalledWith( {
+-				source: 'rgb',
+-				state: 'commit',
+-				value: '#fff',
+-				valueKey: 'hex',
+-			} );
+-		} );
+-
+-		test( 'onChange event for value.length > 4', () => {
+-			const onChange = jest.fn();
+-			const testInstance = TestRenderer.create(
+-				<Input
+-					source="rgb"
+-					label={ 'Color value in hexadecimal' }
+-					valueKey="hex"
+-					value={ '#fff' }
+-					onChange={ onChange }
+-				/>
+-			).root;
+-			testInstance
+-				.findByType( 'input' )
+-				.props.onChange( { target: { value: '#aaaaaa' } } );
+-			expect( onChange ).toHaveBeenCalledTimes( 1 );
+-			expect( onChange ).toHaveBeenCalledWith( {
+-				source: 'rgb',
+-				state: 'commit',
+-				value: '#aaaaaa',
+-				valueKey: 'hex',
+-			} );
+-		} );
+-
+-		test( 'onBlur', () => {
+-			const onChange = jest.fn();
+-			const testInstance = TestRenderer.create(
+-				<Input
+-					source="rgb"
+-					label={ 'Color value in hexadecimal' }
+-					valueKey="hex"
+-					value={ '#fff' }
+-					onChange={ onChange }
+-				/>
+-			).root;
+-			testInstance.findByType( 'input' ).props.onBlur();
+-			expect( onChange ).toHaveBeenCalledTimes( 1 );
+-			expect( onChange ).toHaveBeenCalledWith( {
+-				source: 'rgb',
+-				state: 'commit',
+-				value: '#fff',
+-				valueKey: 'hex',
+-			} );
+-		} );
+-	} );
+-
+-	describe( 'does call onChange with draft state', () => {
+-		test( 'onChange event for value.length <= 4', () => {
+-			const onChange = jest.fn();
+-			const testInstance = TestRenderer.create(
+-				<Input
+-					source="rgb"
+-					label={ 'Color value in hexadecimal' }
+-					valueKey="hex"
+-					value={ '#fff' }
+-					onChange={ onChange }
+-				/>
+-			).root;
+-			testInstance
+-				.findByType( 'input' )
+-				.props.onChange( { target: { value: '#aaaaa' } } );
+-			expect( onChange ).toHaveBeenCalledTimes( 1 );
+-			expect( onChange ).toHaveBeenCalledWith( {
+-				source: 'rgb',
+-				state: 'draft',
+-				value: '#aaaaa',
+-				valueKey: 'hex',
+-			} );
+-		} );
+-	} );
+-
+-	describe( 'does not call onChange', () => {
+-		test( 'onKeyDown not ENTER, DOWN, or UP', () => {
+-			const onChange = jest.fn();
+-			const testInstance = TestRenderer.create(
+-				<Input
+-					label={ 'Color value in hexadecimal' }
+-					valueKey="hex"
+-					value={ '#fff' }
+-					onChange={ onChange }
+-				/>
+-			).root;
+-			testInstance
+-				.findByType( 'input' )
+-				.props.onKeyDown( { keyCode: SPACE } );
+-			expect( onChange ).not.toHaveBeenCalled();
+-		} );
+-	} );
+-} );
+diff --git a/packages/components/src/ui/color-picker/types.ts b/packages/components/src/color-picker/types.ts
+similarity index 100%
+rename from packages/components/src/ui/color-picker/types.ts
+rename to packages/components/src/color-picker/types.ts
+diff --git a/packages/components/src/ui/color-picker/use-deprecated-props.ts b/packages/components/src/color-picker/use-deprecated-props.ts
+similarity index 95%
+rename from packages/components/src/ui/color-picker/use-deprecated-props.ts
+rename to packages/components/src/color-picker/use-deprecated-props.ts
+index 7fc952b8f99ab5..a4ab085704e60f 100644
+--- a/packages/components/src/ui/color-picker/use-deprecated-props.ts
++++ b/packages/components/src/color-picker/use-deprecated-props.ts
+@@ -43,7 +43,7 @@ type LegacyColor =
+  * @deprecated
+  */
+ export interface LegacyProps {
+-	color: LegacyColor;
++	color: LegacyColor | undefined;
+ 	/**
+ 	 * @deprecated
+ 	 */
+@@ -69,7 +69,10 @@ function isLegacyProps( props: any ): props is LegacyProps {
+ 
+ function getColorFromLegacyProps(
+ 	props: LegacyProps
+-): ColorFormats.HSL | ColorFormats.HSLA {
++): ColorFormats.HSL | ColorFormats.HSLA | undefined {
++	if ( ! props.color ) {
++		return undefined;
++	}
+ 	if ( typeof props.color === 'string' ) {
+ 		return colorize( props.color ).toHsl();
+ 	}
+diff --git a/packages/components/src/color-picker/utils.js b/packages/components/src/color-picker/utils.js
+deleted file mode 100644
+index e59576cfeda3cf..00000000000000
+--- a/packages/components/src/color-picker/utils.js
++++ /dev/null
+@@ -1,214 +0,0 @@
+-/**
+- * Parts of this source were derived and modified from react-color,
+- * released under the MIT license.
+- *
+- * https://github.com/casesandberg/react-color/
+- *
+- * Copyright (c) 2015 Case Sandberg
+- *
+- * Permission is hereby granted, free of charge, to any person obtaining a copy
+- * of this software and associated documentation files (the "Software"), to deal
+- * in the Software without restriction, including without limitation the rights
+- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+- * copies of the Software, and to permit persons to whom the Software is
+- * furnished to do so, subject to the following conditions:
+- *
+- * The above copyright notice and this permission notice shall be included in
+- * all copies or substantial portions of the Software.
+- *
+- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+- * THE SOFTWARE.
+- */
+-
+-/**
+- * External dependencies
+- */
+-import { each } from 'lodash';
+-import tinycolor from 'tinycolor2';
+-
+-/**
+- * Given a hex color, get all other color properties (rgb, alpha, etc).
+- *
+- * @param {Object|string} data   A hex color string or an object with a hex property
+- * @param {string}        oldHue A reference to the hue of the previous color, otherwise dragging the saturation to zero will reset the current hue to zero as well. See https://github.com/casesandberg/react-color/issues/29#issuecomment-132686909.
+- * @return {Object} An object of different color representations.
+- */
+-export function colorToState( data = {}, oldHue = false ) {
+-	const color = data.hex ? tinycolor( data.hex ) : tinycolor( data );
+-	const hsl = color.toHsl();
+-	hsl.h = Math.round( hsl.h );
+-	hsl.s = Math.round( hsl.s * 100 );
+-	hsl.l = Math.round( hsl.l * 100 );
+-	const hsv = color.toHsv();
+-	hsv.h = Math.round( hsv.h );
+-	hsv.s = Math.round( hsv.s * 100 );
+-	hsv.v = Math.round( hsv.v * 100 );
+-	const rgb = color.toRgb();
+-	const hex = color.toHex();
+-	if ( hsl.s === 0 ) {
+-		hsl.h = oldHue || 0;
+-		hsv.h = oldHue || 0;
+-	}
+-	const transparent = hex === '000000' && rgb.a === 0;
+-
+-	return {
+-		color,
+-		hex: transparent ? 'transparent' : `#${ hex }`,
+-		hsl,
+-		hsv,
+-		oldHue: data.h || oldHue || hsl.h,
+-		rgb,
+-		source: data.source,
+-	};
+-}
+-
+-/**
+- * Get the top/left offsets of a point in a container, also returns the container width/height.
+- *
+- * @param {Event}       e         Mouse or touch event with a location coordinate.
+- * @param {HTMLElement} container The container div, returned point is relative to this container.
+- * @return {Object} An object of the offset positions & container size.
+- */
+-function getPointOffset( e, container ) {
+-	e.preventDefault();
+-	const {
+-		left: containerLeft,
+-		top: containerTop,
+-		width,
+-		height,
+-	} = container.getBoundingClientRect();
+-	const x = typeof e.pageX === 'number' ? e.pageX : e.touches[ 0 ].pageX;
+-	const y = typeof e.pageY === 'number' ? e.pageY : e.touches[ 0 ].pageY;
+-	let left = x - ( containerLeft + window.pageXOffset );
+-	let top = y - ( containerTop + window.pageYOffset );
+-
+-	if ( left < 0 ) {
+-		left = 0;
+-	} else if ( left > width ) {
+-		left = width;
+-	} else if ( top < 0 ) {
+-		top = 0;
+-	} else if ( top > height ) {
+-		top = height;
+-	}
+-
+-	return { top, left, width, height };
+-}
+-
+-/**
+- * Check if a string is a valid hex color code.
+- *
+- * @param {string} hex A possible hex color.
+- * @return {boolean} True if the color is a valid hex color.
+- */
+-export function isValidHex( hex ) {
+-	// disable hex4 and hex8
+-	const lh = String( hex ).charAt( 0 ) === '#' ? 1 : 0;
+-	return (
+-		hex.length !== 4 + lh &&
+-		hex.length < 7 + lh &&
+-		tinycolor( hex ).isValid()
+-	);
+-}
+-
+-/**
+- * Check an object for any valid color properties.
+- *
+- * @param {Object} data A possible object representing a color.
+- * @return {Object|boolean} If a valid representation of color, returns the data object. Otherwise returns false.
+- */
+-export function simpleCheckForValidColor( data ) {
+-	const keysToCheck = [ 'r', 'g', 'b', 'a', 'h', 's', 'l', 'v' ];
+-	let checked = 0;
+-	let passed = 0;
+-	each( keysToCheck, ( letter ) => {
+-		if ( data[ letter ] ) {
+-			checked += 1;
+-			if ( ! isNaN( data[ letter ] ) ) {
+-				passed += 1;
+-			}
+-		}
+-	} );
+-	return checked === passed ? data : false;
+-}
+-
+-/**
+- * Calculate the current alpha based on a mouse or touch event
+- *
+- * @param {Event}       e         A mouse or touch event on the alpha bar.
+- * @param {Object}      props     The current component props
+- * @param {HTMLElement} container The container div for the alpha bar graph.
+- * @return {Object|null} If the alpha value has changed, returns a new color object.
+- */
+-export function calculateAlphaChange( e, props, container ) {
+-	const { left, width } = getPointOffset( e, container );
+-	const a = left < 0 ? 0 : Math.round( ( left * 100 ) / width ) / 100;
+-
+-	if ( props.hsl.a !== a ) {
+-		return {
+-			h: props.hsl.h,
+-			s: props.hsl.s,
+-			l: props.hsl.l,
+-			a,
+-			source: 'rgb',
+-		};
+-	}
+-	return null;
+-}
+-
+-/**
+- * Calculate the current hue based on a mouse or touch event
+- *
+- * @param {Event}       e         A mouse or touch event on the hue bar.
+- * @param {Object}      props     The current component props
+- * @param {HTMLElement} container The container div for the hue bar graph.
+- * @return {Object|null} If the hue value has changed, returns a new color object.
+- */
+-export function calculateHueChange( e, props, container ) {
+-	const { left, width } = getPointOffset( e, container );
+-	const percent = ( left * 100 ) / width;
+-	const h = left >= width ? 359 : ( 360 * percent ) / 100;
+-
+-	if ( props.hsl.h !== h ) {
+-		return {
+-			h,
+-			s: props.hsl.s,
+-			l: props.hsl.l,
+-			a: props.hsl.a,
+-			source: 'rgb',
+-		};
+-	}
+-	return null;
+-}
+-
+-/**
+- * Calculate the current saturation & brightness based on a mouse or touch event
+- *
+- * @param {Event}       e         A mouse or touch event on the saturation graph.
+- * @param {Object}      props     The current component props
+- * @param {HTMLElement} container The container div for the 2D saturation graph.
+- * @return {Object} Returns a new color object.
+- */
+-export function calculateSaturationChange( e, props, container ) {
+-	const { top, left, width, height } = getPointOffset( e, container );
+-	const saturation = left < 0 ? 0 : ( left * 100 ) / width;
+-	let bright = top >= height ? 0 : -( ( top * 100 ) / height ) + 100;
+-	// `v` values less than 1 are considered in the [0,1] range, causing unexpected behavior at the bottom
+-	// of the chart. To fix this, we assume any value less than 1 should be 0 brightness.
+-	if ( bright < 1 ) {
+-		bright = 0;
+-	}
+-
+-	return {
+-		h: props.hsl.h,
+-		s: saturation,
+-		v: bright,
+-		a: props.hsl.a,
+-		source: 'rgb',
+-	};
+-}
+diff --git a/packages/components/src/custom-gradient-bar/control-points.js b/packages/components/src/custom-gradient-bar/control-points.js
+index fc63c5896a5873..10b5f1b9b7189a 100644
+--- a/packages/components/src/custom-gradient-bar/control-points.js
++++ b/packages/components/src/custom-gradient-bar/control-points.js
+@@ -16,7 +16,7 @@ import { LEFT, RIGHT } from '@wordpress/keycodes';
+  * Internal dependencies
+  */
+ import Button from '../button';
+-import ColorPicker from '../color-picker';
++import { ColorPicker } from '../color-picker';
+ import Dropdown from '../dropdown';
+ import { VisuallyHidden } from '../visually-hidden';
+ 
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 28f8e245941e81..5866cb5b24b950 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -39,7 +39,7 @@ export { default as ClipboardButton } from './clipboard-button';
+ export { default as __experimentalColorEdit } from './color-edit';
+ export { default as ColorIndicator } from './color-indicator';
+ export { default as ColorPalette } from './color-palette';
+-export { default as ColorPicker } from './color-picker';
++export { ColorPicker } from './color-picker';
+ export { default as ComboboxControl } from './combobox-control';
+ export {
+ 	Composite as __unstableComposite,
+diff --git a/packages/components/src/index.native.js b/packages/components/src/index.native.js
+index b9c92a793f3b7b..d733021cba85dc 100644
+--- a/packages/components/src/index.native.js
++++ b/packages/components/src/index.native.js
+@@ -10,7 +10,7 @@ export {
+ } from '@wordpress/primitives';
+ export { default as ColorIndicator } from './color-indicator';
+ export { default as ColorPalette } from './color-palette';
+-export { default as ColorPicker } from './color-picker';
++export { ColorPicker } from './color-picker';
+ export { default as Dashicon } from './dashicon';
+ export { default as Dropdown } from './dropdown';
+ export { default as DropdownMenu } from './dropdown-menu';
+diff --git a/packages/components/src/mobile/color-settings/picker-screen.native.js b/packages/components/src/mobile/color-settings/picker-screen.native.js
+index edb7d260e86d97..440abd7e8ed202 100644
+--- a/packages/components/src/mobile/color-settings/picker-screen.native.js
++++ b/packages/components/src/mobile/color-settings/picker-screen.native.js
+@@ -12,7 +12,7 @@ import { BottomSheetContext } from '@wordpress/components';
+ /**
+  * Internal dependencies
+  */
+-import ColorPicker from '../../color-picker';
++import { ColorPicker } from '../../color-picker';
+ 
+ const PickerScreen = () => {
+ 	const route = useRoute();
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 22ae2fb4779954..01231952a2cc01 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -6,7 +6,6 @@
+ @import "./circular-option-picker/style.scss";
+ @import "./color-edit/style.scss";
+ @import "./color-indicator/style.scss";
+-@import "./color-picker/style.scss";
+ @import "./combobox-control/style.scss";
+ @import "./color-list-picker/style.scss";
+ @import "./custom-gradient-picker/style.scss";
+diff --git a/packages/components/src/ui/color-picker/README.md b/packages/components/src/ui/color-picker/README.md
+deleted file mode 100644
+index 53c2ba6292a328..00000000000000
+--- a/packages/components/src/ui/color-picker/README.md
++++ /dev/null
+@@ -1,57 +0,0 @@
+-# ColorPicker
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-`ColorPicker` is a color picking component based on `react-colorful`. It lets you pick a color visually or by manipulating the individual RGB(A), HSL(A) and Hex(8) color values.
+-
+-## Usage
+-
+-```jsx
+-import { ColorPicker } from '@wordpress/components/ui';
+-
+-function Example() {
+-	const [color, setColor] = useState();
+-	return (
+-		<ColorPicker
+-			color={color}
+-			onChange={setColor}
+-			enableAlpha
+-			defaultValue="#000"
+-		/>
+-	);
+-}
+-```
+-
+-## Props
+-
+-### `color`
+-
+-**Type**: `string`
+-
+-The current color value to display in the picker. Must be a hex or hex8 string.
+-
+-### `onChange`
+-
+-**Type**: `(hex8Color: string) => void`
+-
+-Fired when the color changes. Always passes a hex8 color string.
+-
+-### `enableAlpha`
+-
+-**Type**: `boolean`
+-
+-Defaults to `false`. When `true` the color picker will display the alpha channel both in the bottom inputs as well as in the color picker itself.
+-
+-### `defaultValue`
+-
+-**Type**: `string | undefined`
+-
+-An optional default value to use for the color picker.
+-
+-### `copyFormat`
+-
+-**Type**: `'hex' | 'hsl' | 'rgb' | undefined`
+-
+-The format to copy when clicking the displayed color format.
+diff --git a/packages/components/src/ui/color-picker/stories/index.js b/packages/components/src/ui/color-picker/stories/index.js
+deleted file mode 100644
+index 44c0ccba2b7347..00000000000000
+--- a/packages/components/src/ui/color-picker/stories/index.js
++++ /dev/null
+@@ -1,81 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, select } from '@storybook/addon-knobs';
+-import colorize from 'tinycolor2';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { ColorPicker } from '..';
+-import { Flex } from '../../../flex';
+-import { Spacer } from '../../../spacer';
+-import { space } from '../../utils/space';
+-
+-export default {
+-	component: ColorPicker,
+-	title: 'Components (Experimental)/ColorPicker',
+-};
+-
+-const PROP_UNSET = 'unset';
+-
+-const Example = () => {
+-	const [ color, setColor ] = useState( undefined );
+-	const props = {
+-		enableAlpha: boolean( 'enableAlpha', false ),
+-		copyFormat: select(
+-			'copyFormat',
+-			[ PROP_UNSET, 'rgb', 'hsl', 'hex' ],
+-			PROP_UNSET
+-		),
+-	};
+-
+-	if ( props.copyFormat === PROP_UNSET ) {
+-		delete props.copyFormat;
+-	}
+-
+-	return (
+-		<Flex
+-			as={ Spacer }
+-			gap={ space( 2 ) }
+-			justify="space-around"
+-			align="flex-start"
+-			marginTop={ space( 10 ) }
+-		>
+-			<ColorPicker { ...props } color={ color } onChange={ setColor } />
+-			<div style={ { width: 200, textAlign: 'center' } }>
+-				{ colorize( color ).toHslString() }
+-			</div>
+-			<ColorPicker { ...props } color={ color } onChange={ setColor } />
+-		</Flex>
+-	);
+-};
+-
+-export const _default = () => {
+-	return <Example />;
+-};
+-
+-const LegacyExample = () => {
+-	const [ legacyColor, setLegacyColor ] = useState( '#fff' );
+-	const legacyProps = {
+-		color: legacyColor,
+-		onChangeComplete: setLegacyColor,
+-		disableAlpha: boolean( 'disableAlpha', true ),
+-	};
+-
+-	return (
+-		<Flex align="flex-start" justify="flex-start">
+-			<ColorPicker { ...legacyProps } />
+-			<pre style={ { width: '20em' } }>
+-				{ JSON.stringify( legacyColor, undefined, 4 ) }
+-			</pre>
+-		</Flex>
+-	);
+-};
+-
+-export const legacy = () => <LegacyExample />;
+diff --git a/packages/components/src/ui/color-picker/test/index.js b/packages/components/src/ui/color-picker/test/index.js
+deleted file mode 100644
+index 503d5ffa66e8f4..00000000000000
+--- a/packages/components/src/ui/color-picker/test/index.js
++++ /dev/null
+@@ -1,168 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, fireEvent } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { ColorPicker } from '..';
+-
+-/**
+- * Ordinarily we'd try to select the compnoent by role but the silder role appears
+- * on several elements and we'd end up encoding assumptions about order when
+- * trying to select the appropriate element. We might as well just use the classname
+- * on the container which will be more durable if, for example, the order changes.
+- *
+- * @param {HTMLElement} container
+- * @return {HTMLElement} The saturation element
+- */
+-function getSaturation( container ) {
+-	return container.querySelector(
+-		'.react-colorful__saturation .react-colorful__interactive'
+-	);
+-}
+-
+-// Fix to pass `pageX` and `pageY`
+-// See https://github.com/testing-library/react-testing-library/issues/268
+-class FakeMouseEvent extends window.MouseEvent {
+-	constructor( type, values = {} ) {
+-		super( type, { buttons: 1, bubbles: true, ...values } );
+-
+-		Object.assign( this, {
+-			pageX: values.pageX || 0,
+-			pageY: values.pageY || 0,
+-		} );
+-	}
+-}
+-
+-function moveReactColorfulSlider( sliderElement, from, to ) {
+-	fireEvent( sliderElement, new FakeMouseEvent( 'mousedown', from ) );
+-	fireEvent( sliderElement, new FakeMouseEvent( 'mousemove', to ) );
+-}
+-
+-const sleep = ( ms ) => {
+-	const promise = new Promise( ( resolve ) => setTimeout( resolve, ms ) );
+-	jest.advanceTimersByTime( ms + 1 );
+-	return promise;
+-};
+-
+-const hslMatcher = expect.objectContaining( {
+-	h: expect.any( Number ),
+-	s: expect.any( Number ),
+-	l: expect.any( Number ),
+-} );
+-
+-const hslaMatcher = expect.objectContaining( {
+-	h: expect.any( Number ),
+-	s: expect.any( Number ),
+-	l: expect.any( Number ),
+-	a: expect.any( Number ),
+-} );
+-
+-const legacyColorMatcher = {
+-	color: expect.anything(),
+-	hex: expect.any( String ),
+-	hsl: hslaMatcher,
+-	hsv: expect.objectContaining( {
+-		h: expect.any( Number ),
+-		s: expect.any( Number ),
+-		v: expect.any( Number ),
+-		a: expect.any( Number ),
+-	} ),
+-	rgb: expect.objectContaining( {
+-		r: expect.any( Number ),
+-		g: expect.any( Number ),
+-		b: expect.any( Number ),
+-		a: expect.any( Number ),
+-	} ),
+-	oldHue: expect.any( Number ),
+-	source: 'hex',
+-};
+-
+-describe( 'ColorPicker', () => {
+-	describe( 'legacy props', () => {
+-		it( 'should fire onChangeComplete with the legacy color format', async () => {
+-			const onChangeComplete = jest.fn();
+-			const color = '#fff';
+-
+-			const { container } = render(
+-				<ColorPicker
+-					onChangeComplete={ onChangeComplete }
+-					color={ color }
+-				/>
+-			);
+-
+-			const saturation = getSaturation( container );
+-			moveReactColorfulSlider(
+-				saturation,
+-				{ pageX: 0, pageY: 0 },
+-				{ pageX: 10, pageY: 10 }
+-			);
+-
+-			// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
+-			await sleep( 1 );
+-
+-			expect( onChangeComplete ).toHaveBeenCalledWith(
+-				legacyColorMatcher
+-			);
+-		} );
+-	} );
+-
+-	it( 'should fire onChange with the HSLA value', async () => {
+-		const onChange = jest.fn();
+-		const color = {
+-			h: 125,
+-			s: 0.2,
+-			l: 0.5,
+-			a: 0.5,
+-		};
+-
+-		const { container } = render(
+-			<ColorPicker onChange={ onChange } color={ color } enableAlpha />
+-		);
+-
+-		const saturation = getSaturation( container );
+-		moveReactColorfulSlider(
+-			saturation,
+-			{ pageX: 0, pageY: 0 },
+-			{ pageX: 10, pageY: 10 }
+-		);
+-
+-		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
+-		await sleep( 1 );
+-
+-		expect( onChange ).toHaveBeenCalledWith( hslaMatcher );
+-	} );
+-
+-	it( 'should fire onChange with the HSL value', async () => {
+-		const onChange = jest.fn();
+-		const color = {
+-			h: 125,
+-			s: 0.2,
+-			l: 0.5,
+-			// add alpha to prove it's ignored
+-			a: 0.5,
+-		};
+-
+-		const { container } = render(
+-			<ColorPicker
+-				onChange={ onChange }
+-				color={ color }
+-				enableAlpha={ false }
+-			/>
+-		);
+-
+-		const saturation = getSaturation( container );
+-		moveReactColorfulSlider(
+-			saturation,
+-			{ pageX: 0, pageY: 0 },
+-			{ pageX: 10, pageY: 10 }
+-		);
+-
+-		// `onChange` is debounced so we need to sleep for at least 1ms before checking that onChange was called
+-		await sleep( 1 );
+-
+-		expect( onChange ).toHaveBeenCalledWith( hslMatcher );
+-	} );
+-} );
+diff --git a/packages/e2e-tests/specs/editor/blocks/heading.test.js b/packages/e2e-tests/specs/editor/blocks/heading.test.js
+index 3ea0cfb6b89a18..02781002dcd5cf 100644
+--- a/packages/e2e-tests/specs/editor/blocks/heading.test.js
++++ b/packages/e2e-tests/specs/editor/blocks/heading.test.js
+@@ -11,8 +11,10 @@ import {
+ describe( 'Heading', () => {
+ 	const CUSTOM_COLOR_TEXT = 'Custom color';
+ 	const CUSTOM_COLOR_BUTTON_X_SELECTOR = `//button[contains(text(),'${ CUSTOM_COLOR_TEXT }')]`;
++	const CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR =
++		'.components-color-picker button[aria-label="Show detailed inputs"]';
+ 	const COLOR_INPUT_FIELD_SELECTOR =
+-		'.components-color-palette__picker .components-text-control__input';
++		'.components-color-picker .components-input-control__input';
+ 	const COLOR_PANEL_TOGGLE_X_SELECTOR =
+ 		"//button[./span[contains(text(),'Color')]]";
+ 
+@@ -80,10 +82,11 @@ describe( 'Heading', () => {
+ 		);
+ 
+ 		await customTextColorButton.click();
++		await page.click( CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR );
+ 		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
+ 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
+ 		await pressKeyWithModifier( 'primary', 'A' );
+-		await page.keyboard.type( '#7700ff' );
++		await page.keyboard.type( '7700ff' );
+ 		await page.click( 'h3[data-type="core/heading"]' );
+ 		await page.waitForSelector(
+ 			'.component-color-indicator[aria-label="(Color: #7700ff)"]'

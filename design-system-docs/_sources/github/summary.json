@@ -1,0 +1,31 @@
+{
+	"generated_at": "2026-06-29T08:02:53.814Z",
+	"repository": "WordPress/gutenberg",
+	"labels": [
+		"Design System",
+		"[Package] Components",
+		"[Package] UI",
+		"[Package] Theme",
+		"[Feature] Component System"
+	],
+	"per_label_counts": {
+		"Design System": 171,
+		"[Package] Components": 3866,
+		"[Package] UI": 273,
+		"[Package] Theme": 182,
+		"[Feature] Component System": 443
+	},
+	"union_count": 4366,
+	"issues": 1047,
+	"pull_requests": 3319,
+	"regular_issue_pr_comments_from_listing": 19703,
+	"source_markdown_files": 4366,
+	"pr_diffs_fetched": 3316,
+	"pr_diffs_missing": 3,
+	"diff_fetch_completed_at": "2026-06-29T08:06:59.048Z",
+	"api_diff_errors": 3,
+	"oversized_diff_fallbacks": 3,
+	"pr_code_artifacts_fetched": 3319,
+	"pr_code_artifacts_missing": 0,
+	"refreshed_at": "2026-06-29T08:09:09.686Z"
+}

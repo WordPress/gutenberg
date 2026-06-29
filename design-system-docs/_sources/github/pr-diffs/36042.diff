@@ -1,0 +1,286 @@
+diff --git a/packages/components/CONTRIBUTING.md b/packages/components/CONTRIBUTING.md
+index 1056dca1dfadc7..06803bafeb9757 100644
+--- a/packages/components/CONTRIBUTING.md
++++ b/packages/components/CONTRIBUTING.md
+@@ -180,6 +180,14 @@ All new component should be styled using [Emotion](https://emotion.sh/docs/intro
+ 
+ Note: Instead of using Emotion's standard `cx` function, the custom [`useCx` hook](/packages/components/src/utils/hooks/use-cx.ts) should be used instead.
+ 
++### Theme support
++
++To acccess theme variables from Emotion components, use the custom [`useTheme` hook](/packages/components/src/ui/theme/index.ts). This function safely returns the default WordPress theme object if there is no `ThemeProvider` parent of the component calling `useTheme`. Otherwise it will return the contextual theme.
++
++Use the [`createTheme` function](/packages/components/src/ui/theme/index.ts) to create custom themes based on the default WordPress theme.
++
++And finally, for `styled` components, rather than accessing `props.theme` directly, pass it through the [`safeTheme` function](/packages/components/src/ui/theme/index.ts) to safely retrieve either the contextual theme passed to a parent `ThemeProvider` or the default WordPress theme when there is no `ThemeProvider`.
++
+ ## Context system
+ 
+ The `@wordpress/components` context system is based on [React's `Context` API](https://reactjs.org/docs/context.html), and is a way for components to adapt to the "context" they're being rendered in.
+diff --git a/packages/components/src/utils/hooks/emotion.d.ts b/packages/components/src/utils/hooks/emotion.d.ts
+index e156f8acf69ffa..6ec49be0aecfab 100644
+--- a/packages/components/src/utils/hooks/emotion.d.ts
++++ b/packages/components/src/utils/hooks/emotion.d.ts
+@@ -1,5 +1,7 @@
+ import type { EmotionCache } from '@emotion/utils';
++import type { WordPressTheme } from './theme';
+ 
+ declare module '@emotion/react' {
+ 	export function __unsafe_useEmotionCache(): EmotionCache | null;
++	declare interface Theme extends WordPressTheme {}
+ }
+diff --git a/packages/components/src/utils/hooks/index.js b/packages/components/src/utils/hooks/index.js
+index beacf31b7562cd..2c28769f77e8f3 100644
+--- a/packages/components/src/utils/hooks/index.js
++++ b/packages/components/src/utils/hooks/index.js
+@@ -3,3 +3,4 @@ export { default as useUpdateEffect } from './use-update-effect';
+ export { useControlledValue } from './use-controlled-value';
+ export { useCx } from './use-cx';
+ export { useLatestRef } from './use-latest-ref';
++export { useTheme, createTheme, safeTheme } from './theme';
+diff --git a/packages/components/src/utils/hooks/theme/index.ts b/packages/components/src/utils/hooks/theme/index.ts
+new file mode 100644
+index 00000000000000..a6187070e70352
+--- /dev/null
++++ b/packages/components/src/utils/hooks/theme/index.ts
+@@ -0,0 +1,54 @@
++/**
++ * External dependencies
++ */
++import {
++	useTheme as useEmotionTheme,
++	Theme as EmotionTheme,
++} from '@emotion/react';
++import type { DeepPartial } from 'utility-types';
++import { merge } from 'lodash';
++
++/**
++ * Internal dependencies
++ */
++import { CONFIG, COLORS } from '../..';
++
++type Config = typeof CONFIG;
++type Colors = typeof COLORS;
++export type WordPressTheme = {
++	config: Config;
++	colors: Colors;
++};
++
++const DEFAULT_THEME: WordPressTheme = { config: CONFIG, colors: COLORS };
++
++/**
++ * Creates a theme getter function using lodash's `merge` to allow for easy
++ * partial overrides.
++ *
++ * @param  overrides        Override values for the particular theme being created
++ * @param  options          Options configuration for the `createTheme` function
++ * @param  options.isStatic Whether to inherit from ancestor themes
++ * @return A theme getter function to be passed to emotion's ThemeProvider
++ */
++export const createTheme = (
++	overrides: DeepPartial< WordPressTheme >,
++	{ isStatic }: { isStatic: boolean } = { isStatic: true }
++) =>
++	isStatic
++		? ( merge( {}, DEFAULT_THEME, overrides ) as WordPressTheme )
++		: ( ancestor: EmotionTheme ) =>
++				merge(
++					{},
++					DEFAULT_THEME,
++					ancestor,
++					overrides
++				) as WordPressTheme;
++
++const isWordPressTheme = ( theme: any ): theme is WordPressTheme =>
++	'config' in theme && 'colors' in theme;
++
++export const safeTheme = ( theme: EmotionTheme ): WordPressTheme =>
++	isWordPressTheme( theme ) ? theme : DEFAULT_THEME;
++
++export const useTheme = () => safeTheme( useEmotionTheme() );
+diff --git a/packages/components/src/utils/hooks/theme/stories/Theme.stories.js b/packages/components/src/utils/hooks/theme/stories/Theme.stories.js
+new file mode 100644
+index 00000000000000..631e0aabaa2c38
+--- /dev/null
++++ b/packages/components/src/utils/hooks/theme/stories/Theme.stories.js
+@@ -0,0 +1,81 @@
++/**
++ * External dependencies
++ */
++import { ThemeProvider, css } from '@emotion/react';
++import styled from '@emotion/styled';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { createTheme, safeTheme, useTheme } from '..';
++import { useCx } from '../../../utils';
++import { VStack } from '../../../v-stack';
++import { Divider } from '../../../divider';
++
++export default {
++	title: 'Components (Experimental)/Theme',
++};
++
++const MyTheme = createTheme( { colors: { black: 'white', white: 'black' } } );
++
++const ThemedText = styled.span`
++	color: ${ ( props ) => safeTheme( props.theme ).colors.black };
++	background-color: ${ ( props ) => safeTheme( props.theme ).colors.white };
++`;
++
++const ThemedTextWithCss = ( { children } ) => {
++	const theme = useTheme();
++
++	const style = useMemo(
++		() => css`
++			color: ${ theme.colors.black };
++			background-color: ${ theme.colors.white };
++		`,
++		[ theme ]
++	);
++
++	const cx = useCx();
++	const classes = cx( style );
++
++	return <div className={ classes }>{ children }</div>;
++};
++
++export const _default = () => {
++	return (
++		<VStack>
++			<p>
++				Check out the source code for this story to see the differences
++				in how these are implemented.
++			</p>
++			<p>
++				The first group uses `styled` with the `safeTheme` function to
++				access the contextual theme without requiring a root level
++				ThemeProvider to provide the default theme
++			</p>
++			<p>
++				The second group uses our custom `useTheme` hook which wraps
++				Emotion&apos;s own `useTheme` with a simple conditional to
++				return the default theme if none was provided by a ThemeProvider
++			</p>
++			<Divider />
++			<ThemedText>This is text without the custom theme</ThemedText>
++			<ThemeProvider theme={ MyTheme }>
++				<ThemedText>This is text with the custom theme</ThemedText>
++			</ThemeProvider>
++			<Divider />
++			<ThemedTextWithCss>
++				This is text without the custom theme using `css`
++			</ThemedTextWithCss>
++			<ThemeProvider theme={ MyTheme }>
++				<ThemedTextWithCss>
++					This is text with the custom theme using `css`
++				</ThemedTextWithCss>
++			</ThemeProvider>
++		</VStack>
++	);
++};
+diff --git a/packages/components/src/utils/hooks/theme/test/index.js b/packages/components/src/utils/hooks/theme/test/index.js
+new file mode 100644
+index 00000000000000..e53511901601d2
+--- /dev/null
++++ b/packages/components/src/utils/hooks/theme/test/index.js
+@@ -0,0 +1,93 @@
++/**
++ * External dependencies
++ */
++import { merge } from 'lodash';
++import { css, ThemeProvider } from '@emotion/react';
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { createTheme, safeTheme, useTheme } from '..';
++
++import { CONFIG, COLORS, useCx } from '../../..';
++
++describe( 'theme utils', () => {
++	describe( 'safeTheme', () => {
++		it( 'should return the default theme if a non-WP-theme object is supplied', () => {
++			expect( safeTheme( {} ) ).toMatchObject( {
++				config: CONFIG,
++				colors: COLORS,
++			} );
++		} );
++
++		it( 'should return the overridden theme if a WP theme object is supplied', () => {
++			const theme = createTheme( { colors: { black: 'white' } } );
++
++			expect( safeTheme( theme ) ).toBe( theme );
++		} );
++	} );
++
++	describe( 'createTheme', () => {
++		it( 'should return the merged theme', () => {
++			expect(
++				createTheme( { colors: { black: 'white' } } )
++			).toMatchObject(
++				merge(
++					{ colors: COLORS, config: CONFIG },
++					{ colors: { black: 'white' } }
++				)
++			);
++		} );
++
++		it( 'should return a function that merges the ancestor theme', () => {
++			const themeGetter = createTheme(
++				{ colors: { black: 'white' } },
++				{ isStatic: false }
++			);
++
++			const expectedResult = merge(
++				{ colors: COLORS, config: CONFIG },
++				{ colors: { white: 'black', black: 'white' } }
++			);
++
++			expect(
++				themeGetter( { colors: { white: 'black' } } )
++			).toMatchObject( expectedResult );
++		} );
++	} );
++
++	describe( 'useTheme', () => {
++		const Wrapper = () => {
++			const theme = useTheme();
++			const cx = useCx();
++
++			const style = css`
++				color: ${ theme.colors.alert.red };
++			`;
++
++			return <div className={ cx( style ) }>Code is Poetry</div>;
++		};
++
++		it( 'should render using the default theme if there is no provider', () => {
++			render( <Wrapper /> );
++			expect( screen.getByText( 'Code is Poetry' ) ).toHaveStyle(
++				`color: ${ COLORS.alert.red }`
++			);
++		} );
++
++		it( 'should render using the custom theme if there is a ThemeProvider', () => {
++			const theme = createTheme( {
++				colors: { alert: { red: 'green ' } },
++			} );
++			render(
++				<ThemeProvider theme={ theme }>
++					<Wrapper />
++				</ThemeProvider>
++			);
++			expect( screen.getByText( 'Code is Poetry' ) ).toHaveStyle(
++				'color: green'
++			);
++		} );
++	} );
++} );

@@ -1,0 +1,397 @@
+diff --git a/packages/boot/src/components/canvas/back-button.scss b/packages/boot/src/components/canvas/back-button.scss
+index 64d12c1bbd76c9..6f3c4820d964d7 100644
+--- a/packages/boot/src/components/canvas/back-button.scss
++++ b/packages/boot/src/components/canvas/back-button.scss
+@@ -32,9 +32,9 @@
+ 
+ 	&:focus:not(:active) {
+ 		outline:
+-			var(--wpds-border-width-focus) solid
++			var(--wpds-border-width-interactive-focus) solid
+ 			var(--wpds-color-stroke-focus-brand);
+-		outline-offset: calc(-1 * var(--wpds-border-width-focus));
++		outline-offset: calc(-1 * var(--wpds-border-width-interactive-focus));
+ 	}
+ }
+ 
+diff --git a/packages/boot/src/components/navigation/navigation-item/style.scss b/packages/boot/src/components/navigation/navigation-item/style.scss
+index a402c270711458..6244fa3d91dc93 100644
+--- a/packages/boot/src/components/navigation/navigation-item/style.scss
++++ b/packages/boot/src/components/navigation/navigation-item/style.scss
+@@ -19,7 +19,7 @@
+ 	}
+ 
+ 	// Rounded focus ring
+-	border-radius: var(--wpds-border-radius-small, 2px);
++	border-radius: var(--wpds-border-radius-surface-sm, 2px);
+ 
+ 	&.active,
+ 	&:hover,
+diff --git a/packages/boot/src/components/site-hub/style.scss b/packages/boot/src/components/site-hub/style.scss
+index f1beddc18ab9ef..3f5a50022c00d4 100644
+--- a/packages/boot/src/components/site-hub/style.scss
++++ b/packages/boot/src/components/site-hub/style.scss
+@@ -47,8 +47,8 @@
+ 
+ 	&:focus:not(:active) {
+ 		outline:
+-			var(--wpds-border-width-focus, 2px) solid
++			var(--wpds-border-width-interactive-focus, 2px) solid
+ 			var(--wpds-color-stroke-focus-brand, #0073aa);
+-		outline-offset: calc(-1 * var(--wpds-border-width-focus, 2px));
++		outline-offset: calc(-1 * var(--wpds-border-width-interactive-focus, 2px));
+ 	}
+ }
+diff --git a/packages/boot/src/components/site-icon-link/style.scss b/packages/boot/src/components/site-icon-link/style.scss
+index db403792faea4f..da0d3980960c58 100644
+--- a/packages/boot/src/components/site-icon-link/style.scss
++++ b/packages/boot/src/components/site-icon-link/style.scss
+@@ -17,8 +17,8 @@ $header-height: variables.$header-height;
+ 
+ 	&:focus:not(:active) {
+ 		outline:
+-			var(--wpds-border-width-focus, 2px) solid
++			var(--wpds-border-width-interactive-focus, 2px) solid
+ 			var(--wpds-color-stroke-focus-brand, #0073aa);
+-		outline-offset: calc(-1 * var(--wpds-border-width-focus, 2px));
++		outline-offset: calc(-1 * var(--wpds-border-width-interactive-focus, 2px));
+ 	}
+ }
+diff --git a/packages/boot/src/components/site-icon/style.scss b/packages/boot/src/components/site-icon/style.scss
+index 3c5dd689e86124..0e82f4cc0464f9 100644
+--- a/packages/boot/src/components/site-icon/style.scss
++++ b/packages/boot/src/components/site-icon/style.scss
+@@ -15,5 +15,5 @@
+ 	height: variables.$grid-unit-40;
+ 	object-fit: cover;
+ 	aspect-ratio: 1 / 1;
+-	border-radius: var(--wpds-border-radius-medium, 4px);
++	border-radius: var(--wpds-border-radius-surface-md, 4px);
+ }
+diff --git a/packages/theme/docs/ds-tokens.md b/packages/theme/docs/ds-tokens.md
+index e2d2464244d499..8b26286d26c840 100644
+--- a/packages/theme/docs/ds-tokens.md
++++ b/packages/theme/docs/ds-tokens.md
+@@ -9,13 +9,17 @@ Do not edit directly.
+ 
+ ### Border
+ 
+-| Variable name                  | Description                 |
+-| ------------------------------ | --------------------------- |
+-| `--wpds-border-radius-x-small` | Extra small radius          |
+-| `--wpds-border-radius-small`   | Small radius                |
+-| `--wpds-border-radius-medium`  | Medium radius               |
+-| `--wpds-border-radius-large`   | Large radius                |
+-| `--wpds-border-width-focus`    | Border width for focus ring |
++| Variable name                           | Description                     |
++| --------------------------------------- | ------------------------------- |
++| `--wpds-border-radius-surface-xs`       | Extra small radius for surfaces |
++| `--wpds-border-radius-surface-sm`       | Small radius for surfaces       |
++| `--wpds-border-radius-surface-md`       | Medium radius for surfaces      |
++| `--wpds-border-radius-surface-lg`       | Large radius for surfaces       |
++| `--wpds-border-width-surface-xs`        | Extra small width for surfaces  |
++| `--wpds-border-width-surface-sm`        | Small width for surfaces        |
++| `--wpds-border-width-surface-md`        | Medium width for surfaces       |
++| `--wpds-border-width-surface-lg`        | Large width for surfaces        |
++| `--wpds-border-width-interactive-focus` | Border width for focus ring     |
+ 
+ ### Color
+ 
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 9c575baa96f3e2..48de005505d48e 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -3,11 +3,15 @@
+  * ------------------------------------------- */
+ 
+ :root {
+-	--wpds-border-radius-large: 8px; /* Large radius */
+-	--wpds-border-radius-medium: 4px; /* Medium radius */
+-	--wpds-border-radius-small: 2px; /* Small radius */
+-	--wpds-border-radius-x-small: 1px; /* Extra small radius */
+-	--wpds-border-width-focus: 2px; /* Border width for focus ring */
++	--wpds-border-radius-surface-lg: 8px; /* Large radius for surfaces */
++	--wpds-border-radius-surface-md: 4px; /* Medium radius for surfaces */
++	--wpds-border-radius-surface-sm: 2px; /* Small radius for surfaces */
++	--wpds-border-radius-surface-xs: 1px; /* Extra small radius for surfaces */
++	--wpds-border-width-interactive-focus: 2px; /* Border width for focus ring */
++	--wpds-border-width-surface-lg: 8px; /* Large width for surfaces */
++	--wpds-border-width-surface-md: 4px; /* Medium width for surfaces */
++	--wpds-border-width-surface-sm: 2px; /* Small width for surfaces */
++	--wpds-border-width-surface-xs: 1px; /* Extra small width for surfaces */
+ 	--wpds-color-bg-interactive-brand: #00000000; /* Background color for interactive elements with brand tone and normal emphasis. */
+ 	--wpds-color-bg-interactive-brand-active: #f6f8fc; /* Background color for interactive elements with brand tone and normal emphasis that are hovered, focused, or active. */
+ 	--wpds-color-bg-interactive-brand-disabled: #e2e2e2; /* Background color for interactive elements with brand tone and normal emphasis, in their disabled state. */
+@@ -155,6 +159,6 @@
+ 
+ @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {
+ 	:root {
+-		--wpds-border-width-focus: 1.5px; /* Border width for focus ring */
++		--wpds-border-width-interactive-focus: 1.5px; /* Border width for focus ring */
+ 	}
+ }
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.js b/packages/theme/src/prebuilt/js/design-tokens.js
+index e5bb76c76005d1..bda54293ea0dc1 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.js
++++ b/packages/theme/src/prebuilt/js/design-tokens.js
+@@ -4,11 +4,15 @@
+  */
+ 
+ export default [
+-	'--wpds-border-radius-x-small',
+-	'--wpds-border-radius-small',
+-	'--wpds-border-radius-medium',
+-	'--wpds-border-radius-large',
+-	'--wpds-border-width-focus',
++	'--wpds-border-radius-surface-xs',
++	'--wpds-border-radius-surface-sm',
++	'--wpds-border-radius-surface-md',
++	'--wpds-border-radius-surface-lg',
++	'--wpds-border-width-surface-xs',
++	'--wpds-border-width-surface-sm',
++	'--wpds-border-width-surface-md',
++	'--wpds-border-width-surface-lg',
++	'--wpds-border-width-interactive-focus',
+ 	'--wpds-color-bg-surface-neutral',
+ 	'--wpds-color-bg-surface-neutral-strong',
+ 	'--wpds-color-bg-surface-neutral-weak',
+diff --git a/packages/theme/src/prebuilt/json/figma.json b/packages/theme/src/prebuilt/json/figma.json
+index 39b74a0d267213..dc36e372a93d97 100644
+--- a/packages/theme/src/prebuilt/json/figma.json
++++ b/packages/theme/src/prebuilt/json/figma.json
+@@ -1,29 +1,53 @@
+ {
+-	"Border/radius-x-small": {
++	"Border/radius-surface-xs": {
+ 		"value": {
+ 			".": "1px"
+ 		},
+-		"description": "Extra small radius"
++		"description": "Extra small radius for surfaces"
+ 	},
+-	"Border/radius-small": {
++	"Border/radius-surface-sm": {
+ 		"value": {
+ 			".": "2px"
+ 		},
+-		"description": "Small radius"
++		"description": "Small radius for surfaces"
+ 	},
+-	"Border/radius-medium": {
++	"Border/radius-surface-md": {
+ 		"value": {
+ 			".": "4px"
+ 		},
+-		"description": "Medium radius"
++		"description": "Medium radius for surfaces"
+ 	},
+-	"Border/radius-large": {
++	"Border/radius-surface-lg": {
+ 		"value": {
+ 			".": "8px"
+ 		},
+-		"description": "Large radius"
++		"description": "Large radius for surfaces"
+ 	},
+-	"Border/width-focus": {
++	"Border/width-surface-xs": {
++		"value": {
++			".": "1px"
++		},
++		"description": "Extra small width for surfaces"
++	},
++	"Border/width-surface-sm": {
++		"value": {
++			".": "2px"
++		},
++		"description": "Small width for surfaces"
++	},
++	"Border/width-surface-md": {
++		"value": {
++			".": "4px"
++		},
++		"description": "Medium width for surfaces"
++	},
++	"Border/width-surface-lg": {
++		"value": {
++			".": "8px"
++		},
++		"description": "Large width for surfaces"
++	},
++	"Border/width-interactive-focus": {
+ 		"value": {
+ 			".": "2px",
+ 			"high-dpi": "1.5px"
+diff --git a/packages/theme/tokens/border.json b/packages/theme/tokens/border.json
+index cfe210f08ae204..7f589be824d6ab 100644
+--- a/packages/theme/tokens/border.json
++++ b/packages/theme/tokens/border.json
+@@ -2,30 +2,52 @@
+ 	"border": {
+ 		"$type": "dimension",
+ 		"radius": {
+-			"x-small": {
+-				"$value": { "value": 1, "unit": "px" },
+-				"$description": "Extra small radius"
+-			},
+-			"small": {
+-				"$value": { "value": 2, "unit": "px" },
+-				"$description": "Small radius"
+-			},
+-			"medium": {
+-				"$value": { "value": 4, "unit": "px" },
+-				"$description": "Medium radius"
+-			},
+-			"large": {
+-				"$value": { "value": 8, "unit": "px" },
+-				"$description": "Large radius"
++			"surface": {
++				"xs": {
++					"$value": { "value": 1, "unit": "px" },
++					"$description": "Extra small radius for surfaces"
++				},
++				"sm": {
++					"$value": { "value": 2, "unit": "px" },
++					"$description": "Small radius for surfaces"
++				},
++				"md": {
++					"$value": { "value": 4, "unit": "px" },
++					"$description": "Medium radius for surfaces"
++				},
++				"lg": {
++					"$value": { "value": 8, "unit": "px" },
++					"$description": "Large radius for surfaces"
++				}
+ 			}
+ 		},
+ 		"width": {
+-			"focus": {
+-				"$value": { "value": 2, "unit": "px" },
+-				"$description": "Border width for focus ring",
+-				"$extensions": {
+-					"mode": {
+-						"high-dpi": { "value": 1.5, "unit": "px" }
++			"surface": {
++				"xs": {
++					"$value": { "value": 1, "unit": "px" },
++					"$description": "Extra small width for surfaces"
++				},
++				"sm": {
++					"$value": { "value": 2, "unit": "px" },
++					"$description": "Small width for surfaces"
++				},
++				"md": {
++					"$value": { "value": 4, "unit": "px" },
++					"$description": "Medium width for surfaces"
++				},
++				"lg": {
++					"$value": { "value": 8, "unit": "px" },
++					"$description": "Large width for surfaces"
++				}
++			},
++			"interactive": {
++				"focus": {
++					"$value": { "value": 2, "unit": "px" },
++					"$description": "Border width for focus ring",
++					"$extensions": {
++						"mode": {
++							"high-dpi": { "value": 1.5, "unit": "px" }
++						}
+ 					}
+ 				}
+ 			}
+diff --git a/packages/ui/src/box/box.tsx b/packages/ui/src/box/box.tsx
+index ef59fc38b94d57..1320778584bb00 100644
+--- a/packages/ui/src/box/box.tsx
++++ b/packages/ui/src/box/box.tsx
+@@ -84,6 +84,9 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
+ 		backgroundColor,
+ 		color,
+ 		padding,
++		borderRadius,
++		borderWidth,
++		borderColor,
+ 		render = DEFAULT_RENDER,
+ 		...props
+ 	},
+@@ -106,5 +109,18 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
+ 		);
+ 	}
+ 
++	if ( borderRadius ) {
++		style.borderRadius = `var(--wpds-border-radius-${ target }-${ borderRadius }, var(--wpds-border-radius-surface-${ borderRadius }))`;
++	}
++
++	if ( borderWidth ) {
++		style.borderWidth = `var(--wpds-border-width-${ target }-${ borderWidth }, var(--wpds-border-width-surface-${ borderWidth }))`;
++		style.borderStyle = 'solid';
++	}
++
++	if ( borderColor ) {
++		style.borderColor = `var(--wpds-color-stroke-${ target }-${ borderColor }, var(--wpds-color-stroke-surface-${ borderColor }))`;
++	}
++
+ 	return renderElement< 'div' >( render, { style, ...props }, ref );
+ } );
+diff --git a/packages/ui/src/box/stories/index.story.tsx b/packages/ui/src/box/stories/index.story.tsx
+index 2c4180665e05bf..a54759a260fb97 100644
+--- a/packages/ui/src/box/stories/index.story.tsx
++++ b/packages/ui/src/box/stories/index.story.tsx
+@@ -28,6 +28,9 @@ export const Default: Story = {
+ 		backgroundColor: 'info',
+ 		color: 'info',
+ 		padding: 'sm',
++		borderColor: 'brand',
++		borderRadius: 'md',
++		borderWidth: 'sm',
+ 	},
+ 	argTypes: {
+ 		padding: {
+diff --git a/packages/ui/src/box/types.ts b/packages/ui/src/box/types.ts
+index e90ac472eccb75..d576238994b1a4 100644
+--- a/packages/ui/src/box/types.ts
++++ b/packages/ui/src/box/types.ts
+@@ -37,6 +37,21 @@ type ForegroundColor =
+ 	| 'error'
+ 	| 'error-weak';
+ 
++type StrokeColor =
++	| 'brand'
++	| 'brand-strong'
++	| 'error'
++	| 'error-strong'
++	| 'info'
++	| 'info-strong'
++	| 'neutral'
++	| 'neutral-strong'
++	| 'neutral-weak'
++	| 'success'
++	| 'success-strong'
++	| 'warning'
++	| 'warning-strong';
++
+ type DimensionVariant< T > = {
+ 	block?: T;
+ 	blockStart?: T;
+@@ -67,6 +82,21 @@ export interface BoxProps extends ComponentProps< 'div' > {
+ 	 */
+ 	padding?: Size | DimensionVariant< Size >;
+ 
++	/**
++	 * The surface border radius design token.
++	 */
++	borderRadius?: Exclude< SizeToken, '2xs' >;
++
++	/**
++	 * The surface border width design token.
++	 */
++	borderWidth?: Exclude< SizeToken, '2xs' >;
++
++	/**
++	 * The surface border stroke color design token.
++	 */
++	borderColor?: StrokeColor;
++
+ 	/**
+ 	 * The content to be rendered inside the component.
+ 	 */

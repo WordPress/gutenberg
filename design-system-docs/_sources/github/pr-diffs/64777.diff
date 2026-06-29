@@ -1,0 +1,602 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 08e1027f3e7870..f4d8661fa75483 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ 
+ -   `MenuGroup`: Simplify the MenuGroup styles within dropdown menus. ([#65561](https://github.com/WordPress/gutenberg/pull/65561)).
+ -   `DatePicker`: Use compact button size. ([#65653](https://github.com/WordPress/gutenberg/pull/65653)).
++-   `Navigator`: add support for exit animation ([#64777](https://github.com/WordPress/gutenberg/pull/64777)).
+ 
+ ## 28.8.0 (2024-09-19)
+ 
+diff --git a/packages/components/src/navigator/navigator-provider/README.md b/packages/components/src/navigator/navigator-provider/README.md
+index 35bf7a69720be2..b9bc8f0c6bcdc9 100644
+--- a/packages/components/src/navigator/navigator-provider/README.md
++++ b/packages/components/src/navigator/navigator-provider/README.md
+@@ -33,7 +33,7 @@ const MyNavigation = () => (
+ );
+ ```
+ 
+-**Important note**
++### Hierarchical `path`s
+ 
+ `Navigator` assumes that screens are organized hierarchically according to their `path`, which should follow a URL-like scheme where each path segment starts with and is separated by the `/` character.
+ 
+@@ -47,6 +47,10 @@ For example:
+ -   `/parent/:param` is a child of `/parent` as well.
+ -   if the current screen has a `path` with value `/parent/child/grand-child`, when going "back" `Navigator` will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) is found.
+ 
++### Height and animations
++
++Due to how `NavigatorScreen` animations work, it is recommended that the `NavigatorProvider` component is assigned a `height` to prevent some potential UI jumps while moving across screens.
++
+ ## Props
+ 
+ The component accepts the following props:
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index 5882f271d4518f..f2d2c26e576c27 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -15,7 +15,6 @@ import {
+ 	useId,
+ } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+-import { isRTL as isRTLFn } from '@wordpress/i18n';
+ import { escapeAttribute } from '@wordpress/escape-html';
+ import warning from '@wordpress/warning';
+ 
+@@ -29,6 +28,7 @@ import { View } from '../../view';
+ import { NavigatorContext } from '../context';
+ import * as styles from '../styles';
+ import type { NavigatorScreenProps } from '../types';
++import { useScreenAnimatePresence } from './use-screen-animate-presence';
+ 
+ function UnconnectedNavigatorScreen(
+ 	props: WordPressComponentProps< NavigatorScreenProps, 'div', false >,
+@@ -41,16 +41,24 @@ function UnconnectedNavigatorScreen(
+ 	}
+ 
+ 	const screenId = useId();
+-	const { children, className, path, ...otherProps } = useContextSystem(
+-		props,
+-		'NavigatorScreen'
+-	);
++
++	const {
++		children,
++		className,
++		path,
++		onAnimationEnd: onAnimationEndProp,
++		...otherProps
++	} = useContextSystem( props, 'NavigatorScreen' );
+ 
+ 	const { location, match, addScreen, removeScreen } =
+ 		useContext( NavigatorContext );
++	const { isInitial, isBack, focusTargetSelector, skipFocus } = location;
++
+ 	const isMatch = match === screenId;
+ 	const wrapperRef = useRef< HTMLDivElement >( null );
++	const skipAnimationAndFocusRestoration = !! isInitial && ! isBack;
+ 
++	// Register / unregister screen with the navigator context.
+ 	useEffect( () => {
+ 		const screen = {
+ 			id: screenId,
+@@ -60,31 +68,28 @@ function UnconnectedNavigatorScreen(
+ 		return () => removeScreen( screen );
+ 	}, [ screenId, path, addScreen, removeScreen ] );
+ 
+-	const isRTL = isRTLFn();
+-	const { isInitial, isBack } = location;
++	// Animation.
++	const { animationStyles, shouldRenderScreen, screenProps } =
++		useScreenAnimatePresence( {
++			isMatch,
++			isBack,
++			onAnimationEnd: onAnimationEndProp,
++			skipAnimation: skipAnimationAndFocusRestoration,
++		} );
++
+ 	const cx = useCx();
+ 	const classes = useMemo(
+-		() =>
+-			cx(
+-				styles.navigatorScreen( {
+-					isInitial,
+-					isBack,
+-					isRTL,
+-				} ),
+-				className
+-			),
+-		[ className, cx, isInitial, isBack, isRTL ]
++		() => cx( styles.navigatorScreen, animationStyles, className ),
++		[ className, cx, animationStyles ]
+ 	);
+ 
++	// Focus restoration
+ 	const locationRef = useRef( location );
+-
+ 	useEffect( () => {
+ 		locationRef.current = location;
+ 	}, [ location ] );
+-
+-	// Focus restoration
+-	const isInitialLocation = location.isInitial && ! location.isBack;
+ 	useEffect( () => {
++		const wrapperEl = wrapperRef.current;
+ 		// Only attempt to restore focus:
+ 		// - if the current location is not the initial one (to avoid moving focus on page load)
+ 		// - when the screen becomes visible
+@@ -92,20 +97,20 @@ function UnconnectedNavigatorScreen(
+ 		// - if focus hasn't already been restored for the current location
+ 		// - if the `skipFocus` option is not set to `true`. This is useful when we trigger the navigation outside of NavigatorScreen.
+ 		if (
+-			isInitialLocation ||
++			skipAnimationAndFocusRestoration ||
+ 			! isMatch ||
+-			! wrapperRef.current ||
++			! wrapperEl ||
+ 			locationRef.current.hasRestoredFocus ||
+-			location.skipFocus
++			skipFocus
+ 		) {
+ 			return;
+ 		}
+ 
+-		const activeElement = wrapperRef.current.ownerDocument.activeElement;
++		const activeElement = wrapperEl.ownerDocument.activeElement;
+ 
+ 		// If an element is already focused within the wrapper do not focus the
+ 		// element. This prevents inputs or buttons from losing focus unnecessarily.
+-		if ( wrapperRef.current.contains( activeElement ) ) {
++		if ( wrapperEl.contains( activeElement ) ) {
+ 			return;
+ 		}
+ 
+@@ -113,33 +118,36 @@ function UnconnectedNavigatorScreen(
+ 
+ 		// When navigating back, if a selector is provided, use it to look for the
+ 		// target element (assumed to be a node inside the current NavigatorScreen)
+-		if ( location.isBack && location.focusTargetSelector ) {
+-			elementToFocus = wrapperRef.current.querySelector(
+-				location.focusTargetSelector
+-			);
++		if ( isBack && focusTargetSelector ) {
++			elementToFocus = wrapperEl.querySelector( focusTargetSelector );
+ 		}
+ 
+ 		// If the previous query didn't run or find any element to focus, fallback
+ 		// to the first tabbable element in the screen (or the screen itself).
+ 		if ( ! elementToFocus ) {
+-			const [ firstTabbable ] = focus.tabbable.find( wrapperRef.current );
+-			elementToFocus = firstTabbable ?? wrapperRef.current;
++			const [ firstTabbable ] = focus.tabbable.find( wrapperEl );
++			elementToFocus = firstTabbable ?? wrapperEl;
+ 		}
+ 
+ 		locationRef.current.hasRestoredFocus = true;
+ 		elementToFocus.focus();
+ 	}, [
+-		isInitialLocation,
++		skipAnimationAndFocusRestoration,
+ 		isMatch,
+-		location.isBack,
+-		location.focusTargetSelector,
+-		location.skipFocus,
++		isBack,
++		focusTargetSelector,
++		skipFocus,
+ 	] );
+ 
+ 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
+ 
+-	return isMatch ? (
+-		<View ref={ mergedWrapperRef } className={ classes } { ...otherProps }>
++	return shouldRenderScreen ? (
++		<View
++			ref={ mergedWrapperRef }
++			className={ classes }
++			{ ...screenProps }
++			{ ...otherProps }
++		>
+ 			{ children }
+ 		</View>
+ 	) : null;
+diff --git a/packages/components/src/navigator/navigator-screen/use-screen-animate-presence.ts b/packages/components/src/navigator/navigator-screen/use-screen-animate-presence.ts
+new file mode 100644
+index 00000000000000..af5a47ee12df4c
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-screen/use-screen-animate-presence.ts
+@@ -0,0 +1,177 @@
++/**
++ * WordPress dependencies
++ */
++import {
++	useState,
++	useEffect,
++	useLayoutEffect,
++	useCallback,
++} from '@wordpress/element';
++import { useReducedMotion } from '@wordpress/compose';
++import { isRTL as isRTLFn } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from '../styles';
++
++// Possible values:
++// - 'INITIAL': the initial state
++// - 'ANIMATING_IN': start enter animation
++// - 'IN': enter animation has ended
++// - 'ANIMATING_OUT': start exit animation
++// - 'OUT': the exit animation has ended
++type AnimationStatus =
++	| 'INITIAL'
++	| 'ANIMATING_IN'
++	| 'IN'
++	| 'ANIMATING_OUT'
++	| 'OUT';
++
++// Allow an extra 20% of the total animation duration to account for potential
++// event loop delays.
++const ANIMATION_TIMEOUT_MARGIN = 1.2;
++
++const isEnterAnimation = (
++	animationDirection: 'end' | 'start',
++	animationStatus: AnimationStatus,
++	animationName: string
++) =>
++	animationStatus === 'ANIMATING_IN' &&
++	animationName === styles.ANIMATION_END_NAMES[ animationDirection ].in;
++
++const isExitAnimation = (
++	animationDirection: 'end' | 'start',
++	animationStatus: AnimationStatus,
++	animationName: string
++) =>
++	animationStatus === 'ANIMATING_OUT' &&
++	animationName === styles.ANIMATION_END_NAMES[ animationDirection ].out;
++
++export function useScreenAnimatePresence( {
++	isMatch,
++	skipAnimation,
++	isBack,
++	onAnimationEnd,
++}: {
++	isMatch: boolean;
++	skipAnimation: boolean;
++	isBack?: boolean;
++	onAnimationEnd?: React.AnimationEventHandler< Element >;
++} ) {
++	const isRTL = isRTLFn();
++	const prefersReducedMotion = useReducedMotion();
++
++	const [ animationStatus, setAnimationStatus ] =
++		useState< AnimationStatus >( 'INITIAL' );
++
++	// Start enter and exit animations when the screen is selected or deselected.
++	// The animation status is set to `IN` or `OUT` immediately if the animation
++	// should be skipped.
++	const becameSelected =
++		animationStatus !== 'ANIMATING_IN' &&
++		animationStatus !== 'IN' &&
++		isMatch;
++	const becameUnselected =
++		animationStatus !== 'ANIMATING_OUT' &&
++		animationStatus !== 'OUT' &&
++		! isMatch;
++	useLayoutEffect( () => {
++		if ( becameSelected ) {
++			setAnimationStatus(
++				skipAnimation || prefersReducedMotion ? 'IN' : 'ANIMATING_IN'
++			);
++		} else if ( becameUnselected ) {
++			setAnimationStatus(
++				skipAnimation || prefersReducedMotion ? 'OUT' : 'ANIMATING_OUT'
++			);
++		}
++	}, [
++		becameSelected,
++		becameUnselected,
++		skipAnimation,
++		prefersReducedMotion,
++	] );
++
++	// Animation attributes (derived state).
++	const animationDirection =
++		( isRTL && isBack ) || ( ! isRTL && ! isBack ) ? 'end' : 'start';
++	const isAnimatingIn = animationStatus === 'ANIMATING_IN';
++	const isAnimatingOut = animationStatus === 'ANIMATING_OUT';
++	let animationType: 'in' | 'out' | undefined;
++	if ( isAnimatingIn ) {
++		animationType = 'in';
++	} else if ( isAnimatingOut ) {
++		animationType = 'out';
++	}
++
++	const onScreenAnimationEnd = useCallback(
++		( e: React.AnimationEvent< HTMLElement > ) => {
++			onAnimationEnd?.( e );
++
++			if (
++				isExitAnimation(
++					animationDirection,
++					animationStatus,
++					e.animationName
++				)
++			) {
++				// When the exit animation ends on an unselected screen, set the
++				// status to 'OUT' to remove the screen contents from the DOM.
++				setAnimationStatus( 'OUT' );
++			} else if (
++				isEnterAnimation(
++					animationDirection,
++					animationStatus,
++					e.animationName
++				)
++			) {
++				// When the enter animation ends on a selected screen, set the
++				// status to 'IN' to ensure the screen is rendered in the DOM.
++				setAnimationStatus( 'IN' );
++			}
++		},
++		[ onAnimationEnd, animationStatus, animationDirection ]
++	);
++
++	// Fallback timeout to ensure that the logic is applied even if the
++	// `animationend` event is not triggered.
++	useEffect( () => {
++		let animationTimeout: number | undefined;
++
++		if ( isAnimatingOut ) {
++			animationTimeout = window.setTimeout( () => {
++				setAnimationStatus( 'OUT' );
++				animationTimeout = undefined;
++			}, styles.TOTAL_ANIMATION_DURATION.OUT * ANIMATION_TIMEOUT_MARGIN );
++		} else if ( isAnimatingIn ) {
++			animationTimeout = window.setTimeout( () => {
++				setAnimationStatus( 'IN' );
++				animationTimeout = undefined;
++			}, styles.TOTAL_ANIMATION_DURATION.IN * ANIMATION_TIMEOUT_MARGIN );
++		}
++
++		return () => {
++			if ( animationTimeout ) {
++				window.clearTimeout( animationTimeout );
++				animationTimeout = undefined;
++			}
++		};
++	}, [ isAnimatingOut, isAnimatingIn ] );
++
++	return {
++		animationStyles: styles.navigatorScreenAnimation,
++		// Render the screen's contents in the DOM not only when the screen is
++		// selected, but also while it is animating out.
++		shouldRenderScreen:
++			isMatch ||
++			animationStatus === 'IN' ||
++			animationStatus === 'ANIMATING_OUT',
++		screenProps: {
++			onAnimationEnd: onScreenAnimationEnd,
++			'data-animation-direction': animationDirection,
++			'data-animation-type': animationType,
++			'data-skip-animation': skipAnimation || undefined,
++		},
++	} as const;
++}
+diff --git a/packages/components/src/navigator/stories/index.story.tsx b/packages/components/src/navigator/stories/index.story.tsx
+index 30b9c71a368c1a..8edac7e7b81686 100644
+--- a/packages/components/src/navigator/stories/index.story.tsx
++++ b/packages/components/src/navigator/stories/index.story.tsx
+@@ -36,12 +36,12 @@ const meta: Meta< typeof NavigatorProvider > = {
+ 			return (
+ 				<>
+ 					<style>{ `
+-					  /* These attributes are a private implementation detail of the
+-						  Navigator component. Do not use outside of its source code. */
++					  /* The data-wp-component attribute is a private implementation
++						 * detail of the Navigator component. Do not use outside of
++						 * its source code.
++						 */
+ 						[data-wp-component="NavigatorProvider"] {
+-							height: calc(100vh - 2rem);
+-							max-height: 250px;
+-
++							height: 250px;
+ 						}
+ 						[data-wp-component="NavigatorScreen"]:not([data-sticky]) {
+ 							padding: 8px;
+@@ -167,6 +167,7 @@ export const SkipFocus: StoryObj< typeof NavigatorProvider > = {
+ 						outline: '1px solid black',
+ 						outlineOffset: '-1px',
+ 						marginBlockEnd: '1rem',
++						display: 'contents',
+ 					} }
+ 				>
+ 					<NavigatorScreen path="/">
+diff --git a/packages/components/src/navigator/styles.ts b/packages/components/src/navigator/styles.ts
+index 0203edbdf1816a..fd355bf4dd48fb 100644
+--- a/packages/components/src/navigator/styles.ts
++++ b/packages/components/src/navigator/styles.ts
+@@ -4,68 +4,139 @@
+ import { css, keyframes } from '@emotion/react';
+ 
+ export const navigatorProviderWrapper = css`
++	position: relative;
+ 	/* Prevents horizontal overflow while animating screen transitions */
+-	overflow-x: hidden;
+-	/* Mark this subsection of the DOM as isolated, providing performance benefits
+-	 * by limiting calculations of layout, style and paint to a DOM subtree rather
+-	 * than the entire page.
++	overflow-x: clip;
++	/*
++	 * Mark this DOM subtree as isolated when it comes to layout calculations,
++	 * providing performance benefits.
+ 	 */
+-	contain: content;
++	contain: layout;
++
++	display: grid;
++	grid-template-columns: 1fr;
++	grid-template-rows: 1fr;
++	align-items: start;
+ `;
+ 
+-const fadeInFromRight = keyframes( {
+-	'0%': {
++const fadeIn = keyframes( {
++	from: {
+ 		opacity: 0,
+-		transform: `translateX( 50px )`,
+ 	},
+-	'100%': { opacity: 1, transform: 'none' },
+ } );
+ 
+-const fadeInFromLeft = keyframes( {
+-	'0%': {
++const fadeOut = keyframes( {
++	to: {
+ 		opacity: 0,
+-		transform: `translateX( -50px )`,
+ 	},
+-	'100%': { opacity: 1, transform: 'none' },
+ } );
+ 
+-type NavigatorScreenAnimationProps = {
+-	isInitial?: boolean;
+-	isBack?: boolean;
+-	isRTL: boolean;
++export const slideFromRight = keyframes( {
++	from: {
++		transform: 'translateX(100px)',
++	},
++} );
++
++export const slideToLeft = keyframes( {
++	to: {
++		transform: 'translateX(-80px)',
++	},
++} );
++
++export const slideFromLeft = keyframes( {
++	from: {
++		transform: 'translateX(-100px)',
++	},
++} );
++
++export const slideToRight = keyframes( {
++	to: {
++		transform: 'translateX(80px)',
++	},
++} );
++
++const FADE = {
++	DURATION: 70,
++	EASING: 'linear',
++	DELAY: {
++		IN: 70,
++		OUT: 40,
++	},
++};
++const SLIDE = {
++	DURATION: 300,
++	EASING: 'cubic-bezier(0.33, 0, 0, 1)',
++};
++
++export const TOTAL_ANIMATION_DURATION = {
++	IN: Math.max( FADE.DURATION + FADE.DELAY.IN, SLIDE.DURATION ),
++	OUT: Math.max( FADE.DURATION + FADE.DELAY.OUT, SLIDE.DURATION ),
+ };
+ 
+-const navigatorScreenAnimation = ( {
+-	isInitial,
+-	isBack,
+-	isRTL,
+-}: NavigatorScreenAnimationProps ) => {
+-	if ( isInitial && ! isBack ) {
+-		return;
+-	}
++export const ANIMATION_END_NAMES = {
++	end: {
++		in: slideFromRight.name,
++		out: slideToLeft.name,
++	},
++	start: {
++		in: slideFromLeft.name,
++		out: slideToRight.name,
++	},
++};
+ 
+-	const animationName =
+-		( isRTL && isBack ) || ( ! isRTL && ! isBack )
+-			? fadeInFromRight
+-			: fadeInFromLeft;
++const ANIMATION = {
++	end: {
++		in: css`
++			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
++				.IN }ms both ${ fadeIn }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideFromRight }
++		`,
++		out: css`
++			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
++				.OUT }ms both ${ fadeOut }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideToLeft }
++		`,
++	},
++	start: {
++		in: css`
++			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
++				.IN }ms both ${ fadeIn }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideFromLeft }
++		`,
++		out: css`
++			${ FADE.DURATION }ms ${ FADE.EASING } ${ FADE.DELAY
++				.OUT }ms both ${ fadeOut }, ${ SLIDE.DURATION }ms ${ SLIDE.EASING } both ${ slideToRight }
++		`,
++	},
++} as const;
++export const navigatorScreenAnimation = css`
++	z-index: 1;
+ 
+-	return css`
+-		animation-duration: 0.14s;
+-		animation-timing-function: ease-in-out;
+-		will-change: transform, opacity;
+-		animation-name: ${ animationName };
++	&[data-animation-type='out'] {
++		z-index: 0;
++	}
+ 
+-		@media ( prefers-reduced-motion ) {
+-			animation-duration: 0s;
++	@media not ( prefers-reduced-motion ) {
++		&:not( [data-skip-animation] ) {
++			${ ( [ 'start', 'end' ] as const ).map( ( direction ) =>
++				( [ 'in', 'out' ] as const ).map(
++					( type ) => css`
++						&[data-animation-direction='${ direction }'][data-animation-type='${ type }'] {
++							animation: ${ ANIMATION[ direction ][ type ] };
++						}
++					`
++				)
++			) }
+ 		}
+-	`;
+-};
++	}
++`;
+ 
+-export const navigatorScreen = ( props: NavigatorScreenAnimationProps ) => css`
++export const navigatorScreen = css`
+ 	/* Ensures horizontal overflow is visually accessible */
+ 	overflow-x: auto;
+ 	/* In case the root has a height, it should not be exceeded */
+ 	max-height: 100%;
++	box-sizing: border-box;
++
++	position: relative;
+ 
+-	${ navigatorScreenAnimation( props ) }
++	grid-column: 1 / -1;
++	grid-row: 1 / -1;
+ `;

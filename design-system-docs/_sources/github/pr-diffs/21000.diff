@@ -1,0 +1,13 @@
+diff --git a/packages/editor/src/components/editor-notices/style.scss b/packages/editor/src/components/editor-notices/style.scss
+index 14ea34748cce53..b9687bc87de866 100644
+--- a/packages/editor/src/components/editor-notices/style.scss
++++ b/packages/editor/src/components/editor-notices/style.scss
+@@ -35,4 +35,8 @@
+ 
+ .components-editor-notices__snackbar {
+ 	width: 100%;
++	@include break-medium() {
++		width: fit-content;
++		width: -moz-fit-content;
++	}
+ }

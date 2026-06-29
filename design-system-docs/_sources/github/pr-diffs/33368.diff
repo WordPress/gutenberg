@@ -1,0 +1,185 @@
+diff --git a/packages/components/src/utils/backgrounds.ts b/packages/components/src/utils/backgrounds.ts
+new file mode 100644
+index 00000000000000..479633ff4ac6e3
+--- /dev/null
++++ b/packages/components/src/utils/backgrounds.ts
+@@ -0,0 +1,100 @@
++/**
++ * External dependencies
++ */
++import { css, SerializedStyles } from '@emotion/react';
++import colorize from 'tinycolor2';
++
++/**
++ * Internal dependencies
++ */
++import COLORS from './colors-values';
++
++export const SUPPORTED_COLORS = [
++	'blue',
++	'red',
++	'purple',
++	'green',
++	'yellow',
++	'orange',
++	'darkGray',
++	'lightGray',
++] as const;
++
++export type SupportedColor = typeof SUPPORTED_COLORS[ number ];
++
++function assertIsSupportedColor( color: any ): asserts color is SupportedColor {
++	if ( ! SUPPORTED_COLORS.includes( color ) ) {
++		throw new Error(
++			`'color' must be one of the supported colors: ${ SUPPORTED_COLORS.join(
++				', '
++			) }`
++		);
++	}
++}
++
++export function getBackgroundColor(
++	color: SupportedColor,
++	options: { isBold?: boolean } = {}
++): SerializedStyles {
++	assertIsSupportedColor( color );
++
++	const { isBold } = options;
++
++	const colorized = colorize( color );
++
++	switch ( color ) {
++		case 'purple':
++		case 'green':
++			colorized.lighten( 60 );
++			colorized.desaturate( 60 );
++			break;
++		case 'blue':
++		case 'red':
++		case 'orange':
++			colorized.lighten( 40 );
++			colorized.desaturate( 10 );
++			break;
++		case 'darkGray':
++			colorized.lighten( 25 );
++			break;
++		case 'lightGray':
++			colorized.lighten( 13 );
++			break;
++		case 'yellow':
++			colorized.lighten( 40 );
++			break;
++	}
++
++	if ( isBold ) {
++		colorized.darken( 20 );
++	}
++
++	return css( {
++		background: colorized.toHslString(),
++		fontWeight: isBold ? 'bold' : 'normal',
++	} );
++}
++
++const BACKGROUND_COLOR_TO_TEXT: Record< SupportedColor, `#${ string }` > = {
++	blue: '#005f8c',
++	green: '#25612f',
++	yellow: '#c44f09',
++	orange: '#aa3e1a',
++	red: '#841e1e',
++	lightGray: '#6c7177',
++	darkGray: '#191E23',
++	purple: '#342c48',
++};
++
++export function getTextColorForBackgroundColor(
++	color: SupportedColor,
++	{ isBold }: { isBold?: boolean } = {}
++): SerializedStyles {
++	assertIsSupportedColor( color );
++
++	const value = isBold ? COLORS.black : BACKGROUND_COLOR_TO_TEXT[ color ];
++
++	return css`
++		color: ${ value };
++	`;
++}
+diff --git a/packages/components/src/utils/stories/backgrounds.js b/packages/components/src/utils/stories/backgrounds.js
+new file mode 100644
+index 00000000000000..dcb0e844311881
+--- /dev/null
++++ b/packages/components/src/utils/stories/backgrounds.js
+@@ -0,0 +1,73 @@
++/**
++ * External dependencies
++ */
++import { css } from '@emotion/react';
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import { useCx } from '../hooks';
++import {
++	SUPPORTED_COLORS,
++	getBackgroundColor,
++	getTextColorForBackgroundColor,
++} from '../backgrounds';
++import { HStack } from '../../h-stack';
++
++export default {
++	title: 'Components (Experimental)/Background Colors',
++};
++
++const WhiteBackground = styled( HStack )`
++	background-color: white;
++	padding: 2em;
++`;
++
++const BlackBackground = styled( WhiteBackground )`
++	background-color: black;
++`;
++
++const Example = ( { color, isBold } ) => {
++	const cx = useCx();
++
++	const textColor = getTextColorForBackgroundColor( color, { isBold } );
++	const bgColor = getBackgroundColor( color, { isBold } );
++
++	const classes = cx(
++		bgColor,
++		textColor,
++		css( {
++			padding: '1em',
++			borderRadius: '2px',
++			borderColor: color,
++			borderStyle: 'solid',
++			borderWidth: '1px',
++		} )
++	);
++
++	return <span className={ classes }>This is an example</span>;
++};
++
++export const _default = () => {
++	return (
++		<>
++			<WhiteBackground wrap>
++				{ SUPPORTED_COLORS.map( ( color ) => (
++					<Example color={ color } key={ color } />
++				) ) }
++				{ SUPPORTED_COLORS.map( ( color ) => (
++					<Example color={ color } key={ color } isBold />
++				) ) }
++			</WhiteBackground>
++			<BlackBackground wrap>
++				{ SUPPORTED_COLORS.map( ( color ) => (
++					<Example color={ color } key={ color } />
++				) ) }
++				{ SUPPORTED_COLORS.map( ( color ) => (
++					<Example color={ color } key={ color } isBold />
++				) ) }
++			</BlackBackground>
++		</>
++	);
++};

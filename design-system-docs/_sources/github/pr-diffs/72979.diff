@@ -1,0 +1,45 @@
+diff --git a/packages/boot/src/components/navigation/router-link-item.tsx b/packages/boot/src/components/navigation/router-link-item.tsx
+index 94cf8bcab08d16..6cb5a1faf593f0 100644
+--- a/packages/boot/src/components/navigation/router-link-item.tsx
++++ b/packages/boot/src/components/navigation/router-link-item.tsx
+@@ -9,11 +9,9 @@ import type { ForwardedRef } from 'react';
+  */
+ import { forwardRef } from '@wordpress/element';
+ import { __experimentalItem as Item } from '@wordpress/components';
+-import type { ItemProps } from '@wordpress/components/build-types/item-group/types';
+-import type { WordPressComponentProps } from '@wordpress/components/build-types/context';
+ 
+ function AnchorOnlyItem(
+-	props: WordPressComponentProps< ItemProps, 'a' >,
++	props: React.ComponentProps< typeof Item >,
+ 	forwardedRef: ForwardedRef< HTMLAnchorElement >
+ ) {
+ 	return <Item as="a" ref={ forwardedRef } { ...props } />;
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8455c0be46601f..01a7ae865b10dd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,10 +2,8 @@
+ 
+ ## Unreleased
+ 
+-
+ ### Bug Fixes
+ 
+--   Reexport all of the `build-types` folder from the `components` package entry point ([#72809](https://github.com/WordPress/gutenberg/pull/72809)).
+ -   `TextareaControl`: Add `min-height` to the textarea element ([#72867](https://github.com/WordPress/gutenberg/pull/72867)).
+ -   `Card`, `CardHeader`, `CardBody` and `CardFooter`: Add support for directional padding through object-based size prop, allowing independent control of padding for each side ([#72511](https://github.com/WordPress/gutenberg/pull/72511)).
+ 
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 9f4d90721c4c19..385596768d5886 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -26,7 +26,7 @@
+ 	"module": "build-module/index.js",
+ 	"exports": {
+ 		".": {
+-			"types": "./build-types",
++			"types": "./build-types/index.d.ts",
+ 			"import": "./build-module/index.js",
+ 			"require": "./build/index.js"
+ 		},

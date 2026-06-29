@@ -1,0 +1,45 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3881fea0860ffc..f0e3892b1facc0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ 
+ ### Internal
+ 
++-   `Disabled`: add a note in the docs about the lack of polyfill for the `inert` attribute ([#45272](https://github.com/WordPress/gutenberg/pull/45272))
+ -   `Snackbar`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44934](https://github.com/WordPress/gutenberg/pull/44934))
+ -   `AnglePickerControl`: Set Storybook Label control type to 'text' ([#45122](https://github.com/WordPress/gutenberg/pull/45122)).
+ -   `SlotFill`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44403](https://github.com/WordPress/gutenberg/pull/44403))
+diff --git a/packages/components/src/disabled/README.md b/packages/components/src/disabled/README.md
+index 73350d4d9e21a4..c36afc2044bd20 100644
+--- a/packages/components/src/disabled/README.md
++++ b/packages/components/src/disabled/README.md
+@@ -47,6 +47,8 @@ function CustomButton( props ) {
+ }
+ ```
+ 
++_Note: this component may not behave as expected in browsers that don't support [the `inert` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/inert). We recommend adding [the official WICG polyfill](https://github.com/WICG/inert) when using this component in your project._
++
+ ### Props
+ 
+ The component accepts the following props:
+diff --git a/packages/components/src/disabled/index.tsx b/packages/components/src/disabled/index.tsx
+index 6ef627e8350fa3..91c4316f3a6d82 100644
+--- a/packages/components/src/disabled/index.tsx
++++ b/packages/components/src/disabled/index.tsx
+@@ -15,7 +15,14 @@ const Context = createContext< boolean >( false );
+ const { Consumer, Provider } = Context;
+ 
+ /**
+- * `Disabled` is a component which disables descendant tabbable elements and prevents pointer interaction.
++ * `Disabled` is a component which disables descendant tabbable elements and
++ * prevents pointer interaction.
++ *
++ * _Note: this component may not behave as expected in browsers that don't
++ * support the `inert` HTML attribute. We recommend adding the official WICG
++ * polyfill when using this component in your project._
++ *
++ * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/inert
+  *
+  * ```jsx
+  * import { Button, Disabled, TextControl } from '@wordpress/components';

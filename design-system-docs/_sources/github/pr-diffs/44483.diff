@@ -1,0 +1,324 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eb7405e7ec9841..ddc898bd0237a6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `Popover`: refactor unit tests to TypeScript and modern RTL assertions ([#44373](https://github.com/WordPress/gutenberg/pull/44373)).
+ -   `Sandbox`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44378](https://github.com/WordPress/gutenberg/pull/44378))
+ -   `FontSizePicker`: Convert to TypeScript ([#44449](https://github.com/WordPress/gutenberg/pull/44449)).
++-   `FontSizePicker`: Replace SCSS with Emotion + components ([#44483](https://github.com/WordPress/gutenberg/pull/44483)).
+ 
+ ## 21.1.0 (2022-09-21)
+ 
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index 190ca6e1517e0d..317fadd518057c 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import classNames from 'classnames';
+ import type { ReactNode, ForwardedRef } from 'react';
+ 
+ /**
+@@ -15,7 +14,6 @@ import { useState, useMemo, forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { BaseControl } from '../base-control';
+ import Button from '../button';
+ import RangeControl from '../range-control';
+ import { Flex, FlexItem } from '../flex';
+@@ -40,6 +38,14 @@ import type {
+ 	FontSizeSelectOption,
+ 	FontSizeToggleGroupOption,
+ } from './types';
++import {
++	Container,
++	HeaderHint,
++	HeaderLabel,
++	Controls,
++	ResetButton,
++} from './styles';
++import { Spacer } from '../spacer';
+ 
+ // This conditional is needed to maintain the spacing before the slider in the `withSlider` case.
+ const MaybeVStack = ( {
+@@ -163,49 +169,49 @@ const UnforwardedFontSizePicker = (
+ 		__( 'Currently selected font size: %s' ),
+ 		selectedOption.name
+ 	);
+-	const baseClassName = 'components-font-size-picker';
+ 	return (
+-		<fieldset className={ baseClassName } { ...( ref ? {} : { ref } ) }>
++		<Container ref={ ref } className="components-font-size-picker">
+ 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
+-			<HStack className={ `${ baseClassName }__header` }>
+-				<BaseControl.VisualLabel>
+-					{ __( 'Size' ) }
+-					{ headerHint && (
+-						<span className={ `${ baseClassName }__header__hint` }>
+-							{ headerHint }
+-						</span>
++			<Spacer>
++				<HStack className="components-font-size-picker__header">
++					<HeaderLabel>
++						{ __( 'Size' ) }
++						{ headerHint && (
++							<HeaderHint className="components-font-size-picker__header__hint">
++								{ headerHint }
++							</HeaderHint>
++						) }
++					</HeaderLabel>
++					{ ! disableCustomFontSizes && (
++						<Button
++							label={
++								showCustomValueControl
++									? __( 'Use size preset' )
++									: __( 'Set custom size' )
++							}
++							icon={ settings }
++							onClick={ () => {
++								setShowCustomValueControl(
++									! showCustomValueControl
++								);
++							} }
++							isPressed={ showCustomValueControl }
++							isSmall
++						/>
+ 					) }
+-				</BaseControl.VisualLabel>
+-				{ ! disableCustomFontSizes && (
+-					<Button
+-						label={
+-							showCustomValueControl
+-								? __( 'Use size preset' )
+-								: __( 'Set custom size' )
+-						}
+-						icon={ settings }
+-						onClick={ () => {
+-							setShowCustomValueControl(
+-								! showCustomValueControl
+-							);
+-						} }
+-						isPressed={ showCustomValueControl }
+-						isSmall
+-					/>
+-				) }
+-			</HStack>
++				</HStack>
++			</Spacer>
+ 			<MaybeVStack __nextHasNoMarginBottom={ __nextHasNoMarginBottom }>
+-				<div
+-					className={ classNames( `${ baseClassName }__controls`, {
+-						'is-next-has-no-margin-bottom': __nextHasNoMarginBottom,
+-					} ) }
++				<Controls
++					className="components-font-size-picker__controls"
++					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 				>
+ 					{ !! fontSizes.length &&
+ 						shouldUseSelectControl &&
+ 						! showCustomValueControl && (
+ 							<CustomSelectControl
+ 								__nextUnconstrainedWidth
+-								className={ `${ baseClassName }__select` }
++								className="components-font-size-picker__select"
+ 								label={ __( 'Font size' ) }
+ 								hideLabelFromVision
+ 								describedBy={ currentFontSizeSR }
+@@ -267,7 +273,7 @@ const UnforwardedFontSizePicker = (
+ 						showCustomValueControl && (
+ 							<Flex
+ 								justify="space-between"
+-								className={ `${ baseClassName }__custom-size-control` }
++								className="components-font-size-picker__custom-size-control"
+ 							>
+ 								<FlexItem isBlock>
+ 									<UnitControl
+@@ -298,8 +304,7 @@ const UnforwardedFontSizePicker = (
+ 								</FlexItem>
+ 								{ withReset && (
+ 									<FlexItem isBlock>
+-										<Button
+-											className="components-color-palette__clear"
++										<ResetButton
+ 											disabled={ value === undefined }
+ 											onClick={ () => {
+ 												onChange?.( undefined );
+@@ -308,16 +313,16 @@ const UnforwardedFontSizePicker = (
+ 											variant="secondary"
+ 										>
+ 											{ __( 'Reset' ) }
+-										</Button>
++										</ResetButton>
+ 									</FlexItem>
+ 								) }
+ 							</Flex>
+ 						) }
+-				</div>
++				</Controls>
+ 				{ withSlider && (
+ 					<RangeControl
+ 						__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+-						className={ `${ baseClassName }__custom-input` }
++						className="components-font-size-picker__custom-input"
+ 						label={ __( 'Custom Size' ) }
+ 						value={
+ 							isPixelValue && noUnitsValue
+@@ -333,7 +338,7 @@ const UnforwardedFontSizePicker = (
+ 					/>
+ 				) }
+ 			</MaybeVStack>
+-		</fieldset>
++		</Container>
+ 	);
+ };
+ 
+diff --git a/packages/components/src/font-size-picker/style.scss b/packages/components/src/font-size-picker/style.scss
+deleted file mode 100644
+index e19342aabf3190..00000000000000
+--- a/packages/components/src/font-size-picker/style.scss
++++ /dev/null
+@@ -1,78 +0,0 @@
+-.components-font-size-picker__header {
+-	&__hint {
+-		margin-left: $grid-unit-05;
+-		color: $gray-700;
+-	}
+-
+-	.components-base-control__label {
+-		margin-bottom: 0;
+-	}
+-
+-	// This button is inheriting padding and min-width.
+-	// @todo: we should refactor it to not need to unset this.
+-	.components-button.is-small.has-icon:not(.has-text) {
+-		min-width: $icon-size;
+-		padding: 0;
+-	}
+-}
+-
+-.components-font-size-picker__controls {
+-	max-width: $sidebar-width - ( 2 * $grid-unit-20 );
+-	align-items: center;
+-	margin-top: $grid-unit-10;
+-
+-	&:not(.is-next-has-no-margin-bottom) {
+-		margin-bottom: $grid-unit-30;
+-	}
+-
+-	.components-unit-control-wrapper {
+-		.components-input-control__label {
+-			font-weight: 300;
+-			padding-bottom: 0 !important;
+-			margin-bottom: $grid-unit-10 !important;
+-		}
+-	}
+-
+-	// Apply the same height as the isSmall Reset button.
+-	.components-font-size-picker__number {
+-		@include input-control;
+-		display: inline-block;
+-		font-weight: 500;
+-		height: 30px;
+-		margin-bottom: 0;
+-		margin-left: 0;
+-		margin-right: $grid-unit-10;
+-		margin-top: $grid-unit-10;
+-		width: 54px;
+-
+-		// Show the reset button as disabled until a value is entered.
+-		&[value=""] + .components-button {
+-			cursor: default;
+-			opacity: 0.3;
+-			pointer-events: none;
+-		}
+-
+-		&-container {
+-			display: flex;
+-			flex-direction: column;
+-		}
+-	}
+-
+-	.components-color-palette__clear {
+-		height: 30px;
+-	}
+-}
+-
+-.components-font-size-picker__custom-input {
+-	.components-range-control__slider + .dashicon {
+-		width: 30px;
+-		height: 30px;
+-	}
+-}
+-
+-.components-font-size-picker {
+-	border: 0;
+-	padding: 0;
+-	margin: 0;
+-}
+-
+diff --git a/packages/components/src/font-size-picker/styles.ts b/packages/components/src/font-size-picker/styles.ts
+new file mode 100644
+index 00000000000000..fe04172a8fc3aa
+--- /dev/null
++++ b/packages/components/src/font-size-picker/styles.ts
+@@ -0,0 +1,44 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import BaseControl from '../base-control';
++import Button from '../button';
++import { space } from '../ui/utils/space';
++import { COLORS } from '../utils';
++
++export const Container = styled.fieldset`
++	border: 0;
++	margin: 0;
++	padding: 0;
++`;
++
++export const HeaderLabel = styled( BaseControl.VisualLabel )`
++	margin-bottom: 0;
++`;
++
++export const HeaderHint = styled.span`
++	color: ${ COLORS.gray[ 700 ] };
++	margin-left: ${ space( 1 ) };
++`;
++
++// 280px is the sidebar width.
++// TODO: Remove this, @wordpress/components shouldn't care what a "sidebar" is.
++export const Controls = styled.div< {
++	__nextHasNoMarginBottom: boolean;
++} >`
++	max-width: calc( 280px - ${ space( 4 ) } * 2 );
++
++	${ ( props ) =>
++		! props.__nextHasNoMarginBottom && `margin-bottom: ${ space( 6 ) };` }
++`;
++
++export const ResetButton = styled( Button )`
++	&&& {
++		height: 30px;
++	}
++`;
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 2052a40b66f8f7..3c42941e0d7158 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -17,7 +17,6 @@
+ @import "./dropdown/style.scss";
+ @import "./dropdown-menu/style.scss";
+ @import "./duotone-picker/style.scss";
+-@import "./font-size-picker/style.scss";
+ @import "./form-toggle/style.scss";
+ @import "./form-token-field/style.scss";
+ @import "./guide/style.scss";

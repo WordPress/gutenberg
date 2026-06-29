@@ -1,0 +1,119 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..68e20df61a05fe 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `Surface`: Remove "experimental" designation ([#61065](https://github.com/WordPress/gutenberg/pull/61065)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/elevation/README.md b/packages/components/src/elevation/README.md
+index 3cdb379b82ab4f..7d6b1856193014 100644
+--- a/packages/components/src/elevation/README.md
++++ b/packages/components/src/elevation/README.md
+@@ -13,7 +13,7 @@ The shadow effect is generated using the `value` prop.
+ ```jsx
+ import {
+ 	__experimentalElevation as Elevation,
+-	__experimentalSurface as Surface,
++	Surface,
+ 	__experimentalText as Text,
+ } from '@wordpress/components';
+ 
+diff --git a/packages/components/src/elevation/component.tsx b/packages/components/src/elevation/component.tsx
+index d116859d9a303a..8909eec580014e 100644
+--- a/packages/components/src/elevation/component.tsx
++++ b/packages/components/src/elevation/component.tsx
+@@ -30,7 +30,7 @@ function UnconnectedElevation(
+  * ```jsx
+  * import {
+  *	__experimentalElevation as Elevation,
+- *	__experimentalSurface as Surface,
++ *	Surface,
+  *	__experimentalText as Text,
+  * } from '@wordpress/components';
+  *
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..312d7daf4b253f 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -147,7 +147,13 @@ export { default as SnackbarList } from './snackbar/list';
+ export { Spacer as __experimentalSpacer } from './spacer';
+ export { Scrollable as __experimentalScrollable } from './scrollable';
+ export { default as Spinner } from './spinner';
+-export { Surface as __experimentalSurface } from './surface';
++export {
++	/**
++	 * @deprecated Import `Surface` instead.
++	 */
++	Surface as __experimentalSurface,
++	Surface,
++} from './surface';
+ export { default as TabPanel } from './tab-panel';
+ export { Text as __experimentalText } from './text';
+ export { default as TextControl } from './text-control';
+diff --git a/packages/components/src/surface/README.md b/packages/components/src/surface/README.md
+index 6f0d83ecb9cc9f..89a9fcdf9161c9 100644
+--- a/packages/components/src/surface/README.md
++++ b/packages/components/src/surface/README.md
+@@ -1,9 +1,5 @@
+ # Surface
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `Surface` is a core component that renders a primary background color.
+ 
+ ## Usage
+@@ -12,7 +8,7 @@ In the example below, notice how the `Surface` renders in white (or dark gray if
+ 
+ ```jsx
+ import {
+-	__experimentalSurface as Surface,
++	Surface,
+ 	__experimentalText as Text,
+ } from '@wordpress/components';
+ 
+diff --git a/packages/components/src/surface/component.tsx b/packages/components/src/surface/component.tsx
+index ba0745a40b5044..d7e20500277c7b 100644
+--- a/packages/components/src/surface/component.tsx
++++ b/packages/components/src/surface/component.tsx
+@@ -28,7 +28,7 @@ function UnconnectedSurface(
+  *
+  * ```jsx
+  * import {
+- *	__experimentalSurface as Surface,
++ *	Surface,
+  *	__experimentalText as Text,
+  * } from '@wordpress/components';
+  *
+diff --git a/packages/components/src/surface/stories/index.story.tsx b/packages/components/src/surface/stories/index.story.tsx
+index 7f6790d09c848e..424f1c0112e4ea 100644
+--- a/packages/components/src/surface/stories/index.story.tsx
++++ b/packages/components/src/surface/stories/index.story.tsx
+@@ -11,7 +11,7 @@ import { Text } from '../../text';
+ 
+ const meta: Meta< typeof Surface > = {
+ 	component: Surface,
+-	title: 'Components (Experimental)/Surface',
++	title: 'Components/Surface',
+ 	argTypes: {
+ 		children: { control: { type: null } },
+ 		as: { control: { type: 'text' } },
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..fef75fc6f77c48 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,6 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation', 'surface' ];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

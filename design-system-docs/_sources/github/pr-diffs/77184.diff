@@ -1,0 +1,255 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 76d38fbc86a53b..9e88ee74b6e8f0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Deprecations
++
++-   `BorderControl`: Stabilize `__unstablePopoverProps` as `popoverProps`. The old prop is deprecated and will be removed in a future version ([#77184](https://github.com/WordPress/gutenberg/pull/77184)).
++
+ ### Bug Fixes
+ 
+ -   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index 719ac2206ef657..29fd0249db3c76 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -45,19 +45,18 @@ const BorderBoxControlSplitControls = (
+ 	);
+ 
+ 	// Memoize popoverProps to avoid returning a new object every time.
+-	const popoverProps: BorderControlProps[ '__unstablePopoverProps' ] =
+-		useMemo(
+-			() =>
+-				popoverPlacement
+-					? {
+-							placement: popoverPlacement,
+-							offset: popoverOffset,
+-							anchor: popoverAnchor,
+-							shift: true,
+-					  }
+-					: undefined,
+-			[ popoverPlacement, popoverOffset, popoverAnchor ]
+-		);
++	const popoverProps: BorderControlProps[ 'popoverProps' ] = useMemo(
++		() =>
++			popoverPlacement
++				? {
++						placement: popoverPlacement,
++						offset: popoverOffset,
++						anchor: popoverAnchor,
++						shift: true,
++				  }
++				: undefined,
++		[ popoverPlacement, popoverOffset, popoverAnchor ]
++	);
+ 
+ 	const sharedBorderControlProps = {
+ 		colors,
+@@ -83,7 +82,7 @@ const BorderBoxControlSplitControls = (
+ 				hideLabelFromVision
+ 				label={ __( 'Top border' ) }
+ 				onChange={ ( newBorder ) => onChange( newBorder, 'top' ) }
+-				__unstablePopoverProps={ popoverProps }
++				popoverProps={ popoverProps }
+ 				value={ value?.top }
+ 				{ ...sharedBorderControlProps }
+ 			/>
+@@ -93,7 +92,7 @@ const BorderBoxControlSplitControls = (
+ 				hideLabelFromVision
+ 				label={ __( 'Left border' ) }
+ 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
+-				__unstablePopoverProps={ popoverProps }
++				popoverProps={ popoverProps }
+ 				value={ value?.left }
+ 				{ ...sharedBorderControlProps }
+ 			/>
+@@ -104,7 +103,7 @@ const BorderBoxControlSplitControls = (
+ 				hideLabelFromVision
+ 				label={ __( 'Right border' ) }
+ 				onChange={ ( newBorder ) => onChange( newBorder, 'right' ) }
+-				__unstablePopoverProps={ popoverProps }
++				popoverProps={ popoverProps }
+ 				value={ value?.right }
+ 				{ ...sharedBorderControlProps }
+ 			/>
+@@ -115,7 +114,7 @@ const BorderBoxControlSplitControls = (
+ 				hideLabelFromVision
+ 				label={ __( 'Bottom border' ) }
+ 				onChange={ ( newBorder ) => onChange( newBorder, 'bottom' ) }
+-				__unstablePopoverProps={ popoverProps }
++				popoverProps={ popoverProps }
+ 				value={ value?.bottom }
+ 				{ ...sharedBorderControlProps }
+ 			/>
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index 0e84c7b56ee483..229766058ca6f9 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -74,19 +74,18 @@ const UnconnectedBorderBoxControl = (
+ 	);
+ 
+ 	// Memoize popoverProps to avoid returning a new object every time.
+-	const popoverProps: BorderControlProps[ '__unstablePopoverProps' ] =
+-		useMemo(
+-			() =>
+-				popoverPlacement
+-					? {
+-							placement: popoverPlacement,
+-							offset: popoverOffset,
+-							anchor: popoverAnchor,
+-							shift: true,
+-					  }
+-					: undefined,
+-			[ popoverPlacement, popoverOffset, popoverAnchor ]
+-		);
++	const popoverProps: BorderControlProps[ 'popoverProps' ] = useMemo(
++		() =>
++			popoverPlacement
++				? {
++						placement: popoverPlacement,
++						offset: popoverOffset,
++						anchor: popoverAnchor,
++						shift: true,
++				  }
++				: undefined,
++		[ popoverPlacement, popoverOffset, popoverAnchor ]
++	);
+ 
+ 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
+ 	return (
+@@ -108,7 +107,7 @@ const UnconnectedBorderBoxControl = (
+ 						placeholder={
+ 							hasMixedBorders ? __( 'Mixed' ) : undefined
+ 						}
+-						__unstablePopoverProps={ popoverProps }
++						popoverProps={ popoverProps }
+ 						shouldSanitizeBorder={ false } // This component will handle that.
+ 						value={ linkedValue }
+ 						withSlider
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index 23ee902df5ffc3..f461d07772c92a 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -159,7 +159,7 @@ const BorderControlDropdown = (
+ 		popoverControlsClassName,
+ 		resetButtonWrapperClassName,
+ 		size,
+-		__unstablePopoverProps,
++		popoverProps,
+ 		...otherProps
+ 	} = useBorderControlDropdown( props );
+ 
+@@ -244,7 +244,7 @@ const BorderControlDropdown = (
+ 			renderToggle={ renderToggle }
+ 			renderContent={ renderContent }
+ 			popoverProps={ {
+-				...__unstablePopoverProps,
++				...popoverProps,
+ 			} }
+ 			{ ...otherProps }
+ 			ref={ forwardedRef }
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index a16907dfe5981f..9a9291782f3acb 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -54,7 +54,7 @@ const UnconnectedBorderControl = (
+ 		onSliderChange,
+ 		onWidthChange,
+ 		placeholder,
+-		__unstablePopoverProps,
++		popoverProps,
+ 		previousStyleSelection,
+ 		showDropdownHeader,
+ 		size,
+@@ -82,9 +82,7 @@ const UnconnectedBorderControl = (
+ 							<BorderControlDropdown
+ 								border={ border }
+ 								colors={ colors }
+-								__unstablePopoverProps={
+-									__unstablePopoverProps
+-								}
++								popoverProps={ popoverProps }
+ 								disableCustomColors={ disableCustomColors }
+ 								enableAlpha={ enableAlpha }
+ 								enableStyle={ enableStyle }
+diff --git a/packages/components/src/border-control/border-control/hook.ts b/packages/components/src/border-control/border-control/hook.ts
+index 9b0f064c51921f..4a4ac763d1efa2 100644
+--- a/packages/components/src/border-control/border-control/hook.ts
++++ b/packages/components/src/border-control/border-control/hook.ts
+@@ -2,6 +2,7 @@
+  * WordPress dependencies
+  */
+ import { useCallback, useMemo, useState } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -36,12 +37,24 @@ export function useBorderControl(
+ 		size = 'default',
+ 		value: border,
+ 		width,
++		popoverProps,
++		__unstablePopoverProps,
+ 		__experimentalIsRenderedInSidebar = false,
+ 		__next40pxDefaultSize,
+ 		__shouldNotWarnDeprecated36pxSize,
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderControl' );
+ 
++	if ( __unstablePopoverProps !== undefined ) {
++		deprecated(
++			'`__unstablePopoverProps` prop in wp.components.BorderControl',
++			{
++				since: '7.0',
++				alternative: '`popoverProps`',
++			}
++		);
++	}
++
+ 	maybeWarnDeprecated36pxSize( {
+ 		componentName: 'BorderControl',
+ 		__next40pxDefaultSize,
+@@ -163,6 +176,7 @@ export function useBorderControl(
+ 		onBorderChange,
+ 		onSliderChange,
+ 		onWidthChange,
++		popoverProps: popoverProps ?? __unstablePopoverProps,
+ 		previousStyleSelection: styleSelection,
+ 		sliderClassName,
+ 		value: border,
+diff --git a/packages/components/src/border-control/types.ts b/packages/components/src/border-control/types.ts
+index ecd3f67c9be08d..37a6dbaaf33306 100644
+--- a/packages/components/src/border-control/types.ts
++++ b/packages/components/src/border-control/types.ts
+@@ -73,7 +73,13 @@ export type BorderControlProps = ColorProps &
+ 		 */
+ 		placeholder?: HTMLInputElement[ 'placeholder' ];
+ 		/**
+-		 * An internal prop used to control the visibility of the dropdown.
++		 * Props to pass to the popover that contains the border color and style
++		 * picker dropdown.
++		 */
++		popoverProps?: Omit< PopoverProps, 'children' >;
++		/**
++		 * @deprecated Use `popoverProps` instead.
++		 * @ignore
+ 		 */
+ 		__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
+ 		/**
+@@ -138,9 +144,10 @@ export type DropdownProps = ColorProps &
+ 		 */
+ 		isStyleSettable: boolean;
+ 		/**
+-		 * An internal prop used to control the visibility of the dropdown.
++		 * Props to pass to the popover that contains the border color and style
++		 * picker dropdown.
+ 		 */
+-		__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
++		popoverProps?: Omit< PopoverProps, 'children' >;
+ 		/**
+ 		 * A callback invoked when the border color or style selections change.
+ 		 */

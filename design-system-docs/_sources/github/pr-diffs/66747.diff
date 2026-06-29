@@ -1,0 +1,324 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b23d024a724dd1..51dcbd61f3c701 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `TextControl`: Deprecate 36px default size ([#66745](https://github.com/WordPress/gutenberg/pull/66745).
+ -   `FontSizePicker`: Deprecate 36px default size ([#66920](https://github.com/WordPress/gutenberg/pull/66920)).
+ -   `ComboboxControl`: Deprecate 36px default size ([#66900](https://github.com/WordPress/gutenberg/pull/66900)).
++-   `ToggleGroupControl`: Deprecate 36px default size ([#66747](https://github.com/WordPress/gutenberg/pull/66747)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx b/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
+index 1e4cbcd1b72660..1b3619c800e453 100644
+--- a/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
++++ b/packages/components/src/font-size-picker/font-size-picker-toggle-group.tsx
+@@ -19,6 +19,7 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
+ 		<ToggleGroupControl
+ 			__nextHasNoMarginBottom
+ 			__next40pxDefaultSize={ __next40pxDefaultSize }
++			__shouldNotWarnDeprecated36pxSize
+ 			label={ __( 'Font size' ) }
+ 			hideLabelFromVision
+ 			value={ value }
+diff --git a/packages/components/src/toggle-group-control/stories/index.story.tsx b/packages/components/src/toggle-group-control/stories/index.story.tsx
+index afdfa457f66348..bd6c67e2538870 100644
+--- a/packages/components/src/toggle-group-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-group-control/stories/index.story.tsx
+@@ -51,6 +51,7 @@ const Template: StoryFn< typeof ToggleGroupControl > = ( {
+ 	return (
+ 		<ToggleGroupControl
+ 			__nextHasNoMarginBottom
++			__next40pxDefaultSize
+ 			{ ...props }
+ 			onChange={ ( ...changeArgs ) => {
+ 				setValue( ...changeArgs );
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index 832c6d7cb7a8c8..f344cd6ba16528 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -44,8 +44,8 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   display: inline-flex;
+   min-width: 0;
+   position: relative;
+-  min-height: 36px;
+-  padding: 2px;
++  min-height: 40px;
++  padding: 3px;
+ }
+ 
+ .emotion-8:hover {
+@@ -159,7 +159,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   width: 100%;
+   z-index: 2;
+   color: #1e1e1e;
+-  height: 30px;
++  height: 32px;
+   aspect-ratio: 1;
+   padding-left: 0;
+   padding-right: 0;
+@@ -236,7 +236,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   width: 100%;
+   z-index: 2;
+   color: #1e1e1e;
+-  height: 30px;
++  height: 32px;
+   aspect-ratio: 1;
+   padding-left: 0;
+   padding-right: 0;
+@@ -409,8 +409,8 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+   display: inline-flex;
+   min-width: 0;
+   position: relative;
+-  min-height: 36px;
+-  padding: 2px;
++  min-height: 40px;
++  padding: 3px;
+ }
+ 
+ .emotion-8:hover {
+@@ -678,8 +678,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   display: inline-flex;
+   min-width: 0;
+   position: relative;
+-  min-height: 36px;
+-  padding: 2px;
++  min-height: 40px;
++  padding: 3px;
+ }
+ 
+ .emotion-8:hover {
+@@ -793,7 +793,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   width: 100%;
+   z-index: 2;
+   color: #1e1e1e;
+-  height: 30px;
++  height: 32px;
+   aspect-ratio: 1;
+   padding-left: 0;
+   padding-right: 0;
+@@ -870,7 +870,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   width: 100%;
+   z-index: 2;
+   color: #1e1e1e;
+-  height: 30px;
++  height: 32px;
+   aspect-ratio: 1;
+   padding-left: 0;
+   padding-right: 0;
+@@ -1037,8 +1037,8 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+   display: inline-flex;
+   min-width: 0;
+   position: relative;
+-  min-height: 36px;
+-  padding: 2px;
++  min-height: 40px;
++  padding: 3px;
+ }
+ 
+ .emotion-8:hover {
+diff --git a/packages/components/src/toggle-group-control/test/index.tsx b/packages/components/src/toggle-group-control/test/index.tsx
+index 168e8f498958b5..44cfda69c423cf 100644
+--- a/packages/components/src/toggle-group-control/test/index.tsx
++++ b/packages/components/src/toggle-group-control/test/index.tsx
+@@ -28,7 +28,13 @@ const hoverOutside = async () => {
+ };
+ 
+ const ToggleGroupControl = ( props: ToggleGroupControlProps ) => {
+-	return <_ToggleGroupControl { ...props } __nextHasNoMarginBottom />;
++	return (
++		<_ToggleGroupControl
++			{ ...props }
++			__nextHasNoMarginBottom
++			__next40pxDefaultSize
++		/>
++	);
+ };
+ 
+ const ControlledToggleGroupControl = ( {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+index a0e3a44cf74607..1ee82b26a91998 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/README.md
+@@ -17,7 +17,7 @@ import { formatLowercase, formatUppercase } from '@wordpress/icons';
+ 
+ function Example() {
+ 	return (
+-		<ToggleGroupControl __nextHasNoMarginBottom>
++		<ToggleGroupControl __nextHasNoMarginBottom __next40pxDefaultSize>
+ 			<ToggleGroupControlOptionIcon
+ 				value="uppercase"
+ 				icon={ formatUppercase }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+index 352b4acee71844..d1840cba5595d9 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-icon/component.tsx
+@@ -52,7 +52,7 @@ function UnforwardedToggleGroupControlOptionIcon(
+  *
+  * function Example() {
+  *  return (
+- *    <ToggleGroupControl __nextHasNoMarginBottom>
++ *    <ToggleGroupControl __nextHasNoMarginBottom __next40pxDefaultSize>
+  *      <ToggleGroupControlOptionIcon
+  *        value="uppercase"
+  *        label="Uppercase"
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+index 2e7c55bd688361..411857d260a311 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/README.md
+@@ -6,7 +6,6 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ `ToggleGroupControlOption` is a form component and is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md).
+ 
+-
+ ## Usage
+ 
+ ```js
+@@ -22,6 +21,7 @@ function Example() {
+ 			value="vertical"
+ 			isBlock
+ 			__nextHasNoMarginBottom
++			__next40pxDefaultSize
+ 		>
+ 			<ToggleGroupControlOption
+ 				value="horizontal"
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+index b71d37e81cf25f..8632d92fc00578 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/component.tsx
+@@ -53,6 +53,7 @@ function UnforwardedToggleGroupControlOption(
+  *       value="vertical"
+  *       isBlock
+  *       __nextHasNoMarginBottom
++ *       __next40pxDefaultSize
+  *     >
+  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
+  *       <ToggleGroupControlOption value="vertical" label="Vertical" />
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/README.md b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+index ca5c5d14eb6b5a..841d474c148d45 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/README.md
++++ b/packages/components/src/toggle-group-control/toggle-group-control/README.md
+@@ -25,6 +25,7 @@ function Example() {
+ 			value="vertical"
+ 			isBlock
+ 			__nextHasNoMarginBottom
++			__next40pxDefaultSize
+ 		>
+ 			<ToggleGroupControlOption value="horizontal" label="Horizontal" />
+ 			<ToggleGroupControlOption value="vertical" label="Vertical" />
+@@ -100,4 +101,4 @@ Start opting into the larger default height that will become the default size in
+ Start opting into the new margin-free styles that will become the default in a future version.
+ 
+ -   Required: No
+--   Default: `false`
+\ No newline at end of file
++-   Default: `false`
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 0c3cadf210d84a..9f3427e95a6017 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -23,6 +23,7 @@ import { ToggleGroupControlAsButtonGroup } from './as-button-group';
+ import { useTrackElementOffsetRect } from '../../utils/element-rect';
+ import { useMergeRefs } from '@wordpress/compose';
+ import { useAnimatedOffsetRect } from '../../utils/hooks/use-animated-offset-rect';
++import { maybeWarnDeprecated36pxSize } from '../../utils/deprecated-36px-size';
+ 
+ function UnconnectedToggleGroupControl(
+ 	props: WordPressComponentProps< ToggleGroupControlProps, 'div', false >,
+@@ -31,6 +32,7 @@ function UnconnectedToggleGroupControl(
+ 	const {
+ 		__nextHasNoMarginBottom = false,
+ 		__next40pxDefaultSize = false,
++		__shouldNotWarnDeprecated36pxSize,
+ 		className,
+ 		isAdaptiveWidth = false,
+ 		isBlock = false,
+@@ -81,6 +83,13 @@ function UnconnectedToggleGroupControl(
+ 		? ToggleGroupControlAsButtonGroup
+ 		: ToggleGroupControlAsRadioGroup;
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'ToggleGroupControl',
++		size,
++		__next40pxDefaultSize,
++		__shouldNotWarnDeprecated36pxSize,
++	} );
++
+ 	return (
+ 		<BaseControl
+ 			help={ help }
+@@ -135,6 +144,7 @@ function UnconnectedToggleGroupControl(
+  *       value="vertical"
+  *       isBlock
+  *       __nextHasNoMarginBottom
++ *       __next40pxDefaultSize
+  *     >
+  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
+  *       <ToggleGroupControlOption value="vertical" label="Vertical" />
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index 463d8d26e64410..cfa9d00080467c 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -128,6 +128,13 @@ export type ToggleGroupControlProps = Pick<
+ 	 * @default false
+ 	 */
+ 	__next40pxDefaultSize?: boolean;
++	/**
++	 * Do not throw a warning for the deprecated 36px default size.
++	 * For internal components of other components that already throw the warning.
++	 *
++	 * @ignore
++	 */
++	__shouldNotWarnDeprecated36pxSize?: boolean;
+ };
+ 
+ export type ToggleGroupControlContextProps = {
+diff --git a/packages/components/src/tools-panel/stories/index.story.tsx b/packages/components/src/tools-panel/stories/index.story.tsx
+index 459932c9d22d7a..787585ac716b51 100644
+--- a/packages/components/src/tools-panel/stories/index.story.tsx
++++ b/packages/components/src/tools-panel/stories/index.story.tsx
+@@ -110,6 +110,7 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
+ 					>
+ 						<ToggleGroupControl
+ 							__nextHasNoMarginBottom
++							__next40pxDefaultSize
+ 							label="Scale"
+ 							value={ scale }
+ 							onChange={ ( next ) => setScale( next ) }
+@@ -457,6 +458,7 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
+ 				>
+ 					<ToggleGroupControl
+ 						__nextHasNoMarginBottom
++						__next40pxDefaultSize
+ 						label="Scale"
+ 						value={ scale }
+ 						onChange={ ( next ) =>
+@@ -559,6 +561,7 @@ export const WithConditionallyRenderedControl: StoryFn<
+ 					>
+ 						<ToggleGroupControl
+ 							__nextHasNoMarginBottom
++							__next40pxDefaultSize
+ 							label="Scale"
+ 							value={ scale }
+ 							onChange={ ( next ) =>
+diff --git a/packages/components/src/utils/deprecated-36px-size.ts b/packages/components/src/utils/deprecated-36px-size.ts
+index be5baa2515637c..0f87c2cd270c73 100644
+--- a/packages/components/src/utils/deprecated-36px-size.ts
++++ b/packages/components/src/utils/deprecated-36px-size.ts
+@@ -7,12 +7,15 @@ export function maybeWarnDeprecated36pxSize( {
+ 	componentName,
+ 	__next40pxDefaultSize,
+ 	size,
++	__shouldNotWarnDeprecated36pxSize,
+ }: {
+ 	componentName: string;
+ 	__next40pxDefaultSize: boolean | undefined;
+ 	size: string | undefined;
++	__shouldNotWarnDeprecated36pxSize?: boolean;
+ } ) {
+ 	if (
++		__shouldNotWarnDeprecated36pxSize ||
+ 		__next40pxDefaultSize ||
+ 		( size !== undefined && size !== 'default' )
+ 	) {

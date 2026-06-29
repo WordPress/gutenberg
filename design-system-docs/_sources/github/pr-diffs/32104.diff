@@ -1,0 +1,17 @@
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 99adcbbb46ce00..ca00ff32d3db98 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -21,10 +21,12 @@
+ 		"src/base-control/**/*",
+ 		"src/dashicon/**/*",
+ 		"src/disabled/**/*",
++		"src/divider/**/*",
+ 		"src/draggable/**/*",
+ 		"src/elevation/**/*",
+ 		"src/flex/**/*",
+ 		"src/form-group/**/*",
++		"src/heading/**/*",
+ 		"src/scroll-lock/**/*",
+ 		"src/shortcut/**/*",
+ 		"src/spinner/**/*",

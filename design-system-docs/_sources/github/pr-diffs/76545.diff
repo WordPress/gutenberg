@@ -1,0 +1,230 @@
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index d16a6bdb983b31..98dd4657d27393 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   Add `--wpds-dimension-size-*` design tokens for element sizing ([#76545](https://github.com/WordPress/gutenberg/pull/76545)).
++
+ ### Code Quality
+ 
+ -   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index 54cbc21c50a551..d936e906315704 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -238,29 +238,37 @@ The interactive state of the element. The default (no modifier) is the idle stat
+ 
+ ### Dimension
+ 
+-| Variable name                        | Description                  |
+-| ------------------------------------ | ---------------------------- |
+-| `--wpds-dimension-base`              | Base dimension unit          |
+-| `--wpds-dimension-padding-xs`        | Extra small padding          |
+-| `--wpds-dimension-padding-sm`        | Small padding                |
+-| `--wpds-dimension-padding-md`        | Medium padding               |
+-| `--wpds-dimension-padding-lg`        | Large padding                |
+-| `--wpds-dimension-padding-xl`        | Extra large padding          |
+-| `--wpds-dimension-padding-2xl`       | 2x extra large padding       |
+-| `--wpds-dimension-padding-3xl`       | 3x extra large padding       |
+-| `--wpds-dimension-gap-xs`            | Extra small gap              |
+-| `--wpds-dimension-gap-sm`            | Small gap                    |
+-| `--wpds-dimension-gap-md`            | Medium gap                   |
+-| `--wpds-dimension-gap-lg`            | Large gap                    |
+-| `--wpds-dimension-gap-xl`            | Extra large gap              |
+-| `--wpds-dimension-gap-2xl`           | 2x extra large gap           |
+-| `--wpds-dimension-gap-3xl`           | 3x extra large gap           |
+-| `--wpds-dimension-surface-width-xs`  | Extra small surface width    |
+-| `--wpds-dimension-surface-width-sm`  | Small surface width          |
+-| `--wpds-dimension-surface-width-md`  | Medium surface width         |
+-| `--wpds-dimension-surface-width-lg`  | Large surface width          |
+-| `--wpds-dimension-surface-width-xl`  | Extra large surface width    |
+-| `--wpds-dimension-surface-width-2xl` | 2x extra large surface width |
++| Variable name                        | Description                                                              |
++| ------------------------------------ | ------------------------------------------------------------------------ |
++| `--wpds-dimension-base`              | Base dimension unit                                                      |
++| `--wpds-dimension-padding-xs`        | Extra small padding                                                      |
++| `--wpds-dimension-padding-sm`        | Small padding                                                            |
++| `--wpds-dimension-padding-md`        | Medium padding                                                           |
++| `--wpds-dimension-padding-lg`        | Large padding                                                            |
++| `--wpds-dimension-padding-xl`        | Extra large padding                                                      |
++| `--wpds-dimension-padding-2xl`       | 2x extra large padding                                                   |
++| `--wpds-dimension-padding-3xl`       | 3x extra large padding                                                   |
++| `--wpds-dimension-gap-xs`            | Extra small gap                                                          |
++| `--wpds-dimension-gap-sm`            | Small gap                                                                |
++| `--wpds-dimension-gap-md`            | Medium gap                                                               |
++| `--wpds-dimension-gap-lg`            | Large gap                                                                |
++| `--wpds-dimension-gap-xl`            | Extra large gap                                                          |
++| `--wpds-dimension-gap-2xl`           | 2x extra large gap                                                       |
++| `--wpds-dimension-gap-3xl`           | 3x extra large gap                                                       |
++| `--wpds-dimension-size-5xs`          | Notification indicators                                                  |
++| `--wpds-dimension-size-4xs`          | Visual size for small interactive elements like resize handles           |
++| `--wpds-dimension-size-3xs`          | Small markers                                                            |
++| `--wpds-dimension-size-2xs`          | For small controls like checkboxes and radios, or small decorative icons |
++| `--wpds-dimension-size-xs`           | For medium sized icons                                                   |
++| `--wpds-dimension-size-sm`           | For icons and small buttons                                              |
++| `--wpds-dimension-size-md`           | For medium-sized buttons and inputs                                      |
++| `--wpds-dimension-size-lg`           | Default size for buttons and inputs                                      |
++| `--wpds-dimension-surface-width-xs`  | Extra small surface width                                                |
++| `--wpds-dimension-surface-width-sm`  | Small surface width                                                      |
++| `--wpds-dimension-surface-width-md`  | Medium surface width                                                     |
++| `--wpds-dimension-surface-width-lg`  | Large surface width                                                      |
++| `--wpds-dimension-surface-width-xl`  | Extra large surface width                                                |
++| `--wpds-dimension-surface-width-2xl` | 2x extra large surface width                                             |
+ 
+ ### Elevation
+ 
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index 1f993bf5487644..8b5f0f2084604b 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -229,6 +229,22 @@
+ 	--wpds-dimension-gap-2xl: 32px;
+ 	/* 3x extra large gap */
+ 	--wpds-dimension-gap-3xl: 40px;
++	/* Notification indicators */
++	--wpds-dimension-size-5xs: 4px;
++	/* Visual size for small interactive elements like resize handles */
++	--wpds-dimension-size-4xs: 8px;
++	/* Small markers */
++	--wpds-dimension-size-3xs: 12px;
++	/* For small controls like checkboxes and radios, or small decorative icons */
++	--wpds-dimension-size-2xs: 16px;
++	/* For medium sized icons */
++	--wpds-dimension-size-xs: 20px;
++	/* For icons and small buttons */
++	--wpds-dimension-size-sm: 24px;
++	/* For medium-sized buttons and inputs */
++	--wpds-dimension-size-md: 32px;
++	/* Default size for buttons and inputs */
++	--wpds-dimension-size-lg: 40px;
+ 	/* Extra small surface width */
+ 	--wpds-dimension-surface-width-xs: 240px;
+ 	/* Small surface width */
+diff --git a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+index 01f446004dd305..f78e084bdfa762 100644
+--- a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
++++ b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+@@ -127,6 +127,14 @@ export default {
+ 	'--wpds-dimension-padding-sm': '8px',
+ 	'--wpds-dimension-padding-xl': '20px',
+ 	'--wpds-dimension-padding-xs': '4px',
++	'--wpds-dimension-size-2xs': '16px',
++	'--wpds-dimension-size-3xs': '12px',
++	'--wpds-dimension-size-4xs': '8px',
++	'--wpds-dimension-size-5xs': '4px',
++	'--wpds-dimension-size-lg': '40px',
++	'--wpds-dimension-size-md': '32px',
++	'--wpds-dimension-size-sm': '24px',
++	'--wpds-dimension-size-xs': '20px',
+ 	'--wpds-dimension-surface-width-2xl': '960px',
+ 	'--wpds-dimension-surface-width-lg': '560px',
+ 	'--wpds-dimension-surface-width-md': '400px',
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index 24866ac07a5c55..9da5741598a5b1 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -117,6 +117,14 @@ export default [
+ 	'--wpds-dimension-gap-xl',
+ 	'--wpds-dimension-gap-2xl',
+ 	'--wpds-dimension-gap-3xl',
++	'--wpds-dimension-size-5xs',
++	'--wpds-dimension-size-4xs',
++	'--wpds-dimension-size-3xs',
++	'--wpds-dimension-size-2xs',
++	'--wpds-dimension-size-xs',
++	'--wpds-dimension-size-sm',
++	'--wpds-dimension-size-md',
++	'--wpds-dimension-size-lg',
+ 	'--wpds-dimension-surface-width-xs',
+ 	'--wpds-dimension-surface-width-sm',
+ 	'--wpds-dimension-surface-width-md',
+diff --git a/packages/theme/src/prebuilt/ts/token-types.ts b/packages/theme/src/prebuilt/ts/token-types.ts
+index c1d8e7fdc05476..c9f1d49e687d8d 100644
+--- a/packages/theme/src/prebuilt/ts/token-types.ts
++++ b/packages/theme/src/prebuilt/ts/token-types.ts
+@@ -13,6 +13,19 @@ export type PaddingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+  */
+ export type GapSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+ 
++/**
++ * Size scale for element sizing tokens.
++ */
++export type ElementSize =
++	| '5xs'
++	| '4xs'
++	| '3xs'
++	| '2xs'
++	| 'xs'
++	| 'sm'
++	| 'md'
++	| 'lg';
++
+ /**
+  * Size scale for surface width tokens.
+  */
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index 5c07c14512cb41..1faa38185a7513 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -94,6 +94,11 @@ const config: Config = {
+ 					description: 'Size scale for gap tokens.',
+ 					patterns: [ /^wpds-dimension\.gap\.([^.]+)$/ ],
+ 				},
++				{
++					name: 'ElementSize',
++					description: 'Size scale for element sizing tokens.',
++					patterns: [ /^wpds-dimension\.size\.([^.]+)$/ ],
++				},
+ 				{
+ 					name: 'SurfaceWidthSize',
+ 					description: 'Size scale for surface width tokens.',
+diff --git a/packages/theme/tokens/dimension.json b/packages/theme/tokens/dimension.json
+index 243486f001f69a..8f5909d07ac513 100644
+--- a/packages/theme/tokens/dimension.json
++++ b/packages/theme/tokens/dimension.json
+@@ -151,6 +151,40 @@
+ 				}
+ 			}
+ 		},
++		"size": {
++			"5xs": {
++				"$value": "{wpds-dimension.primitive.space.10}",
++				"$description": "Notification indicators"
++			},
++			"4xs": {
++				"$value": "{wpds-dimension.primitive.space.20}",
++				"$description": "Visual size for small interactive elements like resize handles"
++			},
++			"3xs": {
++				"$value": "{wpds-dimension.primitive.space.30}",
++				"$description": "Small markers"
++			},
++			"2xs": {
++				"$value": "{wpds-dimension.primitive.space.40}",
++				"$description": "For small controls like checkboxes and radios, or small decorative icons"
++			},
++			"xs": {
++				"$value": "{wpds-dimension.primitive.space.50}",
++				"$description": "For medium sized icons"
++			},
++			"sm": {
++				"$value": "{wpds-dimension.primitive.space.60}",
++				"$description": "For icons and small buttons"
++			},
++			"md": {
++				"$value": "{wpds-dimension.primitive.space.70}",
++				"$description": "For medium-sized buttons and inputs"
++			},
++			"lg": {
++				"$value": "{wpds-dimension.primitive.space.80}",
++				"$description": "Default size for buttons and inputs"
++			}
++		},
+ 		"surface-width": {
+ 			"xs": {
+ 				"$value": { "value": 240, "unit": "px" },

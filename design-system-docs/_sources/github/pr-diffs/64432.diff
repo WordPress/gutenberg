@@ -1,0 +1,37 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 96bf76815e71dd..57ba69197cfa98 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ 
+ -   `Composite`: improve Storybook examples and add interactive controls ([#64397](https://github.com/WordPress/gutenberg/pull/64397)).
+ -   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
++-   `DropdownMenuV2`: adopt elevation scale ([#64432](https://github.com/WordPress/gutenberg/pull/64432)).
+ 
+ ## 28.5.0 (2024-08-07)
+ 
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/dropdown-menu-v2/styles.ts
+index ab7c763b5f4569..950a549f8566a4 100644
+--- a/packages/components/src/dropdown-menu-v2/styles.ts
++++ b/packages/components/src/dropdown-menu-v2/styles.ts
+@@ -31,7 +31,7 @@ const ITEM_PADDING_INLINE = space( 3 );
+ const DEFAULT_BORDER_COLOR = COLORS.gray[ 300 ];
+ const DIVIDER_COLOR = COLORS.gray[ 200 ];
+ const TOOLBAR_VARIANT_BORDER_COLOR = COLORS.gray[ '900' ];
+-const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.popoverShadow }`;
++const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLOR }, ${ CONFIG.elevationXSmall }`;
+ const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
+ 
+ const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 65632170c9e3d7..02c6f69544c2bf 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -73,7 +73,6 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
+ 	cardPaddingSmall: `${ space( 4 ) }`,
+ 	cardPaddingMedium: `${ space( 4 ) } ${ space( 6 ) }`,
+ 	cardPaddingLarge: `${ space( 6 ) } ${ space( 8 ) }`,
+-	popoverShadow: `0 0.7px 1px rgba(0, 0, 0, 0.1), 0 1.2px 1.7px -0.2px rgba(0, 0, 0, 0.1), 0 2.3px 3.3px -0.5px rgba(0, 0, 0, 0.1)`,
+ 	elevationXSmall: `0 0.7px 1px rgba(0, 0, 0, 0.1), 0 1.2px 1.7px -0.2px rgba(0, 0, 0, 0.1), 0 2.3px 3.3px -0.5px rgba(0, 0, 0, 0.1)`,
+ 	elevationSmall: `0 0.7px 1px 0 rgba(0, 0, 0, 0.12), 0 2.2px 3.7px -0.2px rgba(0, 0, 0, 0.12), 0 5.3px 7.3px -0.5px rgba(0, 0, 0, 0.12)`,
+ 	elevationMedium: `0 0.7px 1px 0 rgba(0, 0, 0, 0.14), 0 4.2px 5.7px -0.2px rgba(0, 0, 0, 0.14), 0 7.3px 9.3px -0.5px rgba(0, 0, 0, 0.14)`,

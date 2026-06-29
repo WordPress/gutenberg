@@ -1,0 +1,13 @@
+diff --git a/packages/components/CONTRIBUTING.md b/packages/components/CONTRIBUTING.md
+index 7e88400d456eda..3f3b3d29e3d900 100644
+--- a/packages/components/CONTRIBUTING.md
++++ b/packages/components/CONTRIBUTING.md
+@@ -56,7 +56,7 @@ It’s encouraged to surface works-in-progress. If you’re not able to complete
+ 
+ Once the team has discussed and approved the change, it's time to start implementing it.
+ 
+-1. **Provide a rationale**: Explain how your component will add value to the system and the greater product ecosystem. Be sure to include any user experience and interaction descriptions.
++1. ** Please provide a justification**: Explain how your component will add value to the system and the greater product ecosystem. Be sure to include any user experience and interaction descriptions.
+ 2. **Draft documentation**: New components need development, design, and accessibility guidelines. Additionally, if your change adds additional behavior or expands a component’s features, those changes will need to be fully documented as well. Read through existing component documentation for examples. Start with a rough draft, and reviewers will help polish documentation.
+ 3. **Provide working code**: The component or enhancement must be built in React. See the [developer contribution guidelines](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/README.md).
+ 4. **Create a design spec**: Create sizing and styling annotations for all aspects of the component. This spec should provide a developer with everything they need to create the design in code. [Figma automatically does this for you](https://help.figma.com/article/32-developer-handoff).

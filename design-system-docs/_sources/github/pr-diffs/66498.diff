@@ -1,0 +1,28 @@
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index 2f736d6b95441c..b7cfef7e19a096 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -48,10 +48,21 @@ function useScrollRectIntoView(
+ 		const childRightEdge = childLeft + childWidth;
+ 		const rightOverflow = childRightEdge + margin - parentRightEdge;
+ 		const leftOverflow = parentScroll - ( childLeft - margin );
++
++		let scrollLeft = null;
+ 		if ( leftOverflow > 0 ) {
+-			parent.scrollLeft = parentScroll - leftOverflow;
++			scrollLeft = parentScroll - leftOverflow;
+ 		} else if ( rightOverflow > 0 ) {
+-			parent.scrollLeft = parentScroll + rightOverflow;
++			scrollLeft = parentScroll + rightOverflow;
++		}
++
++		if ( scrollLeft !== null ) {
++			/**
++			 * The optional chaining is used here to avoid unit test failures.
++			 * It can be removed when JSDOM supports `Element` scroll methods.
++			 * See: https://github.com/WordPress/gutenberg/pull/66498#issuecomment-2441146096
++			 */
++			parent.scroll?.( { left: scrollLeft } );
+ 		}
+ 	}, [ margin, parent, rect ] );
+ }

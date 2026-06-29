@@ -1,0 +1,40 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9341104dda97e6..4f0444353d67a2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,7 @@
+ -   `CustomSelectControlV2`: allow wrapping item hint to new line ([#62848](https://github.com/WordPress/gutenberg/pull/62848)).
+ -   `CustomSelectControlV2`: fix select popover content overflow. ([#62844](https://github.com/WordPress/gutenberg/pull/62844))
+ -   `CustomSelectControlV2`: keep legacy arrow down behavior only for legacy wrapper. ([#62919](https://github.com/WordPress/gutenberg/pull/62919))
++-   `CustomSelectControlV2`: fix trigger button font size. ([#63131](https://github.com/WordPress/gutenberg/pull/63131))
+ -   Extract `TimeInput` component from `TimePicker` ([#60613](https://github.com/WordPress/gutenberg/pull/60613)).
+ -   `TimeInput`: Add `label` prop ([#63106](https://github.com/WordPress/gutenberg/pull/63106)).
+ 
+diff --git a/packages/components/src/custom-select-control-v2/styles.ts b/packages/components/src/custom-select-control-v2/styles.ts
+index e4d6140fbf6d79..273f581ae3847a 100644
+--- a/packages/components/src/custom-select-control-v2/styles.ts
++++ b/packages/components/src/custom-select-control-v2/styles.ts
+@@ -10,6 +10,7 @@ import styled from '@emotion/styled';
+ import { COLORS, CONFIG } from '../utils';
+ import { space } from '../utils/space';
+ import { chevronIconSize } from '../select-control/styles/select-control-styles';
++import { fontSizeStyles } from '../input-control/styles/input-control-styles';
+ import type { CustomSelectButtonSize } from './types';
+ 
+ const INLINE_PADDING = {
+@@ -91,7 +92,6 @@ export const Select = styled( Ariakit.Select, {
+ 		color: ${ COLORS.theme.foreground };
+ 		cursor: pointer;
+ 		font-family: inherit;
+-		font-size: ${ CONFIG.fontSize };
+ 		text-align: start;
+ 		user-select: none;
+ 		width: 100%;
+@@ -102,6 +102,7 @@ export const Select = styled( Ariakit.Select, {
+ 
+ 		${ getSelectSize( size, hasCustomRenderProp ? 'minHeight' : 'height' ) }
+ 		${ ! hasCustomRenderProp && truncateStyles }
++		${ fontSizeStyles( { inputSize: size } ) }
+ 	`
+ );
+ 

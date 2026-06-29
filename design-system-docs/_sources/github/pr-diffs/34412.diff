@@ -1,0 +1,548 @@
+diff --git a/packages/components/src/modal/frame.js b/packages/components/src/modal/frame.js
+deleted file mode 100644
+index b563dff76c2559..00000000000000
+--- a/packages/components/src/modal/frame.js
++++ /dev/null
+@@ -1,111 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-
+-import { Component } from '@wordpress/element';
+-import { ESCAPE } from '@wordpress/keycodes';
+-import {
+-	useFocusReturn,
+-	useFocusOnMount,
+-	useConstrainedTabbing,
+-	useMergeRefs,
+-} from '@wordpress/compose';
+-
+-/**
+- * Internal dependencies
+- */
+-import withFocusOutside from '../higher-order/with-focus-outside';
+-
+-function ModalFrameContent( {
+-	overlayClassName,
+-	contentLabel,
+-	aria: { describedby, labelledby },
+-	children,
+-	className,
+-	role,
+-	style,
+-	focusOnMount,
+-	shouldCloseOnEsc,
+-	onRequestClose,
+-} ) {
+-	function handleEscapeKeyDown( event ) {
+-		if (
+-			shouldCloseOnEsc &&
+-			event.keyCode === ESCAPE &&
+-			! event.defaultPrevented
+-		) {
+-			event.preventDefault();
+-			if ( onRequestClose ) {
+-				onRequestClose( event );
+-			}
+-		}
+-	}
+-	const focusOnMountRef = useFocusOnMount( focusOnMount );
+-	const constrainedTabbingRef = useConstrainedTabbing();
+-	const focusReturnRef = useFocusReturn();
+-
+-	return (
+-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+-		<div
+-			className={ classnames(
+-				'components-modal__screen-overlay',
+-				overlayClassName
+-			) }
+-			onKeyDown={ handleEscapeKeyDown }
+-		>
+-			<div
+-				className={ classnames( 'components-modal__frame', className ) }
+-				style={ style }
+-				ref={ useMergeRefs( [
+-					constrainedTabbingRef,
+-					focusReturnRef,
+-					focusOnMountRef,
+-				] ) }
+-				role={ role }
+-				aria-label={ contentLabel }
+-				aria-labelledby={ contentLabel ? null : labelledby }
+-				aria-describedby={ describedby }
+-				tabIndex="-1"
+-			>
+-				{ children }
+-			</div>
+-		</div>
+-	);
+-}
+-
+-class ModalFrame extends Component {
+-	constructor() {
+-		super( ...arguments );
+-		this.handleFocusOutside = this.handleFocusOutside.bind( this );
+-	}
+-
+-	/**
+-	 * Callback function called when clicked outside the modal.
+-	 *
+-	 * @param {Object} event Mouse click event.
+-	 */
+-	handleFocusOutside( event ) {
+-		if (
+-			this.props.shouldCloseOnClickOutside &&
+-			this.props.onRequestClose
+-		) {
+-			this.props.onRequestClose( event );
+-		}
+-	}
+-
+-	/**
+-	 * Renders the modal frame element.
+-	 *
+-	 * @return {WPElement} The modal frame element.
+-	 */
+-	render() {
+-		return <ModalFrameContent { ...this.props } />;
+-	}
+-}
+-
+-export default withFocusOutside( ModalFrame );
+diff --git a/packages/components/src/modal/header.js b/packages/components/src/modal/header.js
+deleted file mode 100644
+index 7fcc145b05484e..00000000000000
+--- a/packages/components/src/modal/header.js
++++ /dev/null
+@@ -1,53 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { __ } from '@wordpress/i18n';
+-import { closeSmall } from '@wordpress/icons';
+-
+-/**
+- * Internal dependencies
+- */
+-import Button from '../button';
+-
+-const ModalHeader = ( {
+-	icon,
+-	title,
+-	onClose,
+-	closeLabel,
+-	headingId,
+-	isDismissible,
+-} ) => {
+-	const label = closeLabel ? closeLabel : __( 'Close dialog' );
+-
+-	return (
+-		<div className="components-modal__header">
+-			<div className="components-modal__header-heading-container">
+-				{ icon && (
+-					<span
+-						className="components-modal__icon-container"
+-						aria-hidden
+-					>
+-						{ icon }
+-					</span>
+-				) }
+-				{ title && (
+-					<h1
+-						id={ headingId }
+-						className="components-modal__header-heading"
+-					>
+-						{ title }
+-					</h1>
+-				) }
+-			</div>
+-			{ isDismissible && (
+-				<Button
+-					onClick={ onClose }
+-					icon={ closeSmall }
+-					label={ label }
+-				/>
+-			) }
+-		</div>
+-	);
+-};
+-
+-export default ModalHeader;
+diff --git a/packages/components/src/modal/index.js b/packages/components/src/modal/index.js
+index 2144972d42f187..0d4ec5de58f048 100644
+--- a/packages/components/src/modal/index.js
++++ b/packages/components/src/modal/index.js
+@@ -1,173 +1,164 @@
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
+ /**
+  * WordPress dependencies
+  */
+-import { Component, createPortal } from '@wordpress/element';
+-import { withInstanceId } from '@wordpress/compose';
++import { createPortal, useEffect, useRef } from '@wordpress/element';
++import {
++	useInstanceId,
++	useFocusReturn,
++	useFocusOnMount,
++	__experimentalUseFocusOutside as useFocusOutside,
++	useConstrainedTabbing,
++	useMergeRefs,
++} from '@wordpress/compose';
+ import deprecated from '@wordpress/deprecated';
++import { ESCAPE } from '@wordpress/keycodes';
++import { __ } from '@wordpress/i18n';
++import { closeSmall } from '@wordpress/icons';
+ 
+ /**
+  * Internal dependencies
+  */
+-import ModalFrame from './frame';
+-import ModalHeader from './header';
+ import * as ariaHelper from './aria-helper';
++import Button from '../button';
+ 
+ // Used to count the number of open modals.
+-let parentElement,
+-	openModalCount = 0;
+-
+-class Modal extends Component {
+-	constructor( props ) {
+-		super( props );
+-		this.prepareDOM();
+-	}
+-
+-	/**
+-	 * Appends the modal's node to the DOM, so the portal can render the
+-	 * modal in it. Also calls the openFirstModal when this is the first modal to be
+-	 * opened.
+-	 */
+-	componentDidMount() {
++let openModalCount = 0;
++
++export default function Modal( {
++	bodyOpenClassName = 'modal-open',
++	role = 'dialog',
++	title = null,
++	focusOnMount = true,
++	shouldCloseOnEsc = true,
++	shouldCloseOnClickOutside = true,
++	isDismissable, // Deprecated
++	isDismissible = isDismissable || true,
++	/* accessibility */
++	aria = {
++		labelledby: null,
++		describedby: null,
++	},
++	onRequestClose,
++	icon,
++	closeButtonLabel,
++	children,
++	style,
++	overlayClassName,
++	className,
++	contentLabel,
++} ) {
++	const ref = useRef();
++	const instanceId = useInstanceId( Modal );
++	const headingId = title
++		? `components-modal-header-${ instanceId }`
++		: aria.labelledby;
++	const focusOnMountRef = useFocusOnMount( focusOnMount );
++	const constrainedTabbingRef = useConstrainedTabbing();
++	const focusReturnRef = useFocusReturn();
++	const focusOutsideProps = useFocusOutside( onRequestClose );
++
++	useEffect( () => {
+ 		openModalCount++;
+ 
+ 		if ( openModalCount === 1 ) {
+-			this.openFirstModal();
++			ariaHelper.hideApp( ref.current );
++			document.body.classList.add( bodyOpenClassName );
+ 		}
+-	}
+-
+-	/**
+-	 * Removes the modal's node from the DOM. Also calls closeLastModal when this is
+-	 * the last modal to be closed.
+-	 */
+-	componentWillUnmount() {
+-		openModalCount--;
+ 
+-		if ( openModalCount === 0 ) {
+-			this.closeLastModal();
+-		}
+-
+-		this.cleanDOM();
++		return () => {
++			openModalCount--;
++
++			if ( openModalCount === 0 ) {
++				document.body.classList.remove( bodyOpenClassName );
++				ariaHelper.showApp();
++			}
++		};
++	}, [] );
++
++	if ( isDismissable ) {
++		deprecated( 'isDismissable prop of the Modal component', {
++			since: '5.4',
++			alternative: 'isDismissible prop (renamed) of the Modal component',
++		} );
+ 	}
+ 
+-	/**
+-	 * Prepares the DOM for the modals to be rendered.
+-	 *
+-	 * Every modal is mounted in a separate div appended to a parent div
+-	 * that is appended to the document body.
+-	 *
+-	 * The parent div will be created if it does not yet exist, and the
+-	 * separate div for this specific modal will be appended to that.
+-	 */
+-	prepareDOM() {
+-		if ( ! parentElement ) {
+-			parentElement = document.createElement( 'div' );
+-			document.body.appendChild( parentElement );
++	function handleEscapeKeyDown( event ) {
++		if (
++			shouldCloseOnEsc &&
++			event.keyCode === ESCAPE &&
++			! event.defaultPrevented
++		) {
++			event.preventDefault();
++			if ( onRequestClose ) {
++				onRequestClose( event );
++			}
+ 		}
+-		this.node = document.createElement( 'div' );
+-		parentElement.appendChild( this.node );
+-	}
+-
+-	/**
+-	 * Removes the specific mounting point for this modal from the DOM.
+-	 */
+-	cleanDOM() {
+-		parentElement.removeChild( this.node );
+-	}
+-
+-	/**
+-	 * Prepares the DOM for this modal and any additional modal to be mounted.
+-	 *
+-	 * It appends an additional div to the body for the modals to be rendered in,
+-	 * it hides any other elements from screen-readers and adds an additional class
+-	 * to the body to prevent scrolling while the modal is open.
+-	 */
+-	openFirstModal() {
+-		ariaHelper.hideApp( parentElement );
+-		document.body.classList.add( this.props.bodyOpenClassName );
+-	}
+-
+-	/**
+-	 * Cleans up the DOM after the last modal is closed and makes the app available
+-	 * for screen-readers again.
+-	 */
+-	closeLastModal() {
+-		document.body.classList.remove( this.props.bodyOpenClassName );
+-		ariaHelper.showApp();
+ 	}
+ 
+-	/**
+-	 * Renders the modal.
+-	 *
+-	 * @return {WPElement} The modal element.
+-	 */
+-	render() {
+-		const {
+-			onRequestClose,
+-			title,
+-			icon,
+-			closeButtonLabel,
+-			children,
+-			aria,
+-			instanceId,
+-			isDismissible,
+-			isDismissable, //Deprecated
+-			// Many of the documented props for Modal are passed straight through
+-			// to the ModalFrame component and handled there.
+-			...otherProps
+-		} = this.props;
+-
+-		const headingId = title
+-			? `components-modal-header-${ instanceId }`
+-			: aria.labelledby;
+-
+-		if ( isDismissable ) {
+-			deprecated( 'isDismissable prop of the Modal component', {
+-				since: '5.4',
+-				alternative:
+-					'isDismissible prop (renamed) of the Modal component',
+-			} );
+-		}
+-		// Disable reason: this stops mouse events from triggering tooltips and
+-		// other elements underneath the modal overlay.
+-		return createPortal(
+-			<ModalFrame
+-				onRequestClose={ onRequestClose }
+-				aria={ {
+-					labelledby: headingId,
+-					describedby: aria.describedby,
+-				} }
+-				{ ...otherProps }
++	return createPortal(
++		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
++		<div
++			ref={ ref }
++			className={ classnames(
++				'components-modal__screen-overlay',
++				overlayClassName
++			) }
++			onKeyDown={ handleEscapeKeyDown }
++		>
++			<div
++				className={ classnames( 'components-modal__frame', className ) }
++				style={ style }
++				ref={ useMergeRefs( [
++					constrainedTabbingRef,
++					focusReturnRef,
++					focusOnMountRef,
++				] ) }
++				role={ role }
++				aria-label={ contentLabel }
++				aria-labelledby={ contentLabel ? null : headingId }
++				aria-describedby={ aria.describedby }
++				tabIndex="-1"
++				{ ...( shouldCloseOnClickOutside ? focusOutsideProps : {} ) }
+ 			>
+ 				<div className={ 'components-modal__content' } role="document">
+-					<ModalHeader
+-						closeLabel={ closeButtonLabel }
+-						headingId={ title && headingId }
+-						icon={ icon }
+-						isDismissible={ isDismissible || isDismissable }
+-						onClose={ onRequestClose }
+-						title={ title }
+-					/>
++					<div className="components-modal__header">
++						<div className="components-modal__header-heading-container">
++							{ icon && (
++								<span
++									className="components-modal__icon-container"
++									aria-hidden
++								>
++									{ icon }
++								</span>
++							) }
++							{ title && (
++								<h1
++									id={ headingId }
++									className="components-modal__header-heading"
++								>
++									{ title }
++								</h1>
++							) }
++						</div>
++						{ isDismissible && (
++							<Button
++								onClick={ onRequestClose }
++								icon={ closeSmall }
++								label={
++									closeButtonLabel || __( 'Close dialog' )
++								}
++							/>
++						) }
++					</div>
+ 					{ children }
+ 				</div>
+-			</ModalFrame>,
+-			this.node
+-		);
+-	}
++			</div>
++		</div>,
++		document.body
++	);
+ }
+-
+-Modal.defaultProps = {
+-	bodyOpenClassName: 'modal-open',
+-	role: 'dialog',
+-	title: null,
+-	focusOnMount: true,
+-	shouldCloseOnEsc: true,
+-	shouldCloseOnClickOutside: true,
+-	isDismissible: true,
+-	/* accessibility */
+-	aria: {
+-		labelledby: null,
+-		describedby: null,
+-	},
+-};
+-
+-export default withInstanceId( Modal );
+diff --git a/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/__snapshots__/index.js.snap
+index 139628d753d88a..9b50a624ada291 100644
+--- a/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/keyboard-shortcut-help-modal/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is active 1`] = `
+-<WithInstanceId(Modal)
++<Modal
+   className="edit-post-keyboard-shortcut-help-modal"
+   closeLabel="Close"
+   onRequestClose={[Function]}
+@@ -80,7 +80,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
+     }
+     title="Text formatting"
+   />
+-</WithInstanceId(Modal)>
++</Modal>
+ `;
+ 
+ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is not active 1`] = `""`;
+diff --git a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+index d8351581e23684..97bad699daf328 100644
+--- a/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/test/__snapshots__/index.js.snap
+@@ -1,7 +1,7 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+ exports[`PreferencesModal should match snapshot when the modal is active large viewports 1`] = `
+-<WithInstanceId(Modal)
++<Modal
+   className="edit-post-preferences-modal"
+   closeLabel="Close"
+   onRequestClose={[Function]}
+@@ -30,11 +30,11 @@ exports[`PreferencesModal should match snapshot when the modal is active large v
+   >
+     <Component />
+   </TabPanel>
+-</WithInstanceId(Modal)>
++</Modal>
+ `;
+ 
+ exports[`PreferencesModal should match snapshot when the modal is active small viewports 1`] = `
+-<WithInstanceId(Modal)
++<Modal
+   className="edit-post-preferences-modal"
+   closeLabel="Close"
+   onRequestClose={[Function]}
+@@ -186,5 +186,5 @@ exports[`PreferencesModal should match snapshot when the modal is active small v
+       </NavigationItem>
+     </NavigationMenu>
+   </Navigation>
+-</WithInstanceId(Modal)>
++</Modal>
+ `;

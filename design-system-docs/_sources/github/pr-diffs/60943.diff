@@ -1,0 +1,43 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3cbc2b3159aac9..d4ae5427840970 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `SlotFill`: fixed missing `getServerSnapshot` parameter in slot map ([#60943](https://github.com/WordPress/gutenberg/pull/60943)).
++
+ ## 27.4.0 (2024-04-19)
+ 
+ ### Deprecation
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/observable-map.ts b/packages/components/src/slot-fill/bubbles-virtually/observable-map.ts
+index fcf6871ceabcc8..f4c27077e3f458 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/observable-map.ts
++++ b/packages/components/src/slot-fill/bubbles-virtually/observable-map.ts
+@@ -75,5 +75,5 @@ export function useObservableValue< K, V >(
+ 		],
+ 		[ map, name ]
+ 	);
+-	return useSyncExternalStore( subscribe, getValue );
++	return useSyncExternalStore( subscribe, getValue, getValue );
+ }
+diff --git a/packages/plugins/src/components/plugin-area/index.tsx b/packages/plugins/src/components/plugin-area/index.tsx
+index 231a519b030d01..406ba6724b6a13 100644
+--- a/packages/plugins/src/components/plugin-area/index.tsx
++++ b/packages/plugins/src/components/plugin-area/index.tsx
+@@ -113,7 +113,11 @@ function PluginArea( {
+ 		};
+ 	}, [ scope ] );
+ 
+-	const plugins = useSyncExternalStore( store.subscribe, store.getValue );
++	const plugins = useSyncExternalStore(
++		store.subscribe,
++		store.getValue,
++		store.getValue
++	);
+ 
+ 	return (
+ 		<div style={ { display: 'none' } }>

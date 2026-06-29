@@ -1,0 +1,103 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f1ff788eaab384..0fa80ad89fa045 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ 
+ -   `ToggleGroupControl`: Make unselected item color consistent across all variants ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
+ -   `Button`: Add `word-break: break-word`. ([#76071](https://github.com/WordPress/gutenberg/pull/76071)).
++-   `Tooltip`: Change default `placement` from `bottom` to `top`. ([#76131](https://github.com/WordPress/gutenberg/pull/76131)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/tooltip/README.md b/packages/components/src/tooltip/README.md
+index ef2cd35d25543e..b13ca4c54aec9d 100644
+--- a/packages/components/src/tooltip/README.md
++++ b/packages/components/src/tooltip/README.md
+@@ -51,7 +51,7 @@ Option to hide the tooltip when the anchor is clicked.
+ Used to specify the tooltip's placement with respect to its anchor.
+ 
+ -   Required: No
+--   Default: `'bottom'`
++-   Default: `'top'`
+ 
+ #### `position`: `string`
+ 
+@@ -60,7 +60,7 @@ _Note: use the `placement` prop instead when possible._
+ Legacy way to specify the popover's position with respect to its anchor. Specify y- and x-axis as a space-separated string. Supports `'top'`, `'middle'`, `'bottom'` y axis, and `'left'`, `'center'`, `'right'` x axis.
+ 
+ -   Required: No
+--   Default: `'bottom'`
++-   Default: `'top'`
+ 
+ #### `shortcut`: `string` | `object`
+ 
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index c67c7889bd0d0d..0c0d9d1d183bae 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -58,7 +58,7 @@ function UnforwardedTooltip(
+ 	// Compute tooltip's placement:
+ 	// - give priority to `placement` prop, if defined
+ 	// - otherwise, compute it from the legacy `position` prop (if defined)
+-	// - finally, fallback to the default placement: 'bottom'
++	// - finally, fallback to the default placement: 'top'
+ 	let computedPlacement;
+ 	if ( placement !== undefined ) {
+ 		computedPlacement = placement;
+@@ -69,7 +69,7 @@ function UnforwardedTooltip(
+ 			alternative: '`placement` prop',
+ 		} );
+ 	}
+-	computedPlacement = computedPlacement || 'bottom';
++	computedPlacement = computedPlacement || 'top';
+ 
+ 	const tooltipStore = Ariakit.useTooltipStore( {
+ 		placement: computedPlacement,
+diff --git a/packages/components/src/tooltip/types.ts b/packages/components/src/tooltip/types.ts
+index 3d42b02428de07..3945386023ac0d 100644
+--- a/packages/components/src/tooltip/types.ts
++++ b/packages/components/src/tooltip/types.ts
+@@ -35,7 +35,7 @@ export type TooltipProps = {
+ 	/**
+ 	 * Where the tooltip should be positioned relative to its parent.
+ 	 *
+-	 * @default bottom
++	 * @default top
+ 	 */
+ 	placement?: Placement;
+ 	/**
+@@ -47,7 +47,7 @@ export type TooltipProps = {
+ 	 * `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
+ 	 *
+ 	 * @deprecated
+-	 * @default bottom
++	 * @default top
+ 	 */
+ 	position?: PopoverProps[ 'position' ];
+ 	/**
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index bfb8d653956250..951460cea30ec6 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ ### Enhancements
+ 
+ -   `Dialog`: Add `--wp-ui-dialog-z-index` CSS custom property for legacy z-index compatibility ([#75874](https://github.com/WordPress/gutenberg/pull/75874)).
++-   `Tooltip`: Change default `side` from `bottom` to `top`. ([#76131](https://github.com/WordPress/gutenberg/pull/76131)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/ui/src/tooltip/popup.tsx b/packages/ui/src/tooltip/popup.tsx
+index c93053645ea5f3..e203b1f6dbcc34 100644
+--- a/packages/ui/src/tooltip/popup.tsx
++++ b/packages/ui/src/tooltip/popup.tsx
+@@ -16,7 +16,7 @@ const ThemeProvider: typeof ThemeProviderType =
+ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
+ 	{
+ 		align = 'center',
+-		side = 'bottom',
++		side = 'top',
+ 		sideOffset = 4,
+ 		children,
+ 		className,

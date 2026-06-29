@@ -1,0 +1,386 @@
+diff --git a/packages/edit-widgets/src/components/sidebar/index.js b/packages/edit-widgets/src/components/sidebar/index.js
+index 27af07831e1eed..f08ee81a0d19cc 100644
+--- a/packages/edit-widgets/src/components/sidebar/index.js
++++ b/packages/edit-widgets/src/components/sidebar/index.js
+@@ -1,13 +1,13 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+ /**
+  * WordPress dependencies
+  */
+-import { useEffect, Platform } from '@wordpress/element';
+-import { isRTL, __, sprintf } from '@wordpress/i18n';
++import {
++	useEffect,
++	Platform,
++	useContext,
++	useCallback,
++} from '@wordpress/element';
++import { isRTL, __ } from '@wordpress/i18n';
+ import {
+ 	ComplementaryArea,
+ 	store as interfaceStore,
+@@ -18,7 +18,7 @@ import {
+ } from '@wordpress/block-editor';
+ 
+ import { drawerLeft, drawerRight } from '@wordpress/icons';
+-import { Button } from '@wordpress/components';
++import { privateApis as componentsPrivateApis } from '@wordpress/components';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ 
+ const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
+@@ -37,32 +37,112 @@ const WIDGET_AREAS_IDENTIFIER = 'edit-widgets/block-areas';
+  */
+ import WidgetAreas from './widget-areas';
+ import { store as editWidgetsStore } from '../../store';
++import { unlock } from '../../lock-unlock';
++
++const { Tabs } = unlock( componentsPrivateApis );
+ 
+-function ComplementaryAreaTab( { identifier, label, isActive } ) {
++function SidebarHeader( { selectedWidgetAreaBlock } ) {
++	return (
++		<Tabs.TabList>
++			<Tabs.Tab tabId={ WIDGET_AREAS_IDENTIFIER }>
++				{ selectedWidgetAreaBlock
++					? selectedWidgetAreaBlock.attributes.name
++					: __( 'Widget Areas' ) }
++			</Tabs.Tab>
++			<Tabs.Tab tabId={ BLOCK_INSPECTOR_IDENTIFIER }>
++				{ __( 'Block' ) }
++			</Tabs.Tab>
++		</Tabs.TabList>
++	);
++}
++
++function SidebarContent( {
++	hasSelectedNonAreaBlock,
++	currentArea,
++	isGeneralSidebarOpen,
++	selectedWidgetAreaBlock,
++} ) {
+ 	const { enableComplementaryArea } = useDispatch( interfaceStore );
++
++	useEffect( () => {
++		if (
++			hasSelectedNonAreaBlock &&
++			currentArea === WIDGET_AREAS_IDENTIFIER &&
++			isGeneralSidebarOpen
++		) {
++			enableComplementaryArea(
++				'core/edit-widgets',
++				BLOCK_INSPECTOR_IDENTIFIER
++			);
++		}
++		if (
++			! hasSelectedNonAreaBlock &&
++			currentArea === BLOCK_INSPECTOR_IDENTIFIER &&
++			isGeneralSidebarOpen
++		) {
++			enableComplementaryArea(
++				'core/edit-widgets',
++				WIDGET_AREAS_IDENTIFIER
++			);
++		}
++		// We're intentionally leaving `currentArea` and `isGeneralSidebarOpen`
++		// out of the dep array because we want this effect to run based on
++		// block selection changes, not sidebar state changes.
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++	}, [ hasSelectedNonAreaBlock, enableComplementaryArea ] );
++
++	const tabsContextValue = useContext( Tabs.Context );
++
+ 	return (
+-		<Button
+-			onClick={ () =>
+-				enableComplementaryArea( editWidgetsStore.name, identifier )
+-			}
+-			className={ classnames( 'edit-widgets-sidebar__panel-tab', {
+-				'is-active': isActive,
+-			} ) }
+-			aria-label={
+-				isActive
+-					? // translators: %s: sidebar label e.g: "Widget Areas".
+-					  sprintf( __( '%s (selected)' ), label )
+-					: label
++		<ComplementaryArea
++			className="edit-widgets-sidebar"
++			header={
++				<Tabs.Context.Provider value={ tabsContextValue }>
++					<SidebarHeader
++						selectedWidgetAreaBlock={ selectedWidgetAreaBlock }
++					/>
++				</Tabs.Context.Provider>
+ 			}
+-			data-label={ label }
++			headerClassName="edit-widgets-sidebar__panel-tabs"
++			/* translators: button label text should, if possible, be under 16 characters. */
++			title={ __( 'Settings' ) }
++			closeLabel={ __( 'Close Settings' ) }
++			scope="core/edit-widgets"
++			identifier={ currentArea }
++			icon={ isRTL() ? drawerLeft : drawerRight }
++			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
+ 		>
+-			{ label }
+-		</Button>
++			<Tabs.Context.Provider value={ tabsContextValue }>
++				<Tabs.TabPanel
++					tabId={ WIDGET_AREAS_IDENTIFIER }
++					focusable={ false }
++				>
++					<WidgetAreas
++						selectedWidgetAreaId={
++							selectedWidgetAreaBlock?.attributes.id
++						}
++					/>
++				</Tabs.TabPanel>
++				<Tabs.TabPanel
++					tabId={ BLOCK_INSPECTOR_IDENTIFIER }
++					focusable={ false }
++				>
++					{ hasSelectedNonAreaBlock ? (
++						<BlockInspector />
++					) : (
++						// Pretend that Widget Areas are part of the UI by not
++						// showing the Block Inspector when one is selected.
++						<span className="block-editor-block-inspector__no-blocks">
++							{ __( 'No block selected.' ) }
++						</span>
++					) }
++				</Tabs.TabPanel>
++			</Tabs.Context.Provider>
++		</ComplementaryArea>
+ 	);
+ }
+ 
+ export default function Sidebar() {
+-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+ 	const {
+ 		currentArea,
+ 		hasSelectedNonAreaBlock,
+@@ -110,84 +190,41 @@ export default function Sidebar() {
+ 		};
+ 	}, [] );
+ 
+-	// currentArea, and isGeneralSidebarOpen are intentionally left out from the dependencies,
+-	// because we want to run the effect when a block is selected/unselected and not when the sidebar state changes.
+-	useEffect( () => {
+-		if (
+-			hasSelectedNonAreaBlock &&
+-			currentArea === WIDGET_AREAS_IDENTIFIER &&
+-			isGeneralSidebarOpen
+-		) {
+-			enableComplementaryArea(
+-				'core/edit-widgets',
+-				BLOCK_INSPECTOR_IDENTIFIER
+-			);
+-		}
+-		if (
+-			! hasSelectedNonAreaBlock &&
+-			currentArea === BLOCK_INSPECTOR_IDENTIFIER &&
+-			isGeneralSidebarOpen
+-		) {
+-			enableComplementaryArea(
+-				'core/edit-widgets',
+-				WIDGET_AREAS_IDENTIFIER
+-			);
+-		}
+-	}, [ hasSelectedNonAreaBlock, enableComplementaryArea ] );
++	const { enableComplementaryArea } = useDispatch( interfaceStore );
+ 
+-	return (
+-		<ComplementaryArea
+-			className="edit-widgets-sidebar"
+-			header={
+-				<ul>
+-					<li>
+-						<ComplementaryAreaTab
+-							identifier={ WIDGET_AREAS_IDENTIFIER }
+-							label={
+-								selectedWidgetAreaBlock
+-									? selectedWidgetAreaBlock.attributes.name
+-									: __( 'Widget Areas' )
+-							}
+-							isActive={ currentArea === WIDGET_AREAS_IDENTIFIER }
+-						/>
+-					</li>
+-					<li>
+-						<ComplementaryAreaTab
+-							identifier={ BLOCK_INSPECTOR_IDENTIFIER }
+-							label={ __( 'Block' ) }
+-							isActive={
+-								currentArea === BLOCK_INSPECTOR_IDENTIFIER
+-							}
+-						/>
+-					</li>
+-				</ul>
++	// `newSelectedTabId` could technically be falsey if no tab is selected (i.e.
++	// the initial render) or when we don't want a tab displayed (i.e. the
++	// sidebar is closed). These cases should both be covered by the `!!` check
++	// below, so we shouldn't need any additional falsey handling.
++	const onTabSelect = useCallback(
++		( newSelectedTabId ) => {
++			if ( !! newSelectedTabId ) {
++				enableComplementaryArea(
++					editWidgetsStore.name,
++					newSelectedTabId
++				);
+ 			}
+-			headerClassName="edit-widgets-sidebar__panel-tabs"
+-			/* translators: button label text should, if possible, be under 16 characters. */
+-			title={ __( 'Settings' ) }
+-			closeLabel={ __( 'Close Settings' ) }
+-			scope="core/edit-widgets"
+-			identifier={ currentArea }
+-			icon={ isRTL() ? drawerLeft : drawerRight }
+-			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
++		},
++		[ enableComplementaryArea ]
++	);
++
++	return (
++		<Tabs
++			// Due to how this component is controlled (via a value from the
++			// `interfaceStore`), when the sidebar closes the currently selected
++			// tab can't be found. This causes the component to continuously reset
++			// the selection to `null` in an infinite loop. Proactively setting
++			// the selected tab to `null` avoids that.
++			selectedTabId={ isGeneralSidebarOpen ? currentArea : null }
++			onSelect={ onTabSelect }
++			selectOnMove={ false }
+ 		>
+-			{ currentArea === WIDGET_AREAS_IDENTIFIER && (
+-				<WidgetAreas
+-					selectedWidgetAreaId={
+-						selectedWidgetAreaBlock?.attributes.id
+-					}
+-				/>
+-			) }
+-			{ currentArea === BLOCK_INSPECTOR_IDENTIFIER &&
+-				( hasSelectedNonAreaBlock ? (
+-					<BlockInspector />
+-				) : (
+-					// Pretend that Widget Areas are part of the UI by not
+-					// showing the Block Inspector when one is selected.
+-					<span className="block-editor-block-inspector__no-blocks">
+-						{ __( 'No block selected.' ) }
+-					</span>
+-				) ) }
+-		</ComplementaryArea>
++			<SidebarContent
++				hasSelectedNonAreaBlock={ hasSelectedNonAreaBlock }
++				currentArea={ currentArea }
++				isGeneralSidebarOpen={ isGeneralSidebarOpen }
++				selectedWidgetAreaBlock={ selectedWidgetAreaBlock }
++			/>
++		</Tabs>
+ 	);
+ }
+diff --git a/packages/edit-widgets/src/components/sidebar/style.scss b/packages/edit-widgets/src/components/sidebar/style.scss
+index a417ba83ebbd60..d54f25af07c386 100644
+--- a/packages/edit-widgets/src/components/sidebar/style.scss
++++ b/packages/edit-widgets/src/components/sidebar/style.scss
+@@ -1,99 +1,5 @@
+ .components-panel__header.edit-widgets-sidebar__panel-tabs {
+-	justify-content: flex-start;
+ 	padding-left: 0;
+-	padding-right: $grid-unit-05;
+-	border-top: 0;
+-	margin-top: 0;
+-
+-	ul {
+-		display: flex;
+-	}
+-	li {
+-		margin: 0;
+-	}
+-	.components-button.has-icon {
+-		display: none;
+-		margin-left: auto;
+-
+-		@include break-medium() {
+-			display: flex;
+-		}
+-	}
+-}
+-
+-// This tab style CSS is duplicated verbatim in
+-// /packages/components/src/tab-panel/style.scss
+-.components-button.edit-widgets-sidebar__panel-tab {
+-	position: relative;
+-	border-radius: 0;
+-	height: $grid-unit-60;
+-	background: transparent;
+-	border: none;
+-	box-shadow: none;
+-	cursor: pointer;
+-	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+-	margin-left: 0;
+-	font-weight: 500;
+-
+-	&:focus:not(:disabled) {
+-		position: relative;
+-		box-shadow: none;
+-		outline: none;
+-	}
+-
+-	// Tab indicator
+-	&::after {
+-		content: "";
+-		position: absolute;
+-		right: 0;
+-		bottom: 0;
+-		left: 0;
+-		pointer-events: none;
+-
+-		// Draw the indicator.
+-		background: var(--wp-admin-theme-color);
+-		height: calc(0 * var(--wp-admin-border-width-focus));
+-		border-radius: 0;
+-
+-		// Animation
+-		transition: all 0.1s linear;
+-		@include reduce-motion("transition");
+-	}
+-
+-	// Active.
+-	&.is-active::after {
+-		height: calc(1 * var(--wp-admin-border-width-focus));
+-
+-		// Windows high contrast mode.
+-		outline: 2px solid transparent;
+-		outline-offset: -1px;
+-	}
+-
+-	// Focus.
+-	&::before {
+-		content: "";
+-		position: absolute;
+-		top: $grid-unit-15;
+-		right: $grid-unit-15;
+-		bottom: $grid-unit-15;
+-		left: $grid-unit-15;
+-		pointer-events: none;
+-
+-		// Draw the indicator.
+-		box-shadow: 0 0 0 0 transparent;
+-		border-radius: $radius-block-ui;
+-
+-		// Animation
+-		transition: all 0.1s linear;
+-		@include reduce-motion("transition");
+-	}
+-
+-	&:focus-visible::before {
+-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+-
+-		// Windows high contrast mode.
+-		outline: 2px solid transparent;
+-	}
+ }
+ 
+ 

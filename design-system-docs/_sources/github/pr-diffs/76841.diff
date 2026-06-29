@@ -1,0 +1,879 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 8f227f2e3be6a1..5f0a6be4bbf3ae 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### New Features
+ 
++-   Add `ConfirmDialog` primitive ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+ -   Add `InputControl` component ([#76653](https://github.com/WordPress/gutenberg/pull/76653)).
+ 
+ ### Bug Fixes
+diff --git a/packages/ui/src/confirm-dialog/context.tsx b/packages/ui/src/confirm-dialog/context.tsx
+new file mode 100644
+index 00000000000000..170fe4bf507cd1
+--- /dev/null
++++ b/packages/ui/src/confirm-dialog/context.tsx
+@@ -0,0 +1,13 @@
++import { createContext } from '@wordpress/element';
++
++interface ConfirmDialogContextValue {
++	intent: 'default' | 'irreversible';
++	title: string;
++}
++
++const ConfirmDialogContext = createContext< ConfirmDialogContextValue >( {
++	intent: 'default',
++	title: '',
++} );
++
++export { ConfirmDialogContext };
+diff --git a/packages/ui/src/confirm-dialog/index.ts b/packages/ui/src/confirm-dialog/index.ts
+new file mode 100644
+index 00000000000000..ec1477d0fd6c64
+--- /dev/null
++++ b/packages/ui/src/confirm-dialog/index.ts
+@@ -0,0 +1,3 @@
++export { Root } from './root';
++export { Trigger } from './trigger';
++export { Popup } from './popup';
+diff --git a/packages/ui/src/confirm-dialog/popup.tsx b/packages/ui/src/confirm-dialog/popup.tsx
+new file mode 100644
+index 00000000000000..7de29f069f92ad
+--- /dev/null
++++ b/packages/ui/src/confirm-dialog/popup.tsx
+@@ -0,0 +1,48 @@
++import { forwardRef, useContext } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
++
++import * as Dialog from '../dialog';
++import { ConfirmDialogContext } from './context';
++import styles from './style.module.css';
++import type { PopupProps } from './types';
++
++const Popup = forwardRef< HTMLDivElement, PopupProps >(
++	function ConfirmDialogPopup(
++		{
++			children,
++			onConfirm,
++			confirmButtonText = __( 'OK' ),
++			cancelButtonText = __( 'Cancel' ),
++		},
++		ref
++	) {
++		const { intent, title } = useContext( ConfirmDialogContext );
++		const isIrreversible = intent === 'irreversible';
++
++		return (
++			<Dialog.Popup ref={ ref }>
++				<Dialog.Header>
++					<Dialog.Title>{ title }</Dialog.Title>
++				</Dialog.Header>
++				{ children }
++				<Dialog.Footer>
++					<Dialog.Action variant="minimal">
++						{ cancelButtonText }
++					</Dialog.Action>
++					<Dialog.Action
++						className={
++							isIrreversible
++								? styles[ 'irreversible-action' ]
++								: undefined
++						}
++						onClick={ onConfirm }
++					>
++						{ confirmButtonText }
++					</Dialog.Action>
++				</Dialog.Footer>
++			</Dialog.Popup>
++		);
++	}
++);
++
++export { Popup };
+diff --git a/packages/ui/src/confirm-dialog/root.tsx b/packages/ui/src/confirm-dialog/root.tsx
+new file mode 100644
+index 00000000000000..13d4497ddf2eb5
+--- /dev/null
++++ b/packages/ui/src/confirm-dialog/root.tsx
+@@ -0,0 +1,81 @@
++import { useMemo } from '@wordpress/element';
++
++import * as Dialog from '../dialog';
++import type { RootProps as DialogRootProps } from '../dialog/types';
++import { ConfirmDialogContext } from './context';
++import type { RootProps } from './types';
++
++/**
++ * A convenience wrapper for Dialog that provides common confirmation dialog
++ * patterns with confirm and cancel actions.
++ *
++ * Use `ConfirmDialog.Trigger` to render a button that opens the dialog.
++ * Use `ConfirmDialog.Popup` to render the dialog content.
++ * The `ConfirmDialog.Trigger` is optional — the dialog can also be controlled
++ * via `open` / `onOpenChange` props.
++ *
++ * ## Use cases
++ *
++ * - **Default intent**: Standard confirmation dialog for reversible actions.
++ *   The dialog can be dismissed via backdrop click, Escape key, cancel, or
++ *   confirm button.
++ * - **Irreversible intent**: Confirmation dialog for irreversible actions that
++ *   cannot be undone. Users can dismiss the dialog via Escape key, cancel, or
++ *   confirm button, but not via backdrop click. The "confirm" action button
++ *   uses error/danger coloring.
++ *
++ * For use cases outside the standard confirm/cancel pattern, use the lower-level
++ * `Dialog` component directly.
++ *
++ * See the [Destructive Actions guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-patterns-destructive-actions--docs)
++ * for more details on when to use each pattern.
++ */
++function Root( {
++	intent = 'default',
++	title,
++	children,
++	open,
++	onOpenChange,
++	defaultOpen,
++}: RootProps ) {
++	const isIrreversible = intent === 'irreversible';
++
++	const handleOpenChange: DialogRootProps[ 'onOpenChange' ] = (
++		nextOpen,
++		eventDetails
++	) => {
++		const { reason, cancel } = eventDetails;
++
++		if (
++			isIrreversible &&
++			! nextOpen &&
++			! [ 'close-press', 'escape-key' ].includes( reason )
++		) {
++			// For irreversible actions, user must explicitly click the
++			// confirm or cancel button, or press the Escape key. Clicking
++			// on the backdrop won't close the dialog.
++			cancel();
++		} else {
++			onOpenChange?.( nextOpen, eventDetails );
++		}
++	};
++
++	const contextValue = useMemo(
++		() => ( { intent, title } ),
++		[ intent, title ]
++	);
++
++	return (
++		<Dialog.Root
++			open={ open }
++			onOpenChange={ handleOpenChange }
++			defaultOpen={ defaultOpen }
++		>
++			<ConfirmDialogContext.Provider value={ contextValue }>
++				{ children }
++			</ConfirmDialogContext.Provider>
++		</Dialog.Root>
++	);
++}
++
++export { Root };
+diff --git a/packages/ui/src/confirm-dialog/stories/index.story.tsx b/packages/ui/src/confirm-dialog/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..f313fe901af36b
+--- /dev/null
++++ b/packages/ui/src/confirm-dialog/stories/index.story.tsx
+@@ -0,0 +1,201 @@
++import { Menu } from '@base-ui/react/menu';
++import { useState } from '@wordpress/element';
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { action } from 'storybook/actions';
++import { fn } from 'storybook/test';
++
++import { ConfirmDialog } from '../..';
++
++const meta: Meta< typeof ConfirmDialog.Root > = {
++	title: 'Design System/Components/ConfirmDialog',
++	component: ConfirmDialog.Root,
++	subcomponents: {
++		'ConfirmDialog.Trigger': ConfirmDialog.Trigger,
++		'ConfirmDialog.Popup': ConfirmDialog.Popup,
++	},
++	argTypes: {
++		onOpenChange: { action: fn() },
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof ConfirmDialog.Root >;
++
++/**
++ * Standard confirmation dialog for reversible actions. The dialog can be
++ * dismissed via backdrop click, Escape key, cancel, or confirm button.
++ */
++export const Default: Story = {
++	args: {
++		title: 'Move to trash?',
++		children: (
++			<>
++				<ConfirmDialog.Trigger>Move to trash</ConfirmDialog.Trigger>
++				<ConfirmDialog.Popup onConfirm={ action( 'onConfirm' ) }>
++					This post will be moved to trash. You can restore it later.
++				</ConfirmDialog.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * Confirmation dialog for irreversible actions that cannot be undone. Users can
++ * dismiss the dialog via Escape key, cancel, or confirm button, but not via
++ * backdrop click. The "confirm" action button uses error/danger coloring.
++ */
++export const Irreversible: Story = {
++	args: {
++		title: 'Delete permanently?',
++		intent: 'irreversible',
++		children: (
++			<>
++				<ConfirmDialog.Trigger>
++					Delete permanently
++				</ConfirmDialog.Trigger>
++				<ConfirmDialog.Popup
++					onConfirm={ action( 'onConfirm' ) }
++					confirmButtonText="Delete permanently"
++				>
++					This action cannot be undone. All data will be lost.
++				</ConfirmDialog.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * Example with custom button text for both confirm and cancel buttons.
++ */
++export const CustomButtonText: Story = {
++	args: {
++		title: 'Send feedback?',
++		children: (
++			<>
++				<ConfirmDialog.Trigger>Send feedback</ConfirmDialog.Trigger>
++				<ConfirmDialog.Popup
++					onConfirm={ action( 'onConfirm' ) }
++					confirmButtonText="Send feedback"
++					cancelButtonText="Not now"
++				>
++					Your feedback helps us improve. Would you like to send it
++					now?
++				</ConfirmDialog.Popup>
++			</>
++		),
++	},
++};
++
++const menuPopupStyles: React.CSSProperties = {
++	background: 'var(--wpds-color-bg-surface-neutral-strong)',
++	border: '1px solid var(--wpds-color-stroke-surface-neutral)',
++	borderRadius: '8px',
++	padding: '4px',
++	minWidth: '160px',
++	boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
++};
++
++const menuItemStyles: React.CSSProperties = {
++	display: 'block',
++	width: '100%',
++	padding: '8px 12px',
++	borderRadius: '4px',
++	border: 'none',
++	background: 'none',
++	textAlign: 'start',
++	fontSize: 'inherit',
++	userSelect: 'none',
++};
++
++/**
++ * Example showing composition with a menu. The `ConfirmDialog.Trigger` is
++ * composed with Base UI's `Menu.Item` using the `render` prop, allowing the
++ * menu item to directly trigger the confirm dialog.
++ *
++ * Note: the example currently uses the `Menu` component from BaseUI, although
++ * consumers should not use BaseUI directly and instead use the DS `Menu`
++ * component (not ready yet).
++ */
++export const MenuTrigger: Story = {
++	args: {
++		title: 'Delete permanently?',
++		intent: 'irreversible',
++	},
++	render: ( args ) => {
++		const [ menuOpen, setMenuOpen ] = useState( false );
++		return (
++			<>
++				<Menu.Root onOpenChange={ setMenuOpen } open={ menuOpen }>
++					<Menu.Trigger>Actions ▾</Menu.Trigger>
++					<Menu.Portal>
++						<Menu.Positioner>
++							<Menu.Popup style={ menuPopupStyles }>
++								<Menu.Item style={ menuItemStyles }>
++									Edit
++								</Menu.Item>
++								<ConfirmDialog.Root { ...args }>
++									<Menu.Item
++										render={
++											<ConfirmDialog.Trigger
++												// Quick fix to remove `button`-specific styles.
++												// This shouldn't be an issue once we use the DS `Menu`
++												// component, which will come with item styles.
++												render={ <div /> }
++											/>
++										}
++										style={ menuItemStyles }
++										closeOnClick={ false }
++									>
++										Delete...
++										<ConfirmDialog.Popup
++											onConfirm={ () => {
++												setMenuOpen( false );
++											} }
++											confirmButtonText="Delete permanently"
++										>
++											This action cannot be undone. All
++											data will be lost.
++										</ConfirmDialog.Popup>
++									</Menu.Item>
++								</ConfirmDialog.Root>
++							</Menu.Popup>
++						</Menu.Positioner>
++					</Menu.Portal>
++				</Menu.Root>
++			</>
++		);
++	},
++};
++
++/**
++ * The `ConfirmDialog.Trigger` element is not necessary when the open state is
++ * controlled externally. This is useful when the dialog needs to be opened
++ * from code or from a non-standard trigger element.
++ */
++export const Controlled: Story = {
++	render: function Controlled( args ) {
++		const [ isOpen, setIsOpen ] = useState( false );
++
++		return (
++			<>
++				<button onClick={ () => setIsOpen( true ) }>Open Dialog</button>
++				<ConfirmDialog.Root
++					{ ...args }
++					open={ isOpen }
++					onOpenChange={ ( open, eventDetails ) => {
++						setIsOpen( open );
++						args.onOpenChange?.( open, eventDetails );
++					} }
++				>
++					<ConfirmDialog.Popup onConfirm={ action( 'onConfirm' ) }>
++						This post will be moved to trash. You can restore it
++						later.
++					</ConfirmDialog.Popup>
++				</ConfirmDialog.Root>
++			</>
++		);
++	},
++	args: {
++		title: 'Move to trash?',
++	},
++};
+diff --git a/packages/ui/src/confirm-dialog/style.module.css b/packages/ui/src/confirm-dialog/style.module.css
+new file mode 100644
+index 00000000000000..f8706bf6f0b6fd
+--- /dev/null
++++ b/packages/ui/src/confirm-dialog/style.module.css
+@@ -0,0 +1,18 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-compositions {
++	.irreversible-action {
++		--wp-ui-button-background-color: var(
++			--wpds-color-bg-interactive-error-strong
++		);
++		--wp-ui-button-background-color-active: var(
++			--wpds-color-bg-interactive-error-strong-active
++		);
++		--wp-ui-button-foreground-color: var(
++			--wpds-color-fg-interactive-error-strong
++		);
++		--wp-ui-button-foreground-color-active: var(
++			--wpds-color-fg-interactive-error-strong-active
++		);
++	}
++}
+diff --git a/packages/ui/src/confirm-dialog/test/index.test.tsx b/packages/ui/src/confirm-dialog/test/index.test.tsx
+new file mode 100644
+index 00000000000000..831990af91a0fe
+--- /dev/null
++++ b/packages/ui/src/confirm-dialog/test/index.test.tsx
+@@ -0,0 +1,318 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { createRef } from '@wordpress/element';
++
++import * as ConfirmDialog from '..';
++
++describe( 'ConfirmDialog', () => {
++	it( 'forwards ref', () => {
++		const triggerRef = createRef< HTMLButtonElement >();
++		const popupRef = createRef< HTMLDivElement >();
++
++		render(
++			<ConfirmDialog.Root title="Test Title" defaultOpen>
++				<ConfirmDialog.Trigger ref={ triggerRef }>
++					Open
++				</ConfirmDialog.Trigger>
++				<ConfirmDialog.Popup ref={ popupRef } onConfirm={ jest.fn() }>
++					Test message content
++				</ConfirmDialog.Popup>
++			</ConfirmDialog.Root>
++		);
++
++		expect( triggerRef.current ).toBeInstanceOf( HTMLButtonElement );
++		expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++
++	it( 'renders with title, message, and default buttons', async () => {
++		render(
++			<ConfirmDialog.Root
++				title="Test Title"
++				open
++				onOpenChange={ jest.fn() }
++			>
++				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
++					Test message content
++				</ConfirmDialog.Popup>
++			</ConfirmDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Test Title' ) ).toBeVisible();
++		} );
++
++		expect( screen.getByText( 'Test message content' ) ).toBeVisible();
++		expect(
++			screen.queryByRole( 'button', { name: 'Close' } )
++		).not.toBeInTheDocument();
++		expect( screen.getByRole( 'button', { name: 'OK' } ) ).toBeVisible();
++		expect(
++			screen.getByRole( 'button', { name: 'Cancel' } )
++		).toBeVisible();
++	} );
++
++	it( 'calls onConfirm and onOpenChange when confirm button is clicked', async () => {
++		const onConfirm = jest.fn();
++		const onOpenChange = jest.fn();
++
++		render(
++			<ConfirmDialog.Root
++				title="Confirm Action"
++				open
++				onOpenChange={ onOpenChange }
++			>
++				<ConfirmDialog.Popup onConfirm={ onConfirm }>
++					Are you sure?
++				</ConfirmDialog.Popup>
++			</ConfirmDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect(
++				screen.getByRole( 'button', { name: 'OK' } )
++			).toBeVisible();
++		} );
++
++		await userEvent.click( screen.getByRole( 'button', { name: 'OK' } ) );
++
++		expect( onConfirm ).toHaveBeenCalledTimes( 1 );
++		expect( onOpenChange ).toHaveBeenCalledWith(
++			false,
++			expect.objectContaining( { reason: 'close-press' } )
++		);
++	} );
++
++	it( 'calls onOpenChange when cancel button is clicked', async () => {
++		const onConfirm = jest.fn();
++		const onOpenChange = jest.fn();
++
++		render(
++			<ConfirmDialog.Root
++				title="Confirm Action"
++				open
++				onOpenChange={ onOpenChange }
++			>
++				<ConfirmDialog.Popup onConfirm={ onConfirm }>
++					Are you sure?
++				</ConfirmDialog.Popup>
++			</ConfirmDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect(
++				screen.getByRole( 'button', { name: 'Cancel' } )
++			).toBeVisible();
++		} );
++
++		await userEvent.click(
++			screen.getByRole( 'button', { name: 'Cancel' } )
++		);
++
++		expect( onOpenChange ).toHaveBeenCalledWith(
++			false,
++			expect.objectContaining( { reason: 'close-press' } )
++		);
++		expect( onConfirm ).not.toHaveBeenCalled();
++	} );
++
++	it( 'renders with title, message, and default buttons for irreversible intent', async () => {
++		render(
++			<ConfirmDialog.Root
++				title="Irreversible Dialog"
++				intent="irreversible"
++				open
++				onOpenChange={ jest.fn() }
++			>
++				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
++					Irreversible message content
++				</ConfirmDialog.Popup>
++			</ConfirmDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Irreversible Dialog' ) ).toBeVisible();
++		} );
++
++		expect(
++			screen.getByText( 'Irreversible message content' )
++		).toBeVisible();
++		expect(
++			screen.queryByRole( 'button', { name: 'Close' } )
++		).not.toBeInTheDocument();
++		expect( screen.getByRole( 'button', { name: 'OK' } ) ).toBeVisible();
++		expect(
++			screen.getByRole( 'button', { name: 'Cancel' } )
++		).toBeVisible();
++	} );
++
++	it( 'calls onOpenChange on escape key for irreversible intent', async () => {
++		const onOpenChange = jest.fn();
++
++		render(
++			<ConfirmDialog.Root
++				title="Irreversible Dialog"
++				intent="irreversible"
++				open
++				onOpenChange={ onOpenChange }
++			>
++				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
++					Content
++				</ConfirmDialog.Popup>
++			</ConfirmDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Irreversible Dialog' ) ).toBeVisible();
++		} );
++
++		await userEvent.keyboard( '{Escape}' );
++
++		expect( onOpenChange ).toHaveBeenCalledWith(
++			false,
++			expect.objectContaining( { reason: 'escape-key' } )
++		);
++	} );
++
++	it( 'does not call onOpenChange on backdrop click for irreversible intent', async () => {
++		const onOpenChange = jest.fn();
++
++		render(
++			<ConfirmDialog.Root
++				title="Irreversible Dialog"
++				intent="irreversible"
++				open
++				onOpenChange={ onOpenChange }
++			>
++				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
++					Content
++				</ConfirmDialog.Popup>
++			</ConfirmDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Irreversible Dialog' ) ).toBeVisible();
++		} );
++
++		// Click the backdrop (outside the dialog)
++		await userEvent.click( document.body );
++
++		expect( onOpenChange ).not.toHaveBeenCalled();
++	} );
++
++	it( 'calls onOpenChange on cancel button click for irreversible intent', async () => {
++		const onOpenChange = jest.fn();
++		const onConfirm = jest.fn();
++
++		render(
++			<ConfirmDialog.Root
++				title="Irreversible Dialog"
++				intent="irreversible"
++				open
++				onOpenChange={ onOpenChange }
++			>
++				<ConfirmDialog.Popup onConfirm={ onConfirm }>
++					Content
++				</ConfirmDialog.Popup>
++			</ConfirmDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect(
++				screen.getByRole( 'button', { name: 'Cancel' } )
++			).toBeVisible();
++		} );
++
++		await userEvent.click(
++			screen.getByRole( 'button', { name: 'Cancel' } )
++		);
++
++		expect( onOpenChange ).toHaveBeenCalledWith(
++			false,
++			expect.objectContaining( { reason: 'close-press' } )
++		);
++		expect( onConfirm ).not.toHaveBeenCalled();
++	} );
++
++	it( 'calls onConfirm and onOpenChange on confirm button click for irreversible intent', async () => {
++		const onOpenChange = jest.fn();
++		const onConfirm = jest.fn();
++
++		render(
++			<ConfirmDialog.Root
++				title="Irreversible Dialog"
++				intent="irreversible"
++				open
++				onOpenChange={ onOpenChange }
++			>
++				<ConfirmDialog.Popup onConfirm={ onConfirm }>
++					Content
++				</ConfirmDialog.Popup>
++			</ConfirmDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect(
++				screen.getByRole( 'button', { name: 'OK' } )
++			).toBeVisible();
++		} );
++
++		await userEvent.click( screen.getByRole( 'button', { name: 'OK' } ) );
++
++		expect( onConfirm ).toHaveBeenCalledTimes( 1 );
++		expect( onOpenChange ).toHaveBeenCalledWith(
++			false,
++			expect.objectContaining( { reason: 'close-press' } )
++		);
++	} );
++
++	it( 'uses custom button text when provided', async () => {
++		render(
++			<ConfirmDialog.Root
++				title="Custom Text"
++				open
++				onOpenChange={ jest.fn() }
++			>
++				<ConfirmDialog.Popup
++					onConfirm={ jest.fn() }
++					confirmButtonText="Yes, do it"
++					cancelButtonText="No, go back"
++				>
++					Custom message
++				</ConfirmDialog.Popup>
++			</ConfirmDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect(
++				screen.getByRole( 'button', { name: 'Yes, do it' } )
++			).toBeVisible();
++		} );
++
++		expect(
++			screen.getByRole( 'button', { name: 'No, go back' } )
++		).toBeVisible();
++	} );
++
++	it( 'opens dialog when Trigger is clicked', async () => {
++		render(
++			<ConfirmDialog.Root title="Trigger Test">
++				<ConfirmDialog.Trigger>Open</ConfirmDialog.Trigger>
++				<ConfirmDialog.Popup onConfirm={ jest.fn() }>
++					Dialog content
++				</ConfirmDialog.Popup>
++			</ConfirmDialog.Root>
++		);
++
++		expect(
++			screen.queryByText( 'Dialog content' )
++		).not.toBeInTheDocument();
++
++		await userEvent.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Trigger Test' ) ).toBeVisible();
++		} );
++
++		expect( screen.getByText( 'Dialog content' ) ).toBeVisible();
++	} );
++} );
+diff --git a/packages/ui/src/confirm-dialog/trigger.tsx b/packages/ui/src/confirm-dialog/trigger.tsx
+new file mode 100644
+index 00000000000000..04bc5b120c521a
+--- /dev/null
++++ b/packages/ui/src/confirm-dialog/trigger.tsx
+@@ -0,0 +1,15 @@
++import { forwardRef } from '@wordpress/element';
++
++import * as Dialog from '../dialog';
++import type { TriggerProps } from './types';
++
++/**
++ * Renders a button that opens the confirmation dialog when clicked.
++ */
++const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
++	function ConfirmDialogTrigger( props, ref ) {
++		return <Dialog.Trigger ref={ ref } { ...props } />;
++	}
++);
++
++export { Trigger };
+diff --git a/packages/ui/src/confirm-dialog/types.ts b/packages/ui/src/confirm-dialog/types.ts
+new file mode 100644
+index 00000000000000..56c6690afa8634
+--- /dev/null
++++ b/packages/ui/src/confirm-dialog/types.ts
+@@ -0,0 +1,65 @@
++import type { ReactNode } from 'react';
++
++import type {
++	RootProps as DialogRootProps,
++	TriggerProps as DialogTriggerProps,
++} from '../dialog/types';
++
++export interface RootProps
++	extends Pick< DialogRootProps, 'open' | 'onOpenChange' | 'defaultOpen' > {
++	/**
++	 * The content to be rendered inside the component. Typically includes
++	 * `ConfirmDialog.Trigger` and `ConfirmDialog.Popup`.
++	 */
++	children: ReactNode;
++
++	/**
++	 * The semantic intent of the dialog, which determines its behavior and
++	 * styling.
++	 *
++	 * - `'default'`: Standard confirmation dialog for reversible actions.
++	 *   The dialog can be dismissed via backdrop click, Escape key, cancel, or
++	 *   confirm button.
++	 * - `'irreversible'`: Confirmation dialog for irreversible actions that
++	 *   cannot be undone. Users can dismiss the dialog via Escape key, cancel, or
++	 *   confirm button, but not via backdrop click. The "confirm" action button
++	 *   uses error/danger coloring.
++	 *
++	 * @default 'default'
++	 */
++	intent?: 'default' | 'irreversible';
++
++	/**
++	 * The title displayed in the dialog header. This serves as both the
++	 * visible heading and the accessible label for the dialog.
++	 */
++	title: string;
++}
++
++export type TriggerProps = DialogTriggerProps;
++
++export interface PopupProps {
++	/**
++	 * The message content displayed in the dialog body.
++	 */
++	children: ReactNode;
++
++	/**
++	 * Callback fired when the user confirms the action.
++	 */
++	onConfirm: () => void;
++
++	/**
++	 * Custom text for the confirm button.
++	 *
++	 * @default 'OK'
++	 */
++	confirmButtonText?: string;
++
++	/**
++	 * Custom text for the cancel button.
++	 *
++	 * @default 'Cancel'
++	 */
++	cancelButtonText?: string;
++}
+diff --git a/packages/ui/src/dialog/stories/index.story.tsx b/packages/ui/src/dialog/stories/index.story.tsx
+index e70362f0241b77..086af1fa06170b 100644
+--- a/packages/ui/src/dialog/stories/index.story.tsx
++++ b/packages/ui/src/dialog/stories/index.story.tsx
+@@ -73,34 +73,6 @@ export const _Default: Story = {
+ 	},
+ };
+ 
+-/**
+- * A confirmation dialog that intentionally omits the close icon. The user
+- * must explicitly choose "Cancel" or "Confirm" to make their intent clear,
+- * since it is not obvious what would happen when clicking a close icon.
+- */
+-export const ConfirmDialog: Story = {
+-	args: {
+-		children: (
+-			<>
+-				<Dialog.Trigger>Confirm Action</Dialog.Trigger>
+-				<Dialog.Popup>
+-					<Dialog.Header>
+-						<Dialog.Title>Confirm Action</Dialog.Title>
+-					</Dialog.Header>
+-					<p>
+-						Are you sure you want to proceed? This action cannot be
+-						undone.
+-					</p>
+-					<Dialog.Footer>
+-						<Dialog.Action variant="outline">Cancel</Dialog.Action>
+-						<Dialog.Action>Confirm</Dialog.Action>
+-					</Dialog.Footer>
+-				</Dialog.Popup>
+-			</>
+-		),
+-	},
+-};
+-
+ const ALL_SIZES = [ 'small', 'medium', 'large', 'stretch', 'full' ] as const;
+ 
+ function SizeSelector( {
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 3908b6d34b9c13..6cde76f4b5043d 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -3,6 +3,7 @@ export * from './button';
+ export * as Card from './card';
+ export * as Collapsible from './collapsible';
+ export * as CollapsibleCard from './collapsible-card';
++export * as ConfirmDialog from './confirm-dialog';
+ export * as Dialog from './dialog';
+ export * as EmptyState from './empty-state';
+ export * from './form';

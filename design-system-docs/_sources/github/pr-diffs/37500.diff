@@ -1,0 +1,48 @@
+diff --git a/packages/block-editor/src/components/colors-gradients/style.scss b/packages/block-editor/src/components/colors-gradients/style.scss
+index fde8f3225d164c..13b5fd83458af7 100644
+--- a/packages/block-editor/src/components/colors-gradients/style.scss
++++ b/packages/block-editor/src/components/colors-gradients/style.scss
+@@ -7,12 +7,16 @@
+ .block-editor-panel-color-gradient-settings {
+ 	.block-editor-panel-color-gradient-settings__panel-title {
+ 		display: flex;
+-		gap: $grid-unit-15;
++		gap: $grid-unit-10;
+ 
+ 		.component-color-indicator {
+ 			width: $grid-unit-15;
+ 			height: $grid-unit-15;
+ 			align-self: center;
++
++			&:first-child {
++				margin-left: $grid-unit-15;
++			}
+ 		}
+ 	}
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0e8026b8115aad..839980fd15745e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -33,6 +33,7 @@
+ -   Unify styles for `ColorIndicator` with how they appear in Global Styles ([#37028](https://github.com/WordPress/gutenberg/pull/37028))
+ -   Add support for rendering the `ColorPalette` in a `Dropdown` when opened in the sidebar ([#37067](https://github.com/WordPress/gutenberg/pull/37067))
+ -   Show an incremental sequence of numbers (1/2/3/4/5) as a label of the font size, when we have at most five font sizes, where at least one the them contains a complex css value(clamp, var, etc..). We do this because complex css values cannot be calculated properly and the incremental sequence of numbers as labels can help the user better mentally map the different available font sizes. ([#37038](https://github.com/WordPress/gutenberg/pull/37038))
++-   Add support for proper borders to color indicators ([#37500](https://github.com/WordPress/gutenberg/pull/37500))
+ 
+ ## 19.1.4 (2021-12-13)
+ 
+diff --git a/packages/components/src/color-indicator/style.scss b/packages/components/src/color-indicator/style.scss
+index 4dbce337b7fa9a..68abd0808f42fb 100644
+--- a/packages/components/src/color-indicator/style.scss
++++ b/packages/components/src/color-indicator/style.scss
+@@ -1,8 +1,8 @@
+ .component-color-indicator {
+ 	width: $grid-unit-50 * 0.5;
+ 	height: $grid-unit-50 * 0.5;
++	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+ 	border-radius: 50%;
+-	border: $border-width solid $gray-300;
+ 	display: inline-block;
+ 	padding: 0;
+ }

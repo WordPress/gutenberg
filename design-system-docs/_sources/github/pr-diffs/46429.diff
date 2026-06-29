@@ -1,0 +1,69 @@
+diff --git a/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap
+index 023dd8769b783a..12c09f2c7c98ab 100644
+--- a/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap
+@@ -4,7 +4,7 @@ exports[`URLPopover matches the snapshot in its default state 1`] = `
+ <div>
+   <span>
+     <div
+-      class="components-popover block-editor-url-popover"
++      class="components-popover block-editor-url-popover is-positioned"
+       style="position: absolute; left: 0px; top: 0px;"
+       tabindex="-1"
+     >
+@@ -52,7 +52,7 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`]
+ <div>
+   <span>
+     <div
+-      class="components-popover block-editor-url-popover"
++      class="components-popover block-editor-url-popover is-positioned"
+       style="position: absolute; left: 0px; top: 0px;"
+       tabindex="-1"
+     >
+@@ -107,7 +107,7 @@ exports[`URLPopover matches the snapshot when there are no settings 1`] = `
+ <div>
+   <span>
+     <div
+-      class="components-popover block-editor-url-popover"
++      class="components-popover block-editor-url-popover is-positioned"
+       style="position: absolute; left: 0px; top: 0px;"
+       tabindex="-1"
+     >
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 1d3b2af1dec1ae..c56d1f8475315a 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -472,6 +472,7 @@ const UnforwardedPopover = (
+ 			placement={ computedPlacement }
+ 			className={ classnames( 'components-popover', className, {
+ 				'is-expanded': isExpanded,
++				'is-positioned': x !== null && y !== null,
+ 				// Use the 'alternate' classname for 'toolbar' variant for back compat.
+ 				[ `is-${
+ 					computedVariant === 'toolbar'
+diff --git a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+index 7d87549eac0aa1..876bae4b690887 100644
+--- a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
++++ b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+@@ -3,7 +3,7 @@
+ exports[`DotTip should render correctly 1`] = `
+ <div
+   aria-label="Editor tips"
+-  class="components-popover nux-dot-tip"
++  class="components-popover nux-dot-tip is-positioned"
+   role="dialog"
+   style="position: absolute; opacity: 0; transform: translateX(-2em) scale(0) translateZ(0); transform-origin: 0% 50% 0; left: 0px; top: 0px;"
+   tabindex="-1"
+diff --git a/test/unit/config/matchers/to-be-positioned-popover.js b/test/unit/config/matchers/to-be-positioned-popover.js
+index f646ff291d2131..526b8de49a7534 100644
+--- a/test/unit/config/matchers/to-be-positioned-popover.js
++++ b/test/unit/config/matchers/to-be-positioned-popover.js
+@@ -5,7 +5,7 @@
+  * @param {HTMLElement} element Popover element.
+  */
+ function toBePositionedPopover( element ) {
+-	const pass = element.style.top !== '' && element.style.left !== '';
++	const pass = element.classList.contains( 'is-positioned' );
+ 	return {
+ 		pass,
+ 		message: () => `Received element is ${ pass ? '' : 'not ' }positioned`,

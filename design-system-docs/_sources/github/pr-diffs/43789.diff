@@ -1,0 +1,181 @@
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index d24c0bf2603f9d..e52e81a4287d96 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { useRef } from '@wordpress/element';
++import { useCallback, useState, useEffect } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+@@ -14,7 +14,7 @@ import { Grid } from '../../grid';
+ import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import { useBorderBoxControlSplitControls } from './hook';
+ 
+-import type { SplitControlsProps } from '../types';
++import type { SplitControlsProps, PopoverPartialProps } from '../types';
+ 
+ const BorderBoxControlSplitControls = (
+ 	props: WordPressComponentProps< SplitControlsProps, 'div' >,
+@@ -36,16 +36,25 @@ const BorderBoxControlSplitControls = (
+ 		__next36pxDefaultSize,
+ 		...otherProps
+ 	} = useBorderBoxControlSplitControls( props );
+-	const containerRef = useRef();
+-	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
+-	const popoverProps = popoverPlacement
+-		? {
++	const [ popoverProps, setPopoverProps ] = useState< PopoverPartialProps >();
++	const [ popoverAnchor, setPopoverAnchor ] = useState< Element >();
++
++	const containerRef = useCallback( ( node ) => {
++		setPopoverAnchor( node ?? undefined );
++	}, [] );
++
++	useEffect( () => {
++		if ( popoverPlacement ) {
++			setPopoverProps( {
+ 				placement: popoverPlacement,
+ 				offset: popoverOffset,
+-				anchorRef: containerRef,
++				anchor: popoverAnchor,
+ 				__unstableShift: true,
+-		  }
+-		: undefined;
++			} );
++		} else {
++			setPopoverProps( undefined );
++		}
++	}, [ popoverPlacement, popoverOffset, popoverAnchor ] );
+ 
+ 	const sharedBorderControlProps = {
+ 		colors,
+@@ -58,6 +67,8 @@ const BorderBoxControlSplitControls = (
+ 		__next36pxDefaultSize,
+ 	};
+ 
++	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
++
+ 	return (
+ 		<Grid { ...otherProps } ref={ mergedRef } gap={ 4 }>
+ 			<BorderBoxControlVisualizer
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index 877e5c4da0669d..4f219f6ce7031e 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { useRef } from '@wordpress/element';
++import { useCallback, useState, useEffect } from '@wordpress/element';
+ import { useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+@@ -18,7 +18,7 @@ import { VisuallyHidden } from '../../visually-hidden';
+ import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import { useBorderBoxControl } from './hook';
+ 
+-import type { BorderBoxControlProps } from '../types';
++import type { BorderBoxControlProps, PopoverPartialProps } from '../types';
+ import type { LabelProps } from '../../border-control/types';
+ 
+ const BorderLabel = ( props: LabelProps ) => {
+@@ -62,16 +62,28 @@ const BorderBoxControl = (
+ 		__next36pxDefaultSize = false,
+ 		...otherProps
+ 	} = useBorderBoxControl( props );
+-	const containerRef = useRef();
+-	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
+-	const popoverProps = popoverPlacement
+-		? {
++
++	const [ popoverProps, setPopoverProps ] = useState< PopoverPartialProps >();
++	const [ popoverAnchor, setPopoverAnchor ] = useState< Element >();
++
++	const containerRef = useCallback( ( node ) => {
++		setPopoverAnchor( node ?? undefined );
++	}, [] );
++
++	useEffect( () => {
++		if ( popoverPlacement ) {
++			setPopoverProps( {
+ 				placement: popoverPlacement,
+ 				offset: popoverOffset,
+-				anchorRef: containerRef,
++				anchor: popoverAnchor,
+ 				__unstableShift: true,
+-		  }
+-		: undefined;
++			} );
++		} else {
++			setPopoverProps( undefined );
++		}
++	}, [ popoverPlacement, popoverOffset, popoverAnchor ] );
++
++	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
+ 
+ 	return (
+ 		<View className={ className } { ...otherProps } ref={ mergedRef }>
+diff --git a/packages/components/src/border-box-control/stories/index.js b/packages/components/src/border-box-control/stories/index.js
+index 1f6413fa50ab08..469d6d4d3407f0 100644
+--- a/packages/components/src/border-box-control/stories/index.js
++++ b/packages/components/src/border-box-control/stories/index.js
+@@ -85,6 +85,7 @@ Default.args = {
+ 		width: '1px',
+ 	},
+ 	__next36pxDefaultSize: false,
++	popoverPlacement: 'right-start',
+ };
+ 
+ const WrapperView = styled.div`
+diff --git a/packages/components/src/border-box-control/types.ts b/packages/components/src/border-box-control/types.ts
+index 08962f4dac291f..f0640bb8a9c402 100644
+--- a/packages/components/src/border-box-control/types.ts
++++ b/packages/components/src/border-box-control/types.ts
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import type { Placement, ReferenceType } from '@floating-ui/react-dom';
++
+ /**
+  * Internal dependencies
+  */
+@@ -14,6 +19,15 @@ export type AnyBorder = Border | Borders | undefined;
+ export type BorderProp = keyof Border;
+ export type BorderSide = keyof Borders;
+ 
++// TODO: replace with Popover actual props once the component
++// gets converted to TypeScript
++export type PopoverPartialProps = {
++	placement?: Placement;
++	offset?: number;
++	anchor?: ReferenceType;
++	__unstableShift?: boolean;
++};
++
+ export type BorderBoxControlProps = ColorProps &
+ 	LabelProps & {
+ 		/**
+@@ -29,7 +43,7 @@ export type BorderBoxControlProps = ColorProps &
+ 		/**
+ 		 * The position of the color popovers compared to the control wrapper.
+ 		 */
+-		popoverPlacement?: string;
++		popoverPlacement?: Placement;
+ 		/**
+ 		 * The space between the popover and the control wrapper.
+ 		 */
+@@ -103,7 +117,7 @@ export type SplitControlsProps = ColorProps & {
+ 	/**
+ 	 * The position of the color popovers compared to the control wrapper.
+ 	 */
+-	popoverPlacement?: string;
++	popoverPlacement?: Placement;
+ 	/**
+ 	 * The space between the popover and the control wrapper.
+ 	 */

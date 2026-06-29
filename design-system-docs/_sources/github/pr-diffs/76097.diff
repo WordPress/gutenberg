@@ -1,0 +1,722 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 89de1016d5fbac..0fdd7b11e24267 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ 
+ ### Internal
+ 
++-   `Modal`, `Menu`, `DropdownMenu`: Adopt `--wpds-motion-easing-*` and `--wpds-motion-duration-*` design tokens for animation timing ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
+ -   Update `date-fns` dependency to `v4.1.0` ([#78057](https://github.com/WordPress/gutenberg/pull/78057)).
+ -   Update code to comply with `eslint-plugin-react-hooks` v7 ([#69962](https://github.com/WordPress/gutenberg/pull/69962)).
+ -   `SlotFill`: Add dependencies to `updateFill` effect ([#77907](https://github.com/WordPress/gutenberg/pull/77907)).
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 9515bd96d7dcfb..997f57becdc97b 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -168,8 +168,7 @@ function UnforwardedModal(
+ 		};
+ 	}, [ bodyOpenClassName ] );
+ 
+-	const { closeModal, frameRef, frameStyle, overlayClassname } =
+-		useModalExitAnimation();
++	const { closeModal, frameRef, overlayClassname } = useModalExitAnimation();
+ 
+ 	// Calls the isContentScrollable callback when the Modal children container resizes.
+ 	useLayoutEffect( () => {
+@@ -259,10 +258,7 @@ function UnforwardedModal(
+ 						sizeClass,
+ 						className
+ 					) }
+-					style={ {
+-						...frameStyle,
+-						...style,
+-					} }
++					style={ style }
+ 					ref={ useMergeRefs( [
+ 						frameRef,
+ 						constrainedTabbingRef,
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index 82a23a600f21f1..0d72caf367b4ff 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -16,13 +16,13 @@
+ 	z-index: z-index(".components-modal__screen-overlay");
+ 	display: flex;
+ 	// This animates the appearance of the backdrop.
+-	@include animation__fade-in();
++	@include animation__fade-in($speed: var(--wpds-motion-duration-sm), $easing: var(--wpds-motion-easing-subtle));
+ 
+ 	&.is-animating-out {
+ 		// Note: it's important that the fade-out animation doesn't end after the
+ 		// modal frame's disappear animation, because the component will be removed
+ 		// from the DOM when that animation ends.
+-		@include animation__fade-out($delay: 80ms);
++		@include animation__fade-out($speed: var(--wpds-motion-duration-sm), $delay: var(--wpds-motion-duration-xs), $easing: var(--wpds-motion-easing-subtle));
+ 	}
+ }
+ 
+@@ -47,7 +47,7 @@
+ 	// Animate the modal frame/contents appearing on the page.
+ 	animation-name: components-modal__appear-animation;
+ 	animation-fill-mode: forwards;
+-	animation-timing-function: cubic-bezier(0.29, 0, 0, 1);
++	animation-timing-function: var(--wpds-motion-easing-expressive);
+ 
+ 	// Ensure all headings use the proper editor text color, overriding wp-admin common.css
+ 	h1,
+@@ -57,12 +57,12 @@
+ 	}
+ 
+ 	@media not (prefers-reduced-motion) {
+-		animation-duration: var(--modal-frame-animation-duration);
++		animation-duration: var(--wpds-motion-duration-md);
+ 	}
+ 
+ 	.components-modal__screen-overlay.is-animating-out & {
+ 		animation-name: components-modal__disappear-animation;
+-		animation-timing-function: cubic-bezier(1, 0, 0.2, 1);
++		animation-timing-function: var(--wpds-motion-easing-expressive);
+ 	}
+ 
+ 	// Show a centered modal on bigger screens.
+diff --git a/packages/components/src/modal/use-modal-exit-animation.ts b/packages/components/src/modal/use-modal-exit-animation.ts
+index 3a62654aea4c56..5aea678e436751 100644
+--- a/packages/components/src/modal/use-modal-exit-animation.ts
++++ b/packages/components/src/modal/use-modal-exit-animation.ts
+@@ -10,9 +10,15 @@ import warning from '@wordpress/warning';
+  */
+ import { CONFIG } from '../utils';
+ 
+-// Animation duration (ms) extracted to JS in order to be used on a setTimeout.
+-const FRAME_ANIMATION_DURATION = CONFIG.transitionDuration;
+-const FRAME_ANIMATION_DURATION_NUMBER = Number.parseInt(
++/**
++ * Milliseconds used as a fallback when racing `animationend` against a timeout.
++ *
++ * Sourced from `CONFIG.transitionDuration`. This value is implicitly coupled to
++ * the modal frame’s CSS `animation-duration` in `style.scss`, which uses
++ * `var(--wpds-motion-duration-md)`. If either the token, the SCSS, or
++ * `CONFIG.transitionDuration` changes, keep them aligned so exit timing stays correct.
++ */
++const FRAME_ANIMATION_DURATION_MS = Number.parseInt(
+ 	CONFIG.transitionDuration
+ );
+ 
+@@ -68,7 +74,7 @@ export function useModalExitAnimation() {
+ 							// Allow an extra 20% of the animation duration for the
+ 							// animationend event to fire, in case the animation frame is
+ 							// slightly delayes by some other events in the event loop.
+-							FRAME_ANIMATION_DURATION_NUMBER * 1.2
++							FRAME_ANIMATION_DURATION_MS * 1.2
+ 						);
+ 					} );
+ 
+@@ -91,9 +97,6 @@ export function useModalExitAnimation() {
+ 	return {
+ 		overlayClassname: isAnimatingOut ? 'is-animating-out' : undefined,
+ 		frameRef,
+-		frameStyle: {
+-			'--modal-frame-animation-duration': `${ FRAME_ANIMATION_DURATION }`,
+-		},
+ 		closeModal,
+ 	};
+ }
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index 567c72c38a5bed..35ad914e34d7f8 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -65,6 +65,9 @@ export default Object.assign( {}, CONTROL_PROPS, {
+ 	surfaceBorderSubtleColor: 'rgba(0, 0, 0, 0.05)',
+ 	surfaceBackgroundTertiaryColor: COLORS.white,
+ 	surfaceColor: COLORS.white,
++	// Modal exit animation: `use-modal-exit-animation` parses this for the
++	// `animationend` timeout race; keep the numeric duration equal to
++	// `--wpds-motion-duration-md` on `.components-modal__frame` in modal/style.scss.
+ 	transitionDuration: '200ms',
+ 	transitionDurationFast: '160ms',
+ 	transitionDurationFaster: '120ms',
+diff --git a/packages/components/src/utils/dropdown-motion.ts b/packages/components/src/utils/dropdown-motion.ts
+index bf6e4adef7b1c7..47f7347948da75 100644
+--- a/packages/components/src/utils/dropdown-motion.ts
++++ b/packages/components/src/utils/dropdown-motion.ts
+@@ -1,14 +1,15 @@
+ // Motion configuration for dropdown-like popovers.
+ // Keep constants in sync with: packages/ui/src/utils/css/dropdown-motion.module.css
++// Values should stay in sync with --wpds-motion-* design tokens.
+ 
+ export const DROPDOWN_MOTION = Object.freeze( {
+ 	SLIDE_DISTANCE: 4,
+ 	SLIDE_DURATION: 200,
+ 	SLIDE_EASING: {
+ 		function: 'cubic-bezier',
+-		args: [ 0, 0, 0, 1 ] as const,
++		args: [ 0.25, 0, 0, 1 ] as const,
+ 	},
+-	FADE_DURATION: 80,
++	FADE_DURATION: 100,
+ 	FADE_EASING: {
+ 		function: 'linear',
+ 	},
+@@ -24,6 +25,9 @@ const convertEasingToString = ( easing: {
+ 	return easing.function;
+ };
+ 
++// Note: --wpds-* tokens can't be used here directly because the build-time
++// fallback injection is not compatible with Emotion. This file is consumed
++// by Menu's Emotion styles.
+ export const DROPDOWN_MOTION_CSS = Object.freeze( {
+ 	SLIDE_DISTANCE: `${ DROPDOWN_MOTION.SLIDE_DISTANCE }px`,
+ 	SLIDE_DURATION: `${ DROPDOWN_MOTION.SLIDE_DURATION }ms`,
+diff --git a/packages/theme/CHANGELOG.md b/packages/theme/CHANGELOG.md
+index 15f0e97ae2fe04..aa623fde8c4823 100644
+--- a/packages/theme/CHANGELOG.md
++++ b/packages/theme/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### New Features
++
++-   Add `--wpds-motion-duration-*` and `--wpds-motion-easing-*` design tokens for standardizing animation timing across components. Easing tokens use intent-based names: `subtle`, `balanced`, and `expressive` ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
++
+ ## 0.12.0 (2026-04-29)
+ 
+ ## 0.11.0 (2026-04-15)
+diff --git a/packages/theme/README.md b/packages/theme/README.md
+index a9b8dbd84e8406..efdd5dc3492261 100644
+--- a/packages/theme/README.md
++++ b/packages/theme/README.md
+@@ -69,6 +69,7 @@ The design system follows the [Design Tokens Community Group (DTCG)](https://des
+ | `typography.json` | Font family stacks, font sizes, and line heights                                                                                 |
+ | `border.json`     | Border radius and width values                                                                                                   |
+ | `elevation.json`  | Shadow definitions for creating depth and layering                                                                               |
++| `motion.json`     | Animation durations and easing curves                                                                                            |
+ 
+ Each JSON file contains both primitive and semantic token definitions in a hierarchical structure. These files are the source of truth for the design system and are processed during the build step to generate CSS custom properties and other output formats in `/src/prebuilt`.
+ 
+@@ -88,6 +89,7 @@ Semantic tokens follow a consistent naming pattern:
+ | `dimension`  | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
+ | `border`     | Border properties like radius and width                                        |
+ | `elevation`  | Shadow definitions for layering and depth                                      |
++| `motion`     | Animation durations and easing curves                                          |
+ | `typography` | Typography properties like font family, font size, and line-height             |
+ 
+ **Property** is the specific design property being defined.
+@@ -101,6 +103,8 @@ Semantic tokens follow a consistent naming pattern:
+ | `gap`         | Spacing between elements           |
+ | `radius`      | Border radius for rounded corners  |
+ | `width`       | Border width                       |
++| `duration`    | Animation duration                 |
++| `easing`      | Animation easing curve             |
+ | `font-size`   | Font size                          |
+ | `font-family` | Font family                        |
+ | `font-weight` | Font weight                        |
+diff --git a/packages/theme/docs/tokens.md b/packages/theme/docs/tokens.md
+index 45b3a86390b50a..59af41fae0c770 100644
+--- a/packages/theme/docs/tokens.md
++++ b/packages/theme/docs/tokens.md
+@@ -155,6 +155,19 @@ Do not edit directly.
+ | `--wpds-elevation-md` | For components that offer additional actions. Example: Menus, Command Palette                                                     |
+ | `--wpds-elevation-lg` | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
+ 
++### Motion
++
++| Variable name                     | Description                                                                                         |
++| --------------------------------- | --------------------------------------------------------------------------------------------------- |
++| `--wpds-motion-duration-xs`       | Micro-delays and transition offsets                                                                 |
++| `--wpds-motion-duration-sm`       | Micro-interactions like focus rings and state changes                                               |
++| `--wpds-motion-duration-md`       | Standard transitions like menus and popovers                                                        |
++| `--wpds-motion-duration-lg`       | Deliberate animations like slides and reveals                                                       |
++| `--wpds-motion-duration-xl`       | Extended animations like complex or multi-step transitions                                          |
++| `--wpds-motion-easing-subtle`     | Nearly imperceptible easing for hover, color, and background transitions                            |
++| `--wpds-motion-easing-balanced`   | General-purpose easing for on-screen movement like resizing, morphing, and layout shifts            |
++| `--wpds-motion-easing-expressive` | Noticeable easing for enter/exit and spatial transitions like menus, popovers, dialogs, and drawers |
++
+ ### Typography
+ 
+ | Variable name                           | Description                                  |
+diff --git a/packages/theme/src/prebuilt/css/design-tokens.css b/packages/theme/src/prebuilt/css/design-tokens.css
+index dff0e2217bacb7..451b577fe68401 100644
+--- a/packages/theme/src/prebuilt/css/design-tokens.css
++++ b/packages/theme/src/prebuilt/css/design-tokens.css
+@@ -253,6 +253,22 @@
+ 	/* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
+ 	--wpds-elevation-lg: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
+ 		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005;
++	/* Micro-delays and transition offsets */
++	--wpds-motion-duration-xs: 50ms;
++	/* Micro-interactions like focus rings and state changes */
++	--wpds-motion-duration-sm: 100ms;
++	/* Standard transitions like menus and popovers */
++	--wpds-motion-duration-md: 200ms;
++	/* Deliberate animations like slides and reveals */
++	--wpds-motion-duration-lg: 300ms;
++	/* Extended animations like complex or multi-step transitions */
++	--wpds-motion-duration-xl: 400ms;
++	/* Nearly imperceptible easing for hover, color, and background transitions */
++	--wpds-motion-easing-subtle: cubic-bezier( 0.15, 0, 0.15, 1 );
++	/* General-purpose easing for on-screen movement like resizing, morphing, and layout shifts */
++	--wpds-motion-easing-balanced: cubic-bezier( 0.4, 0, 0.2, 1 );
++	/* Noticeable easing for enter/exit and spatial transitions like menus, popovers, dialogs, and drawers */
++	--wpds-motion-easing-expressive: cubic-bezier( 0.25, 0, 0, 1 );
+ 	/* Headings font family */
+ 	--wpds-typography-font-family-heading: -apple-system, system-ui, 'Segoe UI',
+ 		'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue',
+diff --git a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+index c88207feb85e9c..01f446004dd305 100644
+--- a/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
++++ b/packages/theme/src/prebuilt/js/design-token-fallbacks.mjs
+@@ -141,6 +141,14 @@ export default {
+ 		'0 1px 2px 0 #0000000d, 0 2px 3px 0 #0000000a, 0 6px 6px 0 #00000008, 0 8px 8px 0 #00000005',
+ 	'--wpds-elevation-xs':
+ 		'0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005, 0 3px 3px 0 #00000005, 0 4px 4px 0 #00000003',
++	'--wpds-motion-duration-lg': '300ms',
++	'--wpds-motion-duration-md': '200ms',
++	'--wpds-motion-duration-sm': '100ms',
++	'--wpds-motion-duration-xl': '400ms',
++	'--wpds-motion-duration-xs': '50ms',
++	'--wpds-motion-easing-balanced': 'cubic-bezier(0.4, 0, 0.2, 1)',
++	'--wpds-motion-easing-expressive': 'cubic-bezier(0.25, 0, 0, 1)',
++	'--wpds-motion-easing-subtle': 'cubic-bezier(0.15, 0, 0.15, 1)',
+ 	'--wpds-typography-font-family-body':
+ 		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
+ 	'--wpds-typography-font-family-heading':
+diff --git a/packages/theme/src/prebuilt/js/design-tokens.mjs b/packages/theme/src/prebuilt/js/design-tokens.mjs
+index 469cfa20eb0345..24866ac07a5c55 100644
+--- a/packages/theme/src/prebuilt/js/design-tokens.mjs
++++ b/packages/theme/src/prebuilt/js/design-tokens.mjs
+@@ -127,6 +127,14 @@ export default [
+ 	'--wpds-elevation-sm',
+ 	'--wpds-elevation-md',
+ 	'--wpds-elevation-lg',
++	'--wpds-motion-duration-xs',
++	'--wpds-motion-duration-sm',
++	'--wpds-motion-duration-md',
++	'--wpds-motion-duration-lg',
++	'--wpds-motion-duration-xl',
++	'--wpds-motion-easing-subtle',
++	'--wpds-motion-easing-balanced',
++	'--wpds-motion-easing-expressive',
+ 	'--wpds-typography-font-family-heading',
+ 	'--wpds-typography-font-family-body',
+ 	'--wpds-typography-font-family-mono',
+diff --git a/packages/theme/src/prebuilt/ts/token-types.ts b/packages/theme/src/prebuilt/ts/token-types.ts
+index fdbee9ba0f1367..c1d8e7fdc05476 100644
+--- a/packages/theme/src/prebuilt/ts/token-types.ts
++++ b/packages/theme/src/prebuilt/ts/token-types.ts
+@@ -18,6 +18,16 @@ export type GapSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+  */
+ export type SurfaceWidthSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+ 
++/**
++ * Size scale for duration tokens.
++ */
++export type DurationSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
++
++/**
++ * Easing curve variants.
++ */
++export type Easing = 'subtle' | 'balanced' | 'expressive';
++
+ /**
+  * Size scale for border radius tokens.
+  */
+diff --git a/packages/theme/terrazzo.config.ts b/packages/theme/terrazzo.config.ts
+index 6e543f5089f66f..ec2fcbb056992b 100644
+--- a/packages/theme/terrazzo.config.ts
++++ b/packages/theme/terrazzo.config.ts
+@@ -22,6 +22,7 @@ const config: Config = {
+ 		'./tokens/cursor.json',
+ 		'./tokens/dimension.json',
+ 		'./tokens/elevation.json',
++		'./tokens/motion.json',
+ 		'./tokens/typography.json',
+ 	],
+ 	outDir: './src/prebuilt',
+@@ -126,6 +127,16 @@ const config: Config = {
+ 					description: 'Size scale for surface width tokens.',
+ 					patterns: [ /^wpds-dimension\.surface-width\.([^.]+)$/ ],
+ 				},
++				{
++					name: 'DurationSize',
++					description: 'Size scale for duration tokens.',
++					patterns: [ /^wpds-motion\.duration\.([^.]+)$/ ],
++				},
++				{
++					name: 'Easing',
++					description: 'Easing curve variants.',
++					patterns: [ /^wpds-motion\.easing\.([^.]+)$/ ],
++				},
+ 				{
+ 					name: 'BorderRadiusSize',
+ 					description: 'Size scale for border radius tokens.',
+diff --git a/packages/theme/tokens/motion.json b/packages/theme/tokens/motion.json
+new file mode 100644
+index 00000000000000..f76ddcbbdf1121
+--- /dev/null
++++ b/packages/theme/tokens/motion.json
+@@ -0,0 +1,42 @@
++{
++	"wpds-motion": {
++		"duration": {
++			"$type": "duration",
++			"xs": {
++				"$value": { "value": 50, "unit": "ms" },
++				"$description": "Micro-delays and transition offsets"
++			},
++			"sm": {
++				"$value": { "value": 100, "unit": "ms" },
++				"$description": "Micro-interactions like focus rings and state changes"
++			},
++			"md": {
++				"$value": { "value": 200, "unit": "ms" },
++				"$description": "Standard transitions like menus and popovers"
++			},
++			"lg": {
++				"$value": { "value": 300, "unit": "ms" },
++				"$description": "Deliberate animations like slides and reveals"
++			},
++			"xl": {
++				"$value": { "value": 400, "unit": "ms" },
++				"$description": "Extended animations like complex or multi-step transitions"
++			}
++		},
++		"easing": {
++			"$type": "cubicBezier",
++			"subtle": {
++				"$value": [ 0.15, 0, 0.15, 1 ],
++				"$description": "Nearly imperceptible easing for hover, color, and background transitions"
++			},
++			"balanced": {
++				"$value": [ 0.4, 0, 0.2, 1 ],
++				"$description": "General-purpose easing for on-screen movement like resizing, morphing, and layout shifts"
++			},
++			"expressive": {
++				"$value": [ 0.25, 0, 0, 1 ],
++				"$description": "Noticeable easing for enter/exit and spatial transitions like menus, popovers, dialogs, and drawers"
++			}
++		}
++	}
++}
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 82bdc79c82297c..6964bf3ec7e376 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -21,6 +21,10 @@
+ -   `Drawer`: Fade the popup elevation shadow alongside the slide ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+ -   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+ 
++### Internal
++
++-   `Dialog`: Use `--wpds-motion-*` design tokens for animation duration and easing ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
++
+ ## 0.12.0 (2026-04-29)
+ 
+ ### Breaking Changes
+diff --git a/packages/ui/src/dialog/style.module.css b/packages/ui/src/dialog/style.module.css
+index 429a7c5858f6b9..3dd4ee3b681b75 100644
+--- a/packages/ui/src/dialog/style.module.css
++++ b/packages/ui/src/dialog/style.module.css
+@@ -17,7 +17,7 @@
+ 		}
+ 
+ 		@media not (prefers-reduced-motion) {
+-			transition: opacity 0.2s ease-out;
++			transition: opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle);
+ 		}
+ 	}
+ 
+@@ -60,14 +60,8 @@
+ 
+ 		@media not (prefers-reduced-motion) {
+ 			transition:
+-				opacity 0.2s cubic-bezier(1, 0, 0.2, 1),
+-				transform 0.2s cubic-bezier(1, 0, 0.2, 1);
+-
+-			&[data-open] {
+-				transition:
+-					opacity 0.2s cubic-bezier(0.29, 0, 0, 1),
+-					transform 0.2s cubic-bezier(0.29, 0, 0, 1);
+-			}
++				opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive),
++				transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive);
+ 		}
+ 
+ 		@media (min-width: 480px) {
+diff --git a/packages/ui/src/utils/css/dropdown-motion.module.css b/packages/ui/src/utils/css/dropdown-motion.module.css
+index b5f1bf423959d8..f6e7a8a71a7fc8 100644
+--- a/packages/ui/src/utils/css/dropdown-motion.module.css
++++ b/packages/ui/src/utils/css/dropdown-motion.module.css
+@@ -8,9 +8,9 @@
+ @layer wp-ui-utilities {
+ 	.dropdown-motion {
+ 		--wp-ui-dropdown-slide-distance: 4px;
+-		--wp-ui-dropdown-slide-duration: 200ms;
+-		--wp-ui-dropdown-slide-easing: cubic-bezier(0, 0, 0, 1);
+-		--wp-ui-dropdown-fade-duration: 80ms;
++		--wp-ui-dropdown-slide-duration: var(--wpds-motion-duration-md);
++		--wp-ui-dropdown-slide-easing: var(--wpds-motion-easing-expressive);
++		--wp-ui-dropdown-fade-duration: var(--wpds-motion-duration-sm);
+ 		--wp-ui-dropdown-fade-easing: linear;
+ 
+ 		@media not ( prefers-reduced-motion ) {
+diff --git a/storybook/stories/design-system/tokens/motion.story.tsx b/storybook/stories/design-system/tokens/motion.story.tsx
+new file mode 100644
+index 00000000000000..ed676c3d0e2567
+--- /dev/null
++++ b/storybook/stories/design-system/tokens/motion.story.tsx
+@@ -0,0 +1,253 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { useState, useCallback, useId } from '@wordpress/element';
++import { Button, Field, InputControl, Select, Stack } from '@wordpress/ui';
++
++const EASING_TOKENS = [
++	{
++		name: 'subtle',
++		variable: 'var(--wpds-motion-easing-subtle)',
++		description: 'Hover, color, and background transitions.',
++	},
++	{
++		name: 'balanced',
++		variable: 'var(--wpds-motion-easing-balanced)',
++		description:
++			'On-screen movement like resizing, morphing, and layout shifts.',
++	},
++	{
++		name: 'expressive',
++		variable: 'var(--wpds-motion-easing-expressive)',
++		description:
++			'Enter/exit and spatial transitions like menus, popovers, dialogs, and drawers.',
++	},
++];
++
++const DURATION_TOKENS = [
++	{
++		name: 'xs',
++		variable: 'var(--wpds-motion-duration-xs)',
++		description: 'Micro-delays and transition offsets.',
++	},
++	{
++		name: 'sm',
++		variable: 'var(--wpds-motion-duration-sm)',
++		description: 'Micro-interactions like focus rings and state changes.',
++	},
++	{
++		name: 'md',
++		variable: 'var(--wpds-motion-duration-md)',
++		description: 'Standard transitions like menus and popovers.',
++	},
++	{
++		name: 'lg',
++		variable: 'var(--wpds-motion-duration-lg)',
++		description: 'Deliberate animations like slides and reveals.',
++	},
++	{
++		name: 'xl',
++		variable: 'var(--wpds-motion-duration-xl)',
++		description:
++			'Extended animations like complex or multi-step transitions.',
++	},
++];
++
++const DURATION_OPTIONS = [
++	{ label: 'xs', value: 'var(--wpds-motion-duration-xs)' },
++	{ label: 'sm', value: 'var(--wpds-motion-duration-sm)' },
++	{ label: 'md', value: 'var(--wpds-motion-duration-md)' },
++	{ label: 'lg', value: 'var(--wpds-motion-duration-lg)' },
++	{ label: 'xl', value: 'var(--wpds-motion-duration-xl)' },
++	{ label: 'Custom', value: 'custom' },
++];
++
++const labelStyle = {
++	fontFamily: 'var(--wpds-typography-font-family-mono)',
++	fontSize: 'var(--wpds-typography-font-size-sm)',
++	color: 'var(--wpds-color-fg-content-neutral)',
++} as const;
++
++const descriptionStyle = {
++	fontFamily: 'var(--wpds-typography-font-family-body)',
++	fontSize: 'var(--wpds-typography-font-size-xs)',
++	color: 'var(--wpds-color-fg-content-neutral-weak)',
++} as const;
++
++const trackStyle = {
++	position: 'relative',
++	height: '40px',
++	borderRadius: 'var(--wpds-border-radius-sm)',
++	backgroundColor: 'var(--wpds-color-bg-surface-neutral-weak)',
++	overflow: 'hidden',
++	flex: 1,
++} as const;
++
++const dotKeyframes = `@keyframes slideRight {
++	from { inset-inline-start: 4px; }
++	to { inset-inline-start: calc(100% - 36px); }
++}`;
++
++const dotBaseStyle = {
++	position: 'absolute',
++	top: '4px',
++	insetInlineStart: '4px',
++	width: '32px',
++	height: '32px',
++	borderRadius: 'var(--wpds-border-radius-sm)',
++	backgroundColor: 'var(--wpds-color-bg-interactive-brand-strong)',
++	animationName: 'slideRight',
++	animationFillMode: 'forwards',
++} as const;
++
++function AnimationRow( {
++	label,
++	description,
++	duration,
++	easing,
++	animKey,
++}: {
++	label: string;
++	description?: string;
++	duration: string;
++	easing: string;
++	animKey: number;
++} ) {
++	return (
++		<Stack align="center" gap="lg">
++			<Stack
++				direction="column"
++				gap="xs"
++				style={ { width: '320px', flexShrink: 0 } }
++			>
++				<span style={ labelStyle }>{ label }</span>
++				{ description && (
++					<span style={ descriptionStyle }>{ description }</span>
++				) }
++			</Stack>
++			<div style={ trackStyle }>
++				<div
++					key={ animKey }
++					style={ {
++						...dotBaseStyle,
++						animationDuration: duration,
++						animationTimingFunction: easing,
++					} }
++				/>
++			</div>
++		</Stack>
++	);
++}
++
++function MotionDemo() {
++	const durationSelectId = useId();
++	const [ animKey, setAnimKey ] = useState( 0 );
++	const replay = useCallback( () => setAnimKey( ( k ) => k + 1 ), [] );
++	const [ selectedDuration, setSelectedDuration ] = useState(
++		'var(--wpds-motion-duration-xl)'
++	);
++	const [ customDuration, setCustomDuration ] = useState( '600' );
++
++	const easingDuration =
++		selectedDuration === 'custom'
++			? `${ customDuration }ms`
++			: selectedDuration;
++
++	return (
++		<Stack direction="column" gap="xl">
++			<style>{ dotKeyframes }</style>
++			<div>
++				<Button tone="brand" onClick={ replay }>
++					Replay animations
++				</Button>
++			</div>
++
++			<Stack direction="column" gap="lg">
++				<h3>Easing curves</h3>
++				<Stack align="end" gap="md" wrap="wrap">
++					<Field.Root style={ { minWidth: '180px' } }>
++						<Field.Label htmlFor={ durationSelectId }>
++							Duration
++						</Field.Label>
++						<Select.Root
++							value={ selectedDuration }
++							onValueChange={ ( value ) => {
++								if ( typeof value !== 'string' ) {
++									return;
++								}
++								setSelectedDuration( value );
++								setAnimKey( ( k ) => k + 1 );
++							} }
++						>
++							<Select.Trigger id={ durationSelectId } />
++							<Select.Popup>
++								{ DURATION_OPTIONS.map( ( opt ) => (
++									<Select.Item
++										key={ opt.value }
++										value={ opt.value }
++									>
++										{ opt.label }
++									</Select.Item>
++								) ) }
++							</Select.Popup>
++						</Select.Root>
++					</Field.Root>
++					{ selectedDuration === 'custom' && (
++						<InputControl
++							label="Value (ms)"
++							type="number"
++							min={ 0 }
++							max={ 5000 }
++							step={ 50 }
++							value={ customDuration }
++							onValueChange={ ( value ) => {
++								setCustomDuration( value );
++								setAnimKey( ( k ) => k + 1 );
++							} }
++							style={ { width: '120px' } }
++						/>
++					) }
++				</Stack>
++				<Stack direction="column" gap="md">
++					{ EASING_TOKENS.map( ( token ) => (
++						<AnimationRow
++							key={ token.name }
++							label={ token.name }
++							description={ token.description }
++							duration={ easingDuration }
++							easing={ token.variable }
++							animKey={ animKey }
++						/>
++					) ) }
++				</Stack>
++			</Stack>
++
++			<Stack direction="column" gap="lg">
++				<h3>Durations</h3>
++				<p>All using easing-balanced</p>
++				<Stack direction="column" gap="md">
++					{ DURATION_TOKENS.map( ( token ) => (
++						<AnimationRow
++							key={ token.name }
++							label={ token.name }
++							description={ token.description }
++							duration={ token.variable }
++							easing="var(--wpds-motion-easing-balanced)"
++							animKey={ animKey }
++						/>
++					) ) }
++				</Stack>
++			</Stack>
++		</Stack>
++	);
++}
++
++const meta: Meta< typeof MotionDemo > = {
++	title: 'Design System/Tokens/Motion',
++	component: MotionDemo,
++	parameters: {
++		controls: { hideNoControlsWarning: true },
++		docs: { canvas: { sourceState: 'shown' } },
++	},
++};
++export default meta;
++
++export const Default: StoryObj< typeof MotionDemo > = {};

@@ -1,0 +1,20 @@
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index 90a8a901354a39..054dc6da1be140 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -150,7 +150,6 @@ export function TimePicker( {
+ 			max={ 31 }
+ 			required
+ 			spinControls="none"
+-			isPressEnterToChange
+ 			isDragEnabled={ false }
+ 			isShiftStepEnabled={ false }
+ 			onChange={ buildNumberControlChangeCallback( 'date' ) }
+@@ -189,7 +188,6 @@ export function TimePicker( {
+ 			max={ 9999 }
+ 			required
+ 			spinControls="none"
+-			isPressEnterToChange
+ 			isDragEnabled={ false }
+ 			isShiftStepEnabled={ false }
+ 			onChange={ buildNumberControlChangeCallback( 'year' ) }

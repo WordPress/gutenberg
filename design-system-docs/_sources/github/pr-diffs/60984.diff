@@ -1,0 +1,199 @@
+diff --git a/packages/block-editor/src/components/global-styles/dimensions-panel.js b/packages/block-editor/src/components/global-styles/dimensions-panel.js
+index 3ba726b1a66135..6e5c46d85b9008 100644
+--- a/packages/block-editor/src/components/global-styles/dimensions-panel.js
++++ b/packages/block-editor/src/components/global-styles/dimensions-panel.js
+@@ -17,7 +17,7 @@ import {
+ 	__experimentalView as View,
+ } from '@wordpress/components';
+ import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
+-import { useCallback, Platform } from '@wordpress/element';
++import { useCallback, useState, Platform } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -248,6 +248,10 @@ export default function DimensionsPanel( {
+ 		],
+ 	} );
+ 
++	//Minimum Margin Value
++	const minimumMargin = -Infinity;
++	const [ minMarginValue, setMinMarginValue ] = useState( minimumMargin );
++
+ 	// Content Size
+ 	const showContentSizeControl =
+ 		useHasContentSize( settings ) && includeLayoutControls;
+@@ -435,6 +439,17 @@ export default function DimensionsPanel( {
+ 
+ 	const onMouseLeaveControls = () => onVisualize( false );
+ 
++	const inputProps = {
++		min: minMarginValue,
++		onDragStart: () => {
++			//Reset to 0 in case the value was negative.
++			setMinMarginValue( 0 );
++		},
++		onDragEnd: () => {
++			setMinMarginValue( minimumMargin );
++		},
++	};
++
+ 	return (
+ 		<Wrapper
+ 			resetAllFilter={ resetAllFilter }
+@@ -561,7 +576,7 @@ export default function DimensionsPanel( {
+ 						<BoxControl
+ 							values={ marginValues }
+ 							onChange={ setMarginValues }
+-							min={ -Infinity }
++							inputProps={ inputProps }
+ 							label={ __( 'Margin' ) }
+ 							sides={ marginSides }
+ 							units={ units }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..612f2d4546655d 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,7 +5,6 @@
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+--   `BoxControl`: Allow negative values for margin controls ([#60347](https://github.com/WordPress/gutenberg/pull/60347)).
+ -   `View`: Fix prop types ([#60919](https://github.com/WordPress/gutenberg/pull/60919)).
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/box-control/index.tsx b/packages/components/src/box-control/index.tsx
+index f90fc8840948a8..9c3452d4ccb806 100644
+--- a/packages/components/src/box-control/index.tsx
++++ b/packages/components/src/box-control/index.tsx
+@@ -34,6 +34,10 @@ import type {
+ 	BoxControlValue,
+ } from './types';
+ 
++const defaultInputProps = {
++	min: 0,
++};
++
+ const noop = () => {};
+ 
+ function useUniqueId( idProp?: string ) {
+@@ -70,6 +74,7 @@ function useUniqueId( idProp?: string ) {
+ function BoxControl( {
+ 	__next40pxDefaultSize = false,
+ 	id: idProp,
++	inputProps = defaultInputProps,
+ 	onChange = noop,
+ 	label = __( 'Box Control' ),
+ 	values: valuesProp,
+@@ -80,7 +85,6 @@ function BoxControl( {
+ 	resetValues = DEFAULT_VALUES,
+ 	onMouseOver,
+ 	onMouseOut,
+-	...inputProps
+ }: BoxControlProps ) {
+ 	const [ values, setValues ] = useControlledState( valuesProp, {
+ 		fallback: DEFAULT_VALUES,
+@@ -136,11 +140,8 @@ function BoxControl( {
+ 		setIsDirty( false );
+ 	};
+ 
+-	const min = 'min' in inputProps ? inputProps.min : 0;
+-	const newInputProps = { ...inputProps, min };
+-
+ 	const inputControlProps = {
+-		newInputProps,
++		...inputProps,
+ 		onChange: handleOnChange,
+ 		onFocus: handleOnFocus,
+ 		isLinked,
+diff --git a/packages/components/src/box-control/input-controls.tsx b/packages/components/src/box-control/input-controls.tsx
+index 2c10c0510ad3e5..553f547abf9b0d 100644
+--- a/packages/components/src/box-control/input-controls.tsx
++++ b/packages/components/src/box-control/input-controls.tsx
+@@ -2,7 +2,6 @@
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+@@ -29,8 +28,6 @@ export default function BoxInputControls( {
+ 	sides,
+ 	...props
+ }: BoxControlInputControlProps ) {
+-	const minimumCustomValue = props.min;
+-	const [ minValue, setMinValue ] = useState( minimumCustomValue );
+ 	const generatedId = useInstanceId( BoxInputControls, 'box-control-input' );
+ 
+ 	const createHandleOnFocus =
+@@ -103,9 +100,6 @@ export default function BoxInputControls( {
+ 					? parsedUnit
+ 					: selectedUnits[ side ];
+ 
+-				const isNegativeValue =
+-					parsedQuantity !== undefined && parsedQuantity < 0;
+-
+ 				const inputId = [ generatedId, side ].join( '-' );
+ 
+ 				return (
+@@ -121,7 +115,6 @@ export default function BoxInputControls( {
+ 								value={ [ parsedQuantity, computedUnit ].join(
+ 									''
+ 								) }
+-								min={ minValue }
+ 								onChange={ ( nextValue, extra ) =>
+ 									handleOnValueChange(
+ 										side,
+@@ -133,19 +126,6 @@ export default function BoxInputControls( {
+ 									side
+ 								) }
+ 								onFocus={ createHandleOnFocus( side ) }
+-								onDragStart={ () => {
+-									if ( isNegativeValue ) {
+-										setMinValue( 0 );
+-									}
+-								} }
+-								onDrag={ () => {
+-									if ( isNegativeValue ) {
+-										setMinValue( 0 );
+-									}
+-								} }
+-								onDragEnd={ () => {
+-									setMinValue( minimumCustomValue );
+-								} }
+ 								label={ LABELS[ side ] }
+ 								hideLabelFromVision
+ 							/>
+diff --git a/packages/components/src/box-control/test/index.tsx b/packages/components/src/box-control/test/index.tsx
+index 1ea3c84aae9225..681e7721d0c13a 100644
+--- a/packages/components/src/box-control/test/index.tsx
++++ b/packages/components/src/box-control/test/index.tsx
+@@ -80,6 +80,28 @@ describe( 'BoxControl', () => {
+ 			expect( input ).toHaveValue( '50' );
+ 			expect( screen.getByRole( 'slider' ) ).toHaveValue( '50' );
+ 		} );
++
++		it( 'should render the number input with a default min value of 0', () => {
++			render( <BoxControl onChange={ () => {} } /> );
++
++			const input = screen.getByRole( 'textbox', { name: 'All sides' } );
++
++			expect( input ).toHaveAttribute( 'min', '0' );
++		} );
++
++		it( 'should pass down `inputProps` to the underlying number input', () => {
++			render(
++				<BoxControl
++					onChange={ () => {} }
++					inputProps={ { min: 10, max: 50 } }
++				/>
++			);
++
++			const input = screen.getByRole( 'textbox', { name: 'All sides' } );
++
++			expect( input ).toHaveAttribute( 'min', '10' );
++			expect( input ).toHaveAttribute( 'max', '50' );
++		} );
+ 	} );
+ 
+ 	describe( 'Reset', () => {

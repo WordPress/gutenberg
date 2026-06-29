@@ -1,0 +1,352 @@
+diff --git a/packages/block-editor/src/components/image-editor/zoom-dropdown.js b/packages/block-editor/src/components/image-editor/zoom-dropdown.js
+index 2694382e3860c2..70baa28b2e112c 100644
+--- a/packages/block-editor/src/components/image-editor/zoom-dropdown.js
++++ b/packages/block-editor/src/components/image-editor/zoom-dropdown.js
+@@ -28,6 +28,7 @@ export default function ZoomDropdown() {
+ 			) }
+ 			renderContent={ () => (
+ 				<RangeControl
++					__nextHasNoMarginBottom
+ 					label={ __( 'Zoom' ) }
+ 					min={ MIN_ZOOM }
+ 					max={ MAX_ZOOM }
+diff --git a/packages/block-editor/src/components/spacing-sizes-control/spacing-input-control.js b/packages/block-editor/src/components/spacing-sizes-control/spacing-input-control.js
+index bc4a1b649744a6..d110f8e820b197 100644
+--- a/packages/block-editor/src/components/spacing-sizes-control/spacing-input-control.js
++++ b/packages/block-editor/src/components/spacing-sizes-control/spacing-input-control.js
+@@ -252,6 +252,7 @@ export default function SpacingInputControl( {
+ 						withInputField={ false }
+ 						onChange={ handleCustomValueSliderChange }
+ 						className="components-spacing-sizes-control__custom-value-range"
++						__nextHasNoMarginBottom
+ 					/>
+ 				</>
+ 			) }
+diff --git a/packages/block-library/src/avatar/edit.js b/packages/block-library/src/avatar/edit.js
+index 7df772677ebb7d..2741b7adcd3dae 100644
+--- a/packages/block-library/src/avatar/edit.js
++++ b/packages/block-library/src/avatar/edit.js
+@@ -35,6 +35,7 @@ const AvatarInspectorControls = ( {
+ 	<InspectorControls>
+ 		<PanelBody title={ __( 'Settings' ) }>
+ 			<RangeControl
++				__nextHasNoMarginBottom
+ 				label={ __( 'Image size' ) }
+ 				onChange={ ( newSize ) =>
+ 					setAttributes( {
+diff --git a/packages/block-library/src/columns/edit.js b/packages/block-library/src/columns/edit.js
+index 8879f0e52f2e7a..b978c411107d5e 100644
+--- a/packages/block-library/src/columns/edit.js
++++ b/packages/block-library/src/columns/edit.js
+@@ -95,6 +95,7 @@ function ColumnsEditContainer( {
+ 			<InspectorControls>
+ 				<PanelBody>
+ 					<RangeControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Columns' ) }
+ 						value={ count }
+ 						onChange={ ( value ) => updateColumns( count, value ) }
+diff --git a/packages/block-library/src/comment-author-avatar/edit.js b/packages/block-library/src/comment-author-avatar/edit.js
+index 6bc4651af4307d..9abc9021807f4f 100644
+--- a/packages/block-library/src/comment-author-avatar/edit.js
++++ b/packages/block-library/src/comment-author-avatar/edit.js
+@@ -50,6 +50,7 @@ export default function Edit( {
+ 		<InspectorControls>
+ 			<PanelBody title={ __( 'Avatar Settings' ) }>
+ 				<RangeControl
++					__nextHasNoMarginBottom
+ 					label={ __( 'Image size' ) }
+ 					onChange={ ( newWidth ) =>
+ 						setAttributes( {
+diff --git a/packages/block-library/src/cover/edit/inspector-controls.js b/packages/block-library/src/cover/edit/inspector-controls.js
+index 98747988c8f409..d3f65672e09328 100644
+--- a/packages/block-library/src/cover/edit/inspector-controls.js
++++ b/packages/block-library/src/cover/edit/inspector-controls.js
+@@ -266,6 +266,7 @@ export default function CoverInspectorControls( {
+ 					panelId={ clientId }
+ 				>
+ 					<RangeControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Overlay opacity' ) }
+ 						value={ dimRatio }
+ 						onChange={ ( newDimRation ) =>
+diff --git a/packages/block-library/src/file/inspector.js b/packages/block-library/src/file/inspector.js
+index 121f5e0473e767..71e0885eae1c6b 100644
+--- a/packages/block-library/src/file/inspector.js
++++ b/packages/block-library/src/file/inspector.js
+@@ -56,6 +56,7 @@ export default function FileBlockInspector( {
+ 						/>
+ 						{ displayPreview && (
+ 							<RangeControl
++								__nextHasNoMarginBottom
+ 								label={ __( 'Height in pixels' ) }
+ 								min={ MIN_PREVIEW_HEIGHT }
+ 								max={ Math.max(
+diff --git a/packages/block-library/src/gallery/edit.js b/packages/block-library/src/gallery/edit.js
+index 6d1a4ac5fc404a..b6351da6b0c9f6 100644
+--- a/packages/block-library/src/gallery/edit.js
++++ b/packages/block-library/src/gallery/edit.js
+@@ -486,6 +486,7 @@ function GalleryEdit( props ) {
+ 				<PanelBody title={ __( 'Settings' ) }>
+ 					{ images.length > 1 && (
+ 						<RangeControl
++							__nextHasNoMarginBottom
+ 							label={ __( 'Columns' ) }
+ 							value={
+ 								columns
+diff --git a/packages/block-library/src/gallery/v1/edit.js b/packages/block-library/src/gallery/v1/edit.js
+index 58d9011ee1fa7c..e79760a544cd2c 100644
+--- a/packages/block-library/src/gallery/v1/edit.js
++++ b/packages/block-library/src/gallery/v1/edit.js
+@@ -403,6 +403,7 @@ function GalleryEdit( props ) {
+ 				<PanelBody title={ __( 'Settings' ) }>
+ 					{ images.length > 1 && (
+ 						<RangeControl
++							__nextHasNoMarginBottom
+ 							label={ __( 'Columns' ) }
+ 							value={ columns }
+ 							onChange={ setColumnsNumber }
+diff --git a/packages/block-library/src/image/editor.scss b/packages/block-library/src/image/editor.scss
+index 3e4bb7dd6392f0..fb32ab54298bc2 100644
+--- a/packages/block-library/src/image/editor.scss
++++ b/packages/block-library/src/image/editor.scss
+@@ -161,17 +161,6 @@ figure.wp-block-image:not(.wp-block) {
+ 		min-width: 260px;
+ 		overflow: visible !important;
+ 	}
+-
+-	.components-range-control {
+-		flex: 1;
+-	}
+-
+-	.components-base-control__field {
+-		display: flex;
+-		margin-bottom: 0;
+-		flex-direction: column;
+-		align-items: flex-start;
+-	}
+ }
+ 
+ .wp-block-image__aspect-ratio {
+diff --git a/packages/block-library/src/latest-comments/edit.js b/packages/block-library/src/latest-comments/edit.js
+index a376ebb94b6de2..01eb9e11dc3dec 100644
+--- a/packages/block-library/src/latest-comments/edit.js
++++ b/packages/block-library/src/latest-comments/edit.js
+@@ -56,6 +56,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
+ 						}
+ 					/>
+ 					<RangeControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Number of comments' ) }
+ 						value={ commentsToShow }
+ 						onChange={ ( value ) =>
+diff --git a/packages/block-library/src/latest-posts/edit.js b/packages/block-library/src/latest-posts/edit.js
+index 3671ec555e600c..45ffe1338aaabf 100644
+--- a/packages/block-library/src/latest-posts/edit.js
++++ b/packages/block-library/src/latest-posts/edit.js
+@@ -234,6 +234,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
+ 				{ displayPostContent &&
+ 					displayPostContentRadio === 'excerpt' && (
+ 						<RangeControl
++							__nextHasNoMarginBottom
+ 							label={ __( 'Max number of words in excerpt' ) }
+ 							value={ excerptLength }
+ 							onChange={ ( value ) =>
+@@ -355,6 +356,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
+ 
+ 				{ postLayout === 'grid' && (
+ 					<RangeControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Columns' ) }
+ 						value={ columns }
+ 						onChange={ ( value ) =>
+diff --git a/packages/block-library/src/media-text/edit.js b/packages/block-library/src/media-text/edit.js
+index c336aab558ac61..b85249f3a74b27 100644
+--- a/packages/block-library/src/media-text/edit.js
++++ b/packages/block-library/src/media-text/edit.js
+@@ -307,6 +307,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes, clientId } ) {
+ 			) }
+ 			{ mediaUrl && (
+ 				<RangeControl
++					__nextHasNoMarginBottom
+ 					label={ __( 'Media width' ) }
+ 					value={ temporaryMediaWidth || mediaWidth }
+ 					onChange={ commitWidthChange }
+diff --git a/packages/block-library/src/post-featured-image/overlay.js b/packages/block-library/src/post-featured-image/overlay.js
+index f577978b9a3c93..fc885741b4d05b 100644
+--- a/packages/block-library/src/post-featured-image/overlay.js
++++ b/packages/block-library/src/post-featured-image/overlay.js
+@@ -98,6 +98,7 @@ const Overlay = ( {
+ 					panelId={ clientId }
+ 				>
+ 					<RangeControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Overlay opacity' ) }
+ 						value={ dimRatio }
+ 						onChange={ ( newDimRatio ) =>
+diff --git a/packages/block-library/src/query/edit/inspector-controls/index.js b/packages/block-library/src/query/edit/inspector-controls/index.js
+index ffe19060682d3f..13cc70e9dc5428 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/index.js
++++ b/packages/block-library/src/query/edit/inspector-controls/index.js
+@@ -141,6 +141,7 @@ export default function QueryInspectorControls( {
+ 						{ showColumnsControl && (
+ 							<>
+ 								<RangeControl
++									__nextHasNoMarginBottom
+ 									label={ __( 'Columns' ) }
+ 									value={ displayLayout.columns }
+ 									onChange={ ( value ) =>
+diff --git a/packages/block-library/src/rss/edit.js b/packages/block-library/src/rss/edit.js
+index f72bf1c77e6741..f7689b8c38ca1c 100644
+--- a/packages/block-library/src/rss/edit.js
++++ b/packages/block-library/src/rss/edit.js
+@@ -111,6 +111,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
+ 			<InspectorControls>
+ 				<PanelBody title={ __( 'Settings' ) }>
+ 					<RangeControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Number of items' ) }
+ 						value={ itemsToShow }
+ 						onChange={ ( value ) =>
+@@ -137,6 +138,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
+ 					/>
+ 					{ displayExcerpt && (
+ 						<RangeControl
++							__nextHasNoMarginBottom
+ 							label={ __( 'Max number of words in excerpt' ) }
+ 							value={ excerptLength }
+ 							onChange={ ( value ) =>
+@@ -149,6 +151,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
+ 					) }
+ 					{ blockLayout === 'grid' && (
+ 						<RangeControl
++							__nextHasNoMarginBottom
+ 							label={ __( 'Columns' ) }
+ 							value={ columns }
+ 							onChange={ ( value ) =>
+diff --git a/packages/block-library/src/site-logo/edit.js b/packages/block-library/src/site-logo/edit.js
+index 0d752a5dbae31f..6abf3701e17cad 100644
+--- a/packages/block-library/src/site-logo/edit.js
++++ b/packages/block-library/src/site-logo/edit.js
+@@ -298,6 +298,7 @@ const SiteLogo = ( {
+ 			<InspectorControls>
+ 				<PanelBody title={ __( 'Settings' ) }>
+ 					<RangeControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Image width' ) }
+ 						onChange={ ( newWidth ) =>
+ 							setAttributes( { width: newWidth } )
+diff --git a/packages/block-library/src/tag-cloud/edit.js b/packages/block-library/src/tag-cloud/edit.js
+index df4824cb0e35ec..dd669a7e840b3f 100644
+--- a/packages/block-library/src/tag-cloud/edit.js
++++ b/packages/block-library/src/tag-cloud/edit.js
+@@ -124,6 +124,7 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
+ 					}
+ 				/>
+ 				<RangeControl
++					__nextHasNoMarginBottom
+ 					label={ __( 'Number of tags' ) }
+ 					value={ numberOfTags }
+ 					onChange={ ( value ) =>
+diff --git a/packages/block-library/src/text-columns/edit.js b/packages/block-library/src/text-columns/edit.js
+index 180c786226c803..993e5da0c80e39 100644
+--- a/packages/block-library/src/text-columns/edit.js
++++ b/packages/block-library/src/text-columns/edit.js
+@@ -39,6 +39,7 @@ export default function TextColumnsEdit( { attributes, setAttributes } ) {
+ 			<InspectorControls>
+ 				<PanelBody>
+ 					<RangeControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Columns' ) }
+ 						value={ columns }
+ 						onChange={ ( value ) =>
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 31ff26cd34b837..9939a3775718ff 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ 
+ -   `TabPanel`: Add ability to set icon only tab buttons ([#45005](https://github.com/WordPress/gutenberg/pull/45005)).
+ -   `InputControl`, `NumberControl`, `UnitControl`: Add `help` prop for additional description ([#45931](https://github.com/WordPress/gutenberg/pull/45931)).
++-   `BorderControl`, `ColorPicker` & `QueryControls`: Replace bottom margin overrides with `__nextHasNoMarginBottom` ([#45985](https://github.com/WordPress/gutenberg/pull/45985)).
+ -   `CustomSelectControl`, `UnitControl`: Add `onFocus` and `onBlur` props ([#46096](https://github.com/WordPress/gutenberg/pull/46096)).
+ 
+ ### Experimental
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 942adc4e95b477..0350ceaff6e7b2 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -104,6 +104,7 @@ const UnconnectedBorderControl = (
+ 				/>
+ 				{ withSlider && (
+ 					<RangeControl
++						__nextHasNoMarginBottom
+ 						label={ __( 'Border width' ) }
+ 						hideLabelFromVision
+ 						className={ sliderClassName }
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index b105e8b62bd7bd..7dec1d7dde434d 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -8,10 +8,7 @@ import { css } from '@emotion/react';
+  */
+ import { COLORS, CONFIG, boxSizingReset, rtl } from '../utils';
+ import { space } from '../ui/utils/space';
+-import {
+-	StyledField,
+-	StyledLabel,
+-} from '../base-control/styles/base-control-styles';
++import { StyledLabel } from '../base-control/styles/base-control-styles';
+ import {
+ 	ValueInput as UnitControlWrapper,
+ 	UnitSelect,
+@@ -193,10 +190,4 @@ export const borderStyleButton = css`
+ export const borderSlider = () => css`
+ 	flex: 1 1 60%;
+ 	${ rtl( { marginRight: space( 3 ) } )() }
+-
+-	${ StyledField } {
+-		margin-bottom: 0;
+-		font-size: 0;
+-		display: flex;
+-	}
+ `;
+diff --git a/packages/components/src/color-picker/input-with-slider.tsx b/packages/components/src/color-picker/input-with-slider.tsx
+index be09e789d7902e..f28c7307c07727 100644
+--- a/packages/components/src/color-picker/input-with-slider.tsx
++++ b/packages/components/src/color-picker/input-with-slider.tsx
+@@ -60,6 +60,7 @@ export const InputWithSlider = ( {
+ 				size="__unstable-large"
+ 			/>
+ 			<RangeControl
++				__nextHasNoMarginBottom
+ 				label={ label }
+ 				hideLabelFromVision
+ 				min={ min }
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index 97a1171dd53beb..0058cb90f4710e 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -38,10 +38,6 @@ export const SelectControl = styled( InnerSelectControl )`
+ export const RangeControl = styled( InnerRangeControl )`
+ 	flex: 1;
+ 	margin-right: ${ space( 2 ) };
+-
+-	${ StyledField } {
+-		margin-bottom: 0;
+-	}
+ `;
+ 
+ // Make the Hue circle picker not go out of the bar.
+diff --git a/packages/components/src/query-controls/index.js b/packages/components/src/query-controls/index.js
+index 04c225a7691dda..e62d71eb2d8eb1 100644
+--- a/packages/components/src/query-controls/index.js
++++ b/packages/components/src/query-controls/index.js
+@@ -107,6 +107,7 @@ export default function QueryControls( {
+ 		),
+ 		onNumberOfItemsChange && (
+ 			<RangeControl
++				__nextHasNoMarginBottom
+ 				key="query-controls-range-control"
+ 				label={ __( 'Number of items' ) }
+ 				value={ numberOfItems }

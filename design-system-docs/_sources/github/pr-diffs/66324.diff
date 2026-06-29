@@ -1,0 +1,748 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 211ddd9bc35860..dfe779b4683523 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -356,18 +356,6 @@ module.exports = {
+ 				],
+ 			},
+ 		},
+-		{
+-			files: [
+-				// Components package.
+-				'packages/components/src/**/*.[tj]s?(x)',
+-				// Navigation block.
+-				'packages/block-library/src/navigation/**/*.[tj]s?(x)',
+-			],
+-			excludedFiles: [ ...developmentFiles ],
+-			rules: {
+-				'react-hooks/exhaustive-deps': 'error',
+-			},
+-		},
+ 		{
+ 			files: [ 'packages/jest*/**/*.js', '**/test/**/*.js' ],
+ 			excludedFiles: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b149172bd10376..05aebec05ea0e4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,10 @@
+ -   `Tabs` and `TabPanel`: Fix arrow key navigation in RTL ([#66201](https://github.com/WordPress/gutenberg/pull/66201)).
+ -   `Tabs`: override tablist's tabindex only when necessary ([#66209](https://github.com/WordPress/gutenberg/pull/66209)).
+ 
++### Internal
++
++-   ESLint: Stop disabling `react-hooks/exhaustive-deps` rule ([#66324](https://github.com/WordPress/gutenberg/pull/66324)).
++
+ ## 28.10.0 (2024-10-16)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.native.js b/packages/components/src/autocomplete/autocompleter-ui.native.js
+index 1400c78e518d75..daf4fe301abf77 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.native.js
++++ b/packages/components/src/autocomplete/autocompleter-ui.native.js
+@@ -69,9 +69,8 @@ export function getAutoCompleterUI( autocompleter ) {
+ 			} else if ( isVisible && text.length === 0 ) {
+ 				startAnimation( false );
+ 			}
+-			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
++			// We want to avoid introducing unexpected side effects.
+ 			// See https://github.com/WordPress/gutenberg/pull/41820
+-			// eslint-disable-next-line react-hooks/exhaustive-deps
+ 		}, [ items, isVisible, text ] );
+ 
+ 		const activeItemStyles = usePreferredColorSchemeStyle(
+@@ -112,9 +111,8 @@ export function getAutoCompleterUI( autocompleter ) {
+ 					}
+ 				} );
+ 			},
+-			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
++			// We want to avoid introducing unexpected side effects.
+ 			// See https://github.com/WordPress/gutenberg/pull/41820
+-			// eslint-disable-next-line react-hooks/exhaustive-deps
+ 			[ isVisible ]
+ 		);
+ 
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.tsx b/packages/components/src/autocomplete/autocompleter-ui.tsx
+index c6c1b94deb577e..69105f6c9d3b44 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.tsx
++++ b/packages/components/src/autocomplete/autocompleter-ui.tsx
+@@ -165,9 +165,8 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
+ 		useLayoutEffect( () => {
+ 			onChangeOptions( items );
+ 			announce( items );
+-			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
++			// We want to avoid introducing unexpected side effects.
+ 			// See https://github.com/WordPress/gutenberg/pull/41820
+-			// eslint-disable-next-line react-hooks/exhaustive-deps
+ 		}, [ items ] );
+ 
+ 		if ( items.length === 0 ) {
+@@ -235,8 +234,5 @@ function useOnClickOutside(
+ 			document.removeEventListener( 'mousedown', listener );
+ 			document.removeEventListener( 'touchstart', listener );
+ 		};
+-		// Disable reason: `ref` is a ref object and should not be included in a
+-		// hook's dependency list.
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+-	}, [ handler ] );
++	}, [ handler, ref ] );
+ }
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index ad930d3affdd14..f3278a46015c3c 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -380,9 +380,8 @@ export function useAutocomplete( {
+ 				: AutocompleterUI
+ 		);
+ 		setFilterValue( query === null ? '' : query );
+-		// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
++		// We want to avoid introducing unexpected side effects.
+ 		// See https://github.com/WordPress/gutenberg/pull/41820
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ textContent ] );
+ 
+ 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
+diff --git a/packages/components/src/color-palette/index.native.js b/packages/components/src/color-palette/index.native.js
+index bb45de6d66e884..ab86cd6f05f127 100644
+--- a/packages/components/src/color-palette/index.native.js
++++ b/packages/components/src/color-palette/index.native.js
+@@ -115,9 +115,8 @@ function ColorPalette( {
+ 				scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
+ 			}
+ 		}
+-		// Temporarily disabling exhuastive-deps until the component can be refactored and updated safely.
++		// Not adding additional dependencies until the component can be refactored and updated safely.
+ 		// Please see https://github.com/WordPress/gutenberg/pull/41253 for discussion and details.
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ currentSegment ] );
+ 
+ 	function isSelectedCustom() {
+diff --git a/packages/components/src/color-picker/index.native.js b/packages/components/src/color-picker/index.native.js
+index 46059a58520ba9..302de6b7d79b89 100644
+--- a/packages/components/src/color-picker/index.native.js
++++ b/packages/components/src/color-picker/index.native.js
+@@ -111,7 +111,6 @@ function ColorPicker( {
+ 		// the hook’s dependencies and running it a single time. Ideally there
+ 		// may be a way to refactor and obviate the disabled lint rule. If not,
+ 		// this comment should be replaced by one that explains the reasoning.
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ 
+ 	function onButtonPress( action ) {
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index 5a565ee38cec59..ca093f9d70847b 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -302,7 +302,6 @@ function Day( {
+ 		}
+ 		// isFocusAllowed is not a dep as there is no point calling focus() on
+ 		// an already focused element.
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ isFocusable ] );
+ 
+ 	return (
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 9f05dfee008da0..4f2f325e409a76 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -124,17 +124,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 		}
+ 
+ 		// TODO: updateSuggestions() should first be refactored so its actual deps are clearer.
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ suggestions, prevSuggestions, value, prevValue ] );
+ 
+ 	useEffect( () => {
+ 		updateSuggestions();
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ incompleteTokenValue ] );
+ 
+ 	useEffect( () => {
+ 		updateSuggestions();
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ __experimentalAutoSelectFirstMatch ] );
+ 
+ 	if ( disabled && isActive ) {
+diff --git a/packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/navigation-screen.native.js b/packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/navigation-screen.native.js
+index d5defc14dd475d..8c43bc85612762 100644
+--- a/packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/navigation-screen.native.js
++++ b/packages/components/src/mobile/bottom-sheet/bottom-sheet-navigation/navigation-screen.native.js
+@@ -71,9 +71,9 @@ const BottomSheetNavigationScreen = ( {
+ 			 * callbacks triggered based upon which screen is currently active.
+ 			 *
+ 			 * Related: https://github.com/WordPress/gutenberg/pull/36328#discussion_r768897546
++			 *
++			 * Also see https://github.com/WordPress/gutenberg/pull/41166.
+ 			 */
+-			// see https://github.com/WordPress/gutenberg/pull/41166
+-			// eslint-disable-next-line react-hooks/exhaustive-deps
+ 		}, [] )
+ 	);
+ 
+@@ -130,9 +130,7 @@ const BottomSheetNavigationScreen = ( {
+ 				</TouchableHighlight>
+ 			</ScrollView>
+ 		);
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [
+ 		children,
+ 		isFocused,
+diff --git a/packages/components/src/mobile/bottom-sheet/sub-sheet/index.native.js b/packages/components/src/mobile/bottom-sheet/sub-sheet/index.native.js
+index d46b10cfb560f1..14040be0cc239e 100644
+--- a/packages/components/src/mobile/bottom-sheet/sub-sheet/index.native.js
++++ b/packages/components/src/mobile/bottom-sheet/sub-sheet/index.native.js
+@@ -28,9 +28,7 @@ const BottomSheetSubSheet = ( {
+ 		if ( showSheet ) {
+ 			setIsFullScreen( isFullScreen );
+ 		}
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ showSheet, isFullScreen ] );
+ 
+ 	return (
+diff --git a/packages/components/src/mobile/color-settings/index.native.js b/packages/components/src/mobile/color-settings/index.native.js
+index 10cf776ed808c2..c7956df0e935dd 100644
+--- a/packages/components/src/mobile/color-settings/index.native.js
++++ b/packages/components/src/mobile/color-settings/index.native.js
+@@ -35,9 +35,7 @@ const ColorSettingsMemo = memo(
+ 		useEffect( () => {
+ 			shouldEnableBottomSheetMaxHeight( true );
+ 			onHandleClosingBottomSheet( null );
+-			// Disable reason: deferring this refactor to the native team.
+-			// see https://github.com/WordPress/gutenberg/pull/41166
+-			// eslint-disable-next-line react-hooks/exhaustive-deps
++			// See https://github.com/WordPress/gutenberg/pull/41166
+ 		}, [] );
+ 		return (
+ 			<BottomSheet.NavigationContainer>
+diff --git a/packages/components/src/mobile/color-settings/picker-screen.native.js b/packages/components/src/mobile/color-settings/picker-screen.native.js
+index 2d505621f6eda1..e924580d939794 100644
+--- a/packages/components/src/mobile/color-settings/picker-screen.native.js
++++ b/packages/components/src/mobile/color-settings/picker-screen.native.js
+@@ -43,9 +43,7 @@ const PickerScreen = () => {
+ 				onHandleHardwareButtonPress={ onHandleHardwareButtonPress }
+ 			/>
+ 		);
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [
+ 		setColor,
+ 		currentValue,
+diff --git a/packages/components/src/mobile/image/index.native.js b/packages/components/src/mobile/image/index.native.js
+index 9f8673b7bdcdff..3c7e4ddc19c006 100644
+--- a/packages/components/src/mobile/image/index.native.js
++++ b/packages/components/src/mobile/image/index.native.js
+@@ -112,9 +112,7 @@ const ImageComponent = ( {
+ 			}
+ 		}
+ 		return () => ( isCurrent = false );
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ url ] );
+ 
+ 	const onContainerLayout = ( event ) => {
+diff --git a/packages/components/src/mobile/keyboard-avoiding-view/index.ios.js b/packages/components/src/mobile/keyboard-avoiding-view/index.ios.js
+index f13e7d329874fd..7630fd21fbc429 100644
+--- a/packages/components/src/mobile/keyboard-avoiding-view/index.ios.js
++++ b/packages/components/src/mobile/keyboard-avoiding-view/index.ios.js
+@@ -69,9 +69,7 @@ export const KeyboardAvoidingView = ( {
+ 			keyboardShowSubscription.remove();
+ 			keyboardHideSubscription.remove();
+ 		};
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [] );
+ 
+ 	function onSafeAreaInsetsUpdate( { safeAreaInsets } ) {
+diff --git a/packages/components/src/mobile/link-picker/link-picker-results.native.js b/packages/components/src/mobile/link-picker/link-picker-results.native.js
+index 1d411b97ff0667..4751ebc1ee2111 100644
+--- a/packages/components/src/mobile/link-picker/link-picker-results.native.js
++++ b/packages/components/src/mobile/link-picker/link-picker-results.native.js
+@@ -75,9 +75,8 @@ export default function LinkPickerResults( {
+ 		return {
+ 			fetchMoreSuggestions: debounce( fetchMore, REQUEST_DEBOUNCE_DELAY ),
+ 		};
+-		// Disable eslint rule for now, to avoid introducing a regression
++		// Not adding dependencies for now, to avoid introducing a regression
+ 		// (see https://github.com/WordPress/gutenberg/pull/23922#discussion_r1170634879).
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ 
+ 	// Prevent setting state when unmounted.
+@@ -90,9 +89,7 @@ export default function LinkPickerResults( {
+ 		setHasAllSuggestions( false );
+ 		setLinks( [ directEntry ] );
+ 		fetchMoreSuggestions( { query, links: [ directEntry ] } );
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ query ] );
+ 
+ 	const onEndReached = () => fetchMoreSuggestions( { query, links } );
+diff --git a/packages/components/src/mobile/link-picker/link-picker-screen.native.js b/packages/components/src/mobile/link-picker/link-picker-screen.native.js
+index 7bc1dbd7009b62..999c9053c59862 100644
+--- a/packages/components/src/mobile/link-picker/link-picker-screen.native.js
++++ b/packages/components/src/mobile/link-picker/link-picker-screen.native.js
+@@ -53,9 +53,7 @@ const LinkPickerScreen = ( { returnScreenName } ) => {
+ 				onCancel={ onCancel }
+ 			/>
+ 		);
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ inputValue ] );
+ };
+ 
+diff --git a/packages/components/src/mobile/link-settings/index.native.js b/packages/components/src/mobile/link-settings/index.native.js
+index e80672a3103fa6..a01e33b410a5c0 100644
+--- a/packages/components/src/mobile/link-settings/index.native.js
++++ b/packages/components/src/mobile/link-settings/index.native.js
+@@ -101,9 +101,7 @@ function LinkSettings( {
+ 		if ( onHandleClosingBottomSheet ) {
+ 			onHandleClosingBottomSheet( onCloseSettingsSheet );
+ 		}
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ urlInputValue, labelInputValue, linkRelInputValue ] );
+ 
+ 	useEffect( () => {
+@@ -115,9 +113,7 @@ function LinkSettings( {
+ 		if ( url !== urlInputValue ) {
+ 			setUrlInputValue( url || '' );
+ 		}
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ url ] );
+ 
+ 	useEffect( () => {
+@@ -141,9 +137,7 @@ function LinkSettings( {
+ 		if ( prevEditorSidebarOpened && ! editorSidebarOpened ) {
+ 			onSetAttributes();
+ 		}
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ editorSidebarOpened, isVisible ] );
+ 
+ 	useEffect( () => {
+@@ -156,9 +150,7 @@ function LinkSettings( {
+ 				url: prependHTTP( urlValue ),
+ 			} );
+ 		}
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ urlValue ] );
+ 
+ 	const onChangeURL = useCallback(
+@@ -188,9 +180,7 @@ function LinkSettings( {
+ 				rel: linkRelInputValue,
+ 			} );
+ 		}
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ urlInputValue, labelInputValue, linkRelInputValue, setAttributes ] );
+ 
+ 	const onCloseSettingsSheet = useCallback( () => {
+@@ -223,9 +213,7 @@ function LinkSettings( {
+ 				rel: updatedRel,
+ 			} );
+ 		},
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 		[ linkRelInputValue ]
+ 	);
+ 
+diff --git a/packages/components/src/mobile/link-settings/link-settings-screen.native.js b/packages/components/src/mobile/link-settings/link-settings-screen.native.js
+index d04bd0699b7a54..7147becd67b22d 100644
+--- a/packages/components/src/mobile/link-settings/link-settings-screen.native.js
++++ b/packages/components/src/mobile/link-settings/link-settings-screen.native.js
+@@ -37,9 +37,7 @@ const LinkSettingsScreen = ( props ) => {
+ 				urlValue={ inputValue }
+ 			/>
+ 		);
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ props, inputValue, navigation, route ] );
+ };
+ 
+diff --git a/packages/components/src/mobile/segmented-control/index.native.js b/packages/components/src/mobile/segmented-control/index.native.js
+index 49d46b8cd08beb..36b92bb0d4ea32 100644
+--- a/packages/components/src/mobile/segmented-control/index.native.js
++++ b/packages/components/src/mobile/segmented-control/index.native.js
+@@ -74,18 +74,14 @@ const SegmentedControls = ( {
+ 	useEffect( () => {
+ 		setActiveSegmentIndex( selectedSegmentIndex );
+ 		segmentHandler( segments[ selectedSegmentIndex ] );
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [] );
+ 
+ 	useEffect( () => {
+ 		positionAnimationValue.setValue(
+ 			calculateEndValue( activeSegmentIndex )
+ 		);
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ segmentsDimensions ] );
+ 
+ 	const containerStyle = usePreferredColorSchemeStyle(
+diff --git a/packages/components/src/mobile/utils/use-unit-converter-to-mobile.native.js b/packages/components/src/mobile/utils/use-unit-converter-to-mobile.native.js
+index 891f11f502ebfe..0b1dfd31147dee 100644
+--- a/packages/components/src/mobile/utils/use-unit-converter-to-mobile.native.js
++++ b/packages/components/src/mobile/utils/use-unit-converter-to-mobile.native.js
+@@ -66,9 +66,7 @@ const useConvertUnitToMobile = ( value, unit, styles ) => {
+ 		return () => {
+ 			dimensionsChangeSubscription.remove();
+ 		};
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [] );
+ 
+ 	const onDimensionsChange = useCallback( ( { window } ) => {
+@@ -85,9 +83,7 @@ const useConvertUnitToMobile = ( value, unit, styles ) => {
+ 			valueToConvert,
+ 			valueUnit
+ 		);
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ windowSizes, value, unit ] );
+ };
+ 
+diff --git a/packages/components/src/navigation/index.tsx b/packages/components/src/navigation/index.tsx
+index 0069369f3e00cb..92f431dfb22fc7 100644
+--- a/packages/components/src/navigation/index.tsx
++++ b/packages/components/src/navigation/index.tsx
+@@ -104,9 +104,8 @@ export function Navigation( {
+ 		if ( activeMenu !== menu ) {
+ 			setActiveMenu( activeMenu );
+ 		}
+-		// Ignore exhaustive-deps here, as it would require either a larger refactor or some questionable workarounds.
++		// Not adding deps for now, as it would require either a larger refactor or some questionable workarounds.
+ 		// See https://github.com/WordPress/gutenberg/pull/41612 for context.
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ activeMenu ] );
+ 
+ 	const context = {
+diff --git a/packages/components/src/navigation/item/use-navigation-tree-item.tsx b/packages/components/src/navigation/item/use-navigation-tree-item.tsx
+index e294af4169517e..335e55f2401bf4 100644
+--- a/packages/components/src/navigation/item/use-navigation-tree-item.tsx
++++ b/packages/components/src/navigation/item/use-navigation-tree-item.tsx
+@@ -41,7 +41,7 @@ export const useNavigationTreeItem = (
+ 		return () => {
+ 			removeItem( itemId );
+ 		};
+-		// Ignore exhaustive-deps rule for now. See https://github.com/WordPress/gutenberg/pull/41639
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// Not adding deps for now, as it would require either a larger refactor.
++		// See https://github.com/WordPress/gutenberg/pull/41639
+ 	}, [ activeMenu, search ] );
+ };
+diff --git a/packages/components/src/navigation/menu/menu-title-search.tsx b/packages/components/src/navigation/menu/menu-title-search.tsx
+index c1dbda5af88fb0..f0014fa4768046 100644
+--- a/packages/components/src/navigation/menu/menu-title-search.tsx
++++ b/packages/components/src/navigation/menu/menu-title-search.tsx
+@@ -55,8 +55,8 @@ function MenuTitleSearch( {
+ 			count
+ 		);
+ 		debouncedSpeak( resultsFoundMessage );
+-		// Ignore exhaustive-deps rule for now. See https://github.com/WordPress/gutenberg/pull/44090
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// Not adding deps for now, as it would require either a larger refactor.
++		// See https://github.com/WordPress/gutenberg/pull/44090
+ 	}, [ items, search ] );
+ 
+ 	const onClose = () => {
+diff --git a/packages/components/src/navigation/menu/use-navigation-tree-menu.tsx b/packages/components/src/navigation/menu/use-navigation-tree-menu.tsx
+index 1db2ee87fa7847..8631812445cd7d 100644
+--- a/packages/components/src/navigation/menu/use-navigation-tree-menu.tsx
++++ b/packages/components/src/navigation/menu/use-navigation-tree-menu.tsx
+@@ -23,7 +23,7 @@ export const useNavigationTreeMenu = ( props: NavigationMenuProps ) => {
+ 		return () => {
+ 			removeMenu( key );
+ 		};
+-		// Ignore exhaustive-deps rule for now. See https://github.com/WordPress/gutenberg/pull/44090
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// Not adding deps for now, as it would require either a larger refactor
++		// See https://github.com/WordPress/gutenberg/pull/44090
+ 	}, [] );
+ };
+diff --git a/packages/components/src/sandbox/index.native.js b/packages/components/src/sandbox/index.native.js
+index b9bbc9a4e3281f..72070bf6efcd08 100644
+--- a/packages/components/src/sandbox/index.native.js
++++ b/packages/components/src/sandbox/index.native.js
+@@ -336,9 +336,7 @@ const Sandbox = forwardRef( function Sandbox(
+ 
+ 	useEffect( () => {
+ 		updateContentHtml();
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ html, title, type, styles, scripts ] );
+ 
+ 	useEffect( () => {
+diff --git a/packages/components/src/sandbox/index.tsx b/packages/components/src/sandbox/index.tsx
+index 4ad971cb63ca90..5288fea3f7e43e 100644
+--- a/packages/components/src/sandbox/index.tsx
++++ b/packages/components/src/sandbox/index.tsx
+@@ -262,23 +262,20 @@ function SandBox( {
+ 				checkMessageForResize
+ 			);
+ 		};
+-		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
++		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
+ 		// See https://github.com/WordPress/gutenberg/pull/44378
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ 
+ 	useEffect( () => {
+ 		trySandBox();
+-		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
++		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
+ 		// See https://github.com/WordPress/gutenberg/pull/44378
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ title, styles, scripts ] );
+ 
+ 	useEffect( () => {
+ 		trySandBox( true );
+-		// Ignore reason: passing `exhaustive-deps` will likely involve a more detailed refactor.
++		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
+ 		// See https://github.com/WordPress/gutenberg/pull/44378
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ html, type ] );
+ 
+ 	return (
+diff --git a/packages/components/src/search-control/index.native.js b/packages/components/src/search-control/index.native.js
+index 8bff86049b0182..5bb03196d1de14 100644
+--- a/packages/components/src/search-control/index.native.js
++++ b/packages/components/src/search-control/index.native.js
+@@ -122,9 +122,7 @@ function SearchControl( {
+ 		mergeFutureStyles( activeDarkStyles, [ isActive, isDark ] );
+ 
+ 		setCurrentStyles( futureStyles );
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ isActive, isDark ] );
+ 
+ 	const clearInput = useCallback( () => {
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot.tsx b/packages/components/src/slot-fill/bubbles-virtually/slot.tsx
+index e836782c906154..6ac2d51e1f857f 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot.tsx
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot.tsx
+@@ -49,11 +49,10 @@ function Slot(
+ 		return () => {
+ 			unregisterSlot( name, ref );
+ 		};
+-		// Ignore reason: We don't want to unregister and register the slot whenever
++		// We don't want to unregister and register the slot whenever
+ 		// `fillProps` change, which would cause the fill to be re-mounted. Instead,
+ 		// we can just update the slot (see hook below).
+ 		// For more context, see https://github.com/WordPress/gutenberg/pull/44403#discussion_r994415973
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ registerSlot, unregisterSlot, name ] );
+ 	// fillProps may be an update that interacts with the layout, so we
+ 	// useLayoutEffect.
+diff --git a/packages/components/src/slot-fill/fill.ts b/packages/components/src/slot-fill/fill.ts
+index 6aefacc4ff6f18..4134af25684b07 100644
+--- a/packages/components/src/slot-fill/fill.ts
++++ b/packages/components/src/slot-fill/fill.ts
+@@ -23,9 +23,8 @@ export default function Fill( { name, children }: FillComponentProps ) {
+ 		const refValue = ref.current;
+ 		registerFill( name, refValue );
+ 		return () => unregisterFill( name, refValue );
+-		// Ignore reason: the useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
++		// The useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
+ 		// We'll leave them as-is until a more detailed investigation/refactor can be performed.
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ 
+ 	useLayoutEffect( () => {
+@@ -33,9 +32,8 @@ export default function Fill( { name, children }: FillComponentProps ) {
+ 		if ( slot ) {
+ 			slot.forceUpdate();
+ 		}
+-		// Ignore reason: the useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
++		// The useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
+ 		// We'll leave them as-is until a more detailed investigation/refactor can be performed.
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ children ] );
+ 
+ 	useLayoutEffect( () => {
+@@ -46,9 +44,8 @@ export default function Fill( { name, children }: FillComponentProps ) {
+ 		unregisterFill( ref.current.name, ref.current );
+ 		ref.current.name = name;
+ 		registerFill( name, ref.current );
+-		// Ignore reason: the useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
++		// The useLayoutEffects here are written to fire at specific times, and introducing new dependencies could cause unexpected changes in behavior.
+ 		// We'll leave them as-is until a more detailed investigation/refactor can be performed.
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ name ] );
+ 
+ 	return null;
+diff --git a/packages/components/src/tools-panel/tools-panel-item/hook.ts b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+index 1e33e7c6740ded..e0a1f0139dcace 100644
+--- a/packages/components/src/tools-panel/tools-panel-item/hook.ts
++++ b/packages/components/src/tools-panel/tools-panel-item/hook.ts
+@@ -54,11 +54,9 @@ export function useToolsPanelItem(
+ 
+ 	// hasValue is a new function on every render, so do not add it as a
+ 	// dependency to the useCallback hook! If needed, we should use a ref.
+-	// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	const hasValueCallback = useCallback( hasValue, [ panelId ] );
+ 	// resetAllFilter is a new function on every render, so do not add it as a
+ 	// dependency to the useCallback hook! If needed, we should use a ref.
+-	// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
+ 	const previousPanelId = usePrevious( currentPanelId );
+ 
+diff --git a/packages/components/src/tooltip/index.native.js b/packages/components/src/tooltip/index.native.js
+index 61b08c052dfacc..ff880d38e19822 100644
+--- a/packages/components/src/tooltip/index.native.js
++++ b/packages/components/src/tooltip/index.native.js
+@@ -62,9 +62,7 @@ const useKeyboardVisibility = () => {
+ 			showListener.remove();
+ 			hideListener.remove();
+ 		};
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [] );
+ 
+ 	return keyboardVisible;
+@@ -105,9 +103,7 @@ const Tooltip = ( {
+ 			} );
+ 		}
+ 		return () => onHandleScreenTouch( null );
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ visible ] );
+ 
+ 	// Manage visibility animation.
+@@ -121,9 +117,7 @@ const Tooltip = ( {
+ 			setAnimating( true );
+ 			startAnimation();
+ 		}
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ visible ] );
+ 
+ 	// Manage tooltip visibility and position in relation to keyboard.
+@@ -142,9 +136,7 @@ const Tooltip = ( {
+ 			setAnimating( true );
+ 			setVisible( false );
+ 		}
+-		// Disable reason: deferring this refactor to the native team.
+-		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
++		// See https://github.com/WordPress/gutenberg/pull/41166
+ 	}, [ visible, keyboardVisible ] );
+ 
+ 	// Manage tooltip position during keyboard frame changes.
+@@ -273,9 +265,7 @@ const TooltipSlot = ( { children, ...rest } ) => {
+ 		setHandleScreenTouch( null );
+ 	};
+ 	// Memoize context value to avoid unnecessary rerenders of the Provider's children
+-	// Disable reason: deferring this refactor to the native team.
+-	// see https://github.com/WordPress/gutenberg/pull/41166
+-	// eslint-disable-next-line react-hooks/exhaustive-deps
++	// See https://github.com/WordPress/gutenberg/pull/41166
+ 	const value = useMemo( () => ( { onHandleScreenTouch } ) );
+ 
+ 	return (
+diff --git a/packages/components/src/unit-control/index.native.js b/packages/components/src/unit-control/index.native.js
+index a4c0b913f53432..4aae14de65779e 100644
+--- a/packages/components/src/unit-control/index.native.js
++++ b/packages/components/src/unit-control/index.native.js
+@@ -47,10 +47,8 @@ function UnitControl( {
+ 		if ( pickerRef?.current ) {
+ 			pickerRef.current.presentPicker();
+ 		}
+-		// Disable reason: this should be fixed by the native team.
+-		// It would be great if this could be done in the context of
++		// It would be great if the deps could be addressed in the context of
+ 		// https://github.com/WordPress/gutenberg/pull/39218
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ pickerRef?.current ] );
+ 
+ 	const currentInputValue = currentInput === null ? value : currentInput;
+@@ -106,10 +104,8 @@ function UnitControl( {
+ 			anchorNodeRef?.current
+ 				? findNodeHandle( anchorNodeRef?.current )
+ 				: undefined,
+-		// Disable reason: this should be fixed by the native team.
+-		// It would be great if this could be done in the context of
++		// It would be great if the deps could be addressed in the context of
+ 		// https://github.com/WordPress/gutenberg/pull/39218
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 		[ anchorNodeRef?.current ]
+ 	);
+ 
+diff --git a/packages/components/src/utils/element-rect.ts b/packages/components/src/utils/element-rect.ts
+index 7f9693ef9f7df2..0f58ea6d7caf54 100644
+--- a/packages/components/src/utils/element-rect.ts
++++ b/packages/components/src/utils/element-rect.ts
+@@ -181,7 +181,6 @@ export function useTrackElementOffsetRect(
+ 		measure();
+ 		// `measure` is a stable function, so it's safe to omit it from the deps array.
+ 		// deps can't be statically analyzed by ESLint
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, deps );
+ 
+ 	return indicatorPosition;
+diff --git a/packages/components/src/utils/hooks/use-update-effect.js b/packages/components/src/utils/hooks/use-update-effect.js
+index ed2c3ca4363579..e371647f033de6 100644
+--- a/packages/components/src/utils/hooks/use-update-effect.js
++++ b/packages/components/src/utils/hooks/use-update-effect.js
+@@ -19,11 +19,9 @@ function useUpdateEffect( effect, deps ) {
+ 		}
+ 		mountedRef.current = true;
+ 		return undefined;
+-		// Disable reasons:
+ 		// 1. This hook needs to pass a dep list that isn't an array literal
+ 		// 2. `effect` is missing from the array, and will need to be added carefully to avoid additional warnings
+ 		// see https://github.com/WordPress/gutenberg/pull/41166
+-		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, deps );
+ 
+ 	useEffect(

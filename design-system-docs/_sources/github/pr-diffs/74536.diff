@@ -1,0 +1,205 @@
+diff --git a/.wp-env.json b/.wp-env.json
+index 71dd1fc74b3320..8e88ac26651f58 100644
+--- a/.wp-env.json
++++ b/.wp-env.json
+@@ -2,7 +2,7 @@
+ 	"$schema": "./schemas/json/wp-env.json",
+ 	"testsEnvironment": false,
+ 	"core": "WordPress/WordPress",
+-	"plugins": [ "." ],
++	"plugins": [],
+ 	"themes": [ "./test/emptytheme" ],
+ 	"phpmyadminPort": 9000
+ }
+diff --git a/.wp-env.test.json b/.wp-env.test.json
+index ba4ebfce631a98..a6a30f4528cc28 100644
+--- a/.wp-env.test.json
++++ b/.wp-env.test.json
+@@ -3,14 +3,13 @@
+ 	"testsEnvironment": false,
+ 	"port": 8889,
+ 	"core": "WordPress/WordPress",
+-	"plugins": [ "." ],
++	"plugins": [],
+ 	"themes": [ "./test/emptytheme" ],
+ 	"config": {
+ 		"WP_DEBUG": false,
+ 		"SCRIPT_DEBUG": false
+ 	},
+ 	"mappings": {
+-		"wp-content/plugins/gutenberg": ".",
+ 		"wp-content/mu-plugins": "./packages/e2e-tests/mu-plugins",
+ 		"wp-content/plugins/gutenberg-test-plugins": "./packages/e2e-tests/plugins",
+ 		"wp-content/themes/gutenberg-test-themes": "./test/gutenberg-test-themes",
+diff --git a/packages/e2e-test-utils-playwright/src/request-utils/gutenberg-experiments.ts b/packages/e2e-test-utils-playwright/src/request-utils/gutenberg-experiments.ts
+index 2f34a797b79856..f4cd90c24d8018 100644
+--- a/packages/e2e-test-utils-playwright/src/request-utils/gutenberg-experiments.ts
++++ b/packages/e2e-test-utils-playwright/src/request-utils/gutenberg-experiments.ts
+@@ -9,14 +9,18 @@ import type { RequestUtils } from './index';
+  * @param this
+  * @param experiments Array of experimental flags to enable. Pass in an empty array to disable all experiments.
+  *                    Use 'active_templates' for the template activation feature.
++ * @return Returns true if experiments were set successfully, false if Gutenberg plugin is not active.
+  */
+ async function setGutenbergExperiments(
+ 	this: RequestUtils,
+ 	experiments: string[]
+-) {
++): Promise< boolean > {
+ 	const response = await this.request.get(
+ 		'/wp-admin/admin.php?page=gutenberg-experiments'
+ 	);
++	if ( response.status() !== 200 ) {
++		return false;
++	}
+ 	const html = await response.text();
+ 	const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
+ 
+@@ -56,6 +60,8 @@ async function setGutenbergExperiments(
+ 		form: formData,
+ 		failOnStatusCode: true,
+ 	} );
++
++	return true;
+ }
+ 
+ export { setGutenbergExperiments };
+diff --git a/packages/e2e-test-utils-playwright/src/test.ts b/packages/e2e-test-utils-playwright/src/test.ts
+index b1300bb9be72ff..66256c37080384 100644
+--- a/packages/e2e-test-utils-playwright/src/test.ts
++++ b/packages/e2e-test-utils-playwright/src/test.ts
+@@ -133,6 +133,7 @@ const test = base.extend<
+ 	{
+ 		requestUtils: RequestUtils;
+ 		lighthousePort: number;
++		isGutenbergPluginActive: boolean;
+ 	}
+ >( {
+ 	admin: async ( { page, pageUtils, editor }, use ) => {
+@@ -197,6 +198,19 @@ const test = base.extend<
+ 	metrics: async ( { page }, use ) => {
+ 		await use( new Metrics( { page } ) );
+ 	},
++	isGutenbergPluginActive: [
++		async ( { requestUtils }, use ) => {
++			const plugins = await requestUtils.rest( {
++				path: '/wp/v2/plugins',
++			} );
++			const gutenberg = plugins.find(
++				( p: { plugin: string; status: string } ) =>
++					p.plugin === 'gutenberg/gutenberg'
++			);
++			await use( gutenberg?.status === 'active' );
++		},
++		{ scope: 'worker' },
++	],
+ } );
+ 
+ export { test, expect };
+diff --git a/packages/e2e-tests/plugins/delete-installed-fonts.php b/packages/e2e-tests/plugins/delete-installed-fonts.php
+index 3ef01406f854be..cf0be66ef6f8b0 100644
+--- a/packages/e2e-tests/plugins/delete-installed-fonts.php
++++ b/packages/e2e-tests/plugins/delete-installed-fonts.php
+@@ -56,7 +56,7 @@ function gutenberg_delete_installed_fonts() {
+ 	}
+ 
+ 	// Delete any installed fonts from global styles.
+-	$global_styles_post_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
++	$global_styles_post_id = WP_Theme_JSON_Resolver::get_user_global_styles_post_id();
+ 	$request               = new WP_REST_Request( 'POST', '/wp/v2/global-styles/' . $global_styles_post_id );
+ 	$request->set_body_params( array( 'settings' => array( 'typography' => array( 'fontFamilies' => array() ) ) ) );
+ 
+diff --git a/test/e2e/specs/editor/local/demo.spec.js b/test/e2e/specs/editor/local/demo.spec.js
+index 2782461812ea84..e35efdf780ffe9 100644
+--- a/test/e2e/specs/editor/local/demo.spec.js
++++ b/test/e2e/specs/editor/local/demo.spec.js
+@@ -8,7 +8,14 @@ test.describe( 'New editor state', () => {
+ 		page,
+ 		admin,
+ 		editor,
++		isGutenbergPluginActive,
+ 	} ) => {
++		// eslint-disable-next-line playwright/no-skipped-test
++		test.skip(
++			! isGutenbergPluginActive,
++			'This test requires Gutenberg plugin to be active'
++		);
++
+ 		await admin.visitAdminPage( 'post-new.php', 'gutenberg-demo' );
+ 		await editor.setPreferences( 'core/edit-site', {
+ 			welcomeGuide: false,
+diff --git a/test/e2e/specs/editor/plugins/server-side-rendered-block.spec.js b/test/e2e/specs/editor/plugins/server-side-rendered-block.spec.js
+index cf5bbb7bdbd6fa..39ef9031ef22c4 100644
+--- a/test/e2e/specs/editor/plugins/server-side-rendered-block.spec.js
++++ b/test/e2e/specs/editor/plugins/server-side-rendered-block.spec.js
+@@ -106,7 +106,13 @@ test.describe( 'Server-side rendered block', () => {
+ } );
+ 
+ test.describe( 'PHP-only auto-register blocks', () => {
+-	test.beforeAll( async ( { requestUtils } ) => {
++	test.beforeAll( async ( { requestUtils, isGutenbergPluginActive } ) => {
++		// eslint-disable-next-line playwright/no-skipped-test
++		test.skip(
++			! isGutenbergPluginActive,
++			'This test suite requires Gutenberg plugin to be active'
++		);
++
+ 		await requestUtils.activatePlugin(
+ 			'gutenberg-test-server-side-rendered-block'
+ 		);
+diff --git a/test/e2e/specs/editor/various/should-iframe.spec.js b/test/e2e/specs/editor/various/should-iframe.spec.js
+index 3920847c012e5e..495b93292ec881 100644
+--- a/test/e2e/specs/editor/various/should-iframe.spec.js
++++ b/test/e2e/specs/editor/various/should-iframe.spec.js
+@@ -11,6 +11,7 @@ test.describe( 'Should iframe', () => {
+ 	test( 'should remain iframed when a v1 block is added', async ( {
+ 		page,
+ 		editor,
++		isGutenbergPluginActive,
+ 	} ) => {
+ 		const iframe = page.locator( 'iframe[name="editor-canvas"]' );
+ 
+@@ -33,7 +34,12 @@ test.describe( 'Should iframe', () => {
+ 		// Insert the v1 block.
+ 		await editor.insertBlock( { name: 'test/v1' } );
+ 
+-		// The editor should remain iframed because Gutenberg is active.
+-		await expect( iframe ).toBeVisible();
++		if ( isGutenbergPluginActive ) {
++			// Gutenberg keeps the editor iframed even with v1 blocks.
++			await expect( iframe ).toBeVisible();
++		} else {
++			// Core exits iframe mode when a v1 block is added.
++			await expect( iframe ).toBeHidden();
++		}
+ 	} );
+ } );
+diff --git a/test/e2e/specs/site-editor/global-styles-sidebar.spec.js b/test/e2e/specs/site-editor/global-styles-sidebar.spec.js
+index e00a089755a945..48c975231ee666 100644
+--- a/test/e2e/specs/site-editor/global-styles-sidebar.spec.js
++++ b/test/e2e/specs/site-editor/global-styles-sidebar.spec.js
+@@ -20,7 +20,10 @@ test.describe( 'Global styles sidebar', () => {
+ 		} );
+ 	} );
+ 
+-	test( 'should filter blocks list results', async ( { page } ) => {
++	test( 'should filter blocks list results', async ( {
++		page,
++		isGutenbergPluginActive,
++	} ) => {
+ 		// Navigate to Styles -> Blocks.
+ 		await page
+ 			.getByRole( 'region', { name: 'Editor top bar' } )
+@@ -43,5 +46,12 @@ test.describe( 'Global styles sidebar', () => {
+ 		await expect(
+ 			page.getByRole( 'button', { name: 'Accordion Item' } )
+ 		).toBeVisible();
++		if ( isGutenbergPluginActive ) {
++			await expect(
++				page.getByRole( 'button', {
++					name: 'Table of Contents',
++				} )
++			).toBeVisible();
++		}
+ 	} );
+ } );

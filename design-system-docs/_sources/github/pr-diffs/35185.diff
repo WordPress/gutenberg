@@ -1,0 +1,264 @@
+diff --git a/package-lock.json b/package-lock.json
+index 17c6d7e9f0af1f..614b1ee32350ec 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -18215,6 +18215,7 @@
+ 				"@wordpress/rich-text": "file:packages/rich-text",
+ 				"@wordpress/warning": "file:packages/warning",
+ 				"classnames": "^2.3.1",
++				"colord": "^2.7.0",
+ 				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^6.0.15",
+ 				"framer-motion": "^4.1.17",
+@@ -18232,6 +18233,13 @@
+ 				"rememo": "^3.0.0",
+ 				"tinycolor2": "^1.4.2",
+ 				"uuid": "^8.3.0"
++			},
++			"dependencies": {
++				"colord": {
++					"version": "2.8.0",
++					"resolved": "https://registry.npmjs.org/colord/-/colord-2.8.0.tgz",
++					"integrity": "sha512-kNkVV4KFta3TYQv0bzs4xNwLaeag261pxgzGQSh4cQ1rEhYjcTJfFRP0SDlbhLONg0eSoLzrDd79PosjbltufA=="
++				}
+ 			}
+ 		},
+ 		"@wordpress/compose": {
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 06de8f83938cab..dc65ab06e65512 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -71,7 +71,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+             />
+             <svg
+               aria-hidden={true}
+-              fill="#000000"
++              fill="#000"
+               focusable={false}
+               height={24}
+               role="img"
+diff --git a/packages/components/package.json b/packages/components/package.json
+index fc9632f8398d71..5199c708609f7b 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -50,6 +50,7 @@
+ 		"@wordpress/rich-text": "file:../rich-text",
+ 		"@wordpress/warning": "file:../warning",
+ 		"classnames": "^2.3.1",
++		"colord": "^2.7.0",
+ 		"dom-scroll-into-view": "^1.2.1",
+ 		"downshift": "^6.0.15",
+ 		"framer-motion": "^4.1.17",
+diff --git a/packages/components/src/color-palette/index.js b/packages/components/src/color-palette/index.js
+index 6f8dc6181ee03d..67130f70840d4a 100644
+--- a/packages/components/src/color-palette/index.js
++++ b/packages/components/src/color-palette/index.js
+@@ -2,7 +2,9 @@
+  * External dependencies
+  */
+ import { map } from 'lodash';
+-import tinycolor from 'tinycolor2';
++import { colord, extend } from 'colord';
++import namesPlugin from 'colord/plugins/names';
++import a11yPlugin from 'colord/plugins/a11y';
+ 
+ /**
+  * WordPress dependencies
+@@ -16,6 +18,8 @@ import { useCallback, useMemo } from '@wordpress/element';
+ import ColorPicker from '../color-picker';
+ import CircularOptionPicker from '../circular-option-picker';
+ 
++extend( [ namesPlugin, a11yPlugin ] );
++
+ export default function ColorPalette( {
+ 	clearable = true,
+ 	className,
+@@ -26,37 +30,42 @@ export default function ColorPalette( {
+ } ) {
+ 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
+ 	const colorOptions = useMemo( () => {
+-		return map( colors, ( { color, name } ) => (
+-			<CircularOptionPicker.Option
+-				key={ color }
+-				isSelected={ value === color }
+-				selectedIconProps={
+-					value === color
+-						? {
+-								fill: tinycolor
+-									.mostReadable( color, [ '#000', '#fff' ] )
+-									.toHexString(),
+-						  }
+-						: {}
+-				}
+-				tooltipText={
+-					name ||
+-					// translators: %s: color hex code e.g: "#f00".
+-					sprintf( __( 'Color code: %s' ), color )
+-				}
+-				style={ { backgroundColor: color, color } }
+-				onClick={
+-					value === color ? clearColor : () => onChange( color )
+-				}
+-				aria-label={
+-					name
+-						? // translators: %s: The name of the color e.g: "vivid red".
+-						  sprintf( __( 'Color: %s' ), name )
+-						: // translators: %s: color hex code e.g: "#f00".
+-						  sprintf( __( 'Color code: %s' ), color )
+-				}
+-			/>
+-		) );
++		return map( colors, ( { color, name } ) => {
++			const colordColor = colord( color );
++			return (
++				<CircularOptionPicker.Option
++					key={ color }
++					isSelected={ value === color }
++					selectedIconProps={
++						value === color
++							? {
++									fill:
++										colordColor.contrast() >
++										colordColor.contrast( '#000' )
++											? '#fff'
++											: '#000',
++							  }
++							: {}
++					}
++					tooltipText={
++						name ||
++						// translators: %s: color hex code e.g: "#f00".
++						sprintf( __( 'Color code: %s' ), color )
++					}
++					style={ { backgroundColor: color, color } }
++					onClick={
++						value === color ? clearColor : () => onChange( color )
++					}
++					aria-label={
++						name
++							? // translators: %s: The name of the color e.g: "vivid red".
++							  sprintf( __( 'Color: %s' ), name )
++							: // translators: %s: color hex code e.g: "#f00".
++							  sprintf( __( 'Color code: %s' ), color )
++					}
++				/>
++			);
++		} );
+ 	}, [ colors, value, onChange, clearColor ] );
+ 	const renderCustomColorPicker = () => (
+ 		<ColorPicker
+diff --git a/packages/components/src/color-palette/test/__snapshots__/index.js.snap b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+index bc7c279b1ee2d2..55ce05c15b7eea 100644
+--- a/packages/components/src/color-palette/test/__snapshots__/index.js.snap
++++ b/packages/components/src/color-palette/test/__snapshots__/index.js.snap
+@@ -155,7 +155,7 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
+         onClick={[Function]}
+         selectedIconProps={
+           Object {
+-            "fill": "#000000",
++            "fill": "#000",
+           }
+         }
+         style={
+@@ -250,7 +250,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+           onClick={[Function]}
+           selectedIconProps={
+             Object {
+-              "fill": "#000000",
++              "fill": "#000",
+             }
+           }
+           style={
+@@ -303,7 +303,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+           onClick={[Function]}
+           selectedIconProps={
+             Object {
+-              "fill": "#000000",
++              "fill": "#000",
+             }
+           }
+           style={
+@@ -359,7 +359,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+               </ForwardRef(Button)>
+             </Tooltip>
+             <Icon
+-              fill="#000000"
++              fill="#000"
+               icon={
+                 <SVG
+                   viewBox="0 0 24 24"
+@@ -372,7 +372,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+               }
+             >
+               <SVG
+-                fill="#000000"
++                fill="#000"
+                 height={24}
+                 viewBox="0 0 24 24"
+                 width={24}
+@@ -380,7 +380,7 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+               >
+                 <svg
+                   aria-hidden={true}
+-                  fill="#000000"
++                  fill="#000"
+                   focusable={false}
+                   height={24}
+                   role="img"
+diff --git a/packages/components/src/custom-gradient-picker/utils.js b/packages/components/src/custom-gradient-picker/utils.js
+index 0767f1e40a881b..c7c8d8289ba63c 100644
+--- a/packages/components/src/custom-gradient-picker/utils.js
++++ b/packages/components/src/custom-gradient-picker/utils.js
+@@ -2,7 +2,8 @@
+  * External dependencies
+  */
+ import gradientParser from 'gradient-parser';
+-import tinycolor from 'tinycolor2';
++import { colord, extend } from 'colord';
++import namesPlugin from 'colord/plugins/names';
+ 
+ /**
+  * Internal dependencies
+@@ -14,6 +15,8 @@ import {
+ } from './constants';
+ import { serializeGradient } from './serializer';
+ 
++extend( [ namesPlugin ] );
++
+ export function getLinearGradientRepresentation( gradientAST ) {
+ 	return serializeGradient( {
+ 		type: 'linear-gradient',
+@@ -68,7 +71,7 @@ export function getGradientAstWithControlPoints(
+ 	return {
+ 		...gradientAST,
+ 		colorStops: newControlPoints.map( ( { position, color } ) => {
+-			const { r, g, b, a } = tinycolor( color ).toRgb();
++			const { r, g, b, a } = colord( color ).toRgb();
+ 			return {
+ 				length: {
+ 					type: '%',
+diff --git a/packages/components/src/duotone-picker/utils.js b/packages/components/src/duotone-picker/utils.js
+index 72c607072e8c6a..f33aff4f965d52 100644
+--- a/packages/components/src/duotone-picker/utils.js
++++ b/packages/components/src/duotone-picker/utils.js
+@@ -1,7 +1,10 @@
+ /**
+  * External dependencies
+  */
+-import tinycolor from 'tinycolor2';
++import { colord, extend } from 'colord';
++import namesPlugin from 'colord/plugins/names';
++
++extend( [ namesPlugin ] );
+ 
+ /**
+  * Object representation for a color.
+@@ -26,7 +29,7 @@ export function getDefaultColors( palette ) {
+ 	return palette
+ 		.map( ( { color } ) => ( {
+ 			color,
+-			brightness: tinycolor( color ).getBrightness() / 255,
++			brightness: colord( color ).brightness(),
+ 		} ) )
+ 		.reduce(
+ 			( [ min, max ], current ) => {

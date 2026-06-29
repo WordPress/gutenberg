@@ -1,0 +1,1758 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index aea6b4485259bd..92723fbf9b7c12 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   Upgrade `gradient-parser` to version `1.1.1` to support HSL/HSLA color, CSS variables, and `calc()` expressions ([#71186](https://github.com/WordPress/gutenberg/pull/71186)).
+ 
++### Internal
++
++-   Validated form controls: Add support for async validation. This is a breaking API change that splits the `customValidator` prop into an `onValidate` callback and a `customValidity` object. ([#71184](https://github.com/WordPress/gutenberg/pull/71184)).
++
+ ## 30.1.0 (2025-08-07)
+ 
+ ### Enhancement
+diff --git a/packages/components/src/validated-form-controls/components/checkbox-control.tsx b/packages/components/src/validated-form-controls/components/checkbox-control.tsx
+index b4f194e5830a23..e3e8ed17eb13a7 100644
+--- a/packages/components/src/validated-form-controls/components/checkbox-control.tsx
++++ b/packages/components/src/validated-form-controls/components/checkbox-control.tsx
+@@ -17,7 +17,8 @@ type Value = CheckboxControlProps[ 'checked' ];
+ const UnforwardedValidatedCheckboxControl = (
+ 	{
+ 		required,
+-		customValidator,
++		onValidate,
++		customValidity,
+ 		onChange,
+ 		markWhenOptional,
+ 		...restProps
+@@ -37,9 +38,10 @@ const UnforwardedValidatedCheckboxControl = (
+ 			required={ required }
+ 			markWhenOptional={ markWhenOptional }
+ 			ref={ mergedRefs }
+-			customValidator={ () => {
+-				return customValidator?.( valueRef.current );
++			onValidate={ () => {
++				return onValidate?.( valueRef.current );
+ 			} }
++			customValidity={ customValidity }
+ 			getValidityTarget={ () =>
+ 				validityTargetRef.current?.querySelector< HTMLInputElement >(
+ 					'input[type="checkbox"]'
+diff --git a/packages/components/src/validated-form-controls/components/combobox-control.tsx b/packages/components/src/validated-form-controls/components/combobox-control.tsx
+index fc2b43b6da15e6..e9c9bbb21d754c 100644
+--- a/packages/components/src/validated-form-controls/components/combobox-control.tsx
++++ b/packages/components/src/validated-form-controls/components/combobox-control.tsx
+@@ -17,7 +17,8 @@ type Value = ComboboxControlProps[ 'value' ];
+ const UnforwardedValidatedComboboxControl = (
+ 	{
+ 		required,
+-		customValidator,
++		onValidate,
++		customValidity,
+ 		onChange,
+ 		markWhenOptional,
+ 		...restProps
+@@ -50,9 +51,10 @@ const UnforwardedValidatedComboboxControl = (
+ 			required={ required }
+ 			markWhenOptional={ markWhenOptional }
+ 			ref={ mergedRefs }
+-			customValidator={ () => {
+-				return customValidator?.( valueRef.current );
++			onValidate={ () => {
++				return onValidate?.( valueRef.current );
+ 			} }
++			customValidity={ customValidity }
+ 			getValidityTarget={ () =>
+ 				validityTargetRef.current?.querySelector< HTMLInputElement >(
+ 					'input[role="combobox"]'
+diff --git a/packages/components/src/validated-form-controls/components/custom-select-control.tsx b/packages/components/src/validated-form-controls/components/custom-select-control.tsx
+index 641a98cb57c54b..813a7c15344c09 100644
+--- a/packages/components/src/validated-form-controls/components/custom-select-control.tsx
++++ b/packages/components/src/validated-form-controls/components/custom-select-control.tsx
+@@ -21,7 +21,8 @@ type Value = CustomSelectControlProps[ 'value' ];
+ const UnforwardedValidatedCustomSelectControl = (
+ 	{
+ 		required,
+-		customValidator,
++		onValidate,
++		customValidity,
+ 		onChange,
+ 		markWhenOptional,
+ 		...restProps
+@@ -43,9 +44,10 @@ const UnforwardedValidatedCustomSelectControl = (
+ 			<ControlWithError
+ 				required={ required }
+ 				markWhenOptional={ markWhenOptional }
+-				customValidator={ () => {
+-					return customValidator?.( valueRef.current );
++				onValidate={ () => {
++					return onValidate?.( valueRef.current );
+ 				} }
++				customValidity={ customValidity }
+ 				getValidityTarget={ () => validityTargetRef.current }
+ 			>
+ 				<CustomSelectControl
+diff --git a/packages/components/src/validated-form-controls/components/input-control.tsx b/packages/components/src/validated-form-controls/components/input-control.tsx
+index fa7d5d39320f2d..bd896bead85009 100644
+--- a/packages/components/src/validated-form-controls/components/input-control.tsx
++++ b/packages/components/src/validated-form-controls/components/input-control.tsx
+@@ -17,7 +17,8 @@ type Value = InputControlProps[ 'value' ];
+ const UnforwardedValidatedInputControl = (
+ 	{
+ 		required,
+-		customValidator,
++		onValidate,
++		customValidity,
+ 		onChange,
+ 		markWhenOptional,
+ 		...restProps
+@@ -36,9 +37,10 @@ const UnforwardedValidatedInputControl = (
+ 		<ControlWithError
+ 			required={ required }
+ 			markWhenOptional={ markWhenOptional }
+-			customValidator={ () => {
+-				return customValidator?.( valueRef.current );
++			onValidate={ () => {
++				return onValidate?.( valueRef.current );
+ 			} }
++			customValidity={ customValidity }
+ 			getValidityTarget={ () => validityTargetRef.current }
+ 		>
+ 			<InputControl
+diff --git a/packages/components/src/validated-form-controls/components/number-control.tsx b/packages/components/src/validated-form-controls/components/number-control.tsx
+index ddb1f78b07fbbb..be4fb210945972 100644
+--- a/packages/components/src/validated-form-controls/components/number-control.tsx
++++ b/packages/components/src/validated-form-controls/components/number-control.tsx
+@@ -17,7 +17,8 @@ type Value = NumberControlProps[ 'value' ];
+ const UnforwardedValidatedNumberControl = (
+ 	{
+ 		required,
+-		customValidator,
++		onValidate,
++		customValidity,
+ 		onChange,
+ 		markWhenOptional,
+ 		...restProps
+@@ -36,9 +37,10 @@ const UnforwardedValidatedNumberControl = (
+ 		<ControlWithError
+ 			required={ required }
+ 			markWhenOptional={ markWhenOptional }
+-			customValidator={ () => {
+-				return customValidator?.( valueRef.current );
++			onValidate={ () => {
++				return onValidate?.( valueRef.current );
+ 			} }
++			customValidity={ customValidity }
+ 			getValidityTarget={ () => validityTargetRef.current }
+ 		>
+ 			<NumberControl
+diff --git a/packages/components/src/validated-form-controls/components/radio-control.tsx b/packages/components/src/validated-form-controls/components/radio-control.tsx
+index 6d335c01ac3a59..6c0b443f6fd995 100644
+--- a/packages/components/src/validated-form-controls/components/radio-control.tsx
++++ b/packages/components/src/validated-form-controls/components/radio-control.tsx
+@@ -17,7 +17,8 @@ type Value = RadioControlProps[ 'selected' ];
+ const UnforwardedValidatedRadioControl = (
+ 	{
+ 		required,
+-		customValidator,
++		onValidate,
++		customValidity,
+ 		onChange,
+ 		markWhenOptional,
+ 		...restProps
+@@ -35,9 +36,10 @@ const UnforwardedValidatedRadioControl = (
+ 			markWhenOptional={ markWhenOptional }
+ 			// TODO: Upstream limitation - RadioControl does not accept a ref.
+ 			ref={ mergedRefs }
+-			customValidator={ () => {
+-				return customValidator?.( valueRef.current );
++			onValidate={ () => {
++				return onValidate?.( valueRef.current );
+ 			} }
++			customValidity={ customValidity }
+ 			getValidityTarget={ () =>
+ 				validityTargetRef.current?.querySelector< HTMLInputElement >(
+ 					'input[type="radio"]'
+diff --git a/packages/components/src/validated-form-controls/components/range-control.tsx b/packages/components/src/validated-form-controls/components/range-control.tsx
+index 2ad5b90539fc6b..04d1232bd780d6 100644
+--- a/packages/components/src/validated-form-controls/components/range-control.tsx
++++ b/packages/components/src/validated-form-controls/components/range-control.tsx
+@@ -17,7 +17,8 @@ type Value = RangeControlProps[ 'value' ];
+ const UnforwardedValidatedRangeControl = (
+ 	{
+ 		required,
+-		customValidator,
++		onValidate,
++		customValidity,
+ 		onChange,
+ 		markWhenOptional,
+ 		...restProps
+@@ -36,9 +37,10 @@ const UnforwardedValidatedRangeControl = (
+ 		<ControlWithError
+ 			required={ required }
+ 			markWhenOptional={ markWhenOptional }
+-			customValidator={ () => {
+-				return customValidator?.( valueRef.current );
++			onValidate={ () => {
++				return onValidate?.( valueRef.current );
+ 			} }
++			customValidity={ customValidity }
+ 			getValidityTarget={ () => validityTargetRef.current }
+ 		>
+ 			<RangeControl
+diff --git a/packages/components/src/validated-form-controls/components/select-control.tsx b/packages/components/src/validated-form-controls/components/select-control.tsx
+index faeb9164260174..8f7621d42fd9da 100644
+--- a/packages/components/src/validated-form-controls/components/select-control.tsx
++++ b/packages/components/src/validated-form-controls/components/select-control.tsx
+@@ -26,7 +26,8 @@ type Value = SelectControlProps[ 'value' ];
+ const UnforwardedValidatedSelectControl = (
+ 	{
+ 		required,
+-		customValidator,
++		onValidate,
++		customValidity,
+ 		onChange,
+ 		markWhenOptional,
+ 		...restProps
+@@ -51,9 +52,10 @@ const UnforwardedValidatedSelectControl = (
+ 		<ControlWithError
+ 			required={ required }
+ 			markWhenOptional={ markWhenOptional }
+-			customValidator={ () => {
+-				return customValidator?.( valueRef.current );
++			onValidate={ () => {
++				return onValidate?.( valueRef.current );
+ 			} }
++			customValidity={ customValidity }
+ 			getValidityTarget={ () => validityTargetRef.current }
+ 		>
+ 			<SelectControl
+diff --git a/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx
+index 1a88a2677f31d3..a11cd5f070eee8 100644
+--- a/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/checkbox-control.story.tsx
+@@ -32,6 +32,12 @@ export default meta;
+ export const Default: StoryObj< typeof ValidatedCheckboxControl > = {
+ 	render: function Template( { onChange, ...args } ) {
+ 		const [ checked, setChecked ] = useState( false );
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedCheckboxControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<ValidatedCheckboxControl
+@@ -41,6 +47,17 @@ export const Default: StoryObj< typeof ValidatedCheckboxControl > = {
+ 					setChecked( value );
+ 					onChange?.( value );
+ 				} }
++				onValidate={ ( value ) => {
++					if ( value ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message: 'This checkbox may not be checked.',
++						} );
++					} else {
++						setCustomValidity( undefined );
++					}
++				} }
++				customValidity={ customValidity }
+ 			/>
+ 		);
+ 	},
+@@ -49,10 +66,4 @@ Default.args = {
+ 	required: true,
+ 	label: 'Checkbox',
+ 	help: 'This checkbox may neither be checked nor unchecked.',
+-	customValidator: ( value ) => {
+-		if ( value ) {
+-			return 'This checkbox may not be checked.';
+-		}
+-		return undefined;
+-	},
+ };
+diff --git a/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx
+index 10af5060bd7f8e..c53b810737c363 100644
+--- a/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/combobox-control.story.tsx
+@@ -35,6 +35,12 @@ export const Default: StoryObj< typeof ValidatedComboboxControl > = {
+ 					typeof ValidatedComboboxControl
+ 				>[ 'value' ]
+ 			>();
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedComboboxControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<ValidatedComboboxControl
+@@ -44,6 +50,17 @@ export const Default: StoryObj< typeof ValidatedComboboxControl > = {
+ 					setValue( newValue );
+ 					onChange?.( newValue );
+ 				} }
++				onValidate={ ( v ) => {
++					if ( v === 'a' ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message: 'Option A is not allowed.',
++						} );
++					} else {
++						setCustomValidity( undefined );
++					}
++				} }
++				customValidity={ customValidity }
+ 			/>
+ 		);
+ 	},
+@@ -56,10 +73,4 @@ Default.args = {
+ 		{ value: 'a', label: 'Option A (not allowed)' },
+ 		{ value: 'b', label: 'Option B' },
+ 	],
+-	customValidator: ( value ) => {
+-		if ( value === 'a' ) {
+-			return 'Option A is not allowed.';
+-		}
+-		return undefined;
+-	},
+ };
+diff --git a/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx
+index d6d6ecf6d10d27..a8903d01ae2887 100644
+--- a/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/custom-select-control.story.tsx
+@@ -35,6 +35,12 @@ export const Default: StoryObj< typeof ValidatedCustomSelectControl > = {
+ 					typeof ValidatedCustomSelectControl
+ 				>[ 'value' ]
+ 			>();
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedCustomSelectControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<ValidatedCustomSelectControl
+@@ -44,6 +50,17 @@ export const Default: StoryObj< typeof ValidatedCustomSelectControl > = {
+ 					setValue( newValue.selectedItem );
+ 					onChange?.( newValue );
+ 				} }
++				onValidate={ ( v ) => {
++					if ( v?.key === 'a' ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message: 'Option A is not allowed.',
++						} );
++					} else {
++						setCustomValidity( undefined );
++					}
++				} }
++				customValidity={ customValidity }
+ 			/>
+ 		);
+ 	},
+@@ -56,10 +73,4 @@ Default.args = {
+ 		{ key: 'a', name: 'Option A (not allowed)' },
+ 		{ key: 'b', name: 'Option B' },
+ 	],
+-	customValidator: ( value ) => {
+-		if ( value?.key === 'a' ) {
+-			return 'Option A is not allowed.';
+-		}
+-		return undefined;
+-	},
+ };
+diff --git a/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx
+index 4f08e48d8e3748..2f1192266a1e2a 100644
+--- a/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/input-control.story.tsx
+@@ -46,6 +46,12 @@ export const Default: StoryObj< typeof ValidatedInputControl > = {
+ 			useState<
+ 				React.ComponentProps< typeof ValidatedInputControl >[ 'value' ]
+ 			>( '' );
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedInputControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<ValidatedInputControl
+@@ -55,6 +61,17 @@ export const Default: StoryObj< typeof ValidatedInputControl > = {
+ 					setValue( newValue );
+ 					onChange?.( newValue, ...rest );
+ 				} }
++				onValidate={ ( v ) => {
++					if ( v?.toLowerCase() === 'error' ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message: 'The word "error" is not allowed.',
++						} );
++					} else {
++						setCustomValidity( undefined );
++					}
++				} }
++				customValidity={ customValidity }
+ 			/>
+ 		);
+ 	},
+@@ -63,12 +80,6 @@ Default.args = {
+ 	required: true,
+ 	label: 'Input',
+ 	help: 'The word "error" will trigger an error.',
+-	customValidator: ( value ) => {
+-		if ( value?.toLowerCase() === 'error' ) {
+-			return 'The word "error" is not allowed.';
+-		}
+-		return undefined;
+-	},
+ };
+ 
+ /**
+@@ -83,6 +94,12 @@ export const Password: StoryObj< typeof ValidatedInputControl > = {
+ 				React.ComponentProps< typeof ValidatedInputControl >[ 'value' ]
+ 			>( '' );
+ 		const [ visible, setVisible ] = useState( false );
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedInputControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<ValidatedInputControl
+@@ -105,6 +122,34 @@ export const Password: StoryObj< typeof ValidatedInputControl > = {
+ 					setValue( newValue );
+ 					onChange?.( newValue, ...rest );
+ 				} }
++				onValidate={ ( v ) => {
++					if ( ! /\d/.test( v ?? '' ) ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message:
++								'Password must include at least one number.',
++						} );
++						return;
++					}
++					if ( ! /[A-Z]/.test( v ?? '' ) ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message:
++								'Password must include at least one capital letter.',
++						} );
++						return;
++					}
++					if ( ! /[!@£$%^&*#]/.test( v ?? '' ) ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message:
++								'Password must include at least one symbol.',
++						} );
++						return;
++					}
++					setCustomValidity( undefined );
++				} }
++				customValidity={ customValidity }
+ 			/>
+ 		);
+ 	},
+@@ -114,18 +159,6 @@ Password.args = {
+ 	label: 'Password',
+ 	help: 'Minimum 8 characters, include a number, capital letter, and symbol (!@£$%^&*#).',
+ 	minLength: 8,
+-	customValidator: ( value ) => {
+-		if ( ! /\d/.test( value ?? '' ) ) {
+-			return 'Password must include at least one number.';
+-		}
+-		if ( ! /[A-Z]/.test( value ?? '' ) ) {
+-			return 'Password must include at least one capital letter.';
+-		}
+-		if ( ! /[!@£$%^&*#]/.test( value ?? '' ) ) {
+-			return 'Password must include at least one symbol.';
+-		}
+-		return undefined;
+-	},
+ };
+ Password.argTypes = {
+ 	suffix: { control: false },
+diff --git a/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx
+index 3b28a7e4d86593..fcce7580e0a73f 100644
+--- a/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/number-control.story.tsx
+@@ -37,6 +37,12 @@ export const Default: StoryObj< typeof ValidatedNumberControl > = {
+ 			useState<
+ 				React.ComponentProps< typeof ValidatedNumberControl >[ 'value' ]
+ 			>();
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedNumberControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<ValidatedNumberControl
+@@ -46,6 +52,17 @@ export const Default: StoryObj< typeof ValidatedNumberControl > = {
+ 					setValue( newValue );
+ 					onChange?.( newValue, ...rest );
+ 				} }
++				onValidate={ ( v ) => {
++					if ( v && parseInt( v.toString(), 10 ) % 2 !== 0 ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message: 'Choose an even number.',
++						} );
++					} else {
++						setCustomValidity( undefined );
++					}
++				} }
++				customValidity={ customValidity }
+ 			/>
+ 		);
+ 	},
+@@ -54,10 +71,4 @@ Default.args = {
+ 	required: true,
+ 	label: 'Number',
+ 	help: 'Odd numbers are not allowed.',
+-	customValidator: ( value ) => {
+-		if ( value && parseInt( value.toString(), 10 ) % 2 !== 0 ) {
+-			return 'Choose an even number.';
+-		}
+-		return undefined;
+-	},
+ };
+diff --git a/packages/components/src/validated-form-controls/components/stories/overview.mdx b/packages/components/src/validated-form-controls/components/stories/overview.mdx
+index 19666fd44895d0..bd342688c1edf0 100644
+--- a/packages/components/src/validated-form-controls/components/stories/overview.mdx
++++ b/packages/components/src/validated-form-controls/components/stories/overview.mdx
+@@ -16,7 +16,7 @@ We are still gathering feedback and iterating. Please get in touch with `@WordPr
+ 
+ Component APIs are the same as the underlying WordPress components, with the addition of some optional props:
+ 
+-<ArgTypes of={ ValidatedInputControl } include={ [ 'required', 'markWhenOptional', 'customValidator' ] } />
++<ArgTypes of={ ValidatedInputControl } include={ [ 'required', 'markWhenOptional', 'onValidate', 'customValidity' ] } />
+ 
+ ## Implementation
+ 
+diff --git a/packages/components/src/validated-form-controls/components/stories/overview.story.tsx b/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
+index 4b7dcccc8ae4d4..6f5e9ac174167c 100644
+--- a/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/overview.story.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useState } from '@wordpress/element';
++import { useRef, useCallback, useState } from '@wordpress/element';
+ 
+ /**
+  * External dependencies
+@@ -14,6 +14,7 @@ import type { Meta, StoryObj } from '@storybook/react';
+ import { ValidatedInputControl } from '..';
+ import { formDecorator } from './story-utils';
+ import type { ControlWithError } from '../../control-with-error';
++import { debounce } from '@wordpress/compose';
+ 
+ const meta: Meta< typeof ControlWithError > = {
+ 	title: 'Components/Selection & Input/Validated Form Controls/Overview',
+@@ -32,6 +33,18 @@ export const WithMultipleControls: Story = {
+ 	render: function Template() {
+ 		const [ text, setText ] = useState( '' );
+ 		const [ text2, setText2 ] = useState( '' );
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedInputControl
++				>[ 'customValidity' ]
++			>( undefined );
++		const [ customValidity2, setCustomValidity2 ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedInputControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<>
+@@ -40,12 +53,17 @@ export const WithMultipleControls: Story = {
+ 					required
+ 					value={ text }
+ 					help="The word 'error' will trigger an error."
+-					customValidator={ ( value ) => {
++					onValidate={ ( value ) => {
+ 						if ( value?.toLowerCase() === 'error' ) {
+-							return 'The word "error" is not allowed.';
++							setCustomValidity( {
++								type: 'invalid',
++								message: 'The word "error" is not allowed.',
++							} );
++						} else {
++							setCustomValidity( undefined );
+ 						}
+-						return undefined;
+ 					} }
++					customValidity={ customValidity }
+ 					onChange={ ( value ) => setText( value ?? '' ) }
+ 				/>
+ 				<ValidatedInputControl
+@@ -53,13 +71,18 @@ export const WithMultipleControls: Story = {
+ 					required
+ 					value={ text2 }
+ 					help="The word 'error' will trigger an error."
+-					customValidator={ ( value ) => {
++					onValidate={ ( value ) => {
+ 						if ( value?.toLowerCase() === 'error' ) {
+-							return 'The word "error" is not allowed.';
++							setCustomValidity2( {
++								type: 'invalid',
++								message: 'The word "error" is not allowed.',
++							} );
++						} else {
++							setCustomValidity2( undefined );
+ 						}
+-						return undefined;
+ 					} }
+ 					onChange={ ( value ) => setText2( value ?? '' ) }
++					customValidity={ customValidity2 }
+ 				/>
+ 			</>
+ 		);
+@@ -73,7 +96,12 @@ export const WithMultipleControls: Story = {
+ export const WithHelpTextReplacement: Story = {
+ 	render: function Template() {
+ 		const [ text, setText ] = useState( '' );
+-		const [ hasCustomError, setHasCustomError ] = useState( false );
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedInputControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<ValidatedInputControl
+@@ -81,20 +109,100 @@ export const WithHelpTextReplacement: Story = {
+ 				required
+ 				value={ text }
+ 				help={
+-					hasCustomError
++					customValidity
+ 						? undefined
+ 						: 'The word "error" is not allowed.'
+ 				}
+-				customValidator={ ( value ) => {
++				onValidate={ ( value ) => {
+ 					if ( value?.toLowerCase() === 'error' ) {
+-						setHasCustomError( true );
+-						return 'The word "error" is not allowed.';
++						setCustomValidity( {
++							type: 'invalid',
++							message: 'The word "error" is not allowed.',
++						} );
++					} else {
++						setCustomValidity( undefined );
+ 					}
+-					setHasCustomError( false );
+-					return undefined;
+ 				} }
+ 				onChange={ ( value ) => setText( value ?? '' ) }
++				customValidity={ customValidity }
+ 			/>
+ 		);
+ 	},
+ };
++
++/**
++ * To provide feedback from server-side validation, the `customValidity` prop can be used
++ * to show additional status indicators while waiting for the server response,
++ * and after the response is received.
++ *
++ * These indicators are intended for asynchronous validation calls that may take more than 1 second to complete.
++ * They may be unnecessary when responses are generally quick.
++ */
++export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
++	render: function Template( { ...args } ) {
++		const [ text, setText ] = useState( '' );
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedInputControl
++				>[ 'customValidity' ]
++			>( undefined );
++
++		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
++		const previousValidationValueRef = useRef< unknown >( '' );
++
++		// eslint-disable-next-line react-hooks/exhaustive-deps
++		const debouncedValidate = useCallback(
++			debounce( ( v ) => {
++				if ( v === previousValidationValueRef.current ) {
++					return;
++				}
++
++				previousValidationValueRef.current = v;
++
++				setCustomValidity( {
++					type: 'validating',
++					message: 'Validating...',
++				} );
++
++				clearTimeout( timeoutRef.current );
++				timeoutRef.current = setTimeout(
++					() => {
++						if ( v?.toString().toLowerCase() === 'error' ) {
++							setCustomValidity( {
++								type: 'invalid',
++								message: 'The word "error" is not allowed.',
++							} );
++						} else {
++							setCustomValidity( {
++								type: 'valid',
++								message: 'Validated',
++							} );
++						}
++					},
++					// Mimics a random server response time.
++					// eslint-disable-next-line no-restricted-syntax
++					Math.random() < 0.5 ? 1500 : 300
++				);
++			}, 500 ),
++			[]
++		);
++
++		return (
++			<ValidatedInputControl
++				{ ...args }
++				value={ text }
++				onChange={ ( newValue ) => {
++					setText( newValue ?? '' );
++				} }
++				onValidate={ debouncedValidate }
++				customValidity={ customValidity }
++			/>
++		);
++	},
++};
++AsyncValidation.args = {
++	label: 'Text',
++	help: 'The word "error" will trigger an error asynchronously.',
++	required: true,
++};
+diff --git a/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx
+index 5f38d32a1d7c39..fafcedc5c6de36 100644
+--- a/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/radio-control.story.tsx
+@@ -35,6 +35,12 @@ export const Default: StoryObj< typeof ValidatedRadioControl > = {
+ 					typeof ValidatedRadioControl
+ 				>[ 'selected' ]
+ 			>();
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedRadioControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<ValidatedRadioControl
+@@ -44,6 +50,17 @@ export const Default: StoryObj< typeof ValidatedRadioControl > = {
+ 					setSelected( value );
+ 					onChange?.( value );
+ 				} }
++				onValidate={ ( v ) => {
++					if ( v === 'b' ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message: 'Option B is not allowed.',
++						} );
++					} else {
++						setCustomValidity( undefined );
++					}
++				} }
++				customValidity={ customValidity }
+ 			/>
+ 		);
+ 	},
+@@ -56,10 +73,4 @@ Default.args = {
+ 		{ label: 'Option A', value: 'a' },
+ 		{ label: 'Option B (not allowed)', value: 'b' },
+ 	],
+-	customValidator: ( value ) => {
+-		if ( value === 'b' ) {
+-			return 'Option B is not allowed.';
+-		}
+-		return undefined;
+-	},
+ };
+diff --git a/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx
+index 296541475412db..62030ad0bc091a 100644
+--- a/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/range-control.story.tsx
+@@ -33,6 +33,12 @@ export const Default: StoryObj< typeof ValidatedRangeControl > = {
+ 			useState<
+ 				React.ComponentProps< typeof ValidatedRangeControl >[ 'value' ]
+ 			>();
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedRangeControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<ValidatedRangeControl
+@@ -42,6 +48,17 @@ export const Default: StoryObj< typeof ValidatedRangeControl > = {
+ 					setValue( newValue );
+ 					onChange?.( newValue );
+ 				} }
++				onValidate={ ( v ) => {
++					if ( v && v % 2 !== 0 ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message: 'Choose an even number.',
++						} );
++					} else {
++						setCustomValidity( undefined );
++					}
++				} }
++				customValidity={ customValidity }
+ 			/>
+ 		);
+ 	},
+@@ -52,10 +69,4 @@ Default.args = {
+ 	help: 'Odd numbers are not allowed.',
+ 	min: 0,
+ 	max: 20,
+-	customValidator: ( value ) => {
+-		if ( value && value % 2 !== 0 ) {
+-			return 'Choose an even number.';
+-		}
+-		return undefined;
+-	},
+ };
+diff --git a/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx
+index b8d6d434e01b5c..f59b332924eb60 100644
+--- a/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/select-control.story.tsx
+@@ -30,6 +30,12 @@ export default meta;
+ export const Default: StoryObj< typeof ValidatedSelectControl > = {
+ 	render: function Template( { onChange, ...args } ) {
+ 		const [ value, setValue ] = useState( '' );
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedSelectControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<ValidatedSelectControl
+@@ -39,6 +45,17 @@ export const Default: StoryObj< typeof ValidatedSelectControl > = {
+ 					setValue( newValue );
+ 					onChange?.( newValue );
+ 				} }
++				onValidate={ ( v ) => {
++					if ( v === '1' ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message: 'Option 1 is not allowed.',
++						} );
++					} else {
++						setCustomValidity( undefined );
++					}
++				} }
++				customValidity={ customValidity }
+ 			/>
+ 		);
+ 	},
+@@ -52,10 +69,4 @@ Default.args = {
+ 		{ value: '1', label: 'Option 1 (not allowed)' },
+ 		{ value: '2', label: 'Option 2' },
+ 	],
+-	customValidator: ( value ) => {
+-		if ( value === '1' ) {
+-			return 'Option 1 is not allowed.';
+-		}
+-		return undefined;
+-	},
+ };
+diff --git a/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx
+index c8f5ab3c0e68cf..363f1b49c9a177 100644
+--- a/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/text-control.story.tsx
+@@ -30,6 +30,12 @@ export default meta;
+ export const Default: StoryObj< typeof ValidatedTextControl > = {
+ 	render: function Template( { onChange, ...args } ) {
+ 		const [ value, setValue ] = useState( '' );
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedTextControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<ValidatedTextControl
+@@ -39,6 +45,17 @@ export const Default: StoryObj< typeof ValidatedTextControl > = {
+ 					setValue( newValue );
+ 					onChange?.( newValue );
+ 				} }
++				onValidate={ ( v ) => {
++					if ( v?.toString().toLowerCase() === 'error' ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message: 'The word "error" is not allowed.',
++						} );
++					} else {
++						setCustomValidity( undefined );
++					}
++				} }
++				customValidity={ customValidity }
+ 			/>
+ 		);
+ 	},
+@@ -47,10 +64,4 @@ Default.args = {
+ 	required: true,
+ 	label: 'Text',
+ 	help: "The word 'error' will trigger an error.",
+-	customValidator: ( value ) => {
+-		if ( value?.toString().toLowerCase() === 'error' ) {
+-			return 'The word "error" is not allowed.';
+-		}
+-		return undefined;
+-	},
+ };
+diff --git a/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx
+index 7800286762fe74..ca7f5045504070 100644
+--- a/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/textarea-control.story.tsx
+@@ -27,6 +27,12 @@ export default meta;
+ export const Default: StoryObj< typeof ValidatedTextareaControl > = {
+ 	render: function Template( { onChange, ...args } ) {
+ 		const [ value, setValue ] = useState( '' );
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedTextareaControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<ValidatedTextareaControl
+@@ -36,6 +42,17 @@ export const Default: StoryObj< typeof ValidatedTextareaControl > = {
+ 					onChange?.( newValue );
+ 				} }
+ 				value={ value }
++				onValidate={ ( v ) => {
++					if ( v?.toLowerCase() === 'error' ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message: 'The word "error" is not allowed.',
++						} );
++					} else {
++						setCustomValidity( undefined );
++					}
++				} }
++				customValidity={ customValidity }
+ 			/>
+ 		);
+ 	},
+@@ -44,10 +61,4 @@ Default.args = {
+ 	required: true,
+ 	label: 'Textarea',
+ 	help: 'The word "error" will trigger an error.',
+-	customValidator: ( value ) => {
+-		if ( value?.toLowerCase() === 'error' ) {
+-			return 'The word "error" is not allowed.';
+-		}
+-		return undefined;
+-	},
+ };
+diff --git a/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx
+index f38885785a4ae9..3d983219fdb575 100644
+--- a/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/toggle-control.story.tsx
+@@ -30,6 +30,12 @@ export default meta;
+ export const Default: StoryObj< typeof ValidatedToggleControl > = {
+ 	render: function Template( { onChange, ...args } ) {
+ 		const [ checked, setChecked ] = useState( false );
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedToggleControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<ValidatedToggleControl
+@@ -39,6 +45,17 @@ export const Default: StoryObj< typeof ValidatedToggleControl > = {
+ 					setChecked( value );
+ 					onChange?.( value );
+ 				} }
++				onValidate={ ( v ) => {
++					if ( v ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message: 'This toggle may not be enabled.',
++						} );
++					} else {
++						setCustomValidity( undefined );
++					}
++				} }
++				customValidity={ customValidity }
+ 			/>
+ 		);
+ 	},
+@@ -47,10 +64,4 @@ Default.args = {
+ 	required: true,
+ 	label: 'Toggle',
+ 	help: 'This toggle may neither be enabled nor disabled.',
+-	customValidator: ( value ) => {
+-		if ( value ) {
+-			return 'This toggle may not be enabled.';
+-		}
+-		return undefined;
+-	},
+ };
+diff --git a/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx b/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx
+index 0021207eb2011e..54831b6f2e6bad 100644
+--- a/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx
++++ b/packages/components/src/validated-form-controls/components/stories/toggle-group-control.story.tsx
+@@ -36,6 +36,12 @@ export const Default: StoryObj< typeof ValidatedToggleGroupControl > = {
+ 					typeof ValidatedToggleGroupControl
+ 				>[ 'value' ]
+ 			>( '1' );
++		const [ customValidity, setCustomValidity ] =
++			useState<
++				React.ComponentProps<
++					typeof ValidatedToggleGroupControl
++				>[ 'customValidity' ]
++			>( undefined );
+ 
+ 		return (
+ 			<ValidatedToggleGroupControl
+@@ -45,6 +51,17 @@ export const Default: StoryObj< typeof ValidatedToggleGroupControl > = {
+ 					setValue( newValue );
+ 					onChange?.( newValue );
+ 				} }
++				onValidate={ ( v ) => {
++					if ( v === '2' ) {
++						setCustomValidity( {
++							type: 'invalid',
++							message: 'Option 2 is not allowed.',
++						} );
++					} else {
++						setCustomValidity( undefined );
++					}
++				} }
++				customValidity={ customValidity }
+ 			/>
+ 		);
+ 	},
+@@ -58,10 +75,4 @@ Default.args = {
+ 		<ToggleGroupControlOption value="2" key="2" label="Option 2" />,
+ 	],
+ 	help: 'Selecting option 2 will trigger an error.',
+-	customValidator: ( value ) => {
+-		if ( value === '2' ) {
+-			return 'Option 2 is not allowed.';
+-		}
+-		return undefined;
+-	},
+ };
+diff --git a/packages/components/src/validated-form-controls/components/text-control.tsx b/packages/components/src/validated-form-controls/components/text-control.tsx
+index 853a671055d7b6..ba180e011e08ed 100644
+--- a/packages/components/src/validated-form-controls/components/text-control.tsx
++++ b/packages/components/src/validated-form-controls/components/text-control.tsx
+@@ -17,7 +17,8 @@ type Value = TextControlProps[ 'value' ];
+ const UnforwardedValidatedTextControl = (
+ 	{
+ 		required,
+-		customValidator,
++		onValidate,
++		customValidity,
+ 		onChange,
+ 		markWhenOptional,
+ 		...restProps
+@@ -36,9 +37,10 @@ const UnforwardedValidatedTextControl = (
+ 		<ControlWithError
+ 			required={ required }
+ 			markWhenOptional={ markWhenOptional }
+-			customValidator={ () => {
+-				return customValidator?.( valueRef.current );
++			onValidate={ () => {
++				return onValidate?.( valueRef.current );
+ 			} }
++			customValidity={ customValidity }
+ 			getValidityTarget={ () => validityTargetRef.current }
+ 		>
+ 			<TextControl
+diff --git a/packages/components/src/validated-form-controls/components/textarea-control.tsx b/packages/components/src/validated-form-controls/components/textarea-control.tsx
+index c874e4b55b9d15..02811541a5eea6 100644
+--- a/packages/components/src/validated-form-controls/components/textarea-control.tsx
++++ b/packages/components/src/validated-form-controls/components/textarea-control.tsx
+@@ -17,7 +17,8 @@ type Value = TextareaControlProps[ 'value' ];
+ const UnforwardedValidatedTextareaControl = (
+ 	{
+ 		required,
+-		customValidator,
++		onValidate,
++		customValidity,
+ 		onChange,
+ 		markWhenOptional,
+ 		...restProps
+@@ -36,9 +37,10 @@ const UnforwardedValidatedTextareaControl = (
+ 		<ControlWithError
+ 			required={ required }
+ 			markWhenOptional={ markWhenOptional }
+-			customValidator={ () => {
+-				return customValidator?.( valueRef.current );
++			onValidate={ () => {
++				return onValidate?.( valueRef.current );
+ 			} }
++			customValidity={ customValidity }
+ 			getValidityTarget={ () => validityTargetRef.current }
+ 		>
+ 			<TextareaControl
+diff --git a/packages/components/src/validated-form-controls/components/toggle-control.tsx b/packages/components/src/validated-form-controls/components/toggle-control.tsx
+index 802e49d5465a93..2a6db6507c8ee2 100644
+--- a/packages/components/src/validated-form-controls/components/toggle-control.tsx
++++ b/packages/components/src/validated-form-controls/components/toggle-control.tsx
+@@ -19,7 +19,8 @@ type Value = ToggleControlProps[ 'checked' ];
+ const UnforwardedValidatedToggleControl = (
+ 	{
+ 		required,
+-		customValidator,
++		onValidate,
++		customValidity,
+ 		onChange,
+ 		markWhenOptional,
+ 		...restProps
+@@ -46,9 +47,10 @@ const UnforwardedValidatedToggleControl = (
+ 		<ControlWithError
+ 			required={ required }
+ 			markWhenOptional={ markWhenOptional }
+-			customValidator={ () => {
+-				return customValidator?.( valueRef.current );
++			onValidate={ () => {
++				return onValidate?.( valueRef.current );
+ 			} }
++			customValidity={ customValidity }
+ 			getValidityTarget={ () => validityTargetRef.current }
+ 		>
+ 			<ToggleControl
+diff --git a/packages/components/src/validated-form-controls/components/toggle-group-control.tsx b/packages/components/src/validated-form-controls/components/toggle-group-control.tsx
+index 16feee33830ea3..35d550fc5ab6e7 100644
+--- a/packages/components/src/validated-form-controls/components/toggle-group-control.tsx
++++ b/packages/components/src/validated-form-controls/components/toggle-group-control.tsx
+@@ -16,7 +16,8 @@ type Value = ToggleGroupControlProps[ 'value' ];
+ const UnforwardedValidatedToggleGroupControl = (
+ 	{
+ 		required,
+-		customValidator,
++		onValidate,
++		customValidity,
+ 		onChange,
+ 		markWhenOptional,
+ 		...restProps
+@@ -37,9 +38,10 @@ const UnforwardedValidatedToggleGroupControl = (
+ 			<ControlWithError
+ 				required={ required }
+ 				markWhenOptional={ markWhenOptional }
+-				customValidator={ () => {
+-					return customValidator?.( valueRef.current );
++				onValidate={ () => {
++					return onValidate?.( valueRef.current );
+ 				} }
++				customValidity={ customValidity }
+ 				getValidityTarget={ () => validityTargetRef.current }
+ 			>
+ 				<ToggleGroupControl
+diff --git a/packages/components/src/validated-form-controls/components/types.ts b/packages/components/src/validated-form-controls/components/types.ts
+index 83483bb8438cd1..b8482a84997826 100644
+--- a/packages/components/src/validated-form-controls/components/types.ts
++++ b/packages/components/src/validated-form-controls/components/types.ts
+@@ -10,19 +10,28 @@ export type ValidatedControlProps< V > = {
+ 	 */
+ 	markWhenOptional?: boolean;
+ 	/**
+-	 * A function that returns a custom validity message when applicable. This error message will be applied to the
+-	 * underlying element using the native [`setCustomValidity()` method](https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/setCustomValidity).
+-	 * This means the custom validator will be run _in addition_ to any other HTML attribute-based validation, and
+-	 * will be prioritized over any existing validity messages dictated by the HTML attributes.
+-	 * An empty string or `undefined` return value will clear any existing custom validity message.
++	 * Optional callback to run when the input should be validated. Use this to set
++	 * a `customValidity` as necessary.
+ 	 *
+-	 * Make sure you don't programatically pass a value (such as an initial value) to the control component
+-	 * that fails this validator, because the validator will only run for user-initiated changes.
++	 * Always prefer using standard HTML attributes like `required` and `min`/`max` over
++	 * custom validators when possible, as they are simpler and have localized error messages built in.
++	 */
++	onValidate?: ( currentValue: V ) => void;
++	/**
++	 * Show a custom message based on the validation status.
+ 	 *
+-	 * Always prefer using standard HTML attributes like `required` and `min`/`max` over custom validators
+-	 * when possible, as they are simpler and have localized error messages built in.
++	 * - When `type` is `invalid`, the message will be applied to the underlying element using the
++	 * native [`setCustomValidity()` method](https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/setCustomValidity).
++	 * This means the custom message will be prioritized over any existing validity messages
++	 * triggered by HTML attribute-based validation.
++	 * - When `type` is `validating` or `valid`, the custom validity message of the underlying element
++	 * will be cleared. If there are no remaining validity messages triggered by HTML attribute-based validation,
++	 * the message will be presented as a status indicator rather than an error. These indicators are intended
++	 * for asynchronous validation calls that may take more than 1 second to complete.
++	 * Otherwise, custom errors can simply be cleared by setting the `customValidity` prop to `undefined`.
+ 	 */
+-	// TODO: Technically, we could add an optional `customValidity` string prop so the consumer can set
+-	// an error message at any point in time. We should wait until we have a use case though.
+-	customValidator?: ( currentValue: V ) => string | void;
++	customValidity?: {
++		type: 'validating' | 'valid' | 'invalid';
++		message: string;
++	};
+ };
+diff --git a/packages/components/src/validated-form-controls/control-with-error.tsx b/packages/components/src/validated-form-controls/control-with-error.tsx
+index 925b9f66119ec2..aa6027a74c9edc 100644
+--- a/packages/components/src/validated-form-controls/control-with-error.tsx
++++ b/packages/components/src/validated-form-controls/control-with-error.tsx
+@@ -2,7 +2,6 @@
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { error } from '@wordpress/icons';
+ 
+ /**
+  * External dependencies
+@@ -18,8 +17,8 @@ import {
+  * Internal dependencies
+  */
+ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+-
+-import Icon from '../icon';
++import type { ValidatedControlProps } from './components/types';
++import { ValidityIndicator } from './validity-indicator';
+ 
+ function appendRequiredIndicator(
+ 	label: React.ReactNode,
+@@ -61,7 +60,8 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 	{
+ 		required,
+ 		markWhenOptional,
+-		customValidator,
++		onValidate,
++		customValidity,
+ 		getValidityTarget,
+ 		children,
+ 	}: {
+@@ -74,12 +74,10 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		 */
+ 		markWhenOptional?: boolean;
+ 		/**
+-		 * A function that returns a custom validity message when applicable.
+-		 *
+-		 * This message will be applied to the element returned by `getValidityTarget`.
+-		 * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLObjectElement/setCustomValidity
++		 * The callback to run when the input should be validated.
+ 		 */
+-		customValidator?: () => string | void;
++		onValidate?: () => void;
++		customValidity?: ValidatedControlProps< unknown >[ 'customValidity' ];
+ 		/**
+ 		 * A function that returns the actual element on which the validity data should be applied.
+ 		 */
+@@ -92,6 +90,13 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 	forwardedRef: React.ForwardedRef< HTMLDivElement >
+ ) {
+ 	const [ errorMessage, setErrorMessage ] = useState< string | undefined >();
++	const [ statusMessage, setStatusMessage ] = useState<
++		| {
++				type: 'validating' | 'valid';
++				message?: string;
++		  }
++		| undefined
++	>();
+ 	const [ isTouched, setIsTouched ] = useState( false );
+ 
+ 	// Ensure that error messages are visible after user attemps to submit a form
+@@ -111,13 +116,58 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		};
+ 	} );
+ 
+-	const validate = () => {
+-		const message = customValidator?.();
++	useEffect( () => {
++		if ( ! isTouched ) {
++			return;
++		}
++
+ 		const validityTarget = getValidityTarget();
+ 
+-		validityTarget?.setCustomValidity( message ?? '' );
+-		setErrorMessage( validityTarget?.validationMessage );
+-	};
++		if ( ! customValidity?.type ) {
++			validityTarget?.setCustomValidity( '' );
++			setErrorMessage( validityTarget?.validationMessage );
++			setStatusMessage( undefined );
++			return;
++		}
++
++		switch ( customValidity.type ) {
++			case 'validating': {
++				// Wait before showing a validating state.
++				const timer = setTimeout( () => {
++					setStatusMessage( {
++						type: 'validating',
++						message: customValidity.message,
++					} );
++				}, 1000 );
++
++				return () => clearTimeout( timer );
++			}
++			case 'valid': {
++				validityTarget?.setCustomValidity( '' );
++				setErrorMessage( validityTarget?.validationMessage );
++
++				setStatusMessage( {
++					type: 'valid',
++					message: customValidity.message,
++				} );
++				return;
++			}
++			case 'invalid': {
++				validityTarget?.setCustomValidity(
++					customValidity.message ?? ''
++				);
++				setErrorMessage( validityTarget?.validationMessage );
++
++				setStatusMessage( undefined );
++				return undefined;
++			}
++		}
++	}, [
++		isTouched,
++		customValidity?.type,
++		customValidity?.message,
++		getValidityTarget,
++	] );
+ 
+ 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
+ 		// Only consider "blurred from the component" if focus has fully left the wrapping div.
+@@ -138,7 +188,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 				return;
+ 			}
+ 
+-			validate();
++			onValidate?.();
+ 		}
+ 	};
+ 
+@@ -148,7 +198,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		// Only validate incrementally if the field has blurred at least once,
+ 		// or currently has an error message.
+ 		if ( isTouched || errorMessage ) {
+-			validate();
++			onValidate?.();
+ 		}
+ 	};
+ 
+@@ -156,7 +206,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		// Ensures that custom validators are triggered when the user submits by pressing Enter,
+ 		// without ever blurring the control.
+ 		if ( event.key === 'Enter' ) {
+-			validate();
++			onValidate?.();
+ 		}
+ 	};
+ 
+@@ -180,15 +230,16 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 			} ) }
+ 			<div aria-live="polite">
+ 				{ errorMessage && (
+-					<p className="components-validated-control__error">
+-						<Icon
+-							className="components-validated-control__error-icon"
+-							icon={ error }
+-							size={ 16 }
+-							fill="currentColor"
+-						/>
+-						{ errorMessage }
+-					</p>
++					<ValidityIndicator
++						type="invalid"
++						message={ errorMessage }
++					/>
++				) }
++				{ ! errorMessage && statusMessage && (
++					<ValidityIndicator
++						type={ statusMessage.type }
++						message={ statusMessage.message }
++					/>
+ 				) }
+ 			</div>
+ 		</div>
+diff --git a/packages/components/src/validated-form-controls/style.scss b/packages/components/src/validated-form-controls/style.scss
+index 1067ab8092b1e1..ecd5058f9130fb 100644
+--- a/packages/components/src/validated-form-controls/style.scss
++++ b/packages/components/src/validated-form-controls/style.scss
+@@ -45,7 +45,7 @@
+ 	pointer-events: none;
+ }
+ 
+-.components-validated-control__error {
++.components-validated-control__indicator {
+ 	display: flex;
+ 	align-items: flex-start;
+ 	gap: 4px;
+@@ -53,17 +53,31 @@
+ 	font-family: $font-family-body;
+ 	font-size: 0.75rem;
+ 	line-height: 16px; // matches the icon size
+-	color: $alert-red;
++	color: $components-color-gray-700;
+ 	animation:
+-		components-validated-control__error-jump 0.2s
++		components-validated-control__indicator-jump 0.2s
+ 		cubic-bezier(0.68, -0.55, 0.27, 1.55);
++
++	&.is-invalid {
++		color: $alert-red;
++	}
++
++	&.is-valid {
++		color: color-mix(in srgb, $black 30%, $alert-green);
++	}
+ }
+ 
+-.components-validated-control__error-icon {
++.components-validated-control__indicator-icon {
+ 	flex-shrink: 0;
+ }
+ 
+-@keyframes components-validated-control__error-jump {
++.components-validated-control__indicator-spinner {
++	margin: 2px;
++	width: $grid-unit-15;
++	height: $grid-unit-15;
++}
++
++@keyframes components-validated-control__indicator-jump {
+ 	0% {
+ 		transform: translateY(-4px);
+ 		opacity: 0;
+diff --git a/packages/components/src/validated-form-controls/validity-indicator.tsx b/packages/components/src/validated-form-controls/validity-indicator.tsx
+new file mode 100644
+index 00000000000000..39fcad129814a7
+--- /dev/null
++++ b/packages/components/src/validated-form-controls/validity-indicator.tsx
+@@ -0,0 +1,48 @@
++/**
++ * External dependencies
++ */
++import clsx from 'clsx';
++
++/**
++ * WordPress dependencies
++ */
++import { error, published } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import Icon from '../icon';
++import Spinner from '../spinner';
++
++export function ValidityIndicator( {
++	type,
++	message,
++}: {
++	type: 'validating' | 'valid' | 'invalid';
++	message?: string;
++} ) {
++	const ICON = {
++		valid: published,
++		invalid: error,
++	};
++	return (
++		<p
++			className={ clsx(
++				'components-validated-control__indicator',
++				`is-${ type }`
++			) }
++		>
++			{ type === 'validating' ? (
++				<Spinner className="components-validated-control__indicator-spinner" />
++			) : (
++				<Icon
++					className="components-validated-control__indicator-icon"
++					icon={ ICON[ type ] }
++					size={ 16 }
++					fill="currentColor"
++				/>
++			) }
++			{ message }
++		</p>
++	);
++}
+diff --git a/packages/dataviews/src/dataform-controls/boolean.tsx b/packages/dataviews/src/dataform-controls/boolean.tsx
+index 5483bd0df67f97..6baf9c4d45dc27 100644
+--- a/packages/dataviews/src/dataform-controls/boolean.tsx
++++ b/packages/dataviews/src/dataform-controls/boolean.tsx
+@@ -2,6 +2,7 @@
+  * WordPress dependencies
+  */
+ import { privateApis } from '@wordpress/components';
++import { useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -18,23 +19,36 @@ export default function Boolean< Item >( {
+ 	hideLabelFromVision,
+ }: DataFormControlProps< Item > ) {
+ 	const { id, getValue, label } = field;
++	const [ customValidity, setCustomValidity ] =
++		useState<
++			React.ComponentProps<
++				typeof ValidatedToggleControl
++			>[ 'customValidity' ]
++		>( undefined );
+ 
+ 	return (
+ 		<ValidatedToggleControl
+ 			required={ !! field.isValid.required }
+-			customValidator={ ( newValue: any ) => {
+-				if ( field.isValid?.custom ) {
+-					return field.isValid.custom(
+-						{
+-							...data,
+-							[ id ]: newValue,
+-						},
+-						field
+-					);
++			onValidate={ ( newValue: any ) => {
++				const message = field.isValid?.custom?.(
++					{
++						...data,
++						[ id ]: newValue,
++					},
++					field
++				);
++
++				if ( message ) {
++					setCustomValidity( {
++						type: 'invalid',
++						message,
++					} );
++					return;
+ 				}
+ 
+-				return null;
++				setCustomValidity( undefined );
+ 			} }
++			customValidity={ customValidity }
+ 			hidden={ hideLabelFromVision }
+ 			__nextHasNoMarginBottom
+ 			label={ label }
+diff --git a/packages/dataviews/src/dataform-controls/email.tsx b/packages/dataviews/src/dataform-controls/email.tsx
+index 431dd27e32f09d..3c222f2a6a51c4 100644
+--- a/packages/dataviews/src/dataform-controls/email.tsx
++++ b/packages/dataviews/src/dataform-controls/email.tsx
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { privateApis } from '@wordpress/components';
+-import { useCallback } from '@wordpress/element';
++import { useCallback, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -20,6 +20,12 @@ export default function Email< Item >( {
+ }: DataFormControlProps< Item > ) {
+ 	const { id, label, placeholder, description } = field;
+ 	const value = field.getValue( { item: data } );
++	const [ customValidity, setCustomValidity ] =
++		useState<
++			React.ComponentProps<
++				typeof ValidatedTextControl
++			>[ 'customValidity' ]
++		>( undefined );
+ 
+ 	const onChangeControl = useCallback(
+ 		( newValue: string ) =>
+@@ -32,19 +38,26 @@ export default function Email< Item >( {
+ 	return (
+ 		<ValidatedTextControl
+ 			required={ !! field.isValid?.required }
+-			customValidator={ ( newValue: any ) => {
+-				if ( field.isValid?.custom ) {
+-					return field.isValid.custom(
+-						{
+-							...data,
+-							[ id ]: newValue,
+-						},
+-						field
+-					);
++			onValidate={ ( newValue: any ) => {
++				const message = field.isValid?.custom?.(
++					{
++						...data,
++						[ id ]: newValue,
++					},
++					field
++				);
++
++				if ( message ) {
++					setCustomValidity( {
++						type: 'invalid',
++						message,
++					} );
++					return;
+ 				}
+ 
+-				return null;
++				setCustomValidity( undefined );
+ 			} }
++			customValidity={ customValidity }
+ 			type="email"
+ 			label={ label }
+ 			placeholder={ placeholder }
+diff --git a/packages/dataviews/src/dataform-controls/integer.tsx b/packages/dataviews/src/dataform-controls/integer.tsx
+index 7cd51068d8deab..04c469f0759632 100644
+--- a/packages/dataviews/src/dataform-controls/integer.tsx
++++ b/packages/dataviews/src/dataform-controls/integer.tsx
+@@ -7,7 +7,7 @@ import {
+ 	__experimentalNumberControl as NumberControl,
+ 	privateApis,
+ } from '@wordpress/components';
+-import { useCallback } from '@wordpress/element';
++import { useCallback, useState } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+@@ -84,6 +84,13 @@ export default function Integer< Item >( {
+ }: DataFormControlProps< Item > ) {
+ 	const { id, label, description } = field;
+ 	const value = field.getValue( { item: data } ) ?? '';
++	const [ customValidity, setCustomValidity ] =
++		useState<
++			React.ComponentProps<
++				typeof ValidatedNumberControl
++			>[ 'customValidity' ]
++		>( undefined );
++
+ 	const onChangeControl = useCallback(
+ 		( newValue: string | undefined ) => {
+ 			onChange( {
+@@ -112,21 +119,28 @@ export default function Integer< Item >( {
+ 	return (
+ 		<ValidatedNumberControl
+ 			required={ !! field.isValid?.required }
+-			customValidator={ ( newValue: any ) => {
+-				if ( field.isValid?.custom ) {
+-					return field.isValid.custom(
+-						{
+-							...data,
+-							[ id ]: [ undefined, '', null ].includes( newValue )
+-								? undefined
+-								: Number( newValue ),
+-						},
+-						field
+-					);
++			onValidate={ ( newValue: any ) => {
++				const message = field.isValid?.custom?.(
++					{
++						...data,
++						[ id ]: [ undefined, '', null ].includes( newValue )
++							? undefined
++							: Number( newValue ),
++					},
++					field
++				);
++
++				if ( message ) {
++					setCustomValidity( {
++						type: 'invalid',
++						message,
++					} );
++					return;
+ 				}
+ 
+-				return null;
++				setCustomValidity( undefined );
+ 			} }
++			customValidity={ customValidity }
+ 			label={ label }
+ 			help={ description }
+ 			value={ value }
+diff --git a/packages/dataviews/src/dataform-controls/text.tsx b/packages/dataviews/src/dataform-controls/text.tsx
+index 10e409555ac3fc..6b5a4a2e11b204 100644
+--- a/packages/dataviews/src/dataform-controls/text.tsx
++++ b/packages/dataviews/src/dataform-controls/text.tsx
+@@ -2,7 +2,7 @@
+  * WordPress dependencies
+  */
+ import { privateApis } from '@wordpress/components';
+-import { useCallback } from '@wordpress/element';
++import { useCallback, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -20,6 +20,12 @@ export default function Text< Item >( {
+ }: DataFormControlProps< Item > ) {
+ 	const { id, label, placeholder, description } = field;
+ 	const value = field.getValue( { item: data } );
++	const [ customValidity, setCustomValidity ] =
++		useState<
++			React.ComponentProps<
++				typeof ValidatedTextControl
++			>[ 'customValidity' ]
++		>( undefined );
+ 
+ 	const onChangeControl = useCallback(
+ 		( newValue: string ) =>
+@@ -32,19 +38,26 @@ export default function Text< Item >( {
+ 	return (
+ 		<ValidatedTextControl
+ 			required={ !! field.isValid?.required }
+-			customValidator={ ( newValue: any ) => {
+-				if ( field.isValid?.custom ) {
+-					return field.isValid.custom(
+-						{
+-							...data,
+-							[ id ]: newValue,
+-						},
+-						field
+-					);
++			onValidate={ ( newValue: any ) => {
++				const message = field.isValid?.custom?.(
++					{
++						...data,
++						[ id ]: newValue,
++					},
++					field
++				);
++
++				if ( message ) {
++					setCustomValidity( {
++						type: 'invalid',
++						message,
++					} );
++					return;
+ 				}
+ 
+-				return null;
++				setCustomValidity( undefined );
+ 			} }
++			customValidity={ customValidity }
+ 			label={ label }
+ 			placeholder={ placeholder }
+ 			value={ value ?? '' }

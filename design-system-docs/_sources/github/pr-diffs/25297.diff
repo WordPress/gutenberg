@@ -1,0 +1,104 @@
+diff --git a/packages/components/src/box-control/README.md b/packages/components/src/box-control/README.md
+index 7fbf8b59c42516..7d159cb5109db3 100644
+--- a/packages/components/src/box-control/README.md
++++ b/packages/components/src/box-control/README.md
+@@ -94,6 +94,13 @@ const Example = () => {
+ 
+ ## Props
+ 
++### iconComponent
++
++A custom icon to render that visualizes the selected `BoxControl` sides.
++
++-   Type: `React.Component`
++-   Required: No
++
+ ### inputProps
+ 
+ Props for the internal [InputControl](../input-control) components.
+diff --git a/packages/components/src/box-control/index.js b/packages/components/src/box-control/index.js
+index 4291c756a9aeb7..46fd6dfabdb8e4 100644
+--- a/packages/components/src/box-control/index.js
++++ b/packages/components/src/box-control/index.js
+@@ -7,7 +7,7 @@ import { noop } from 'lodash';
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { useState } from '@wordpress/element';
++import { createElement, useState } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+@@ -45,6 +45,7 @@ function useUniqueId( idProp ) {
+ }
+ export default function BoxControl( {
+ 	id: idProp,
++	iconComponent = BoxControlIcon,
+ 	inputProps = defaultInputProps,
+ 	onChange = noop,
+ 	onChangeShowVisualizer = noop,
+@@ -110,6 +111,8 @@ export default function BoxControl( {
+ 		values: inputValues,
+ 	};
+ 
++	const BoxIcon = createElement( iconComponent, { side } );
++
+ 	return (
+ 		<Root id={ id } role="region" aria-labelledby={ headingId }>
+ 			<Header className="component-box-control__header">
+@@ -134,9 +137,7 @@ export default function BoxControl( {
+ 				</FlexItem>
+ 			</Header>
+ 			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
+-				<FlexItem>
+-					<BoxControlIcon side={ side } />
+-				</FlexItem>
++				<FlexItem>{ BoxIcon }</FlexItem>
+ 				{ isLinked && (
+ 					<FlexBlock>
+ 						<AllInputControl { ...inputControlProps } />
+diff --git a/packages/components/src/box-control/stories/index.js b/packages/components/src/box-control/stories/index.js
+index 60205d435fb944..9aebe77cc5b1ca 100644
+--- a/packages/components/src/box-control/stories/index.js
++++ b/packages/components/src/box-control/stories/index.js
+@@ -79,3 +79,40 @@ const Box = styled.div`
+ const Content = styled.div`
+ 	padding: 20px;
+ `;
++
++function CustomBoxIcon( { side } ) {
++	let icon = '✊';
++	switch ( side ) {
++		case 'top':
++			icon = '☝️';
++			break;
++		case 'bottom':
++			icon = '👇';
++			break;
++		case 'left':
++			icon = '👈';
++			break;
++		case 'right':
++			icon = '👉';
++			break;
++	}
++	return (
++		<div
++			style={ {
++				fontSize: 18,
++				lineHeight: 1,
++				width: 24,
++				height: 24,
++				padding: 2,
++			} }
++		>
++			<span role="img" alt="icon">
++				{ icon }
++			</span>
++		</div>
++	);
++}
++
++export const customIcon = () => {
++	return <BoxControl iconComponent={ CustomBoxIcon } />;
++};

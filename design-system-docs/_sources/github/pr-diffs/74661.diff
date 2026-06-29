@@ -1,0 +1,1002 @@
+diff --git a/.stylelintrc.js b/.stylelintrc.js
+index ceac8b8fd8e696..94f225538c5eb3 100644
+--- a/.stylelintrc.js
++++ b/.stylelintrc.js
+@@ -83,6 +83,15 @@ module.exports = {
+ 						],
+ 					},
+ 				],
++				'property-no-unknown': [
++					true,
++					{
++						ignoreProperties: [
++							// https://github.com/css-modules/css-modules/blob/master/docs/composition.md
++							'composes',
++						],
++					},
++				],
+ 			},
+ 		},
+ 	],
+diff --git a/package-lock.json b/package-lock.json
+index 75c8294415d78c..1b04769983d653 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -55003,6 +55003,8 @@
+ 				"@wordpress/i18n": "file:../i18n",
+ 				"@wordpress/icons": "file:../icons",
+ 				"@wordpress/primitives": "file:../primitives",
++				"@wordpress/private-apis": "file:../private-apis",
++				"@wordpress/theme": "file:../theme",
+ 				"clsx": "^2.1.1"
+ 			},
+ 			"devDependencies": {
+@@ -55011,7 +55013,6 @@
+ 				"@testing-library/jest-dom": "^6.6.3",
+ 				"@types/jest": "^29.5.14",
+ 				"@types/node": "^20.17.10",
+-				"@wordpress/theme": "file:../theme",
+ 				"storybook": "^10.1.11"
+ 			},
+ 			"engines": {
+diff --git a/packages/components/src/utils/dropdown-motion.ts b/packages/components/src/utils/dropdown-motion.ts
+index f5576a8ff6e41f..bf6e4adef7b1c7 100644
+--- a/packages/components/src/utils/dropdown-motion.ts
++++ b/packages/components/src/utils/dropdown-motion.ts
+@@ -1,4 +1,5 @@
+ // Motion configuration for dropdown-like popovers.
++// Keep constants in sync with: packages/ui/src/utils/css/dropdown-motion.module.css
+ 
+ export const DROPDOWN_MOTION = Object.freeze( {
+ 	SLIDE_DISTANCE: 4,
+diff --git a/packages/private-apis/src/implementation.ts b/packages/private-apis/src/implementation.ts
+index d46d419ffc4eb6..cf6f3aa298853f 100644
+--- a/packages/private-apis/src/implementation.ts
++++ b/packages/private-apis/src/implementation.ts
+@@ -42,6 +42,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
+ 	'@wordpress/media-utils',
+ 	'@wordpress/upload-media',
+ 	'@wordpress/global-styles-ui',
++	'@wordpress/ui',
+ ];
+ 
+ /*
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 525dbce2da40c0..02b47875997cba 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -16,3 +16,4 @@
+ -   Add `Button` component ([#74415](https://github.com/WordPress/gutenberg/pull/74415), [#74416](https://github.com/WordPress/gutenberg/pull/74416), [#74470](https://github.com/WordPress/gutenberg/pull/74470)).
+ -   Add `InputLayout` primitive ([#74313](https://github.com/WordPress/gutenberg/pull/74313)).
+ -   Add `Input` primitive ([#74615](https://github.com/WordPress/gutenberg/pull/74615)).
++-   Add `Select` primitive ([#74661](https://github.com/WordPress/gutenberg/pull/74661)).
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 16a734a99aafe8..c902b7dbb59bbf 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -49,6 +49,8 @@
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/icons": "file:../icons",
+ 		"@wordpress/primitives": "file:../primitives",
++		"@wordpress/private-apis": "file:../private-apis",
++		"@wordpress/theme": "file:../theme",
+ 		"clsx": "^2.1.1"
+ 	},
+ 	"devDependencies": {
+@@ -57,7 +59,6 @@
+ 		"@testing-library/jest-dom": "^6.6.3",
+ 		"@types/jest": "^29.5.14",
+ 		"@types/node": "^20.17.10",
+-		"@wordpress/theme": "file:../theme",
+ 		"storybook": "^10.1.11"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/ui/src/form/primitives/constants.ts b/packages/ui/src/form/primitives/constants.ts
+new file mode 100644
+index 00000000000000..6ea8a7ac6b8c49
+--- /dev/null
++++ b/packages/ui/src/form/primitives/constants.ts
+@@ -0,0 +1,10 @@
++import type { Select as _Select } from '@base-ui/react/select';
++
++/**
++ * Shared positioning props for item popups (Select, Combobox, etc.).
++ */
++export const ITEM_POPUP_POSITIONER_PROPS = {
++	align: 'start',
++	sideOffset: 8,
++	collisionPadding: 12,
++} satisfies Partial< _Select.Positioner.Props >;
+diff --git a/packages/ui/src/form/primitives/index.ts b/packages/ui/src/form/primitives/index.ts
+index 36932e88a872a9..c5531ce572579b 100644
+--- a/packages/ui/src/form/primitives/index.ts
++++ b/packages/ui/src/form/primitives/index.ts
+@@ -2,3 +2,4 @@ export * as Field from './field';
+ export * as Fieldset from './fieldset';
+ export { Input } from './input';
+ export { InputLayout } from './input-layout';
++export * as Select from './select';
+diff --git a/packages/ui/src/form/primitives/input-layout/style.module.css b/packages/ui/src/form/primitives/input-layout/style.module.css
+index 0828665dd669b4..0169d86db5b662 100644
+--- a/packages/ui/src/form/primitives/input-layout/style.module.css
++++ b/packages/ui/src/form/primitives/input-layout/style.module.css
+@@ -33,7 +33,8 @@
+ 			height: 24px;
+ 		}
+ 
+-		&.is-disabled {
++		&.is-disabled,
++		&:has([data-can-disable-input-layout][data-disabled]) {
+ 			background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+ 			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+ 			color: var(--wpds-color-fg-interactive-neutral-disabled);
+@@ -53,7 +54,7 @@
+ 			outline: none;
+ 		}
+ 
+-		&:hover:not(.is-disabled, .is-borderless) {
++		&:hover:not(.is-disabled, :has([data-can-disable-input-layout][data-disabled]), .is-borderless) {
+ 			border-color: var(--wpds-color-stroke-interactive-neutral-active);
+ 		}
+ 	}
+diff --git a/packages/ui/src/form/primitives/select/index.ts b/packages/ui/src/form/primitives/select/index.ts
+new file mode 100644
+index 00000000000000..372c235a15734c
+--- /dev/null
++++ b/packages/ui/src/form/primitives/select/index.ts
+@@ -0,0 +1,4 @@
++export { Item } from './item';
++export { Popup } from './popup';
++export { Root } from './root';
++export { Trigger } from './trigger';
+diff --git a/packages/ui/src/form/primitives/select/item.tsx b/packages/ui/src/form/primitives/select/item.tsx
+new file mode 100644
+index 00000000000000..cf600268f22404
+--- /dev/null
++++ b/packages/ui/src/form/primitives/select/item.tsx
+@@ -0,0 +1,39 @@
++import { Select as _Select } from '@base-ui/react/select';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { check } from '@wordpress/icons';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++import resetStyles from '../../../utils/css/resets.module.css';
++import { Icon } from '../../../icon';
++import type { SelectItemProps } from './types';
++
++export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
++	function Item(
++		{ className, value, size = 'default', children = value, ...restProps },
++		ref
++	) {
++		return (
++			<_Select.Item
++				className={ clsx(
++					resetStyles[ 'box-sizing' ],
++					itemPopupStyles.item,
++					itemPopupStyles[ `is-size-${ size }` ],
++					className
++				) }
++				value={ value }
++				ref={ ref }
++				{ ...restProps }
++			>
++				<Icon
++					icon={ check }
++					className={ clsx(
++						itemPopupStyles[ 'item-indicator' ],
++						itemPopupStyles[ 'item-indicator-icon' ]
++					) }
++					size={ size === 'small' ? 20 : 24 }
++				/>
++				<_Select.ItemText>{ children }</_Select.ItemText>
++			</_Select.Item>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/select/popup.tsx b/packages/ui/src/form/primitives/select/popup.tsx
+new file mode 100644
+index 00000000000000..6e8a3ad54b746a
+--- /dev/null
++++ b/packages/ui/src/form/primitives/select/popup.tsx
+@@ -0,0 +1,55 @@
++import { Select as _Select } from '@base-ui/react/select';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import {
++	type ThemeProvider as ThemeProviderType,
++	privateApis as themePrivateApis,
++} from '@wordpress/theme';
++import { unlock } from '../../../lock-unlock';
++import itemPopupStyles from '../../../utils/css/item-popup.module.css';
++import resetStyles from '../../../utils/css/resets.module.css';
++import styles from './style.module.css';
++import type { SelectPopupProps } from './types';
++import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
++
++const ThemeProvider: typeof ThemeProviderType =
++	unlock( themePrivateApis ).ThemeProvider;
++
++export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
++	function Popup( { className, children, style, ...restProps }, ref ) {
++		return (
++			<_Select.Portal>
++				<_Select.Positioner
++					{ ...ITEM_POPUP_POSITIONER_PROPS }
++					alignItemWithTrigger={ false }
++					style={ style }
++					className={ clsx(
++						resetStyles[ 'box-sizing' ],
++						styles.positioner,
++						className
++					) }
++				>
++					<ThemeProvider>
++						<_Select.Popup
++							ref={ ref }
++							className={ itemPopupStyles.popup }
++							{ ...restProps }
++						>
++							<_Select.List className={ itemPopupStyles.list }>
++								<div
++									className={
++										itemPopupStyles[
++											'list-scrollable-container'
++										]
++									}
++								>
++									{ children }
++								</div>
++							</_Select.List>
++						</_Select.Popup>
++					</ThemeProvider>
++				</_Select.Positioner>
++			</_Select.Portal>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/select/root.tsx b/packages/ui/src/form/primitives/select/root.tsx
+new file mode 100644
+index 00000000000000..7d430741bd7948
+--- /dev/null
++++ b/packages/ui/src/form/primitives/select/root.tsx
+@@ -0,0 +1,6 @@
++import { Select as _Select } from '@base-ui/react/select';
++import type { SelectRootProps } from './types';
++
++export function Root( props: SelectRootProps ) {
++	return <_Select.Root< string, false > { ...props } />;
++}
+diff --git a/packages/ui/src/form/primitives/select/stories/index.story.tsx b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..e8bd92e4c46aab
+--- /dev/null
++++ b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+@@ -0,0 +1,276 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import '@wordpress/theme/design-tokens.css';
++import { Select } from '../../../..';
++
++const meta: Meta< typeof Select.Root > = {
++	title: 'Design System/Components/Form/Primitives/Select',
++	component: Select.Root,
++	subcomponents: {
++		Trigger: Select.Trigger,
++		Popup: Select.Popup,
++		Item: Select.Item,
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof Select.Root >;
++
++export const Default: Story = {
++	args: {
++		children: (
++			<>
++				<Select.Trigger />
++				<Select.Popup>
++					{ Array.from( { length: 6 }, ( _, index ) => (
++						<Select.Item
++							key={ index }
++							value={ `Item ${ index + 1 }` }
++						/>
++					) ) }
++				</Select.Popup>
++			</>
++		),
++	},
++};
++
++export const Compact: Story = {
++	args: {
++		children: (
++			<>
++				<Select.Trigger size="compact" />
++				<Select.Popup>
++					{ Array.from( { length: 6 }, ( _, index ) => (
++						<Select.Item
++							key={ index }
++							value={ `Item ${ index + 1 }` }
++							size="compact"
++						/>
++					) ) }
++				</Select.Popup>
++			</>
++		),
++		defaultValue: 'Item 1',
++	},
++};
++
++/**
++ * The `minimal` variant must be used judiciously, because in many
++ * contexts it can be unclear to users that it is a select trigger.
++ *
++ * Combined with the `small` size, `minimal` can be used to create a
++ * very low-profile `Select`, intended for rare use cases like
++ * a pagination control.
++ */
++export const Minimal: Story = {
++	args: {
++		children: (
++			<>
++				<Select.Trigger size="small" variant="minimal" />
++				<Select.Popup>
++					{ Array.from( { length: 6 }, ( _, index ) => (
++						<Select.Item
++							key={ index }
++							value={ `${ index + 1 }` }
++							size="small"
++						/>
++					) ) }
++				</Select.Popup>
++			</>
++		),
++		defaultValue: '1',
++	},
++};
++
++const withEmptyOptionItems = [
++	{
++		value: '',
++		label: 'Select',
++		disabled: true,
++	},
++	{
++		value: 'Item 2',
++		label: 'Item 2',
++	},
++];
++
++/**
++ * By passing an `items` array to `Select.Root`, the `Select.Trigger` will be able to
++ * render a `label` string for each item rather than the raw `value` string. In this
++ * case, the option with an empty string value has a `"Select"` label string.
++ *
++ * This may be easier than writing a custom render function for the `Select.Trigger`.
++ */
++export const WithEmptyValueOption: Story = {
++	args: {
++		items: withEmptyOptionItems,
++		children: (
++			<>
++				<Select.Trigger />
++				<Select.Popup>
++					{ withEmptyOptionItems.map( ( item ) => (
++						<Select.Item
++							key={ item.value }
++							value={ item.value }
++							label={ item.label }
++							disabled={ item.disabled }
++						>
++							{ item.label }
++						</Select.Item>
++					) ) }
++				</Select.Popup>
++			</>
++		),
++		defaultValue: '',
++	},
++};
++
++/**
++ * When accessibly labeling a `Select`, note that the label must be associated with the `Select.Trigger`,
++ * not the `Select.Root`.
++ *
++ * Whether labeling with `aria-label`, `htmlFor`, or `aria-labelledby`, the association must be made to the `Select.Trigger`.
++ */
++export const Labeling: Story = {
++	args: {
++		children: (
++			<>
++				<Select.Trigger aria-label="User role" />
++				<Select.Popup>
++					<Select.Item value="Administrator" />
++					<Select.Item value="Editor" />
++				</Select.Popup>
++			</>
++		),
++		defaultValue: 'Administrator',
++	},
++};
++
++const longItemValue =
++	'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
++
++export const WithOverflow: Story = {
++	args: {
++		children: (
++			<>
++				<Select.Trigger />
++				<Select.Popup>
++					<Select.Item value={ longItemValue } />
++					<Select.Item value="Item 2" />
++				</Select.Popup>
++			</>
++		),
++		defaultValue: longItemValue,
++	},
++};
++
++export const Disabled: Story = {
++	args: {
++		children: (
++			<>
++				<Select.Trigger />
++				<Select.Popup>
++					<Select.Item value="Item 1" />
++					<Select.Item value="Item 2" />
++				</Select.Popup>
++			</>
++		),
++		defaultValue: 'Item 1',
++		disabled: true,
++	},
++};
++
++export const WithDisabledItem: Story = {
++	args: {
++		children: (
++			<>
++				<Select.Trigger />
++				<Select.Popup>
++					<Select.Item value="Item 1" />
++					<Select.Item value="Item 2" disabled />
++				</Select.Popup>
++			</>
++		),
++		defaultValue: 'Item 1',
++	},
++};
++
++const customOptions = [
++	{
++		value: 'User 1',
++		label: 'User 1 (Admin)',
++	},
++	{
++		value: 'User 2',
++		label: 'User 2 (Editor)',
++	},
++];
++
++/**
++ * For custom needs, a `Select.Trigger` can take a custom render function as its children,
++ * while `Select.Item` can take arbitrary content as children.
++ */
++export const WithCustomTriggerAndItem: Story = {
++	args: {
++		children: (
++			<>
++				<Select.Trigger>
++					{ ( value ) => (
++						<span
++							style={ {
++								display: 'flex',
++								alignItems: 'center',
++								gap: 8,
++							} }
++						>
++							<img
++								src={ `https://gravatar.com/avatar/?d=initials&name=${ value }` }
++								alt=""
++								width="20"
++								style={ {
++									borderRadius: '50%',
++								} }
++							/>
++							{ value }
++						</span>
++					) }
++				</Select.Trigger>
++				<Select.Popup>
++					{ customOptions.map( ( item ) => (
++						<Select.Item
++							key={ item.value }
++							value={ item.value }
++							label={ item.label }
++						>
++							{ item.label }
++						</Select.Item>
++					) ) }
++				</Select.Popup>
++			</>
++		),
++		defaultValue: 'User 1',
++	},
++};
++
++/**
++ * Popovers in Gutenberg are managed with explicit z-index values, which can create
++ * situations where a popover renders below another popover, when you want it to be rendered above.
++ *
++ * The `--wp-ui-select-z-index` CSS variable, available on the `Select.Popup` component,
++ * is an escape hatch that can be used to override the z-index of a given `Select` popover
++ * on a case-by-case basis.
++ */
++export const WithCustomZIndex: Story = {
++	name: 'With Custom z-index',
++	args: {
++		children: (
++			<>
++				<Select.Trigger />
++				<Select.Popup style={ { '--wp-ui-select-z-index': '1000001' } }>
++					<Select.Item value="Item 1" />
++					<Select.Item value="Item 2" />
++				</Select.Popup>
++			</>
++		),
++		defaultValue: 'Item 1',
++	},
++};
+diff --git a/packages/ui/src/form/primitives/select/style.module.css b/packages/ui/src/form/primitives/select/style.module.css
+new file mode 100644
+index 00000000000000..d1903695dfbb93
+--- /dev/null
++++ b/packages/ui/src/form/primitives/select/style.module.css
+@@ -0,0 +1,7 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.positioner {
++		z-index: var(--wp-ui-select-z-index, initial);
++	}
++}
+diff --git a/packages/ui/src/form/primitives/select/test/index.test.tsx b/packages/ui/src/form/primitives/select/test/index.test.tsx
+new file mode 100644
+index 00000000000000..70b64721c70d22
+--- /dev/null
++++ b/packages/ui/src/form/primitives/select/test/index.test.tsx
+@@ -0,0 +1,35 @@
++import { render } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { createRef } from '@wordpress/element';
++import * as Select from '../index';
++
++jest.setTimeout( 10000 );
++
++describe( 'Select', () => {
++	it( 'forwards ref', async () => {
++		const user = userEvent.setup();
++		const triggerRef = createRef< HTMLButtonElement >();
++		const popupRef = createRef< HTMLDivElement >();
++		const itemRef = createRef< HTMLDivElement >();
++
++		render(
++			<Select.Root>
++				<Select.Trigger ref={ triggerRef } />
++				<Select.Popup ref={ popupRef }>
++					<Select.Item ref={ itemRef } value="Item 1" />
++					<Select.Item value="Item 2" />
++				</Select.Popup>
++			</Select.Root>
++		);
++
++		// Test trigger ref before interaction
++		expect( triggerRef.current ).toBeInstanceOf( HTMLButtonElement );
++
++		// Click on the trigger to open the select dropdown
++		await user.click( triggerRef.current! );
++
++		// Now test that the popup and item refs are also available
++		expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++} );
+diff --git a/packages/ui/src/form/primitives/select/trigger.tsx b/packages/ui/src/form/primitives/select/trigger.tsx
+new file mode 100644
+index 00000000000000..b811fa033f2360
+--- /dev/null
++++ b/packages/ui/src/form/primitives/select/trigger.tsx
+@@ -0,0 +1,58 @@
++import { Select as _Select } from '@base-ui/react/select';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { chevronDown } from '@wordpress/icons';
++import focusStyles from '../../../utils/css/focus.module.css';
++import selectTriggerStyles from '../../../utils/css/select-trigger.module.css';
++import { InputLayout } from '../input-layout';
++import { Icon } from '../../../icon';
++import type { SelectTriggerProps } from './types';
++
++export const Trigger = forwardRef< HTMLButtonElement, SelectTriggerProps >(
++	function Trigger(
++		{ className, size, variant, children, ...restProps },
++		ref
++	) {
++		return (
++			<InputLayout
++				className={ clsx(
++					focusStyles[ 'outset-ring--focus-within-except-active' ],
++					selectTriggerStyles[ 'trigger-wrapper' ],
++					variant === 'minimal' &&
++						selectTriggerStyles[ 'is-minimal' ],
++					className
++				) }
++				size={ size }
++				isBorderless={ variant === 'minimal' }
++			>
++				<_Select.Trigger
++					{ ...restProps }
++					className={ clsx(
++						selectTriggerStyles.trigger,
++						variant === 'minimal' &&
++							selectTriggerStyles[ 'is-minimal' ]
++					) }
++					data-can-disable-input-layout
++					ref={ ref }
++				>
++					<_Select.Value
++						className={ ( state ) =>
++							clsx(
++								selectTriggerStyles[ 'trigger-value' ],
++								state.value === '' &&
++									selectTriggerStyles[ 'is-placeholder' ]
++							)
++						}
++					>
++						{ children }
++					</_Select.Value>
++					<Icon
++						className={ selectTriggerStyles[ 'trigger-caret' ] }
++						icon={ chevronDown }
++						size={ 18 }
++					/>
++				</_Select.Trigger>
++			</InputLayout>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/select/types.ts b/packages/ui/src/form/primitives/select/types.ts
+new file mode 100644
+index 00000000000000..591104f8806fcb
+--- /dev/null
++++ b/packages/ui/src/form/primitives/select/types.ts
+@@ -0,0 +1,52 @@
++import type { Select as _Select } from '@base-ui/react/select';
++import type { InputLayoutProps } from '../input-layout/types';
++
++// The second type parameter is the `multiple` flag (currently disabled).
++export type SelectRootProps = Omit<
++	_Select.Root.Props< string, false >,
++	'multiple'
++>;
++
++export type SelectTriggerProps = Omit< _Select.Trigger.Props, 'children' > & {
++	/**
++	 * The size of the trigger.
++	 *
++	 * @default 'default'
++	 */
++	size?: InputLayoutProps[ 'size' ];
++	/**
++	 * The style variant of the trigger.
++	 *
++	 * @default 'default'
++	 */
++	variant?: 'default' | 'minimal';
++	/**
++	 * A function that gets called with the current value as an argument.
++	 * Use this to customize the trigger content.
++	 */
++	children?: _Select.Value.Props[ 'children' ];
++};
++
++export type SelectPopupProps = _Select.Popup.Props;
++
++export type SelectItemProps = Omit<
++	_Select.Item.Props,
++	'children' | 'value'
++> & {
++	/**
++	 * A unique value that identifies this select item.
++	 */
++	value?: string;
++	/**
++	 * The size of the item.
++	 *
++	 * @default 'default'
++	 */
++	size?: InputLayoutProps[ 'size' ];
++	/**
++	 * The content of the item.
++	 *
++	 * @default `value`
++	 */
++	children?: _Select.Item.Props[ 'children' ];
++};
+diff --git a/packages/ui/src/lock-unlock.ts b/packages/ui/src/lock-unlock.ts
+new file mode 100644
+index 00000000000000..654c14703eec79
+--- /dev/null
++++ b/packages/ui/src/lock-unlock.ts
+@@ -0,0 +1,7 @@
++import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
++
++export const { lock, unlock } =
++	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
++		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
++		'@wordpress/ui'
++	);
+diff --git a/packages/ui/src/utils/css/dropdown-motion.module.css b/packages/ui/src/utils/css/dropdown-motion.module.css
+new file mode 100644
+index 00000000000000..b5f1bf423959d8
+--- /dev/null
++++ b/packages/ui/src/utils/css/dropdown-motion.module.css
+@@ -0,0 +1,47 @@
++/*
++ * Motion configuration for dropdown-like popovers.
++ * Keep constants in sync with: packages/components/src/utils/dropdown-motion.ts
++ */
++
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-utilities {
++	.dropdown-motion {
++		--wp-ui-dropdown-slide-distance: 4px;
++		--wp-ui-dropdown-slide-duration: 200ms;
++		--wp-ui-dropdown-slide-easing: cubic-bezier(0, 0, 0, 1);
++		--wp-ui-dropdown-fade-duration: 80ms;
++		--wp-ui-dropdown-fade-easing: linear;
++
++		@media not ( prefers-reduced-motion ) {
++			transition-property: transform, opacity;
++			transition-duration:
++				var(--wp-ui-dropdown-slide-duration),
++				var(--wp-ui-dropdown-fade-duration);
++			transition-timing-function:
++				var(--wp-ui-dropdown-slide-easing),
++				var(--wp-ui-dropdown-fade-easing);
++			will-change: transform, opacity;
++		}
++
++		opacity: 0;
++
++		&[data-side="bottom"] {
++			transform: translateY(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
++		}
++		&[data-side="top"] {
++			transform: translateY(var(--wp-ui-dropdown-slide-distance));
++		}
++		&[data-side="left"] {
++			transform: translateX(var(--wp-ui-dropdown-slide-distance));
++		}
++		&[data-side="right"] {
++			transform: translateX(calc(-1 * var(--wp-ui-dropdown-slide-distance)));
++		}
++
++		&[data-open]:not([data-starting-style]) {
++			opacity: 1;
++			transform: translate(0);
++		}
++	}
++}
+diff --git a/packages/ui/src/utils/css/item-popup.module.css b/packages/ui/src/utils/css/item-popup.module.css
+new file mode 100644
+index 00000000000000..69fec88d07f2d0
+--- /dev/null
++++ b/packages/ui/src/utils/css/item-popup.module.css
+@@ -0,0 +1,127 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-utilities {
++	.popup {
++		composes: dropdown-motion from "./dropdown-motion.module.css";
++
++		--wp-ui-popup-padding: 4px;
++
++		display: grid;
++		grid-template-rows: auto minmax(0, 1fr);
++		grid-template-areas: "header" "main";
++		max-height: min(var(--available-height), 480px, 60dvh);
++		min-width: var(--anchor-width);
++		max-width: var(--available-width);
++		border-radius: var(--wpds-border-radius-surface-md);
++		border: 1px solid var(--wpds-color-stroke-surface-neutral);
++		box-shadow: var(--wpds-elevation-medium);
++		background-color: var(--wpds-color-bg-surface-neutral-strong);
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wpds-font-size-md);
++		line-height: 1.4;
++		color: var(--wpds-color-fg-interactive-neutral);
++	}
++
++	.list {
++		display: grid;
++		grid-area: main;
++		grid-template-rows: minmax(0, 1fr) auto;
++		grid-template-areas: "scrollable" "footer";
++	}
++
++	.list-scrollable-container {
++		overflow-block: auto;
++		overscroll-behavior: contain;
++		grid-area: scrollable;
++		scroll-padding-block: var(--wp-ui-popup-padding);
++
++		&:not(:empty) {
++			padding-block: var(--wp-ui-popup-padding);
++		}
++	}
++
++	.list-footer {
++		grid-area: footer;
++		padding-block: var(--wp-ui-popup-padding);
++
++		.list-scrollable-container:not(:empty) + & {
++			border-block-start: 1px solid var(--wpds-color-stroke-surface-neutral);
++		}
++	}
++
++	/* TODO: Use padding token */
++	.item {
++		--wp-ui-popup-item-height: 40px;
++		--wp-ui-popup-item-padding-inline: 12px;
++		--wp-ui-popup-item-padding-block: 4px;
++
++		display: grid;
++		grid-template-columns: 24px 1fr;
++		align-items: center;
++		justify-content: flex-start;
++		gap: var(--wpds-dimension-gap-2xs);
++		min-height: var(--wp-ui-popup-item-height);
++		border-radius: var(--wpds-border-radius-surface-sm);
++		user-select: none;
++		margin-inline: var(--wp-ui-popup-padding);
++		padding-block: var(--wp-ui-popup-item-padding-block);
++
++		/* Optically adjust the prefix icon to a more balanced position. */
++		padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - 4px);
++		padding-inline-end: var(--wp-ui-popup-item-padding-inline);
++
++		&.is-size-compact {
++			--wp-ui-popup-item-height: 32px;
++			--wp-ui-popup-item-padding-inline: 8px;
++		}
++
++		&.is-size-small {
++			--wp-ui-popup-item-height: 24px;
++			--wp-ui-popup-item-padding-inline: 8px;
++			--wp-ui-popup-item-padding-block: 2px;
++		}
++
++		&:not([data-selected]) {
++			.item-indicator-icon {
++				opacity: 0;
++			}
++		}
++
++		&[data-highlighted]:not([aria-disabled="true"]) {
++			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
++			color: var(--wpds-color-fg-interactive-neutral);
++
++			@media ( forced-colors: active ) {
++				outline: 1px solid Highlight;
++			}
++		}
++
++		&[aria-disabled="true"] {
++			color: var(--wpds-color-fg-interactive-neutral-disabled);
++
++			@media ( forced-colors: active ) {
++				color: GrayText;
++			}
++		}
++	}
++
++	.item-indicator {
++		justify-self: center;
++	}
++
++	.empty {
++		--wp-ui-popup-empty-min-height: 40px;
++		--wp-ui-popup-empty-padding-inline: 12px;
++
++		grid-area: main;
++		display: flex;
++		align-items: center;
++		padding-inline: var(--wp-ui-popup-empty-padding-inline);
++		color: var(--wpds-color-fg-content-neutral-weak);
++
++		&:not(:empty) {
++			min-height: var(--wp-ui-popup-empty-min-height);
++		}
++	}
++
++}
+diff --git a/packages/ui/src/utils/css/select-trigger.module.css b/packages/ui/src/utils/css/select-trigger.module.css
+new file mode 100644
+index 00000000000000..15f59ce06de914
+--- /dev/null
++++ b/packages/ui/src/utils/css/select-trigger.module.css
+@@ -0,0 +1,58 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-utilities {
++	.trigger-wrapper {
++		&.is-minimal {
++			width: fit-content;
++		}
++	}
++
++	.trigger {
++		display: flex;
++		justify-content: space-between;
++		align-items: center;
++		gap: var(--wpds-dimension-gap-2xs);
++		width: 100%;
++		padding-block: 4px;
++
++		/* Optically adjust the caret to a more balanced position. */
++		padding-inline-start: var(--wp-ui-input-layout-padding-inline);
++		padding-inline-end: calc(var(--wp-ui-input-layout-padding-inline) - 4px);
++
++		background-color: transparent;
++		border: none;
++		color: var(--wpds-color-fg-interactive-neutral);
++		font-family: inherit;
++		font-size: inherit;
++		line-height: 1.4;
++		text-align: start;
++		user-select: none;
++
++		&.is-minimal {
++			width: auto;
++		}
++
++		&:focus {
++			outline: none; /* handled by InputLayout component */
++		}
++
++		&[data-disabled] {
++			background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
++			color: var(--wpds-color-fg-interactive-neutral-disabled);
++		}
++	}
++
++	.trigger-value {
++		overflow: hidden;
++		text-overflow: ellipsis;
++		white-space: nowrap;
++
++		&.is-placeholder {
++			color: var(--wpds-color-fg-interactive-neutral-disabled);
++		}
++	}
++
++	.trigger-caret {
++		flex: 0 0 auto;
++	}
++}
+diff --git a/packages/ui/tsconfig.json b/packages/ui/tsconfig.json
+index a63ca8f3e4c83a..0a2f1de667d363 100644
+--- a/packages/ui/tsconfig.json
++++ b/packages/ui/tsconfig.json
+@@ -10,6 +10,7 @@
+ 		{ "path": "../i18n" },
+ 		{ "path": "../icons" },
+ 		{ "path": "../primitives" },
++		{ "path": "../private-apis" },
+ 		{ "path": "../theme" }
+ 	],
+ 	"files": [ "global.d.ts" ],

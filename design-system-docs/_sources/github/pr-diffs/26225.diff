@@ -1,0 +1,288 @@
+diff --git a/packages/components/src/snackbar/index.js b/packages/components/src/snackbar/index.js
+index 4c5ae0ac7e5b05..02449226ad0300 100644
+--- a/packages/components/src/snackbar/index.js
++++ b/packages/components/src/snackbar/index.js
+@@ -15,7 +15,11 @@ import warning from '@wordpress/warning';
+ /**
+  * Internal dependencies
+  */
+-import { Button } from '../';
++import {
++	SnackbarActionButton,
++	SnackbarContent,
++	SnackbarWrapper,
++} from './styles/snackbar-styles';
+ 
+ const NOTICE_TIMEOUT = 10000;
+ 
+@@ -25,8 +29,8 @@ const NOTICE_TIMEOUT = 10000;
+  * Custom hook which announces the message with the given politeness, if a
+  * valid message is provided.
+  *
+- * @param {string|WPElement}     [message]  Message to announce.
+- * @param {'polite'|'assertive'} politeness Politeness to announce.
++ * @param {string | WPElement}     message  Message to announce.
++ * @param {'polite' | 'assertive'} politeness Politeness to announce.
+  */
+ function useSpokenMessage( message, politeness ) {
+ 	const spokenMessage =
+@@ -39,6 +43,22 @@ function useSpokenMessage( message, politeness ) {
+ 	}, [ spokenMessage, politeness ] );
+ }
+ 
++/** @typedef {{label: string, onClick: ((event: import('react').MouseEvent<HTMLButtonElement>) => void), url: string}} Action */
++
++/**
++ * @typedef Props
++ * @property {string} [className] Optional classname passed to the component.
++ * @property {string | WPElement} children The message to render.
++ * @property {string | WPElement} [spokenMessage] Message to speak if different from children.
++ * @property {'polite' | 'assertive'} [politeness='polite'] Politeness with which to speak the message.
++ * @property {Action[]} [actions=[]] Optional actions for the snackbar.
++ * @property {() => void} [onRemove] Function to run when the snackbar is clicked or keypressed.
++ */
++
++/**
++ * @param {Props} props
++ * @param {import('react').Ref<HTMLDivElement>} ref
++ */
+ function Snackbar(
+ 	{
+ 		className,
+@@ -70,24 +90,27 @@ function Snackbar(
+ 	}
+ 
+ 	return (
+-		<div
++		<SnackbarWrapper
+ 			ref={ ref }
+ 			className={ classes }
+ 			onClick={ onRemove }
+-			tabIndex="0"
++			tabIndex={ 0 }
+ 			role="button"
+ 			onKeyPress={ onRemove }
+ 			aria-label={ __( 'Dismiss this notice' ) }
+ 		>
+-			<div className="components-snackbar__content">
++			<SnackbarContent className="components-snackbar__content">
+ 				{ children }
+ 				{ actions.map( ( { label, onClick, url }, index ) => {
+ 					return (
+-						<Button
++						<SnackbarActionButton
+ 							key={ index }
+ 							href={ url }
+ 							isTertiary
+-							onClick={ ( event ) => {
++							onClick={ (
++								/** @type {import('react').MouseEvent<HTMLButtonElement>} */
++								event
++							) => {
+ 								event.stopPropagation();
+ 								if ( onClick ) {
+ 									onClick( event );
+@@ -96,11 +119,11 @@ function Snackbar(
+ 							className="components-snackbar__action"
+ 						>
+ 							{ label }
+-						</Button>
++						</SnackbarActionButton>
+ 					);
+ 				} ) }
+-			</div>
+-		</div>
++			</SnackbarContent>
++		</SnackbarWrapper>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/snackbar/list.js b/packages/components/src/snackbar/list.js
+index 1246822590fcc7..46cd8af468ca29 100644
+--- a/packages/components/src/snackbar/list.js
++++ b/packages/components/src/snackbar/list.js
+@@ -16,15 +16,21 @@ import { useState } from '@wordpress/element';
+  */
+ import Snackbar from './';
+ 
++/** @typedef {{ content: string } & Omit<import('./index').Props, 'onRemove' | 'children'>} Notice */
++
++/**
++ * @typedef Props
++ * @property {Notice[]} notices Notices to render.
++ * @property {(notice: Notice) => void} onRemove Functionc called when a notice should be removed / dismissed.
++ * @property {string} [className] Name of the class used by the component.
++ * @property {import('react').ReactNode} children Rendered inside the notice list.
++ * @return {JSX.Element} Element
++ */
++
+ /**
+  * Renders a list of notices.
+  *
+- * @param  {Object}   $0           Props passed to the component.
+- * @param  {Array}    $0.notices   Array of notices to render.
+- * @param  {Function} $0.onRemove  Function called when a notice should be removed / dismissed.
+- * @param  {Object}   $0.className Name of the class used by the component.
+- * @param  {Object}   $0.children  Array of children to be rendered inside the notice list.
+- * @return {Object}                The rendered notices list.
++ * @param {Props} props Props
+  */
+ function SnackbarList( { notices, className, children, onRemove = noop } ) {
+ 	const isReducedMotion = useReducedMotion();
+diff --git a/packages/components/src/snackbar/style.scss b/packages/components/src/snackbar/style.scss
+index 5d82bc97ac9084..b9260a811445a7 100644
+--- a/packages/components/src/snackbar/style.scss
++++ b/packages/components/src/snackbar/style.scss
+@@ -1,58 +1,3 @@
+-.components-snackbar {
+-	font-family: $default-font;
+-	font-size: $default-font-size;
+-	background-color: $gray-900;
+-	border-radius: $radius-block-ui;
+-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+-	color: $white;
+-	padding: 16px 24px;
+-	width: 100%;
+-	max-width: 600px;
+-	box-sizing: border-box;
+-	cursor: pointer;
+-
+-	@include break-small() {
+-		width: fit-content;
+-	}
+-
+-	&:focus {
+-		box-shadow:
+-			0 0 0 1px $white,
+-			0 0 0 3px var(--wp-admin-theme-color);
+-	}
+-}
+-
+-.components-snackbar__action.components-button {
+-	margin-left: $grid-unit-40;
+-	color: $white;
+-	height: auto;
+-	flex-shrink: 0;
+-	line-height: $default-line-height;
+-	padding: 0;
+-
+-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) {
+-		text-decoration: underline;
+-		background-color: transparent;
+-
+-		&:focus {
+-			color: $white;
+-			box-shadow: none;
+-			outline: 1px dotted $white;
+-		}
+-
+-		&:hover {
+-			color: var(--wp-admin-theme-color);
+-		}
+-	}
+-}
+-
+-.components-snackbar__content {
+-	display: flex;
+-	align-items: baseline;
+-	justify-content: space-between;
+-	line-height: $default-line-height;
+-}
+-
+ .components-snackbar-list {
+ 	position: absolute;
+ 	z-index: z-index(".components-snackbar-list");
+diff --git a/packages/components/src/snackbar/styles/snackbar-styles.js b/packages/components/src/snackbar/styles/snackbar-styles.js
+new file mode 100644
+index 00000000000000..eda36daf98171c
+--- /dev/null
++++ b/packages/components/src/snackbar/styles/snackbar-styles.js
+@@ -0,0 +1,64 @@
++/**
++ * External dependencies
++ */
++import styled from '@emotion/styled';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../../button';
++import { breakpoint, color, font, config, space } from '../../utils';
++
++export const SnackbarWrapper = styled.div`
++	font-family: ${ font( 'default.fontFamily' ) };
++	font-size: ${ font( 'default.fontSize' ) };
++	background-color: ${ color( 'gray.900' ) };
++	border-radius: ${ config( 'radiusBlockUi' ) };
++	box-shadow: 0 2px 4px rgba( 0, 0, 0, 0.3 );
++	color: ${ color( 'white' ) };
++	padding: 16px 24px;
++	width: 100%;
++	max-width: 600px;
++	box-sizing: border-box;
++	cursor: pointer;
++
++	${ breakpoint( 'small' ) } {
++		width: fit-content;
++	}
++
++	&:focus {
++		box-shadow: 0 0 0 1px ${ color( 'white' ) },
++			0 0 0 3px var( --wp-admin-theme-color );
++	}
++`;
++
++export const SnackbarContent = styled.div`
++	display: flex;
++	align-items: baseline;
++	justify-content: space-between;
++	line-height: ${ font( 'default.lineHeight' ) };
++`;
++
++export const SnackbarActionButton = styled( Button )`
++	margin-left: ${ space( 4 ) };
++	color: ${ color( 'white' ) };
++	height: auto;
++	flex-shrink: 0;
++	line-height: ${ font( 'default.lineHeight' ) };
++	padding: 0;
++
++	&:not( :disabled ):not( [aria-disabled='true'] ):not( .is-secondary ) {
++		text-decoration: underline;
++		background-color: transparent;
++
++		&:focus {
++			color: ${ color( 'white' ) };
++			box-shadow: none;
++			outline: 1px dotted ${ color( 'white' ) };
++		}
++
++		&:hover {
++			color: var( --wp-admin-theme-color );
++		}
++	}
++`;
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index b9e2313c6bbb44..c22d2ece813978 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -169,6 +169,7 @@ export const COLORS = {
+ 	darkOpacity: DARK_OPACITY,
+ 	darkOpacityLight: DARK_OPACITY_LIGHT,
+ 	mediumGray: G2.mediumGray,
++	gray: G2.gray,
+ 	lightGray: merge( {}, LIGHT_GRAY, G2.lightGray ),
+ 	lightGrayLight: LIGHT_OPACITY_LIGHT,
+ 	blue: merge( {}, BLUE, G2.blue ),
+diff --git a/packages/components/src/utils/font-values.js b/packages/components/src/utils/font-values.js
+index 4319e6d7339aed..11be2439ac62db 100644
+--- a/packages/components/src/utils/font-values.js
++++ b/packages/components/src/utils/font-values.js
+@@ -2,6 +2,7 @@ export default {
+ 	'default.fontFamily':
+ 		"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif",
+ 	'default.fontSize': '13px',
++	'default.lineHeight': '1.4',
+ 
+ 	'helpText.fontSize': '12px',
+ 

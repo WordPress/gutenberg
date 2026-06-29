@@ -1,0 +1,152 @@
+diff --git a/packages/e2e-tests/specs/editor/various/post-visibility.test.js b/packages/e2e-tests/specs/editor/various/post-visibility.test.js
+index c395ea87952364..4990bcbdbd5d79 100644
+--- a/packages/e2e-tests/specs/editor/various/post-visibility.test.js
++++ b/packages/e2e-tests/specs/editor/various/post-visibility.test.js
+@@ -26,6 +26,15 @@ describe( 'Post visibility', () => {
+ 			);
+ 			await privateLabel.click();
+ 
++			await page.waitForXPath(
++				'//*[text()="Would you like to privately publish this post now?"]'
++			);
++
++			const [ confirmButton ] = await page.$x(
++				'//*[@role="dialog"]//button[text()="OK"]'
++			);
++			await confirmButton.click();
++
+ 			const currentStatus = await page.evaluate( () => {
+ 				return wp.data
+ 					.select( 'core/editor' )
+@@ -34,6 +43,42 @@ describe( 'Post visibility', () => {
+ 
+ 			expect( currentStatus ).toBe( 'private' );
+ 		} );
++
++		it( `can be canceled when the viewport is ${ viewport }`, async () => {
++			await setBrowserViewport( viewport );
++
++			await createNewPost();
++
++			await openDocumentSettingsSidebar();
++
++			const initialStatus = await page.evaluate( () => {
++				return wp.data
++					.select( 'core/editor' )
++					.getEditedPostAttribute( 'status' );
++			} );
++
++			await page.click( '.edit-post-post-visibility__toggle' );
++
++			const [ privateLabel ] = await page.$x(
++				'//label[text()="Private"]'
++			);
++			await privateLabel.click();
++			await page.waitForXPath(
++				'//*[text()="Would you like to privately publish this post now?"]'
++			);
++			const cancelButton = await page.waitForXPath(
++				'//*[@role="dialog"][not(@id="wp-link-wrap")]//button[text()="Cancel"]'
++			);
++			await cancelButton.click();
++
++			const currentStatus = await page.evaluate( () => {
++				return wp.data
++					.select( 'core/editor' )
++					.getEditedPostAttribute( 'status' );
++			} );
++
++			expect( currentStatus ).toBe( initialStatus );
++		} );
+ 	} );
+ 
+ 	it( 'visibility remains private even if the publish date is in the future', async () => {
+@@ -60,6 +105,15 @@ describe( 'Post visibility', () => {
+ 		const [ privateLabel ] = await page.$x( '//label[text()="Private"]' );
+ 		await privateLabel.click();
+ 
++		await page.waitForXPath(
++			'//*[text()="Would you like to privately publish this post now?"]'
++		);
++
++		const [ confirmButton ] = await page.$x(
++			'//*[@role="dialog"]//button[text()="OK"]'
++		);
++		await confirmButton.click();
++
+ 		// Enter a title for this post.
+ 		await page.type( '.editor-post-title__input', ' Changed' );
+ 
+diff --git a/packages/editor/src/components/post-visibility/index.js b/packages/editor/src/components/post-visibility/index.js
+index 7d86880def97db..86fe0df98db158 100644
+--- a/packages/editor/src/components/post-visibility/index.js
++++ b/packages/editor/src/components/post-visibility/index.js
+@@ -3,7 +3,10 @@
+  */
+ import { __ } from '@wordpress/i18n';
+ import { Component } from '@wordpress/element';
+-import { VisuallyHidden } from '@wordpress/components';
++import {
++	VisuallyHidden,
++	__experimentalConfirmDialog as ConfirmDialog,
++} from '@wordpress/components';
+ import { withInstanceId, compose } from '@wordpress/compose';
+ import { withSelect, withDispatch } from '@wordpress/data';
+ 
+@@ -24,6 +27,7 @@ export class PostVisibility extends Component {
+ 
+ 		this.state = {
+ 			hasPassword: !! props.password,
++			showPrivateConfirmDialog: false,
+ 		};
+ 	}
+ 
+@@ -35,21 +39,23 @@ export class PostVisibility extends Component {
+ 	}
+ 
+ 	setPrivate() {
+-		if (
+-			// eslint-disable-next-line no-alert
+-			! window.confirm(
+-				__( 'Would you like to privately publish this post now?' )
+-			)
+-		) {
+-			return;
+-		}
++		this.setState( { showPrivateConfirmDialog: true } );
++	}
+ 
++	confirmPrivate = () => {
+ 		const { onUpdateVisibility, onSave } = this.props;
+ 
+ 		onUpdateVisibility( 'private' );
+-		this.setState( { hasPassword: false } );
++		this.setState( {
++			hasPassword: false,
++			showPrivateConfirmDialog: false,
++		} );
+ 		onSave();
+-	}
++	};
++
++	handleDialogCancel = () => {
++		this.setState( { showPrivateConfirmDialog: false } );
++	};
+ 
+ 	setPasswordProtected() {
+ 		const { visibility, onUpdateVisibility, status, password } = this.props;
+@@ -145,6 +151,14 @@ export class PostVisibility extends Component {
+ 					/>
+ 				</div>
+ 			),
++			<ConfirmDialog
++				key="private-publish-confirmation"
++				isOpen={ this.state.showPrivateConfirmDialog }
++				onConfirm={ this.confirmPrivate }
++				onCancel={ this.handleDialogCancel }
++			>
++				{ __( 'Would you like to privately publish this post now?' ) }
++			</ConfirmDialog>,
+ 		];
+ 	}
+ }

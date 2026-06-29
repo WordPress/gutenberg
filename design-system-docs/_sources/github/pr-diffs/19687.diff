@@ -1,0 +1,309 @@
+diff --git a/package-lock.json b/package-lock.json
+index ba86ec93bcaf0f..3de16922dcf156 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -8471,6 +8471,7 @@
+ 				"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
+ 				"@wordpress/keycodes": "file:packages/keycodes",
+ 				"@wordpress/rich-text": "file:packages/rich-text",
++				"@wordpress/warning": "file:packages/warning",
+ 				"classnames": "^2.2.5",
+ 				"clipboard": "^2.0.1",
+ 				"dom-scroll-into-view": "^1.2.1",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index bc3098392d40b9..ffca4026ebd5cc 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -39,6 +39,7 @@
+ 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+ 		"@wordpress/keycodes": "file:../keycodes",
+ 		"@wordpress/rich-text": "file:../rich-text",
++		"@wordpress/warning": "file:../warning",
+ 		"classnames": "^2.2.5",
+ 		"clipboard": "^2.0.1",
+ 		"dom-scroll-into-view": "^1.2.1",
+diff --git a/packages/components/src/snackbar/index.js b/packages/components/src/snackbar/index.js
+index e970a0fba5dc03..88140d8083891b 100644
+--- a/packages/components/src/snackbar/index.js
++++ b/packages/components/src/snackbar/index.js
+@@ -9,6 +9,7 @@ import classnames from 'classnames';
+  */
+ import { useEffect, forwardRef } from '@wordpress/element';
+ import { __ } from '@wordpress/i18n';
++import warning from '@wordpress/warning';
+ 
+ /**
+  * Internal dependencies
+@@ -34,8 +35,7 @@ function Snackbar( {
+ 	const classes = classnames( className, 'components-snackbar' );
+ 	if ( actions && actions.length > 1 ) {
+ 		// we need to inform developers that snackbar only accepts 1 action
+-		// eslint-disable-next-line no-console
+-		console.warn( 'Snackbar can only have 1 action, use Notice if your message require many messages' );
++		warning( 'Snackbar can only have 1 action, use Notice if your message require many messages' );
+ 		// return first element only while keeping it inside an array
+ 		actions = [ actions[ 0 ] ];
+ 	}
+diff --git a/packages/components/src/toolbar-item/index.js b/packages/components/src/toolbar-item/index.js
+index 00170174387bd4..484c185d0816c4 100644
+--- a/packages/components/src/toolbar-item/index.js
++++ b/packages/components/src/toolbar-item/index.js
+@@ -7,6 +7,7 @@ import { useToolbarItem } from 'reakit/Toolbar';
+  * WordPress dependencies
+  */
+ import { forwardRef, useContext } from '@wordpress/element';
++import warning from '@wordpress/warning';
+ 
+ /**
+  * Internal dependencies
+@@ -19,14 +20,12 @@ function ToolbarItem( { children, ...props }, ref ) {
+ 	const itemProps = useToolbarItem( accessibleToolbarState, { ...props, ref } );
+ 
+ 	if ( typeof children !== 'function' ) {
+-		// eslint-disable-next-line no-console
+-		console.warn( '`ToolbarItem` is a generic headless component that accepts only function children props' );
++		warning( '`ToolbarItem` is a generic headless component that accepts only function children props' );
+ 		return null;
+ 	}
+ 
+ 	if ( ! accessibleToolbarState ) {
+-		// eslint-disable-next-line no-console
+-		console.warn( '`ToolbarItem` should be rendered within `<Toolbar __experimentalAccessibilityLabel="label">`' );
++		warning( '`ToolbarItem` should be rendered within `<Toolbar __experimentalAccessibilityLabel="label">`' );
+ 		return null;
+ 	}
+ 
+diff --git a/packages/components/src/toolbar-item/index.native.js b/packages/components/src/toolbar-item/index.native.js
+index 9819d0ed02d83b..6fb0150cafa515 100644
+--- a/packages/components/src/toolbar-item/index.native.js
++++ b/packages/components/src/toolbar-item/index.native.js
+@@ -2,11 +2,11 @@
+  * WordPress dependencies
+  */
+ import { forwardRef } from '@wordpress/element';
++import warning from '@wordpress/warning';
+ 
+ function ToolbarItem( { children, ...props }, ref ) {
+ 	if ( typeof children !== 'function' ) {
+-		// eslint-disable-next-line no-console
+-		console.warn( '`ToolbarItem` is a generic headless component that accepts only function children props' );
++		warning( '`ToolbarItem` is a generic headless component that accepts only function children props' );
+ 		return null;
+ 	}
+ 
+diff --git a/packages/warning/README.md b/packages/warning/README.md
+index 74d5d2d7f5cd34..034991251c89ca 100644
+--- a/packages/warning/README.md
++++ b/packages/warning/README.md
+@@ -32,7 +32,7 @@ To prevent that, you should:
+ 
+ <a name="default" href="#default">#</a> **default**
+ 
+-Shows a warning with `message` if `condition` passes and environment is not `production`.
++Shows a warning with `message` if environment is not `production`.
+ 
+ _Usage_
+ 
+@@ -40,14 +40,15 @@ _Usage_
+ import warning from '@wordpress/warning';
+ 
+ function MyComponent( props ) {
+-  warning( ! props.title, '`props.title` was not passed' );
++  if ( ! props.title ) {
++    warning( '`props.title` was not passed' );
++  }
+   ...
+ }
+ ```
+ 
+ _Parameters_
+ 
+--   _condition_ `boolean`: Whether the warning will be triggered or not.
+ -   _message_ `string`: Message to show in the warning.
+ 
+ 
+diff --git a/packages/warning/babel-plugin.js b/packages/warning/babel-plugin.js
+index 2266fe0a0d416e..4b6d7f08cb63ac 100644
+--- a/packages/warning/babel-plugin.js
++++ b/packages/warning/babel-plugin.js
+@@ -69,9 +69,9 @@ function babelPlugin( { types: t } ) {
+ 
+ 				if ( path.get( 'callee' ).isIdentifier( { name } ) ) {
+ 					// Turns this code:
+-					// warning(condition, argument, argument);
++					// warning(argument);
+ 					// into this:
+-					// typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(condition, argument, argument) : void 0;
++					// typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(argument) : void 0;
+ 					node[ seen ] = true;
+ 					path.replaceWith(
+ 						t.ifStatement(
+diff --git a/packages/warning/src/index.js b/packages/warning/src/index.js
+index 9774020697b7a4..f81c561c0aaee1 100644
+--- a/packages/warning/src/index.js
++++ b/packages/warning/src/index.js
+@@ -7,9 +7,8 @@ function isDev() {
+ }
+ 
+ /**
+- * Shows a warning with `message` if `condition` passes and environment is not `production`.
++ * Shows a warning with `message` if environment is not `production`.
+  *
+- * @param {boolean} condition Whether the warning will be triggered or not.
+  * @param {string} message Message to show in the warning.
+  *
+  * @example
+@@ -17,20 +16,18 @@ function isDev() {
+  * import warning from '@wordpress/warning';
+  *
+  * function MyComponent( props ) {
+- *   warning( ! props.title, '`props.title` was not passed' );
++ *   if ( ! props.title ) {
++ *     warning( '`props.title` was not passed' );
++ *   }
+  *   ...
+  * }
+  * ```
+  */
+-export default function warning( condition, message ) {
++export default function warning( message ) {
+ 	if ( ! isDev() ) {
+ 		return;
+ 	}
+ 
+-	if ( ! condition ) {
+-		return;
+-	}
+-
+ 	// eslint-disable-next-line no-console
+ 	console.warn( message );
+ 
+diff --git a/packages/warning/src/test/index.js b/packages/warning/src/test/index.js
+index b5e83253ab6086..aa97a8c661b260 100644
+--- a/packages/warning/src/test/index.js
++++ b/packages/warning/src/test/index.js
+@@ -12,19 +12,13 @@ describe( 'warning', () => {
+ 
+ 	it( 'logs to console.warn when NODE_ENV is not "production"', () => {
+ 		process.env.NODE_ENV = 'development';
+-		warning( true, 'warning' );
++		warning( 'warning' );
+ 		expect( console ).toHaveWarnedWith( 'warning' );
+ 	} );
+ 
+ 	it( 'does not log to console.warn if NODE_ENV is "production"', () => {
+ 		process.env.NODE_ENV = 'production';
+-		warning( true, 'warning' );
+-		expect( console ).not.toHaveWarned();
+-	} );
+-
+-	it( 'does not log to console.warn if condition is falsy', () => {
+-		process.env.NODE_ENV = 'development';
+-		warning( false, 'warning' );
++		warning( 'warning' );
+ 		expect( console ).not.toHaveWarned();
+ 	} );
+ } );
+diff --git a/packages/warning/test/babel-plugin.js b/packages/warning/test/babel-plugin.js
+index 7758af5a96b9c4..f4f2a9c759890c 100644
+--- a/packages/warning/test/babel-plugin.js
++++ b/packages/warning/test/babel-plugin.js
+@@ -25,26 +25,26 @@ describe( 'babel-plugin', function() {
+ 		compare(
+ 			join(
+ 				'import warning from "@wordpress/warning";',
+-				'warning(true, "a", "b");'
++				'warning("a");'
+ 			),
+ 			join(
+ 				'import warning from "@wordpress/warning";',
+-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(true, "a", "b") : void 0;'
++				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("a") : void 0;'
+ 			)
+ 		);
+ 	} );
+ 
+ 	it( 'should not replace warning calls without import declaration', () => {
+ 		compare(
+-			'warning(true, "a", "b");',
+-			'warning(true, "a", "b");'
++			'warning("a");',
++			'warning("a");'
+ 		);
+ 	} );
+ 
+ 	it( 'should replace warning calls without import declaration with plugin options', () => {
+ 		compare(
+-			'warning(true, "a", "b");',
+-			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(true, "a", "b") : void 0;',
++			'warning("a");',
++			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("a") : void 0;',
+ 			{ callee: 'warning' }
+ 		);
+ 	} );
+@@ -53,15 +53,15 @@ describe( 'babel-plugin', function() {
+ 		compare(
+ 			join(
+ 				'import warning from "@wordpress/warning";',
+-				'warning(true, "a", "b");',
+-				'warning(false, "b", "a");',
+-				'warning(cond, "c");',
++				'warning("a");',
++				'warning("b");',
++				'warning("c");',
+ 			),
+ 			join(
+ 				'import warning from "@wordpress/warning";',
+-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(true, "a", "b") : void 0;',
+-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(false, "b", "a") : void 0;',
+-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning(cond, "c") : void 0;'
++				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("a") : void 0;',
++				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("b") : void 0;',
++				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("c") : void 0;'
+ 			)
+ 		);
+ 	} );
+@@ -70,15 +70,15 @@ describe( 'babel-plugin', function() {
+ 		compare(
+ 			join(
+ 				'import warn from "@wordpress/warning";',
+-				'warn(true, "a", "b");',
+-				'warn(false, "b", "a");',
+-				'warn(cond, "c");',
++				'warn("a");',
++				'warn("b");',
++				'warn("c");',
+ 			),
+ 			join(
+ 				'import warn from "@wordpress/warning";',
+-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(true, "a", "b") : void 0;',
+-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(false, "b", "a") : void 0;',
+-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(cond, "c") : void 0;'
++				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("a") : void 0;',
++				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("b") : void 0;',
++				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("c") : void 0;'
+ 			)
+ 		);
+ 	} );
+@@ -87,15 +87,15 @@ describe( 'babel-plugin', function() {
+ 		compare(
+ 			join(
+ 				'import warn from "@wordpress/warning";',
+-				'warn(true, "a", "b");',
+-				'warn(false, "b", "a");',
+-				'warn(cond, "c");',
++				'warn("a");',
++				'warn("b");',
++				'warn("c");',
+ 			),
+ 			join(
+ 				'import warn from "@wordpress/warning";',
+-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(true, "a", "b") : void 0;',
+-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(false, "b", "a") : void 0;',
+-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn(cond, "c") : void 0;'
++				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("a") : void 0;',
++				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("b") : void 0;',
++				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("c") : void 0;'
+ 			)
+ 		);
+ 	} );

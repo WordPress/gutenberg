@@ -1,0 +1,28 @@
+diff --git a/packages/admin-ui/CHANGELOG.md b/packages/admin-ui/CHANGELOG.md
+index 80a67132fffb7e..e32e5421ce85d4 100644
+--- a/packages/admin-ui/CHANGELOG.md
++++ b/packages/admin-ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   Increase page header vertical padding. [#77152](https://github.com/WordPress/gutenberg/pull/77152)
++
+ ## 1.11.0 (2026-04-01)
+ 
+ ### Bug Fixes
+diff --git a/packages/admin-ui/src/page/style.scss b/packages/admin-ui/src/page/style.scss
+index 0232f7d94b9c19..fbd5fb310500a3 100644
+--- a/packages/admin-ui/src/page/style.scss
++++ b/packages/admin-ui/src/page/style.scss
+@@ -14,7 +14,7 @@
+ }
+ 
+ .admin-ui-page__header {
+-	padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-2xl);
++	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
+ 	border-bottom: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+ 	background: var(--wpds-color-bg-surface-neutral-strong);
+ 	position: sticky;

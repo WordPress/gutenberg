@@ -1,0 +1,14 @@
+diff --git a/packages/components/src/autocomplete/style.scss b/packages/components/src/autocomplete/style.scss
+index 891febedfad016..20dc5db90ae6e8 100644
+--- a/packages/components/src/autocomplete/style.scss
++++ b/packages/components/src/autocomplete/style.scss
+@@ -4,6 +4,9 @@
+ 
+ .components-autocomplete__result.components-button {
+ 	display: flex;
++	height: auto;
++	min-height: $button-size;
++	text-align: left;
+ 	width: 100%;
+ 
+ 	&.is-selected {

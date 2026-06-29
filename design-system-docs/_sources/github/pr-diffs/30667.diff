@@ -1,0 +1,25 @@
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/fill.js b/packages/components/src/slot-fill/bubbles-virtually/fill.js
+index 38390ab28954c2..51a141ca2e2dc0 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/fill.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/fill.js
+@@ -10,7 +10,19 @@ import useSlot from './use-slot';
+ 
+ function useForceUpdate() {
+ 	const [ , setState ] = useState( {} );
+-	return () => setState( {} );
++	const mounted = useRef( true );
++
++	useEffect( () => {
++		return () => {
++			mounted.current = false;
++		};
++	}, [] );
++
++	return () => {
++		if ( mounted.current ) {
++			setState( {} );
++		}
++	};
+ }
+ 
+ export default function Fill( { name, children } ) {

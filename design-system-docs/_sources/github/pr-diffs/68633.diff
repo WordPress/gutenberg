@@ -1,0 +1,56 @@
+diff --git a/packages/block-editor/src/components/global-styles/border-panel.js b/packages/block-editor/src/components/global-styles/border-panel.js
+index aea8e67f5b5944..8f24c552441580 100644
+--- a/packages/block-editor/src/components/global-styles/border-panel.js
++++ b/packages/block-editor/src/components/global-styles/border-panel.js
+@@ -7,7 +7,6 @@ import {
+ 	__experimentalIsDefinedBorder as isDefinedBorder,
+ 	__experimentalToolsPanel as ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+-	__experimentalItemGroup as ItemGroup,
+ 	BaseControl,
+ } from '@wordpress/components';
+ import { useCallback, useMemo } from '@wordpress/element';
+@@ -298,13 +297,11 @@ export default function BorderPanel( {
+ 						</BaseControl.VisualLabel>
+ 					) : null }
+ 
+-					<ItemGroup isBordered isSeparated>
+-						<ShadowPopover
+-							shadow={ shadow }
+-							onShadowChange={ setShadow }
+-							settings={ settings }
+-						/>
+-					</ItemGroup>
++					<ShadowPopover
++						shadow={ shadow }
++						onShadowChange={ setShadow }
++						settings={ settings }
++					/>
+ 				</ToolsPanelItem>
+ 			) }
+ 		</Wrapper>
+diff --git a/packages/block-editor/src/components/global-styles/style.scss b/packages/block-editor/src/components/global-styles/style.scss
+index 88b2bc75306e13..d121026452dcca 100644
+--- a/packages/block-editor/src/components/global-styles/style.scss
++++ b/packages/block-editor/src/components/global-styles/style.scss
+@@ -25,6 +25,8 @@
+ 	display: block;
+ 	padding: 0;
+ 	position: relative;
++	border: 1px solid $gray-300;
++	border-radius: $radius-small;
+ }
+ 
+ .block-editor-global-styles-filters-panel__dropdown-toggle,
+@@ -59,11 +61,6 @@
+ 	}
+ }
+ 
+-.block-editor-global-styles-filters-panel__dropdown {
+-	border: 1px solid $gray-300;
+-	border-radius: $radius-small;
+-}
+-
+ // These styles are similar to the color palette.
+ .block-editor-global-styles__shadow-indicator {
+ 	appearance: none;

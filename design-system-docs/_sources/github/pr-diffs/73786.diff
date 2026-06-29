@@ -1,0 +1,240 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bd824ef8f2503e..6094f171988b17 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ ### Internal
+ 
+ -   `AlignmentMatrixControl`: Migrate styles from Emotion to a CSS module ([#73714](https://github.com/WordPress/gutenberg/pull/73714) and [#73757](https://github.com/WordPress/gutenberg/pull/73757)).
++-   `AnglePickerControl`: Migrate styles from Emotion to a CSS module ([#73786](https://github.com/WordPress/gutenberg/pull/73786)).
+ 
+ ## 30.9.0 (2025-11-26)
+ 
+diff --git a/packages/components/src/angle-picker-control/angle-circle.tsx b/packages/components/src/angle-picker-control/angle-circle.tsx
+index 52a2d2838a1f26..ae0538b50f1954 100644
+--- a/packages/components/src/angle-picker-control/angle-circle.tsx
++++ b/packages/components/src/angle-picker-control/angle-circle.tsx
+@@ -1,3 +1,8 @@
++/**
++ * External dependencies
++ */
++import clsx from 'clsx';
++
+ /**
+  * WordPress dependencies
+  */
+@@ -7,11 +12,7 @@ import { __experimentalUseDragging as useDragging } from '@wordpress/compose';
+ /**
+  * Internal dependencies
+  */
+-import {
+-	CircleRoot,
+-	CircleIndicatorWrapper,
+-	CircleIndicator,
+-} from './styles/angle-picker-control-styles';
++import styles from './style.module.scss';
+ 
+ import type { WordPressComponentProps } from '../context';
+ import type { AngleCircleProps } from './types';
+@@ -25,6 +26,7 @@ type UseDraggingCallbackEvent =
+ function AngleCircle( {
+ 	value,
+ 	onChange,
++	className,
+ 	...props
+ }: WordPressComponentProps< AngleCircleProps, 'div' > ) {
+ 	const angleCircleRef = useRef< HTMLDivElement | null >( null );
+@@ -89,22 +91,35 @@ function AngleCircle( {
+ 	}, [ isDragging ] );
+ 
+ 	return (
+-		<CircleRoot
++		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
++		<div
+ 			ref={ angleCircleRef }
+ 			onMouseDown={ startDrag }
+-			className="components-angle-picker-control__angle-circle"
++			className={ clsx(
++				'components-angle-picker-control__angle-circle',
++				styles[ 'circle-root' ],
++				className
++			) }
+ 			{ ...props }
+ 		>
+-			<CircleIndicatorWrapper
++			<div
+ 				style={
+ 					value ? { transform: `rotate(${ value }deg)` } : undefined
+ 				}
+-				className="components-angle-picker-control__angle-circle-indicator-wrapper"
++				className={ clsx(
++					'components-angle-picker-control__angle-circle-indicator-wrapper',
++					styles[ 'circle-indicator-wrapper' ]
++				) }
+ 				tabIndex={ -1 }
+ 			>
+-				<CircleIndicator className="components-angle-picker-control__angle-circle-indicator" />
+-			</CircleIndicatorWrapper>
+-		</CircleRoot>
++				<div
++					className={ clsx(
++						'components-angle-picker-control__angle-circle-indicator',
++						styles[ 'circle-indicator' ]
++					) }
++				/>
++			</div>
++		</div>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/angle-picker-control/index.tsx b/packages/components/src/angle-picker-control/index.tsx
+index 2743746bfd76a2..c4b73a5e75d4ab 100644
+--- a/packages/components/src/angle-picker-control/index.tsx
++++ b/packages/components/src/angle-picker-control/index.tsx
+@@ -16,8 +16,9 @@ import { isRTL, __ } from '@wordpress/i18n';
+ import { Flex, FlexBlock } from '../flex';
+ import { Spacer } from '../spacer';
+ import NumberControl from '../number-control';
++import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
++import InputControlSuffixWrapper from '../input-control/input-suffix-wrapper';
+ import AngleCircle from './angle-circle';
+-import { UnitText } from './styles/angle-picker-control-styles';
+ 
+ import type { WordPressComponentProps } from '../context';
+ import type { AnglePickerControlProps } from './types';
+@@ -48,10 +49,11 @@ function UnforwardedAnglePickerControl(
+ 
+ 	const classes = clsx( 'components-angle-picker-control', className );
+ 
+-	const unitText = <UnitText>°</UnitText>;
+-	const [ prefixedUnitText, suffixedUnitText ] = isRTL()
+-		? [ unitText, null ]
+-		: [ null, unitText ];
++	// Override the default behavior and position the degree symbol to the
++	// right of the number, regardless of the language direction.
++	const prefixOrSuffixProp = isRTL()
++		? { prefix: <InputControlPrefixWrapper>°</InputControlPrefixWrapper> }
++		: { suffix: <InputControlSuffixWrapper>°</InputControlSuffixWrapper> };
+ 
+ 	return (
+ 		<Flex { ...restProps } ref={ ref } className={ classes } gap={ 2 }>
+@@ -66,8 +68,7 @@ function UnforwardedAnglePickerControl(
+ 					step="1"
+ 					value={ value }
+ 					spinControls="none"
+-					prefix={ prefixedUnitText }
+-					suffix={ suffixedUnitText }
++					{ ...prefixOrSuffixProp }
+ 				/>
+ 			</FlexBlock>
+ 			<Spacer marginBottom="1" marginTop="auto">
+diff --git a/packages/components/src/angle-picker-control/style.module.scss b/packages/components/src/angle-picker-control/style.module.scss
+new file mode 100644
+index 00000000000000..5cffe0a3ec6fb6
+--- /dev/null
++++ b/packages/components/src/angle-picker-control/style.module.scss
+@@ -0,0 +1,40 @@
++@use "@wordpress/base-styles/variables" as *;
++@use "../utils/theme-variables" as *;
++
++.circle-root {
++	border-radius: $radius-round;
++	border: $border-width solid $components-color-border;
++	box-sizing: border-box;
++	cursor: grab;
++	height: 32px;
++	overflow: hidden;
++	width: 32px;
++
++	&:active {
++		cursor: grabbing;
++	}
++}
++
++.circle-indicator-wrapper {
++	box-sizing: border-box;
++	position: relative;
++	width: 100%;
++	height: 100%;
++
++	&:focus-visible {
++		outline: none;
++	}
++}
++
++.circle-indicator {
++	background: $components-color-accent;
++	border-radius: $radius-round;
++	box-sizing: border-box;
++	display: block;
++	left: 50%;
++	top: 4px;
++	transform: translateX(-50%);
++	position: absolute;
++	width: 6px;
++	height: 6px;
++}
+diff --git a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.tsx b/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.tsx
+deleted file mode 100644
+index f57d60db0744b1..00000000000000
+--- a/packages/components/src/angle-picker-control/styles/angle-picker-control-styles.tsx
++++ /dev/null
+@@ -1,58 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import styled from '@emotion/styled';
+-
+-/**
+- * Internal dependencies
+- */
+-import { COLORS } from '../../utils';
+-import { space } from '../../utils/space';
+-import { Text } from '../../text';
+-import CONFIG from '../../utils/config-values';
+-
+-const CIRCLE_SIZE = 32;
+-const INNER_CIRCLE_SIZE = 6;
+-
+-export const CircleRoot = styled.div`
+-	border-radius: ${ CONFIG.radiusRound };
+-	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
+-	box-sizing: border-box;
+-	cursor: grab;
+-	height: ${ CIRCLE_SIZE }px;
+-	overflow: hidden;
+-	width: ${ CIRCLE_SIZE }px;
+-
+-	:active {
+-		cursor: grabbing;
+-	}
+-`;
+-
+-export const CircleIndicatorWrapper = styled.div`
+-	box-sizing: border-box;
+-	position: relative;
+-	width: 100%;
+-	height: 100%;
+-
+-	:focus-visible {
+-		outline: none;
+-	}
+-`;
+-
+-export const CircleIndicator = styled.div`
+-	background: ${ COLORS.theme.accent };
+-	border-radius: ${ CONFIG.radiusRound };
+-	box-sizing: border-box;
+-	display: block;
+-	left: 50%;
+-	top: 4px;
+-	transform: translateX( -50% );
+-	position: absolute;
+-	width: ${ INNER_CIRCLE_SIZE }px;
+-	height: ${ INNER_CIRCLE_SIZE }px;
+-`;
+-
+-export const UnitText = styled( Text )`
+-	color: ${ COLORS.theme.accent };
+-	margin-right: ${ space( 3 ) };
+-`;

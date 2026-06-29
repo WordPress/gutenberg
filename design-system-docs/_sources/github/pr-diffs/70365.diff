@@ -1,0 +1,386 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 83b9b1a46df759..538ed4e4ed12f0 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -857,12 +857,24 @@
+ 		"markdown_source": "../packages/components/src/dashicon/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "DatePicker",
++		"slug": "date-picker",
++		"markdown_source": "../packages/components/src/date-time/date-picker/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "DateTime",
+ 		"slug": "date-time",
+ 		"markdown_source": "../packages/components/src/date-time/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "TimePicker",
++		"slug": "time-picker",
++		"markdown_source": "../packages/components/src/date-time/time-picker/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "Disabled",
+ 		"slug": "disabled",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 372cbca960e0bc..26b7f3edf36ad2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Documentation
++
++-   Add README.md files for `DatePicker` and `TimePicker` components ([#70365](https://github.com/WordPress/gutenberg/pull/70365)).
++
+ ### Bug Fixes
+ 
+ -   `CheckboxControl`: Fix disabled styles [#77132](https://github.com/WordPress/gutenberg/pull/77132).
+diff --git a/packages/components/src/date-time/README.md b/packages/components/src/date-time/README.md
+index b57a3f859b0e11..5c69d8a2909dea 100644
+--- a/packages/components/src/date-time/README.md
++++ b/packages/components/src/date-time/README.md
+@@ -70,7 +70,7 @@ A callback function which receives a Date object representing a day as an argume
+ 
+ -   Required: No
+ 
+-### `onMonthPreviewed`: `( date: Date ) => void`
++### `onMonthPreviewed`: `( date: string ) => void`
+ 
+ A callback invoked when selecting the previous/next month in the date picker. The callback receives the new month date in the ISO format as an argument.
+ 
+@@ -87,5 +87,5 @@ List of events to show in the date picker. Each event will appear as a dot on th
+ 
+ The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
+ 
+-- Required: No
+-- Default: 0
++-   Required: No
++-   Default: 0
+diff --git a/packages/components/src/date-time/date-picker/README.md b/packages/components/src/date-time/date-picker/README.md
+new file mode 100644
+index 00000000000000..1a70ff3ba6f97b
+--- /dev/null
++++ b/packages/components/src/date-time/date-picker/README.md
+@@ -0,0 +1,65 @@
++# DatePicker
++
++DatePicker is a React component that renders a calendar for date selection. It can be used independently or as part of the `DateTimePicker` component.
++
++## Usage
++
++Render a DatePicker.
++
++```jsx
++import { useState } from 'react';
++import { DatePicker } from '@wordpress/components';
++
++const MyDatePicker = () => {
++	const [ date, setDate ] = useState( new Date() );
++
++	return (
++		<DatePicker
++			currentDate={ date }
++			onChange={ ( newDate ) => setDate( newDate ) }
++		/>
++	);
++};
++```
++
++## Props
++
++The component accepts the following props:
++
++### `currentDate`: `Date | string | number | null`
++
++The current date at initialization. Optionally pass in a `null` value to specify no date is currently selected.
++
++-   Required: No
++-   Default: today's date
++
++### `onChange`: `( date: string ) => void`
++
++The function called when a new date has been selected. It is passed the `currentDate` as an argument.
++
++-   Required: No
++
++### `events`: `{ date: Date }[]`
++
++List of events to show in the date picker. Each event will appear as a dot on the day of the event.
++
++-   Required: No
++
++### `isInvalidDate`: `( date: Date ) => boolean`
++
++A callback function which receives a Date object representing a day as an argument, and should return a Boolean to signify if the day is valid or not.
++
++-   Required: No
++
++### `onMonthPreviewed`: `( date: string ) => void`
++
++A callback invoked when selecting the previous/next month in the date picker. The callback receives the new month date in the ISO format as an argument.
++
++-   Required: No
++
++### `startOfWeek`: `0 | 1 | 2 | 3 | 4 | 5 | 6`
++
++The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
++
++-   Required: No
++-   Default: 0
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date-picker/index.tsx
+similarity index 100%
+rename from packages/components/src/date-time/date/index.tsx
+rename to packages/components/src/date-time/date-picker/index.tsx
+diff --git a/packages/components/src/date-time/date/styles.ts b/packages/components/src/date-time/date-picker/styles.ts
+similarity index 100%
+rename from packages/components/src/date-time/date/styles.ts
+rename to packages/components/src/date-time/date-picker/styles.ts
+diff --git a/packages/components/src/date-time/date/test/index.tsx b/packages/components/src/date-time/date-picker/test/index.tsx
+similarity index 100%
+rename from packages/components/src/date-time/date/test/index.tsx
+rename to packages/components/src/date-time/date-picker/test/index.tsx
+diff --git a/packages/components/src/date-time/date/test/use-lilius.ts b/packages/components/src/date-time/date-picker/test/use-lilius.ts
+similarity index 100%
+rename from packages/components/src/date-time/date/test/use-lilius.ts
+rename to packages/components/src/date-time/date-picker/test/use-lilius.ts
+diff --git a/packages/components/src/date-time/date/use-lilius/index.ts b/packages/components/src/date-time/date-picker/use-lilius/index.ts
+similarity index 100%
+rename from packages/components/src/date-time/date/use-lilius/index.ts
+rename to packages/components/src/date-time/date-picker/use-lilius/index.ts
+diff --git a/packages/components/src/date-time/date-time/index.tsx b/packages/components/src/date-time/date-time/index.tsx
+index 2be59694253700..df08a284a9259d 100644
+--- a/packages/components/src/date-time/date-time/index.tsx
++++ b/packages/components/src/date-time/date-time/index.tsx
+@@ -11,8 +11,8 @@ import { forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { default as DatePicker } from '../date';
+-import { default as TimePicker } from '../time';
++import { default as DatePicker } from '../date-picker';
++import { default as TimePicker } from '../time-picker';
+ import type { DateTimePickerProps } from '../types';
+ import { Wrapper } from './styles';
+ 
+diff --git a/packages/components/src/date-time/index.ts b/packages/components/src/date-time/index.ts
+index a103bac0d30efb..291d2b317ed499 100644
+--- a/packages/components/src/date-time/index.ts
++++ b/packages/components/src/date-time/index.ts
+@@ -1,8 +1,8 @@
+ /**
+  * Internal dependencies
+  */
+-import { default as DatePicker } from './date';
+-import { default as TimePicker } from './time';
++import { default as DatePicker } from './date-picker';
++import { default as TimePicker } from './time-picker';
+ import { default as DateTimePicker } from './date-time';
+ 
+ export { DatePicker, TimePicker };
+diff --git a/packages/components/src/date-time/stories/date.story.tsx b/packages/components/src/date-time/stories/date.story.tsx
+index 8344e870e75aa0..047685fffe5a37 100644
+--- a/packages/components/src/date-time/stories/date.story.tsx
++++ b/packages/components/src/date-time/stories/date.story.tsx
+@@ -11,7 +11,7 @@ import { useState, useEffect } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import DatePicker from '../date';
++import DatePicker from '../date-picker';
+ import { daysFromNow, isWeekend } from './utils';
+ 
+ const meta: Meta< typeof DatePicker > = {
+diff --git a/packages/components/src/date-time/stories/time.story.tsx b/packages/components/src/date-time/stories/time.story.tsx
+index e0673c2a4cd24b..9174758f86f2a9 100644
+--- a/packages/components/src/date-time/stories/time.story.tsx
++++ b/packages/components/src/date-time/stories/time.story.tsx
+@@ -11,7 +11,7 @@ import { useState, useEffect } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import TimePicker from '../time';
++import TimePicker from '../time-picker';
+ 
+ const meta: Meta< typeof TimePicker > = {
+ 	title: 'Components/Selection & Input/Time & Date/TimePicker',
+diff --git a/packages/components/src/date-time/time-picker/README.md b/packages/components/src/date-time/time-picker/README.md
+new file mode 100644
+index 00000000000000..b8ef00a99d0b51
+--- /dev/null
++++ b/packages/components/src/date-time/time-picker/README.md
+@@ -0,0 +1,119 @@
++# TimePicker
++
++TimePicker is a React component that renders form inputs for time and date selection. It can be used independently or as part of the `DateTimePicker` component.
++
++**Note:** `TimePicker` also exposes a compound sub-component, `TimePicker.TimeInput`, which can be used independently to render a time input field without the full picker UI.
++
++## Usage
++
++Render a TimePicker.
++
++```jsx
++import { useState } from 'react';
++import { TimePicker } from '@wordpress/components';
++
++const MyTimePicker = () => {
++	const [ time, setTime ] = useState( new Date() );
++
++	return (
++		<TimePicker
++			currentTime={ time }
++			onChange={ ( newTime ) => setTime( newTime ) }
++			is12Hour
++		/>
++	);
++};
++```
++
++## Props
++
++The component accepts the following props:
++
++### `currentTime`: `Date | string | number | null`
++
++The current time at initialization. Optionally pass in a `null` value to specify no time is currently selected.
++
++-   Required: No
++-   Default: current time
++
++### `onChange`: `( time: string ) => void`
++
++The function called when a new time has been selected. It is passed the time as an ISO-formatted string.
++
++-   Required: No
++
++### `is12Hour`: `boolean`
++
++Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed.
++
++-   Required: No
++-   Default: false
++
++### `dateOrder`: `'dmy' | 'mdy' | 'ymd'`
++
++The order of day, month, and year. This prop overrides the time format determined by `is12Hour` prop.
++
++-   Required: No
++-   Default: `'dmy'` (or `'mdy'` when `is12Hour` is `true`)
++
++### `hideLabelFromVision`: `boolean`
++
++Whether to visually hide field labels while keeping them accessible to screen readers.
++
++-   Required: No
++-   Default: false
++
++## TimePicker.TimeInput
++
++A standalone time input component. Values are passed as an object in 24-hour format (`{ hours: number, minutes: number }`).
++
++### Usage
++
++```jsx
++import { useState } from 'react';
++import { TimePicker } from '@wordpress/components';
++
++const MyTimeInput = () => {
++	const [ time, setTime ] = useState( { hours: 13, minutes: 30 } );
++
++	return (
++		<TimePicker.TimeInput
++			value={ time }
++			onChange={ setTime }
++			label="Time"
++		/>
++	);
++};
++```
++
++### Props
++
++#### `value`: `{ hours: number, minutes: number }`
++
++The time input value in 24-hour format.
++
++-   Required: No
++
++#### `defaultValue`: `{ hours: number, minutes: number }`
++
++An optional default value for the control when used in uncontrolled mode. If left `undefined`, the current time will be used.
++
++-   Required: No
++
++#### `onChange`: `( time: { hours: number, minutes: number } ) => void`
++
++Called when the time changes. Receives the new value as an object with `hours` and `minutes`.
++
++-   Required: No
++
++#### `is12Hour`: `boolean`
++
++Whether to use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed.
++
++-   Required: No
++
++#### `label`: `string`
++
++The label for the time input.
++
++-   Required: No
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time-picker/index.tsx
+similarity index 97%
+rename from packages/components/src/date-time/time/index.tsx
+rename to packages/components/src/date-time/time-picker/index.tsx
+index f7c63865de5149..fd0c80d9e87cc4 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time-picker/index.tsx
+@@ -30,7 +30,7 @@ import { TimeInput } from './time-input';
+ const VALID_DATE_ORDERS = [ 'dmy', 'mdy', 'ymd' ];
+ 
+ /**
+- * TimePicker is a React component that renders a clock for time selection.
++ * TimePicker is a React component that renders form inputs for time and date selection. It can be used independently or as part of the `DateTimePicker` component.
+  *
+  * ```jsx
+  * import { TimePicker } from '@wordpress/components';
+diff --git a/packages/components/src/date-time/time/styles.ts b/packages/components/src/date-time/time-picker/styles.ts
+similarity index 100%
+rename from packages/components/src/date-time/time/styles.ts
+rename to packages/components/src/date-time/time-picker/styles.ts
+diff --git a/packages/components/src/date-time/time/test/index.tsx b/packages/components/src/date-time/time-picker/test/index.tsx
+similarity index 100%
+rename from packages/components/src/date-time/time/test/index.tsx
+rename to packages/components/src/date-time/time-picker/test/index.tsx
+diff --git a/packages/components/src/date-time/time/time-input/index.tsx b/packages/components/src/date-time/time-picker/time-input/index.tsx
+similarity index 100%
+rename from packages/components/src/date-time/time/time-input/index.tsx
+rename to packages/components/src/date-time/time-picker/time-input/index.tsx
+diff --git a/packages/components/src/date-time/time/time-input/test/index.tsx b/packages/components/src/date-time/time-picker/time-input/test/index.tsx
+similarity index 100%
+rename from packages/components/src/date-time/time/time-input/test/index.tsx
+rename to packages/components/src/date-time/time-picker/time-input/test/index.tsx
+diff --git a/packages/components/src/date-time/time/timezone.tsx b/packages/components/src/date-time/time-picker/timezone.tsx
+similarity index 100%
+rename from packages/components/src/date-time/time/timezone.tsx
+rename to packages/components/src/date-time/time-picker/timezone.tsx
+diff --git a/packages/components/src/date-time/types.ts b/packages/components/src/date-time/types.ts
+index 1f2298d9d450b5..72721c7ec9e002 100644
+--- a/packages/components/src/date-time/types.ts
++++ b/packages/components/src/date-time/types.ts
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import type { MinutesInput } from './time/styles';
++import type { MinutesInput } from './time-picker/styles';
+ 
+ export type TimePickerProps = {
+ 	/**

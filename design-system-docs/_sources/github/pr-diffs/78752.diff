@@ -1,0 +1,153 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1944bb69f68478..81dbe2f632474c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `PanelBody`: Add a `headingLevel` prop to configure the title's heading level (`h1`–`h6`), defaulting to `2` ([#78752](https://github.com/WordPress/gutenberg/pull/78752)).
++
+ ## 34.0.0 (2026-05-27)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/panel/README.md b/packages/components/src/panel/README.md
+index dcb3560bc023bf..68bc5ea7f1bf3b 100644
+--- a/packages/components/src/panel/README.md
++++ b/packages/components/src/panel/README.md
+@@ -104,6 +104,13 @@ Title text. It shows even when the component is closed.
+ 
+ -   Required: No
+ 
++###### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6`
++
++The heading level of the title. Use this to reflect the surrounding document structure so the title is rendered with the appropriate heading tag (`h1`–`h6`).
++
++-   Required: No
++-   Default: `2`
++
+ ###### `opened`: `boolean`
+ 
+ When set to `true`, the component will remain open regardless of the `initialOpen` prop and the
+diff --git a/packages/components/src/panel/body.tsx b/packages/components/src/panel/body.tsx
+index 803b63b71747eb..aef942ec611108 100644
+--- a/packages/components/src/panel/body.tsx
++++ b/packages/components/src/panel/body.tsx
+@@ -29,6 +29,7 @@ export function UnforwardedPanelBody(
+ 		buttonProps = {},
+ 		children,
+ 		className,
++		headingLevel = 2,
+ 		icon,
+ 		initialOpen,
+ 		onToggle = noop,
+@@ -90,6 +91,7 @@ export function UnforwardedPanelBody(
+ 				isOpened={ Boolean( isOpened ) }
+ 				onClick={ handleOnToggle }
+ 				title={ title }
++				headingLevel={ headingLevel }
+ 				{ ...buttonProps }
+ 			/>
+ 			{ typeof children === 'function'
+@@ -102,6 +104,7 @@ export function UnforwardedPanelBody(
+ const PanelBodyTitle = forwardRef(
+ 	(
+ 		{
++			headingLevel = 2,
+ 			isOpened,
+ 			icon,
+ 			title,
+@@ -113,8 +116,11 @@ const PanelBodyTitle = forwardRef(
+ 			return null;
+ 		}
+ 
++		const TitleTag =
++			`h${ headingLevel }` as keyof React.JSX.IntrinsicElements;
++
+ 		return (
+-			<h2 className="components-panel__body-title">
++			<TitleTag className="components-panel__body-title">
+ 				<Button
+ 					__next40pxDefaultSize
+ 					className="components-panel__body-toggle"
+@@ -141,7 +147,7 @@ const PanelBodyTitle = forwardRef(
+ 						/>
+ 					) }
+ 				</Button>
+-			</h2>
++			</TitleTag>
+ 		);
+ 	}
+ );
+diff --git a/packages/components/src/panel/test/body.tsx b/packages/components/src/panel/test/body.tsx
+index fb745f2c602db7..d5bc92dfb119ab 100644
+--- a/packages/components/src/panel/test/body.tsx
++++ b/packages/components/src/panel/test/body.tsx
+@@ -151,4 +151,25 @@ describe( 'PanelBody', () => {
+ 			expect( mock ).toHaveBeenCalled();
+ 		} );
+ 	} );
++
++	describe( 'title heading level', () => {
++		it( 'should render the title as a level 2 heading by default', () => {
++			render( <PanelBody title="Panel" /> );
++
++			expect(
++				screen.getByRole( 'heading', { level: 2, name: 'Panel' } )
++			).toBeInTheDocument();
++		} );
++
++		it( 'should render the title at the specified heading level', () => {
++			render( <PanelBody title="Panel" headingLevel={ 3 } /> );
++
++			expect(
++				screen.getByRole( 'heading', { level: 3, name: 'Panel' } )
++			).toBeInTheDocument();
++			expect(
++				screen.queryByRole( 'heading', { level: 2 } )
++			).not.toBeInTheDocument();
++		} );
++	} );
+ } );
+diff --git a/packages/components/src/panel/types.ts b/packages/components/src/panel/types.ts
+index c28a4e1a25166b..5b970a519b085e 100644
+--- a/packages/components/src/panel/types.ts
++++ b/packages/components/src/panel/types.ts
+@@ -3,6 +3,7 @@
+  */
+ import type { ButtonAsButtonProps } from '../button/types';
+ import type { WordPressComponentProps } from '../context';
++import type { HeadingSize } from '../heading/types';
+ 
+ export type PanelProps = {
+ 	/**
+@@ -67,6 +68,14 @@ export type PanelBodyProps = {
+ 	 * The CSS class to apply to the wrapper element.
+ 	 */
+ 	className?: string;
++	/**
++	 * The heading level of the title. Use this to reflect the surrounding
++	 * document structure so the title is rendered with the appropriate
++	 * heading tag (`h1`–`h6`).
++	 *
++	 * @default 2
++	 */
++	headingLevel?: HeadingSize;
+ 	/**
+ 	 * An icon to be shown next to the title.
+ 	 */
+@@ -101,6 +110,12 @@ export type PanelBodyProps = {
+ };
+ 
+ export type PanelBodyTitleProps = Omit< ButtonAsButtonProps, 'icon' > & {
++	/**
++	 * The heading level of the title.
++	 *
++	 * @default 2
++	 */
++	headingLevel?: HeadingSize;
+ 	/**
+ 	 * An icon to be shown next to the title.
+ 	 */

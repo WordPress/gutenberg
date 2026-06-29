@@ -1,0 +1,151 @@
+diff --git a/packages/components/src/combobox-control/README.md b/packages/components/src/combobox-control/README.md
+index 4089cf9c56e9b5..7a11c8b95fe2e9 100644
+--- a/packages/components/src/combobox-control/README.md
++++ b/packages/components/src/combobox-control/README.md
+@@ -39,6 +39,7 @@ function MyComboboxControl() {
+ 			label="Font Size"
+ 			value={ fontSize }
+ 			onChange={ setFontSize }
++			isLoading={ isLoading }
+ 			options={ filteredOptions }
+ 			onFilterValueChange={ ( inputValue ) =>
+ 				setFilteredOptions(
+@@ -112,13 +113,20 @@ If the control is clicked, the dropdown will expand regardless of this prop.
+ -   Required: No
+ -   Default: `true`
+ 
+-### placeholder
++#### placeholder
+ 
+ If passed, the combobox input will show a placeholder string if no values are present.
+ 
+ -   Type: `string`
+ -   Required: No
+ 
++#### isLoading
++
++Show a spinner (and hide the suggestions dropdown) while data about the matching suggestions (ie the `options` prop) is loading
++
++-   Type: `Boolean`
++-   Required: No
++
+ #### __experimentalRenderItem
+ 
+ Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
+diff --git a/packages/components/src/combobox-control/index.tsx b/packages/components/src/combobox-control/index.tsx
+index 28510c8653d02e..9c6bd2a4d75dd2 100644
+--- a/packages/components/src/combobox-control/index.tsx
++++ b/packages/components/src/combobox-control/index.tsx
+@@ -35,6 +35,7 @@ import type { TokenInputProps } from '../form-token-field/types';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
+ import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
++import Spinner from '../spinner';
+ 
+ const noop = () => {};
+ 
+@@ -126,6 +127,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 		help,
+ 		allowReset = true,
+ 		className,
++		isLoading = false,
+ 		messages = {
+ 			selected: __( 'Item selected.' ),
+ 		},
+@@ -362,6 +364,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 								onChange={ onInputChange }
+ 							/>
+ 						</FlexBlock>
++						{ isLoading && <Spinner /> }
+ 						{ allowReset && (
+ 							<Button
+ 								size="small"
+@@ -375,7 +378,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
+ 							/>
+ 						) }
+ 					</InputWrapperFlex>
+-					{ isExpanded && (
++					{ isExpanded && ! isLoading && (
+ 						<SuggestionsList
+ 							instanceId={ instanceId }
+ 							// The empty string for `value` here is not actually used, but is
+diff --git a/packages/components/src/combobox-control/stories/index.story.tsx b/packages/components/src/combobox-control/stories/index.story.tsx
+index f033742a336623..19eecea54f6890 100644
+--- a/packages/components/src/combobox-control/stories/index.story.tsx
++++ b/packages/components/src/combobox-control/stories/index.story.tsx
+@@ -124,6 +124,7 @@ WithCustomRenderItem.args = {
+ 			</div>
+ 		);
+ 	},
++	isLoading: true,
+ };
+ 
+ /**
+diff --git a/packages/components/src/combobox-control/types.ts b/packages/components/src/combobox-control/types.ts
+index 470b38c35e2c8a..8ecdad501e6b8f 100644
+--- a/packages/components/src/combobox-control/types.ts
++++ b/packages/components/src/combobox-control/types.ts
+@@ -86,4 +86,10 @@ export type ComboboxControlProps = Pick<
+ 	 * If passed, the combobox input will show a placeholder string if no values are present.
+ 	 */
+ 	placeholder?: string;
++
++	/**
++	 * Show a spinner (and hide the suggestions dropdown) while data
++	 * about the matching suggestions (ie the `options` prop) is loading
++	 */
++	isLoading?: boolean;
+ };
+diff --git a/packages/editor/src/components/post-author/combobox.js b/packages/editor/src/components/post-author/combobox.js
+index 867eca7947976a..9cc6e01f5b82ce 100644
+--- a/packages/editor/src/components/post-author/combobox.js
++++ b/packages/editor/src/components/post-author/combobox.js
+@@ -17,7 +17,8 @@ export default function PostAuthorCombobox() {
+ 	const [ fieldValue, setFieldValue ] = useState();
+ 
+ 	const { editPost } = useDispatch( editorStore );
+-	const { authorId, authorOptions } = useAuthorsQuery( fieldValue );
++	const { authorId, authorOptions, isLoading } =
++		useAuthorsQuery( fieldValue );
+ 
+ 	/**
+ 	 * Handle author selection.
+@@ -51,6 +52,7 @@ export default function PostAuthorCombobox() {
+ 			onChange={ handleSelect }
+ 			allowReset={ false }
+ 			hideLabelFromVision
++			isLoading={ isLoading }
+ 		/>
+ 	);
+ }
+diff --git a/packages/editor/src/components/post-author/hook.js b/packages/editor/src/components/post-author/hook.js
+index f251eba79e1806..28c4c126547b82 100644
+--- a/packages/editor/src/components/post-author/hook.js
++++ b/packages/editor/src/components/post-author/hook.js
+@@ -14,9 +14,9 @@ import { store as editorStore } from '../../store';
+ import { AUTHORS_QUERY, BASE_QUERY } from './constants';
+ 
+ export function useAuthorsQuery( search ) {
+-	const { authorId, authors, postAuthor } = useSelect(
++	const { authorId, authors, postAuthor, isLoading } = useSelect(
+ 		( select ) => {
+-			const { getUser, getUsers } = select( coreStore );
++			const { getUser, getUsers, isResolving } = select( coreStore );
+ 			const { getEditedPostAttribute } = select( editorStore );
+ 			const _authorId = getEditedPostAttribute( 'author' );
+ 			const query = { ...AUTHORS_QUERY };
+@@ -30,6 +30,7 @@ export function useAuthorsQuery( search ) {
+ 				authorId: _authorId,
+ 				authors: getUsers( query ),
+ 				postAuthor: getUser( _authorId, BASE_QUERY ),
++				isLoading: isResolving( 'getUsers', [ query ] ),
+ 			};
+ 		},
+ 		[ search ]
+@@ -68,5 +69,5 @@ export function useAuthorsQuery( search ) {
+ 		return [ ...currentAuthor, ...fetchedAuthors ];
+ 	}, [ authors, postAuthor ] );
+ 
+-	return { authorId, authorOptions, postAuthor };
++	return { authorId, authorOptions, postAuthor, isLoading };
+ }

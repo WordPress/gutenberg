@@ -1,0 +1,86 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 68368efca525be..b1709ffbc63488 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,10 @@
+ 
+ -   `Popover`, `ColorPicker`: Obviate pointer event trap #59449 ([#59449](https://github.com/WordPress/gutenberg/pull/59449)).
+ 
++### Experimental
++
++-   `CustomSelectControlV2`: Fix hint behavior in legacy ([#60183](https://github.com/WordPress/gutenberg/pull/60183)).
++
+ ## 27.2.0 (2024-03-21)
+ 
+ -   `Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+index 49c640581c3772..a9c68e344a7870 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/index.tsx
+@@ -68,9 +68,7 @@ function CustomSelect( props: LegacyCustomSelectProps ) {
+ 				<CustomSelectItem
+ 					key={ key }
+ 					value={ name }
+-					children={
+-						__experimentalShowSelectedHint ? withHint : name
+-					}
++					children={ __experimentalHint ? withHint : name }
+ 					{ ...rest }
+ 				/>
+ 			);
+diff --git a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+index 906bf1cde02905..c14eca2b7c54d3 100644
+--- a/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
++++ b/packages/components/src/custom-select-control-v2/legacy-component/test/index.tsx
+@@ -248,7 +248,7 @@ describe.each( [
+ 		);
+ 	} );
+ 
+-	it( 'shows selected hint in list of options when added', async () => {
++	it( 'shows selected hint in list of options when added, regardless of __experimentalShowSelectedHint prop', async () => {
+ 		render(
+ 			<Component
+ 				{ ...legacyProps }
+@@ -260,7 +260,6 @@ describe.each( [
+ 						__experimentalHint: 'Hint',
+ 					},
+ 				] }
+-				__experimentalShowSelectedHint
+ 			/>
+ 		);
+ 
+diff --git a/packages/components/src/custom-select-control/test/index.js b/packages/components/src/custom-select-control/test/index.js
+index 715b2ecc99c7d4..a9d5e7d9451ad5 100644
+--- a/packages/components/src/custom-select-control/test/index.js
++++ b/packages/components/src/custom-select-control/test/index.js
+@@ -238,6 +238,30 @@ describe.each( [
+ 		).toHaveTextContent( 'Hint' );
+ 	} );
+ 
++	it( 'shows selected hint in list of options when added, regardless of __experimentalShowSelectedHint prop', async () => {
++		const user = userEvent.setup();
++
++		render(
++			<Component
++				{ ...props }
++				label="Custom select"
++				options={ [
++					{
++						key: 'one',
++						name: 'One',
++						__experimentalHint: 'Hint',
++					},
++				] }
++			/>
++		);
++
++		await user.click(
++			screen.getByRole( 'button', { name: 'Custom select' } )
++		);
++
++		expect( screen.getByRole( 'option', { name: /hint/i } ) ).toBeVisible();
++	} );
++
+ 	describe( 'Keyboard behavior and accessibility', () => {
+ 		it( 'Captures the keypress event and does not let it propagate', async () => {
+ 			const user = userEvent.setup();

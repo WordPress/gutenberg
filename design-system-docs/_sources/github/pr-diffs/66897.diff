@@ -1,0 +1,198 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4676047d584544..5c8643dc08cf6c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Deprecations
+ 
+ -   `SelectControl`: Deprecate 36px default size ([#66898](https://github.com/WordPress/gutenberg/pull/66898)).
++-   `InputControl`: Deprecate 36px default size ([#66897](https://github.com/WordPress/gutenberg/pull/66897)).
+ 
+ ## 29.0.0 (2024-12-11)
+ 
+diff --git a/packages/components/src/input-control/README.md b/packages/components/src/input-control/README.md
+index 58a3b4a3b1a094..ff5c70decebeb7 100644
+--- a/packages/components/src/input-control/README.md
++++ b/packages/components/src/input-control/README.md
+@@ -17,6 +17,7 @@ const Example = () => {
+ 
+ 	return (
+ 		<InputControl
++			__next40pxDefaultSize
+ 			value={ value }
+ 			onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
+ 		/>
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index fd0fc0a5c45536..d346d1b31b1118 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -20,6 +20,7 @@ import { space } from '../utils/space';
+ import { useDraft } from './utils';
+ import BaseControl from '../base-control';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ const noop = () => {};
+ 
+@@ -36,6 +37,7 @@ export function UnforwardedInputControl(
+ ) {
+ 	const {
+ 		__next40pxDefaultSize,
++		__shouldNotWarnDeprecated36pxSize,
+ 		__unstableStateReducer: stateReducer = ( state ) => state,
+ 		__unstableInputWidth,
+ 		className,
+@@ -68,6 +70,13 @@ export function UnforwardedInputControl(
+ 
+ 	const helpProp = !! help ? { 'aria-describedby': `${ id }__help` } : {};
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'InputControl',
++		__next40pxDefaultSize,
++		size,
++		__shouldNotWarnDeprecated36pxSize,
++	} );
++
+ 	return (
+ 		<BaseControl
+ 			className={ classes }
+@@ -125,6 +134,7 @@ export function UnforwardedInputControl(
+  *
+  *   return (
+  *  	<InputControl
++ * 			__next40pxDefaultSize
+  *  		value={ value }
+  *  		onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
+  *  	/>
+diff --git a/packages/components/src/input-control/stories/index.story.tsx b/packages/components/src/input-control/stories/index.story.tsx
+index 136301c42e7d09..40630938dbb370 100644
+--- a/packages/components/src/input-control/stories/index.story.tsx
++++ b/packages/components/src/input-control/stories/index.story.tsx
+@@ -46,6 +46,7 @@ export const Default = Template.bind( {} );
+ Default.args = {
+ 	label: 'Value',
+ 	placeholder: 'Placeholder',
++	__next40pxDefaultSize: true,
+ };
+ 
+ export const WithHelpText = Template.bind( {} );
+@@ -117,7 +118,6 @@ export const ShowPassword: StoryFn< typeof InputControl > = ( args ) => {
+ 	return (
+ 		<InputControl
+ 			type={ visible ? 'text' : 'password' }
+-			label="Password"
+ 			suffix={
+ 				<InputControlSuffixWrapper variant="control">
+ 					<Button
+@@ -132,3 +132,8 @@ export const ShowPassword: StoryFn< typeof InputControl > = ( args ) => {
+ 		/>
+ 	);
+ };
++ShowPassword.args = {
++	...Default.args,
++	label: 'Password',
++	placeholder: undefined,
++};
+diff --git a/packages/components/src/input-control/test/index.js b/packages/components/src/input-control/test/index.js
+index ace3086c388c8b..46332eb6eea704 100644
+--- a/packages/components/src/input-control/test/index.js
++++ b/packages/components/src/input-control/test/index.js
+@@ -17,9 +17,15 @@ import BaseInputControl from '../';
+ const getInput = () => screen.getByTestId( 'input' );
+ 
+ describe( 'InputControl', () => {
+-	const InputControl = ( props ) => (
+-		<BaseInputControl { ...props } data-testid="input" />
+-	);
++	const InputControl = ( props ) => {
++		return (
++			<BaseInputControl
++				{ ...props }
++				__next40pxDefaultSize
++				data-testid="input"
++			/>
++		);
++	};
+ 
+ 	describe( 'Basic rendering', () => {
+ 		it( 'should render', () => {
+diff --git a/packages/components/src/modal/stories/index.story.tsx b/packages/components/src/modal/stories/index.story.tsx
+index be18ed141dd3fc..3a7b817458ad28 100644
+--- a/packages/components/src/modal/stories/index.story.tsx
++++ b/packages/components/src/modal/stories/index.story.tsx
+@@ -75,7 +75,10 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
+ 						anim id est laborum.
+ 					</p>
+ 
+-					<InputControl style={ { marginBottom: '20px' } } />
++					<InputControl
++						__next40pxDefaultSize
++						style={ { marginBottom: '20px' } }
++					/>
+ 
+ 					<Button variant="secondary" onClick={ closeModal }>
+ 						Close Modal
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index efa84879b8ff3c..6dd1af4024af7f 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -242,6 +242,7 @@ function UnforwardedNumberControl(
+ 				return stateReducerProp?.( baseState, action ) ?? baseState;
+ 			} }
+ 			size={ size }
++			__shouldNotWarnDeprecated36pxSize
+ 			suffix={
+ 				spinControls === 'custom' ? (
+ 					<>
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index a58ecbb685e514..2eb6e3bbe3b6fc 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -60,6 +60,7 @@ const DEFAULT_COLOR = '#000';
+ function NameInput( { value, onChange, label }: NameInputProps ) {
+ 	return (
+ 		<NameInputControl
++			size="compact"
+ 			label={ label }
+ 			hideLabelFromVision
+ 			value={ value }
+diff --git a/packages/components/src/panel/stories/index.story.tsx b/packages/components/src/panel/stories/index.story.tsx
+index db66b911d4dc17..1392247036c2cc 100644
+--- a/packages/components/src/panel/stories/index.story.tsx
++++ b/packages/components/src/panel/stories/index.story.tsx
+@@ -74,12 +74,12 @@ _PanelRow.args = {
+ 	children: (
+ 		<PanelBody title="My Profile">
+ 			<PanelRow>
+-				<InputControl label="First name" />
+-				<InputControl label="Last name" />
++				<InputControl label="First name" __next40pxDefaultSize />
++				<InputControl label="Last name" __next40pxDefaultSize />
+ 			</PanelRow>
+ 			<PanelRow>
+ 				<div style={ { flex: 1 } }>
+-					<InputControl label="Email" />
++					<InputControl label="Email" __next40pxDefaultSize />
+ 				</div>
+ 			</PanelRow>
+ 		</PanelBody>
+diff --git a/packages/components/src/tree-grid/stories/index.story.tsx b/packages/components/src/tree-grid/stories/index.story.tsx
+index f91ba4631d3209..e113103897dbdb 100644
+--- a/packages/components/src/tree-grid/stories/index.story.tsx
++++ b/packages/components/src/tree-grid/stories/index.story.tsx
+@@ -111,6 +111,7 @@ const Rows = ( {
+ 										label="Description"
+ 										hideLabelFromVision
+ 										placeholder="Description"
++										__next40pxDefaultSize
+ 										{ ...props }
+ 									/>
+ 								) }
+@@ -121,6 +122,7 @@ const Rows = ( {
+ 										label="Notes"
+ 										hideLabelFromVision
+ 										placeholder="Notes"
++										__next40pxDefaultSize
+ 										{ ...props }
+ 									/>
+ 								) }

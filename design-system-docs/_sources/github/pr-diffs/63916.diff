@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a05ebab3783b8e..4a423eeb4a57df 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Internal
++
++-   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).
++
+ ## 28.4.0 (2024-07-24)
+ 
+ ### Deprecations
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/dropdown-menu-v2/styles.ts
+index 91a3aaeec1147e..b36f69e62c5094 100644
+--- a/packages/components/src/dropdown-menu-v2/styles.ts
++++ b/packages/components/src/dropdown-menu-v2/styles.ts
+@@ -344,6 +344,7 @@ export const DropdownMenuItemHelpText = styled( Truncate )`
+ 	font-size: ${ font( 'helpText.fontSize' ) };
+ 	line-height: 16px;
+ 	color: ${ COLORS.gray[ '700' ] };
++	word-break: break-all;
+ 
+ 	[data-active-item]:not( [data-focus-visible] ) *:not( ${ DropdownMenu } ) &,
+ 	[aria-disabled='true'] *:not( ${ DropdownMenu } ) & {

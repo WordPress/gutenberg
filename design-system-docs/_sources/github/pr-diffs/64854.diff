@@ -1,0 +1,374 @@
+diff --git a/packages/block-editor/src/hooks/block-bindings.js b/packages/block-editor/src/hooks/block-bindings.js
+index 961a34f6f858fc..3b90ecc1a0c178 100644
+--- a/packages/block-editor/src/hooks/block-bindings.js
++++ b/packages/block-editor/src/hooks/block-bindings.js
+@@ -55,14 +55,9 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
+ 				<Fragment key={ name }>
+ 					<DropdownMenuV2.Group>
+ 						{ Object.keys( fieldsList ).length > 1 && (
+-							<Text
+-								className="block-editor-bindings__source-label"
+-								upperCase
+-								variant="muted"
+-								aria-hidden
+-							>
++							<DropdownMenuV2.GroupLabel>
+ 								{ registeredSources[ name ].label }
+-							</Text>
++							</DropdownMenuV2.GroupLabel>
+ 						) }
+ 						{ Object.entries( fields ).map( ( [ key, value ] ) => (
+ 							<DropdownMenuV2.RadioItem
+@@ -160,7 +155,6 @@ function EditableBlockBindingsPanelItems( {
+ 								isMobile ? 'bottom-start' : 'left-start'
+ 							}
+ 							gutter={ isMobile ? 8 : 36 }
+-							className="block-editor-bindings__popover"
+ 							trigger={
+ 								<Item>
+ 									<BlockBindingsAttribute
+diff --git a/packages/block-editor/src/hooks/block-bindings.scss b/packages/block-editor/src/hooks/block-bindings.scss
+index 603b2115623b8f..69eaa18d57daea 100644
+--- a/packages/block-editor/src/hooks/block-bindings.scss
++++ b/packages/block-editor/src/hooks/block-bindings.scss
+@@ -4,11 +4,3 @@ div.block-editor-bindings__panel {
+ 		color: inherit;
+ 	}
+ }
+-
+-.block-editor-bindings__popover {
+-	// This won't be needed if `DropdownMenuGroup` component handles the label.
+-	.block-editor-bindings__source-label {
+-		grid-column: 2;
+-		margin: $grid-unit-10 0;
+-	}
+-}
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f3c851344b9769..e039da66001f36 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -52,6 +52,7 @@
+ ### Internal
+ 
+ -   `DropdownMenu` v2: refactor to overloaded naming convention ([#64654](https://github.com/WordPress/gutenberg/pull/64654)).
++-   `DropdownMenu` v2: add `GroupLabel` subcomponent ([#64854](https://github.com/WordPress/gutenberg/pull/64854)).
+ -   `Composite` V2: fix Storybook docgen ([#64682](https://github.com/WordPress/gutenberg/pull/64682)).
+ 
+ ## 28.6.0 (2024-08-21)
+diff --git a/packages/components/src/dropdown-menu-v2/README.md b/packages/components/src/dropdown-menu-v2/README.md
+index d0547f1f142600..771b5b74b24bf7 100644
+--- a/packages/components/src/dropdown-menu-v2/README.md
++++ b/packages/components/src/dropdown-menu-v2/README.md
+@@ -311,7 +311,7 @@ The help text contents.
+ 
+ -   Required: yes
+ 
+-### `DropdownMenuGroup`
++### `DropdownMenuV2.Group`
+ 
+ Used to group menu items.
+ 
+@@ -325,6 +325,20 @@ The contents of the group.
+ 
+ -   Required: yes
+ 
+-### `DropdownMenuSeparatorProps`
++### `DropdownMenuV2.GroupLabel`
++
++Used to render a group label. The label text should be kept as short as possible.
++
++#### Props
++
++The component accepts the following props:
++
++##### `children`: `React.ReactNode`
++
++The contents of the group label.
++
++-   Required: yes
++
++### `DropdownMenuV2.Separator`
+ 
+ Used to render a visual separator.
+diff --git a/packages/components/src/dropdown-menu-v2/group-label.tsx b/packages/components/src/dropdown-menu-v2/group-label.tsx
+new file mode 100644
+index 00000000000000..7d838ef9fa620a
+--- /dev/null
++++ b/packages/components/src/dropdown-menu-v2/group-label.tsx
+@@ -0,0 +1,37 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef, useContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { WordPressComponentProps } from '../context';
++import { DropdownMenuContext } from './context';
++import { Text } from '../text';
++import type { DropdownMenuGroupLabelProps } from './types';
++import * as Styled from './styles';
++
++export const DropdownMenuGroupLabel = forwardRef<
++	HTMLDivElement,
++	WordPressComponentProps< DropdownMenuGroupLabelProps, 'div', false >
++>( function DropdownMenuGroup( props, ref ) {
++	const dropdownMenuContext = useContext( DropdownMenuContext );
++	return (
++		<Styled.DropdownMenuGroupLabel
++			ref={ ref }
++			render={
++				// @ts-expect-error The `children` prop is passed
++				<Text
++					upperCase
++					variant="muted"
++					size="11px"
++					weight={ 500 }
++					lineHeight="16px"
++				/>
++			}
++			{ ...props }
++			store={ dropdownMenuContext?.store }
++		/>
++	);
++} );
+diff --git a/packages/components/src/dropdown-menu-v2/index.tsx b/packages/components/src/dropdown-menu-v2/index.tsx
+index 96d335f7b38bb9..34805d2d3e2687 100644
+--- a/packages/components/src/dropdown-menu-v2/index.tsx
++++ b/packages/components/src/dropdown-menu-v2/index.tsx
+@@ -32,6 +32,7 @@ import { DropdownMenuItem } from './item';
+ import { DropdownMenuCheckboxItem } from './checkbox-item';
+ import { DropdownMenuRadioItem } from './radio-item';
+ import { DropdownMenuGroup } from './group';
++import { DropdownMenuGroupLabel } from './group-label';
+ import { DropdownMenuSeparator } from './separator';
+ import { DropdownMenuItemLabel } from './item-label';
+ import { DropdownMenuItemHelpText } from './item-help-text';
+@@ -215,6 +216,9 @@ export const DropdownMenuV2 = Object.assign(
+ 		Group: Object.assign( DropdownMenuGroup, {
+ 			displayName: 'DropdownMenuV2.Group',
+ 		} ),
++		GroupLabel: Object.assign( DropdownMenuGroupLabel, {
++			displayName: 'DropdownMenuV2.GroupLabel',
++		} ),
+ 		Separator: Object.assign( DropdownMenuSeparator, {
+ 			displayName: 'DropdownMenuV2.Separator',
+ 		} ),
+diff --git a/packages/components/src/dropdown-menu-v2/stories/index.story.tsx b/packages/components/src/dropdown-menu-v2/stories/index.story.tsx
+index fd14bb68b1d6ad..90d15ca2ea6c18 100644
+--- a/packages/components/src/dropdown-menu-v2/stories/index.story.tsx
++++ b/packages/components/src/dropdown-menu-v2/stories/index.story.tsx
+@@ -32,6 +32,8 @@ const meta: Meta< typeof DropdownMenuV2 > = {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 		Group: DropdownMenuV2.Group,
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		GroupLabel: DropdownMenuV2.GroupLabel,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 		Separator: DropdownMenuV2.Separator,
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 		Context: DropdownMenuV2.Context,
+@@ -83,6 +85,7 @@ export const Default: StoryFn< typeof DropdownMenuV2 > = ( props ) => (
+ 		<DropdownMenuV2.Item disabled>Disabled item</DropdownMenuV2.Item>
+ 		<DropdownMenuV2.Separator />
+ 		<DropdownMenuV2.Group>
++			<DropdownMenuV2.GroupLabel>Group label</DropdownMenuV2.GroupLabel>
+ 			<DropdownMenuV2.Item
+ 				prefix={ <Icon icon={ customLink } size={ 24 } /> }
+ 			>
+@@ -182,6 +185,9 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 	return (
+ 		<DropdownMenuV2 { ...props }>
+ 			<DropdownMenuV2.Group>
++				<DropdownMenuV2.GroupLabel>
++					Single selection, uncontrolled
++				</DropdownMenuV2.GroupLabel>
+ 				<DropdownMenuV2.CheckboxItem
+ 					name="checkbox-individual-uncontrolled-a"
+ 					value="a"
+@@ -191,7 +197,7 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 						Checkbox item A
+ 					</DropdownMenuV2.ItemLabel>
+ 					<DropdownMenuV2.ItemHelpText>
+-						Uncontrolled
++						Initially unchecked
+ 					</DropdownMenuV2.ItemHelpText>
+ 				</DropdownMenuV2.CheckboxItem>
+ 				<DropdownMenuV2.CheckboxItem
+@@ -203,12 +209,15 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 						Checkbox item B
+ 					</DropdownMenuV2.ItemLabel>
+ 					<DropdownMenuV2.ItemHelpText>
+-						Uncontrolled, initially checked
++						Initially checked
+ 					</DropdownMenuV2.ItemHelpText>
+ 				</DropdownMenuV2.CheckboxItem>
+ 			</DropdownMenuV2.Group>
+ 			<DropdownMenuV2.Separator />
+ 			<DropdownMenuV2.Group>
++				<DropdownMenuV2.GroupLabel>
++					Single selection, controlled
++				</DropdownMenuV2.GroupLabel>
+ 				<DropdownMenuV2.CheckboxItem
+ 					name="checkbox-individual-controlled-a"
+ 					value="a"
+@@ -219,7 +228,7 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 						Checkbox item A
+ 					</DropdownMenuV2.ItemLabel>
+ 					<DropdownMenuV2.ItemHelpText>
+-						Controlled
++						Initially unchecked
+ 					</DropdownMenuV2.ItemHelpText>
+ 				</DropdownMenuV2.CheckboxItem>
+ 				<DropdownMenuV2.CheckboxItem
+@@ -232,12 +241,15 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 						Checkbox item B
+ 					</DropdownMenuV2.ItemLabel>
+ 					<DropdownMenuV2.ItemHelpText>
+-						Controlled, initially checked
++						Initially checked
+ 					</DropdownMenuV2.ItemHelpText>
+ 				</DropdownMenuV2.CheckboxItem>
+ 			</DropdownMenuV2.Group>
+ 			<DropdownMenuV2.Separator />
+ 			<DropdownMenuV2.Group>
++				<DropdownMenuV2.GroupLabel>
++					Multiple selection, uncontrolled
++				</DropdownMenuV2.GroupLabel>
+ 				<DropdownMenuV2.CheckboxItem
+ 					name="checkbox-multiple-uncontrolled"
+ 					value="a"
+@@ -246,7 +258,7 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 						Checkbox item A
+ 					</DropdownMenuV2.ItemLabel>
+ 					<DropdownMenuV2.ItemHelpText>
+-						Uncontrolled, multiple selection
++						Initially unchecked
+ 					</DropdownMenuV2.ItemHelpText>
+ 				</DropdownMenuV2.CheckboxItem>
+ 				<DropdownMenuV2.CheckboxItem
+@@ -258,12 +270,15 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 						Checkbox item B
+ 					</DropdownMenuV2.ItemLabel>
+ 					<DropdownMenuV2.ItemHelpText>
+-						Uncontrolled, multiple selection, initially checked
++						Initially checked
+ 					</DropdownMenuV2.ItemHelpText>
+ 				</DropdownMenuV2.CheckboxItem>
+ 			</DropdownMenuV2.Group>
+ 			<DropdownMenuV2.Separator />
+ 			<DropdownMenuV2.Group>
++				<DropdownMenuV2.GroupLabel>
++					Multiple selection, controlled
++				</DropdownMenuV2.GroupLabel>
+ 				<DropdownMenuV2.CheckboxItem
+ 					name="checkbox-multiple-controlled"
+ 					value="a"
+@@ -274,7 +289,7 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 						Checkbox item A
+ 					</DropdownMenuV2.ItemLabel>
+ 					<DropdownMenuV2.ItemHelpText>
+-						Controlled, multiple selection
++						Initially unchecked
+ 					</DropdownMenuV2.ItemHelpText>
+ 				</DropdownMenuV2.CheckboxItem>
+ 				<DropdownMenuV2.CheckboxItem
+@@ -287,7 +302,7 @@ export const WithCheckboxes: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 						Checkbox item B
+ 					</DropdownMenuV2.ItemLabel>
+ 					<DropdownMenuV2.ItemHelpText>
+-						Controlled, multiple selection, initially checked
++						Initially checked
+ 					</DropdownMenuV2.ItemHelpText>
+ 				</DropdownMenuV2.CheckboxItem>
+ 			</DropdownMenuV2.Group>
+@@ -307,12 +322,15 @@ export const WithRadios: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 	return (
+ 		<DropdownMenuV2 { ...props }>
+ 			<DropdownMenuV2.Group>
++				<DropdownMenuV2.GroupLabel>
++					Uncontrolled
++				</DropdownMenuV2.GroupLabel>
+ 				<DropdownMenuV2.RadioItem name="radio-uncontrolled" value="one">
+ 					<DropdownMenuV2.ItemLabel>
+ 						Radio item 1
+ 					</DropdownMenuV2.ItemLabel>
+ 					<DropdownMenuV2.ItemHelpText>
+-						Uncontrolled
++						Initially unchecked
+ 					</DropdownMenuV2.ItemHelpText>
+ 				</DropdownMenuV2.RadioItem>
+ 				<DropdownMenuV2.RadioItem
+@@ -324,12 +342,15 @@ export const WithRadios: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 						Radio item 2
+ 					</DropdownMenuV2.ItemLabel>
+ 					<DropdownMenuV2.ItemHelpText>
+-						Uncontrolled, initially checked
++						Initially checked
+ 					</DropdownMenuV2.ItemHelpText>
+ 				</DropdownMenuV2.RadioItem>
+ 			</DropdownMenuV2.Group>
+ 			<DropdownMenuV2.Separator />
+ 			<DropdownMenuV2.Group>
++				<DropdownMenuV2.GroupLabel>
++					Controlled
++				</DropdownMenuV2.GroupLabel>
+ 				<DropdownMenuV2.RadioItem
+ 					name="radio-controlled"
+ 					value="one"
+@@ -340,7 +361,7 @@ export const WithRadios: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 						Radio item 1
+ 					</DropdownMenuV2.ItemLabel>
+ 					<DropdownMenuV2.ItemHelpText>
+-						Controlled
++						Initially unchecked
+ 					</DropdownMenuV2.ItemHelpText>
+ 				</DropdownMenuV2.RadioItem>
+ 				<DropdownMenuV2.RadioItem
+@@ -353,7 +374,7 @@ export const WithRadios: StoryFn< typeof DropdownMenuV2 > = ( props ) => {
+ 						Radio item 2
+ 					</DropdownMenuV2.ItemLabel>
+ 					<DropdownMenuV2.ItemHelpText>
+-						Controlled, initially checked
++						Initially checked
+ 					</DropdownMenuV2.ItemHelpText>
+ 				</DropdownMenuV2.RadioItem>
+ 			</DropdownMenuV2.Group>
+diff --git a/packages/components/src/dropdown-menu-v2/styles.ts b/packages/components/src/dropdown-menu-v2/styles.ts
+index 9e71316b6b9dc5..00a22d91dd3598 100644
+--- a/packages/components/src/dropdown-menu-v2/styles.ts
++++ b/packages/components/src/dropdown-menu-v2/styles.ts
+@@ -304,6 +304,15 @@ export const DropdownMenuGroup = styled( Ariakit.MenuGroup )`
+ 	display: contents;
+ `;
+ 
++export const DropdownMenuGroupLabel = styled( Ariakit.MenuGroupLabel )`
++	/* Occupy the width of all grid columns (ie. full width) */
++	grid-column: 1 / -1;
++
++	padding-block-start: ${ space( 3 ) };
++	padding-block-end: ${ space( 2 ) };
++	padding-inline: ${ ITEM_PADDING_INLINE };
++`;
++
+ export const DropdownMenuSeparator = styled( Ariakit.MenuSeparator )<
+ 	Pick< DropdownMenuContext, 'variant' >
+ >`
+diff --git a/packages/components/src/dropdown-menu-v2/types.ts b/packages/components/src/dropdown-menu-v2/types.ts
+index f49f026b787933..795cd9ac76ff58 100644
+--- a/packages/components/src/dropdown-menu-v2/types.ts
++++ b/packages/components/src/dropdown-menu-v2/types.ts
+@@ -87,6 +87,13 @@ export interface DropdownMenuGroupProps {
+ 	children: React.ReactNode;
+ }
+ 
++export interface DropdownMenuGroupLabelProps {
++	/**
++	 * The contents of the dropdown menu group.
++	 */
++	children: React.ReactNode;
++}
++
+ export interface DropdownMenuItemProps {
+ 	/**
+ 	 * The contents of the menu item.

@@ -1,0 +1,25 @@
+diff --git a/packages/components/src/focusable-iframe/stories/index.js b/packages/components/src/focusable-iframe/stories/index.js
+new file mode 100644
+index 00000000000000..631cd8dc0d5eee
+--- /dev/null
++++ b/packages/components/src/focusable-iframe/stories/index.js
+@@ -0,0 +1,19 @@
++/**
++ * External dependencies
++ */
++import { text } from '@storybook/addon-knobs';
++
++/**
++ * Internal dependencies
++ */
++import FocusableIframe from '../';
++
++export default {
++	title: 'Components/FocusableIframe',
++	component: FocusableIframe,
++};
++
++export const _default = () => {
++	const source = text( 'iFrame Source', './' );
++	return <FocusableIframe src={ source } />;
++};

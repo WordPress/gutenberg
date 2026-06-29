@@ -1,0 +1,196 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 43c9f0bfc8b044..cea14615959fef 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -93,6 +93,7 @@ module.exports = {
+ 							'findLast',
+ 							'flatten',
+ 							'flattenDeep',
++							'identity',
+ 							'invoke',
+ 							'isArray',
+ 							'isFinite',
+diff --git a/packages/block-editor/src/components/block-list/index.native.js b/packages/block-editor/src/components/block-list/index.native.js
+index b2e0f18d474801..e21f9855ab370f 100644
+--- a/packages/block-editor/src/components/block-list/index.native.js
++++ b/packages/block-editor/src/components/block-list/index.native.js
+@@ -1,7 +1,6 @@
+ /**
+  * External dependencies
+  */
+-import { identity } from 'lodash';
+ import { View, Platform, TouchableWithoutFeedback } from 'react-native';
+ 
+ /**
+@@ -35,6 +34,7 @@ import { BlockDraggableWrapper } from '../block-draggable';
+ import { store as blockEditorStore } from '../../store';
+ 
+ export const OnCaretVerticalPositionChange = createContext();
++const identity = ( x ) => x;
+ 
+ const stylesMemo = {};
+ const getStyles = (
+diff --git a/packages/block-editor/src/hooks/utils.js b/packages/block-editor/src/hooks/utils.js
+index b49ab4fd8836c6..4d826f8cb759f0 100644
+--- a/packages/block-editor/src/hooks/utils.js
++++ b/packages/block-editor/src/hooks/utils.js
+@@ -5,7 +5,6 @@ import {
+ 	pickBy,
+ 	isEmpty,
+ 	isObject,
+-	identity,
+ 	mapValues,
+ 	forEach,
+ 	get,
+@@ -19,6 +18,8 @@ import {
+  */
+ import { getBlockSupport } from '@wordpress/blocks';
+ 
++const identity = ( x ) => x;
++
+ /**
+  * Removed falsy values from nested object.
+  *
+diff --git a/packages/block-editor/src/store/reducer.js b/packages/block-editor/src/store/reducer.js
+index bc5c181c2fe059..0d3dadd351ca44 100644
+--- a/packages/block-editor/src/store/reducer.js
++++ b/packages/block-editor/src/store/reducer.js
+@@ -11,7 +11,6 @@ import {
+ 	mapValues,
+ 	isEqual,
+ 	isEmpty,
+-	identity,
+ 	omitBy,
+ } from 'lodash';
+ 
+@@ -26,6 +25,8 @@ import { store as blocksStore } from '@wordpress/blocks';
+ import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
+ import { insertAt, moveTo } from './array';
+ 
++const identity = ( x ) => x;
++
+ /**
+  * Given an array of blocks, returns an object where each key is a nesting
+  * context, the value of which is an array of block client IDs existing within
+diff --git a/packages/block-library/src/utils/clean-empty-object.js b/packages/block-library/src/utils/clean-empty-object.js
+index 87ef83a643a218..56e34199eea3e2 100644
+--- a/packages/block-library/src/utils/clean-empty-object.js
++++ b/packages/block-library/src/utils/clean-empty-object.js
+@@ -1,7 +1,9 @@
+ /**
+  * External dependencies
+  */
+-import { isEmpty, isObject, identity, mapValues, pickBy } from 'lodash';
++import { isEmpty, isObject, mapValues, pickBy } from 'lodash';
++
++const identity = ( x ) => x;
+ 
+ /**
+  * Removed empty nodes from nested objects.
+diff --git a/packages/blocks/src/api/validation/index.js b/packages/blocks/src/api/validation/index.js
+index e683b19ca7d9a1..c041708634fff0 100644
+--- a/packages/blocks/src/api/validation/index.js
++++ b/packages/blocks/src/api/validation/index.js
+@@ -2,7 +2,7 @@
+  * External dependencies
+  */
+ import { Tokenizer } from 'simple-html-tokenizer';
+-import { identity, xor, fromPairs, isEqual, includes } from 'lodash';
++import { xor, fromPairs, isEqual, includes } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -25,6 +25,8 @@ import { normalizeBlockType } from '../utils';
+ /** @typedef {import('../registration').WPBlockType} WPBlockType */
+ /** @typedef {import('./logger').LoggerItem} LoggerItem */
+ 
++const identity = ( x ) => x;
++
+ /**
+  * Globally matches any consecutive whitespace
+  *
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f224c9184cdd37..e49491f2c0b2ec 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ -   `ColorPicker` updated to satisfy `react/exhuastive-deps` eslint rule ([#41294](https://github.com/WordPress/gutenberg/pull/41294)).
+ -   `Slot`/`Fill`: Refactor away from Lodash ([#42153](https://github.com/WordPress/gutenberg/pull/42153/)).
+ -   `ComboboxControl`: Refactor away from `_.deburr()` ([#42169](https://github.com/WordPress/gutenberg/pull/42169/)).
++-   `FormTokenField`: Refactor away from `_.identity()` ([#42215](https://github.com/WordPress/gutenberg/pull/42215/)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index 4f213b1bcb0c55..eb96daa8fd6f24 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { last, clone, uniq, map, difference, identity, some } from 'lodash';
++import { last, clone, uniq, map, difference, some } from 'lodash';
+ import classnames from 'classnames';
+ import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
+ 
+@@ -35,6 +35,8 @@ import SuggestionsList from './suggestions-list';
+ import type { FormTokenFieldProps, TokenItem } from './types';
+ import { FlexItem } from '../flex';
+ 
++const identity = ( value: string ) => value;
++
+ /**
+  * A `FormTokenField` is a field similar to the tags and categories fields in the interim editor chrome,
+  * or the "to" field in Mail on OS X. Tokens can be entered by typing them or selecting them from a list of suggested tokens.
+diff --git a/packages/edit-site/src/components/global-styles/global-styles-provider.js b/packages/edit-site/src/components/global-styles/global-styles-provider.js
+index 62008e5ef8f212..4ec0ad2e531ef0 100644
+--- a/packages/edit-site/src/components/global-styles/global-styles-provider.js
++++ b/packages/edit-site/src/components/global-styles/global-styles-provider.js
+@@ -1,14 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import {
+-	mergeWith,
+-	pickBy,
+-	isEmpty,
+-	isObject,
+-	identity,
+-	mapValues,
+-} from 'lodash';
++import { mergeWith, pickBy, isEmpty, isObject, mapValues } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -22,6 +15,8 @@ import { store as coreStore } from '@wordpress/core-data';
+  */
+ import { GlobalStylesContext } from './context';
+ 
++const identity = ( x ) => x;
++
+ function mergeTreesCustomizer( _, srcValue ) {
+ 	// We only pass as arrays the presets,
+ 	// in which case we want the new array of values
+diff --git a/packages/editor/src/components/post-taxonomies/index.js b/packages/editor/src/components/post-taxonomies/index.js
+index d000157069af25..8402c8290b75c2 100644
+--- a/packages/editor/src/components/post-taxonomies/index.js
++++ b/packages/editor/src/components/post-taxonomies/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { filter, identity, includes } from 'lodash';
++import { filter, includes } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -18,6 +18,8 @@ import HierarchicalTermSelector from './hierarchical-term-selector';
+ import FlatTermSelector from './flat-term-selector';
+ import { store as editorStore } from '../../store';
+ 
++const identity = ( x ) => x;
++
+ export function PostTaxonomies( {
+ 	postType,
+ 	taxonomies,

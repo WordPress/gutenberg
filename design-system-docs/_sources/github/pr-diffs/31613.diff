@@ -1,0 +1,316 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index b65c0aead24a5f..80b5154a995ecd 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1229,6 +1229,12 @@
+ 		"markdown_source": "../packages/components/src/visually-hidden/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "ZStack",
++		"slug": "z-stack",
++		"markdown_source": "../packages/components/src/z-stack/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "Package Reference",
+ 		"slug": "packages",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 0378e2e69e038a..233bc8c56f7762 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -146,6 +146,7 @@ export {
+ 	useSlot as __experimentalUseSlot,
+ } from './slot-fill';
+ export { default as __experimentalStyleProvider } from './style-provider';
++export { ZStack as __experimentalZStack } from './z-stack';
+ 
+ // Higher-Order Components
+ export {
+diff --git a/packages/components/src/ui/utils/get-valid-children.ts b/packages/components/src/ui/utils/get-valid-children.ts
+index 47daa26bfc0b1a..cd16f9afa85e10 100644
+--- a/packages/components/src/ui/utils/get-valid-children.ts
++++ b/packages/components/src/ui/utils/get-valid-children.ts
+@@ -12,9 +12,9 @@ import { Children, isValidElement } from '@wordpress/element';
+ /**
+  * Gets a collection of available children elements from a React component's children prop.
+  *
+- * @param {import('react').ReactNode} children
++ * @param children
+  *
+- * @return {import('react').ReactNodeArray} An array of available children.
++ * @return An array of available children.
+  */
+ export function getValidChildren( children: ReactNode ): ReactNodeArray {
+ 	if ( typeof children === 'string' ) return [ children ];
+diff --git a/packages/components/src/z-stack/README.md b/packages/components/src/z-stack/README.md
+new file mode 100644
+index 00000000000000..6a4a31fb38b9f9
+--- /dev/null
++++ b/packages/components/src/z-stack/README.md
+@@ -0,0 +1,39 @@
++# ZStack
++
++> **Experimental!**
++
++## Usage
++
++`ZStack` allows you to stack things along the Z-axis.
++
++```jsx
++import { __experimentalZStack as ZStack } from '@wordpress/components';
++
++function Example() {
++	return (
++		<ZStack offset={ 20 } isLayered>
++			<ExampleImage />
++			<ExampleImage />
++			<ExampleImage />
++		</ZStack>
++	);
++}
++```
++
++## Props
++
++### `isLayered`: `boolean`
++
++When `true`, the children are stacked on top of each other. When `false`, the children follow the normal flow of the layout. Defaults to `true`.
++
++### `isReversed`: `boolean`
++
++Reverse the layer ordering. When `true`, the first child has the lowest `z-index` and the last child has the highest `z-index`. When `false`, the first child has the highest `z-index` and the last child has the lowest `z-index`. Defaults to `false`.
++
++### `offset`: `number`
++
++The amount of space between each child element. Defaults to `0`.
++
++### `children`: `ReactNode`
++
++The children to stack.
+diff --git a/packages/components/src/z-stack/component.tsx b/packages/components/src/z-stack/component.tsx
+new file mode 100644
+index 00000000000000..a85b9e51753692
+--- /dev/null
++++ b/packages/components/src/z-stack/component.tsx
+@@ -0,0 +1,104 @@
++/**
++ * External dependencies
++ */
++import { css, cx } from 'emotion';
++// eslint-disable-next-line no-restricted-imports
++import type { Ref, ReactNode } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { isValidElement } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import { getValidChildren } from '../ui/utils/get-valid-children';
++import { contextConnect, useContextSystem } from '../ui/context';
++// eslint-disable-next-line no-duplicate-imports
++import type { PolymorphicComponentProps } from '../ui/context';
++import { View } from '../view';
++import * as styles from './styles';
++const { ZStackView } = styles;
++
++export interface ZStackProps {
++	/**
++	 * Layers children elements on top of each other (first: highest z-index, last: lowest z-index).
++	 *
++	 * @default true
++	 */
++	isLayered?: boolean;
++	/**
++	 * Reverse the layer ordering (first: lowest z-index, last: highest z-index).
++	 *
++	 * @default false
++	 */
++	isReversed?: boolean;
++	/**
++	 * The amount of offset between each child element.
++	 *
++	 * @default 0
++	 */
++	offset?: number;
++	/**
++	 * Child elements.
++	 */
++	children: ReactNode;
++}
++
++function ZStack(
++	props: PolymorphicComponentProps< ZStackProps, 'div' >,
++	forwardedRef: Ref< any >
++) {
++	const {
++		children,
++		className,
++		isLayered = true,
++		isReversed = false,
++		offset = 0,
++		...otherProps
++	} = useContextSystem( props, 'ZStack' );
++
++	const validChildren = getValidChildren( children );
++	const childrenLastIndex = validChildren.length - 1;
++
++	const clonedChildren = validChildren.map( ( child, index ) => {
++		const zIndex = isReversed ? childrenLastIndex - index : index;
++		const offsetAmount = offset * index;
++
++		const classes = cx(
++			isLayered ? styles.positionAbsolute : styles.positionRelative,
++			css( {
++				...( isLayered
++					? { marginLeft: offsetAmount }
++					: { right: offsetAmount * -1 } ),
++			} )
++		);
++
++		const key = isValidElement( child ) ? child.key : index;
++
++		return (
++			<View
++				className={ classes }
++				key={ key }
++				style={ {
++					zIndex,
++				} }
++			>
++				{ child }
++			</View>
++		);
++	} );
++
++	return (
++		<ZStackView
++			{ ...otherProps }
++			className={ className }
++			ref={ forwardedRef }
++		>
++			{ clonedChildren }
++		</ZStackView>
++	);
++}
++
++export default contextConnect( ZStack, 'ZStack' );
+diff --git a/packages/components/src/z-stack/index.ts b/packages/components/src/z-stack/index.ts
+new file mode 100644
+index 00000000000000..ec29793b39db84
+--- /dev/null
++++ b/packages/components/src/z-stack/index.ts
+@@ -0,0 +1 @@
++export { default as ZStack } from './component';
+diff --git a/packages/components/src/z-stack/stories/index.js b/packages/components/src/z-stack/stories/index.js
+new file mode 100644
+index 00000000000000..c87909e0033b09
+--- /dev/null
++++ b/packages/components/src/z-stack/stories/index.js
+@@ -0,0 +1,67 @@
++/**
++ * External dependencies
++ */
++import { boolean, number } from '@storybook/addon-knobs';
++
++/**
++ * Internal dependencies
++ */
++import { Elevation } from '../../ui/elevation';
++import { HStack } from '../../h-stack';
++import { View } from '../../view';
++import { ZStack } from '..';
++
++export default {
++	component: ZStack,
++	title: 'Components (Experimental)/ZStack',
++};
++
++const Avatar = ( { backgroundColor } ) => {
++	return (
++		<View>
++			<View
++				style={ {
++					border: '3px solid black',
++					borderRadius: '9999px',
++					height: '48px',
++					width: '48px',
++					backgroundColor,
++				} }
++			/>
++			<Elevation
++				borderRadius={ 9999 }
++				isInteractive={ false }
++				value={ 3 }
++			/>
++		</View>
++	);
++};
++
++const AnimatedAvatars = () => {
++	const props = {
++		offset: number( 'offset', 20 ),
++		isLayered: boolean( 'isLayered', true ),
++		isReversed: boolean( 'isReversed', false ),
++	};
++
++	return (
++		<HStack>
++			<View>
++				<ZStack { ...props }>
++					<Avatar backgroundColor="#444" />
++					<Avatar backgroundColor="#777" />
++					<Avatar backgroundColor="#aaa" />
++					<Avatar backgroundColor="#fff" />
++				</ZStack>
++			</View>
++		</HStack>
++	);
++};
++
++export const _default = () => {
++	return (
++		<View>
++			<AnimatedAvatars />
++		</View>
++	);
++};
+diff --git a/packages/components/src/z-stack/styles.ts b/packages/components/src/z-stack/styles.ts
+new file mode 100644
+index 00000000000000..8d585664042440
+--- /dev/null
++++ b/packages/components/src/z-stack/styles.ts
+@@ -0,0 +1,18 @@
++/**
++ * External dependencies
++ */
++import { css } from 'emotion';
++import styled from '@emotion/styled';
++
++export const ZStackView = styled.div`
++	display: flex;
++	position: relative;
++`;
++
++export const positionAbsolute = css`
++	position: absolute;
++`;
++
++export const positionRelative = css`
++	position: relative;
++`;
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index ad80a95934e818..df78104420ca6a 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -36,6 +36,7 @@
+ 		"src/__next/**/*",
+ 		"src/h-stack/**/*",
+ 		"src/v-stack/**/*",
++		"src/z-stack/**/*",
+ 		"src/view/**/*"
+ 	],
+ 	"exclude": [

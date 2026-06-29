@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/tooltip/README.md b/packages/components/src/tooltip/README.md
+index e4d030681240ca..101d642f39eb2e 100644
+--- a/packages/components/src/tooltip/README.md
++++ b/packages/components/src/tooltip/README.md
+@@ -28,7 +28,7 @@ The direction in which the tooltip should open relative to its parent node. Spec
+ 
+ -   Type: `String`
+ -   Required: No
+--   Default: `"top center"`
++-   Default: `"bottom"`
+ 
+ ### children
+ 

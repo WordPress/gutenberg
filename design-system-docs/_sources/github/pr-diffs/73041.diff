@@ -1,0 +1,137 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9299e4cc1243cb..ded1c14f383299 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,10 @@
+ -   `TextareaControl`: Add `min-height` to the textarea element ([#72867](https://github.com/WordPress/gutenberg/pull/72867)).
+ -   `Card`, `CardHeader`, `CardBody` and `CardFooter`: Add support for directional padding through object-based size prop, allowing independent control of padding for each side ([#72511](https://github.com/WordPress/gutenberg/pull/72511)).
+ 
++### Enhancements
++
++-   `ConfirmDialog`: Add `isBusy` prop to component. ([#73041](https://github.com/WordPress/gutenberg/pull/73041)).
++
+ ## 30.7.0 (2025-10-29)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/confirm-dialog/component.tsx b/packages/components/src/confirm-dialog/component.tsx
+index 7e787439d91dfd..fbbbed55df3052 100644
+--- a/packages/components/src/confirm-dialog/component.tsx
++++ b/packages/components/src/confirm-dialog/component.tsx
+@@ -29,6 +29,7 @@ const UnconnectedConfirmDialog = (
+ 		children,
+ 		confirmButtonText,
+ 		cancelButtonText,
++		isBusy,
+ 		...otherProps
+ 	} = useContextSystem( props, 'ConfirmDialog' );
+ 
+@@ -100,6 +101,8 @@ const UnconnectedConfirmDialog = (
+ 								ref={ cancelButtonRef }
+ 								variant="tertiary"
+ 								onClick={ handleEvent( onCancel ) }
++								accessibleWhenDisabled
++								disabled={ isBusy }
+ 							>
+ 								{ cancelLabel }
+ 							</Button>
+@@ -108,6 +111,9 @@ const UnconnectedConfirmDialog = (
+ 								ref={ confirmButtonRef }
+ 								variant="primary"
+ 								onClick={ handleEvent( onConfirm ) }
++								accessibleWhenDisabled
++								disabled={ isBusy }
++								isBusy={ isBusy }
+ 							>
+ 								{ confirmLabel }
+ 							</Button>
+diff --git a/packages/components/src/confirm-dialog/test/index.tsx b/packages/components/src/confirm-dialog/test/index.tsx
+index 65867e827f4845..10d37b81411939 100644
+--- a/packages/components/src/confirm-dialog/test/index.tsx
++++ b/packages/components/src/confirm-dialog/test/index.tsx
+@@ -349,5 +349,71 @@ describe( 'Confirm', () => {
+ 
+ 			expect( onConfirm ).toHaveBeenCalled();
+ 		} );
++
++		it( 'should handle `isBusy` prop with different combinations', () => {
++			const { rerender } = render(
++				<ConfirmDialog
++					isOpen
++					onConfirm={ noop }
++					onCancel={ noop }
++					isBusy
++				>
++					Are you sure?
++				</ConfirmDialog>
++			);
++
++			let cancelButton = screen.getByRole( 'button', {
++				name: 'Cancel',
++			} );
++			let confirmButton = screen.getByRole( 'button', { name: 'OK' } );
++
++			// Only confirm button shows busy spinner
++			expect( cancelButton ).not.toHaveClass( 'is-busy' );
++			expect( confirmButton ).toHaveClass( 'is-busy' );
++
++			// Both buttons are disabled (exposed via aria-disabled due to accessibleWhenDisabled)
++			// Intentionally rely on aria-disabled rather than disabled attribute
++			expect( cancelButton ).toHaveAttribute( 'aria-disabled', 'true' );
++			expect( confirmButton ).toHaveAttribute( 'aria-disabled', 'true' );
++
++			// Test when isBusy is false
++			rerender(
++				<ConfirmDialog
++					isOpen
++					onConfirm={ noop }
++					onCancel={ noop }
++					isBusy={ false }
++				>
++					Are you sure?
++				</ConfirmDialog>
++			);
++
++			cancelButton = screen.getByRole( 'button', {
++				name: 'Cancel',
++			} );
++			confirmButton = screen.getByRole( 'button', { name: 'OK' } );
++
++			expect( cancelButton ).not.toHaveClass( 'is-busy' );
++			expect( confirmButton ).not.toHaveClass( 'is-busy' );
++			expect( cancelButton ).toBeEnabled();
++			expect( confirmButton ).toBeEnabled();
++
++			// Test when isBusy is undefined
++			rerender(
++				<ConfirmDialog isOpen onConfirm={ noop } onCancel={ noop }>
++					Are you sure?
++				</ConfirmDialog>
++			);
++
++			cancelButton = screen.getByRole( 'button', {
++				name: 'Cancel',
++			} );
++			confirmButton = screen.getByRole( 'button', { name: 'OK' } );
++
++			expect( cancelButton ).not.toHaveClass( 'is-busy' );
++			expect( confirmButton ).not.toHaveClass( 'is-busy' );
++			expect( cancelButton ).toBeEnabled();
++			expect( confirmButton ).toBeEnabled();
++		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/confirm-dialog/types.ts b/packages/components/src/confirm-dialog/types.ts
+index b456b9bc4df196..b976ed9d5d332f 100644
+--- a/packages/components/src/confirm-dialog/types.ts
++++ b/packages/components/src/confirm-dialog/types.ts
+@@ -50,4 +50,10 @@ export type ConfirmDialogProps = {
+ 	 * It also implicitly toggles the controlled mode if set or the uncontrolled mode if it's not set.
+ 	 */
+ 	isOpen?: boolean;
++	/**
++	 * Indicates activity while an action is being performed.
++	 * When `true`, the confirm button will show a busy state.
++	 * Both buttons will be disabled.
++	 */
++	isBusy?: boolean;
+ };

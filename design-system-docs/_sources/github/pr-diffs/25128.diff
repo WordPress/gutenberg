@@ -1,0 +1,95 @@
+diff --git a/packages/components/src/radio-group/README.md b/packages/components/src/radio-group/README.md
+index 9354ea281c6e2c..73cffe3b333489 100644
+--- a/packages/components/src/radio-group/README.md
++++ b/packages/components/src/radio-group/README.md
+@@ -51,7 +51,7 @@ import { useState } from '@wordpress/element';
+ const MyControlledRadioRadioGroup = () => {
+ 	const [ checked, setChecked ] = useState( '25' );
+ 	return (
+-		<RadioGroup accessibilityLabel="Width" onChange={ setChecked } checked={ checked }>
++		<RadioGroup label="Width" onChange={ setChecked } checked={ checked }>
+ 			<Radio value="25">25%</Radio>
+ 			<Radio value="50">50%</Radio>
+ 			<Radio value="75">75%</Radio>
+@@ -71,7 +71,7 @@ import { useState } from '@wordpress/element';
+ 
+ const MyUncontrolledRadioRadioGroup = () => {
+ 	return (
+-		<RadioGroup accessibilityLabel="Width" defaultChecked="25">
++		<RadioGroup label="Width" defaultChecked="25">
+ 			<Radio value="25">25%</Radio>
+ 			<Radio value="50">50%</Radio>
+ 			<Radio value="75">75%</Radio>
+diff --git a/packages/components/src/radio-group/index.js b/packages/components/src/radio-group/index.js
+index 11f24605297923..2c024d6c1ce006 100644
+--- a/packages/components/src/radio-group/index.js
++++ b/packages/components/src/radio-group/index.js
+@@ -15,14 +15,7 @@ import ButtonGroup from '../button-group';
+ import RadioContext from '../radio-context';
+ 
+ function RadioGroup(
+-	{
+-		accessibilityLabel,
+-		checked,
+-		defaultChecked,
+-		disabled,
+-		onChange,
+-		...props
+-	},
++	{ label, checked, defaultChecked, disabled, onChange, ...props },
+ 	ref
+ ) {
+ 	const radioState = useRadioState( {
+@@ -42,7 +35,7 @@ function RadioGroup(
+ 			<ReakitRadioGroup
+ 				ref={ ref }
+ 				as={ ButtonGroup }
+-				aria-label={ accessibilityLabel }
++				aria-label={ label }
+ 				{ ...radioState }
+ 				{ ...props }
+ 			/>
+diff --git a/packages/components/src/radio-group/stories/index.js b/packages/components/src/radio-group/stories/index.js
+index 5844cd82016b57..88dd726005ad6b 100644
+--- a/packages/components/src/radio-group/stories/index.js
++++ b/packages/components/src/radio-group/stories/index.js
+@@ -17,7 +17,7 @@ export const _default = () => {
+ 		<RadioGroup
+ 			// id is required for server side rendering
+ 			id="default-radiogroup"
+-			accessibilityLabel="options"
++			label="options"
+ 			defaultChecked="option2"
+ 		>
+ 			<Radio value="option1">Option 1</Radio>
+@@ -35,7 +35,7 @@ export const disabled = () => {
+ 			// id is required for server side rendering
+ 			id="disabled-radiogroup"
+ 			disabled
+-			accessibilityLabel="options"
++			label="options"
+ 			defaultChecked="option2"
+ 		>
+ 			<Radio value="option1">Option 1</Radio>
+@@ -54,7 +54,7 @@ const ControlledRadioGroupWithState = () => {
+ 		<RadioGroup
+ 			// id is required for server side rendering
+ 			id="controlled-radiogroup"
+-			accessibilityLabel="options"
++			label="options"
+ 			checked={ checked }
+ 			onChange={ setChecked }
+ 		>
+diff --git a/packages/components/src/radio/stories/index.js b/packages/components/src/radio/stories/index.js
+index b64c35ed7ba17f..4caeeadeec2b98 100644
+--- a/packages/components/src/radio/stories/index.js
++++ b/packages/components/src/radio/stories/index.js
+@@ -11,7 +11,7 @@ export const _default = () => {
+ 	/* eslint-disable no-restricted-syntax */
+ 	return (
+ 		// id is required for server side rendering
+-		<RadioGroup id="default-radiogroup" accessibilityLabel="options">
++		<RadioGroup id="default-radiogroup" label="options">
+ 			<Radio value="option1">Option 1</Radio>
+ 			<Radio value="option2">Option 2</Radio>
+ 		</RadioGroup>

@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/navigable-container/README.md b/packages/components/src/navigable-container/README.md
+index a982219248f505..bbc1f16dcb8f6c 100644
+--- a/packages/components/src/navigable-container/README.md
++++ b/packages/components/src/navigable-container/README.md
+@@ -24,7 +24,7 @@ Gets an offset, given an event.
+ 
+ -   Required: No
+ 
+-### `onKeydown`: `( event: KeyboardEvent ) => void`
++### `onKeyDown`: `( event: KeyboardEvent ) => void`
+ 
+ A callback invoked on the keydown event.
+ 

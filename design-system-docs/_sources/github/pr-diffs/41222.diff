@@ -1,0 +1,438 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 56f896abeb84be..5a51935d37cddf 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `SelectControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#41269](https://github.com/WordPress/gutenberg/pull/41269)).
+ -   `ColorPicker`: Strip leading hash character from hex values pasted into input. ([#41223](https://github.com/WordPress/gutenberg/pull/41223))
++-   `ColorPicker`: Display detailed color inputs by default. ([#41222](https://github.com/WordPress/gutenberg/pull/41222))
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/color-picker/color-copy-button.tsx b/packages/components/src/color-picker/color-copy-button.tsx
+new file mode 100644
+index 00000000000000..f5d7f2978ddfce
+--- /dev/null
++++ b/packages/components/src/color-picker/color-copy-button.tsx
+@@ -0,0 +1,76 @@
++/**
++ * WordPress dependencies
++ */
++import { useCopyToClipboard } from '@wordpress/compose';
++import { useState, useEffect, useRef } from '@wordpress/element';
++import { copy } from '@wordpress/icons';
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import { CopyButton } from './styles';
++import { Text } from '../text';
++import { Tooltip } from '../ui/tooltip';
++
++import type { ColorCopyButtonProps } from './types';
++
++export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
++	const { color, colorType } = props;
++	const [ copiedColor, setCopiedColor ] = useState< string | null >( null );
++	const copyTimer = useRef< ReturnType< typeof setTimeout > | undefined >();
++	const copyRef = useCopyToClipboard< HTMLDivElement >(
++		() => {
++			switch ( colorType ) {
++				case 'hsl': {
++					return color.toHslString();
++				}
++				case 'rgb': {
++					return color.toRgbString();
++				}
++				default:
++				case 'hex': {
++					return color.toHex();
++				}
++			}
++		},
++		() => {
++			if ( copyTimer.current ) {
++				clearTimeout( copyTimer.current );
++			}
++			setCopiedColor( color.toHex() );
++			copyTimer.current = setTimeout( () => {
++				setCopiedColor( null );
++				copyTimer.current = undefined;
++			}, 3000 );
++		}
++	);
++	useEffect( () => {
++		// Clear copyTimer on component unmount.
++		return () => {
++			if ( copyTimer.current ) {
++				clearTimeout( copyTimer.current );
++			}
++		};
++	}, [] );
++
++	return (
++		<Tooltip
++			content={
++				<Text color="white">
++					{ copiedColor === color.toHex()
++						? __( 'Copied!' )
++						: __( 'Copy' ) }
++				</Text>
++			}
++			placement="bottom"
++		>
++			<CopyButton
++				isSmall
++				ref={ copyRef }
++				icon={ copy }
++				showTooltip={ false }
++			/>
++		</Tooltip>
++	);
++};
+diff --git a/packages/components/src/color-picker/color-display.tsx b/packages/components/src/color-picker/color-display.tsx
+deleted file mode 100644
+index 1178d322a55ae0..00000000000000
+--- a/packages/components/src/color-picker/color-display.tsx
++++ /dev/null
+@@ -1,169 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { Colord } from 'colord';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useCopyToClipboard } from '@wordpress/compose';
+-import { useState, useEffect, useRef } from '@wordpress/element';
+-import { __ } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Text } from '../text';
+-import { Flex, FlexItem } from '../flex';
+-import { Tooltip } from '../ui/tooltip';
+-import type { ColorType } from './types';
+-import { space } from '../ui/utils/space';
+-import { COLORS } from '../utils/colors-values';
+-
+-interface ColorDisplayProps {
+-	color: Colord;
+-	colorType: ColorType;
+-	enableAlpha: boolean;
+-}
+-
+-interface DisplayProps {
+-	color: Colord;
+-	enableAlpha: boolean;
+-}
+-
+-type Values = [ number, string ][];
+-
+-interface ValueDisplayProps {
+-	values: Values;
+-}
+-
+-const ValueDisplay = ( { values }: ValueDisplayProps ) => (
+-	<>
+-		{ values.map( ( [ value, abbreviation ] ) => {
+-			return (
+-				<FlexItem key={ abbreviation } isBlock display="flex">
+-					<Text color={ COLORS.ui.theme }>{ abbreviation }</Text>
+-					<Text>{ value }</Text>
+-				</FlexItem>
+-			);
+-		} ) }
+-	</>
+-);
+-
+-const HslDisplay = ( { color, enableAlpha }: DisplayProps ) => {
+-	const { h, s, l, a } = color.toHsl();
+-
+-	const values: Values = [
+-		[ Math.floor( h ), 'H' ],
+-		[ Math.round( s * 100 ), 'S' ],
+-		[ Math.round( l * 100 ), 'L' ],
+-	];
+-	if ( enableAlpha ) {
+-		values.push( [ Math.round( a * 100 ), 'A' ] );
+-	}
+-
+-	return <ValueDisplay values={ values } />;
+-};
+-
+-const RgbDisplay = ( { color, enableAlpha }: DisplayProps ) => {
+-	const { r, g, b, a } = color.toRgb();
+-
+-	const values: Values = [
+-		[ r, 'R' ],
+-		[ g, 'G' ],
+-		[ b, 'B' ],
+-	];
+-
+-	if ( enableAlpha ) {
+-		values.push( [ Math.round( a * 100 ), 'A' ] );
+-	}
+-
+-	return <ValueDisplay values={ values } />;
+-};
+-
+-const HexDisplay = ( { color }: DisplayProps ) => {
+-	const colorWithoutHash = color.toHex().slice( 1 ).toUpperCase();
+-	return (
+-		<FlexItem>
+-			<Text color={ COLORS.ui.theme }>#</Text>
+-			<Text>{ colorWithoutHash }</Text>
+-		</FlexItem>
+-	);
+-};
+-
+-const getComponent = ( colorType: ColorType ) => {
+-	switch ( colorType ) {
+-		case 'hsl':
+-			return HslDisplay;
+-		case 'rgb':
+-			return RgbDisplay;
+-		default:
+-		case 'hex':
+-			return HexDisplay;
+-	}
+-};
+-
+-export const ColorDisplay = ( {
+-	color,
+-	colorType,
+-	enableAlpha,
+-}: ColorDisplayProps ) => {
+-	const [ copiedColor, setCopiedColor ] = useState< string | null >( null );
+-	const copyTimer = useRef< ReturnType< typeof setTimeout > | undefined >();
+-	const props = { color, enableAlpha };
+-	const Component = getComponent( colorType );
+-	const copyRef = useCopyToClipboard< HTMLDivElement >(
+-		() => {
+-			switch ( colorType ) {
+-				case 'hsl': {
+-					return color.toHslString();
+-				}
+-				case 'rgb': {
+-					return color.toRgbString();
+-				}
+-				default:
+-				case 'hex': {
+-					return color.toHex();
+-				}
+-			}
+-		},
+-		() => {
+-			if ( copyTimer.current ) {
+-				clearTimeout( copyTimer.current );
+-			}
+-			setCopiedColor( color.toHex() );
+-			copyTimer.current = setTimeout( () => {
+-				setCopiedColor( null );
+-				copyTimer.current = undefined;
+-			}, 3000 );
+-		}
+-	);
+-	useEffect( () => {
+-		// Clear copyTimer on component unmount.
+-		return () => {
+-			if ( copyTimer.current ) {
+-				clearTimeout( copyTimer.current );
+-			}
+-		};
+-	}, [] );
+-	return (
+-		<Tooltip
+-			content={
+-				<Text color="white">
+-					{ copiedColor === color.toHex()
+-						? __( 'Copied!' )
+-						: __( 'Copy' ) }
+-				</Text>
+-			}
+-		>
+-			<Flex
+-				justify="flex-start"
+-				gap={ space( 1 ) }
+-				ref={ copyRef }
+-				style={ { height: 30 } }
+-			>
+-				<Component { ...props } />
+-			</Flex>
+-		</Tooltip>
+-	);
+-};
+diff --git a/packages/components/src/color-picker/component.tsx b/packages/components/src/color-picker/component.tsx
+index b08d073cb4df0b..d56cec90f565e0 100644
+--- a/packages/components/src/color-picker/component.tsx
++++ b/packages/components/src/color-picker/component.tsx
+@@ -9,7 +9,6 @@ import namesPlugin from 'colord/plugins/names';
+  * WordPress dependencies
+  */
+ import { useCallback, useState, useMemo } from '@wordpress/element';
+-import { settings } from '@wordpress/icons';
+ import { useDebounce } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+ 
+@@ -27,9 +26,8 @@ import {
+ 	ColorfulWrapper,
+ 	SelectControl,
+ 	AuxiliaryColorArtefactWrapper,
+-	DetailsControlButton,
+ } from './styles';
+-import { ColorDisplay } from './color-display';
++import { ColorCopyButton } from './color-copy-button';
+ import { ColorInput } from './color-input';
+ import { Picker } from './picker';
+ import { useControlledValue } from '../utils/hooks';
+@@ -85,7 +83,6 @@ const ColorPicker = (
+ 		[ debouncedSetColor ]
+ 	);
+ 
+-	const [ showInputs, setShowInputs ] = useState< boolean >( false );
+ 	const [ colorType, setColorType ] = useState< ColorType >(
+ 		copyFormat || 'hex'
+ 	);
+@@ -99,44 +96,27 @@ const ColorPicker = (
+ 			/>
+ 			<AuxiliaryColorArtefactWrapper>
+ 				<HStack justify="space-between">
+-					{ showInputs ? (
+-						<SelectControl
+-							options={ options }
+-							value={ colorType }
+-							onChange={ ( nextColorType ) =>
+-								setColorType( nextColorType as ColorType )
+-							}
+-							label={ __( 'Color format' ) }
+-							hideLabelFromVision
+-						/>
+-					) : (
+-						<ColorDisplay
+-							color={ safeColordColor }
+-							colorType={ copyFormat || colorType }
+-							enableAlpha={ enableAlpha }
+-						/>
+-					) }
+-					<DetailsControlButton
+-						isSmall
+-						onClick={ () => setShowInputs( ! showInputs ) }
+-						icon={ settings }
+-						isPressed={ showInputs }
+-						label={
+-							showInputs
+-								? __( 'Hide detailed inputs' )
+-								: __( 'Show detailed inputs' )
++					<SelectControl
++						options={ options }
++						value={ colorType }
++						onChange={ ( nextColorType ) =>
++							setColorType( nextColorType as ColorType )
+ 						}
++						label={ __( 'Color format' ) }
++						hideLabelFromVision
+ 					/>
+-				</HStack>
+-				<Spacer margin={ 4 } />
+-				{ showInputs && (
+-					<ColorInput
+-						colorType={ colorType }
++					<ColorCopyButton
+ 						color={ safeColordColor }
+-						onChange={ handleChange }
+-						enableAlpha={ enableAlpha }
++						colorType={ copyFormat || colorType }
+ 					/>
+-				) }
++				</HStack>
++				<Spacer margin={ 4 } />
++				<ColorInput
++					colorType={ colorType }
++					color={ safeColordColor }
++					onChange={ handleChange }
++					enableAlpha={ enableAlpha }
++				/>
+ 			</AuxiliaryColorArtefactWrapper>
+ 		</ColorfulWrapper>
+ 	);
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index 318b783adb58e7..378e165ed74ba6 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -111,10 +111,14 @@ export const ColorfulWrapper = styled.div`
+ 	${ inputHeightStyle }
+ `;
+ 
+-export const DetailsControlButton = styled( Button )`
++export const CopyButton = styled( Button )`
+ 	&&&&& {
+ 		min-width: ${ space( 6 ) };
+ 		padding: 0;
++
++		> svg {
++			margin-right: 0;
++		}
+ 	}
+ `;
+ 
+diff --git a/packages/components/src/color-picker/types.ts b/packages/components/src/color-picker/types.ts
+index f55909138c3e96..b2f9d2bc3739f4 100644
+--- a/packages/components/src/color-picker/types.ts
++++ b/packages/components/src/color-picker/types.ts
+@@ -1 +1,10 @@
++/**
++ * External dependencies
++ */
++import type { Colord } from 'colord';
++
+ export type ColorType = 'rgb' | 'hsl' | 'hex';
++export type ColorCopyButtonProps = {
++	color: Colord;
++	colorType: ColorType;
++};
+diff --git a/packages/compose/src/hooks/use-copy-to-clipboard/index.js b/packages/compose/src/hooks/use-copy-to-clipboard/index.js
+index a7c40199f16d72..1d838a1158ecfb 100644
+--- a/packages/compose/src/hooks/use-copy-to-clipboard/index.js
++++ b/packages/compose/src/hooks/use-copy-to-clipboard/index.js
+@@ -35,7 +35,7 @@ function useUpdatedRef( value ) {
+  * @return {import('react').Ref<TElementType>} A ref to assign to the target element.
+  */
+ export default function useCopyToClipboard( text, onSuccess ) {
+-	// Store the dependencies as refs and continuesly update them so they're
++	// Store the dependencies as refs and continuously update them so they're
+ 	// fresh when the callback is called.
+ 	const textRef = useUpdatedRef( text );
+ 	const onSuccessRef = useUpdatedRef( onSuccess );
+diff --git a/packages/e2e-tests/specs/editor/blocks/heading.test.js b/packages/e2e-tests/specs/editor/blocks/heading.test.js
+index 504916d4c84cbc..b4181fce6e99d5 100644
+--- a/packages/e2e-tests/specs/editor/blocks/heading.test.js
++++ b/packages/e2e-tests/specs/editor/blocks/heading.test.js
+@@ -12,8 +12,6 @@ describe( 'Heading', () => {
+ 	const COLOR_ITEM_SELECTOR =
+ 		'.block-editor-panel-color-gradient-settings__dropdown';
+ 	const CUSTOM_COLOR_BUTTON_X_SELECTOR = `.components-color-palette__custom-color`;
+-	const CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR =
+-		'.components-color-picker button[aria-label="Show detailed inputs"]';
+ 	const COLOR_INPUT_FIELD_SELECTOR =
+ 		'.components-color-picker .components-input-control__input';
+ 
+@@ -82,13 +80,11 @@ describe( 'Heading', () => {
+ 		);
+ 
+ 		await customTextColorButton.click();
+-		await page.click( CUSTOM_COLOR_DETAILS_BUTTON_SELECTOR );
+ 		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
+ 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
+ 		await pressKeyWithModifier( 'primary', 'A' );
+ 		await page.keyboard.type( '4b7f4d' );
+-		await page.waitForXPath( '//button//span[contains(text(), "4b7f4d")]' );
+-		await page.click( '.wp-block-post-title' );
++		await page.keyboard.press( 'Enter' );
+ 		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
+ 		"<!-- wp:heading {\\"level\\":3,\\"style\\":{\\"color\\":{\\"text\\":\\"#4b7f4d\\"}}} -->
+ 		<h3 class=\\"has-text-color\\" style=\\"color:#4b7f4d\\">Heading</h3>

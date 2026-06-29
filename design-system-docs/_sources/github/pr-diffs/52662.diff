@@ -1,0 +1,32 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8f5d2d946fa389..f4661358d27a97 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   `Popover`: Pin `react-dropdown-menu` version to avoid breaking changes in dependency updates. ([#52356](https://github.com/WordPress/gutenberg/pull/52356)).
+ -   `Item`: Unify focus style and add default font styles. ([#52495](https://github.com/WordPress/gutenberg/pull/52495)).
+ -   `Toolbar`: Fix toolbar items not being tabbable on the first render. ([#52613](https://github.com/WordPress/gutenberg/pull/52613))
++-   `FormTokenField`: Fix token overflow when moving cursor left or right. ([#52662](https://github.com/WordPress/gutenberg/pull/52662))
+ 
+ ## 25.3.0 (2023-07-05)
+ 
+diff --git a/packages/components/src/form-token-field/styles.ts b/packages/components/src/form-token-field/styles.ts
+index 55cfbe5e242f5b..ee67f44a5f3244 100644
+--- a/packages/components/src/form-token-field/styles.ts
++++ b/packages/components/src/form-token-field/styles.ts
+@@ -9,6 +9,7 @@ import { css } from '@emotion/react';
+  */
+ import { Flex } from '../flex';
+ import { space } from '../ui/utils/space';
++import { boxSizingReset } from '../utils';
+ 
+ type TokensAndInputWrapperProps = {
+ 	__next40pxDefaultSize: boolean;
+@@ -27,6 +28,7 @@ const deprecatedPaddings = ( {
+ 
+ export const TokensAndInputWrapperFlex = styled( Flex )`
+ 	padding: 7px;
++	${ boxSizingReset }
+ 
+ 	${ deprecatedPaddings }
+ `;

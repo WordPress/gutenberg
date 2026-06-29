@@ -1,0 +1,134 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 893bc2e8c48642..477e02ba0cdf86 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ ### Enhancements
+ 
+ -   `Dialog`, `Popover`: Upgrade dev-only title validation from mount-only to cleanup-based re-validation, catching conditionally rendered titles ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
++-   `Link`: Honor `openInNewTab` consistently instead of treating hash links as a special case ([#77422](https://github.com/WordPress/gutenberg/pull/77422)).
+ 
+ ### Internal
+ 
+diff --git a/packages/ui/src/link/link.tsx b/packages/ui/src/link/link.tsx
+index e5ee5a6b672eb1..50fb05dc88191c 100644
+--- a/packages/ui/src/link/link.tsx
++++ b/packages/ui/src/link/link.tsx
+@@ -20,20 +20,10 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
+ 		openInNewTab = false,
+ 		render,
+ 		className,
+-		onClick,
+ 		...props
+ 	},
+ 	ref
+ ) {
+-	const isInternalAnchor = !! props.href?.startsWith( '#' );
+-
+-	const handleClick = ( event: React.MouseEvent< HTMLAnchorElement > ) => {
+-		if ( openInNewTab && isInternalAnchor ) {
+-			event.preventDefault();
+-		}
+-		onClick?.( event );
+-	};
+-
+ 	const element = useRender( {
+ 		render,
+ 		defaultTagName: 'a',
+@@ -49,7 +39,6 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
+ 				openInNewTab && styles[ 'has-link-icon' ],
+ 				className
+ 			),
+-			onClick: handleClick,
+ 			target: openInNewTab ? '_blank' : undefined,
+ 			children: openInNewTab ? (
+ 				<>
+diff --git a/packages/ui/src/link/test/index.test.tsx b/packages/ui/src/link/test/index.test.tsx
+index ede6bb158d71c3..832b1869a82a93 100644
+--- a/packages/ui/src/link/test/index.test.tsx
++++ b/packages/ui/src/link/test/index.test.tsx
+@@ -16,6 +16,24 @@ describe( 'Link', () => {
+ 		expect( ref.current ).toBeInstanceOf( HTMLAnchorElement );
+ 	} );
+ 
++	it( 'calls onClick when clicked (often used for analytics tracking)', async () => {
++		const user = userEvent.setup();
++		const onClick = jest.fn(
++			( event: React.MouseEvent< HTMLAnchorElement > ) =>
++				event.preventDefault()
++		);
++
++		render(
++			<Link href="/page" onClick={ onClick }>
++				Go to page
++			</Link>
++		);
++
++		await user.click( screen.getByRole( 'link', { name: 'Go to page' } ) );
++
++		expect( onClick ).toHaveBeenCalledTimes( 1 );
++	} );
++
+ 	describe( 'openInNewTab', () => {
+ 		it( 'sets target="_blank" when true', () => {
+ 			render(
+@@ -49,45 +67,5 @@ describe( 'Link', () => {
+ 				screen.getByLabelText( '(opens in a new tab)' )
+ 			).toBeInTheDocument();
+ 		} );
+-
+-		it( 'prevents default for internal anchor links', async () => {
+-			const user = userEvent.setup();
+-			const onClick = jest.fn();
+-
+-			render(
+-				<Link href="#section" openInNewTab onClick={ onClick }>
+-					Jump
+-				</Link>
+-			);
+-
+-			await user.click( screen.getByRole( 'link' ) );
+-
+-			expect( onClick ).toHaveBeenCalledTimes( 1 );
+-			expect( onClick.mock.calls[ 0 ][ 0 ].defaultPrevented ).toBe(
+-				true
+-			);
+-		} );
+-
+-		it( 'does not prevent default for external links', async () => {
+-			const user = userEvent.setup();
+-			const onClick = jest.fn();
+-
+-			render(
+-				<Link
+-					href="https://example.com"
+-					openInNewTab
+-					onClick={ onClick }
+-				>
+-					External
+-				</Link>
+-			);
+-
+-			await user.click( screen.getByRole( 'link' ) );
+-
+-			expect( onClick ).toHaveBeenCalledTimes( 1 );
+-			expect( onClick.mock.calls[ 0 ][ 0 ].defaultPrevented ).toBe(
+-				false
+-			);
+-		} );
+ 	} );
+ } );
+diff --git a/packages/ui/src/link/types.ts b/packages/ui/src/link/types.ts
+index 8d1e3f76638f89..4b75215e6e3214 100644
+--- a/packages/ui/src/link/types.ts
++++ b/packages/ui/src/link/types.ts
+@@ -22,8 +22,7 @@ export interface LinkProps extends Omit< ComponentProps< 'a' >, 'target' > {
+ 
+ 	/**
+ 	 * Whether to open the link in a new browser tab.
+-	 * When true, sets `target="_blank"`, appends a visual arrow indicator,
+-	 * and prevents navigation for internal anchors (`#`-prefixed hrefs).
++	 * When true, sets `target="_blank"` and appends a visual arrow indicator.
+ 	 *
+ 	 * @default false
+ 	 */

@@ -1,0 +1,54 @@
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index 3b33f2b499c34b..ad701fbc3116a5 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -64,9 +64,12 @@ function RangeControl( {
+ 			parseFloat( newValue )
+ 		);
+ 	};
++
++	const initialFallbackValue = isFinite( initialPosition ) ?
++		initialPosition : '';
++
+ 	const initialSliderValue = isFinite( currentInputValue ) ?
+-		currentInputValue :
+-		initialPosition || '';
++		currentInputValue : initialFallbackValue;
+ 
+ 	return (
+ 		<BaseControl
+diff --git a/packages/components/src/range-control/stories/index.js b/packages/components/src/range-control/stories/index.js
+index 397b974d8da206..1bc8fc350a45ba 100644
+--- a/packages/components/src/range-control/stories/index.js
++++ b/packages/components/src/range-control/stories/index.js
+@@ -16,7 +16,8 @@ import RangeControl from '../';
+ export default { title: 'Components|RangeControl', component: RangeControl };
+ 
+ const RangeControlWithState = ( props ) => {
+-	const [ value, setValue ] = useState( 5 );
++	const initialValue = props.value === undefined ? 5 : props.value;
++	const [ value, setValue ] = useState( initialValue );
+ 
+ 	return (
+ 		<RangeControl
+@@ -37,6 +38,20 @@ export const _default = () => {
+ 	);
+ };
+ 
++export const InitialValueZero = () => {
++	const label = text( 'Label', 'How many columns should this use?' );
++
++	return (
++		<RangeControlWithState
++			initialPosition={ 0 }
++			label={ label }
++			max={ 20 }
++			min={ 0 }
++			value={ null }
++		/>
++	);
++};
++
+ export const withHelp = () => {
+ 	const label = text( 'Label', 'How many columns should this use?' );
+ 	const help = text( 'Help Text', 'Please select the number of columns you would like this to contain.' );

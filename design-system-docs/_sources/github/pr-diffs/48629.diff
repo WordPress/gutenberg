@@ -1,0 +1,20 @@
+diff --git a/packages/components/src/utils/font.js b/packages/components/src/utils/font.js
+index dff14e5f03ba38..3e9ca680fca744 100644
+--- a/packages/components/src/utils/font.js
++++ b/packages/components/src/utils/font.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { get } from 'lodash';
+-
+ /**
+  * Internal dependencies
+  */
+@@ -14,5 +9,5 @@ import FONT from './font-values';
+  * @return {string} Font rule value
+  */
+ export function font( value ) {
+-	return get( FONT, value, '' );
++	return FONT[ value ] ?? '';
+ }

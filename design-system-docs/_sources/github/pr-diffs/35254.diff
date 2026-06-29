@@ -1,0 +1,99 @@
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index c0a1373744d958..7cd94866ab3ccd 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -82,6 +82,12 @@ const emitToChild = ( children, eventName, event ) => {
+ 	}
+ 
+ 	const child = Children.only( children );
++
++	// If the underlying element is disabled, do not emit the event.
++	if ( child.props.disabled ) {
++		return;
++	}
++
+ 	if ( typeof child.props[ eventName ] === 'function' ) {
+ 		child.props[ eventName ]( event );
+ 	}
+diff --git a/packages/components/src/tooltip/stories/index.js b/packages/components/src/tooltip/stories/index.js
+index b121c09e7be506..a15588c264ca2a 100644
+--- a/packages/components/src/tooltip/stories/index.js
++++ b/packages/components/src/tooltip/stories/index.js
+@@ -1,8 +1,14 @@
+ /**
+  * External dependencies
+  */
++import styled from '@emotion/styled';
+ import { text, select, number } from '@storybook/addon-knobs';
+ 
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
+ /**
+  * Internal dependencies
+  */
+@@ -41,3 +47,31 @@ export const _default = () => {
+ 		</Tooltip>
+ 	);
+ };
++
++const Button = styled.button`
++	margin: 0 10px;
++`;
++
++export const DisabledElement = () => {
++	const [ showMessage, toggleMessage ] = useState( false );
++
++	return (
++		<>
++			<Tooltip text="Hey, I am tooltip" position="bottom center">
++				<Button onClick={ () => toggleMessage( ! showMessage ) }>
++					Hover me!
++				</Button>
++			</Tooltip>
++			<Tooltip text="Hey, I am tooltip" position="bottom center">
++				<Button
++					disabled
++					onClick={ () => toggleMessage( ! showMessage ) }
++				>
++					Hover me, but I am disabled
++				</Button>
++			</Tooltip>
++			<br />
++			{ showMessage ? <p>Hello World!</p> : null }
++		</>
++	);
++};
+diff --git a/packages/components/src/tooltip/test/index.js b/packages/components/src/tooltip/test/index.js
+index d3648904ef6586..edb55ed11ffe5e 100644
+--- a/packages/components/src/tooltip/test/index.js
++++ b/packages/components/src/tooltip/test/index.js
+@@ -211,6 +211,26 @@ describe( 'Tooltip', () => {
+ 			}, TOOLTIP_DELAY );
+ 		} );
+ 
++		it( 'should not emit events back to children when they are disabled', () => {
++			const handleClick = jest.fn();
++
++			const wrapper = mount(
++				<Tooltip text="Show helpful text here">
++					<button disabled onClick={ handleClick }>
++						Click me
++					</button>
++				</Tooltip>
++			);
++
++			const eventCatcher = wrapper.find( '.event-catcher' );
++			eventCatcher.simulate( 'click', {
++				type: 'click',
++				currentTarget: {},
++			} );
++
++			expect( handleClick ).toHaveBeenCalledTimes( 0 );
++		} );
++
+ 		it( 'should cancel pending setIsOver on mouseleave', () => {
+ 			// Mount: Issues with using `setState` asynchronously with shallow-
+ 			// rendered components: https://github.com/airbnb/enzyme/issues/450

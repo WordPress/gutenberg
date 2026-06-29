@@ -1,0 +1,1045 @@
+diff --git a/packages/block-editor/src/components/block-list/block.js b/packages/block-editor/src/components/block-list/block.js
+index 9ba7029dc84a8b..1bc1bc5f5da4f6 100644
+--- a/packages/block-editor/src/components/block-list/block.js
++++ b/packages/block-editor/src/components/block-list/block.js
+@@ -583,6 +583,7 @@ function BlockListBlockProvider( props ) {
+ 				getBlocksByName,
+ 
+ 				getBlockIndex,
++				getBlockCount,
+ 				isBlockMultiSelected,
+ 				isBlockSubtreeDisabled,
+ 				isBlockHighlighted,
+@@ -628,6 +629,7 @@ function BlockListBlockProvider( props ) {
+ 			const blockEditingMode = getBlockEditingMode( clientId );
+ 			const previewContext = {
+ 				isPreviewMode,
++				hasInnerBlocks: getBlockCount( clientId ) > 0,
+ 				blockWithoutAttributes,
+ 				name: blockName,
+ 				attributes,
+@@ -806,6 +808,7 @@ function BlockListBlockProvider( props ) {
+ 		isReusable,
+ 		isDragging,
+ 		hasChildSelected,
++		hasInnerBlocks,
+ 		isSectionBlock,
+ 		isWithinSectionBlock,
+ 		isSelectionWithinCurrentSection,
+@@ -840,6 +843,7 @@ function BlockListBlockProvider( props ) {
+ 		isReusable,
+ 		isDragging,
+ 		hasChildSelected,
++		hasInnerBlocks,
+ 		isSectionBlock,
+ 		isWithinSectionBlock,
+ 		isSelectionWithinCurrentSection,
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/index.js b/packages/block-editor/src/components/block-list/use-block-props/index.js
+index 4b4521a089ef15..51a5cd160e76b7 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/index.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/index.js
+@@ -105,6 +105,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
+ 		canMove,
+ 		blockVisibility,
+ 		deviceType,
++		hasInnerBlocks,
+ 	} = useContext( PrivateBlockContext );
+ 
+ 	const defaultViewRef = useRefEffect( ( element ) => {
+@@ -176,6 +177,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
+ 	return {
+ 		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
+ 		draggable: canMove && ! hasChildSelected ? true : undefined,
++		// Leaf blocks are non-editable atoms by default; container blocks stay
++		// editable roots so their inner blocks remain within the editing host.
++		// RichText overrides this to true on its own element, so text blocks
++		// are editable regardless. Overridable through `props`.
++		contentEditable: hasInnerBlocks,
+ 		...wrapperProps,
+ 		...props,
+ 		ref: mergedRefs,
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/use-focus-first-element.js b/packages/block-editor/src/components/block-list/use-block-props/use-focus-first-element.js
+index 26f7cca2990d89..7f6809f61d4058 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/use-focus-first-element.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/use-focus-first-element.js
+@@ -53,8 +53,19 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
+ 
+ 		const { ownerDocument } = ref.current;
+ 
+-		// Do not focus the block if it already contains the active element.
+-		if ( isInsideRootBlock( ref.current, ownerDocument.activeElement ) ) {
++		// Do not steal focus if this block already contains the active element,
++		// or if an ancestor editing host (the writing flow wrapper) is focused
++		// and the caret is already within this block. Otherwise (e.g. a newly
++		// selected/created block) focus it as usual.
++		const { activeElement } = ownerDocument;
++		const { anchorNode } = ownerDocument.defaultView.getSelection();
++		const hostFocused =
++			activeElement?.isContentEditable &&
++			activeElement.contains( ref.current );
++		if (
++			isInsideRootBlock( ref.current, activeElement ) ||
++			( hostFocused && ref.current.contains( anchorNode ) )
++		) {
+ 			return;
+ 		}
+ 
+@@ -70,7 +81,12 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
+ 			textInputs[ isReverse ? textInputs.length - 1 : 0 ] || ref.current;
+ 
+ 		if ( ! isInsideRootBlock( ref.current, target ) ) {
+-			ref.current.focus();
++			// Do not focus a contentEditable inner blocks wrapper: focusing it
++			// would place a caret in a child and collapse a block-level
++			// selection. The always-on editing host already manages focus.
++			if ( ref.current.getAttribute( 'contenteditable' ) !== 'true' ) {
++				ref.current.focus();
++			}
+ 			return;
+ 		}
+ 
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js b/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js
+index 02d366b7d5cd9a..a345c9788f8658 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js
+@@ -36,11 +36,13 @@ export function useFocusHandler( clientId ) {
+ 			 * @param {FocusEvent} event Focus event.
+ 			 */
+ 			function onFocus( event ) {
+-				// When the whole editor is editable, let writing flow handle
+-				// selection.
+-				if (
+-					node.parentElement.closest( '[contenteditable="true"]' )
+-				) {
++				// When focus lands in an editable (text) region, let writing
++				// flow handle selection: it syncs the block selection from the
++				// caret. This also covers the case where the whole editor is
++				// editable (the always-on writing flow wrapper). For a
++				// non-editable atom (e.g. an image or separator) there is no
++				// caret to sync, so selection is handled below on focus.
++				if ( event.target.isContentEditable ) {
+ 					return;
+ 				}
+ 
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/use-selected-block-event-handlers.js b/packages/block-editor/src/components/block-list/use-block-props/use-selected-block-event-handlers.js
+index 71c512cc3bf4df..8c677ed52b11f1 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/use-selected-block-event-handlers.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/use-selected-block-event-handlers.js
+@@ -5,7 +5,10 @@ import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
+ import { isTextField } from '@wordpress/dom';
+ import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
+ import { useSelect, useDispatch } from '@wordpress/data';
+-import { useRefEffect } from '@wordpress/compose';
++import {
++	useRefEffect,
++	privateApis as composePrivateApis,
++} from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -13,6 +16,8 @@ import { useRefEffect } from '@wordpress/compose';
+ import { store as blockEditorStore } from '../../../store';
+ import { unlock } from '../../../lock-unlock';
+ 
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
++
+ function isColorTransparent( color ) {
+ 	return ! color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)';
+ }
+@@ -69,7 +74,28 @@ export function useEventHandlers( { clientId, isSelected } ) {
+ 					return;
+ 				}
+ 
+-				if ( target !== node || isTextField( target ) ) {
++				// Act on a block-level interaction with this block, not when
++				// editing a text field. On trunk the event targets this block's
++				// wrapper. Under the always-on editing host it targets the host
++				// wrapper; determine "not editing text" from the live selection
++				// (the caret is not inside a rich text).
++				const { anchorNode } =
++					node.ownerDocument.defaultView.getSelection();
++				const anchorElement =
++					anchorNode?.nodeType === 1
++						? anchorNode
++						: anchorNode?.parentElement;
++				const isEditingText = !! anchorElement?.closest(
++					'[data-wp-block-attribute-key]'
++				);
++				const isBlockWrapperTarget =
++					target === node && ! isTextField( target );
++				const isHostTarget =
++					target !== node &&
++					target.isContentEditable &&
++					target.contains( node ) &&
++					! isEditingText;
++				if ( ! isBlockWrapperTarget && ! isHostTarget ) {
+ 					return;
+ 				}
+ 
+@@ -291,7 +317,14 @@ export function useEventHandlers( { clientId, isSelected } ) {
+ 				ownerDocument.documentElement.classList.add( 'is-dragging' );
+ 			}
+ 
+-			node.addEventListener( 'keydown', onKeyDown );
++			// Attach the keydown listener at the document level: under the
++			// always-on editing host the event targets the wrapper rather than
++			// this block, so a per-node listener would never fire.
++			const unsubscribeKeyDown = subscribeDelegatedListener(
++				node.ownerDocument,
++				'keydown',
++				onKeyDown
++			);
+ 			node.addEventListener( 'dragstart', onDragStart );
+ 
+ 			/**
+@@ -322,7 +355,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
+ 			node.addEventListener( 'dblclick', onDoubleClick );
+ 
+ 			return () => {
+-				node.removeEventListener( 'keydown', onKeyDown );
++				unsubscribeKeyDown();
+ 				node.removeEventListener( 'dragstart', onDragStart );
+ 				node.removeEventListener( 'dblclick', onDoubleClick );
+ 			};
+diff --git a/packages/block-editor/src/components/inner-blocks/index.js b/packages/block-editor/src/components/inner-blocks/index.js
+index 58faf9f9a34e1a..32c979e690977f 100644
+--- a/packages/block-editor/src/components/inner-blocks/index.js
++++ b/packages/block-editor/src/components/inner-blocks/index.js
+@@ -290,6 +290,12 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
+ 	return {
+ 		...props,
+ 		ref,
++		// An inner blocks container is an editable root: it must remain part of
++		// the editing host so its child blocks stay within the same host (the
++		// always-on writing flow wrapper). Override the block wrapper's default
++		// `contentEditable={ false }`, which would otherwise isolate the inner
++		// blocks into their own editing hosts.
++		contentEditable: true,
+ 		className: clsx(
+ 			props.className,
+ 			'block-editor-block-list__layout',
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/before-input-rules.js b/packages/block-editor/src/components/rich-text/event-listeners/before-input-rules.js
+index 436d3d8994ff33..7804dc5c9edf03 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/before-input-rules.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/before-input-rules.js
+@@ -23,6 +23,17 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ const wrapSelectionSettings = [ '`', '"', "'", '“”', '‘’' ];
+ 
+ export default ( props ) => ( element ) => {
++	const { ownerDocument } = element;
++	const { defaultView } = ownerDocument;
++
++	// When the editing host is an ancestor (the writing flow wrapper), input
++	// events target that host rather than this element, so determine relevance
++	// from the selection rather than the event target.
++	function isSelectionInElement() {
++		const { anchorNode, focusNode } = defaultView.getSelection();
++		return element.contains( anchorNode ) && element.contains( focusNode );
++	}
++
+ 	function onInput( event ) {
+ 		const { inputType, data } = event;
+ 		const { value, onChange, registry } = props.current;
+@@ -32,6 +43,10 @@ export default ( props ) => ( element ) => {
+ 			return;
+ 		}
+ 
++		if ( ! isSelectionInElement() ) {
++			return;
++		}
++
+ 		if ( isCollapsed( value ) ) {
+ 			return;
+ 		}
+@@ -71,8 +86,6 @@ export default ( props ) => ( element ) => {
+ 
+ 		init.data = endChar;
+ 
+-		const { ownerDocument } = element;
+-		const { defaultView } = ownerDocument;
+ 		const newEvent = new defaultView.InputEvent( 'input', init );
+ 
+ 		// Dispatch an `input` event with the new data. This will trigger the
+@@ -89,5 +102,10 @@ export default ( props ) => ( element ) => {
+ 		event.preventDefault();
+ 	}
+ 
+-	return subscribeDelegatedListener( element, 'beforeinput', onInput, true );
++	return subscribeDelegatedListener(
++		ownerDocument,
++		'beforeinput',
++		onInput,
++		true
++	);
+ };
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/delete.js b/packages/block-editor/src/components/rich-text/event-listeners/delete.js
+index 6445ca55bfcc16..b27a4dd530e633 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/delete.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/delete.js
+@@ -13,6 +13,17 @@ import { unlock } from '../../../lock-unlock';
+ const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ export default ( props ) => ( element ) => {
++	const { ownerDocument } = element;
++	const { defaultView } = ownerDocument;
++
++	// When the editing host is an ancestor (the writing flow wrapper), keydown
++	// events target that host rather than this element, so determine relevance
++	// from the selection rather than the event target.
++	function isSelectionInElement() {
++		const { anchorNode, focusNode } = defaultView.getSelection();
++		return element.contains( anchorNode ) && element.contains( focusNode );
++	}
++
+ 	function onKeyDown( event ) {
+ 		const { keyCode } = event;
+ 
+@@ -20,6 +31,10 @@ export default ( props ) => ( element ) => {
+ 			return;
+ 		}
+ 
++		if ( ! isSelectionInElement() ) {
++			return;
++		}
++
+ 		const { value, onMerge, onRemove } = props.current;
+ 
+ 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
+@@ -54,5 +69,5 @@ export default ( props ) => ( element ) => {
+ 		}
+ 	}
+ 
+-	return subscribeDelegatedListener( element, 'keydown', onKeyDown );
++	return subscribeDelegatedListener( ownerDocument, 'keydown', onKeyDown );
+ };
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/enter.js b/packages/block-editor/src/components/rich-text/event-listeners/enter.js
+index 104b82f00b1572..1a061eb5bff191 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/enter.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/enter.js
+@@ -13,11 +13,26 @@ import { unlock } from '../../../lock-unlock';
+ const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ export default ( props ) => ( element ) => {
++	const { ownerDocument } = element;
++	const { defaultView } = ownerDocument;
++
++	// When the editing host is an ancestor (the writing flow wrapper), keydown
++	// events target that host rather than this element, so determine relevance
++	// from the selection rather than the event target.
++	function isSelectionInElement() {
++		const { anchorNode, focusNode } = defaultView.getSelection();
++		return element.contains( anchorNode ) && element.contains( focusNode );
++	}
++
+ 	function onKeyDownDeprecated( event ) {
+ 		if ( event.keyCode !== ENTER ) {
+ 			return;
+ 		}
+ 
++		if ( ! isSelectionInElement() ) {
++			return;
++		}
++
+ 		const { onReplace, onSplit } = props.current;
+ 
+ 		if ( onReplace && onSplit ) {
+@@ -30,9 +45,7 @@ export default ( props ) => ( element ) => {
+ 			return;
+ 		}
+ 
+-		// The event listener is attached to the window, so we need to check if
+-		// the target is the element.
+-		if ( event.target !== element ) {
++		if ( ! isSelectionInElement() ) {
+ 			return;
+ 		}
+ 
+@@ -79,8 +92,6 @@ export default ( props ) => ( element ) => {
+ 		}
+ 	}
+ 
+-	const { defaultView } = element.ownerDocument;
+-
+ 	// Attach the listener to the window so parent elements have the chance to
+ 	// prevent the default behavior.
+ 	const unsubscribeKeyDown = subscribeDelegatedListener(
+@@ -91,7 +102,7 @@ export default ( props ) => ( element ) => {
+ 	// Capture phase so this runs before ancestor (writing flow) bubble
+ 	// handlers, matching the timing of the previous raw element listener.
+ 	const unsubscribeKeyDownDeprecated = subscribeDelegatedListener(
+-		element,
++		ownerDocument,
+ 		'keydown',
+ 		onKeyDownDeprecated,
+ 		true
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/input-rules.js b/packages/block-editor/src/components/rich-text/event-listeners/input-rules.js
+index ef6f486096f905..fc9d5127dd62c4 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/input-rules.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/input-rules.js
+@@ -49,6 +49,17 @@ export function findSelection( blocks ) {
+ }
+ 
+ export default ( props ) => ( element ) => {
++	const { ownerDocument } = element;
++	const { defaultView } = ownerDocument;
++
++	// When the editing host is an ancestor (the writing flow wrapper), input
++	// events target that host rather than this element, so determine relevance
++	// from the selection rather than the event target.
++	function isSelectionInElement() {
++		const { anchorNode, focusNode } = defaultView.getSelection();
++		return element.contains( anchorNode ) && element.contains( focusNode );
++	}
++
+ 	function inputRule() {
+ 		const { getValue, onReplace, selectionChange, registry } =
+ 			props.current;
+@@ -111,6 +122,10 @@ export default ( props ) => ( element ) => {
+ 			return;
+ 		}
+ 
++		if ( ! isSelectionInElement() ) {
++			return;
++		}
++
+ 		if ( __unstableAllowPrefixTransformations && inputRule() ) {
+ 			return;
+ 		}
+@@ -161,13 +176,13 @@ export default ( props ) => ( element ) => {
+ 	// Capture phase so these run before ancestor (writing flow) bubble
+ 	// handlers, matching the timing of the previous raw element listeners.
+ 	const unsubscribeInput = subscribeDelegatedListener(
+-		element,
++		ownerDocument,
+ 		'input',
+ 		onInput,
+ 		true
+ 	);
+ 	const unsubscribeCompositionEnd = subscribeDelegatedListener(
+-		element,
++		ownerDocument,
+ 		'compositionend',
+ 		onInput,
+ 		true
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/paste-handler.js b/packages/block-editor/src/components/rich-text/event-listeners/paste-handler.js
+index 7672b792f45e26..0abc8ae8b07874 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/paste-handler.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/paste-handler.js
+@@ -33,9 +33,14 @@ export default ( props ) => ( element ) => {
+ 			registry,
+ 		} = props.current;
+ 
+-		// The event listener is attached to the window, so we need to check if
+-		// the target is the element or inside the element.
+-		if ( ! element.contains( event.target ) ) {
++		// The event listener is attached to the window, so we need to check
++		// that the selection is within the element, rather than relying on the
++		// event target (which is the editing host, not necessarily this
++		// element).
++		const { anchorNode, focusNode } = defaultView.getSelection();
++		const containsSelection =
++			element.contains( anchorNode ) && element.contains( focusNode );
++		if ( ! containsSelection ) {
+ 			return;
+ 		}
+ 
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/shortcuts.js b/packages/block-editor/src/components/rich-text/event-listeners/shortcuts.js
+index 6097ecf7c526e1..2715617559e085 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/shortcuts.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/shortcuts.js
+@@ -11,12 +11,31 @@ import { unlock } from '../../../lock-unlock';
+ const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ export default ( props ) => ( element ) => {
++	const { ownerDocument } = element;
++	const { defaultView } = ownerDocument;
+ 	const { keyboardShortcuts } = props.current;
++
++	// When the editing host is an ancestor (the writing flow wrapper), keydown
++	// events target that host rather than this element, so determine relevance
++	// from the selection rather than the event target.
++	function isSelectionInElement() {
++		const { anchorNode, focusNode } = defaultView.getSelection();
++		return element.contains( anchorNode ) && element.contains( focusNode );
++	}
++
+ 	function onKeyDown( event ) {
++		if ( ! isSelectionInElement() ) {
++			return;
++		}
+ 		for ( const keyboardShortcut of keyboardShortcuts.current ) {
+ 			keyboardShortcut( event );
+ 		}
+ 	}
+ 
+-	return subscribeDelegatedListener( element, 'keydown', onKeyDown, true );
++	return subscribeDelegatedListener(
++		ownerDocument,
++		'keydown',
++		onKeyDown,
++		true
++	);
+ };
+diff --git a/packages/block-editor/src/components/writing-flow/index.js b/packages/block-editor/src/components/writing-flow/index.js
+index 60aa510e386828..bae1df953c7cce 100644
+--- a/packages/block-editor/src/components/writing-flow/index.js
++++ b/packages/block-editor/src/components/writing-flow/index.js
+@@ -46,6 +46,10 @@ export function useWritingFlow() {
+ 			useSelectAll(),
+ 			useArrowNav(),
+ 			usePreviewModeNav(),
++			// ALWAYS-ON: the writing flow wrapper is the persistent editing host.
++			useRefEffect( ( node ) => {
++				node.contentEditable = 'true';
++			}, [] ),
+ 			useRefEffect(
+ 				( node ) => {
+ 					node.tabIndex = 0;
+diff --git a/packages/block-editor/src/components/writing-flow/use-drag-selection.js b/packages/block-editor/src/components/writing-flow/use-drag-selection.js
+index 979397c0ce072f..0e9b018b86efb8 100644
+--- a/packages/block-editor/src/components/writing-flow/use-drag-selection.js
++++ b/packages/block-editor/src/components/writing-flow/use-drag-selection.js
+@@ -16,7 +16,8 @@ import { store as blockEditorStore } from '../../store';
+  * @param {boolean}     value `contentEditable` value (true or false)
+  */
+ function setContentEditableWrapper( node, value ) {
+-	node.contentEditable = value;
++	// ALWAYS-ON: the wrapper stays editable; never turn it off.
++	node.contentEditable = 'true';
+ 	// Firefox doesn't automatically move focus.
+ 	if ( value ) {
+ 		node.focus();
+diff --git a/packages/block-editor/src/components/writing-flow/use-input.js b/packages/block-editor/src/components/writing-flow/use-input.js
+index 14e812b3d865ed..6530ba9dd49149 100644
+--- a/packages/block-editor/src/components/writing-flow/use-input.js
++++ b/packages/block-editor/src/components/writing-flow/use-input.js
+@@ -45,10 +45,11 @@ export default function useInput() {
+ 
+ 	return useRefEffect( ( node ) => {
+ 		function onBeforeInput( event ) {
+-			// If writing flow is editable, NEVER allow the browser to alter the
+-			// DOM. This will cause React errors (and the DOM should only be
+-			// altered in a controlled fashion).
+-			if ( node.contentEditable === 'true' ) {
++			// During a multi-block selection the browser must NEVER alter the
++			// DOM directly (it would span blocks uncontrolled and cause React
++			// errors); handle it in a controlled fashion instead. Single-block
++			// input is left to the browser and synced by rich text's onInput.
++			if ( hasMultiSelection() ) {
+ 				event.preventDefault();
+ 			}
+ 		}
+diff --git a/packages/block-editor/src/components/writing-flow/use-select-all.js b/packages/block-editor/src/components/writing-flow/use-select-all.js
+index 1ef4cbbd33bc1e..b7a755a5f7b17d 100644
+--- a/packages/block-editor/src/components/writing-flow/use-select-all.js
++++ b/packages/block-editor/src/components/writing-flow/use-select-all.js
+@@ -24,18 +24,51 @@ export default function useSelectAll() {
+ 				return;
+ 			}
+ 
++			const { ownerDocument } = node;
++			const { defaultView } = ownerDocument;
++			const selection = defaultView.getSelection();
++
++			// When the writing flow wrapper is the editing host, keydown
++			// targets the wrapper rather than the inner rich text. Resolve the
++			// editable element from the selection so the gradual select-all
++			// steps operate per block.
++			const { anchorNode } = selection;
++			const anchorElement =
++				anchorNode?.nodeType === anchorNode?.ELEMENT_NODE
++					? anchorNode
++					: anchorNode?.parentElement;
++			const editable =
++				anchorElement?.closest( '[data-wp-block-attribute-key]' ) ??
++				event.target;
++
+ 			const selectedClientIds = getSelectedBlockClientIds();
+ 
++			// Only carve out a block's text content on the first select-all when
++			// the selection is within a rich text (resolved from the anchor).
++			// When a block is selected at the block level (no text caret) the
++			// editable falls back to the event target, and we should escalate
++			// the selection rather than re-select content.
+ 			if (
++				editable !== event.target &&
+ 				selectedClientIds.length < 2 &&
+-				! isEntirelySelected( event.target )
++				! isEntirelySelected( editable )
+ 			) {
++				// If the wrapper is the editing host, the native select-all
++				// would select the entire wrapper (all blocks) at once. Select
++				// just this block's content first, preserving the gradual
++				// select-all behavior.
++				if ( ownerDocument.activeElement === node ) {
++					event.preventDefault();
++					const range = ownerDocument.createRange();
++					range.selectNodeContents( editable );
++					selection.removeAllRanges();
++					selection.addRange( range );
++				}
+ 				return;
+ 			}
+ 
+ 			event.preventDefault();
+ 
+-			const { ownerDocument } = event.target;
+ 			const [ firstSelectedClientId ] = selectedClientIds;
+ 			const activeClientId = getBlockClientId(
+ 				ownerDocument.activeElement
+diff --git a/packages/block-editor/src/components/writing-flow/use-selection-observer.js b/packages/block-editor/src/components/writing-flow/use-selection-observer.js
+index a0efc8c6f158e6..432da7b538edc4 100644
+--- a/packages/block-editor/src/components/writing-flow/use-selection-observer.js
++++ b/packages/block-editor/src/components/writing-flow/use-selection-observer.js
+@@ -85,13 +85,14 @@ function setContentEditableWrapper( node, value ) {
+ 	// Since we are calling this on every selection change, check if the value
+ 	// needs to be updated first because it trigger the browser to recalculate
+ 	// style.
+-	if ( node.contentEditable !== String( value ) ) {
+-		node.contentEditable = value;
++	// ALWAYS-ON: the wrapper stays editable; never turn it off.
++	if ( node.contentEditable !== 'true' ) {
++		node.contentEditable = 'true';
++	}
+ 
+-		// Firefox doesn't automatically move focus.
+-		if ( value ) {
+-			node.focus();
+-		}
++	// Firefox doesn't automatically move focus.
++	if ( value ) {
++		node.focus();
+ 	}
+ }
+ 
+diff --git a/packages/block-library/src/list-item/hooks/use-space.js b/packages/block-library/src/list-item/hooks/use-space.js
+index 25ed715b372d71..d1dc37c2d5bf50 100644
+--- a/packages/block-library/src/list-item/hooks/use-space.js
++++ b/packages/block-library/src/list-item/hooks/use-space.js
+@@ -26,6 +26,21 @@ export default function useSpace( clientId ) {
+ 
+ 	return useRefEffect(
+ 		( element ) => {
++			const { ownerDocument } = element;
++			const { defaultView } = ownerDocument;
++
++			// When the editing host is an ancestor (the writing flow wrapper),
++			// keydown events target that host rather than this element, so
++			// determine relevance from the selection rather than the event
++			// target.
++			function isSelectionInElement() {
++				const { anchorNode, focusNode } = defaultView.getSelection();
++				return (
++					element.contains( anchorNode ) &&
++					element.contains( focusNode )
++				);
++			}
++
+ 			function onKeyDown( event ) {
+ 				const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
+ 
+@@ -40,6 +55,10 @@ export default function useSpace( clientId ) {
+ 					return;
+ 				}
+ 
++				if ( ! isSelectionInElement() ) {
++					return;
++				}
++
+ 				const selectionStart = getSelectionStart();
+ 				const selectionEnd = getSelectionEnd();
+ 				if (
+@@ -64,7 +83,7 @@ export default function useSpace( clientId ) {
+ 			// Capture phase so we run before writing-flow's ancestor-bubble
+ 			// keydown handlers that gate on `event.defaultPrevented`.
+ 			return subscribeDelegatedListener(
+-				element,
++				ownerDocument,
+ 				'keydown',
+ 				onKeyDown,
+ 				true
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index cfeeb0f58f426c..47be16325c31ca 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -398,7 +398,17 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
+ 	const mergedRefs = useMergeRefs( [
+ 		ref,
+ 		useRefEffect( ( element: HTMLElement ) => {
++			const { ownerDocument } = element;
+ 			function _onKeyDown( event: Event ) {
++				// When the editing host is an ancestor (e.g. the block
++				// editor's writing flow wrapper), keydown events target that
++				// host rather than this element, so determine relevance from
++				// the selection rather than the event target.
++				const selection = ownerDocument.defaultView?.getSelection();
++				const anchorNode = selection?.anchorNode;
++				if ( ! anchorNode || ! element.contains( anchorNode ) ) {
++					return;
++				}
+ 				onKeyDownRef.current?.( event as KeyboardEvent );
+ 			}
+ 			// Capture phase. When the autocomplete popover is open,
+@@ -410,7 +420,7 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
+ 			// so firing in capture lets us preventDefault first when the
+ 			// popover is active.
+ 			return subscribeDelegatedListener(
+-				element,
++				ownerDocument,
+ 				'keydown',
+ 				_onKeyDown,
+ 				true
+diff --git a/packages/rich-text/src/hook/event-listeners/copy-handler.js b/packages/rich-text/src/hook/event-listeners/copy-handler.js
+index 3e279788dbc043..fdcce7d0ca41c9 100644
+--- a/packages/rich-text/src/hook/event-listeners/copy-handler.js
++++ b/packages/rich-text/src/hook/event-listeners/copy-handler.js
+@@ -7,7 +7,6 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
+  * Internal dependencies
+  */
+ import { toHTMLString } from '../../to-html-string';
+-import { isCollapsed } from '../../is-collapsed';
+ import { slice } from '../../slice';
+ import { getTextContent } from '../../get-text-content';
+ import { unlock } from '../../lock-unlock';
+@@ -18,10 +17,13 @@ export default ( props ) => ( element ) => {
+ 	function onCopy( event ) {
+ 		const { record } = props.current;
+ 		const { ownerDocument } = element;
+-		if (
+-			isCollapsed( record.current ) ||
+-			! element.contains( ownerDocument.activeElement )
+-		) {
++		// Determine relevance from the selection, not the active element, so
++		// the handler works regardless of which editing host is focused.
++		const selection = ownerDocument.defaultView.getSelection();
++		const { anchorNode, focusNode } = selection;
++		const containsSelection =
++			element.contains( anchorNode ) && element.contains( focusNode );
++		if ( selection.isCollapsed || ! containsSelection ) {
+ 			return;
+ 		}
+ 
+diff --git a/packages/rich-text/src/hook/event-listeners/format-boundaries.js b/packages/rich-text/src/hook/event-listeners/format-boundaries.js
+index f0be497fc33fcf..4180a09375e244 100644
+--- a/packages/rich-text/src/hook/event-listeners/format-boundaries.js
++++ b/packages/rich-text/src/hook/event-listeners/format-boundaries.js
+@@ -15,6 +15,17 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ const EMPTY_ACTIVE_FORMATS = [];
+ 
+ export default ( props ) => ( element ) => {
++	const { ownerDocument } = element;
++	const { defaultView } = ownerDocument;
++
++	// When the editing host is an ancestor (the writing flow wrapper), keydown
++	// events target that host rather than this element, so determine relevance
++	// from the selection rather than the event target.
++	function isSelectionInElement() {
++		const { anchorNode, focusNode } = defaultView.getSelection();
++		return element.contains( anchorNode ) && element.contains( focusNode );
++	}
++
+ 	function onKeyDown( event ) {
+ 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
+ 
+@@ -29,6 +40,10 @@ export default ( props ) => ( element ) => {
+ 			return;
+ 		}
+ 
++		if ( ! isSelectionInElement() ) {
++			return;
++		}
++
+ 		const { record, applyRecord, forceRender } = props.current;
+ 		const {
+ 			text,
+@@ -38,7 +53,6 @@ export default ( props ) => ( element ) => {
+ 			activeFormats: currentActiveFormats = [],
+ 		} = record.current;
+ 		const collapsed = isCollapsed( record.current );
+-		const { defaultView } = element.ownerDocument;
+ 		// To do: ideally, we should look at visual position instead.
+ 		const { direction } = defaultView.getComputedStyle( element );
+ 		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
+@@ -99,5 +113,10 @@ export default ( props ) => ( element ) => {
+ 		forceRender();
+ 	}
+ 
+-	return subscribeDelegatedListener( element, 'keydown', onKeyDown, true );
++	return subscribeDelegatedListener(
++		ownerDocument,
++		'keydown',
++		onKeyDown,
++		true
++	);
+ };
+diff --git a/packages/rich-text/src/hook/event-listeners/input-and-selection.js b/packages/rich-text/src/hook/event-listeners/input-and-selection.js
+index afa9b920a434bd..e41f007e066d91 100644
+--- a/packages/rich-text/src/hook/event-listeners/input-and-selection.js
++++ b/packages/rich-text/src/hook/event-listeners/input-and-selection.js
+@@ -65,7 +65,19 @@ export default ( props ) => ( element ) => {
+ 
+ 	let isComposing = false;
+ 
++	// When the editing host is an ancestor (the writing flow wrapper), input
++	// events target that host rather than this element, so determine relevance
++	// from the selection rather than the event target.
++	function isSelectionInElement() {
++		const { anchorNode, focusNode } = defaultView.getSelection();
++		return element.contains( anchorNode ) && element.contains( focusNode );
++	}
++
+ 	function onInput( event ) {
++		if ( ! isSelectionInElement() ) {
++			return;
++		}
++
+ 		// Do not trigger a change if characters are being composed. Browsers
+ 		// will usually emit a final `input` event when the characters are
+ 		// composed. As of December 2019, Safari doesn't support
+@@ -129,14 +141,16 @@ export default ( props ) => ( element ) => {
+ 			return;
+ 		}
+ 
+-		// Ensure the active element is the rich text element.
+-		if ( ownerDocument.activeElement !== element ) {
+-			// If it is not, we can stop listening for selection changes. We
+-			// resume listening when the element is focused.
+-			ownerDocument.removeEventListener(
+-				'selectionchange',
+-				handleSelectionChange
+-			);
++		// Determine relevance from the selection rather than the active
++		// element, so the handler still works when the editing host is an
++		// ancestor (e.g. the writing flow wrapper) rather than this element.
++		const { anchorNode, focusNode } = defaultView.getSelection();
++		const containsSelection =
++			element.contains( anchorNode ) &&
++			element.contains( focusNode ) &&
++			!! ownerDocument.activeElement?.contains( element );
++
++		if ( ! containsSelection ) {
+ 			return;
+ 		}
+ 
+@@ -194,14 +208,13 @@ export default ( props ) => ( element ) => {
+ 	}
+ 
+ 	function onCompositionStart() {
++		if ( ! isSelectionInElement() ) {
++			return;
++		}
+ 		isComposing = true;
+-		// Do not update the selection when characters are being composed as
+-		// this rerenders the component and might destroy internal browser
+-		// editing state.
+-		ownerDocument.removeEventListener(
+-			'selectionchange',
+-			handleSelectionChange
+-		);
++		// Selection changes are ignored while composing via the isComposing
++		// guard in handleSelectionChange (updating would rerender and destroy
++		// internal browser editing state).
+ 		// Remove the placeholder. Since the rich text value doesn't update
+ 		// during composition, the placeholder doesn't get removed. There's no
+ 		// need to re-add it, when the value is updated on compositionend it
+@@ -210,15 +223,13 @@ export default ( props ) => ( element ) => {
+ 	}
+ 
+ 	function onCompositionEnd() {
++		if ( ! isComposing ) {
++			return;
++		}
+ 		isComposing = false;
+ 		// Ensure the value is up-to-date for browsers that don't emit a final
+ 		// input event after composition.
+ 		onInput( { inputType: 'insertText' } );
+-		// Tracking selection changes can be resumed.
+-		ownerDocument.addEventListener(
+-			'selectionchange',
+-			handleSelectionChange
+-		);
+ 	}
+ 
+ 	function onFocus( event ) {
+@@ -267,13 +278,9 @@ export default ( props ) => ( element ) => {
+ 
+ 		// There is no selection change event when the element is focused, so
+ 		// we need to manually trigger it. The selection is also not available
+-		// yet in this call stack.
++		// yet in this call stack. The selectionchange listener itself is
++		// attached once on mount.
+ 		window.queueMicrotask( handleSelectionChange );
+-
+-		ownerDocument.addEventListener(
+-			'selectionchange',
+-			handleSelectionChange
+-		);
+ 	}
+ 
+ 	// `input` and `compositionend` must run before block-editor's
+@@ -281,18 +288,18 @@ export default ( props ) => ( element ) => {
+ 	// reading `record.current` updated by our `onInput`. Use capture phase
+ 	// so we fire before any ancestor bubble handlers.
+ 	const unsubscribeInput = subscribeDelegatedListener(
+-		element,
++		ownerDocument,
+ 		'input',
+ 		onInput,
+ 		true
+ 	);
+ 	const unsubscribeCompositionStart = subscribeDelegatedListener(
+-		element,
++		ownerDocument,
+ 		'compositionstart',
+ 		onCompositionStart
+ 	);
+ 	const unsubscribeCompositionEnd = subscribeDelegatedListener(
+-		element,
++		ownerDocument,
+ 		'compositionend',
+ 		onCompositionEnd,
+ 		true
+@@ -303,10 +310,21 @@ export default ( props ) => ( element ) => {
+ 		onFocus
+ 	);
+ 
++	// Always listen for selection changes so the selection syncs to the store
++	// even when the editing host is an ancestor (the writing flow wrapper) and
++	// this element never receives focus. handleSelectionChange guards on
++	// selection containment and composition state.
++	const unsubscribeSelectionChange = subscribeDelegatedListener(
++		ownerDocument,
++		'selectionchange',
++		handleSelectionChange
++	);
++
+ 	return () => {
+ 		unsubscribeInput();
+ 		unsubscribeCompositionStart();
+ 		unsubscribeCompositionEnd();
+ 		unsubscribeFocus();
++		unsubscribeSelectionChange();
+ 	};
+ };
+diff --git a/packages/rich-text/src/hook/index.js b/packages/rich-text/src/hook/index.js
+index c114af516d10c8..8565408c5e38ee 100644
+--- a/packages/rich-text/src/hook/index.js
++++ b/packages/rich-text/src/hook/index.js
+@@ -168,10 +168,20 @@ function useRichTextBase( {
+ 			typeof value === 'string' &&
+ 			previousValue.length !== value.length;
+ 
+-		// Check if focus is on this element
+-		const hasFocus = ref.current?.contains(
+-			ref.current.ownerDocument.activeElement
+-		);
++		// This element is actively edited when focus is on it or a descendant,
++		// or when an ancestor editing host (the writing flow wrapper) is
++		// focused and the selection is within this element.
++		const element = ref.current;
++		const { ownerDocument } = element;
++		const { activeElement } = ownerDocument;
++		const { anchorNode } = ownerDocument.defaultView.getSelection();
++		const hasFocus =
++			element.contains( activeElement ) ||
++			!! (
++				activeElement?.isContentEditable &&
++				activeElement.contains( element ) &&
++				element.contains( anchorNode )
++			);
+ 
+ 		// Skip re-applying the selection state when content changed from external source
+ 		// (e.g., typing in sidebar input changes canvas text)
+@@ -196,7 +206,16 @@ function useRichTextBase( {
+ 			return;
+ 		}
+ 
+-		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
++		// Don't steal focus from an ancestor editing host (the writing flow
++		// wrapper): it already holds focus, and applyRecord sets the selection.
++		const { activeElement } = ref.current.ownerDocument;
++		if (
++			activeElement !== ref.current &&
++			! (
++				activeElement?.isContentEditable &&
++				activeElement.contains( ref.current )
++			)
++		) {
+ 			ref.current.focus();
+ 		}
+ 
+diff --git a/packages/rich-text/src/hook/use-boundary-style.js b/packages/rich-text/src/hook/use-boundary-style.js
+index dd5b930b168af6..4239ed701eb1f7 100644
+--- a/packages/rich-text/src/hook/use-boundary-style.js
++++ b/packages/rich-text/src/hook/use-boundary-style.js
+@@ -39,7 +39,10 @@ export function useBoundaryStyle( { record } ) {
+ 		const newColor = colord( computedStyle.color )
+ 			.alpha( 0.2 )
+ 			.toRgbString();
+-		const selector = `.rich-text:focus ${ boundarySelector }`;
++		// Key off the focused editing host rather than the rich text element:
++		// when the writing flow wrapper is the host, the rich text element
++		// itself never receives focus, so `.rich-text:focus` would never match.
++		const selector = `[contenteditable="true"]:focus ${ boundarySelector }`;
+ 		const rule = `background-color: ${ newColor }`;
+ 		const style = `${ selector } {${ rule }}`;
+ 		const globalStyleId = 'rich-text-boundary-style';
+diff --git a/test/e2e/specs/editor/various/rich-text.spec.js b/test/e2e/specs/editor/various/rich-text.spec.js
+index 66d6c2143bf855..33c7163ac2b74f 100644
+--- a/test/e2e/specs/editor/various/rich-text.spec.js
++++ b/test/e2e/specs/editor/various/rich-text.spec.js
+@@ -44,6 +44,9 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
+ 			.click();
+ 		await page.keyboard.type( 'test' );
+ 		await pageUtils.pressKeys( 'primary+a' );
++		await page.evaluate(
++			() => new Promise( window.requestAnimationFrame )
++		);
+ 		await pageUtils.pressKeys( 'primary+b' );
+ 
+ 		expect( await editor.getBlocks() ).toMatchObject( [
+@@ -112,6 +115,11 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
+ 		await pageUtils.pressKeys( 'primary+b' );
+ 		await page.keyboard.type( ' 2' );
+ 		await pageUtils.pressKeys( 'shift+ArrowLeft' );
++		// The selection updates asynchronously, so apply the format on the next
++		// frame to act on the moved selection rather than the previous one.
++		await page.evaluate(
++			() => new Promise( window.requestAnimationFrame )
++		);
+ 		await pageUtils.pressKeys( 'primary+b' );
+ 
+ 		const count = await editor.canvas
+@@ -493,6 +501,11 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
+ 		await pageUtils.pressKeys( 'primary+x' );
+ 		await page.keyboard.type( 'ab' );
+ 		await page.keyboard.press( 'ArrowLeft' );
++		// The caret position updates asynchronously, so the paste must split on
++		// the next frame to land at the moved caret rather than the old one.
++		await page.evaluate(
++			() => new Promise( window.requestAnimationFrame )
++		);
+ 		await pageUtils.pressKeys( 'primary+v' );
+ 
+ 		expect( await editor.getBlocks() ).toMatchObject( [
+@@ -678,12 +691,19 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
+ 		await pageUtils.pressKeys( 'shift+Enter' );
+ 		await page.keyboard.type( '2' );
+ 
+-		// Select all and copy.
++		// Select all and copy. The selection updates asynchronously, so wait a
++		// frame before copying so the full content is captured.
+ 		await pageUtils.pressKeys( 'primary+a' );
++		await page.evaluate(
++			() => new Promise( window.requestAnimationFrame )
++		);
+ 		await pageUtils.pressKeys( 'primary+c' );
+ 
+ 		// Collapse the selection to the end.
+ 		await page.keyboard.press( 'ArrowRight' );
++		await page.evaluate(
++			() => new Promise( window.requestAnimationFrame )
++		);
+ 
+ 		// Create a list.
+ 		await page.keyboard.press( 'Enter' );

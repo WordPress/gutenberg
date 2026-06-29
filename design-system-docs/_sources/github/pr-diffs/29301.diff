@@ -1,0 +1,61 @@
+diff --git a/packages/components/src/ui/utils/colors.js b/packages/components/src/ui/utils/colors.js
+index d9938f76e7cc3b..fb9fc559f6d6ed 100644
+--- a/packages/components/src/ui/utils/colors.js
++++ b/packages/components/src/ui/utils/colors.js
+@@ -75,7 +75,7 @@ const getComputedBackgroundColor = memoize( _getComputedBackgroundColor );
+  *
+  * @return {string} The optimized text color (black or white).
+  */
+-function getOptimalTextColor( backgroundColor ) {
++export function getOptimalTextColor( backgroundColor ) {
+ 	const background = getComputedBackgroundColor( backgroundColor );
+ 	const isReadableWithBlackText = tinycolor.isReadable(
+ 		background,
+diff --git a/packages/components/src/ui/utils/test/colors.js b/packages/components/src/ui/utils/test/colors.js
+new file mode 100644
+index 00000000000000..eb52b5dbb223bf
+--- /dev/null
++++ b/packages/components/src/ui/utils/test/colors.js
+@@ -0,0 +1,42 @@
++/**
++ * Internal dependencies
++ */
++import { getOptimalTextColor, getOptimalTextShade } from '../colors';
++
++describe( 'getOptimalTextColor', () => {
++	test( 'should be white for dark backgrounds', () => {
++		expect( getOptimalTextColor( 'black' ) ).toBe( '#ffffff' );
++		expect( getOptimalTextColor( '#000' ) ).toBe( '#ffffff' );
++		expect( getOptimalTextColor( '#111' ) ).toBe( '#ffffff' );
++		expect( getOptimalTextColor( '#123' ) ).toBe( '#ffffff' );
++		expect( getOptimalTextColor( '#555' ) ).toBe( '#ffffff' );
++		expect( getOptimalTextColor( '#05f' ) ).toBe( '#ffffff' );
++	} );
++
++	test( 'should be black for light backgrounds', () => {
++		expect( getOptimalTextColor( 'white' ) ).toBe( '#000000' );
++		expect( getOptimalTextColor( '#fff' ) ).toBe( '#000000' );
++		expect( getOptimalTextColor( '#def' ) ).toBe( '#000000' );
++		expect( getOptimalTextColor( '#c3c3c3' ) ).toBe( '#000000' );
++		expect( getOptimalTextColor( '#0ff' ) ).toBe( '#000000' );
++	} );
++} );
++
++describe( 'getOptimalTextShade', () => {
++	test( 'should be "light" for dark backgrounds', () => {
++		expect( getOptimalTextShade( 'black' ) ).toBe( 'light' );
++		expect( getOptimalTextShade( '#000' ) ).toBe( 'light' );
++		expect( getOptimalTextShade( '#111' ) ).toBe( 'light' );
++		expect( getOptimalTextShade( '#123' ) ).toBe( 'light' );
++		expect( getOptimalTextShade( '#555' ) ).toBe( 'light' );
++		expect( getOptimalTextShade( '#05f' ) ).toBe( 'light' );
++	} );
++
++	test( 'should be "dark" for light backgrounds', () => {
++		expect( getOptimalTextShade( 'white' ) ).toBe( 'dark' );
++		expect( getOptimalTextShade( '#fff' ) ).toBe( 'dark' );
++		expect( getOptimalTextShade( '#def' ) ).toBe( 'dark' );
++		expect( getOptimalTextShade( '#c3c3c3' ) ).toBe( 'dark' );
++		expect( getOptimalTextShade( '#0ff' ) ).toBe( 'dark' );
++	} );
++} );

@@ -1,0 +1,201 @@
+diff --git a/packages/components/src/box-control/index.js b/packages/components/src/box-control/index.js
+index d001997d24d2de..4291c756a9aeb7 100644
+--- a/packages/components/src/box-control/index.js
++++ b/packages/components/src/box-control/index.js
+@@ -52,7 +52,9 @@ export default function BoxControl( {
+ 	values: valuesProp,
+ 	units,
+ } ) {
+-	const [ values, setValues ] = useControlledState( valuesProp );
++	const [ values, setValues ] = useControlledState( valuesProp, {
++		fallback: DEFAULT_VALUES,
++	} );
+ 	const inputValues = values || DEFAULT_VALUES;
+ 	const hasInitialValue = isValuesDefined( valuesProp );
+ 
+diff --git a/packages/components/src/box-control/test/index.js b/packages/components/src/box-control/test/index.js
+new file mode 100644
+index 00000000000000..613aac6092fe65
+--- /dev/null
++++ b/packages/components/src/box-control/test/index.js
+@@ -0,0 +1,118 @@
++/**
++ * External dependencies
++ */
++import { render, fireEvent } from '@testing-library/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++import { ENTER } from '@wordpress/keycodes';
++
++/**
++ * Internal dependencies
++ */
++import BoxControl from '../';
++
++describe( 'BoxControl', () => {
++	describe( 'Basic rendering', () => {
++		it( 'should render', () => {
++			const { container } = render( <BoxControl /> );
++			const input = container.querySelector( 'input' );
++
++			expect( input ).toBeTruthy();
++		} );
++
++		it( 'should update values when interacting with input', () => {
++			const { container } = render( <BoxControl /> );
++			const input = container.querySelector( 'input' );
++			const unitSelect = container.querySelector( 'select' );
++
++			fireEvent.change( input, { target: { value: '100%' } } );
++			fireEvent.keyDown( input, { keyCode: ENTER } );
++
++			expect( input.value ).toBe( '100' );
++			expect( unitSelect.value ).toBe( '%' );
++		} );
++	} );
++
++	describe( 'Reset', () => {
++		it( 'should reset values when clicking Reset', () => {
++			const { container, getByText } = render( <BoxControl /> );
++			const input = container.querySelector( 'input' );
++			const unitSelect = container.querySelector( 'select' );
++
++			fireEvent.change( input, { target: { value: '100px' } } );
++			fireEvent.keyDown( input, { keyCode: ENTER } );
++
++			expect( input.value ).toBe( '100' );
++			expect( unitSelect.value ).toBe( 'px' );
++
++			fireEvent.click( getByText( /Reset/ ) );
++
++			expect( input.value ).toBe( '' );
++			expect( unitSelect.value ).toBe( 'px' );
++		} );
++
++		it( 'should reset values when clicking Reset, if controlled', () => {
++			const Example = () => {
++				const [ state, setState ] = useState();
++
++				return (
++					<BoxControl
++						values={ state }
++						onChange={ ( next ) => setState( next ) }
++					/>
++				);
++			};
++			const { container, getByText } = render( <Example /> );
++			const input = container.querySelector( 'input' );
++			const unitSelect = container.querySelector( 'select' );
++
++			fireEvent.change( input, { target: { value: '100px' } } );
++			fireEvent.keyDown( input, { keyCode: ENTER } );
++
++			expect( input.value ).toBe( '100' );
++			expect( unitSelect.value ).toBe( 'px' );
++
++			fireEvent.click( getByText( /Reset/ ) );
++
++			expect( input.value ).toBe( '' );
++			expect( unitSelect.value ).toBe( 'px' );
++		} );
++
++		it( 'should reset values when clicking Reset, if controlled <-> uncontrolled state changes', () => {
++			const Example = () => {
++				const [ state, setState ] = useState();
++
++				return (
++					<BoxControl
++						values={ state }
++						onChange={ ( next ) => {
++							if ( next.top ) {
++								setState( next );
++							} else {
++								// This reverts it to being uncontrolled
++								setState( undefined );
++							}
++						} }
++					/>
++				);
++			};
++			const { container, getByText } = render( <Example /> );
++			const input = container.querySelector( 'input' );
++			const unitSelect = container.querySelector( 'select' );
++
++			fireEvent.change( input, { target: { value: '100px' } } );
++			fireEvent.keyDown( input, { keyCode: ENTER } );
++
++			expect( input.value ).toBe( '100' );
++			expect( unitSelect.value ).toBe( 'px' );
++
++			fireEvent.click( getByText( /Reset/ ) );
++
++			expect( input.value ).toBe( '' );
++			expect( unitSelect.value ).toBe( 'px' );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/unit-control/test/index.js b/packages/components/src/unit-control/test/index.js
+index f78abf47781c62..8eac58f0dfdbaf 100644
+--- a/packages/components/src/unit-control/test/index.js
++++ b/packages/components/src/unit-control/test/index.js
+@@ -387,5 +387,15 @@ describe( 'UnitControl', () => {
+ 
+ 			expect( select.value ).toBe( 'em' );
+ 		} );
++
++		it( 'should fallback to default unit if parsed unit is invalid', () => {
++			const { container: testContainer } = testRender(
++				<UnitControl value={ '10null' } />
++			);
++
++			const select = testContainer.querySelector( 'select' );
++
++			expect( select.value ).toBe( 'px' );
++		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/unit-control/utils.js b/packages/components/src/unit-control/utils.js
+index afe41d9bc39bf4..8abd21dea85bf5 100644
+--- a/packages/components/src/unit-control/utils.js
++++ b/packages/components/src/unit-control/utils.js
+@@ -63,6 +63,8 @@ export function parseUnit( initialValue, units = CSS_UNITS ) {
+ 	if ( hasUnits( units ) ) {
+ 		const match = units.find( ( item ) => item.value === unit );
+ 		unit = match?.value;
++	} else {
++		unit = DEFAULT_UNIT.value;
+ 	}
+ 
+ 	return [ num, unit ];
+diff --git a/packages/components/src/utils/hooks/use-controlled-state.js b/packages/components/src/utils/hooks/use-controlled-state.js
+index cf3de908dd459e..f07c916d7f1c23 100644
+--- a/packages/components/src/utils/hooks/use-controlled-state.js
++++ b/packages/components/src/utils/hooks/use-controlled-state.js
+@@ -1,7 +1,7 @@
+ /**
+  * WordPress dependencies
+  */
+-import { useState } from '@wordpress/element';
++import { useEffect, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -46,6 +46,15 @@ function useControlledState( currentState, options = defaultOptions ) {
+ 	const [ internalState, setInternalState ] = useState( currentState );
+ 	const hasCurrentState = isValueDefined( currentState );
+ 
++	/*
++	 * Resets internal state if value every changes from uncontrolled <-> controlled.
++	 */
++	useEffect( () => {
++		if ( hasCurrentState && internalState ) {
++			setInternalState( undefined );
++		}
++	}, [ hasCurrentState, internalState ] );
++
+ 	const state = getDefinedValue(
+ 		[ currentState, internalState, initial ],
+ 		fallback

@@ -1,0 +1,411 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4d6ea42e8bc0e1..9c0b25dde3dca0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,11 +6,14 @@
+ 
+ -   `FocalPointUnitControl`: Add aria-labels ([#50993](https://github.com/WordPress/gutenberg/pull/50993)).
+ 
++### Enhancements
++
++-   Wrapped `TabPanel` in a `forwardRef` call ([#50199](https://github.com/WordPress/gutenberg/pull/50199)).
++
+ ### Experimental
+ 
+ -   `DropdownMenu` v2: Tweak styles ([#50967](https://github.com/WordPress/gutenberg/pull/50967)).
+ 
+-
+ ## 25.0.0 (2023-05-24)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index 4ed4dc76da22de..20063b2315dd39 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -2,11 +2,13 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
++import type { ForwardedRef } from 'react';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import {
++	forwardRef,
+ 	useState,
+ 	useEffect,
+ 	useLayoutEffect,
+@@ -76,16 +78,19 @@ const TabButton = ( {
+  * );
+  * ```
+  */
+-export function TabPanel( {
+-	className,
+-	children,
+-	tabs,
+-	selectOnMove = true,
+-	initialTabName,
+-	orientation = 'horizontal',
+-	activeClass = 'is-active',
+-	onSelect,
+-}: WordPressComponentProps< TabPanelProps, 'div', false > ) {
++const UnforwardedTabPanel = (
++	{
++		className,
++		children,
++		tabs,
++		selectOnMove = true,
++		initialTabName,
++		orientation = 'horizontal',
++		activeClass = 'is-active',
++		onSelect,
++	}: WordPressComponentProps< TabPanelProps, 'div', false >,
++	ref: ForwardedRef< any >
++) => {
+ 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
+ 	const [ selected, setSelected ] = useState< string >();
+ 
+@@ -151,7 +156,7 @@ export function TabPanel( {
+ 	}, [ tabs, selectedTab?.disabled, handleTabSelection ] );
+ 
+ 	return (
+-		<div className={ className }>
++		<div className={ className } ref={ ref }>
+ 			<NavigableMenu
+ 				role="tablist"
+ 				orientation={ orientation }
+@@ -196,6 +201,7 @@ export function TabPanel( {
+ 			) }
+ 		</div>
+ 	);
+-}
++};
+ 
++export const TabPanel = forwardRef( UnforwardedTabPanel );
+ export default TabPanel;
+diff --git a/packages/e2e-tests/specs/editor/various/block-hierarchy-navigation.test.js b/packages/e2e-tests/specs/editor/various/block-hierarchy-navigation.test.js
+index b1c5a7278efda8..2d05fc08baf7fd 100644
+--- a/packages/e2e-tests/specs/editor/various/block-hierarchy-navigation.test.js
++++ b/packages/e2e-tests/specs/editor/various/block-hierarchy-navigation.test.js
+@@ -141,7 +141,7 @@ describe( 'Navigating the block hierarchy', () => {
+ 		// Navigate to the third column in the columns block.
+ 		await pressKeyWithModifier( 'ctrlShift', '`' );
+ 		await pressKeyWithModifier( 'ctrlShift', '`' );
+-		await pressKeyTimes( 'Tab', 4 );
++		await pressKeyTimes( 'Tab', 3 );
+ 		await pressKeyTimes( 'ArrowDown', 4 );
+ 		await page.waitForSelector(
+ 			'.is-highlighted[aria-label="Block: Column (3 of 3)"]'
+diff --git a/packages/edit-post/src/components/secondary-sidebar/list-view-sidebar.js b/packages/edit-post/src/components/secondary-sidebar/list-view-sidebar.js
+index 69aaf573b840ec..a4e6e639fbd76d 100644
+--- a/packages/edit-post/src/components/secondary-sidebar/list-view-sidebar.js
++++ b/packages/edit-post/src/components/secondary-sidebar/list-view-sidebar.js
+@@ -1,13 +1,8 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+ /**
+  * WordPress dependencies
+  */
+ import { __experimentalListView as ListView } from '@wordpress/block-editor';
+-import { Button } from '@wordpress/components';
++import { Button, TabPanel } from '@wordpress/components';
+ import {
+ 	useFocusOnMount,
+ 	useFocusReturn,
+@@ -30,7 +25,9 @@ import ListViewOutline from './list-view-outline';
+ export default function ListViewSidebar() {
+ 	const { setIsListViewOpened } = useDispatch( editPostStore );
+ 
++	// This hook handles focus when the sidebar first renders.
+ 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
++	// The next 2 hooks handle focus for when the sidebar closes and returning focus to the element that had focus before sidebar opened.
+ 	const headerFocusReturnRef = useFocusReturn();
+ 	const contentFocusReturnRef = useFocusReturn();
+ 
+@@ -44,18 +41,24 @@ export default function ListViewSidebar() {
+ 	// Use internal state instead of a ref to make sure that the component
+ 	// re-renders when the dropZoneElement updates.
+ 	const [ dropZoneElement, setDropZoneElement ] = useState( null );
+-
++	// Tracks our current tab.
+ 	const [ tab, setTab ] = useState( 'list-view' );
+ 
+ 	// This ref refers to the sidebar as a whole.
+ 	const sidebarRef = useRef();
+-	// This ref refers to the list view tab button.
+-	const listViewTabRef = useRef();
+-	// This ref refers to the outline tab button.
+-	const outlineTabRef = useRef();
++	// This ref refers to the tab panel.
++	const tabPanelRef = useRef();
+ 	// This ref refers to the list view application area.
+ 	const listViewRef = useRef();
+ 
++	// Must merge the refs together so focus can be handled properly in the next function.
++	const listViewContainerRef = useMergeRefs( [
++		contentFocusReturnRef,
++		focusOnMountRef,
++		listViewRef,
++		setDropZoneElement,
++	] );
++
+ 	/*
+ 	 * Callback function to handle list view or outline focus.
+ 	 *
+@@ -64,9 +67,11 @@ export default function ListViewSidebar() {
+ 	 * @return void
+ 	 */
+ 	function handleSidebarFocus( currentTab ) {
++		// Tab panel focus.
++		const tabPanelFocus = focus.tabbable.find( tabPanelRef.current )[ 0 ];
+ 		// List view tab is selected.
+ 		if ( currentTab === 'list-view' ) {
+-			// Either focus the list view or the list view tab button. Must have a fallback because the list view does not render when there are no blocks.
++			// Either focus the list view or the tab panel. Must have a fallback because the list view does not render when there are no blocks.
+ 			const listViewApplicationFocus = focus.tabbable.find(
+ 				listViewRef.current
+ 			)[ 0 ];
+@@ -74,11 +79,11 @@ export default function ListViewSidebar() {
+ 				listViewApplicationFocus
+ 			)
+ 				? listViewApplicationFocus
+-				: listViewTabRef.current;
++				: tabPanelFocus;
+ 			listViewFocusArea.focus();
+ 			// Outline tab is selected.
+ 		} else {
+-			outlineTabRef.current.focus();
++			tabPanelFocus.focus();
+ 		}
+ 	}
+ 
+@@ -97,6 +102,22 @@ export default function ListViewSidebar() {
+ 		}
+ 	} );
+ 
++	/**
++	 * Render tab content for a given tab name.
++	 *
++	 * @param {string} tabName The name of the tab to render.
++	 */
++	function renderTabContent( tabName ) {
++		if ( tabName === 'list-view' ) {
++			return (
++				<div className="edit-post-editor__list-view-panel-content">
++					<ListView dropZoneElement={ dropZoneElement } />
++				</div>
++			);
++		}
++		return <ListViewOutline />;
++	}
++
+ 	return (
+ 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+ 		<div
+@@ -104,64 +125,40 @@ export default function ListViewSidebar() {
+ 			onKeyDown={ closeOnEscape }
+ 			ref={ sidebarRef }
+ 		>
+-			<div
+-				className="edit-post-editor__document-overview-panel-header components-panel__header edit-post-sidebar__panel-tabs"
++			<Button
++				className="edit-post-editor__document-overview-panel__close-button"
+ 				ref={ headerFocusReturnRef }
++				icon={ closeSmall }
++				label={ __( 'Close' ) }
++				onClick={ () => setIsListViewOpened( false ) }
++			/>
++			<TabPanel
++				className="edit-post-editor__document-overview-panel__tab-panel"
++				ref={ tabPanelRef }
++				onSelect={ ( tabName ) => setTab( tabName ) }
++				selectOnMove={ false }
++				tabs={ [
++					{
++						name: 'list-view',
++						title: 'List View',
++						className: 'edit-post-sidebar__panel-tab',
++					},
++					{
++						name: 'outline',
++						title: 'Outline',
++						className: 'edit-post-sidebar__panel-tab',
++					},
++				] }
+ 			>
+-				<Button
+-					icon={ closeSmall }
+-					label={ __( 'Close' ) }
+-					onClick={ () => setIsListViewOpened( false ) }
+-				/>
+-				<ul>
+-					<li>
+-						<Button
+-							ref={ listViewTabRef }
+-							onClick={ () => {
+-								setTab( 'list-view' );
+-							} }
+-							className={ classnames(
+-								'edit-post-sidebar__panel-tab',
+-								{ 'is-active': tab === 'list-view' }
+-							) }
+-							aria-current={ tab === 'list-view' }
+-						>
+-							{ __( 'List View' ) }
+-						</Button>
+-					</li>
+-					<li>
+-						<Button
+-							ref={ outlineTabRef }
+-							onClick={ () => {
+-								setTab( 'outline' );
+-							} }
+-							className={ classnames(
+-								'edit-post-sidebar__panel-tab',
+-								{ 'is-active': tab === 'outline' }
+-							) }
+-							aria-current={ tab === 'outline' }
+-						>
+-							{ __( 'Outline' ) }
+-						</Button>
+-					</li>
+-				</ul>
+-			</div>
+-			<div
+-				ref={ useMergeRefs( [
+-					contentFocusReturnRef,
+-					focusOnMountRef,
+-					listViewRef,
+-					setDropZoneElement,
+-				] ) }
+-				className="edit-post-editor__list-view-container"
+-			>
+-				{ tab === 'list-view' && (
+-					<div className="edit-post-editor__list-view-panel-content">
+-						<ListView dropZoneElement={ dropZoneElement } />
++				{ ( currentTab ) => (
++					<div
++						className="edit-post-editor__list-view-container"
++						ref={ listViewContainerRef }
++					>
++						{ renderTabContent( currentTab.name ) }
+ 					</div>
+ 				) }
+-				{ tab === 'outline' && <ListViewOutline /> }
+-			</div>
++			</TabPanel>
+ 		</div>
+ 	);
+ }
+diff --git a/packages/edit-post/src/components/secondary-sidebar/style.scss b/packages/edit-post/src/components/secondary-sidebar/style.scss
+index 63a3746e1b8443..d5ef3212bcfdd6 100644
+--- a/packages/edit-post/src/components/secondary-sidebar/style.scss
++++ b/packages/edit-post/src/components/secondary-sidebar/style.scss
+@@ -17,8 +17,29 @@
+ 		width: 350px;
+ 	}
+ 
+-	.edit-post-sidebar__panel-tabs {
+-		flex-direction: row-reverse;
++	.edit-post-editor__document-overview-panel__close-button {
++		position: absolute;
++		right: $grid-unit-10;
++		top: math.div($grid-unit-60 - $button-size, 2); // ( tab height - button size ) / 2
++		z-index: 1;
++		background: $white;
++	}
++
++	// The TabPanel style overrides in the following blocks should be removed when the new TabPanel is available.
++	.components-tab-panel__tabs {
++		border-bottom: $border-width solid $gray-300;
++		box-sizing: border-box;
++		display: flex;
++		width: 100%;
++		padding-right: $grid-unit-70;
++
++		.edit-post-sidebar__panel-tab {
++			width: 50%;
++		}
++	}
++
++	.components-tab-panel__tab-content {
++		height: calc(100% - #{$grid-unit-60});
+ 	}
+ }
+ 
+@@ -37,34 +58,6 @@
+ 	}
+ }
+ 
+-.edit-post-editor__document-overview-panel-header {
+-	border-bottom: $border-width solid $gray-300;
+-	display: flex;
+-	justify-content: space-between;
+-	height: $grid-unit-60;
+-	padding-left: $grid-unit-20;
+-	padding-right: $grid-unit-05;
+-	ul {
+-		width: calc(100% - #{ $grid-unit-50 });
+-	}
+-	li {
+-		width: 50%;
+-		button {
+-			width: 100%;
+-			text-align: initial;
+-		}
+-	}
+-	li:only-child {
+-		width: 100%;
+-	}
+-
+-	&.components-panel__header.edit-post-sidebar__panel-tabs {
+-		.components-button.has-icon {
+-			display: flex;
+-		}
+-	}
+-}
+-
+ .edit-post-editor__list-view-panel-content,
+ .edit-post-editor__list-view-container > .document-outline,
+ .edit-post-editor__list-view-empty-headings {
+@@ -118,5 +111,9 @@
+ .edit-post-editor__list-view-container {
+ 	display: flex;
+ 	flex-direction: column;
+-	height: calc(100% - #{$grid-unit-60});
++	height: 100%;
++}
++
++.edit-post-editor__document-overview-panel__tab-panel {
++	height: 100%;
+ }
+diff --git a/test/e2e/specs/editor/various/list-view.spec.js b/test/e2e/specs/editor/various/list-view.spec.js
+index b7021752ea8cfb..5c988b3bf36636 100644
+--- a/test/e2e/specs/editor/various/list-view.spec.js
++++ b/test/e2e/specs/editor/various/list-view.spec.js
+@@ -465,9 +465,8 @@ test.describe( 'List View', () => {
+ 
+ 		// Focus the list view close button and make sure the shortcut will
+ 		// close the list view. This is to catch a bug where elements could be
+-		// out of range of the sidebar region. Must shift+tab 3 times to reach
+-		// close button before tabs.
+-		await pageUtils.pressKeys( 'shift+Tab' );
++		// out of range of the sidebar region. Must shift+tab 2 times to reach
++		// close button before tab panel.
+ 		await pageUtils.pressKeys( 'shift+Tab' );
+ 		await pageUtils.pressKeys( 'shift+Tab' );
+ 		await expect(
+@@ -488,7 +487,8 @@ test.describe( 'List View', () => {
+ 		// Focus the outline tab and select it. This test ensures the outline
+ 		// tab receives similar focus events based on the shortcut.
+ 		await pageUtils.pressKeys( 'shift+Tab' );
+-		const outlineButton = editor.canvas.getByRole( 'button', {
++		await page.keyboard.press( 'ArrowRight' );
++		const outlineButton = editor.canvas.getByRole( 'tab', {
+ 			name: 'Outline',
+ 		} );
+ 		await expect( outlineButton ).toBeFocused();

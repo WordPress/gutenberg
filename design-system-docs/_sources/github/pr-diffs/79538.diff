@@ -1,0 +1,51 @@
+diff --git a/packages/components/src/search-control/index.tsx b/packages/components/src/search-control/index.tsx
+index 7f975fe8b604ab..aa00ff028aca01 100644
+--- a/packages/components/src/search-control/index.tsx
++++ b/packages/components/src/search-control/index.tsx
+@@ -58,7 +58,9 @@ function SuffixItem( {
+ 
+ function UnforwardedSearchControl(
+ 	{
+-		__nextHasNoMarginBottom: _, // Prevent passing to internal component
++		// Prevent passing legacy props to internal component.
++		__nextHasNoMarginBottom: _,
++		__next40pxDefaultSize: _next40pxDefaultSize,
+ 		className,
+ 		onChange,
+ 		value,
+diff --git a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+index 1f9ced1e265207..b44f7d153cc866 100644
+--- a/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
++++ b/packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js
+@@ -417,7 +417,6 @@ export function HierarchicalTermSelector( { slug } ) {
+ 		<Flex direction="column" gap="4">
+ 			{ showFilter && ! loading && (
+ 				<SearchControl
+-					__next40pxDefaultSize
+ 					label={ filterLabel }
+ 					placeholder={ filterLabel }
+ 					value={ filterValue }
+diff --git a/storybook/stories/icons/library.story.tsx b/storybook/stories/icons/library.story.tsx
+index b895fa643467a4..271ecde9df30ad 100644
+--- a/storybook/stories/icons/library.story.tsx
++++ b/storybook/stories/icons/library.story.tsx
+@@ -123,7 +123,6 @@ const LibraryExample = ( {
+ 			<VStack spacing={ 8 }>
+ 				<HStack justify="flex-start" alignment="end" spacing={ 8 } wrap>
+ 					<SearchControl
+-						__next40pxDefaultSize
+ 						label="Icon name"
+ 						hideLabelFromVision={ false }
+ 						value={ filter }
+diff --git a/tools/eslint/config.mjs b/tools/eslint/config.mjs
+index df7f936bee8f2c..a553527691772c 100644
+--- a/tools/eslint/config.mjs
++++ b/tools/eslint/config.mjs
+@@ -176,6 +176,7 @@ const restrictedSyntax = [
+ 		'FocalPointPicker',
+ 		'FontSizePicker',
+ 		'QueryControls',
++		'SearchControl',
+ 		'TextControl',
+ 	].map( ( componentName ) => ( {
+ 		selector: `JSXElement[openingElement.name.name="${ componentName }"] JSXAttribute[name.name="__next40pxDefaultSize"]`,

@@ -1,0 +1,190 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c9f63514c8a608..4676047d584544 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Deprecations
++
++-   `SelectControl`: Deprecate 36px default size ([#66898](https://github.com/WordPress/gutenberg/pull/66898)).
++
+ ## 29.0.0 (2024-12-11)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/dimension-control/index.tsx b/packages/components/src/dimension-control/index.tsx
+index 2cc39379ebde0c..ffdfaeb84ee51d 100644
+--- a/packages/components/src/dimension-control/index.tsx
++++ b/packages/components/src/dimension-control/index.tsx
+@@ -113,6 +113,7 @@ export function DimensionControl( props: DimensionControlProps ) {
+ 		<ContextSystemProvider value={ CONTEXT_VALUE }>
+ 			<SelectControl
+ 				__next40pxDefaultSize={ __next40pxDefaultSize }
++				__shouldNotWarnDeprecated36pxSize
+ 				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 				className={ clsx(
+ 					className,
+diff --git a/packages/components/src/disabled/stories/index.story.tsx b/packages/components/src/disabled/stories/index.story.tsx
+index f017305507814e..591118681a82de 100644
+--- a/packages/components/src/disabled/stories/index.story.tsx
++++ b/packages/components/src/disabled/stories/index.story.tsx
+@@ -55,6 +55,7 @@ const Form = () => {
+ 			/>
+ 			<SelectControl
+ 				__nextHasNoMarginBottom
++				__next40pxDefaultSize
+ 				label="Select Control"
+ 				onChange={ () => {} }
+ 				options={ [
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index 13f078cd89cc1f..99c5b1aea92c37 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -40,6 +40,13 @@ interface BaseProps {
+ 	 * @default false
+ 	 */
+ 	__next40pxDefaultSize?: boolean;
++	/**
++	 * Do not throw a warning for the deprecated 36px default size.
++	 * For internal components of other components that already throw the warning.
++	 *
++	 * @ignore
++	 */
++	__shouldNotWarnDeprecated36pxSize?: boolean;
+ 	__unstableInputWidth?: CSSProperties[ 'width' ];
+ 	/**
+ 	 * If true, the label will only be visible to screen readers.
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index c240243408fab3..d8742fce74f54e 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -92,6 +92,7 @@ const MySelectControl = () => {
+ 				{ label: 'Small', value: '25%' },
+ 			] }
+ 			onChange={ ( newSize ) => setSize( newSize ) }
++			__next40pxDefaultSize
+ 			__nextHasNoMarginBottom
+ 		/>
+ 	);
+@@ -114,6 +115,7 @@ Render a user interface to select multiple users from a list.
+ 		{ value: 'b', label: 'User B' },
+ 		{ value: 'c', label: 'User c' },
+ 	] }
++	__next40pxDefaultSize
+ 	__nextHasNoMarginBottom
+ />
+ ```
+@@ -129,6 +131,7 @@ const [ item, setItem ] = useState( '' );
+     label={ __( 'My dinosaur' ) }
+     value={ item } // e.g: value = 'a'
+     onChange={ ( selection ) => { setItem( selection ) } }
++    __next40pxDefaultSize
+     __nextHasNoMarginBottom
+ >
+ 	<optgroup label="Theropods">
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 3686661b8a58dc..e93e9385a9c23b 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -18,6 +18,7 @@ import type { WordPressComponentProps } from '../context';
+ import type { SelectControlProps } from './types';
+ import SelectControlChevronDown from './chevron-down';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( SelectControl );
+@@ -65,6 +66,7 @@ function UnforwardedSelectControl< V extends string >(
+ 		variant = 'default',
+ 		__next40pxDefaultSize = false,
+ 		__nextHasNoMarginBottom = false,
++		__shouldNotWarnDeprecated36pxSize,
+ 		...restProps
+ 	} = useDeprecated36pxDefaultSizeProp( props );
+ 	const id = useUniqueId( idProp );
+@@ -94,6 +96,13 @@ function UnforwardedSelectControl< V extends string >(
+ 
+ 	const classes = clsx( 'components-select-control', className );
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'SelectControl',
++		__next40pxDefaultSize,
++		size,
++		__shouldNotWarnDeprecated36pxSize,
++	} );
++
+ 	return (
+ 		<BaseControl
+ 			help={ help }
+@@ -154,6 +163,7 @@ function UnforwardedSelectControl< V extends string >(
+  *
+  *   return (
+  *     <SelectControl
++ *       __next40pxDefaultSize
+  *       __nextHasNoMarginBottom
+  *       label="Size"
+  *       value={ size }
+diff --git a/packages/components/src/select-control/stories/index.story.tsx b/packages/components/src/select-control/stories/index.story.tsx
+index d872df540602e4..e9f7f09a1ddb05 100644
+--- a/packages/components/src/select-control/stories/index.story.tsx
++++ b/packages/components/src/select-control/stories/index.story.tsx
+@@ -65,6 +65,7 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
+ 
+ export const Default = SelectControlWithState.bind( {} );
+ Default.args = {
++	__next40pxDefaultSize: true,
+ 	__nextHasNoMarginBottom: true,
+ 	label: 'Label',
+ 	options: [
+@@ -87,6 +88,7 @@ WithLabelAndHelpText.args = {
+  */
+ export const WithCustomChildren = SelectControlWithState.bind( {} );
+ WithCustomChildren.args = {
++	__next40pxDefaultSize: true,
+ 	__nextHasNoMarginBottom: true,
+ 	label: 'Label',
+ 	children: (
+diff --git a/packages/components/src/select-control/test/select-control.tsx b/packages/components/src/select-control/test/select-control.tsx
+index 47b684cd20e280..37935d60384b15 100644
+--- a/packages/components/src/select-control/test/select-control.tsx
++++ b/packages/components/src/select-control/test/select-control.tsx
+@@ -12,7 +12,13 @@ import _SelectControl from '..';
+ const SelectControl = (
+ 	props: React.ComponentProps< typeof _SelectControl >
+ ) => {
+-	return <_SelectControl { ...props } __nextHasNoMarginBottom />;
++	return (
++		<_SelectControl
++			{ ...props }
++			__nextHasNoMarginBottom
++			__next40pxDefaultSize
++		/>
++	);
+ };
+ 
+ describe( 'SelectControl', () => {
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+index 4e7211ab9abfb2..3d9f06385c7532 100644
+--- a/packages/components/src/select-control/types.ts
++++ b/packages/components/src/select-control/types.ts
+@@ -13,6 +13,7 @@ type SelectControlBaseProps< V extends string > = Pick<
+ 	InputBaseProps,
+ 	| '__next36pxDefaultSize'
+ 	| '__next40pxDefaultSize'
++	| '__shouldNotWarnDeprecated36pxSize'
+ 	| 'disabled'
+ 	| 'hideLabelFromVision'
+ 	| 'label'
+diff --git a/packages/components/src/tree-select/index.tsx b/packages/components/src/tree-select/index.tsx
+index bd92807bff4cc9..075ae1268e3c72 100644
+--- a/packages/components/src/tree-select/index.tsx
++++ b/packages/components/src/tree-select/index.tsx
+@@ -102,6 +102,7 @@ export function TreeSelect( props: TreeSelectProps ) {
+ 	return (
+ 		<ContextSystemProvider value={ CONTEXT_VALUE }>
+ 			<SelectControl
++				__shouldNotWarnDeprecated36pxSize
+ 				{ ...{ label, options, onChange } }
+ 				value={ selectedId }
+ 				{ ...restProps }

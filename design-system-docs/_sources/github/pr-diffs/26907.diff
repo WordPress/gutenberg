@@ -1,0 +1,256 @@
+diff --git a/docs/designers-developers/developers/data/data-core-notices.md b/docs/designers-developers/developers/data/data-core-notices.md
+index 54dfbdd8d84ed8..cce07f6e3fdc0c 100644
+--- a/docs/designers-developers/developers/data/data-core-notices.md
++++ b/docs/designers-developers/developers/data/data-core-notices.md
+@@ -77,6 +77,7 @@ _Parameters_
+ -   _options.type_ `[string]`: Type of notice, one of `default`, or `snackbar`.
+ -   _options.speak_ `[boolean]`: Whether the notice content should be announced to screen readers.
+ -   _options.actions_ `[Array<WPNoticeAction>]`: User actions to be presented with notice.
++-   _options.icon_ `[Object]`: An icon displayed with the notice.
+ 
+ _Returns_
+ 
+diff --git a/package-lock.json b/package-lock.json
+index a5258c976d644f..5fdb7b259a9710 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -52301,9 +52301,9 @@
+ 					"dev": true
+ 				},
+ 				"base64-js": {
+-					"version": "1.5.0",
+-					"resolved": "https://registry.npmjs.org/base64-js/-/base64-js-1.5.0.tgz",
+-					"integrity": "sha512-Jrdy04F2EKcNggUDfubMUPNAZg2vMquLQSm8sKLYJvz40ClFL1S8GKyDshGkNsbNNE5Z+fQavzU7nSK1I9JUGA==",
++					"version": "1.5.1",
++					"resolved": "https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz",
++					"integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==",
+ 					"dev": true
+ 				},
+ 				"bl": {
+@@ -60565,9 +60565,9 @@
+ 			},
+ 			"dependencies": {
+ 				"base64-js": {
+-					"version": "1.5.0",
+-					"resolved": "https://registry.npmjs.org/base64-js/-/base64-js-1.5.0.tgz",
+-					"integrity": "sha512-Jrdy04F2EKcNggUDfubMUPNAZg2vMquLQSm8sKLYJvz40ClFL1S8GKyDshGkNsbNNE5Z+fQavzU7nSK1I9JUGA==",
++					"version": "1.5.1",
++					"resolved": "https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz",
++					"integrity": "sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==",
+ 					"dev": true
+ 				},
+ 				"buffer": {
+diff --git a/packages/components/src/snackbar/index.js b/packages/components/src/snackbar/index.js
+index 4c5ae0ac7e5b05..e667676218a838 100644
+--- a/packages/components/src/snackbar/index.js
++++ b/packages/components/src/snackbar/index.js
+@@ -47,6 +47,7 @@ function Snackbar(
+ 		politeness = 'polite',
+ 		actions = [],
+ 		onRemove = noop,
++		icon = null,
+ 	},
+ 	ref
+ ) {
+@@ -69,6 +70,13 @@ function Snackbar(
+ 		actions = [ actions[ 0 ] ];
+ 	}
+ 
++	const snackbarContentClassnames = classnames(
++		'components-snackbar__content',
++		{
++			'components-snackbar__content-with-icon': !! icon,
++		}
++	);
++
+ 	return (
+ 		<div
+ 			ref={ ref }
+@@ -79,7 +87,10 @@ function Snackbar(
+ 			onKeyPress={ onRemove }
+ 			aria-label={ __( 'Dismiss this notice' ) }
+ 		>
+-			<div className="components-snackbar__content">
++			<div className={ snackbarContentClassnames }>
++				{ icon && (
++					<div className="components-snackbar__icon">{ icon }</div>
++				) }
+ 				{ children }
+ 				{ actions.map( ( { label, onClick, url }, index ) => {
+ 					return (
+diff --git a/packages/components/src/snackbar/stories/index.js b/packages/components/src/snackbar/stories/index.js
+index dd6a1f30face74..6de47437251bcc 100644
+--- a/packages/components/src/snackbar/stories/index.js
++++ b/packages/components/src/snackbar/stories/index.js
+@@ -33,3 +33,23 @@ export const withActions = () => {
+ 
+ 	return <Snackbar actions={ actions }>{ content }</Snackbar>;
+ };
++
++export const withIcon = () => {
++	const content = text(
++		'Content',
++		'Add an icon to make your snackbar stand out'
++	);
++	const icon = text( 'Icon (as unicode emoji)', '🌮' );
++
++	return (
++		<Snackbar
++			icon={
++				<span role="img" aria-label="Icon" style={ { fontSize: 21 } }>
++					{ icon }
++				</span>
++			}
++		>
++			{ content }
++		</Snackbar>
++	);
++};
+diff --git a/packages/components/src/snackbar/style.scss b/packages/components/src/snackbar/style.scss
+index 5d82bc97ac9084..88f3dcfb19f0e8 100644
+--- a/packages/components/src/snackbar/style.scss
++++ b/packages/components/src/snackbar/style.scss
+@@ -20,6 +20,16 @@
+ 			0 0 0 1px $white,
+ 			0 0 0 3px var(--wp-admin-theme-color);
+ 	}
++
++	.components-snackbar__content-with-icon {
++		margin-left: 32px;
++	}
++
++	.components-snackbar__icon {
++		position: absolute;
++		top: 24px;
++		left: 26px;
++	}
+ }
+ 
+ .components-snackbar__action.components-button {
+diff --git a/packages/notices/src/store/actions.js b/packages/notices/src/store/actions.js
+index 9f9acc3665e277..c8250a4cbd20c3 100644
+--- a/packages/notices/src/store/actions.js
++++ b/packages/notices/src/store/actions.js
+@@ -40,6 +40,7 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
+  *                                                             readers.
+  * @param {Array<WPNoticeAction>} [options.actions]            User actions to be
+  *                                                             presented with notice.
++ * @param {Object}                [options.icon]               An icon displayed with the notice.
+  *
+  * @return {Object} Action object.
+  */
+@@ -52,6 +53,7 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
+ 		actions = [],
+ 		type = 'default',
+ 		__unstableHTML,
++		icon = null,
+ 	} = options;
+ 
+ 	// The supported value shape of content is currently limited to plain text
+@@ -71,6 +73,7 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
+ 			isDismissible,
+ 			actions,
+ 			type,
++			icon,
+ 		},
+ 	};
+ }
+diff --git a/packages/notices/src/store/test/actions.js b/packages/notices/src/store/test/actions.js
+index 44923e66a36274..2edb0eb172a10a 100644
+--- a/packages/notices/src/store/test/actions.js
++++ b/packages/notices/src/store/test/actions.js
+@@ -57,6 +57,7 @@ describe( 'actions', () => {
+ 				id,
+ 				isDismissible: false,
+ 				context: 'foo',
++				icon: '🌮',
+ 			};
+ 
+ 			const result = createNotice( status, content, options );
+@@ -69,9 +70,11 @@ describe( 'actions', () => {
+ 					status,
+ 					content,
+ 					spokenMessage: content,
++					__unstableHTML: undefined,
+ 					isDismissible: false,
+ 					actions: [],
+ 					type: 'default',
++					icon: '🌮',
+ 				},
+ 			} );
+ 		} );
+@@ -100,6 +103,7 @@ describe( 'actions', () => {
+ 					isDismissible: false,
+ 					actions: [],
+ 					type: 'default',
++					icon: null,
+ 				},
+ 			} );
+ 		} );
+diff --git a/packages/notices/src/store/test/reducer.js b/packages/notices/src/store/test/reducer.js
+index 4ae106de4314fa..f356d13f39e106 100644
+--- a/packages/notices/src/store/test/reducer.js
++++ b/packages/notices/src/store/test/reducer.js
+@@ -28,10 +28,12 @@ describe( 'reducer', () => {
+ 					id: expect.any( String ),
+ 					content: 'save error',
+ 					spokenMessage: 'save error',
++					__unstableHTML: undefined,
+ 					status: 'error',
+ 					isDismissible: true,
+ 					actions: [],
+ 					type: 'default',
++					icon: null,
+ 				},
+ 			],
+ 		} );
+@@ -49,10 +51,12 @@ describe( 'reducer', () => {
+ 					id: expect.any( String ),
+ 					content: 'save error',
+ 					spokenMessage: 'save error',
++					__unstableHTML: undefined,
+ 					status: 'error',
+ 					isDismissible: true,
+ 					actions: [],
+ 					type: 'default',
++					icon: null,
+ 				},
+ 			],
+ 		} );
+@@ -71,19 +75,23 @@ describe( 'reducer', () => {
+ 					id: expect.any( String ),
+ 					content: 'save error',
+ 					spokenMessage: 'save error',
++					__unstableHTML: undefined,
+ 					status: 'error',
+ 					isDismissible: true,
+ 					actions: [],
+ 					type: 'default',
++					icon: null,
+ 				},
+ 				{
+ 					id: expect.any( String ),
+ 					content: 'successfully saved',
+ 					spokenMessage: 'successfully saved',
++					__unstableHTML: undefined,
+ 					status: 'success',
+ 					isDismissible: true,
+ 					actions: [],
+ 					type: 'default',
++					icon: null,
+ 				},
+ 			],
+ 		} );
+@@ -142,10 +150,12 @@ describe( 'reducer', () => {
+ 					id: 'error-message',
+ 					content: 'save error (2)',
+ 					spokenMessage: 'save error (2)',
++					__unstableHTML: undefined,
+ 					status: 'error',
+ 					isDismissible: true,
+ 					actions: [],
+ 					type: 'default',
++					icon: null,
+ 				},
+ 			],
+ 		} );

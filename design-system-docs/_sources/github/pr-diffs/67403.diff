@@ -1,0 +1,51 @@
+diff --git a/packages/block-editor/src/hooks/position.js b/packages/block-editor/src/hooks/position.js
+index bf1b730cd67d1a..0fcea03b5bc1c0 100644
+--- a/packages/block-editor/src/hooks/position.js
++++ b/packages/block-editor/src/hooks/position.js
+@@ -287,6 +287,7 @@ export function PositionPanelPure( {
+ 								onChangeType( selectedItem.value );
+ 							} }
+ 							size="__unstable-large"
++							isLegacy={ false }
+ 						/>
+ 					</BaseControl>
+ 				</InspectorControls>
+diff --git a/packages/components/src/custom-select-control/index.tsx b/packages/components/src/custom-select-control/index.tsx
+index ecd9dc37a8f491..c88aa67ae58308 100644
+--- a/packages/components/src/custom-select-control/index.tsx
++++ b/packages/components/src/custom-select-control/index.tsx
+@@ -63,6 +63,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
+ 		value,
+ 		className: classNameProp,
+ 		showSelectedHint = false,
++		isLegacy = true,
+ 		...restProps
+ 	} = useDeprecatedProps( props );
+ 
+@@ -189,7 +190,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
+ 					'components-custom-select-control',
+ 					classNameProp
+ 				) }
+-				isLegacy
++				isLegacy={ isLegacy }
+ 				{ ...restProps }
+ 			>
+ 				{ children }
+diff --git a/packages/components/src/custom-select-control/types.ts b/packages/components/src/custom-select-control/types.ts
+index 0cbc2388e79638..2bfc020d5d0c28 100644
+--- a/packages/components/src/custom-select-control/types.ts
++++ b/packages/components/src/custom-select-control/types.ts
+@@ -120,4 +120,13 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
+ 	 * @default false
+ 	 */
+ 	__next40pxDefaultSize?: boolean;
++	/**
++	 * Enables legacy behavior for the custom select dropdown.
++	 *
++	 * When set to `true`, the dropdown will follow the legacy implementation, including
++	 * positioning and interaction styles. Set to `false` to use the updated behavior.
++	 *
++	 * @default true
++	 */
++	isLegacy?: boolean;
+ };

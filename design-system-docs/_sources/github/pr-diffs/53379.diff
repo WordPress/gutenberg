@@ -1,0 +1,21 @@
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 8edd322ece883d..769e2ab4f7ebd9 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -151,7 +151,7 @@ function UnforwardedSelectControl(
+  * `SelectControl` allows users to select from a single or multiple option menu.
+  * It functions as a wrapper around the browser's native `<select>` element.
+  *
+- * @example
++ * ```jsx
+  * import { SelectControl } from '@wordpress/components';
+  * import { useState } from '@wordpress/element';
+  *
+@@ -171,6 +171,7 @@ function UnforwardedSelectControl(
+  *     />
+  *   );
+  * };
++ * ```
+  */
+ export const SelectControl = forwardRef( UnforwardedSelectControl );
+ 

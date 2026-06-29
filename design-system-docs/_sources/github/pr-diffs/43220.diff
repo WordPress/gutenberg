@@ -1,0 +1,118 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 03ba0dd71c87c6..60eb278650c695 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -79,6 +79,7 @@ module.exports = {
+ 					{
+ 						name: 'lodash',
+ 						importNames: [
++							'camelCase',
+ 							'capitalize',
+ 							'chunk',
+ 							'clamp',
+diff --git a/package-lock.json b/package-lock.json
+index fd2610d4e96def..7709f348ce4f1f 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -16472,6 +16472,7 @@
+ 				"@wordpress/notices": "file:packages/notices",
+ 				"@wordpress/plugins": "file:packages/plugins",
+ 				"@wordpress/url": "file:packages/url",
++				"change-case": "^4.1.2",
+ 				"lodash": "^4.17.21"
+ 			}
+ 		},
+@@ -16652,6 +16653,7 @@
+ 				"@wordpress/i18n": "file:packages/i18n",
+ 				"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
+ 				"@wordpress/shortcode": "file:packages/shortcode",
++				"change-case": "^4.1.2",
+ 				"colord": "^2.7.0",
+ 				"hpq": "^1.3.0",
+ 				"is-plain-obj": "^4.1.0",
+@@ -16702,6 +16704,7 @@
+ 				"@wordpress/primitives": "file:packages/primitives",
+ 				"@wordpress/rich-text": "file:packages/rich-text",
+ 				"@wordpress/warning": "file:packages/warning",
++				"change-case": "^4.1.2",
+ 				"classnames": "^2.3.1",
+ 				"colord": "^2.7.0",
+ 				"dom-scroll-into-view": "^1.2.1",
+diff --git a/packages/block-directory/package.json b/packages/block-directory/package.json
+index 6db96f95e619df..a6ab6e74c200c2 100644
+--- a/packages/block-directory/package.json
++++ b/packages/block-directory/package.json
+@@ -44,6 +44,7 @@
+ 		"@wordpress/notices": "file:../notices",
+ 		"@wordpress/plugins": "file:../plugins",
+ 		"@wordpress/url": "file:../url",
++		"change-case": "^4.1.2",
+ 		"lodash": "^4.17.21"
+ 	},
+ 	"peerDependencies": {
+diff --git a/packages/block-directory/src/store/resolvers.js b/packages/block-directory/src/store/resolvers.js
+index 31c4f6d9f4c3ca..d2b5abcff587c4 100644
+--- a/packages/block-directory/src/store/resolvers.js
++++ b/packages/block-directory/src/store/resolvers.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { camelCase, mapKeys } from 'lodash';
++import { camelCase } from 'change-case';
++import { mapKeys } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/blocks/package.json b/packages/blocks/package.json
+index 20fb2445a26b43..ebdcf532da4790 100644
+--- a/packages/blocks/package.json
++++ b/packages/blocks/package.json
+@@ -41,6 +41,7 @@
+ 		"@wordpress/i18n": "file:../i18n",
+ 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+ 		"@wordpress/shortcode": "file:../shortcode",
++		"change-case": "^4.1.2",
+ 		"colord": "^2.7.0",
+ 		"hpq": "^1.3.0",
+ 		"is-plain-obj": "^4.1.0",
+diff --git a/packages/blocks/src/api/registration.js b/packages/blocks/src/api/registration.js
+index ceb059977b16cd..819d609e5929f3 100644
+--- a/packages/blocks/src/api/registration.js
++++ b/packages/blocks/src/api/registration.js
+@@ -3,7 +3,8 @@
+ /**
+  * External dependencies
+  */
+-import { camelCase, isEmpty, mapKeys, pick, pickBy } from 'lodash';
++import { camelCase } from 'change-case';
++import { isEmpty, mapKeys, pick, pickBy } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+diff --git a/packages/components/package.json b/packages/components/package.json
+index f555a4cbfc89ab..c9227b8cfa6cf3 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -53,6 +53,7 @@
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/rich-text": "file:../rich-text",
+ 		"@wordpress/warning": "file:../warning",
++		"change-case": "^4.1.2",
+ 		"classnames": "^2.3.1",
+ 		"colord": "^2.7.0",
+ 		"dom-scroll-into-view": "^1.2.1",
+diff --git a/packages/components/src/mobile/global-styles-context/utils.native.js b/packages/components/src/mobile/global-styles-context/utils.native.js
+index 84fbc957f0ca3e..badf1bc4066653 100644
+--- a/packages/components/src/mobile/global-styles-context/utils.native.js
++++ b/packages/components/src/mobile/global-styles-context/utils.native.js
+@@ -1,7 +1,8 @@
+ /**
+  * External dependencies
+  */
+-import { find, get, camelCase, has } from 'lodash';
++import { camelCase } from 'change-case';
++import { find, get, has } from 'lodash';
+ import { Dimensions } from 'react-native';
+ 
+ /**

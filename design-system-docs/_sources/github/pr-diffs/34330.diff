@@ -1,0 +1,1102 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 752245898aa451..03643e9e484c95 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   Fixed RTL styles in `Flex` component ([#33729](https://github.com/WordPress/gutenberg/pull/33729)).
+ 
++### Internal
++
++-   Renamed `PolymorphicComponent*` types to `WordPressComponent*` ([#34330](https://github.com/WordPress/gutenberg/pull/34330))
++
+ ## 16.0.0 (2021-08-23)
+ 
+ ### Breaking Change
+diff --git a/packages/components/src/base-field/hook.js b/packages/components/src/base-field/hook.js
+index 14cb90c9e97eb5..e0eaf01dc5c9ca 100644
+--- a/packages/components/src/base-field/hook.js
++++ b/packages/components/src/base-field/hook.js
+@@ -23,7 +23,7 @@ import { useCx } from '../utils/hooks/use-cx';
+ /** @typedef {import('../flex/types').FlexProps & OwnProps} Props */
+ 
+ /**
+- * @param {import('../ui/context').PolymorphicComponentProps<Props, 'div'>} props
++ * @param {import('../ui/context').WordPressComponentProps<Props, 'div'>} props
+  */
+ export function useBaseField( props ) {
+ 	const {
+diff --git a/packages/components/src/card/card-body/component.js b/packages/components/src/card/card-body/component.js
+index 455ddc85ef5b20..73e2e337b4bebb 100644
+--- a/packages/components/src/card/card-body/component.js
++++ b/packages/components/src/card/card-body/component.js
+@@ -7,8 +7,8 @@ import { View } from '../../view';
+ import { useCardBody } from './hook';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').BodyProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                                  forwardedRef
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').BodyProps, 'div'>} props
++ * @param {import('react').Ref<any>}                                                                forwardedRef
+  */
+ function CardBody( props, forwardedRef ) {
+ 	const { isScrollable, ...otherProps } = useCardBody( props );
+diff --git a/packages/components/src/card/card-body/hook.js b/packages/components/src/card/card-body/hook.js
+index f7fdab10a0304b..2e62181b609848 100644
+--- a/packages/components/src/card/card-body/hook.js
++++ b/packages/components/src/card/card-body/hook.js
+@@ -11,7 +11,7 @@ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').BodyProps, 'div'>} props
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').BodyProps, 'div'>} props
+  */
+ export function useCardBody( props ) {
+ 	const {
+diff --git a/packages/components/src/card/card-divider/component.js b/packages/components/src/card/card-divider/component.js
+index d3cce90bc02ba0..058cc341633c2f 100644
+--- a/packages/components/src/card/card-divider/component.js
++++ b/packages/components/src/card/card-divider/component.js
+@@ -6,8 +6,8 @@ import { Divider } from '../../divider';
+ import { useCardDivider } from './hook';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr', false>} props
+- * @param {import('react').Ref<any>}                                                                                forwardedRef
++ * @param {import('../../ui/context').WordPressComponentProps<import('../../divider').DividerProps, 'hr', false>} props
++ * @param {import('react').Ref<any>}                                                                              forwardedRef
+  */
+ function CardDivider( props, forwardedRef ) {
+ 	const dividerProps = useCardDivider( props );
+diff --git a/packages/components/src/card/card-divider/hook.js b/packages/components/src/card/card-divider/hook.js
+index 06961607c78849..091f99a12d079f 100644
+--- a/packages/components/src/card/card-divider/hook.js
++++ b/packages/components/src/card/card-divider/hook.js
+@@ -11,7 +11,7 @@ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../../divider').DividerProps, 'hr', false>} props
++ * @param {import('../../ui/context').WordPressComponentProps<import('../../divider').DividerProps, 'hr', false>} props
+  */
+ export function useCardDivider( props ) {
+ 	const { className, ...otherProps } = useContextSystem(
+diff --git a/packages/components/src/card/card-footer/component.js b/packages/components/src/card/card-footer/component.js
+index b5ef215eb3964a..0b0fa967a7d6c7 100644
+--- a/packages/components/src/card/card-footer/component.js
++++ b/packages/components/src/card/card-footer/component.js
+@@ -6,8 +6,8 @@ import { Flex } from '../../flex';
+ import { useCardFooter } from './hook';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FooterProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                                    forwardedRef
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FooterProps, 'div'>} props
++ * @param {import('react').Ref<any>}                                                                  forwardedRef
+  */
+ function CardFooter( props, forwardedRef ) {
+ 	const footerProps = useCardFooter( props );
+diff --git a/packages/components/src/card/card-footer/hook.js b/packages/components/src/card/card-footer/hook.js
+index 772d0fc175b406..9c5ba8da75532b 100644
+--- a/packages/components/src/card/card-footer/hook.js
++++ b/packages/components/src/card/card-footer/hook.js
+@@ -11,7 +11,7 @@ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FooterProps, 'div'>} props
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FooterProps, 'div'>} props
+  */
+ export function useCardFooter( props ) {
+ 	const {
+diff --git a/packages/components/src/card/card-header/component.js b/packages/components/src/card/card-header/component.js
+index 621448d82856a1..d08a2e3438ea1c 100644
+--- a/packages/components/src/card/card-header/component.js
++++ b/packages/components/src/card/card-header/component.js
+@@ -6,8 +6,8 @@ import { Flex } from '../../flex';
+ import { useCardHeader } from './hook';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').HeaderProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                                    forwardedRef
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').HeaderProps, 'div'>} props
++ * @param {import('react').Ref<any>}                                                                  forwardedRef
+  */
+ function CardHeader( props, forwardedRef ) {
+ 	const headerProps = useCardHeader( props );
+diff --git a/packages/components/src/card/card-header/hook.js b/packages/components/src/card/card-header/hook.js
+index 56a9b99972cabf..3c72511d6bff44 100644
+--- a/packages/components/src/card/card-header/hook.js
++++ b/packages/components/src/card/card-header/hook.js
+@@ -11,7 +11,7 @@ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').HeaderProps, 'div'>} props
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').HeaderProps, 'div'>} props
+  */
+ export function useCardHeader( props ) {
+ 	const {
+diff --git a/packages/components/src/card/card-media/hook.js b/packages/components/src/card/card-media/hook.js
+index 266e112090af16..ec42aabc09155c 100644
+--- a/packages/components/src/card/card-media/hook.js
++++ b/packages/components/src/card/card-media/hook.js
+@@ -11,7 +11,7 @@ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
++ * @param {import('../../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+  */
+ export function useCardMedia( props ) {
+ 	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
+diff --git a/packages/components/src/card/card/component.js b/packages/components/src/card/card/component.js
+index 9f8bcbde6d9bf1..45afbc28de136f 100644
+--- a/packages/components/src/card/card/component.js
++++ b/packages/components/src/card/card/component.js
+@@ -20,8 +20,8 @@ import CONFIG from '../../utils/config-values';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                                              forwardedRef
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
++ * @param {import('react').Ref<any>}                                                            forwardedRef
+  */
+ function Card( props, forwardedRef ) {
+ 	const {
+diff --git a/packages/components/src/card/card/hook.js b/packages/components/src/card/card/hook.js
+index b0e2d1a32325d5..d5a5cf0b478411 100644
+--- a/packages/components/src/card/card/hook.js
++++ b/packages/components/src/card/card/hook.js
+@@ -13,10 +13,10 @@ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
+  */
+ function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
+-	/**@type {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} */
++	/**@type {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} */
+ 	const propsToReturn = {
+ 		...otherProps,
+ 	};
+@@ -40,7 +40,7 @@ function useDeprecatedProps( { elevation, isElevated, ...otherProps } ) {
+ }
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div'>} props
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div'>} props
+  */
+ export function useCard( props ) {
+ 	const {
+diff --git a/packages/components/src/divider/component.tsx b/packages/components/src/divider/component.tsx
+index 7204132d707ce9..085d2f5f012b71 100644
+--- a/packages/components/src/divider/component.tsx
++++ b/packages/components/src/divider/component.tsx
+@@ -9,13 +9,16 @@ import type { Ref } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect, useContextSystem } from '../ui/context';
+-import type { PolymorphicComponentProps } from '../ui/context';
++import {
++	contextConnect,
++	useContextSystem,
++	WordPressComponentProps,
++} from '../ui/context';
+ import { DividerView } from './styles';
+ import type { Props } from './types';
+ 
+ function Divider(
+-	props: PolymorphicComponentProps< Props, 'hr', false >,
++	props: WordPressComponentProps< Props, 'hr', false >,
+ 	forwardedRef: Ref< any >
+ ) {
+ 	const contextProps = useContextSystem( props, 'Divider' );
+diff --git a/packages/components/src/elevation/hook.js b/packages/components/src/elevation/hook.js
+index 24f31fef0f7535..9256a2b2d99ba6 100644
+--- a/packages/components/src/elevation/hook.js
++++ b/packages/components/src/elevation/hook.js
+@@ -30,7 +30,7 @@ export function getBoxShadow( value ) {
+ }
+ 
+ /**
+- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+  */
+ export function useElevation( props ) {
+ 	const {
+diff --git a/packages/components/src/flex/flex-block/hook.js b/packages/components/src/flex/flex-block/hook.js
+index 82d0e2abb6e9d0..deed81d8f28f7c 100644
+--- a/packages/components/src/flex/flex-block/hook.js
++++ b/packages/components/src/flex/flex-block/hook.js
+@@ -5,7 +5,7 @@ import { useContextSystem } from '../../ui/context';
+ import { useFlexItem } from '../flex-item';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexBlockProps, 'div'>} props
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexBlockProps, 'div'>} props
+  */
+ export function useFlexBlock( props ) {
+ 	const otherProps = useContextSystem( props, 'FlexBlock' );
+diff --git a/packages/components/src/flex/flex-item/hook.js b/packages/components/src/flex/flex-item/hook.js
+index 136661aa7dcfbb..2c38e550db32cb 100644
+--- a/packages/components/src/flex/flex-item/hook.js
++++ b/packages/components/src/flex/flex-item/hook.js
+@@ -12,7 +12,7 @@ import * as styles from '../styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexItemProps, 'div'>} props
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexItemProps, 'div'>} props
+  */
+ export function useFlexItem( props ) {
+ 	const {
+diff --git a/packages/components/src/flex/flex/component.js b/packages/components/src/flex/flex/component.js
+index 70c4e448985e0b..31983e0bc48710 100644
+--- a/packages/components/src/flex/flex/component.js
++++ b/packages/components/src/flex/flex/component.js
+@@ -7,8 +7,8 @@ import { FlexContext } from './../context';
+ import { View } from '../../view';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                                  forwardedRef
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
++ * @param {import('react').Ref<any>}                                                                forwardedRef
+  */
+ function Flex( props, forwardedRef ) {
+ 	const { children, isColumn, ...otherProps } = useFlex( props );
+diff --git a/packages/components/src/flex/flex/hook.js b/packages/components/src/flex/flex/hook.js
+index 35c3c7b10de23b..d0826099ec1125 100644
+--- a/packages/components/src/flex/flex/hook.js
++++ b/packages/components/src/flex/flex/hook.js
+@@ -20,8 +20,8 @@ import { useCx, rtl } from '../../utils';
+ 
+ /**
+  *
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexProps, 'div'>} props
+- * @return {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexProps, 'div'>} Props with the deprecated props removed.
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
++ * @return {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} Props with the deprecated props removed.
+  */
+ function useDeprecatedProps( { isReversed, ...otherProps } ) {
+ 	if ( typeof isReversed !== 'undefined' ) {
+@@ -39,7 +39,7 @@ function useDeprecatedProps( { isReversed, ...otherProps } ) {
+ }
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').FlexProps, 'div'>} props
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').FlexProps, 'div'>} props
+  */
+ export function useFlex( props ) {
+ 	const {
+diff --git a/packages/components/src/flyout/flyout-content/component.js b/packages/components/src/flyout/flyout-content/component.js
+index 9c0b41124d3170..943fe0d60c81fb 100644
+--- a/packages/components/src/flyout/flyout-content/component.js
++++ b/packages/components/src/flyout/flyout-content/component.js
+@@ -7,8 +7,8 @@ import { contextConnect, useContextSystem } from '../../ui/context';
+ 
+ /**
+  *
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').ContentProps, 'div', false>} props
+- * @param {import('react').Ref<any>}                                                                            forwardedRef
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').ContentProps, 'div', false>} props
++ * @param {import('react').Ref<any>}                                                                          forwardedRef
+  */
+ function FlyoutContent( props, forwardedRef ) {
+ 	const {
+diff --git a/packages/components/src/flyout/flyout/component.js b/packages/components/src/flyout/flyout/component.js
+index e1d8de13888566..6d9c4a46153ea0 100644
+--- a/packages/components/src/flyout/flyout/component.js
++++ b/packages/components/src/flyout/flyout/component.js
+@@ -21,8 +21,8 @@ import { useFlyout } from './hook';
+ 
+ /**
+  *
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div', false>} props
+- * @param {import('react').Ref<any>}                                                                     forwardedRef
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div', false>} props
++ * @param {import('react').Ref<any>}                                                                   forwardedRef
+  */
+ function Flyout( props, forwardedRef ) {
+ 	const {
+diff --git a/packages/components/src/flyout/flyout/hook.js b/packages/components/src/flyout/flyout/hook.js
+index 4cdb0299019758..d917c1011f4b91 100644
+--- a/packages/components/src/flyout/flyout/hook.js
++++ b/packages/components/src/flyout/flyout/hook.js
+@@ -10,7 +10,7 @@ import { usePopoverState } from 'reakit';
+ import { useContextSystem } from '../../ui/context';
+ 
+ /**
+- * @param {import('../../ui/context').PolymorphicComponentProps<import('../types').Props, 'div', false>} props
++ * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div', false>} props
+  */
+ export function useFlyout( props ) {
+ 	const {
+diff --git a/packages/components/src/grid/hook.js b/packages/components/src/grid/hook.js
+index f2c80c49bd745a..b38b609f99b481 100644
+--- a/packages/components/src/grid/hook.js
++++ b/packages/components/src/grid/hook.js
+@@ -18,7 +18,7 @@ import CONFIG from '../utils/config-values';
+ import { useCx } from '../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+  */
+ export default function useGrid( props ) {
+ 	const {
+diff --git a/packages/components/src/h-stack/hook.js b/packages/components/src/h-stack/hook.js
+index ceadb162e307b6..dd4795776f9534 100644
+--- a/packages/components/src/h-stack/hook.js
++++ b/packages/components/src/h-stack/hook.js
+@@ -8,7 +8,7 @@ import { getValidChildren } from '../ui/utils/get-valid-children';
+ 
+ /**
+  *
+- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+  */
+ export function useHStack( props ) {
+ 	const {
+diff --git a/packages/components/src/heading/hook.ts b/packages/components/src/heading/hook.ts
+index c967b9f0d4ac75..238e4e244c0f14 100644
+--- a/packages/components/src/heading/hook.ts
++++ b/packages/components/src/heading/hook.ts
+@@ -1,8 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../ui/context';
+-import type { PolymorphicComponentProps } from '../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../ui/context';
+ import type { Props as TextProps } from '../text/types';
+ import { useText } from '../text';
+ import { getHeadingFontSize } from '../ui/utils/font-size';
+@@ -50,7 +49,7 @@ export interface HeadingProps extends Omit< TextProps, 'size' > {
+ }
+ 
+ export function useHeading(
+-	props: PolymorphicComponentProps< HeadingProps, 'h1' >
++	props: WordPressComponentProps< HeadingProps, 'h1' >
+ ) {
+ 	const { as: asProp, level = 2, ...otherProps } = useContextSystem(
+ 		props,
+diff --git a/packages/components/src/input-control/input-field.tsx b/packages/components/src/input-control/input-field.tsx
+index 02455733de03c3..88596a8853e07c 100644
+--- a/packages/components/src/input-control/input-field.tsx
++++ b/packages/components/src/input-control/input-field.tsx
+@@ -22,7 +22,7 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+ /**
+  * Internal dependencies
+  */
+-import type { PolymorphicComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../ui/context';
+ import { useDragCursor } from './utils';
+ import { Input } from './styles/input-control-styles';
+ import { useInputControlStateReducer } from './reducer/reducer';
+@@ -53,7 +53,7 @@ function InputField(
+ 		value: valueProp,
+ 		type,
+ 		...props
+-	}: PolymorphicComponentProps< InputFieldProps, 'input', false >,
++	}: WordPressComponentProps< InputFieldProps, 'input', false >,
+ 	ref: Ref< HTMLInputElement >
+ ) {
+ 	const {
+diff --git a/packages/components/src/input-control/label.tsx b/packages/components/src/input-control/label.tsx
+index 537c335373b5d8..ea214707b012b8 100644
+--- a/packages/components/src/input-control/label.tsx
++++ b/packages/components/src/input-control/label.tsx
+@@ -3,7 +3,7 @@
+  */
+ import { VisuallyHidden } from '../visually-hidden';
+ import { Label as BaseLabel } from './styles/input-control-styles';
+-import type { PolymorphicComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../ui/context';
+ import type { InputControlLabelProps } from './types';
+ 
+ export default function Label( {
+@@ -11,7 +11,7 @@ export default function Label( {
+ 	hideLabelFromVision,
+ 	htmlFor,
+ 	...props
+-}: PolymorphicComponentProps< InputControlLabelProps, 'label', false > ) {
++}: WordPressComponentProps< InputControlLabelProps, 'label', false > ) {
+ 	if ( ! children ) return null;
+ 
+ 	if ( hideLabelFromVision ) {
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index bbd518ccb4822d..c6471fa96ead55 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -9,7 +9,7 @@ import type { CSSProperties, ReactNode } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import type { PolymorphicComponentProps } from '../../ui/context';
++import type { WordPressComponentProps } from '../../ui/context';
+ import { Flex, FlexItem } from '../../flex';
+ import { Text } from '../../text';
+ import { COLORS, rtl } from '../../utils';
+@@ -251,7 +251,7 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
+ `;
+ 
+ export const Label = (
+-	props: PolymorphicComponentProps<
++	props: WordPressComponentProps<
+ 		{ labelPosition?: LabelPosition; children: ReactNode },
+ 		'label',
+ 		false
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index e166ffd6219ba3..971075e56a5ee4 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -15,7 +15,7 @@ import type { useDrag } from 'react-use-gesture';
+  */
+ import type { StateReducer } from './reducer/state';
+ import type { FlexProps } from '../flex/types';
+-import type { PolymorphicComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+ export type LabelPosition = 'top' | 'bottom' | 'side' | 'edge';
+ 
+@@ -65,9 +65,9 @@ export interface InputBaseProps extends BaseProps, FlexProps {
+ export interface InputControlProps
+ 	extends Omit< InputBaseProps, 'children' | 'isFocused' >,
+ 		/**
+-		 * The `prefix` prop in `PolymorphicComponentProps< InputFieldProps, 'input', false >` comes from the
++		 * The `prefix` prop in `WordPressComponentProps< InputFieldProps, 'input', false >` comes from the
+ 		 * `HTMLInputAttributes` and clashes with the one from `InputBaseProps`. So we have to omit it from
+-		 * `PolymorphicComponentProps< InputFieldProps, 'input', false >` in order that `InputBaseProps[ 'prefix' ]`
++		 * `WordPressComponentProps< InputFieldProps, 'input', false >` in order that `InputBaseProps[ 'prefix' ]`
+ 		 * be the only prefix prop. Otherwise it tries to do a union of the two prefix properties and you end up
+ 		 * with an unresolvable type.
+ 		 *
+@@ -75,7 +75,7 @@ export interface InputControlProps
+ 		 * for InputField are passed through.
+ 		 */
+ 		Omit<
+-			PolymorphicComponentProps< InputFieldProps, 'input', false >,
++			WordPressComponentProps< InputFieldProps, 'input', false >,
+ 			'stateReducer' | 'prefix' | 'isFocused' | 'setIsFocused'
+ 		> {
+ 	__unstableStateReducer?: InputFieldProps[ 'stateReducer' ];
+diff --git a/packages/components/src/item-group/item-group/component.tsx b/packages/components/src/item-group/item-group/component.tsx
+index 2b77ec041e055c..e58eae897658cb 100644
+--- a/packages/components/src/item-group/item-group/component.tsx
++++ b/packages/components/src/item-group/item-group/component.tsx
+@@ -7,14 +7,14 @@ import type { Ref } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import { contextConnect, PolymorphicComponentProps } from '../../ui/context';
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import { useItemGroup } from './hook';
+ import { ItemGroupContext, useItemGroupContext } from '../context';
+ import { View } from '../../view';
+ import type { ItemGroupProps } from '../types';
+ 
+ function ItemGroup(
+-	props: PolymorphicComponentProps< ItemGroupProps, 'div' >,
++	props: WordPressComponentProps< ItemGroupProps, 'div' >,
+ 	forwardedRef: Ref< any >
+ ) {
+ 	const {
+diff --git a/packages/components/src/item-group/item-group/hook.ts b/packages/components/src/item-group/item-group/hook.ts
+index 90bb63bae3959c..f8ec3740e721ca 100644
+--- a/packages/components/src/item-group/item-group/hook.ts
++++ b/packages/components/src/item-group/item-group/hook.ts
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem, PolymorphicComponentProps } from '../../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ 
+ /**
+  * Internal dependencies
+@@ -11,7 +11,7 @@ import { useCx } from '../../utils/hooks/use-cx';
+ import type { ItemGroupProps } from '../types';
+ 
+ export function useItemGroup(
+-	props: PolymorphicComponentProps< ItemGroupProps, 'div' >
++	props: WordPressComponentProps< ItemGroupProps, 'div' >
+ ) {
+ 	const {
+ 		className,
+diff --git a/packages/components/src/item-group/item/component.tsx b/packages/components/src/item-group/item/component.tsx
+index 6a0eac90a93c98..18f6ae0eb99534 100644
+--- a/packages/components/src/item-group/item/component.tsx
++++ b/packages/components/src/item-group/item/component.tsx
+@@ -9,11 +9,11 @@ import type { Ref } from 'react';
+  */
+ import type { ItemProps } from '../types';
+ import { useItem } from './hook';
+-import { contextConnect, PolymorphicComponentProps } from '../../ui/context';
++import { contextConnect, WordPressComponentProps } from '../../ui/context';
+ import { View } from '../../view';
+ 
+ function Item(
+-	props: PolymorphicComponentProps< ItemProps, 'div' >,
++	props: WordPressComponentProps< ItemProps, 'div' >,
+ 	forwardedRef: Ref< any >
+ ) {
+ 	const { role, wrapperClassName, ...otherProps } = useItem( props );
+diff --git a/packages/components/src/item-group/item/hook.ts b/packages/components/src/item-group/item/hook.ts
+index ac7ad6356ceb34..2ff7574751098e 100644
+--- a/packages/components/src/item-group/item/hook.ts
++++ b/packages/components/src/item-group/item/hook.ts
+@@ -7,15 +7,13 @@ import type { ElementType } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem, PolymorphicComponentProps } from '../../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+ import * as styles from '../styles';
+ import { useItemGroupContext } from '../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import type { ItemProps } from '../types';
+ 
+-export function useItem(
+-	props: PolymorphicComponentProps< ItemProps, 'div' >
+-) {
++export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
+ 	const {
+ 		isAction = false,
+ 		as: asProp,
+diff --git a/packages/components/src/scrollable/hook.js b/packages/components/src/scrollable/hook.js
+index bcfab8ef7c9270..ce8b01e14724d3 100644
+--- a/packages/components/src/scrollable/hook.js
++++ b/packages/components/src/scrollable/hook.js
+@@ -12,7 +12,7 @@ import { useCx } from '../utils/hooks/use-cx';
+ 
+ /* eslint-disable jsdoc/valid-types */
+ /**
+- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+  */
+ /* eslint-enable jsdoc/valid-types */
+ export function useScrollable( props ) {
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index db0f7917c33d76..e3514f7b67f089 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -21,7 +21,7 @@ import InputBase from '../input-control/input-base';
+ import type { InputBaseProps, LabelPosition } from '../input-control/types';
+ import { Select, DownArrowWrapper } from './styles/select-control-styles';
+ import type { Size } from './types';
+-import type { PolymorphicComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+ function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( SelectControl );
+@@ -71,7 +71,7 @@ function SelectControl(
+ 		prefix,
+ 		suffix,
+ 		...props
+-	}: PolymorphicComponentProps< SelectControlProps, 'select', false >,
++	}: WordPressComponentProps< SelectControlProps, 'select', false >,
+ 	ref: Ref< HTMLSelectElement >
+ ) {
+ 	const [ isFocused, setIsFocused ] = useState( false );
+diff --git a/packages/components/src/spacer/hook.ts b/packages/components/src/spacer/hook.ts
+index dda1a7d40cf0ae..c833ec90d896ae 100644
+--- a/packages/components/src/spacer/hook.ts
++++ b/packages/components/src/spacer/hook.ts
+@@ -6,8 +6,7 @@ import { css } from '@emotion/react';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../ui/context';
+-import type { PolymorphicComponentProps } from '../ui/context';
++import { useContextSystem, WordPressComponentProps } from '../ui/context';
+ import { space } from '../ui/utils/space';
+ import { useCx } from '../utils/hooks/use-cx';
+ import type { Props } from './types';
+@@ -15,7 +14,7 @@ import type { Props } from './types';
+ const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
+ 	typeof o !== 'undefined' && o !== null;
+ 
+-export function useSpacer( props: PolymorphicComponentProps< Props, 'div' > ) {
++export function useSpacer( props: WordPressComponentProps< Props, 'div' > ) {
+ 	const {
+ 		className,
+ 		margin,
+diff --git a/packages/components/src/surface/hook.js b/packages/components/src/surface/hook.js
+index a25e6d118c6f30..65d5937a47b927 100644
+--- a/packages/components/src/surface/hook.js
++++ b/packages/components/src/surface/hook.js
+@@ -11,7 +11,7 @@ import * as styles from './styles';
+ import { useCx } from '../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+  */
+ export function useSurface( props ) {
+ 	const {
+diff --git a/packages/components/src/text/hook.js b/packages/components/src/text/hook.js
+index 8c3bb3f31521c3..70ccee41f629af 100644
+--- a/packages/components/src/text/hook.js
++++ b/packages/components/src/text/hook.js
+@@ -23,7 +23,7 @@ import { getLineHeight } from './get-line-height';
+ import { useCx } from '../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'span'>} props
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
+  */
+ export default function useText( props ) {
+ 	const {
+diff --git a/packages/components/src/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/component.tsx
+index 2ab3df7d10b639..1f6758b8e0f7c8 100644
+--- a/packages/components/src/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/component.tsx
+@@ -18,7 +18,7 @@ import { useMergeRefs, useInstanceId } from '@wordpress/compose';
+ import {
+ 	contextConnect,
+ 	useContextSystem,
+-	PolymorphicComponentProps,
++	WordPressComponentProps,
+ } from '../ui/context';
+ import { View } from '../view';
+ import BaseControl from '../base-control';
+@@ -31,7 +31,7 @@ import ToggleGroupControlContext from './toggle-group-control-context';
+ const noop = () => {};
+ 
+ function ToggleGroupControl(
+-	props: PolymorphicComponentProps< ToggleGroupControlProps, 'input' >,
++	props: WordPressComponentProps< ToggleGroupControlProps, 'input' >,
+ 	forwardedRef: import('react').Ref< any >
+ ) {
+ 	const {
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option.tsx
+index 96b1f4692c7329..53bc37a6462ab7 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option.tsx
+@@ -10,7 +10,7 @@ import { useInstanceId } from '@wordpress/compose';
+ import {
+ 	contextConnect,
+ 	useContextSystem,
+-	PolymorphicComponentProps,
++	WordPressComponentProps,
+ } from '../ui/context';
+ import ToggleGroupControlButton from './toggle-group-control-button';
+ import type {
+@@ -42,7 +42,7 @@ function getShowSeparator(
+ }
+ 
+ function ToggleGroupControlOption(
+-	props: PolymorphicComponentProps< ToggleGroupControlOptionProps, 'input' >,
++	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'input' >,
+ 	forwardedRef: import('react').Ref< any >
+ ) {
+ 	const toggleGroupControlContext = useToggleGroupControlContext();
+diff --git a/packages/components/src/truncate/hook.js b/packages/components/src/truncate/hook.js
+index cd9f313da0e95c..64e45c1bed5ea7 100644
+--- a/packages/components/src/truncate/hook.js
++++ b/packages/components/src/truncate/hook.js
+@@ -17,7 +17,7 @@ import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
+ import { useCx } from '../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'span'>} props
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'span'>} props
+  */
+ export default function useTruncate( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/color-picker/component.tsx b/packages/components/src/ui/color-picker/component.tsx
+index 5fa862a07ef9a7..977826c6ccf958 100644
+--- a/packages/components/src/ui/color-picker/component.tsx
++++ b/packages/components/src/ui/color-picker/component.tsx
+@@ -19,7 +19,7 @@ import { __ } from '@wordpress/i18n';
+ import {
+ 	useContextSystem,
+ 	contextConnect,
+-	PolymorphicComponentProps,
++	WordPressComponentProps,
+ } from '../context';
+ import { HStack } from '../../h-stack';
+ import Button from '../../button';
+@@ -53,7 +53,7 @@ const getSafeColor = (
+ };
+ 
+ const ColorPicker = (
+-	props: PolymorphicComponentProps< ColorPickerProps, 'div', false >,
++	props: WordPressComponentProps< ColorPickerProps, 'div', false >,
+ 	forwardedRef: Ref< any >
+ ) => {
+ 	const {
+diff --git a/packages/components/src/ui/context/context-connect.js b/packages/components/src/ui/context/context-connect.js
+index df11228b1e17ea..5dcbb174dbdd03 100644
+--- a/packages/components/src/ui/context/context-connect.js
++++ b/packages/components/src/ui/context/context-connect.js
+@@ -24,12 +24,12 @@ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
+  * The hope is that we can improve render performance by removing functional
+  * component wrappers.
+  *
+- * @template {import('./polymorphic-component').PolymorphicComponentProps<{}, any, any>} P
++ * @template {import('./wordpress-component').WordPressComponentProps<{}, any, any>} P
+  * @param {(props: P, ref: import('react').Ref<any>) => JSX.Element | null} Component            The component to register into the Context system.
+  * @param {string}                                                          namespace            The namespace to register the component under.
+  * @param {Object}                                                          options
+  * @param {boolean}                                                         [options.memo=false]
+- * @return {import('./polymorphic-component').PolymorphicComponentFromProps<P>} The connected PolymorphicComponent
++ * @return {import('./wordpress-component').WordPressComponentFromProps<P>} The connected WordPressComponent
+  */
+ export function contextConnect( Component, namespace, options = {} ) {
+ 	/* eslint-enable jsdoc/valid-types */
+@@ -65,7 +65,7 @@ export function contextConnect( Component, namespace, options = {} ) {
+ 	// @ts-ignore internal property
+ 	WrappedComponent[ CONNECT_STATIC_NAMESPACE ] = uniq( mergedNamespace );
+ 
+-	// @ts-ignore PolymorphicComponent property
++	// @ts-ignore WordPressComponent property
+ 	WrappedComponent.selector = `.${ getStyledClassNameFromKey( namespace ) }`;
+ 
+ 	// @ts-ignore
+diff --git a/packages/components/src/ui/context/index.js b/packages/components/src/ui/context/index.js
+index e19795d7b7a13b..54694e47304ff2 100644
+--- a/packages/components/src/ui/context/index.js
++++ b/packages/components/src/ui/context/index.js
+@@ -8,4 +8,4 @@ export {
+ 	getConnectNamespace,
+ } from './context-connect';
+ export { useContextSystem } from './use-context-system';
+-export * from './polymorphic-component';
++export * from './wordpress-component';
+diff --git a/packages/components/src/ui/context/polymorphic-component.ts b/packages/components/src/ui/context/wordpress-component.ts
+similarity index 79%
+rename from packages/components/src/ui/context/polymorphic-component.ts
+rename to packages/components/src/ui/context/wordpress-component.ts
+index fae6cc41418db8..2bf4372ec6b6e2 100644
+--- a/packages/components/src/ui/context/polymorphic-component.ts
++++ b/packages/components/src/ui/context/wordpress-component.ts
+@@ -11,7 +11,7 @@ import type * as React from 'react';
+  * by `ComponentPropsWithRef`. The context is that components should require the `children`
+  * prop explicitely when needed (see https://github.com/WordPress/gutenberg/pull/31817).
+  */
+-export type PolymorphicComponentProps<
++export type WordPressComponentProps<
+ 	P,
+ 	T extends React.ElementType,
+ 	IsPolymorphic extends boolean = true
+@@ -23,17 +23,17 @@ export type PolymorphicComponentProps<
+ 		  }
+ 		: { as?: never } );
+ 
+-export type PolymorphicComponent<
++export type WordPressComponent<
+ 	T extends React.ElementType,
+ 	O,
+ 	IsPolymorphic extends boolean
+ > = {
+ 	< TT extends React.ElementType >(
+-		props: PolymorphicComponentProps< O, TT, IsPolymorphic > &
++		props: WordPressComponentProps< O, TT, IsPolymorphic > &
+ 			( IsPolymorphic extends true ? { as: TT } : { as: never } )
+ 	): JSX.Element | null;
+ 	(
+-		props: PolymorphicComponentProps< O, T, IsPolymorphic >
++		props: WordPressComponentProps< O, T, IsPolymorphic >
+ 	): JSX.Element | null;
+ 	displayName?: string;
+ 	/**
+@@ -47,8 +47,8 @@ export type PolymorphicComponent<
+ 	selector: `.${ string }`;
+ };
+ 
+-export type PolymorphicComponentFromProps<
++export type WordPressComponentFromProps<
+ 	Props
+-> = Props extends PolymorphicComponentProps< infer P, infer T, infer I >
+-	? PolymorphicComponent< T, P, I >
++> = Props extends WordPressComponentProps< infer P, infer T, infer I >
++	? WordPressComponent< T, P, I >
+ 	: never;
+diff --git a/packages/components/src/ui/control-group/component.js b/packages/components/src/ui/control-group/component.js
+index b1b82c581cdfdd..d291d436c11d4b 100644
+--- a/packages/components/src/ui/control-group/component.js
++++ b/packages/components/src/ui/control-group/component.js
+@@ -11,8 +11,8 @@ import { useControlGroup } from './hook';
+ import { contextConnect } from '../context';
+ 
+ /**
+- * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                                       forwardedRef
++ * @param {import('../context').WordPressComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('react').Ref<any>}                                                     forwardedRef
+  */
+ function ControlGroup( props, forwardedRef ) {
+ 	const {
+diff --git a/packages/components/src/ui/control-group/hook.js b/packages/components/src/ui/control-group/hook.js
+index a30b745f94b9a8..bc1f5d34c08b37 100644
+--- a/packages/components/src/ui/control-group/hook.js
++++ b/packages/components/src/ui/control-group/hook.js
+@@ -8,7 +8,7 @@ import * as styles from './styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('../context').WordPressComponentProps<import('./types').Props, 'div'>} props
+  */
+ export function useControlGroup( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/control-label/hook.js b/packages/components/src/ui/control-label/hook.js
+index e376cc18f726ca..c7f10444fab792 100644
+--- a/packages/components/src/ui/control-label/hook.js
++++ b/packages/components/src/ui/control-label/hook.js
+@@ -8,7 +8,7 @@ import * as styles from './styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'label'>} props
++ * @param {import('../context').WordPressComponentProps<import('./types').Props, 'label'>} props
+  */
+ export function useControlLabel( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/form-group/form-group-content.js b/packages/components/src/ui/form-group/form-group-content.js
+index a84f5fa32faab4..21b95ff9068233 100644
+--- a/packages/components/src/ui/form-group/form-group-content.js
++++ b/packages/components/src/ui/form-group/form-group-content.js
+@@ -12,7 +12,7 @@ import FormGroupHelp from './form-group-help';
+ import FormGroupLabel from './form-group-label';
+ 
+ /**
+- * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupContentProps, 'label'>} props
++ * @param {import('../context').WordPressComponentProps<import('./types').FormGroupContentProps, 'label'>} props
+  */
+ function FormGroupContent( {
+ 	alignLabel,
+diff --git a/packages/components/src/ui/form-group/form-group-label.js b/packages/components/src/ui/form-group/form-group-label.js
+index 8d6c282018cad8..01e9f9be3c51e9 100644
+--- a/packages/components/src/ui/form-group/form-group-label.js
++++ b/packages/components/src/ui/form-group/form-group-label.js
+@@ -10,7 +10,7 @@ import { ControlLabel } from '../control-label';
+ import { VisuallyHidden } from '../../visually-hidden';
+ 
+ /**
+- * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupLabelProps, 'label'>} props
++ * @param {import('../context').WordPressComponentProps<import('./types').FormGroupLabelProps, 'label'>} props
+  * @return {JSX.Element | null} The form group's label.
+  */
+ function FormGroupLabel( { children, id, labelHidden = false, ...props } ) {
+diff --git a/packages/components/src/ui/form-group/form-group.js b/packages/components/src/ui/form-group/form-group.js
+index 9885aa63d24471..fc9eae01325f47 100644
+--- a/packages/components/src/ui/form-group/form-group.js
++++ b/packages/components/src/ui/form-group/form-group.js
+@@ -8,8 +8,8 @@ import FormGroupContent from './form-group-content';
+ import { useFormGroup } from './use-form-group';
+ 
+ /**
+- * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                                forwardedRef
++ * @param {import('../context').WordPressComponentProps<import('./types').FormGroupProps, 'div'>} props
++ * @param {import('react').Ref<any>}                                                              forwardedRef
+  */
+ function FormGroup( props, forwardedRef ) {
+ 	const { contentProps, horizontal, ...otherProps } = useFormGroup( props );
+diff --git a/packages/components/src/ui/form-group/use-form-group.js b/packages/components/src/ui/form-group/use-form-group.js
+index 3b73fc69f5f4ef..eebc5ae3506398 100644
+--- a/packages/components/src/ui/form-group/use-form-group.js
++++ b/packages/components/src/ui/form-group/use-form-group.js
+@@ -11,7 +11,7 @@ import * as styles from './form-group-styles';
+ import { useCx } from '../../utils/hooks/use-cx';
+ 
+ /**
+- * @param {import('../context').PolymorphicComponentProps<import('./types').FormGroupProps, 'div'>} props
++ * @param {import('../context').WordPressComponentProps<import('./types').FormGroupProps, 'div'>} props
+  */
+ export function useFormGroup( props ) {
+ 	const {
+diff --git a/packages/components/src/ui/shortcut/component.tsx b/packages/components/src/ui/shortcut/component.tsx
+index 911aced391c148..f5bbb6a5d791ee 100644
+--- a/packages/components/src/ui/shortcut/component.tsx
++++ b/packages/components/src/ui/shortcut/component.tsx
+@@ -7,8 +7,11 @@ import type { Ref } from 'react';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem, contextConnect } from '../context';
+-import type { PolymorphicComponentProps } from '../context';
++import {
++	useContextSystem,
++	contextConnect,
++	WordPressComponentProps,
++} from '../context';
+ import { View } from '../../view';
+ 
+ export interface ShortcutDescription {
+@@ -22,7 +25,7 @@ export interface Props {
+ }
+ 
+ function Shortcut(
+-	props: PolymorphicComponentProps< Props, 'span' >,
++	props: WordPressComponentProps< Props, 'span' >,
+ 	forwardedRef: Ref< any >
+ ): JSX.Element | null {
+ 	const {
+diff --git a/packages/components/src/ui/spinner/component.js b/packages/components/src/ui/spinner/component.js
+index 12cb30f0d712b8..c5b45fccf0b8af 100644
+--- a/packages/components/src/ui/spinner/component.js
++++ b/packages/components/src/ui/spinner/component.js
+@@ -16,8 +16,8 @@ import { COLORS } from '../../utils/colors-values';
+ 
+ /**
+  *
+- * @param {import('../context').PolymorphicComponentProps<Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                     forwardedRef
++ * @param {import('../context').WordPressComponentProps<Props, 'div'>} props
++ * @param {import('react').Ref<any>}                                   forwardedRef
+  */
+ function Spinner( props, forwardedRef ) {
+ 	const {
+diff --git a/packages/components/src/ui/tooltip/component.js b/packages/components/src/ui/tooltip/component.js
+index f618f4633d48f8..78ab9132407e5e 100644
+--- a/packages/components/src/ui/tooltip/component.js
++++ b/packages/components/src/ui/tooltip/component.js
+@@ -18,8 +18,8 @@ import TooltipContent from './content';
+ import { TooltipShortcut } from './styles';
+ 
+ /**
+- * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+- * @param {import('react').Ref<any>}                                                       forwardedRef
++ * @param {import('../context').WordPressComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('react').Ref<any>}                                                     forwardedRef
+  */
+ function Tooltip( props, forwardedRef ) {
+ 	const {
+diff --git a/packages/components/src/ui/tooltip/content.js b/packages/components/src/ui/tooltip/content.js
+index 08c51288dae23f..b2d533f8288c0b 100644
+--- a/packages/components/src/ui/tooltip/content.js
++++ b/packages/components/src/ui/tooltip/content.js
+@@ -17,8 +17,8 @@ const { TooltipPopoverView } = styles;
+ 
+ /**
+  *
+- * @param {import('../context').PolymorphicComponentProps<import('./types').ContentProps, 'div'>} props
+- * @param {import('react').Ref<any>}                                                              forwardedRef
++ * @param {import('../context').WordPressComponentProps<import('./types').ContentProps, 'div'>} props
++ * @param {import('react').Ref<any>}                                                            forwardedRef
+  */
+ function TooltipContent( props, forwardedRef ) {
+ 	const { children, className, ...otherProps } = useContextSystem(
+diff --git a/packages/components/src/ui/utils/create-component.tsx b/packages/components/src/ui/utils/create-component.tsx
+index f9bd8e6d7d3ed4..8e451cffef11c9 100644
+--- a/packages/components/src/ui/utils/create-component.tsx
++++ b/packages/components/src/ui/utils/create-component.tsx
+@@ -10,14 +10,14 @@ import type { As } from 'reakit-utils/types';
+  */
+ import { contextConnect } from '../context';
+ import type {
+-	PolymorphicComponentProps,
+-	PolymorphicComponentFromProps,
++	WordPressComponentProps,
++	WordPressComponentFromProps,
+ } from '../context';
+ import { View } from '../../view';
+ 
+ interface Options<
+ 	A extends As,
+-	P extends PolymorphicComponentProps< {}, A, any >
++	P extends WordPressComponentProps< {}, A, any >
+ > {
+ 	as: A;
+ 	name: string;
+@@ -37,13 +37,13 @@ interface Options<
+  */
+ export const createComponent = <
+ 	A extends As,
+-	P extends PolymorphicComponentProps< {}, A, any >
++	P extends WordPressComponentProps< {}, A, any >
+ >( {
+ 	as,
+ 	name,
+ 	useHook,
+ 	memo = false,
+-}: Options< A, P > ): PolymorphicComponentFromProps< P > => {
++}: Options< A, P > ): WordPressComponentFromProps< P > => {
+ 	function Component( props: P, forwardedRef: Ref< any > ) {
+ 		const otherProps = useHook( props );
+ 
+diff --git a/packages/components/src/ui/utils/test/create-component.js b/packages/components/src/ui/utils/test/create-component.js
+index 01dbd7b9917974..970a774badf29a 100644
+--- a/packages/components/src/ui/utils/test/create-component.js
++++ b/packages/components/src/ui/utils/test/create-component.js
+@@ -15,7 +15,7 @@ import { createComponent } from '../create-component';
+ 
+ describe( 'createComponent', () => {
+ 	/**
+-	 * @param {import('../context').PolymorphicComponentProps<{}, 'output'>} props
++	 * @param {import('../context').WordPressComponentProps<{}, 'output'>} props
+ 	 */
+ 	const useHook = ( props ) => ( { ...props, 'data-hook-test-prop': true } );
+ 	const name = 'Output';
+diff --git a/packages/components/src/v-stack/hook.js b/packages/components/src/v-stack/hook.js
+index 0dcd4d33c739ae..1852da47bad090 100644
+--- a/packages/components/src/v-stack/hook.js
++++ b/packages/components/src/v-stack/hook.js
+@@ -6,7 +6,7 @@ import { useHStack } from '../h-stack';
+ 
+ /**
+  *
+- * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').WordPressComponentProps<import('./types').Props, 'div'>} props
+  */
+ export function useVStack( props ) {
+ 	const { expanded = false, ...otherProps } = useContextSystem(
+diff --git a/packages/components/src/view/component.js b/packages/components/src/view/component.js
+index 095576a79e886f..4d7808807bd1f3 100644
+--- a/packages/components/src/view/component.js
++++ b/packages/components/src/view/component.js
+@@ -20,7 +20,7 @@ import styled from '@emotion/styled';
+  * }
+  * ```
+  *
+- * @type {import('../ui/context').PolymorphicComponent<'div', { children?: import('react').ReactNode }, true>}
++ * @type {import('../ui/context').WordPressComponent<'div', { children?: import('react').ReactNode }, true>}
+  */
+ // @ts-ignore
+ const View = styled.div``;
+diff --git a/packages/components/src/visually-hidden/component.js b/packages/components/src/visually-hidden/component.js
+index 01b9e65ddc5119..ba0096d3a8bd85 100644
+--- a/packages/components/src/visually-hidden/component.js
++++ b/packages/components/src/visually-hidden/component.js
+@@ -6,8 +6,8 @@ import { visuallyHidden } from './styles';
+ import { View } from '../view';
+ 
+ /**
+- * @param {import('../ui/context').PolymorphicComponentProps<{ children: import('react').ReactNode }, 'div'>} props
+- * @param {import('react').Ref<any>}                                                                          forwardedRef
++ * @param {import('../ui/context').WordPressComponentProps<{ children: import('react').ReactNode }, 'div'>} props
++ * @param {import('react').Ref<any>}                                                                        forwardedRef
+  */
+ function VisuallyHidden( props, forwardedRef ) {
+ 	const { style: styleProp, ...contextProps } = useContextSystem(
+diff --git a/packages/components/src/z-stack/component.tsx b/packages/components/src/z-stack/component.tsx
+index 32767f2877843d..b6ee9fad3f1dcc 100644
+--- a/packages/components/src/z-stack/component.tsx
++++ b/packages/components/src/z-stack/component.tsx
+@@ -14,7 +14,7 @@ import { isValidElement } from '@wordpress/element';
+  */
+ import { getValidChildren } from '../ui/utils/get-valid-children';
+ import { contextConnect, useContextSystem } from '../ui/context';
+-import type { PolymorphicComponentProps } from '../ui/context';
++import type { WordPressComponentProps } from '../ui/context';
+ import { ZStackView, ZStackChildView } from './styles';
+ 
+ export interface ZStackProps {
+@@ -43,7 +43,7 @@ export interface ZStackProps {
+ }
+ 
+ function ZStack(
+-	props: PolymorphicComponentProps< ZStackProps, 'div' >,
++	props: WordPressComponentProps< ZStackProps, 'div' >,
+ 	forwardedRef: Ref< any >
+ ) {
+ 	const {

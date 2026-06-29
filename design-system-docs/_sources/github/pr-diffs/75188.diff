@@ -1,0 +1,182 @@
+diff --git a/packages/block-editor/src/components/link-control/index.js b/packages/block-editor/src/components/link-control/index.js
+index a361ea05a36bfd..901ccdc70a7828 100644
+--- a/packages/block-editor/src/components/link-control/index.js
++++ b/packages/block-editor/src/components/link-control/index.js
+@@ -270,21 +270,6 @@ function LinkControl( {
+ 		};
+ 	}, [] );
+ 
+-	// Trigger validation display when customValidity becomes invalid.
+-	// This effect runs after React has applied the customValidity state update
+-	// and ControlWithError's useEffect has set the native validity on the input.
+-	useEffect( () => {
+-		if ( customValidity?.type === 'invalid' ) {
+-			const inputElement = searchInputRef.current;
+-			if (
+-				inputElement &&
+-				typeof inputElement.reportValidity === 'function'
+-			) {
+-				inputElement.reportValidity();
+-			}
+-		}
+-	}, [ customValidity ] );
+-
+ 	const hasLinkValue = value?.url?.trim()?.length > 0;
+ 
+ 	/**
+diff --git a/packages/block-editor/src/components/link-control/search-input.js b/packages/block-editor/src/components/link-control/search-input.js
+index 39ed35a33835e0..c08b4fc542ffc8 100644
+--- a/packages/block-editor/src/components/link-control/search-input.js
++++ b/packages/block-editor/src/components/link-control/search-input.js
+@@ -153,6 +153,10 @@ const LinkControlSearchInput = forwardRef(
+ 					// but we don't want to show the indicator as it looks cluttered
+ 					// in the link control UI.
+ 					markWhenOptional
++					// Prevent validation from showing on blur. For LinkControl,
++					// validation should only occur on submit, not on blur, since
++					// blur can happen when clicking suggestions or the create page button.
++					validateOnBlur={ false }
+ 					onSubmit={ ( suggestion, event ) => {
+ 						const hasSuggestion = suggestion || focusedSuggestion;
+ 
+diff --git a/packages/block-editor/src/components/url-input/index.js b/packages/block-editor/src/components/url-input/index.js
+index 8bca8727c5458a..f01e4079e6617c 100644
+--- a/packages/block-editor/src/components/url-input/index.js
++++ b/packages/block-editor/src/components/url-input/index.js
+@@ -486,6 +486,10 @@ class URLInput extends Component {
+ 			...( markWhenOptional !== undefined && {
+ 				markWhenOptional,
+ 			} ),
++			// Allow parent to control whether validation shows on blur
++			...( this.props.validateOnBlur !== undefined && {
++				validateOnBlur: this.props.validateOnBlur,
++			} ),
+ 		};
+ 
+ 		if ( renderControl ) {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2cb640580eb884..66e8464f7f4c9c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   Validated form controls (private API): Add `validateOnBlur` prop to control whether validation errors show on blur. When `false`, errors only show on submit or when `customValidity` is explicitly set ([#75188](https://github.com/WordPress/gutenberg/pull/75188)).
++
+ ### Bug Fixes
+ 
+ -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used.
+diff --git a/packages/components/src/validated-form-controls/components/input-control.tsx b/packages/components/src/validated-form-controls/components/input-control.tsx
+index 5274ef0b2f6115..ab6ef0914550c6 100644
+--- a/packages/components/src/validated-form-controls/components/input-control.tsx
++++ b/packages/components/src/validated-form-controls/components/input-control.tsx
+@@ -16,6 +16,7 @@ const UnforwardedValidatedInputControl = (
+ 		required,
+ 		customValidity,
+ 		markWhenOptional,
++		validateOnBlur,
+ 		...restProps
+ 	}: Omit<
+ 		React.ComponentProps< typeof InputControl >,
+@@ -32,6 +33,7 @@ const UnforwardedValidatedInputControl = (
+ 			required={ required }
+ 			markWhenOptional={ markWhenOptional }
+ 			customValidity={ customValidity }
++			validateOnBlur={ validateOnBlur }
+ 			getValidityTarget={ () => validityTargetRef.current }
+ 		>
+ 			<InputControl
+diff --git a/packages/components/src/validated-form-controls/components/types.ts b/packages/components/src/validated-form-controls/components/types.ts
+index 66740a3d98f765..dc2e5ce1f5fb62 100644
+--- a/packages/components/src/validated-form-controls/components/types.ts
++++ b/packages/components/src/validated-form-controls/components/types.ts
+@@ -9,6 +9,12 @@ export type ValidatedControlProps = {
+ 	 * @default false
+ 	 */
+ 	markWhenOptional?: boolean;
++	/**
++	 * Whether to show validation errors when the field blurs.
++	 * When false, errors only show on submit or when customValidity is set.
++	 * @default true
++	 */
++	validateOnBlur?: boolean;
+ 	/**
+ 	 * Show a custom message based on the validation status.
+ 	 *
+diff --git a/packages/components/src/validated-form-controls/control-with-error.tsx b/packages/components/src/validated-form-controls/control-with-error.tsx
+index 448bbb94827f1c..cfe865f818240d 100644
+--- a/packages/components/src/validated-form-controls/control-with-error.tsx
++++ b/packages/components/src/validated-form-controls/control-with-error.tsx
+@@ -60,6 +60,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		markWhenOptional,
+ 		customValidity,
+ 		getValidityTarget,
++		validateOnBlur = true,
+ 		children,
+ 	}: {
+ 		/**
+@@ -75,6 +76,13 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		 * A function that returns the actual element on which the validity data should be applied.
+ 		 */
+ 		getValidityTarget: () => ValidityTarget | null | undefined;
++		/**
++		 * Whether to show validation errors when the field blurs.
++		 * When false, errors only show on submit or when customValidity is set.
++		 *
++		 * @default true
++		 */
++		validateOnBlur?: boolean;
+ 		/**
+ 		 * The control component to apply validation to.
+ 		 *
+@@ -197,18 +205,29 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 				setErrorMessage( validityTarget?.validationMessage );
+ 
+ 				setStatusMessage( undefined );
++
++				// Mark field as touched when consumer explicitly sets an invalid state.
++				// This ensures validation errors show even when validateOnBlur={false},
++				// since explicit validation (like on submit) should trigger error display.
++				setIsTouched( true );
+ 				break;
+ 			}
+ 		}
+ 	}, [ customValidity, getValidityTarget ] );
+ 
+-	// Show messages if field has been touched (i.e. has blurred at least once),
++	// Show messages if field has been touched (i.e. has blurred at least once and validateOnBlur is true),
+ 	// or validation has been triggered by the consumer/user.
+ 	useEffect( (): ReturnType< React.EffectCallback > => {
+ 		if ( ! isTouched || showMessage ) {
+ 			return;
+ 		}
+ 
++		// If validateOnBlur is false, only show messages when explicitly triggered
++		// (via customValidity or invalid event), not just because the field was touched.
++		if ( ! validateOnBlur && ! customValidity?.type ) {
++			return;
++		}
++
+ 		if ( customValidity?.type === 'validating' ) {
+ 			// Don't show validating indicators for quick calls that take less than 1 sec.
+ 			const timer = setTimeout( () => {
+@@ -219,7 +238,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 		}
+ 
+ 		setShowMessage( true );
+-	}, [ isTouched, customValidity?.type, showMessage ] );
++	}, [ isTouched, customValidity?.type, showMessage, validateOnBlur ] );
+ 
+ 	// Mark blurred fields as touched.
+ 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
+@@ -234,7 +253,6 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
+ 			! event.currentTarget.contains( event.relatedTarget )
+ 		) {
+ 			setIsTouched( true );
+-			getValidityTarget()?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
+ 		}
+ 	};
+ 

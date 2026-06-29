@@ -1,0 +1,40 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 019b674123624b..5567b2b561155b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fixes
+ 
+ -   `useAutocomplete`: Fix autocomple UI flicker when deleting trigger prefix ([#69562](https://github.com/WordPress/gutenberg/pull/69562)).
++-   `FormTokenField`: Use `color-mix` for disabled option selection background ([#69621](https://github.com/WordPress/gutenberg/pull/69621)).
+ 
+ ## 29.6.0 (2025-03-13)
+ 
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index 40e5aca989fbe1..636ba1a981c8d0 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -186,7 +186,7 @@
+ 		color: $gray-600;
+ 
+ 		&.is-selected {
+-			background-color: $components-color-accent-transparent-40;
++			background: color-mix(in srgb, $components-color-accent 4%, transparent);
+ 		}
+ 	}
+ 
+diff --git a/packages/components/src/utils/theme-variables.scss b/packages/components/src/utils/theme-variables.scss
+index 8c8c2d8a5633f7..14e44f3ddc7d2f 100644
+--- a/packages/components/src/utils/theme-variables.scss
++++ b/packages/components/src/utils/theme-variables.scss
+@@ -4,10 +4,6 @@
+ // `--wp-admin-theme-color`. If the `--wp-admin-theme-color` variable is not
+ // defined, fallback to the default theme color (WP blueberry).
+ $components-color-accent: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+-
+-// Define accent color transparent variants.
+-$components-color-accent-transparent-40: rgba(var(--wp-components-color-accent--rgb, var(--wp-admin-theme-color--rgb)), 0.04);
+-
+ $components-color-accent-darker-10: var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6));
+ $components-color-accent-darker-20: var(--wp-components-color-accent-darker-20, var(--wp-admin-theme-color-darker-20, #183ad6));
+ 

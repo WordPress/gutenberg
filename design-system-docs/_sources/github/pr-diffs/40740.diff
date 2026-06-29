@@ -1,0 +1,4281 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index 7ae12e9743f003..693f4bd420e529 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -815,12 +815,6 @@
+ 		"markdown_source": "../packages/components/src/flex/flex/README.md",
+ 		"parent": "components"
+ 	},
+-	{
+-		"title": "Flyout",
+-		"slug": "flyout",
+-		"markdown_source": "../packages/components/src/flyout/flyout/README.md",
+-		"parent": "components"
+-	},
+ 	{
+ 		"title": "FocalPointPicker",
+ 		"slug": "focal-point-picker",
+diff --git a/package-lock.json b/package-lock.json
+index 7d6071eadea2f3..22ffe2813d5ca0 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -2724,6 +2724,28 @@
+ 				}
+ 			}
+ 		},
++		"@floating-ui/core": {
++			"version": "0.6.2",
++			"resolved": "https://registry.npmjs.org/@floating-ui/core/-/core-0.6.2.tgz",
++			"integrity": "sha512-jktYRmZwmau63adUG3GKOAVCofBXkk55S/zQ94XOorAHhwqFIOFAy1rSp2N0Wp6/tGbe9V3u/ExlGZypyY17rg=="
++		},
++		"@floating-ui/dom": {
++			"version": "0.4.5",
++			"resolved": "https://registry.npmjs.org/@floating-ui/dom/-/dom-0.4.5.tgz",
++			"integrity": "sha512-b+prvQgJt8pieaKYMSJBXHxX/DYwdLsAWxKYqnO5dO2V4oo/TYBZJAUQCVNjTWWsrs6o4VDrNcP9+E70HAhJdw==",
++			"requires": {
++				"@floating-ui/core": "^0.6.2"
++			}
++		},
++		"@floating-ui/react-dom": {
++			"version": "0.6.3",
++			"resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-0.6.3.tgz",
++			"integrity": "sha512-hC+pS5D6AgS2wWjbmSQ6UR6Kpy+drvWGJIri6e1EDGADTPsCaa4KzCgmCczHrQeInx9tqs81EyDmbKJYY2swKg==",
++			"requires": {
++				"@floating-ui/dom": "^0.4.5",
++				"use-isomorphic-layout-effect": "^1.1.1"
++			}
++		},
+ 		"@gar/promisify": {
+ 			"version": "1.1.2",
+ 			"resolved": "https://registry.npmjs.org/@gar/promisify/-/promisify-1.1.2.tgz",
+@@ -17266,6 +17288,7 @@
+ 				"@emotion/serialize": "^1.0.2",
+ 				"@emotion/styled": "^11.6.0",
+ 				"@emotion/utils": "1.0.0",
++				"@floating-ui/react-dom": "0.6.3",
+ 				"@use-gesture/react": "^10.2.6",
+ 				"@wordpress/a11y": "file:packages/a11y",
+ 				"@wordpress/compose": "file:packages/compose",
+@@ -57866,8 +57889,7 @@
+ 		"use-isomorphic-layout-effect": {
+ 			"version": "1.1.1",
+ 			"resolved": "https://registry.npmjs.org/use-isomorphic-layout-effect/-/use-isomorphic-layout-effect-1.1.1.tgz",
+-			"integrity": "sha512-L7Evj8FGcwo/wpbv/qvSfrkHFtOpCzvM5yl2KVyDJoylVuSvzphiiasmjgQPttIGBAy2WKiBNR98q8w7PiNgKQ==",
+-			"dev": true
++			"integrity": "sha512-L7Evj8FGcwo/wpbv/qvSfrkHFtOpCzvM5yl2KVyDJoylVuSvzphiiasmjgQPttIGBAy2WKiBNR98q8w7PiNgKQ=="
+ 		},
+ 		"use-latest": {
+ 			"version": "1.2.0",
+diff --git a/packages/block-editor/src/components/block-alignment-matrix-control/index.js b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+index 6c3f34137d9038..1a923fe2e057f7 100644
+--- a/packages/block-editor/src/components/block-alignment-matrix-control/index.js
++++ b/packages/block-editor/src/components/block-alignment-matrix-control/index.js
+@@ -22,15 +22,11 @@ function BlockAlignmentMatrixControl( props ) {
+ 	} = props;
+ 
+ 	const icon = <AlignmentMatrixControl.Icon value={ value } />;
+-	const className = 'block-editor-block-alignment-matrix-control';
+-	const popoverClassName = `${ className }__popover`;
+-	const isAlternate = true;
+ 
+ 	return (
+ 		<Dropdown
+ 			position="bottom right"
+-			className={ className }
+-			popoverProps={ { className: popoverClassName, isAlternate } }
++			popoverProps={ { isAlternate: true } }
+ 			renderToggle={ ( { onToggle, isOpen } ) => {
+ 				const openOnArrowDown = ( event ) => {
+ 					if ( ! isOpen && event.keyCode === DOWN ) {
+diff --git a/packages/block-editor/src/components/block-alignment-matrix-control/style.scss b/packages/block-editor/src/components/block-alignment-matrix-control/style.scss
+deleted file mode 100644
+index bc2fa4837bece2..00000000000000
+--- a/packages/block-editor/src/components/block-alignment-matrix-control/style.scss
++++ /dev/null
+@@ -1,10 +0,0 @@
+-.block-editor-block-alignment-matrix-control__popover {
+-	.components-popover__content {
+-		min-width: 0;
+-		width: auto;
+-
+-		> div {
+-			padding: $grid-unit;
+-		}
+-	}
+-}
+diff --git a/packages/block-editor/src/components/block-popover/inbetween.js b/packages/block-editor/src/components/block-popover/inbetween.js
+index 68fdc8955ee8ec..de0fb77ea66bc7 100644
+--- a/packages/block-editor/src/components/block-popover/inbetween.js
++++ b/packages/block-editor/src/components/block-popover/inbetween.js
+@@ -107,6 +107,8 @@ function BlockPopoverInbetween( {
+ 					left: previousRect ? previousRect.right : nextRect.right,
+ 					right: previousRect ? previousRect.left : nextRect.left,
+ 					bottom: nextRect ? nextRect.top : previousRect.bottom,
++					height: 0,
++					width: 0,
+ 					ownerDocument,
+ 				};
+ 			}
+@@ -116,6 +118,8 @@ function BlockPopoverInbetween( {
+ 				left: previousRect ? previousRect.left : nextRect.left,
+ 				right: previousRect ? previousRect.right : nextRect.right,
+ 				bottom: nextRect ? nextRect.top : previousRect.bottom,
++				height: 0,
++				width: 0,
+ 				ownerDocument,
+ 			};
+ 		}
+@@ -126,6 +130,8 @@ function BlockPopoverInbetween( {
+ 				left: previousRect ? previousRect.left : nextRect.right,
+ 				right: nextRect ? nextRect.right : previousRect.left,
+ 				bottom: previousRect ? previousRect.bottom : nextRect.bottom,
++				height: 0,
++				width: 0,
+ 				ownerDocument,
+ 			};
+ 		}
+@@ -135,6 +141,8 @@ function BlockPopoverInbetween( {
+ 			left: previousRect ? previousRect.right : nextRect.left,
+ 			right: nextRect ? nextRect.left : previousRect.right,
+ 			bottom: previousRect ? previousRect.bottom : nextRect.bottom,
++			height: 0,
++			width: 0,
+ 			ownerDocument,
+ 		};
+ 	}, [ previousElement, nextElement ] );
+@@ -155,7 +163,6 @@ function BlockPopoverInbetween( {
+ 	return (
+ 		<Popover
+ 			ref={ popoverScrollRef }
+-			noArrow
+ 			animate={ false }
+ 			getAnchorRect={ getAnchorRect }
+ 			focusOnMount={ false }
+diff --git a/packages/block-editor/src/components/block-popover/index.js b/packages/block-editor/src/components/block-popover/index.js
+index 5b8a2231bb83ee..ce28d8943b010a 100644
+--- a/packages/block-editor/src/components/block-popover/index.js
++++ b/packages/block-editor/src/components/block-popover/index.js
+@@ -7,7 +7,6 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { Popover } from '@wordpress/components';
+-import { getScrollContainer } from '@wordpress/dom';
+ import { useMemo } from '@wordpress/element';
+ 
+ /**
+@@ -50,33 +49,19 @@ export default function BlockPopover( {
+ 		bottom: lastSelectedElement,
+ 	};
+ 
+-	const { ownerDocument } = selectedElement;
+-	const stickyBoundaryElement =
+-		ownerDocument.defaultView.frameElement ||
+-		getScrollContainer( selectedElement ) ||
+-		ownerDocument.body;
+-
+ 	return (
+ 		<Popover
+ 			ref={ popoverScrollRef }
+-			noArrow
+ 			animate={ false }
+ 			position="top right left"
+ 			focusOnMount={ false }
+ 			anchorRef={ anchorRef }
+-			__unstableStickyBoundaryElement={
+-				__unstableCoverTarget ? undefined : stickyBoundaryElement
+-			}
+ 			// Render in the old slot if needed for backward compatibility,
+ 			// otherwise render in place (not in the the default popover slot).
+ 			__unstableSlotName={ __unstablePopoverSlot || null }
+-			__unstableBoundaryParent
+ 			// Observe movement for block animations (especially horizontal).
+ 			__unstableObserveElement={ selectedElement }
+-			// Used to safeguard sticky position behavior against cases where it would permanently
+-			// obscure specific sections of a block.
+-			__unstableEditorCanvasWrapper={ __unstableContentRef?.current }
+-			__unstableForcePosition={ __unstableCoverTarget }
++			__unstableForcePosition
+ 			{ ...props }
+ 			className={ classnames(
+ 				'block-editor-block-popover',
+diff --git a/packages/block-editor/src/components/block-popover/style.scss b/packages/block-editor/src/components/block-popover/style.scss
+index c120f05faa2e8c..df2218950999e3 100644
+--- a/packages/block-editor/src/components/block-popover/style.scss
++++ b/packages/block-editor/src/components/block-popover/style.scss
+@@ -12,6 +12,7 @@
+ 		width: max-content;
+ 		background: none;
+ 		border: none;
++		outline: none;
+ 		box-shadow: none;
+ 		overflow-y: visible;
+ 
+diff --git a/packages/block-editor/src/components/block-switcher/style.scss b/packages/block-editor/src/components/block-switcher/style.scss
+index 282a0b62856b7b..23e32a1ffa6422 100644
+--- a/packages/block-editor/src/components/block-switcher/style.scss
++++ b/packages/block-editor/src/components/block-switcher/style.scss
+@@ -39,11 +39,6 @@
+ 	font-size: 14px;
+ }
+ 
+-// Indent the popover to match the button position.
+-.block-editor-block-switcher__popover {
+-	margin-left: 6px;
+-}
+-
+ .components-button.block-editor-block-switcher__no-switcher-icon {
+ 	display: flex;
+ 
+@@ -93,43 +88,11 @@
+ 	min-width: 300px;
+ }
+ 
+-// We keep the min width the same for the border to work.
+-.components-popover.block-editor-block-switcher__popover .components-popover__content > div {
+-	min-width: auto;
+-	display: flex;
+-	background: $white;
+-	padding: 0;
+-
+-	.components-menu-group {
+-		margin: 0;
+-	}
+-}
+-
+-.block-editor-block-switcher__popover .components-popover__content {
+-
+-	.block-editor-block-styles {
+-		margin: 0 -3px; // Remove the panel body padding while keeping it for the title.
+-	}
+-
+-	// Hide the bottom border on the last panel so it stacks with the popover.
+-	.components-panel__body {
+-		border: 0;
+-
+-		// Elevate this so the hover style is visible.
+-		position: relative;
+-		z-index: 1;
+-	}
+-
+-	.components-panel__body + .components-panel__body {
+-		border-top: $border-width solid $gray-200;
+-	}
+-}
+-
+ .block-editor-block-switcher__popover__preview__parent {
+ 	.block-editor-block-switcher__popover__preview__container {
+ 		position: absolute;
+ 		top: -$grid-unit-15;
+-		left: calc(100% + #{$grid-unit-40});
++		left: calc(100% + #{$grid-unit-20});
+ 	}
+ }
+ 
+@@ -138,7 +101,6 @@
+ 
+ 	// Position correctly. Needs specificity.
+ 	&.components-popover {
+-		margin-left: $grid-unit-05;
+ 		margin-top: $grid-unit-15 - $border-width;
+ 	}
+ 
+@@ -151,6 +113,7 @@
+ 		border: $border-width solid $gray-900;
+ 		background: $white;
+ 		border-radius: $radius-block-ui;
++		outline: none;
+ 	}
+ 
+ 	.block-editor-block-switcher__preview {
+diff --git a/packages/block-editor/src/components/colors-gradients/dropdown.js b/packages/block-editor/src/components/colors-gradients/dropdown.js
+index 5a04d65b6b5d8e..299995d3eb6cc6 100644
+--- a/packages/block-editor/src/components/colors-gradients/dropdown.js
++++ b/packages/block-editor/src/components/colors-gradients/dropdown.js
+@@ -121,13 +121,16 @@ export default function ColorGradientSettingsDropdown( {
+ 	__experimentalIsRenderedInSidebar,
+ 	...props
+ } ) {
+-	const dropdownPosition = __experimentalIsRenderedInSidebar
+-		? 'bottom left'
+-		: undefined;
+-
+ 	const dropdownClassName = __experimentalIsItemGroup
+ 		? 'block-editor-panel-color-gradient-settings__dropdown'
+ 		: 'block-editor-tools-panel-color-gradient-settings__dropdown';
++	let popoverProps;
++	if ( __experimentalIsRenderedInSidebar ) {
++		popoverProps = {
++			placement: 'left-start',
++			offset: 36,
++		};
++	}
+ 
+ 	return (
+ 		// Only wrap with `ItemGroup` if these controls are being rendered
+@@ -170,7 +173,7 @@ export default function ColorGradientSettingsDropdown( {
+ 							{ ...props }
+ 						>
+ 							<Dropdown
+-								position={ dropdownPosition }
++								popoverProps={ popoverProps }
+ 								className={ dropdownClassName }
+ 								contentClassName="block-editor-panel-color-gradient-settings__dropdown-content"
+ 								renderToggle={ renderToggle( toggleSettings ) }
+diff --git a/packages/block-editor/src/components/colors-gradients/style.scss b/packages/block-editor/src/components/colors-gradients/style.scss
+index 468fda8357c11b..e936859db68560 100644
+--- a/packages/block-editor/src/components/colors-gradients/style.scss
++++ b/packages/block-editor/src/components/colors-gradients/style.scss
+@@ -59,25 +59,7 @@
+ }
+ 
+ .block-editor-panel-color-gradient-settings__dropdown-content .components-popover__content {
+-	& > div {
+-		width: $sidebar-width;
+-	}
+-}
+-
+-@include break-medium() {
+-	.block-editor-panel-color-gradient-settings__dropdown-content {
+-		.components-popover__content {
+-			margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 } !important;
+-		}
+-
+-		&.is-from-top .components-popover__content {
+-			margin-top: #{ -($grid-unit-60 + $grid-unit-15) } !important;
+-		}
+-
+-		&.is-from-bottom .components-popover__content {
+-			margin-bottom: #{ -($grid-unit-60 + $grid-unit-15) } !important;
+-		}
+-	}
++	width: $sidebar-width;
+ }
+ 
+ .block-editor-panel-color-gradient-settings__dropdown:last-child > div {
+diff --git a/packages/block-editor/src/components/duotone-control/style.scss b/packages/block-editor/src/components/duotone-control/style.scss
+index f7bf47ee66c1d2..d5b8c24bcdb9df 100644
+--- a/packages/block-editor/src/components/duotone-control/style.scss
++++ b/packages/block-editor/src/components/duotone-control/style.scss
+@@ -9,7 +9,7 @@ $popover-padding: $grid-unit-20;
+ $swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover-padding, $swatch-size + $swatch-gap));
+ 
+ .block-editor-duotone-control__popover {
+-	> .components-popover__content > div {
++	> .components-popover__content {
+ 		padding: $popover-padding;
+ 		width: $popover-width;
+ 	}
+@@ -34,9 +34,3 @@ $swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover
+ 	margin: $grid-unit-20 0;
+ 	font-size: $helptext-font-size;
+ }
+-
+-// Better align the popover under the swatch.
+-// @todo: when the positioning for popovers gets refactored, this can presumably be removed.
+-.block-editor-duotone-control__popover:not([data-y-axis="middle"][data-x-axis="right"]) > .components-popover__content {
+-	margin-left: -14px;
+-}
+diff --git a/packages/block-editor/src/components/inserter/style.scss b/packages/block-editor/src/components/inserter/style.scss
+index da16f256bec2a0..802718847648dc 100644
+--- a/packages/block-editor/src/components/inserter/style.scss
++++ b/packages/block-editor/src/components/inserter/style.scss
+@@ -23,6 +23,7 @@ $block-inserter-tabs-height: 44px;
+ .block-editor-inserter__popover.is-quick {
+ 	.components-popover__content {
+ 		border: none;
++		outline: none;
+ 
+ 		.block-editor-inserter__quick-inserter > * {
+ 			border-left: $border-width solid $gray-400;
+@@ -310,7 +311,7 @@ $block-inserter-tabs-height: 44px;
+ 	border-top: $border-width solid $gray-300;
+ }
+ 
+-.block-editor-inserter__popover.is-quick > .components-popover__content > div {
++.block-editor-inserter__popover.is-quick > .components-popover__content {
+ 	padding: 0;
+ }
+ 
+diff --git a/packages/block-editor/src/components/list-view/drop-indicator.js b/packages/block-editor/src/components/list-view/drop-indicator.js
+index 15f5d68212a8aa..b242ae62ca86f2 100644
+--- a/packages/block-editor/src/components/list-view/drop-indicator.js
++++ b/packages/block-editor/src/components/list-view/drop-indicator.js
+@@ -110,7 +110,6 @@ export default function ListViewDropIndicator( {
+ 
+ 	return (
+ 		<Popover
+-			noArrow
+ 			animate={ false }
+ 			getAnchorRect={ getAnchorRect }
+ 			focusOnMount={ false }
+diff --git a/packages/block-editor/src/components/list-view/style.scss b/packages/block-editor/src/components/list-view/style.scss
+index a7f17303336307..a4efefeafbd992 100644
+--- a/packages/block-editor/src/components/list-view/style.scss
++++ b/packages/block-editor/src/components/list-view/style.scss
+@@ -396,10 +396,11 @@ $block-navigation-max-indent: 8;
+ }
+ 
+ // Reset some popover defaults for the drop indicator.
+-.block-editor-list-view-drop-indicator:not([data-y-axis="middle"][data-x-axis="right"]) > .components-popover__content {
++.block-editor-list-view-drop-indicator > .components-popover__content {
+ 	margin-left: 0;
+ 	border: none;
+ 	box-shadow: none;
++	outline: none;
+ }
+ 
+ .block-editor-list-view-placeholder {
+diff --git a/packages/block-editor/src/components/navigable-toolbar/index.js b/packages/block-editor/src/components/navigable-toolbar/index.js
+index 34ffa790f4ce32..4025468f4abbb4 100644
+--- a/packages/block-editor/src/components/navigable-toolbar/index.js
++++ b/packages/block-editor/src/components/navigable-toolbar/index.js
+@@ -29,7 +29,12 @@ function hasFocusWithin( container ) {
+ function focusFirstTabbableIn( container ) {
+ 	const [ firstTabbable ] = focus.tabbable.find( container );
+ 	if ( firstTabbable ) {
+-		firstTabbable.focus();
++		firstTabbable.focus( {
++			// When focusing newly mounted toolbars,
++			// the position of the popover is often not right on the first render
++			// This prevents the layout shifts when focusing the dialogs.
++			preventScroll: true,
++		} );
+ 	}
+ }
+ 
+@@ -119,7 +124,12 @@ function useToolbarFocus(
+ 				const items = getAllToolbarItemsIn( ref.current );
+ 				const index = initialIndex || 0;
+ 				if ( items[ index ] && hasFocusWithin( ref.current ) ) {
+-					items[ index ].focus();
++					items[ index ].focus( {
++						// When focusing newly mounted toolbars,
++						// the position of the popover is often not right on the first render
++						// This prevents the layout shifts when focusing the dialogs.
++						preventScroll: true,
++					} );
+ 				}
+ 			} );
+ 		}
+diff --git a/packages/block-editor/src/components/preview-options/style.scss b/packages/block-editor/src/components/preview-options/style.scss
+index 166764b35498f3..b25578c1d20519 100644
+--- a/packages/block-editor/src/components/preview-options/style.scss
++++ b/packages/block-editor/src/components/preview-options/style.scss
+@@ -11,10 +11,6 @@
+ }
+ 
+ .block-editor-post-preview__dropdown-content {
+-	.components-popover__content {
+-		overflow-y: visible;
+-	}
+-
+ 	&.edit-post-post-preview-dropdown {
+ 		.components-menu-group {
+ 			&:first-child {
+diff --git a/packages/block-editor/src/components/rich-text/format-toolbar-container.js b/packages/block-editor/src/components/rich-text/format-toolbar-container.js
+index 7d32b911d9de07..08ea1e7e66fdfb 100644
+--- a/packages/block-editor/src/components/rich-text/format-toolbar-container.js
++++ b/packages/block-editor/src/components/rich-text/format-toolbar-container.js
+@@ -14,7 +14,6 @@ const FormatToolbarContainer = ( { inline, anchorRef } ) => {
+ 		// Render in popover.
+ 		return (
+ 			<Popover
+-				noArrow
+ 				position="top center"
+ 				focusOnMount={ false }
+ 				anchorRef={ anchorRef }
+diff --git a/packages/block-editor/src/components/rich-text/index.js b/packages/block-editor/src/components/rich-text/index.js
+index d30fa8eae5e92d..6bb6085f92ac6e 100644
+--- a/packages/block-editor/src/components/rich-text/index.js
++++ b/packages/block-editor/src/components/rich-text/index.js
+@@ -338,7 +338,7 @@ function RichTextWrapper(
+ 			{ isSelected && hasFormats && (
+ 				<FormatToolbarContainer
+ 					inline={ inlineToolbar }
+-					anchorRef={ anchorRef.current }
++					anchorRef={ anchorRef }
+ 				/>
+ 			) }
+ 			<TagName
+diff --git a/packages/block-editor/src/components/rich-text/style.scss b/packages/block-editor/src/components/rich-text/style.scss
+index e4ac6b24f9a16b..03bb7dd607a538 100644
+--- a/packages/block-editor/src/components/rich-text/style.scss
++++ b/packages/block-editor/src/components/rich-text/style.scss
+@@ -42,17 +42,11 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
+ 		min-width: auto;
+ 		margin-bottom: $grid-unit-10;
+ 		box-shadow: none;
+-
+-		// Block UI appearance.
+-		border: $border-width solid $gray-900;
+-		border-radius: $radius-block-ui;
+-		background-color: $white;
++		outline: none;
+ 	}
+ 
+-	.components-toolbar-group,
+ 	.components-toolbar {
+-		// The popover already provides a border.
+-		border: none;
++		border-radius: $radius-block-ui;
+ 	}
+ 
+ 	.components-toolbar__control,
+diff --git a/packages/block-editor/src/components/url-input/index.js b/packages/block-editor/src/components/url-input/index.js
+index 51132f07179fd5..2bd7bacdb32173 100644
+--- a/packages/block-editor/src/components/url-input/index.js
++++ b/packages/block-editor/src/components/url-input/index.js
+@@ -536,7 +536,7 @@ class URLInput extends Component {
+ 			!! suggestions.length
+ 		) {
+ 			return (
+-				<Popover position="bottom" noArrow focusOnMount={ false }>
++				<Popover position="bottom" focusOnMount={ false }>
+ 					<div
+ 						{ ...suggestionsListProps }
+ 						className={ classnames(
+diff --git a/packages/block-editor/src/hooks/border.js b/packages/block-editor/src/hooks/border.js
+index be5c03b1a8c0e1..81cc023bab78ca 100644
+--- a/packages/block-editor/src/hooks/border.js
++++ b/packages/block-editor/src/hooks/border.js
+@@ -269,17 +269,8 @@ export function BorderPanel( props ) {
+ 						colors={ colors }
+ 						enableAlpha={ true }
+ 						onChange={ onBorderChange }
+-						popoverClassNames={ {
+-							linked: 'block-editor__border-box-control__popover',
+-							top:
+-								'block-editor__border-box-control__popover-top',
+-							right:
+-								'block-editor__border-box-control__popover-right',
+-							bottom:
+-								'block-editor__border-box-control__popover-bottom',
+-							left:
+-								'block-editor__border-box-control__popover-left',
+-						} }
++						popoverPlacement="left-start"
++						popoverOffset={ 40 }
+ 						showStyle={ isStyleSupported }
+ 						value={ hydratedBorder }
+ 						__experimentalHasMultipleOrigins={ true }
+diff --git a/packages/block-editor/src/hooks/border.scss b/packages/block-editor/src/hooks/border.scss
+index 0aab500b550764..c86c046309d886 100644
+--- a/packages/block-editor/src/hooks/border.scss
++++ b/packages/block-editor/src/hooks/border.scss
+@@ -3,51 +3,3 @@
+ 		grid-column: span 1;
+ 	}
+ }
+-
+-.block-editor__border-box-control__popover,
+-.block-editor__border-box-control__popover-top,
+-.block-editor__border-box-control__popover-right,
+-.block-editor__border-box-control__popover-bottom,
+-.block-editor__border-box-control__popover-left {
+-	.components-popover__content {
+-		width: 282px;
+-	}
+-}
+-
+-$split-border-control-offset: 55px;
+-
+-@include break-medium() {
+-	.block-editor__border-box-control__popover,
+-	.block-editor__border-box-control__popover-left {
+-		.components-popover__content {
+-			margin-right: #{ $grid-unit-50 + $grid-unit-15 } !important;
+-		}
+-	}
+-
+-	.block-editor__border-box-control__popover-top,
+-	.block-editor__border-box-control__popover-bottom {
+-		.components-popover__content {
+-			margin-right: #{ $grid-unit-50 + $grid-unit-15 + $split-border-control-offset } !important;
+-		}
+-	}
+-
+-	.block-editor__border-box-control__popover-right {
+-		.components-popover__content {
+-			margin-right: #{ $grid-unit-50 + $grid-unit-15 + ( $split-border-control-offset * 2 )} !important;
+-		}
+-	}
+-
+-	.block-editor__border-box-control__popover,
+-	.block-editor__border-box-control__popover-top,
+-	.block-editor__border-box-control__popover-right,
+-	.block-editor__border-box-control__popover-bottom,
+-	.block-editor__border-box-control__popover-left {
+-		&.is-from-top .components-popover__content {
+-			margin-top: #{ -($grid-unit-50 + $grid-unit-15) } !important;
+-		}
+-
+-		&.is-from-bottom .components-popover__content {
+-			margin-bottom: #{ -($grid-unit-50 + $grid-unit-15) } !important;
+-		}
+-	}
+-}
+diff --git a/packages/block-editor/src/style.scss b/packages/block-editor/src/style.scss
+index 9687f16db976e4..5f036b4d9b264d 100644
+--- a/packages/block-editor/src/style.scss
++++ b/packages/block-editor/src/style.scss
+@@ -1,6 +1,5 @@
+ @import "./autocompleters/style.scss";
+ @import "./components/block-alignment-control/style.scss";
+-@import "./components/block-alignment-matrix-control/style.scss";
+ @import "./components/block-icon/style.scss";
+ @import "./components/block-inspector/style.scss";
+ @import "./components/block-list/style.scss";
+diff --git a/packages/block-library/src/image/editor.scss b/packages/block-library/src/image/editor.scss
+index 0fd26a8e0bdecf..bcbcb771bd1cbf 100644
+--- a/packages/block-library/src/image/editor.scss
++++ b/packages/block-library/src/image/editor.scss
+@@ -110,8 +110,8 @@ figure.wp-block-image:not(.wp-block) {
+ 
+ .wp-block-image__zoom {
+ 	.components-popover__content {
+-		overflow: visible;
+ 		min-width: 260px;
++		overflow: visible !important;
+ 	}
+ 
+ 	.components-range-control {
+diff --git a/packages/block-library/src/video/editor.scss b/packages/block-library/src/video/editor.scss
+index 0213c7907a9114..b6d388b6d06f6d 100644
+--- a/packages/block-library/src/video/editor.scss
++++ b/packages/block-library/src/video/editor.scss
+@@ -33,10 +33,6 @@
+ 	z-index: z-index("{core/video track editor popover}");
+ }
+ 
+-.block-library-video-tracks-editor > .components-popover__content {
+-	width: 360px;
+-}
+-
+ .block-library-video-tracks-editor__track-list-track {
+ 	display: flex;
+ 	place-content: space-between;
+@@ -75,9 +71,11 @@
+ 	display: block;
+ }
+ 
+-.block-library-video-tracks-editor > .components-popover__content > div {
++.block-library-video-tracks-editor > .components-popover__content {
++	width: 360px;
+ 	padding: 0;
+ }
++
+ .block-library-video-tracks-editor__track-list,
+ .block-library-video-tracks-editor__add-tracks-container {
+ 	.components-menu-group__label {
+@@ -85,7 +83,6 @@
+ 	}
+ }
+ 
+-
+ .block-library-video-tracks-editor__single-track-editor,
+ .block-library-video-tracks-editor__track-list,
+ .block-library-video-tracks-editor__add-tracks-container {
+diff --git a/packages/components/package.json b/packages/components/package.json
+index 15ea54baa7d6b2..1e791128d29373 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -36,6 +36,7 @@
+ 		"@emotion/serialize": "^1.0.2",
+ 		"@emotion/styled": "^11.6.0",
+ 		"@emotion/utils": "1.0.0",
++		"@floating-ui/react-dom": "0.6.3",
+ 		"@use-gesture/react": "^10.2.6",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/compose": "file:../compose",
+diff --git a/packages/components/src/autocomplete/style.scss b/packages/components/src/autocomplete/style.scss
+index b7060e4a469189..4b8434caacf45a 100644
+--- a/packages/components/src/autocomplete/style.scss
++++ b/packages/components/src/autocomplete/style.scss
+@@ -1,4 +1,4 @@
+-.components-autocomplete__popover .components-popover__content > div {
++.components-autocomplete__popover .components-popover__content {
+ 	padding: $grid-unit-20;
+ 	min-width: 220px;
+ }
+diff --git a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+index add245b0d5e949..af6249f7b4ca95 100644
+--- a/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-split-controls/component.tsx
+@@ -2,6 +2,8 @@
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
++import { useRef } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -25,13 +27,23 @@ const BorderBoxControlSplitControls = (
+ 		enableAlpha,
+ 		enableStyle,
+ 		onChange,
+-		popoverClassNames,
++		popoverPlacement,
++		popoverOffset,
+ 		value,
+ 		__experimentalHasMultipleOrigins,
+ 		__experimentalIsRenderedInSidebar,
+ 		__next36pxDefaultSize,
+ 		...otherProps
+ 	} = useBorderBoxControlSplitControls( props );
++	const containerRef = useRef();
++	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
++	const popoverProps = popoverPlacement
++		? {
++				placement: popoverPlacement,
++				offset: popoverOffset,
++				anchorRef: containerRef,
++		  }
++		: undefined;
+ 
+ 	const sharedBorderControlProps = {
+ 		colors,
+@@ -45,7 +57,7 @@ const BorderBoxControlSplitControls = (
+ 	};
+ 
+ 	return (
+-		<Grid { ...otherProps } ref={ forwardedRef } gap={ 4 }>
++		<Grid { ...otherProps } ref={ mergedRef } gap={ 4 }>
+ 			<BorderBoxControlVisualizer
+ 				value={ value }
+ 				__next36pxDefaultSize={ __next36pxDefaultSize }
+@@ -55,7 +67,7 @@ const BorderBoxControlSplitControls = (
+ 				hideLabelFromVision={ true }
+ 				label={ __( 'Top border' ) }
+ 				onChange={ ( newBorder ) => onChange( newBorder, 'top' ) }
+-				popoverContentClassName={ popoverClassNames?.top }
++				__unstablePopoverProps={ popoverProps }
+ 				value={ value?.top }
+ 				{ ...sharedBorderControlProps }
+ 			/>
+@@ -63,7 +75,7 @@ const BorderBoxControlSplitControls = (
+ 				hideLabelFromVision={ true }
+ 				label={ __( 'Left border' ) }
+ 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
+-				popoverContentClassName={ popoverClassNames?.left }
++				__unstablePopoverProps={ popoverProps }
+ 				value={ value?.left }
+ 				{ ...sharedBorderControlProps }
+ 			/>
+@@ -71,7 +83,7 @@ const BorderBoxControlSplitControls = (
+ 				hideLabelFromVision={ true }
+ 				label={ __( 'Right border' ) }
+ 				onChange={ ( newBorder ) => onChange( newBorder, 'right' ) }
+-				popoverContentClassName={ popoverClassNames?.right }
++				__unstablePopoverProps={ popoverProps }
+ 				value={ value?.right }
+ 				{ ...sharedBorderControlProps }
+ 			/>
+@@ -80,7 +92,7 @@ const BorderBoxControlSplitControls = (
+ 				hideLabelFromVision={ true }
+ 				label={ __( 'Bottom border' ) }
+ 				onChange={ ( newBorder ) => onChange( newBorder, 'bottom' ) }
+-				popoverContentClassName={ popoverClassNames?.bottom }
++				__unstablePopoverProps={ popoverProps }
+ 				value={ value?.bottom }
+ 				{ ...sharedBorderControlProps }
+ 			/>
+diff --git a/packages/components/src/border-box-control/border-box-control/README.md b/packages/components/src/border-box-control/border-box-control/README.md
+index 67a9426823f0f2..c895c1b853de1d 100644
+--- a/packages/components/src/border-box-control/border-box-control/README.md
++++ b/packages/components/src/border-box-control/border-box-control/README.md
+@@ -122,23 +122,19 @@ _Note: The will be `undefined` if a user clears all borders._
+ 
+ - Required: Yes
+ 
+-### `popoverClassNames`: `Object`
++### `popoverPlacement`: `string`
+ 
+-An object defining CSS classnames for all the inner `BorderControl` popover
+-content.
++The position of the color popover relative to the control wrapper.
+ 
+-Example:
+-```js
+-{
+-	linked: 'linked-border-popover-content',
+-	top: 'top-border-popover-content',
+-	right: 'right-border-popover-content',
+-	bottom: 'bottom-border-popover-content',
+-	left: 'left-border-popover-content',
+-}
+-```
++By default, popovers are displayed relative to the button that initiated the popover. By supplying a popover placement, you force the popover to display in a specific location.
++
++The available base placements are 'top', 'right', 'bottom', 'left'. Each of these base placements has an alignment in the form -start and -end. For example, 'right-start', or 'bottom-end'. These allow you to align the tooltip to the edges of the button, rather than centering it.
++
++- Required: No
++
++### `popoverOffset`: `number`
+ 
+-By default, popovers are displayed relative to the button that initiated the popover. By supplying classnames for each individual popover, it is possible to add styling rules to align the popover positions to an unrelated design element, for example, the sidebar inspector in the block editor.
++Works in conjunctions with `popoverPlacement` and allows leaving a space between the color popover and the control wrapper.
+ 
+ - Required: No
+ 
+diff --git a/packages/components/src/border-box-control/border-box-control/component.tsx b/packages/components/src/border-box-control/border-box-control/component.tsx
+index c51de26a1dfddb..654bd0ec4ce1f8 100644
+--- a/packages/components/src/border-box-control/border-box-control/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control/component.tsx
+@@ -2,6 +2,8 @@
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
++import { useRef } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -51,7 +53,8 @@ const BorderBoxControl = (
+ 		linkedValue,
+ 		onLinkedChange,
+ 		onSplitChange,
+-		popoverClassNames,
++		popoverPlacement,
++		popoverOffset,
+ 		splitValue,
+ 		toggleLinked,
+ 		__experimentalHasMultipleOrigins,
+@@ -59,9 +62,18 @@ const BorderBoxControl = (
+ 		__next36pxDefaultSize = false,
+ 		...otherProps
+ 	} = useBorderBoxControl( props );
++	const containerRef = useRef();
++	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
++	const popoverProps = popoverPlacement
++		? {
++				placement: popoverPlacement,
++				offset: popoverOffset,
++				anchorRef: containerRef,
++		  }
++		: undefined;
+ 
+ 	return (
+-		<View className={ className } { ...otherProps } ref={ forwardedRef }>
++		<View className={ className } { ...otherProps } ref={ mergedRef }>
+ 			<BorderLabel
+ 				label={ label }
+ 				hideLabelFromVision={ hideLabelFromVision }
+@@ -78,7 +90,7 @@ const BorderBoxControl = (
+ 						placeholder={
+ 							hasMixedBorders ? __( 'Mixed' ) : undefined
+ 						}
+-						popoverContentClassName={ popoverClassNames?.linked }
++						__unstablePopoverProps={ popoverProps }
+ 						shouldSanitizeBorder={ false } // This component will handle that.
+ 						value={ linkedValue }
+ 						withSlider={ true }
+@@ -98,7 +110,8 @@ const BorderBoxControl = (
+ 						enableAlpha={ enableAlpha }
+ 						enableStyle={ enableStyle }
+ 						onChange={ onSplitChange }
+-						popoverClassNames={ popoverClassNames }
++						popoverPlacement={ popoverPlacement }
++						popoverOffset={ popoverOffset }
+ 						value={ splitValue }
+ 						__experimentalHasMultipleOrigins={
+ 							__experimentalHasMultipleOrigins
+diff --git a/packages/components/src/border-box-control/types.ts b/packages/components/src/border-box-control/types.ts
+index aee55f97df6379..08962f4dac291f 100644
+--- a/packages/components/src/border-box-control/types.ts
++++ b/packages/components/src/border-box-control/types.ts
+@@ -14,14 +14,6 @@ export type AnyBorder = Border | Borders | undefined;
+ export type BorderProp = keyof Border;
+ export type BorderSide = keyof Borders;
+ 
+-export type PopoverClassNames = {
+-	linked?: string;
+-	top?: string;
+-	right?: string;
+-	bottom?: string;
+-	left?: string;
+-};
+-
+ export type BorderBoxControlProps = ColorProps &
+ 	LabelProps & {
+ 		/**
+@@ -35,10 +27,13 @@ export type BorderBoxControlProps = ColorProps &
+ 		 */
+ 		onChange: ( value: AnyBorder ) => void;
+ 		/**
+-		 * An object defining CSS classnames for all the inner `BorderControl`
+-		 * popover content.
++		 * The position of the color popovers compared to the control wrapper.
++		 */
++		popoverPlacement?: string;
++		/**
++		 * The space between the popover and the control wrapper.
+ 		 */
+-		popoverClassNames?: PopoverClassNames;
++		popoverOffset?: number;
+ 		/**
+ 		 * An object representing the current border configuration.
+ 		 *
+@@ -106,10 +101,13 @@ export type SplitControlsProps = ColorProps & {
+ 	 */
+ 	onChange: ( value: Border | undefined, side: BorderSide ) => void;
+ 	/**
+-	 * An object defining CSS classnames for the split side `BorderControl`s'
+-	 * popover content.
++	 * The position of the color popovers compared to the control wrapper.
++	 */
++	popoverPlacement?: string;
++	/**
++	 * The space between the popover and the control wrapper.
+ 	 */
+-	popoverClassNames?: PopoverClassNames;
++	popoverOffset?: number;
+ 	/**
+ 	 * An object representing the current border configuration. It contains
+ 	 * properties for each side, with each side an object reflecting the border
+diff --git a/packages/components/src/border-control/border-control-dropdown/component.tsx b/packages/components/src/border-control/border-control-dropdown/component.tsx
+index 80940164afcd0d..6d8ee795497dc7 100644
+--- a/packages/components/src/border-control/border-control-dropdown/component.tsx
++++ b/packages/components/src/border-control/border-control-dropdown/component.tsx
+@@ -147,6 +147,7 @@ const BorderControlDropdown = (
+ 		resetButtonClassName,
+ 		showDropdownHeader,
+ 		enableStyle = true,
++		__unstablePopoverProps,
+ 		...otherProps
+ 	} = useBorderControlDropdown( props );
+ 
+@@ -240,7 +241,10 @@ const BorderControlDropdown = (
+ 		<Dropdown
+ 			renderToggle={ renderToggle }
+ 			renderContent={ renderContent }
+-			contentClassName={ popoverClassName }
++			popoverProps={ {
++				...__unstablePopoverProps,
++				className: popoverClassName,
++			} }
+ 			{ ...otherProps }
+ 			ref={ forwardedRef }
+ 		/>
+diff --git a/packages/components/src/border-control/border-control-dropdown/hook.ts b/packages/components/src/border-control/border-control-dropdown/hook.ts
+index 25d86521484683..aab058874ae964 100644
+--- a/packages/components/src/border-control/border-control-dropdown/hook.ts
++++ b/packages/components/src/border-control/border-control-dropdown/hook.ts
+@@ -20,7 +20,6 @@ export function useBorderControlDropdown(
+ 		border,
+ 		className,
+ 		colors,
+-		contentClassName,
+ 		onChange,
+ 		previousStyleSelection,
+ 		__next36pxDefaultSize,
+@@ -68,8 +67,8 @@ export function useBorderControlDropdown(
+ 	}, [ border, cx, __next36pxDefaultSize ] );
+ 
+ 	const popoverClassName = useMemo( () => {
+-		return cx( styles.borderControlPopover, contentClassName );
+-	}, [ cx, contentClassName ] );
++		return cx( styles.borderControlPopover );
++	}, [ cx ] );
+ 
+ 	const popoverControlsClassName = useMemo( () => {
+ 		return cx( styles.borderControlPopoverControls );
+diff --git a/packages/components/src/border-control/border-control/README.md b/packages/components/src/border-control/border-control/README.md
+index aa8b439d8326bb..a4d0f2017f2d65 100644
+--- a/packages/components/src/border-control/border-control/README.md
++++ b/packages/components/src/border-control/border-control/README.md
+@@ -113,13 +113,6 @@ _Note: the value may be `undefined` if a user clears all border properties._
+ 
+ - Required: Yes
+ 
+-### `popoverContentClassName`: `string`
+-
+-A custom CSS class name to be assigned to the `BorderControl`'s dropdown
+-popover content.
+-
+-- Required: No
+-
+ ### `shouldSanitizeBorder`: `boolean`
+ 
+ If opted into, sanitizing the border means that if no width or color have been
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 59e6743e9e5a1f..942e8b00104da3 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -43,7 +43,7 @@ const BorderControl = (
+ 		onSliderChange,
+ 		onWidthChange,
+ 		placeholder,
+-		popoverContentClassName,
++		__unstablePopoverProps,
+ 		previousStyleSelection,
+ 		showDropdownHeader,
+ 		sliderClassName,
+@@ -69,7 +69,7 @@ const BorderControl = (
+ 					<BorderControlDropdown
+ 						border={ border }
+ 						colors={ colors }
+-						contentClassName={ popoverContentClassName }
++						__unstablePopoverProps={ __unstablePopoverProps }
+ 						disableCustomColors={ disableCustomColors }
+ 						enableAlpha={ enableAlpha }
+ 						enableStyle={ enableStyle }
+diff --git a/packages/components/src/border-control/styles.ts b/packages/components/src/border-control/styles.ts
+index b50165512a819b..09a592fe2a6502 100644
+--- a/packages/components/src/border-control/styles.ts
++++ b/packages/components/src/border-control/styles.ts
+@@ -172,8 +172,9 @@ export const colorIndicatorWrapper = (
+ 
+ export const borderControlPopover = css`
+ 	/* Remove padding from content, this will be re-added via inner elements*/
+-	&& > div > div {
++	&& .components-popover__content {
+ 		padding: 0;
++		width: 264px;
+ 	}
+ `;
+ 
+diff --git a/packages/components/src/border-control/types.ts b/packages/components/src/border-control/types.ts
+index 049c278a5e71f2..0605b2e40fe413 100644
+--- a/packages/components/src/border-control/types.ts
++++ b/packages/components/src/border-control/types.ts
+@@ -81,10 +81,9 @@ export type BorderControlProps = ColorProps &
+ 		 */
+ 		onChange: ( value?: Border ) => void;
+ 		/**
+-		 * A custom CSS class name to be assigned to the border control's
+-		 * dropdown popover content.
++		 * An internal prop used to control the visibility of the dropdown.
+ 		 */
+-		popoverContentClassName?: string;
++		__unstablePopoverProps?: Record< string, unknown >;
+ 		/**
+ 		 * If opted into, sanitizing the border means that if no width or color
+ 		 * have been selected, the border style is also cleared and `undefined`
+@@ -131,10 +130,9 @@ export type DropdownProps = ColorProps & {
+ 	 */
+ 	border?: Border;
+ 	/**
+-	 * A custom CSS class name to be assigned to the border control's
+-	 * dropdown popover content.
++	 * An internal prop used to control the visibility of the dropdown.
+ 	 */
+-	contentClassName?: string;
++	__unstablePopoverProps?: Record< string, unknown >;
+ 	/**
+ 	 * This controls whether to render border style options.
+ 	 *
+diff --git a/packages/components/src/color-palette/index.js b/packages/components/src/color-palette/index.js
+index 9e2745fd575747..4c92fd35b1822a 100644
+--- a/packages/components/src/color-palette/index.js
++++ b/packages/components/src/color-palette/index.js
+@@ -6,7 +6,6 @@ import { map } from 'lodash';
+ import { colord, extend } from 'colord';
+ import namesPlugin from 'colord/plugins/names';
+ import a11yPlugin from 'colord/plugins/a11y';
+-import classnames from 'classnames';
+ 
+ /**
+  * WordPress dependencies
+@@ -116,12 +115,12 @@ function MultiplePalettes( {
+ export function CustomColorPickerDropdown( { isRenderedInSidebar, ...props } ) {
+ 	return (
+ 		<Dropdown
+-			contentClassName={ classnames(
+-				'components-color-palette__custom-color-dropdown-content',
+-				{
+-					'is-rendered-in-sidebar': isRenderedInSidebar,
+-				}
+-			) }
++			contentClassName="components-color-palette__custom-color-dropdown-content"
++			popoverProps={
++				isRenderedInSidebar
++					? { placement: 'left-start', offset: 20 }
++					: undefined
++			}
+ 			{ ...props }
+ 		/>
+ 	);
+@@ -176,11 +175,6 @@ export default function ColorPalette( {
+ 		/>
+ 	);
+ 
+-	let dropdownPosition;
+-	if ( __experimentalIsRenderedInSidebar ) {
+-		dropdownPosition = 'bottom left';
+-	}
+-
+ 	const colordColor = colord( value );
+ 
+ 	const valueWithoutLeadingHash = value?.startsWith( '#' )
+@@ -211,7 +205,6 @@ export default function ColorPalette( {
+ 		<VStack spacing={ 3 } className={ className }>
+ 			{ ! disableCustomColors && (
+ 				<CustomColorPickerDropdown
+-					position={ dropdownPosition }
+ 					isRenderedInSidebar={ __experimentalIsRenderedInSidebar }
+ 					renderContent={ renderCustomColorPicker }
+ 					renderToggle={ ( { isOpen, onToggle } ) => (
+diff --git a/packages/components/src/color-palette/style.scss b/packages/components/src/color-palette/style.scss
+index 3aab4914deee33..1abb50c6e35283 100644
+--- a/packages/components/src/color-palette/style.scss
++++ b/packages/components/src/color-palette/style.scss
+@@ -30,31 +30,16 @@
+ 	overflow: visible;
+ 	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.05);
+ 	border: none;
++	outline: none;
+ 	border-radius: $radius-block-ui;
+-	max-height: fit-content !important;
+-	& > div {
+-		padding: 0;
+-	}
++	padding: 0;
++
+ 	.react-colorful__saturation {
+ 		border-top-right-radius: $radius-block-ui;
+ 		border-top-left-radius: $radius-block-ui;
+ 	}
+ }
+ 
+-@include break-medium() {
+-	.components-dropdown__content.components-color-palette__custom-color-dropdown-content.is-rendered-in-sidebar {
+-		.components-popover__content.components-popover__content {
+-			margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 };
+-		}
+-		&.is-from-top .components-popover__content {
+-			margin-top: #{ -($grid-unit-60 + $grid-unit-15) };
+-		}
+-		&.is-from-bottom .components-popover__content {
+-			margin-bottom: #{ -($grid-unit-60 + $grid-unit-15) };
+-		}
+-	}
+-}
+-
+ .components-color-palette__custom-color-name {
+ 	text-align: left;
+ }
+diff --git a/packages/components/src/dropdown/index.js b/packages/components/src/dropdown/index.js
+index d9ebd10fab9ffc..ce080c1be0adb6 100644
+--- a/packages/components/src/dropdown/index.js
++++ b/packages/components/src/dropdown/index.js
+@@ -31,12 +31,12 @@ export default function Dropdown( props ) {
+ 	const {
+ 		renderContent,
+ 		renderToggle,
+-		position = 'bottom right',
+ 		className,
+ 		contentClassName,
+ 		expandOnMobile,
+ 		headerTitle,
+ 		focusOnMount,
++		position,
+ 		popoverProps,
+ 		onClose,
+ 		onToggle,
+@@ -82,6 +82,10 @@ export default function Dropdown( props ) {
+ 	}
+ 
+ 	const args = { isOpen, onToggle: toggle, onClose: close };
++	const hasAnchorRef =
++		!! popoverProps?.anchorRef ||
++		!! popoverProps?.getAnchorRect ||
++		!! popoverProps?.anchorRect;
+ 
+ 	return (
+ 		<div
+@@ -101,10 +105,11 @@ export default function Dropdown( props ) {
+ 					expandOnMobile={ expandOnMobile }
+ 					headerTitle={ headerTitle }
+ 					focusOnMount={ focusOnMount }
++					// This value is used to ensure that the dropdowns
++					// align with the editor header by default.
++					offset={ 13 }
++					anchorRef={ ! hasAnchorRef ? containerRef : undefined }
+ 					{ ...popoverProps }
+-					anchorRef={
+-						popoverProps?.anchorRef ?? containerRef.current
+-					}
+ 					className={ classnames(
+ 						'components-dropdown__content',
+ 						popoverProps ? popoverProps.className : undefined,
+diff --git a/packages/components/src/dropdown/style.scss b/packages/components/src/dropdown/style.scss
+index edb425b74a3526..f3b0570eca1d84 100644
+--- a/packages/components/src/dropdown/style.scss
++++ b/packages/components/src/dropdown/style.scss
+@@ -3,7 +3,7 @@
+ }
+ 
+ .components-dropdown__content {
+-	.components-popover__content > div {
++	.components-popover__content {
+ 		padding: $grid-unit-10;
+ 	}
+ 
+diff --git a/packages/components/src/flyout/context.js b/packages/components/src/flyout/context.js
+deleted file mode 100644
+index f1678c99e3efd5..00000000000000
+--- a/packages/components/src/flyout/context.js
++++ /dev/null
+@@ -1,10 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext, useContext } from '@wordpress/element';
+-
+-/**
+- * @type {import('react').Context<import('./types').Context>}
+- */
+-export const FlyoutContext = createContext( {} );
+-export const useFlyoutContext = () => useContext( FlyoutContext );
+diff --git a/packages/components/src/flyout/flyout-content/component.js b/packages/components/src/flyout/flyout-content/component.js
+deleted file mode 100644
+index e1f415e2dda1b7..00000000000000
+--- a/packages/components/src/flyout/flyout-content/component.js
++++ /dev/null
+@@ -1,53 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { useFlyoutContext } from '../context';
+-import { FlyoutContentView, CardView } from '../styles';
+-import { contextConnect, useContextSystem } from '../../ui/context';
+-
+-/**
+- *
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').ContentProps, 'div', false>} props
+- * @param {import('react').ForwardedRef<any>}                                                                 forwardedRef forwardedRef
+- */
+-function FlyoutContent( props, forwardedRef ) {
+-	const {
+-		children,
+-		elevation,
+-		maxWidth,
+-		style = {},
+-		...otherProps
+-	} = useContextSystem( props, 'FlyoutContent' );
+-
+-	const { label, flyoutState } = useFlyoutContext();
+-
+-	if ( ! flyoutState ) {
+-		throw new Error(
+-			'`FlyoutContent` must only be used inside a `Flyout`.'
+-		);
+-	}
+-
+-	const showContent = flyoutState.visible || flyoutState.animating;
+-
+-	return (
+-		<FlyoutContentView
+-			aria-label={ label }
+-			// maxWidth is applied via inline styles in order to avoid the `React does
+-			// not recognize the maxWidth prop on a DOM element` error that comes from
+-			// passing `maxWidth` as a prop to `FlyoutContentView`
+-			style={ { maxWidth, ...style } }
+-			{ ...otherProps }
+-			{ ...flyoutState }
+-		>
+-			{ showContent && (
+-				<CardView elevation={ elevation } ref={ forwardedRef }>
+-					{ children }
+-				</CardView>
+-			) }
+-		</FlyoutContentView>
+-	);
+-}
+-
+-const ConnectedFlyoutContent = contextConnect( FlyoutContent, 'FlyoutContent' );
+-
+-export default ConnectedFlyoutContent;
+diff --git a/packages/components/src/flyout/flyout-content/index.js b/packages/components/src/flyout/flyout-content/index.js
+deleted file mode 100644
+index b404d7fd44a81a..00000000000000
+--- a/packages/components/src/flyout/flyout-content/index.js
++++ /dev/null
+@@ -1 +0,0 @@
+-export { default } from './component';
+diff --git a/packages/components/src/flyout/flyout/README.md b/packages/components/src/flyout/flyout/README.md
+deleted file mode 100644
+index 49aa328bd6b1f9..00000000000000
+--- a/packages/components/src/flyout/flyout/README.md
++++ /dev/null
+@@ -1,98 +0,0 @@
+-# Flyout
+-
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+-`Flyout` is a component to render a floating content modal. It is similar in purpose to a tooltip, but renders content of any sort, not only simple text.
+-
+-## Usage
+-
+-```jsx
+-import { Button, __experimentalFlyout as Flyout, __experimentalText as Text } from '@wordpress/components';
+-
+-function Example() {
+-	return (
+-		<Flyout trigger={ <Button>Show/Hide content</Button> }>
+-			<Text>Code is Poetry</Text>
+-		</Flyout>
+-	);
+-}
+-```
+-
+-## Props
+-
+-### `state`: `PopoverStateReturn`
+-
+-- Required: No
+-
+-### `label`: `string`
+-
+-- Required: No
+-
+-### `animated`: `boolean`
+-
+-Determines if `Flyout` has animations.
+-
+-- Required: No
+-- Default: `true`
+-
+-### `animationDuration`: `boolean`
+-
+-The duration of `Flyout` animations.
+-
+-- Required: No
+-- Default: `160`
+-
+-### `baseId`: `string`
+-
+-ID that will serve as a base for all the items IDs. See https://reakit.io/docs/popover/#usepopoverstate
+-
+-- Required: No
+-- Default: `160`
+-
+-### `elevation`: `number`
+-
+-Size of the elevation shadow. For more information, check out [`Card`](/packages/components/src/card/card/README.md#props).
+-
+-- Required: No
+-- Default: `5`
+-
+-### `maxWidth`: `CSSProperties[ 'maxWidth' ]`
+-
+-Max-width for the `Flyout` element.
+-
+-- Required: No
+-- Default: `360`
+-
+-### `onVisibleChange`: `( ...args: any ) => void`
+-
+-Callback for when the `visible` state changes.
+-
+-- Required: No
+-
+-### `trigger`: `FunctionComponentElement< any >`
+-
+-Element that triggers the `visible` state of `Flyout` when clicked.
+-
+-```jsx
+-<Flyout trigger={<Button>Greet</Button>}>
+-	<Text>Hi! I'm Olaf!</Text>
+-</Flyout>
+-```
+-
+-- Required: Yes
+-
+-### `visible`: `boolean`
+-
+-Whether `Flyout` is visible. See [the `Reakit` docs](https://reakit.io/docs/popover/#usepopoverstate) for more information.
+-
+-- Required: No
+-- Default: `false`
+-
+-### `placement`: `PopperPlacement`
+-
+-Position of the popover element. See [the `popper` docs](https://popper.js.org/docs/v1/#popperplacements--codeenumcode) for more information.
+-
+-- Required: No
+-- Default: `auto`
+diff --git a/packages/components/src/flyout/flyout/component.js b/packages/components/src/flyout/flyout/component.js
+deleted file mode 100644
+index 1ad283d0ab1d67..00000000000000
+--- a/packages/components/src/flyout/flyout/component.js
++++ /dev/null
+@@ -1,111 +0,0 @@
+-/**
+- * External dependencies
+- */
+-// eslint-disable-next-line no-restricted-imports
+-import { PopoverDisclosure, Portal } from 'reakit';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useCallback, useMemo, cloneElement } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { contextConnect } from '../../ui/context';
+-import { FlyoutContext } from '../context';
+-import { useFlyoutResizeUpdater } from '../utils';
+-import FlyoutContent from '../flyout-content';
+-import { useUpdateEffect } from '../../utils/hooks';
+-import { useFlyout } from './hook';
+-
+-/**
+- *
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div', false>} props
+- * @param {import('react').ForwardedRef<any>}                                                          forwardedRef
+- */
+-function Flyout( props, forwardedRef ) {
+-	const {
+-		children,
+-		elevation,
+-		label,
+-		maxWidth,
+-		onVisibleChange,
+-		trigger,
+-		flyoutState,
+-		...otherProps
+-	} = useFlyout( props );
+-
+-	const resizeListener = useFlyoutResizeUpdater( {
+-		onResize: flyoutState.unstable_update,
+-	} );
+-
+-	const uniqueId = `flyout-${ flyoutState.baseId }`;
+-	const labelId = label || uniqueId;
+-
+-	const contextProps = useMemo(
+-		() => ( {
+-			label: labelId,
+-			flyoutState,
+-		} ),
+-		[ labelId, flyoutState ]
+-	);
+-
+-	const triggerContent = useCallback(
+-		( triggerProps ) => {
+-			return cloneElement( trigger, triggerProps );
+-		},
+-		[ trigger ]
+-	);
+-
+-	useUpdateEffect( () => {
+-		onVisibleChange?.( flyoutState.visible );
+-	}, [ flyoutState.visible ] );
+-
+-	return (
+-		<FlyoutContext.Provider value={ contextProps }>
+-			{ trigger && (
+-				<PopoverDisclosure
+-					{ ...flyoutState }
+-					ref={ trigger.ref }
+-					{ ...trigger.props }
+-				>
+-					{ triggerContent }
+-				</PopoverDisclosure>
+-			) }
+-			<Portal>
+-				<FlyoutContent
+-					ref={ forwardedRef }
+-					{ ...otherProps }
+-					elevation={ elevation }
+-					maxWidth={ maxWidth }
+-				>
+-					{ resizeListener }
+-					{ children }
+-				</FlyoutContent>
+-			</Portal>
+-		</FlyoutContext.Provider>
+-	);
+-}
+-
+-/**
+- * `Flyout` is a component to render a floating content modal.
+- * It is similar in purpose to a tooltip, but renders content of any sort,
+- * not only simple text.
+- *
+- * @example
+- * ```jsx
+- * import { Button, __experimentalFlyout as Flyout, __experimentalText as } from '@wordpress/components';
+- *
+- * function Example() {
+- * 	return (
+- * 		<Flyout trigger={ <Button>Show/Hide content</Button> }>
+- *			<Text>Code is Poetry</Text>
+- * 		</Flyout>
+- * 	);
+- * }
+- * ```
+- */
+-const ConnectedFlyout = contextConnect( Flyout, 'Flyout' );
+-
+-export default ConnectedFlyout;
+diff --git a/packages/components/src/flyout/flyout/hook.js b/packages/components/src/flyout/flyout/hook.js
+deleted file mode 100644
+index d917c1011f4b91..00000000000000
+--- a/packages/components/src/flyout/flyout/hook.js
++++ /dev/null
+@@ -1,45 +0,0 @@
+-/**
+- * External dependencies
+- */
+-// eslint-disable-next-line no-restricted-imports
+-import { usePopoverState } from 'reakit';
+-
+-/**
+- * Internal dependencies
+- */
+-import { useContextSystem } from '../../ui/context';
+-
+-/**
+- * @param {import('../../ui/context').WordPressComponentProps<import('../types').Props, 'div', false>} props
+- */
+-export function useFlyout( props ) {
+-	const {
+-		animated = true,
+-		animationDuration = 160,
+-		baseId,
+-		elevation = 5,
+-		id,
+-		maxWidth = 360,
+-		placement,
+-		state,
+-		visible,
+-		...otherProps
+-	} = useContextSystem( props, 'Flyout' );
+-
+-	const _flyoutState = usePopoverState( {
+-		animated: animated ? animationDuration : undefined,
+-		baseId: baseId || id,
+-		placement,
+-		visible,
+-		...otherProps,
+-	} );
+-
+-	const flyoutState = state || _flyoutState;
+-
+-	return {
+-		...otherProps,
+-		elevation,
+-		maxWidth,
+-		flyoutState,
+-	};
+-}
+diff --git a/packages/components/src/flyout/flyout/index.js b/packages/components/src/flyout/flyout/index.js
+deleted file mode 100644
+index ef5d7d27828f85..00000000000000
+--- a/packages/components/src/flyout/flyout/index.js
++++ /dev/null
+@@ -1,2 +0,0 @@
+-export { default } from './component';
+-export { useFlyout } from './hook';
+diff --git a/packages/components/src/flyout/index.js b/packages/components/src/flyout/index.js
+deleted file mode 100644
+index 28e34de445ba03..00000000000000
+--- a/packages/components/src/flyout/index.js
++++ /dev/null
+@@ -1 +0,0 @@
+-export { default as Flyout } from './flyout';
+diff --git a/packages/components/src/flyout/stories/index.js b/packages/components/src/flyout/stories/index.js
+deleted file mode 100644
+index df8f41b8f279ea..00000000000000
+--- a/packages/components/src/flyout/stories/index.js
++++ /dev/null
+@@ -1,24 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { CardBody, CardHeader } from '../../card';
+-import Button from '../../button';
+-import { Flyout } from '..';
+-
+-export default {
+-	component: Flyout,
+-	title: 'Components (Experimental)/Flyout',
+-};
+-
+-export const _default = () => {
+-	return (
+-		<Flyout
+-			trigger={ <Button>Click</Button> }
+-			visible
+-			placement="bottom-start"
+-		>
+-			<CardHeader>Go</CardHeader>
+-			<CardBody>Stuff</CardBody>
+-		</Flyout>
+-	);
+-};
+diff --git a/packages/components/src/flyout/styles.ts b/packages/components/src/flyout/styles.ts
+deleted file mode 100644
+index 3ac211d808ffd7..00000000000000
+--- a/packages/components/src/flyout/styles.ts
++++ /dev/null
+@@ -1,41 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import styled, { StyledComponent } from '@emotion/styled';
+-// eslint-disable-next-line no-restricted-imports
+-import { Popover as ReakitPopover } from 'reakit';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Card, CardBody } from '../card';
+-import * as ZIndex from '../utils/z-index';
+-import CONFIG from '../utils/config-values';
+-
+-export const FlyoutContentView: StyledComponent<
+-	React.ComponentPropsWithoutRef< typeof ReakitPopover >
+-> = styled( ReakitPopover )`
+-	z-index: ${ ZIndex.Flyout };
+-	box-sizing: border-box;
+-	opacity: 0;
+-	outline: none;
+-	position: relative;
+-	transform-origin: center center;
+-	transition: opacity ${ CONFIG.transitionDurationFastest } linear;
+-	width: 100%;
+-
+-	&[data-enter] {
+-		opacity: 1;
+-	}
+-
+-	&::before,
+-	&::after {
+-		display: none;
+-	}
+-`;
+-
+-export const CardView = styled( Card )`
+-	${ CardBody.selector } {
+-		max-height: 80vh;
+-	}
+-`;
+diff --git a/packages/components/src/flyout/test/__snapshots__/index.js.snap b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+deleted file mode 100644
+index 60c6d3fe10500f..00000000000000
+--- a/packages/components/src/flyout/test/__snapshots__/index.js.snap
++++ /dev/null
+@@ -1,183 +0,0 @@
+-// Jest Snapshot v1, https://goo.gl/fbAQLP
+-
+-exports[`props should render correctly 1`] = `
+-.emotion-1 {
+-  background-color: #fff;
+-  color: #1e1e1e;
+-  position: relative;
+-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+-  outline: none;
+-  border-radius: calc(2px - 1px);
+-}
+-
+-.emotion-1 .components-card-body {
+-  max-height: 80vh;
+-}
+-
+-.emotion-3 {
+-  height: 100%;
+-}
+-
+-.emotion-5 {
+-  box-sizing: border-box;
+-  height: auto;
+-  max-height: 100%;
+-  padding: calc(4px * 4) calc(4px * 6);
+-}
+-
+-.emotion-5:first-of-type {
+-  border-top-left-radius: calc(2px - 1px);
+-  border-top-right-radius: calc(2px - 1px);
+-}
+-
+-.emotion-5:last-of-type {
+-  border-bottom-left-radius: calc(2px - 1px);
+-  border-bottom-right-radius: calc(2px - 1px);
+-}
+-
+-.emotion-7 {
+-  background: transparent;
+-  display: block;
+-  margin: 0!important;
+-  pointer-events: none;
+-  position: absolute;
+-  will-change: box-shadow;
+-  border-radius: inherit;
+-  bottom: 0;
+-  box-shadow: 0 1px 2px 0 rgba(0 ,0, 0, 0.05);
+-  opacity: 1;
+-  left: 0;
+-  right: 0;
+-  top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  border-radius: 2px;
+-}
+-
+-@media ( prefers-reduced-motion: reduce ) {
+-  .emotion-7 {
+-    transition-duration: 0ms;
+-  }
+-}
+-
+-.emotion-9 {
+-  background: transparent;
+-  display: block;
+-  margin: 0!important;
+-  pointer-events: none;
+-  position: absolute;
+-  will-change: box-shadow;
+-  border-radius: inherit;
+-  bottom: 0;
+-  box-shadow: 0 5px 10px 0 rgba(0 ,0, 0, 0.25);
+-  opacity: 1;
+-  left: 0;
+-  right: 0;
+-  top: 0;
+-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+-  border-radius: 2px;
+-}
+-
+-@media ( prefers-reduced-motion: reduce ) {
+-  .emotion-9 {
+-    transition-duration: 0ms;
+-  }
+-}
+-
+-<div
+-  class="components-surface components-card emotion-0 emotion-1 emotion-2"
+-  data-wp-c16t="true"
+-  data-wp-component="Card"
+->
+-  <div
+-    class="emotion-3 emotion-2"
+-  >
+-    <div
+-      aria-hidden="true"
+-      style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
+-    />
+-    <div
+-      class="components-card__body components-card-body emotion-5 emotion-2"
+-      data-wp-c16t="true"
+-      data-wp-component="CardBody"
+-    >
+-      Code is Poetry
+-    </div>
+-  </div>
+-  <div
+-    aria-hidden="true"
+-    class="components-elevation emotion-7 emotion-2"
+-    data-wp-c16t="true"
+-    data-wp-component="Elevation"
+-  />
+-  <div
+-    aria-hidden="true"
+-    class="components-elevation emotion-9 emotion-2"
+-    data-wp-c16t="true"
+-    data-wp-component="Elevation"
+-  />
+-</div>
+-`;
+-
+-exports[`props should render label 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -1,12 +1,12 @@
+-  <div
+--   aria-label="show"
+-+   aria-label="flyout-base-flyout"
+-    class="components-flyout-content components-flyout css-1b8wigk-FlyoutContentView e1vtu5161"
+-    data-dialog="true"
+-    data-wp-c16t="true"
+-    data-wp-component="Flyout"
+--   id="labelled-flyout"
+-+   id="base-flyout"
+-    role="dialog"
+-    style="position: fixed; left: 100%; top: 100%; max-width: 360px;"
+-    tabindex="-1"
+-  >
+-    <div
+-`;
+-
+-exports[`props should render without content 1`] = `
+-Snapshot Diff:
+-- First value
+-+ Second value
+-
+-@@ -1,12 +1,12 @@
+-  <div
+--   aria-label="flyout-contentless-flyout"
+-+   aria-label="flyout-base-flyout"
+-    class="components-flyout-content components-flyout css-1b8wigk-FlyoutContentView e1vtu5161"
+-    data-dialog="true"
+-    data-wp-c16t="true"
+-    data-wp-component="Flyout"
+--   id="contentless-flyout"
+-+   id="base-flyout"
+-    role="dialog"
+-    style="position: fixed; left: 100%; top: 100%; max-width: 360px;"
+-    tabindex="-1"
+-  >
+-    <div
+-@@ -19,10 +19,17 @@
+-      >
+-        <div
+-          aria-hidden="true"
+-          style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
+-        />
+-+       <div
+-+         class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium em57xhy0"
+-+         data-wp-c16t="true"
+-+         data-wp-component="CardBody"
+-+       >
+-+         Code is Poetry
+-+       </div>
+-      </div>
+-      <div
+-        aria-hidden="true"
+-        class="components-elevation css-1b4rkmt-View-Elevation-sx-Base-elevationClassName em57xhy0"
+-        data-wp-c16t="true"
+-`;
+diff --git a/packages/components/src/flyout/test/index.js b/packages/components/src/flyout/test/index.js
+deleted file mode 100644
+index 8d46dbb9d19bd5..00000000000000
+--- a/packages/components/src/flyout/test/index.js
++++ /dev/null
+@@ -1,103 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render, screen } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import Button from '../../button';
+-import { CardBody } from '../../card';
+-import { Flyout } from '..';
+-
+-describe( 'props', () => {
+-	const baseFlyoutId = 'base-flyout';
+-	beforeEach( () => {
+-		render(
+-			<Flyout
+-				baseId={ baseFlyoutId }
+-				trigger={ <Button>WordPress.org</Button> }
+-				visible
+-			>
+-				<CardBody>Code is Poetry</CardBody>
+-			</Flyout>
+-		);
+-	} );
+-
+-	test( 'should render correctly', () => {
+-		const dialog = screen.getByRole( 'dialog' );
+-		expect( dialog.firstChild ).toMatchSnapshot();
+-	} );
+-
+-	test( 'should render invisible', () => {
+-		const invisibleFlyoutTriggerContent =
+-			'WordPress.org - invisible flyout';
+-		render(
+-			<Flyout
+-				baseId="flyout"
+-				trigger={ <Button>{ invisibleFlyoutTriggerContent }</Button> }
+-				visible={ false }
+-			>
+-				<CardBody>Code is Poetry</CardBody>
+-			</Flyout>
+-		);
+-
+-		const flyouts = screen.getAllByRole( 'dialog' );
+-		const trigger = screen.getByText( invisibleFlyoutTriggerContent );
+-		// Assert only the base flyout rendered.
+-		expect( flyouts ).toHaveLength( 1 );
+-		expect( flyouts[ 0 ].id ).toBe( baseFlyoutId );
+-		expect( trigger ).not.toBeUndefined();
+-	} );
+-
+-	test( 'should render without trigger', () => {
+-		const triggerlessFlyoutId = 'triggerless-flyout';
+-		render(
+-			<Flyout baseId={ triggerlessFlyoutId } visible>
+-				<CardBody>Code is Poetry</CardBody>
+-			</Flyout>
+-		);
+-		const flyouts = screen.getAllByRole( 'dialog' );
+-		const triggerlessFlyout = flyouts.find(
+-			( p ) => p.id === triggerlessFlyoutId
+-		);
+-		expect( triggerlessFlyout ).not.toBeUndefined();
+-	} );
+-
+-	test( 'should render without content', () => {
+-		const contentlessFlyoutId = 'contentless-flyout';
+-		render(
+-			<Flyout
+-				baseId={ contentlessFlyoutId }
+-				trigger={ <Button>WordPress.org</Button> }
+-				visible
+-			/>
+-		);
+-		const flyouts = screen.getAllByRole( 'dialog' );
+-		const contentlessFlyout = flyouts.find(
+-			( p ) => p.id === contentlessFlyoutId
+-		);
+-		const baseFlyout = flyouts.find( ( p ) => p.id === baseFlyoutId );
+-		expect( contentlessFlyout ).toMatchDiffSnapshot( baseFlyout );
+-	} );
+-
+-	test( 'should render label', () => {
+-		const labelledFlyoutId = 'labelled-flyout';
+-		render(
+-			<Flyout
+-				baseId={ labelledFlyoutId }
+-				label="show"
+-				trigger={ <Button>WordPress.org</Button> }
+-				visible
+-			>
+-				<CardBody>Code is Poetry</CardBody>
+-			</Flyout>
+-		);
+-		const flyouts = screen.getAllByRole( 'dialog' );
+-		const labelledFlyout = flyouts.find(
+-			( p ) => p.id === labelledFlyoutId
+-		);
+-		const baseFlyout = flyouts.find( ( p ) => p.id === baseFlyoutId );
+-		expect( labelledFlyout ).toMatchDiffSnapshot( baseFlyout );
+-	} );
+-} );
+diff --git a/packages/components/src/flyout/types.ts b/packages/components/src/flyout/types.ts
+deleted file mode 100644
+index 0a7a861e62580e..00000000000000
+--- a/packages/components/src/flyout/types.ts
++++ /dev/null
+@@ -1,84 +0,0 @@
+-/**
+- * External dependencies
+- */
+-// eslint-disable-next-line no-restricted-imports
+-import type { PopoverStateReturn } from 'reakit';
+-import type { CSSProperties, FunctionComponentElement } from 'react';
+-
+-/**
+- * Internal dependencies
+- */
+-import type { PopperProps } from '../utils/types';
+-
+-export type Context = {
+-	flyoutState?: PopoverStateReturn;
+-	label?: string;
+-};
+-
+-export type Props = PopperProps & {
+-	state?: PopoverStateReturn;
+-	label?: string;
+-	/**
+-	 * Determines if `Flyout` has animations.
+-	 *
+-	 * @default true
+-	 */
+-	animated?: boolean;
+-	/**
+-	 * The duration of `Flyout` animations.
+-	 *
+-	 * @default 160
+-	 */
+-	animationDuration?: boolean;
+-	/**
+-	 * ID that will serve as a base for all the items IDs.
+-	 *
+-	 * @see https://reakit.io/docs/popover/#usepopoverstate
+-	 */
+-	baseId?: string;
+-	/**
+-	 * Renders `Elevation` styles for the `Flyout`.
+-	 *
+-	 * @default 5
+-	 */
+-	elevation?: number;
+-	/**
+-	 * Max-width for the `Flyout` element.
+-	 *
+-	 * @default 360
+-	 */
+-	maxWidth?: CSSProperties[ 'maxWidth' ];
+-	/**
+-	 * Callback for when the `visible` state changes.
+-	 */
+-	onVisibleChange?: ( ...args: any ) => void;
+-	/**
+-	 * Element that triggers the `visible` state of `Flyout` when clicked.
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * <Flyout trigger={<Button>Greet</Button>}>
+-	 *  <Text>Hi! I'm Olaf!</Text>
+-	 * </Flyout>
+-	 * ```
+-	 */
+-	trigger: FunctionComponentElement< any >;
+-	/**
+-	 * Whether `Flyout` is visible.
+-	 *
+-	 * @default false
+-	 *
+-	 * @see https://reakit.io/docs/popover/#usepopoverstate
+-	 */
+-	visible?: boolean;
+-	/**
+-	 * The children elements.
+-	 */
+-	children: React.ReactNode;
+-};
+-
+-export type ContentProps = {
+-	elevation: number;
+-	maxWidth: CSSProperties[ 'maxWidth' ];
+-	children: React.ReactNode;
+-};
+diff --git a/packages/components/src/flyout/utils.js b/packages/components/src/flyout/utils.js
+deleted file mode 100644
+index 7258e8d72d8dc4..00000000000000
+--- a/packages/components/src/flyout/utils.js
++++ /dev/null
+@@ -1,21 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import {
+-	useIsomorphicLayoutEffect,
+-	useResizeObserver,
+-} from '@wordpress/compose';
+-
+-/**
+- *
+- * @param { { onResize?: () => any } } onResize
+- */
+-export function useFlyoutResizeUpdater( { onResize } ) {
+-	const [ resizeListener, sizes ] = useResizeObserver();
+-
+-	useIsomorphicLayoutEffect( () => {
+-		onResize?.();
+-	}, [ sizes.width, sizes.height ] );
+-
+-	return resizeListener;
+-}
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 6b90c5a1142e31..0c142746ab2af5 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -71,7 +71,6 @@ export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
+ export { Elevation as __experimentalElevation } from './elevation';
+ export { default as ExternalLink } from './external-link';
+ export { Flex, FlexBlock, FlexItem } from './flex';
+-export { Flyout as __experimentalFlyout } from './flyout';
+ export { default as FocalPointPicker } from './focal-point-picker';
+ export { default as FocusableIframe } from './focusable-iframe';
+ export { default as FontSizePicker } from './font-size-picker';
+diff --git a/packages/components/src/navigator/stories/index.js b/packages/components/src/navigator/stories/index.js
+index bb6cb6bab671bc..e8078ba74b32e5 100644
+--- a/packages/components/src/navigator/stories/index.js
++++ b/packages/components/src/navigator/stories/index.js
+@@ -9,7 +9,7 @@ import { css } from '@emotion/react';
+ import Button from '../../button';
+ import { Card, CardBody, CardFooter, CardHeader } from '../../card';
+ import { HStack } from '../../h-stack';
+-import { Flyout } from '../../flyout';
++import { Popover } from '../../popover';
+ import { useCx } from '../../utils/hooks/use-cx';
+ import {
+ 	NavigatorProvider,
+@@ -54,17 +54,13 @@ const MyNavigation = () => {
+ 								Navigate to screen with sticky content.
+ 							</NavigatorButton>
+ 
+-							<Flyout
+-								trigger={
+-									<Button variant="primary">
+-										Open test dialog
+-									</Button>
+-								}
+-								placement="bottom-start"
+-							>
+-								<CardHeader>Go</CardHeader>
+-								<CardBody>Stuff</CardBody>
+-							</Flyout>
++							<Button variant="primary">
++								Open test dialog
++								<Popover>
++									<CardHeader>Go</CardHeader>
++									<CardBody>Stuff</CardBody>
++								</Popover>
++							</Button>
+ 						</HStack>
+ 					</CardBody>
+ 				</Card>
+diff --git a/packages/components/src/palette-edit/index.js b/packages/components/src/palette-edit/index.js
+index b198fc3fb404b1..25411ba93adb5e 100644
+--- a/packages/components/src/palette-edit/index.js
++++ b/packages/components/src/palette-edit/index.js
+@@ -156,7 +156,8 @@ function Option( {
+ 			</HStack>
+ 			{ isEditing && (
+ 				<Popover
+-					position="bottom left"
++					placement="left-start"
++					offset={ 20 }
+ 					className="components-palette-edit__popover"
+ 				>
+ 					{ ! isGradient && (
+diff --git a/packages/components/src/palette-edit/style.scss b/packages/components/src/palette-edit/style.scss
+index ef78dd30fe9252..d23c88c9e182fe 100644
+--- a/packages/components/src/palette-edit/style.scss
++++ b/packages/components/src/palette-edit/style.scss
+@@ -1,10 +1,3 @@
+-@include break-medium() {
+-	.components-palette-edit__popover.components-popover .components-popover__content.components-popover__content.components-popover__content {
+-		margin-right: #{ math.div($sidebar-width, 2) + $grid-unit-20 };
+-		margin-top: #{ -($grid-unit-60 + $border-width) };
+-	}
+-}
+-
+ .components-palette-edit__popover {
+ 	.components-custom-gradient-picker__gradient-bar {
+ 		margin-top: 0;
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index f39e5f79e4e3b7..3e8a5e2cf28550 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -59,13 +59,17 @@ Set this prop to `false` to disable focus changing entirely. This should only be
+ -   Required: No
+ -   Default: `"firstElement"`
+ 
+-### position
++### placement
+ 
+-The direction in which the popover should open relative to its parent node. Specify y- and x-axis as a space-separated string. Supports `"top"`, `"middle"`, `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
++The direction in which the popover should open relative to its parent node or anchor node. 
++
++The available base placements are 'top', 'right', 'bottom', 'left'.
++
++Each of these base placements has an alignment in the form -start and -end. For example, 'right-start', or 'bottom-end'. These allow you to align the tooltip to the edges of the button, rather than centering it.
+ 
+ -   Type: `String`
+ -   Required: No
+--   Default: `"bottom right"`
++-   Default: `"bottom-start"`
+ 
+ ### children
+ 
+@@ -137,9 +141,3 @@ If you need the `DOMRect` object i.e., the position of popover to be calculated
+ 
+ -   Type: `Function`
+ -   Required: No
+-
+-## Methods
+-
+-### refresh
+-
+-Calling `refresh()` will force the Popover to recalculate its size and position. This is useful when a DOM change causes the anchor node to change position.
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 042d3a4a20bfa3..b24013bc7c45ee 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -3,31 +3,39 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
++import {
++	useFloating,
++	flip,
++	shift,
++	autoUpdate,
++	arrow,
++	offset as offsetMiddleware,
++	limitShift,
++	size,
++} from '@floating-ui/react-dom';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import {
+ 	useRef,
+-	useState,
+ 	useLayoutEffect,
+ 	forwardRef,
+ 	createContext,
+ 	useContext,
++	useMemo,
+ } from '@wordpress/element';
+-import { getRectangleFromRange } from '@wordpress/dom';
+ import {
+ 	useViewportMatch,
+-	useResizeObserver,
+ 	useMergeRefs,
+ 	__experimentalUseDialog as useDialog,
+ } from '@wordpress/compose';
+ import { close } from '@wordpress/icons';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { computePopoverPosition, offsetIframe } from './utils';
+ import Button from '../button';
+ import ScrollLock from '../scroll-lock';
+ import { Slot, Fill, useSlot } from '../slot-fill';
+@@ -42,405 +50,156 @@ const SLOT_NAME = 'Popover';
+ 
+ const slotNameContext = createContext();
+ 
+-function computeAnchorRect(
+-	anchorRefFallback,
+-	anchorRect,
+-	getAnchorRect,
+-	anchorRef = false,
+-	container
+-) {
+-	if ( anchorRect ) {
+-		return anchorRect;
+-	}
+-
+-	if ( getAnchorRect ) {
+-		if ( ! anchorRefFallback.current ) {
+-			return;
+-		}
+-
+-		const rect = getAnchorRect( anchorRefFallback.current );
+-		return offsetIframe(
+-			rect,
+-			rect.ownerDocument || anchorRefFallback.current.ownerDocument,
+-			container
+-		);
+-	}
++const positionToPlacement = ( position ) => {
++	const [ x, y, z ] = position.split( ' ' );
+ 
+-	if ( anchorRef !== false ) {
+-		if (
+-			! anchorRef ||
+-			! window.Range ||
+-			! window.Element ||
+-			! window.DOMRect
+-		) {
+-			return;
++	if ( [ 'top', 'bottom' ].includes( x ) ) {
++		let suffix = '';
++		if ( ( !! z && z === 'left' ) || y === 'right' ) {
++			suffix = '-start';
++		} else if ( ( !! z && z === 'right' ) || y === 'left' ) {
++			suffix = '-end';
+ 		}
+-
+-		// Duck-type to check if `anchorRef` is an instance of Range
+-		// `anchorRef instanceof window.Range` checks will break across document boundaries
+-		// such as in an iframe.
+-		if ( typeof anchorRef?.cloneRange === 'function' ) {
+-			return offsetIframe(
+-				getRectangleFromRange( anchorRef ),
+-				anchorRef.endContainer.ownerDocument,
+-				container
+-			);
+-		}
+-
+-		// Duck-type to check if `anchorRef` is an instance of Element
+-		// `anchorRef instanceof window.Element` checks will break across document boundaries
+-		// such as in an iframe.
+-		if ( typeof anchorRef?.getBoundingClientRect === 'function' ) {
+-			const rect = offsetIframe(
+-				anchorRef.getBoundingClientRect(),
+-				anchorRef.ownerDocument,
+-				container
+-			);
+-
+-			return rect;
+-		}
+-
+-		const { top, bottom } = anchorRef;
+-		const topRect = top.getBoundingClientRect();
+-		const bottomRect = bottom.getBoundingClientRect();
+-
+-		return offsetIframe(
+-			new window.DOMRect(
+-				topRect.left,
+-				topRect.top,
+-				topRect.width,
+-				bottomRect.bottom - topRect.top
+-			),
+-			top.ownerDocument,
+-			container
+-		);
+-	}
+-
+-	if ( ! anchorRefFallback.current ) {
+-		return;
++		return x + suffix;
+ 	}
+ 
+-	const { parentNode } = anchorRefFallback.current;
+-
+-	return offsetIframe(
+-		parentNode.getBoundingClientRect(),
+-		parentNode.ownerDocument,
+-		container
+-	);
+-}
++	return y;
++};
+ 
+-/**
+- * Sets or removes an element attribute.
+- *
+- * @param {Element} element The element to modify.
+- * @param {string}  name    The attribute name to set or remove.
+- * @param {?string} value   The value to set. A falsy value will remove the
+- *                          attribute.
+- */
+-function setAttribute( element, name, value ) {
+-	if ( ! value ) {
+-		if ( element.hasAttribute( name ) ) {
+-			element.removeAttribute( name );
++const placementToAnimationOrigin = ( placement ) => {
++	const [ a, b ] = placement.split( '-' );
++
++	let x, y;
++	if ( a === 'top' || a === 'bottom' ) {
++		x = a === 'top' ? 'bottom' : 'top';
++		y = 'middle';
++		if ( b === 'start' ) {
++			y = 'left';
++		} else if ( b === 'end' ) {
++			y = 'right';
+ 		}
+-	} else if ( element.getAttribute( name ) !== value ) {
+-		element.setAttribute( name, value );
+ 	}
+-}
+-
+-/**
+- * Sets or removes an element style property.
+- *
+- * @param {Element} element  The element to modify.
+- * @param {string}  property The property to set or remove.
+- * @param {?string} value    The value to set. A falsy value will remove the
+- *                           property.
+- */
+-function setStyle( element, property, value = '' ) {
+-	if ( element.style[ property ] !== value ) {
+-		element.style[ property ] = value;
+-	}
+-}
+ 
+-/**
+- * Sets or removes an element class.
+- *
+- * @param {Element} element The element to modify.
+- * @param {string}  name    The class to set or remove.
+- * @param {boolean} toggle  True to set the class, false to remove.
+- */
+-function setClass( element, name, toggle ) {
+-	if ( toggle ) {
+-		if ( ! element.classList.contains( name ) ) {
+-			element.classList.add( name );
++	if ( a === 'left' || a === 'right' ) {
++		x = 'center';
++		y = a === 'left' ? 'right' : 'left';
++		if ( b === 'start' ) {
++			x = 'top';
++		} else if ( b === 'end' ) {
++			x = 'bottom';
+ 		}
+-	} else if ( element.classList.contains( name ) ) {
+-		element.classList.remove( name );
+-	}
+-}
+-
+-function getAnchorDocument( anchor ) {
+-	if ( ! anchor ) {
+-		return;
+-	}
+-
+-	if ( anchor.endContainer ) {
+-		return anchor.endContainer.ownerDocument;
+ 	}
+ 
+-	if ( anchor.top ) {
+-		return anchor.top.ownerDocument;
+-	}
+-
+-	return anchor.ownerDocument;
+-}
++	return x + ' ' + y;
++};
+ 
+ const Popover = (
+ 	{
++		range,
++		animate = true,
+ 		headerTitle,
+ 		onClose,
+ 		children,
+ 		className,
+ 		noArrow = true,
+ 		isAlternate,
+-		// Disable reason: We generate the `...contentProps` rest as remainder
+-		// of props which aren't explicitly handled by this component.
+-		/* eslint-disable no-unused-vars */
+-		position = 'bottom right',
+-		range,
++		position,
++		placement = 'bottom-start',
++		offset,
+ 		focusOnMount = 'firstElement',
+ 		anchorRef,
+ 		anchorRect,
+ 		getAnchorRect,
+ 		expandOnMobile,
+-		animate = true,
+ 		onFocusOutside,
+-		__unstableStickyBoundaryElement,
+ 		__unstableSlotName = SLOT_NAME,
+ 		__unstableObserveElement,
+-		__unstableBoundaryParent,
+ 		__unstableForcePosition,
+-		__unstableForceXAlignment,
+-		__unstableEditorCanvasWrapper,
+-		/* eslint-enable no-unused-vars */
+ 		...contentProps
+ 	},
+ 	ref
+ ) => {
+-	const anchorRefFallback = useRef( null );
+-	const contentRef = useRef( null );
+-	const containerRef = useRef();
++	if ( range ) {
++		deprecated( 'range prop in Popover component', {
++			since: '6.1',
++			version: '6.3',
++		} );
++	}
++
++	const arrowRef = useRef( null );
+ 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+-	const [ animateOrigin, setAnimateOrigin ] = useState();
+-	const slotName = useContext( slotNameContext ) || __unstableSlotName;
+-	const slot = useSlot( slotName );
+ 	const isExpanded = expandOnMobile && isMobileViewport;
+-	const [ containerResizeListener, contentSize ] = useResizeObserver();
+-	noArrow = isExpanded || noArrow;
+-
+-	useLayoutEffect( () => {
+-		if ( isExpanded ) {
+-			setClass( containerRef.current, 'is-without-arrow', noArrow );
+-			setClass( containerRef.current, 'is-alternate', isAlternate );
+-			setAttribute( containerRef.current, 'data-x-axis' );
+-			setAttribute( containerRef.current, 'data-y-axis' );
+-			setStyle( containerRef.current, 'top' );
+-			setStyle( containerRef.current, 'left' );
+-			setStyle( contentRef.current, 'maxHeight' );
+-			setStyle( contentRef.current, 'maxWidth' );
+-			return;
++	const hasArrow = ! isExpanded && ! noArrow;
++	const usedPlacement = position
++		? positionToPlacement( position )
++		: placement;
++
++	/**
++	 * Offsets the the position of the popover when the anchor is inside an iframe.
++	 */
++	const frameOffset = useMemo( () => {
++		let ownerDocument = document;
++		if ( anchorRef?.top ) {
++			ownerDocument = anchorRef?.top.ownerDocument;
++		} else if ( anchorRef?.startContainer ) {
++			ownerDocument = anchorRef.startContainer.ownerDocument;
++		} else if ( anchorRef?.current ) {
++			ownerDocument = anchorRef.current.ownerDocument;
++		} else if ( anchorRef ) {
++			// This one should be deprecated.
++			ownerDocument = anchorRef.ownerDocument;
++		} else if ( anchorRect && anchorRect?.ownerDocument ) {
++			ownerDocument = anchorRect.ownerDocument;
++		} else if ( getAnchorRect ) {
++			ownerDocument = getAnchorRect()?.ownerDocument ?? document;
+ 		}
+ 
+-		const refresh = () => {
+-			if ( ! containerRef.current || ! contentRef.current ) {
+-				return;
+-			}
+-
+-			let anchor = computeAnchorRect(
+-				anchorRefFallback,
+-				anchorRect,
+-				getAnchorRect,
+-				anchorRef,
+-				containerRef.current
+-			);
+-
+-			if ( ! anchor ) {
+-				return;
+-			}
+-
+-			const { offsetParent, ownerDocument } = containerRef.current;
+-
+-			let relativeOffsetTop = 0;
+-
+-			// If there is a positioned ancestor element that is not the body,
+-			// subtract the position from the anchor rect. If the position of
+-			// the popover is fixed, the offset parent is null or the body
+-			// element, in which case the position is relative to the viewport.
+-			// See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent
+-			if ( offsetParent && offsetParent !== ownerDocument.body ) {
+-				const offsetParentRect = offsetParent.getBoundingClientRect();
+-
+-				relativeOffsetTop = offsetParentRect.top;
+-				anchor = new window.DOMRect(
+-					anchor.left - offsetParentRect.left,
+-					anchor.top - offsetParentRect.top,
+-					anchor.width,
+-					anchor.height
+-				);
+-			}
+-
+-			let boundaryElement;
+-			if ( __unstableBoundaryParent ) {
+-				boundaryElement = containerRef.current.parentElement;
+-			}
+-
+-			const usedContentSize = ! contentSize.height
+-				? contentRef.current.getBoundingClientRect()
+-				: contentSize;
+-
+-			const {
+-				popoverTop,
+-				popoverLeft,
+-				xAxis,
+-				yAxis,
+-				contentHeight,
+-				contentWidth,
+-			} = computePopoverPosition(
+-				anchor,
+-				usedContentSize,
+-				position,
+-				__unstableStickyBoundaryElement,
+-				containerRef.current,
+-				relativeOffsetTop,
+-				boundaryElement,
+-				__unstableForcePosition,
+-				__unstableForceXAlignment,
+-				__unstableEditorCanvasWrapper
+-			);
+-
+-			if (
+-				typeof popoverTop === 'number' &&
+-				typeof popoverLeft === 'number'
+-			) {
+-				setStyle( containerRef.current, 'top', popoverTop + 'px' );
+-				setStyle( containerRef.current, 'left', popoverLeft + 'px' );
+-			}
+-
+-			setClass(
+-				containerRef.current,
+-				'is-without-arrow',
+-				noArrow || ( xAxis === 'center' && yAxis === 'middle' )
+-			);
+-			setClass( containerRef.current, 'is-alternate', isAlternate );
+-			setAttribute( containerRef.current, 'data-x-axis', xAxis );
+-			setAttribute( containerRef.current, 'data-y-axis', yAxis );
+-			setStyle(
+-				contentRef.current,
+-				'maxHeight',
+-				typeof contentHeight === 'number' ? contentHeight + 'px' : ''
+-			);
+-			setStyle(
+-				contentRef.current,
+-				'maxWidth',
+-				typeof contentWidth === 'number' ? contentWidth + 'px' : ''
+-			);
+-
+-			// Compute the animation position.
+-			const yAxisMapping = {
+-				top: 'bottom',
+-				bottom: 'top',
+-			};
+-			const xAxisMapping = {
+-				left: 'right',
+-				right: 'left',
+-			};
+-			const animateYAxis = yAxisMapping[ yAxis ] || 'middle';
+-			const animateXAxis = xAxisMapping[ xAxis ] || 'center';
+-
+-			setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
+-		};
+-
+-		refresh();
+-
+-		const { ownerDocument } = containerRef.current;
+ 		const { defaultView } = ownerDocument;
++		const { frameElement } = defaultView;
+ 
+-		/*
+-		 * There are sometimes we need to reposition or resize the popover that
+-		 * are not handled by the resize/scroll window events (i.e. CSS changes
+-		 * in the layout that changes the position of the anchor).
+-		 *
+-		 * For these situations, we refresh the popover every 0.5s
+-		 */
+-		const intervalHandle = defaultView.setInterval( refresh, 500 );
+-
+-		let rafId;
+-
+-		const refreshOnAnimationFrame = () => {
+-			defaultView.cancelAnimationFrame( rafId );
+-			rafId = defaultView.requestAnimationFrame( refresh );
+-		};
+-
+-		// Sometimes a click trigger a layout change that affects the popover
+-		// position. This is an opportunity to immediately refresh rather than
+-		// at the interval.
+-		defaultView.addEventListener( 'click', refreshOnAnimationFrame );
+-		defaultView.addEventListener( 'resize', refresh );
+-		defaultView.addEventListener( 'scroll', refresh, true );
+-
+-		const anchorDocument = getAnchorDocument( anchorRef );
+-
+-		// If the anchor is within an iframe, the popover position also needs
+-		// to refrest when the iframe content is scrolled or resized.
+-		if ( anchorDocument && anchorDocument !== ownerDocument ) {
+-			anchorDocument.defaultView.addEventListener( 'resize', refresh );
+-			anchorDocument.defaultView.addEventListener(
+-				'scroll',
+-				refresh,
+-				true
+-			);
++		if ( ! frameElement || ownerDocument === document ) {
++			return undefined;
+ 		}
+ 
+-		let observer;
+-
+-		if ( __unstableObserveElement ) {
+-			observer = new defaultView.MutationObserver( refresh );
+-			observer.observe( __unstableObserveElement, { attributes: true } );
+-		}
+-
+-		return () => {
+-			defaultView.clearInterval( intervalHandle );
+-			defaultView.removeEventListener( 'resize', refresh );
+-			defaultView.removeEventListener( 'scroll', refresh, true );
+-			defaultView.removeEventListener( 'click', refreshOnAnimationFrame );
+-			defaultView.cancelAnimationFrame( rafId );
+-
+-			if ( anchorDocument && anchorDocument !== ownerDocument ) {
+-				anchorDocument.defaultView?.removeEventListener(
+-					'resize',
+-					refresh
+-				);
+-				anchorDocument.defaultView?.removeEventListener(
+-					'scroll',
+-					refresh,
+-					true
+-				);
+-			}
+-
+-			if ( observer ) {
+-				observer.disconnect();
+-			}
++		const iframeRect = frameElement.getBoundingClientRect();
++		return {
++			name: 'iframeOffset',
++			fn( { x, y } ) {
++				return {
++					x: x + iframeRect.left,
++					y: y + iframeRect.top,
++				};
++			},
+ 		};
+-	}, [
+-		isExpanded,
+-		anchorRect,
+-		getAnchorRect,
+-		anchorRef,
+-		position,
+-		contentSize,
+-		__unstableStickyBoundaryElement,
+-		__unstableObserveElement,
+-		__unstableBoundaryParent,
+-	] );
++	}, [ anchorRef, anchorRect, getAnchorRect ] );
++
++	const middlewares = [
++		frameOffset,
++		offset ? offsetMiddleware( offset ) : undefined,
++		__unstableForcePosition ? undefined : flip(),
++		__unstableForcePosition
++			? undefined
++			: size( {
++					apply( { width, height } ) {
++						if ( ! refs.floating.current ) return;
++
++						Object.assign( refs.floating.current.firstChild.style, {
++							maxWidth: `${ width }px`,
++							maxHeight: `${ height }px`,
++							overflow: 'auto',
++						} );
++					},
++			  } ),
++		,
++		shift( {
++			crossAxis: true,
++			limiter: limitShift(),
++		} ),
++		hasArrow ? arrow( { element: arrowRef } ) : undefined,
++	].filter( ( m ) => !! m );
++	const anchorRefFallback = useRef( null );
++	const slotName = useContext( slotNameContext ) || __unstableSlotName;
++	const slot = useSlot( slotName );
+ 
+ 	const onDialogClose = ( type, event ) => {
+ 		// Ideally the popover should have just a single onClose prop and
+@@ -458,14 +217,104 @@ const Popover = (
+ 		onClose: onDialogClose,
+ 	} );
+ 
+-	const mergedRefs = useMergeRefs( [ containerRef, dialogRef, ref ] );
++	const {
++		x,
++		y,
++		reference,
++		floating,
++		strategy,
++		refs,
++		update,
++		placement: placementData,
++		middlewareData: { arrow: arrowData = {} },
++	} = useFloating( {
++		placement: usedPlacement,
++		middleware: middlewares,
++	} );
++	const staticSide = {
++		top: 'bottom',
++		right: 'left',
++		bottom: 'top',
++		left: 'right',
++	}[ placementData.split( '-' )[ 0 ] ];
++	const mergedRefs = useMergeRefs( [ floating, dialogRef, ref ] );
++
++	// Updates references
++	useLayoutEffect( () => {
++		// No ref or position have been passed
++		let usedRef;
++		if ( anchorRef?.top ) {
++			usedRef = {
++				getBoundingClientRect() {
++					const topRect = anchorRef.top.getBoundingClientRect();
++					const bottomRect = anchorRef.bottom.getBoundingClientRect();
++					return new window.DOMRect(
++						topRect.x,
++						topRect.y,
++						topRect.width,
++						bottomRect.bottom - topRect.top
++					);
++				},
++			};
++		} else if ( anchorRef?.current ) {
++			usedRef = anchorRef.current;
++		} else if ( anchorRef ) {
++			usedRef = anchorRef;
++		} else if ( anchorRect ) {
++			usedRef = {
++				getBoundingClientRect() {
++					return anchorRect;
++				},
++			};
++		} else if ( getAnchorRect ) {
++			usedRef = {
++				getBoundingClientRect() {
++					const rect = getAnchorRect();
++					return {
++						...rect,
++						x: rect.x ?? rect.left,
++						y: rect.y ?? rect.top,
++						height: rect.height ?? rect.bottom - rect.top,
++						width: rect.width ?? rect.right - rect.left,
++					};
++				},
++			};
++		} else if ( anchorRefFallback.current ) {
++			usedRef = anchorRefFallback.current;
++		}
++
++		if ( ! usedRef ) {
++			return;
++		}
++
++		reference( usedRef );
++
++		if ( ! refs.floating.current ) {
++			return;
++		}
++
++		return autoUpdate( usedRef, refs.floating.current, update );
++	}, [ anchorRef, anchorRect, getAnchorRect ] );
++
++	// This is only needed for a smoth transition when moving blocks.
++	useLayoutEffect( () => {
++		if ( ! __unstableObserveElement ) {
++			return;
++		}
++		const observer = new window.MutationObserver( update );
++		observer.observe( __unstableObserveElement, { attributes: true } );
++
++		return () => {
++			observer.disconnect();
++		};
++	}, [ __unstableObserveElement ] );
+ 
+ 	/** @type {false | string} */
+ 	const animateClassName =
+-		Boolean( animate && animateOrigin ) &&
++		!! animate &&
+ 		getAnimateClassName( {
+ 			type: 'appear',
+-			origin: animateOrigin,
++			origin: placementToAnimationOrigin( placementData ),
+ 		} );
+ 
+ 	// Disable reason: We care to capture the _bubbled_ events from inputs
+@@ -481,7 +330,6 @@ const Popover = (
+ 				animateClassName,
+ 				{
+ 					'is-expanded': isExpanded,
+-					'is-without-arrow': noArrow,
+ 					'is-alternate': isAlternate,
+ 				}
+ 			) }
+@@ -489,6 +337,15 @@ const Popover = (
+ 			ref={ mergedRefs }
+ 			{ ...dialogProps }
+ 			tabIndex="-1"
++			style={
++				isExpanded
++					? undefined
++					: {
++							position: strategy,
++							left: Number.isNaN( x ) ? 0 : x,
++							top: Number.isNaN( y ) ? 0 : y,
++					  }
++			}
+ 		>
+ 			{ isExpanded && <ScrollLock /> }
+ 			{ isExpanded && (
+@@ -503,12 +360,26 @@ const Popover = (
+ 					/>
+ 				</div>
+ 			) }
+-			<div ref={ contentRef } className="components-popover__content">
+-				<div style={ { position: 'relative' } }>
+-					{ containerResizeListener }
+-					{ children }
+-				</div>
+-			</div>
++			<div className="components-popover__content">{ children }</div>
++			{ hasArrow && (
++				<div
++					className="components-popover__arrow"
++					ref={ arrowRef }
++					style={ {
++						left:
++							! arrowData?.x || Number.isNaN( arrowData?.x )
++								? 0
++								: arrowData.x,
++						top:
++							! arrowData?.y || Number.isNaN( arrowData?.y )
++								? 0
++								: arrowData.y,
++						right: undefined,
++						bottom: undefined,
++						[ staticSide ]: '-4px',
++					} }
++				/>
++			) }
+ 		</div>
+ 	);
+ 
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index 44446118161c6e..11697fedc2e6ad 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -1,222 +1,41 @@
+-$arrow-size: 8px;
+-
+-/*!rtl:begin:ignore*/
+ .components-popover {
+-	position: fixed;
+ 	z-index: z-index(".components-popover");
+-	top: 0;
+-	left: 0;
+-
+-	// Hide the popover element until the position has been calculated. The position
+-	// cannot be calculated until the popover element is rendered because the
+-	// position depends on the size of the popover.
+-	opacity: 0;
+-
+-	&.is-expanded,
+-	&[data-x-axis][data-y-axis] {
+-		opacity: 1;
+-	}
+ 
+ 	&.is-expanded {
++		position: fixed;
+ 		top: 0;
+ 		left: 0;
+ 		right: 0;
+ 		bottom: 0;
+ 		z-index: z-index(".components-popover") !important;
+ 	}
+-
+-	&:not(.is-without-arrow) {
+-		margin-left: 2px;
+-
+-		&::before {
+-			border: $arrow-size solid $gray-400;
+-		}
+-
+-		&.is-alternate::before {
+-			border-color: $gray-900;
+-		}
+-
+-		&::after {
+-			border: $arrow-size solid $white;
+-		}
+-
+-		&::before,
+-		&::after {
+-			content: "";
+-			position: absolute;
+-			height: 0;
+-			width: 0;
+-			line-height: 0;
+-		}
+-
+-		&[data-y-axis="top"] {
+-			margin-top: - $arrow-size;
+-
+-			&::before {
+-				bottom: - $arrow-size;
+-			}
+-
+-			&::after {
+-				bottom: -6px;
+-			}
+-
+-			&::before,
+-			&::after {
+-				border-bottom: none;
+-				border-left-color: transparent;
+-				border-right-color: transparent;
+-				border-top-style: solid;
+-				margin-left: -10px;
+-			}
+-		}
+-
+-		&[data-y-axis="bottom"] {
+-			margin-top: $arrow-size;
+-
+-			&::before {
+-				top: -$arrow-size;
+-			}
+-
+-			&::after {
+-				top: -6px;
+-			}
+-
+-			&::before,
+-			&::after {
+-				border-bottom-style: solid;
+-				border-left-color: transparent;
+-				border-right-color: transparent;
+-				border-top: none;
+-				margin-left: -10px;
+-			}
+-		}
+-
+-		&[data-y-axis="middle"][data-x-axis="left"] {
+-			margin-left: -$arrow-size;
+-
+-			&::before {
+-				right: -$arrow-size;
+-			}
+-
+-			&::after {
+-				right: -6px;
+-			}
+-
+-			&::before,
+-			&::after {
+-				border-bottom-color: transparent;
+-				border-left-style: solid;
+-				border-right: none;
+-				border-top-color: transparent;
+-			}
+-		}
+-
+-		&[data-y-axis="middle"][data-x-axis="right"] {
+-			margin-left: $arrow-size;
+-
+-			&::before {
+-				left: -$arrow-size;
+-			}
+-
+-			&::after {
+-				left: -6px;
+-			}
+-
+-			&::before,
+-			&::after {
+-				border-bottom-color: transparent;
+-				border-left: none;
+-				border-right-style: solid;
+-				border-top-color: transparent;
+-			}
+-		}
+-	}
+-
+-	&[data-y-axis="top"] {
+-		bottom: 100%;
+-	}
+-
+-	&[data-y-axis="bottom"] {
+-		top: 100%;
+-	}
+-
+-	&[data-y-axis="middle"] {
+-		align-items: center;
+-		display: flex;
+-	}
+-
+-	// Add spacing.
+-	&.is-from-top {
+-		margin-top: $grid-unit-15;
+-	}
+-
+-	&.is-from-bottom {
+-		margin-top: -$grid-unit-15;
+-	}
+-
+-	&.is-from-left:not(.is-from-top):not(.is-from-bottom) {
+-		margin-left: $grid-unit-15;
+-	}
+-
+-	&.is-from-right:not(.is-from-top):not(.is-from-bottom) {
+-		margin-right: $grid-unit-15;
+-	}
+ }
+ 
+ .components-popover__content {
+-	height: 100%;
+ 	background: $white;
+-	border: $border-width solid $gray-400;
++	// Using outline instead of border to avoid impacting
++	// popover computations.
++	outline: $border-width solid $gray-400;
+ 	box-shadow: $shadow-popover;
+ 	border-radius: $radius-block-ui;
++	box-sizing: border-box;
++	width: min-content;
+ 
+ 	// Alternate treatment for popovers that put them at elevation zero with high contrast.
+ 	.is-alternate & {
+-		border: $border-width solid $gray-900;
++		outline: $border-width solid $gray-900;
+ 		box-shadow: none;
+ 	}
+ 
+-	.components-popover & {
+-		position: absolute;
+-		height: auto;
+-		overflow-y: auto;
+-	}
+-
+ 	.components-popover.is-expanded & {
+ 		position: static;
+ 		height: calc(100% - #{ $panel-header-height });
+ 		overflow-y: visible;
+ 		min-width: auto;
+ 		border: none;
++		outline: none;
+ 		border-top: $border-width solid $gray-900;
+ 	}
+-
+-	.components-popover[data-y-axis="top"] & {
+-		bottom: 100%;
+-	}
+-
+-	.components-popover[data-x-axis="center"] & {
+-		left: 50%;
+-		transform: translateX(-50%);
+-	}
+-
+-	.components-popover[data-x-axis="right"] & {
+-		position: absolute;
+-		left: 100%;
+-	}
+-
+-	.components-popover:not([data-y-axis="middle"])[data-x-axis="right"] & {
+-		margin-left: -($grid-unit-30 + $border-width);
+-	}
+-
+-	.components-popover[data-x-axis="left"] & {
+-		position: absolute;
+-		right: 100%;
+-	}
+-
+-	.components-popover:not([data-y-axis="middle"])[data-x-axis="left"] & {
+-		margin-right: -($grid-unit-30 + $border-width);
+-	}
+ }
+ 
+ .components-popover__header {
+@@ -238,4 +57,15 @@ $arrow-size: 8px;
+ .components-popover__close.components-button {
+ 	z-index: z-index(".components-popover__close");
+ }
+-/*!rtl:end:ignore*/
++
++.components-popover__arrow {
++	position: absolute;
++	background: $gray-400;
++	width: 8px;
++	height: 8px;
++	transform: rotate(45deg);
++	z-index: -1;
++	.is-alternate & {
++		background: $gray-900;
++	}
++}
+diff --git a/packages/components/src/popover/test/__snapshots__/index.js.snap b/packages/components/src/popover/test/__snapshots__/index.js.snap
+index 2c7663281a154e..d985500486625f 100644
+--- a/packages/components/src/popover/test/__snapshots__/index.js.snap
++++ b/packages/components/src/popover/test/__snapshots__/index.js.snap
+@@ -3,25 +3,15 @@
+ exports[`Popover should pass additional props to portaled element 1`] = `
+ <span>
+   <div
+-    class="components-popover components-animate__appear is-from-top is-from-left is-without-arrow"
+-    data-x-axis="right"
+-    data-y-axis="bottom"
++    class="components-popover components-animate__appear is-from-left is-from-top"
+     role="tooltip"
+-    style="top: 0px; left: 0px;"
++    style="position: absolute;"
+     tabindex="-1"
+   >
+     <div
+       class="components-popover__content"
+     >
+-      <div
+-        style="position: relative;"
+-      >
+-        <div
+-          aria-hidden="true"
+-          style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
+-        />
+-        Hello
+-      </div>
++      Hello
+     </div>
+   </div>
+ </span>
+@@ -30,24 +20,14 @@ exports[`Popover should pass additional props to portaled element 1`] = `
+ exports[`Popover should render content 1`] = `
+ <span>
+   <div
+-    class="components-popover components-animate__appear is-from-top is-from-left is-without-arrow"
+-    data-x-axis="right"
+-    data-y-axis="bottom"
+-    style="top: 0px; left: 0px;"
++    class="components-popover components-animate__appear is-from-left is-from-top"
++    style="position: absolute;"
+     tabindex="-1"
+   >
+     <div
+       class="components-popover__content"
+     >
+-      <div
+-        style="position: relative;"
+-      >
+-        <div
+-          aria-hidden="true"
+-          style="position: absolute; top: 0px; left: 0px; right: 0px; bottom: 0px; pointer-events: none; opacity: 0; overflow: hidden; z-index: -1;"
+-        />
+-        Hello
+-      </div>
++      Hello
+     </div>
+   </div>
+ </span>
+diff --git a/packages/components/src/popover/test/utils.js b/packages/components/src/popover/test/utils.js
+deleted file mode 100644
+index 3d6b3a8358db65..00000000000000
+--- a/packages/components/src/popover/test/utils.js
++++ /dev/null
+@@ -1,304 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import {
+-	computePopoverPosition,
+-	computePopoverYAxisPosition,
+-	computePopoverXAxisPosition,
+-	offsetIframe,
+-} from '../utils';
+-
+-describe( 'computePopoverYAxisPosition', () => {
+-	it( 'should leave the position as is there’s enought space', () => {
+-		const anchorRect = {
+-			top: 10,
+-			left: 10,
+-			bottom: 30,
+-			right: 30,
+-			width: 20,
+-			height: 20,
+-		};
+-
+-		const contentSize = {
+-			width: 200,
+-			height: 300,
+-		};
+-
+-		expect(
+-			computePopoverYAxisPosition( anchorRect, contentSize, 'bottom' )
+-		).toEqual( {
+-			contentHeight: null,
+-			popoverTop: 30,
+-			yAxis: 'bottom',
+-		} );
+-	} );
+-
+-	it( "should switch to bottom position if there's not enough space", () => {
+-		const anchorRect = {
+-			top: 10,
+-			left: 10,
+-			bottom: 30,
+-			right: 30,
+-			width: 20,
+-			height: 20,
+-		};
+-
+-		const contentSize = {
+-			width: 200,
+-			height: 300,
+-		};
+-
+-		expect(
+-			computePopoverYAxisPosition( anchorRect, contentSize, 'top' )
+-		).toEqual( {
+-			contentHeight: null,
+-			popoverTop: 30,
+-			yAxis: 'bottom',
+-		} );
+-	} );
+-
+-	it( "should set a maxHeight if there's not enough space in any direction", () => {
+-		const anchorRect = {
+-			top: 400,
+-			left: 10,
+-			bottom: 420,
+-			right: 30,
+-			width: 20,
+-			height: 20,
+-		};
+-
+-		const contentSize = {
+-			width: 200,
+-			height: 500,
+-		};
+-
+-		expect(
+-			computePopoverYAxisPosition( anchorRect, contentSize, 'bottom' )
+-		).toEqual( {
+-			contentHeight: 390,
+-			popoverTop: 400,
+-			yAxis: 'top',
+-		} );
+-	} );
+-
+-	it( 'should position a popover in the middle', () => {
+-		const anchorRect = {
+-			top: 400,
+-			left: 10,
+-			bottom: 30,
+-			right: 30,
+-			width: 20,
+-			height: 20,
+-		};
+-
+-		const contentSize = {
+-			width: 200,
+-			height: 300,
+-		};
+-
+-		expect(
+-			computePopoverYAxisPosition( anchorRect, contentSize, 'middle' )
+-		).toEqual( {
+-			contentHeight: null,
+-			popoverTop: 410,
+-			yAxis: 'middle',
+-		} );
+-	} );
+-} );
+-
+-describe( 'computePopoverXAxisPosition', () => {
+-	it( 'should leave the position as is there’s enought space', () => {
+-		const anchorRect = {
+-			top: 10,
+-			left: 10,
+-			bottom: 30,
+-			right: 30,
+-			width: 20,
+-			height: 20,
+-		};
+-
+-		const contentSize = {
+-			width: 200,
+-			height: 300,
+-		};
+-
+-		expect(
+-			computePopoverXAxisPosition( anchorRect, contentSize, 'right' )
+-		).toEqual( {
+-			contentWidth: null,
+-			popoverLeft: 20,
+-			xAxis: 'right',
+-		} );
+-	} );
+-
+-	it( "should switch to right position if there's not enough space", () => {
+-		const anchorRect = {
+-			top: 10,
+-			left: 10,
+-			bottom: 30,
+-			right: 30,
+-			width: 20,
+-			height: 20,
+-		};
+-
+-		const contentSize = {
+-			width: 200,
+-			height: 300,
+-		};
+-
+-		expect(
+-			computePopoverXAxisPosition( anchorRect, contentSize, 'center' )
+-		).toEqual( {
+-			contentWidth: null,
+-			popoverLeft: 20,
+-			xAxis: 'right',
+-		} );
+-	} );
+-
+-	it( "should center popover if there's not enough space in any direction", () => {
+-		const anchorRect = {
+-			top: 10,
+-			left: 400,
+-			bottom: 30,
+-			right: 420,
+-			width: 20,
+-			height: 20,
+-		};
+-
+-		const contentSize = {
+-			width: 800,
+-			height: 300,
+-		};
+-
+-		expect(
+-			computePopoverXAxisPosition( anchorRect, contentSize, 'right' )
+-		).toEqual( {
+-			contentWidth: null,
+-			popoverLeft: 512,
+-			xAxis: 'center',
+-		} );
+-	} );
+-
+-	it( 'should set the content width to the viewport width if content is too wide', () => {
+-		const anchorRect = {
+-			top: 10,
+-			left: 400,
+-			bottom: 30,
+-			right: 420,
+-			width: 20,
+-			height: 20,
+-		};
+-
+-		const contentSize = {
+-			width: 1500,
+-			height: 300,
+-		};
+-
+-		expect(
+-			computePopoverXAxisPosition( anchorRect, contentSize, 'right' )
+-		).toEqual( {
+-			contentWidth: 1024,
+-			popoverLeft: 512,
+-			xAxis: 'center',
+-		} );
+-	} );
+-} );
+-
+-describe( 'computePopoverPosition', () => {
+-	it( 'should leave the position as is there’s enought space', () => {
+-		const anchorRect = {
+-			top: 10,
+-			left: 10,
+-			bottom: 30,
+-			right: 30,
+-			width: 20,
+-			height: 20,
+-		};
+-
+-		const contentSize = {
+-			width: 200,
+-			height: 300,
+-		};
+-
+-		expect(
+-			computePopoverPosition( anchorRect, contentSize, 'bottom right' )
+-		).toEqual( {
+-			contentWidth: null,
+-			popoverLeft: 20,
+-			xAxis: 'right',
+-			contentHeight: null,
+-			popoverTop: 30,
+-			yAxis: 'bottom',
+-		} );
+-	} );
+-} );
+-
+-describe( 'offsetIframe', () => {
+-	let parent;
+-
+-	beforeEach( () => {
+-		parent = document.createElement( 'div' );
+-		document.body.appendChild( parent );
+-	} );
+-
+-	afterEach( () => {
+-		parent.remove();
+-	} );
+-
+-	it( 'returns rect without changes if element is not an iframe', () => {
+-		const rect = {
+-			left: 50,
+-			top: 50,
+-			bottom: 100,
+-			right: 100,
+-			width: 50,
+-			height: 50,
+-		};
+-		const offsettedRect = offsetIframe( rect, parent.ownerDocument );
+-
+-		expect( offsettedRect ).toEqual( rect );
+-	} );
+-
+-	it( 'returns offsetted rect if element is in an iframe', () => {
+-		const iframeLeft = 25;
+-		const iframeTop = 50;
+-		const childLeft = 10;
+-		const childTop = 100;
+-
+-		const iframe = document.createElement( 'iframe' );
+-		parent.appendChild( iframe );
+-		// JSDom doesn't have a layout engine
+-		// so we need to mock getBoundingClientRect and DOMRect.
+-		iframe.getBoundingClientRect = jest.fn( () => ( {
+-			width: 100,
+-			height: 100,
+-			top: iframeTop,
+-			left: iframeLeft,
+-		} ) );
+-		iframe.contentWindow.DOMRect = jest.fn(
+-			( left, top, width, height ) => ( {
+-				left,
+-				top,
+-				right: left + width,
+-				bottom: top + height,
+-				width,
+-				height,
+-			} )
+-		);
+-
+-		const child = document.createElement( 'div' );
+-		iframe.contentWindow.document.body.appendChild( child );
+-		child.getBoundingClientRect = jest.fn( () => ( {
+-			width: 100,
+-			height: 100,
+-			top: childTop,
+-			left: childLeft,
+-		} ) );
+-
+-		const rect = child.getBoundingClientRect();
+-		const offsettedRect = offsetIframe( rect, child.ownerDocument, parent );
+-
+-		expect( offsettedRect.left ).toBe( iframeLeft + childLeft );
+-		expect( offsettedRect.top ).toBe( iframeTop + childTop );
+-	} );
+-} );
+diff --git a/packages/components/src/popover/utils.js b/packages/components/src/popover/utils.js
+deleted file mode 100644
+index 012b2b3dec7483..00000000000000
+--- a/packages/components/src/popover/utils.js
++++ /dev/null
+@@ -1,396 +0,0 @@
+-// @ts-nocheck
+-/**
+- * WordPress dependencies
+- */
+-import { isRTL } from '@wordpress/i18n';
+-
+-/**
+- * Module constants
+- */
+-const HEIGHT_OFFSET = 10; // Used by the arrow and a bit of empty space.
+-
+-/**
+- * Utility used to compute the popover position over the xAxis
+- *
+- * @param {Object}  anchorRect            Anchor Rect.
+- * @param {Object}  contentSize           Content Size.
+- * @param {string}  xAxis                 Desired xAxis.
+- * @param {string}  corner                Desired corner.
+- * @param {boolean} stickyBoundaryElement The boundary element to use when
+- *                                        switching between sticky and normal
+- *                                        position.
+- * @param {string}  chosenYAxis           yAxis to be used.
+- * @param {Element} boundaryElement       Boundary element.
+- * @param {boolean} forcePosition         Don't adjust position based on anchor.
+- * @param {boolean} forceXAlignment       Don't adjust alignment based on YAxis
+- *
+- * @return {Object} Popover xAxis position and constraints.
+- */
+-export function computePopoverXAxisPosition(
+-	anchorRect,
+-	contentSize,
+-	xAxis,
+-	corner,
+-	stickyBoundaryElement,
+-	chosenYAxis,
+-	boundaryElement,
+-	forcePosition,
+-	forceXAlignment
+-) {
+-	const { width } = contentSize;
+-
+-	// Correct xAxis for RTL support.
+-	if ( xAxis === 'left' && isRTL() ) {
+-		xAxis = 'right';
+-	} else if ( xAxis === 'right' && isRTL() ) {
+-		xAxis = 'left';
+-	}
+-
+-	if ( corner === 'left' && isRTL() ) {
+-		corner = 'right';
+-	} else if ( corner === 'right' && isRTL() ) {
+-		corner = 'left';
+-	}
+-
+-	// X axis alignment choices.
+-	const anchorMidPoint = Math.round( anchorRect.left + anchorRect.width / 2 );
+-	const centerAlignment = {
+-		popoverLeft: anchorMidPoint,
+-		contentWidth:
+-			( anchorMidPoint - width / 2 > 0 ? width / 2 : anchorMidPoint ) +
+-			( anchorMidPoint + width / 2 > window.innerWidth
+-				? window.innerWidth - anchorMidPoint
+-				: width / 2 ),
+-	};
+-
+-	let leftAlignmentX = anchorRect.left;
+-
+-	if ( corner === 'right' ) {
+-		leftAlignmentX = anchorRect.right;
+-	} else if ( chosenYAxis !== 'middle' && ! forceXAlignment ) {
+-		leftAlignmentX = anchorMidPoint;
+-	}
+-
+-	let rightAlignmentX = anchorRect.right;
+-
+-	if ( corner === 'left' ) {
+-		rightAlignmentX = anchorRect.left;
+-	} else if ( chosenYAxis !== 'middle' && ! forceXAlignment ) {
+-		rightAlignmentX = anchorMidPoint;
+-	}
+-
+-	const leftAlignment = {
+-		popoverLeft: leftAlignmentX,
+-		contentWidth: leftAlignmentX - width > 0 ? width : leftAlignmentX,
+-	};
+-	const rightAlignment = {
+-		popoverLeft: rightAlignmentX,
+-		contentWidth:
+-			rightAlignmentX + width > window.innerWidth
+-				? window.innerWidth - rightAlignmentX
+-				: width,
+-	};
+-
+-	// Choosing the x axis.
+-	let chosenXAxis = xAxis;
+-	let contentWidth = null;
+-
+-	if ( ! stickyBoundaryElement && ! forcePosition ) {
+-		if ( xAxis === 'center' && centerAlignment.contentWidth === width ) {
+-			chosenXAxis = 'center';
+-		} else if ( xAxis === 'left' && leftAlignment.contentWidth === width ) {
+-			chosenXAxis = 'left';
+-		} else if (
+-			xAxis === 'right' &&
+-			rightAlignment.contentWidth === width
+-		) {
+-			chosenXAxis = 'right';
+-		} else {
+-			chosenXAxis =
+-				leftAlignment.contentWidth > rightAlignment.contentWidth
+-					? 'left'
+-					: 'right';
+-			const chosenWidth =
+-				chosenXAxis === 'left'
+-					? leftAlignment.contentWidth
+-					: rightAlignment.contentWidth;
+-
+-			// Limit width of the content to the viewport width
+-			if ( width > window.innerWidth ) {
+-				contentWidth = window.innerWidth;
+-			}
+-
+-			// If we can't find any alignment options that could fit
+-			// our content, then let's fallback to the center of the viewport.
+-			if ( chosenWidth !== width ) {
+-				chosenXAxis = 'center';
+-				centerAlignment.popoverLeft = window.innerWidth / 2;
+-			}
+-		}
+-	}
+-
+-	let popoverLeft;
+-	if ( chosenXAxis === 'center' ) {
+-		popoverLeft = centerAlignment.popoverLeft;
+-	} else if ( chosenXAxis === 'left' ) {
+-		popoverLeft = leftAlignment.popoverLeft;
+-	} else {
+-		popoverLeft = rightAlignment.popoverLeft;
+-	}
+-
+-	if ( boundaryElement ) {
+-		popoverLeft = Math.min(
+-			popoverLeft,
+-			boundaryElement.offsetLeft + boundaryElement.offsetWidth - width
+-		);
+-
+-		// Avoid the popover being position beyond the left boundary if the
+-		// direction is left to right.
+-		if ( ! isRTL() ) {
+-			popoverLeft = Math.max( popoverLeft, 0 );
+-		}
+-	}
+-
+-	return {
+-		xAxis: chosenXAxis,
+-		popoverLeft,
+-		contentWidth,
+-	};
+-}
+-
+-/**
+- * Utility used to compute the popover position over the yAxis
+- *
+- * @param {Object}       anchorRect            Anchor Rect.
+- * @param {Object}       contentSize           Content Size.
+- * @param {string}       yAxis                 Desired yAxis.
+- * @param {string}       corner                Desired corner.
+- * @param {boolean}      stickyBoundaryElement The boundary element to use when switching between sticky
+- *                                             and normal position.
+- * @param {Element}      anchorRef             The anchor element.
+- * @param {Element}      relativeOffsetTop     If applicable, top offset of the relative positioned
+- *                                             parent container.
+- * @param {boolean}      forcePosition         Don't adjust position based on anchor.
+- * @param {Element|null} editorWrapper         Element that wraps the editor content. Used to access
+- *                                             scroll position to determine sticky behavior.
+- * @return {Object} Popover xAxis position and constraints.
+- */
+-export function computePopoverYAxisPosition(
+-	anchorRect,
+-	contentSize,
+-	yAxis,
+-	corner,
+-	stickyBoundaryElement,
+-	anchorRef,
+-	relativeOffsetTop,
+-	forcePosition,
+-	editorWrapper
+-) {
+-	const { height } = contentSize;
+-
+-	if ( stickyBoundaryElement ) {
+-		const stickyRect = stickyBoundaryElement.getBoundingClientRect();
+-		const stickyPositionTop = stickyRect.top + height - relativeOffsetTop;
+-		const stickyPositionBottom =
+-			stickyRect.bottom - height - relativeOffsetTop;
+-
+-		if ( anchorRect.top <= stickyPositionTop ) {
+-			if ( editorWrapper ) {
+-				// If a popover cannot be positioned above the anchor, even after scrolling, we must
+-				// ensure we use the bottom position instead of the popover slot.  This prevents the
+-				// popover from always restricting block content and interaction while selected if the
+-				// block is near the top of the site editor.
+-
+-				const isRoomAboveInCanvas =
+-					height + HEIGHT_OFFSET <
+-					editorWrapper.scrollTop + anchorRect.top;
+-				if ( ! isRoomAboveInCanvas ) {
+-					return {
+-						yAxis: 'bottom',
+-						// If the bottom of the block is also below the bottom sticky position (ex -
+-						// block is also taller than the editor window), return the bottom sticky
+-						// position instead.  We do this instead of the top sticky position both to
+-						// allow a smooth transition and more importantly to ensure every section of
+-						// the block can be free from popover obscuration at some point in the
+-						// scroll position.
+-						popoverTop: Math.min(
+-							anchorRect.bottom,
+-							stickyPositionBottom
+-						),
+-					};
+-				}
+-			}
+-			// Default sticky behavior.
+-			return {
+-				yAxis,
+-				popoverTop: Math.min( anchorRect.bottom, stickyPositionTop ),
+-			};
+-		}
+-	}
+-
+-	// Y axis alignment choices.
+-	let anchorMidPoint = anchorRect.top + anchorRect.height / 2;
+-
+-	if ( corner === 'bottom' ) {
+-		anchorMidPoint = anchorRect.bottom;
+-	} else if ( corner === 'top' ) {
+-		anchorMidPoint = anchorRect.top;
+-	}
+-
+-	const middleAlignment = {
+-		popoverTop: anchorMidPoint,
+-		contentHeight:
+-			( anchorMidPoint - height / 2 > 0 ? height / 2 : anchorMidPoint ) +
+-			( anchorMidPoint + height / 2 > window.innerHeight
+-				? window.innerHeight - anchorMidPoint
+-				: height / 2 ),
+-	};
+-
+-	const topAlignment = {
+-		popoverTop: anchorRect.top,
+-		contentHeight:
+-			anchorRect.top - HEIGHT_OFFSET - height > 0
+-				? height
+-				: anchorRect.top - HEIGHT_OFFSET,
+-	};
+-	const bottomAlignment = {
+-		popoverTop: anchorRect.bottom,
+-		contentHeight:
+-			anchorRect.bottom + HEIGHT_OFFSET + height > window.innerHeight
+-				? window.innerHeight - HEIGHT_OFFSET - anchorRect.bottom
+-				: height,
+-	};
+-
+-	// Choosing the y axis.
+-	let chosenYAxis = yAxis;
+-	let contentHeight = null;
+-
+-	if ( ! stickyBoundaryElement && ! forcePosition ) {
+-		if ( yAxis === 'middle' && middleAlignment.contentHeight === height ) {
+-			chosenYAxis = 'middle';
+-		} else if ( yAxis === 'top' && topAlignment.contentHeight === height ) {
+-			chosenYAxis = 'top';
+-		} else if (
+-			yAxis === 'bottom' &&
+-			bottomAlignment.contentHeight === height
+-		) {
+-			chosenYAxis = 'bottom';
+-		} else {
+-			chosenYAxis =
+-				topAlignment.contentHeight > bottomAlignment.contentHeight
+-					? 'top'
+-					: 'bottom';
+-			const chosenHeight =
+-				chosenYAxis === 'top'
+-					? topAlignment.contentHeight
+-					: bottomAlignment.contentHeight;
+-			contentHeight = chosenHeight !== height ? chosenHeight : null;
+-		}
+-	}
+-
+-	let popoverTop;
+-	if ( chosenYAxis === 'middle' ) {
+-		popoverTop = middleAlignment.popoverTop;
+-	} else if ( chosenYAxis === 'top' ) {
+-		popoverTop = topAlignment.popoverTop;
+-	} else {
+-		popoverTop = bottomAlignment.popoverTop;
+-	}
+-
+-	return {
+-		yAxis: chosenYAxis,
+-		popoverTop,
+-		contentHeight,
+-	};
+-}
+-
+-/**
+- * Utility used to compute the popover position and the content max width/height for a popover given
+- * its anchor rect and its content size.
+- *
+- * @param {Object}       anchorRect            Anchor Rect.
+- * @param {Object}       contentSize           Content Size.
+- * @param {string}       position              Position.
+- * @param {boolean}      stickyBoundaryElement The boundary element to use when switching between
+- *                                             sticky and normal position.
+- * @param {Element}      anchorRef             The anchor element.
+- * @param {number}       relativeOffsetTop     If applicable, top offset of the relative positioned
+- *                                             parent container.
+- * @param {Element}      boundaryElement       Boundary element.
+- * @param {boolean}      forcePosition         Don't adjust position based on anchor.
+- * @param {boolean}      forceXAlignment       Don't adjust alignment based on YAxis
+- * @param {Element|null} editorWrapper         Element that wraps the editor content. Used to access
+- *                                             scroll position to determine sticky behavior.
+- * @return {Object} Popover position and constraints.
+- */
+-export function computePopoverPosition(
+-	anchorRect,
+-	contentSize,
+-	position = 'top',
+-	stickyBoundaryElement,
+-	anchorRef,
+-	relativeOffsetTop,
+-	boundaryElement,
+-	forcePosition,
+-	forceXAlignment,
+-	editorWrapper
+-) {
+-	const [ yAxis, xAxis = 'center', corner ] = position.split( ' ' );
+-
+-	const yAxisPosition = computePopoverYAxisPosition(
+-		anchorRect,
+-		contentSize,
+-		yAxis,
+-		corner,
+-		stickyBoundaryElement,
+-		anchorRef,
+-		relativeOffsetTop,
+-		forcePosition,
+-		editorWrapper
+-	);
+-	const xAxisPosition = computePopoverXAxisPosition(
+-		anchorRect,
+-		contentSize,
+-		xAxis,
+-		corner,
+-		stickyBoundaryElement,
+-		yAxisPosition.yAxis,
+-		boundaryElement,
+-		forcePosition,
+-		forceXAlignment
+-	);
+-
+-	return {
+-		...xAxisPosition,
+-		...yAxisPosition,
+-	};
+-}
+-
+-/**
+- * Offsets the given rect by the position of the iframe that contains the
+- * element. If the owner document is not in an iframe then it returns with the
+- * original rect. If the popover container document and the anchor document are
+- * the same, the original rect will also be returned.
+- *
+- * @param {DOMRect}  rect          bounds of the element
+- * @param {Document} ownerDocument document of the element
+- * @param {Element}  container     The popover container to position.
+- *
+- * @return {DOMRect} offsetted bounds
+- */
+-export function offsetIframe( rect, ownerDocument, container ) {
+-	const { defaultView } = ownerDocument;
+-	const { frameElement } = defaultView;
+-
+-	if ( ! frameElement || ownerDocument === container.ownerDocument ) {
+-		return rect;
+-	}
+-
+-	const iframeRect = frameElement.getBoundingClientRect();
+-	return new defaultView.DOMRect(
+-		rect.left + iframeRect.left,
+-		rect.top + iframeRect.top,
+-		rect.width,
+-		rect.height
+-	);
+-}
+diff --git a/packages/components/src/tooltip/index.js b/packages/components/src/tooltip/index.js
+index f395e528fb178c..b9177cf7826704 100644
+--- a/packages/components/src/tooltip/index.js
++++ b/packages/components/src/tooltip/index.js
+@@ -64,7 +64,7 @@ const addPopoverToGrandchildren = ( {
+ 				className="components-tooltip"
+ 				aria-hidden="true"
+ 				animate={ false }
+-				noArrow={ true }
++				offset={ 12 }
+ 			>
+ 				{ text }
+ 				<Shortcut
+@@ -93,7 +93,13 @@ const emitToChild = ( children, eventName, event ) => {
+ };
+ 
+ function Tooltip( props ) {
+-	const { children, position, text, shortcut, delay = TOOLTIP_DELAY } = props;
++	const {
++		children,
++		position = 'bottom middle',
++		text,
++		shortcut,
++		delay = TOOLTIP_DELAY,
++	} = props;
+ 	/**
+ 	 * Whether a mouse is currently pressed, used in determining whether
+ 	 * to handle a focus event as displaying the tooltip immediately.
+diff --git a/packages/components/src/tooltip/style.scss b/packages/components/src/tooltip/style.scss
+index df3cfbcf4826a8..3de494fa60359e 100644
+--- a/packages/components/src/tooltip/style.scss
++++ b/packages/components/src/tooltip/style.scss
+@@ -10,16 +10,14 @@
+ 	background: $gray-900;
+ 	border-radius: $radius-block-ui;
+ 	border-width: 0;
++	outline: none;
+ 	color: $white;
+ 	white-space: nowrap;
+ 	text-align: center;
+ 	line-height: 1.4;
+ 	font-size: 12px;
+ 	box-shadow: none;
+-
+-	> div {
+-		padding: $grid-unit-05 $grid-unit-10;
+-	}
++	padding: $grid-unit-05 $grid-unit-10;
+ }
+ 
+ .components-tooltip__shortcut {
+diff --git a/packages/compose/src/hooks/use-focus-on-mount/index.js b/packages/compose/src/hooks/use-focus-on-mount/index.js
+index a971c3dac54a10..cf0e97e661bfc6 100644
+--- a/packages/compose/src/hooks/use-focus-on-mount/index.js
++++ b/packages/compose/src/hooks/use-focus-on-mount/index.js
+@@ -50,6 +50,11 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
+ 			}
+ 		}
+ 
+-		target.focus();
++		target.focus( {
++			// When focusing newly mounted dialogs,
++			// the position of the popover is often not right on the first render
++			// This prevents the layout shifts when focusing the dialogs.
++			preventScroll: true,
++		} );
+ 	}, [] );
+ }
+diff --git a/packages/e2e-tests/specs/editor/blocks/__snapshots__/heading.test.js.snap b/packages/e2e-tests/specs/editor/blocks/__snapshots__/heading.test.js.snap
+index 86257779ea8b98..b175d82c81d1ff 100644
+--- a/packages/e2e-tests/specs/editor/blocks/__snapshots__/heading.test.js.snap
++++ b/packages/e2e-tests/specs/editor/blocks/__snapshots__/heading.test.js.snap
+@@ -12,12 +12,6 @@ exports[`Heading can be created by prefixing number sign and a space 1`] = `
+ <!-- /wp:heading -->"
+ `;
+ 
+-exports[`Heading should correctly apply custom colors 1`] = `
+-"<!-- wp:heading {\\"level\\":3,\\"style\\":{\\"color\\":{\\"text\\":\\"#0782f6\\"}}} -->
+-<h3 class=\\"has-text-color\\" style=\\"color:#0782f6\\">Heading</h3>
+-<!-- /wp:heading -->"
+-`;
+-
+ exports[`Heading should correctly apply named colors 1`] = `
+ "<!-- wp:heading {\\"textColor\\":\\"luminous-vivid-orange\\"} -->
+ <h2 class=\\"has-luminous-vivid-orange-color has-text-color\\">Heading</h2>
+diff --git a/packages/e2e-tests/specs/editor/blocks/heading.test.js b/packages/e2e-tests/specs/editor/blocks/heading.test.js
+index ecfb8fc236161b..504916d4c84cbc 100644
+--- a/packages/e2e-tests/specs/editor/blocks/heading.test.js
++++ b/packages/e2e-tests/specs/editor/blocks/heading.test.js
+@@ -86,10 +86,14 @@ describe( 'Heading', () => {
+ 		await page.waitForSelector( COLOR_INPUT_FIELD_SELECTOR );
+ 		await page.click( COLOR_INPUT_FIELD_SELECTOR );
+ 		await pressKeyWithModifier( 'primary', 'A' );
+-		await page.keyboard.type( '0782f6' );
+-		await page.click( 'h3[data-type="core/heading"]' );
+-		await page.waitForXPath( '//button//span[contains(text(), "0782f6")]' );
+-		expect( await getEditedPostContent() ).toMatchSnapshot();
++		await page.keyboard.type( '4b7f4d' );
++		await page.waitForXPath( '//button//span[contains(text(), "4b7f4d")]' );
++		await page.click( '.wp-block-post-title' );
++		expect( await getEditedPostContent() ).toMatchInlineSnapshot( `
++		"<!-- wp:heading {\\"level\\":3,\\"style\\":{\\"color\\":{\\"text\\":\\"#4b7f4d\\"}}} -->
++		<h3 class=\\"has-text-color\\" style=\\"color:#4b7f4d\\">Heading</h3>
++		<!-- /wp:heading -->"
++	` );
+ 	} );
+ 
+ 	it( 'should correctly apply named colors', async () => {
+diff --git a/packages/edit-post/src/components/header/style.scss b/packages/edit-post/src/components/header/style.scss
+index 3f8757eb2e3e9a..8ad308b8057ed3 100644
+--- a/packages/edit-post/src/components/header/style.scss
++++ b/packages/edit-post/src/components/header/style.scss
+@@ -84,10 +84,8 @@
+ 	}
+ }
+ 
+-.edit-post-post-preview-dropdown {
+-	.components-popover__content > div {
+-		padding-bottom: 0;
+-	}
++.edit-post-post-preview-dropdown .components-popover__content {
++	padding-bottom: 0;
+ }
+ 
+ /**
+diff --git a/packages/edit-post/src/components/sidebar/post-schedule/index.js b/packages/edit-post/src/components/sidebar/post-schedule/index.js
+index ea786d031b3d8e..5b6c9a0e6481dc 100644
+--- a/packages/edit-post/src/components/sidebar/post-schedule/index.js
++++ b/packages/edit-post/src/components/sidebar/post-schedule/index.js
+@@ -18,7 +18,7 @@ export function PostSchedule() {
+ 			<PanelRow className="edit-post-post-schedule" ref={ anchorRef }>
+ 				<span>{ __( 'Publish' ) }</span>
+ 				<Dropdown
+-					popoverProps={ { anchorRef: anchorRef.current } }
++					popoverProps={ { anchorRef } }
+ 					position="bottom left"
+ 					contentClassName="edit-post-post-schedule__dialog"
+ 					renderToggle={ ( { onToggle, isOpen } ) => (
+diff --git a/packages/edit-post/src/components/sidebar/post-schedule/style.scss b/packages/edit-post/src/components/sidebar/post-schedule/style.scss
+index e7f99795a33c63..1b41f731f8feb3 100644
+--- a/packages/edit-post/src/components/sidebar/post-schedule/style.scss
++++ b/packages/edit-post/src/components/sidebar/post-schedule/style.scss
+@@ -13,8 +13,8 @@
+ 	text-align: right;
+ }
+ 
+-// Zero out a blanket padding that is set on the popover component.
++// Zero out a blanket padding that is set on the dropdown component.
+ // The datetime component has its own padding.
+-.edit-post-post-schedule__dialog .components-popover__content > div {
++.edit-post-post-schedule__dialog .components-popover__content {
+ 	padding: 0;
+ }
+diff --git a/packages/edit-site/src/components/global-styles/border-panel.js b/packages/edit-site/src/components/global-styles/border-panel.js
+index 780b165f785703..71fe69769719ea 100644
+--- a/packages/edit-site/src/components/global-styles/border-panel.js
++++ b/packages/edit-site/src/components/global-styles/border-panel.js
+@@ -182,18 +182,8 @@ export default function BorderPanel( { name } ) {
+ 						onChange={ onBorderChange }
+ 						showStyle={ showBorderStyle }
+ 						value={ border }
+-						popoverClassNames={ {
+-							linked:
+-								'edit-site-global-styles-sidebar__border-box-control__popover',
+-							top:
+-								'edit-site-global-styles-sidebar__border-box-control__popover-top',
+-							right:
+-								'edit-site-global-styles-sidebar__border-box-control__popover-right',
+-							bottom:
+-								'edit-site-global-styles-sidebar__border-box-control__popover-bottom',
+-							left:
+-								'edit-site-global-styles-sidebar__border-box-control__popover-left',
+-						} }
++						popoverPlacement="left-start"
++						popoverOffset={ 40 }
+ 						__experimentalHasMultipleOrigins={ true }
+ 						__experimentalIsRenderedInSidebar={ true }
+ 					/>
+diff --git a/packages/edit-site/src/components/header/document-actions/style.scss b/packages/edit-site/src/components/header/document-actions/style.scss
+index 6e10e1d8c9b711..b83a65938b19a7 100644
+--- a/packages/edit-site/src/components/header/document-actions/style.scss
++++ b/packages/edit-site/src/components/header/document-actions/style.scss
+@@ -66,7 +66,7 @@
+ 	}
+ }
+ 
+-.edit-site-document-actions__info-dropdown > .components-popover__content > div {
++.edit-site-document-actions__info-dropdown > .components-popover__content {
+ 	padding: 0;
+ 	min-width: 240px;
+ }
+diff --git a/packages/edit-site/src/components/sidebar/style.scss b/packages/edit-site/src/components/sidebar/style.scss
+index b2a4119e5c71ef..b3992b7774b0d3 100644
+--- a/packages/edit-site/src/components/sidebar/style.scss
++++ b/packages/edit-site/src/components/sidebar/style.scss
+@@ -88,55 +88,6 @@
+ 	line-height: 1;
+ }
+ 
+-
+-.edit-site-global-styles-sidebar__border-box-control__popover,
+-.edit-site-global-styles-sidebar__border-box-control__popover-top,
+-.edit-site-global-styles-sidebar__border-box-control__popover-right,
+-.edit-site-global-styles-sidebar__border-box-control__popover-bottom,
+-.edit-site-global-styles-sidebar__border-box-control__popover-left {
+-	.components-popover__content {
+-		width: 282px;
+-	}
+-}
+-
+-$split-border-control-offset: 55px;
+-
+-@include break-medium() {
+-	.edit-site-global-styles-sidebar__border-box-control__popover,
+-	.edit-site-global-styles-sidebar__border-box-control__popover-left {
+-		.components-popover__content {
+-			margin-right: #{ $grid-unit-50 + $grid-unit-15 } !important;
+-		}
+-	}
+-
+-	.edit-site-global-styles-sidebar__border-box-control__popover-top,
+-	.edit-site-global-styles-sidebar__border-box-control__popover-bottom {
+-		.components-popover__content {
+-			margin-right: #{ $grid-unit-50 + $grid-unit-15 + $split-border-control-offset } !important;
+-		}
+-	}
+-
+-	.edit-site-global-styles-sidebar__border-box-control__popover-right {
+-		.components-popover__content {
+-			margin-right: #{ $grid-unit-50 + $grid-unit-15 + ( $split-border-control-offset * 2 )} !important;
+-		}
+-	}
+-
+-	.edit-site-global-styles-sidebar__border-box-control__popover,
+-	.edit-site-global-styles-sidebar__border-box-control__popover-top,
+-	.edit-site-global-styles-sidebar__border-box-control__popover-right,
+-	.edit-site-global-styles-sidebar__border-box-control__popover-bottom,
+-	.edit-site-global-styles-sidebar__border-box-control__popover-left {
+-		&.is-from-top .components-popover__content {
+-			margin-top: #{ -($grid-unit-50 + $grid-unit-15) } !important;
+-		}
+-
+-		&.is-from-bottom .components-popover__content {
+-			margin-bottom: #{ -($grid-unit-50 + $grid-unit-15) } !important;
+-		}
+-	}
+-}
+-
+ // Override the `hr` styles defined in the `ComplementaryArea` component
+ // from the `@wordpress/interface` package.
+ .edit-site-global-styles-sidebar hr {
+diff --git a/packages/editor/src/components/table-of-contents/style.scss b/packages/editor/src/components/table-of-contents/style.scss
+index 20b570b8799dc7..b1dc4249de0844 100644
+--- a/packages/editor/src/components/table-of-contents/style.scss
++++ b/packages/editor/src/components/table-of-contents/style.scss
+@@ -8,9 +8,7 @@
+ 
+ .table-of-contents__popover {
+ 	.components-popover__content {
+-		> div {
+-			padding: $grid-unit-20;
+-		}
++		padding: $grid-unit-20;
+ 
+ 		@include break-small {
+ 			max-height: calc(100vh - 120px);
+diff --git a/packages/interface/src/components/more-menu-dropdown/style.scss b/packages/interface/src/components/more-menu-dropdown/style.scss
+index 0e98b90de6c062..56852977fa05f7 100644
+--- a/packages/interface/src/components/more-menu-dropdown/style.scss
++++ b/packages/interface/src/components/more-menu-dropdown/style.scss
+@@ -21,7 +21,6 @@
+ 
+ 	// Let the menu scale to fit items.
+ 	@include break-mobile() {
+-		width: auto;
+ 		max-width: $break-mobile;
+ 	}
+ 
+diff --git a/packages/list-reusable-blocks/src/components/import-dropdown/style.scss b/packages/list-reusable-blocks/src/components/import-dropdown/style.scss
+index c12c7fd4d3f155..8c2dc9c94bd71f 100644
+--- a/packages/list-reusable-blocks/src/components/import-dropdown/style.scss
++++ b/packages/list-reusable-blocks/src/components/import-dropdown/style.scss
+@@ -1,3 +1,3 @@
+-.list-reusable-blocks-import-dropdown__content .components-popover__content > div {
++.list-reusable-blocks-import-dropdown__content .components-popover__content {
+ 	padding: 10px;
+ }
+diff --git a/packages/nux/src/components/dot-tip/index.js b/packages/nux/src/components/dot-tip/index.js
+index c604c456254280..6f6f09bdf289c0 100644
+--- a/packages/nux/src/components/dot-tip/index.js
++++ b/packages/nux/src/components/dot-tip/index.js
+@@ -48,7 +48,6 @@ export function DotTip( {
+ 		<Popover
+ 			className="nux-dot-tip"
+ 			position={ position }
+-			noArrow
+ 			focusOnMount="container"
+ 			role="dialog"
+ 			aria-label={ __( 'Editor tips' ) }
+diff --git a/packages/nux/src/components/dot-tip/style.scss b/packages/nux/src/components/dot-tip/style.scss
+index e10d1dc9db0d0f..3ab0c1a540fd5a 100644
+--- a/packages/nux/src/components/dot-tip/style.scss
++++ b/packages/nux/src/components/dot-tip/style.scss
+@@ -39,10 +39,7 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
+ 
+ 	.components-popover__content {
+ 		width: 350px;
+-
+-		> div {
+-			padding: 20px 18px;
+-		}
++		padding: 20px 18px;
+ 
+ 		@include break-small {
+ 			width: 450px;
+diff --git a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+index a737545c530122..1071acfa25cd36 100644
+--- a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
++++ b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+@@ -5,7 +5,6 @@ exports[`DotTip should render correctly 1`] = `
+   aria-label="Editor tips"
+   className="nux-dot-tip"
+   focusOnMount="container"
+-  noArrow={true}
+   onClick={[Function]}
+   onFocusOutside={[Function]}
+   position="middle right"
+diff --git a/packages/widgets/src/blocks/legacy-widget/edit/form.js b/packages/widgets/src/blocks/legacy-widget/edit/form.js
+index b7a3f0e3e9b98c..f164e0eed6f6eb 100644
+--- a/packages/widgets/src/blocks/legacy-widget/edit/form.js
++++ b/packages/widgets/src/blocks/legacy-widget/edit/form.js
+@@ -104,7 +104,7 @@ export default function Form( {
+ 				<Popover
+ 					focusOnMount={ false }
+ 					position="middle right"
+-					__unstableForceXAlignment
++					__unstableForcePosition
+ 				>
+ 					<div
+ 						ref={ ref }

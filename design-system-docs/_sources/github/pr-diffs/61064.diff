@@ -1,0 +1,105 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..e86663d48b85f6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `Spacer`: Remove "experimental" designation ([#61064](https://github.com/WordPress/gutenberg/pull/61064)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/h-stack/README.md b/packages/components/src/h-stack/README.md
+index 77e3c77b940f2a..a3825d835263b8 100644
+--- a/packages/components/src/h-stack/README.md
++++ b/packages/components/src/h-stack/README.md
+@@ -86,7 +86,7 @@ When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to t
+ ```jsx
+ import {
+ 	__experimentalHStack as HStack,
+-	__experimentalSpacer as Spacer,
++	Spacer,
+ 	__experimentalText as Text,
+ } from '@wordpress/components';
+ 
+@@ -108,7 +108,7 @@ function Example() {
+ ```jsx
+ import {
+ 	__experimentalHStack as HStack,
+-	__experimentalSpacer as Spacer,
++	Spacer,
+ 	__experimentalText as Text,
+ } from '@wordpress/components';
+ 
+diff --git a/packages/components/src/spacer/README.md b/packages/components/src/spacer/README.md
+index 16160d39b61fa0..db9fc6a67b4209 100644
+--- a/packages/components/src/spacer/README.md
++++ b/packages/components/src/spacer/README.md
+@@ -1,9 +1,5 @@
+ # Spacer
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+-</div>
+-
+ `Spacer` is a primitive layout component that providers inner (`padding`) or outer (`margin`) space in-between components. It can also be used to adaptively provide space within an `HStack` or `VStack`.
+ 
+ ## Usage
+@@ -12,7 +8,7 @@ This feature is still experimental. “Experimental” means this is an early im
+ 
+ ```jsx
+ import {
+-	__experimentalSpacer as Spacer,
++	Spacer,
+ 	__experimentalHeading as Heading,
+ 	__experimentalView as View,
+ } from '@wordpress/components';
+diff --git a/packages/components/src/spacer/stories/index.story.tsx b/packages/components/src/spacer/stories/index.story.tsx
+index 586658ac0f01f5..0c69e901b26e9a 100644
+--- a/packages/components/src/spacer/stories/index.story.tsx
++++ b/packages/components/src/spacer/stories/index.story.tsx
+@@ -31,7 +31,7 @@ const controls = [
+ 
+ const meta: Meta< typeof Spacer > = {
+ 	component: Spacer,
+-	title: 'Components (Experimental)/Spacer',
++	title: 'Components/Spacer',
+ 	argTypes: {
+ 		as: { control: { type: 'text' } },
+ 		children: {
+diff --git a/packages/components/src/v-stack/README.md b/packages/components/src/v-stack/README.md
+index 2f447b18015e51..2081c1ee8ee2e3 100644
+--- a/packages/components/src/v-stack/README.md
++++ b/packages/components/src/v-stack/README.md
+@@ -73,7 +73,7 @@ When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to t
+ 
+ ```jsx
+ import {
+-	__experimentalSpacer as Spacer,
++	Spacer,
+ 	__experimentalText as Text,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+@@ -95,7 +95,7 @@ function Example() {
+ 
+ ```jsx
+ import {
+-	__experimentalSpacer as Spacer,
++	Spacer,
+ 	__experimentalText as Text,
+ 	__experimentalVStack as VStack,
+ } from '@wordpress/components';
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..35b084075e285e 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,6 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation', 'spacer' ];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

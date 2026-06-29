@@ -1,0 +1,180 @@
+diff --git a/packages/block-editor/src/components/colors-gradients/control.js b/packages/block-editor/src/components/colors-gradients/control.js
+index 241da40d5aa3a0..34e4f334e3c588 100644
+--- a/packages/block-editor/src/components/colors-gradients/control.js
++++ b/packages/block-editor/src/components/colors-gradients/control.js
+@@ -92,6 +92,7 @@ function ColorGradientControlInner( {
+ 		),
+ 		[ TAB_GRADIENT.value ]: (
+ 			<GradientPicker
++				__nextHasNoMargin
+ 				value={ gradientValue }
+ 				onChange={
+ 					canChooseAColor
+diff --git a/packages/components/src/custom-gradient-picker/index.js b/packages/components/src/custom-gradient-picker/index.js
+index 8247f9f2202f54..c1cc594c470646 100644
+--- a/packages/components/src/custom-gradient-picker/index.js
++++ b/packages/components/src/custom-gradient-picker/index.js
+@@ -6,6 +6,7 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
++import deprecated from '@wordpress/deprecated';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+@@ -125,6 +126,17 @@ export default function CustomGradientPicker( {
+ 		position: parseInt( colorStop.length.value ),
+ 	} ) );
+ 
++	if ( ! __nextHasNoMargin ) {
++		deprecated(
++			'Outer margin styles for wp.components.CustomGradientPicker',
++			{
++				since: '6.1',
++				version: '6.4',
++				hint: 'Set the `__nextHasNoMargin` prop to true to start opting into the new styles, which will become the default in a future version',
++			}
++		);
++	}
++
+ 	return (
+ 		<VStack
+ 			spacing={ 5 }
+diff --git a/packages/components/src/custom-gradient-picker/stories/index.js b/packages/components/src/custom-gradient-picker/stories/index.js
+index d4be0eb6917c85..9e56d1534955d0 100644
+--- a/packages/components/src/custom-gradient-picker/stories/index.js
++++ b/packages/components/src/custom-gradient-picker/stories/index.js
+@@ -28,3 +28,6 @@ const CustomGradientPickerWithState = ( props ) => {
+ };
+ 
+ export const Default = CustomGradientPickerWithState.bind( {} );
++Default.args = {
++	__nextHasNoMargin: true,
++};
+diff --git a/packages/components/src/gradient-picker/README.md b/packages/components/src/gradient-picker/README.md
+index 390631428028b5..8def1ef24de590 100644
+--- a/packages/components/src/gradient-picker/README.md
++++ b/packages/components/src/gradient-picker/README.md
+@@ -17,6 +17,7 @@ const myGradientPicker = () => {
+ 
+ 	return (
+ 		<GradientPicker
++			__nextHasNoMargin
+ 			value={ gradient }
+ 			onChange={ ( currentGradient ) => setGradient( currentGradient ) }
+ 			gradients={ [
+@@ -92,3 +93,11 @@ If true, the gradient picker will not be displayed and only defined gradients fr
+ -   Type: `Boolean`
+ -   Required: No
+ -   Default: false
++
++### __nextHasNoMargin
++
++Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
++
++-   Type: `Boolean`
++-   Required: No
++-   Default: `false`
+diff --git a/packages/components/src/gradient-picker/index.js b/packages/components/src/gradient-picker/index.js
+index 4f8cbe9fc7a303..d351476eb23c68 100644
+--- a/packages/components/src/gradient-picker/index.js
++++ b/packages/components/src/gradient-picker/index.js
+@@ -8,6 +8,7 @@ import { map } from 'lodash';
+  */
+ import { __, sprintf } from '@wordpress/i18n';
+ import { useCallback, useMemo } from '@wordpress/element';
++import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -120,6 +121,14 @@ export default function GradientPicker( {
+ 			? MultipleOrigin
+ 			: SingleOrigin;
+ 
++	if ( ! __nextHasNoMargin ) {
++		deprecated( 'Outer margin styles for wp.components.GradientPicker', {
++			since: '6.1',
++			version: '6.4',
++			hint: 'Set the `__nextHasNoMargin` prop to true to start opting into the new styles, which will become the default in a future version',
++		} );
++	}
++
+ 	// Can be removed when deprecation period is over
+ 	const deprecatedMarginSpacerProps = ! __nextHasNoMargin
+ 		? { marginTop: 3 }
+diff --git a/packages/components/src/gradient-picker/stories/index.js b/packages/components/src/gradient-picker/stories/index.js
+index 1a3bd61357e27b..508fa25bdb1949 100644
+--- a/packages/components/src/gradient-picker/stories/index.js
++++ b/packages/components/src/gradient-picker/stories/index.js
+@@ -74,6 +74,7 @@ const Template = ( { onChange, ...props } ) => {
+ 
+ export const Default = Template.bind( {} );
+ Default.args = {
++	__nextHasNoMargin: true,
+ 	gradients: GRADIENTS,
+ };
+ 
+diff --git a/packages/components/src/palette-edit/index.js b/packages/components/src/palette-edit/index.js
+index c4c3aa3373f0a1..065302acc10865 100644
+--- a/packages/components/src/palette-edit/index.js
++++ b/packages/components/src/palette-edit/index.js
+@@ -173,16 +173,19 @@ function Option( {
+ 						/>
+ 					) }
+ 					{ isGradient && (
+-						<CustomGradientPicker
+-							__experimentalIsRenderedInSidebar
+-							value={ value }
+-							onChange={ ( newGradient ) =>
+-								onChange( {
+-									...element,
+-									gradient: newGradient,
+-								} )
+-							}
+-						/>
++						<div className="components-palette-edit__popover-gradient-picker">
++							<CustomGradientPicker
++								__nextHasNoMargin
++								__experimentalIsRenderedInSidebar
++								value={ value }
++								onChange={ ( newGradient ) =>
++									onChange( {
++										...element,
++										gradient: newGradient,
++									} )
++								}
++							/>
++						</div>
+ 					) }
+ 				</Popover>
+ 			) }
+@@ -451,6 +454,7 @@ export default function PaletteEdit( {
+ 					{ ! isEditing &&
+ 						( isGradient ? (
+ 							<GradientPicker
++								__nextHasNoMargin
+ 								gradients={ gradients }
+ 								onChange={ () => {} }
+ 								clearable={ false }
+diff --git a/packages/components/src/palette-edit/style.scss b/packages/components/src/palette-edit/style.scss
+index d23c88c9e182fe..55fdfbf42cb525 100644
+--- a/packages/components/src/palette-edit/style.scss
++++ b/packages/components/src/palette-edit/style.scss
+@@ -1,14 +1,6 @@
+-.components-palette-edit__popover {
+-	.components-custom-gradient-picker__gradient-bar {
+-		margin-top: 0;
+-	}
+-	.components-custom-gradient-picker__ui-line {
+-		margin-bottom: 0;
+-	}
+-	.components-custom-gradient-picker {
+-		width: 280px;
+-		padding: 8px;
+-	}
++.components-palette-edit__popover-gradient-picker {
++	width: 280px;
++	padding: 8px;
+ }
+ .components-dropdown-menu__menu {
+ 	.components-palette-edit__menu-button {

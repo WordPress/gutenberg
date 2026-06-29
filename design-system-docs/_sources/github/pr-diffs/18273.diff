@@ -1,0 +1,188 @@
+diff --git a/docs/designers-developers/developers/themes/theme-support.md b/docs/designers-developers/developers/themes/theme-support.md
+index a6d8548fb9cfdc..49ec9a61c94905 100644
+--- a/docs/designers-developers/developers/themes/theme-support.md
++++ b/docs/designers-developers/developers/themes/theme-support.md
+@@ -176,7 +176,7 @@ add_theme_support(
+ 
+ ### Block Font Sizes:
+ 
+-Blocks may allow the user to configure the font sizes they use, e.g., the paragraph block. The block  provides a default set of font sizes, but a theme can overwrite it and provide its own:
++Blocks may allow the user to configure the font sizes they use, e.g., the paragraph block. The block provides a default set of font sizes, but a theme can overwrite it and provide its own:
+ 
+ ```php
+ add_theme_support( 'editor-font-sizes', array(
+@@ -186,9 +186,9 @@ add_theme_support( 'editor-font-sizes', array(
+ 		'slug' => 'small'
+ 	),
+ 	array(
+-		'name' => __( 'Normal', 'themeLangDomain' ),
++		'name' => __( 'Regular', 'themeLangDomain' ),
+ 		'size' => 16,
+-		'slug' => 'normal'
++		'slug' => 'regular'
+ 	),
+ 	array(
+ 		'name' => __( 'Large', 'themeLangDomain' ),
+@@ -216,6 +216,8 @@ As an example for the regular font size, a theme may provide the following class
+ }
+ ```
+ 
++**Note:** The slugs `default` and `custom` are reserved and cannot be used by themes.
++
+ ### Disabling custom font sizes
+ 
+ Themes can disable the ability to set custom font sizes with the following code:
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index 6024e1403b09b5..1028d305e1bc9c 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -72,6 +72,8 @@ The property `size` contains a number with the font size value, in `px`.
+ The `name` property includes a label for that font size e.g.: `Small`.
+ The `slug` property is a string with a unique identifier for the font size. Used for the class generation process.
+ 
++**Note:** The slugs `default` and `custom` are reserved and cannot be used.
++
+ - Type: `Array`
+ - Required: No
+ 
+diff --git a/packages/components/src/font-size-picker/index.js b/packages/components/src/font-size-picker/index.js
+index 2e9db1801ab247..ed5691d8336b3b 100644
+--- a/packages/components/src/font-size-picker/index.js
++++ b/packages/components/src/font-size-picker/index.js
+@@ -13,26 +13,30 @@ import Button from '../button';
+ import RangeControl from '../range-control';
+ import CustomSelectControl from '../custom-select-control';
+ 
++const DEFAULT_FONT_SIZE = 'default';
++const CUSTOM_FONT_SIZE = 'custom';
++
+ function getSelectValueFromFontSize( fontSizes, value ) {
+ 	if ( value ) {
+-		const fontSizeValue = fontSizes.find( ( font ) => font.size === value );
+-		return fontSizeValue ? fontSizeValue.slug : 'custom';
++		const fontSizeValue = fontSizes.find( ( font ) => font.size === Number( value ) );
++		return fontSizeValue ? fontSizeValue.slug : CUSTOM_FONT_SIZE;
+ 	}
+-	return 'normal';
++	return DEFAULT_FONT_SIZE;
+ }
+ 
+ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+-	if ( ! disableCustomFontSizes ) {
+-		optionsArray = [
+-			...optionsArray,
+-			{ slug: 'custom', name: __( 'Custom' ) },
+-		];
+-	}
+-	return optionsArray.map( ( option ) => ( {
+-		key: option.slug,
+-		name: option.name,
+-		style: { fontSize: option.size },
+-	} ) );
++	optionsArray = [
++		{ slug: DEFAULT_FONT_SIZE, name: __( 'Default' ) },
++		...optionsArray,
++		...disableCustomFontSizes ? [] : [ { slug: CUSTOM_FONT_SIZE, name: __( 'Custom' ) } ],
++	];
++	return optionsArray.map( ( option ) => (
++		{
++			key: option.slug,
++			name: option.name,
++			style: { fontSize: option.size },
++		}
++	) );
+ }
+ 
+ export default function FontSizePicker( {
+@@ -50,27 +54,44 @@ export default function FontSizePicker( {
+ 		return null;
+ 	}
+ 
+-	const onChangeValue = ( event ) => {
+-		const newValue = event.target.value;
+-		setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, Number( newValue ) ) );
+-		if ( newValue === '' ) {
++	const setFontSize = ( fontSizeKey, fontSizeValue ) => {
++		setCurrentSelectValue( fontSizeKey );
++
++		if ( fontSizeKey === DEFAULT_FONT_SIZE ) {
+ 			onChange( undefined );
+ 			return;
+ 		}
+-		onChange( Number( newValue ) );
++
++		if ( ! fontSizeValue ) {
++			return;
++		}
++
++		onChange( Number( fontSizeValue ) );
++	};
++
++	const onChangeValue = ( event ) => {
++		const newValue = event.target.value;
++		const key = getSelectValueFromFontSize( fontSizes, newValue );
++		setFontSize( key, newValue );
+ 	};
+ 
+ 	const onSelectChangeValue = ( { selectedItem } ) => {
+-		setCurrentSelectValue( selectedItem.key );
+-		onChange( selectedItem.style && selectedItem.style.fontSize );
++		const selectedKey = selectedItem.key;
++		const selectedValue = selectedItem.style && selectedItem.style.fontSize;
++		setFontSize( selectedKey, selectedValue );
+ 	};
+ 
+ 	const onSliderChangeValue = ( sliderValue ) => {
+-		onChange( sliderValue );
+-		setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, sliderValue ) );
++		const sliderKey = getSelectValueFromFontSize( fontSizes, sliderValue );
++		setFontSize( sliderKey, sliderValue );
++	};
++
++	const reset = () => {
++		setFontSize( DEFAULT_FONT_SIZE );
+ 	};
+ 
+ 	const options = getSelectOptions( fontSizes, disableCustomFontSizes );
++
+ 	const rangeControlNumberId = `components-range-control__number#${ instanceId }`;
+ 	return (
+ 		<fieldset className="components-font-size-picker">
+@@ -106,10 +127,7 @@ export default function FontSizePicker( {
+ 				<Button
+ 					className="components-color-palette__clear"
+ 					disabled={ value === undefined }
+-					onClick={ () => {
+-						onChange( undefined );
+-						setCurrentSelectValue( getSelectValueFromFontSize( fontSizes, undefined ) );
+-					} }
++					onClick={ reset }
+ 					isSmall
+ 					isSecondary
+ 				>
+diff --git a/packages/e2e-tests/specs/editor/various/editor-modes.test.js b/packages/e2e-tests/specs/editor/various/editor-modes.test.js
+index ac5c7180d39067..3a002a2d1f25d4 100644
+--- a/packages/e2e-tests/specs/editor/various/editor-modes.test.js
++++ b/packages/e2e-tests/specs/editor/various/editor-modes.test.js
+@@ -79,7 +79,7 @@ describe( 'Editing modes (visual/HTML)', () => {
+ 
+ 		// Change the font size using the sidebar.
+ 		await page.click( '.components-font-size-picker__select' );
+-		await page.click( '.components-custom-select-control__item:nth-child(4)' );
++		await page.click( '.components-custom-select-control__item:nth-child(5)' );
+ 
+ 		// Make sure the HTML content updated.
+ 		htmlBlockContent = await page.$eval( '.block-editor-block-list__layout .block-editor-block-list__block .block-editor-block-list__block-html-textarea', ( node ) => node.textContent );
+diff --git a/packages/e2e-tests/specs/editor/various/font-size-picker.test.js b/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
+index 04639b26814861..02b9e287b2d0e3 100644
+--- a/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
++++ b/packages/e2e-tests/specs/editor/various/font-size-picker.test.js
+@@ -18,7 +18,7 @@ describe( 'Font Size Picker', () => {
+ 		await clickBlockAppender();
+ 		await page.keyboard.type( 'Paragraph to be made "large"' );
+ 		await page.click( '.components-font-size-picker__select' );
+-		await page.click( '.components-custom-select-control__item:nth-child(4)' );
++		await page.click( '.components-custom-select-control__item:nth-child(5)' );
+ 
+ 		// Ensure content matches snapshot.
+ 		const content = await getEditedPostContent();

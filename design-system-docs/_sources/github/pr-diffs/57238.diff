@@ -1,0 +1,28 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index eccd9e639e5f20..c21aeeb7fc5fd8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ 
+ ### Enhancements
+ 
++-   `DropdownMenuV2`: do not collapse suffix width ([#57238](https://github.com/WordPress/gutenberg/pull/57238)).
+ -   `DateTimePicker`: Adjustment of the dot position on DayButton and expansion of the button area. ([#55502](https://github.com/WordPress/gutenberg/pull/55502)).
+ 
+ ### Experimental
+diff --git a/packages/components/src/dropdown-menu-v2-ariakit/styles.ts b/packages/components/src/dropdown-menu-v2-ariakit/styles.ts
+index eaa249ae86b78c..ec6b2cb74d2172 100644
+--- a/packages/components/src/dropdown-menu-v2-ariakit/styles.ts
++++ b/packages/components/src/dropdown-menu-v2-ariakit/styles.ts
+@@ -269,8 +269,9 @@ export const DropdownMenuItemChildrenWrapper = styled.div`
+ `;
+ 
+ export const ItemSuffixWrapper = styled.span`
+-	flex: 0;
+-	width: max-content;
++	flex: 0 1 fit-content;
++	min-width: 0;
++	width: fit-content;
+ 
+ 	display: flex;
+ 	align-items: center;

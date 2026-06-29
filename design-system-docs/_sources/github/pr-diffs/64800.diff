@@ -1,0 +1,150 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 44536df98b5815..693fcf71db183f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -42,6 +42,10 @@
+     -   `TreeSelect`
+     -   `UnitControl`
+ 
++### Bug Fixes
++
++-   `TimePicker`: use ToggleGroupControl for AM/PM toggle ([#64800](https://github.com/WordPress/gutenberg/pull/64800)).
++
+ ### Internal
+ 
+ -   `DropdownMenu` v2: refactor to overloaded naming convention ([#64654](https://github.com/WordPress/gutenberg/pull/64654)).
+diff --git a/packages/components/src/date-time/time/test/index.tsx b/packages/components/src/date-time/time/test/index.tsx
+index 0b91d95a5fc92d..6f843fda75336c 100644
+--- a/packages/components/src/date-time/time/test/index.tsx
++++ b/packages/components/src/date-time/time/test/index.tsx
+@@ -281,12 +281,9 @@ describe( 'TimePicker', () => {
+ 		expect(
+ 			( screen.getByLabelText( 'Minutes' ) as HTMLInputElement ).value
+ 		).toBe( '00' );
+-		/**
+-		 * This is not ideal, but best of we can do for now until we refactor
+-		 * AM/PM into accessible elements, like radio buttons.
+-		 */
+-		expect( screen.getByText( 'AM' ) ).not.toHaveClass( 'is-primary' );
+-		expect( screen.getByText( 'PM' ) ).toHaveClass( 'is-primary' );
++
++		expect( screen.getByRole( 'radio', { name: 'AM' } ) ).not.toBeChecked();
++		expect( screen.getByRole( 'radio', { name: 'PM' } ) ).toBeChecked();
+ 	} );
+ 
+ 	it( 'should have different layouts/orders for 12/24 hour formats', () => {
+diff --git a/packages/components/src/date-time/time/time-input/index.tsx b/packages/components/src/date-time/time/time-input/index.tsx
+index b4421c601b1d6d..e2628fdb7a2b46 100644
+--- a/packages/components/src/date-time/time/time-input/index.tsx
++++ b/packages/components/src/date-time/time/time-input/index.tsx
+@@ -20,8 +20,6 @@ import {
+ 	Fieldset,
+ } from '../styles';
+ import { HStack } from '../../../h-stack';
+-import Button from '../../../button';
+-import ButtonGroup from '../../../button-group';
+ import {
+ 	from12hTo24h,
+ 	from24hTo12h,
+@@ -32,6 +30,10 @@ import type { TimeInputProps } from '../../types';
+ import type { InputChangeCallback } from '../../../input-control/types';
+ import { useControlledValue } from '../../../utils';
+ import BaseControl from '../../../base-control';
++import {
++	ToggleGroupControl,
++	ToggleGroupControlOption,
++} from '../../../toggle-group-control';
+ 
+ export function TimeInput( {
+ 	value: valueProp,
+@@ -164,30 +166,28 @@ export function TimeInput( {
+ 					/>
+ 				</TimeWrapper>
+ 				{ is12Hour && (
+-					<ButtonGroup
+-						className="components-datetime__time-field components-datetime__time-field-am-pm" // Unused, for backwards compatibility.
++					<ToggleGroupControl
++						__next40pxDefaultSize
++						__nextHasNoMarginBottom
++						isBlock
++						label={ __( 'Select AM or PM' ) }
++						hideLabelFromVision
++						value={ dayPeriod }
++						onChange={ ( newValue ) => {
++							buildAmPmChangeCallback(
++								newValue as 'AM' | 'PM'
++							)();
++						} }
+ 					>
+-						<Button
+-							className="components-datetime__time-am-button" // Unused, for backwards compatibility.
+-							variant={
+-								dayPeriod === 'AM' ? 'primary' : 'secondary'
+-							}
+-							__next40pxDefaultSize
+-							onClick={ buildAmPmChangeCallback( 'AM' ) }
+-						>
+-							{ __( 'AM' ) }
+-						</Button>
+-						<Button
+-							className="components-datetime__time-pm-button" // Unused, for backwards compatibility.
+-							variant={
+-								dayPeriod === 'PM' ? 'primary' : 'secondary'
+-							}
+-							__next40pxDefaultSize
+-							onClick={ buildAmPmChangeCallback( 'PM' ) }
+-						>
+-							{ __( 'PM' ) }
+-						</Button>
+-					</ButtonGroup>
++						<ToggleGroupControlOption
++							value="AM"
++							label={ __( 'AM' ) }
++						/>
++						<ToggleGroupControlOption
++							value="PM"
++							label={ __( 'PM' ) }
++						/>
++					</ToggleGroupControl>
+ 				) }
+ 			</HStack>
+ 		</Wrapper>
+diff --git a/packages/components/src/date-time/time/time-input/test/index.tsx b/packages/components/src/date-time/time/time-input/test/index.tsx
+index c107cd2c9d79b6..eae082a12bc1c9 100644
+--- a/packages/components/src/date-time/time/time-input/test/index.tsx
++++ b/packages/components/src/date-time/time/time-input/test/index.tsx
+@@ -80,12 +80,11 @@ describe( 'TimeInput', () => {
+ 		const minutesInput = screen.getByRole( 'spinbutton', {
+ 			name: 'Minutes',
+ 		} );
+-		const amButton = screen.getByRole( 'button', { name: 'AM' } );
+-		const pmButton = screen.getByRole( 'button', { name: 'PM' } );
++		const amButton = screen.getByRole( 'radio', { name: 'AM' } );
++		const pmButton = screen.getByRole( 'radio', { name: 'PM' } );
+ 
+-		// TODO: Update assert these states through the accessibility tree rather than through styles, see: https://github.com/WordPress/gutenberg/issues/61163
+-		expect( amButton ).toHaveClass( 'is-primary' );
+-		expect( pmButton ).not.toHaveClass( 'is-primary' );
++		expect( amButton ).toBeChecked();
++		expect( pmButton ).not.toBeChecked();
+ 		expect( hoursInput ).not.toHaveValue( 0 );
+ 		expect( hoursInput ).toHaveValue( 12 );
+ 
+@@ -94,7 +93,7 @@ describe( 'TimeInput', () => {
+ 		await user.keyboard( '{Tab}' );
+ 
+ 		expect( onChangeSpy ).toHaveBeenCalledWith( { hours: 0, minutes: 35 } );
+-		expect( amButton ).toHaveClass( 'is-primary' );
++		expect( amButton ).toBeChecked();
+ 
+ 		await user.clear( hoursInput );
+ 		await user.type( hoursInput, '12' );
+@@ -107,7 +106,7 @@ describe( 'TimeInput', () => {
+ 			hours: 12,
+ 			minutes: 35,
+ 		} );
+-		expect( pmButton ).toHaveClass( 'is-primary' );
++		expect( pmButton ).toBeChecked();
+ 	} );
+ 
+ 	it( 'should call onChange with defined minutes steps', async () => {

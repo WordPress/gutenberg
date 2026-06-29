@@ -1,0 +1,437 @@
+diff --git a/assets/stylesheets/_z-index.scss b/assets/stylesheets/_z-index.scss
+index 67e8396320addb..7b7e0aedd55301 100644
+--- a/assets/stylesheets/_z-index.scss
++++ b/assets/stylesheets/_z-index.scss
+@@ -115,6 +115,9 @@ $z-layers: (
+ 	// Make sure block manager sticky category titles appear above the options
+ 	".edit-post-manage-blocks-modal__category-title": 1,
+ 
++	// Needs to appear bellow other color circular picker related UI elements.
++	".components-circular-option-picker__option-wrapper::before": -1,
++
+ 	".components-circular-option-picker__option.is-active": 1,
+ 	// Needs to be higher than .components-circular-option-picker__option.is-active.
+ 	".components-circular-option-picker__option.is-active + .dashicons-saved": 2
+diff --git a/packages/block-editor/src/components/gradient-picker/control.js b/packages/block-editor/src/components/gradient-picker/control.js
+new file mode 100644
+index 00000000000000..73609ffdf17e27
+--- /dev/null
++++ b/packages/block-editor/src/components/gradient-picker/control.js
+@@ -0,0 +1,35 @@
++
++/**
++ * External dependencies
++ */
++import classnames from 'classnames';
++
++/**
++ * WordPress dependencies
++ */
++import { BaseControl } from '@wordpress/components';
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import GradientPicker from './';
++
++export default function( { className, ...props } ) {
++	return (
++		<BaseControl
++			className={ classnames(
++				'block-editor-gradient-picker-control',
++				className
++			) }
++		>
++			<BaseControl.VisualLabel>
++				{ __( 'Gradient Presets' ) }
++			</BaseControl.VisualLabel>
++			<GradientPicker
++				className="block-editor-gradient-picker-control__gradient-picker-presets"
++				{ ...props }
++			/>
++		</BaseControl>
++	);
++}
+diff --git a/packages/block-editor/src/components/gradient-picker/control.scss b/packages/block-editor/src/components/gradient-picker/control.scss
+new file mode 100644
+index 00000000000000..e73745321e6c93
+--- /dev/null
++++ b/packages/block-editor/src/components/gradient-picker/control.scss
+@@ -0,0 +1,4 @@
++.block-editor-gradient-picker-control__gradient-picker-presets {
++	display: inline-block;
++	margin-top: 0.6rem;
++}
+diff --git a/packages/block-editor/src/components/gradient-picker/index.js b/packages/block-editor/src/components/gradient-picker/index.js
+new file mode 100644
+index 00000000000000..a4b5fac2b98f7c
+--- /dev/null
++++ b/packages/block-editor/src/components/gradient-picker/index.js
+@@ -0,0 +1,24 @@
++/**
++ * WordPress dependencies
++ */
++import { __experimentalGradientPicker } from '@wordpress/components';
++import { useSelect } from '@wordpress/data';
++
++function GradientPickerWithGradients( props ) {
++	const gradients = useSelect( ( select ) => (
++		select( 'core/block-editor' ).getSettings().gradients
++	) );
++	return (
++		<__experimentalGradientPicker
++			{ ...props }
++			gradients={ gradients }
++		/>
++	);
++}
++
++export default function( props ) {
++	const ComponentToUse = props.gradients ?
++		__experimentalGradientPicker :
++		GradientPickerWithGradients;
++	return ( <ComponentToUse { ...props } /> );
++}
+diff --git a/packages/block-editor/src/components/index.js b/packages/block-editor/src/components/index.js
+index 84184ac70bd5bc..6e9bb592378678 100644
+--- a/packages/block-editor/src/components/index.js
++++ b/packages/block-editor/src/components/index.js
+@@ -17,6 +17,8 @@ export { default as BlockVerticalAlignmentToolbar } from './block-vertical-align
+ export { default as ButtonBlockerAppender } from './button-block-appender';
+ export { default as ColorPalette } from './color-palette';
+ export { default as ContrastChecker } from './contrast-checker';
++export { default as __experimentalGradientPicker } from './gradient-picker';
++export { default as __experimentalGradientPickerControl } from './gradient-picker/control';
+ export { default as InnerBlocks } from './inner-blocks';
+ export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
+ export { default as InspectorControls } from './inspector-controls';
+diff --git a/packages/block-editor/src/store/defaults.js b/packages/block-editor/src/store/defaults.js
+index f7076f28c27570..06eabc9f6f11f4 100644
+--- a/packages/block-editor/src/store/defaults.js
++++ b/packages/block-editor/src/store/defaults.js
+@@ -152,5 +152,80 @@ export const SETTINGS_DEFAULTS = {
+ 	__experimentalEnableLegacyWidgetBlock: false,
+ 	__experimentalEnableMenuBlock: false,
+ 	__experimentalBlockDirectory: false,
++	gradients: [
++		{
++			name: __( 'Vivid cyan blue to vivid purple' ),
++			gradient: 'linear-gradient(135deg, rgba(6, 147, 227, 1) 0%, rgb(155, 81, 224) 100%)',
++		},
++		{
++			name: __( 'Vivid green cyan to vivid cyan blue' ),
++			gradient: 'linear-gradient(135deg, rgba(0, 208, 132, 1) 0%, rgba(6, 147, 227, 1) 100%)',
++		},
++		{
++			name: __( 'Light green cyan to vivid green cyan' ),
++			gradient: 'linear-gradient(135deg, rgb(122, 220, 180) 0%, rgb(0, 208, 130) 100%)',
++		},
++		{
++			name: __( 'Luminous vivid amber to luminous vivid orange' ),
++			gradient: 'linear-gradient(135deg, rgba(252, 185, 0, 1) 0%, rgba(255, 105, 0, 1) 100%)',
++		},
++		{
++			name: __( 'Luminous vivid orange to vivid red' ),
++			gradient: 'linear-gradient(135deg, rgba(255, 105, 0, 1) 0%, rgb(207, 46, 46) 100%)',
++		},
++		{
++			name: __( 'Very light gray to cyan bluish gray' ),
++			gradient: 'linear-gradient(135deg, rgb(238, 238, 238) 0%, rgb(169, 184, 195)',
++		},
++		// The following use new, customized colors.
++		{
++			name: __( 'Cool to warm spectrum' ),
++			gradient: 'linear-gradient(135deg, rgb(74, 234, 220), rgb(151, 120, 209), rgb(207, 42, 186), rgb(238, 44, 130), rgb(251, 105, 98),rgb(254, 248, 76)',
++		},
++		{
++			name: __( 'Blush light purple' ),
++			gradient: 'linear-gradient(135deg, rgb(255, 206, 236), rgb(152, 150, 240)',
++		},
++		{
++			name: __( 'Blush bordeaux' ),
++			gradient: 'linear-gradient(135deg, rgb(254, 205, 165), rgb(254, 45, 45), rgb(107, 0, 62)',
++		},
++		{
++			name: __( 'Purple crush' ),
++			gradient: 'linear-gradient(135deg, rgb(52, 226, 228), rgb(71, 33, 251), rgb(171, 29, 254)',
++		},
++		{
++			name: __( 'Luminous dusk' ),
++			gradient: 'linear-gradient(135deg, rgb(255, 203, 112), rgb(199, 81, 192), rgb(65, 88, 208)',
++		},
++		{
++			name: __( 'Hazy dawn' ),
++			gradient: 'linear-gradient(135deg, rgb(250, 172, 168), rgb(218, 208, 236)',
++		},
++		{
++			name: __( 'Pale ocean' ),
++			gradient: 'linear-gradient(135deg, rgb(255, 245, 203), rgb(182, 227, 212), rgb(51, 167, 181)',
++		},
++		{
++			name: __( 'Electric grass' ),
++			gradient: 'linear-gradient(135deg, rgb(202, 248, 128), rgb(113, 206, 126)',
++		},
++		{
++			name: __( 'Subdued olive' ),
++			gradient: 'linear-gradient(135deg, rgb(250, 250, 225), rgb(103, 166, 113)',
++		},
++		{
++			name: __( 'Atomic cream' ),
++			gradient: 'linear-gradient(135deg, rgb(253, 215, 154), rgb(0, 74, 89)',
++		},
++		{
++			name: __( 'Nightshade' ),
++			gradient: 'linear-gradient(135deg, rgb(51, 9, 104), rgb(49, 205, 207)',
++		},
++		{
++			name: __( 'Midnight' ),
++			gradient: 'linear-gradient(135deg, rgb(2, 3, 129), rgb(40, 116, 252)',
++		},
++	],
+ };
+ 
+diff --git a/packages/block-editor/src/style.scss b/packages/block-editor/src/style.scss
+index 95d7a0805873c4..8ebb2e487a4f29 100644
+--- a/packages/block-editor/src/style.scss
++++ b/packages/block-editor/src/style.scss
+@@ -17,6 +17,7 @@
+ @import "./components/color-palette/control.scss";
+ @import "./components/contrast-checker/style.scss";
+ @import "./components/default-block-appender/style.scss";
++@import "./components/gradient-picker/control.scss";
+ @import "./components/inner-blocks/style.scss";
+ @import "./components/inserter-with-shortcuts/style.scss";
+ @import "./components/inserter/style.scss";
+diff --git a/packages/block-library/src/button/block.json b/packages/block-library/src/button/block.json
+index ebe5748d489e25..ff43c67db5e834 100644
+--- a/packages/block-library/src/button/block.json
++++ b/packages/block-library/src/button/block.json
+@@ -48,6 +48,9 @@
+ 		},
+ 		"borderRadius": {
+ 			"type": "number"
++		},
++		"customGradient": {
++			"type": "string"
+ 		}
+ 	}
+ }
+diff --git a/packages/block-library/src/button/edit.js b/packages/block-library/src/button/edit.js
+index a57ab89ca94f6c..17908484218091 100644
+--- a/packages/block-library/src/button/edit.js
++++ b/packages/block-library/src/button/edit.js
+@@ -30,6 +30,7 @@ import {
+ 	InspectorControls,
+ 	withColors,
+ 	PanelColorSettings,
++	__experimentalGradientPickerControl,
+ } from '@wordpress/block-editor';
+ 
+ const { getComputedStyle } = window;
+@@ -133,6 +134,7 @@ class ButtonEdit extends Component {
+ 			text,
+ 			title,
+ 			url,
++			customGradient,
+ 		} = attributes;
+ 
+ 		const linkId = `wp-block-button__inline-link-${ instanceId }`;
+@@ -146,15 +148,16 @@ class ButtonEdit extends Component {
+ 					withoutInteractiveFormatting
+ 					className={ classnames(
+ 						'wp-block-button__link', {
+-							'has-background': backgroundColor.color,
+-							[ backgroundColor.class ]: backgroundColor.class,
++							'has-background': backgroundColor.color || customGradient,
++							[ backgroundColor.class ]: ! customGradient && backgroundColor.class,
+ 							'has-text-color': textColor.color,
+ 							[ textColor.class ]: textColor.class,
+ 							'no-border-radius': borderRadius === 0,
+ 						}
+ 					) }
+ 					style={ {
+-						backgroundColor: backgroundColor.color,
++						backgroundColor: ! customGradient && backgroundColor.color,
++						background: customGradient,
+ 						color: textColor.color,
+ 						borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+ 					} }
+@@ -183,7 +186,10 @@ class ButtonEdit extends Component {
+ 						colorSettings={ [
+ 							{
+ 								value: backgroundColor.color,
+-								onChange: setBackgroundColor,
++								onChange: ( newColor ) => {
++									setAttributes( { customGradient: undefined } );
++									setBackgroundColor( newColor );
++								},
+ 								label: __( 'Background Color' ),
+ 							},
+ 							{
+@@ -205,6 +211,20 @@ class ButtonEdit extends Component {
+ 							} }
+ 						/>
+ 					</PanelColorSettings>
++					<PanelBody title={ __( 'Gradient' ) }>
++						<__experimentalGradientPickerControl
++							onChange={
++								( newGradient ) => {
++									setAttributes( {
++										customGradient: newGradient,
++										backgroundColor: undefined,
++										customBackgroundColor: undefined,
++									} );
++								}
++							}
++							value={ customGradient }
++						/>
++					</PanelBody>
+ 					<BorderPanel
+ 						borderRadius={ borderRadius }
+ 						setAttributes={ setAttributes }
+diff --git a/packages/block-library/src/button/save.js b/packages/block-library/src/button/save.js
+index ab2385bb755928..bcf18ffc293242 100644
+--- a/packages/block-library/src/button/save.js
++++ b/packages/block-library/src/button/save.js
+@@ -17,6 +17,7 @@ export default function save( { attributes } ) {
+ 		borderRadius,
+ 		customBackgroundColor,
+ 		customTextColor,
++		customGradient,
+ 		linkTarget,
+ 		rel,
+ 		text,
+@@ -26,18 +27,19 @@ export default function save( { attributes } ) {
+ 	} = attributes;
+ 
+ 	const textClass = getColorClassName( 'color', textColor );
+-	const backgroundClass = getColorClassName( 'background-color', backgroundColor );
++	const backgroundClass = ! customGradient && getColorClassName( 'background-color', backgroundColor );
+ 
+ 	const buttonClasses = classnames( 'wp-block-button__link', {
+ 		'has-text-color': textColor || customTextColor,
+ 		[ textClass ]: textClass,
+-		'has-background': backgroundColor || customBackgroundColor,
++		'has-background': backgroundColor || customBackgroundColor || customGradient,
+ 		[ backgroundClass ]: backgroundClass,
+ 		'no-border-radius': borderRadius === 0,
+ 	} );
+ 
+ 	const buttonStyle = {
+-		backgroundColor: backgroundClass ? undefined : customBackgroundColor,
++		backgroundColor: backgroundClass || customGradient ? undefined : customBackgroundColor,
++		background: customGradient ? customGradient : undefined,
+ 		color: textClass ? undefined : customTextColor,
+ 		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+ 	};
+diff --git a/packages/components/src/circular-option-picker/style.scss b/packages/components/src/circular-option-picker/style.scss
+index 721d8307a85e34..4098ca3248d0d8 100644
+--- a/packages/components/src/circular-option-picker/style.scss
++++ b/packages/components/src/circular-option-picker/style.scss
+@@ -33,6 +33,21 @@ $color-palette-circle-spacing: 14px;
+ 	}
+ }
+ 
++.components-circular-option-picker__option-wrapper::before {
++	content: "";
++	position: absolute;
++	top: 1px;
++	left: 1px;
++	bottom: 1px;
++	right: 1px;
++	border-radius: $radius-round;
++	// Show a thin circular outline in Windows high contrast mode, otherwise the button is invisible.
++	z-index: z-index(".components-circular-option-picker__option-wrapper::before");
++	// Need to disable the lint rule because given that we are in the presence of a data URL that needs quotes we need to wrap it with single quotes.
++	/* stylelint-disable-next-line function-url-quotes */
++	background: url('data:image/svg+xml,%3Csvg width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M6 8V6H4v2h2zM8 8V6h2v2H8zM10 16H8v-2h2v2zM12 16v-2h2v2h-2zM12 18v-2h-2v2H8v2h2v-2h2zM14 18v2h-2v-2h2zM16 18h-2v-2h2v2z" fill="%23555D65"/%3E%3Cpath fill-rule="evenodd" clip-rule="evenodd" d="M18 18h2v-2h-2v-2h2v-2h-2v-2h2V8h-2v2h-2V8h-2v2h2v2h-2v2h2v2h2v2zm-2-4v-2h2v2h-2z" fill="%23555D65"/%3E%3Cpath d="M18 18v2h-2v-2h2z" fill="%23555D65"/%3E%3Cpath fill-rule="evenodd" clip-rule="evenodd" d="M8 10V8H6v2H4v2h2v2H4v2h2v2H4v2h2v2H4v2h2v-2h2v2h2v-2h2v2h2v-2h2v2h2v-2h2v2h2v-2h2v-2h-2v-2h2v-2h-2v-2h2v-2h-2v-2h2V8h-2V6h2V4h-2v2h-2V4h-2v2h-2V4h-2v2h-2V4h-2v2h2v2h-2v2H8zm0 2v-2H6v2h2zm2 0v-2h2v2h-2zm0 2v-2H8v2H6v2h2v2H6v2h2v2h2v-2h2v2h2v-2h2v2h2v-2h2v2h2v-2h-2v-2h2v-2h-2v-2h2v-2h-2v-2h2V8h-2V6h-2v2h-2V6h-2v2h-2v2h2v2h-2v2h-2z" fill="%23555D65"/%3E%3Cpath fill-rule="evenodd" clip-rule="evenodd" d="M4 0H2v2H0v2h2v2H0v2h2v2H0v2h2v2H0v2h2v2H0v2h2v2H0v2h2v2H0v2h2v-2h2v2h2v-2h2v2h2v-2h2v2h2v-2h2v2h2v-2h2v2h2v-2h2v2h2v-2h2v-2h-2v-2h2v-2h-2v-2h2v-2h-2v-2h2v-2h-2v-2h2V8h-2V6h2V4h-2V2h2V0h-2v2h-2V0h-2v2h-2V0h-2v2h-2V0h-2v2h-2V0h-2v2H8V0H6v2H4V0zm0 4V2H2v2h2zm2 0V2h2v2H6zm0 2V4H4v2H2v2h2v2H2v2h2v2H2v2h2v2H2v2h2v2H2v2h2v2h2v-2h2v2h2v-2h2v2h2v-2h2v2h2v-2h2v2h2v-2h2v2h2v-2h-2v-2h2v-2h-2v-2h2v-2h-2v-2h2v-2h-2v-2h2V8h-2V6h2V4h-2V2h-2v2h-2V2h-2v2h-2V2h-2v2h-2V2h-2v2H8v2H6z" fill="%23555D65"/%3E%3C/svg%3E');
++}
++
+ .components-circular-option-picker__option {
+ 	display: inline-block;
+ 	vertical-align: top;
+diff --git a/packages/components/src/gradient-picker/index.js b/packages/components/src/gradient-picker/index.js
+new file mode 100644
+index 00000000000000..1a60de751646f3
+--- /dev/null
++++ b/packages/components/src/gradient-picker/index.js
+@@ -0,0 +1,66 @@
++/**
++ * External dependencies
++ */
++import { map } from 'lodash';
++
++/**
++ * WordPress dependencies
++ */
++import { __, sprintf } from '@wordpress/i18n';
++import { useCallback, useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import CircularOptionPicker from '../circular-option-picker';
++
++export default function GradientPicker( {
++	className,
++	gradients,
++	onChange,
++	value,
++} ) {
++	const clearGradient = useCallback(
++		() => onChange( undefined ),
++		[ onChange ]
++	);
++	const gradientOptions = useMemo(
++		() => {
++			return map( gradients, ( { gradient, name } ) => (
++				<CircularOptionPicker.Option
++					key={ gradient }
++					value={ gradient }
++					isSelected={ value === gradient }
++					tooltipText={ name ||
++						// translators: %s: gradient code e.g: "linear-gradient(90deg, rgba(98,16,153,1) 0%, rgba(172,110,22,1) 100%);".
++						sprintf( __( 'Gradient code: %s' ), gradient )
++					}
++					style={ { color: 'rgba( 0,0,0,0 )', background: gradient } }
++					onClick={
++						value === gradient ?
++							clearGradient :
++							() => ( onChange( gradient ) )
++					}
++					aria-label={ name ?
++						// translators: %s: The name of the gradient e.g: "Angular red to blue".
++						sprintf( __( 'Gradient: %s' ), name ) :
++						// translators: %s: gradient code e.g: "linear-gradient(90deg, rgba(98,16,153,1) 0%, rgba(172,110,22,1) 100%);".
++						sprintf( __( 'Gradient code: %s' ), gradient )
++					}
++				/>
++			) );
++		},
++		[ gradients, value, onChange, clearGradient ]
++	);
++	return (
++		<CircularOptionPicker
++			className={ className }
++			options={ gradientOptions }
++			actions={ (
++				<CircularOptionPicker.ButtonAction onClick={ clearGradient }>
++					{ __( 'Clear' ) }
++				</CircularOptionPicker.ButtonAction>
++			) }
++		/>
++	);
++}
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 5ce67b968084ea..8542a86ba9b659 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -25,6 +25,7 @@ export { default as FontSizePicker } from './font-size-picker';
+ export { default as FormFileUpload } from './form-file-upload';
+ export { default as FormToggle } from './form-toggle';
+ export { default as FormTokenField } from './form-token-field';
++export { default as __experimentalGradientPicker } from './gradient-picker';
+ export { default as Icon } from './icon';
+ export { default as IconButton } from './icon-button';
+ export { default as KeyboardShortcuts } from './keyboard-shortcuts';

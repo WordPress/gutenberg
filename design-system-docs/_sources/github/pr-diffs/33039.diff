@@ -1,0 +1,156 @@
+diff --git a/packages/components/src/utils/hooks/index.js b/packages/components/src/utils/hooks/index.js
+index 3eeca7881e2563..187718e5e70a9a 100644
+--- a/packages/components/src/utils/hooks/index.js
++++ b/packages/components/src/utils/hooks/index.js
+@@ -1,3 +1,4 @@
+ export { default as useControlledState } from './use-controlled-state';
+ export { default as useJumpStep } from './use-jump-step';
+ export { default as useUpdateEffect } from './use-update-effect';
++export { useControlledValue } from './use-controlled-value';
+diff --git a/packages/components/src/utils/hooks/test/use-controlled-value.js b/packages/components/src/utils/hooks/test/use-controlled-value.js
+new file mode 100644
+index 00000000000000..1d63d9248021ea
+--- /dev/null
++++ b/packages/components/src/utils/hooks/test/use-controlled-value.js
+@@ -0,0 +1,101 @@
++/**
++ * External dependencies
++ */
++import { fireEvent, render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { useControlledValue } from '../use-controlled-value';
++
++function Input( props ) {
++	const [ value, setValue ] = useControlledValue( props );
++	return (
++		<input
++			value={ value }
++			onChange={ ( event ) => setValue( event.target.value ) }
++		/>
++	);
++}
++
++function getInput() {
++	return screen.getByRole( 'textbox' );
++}
++
++describe( 'useControlledValue', () => {
++	it( 'should use the default value', () => {
++		render( <Input defaultValue="WordPress.org" /> );
++		expect( getInput() ).toHaveValue( 'WordPress.org' );
++	} );
++
++	it( 'should use the default value then switch to the controlled value', () => {
++		const { rerender } = render( <Input defaultValue="WordPress.org" /> );
++		expect( getInput() ).toHaveValue( 'WordPress.org' );
++
++		rerender(
++			<Input defaultValue="WordPress.org" value="Code is Poetry" />
++		);
++		expect( getInput() ).toHaveValue( 'Code is Poetry' );
++	} );
++
++	it( 'should not call onChange only when there is no value being passed in', () => {
++		const onChange = jest.fn();
++		render( <Input defaultValue="WordPress.org" onChange={ onChange } /> );
++
++		expect( getInput() ).toHaveValue( 'WordPress.org' );
++
++		fireEvent.change( getInput(), { target: { value: 'Code is Poetry' } } );
++
++		expect( getInput() ).toHaveValue( 'Code is Poetry' );
++		expect( onChange ).not.toHaveBeenCalled();
++	} );
++
++	it( 'should call onChange when there is a value passed in', () => {
++		const onChange = jest.fn();
++		const { rerender } = render(
++			<Input
++				defaultValue="WordPress.org"
++				value="Code is Poetry"
++				onChange={ onChange }
++			/>
++		);
++
++		expect( getInput() ).toHaveValue( 'Code is Poetry' );
++
++		fireEvent.change( getInput(), {
++			target: { value: 'WordPress rocks!' },
++		} );
++
++		rerender(
++			<Input
++				defaultValue="WordPress.org"
++				value="WordPress rocks!"
++				onChange={ onChange }
++			/>
++		);
++
++		expect( getInput() ).toHaveValue( 'WordPress rocks!' );
++		expect( onChange ).toHaveBeenCalledWith( 'WordPress rocks!' );
++	} );
++
++	it( 'should not maintain internal state if no onChange is passed but a value is passed', () => {
++		const { rerender } = render( <Input value="Code is Poetry" /> );
++
++		expect( getInput() ).toHaveValue( 'Code is Poetry' );
++
++		// primarily this proves that the hook doesn't break if no onChange is passed but
++		// value turns into a controlled state, for example if the value needs to be set
++		// to a constant in certain conditions but no change listening needs to happen
++		fireEvent.change( getInput(), { target: { value: 'WordPress.org' } } );
++
++		// If `value` is passed then we expect the value to be fully controlled
++		// meaning that the value passed in will always be used even though
++		// we're managing internal state.
++		expect( getInput() ).toHaveValue( 'Code is Poetry' );
++
++		// Next we un-set the value to uncover the internal state which was still maintained
++		rerender( <Input /> );
++
++		expect( getInput() ).toHaveValue( 'WordPress.org' );
++	} );
++} );
+diff --git a/packages/components/src/utils/hooks/use-controlled-value.ts b/packages/components/src/utils/hooks/use-controlled-value.ts
+new file mode 100644
+index 00000000000000..c0878e75f191cf
+--- /dev/null
++++ b/packages/components/src/utils/hooks/use-controlled-value.ts
+@@ -0,0 +1,34 @@
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++type Props< T > = {
++	defaultValue?: T;
++	value?: T;
++	onChange?: ( value: T ) => void;
++};
++
++/**
++ * Simplified and improved implementation of useControlledState.
++ *
++ * @param  props
++ * @param  props.defaultValue
++ * @param  props.value
++ * @param  props.onChange
++ * @return The controlled value and the value setter.
++ */
++export function useControlledValue< T >( {
++	defaultValue,
++	onChange,
++	value: valueProp,
++}: Props< T > ): [ T | undefined, ( value: T ) => void ] {
++	const hasValue = typeof valueProp !== 'undefined';
++	const initialValue = hasValue ? valueProp : defaultValue;
++	const [ state, setState ] = useState( initialValue );
++	const value = hasValue ? valueProp : state;
++	const setValue =
++		hasValue && typeof onChange === 'function' ? onChange : setState;
++
++	return [ value, setValue ];
++}

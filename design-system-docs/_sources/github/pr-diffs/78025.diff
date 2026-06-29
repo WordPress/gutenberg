@@ -1,0 +1,135 @@
+diff --git a/packages/block-editor/src/components/inspector-controls-tabs/advanced-controls-panel.js b/packages/block-editor/src/components/inspector-controls-tabs/advanced-controls-panel.js
+index fabe0c429216ae..58484cad08a1b1 100644
+--- a/packages/block-editor/src/components/inspector-controls-tabs/advanced-controls-panel.js
++++ b/packages/block-editor/src/components/inspector-controls-tabs/advanced-controls-panel.js
+@@ -6,6 +6,7 @@ import {
+ 	__experimentalUseSlotFills as useSlotFills,
+ } from '@wordpress/components';
+ import { __ } from '@wordpress/i18n';
++import { useSelect } from '@wordpress/data';
+ 
+ /**
+  * Internal dependencies
+@@ -14,6 +15,7 @@ import {
+ 	default as InspectorControls,
+ 	InspectorAdvancedControls,
+ } from '../inspector-controls';
++import { store as blockEditorStore } from '../../store';
+ import { PrivateInspectorControlsAllowedBlocks } from '../inspector-controls/groups';
+ 
+ const AdvancedControls = ( { initialOpen = false } ) => {
+@@ -24,6 +26,15 @@ const AdvancedControls = ( { initialOpen = false } ) => {
+ 	const hasFills = Boolean( fills && fills.length );
+ 	const hasPrivateFills = Boolean( privateFills && privateFills.length );
+ 
++	const blockClassName = useSelect( ( select ) => {
++		const { getSelectedBlockClientId, getBlockAttributes } =
++			select( blockEditorStore );
++		const clientId = getSelectedBlockClientId();
++		return clientId
++			? getBlockAttributes( clientId )?.className ?? null
++			: null;
++	} );
++
+ 	if ( ! hasFills && ! hasPrivateFills ) {
+ 		return null;
+ 	}
+@@ -32,6 +43,7 @@ const AdvancedControls = ( { initialOpen = false } ) => {
+ 		<PanelBody
+ 			className="block-editor-block-inspector__advanced"
+ 			title={ __( 'Advanced' ) }
++			blockClasses={ blockClassName }
+ 			initialOpen={ initialOpen }
+ 		>
+ 			<InspectorControls.Slot group="advanced" />
+diff --git a/packages/components/src/panel/body.tsx b/packages/components/src/panel/body.tsx
+index 803b63b71747eb..50591bc116e04b 100644
+--- a/packages/components/src/panel/body.tsx
++++ b/packages/components/src/panel/body.tsx
+@@ -26,6 +26,7 @@ export function UnforwardedPanelBody(
+ 	ref: React.ForwardedRef< HTMLDivElement >
+ ) {
+ 	const {
++		blockClasses,
+ 		buttonProps = {},
+ 		children,
+ 		className,
+@@ -90,6 +91,7 @@ export function UnforwardedPanelBody(
+ 				isOpened={ Boolean( isOpened ) }
+ 				onClick={ handleOnToggle }
+ 				title={ title }
++				blockClasses={ blockClasses }
+ 				{ ...buttonProps }
+ 			/>
+ 			{ typeof children === 'function'
+@@ -102,6 +104,7 @@ export function UnforwardedPanelBody(
+ const PanelBodyTitle = forwardRef(
+ 	(
+ 		{
++			blockClasses = '',
+ 			isOpened,
+ 			icon,
+ 			title,
+@@ -133,6 +136,12 @@ const PanelBodyTitle = forwardRef(
+ 						/>
+ 					</span>
+ 					{ title }
++					<span
++						title={ blockClasses }
++						className="block-editor-block-inspector__advanced-button__css-class-name"
++					>
++						{ blockClasses }
++					</span>
+ 					{ icon && (
+ 						<Icon
+ 							icon={ icon }
+diff --git a/packages/components/src/panel/style.scss b/packages/components/src/panel/style.scss
+index 1cba950547e6f5..a2ffe182d5e30b 100644
+--- a/packages/components/src/panel/style.scss
++++ b/packages/components/src/panel/style.scss
+@@ -169,3 +169,19 @@
+ .components-panel .circle-picker {
+ 	padding-bottom: 20px;
+ }
++
++.block-editor-block-inspector__advanced-button__css-class-name {
++	background-color: $gray-100;
++	color: $gray-800;
++	padding: 2px $grid-unit-10;
++	border-radius: $radius-small;
++	font-size: $font-size-small;
++	font-weight: 400;
++	line-height: $font-line-height-small;
++	position: absolute;
++	right: $grid-unit-60;
++	max-width: 50%;
++	white-space: nowrap;
++	overflow: hidden;
++	text-overflow: ellipsis;
++}
+diff --git a/packages/components/src/panel/types.ts b/packages/components/src/panel/types.ts
+index c28a4e1a25166b..1ba46508b76df6 100644
+--- a/packages/components/src/panel/types.ts
++++ b/packages/components/src/panel/types.ts
+@@ -44,6 +44,10 @@ export type PanelRowProps = {
+ };
+ 
+ export type PanelBodyProps = {
++	/**
++	 * The block classes.
++	 */
++	blockClasses?: string;
+ 	/**
+ 	 * Props that are passed to the `Button` component in title within the
+ 	 * `PanelBody`.
+@@ -101,6 +105,10 @@ export type PanelBodyProps = {
+ };
+ 
+ export type PanelBodyTitleProps = Omit< ButtonAsButtonProps, 'icon' > & {
++	/**
++	 * The block classes.
++	 */
++	blockClasses?: string;
+ 	/**
+ 	 * An icon to be shown next to the title.
+ 	 */

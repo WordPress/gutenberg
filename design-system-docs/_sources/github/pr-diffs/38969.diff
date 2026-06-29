@@ -1,0 +1,166 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 85be68b0598ce3..aa3d15f668066e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   Normalize `font-family` on `Button`, `ColorPalette`, `ComoboboxControl`, `DateTimePicker`, `FormTokenField`, `InputControl`, `SelectControl`, and `ToggleGroupControl` ([#38969](https://github.com/WordPress/gutenberg/pull/38969)).
++
+ ## 19.5.0 (2022-02-23)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 80222620b874df..6a33b1cdd9019f 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -1,6 +1,7 @@
+ .components-button {
+ 	display: inline-flex;
+ 	text-decoration: none;
++	font-family: inherit;
+ 	font-weight: normal;
+ 	font-size: $default-font-size;
+ 	margin: 0;
+diff --git a/packages/components/src/color-palette/style.scss b/packages/components/src/color-palette/style.scss
+index 4ba05745ad2345..e796f2be9ac5b1 100644
+--- a/packages/components/src/color-palette/style.scss
++++ b/packages/components/src/color-palette/style.scss
+@@ -5,6 +5,7 @@
+ 	display: block;
+ 	border-radius: $radius-block-ui;
+ 	height: $grid-unit-60;
++	font-family: inherit;
+ 	text-align: right;
+ 	width: 100%;
+ 	background-image:
+diff --git a/packages/components/src/combobox-control/style.scss b/packages/components/src/combobox-control/style.scss
+index 51004a533b4305..3eca7ad146e129 100644
+--- a/packages/components/src/combobox-control/style.scss
++++ b/packages/components/src/combobox-control/style.scss
+@@ -6,6 +6,7 @@ input.components-combobox-control__input[type="text"] {
+ 	width: 100%;
+ 	border: none;
+ 	box-shadow: none;
++	font-family: inherit;
+ 	font-size: 16px;
+ 	padding: 2px;
+ 	margin: 0;
+diff --git a/packages/components/src/date-time/style.scss b/packages/components/src/date-time/style.scss
+index 5eac3985921e4c..636f7851218798 100644
+--- a/packages/components/src/date-time/style.scss
++++ b/packages/components/src/date-time/style.scss
+@@ -237,6 +237,10 @@
+ 	}
+ }
+ 
++.components-datetime__time-field-integer-field {
++	font-family: inherit;
++}
++
+ .components-datetime__time-field-hours-input,
+ .components-datetime__time-field-minutes-input,
+ .components-datetime__time-field-day-input {
+diff --git a/packages/components/src/date-time/time.js b/packages/components/src/date-time/time.js
+index b3ed133416063a..3fc7da4fe3970f 100644
+--- a/packages/components/src/date-time/time.js
++++ b/packages/components/src/date-time/time.js
+@@ -36,12 +36,19 @@ function from12hTo24h( hours, isPm ) {
+  * <UpdateOnBlurAsIntegerField>
+  * A shared component to parse, validate, and handle remounting of the underlying form field element like <input> and <select>.
+  *
+- * @param {Object}        props          Component props.
+- * @param {string}        props.as       Render the component as specific element tag, defaults to "input".
+- * @param {number|string} props.value    The default value of the component which will be parsed to integer.
+- * @param {Function}      props.onUpdate Call back when blurred and validated.
++ * @param {Object}        props             Component props.
++ * @param {string}        props.as          Render the component as specific element tag, defaults to "input".
++ * @param {number|string} props.value       The default value of the component which will be parsed to integer.
++ * @param {Function}      props.onUpdate    Call back when blurred and validated.
++ * @param {string}        [props.className]
+  */
+-function UpdateOnBlurAsIntegerField( { as, value, onUpdate, ...props } ) {
++function UpdateOnBlurAsIntegerField( {
++	as,
++	value,
++	onUpdate,
++	className,
++	...props
++} ) {
+ 	function handleBlur( event ) {
+ 		const { target } = event;
+ 
+@@ -70,6 +77,10 @@ function UpdateOnBlurAsIntegerField( { as, value, onUpdate, ...props } ) {
+ 		key: value,
+ 		defaultValue: value,
+ 		onBlur: handleBlur,
++		className: classnames(
++			'components-datetime__time-field-integer-field',
++			className
++		),
+ 		...props,
+ 	} );
+ }
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index 278cf7daba79da..7d26cb5152eae4 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -22,6 +22,7 @@
+ 	input[type="text"].components-form-token-field__input {
+ 		display: inline-block;
+ 		flex: 1;
++		font-family: inherit;
+ 		font-size: 16px;
+ 		width: 100%;
+ 		max-width: 100%;
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 32879f910535b6..63e38ac90a6307 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -212,6 +212,7 @@ export const Input = styled.input< InputProps >`
+ 		box-shadow: none !important;
+ 		color: ${ COLORS.black };
+ 		display: block;
++		font-family: inherit;
+ 		margin: 0;
+ 		outline: none;
+ 		width: 100%;
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index c0646560984bd8..ac0a2cc8887b71 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -98,6 +98,7 @@ export const Select = styled.select< SelectProps >`
+ 		box-shadow: none !important;
+ 		color: ${ COLORS.black };
+ 		display: block;
++		font-family: inherit;
+ 		margin: 0;
+ 		width: 100%;
+ 
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+index ee2df2d4d96a3e..c3663a83a9b170 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.js.snap
+@@ -84,6 +84,7 @@ exports[`ToggleGroupControl should render correctly 1`] = `
+   display: -webkit-flex;
+   display: -ms-flexbox;
+   display: flex;
++  font-family: inherit;
+   height: 100%;
+   -webkit-box-pack: center;
+   -ms-flex-pack: center;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option/styles.ts
+index 7570b0561eb5f0..9486e9b05f40de 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option/styles.ts
+@@ -29,6 +29,7 @@ export const buttonView = css`
+ 	color: ${ COLORS.gray[ 700 ] };
+ 	cursor: pointer;
+ 	display: flex;
++	font-family: inherit;
+ 	height: 100%;
+ 	justify-content: center;
+ 	line-height: 100%;

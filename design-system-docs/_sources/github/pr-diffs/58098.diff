@@ -1,0 +1,136 @@
+diff --git a/packages/block-library/src/embed/editor.scss b/packages/block-library/src/embed/editor.scss
+index 368784c22f38ab..ae0b1fe1ee68b2 100644
+--- a/packages/block-library/src/embed/editor.scss
++++ b/packages/block-library/src/embed/editor.scss
+@@ -16,9 +16,15 @@
+ 	.components-placeholder__error {
+ 		word-break: break-word;
+ 	}
++}
++
++.wp-block-embed__learn-more {
++	margin-top: 1em;
+ 
+-	.components-placeholder__learn-more {
+-		margin-top: 1em;
++	@at-root .wp-block-post-content & {
++		a {
++			color: var(--wp-admin-theme-color);
++		}
+ 	}
+ }
+ 
+diff --git a/packages/block-library/src/embed/embed-placeholder.js b/packages/block-library/src/embed/embed-placeholder.js
+index 5b9191c3446a79..9552bf9acf0280 100644
+--- a/packages/block-library/src/embed/embed-placeholder.js
++++ b/packages/block-library/src/embed/embed-placeholder.js
+@@ -37,7 +37,7 @@ const EmbedPlaceholder = ( {
+ 					{ _x( 'Embed', 'button label' ) }
+ 				</Button>
+ 			</form>
+-			<div className="components-placeholder__learn-more">
++			<div className="wp-block-embed__learn-more">
+ 				<ExternalLink
+ 					href={ __(
+ 						'https://wordpress.org/documentation/article/embeds/'
+diff --git a/packages/components/.stylelintrc.js b/packages/components/.stylelintrc.js
+new file mode 100644
+index 00000000000000..be2035d903731e
+--- /dev/null
++++ b/packages/components/.stylelintrc.js
+@@ -0,0 +1,23 @@
++/** @type {import('stylelint').Config} */
++module.exports = {
++	extends: '../../.stylelintrc.json',
++	rules: {
++		'declaration-property-value-disallowed-list': [
++			{
++				'/.*/': '/--wp-admin-theme-/',
++			},
++			{
++				message:
++					'--wp-admin-theme-* variables do not support component theming. Use Sass variables from packages/components/src/utils/theme-variables.scss instead.',
++			},
++		],
++	},
++	overrides: [
++		{
++			files: [ './src/utils/theme-variables.scss' ],
++			rules: {
++				'declaration-property-value-disallowed-list': null,
++			},
++		},
++	],
++};
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 92ce15dc425f6d..954357eb1ae684 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ 
+ ### Experimental
+ 
++-   `Guide`, `Modal`: Restore accent color themability ([#58098](https://github.com/WordPress/gutenberg/pull/58098)).
+ -   `BoxControl`: Update design ([#56665](https://github.com/WordPress/gutenberg/pull/56665)).
+ -   `CustomSelect`: adjust `renderSelectedValue` to fix sizing ([#57865](https://github.com/WordPress/gutenberg/pull/57865)).
+ 
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 0af5144d3d4b7f..aa7d9a5cc018ec 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -164,11 +164,13 @@
+ 
+ 		&:hover:not(:disabled, [aria-disabled="true"]) {
+ 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
++			/* stylelint-disable-next-line declaration-property-value-disallowed-list */
+ 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+ 		}
+ 
+ 		&:active:not(:disabled, [aria-disabled="true"]) {
+ 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
++			/* stylelint-disable-next-line declaration-property-value-disallowed-list */
+ 			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+ 		}
+ 
+diff --git a/packages/components/src/guide/style.scss b/packages/components/src/guide/style.scss
+index b2516edeff1354..76f7b03ac4aafc 100644
+--- a/packages/components/src/guide/style.scss
++++ b/packages/components/src/guide/style.scss
+@@ -82,7 +82,7 @@
+ 		}
+ 
+ 		li[aria-current="step"] .components-button {
+-			color: var(--wp-components-color-accent, var(--wp-admin-theme-color));
++			color: $components-color-accent;
+ 		}
+ 	}
+ }
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index 0933f836892f1d..352f8dc8ba1091 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -160,7 +160,7 @@
+ 	}
+ 
+ 	&.is-scrollable:focus-visible {
+-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
++		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
+ 
+ 		// Windows High Contrast mode will show this outline, but not the box-shadow.
+ 		outline: 2px solid transparent;
+diff --git a/packages/components/src/placeholder/style.scss b/packages/components/src/placeholder/style.scss
+index ce98350b767353..fc9d57b6ec22f1 100644
+--- a/packages/components/src/placeholder/style.scss
++++ b/packages/components/src/placeholder/style.scss
+@@ -148,11 +148,6 @@
+ 			padding: 0 $grid-unit-10 2px;
+ 		}
+ 	}
+-	.components-placeholder__learn-more {
+-		.components-external-link {
+-			color: var(--wp-admin-theme-color);
+-		}
+-	}
+ }
+ 
+ 

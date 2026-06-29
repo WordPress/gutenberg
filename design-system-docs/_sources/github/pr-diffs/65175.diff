@@ -1,0 +1,861 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3baddb5cccadd6..2d859184ae381b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,8 @@
+ 
+ -   `ToolsPanel`: atomic one-step state update when (un)registering panels ([#65564](https://github.com/WordPress/gutenberg/pull/65564)).
+ -   `Navigator`: fix `isInitial` logic ([#65527](https://github.com/WordPress/gutenberg/pull/65527)).
++-   `ToggleGroupControl`: Fix arrow key navigation in RTL ([#65735](https://github.com/WordPress/gutenberg/pull/65735)).
++-   `ToggleGroupControl`: indicator doesn't jump around when the layout around it changes ([#65175](https://github.com/WordPress/gutenberg/pull/65175)).
+ 
+ ### Deprecations
+ 
+@@ -21,6 +23,8 @@
+ -   `Navigator`: add support for exit animation ([#64777](https://github.com/WordPress/gutenberg/pull/64777)).
+ -   `Guide`: Update finish button to use the new default size ([#65680](https://github.com/WordPress/gutenberg/pull/65680)).
+ -   `BorderControl`: Use `__next40pxDefaultSize` prop for Reset button ([#65682](https://github.com/WordPress/gutenberg/pull/65682)).
++-   `Navigator`: stabilize APIs ([#64613](https://github.com/WordPress/gutenberg/pull/64613)).
++-   `ToggleGroupControl`: indicator animation is now more lightweight and performant ([#65175](https://github.com/WordPress/gutenberg/pull/65175)).
+ 
+ ## 28.8.0 (2024-09-19)
+ 
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index e9b4f4ca22ab85..6885263d09b23d 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -60,6 +60,55 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   outline-offset: -2px;
+ }
+ 
++@media not ( prefers-reduced-motion ) {
++  .emotion-8.is-animation-enabled::before {
++    transition-property: transform,border-radius;
++    transition-duration: 0.2s;
++    transition-timing-function: ease-out;
++  }
++}
++
++.emotion-8::before {
++  content: '';
++  position: absolute;
++  pointer-events: none;
++  background: #1e1e1e;
++  outline: 2px solid transparent;
++  outline-offset: -3px;
++  --antialiasing-factor: 100;
++  border-radius: calc(
++  				1px /
++  					(
++  						var( --selected-width, 0 ) /
++  							var( --antialiasing-factor )
++  					)
++  			)/1px;
++  left: -1px;
++  width: calc( var( --antialiasing-factor ) * 1px );
++  height: calc( var( --selected-height, 0 ) * 1px );
++  transform-origin: left top;
++  -webkit-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++  -moz-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++  -ms-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++  transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++}
++
+ .emotion-10 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+@@ -150,17 +199,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+   line-height: 1;
+ }
+ 
+-.emotion-15 {
+-  background: #1e1e1e;
+-  border-radius: 1px;
+-  position: absolute;
+-  inset: 0;
+-  z-index: 1;
+-  outline: 2px solid transparent;
+-  outline-offset: -3px;
+-}
+-
+-.emotion-18 {
++.emotion-17 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -204,22 +243,22 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+ }
+ 
+ @media not ( prefers-reduced-motion ) {
+-  .emotion-18 {
++  .emotion-17 {
+     -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+     transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+   }
+ }
+ 
+-.emotion-18::-moz-focus-inner {
++.emotion-17::-moz-focus-inner {
+   border: 0;
+ }
+ 
+-.emotion-18[disabled] {
++.emotion-17[disabled] {
+   opacity: 0.4;
+   cursor: default;
+ }
+ 
+-.emotion-18:active {
++.emotion-17:active {
+   background: #fff;
+ }
+ 
+@@ -280,12 +319,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+               </svg>
+             </div>
+           </button>
+-          <div>
+-            <div
+-              class="emotion-15"
+-              role="presentation"
+-            />
+-          </div>
+         </div>
+         <div
+           class="emotion-10 emotion-11"
+@@ -293,7 +326,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+           <button
+             aria-checked="false"
+             aria-label="Lowercase"
+-            class="emotion-18 components-toggle-group-control-option-base"
++            class="emotion-17 components-toggle-group-control-option-base"
+             data-value="lowercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -392,6 +425,55 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+   outline-offset: -2px;
+ }
+ 
++@media not ( prefers-reduced-motion ) {
++  .emotion-8.is-animation-enabled::before {
++    transition-property: transform,border-radius;
++    transition-duration: 0.2s;
++    transition-timing-function: ease-out;
++  }
++}
++
++.emotion-8::before {
++  content: '';
++  position: absolute;
++  pointer-events: none;
++  background: #1e1e1e;
++  outline: 2px solid transparent;
++  outline-offset: -3px;
++  --antialiasing-factor: 100;
++  border-radius: calc(
++  				1px /
++  					(
++  						var( --selected-width, 0 ) /
++  							var( --antialiasing-factor )
++  					)
++  			)/1px;
++  left: -1px;
++  width: calc( var( --antialiasing-factor ) * 1px );
++  height: calc( var( --selected-height, 0 ) * 1px );
++  transform-origin: left top;
++  -webkit-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++  -moz-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++  -ms-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++  transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++}
++
+ .emotion-10 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+@@ -612,6 +694,55 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   outline-offset: -2px;
+ }
+ 
++@media not ( prefers-reduced-motion ) {
++  .emotion-8.is-animation-enabled::before {
++    transition-property: transform,border-radius;
++    transition-duration: 0.2s;
++    transition-timing-function: ease-out;
++  }
++}
++
++.emotion-8::before {
++  content: '';
++  position: absolute;
++  pointer-events: none;
++  background: #1e1e1e;
++  outline: 2px solid transparent;
++  outline-offset: -3px;
++  --antialiasing-factor: 100;
++  border-radius: calc(
++  				1px /
++  					(
++  						var( --selected-width, 0 ) /
++  							var( --antialiasing-factor )
++  					)
++  			)/1px;
++  left: -1px;
++  width: calc( var( --antialiasing-factor ) * 1px );
++  height: calc( var( --selected-height, 0 ) * 1px );
++  transform-origin: left top;
++  -webkit-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++  -moz-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++  -ms-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++  transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++}
++
+ .emotion-10 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+@@ -702,17 +833,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+   line-height: 1;
+ }
+ 
+-.emotion-15 {
+-  background: #1e1e1e;
+-  border-radius: 1px;
+-  position: absolute;
+-  inset: 0;
+-  z-index: 1;
+-  outline: 2px solid transparent;
+-  outline-offset: -3px;
+-}
+-
+-.emotion-18 {
++.emotion-17 {
+   -webkit-align-items: center;
+   -webkit-box-align: center;
+   -ms-flex-align: center;
+@@ -756,22 +877,22 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+ }
+ 
+ @media not ( prefers-reduced-motion ) {
+-  .emotion-18 {
++  .emotion-17 {
+     -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+     transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+   }
+ }
+ 
+-.emotion-18::-moz-focus-inner {
++.emotion-17::-moz-focus-inner {
+   border: 0;
+ }
+ 
+-.emotion-18[disabled] {
++.emotion-17[disabled] {
+   opacity: 0.4;
+   cursor: default;
+ }
+ 
+-.emotion-18:active {
++.emotion-17:active {
+   background: #fff;
+ }
+ 
+@@ -832,12 +953,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+               </svg>
+             </div>
+           </button>
+-          <div>
+-            <div
+-              class="emotion-15"
+-              role="presentation"
+-            />
+-          </div>
+         </div>
+         <div
+           class="emotion-10 emotion-11"
+@@ -845,7 +960,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+           <button
+             aria-checked="false"
+             aria-label="Lowercase"
+-            class="emotion-18 components-toggle-group-control-option-base"
++            class="emotion-17 components-toggle-group-control-option-base"
+             data-value="lowercase"
+             data-wp-c16t="true"
+             data-wp-component="ToggleGroupControlOptionBase"
+@@ -938,6 +1053,55 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+   outline-offset: -2px;
+ }
+ 
++@media not ( prefers-reduced-motion ) {
++  .emotion-8.is-animation-enabled::before {
++    transition-property: transform,border-radius;
++    transition-duration: 0.2s;
++    transition-timing-function: ease-out;
++  }
++}
++
++.emotion-8::before {
++  content: '';
++  position: absolute;
++  pointer-events: none;
++  background: #1e1e1e;
++  outline: 2px solid transparent;
++  outline-offset: -3px;
++  --antialiasing-factor: 100;
++  border-radius: calc(
++  				1px /
++  					(
++  						var( --selected-width, 0 ) /
++  							var( --antialiasing-factor )
++  					)
++  			)/1px;
++  left: -1px;
++  width: calc( var( --antialiasing-factor ) * 1px );
++  height: calc( var( --selected-height, 0 ) * 1px );
++  transform-origin: left top;
++  -webkit-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++  -moz-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++  -ms-transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++  transform: translateX( calc( var( --selected-left, 0 ) * 1px ) ) scaleX(
++  				calc(
++  					var( --selected-width, 0 ) / var( --antialiasing-factor )
++  				)
++  			);
++}
++
+ .emotion-10 {
+   display: -webkit-inline-box;
+   display: -webkit-inline-flex;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+index 30d74e68913f22..d8604c59c540f0 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/component.tsx
+@@ -3,13 +3,12 @@
+  */
+ import type { ForwardedRef } from 'react';
+ import * as Ariakit from '@ariakit/react';
+-import { motion } from 'framer-motion';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { useReducedMotion, useInstanceId } from '@wordpress/compose';
+-import { useMemo } from '@wordpress/element';
++import { useInstanceId } from '@wordpress/compose';
++import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -27,12 +26,6 @@ import Tooltip from '../../tooltip';
+ 
+ const { ButtonContentView, LabelView } = styles;
+ 
+-const REDUCED_MOTION_TRANSITION_CONFIG = {
+-	duration: 0,
+-};
+-
+-const LAYOUT_ID = 'toggle-group-backdrop-shared-layout-id';
+-
+ const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
+ 	if ( showTooltip && text ) {
+ 		return (
+@@ -58,7 +51,6 @@ function ToggleGroupControlOptionBase(
+ 	>,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+-	const shouldReduceMotion = useReducedMotion();
+ 	const toggleGroupControlContext = useToggleGroupControlContext();
+ 
+ 	const id = useInstanceId(
+@@ -107,7 +99,6 @@ function ToggleGroupControlOptionBase(
+ 			),
+ 		[ cx, isDeselectable, isIcon, isPressed, size, className ]
+ 	);
+-	const backdropClasses = useMemo( () => cx( styles.backdropView ), [ cx ] );
+ 
+ 	const buttonOnClick = () => {
+ 		if ( isDeselectable && isPressed ) {
+@@ -124,8 +115,15 @@ function ToggleGroupControlOptionBase(
+ 		ref: forwardedRef,
+ 	};
+ 
++	const labelRef = useRef< HTMLDivElement | null >( null );
++	useLayoutEffect( () => {
++		if ( isPressed && labelRef.current ) {
++			toggleGroupControlContext.setSelectedElement( labelRef.current );
++		}
++	}, [ isPressed, toggleGroupControlContext ] );
++
+ 	return (
+-		<LabelView className={ labelViewClasses }>
++		<LabelView ref={ labelRef } className={ labelViewClasses }>
+ 			<WithToolTip
+ 				showTooltip={ showTooltip }
+ 				text={ otherButtonProps[ 'aria-label' ] }
+@@ -163,21 +161,6 @@ function ToggleGroupControlOptionBase(
+ 					</Ariakit.Radio>
+ 				) }
+ 			</WithToolTip>
+-			{ /* Animated backdrop using framer motion's shared layout animation */ }
+-			{ isPressed ? (
+-				<motion.div layout layoutRoot>
+-					<motion.div
+-						className={ backdropClasses }
+-						transition={
+-							shouldReduceMotion
+-								? REDUCED_MOTION_TRANSITION_CONFIG
+-								: undefined
+-						}
+-						role="presentation"
+-						layoutId={ LAYOUT_ID }
+-					/>
+-				</motion.div>
+-			) : null }
+ 		</LabelView>
+ 	);
+ }
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+index 020468991225c1..c0248f9b3f7f22 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control-option-base/styles.ts
+@@ -119,14 +119,3 @@ const isIconStyles = ( {
+ 		padding-right: 0;
+ 	`;
+ };
+-
+-export const backdropView = css`
+-	background: ${ COLORS.gray[ 900 ] };
+-	border-radius: ${ CONFIG.radiusXSmall };
+-	position: absolute;
+-	inset: 0;
+-	z-index: 1;
+-	// Windows High Contrast mode will show this outline, but not the box-shadow.
+-	outline: 2px solid transparent;
+-	outline-offset: -3px;
+-`;
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
+index b3f56bccd07c5f..7ce762b6e71df2 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-button-group.tsx
+@@ -26,6 +26,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
+ 		size,
+ 		value: valueProp,
+ 		id: idProp,
++		setSelectedElement,
+ 		...otherProps
+ 	}: WordPressComponentProps<
+ 		ToggleGroupControlMainControlProps,
+@@ -54,16 +55,23 @@ function UnforwardedToggleGroupControlAsButtonGroup(
+ 	} );
+ 
+ 	const groupContextValue = useMemo(
+-		() =>
+-			( {
+-				baseId,
+-				value: selectedValue,
+-				setValue: setSelectedValue,
+-				isBlock: ! isAdaptiveWidth,
+-				isDeselectable: true,
+-				size,
+-			} ) as ToggleGroupControlContextProps,
+-		[ baseId, selectedValue, setSelectedValue, isAdaptiveWidth, size ]
++		(): ToggleGroupControlContextProps => ( {
++			baseId,
++			value: selectedValue,
++			setValue: setSelectedValue,
++			isBlock: ! isAdaptiveWidth,
++			isDeselectable: true,
++			size,
++			setSelectedElement,
++		} ),
++		[
++			baseId,
++			selectedValue,
++			setSelectedValue,
++			isAdaptiveWidth,
++			size,
++			setSelectedElement,
++		]
+ 	);
+ 
+ 	return (
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+index c062e35cb2b72b..342f9f128defd9 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+@@ -33,6 +33,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
+ 		size,
+ 		value: valueProp,
+ 		id: idProp,
++		setSelectedElement,
+ 		...otherProps
+ 	}: WordPressComponentProps<
+ 		ToggleGroupControlMainControlProps,
+@@ -73,15 +74,24 @@ function UnforwardedToggleGroupControlAsRadioGroup(
+ 	const setValue = radio.setValue;
+ 
+ 	const groupContextValue = useMemo(
+-		() =>
+-			( {
+-				baseId,
+-				isBlock: ! isAdaptiveWidth,
+-				size,
+-				value: selectedValue,
+-				setValue,
+-			} ) as ToggleGroupControlContextProps,
+-		[ baseId, isAdaptiveWidth, size, selectedValue, setValue ]
++		(): ToggleGroupControlContextProps => ( {
++			baseId,
++			isBlock: ! isAdaptiveWidth,
++			size,
++			// @ts-expect-error - This is wrong and we should fix it.
++			value: selectedValue,
++			// @ts-expect-error - This is wrong and we should fix it.
++			setValue,
++			setSelectedElement,
++		} ),
++		[
++			baseId,
++			isAdaptiveWidth,
++			selectedValue,
++			setSelectedElement,
++			setValue,
++			size,
++		]
+ 	);
+ 
+ 	return (
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index 1c86c93548f6df..5f8da76676293e 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -2,13 +2,11 @@
+  * External dependencies
+  */
+ import type { ForwardedRef } from 'react';
+-import { LayoutGroup } from 'framer-motion';
+ 
+ /**
+  * WordPress dependencies
+  */
+-import { useInstanceId } from '@wordpress/compose';
+-import { useMemo } from '@wordpress/element';
++import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -22,6 +20,68 @@ import { VisualLabelWrapper } from './styles';
+ import * as styles from './styles';
+ import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
+ import { ToggleGroupControlAsButtonGroup } from './as-button-group';
++import { useTrackElementOffsetRect } from '../../utils/element-rect';
++import { useOnValueUpdate } from '../../utils/hooks/use-on-value-update';
++import { useEvent, useMergeRefs } from '@wordpress/compose';
++
++/**
++ * A utility used to animate something (e.g. an indicator for the selected option
++ * of a component).
++ *
++ * It works by tracking the position and size (i.e., the "rect") of a given subelement,
++ * typically the one that corresponds to the selected option, relative to its offset
++ * parent. Then it:
++ *
++ * - Keeps CSS variables with that information in the parent, so that the animation
++ *   can be implemented with them.
++ * - Adds a `is-animation-enabled` CSS class when the element changes, so that the
++ *   target (e.g. the indicator) can be animated to its new position.
++ * - Removes the `is-animation-enabled` class when the animation is done.
++ */
++function useSubelementAnimation(
++	subelement?: HTMLElement | null,
++	{
++		parent = subelement?.offsetParent as HTMLElement | null | undefined,
++		prefix = 'subelement',
++		transitionEndFilter,
++	}: {
++		parent?: HTMLElement | null | undefined;
++		prefix?: string;
++		transitionEndFilter?: ( event: TransitionEvent ) => boolean;
++	} = {}
++) {
++	const rect = useTrackElementOffsetRect( subelement );
++
++	const setProperties = useEvent( () => {
++		( Object.keys( rect ) as Array< keyof typeof rect > ).forEach(
++			( property ) =>
++				property !== 'element' &&
++				parent?.style.setProperty(
++					`--${ prefix }-${ property }`,
++					String( rect[ property ] )
++				)
++		);
++	} );
++	useLayoutEffect( () => {
++		setProperties();
++	}, [ rect, setProperties ] );
++	useOnValueUpdate( rect.element, ( { previousValue } ) => {
++		// Only enable the animation when moving from one element to another.
++		if ( rect.element && previousValue ) {
++			parent?.classList.add( 'is-animation-enabled' );
++		}
++	} );
++	useLayoutEffect( () => {
++		function onTransitionEnd( event: TransitionEvent ) {
++			if ( transitionEndFilter?.( event ) ?? true ) {
++				parent?.classList.remove( 'is-animation-enabled' );
++			}
++		}
++		parent?.addEventListener( 'transitionend', onTransitionEnd );
++		return () =>
++			parent?.removeEventListener( 'transitionend', onTransitionEnd );
++	}, [ parent, transitionEndFilter ] );
++}
+ 
+ function UnconnectedToggleGroupControl(
+ 	props: WordPressComponentProps< ToggleGroupControlProps, 'div', false >,
+@@ -44,10 +104,18 @@ function UnconnectedToggleGroupControl(
+ 		...otherProps
+ 	} = useContextSystem( props, 'ToggleGroupControl' );
+ 
+-	const baseId = useInstanceId( ToggleGroupControl, 'toggle-group-control' );
+ 	const normalizedSize =
+ 		__next40pxDefaultSize && size === 'default' ? '__unstable-large' : size;
+ 
++	const [ selectedElement, setSelectedElement ] = useState< HTMLElement >();
++	const [ controlElement, setControlElement ] = useState< HTMLElement >();
++	const refs = useMergeRefs( [ setControlElement, forwardedRef ] );
++	useSubelementAnimation( value ? selectedElement : undefined, {
++		parent: controlElement,
++		prefix: 'selected',
++		transitionEndFilter: ( event ) => event.pseudoElement === '::before',
++	} );
++
+ 	const cx = useCx();
+ 
+ 	const classes = useMemo(
+@@ -81,15 +149,16 @@ function UnconnectedToggleGroupControl(
+ 			) }
+ 			<MainControl
+ 				{ ...otherProps }
++				setSelectedElement={ setSelectedElement }
+ 				className={ classes }
+ 				isAdaptiveWidth={ isAdaptiveWidth }
+ 				label={ label }
+ 				onChange={ onChange }
+-				ref={ forwardedRef }
++				ref={ refs }
+ 				size={ normalizedSize }
+ 				value={ value }
+ 			>
+-				<LayoutGroup id={ baseId }>{ children }</LayoutGroup>
++				{ children }
+ 			</MainControl>
+ 		</BaseControl>
+ 	);
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+index 8d01c150a45eaf..ee6122126f557f 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
++++ b/packages/components/src/toggle-group-control/toggle-group-control/styles.ts
+@@ -26,6 +26,47 @@ export const toggleGroupControl = ( {
+ 
+ 	${ toggleGroupControlSize( size ) }
+ 	${ ! isDeselectable && enclosingBorders( isBlock ) }
++
++	@media not ( prefers-reduced-motion ) {
++		&.is-animation-enabled::before {
++			transition-property: transform, border-radius;
++			transition-duration: 0.2s;
++			transition-timing-function: ease-out;
++		}
++	}
++
++	&::before {
++		content: '';
++		position: absolute;
++		pointer-events: none;
++		background: ${ COLORS.gray[ 900 ] };
++
++		// Windows High Contrast mode will show this outline, but not the box-shadow.
++		outline: 2px solid transparent;
++		outline-offset: -3px;
++
++		/* Using a large value to avoid antialiasing rounding issues
++			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
++		--antialiasing-factor: 100;
++		/* Adjusting the border radius to match the scaling in the x axis. */
++		border-radius: calc(
++				${ CONFIG.radiusXSmall } /
++					(
++						var( --selected-width, 0 ) /
++							var( --antialiasing-factor )
++					)
++			) / ${ CONFIG.radiusXSmall };
++		left: -1px; // Correcting for border.
++		width: calc( var( --antialiasing-factor ) * 1px );
++		height: calc( var( --selected-height, 0 ) * 1px );
++		transform-origin: left top;
++		transform: translateX( calc( var( --selected-left, 0 ) * 1px ) )
++			scaleX(
++				calc(
++					var( --selected-width, 0 ) / var( --antialiasing-factor )
++				)
++			);
++	}
+ `;
+ 
+ const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
+diff --git a/packages/components/src/toggle-group-control/types.ts b/packages/components/src/toggle-group-control/types.ts
+index d49ef3cbb77cb4..2a4af680263dba 100644
+--- a/packages/components/src/toggle-group-control/types.ts
++++ b/packages/components/src/toggle-group-control/types.ts
+@@ -137,9 +137,11 @@ export type ToggleGroupControlContextProps = {
+ 	size: ToggleGroupControlProps[ 'size' ];
+ 	value: ToggleGroupControlProps[ 'value' ];
+ 	setValue: ( newValue: string | number | undefined ) => void;
++	setSelectedElement: ( element: HTMLElement | undefined ) => void;
+ };
+ 
+ export type ToggleGroupControlMainControlProps = Pick<
+ 	ToggleGroupControlProps,
+ 	'children' | 'isAdaptiveWidth' | 'label' | 'size' | 'onChange' | 'value'
+->;
++> &
++	Pick< ToggleGroupControlContextProps, 'setSelectedElement' >;
+diff --git a/packages/components/src/utils/element-rect.ts b/packages/components/src/utils/element-rect.ts
+index 4c60e4ba51c48a..7c83db4428ca0f 100644
+--- a/packages/components/src/utils/element-rect.ts
++++ b/packages/components/src/utils/element-rect.ts
+@@ -9,6 +9,10 @@ import { useEvent, useResizeObserver } from '@wordpress/compose';
+  * The position and dimensions of an element, relative to its offset parent.
+  */
+ export type ElementOffsetRect = {
++	/**
++	 * The element the rect belongs to.
++	 */
++	element: HTMLElement | undefined;
+ 	/**
+ 	 * The distance from the top edge of the offset parent to the top edge of
+ 	 * the element.
+@@ -43,6 +47,7 @@ export type ElementOffsetRect = {
+  * An `ElementOffsetRect` object with all values set to zero.
+  */
+ export const NULL_ELEMENT_OFFSET_RECT = {
++	element: undefined,
+ 	top: 0,
+ 	right: 0,
+ 	bottom: 0,
+@@ -92,6 +97,7 @@ export function getElementOffsetRect(
+ 	const scaleY = computedHeight / rect.height;
+ 
+ 	return {
++		element,
+ 		// To obtain the adjusted values for the position:
+ 		// 1. Compute the element's position relative to the offset parent.
+ 		// 2. Correct for the scale factor.
+@@ -119,6 +125,9 @@ const POLL_RATE = 100;
+  * Tracks the position and dimensions of an element, relative to its offset
+  * parent. The element can be changed dynamically.
+  *
++ * When no element is provided (`null` or `undefined`), the hook will return
++ * a "null" rect, in which all values are `0` and `element` is `undefined`.
++ *
+  * **Note:** sometimes, the measurement will fail (see `getElementOffsetRect`'s
+  * documentation for more details). When that happens, this hook will attempt
+  * to measure again after a frame, and if that fails, it will poll every 100
+@@ -155,10 +164,12 @@ export function useTrackElementOffsetRect(
+ 		}
+ 	} );
+ 
+-	useLayoutEffect(
+-		() => setElement( targetElement ),
+-		[ setElement, targetElement ]
+-	);
++	useLayoutEffect( () => {
++		setElement( targetElement );
++		if ( ! targetElement ) {
++			setIndicatorPosition( NULL_ELEMENT_OFFSET_RECT );
++		}
++	}, [ setElement, targetElement ] );
+ 
+ 	return indicatorPosition;
+ }
+diff --git a/packages/components/src/utils/hooks/use-on-value-update.ts b/packages/components/src/utils/hooks/use-on-value-update.ts
+index 05c7173d092fac..15cfc321359e7c 100644
+--- a/packages/components/src/utils/hooks/use-on-value-update.ts
++++ b/packages/components/src/utils/hooks/use-on-value-update.ts
+@@ -3,7 +3,7 @@
+  * WordPress dependencies
+  */
+ import { useEvent } from '@wordpress/compose';
+-import { useRef, useEffect } from '@wordpress/element';
++import { useRef, useLayoutEffect } from '@wordpress/element';
+ 
+ /**
+  * Context object for the `onUpdate` callback of `useOnValueUpdate`.
+@@ -27,7 +27,7 @@ export function useOnValueUpdate< T >(
+ ) {
+ 	const previousValueRef = useRef( value );
+ 	const updateCallbackEvent = useEvent( onUpdate );
+-	useEffect( () => {
++	useLayoutEffect( () => {
+ 		if ( previousValueRef.current !== value ) {
+ 			updateCallbackEvent( {
+ 				previousValue: previousValueRef.current,

@@ -1,0 +1,111 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e0a80b0295aa7b..a5a47c65c10bce 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ -   `Modal`: Accessibly hide/show outer modal when nested ([#54743](https://github.com/WordPress/gutenberg/pull/54743)).
+ -   `InputControl`, `NumberControl`, `UnitControl`, `SelectControl`, `CustomSelectControl`, `TreeSelect`: Add opt-in prop for next 40px default size, superseding the `__next36pxDefaultSize` prop ([#53819](https://github.com/WordPress/gutenberg/pull/53819)).
+ -   `Modal`: add a new `size` prop to support preset widths, including a `fill` option to eventually replace the `isFullScreen` prop ([#54471](https://github.com/WordPress/gutenberg/pull/54471)).
++-   Wrapped `TextareaControl` in a `forwardRef` call ([#54975](https://github.com/WordPress/gutenberg/pull/54975)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/textarea-control/index.tsx b/packages/components/src/textarea-control/index.tsx
+index 64c2da7ecd11dd..7c0b0e92762fa6 100644
+--- a/packages/components/src/textarea-control/index.tsx
++++ b/packages/components/src/textarea-control/index.tsx
+@@ -1,12 +1,8 @@
+-/**
+- * External dependencies
+- */
+-import type { ChangeEvent } from 'react';
+-
+ /**
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -16,31 +12,9 @@ import { StyledTextarea } from './styles/textarea-control-styles';
+ import type { TextareaControlProps } from './types';
+ import type { WordPressComponentProps } from '../context';
+ 
+-/**
+- * TextareaControls are TextControls that allow for multiple lines of text, and
+- * wrap overflow text onto a new line. They are a fixed height and scroll
+- * vertically when the cursor reaches the bottom of the field.
+- *
+- * ```jsx
+- * import { TextareaControl } from '@wordpress/components';
+- * import { useState } from '@wordpress/element';
+- *
+- * const MyTextareaControl = () => {
+- *   const [ text, setText ] = useState( '' );
+- *
+- *   return (
+- *     <TextareaControl
+- *       label="Text"
+- *       help="Enter some text"
+- *       value={ text }
+- *       onChange={ ( value ) => setText( value ) }
+- *     />
+- *   );
+- * };
+- * ```
+- */
+-export function TextareaControl(
+-	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >
++function UnforwardedTextareaControl(
++	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >,
++	ref: React.ForwardedRef< HTMLTextAreaElement >
+ ) {
+ 	const {
+ 		__nextHasNoMarginBottom,
+@@ -55,7 +29,7 @@ export function TextareaControl(
+ 	} = props;
+ 	const instanceId = useInstanceId( TextareaControl );
+ 	const id = `inspector-textarea-control-${ instanceId }`;
+-	const onChangeValue = ( event: ChangeEvent< HTMLTextAreaElement > ) =>
++	const onChangeValue = ( event: React.ChangeEvent< HTMLTextAreaElement > ) =>
+ 		onChange( event.target.value );
+ 
+ 	return (
+@@ -74,10 +48,36 @@ export function TextareaControl(
+ 				onChange={ onChangeValue }
+ 				aria-describedby={ !! help ? id + '__help' : undefined }
+ 				value={ value }
++				ref={ ref }
+ 				{ ...additionalProps }
+ 			/>
+ 		</BaseControl>
+ 	);
+ }
+ 
++/**
++ * TextareaControls are TextControls that allow for multiple lines of text, and
++ * wrap overflow text onto a new line. They are a fixed height and scroll
++ * vertically when the cursor reaches the bottom of the field.
++ *
++ * ```jsx
++ * import { TextareaControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyTextareaControl = () => {
++ *   const [ text, setText ] = useState( '' );
++ *
++ *   return (
++ *     <TextareaControl
++ *       label="Text"
++ *       help="Enter some text"
++ *       value={ text }
++ *       onChange={ ( value ) => setText( value ) }
++ *     />
++ *   );
++ * };
++ * ```
++ */
++export const TextareaControl = forwardRef( UnforwardedTextareaControl );
++
+ export default TextareaControl;

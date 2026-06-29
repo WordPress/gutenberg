@@ -1,0 +1,126 @@
+diff --git a/packages/components/src/custom-select-control-v2/custom-select.tsx b/packages/components/src/custom-select-control-v2/custom-select.tsx
+index bb458abcc282ff..9c3baf182a399a 100644
+--- a/packages/components/src/custom-select-control-v2/custom-select.tsx
++++ b/packages/components/src/custom-select-control-v2/custom-select.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import * as Ariakit from '@ariakit/react';
+-import { useStoreState } from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -63,7 +62,7 @@ const CustomSelectButton = ( {
+ 		CustomSelectStore,
+ 	'onChange'
+ > ) => {
+-	const { value: currentValue } = useStoreState( store );
++	const { value: currentValue } = Ariakit.useStoreState( store );
+ 
+ 	const computedRenderSelectedValue = useMemo(
+ 		() => renderSelectedValue ?? defaultRenderSelectedValue,
+diff --git a/packages/components/src/menu/index.tsx b/packages/components/src/menu/index.tsx
+index 6f6e89b0a1c72b..9886f324823212 100644
+--- a/packages/components/src/menu/index.tsx
++++ b/packages/components/src/menu/index.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import * as Ariakit from '@ariakit/react';
+-import { useStoreState } from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -109,7 +108,7 @@ const UnconnectedMenu = (
+ 	// Extract the side from the applied placement — useful for animations.
+ 	// Using `currentPlacement` instead of `placement` to make sure that we
+ 	// use the final computed placement (including "flips" etc).
+-	const appliedPlacementSide = useStoreState(
++	const appliedPlacementSide = Ariakit.useStoreState(
+ 		menuStore,
+ 		'currentPlacement'
+ 	).split( '-' )[ 0 ];
+diff --git a/packages/components/src/radio-group/radio.tsx b/packages/components/src/radio-group/radio.tsx
+index 782a737b6ba28a..4c54e0694f4bde 100644
+--- a/packages/components/src/radio-group/radio.tsx
++++ b/packages/components/src/radio-group/radio.tsx
+@@ -7,7 +7,6 @@ import { forwardRef, useContext } from '@wordpress/element';
+  * External dependencies
+  */
+ import * as Ariakit from '@ariakit/react';
+-import { useStoreState } from '@ariakit/react';
+ 
+ /**
+  * Internal dependencies
+@@ -28,7 +27,7 @@ function UnforwardedRadio(
+ ) {
+ 	const { store, disabled } = useContext( RadioGroupContext );
+ 
+-	const selectedValue = useStoreState( store, 'value' );
++	const selectedValue = Ariakit.useStoreState( store, 'value' );
+ 	const isChecked = selectedValue !== undefined && selectedValue === value;
+ 
+ 	maybeWarnDeprecated36pxSize( {
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index be06b42fcd013f..ec4f33d875a381 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import * as Ariakit from '@ariakit/react';
+-import { useStoreState } from '@ariakit/react';
+ import clsx from 'clsx';
+ import type { ForwardedRef } from 'react';
+ 
+@@ -125,7 +124,7 @@ const UnforwardedTabPanel = (
+ 	} );
+ 
+ 	const selectedTabName = extractTabName(
+-		useStoreState( tabStore, 'selectedId' )
++		Ariakit.useStoreState( tabStore, 'selectedId' )
+ 	);
+ 
+ 	const setTabStoreSelectedId = useCallback(
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+index 0166728dbafba4..56fb5faca56385 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/as-radio-group.tsx
+@@ -3,7 +3,6 @@
+  */
+ import type { ForwardedRef } from 'react';
+ import * as Ariakit from '@ariakit/react';
+-import { useStoreState } from '@ariakit/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -70,7 +69,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
+ 		rtl: isRTL(),
+ 	} );
+ 
+-	const selectedValue = useStoreState( radio, 'value' );
++	const selectedValue = Ariakit.useStoreState( radio, 'value' );
+ 	const setValue = radio.setValue;
+ 
+ 	// Ensures that the active id is also reset after the value is "reset" by the consumer.
+diff --git a/packages/components/src/tooltip/index.tsx b/packages/components/src/tooltip/index.tsx
+index ce94daf67bfaba..b7184579ceca91 100644
+--- a/packages/components/src/tooltip/index.tsx
++++ b/packages/components/src/tooltip/index.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import * as Ariakit from '@ariakit/react';
+-import { useStoreState } from '@ariakit/react';
+ import clsx from 'clsx';
+ 
+ /**
+@@ -94,7 +93,7 @@ function UnforwardedTooltip(
+ 		placement: computedPlacement,
+ 		showTimeout: delay,
+ 	} );
+-	const mounted = useStoreState( tooltipStore, 'mounted' );
++	const mounted = Ariakit.useStoreState( tooltipStore, 'mounted' );
+ 
+ 	if ( isNestedInTooltip ) {
+ 		return isOnlyChild ? (

@@ -1,0 +1,95 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fb5e36f1fb6e61..5d05abc7026b22 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Internal
+ 
+ -   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
++-   Migrate `DisclosureContent` from `reakit` to `ariakit` and TypeScript ([#55639](https://github.com/WordPress/gutenberg/pull/55639))
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/disclosure/index.js b/packages/components/src/disclosure/index.js
+deleted file mode 100644
+index 5458ba053eef6a..00000000000000
+--- a/packages/components/src/disclosure/index.js
++++ /dev/null
+@@ -1,11 +0,0 @@
+-/**
+- * Accessible Disclosure component that controls visibility of a section of
+- * content. It follows the WAI-ARIA Disclosure Pattern.
+- *
+- * @see https://reakit.io/docs/disclosure/
+- *
+- * The plan is to build own API that accounts for future breaking changes
+- * in Reakit (https://github.com/WordPress/gutenberg/pull/28085).
+- */
+-/* eslint-disable-next-line no-restricted-imports */
+-export { DisclosureContent } from 'reakit';
+diff --git a/packages/components/src/disclosure/index.tsx b/packages/components/src/disclosure/index.tsx
+new file mode 100644
+index 00000000000000..5bacfcabc349a6
+--- /dev/null
++++ b/packages/components/src/disclosure/index.tsx
+@@ -0,0 +1,44 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import * as Ariakit from '@ariakit/react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { DisclosureContentProps } from './types';
++import type { WordPressComponentProps } from '../context';
++
++/**
++ * Accessible Disclosure component that controls visibility of a section of
++ * content. It follows the WAI-ARIA Disclosure Pattern.
++ */
++const UnforwardedDisclosureContent = (
++	{
++		visible,
++		children,
++		...props
++	}: WordPressComponentProps< DisclosureContentProps, 'div', false >,
++	ref: React.ForwardedRef< any >
++) => {
++	const disclosure = Ariakit.useDisclosureStore( { open: visible } );
++
++	return (
++		<Ariakit.DisclosureContent
++			store={ disclosure }
++			ref={ ref }
++			{ ...props }
++		>
++			{ children }
++		</Ariakit.DisclosureContent>
++	);
++};
++
++export const DisclosureContent = forwardRef( UnforwardedDisclosureContent );
++export default DisclosureContent;
+diff --git a/packages/components/src/disclosure/types.tsx b/packages/components/src/disclosure/types.tsx
+new file mode 100644
+index 00000000000000..6a0a746bb6397f
+--- /dev/null
++++ b/packages/components/src/disclosure/types.tsx
+@@ -0,0 +1,10 @@
++export type DisclosureContentProps = {
++	/**
++	 * If set to `true` the content will be shown, otherwise it's hidden.
++	 */
++	visible?: boolean;
++	/**
++	 * The content to display within the component.
++	 */
++	children: React.ReactNode;
++};

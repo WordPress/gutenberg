@@ -1,0 +1,339 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fe326e847970b4..28298c8bb8cd14 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `BoxControl`: Passive deprecate `onMouseOver`/`onMouseOut`. Pass to the `inputProps` prop instead ([#67332](https://github.com/WordPress/gutenberg/pull/67332)).
+ -   `BoxControl`: Deprecate 36px default size ([#66704](https://github.com/WordPress/gutenberg/pull/66704)).
++-   `UnitControl`: Deprecate 36px default size ([#66791](https://github.com/WordPress/gutenberg/pull/66791)).
+ 
+ ### Internal
+ 
+@@ -20,7 +21,7 @@
+ -   `FontSizePicker`: Deprecate 36px default size ([#66920](https://github.com/WordPress/gutenberg/pull/66920)).
+ -   `ComboboxControl`: Deprecate 36px default size ([#66900](https://github.com/WordPress/gutenberg/pull/66900)).
+ -   `ToggleGroupControl`: Deprecate 36px default size ([#66747](https://github.com/WordPress/gutenberg/pull/66747)).
+--   `RangeControl`: Deprecate 36px default size ([#66721](https://github.com/WordPress/gutenberg/pull/66721)). 
++-   `RangeControl`: Deprecate 36px default size ([#66721](https://github.com/WordPress/gutenberg/pull/66721)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 2ba338c2bb30cb..f71599b274778d 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -75,6 +75,8 @@ const UnconnectedBorderControl = (
+ 			/>
+ 			<HStack spacing={ 4 } className={ innerWrapperClassName }>
+ 				<UnitControl
++					__next40pxDefaultSize={ __next40pxDefaultSize }
++					__shouldNotWarnDeprecated36pxSize
+ 					prefix={
+ 						<Spacer marginRight={ 1 } marginBottom={ 0 }>
+ 							<BorderControlDropdown
+diff --git a/packages/components/src/box-control/all-input-control.tsx b/packages/components/src/box-control/all-input-control.tsx
+index 057cf3c15d8c38..0cfaea21915f6d 100644
+--- a/packages/components/src/box-control/all-input-control.tsx
++++ b/packages/components/src/box-control/all-input-control.tsx
+@@ -74,6 +74,7 @@ export default function AllInputControl( {
+ 		<>
+ 			<StyledUnitControl
+ 				{ ...props }
++				__shouldNotWarnDeprecated36pxSize
+ 				__next40pxDefaultSize={ __next40pxDefaultSize }
+ 				className="component-box-control__unit-control"
+ 				disableUnits={ isMixed }
+diff --git a/packages/components/src/box-control/axial-input-controls.tsx b/packages/components/src/box-control/axial-input-controls.tsx
+index 40b39840b464b5..f8cbc5635c9b55 100644
+--- a/packages/components/src/box-control/axial-input-controls.tsx
++++ b/packages/components/src/box-control/axial-input-controls.tsx
+@@ -106,6 +106,7 @@ export default function AxialInputControls( {
+ 						<Tooltip placement="top-end" text={ LABELS[ side ] }>
+ 							<StyledUnitControl
+ 								{ ...props }
++								__shouldNotWarnDeprecated36pxSize
+ 								__next40pxDefaultSize={ __next40pxDefaultSize }
+ 								className="component-box-control__unit-control"
+ 								id={ inputId }
+diff --git a/packages/components/src/box-control/input-controls.tsx b/packages/components/src/box-control/input-controls.tsx
+index 1f005f6c6c01bd..8f4518d717dbed 100644
+--- a/packages/components/src/box-control/input-controls.tsx
++++ b/packages/components/src/box-control/input-controls.tsx
+@@ -108,6 +108,7 @@ export default function BoxInputControls( {
+ 						<Tooltip placement="top-end" text={ LABELS[ side ] }>
+ 							<StyledUnitControl
+ 								{ ...props }
++								__shouldNotWarnDeprecated36pxSize
+ 								__next40pxDefaultSize={ __next40pxDefaultSize }
+ 								className="component-box-control__unit-control"
+ 								id={ inputId }
+diff --git a/packages/components/src/font-size-picker/index.tsx b/packages/components/src/font-size-picker/index.tsx
+index a71e60cd6719c8..a47812640f1a29 100644
+--- a/packages/components/src/font-size-picker/index.tsx
++++ b/packages/components/src/font-size-picker/index.tsx
+@@ -212,6 +212,7 @@ const UnforwardedFontSizePicker = (
+ 						<FlexItem isBlock>
+ 							<UnitControl
+ 								__next40pxDefaultSize={ __next40pxDefaultSize }
++								__shouldNotWarnDeprecated36pxSize
+ 								label={ __( 'Custom' ) }
+ 								labelPosition="top"
+ 								hideLabelFromVision
+diff --git a/packages/components/src/tools-panel/stories/index.story.tsx b/packages/components/src/tools-panel/stories/index.story.tsx
+index 787585ac716b51..0fbdae794d838d 100644
+--- a/packages/components/src/tools-panel/stories/index.story.tsx
++++ b/packages/components/src/tools-panel/stories/index.story.tsx
+@@ -74,6 +74,7 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
+ 						isShownByDefault
+ 					>
+ 						<UnitControl
++							__next40pxDefaultSize
+ 							label="Width"
+ 							value={ width }
+ 							onChange={ ( next ) => setWidth( next ) }
+@@ -86,6 +87,7 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
+ 						isShownByDefault
+ 					>
+ 						<UnitControl
++							__next40pxDefaultSize
+ 							label="Height"
+ 							value={ height }
+ 							onChange={ ( next ) => setHeight( next ) }
+@@ -98,6 +100,7 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
+ 						isShownByDefault
+ 					>
+ 						<UnitControl
++							__next40pxDefaultSize
+ 							label="Minimum height"
+ 							value={ minHeight }
+ 							onChange={ ( next ) => setMinHeight( next ) }
+@@ -167,6 +170,7 @@ export const WithNonToolsPanelItems: StoryFn< typeof ToolsPanel > = ( {
+ 						isShownByDefault
+ 					>
+ 						<UnitControl
++							__next40pxDefaultSize
+ 							label="Width"
+ 							value={ width }
+ 							onChange={ ( next ) => setWidth( next ) }
+@@ -179,6 +183,7 @@ export const WithNonToolsPanelItems: StoryFn< typeof ToolsPanel > = ( {
+ 						isShownByDefault
+ 					>
+ 						<UnitControl
++							__next40pxDefaultSize
+ 							label="Height"
+ 							value={ height }
+ 							onChange={ ( next ) => setHeight( next ) }
+@@ -237,6 +242,7 @@ export const WithOptionalItemsPlusIcon: StoryFn< typeof ToolsPanel > = ( {
+ 							}
+ 						>
+ 							<UnitControl
++								__next40pxDefaultSize
+ 								label="Minimum width"
+ 								value={ minWidth }
+ 								onChange={ ( next ) => setMinWidth( next ) }
+@@ -249,6 +255,7 @@ export const WithOptionalItemsPlusIcon: StoryFn< typeof ToolsPanel > = ( {
+ 							isShownByDefault={ false }
+ 						>
+ 							<UnitControl
++								__next40pxDefaultSize
+ 								label="Width"
+ 								value={ width }
+ 								onChange={ ( next ) => setWidth( next ) }
+@@ -261,6 +268,7 @@ export const WithOptionalItemsPlusIcon: StoryFn< typeof ToolsPanel > = ( {
+ 							isShownByDefault={ false }
+ 						>
+ 							<UnitControl
++								__next40pxDefaultSize
+ 								label="Height"
+ 								value={ height }
+ 								onChange={ ( next ) => setHeight( next ) }
+@@ -341,6 +349,7 @@ export const WithSlotFillItems: StoryFn< typeof ToolsPanel > = ( {
+ 					panelId={ panelId }
+ 				>
+ 					<UnitControl
++						__next40pxDefaultSize
+ 						label="Injected Width"
+ 						value={ width }
+ 						onChange={ ( next ) =>
+@@ -356,6 +365,7 @@ export const WithSlotFillItems: StoryFn< typeof ToolsPanel > = ( {
+ 					panelId={ panelId }
+ 				>
+ 					<UnitControl
++						__next40pxDefaultSize
+ 						label="Injected Height"
+ 						value={ height }
+ 						onChange={ ( next ) =>
+@@ -441,6 +451,7 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
+ 					isShownByDefault
+ 				>
+ 					<UnitControl
++						__next40pxDefaultSize
+ 						label="Injected Height"
+ 						value={ height }
+ 						onChange={ ( next ) =>
+@@ -541,6 +552,7 @@ export const WithConditionallyRenderedControl: StoryFn<
+ 					isShownByDefault
+ 				>
+ 					<UnitControl
++						__next40pxDefaultSize
+ 						label="Injected Height"
+ 						value={ height }
+ 						onChange={ ( next ) =>
+diff --git a/packages/components/src/tools-panel/tools-panel/README.md b/packages/components/src/tools-panel/tools-panel/README.md
+index 1895f5ccc843ec..b5e6860e2bd072 100644
+--- a/packages/components/src/tools-panel/tools-panel/README.md
++++ b/packages/components/src/tools-panel/tools-panel/README.md
+@@ -101,6 +101,7 @@ export function DimensionPanel() {
+ 				isShownByDefault
+ 			>
+ 				<UnitControl
++					__next40pxDefaultSize
+ 					label={ __( 'Height' ) }
+ 					onChange={ setHeight }
+ 					value={ height }
+@@ -113,6 +114,7 @@ export function DimensionPanel() {
+ 				isShownByDefault
+ 			>
+ 				<UnitControl
++					__next40pxDefaultSize
+ 					label={ __( 'Width' ) }
+ 					onChange={ setWidth }
+ 					value={ width }
+diff --git a/packages/components/src/tools-panel/tools-panel/component.tsx b/packages/components/src/tools-panel/tools-panel/component.tsx
+index 4e01e39ffffb43..c094d593dd4c24 100644
+--- a/packages/components/src/tools-panel/tools-panel/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel/component.tsx
+@@ -75,6 +75,7 @@ const UnconnectedToolsPanel = (
+  *         onDeselect={ () => setHeight() }
+  *       >
+  *         <UnitControl
++ *           __next40pxDefaultSize
+  *           label={ __( 'Height' ) }
+  *           onChange={ setHeight }
+  *           value={ height }
+@@ -86,6 +87,7 @@ const UnconnectedToolsPanel = (
+  *         onDeselect={ () => setWidth() }
+  *       >
+  *         <UnitControl
++ *           __next40pxDefaultSize
+  *           label={ __( 'Width' ) }
+  *           onChange={ setWidth }
+  *           value={ width }
+diff --git a/packages/components/src/unit-control/README.md b/packages/components/src/unit-control/README.md
+index dd54de80357d8e..65d9e4b74062dd 100644
+--- a/packages/components/src/unit-control/README.md
++++ b/packages/components/src/unit-control/README.md
+@@ -15,7 +15,7 @@ import { __experimentalUnitControl as UnitControl } from '@wordpress/components'
+ const Example = () => {
+ 	const [ value, setValue ] = useState( '10px' );
+ 
+-	return <UnitControl onChange={ setValue } value={ value } />;
++	return <UnitControl __next40pxDefaultSize onChange={ setValue } value={ value } />;
+ };
+ ```
+ 
+@@ -128,7 +128,7 @@ const Example = () => {
+ 	];
+ 
+ 	return (
+-		<UnitControl onChange={ setValue } value={ value } units={ units } />
++		<UnitControl __next40pxDefaultSize onChange={ setValue } value={ value } units={ units } />
+ 	);
+ };
+ ```
+@@ -143,7 +143,7 @@ For example, a `value` of `50%` will set the current unit to `%`.
+ Example:
+ 
+ ```jsx
+-<UnitControl value="50%" />
++<UnitControl __next40pxDefaultSize value="50%" />
+ ```
+ 
+ -   Required: No
+diff --git a/packages/components/src/unit-control/index.tsx b/packages/components/src/unit-control/index.tsx
+index 2dd08cc155225f..9845c4eb04ef26 100644
+--- a/packages/components/src/unit-control/index.tsx
++++ b/packages/components/src/unit-control/index.tsx
+@@ -27,6 +27,7 @@ import { useControlledState } from '../utils/hooks';
+ import { escapeRegExp } from '../utils/strings';
+ import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
++import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+ 
+ function UnforwardedUnitControl(
+ 	unitControlProps: WordPressComponentProps<
+@@ -55,9 +56,17 @@ function UnforwardedUnitControl(
+ 		units: unitsProp = CSS_UNITS,
+ 		value: valueProp,
+ 		onFocus: onFocusProp,
++		__shouldNotWarnDeprecated36pxSize,
+ 		...props
+ 	} = useDeprecated36pxDefaultSizeProp( unitControlProps );
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'UnitControl',
++		__next40pxDefaultSize: props.__next40pxDefaultSize,
++		size,
++		__shouldNotWarnDeprecated36pxSize,
++	} );
++
+ 	if ( 'unit' in unitControlProps ) {
+ 		deprecated( 'UnitControl unit prop', {
+ 			since: '5.6',
+@@ -246,7 +255,7 @@ function UnforwardedUnitControl(
+  * const Example = () => {
+  *   const [ value, setValue ] = useState( '10px' );
+  *
+- *   return <UnitControl onChange={ setValue } value={ value } />;
++ *   return <UnitControl __next40pxDefaultSize onChange={ setValue } value={ value } />;
+  * };
+  * ```
+  */
+diff --git a/packages/components/src/unit-control/stories/index.story.tsx b/packages/components/src/unit-control/stories/index.story.tsx
+index de8f476e26e5c7..87628c46441169 100644
+--- a/packages/components/src/unit-control/stories/index.story.tsx
++++ b/packages/components/src/unit-control/stories/index.story.tsx
+@@ -59,6 +59,7 @@ export const Default: StoryFn< typeof UnitControl > = DefaultTemplate.bind(
+ );
+ Default.args = {
+ 	label: 'Label',
++	__next40pxDefaultSize: true,
+ };
+ 
+ /**
+diff --git a/packages/components/src/unit-control/test/index.tsx b/packages/components/src/unit-control/test/index.tsx
+index d91498d46478b3..ad98d57cae6405 100644
+--- a/packages/components/src/unit-control/test/index.tsx
++++ b/packages/components/src/unit-control/test/index.tsx
+@@ -12,9 +12,13 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import UnitControl from '..';
++import _UnitControl from '..';
+ import { CSS_UNITS, parseQuantityAndUnitFromRawValue } from '../utils';
+ 
++const UnitControl = ( props: React.ComponentProps< typeof _UnitControl > ) => (
++	<_UnitControl __next40pxDefaultSize { ...props } />
++);
++
+ const getInput = ( {
+ 	isInputTypeText = false,
+ }: {
+diff --git a/packages/components/src/unit-control/types.ts b/packages/components/src/unit-control/types.ts
+index 9164502668a2b0..891945b422862a 100644
+--- a/packages/components/src/unit-control/types.ts
++++ b/packages/components/src/unit-control/types.ts
+@@ -107,4 +107,11 @@ export type UnitControlProps = Pick< InputControlProps, 'size' > &
+ 		 * Callback when either the quantity or the unit inputs gains focus.
+ 		 */
+ 		onFocus?: FocusEventHandler< HTMLInputElement | HTMLSelectElement >;
++		/**
++		 * Do not throw a warning for the deprecated 36px default size.
++		 * For internal components of other components that already throw the warning.
++		 *
++		 * @ignore
++		 */
++		__shouldNotWarnDeprecated36pxSize?: boolean;
+ 	};

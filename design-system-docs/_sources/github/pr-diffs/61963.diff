@@ -1,0 +1,93 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3d5b0d9dfe1f35..54f516ed84ba92 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ 
+ ### Internal
+ 
++-   Remove `reduceMotion` util ([#61963](https://github.com/WordPress/gutenberg/pull/61963)).
+ -   Add type support for CSS Custom Properties ([#61872](https://github.com/WordPress/gutenberg/pull/61872)).
+ -   Remove usage of deprecated spreading of `key` prop in JSX in CustomSelectControl and FormTokenField components ([#61692](https://github.com/WordPress/gutenberg/pull/61692)).
+ -   Tooltip: Fix Ariakit tooltip store usage ([#61858](https://github.com/WordPress/gutenberg/pull/61858)).
+diff --git a/packages/components/src/focal-point-picker/styles/focal-point-style.ts b/packages/components/src/focal-point-picker/styles/focal-point-style.ts
+index 5ee0c01c42dd62..6f95978256f72e 100644
+--- a/packages/components/src/focal-point-picker/styles/focal-point-style.ts
++++ b/packages/components/src/focal-point-picker/styles/focal-point-style.ts
+@@ -3,11 +3,6 @@
+  */
+ import styled from '@emotion/styled';
+ 
+-/**
+- * Internal dependencies
+- */
+-import { reduceMotion } from '../../utils';
+-
+ export const PointerCircle = styled.div`
+ 	background-color: transparent;
+ 	cursor: grab;
+@@ -23,9 +18,10 @@ export const PointerCircle = styled.div`
+ 	border-radius: 50%;
+ 	backdrop-filter: blur( 16px ) saturate( 180% );
+ 	box-shadow: rgb( 0 0 0 / 10% ) 0px 0px 8px;
+-	transition: transform 100ms linear;
+ 
+-	${ reduceMotion( 'transition' ) }
++	@media not ( prefers-reduced-motion ) {
++		transition: transform 100ms linear;
++	}
+ 
+ 	${ ( { isDragging }: { isDragging: boolean } ) =>
+ 		isDragging &&
+diff --git a/packages/components/src/utils/reduce-motion.js b/packages/components/src/utils/reduce-motion.js
+deleted file mode 100644
+index 68089e019e50eb..00000000000000
+--- a/packages/components/src/utils/reduce-motion.js
++++ /dev/null
+@@ -1,35 +0,0 @@
+-/**
+- * Allows users to opt-out of animations via OS-level preferences.
+- *
+- * @param {'transition' | 'animation' | string} [prop='transition'] CSS Property name
+- * @return {string} Generated CSS code for the reduced style
+- *
+- * @deprecated Write your own media query instead,
+- * e.g. `@media not ( prefers-reduced-motion ) { ...some animation... }` or
+- * `@media ( prefers-reduced-motion ) { ...reduced animation... }`.
+- */
+-export function reduceMotion( prop = 'transition' ) {
+-	let style;
+-
+-	switch ( prop ) {
+-		case 'transition':
+-			style = 'transition-duration: 0ms;';
+-			break;
+-
+-		case 'animation':
+-			style = 'animation-duration: 1ms;';
+-			break;
+-
+-		default:
+-			style = `
+-				animation-duration: 1ms;
+-				transition-duration: 0ms;
+-			`;
+-	}
+-
+-	return `
+-		@media ( prefers-reduced-motion: reduce ) {
+-			${ style };
+-		}
+-	`;
+-}
+diff --git a/packages/components/src/utils/style-mixins.js b/packages/components/src/utils/style-mixins.js
+index c858e8731fc523..46ee1183f59698 100644
+--- a/packages/components/src/utils/style-mixins.js
++++ b/packages/components/src/utils/style-mixins.js
+@@ -1,6 +1,5 @@
+ export { boxSizingReset } from './box-sizing';
+ export { rgba } from './colors';
+-export { reduceMotion } from './reduce-motion';
+ export { rtl } from './rtl';
+ export { font } from './font';
+ export { breakpoint } from './breakpoint';

@@ -1,0 +1,60 @@
+diff --git a/packages/base-styles/_animations.scss b/packages/base-styles/_animations.scss
+index bdfd7595da8e44..ce1f935b7d4d5b 100644
+--- a/packages/base-styles/_animations.scss
++++ b/packages/base-styles/_animations.scss
+@@ -1,5 +1,5 @@
+-@mixin edit-post__fade-in-animation($speed: 0.2s, $delay: 0s) {
+-	animation: edit-post__fade-in-animation $speed ease-out $delay;
++@mixin edit-post__fade-in-animation($speed: 0.08s, $delay: 0s) {
++	animation: edit-post__fade-in-animation $speed linear $delay;
+ 	animation-fill-mode: forwards;
+ 	@include reduce-motion("animation");
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ce3fd808e7ed89..fc74129492fd75 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -44,6 +44,7 @@
+     -   `TimePicker` (on the inputs)
+     -   `TreeSelect`
+     -   `UnitControl`
++-   `Modal`: Update animation effect ([#64580](https://github.com/WordPress/gutenberg/pull/64580)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index 75ba7e1384e4c1..47d5df116d8865 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -8,7 +8,6 @@
+ 	background-color: rgba($black, 0.35);
+ 	z-index: z-index(".components-modal__screen-overlay");
+ 	display: flex;
+-	// backdrop-filter: blur($grid-unit);
+ 	// This animates the appearance of the white background.
+ 	@include edit-post__fade-in-animation();
+ }
+@@ -26,7 +25,7 @@
+ 	// Have the content element fill the vertical space yet not overflow.
+ 	display: flex;
+ 	// Animate the modal frame/contents appearing on the page.
+-	animation: components-modal__appear-animation 0.1s ease-out;
++	animation: components-modal__appear-animation 0.26s cubic-bezier(0.29, 0, 0, 1);
+ 	animation-fill-mode: forwards;
+ 	@include reduce-motion("animation");
+ 
+@@ -80,10 +79,12 @@
+ 
+ @keyframes components-modal__appear-animation {
+ 	from {
+-		transform: translateY($grid-unit-40);
++		opacity: 0;
++		transform: scale(0.9);
+ 	}
+ 	to {
+-		transform: translateY(0);
++		opacity: 1;
++		transform: scale(1);
+ 	}
+ }
+ 

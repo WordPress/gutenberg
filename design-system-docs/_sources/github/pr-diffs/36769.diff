@@ -1,0 +1,65 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f7ff065954f5bd..b1c5cc814dfbc0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   Reinstated the ability to pass additional props to the `ToolsPanel` ([36428](https://github.com/WordPress/gutenberg/pull/36428)).
+ -   Added an `__unstable-large` size variant to `InputControl`, `SelectControl`, and `UnitControl` for selective migration to the larger 40px heights. ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
+ -   Fixed inconsistent padding in `UnitControl` ([#35646](https://github.com/WordPress/gutenberg/pull/35646)).
++-   Added support for RTL behavior for the `ZStack`'s `offset` prop ([#36769](https://github.com/WordPress/gutenberg/pull/36769))
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/z-stack/README.md b/packages/components/src/z-stack/README.md
+index 7f07104b0654fc..8705f82c085175 100644
+--- a/packages/components/src/z-stack/README.md
++++ b/packages/components/src/z-stack/README.md
+@@ -34,7 +34,7 @@ Reverse the layer ordering. When `true`, the first child has the lowest `z-index
+ 
+ ### `offset`: `number`
+ 
+-The amount of space between each child element. Defaults to `0`.
++The amount of space between each child element. Defaults to `0`. Its value is automatically inverted (i.e. from positive to negative, and viceversa) when switching from LTR to RTL.
+ 
+ ### `children`: `ReactNode`
+ 
+diff --git a/packages/components/src/z-stack/component.tsx b/packages/components/src/z-stack/component.tsx
+index b6ee9fad3f1dcc..5e594101dab653 100644
+--- a/packages/components/src/z-stack/component.tsx
++++ b/packages/components/src/z-stack/component.tsx
+@@ -31,7 +31,7 @@ export interface ZStackProps {
+ 	 */
+ 	isReversed?: boolean;
+ 	/**
+-	 * The amount of offset between each child element.
++	 * The amount of offset between each child element. The amount of space between each child element. Defaults to `0`. Its value is automatically inverted (i.e. from positive to negative, and viceversa) when switching from LTR to RTL.
+ 	 *
+ 	 * @default 0
+ 	 */
+diff --git a/packages/components/src/z-stack/styles.ts b/packages/components/src/z-stack/styles.ts
+index 141ab50191d744..d0bf20d38b1f4c 100644
+--- a/packages/components/src/z-stack/styles.ts
++++ b/packages/components/src/z-stack/styles.ts
+@@ -4,6 +4,11 @@
+ import { css } from '@emotion/react';
+ import styled from '@emotion/styled';
+ 
++/**
++ * Internal dependencies
++ */
++import { rtl } from '../utils';
++
+ export const ZStackView = styled.div`
+ 	display: flex;
+ 	position: relative;
+@@ -16,8 +21,8 @@ export const ZStackChildView = styled.div< {
+ } >`
+ 	${ ( { isLayered, offsetAmount } ) =>
+ 		isLayered
+-			? css( { marginLeft: offsetAmount } )
+-			: css( { right: offsetAmount * -1 } ) }
++			? css( rtl( { marginLeft: offsetAmount } )() )
++			: css( rtl( { right: offsetAmount * -1 } )() ) }
+ 
+ 	${ ( { isLayered } ) =>
+ 		isLayered ? positionAbsolute : positionRelative }

@@ -1,0 +1,87 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 96ec72b73bb271..a2f87e010cbd7c 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   Replaced hardcoded blue in `ColorPicker` with UI theme color ([#36153](https://github.com/WordPress/gutenberg/pull/36153)).
++
+ ### Experimental
+ 
+ -   Updated the `ToolsPanel` to use `Grid` internally to manage panel layout ([35621](https://github.com/WordPress/gutenberg/pull/35621)).
+diff --git a/packages/components/src/color-picker/color-display.tsx b/packages/components/src/color-picker/color-display.tsx
+index 751858436767ca..be78b948b1e89a 100644
+--- a/packages/components/src/color-picker/color-display.tsx
++++ b/packages/components/src/color-picker/color-display.tsx
+@@ -18,6 +18,7 @@ import { Flex, FlexItem } from '../flex';
+ import { Tooltip } from '../ui/tooltip';
+ import type { ColorType } from './types';
+ import { space } from '../ui/utils/space';
++import { COLORS } from '../utils/colors-values';
+ 
+ interface ColorDisplayProps {
+ 	color: Colord;
+@@ -41,7 +42,7 @@ const ValueDisplay = ( { values }: ValueDisplayProps ) => (
+ 		{ values.map( ( [ value, abbreviation ] ) => {
+ 			return (
+ 				<FlexItem key={ abbreviation } isBlock display="flex">
+-					<Text color="blue">{ abbreviation }</Text>
++					<Text color={ COLORS.ui.theme }>{ abbreviation }</Text>
+ 					<Text>{ value }</Text>
+ 				</FlexItem>
+ 			);
+@@ -84,7 +85,7 @@ const HexDisplay = ( { color }: DisplayProps ) => {
+ 	const colorWithoutHash = color.toHex().slice( 1 ).toUpperCase();
+ 	return (
+ 		<FlexItem>
+-			<Text color="blue">#</Text>
++			<Text color={ COLORS.ui.theme }>#</Text>
+ 			<Text>{ colorWithoutHash }</Text>
+ 		</FlexItem>
+ 	);
+diff --git a/packages/components/src/color-picker/hex-input.tsx b/packages/components/src/color-picker/hex-input.tsx
+index c17d8866fc02fa..f79ce4f3f2b31e 100644
+--- a/packages/components/src/color-picker/hex-input.tsx
++++ b/packages/components/src/color-picker/hex-input.tsx
+@@ -15,6 +15,7 @@ import { Text } from '../text';
+ import { Spacer } from '../spacer';
+ import { space } from '../ui/utils/space';
+ import { ColorHexInputControl } from './styles';
++import { COLORS } from '../utils/colors-values';
+ 
+ interface HexInputProps {
+ 	color: Colord;
+@@ -35,7 +36,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+ 				<Spacer
+ 					as={ Text }
+ 					marginLeft={ space( 3.5 ) }
+-					color="blue"
++					color={ COLORS.ui.theme }
+ 					lineHeight={ 1 }
+ 				>
+ 					#
+diff --git a/packages/components/src/color-picker/input-with-slider.tsx b/packages/components/src/color-picker/input-with-slider.tsx
+index a38f600a8bf63b..fb45238ec5016d 100644
+--- a/packages/components/src/color-picker/input-with-slider.tsx
++++ b/packages/components/src/color-picker/input-with-slider.tsx
+@@ -6,6 +6,7 @@ import { Text } from '../text';
+ import { Spacer } from '../spacer';
+ import { space } from '../ui/utils/space';
+ import { RangeControl, NumberControlWrapper } from './styles';
++import { COLORS } from '../utils/colors-values';
+ 
+ interface InputWithSliderProps {
+ 	min: number;
+@@ -37,7 +38,7 @@ export const InputWithSlider = ( {
+ 					<Spacer
+ 						as={ Text }
+ 						paddingLeft={ space( 3.5 ) }
+-						color="blue"
++						color={ COLORS.ui.theme }
+ 						lineHeight={ 1 }
+ 					>
+ 						{ abbreviation }

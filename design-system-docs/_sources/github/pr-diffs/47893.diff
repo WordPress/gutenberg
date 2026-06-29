@@ -1,0 +1,255 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c24effeff51c65..ae95d589b3e27f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `SelectControl`: Fix styling when `multiple` prop is enabled ([#47893](https://github.com/WordPress/gutenberg/pull/43213)).
++
+ ### Enhancements
+ 
+ -  `ColorPalette`, `GradientPicker`, `PaletteEdit`, `ToolsPanel`: add new props to set a custom heading level ([43848](https://github.com/WordPress/gutenberg/pull/43848) and [#47788](https://github.com/WordPress/gutenberg/pull/47788)).
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index 56e9a4ffffe6d9..8edf2a4875e52a 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -116,7 +116,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   width: 100%;
+   max-width: none;
+   cursor: pointer;
+-  overflow: hidden;
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   font-size: 16px;
+@@ -126,6 +125,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   padding-bottom: 0;
+   padding-left: 8px;
+   padding-right: 26px;
++  overflow: hidden;
+ }
+ 
+ @media ( min-width: 600px ) {
+@@ -387,7 +387,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   width: 100%;
+   max-width: none;
+   cursor: pointer;
+-  overflow: hidden;
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   font-size: 16px;
+@@ -397,6 +396,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   padding-bottom: 0;
+   padding-left: 8px;
+   padding-right: 26px;
++  overflow: hidden;
+ }
+ 
+ @media ( min-width: 600px ) {
+@@ -668,7 +668,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   width: 100%;
+   max-width: none;
+   cursor: pointer;
+-  overflow: hidden;
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   font-size: 16px;
+@@ -678,6 +677,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   padding-bottom: 0;
+   padding-left: 8px;
+   padding-right: 26px;
++  overflow: hidden;
+ }
+ 
+ @media ( min-width: 600px ) {
+@@ -961,7 +961,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   width: 100%;
+   max-width: none;
+   cursor: pointer;
+-  overflow: hidden;
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   font-size: 16px;
+@@ -971,6 +970,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   padding-bottom: 0;
+   padding-left: 8px;
+   padding-right: 26px;
++  overflow: hidden;
+ }
+ 
+ @media ( min-width: 600px ) {
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index 1d96f2ba92b76e..dc6e884a5e12be 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -187,7 +187,9 @@ If this property is added, a help text will be generated using help property as
+ 
+ #### multiple
+ 
+-If this property is added, multiple values can be selected. The value passed should be an array.
++If this property is added, multiple values can be selected. The `value` passed should be an array.
++
++In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
+ 
+ -   Type: `Boolean`
+ -   Required: No
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 2abd647388cf27..75569dac80a169 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -101,7 +101,9 @@ function UnforwardedSelectControl(
+ 				isFocused={ isFocused }
+ 				label={ label }
+ 				size={ size }
+-				suffix={ suffix || <SelectControlChevronDown /> }
++				suffix={
++					suffix || ( ! multiple && <SelectControlChevronDown /> )
++				}
+ 				prefix={ prefix }
+ 				labelPosition={ labelPosition }
+ 				__next36pxDefaultSize={ __next36pxDefaultSize }
+diff --git a/packages/components/src/select-control/style.scss b/packages/components/src/select-control/style.scss
+index b59fa2160b9526..1558314af554f8 100644
+--- a/packages/components/src/select-control/style.scss
++++ b/packages/components/src/select-control/style.scss
+@@ -1,16 +1,6 @@
+ .components-select-control__input {
+-	background: $white;
+-	height: 36px;
+-	line-height: 36px;
+-	margin: 1px;
+ 	outline: 0;
+-	width: 100%;
+ 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
+-
+-	@include break-medium() {
+-		height: 28px;
+-		line-height: 28px;
+-	}
+ }
+ 
+ @media (max-width: #{ ($break-medium) }) {
+diff --git a/packages/components/src/select-control/styles/select-control-styles.ts b/packages/components/src/select-control/styles/select-control-styles.ts
+index e0976c9f507697..2374015d747faf 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.ts
++++ b/packages/components/src/select-control/styles/select-control-styles.ts
+@@ -13,7 +13,10 @@ import type { SelectControlProps } from '../types';
+ import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper';
+ 
+ interface SelectProps
+-	extends Pick< SelectControlProps, '__next36pxDefaultSize' | 'disabled' > {
++	extends Pick<
++		SelectControlProps,
++		'__next36pxDefaultSize' | 'disabled' | 'multiple'
++	> {
+ 	// Using `selectSize` instead of `size` to avoid a type conflict with the
+ 	// `size` HTML attribute of the `select` element.
+ 	selectSize?: SelectControlProps[ 'size' ];
+@@ -50,8 +53,15 @@ const fontSizeStyles = ( { selectSize = 'default' }: SelectProps ) => {
+ 
+ const sizeStyles = ( {
+ 	__next36pxDefaultSize,
++	multiple,
+ 	selectSize = 'default',
+ }: SelectProps ) => {
++	if ( multiple ) {
++		// When `multiple`, just use the native browser styles
++		// without setting explicit height.
++		return;
++	}
++
+ 	const sizes = {
+ 		default: {
+ 			height: 36,
+@@ -91,33 +101,37 @@ export const chevronIconSize = 18;
+ 
+ const sizePaddings = ( {
+ 	__next36pxDefaultSize,
++	multiple,
+ 	selectSize = 'default',
+ }: SelectProps ) => {
+-	const iconWidth = chevronIconSize;
+-
+-	const sizes = {
+-		default: {
+-			paddingLeft: 16,
+-			paddingRight: 16 + iconWidth,
+-		},
+-		small: {
+-			paddingLeft: 8,
+-			paddingRight: 8 + iconWidth,
+-		},
+-		'__unstable-large': {
+-			paddingLeft: 16,
+-			paddingRight: 16 + iconWidth,
+-		},
++	const padding = {
++		default: 16,
++		small: 8,
++		'__unstable-large': 16,
+ 	};
+ 
+ 	if ( ! __next36pxDefaultSize ) {
+-		sizes.default = {
+-			paddingLeft: 8,
+-			paddingRight: 8 + iconWidth,
+-		};
++		padding.default = 8;
+ 	}
+ 
+-	return rtl( sizes[ selectSize ] || sizes.default );
++	const selectedPadding = padding[ selectSize ] || padding.default;
++
++	return rtl( {
++		paddingLeft: selectedPadding,
++		paddingRight: selectedPadding + chevronIconSize,
++		...( multiple
++			? {
++					paddingTop: selectedPadding,
++					paddingBottom: selectedPadding,
++			  }
++			: {} ),
++	} );
++};
++
++const overflowStyles = ( { multiple }: SelectProps ) => {
++	return {
++		overflow: multiple ? 'auto' : 'hidden',
++	};
+ };
+ 
+ // TODO: Resolve need to use &&& to increase specificity
+@@ -137,7 +151,6 @@ export const Select = styled.select< SelectProps >`
+ 		width: 100%;
+ 		max-width: none;
+ 		cursor: pointer;
+-		overflow: hidden;
+ 		white-space: nowrap;
+ 		text-overflow: ellipsis;
+ 
+@@ -145,6 +158,7 @@ export const Select = styled.select< SelectProps >`
+ 		${ fontSizeStyles };
+ 		${ sizeStyles };
+ 		${ sizePaddings };
++		${ overflowStyles }
+ 	}
+ `;
+ 
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+index 6126ba5043d6c4..2b8d187d4031ea 100644
+--- a/packages/components/src/select-control/types.ts
++++ b/packages/components/src/select-control/types.ts
+@@ -23,7 +23,9 @@ export interface SelectControlProps
+ 		>,
+ 		Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > {
+ 	/**
+-	 * If this property is added, multiple values can be selected. The value passed should be an array.
++	 * If this property is added, multiple values can be selected. The `value` passed should be an array.
++	 *
++	 * In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
+ 	 *
+ 	 * @default false
+ 	 */

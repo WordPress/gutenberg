@@ -1,0 +1,39 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f34ca0aa08a6cb..6e078bb4ae64d8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ ### Bug Fixes
+ 
+ -   `Popover`: Don't close when focus moves into the `@wordpress/ui` compat overlay slot, or is restored to the popover from any portaled descendant. This unblocks nested overlays such as `@wordpress/ui` `Select`, which previously dismissed the host `Popover` on hover and on overlay dismissal ([#78407](https://github.com/WordPress/gutenberg/pull/78407)).
++-   `RangeControl`: Remove the `icon` prop from the web types. It was added in error during the TypeScript migration and never had any effect on web; use `beforeIcon` or `afterIcon` instead. The prop remains functional in the native (mobile) implementation ([#78444](https://github.com/WordPress/gutenberg/pull/78444)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/range-control/stories/index.story.tsx b/packages/components/src/range-control/stories/index.story.tsx
+index 5f07b4db4adbfb..731359bb15eafe 100644
+--- a/packages/components/src/range-control/stories/index.story.tsx
++++ b/packages/components/src/range-control/stories/index.story.tsx
+@@ -35,7 +35,6 @@ const meta: Meta< typeof RangeControl > = {
+ 		},
+ 		color: { control: { type: 'color' } },
+ 		help: { control: { type: 'text' } },
+-		icon: { control: false },
+ 		marks: { control: { type: 'object' } },
+ 		onBlur: { control: false },
+ 		onChange: { control: false },
+diff --git a/packages/components/src/range-control/types.ts b/packages/components/src/range-control/types.ts
+index ac8afa2e0c86e6..c890b4874ef68f 100644
+--- a/packages/components/src/range-control/types.ts
++++ b/packages/components/src/range-control/types.ts
+@@ -114,10 +114,6 @@ export type RangeControlProps = Pick<
+ 		 * `undefined`.
+ 		 */
+ 		currentInput?: number;
+-		/**
+-		 * An icon to be shown above the slider next to its container title.
+-		 */
+-		icon?: string;
+ 		/**
+ 		 * The slider starting position, used when no `value` is passed.
+ 		 * The `initialPosition` will be clamped between the provided `min`

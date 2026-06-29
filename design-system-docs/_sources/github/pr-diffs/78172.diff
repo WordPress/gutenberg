@@ -1,0 +1,106 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 82bdc79c82297c..7ad412d9d22deb 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Text`: Provide CSS defense values for every variant when rendered as either a paragraph or heading element ([#78172](https://github.com/WordPress/gutenberg/pull/78172)).
+ -   `Autocomplete`, `Select`: Do not show the interactive cursor for disabled select triggers or disabled popup items ([#78112](https://github.com/WordPress/gutenberg/pull/78112)).
+ -   `Select`: Hide the browser focus ring on highlighted popup items ([#77919](https://github.com/WordPress/gutenberg/pull/77919)).
+ -   `Drawer`: Restore the slide-out animation when the popup closes ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+diff --git a/packages/ui/src/text/style.module.css b/packages/ui/src/text/style.module.css
+index a2e1ea1d3f9817..cc330b726bb6de 100644
+--- a/packages/ui/src/text/style.module.css
++++ b/packages/ui/src/text/style.module.css
+@@ -5,8 +5,13 @@
+ 		margin: 0;
+ 	}
+ 
++	/* Text variants can render as either paragraphs or headings, so each variant
++	   provides values for both element-specific CSS defenses. */
+ 	.heading-2xl {
+ 		--_gcd-heading-font-size: var(--wpds-typography-font-size-2xl);
++		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
++		--_gcd-p-font-size: var(--wpds-typography-font-size-2xl);
++		--_gcd-p-line-height: var(--wpds-typography-line-height-2xl);
+ 
+ 		font-family: var(--wpds-typography-font-family-heading);
+ 		font-size: var(--wpds-typography-font-size-2xl);
+@@ -16,6 +21,9 @@
+ 
+ 	.heading-xl {
+ 		--_gcd-heading-font-size: var(--wpds-typography-font-size-xl);
++		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
++		--_gcd-p-font-size: var(--wpds-typography-font-size-xl);
++		--_gcd-p-line-height: var(--wpds-typography-line-height-md);
+ 
+ 		font-family: var(--wpds-typography-font-family-heading);
+ 		font-size: var(--wpds-typography-font-size-xl);
+@@ -25,6 +33,9 @@
+ 
+ 	.heading-lg {
+ 		--_gcd-heading-font-size: var(--wpds-typography-font-size-lg);
++		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
++		--_gcd-p-font-size: var(--wpds-typography-font-size-lg);
++		--_gcd-p-line-height: var(--wpds-typography-line-height-sm);
+ 
+ 		font-family: var(--wpds-typography-font-family-heading);
+ 		font-size: var(--wpds-typography-font-size-lg);
+@@ -34,6 +45,9 @@
+ 
+ 	.heading-md {
+ 		--_gcd-heading-font-size: var(--wpds-typography-font-size-md);
++		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
++		--_gcd-p-font-size: var(--wpds-typography-font-size-md);
++		--_gcd-p-line-height: var(--wpds-typography-line-height-sm);
+ 
+ 		font-family: var(--wpds-typography-font-family-heading);
+ 		font-size: var(--wpds-typography-font-size-md);
+@@ -43,6 +57,9 @@
+ 
+ 	.heading-sm {
+ 		--_gcd-heading-font-size: var(--wpds-typography-font-size-xs);
++		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-medium);
++		--_gcd-p-font-size: var(--wpds-typography-font-size-xs);
++		--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
+ 
+ 		font-family: var(--wpds-typography-font-family-heading);
+ 		font-size: var(--wpds-typography-font-size-xs);
+@@ -52,6 +69,8 @@
+ 	}
+ 
+ 	.body-xl {
++		--_gcd-heading-font-size: var(--wpds-typography-font-size-xl);
++		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
+ 		--_gcd-p-font-size: var(--wpds-typography-font-size-xl);
+ 		--_gcd-p-line-height: var(--wpds-typography-line-height-xl);
+ 
+@@ -62,6 +81,8 @@
+ 	}
+ 
+ 	.body-lg {
++		--_gcd-heading-font-size: var(--wpds-typography-font-size-lg);
++		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
+ 		--_gcd-p-font-size: var(--wpds-typography-font-size-lg);
+ 		--_gcd-p-line-height: var(--wpds-typography-line-height-md);
+ 
+@@ -72,6 +93,8 @@
+ 	}
+ 
+ 	.body-md {
++		--_gcd-heading-font-size: var(--wpds-typography-font-size-md);
++		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
+ 		--_gcd-p-font-size: var(--wpds-typography-font-size-md);
+ 		--_gcd-p-line-height: var(--wpds-typography-line-height-sm);
+ 
+@@ -82,6 +105,8 @@
+ 	}
+ 
+ 	.body-sm {
++		--_gcd-heading-font-size: var(--wpds-typography-font-size-sm);
++		--_gcd-heading-font-weight: var(--wpds-typography-font-weight-regular);
+ 		--_gcd-p-font-size: var(--wpds-typography-font-size-sm);
+ 		--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
+ 

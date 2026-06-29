@@ -1,0 +1,47 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index edbd02867c0103..c4153503fd798f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   `CheckboxControl`: Add option to not render label ([#56158](https://github.com/WordPress/gutenberg/pull/56158)).
+ -   `PaletteEdit`: Gradient pickers to use same width as color pickers ([#56801](https://github.com/WordPress/gutenberg/pull/56801)).
+ -   `FocalPointPicker`: Add opt-in prop for 40px default size ([#56021](https://github.com/WordPress/gutenberg/pull/56021)).
++-   `DimensionControl`: Add opt-in prop for 40px default size ([#56805](https://github.com/WordPress/gutenberg/pull/56805)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/dimension-control/index.tsx b/packages/components/src/dimension-control/index.tsx
+index 0fbdd62b58a00d..38ad5b2f85ccc7 100644
+--- a/packages/components/src/dimension-control/index.tsx
++++ b/packages/components/src/dimension-control/index.tsx
+@@ -42,6 +42,7 @@ import type { SelectControlSingleSelectionProps } from '../select-control/types'
+  */
+ export function DimensionControl( props: DimensionControlProps ) {
+ 	const {
++		__next40pxDefaultSize = false,
+ 		label,
+ 		value,
+ 		sizes = sizesTable,
+@@ -85,6 +86,7 @@ export function DimensionControl( props: DimensionControlProps ) {
+ 
+ 	return (
+ 		<SelectControl
++			__next40pxDefaultSize={ __next40pxDefaultSize }
+ 			className={ classnames(
+ 				className,
+ 				'block-editor-dimension-control'
+diff --git a/packages/components/src/dimension-control/types.ts b/packages/components/src/dimension-control/types.ts
+index 534b80053db968..671454f18c8a9b 100644
+--- a/packages/components/src/dimension-control/types.ts
++++ b/packages/components/src/dimension-control/types.ts
+@@ -45,4 +45,10 @@ export type DimensionControlProps = {
+ 	 * @default ''
+ 	 */
+ 	className?: string;
++	/**
++	 * Start opting into the larger default height that will become the default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next40pxDefaultSize?: boolean;
+ };

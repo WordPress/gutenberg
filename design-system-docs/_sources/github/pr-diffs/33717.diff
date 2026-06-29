@@ -1,0 +1,251 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 2563edaafd004a..a9ce5392e2f2eb 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -70,6 +70,11 @@ module.exports = {
+ 			'error',
+ 			{
+ 				paths: [
++					{
++						name: 'framer-motion',
++						message:
++							'Please use the Framer Motion API through `@wordpress/components` instead.',
++					},
+ 					{
+ 						name: 'lodash',
+ 						importNames: [ 'memoize' ],
+diff --git a/package-lock.json b/package-lock.json
+index 87002bae72d993..26cb192adf729e 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -14681,6 +14681,7 @@
+ 				"classnames": "^2.3.1",
+ 				"dom-scroll-into-view": "^1.2.1",
+ 				"downshift": "^6.0.15",
++				"framer-motion": "^4.1.17",
+ 				"gradient-parser": "^0.1.5",
+ 				"highlight-words-core": "^1.2.2",
+ 				"lodash": "^4.17.21",
+@@ -14689,7 +14690,6 @@
+ 				"re-resizable": "^6.4.0",
+ 				"react-dates": "^17.1.1",
+ 				"react-resize-aware": "^3.1.0",
+-				"react-spring": "^8.0.20",
+ 				"react-use-gesture": "^9.0.0",
+ 				"reakit": "^1.3.8",
+ 				"rememo": "^3.0.0",
+@@ -14956,7 +14956,6 @@
+ 				"@wordpress/viewport": "file:packages/viewport",
+ 				"@wordpress/warning": "file:packages/warning",
+ 				"classnames": "^2.3.1",
+-				"framer-motion": "^4.1.3",
+ 				"lodash": "^4.17.21",
+ 				"memize": "^1.1.0",
+ 				"rememo": "^3.0.0",
+diff --git a/packages/components/package.json b/packages/components/package.json
+index a5818b5908bb82..c131e5b6ea52a3 100644
+--- a/packages/components/package.json
++++ b/packages/components/package.json
+@@ -52,6 +52,7 @@
+ 		"classnames": "^2.3.1",
+ 		"dom-scroll-into-view": "^1.2.1",
+ 		"downshift": "^6.0.15",
++		"framer-motion": "^4.1.17",
+ 		"gradient-parser": "^0.1.5",
+ 		"highlight-words-core": "^1.2.2",
+ 		"lodash": "^4.17.21",
+@@ -60,7 +61,6 @@
+ 		"re-resizable": "^6.4.0",
+ 		"react-dates": "^17.1.1",
+ 		"react-resize-aware": "^3.1.0",
+-		"react-spring": "^8.0.20",
+ 		"react-use-gesture": "^9.0.0",
+ 		"reakit": "^1.3.8",
+ 		"rememo": "^3.0.0",
+diff --git a/packages/components/src/animation/index.js b/packages/components/src/animation/index.js
+new file mode 100644
+index 00000000000000..1c6d14e00f2cde
+--- /dev/null
++++ b/packages/components/src/animation/index.js
+@@ -0,0 +1,14 @@
++/**
++ * Framer Motion is used to create animated, interactive interfaces. The package is roughly ~30kb so
++ * this should ideally be loaded once across all Gutenberg packages. To give ourselves more flexibility
++ * in trying animation options, we avoid making this public API.
++ *
++ * @see https://www.framer.com/docs/animation/
++ */
++
++// eslint-disable-next-line no-restricted-imports
++export {
++	motion as __unstableMotion,
++	AnimatePresence as __unstableAnimatePresence,
++	AnimateSharedLayout as __unstableAnimateSharedLayout,
++} from 'framer-motion';
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 639b4fa704af48..59550b082e7d6a 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -16,6 +16,7 @@ export {
+ 	default as Animate,
+ 	getAnimateClassName as __unstableGetAnimateClassName,
+ } from './animate';
++export { __unstableMotion } from './animation';
+ export { default as AnglePickerControl } from './angle-picker-control';
+ export {
+ 	default as Autocomplete,
+diff --git a/packages/components/src/snackbar/list.js b/packages/components/src/snackbar/list.js
+index cc0c8dc7e0cd93..d3e24571d420a6 100644
+--- a/packages/components/src/snackbar/list.js
++++ b/packages/components/src/snackbar/list.js
+@@ -3,18 +3,46 @@
+  */
+ import classnames from 'classnames';
+ import { omit, noop } from 'lodash';
+-import { useTransition, animated } from 'react-spring/web.cjs';
+ 
+ /**
+  * WordPress dependencies
+  */
+ import { useReducedMotion } from '@wordpress/compose';
+-import { useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Snackbar from './';
++import {
++	__unstableMotion as motion,
++	__unstableAnimatePresence as AnimatePresence,
++} from '../animation';
++
++const SNACKBAR_VARIANTS = {
++	init: {
++		height: 0,
++		opacity: 0,
++	},
++	open: {
++		height: 'auto',
++		opacity: 1,
++		transition: {
++			height: { stiffness: 1000, velocity: -100 },
++		},
++	},
++	exit: {
++		opacity: 0,
++		transition: {
++			duration: 0.5,
++		},
++	},
++};
++
++const SNACKBAR_REDUCE_MOTION_VARIANTS = {
++	init: false,
++	open: false,
++	exit: false,
++};
+ 
+ /**
+  * Renders a list of notices.
+@@ -29,42 +57,38 @@ import Snackbar from './';
+  */
+ function SnackbarList( { notices, className, children, onRemove = noop } ) {
+ 	const isReducedMotion = useReducedMotion();
+-	const [ refMap ] = useState( () => new WeakMap() );
+-	const transitions = useTransition( notices, ( notice ) => notice.id, {
+-		from: { opacity: 0, height: 0 },
+-		enter: ( item ) => async ( next ) =>
+-			await next( {
+-				opacity: 1,
+-				height: refMap.get( item ).offsetHeight,
+-			} ),
+-		leave: () => async ( next ) => {
+-			await next( { opacity: 0 } );
+-			await next( { height: 0 } );
+-		},
+-		immediate: isReducedMotion,
+-	} );
+-
+ 	className = classnames( 'components-snackbar-list', className );
+ 	const removeNotice = ( notice ) => () => onRemove( notice.id );
+-
+ 	return (
+ 		<div className={ className }>
+ 			{ children }
+-			{ transitions.map( ( { item: notice, key, props: style } ) => (
+-				<animated.div key={ key } style={ style }>
+-					<div
+-						className="components-snackbar-list__notice-container"
+-						ref={ ( ref ) => ref && refMap.set( notice, ref ) }
+-					>
+-						<Snackbar
+-							{ ...omit( notice, [ 'content' ] ) }
+-							onRemove={ removeNotice( notice ) }
++			<AnimatePresence>
++				{ notices.map( ( notice ) => {
++					return (
++						<motion.div
++							layout={ ! isReducedMotion } //see https://www.framer.com/docs/animation/#layout-animations
++							initial={ 'init' }
++							animate={ 'open' }
++							exit={ 'exit' }
++							key={ notice.id }
++							variants={
++								isReducedMotion
++									? SNACKBAR_REDUCE_MOTION_VARIANTS
++									: SNACKBAR_VARIANTS
++							}
+ 						>
+-							{ notice.content }
+-						</Snackbar>
+-					</div>
+-				</animated.div>
+-			) ) }
++							<div className="components-snackbar-list__notice-container">
++								<Snackbar
++									{ ...omit( notice, [ 'content' ] ) }
++									onRemove={ removeNotice( notice ) }
++								>
++									{ notice.content }
++								</Snackbar>
++							</div>
++						</motion.div>
++					);
++				} ) }
++			</AnimatePresence>
+ 		</div>
+ 	);
+ }
+diff --git a/packages/edit-post/package.json b/packages/edit-post/package.json
+index 197b568d20102c..b5fe7f1c5e301c 100644
+--- a/packages/edit-post/package.json
++++ b/packages/edit-post/package.json
+@@ -53,7 +53,6 @@
+ 		"@wordpress/viewport": "file:../viewport",
+ 		"@wordpress/warning": "file:../warning",
+ 		"classnames": "^2.3.1",
+-		"framer-motion": "^4.1.3",
+ 		"lodash": "^4.17.21",
+ 		"memize": "^1.1.0",
+ 		"rememo": "^3.0.0",
+diff --git a/packages/edit-post/src/components/visual-editor/index.js b/packages/edit-post/src/components/visual-editor/index.js
+index eced55ecdc0a8c..a845de6d7a3403 100644
+--- a/packages/edit-post/src/components/visual-editor/index.js
++++ b/packages/edit-post/src/components/visual-editor/index.js
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { motion } from 'framer-motion';
+ 
+ /**
+  * WordPress dependencies
+@@ -32,7 +31,7 @@ import {
+ 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+ } from '@wordpress/block-editor';
+ import { useRef, useMemo } from '@wordpress/element';
+-import { Button } from '@wordpress/components';
++import { Button, __unstableMotion as motion } from '@wordpress/components';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { useMergeRefs } from '@wordpress/compose';
+ import { arrowLeft } from '@wordpress/icons';

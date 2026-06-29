@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/date-time/style.scss b/packages/components/src/date-time/style.scss
+index f2930c10241b3a..bee202f96099b9 100644
+--- a/packages/components/src/date-time/style.scss
++++ b/packages/components/src/date-time/style.scss
+@@ -40,7 +40,7 @@
+ 		background: theme(primary);
+ 
+ 		&:hover {
+-			background: theme(primary) shade(15%);
++			background: color(theme(primary) shade(15%));
+ 		}
+ 	}
+ 

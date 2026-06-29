@@ -1,0 +1,94 @@
+diff --git a/packages/components/src/modal/index.tsx b/packages/components/src/modal/index.tsx
+index 2dec0f65240f9b..64a3cc985ac099 100644
+--- a/packages/components/src/modal/index.tsx
++++ b/packages/components/src/modal/index.tsx
+@@ -66,6 +66,7 @@ function UnforwardedModal(
+ 			describedby: undefined,
+ 		},
+ 		onRequestClose,
++		onValidateClose = () => true,
+ 		icon,
+ 		closeButtonLabel,
+ 		children,
+@@ -341,11 +342,13 @@ function UnforwardedModal(
+ 											size="compact"
+ 											onClick={ (
+ 												event: React.MouseEvent< HTMLButtonElement >
+-											) =>
+-												closeModal().then( () =>
+-													onRequestClose( event )
+-												)
+-											}
++											) => {
++												if ( onValidateClose() ) {
++													closeModal().then( () =>
++														onRequestClose( event )
++													);
++												}
++											} }
+ 											icon={ close }
+ 											label={
+ 												closeButtonLabel ||
+diff --git a/packages/components/src/modal/stories/index.story.tsx b/packages/components/src/modal/stories/index.story.tsx
+index 880688ed5c51c3..8e3575746ed729 100644
+--- a/packages/components/src/modal/stories/index.story.tsx
++++ b/packages/components/src/modal/stories/index.story.tsx
+@@ -6,7 +6,7 @@ import type { StoryFn, Meta } from '@storybook/react';
+ /**
+  * WordPress dependencies
+  */
+-import { useState } from '@wordpress/element';
++import { useRef, useState } from '@wordpress/element';
+ import { fullscreen } from '@wordpress/icons';
+ 
+ /**
+@@ -118,3 +118,37 @@ WithHeaderActions.args = {
+ WithHeaderActions.parameters = {
+ 	...Default.parameters,
+ };
++
++export const PreventCloseRequest = {
++	render: function Render() {
++		const [ isOpen, setOpen ] = useState( false );
++		const closableCbxRef = useRef< HTMLInputElement >( null );
++		const openModal = () => setOpen( true );
++		const closeModal = () => setOpen( false );
++
++		return (
++			<>
++				<Button variant="secondary" onClick={ openModal }>
++					Open Modal
++				</Button>
++				{ isOpen && (
++					<Modal
++						title="This is my modal"
++						onRequestClose={ closeModal }
++						onValidateClose={ () =>
++							closableCbxRef.current?.checked
++						}
++					>
++						<input
++							type="checkbox"
++							// eslint-disable-next-line no-restricted-syntax
++							id="allow-close"
++							ref={ closableCbxRef }
++						/>{ ' ' }
++						<label htmlFor="allow-close">Allow close</label>
++					</Modal>
++				) }
++			</>
++		);
++	},
++};
+diff --git a/packages/components/src/modal/types.ts b/packages/components/src/modal/types.ts
+index f6f35eec85fc73..67240bd57185e3 100644
+--- a/packages/components/src/modal/types.ts
++++ b/packages/components/src/modal/types.ts
+@@ -103,6 +103,7 @@ export type ModalProps = {
+ 	onRequestClose: (
+ 		event?: React.KeyboardEvent< HTMLDivElement > | React.SyntheticEvent
+ 	) => void;
++	onValidateClose?: () => boolean | void;
+ 	/**
+ 	 * If this property is added, it will an additional class name to the modal
+ 	 * overlay `div`.

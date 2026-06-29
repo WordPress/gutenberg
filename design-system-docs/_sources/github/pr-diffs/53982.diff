@@ -1,0 +1,132 @@
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index c9cec1a5a565e0..21f81e0f09e807 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -569,17 +569,20 @@ const UnforwardedPopover = (
+ 
+ 	if ( shouldRenderWithinSlot ) {
+ 		content = <Fill name={ slotName }>{ content }</Fill>;
++	} else if ( ! inline ) {
++		content = createPortal( content, getPopoverFallbackContainer() );
+ 	}
+ 
+-	if ( ! hasAnchor ) {
+-		content = <span ref={ anchorRefFallback }>{ content }</span>;
+-	}
+-
+-	if ( shouldRenderWithinSlot || inline ) {
++	if ( hasAnchor ) {
+ 		return content;
+ 	}
+ 
+-	return createPortal( content, getPopoverFallbackContainer() );
++	return (
++		<>
++			<span ref={ anchorRefFallback } />
++			{ content }
++		</>
++	);
+ };
+ 
+ /**
+diff --git a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+index bfdb68b78cf578..29a743a5316de3 100644
+--- a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
++++ b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+@@ -5,7 +5,7 @@ exports[`DotTip should render correctly 1`] = `
+   aria-label="Editor tips"
+   class="components-popover nux-dot-tip is-positioned"
+   role="dialog"
+-  style="position: absolute; top: 0px; left: 0px; opacity: 0; transform: translateX(0px) translateY(0px) translateX(-2em) scale(0) translateZ(0); transform-origin: 0% 50% 0;"
++  style="position: absolute; top: 0px; left: 0px; opacity: 1; transform: none; transform-origin: 0% 50% 0;"
+   tabindex="-1"
+ >
+   <div
+diff --git a/packages/nux/src/components/dot-tip/test/index.js b/packages/nux/src/components/dot-tip/test/index.js
+index ff92e1fde04d5e..9d54e00088625e 100644
+--- a/packages/nux/src/components/dot-tip/test/index.js
++++ b/packages/nux/src/components/dot-tip/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { act, render, screen } from '@testing-library/react';
++import { render, screen, waitFor } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+ /**
+@@ -9,8 +9,6 @@ import userEvent from '@testing-library/user-event';
+  */
+ import { DotTip } from '..';
+ 
+-const noop = () => {};
+-
+ describe( 'DotTip', () => {
+ 	beforeEach( () => {
+ 		jest.useFakeTimers();
+@@ -20,26 +18,26 @@ describe( 'DotTip', () => {
+ 		jest.useRealTimers();
+ 	} );
+ 
+-	it( 'should not render anything if invisible', async () => {
++	it( 'should not render anything if invisible', () => {
+ 		render(
+ 			<DotTip>
+ 				It looks like you’re writing a letter. Would you like help?
+ 			</DotTip>
+ 		);
+ 
+-		await act( () => Promise.resolve() );
+-
+ 		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+ 	} );
+ 
+ 	it( 'should render correctly', async () => {
+ 		render(
+-			<DotTip isVisible setTimeout={ noop }>
++			<DotTip isVisible>
+ 				It looks like you’re writing a letter. Would you like help?
+ 			</DotTip>
+ 		);
+ 
+-		await act( () => Promise.resolve() );
++		await waitFor( () =>
++			expect( screen.getByRole( 'dialog' ) ).toBePositionedPopover()
++		);
+ 
+ 		expect( screen.getByRole( 'dialog' ) ).toMatchSnapshot();
+ 	} );
+@@ -51,12 +49,14 @@ describe( 'DotTip', () => {
+ 		const onDismiss = jest.fn();
+ 
+ 		render(
+-			<DotTip isVisible onDismiss={ onDismiss } setTimeout={ noop }>
++			<DotTip isVisible onDismiss={ onDismiss }>
+ 				It looks like you’re writing a letter. Would you like help?
+ 			</DotTip>
+ 		);
+ 
+-		await act( () => Promise.resolve() );
++		await waitFor( () =>
++			expect( screen.getByRole( 'dialog' ) ).toBePositionedPopover()
++		);
+ 
+ 		await user.click( screen.getByRole( 'button', { name: 'Got it' } ) );
+ 
+@@ -70,12 +70,14 @@ describe( 'DotTip', () => {
+ 		const onDisable = jest.fn();
+ 
+ 		render(
+-			<DotTip isVisible onDisable={ onDisable } setTimeout={ noop }>
++			<DotTip isVisible onDisable={ onDisable }>
+ 				It looks like you’re writing a letter. Would you like help?
+ 			</DotTip>
+ 		);
+ 
+-		await act( () => Promise.resolve() );
++		await waitFor( () =>
++			expect( screen.getByRole( 'dialog' ) ).toBePositionedPopover()
++		);
+ 
+ 		await user.click(
+ 			screen.getByRole( 'button', { name: 'Disable tips' } )

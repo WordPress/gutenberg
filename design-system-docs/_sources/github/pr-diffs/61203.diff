@@ -1,0 +1,127 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d11db200494bea..e36439492611d3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ ### Bug Fix
+ 
++-   `BaseControl`, `InputControl`: Remove usage of aria-details from InputControl and BaseControl ([#61203](https://github.com/WordPress/gutenberg/pull/61203)).
+ -   `SlotFill`: fixed missing `getServerSnapshot` parameter in slot map ([#60943](https://github.com/WordPress/gutenberg/pull/60943)).
+ 
+ ### Enhancements
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index c2f3dc3e0108fd..bc46629d2b6182 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -53,7 +53,7 @@ If true, the label will only be visible to screen readers.
+ 
+ ### help
+ 
+-Additional description for the control. It is preferable to use plain text for `help`, as it can be accessibly associated with the control using `aria-describedby`. When the `help` contains links, or otherwise non-plain text content, it will be associated with the control using `aria-details`.
++Additional description for the control. The element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
+ 
+ -   Type: `ReactNode`
+ -   Required: No
+diff --git a/packages/components/src/base-control/hooks.ts b/packages/components/src/base-control/hooks.ts
+index cfc5a8cf9baa47..7aa7c242575220 100644
+--- a/packages/components/src/base-control/hooks.ts
++++ b/packages/components/src/base-control/hooks.ts
+@@ -27,10 +27,6 @@ export function useBaseControlProps(
+ 		preferredId
+ 	);
+ 
+-	// ARIA descriptions can only contain plain text, so fall back to aria-details if not.
+-	const helpPropName =
+-		typeof help === 'string' ? 'aria-describedby' : 'aria-details';
+-
+ 	return {
+ 		baseControlProps: {
+ 			id: uniqueId,
+@@ -39,7 +35,7 @@ export function useBaseControlProps(
+ 		},
+ 		controlProps: {
+ 			id: uniqueId,
+-			...( !! help ? { [ helpPropName ]: `${ uniqueId }__help` } : {} ),
++			...( !! help ? { 'aria-describedby': `${ uniqueId }__help` } : {} ),
+ 		},
+ 	};
+ }
+diff --git a/packages/components/src/base-control/test/index.tsx b/packages/components/src/base-control/test/index.tsx
+index e83c041590c598..07623a8b4c3e7d 100644
+--- a/packages/components/src/base-control/test/index.tsx
++++ b/packages/components/src/base-control/test/index.tsx
+@@ -31,7 +31,7 @@ describe( 'BaseControl', () => {
+ 		).toBeInTheDocument();
+ 	} );
+ 
+-	it( 'should render help as aria-details when not plain text', () => {
++	it( 'should still render help as aria-describedby when not plain text', () => {
+ 		render(
+ 			<MyBaseControl
+ 				label="Text"
+@@ -44,10 +44,10 @@ describe( 'BaseControl', () => {
+ 			name: 'My help text',
+ 		} );
+ 
+-		expect( textarea ).toHaveAttribute( 'aria-details' );
++		expect( textarea ).toHaveAttribute( 'aria-describedby' );
+ 		expect(
+ 			// eslint-disable-next-line testing-library/no-node-access
+-			help.closest( `#${ textarea.getAttribute( 'aria-details' ) }` )
++			help.closest( `#${ textarea.getAttribute( 'aria-describedby' ) }` )
+ 		).toBeVisible();
+ 	} );
+ } );
+diff --git a/packages/components/src/base-control/types.ts b/packages/components/src/base-control/types.ts
+index 36306e9a24b0b2..eeb8736cf1b956 100644
+--- a/packages/components/src/base-control/types.ts
++++ b/packages/components/src/base-control/types.ts
+@@ -21,8 +21,7 @@ export type BaseControlProps = {
+ 	/**
+ 	 * Additional description for the control.
+ 	 *
+-	 * It is preferable to use plain text for `help`, as it can be accessibly associated with the control using `aria-describedby`.
+-	 * When the `help` contains links, or otherwise non-plain text content, it will be associated with the control using `aria-details`.
++	 * The element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
+ 	 */
+ 	help?: ReactNode;
+ 	/**
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index 1cf9000a467dd7..cabe2b3b65f4bd 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -66,10 +66,7 @@ export function UnforwardedInputControl(
+ 		onChange,
+ 	} );
+ 
+-	// ARIA descriptions can only contain plain text, so fall back to aria-details if not.
+-	const helpPropName =
+-		typeof help === 'string' ? 'aria-describedby' : 'aria-details';
+-	const helpProp = !! help ? { [ helpPropName ]: `${ id }__help` } : {};
++	const helpProp = !! help ? { 'aria-describedby': `${ id }__help` } : {};
+ 
+ 	return (
+ 		<BaseControl
+diff --git a/packages/components/src/input-control/test/index.js b/packages/components/src/input-control/test/index.js
+index 1ca2860442bd95..4e78a7c6c4b563 100644
+--- a/packages/components/src/input-control/test/index.js
++++ b/packages/components/src/input-control/test/index.js
+@@ -53,7 +53,7 @@ describe( 'InputControl', () => {
+ 			).toBeInTheDocument();
+ 		} );
+ 
+-		it( 'should render help as aria-details when not plain text', () => {
++		it( 'should still render help as aria-describedby when not plain text', () => {
+ 			render( <InputControl help={ <a href="/foo">My help text</a> } /> );
+ 
+ 			const input = screen.getByRole( 'textbox' );
+@@ -61,7 +61,7 @@ describe( 'InputControl', () => {
+ 
+ 			expect(
+ 				// eslint-disable-next-line testing-library/no-node-access
+-				help.closest( `#${ input.getAttribute( 'aria-details' ) }` )
++				help.closest( `#${ input.getAttribute( 'aria-describedby' ) }` )
+ 			).toBeVisible();
+ 		} );
+ 	} );

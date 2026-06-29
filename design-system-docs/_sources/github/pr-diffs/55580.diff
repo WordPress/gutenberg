@@ -1,0 +1,518 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5d05abc7026b22..f43697b07e0c73 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   Migrate `Divider` from `reakit` to `ariakit` ([#55622](https://github.com/WordPress/gutenberg/pull/55622))
+ -   Migrate `DisclosureContent` from `reakit` to `ariakit` and TypeScript ([#55639](https://github.com/WordPress/gutenberg/pull/55639))
++-   Migrate `RadioGroup` from `reakit` to `ariakit` and TypeScript ([#55580](https://github.com/WordPress/gutenberg/pull/55580))
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/radio-group/context.tsx b/packages/components/src/radio-group/context.tsx
+new file mode 100644
+index 00000000000000..c2fa1b009b4e1f
+--- /dev/null
++++ b/packages/components/src/radio-group/context.tsx
+@@ -0,0 +1,18 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type * as Ariakit from '@ariakit/react';
++
++/**
++ * WordPress dependencies
++ */
++import { createContext } from '@wordpress/element';
++
++export const RadioGroupContext = createContext< {
++	store?: Ariakit.RadioStore;
++	disabled?: boolean;
++} >( {
++	store: undefined,
++	disabled: undefined,
++} );
+diff --git a/packages/components/src/radio-group/index.js b/packages/components/src/radio-group/index.js
+deleted file mode 100644
+index a94493c5f2fd8c..00000000000000
+--- a/packages/components/src/radio-group/index.js
++++ /dev/null
+@@ -1,51 +0,0 @@
+-// @ts-nocheck
+-
+-/**
+- * External dependencies
+- */
+-import { useRadioState, RadioGroup as ReakitRadioGroup } from 'reakit/Radio';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import ButtonGroup from '../button-group';
+-import RadioContext from './radio-context';
+-
+-function RadioGroup(
+-	{ label, checked, defaultChecked, disabled, onChange, ...props },
+-	ref
+-) {
+-	const radioState = useRadioState( {
+-		state: defaultChecked,
+-		baseId: props.id,
+-	} );
+-	const radioContext = {
+-		...radioState,
+-		disabled,
+-		// Controlled or uncontrolled.
+-		state: checked ?? radioState.state,
+-		setState: onChange ?? radioState.setState,
+-	};
+-
+-	return (
+-		<RadioContext.Provider value={ radioContext }>
+-			<ReakitRadioGroup
+-				ref={ ref }
+-				as={ ButtonGroup }
+-				aria-label={ label }
+-				{ ...radioState }
+-				{ ...props }
+-			/>
+-		</RadioContext.Provider>
+-	);
+-}
+-
+-/**
+- * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
+- */
+-export default forwardRef( RadioGroup );
+diff --git a/packages/components/src/radio-group/index.tsx b/packages/components/src/radio-group/index.tsx
+new file mode 100644
+index 00000000000000..8bc35f8382ee34
+--- /dev/null
++++ b/packages/components/src/radio-group/index.tsx
+@@ -0,0 +1,65 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import * as Ariakit from '@ariakit/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo, forwardRef } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import ButtonGroup from '../button-group';
++import type { WordPressComponentProps } from '../context';
++import { RadioGroupContext } from './context';
++import type { RadioGroupProps } from './types';
++
++function UnforwardedRadioGroup(
++	{
++		label,
++		checked,
++		defaultChecked,
++		disabled,
++		onChange,
++		children,
++		...props
++	}: WordPressComponentProps< RadioGroupProps, 'div', false >,
++	ref: React.ForwardedRef< any >
++) {
++	const radioStore = Ariakit.useRadioStore( {
++		value: checked,
++		defaultValue: defaultChecked,
++		setValue: ( newValue ) => {
++			onChange?.( newValue ?? undefined );
++		},
++	} );
++
++	const contextValue = useMemo(
++		() => ( {
++			store: radioStore,
++			disabled,
++		} ),
++		[ radioStore, disabled ]
++	);
++
++	return (
++		<RadioGroupContext.Provider value={ contextValue }>
++			<Ariakit.RadioGroup
++				store={ radioStore }
++				render={ <ButtonGroup>{ children }</ButtonGroup> }
++				aria-label={ label }
++				ref={ ref }
++				{ ...props }
++			/>
++		</RadioGroupContext.Provider>
++	);
++}
++
++/**
++ * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
++ */
++export const RadioGroup = forwardRef( UnforwardedRadioGroup );
++export default RadioGroup;
+diff --git a/packages/components/src/radio-group/radio-context/index.js b/packages/components/src/radio-group/radio-context/index.js
+deleted file mode 100644
+index 58a7783dcb84e0..00000000000000
+--- a/packages/components/src/radio-group/radio-context/index.js
++++ /dev/null
+@@ -1,11 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext } from '@wordpress/element';
+-
+-const RadioContext = createContext( {
+-	state: null,
+-	setState: () => {},
+-} );
+-
+-export default RadioContext;
+diff --git a/packages/components/src/radio-group/radio.tsx b/packages/components/src/radio-group/radio.tsx
+new file mode 100644
+index 00000000000000..8187b4a4ba573e
+--- /dev/null
++++ b/packages/components/src/radio-group/radio.tsx
+@@ -0,0 +1,55 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef, useContext } from '@wordpress/element';
++
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import * as Ariakit from '@ariakit/react';
++
++/**
++ * Internal dependencies
++ */
++import Button from '../button';
++import { RadioGroupContext } from './context';
++import type { WordPressComponentProps } from '../context';
++import type { RadioProps } from './types';
++
++function UnforwardedRadio(
++	{
++		value,
++		children,
++		...props
++	}: WordPressComponentProps< RadioProps, 'button', false >,
++	ref: React.ForwardedRef< any >
++) {
++	const { store, disabled } = useContext( RadioGroupContext );
++
++	const selectedValue = store?.useState( 'value' );
++	const isChecked = selectedValue !== undefined && selectedValue === value;
++
++	return (
++		<Ariakit.Radio
++			disabled={ disabled }
++			store={ store }
++			ref={ ref }
++			value={ value }
++			render={
++				<Button
++					variant={ isChecked ? 'primary' : 'secondary' }
++					{ ...props }
++				/>
++			}
++		>
++			{ children || value }
++		</Ariakit.Radio>
++	);
++}
++
++/**
++ * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
++ */
++export const Radio = forwardRef( UnforwardedRadio );
++export default Radio;
+diff --git a/packages/components/src/radio-group/radio/index.js b/packages/components/src/radio-group/radio/index.js
+deleted file mode 100644
+index 446850c421b4c1..00000000000000
+--- a/packages/components/src/radio-group/radio/index.js
++++ /dev/null
+@@ -1,40 +0,0 @@
+-// @ts-nocheck
+-
+-/**
+- * External dependencies
+- */
+-import { Radio as ReakitRadio } from 'reakit/Radio';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useContext, forwardRef } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import Button from '../../button';
+-import RadioContext from '../radio-context';
+-
+-function Radio( { children, value, ...props }, ref ) {
+-	const radioContext = useContext( RadioContext );
+-	const checked = radioContext.state === value;
+-
+-	return (
+-		<ReakitRadio
+-			ref={ ref }
+-			as={ Button }
+-			variant={ checked ? 'primary' : 'secondary' }
+-			value={ value }
+-			{ ...radioContext }
+-			{ ...props }
+-		>
+-			{ children || value }
+-		</ReakitRadio>
+-	);
+-}
+-
+-/**
+- * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
+- */
+-export default forwardRef( Radio );
+diff --git a/packages/components/src/radio-group/stories/index.story.js b/packages/components/src/radio-group/stories/index.story.js
+deleted file mode 100644
+index 58125bf808be2b..00000000000000
+--- a/packages/components/src/radio-group/stories/index.story.js
++++ /dev/null
+@@ -1,83 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import Radio from '../radio';
+-import RadioGroup from '../';
+-
+-export default {
+-	title: 'Components (Deprecated)/RadioGroup',
+-	component: RadioGroup,
+-	subcomponents: { Radio },
+-	parameters: {
+-		docs: {
+-			description: {
+-				component:
+-					'This component is deprecated. Use `RadioControl` or `ToggleGroupControl` instead.',
+-			},
+-		},
+-	},
+-};
+-
+-export const _default = () => {
+-	/* eslint-disable no-restricted-syntax */
+-	return (
+-		<RadioGroup
+-			// id is required for server side rendering
+-			id="default-radiogroup"
+-			label="options"
+-			defaultChecked="option2"
+-		>
+-			<Radio value="option1">Option 1</Radio>
+-			<Radio value="option2">Option 2</Radio>
+-			<Radio value="option3">Option 3</Radio>
+-		</RadioGroup>
+-	);
+-	/* eslint-enable no-restricted-syntax */
+-};
+-
+-export const Disabled = () => {
+-	/* eslint-disable no-restricted-syntax */
+-	return (
+-		<RadioGroup
+-			// id is required for server side rendering
+-			id="disabled-radiogroup"
+-			disabled
+-			label="options"
+-			defaultChecked="option2"
+-		>
+-			<Radio value="option1">Option 1</Radio>
+-			<Radio value="option2">Option 2</Radio>
+-			<Radio value="option3">Option 3</Radio>
+-		</RadioGroup>
+-	);
+-	/* eslint-enable no-restricted-syntax */
+-};
+-
+-const ControlledRadioGroupWithState = () => {
+-	const [ checked, setChecked ] = useState( 1 );
+-
+-	/* eslint-disable no-restricted-syntax */
+-	return (
+-		<RadioGroup
+-			// id is required for server side rendering
+-			id="controlled-radiogroup"
+-			label="options"
+-			checked={ checked }
+-			onChange={ setChecked }
+-		>
+-			<Radio value={ 0 }>Option 1</Radio>
+-			<Radio value={ 1 }>Option 2</Radio>
+-			<Radio value={ 2 }>Option 3</Radio>
+-		</RadioGroup>
+-	);
+-	/* eslint-enable no-restricted-syntax */
+-};
+-
+-export const Controlled = () => {
+-	return <ControlledRadioGroupWithState />;
+-};
+diff --git a/packages/components/src/radio-group/stories/index.story.tsx b/packages/components/src/radio-group/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..cfa0a253fb7a0b
+--- /dev/null
++++ b/packages/components/src/radio-group/stories/index.story.tsx
+@@ -0,0 +1,90 @@
++/**
++ * External dependencies
++ */
++import type { Meta, StoryFn } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import { RadioGroup } from '..';
++import { Radio } from '../radio';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++const meta: Meta< typeof RadioGroup > = {
++	title: 'Components (Deprecated)/RadioGroup',
++	component: RadioGroup,
++	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++	subcomponents: { Radio },
++	argTypes: {
++		onChange: { control: { type: null } },
++		children: { control: { type: null } },
++		checked: { control: { type: 'text' } },
++	},
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: { canvas: { sourceState: 'shown' } },
++	},
++};
++export default meta;
++
++const Template: StoryFn< typeof RadioGroup > = ( props ) => {
++	return <RadioGroup { ...props } />;
++};
++
++export const Default: StoryFn< typeof RadioGroup > = Template.bind( {} );
++Default.args = {
++	id: 'default-radiogroup',
++	label: 'options',
++	defaultChecked: 'option2',
++	children: (
++		<>
++			<Radio value="option1">Option 1</Radio>
++			<Radio value="option2">Option 2</Radio>
++			<Radio value="option3">Option 3</Radio>
++		</>
++	),
++};
++
++export const Disabled: StoryFn< typeof RadioGroup > = Template.bind( {} );
++Disabled.args = {
++	...Default.args,
++	id: 'disabled-radiogroup',
++	disabled: true,
++};
++
++const ControlledTemplate: StoryFn< typeof RadioGroup > = ( {
++	checked: checkedProp,
++	onChange: onChangeProp,
++	...props
++} ) => {
++	const [ checked, setChecked ] =
++		useState< React.ComponentProps< typeof RadioGroup >[ 'checked' ] >(
++			checkedProp
++		);
++
++	const onChange: typeof onChangeProp = ( value ) => {
++		setChecked( value );
++		onChangeProp?.( value );
++	};
++
++	return (
++		<RadioGroup { ...props } onChange={ onChange } checked={ checked } />
++	);
++};
++
++export const Controlled: StoryFn< typeof RadioGroup > = ControlledTemplate.bind(
++	{}
++);
++Controlled.args = {
++	...Default.args,
++	checked: 'option2',
++	id: 'controlled-radiogroup',
++};
++Controlled.argTypes = {
++	checked: { control: { type: null } },
++};
+diff --git a/packages/components/src/radio-group/types.ts b/packages/components/src/radio-group/types.ts
+new file mode 100644
+index 00000000000000..6422cf4b275f00
+--- /dev/null
++++ b/packages/components/src/radio-group/types.ts
+@@ -0,0 +1,39 @@
++export type RadioGroupProps = {
++	/**
++	 * Accessible label for the radio group
++	 */
++	label: string;
++	/**
++	 * The `value` of the `Radio` element which should be selected.
++	 * Indicates controlled usage of the component.
++	 */
++	checked?: string | number;
++	/**
++	 * The value of the radio element which is initially selected.
++	 */
++	defaultChecked?: string | number;
++	/**
++	 * Whether the `RadioGroup` should be disabled.
++	 */
++	disabled?: boolean;
++	/**
++	 * Called when a `Radio` element has been selected.
++	 * Receives the `value` of the selected element as an argument.
++	 */
++	onChange?: ( value: string | number | undefined ) => void;
++	/**
++	 * The children elements, which should be a series of `Radio` components.
++	 */
++	children: React.ReactNode;
++};
++
++export type RadioProps = {
++	/**
++	 * The actual value of the radio element.
++	 */
++	value: string | number;
++	/**
++	 * Content displayed on the Radio element. If there aren't any children, `value` is displayed.
++	 */
++	children?: React.ReactNode;
++};

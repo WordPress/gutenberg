@@ -1,0 +1,110 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fbfb7ba5bb278e..8e889473afb7de 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ -   `NavigationMenu` updated to ignore `react/exhaustive-deps` eslint rule ([#44090](https://github.com/WordPress/gutenberg/pull/44090)).
+ -   `RangeControl`: updated to pass `react/exhaustive-deps` eslint rule ([#44271](https://github.com/WordPress/gutenberg/pull/44271)).
+ -   `UnitControl` updated to pass the `react/exhaustive-deps` eslint rule ([#44161](https://github.com/WordPress/gutenberg/pull/44161)).
++-   `Notice`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44157](https://github.com/WordPress/gutenberg/pull/44157))
+ 
+ ## 21.0.0 (2022-09-13)
+ 
+diff --git a/packages/components/src/notice/index.native.js b/packages/components/src/notice/index.native.js
+index 72910b17620c5f..b2f2eb75c9435a 100644
+--- a/packages/components/src/notice/index.native.js
++++ b/packages/components/src/notice/index.native.js
+@@ -14,7 +14,7 @@ import { BlurView } from '@react-native-community/blur';
+ /**
+  * WordPress dependencies
+  */
+-import { useEffect, useRef, Platform } from '@wordpress/element';
++import { useEffect, useRef, useCallback, Platform } from '@wordpress/element';
+ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+ 
+ /**
+@@ -30,40 +30,37 @@ const Notice = ( { onNoticeHidden, content, id, status } ) => {
+ 	const timer = useRef( null );
+ 
+ 	useEffect( () => {
+-		startAnimation();
+-
+-		return () => {
+-			clearTimeout( timer?.current );
+-		};
+-	}, [] );
+-
+-	function onHide() {
++		// start animation
+ 		Animated.timing( animationValue, {
+-			toValue: 0,
+-			duration: 150,
++			toValue: 1,
++			duration: 300,
+ 			useNativeDriver: true,
+ 			easing: Easing.out( Easing.quad ),
+ 		} ).start( ( { finished } ) => {
+ 			if ( finished && onNoticeHidden ) {
+-				onNoticeHidden( id );
++				timer.current = setTimeout( () => {
++					onHide();
++				}, HIDE_TIMER );
+ 			}
+ 		} );
+-	}
+ 
+-	function startAnimation() {
++		return () => {
++			clearTimeout( timer?.current );
++		};
++	}, [ animationValue, onHide, onNoticeHidden ] );
++
++	const onHide = useCallback( () => {
+ 		Animated.timing( animationValue, {
+-			toValue: 1,
+-			duration: 300,
++			toValue: 0,
++			duration: 150,
+ 			useNativeDriver: true,
+ 			easing: Easing.out( Easing.quad ),
+ 		} ).start( ( { finished } ) => {
+ 			if ( finished && onNoticeHidden ) {
+-				timer.current = setTimeout( () => {
+-					onHide();
+-				}, HIDE_TIMER );
++				onNoticeHidden( id );
+ 			}
+ 		} );
+-	}
++	}, [ animationValue, onNoticeHidden, id ] );
+ 
+ 	const noticeSolidStyles = usePreferredColorSchemeStyle(
+ 		styles.noticeSolid,
+diff --git a/packages/components/src/notice/list.native.js b/packages/components/src/notice/list.native.js
+index bf067a0942fd6e..72a4c743108995 100644
+--- a/packages/components/src/notice/list.native.js
++++ b/packages/components/src/notice/list.native.js
+@@ -14,6 +14,7 @@ import { store as noticesStore } from '@wordpress/notices';
+  */
+ import Notice from './';
+ import styles from './style.scss';
++import { useCallback } from '@wordpress/element';
+ 
+ function NoticeList() {
+ 	const { notices } = useSelect( ( select ) => {
+@@ -25,9 +26,12 @@ function NoticeList() {
+ 
+ 	const { removeNotice } = useDispatch( noticesStore );
+ 
+-	function onRemoveNotice( id ) {
+-		removeNotice( id );
+-	}
++	const onRemoveNotice = useCallback(
++		( id ) => {
++			removeNotice( id );
++		},
++		[ removeNotice ]
++	);
+ 
+ 	if ( ! notices.length ) {
+ 		return null;

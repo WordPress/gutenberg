@@ -1,0 +1,3364 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 94eaaf9c71c931..42714bda53145b 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: **`Popup` portal API** ([#77452](https://github.com/WordPress/gutenberg/pull/77452)). Add `Portal` subcomponents and an optional `portal` prop on `Popup` (when omitted, the default `Portal` is used). Remove `container` from every `Popup` and `portalClassName` from `Dialog.Popup` / `AlertDialog.Popup`; pass `portal={ <Matching.Portal … /> }` for `container`, `className`, `style`, and other portal options.
+ -   `Popover`, `Tooltip`, `Select`: `style` and `className` on `Popup` are now forwarded to the inner Base UI `Popup` element instead of the outer `Positioner`. To override the per-instance z-index, pass `portal={ <Overlay.Portal style={ { '--wp-ui-<overlay>-z-index': '9999' } } /> }` (or set the variable globally on a wrapping element); inline `style={ { zIndex: … } }` on `Popup` no longer reaches the positioned element.
++-   `Dialog`, `Drawer`: Scrolling now requires the new `Dialog.Content` / `Drawer.Content` subcomponent; the popup itself no longer scrolls. Rendering `Header` / `Footer` as siblings of `Content` pins them to the popup edges; nesting them inside `Content` opts out of pinning. `AlertDialog.Popup` adds `stickyHeader` / `stickyFooter` props (default `true`) for the same choice on its internal chrome ([#77559](https://github.com/WordPress/gutenberg/pull/77559)).
+ 
+ ### New Features
+ 
+@@ -27,6 +28,7 @@
+ 
+ ### Enhancements
+ 
++-   `Dialog` / `AlertDialog` / `Drawer`: Pin header / footer chrome to the popup edges when the body overflows, and show separator borders only while there is off-screen content in that direction ([#77559](https://github.com/WordPress/gutenberg/pull/77559)).
+ -   `Dialog`: Add `Dialog.Description` sub-component, expose `onOpenChangeComplete`, skip the backdrop when `modal` is not `true`, use `100dvh` for viewport-based heights so the popup fits the dynamic viewport on mobile, and forward `className` on `Dialog.Title` ([#77194](https://github.com/WordPress/gutenberg/pull/77194)).
+ -   `Dialog`: `Dialog.Header` and `Dialog.Footer` now default to `<header>` and `<footer>` elements for richer landmark semantics. Their `ref` type widens from `HTMLDivElement` to `HTMLElement`; pass `render` to opt out of the default tag ([#76690](https://github.com/WordPress/gutenberg/pull/76690)).
+ -   `Dialog`, `Popover`: Upgrade dev-only title validation from mount-only to cleanup-based re-validation, catching conditionally rendered titles ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
+diff --git a/packages/ui/src/alert-dialog/popup.tsx b/packages/ui/src/alert-dialog/popup.tsx
+index cf58be1faeeab1..346ec90b0678b1 100644
+--- a/packages/ui/src/alert-dialog/popup.tsx
++++ b/packages/ui/src/alert-dialog/popup.tsx
+@@ -1,6 +1,7 @@
+ import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
+ import clsx from 'clsx';
+ import { forwardRef, useContext } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
+ import { __ } from '@wordpress/i18n';
+ import {
+ 	type ThemeProvider as ThemeProviderType,
+@@ -10,6 +11,13 @@ import {
+ import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+ import { Button } from '../button';
+ import dialogStyles from '../dialog/style.module.css';
++import focusStyles from '../utils/css/focus.module.css';
++import overlayChromeStyles from '../utils/css/overlay-chrome.module.css';
++import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
++import {
++	SCROLL_CONTAINER_ATTR,
++	useOverlayScrollStateAttributes,
++} from '../utils/use-overlay-scroll-state-attributes';
+ import { unlock } from '../lock-unlock';
+ import { Stack } from '../stack';
+ import { Text } from '../text';
+@@ -32,6 +40,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
+ 			children,
+ 			confirmButtonText = __( 'OK' ),
+ 			cancelButtonText = __( 'Cancel' ),
++			stickyHeader = true,
++			stickyFooter = true,
++			initialFocus,
++			finalFocus,
+ 			...props
+ 		},
+ 		ref
+@@ -39,6 +51,32 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
+ 		const { phase, showSpinner, errorMessage, confirm } =
+ 			useContext( AlertDialogContext );
+ 
++		/*
++		 * Scroll ownership lives on an internal scroll container so the
++		 * shared chrome CSS can target `[data-wp-ui-overlay-scroll-container]`
++		 * here the same way it does on Dialog.Content / Drawer.Content.
++		 * `stickyHeader` / `stickyFooter` control whether the chrome renders
++		 * as a sibling of the scroller (pinned) or inside it (scrolls with
++		 * the body).
++		 */
++		const { ref: scrollStateRef, onScroll } =
++			useOverlayScrollStateAttributes< HTMLDivElement >();
++
++		/*
++		 * Skip the internal scroll container during initial focus
++		 * resolution: when the body overflows, that container becomes
++		 * `tabindex="0"` (so keyboard users can arrow-scroll it) and
++		 * would otherwise win first-tabbable status over the action
++		 * buttons. Mirrors the same wiring on Dialog/Drawer popups.
++		 */
++		const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus(
++			{
++				initialFocus,
++				deprioritizedAttributes: [ SCROLL_CONTAINER_ATTR ],
++			}
++		);
++		const mergedRef = useMergeRefs( [ ref, popupRef ] );
++
+ 		const confirmClassName =
+ 			intent === 'irreversible'
+ 				? alertDialogStyles[ 'irreversible-action' ]
+@@ -46,30 +84,83 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
+ 
+ 		const buttonsDisabled = phase !== 'idle' || undefined;
+ 
++		const headerElement = (
++			<div className={ overlayChromeStyles.header }>
++				<Text
++					variant="heading-xl"
++					render={ <_AlertDialog.Title /> }
++					className={ overlayChromeStyles.title }
++				>
++					{ title }
++				</Text>
++			</div>
++		);
++
++		const footerElement = (
++			<div
++				className={ clsx(
++					overlayChromeStyles.footer,
++					alertDialogStyles[ 'footer-column' ]
++				) }
++			>
++				<Stack
++					direction="row"
++					gap="sm"
++					justify="flex-end"
++					align="center"
++				>
++					<_AlertDialog.Close
++						render={ <Button variant="minimal" /> }
++						disabled={ buttonsDisabled }
++					>
++						{ cancelButtonText }
++					</_AlertDialog.Close>
++					<Button
++						className={ confirmClassName }
++						onClick={ confirm }
++						loading={ showSpinner || undefined }
++						disabled={ buttonsDisabled }
++					>
++						{ confirmButtonText }
++					</Button>
++				</Stack>
++				{ errorMessage && (
++					<Text
++						variant="body-sm"
++						className={ alertDialogStyles[ 'error-message' ] }
++					>
++						{ errorMessage }
++					</Text>
++				) }
++			</div>
++		);
++
+ 		const portalChildren = (
+ 			<>
+ 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
+ 				<ThemeProvider>
+ 					<_AlertDialog.Popup
+-						ref={ ref }
++						ref={ mergedRef }
+ 						className={ clsx(
+ 							dialogStyles.popup,
+ 							className,
+ 							dialogStyles[ 'is-medium' ]
+ 						) }
++						initialFocus={ resolvedInitialFocus }
++						finalFocus={ finalFocus }
+ 						{ ...props }
++						data-wp-ui-overlay-modal=""
+ 					>
+-						<Stack
+-							direction="column"
+-							gap="sm"
+-							className={ alertDialogStyles.header }
++						{ stickyHeader && headerElement }
++						<div
++							ref={ scrollStateRef }
++							className={ clsx(
++								overlayChromeStyles.content,
++								focusStyles[ 'outset-ring--focus-visible' ]
++							) }
++							onScroll={ onScroll }
+ 						>
+-							<Text
+-								variant="heading-xl"
+-								render={ <_AlertDialog.Title /> }
+-							>
+-								{ title }
+-							</Text>
++							{ ! stickyHeader && headerElement }
+ 							{ description && (
+ 								<Text
+ 									variant="body-md"
+@@ -78,36 +169,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
+ 									{ description }
+ 								</Text>
+ 							) }
+-						</Stack>
+-						{ children }
+-						<Stack direction="column" gap="md">
+-							<div className={ dialogStyles.footer }>
+-								<_AlertDialog.Close
+-									render={ <Button variant="minimal" /> }
+-									disabled={ buttonsDisabled }
+-								>
+-									{ cancelButtonText }
+-								</_AlertDialog.Close>
+-								<Button
+-									className={ confirmClassName }
+-									onClick={ confirm }
+-									loading={ showSpinner || undefined }
+-									disabled={ buttonsDisabled }
+-								>
+-									{ confirmButtonText }
+-								</Button>
+-							</div>
+-							{ errorMessage && (
+-								<Text
+-									variant="body-sm"
+-									className={
+-										alertDialogStyles[ 'error-message' ]
+-									}
+-								>
+-									{ errorMessage }
+-								</Text>
+-							) }
+-						</Stack>
++							{ children }
++							{ ! stickyFooter && footerElement }
++						</div>
++						{ stickyFooter && footerElement }
+ 					</_AlertDialog.Popup>
+ 				</ThemeProvider>
+ 			</>
+diff --git a/packages/ui/src/alert-dialog/stories/index.story.tsx b/packages/ui/src/alert-dialog/stories/index.story.tsx
+index 53c910a8639d62..c0ac43127058de 100644
+--- a/packages/ui/src/alert-dialog/stories/index.story.tsx
++++ b/packages/ui/src/alert-dialog/stories/index.story.tsx
+@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { action } from 'storybook/actions';
+ import { fn } from 'storybook/test';
+ import * as AlertDialog from '../';
++import { Stack } from '../../stack';
+ import { Text } from '../../text';
+ 
+ const meta: Meta< typeof AlertDialog.Root > = {
+@@ -97,7 +98,7 @@ export const WithCustomContent: Story = {
+ 				>
+ 					<ul
+ 						style={ {
+-							margin: 0,
++							margin: 'var(--wpds-dimension-gap-sm) 0 0',
+ 							paddingInlineStart: 'var(--wpds-dimension-gap-lg)',
+ 						} }
+ 					>
+@@ -311,6 +312,88 @@ export const AsyncConfirm: Story = {
+ 	},
+ };
+ 
++function StickyToggle( {
++	label,
++	value,
++	onChange,
++}: {
++	label: string;
++	value: boolean;
++	onChange: ( value: boolean ) => void;
++} ) {
++	const id = useId();
++	return (
++		<Stack direction="row" gap="sm" align="center">
++			<input
++				id={ id }
++				type="checkbox"
++				checked={ value }
++				onChange={ ( event ) => onChange( event.target.checked ) }
++			/>
++			<label htmlFor={ id }>{ label }</label>
++		</Stack>
++	);
++}
++
++function ScrollableContent() {
++	const [ stickyHeader, setStickyHeader ] = useState( true );
++	const [ stickyFooter, setStickyFooter ] = useState( true );
++	return (
++		<>
++			<Stack direction="column" gap="lg" align="start">
++				<Stack direction="row" gap="lg" align="center">
++					<StickyToggle
++						label="Sticky header"
++						value={ stickyHeader }
++						onChange={ setStickyHeader }
++					/>
++					<StickyToggle
++						label="Sticky footer"
++						value={ stickyFooter }
++						onChange={ setStickyFooter }
++					/>
++				</Stack>
++				<AlertDialog.Trigger>Review terms</AlertDialog.Trigger>
++			</Stack>
++			<AlertDialog.Popup
++				title="Terms of service"
++				description="Please review the terms before continuing."
++				confirmButtonText="Accept"
++				cancelButtonText="Decline"
++				stickyHeader={ stickyHeader }
++				stickyFooter={ stickyFooter }
++			>
++				<Stack direction="column" gap="lg">
++					{ Array.from( { length: 20 } ).map( ( _, index ) => (
++						<p key={ index } style={ { margin: 0 } }>
++							Paragraph { index + 1 }: Lorem ipsum dolor sit amet,
++							consectetur adipiscing elit. Sed do eiusmod tempor
++							incididunt ut labore et dolore magna aliqua. Ut enim
++							ad minim veniam, quis nostrud exercitation ullamco
++							laboris nisi ut aliquip ex ea commodo consequat.
++						</p>
++					) ) }
++				</Stack>
++			</AlertDialog.Popup>
++		</>
++	);
++}
++
++/**
++ * When the dialog's body overflows the available height, the title/description
++ * area stays pinned to the top of the popup and the action buttons stay pinned
++ * to the bottom so users keep sight of the context and primary actions while
++ * scrolling. Separator borders appear only when there is off-screen content
++ * above or below. Pass `stickyHeader={ false }` or `stickyFooter={ false }` on
++ * `AlertDialog.Popup` to opt out — the toggles in this story drive both props
++ * independently.
++ */
++export const Scrollable: Story = {
++	args: {
++		children: <ScrollableContent />,
++	},
++};
++
+ /**
+  * The `AlertDialog.Trigger` element is not necessary when the open state is
+  * controlled externally. This is useful when the dialog needs to be opened
+diff --git a/packages/ui/src/alert-dialog/style.module.css b/packages/ui/src/alert-dialog/style.module.css
+index f8af7e3f728501..1e443a87c4ce60 100644
+--- a/packages/ui/src/alert-dialog/style.module.css
++++ b/packages/ui/src/alert-dialog/style.module.css
+@@ -1,14 +1,23 @@
+ @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+ 
+ @layer wp-ui-components {
+-	.header {
+-		margin-bottom: var(--wpds-dimension-gap-lg);
+-	}
+-
+ 	.error-message {
+ 		align-self: flex-end;
+ 		color: var(--wpds-color-fg-content-error);
+ 	}
++
++	/*
++	 * AlertDialog stacks an actions row and an optional error message in
++	 * its footer. Override the shared `.footer` row layout to a column so
++	 * both children lay out vertically while inheriting the chrome
++	 * padding + separator from `overlay-chrome.module.css`.
++	 */
++	.footer-column {
++		flex-direction: column;
++		align-items: stretch;
++		justify-content: flex-start;
++		gap: var(--wpds-dimension-gap-md);
++	}
+ }
+ 
+ @layer wp-ui-compositions {
+diff --git a/packages/ui/src/alert-dialog/test/index.test.tsx b/packages/ui/src/alert-dialog/test/index.test.tsx
+index 3c1944f4ec3c5a..fe987b5e2e21fb 100644
+--- a/packages/ui/src/alert-dialog/test/index.test.tsx
++++ b/packages/ui/src/alert-dialog/test/index.test.tsx
+@@ -1510,4 +1510,326 @@ describe( 'AlertDialog', () => {
+ 			);
+ 		} );
+ 	} );
++
++	describe( 'overlay scroll container', () => {
++		// AlertDialog's scroll container is a library-internal `<div>` with
++		// no role or testid — a `querySelector` is the only way to reach
++		// it from a test. The Testing Library rule is disabled for this
++		// helper because that's exactly what it's flagging.
++		const findScroller = ( popup: HTMLElement | null ): HTMLDivElement => {
++			if ( ! popup ) {
++				throw new Error(
++					'Popup ref not attached — did AlertDialog.Popup render?'
++				);
++			}
++			// eslint-disable-next-line testing-library/no-node-access
++			const el = popup.querySelector(
++				'[data-wp-ui-overlay-scroll-container]'
++			);
++			if ( ! ( el instanceof HTMLDivElement ) ) {
++				throw new Error(
++					'Scroll container not found inside AlertDialog popup'
++				);
++			}
++			return el;
++		};
++
++		it( 'renders an internal scroll container with data-wp-ui-overlay-scroll-container', async () => {
++			const popupRef = createRef< HTMLDivElement >();
++
++			render(
++				<AlertDialog.Root defaultOpen>
++					<AlertDialog.Trigger>Open</AlertDialog.Trigger>
++					<AlertDialog.Popup ref={ popupRef } title="Title">
++						Body
++					</AlertDialog.Popup>
++				</AlertDialog.Root>
++			);
++
++			await waitFor( () => {
++				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			expect( findScroller( popupRef.current ) ).toBeInstanceOf(
++				HTMLDivElement
++			);
++		} );
++
++		it( 'is always modal (data-wp-ui-overlay-modal present on popup)', async () => {
++			const popupRef = createRef< HTMLDivElement >();
++
++			render(
++				<AlertDialog.Root defaultOpen>
++					<AlertDialog.Trigger>Open</AlertDialog.Trigger>
++					<AlertDialog.Popup ref={ popupRef } title="Title">
++						Body
++					</AlertDialog.Popup>
++				</AlertDialog.Root>
++			);
++
++			await waitFor( () => {
++				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			expect( popupRef.current ).toHaveAttribute(
++				'data-wp-ui-overlay-modal'
++			);
++		} );
++
++		it( 'pins header and footer outside the scroller when sticky props are true (default)', async () => {
++			const popupRef = createRef< HTMLDivElement >();
++
++			render(
++				<AlertDialog.Root defaultOpen>
++					<AlertDialog.Trigger>Open</AlertDialog.Trigger>
++					<AlertDialog.Popup ref={ popupRef } title="Title">
++						Body
++					</AlertDialog.Popup>
++				</AlertDialog.Root>
++			);
++
++			await waitFor( () => {
++				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			const scroller = findScroller( popupRef.current );
++			const title = screen.getByRole( 'heading', { name: 'Title' } );
++			const ok = screen.getByRole( 'button', { name: 'OK' } );
++
++			// Default: chrome sits outside the scroll container.
++			expect( scroller ).not.toContainElement( title );
++			expect( scroller ).not.toContainElement( ok );
++		} );
++
++		it( 'nests header and footer inside the scroller when stickyHeader and stickyFooter are false', async () => {
++			const popupRef = createRef< HTMLDivElement >();
++
++			render(
++				<AlertDialog.Root defaultOpen>
++					<AlertDialog.Trigger>Open</AlertDialog.Trigger>
++					<AlertDialog.Popup
++						ref={ popupRef }
++						title="Title"
++						stickyHeader={ false }
++						stickyFooter={ false }
++					>
++						Body
++					</AlertDialog.Popup>
++				</AlertDialog.Root>
++			);
++
++			await waitFor( () => {
++				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			const scroller = findScroller( popupRef.current );
++			const title = screen.getByRole( 'heading', { name: 'Title' } );
++			const ok = screen.getByRole( 'button', { name: 'OK' } );
++
++			expect( scroller ).toContainElement( title );
++			expect( scroller ).toContainElement( ok );
++		} );
++
++		it( 'toggles tabindex="0" on the scroller based on overflow', async () => {
++			const popupRef = createRef< HTMLDivElement >();
++
++			render(
++				<AlertDialog.Root defaultOpen>
++					<AlertDialog.Trigger>Open</AlertDialog.Trigger>
++					<AlertDialog.Popup ref={ popupRef } title="Title">
++						Body
++					</AlertDialog.Popup>
++				</AlertDialog.Root>
++			);
++
++			await waitFor( () => {
++				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			const scroller = findScroller( popupRef.current );
++
++			Object.defineProperty( scroller, 'scrollHeight', {
++				configurable: true,
++				value: 500,
++			} );
++			Object.defineProperty( scroller, 'clientHeight', {
++				configurable: true,
++				value: 100,
++			} );
++			Object.defineProperty( scroller, 'scrollTop', {
++				configurable: true,
++				value: 0,
++			} );
++
++			act( () => {
++				scroller.dispatchEvent(
++					new Event( 'scroll', { bubbles: true } )
++				);
++			} );
++
++			expect( scroller ).toHaveAttribute( 'tabindex', '0' );
++
++			Object.defineProperty( scroller, 'scrollHeight', {
++				configurable: true,
++				value: 100,
++			} );
++
++			act( () => {
++				scroller.dispatchEvent(
++					new Event( 'scroll', { bubbles: true } )
++				);
++			} );
++
++			expect( scroller ).not.toHaveAttribute( 'tabindex' );
++		} );
++
++		it( 'toggles data-wp-ui-overlay-scrolled-from-* on the scroller based on scroll position', async () => {
++			const popupRef = createRef< HTMLDivElement >();
++
++			render(
++				<AlertDialog.Root defaultOpen>
++					<AlertDialog.Trigger>Open</AlertDialog.Trigger>
++					<AlertDialog.Popup ref={ popupRef } title="Title">
++						Body
++					</AlertDialog.Popup>
++				</AlertDialog.Root>
++			);
++
++			await waitFor( () => {
++				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			// JSDOM doesn't lay out elements, so we simulate an
++			// overflowing scroll container by stubbing layout metrics
++			// per scenario and dispatching a scroll event.
++			const scroller = findScroller( popupRef.current );
++			Object.defineProperty( scroller, 'scrollHeight', {
++				configurable: true,
++				value: 500,
++			} );
++			Object.defineProperty( scroller, 'clientHeight', {
++				configurable: true,
++				value: 100,
++			} );
++
++			const setScrollTop = ( value: number ) => {
++				Object.defineProperty( scroller, 'scrollTop', {
++					configurable: true,
++					value,
++				} );
++				act( () => {
++					scroller.dispatchEvent(
++						new Event( 'scroll', { bubbles: true } )
++					);
++				} );
++			};
++
++			setScrollTop( 0 );
++			expect( scroller ).not.toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-top'
++			);
++			expect( scroller ).toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-bottom'
++			);
++
++			setScrollTop( 200 );
++			expect( scroller ).toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-top'
++			);
++			expect( scroller ).toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-bottom'
++			);
++
++			setScrollTop( 400 );
++			expect( scroller ).toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-top'
++			);
++			expect( scroller ).not.toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-bottom'
++			);
++		} );
++
++		it( 'does not focus the scroll container on open even when it is keyboard-tabbable', async () => {
++			// JSDOM reports `scrollHeight`/`clientHeight` as 0 by default,
++			// so the scroll container would never overflow on its own and
++			// would never become `tabindex="0"`. Forcing both prototype
++			// getters to overflow values here makes the scroller
++			// keyboard-reachable at the moment Base UI resolves
++			// `initialFocus` — exactly the configuration that, without
++			// `useDeprioritizedInitialFocus` wired up, lets the scroller
++			// steal focus from the action buttons.
++			const originalScrollHeight = Object.getOwnPropertyDescriptor(
++				Element.prototype,
++				'scrollHeight'
++			);
++			const originalClientHeight = Object.getOwnPropertyDescriptor(
++				Element.prototype,
++				'clientHeight'
++			);
++			Object.defineProperty( Element.prototype, 'scrollHeight', {
++				configurable: true,
++				get() {
++					return 500;
++				},
++			} );
++			Object.defineProperty( Element.prototype, 'clientHeight', {
++				configurable: true,
++				get() {
++					return 100;
++				},
++			} );
++
++			try {
++				const user = userEvent.setup();
++				const popupRef = createRef< HTMLDivElement >();
++
++				render(
++					<AlertDialog.Root>
++						<AlertDialog.Trigger>Open</AlertDialog.Trigger>
++						<AlertDialog.Popup ref={ popupRef } title="Title">
++							Body that overflows
++						</AlertDialog.Popup>
++					</AlertDialog.Root>
++				);
++
++				await user.click(
++					screen.getByRole( 'button', { name: 'Open' } )
++				);
++
++				await waitFor( () => {
++					expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++				} );
++
++				// The scroll container (overflow forced via the
++				// prototype stubs above) must not steal focus from the
++				// action buttons — that's exactly what the
++				// `useDeprioritizedInitialFocus` wiring on
++				// `AlertDialog.Popup` is there to prevent. The Cancel
++				// button is the first non-deprioritized tabbable, so
++				// focus should settle on it.
++				const scroller = findScroller( popupRef.current );
++				await waitFor( () => {
++					expect(
++						screen.getByRole( 'button', { name: 'Cancel' } )
++					).toHaveFocus();
++				} );
++				expect( scroller ).not.toHaveFocus();
++			} finally {
++				if ( originalScrollHeight ) {
++					Object.defineProperty(
++						Element.prototype,
++						'scrollHeight',
++						originalScrollHeight
++					);
++				}
++				if ( originalClientHeight ) {
++					Object.defineProperty(
++						Element.prototype,
++						'clientHeight',
++						originalClientHeight
++					);
++				}
++			}
++		} );
++	} );
+ } );
+diff --git a/packages/ui/src/alert-dialog/types.ts b/packages/ui/src/alert-dialog/types.ts
+index 4a19994855774e..459e32f2320986 100644
+--- a/packages/ui/src/alert-dialog/types.ts
++++ b/packages/ui/src/alert-dialog/types.ts
+@@ -126,4 +126,21 @@ export interface PopupProps
+ 	 * @default 'Cancel'
+ 	 */
+ 	cancelButtonText?: string;
++
++	/**
++	 * When `true`, the dialog's title stays pinned to the top of the popup
++	 * as the body scrolls. When `false`, the title scrolls with the body.
++	 *
++	 * @default true
++	 */
++	stickyHeader?: boolean;
++
++	/**
++	 * When `true`, the dialog's action buttons (and error message, if any)
++	 * stay pinned to the bottom of the popup as the body scrolls. When
++	 * `false`, they scroll with the body.
++	 *
++	 * @default true
++	 */
++	stickyFooter?: boolean;
+ }
+diff --git a/packages/ui/src/dialog/content.tsx b/packages/ui/src/dialog/content.tsx
+new file mode 100644
+index 00000000000000..99d468a696ec09
+--- /dev/null
++++ b/packages/ui/src/dialog/content.tsx
+@@ -0,0 +1,47 @@
++import { mergeProps, useRender } from '@base-ui/react';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
++import { useOverlayScrollStateAttributes } from '../utils/use-overlay-scroll-state-attributes';
++import focusStyles from '../utils/css/focus.module.css';
++import styles from './style.module.css';
++import type { ContentProps } from './types';
++
++/**
++ * Renders the scrollable body of the dialog, sitting between `Dialog.Header`
++ * and `Dialog.Footer` as a flex sibling.
++ *
++ * **Required for scrolling** — `Dialog.Content` is the element that owns
++ * the popup's overflow. Without it, body content that exceeds the popup's
++ * max height clips instead of scrolling. Render it once per popup and wrap
++ * any freeform body content in it.
++ *
++ * Placing `Dialog.Header` or `Dialog.Footer` *inside* `Dialog.Content`
++ * makes them scroll with the body (the "non-sticky" opt-out) rather than
++ * staying pinned to the popup's edges.
++ */
++const Content = forwardRef< HTMLDivElement, ContentProps >(
++	function DialogContent( { className, render, onScroll, ...props }, ref ) {
++		const { ref: scrollStateRef, onScroll: scrollStateOnScroll } =
++			useOverlayScrollStateAttributes< HTMLDivElement >( onScroll );
++		const mergedRef = useMergeRefs( [ ref, scrollStateRef ] );
++
++		const element = useRender( {
++			defaultTagName: 'div',
++			render,
++			ref: mergedRef,
++			props: mergeProps< 'div' >( props, {
++				className: clsx(
++					styles.content,
++					focusStyles[ 'outset-ring--focus-visible' ],
++					className
++				),
++				onScroll: scrollStateOnScroll,
++			} ),
++		} );
++
++		return element;
++	}
++);
++
++export { Content };
+diff --git a/packages/ui/src/dialog/footer.tsx b/packages/ui/src/dialog/footer.tsx
+index baa48fd77d9385..ea368a0459459c 100644
+--- a/packages/ui/src/dialog/footer.tsx
++++ b/packages/ui/src/dialog/footer.tsx
+@@ -11,6 +11,9 @@ import type { FooterProps } from './types';
+  * Defaults to a native `<footer>` element for richer semantics (contentinfo
+  * landmark navigation where screen readers expose landmarks nested in
+  * dialogs). Pass `render` to opt out of the default tag.
++ *
++ * The footer is pinned to the bottom of the popup by default. To let it
++ * scroll with the body instead, render it *inside* `Dialog.Content`.
+  */
+ const Footer = forwardRef< HTMLElement, FooterProps >( function DialogFooter(
+ 	{ className, render, ...props },
+diff --git a/packages/ui/src/dialog/header.tsx b/packages/ui/src/dialog/header.tsx
+index 0cb98567114441..9977c0cb3c4042 100644
+--- a/packages/ui/src/dialog/header.tsx
++++ b/packages/ui/src/dialog/header.tsx
+@@ -11,6 +11,9 @@ import type { HeaderProps } from './types';
+  * Defaults to a native `<header>` element for richer semantics (heading-level
+  * scanning, and banner landmark navigation where screen readers expose
+  * landmarks nested in dialogs). Pass `render` to opt out of the default tag.
++ *
++ * The header is pinned to the top of the popup by default. To let it scroll
++ * with the body instead, render it *inside* `Dialog.Content`.
+  */
+ const Header = forwardRef< HTMLElement, HeaderProps >( function DialogHeader(
+ 	{ className, render, ...props },
+diff --git a/packages/ui/src/dialog/index.ts b/packages/ui/src/dialog/index.ts
+index fe245283db524f..36927a3ba31391 100644
+--- a/packages/ui/src/dialog/index.ts
++++ b/packages/ui/src/dialog/index.ts
+@@ -1,5 +1,6 @@
+ import { Action } from './action';
+ import { CloseIcon } from './close-icon';
++import { Content } from './content';
+ import { Description } from './description';
+ import { Footer } from './footer';
+ import { Header } from './header';
+@@ -12,6 +13,7 @@ import { Trigger } from './trigger';
+ export {
+ 	Action,
+ 	CloseIcon,
++	Content,
+ 	Description,
+ 	Footer,
+ 	Header,
+diff --git a/packages/ui/src/dialog/popup.tsx b/packages/ui/src/dialog/popup.tsx
+index 21e87637f8e811..d8a1dcf7981148 100644
+--- a/packages/ui/src/dialog/popup.tsx
++++ b/packages/ui/src/dialog/popup.tsx
+@@ -8,6 +8,7 @@ import {
+ } from '@wordpress/theme';
+ import { unlock } from '../lock-unlock';
+ import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
++import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
+ import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+ import { DialogValidationProvider, useDialogModal } from './context';
+ import { Portal } from './portal';
+@@ -40,7 +41,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
+ ) {
+ 	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
+ 		initialFocus,
+-		deprioritizedAttribute: CLOSE_ICON_ATTR,
++		deprioritizedAttributes: [ CLOSE_ICON_ATTR, SCROLL_CONTAINER_ATTR ],
+ 	} );
+ 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
+ 	const modal = useDialogModal();
+@@ -69,6 +70,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
+ 					initialFocus={ resolvedInitialFocus }
+ 					finalFocus={ finalFocus }
+ 					{ ...props }
++					data-wp-ui-overlay-modal={ modal === true ? '' : undefined }
+ 				>
+ 					<DialogValidationProvider>
+ 						{ children }
+diff --git a/packages/ui/src/dialog/stories/index.story.tsx b/packages/ui/src/dialog/stories/index.story.tsx
+index e71c6aea316c93..928035035810c8 100644
+--- a/packages/ui/src/dialog/stories/index.story.tsx
++++ b/packages/ui/src/dialog/stories/index.story.tsx
+@@ -1,6 +1,7 @@
+ import type { Meta, StoryObj } from '@storybook/react-vite';
+ import { useId, useState } from '@wordpress/element';
+ import type { ComponentProps } from 'react';
++import { Stack } from '../../stack';
+ import { VisuallyHidden } from '../../visually-hidden';
+ import * as Dialog from '../index';
+ 
+@@ -13,6 +14,7 @@ const meta: Meta< typeof Dialog.Root > = {
+ 		'Dialog.Header': Dialog.Header,
+ 		'Dialog.Title': Dialog.Title,
+ 		'Dialog.Description': Dialog.Description,
++		'Dialog.Content': Dialog.Content,
+ 		'Dialog.CloseIcon': Dialog.CloseIcon,
+ 		'Dialog.Action': Dialog.Action,
+ 		'Dialog.Footer': Dialog.Footer,
+@@ -42,11 +44,13 @@ export const _Default: Story = {
+ 						<Dialog.Title>Welcome</Dialog.Title>
+ 						<Dialog.CloseIcon />
+ 					</Dialog.Header>
+-					<Dialog.Description>
+-						This dialog demonstrates best practices for
+-						informational dialogs. It includes a close icon because
+-						dismissing it is safe and expected.
+-					</Dialog.Description>
++					<Dialog.Content>
++						<Dialog.Description>
++							This dialog demonstrates best practices for
++							informational dialogs. It includes a close icon
++							because dismissing it is safe and expected.
++						</Dialog.Description>
++					</Dialog.Content>
+ 					<Dialog.Footer>
+ 						<Dialog.Action>Got it</Dialog.Action>
+ 					</Dialog.Footer>
+@@ -67,7 +71,7 @@ function SizeSelector( {
+ } ) {
+ 	const selectId = useId();
+ 	return (
+-		<div style={ { display: 'flex', gap: 8, alignItems: 'center' } }>
++		<Stack direction="row" gap="sm" align="center">
+ 			<label htmlFor={ selectId }>Dialog size preset</label>
+ 			<select
+ 				id={ selectId }
+@@ -87,7 +91,7 @@ function SizeSelector( {
+ 					</option>
+ 				) ) }
+ 			</select>
+-		</div>
++		</Stack>
+ 	);
+ }
+ 
+@@ -96,27 +100,24 @@ function SizePlaygroundContent() {
+ 		useState< ComponentProps< typeof Dialog.Popup >[ 'size' ] >( 'medium' );
+ 	return (
+ 		<>
+-			<div
+-				style={ {
+-					display: 'flex',
+-					flexDirection: 'column',
+-					gap: 16,
+-					alignItems: 'start',
+-				} }
+-			>
++			<Stack direction="column" gap="lg" align="start">
+ 				<SizeSelector value={ size } onChange={ setSize } />
+ 				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+-			</div>
++			</Stack>
+ 			<Dialog.Popup size={ size }>
+ 				<Dialog.Header>
+ 					<Dialog.Title>Size Playground</Dialog.Title>
+ 					<Dialog.CloseIcon />
+ 				</Dialog.Header>
+-				<SizeSelector value={ size } onChange={ setSize } />
+-				<p>
+-					Use the dropdown above (or outside the dialog) to change the
+-					popup size. Both controls stay in sync.
+-				</p>
++				<Dialog.Content>
++					<Stack direction="column" gap="lg" align="start">
++						<SizeSelector value={ size } onChange={ setSize } />
++						<p style={ { margin: 0 } }>
++							Use the dropdown above (or outside the dialog) to
++							change the popup size. Both controls stay in sync.
++						</p>
++					</Stack>
++				</Dialog.Content>
+ 				<Dialog.Footer>
+ 					<Dialog.Action>Got it</Dialog.Action>
+ 				</Dialog.Footer>
+@@ -164,11 +165,13 @@ export const WithCustomZIndex: Story = {
+ 						<Dialog.Title>Custom z-index</Dialog.Title>
+ 						<Dialog.CloseIcon />
+ 					</Dialog.Header>
+-					<Dialog.Description>
+-						The backdrop and popup render at `z-index: 9999` via the
+-						`--wp-ui-dialog-z-index` CSS custom property, set on
+-						`Dialog.Portal` through the `portal` prop.
+-					</Dialog.Description>
++					<Dialog.Content>
++						<Dialog.Description>
++							The backdrop and popup render at `z-index: 9999` via
++							the `--wp-ui-dialog-z-index` CSS custom property,
++							set on `Dialog.Portal` through the `portal` prop.
++						</Dialog.Description>
++					</Dialog.Content>
+ 					<Dialog.Footer>
+ 						<Dialog.Action>Got it</Dialog.Action>
+ 					</Dialog.Footer>
+@@ -178,6 +181,129 @@ export const WithCustomZIndex: Story = {
+ 	},
+ };
+ 
++function StickyToggle( {
++	stickyHeader,
++	stickyFooter,
++	onStickyHeaderChange,
++	onStickyFooterChange,
++}: {
++	stickyHeader: boolean;
++	stickyFooter: boolean;
++	onStickyHeaderChange: ( value: boolean ) => void;
++	onStickyFooterChange: ( value: boolean ) => void;
++} ) {
++	const headerId = useId();
++	const footerId = useId();
++	return (
++		<Stack direction="row" gap="md" align="center">
++			<Stack direction="row" gap="xs" align="center">
++				<input
++					id={ headerId }
++					type="checkbox"
++					checked={ stickyHeader }
++					onChange={ ( e ) =>
++						onStickyHeaderChange( e.target.checked )
++					}
++				/>
++				<label htmlFor={ headerId }>Sticky header</label>
++			</Stack>
++			<Stack direction="row" gap="xs" align="center">
++				<input
++					id={ footerId }
++					type="checkbox"
++					checked={ stickyFooter }
++					onChange={ ( e ) =>
++						onStickyFooterChange( e.target.checked )
++					}
++				/>
++				<label htmlFor={ footerId }>Sticky footer</label>
++			</Stack>
++		</Stack>
++	);
++}
++
++function ScrollableContent() {
++	const [ size, setSize ] =
++		useState< ComponentProps< typeof Dialog.Popup >[ 'size' ] >( 'medium' );
++	const [ stickyHeader, setStickyHeader ] = useState( true );
++	const [ stickyFooter, setStickyFooter ] = useState( true );
++
++	const header = (
++		<Dialog.Header>
++			<Dialog.Title>Terms of service</Dialog.Title>
++			<Dialog.CloseIcon />
++		</Dialog.Header>
++	);
++	const footer = (
++		<Dialog.Footer>
++			<Dialog.Action variant="outline">Decline</Dialog.Action>
++			<Dialog.Action>Accept</Dialog.Action>
++		</Dialog.Footer>
++	);
++	const controls = (
++		<Stack direction="column" gap="sm" align="start">
++			<SizeSelector value={ size } onChange={ setSize } />
++			<StickyToggle
++				stickyHeader={ stickyHeader }
++				stickyFooter={ stickyFooter }
++				onStickyHeaderChange={ setStickyHeader }
++				onStickyFooterChange={ setStickyFooter }
++			/>
++		</Stack>
++	);
++
++	return (
++		<>
++			<Stack direction="column" gap="lg" align="start">
++				{ controls }
++				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
++			</Stack>
++			<Dialog.Popup size={ size }>
++				{ stickyHeader && header }
++				<Dialog.Content>
++					{ ! stickyHeader && header }
++					<Stack direction="column" gap="lg">
++						{ controls }
++						{ Array.from( { length: 20 } ).map( ( _, index ) => (
++							<p key={ index } style={ { margin: 0 } }>
++								Paragraph { index + 1 }: Lorem ipsum dolor sit
++								amet, consectetur adipiscing elit. Sed do
++								eiusmod tempor incididunt ut labore et dolore
++								magna aliqua. Ut enim ad minim veniam, quis
++								nostrud exercitation ullamco laboris nisi ut
++								aliquip ex ea commodo consequat.
++							</p>
++						) ) }
++					</Stack>
++					{ ! stickyFooter && footer }
++				</Dialog.Content>
++				{ stickyFooter && footer }
++			</Dialog.Popup>
++		</>
++	);
++}
++
++/**
++ * When dialog content overflows the available height, `Dialog.Content`
++ * scrolls while `Dialog.Header` and `Dialog.Footer` stay pinned to the
++ * popup's top and bottom edges. Separator lines appear only when there
++ * is off-screen content above the header or below the footer.
++ *
++ * To let the header or footer scroll with the body instead of staying
++ * pinned, render it *inside* `Dialog.Content` rather than as a sibling.
++ * The inline "Sticky header / Sticky footer" checkboxes toggle exactly
++ * that placement at runtime.
++ *
++ * Use the inline controls to change the popup `size` and the sticky
++ * placement. The same controls render both outside and inside the
++ * dialog and stay in sync.
++ */
++export const Scrollable: Story = {
++	args: {
++		children: <ScrollableContent />,
++	},
++};
++
+ /**
+  * A dialog with a visually hidden title. The title is still present in the
+  * DOM for `aria-labelledby`, but is not visible to sighted users.
+@@ -197,10 +323,13 @@ export const WithVisuallyHiddenTitle: Story = {
+ 						</VisuallyHidden>
+ 						<Dialog.CloseIcon />
+ 					</Dialog.Header>
+-					<p>
+-						This dialog has a visually hidden title. Inspect the DOM
+-						or use a screen reader to verify the heading is present.
+-					</p>
++					<Dialog.Content>
++						<p style={ { margin: 0 } }>
++							This dialog has a visually hidden title. Inspect the
++							DOM or use a screen reader to verify the heading is
++							present.
++						</p>
++					</Dialog.Content>
+ 					<Dialog.Footer>
+ 						<Dialog.Action>Got it</Dialog.Action>
+ 					</Dialog.Footer>
+diff --git a/packages/ui/src/dialog/style.module.css b/packages/ui/src/dialog/style.module.css
+index 697949ec61bbb0..93c695c8d40c17 100644
+--- a/packages/ui/src/dialog/style.module.css
++++ b/packages/ui/src/dialog/style.module.css
+@@ -21,6 +21,12 @@
+ 		}
+ 	}
+ 
++	/*
++	 * The popup is a flex column that lays out three regions — header,
++	 * content, footer — as siblings. The middle `.content` region owns the
++	 * scroll; the popup itself clips to its rounded border. See
++	 * `overlay-chrome.module.css` for the shared chrome/content primitives.
++	 */
+ 	.popup {
+ 		--viewport-inset: var(--wpds-dimension-padding-2xl);
+ 
+@@ -31,14 +37,15 @@
+ 		z-index: var(--wp-ui-dialog-z-index, initial);
+ 		transform: translate(-50%, -50%);
+ 		box-sizing: border-box;
++		display: flex;
++		flex-direction: column;
+ 		min-width: var(--wpds-dimension-surface-width-sm);
+ 		width: calc(100vw - 2 * var(--viewport-inset));
+ 		max-height: calc(100dvh - 2 * var(--viewport-inset));
+-		padding: var(--wpds-dimension-padding-2xl);
+ 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+ 		border-radius: var(--wpds-border-radius-lg);
+ 		box-shadow: var(--wpds-elevation-lg);
+-		overflow: auto;
++		overflow: hidden;
+ 		font-family: var(--wpds-typography-font-family-body);
+ 		font-size: var(--wpds-typography-font-size-md);
+ 		line-height: var(--wpds-typography-line-height-md);
+@@ -92,37 +99,43 @@
+ 		}
+ 	}
+ 
++	/*
++	 * Chrome + content primitives are centralized in
++	 * `overlay-chrome.module.css` and shared with `drawer/style.module.css`
++	 * and `alert-dialog/popup.tsx`. Separator coloring and the modal
++	 * overscroll rule live there as well, keyed off the
++	 * `data-wp-ui-overlay-scroll-container` attribute that
++	 * `useOverlayScrollStateAttributes` sets on the scroll container.
++	 */
+ 	.header {
+-		display: flex;
+-		align-items: center;
+-		gap: var(--wpds-dimension-gap-sm);
+-		margin-bottom: var(--wpds-dimension-gap-lg);
++		composes: header from "../utils/css/overlay-chrome.module.css";
++	}
++
++	.footer {
++		composes: footer from "../utils/css/overlay-chrome.module.css";
+ 	}
+ 
+ 	.title {
+-		color: var(--wpds-color-fg-content-neutral);
+-		--_gcd-heading-color: var(--wpds-color-fg-content-neutral);
++		composes: title from "../utils/css/overlay-chrome.module.css";
++	}
+ 
+-		margin-inline-end: auto;
+-		/* Workaround: the GCD shorthand `margin` overrides the longhand above.
+-		 * Keep both so the layout survives GCD removal. */
+-		--_gcd-heading-margin: 0 auto 0 0;
++	.content {
++		composes: content from "../utils/css/overlay-chrome.module.css";
++	}
+ 
+-		&:dir(rtl) {
+-			--_gcd-heading-margin: 0 0 0 auto;
+-		}
++	/*
++	 * Push the close icon to the inline end even when the title is taken out
++	 * of flow (e.g. wrapped in `VisuallyHidden`, which sets `position:
++	 * absolute`). In that case `.title`'s `margin-inline-end: auto` is a
++	 * no-op because the title no longer participates in the flex layout, so
++	 * we also anchor the close icon itself.
++	 */
++	.header [data-wp-ui-dialog-close-icon] {
++		margin-inline-start: auto;
+ 	}
+ 
+ 	.description {
+ 		margin-bottom: var(--wpds-dimension-gap-lg);
+ 	}
+ 
+-	.footer {
+-		display: flex;
+-		justify-content: flex-end;
+-		align-items: center;
+-		gap: var(--wpds-dimension-gap-sm);
+-		margin-top: var(--wpds-dimension-gap-lg);
+-		padding-top: var(--wpds-dimension-padding-lg);
+-	}
+ }
+diff --git a/packages/ui/src/dialog/test/index.test.tsx b/packages/ui/src/dialog/test/index.test.tsx
+index ed79041b69fd26..2f41f9e3e06440 100644
+--- a/packages/ui/src/dialog/test/index.test.tsx
++++ b/packages/ui/src/dialog/test/index.test.tsx
+@@ -27,6 +27,7 @@ describe( 'Dialog', () => {
+ 		const descriptionRef = createRef< HTMLParagraphElement >();
+ 		const closeIconRef = createRef< HTMLButtonElement >();
+ 		const footerRef = createRef< HTMLElement >();
++		const contentRef = createRef< HTMLDivElement >();
+ 
+ 		render(
+ 			<Dialog.Root>
+@@ -38,9 +39,11 @@ describe( 'Dialog', () => {
+ 						</Dialog.Title>
+ 						<Dialog.CloseIcon ref={ closeIconRef } />
+ 					</Dialog.Header>
+-					<Dialog.Description ref={ descriptionRef }>
+-						A test description
+-					</Dialog.Description>
++					<Dialog.Content ref={ contentRef }>
++						<Dialog.Description ref={ descriptionRef }>
++							A test description
++						</Dialog.Description>
++					</Dialog.Content>
+ 					<Dialog.Footer ref={ footerRef }>
+ 						<Dialog.Action ref={ actionRef }>Close</Dialog.Action>
+ 					</Dialog.Footer>
+@@ -68,6 +71,7 @@ describe( 'Dialog', () => {
+ 		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
+ 		expect( footerRef.current ).toBeInstanceOf( HTMLElement );
+ 		expect( footerRef.current?.tagName ).toBe( 'FOOTER' );
++		expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
+ 	} );
+ 
+ 	it( 'merges user `className` on Dialog.Title with the internal one', async () => {
+@@ -781,4 +785,401 @@ describe( 'Dialog', () => {
+ 			);
+ 		} );
+ 	} );
++
++	describe( 'overlay scroll container', () => {
++		it( 'marks Dialog.Content with data-wp-ui-overlay-scroll-container', async () => {
++			const user = userEvent.setup();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<Dialog.Root>
++					<Dialog.Trigger>Open</Dialog.Trigger>
++					<Dialog.Popup>
++						<Dialog.Title>Title</Dialog.Title>
++						<Dialog.Content ref={ contentRef }>
++							<p>Body</p>
++						</Dialog.Content>
++					</Dialog.Popup>
++				</Dialog.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			expect( contentRef.current ).toHaveAttribute(
++				'data-wp-ui-overlay-scroll-container'
++			);
++		} );
++
++		it( 'sets data-wp-ui-overlay-modal on the popup when modal is true', async () => {
++			const user = userEvent.setup();
++			const popupRef = createRef< HTMLDivElement >();
++
++			render(
++				<Dialog.Root modal>
++					<Dialog.Trigger>Open</Dialog.Trigger>
++					<Dialog.Popup ref={ popupRef }>
++						<Dialog.Title>Title</Dialog.Title>
++					</Dialog.Popup>
++				</Dialog.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			expect( popupRef.current ).toHaveAttribute(
++				'data-wp-ui-overlay-modal'
++			);
++		} );
++
++		it.each( [
++			[ 'false', false as const ],
++			[ 'trap-focus', 'trap-focus' as const ],
++		] )(
++			'omits data-wp-ui-overlay-modal on the popup when modal is %s',
++			async ( _label, modal ) => {
++				const user = userEvent.setup();
++				const popupRef = createRef< HTMLDivElement >();
++
++				render(
++					<Dialog.Root modal={ modal }>
++						<Dialog.Trigger>Open</Dialog.Trigger>
++						<Dialog.Popup ref={ popupRef }>
++							<Dialog.Title>Title</Dialog.Title>
++						</Dialog.Popup>
++					</Dialog.Root>
++				);
++
++				await user.click(
++					screen.getByRole( 'button', { name: 'Open' } )
++				);
++				await waitFor( () => {
++					expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++				} );
++
++				expect( popupRef.current ).not.toHaveAttribute(
++					'data-wp-ui-overlay-modal'
++				);
++			}
++		);
++
++		it( 'pins Dialog.Header when rendered as a sibling of Dialog.Content', async () => {
++			const user = userEvent.setup();
++			const popupRef = createRef< HTMLDivElement >();
++			const headerRef = createRef< HTMLElement >();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<Dialog.Root>
++					<Dialog.Trigger>Open</Dialog.Trigger>
++					<Dialog.Popup ref={ popupRef }>
++						<Dialog.Header ref={ headerRef }>
++							<Dialog.Title>Title</Dialog.Title>
++						</Dialog.Header>
++						<Dialog.Content ref={ contentRef }>
++							<p>Body</p>
++						</Dialog.Content>
++					</Dialog.Popup>
++				</Dialog.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( headerRef.current ).toBeInstanceOf( HTMLElement );
++			} );
++
++			// The header is inside the popup but NOT inside the scroll
++			// container — it sits outside the scrolling region as a
++			// pinned flex sibling of `Content`.
++			expect( popupRef.current ).toContainElement( headerRef.current );
++			expect( popupRef.current ).toContainElement( contentRef.current );
++			expect( contentRef.current ).not.toContainElement(
++				headerRef.current
++			);
++			// And it sits *before* the scroll container — the CSS
++			// sticky-separator selectors rely on that DOM order.
++			const position = headerRef.current!.compareDocumentPosition(
++				contentRef.current!
++			);
++			expect(
++				// eslint-disable-next-line no-bitwise
++				position & Node.DOCUMENT_POSITION_FOLLOWING
++			).toBeTruthy();
++		} );
++
++		it( 'scrolls Dialog.Header with the body when nested inside Dialog.Content', async () => {
++			const user = userEvent.setup();
++			const headerRef = createRef< HTMLElement >();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<Dialog.Root>
++					<Dialog.Trigger>Open</Dialog.Trigger>
++					<Dialog.Popup>
++						<Dialog.Content ref={ contentRef }>
++							<Dialog.Header ref={ headerRef }>
++								<Dialog.Title>Title</Dialog.Title>
++							</Dialog.Header>
++							<p>Body</p>
++						</Dialog.Content>
++					</Dialog.Popup>
++				</Dialog.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( headerRef.current ).toBeInstanceOf( HTMLElement );
++			} );
++
++			expect( contentRef.current ).toContainElement( headerRef.current );
++		} );
++
++		it( 'invokes a consumer-supplied onScroll on Dialog.Content', async () => {
++			const user = userEvent.setup();
++			const onScroll = jest.fn();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<Dialog.Root>
++					<Dialog.Trigger>Open</Dialog.Trigger>
++					<Dialog.Popup>
++						<Dialog.Title>Title</Dialog.Title>
++						<Dialog.Content
++							ref={ contentRef }
++							onScroll={ onScroll }
++						>
++							<p>Body</p>
++						</Dialog.Content>
++					</Dialog.Popup>
++				</Dialog.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			act( () => {
++				contentRef.current?.dispatchEvent(
++					new Event( 'scroll', { bubbles: true } )
++				);
++			} );
++
++			expect( onScroll ).toHaveBeenCalledTimes( 1 );
++		} );
++
++		it( 'toggles tabindex="0" on Dialog.Content based on overflow', async () => {
++			const user = userEvent.setup();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<Dialog.Root>
++					<Dialog.Trigger>Open</Dialog.Trigger>
++					<Dialog.Popup>
++						<Dialog.Title>Title</Dialog.Title>
++						<Dialog.Content ref={ contentRef }>
++							<p>Body</p>
++						</Dialog.Content>
++					</Dialog.Popup>
++				</Dialog.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			// JSDOM reports 0/0 dimensions by default, so the initial
++			// mount sees no overflow and installs no tabindex. Stub
++			// layout metrics, dispatch a scroll to re-run the update,
++			// and verify the tabindex is installed.
++			const content = contentRef.current!;
++			Object.defineProperty( content, 'scrollHeight', {
++				configurable: true,
++				value: 500,
++			} );
++			Object.defineProperty( content, 'clientHeight', {
++				configurable: true,
++				value: 100,
++			} );
++			Object.defineProperty( content, 'scrollTop', {
++				configurable: true,
++				value: 0,
++			} );
++
++			act( () => {
++				content.dispatchEvent(
++					new Event( 'scroll', { bubbles: true } )
++				);
++			} );
++
++			expect( content ).toHaveAttribute( 'tabindex', '0' );
++
++			// Shrink content so it no longer overflows and verify the
++			// hook removes its managed tabindex.
++			Object.defineProperty( content, 'scrollHeight', {
++				configurable: true,
++				value: 100,
++			} );
++
++			act( () => {
++				content.dispatchEvent(
++					new Event( 'scroll', { bubbles: true } )
++				);
++			} );
++
++			expect( content ).not.toHaveAttribute( 'tabindex' );
++		} );
++
++		// This test exercises the `updateScrollAttributes` path for
++		// consumer takeover (overflow flips off while the override is
++		// in place). The matching `cleanupScrollAttributes` path —
++		// popup unmounts while the override is in place — is covered
++		// transitively because both paths share a single
++		// `reconcileTabbableFlag` helper inside the hook. If that
++		// shared helper is ever inlined or split, add an explicit
++		// unmount-after-takeover test to keep both paths regressions-
++		// guarded.
++		it( 'preserves a consumer-supplied tabindex set after the hook installed its own', async () => {
++			const user = userEvent.setup();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<Dialog.Root>
++					<Dialog.Trigger>Open</Dialog.Trigger>
++					<Dialog.Popup>
++						<Dialog.Title>Title</Dialog.Title>
++						<Dialog.Content ref={ contentRef }>
++							<p>Body</p>
++						</Dialog.Content>
++					</Dialog.Popup>
++				</Dialog.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			const content = contentRef.current!;
++			Object.defineProperty( content, 'scrollHeight', {
++				configurable: true,
++				value: 500,
++			} );
++			Object.defineProperty( content, 'clientHeight', {
++				configurable: true,
++				value: 100,
++			} );
++			Object.defineProperty( content, 'scrollTop', {
++				configurable: true,
++				value: 0,
++			} );
++
++			act( () => {
++				content.dispatchEvent(
++					new Event( 'scroll', { bubbles: true } )
++				);
++			} );
++
++			expect( content ).toHaveAttribute( 'tabindex', '0' );
++
++			// Simulate the consumer taking over the tabindex after the
++			// hook installed its own (e.g. a re-render with an explicit
++			// `tabIndex={ -1 }` prop). The hook should detect the
++			// consumer takeover and not clobber that value on the next
++			// non-overflow tick.
++			content.setAttribute( 'tabindex', '-1' );
++
++			Object.defineProperty( content, 'scrollHeight', {
++				configurable: true,
++				value: 100,
++			} );
++
++			act( () => {
++				content.dispatchEvent(
++					new Event( 'scroll', { bubbles: true } )
++				);
++			} );
++
++			expect( content ).toHaveAttribute( 'tabindex', '-1' );
++		} );
++
++		it( 'toggles data-wp-ui-overlay-scrolled-from-* based on scroll position', async () => {
++			const user = userEvent.setup();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<Dialog.Root>
++					<Dialog.Trigger>Open</Dialog.Trigger>
++					<Dialog.Popup>
++						<Dialog.Title>Title</Dialog.Title>
++						<Dialog.Content ref={ contentRef }>
++							<p>Body</p>
++						</Dialog.Content>
++					</Dialog.Popup>
++				</Dialog.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			// JSDOM doesn't lay out elements, so we simulate an
++			// overflowing scroll container by stubbing layout metrics
++			// per scenario and dispatching a scroll event.
++			const content = contentRef.current!;
++			Object.defineProperty( content, 'scrollHeight', {
++				configurable: true,
++				value: 500,
++			} );
++			Object.defineProperty( content, 'clientHeight', {
++				configurable: true,
++				value: 100,
++			} );
++
++			const setScrollTop = ( value: number ) => {
++				Object.defineProperty( content, 'scrollTop', {
++					configurable: true,
++					value,
++				} );
++				act( () => {
++					content.dispatchEvent(
++						new Event( 'scroll', { bubbles: true } )
++					);
++				} );
++			};
++
++			// At the top: only "from-bottom" is set (content below).
++			setScrollTop( 0 );
++			expect( content ).not.toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-top'
++			);
++			expect( content ).toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-bottom'
++			);
++
++			// In the middle: both are set.
++			setScrollTop( 200 );
++			expect( content ).toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-top'
++			);
++			expect( content ).toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-bottom'
++			);
++
++			// At the bottom: only "from-top" is set (content above).
++			setScrollTop( 400 );
++			expect( content ).toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-top'
++			);
++			expect( content ).not.toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-bottom'
++			);
++		} );
++	} );
+ } );
+diff --git a/packages/ui/src/dialog/types.ts b/packages/ui/src/dialog/types.ts
+index 9f0f65cdbfd7a3..1c0457111c5b1e 100644
+--- a/packages/ui/src/dialog/types.ts
++++ b/packages/ui/src/dialog/types.ts
+@@ -90,6 +90,42 @@ export interface HeaderProps extends ComponentProps< 'header' > {
+ 	children?: ReactNode;
+ }
+ 
++export interface ContentProps extends ComponentProps< 'div' > {
++	/**
++	 * The body content to be rendered inside the scroll container.
++	 */
++	children?: ReactNode;
++	/**
++	 * The scroll region automatically becomes a keyboard-reachable tab
++	 * stop (`tabindex="0"`) whenever the body overflows, so keyboard
++	 * users can arrow-scroll the region (WCAG 2.1.1). It becomes
++	 * non-tabbable again as soon as the content no longer overflows.
++	 *
++	 * If you supply `tabIndex` explicitly, your value wins and is never
++	 * overwritten — including `tabIndex={ -1 }` to opt out of the
++	 * automatic tab stop entirely, and including overrides applied
++	 * after the component had already managed the value.
++	 *
++	 * Two narrow edge cases:
++	 * - If you later *remove* an explicit `tabIndex` at runtime, the
++	 *   component will resume managing it on the next overflow tick; it
++	 *   can't distinguish a previous explicit opt-out from an
++	 *   unconfigured state.
++	 * - Passing `tabIndex={ 0 }` while the body overflows produces a
++	 *   value identical to the auto-managed one, so the component can
++	 *   no longer tell the two apart and may strip it on the next
++	 *   non-overflow tick. Pick a different value (or rely on the
++	 *   default behavior, which is already `0` while overflowing).
++	 *
++	 * Note: the scroll region is intentionally rendered without
++	 * `role` / `aria-label`, so screen readers don't announce a
++	 * generic "scrollable" landmark on top of the dialog's existing
++	 * heading + body; the surrounding `Dialog.Title` and body content
++	 * provide the context.
++	 */
++	tabIndex?: number;
++}
++
+ export interface TitleProps extends ComponentProps< 'h2' > {
+ 	/**
+ 	 * The title content to be rendered. This serves as both the visible
+diff --git a/packages/ui/src/drawer/content.tsx b/packages/ui/src/drawer/content.tsx
+new file mode 100644
+index 00000000000000..dc65c2d3b3b48c
+--- /dev/null
++++ b/packages/ui/src/drawer/content.tsx
+@@ -0,0 +1,50 @@
++import { Drawer as _Drawer } from '@base-ui/react/drawer';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { useMergeRefs } from '@wordpress/compose';
++import { useOverlayScrollStateAttributes } from '../utils/use-overlay-scroll-state-attributes';
++import focusStyles from '../utils/css/focus.module.css';
++import styles from './style.module.css';
++import type { ContentProps } from './types';
++
++/**
++ * Renders the scrollable body of the drawer, sitting between `Drawer.Header`
++ * and `Drawer.Footer` as a flex sibling.
++ *
++ * **Required for scrolling** — `Drawer.Content` is the element that owns
++ * the popup's overflow. Without it, body content that exceeds the popup's
++ * available space clips instead of scrolling, and Base UI's
++ * swipe-dismiss-on-scroll-edge logic will not engage on up/down drawers.
++ * Render it once per popup and wrap any freeform body content in it.
++ *
++ * Placing `Drawer.Header` or `Drawer.Footer` *inside* `Drawer.Content`
++ * makes them scroll with the body (the "non-sticky" opt-out) rather than
++ * staying pinned to the popup's edges.
++ *
++ * Renders Base UI's `_Drawer.Content` so swipe-dismiss wiring remains
++ * wired automatically.
++ */
++const Content = forwardRef< HTMLDivElement, ContentProps >(
++	function DrawerContent( { className, children, onScroll, ...props }, ref ) {
++		const { ref: scrollStateRef, onScroll: scrollStateOnScroll } =
++			useOverlayScrollStateAttributes< HTMLDivElement >( onScroll );
++		const mergedRef = useMergeRefs( [ ref, scrollStateRef ] );
++
++		return (
++			<_Drawer.Content
++				ref={ mergedRef }
++				className={ clsx(
++					styles.content,
++					focusStyles[ 'outset-ring--focus-visible' ],
++					className
++				) }
++				onScroll={ scrollStateOnScroll }
++				{ ...props }
++			>
++				{ children }
++			</_Drawer.Content>
++		);
++	}
++);
++
++export { Content };
+diff --git a/packages/ui/src/drawer/footer.tsx b/packages/ui/src/drawer/footer.tsx
+index 84fd321fe976fb..becb0351281941 100644
+--- a/packages/ui/src/drawer/footer.tsx
++++ b/packages/ui/src/drawer/footer.tsx
+@@ -11,6 +11,9 @@ import type { FooterProps } from './types';
+  * Defaults to a native `<footer>` element for richer semantics (contentinfo
+  * landmark navigation where screen readers expose landmarks nested in
+  * dialogs). Pass `render` to opt out of the default tag.
++ *
++ * The footer is pinned to the bottom of the popup by default. To let it
++ * scroll with the body instead, render it *inside* `Drawer.Content`.
+  */
+ const Footer = forwardRef< HTMLElement, FooterProps >( function DrawerFooter(
+ 	{ className, render, ...props },
+diff --git a/packages/ui/src/drawer/header.tsx b/packages/ui/src/drawer/header.tsx
+index 41fd3e722a0e0c..c7fee2f28c3e07 100644
+--- a/packages/ui/src/drawer/header.tsx
++++ b/packages/ui/src/drawer/header.tsx
+@@ -11,6 +11,9 @@ import type { HeaderProps } from './types';
+  * Defaults to a native `<header>` element for richer semantics (heading-level
+  * scanning, and banner landmark navigation where screen readers expose
+  * landmarks nested in dialogs). Pass `render` to opt out of the default tag.
++ *
++ * The header is pinned to the top of the popup by default. To let it scroll
++ * with the body instead, render it *inside* `Drawer.Content`.
+  */
+ const Header = forwardRef< HTMLElement, HeaderProps >( function DrawerHeader(
+ 	{ className, render, ...props },
+diff --git a/packages/ui/src/drawer/index.ts b/packages/ui/src/drawer/index.ts
+index fe245283db524f..36927a3ba31391 100644
+--- a/packages/ui/src/drawer/index.ts
++++ b/packages/ui/src/drawer/index.ts
+@@ -1,5 +1,6 @@
+ import { Action } from './action';
+ import { CloseIcon } from './close-icon';
++import { Content } from './content';
+ import { Description } from './description';
+ import { Footer } from './footer';
+ import { Header } from './header';
+@@ -12,6 +13,7 @@ import { Trigger } from './trigger';
+ export {
+ 	Action,
+ 	CloseIcon,
++	Content,
+ 	Description,
+ 	Footer,
+ 	Header,
+diff --git a/packages/ui/src/drawer/popup.tsx b/packages/ui/src/drawer/popup.tsx
+index 89a4860766486e..11c21fb6765cb8 100644
+--- a/packages/ui/src/drawer/popup.tsx
++++ b/packages/ui/src/drawer/popup.tsx
+@@ -8,6 +8,7 @@ import {
+ } from '@wordpress/theme';
+ import { unlock } from '../lock-unlock';
+ import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
++import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
+ import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+ import { DrawerValidationProvider, useDrawerModal } from './context';
+ import { Portal } from './portal';
+@@ -25,6 +26,11 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-drawer-close-icon';
+  *
+  * When `portal` is omitted, defaults to `Drawer.Portal`. Portal merging is
+  * handled by `renderPortalWithChildren` (shared with other overlay `Popup`s).
++ *
++ * The popup is a flex column; scroll ownership lives on `Drawer.Content`,
++ * which children are expected to render. Without it, long body content will
++ * clip instead of scrolling and Base UI's swipe-dismiss-on-scroll-edge
++ * logic on up/down drawers cannot engage.
+  */
+ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
+ 	{ className, portal, children, size, initialFocus, finalFocus, ...props },
+@@ -32,7 +38,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
+ ) {
+ 	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
+ 		initialFocus,
+-		deprioritizedAttribute: CLOSE_ICON_ATTR,
++		deprioritizedAttributes: [ CLOSE_ICON_ATTR, SCROLL_CONTAINER_ATTR ],
+ 	} );
+ 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
+ 	const modal = useDrawerModal();
+@@ -75,12 +81,13 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
+ 						initialFocus={ resolvedInitialFocus }
+ 						finalFocus={ finalFocus }
+ 						{ ...props }
++						data-wp-ui-overlay-modal={
++							modal === true ? '' : undefined
++						}
+ 					>
+-						<_Drawer.Content className={ styles.content }>
+-							<DrawerValidationProvider>
+-								{ children }
+-							</DrawerValidationProvider>
+-						</_Drawer.Content>
++						<DrawerValidationProvider>
++							{ children }
++						</DrawerValidationProvider>
+ 					</_Drawer.Popup>
+ 				</ThemeProvider>
+ 			</_Drawer.Viewport>
+diff --git a/packages/ui/src/drawer/stories/index.story.tsx b/packages/ui/src/drawer/stories/index.story.tsx
+index 5984f7d2efc88f..df879bc75a828b 100644
+--- a/packages/ui/src/drawer/stories/index.story.tsx
++++ b/packages/ui/src/drawer/stories/index.story.tsx
+@@ -14,6 +14,7 @@ const meta: Meta< typeof Drawer.Root > = {
+ 		'Drawer.Header': Drawer.Header,
+ 		'Drawer.Title': Drawer.Title,
+ 		'Drawer.Description': Drawer.Description,
++		'Drawer.Content': Drawer.Content,
+ 		'Drawer.CloseIcon': Drawer.CloseIcon,
+ 		'Drawer.Action': Drawer.Action,
+ 		'Drawer.Footer': Drawer.Footer,
+@@ -43,9 +44,11 @@ export const _Default: Story = {
+ 						<Drawer.Title>Navigation</Drawer.Title>
+ 						<Drawer.CloseIcon />
+ 					</Drawer.Header>
+-					<Drawer.Description>
+-						Browse through the available sections below.
+-					</Drawer.Description>
++					<Drawer.Content>
++						<Drawer.Description>
++							Browse through the available sections below.
++						</Drawer.Description>
++					</Drawer.Content>
+ 					<Drawer.Footer>
+ 						<Drawer.Action>Done</Drawer.Action>
+ 					</Drawer.Footer>
+@@ -89,10 +92,12 @@ export const AllSides: Story = {
+ 								<Drawer.Title>{ title }</Drawer.Title>
+ 								<Drawer.CloseIcon />
+ 							</Drawer.Header>
+-							<Drawer.Description>
+-								Slides in from the { label.toLowerCase() } edge.
+-								Swipe to dismiss.
+-							</Drawer.Description>
++							<Drawer.Content>
++								<Drawer.Description>
++									Slides in from the { label.toLowerCase() }{ ' ' }
++									edge. Swipe to dismiss.
++								</Drawer.Description>
++							</Drawer.Content>
+ 							<Drawer.Footer>
+ 								<Drawer.Action>Close</Drawer.Action>
+ 							</Drawer.Footer>
+@@ -129,10 +134,12 @@ export const Controlled: Story = {
+ 						<Drawer.Title>Controlled Drawer</Drawer.Title>
+ 						<Drawer.CloseIcon />
+ 					</Drawer.Header>
+-					<Drawer.Description>
+-						The open state is managed externally via{ ' ' }
+-						<code>open</code> and <code>onOpenChange</code>.
+-					</Drawer.Description>
++					<Drawer.Content>
++						<Drawer.Description>
++							The open state is managed externally via{ ' ' }
++							<code>open</code> and <code>onOpenChange</code>.
++						</Drawer.Description>
++					</Drawer.Content>
+ 					<Drawer.Footer>
+ 						<Drawer.Action>Close</Drawer.Action>
+ 					</Drawer.Footer>
+@@ -164,10 +171,12 @@ export const NonModal: Story = {
+ 						<Drawer.Title>Non-Modal</Drawer.Title>
+ 						<Drawer.CloseIcon />
+ 					</Drawer.Header>
+-					<Drawer.Description>
+-						This drawer does not trap focus and allows interaction
+-						with the rest of the page while open.
+-					</Drawer.Description>
++					<Drawer.Content>
++						<Drawer.Description>
++							This drawer does not trap focus and allows
++							interaction with the rest of the page while open.
++						</Drawer.Description>
++					</Drawer.Content>
+ 					<Drawer.Footer>
+ 						<Drawer.Action>Close</Drawer.Action>
+ 					</Drawer.Footer>
+@@ -284,12 +293,14 @@ export const WithCustomZIndex: Story = {
+ 						<Drawer.Title>Custom z-index</Drawer.Title>
+ 						<Drawer.CloseIcon />
+ 					</Drawer.Header>
+-					<Drawer.Description>
+-						The backdrop, viewport, and popup render at `z-index:
+-						9999` via the `--wp-ui-drawer-z-index` CSS custom
+-						property, set on `Drawer.Portal` through the `portal`
+-						prop.
+-					</Drawer.Description>
++					<Drawer.Content>
++						<Drawer.Description>
++							The backdrop, viewport, and popup render at
++							`z-index: 9999` via the `--wp-ui-drawer-z-index` CSS
++							custom property, set on `Drawer.Portal` through the
++							`portal` prop.
++						</Drawer.Description>
++					</Drawer.Content>
+ 					<Drawer.Footer>
+ 						<Drawer.Action>Got it</Drawer.Action>
+ 					</Drawer.Footer>
+@@ -332,24 +343,30 @@ export const SizePlayground: Story = {
+ 						<Drawer.Title>Size Playground</Drawer.Title>
+ 						<Drawer.CloseIcon />
+ 					</Drawer.Header>
+-					<Stack direction="column" gap="lg">
+-						<div
+-							style={ {
+-								display: 'grid',
+-								gap: 8,
+-							} }
+-						>
+-							<SizeSelector value={ size } onChange={ setSize } />
+-							<DirectionSelector
+-								value={ direction }
+-								onChange={ setDirection }
+-							/>
+-						</div>
+-						<Drawer.Description>
+-							Use the dropdowns to change the size and direction.
+-							Both inside and outside controls stay in sync.
+-						</Drawer.Description>
+-					</Stack>
++					<Drawer.Content>
++						<Stack direction="column" gap="lg">
++							<div
++								style={ {
++									display: 'grid',
++									gap: 8,
++								} }
++							>
++								<SizeSelector
++									value={ size }
++									onChange={ setSize }
++								/>
++								<DirectionSelector
++									value={ direction }
++									onChange={ setDirection }
++								/>
++							</div>
++							<Drawer.Description>
++								Use the dropdowns to change the size and
++								direction. Both inside and outside controls stay
++								in sync.
++							</Drawer.Description>
++						</Stack>
++					</Drawer.Content>
+ 					<Drawer.Footer>
+ 						<Drawer.Action>Got it</Drawer.Action>
+ 					</Drawer.Footer>
+@@ -361,3 +378,166 @@ export const SizePlayground: Story = {
+ 		swipeDirection: { control: false },
+ 	},
+ };
++
++type ScrollableControlProps = {
++	size: ComponentProps< typeof Drawer.Popup >[ 'size' ];
++	setSize: ( size: ComponentProps< typeof Drawer.Popup >[ 'size' ] ) => void;
++	direction: ComponentProps< typeof Drawer.Root >[ 'swipeDirection' ];
++	setDirection: (
++		dir: ComponentProps< typeof Drawer.Root >[ 'swipeDirection' ]
++	) => void;
++	stickyHeader: boolean;
++	setStickyHeader: ( value: boolean ) => void;
++	stickyFooter: boolean;
++	setStickyFooter: ( value: boolean ) => void;
++};
++
++function StickyToggle( {
++	stickyHeader,
++	stickyFooter,
++	setStickyHeader,
++	setStickyFooter,
++}: Pick<
++	ScrollableControlProps,
++	'stickyHeader' | 'stickyFooter' | 'setStickyHeader' | 'setStickyFooter'
++> ) {
++	const headerId = useId();
++	const footerId = useId();
++	return (
++		<Stack direction="row" gap="md" align="center">
++			<Stack direction="row" gap="xs" align="center">
++				<input
++					id={ headerId }
++					type="checkbox"
++					checked={ stickyHeader }
++					onChange={ ( e ) => setStickyHeader( e.target.checked ) }
++				/>
++				<label htmlFor={ headerId }>Sticky header</label>
++			</Stack>
++			<Stack direction="row" gap="xs" align="center">
++				<input
++					id={ footerId }
++					type="checkbox"
++					checked={ stickyFooter }
++					onChange={ ( e ) => setStickyFooter( e.target.checked ) }
++				/>
++				<label htmlFor={ footerId }>Sticky footer</label>
++			</Stack>
++		</Stack>
++	);
++}
++
++function ScrollableControls( {
++	size,
++	setSize,
++	direction,
++	setDirection,
++	stickyHeader,
++	setStickyHeader,
++	stickyFooter,
++	setStickyFooter,
++}: ScrollableControlProps ) {
++	return (
++		<Stack direction="column" gap="sm" align="start">
++			<Stack direction="row" gap="lg" align="center">
++				<SizeSelector value={ size } onChange={ setSize } />
++				<DirectionSelector
++					value={ direction }
++					onChange={ setDirection }
++				/>
++			</Stack>
++			<StickyToggle
++				stickyHeader={ stickyHeader }
++				stickyFooter={ stickyFooter }
++				setStickyHeader={ setStickyHeader }
++				setStickyFooter={ setStickyFooter }
++			/>
++		</Stack>
++	);
++}
++
++/**
++ * When drawer content overflows the available space, `Drawer.Content`
++ * scrolls while `Drawer.Header` and `Drawer.Footer` stay pinned to the
++ * popup's edges. Separator lines appear only when there is off-screen
++ * content above the header or below the footer.
++ *
++ * To let the header or footer scroll with the body instead of staying
++ * pinned, render it *inside* `Drawer.Content` rather than as a sibling.
++ * The inline "Sticky header / Sticky footer" checkboxes toggle exactly
++ * that placement at runtime.
++ *
++ * Use the inline controls to change the popup `size`, `swipeDirection`,
++ * and sticky placement. The same controls render both outside and inside
++ * the drawer and stay in sync.
++ */
++export const Scrollable: Story = {
++	render: function ScrollableRender( args ) {
++		const [ size, setSize ] =
++			useState< ComponentProps< typeof Drawer.Popup >[ 'size' ] >();
++		const [ direction, setDirection ] = useState<
++			ComponentProps< typeof Drawer.Root >[ 'swipeDirection' ]
++		>( args.swipeDirection ?? 'left' );
++		const [ stickyHeader, setStickyHeader ] = useState( true );
++		const [ stickyFooter, setStickyFooter ] = useState( true );
++		const controlProps: ScrollableControlProps = {
++			size,
++			setSize,
++			direction,
++			setDirection,
++			stickyHeader,
++			setStickyHeader,
++			stickyFooter,
++			setStickyFooter,
++		};
++
++		const header = (
++			<Drawer.Header>
++				<Drawer.Title>Terms of service</Drawer.Title>
++				<Drawer.CloseIcon />
++			</Drawer.Header>
++		);
++		const footer = (
++			<Drawer.Footer>
++				<Drawer.Action variant="outline">Decline</Drawer.Action>
++				<Drawer.Action>Accept</Drawer.Action>
++			</Drawer.Footer>
++		);
++
++		return (
++			<Drawer.Root { ...args } swipeDirection={ direction }>
++				<Stack direction="column" gap="lg" align="start">
++					<ScrollableControls { ...controlProps } />
++					<Drawer.Trigger>Open Drawer</Drawer.Trigger>
++				</Stack>
++				<Drawer.Popup size={ size }>
++					{ stickyHeader && header }
++					<Drawer.Content>
++						{ ! stickyHeader && header }
++						<Stack direction="column" gap="lg">
++							<ScrollableControls { ...controlProps } />
++							{ Array.from( { length: 20 } ).map(
++								( _, index ) => (
++									<p key={ index } style={ { margin: 0 } }>
++										Paragraph { index + 1 }: Lorem ipsum
++										dolor sit amet, consectetur adipiscing
++										elit. Sed do eiusmod tempor incididunt
++										ut labore et dolore magna aliqua. Ut
++										enim ad minim veniam, quis nostrud
++										exercitation ullamco laboris nisi ut
++										aliquip ex ea commodo consequat.
++									</p>
++								)
++							) }
++						</Stack>
++						{ ! stickyFooter && footer }
++					</Drawer.Content>
++					{ stickyFooter && footer }
++				</Drawer.Popup>
++			</Drawer.Root>
++		);
++	},
++	argTypes: {
++		swipeDirection: { control: false },
++	},
++};
+diff --git a/packages/ui/src/drawer/style.module.css b/packages/ui/src/drawer/style.module.css
+index 79f1bc083ec03f..cdae283bd4f735 100644
+--- a/packages/ui/src/drawer/style.module.css
++++ b/packages/ui/src/drawer/style.module.css
+@@ -63,14 +63,24 @@
+ 		pointer-events: none;
+ 	}
+ 
++	/*
++	 * The popup is a flex column laying out three regions — header, content,
++	 * footer — as siblings. Scrolling lives on `Drawer.Content` (which wraps
++	 * Base UI's `_Drawer.Content`), not the popup. `overflow: hidden` clips
++	 * content to the rounded border; transform-based swipe animations are
++	 * unaffected by it. See `overlay-chrome.module.css` for the shared
++	 * chrome/content primitives.
++	 */
+ 	.popup {
+ 		--viewport-inset: var(--wpds-dimension-padding-2xl);
+ 
+ 		position: fixed;
+ 		z-index: var(--wp-ui-drawer-z-index, initial);
+ 		box-sizing: border-box;
+-		display: block;
++		display: flex;
++		flex-direction: column;
+ 		outline: 0;
++		overflow: hidden;
+ 		pointer-events: auto;
+ 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+ 		box-shadow: var(--wpds-elevation-lg);
+@@ -78,13 +88,6 @@
+ 		font-size: var(--wpds-typography-font-size-md);
+ 		line-height: var(--wpds-typography-line-height-md);
+ 		color: var(--wpds-color-fg-content-neutral);
+-		/*
+-		 * Scroll on the block axis. For left/right drawers, swipe is on the
+-		 * inline axis (no conflict). For up/down drawers, swipe dismissal only
+-		 * engages once scroll reaches an edge.
+-		 */
+-		overflow-block: auto;
+-		overscroll-behavior: contain;
+ 		touch-action: auto;
+ 
+ 		&[data-open],
+@@ -213,15 +216,56 @@
+ 		}
+ 	}
+ 
++	/*
++	 * Chrome + content primitives are centralized in
++	 * `overlay-chrome.module.css` and shared with `dialog/style.module.css`
++	 * and `alert-dialog/popup.tsx`. Separator coloring and the modal
++	 * overscroll rule live there too, keyed off the
++	 * `data-wp-ui-overlay-scroll-container` attribute set on `.content` by
++	 * `useOverlayScrollStateAttributes`.
++	 *
++	 * For up/down drawers Base UI's swipe-dismiss-on-scroll-edge logic
++	 * discovers the scrollable element by walking up from the touch target,
++	 * so moving scroll ownership from the popup onto `.content` remains
++	 * transparent to the gesture handling.
++	 */
++	.header {
++		composes: header from "../utils/css/overlay-chrome.module.css";
++	}
++
++	.footer {
++		composes: footer from "../utils/css/overlay-chrome.module.css";
++	}
++
++	.title {
++		composes: title from "../utils/css/overlay-chrome.module.css";
++	}
++
+ 	.content {
+-		padding: var(--wpds-dimension-padding-2xl);
++		composes: content from "../utils/css/overlay-chrome.module.css";
+ 	}
+ 
+ 	/*
+-	 * The popup is anchored to a physical edge regardless of writing direction
+-	 * (see `left: 0` / `right: 0` above), so the safe-area padding uses the
+-	 * matching physical side. `env(safe-area-inset-*)` is already physical,
+-	 * so pairing it with logical `padding-inline-*` would be wrong in RTL.
++	 * Push the close icon to the inline end even when the title is taken out
++	 * of flow (e.g. wrapped in `VisuallyHidden`, which sets `position:
++	 * absolute`). In that case `.title`'s `margin-inline-end: auto` is a
++	 * no-op because the title no longer participates in the flex layout, so
++	 * we also anchor the close icon itself.
++	 */
++	.header [data-wp-ui-drawer-close-icon] {
++		margin-inline-start: auto;
++	}
++
++	/*
++	 * Safe-area insets. The popup is anchored to a physical edge regardless
++	 * of writing direction (see `left: 0` / `right: 0` on `.popup` above),
++	 * so `env(safe-area-inset-*)` — which is already physical — is paired
++	 * with matching physical padding properties.
++	 *
++	 * For left/right drawers the inset lives on the scroll container itself.
++	 * For up/down drawers it lives on the chrome that occupies the popup's
++	 * anchored edge (pinned case); when that edge has no chrome sibling,
++	 * the scroll container carries the padding instead.
+ 	 */
+ 	.popup[data-swipe-direction="left"] .content {
+ 		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
+@@ -233,41 +277,19 @@
+ 		padding-right: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-right));
+ 	}
+ 
+-	.popup[data-swipe-direction="down"] .content {
+-		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
+-	}
+-
+-	.popup[data-swipe-direction="up"] .content {
++	.popup[data-swipe-direction="up"] > .header {
+ 		padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
+ 	}
+ 
+-	.header {
+-		display: flex;
+-		align-items: center;
+-		gap: var(--wpds-dimension-gap-sm);
+-		margin-bottom: var(--wpds-dimension-gap-lg);
++	.popup[data-swipe-direction="down"] > .footer {
++		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
+ 	}
+ 
+-	.title {
+-		color: var(--wpds-color-fg-content-neutral);
+-		--_gcd-heading-color: var(--wpds-color-fg-content-neutral);
+-
+-		margin-inline-end: auto;
+-		/* Workaround: the GCD shorthand `margin` overrides the longhand above.
+-		 * Keep both so the layout survives GCD removal. */
+-		--_gcd-heading-margin: 0 auto 0 0;
+-
+-		&:dir(rtl) {
+-			--_gcd-heading-margin: 0 0 0 auto;
+-		}
++	.popup[data-swipe-direction="up"] > .content:first-child {
++		padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
+ 	}
+ 
+-	.footer {
+-		display: flex;
+-		justify-content: flex-end;
+-		align-items: center;
+-		gap: var(--wpds-dimension-gap-sm);
+-		margin-top: var(--wpds-dimension-gap-lg);
+-		padding-top: var(--wpds-dimension-padding-lg);
++	.popup[data-swipe-direction="down"] > .content:last-child {
++		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
+ 	}
+ }
+diff --git a/packages/ui/src/drawer/test/index.test.tsx b/packages/ui/src/drawer/test/index.test.tsx
+index 081f1a64b317d6..87bc3c10758377 100644
+--- a/packages/ui/src/drawer/test/index.test.tsx
++++ b/packages/ui/src/drawer/test/index.test.tsx
+@@ -27,6 +27,7 @@ describe( 'Drawer', () => {
+ 		const titleRef = createRef< HTMLHeadingElement >();
+ 		const descriptionRef = createRef< HTMLParagraphElement >();
+ 		const closeIconRef = createRef< HTMLButtonElement >();
++		const contentRef = createRef< HTMLDivElement >();
+ 
+ 		render(
+ 			<Drawer.Root>
+@@ -38,9 +39,11 @@ describe( 'Drawer', () => {
+ 						</Drawer.Title>
+ 						<Drawer.CloseIcon ref={ closeIconRef } />
+ 					</Drawer.Header>
+-					<Drawer.Description ref={ descriptionRef }>
+-						A test description
+-					</Drawer.Description>
++					<Drawer.Content ref={ contentRef }>
++						<Drawer.Description ref={ descriptionRef }>
++							A test description
++						</Drawer.Description>
++					</Drawer.Content>
+ 					<Drawer.Footer ref={ footerRef }>
+ 						<Drawer.Action ref={ actionRef }>Close</Drawer.Action>
+ 					</Drawer.Footer>
+@@ -64,6 +67,7 @@ describe( 'Drawer', () => {
+ 		expect( footerRef.current ).toBeInstanceOf( HTMLElement );
+ 		expect( footerRef.current?.tagName ).toBe( 'FOOTER' );
+ 		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
++		expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
+ 	} );
+ 
+ 	it( 'renders Drawer.Header and supports render/className props', async () => {
+@@ -778,4 +782,316 @@ describe( 'Drawer', () => {
+ 			cleanup();
+ 		} );
+ 	} );
++
++	describe( 'overlay scroll container', () => {
++		it( 'marks Drawer.Content with data-wp-ui-overlay-scroll-container', async () => {
++			const user = userEvent.setup();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<Drawer.Root>
++					<Drawer.Trigger>Open</Drawer.Trigger>
++					<Drawer.Popup>
++						<Drawer.Title>Title</Drawer.Title>
++						<Drawer.Content ref={ contentRef }>
++							<p>Body</p>
++						</Drawer.Content>
++					</Drawer.Popup>
++				</Drawer.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			expect( contentRef.current ).toHaveAttribute(
++				'data-wp-ui-overlay-scroll-container'
++			);
++		} );
++
++		it( 'sets data-wp-ui-overlay-modal on the popup when modal is true', async () => {
++			const user = userEvent.setup();
++			const popupRef = createRef< HTMLDivElement >();
++
++			render(
++				<Drawer.Root modal>
++					<Drawer.Trigger>Open</Drawer.Trigger>
++					<Drawer.Popup ref={ popupRef }>
++						<Drawer.Title>Title</Drawer.Title>
++					</Drawer.Popup>
++				</Drawer.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			expect( popupRef.current ).toHaveAttribute(
++				'data-wp-ui-overlay-modal'
++			);
++		} );
++
++		it.each( [
++			[ 'false', false as const ],
++			[ 'trap-focus', 'trap-focus' as const ],
++		] )(
++			'omits data-wp-ui-overlay-modal on the popup when modal is %s',
++			async ( _label, modal ) => {
++				const user = userEvent.setup();
++				const popupRef = createRef< HTMLDivElement >();
++
++				render(
++					<Drawer.Root modal={ modal }>
++						<Drawer.Trigger>Open</Drawer.Trigger>
++						<Drawer.Popup ref={ popupRef }>
++							<Drawer.Title>Title</Drawer.Title>
++						</Drawer.Popup>
++					</Drawer.Root>
++				);
++
++				await user.click(
++					screen.getByRole( 'button', { name: 'Open' } )
++				);
++				await waitFor( () => {
++					expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++				} );
++
++				expect( popupRef.current ).not.toHaveAttribute(
++					'data-wp-ui-overlay-modal'
++				);
++			}
++		);
++
++		it( 'pins Drawer.Header when rendered as a sibling of Drawer.Content', async () => {
++			const user = userEvent.setup();
++			const popupRef = createRef< HTMLDivElement >();
++			const headerRef = createRef< HTMLElement >();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<Drawer.Root>
++					<Drawer.Trigger>Open</Drawer.Trigger>
++					<Drawer.Popup ref={ popupRef }>
++						<Drawer.Header ref={ headerRef }>
++							<Drawer.Title>Title</Drawer.Title>
++						</Drawer.Header>
++						<Drawer.Content ref={ contentRef }>
++							<p>Body</p>
++						</Drawer.Content>
++					</Drawer.Popup>
++				</Drawer.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( headerRef.current ).toBeInstanceOf( HTMLElement );
++			} );
++
++			expect( popupRef.current ).toContainElement( headerRef.current );
++			expect( popupRef.current ).toContainElement( contentRef.current );
++			expect( contentRef.current ).not.toContainElement(
++				headerRef.current
++			);
++			// And it sits *before* the scroll container — the CSS
++			// sticky-separator selectors rely on that DOM order.
++			const position = headerRef.current!.compareDocumentPosition(
++				contentRef.current!
++			);
++			expect(
++				// eslint-disable-next-line no-bitwise
++				position & Node.DOCUMENT_POSITION_FOLLOWING
++			).toBeTruthy();
++		} );
++
++		it( 'scrolls Drawer.Header with the body when nested inside Drawer.Content', async () => {
++			const user = userEvent.setup();
++			const headerRef = createRef< HTMLElement >();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<Drawer.Root>
++					<Drawer.Trigger>Open</Drawer.Trigger>
++					<Drawer.Popup>
++						<Drawer.Content ref={ contentRef }>
++							<Drawer.Header ref={ headerRef }>
++								<Drawer.Title>Title</Drawer.Title>
++							</Drawer.Header>
++							<p>Body</p>
++						</Drawer.Content>
++					</Drawer.Popup>
++				</Drawer.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( headerRef.current ).toBeInstanceOf( HTMLElement );
++			} );
++
++			expect( contentRef.current ).toContainElement( headerRef.current );
++		} );
++
++		it( 'invokes a consumer-supplied onScroll on Drawer.Content', async () => {
++			const user = userEvent.setup();
++			const onScroll = jest.fn();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<Drawer.Root>
++					<Drawer.Trigger>Open</Drawer.Trigger>
++					<Drawer.Popup>
++						<Drawer.Title>Title</Drawer.Title>
++						<Drawer.Content
++							ref={ contentRef }
++							onScroll={ onScroll }
++						>
++							<p>Body</p>
++						</Drawer.Content>
++					</Drawer.Popup>
++				</Drawer.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			act( () => {
++				contentRef.current?.dispatchEvent(
++					new Event( 'scroll', { bubbles: true } )
++				);
++			} );
++
++			expect( onScroll ).toHaveBeenCalledTimes( 1 );
++		} );
++
++		it( 'toggles tabindex="0" on Drawer.Content based on overflow', async () => {
++			const user = userEvent.setup();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<Drawer.Root>
++					<Drawer.Trigger>Open</Drawer.Trigger>
++					<Drawer.Popup>
++						<Drawer.Title>Title</Drawer.Title>
++						<Drawer.Content ref={ contentRef }>
++							<p>Body</p>
++						</Drawer.Content>
++					</Drawer.Popup>
++				</Drawer.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			const content = contentRef.current!;
++			Object.defineProperty( content, 'scrollHeight', {
++				configurable: true,
++				value: 500,
++			} );
++			Object.defineProperty( content, 'clientHeight', {
++				configurable: true,
++				value: 100,
++			} );
++			Object.defineProperty( content, 'scrollTop', {
++				configurable: true,
++				value: 0,
++			} );
++
++			act( () => {
++				content.dispatchEvent(
++					new Event( 'scroll', { bubbles: true } )
++				);
++			} );
++
++			expect( content ).toHaveAttribute( 'tabindex', '0' );
++
++			Object.defineProperty( content, 'scrollHeight', {
++				configurable: true,
++				value: 100,
++			} );
++
++			act( () => {
++				content.dispatchEvent(
++					new Event( 'scroll', { bubbles: true } )
++				);
++			} );
++
++			expect( content ).not.toHaveAttribute( 'tabindex' );
++		} );
++
++		it( 'toggles data-wp-ui-overlay-scrolled-from-* based on scroll position', async () => {
++			const user = userEvent.setup();
++			const contentRef = createRef< HTMLDivElement >();
++
++			render(
++				<Drawer.Root>
++					<Drawer.Trigger>Open</Drawer.Trigger>
++					<Drawer.Popup>
++						<Drawer.Title>Title</Drawer.Title>
++						<Drawer.Content ref={ contentRef }>
++							<p>Body</p>
++						</Drawer.Content>
++					</Drawer.Popup>
++				</Drawer.Root>
++			);
++
++			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
++			await waitFor( () => {
++				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
++			} );
++
++			// JSDOM doesn't lay out elements, so we simulate an
++			// overflowing scroll container by stubbing layout metrics
++			// per scenario and dispatching a scroll event.
++			const content = contentRef.current!;
++			Object.defineProperty( content, 'scrollHeight', {
++				configurable: true,
++				value: 500,
++			} );
++			Object.defineProperty( content, 'clientHeight', {
++				configurable: true,
++				value: 100,
++			} );
++
++			const setScrollTop = ( value: number ) => {
++				Object.defineProperty( content, 'scrollTop', {
++					configurable: true,
++					value,
++				} );
++				act( () => {
++					content.dispatchEvent(
++						new Event( 'scroll', { bubbles: true } )
++					);
++				} );
++			};
++
++			setScrollTop( 0 );
++			expect( content ).not.toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-top'
++			);
++			expect( content ).toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-bottom'
++			);
++
++			setScrollTop( 200 );
++			expect( content ).toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-top'
++			);
++			expect( content ).toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-bottom'
++			);
++
++			setScrollTop( 400 );
++			expect( content ).toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-top'
++			);
++			expect( content ).not.toHaveAttribute(
++				'data-wp-ui-overlay-scrolled-from-bottom'
++			);
++		} );
++	} );
+ } );
+diff --git a/packages/ui/src/drawer/types.ts b/packages/ui/src/drawer/types.ts
+index 20c29c4728926a..886af06bdc2f17 100644
+--- a/packages/ui/src/drawer/types.ts
++++ b/packages/ui/src/drawer/types.ts
+@@ -99,6 +99,42 @@ export interface HeaderProps extends ComponentProps< 'header' > {
+ 	children?: ReactNode;
+ }
+ 
++export interface ContentProps extends ComponentProps< 'div' > {
++	/**
++	 * The body content to be rendered inside the scroll container.
++	 */
++	children?: ReactNode;
++	/**
++	 * The scroll region automatically becomes a keyboard-reachable tab
++	 * stop (`tabindex="0"`) whenever the body overflows, so keyboard
++	 * users can arrow-scroll the region (WCAG 2.1.1). It becomes
++	 * non-tabbable again as soon as the content no longer overflows.
++	 *
++	 * If you supply `tabIndex` explicitly, your value wins and is never
++	 * overwritten — including `tabIndex={ -1 }` to opt out of the
++	 * automatic tab stop entirely, and including overrides applied
++	 * after the component had already managed the value.
++	 *
++	 * Two narrow edge cases:
++	 * - If you later *remove* an explicit `tabIndex` at runtime, the
++	 *   component will resume managing it on the next overflow tick; it
++	 *   can't distinguish a previous explicit opt-out from an
++	 *   unconfigured state.
++	 * - Passing `tabIndex={ 0 }` while the body overflows produces a
++	 *   value identical to the auto-managed one, so the component can
++	 *   no longer tell the two apart and may strip it on the next
++	 *   non-overflow tick. Pick a different value (or rely on the
++	 *   default behavior, which is already `0` while overflowing).
++	 *
++	 * Note: the scroll region is intentionally rendered without
++	 * `role` / `aria-label`, so screen readers don't announce a
++	 * generic "scrollable" landmark on top of the drawer's existing
++	 * heading + body; the surrounding `Drawer.Title` and body content
++	 * provide the context.
++	 */
++	tabIndex?: number;
++}
++
+ export interface TitleProps extends ComponentProps< 'h2' > {
+ 	/**
+ 	 * The title content to be rendered. This serves as both the visible
+diff --git a/packages/ui/src/popover/popup.tsx b/packages/ui/src/popover/popup.tsx
+index 52eb7c6e6494f0..95234c7b492d61 100644
+--- a/packages/ui/src/popover/popup.tsx
++++ b/packages/ui/src/popover/popup.tsx
+@@ -54,7 +54,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
+ ) {
+ 	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
+ 		initialFocus,
+-		deprioritizedAttribute: CLOSE_ATTR,
++		deprioritizedAttributes: [ CLOSE_ATTR ],
+ 	} );
+ 	const mergedPopupRef = useMergeRefs( [ ref, popupRef ] );
+ 
+diff --git a/packages/ui/src/utils/css/overlay-chrome.module.css b/packages/ui/src/utils/css/overlay-chrome.module.css
+new file mode 100644
+index 00000000000000..2979a61377e5d0
+--- /dev/null
++++ b/packages/ui/src/utils/css/overlay-chrome.module.css
+@@ -0,0 +1,222 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	/*
++	 * Shared chrome + scroll-container primitives for overlay popups
++	 * (Dialog, AlertDialog, Drawer).
++	 *
++	 * Layout model: the popup is a vertical flex column with three regions
++	 * — `.header`, `.content`, `.footer`. Only `.content` scrolls; the
++	 * chrome sits at the popup's block-axis edges as natural flex siblings.
++	 *
++	 * Sticky opt-out for `Dialog` / `Drawer` is expressed in the DOM by
++	 * placing `Dialog.Header` / `Dialog.Footer` (or the Drawer equivalents)
++	 * inside `Dialog.Content` / `Drawer.Content` so they scroll with the
++	 * body; AlertDialog exposes the same choice via `stickyHeader` /
++	 * `stickyFooter` props, since it owns its internal DOM.
++	 */
++
++	/*
++	 * Chrome: flex row, no background (the popup already paints it), no
++	 * sticky positioning. Block-axis padding is asymmetric: the outer
++	 * side (popup edge) uses `padding-2xl` to match the inset that used
++	 * to live on the popup; the inner side (toward `.content`) uses the
++	 * tokenized `gap-lg` in full.
++	 *
++	 * No separator border here — the base chrome has none. The pinned
++	 * case (where a separator is needed) adds a `border-block-*: 1px
++	 * solid transparent` on the inner side and subtracts 1px from that
++	 * same padding so the chrome's overall border-box height stays
++	 * identical to the non-pinned case. See the `:has(~ .content)` /
++	 * `.content ~` rules below.
++	 *
++	 * `min-height` on `.header` keeps the header footprint stable whether
++	 * or not a close icon is rendered (notably the AlertDialog case, which
++	 * has no close button).
++	 */
++	.header {
++		display: flex;
++		align-items: center;
++		gap: var(--wpds-dimension-gap-sm);
++		padding-block: var(--wpds-dimension-padding-2xl) var(--wpds-dimension-gap-lg);
++		padding-inline: var(--wpds-dimension-padding-2xl);
++		/* TODO: refactor to a DS element size token when available. */
++		min-height: 32px;
++	}
++
++	.footer {
++		display: flex;
++		justify-content: flex-end;
++		align-items: center;
++		gap: var(--wpds-dimension-gap-sm);
++		padding-block: var(--wpds-dimension-gap-lg) var(--wpds-dimension-padding-2xl);
++		padding-inline: var(--wpds-dimension-padding-2xl);
++	}
++
++	/*
++	 * Overlay heading defaults: anchor the title to the inline start and
++	 * set the neutral text color explicitly. `--_gcd-heading-color` and
++	 * `--_gcd-heading-margin` defend against the heading-reset rules in
++	 * `global-css-defense.module.css`, which would otherwise take over a
++	 * `<h2>` rendered via `Text`.
++	 */
++	.title {
++		color: var(--wpds-color-fg-content-neutral);
++		--_gcd-heading-color: var(--wpds-color-fg-content-neutral);
++
++		margin-inline-end: auto;
++		--_gcd-heading-margin: 0 auto 0 0;
++
++		&:dir(rtl) {
++			--_gcd-heading-margin: 0 0 0 auto;
++		}
++	}
++
++	/*
++	 * Scroll container. `flex: 1 1 auto` + `min-block-size: 0` lets it
++	 * shrink below its content size so `overflow-block: auto` can actually
++	 * show a scrollbar when content exceeds the available space. Default
++	 * padding is `padding-2xl` on all sides; the yield rules below strip
++	 * block padding when chrome occupies that edge.
++	 *
++	 * Scrolling is intentionally block-axis-only. `overflow-inline: hidden`
++	 * clips wide content instead of introducing a horizontal scrollbar:
++	 * the sibling chrome doesn't scroll inline, the popup edge already
++	 * clips, and `useOverlayScrollStateAttributes` only tracks block-axis
++	 * overflow (tabindex + separator state). Overlay consumers should
++	 * constrain content width rather than rely on horizontal scroll.
++	 */
++	.content {
++		flex: 1 1 auto;
++		min-block-size: 0;
++		overflow-block: auto;
++		overflow-inline: hidden;
++		padding: var(--wpds-dimension-padding-2xl);
++
++		/*
++		 * The shared `outset-ring--focus-visible` utility (composed by
++		 * the Content components) uses an `outline-offset` of `+1px`,
++		 * which for this scroll container would put the ring outside
++		 * the popup's rounded corners and have it clipped by the
++		 * popup's `overflow: hidden`. Inset the ring by the focus
++		 * width instead, so it sits flush inside the content box.
++		 *
++		 * The shared utility's transition shorthand (`transition:
++		 * outline …`) only animates outline-color and outline-width,
++		 * not outline-offset, so the negative offset applied here is
++		 * static — visually, the ring still fades in/out via color
++		 * change while the offset stays put.
++		 */
++		&:focus-visible {
++			outline-offset: calc(var(--wpds-border-width-focus) * -1);
++		}
++	}
++
++	/*
++	 * Pinned chrome: reserve 1px on the inner side for the separator
++	 * border and subtract that same 1px from the adjacent padding. Net
++	 * effect on block-axis height is zero — the chrome's overall
++	 * border-box matches the non-pinned case — while the border provides
++	 * a fixed slot that the scroll-state rules below colorize.
++	 *
++	 * `.content` then drops its matching block-axis padding on that
++	 * edge, because the chrome already supplies the popup-edge
++	 * `padding-2xl` + inner `gap-lg`.
++	 *
++	 * Sibling relationships intentionally use the general-sibling
++	 * combinator (`~`) and `:has(~ …)` instead of the adjacent
++	 * combinator, so an extra element between header / content / footer
++	 * (custom wrappers, an a11y live region, etc.) doesn't silently
++	 * break the pinned layout. The expected DOM shape is still
++	 * header → content → footer; additional siblings in between are
++	 * tolerated.
++	 */
++	.header:has(~ .content) {
++		padding-block-end: calc(var(--wpds-dimension-gap-lg) - 1px);
++		border-block-end: 1px solid transparent;
++	}
++
++	.header ~ .content {
++		padding-block-start: 0;
++	}
++
++	.content ~ .footer {
++		padding-block-start: calc(var(--wpds-dimension-gap-lg) - 1px);
++		border-block-start: 1px solid transparent;
++	}
++
++	.content:has(~ .footer) {
++		padding-block-end: 0;
++	}
++
++	/*
++	 * Non-pinned case: when `.header` / `.footer` live inside `.content`
++	 * (scrolls with body). The scroll container already supplies the
++	 * inline popup-edge padding, so nested chrome always collapses its
++	 * own `padding-inline` regardless of its position inside `.content`
++	 * (no `:first-child` / `:last-child` guard). Block-axis padding is
++	 * only collapsed at the scroll edges — the `:first-child` /
++	 * `:last-child` rules keep the body's `gap-lg` visual separation
++	 * between the chrome and any preceding / following siblings inside
++	 * `.content`. No border — the separator is specific to the pinned
++	 * case.
++	 */
++	.content > .header {
++		padding-inline: 0;
++	}
++
++	.content > .header:first-child {
++		padding-block-start: 0;
++	}
++
++	.content > .footer {
++		padding-inline: 0;
++	}
++
++	.content > .footer:last-child {
++		padding-block-end: 0;
++	}
++
++	/*
++	 * Separator coloring. The transparent border on the pinned chrome is
++	 * colorized when the adjacent scroll container reports off-screen
++	 * content in that direction. Toggling the color (not the border's
++	 * existence) means no layout shift on scroll.
++	 *
++	 * `useOverlayScrollStateAttributes` owns the
++	 * `data-wp-ui-overlay-scrolled-from-*` toggles, so CSS handles the
++	 * visual state without React re-rendering on scroll.
++	 *
++	 * Forced-colors note: `border-color: transparent` is preserved as-is
++	 * in forced-colors mode per spec, so the default (non-scrolled)
++	 * state stays invisible. When the color toggles to a token value
++	 * below, the UA substitutes a system color (typically `CanvasText`),
++	 * so the separator remains visible in forced-colors mode without
++	 * any additional rules.
++	 */
++	.header:has(~ [data-wp-ui-overlay-scroll-container][data-wp-ui-overlay-scrolled-from-top]) {
++		border-block-end-color: var(--wpds-color-stroke-surface-neutral);
++	}
++
++	[data-wp-ui-overlay-scroll-container][data-wp-ui-overlay-scrolled-from-bottom] ~ .footer {
++		border-block-start-color: var(--wpds-color-stroke-surface-neutral);
++	}
++
++	/*
++	 * `overscroll-behavior: contain` stops scroll chaining from the overlay
++	 * to whatever sits behind it. We only want that when the overlay is
++	 * modal: a non-modal overlay lets the page underneath remain
++	 * interactive, and chaining scroll to the page there is the intuitive
++	 * behavior.
++	 *
++	 * `data-wp-ui-overlay-modal` is toggled on the popup by each component
++	 * (Dialog / Drawer mirror their `modal` prop; AlertDialog is always
++	 * modal). The scroll container always lives inside the popup —
++	 * `Dialog.Content` / `Drawer.Content` for the public API, or an
++	 * internal container for AlertDialog — so a single descendant
++	 * selector anchored at the modal popup covers all three.
++	 */
++	[data-wp-ui-overlay-modal] [data-wp-ui-overlay-scroll-container] {
++		overscroll-behavior: contain;
++	}
++}
+diff --git a/packages/ui/src/utils/test/use-deprioritized-initial-focus.test.tsx b/packages/ui/src/utils/test/use-deprioritized-initial-focus.test.tsx
+index 9b5096ad91bdf9..d3beef871b497f 100644
+--- a/packages/ui/src/utils/test/use-deprioritized-initial-focus.test.tsx
++++ b/packages/ui/src/utils/test/use-deprioritized-initial-focus.test.tsx
+@@ -17,7 +17,7 @@ function TestHarness( {
+ } ) {
+ 	const result = useDeprioritizedInitialFocus( {
+ 		initialFocus,
+-		deprioritizedAttribute: ATTR,
++		deprioritizedAttributes: [ ATTR ],
+ 	} );
+ 
+ 	useEffect( () => {
+@@ -156,7 +156,7 @@ describe( 'useDeprioritizedInitialFocus', () => {
+ 			} ) {
+ 				const result = useDeprioritizedInitialFocus( {
+ 					initialFocus: undefined,
+-					deprioritizedAttribute: ATTR,
++					deprioritizedAttributes: [ ATTR ],
+ 				} );
+ 
+ 				useEffect( () => {
+@@ -200,7 +200,7 @@ describe( 'useDeprioritizedInitialFocus', () => {
+ 			} ) {
+ 				const result = useDeprioritizedInitialFocus( {
+ 					initialFocus: undefined,
+-					deprioritizedAttribute: ATTR,
++					deprioritizedAttributes: [ ATTR ],
+ 				} );
+ 
+ 				useEffect( () => {
+diff --git a/packages/ui/src/utils/use-deprioritized-initial-focus.ts b/packages/ui/src/utils/use-deprioritized-initial-focus.ts
+index ac1dbe97ddc6bb..c729092a345e8e 100644
+--- a/packages/ui/src/utils/use-deprioritized-initial-focus.ts
++++ b/packages/ui/src/utils/use-deprioritized-initial-focus.ts
+@@ -1,5 +1,5 @@
+ import type { Popover as _Popover } from '@base-ui/react/popover';
+-import { useMemo, useRef } from '@wordpress/element';
++import { useRef } from '@wordpress/element';
+ import { tabbable } from 'tabbable';
+ 
+ /**
+@@ -24,39 +24,43 @@ const getTabbableOptions = () => ( {
+ 
+ /**
+  * Returns a resolved `initialFocus` value that deprioritizes elements
+- * marked with a given data attribute (e.g. a close icon), and an internal
+- * ref that must be merged onto the popup element.
++ * marked with any of the given data attributes (e.g. a close icon, a
++ * library-managed scroll container), and an internal ref that must be
++ * merged onto the popup element.
+  *
+  * When `initialFocus` is `undefined` or `true` (the default behavior),
+  * the hook replaces it with a callback that:
+  * 1. On touch interactions — focuses the popup element itself (preventing
+  *    the virtual keyboard on Android), matching Base UI's default.
+  * 2. On other interactions — returns the first tabbable element that does
+- *    *not* carry `deprioritizedAttribute`. Falls back to Base UI's default
+- *    when the deprioritized element is the only tabbable element.
++ *    *not* carry any of `deprioritizedAttributes`. Falls back to Base
++ *    UI's default when every tabbable element is deprioritized.
+  *
+  * All other `initialFocus` values (`false`, `RefObject`, callback) pass
+  * through unchanged.
+  *
+  * @param props
+- * @param props.initialFocus           The consumer-provided `initialFocus` value.
+- * @param props.deprioritizedAttribute The data attribute whose elements should be deprioritized.
++ * @param props.initialFocus            The consumer-provided `initialFocus` value.
++ * @param props.deprioritizedAttributes The data attributes whose elements should be deprioritized.
+  */
+ export function useDeprioritizedInitialFocus( {
+ 	initialFocus,
+-	deprioritizedAttribute,
++	deprioritizedAttributes,
+ }: {
+ 	initialFocus: InitialFocus;
+-	deprioritizedAttribute: string;
++	deprioritizedAttributes: string[];
+ } ) {
+ 	const popupRef = useRef< HTMLDivElement >( null );
+ 
+-	const resolvedInitialFocus = useMemo( (): InitialFocus => {
+-		if ( initialFocus !== undefined && initialFocus !== true ) {
+-			return initialFocus;
+-		}
+-
+-		return ( interactionType ): HTMLElement | boolean | null => {
++	// Returning a fresh callback on every render is intentional. Base UI
++	// stores `initialFocus` via `useValueAsRef` (see its FloatingFocusManager
++	// source) and reads it through `ref.current` only at open time, so
++	// reference identity doesn't affect behavior. Skipping `useMemo` also
++	// avoids either forcing callers to memoize their attributes array or
++	// fighting the React Compiler with a stringified dep key.
++	let resolvedInitialFocus: InitialFocus = initialFocus;
++	if ( initialFocus === undefined || initialFocus === true ) {
++		resolvedInitialFocus = ( interactionType ) => {
+ 			if ( interactionType === 'touch' ) {
+ 				return popupRef.current ?? true;
+ 			}
+@@ -70,7 +74,9 @@ export function useDeprioritizedInitialFocus( {
+ 			for ( const el of tabbables ) {
+ 				if (
+ 					el instanceof HTMLElement &&
+-					! el.hasAttribute( deprioritizedAttribute )
++					! deprioritizedAttributes.some( ( attr ) =>
++						el.hasAttribute( attr )
++					)
+ 				) {
+ 					return el;
+ 				}
+@@ -78,7 +84,7 @@ export function useDeprioritizedInitialFocus( {
+ 
+ 			return true;
+ 		};
+-	}, [ initialFocus, deprioritizedAttribute ] );
++	}
+ 
+ 	return { resolvedInitialFocus, popupRef };
+ }
+diff --git a/packages/ui/src/utils/use-overlay-scroll-state-attributes.ts b/packages/ui/src/utils/use-overlay-scroll-state-attributes.ts
+new file mode 100644
+index 00000000000000..f65b1ed67100d4
+--- /dev/null
++++ b/packages/ui/src/utils/use-overlay-scroll-state-attributes.ts
+@@ -0,0 +1,272 @@
++import type { UIEvent, UIEventHandler } from 'react';
++import { useCallback, useLayoutEffect, useState } from '@wordpress/element';
++
++export const SCROLL_CONTAINER_ATTR = 'data-wp-ui-overlay-scroll-container';
++const SCROLLED_FROM_TOP_ATTR = 'data-wp-ui-overlay-scrolled-from-top';
++const SCROLLED_FROM_BOTTOM_ATTR = 'data-wp-ui-overlay-scrolled-from-bottom';
++/**
++ * Marks a `tabindex` that this hook installed, so subsequent runs can tell
++ * a hook-managed tabindex apart from one the consumer set on the element
++ * themselves.
++ *
++ * Internal: the constant is not exported, but the literal string is named
++ * in the public JSDoc on `useOverlayScrollStateAttributes` so consumers
++ * grepping for "why does this element have a `tabindex='0'` I didn't set?"
++ * can find the breadcrumb. If this string changes, update the JSDoc too.
++ */
++const SCROLL_TABBABLE_FLAG_ATTR = 'data-wp-ui-overlay-scroll-tabbable';
++
++/**
++ * Allow fractional-pixel rounding when comparing scroll offsets. Browsers can
++ * report `scrollTop + clientHeight` as slightly less than `scrollHeight` even
++ * when fully scrolled to the bottom.
++ */
++const SCROLL_END_EPSILON = 1;
++
++/**
++ * Detect consumer takeover of a previously hook-managed `tabindex` after the
++ * hook had already installed its own: if the flag is set but the current
++ * `tabindex` is no longer `"0"`, the consumer has overridden our value. Drop
++ * the flag so subsequent ticks treat the `tabindex` as consumer-owned and
++ * never touch it again.
++ *
++ * Limitation: the heuristic compares the DOM attribute, so a consumer who
++ * passes `tabIndex={ 0 }` explicitly is indistinguishable from our own
++ * managed `"0"` and would still be cleaned up on the next non-overflow
++ * tick. See the contract paragraph on `useOverlayScrollStateAttributes`.
++ *
++ * @param el The scroll container.
++ */
++function reconcileTabbableFlag( el: HTMLElement ) {
++	if (
++		el.hasAttribute( SCROLL_TABBABLE_FLAG_ATTR ) &&
++		el.getAttribute( 'tabindex' ) !== '0'
++	) {
++		el.removeAttribute( SCROLL_TABBABLE_FLAG_ATTR );
++	}
++}
++
++function updateScrollAttributes( el: HTMLElement ) {
++	const { scrollTop, clientHeight, scrollHeight } = el;
++	const overflows = scrollHeight - clientHeight > SCROLL_END_EPSILON;
++
++	el.toggleAttribute( SCROLLED_FROM_TOP_ATTR, scrollTop > 0 );
++	el.toggleAttribute(
++		SCROLLED_FROM_BOTTOM_ATTR,
++		scrollTop + clientHeight < scrollHeight - SCROLL_END_EPSILON
++	);
++
++	// Keyboard-scrollable regions must be reachable via Tab (WCAG 2.1.1),
++	// but adding a stray tab stop to a non-scrolling `<div>` is an
++	// anti-pattern. Toggle `tabindex="0"` only while the element actually
++	// overflows. The flag attribute guards against clobbering a
++	// consumer-supplied tabindex: we only touch attributes we installed.
++
++	// Takeover-after-install: detect a consumer who started overriding
++	// our managed `"0"` *after* the hook installed it (e.g. a re-render
++	// passing `tabIndex={ -1 }`). The flag is dropped so the install /
++	// cleanup branches below leave the consumer's value untouched.
++	reconcileTabbableFlag( el );
++
++	if ( overflows ) {
++		// Pre-install opt-out: a consumer-supplied `tabindex` (including
++		// `tabindex="-1"` to hide the region from Tab order) keeps its
++		// value because the flag is never installed in the first place.
++		// If that consumer-supplied value is later *removed*, the hook
++		// will install its own on the next overflow tick — the DOM
++		// attribute alone can't distinguish a prior explicit opt-out
++		// from an unconfigured state.
++		if (
++			! el.hasAttribute( SCROLL_TABBABLE_FLAG_ATTR ) &&
++			el.getAttribute( 'tabindex' ) === null
++		) {
++			el.setAttribute( 'tabindex', '0' );
++			el.setAttribute( SCROLL_TABBABLE_FLAG_ATTR, '' );
++		}
++	} else if ( el.hasAttribute( SCROLL_TABBABLE_FLAG_ATTR ) ) {
++		el.removeAttribute( 'tabindex' );
++		el.removeAttribute( SCROLL_TABBABLE_FLAG_ATTR );
++	}
++}
++
++const HOOK_OWNED_ATTRS = [
++	SCROLL_CONTAINER_ATTR,
++	SCROLLED_FROM_TOP_ATTR,
++	SCROLLED_FROM_BOTTOM_ATTR,
++] as const;
++
++function cleanupScrollAttributes( el: HTMLElement ) {
++	for ( const attr of HOOK_OWNED_ATTRS ) {
++		el.removeAttribute( attr );
++	}
++	// Reconcile first so a flag left over from a consumer-takeover never
++	// causes us to clobber the consumer's `tabindex` here.
++	reconcileTabbableFlag( el );
++	// After reconciliation the flag is set only when the current
++	// `tabindex` is still `"0"` (i.e. ours). Any other value belongs to
++	// the consumer and is left alone.
++	if ( el.hasAttribute( SCROLL_TABBABLE_FLAG_ATTR ) ) {
++		el.removeAttribute( 'tabindex' );
++		el.removeAttribute( SCROLL_TABBABLE_FLAG_ATTR );
++	}
++}
++
++/**
++ * Keeps `data-wp-ui-overlay-scrolled-from-top` and
++ * `data-wp-ui-overlay-scrolled-from-bottom` attributes in sync with a
++ * scrollable overlay element's scroll position, and marks the element with
++ * `data-wp-ui-overlay-scroll-container` so shared CSS (see
++ * `overlay-chrome.module.css`) can target it without coupling to a specific
++ * class name. Descendant selectors (e.g. sticky header/footer chrome) read
++ * these attributes to toggle their separator border without forcing a React
++ * re-render on every scroll frame.
++ *
++ * When the element overflows, a `tabindex="0"` is also installed so keyboard
++ * users can focus the region and arrow-scroll it (WCAG 2.1.1). The tabindex
++ * is removed again as soon as the element no longer overflows — a stray tab
++ * stop on a non-scrolling region is an anti-pattern. An internal flag
++ * attribute (`data-wp-ui-overlay-scroll-tabbable`) marks tabindex values
++ * the hook installed, so a consumer-supplied `tabindex` is never
++ * overwritten.
++ *
++ * Tabindex contract:
++ * - **Pre-install opt-out**: a `tabindex` set on the element before the
++ *   first overflow is detected is left alone forever. The flag is never
++ *   installed, so the hook never owns the attribute. (This means
++ *   `tabIndex={ -1 }` on `Dialog.Content` / `Drawer.Content` reliably
++ *   suppresses the auto tab stop.)
++ * - **Takeover after install**: if the consumer overrides the hook's
++ *   `"0"` with a *different* value after the fact, the flag is dropped
++ *   on the next tick (`reconcileTabbableFlag`) and the consumer's value
++ *   is preserved through subsequent overflow / non-overflow transitions
++ *   and through cleanup.
++ * - **Indistinguishable case**: a consumer who passes `tabIndex={ 0 }`
++ *   explicitly while the hook also has `"0"` installed cannot be
++ *   detected — the DOM attribute is identical to the hook-managed
++ *   value, so the hook will still strip it on the next non-overflow
++ *   tick. This is rarely intentional (the consumer's `0` matches the
++ *   hook's behavior anyway), but consumers needing a guaranteed
++ *   sticky `0` should avoid relying on it across overflow flips.
++ *
++ * Overflow detection is block-axis-only. Overlay popups are expected to
++ * constrain content width (`overlay-chrome.module.css` clips `.content`
++ * with `overflow-inline: hidden`); horizontal scrolling is intentionally
++ * not supported, so this hook doesn't toggle tabindex on inline-axis
++ * overflow and the scroll-state attributes don't track it.
++ *
++ * Returns a callback `ref` that the caller must attach to the scroll
++ * container, and an `onScroll` handler to wire up to the same element. A
++ * callback ref (not a `RefObject`) is used because overlay libraries like
++ * Base UI mount the popup DOM lazily when the overlay opens, so the
++ * attributes must be initialized the moment the node is attached, not when
++ * the host component first renders. `useState` also absorbs repeated
++ * attachments of the same node (Strict Mode remount, stable refs) without
++ * re-running the effect.
++ *
++ * Change detection combines a `ResizeObserver` scoped to the container
++ * and its direct children (to catch flex-layout growth) with a
++ * `MutationObserver` on direct-child additions/removals only (to keep
++ * the resize-observer set in sync as direct children come and go).
++ *
++ * Deeper subtree mutations are intentionally not observed: in practice,
++ * any descendant whose growth changes the scroll size also propagates a
++ * resize up the layout tree, so the existing `ResizeObserver` on direct
++ * children catches it. Watching the full subtree would fan out the
++ * mutation callback over every text-node insertion in content-heavy
++ * overlays (rich-text editors, virtualized lists), which isn't worth
++ * the cost of the rare deep-mutation-without-resize case. Revisit
++ * (and consider rAF-coalescing the callback) if a real consumer hits
++ * an attribute-staleness regression.
++ *
++ * Once CSS scroll-state container queries are supported across target
++ * browsers, both the data attributes and this hook can be replaced with
++ * `@container scroll-state(scrollable: top)` / `(scrollable: bottom)`.
++ * See: https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Conditional_rules/Container_scroll-state_queries
++ *
++ * @param onScroll Optional `onScroll` from the parent; invoked after the
++ *                 overlay scroll-state attributes are updated, so by the
++ *                 time this handler runs, `data-wp-ui-overlay-scrolled-*`
++ *                 on `event.currentTarget` already reflect the post-scroll
++ *                 state.
++ */
++export function useOverlayScrollStateAttributes<
++	T extends HTMLElement = HTMLElement,
++>( onScroll?: UIEventHandler< T > | undefined ) {
++	const [ node, setNode ] = useState< T | null >( null );
++
++	const ref = useCallback( ( el: T | null ) => {
++		setNode( el );
++	}, [] );
++
++	useLayoutEffect( () => {
++		if ( ! node ) {
++			return;
++		}
++
++		node.setAttribute( SCROLL_CONTAINER_ATTR, '' );
++		updateScrollAttributes( node );
++
++		if ( typeof ResizeObserver === 'undefined' ) {
++			return () => {
++				cleanupScrollAttributes( node );
++			};
++		}
++
++		const resizeObserver = new ResizeObserver( () => {
++			updateScrollAttributes( node );
++		} );
++		resizeObserver.observe( node );
++		for ( const child of Array.from( node.children ) ) {
++			resizeObserver.observe( child );
++		}
++
++		let mutationObserver: MutationObserver | undefined;
++		if ( typeof MutationObserver !== 'undefined' ) {
++			mutationObserver = new MutationObserver( ( records ) => {
++				for ( const record of records ) {
++					// Only direct-child additions/removals affect what the
++					// ResizeObserver is observing; deeper descendant changes
++					// reach us through this callback for attribute refresh,
++					// but we don't observe them individually to keep the
++					// cost bounded on large subtrees.
++					if ( record.target === node ) {
++						for ( const added of Array.from( record.addedNodes ) ) {
++							if ( added instanceof Element ) {
++								resizeObserver.observe( added );
++							}
++						}
++						for ( const removed of Array.from(
++							record.removedNodes
++						) ) {
++							if ( removed instanceof Element ) {
++								resizeObserver.unobserve( removed );
++							}
++						}
++					}
++				}
++				updateScrollAttributes( node );
++			} );
++			// Direct children only — see the JSDoc above for why we
++			// intentionally don't observe the full subtree.
++			mutationObserver.observe( node, {
++				childList: true,
++			} );
++		}
++
++		return () => {
++			resizeObserver.disconnect();
++			mutationObserver?.disconnect();
++			cleanupScrollAttributes( node );
++		};
++	}, [ node ] );
++
++	const handleScroll = useCallback(
++		( event: UIEvent< T > ) => {
++			updateScrollAttributes( event.currentTarget );
++			onScroll?.( event );
++		},
++		[ onScroll ]
++	);
++
++	return { ref, onScroll: handleScroll };
++}

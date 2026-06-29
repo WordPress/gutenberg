@@ -1,0 +1,87 @@
+diff --git a/packages/components/src/form-token-field/index.js b/packages/components/src/form-token-field/index.js
+index 18c05f4f0ffa45..87563268d18221 100644
+--- a/packages/components/src/form-token-field/index.js
++++ b/packages/components/src/form-token-field/index.js
+@@ -530,6 +530,7 @@ class FormTokenField extends Component {
+ 			label = __( 'Add item' ),
+ 			instanceId,
+ 			className,
++			help,
+ 		} = this.props;
+ 		const { isExpanded } = this.state;
+ 		const classes = classnames( className, 'components-form-token-field__input-container', {
+@@ -551,6 +552,14 @@ class FormTokenField extends Component {
+ 			} );
+ 		}
+ 
++		const howTo = !! help ? {
++			className: 'components-form-token-field__help',
++			text: help,
++		} : {
++			className: 'screen-reader-text',
++			text: __( 'Separate with commas' ),
++		};
++
+ 		// Disable reason: There is no appropriate role which describes the
+ 		// input container intended accessible usability.
+ 		// TODO: Refactor click detection to use blur to stop propagation.
+@@ -583,8 +592,8 @@ class FormTokenField extends Component {
+ 						/>
+ 					) }
+ 				</div>
+-				<div id={ `components-form-token-suggestions-howto-${ instanceId }` } className="screen-reader-text">
+-					{ __( 'Separate with commas' ) }
++				<div id={ `components-form-token-suggestions-howto-${ instanceId }` } className={ howTo.className }>
++					{ howTo.text }
+ 				</div>
+ 			</div>
+ 		);
+@@ -608,6 +617,7 @@ FormTokenField.defaultProps = {
+ 		removed: __( 'Item removed.' ),
+ 		remove: __( 'Remove item' ),
+ 	},
++	help: '',
+ };
+ 
+ export default withSpokenMessages( withInstanceId( FormTokenField ) );
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index 1080070a4ddafb..ecc505e12fd93f 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -51,6 +51,12 @@
+ 	margin-bottom: $grid-size-small;
+ }
+ 
++.components-form-token-field__help {
++	margin-top: $grid-size;
++	font-style: italic;
++	margin-bottom: 0;
++}
++
+ // Tokens
+ .components-form-token-field__token {
+ 	font-size: $default-font-size;
+diff --git a/packages/editor/src/components/post-taxonomies/flat-term-selector.js b/packages/editor/src/components/post-taxonomies/flat-term-selector.js
+index c42e7e15ffbd2f..077f207ac2b0a3 100644
+--- a/packages/editor/src/components/post-taxonomies/flat-term-selector.js
++++ b/packages/editor/src/components/post-taxonomies/flat-term-selector.js
+@@ -185,6 +185,11 @@ class FlatTermSelector extends Component {
+ 		const termAddedLabel = sprintf( _x( '%s added', 'term' ), singularName );
+ 		const termRemovedLabel = sprintf( _x( '%s removed', 'term' ), singularName );
+ 		const removeTermLabel = sprintf( _x( 'Remove %s', 'term' ), singularName );
++		const help = get(
++			taxonomy,
++			[ 'labels', 'separate_items_with_commas' ],
++			_x( 'Separate terms with commas', 'how to separate term items' )
++		);
+ 
+ 		return (
+ 			<FormTokenField
+@@ -201,6 +206,7 @@ class FlatTermSelector extends Component {
+ 					removed: termRemovedLabel,
+ 					remove: removeTermLabel,
+ 				} }
++				help={ help }
+ 			/>
+ 		);
+ 	}

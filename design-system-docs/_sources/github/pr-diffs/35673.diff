@@ -1,0 +1,50 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f2750a38ca79e6..ab6f0365fc1030 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ 
+ -   Removed the `fieldset` wrapper from the `FontAppearanceControl` component ([35461](https://github.com/WordPress/gutenberg/pull/35461)).
+ -   Refactored the `ToggleGroupControl` component's structure and embedded `ToggleGroupControlButton` directly into `ToggleGroupControlOption` ([#35600](https://github.com/WordPress/gutenberg/pull/35600)).
++-   Added support for showing an experimental hint in `CustomSelectControl`  ([#35673](https://github.com/WordPress/gutenberg/pull/35673)).
+ 
+ ### Breaking Changes
+ 
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index 5fa74367aa7d45..90b5bbf2115e20 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -156,16 +156,16 @@ export default function CustomSelectControl( {
+ 									{
+ 										'is-highlighted':
+ 											index === highlightedIndex,
+-										'has-hint': !! item.hint,
++										'has-hint': !! item.__experimentalHint,
+ 									}
+ 								),
+ 								style: item.style,
+ 							} ) }
+ 						>
+ 							{ item.name }
+-							{ item.hint && (
++							{ item.__experimentalHint && (
+ 								<span className="components-custom-select-control__item-hint">
+-									{ item.hint }
++									{ item.__experimentalHint }
+ 								</span>
+ 							) }
+ 							{ item === selectedItem && (
+diff --git a/packages/components/src/font-size-picker/utils.js b/packages/components/src/font-size-picker/utils.js
+index 3310257de1ff75..e0f16e0de3464f 100644
+--- a/packages/components/src/font-size-picker/utils.js
++++ b/packages/components/src/font-size-picker/utils.js
+@@ -74,7 +74,8 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+ 		key: slug,
+ 		name,
+ 		size,
+-		hint: size && isSimpleCssValue( size ) && parseInt( size ),
++		__experimentalHint:
++			size && isSimpleCssValue( size ) && parseInt( size ),
+ 	} ) );
+ }
+ 

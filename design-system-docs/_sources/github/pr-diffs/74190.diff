@@ -1,0 +1,565 @@
+diff --git a/package-lock.json b/package-lock.json
+index be1ce4e0268ad4..3f6503c88060d6 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -56199,6 +56199,7 @@
+ 			"dependencies": {
+ 				"@base-ui/react": "^1.0.0",
+ 				"@wordpress/element": "file:../element",
++				"@wordpress/i18n": "file:../i18n",
+ 				"clsx": "^2.1.1"
+ 			},
+ 			"devDependencies": {
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index db3b650f1e42c9..28fb2b0d196bea 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -10,3 +10,4 @@
+ 
+ -   Add `Stack` component ([#73928](https://github.com/WordPress/gutenberg/pull/73928)).
+ -   Add `VisuallyHidden` component ([#74189](https://github.com/WordPress/gutenberg/pull/74189)).
++-   Add `Field` primitives ([#74190](https://github.com/WordPress/gutenberg/pull/74190)).
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index f0be6636430a18..c5ae8d2265e491 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -46,6 +46,7 @@
+ 	"dependencies": {
+ 		"@base-ui/react": "^1.0.0",
+ 		"@wordpress/element": "file:../element",
++		"@wordpress/i18n": "file:../i18n",
+ 		"clsx": "^2.1.1"
+ 	},
+ 	"devDependencies": {
+diff --git a/packages/ui/src/form/primitives/field/control.tsx b/packages/ui/src/form/primitives/field/control.tsx
+new file mode 100644
+index 00000000000000..291522ccc7ccbf
+--- /dev/null
++++ b/packages/ui/src/form/primitives/field/control.tsx
+@@ -0,0 +1,9 @@
++import { Field as _Field } from '@base-ui/react/field';
++import { forwardRef } from '@wordpress/element';
++import type { FieldControlProps } from './types';
++
++export const Control = forwardRef< HTMLInputElement, FieldControlProps >(
++	function Control( props, ref ) {
++		return <_Field.Control ref={ ref } { ...props } />;
++	}
++);
+diff --git a/packages/ui/src/form/primitives/field/description.tsx b/packages/ui/src/form/primitives/field/description.tsx
+new file mode 100644
+index 00000000000000..9ecef06d862214
+--- /dev/null
++++ b/packages/ui/src/form/primitives/field/description.tsx
+@@ -0,0 +1,18 @@
++import clsx from 'clsx';
++import { Field as _Field } from '@base-ui/react/field';
++import { forwardRef } from '@wordpress/element';
++import fieldStyles from '../../../utils/css/field.module.css';
++import type { FieldDescriptionProps } from './types';
++
++export const Description = forwardRef<
++	HTMLParagraphElement,
++	FieldDescriptionProps
++>( function Description( { className, ...restProps }, ref ) {
++	return (
++		<_Field.Description
++			ref={ ref }
++			className={ clsx( fieldStyles.description, className ) }
++			{ ...restProps }
++		/>
++	);
++} );
+diff --git a/packages/ui/src/form/primitives/field/details.tsx b/packages/ui/src/form/primitives/field/details.tsx
+new file mode 100644
+index 00000000000000..f30725b9e3f142
+--- /dev/null
++++ b/packages/ui/src/form/primitives/field/details.tsx
+@@ -0,0 +1,36 @@
++import clsx from 'clsx';
++import { Field as _Field } from '@base-ui/react/field';
++import { forwardRef } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
++import fieldStyles from '../../../utils/css/field.module.css';
++import type { FieldDetailsProps } from './types';
++import { VisuallyHidden } from '../../../visually-hidden';
++
++/**
++ * A component for showing additional information about the field,
++ * styled similarly to a normal `Field.Description`.
++ * Unlike a normal description, it can include links and other semantic elements.
++ *
++ * Although this content is not associated with the field using direct semantics,
++ * it is made discoverable to screen reader users via a visually hidden description,
++ * alerting them to the presence of additional information below.
++ *
++ * If the content only includes plain text, use `Field.Description` instead,
++ * so the readout is not unnecessarily verbose for screen reader users.
++ */
++export const Details = forwardRef< HTMLDivElement, FieldDetailsProps >(
++	function Details( { className, ...restProps }, ref ) {
++		return (
++			<>
++				<_Field.Description render={ <VisuallyHidden /> }>
++					{ __( 'More details follow the field.' ) }
++				</_Field.Description>
++				<div
++					ref={ ref }
++					className={ clsx( fieldStyles.description, className ) }
++					{ ...restProps }
++				></div>
++			</>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/field/index.ts b/packages/ui/src/form/primitives/field/index.ts
+new file mode 100644
+index 00000000000000..a2a2ce945dd7d1
+--- /dev/null
++++ b/packages/ui/src/form/primitives/field/index.ts
+@@ -0,0 +1,8 @@
++import { Root } from './root';
++import { Item } from './item';
++import { Label } from './label';
++import { Description } from './description';
++import { Details } from './details';
++import { Control } from './control';
++
++export { Root, Item, Label, Description, Details, Control };
+diff --git a/packages/ui/src/form/primitives/field/item.tsx b/packages/ui/src/form/primitives/field/item.tsx
+new file mode 100644
+index 00000000000000..e2430b1967d93f
+--- /dev/null
++++ b/packages/ui/src/form/primitives/field/item.tsx
+@@ -0,0 +1,9 @@
++import { Field as _Field } from '@base-ui/react/field';
++import { forwardRef } from '@wordpress/element';
++import type { FieldItemProps } from './types';
++
++export const Item: React.ForwardRefExoticComponent<
++	FieldItemProps & React.RefAttributes< HTMLDivElement >
++> = forwardRef( function Item( props, ref ) {
++	return <_Field.Item ref={ ref } { ...props } />;
++} );
+diff --git a/packages/ui/src/form/primitives/field/label.tsx b/packages/ui/src/form/primitives/field/label.tsx
+new file mode 100644
+index 00000000000000..d85560b8117bd5
+--- /dev/null
++++ b/packages/ui/src/form/primitives/field/label.tsx
+@@ -0,0 +1,21 @@
++import clsx from 'clsx';
++import { Field as _Field } from '@base-ui/react/field';
++import { forwardRef } from '@wordpress/element';
++import fieldStyles from '../../../utils/css/field.module.css';
++import type { FieldLabelProps } from './types';
++
++export const Label = forwardRef< HTMLLabelElement, FieldLabelProps >(
++	function Label( { className, variant, ...restProps }, ref ) {
++		return (
++			<_Field.Label
++				ref={ ref }
++				className={ clsx(
++					fieldStyles.label,
++					variant && fieldStyles[ `is-${ variant }` ],
++					className
++				) }
++				{ ...restProps }
++			/>
++		);
++	}
++);
+diff --git a/packages/ui/src/form/primitives/field/root.tsx b/packages/ui/src/form/primitives/field/root.tsx
+new file mode 100644
+index 00000000000000..b924384437f868
+--- /dev/null
++++ b/packages/ui/src/form/primitives/field/root.tsx
+@@ -0,0 +1,31 @@
++import clsx from 'clsx';
++import { Field as _Field } from '@base-ui/react/field';
++import { forwardRef } from '@wordpress/element';
++import resetStyles from '../../../utils/css/resets.module.css';
++import type { FieldRootProps } from './types';
++import { Stack } from '../../../stack';
++
++const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
++	<Stack { ...props } direction="column" gap="xs" />
++);
++
++/**
++ * A low-level component that associates an accessible label and description
++ * with a single form control element.
++ *
++ * Simply wrapping a control with this component does not guarantee
++ * accessible labeling. See examples for how to associate the label in different cases.
++ */
++export const Root = forwardRef< HTMLDivElement, FieldRootProps >( function Root(
++	{ className, render = DEFAULT_RENDER, ...restProps },
++	ref
++) {
++	return (
++		<_Field.Root
++			ref={ ref }
++			className={ clsx( resetStyles[ 'box-sizing' ], className ) }
++			render={ render }
++			{ ...restProps }
++		/>
++	);
++} );
+diff --git a/packages/ui/src/form/primitives/field/stories/index.story.tsx b/packages/ui/src/form/primitives/field/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..36065859aa611b
+--- /dev/null
++++ b/packages/ui/src/form/primitives/field/stories/index.story.tsx
+@@ -0,0 +1,137 @@
++import type { Meta, StoryObj } from '@storybook/react';
++import { useId } from '@wordpress/element';
++import '@wordpress/theme/design-tokens.css';
++import { Field } from '../../../..';
++
++const meta: Meta< typeof Field.Root > = {
++	title: 'Design System/Components/Form/Primitives/Field',
++	component: Field.Root,
++	subcomponents: {
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Item: Field.Item,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Label: Field.Label,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Control: Field.Control,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Description: Field.Description,
++		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
++		Details: Field.Details,
++	},
++};
++export default meta;
++
++/**
++ * If your control component forwards refs, as well as the `aria-labelledby` and `aria-describedby` props
++ * to the actual underlying HTML element to be labeled,
++ * you can simply place your control in the `render` prop of `Field.Control`.
++ */
++export const Default: StoryObj< typeof Field.Root > = {
++	args: {
++		children: (
++			<>
++				<Field.Label>Label</Field.Label>
++				<Field.Control
++					render={ <input type="text" placeholder="Placeholder" /> }
++				/>
++				<Field.Description>
++					The accessible description.
++				</Field.Description>
++			</>
++		),
++	},
++};
++
++const MyNonRefForwardingControl = (
++	props: React.ComponentProps< 'input' >
++) => {
++	return <input type="text" { ...props } />;
++};
++
++/**
++ * If your control component does not forward refs, but does forward the `id` prop
++ * to the actual underlying HTML element to be labeled, use the `htmlFor` prop
++ * of the `Field.Label` component to associate the label with the control.
++ *
++ * This is preferred over `aria-labelledby` because it allows users to click the
++ * label to focus the control.
++ */
++export const UsingHtmlFor: StoryObj< typeof Field.Root > = {
++	name: 'Using htmlFor',
++	render: ( args ) => {
++		const controlId = useId();
++		const descriptionId = useId();
++
++		return (
++			<Field.Root { ...args }>
++				<Field.Label htmlFor={ controlId }>Label</Field.Label>
++				<MyNonRefForwardingControl
++					placeholder="Placeholder"
++					id={ controlId }
++					aria-describedby={ descriptionId }
++				/>
++				<Field.Description id={ descriptionId }>
++					The accessible description.
++				</Field.Description>
++			</Field.Root>
++		);
++	},
++};
++
++/**
++ * If your control component does not forward refs nor the `id` prop, but does
++ * forward the `aria-labelledby` prop to the actual underlying HTML element to be
++ * labeled, use the `id` prop of the `Field.Label` component to associate the
++ * label with the control.
++ */
++export const UsingAriaLabelledby: StoryObj< typeof Field.Root > = {
++	name: 'Using aria-labelledby',
++	render: ( args ) => {
++		const labelId = useId();
++		const descriptionId = useId();
++
++		return (
++			<Field.Root { ...args }>
++				<Field.Label id={ labelId }>Label</Field.Label>
++				<MyNonRefForwardingControl
++					placeholder="Placeholder"
++					aria-labelledby={ labelId }
++					aria-describedby={ descriptionId }
++				/>
++				<Field.Description id={ descriptionId }>
++					The accessible description.
++				</Field.Description>{ ' ' }
++			</Field.Root>
++		);
++	},
++};
++
++/**
++ * To add rich content (such as links) to the description, use `Field.Details`.
++ *
++ * Although this content is not associated with the field using direct semantics,
++ * it is made discoverable to screen reader users via a visually hidden description,
++ * alerting them to the presence of additional information below.
++ *
++ * If the content only includes plain text, use `Field.Description` instead,
++ * so the readout is not unnecessarily verbose for screen reader users.
++ */
++export const WithDetails: StoryObj< typeof Field.Root > = {
++	args: {
++		children: (
++			<>
++				<Field.Label>Label</Field.Label>
++				<Field.Control
++					render={ <input type="text" placeholder="Placeholder" /> }
++				/>
++				<Field.Details>
++					Details can include{ '	' }
++					<a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a">
++						links to more information
++					</a>{ ' ' }
++					and other semantic elements.
++				</Field.Details>
++			</>
++		),
++	},
++};
+diff --git a/packages/ui/src/form/primitives/field/test/index.test.tsx b/packages/ui/src/form/primitives/field/test/index.test.tsx
+new file mode 100644
+index 00000000000000..4363826d12e527
+--- /dev/null
++++ b/packages/ui/src/form/primitives/field/test/index.test.tsx
+@@ -0,0 +1,36 @@
++import { render } from '@testing-library/react';
++import { createRef } from '@wordpress/element';
++import * as Field from '../index';
++
++describe( 'Field', () => {
++	it( 'forwards ref', () => {
++		const rootRef = createRef< HTMLDivElement >();
++		const itemRef = createRef< HTMLDivElement >();
++		const controlRef = createRef< HTMLInputElement >();
++		const labelRef = createRef< HTMLLabelElement >();
++		const descriptionRef = createRef< HTMLParagraphElement >();
++		const detailsRef = createRef< HTMLDivElement >();
++
++		render(
++			<Field.Root ref={ rootRef } name="test-field">
++				<Field.Item ref={ itemRef }>
++					<Field.Label ref={ labelRef }>Field Label</Field.Label>
++					<Field.Control ref={ controlRef } render={ <input /> } />
++					<Field.Description ref={ descriptionRef }>
++						Field description
++					</Field.Description>
++					<Field.Details ref={ detailsRef }>
++						Field <a href="#details">details</a>
++					</Field.Details>
++				</Field.Item>
++			</Field.Root>
++		);
++
++		expect( rootRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
++		expect( controlRef.current ).toBeInstanceOf( HTMLInputElement );
++		expect( labelRef.current ).toBeInstanceOf( HTMLLabelElement );
++		expect( descriptionRef.current ).toBeInstanceOf( HTMLParagraphElement );
++		expect( detailsRef.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++} );
+diff --git a/packages/ui/src/form/primitives/field/types.ts b/packages/ui/src/form/primitives/field/types.ts
+new file mode 100644
+index 00000000000000..30bd8bd35ed4a8
+--- /dev/null
++++ b/packages/ui/src/form/primitives/field/types.ts
+@@ -0,0 +1,82 @@
++import type { Field } from '@base-ui/react/field';
++import type { ComponentProps } from '../../../utils/types';
++
++export type FieldRootProps = Omit<
++	ComponentProps< typeof Field.Root >,
++	| 'disabled'
++	// TODO: Maybe allow these when we have validation support ready.
++	| 'dirty'
++	| 'invalid'
++	| 'touched'
++	| 'validate'
++	| 'validationDebounceTime'
++	| 'validationMode'
++> & {
++	children?: Field.Root.Props[ 'children' ];
++	/**
++	 * Whether the field is disabled.
++	 *
++	 * @default false
++	 */
++	disabled?: Field.Root.Props[ 'disabled' ];
++};
++
++export type FieldItemProps = ComponentProps< typeof Field.Item > & {
++	children?: React.ReactNode;
++};
++
++export type FieldLabelProps = ComponentProps< typeof Field.Label > & {
++	/**
++	 * The label string, or the string and the element to associate it with.
++	 *
++	 * To keep things accessible, do not include other interactive
++	 * elements such as links or buttons.
++	 */
++	children?: Field.Label.Props[ 'children' ];
++	/**
++	 * The visual variant of the label.
++	 *
++	 * Use 'plain' for controls like checkboxes and radio buttons.
++	 *
++	 * @default 'default'
++	 */
++	variant?: 'default' | 'plain';
++};
++
++export type FieldControlProps = Omit<
++	ComponentProps< typeof Field.Control >,
++	'defaultValue'
++> & {
++	children?: Field.Control.Props[ 'children' ];
++	/**
++	 * The default value to use in uncontrolled mode.
++	 */
++	defaultValue?: Field.Control.Props[ 'defaultValue' ];
++};
++
++export type FieldDescriptionProps = ComponentProps<
++	typeof Field.Description
++> & {
++	/**
++	 * The accessible description, associated using `aria-describedby`.
++	 *
++	 * For screen reader accessibility, this should only contain plain text,
++	 * and no semantics such as links.
++	 */
++	children?: string;
++};
++
++export type FieldDetailsProps = ComponentProps< 'div' > & {
++	/**
++	 * Additional information about the field, which unlike a normal description,
++	 * can include links and other semantic elements.
++	 *
++	 * Although this content is not associated with the field using direct semantics,
++	 * it is made discoverable to screen reader users via a visually hidden description,
++	 * alerting them to the presence of additional information below.
++	 *
++	 * Do not use this component when the details content is only plain text,
++	 * as it makes the readout unnecessarily verbose for screen reader users.
++	 */
++	children?: React.ReactNode;
++};
+diff --git a/packages/ui/src/form/primitives/index.ts b/packages/ui/src/form/primitives/index.ts
+new file mode 100644
+index 00000000000000..090e4e93b84d07
+--- /dev/null
++++ b/packages/ui/src/form/primitives/index.ts
+@@ -0,0 +1 @@
++export * as Field from './field';
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 2f06a9456b4aa0..8efe7bdc93fcaa 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -1,4 +1,5 @@
+ export * from './box';
+ export * from './badge';
++export * from './form/primitives';
+ export * from './stack';
+ export * from './visually-hidden';
+diff --git a/packages/ui/src/utils/css/field.module.css b/packages/ui/src/utils/css/field.module.css
+new file mode 100644
+index 00000000000000..dd5c15f1f8142f
+--- /dev/null
++++ b/packages/ui/src/utils/css/field.module.css
+@@ -0,0 +1,27 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-utilities {
++	.label {
++		--wp-ui-field-label-line-height: var(--wpds-font-line-height-x-small);
++
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wpds-font-size-x-small);
++		line-height: var(--wp-ui-field-label-line-height);
++		font-weight: 499; /* TODO: Use variable? */
++		text-transform: uppercase;
++		color: var(--wpds-color-fg-content-neutral);
++
++		&.is-plain {
++			font-size: var(--wpds-font-size-medium);
++			text-transform: none;
++		}
++	}
++
++	.description {
++		margin: 0;
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wpds-font-size-small);
++		line-height: var(--wpds-font-line-height-x-small);
++		color: var(--wpds-color-fg-content-neutral-weak);
++	}
++}
+diff --git a/packages/ui/src/utils/css/resets.module.css b/packages/ui/src/utils/css/resets.module.css
+new file mode 100644
+index 00000000000000..4c003ee93f30ed
+--- /dev/null
++++ b/packages/ui/src/utils/css/resets.module.css
+@@ -0,0 +1,13 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-utilities {
++	.box-sizing {
++		box-sizing: border-box;
++
++		*,
++		*::before,
++		*::after {
++			box-sizing: inherit;
++		}
++	}
++}
+diff --git a/packages/ui/tsconfig.json b/packages/ui/tsconfig.json
+index a7d445ffa2cbbb..b853d74120bdfa 100644
+--- a/packages/ui/tsconfig.json
++++ b/packages/ui/tsconfig.json
+@@ -4,6 +4,10 @@
+ 	"compilerOptions": {
+ 		"types": [ "node", "jest", "@testing-library/jest-dom" ]
+ 	},
+-	"references": [ { "path": "../element" }, { "path": "../theme" } ],
++	"references": [
++		{ "path": "../element" },
++		{ "path": "../i18n" },
++		{ "path": "../theme" }
++	],
+ 	"exclude": []
+ }

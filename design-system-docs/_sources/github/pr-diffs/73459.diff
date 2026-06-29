@@ -1,0 +1,120 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b439409abe6524..4b696dd040f3e1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `ExternalLink`: Add `withoutIcon` prop to component to allow rendering the link without the external icon (↗ or ↖). ([#73459](https://github.com/WordPress/gutenberg/pull/73459)).
++
+ ### Bug Fixes
+ 
+ -   `ExternalLink`: Fix arrow direction for RTL languages. The external link arrow now correctly points to the top-left (↖) instead of top-right (↗) in RTL layouts. ([#73400](https://github.com/WordPress/gutenberg/pull/73400))
+diff --git a/packages/components/src/external-link/index.tsx b/packages/components/src/external-link/index.tsx
+index e8e3f080d4bf2b..cf2868021cfb25 100644
+--- a/packages/components/src/external-link/index.tsx
++++ b/packages/components/src/external-link/index.tsx
+@@ -15,6 +15,7 @@ import { forwardRef } from '@wordpress/element';
+  */
+ import type { ExternalLinkProps } from './types';
+ import type { WordPressComponentProps } from '../context';
++import { VisuallyHidden } from '../visually-hidden';
+ 
+ function UnforwardedExternalLink(
+ 	props: Omit<
+@@ -23,7 +24,14 @@ function UnforwardedExternalLink(
+ 	>,
+ 	ref: ForwardedRef< HTMLAnchorElement >
+ ) {
+-	const { href, children, className, rel = '', ...additionalProps } = props;
++	const {
++		href,
++		children,
++		className,
++		rel = '',
++		withoutIcon,
++		...additionalProps
++	} = props;
+ 	const optimizedRel = [
+ 		...new Set(
+ 			[
+@@ -66,15 +74,22 @@ function UnforwardedExternalLink(
+ 			<span className="components-external-link__contents">
+ 				{ children }
+ 			</span>
+-			<span
+-				className="components-external-link__icon"
+-				aria-label={
+-					/* translators: accessibility text */
+-					__( '(opens in a new tab)' )
+-				}
+-			>
+-				{ isRTL() ? '\u2196' : '\u2197' }
+-			</span>
++
++			{ withoutIcon ? (
++				<VisuallyHidden>
++					{ __( '(opens in a new tab)' ) }
++				</VisuallyHidden>
++			) : (
++				<span
++					className="components-external-link__icon"
++					aria-label={
++						/* translators: accessibility text */
++						__( '(opens in a new tab)' )
++					}
++				>
++					{ isRTL() ? '\u2196' : '\u2197' }
++				</span>
++			) }
+ 		</a>
+ 		/* eslint-enable react/jsx-no-target-blank */
+ 	);
+diff --git a/packages/components/src/external-link/stories/index.story.tsx b/packages/components/src/external-link/stories/index.story.tsx
+index eb70999413187f..4b6e13fbf4d396 100644
+--- a/packages/components/src/external-link/stories/index.story.tsx
++++ b/packages/components/src/external-link/stories/index.story.tsx
+@@ -25,11 +25,25 @@ const meta: Meta< typeof ExternalLink > = {
+ export default meta;
+ 
+ const Template: StoryFn< typeof ExternalLink > = ( { ...args } ) => {
+-	return <ExternalLink { ...args } />;
++	return (
++		<p>
++			Link to <ExternalLink { ...args } /> in a new tab
++		</p>
++	);
+ };
+ 
+ export const Default: StoryFn< typeof ExternalLink > = Template.bind( {} );
+ Default.args = {
+ 	children: 'WordPress',
+ 	href: 'https://wordpress.org',
++	withoutIcon: false,
++};
++
++/**
++ * Link without icon
++ */
++export const WithoutIcon = Template.bind( {} );
++WithoutIcon.args = {
++	...Default.args,
++	withoutIcon: true,
+ };
+diff --git a/packages/components/src/external-link/types.ts b/packages/components/src/external-link/types.ts
+index a2b5cfb8324ced..ce4a40f3a9d8ac 100644
+--- a/packages/components/src/external-link/types.ts
++++ b/packages/components/src/external-link/types.ts
+@@ -12,4 +12,9 @@ export type ExternalLinkProps = {
+ 	 * The URL of the external resource.
+ 	 */
+ 	href: string;
++
++	/**
++	 * Render the link without the external link icon (↗ or ↖).
++	 */
++	withoutIcon?: boolean;
+ };

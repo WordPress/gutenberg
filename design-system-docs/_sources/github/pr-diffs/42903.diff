@@ -1,0 +1,456 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index facbc86f3122e2..7ea421e53d9084 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `Tooltip (Experimental)`, `CustomSelectControl`, `TimePicker`: Add missing font-size styles which were necessary in non-WordPress contexts ([#42844](https://github.com/WordPress/gutenberg/pull/42844/)).
+ -   `TextControl`, `TextareaControl`, `ToggleGroupControl`: Add `box-sizing` reset style ([#42889](https://github.com/WordPress/gutenberg/pull/42889)).
+ -   `Popover`: fix arrow placement and design ([#42874](https://github.com/WordPress/gutenberg/pull/42874/)).
++-   `Popover`: fix minor glitch in arrow [#42903](https://github.com/WordPress/gutenberg/pull/42903)).
+ 
+ ### Enhancements
+ 
+@@ -23,6 +24,7 @@
+ 
+ -   `Flex`, `FlexItem`, `FlexBlock`: Convert to TypeScript ([#42537](https://github.com/WordPress/gutenberg/pull/42537)).
+ -   `InputControl`: Fix incorrect `size` prop passing ([#42793](https://github.com/WordPress/gutenberg/pull/42793)).
++-   `Popover`: rewrite Storybook examples using controls [#42903](https://github.com/WordPress/gutenberg/pull/42903)).
+ 
+ ## 19.16.0 (2022-07-27)
+ 
+diff --git a/packages/components/src/popover/stories/_utils.js b/packages/components/src/popover/stories/_utils.js
+deleted file mode 100644
+index c99c23190e3603..00000000000000
+--- a/packages/components/src/popover/stories/_utils.js
++++ /dev/null
+@@ -1,64 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useCallback, useEffect, useState } from '@wordpress/element';
+-
+-export const DraggableWrapper = (
+-	props = { role: 'presentation', style: {} }
+-) => {
+-	const { role, style, ...restProps } = props;
+-	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
+-	const [ isDragging, setDragging ] = useState( false );
+-
+-	const updatePosition = useCallback(
+-		( event ) => {
+-			if ( ! isDragging ) {
+-				return false;
+-			}
+-			const { movementX, movementY } = event;
+-			setPosition( {
+-				...position,
+-				x: position.x + movementX,
+-				y: position.y + movementY,
+-			} );
+-		},
+-		[ isDragging, position ]
+-	);
+-
+-	const startDragging = useCallback( () => setDragging( true ), [] );
+-	const stopDragging = useCallback( () => setDragging( false ), [] );
+-
+-	useEffect( () => {
+-		document.addEventListener( 'mousemove', updatePosition );
+-		document.addEventListener( 'mouseup', stopDragging );
+-		return () => {
+-			document.removeEventListener( 'mousemove', updatePosition );
+-			document.removeEventListener( 'mouseup', stopDragging );
+-		};
+-	}, [ updatePosition, stopDragging ] );
+-
+-	const { x, y } = position;
+-
+-	/**
+-	 * Ideally, the x and y coordinates would be applied transform: translate.
+-	 * However, using transform is causing layout rendering issues when
+-	 * combined with components like Popover (due to their positioning
+-	 * strategy).
+-	 */
+-	const componentStyle = {
+-		...style,
+-		position: 'relative',
+-		top: y,
+-		left: x,
+-	};
+-
+-	return (
+-		<div
+-			{ ...restProps }
+-			onMouseUp={ stopDragging }
+-			onMouseDown={ startDragging }
+-			role={ role }
+-			style={ componentStyle }
+-		/>
+-	);
+-};
+diff --git a/packages/components/src/popover/stories/index.js b/packages/components/src/popover/stories/index.js
+index 0025e66fe0f4e1..32bcb6463d677e 100644
+--- a/packages/components/src/popover/stories/index.js
++++ b/packages/components/src/popover/stories/index.js
+@@ -1,123 +1,176 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, select, text } from '@storybook/addon-knobs';
+-
+ /**
+  * WordPress dependencies
+  */
+-import { useState } from '@wordpress/element';
++import { useState, useRef } from '@wordpress/element';
++import { __unstableIframe as Iframe } from '@wordpress/block-editor';
+ 
+ /**
+  * Internal dependencies
+  */
+-import { DraggableWrapper } from './_utils';
+-import Popover from '../';
+ import Button from '../../button';
++import { Provider as SlotFillProvider } from '../../slot-fill';
++import Popover from '../';
++
++// Format: "[yAxis] [xAxis]"
++// Valid yAxis values: 'top', 'middle', 'bottom'
++// Valid xAxis values: 'left', 'center', 'right'
++const AVAILABLE_POSITIONS = [
++	'top left',
++	'top center',
++	'top right',
++	'middle left',
++	'middle center',
++	'middle right',
++	'bottom left',
++	'bottom center',
++	'bottom right',
++];
++
++// Follows floating UI's conventions
++// See https://floating-ui.com/docs/computePosition#placement
++const AVAILABLE_PLACEMENTS = [
++	'top',
++	'top-start',
++	'top-end',
++	'right',
++	'right-start',
++	'right-end',
++	'bottom',
++	'bottom-start',
++	'bottom-end',
++	'left',
++	'left-start',
++	'left-end',
++];
+ 
+ export default {
+ 	title: 'Components/Popover',
+ 	component: Popover,
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-export const _default = () => {
+-	const show = boolean( 'Example: Show', true );
+-	const children = text( 'children', 'Popover Content' );
+-	const animate = boolean( 'animate', false );
+-	const expandOnMobile = boolean( 'expandOnMobile', false );
+-	const focusOnMount = select(
+-		'focusOnMount',
+-		{
+-			firstElement: 'firstElement',
+-			container: 'container',
++	argTypes: {
++		anchorRef: { control: { type: null } },
++		anchorRect: { control: { type: null } },
++		animate: { control: { type: 'boolean' } },
++		children: { control: { type: null } },
++		className: { control: { type: 'text' } },
++		expandOnMobile: { control: { type: 'boolean' } },
++		focusOnMount: {
++			control: { type: 'select' },
++			options: [ 'firstElement', 'container', false ],
+ 		},
+-		'firstElement'
+-	);
+-	const noArrow = boolean( 'noArrow', false );
+-	const isAlternate = boolean( 'isAlternate', false );
+-
+-	const props = {
+-		animate,
+-		children,
+-		expandOnMobile,
+-		focusOnMount,
+-		noArrow,
+-		isAlternate,
+-	};
+-
+-	if ( ! show ) {
+-		return null;
+-	}
+-
+-	return <Popover { ...props } />;
++		getAnchorRect: { control: { type: null } },
++		headerTitle: { control: { type: 'text' } },
++		isAlternate: { control: { type: 'boolean' } },
++		noArrow: { control: { type: 'boolean' } },
++		onClose: { control: { type: null } },
++		offset: { control: { type: 'number' } },
++		onFocusOutside: { control: { type: null } },
++		placement: {
++			control: { type: 'select' },
++			options: AVAILABLE_PLACEMENTS,
++		},
++		position: {
++			control: { type: 'select' },
++			options: AVAILABLE_POSITIONS,
++		},
++		__unstableSlotName: { control: { type: null } },
++		__unstableObserveElement: { control: { type: null } },
++		__unstableForcePosition: { control: { type: 'boolean' } },
++		__unstableShift: { control: { type: 'boolean' } },
++	},
+ };
+ 
+-const DragExample = ( props ) => {
+-	const { label, content, ...restProps } = props;
++const PopoverWithAnchor = ( args ) => {
++	const anchorRef = useRef( null );
+ 
+ 	return (
+-		<div>
+-			<div style={ { position: 'absolute', color: '#555' } }>
+-				<p>Move the gray box around.</p>
+-				<p>
+-					The{ ' ' }
+-					<strong style={ { background: 'pink' } }>
+-						pink bordered
+-					</strong>{ ' ' }
+-					element is a parent.
+-				</p>
+-				<p>
+-					The{ ' ' }
+-					<strong style={ { background: 'cyan' } }>
+-						cyan bordered
+-					</strong>{ ' ' }
+-					element is a sibling to <strong>Popover</strong>.
+-				</p>
+-				<p>
+-					<strong>Popover</strong> aligns to the content within
+-					parent.
+-				</p>
+-			</div>
+-			<div
+-				style={ {
+-					height: '100vh',
+-					width: '100%',
+-					display: 'flex',
+-					alignItems: 'center',
+-					justifyContent: 'center',
+-				} }
++		<div
++			style={ {
++				height: '200px',
++				display: 'flex',
++				justifyContent: 'center',
++				alignItems: 'center',
++			} }
++		>
++			<p
++				style={ { padding: '8px', background: 'salmon' } }
++				ref={ anchorRef }
+ 			>
+-				<DraggableWrapper
+-					style={ {
+-						background: '#ddd',
+-						border: '2px solid pink',
+-						borderRadius: 4,
+-						padding: 10,
+-						userSelect: 'none',
+-					} }
+-				>
+-					<div style={ { border: '2px solid cyan' } }>{ label }</div>
+-					<Popover { ...restProps }>{ content }</Popover>
+-				</DraggableWrapper>
+-			</div>
++				Popover&apos;s anchor
++			</p>
++			<Popover { ...args } anchorRef={ anchorRef } />
+ 		</div>
+ 	);
+ };
+ 
+-export const positioning = () => {
+-	const label = text( 'Example: Label', 'Drag Me!' );
+-	const content = text( 'Example: Content', 'Popover' );
+-	const noArrow = boolean( 'noArrow', false );
++export const Default = ( args ) => {
++	const [ isVisible, setIsVisible ] = useState( false );
++	const toggleVisible = () => {
++		setIsVisible( ( state ) => ! state );
++	};
+ 
+ 	return (
+-		<DragExample label={ label } content={ content } noArrow={ noArrow } />
++		<div
++			style={ {
++				minWidth: '600px',
++				minHeight: '600px',
++				display: 'flex',
++				alignItems: 'center',
++				justifyContent: 'center',
++			} }
++		>
++			<Button variant="secondary" onClick={ toggleVisible }>
++				Toggle Popover
++				{ isVisible && <Popover { ...args } /> }
++			</Button>
++		</div>
+ 	);
+ };
++Default.args = {
++	children: <>Popover&apos;s&nbsp;content</>,
++};
+ 
+-function DynamicHeightPopover() {
++/**
++ * Resize / scroll the viewport to test the behavior of the popovers when they
++ * reach the viewport boundaries.
++ */
++export const AllPlacements = ( { children, ...args } ) => (
++	<div
++		style={ {
++			minWidth: '600px',
++			marginLeft: 'auto',
++			marginRight: 'auto',
++		} }
++	>
++		<h2>
++			Resize / scroll the viewport to test the behavior of the popovers
++			when they reach the viewport boundaries.
++		</h2>
++		<div>
++			{ AVAILABLE_PLACEMENTS.map( ( p ) => (
++				<PopoverWithAnchor key={ p } placement={ p } { ...args }>
++					{ children }
++					<div>
++						<small>(placement: { p })</small>
++					</div>
++				</PopoverWithAnchor>
++			) ) }
++		</div>
++	</div>
++);
++// Excluding placement and position since they all possible values
++// are passed directly in code.
++AllPlacements.parameters = {
++	controls: {
++		exclude: [ 'placement', 'position' ],
++	},
++};
++AllPlacements.args = {
++	...Default.args,
++	noArrow: false,
++	offset: 10,
++};
++
++export const DynamicHeight = ( { children, ...args } ) => {
+ 	const [ height, setHeight ] = useState( 200 );
+ 	const increase = () => setHeight( height + 100 );
+ 	const decrease = () => setHeight( height - 100 );
+@@ -146,7 +199,7 @@ function DynamicHeightPopover() {
+ 			</p>
+ 
+ 			<div>
+-				<Popover>
++				<Popover { ...args }>
+ 					<div
+ 						style={ {
+ 							height,
+@@ -154,14 +207,62 @@ function DynamicHeightPopover() {
+ 							padding: '20px',
+ 						} }
+ 					>
+-						Content with dynamic height
++						{ children }
+ 					</div>
+ 				</Popover>
+ 			</div>
+ 		</div>
+ 	);
+-}
++};
++DynamicHeight.args = {
++	...Default.args,
++	children: 'Content with dynamic height',
++};
++
++export const WithSlotOutsideIframe = ( args ) => {
++	const anchorRef = useRef( null );
++	const slotName = 'popover-with-slot-outside-iframe';
+ 
+-export const dynamicHeight = () => {
+-	return <DynamicHeightPopover />;
++	return (
++		<SlotFillProvider>
++			<div>
++				<Popover.Slot name={ slotName } />
++				<Iframe
++					style={ {
++						width: '100%',
++						height: '100%',
++					} }
++				>
++					<div
++						style={ {
++							height: '200vh',
++							paddingTop: '10vh',
++						} }
++					>
++						<p
++							style={ {
++								padding: '8px',
++								background: 'salmon',
++								maxWidth: '200px',
++								marginTop: '30px',
++								marginLeft: 'auto',
++								marginRight: 'auto',
++							} }
++							ref={ anchorRef }
++						>
++							Popover&apos;s anchor
++						</p>
++						<Popover
++							{ ...args }
++							__unstableSlotName={ slotName }
++							anchorRef={ anchorRef }
++						/>
++					</div>
++				</Iframe>
++			</div>
++		</SlotFillProvider>
++	);
++};
++WithSlotOutsideIframe.args = {
++	...Default.args,
+ };
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index 00639f67216781..13649142c2caec 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -73,9 +73,9 @@ $arrow-triangle-base-size: 14px;
+ 		content: "";
+ 		position: absolute;
+ 		top: -1px;
+-		left: 0;
++		left: 1px;
+ 		height: 2px;
+-		width: 100%;
++		right: 1px;
+ 		background-color: $white;
+ 	}
+ 

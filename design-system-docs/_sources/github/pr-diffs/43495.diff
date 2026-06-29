@@ -1,0 +1,240 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0676541a232413..26d332766d5b77 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -33,6 +33,7 @@
+ -   Update `floating-ui` to the latest version ([#43206](https://github.com/WordPress/gutenberg/pull/43206)).
+ -   `DateTimePicker`, `TimePicker`, `DatePicker`: Switch from `moment` to `date-fns` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
+ -   `DatePicker`: Switch from `react-dates` to `use-lilius` ([#43005](https://github.com/WordPress/gutenberg/pull/43005)).
++-   `DateTimePicker`: address feedback after recent refactor to `date-fns` and `use-lilius` ([#43495](https://github.com/WordPress/gutenberg/pull/43495)).
+ -   `convertLTRToRTL()`: Refactor away from `_.mapKeys()` ([#43258](https://github.com/WordPress/gutenberg/pull/43258/)).
+ -   `withSpokenMessages`: Update to use `@testing-library/react` ([#43273](https://github.com/WordPress/gutenberg/pull/43273)).
+ -   `MenuGroup`: Refactor unit tests to use `@testing-library/react` ([#43275](https://github.com/WordPress/gutenberg/pull/43275)).
+diff --git a/packages/components/src/date-time/date-time/index.tsx b/packages/components/src/date-time/date-time/index.tsx
+index 5324a13a8d7cc8..07e0c6e0d89465 100644
+--- a/packages/components/src/date-time/date-time/index.tsx
++++ b/packages/components/src/date-time/date-time/index.tsx
+@@ -17,11 +17,10 @@ import Button from '../../button';
+ import { default as DatePicker } from '../date';
+ import { default as TimePicker } from '../time';
+ import type { DateTimePickerProps } from '../types';
+-import { CalendarHelp } from './styles';
++import { Wrapper, CalendarHelp } from './styles';
+ import { HStack } from '../../h-stack';
+ import { Heading } from '../../heading';
+ import { Spacer } from '../../spacer';
+-import { VStack } from '../../v-stack';
+ 
+ export { DatePicker, TimePicker };
+ 
+@@ -64,7 +63,7 @@ function UnforwardedDateTimePicker(
+ 	}
+ 
+ 	return (
+-		<VStack ref={ ref } className="components-datetime" spacing={ 4 }>
++		<Wrapper ref={ ref } className="components-datetime" spacing={ 4 }>
+ 			{ ! calendarHelpIsVisible && (
+ 				<>
+ 					<TimePicker
+@@ -187,7 +186,7 @@ function UnforwardedDateTimePicker(
+ 					) }
+ 				</HStack>
+ 			) }
+-		</VStack>
++		</Wrapper>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/date-time/date-time/styles.ts b/packages/components/src/date-time/date-time/styles.ts
+index 8c5693213eabbe..a7f23eb276e047 100644
+--- a/packages/components/src/date-time/date-time/styles.ts
++++ b/packages/components/src/date-time/date-time/styles.ts
+@@ -3,6 +3,15 @@
+  */
+ import styled from '@emotion/styled';
+ 
++/**
++ * Internal dependencies
++ */
++import { VStack } from '../../v-stack';
++
++export const Wrapper = styled( VStack )`
++	box-sizing: border-box;
++`;
++
+ export const CalendarHelp = styled.div`
+ 	min-width: 260px;
+ `;
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index 2cad8a18131c81..b3f64868f80bf3 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -13,6 +13,8 @@ import {
+ 	subWeeks,
+ 	addWeeks,
+ 	isSameMonth,
++	startOfWeek,
++	endOfWeek,
+ } from 'date-fns';
+ 
+ /**
+@@ -28,6 +30,7 @@ import { useState, useRef, useEffect } from '@wordpress/element';
+  */
+ import type { DatePickerProps } from '../types';
+ import {
++	Wrapper,
+ 	Navigator,
+ 	NavigatorHeading,
+ 	Calendar,
+@@ -63,7 +66,7 @@ export function DatePicker( {
+ 	events = [],
+ 	isInvalidDate,
+ 	onMonthPreviewed,
+-	startOfWeek = 0,
++	startOfWeek: weekStartsOn = 0,
+ }: DatePickerProps ) {
+ 	const date = currentDate ? inputToDate( currentDate ) : new Date();
+ 
+@@ -78,7 +81,7 @@ export function DatePicker( {
+ 	} = useLilius( {
+ 		selected: [ startOfDay( date ) ],
+ 		viewing: startOfDay( date ),
+-		weekStartsOn: startOfWeek,
++		weekStartsOn,
+ 	} );
+ 
+ 	// Used to implement a roving tab index. Tracks the day that receives focus
+@@ -101,7 +104,7 @@ export function DatePicker( {
+ 	}
+ 
+ 	return (
+-		<div
++		<Wrapper
+ 			className="components-datetime__date"
+ 			role="application"
+ 			aria-label={ __( 'Calendar' ) }
+@@ -218,7 +221,22 @@ export function DatePicker( {
+ 									if ( event.key === 'ArrowDown' ) {
+ 										nextFocusable = addWeeks( day, 1 );
+ 									}
++									if ( event.key === 'PageUp' ) {
++										nextFocusable = subMonths( day, 1 );
++									}
++									if ( event.key === 'PageDown' ) {
++										nextFocusable = addMonths( day, 1 );
++									}
++									if ( event.key === 'Home' ) {
++										nextFocusable = startOfWeek( day );
++									}
++									if ( event.key === 'End' ) {
++										nextFocusable = startOfDay(
++											endOfWeek( day )
++										);
++									}
+ 									if ( nextFocusable ) {
++										event.preventDefault();
+ 										setFocusable( nextFocusable );
+ 										if (
+ 											! isSameMonth(
+@@ -241,7 +259,7 @@ export function DatePicker( {
+ 					} )
+ 				) }
+ 			</Calendar>
+-		</div>
++		</Wrapper>
+ 	);
+ }
+ 
+@@ -274,12 +292,14 @@ function Day( {
+ 
+ 	// Focus the day when it becomes focusable, e.g. because an arrow key is
+ 	// pressed. Only do this if focus is allowed - this stops us stealing focus
+-	// from e.g. a TimePicker input. Note that isFocusAllowed is not a dep as
+-	// there is no point calling focus() on an already focused element.
++	// from e.g. a TimePicker input.
+ 	useEffect( () => {
+ 		if ( ref.current && isFocusable && isFocusAllowed ) {
+ 			ref.current.focus();
+ 		}
++		// isFocusAllowed is not a dep as there is no point calling focus() on
++		// an already focused element.
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ isFocusable ] );
+ 
+ 	return (
+diff --git a/packages/components/src/date-time/date/styles.ts b/packages/components/src/date-time/date/styles.ts
+index 76288be8a2ef62..a0f1853098f16e 100644
+--- a/packages/components/src/date-time/date/styles.ts
++++ b/packages/components/src/date-time/date/styles.ts
+@@ -12,6 +12,10 @@ import { HStack } from '../../h-stack';
+ import { Heading } from '../../heading';
+ import { space } from '../../ui/utils/space';
+ 
++export const Wrapper = styled.div`
++	box-sizing: border-box;
++`;
++
+ export const Navigator = styled( HStack )`
+ 	margin-bottom: ${ space( 4 ) };
+ `;
+@@ -35,6 +39,8 @@ export const Calendar = styled.div`
+ 
+ export const DayOfWeek = styled.div`
+ 	color: ${ COLORS.gray[ 700 ] };
++	font-size: ${ CONFIG.fontSize };
++	line-height: ${ CONFIG.fontLineHeightBase };
+ 
+ 	&:nth-of-type( 1 ) {
+ 		justify-self: start;
+diff --git a/packages/components/src/date-time/date/test/index.tsx b/packages/components/src/date-time/date/test/index.tsx
+index 7cd7eeaf6a10c8..c519d34d911692 100644
+--- a/packages/components/src/date-time/date/test/index.tsx
++++ b/packages/components/src/date-time/date/test/index.tsx
+@@ -31,7 +31,9 @@ describe( 'DatePicker', () => {
+ 	} );
+ 
+ 	it( 'should call onChange when a day is selected', async () => {
+-		const user = userEvent.setup( { delay: null } );
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
+ 
+ 		const onChange = jest.fn();
+ 
+@@ -50,7 +52,9 @@ describe( 'DatePicker', () => {
+ 	} );
+ 
+ 	it( 'should call onMonthPreviewed and onChange when a day in a different month is selected', async () => {
+-		const user = userEvent.setup( { delay: null } );
++		const user = userEvent.setup( {
++			advanceTimers: jest.advanceTimersByTime,
++		} );
+ 
+ 		const onMonthPreviewed = jest.fn();
+ 		const onChange = jest.fn();
+diff --git a/packages/components/src/date-time/time/styles.ts b/packages/components/src/date-time/time/styles.ts
+index 68c59d08873922..bc579a6731ee98 100644
+--- a/packages/components/src/date-time/time/styles.ts
++++ b/packages/components/src/date-time/time/styles.ts
+@@ -18,6 +18,7 @@ import SelectControl from '../../select-control';
+ import { Select } from '../../select-control/styles/select-control-styles';
+ 
+ export const Wrapper = styled.div`
++	box-sizing: border-box;
+ 	font-size: ${ CONFIG.fontSize };
+ `;
+ 
+diff --git a/packages/date/src/index.js b/packages/date/src/index.js
+index 2a67fc35d59a26..520d3468fd0c5a 100644
+--- a/packages/date/src/index.js
++++ b/packages/date/src/index.js
+@@ -580,7 +580,8 @@ function buildMoment( dateValue, timezone = '' ) {
+ 	const dateMoment = momentLib( dateValue );
+ 
+ 	if ( timezone && ! isUTCOffset( timezone ) ) {
+-		return dateMoment.tz( String( timezone ) );
++		// The ! isUTCOffset() check guarantees that timezone is a string.
++		return dateMoment.tz( /** @type {string} */ ( timezone ) );
+ 	}
+ 
+ 	if ( timezone && isUTCOffset( timezone ) ) {

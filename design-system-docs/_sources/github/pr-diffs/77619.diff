@@ -1,0 +1,66 @@
+diff --git a/packages/base-styles/CHANGELOG.md b/packages/base-styles/CHANGELOG.md
+index 20d1abefde3e3d..182721f7c9c13b 100644
+--- a/packages/base-styles/CHANGELOG.md
++++ b/packages/base-styles/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Breaking Changes
+ 
++-   Remove `.components-form-toggle__input` from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619)).
+ -   Remove `.components-button {:focus or .is-primary}` from the `z-index()` helper ([#77621](https://github.com/WordPress/gutenberg/pull/77621)).
+ 
+ ## 6.20.0 (2026-04-15)
+diff --git a/packages/base-styles/_z-index.scss b/packages/base-styles/_z-index.scss
+index e04c0c25bb5b43..9dc8b702838a78 100644
+--- a/packages/base-styles/_z-index.scss
++++ b/packages/base-styles/_z-index.scss
+@@ -10,7 +10,6 @@ $z-layers: (
+ 	".block-editor-block-switcher__arrow": 1,
+ 	".block-editor-block-list__block {core/image aligned wide or fullwide}": 20,
+ 	".block-library-classic__toolbar": 31, // When scrolled to top this toolbar needs to sit over block-editor-block-toolbar
+-	".components-form-toggle__input": 1,
+ 	".editor-text-editor__toolbar": 1,
+ 
+ 	// These next three share a stacking context
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 66bf7302a98702..aacf7470b421ac 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `Menu`: Remove `cursor: not-allowed` and added pointer styles to menu ([#70412](https://github.com/WordPress/gutenberg/pull/70412))
++-   `FormToggle`: Add stacking context isolation ([#77619](https://github.com/WordPress/gutenberg/pull/77619)).
+ 
+ ### Breaking Changes
+ 
+diff --git a/packages/components/src/form-toggle/style.scss b/packages/components/src/form-toggle/style.scss
+index 7f8bcaf5993e14..48a50e5c0dafc6 100644
+--- a/packages/components/src/form-toggle/style.scss
++++ b/packages/components/src/form-toggle/style.scss
+@@ -2,7 +2,6 @@
+ @use "@wordpress/base-styles/colors" as *;
+ @use "@wordpress/base-styles/mixins" as *;
+ @use "@wordpress/base-styles/variables" as *;
+-@use "@wordpress/base-styles/z-index" as *;
+ @use "../utils/theme-variables" as *;
+ 
+ $toggle-width: $grid-unit-40;
+@@ -14,6 +13,7 @@ $transition-duration: 0.2s;
+ 
+ .components-form-toggle {
+ 	position: relative;
++	isolation: isolate;
+ 	display: inline-block;
+ 	height: $toggle-height;
+ 
+@@ -151,7 +151,8 @@ $transition-duration: 0.2s;
+ 	opacity: 0;
+ 	margin: 0;
+ 	padding: 0;
+-	z-index: z-index(".components-form-toggle__input");
++	// Sit above the visual track and thumb so the invisible input receives pointer events.
++	z-index: 1;
+ 
+ 	// This overrides a border style that is inherited from parent checkbox styles.
+ 	border: none;

@@ -1,0 +1,1258 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 40e79b6d904b45..65c9eb62fea256 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -579,5 +579,23 @@ module.exports = {
+ 				'@wordpress/use-recommended-components': 'off',
+ 			},
+ 		},
++		{
++			files: [ '**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs' ],
++			rules: {
++				'no-unused-vars': [
++					'error',
++					{ ignoreRestSiblings: true, caughtErrors: 'all' },
++				],
++			},
++		},
++		{
++			files: [ '**/*.ts', '**/*.tsx' ],
++			rules: {
++				'@typescript-eslint/no-unused-vars': [
++					'error',
++					{ ignoreRestSiblings: true, caughtErrors: 'all' },
++				],
++			},
++		},
+ 	],
+ };
+diff --git a/bin/packages/check-build-type-declaration-files.js b/bin/packages/check-build-type-declaration-files.js
+index 244a3c6abc85fa..39643eb26c2aeb 100644
+--- a/bin/packages/check-build-type-declaration-files.js
++++ b/bin/packages/check-build-type-declaration-files.js
+@@ -59,7 +59,7 @@ async function getDecFile( packagePath ) {
+ 	try {
+ 		await fs.access( decFile );
+ 		return decFile;
+-	} catch ( err ) {
++	} catch {
+ 		console.error(
+ 			`Cannot access this declaration file. You may need to run tsc again: ${ decFile }`
+ 		);
+diff --git a/packages/block-editor/src/components/block-draggable/test/helpers.native.js b/packages/block-editor/src/components/block-draggable/test/helpers.native.js
+index 63afe8e7add34e..442cbf39af30fa 100644
+--- a/packages/block-editor/src/components/block-draggable/test/helpers.native.js
++++ b/packages/block-editor/src/components/block-draggable/test/helpers.native.js
+@@ -175,7 +175,7 @@ export const getDraggableChip = ( { getByTestId } ) => {
+ 	let draggableChip;
+ 	try {
+ 		draggableChip = getByTestId( 'draggable-chip' );
+-	} catch ( e ) {
++	} catch {
+ 		// NOOP.
+ 	}
+ 	return draggableChip;
+diff --git a/packages/block-editor/src/components/iframe/get-compatibility-styles.js b/packages/block-editor/src/components/iframe/get-compatibility-styles.js
+index 05ec5968082e22..ea98279d5866dd 100644
+--- a/packages/block-editor/src/components/iframe/get-compatibility-styles.js
++++ b/packages/block-editor/src/components/iframe/get-compatibility-styles.js
+@@ -21,7 +21,7 @@ export function getCompatibilityStyles() {
+ 				// May fail for external styles.
+ 				// eslint-disable-next-line no-unused-expressions
+ 				styleSheet.cssRules;
+-			} catch ( e ) {
++			} catch {
+ 				return accumulator;
+ 			}
+ 
+diff --git a/packages/block-editor/src/components/inserter/media-tab/hooks.js b/packages/block-editor/src/components/inserter/media-tab/hooks.js
+index 694b321832422a..2ce0dbaf89cce3 100644
+--- a/packages/block-editor/src/components/inserter/media-tab/hooks.js
++++ b/packages/block-editor/src/components/inserter/media-tab/hooks.js
+@@ -100,7 +100,7 @@ export function useMediaCategories( rootClientId ) {
+ 							results = await category.fetch( {
+ 								per_page: 1,
+ 							} );
+-						} catch ( e ) {
++						} catch {
+ 							// If the request fails, we shallow the error and just don't show
+ 							// the category, in order to not break the media tab.
+ 						}
+diff --git a/packages/block-editor/src/components/link-control/search-input.js b/packages/block-editor/src/components/link-control/search-input.js
+index c72e7f69166ce6..def03eaece0058 100644
+--- a/packages/block-editor/src/components/link-control/search-input.js
++++ b/packages/block-editor/src/components/link-control/search-input.js
+@@ -99,7 +99,7 @@ const LinkControlSearchInput = forwardRef(
+ 					if ( suggestion?.url ) {
+ 						onSelect( suggestion );
+ 					}
+-				} catch ( e ) {}
++				} catch {}
+ 				return;
+ 			}
+ 
+diff --git a/packages/block-editor/src/components/use-on-block-drop/index.js b/packages/block-editor/src/components/use-on-block-drop/index.js
+index c7778ff44dc053..b66d6c1f5b2440 100644
+--- a/packages/block-editor/src/components/use-on-block-drop/index.js
++++ b/packages/block-editor/src/components/use-on-block-drop/index.js
+@@ -46,7 +46,7 @@ export function parseDropEvent( event ) {
+ 			result,
+ 			JSON.parse( event.dataTransfer.getData( 'wp-blocks' ) )
+ 		);
+-	} catch ( err ) {
++	} catch {
+ 		return result;
+ 	}
+ 
+diff --git a/packages/block-editor/src/components/use-paste-styles/index.js b/packages/block-editor/src/components/use-paste-styles/index.js
+index 3be3efc295a68b..cd032b1076d0b5 100644
+--- a/packages/block-editor/src/components/use-paste-styles/index.js
++++ b/packages/block-editor/src/components/use-paste-styles/index.js
+@@ -44,7 +44,7 @@ function hasSerializedBlocks( text ) {
+ 			return false;
+ 		}
+ 		return true;
+-	} catch ( err ) {
++	} catch {
+ 		// Parsing error, the text is not serialized blocks.
+ 		// (Even though that it technically won't happen)
+ 		return false;
+@@ -153,7 +153,7 @@ export default function usePasteStyles() {
+ 				}
+ 
+ 				html = await window.navigator.clipboard.readText();
+-			} catch ( error ) {
++			} catch {
+ 				// Possibly the permission is denied.
+ 				createErrorNotice(
+ 					__(
+diff --git a/packages/block-editor/src/utils/pasting.js b/packages/block-editor/src/utils/pasting.js
+index 2e97849904c68b..b40ba445f7eb38 100644
+--- a/packages/block-editor/src/utils/pasting.js
++++ b/packages/block-editor/src/utils/pasting.js
+@@ -55,7 +55,7 @@ export function getPasteEventData( { clipboardData } ) {
+ 	try {
+ 		plainText = clipboardData.getData( 'text/plain' );
+ 		html = clipboardData.getData( 'text/html' );
+-	} catch ( error ) {
++	} catch {
+ 		// Some browsers like UC Browser paste plain text by default and
+ 		// don't support clipboardData at all, so allow default
+ 		// behaviour.
+diff --git a/packages/block-library/src/cover/edit/color-utils.js b/packages/block-library/src/cover/edit/color-utils.js
+index de62b5dfbb014e..2326efbfcfb93d 100644
+--- a/packages/block-library/src/cover/edit/color-utils.js
++++ b/packages/block-library/src/cover/edit/color-utils.js
+@@ -92,7 +92,7 @@ export const getMediaColor = memoize( async ( url ) => {
+ 			crossOrigin: imgCrossOrigin,
+ 		} );
+ 		return color.hex;
+-	} catch ( error ) {
++	} catch {
+ 		// If there's an error return the fallback color.
+ 		return DEFAULT_BACKGROUND_COLOR;
+ 	}
+diff --git a/packages/block-library/src/cover/embed-video-utils.js b/packages/block-library/src/cover/embed-video-utils.js
+index ef8f0eaf3f1786..6623cdb78ca292 100644
+--- a/packages/block-library/src/cover/embed-video-utils.js
++++ b/packages/block-library/src/cover/embed-video-utils.js
+@@ -189,7 +189,7 @@ export function getBackgroundVideoSrc( src ) {
+ 		}
+ 
+ 		return url.toString();
+-	} catch ( error ) {
++	} catch {
+ 		// If URL parsing fails, return original src
+ 		return src;
+ 	}
+diff --git a/packages/block-library/src/embed/test/index.native.js b/packages/block-library/src/embed/test/index.native.js
+index 59e4cfe51fccec..000ac61c11aa97 100644
+--- a/packages/block-library/src/embed/test/index.native.js
++++ b/packages/block-library/src/embed/test/index.native.js
+@@ -28,9 +28,10 @@ import { requestPreview } from '@wordpress/react-native-bridge';
+ /**
+  * Internal dependencies
+  */
++import { WebView } from 'react-native-webview';
++
+ import * as paragraph from '../../paragraph';
+ import * as embed from '..';
+-import { WebView } from 'react-native-webview';
+ 
+ // Override modal mock to prevent unmounting it when is not visible.
+ // This is required to be able to trigger onClose and onDismiss events when
+@@ -1114,7 +1115,7 @@ describe( 'Embed block', () => {
+ 			try {
+ 				mediaSettingsPanel =
+ 					await screen.findByText( 'Media settings' );
+-			} catch ( e ) {
++			} catch {
+ 				// NOOP.
+ 			}
+ 
+diff --git a/packages/block-library/src/file/utils/index.js b/packages/block-library/src/file/utils/index.js
+index 283565f47bd98c..0aba91b9684d5d 100644
+--- a/packages/block-library/src/file/utils/index.js
++++ b/packages/block-library/src/file/utils/index.js
+@@ -54,7 +54,7 @@ const createActiveXObject = ( type ) => {
+ 	let ax;
+ 	try {
+ 		ax = new window.ActiveXObject( type );
+-	} catch ( e ) {
++	} catch {
+ 		ax = undefined;
+ 	}
+ 	return ax;
+diff --git a/packages/block-library/src/form/view.js b/packages/block-library/src/form/view.js
+index 714ff26ddba9be..17d68fcbdc43c1 100644
+--- a/packages/block-library/src/form/view.js
++++ b/packages/block-library/src/form/view.js
+@@ -47,7 +47,7 @@ document.querySelectorAll( 'form.wp-block-form' ).forEach( function ( form ) {
+ 			} else {
+ 				redirectNotification( 'error' );
+ 			}
+-		} catch ( error ) {
++		} catch {
+ 			redirectNotification( 'error' );
+ 		}
+ 	} );
+diff --git a/packages/block-library/src/navigation-link/link-ui/page-creator.js b/packages/block-library/src/navigation-link/link-ui/page-creator.js
+index 30d1799f190979..5ad7a1c0ab9049 100644
+--- a/packages/block-library/src/navigation-link/link-ui/page-creator.js
++++ b/packages/block-library/src/navigation-link/link-ui/page-creator.js
+@@ -103,7 +103,7 @@ export function LinkUIPageCreator( {
+ 
+ 				onPageCreated( pageLink );
+ 			}
+-		} catch ( error ) {
++		} catch {
+ 			// Show error notice
+ 			createErrorNotice(
+ 				__( 'Failed to create page. Please try again.' ),
+diff --git a/packages/block-library/src/navigation-link/shared/update-attributes.js b/packages/block-library/src/navigation-link/shared/update-attributes.js
+index 629f319ece306e..1121b164c5bc3a 100644
+--- a/packages/block-library/src/navigation-link/shared/update-attributes.js
++++ b/packages/block-library/src/navigation-link/shared/update-attributes.js
+@@ -34,7 +34,7 @@ const shouldSeverEntityLink = ( originalUrl, newUrl ) => {
+ 					? window.location.origin
+ 					: 'https://wordpress.org' );
+ 			return new URL( url, base );
+-		} catch ( error ) {
++		} catch {
+ 			// If URL construction still fails, it's likely an invalid URL
+ 			// and we should sever the entity link
+ 			return null;
+diff --git a/packages/block-library/src/navigation-link/shared/use-link-preview.js b/packages/block-library/src/navigation-link/shared/use-link-preview.js
+index e3c042bd491eab..a29ee52ace24e1 100644
+--- a/packages/block-library/src/navigation-link/shared/use-link-preview.js
++++ b/packages/block-library/src/navigation-link/shared/use-link-preview.js
+@@ -101,7 +101,7 @@ export function computeDisplayUrl( { linkUrl, homeUrl } = {} ) {
+ 			// Different host - this is an external link
+ 			isExternal = true;
+ 		}
+-	} catch ( e ) {
++	} catch {
+ 		// URL parsing failed - treat as external (e.g. no homeUrl, or URL without protocol)
+ 		isExternal = true;
+ 	}
+diff --git a/packages/block-library/src/pattern/edit.js b/packages/block-library/src/pattern/edit.js
+index f496132f6e2b1d..0f480650af9bfc 100644
+--- a/packages/block-library/src/pattern/edit.js
++++ b/packages/block-library/src/pattern/edit.js
+@@ -78,7 +78,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
+ 		if ( ! hasRecursionError && selectedPattern?.blocks ) {
+ 			try {
+ 				parsePatternDependencies( selectedPattern );
+-			} catch ( error ) {
++			} catch {
+ 				setHasRecursionError( true );
+ 				return;
+ 			}
+diff --git a/packages/block-serialization-default-parser/src/index.ts b/packages/block-serialization-default-parser/src/index.ts
+index ce70fad763162d..576503b55d490f 100644
+--- a/packages/block-serialization-default-parser/src/index.ts
++++ b/packages/block-serialization-default-parser/src/index.ts
+@@ -366,7 +366,7 @@ function proceed(): boolean {
+ function parseJSON( input: string ): Object | null {
+ 	try {
+ 		return JSON.parse( input );
+-	} catch ( e ) {
++	} catch {
+ 		return null;
+ 	}
+ }
+diff --git a/packages/block-serialization-spec-parser/shared-tests.js b/packages/block-serialization-spec-parser/shared-tests.js
+index d7989e97f53bca..60b743203da254 100644
+--- a/packages/block-serialization-spec-parser/shared-tests.js
++++ b/packages/block-serialization-spec-parser/shared-tests.js
+@@ -372,7 +372,7 @@ export const phpTester = ( name, filename ) =>
+ 								'"attrs":{}'
+ 							)
+ 						);
+-					} catch ( e ) {
++					} catch {
+ 						throw new Error(
+ 							'failed to parse JSON:\n' + process.stdout
+ 						);
+diff --git a/packages/blocks/src/api/children.js b/packages/blocks/src/api/children.js
+index fe46a30870af97..fd7c928274278b 100644
+--- a/packages/blocks/src/api/children.js
++++ b/packages/blocks/src/api/children.js
+@@ -110,7 +110,7 @@ export function fromDOM( domNodes ) {
+ 	for ( let i = 0; i < domNodes.length; i++ ) {
+ 		try {
+ 			result.push( node.fromDOM( domNodes[ i ] ) );
+-		} catch ( error ) {
++		} catch {
+ 			// Simply ignore if DOM node could not be converted.
+ 		}
+ 	}
+diff --git a/packages/blocks/src/api/node.js b/packages/blocks/src/api/node.js
+index 5db58647c39885..ed8e112ea1fcfe 100644
+--- a/packages/blocks/src/api/node.js
++++ b/packages/blocks/src/api/node.js
+@@ -139,7 +139,7 @@ export function matcher( selector ) {
+ 
+ 		try {
+ 			return fromDOM( match );
+-		} catch ( error ) {
++		} catch {
+ 			return null;
+ 		}
+ 	};
+diff --git a/packages/blocks/src/api/raw-handling/image-corrector.js b/packages/blocks/src/api/raw-handling/image-corrector.js
+index d3cf2ffb17486f..933a61ec038311 100644
+--- a/packages/blocks/src/api/raw-handling/image-corrector.js
++++ b/packages/blocks/src/api/raw-handling/image-corrector.js
+@@ -27,7 +27,7 @@ export default function imageCorrector( node ) {
+ 		// Can throw DOMException!
+ 		try {
+ 			decoded = atob( data );
+-		} catch ( e ) {
++		} catch {
+ 			node.src = '';
+ 			return;
+ 		}
+diff --git a/packages/blocks/src/api/serializer.js b/packages/blocks/src/api/serializer.js
+index d61a1b11b384bf..fa912a882eab82 100644
+--- a/packages/blocks/src/api/serializer.js
++++ b/packages/blocks/src/api/serializer.js
+@@ -320,7 +320,7 @@ export function getBlockInnerHTML( block ) {
+ 				block.attributes,
+ 				block.innerBlocks
+ 			);
+-		} catch ( error ) {}
++		} catch {}
+ 	}
+ 
+ 	return saveContent;
+diff --git a/packages/blocks/src/api/validation/index.js b/packages/blocks/src/api/validation/index.js
+index 1044d43e463f87..6f3065a333c80a 100644
+--- a/packages/blocks/src/api/validation/index.js
++++ b/packages/blocks/src/api/validation/index.js
+@@ -575,7 +575,7 @@ export function getNextNonWhitespaceToken( tokens ) {
+ function getHTMLTokens( html, logger = createLogger() ) {
+ 	try {
+ 		return new Tokenizer( new DecodeEntityParser() ).tokenize( html );
+-	} catch ( e ) {
++	} catch {
+ 		logger.warning( 'Malformed HTML detected: %s', html );
+ 	}
+ 
+diff --git a/packages/components/src/mobile/utils/get-px-from-css-unit.native.js b/packages/components/src/mobile/utils/get-px-from-css-unit.native.js
+index e4650b88485274..0c86505aabaaee 100644
+--- a/packages/components/src/mobile/utils/get-px-from-css-unit.native.js
++++ b/packages/components/src/mobile/utils/get-px-from-css-unit.native.js
+@@ -26,7 +26,7 @@ function parseUnit( cssUnit ) {
+ function calculate( expression ) {
+ 	try {
+ 		return Function( `'use strict'; return (${ expression })` )();
+-	} catch ( err ) {
++	} catch {
+ 		return null;
+ 	}
+ }
+diff --git a/packages/components/src/sandbox/index.native.js b/packages/components/src/sandbox/index.native.js
+index 72070bf6efcd08..9d04ed43b81e2b 100644
+--- a/packages/components/src/sandbox/index.native.js
++++ b/packages/components/src/sandbox/index.native.js
+@@ -297,7 +297,7 @@ const Sandbox = forwardRef( function Sandbox(
+ 
+ 			try {
+ 				data = JSON.parse( data );
+-			} catch ( e ) {
++			} catch {
+ 				return;
+ 			}
+ 
+diff --git a/packages/components/src/sandbox/index.tsx b/packages/components/src/sandbox/index.tsx
+index 14c57b42d566ab..1cc4652a70a6c6 100644
+--- a/packages/components/src/sandbox/index.tsx
++++ b/packages/components/src/sandbox/index.tsx
+@@ -141,7 +141,7 @@ function SandBox( {
+ 	function isFrameAccessible() {
+ 		try {
+ 			return !! ref.current?.contentDocument?.body;
+-		} catch ( e ) {
++		} catch {
+ 			return false;
+ 		}
+ 	}
+@@ -232,7 +232,7 @@ function SandBox( {
+ 			if ( 'string' === typeof data ) {
+ 				try {
+ 					data = JSON.parse( data );
+-				} catch ( e ) {}
++				} catch {}
+ 			}
+ 
+ 			// Update the state only if the message is formatted as we expect,
+diff --git a/packages/core-data/src/resolvers.js b/packages/core-data/src/resolvers.js
+index 1abd7d7e669b30..dfef02c0968e12 100644
+--- a/packages/core-data/src/resolvers.js
++++ b/packages/core-data/src/resolvers.js
+@@ -578,7 +578,7 @@ export const getEntityRecords =
+ 
+ 				dispatch.__unstableReleaseStoreLock( lock );
+ 			} );
+-		} catch ( e ) {
++		} catch {
+ 			dispatch.__unstableReleaseStoreLock( lock );
+ 		}
+ 	};
+@@ -635,7 +635,7 @@ export const getEmbedPreview =
+ 				path: addQueryArgs( '/oembed/1.0/proxy', { url } ),
+ 			} );
+ 			dispatch.receiveEmbedPreview( url, embedProxyResponse );
+-		} catch ( error ) {
++		} catch {
+ 			// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
+ 			dispatch.receiveEmbedPreview( url, false );
+ 		}
+@@ -706,7 +706,7 @@ export const canUser =
+ 				method: 'OPTIONS',
+ 				parse: false,
+ 			} );
+-		} catch ( error ) {
++		} catch {
+ 			// Do nothing if our OPTIONS request comes back with an API error (4xx or
+ 			// 5xx). The previously determined isAllowed value will remain in the store.
+ 			return;
+@@ -1077,7 +1077,7 @@ export const getRevisions =
+ 				entityConfig.supportsPagination && query.per_page !== -1;
+ 			try {
+ 				response = await apiFetch( { path, parse: ! isPaginated } );
+-			} catch ( error ) {
++			} catch {
+ 				// Do nothing if our request comes back with an API error.
+ 				return;
+ 			}
+@@ -1220,7 +1220,7 @@ export const getRevision =
+ 			let record;
+ 			try {
+ 				record = await apiFetch( { path } );
+-			} catch ( error ) {
++			} catch {
+ 				// Do nothing if our request comes back with an API error.
+ 				return;
+ 			}
+@@ -1257,7 +1257,7 @@ export const getRegisteredPostMeta =
+ 				path: `${ restNamespace }/${ restBase }/?context=edit`,
+ 				method: 'OPTIONS',
+ 			} );
+-		} catch ( error ) {
++		} catch {
+ 			// Do nothing if the request comes back with an API error.
+ 			return;
+ 		}
+diff --git a/packages/create-block/lib/templates.js b/packages/create-block/lib/templates.js
+index a74419c3c998a0..0ff4bf2e9c1d11 100644
+--- a/packages/create-block/lib/templates.js
++++ b/packages/create-block/lib/templates.js
+@@ -118,7 +118,7 @@ const getOutputAssets = async ( outputAssetsPath ) => {
+ const externalTemplateExists = async ( templateName ) => {
+ 	try {
+ 		await command( `npm view ${ templateName }` );
+-	} catch ( error ) {
++	} catch {
+ 		return false;
+ 	}
+ 	return true;
+diff --git a/packages/data/src/plugins/persistence/index.ts b/packages/data/src/plugins/persistence/index.ts
+index f8506e8e388ea4..a7b067484709b0 100644
+--- a/packages/data/src/plugins/persistence/index.ts
++++ b/packages/data/src/plugins/persistence/index.ts
+@@ -94,7 +94,7 @@ export function createPersistenceInterface(
+ 			} else {
+ 				try {
+ 					data = JSON.parse( persisted );
+-				} catch ( error ) {
++				} catch {
+ 					// Similarly, should any error be thrown during parse of
+ 					// the string (malformed JSON), fall back to empty object.
+ 					data = {};
+diff --git a/packages/data/src/plugins/persistence/storage/default.ts b/packages/data/src/plugins/persistence/storage/default.ts
+index 9eff9ec2f4f38e..0f801f8500b095 100644
+--- a/packages/data/src/plugins/persistence/storage/default.ts
++++ b/packages/data/src/plugins/persistence/storage/default.ts
+@@ -13,7 +13,7 @@ try {
+ 	storage = window.localStorage;
+ 	storage.setItem( '__wpDataTestLocalStorage', '' );
+ 	storage.removeItem!( '__wpDataTestLocalStorage' );
+-} catch ( error ) {
++} catch {
+ 	storage = objectStorage;
+ }
+ 
+diff --git a/packages/data/src/redux-store/metadata/test/selectors.js b/packages/data/src/redux-store/metadata/test/selectors.js
+index 37eb820889cc15..e699b531fd344f 100644
+--- a/packages/data/src/redux-store/metadata/test/selectors.js
++++ b/packages/data/src/redux-store/metadata/test/selectors.js
+@@ -21,7 +21,7 @@ const testStore = {
+ async function resolve( registry, selector ) {
+ 	try {
+ 		await registry.resolveSelect( 'store' )[ selector ]();
+-	} catch ( e ) {}
++	} catch {}
+ }
+ 
+ describe( 'getIsResolving', () => {
+diff --git a/packages/data/src/registry.ts b/packages/data/src/registry.ts
+index 429d4e27b78d58..c3893aa0025129 100644
+--- a/packages/data/src/registry.ts
++++ b/packages/data/src/registry.ts
+@@ -261,7 +261,7 @@ export function createRegistry(
+ 				unlock( store.store ).registerPrivateSelectors(
+ 					unlock( parent ).privateSelectorsOf( name )
+ 				);
+-			} catch ( e ) {
++			} catch {
+ 				// unlock() throws if store.store was not locked.
+ 				// The error indicates there's nothing to do here so let's
+ 				// ignore it.
+@@ -389,7 +389,7 @@ export function createRegistry(
+ 		privateActionsOf: ( name: string ) => {
+ 			try {
+ 				return unlock( stores[ name ].store ).privateActions;
+-			} catch ( e ) {
++			} catch {
+ 				// unlock() throws an error the store was not locked – this means
+ 				// there no private actions are available
+ 				return {};
+@@ -398,7 +398,7 @@ export function createRegistry(
+ 		privateSelectorsOf: ( name: string ) => {
+ 			try {
+ 				return unlock( stores[ name ].store ).privateSelectors;
+-			} catch ( e ) {
++			} catch {
+ 				return {};
+ 			}
+ 		},
+diff --git a/packages/docgen/lib/get-type-annotation.js b/packages/docgen/lib/get-type-annotation.js
+index 51ea6880d823a3..2d08a7a536d532 100644
+--- a/packages/docgen/lib/get-type-annotation.js
++++ b/packages/docgen/lib/get-type-annotation.js
+@@ -598,7 +598,7 @@ function getVariableTypeAnnotation( declarationToken ) {
+ 
+ 	try {
+ 		return getTypeAnnotation( resolvedToken.typeAnnotation.typeAnnotation );
+-	} catch ( e ) {
++	} catch {
+ 		// Assume it's a fully undocumented variable, there's nothing we can do about that but fail silently.
+ 	}
+ }
+diff --git a/packages/dom/src/dom/input-field-has-uncollapsed-selection.js b/packages/dom/src/dom/input-field-has-uncollapsed-selection.js
+index 641c07fb677149..b13bbbbcd2647c 100644
+--- a/packages/dom/src/dom/input-field-has-uncollapsed-selection.js
++++ b/packages/dom/src/dom/input-field-has-uncollapsed-selection.js
+@@ -40,7 +40,7 @@ export default function inputFieldHasUncollapsedSelection( element ) {
+ 			// when not null, compare the two points
+ 			selectionStart !== selectionEnd
+ 		);
+-	} catch ( error ) {
++	} catch {
+ 		// This is Safari's way of saying that the input type doesn't implement
+ 		// selection, so we default to true.
+ 		return true;
+diff --git a/packages/e2e-test-utils-playwright/src/admin/visit-site-editor.ts b/packages/e2e-test-utils-playwright/src/admin/visit-site-editor.ts
+index 670792a8f95bea..c00f187ccbce6c 100644
+--- a/packages/e2e-test-utils-playwright/src/admin/visit-site-editor.ts
++++ b/packages/e2e-test-utils-playwright/src/admin/visit-site-editor.ts
+@@ -76,7 +76,7 @@ export async function visitSiteEditor(
+ 				// doesn't make it under the default timeout value.
+ 				timeout: 60_000,
+ 			} );
+-		} catch ( error ) {
++		} catch {
+ 			// If the canvas loader is already disappeared, skip the waiting.
+ 			await this.page
+ 				.getByRole( 'region', { name: 'Editor content' } )
+diff --git a/packages/e2e-test-utils-playwright/src/test.ts b/packages/e2e-test-utils-playwright/src/test.ts
+index b1300bb9be72ff..45213ca953cfec 100644
+--- a/packages/e2e-test-utils-playwright/src/test.ts
++++ b/packages/e2e-test-utils-playwright/src/test.ts
+@@ -153,7 +153,7 @@ const test = base.extend<
+ 			await page.evaluate( () => {
+ 				window.localStorage.clear();
+ 			} );
+-		} catch ( error ) {
++		} catch {
+ 			// noop.
+ 		}
+ 
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/generator-scope/view.js b/packages/e2e-tests/plugins/interactive-blocks/generator-scope/view.js
+index 786dd304cf7c57..5a377bb049bb63 100644
+--- a/packages/e2e-tests/plugins/interactive-blocks/generator-scope/view.js
++++ b/packages/e2e-tests/plugins/interactive-blocks/generator-scope/view.js
+@@ -23,7 +23,7 @@ const { callbacks } = store( 'test/generator-scope', {
+ 			let value = yield Promise.resolve( 1 );
+ 			try {
+ 				value = yield Promise.reject( 2 );
+-			} catch ( e ) {
++			} catch {
+ 				value = yield Promise.resolve( 3 );
+ 			}
+ 			getContext().result = value;
+diff --git a/packages/e2e-tests/plugins/interactive-blocks/router-navigate/view.js b/packages/e2e-tests/plugins/interactive-blocks/router-navigate/view.js
+index 86ca22dbc2a7e2..027bf83ca64249 100644
+--- a/packages/e2e-tests/plugins/interactive-blocks/router-navigate/view.js
++++ b/packages/e2e-tests/plugins/interactive-blocks/router-navigate/view.js
+@@ -34,7 +34,7 @@ const { state } = store( 'router', {
+ 
+ 			try {
+ 				yield actions.navigate( e.target.href, { force, timeout } );
+-			} catch ( error ) {
++			} catch {
+ 				state.status = 'fail';
+ 			}
+ 
+diff --git a/packages/edit-site/src/components/more-menu/site-export.js b/packages/edit-site/src/components/more-menu/site-export.js
+index 87f93d0cc83003..c3f783ec4ba41c 100644
+--- a/packages/edit-site/src/components/more-menu/site-export.js
++++ b/packages/edit-site/src/components/more-menu/site-export.js
+@@ -49,7 +49,7 @@ export default function SiteExport() {
+ 			let error = {};
+ 			try {
+ 				error = await errorResponse.json();
+-			} catch ( e ) {}
++			} catch {}
+ 			const errorMessage =
+ 				error.message && error.code !== 'unknown_error'
+ 					? error.message
+diff --git a/packages/editor/src/components/collaborators-overlay/cursor-dom-utils.ts b/packages/editor/src/components/collaborators-overlay/cursor-dom-utils.ts
+index 16f86facccd237..59d8e49c3dadfc 100644
+--- a/packages/editor/src/components/collaborators-overlay/cursor-dom-utils.ts
++++ b/packages/editor/src/components/collaborators-overlay/cursor-dom-utils.ts
+@@ -67,7 +67,7 @@ const getOffsetPositionInBlock = (
+ 
+ 	try {
+ 		cursorRange.setStart( node, offset );
+-	} catch ( error ) {
++	} catch {
+ 		return null;
+ 	}
+ 
+diff --git a/packages/editor/src/components/collaborators-overlay/timing-utils.ts b/packages/editor/src/components/collaborators-overlay/timing-utils.ts
+index 5d4918715f3679..dedae2bd740167 100644
+--- a/packages/editor/src/components/collaborators-overlay/timing-utils.ts
++++ b/packages/editor/src/components/collaborators-overlay/timing-utils.ts
+@@ -13,7 +13,7 @@ export function setDelayedInterval( callback: () => void, delayMs: number ) {
+ 	const runner = () => {
+ 		try {
+ 			callback();
+-		} catch ( error ) {
++		} catch {
+ 			// Do nothing
+ 		}
+ 
+diff --git a/packages/editor/src/components/error-boundary/index.js b/packages/editor/src/components/error-boundary/index.js
+index f3e6e5fd127afc..014758f79ae700 100644
+--- a/packages/editor/src/components/error-boundary/index.js
++++ b/packages/editor/src/components/error-boundary/index.js
+@@ -26,7 +26,7 @@ function getContent() {
+ 		// content serialization throughout the lifetime of a non-erroring
+ 		// application.
+ 		return select( editorStore ).getEditedPostContent();
+-	} catch ( error ) {}
++	} catch {}
+ }
+ 
+ function CopyButton( { text, children, variant = 'secondary' } ) {
+diff --git a/packages/editor/src/components/error-boundary/index.native.js b/packages/editor/src/components/error-boundary/index.native.js
+index 4c05ceb3fc150b..a020d55d44df22 100644
+--- a/packages/editor/src/components/error-boundary/index.native.js
++++ b/packages/editor/src/components/error-boundary/index.native.js
+@@ -34,7 +34,7 @@ function getContent() {
+ 		// content serialization throughout the lifetime of a non-erroring
+ 		// application.
+ 		return select( editorStore ).getEditedPostContent();
+-	} catch ( error ) {}
++	} catch {}
+ }
+ 
+ function CopyButton( {
+diff --git a/packages/editor/src/components/post-title/index.js b/packages/editor/src/components/post-title/index.js
+index deb73fcff57164..bc3831b3d7a0f9 100644
+--- a/packages/editor/src/components/post-title/index.js
++++ b/packages/editor/src/components/post-title/index.js
+@@ -124,7 +124,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
+ 		try {
+ 			plainText = clipboardData.getData( 'text/plain' );
+ 			html = clipboardData.getData( 'text/html' );
+-		} catch ( error ) {
++		} catch {
+ 			// Some browsers like UC Browser paste plain text by default and
+ 			// don't support clipboardData at all, so allow default
+ 			// behaviour.
+diff --git a/packages/env/lib/config/load-config.js b/packages/env/lib/config/load-config.js
+index fd184903e472ee..efd5fc2ed2de1e 100644
+--- a/packages/env/lib/config/load-config.js
++++ b/packages/env/lib/config/load-config.js
+@@ -61,7 +61,7 @@ module.exports = async function loadConfig(
+ 	if ( customConfigPath ) {
+ 		try {
+ 			await fs.stat( configFilePath );
+-		} catch ( error ) {
++		} catch {
+ 			throw new ValidationError(
+ 				`Config file not found: ${ configFilePath }`
+ 			);
+diff --git a/packages/env/lib/config/parse-source-string.js b/packages/env/lib/config/parse-source-string.js
+index d4eb3ac6f9ad22..313f411fa51060 100644
+--- a/packages/env/lib/config/parse-source-string.js
++++ b/packages/env/lib/config/parse-source-string.js
+@@ -106,7 +106,7 @@ function parseSourceString( sourceString, { cacheDirectoryPath } ) {
+ 				basename,
+ 			};
+ 		}
+-	} catch ( err ) {}
++	} catch {}
+ 
+ 	const gitHubFields = sourceString.match(
+ 		/^([^\/]+)\/([^#\/]+)(\/([^#]+))?(?:#(.+))?$/
+diff --git a/packages/env/lib/runtime/docker/wordpress.js b/packages/env/lib/runtime/docker/wordpress.js
+index a4ca62031ec08b..a0c4268499ab4d 100644
+--- a/packages/env/lib/runtime/docker/wordpress.js
++++ b/packages/env/lib/runtime/docker/wordpress.js
+@@ -64,7 +64,7 @@ async function configureWordPress( environment, config, spinner ) {
+ 			spinner,
+ 			config.debug
+ 		);
+-	} catch ( err ) {
++	} catch {
+ 		// Ignore error.
+ 	}
+ 
+diff --git a/packages/env/lib/runtime/playground/index.js b/packages/env/lib/runtime/playground/index.js
+index ebd11384b939da..4b87ab87033bf9 100644
+--- a/packages/env/lib/runtime/playground/index.js
++++ b/packages/env/lib/runtime/playground/index.js
+@@ -327,7 +327,7 @@ class PlaygroundRuntime {
+ 			try {
+ 				const pidContent = await fs.readFile( pidFile, 'utf8' );
+ 				pid = parseInt( pidContent.trim(), 10 );
+-			} catch ( error ) {
++			} catch {
+ 				// PID file doesn't exist or can't be read
+ 				spinner.text = 'Stopped WordPress Playground.';
+ 				return;
+@@ -350,7 +350,7 @@ class PlaygroundRuntime {
+ 				} catch {
+ 					// Process group already terminated
+ 				}
+-			} catch ( error ) {
++			} catch {
+ 				// Process group doesn't exist or already terminated
+ 			}
+ 
+diff --git a/packages/eslint-plugin/utils/is-package-installed.js b/packages/eslint-plugin/utils/is-package-installed.js
+index 5b79da0c5788ac..2435dcd51af45e 100644
+--- a/packages/eslint-plugin/utils/is-package-installed.js
++++ b/packages/eslint-plugin/utils/is-package-installed.js
+@@ -9,7 +9,7 @@ const isPackageInstalled = ( packageName ) => {
+ 		if ( require.resolve( packageName ) ) {
+ 			return true;
+ 		}
+-	} catch ( error ) {}
++	} catch {}
+ 	return false;
+ };
+ 
+diff --git a/packages/global-styles-engine/src/preview-state-styles.ts b/packages/global-styles-engine/src/preview-state-styles.ts
+index 7a1e36e2206b94..3fc72766aa2e58 100644
+--- a/packages/global-styles-engine/src/preview-state-styles.ts
++++ b/packages/global-styles-engine/src/preview-state-styles.ts
+@@ -36,7 +36,7 @@ export function generatePreviewStateStyles(
+ 		const [ generatedStyles ] = generateGlobalStyles( previewConfig, [] );
+ 
+ 		return generatedStyles.map( ( style ) => style.css ).join( '\n' );
+-	} catch ( error ) {
++	} catch {
+ 		// If generation fails, return empty string to avoid breaking previews
+ 		return '';
+ 	}
+diff --git a/packages/global-styles-ui/src/font-library/font-collection.tsx b/packages/global-styles-ui/src/font-library/font-collection.tsx
+index 005f10c49b3fb6..c5ec40bdb14a66 100644
+--- a/packages/global-styles-ui/src/font-library/font-collection.tsx
++++ b/packages/global-styles-ui/src/font-library/font-collection.tsx
+@@ -210,7 +210,7 @@ function FontCollection( { slug }: { slug: string } ) {
+ 					} )
+ 				);
+ 			}
+-		} catch ( error ) {
++		} catch {
+ 			// If any of the fonts fail to download,
+ 			// show an error notice and stop the request from being sent.
+ 			setNotice( {
+diff --git a/packages/global-styles-ui/src/font-library/upload-fonts.tsx b/packages/global-styles-ui/src/font-library/upload-fonts.tsx
+index e9fb375f0c70c6..36253487f3cfc5 100644
+--- a/packages/global-styles-ui/src/font-library/upload-fonts.tsx
++++ b/packages/global-styles-ui/src/font-library/upload-fonts.tsx
+@@ -131,7 +131,7 @@ function UploadFonts() {
+ 			const buffer = await readFileAsArrayBuffer( file );
+ 			await font.fromDataBuffer( buffer, 'font' );
+ 			return true;
+-		} catch ( error ) {
++		} catch {
+ 			return false;
+ 		}
+ 	}
+diff --git a/packages/icons/lib/validate-collection.cjs b/packages/icons/lib/validate-collection.cjs
+index ed7f2213d5b96d..df281ea48ea95e 100644
+--- a/packages/icons/lib/validate-collection.cjs
++++ b/packages/icons/lib/validate-collection.cjs
+@@ -16,7 +16,7 @@ async function validateCollection() {
+ 
+ 	try {
+ 		await stat( manifestPath );
+-	} catch ( error ) {
++	} catch {
+ 		throw new Error(
+ 			`Could not find icons manifest at '${ manifestPath }'`
+ 		);
+diff --git a/packages/interactivity-router/src/assets/dynamic-importmap/fetch.ts b/packages/interactivity-router/src/assets/dynamic-importmap/fetch.ts
+index b95c9a74858ab0..98df9d2615a6d9 100644
+--- a/packages/interactivity-router/src/assets/dynamic-importmap/fetch.ts
++++ b/packages/interactivity-router/src/assets/dynamic-importmap/fetch.ts
+@@ -42,7 +42,7 @@ export async function fetchModule(
+ 	let res: Response;
+ 	try {
+ 		res = await fetch( url, fetchOpts );
+-	} catch ( e ) {
++	} catch {
+ 		throw Error( `Network error${ fetching( url, parent ) }.` );
+ 	}
+ 	if ( ! res.ok ) {
+diff --git a/packages/interactivity-router/src/assets/dynamic-importmap/resolver.ts b/packages/interactivity-router/src/assets/dynamic-importmap/resolver.ts
+index bffb0db82e8b3b..d8af46b7a373eb 100644
+--- a/packages/interactivity-router/src/assets/dynamic-importmap/resolver.ts
++++ b/packages/interactivity-router/src/assets/dynamic-importmap/resolver.ts
+@@ -22,7 +22,7 @@ function isURL( url: string ) {
+ 	try {
+ 		new URL( url );
+ 		return true;
+-	} catch ( _ ) {
++	} catch {
+ 		return false;
+ 	}
+ }
+diff --git a/packages/interactivity-router/src/index.ts b/packages/interactivity-router/src/index.ts
+index ef2d205b73962f..697da7db2bf04c 100644
+--- a/packages/interactivity-router/src/index.ts
++++ b/packages/interactivity-router/src/index.ts
+@@ -90,7 +90,7 @@ const parseRegionAttribute = ( region: Element ) => {
+ 	try {
+ 		const { id, attachTo } = JSON.parse( value );
+ 		return { id, attachTo };
+-	} catch ( e ) {
++	} catch {
+ 		return { id: value };
+ 	}
+ };
+@@ -169,7 +169,7 @@ const fetchPage = async ( url: string, { html }: { html: string } ) => {
+ 		}
+ 		const dom = new window.DOMParser().parseFromString( html, 'text/html' );
+ 		return await preparePage( url, dom );
+-	} catch ( e ) {
++	} catch {
+ 		return false;
+ 	}
+ };
+diff --git a/packages/interactivity/src/directives.tsx b/packages/interactivity/src/directives.tsx
+index f5d908786697c0..0830aa1e27b869 100644
+--- a/packages/interactivity/src/directives.tsx
++++ b/packages/interactivity/src/directives.tsx
+@@ -782,7 +782,7 @@ export default () => {
+ 								? ''
+ 								: result;
+ 						return;
+-					} catch ( err ) {}
++					} catch {}
+ 				}
+ 				/*
+ 				 * aria- and data- attributes have no boolean representation.
+@@ -858,7 +858,7 @@ export default () => {
+ 				}
+ 				element.props.children =
+ 					typeof result === 'object' ? null : result.toString();
+-			} catch ( e ) {
++			} catch {
+ 				element.props.children = null;
+ 			}
+ 		} );
+diff --git a/packages/interactivity/src/proxies/test/state-proxy.ts b/packages/interactivity/src/proxies/test/state-proxy.ts
+index 92500189fc8309..97448811e35a5a 100644
+--- a/packages/interactivity/src/proxies/test/state-proxy.ts
++++ b/packages/interactivity/src/proxies/test/state-proxy.ts
+@@ -919,7 +919,7 @@ describe( 'Interactivity API', () => {
+ 						let tag = 'No scope';
+ 						try {
+ 							tag = getContext< any >().tag;
+-						} catch ( e ) {}
++						} catch {}
+ 						return `${ tag }: ${ this.number }`;
+ 					},
+ 				} );
+diff --git a/packages/interactivity/src/test/utils.ts b/packages/interactivity/src/test/utils.ts
+index 2001f06450706b..b87bbc53520159 100644
+--- a/packages/interactivity/src/test/utils.ts
++++ b/packages/interactivity/src/test/utils.ts
+@@ -196,7 +196,7 @@ describe( 'Interactivity API', () => {
+ 						namespace: getNamespace(),
+ 					} );
+ 					a = yield Promise.reject( new Error( 'CatchMe' ) );
+-				} catch ( e ) {
++				} catch {
+ 					steps.push( {
+ 						scope: getScope(),
+ 						namespace: getNamespace(),
+diff --git a/packages/interactivity/src/utils.ts b/packages/interactivity/src/utils.ts
+index dea3d2228780bc..9ab4d278abc189 100644
+--- a/packages/interactivity/src/utils.ts
++++ b/packages/interactivity/src/utils.ts
+@@ -401,7 +401,7 @@ export const warn = ( message: string ): void => {
+ 		// A consumer can use 'pause on caught exceptions'
+ 		try {
+ 			throw Error( message );
+-		} catch ( e ) {
++		} catch {
+ 			// Do nothing.
+ 		}
+ 		logged.add( message );
+diff --git a/packages/list-reusable-blocks/src/utils/import.js b/packages/list-reusable-blocks/src/utils/import.js
+index 432948ce6d6dbc..adc3f457474e32 100644
+--- a/packages/list-reusable-blocks/src/utils/import.js
++++ b/packages/list-reusable-blocks/src/utils/import.js
+@@ -19,7 +19,7 @@ async function importReusableBlock( file ) {
+ 	let parsedContent;
+ 	try {
+ 		parsedContent = JSON.parse( fileContent );
+-	} catch ( e ) {
++	} catch {
+ 		throw new Error( 'Invalid JSON file' );
+ 	}
+ 	if (
+diff --git a/packages/patterns/src/store/actions.js b/packages/patterns/src/store/actions.js
+index 80b3f9bff4588a..64ba04958ff469 100644
+--- a/packages/patterns/src/store/actions.js
++++ b/packages/patterns/src/store/actions.js
+@@ -57,7 +57,7 @@ export const createPatternFromFile =
+ 		let parsedContent;
+ 		try {
+ 			parsedContent = JSON.parse( fileContent );
+-		} catch ( e ) {
++		} catch {
+ 			throw new Error( 'Invalid JSON file' );
+ 		}
+ 		if (
+diff --git a/packages/react-native-editor/__device-tests__/helpers/utils.js b/packages/react-native-editor/__device-tests__/helpers/utils.js
+index 94a856593570cb..8c49dd1ccd3d59 100644
+--- a/packages/react-native-editor/__device-tests__/helpers/utils.js
++++ b/packages/react-native-editor/__device-tests__/helpers/utils.js
+@@ -111,7 +111,7 @@ const setupDriver = async () => {
+ 					'Detected Android device running Android %s',
+ 					androidVersion
+ 				);
+-			} catch ( error ) {
++			} catch {
+ 				// Ignore error.
+ 			}
+ 		} else {
+@@ -692,7 +692,7 @@ const clickIfClickable = async (
+ 
+ 	try {
+ 		return await element.click();
+-	} catch ( error ) {
++	} catch {
+ 		if ( iteration >= maxIteration ) {
+ 			// eslint-disable-next-line no-console
+ 			console.error(
+diff --git a/packages/react-native-editor/bin/extract-files-from-sourcemap.js b/packages/react-native-editor/bin/extract-files-from-sourcemap.js
+index 8fea2afa202d62..6f755f567c098d 100755
+--- a/packages/react-native-editor/bin/extract-files-from-sourcemap.js
++++ b/packages/react-native-editor/bin/extract-files-from-sourcemap.js
+@@ -40,14 +40,14 @@ if ( require.main === module ) {
+ 	}
+ 	try {
+ 		fs.accessSync( mapFile );
+-	} catch ( err ) {
++	} catch {
+ 		// eslint-disable-next-line no-console
+ 		console.error( `Map file "${ mapFile } doesn't exist.` );
+ 		process.exit( 1 );
+ 	}
+ 	try {
+ 		fs.accessSync( targetDir );
+-	} catch ( err ) {
++	} catch {
+ 		// eslint-disable-next-line no-console
+ 		console.error( `Target directory "${ targetDir }"" doesn't exist.` );
+ 		process.exit( 1 );
+@@ -74,7 +74,7 @@ if ( require.main === module ) {
+ 		try {
+ 			fs.accessSync( file );
+ 			return true;
+-		} catch ( error ) {
++		} catch {
+ 			return false;
+ 		}
+ 	} );
+@@ -87,7 +87,7 @@ if ( require.main === module ) {
+ 				.replace( '.ts', '.js' );
+ 			try {
+ 				fs.accessSync( compiledFile );
+-			} catch ( error ) {
++			} catch {
+ 				// eslint-disable-next-line no-console
+ 				console.warn(
+ 					`Couldn't find matching build file for Typescript file "${ compiledFile }".`
+diff --git a/packages/react-native-editor/i18n-cache/index.js b/packages/react-native-editor/i18n-cache/index.js
+index 9ff94b17a3f0fc..9e38633241adf1 100644
+--- a/packages/react-native-editor/i18n-cache/index.js
++++ b/packages/react-native-editor/i18n-cache/index.js
+@@ -76,7 +76,7 @@ const fetchTranslation = ( locale ) => {
+ 				locale,
+ 				inCache: true,
+ 			} );
+-		} catch ( error ) {
++		} catch {
+ 			// translation not found, let's fetch it
+ 		}
+ 	}
+diff --git a/packages/report-flaky-tests/src/markdown.ts b/packages/report-flaky-tests/src/markdown.ts
+index 0f55c12a247130..b92fdaca5a799d 100644
+--- a/packages/report-flaky-tests/src/markdown.ts
++++ b/packages/report-flaky-tests/src/markdown.ts
+@@ -37,7 +37,7 @@ const metaData = {
+ 			if ( matched ) {
+ 				return JSON.parse( matched[ 1 ] );
+ 			}
+-		} catch ( error ) {
++		} catch {
+ 			// Ignore errors.
+ 		}
+ 		return undefined;
+diff --git a/packages/scripts/scripts/test-playwright.js b/packages/scripts/scripts/test-playwright.js
+index 82860f7e263b38..27934f0f7ec144 100644
+--- a/packages/scripts/scripts/test-playwright.js
++++ b/packages/scripts/scripts/test-playwright.js
+@@ -40,7 +40,7 @@ let loadConfig = null;
+ try {
+ 	// First, try to load the package installed from among the optional peerDependencies.
+ 	loadConfig = require( '@wordpress/env/lib/config' ).loadConfig;
+-} catch ( error ) {
++} catch {
+ 	// eslint-disable-next-line no-console
+ 	console.log(
+ 		'Notice: Could not find @wordpress/env package. Using WP_BASE_URL environment variable or else the default http://localhost:8889 URL for tests.'
+diff --git a/packages/scripts/utils/config.js b/packages/scripts/utils/config.js
+index 8894819f20f4c0..b6dcf16c21cae0 100644
+--- a/packages/scripts/utils/config.js
++++ b/packages/scripts/utils/config.js
+@@ -272,7 +272,7 @@ function getWebpackEntryPoints( buildType ) {
+ 				// at which point they are completely empty and therefore not valid JSON
+ 				try {
+ 					parsedBlockJson = JSON.parse( fileContents );
+-				} catch ( error ) {
++				} catch {
+ 					warn(
+ 						`Not scanning "${ blockMetadataFile.replace(
+ 							fromProjectRoot( sep ),
+@@ -402,7 +402,7 @@ function getPhpFilePaths( context, props ) {
+ 		let parsedBlockJson;
+ 		try {
+ 			parsedBlockJson = JSON.parse( readFileSync( blockMetadataFile ) );
+-		} catch ( error ) {
++		} catch {
+ 			warn(
+ 				`Not scanning "${ blockMetadataFile.replace(
+ 					fromProjectRoot( sep ),
+diff --git a/packages/style-engine/src/styles/utils.ts b/packages/style-engine/src/styles/utils.ts
+index e50bc487b1db50..10138666b2851d 100644
+--- a/packages/style-engine/src/styles/utils.ts
++++ b/packages/style-engine/src/styles/utils.ts
+@@ -207,7 +207,7 @@ export function camelCaseJoin( strings: string[] ): string {
+ export function safeDecodeURI( uri: string ): string {
+ 	try {
+ 		return decodeURI( uri );
+-	} catch ( uriError ) {
++	} catch {
+ 		return uri;
+ 	}
+ }
+diff --git a/packages/sync/src/utils.ts b/packages/sync/src/utils.ts
+index c80e1c402c86f5..a420f811205cf7 100644
+--- a/packages/sync/src/utils.ts
++++ b/packages/sync/src/utils.ts
+@@ -96,7 +96,7 @@ export function deserializeCrdtDoc(
+ 		ydoc.clientID = pseudoRandomID();
+ 
+ 		return ydoc;
+-	} catch ( e ) {
++	} catch {
+ 		return null;
+ 	}
+ }
+diff --git a/packages/url/src/get-filename.ts b/packages/url/src/get-filename.ts
+index d5550618734370..e9d187266be305 100644
+--- a/packages/url/src/get-filename.ts
++++ b/packages/url/src/get-filename.ts
+@@ -22,7 +22,7 @@ export function getFilename( url: string ): string | void {
+ 		filename = new URL( url, 'http://example.com' ).pathname
+ 			.split( '/' )
+ 			.pop();
+-	} catch ( error ) {}
++	} catch {}
+ 
+ 	if ( filename ) {
+ 		return filename;
+diff --git a/packages/url/src/get-query-string.ts b/packages/url/src/get-query-string.ts
+index 91f9947a61e664..ac845b20e4f9b1 100644
+--- a/packages/url/src/get-query-string.ts
++++ b/packages/url/src/get-query-string.ts
+@@ -14,7 +14,7 @@ export function getQueryString( url: string ): string | void {
+ 	let query;
+ 	try {
+ 		query = new URL( url, 'http://example.com' ).search.substring( 1 );
+-	} catch ( error ) {}
++	} catch {}
+ 
+ 	if ( query ) {
+ 		return query;
+diff --git a/packages/url/src/safe-decode-uri-component.ts b/packages/url/src/safe-decode-uri-component.ts
+index 236637bf768470..b3d3fff4feb959 100644
+--- a/packages/url/src/safe-decode-uri-component.ts
++++ b/packages/url/src/safe-decode-uri-component.ts
+@@ -9,7 +9,7 @@
+ export function safeDecodeURIComponent( uriComponent: string ): string {
+ 	try {
+ 		return decodeURIComponent( uriComponent );
+-	} catch ( uriComponentError ) {
++	} catch {
+ 		return uriComponent;
+ 	}
+ }
+diff --git a/packages/url/src/safe-decode-uri.ts b/packages/url/src/safe-decode-uri.ts
+index ab0830597fd0df..4cf48245efc355 100644
+--- a/packages/url/src/safe-decode-uri.ts
++++ b/packages/url/src/safe-decode-uri.ts
+@@ -14,7 +14,7 @@
+ export function safeDecodeURI( uri: string ): string {
+ 	try {
+ 		return decodeURI( uri );
+-	} catch ( uriError ) {
++	} catch {
+ 		return uri;
+ 	}
+ }
+diff --git a/packages/warning/src/index.ts b/packages/warning/src/index.ts
+index a5a092abbd2121..26c018c38953fb 100644
+--- a/packages/warning/src/index.ts
++++ b/packages/warning/src/index.ts
+@@ -43,7 +43,7 @@ export default function warning( message: string ): void {
+ 	// https://github.com/facebook/react/issues/4216
+ 	try {
+ 		throw Error( message );
+-	} catch ( x ) {
++	} catch {
+ 		// Do nothing.
+ 	}
+ 	logged.add( message );
+diff --git a/packages/wp-build/lib/route-utils.mjs b/packages/wp-build/lib/route-utils.mjs
+index a685419b92ed19..86ec8b61c7bbb5 100644
+--- a/packages/wp-build/lib/route-utils.mjs
++++ b/packages/wp-build/lib/route-utils.mjs
+@@ -22,7 +22,7 @@ export function getAllRoutes( rootDir ) {
+ 		return readdirSync( routesPath, { withFileTypes: true } )
+ 			.filter( ( dirent ) => dirent.isDirectory() )
+ 			.map( ( dirent ) => dirent.name );
+-	} catch ( error ) {
++	} catch {
+ 		// Routes directory doesn't exist, return empty array
+ 		return [];
+ 	}
+diff --git a/test/e2e/specs/admin/font-library.spec.js b/test/e2e/specs/admin/font-library.spec.js
+index ba4dddf9ee83c6..e9514eafc55d5f 100644
+--- a/test/e2e/specs/admin/font-library.spec.js
++++ b/test/e2e/specs/admin/font-library.spec.js
+@@ -93,7 +93,7 @@ test.describe( 'Font Library', () => {
+ 					// Attempt to load the font - this will throw or return empty array if not available.
+ 					const fonts = await document.fonts.load( '16px "Exo 2"' );
+ 					return fonts.length > 0;
+-				} catch ( error ) {
++				} catch {
+ 					return false;
+ 				}
+ 			} );
+diff --git a/test/e2e/specs/editor/blocks/cover.spec.js b/test/e2e/specs/editor/blocks/cover.spec.js
+index 1afd6ba9997e86..27cc6c0d4ac4e3 100644
+--- a/test/e2e/specs/editor/blocks/cover.spec.js
++++ b/test/e2e/specs/editor/blocks/cover.spec.js
+@@ -374,7 +374,7 @@ test.describe( 'Cover', () => {
+ 				trial: true,
+ 				timeout: 1000, // This test will always take 1 second to run.
+ 			} );
+-		} catch ( error ) {
++		} catch {
+ 			isClickable = false;
+ 		}
+ 
+diff --git a/test/integration/fixtures/utils.js b/test/integration/fixtures/utils.js
+index 7b8d5fc2c9e055..5b3934fe60568f 100644
+--- a/test/integration/fixtures/utils.js
++++ b/test/integration/fixtures/utils.js
+@@ -9,7 +9,7 @@ const FIXTURES_DIR = path.join( __dirname, 'blocks' );
+ function readFixtureFile( fixturesDir, filename ) {
+ 	try {
+ 		return fs.readFileSync( path.join( fixturesDir, filename ), 'utf8' );
+-	} catch ( err ) {
++	} catch {
+ 		return null;
+ 	}
+ }
+diff --git a/test/native/matchers/utils.js b/test/native/matchers/utils.js
+index 921dc11618e8d4..4d9086bbba1523 100644
+--- a/test/native/matchers/utils.js
++++ b/test/native/matchers/utils.js
+@@ -20,7 +20,7 @@ export class ReactElementTypeError extends Error {
+ 		let withType = '';
+ 		try {
+ 			withType = printWithType( 'Received', received, printReceived );
+-		} catch ( e ) {}
++		} catch {}
+ 		this.message = [
+ 			matcherHint(
+ 				`${ context.isNot ? '.not' : '' }.${ matcherFn.name }`,
+diff --git a/test/unit/config/matchers/to-match-style-diff-snapshot.js b/test/unit/config/matchers/to-match-style-diff-snapshot.js
+index c0f31d6be62a2c..cc81a8b9eb005f 100644
+--- a/test/unit/config/matchers/to-match-style-diff-snapshot.js
++++ b/test/unit/config/matchers/to-match-style-diff-snapshot.js
+@@ -21,7 +21,7 @@ const getStyleRulesForElement = ( element, styleSheets ) => {
+ 					found.push( rule.style );
+ 				}
+ 			} );
+-		} catch ( e ) {}
++		} catch {}
+ 
+ 		return [ ...matchingRules, ...found ];
+ 	}, [] );

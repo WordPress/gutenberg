@@ -1,0 +1,15 @@
+diff --git a/packages/block-editor/src/components/block-list/use-in-between-inserter.js b/packages/block-editor/src/components/block-list/use-in-between-inserter.js
+index 044e5b185a2244..68fa8628c54c72 100644
+--- a/packages/block-editor/src/components/block-list/use-in-between-inserter.js
++++ b/packages/block-editor/src/components/block-list/use-in-between-inserter.js
+@@ -40,7 +40,9 @@ export function useInBetweenInserter() {
+ 			}
+ 
+ 			function onMouseMove( event ) {
+-				if ( openRef.current ) {
++				// openRef is the reference to the insertion point between blocks.
++				// If the reference is not set or the insertion point is already open, return.
++				if ( openRef === undefined || openRef.current ) {
+ 					return;
+ 				}
+ 

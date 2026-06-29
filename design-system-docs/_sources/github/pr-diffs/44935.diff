@@ -1,0 +1,30 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e6f130a034bfb6..68cfb5b4e46aad 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -24,6 +24,7 @@
+ -   `SlotFill`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44403](https://github.com/WordPress/gutenberg/pull/44403))
+ -   `Context`: updated to ignore `react/exhaustive-deps` eslint rule ([#45044](https://github.com/WordPress/gutenberg/pull/45044))
+ -   `Button`: Refactor Storybook to controls and align docs ([#44105](https://github.com/WordPress/gutenberg/pull/44105)).
++-   `TabPanel`: updated to satisfy `react/exhaustive-deps` eslint rule ([#44935](https://github.com/WordPress/gutenberg/pull/44935))
+ 
+ ## 21.3.0 (2022-10-19)
+ 
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index 8388d715b23431..4e0b0394bd7409 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -97,11 +97,10 @@ export function TabPanel( {
+ 	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
+ 
+ 	useEffect( () => {
+-		const newSelectedTab = find( tabs, { name: selected } );
+-		if ( ! newSelectedTab && tabs.length > 0 ) {
++		if ( ! selectedTab?.name && tabs.length > 0 ) {
+ 			handleTabSelection( initialTabName || tabs[ 0 ].name );
+ 		}
+-	}, [ tabs ] );
++	}, [ tabs, selectedTab?.name, initialTabName ] );
+ 
+ 	return (
+ 		<div className={ className }>

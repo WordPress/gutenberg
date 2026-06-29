@@ -1,0 +1,34 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8f5f7399830597..555a12ef823d02 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,10 @@
+ -   `CustomGradientPicker`: Add state persistence when switching between Linear and Radial Gradient ([#76595](https://github.com/WordPress/gutenberg/pull/76595)).
+ -   `Button`: fix focus styles in High Contrast (forced colors) mode ([#76719](https://github.com/WordPress/gutenberg/pull/76719)).
+ 
++### Enhancements
++
++-   `Button`: Hide focus outline on `:active` in High Contrast (forced colors) mode to provide visual click feedback ([#76833](https://github.com/WordPress/gutenberg/pull/76833)).
++
+ ## 32.4.0 (2026-03-18)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 6c00d8b4709f4d..44ca2bf1409957 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -391,6 +391,14 @@
+ 		}
+ 	}
+ 
++	// Hide focus outline on :active to provide click feedback in forced-colors
++	// mode, where box-shadow is not visible. Higher specificity (0,3,0)
++	// ensures this wins over variant outline declarations. Placed after
++	// .is-pressed to also win by source order at equal specificity (0,3,0).
++	&:focus:active {
++		outline: none;
++	}
++
+ 	svg {
+ 		fill: currentColor;
+ 		outline: none;

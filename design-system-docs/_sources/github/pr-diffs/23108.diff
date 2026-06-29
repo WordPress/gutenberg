@@ -1,0 +1,82 @@
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
+index cfee66bd11a9a3..1fb905a56ffc98 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-context.js
+@@ -7,6 +7,7 @@ const SlotFillContext = createContext( {
+ 	slots: {},
+ 	fills: {},
+ 	registerSlot: () => {},
++	updateSlot: () => {},
+ 	unregisterSlot: () => {},
+ 	registerFill: () => {},
+ 	unregisterFill: () => {},
+diff --git a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+index d9a3efb75159db..c90f7b72810ada 100644
+--- a/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
++++ b/packages/components/src/slot-fill/bubbles-virtually/slot-fill-provider.js
+@@ -93,6 +93,7 @@ function useSlotRegistry() {
+ 			slots,
+ 			fills,
+ 			registerSlot,
++			updateSlot,
+ 			unregisterSlot,
+ 			registerFill,
+ 			unregisterFill,
+diff --git a/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap b/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
+index 5cffdf5ec3f6ca..bfac447c806050 100644
+--- a/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
++++ b/packages/components/src/slot-fill/test/__snapshots__/slot.js.snap
+@@ -1,5 +1,11 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
++exports[`Slot bubblesVirtually false should not break without a Provider 1`] = `
++<div>
++  <div />
++</div>
++`;
++
+ exports[`Slot bubblesVirtually false should subsume another slot by the same name 1`] = `
+ <div>
+   <div
+@@ -37,6 +43,14 @@ exports[`Slot bubblesVirtually false should unmount two slots with the same name
+ </div>
+ `;
+ 
++exports[`Slot bubblesVirtually true should not break without a Provider 1`] = `
++<div>
++  <div>
++    <div />
++  </div>
++</div>
++`;
++
+ exports[`Slot bubblesVirtually true should subsume another slot by the same name 1`] = `
+ <div>
+   <div
+diff --git a/packages/components/src/slot-fill/test/slot.js b/packages/components/src/slot-fill/test/slot.js
+index 398ea965924458..fd639c888ec52b 100644
+--- a/packages/components/src/slot-fill/test/slot.js
++++ b/packages/components/src/slot-fill/test/slot.js
+@@ -300,6 +300,22 @@ describe( 'Slot', () => {
+ 				);
+ 				expect( container ).toMatchSnapshot();
+ 			} );
++
++			it( 'should not break without a Provider', () => {
++				const { container } = render(
++					<>
++						<div>
++							<Slot
++								name="chicken"
++								bubblesVirtually={ bubblesVirtually }
++							/>
++						</div>
++						<Fill name="chicken" />
++					</>
++				);
++
++				expect( container ).toMatchSnapshot();
++			} );
+ 		}
+ 	);
+ } );

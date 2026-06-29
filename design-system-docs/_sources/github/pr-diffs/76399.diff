@@ -1,0 +1,145 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index ccd91d53f44199..3e4b7fb142a3e1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,7 @@
+ 
+ -   Revert `word-break: break-word` addition ([#76230](https://github.com/WordPress/gutenberg/pull/76230)).
+ -   `VisuallyHidden`: Add `word-break: normal` to prevent text wrapping issues in screen reader content ([#75539](https://github.com/WordPress/gutenberg/pull/75539)).
++-   `InputControl`: Fix issue where prop value may not be accurately reflected into displayed field if value is modified in change handler, when used in combination with `isPressEnterToChange`.
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/input-control/test/index.js b/packages/components/src/input-control/test/index.js
+index 395da482d43ac8..31696ffabc378b 100644
+--- a/packages/components/src/input-control/test/index.js
++++ b/packages/components/src/input-control/test/index.js
+@@ -182,6 +182,36 @@ describe( 'InputControl', () => {
+ 			expect( spy ).toHaveBeenCalledWith( 'that was then' );
+ 		} );
+ 
++		it( 'should update value if the parent transforms it on commit', async () => {
++			const onChange = jest.fn();
++			const user = await userEvent.setup();
++			const Example = () => {
++				const [ state, setState ] = useState( '50' );
++				return (
++					<InputControl
++						value={ state }
++						onChange={ ( nextValue ) => {
++							const clampedValue =
++								Number( nextValue ) > 60 ? '60' : nextValue;
++							setState( clampedValue );
++							onChange( clampedValue );
++						} }
++						isPressEnterToChange
++					/>
++				);
++			};
++			render( <Example /> );
++			const input = getInput();
++
++			await user.clear( input );
++			await user.type( input, '99' );
++			await user.keyboard( '{Tab}' );
++
++			expect( onChange ).toHaveBeenCalledTimes( 1 );
++			expect( onChange ).toHaveBeenCalledWith( '60' );
++			expect( input ).toHaveValue( '60' );
++		} );
++
+ 		it( 'should commit value when blurred if value is invalid', async () => {
+ 			const user = await userEvent.setup();
+ 			const spyChange = jest.fn();
+diff --git a/packages/components/src/input-control/utils.ts b/packages/components/src/input-control/utils.ts
+index 5bc42312af1f5d..bb9b57fecea7ad 100644
+--- a/packages/components/src/input-control/utils.ts
++++ b/packages/components/src/input-control/utils.ts
+@@ -6,12 +6,7 @@ import type { FocusEventHandler } from 'react';
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	useEffect,
+-	useLayoutEffect,
+-	useRef,
+-	useState,
+-} from '@wordpress/element';
++import { useEffect, useLayoutEffect, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -73,7 +68,6 @@ export function useDraft( props: {
+ 	onBlur?: FocusEventHandler;
+ 	onChange: InputChangeCallback;
+ } ) {
+-	const previousValueRef = useRef( props.value );
+ 	const [ draft, setDraft ] = useState< {
+ 		value?: string;
+ 		isStale?: boolean;
+@@ -84,11 +78,9 @@ export function useDraft( props: {
+ 	// To do so, it tracks the previous value and marks the draft value as stale
+ 	// after each render.
+ 	useLayoutEffect( () => {
+-		const { current: previousValue } = previousValueRef;
+-		previousValueRef.current = props.value;
+ 		if ( draft.value !== undefined && ! draft.isStale ) {
+ 			setDraft( { ...draft, isStale: true } );
+-		} else if ( draft.isStale && props.value !== previousValue ) {
++		} else if ( draft.isStale && props.value !== draft.value ) {
+ 			setDraft( {} );
+ 		}
+ 	}, [ props.value, draft ] );
+diff --git a/packages/components/src/number-control/index.tsx b/packages/components/src/number-control/index.tsx
+index b90130ec3e6728..54a4137b2b0056 100644
+--- a/packages/components/src/number-control/index.tsx
++++ b/packages/components/src/number-control/index.tsx
+@@ -235,8 +235,7 @@ function UnforwardedNumberControl(
+ 			required={ required }
+ 			step={ step }
+ 			type={ typeProp }
+-			// @ts-expect-error TODO: Resolve discrepancy between `value` types in InputControl based components
+-			value={ valueProp }
++			value={ valueProp === undefined ? valueProp : String( valueProp ) }
+ 			__unstableStateReducer={ numberControlStateReducer }
+ 			size={ size }
+ 			__shouldNotWarnDeprecated36pxSize
+diff --git a/packages/components/src/range-control/test/index.tsx b/packages/components/src/range-control/test/index.tsx
+index 40f23eceed4f15..638ec70e2d0507 100644
+--- a/packages/components/src/range-control/test/index.tsx
++++ b/packages/components/src/range-control/test/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import { act, fireEvent, render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
+ 
+ /**
+  * Internal dependencies
+@@ -102,7 +103,8 @@ describe( 'RangeControl', () => {
+ 			expect( onChange ).not.toHaveBeenCalled();
+ 		} );
+ 
+-		it( 'should keep invalid values in number input until loss of focus', () => {
++		it( 'should keep invalid values in number input until loss of focus', async () => {
++			const user = userEvent.setup();
+ 			const onChange = jest.fn();
+ 			render(
+ 				<RangeControl onChange={ onChange } min={ -1 } max={ 1 } />
+@@ -111,13 +113,13 @@ describe( 'RangeControl', () => {
+ 			const rangeInput = getRangeInput();
+ 			const numberInput = getNumberInput();
+ 
+-			act( () => numberInput.focus() );
+-			fireChangeEvent( numberInput, '-1.1' );
++			await user.clear( numberInput );
++			await user.type( numberInput, '-1.1' );
+ 
+ 			expect( numberInput.value ).toBe( '-1.1' );
+ 			expect( rangeInput.value ).toBe( '-1' );
+ 
+-			fireEvent.blur( numberInput );
++			await user.keyboard( '{Tab}' );
+ 			expect( onChange ).toHaveBeenCalledWith( -1 );
+ 			expect( numberInput.value ).toBe( '-1' );
+ 		} );

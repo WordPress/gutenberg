@@ -1,0 +1,186 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4196d8be8f5524..2fbc3447917a1e 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ -   `BorderControl`: Ensure box-sizing is reset for the control ([#42754](https://github.com/WordPress/gutenberg/pull/42754)).
+ -   `InputControl`: Fix acceptance of falsy values in controlled updates ([#42484](https://github.com/WordPress/gutenberg/pull/42484/)).
+ -   `Tooltip (Experimental)`, `CustomSelectControl`, `TimePicker`: Add missing font-size styles which were necessary in non-WordPress contexts ([#42844](https://github.com/WordPress/gutenberg/pull/42844/)).
++-   `Popover`: fix arrow placement and design ([#42874](https://github.com/WordPress/gutenberg/pull/42874/)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 0b9e3f0a981772..c3f56c93895fe5 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -32,6 +32,7 @@ import {
+ } from '@wordpress/compose';
+ import { close } from '@wordpress/icons';
+ import deprecated from '@wordpress/deprecated';
++import { Path, SVG } from '@wordpress/primitives';
+ 
+ /**
+  * Internal dependencies
+@@ -48,6 +49,30 @@ import { getAnimateClassName } from '../animate';
+  */
+ const SLOT_NAME = 'Popover';
+ 
++// An SVG displaying a triangle facing down, filled with a solid
++// color and bordered in such a way to create an arrow-like effect.
++// Keeping the SVG's viewbox squared simplify the arrow positioning
++// calculations.
++const ArrowTriangle = ( props ) => (
++	<SVG
++		{ ...props }
++		xmlns="http://www.w3.org/2000/svg"
++		viewBox={ `0 0 100 100` }
++		className="components-popover__triangle"
++		role="presentation"
++	>
++		<Path
++			className="components-popover__triangle-bg"
++			d="M 0 0 L 50 50 L 100 0"
++		/>
++		<Path
++			className="components-popover__triangle-border"
++			d="M 0 0 L 50 50 L 100 0"
++			vectorEffect="non-scaling-stroke"
++		/>
++	</SVG>
++);
++
+ const slotNameContext = createContext();
+ 
+ const positionToPlacement = ( position ) => {
+@@ -266,12 +291,7 @@ const Popover = (
+ 		placement: usedPlacement,
+ 		middleware: middlewares,
+ 	} );
+-	const staticSide = {
+-		top: 'bottom',
+-		right: 'left',
+-		bottom: 'top',
+-		left: 'right',
+-	}[ placementData.split( '-' )[ 0 ] ];
++
+ 	const mergedRefs = useMergeRefs( [ floating, dialogRef, ref ] );
+ 
+ 	// Updates references
+@@ -407,22 +427,22 @@ const Popover = (
+ 			<div className="components-popover__content">{ children }</div>
+ 			{ hasArrow && (
+ 				<div
+-					className="components-popover__arrow"
+ 					ref={ arrowRef }
++					className={ [
++						'components-popover__arrow',
++						`is-${ placementData.split( '-' )[ 0 ] }`,
++					].join( ' ' ) }
+ 					style={ {
+-						left:
+-							! arrowData?.x || Number.isNaN( arrowData?.x )
+-								? 0
+-								: arrowData.x,
+-						top:
+-							! arrowData?.y || Number.isNaN( arrowData?.y )
+-								? 0
+-								: arrowData.y,
+-						right: undefined,
+-						bottom: undefined,
+-						[ staticSide ]: '-4px',
++						left: Number.isFinite( arrowData?.x )
++							? `${ arrowData.x }px`
++							: '',
++						top: Number.isFinite( arrowData?.y )
++							? `${ arrowData.y }px`
++							: '',
+ 					} }
+-				/>
++				>
++					<ArrowTriangle />
++				</div>
+ 			) }
+ 		</div>
+ 	);
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index 6002139c2c8566..00639f67216781 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -1,3 +1,5 @@
++$arrow-triangle-base-size: 14px;
++
+ .components-popover {
+ 	z-index: z-index(".components-popover");
+ 
+@@ -60,12 +62,64 @@
+ 
+ .components-popover__arrow {
+ 	position: absolute;
+-	background: $gray-400;
+-	width: 8px;
+-	height: 8px;
+-	transform: rotate(45deg);
+-	z-index: -1;
++	width: $arrow-triangle-base-size;
++	height: $arrow-triangle-base-size;
++	pointer-events: none;
++
++	// Thin line that helps to make sure that the underlying
++	// popover__content's outline is fully overlapped by the
++	// arrow
++	&::before {
++		content: "";
++		position: absolute;
++		top: -1px;
++		left: 0;
++		height: 2px;
++		width: 100%;
++		background-color: $white;
++	}
++
++	// Position and rotate the arrow depending on the popover's placement.
++	// The `!important' is necessary to override the inline styles.
++	&.is-top {
++		bottom: -1 * $arrow-triangle-base-size !important;
++		transform: rotate(0);
++	}
++	&.is-right {
++		/*rtl:begin:ignore*/
++		left: -1 * $arrow-triangle-base-size !important;
++		transform: rotate(90deg);
++	}
++	&.is-bottom {
++		top: -1 * $arrow-triangle-base-size !important;
++		transform: rotate(180deg);
++	}
++	&.is-left {
++		/*rtl:begin:ignore*/
++		right: -1 * $arrow-triangle-base-size !important;
++		transform: rotate(-90deg);
++		/*rtl:end:ignore*/
++	}
++}
++
++.components-popover__triangle {
++	position: absolute;
++	height: 100%;
++	width: 100%;
++}
++
++.components-popover__triangle-bg {
++	// Fill color is the same as the .components-popover__content's background
++	fill: $white;
++}
++
++.components-popover__triangle-border {
++	// Stroke colors are the same as the .components-popover__content's outline
++	fill: transparent;
++	stroke-width: $border-width;
++	stroke: $gray-400;
++
+ 	.is-alternate & {
+-		background: $gray-900;
++		stroke: $gray-900;
+ 	}
+ }

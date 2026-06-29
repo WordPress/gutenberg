@@ -1,0 +1,270 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 1e5bea6e67afa8..7af6d21a72e450 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -19,6 +19,7 @@
+ -   `Notice`: Improve narrow layout by letting description and actions span the icon column when a title is present ([#76202](https://github.com/WordPress/gutenberg/pull/76202)).
+ -   `Notice`: Use `Text` component for `Title` and `Description` typography ([#75870](https://github.com/WordPress/gutenberg/pull/75870)).
+ -   `Card`, `CollapsibleCard`: update padding to match legacy `Card` component ([#76368](https://github.com/WordPress/gutenberg/pull/76368)).
++-   `CollapsibleCard`: move trigger to the header ([#76265](https://github.com/WordPress/gutenberg/pull/76265)).
+ 
+ ## 0.8.0 (2026-03-04)
+ 
+diff --git a/packages/ui/src/collapsible-card/header.tsx b/packages/ui/src/collapsible-card/header.tsx
+index cf4c880bb5aabe..a1dbb0add52878 100644
+--- a/packages/ui/src/collapsible-card/header.tsx
++++ b/packages/ui/src/collapsible-card/header.tsx
+@@ -1,12 +1,11 @@
+ import clsx from 'clsx';
+-import type { MouseEvent } from 'react';
+-import { forwardRef, useCallback, useRef } from '@wordpress/element';
+-import { __ } from '@wordpress/i18n';
+-import { chevronDown, chevronUp } from '@wordpress/icons';
++import { forwardRef } from '@wordpress/element';
++import { chevronDown } from '@wordpress/icons';
+ import * as Card from '../card';
+ import * as Collapsible from '../collapsible';
+-import { IconButton } from '../icon-button';
++import { Icon } from '../icon';
+ import styles from './style.module.css';
++import focusStyles from '../utils/css/focus.module.css';
+ import type { HeaderProps } from './types';
+ 
+ /**
+@@ -20,62 +19,35 @@ import type { HeaderProps } from './types';
+  */
+ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
+ 	function CollapsibleCardHeader(
+-		{ children, className, onClick, ...restProps },
++		{ children, className, render, ...restProps },
+ 		ref
+ 	) {
+-		const triggerRef = useRef< HTMLButtonElement >( null );
+-
+-		const handleHeaderClick = useCallback(
+-			( event: MouseEvent< HTMLDivElement > ) => {
+-				const trigger = triggerRef.current;
+-				if (
+-					trigger &&
+-					event.target instanceof Node &&
+-					! trigger.contains( event.target )
+-				) {
+-					trigger.click();
+-				}
+-
+-				onClick?.( event );
+-			},
+-			[ onClick ]
+-		);
+-
+ 		return (
+-			<Card.Header
+-				ref={ ref }
++			<Collapsible.Trigger
+ 				className={ clsx( styles.header, className ) }
+-				onClick={ handleHeaderClick }
+-				{ ...restProps }
++				render={
++					<Card.Header
++						ref={ ref }
++						render={ render }
++						{ ...restProps }
++					/>
++				}
++				nativeButton={ false }
+ 			>
+ 				<div className={ styles[ 'header-content' ] }>{ children }</div>
+ 				<div className={ styles[ 'header-trigger-wrapper' ] }>
+-					<Collapsible.Trigger
+-						ref={ triggerRef }
+-						render={ ( props ) => (
+-							<IconButton
+-								{ ...props }
+-								label={ __( 'Expand or collapse card' ) }
+-								// The Collapsible wrapper's `render` prop
+-								// uses a single-argument callback (via the
+-								// ComponentProps utility), so Base UI's
+-								// second `state` argument isn't available
+-								// here. We derive the open state from
+-								// `aria-expanded` instead of `state.open`.
+-								icon={
+-									props[ 'aria-expanded' ] === true
+-										? chevronUp
+-										: chevronDown
+-								}
+-								variant="minimal"
+-								tone="neutral"
+-								size="compact"
+-							/>
++					<Icon
++						icon={ chevronDown }
++						className={ clsx(
++							styles[ 'header-trigger' ],
++							// While the interactive trigger element is the whole header,
++							// the focus ring will be displayed only on the icon to visually
++							// emulate it being the button.
++							focusStyles[ 'outset-ring--focus-parent-visible' ]
+ 						) }
+-						className={ styles[ 'header-trigger' ] }
+ 					/>
+ 				</div>
+-			</Card.Header>
++			</Collapsible.Trigger>
+ 		);
+ 	}
+ );
+diff --git a/packages/ui/src/collapsible-card/style.module.css b/packages/ui/src/collapsible-card/style.module.css
+index cc1f8659afc1d5..55b0744ebb6532 100644
+--- a/packages/ui/src/collapsible-card/style.module.css
++++ b/packages/ui/src/collapsible-card/style.module.css
+@@ -19,7 +19,19 @@
+ 		/* Offset by half the button's own height so it visually centers
+ 		   at the wrapper's midpoint (which `align-self: center` places at
+ 		   the vertical center of the header). */
+-		transform: translateY(-50%);
++		translate: 0 -50%;
++
++		/* For an outline that looks like `IconButton`'s */
++		border-radius: var(--wpds-border-radius-sm);
++	}
++
++	.header[data-panel-open] .header-trigger {
++		rotate: 180deg;
++	}
++
++	/* Simulate disabled button styles */
++	.header[data-disabled] .header-trigger {
++		color: var(--wpds-color-fg-interactive-neutral-disabled);
+ 	}
+ }
+ 
+@@ -29,8 +41,9 @@
+ 		flex-direction: row;
+ 		align-items: stretch;
+ 		gap: var(--wpds-dimension-gap-sm);
++		outline: none;
+ 
+-		&:has(.header-trigger:not([data-disabled])) {
++		&:not([data-disabled]) {
+ 			cursor: var(--wpds-cursor-control);
+ 		}
+ 	}
+diff --git a/packages/ui/src/collapsible-card/test/index.test.tsx b/packages/ui/src/collapsible-card/test/index.test.tsx
+index 6c2004807c4229..445f7e2da5da6e 100644
+--- a/packages/ui/src/collapsible-card/test/index.test.tsx
++++ b/packages/ui/src/collapsible-card/test/index.test.tsx
+@@ -93,7 +93,8 @@ describe( 'CollapsibleCard', () => {
+ 
+ 			await user.click(
+ 				screen.getByRole( 'button', {
+-					name: 'Expand or collapse card',
++					name: 'Title',
++					expanded: false,
+ 				} )
+ 			);
+ 
+@@ -101,7 +102,8 @@ describe( 'CollapsibleCard', () => {
+ 
+ 			await user.click(
+ 				screen.getByRole( 'button', {
+-					name: 'Expand or collapse card',
++					name: 'Title',
++					expanded: true,
+ 				} )
+ 			);
+ 
+@@ -110,31 +112,6 @@ describe( 'CollapsibleCard', () => {
+ 			).not.toBeInTheDocument();
+ 		} );
+ 
+-		it( 'toggles content when clicking the header area', async () => {
+-			const user = userEvent.setup();
+-
+-			render(
+-				<CollapsibleCard.Root>
+-					<CollapsibleCard.Header>
+-						<Card.Title>Header click test</Card.Title>
+-					</CollapsibleCard.Header>
+-					<CollapsibleCard.Content>
+-						<p>Header toggled content</p>
+-					</CollapsibleCard.Content>
+-				</CollapsibleCard.Root>
+-			);
+-
+-			expect(
+-				screen.queryByText( 'Header toggled content' )
+-			).not.toBeInTheDocument();
+-
+-			await user.click( screen.getByText( 'Header click test' ) );
+-
+-			expect(
+-				screen.getByText( 'Header toggled content' )
+-			).toBeVisible();
+-		} );
+-
+ 		it( 'calls onOpenChange when toggled', async () => {
+ 			const onOpenChange = jest.fn();
+ 			const user = userEvent.setup();
+@@ -152,7 +129,8 @@ describe( 'CollapsibleCard', () => {
+ 
+ 			await user.click(
+ 				screen.getByRole( 'button', {
+-					name: 'Expand or collapse card',
++					name: 'Title',
++					expanded: false,
+ 				} )
+ 			);
+ 
+@@ -179,7 +157,8 @@ describe( 'CollapsibleCard', () => {
+ 
+ 			await user.click(
+ 				screen.getByRole( 'button', {
+-					name: 'Expand or collapse card',
++					name: 'Title',
++					expanded: true,
+ 				} )
+ 			);
+ 
+@@ -188,7 +167,7 @@ describe( 'CollapsibleCard', () => {
+ 	} );
+ 
+ 	describe( 'trigger', () => {
+-		it( 'renders a toggle button', () => {
++		it( 'renders the header as a toggle button', () => {
+ 			render(
+ 				<CollapsibleCard.Root>
+ 					<CollapsibleCard.Header>
+@@ -199,7 +178,8 @@ describe( 'CollapsibleCard', () => {
+ 
+ 			expect(
+ 				screen.getByRole( 'button', {
+-					name: 'Expand or collapse card',
++					name: 'Title',
++					expanded: false,
+ 				} )
+ 			).toBeVisible();
+ 		} );
+diff --git a/packages/ui/src/utils/css/focus.module.css b/packages/ui/src/utils/css/focus.module.css
+index 9a48e96826a460..d11f440305dca8 100644
+--- a/packages/ui/src/utils/css/focus.module.css
++++ b/packages/ui/src/utils/css/focus.module.css
+@@ -6,7 +6,8 @@
+ 	.outset-ring--focus-visible,
+ 	.outset-ring--focus-within,
+ 	.outset-ring--focus-within-except-active,
+-	.outset-ring--focus-within-visible {
++	.outset-ring--focus-within-visible,
++	.outset-ring--focus-parent-visible {
+ 		@media not ( prefers-reduced-motion ) {
+ 			transition: outline 0.1s ease-out;
+ 		}
+@@ -24,7 +25,8 @@
+ 	.outset-ring--focus-visible:focus-visible,
+ 	.outset-ring--focus-within:focus-within,
+ 	.outset-ring--focus-within-except-active:focus-within:not(:has(:active)),
+-	.outset-ring--focus-within-visible:focus-within:has(:focus-visible) {
++	.outset-ring--focus-within-visible:focus-within:has(:focus-visible),
++	:focus-visible .outset-ring--focus-parent-visible {
+ 		outline-width: var(--wpds-border-width-focus);
+ 		outline-color: var(--wpds-color-stroke-focus-brand);
+ 	}

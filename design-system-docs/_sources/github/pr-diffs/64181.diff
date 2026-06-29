@@ -1,0 +1,32 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index e77ae39ddb3d20..0c0fab401d02a8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ 
+ -   `TimeInput`: Expose as subcomponent of `TimePicker` ([#63145](https://github.com/WordPress/gutenberg/pull/63145)).
+ -   `RadioControl`: add support for option help text ([#63751](https://github.com/WordPress/gutenberg/pull/63751)).
++-   `Guide`: Add `__next40pxDefaultSize` to buttons ([#64181](https://github.com/WordPress/gutenberg/pull/64181)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/guide/index.tsx b/packages/components/src/guide/index.tsx
+index afb39e7bd12b50..0ca5957fd3a656 100644
+--- a/packages/components/src/guide/index.tsx
++++ b/packages/components/src/guide/index.tsx
+@@ -144,6 +144,7 @@ function Guide( {
+ 							className="components-guide__back-button"
+ 							variant="tertiary"
+ 							onClick={ goBack }
++							__next40pxDefaultSize
+ 						>
+ 							{ __( 'Previous' ) }
+ 						</Button>
+@@ -153,6 +154,7 @@ function Guide( {
+ 							className="components-guide__forward-button"
+ 							variant="primary"
+ 							onClick={ goForward }
++							__next40pxDefaultSize
+ 						>
+ 							{ __( 'Next' ) }
+ 						</Button>

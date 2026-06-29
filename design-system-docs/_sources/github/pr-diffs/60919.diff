@@ -1,0 +1,467 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0df9c6c9df8425..ebb84abc0772e0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancements
+ 
+ -   `BoxControl`: Allow negative values for margin controls ([#60347](https://github.com/WordPress/gutenberg/pull/60347)).
++-   `View`: Fix prop types ([#60919](https://github.com/WordPress/gutenberg/pull/60919)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/card/test/__snapshots__/index.tsx.snap b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+index 0b723732e3dbaf..60dcd306f3f526 100644
+--- a/packages/components/src/card/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+@@ -8,8 +8,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium e19lxcc00"
+-+     class="components-scrollable components-card__body components-card-body css-1w878rm-View-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium e19lxcc00"
++-     class="components-card__body components-card-body css-d0qyo2-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
+++     class="components-scrollable components-card__body components-card-body css-vpf7zs-PolymorphicDiv-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius-medium e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -25,8 +25,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium e19lxcc00"
+-+     class="components-card__body components-card-body css-2oh82v-View-Body-borderRadius-medium-shady e19lxcc00"
++-     class="components-card__body components-card-body css-d0qyo2-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
+++     class="components-card__body components-card-body css-4zm8r0-PolymorphicDiv-Body-borderRadius-medium-shady e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -42,8 +42,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__footer components-card-footer css-120suhd-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__footer components-card-footer css-opd7jt-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
++-     class="components-flex components-card__footer components-card-footer css-1l4bmbt-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+++     class="components-flex components-card__footer components-card-footer css-8pv7rj-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -59,8 +59,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__footer components-card-footer css-120suhd-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__footer components-card-footer css-ys33kb-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
++-     class="components-flex components-card__footer components-card-footer css-1l4bmbt-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+++     class="components-flex components-card__footer components-card-footer css-1hguscv-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -76,8 +76,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-flex components-card__header components-card-header css-3fkkv8-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__header components-card-header css-tedm3i-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
++-     class="components-flex components-card__header components-card-header css-1tfuk0d-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+++     class="components-flex components-card__header components-card-header css-10qs2ur-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardHeader"
+     >
+@@ -93,19 +93,19 @@ Snapshot Diff:
+ @@ -6,18 +6,18 @@
+     >
+       <div
+-        class="css-mgwsf4-View-Content e19lxcc00"
++        class="css-76dw7d-PolymorphicDiv-Content e19lxcc00"
+       >
+         <div
+--         class="components-flex components-card__header components-card-header css-3fkkv8-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+-+         class="components-flex components-card__header components-card-header css-2feznw-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-large e19lxcc00"
++-         class="components-flex components-card__header components-card-header css-1tfuk0d-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+++         class="components-flex components-card__header components-card-header css-d1c2bv-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-large e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+           Header
+         </div>
+         <div
+--         class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium e19lxcc00"
+-+         class="components-card__body components-card-body css-1nonx1n-View-Body-borderRadius-large e19lxcc00"
++-         class="components-card__body components-card-body css-d0qyo2-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
+++         class="components-card__body components-card-body css-kub9fa-PolymorphicDiv-Body-borderRadius-large e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+@@ -138,27 +138,27 @@ Snapshot Diff:
+ @@ -6,25 +6,25 @@
+     >
+       <div
+-        class="css-mgwsf4-View-Content e19lxcc00"
++        class="css-76dw7d-PolymorphicDiv-Content e19lxcc00"
+       >
+         <div
+--         class="components-flex components-card__header components-card-header css-ed5e1x-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-large-borderless e19lxcc00"
+-+         class="components-flex components-card__header components-card-header css-1f9ii60-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-small e19lxcc00"
++-         class="components-flex components-card__header components-card-header css-1xfrxuu-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-large-borderless e19lxcc00"
+++         class="components-flex components-card__header components-card-header css-1mitrbv-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-small e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+           Header
+         </div>
+         <div
+--         class="components-card__body components-card-body css-1nonx1n-View-Body-borderRadius-large e19lxcc00"
+-+         class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium e19lxcc00"
++-         class="components-card__body components-card-body css-kub9fa-PolymorphicDiv-Body-borderRadius-large e19lxcc00"
+++         class="components-card__body components-card-body css-d0qyo2-PolymorphicDiv-Body-borderRadius-medium e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+           Body
+         </div>
+         <div
+--         class="components-flex components-card__footer components-card-footer css-ide17g-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-large-borderless e19lxcc00"
+-+         class="components-flex components-card__footer components-card-footer css-jsws2e-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-xSmallCardPadding e19lxcc00"
++-         class="components-flex components-card__footer components-card-footer css-8o7z5w-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-large-borderless e19lxcc00"
+++         class="components-flex components-card__footer components-card-footer css-1umuqb4-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-xSmallCardPadding e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="CardFooter"
+         >
+@@ -174,33 +174,33 @@ Snapshot Diff:
+ @@ -1,30 +1,30 @@
+   <div>
+     <div
+--     class="components-surface components-card css-hkvggq-View-Surface-getBorders-primary-Card-boxShadowless-rounded e19lxcc00"
+-+     class="components-surface components-card css-nsno0f-View-Surface-getBorders-primary-Card-rounded e19lxcc00"
++-     class="components-surface components-card css-5ubhkm-PolymorphicDiv-Surface-getBorders-primary-Card-boxShadowless-rounded e19lxcc00"
+++     class="components-surface components-card css-1lc0qq8-PolymorphicDiv-Surface-getBorders-primary-Card-rounded e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="Card"
+     >
+       <div
+-        class="css-mgwsf4-View-Content e19lxcc00"
++        class="css-76dw7d-PolymorphicDiv-Content e19lxcc00"
+       >
+         <div
+--         class="components-flex components-card__header components-card-header css-ed5e1x-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-large-borderless e19lxcc00"
+-+         class="components-flex components-card__header components-card-header css-1f9ii60-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-small e19lxcc00"
++-         class="components-flex components-card__header components-card-header css-1xfrxuu-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-large-borderless e19lxcc00"
+++         class="components-flex components-card__header components-card-header css-1mitrbv-PolymorphicDiv-Flex-base-ItemsRow-Header-borderRadius-borderColor-small e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="CardHeader"
+         >
+           Header
+         </div>
+         <div
+--         class="components-card__body components-card-body css-1nonx1n-View-Body-borderRadius-large e19lxcc00"
+-+         class="components-card__body components-card-body css-5spj1a-View-Body-borderRadius-small e19lxcc00"
++-         class="components-card__body components-card-body css-kub9fa-PolymorphicDiv-Body-borderRadius-large e19lxcc00"
+++         class="components-card__body components-card-body css-1djcdvu-PolymorphicDiv-Body-borderRadius-small e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="CardBody"
+         >
+           Body
+         </div>
+         <div
+--         class="components-flex components-card__footer components-card-footer css-ide17g-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-large-borderless e19lxcc00"
+-+         class="components-flex components-card__footer components-card-footer css-1ih54yp-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-small e19lxcc00"
++-         class="components-flex components-card__footer components-card-footer css-8o7z5w-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-large-borderless e19lxcc00"
+++         class="components-flex components-card__footer components-card-footer css-1awxp6o-PolymorphicDiv-Flex-base-ItemsRow-Footer-borderRadius-borderColor-small e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="CardFooter"
+         >
+@@ -470,15 +470,15 @@ Snapshot Diff:
+       </div>
+       <div
+         aria-hidden="true"
+--       class="components-elevation css-1lsfy80-View-Elevation-sx-Base-elevationClassName e19lxcc00"
+-+       class="components-elevation css-15t1t3g-View-Elevation-sx-Base-elevationClassName e19lxcc00"
++-       class="components-elevation css-1ilbefw-PolymorphicDiv-Elevation-sx-Base-elevationClassName e19lxcc00"
+++       class="components-elevation css-10h9eji-PolymorphicDiv-Elevation-sx-Base-elevationClassName e19lxcc00"
+         data-wp-c16t="true"
+         data-wp-component="Elevation"
+       />
+       <div
+         aria-hidden="true"
+--       class="components-elevation css-18cl04p-View-Elevation-sx-Base-elevationClassName e19lxcc00"
+-+       class="components-elevation css-15t1t3g-View-Elevation-sx-Base-elevationClassName e19lxcc00"
++-       class="components-elevation css-7he0ow-PolymorphicDiv-Elevation-sx-Base-elevationClassName e19lxcc00"
+++       class="components-elevation css-10h9eji-PolymorphicDiv-Elevation-sx-Base-elevationClassName e19lxcc00"
+         data-wp-c16t="true"
+         data-wp-component="Elevation"
+       />
+diff --git a/packages/components/src/flex/test/__snapshots__/index.tsx.snap b/packages/components/src/flex/test/__snapshots__/index.tsx.snap
+index 072b70ff9cb806..f963bf0fd7167d 100644
+--- a/packages/components/src/flex/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/flex/test/__snapshots__/index.tsx.snap
+@@ -7,25 +7,25 @@ Snapshot Diff:
+ 
+ @@ -1,22 +1,18 @@
+   <div
+-    class="components-flex css-j6raph-View-Flex-base-ItemsRow e19lxcc00"
++    class="components-flex css-1hwd9hm-PolymorphicDiv-Flex-base-ItemsRow e19lxcc00"
+ -   data-testid="flex"
+ +   data-testid="base-flex"
+     data-wp-c16t="true"
+     data-wp-component="Flex"
+   >
+     <div
+-      class="components-flex-item css-mw3lhz-View-Item-sx-Base e19lxcc00"
++      class="components-flex-item css-eno349-PolymorphicDiv-Item-sx-Base e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="FlexItem"
+     >
+       Item
+     </div>
+ -   <div
+--     class="css-1mm2cvy-View e19lxcc00"
++-     class="css-161q9d5-PolymorphicDiv e19lxcc00"
+ -   />
+ -   <div />
+     <div
+-      class="components-flex-item components-flex-block css-14wzr73-View-Item-sx-Base-block e19lxcc00"
++      class="components-flex-item components-flex-block css-10m3u8l-PolymorphicDiv-Item-sx-Base-block e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="FlexBlock"
+     >
+diff --git a/packages/components/src/item-group/item/hook.ts b/packages/components/src/item-group/item/hook.ts
+index 188b575e072c87..be817a24dcbb1e 100644
+--- a/packages/components/src/item-group/item/hook.ts
++++ b/packages/components/src/item-group/item/hook.ts
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import type { ElementType } from 'react';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -32,11 +27,7 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
+ 
+ 	const size = sizeProp || contextSize;
+ 
+-	const as =
+-		asProp ||
+-		( ( typeof onClick !== 'undefined'
+-			? 'button'
+-			: 'div' ) as ElementType );
++	const as = asProp || ( typeof onClick !== 'undefined' ? 'button' : 'div' );
+ 
+ 	const cx = useCx();
+ 
+diff --git a/packages/components/src/item-group/test/__snapshots__/index.js.snap b/packages/components/src/item-group/test/__snapshots__/index.js.snap
+index f5211b7b1683fe..24ecd27f68c49f 100644
+--- a/packages/components/src/item-group/test/__snapshots__/index.js.snap
++++ b/packages/components/src/item-group/test/__snapshots__/index.js.snap
+@@ -11,8 +11,8 @@ Snapshot Diff:
+         role="listitem"
+       >
+         <div
+--         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
+-+         class="components-item css-gg7ygh-View-large-item-spacedAround e19lxcc00"
++-         class="components-item css-au4yox-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
+++         class="components-item css-1h3jinl-PolymorphicDiv-large-item-spacedAround e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="Item"
+         >
+@@ -24,8 +24,8 @@ Snapshot Diff:
+         role="listitem"
+       >
+         <div
+--         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
+-+         class="components-item css-gg7ygh-View-large-item-spacedAround e19lxcc00"
++-         class="components-item css-au4yox-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
+++         class="components-item css-1h3jinl-PolymorphicDiv-large-item-spacedAround e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="Item"
+         >
+@@ -44,8 +44,8 @@ Snapshot Diff:
+       role="listitem"
+     >
+       <div
+--       class="components-item css-1lf4kzd-View-medium-item e19lxcc00"
+-+       class="components-item css-1vv4aem-View-large-item e19lxcc00"
++-       class="components-item css-tpom78-PolymorphicDiv-medium-item e19lxcc00"
+++       class="components-item css-vss65r-PolymorphicDiv-large-item e19lxcc00"
+         data-wp-c16t="true"
+         data-wp-component="Item"
+       >
+@@ -114,8 +114,8 @@ Snapshot Diff:
+ @@ -1,18 +1,18 @@
+   <div>
+     <div
+--     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
+-+     class="components-item-group css-18qvw1m-View-separated-rounded e19lxcc00"
++-     class="components-item-group css-1iattls-PolymorphicDiv-rounded e19lxcc00"
+++     class="components-item-group css-zgfros-PolymorphicDiv-separated-rounded e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="ItemGroup"
+       role="list"
+@@ -125,8 +125,8 @@ Snapshot Diff:
+         role="listitem"
+       >
+         <div
+--         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
+-+         class="components-item css-1lf4kzd-View-medium-item e19lxcc00"
++-         class="components-item css-au4yox-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
+++         class="components-item css-tpom78-PolymorphicDiv-medium-item e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="Item"
+         >
+@@ -142,8 +142,8 @@ Snapshot Diff:
+ @@ -1,18 +1,18 @@
+   <div>
+     <div
+--     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
+-+     class="components-item-group css-acyoj6-View-bordered-rounded e19lxcc00"
++-     class="components-item-group css-1iattls-PolymorphicDiv-rounded e19lxcc00"
+++     class="components-item-group css-1ibn92o-PolymorphicDiv-bordered-rounded e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="ItemGroup"
+       role="list"
+@@ -153,8 +153,8 @@ Snapshot Diff:
+         role="listitem"
+       >
+         <div
+--         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
+-+         class="components-item css-1lf4kzd-View-medium-item e19lxcc00"
++-         class="components-item css-au4yox-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
+++         class="components-item css-tpom78-PolymorphicDiv-medium-item e19lxcc00"
+           data-wp-c16t="true"
+           data-wp-component="Item"
+         >
+@@ -170,8 +170,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
+-+     class="components-item-group css-1mm2cvy-View e19lxcc00"
++-     class="components-item-group css-1iattls-PolymorphicDiv-rounded e19lxcc00"
+++     class="components-item-group css-161q9d5-PolymorphicDiv e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="ItemGroup"
+       role="list"
+diff --git a/packages/components/src/surface/test/__snapshots__/index.tsx.snap b/packages/components/src/surface/test/__snapshots__/index.tsx.snap
+index 200382f04ae5b6..520649a54d295a 100644
+--- a/packages/components/src/surface/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/surface/test/__snapshots__/index.tsx.snap
+@@ -8,8 +8,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-surface css-pt58n0-View-Surface-getBorders-primary e19lxcc00"
+-+     class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
++-     class="components-surface css-1bmtyqd-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+++     class="components-surface css-1u146xf-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="Surface"
+     >
+@@ -25,8 +25,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-surface css-1vckp4o-View-Surface-getBorders-primary e19lxcc00"
+-+     class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
++-     class="components-surface css-iin9ud-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+++     class="components-surface css-1u146xf-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="Surface"
+     >
+@@ -42,8 +42,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-surface css-sw9dzi-View-Surface-getBorders-primary e19lxcc00"
+-+     class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
++-     class="components-surface css-4j30ez-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+++     class="components-surface css-1u146xf-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="Surface"
+     >
+@@ -59,8 +59,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-surface css-123k66h-View-Surface-getBorders-primary e19lxcc00"
+-+     class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
++-     class="components-surface css-1v7smm4-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+++     class="components-surface css-1u146xf-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="Surface"
+     >
+@@ -94,8 +94,8 @@ Snapshot Diff:
+ @@ -1,8 +1,8 @@
+   <div>
+     <div
+--     class="components-surface css-1m2pafr-View-Surface-getBorders-secondary e19lxcc00"
+-+     class="components-surface css-soe81k-View-Surface-getBorders-primary e19lxcc00"
++-     class="components-surface css-1afnk4j-PolymorphicDiv-Surface-getBorders-secondary e19lxcc00"
+++     class="components-surface css-1u146xf-PolymorphicDiv-Surface-getBorders-primary e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="Surface"
+     >
+diff --git a/packages/components/src/view/component.tsx b/packages/components/src/view/component.tsx
+index a970c5c757431f..6742bd9f52e510 100644
+--- a/packages/components/src/view/component.tsx
++++ b/packages/components/src/view/component.tsx
+@@ -2,13 +2,25 @@
+  * External dependencies
+  */
+ import styled from '@emotion/styled';
+-import type { RefAttributes } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+-import type { WordPressComponent } from '../context/wordpress-component';
+-import type { ViewProps } from './types';
++import type { WordPressComponentProps } from '../context';
++
++const PolymorphicDiv = styled.div``;
++
++function UnforwardedView< T extends React.ElementType = 'div' >(
++	{ as, ...restProps }: WordPressComponentProps< {}, T >,
++	ref: React.ForwardedRef< any >
++) {
++	return <PolymorphicDiv as={ as } ref={ ref } { ...restProps } />;
++}
+ 
+ /**
+  * `View` is a core component that renders everything in the library.
+@@ -26,13 +38,8 @@ import type { ViewProps } from './types';
+  * }
+  * ```
+  */
+-export const View: WordPressComponent<
+-	'div',
+-	ViewProps & RefAttributes< any >,
+-	true
+-> = styled.div``;
+-
+-View.selector = '.components-view';
+-View.displayName = 'View';
++export const View = Object.assign( forwardRef( UnforwardedView ), {
++	selector: '.components-view',
++} );
+ 
+ export default View;
+diff --git a/packages/components/src/view/types.ts b/packages/components/src/view/types.ts
+deleted file mode 100644
+index 6c7e1508812c8c..00000000000000
+--- a/packages/components/src/view/types.ts
++++ /dev/null
+@@ -1,6 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { ReactNode } from 'react';
+-
+-export type ViewProps = { children?: ReactNode };

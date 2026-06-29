@@ -1,0 +1,75 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5fc095dfcada75..fb43b944260359 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `ColorPicker`: Change the inputs to the new 36px height ([#41795](https://github.com/WordPress/gutenberg/pull/41795)).
++
+ ### Internal
+ 
+ -   `Spinner`: Convert to TypeScript and update storybook ([#41540](https://github.com/WordPress/gutenberg/pull/41540/)).
+diff --git a/packages/components/src/color-picker/hex-input.tsx b/packages/components/src/color-picker/hex-input.tsx
+index e62e8d3e526431..a5b9caf4a11415 100644
+--- a/packages/components/src/color-picker/hex-input.tsx
++++ b/packages/components/src/color-picker/hex-input.tsx
+@@ -50,6 +50,7 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
+ 
+ 	return (
+ 		<ColorHexInputControl
++			__next36pxDefaultSize={ true }
+ 			prefix={
+ 				<Spacer
+ 					as={ Text }
+diff --git a/packages/components/src/color-picker/input-with-slider.tsx b/packages/components/src/color-picker/input-with-slider.tsx
+index fb45238ec5016d..b29b99b402707b 100644
+--- a/packages/components/src/color-picker/input-with-slider.tsx
++++ b/packages/components/src/color-picker/input-with-slider.tsx
+@@ -28,6 +28,7 @@ export const InputWithSlider = ( {
+ 	return (
+ 		<Spacer as={ HStack } spacing={ 4 }>
+ 			<NumberControlWrapper
++				__next36pxDefaultSize={ true }
+ 				min={ min }
+ 				max={ max }
+ 				label={ label }
+diff --git a/packages/components/src/color-picker/styles.ts b/packages/components/src/color-picker/styles.ts
+index 378e165ed74ba6..ad32652767266c 100644
+--- a/packages/components/src/color-picker/styles.ts
++++ b/packages/components/src/color-picker/styles.ts
+@@ -15,7 +15,6 @@ import Button from '../button';
+ import {
+ 	BackdropUI,
+ 	Container as InputControlContainer,
+-	Input,
+ } from '../input-control/styles/input-control-styles';
+ import InputControl from '../input-control';
+ import CONFIG from '../utils/config-values';
+@@ -42,14 +41,6 @@ export const RangeControl = styled( InnerRangeControl )`
+ 	}
+ `;
+ 
+-// All inputs should be the same height so this should be changed at the component level.
+-// That involves changing heights of multiple input types probably buttons too etc.
+-// So until that is done we are already using the new height on the color picker so it matches the mockups.
+-const inputHeightStyle = `
+-&&& ${ Input } {
+-	height: 40px;
+-}`;
+-
+ // Make the Hue circle picker not go out of the bar.
+ const interactiveHueStyles = `
+ .react-colorful__interactive {
+@@ -107,8 +98,6 @@ export const ColorfulWrapper = styled.div`
+ 	${ StyledField } {
+ 		margin-bottom: 0;
+ 	}
+-
+-	${ inputHeightStyle }
+ `;
+ 
+ export const CopyButton = styled( Button )`

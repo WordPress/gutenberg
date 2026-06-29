@@ -1,0 +1,56 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8c656f4adb48bb..f06a81c930a7f7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ 
+ ### Enhancements
+ 
++-   `Navigator`: warn if a screen's `path` doesn't follow a URL-like scheme ([#65231](https://github.com/WordPress/gutenberg/pull/65231)).
+ -   `Modal`: Decrease close button size and remove horizontal offset ([#65131](https://github.com/WordPress/gutenberg/pull/65131)).
+ 
+ ### Internal
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index be5c4bfaf41ec4..5882f271d4518f 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -17,6 +17,7 @@ import {
+ import { useMergeRefs } from '@wordpress/compose';
+ import { isRTL as isRTLFn } from '@wordpress/i18n';
+ import { escapeAttribute } from '@wordpress/escape-html';
++import warning from '@wordpress/warning';
+ 
+ /**
+  * Internal dependencies
+@@ -33,6 +34,12 @@ function UnconnectedNavigatorScreen(
+ 	props: WordPressComponentProps< NavigatorScreenProps, 'div', false >,
+ 	forwardedRef: ForwardedRef< any >
+ ) {
++	if ( ! /^\//.test( props.path ) ) {
++		warning(
++			'wp.components.NavigatorScreen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
++		);
++	}
++
+ 	const screenId = useId();
+ 	const { children, className, path, ...otherProps } = useContextSystem(
+ 		props,
+diff --git a/packages/components/src/navigator/test/index.tsx b/packages/components/src/navigator/test/index.tsx
+index 9b9b257ea09681..820942a22644ba 100644
+--- a/packages/components/src/navigator/test/index.tsx
++++ b/packages/components/src/navigator/test/index.tsx
+@@ -642,6 +642,14 @@ describe( 'Navigator', () => {
+ 		).toHaveAttribute( 'id', INVALID_HTML_ATTRIBUTE.escaped );
+ 	} );
+ 
++	it( 'should warn if the `path` prop does not follow the required format', () => {
++		render( <NavigatorScreen path="not-valid">Test</NavigatorScreen> );
++
++		expect( console ).toHaveWarnedWith(
++			'wp.components.NavigatorScreen: the `path` should follow a URL-like scheme; it should start with and be separated by the `/` character.'
++		);
++	} );
++
+ 	it( 'should match correctly paths with named arguments', async () => {
+ 		const user = userEvent.setup();
+ 

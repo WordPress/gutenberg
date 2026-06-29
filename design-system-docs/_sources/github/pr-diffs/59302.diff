@@ -1,0 +1,39 @@
+diff --git a/packages/block-editor/src/components/spacing-sizes-control/sides-dropdown/index.js b/packages/block-editor/src/components/spacing-sizes-control/sides-dropdown/index.js
+index 0f83a8db1c831e..e399efa5b44674 100644
+--- a/packages/block-editor/src/components/spacing-sizes-control/sides-dropdown/index.js
++++ b/packages/block-editor/src/components/spacing-sizes-control/sides-dropdown/index.js
+@@ -30,7 +30,7 @@ export default function SidesDropdown( {
+ 			icon={ sideIcon }
+ 			label={ labelProp }
+ 			className="spacing-sizes-control__dropdown"
+-			toggleProps={ { isSmall: true } }
++			toggleProps={ { size: 'small' } }
+ 		>
+ 			{ ( { onClose } ) => {
+ 				return (
+diff --git a/packages/components/src/palette-edit/index.tsx b/packages/components/src/palette-edit/index.tsx
+index 08b093d005ed2a..5dd8787eb6594a 100644
+--- a/packages/components/src/palette-edit/index.tsx
++++ b/packages/components/src/palette-edit/index.tsx
+@@ -480,7 +480,7 @@ export function PaletteEdit( {
+ 										: __( 'Color options' )
+ 								}
+ 								toggleProps={ {
+-									isSmall: true,
++									size: 'small',
+ 								} }
+ 							>
+ 								{ ( { onClose }: { onClose: () => void } ) => (
+diff --git a/packages/components/src/tools-panel/tools-panel-header/component.tsx b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+index 3739134008577d..b08981f94949a6 100644
+--- a/packages/components/src/tools-panel/tools-panel-header/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel-header/component.tsx
+@@ -199,7 +199,7 @@ const ToolsPanelHeader = (
+ 					label={ dropDownMenuLabelText }
+ 					menuProps={ { className: dropdownMenuClassName } }
+ 					toggleProps={ {
+-						isSmall: true,
++						size: 'small',
+ 						describedBy: dropdownMenuDescriptionText,
+ 					} }
+ 				>

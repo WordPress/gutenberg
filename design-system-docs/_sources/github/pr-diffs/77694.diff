@@ -1,0 +1,677 @@
+diff --git a/packages/admin-ui/src/breadcrumbs/index.tsx b/packages/admin-ui/src/breadcrumbs/index.tsx
+index fc327b9a4e822e..dd166e6b185660 100644
+--- a/packages/admin-ui/src/breadcrumbs/index.tsx
++++ b/packages/admin-ui/src/breadcrumbs/index.tsx
+@@ -1,18 +1,38 @@
+ /**
+  * WordPress dependencies
+  */
+-import { Link } from '@wordpress/route';
++import clsx from 'clsx';
+ import { __ } from '@wordpress/i18n';
+-import {
+-	__experimentalHeading as Heading,
+-	__experimentalHStack as HStack,
+-} from '@wordpress/components';
++import { Link } from '@wordpress/route';
++import { __experimentalHeading as Heading } from '@wordpress/components';
++import { Breadcrumb } from '@wordpress/ui';
+ 
+ /**
+  * Internal dependencies
+  */
+ import type { BreadcrumbsProps } from './types';
+ 
++function createRouteLinkRender( to: string ) {
++	return function RouteLinkRender( props: React.ComponentProps< 'a' > ) {
++		const { href: _href, ...anchorProps } = props;
++
++		return <Link to={ to } { ...( anchorProps as Record< string, unknown > ) } />;
++	};
++}
++
++function renderCurrentHeading( props: React.ComponentProps< 'span' > ) {
++	const { className, ...headingProps } = props;
++
++	return (
++		<Heading
++			level={ 1 }
++			truncate
++			className={ clsx( 'admin-ui-breadcrumbs__current', className ) }
++			{ ...( headingProps as Record< string, unknown > ) }
++		/>
++	);
++}
++
+ /**
+  * Renders a breadcrumb navigation trail.
+  *
+@@ -53,30 +73,32 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
+ 	}
+ 
+ 	return (
+-		<nav aria-label={ __( 'Breadcrumbs' ) }>
+-			<HStack
+-				as="ul"
+-				className="admin-ui-breadcrumbs__list"
+-				spacing={ 0 }
+-				justify="flex-start"
+-				alignment="center"
+-			>
++		<Breadcrumb aria-label={ __( 'Breadcrumbs' ) }>
++			<Breadcrumb.List className="admin-ui-breadcrumbs__list">
+ 				{ precedingItems.map( ( item, index ) => (
+-					<li key={ index }>
+-						<Link to={ item.to }>{ item.label }</Link>
+-					</li>
++					<Breadcrumb.Item
++						key={ index }
++						href={ item.to }
++						render={ createRouteLinkRender( item.to! ) }
++					>
++						{ item.label }
++					</Breadcrumb.Item>
+ 				) ) }
+-				<li>
+-					{ lastItem.to ? (
+-						<Link to={ lastItem.to }>{ lastItem.label }</Link>
+-					) : (
+-						<Heading level={ 1 } truncate>
+-							{ lastItem.label }
+-						</Heading>
+-					) }
+-				</li>
+-			</HStack>
+-		</nav>
++				{ lastItem.to ? (
++					<Breadcrumb.Item
++						href={ lastItem.to }
++						render={ createRouteLinkRender( lastItem.to ) }
++						aria-current="page"
++					>
++						{ lastItem.label }
++					</Breadcrumb.Item>
++				) : (
++					<Breadcrumb.Current render={ renderCurrentHeading }>
++						{ lastItem.label }
++					</Breadcrumb.Current>
++				) }
++			</Breadcrumb.List>
++		</Breadcrumb>
+ 	);
+ };
+ 
+diff --git a/packages/admin-ui/src/breadcrumbs/style.scss b/packages/admin-ui/src/breadcrumbs/style.scss
+index c15416a8bbebd5..33dc25251b1b40 100644
+--- a/packages/admin-ui/src/breadcrumbs/style.scss
++++ b/packages/admin-ui/src/breadcrumbs/style.scss
+@@ -1,25 +1,12 @@
+-@use "@wordpress/base-styles/variables";
+-
+ .admin-ui-breadcrumbs__list {
+-	// @TODO: use Text component from UI when available.
+ 	font-family: var(--wpds-typography-font-family-heading);
+ 	font-size: var(--wpds-typography-font-size-lg);
+ 	font-weight: var(--wpds-typography-font-weight-medium);
+ 	line-height: var(--wpds-typography-line-height-lg);
+-	list-style: none;
+-	padding: 0;
+-	margin: 0;
+-	// gap prop don't seem to be working properly.
+-	gap: 0;
+ 	min-height: 32px;
++}
+ 
+-	li:not(:last-child)::after {
+-		content: "/";
+-		margin: 0 variables.$grid-unit-10;
+-	}
+-
+-	h1 {
+-		font-size: inherit;
+-		line-height: inherit;
+-	}
++.admin-ui-breadcrumbs__current {
++	font-size: inherit;
++	line-height: inherit;
+ }
+diff --git a/packages/ui/src/breadcrumb/breadcrumb.tsx b/packages/ui/src/breadcrumb/breadcrumb.tsx
+new file mode 100644
+index 00000000000000..77140908103ed5
+--- /dev/null
++++ b/packages/ui/src/breadcrumb/breadcrumb.tsx
+@@ -0,0 +1,71 @@
++import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
++import { BreadcrumbList } from './list';
++import { BreadcrumbItem } from './item';
++import { BreadcrumbCurrent } from './current';
++import type { BreadcrumbProps } from './types';
++import styles from './style.module.css';
++
++export const BreadcrumbBase = forwardRef< HTMLElement, BreadcrumbProps >(
++	function Breadcrumb( { items, children, render, className, ...props }, ref ) {
++		if ( process.env.NODE_ENV !== 'production' && items?.length ) {
++			const invalidItem = items.slice( 0, -1 ).find( ( item ) => ! item.href );
++
++			if ( invalidItem ) {
++				throw new Error(
++					'Breadcrumb: all items except the last must provide an `href` prop when using the `items` API.'
++				);
++			}
++		}
++
++		const breadcrumbItems = items?.length
++			? items.map( ( item, index ) => {
++				const isCurrent = index === items.length - 1;
++
++				if ( isCurrent && ! item.href ) {
++					return (
++						<BreadcrumbCurrent key={ index } render={ item.render }>
++							{ item.label }
++						</BreadcrumbCurrent>
++					);
++				}
++
++				return (
++					<BreadcrumbItem
++						key={ index }
++						href={ item.href }
++						render={ item.render as React.ComponentProps<
++							typeof BreadcrumbItem
++						>['render'] }
++						aria-current={ isCurrent ? 'page' : undefined }
++					>
++						{ item.label }
++					</BreadcrumbItem>
++				);
++			} )
++			: null;
++
++		const content =
++			children ??
++			( breadcrumbItems?.length ? <BreadcrumbList>{ breadcrumbItems }</BreadcrumbList> : null );
++
++		if ( ! content ) {
++			return null;
++		}
++
++		const element = useRender( {
++			render,
++			defaultTagName: 'nav',
++			ref,
++			props: mergeProps< 'nav' >( props, {
++				'aria-label': props[ 'aria-label' ] ?? __( 'Breadcrumbs' ),
++				className: clsx( styles.breadcrumb, className ),
++				children: content,
++			} ),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/breadcrumb/current.tsx b/packages/ui/src/breadcrumb/current.tsx
+new file mode 100644
+index 00000000000000..63b8abd6d0c7b3
+--- /dev/null
++++ b/packages/ui/src/breadcrumb/current.tsx
+@@ -0,0 +1,21 @@
++import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import type { BreadcrumbCurrentProps } from './types';
++import styles from './style.module.css';
++
++export const BreadcrumbCurrent = forwardRef< HTMLSpanElement, BreadcrumbCurrentProps >(
++	function BreadcrumbCurrent( { render, className, ...props }, ref ) {
++		const element = useRender( {
++			render,
++			defaultTagName: 'span',
++			ref,
++			props: mergeProps< 'span' >( props, {
++				'aria-current': props[ 'aria-current' ] ?? 'page',
++				className: clsx( styles.content, styles.current, className ),
++			} ),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/breadcrumb/index.ts b/packages/ui/src/breadcrumb/index.ts
+new file mode 100644
+index 00000000000000..115e55b9b0ff7b
+--- /dev/null
++++ b/packages/ui/src/breadcrumb/index.ts
+@@ -0,0 +1,18 @@
++import { BreadcrumbBase } from './breadcrumb';
++import { BreadcrumbList } from './list';
++import { BreadcrumbItem } from './item';
++import { BreadcrumbCurrent } from './current';
++
++/**
++ * A breadcrumb navigation component with a simple `items` API and compound
++ * subcomponents for custom composition.
++ */
++export const Breadcrumb = Object.assign( BreadcrumbBase, {
++	List: BreadcrumbList,
++	Item: BreadcrumbItem,
++	Current: BreadcrumbCurrent,
++} ) as typeof BreadcrumbBase & {
++	List: typeof BreadcrumbList;
++	Item: typeof BreadcrumbItem;
++	Current: typeof BreadcrumbCurrent;
++};
+diff --git a/packages/ui/src/breadcrumb/item.tsx b/packages/ui/src/breadcrumb/item.tsx
+new file mode 100644
+index 00000000000000..1f494e514b204a
+--- /dev/null
++++ b/packages/ui/src/breadcrumb/item.tsx
+@@ -0,0 +1,20 @@
++import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
++import { forwardRef } from '@wordpress/element';
++import type { BreadcrumbItemProps } from './types';
++import styles from './style.module.css';
++
++export const BreadcrumbItem = forwardRef< HTMLAnchorElement, BreadcrumbItemProps >(
++	function BreadcrumbItem( { render, className, ...props }, ref ) {
++		const element = useRender( {
++			render,
++			defaultTagName: 'a',
++			ref,
++			props: mergeProps< 'a' >( props, {
++				className: clsx( styles.content, styles.item, className ),
++			} ),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/breadcrumb/list.tsx b/packages/ui/src/breadcrumb/list.tsx
+new file mode 100644
+index 00000000000000..16b85bc63131ce
+--- /dev/null
++++ b/packages/ui/src/breadcrumb/list.tsx
+@@ -0,0 +1,27 @@
++import { useRender, mergeProps } from '@base-ui/react';
++import clsx from 'clsx';
++import { Children, forwardRef } from '@wordpress/element';
++import type { BreadcrumbListProps } from './types';
++import styles from './style.module.css';
++
++export const BreadcrumbList = forwardRef< HTMLOListElement, BreadcrumbListProps >(
++	function BreadcrumbList( { children, render, className, ...props }, ref ) {
++		const items = Children.toArray( children );
++
++		const element = useRender( {
++			render,
++			defaultTagName: 'ol',
++			ref,
++			props: mergeProps< 'ol' >( props, {
++				className: clsx( styles.list, className ),
++				children: items.map( ( child, index ) => (
++					<li className={ styles[ 'list-item' ] } key={ index }>
++						{ child }
++					</li>
++				) ),
++			} ),
++		} );
++
++		return element;
++	}
++);
+diff --git a/packages/ui/src/breadcrumb/stories/index.story.tsx b/packages/ui/src/breadcrumb/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..f836c244257784
+--- /dev/null
++++ b/packages/ui/src/breadcrumb/stories/index.story.tsx
+@@ -0,0 +1,40 @@
++/**
++ * External dependencies
++ */
++import type { Meta, StoryObj } from '@storybook/react-vite';
++
++/**
++ * Internal dependencies
++ */
++import { Breadcrumb } from '..';
++
++const meta: Meta< typeof Breadcrumb > = {
++	component: Breadcrumb,
++	title: 'UI/Breadcrumb',
++};
++
++export default meta;
++
++type Story = StoryObj< typeof meta >;
++
++export const FromItems: Story = {
++	args: {
++		items: [
++			{ label: 'Home', href: '/' },
++			{ label: 'Settings', href: '/settings' },
++			{ label: 'General' },
++		],
++	},
++};
++
++export const Compound: Story = {
++	render: () => (
++		<Breadcrumb>
++			<Breadcrumb.List>
++				<Breadcrumb.Item href="/">Home</Breadcrumb.Item>
++				<Breadcrumb.Item href="/settings">Settings</Breadcrumb.Item>
++				<Breadcrumb.Current>General</Breadcrumb.Current>
++			</Breadcrumb.List>
++		</Breadcrumb>
++	),
++};
+diff --git a/packages/ui/src/breadcrumb/stories/usage-guidelines.mdx b/packages/ui/src/breadcrumb/stories/usage-guidelines.mdx
+new file mode 100644
+index 00000000000000..ff3b0871f911d9
+--- /dev/null
++++ b/packages/ui/src/breadcrumb/stories/usage-guidelines.mdx
+@@ -0,0 +1,35 @@
++import { Canvas, Meta } from '@storybook/addon-docs/blocks';
++import * as BreadcrumbStories from './index.story';
++
++<Meta of={ BreadcrumbStories } />
++
++# Breadcrumb usage guidelines
++
++## Implementation notes
++
++-   Use `Breadcrumb` as a pure UI primitive. It is intentionally agnostic to routing and renders standard HTML semantics by default.
++-   The default structure is a `nav` landmark containing an ordered list, which communicates hierarchy to assistive technologies.
++-   Mark the current page with `aria-current="page"`. When using the `items` API, this is applied automatically to the last item.
++-   Use the `items` prop for straightforward breadcrumb trails, or the compound API when you need custom rendering.
++-   Links render as `<a href>` by default. For routers or custom navigation layers, pass a `render` prop to `Breadcrumb.Item`.
++
++<Canvas of={ BreadcrumbStories.FromItems } />
++
++## Compound composition
++
++Use `Breadcrumb.List`, `Breadcrumb.Item`, and `Breadcrumb.Current` when you need to compose breadcrumbs manually or integrate with a router-specific link component.
++
++<Canvas of={ BreadcrumbStories.Compound } />
++
++## Truncation
++
++This implementation provides a conservative baseline for truncation by applying single-line ellipsis behavior to breadcrumb content, especially the trailing item in constrained layouts.
++
++It does not introduce overflow disclosure UI such as an ellipsis menu or popover. That behavior was intentionally left out until there is clearer product and design direction for how hidden breadcrumb items should be revealed.
++
++## Accessibility
++
++-   Keep breadcrumb labels concise and descriptive.
++-   Preserve keyboard access for all navigable items.
++-   Avoid replacing the current page item with a non-semantic container unless the replacement still exposes `aria-current="page"`.
++-   If you customize rendering, preserve the accessible name and link behavior of each breadcrumb item.
+\ No newline at end of file
+diff --git a/packages/ui/src/breadcrumb/style.module.css b/packages/ui/src/breadcrumb/style.module.css
+new file mode 100644
+index 00000000000000..c34569d255e4af
+--- /dev/null
++++ b/packages/ui/src/breadcrumb/style.module.css
+@@ -0,0 +1,62 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-components {
++	.breadcrumb {
++		min-width: 0;
++	}
++
++	.list {
++		display: flex;
++		align-items: center;
++		gap: 0;
++		list-style: none;
++		margin: 0;
++		padding: 0;
++		min-width: 0;
++		font-family: var(--wpds-typography-font-family-heading);
++		font-size: var(--wpds-typography-font-size-lg);
++		font-weight: var(--wpds-typography-font-weight-medium);
++		line-height: var(--wpds-typography-line-height-lg);
++	}
++
++	.list-item {
++		display: inline-flex;
++		align-items: center;
++		min-width: 0;
++		max-width: 100%;
++		flex-shrink: 1;
++	}
++
++	.list-item:not(:last-child)::after {
++		content: "/";
++		flex: 0 0 auto;
++		margin-inline: var(--wpds-dimension-gap-sm);
++		color: currentColor;
++	}
++
++	.list-item:last-child {
++		flex: 1 1 auto;
++	}
++
++	.content {
++		display: inline-block;
++		min-width: 0;
++		max-width: 100%;
++		overflow: hidden;
++		text-overflow: ellipsis;
++		white-space: nowrap;
++	}
++
++	.item {
++		color: inherit;
++		text-decoration: none;
++	}
++
++	.item:hover {
++		text-decoration: underline;
++	}
++
++	.current {
++		color: inherit;
++	}
++}
+diff --git a/packages/ui/src/breadcrumb/test/index.test.tsx b/packages/ui/src/breadcrumb/test/index.test.tsx
+new file mode 100644
+index 00000000000000..6b261513828e82
+--- /dev/null
++++ b/packages/ui/src/breadcrumb/test/index.test.tsx
+@@ -0,0 +1,121 @@
++import { createRef } from '@wordpress/element';
++import { render, screen } from '@testing-library/react';
++import { Breadcrumb } from '../index';
++
++describe( 'Breadcrumb', () => {
++	it( 'renders a navigation landmark and ordered list from items', () => {
++		render(
++			<Breadcrumb
++				items={ [
++					{ label: 'Home', href: '/' },
++					{ label: 'Settings', href: '/settings' },
++					{ label: 'General' },
++				] }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'navigation', { name: 'Breadcrumbs' } )
++		).toBeInTheDocument();
++		expect( screen.getByRole( 'list' ) ).toBeInTheDocument();
++		expect( screen.getAllByRole( 'listitem' ) ).toHaveLength( 3 );
++	} );
++
++	it( 'renders preceding items as links and the last item as the current page', () => {
++		render(
++			<Breadcrumb
++				items={ [
++					{ label: 'Home', href: '/' },
++					{ label: 'General' },
++				] }
++			/>
++		);
++
++		expect( screen.getByRole( 'link', { name: 'Home' } ) ).toHaveAttribute(
++			'href',
++			'/'
++		);
++		expect( screen.getByText( 'General' ) ).toHaveAttribute(
++			'aria-current',
++			'page'
++		);
++	} );
++
++	it( 'applies aria-current to the last link when it has an href', () => {
++		render(
++			<Breadcrumb
++				items={ [
++					{ label: 'Home', href: '/' },
++					{ label: 'Settings', href: '/settings' },
++				] }
++			/>
++		);
++
++		expect( screen.getByRole( 'link', { name: 'Settings' } ) ).toHaveAttribute(
++			'aria-current',
++			'page'
++		);
++	} );
++
++	it( 'throws when a non-final item is missing href in the items API', () => {
++		expect( () =>
++			render(
++				<Breadcrumb
++					items={ [
++						{ label: 'Home' },
++						{ label: 'General' },
++					] }
++				/>
++			)
++		).toThrow( /all items except the last must provide an `href`/ );
++		expect( console ).toHaveErrored();
++	} );
++
++	it( 'supports compound composition and forwards refs', () => {
++		const ref = createRef< HTMLElement >();
++
++		render(
++			<Breadcrumb ref={ ref }>
++				<Breadcrumb.List>
++					<Breadcrumb.Item href="/">Home</Breadcrumb.Item>
++					<Breadcrumb.Current>Current</Breadcrumb.Current>
++				</Breadcrumb.List>
++			</Breadcrumb>
++		);
++
++		expect( ref.current?.tagName ).toBe( 'NAV' );
++		expect( screen.getByRole( 'link', { name: 'Home' } ) ).toHaveAttribute(
++			'href',
++			'/'
++		);
++		expect( screen.getByText( 'Current' ) ).toHaveAttribute(
++			'aria-current',
++			'page'
++		);
++	} );
++
++	it( 'supports custom item rendering', () => {
++		render(
++			<Breadcrumb>
++				<Breadcrumb.List>
++					<Breadcrumb.Item
++						href="/"
++						render={ ( props ) => {
++							const { href, ...otherProps } = props as React.ComponentProps< 'a' >;
++
++							return <button data-href={ href } type="button" { ...otherProps } />;
++						} }
++					>
++						Home
++					</Breadcrumb.Item>
++					<Breadcrumb.Current>Current</Breadcrumb.Current>
++				</Breadcrumb.List>
++			</Breadcrumb>
++		);
++
++		expect( screen.getByRole( 'button', { name: 'Home' } ) ).toHaveAttribute(
++			'data-href',
++			'/'
++		);
++	} );
++} );
+diff --git a/packages/ui/src/breadcrumb/types.ts b/packages/ui/src/breadcrumb/types.ts
+new file mode 100644
+index 00000000000000..caa842cc0d30e9
+--- /dev/null
++++ b/packages/ui/src/breadcrumb/types.ts
+@@ -0,0 +1,55 @@
++import type { ReactNode } from 'react';
++import type { ComponentProps } from '../utils/types';
++
++export interface BreadcrumbDefinition {
++	/**
++	 * The content rendered for the breadcrumb item.
++	 */
++	label: ReactNode;
++
++	/**
++	 * The URL used when the item is rendered as a link.
++	 */
++	href?: string;
++
++	/**
++	 * Customizes the underlying rendered element.
++	 */
++	render?: ComponentProps< 'a' >['render'] | ComponentProps< 'span' >['render'];
++}
++
++export interface BreadcrumbProps extends Omit< ComponentProps< 'nav' >, 'children' > {
++	/**
++	 * An array of breadcrumb items to render.
++	 *
++	 * All items except the last must provide an `href` value.
++	 */
++	items?: BreadcrumbDefinition[];
++
++	/**
++	 * Custom breadcrumb content. Use with `Breadcrumb.List`, `Breadcrumb.Item`,
++	 * and `Breadcrumb.Current` for compound composition.
++	 */
++	children?: ReactNode;
++}
++
++export interface BreadcrumbListProps extends ComponentProps< 'ol' > {
++	/**
++	 * The breadcrumb items.
++	 */
++	children?: ReactNode;
++}
++
++export interface BreadcrumbItemProps extends ComponentProps< 'a' > {
++	/**
++	 * The content rendered inside the breadcrumb link.
++	 */
++	children?: ReactNode;
++}
++
++export interface BreadcrumbCurrentProps extends ComponentProps< 'span' > {
++	/**
++	 * The content rendered for the current page.
++	 */
++	children?: ReactNode;
++}
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 800fb880628e5e..c764bc388bb970 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -1,3 +1,4 @@
++export * from './breadcrumb';
+ export * from './badge';
+ export * from './button';
+ export * as Card from './card';

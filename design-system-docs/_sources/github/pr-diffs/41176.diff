@@ -1,0 +1,54 @@
+diff --git a/packages/block-editor/src/components/border-radius-control/linked-button.js b/packages/block-editor/src/components/border-radius-control/linked-button.js
+index 58fec1012b0651..1ec8c2fdd8dcb1 100644
+--- a/packages/block-editor/src/components/border-radius-control/linked-button.js
++++ b/packages/block-editor/src/components/border-radius-control/linked-button.js
+@@ -9,7 +9,7 @@ export default function LinkedButton( { isLinked, ...props } ) {
+ 	const label = isLinked ? __( 'Unlink Radii' ) : __( 'Link Radii' );
+ 
+ 	return (
+-		<Tooltip text={ label }>
++		<Tooltip text={ label } position="bottom left">
+ 			<Button
+ 				{ ...props }
+ 				className="component-border-radius-control__linked-button"
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8edd05d9f0837e..794e696b27cb43 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug fix
++
++-   `BoxControl` and `BorderBoxControl`: Ensure Unlink tooltip position stays within the viewport. ([#41176](https://github.com/WordPress/gutenberg/pull/41176))
++
+ ## 19.11.0 (2022-05-18)
+ 
+ ### Enhancements
+diff --git a/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx b/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
+index 21e9d5e3e90fe3..380973de79a992 100644
+--- a/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
++++ b/packages/components/src/border-box-control/border-box-control-linked-button/component.tsx
+@@ -27,7 +27,7 @@ const BorderBoxControlLinkedButton = (
+ 	const label = isLinked ? __( 'Unlink sides' ) : __( 'Link sides' );
+ 
+ 	return (
+-		<Tooltip text={ label }>
++		<Tooltip text={ label } position="bottom left">
+ 			<View className={ className }>
+ 				<Button
+ 					{ ...buttonProps }
+diff --git a/packages/components/src/box-control/linked-button.js b/packages/components/src/box-control/linked-button.js
+index 3a24a62f188be0..eeaf1fdd0ab399 100644
+--- a/packages/components/src/box-control/linked-button.js
++++ b/packages/components/src/box-control/linked-button.js
+@@ -14,7 +14,7 @@ export default function LinkedButton( { isLinked, ...props } ) {
+ 	const label = isLinked ? __( 'Unlink Sides' ) : __( 'Link Sides' );
+ 
+ 	return (
+-		<Tooltip text={ label }>
++		<Tooltip text={ label } position="bottom left">
+ 			<span>
+ 				<Button
+ 					{ ...props }

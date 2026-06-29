@@ -1,0 +1,53 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index cf1cfcd120b490..eb88a08b6b54db 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,7 @@
+ -   `ProgressBar`: Use the theme system accent for indicator color ([#53347](https://github.com/WordPress/gutenberg/pull/53347)).
+ -   `ProgressBar`: Use gray 300 for track color ([#53349](https://github.com/WordPress/gutenberg/pull/53349)).
+ -   `Modal`: add `headerActions` prop to render buttons in the header. ([#53328](https://github.com/WordPress/gutenberg/pull/53328)).
++-   `ProgressBar`: Add default `tabIndex` to make focusable ([#53383](https://github.com/WordPress/gutenberg/pull/53383)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/progress-bar/index.tsx b/packages/components/src/progress-bar/index.tsx
+index 16f2630953840a..c21f0f5e80969f 100644
+--- a/packages/components/src/progress-bar/index.tsx
++++ b/packages/components/src/progress-bar/index.tsx
+@@ -34,6 +34,7 @@ function UnforwardedProgressBar(
+ 				value={ value }
+ 				aria-label={ __( 'Loading …' ) }
+ 				ref={ ref }
++				tabIndex={ 0 }
+ 				{ ...progressProps }
+ 			/>
+ 		</ProgressBarStyled.Track>
+diff --git a/packages/components/src/progress-bar/test/index.tsx b/packages/components/src/progress-bar/test/index.tsx
+index 425c54ce8a3022..d3844e406ba2d0 100644
+--- a/packages/components/src/progress-bar/test/index.tsx
++++ b/packages/components/src/progress-bar/test/index.tsx
+@@ -2,6 +2,7 @@
+  * External dependencies
+  */
+ import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
+ 
+ /**
+  * Internal dependencies
+@@ -76,4 +77,16 @@ describe( 'ProgressBar', () => {
+ 		);
+ 		expect( screen.getByRole( 'progressbar' ) ).toHaveStyle( style );
+ 	} );
++
++	it( 'should be able to focus the underlying `progress` element', async () => {
++		const user = userEvent.setup();
++
++		render( <ProgressBar /> );
++
++		expect( screen.getByRole( 'progressbar' ) ).not.toHaveFocus();
++
++		await user.tab();
++
++		expect( screen.getByRole( 'progressbar' ) ).toHaveFocus();
++	} );
+ } );

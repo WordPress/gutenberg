@@ -1,0 +1,44 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7cf8f7f2ff828d..b0cd094e4ae81b 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `FormTokenField`: Fix disabled styles. [#77137](https://github.com/WordPress/gutenberg/pull/77137)
+ -   `Textarea`: Fix disabled styles [#77129](https://github.com/WordPress/gutenberg/pull/77129).
+ -   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).
+ -   `ValidatedRangeControl`: Fix `aria-label` rendered as `[object Object]` when `required` or `markWhenOptional` is set ([#77042](https://github.com/WordPress/gutenberg/pull/77042)).
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index a7b31dd5c9f6dc..5ef4b280096fce 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -11,8 +11,10 @@
+ 	cursor: text;
+ 
+ 	&.is-disabled {
+-		background: $gray-300;
+-		border-color: $gray-300;
++		background: $components-color-gray-100;
++		border-color: $components-color-gray-400;
++		cursor: default;
++		opacity: 1;
+ 	}
+ 
+ 	&.is-active {
+@@ -82,6 +84,14 @@
+ 		}
+ 	}
+ 
++	&.is-disabled {
++		.components-form-token-field__token-text,
++		.components-form-token-field__remove-token.components-button {
++			background: $components-color-gray-100;
++			color: $components-color-gray-600;
++		}
++	}
++
+ 	&.is-borderless {
+ 		position: relative;
+ 		padding: 0 24px 0 0;

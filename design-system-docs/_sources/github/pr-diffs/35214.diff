@@ -1,0 +1,557 @@
+diff --git a/packages/components/src/navigator/context.js b/packages/components/src/navigator/context.js
+deleted file mode 100644
+index 2113ae49082865..00000000000000
+--- a/packages/components/src/navigator/context.js
++++ /dev/null
+@@ -1,6 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { createContext } from '@wordpress/element';
+-
+-export const NavigatorContext = createContext();
+diff --git a/packages/components/src/navigator/context.ts b/packages/components/src/navigator/context.ts
+new file mode 100644
+index 00000000000000..17b26fb9c14ad5
+--- /dev/null
++++ b/packages/components/src/navigator/context.ts
+@@ -0,0 +1,12 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import type { NavigatorContext as NavigatorContextType } from './types';
++
++const initialContextValue: NavigatorContextType = [ {}, () => {} ];
++export const NavigatorContext = createContext( initialContextValue );
+diff --git a/packages/components/src/navigator/index.js b/packages/components/src/navigator/index.ts
+similarity index 100%
+rename from packages/components/src/navigator/index.js
+rename to packages/components/src/navigator/index.ts
+diff --git a/packages/components/src/navigator/navigator-provider/README.md b/packages/components/src/navigator/navigator-provider/README.md
+index dead39a0bb7f6d..4ce48a75790b84 100644
+--- a/packages/components/src/navigator/navigator-provider/README.md
++++ b/packages/components/src/navigator/navigator-provider/README.md
+@@ -60,8 +60,7 @@ The initial active path.
+ 
+ -   Required: No
+ 
+-
+-## The navigator object
++## The `navigator` object
+ 
+ You can retrieve a `navigator` instance by using the `useNavigator` hook.
+ 
+diff --git a/packages/components/src/navigator/navigator-provider/component.js b/packages/components/src/navigator/navigator-provider/component.js
+deleted file mode 100644
+index a49553ac5377c4..00000000000000
+--- a/packages/components/src/navigator/navigator-provider/component.js
++++ /dev/null
+@@ -1,21 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import { NavigatorContext } from '../context';
+-
+-function NavigatorProvider( { initialPath, children } ) {
+-	const [ path, setPath ] = useState( { path: initialPath } );
+-
+-	return (
+-		<NavigatorContext.Provider value={ [ path, setPath ] }>
+-			{ children }
+-		</NavigatorContext.Provider>
+-	);
+-}
+-
+-export default NavigatorProvider;
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+new file mode 100644
+index 00000000000000..5f8e82e6137213
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -0,0 +1,96 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import {
++	contextConnect,
++	useContextSystem,
++	WordPressComponentProps,
++} from '../../ui/context';
++import { View } from '../../view';
++import { NavigatorContext } from '../context';
++import type { NavigatorProviderProps, NavigatorPath } from '../types';
++
++function NavigatorProvider(
++	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
++	forwardedRef: Ref< any >
++) {
++	const { initialPath, children, ...otherProps } = useContextSystem(
++		props,
++		'NavigatorProvider'
++	);
++
++	const [ path, setPath ] = useState< NavigatorPath >( {
++		path: initialPath,
++	} );
++
++	return (
++		<View ref={ forwardedRef } { ...otherProps }>
++			<NavigatorContext.Provider value={ [ path, setPath ] }>
++				{ children }
++			</NavigatorContext.Provider>
++		</View>
++	);
++}
++
++/**
++ * The `NavigatorProvider` component allows rendering nested panels or menus (via the `NavigatorScreen` component) and navigate between these different states (via the `useNavigator` hook).
++ * The Global Styles sidebar is an example of this. The `Navigator*` family of components is _not_ opinionated in terms of UI, and can be composed with any UI components to navigate between the nested screens.
++ *
++ * @example
++ * ```jsx
++ * import {
++ *   __experimentalNavigatorProvider as NavigatorProvider,
++ *   __experimentalNavigatorScreen as NavigatorScreen,
++ *   __experimentalUseNavigator as useNavigator,
++ * } from '@wordpress/components';
++ *
++ * function NavigatorButton( {
++ *   path,
++ *   isBack = false,
++ *   ...props
++ * } ) {
++ *   const navigator = useNavigator();
++ *   return (
++ *   	<Button
++ *   	  onClick={ () => navigator.push( path, { isBack } ) }
++ *   	  { ...props }
++ *   	/>
++ *   );
++ * }
++ *
++ * const MyNavigation = () => (
++ *   <NavigatorProvider initialPath="/">
++ *     <NavigatorScreen path="/">
++ *       <p>This is the home screen.</p>
++ *   	   <NavigatorButton isPrimary path="/child">
++ *          Navigate to child screen.
++ *       </NavigatorButton>
++ *     </NavigatorScreen>
++ *
++ *     <NavigatorScreen path="/child">
++ *       <p>This is the child screen.</p>
++ *       <NavigatorButton isPrimary path="/" isBack>
++ *         Go back
++ *       </NavigatorButton>
++ *     </NavigatorScreen>
++ *   </NavigatorProvider>
++ * );
++ * ```
++ */
++const ConnectedNavigatorProvider = contextConnect(
++	NavigatorProvider,
++	'NavigatorProvider'
++);
++
++export default ConnectedNavigatorProvider;
+diff --git a/packages/components/src/navigator/navigator-provider/index.js b/packages/components/src/navigator/navigator-provider/index.ts
+similarity index 100%
+rename from packages/components/src/navigator/navigator-provider/index.js
+rename to packages/components/src/navigator/navigator-provider/index.ts
+diff --git a/packages/components/src/navigator/navigator-screen/README.md b/packages/components/src/navigator/navigator-screen/README.md
+index 65957155b04881..bd48b91444fb12 100644
+--- a/packages/components/src/navigator/navigator-screen/README.md
++++ b/packages/components/src/navigator/navigator-screen/README.md
+@@ -14,9 +14,8 @@ Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/
+ 
+ The component accepts the following props:
+ 
+-### `path`
++### `path`: `string`
+ 
+--   Type: `string`
+--   Required: Yes
++The screen's path, matched against the current path stored in the navigator.
+ 
+-The path of the current screen.
++-   Required: Yes
+diff --git a/packages/components/src/navigator/navigator-screen/component.js b/packages/components/src/navigator/navigator-screen/component.js
+deleted file mode 100644
+index 3a5e33605a0b3e..00000000000000
+--- a/packages/components/src/navigator/navigator-screen/component.js
++++ /dev/null
+@@ -1,92 +0,0 @@
+-/**
+- * External dependencies
+- */
+-// eslint-disable-next-line no-restricted-imports
+-import { motion } from 'framer-motion';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useContext, useEffect, useState } from '@wordpress/element';
+-import { useReducedMotion, useFocusOnMount } from '@wordpress/compose';
+-import { isRTL } from '@wordpress/i18n';
+-
+-/**
+- * Internal dependencies
+- */
+-import { NavigatorContext } from '../context';
+-
+-const animationEnterDelay = 0;
+-const animationEnterDuration = 0.14;
+-const animationExitDuration = 0.14;
+-const animationExitDelay = 0;
+-
+-function NavigatorScreen( { children, path } ) {
+-	const prefersReducedMotion = useReducedMotion();
+-	const [ currentPath ] = useContext( NavigatorContext );
+-	const isMatch = currentPath.path === path;
+-	const ref = useFocusOnMount();
+-
+-	// This flag is used to only apply the focus on mount when the actual path changes.
+-	// It avoids the focus to happen on the first render.
+-	const [ hasPathChanged, setHasPathChanged ] = useState( false );
+-	useEffect( () => {
+-		setHasPathChanged( true );
+-	}, [ path ] );
+-
+-	if ( ! isMatch ) {
+-		return null;
+-	}
+-
+-	if ( prefersReducedMotion ) {
+-		return <div>{ children }</div>;
+-	}
+-
+-	const animate = {
+-		opacity: 1,
+-		transition: {
+-			delay: animationEnterDelay,
+-			duration: animationEnterDuration,
+-			ease: 'easeInOut',
+-		},
+-		x: 0,
+-	};
+-	const initial = {
+-		opacity: 0,
+-		x:
+-			( isRTL() && currentPath.isBack ) ||
+-			( ! isRTL() && ! currentPath.isBack )
+-				? 50
+-				: -50,
+-	};
+-	const exit = {
+-		delay: animationExitDelay,
+-		opacity: 0,
+-		x:
+-			( ! isRTL() && currentPath.isBack ) ||
+-			( isRTL() && ! currentPath.isBack )
+-				? 50
+-				: -50,
+-		transition: {
+-			duration: animationExitDuration,
+-			ease: 'easeInOut',
+-		},
+-	};
+-
+-	const animatedProps = {
+-		animate,
+-		exit,
+-		initial,
+-	};
+-
+-	return (
+-		<motion.div
+-			ref={ hasPathChanged ? ref : undefined }
+-			{ ...animatedProps }
+-		>
+-			{ children }
+-		</motion.div>
+-	);
+-}
+-
+-export default NavigatorScreen;
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+new file mode 100644
+index 00000000000000..95d7fec931dbbe
+--- /dev/null
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -0,0 +1,167 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++// eslint-disable-next-line no-restricted-imports
++import { motion, MotionProps } from 'framer-motion';
++
++/**
++ * WordPress dependencies
++ */
++import { useContext, useEffect, useState } from '@wordpress/element';
++import { useReducedMotion, useFocusOnMount } from '@wordpress/compose';
++import { isRTL } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import {
++	contextConnect,
++	useContextSystem,
++	WordPressComponentProps,
++} from '../../ui/context';
++import { View } from '../../view';
++import { NavigatorContext } from '../context';
++import type { NavigatorScreenProps } from '../types';
++
++const animationEnterDelay = 0;
++const animationEnterDuration = 0.14;
++const animationExitDuration = 0.14;
++const animationExitDelay = 0;
++
++// Props specific to `framer-motion` can't be currently passed to `NavigatorScreen`,
++// as some of them would overlap with HTML props (e.g. `onAnimationStart`, ...)
++type Props = Omit<
++	WordPressComponentProps< NavigatorScreenProps, 'div', false >,
++	keyof MotionProps
++>;
++
++function NavigatorScreen( props: Props, forwardedRef: Ref< any > ) {
++	const { children, path, ...otherProps } = useContextSystem(
++		props,
++		'NavigatorScreen'
++	);
++
++	const prefersReducedMotion = useReducedMotion();
++	const [ currentPath ] = useContext( NavigatorContext );
++	const isMatch = currentPath.path === path;
++	const ref = useFocusOnMount();
++
++	// This flag is used to only apply the focus on mount when the actual path changes.
++	// It avoids the focus to happen on the first render.
++	const [ hasPathChanged, setHasPathChanged ] = useState( false );
++	useEffect( () => {
++		setHasPathChanged( true );
++	}, [ path ] );
++
++	if ( ! isMatch ) {
++		return null;
++	}
++
++	if ( prefersReducedMotion ) {
++		return (
++			<View ref={ forwardedRef } { ...otherProps }>
++				{ children }
++			</View>
++		);
++	}
++
++	const animate = {
++		opacity: 1,
++		transition: {
++			delay: animationEnterDelay,
++			duration: animationEnterDuration,
++			ease: 'easeInOut',
++		},
++		x: 0,
++	};
++	const initial = {
++		opacity: 0,
++		x:
++			( isRTL() && currentPath.isBack ) ||
++			( ! isRTL() && ! currentPath.isBack )
++				? 50
++				: -50,
++	};
++	const exit = {
++		delay: animationExitDelay,
++		opacity: 0,
++		x:
++			( ! isRTL() && currentPath.isBack ) ||
++			( isRTL() && ! currentPath.isBack )
++				? 50
++				: -50,
++		transition: {
++			duration: animationExitDuration,
++			ease: 'easeInOut',
++		},
++	};
++
++	const animatedProps = {
++		animate,
++		exit,
++		initial,
++	};
++
++	return (
++		<motion.div
++			ref={ hasPathChanged ? ref : undefined }
++			{ ...otherProps }
++			{ ...animatedProps }
++		>
++			{ children }
++		</motion.div>
++	);
++}
++
++/**
++ * The `NavigatorScreen` component represents a single view/screen/panel/menu and is supposed to be used in combination with the `NavigatorProvider` component.
++ *
++ * @example
++ * ```jsx
++ * import {
++ *   __experimentalNavigatorProvider as NavigatorProvider,
++ *   __experimentalNavigatorScreen as NavigatorScreen,
++ *   __experimentalUseNavigator as useNavigator,
++ * } from '@wordpress/components';
++ *
++ * function NavigatorButton( {
++ *   path,
++ *   isBack = false,
++ *   ...props
++ * } ) {
++ *   const navigator = useNavigator();
++ *   return (
++ *   	<Button
++ *   	  onClick={ () => navigator.push( path, { isBack } ) }
++ *   	  { ...props }
++ *   	/>
++ *   );
++ * }
++ *
++ * const MyNavigation = () => (
++ *   <NavigatorProvider initialPath="/">
++ *     <NavigatorScreen path="/">
++ *       <p>This is the home screen.</p>
++ *   	   <NavigatorButton isPrimary path="/child">
++ *          Navigate to child screen.
++ *       </NavigatorButton>
++ *     </NavigatorScreen>
++ *
++ *     <NavigatorScreen path="/child">
++ *       <p>This is the child screen.</p>
++ *       <NavigatorButton isPrimary path="/" isBack>
++ *         Go back
++ *       </NavigatorButton>
++ *     </NavigatorScreen>
++ *   </NavigatorProvider>
++ * );
++ * ```
++ */
++const ConnectedNavigatorScreen = contextConnect(
++	NavigatorScreen,
++	'NavigatorScreen'
++);
++
++export default ConnectedNavigatorScreen;
+diff --git a/packages/components/src/navigator/navigator-screen/index.js b/packages/components/src/navigator/navigator-screen/index.ts
+similarity index 100%
+rename from packages/components/src/navigator/navigator-screen/index.js
+rename to packages/components/src/navigator/navigator-screen/index.ts
+diff --git a/packages/components/src/navigator/types.ts b/packages/components/src/navigator/types.ts
+new file mode 100644
+index 00000000000000..acc5aecb840dff
+--- /dev/null
++++ b/packages/components/src/navigator/types.ts
+@@ -0,0 +1,45 @@
++/**
++ * External dependencies
++ */
++// eslint-disable-next-line no-restricted-imports
++import type { ReactNode } from 'react';
++
++type NavigatorPathOptions = {
++	isBack?: boolean;
++};
++
++export type NavigatorPath = NavigatorPathOptions & {
++	path?: string;
++};
++
++export type NavigatorContext = [
++	NavigatorPath,
++	( path: NavigatorPath ) => void
++];
++
++// Returned by the `useNavigator` hook
++export type Navigator = {
++	push: ( path: string, options: NavigatorPathOptions ) => void;
++};
++
++export type NavigatorProviderProps = {
++	/**
++	 * The initial active path.
++	 */
++	initialPath: string;
++	/**
++	 * The children elements.
++	 */
++	children: ReactNode;
++};
++
++export type NavigatorScreenProps = {
++	/**
++	 * The screen's path, matched against the current path stored in the navigator.
++	 */
++	path: string;
++	/**
++	 * The children elements.
++	 */
++	children: ReactNode;
++};
+diff --git a/packages/components/src/navigator/use-navigator.js b/packages/components/src/navigator/use-navigator.ts
+similarity index 72%
+rename from packages/components/src/navigator/use-navigator.js
+rename to packages/components/src/navigator/use-navigator.ts
+index 232fdaafd7d064..4d39de1fe5ceb4 100644
+--- a/packages/components/src/navigator/use-navigator.js
++++ b/packages/components/src/navigator/use-navigator.ts
+@@ -7,8 +7,12 @@ import { useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { NavigatorContext } from './context';
++import type { Navigator } from './types';
+ 
+-function useNavigator() {
++/**
++ * Retrieves a `navigator` instance.
++ */
++function useNavigator(): Navigator {
+ 	const [ , setPath ] = useContext( NavigatorContext );
+ 
+ 	return {
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index cd26b356e617e0..3af6745f4be320 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -46,6 +46,7 @@
+ 		"src/menu-item/**/*",
+ 		"src/menu-group/**/*",
+ 		"src/navigable-container/**/*",
++		"src/navigator/**/*",
+ 		"src/number-control/**/*",
+ 		"src/popover/**/*",
+ 		"src/range-control/**/*",

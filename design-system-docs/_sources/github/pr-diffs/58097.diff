@@ -1,0 +1,323 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a8de9010dfc30f..59cce32e06e841 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   `Guide`, `Modal`: Restore accent color themability ([#58098](https://github.com/WordPress/gutenberg/pull/58098)).
+ -   `DropdownMenuV2`: Restore accent color themability ([#58130](https://github.com/WordPress/gutenberg/pull/58130)).
++-   Expand theming support in the `COLORS` variable object ([#58097](https://github.com/WordPress/gutenberg/pull/58097)).
+ 
+ ## 25.16.0 (2024-01-24)
+ 
+diff --git a/packages/components/src/card/test/__snapshots__/index.tsx.snap b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+index b86714d86636a8..0b723732e3dbaf 100644
+--- a/packages/components/src/card/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/card/test/__snapshots__/index.tsx.snap
+@@ -26,7 +26,7 @@ Snapshot Diff:
+   <div>
+     <div
+ -     class="components-card__body components-card-body css-1nwhnu3-View-Body-borderRadius-medium e19lxcc00"
+-+     class="components-card__body components-card-body css-1nhkags-View-Body-borderRadius-medium-shady e19lxcc00"
+++     class="components-card__body components-card-body css-2oh82v-View-Body-borderRadius-medium-shady e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardBody"
+     >
+@@ -43,7 +43,7 @@ Snapshot Diff:
+   <div>
+     <div
+ -     class="components-flex components-card__footer components-card-footer css-120suhd-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__footer components-card-footer css-19jxwll-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
+++     class="components-flex components-card__footer components-card-footer css-opd7jt-View-Flex-base-ItemsRow-Footer-borderRadius-borderColor-medium-shady e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardFooter"
+     >
+@@ -77,7 +77,7 @@ Snapshot Diff:
+   <div>
+     <div
+ -     class="components-flex components-card__header components-card-header css-3fkkv8-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium e19lxcc00"
+-+     class="components-flex components-card__header components-card-header css-1qktnah-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
+++     class="components-flex components-card__header components-card-header css-tedm3i-View-Flex-base-ItemsRow-Header-borderRadius-borderColor-medium-shady e19lxcc00"
+       data-wp-c16t="true"
+       data-wp-component="CardHeader"
+     >
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index 9b3f8b2d90e987..9827e818b332fb 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -96,7 +96,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   -ms-flex: 1;
+   flex: 1;
+   position: relative;
+-  background-color: #fff;
++  background-color: var(--wp-components-color-background, #fff);
+   width: 100%;
+ }
+ 
+@@ -174,7 +174,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   position: absolute;
+   right: 0;
+   top: 0;
+-  border-color: #949494;
++  border-color: var(--wp-components-color-gray-600, #949494);
+   border-style: solid;
+   border-width: 1px;
+   padding-left: 2px;
+@@ -367,7 +367,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   -ms-flex: 1;
+   flex: 1;
+   position: relative;
+-  background-color: #fff;
++  background-color: var(--wp-components-color-background, #fff);
+   width: 100%;
+ }
+ 
+@@ -445,7 +445,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   position: absolute;
+   right: 0;
+   top: 0;
+-  border-color: #949494;
++  border-color: var(--wp-components-color-gray-600, #949494);
+   border-style: solid;
+   border-width: 1px;
+   padding-left: 2px;
+@@ -648,7 +648,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   -ms-flex: 1;
+   flex: 1;
+   position: relative;
+-  background-color: #fff;
++  background-color: var(--wp-components-color-background, #fff);
+   width: 100%;
+ }
+ 
+@@ -726,7 +726,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   position: absolute;
+   right: 0;
+   top: 0;
+-  border-color: #949494;
++  border-color: var(--wp-components-color-gray-600, #949494);
+   border-style: solid;
+   border-width: 1px;
+   padding-left: 2px;
+@@ -941,7 +941,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   -ms-flex: 1;
+   flex: 1;
+   position: relative;
+-  background-color: #fff;
++  background-color: var(--wp-components-color-background, #fff);
+   width: 100%;
+ }
+ 
+@@ -1019,7 +1019,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   position: absolute;
+   right: 0;
+   top: 0;
+-  border-color: #949494;
++  border-color: var(--wp-components-color-gray-600, #949494);
+   border-style: solid;
+   border-width: 1px;
+   padding-left: 2px;
+diff --git a/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts
+index 399fe92616d569..acd015687f81b8 100644
+--- a/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts
++++ b/packages/components/src/resizable-box/resize-tooltip/styles/resize-tooltip.styles.ts
+@@ -30,12 +30,12 @@ export const TooltipWrapper = styled.div`
+ `;
+ 
+ export const Tooltip = styled.div`
+-	background: ${ COLORS.gray[ 900 ] };
++	background: ${ COLORS.theme.foreground };
+ 	border-radius: 2px;
+ 	box-sizing: border-box;
+ 	font-family: ${ font( 'default.fontFamily' ) };
+ 	font-size: 12px;
+-	color: ${ COLORS.ui.textDark };
++	color: ${ COLORS.theme.foregroundInverted };
+ 	padding: 4px 8px;
+ 	position: relative;
+ `;
+@@ -45,7 +45,7 @@ export const Tooltip = styled.div`
+ 
+ export const LabelText = styled( Text )`
+ 	&&& {
+-		color: ${ COLORS.ui.textDark };
++		color: ${ COLORS.theme.foregroundInverted };
+ 		display: block;
+ 		font-size: 13px;
+ 		line-height: 1.4;
+diff --git a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+index bac30669f1851c..d672cfa76a8c5b 100644
+--- a/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/toggle-group-control/test/__snapshots__/index.tsx.snap
+@@ -39,7 +39,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+ }
+ 
+ .emotion-8 {
+-  background: #fff;
++  background: var(--wp-components-color-background, #fff);
+   border: 1px solid transparent;
+   border-radius: 2px;
+   display: -webkit-inline-box;
+@@ -53,7 +53,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] =
+ }
+ 
+ .emotion-8:hover {
+-  border-color: #757575;
++  border-color: var(--wp-components-color-gray-700, #757575);
+ }
+ 
+ .emotion-8:focus-within {
+@@ -366,7 +366,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+ }
+ 
+ .emotion-8 {
+-  background: #fff;
++  background: var(--wp-components-color-background, #fff);
+   border: 1px solid transparent;
+   border-radius: 2px;
+   display: -webkit-inline-box;
+@@ -380,7 +380,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
+ }
+ 
+ .emotion-8:hover {
+-  border-color: #757575;
++  border-color: var(--wp-components-color-gray-700, #757575);
+ }
+ 
+ .emotion-8:focus-within {
+@@ -586,7 +586,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+ }
+ 
+ .emotion-8 {
+-  background: #fff;
++  background: var(--wp-components-color-background, #fff);
+   border: 1px solid transparent;
+   border-radius: 2px;
+   display: -webkit-inline-box;
+@@ -600,7 +600,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`]
+ }
+ 
+ .emotion-8:hover {
+-  border-color: #757575;
++  border-color: var(--wp-components-color-gray-700, #757575);
+ }
+ 
+ .emotion-8:focus-within {
+@@ -907,7 +907,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+ }
+ 
+ .emotion-8 {
+-  background: #fff;
++  background: var(--wp-components-color-background, #fff);
+   border: 1px solid transparent;
+   border-radius: 2px;
+   display: -webkit-inline-box;
+@@ -921,7 +921,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
+ }
+ 
+ .emotion-8:hover {
+-  border-color: #757575;
++  border-color: var(--wp-components-color-gray-700, #757575);
+ }
+ 
+ .emotion-8:focus-within {
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index 1f2cdab6729094..1ad528d13f0108 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -1,8 +1,6 @@
+ /**
+  * Internal dependencies
+  */
+-import { rgba } from './colors';
+-
+ const white = '#fff';
+ 
+ // Matches the grays in @wordpress/base-styles
+@@ -29,41 +27,65 @@ const ALERT = {
+ 	green: '#4ab866',
+ };
+ 
+-// Matches the Modern admin scheme in @wordpress/base-styles
+-const ADMIN = {
+-	theme: 'var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))',
+-	themeDark10:
+-		'var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6))',
++// Should match packages/components/src/utils/theme-variables.scss
++const THEME = {
++	accent: `var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9))`,
++	accentDarker10: `var(--wp-components-color-accent-darker-10, var(--wp-admin-theme-color-darker-10, #2145e6))`,
++	accentDarker20: `var(--wp-components-color-accent-darker-20, var(--wp-admin-theme-color-darker-20, #183ad6))`,
++	/** Used when placing text on the accent color. */
++	accentInverted: `var(--wp-components-color-accent-inverted, ${ white })`,
++
++	background: `var(--wp-components-color-background, ${ white })`,
++
++	foreground: `var(--wp-components-color-foreground, ${ GRAY[ 900 ] })`,
++	/** Used when placing text on the foreground color. */
++	foregroundInverted: `var(--wp-components-color-foreground-inverted, ${ white })`,
++
++	gray: {
++		/** @deprecated Use `COLORS.theme.foreground` instead. */
++		900: `var(--wp-components-color-foreground, ${ GRAY[ 900 ] })`,
++		800: `var(--wp-components-color-gray-800, ${ GRAY[ 800 ] })`,
++		700: `var(--wp-components-color-gray-700, ${ GRAY[ 700 ] })`,
++		600: `var(--wp-components-color-gray-600, ${ GRAY[ 600 ] })`,
++		400: `var(--wp-components-color-gray-400, ${ GRAY[ 400 ] })`,
++		300: `var(--wp-components-color-gray-300, ${ GRAY[ 300 ] })`,
++		200: `var(--wp-components-color-gray-200, ${ GRAY[ 200 ] })`,
++		100: `var(--wp-components-color-gray-100, ${ GRAY[ 100 ] })`,
++	},
+ };
+ 
+ const UI = {
+-	background: white,
+-	backgroundDisabled: GRAY[ 100 ],
+-	border: GRAY[ 600 ],
+-	borderHover: GRAY[ 700 ],
+-	borderFocus: ADMIN.theme,
+-	borderDisabled: GRAY[ 400 ],
+-	textDisabled: GRAY[ 600 ],
+-	textDark: white,
++	background: THEME.background,
++	backgroundDisabled: THEME.gray[ 100 ],
++	border: THEME.gray[ 600 ],
++	borderHover: THEME.gray[ 700 ],
++	borderFocus: THEME.accent,
++	borderDisabled: THEME.gray[ 400 ],
++	textDisabled: THEME.gray[ 600 ],
+ 
+ 	// Matches @wordpress/base-styles
+-	darkGrayPlaceholder: rgba( GRAY[ 900 ], 0.62 ),
+-	lightGrayPlaceholder: rgba( white, 0.65 ),
+-};
+-
+-const THEME = {
+-	accent: ADMIN.theme,
+-	accentDarker10: ADMIN.themeDark10,
++	darkGrayPlaceholder: `color-mix(in srgb, ${ THEME.foreground }, transparent 38%)`,
++	lightGrayPlaceholder: `color-mix(in srgb, ${ THEME.background }, transparent 35%)`,
+ };
+ 
+ export const COLORS = Object.freeze( {
+ 	/**
+ 	 * The main gray color object.
++	 *
++	 * @deprecated Use semantic aliases in `COLORS.ui` or theme-ready variables in `COLORS.theme.gray`.
+ 	 */
+-	gray: GRAY,
++	gray: GRAY, // TODO: Stop exporting this when everything is migrated to `theme` or `ui`
+ 	white,
+ 	alert: ALERT,
++	/**
++	 * Theme-ready variables with fallbacks.
++	 *
++	 * Prefer semantic aliases in `COLORS.ui` when applicable.
++	 */
+ 	theme: THEME,
++	/**
++	 * Semantic aliases (prefer these over raw variables when applicable).
++	 */
+ 	ui: UI,
+ } );
+ 

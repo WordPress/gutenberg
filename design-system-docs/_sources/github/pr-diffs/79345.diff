@@ -1,0 +1,1971 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index d6f80df8724722..c557bddbce6750 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -2771,12 +2771,6 @@
+ 		"markdown_source": "../packages/reusable-blocks/README.md",
+ 		"parent": "packages"
+ 	},
+-	{
+-		"title": "@wordpress/rich-text-control",
+-		"slug": "packages-rich-text-control",
+-		"markdown_source": "../packages/rich-text-control/README.md",
+-		"parent": "packages"
+-	},
+ 	{
+ 		"title": "@wordpress/rich-text",
+ 		"slug": "packages-rich-text",
+diff --git a/lib/compat/wordpress-7.0/class-gutenberg-rest-autosaves-controller.php b/lib/compat/wordpress-7.0/class-gutenberg-rest-autosaves-controller.php
+index 46bee03df70d65..eeea38ad5911f1 100644
+--- a/lib/compat/wordpress-7.0/class-gutenberg-rest-autosaves-controller.php
++++ b/lib/compat/wordpress-7.0/class-gutenberg-rest-autosaves-controller.php
+@@ -110,6 +110,14 @@ public function create_item( $request ) {
+ 
+ 		if ( $should_update_parent_draft_post ) {
+ 			$autosave_id = wp_update_post( wp_slash( (array) $prepared_post ), true );
++		} elseif ( $this->is_redundant_autosave( $post, (array) $prepared_post, (array) $request->get_param( 'meta' ), $user_id ) ) {
++			/*
++			 * Nothing changed and there is no existing autosave to update, so
++			 * storing a revision would only create one that is identical to the
++			 * post. Avoid a no-op revision because WordPress decides whether to warn
++			 * about "a more recent autosave" by comparing timestamps.
++			 */
++			$autosave_id = $post->ID;
+ 		} else {
+ 			$autosave_id = $this->create_post_autosave( (array) $prepared_post, (array) $request->get_param( 'meta' ) );
+ 		}
+@@ -126,4 +134,59 @@ public function create_item( $request ) {
+ 
+ 		return $response;
+ 	}
++
++	/**
++	 * Determines whether an incoming autosave would be a redundant no-op.
++	 *
++	 * Core's WP_REST_Autosaves_Controller::create_post_autosave() already avoids
++	 * a redundant write, but only when an autosave already exists for the user.
++	 * When none exists yet, it still creates a brand-new revision even if that
++	 * revision is identical to the parent post.
++	 *
++	 * The revisioned post fields (title, content, excerpt) and revisioned meta
++	 * (e.g. `footnotes`) are compared, matching the fields core itself diffs.
++	 * Revisioned meta matters because some edits live only in meta: changing a
++	 * footnote's text leaves the post content untouched, and previewing those
++	 * changes depends on the autosave carrying the new meta, so it must not be
++	 * skipped. Non-revisioned meta (e.g. the constantly changing `_crdt_document`)
++	 * is naturally excluded because it is not a revisioned meta key.
++	 *
++	 * @since 7.0.0
++	 *
++	 * @param WP_Post $post      The saved parent post.
++	 * @param array   $post_data Prepared autosave post data.
++	 * @param array   $meta      Meta values submitted with the autosave.
++	 * @param int     $user_id   The current user ID.
++	 * @return bool Whether the autosave can be skipped without losing anything.
++	 */
++	private function is_redundant_autosave( $post, $post_data, $meta, $user_id ) {
++		// Core already returns the existing autosave unchanged when nothing
++		// differs, so only the first autosave needs guarding here.
++		if ( wp_get_post_autosave( $post->ID, $user_id ) ) {
++			return false;
++		}
++
++		$new_autosave    = _wp_post_revision_data( $post_data, true );
++		$revision_fields = _wp_post_revision_fields( $post );
++
++		foreach ( array_intersect( array_keys( $new_autosave ), array_keys( $revision_fields ) ) as $field ) {
++			if ( normalize_whitespace( $new_autosave[ $field ] ) !== normalize_whitespace( $post->$field ) ) {
++				return false;
++			}
++		}
++
++		foreach ( wp_post_revision_meta_keys( $post->post_type ) as $meta_key ) {
++			// get_metadata_raw avoids the registered default. Treat an unset value
++			// and an empty string as equivalent so the editor's empty default for
++			// an unset key is not mistaken for a change.
++			$old_meta = get_metadata_raw( 'post', $post->ID, $meta_key, true ) ?? '';
++			$new_meta = $meta[ $meta_key ] ?? '';
++
++			if ( $old_meta !== $new_meta ) {
++				return false;
++			}
++		}
++
++		return true;
++	}
+ }
+diff --git a/package-lock.json b/package-lock.json
+index 18313705fb2165..a5402b87fd8a35 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -16561,10 +16561,6 @@
+ 			"resolved": "packages/rich-text",
+ 			"link": true
+ 		},
+-		"node_modules/@wordpress/rich-text-control": {
+-			"resolved": "packages/rich-text-control",
+-			"link": true
+-		},
+ 		"node_modules/@wordpress/route": {
+ 			"resolved": "packages/route",
+ 			"link": true
+@@ -49758,7 +49754,7 @@
+ 				"@wordpress/keycodes": "file:../keycodes",
+ 				"@wordpress/primitives": "file:../primitives",
+ 				"@wordpress/private-apis": "file:../private-apis",
+-				"@wordpress/rich-text-control": "file:../rich-text-control",
++				"@wordpress/rich-text": "file:../rich-text",
+ 				"@wordpress/ui": "file:../ui",
+ 				"@wordpress/warning": "file:../warning",
+ 				"clsx": "^2.1.1",
+@@ -52641,6 +52637,7 @@
+ 		"packages/rich-text-control": {
+ 			"name": "@wordpress/rich-text-control",
+ 			"version": "0.1.0",
++			"extraneous": true,
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+ 				"@wordpress/base-styles": "file:../base-styles",
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 691a5ad13d17a5..9d1274c18e6fbf 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,10 @@
+     -   `FontSizePicker` ([#79481](https://github.com/WordPress/gutenberg/pull/79481))
+     -   `TreeSelect` ([#79550](https://github.com/WordPress/gutenberg/pull/79550))
+ 
++### New Components
++
++-   `RichTextControl` (private): Add a presentational rich text control shell — `BaseControl` + label, a `contentEditable` element, and the format popover slot scaffolding — decoupled from `@wordpress/rich-text`. The editable wiring is injected by the consumer via `editableRef` and `children`, and selection is controlled via `onSelectedChange` ([#79345](https://github.com/WordPress/gutenberg/pull/79345)).
++
+ ### Documentation
+ 
+ -   Document the safe `clsx` pattern for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490)).
+diff --git a/packages/components/src/private-apis.ts b/packages/components/src/private-apis.ts
+index 43d85db9365f7a..98a4d210df7707 100644
+--- a/packages/components/src/private-apis.ts
++++ b/packages/components/src/private-apis.ts
+@@ -30,9 +30,11 @@ import {
+ 	ValidatedToggleGroupControl,
+ } from './validated-form-controls';
+ import { ValidatedFormTokenField } from './validated-form-controls/components/form-token-field';
++import RichTextControl from './rich-text-control';
+ 
+ export const privateApis = {};
+ lock( privateApis, {
++	RichTextControl,
+ 	__experimentalPopoverLegacyPositionToPlacement,
+ 	ComponentsContext,
+ 	Tabs,
+diff --git a/packages/components/src/rich-text-control/index.tsx b/packages/components/src/rich-text-control/index.tsx
+new file mode 100644
+index 00000000000000..5e8b344b30890d
+--- /dev/null
++++ b/packages/components/src/rich-text-control/index.tsx
+@@ -0,0 +1,214 @@
++/**
++ * External dependencies
++ */
++import clsx from 'clsx';
++
++/**
++ * WordPress dependencies
++ */
++import { useMergeRefs, useRefEffect } from '@wordpress/compose';
++import { createPortal, useEffect, useRef, useState } from '@wordpress/element';
++import type { Ref, ReactNode } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import BaseControl from '../base-control';
++import { useBaseControlProps } from '../base-control/hooks';
++import Popover from '../popover';
++import { Provider as SlotFillProvider } from '../slot-fill';
++
++type RichTextControlProps = {
++	/**
++	 * Label text for the control.
++	 */
++	label: string;
++	/**
++	 * Ref attached to the `contentEditable` element. The rich-text wiring is
++	 * injected through this ref (e.g. the `useRichText` ref, event-listener
++	 * refs, and an anchor ref), keeping this component free of any
++	 * `@wordpress/rich-text` dependency.
++	 */
++	editableRef?: Ref< HTMLDivElement >;
++	/**
++	 * Called when the field gains or loses an "active" selection. The control
++	 * is controlled: it owns no selection state itself, it only drives the
++	 * focus/blur transitions (deferring deselection so a format popover opened
++	 * from the field can claim focus without the field deselecting).
++	 */
++	onSelectedChange?: ( isSelected: boolean ) => void;
++	/**
++	 * Placeholder slot for the rich-text assembly (e.g. `FormatEdit` and its
++	 * context providers). Rendered inside the control's private
++	 * `SlotFillProvider` so any format popovers portal into this control's own
++	 * `Popover.Slot`.
++	 */
++	children?: ReactNode;
++	/**
++	 * Unique identifier for the control.
++	 */
++	id?: string;
++	/**
++	 * Additional class name applied to the `contentEditable` element.
++	 */
++	className?: string;
++	/**
++	 * Whether to visually hide the label (still accessible to screen readers).
++	 */
++	hideLabelFromVision?: boolean;
++	/**
++	 * Whether line breaks are disabled. Drives `aria-multiline`.
++	 */
++	disableLineBreaks?: boolean;
++	/**
++	 * Whether to move focus to the field when it mounts. Off by default; opt in
++	 * for standalone forms where no other code lands focus on the field.
++	 */
++	focusOnMount?: boolean;
++};
++
++/**
++ * A presentational rich text control: a labeled `contentEditable` form field
++ * with the slot scaffolding format popovers need.
++ *
++ * Unlike the in-canvas `RichText` from `@wordpress/block-editor`, this control
++ * is intended for standalone form fields (DataForms, sidebar inputs, etc.).
++ * It is deliberately **presentational only** and has no `@wordpress/rich-text`
++ * dependency: the editable behavior (value, formatting, keyboard shortcuts) is
++ * injected by the consumer through `editableRef` and `children`. The consumer
++ * owns the `useRichText` wiring; this component owns the chrome
++ * (`BaseControl` + label, the editable element, and the popover slot).
++ *
++ * @example
++ * ```jsx
++ * // The rich-text "assembly" lives in the consumer.
++ * <RichTextControl
++ *     label="Caption"
++ *     editableRef={ mergedRef }
++ *     onSelectedChange={ setIsSelected }
++ * >
++ *     { isSelected && (
++ *         <keyboardShortcutContext.Provider value={ shortcuts }>
++ *             <FormatEdit … />
++ *         </keyboardShortcutContext.Provider>
++ *     ) }
++ * </RichTextControl>
++ * ```
++ */
++function RichTextControl( {
++	label,
++	editableRef,
++	onSelectedChange,
++	children,
++	id,
++	className,
++	hideLabelFromVision,
++	disableLineBreaks,
++	focusOnMount,
++}: RichTextControlProps ) {
++	// Format types open their UI (e.g. the inline link popover via Cmd+K) in
++	// portaled popovers. We host them in a private `SlotFillProvider` paired
++	// with our own `Popover.Slot` (rendered below), wrapped in a marker
++	// element. That way blur handling can tell precisely that focus moved into
++	// a popover this control opened, rather than any popover that happens to be
++	// on screen, and the popovers don't leak into an ambient slot registry.
++	// The slot is portaled to the field's document body so popovers escape any
++	// scroll/overflow container the control sits in (e.g. a sidebar). The body
++	// is read from the field element rather than the global `document` to stay
++	// correct if the control is ever rendered inside an iframe.
++	const [ popoverSlotContainer, setPopoverSlotContainer ] =
++		useState< HTMLElement >();
++	const popoverSlotContainerRef = useRefEffect< HTMLDivElement >(
++		( element ) => {
++			setPopoverSlotContainer( element.ownerDocument.body );
++		},
++		[]
++	);
++
++	// When the textbox blurs, defer flipping the selection off so a
++	// portal-rendered popover (e.g. the inline link UI opened via Cmd+K) can
++	// claim focus without the consumer's `FormatEdit` -- and therefore the
++	// popover itself -- unmounting underneath it.
++	const blurDeselectTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
++	useEffect( () => () => clearTimeout( blurDeselectTimeoutRef.current ), [] );
++
++	const focusOnMountRef = useRefEffect< HTMLDivElement >(
++		( element ) => {
++			if ( focusOnMount ) {
++				element.focus();
++			}
++		},
++		[ focusOnMount ]
++	);
++
++	const { baseControlProps, controlProps } = useBaseControlProps( {
++		id,
++		hideLabelFromVision,
++		label,
++	} );
++
++	return (
++		<>
++			<SlotFillProvider>
++				{ children }
++				{ popoverSlotContainer &&
++					createPortal(
++						<div data-rich-text-control-popover-slot>
++							<Popover.Slot />
++						</div>,
++						popoverSlotContainer
++					) }
++			</SlotFillProvider>
++			<BaseControl { ...baseControlProps }>
++				<div
++					className={ clsx( 'wp-rich-text-control', className ) }
++					role="textbox"
++					aria-multiline={ ! disableLineBreaks }
++					aria-label={ label }
++					ref={ useMergeRefs( [
++						editableRef ?? null,
++						focusOnMountRef,
++						popoverSlotContainerRef,
++					] ) }
++					onFocus={ () => {
++						clearTimeout( blurDeselectTimeoutRef.current );
++						onSelectedChange?.( true );
++					} }
++					onBlur={ ( event ) => {
++						clearTimeout( blurDeselectTimeoutRef.current );
++						const { ownerDocument } = event.currentTarget;
++						blurDeselectTimeoutRef.current = setTimeout( () => {
++							// Stay selected if focus moved into a popover that a
++							// format type opened from this control (e.g. the
++							// inline link UI via Cmd+K). `@wordpress/components`
++							// popovers are scoped to this control's own slot
++							// (see `SlotFillProvider` above) and land inside the
++							// `data-rich-text-control-popover-slot` marker, so we
++							// match them precisely rather than treating any
++							// on-screen popover as ours.
++							// `[data-wp-compat-overlay-slot]` additionally covers
++							// popovers already migrated to `@wordpress/ui`, which
++							// portal into the shared compat overlay slot rather
++							// than our own.
++							const active = ownerDocument.activeElement;
++							if (
++								active &&
++								active.closest(
++									'[data-rich-text-control-popover-slot],[data-wp-compat-overlay-slot]'
++								)
++							) {
++								return;
++							}
++							onSelectedChange?.( false );
++						}, 0 );
++					} }
++					contentEditable
++					suppressContentEditableWarning
++					{ ...controlProps }
++				/>
++			</BaseControl>
++		</>
++	);
++}
++
++export default RichTextControl;
+diff --git a/packages/rich-text-control/src/style.scss b/packages/components/src/rich-text-control/style.scss
+similarity index 87%
+rename from packages/rich-text-control/src/style.scss
+rename to packages/components/src/rich-text-control/style.scss
+index 58fb95baa4480c..c3867f3c3ba208 100644
+--- a/packages/rich-text-control/src/style.scss
++++ b/packages/components/src/rich-text-control/style.scss
+@@ -19,6 +19,5 @@
+ 
+ 	// Subtract 1px to account for the border, which isn't included on the element
+ 	// on newer components like InputControl, SelectControl, etc.
+-	// These values should be shared with the `controlPaddingX` in ./utils/config-values.js
+ 	padding: $grid-unit-15;
+ }
+diff --git a/packages/components/src/rich-text-control/test/index.tsx b/packages/components/src/rich-text-control/test/index.tsx
+new file mode 100644
+index 00000000000000..7ebbc86d8d8ef1
+--- /dev/null
++++ b/packages/components/src/rich-text-control/test/index.tsx
+@@ -0,0 +1,221 @@
++/**
++ * External dependencies
++ */
++import { render, screen, fireEvent, act } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import RichTextControl from '..';
++
++function getTextbox( container: HTMLElement ) {
++	return container.querySelector(
++		'.wp-rich-text-control'
++	) as HTMLDivElement | null;
++}
++
++// The presentational shell is deliberately decoupled from `@wordpress/rich-text`:
++// the editable behavior is injected by the consumer through `editableRef` and
++// `children`. These tests exercise only the chrome the shell owns -- the label,
++// the `contentEditable` element, and the controlled focus/blur selection
++// heuristic -- with no rich-text wiring at all.
++describe( 'RichTextControl (presentational shell)', () => {
++	it( 'renders a labeled contenteditable textbox', () => {
++		const { container } = render( <RichTextControl label="Description" /> );
++
++		const textbox = getTextbox( container )!;
++		const label = screen.getByText( 'Description' );
++
++		expect( textbox ).toBeInTheDocument();
++		expect( textbox ).toHaveAttribute( 'role', 'textbox' );
++		expect( textbox ).toHaveAttribute( 'contenteditable', 'true' );
++		// `BaseControl` wires the label's `for` to the control's `id`.
++		expect( label ).toHaveAttribute( 'for', textbox.id );
++		// `<label for>` does not contribute an accessible name to a non-form
++		// element (a `<div role="textbox">`), so the label is also mirrored
++		// onto `aria-label` for assistive tech and test locators.
++		expect( textbox ).toHaveAttribute( 'aria-label', 'Description' );
++	} );
++
++	it( 'visually hides the label when `hideLabelFromVision` is set', () => {
++		render( <RichTextControl label="Note" hideLabelFromVision /> );
++
++		const label = screen.getByText( 'Note' );
++		expect( label ).toHaveClass( 'components-visually-hidden' );
++	} );
++
++	it( 'forwards `disableLineBreaks` to the textbox via `aria-multiline`', () => {
++		const { container, rerender } = render(
++			<RichTextControl label="Single line" />
++		);
++		expect( getTextbox( container ) ).toHaveAttribute(
++			'aria-multiline',
++			'true'
++		);
++
++		rerender( <RichTextControl label="Single line" disableLineBreaks /> );
++		expect( getTextbox( container ) ).toHaveAttribute(
++			'aria-multiline',
++			'false'
++		);
++	} );
++
++	it( 'merges a consumer-supplied className with the control class', () => {
++		const { container } = render(
++			<RichTextControl label="Styled" className="my-custom-class" />
++		);
++
++		const textbox = getTextbox( container )!;
++		expect( textbox ).toHaveClass( 'wp-rich-text-control' );
++		expect( textbox ).toHaveClass( 'my-custom-class' );
++	} );
++
++	it( 'attaches the injected editableRef to the contenteditable element', () => {
++		const editableRef = jest.fn();
++		const { container } = render(
++			<RichTextControl label="Note" editableRef={ editableRef } />
++		);
++
++		expect( editableRef ).toHaveBeenCalledWith( getTextbox( container ) );
++	} );
++
++	it( 'does not take focus on mount by default', () => {
++		const { container } = render( <RichTextControl label="Note" /> );
++		expect( getTextbox( container ) ).not.toHaveFocus();
++	} );
++
++	it( 'takes focus on mount when `focusOnMount` is set', () => {
++		const { container } = render(
++			<RichTextControl label="Note" focusOnMount />
++		);
++		expect( getTextbox( container ) ).toHaveFocus();
++	} );
++
++	describe( 'controlled selection', () => {
++		// The shell owns no selection state; it only drives the transitions.
++		// Blur is deferred via a 0ms `setTimeout` so a portal-rendered popover
++		// (e.g. the inline link UI) can claim focus before the consumer's
++		// `FormatEdit` -- and therefore the popover -- unmounts.
++		async function flushBlurTimer() {
++			await act( async () => {
++				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
++			} );
++		}
++
++		it( 'reports selection on focus', () => {
++			const onSelectedChange = jest.fn();
++			const { container } = render(
++				<RichTextControl
++					label="Field"
++					onSelectedChange={ onSelectedChange }
++				/>
++			);
++
++			fireEvent.focus( getTextbox( container )! );
++			expect( onSelectedChange ).toHaveBeenCalledWith( true );
++		} );
++
++		it( 'reports deselection on blur to nowhere', async () => {
++			const onSelectedChange = jest.fn();
++			const { container } = render(
++				<RichTextControl
++					label="Field"
++					onSelectedChange={ onSelectedChange }
++				/>
++			);
++			const textbox = getTextbox( container )!;
++
++			fireEvent.focus( textbox );
++			fireEvent.blur( textbox );
++			await flushBlurTimer();
++
++			expect( onSelectedChange ).toHaveBeenLastCalledWith( false );
++		} );
++
++		// Focus the textbox, move focus into the supplied stand-in element,
++		// then blur the textbox and flush the deferred deselection timer.
++		async function blurWithFocusIn(
++			textbox: HTMLElement,
++			button: HTMLElement
++		) {
++			fireEvent.focus( textbox );
++			button.focus();
++			fireEvent.blur( textbox );
++			await flushBlurTimer();
++		}
++
++		it( 'stays selected when focus moves into the control popover slot', async () => {
++			const onSelectedChange = jest.fn();
++			const { container } = render(
++				<>
++					<RichTextControl
++						label="Field"
++						onSelectedChange={ onSelectedChange }
++					/>
++					{ /* Stand-in for the inline link UI popover, which the
++					   control scopes into its own slot, marked with this
++					   attribute. */ }
++					<div data-rich-text-control-popover-slot>
++						<button type="button">Inside popover</button>
++					</div>
++				</>
++			);
++
++			await blurWithFocusIn(
++				getTextbox( container )!,
++				screen.getByRole( 'button', { name: 'Inside popover' } )
++			);
++
++			expect( onSelectedChange ).not.toHaveBeenCalledWith( false );
++		} );
++
++		it( 'stays selected when focus moves into a `@wordpress/ui` compat overlay', async () => {
++			const onSelectedChange = jest.fn();
++			const { container } = render(
++				<>
++					<RichTextControl
++						label="Field"
++						onSelectedChange={ onSelectedChange }
++					/>
++					{ /* Stand-in for a popover migrated to `@wordpress/ui`,
++					   which portals into the shared compat overlay slot. */ }
++					<div data-wp-compat-overlay-slot>
++						<button type="button">Inside overlay</button>
++					</div>
++				</>
++			);
++
++			await blurWithFocusIn(
++				getTextbox( container )!,
++				screen.getByRole( 'button', { name: 'Inside overlay' } )
++			);
++
++			expect( onSelectedChange ).not.toHaveBeenCalledWith( false );
++		} );
++
++		it( 'deselects when focus moves to an unrelated popover', async () => {
++			const onSelectedChange = jest.fn();
++			const { container } = render(
++				<>
++					<RichTextControl
++						label="Field"
++						onSelectedChange={ onSelectedChange }
++					/>
++					{ /* A popover this control did not open: generic
++					   `.components-popover` but none of the control's slot
++					   markers, so it must not keep the field selected. */ }
++					<div className="components-popover">
++						<button type="button">Unrelated popover</button>
++					</div>
++				</>
++			);
++
++			await blurWithFocusIn(
++				getTextbox( container )!,
++				screen.getByRole( 'button', { name: 'Unrelated popover' } )
++			);
++
++			expect( onSelectedChange ).toHaveBeenLastCalledWith( false );
++		} );
++	} );
++} );
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 6d85fd28f7ac60..ed1b996c4c807b 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -45,6 +45,7 @@
+ @use "./toolbar/toolbar-button/style.scss" as *;
+ @use "./toolbar/toolbar-group/style.scss" as *;
+ @use "./tooltip/style.scss" as *;
++@use "./rich-text-control/style.scss" as *;
+ @use "./validated-form-controls/style.scss" as *;
+ 
+ // Include the default WP Components color variables.
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 041f442c66bbd4..f967f56ec9550c 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -10,7 +10,7 @@
+ 
+ ### New Features
+ 
+-- DataForms: Add a `richtext` control, backed by `@wordpress/rich-text-control`, selectable via `Edit: 'richtext'` (or an `EditConfig` with `control: 'richtext'`). [#78471](https://github.com/WordPress/gutenberg/pull/78471)
++- DataForms: Add a `richtext` control, selectable via `Edit: 'richtext'` (or an `EditConfig` with `control: 'richtext'`). It is assembled in-package from `@wordpress/rich-text` and the presentational `RichTextControl` shell in `@wordpress/components`. [#78471](https://github.com/WordPress/gutenberg/pull/78471) [#79345](https://github.com/WordPress/gutenberg/pull/79345)
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/dataviews/package.json b/packages/dataviews/package.json
+index 8d3cca5a6b089c..2073a762e35b45 100644
+--- a/packages/dataviews/package.json
++++ b/packages/dataviews/package.json
+@@ -64,7 +64,7 @@
+ 		"@wordpress/keycodes": "file:../keycodes",
+ 		"@wordpress/primitives": "file:../primitives",
+ 		"@wordpress/private-apis": "file:../private-apis",
+-		"@wordpress/rich-text-control": "file:../rich-text-control",
++		"@wordpress/rich-text": "file:../rich-text",
+ 		"@wordpress/ui": "file:../ui",
+ 		"@wordpress/warning": "file:../warning",
+ 		"clsx": "^2.1.1",
+diff --git a/packages/dataviews/src/components/dataform-controls/richtext/control.tsx b/packages/dataviews/src/components/dataform-controls/richtext/control.tsx
+new file mode 100644
+index 00000000000000..cfd234f85ebe73
+--- /dev/null
++++ b/packages/dataviews/src/components/dataform-controls/richtext/control.tsx
+@@ -0,0 +1,240 @@
++// @ts-nocheck — vendored, loosely-typed glue around `@wordpress/rich-text`
++// private APIs (formerly the untyped `@wordpress/rich-text-control` package).
++/**
++ * WordPress dependencies
++ */
++import { privateApis as componentsPrivateApis } from '@wordpress/components';
++import { useMergeRefs, useRefEffect } from '@wordpress/compose';
++import {
++	useInsertionEffect,
++	useMemo,
++	useRef,
++	useState,
++} from '@wordpress/element';
++import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
++
++/**
++ * Internal dependencies
++ */
++import { unlock } from '../../../lock-unlock';
++import { getAllowedFormats } from './utils';
++import FormatEdit from './format-edit';
++import shortcutsListener from './event-listeners/shortcuts';
++import inputEventsListener from './event-listeners/input-events';
++
++// The presentational shell. It owns the chrome (`BaseControl` + label, the
++// `contentEditable` element, and the popover slot) and has no
++// `@wordpress/rich-text` dependency. This module is the "assembly" that injects
++// the rich-text wiring into it.
++const { RichTextControl } = unlock( componentsPrivateApis );
++
++// `keyboardShortcutContext` / `inputEventContext` are the same context objects
++// that format types' `RichTextShortcut` / `RichTextInputEvent` read. Format
++// types render those components, so providing these contexts here is what wires
++// their keyboard shortcuts and input events to this field.
++const { useRichText, keyboardShortcutContext, inputEventContext } =
++	unlock( richTextPrivateApis );
++
++/**
++ * Assembles a rich text form field by wiring `@wordpress/rich-text`
++ * (`useRichText`, `FormatEdit`, keyboard-shortcut / input-event listeners) into
++ * the presentational `RichTextControl` shell from `@wordpress/components`.
++ *
++ * This is the counterpart to the in-canvas `RichText` component from
++ * `@wordpress/block-editor`: it exposes a straightforward `value` / `onChange`
++ * interface and skips block-editor selection coupling, while still wiring
++ * registered format types so familiar keyboard shortcuts (Cmd+B, Cmd+I, Cmd+K)
++ * keep working.
++ *
++ * @param {Object}   props                                Component properties.
++ * @param {string}   props.label                          Label text for the control.
++ * @param {string}   props.value                          The rich text value (HTML string).
++ * @param {Function} props.onChange                       Callback invoked when the value changes.
++ * @param {string}   [props.placeholder]                  Placeholder text displayed when the field is empty.
++ * @param {string}   [props.id]                           Unique identifier for the control.
++ * @param {string}   [props.clientId]                     Block client ID for context (used by format types that need it).
++ * @param {string}   [props.className]                    Additional class name applied to the contenteditable element.
++ * @param {boolean}  [props.hideLabelFromVision]          Whether to visually hide the label (still accessible to screen readers).
++ * @param {Array}    [props.allowedFormats]               Array of allowed format types.
++ * @param {boolean}  [props.disableFormats]               Whether to disable all formatting.
++ * @param {boolean}  [props.withoutInteractiveFormatting] Whether to disable interactive formatting features.
++ * @param {boolean}  [props.preserveWhiteSpace]           Whether to preserve whitespace in the content.
++ * @param {boolean}  [props.disableLineBreaks]            Whether to disable line breaks in the content.
++ * @param {boolean}  [props.focusOnMount]                 Whether to move focus to the field when it mounts.
++ *
++ * @return {Element} The rendered rich text control.
++ */
++export default function RichTextControlAssembly( {
++	label,
++	value: attrValue,
++	onChange,
++	placeholder,
++	id,
++	clientId,
++	className,
++	hideLabelFromVision,
++	allowedFormats,
++	disableFormats,
++	withoutInteractiveFormatting,
++	preserveWhiteSpace,
++	disableLineBreaks,
++	focusOnMount,
++} ) {
++	const [ selection, setSelection ] = useState( {
++		start: undefined,
++		end: undefined,
++	} );
++	const [ isSelected, setIsSelected ] = useState( false );
++	const anchorRef = useRef();
++	const inputEvents = useRef( new Set() );
++	const keyboardShortcuts = useRef( new Set() );
++
++	const adjustedAllowedFormats = getAllowedFormats( {
++		allowedFormats,
++		disableFormats,
++	} );
++
++	const {
++		value,
++		onChange: onRichTextChange,
++		ref: richTextRef,
++		formatTypes,
++		getValue,
++	} = useRichText( {
++		value: attrValue,
++		onChange,
++		selectionStart: selection.start,
++		selectionEnd: selection.end,
++		onSelectionChange: ( start, end ) => setSelection( { start, end } ),
++		__unstableIsSelected: isSelected,
++		preserveWhiteSpace: !! preserveWhiteSpace,
++		placeholder,
++		__unstableDisableFormats: disableFormats,
++		allowedFormats: adjustedAllowedFormats,
++		withoutInteractiveFormatting,
++		__unstableFormatTypeHandlerContext: useMemo(
++			() => ( {
++				richTextIdentifier: id,
++				blockClientId: clientId,
++			} ),
++			[ id, clientId ]
++		),
++	} );
++
++	function onFocus() {
++		anchorRef.current?.focus();
++	}
++
++	// Wire registered format keyboard shortcuts (e.g. Cmd+B, Cmd+I, Cmd+K) and
++	// InputEvent handlers (e.g. native formatBold) to the contenteditable.
++	// FormatEdit populates these Sets via context; without these listeners the
++	// callbacks would never fire.
++	const eventListenersPropsRef = useRef( {
++		keyboardShortcuts,
++		inputEvents,
++	} );
++
++	// Keep `formatTypes`/`getValue`/`onChange` accessible to the input-rule
++	// listener without retearing it down on every value change.
++	const inputRulePropsRef = useRef( {
++		formatTypes,
++		getValue,
++		onChange: onRichTextChange,
++	} );
++	useInsertionEffect( () => {
++		inputRulePropsRef.current = {
++			formatTypes,
++			getValue,
++			onChange: onRichTextChange,
++		};
++	} );
++
++	const eventListenersRef = useRefEffect(
++		( element ) => {
++			if ( ! isSelected ) {
++				return;
++			}
++			const cleanupShortcuts = shortcutsListener(
++				eventListenersPropsRef
++			)( element );
++			const cleanupInputEvents = inputEventsListener(
++				eventListenersPropsRef
++			)( element );
++
++			// Apply format-level input rules (e.g. `core/code`'s
++			// backtick->inline-code transform). Block-transform input rules
++			// don't apply to a standalone field.
++			function onFormatInput( event ) {
++				if (
++					event.inputType !== 'insertText' &&
++					event.type !== 'compositionend'
++				) {
++					return;
++				}
++				const {
++					formatTypes: types,
++					getValue: getCurrentValue,
++					onChange: handleChange,
++				} = inputRulePropsRef.current;
++				const current = getCurrentValue();
++				const transformed = types.reduce(
++					( accumulator, { __unstableInputRule } ) =>
++						__unstableInputRule
++							? __unstableInputRule( accumulator )
++							: accumulator,
++					current
++				);
++				if ( transformed !== current ) {
++					handleChange( {
++						...transformed,
++						activeFormats: current.activeFormats,
++					} );
++				}
++			}
++			element.addEventListener( 'input', onFormatInput );
++			element.addEventListener( 'compositionend', onFormatInput );
++
++			return () => {
++				cleanupShortcuts();
++				cleanupInputEvents();
++				element.removeEventListener( 'input', onFormatInput );
++				element.removeEventListener( 'compositionend', onFormatInput );
++			};
++		},
++		[ isSelected ]
++	);
++
++	const editableRef = useMergeRefs( [
++		richTextRef,
++		anchorRef,
++		eventListenersRef,
++	] );
++
++	return (
++		<RichTextControl
++			label={ label }
++			id={ id }
++			className={ className }
++			hideLabelFromVision={ hideLabelFromVision }
++			disableLineBreaks={ disableLineBreaks }
++			focusOnMount={ focusOnMount }
++			editableRef={ editableRef }
++			onSelectedChange={ setIsSelected }
++		>
++			{ isSelected && (
++				<keyboardShortcutContext.Provider value={ keyboardShortcuts }>
++					<inputEventContext.Provider value={ inputEvents }>
++						<FormatEdit
++							value={ value }
++							onChange={ onRichTextChange }
++							onFocus={ onFocus }
++							formatTypes={ formatTypes }
++							forwardedRef={ anchorRef }
++							isVisible={ false }
++						/>
++					</inputEventContext.Provider>
++				</keyboardShortcutContext.Provider>
++			) }
++		</RichTextControl>
++	);
++}
+diff --git a/packages/rich-text-control/src/event-listeners/input-events.js b/packages/dataviews/src/components/dataform-controls/richtext/event-listeners/input-events.js
+similarity index 67%
+rename from packages/rich-text-control/src/event-listeners/input-events.js
+rename to packages/dataviews/src/components/dataform-controls/richtext/event-listeners/input-events.js
+index e654a179c42bdc..3b3719c777e81b 100644
+--- a/packages/rich-text-control/src/event-listeners/input-events.js
++++ b/packages/dataviews/src/components/dataform-controls/richtext/event-listeners/input-events.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck — vendored, loosely-typed glue around `@wordpress/rich-text`
++// private APIs (formerly the untyped `@wordpress/rich-text-control` package).
+ export default ( props ) => ( element ) => {
+ 	const { inputEvents } = props.current;
+ 	function onInput( event ) {
+diff --git a/packages/rich-text-control/src/event-listeners/shortcuts.js b/packages/dataviews/src/components/dataform-controls/richtext/event-listeners/shortcuts.js
+similarity index 69%
+rename from packages/rich-text-control/src/event-listeners/shortcuts.js
+rename to packages/dataviews/src/components/dataform-controls/richtext/event-listeners/shortcuts.js
+index bb51a729588151..f53bb7632dde33 100644
+--- a/packages/rich-text-control/src/event-listeners/shortcuts.js
++++ b/packages/dataviews/src/components/dataform-controls/richtext/event-listeners/shortcuts.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck — vendored, loosely-typed glue around `@wordpress/rich-text`
++// private APIs (formerly the untyped `@wordpress/rich-text-control` package).
+ export default ( props ) => ( element ) => {
+ 	const { keyboardShortcuts } = props.current;
+ 	function onKeyDown( event ) {
+diff --git a/packages/rich-text-control/src/format-edit.js b/packages/dataviews/src/components/dataform-controls/richtext/format-edit.tsx
+similarity index 88%
+rename from packages/rich-text-control/src/format-edit.js
+rename to packages/dataviews/src/components/dataform-controls/richtext/format-edit.tsx
+index b15e48ab713149..97fa703f456ebb 100644
+--- a/packages/rich-text-control/src/format-edit.js
++++ b/packages/dataviews/src/components/dataform-controls/richtext/format-edit.tsx
+@@ -1,3 +1,5 @@
++// @ts-nocheck — vendored, loosely-typed glue around `@wordpress/rich-text`
++// private APIs (formerly the untyped `@wordpress/rich-text-control` package).
+ /**
+  * WordPress dependencies
+  */
+diff --git a/packages/dataviews/src/components/dataform-controls/richtext.tsx b/packages/dataviews/src/components/dataform-controls/richtext/index.tsx
+similarity index 54%
+rename from packages/dataviews/src/components/dataform-controls/richtext.tsx
+rename to packages/dataviews/src/components/dataform-controls/richtext/index.tsx
+index 8943667bab6b8e..88119e8c0484db 100644
+--- a/packages/dataviews/src/components/dataform-controls/richtext.tsx
++++ b/packages/dataviews/src/components/dataform-controls/richtext/index.tsx
+@@ -1,16 +1,41 @@
++/**
++ * External dependencies
++ */
++import type { ComponentType } from 'react';
++
+ /**
+  * WordPress dependencies
+  */
+-// @ts-ignore — `@wordpress/rich-text-control` ships no `.d.ts` files, so the
+-// type-declaration build cannot resolve this import even though the package
+-// is declared as a dependency.
+-import { RichTextControl } from '@wordpress/rich-text-control';
+ import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+  */
+-import type { DataFormControlProps } from '../../types';
++import RichTextControlAssembly from './control';
++import type { DataFormControlProps } from '../../../types';
++
++type RichTextControlProps = {
++	label: string;
++	value: string;
++	onChange: ( value: string ) => void;
++	placeholder?: string;
++	id?: string;
++	hideLabelFromVision?: boolean;
++	className?: string;
++	clientId?: string;
++	allowedFormats?: string[];
++	disableFormats?: boolean;
++	withoutInteractiveFormatting?: boolean;
++	preserveWhiteSpace?: boolean;
++	disableLineBreaks?: boolean;
++};
++
++// `./control` is the untyped rich-text "assembly": it wires `@wordpress/rich-text`
++// to the presentational `RichTextControl` shell from `@wordpress/components`. Its
++// JSDoc `@return {Element}` resolves to the DOM `Element`, so cast it to a React
++// component to consume it as JSX with a typed prop contract here.
++const RichTextControl =
++	RichTextControlAssembly as unknown as ComponentType< RichTextControlProps >;
+ 
+ export default function RichText< Item >( {
+ 	data,
+diff --git a/packages/rich-text-control/src/test/control.js b/packages/dataviews/src/components/dataform-controls/richtext/test/control.js
+similarity index 99%
+rename from packages/rich-text-control/src/test/control.js
+rename to packages/dataviews/src/components/dataform-controls/richtext/test/control.js
+index 54264d5b8876c0..e47a71bab923a8 100644
+--- a/packages/rich-text-control/src/test/control.js
++++ b/packages/dataviews/src/components/dataform-controls/richtext/test/control.js
+@@ -12,7 +12,7 @@ import { unregisterFormatType, registerFormatType } from '@wordpress/rich-text';
+  * Internal dependencies
+  */
+ import RichTextControl from '../control';
+-import { unlock } from '../lock-unlock';
++import { unlock } from '../../../../lock-unlock';
+ 
+ function getTextbox( container ) {
+ 	return container.querySelector( '.wp-rich-text-control' );
+diff --git a/packages/rich-text-control/src/utils.js b/packages/dataviews/src/components/dataform-controls/richtext/utils.js
+similarity index 56%
+rename from packages/rich-text-control/src/utils.js
+rename to packages/dataviews/src/components/dataform-controls/richtext/utils.js
+index 1ebe1d85a1d667..77fe2e9b099621 100644
+--- a/packages/rich-text-control/src/utils.js
++++ b/packages/dataviews/src/components/dataform-controls/richtext/utils.js
+@@ -1,3 +1,5 @@
++// @ts-nocheck — vendored, loosely-typed glue around `@wordpress/rich-text`
++// private APIs (formerly the untyped `@wordpress/rich-text-control` package).
+ export function getAllowedFormats( { allowedFormats, disableFormats } ) {
+ 	if ( disableFormats ) {
+ 		return getAllowedFormats.EMPTY_ARRAY;
+diff --git a/packages/dataviews/src/components/dataform-controls/test/richtext.tsx b/packages/dataviews/src/components/dataform-controls/test/richtext.tsx
+index 6653afce258391..18b5cfe55b1249 100644
+--- a/packages/dataviews/src/components/dataform-controls/test/richtext.tsx
++++ b/packages/dataviews/src/components/dataform-controls/test/richtext.tsx
+@@ -4,13 +4,15 @@
+ import { render, screen } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+-// The `RichTextControl` component depends on `@wordpress/rich-text`'s
+-// useRichText hook (format types, event listeners, etc.) which is
+-// integration-heavy. Mock the rich-text-control module entirely so this file
+-// can verify the control's prop wiring in isolation without standing up the
+-// real editing pipeline.
+-jest.mock( '@wordpress/rich-text-control', () => ( {
+-	RichTextControl( props: any ) {
++// The rich-text assembly (`./control`) wires `@wordpress/rich-text`'s
++// useRichText hook (format types, event listeners, etc.) into the
++// presentational `RichTextControl` shell from `@wordpress/components`, which is
++// integration-heavy. Mock the assembly entirely so this file can verify the
++// dataform control's prop wiring in isolation without standing up the real
++// editing pipeline.
++jest.mock( '../richtext/control', () => ( {
++	__esModule: true,
++	default( props: any ) {
+ 		const handleChange = ( event: any ) =>
+ 			props.onChange( event.target.value );
+ 
+diff --git a/packages/dataviews/tsconfig.json b/packages/dataviews/tsconfig.json
+index 41f015ba956477..d1afd24718c45f 100644
+--- a/packages/dataviews/tsconfig.json
++++ b/packages/dataviews/tsconfig.json
+@@ -23,6 +23,7 @@
+ 		{ "path": "../keycodes" },
+ 		{ "path": "../primitives" },
+ 		{ "path": "../private-apis" },
++		{ "path": "../rich-text" },
+ 		{ "path": "../theme" },
+ 		{ "path": "../ui" },
+ 		{ "path": "../url" },
+diff --git a/packages/private-apis/src/implementation.ts b/packages/private-apis/src/implementation.ts
+index d04fb1aa5a1dfd..8ecb30f4bfae89 100644
+--- a/packages/private-apis/src/implementation.ts
++++ b/packages/private-apis/src/implementation.ts
+@@ -37,7 +37,6 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
+ 	'@wordpress/preferences',
+ 	'@wordpress/reusable-blocks',
+ 	'@wordpress/rich-text',
+-	'@wordpress/rich-text-control',
+ 	'@wordpress/route',
+ 	'@wordpress/router',
+ 	'@wordpress/routes',
+diff --git a/packages/rich-text-control/CHANGELOG.md b/packages/rich-text-control/CHANGELOG.md
+deleted file mode 100644
+index 8092bab1ab93f5..00000000000000
+--- a/packages/rich-text-control/CHANGELOG.md
++++ /dev/null
+@@ -1,5 +0,0 @@
+-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
+-
+-## Unreleased
+-
+-Initial release. `RichTextControl` is a standalone form control extracted from `@wordpress/block-editor` so consumers (e.g. `@wordpress/fields`) can render a rich text input without pulling the block-editor module graph.
+diff --git a/packages/rich-text-control/README.md b/packages/rich-text-control/README.md
+deleted file mode 100644
+index efb8fd6a82436a..00000000000000
+--- a/packages/rich-text-control/README.md
++++ /dev/null
+@@ -1,39 +0,0 @@
+-# Rich Text Control
+-
+-A standalone rich text form control built on top of [`@wordpress/rich-text`](https://www.npmjs.com/package/@wordpress/rich-text).
+-
+-Unlike the in-canvas `RichText` component from `@wordpress/block-editor`, `RichTextControl` is intended for standalone form fields (DataForms, sidebar inputs, etc.). It exposes a straightforward `value` / `onChange` interface and skips block-editor selection coupling, while still wiring registered format types so familiar keyboard shortcuts (Cmd+B, Cmd+I, Cmd+K) keep working.
+-
+-## Installation
+-
+-Install the module
+-
+-```bash
+-npm install @wordpress/rich-text-control --save
+-```
+-
+-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
+-
+-## Usage
+-
+-```js
+-import { RichTextControl } from '@wordpress/rich-text-control';
+-
+-function MyField( { value, onChange } ) {
+-	return (
+-		<RichTextControl
+-			label="Description"
+-			value={ value }
+-			onChange={ onChange }
+-		/>
+-	);
+-}
+-```
+-
+-## Contributing to this package
+-
+-This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+-
+-To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+-
+-<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+diff --git a/packages/rich-text-control/package.json b/packages/rich-text-control/package.json
+deleted file mode 100644
+index 05344328577035..00000000000000
+--- a/packages/rich-text-control/package.json
++++ /dev/null
+@@ -1,64 +0,0 @@
+-{
+-	"name": "@wordpress/rich-text-control",
+-	"version": "0.1.0",
+-	"description": "Standalone rich text form control built on top of @wordpress/rich-text.",
+-	"author": "The WordPress Contributors",
+-	"license": "GPL-2.0-or-later",
+-	"keywords": [
+-		"wordpress",
+-		"gutenberg",
+-		"rich-text",
+-		"control"
+-	],
+-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/rich-text-control/README.md",
+-	"repository": {
+-		"type": "git",
+-		"url": "https://github.com/WordPress/gutenberg.git",
+-		"directory": "packages/rich-text-control"
+-	},
+-	"bugs": {
+-		"url": "https://github.com/WordPress/gutenberg/issues"
+-	},
+-	"engines": {
+-		"node": ">=18.12.0",
+-		"npm": ">=8.19.2"
+-	},
+-	"files": [
+-		"src",
+-		"build",
+-		"build-module",
+-		"build-style",
+-		"build-types",
+-		"*.md"
+-	],
+-	"main": "build/index.cjs",
+-	"module": "build-module/index.mjs",
+-	"exports": {
+-		".": {
+-			"types": "./build-types/index.d.ts",
+-			"import": "./build-module/index.mjs",
+-			"require": "./build/index.cjs"
+-		},
+-		"./package.json": "./package.json"
+-	},
+-	"react-native": "src/index",
+-	"sideEffects": [
+-		"build-style/**",
+-		"src/**/*.scss"
+-	],
+-	"dependencies": {
+-		"@wordpress/base-styles": "file:../base-styles",
+-		"@wordpress/components": "file:../components",
+-		"@wordpress/compose": "file:../compose",
+-		"@wordpress/element": "file:../element",
+-		"@wordpress/private-apis": "file:../private-apis",
+-		"@wordpress/rich-text": "file:../rich-text",
+-		"clsx": "^2.1.1"
+-	},
+-	"peerDependencies": {
+-		"react": "^18.0.0"
+-	},
+-	"publishConfig": {
+-		"access": "public"
+-	}
+-}
+diff --git a/packages/rich-text-control/src/control.js b/packages/rich-text-control/src/control.js
+deleted file mode 100644
+index 679fdd7683f79d..00000000000000
+--- a/packages/rich-text-control/src/control.js
++++ /dev/null
+@@ -1,329 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import clsx from 'clsx';
+-
+-/**
+- * WordPress dependencies
+- */
+-import {
+-	BaseControl,
+-	Popover,
+-	SlotFillProvider,
+-	useBaseControlProps,
+-} from '@wordpress/components';
+-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+-import {
+-	createPortal,
+-	useEffect,
+-	useInsertionEffect,
+-	useMemo,
+-	useRef,
+-	useState,
+-} from '@wordpress/element';
+-import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+-
+-/**
+- * Internal dependencies
+- */
+-import { unlock } from './lock-unlock';
+-import { getAllowedFormats } from './utils';
+-import FormatEdit from './format-edit';
+-import shortcutsListener from './event-listeners/shortcuts';
+-import inputEventsListener from './event-listeners/input-events';
+-
+-// `keyboardShortcutContext` / `inputEventContext` are the same context objects
+-// that `@wordpress/block-editor`'s `RichTextShortcut` / `RichTextInputEvent`
+-// read. Format types render those components, so providing these contexts here
+-// (below) is what wires their keyboard shortcuts and input events to this
+-// field even though the control lives outside `@wordpress/block-editor`.
+-const { useRichText, keyboardShortcutContext, inputEventContext } =
+-	unlock( richTextPrivateApis );
+-
+-/**
+- * A rich text control component that provides a contenteditable field with
+- * formatting capabilities.
+- *
+- * Unlike the in-canvas `RichText` component from `@wordpress/block-editor`,
+- * `RichTextControl` is intended for standalone form fields (DataForms, sidebar
+- * inputs, etc.). It exposes a straightforward `value` / `onChange` interface
+- * and skips block-editor selection coupling, while still wiring registered
+- * format types so familiar keyboard shortcuts (Cmd+B, Cmd+I, Cmd+K) continue
+- * to work.
+- *
+- * @param {Object}   props                                Component properties.
+- * @param {string}   props.label                          Label text for the control.
+- * @param {string}   props.value                          The rich text value (HTML string).
+- * @param {Function} props.onChange                       Callback function invoked when the value changes.
+- * @param {string}   [props.placeholder]                  Placeholder text displayed when the field is empty.
+- * @param {string}   [props.id]                           Unique identifier for the control.
+- * @param {string}   [props.clientId]                     Block client ID for context (used by format types that need it).
+- * @param {string}   [props.className]                    Additional class name applied to the contenteditable element.
+- * @param {boolean}  [props.hideLabelFromVision]          Whether to visually hide the label (still accessible to screen readers).
+- * @param {Array}    [props.allowedFormats]               Array of allowed format types.
+- * @param {boolean}  [props.disableFormats]               Whether to disable all formatting.
+- * @param {boolean}  [props.withoutInteractiveFormatting] Whether to disable interactive formatting features.
+- * @param {boolean}  [props.preserveWhiteSpace]           Whether to preserve whitespace in the content.
+- * @param {boolean}  [props.disableLineBreaks]            Whether to disable line breaks in the content.
+- * @param {boolean}  [props.focusOnMount]                 Whether to move focus to the field when it mounts. Off by default; opt in for standalone forms where no other code lands focus on the field.
+- *
+- * @return {Element} The rendered RichTextControl component.
+- */
+-export default function RichTextControl( {
+-	label,
+-	value: attrValue,
+-	onChange,
+-	placeholder,
+-	id,
+-	clientId,
+-	className,
+-	hideLabelFromVision,
+-	allowedFormats,
+-	disableFormats,
+-	withoutInteractiveFormatting,
+-	preserveWhiteSpace,
+-	disableLineBreaks,
+-	focusOnMount,
+-} ) {
+-	const [ selection, setSelection ] = useState( {
+-		start: undefined,
+-		end: undefined,
+-	} );
+-	const [ isSelected, setIsSelected ] = useState( false );
+-	const anchorRef = useRef();
+-	const inputEvents = useRef( new Set() );
+-	const keyboardShortcuts = useRef( new Set() );
+-
+-	// Format types open their UI (e.g. the inline link popover via Cmd+K) in
+-	// portaled popovers. We host them in a private `SlotFillProvider` paired
+-	// with our own `Popover.Slot` (rendered below), wrapped in a marker
+-	// element. That way blur handling can tell precisely that focus moved into
+-	// a popover this control opened, rather than any popover that happens to be
+-	// on screen, and the popovers don't leak into an ambient slot registry.
+-	// The slot is portaled to the field's document body so popovers escape any
+-	// scroll/overflow container the control sits in (e.g. a sidebar). The body
+-	// is read from the field element rather than the global `document` to stay
+-	// correct if the control is ever rendered inside an iframe.
+-	const [ popoverSlotContainer, setPopoverSlotContainer ] = useState();
+-	const popoverSlotContainerRef = useRefEffect( ( element ) => {
+-		setPopoverSlotContainer( element.ownerDocument.body );
+-	}, [] );
+-
+-	// When the textbox blurs, defer flipping `isSelected` to `false` so a
+-	// portal-rendered popover (e.g., the inline link UI opened via Cmd+K)
+-	// can claim focus without `FormatEdit` — and therefore the popover
+-	// itself — unmounting underneath it.
+-	const blurDeselectTimeoutRef = useRef( undefined );
+-	useEffect( () => () => clearTimeout( blurDeselectTimeoutRef.current ), [] );
+-
+-	const adjustedAllowedFormats = getAllowedFormats( {
+-		allowedFormats,
+-		disableFormats,
+-	} );
+-
+-	const {
+-		value,
+-		onChange: onRichTextChange,
+-		ref: richTextRef,
+-		formatTypes,
+-		getValue,
+-	} = useRichText( {
+-		value: attrValue,
+-		onChange,
+-		selectionStart: selection.start,
+-		selectionEnd: selection.end,
+-		onSelectionChange: ( start, end ) => setSelection( { start, end } ),
+-		__unstableIsSelected: isSelected,
+-		preserveWhiteSpace: !! preserveWhiteSpace,
+-		placeholder,
+-		__unstableDisableFormats: disableFormats,
+-		allowedFormats: adjustedAllowedFormats,
+-		withoutInteractiveFormatting,
+-		__unstableFormatTypeHandlerContext: useMemo(
+-			() => ( {
+-				richTextIdentifier: id,
+-				blockClientId: clientId,
+-			} ),
+-			[ id, clientId ]
+-		),
+-	} );
+-
+-	const { baseControlProps, controlProps } = useBaseControlProps( {
+-		hideLabelFromVision,
+-		label,
+-	} );
+-
+-	function onFocus() {
+-		anchorRef.current?.focus();
+-	}
+-
+-	// Optionally move focus to the field when it mounts. `RichTextControl`
+-	// has no block-editor selection to land focus, so standalone consumers
+-	// (e.g. a note form) need a way to land the caret on open.
+-	const focusOnMountRef = useRefEffect(
+-		( element ) => {
+-			if ( focusOnMount ) {
+-				element.focus();
+-			}
+-		},
+-		[ focusOnMount ]
+-	);
+-
+-	// Wire registered format keyboard shortcuts (e.g. Cmd+B, Cmd+I, Cmd+K)
+-	// and InputEvent handlers (e.g. native formatBold) to the contenteditable.
+-	// FormatEdit populates these Sets via context; without these listeners the
+-	// callbacks would never fire.
+-	const eventListenersPropsRef = useRef( {
+-		keyboardShortcuts,
+-		inputEvents,
+-	} );
+-
+-	// Keep `formatTypes`/`getValue`/`onChange` accessible to the input-rule
+-	// listener without retearing it down on every value change.
+-	const inputRulePropsRef = useRef( {
+-		formatTypes,
+-		getValue,
+-		onChange: onRichTextChange,
+-	} );
+-	useInsertionEffect( () => {
+-		inputRulePropsRef.current = {
+-			formatTypes,
+-			getValue,
+-			onChange: onRichTextChange,
+-		};
+-	} );
+-
+-	const eventListenersRef = useRefEffect(
+-		( element ) => {
+-			if ( ! isSelected ) {
+-				return;
+-			}
+-			const cleanupShortcuts = shortcutsListener(
+-				eventListenersPropsRef
+-			)( element );
+-			const cleanupInputEvents = inputEventsListener(
+-				eventListenersPropsRef
+-			)( element );
+-
+-			// Apply format-level input rules (e.g. `core/code`'s
+-			// backtick→inline-code transform). Block-transform input rules
+-			// don't apply to a standalone field.
+-			function onFormatInput( event ) {
+-				if (
+-					event.inputType !== 'insertText' &&
+-					event.type !== 'compositionend'
+-				) {
+-					return;
+-				}
+-				const {
+-					formatTypes: types,
+-					getValue: getCurrentValue,
+-					onChange: handleChange,
+-				} = inputRulePropsRef.current;
+-				const current = getCurrentValue();
+-				const transformed = types.reduce(
+-					( accumulator, { __unstableInputRule } ) =>
+-						__unstableInputRule
+-							? __unstableInputRule( accumulator )
+-							: accumulator,
+-					current
+-				);
+-				if ( transformed !== current ) {
+-					handleChange( {
+-						...transformed,
+-						activeFormats: current.activeFormats,
+-					} );
+-				}
+-			}
+-			element.addEventListener( 'input', onFormatInput );
+-			element.addEventListener( 'compositionend', onFormatInput );
+-
+-			return () => {
+-				cleanupShortcuts();
+-				cleanupInputEvents();
+-				element.removeEventListener( 'input', onFormatInput );
+-				element.removeEventListener( 'compositionend', onFormatInput );
+-			};
+-		},
+-		[ isSelected ]
+-	);
+-
+-	return (
+-		<>
+-			<SlotFillProvider>
+-				{ isSelected && (
+-					<keyboardShortcutContext.Provider
+-						value={ keyboardShortcuts }
+-					>
+-						<inputEventContext.Provider value={ inputEvents }>
+-							<FormatEdit
+-								value={ value }
+-								onChange={ onRichTextChange }
+-								onFocus={ onFocus }
+-								formatTypes={ formatTypes }
+-								forwardedRef={ anchorRef }
+-								isVisible={ false }
+-							/>
+-						</inputEventContext.Provider>
+-					</keyboardShortcutContext.Provider>
+-				) }
+-				{ popoverSlotContainer &&
+-					createPortal(
+-						<div data-rich-text-control-popover-slot>
+-							<Popover.Slot />
+-						</div>,
+-						popoverSlotContainer
+-					) }
+-			</SlotFillProvider>
+-			<BaseControl { ...baseControlProps }>
+-				<div
+-					className={ clsx( 'wp-rich-text-control', className ) }
+-					role="textbox"
+-					aria-multiline={ ! disableLineBreaks }
+-					aria-label={ label }
+-					ref={ useMergeRefs( [
+-						richTextRef,
+-						anchorRef,
+-						eventListenersRef,
+-						focusOnMountRef,
+-						popoverSlotContainerRef,
+-					] ) }
+-					onFocus={ () => {
+-						clearTimeout( blurDeselectTimeoutRef.current );
+-						setIsSelected( true );
+-					} }
+-					onBlur={ ( event ) => {
+-						clearTimeout( blurDeselectTimeoutRef.current );
+-						const ownerDocument = event.currentTarget.ownerDocument;
+-						blurDeselectTimeoutRef.current = setTimeout( () => {
+-							// Stay selected if focus moved into a popover that a
+-							// format type opened from this control (e.g. the
+-							// inline link UI via Cmd+K). `@wordpress/components`
+-							// popovers are scoped to this control's own slot
+-							// (see `SlotFillProvider` above) and land inside the
+-							// `data-rich-text-control-popover-slot` marker, so we
+-							// match them precisely rather than treating any
+-							// on-screen popover as ours. `[data-wp-compat-overlay-slot]`
+-							// additionally covers popovers already migrated to
+-							// `@wordpress/ui`, which portal into the shared
+-							// compat overlay slot rather than our own.
+-							const active = ownerDocument.activeElement;
+-							if (
+-								active &&
+-								active.closest(
+-									'[data-rich-text-control-popover-slot],[data-wp-compat-overlay-slot]'
+-								)
+-							) {
+-								return;
+-							}
+-							setIsSelected( false );
+-						}, 0 );
+-					} }
+-					contentEditable
+-					suppressContentEditableWarning
+-					{ ...controlProps }
+-				/>
+-			</BaseControl>
+-		</>
+-	);
+-}
+diff --git a/packages/rich-text-control/src/index.js b/packages/rich-text-control/src/index.js
+deleted file mode 100644
+index 2e72d2c9615b64..00000000000000
+--- a/packages/rich-text-control/src/index.js
++++ /dev/null
+@@ -1 +0,0 @@
+-export { default as RichTextControl } from './control';
+diff --git a/packages/rich-text-control/src/lock-unlock.js b/packages/rich-text-control/src/lock-unlock.js
+deleted file mode 100644
+index c1ee4aeac525b0..00000000000000
+--- a/packages/rich-text-control/src/lock-unlock.js
++++ /dev/null
+@@ -1,10 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+-
+-export const { lock, unlock } =
+-	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
+-		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
+-		'@wordpress/rich-text-control'
+-	);
+diff --git a/packages/rich-text-control/src/stories/index.story.tsx b/packages/rich-text-control/src/stories/index.story.tsx
+deleted file mode 100644
+index ede58d02562361..00000000000000
+--- a/packages/rich-text-control/src/stories/index.story.tsx
++++ /dev/null
+@@ -1,90 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import type { Meta, StoryObj } from '@storybook/react-vite';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { SlotFillProvider } from '@wordpress/components';
+-import { useState } from '@wordpress/element';
+-// Registers the core format types (bold, italic, link, …) as a side effect so
+-// the control's keyboard shortcuts (⌘B / ⌘I / ⌘K) and the inline link popover
+-// can be exercised here in isolation from the editor.
+-import '@wordpress/format-library';
+-
+-/**
+- * Internal dependencies
+- */
+-import RichTextControl from '../control';
+-
+-// The control's own styles (and the format/link UI styles) are lazy-loaded in
+-// Storybook via `storybook/package-styles/config.js`, keyed off this story's
+-// component id, rather than imported here.
+-
+-const meta: Meta< typeof RichTextControl > = {
+-	title: 'RichTextControl',
+-	component: RichTextControl,
+-	argTypes: {
+-		value: { control: false },
+-		onChange: { action: 'onChange' },
+-		label: { control: { type: 'text' } },
+-		placeholder: { control: { type: 'text' } },
+-		hideLabelFromVision: { control: { type: 'boolean' } },
+-		disableFormats: { control: { type: 'boolean' } },
+-		disableLineBreaks: { control: { type: 'boolean' } },
+-		focusOnMount: { control: { type: 'boolean' } },
+-	},
+-	parameters: {
+-		controls: { expanded: true },
+-		docs: {
+-			description: {
+-				component:
+-					'A standalone rich text form control for use outside the block canvas (DataForms, sidebar inputs, …). Focus the field, then use ⌘B / ⌘I to format or ⌘K to insert a link. Formatting depends on registered format types — this story imports `@wordpress/format-library` to register the core formats, and wraps the control in a `SlotFillProvider` so format popovers render into the control’s dedicated popover slot.',
+-			},
+-		},
+-	},
+-};
+-export default meta;
+-
+-type Story = StoryObj< typeof RichTextControl >;
+-
+-function ControlledRichText( {
+-	value: initialValue,
+-	onChange,
+-	...args
+-}: {
+-	value?: string;
+-	onChange?: ( value: string ) => void;
+-	[ key: string ]: unknown;
+-} ) {
+-	const [ value, setValue ] = useState( initialValue ?? '' );
+-	return (
+-		<SlotFillProvider>
+-			<RichTextControl
+-				{ ...args }
+-				value={ value }
+-				onChange={ ( newValue: string ) => {
+-					setValue( newValue );
+-					onChange?.( newValue );
+-				} }
+-			/>
+-		</SlotFillProvider>
+-	);
+-}
+-
+-export const Default: Story = {
+-	render: ( args ) => <ControlledRichText { ...args } />,
+-	args: {
+-		label: 'Title',
+-		placeholder: 'Write a title…',
+-	},
+-};
+-
+-export const WithInitialValue: Story = {
+-	render: ( args ) => <ControlledRichText { ...args } />,
+-	args: {
+-		label: 'Excerpt',
+-		value: 'The quick <strong>brown</strong> fox jumps over the <a href="https://wordpress.org">lazy dog</a>.',
+-	},
+-};
+diff --git a/phpunit/tests/collaboration/restAutosavesController.php b/phpunit/tests/collaboration/restAutosavesController.php
+index 7b8ec02b4c2e8d..20a35c62c6109f 100644
+--- a/phpunit/tests/collaboration/restAutosavesController.php
++++ b/phpunit/tests/collaboration/restAutosavesController.php
+@@ -155,6 +155,76 @@ public function test_draft_autosave_creates_revision_when_collaboration_is_enabl
+ 		$this->assertSame( $content, $autosave->post_content );
+ 	}
+ 
++	public function test_draft_autosave_does_not_create_revision_when_content_is_unchanged() {
++		$title   = 'Unchanged RTC draft title';
++		$content = '<!-- wp:paragraph --><p>Unchanged RTC draft content</p><!-- /wp:paragraph -->';
++		$post_id = $this->create_draft( $title, $content );
++
++		// Autosave with the exact same title and content as the saved post, while
++		// still sending meta as the editor does (the CRDT document changes on
++		// every autosave). The unchanged revisioned fields must win: a no-op
++		// autosave should not leave behind a revision that would later be flagged
++		// as "a more recent autosave" purely by its timestamp.
++		$response = $this->dispatch_autosave(
++			$post_id,
++			$title,
++			$content,
++			array(
++				self::CRDT_DOC_META_KEY => 'changed-crdt-doc',
++			)
++		);
++
++		$this->assertSame( 200, $response->get_status() );
++
++		$autosave = wp_get_post_autosave( $post_id, self::$author_id );
++		$this->assertFalse( $autosave, 'Expected no autosave revision for an unchanged autosave.' );
++	}
++
++	public function test_draft_autosave_creates_revision_when_revisioned_meta_changes() {
++		// `footnotes` is the real-world example of a revisioned meta key, but a
++		// dedicated key is registered here so the test does not depend on whether
++		// footnotes happens to be registered in the test bootstrap.
++		$meta_key = 'test_revisioned_meta';
++		register_post_meta(
++			'post',
++			$meta_key,
++			array(
++				'single'            => true,
++				'type'              => 'string',
++				'show_in_rest'      => true,
++				'revisions_enabled' => true,
++			)
++		);
++
++		$title   = 'RTC draft title with revisioned meta';
++		$content = '<!-- wp:paragraph --><p>RTC draft content with revisioned meta</p><!-- /wp:paragraph -->';
++		$post_id = $this->create_draft( $title, $content );
++		update_post_meta( $post_id, $meta_key, 'original meta value' );
++
++		// Autosave with identical title and content but a changed revisioned meta
++		// value. Because the meta is revisioned, the change is recoverable and must
++		// be stored as a revision rather than skipped as a no-op.
++		$response = $this->dispatch_autosave(
++			$post_id,
++			$title,
++			$content,
++			array(
++				$meta_key => 'updated meta value',
++			)
++		);
++
++		unregister_post_meta( 'post', $meta_key );
++
++		$this->assertSame( 200, $response->get_status() );
++
++		$autosave = wp_get_post_autosave( $post_id, self::$author_id );
++		$this->assertInstanceOf( WP_Post::class, $autosave );
++		$this->assertSame(
++			'updated meta value',
++			get_post_meta( $autosave->ID, $meta_key, true )
++		);
++	}
++
+ 	public function test_draft_autosave_does_not_store_crdt_doc_meta_on_revision() {
+ 		$original_title   = 'Original RTC draft title with CRDT meta';
+ 		$original_content = '<!-- wp:paragraph --><p>Original RTC draft content with CRDT meta</p><!-- /wp:paragraph -->';
+diff --git a/storybook/main.ts b/storybook/main.ts
+index c75851430eab02..f75e32ebded71e 100644
+--- a/storybook/main.ts
++++ b/storybook/main.ts
+@@ -24,7 +24,6 @@ const stories = [
+ 	'./stories/icons/**/*.story.@(ts|tsx)',
+ 	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
+ 	'../packages/fields/src/**/stories/*.story.@(js|tsx|mdx)',
+-	'../packages/rich-text-control/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
+ 	'../packages/image-cropper/src/**/stories/*.story.@(js|tsx|mdx)',
+ 	'../packages/media-editor/src/**/stories/*.story.@(js|tsx|mdx)',
+ 	'../packages/media-fields/src/**/stories/*.story.@(js|tsx|mdx)',
+diff --git a/storybook/package-styles/config.js b/storybook/package-styles/config.js
+index f3395f239654a4..1cf406711a51ad 100644
+--- a/storybook/package-styles/config.js
++++ b/storybook/package-styles/config.js
+@@ -19,8 +19,6 @@ import fieldsLtr from '../package-styles/fields-ltr.lazy.scss?inline';
+ import fieldsRtl from '../package-styles/fields-rtl.lazy.scss?inline';
+ import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss?inline';
+ import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss?inline';
+-import richTextControlLtr from '../package-styles/rich-text-control-ltr.lazy.scss?inline';
+-import richTextControlRtl from '../package-styles/rich-text-control-rtl.lazy.scss?inline';
+ import designTokens from '../package-styles/design-tokens.lazy.scss?inline';
+ 
+ /**
+@@ -82,25 +80,6 @@ const CONFIG = [
+ 		ltr: [ componentsLtr, dataviewsLtr, fieldsLtr, mediaFieldsLtr ],
+ 		rtl: [ componentsRtl, dataviewsRtl, fieldsRtl, mediaFieldsRtl ],
+ 	},
+-	{
+-		// `RichTextControl` renders format UI from `@wordpress/format-library`
+-		// and the inline link popover (`LinkControl`) from
+-		// `@wordpress/block-editor`, so it needs those package styles in
+-		// addition to `@wordpress/components`.
+-		componentIdMatcher: /^richtextcontrol/,
+-		ltr: [
+-			componentsLtr,
+-			blockEditorLtr,
+-			formatLibraryLtr,
+-			richTextControlLtr,
+-		],
+-		rtl: [
+-			componentsRtl,
+-			blockEditorRtl,
+-			formatLibraryRtl,
+-			richTextControlRtl,
+-		],
+-	},
+ 	{
+ 		componentIdMatcher: /^admin-ui-/,
+ 		ltr: [ designTokens, componentsLtr ],
+diff --git a/storybook/package-styles/rich-text-control-ltr.lazy.scss b/storybook/package-styles/rich-text-control-ltr.lazy.scss
+deleted file mode 100644
+index 1aa0cdd6ddc843..00000000000000
+--- a/storybook/package-styles/rich-text-control-ltr.lazy.scss
++++ /dev/null
+@@ -1 +0,0 @@
+-@import "../../packages/rich-text-control/build-style/style.css";
+diff --git a/storybook/package-styles/rich-text-control-rtl.lazy.scss b/storybook/package-styles/rich-text-control-rtl.lazy.scss
+deleted file mode 100644
+index 3ccba054bbe530..00000000000000
+--- a/storybook/package-styles/rich-text-control-rtl.lazy.scss
++++ /dev/null
+@@ -1 +0,0 @@
+-@import "../../packages/rich-text-control/build-style/style-rtl.css";
+diff --git a/test/e2e/specs/editor/collaboration/collaboration-stale-autosave-notice.spec.ts b/test/e2e/specs/editor/collaboration/collaboration-stale-autosave-notice.spec.ts
+new file mode 100644
+index 00000000000000..e434b960c95197
+--- /dev/null
++++ b/test/e2e/specs/editor/collaboration/collaboration-stale-autosave-notice.spec.ts
+@@ -0,0 +1,162 @@
++/**
++ * External dependencies
++ */
++import type { Page, Response } from '@playwright/test';
++
++/**
++ * Internal dependencies
++ */
++import { test, expect } from './fixtures';
++
++type RestPost = {
++	id: number;
++	status: string;
++	title?: { raw?: string; rendered?: string } | string;
++	content?: { raw?: string; rendered?: string } | string;
++};
++
++function rawField( field: RestPost[ 'content' ] ): string {
++	if ( ! field ) {
++		return '';
++	}
++
++	return typeof field === 'string'
++		? field
++		: field.raw ?? field.rendered ?? '';
++}
++
++async function getCurrentPostId( page: Page ): Promise< number > {
++	return page.evaluate( () =>
++		( window as any ).wp.data.select( 'core/editor' ).getCurrentPostId()
++	);
++}
++
++function isAutosaveResponse( response: Response, postId: number ): boolean {
++	if ( response.request().method() !== 'POST' ) {
++		return false;
++	}
++
++	const url = new URL( response.url() );
++	const route = `/wp/v2/posts/${ postId }/autosaves`;
++
++	return (
++		url.pathname.includes( `/wp-json${ route }` ) ||
++		url.searchParams.get( 'rest_route' ) === route
++	);
++}
++
++test.describe( 'Collaboration - stale autosave notice', () => {
++	// Reproduces the spurious "There is an autosave of this post that is more
++	// recent than the version below" notice that appears in real-time
++	// collaboration.
++	//
++	// Root cause is two factors combining:
++	//
++	// 1. With RTC enabled, the author's draft autosave is NOT applied to the
++	//    parent post (see Gutenberg_REST_Autosaves_Controller::create_item).
++	//    It is stored as a per-user autosave revision instead, so the revision
++	//    is always more recent than the parent post, even for a no-op autosave
++	//    whose content is identical to the post.
++	//
++	// 2. WordPress core decides whether to show the notice in
++	//    wp-admin/edit-form-blocks.php by comparing ONLY timestamps
++	//    (`$autosave->post_modified_gmt > $post->post_modified_gmt`), never the
++	//    revisioned fields. So a content-identical autosave still triggers the
++	//    notice, and "View the autosave" opens a revision screen with no Content
++	//    diff (just the title), because the content matches the saved post.
++	test( 'does not show an unnecessary notice in RTC after a no-op autosave', async ( {
++		collaborationUtils,
++		editor,
++		page,
++		requestUtils,
++	} ) => {
++		test.setTimeout( 120_000 );
++
++		const marker = 'rtc-stale-autosave-content';
++
++		// Seed the post with the editor's canonical block serialization so the
++		// autosave that follows is a true no-op (byte-identical content), which
++		// is what makes the revision's Content diff blank.
++		const content = `<!-- wp:paragraph -->\n<p>${ marker }</p>\n<!-- /wp:paragraph -->`;
++
++		// Create a draft authored by the current user (admin). `wp_get_post_autosave`
++		// resolves the autosave for the current user, so the author must own the
++		// post. Backdate it so its `post_modified` is deterministically older than
++		// the autosave we trigger below (autosave timestamps have one-second
++		// resolution), without resorting to a wall-clock wait.
++		const post = await requestUtils.createPost( {
++			title: 'RTC stale autosave notice',
++			status: 'draft',
++			content,
++			date_gmt: new Date( Date.now() - 60 * 60 * 1000 ).toISOString(),
++		} );
++
++		await collaborationUtils.openPost( post.id );
++		await collaborationUtils.waitForEntityReady( page, {
++			timeout: 30_000,
++		} );
++
++		const postId = await getCurrentPostId( page );
++		expect( postId ).toBe( post.id );
++
++		// Trigger a no-op autosave (nothing has been edited since load).
++		const autosaveRequest = page.waitForResponse(
++			( response ) => isAutosaveResponse( response, postId ),
++			{ timeout: 30_000 }
++		);
++		await page.evaluate( () =>
++			( window as any ).wp.data.dispatch( 'core/editor' ).autosave()
++		);
++		const autosaveResponse = await autosaveRequest;
++		expect( autosaveResponse.status() ).toBe( 200 );
++		await page.waitForFunction(
++			() =>
++				! ( window as any ).wp.data
++					.select( 'core/editor' )
++					.isAutosavingPost(),
++			undefined,
++			{ timeout: 30_000 }
++		);
++
++		// The autosave was a no-op (identical content), so the server must not
++		// persist a redundant autosave revision. A lingering revision is exactly
++		// what would later out-date the post and surface the spurious notice.
++		const savedPost = await requestUtils.rest< RestPost >( {
++			path: `/wp/v2/posts/${ postId }`,
++			params: { context: 'edit' },
++		} );
++		const autosaves = await requestUtils.rest< RestPost[] >( {
++			path: `/wp/v2/posts/${ postId }/autosaves`,
++			params: { context: 'edit' },
++		} );
++		expect( rawField( savedPost.content ).trim() ).toBe( content.trim() );
++		expect( autosaves ).toHaveLength( 0 );
++
++		// Reload. The autosave was a no-op, so no autosave revision exists to
++		// out-date the post, and the editor must not warn about "a more recent
++		// autosave". Without the controller fix, WordPress would have stored a
++		// redundant revision and surfaced the spurious notice here.
++		await page.reload();
++		await collaborationUtils.waitForCollaborationReady( page, {
++			timeout: 30_000,
++		} );
++		await collaborationUtils.waitForEntityReady( page, {
++			timeout: 30_000,
++		} );
++
++		// Wait until the editor has fully mounted (our paragraph is rendered).
++		// The notice, if any, is created in the editor provider's mount effect,
++		// so by this point it would already be present. This prevents a false
++		// pass from asserting absence before the editor has had a chance to show it.
++		await expect( editor.canvas.getByText( marker ) ).toBeVisible( {
++			timeout: 30_000,
++		} );
++
++		await expect(
++			page.locator( '.components-notice__content' ).filter( {
++				hasText:
++					'There is an autosave of this post that is more recent than the version below.',
++			} )
++		).toHaveCount( 0 );
++	} );
++} );

@@ -1,0 +1,25 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 29675f9630ab1b..5bb9a27bc6ab68 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ ### Internal
+ 
+ -   `PaletteEditListView`: Update to ignore `exhaustive-deps` eslint rule ([#45467](https://github.com/WordPress/gutenberg/pull/45467)).
++-   `withNotices`: Update to pass `exhaustive-deps` eslint rule ([#45530](https://github.com/WordPress/gutenberg/pull/45530)).
+ -   `ItemGroup`: Update to pass `exhaustive-deps` eslint rule ([#45531](https://github.com/WordPress/gutenberg/pull/45531)).
+ 
+ ### Experimental
+diff --git a/packages/components/src/higher-order/with-notices/test/index.js b/packages/components/src/higher-order/with-notices/test/index.js
+index 2778a57c71aa9a..fc529927b2a6f9 100644
+--- a/packages/components/src/higher-order/with-notices/test/index.js
++++ b/packages/components/src/higher-order/with-notices/test/index.js
+@@ -49,7 +49,7 @@ const BaseComponent = ( { noticeOperations, noticeUI, notifications } ) => {
+ 				noticeOperations.createNotice( item )
+ 			);
+ 		}
+-	}, [] );
++	}, [ noticeOperations, notifications ] );
+ 	return (
+ 		<div>
+ 			{ noticeUI }

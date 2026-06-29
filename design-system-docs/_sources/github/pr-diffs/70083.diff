@@ -1,0 +1,45 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 45e21e33dd821f..ae66af0f4d23dc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Enhancement
+ 
+ -   `Snackbar`: Add support to open links in a new tab ([#69905](https://github.com/WordPress/gutenberg/pull/69905)).
++-   `ColorPicker`: Add a visual cue when the value is copied ([#70083](https://github.com/WordPress/gutenberg/pull/70083)).
+ 
+ ## 29.9.0 (2025-05-07)
+ 
+diff --git a/packages/components/src/color-picker/color-copy-button.tsx b/packages/components/src/color-picker/color-copy-button.tsx
+index 6e49fa7ae85e74..8a1a2c83a8c08f 100644
+--- a/packages/components/src/color-picker/color-copy-button.tsx
++++ b/packages/components/src/color-picker/color-copy-button.tsx
+@@ -3,7 +3,7 @@
+  */
+ import { useCopyToClipboard } from '@wordpress/compose';
+ import { useState, useEffect, useRef } from '@wordpress/element';
+-import { copy } from '@wordpress/icons';
++import { copy, check } from '@wordpress/icons';
+ import { __ } from '@wordpress/i18n';
+ 
+ /**
+@@ -55,8 +55,8 @@ export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
+ 		};
+ 	}, [] );
+ 
+-	const label =
+-		copiedColor === color.toHex() ? __( 'Copied!' ) : __( 'Copy' );
++	const isCopied = copiedColor === color.toHex();
++	const label = isCopied ? __( 'Copied!' ) : __( 'Copy' );
+ 
+ 	return (
+ 		<Tooltip delay={ 0 } hideOnClick={ false } text={ label }>
+@@ -64,7 +64,7 @@ export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
+ 				size="compact"
+ 				aria-label={ label }
+ 				ref={ copyRef }
+-				icon={ copy }
++				icon={ isCopied ? check : copy }
+ 				showTooltip={ false }
+ 			/>
+ 		</Tooltip>

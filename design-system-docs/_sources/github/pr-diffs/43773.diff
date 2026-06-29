@@ -1,0 +1,70 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 28d31aee885713..5e40ff6cfb76cd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,9 +11,8 @@
+ 
+ -   `ToggleControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43717](https://github.com/WordPress/gutenberg/pull/43717)). 
+ -   `CheckboxControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43720](https://github.com/WordPress/gutenberg/pull/43720)).
+-
+-### Enhancements
+-
++-   `RangeControl`: Tweak dark gray marking color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
++-   `UnitControl`: Tweak unit dropdown color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
+ -   `CardHeader`, `CardBody`, `CardFooter`: Tweak `isShady` background colors to be consistent with the grays in `@wordpress/base-styles` ([#43719](https://github.com/WordPress/gutenberg/pull/43719)).
+ -   `InputControl`, `SelectControl`: Tweak `disabled` colors to be consistent with the grays in `@wordpress/base-styles` ([#43719](https://github.com/WordPress/gutenberg/pull/43719)).
+ 
+diff --git a/packages/components/src/range-control/styles/range-control-styles.ts b/packages/components/src/range-control/styles/range-control-styles.ts
+index c746bc9c72a6fb..442d3059465d6b 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.ts
++++ b/packages/components/src/range-control/styles/range-control-styles.ts
+@@ -152,7 +152,7 @@ export const Mark = styled.span`
+ 
+ const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
+ 	return css( {
+-		color: isFilled ? COLORS.darkGray[ 300 ] : COLORS.lightGray[ 600 ],
++		color: isFilled ? COLORS.gray[ 700 ] : COLORS.lightGray[ 600 ],
+ 	} );
+ };
+ 
+diff --git a/packages/components/src/unit-control/styles/unit-control-styles.ts b/packages/components/src/unit-control/styles/unit-control-styles.ts
+index 312e2a41372672..bfc299807fd315 100644
+--- a/packages/components/src/unit-control/styles/unit-control-styles.ts
++++ b/packages/components/src/unit-control/styles/unit-control-styles.ts
+@@ -66,7 +66,7 @@ const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
+ 			box-sizing: border-box;
+ 			padding: 2px 1px;
+ 			width: 20px;
+-			color: ${ COLORS.darkGray[ 500 ] };
++			color: ${ COLORS.gray[ 800 ] };
+ 			font-size: 8px;
+ 			line-height: 1;
+ 			letter-spacing: -0.5px;
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index 83c3a6381f0f38..79d38477569534 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -22,12 +22,6 @@ const GRAY = {
+ 	100: '#f0f0f0',
+ };
+ 
+-// TODO: Replace usages of these with the equivalents in `GRAY`
+-const DARK_GRAY = {
+-	500: '#555d66', // Use this most of the time for dark items.
+-	300: '#6c7781', // Lightest gray that can be used for AA text contrast.
+-};
+-
+ // TODO: Replace usages of these with the equivalents in `GRAY`
+ const LIGHT_GRAY = {
+ 	800: '#b5bcc2',
+@@ -66,10 +60,6 @@ const UI = {
+ };
+ 
+ export const COLORS = Object.freeze( {
+-	/**
+-	 * @deprecated Try to use `gray` instead.
+-	 */
+-	darkGray: DARK_GRAY,
+ 	/**
+ 	 * The main gray color object.
+ 	 */

@@ -1,0 +1,28 @@
+diff --git a/packages/components/src/date-time/date-time/index.tsx b/packages/components/src/date-time/date-time/index.tsx
+index 07e0c6e0d89465..3d97b19dc17c6c 100644
+--- a/packages/components/src/date-time/date-time/index.tsx
++++ b/packages/components/src/date-time/date-time/index.tsx
+@@ -207,6 +207,8 @@ function UnforwardedDateTimePicker(
+  *       currentDate={ date }
+  *       onChange={ ( newDate ) => setDate( newDate ) }
+  *       is12Hour
++ *       __nextRemoveHelpButton
++ *       __nextRemoveResetButton
+  *     />
+  *   );
+  * };
+diff --git a/packages/components/src/date-time/stories/date-time.tsx b/packages/components/src/date-time/stories/date-time.tsx
+index 447b9cf265ab86..53d369728d34d7 100644
+--- a/packages/components/src/date-time/stories/date-time.tsx
++++ b/packages/components/src/date-time/stories/date-time.tsx
+@@ -52,6 +52,10 @@ const Template: ComponentStory< typeof DateTimePicker > = ( {
+ export const Default: ComponentStory< typeof DateTimePicker > = Template.bind(
+ 	{}
+ );
++Default.args = {
++	__nextRemoveHelpButton: true,
++	__nextRemoveResetButton: true,
++};
+ 
+ export const WithEvents: ComponentStory< typeof DateTimePicker > =
+ 	Template.bind( {} );

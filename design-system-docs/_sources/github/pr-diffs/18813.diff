@@ -1,0 +1,857 @@
+diff --git a/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
+index e013b82467e2d5..8686ba2b135cc0 100644
+--- a/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/link-control/test/__snapshots__/index.js.snap
+@@ -1,3 +1,3 @@
+ // Jest Snapshot v1, https://goo.gl/fbAQLP
+ 
+-exports[`Basic rendering should display with required props 1`] = `"<span><div tabindex=\\"-1\\"><div><div><div class=\\"components-popover block-editor-link-control is-bottom is-center components-animate__appear is-from-top\\" style=\\"\\"><div class=\\"components-popover__content\\" tabindex=\\"-1\\"><div class=\\"block-editor-link-control__popover-inner\\"><div class=\\"block-editor-link-control__search\\"><form><div class=\\"components-base-control editor-url-input block-editor-url-input block-editor-link-control__search-input\\"><div class=\\"components-base-control__field\\"><input type=\\"text\\" aria-label=\\"URL\\" required=\\"\\" placeholder=\\"Search or type url\\" role=\\"combobox\\" aria-expanded=\\"false\\" aria-autocomplete=\\"list\\" aria-owns=\\"block-editor-url-input-suggestions-0\\" value=\\"\\"></div></div><button type=\\"reset\\" disabled=\\"\\" aria-label=\\"Reset\\" class=\\"components-button components-icon-button block-editor-link-control__search-reset\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" class=\\"dashicon dashicons-no-alt\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\"><path d=\\"M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z\\"></path></svg></button></form></div></div></div></div></div></div></div></span>"`;
++exports[`Basic rendering should display with required props 1`] = `"<span><div tabindex=\\"-1\\"><div><div><div class=\\"components-popover block-editor-link-control components-animate__appear is-from-top is-from-center\\" data-x-axis=\\"center\\" data-y-axis=\\"bottom\\" style=\\"top: 0px; left: 0px;\\"><div class=\\"components-popover__content\\" tabindex=\\"-1\\"><div class=\\"block-editor-link-control__popover-inner\\"><div class=\\"block-editor-link-control__search\\"><form><div class=\\"components-base-control editor-url-input block-editor-url-input block-editor-link-control__search-input\\"><div class=\\"components-base-control__field\\"><input type=\\"text\\" aria-label=\\"URL\\" required=\\"\\" placeholder=\\"Search or type url\\" role=\\"combobox\\" aria-expanded=\\"false\\" aria-autocomplete=\\"list\\" aria-owns=\\"block-editor-url-input-suggestions-0\\" value=\\"\\"></div></div><button type=\\"reset\\" disabled=\\"\\" aria-label=\\"Reset\\" class=\\"components-button components-icon-button block-editor-link-control__search-reset\\"><svg aria-hidden=\\"true\\" role=\\"img\\" focusable=\\"false\\" class=\\"dashicon dashicons-no-alt\\" xmlns=\\"http://www.w3.org/2000/svg\\" width=\\"20\\" height=\\"20\\" viewBox=\\"0 0 20 20\\"><path d=\\"M14.95 6.46L11.41 10l3.54 3.54-1.41 1.41L10 11.42l-3.53 3.53-1.42-1.42L8.58 10 5.05 6.47l1.42-1.42L10 8.58l3.54-3.53z\\"></path></svg></button></form></div></div></div></div></div></div></div></span>"`;
+diff --git a/packages/components/src/isolated-event-container/index.js b/packages/components/src/isolated-event-container/index.js
+index 1f305071c95cf7..74fc49276575ff 100644
+--- a/packages/components/src/isolated-event-container/index.js
++++ b/packages/components/src/isolated-event-container/index.js
+@@ -1,35 +1,24 @@
+ /**
+  * WordPress dependencies
+  */
+-import { Component } from '@wordpress/element';
++import { forwardRef } from '@wordpress/element';
+ 
+-class IsolatedEventContainer extends Component {
+-	constructor( props ) {
+-		super( props );
+-
+-		this.stopEventPropagationOutsideContainer = this.stopEventPropagationOutsideContainer.bind( this );
+-	}
+-
+-	stopEventPropagationOutsideContainer( event ) {
+-		event.stopPropagation();
+-	}
+-
+-	render() {
+-		const { children, ... props } = this.props;
+-
+-		// Disable reason: this stops certain events from propagating outside of the component.
+-		//   - onMouseDown is disabled as this can cause interactions with other DOM elements
+-		/* eslint-disable jsx-a11y/no-static-element-interactions */
+-		return (
+-			<div
+-				{ ... props }
+-				onMouseDown={ this.stopEventPropagationOutsideContainer }
+-			>
+-				{ children }
+-			</div>
+-		);
+-		/* eslint-enable jsx-a11y/no-static-element-interactions */
+-	}
++function stopPropagation( event ) {
++	event.stopPropagation();
+ }
+ 
+-export default IsolatedEventContainer;
++export default forwardRef( ( { children, ...props }, ref ) => {
++	// Disable reason: this stops certain events from propagating outside of the component.
++	//   - onMouseDown is disabled as this can cause interactions with other DOM elements
++	/* eslint-disable jsx-a11y/no-static-element-interactions */
++	return (
++		<div
++			{ ...props }
++			ref={ ref }
++			onMouseDown={ stopPropagation }
++		>
++			{ children }
++		</div>
++	);
++	/* eslint-enable jsx-a11y/no-static-element-interactions */
++} );
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 0f5f16b1bc8e1f..de8daaab08dc74 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -9,7 +9,6 @@ import classnames from 'classnames';
+ import { useRef, useState, useEffect } from '@wordpress/element';
+ import { focus, getRectangleFromRange } from '@wordpress/dom';
+ import { ESCAPE } from '@wordpress/keycodes';
+-import isShallowEqual from '@wordpress/is-shallow-equal';
+ import deprecated from '@wordpress/deprecated';
+ 
+ /**
+@@ -34,34 +33,6 @@ const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) =
+  */
+ const SLOT_NAME = 'Popover';
+ 
+-/**
+- * Hook used trigger an event handler once the window is resized or scrolled.
+- *
+- * @param {Function} handler              Event handler.
+- * @param {Object}   ignoredScrollableRef scroll events inside this element are ignored.
+- */
+-function useThrottledWindowScrollOrResize( handler, ignoredScrollableRef ) {
+-	// Refresh anchor rect on resize
+-	useEffect( () => {
+-		let refreshHandle;
+-		const throttledRefresh = ( event ) => {
+-			window.cancelAnimationFrame( refreshHandle );
+-			if ( ignoredScrollableRef && event && event.type === 'scroll' && ignoredScrollableRef.current.contains( event.target ) ) {
+-				return;
+-			}
+-			refreshHandle = window.requestAnimationFrame( handler );
+-		};
+-
+-		window.addEventListener( 'resize', throttledRefresh );
+-		window.addEventListener( 'scroll', throttledRefresh, true );
+-
+-		return () => {
+-			window.removeEventListener( 'resize', throttledRefresh );
+-			window.removeEventListener( 'scroll', throttledRefresh, true );
+-		};
+-	}, [] );
+-}
+-
+ function computeAnchorRect(
+ 	anchorRefFallback,
+ 	anchorRect,
+@@ -150,145 +121,6 @@ function withoutPadding( rect, element ) {
+ 	};
+ }
+ 
+-/**
+- * Hook used to compute and update the anchor position properly.
+- *
+- * @param {Object}        anchorRefFallback          Reference to the popover anchor fallback element.
+- * @param {Object}        contentRef                 Reference to the popover content element.
+- * @param {Object}        anchorRect                 Anchor Rect prop used to override the computed value.
+- * @param {Function}      getAnchorRect              Function used to override the anchor value computation algorithm.
+- * @param {Element|Range} anchorRef                  A live element or range reference.
+- * @param {boolean}       shouldAnchorIncludePadding Whether to include the anchor padding.
+- * @param {number}        anchorVerticalBuffer       Vertical buffer for the anchor.
+- * @param {number}        anchorHorizontalBuffer     Horizontal buffer for the anchor.
+- *
+- * @return {Object} Anchor position.
+- */
+-function useAnchor(
+-	anchorRefFallback,
+-	contentRef,
+-	anchorRect,
+-	getAnchorRect,
+-	anchorRef,
+-	shouldAnchorIncludePadding,
+-	anchorVerticalBuffer,
+-	anchorHorizontalBuffer
+-) {
+-	const [ anchor, setAnchor ] = useState( null );
+-	const refreshAnchorRect = () => {
+-		let newAnchor = computeAnchorRect(
+-			anchorRefFallback,
+-			anchorRect,
+-			getAnchorRect,
+-			anchorRef,
+-			shouldAnchorIncludePadding
+-		);
+-
+-		newAnchor = addBuffer(
+-			newAnchor,
+-			anchorVerticalBuffer,
+-			anchorHorizontalBuffer
+-		);
+-
+-		if ( ! isShallowEqual( newAnchor, anchor ) ) {
+-			setAnchor( newAnchor );
+-		}
+-	};
+-	useEffect( refreshAnchorRect, [ anchorRect, getAnchorRect ] );
+-	useEffect( () => {
+-		if ( ! anchorRect ) {
+-			/*
+-			* There are sometimes we need to reposition or resize the popover that are not
+-			* handled by the resize/scroll window events (i.e. CSS changes in the layout
+-			* that changes the position of the anchor).
+-			*
+-			* For these situations, we refresh the popover every 0.5s
+-			*/
+-			const intervalHandle = setInterval( refreshAnchorRect, 500 );
+-
+-			return () => clearInterval( intervalHandle );
+-		}
+-	}, [ anchorRect ] );
+-
+-	useThrottledWindowScrollOrResize( refreshAnchorRect, contentRef );
+-
+-	return anchor;
+-}
+-
+-/**
+- * Hook used to compute the initial size of an element.
+- * The popover applies styling to limit the height of the element,
+- * we only care about the initial size.
+- *
+- * @param {Object} ref Reference to the popover content element.
+- *
+- * @return {Object} Content size.
+- */
+-function useInitialContentSize( ref ) {
+-	const [ contentSize, setContentSize ] = useState( null );
+-	useEffect( () => {
+-		const contentRect = ref.current.getBoundingClientRect();
+-		setContentSize( {
+-			width: contentRect.width,
+-			height: contentRect.height,
+-		} );
+-	}, [] );
+-
+-	return contentSize;
+-}
+-
+-/**
+- * Hook used to compute and update the position of the popover
+- * based on the anchor position and the content size.
+- *
+- * @param {Object}  anchor          Anchor Position.
+- * @param {Object}  contentSize     Content Size.
+- * @param {string}  position        Position prop.
+- * @param {boolean} expandOnMobile  Whether to show the popover full width on mobile.
+- * @param {Object}  contentRef      Reference to the popover content element.
+- *
+- * @return {Object} Popover position.
+- */
+-function usePopoverPosition( anchor, contentSize, position, expandOnMobile, contentRef ) {
+-	const [ popoverPosition, setPopoverPosition ] = useState( {
+-		popoverLeft: null,
+-		popoverTop: null,
+-		yAxis: 'top',
+-		xAxis: 'center',
+-		contentHeight: null,
+-		contentWidth: null,
+-		isMobile: false,
+-	} );
+-	const refreshPopoverPosition = () => {
+-		if ( ! anchor || ! contentSize ) {
+-			return;
+-		}
+-
+-		const newPopoverPosition = computePopoverPosition(
+-			anchor,
+-			contentSize,
+-			position,
+-			expandOnMobile
+-		);
+-
+-		if (
+-			popoverPosition.yAxis !== newPopoverPosition.yAxis ||
+-			popoverPosition.xAxis !== newPopoverPosition.xAxis ||
+-			popoverPosition.popoverLeft !== newPopoverPosition.popoverLeft ||
+-			popoverPosition.popoverTop !== newPopoverPosition.popoverTop ||
+-			popoverPosition.contentHeight !== newPopoverPosition.contentHeight ||
+-			popoverPosition.contentWidth !== newPopoverPosition.contentWidth ||
+-			popoverPosition.isMobile !== newPopoverPosition.isMobile
+-		) {
+-			setPopoverPosition( newPopoverPosition );
+-		}
+-	};
+-	useEffect( refreshPopoverPosition, [ anchor, contentSize ] );
+-	useThrottledWindowScrollOrResize( refreshPopoverPosition, contentRef );
+-
+-	return popoverPosition;
+-}
+-
+ /**
+  * Hook used to focus the first tabbable element on mount.
+  *
+@@ -313,6 +145,7 @@ function useFocusContentOnMount( focusOnMount, contentRef ) {
+ 			// Find first tabbable node within content and shift focus, falling
+ 			// back to the popover panel itself.
+ 				const firstTabbable = focus.tabbable.find( contentRef.current )[ 0 ];
++
+ 				if ( firstTabbable ) {
+ 					firstTabbable.focus();
+ 				} else {
+@@ -361,38 +194,110 @@ const Popover = ( {
+ } ) => {
+ 	const anchorRefFallback = useRef( null );
+ 	const contentRef = useRef( null );
++	const containerRef = useRef();
++	const [ isMobileViewport, setIsMobileViewport ] = useState( false );
++	const [ animateOrigin, setAnimateOrigin ] = useState();
++
++	useEffect( () => {
++		const resize = () => setIsMobileViewport( window.innerWidth < 782 );
++		window.addEventListener( 'resize', resize );
++		return () => window.removeEventListener( 'resize', resize );
++	} );
++
++	useEffect( () => {
++		if ( isMobileViewport && expandOnMobile ) {
++			return;
++		}
++
++		const refresh = () => {
++			let anchor = computeAnchorRect(
++				anchorRefFallback,
++				anchorRect,
++				getAnchorRect,
++				anchorRef,
++				shouldAnchorIncludePadding
++			);
++
++			if ( ! anchor ) {
++				return;
++			}
++
++			anchor = addBuffer(
++				anchor,
++				anchorVerticalBuffer,
++				anchorHorizontalBuffer
++			);
++
++			const contentSize = {
++				height: contentRef.current.scrollHeight,
++				width: contentRef.current.scrollWidth,
++			};
++			const {
++				popoverTop,
++				popoverLeft,
++				xAxis,
++				yAxis,
++				contentHeight,
++				contentWidth,
++			} = computePopoverPosition( anchor, contentSize, position );
++
++			// Compute the animation position
++			const yAxisMapping = {
++				top: 'bottom',
++				bottom: 'top',
++			};
++			const xAxisMapping = {
++				left: 'right',
++				right: 'left',
++			};
++			const animateYAxis = yAxisMapping[ yAxis ] || 'middle';
++			const animateXAxis = xAxisMapping[ xAxis ] || 'center';
++
++			containerRef.current.setAttribute( 'data-x-axis', xAxis );
++			containerRef.current.setAttribute( 'data-y-axis', yAxis );
++			containerRef.current.style.top = popoverTop + 'px';
++			containerRef.current.style.left = popoverLeft + 'px';
++			contentRef.current.style.maxHeight = contentHeight ? contentHeight + 'px' : '';
++			contentRef.current.style.maxWidth = contentWidth ? contentWidth + 'px' : '';
++
++			if ( xAxis === 'center' && yAxis === 'middle' ) {
++				contentRef.current.classList.add( 'is-without-arrow' );
++			} else {
++				contentRef.current.classList.remove( 'is-without-arrow' );
++			}
++
++			setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
++		};
+ 
+-	// Animation
+-	const [ isReadyToAnimate, setIsReadyToAnimate ] = useState( false );
++		refresh();
++
++		/*
++		 * There are sometimes we need to reposition or resize the popover that
++		 * are not handled by the resize/scroll window events (i.e. CSS changes
++		 * in the layout that changes the position of the anchor).
++		 *
++		 * For these situations, we refresh the popover every 0.5s
++		 */
++		const intervalHandle = window.setInterval( refresh, 500 );
++		window.addEventListener( 'resize', refresh );
++		window.addEventListener( 'scroll', refresh, true );
+ 
+-	// Anchor position
+-	const anchor = useAnchor(
+-		anchorRefFallback,
+-		contentRef,
++		return () => {
++			window.clearInterval( intervalHandle );
++			window.removeEventListener( 'resize', refresh );
++			window.removeEventListener( 'scroll', refresh, true );
++		};
++	}, [
++		isMobileViewport,
++		expandOnMobile,
+ 		anchorRect,
+ 		getAnchorRect,
+ 		anchorRef,
+ 		shouldAnchorIncludePadding,
+ 		anchorVerticalBuffer,
+-		anchorHorizontalBuffer
+-	);
+-
+-	// Content size
+-	const contentSize = useInitialContentSize( contentRef );
+-	useEffect( () => {
+-		if ( contentSize ) {
+-			setIsReadyToAnimate( true );
+-		}
+-	}, [ contentSize ] );
+-
+-	// Compute the position
+-	const popoverPosition = usePopoverPosition(
+-		anchor,
+-		contentSize,
++		anchorHorizontalBuffer,
+ 		position,
+-		expandOnMobile,
+-		contentRef
+-	);
++	] );
+ 
+ 	useFocusContentOnMount( focusOnMount, contentRef );
+ 
+@@ -451,53 +356,31 @@ const Popover = ( {
+ 		onClickOutside( clickEvent );
+ 	}
+ 
+-	// Compute the animation position
+-	const yAxisMapping = {
+-		top: 'bottom',
+-		bottom: 'top',
+-	};
+-	const xAxisMapping = {
+-		left: 'right',
+-		right: 'left',
+-	};
+-	const animateYAxis = yAxisMapping[ popoverPosition.yAxis ] || 'middle';
+-	const animateXAxis = xAxisMapping[ popoverPosition.xAxis ] || 'center';
+-
+-	const classes = classnames(
+-		'components-popover',
+-		className,
+-		'is-' + popoverPosition.yAxis,
+-		'is-' + popoverPosition.xAxis,
+-		{
+-			'is-mobile': popoverPosition.isMobile,
+-			'is-without-arrow': noArrow || (
+-				popoverPosition.xAxis === 'center' &&
+-				popoverPosition.yAxis === 'middle'
+-			),
+-		}
+-	);
+-
+ 	// Disable reason: We care to capture the _bubbled_ events from inputs
+ 	// within popover as inferring close intent.
+ 
+ 	let content = (
+ 		<PopoverDetectOutside onFocusOutside={ handleOnFocusOutside }>
+ 			<Animate
+-				type={ animate && isReadyToAnimate ? 'appear' : null }
+-				options={ { origin: animateYAxis + ' ' + animateXAxis } }
++				type={ animate && animateOrigin ? 'appear' : null }
++				options={ { origin: animateOrigin } }
+ 			>
+ 				{ ( { className: animateClassName } ) => (
+ 					<IsolatedEventContainer
+-						className={ classnames( classes, animateClassName ) }
+-						style={ {
+-							top: ! popoverPosition.isMobile && popoverPosition.popoverTop ? popoverPosition.popoverTop + 'px' : undefined,
+-							left: ! popoverPosition.isMobile && popoverPosition.popoverLeft ? popoverPosition.popoverLeft + 'px' : undefined,
+-							visibility: contentSize ? undefined : 'hidden',
+-						} }
++						className={ classnames(
++							'components-popover',
++							className,
++							animateClassName,
++							{
++								'is-mobile': isMobileViewport && expandOnMobile,
++								'is-without-arrow': noArrow,
++							}
++						) }
+ 						{ ...contentProps }
+ 						onKeyDown={ maybeClose }
++						ref={ containerRef }
+ 					>
+-						{ popoverPosition.isMobile && (
++						{ isMobileViewport && expandOnMobile && (
+ 							<div className="components-popover__header">
+ 								<span className="components-popover__header-title">
+ 									{ headerTitle }
+@@ -508,10 +391,6 @@ const Popover = ( {
+ 						<div
+ 							ref={ contentRef }
+ 							className="components-popover__content"
+-							style={ {
+-								maxHeight: ! popoverPosition.isMobile && popoverPosition.contentHeight ? popoverPosition.contentHeight + 'px' : undefined,
+-								maxWidth: ! popoverPosition.isMobile && popoverPosition.contentWidth ? popoverPosition.contentWidth + 'px' : undefined,
+-							} }
+ 							tabIndex="-1"
+ 						>
+ 							{ children }
+@@ -540,7 +419,7 @@ const Popover = ( {
+ 				return (
+ 					<span ref={ anchorRefFallback }>
+ 						{ content }
+-						{ popoverPosition.isMobile && expandOnMobile && <ScrollLock /> }
++						{ isMobileViewport && expandOnMobile && <ScrollLock /> }
+ 					</span>
+ 				);
+ 			} }
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index 4312f89fe84f9c..2da4d0f988ba41 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -33,7 +33,7 @@ $arrow-size: 8px;
+ 			line-height: 0;
+ 		}
+ 
+-		&.is-top {
++		&[data-y-axis="top"] {
+ 			margin-top: - $arrow-size;
+ 
+ 			&::before {
+@@ -54,7 +54,7 @@ $arrow-size: 8px;
+ 			}
+ 		}
+ 
+-		&.is-bottom {
++		&[data-y-axis="bottom"] {
+ 			margin-top: $arrow-size;
+ 
+ 			&::before {
+@@ -75,7 +75,7 @@ $arrow-size: 8px;
+ 			}
+ 		}
+ 
+-		&.is-middle.is-left {
++		&[data-y-axis="middle"][data-x-axis="left"] {
+ 			margin-left: -$arrow-size;
+ 
+ 			&::before {
+@@ -95,7 +95,7 @@ $arrow-size: 8px;
+ 			}
+ 		}
+ 
+-		&.is-middle.is-right {
++		&[data-y-axis="middle"][data-x-axis="right"] {
+ 			margin-left: $arrow-size;
+ 
+ 			&::before {
+@@ -117,15 +117,15 @@ $arrow-size: 8px;
+ 	}
+ 
+ 	&:not(.is-mobile) {
+-		&.is-top {
++		&[data-y-axis="top"] {
+ 			bottom: 100%;
+ 		}
+ 
+-		&.is-bottom {
++		&[data-y-axis="bottom"] {
+ 			top: 100%;
+ 		}
+ 
+-		&.is-middle {
++		&[data-y-axis="middle"] {
+ 			align-items: center;
+ 			display: flex;
+ 		}
+@@ -150,30 +150,30 @@ $arrow-size: 8px;
+ 		min-width: 260px;
+ 	}
+ 
+-	.components-popover:not(.is-mobile).is-top & {
++	.components-popover:not(.is-mobile)[data-y-axis="top"] & {
+ 		bottom: 100%;
+ 	}
+ 
+-	.components-popover:not(.is-mobile).is-center & {
++	.components-popover:not(.is-mobile)[data-x-axis="center"] & {
+ 		left: 50%;
+ 		transform: translateX(-50%);
+ 	}
+ 
+-	.components-popover:not(.is-mobile).is-right & {
++	.components-popover:not(.is-mobile)[data-x-axis="right"] & {
+ 		position: absolute;
+ 		left: 100%;
+ 	}
+ 
+-	.components-popover:not(.is-mobile):not(.is-middle).is-right & {
++	.components-popover:not(.is-mobile):not([data-y-axis="middle"])[data-x-axis="right"] & {
+ 		margin-left: -24px;
+ 	}
+ 
+-	.components-popover:not(.is-mobile).is-left & {
++	.components-popover:not(.is-mobile)[data-x-axis="left"] & {
+ 		position: absolute;
+ 		right: 100%;
+ 	}
+ 
+-	.components-popover:not(.is-mobile):not(.is-middle).is-left & {
++	.components-popover:not(.is-mobile):not([data-y-axis="middle"])[data-x-axis="left"] & {
+ 		margin-right: -24px;
+ 	}
+ }
+@@ -183,6 +183,17 @@ $arrow-size: 8px;
+ 	height: 100%;
+ }
+ 
++// Hide the popover element until the position has been calculated. The position
++// cannot be calculated until the popover element is rendered because the
++// position depends on the size of the popover.
++.components-popover {
++	opacity: 0;
++}
++
++.components-popover[data-x-axis][data-y-axis] {
++	opacity: 1;
++}
++
+ .components-popover__header {
+ 	align-items: center;
+ 	background: $white;
+diff --git a/packages/components/src/popover/test/__snapshots__/index.js.snap b/packages/components/src/popover/test/__snapshots__/index.js.snap
+index 614f2dd55e5ee5..cb1d263c4aa0fa 100644
+--- a/packages/components/src/popover/test/__snapshots__/index.js.snap
++++ b/packages/components/src/popover/test/__snapshots__/index.js.snap
+@@ -8,9 +8,11 @@ exports[`Popover should pass additional props to portaled element 1`] = `
+     <div>
+       <div>
+         <div
+-          class="components-popover is-bottom is-center components-animate__appear is-from-top"
++          class="components-popover components-animate__appear is-from-top is-from-center"
++          data-x-axis="center"
++          data-y-axis="bottom"
+           role="tooltip"
+-          style=""
++          style="top: 0px; left: 0px;"
+         >
+           <div
+             class="components-popover__content"
+@@ -33,8 +35,10 @@ exports[`Popover should render content 1`] = `
+     <div>
+       <div>
+         <div
+-          class="components-popover is-bottom is-center components-animate__appear is-from-top"
+-          style=""
++          class="components-popover components-animate__appear is-from-top is-from-center"
++          data-x-axis="center"
++          data-y-axis="bottom"
++          style="top: 0px; left: 0px;"
+         >
+           <div
+             class="components-popover__content"
+diff --git a/packages/components/src/popover/test/utils.js b/packages/components/src/popover/test/utils.js
+index 3c491fa98d9a54..670d1ac2e2624b 100644
+--- a/packages/components/src/popover/test/utils.js
++++ b/packages/components/src/popover/test/utils.js
+@@ -188,29 +188,6 @@ describe( 'computePopoverPosition', () => {
+ 			contentHeight: null,
+ 			popoverTop: 30,
+ 			yAxis: 'bottom',
+-			isMobile: false,
+ 		} );
+ 	} );
+-
+-	it( 'should set isMobile to true on small viewPosts', () => {
+-		const originalWidth = window.innerWidth;
+-
+-		const anchorRect = {
+-			top: 10,
+-			left: 10,
+-			bottom: 30,
+-			right: 30,
+-			width: 20,
+-			height: 20,
+-		};
+-
+-		const contentSize = {
+-			width: 200,
+-			height: 300,
+-		};
+-
+-		window.innerWidth = 200;
+-		expect( computePopoverPosition( anchorRect, contentSize, 'bottom right', true ).isMobile ).toBe( true );
+-		window.innerWidth = originalWidth;
+-	} );
+ } );
+diff --git a/packages/components/src/popover/utils.js b/packages/components/src/popover/utils.js
+index 1b71fab09aa574..9379e6d2786c09 100644
+--- a/packages/components/src/popover/utils.js
++++ b/packages/components/src/popover/utils.js
+@@ -3,7 +3,6 @@
+  * Module constants
+  */
+ const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
+-const isMobileViewport = () => window.innerWidth < 782;
+ const isRTL = () => document.documentElement.dir === 'rtl';
+ 
+ /**
+@@ -144,18 +143,16 @@ export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis ) {
+  * @param {Object} anchorRect       Anchor Rect.
+  * @param {Object} contentSize      Content Size.
+  * @param {string} position         Position.
+- * @param {boolean} expandOnMobile  Whether to expand the popover on mobile or not.
+  *
+  * @return {Object} Popover position and constraints.
+  */
+-export function computePopoverPosition( anchorRect, contentSize, position = 'top', expandOnMobile = false ) {
++export function computePopoverPosition( anchorRect, contentSize, position = 'top' ) {
+ 	const [ yAxis, xAxis = 'center' ] = position.split( ' ' );
+ 
+ 	const yAxisPosition = computePopoverYAxisPosition( anchorRect, contentSize, yAxis );
+ 	const xAxisPosition = computePopoverXAxisPosition( anchorRect, contentSize, xAxis, yAxisPosition.yAxis );
+ 
+ 	return {
+-		isMobile: isMobileViewport() && expandOnMobile,
+ 		...xAxisPosition,
+ 		...yAxisPosition,
+ 	};
+diff --git a/packages/components/src/tooltip/style.scss b/packages/components/src/tooltip/style.scss
+index 93642af8cf2052..eeb7382e4c0212 100644
+--- a/packages/components/src/tooltip/style.scss
++++ b/packages/components/src/tooltip/style.scss
+@@ -5,11 +5,11 @@
+ 		border-color: transparent;
+ 	}
+ 
+-	&.is-top::after {
++	&[data-y-axis="top"]::after {
+ 		border-top-color: $dark-gray-900;
+ 	}
+ 
+-	&.is-bottom::after {
++	&[data-y-axis="bottom"]::after {
+ 		border-bottom-color: $dark-gray-900;
+ 	}
+ 
+diff --git a/packages/nux/src/components/dot-tip/style.scss b/packages/nux/src/components/dot-tip/style.scss
+index e8e25b423830ca..c3b2a01448a89d 100644
+--- a/packages/nux/src/components/dot-tip/style.scss
++++ b/packages/nux/src/components/dot-tip/style.scss
+@@ -51,37 +51,37 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
+ 	}
+ 
+ 	// Position the dot right next to the edge of the button
+-	&.is-top {
++	&[data-y-axis="top"] {
+ 		margin-top: -$dot-size / 2;
+ 	}
+-	&.is-bottom {
++	&[data-y-axis="bottom"] {
+ 		margin-top: $dot-size / 2;
+ 	}
+-	&.is-middle.is-left {
++	&[data-y-axis="middle"][data-y-axis="left"] {
+ 		margin-left: -$dot-size / 2;
+ 	}
+-	&.is-middle.is-right {
++	&[data-y-axis="middle"][data-y-axis="right"] {
+ 		margin-left: $dot-size / 2;
+ 	}
+ 
+ 	// Position the tip content away from the dot
+-	&.is-top .components-popover__content {
++	&[data-y-axis="top"] .components-popover__content {
+ 		margin-bottom: 20px;
+ 	}
+-	&.is-bottom .components-popover__content {
++	&[data-y-axis="bottom"] .components-popover__content {
+ 		margin-top: 20px;
+ 	}
+-	&.is-middle.is-left .components-popover__content {
++	&[data-y-axis="middle"][data-y-axis="left"] .components-popover__content {
+ 		margin-right: 20px;
+ 	}
+-	&.is-middle.is-right .components-popover__content {
++	&[data-y-axis="middle"][data-y-axis="right"] .components-popover__content {
+ 		margin-left: 20px;
+ 	}
+ 
+ 	// Extra specificity so that we can override the styles in .component-popover
+-	&:not(.is-mobile).is-left,
+-	&:not(.is-mobile).is-center,
+-	&:not(.is-mobile).is-right {
++	&:not(.is-mobile)[data-y-axis="left"],
++	&:not(.is-mobile)[data-y-axis="center"],
++	&:not(.is-mobile)[data-y-axis="right"] {
+ 		// Position tips above popovers
+ 		z-index: z-index(".nux-dot-tip");
+ 
+@@ -99,22 +99,22 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
+ 		}
+ 	}
+ 
+-	&.components-popover:not(.is-mobile):not(.is-middle).is-right .components-popover__content {
++	&.components-popover:not(.is-mobile):not([data-y-axis="middle"])[data-y-axis="right"] .components-popover__content {
+ 		/*!rtl:ignore*/
+ 		margin-left: 0;
+ 	}
+ 
+-	&.components-popover:not(.is-mobile):not(.is-middle).is-left .components-popover__content {
++	&.components-popover:not(.is-mobile):not([data-y-axis="middle"])[data-y-axis="left"] .components-popover__content {
+ 		/*!rtl:ignore*/
+ 		margin-right: 0;
+ 	}
+ 
+-	&.components-popover.edit-post-more-menu__content:not(.is-mobile):not(.is-middle).is-right .components-popover__content {
++	&.components-popover.edit-post-more-menu__content:not(.is-mobile):not([data-y-axis="middle"])[data-y-axis="right"] .components-popover__content {
+ 		/*!rtl:ignore*/
+ 		margin-left: -12px;
+ 	}
+ 
+-	&.components-popover.edit-post-more-menu__content:not(.is-mobile):not(.is-middle).is-left .components-popover__content {
++	&.components-popover.edit-post-more-menu__content:not(.is-mobile):not([data-y-axis="middle"])[data-y-axis="left"] .components-popover__content {
+ 		/*!rtl:ignore*/
+ 		margin-right: -12px;
+ 	}
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index 1c0741a0c3f8b7..ac42540a636b04 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -2449,25 +2449,12 @@ exports[`Storyshots Components|Popover Default 1`] = `
+         onTouchStart={[Function]}
+       >
+         <div
+-          className="components-popover is-top is-center"
++          className="components-popover"
+           onKeyDown={[Function]}
+           onMouseDown={[Function]}
+-          style={
+-            Object {
+-              "left": undefined,
+-              "top": undefined,
+-              "visibility": "hidden",
+-            }
+-          }
+         >
+           <div
+             className="components-popover__content"
+-            style={
+-              Object {
+-                "maxHeight": undefined,
+-                "maxWidth": undefined,
+-              }
+-            }
+             tabIndex="-1"
+           >
+             Popover Content
+@@ -2587,25 +2574,12 @@ exports[`Storyshots Components|Popover Positioning 1`] = `
+               onTouchStart={[Function]}
+             >
+               <div
+-                className="components-popover is-top is-center"
++                className="components-popover"
+                 onKeyDown={[Function]}
+                 onMouseDown={[Function]}
+-                style={
+-                  Object {
+-                    "left": undefined,
+-                    "top": undefined,
+-                    "visibility": "hidden",
+-                  }
+-                }
+               >
+                 <div
+                   className="components-popover__content"
+-                  style={
+-                    Object {
+-                      "maxHeight": undefined,
+-                      "maxWidth": undefined,
+-                    }
+-                  }
+                   tabIndex="-1"
+                 >
+                   Popover

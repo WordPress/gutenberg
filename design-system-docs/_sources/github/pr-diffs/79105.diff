@@ -1,0 +1,3238 @@
+diff --git a/docs/reference-guides/block-api/block-supports.md b/docs/reference-guides/block-api/block-supports.md
+index eda5b0102f4b67..3577e247ed98b9 100644
+--- a/docs/reference-guides/block-api/block-supports.md
++++ b/docs/reference-guides/block-api/block-supports.md
+@@ -682,6 +682,19 @@ attributes: {
+ }
+ ```
+ 
++## editableRoot
++
++-   Type: `boolean`
++-   Default value: `false`
++
++When set to `true`, the block declares that it keeps working when an ancestor
++element (the editor canvas) is the `contenteditable` editing host, with focus
++and the native selection residing there instead of on the block's own editable
++elements. The editor uses this to keep the canvas editable while such a block
++is selected, enabling native partial selection across blocks. Blocks that rely
++on `event.target` or DOM focus pointing at their own elements should not
++declare this support.
++
+ ## filter
+ 
+ -   Type: `Object`
+diff --git a/docs/reference-guides/core-blocks/README.md b/docs/reference-guides/core-blocks/README.md
+index 6c2d4aa4245df8..1d37f7feb604a9 100644
+--- a/docs/reference-guides/core-blocks/README.md
++++ b/docs/reference-guides/core-blocks/README.md
+@@ -616,7 +616,7 @@ Start with the basic building block of all narrative.
+ 
+ -	**Name:** [core/paragraph](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-paragraph/)
+ -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
+--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns, textIndent), ~~className~~
++-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), editableRoot, interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns, textIndent), ~~className~~
+ -	**Attributes:** content, direction, dropCap, placeholder
+ 
+ ## Pattern Placeholder
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/use-focus-first-element.js b/packages/block-editor/src/components/block-list/use-block-props/use-focus-first-element.js
+index 26f7cca2990d89..de00a7bcf35364 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/use-focus-first-element.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/use-focus-first-element.js
+@@ -29,9 +29,8 @@ import { unlock } from '../../../lock-unlock';
+  */
+ export function useFocusFirstElement( { clientId, initialPosition } ) {
+ 	const ref = useRef();
+-	const { isBlockSelected, isMultiSelecting, isZoomOut } = unlock(
+-		useSelect( blockEditorStore )
+-	);
++	const { isBlockSelected, isMultiSelecting, isZoomOut, getSelectionStart } =
++		unlock( useSelect( blockEditorStore ) );
+ 
+ 	useEffect( () => {
+ 		// Check if the block is still selected at the time this effect runs.
+@@ -58,6 +57,30 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
+ 			return;
+ 		}
+ 
++		// Do not move the caret when a focused editing host contains the
++		// block (the block supports `editableRoot`) and the selection is
++		// already inside the block, unless an edge position is explicitly
++		// requested while the block's rich text doesn't own the selection
++		// (the store selection carries no offsets for the block): the
++		// in-block selection is then left over from a previous state (e.g.
++		// after removing the focused block in between).
++		const { activeElement } = ownerDocument;
++		if (
++			activeElement?.isContentEditable &&
++			activeElement.contains( ref.current )
++		) {
++			const { clientId: selectionClientId, offset } = getSelectionStart();
++			const selection = ownerDocument.defaultView.getSelection();
++			if (
++				selection.anchorNode &&
++				ref.current.contains( selection.anchorNode ) &&
++				( initialPosition === 0 ||
++					( offset !== undefined && selectionClientId === clientId ) )
++			) {
++				return;
++			}
++		}
++
+ 		// Find all tabbables within node.
+ 		const textInputs = focus.tabbable
+ 			.find( ref.current )
+diff --git a/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js b/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js
+index 02d366b7d5cd9a..db06effeff975c 100644
+--- a/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js
++++ b/packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js
+@@ -27,6 +27,16 @@ export function useFocusHandler( clientId ) {
+ 
+ 	return useRefEffect(
+ 		( node ) => {
++			let isShiftMouseDown = false;
++
++			function onMouseDown( event ) {
++				isShiftMouseDown = event.shiftKey;
++			}
++
++			function onMouseUp() {
++				isShiftMouseDown = false;
++			}
++
+ 			/**
+ 			 * Marks the block as selected when focused and not already
+ 			 * selected. This specifically handles the case where block does not
+@@ -36,9 +46,12 @@ export function useFocusHandler( clientId ) {
+ 			 * @param {FocusEvent} event Focus event.
+ 			 */
+ 			function onFocus( event ) {
+-				// When the whole editor is editable, let writing flow handle
+-				// selection.
++				// When the whole editor is editable and a shift+click gesture
++				// is in progress, let writing flow handle (multi) selection.
++				// Without the shift key, focus within an editable wrapper
++				// still expresses the intent to select the block.
+ 				if (
++					isShiftMouseDown &&
+ 					node.parentElement.closest( '[contenteditable="true"]' )
+ 				) {
+ 					return;
+@@ -63,7 +76,27 @@ export function useFocusHandler( clientId ) {
+ 				selectBlock( clientId );
+ 			}
+ 
+-			return subscribeDelegatedListener( node, 'focusin', onFocus );
++			const unsubscribeFocus = subscribeDelegatedListener(
++				node,
++				'focusin',
++				onFocus
++			);
++			const unsubscribeMouseDown = subscribeDelegatedListener(
++				node,
++				'mousedown',
++				onMouseDown
++			);
++			const unsubscribeMouseUp = subscribeDelegatedListener(
++				node.ownerDocument,
++				'mouseup',
++				onMouseUp
++			);
++
++			return () => {
++				unsubscribeFocus();
++				unsubscribeMouseDown();
++				unsubscribeMouseUp();
++			};
+ 		},
+ 		[ isBlockSelected, selectBlock ]
+ 	);
+diff --git a/packages/block-editor/src/components/observe-typing/index.js b/packages/block-editor/src/components/observe-typing/index.js
+index b43bbf1b01fcf1..1d564f5018b700 100644
+--- a/packages/block-editor/src/components/observe-typing/index.js
++++ b/packages/block-editor/src/components/observe-typing/index.js
+@@ -176,7 +176,14 @@ export function useTypingObserver() {
+ 				}
+ 
+ 				node.addEventListener( 'focus', stopTypingOnNonTextField );
+-				node.addEventListener( 'keydown', stopTypingOnEscapeKey );
++				// Attached to the document: when a focused editing host
++				// containing the node holds the selection (`editableRoot`),
++				// key events target the host, which is an ancestor of the
++				// node, so they never reach a node-bound listener.
++				node.ownerDocument.addEventListener(
++					'keydown',
++					stopTypingOnEscapeKey
++				);
+ 
+ 				node.ownerDocument.addEventListener(
+ 					'selectionchange',
+@@ -189,7 +196,7 @@ export function useTypingObserver() {
+ 						'focus',
+ 						stopTypingOnNonTextField
+ 					);
+-					node.removeEventListener(
++					node.ownerDocument.removeEventListener(
+ 						'keydown',
+ 						stopTypingOnEscapeKey
+ 					);
+@@ -211,8 +218,13 @@ export function useTypingObserver() {
+ 
+ 				// Abort early if already typing, or key press is incurred outside a
+ 				// text field (e.g. arrow-ing through toolbar buttons).
+-				// Ignore typing if outside the current DOM container
+-				if ( ! isTextField( target ) || ! node.contains( target ) ) {
++				// Ignore typing if outside the current DOM container, unless
++				// the target is a focused editing host containing it
++				// (`editableRoot`): key events then target the host.
++				if (
++					! isTextField( target ) ||
++					! ( node.contains( target ) || target.contains( node ) )
++				) {
+ 					return;
+ 				}
+ 
+@@ -230,12 +242,23 @@ export function useTypingObserver() {
+ 				startTyping();
+ 			}
+ 
+-			node.addEventListener( 'keypress', startTypingInTextField );
+-			node.addEventListener( 'keydown', startTypingInTextField );
++			// See the note above about the document-bound keydown listener.
++			const { ownerDocument } = node;
++			ownerDocument.addEventListener(
++				'keypress',
++				startTypingInTextField
++			);
++			ownerDocument.addEventListener( 'keydown', startTypingInTextField );
+ 
+ 			return () => {
+-				node.removeEventListener( 'keypress', startTypingInTextField );
+-				node.removeEventListener( 'keydown', startTypingInTextField );
++				ownerDocument.removeEventListener(
++					'keypress',
++					startTypingInTextField
++				);
++				ownerDocument.removeEventListener(
++					'keydown',
++					startTypingInTextField
++				);
+ 			};
+ 		},
+ 		[ isTyping, startTyping, stopTyping ]
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/before-input-rules.js b/packages/block-editor/src/components/rich-text/event-listeners/before-input-rules.js
+index 436d3d8994ff33..82ca88212e3f6a 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/before-input-rules.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/before-input-rules.js
+@@ -1,9 +1,12 @@
+ /**
+  * WordPress dependencies
+  */
+-import { insert, isCollapsed } from '@wordpress/rich-text';
++import {
++	insert,
++	isCollapsed,
++	privateApis as richTextPrivateApis,
++} from '@wordpress/rich-text';
+ import { applyFilters } from '@wordpress/hooks';
+-import { privateApis as composePrivateApis } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -11,7 +14,7 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
+ import { store as blockEditorStore } from '../../../store';
+ import { unlock } from '../../../lock-unlock';
+ 
+-const { subscribeDelegatedListener } = unlock( composePrivateApis );
++const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+ 
+ /**
+  * When typing over a selection, the selection will we wrapped by a matching
+@@ -84,10 +87,10 @@ export default ( props ) => ( element ) => {
+ 		// call few lines above has fully updated the data store state and rerendered
+ 		// all affected components.
+ 		window.queueMicrotask( () => {
+-			event.target.dispatchEvent( newEvent );
++			element.dispatchEvent( newEvent );
+ 		} );
+ 		event.preventDefault();
+ 	}
+ 
+-	return subscribeDelegatedListener( element, 'beforeinput', onInput, true );
++	return subscribeOwnedListener( element, 'beforeinput', onInput, true );
+ };
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/delete.js b/packages/block-editor/src/components/rich-text/event-listeners/delete.js
+index 6445ca55bfcc16..a3f7507b9e06c6 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/delete.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/delete.js
+@@ -2,15 +2,18 @@
+  * WordPress dependencies
+  */
+ import { DELETE, BACKSPACE } from '@wordpress/keycodes';
+-import { isCollapsed, isEmpty } from '@wordpress/rich-text';
+-import { privateApis as composePrivateApis } from '@wordpress/compose';
++import {
++	isCollapsed,
++	isEmpty,
++	privateApis as richTextPrivateApis,
++} from '@wordpress/rich-text';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { unlock } from '../../../lock-unlock';
+ 
+-const { subscribeDelegatedListener } = unlock( composePrivateApis );
++const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+ 
+ export default ( props ) => ( element ) => {
+ 	function onKeyDown( event ) {
+@@ -54,5 +57,5 @@ export default ( props ) => ( element ) => {
+ 		}
+ 	}
+ 
+-	return subscribeDelegatedListener( element, 'keydown', onKeyDown );
++	return subscribeOwnedListener( element, 'keydown', onKeyDown );
+ };
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/enter.js b/packages/block-editor/src/components/rich-text/event-listeners/enter.js
+index 104b82f00b1572..b0ed2d5d214e36 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/enter.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/enter.js
+@@ -2,7 +2,11 @@
+  * WordPress dependencies
+  */
+ import { ENTER } from '@wordpress/keycodes';
+-import { insert, remove } from '@wordpress/rich-text';
++import {
++	insert,
++	remove,
++	privateApis as richTextPrivateApis,
++} from '@wordpress/rich-text';
+ import { privateApis as composePrivateApis } from '@wordpress/compose';
+ 
+ /**
+@@ -10,6 +14,7 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
+  */
+ import { unlock } from '../../../lock-unlock';
+ 
++const { subscribeOwnedListener, ownsSelection } = unlock( richTextPrivateApis );
+ const { subscribeDelegatedListener } = unlock( composePrivateApis );
+ 
+ export default ( props ) => ( element ) => {
+@@ -31,8 +36,9 @@ export default ( props ) => ( element ) => {
+ 		}
+ 
+ 		// The event listener is attached to the window, so we need to check if
+-		// the target is the element.
+-		if ( event.target !== element ) {
++		// the target is the element, or whether the element owns the
++		// selection through a focused editing host.
++		if ( event.target !== element && ! ownsSelection( element ) ) {
+ 			return;
+ 		}
+ 
+@@ -90,7 +96,7 @@ export default ( props ) => ( element ) => {
+ 	);
+ 	// Capture phase so this runs before ancestor (writing flow) bubble
+ 	// handlers, matching the timing of the previous raw element listener.
+-	const unsubscribeKeyDownDeprecated = subscribeDelegatedListener(
++	const unsubscribeKeyDownDeprecated = subscribeOwnedListener(
+ 		element,
+ 		'keydown',
+ 		onKeyDownDeprecated,
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/input-events.js b/packages/block-editor/src/components/rich-text/event-listeners/input-events.js
+index 80e88cfa99dd23..58a3dc17cbf6eb 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/input-events.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/input-events.js
+@@ -1,14 +1,15 @@
+ /**
+  * WordPress dependencies
+  */
+-import { privateApis as composePrivateApis } from '@wordpress/compose';
++
++import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { unlock } from '../../../lock-unlock';
+ 
+-const { subscribeDelegatedListener } = unlock( composePrivateApis );
++const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+ 
+ export default ( props ) => ( element ) => {
+ 	const { inputEvents } = props.current;
+@@ -18,5 +19,5 @@ export default ( props ) => ( element ) => {
+ 		}
+ 	}
+ 
+-	return subscribeDelegatedListener( element, 'input', onInput );
++	return subscribeOwnedListener( element, 'input', onInput );
+ };
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/input-rules.js b/packages/block-editor/src/components/rich-text/event-listeners/input-rules.js
+index ef6f486096f905..d831ee4e82a26a 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/input-rules.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/input-rules.js
+@@ -1,9 +1,12 @@
+ /**
+  * WordPress dependencies
+  */
+-import { insert, toHTMLString } from '@wordpress/rich-text';
++import {
++	insert,
++	toHTMLString,
++	privateApis as richTextPrivateApis,
++} from '@wordpress/rich-text';
+ import { getBlockTransforms, findTransform } from '@wordpress/blocks';
+-import { privateApis as composePrivateApis } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+@@ -16,7 +19,7 @@ import {
+ } from '../../../utils/selection';
+ import { unlock } from '../../../lock-unlock';
+ 
+-const { subscribeDelegatedListener } = unlock( composePrivateApis );
++const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+ 
+ export function findSelection( blocks ) {
+ 	let i = blocks.length;
+@@ -160,13 +163,13 @@ export default ( props ) => ( element ) => {
+ 
+ 	// Capture phase so these run before ancestor (writing flow) bubble
+ 	// handlers, matching the timing of the previous raw element listeners.
+-	const unsubscribeInput = subscribeDelegatedListener(
++	const unsubscribeInput = subscribeOwnedListener(
+ 		element,
+ 		'input',
+ 		onInput,
+ 		true
+ 	);
+-	const unsubscribeCompositionEnd = subscribeDelegatedListener(
++	const unsubscribeCompositionEnd = subscribeOwnedListener(
+ 		element,
+ 		'compositionend',
+ 		onInput,
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/insert-replacement-text.js b/packages/block-editor/src/components/rich-text/event-listeners/insert-replacement-text.js
+index af0b144c5a29d9..bf74207c91a967 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/insert-replacement-text.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/insert-replacement-text.js
+@@ -1,7 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import { privateApis as composePrivateApis } from '@wordpress/compose';
++
++import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+ 
+ /**
+  * Internal dependencies
+@@ -9,7 +10,7 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
+ import { store as blockEditorStore } from '../../../store';
+ import { unlock } from '../../../lock-unlock';
+ 
+-const { subscribeDelegatedListener } = unlock( composePrivateApis );
++const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+ 
+ /**
+  * When the browser is about to auto correct, add an undo level so the user can
+@@ -29,5 +30,5 @@ export default ( props ) => ( element ) => {
+ 			.__unstableMarkLastChangeAsPersistent();
+ 	}
+ 
+-	return subscribeDelegatedListener( element, 'beforeinput', onInput );
++	return subscribeOwnedListener( element, 'beforeinput', onInput );
+ };
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/paste-handler.js b/packages/block-editor/src/components/rich-text/event-listeners/paste-handler.js
+index 7672b792f45e26..55d72fd6e3c9fb 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/paste-handler.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/paste-handler.js
+@@ -2,7 +2,12 @@
+  * WordPress dependencies
+  */
+ import { pasteHandler } from '@wordpress/blocks';
+-import { isEmpty, insert, create } from '@wordpress/rich-text';
++import {
++	isEmpty,
++	insert,
++	create,
++	privateApis as richTextPrivateApis,
++} from '@wordpress/rich-text';
+ import { isURL } from '@wordpress/url';
+ import { privateApis as composePrivateApis } from '@wordpress/compose';
+ 
+@@ -15,6 +20,7 @@ import { getPasteEventData } from '../../../utils/pasting';
+ import { unlock } from '../../../lock-unlock';
+ 
+ const { subscribeDelegatedListener } = unlock( composePrivateApis );
++const { ownsSelection } = unlock( richTextPrivateApis );
+ 
+ /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
+ 
+@@ -23,7 +29,7 @@ export default ( props ) => ( element ) => {
+ 		const {
+ 			disableFormats,
+ 			onChange,
+-			value,
++			getValue,
+ 			formatTypes,
+ 			tagName,
+ 			onReplace,
+@@ -34,8 +40,14 @@ export default ( props ) => ( element ) => {
+ 		} = props.current;
+ 
+ 		// The event listener is attached to the window, so we need to check if
+-		// the target is the element or inside the element.
+-		if ( ! element.contains( event.target ) ) {
++		// the target is the element or inside the element. When the editable
++		// wrapper holds focus (the selected block supports `editableRoot`),
++		// the event targets the wrapper instead; the element then owns the
++		// paste when it contains the selection.
++		if (
++			! element.contains( event.target ) &&
++			! ownsSelection( element )
++		) {
+ 			return;
+ 		}
+ 
+@@ -43,6 +55,10 @@ export default ( props ) => ( element ) => {
+ 			return;
+ 		}
+ 
++		// Read the live record: the value bound at render time may not yet
++		// reflect a selection change that happened in the same task.
++		const value = getValue();
++
+ 		const { plainText, html } = getPasteEventData( event );
+ 
+ 		event.preventDefault();
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/remove-browser-shortcuts.js b/packages/block-editor/src/components/rich-text/event-listeners/remove-browser-shortcuts.js
+index a3e336f30ab441..b9ecd4aa654322 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/remove-browser-shortcuts.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/remove-browser-shortcuts.js
+@@ -2,14 +2,15 @@
+  * WordPress dependencies
+  */
+ import { isKeyboardEvent } from '@wordpress/keycodes';
+-import { privateApis as composePrivateApis } from '@wordpress/compose';
++
++import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { unlock } from '../../../lock-unlock';
+ 
+-const { subscribeDelegatedListener } = unlock( composePrivateApis );
++const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+ 
+ /**
+  * Hook to prevent default behaviors for key combinations otherwise handled
+@@ -25,5 +26,5 @@ export default () => ( node ) => {
+ 			event.preventDefault();
+ 		}
+ 	}
+-	return subscribeDelegatedListener( node, 'keydown', onKeydown, true );
++	return subscribeOwnedListener( node, 'keydown', onKeydown, true );
+ };
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/shortcuts.js b/packages/block-editor/src/components/rich-text/event-listeners/shortcuts.js
+index 6097ecf7c526e1..609b9e4e76ebf4 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/shortcuts.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/shortcuts.js
+@@ -1,14 +1,15 @@
+ /**
+  * WordPress dependencies
+  */
+-import { privateApis as composePrivateApis } from '@wordpress/compose';
++
++import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { unlock } from '../../../lock-unlock';
+ 
+-const { subscribeDelegatedListener } = unlock( composePrivateApis );
++const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+ 
+ export default ( props ) => ( element ) => {
+ 	const { keyboardShortcuts } = props.current;
+@@ -18,5 +19,5 @@ export default ( props ) => ( element ) => {
+ 		}
+ 	}
+ 
+-	return subscribeDelegatedListener( element, 'keydown', onKeyDown, true );
++	return subscribeOwnedListener( element, 'keydown', onKeyDown, true );
+ };
+diff --git a/packages/block-editor/src/components/rich-text/event-listeners/undo-automatic-change.js b/packages/block-editor/src/components/rich-text/event-listeners/undo-automatic-change.js
+index dc6b99409c35bf..8ebf33b2065fef 100644
+--- a/packages/block-editor/src/components/rich-text/event-listeners/undo-automatic-change.js
++++ b/packages/block-editor/src/components/rich-text/event-listeners/undo-automatic-change.js
+@@ -2,7 +2,8 @@
+  * WordPress dependencies
+  */
+ import { BACKSPACE, ESCAPE } from '@wordpress/keycodes';
+-import { privateApis as composePrivateApis } from '@wordpress/compose';
++
++import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+ 
+ /**
+  * Internal dependencies
+@@ -10,7 +11,7 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
+ import { store as blockEditorStore } from '../../../store';
+ import { unlock } from '../../../lock-unlock';
+ 
+-const { subscribeDelegatedListener } = unlock( composePrivateApis );
++const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+ 
+ export default ( props ) => ( element ) => {
+ 	function onKeyDown( event ) {
+@@ -42,5 +43,5 @@ export default ( props ) => ( element ) => {
+ 		__experimentalUndo();
+ 	}
+ 
+-	return subscribeDelegatedListener( element, 'keydown', onKeyDown );
++	return subscribeOwnedListener( element, 'keydown', onKeyDown );
+ };
+diff --git a/packages/block-editor/src/components/rich-text/index.js b/packages/block-editor/src/components/rich-text/index.js
+index e5aa66c991d048..f1406adde6ecc2 100644
+--- a/packages/block-editor/src/components/rich-text/index.js
++++ b/packages/block-editor/src/components/rich-text/index.js
+@@ -11,6 +11,7 @@ import {
+ 	useRef,
+ 	useState,
+ 	useCallback,
++	useEffect,
+ 	useMemo,
+ 	forwardRef,
+ 	createContext,
+@@ -39,6 +40,7 @@ import { getAllowedFormats } from './utils';
+ import { Content, valueToHTMLString } from './content';
+ import { withDeprecations } from './with-deprecations';
+ import BlockContext from '../block-context';
++import { useHasEditableRoot } from '../writing-flow/use-editable-root';
+ import { unlock } from '../../lock-unlock';
+ 
+ const { useRichText } = unlock( richTextPrivateApis );
+@@ -238,6 +240,13 @@ export function RichTextWrapper(
+ 	const shouldDisableEditing =
+ 		readOnly || disableBoundBlock || shouldDisableForPattern;
+ 
++	const { hasEditableRoot } = useHasEditableRoot();
++	const hasDefaultEditingMode = useSelect(
++		( select ) =>
++			select( blockEditorStore ).getBlockEditingMode( clientId ) ===
++			'default',
++		[ clientId ]
++	);
+ 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
+ 		useSelect( blockEditorStore );
+ 	const { selectionChange } = useDispatch( blockEditorStore );
+@@ -341,6 +350,55 @@ export function RichTextWrapper(
+ 		onChange,
+ 	} );
+ 
++	// While a focused editing host owns the selection (the block supports
++	// `editableRoot`), ARIA attributes describing the autocomplete state must
++	// be mirrored onto the host: assistive technology resolves them relative
++	// to the focused element.
++	const {
++		'aria-autocomplete': ariaAutocomplete,
++		'aria-owns': ariaOwns,
++		'aria-activedescendant': ariaActiveDescendant,
++	} = autocompleteProps;
++	useEffect( () => {
++		if ( ! hasEditableRoot || ! isSelected ) {
++			return;
++		}
++
++		const host = anchorRef.current?.parentElement?.closest(
++			'[contenteditable="true"]'
++		);
++
++		if ( ! host ) {
++			return;
++		}
++
++		const attributes = {
++			'aria-autocomplete': ariaAutocomplete,
++			'aria-owns': ariaOwns,
++			'aria-activedescendant': ariaActiveDescendant,
++		};
++
++		for ( const [ key, value_ ] of Object.entries( attributes ) ) {
++			if ( value_ === undefined ) {
++				host.removeAttribute( key );
++			} else {
++				host.setAttribute( key, value_ );
++			}
++		}
++
++		return () => {
++			for ( const key of Object.keys( attributes ) ) {
++				host.removeAttribute( key );
++			}
++		};
++	}, [
++		hasEditableRoot,
++		isSelected,
++		ariaAutocomplete,
++		ariaOwns,
++		ariaActiveDescendant,
++	] );
++
+ 	useMarkPersistent( { html: adjustedValue, value } );
+ 
+ 	const keyboardShortcuts = useRef( new Set() );
+@@ -350,6 +408,24 @@ export function RichTextWrapper(
+ 		anchorRef.current?.focus();
+ 	}
+ 
++	// Setting tabIndex to 0 is unnecessary, the element is already focusable
++	// because it's contentEditable. This also fixes a Safari bug where it's
++	// not possible to Shift+Click multi select blocks when Shift Clicking
++	// into an element with tabIndex because Safari will focus the element.
++	// However, Safari will correctly ignore nested contentEditable elements.
++	// While the writing flow wrapper is contentEditable (the selected block
++	// supports `editableRoot`), nested editable elements are no longer
++	// focusable areas on their own, so an explicit tabIndex restores their
++	// focusability.
++	let tabIndex = props.tabIndex;
++	if ( ! shouldDisableEditing ) {
++		if ( hasEditableRoot && hasDefaultEditingMode && isBlockSelected ) {
++			tabIndex = props.tabIndex ?? 0;
++		} else if ( hasEditableRoot && props.tabIndex === 0 ) {
++			tabIndex = null;
++		}
++	}
++
+ 	const TagName = tagName;
+ 	return (
+ 		<>
+@@ -433,17 +509,7 @@ export function RichTextWrapper(
+ 					props.className,
+ 					'rich-text'
+ 				) }
+-				// Setting tabIndex to 0 is unnecessary, the element is already
+-				// focusable because it's contentEditable. This also fixes a
+-				// Safari bug where it's not possible to Shift+Click multi
+-				// select blocks when Shift Clicking into an element with
+-				// tabIndex because Safari will focus the element. However,
+-				// Safari will correctly ignore nested contentEditable elements.
+-				tabIndex={
+-					props.tabIndex === 0 && ! shouldDisableEditing
+-						? null
+-						: props.tabIndex
+-				}
++				tabIndex={ tabIndex }
+ 				data-wp-block-attribute-key={ identifier }
+ 			/>
+ 		</>
+diff --git a/packages/block-editor/src/components/typewriter/index.js b/packages/block-editor/src/components/typewriter/index.js
+index 76a6870788c80a..04744ad59715fb 100644
+--- a/packages/block-editor/src/components/typewriter/index.js
++++ b/packages/block-editor/src/components/typewriter/index.js
+@@ -23,10 +23,13 @@ export function useTypewriter() {
+ 
+ 	return useRefEffect(
+ 		( node ) => {
+-			if ( ! hasSelectedBlock ) {
+-				return;
+-			}
+-
++			// Attach the listeners unconditionally rather than only while a
++			// block is selected. `maintainCaretPosition` already no-ops unless
++			// the selection is within an editable element, and gating on the
++			// `hasSelectedBlock` subscription is unreliable when the selected
++			// block supports an editable root: the wrapper holds focus and a
++			// transient selection update can leave the subscription stale,
++			// leaving the typewriter inactive.
+ 			const { ownerDocument } = node;
+ 			const { defaultView } = ownerDocument;
+ 
+@@ -192,6 +195,39 @@ export function useTypewriter() {
+ 				}
+ 			}
+ 
++			/**
++			 * Returns the editable element owning the selection: the active
++			 * element, or, when a focused editing host contains the node
++			 * (a selected block supports `editableRoot`), the editable
++			 * element containing the selection.
++			 */
++			function getActiveEditableElement() {
++				const { activeElement } = ownerDocument;
++
++				if ( ! activeElement ) {
++					return null;
++				}
++
++				if (
++					! activeElement.isContentEditable ||
++					! activeElement.contains( node )
++				) {
++					return activeElement;
++				}
++
++				const { anchorNode } = defaultView.getSelection();
++
++				if ( ! anchorNode ) {
++					return null;
++				}
++
++				const element =
++					anchorNode.nodeType === anchorNode.ELEMENT_NODE
++						? anchorNode
++						: anchorNode.parentElement;
++				return element?.closest( '[contenteditable="true"]' ) ?? null;
++			}
++
+ 			/**
+ 			 * Checks if the current situation is eligible for scroll:
+ 			 * - There should be one and only one block selected.
+@@ -199,9 +235,11 @@ export function useTypewriter() {
+ 			 * - The active element must be contenteditable.
+ 			 */
+ 			function isSelectionEligibleForScroll() {
++				const activeEditableElement = getActiveEditableElement();
+ 				return (
+-					node.contains( ownerDocument.activeElement ) &&
+-					ownerDocument.activeElement.isContentEditable
++					!! activeEditableElement &&
++					node.contains( activeEditableElement ) &&
++					activeEditableElement.isContentEditable
+ 				);
+ 			}
+ 
+@@ -211,16 +249,42 @@ export function useTypewriter() {
+ 				);
+ 				const lastEditableNode =
+ 					editableNodes[ editableNodes.length - 1 ];
+-				return lastEditableNode === ownerDocument.activeElement;
++				return lastEditableNode === getActiveEditableElement();
+ 			}
+ 
++			/**
++			 * Calls the given listener for events targeting the node's
++			 * subtree, or a focused editing host containing the node, which
++			 * key events target instead of the node (`editableRoot`).
++			 *
++			 * @param {Function} listener Event listener.
++			 */
++			function withOwnedEvents( listener ) {
++				return ( event ) => {
++					const { target } = event;
++					if (
++						node.contains( target ) ||
++						( target.isContentEditable && target.contains( node ) )
++					) {
++						listener( event );
++					}
++				};
++			}
++
++			const onOwnedKeyDown = withOwnedEvents( onKeyDown );
++			const onOwnedKeyUp = withOwnedEvents( maintainCaretPosition );
++
+ 			// When the user scrolls or resizes, the scroll position should be
+ 			// reset.
+ 			defaultView.addEventListener( 'scroll', onScrollResize, true );
+ 			defaultView.addEventListener( 'resize', onScrollResize, true );
+ 
+-			node.addEventListener( 'keydown', onKeyDown );
+-			node.addEventListener( 'keyup', maintainCaretPosition );
++			// Attached to the document: when a focused editing host containing
++			// the node holds the selection, key events target the host, an
++			// ancestor of the node, so they never reach a node-bound
++			// listener.
++			ownerDocument.addEventListener( 'keydown', onOwnedKeyDown );
++			ownerDocument.addEventListener( 'keyup', onOwnedKeyUp );
+ 			node.addEventListener( 'mousedown', addSelectionChangeListener );
+ 			node.addEventListener( 'touchstart', addSelectionChangeListener );
+ 
+@@ -236,8 +300,8 @@ export function useTypewriter() {
+ 					true
+ 				);
+ 
+-				node.removeEventListener( 'keydown', onKeyDown );
+-				node.removeEventListener( 'keyup', maintainCaretPosition );
++				ownerDocument.removeEventListener( 'keydown', onOwnedKeyDown );
++				ownerDocument.removeEventListener( 'keyup', onOwnedKeyUp );
+ 				node.removeEventListener(
+ 					'mousedown',
+ 					addSelectionChangeListener
+diff --git a/packages/block-editor/src/components/writing-flow/index.js b/packages/block-editor/src/components/writing-flow/index.js
+index 60aa510e386828..c9108d1cacbb72 100644
+--- a/packages/block-editor/src/components/writing-flow/index.js
++++ b/packages/block-editor/src/components/writing-flow/index.js
+@@ -14,6 +14,8 @@ import { forwardRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
++import useEditableRoot from './use-editable-root';
++import useHomeEnd from './use-home-end';
+ import useMultiSelection from './use-multi-selection';
+ import useTabNav from './use-tab-nav';
+ import useArrowNav from './use-arrow-nav';
+@@ -39,6 +41,8 @@ export function useWritingFlow() {
+ 			ref,
+ 			useClipboardHandler(),
+ 			useInput(),
++			useEditableRoot(),
++			useHomeEnd(),
+ 			useDragSelection(),
+ 			useSelectionObserver(),
+ 			useClickSelection(),
+diff --git a/packages/block-editor/src/components/writing-flow/use-arrow-nav.js b/packages/block-editor/src/components/writing-flow/use-arrow-nav.js
+index e7f0176f8620ab..5e9b59b740464b 100644
+--- a/packages/block-editor/src/components/writing-flow/use-arrow-nav.js
++++ b/packages/block-editor/src/components/writing-flow/use-arrow-nav.js
+@@ -18,7 +18,7 @@ import { useRefEffect } from '@wordpress/compose';
+ /**
+  * Internal dependencies
+  */
+-import { getBlockClientId } from '../../utils/dom';
++import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
+ import { store as blockEditorStore } from '../../store';
+ 
+ /**
+@@ -141,8 +141,16 @@ export function getClosestTabbable(
+ 			return false;
+ 		}
+ 
+-		// Skip focusable elements such as links within content editable nodes.
+-		if ( node.isContentEditable && node.contentEditable !== 'true' ) {
++		// Skip focusable elements such as links within content editable
++		// nodes: nodes whose closest editable host is an editable element
++		// within a block. When an editable root (e.g. the canvas wrapper)
++		// is the editing host, everything within it is content editable,
++		// but focusables like block wrappers are not text content.
++		if (
++			node.isContentEditable &&
++			node.contentEditable !== 'true' &&
++			getBlockClientId( node.closest( '[contenteditable="true"]' ) )
++		) {
+ 			return false;
+ 		}
+ 
+@@ -198,8 +206,17 @@ export default function useArrowNav() {
+ 				return;
+ 			}
+ 
+-			const { keyCode, target, shiftKey, ctrlKey, altKey, metaKey } =
+-				event;
++			const { keyCode, shiftKey, ctrlKey, altKey, metaKey } = event;
++			// When the wrapper is contentEditable and holds focus (the
++			// selected block supports `editableRoot`), the event targets the
++			// wrapper; resolve the editable element containing the selection.
++			const target =
++				( event.target === node &&
++					getSelectionEditableElement(
++						node.ownerDocument.defaultView.getSelection(),
++						node
++					) ) ||
++				event.target;
+ 			const isUp = keyCode === UP;
+ 			const isDown = keyCode === DOWN;
+ 			const isLeft = keyCode === LEFT;
+@@ -271,13 +288,24 @@ export default function useArrowNav() {
+ 			const { keepCaretInsideBlock } = getSettings();
+ 
+ 			if ( shiftKey ) {
+-				if (
+-					isClosestTabbableABlock( target, isReverse ) &&
+-					isNavEdge( target, isReverse )
+-				) {
+-					node.contentEditable = true;
+-					// Firefox doesn't automatically move focus.
+-					node.focus();
++				if ( isNavEdge( target, isReverse ) ) {
++					if ( isClosestTabbableABlock( target, isReverse ) ) {
++						node.contentEditable = true;
++						// Firefox doesn't automatically move focus.
++						node.focus();
++					} else if ( node.contentEditable === 'true' ) {
++						// There is no block to extend the selection into.
++						// Within an editable wrapper the selection could
++						// natively escape into surrounding editable elements
++						// (e.g. the post title), so keep it inside the block
++						// by extending it to the block's edge.
++						const selection = defaultView.getSelection();
++						selection.extend(
++							target,
++							isReverse ? 0 : target.childNodes.length
++						);
++						event.preventDefault();
++					}
+ 				}
+ 			} else if (
+ 				isVertical &&
+diff --git a/packages/block-editor/src/components/writing-flow/use-editable-root.js b/packages/block-editor/src/components/writing-flow/use-editable-root.js
+new file mode 100644
+index 00000000000000..ca2913274f36d7
+--- /dev/null
++++ b/packages/block-editor/src/components/writing-flow/use-editable-root.js
+@@ -0,0 +1,139 @@
++/**
++ * WordPress dependencies
++ */
++import { useSelect } from '@wordpress/data';
++import { useRefEffect } from '@wordpress/compose';
++import { hasBlockSupport } from '@wordpress/blocks';
++
++/**
++ * Internal dependencies
++ */
++import { store as blockEditorStore } from '../../store';
++import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
++import { unlock } from '../../lock-unlock';
++
++/**
++ * Returns true when the writing flow wrapper should be contentEditable: the
++ * selected block supports `editableRoot`.
++ *
++ * @return {Object} Whether the wrapper should be editable, and the selected
++ *                  block client ID.
++ */
++export function useHasEditableRoot() {
++	return useSelect( ( select ) => {
++		const {
++			getSelectedBlockClientId,
++			getBlockName,
++			getBlockEditingMode,
++			getBlockMode,
++		} = select( blockEditorStore );
++		const clientId = getSelectedBlockClientId();
++		return {
++			selectedClientId: clientId,
++			hasEditableRoot:
++				!! clientId &&
++				getBlockEditingMode( clientId ) === 'default' &&
++				// Not when the block is edited as HTML: there is no rich text
++				// to host then, only a textarea, which the editing host would
++				// interfere with.
++				getBlockMode( clientId ) === 'visual' &&
++				hasBlockSupport(
++					getBlockName( clientId ),
++					'editableRoot',
++					false
++				),
++		};
++	}, [] );
++}
++
++/**
++ * Keeps the writing flow wrapper contentEditable while the selected block
++ * supports `editableRoot`, so the native selection can extend across blocks.
++ * While the wrapper is editable it must also hold focus: a nested editable
++ * element cannot retain focus once an ancestor becomes an editing host (the
++ * first DOM mutation moves focus to the host, inconsistently across
++ * browsers).
++ */
++export default function useEditableRoot() {
++	const { hasMultiSelection, isMultiSelecting, isZoomOut } = unlock(
++		useSelect( blockEditorStore )
++	);
++	const { selectedClientId, hasEditableRoot: supportsEditableRoot } =
++		useHasEditableRoot();
++
++	return useRefEffect(
++		( node ) => {
++			if ( supportsEditableRoot && ! isZoomOut() ) {
++				if ( node.getAttribute( 'contenteditable' ) !== 'true' ) {
++					node.setAttribute( 'contenteditable', 'true' );
++
++					// Abort in environments without contentEditable support
++					// (JSDOM): without editing host semantics the wrapper
++					// must not claim to be one.
++					if ( ! node.isContentEditable ) {
++						node.removeAttribute( 'contenteditable' );
++						return;
++					}
++				}
++
++				// Move focus from the block's editable element to the
++				// wrapper, but only when an editable element belonging to
++				// the selected block has focus. Never steal focus from other
++				// regions (e.g. List View), UI elements (e.g. buttons), or
++				// other editables within the wrapper (e.g. the post title).
++				// The selection is preserved.
++				const { activeElement } = node.ownerDocument;
++				if (
++					activeElement !== node &&
++					activeElement?.isContentEditable &&
++					node.contains( activeElement ) &&
++					getBlockClientId( activeElement ) === selectedClientId
++				) {
++					// Only move focus when the selection has settled within
++					// the focused element. If the selection is still outside,
++					// a mousedown just focused the element and the browser
++					// has not placed the caret yet; moving focus now would
++					// cancel the pending caret placement. The selection
++					// observer moves focus once the selection lands.
++					const selection =
++						node.ownerDocument.defaultView.getSelection();
++					if (
++						selection.anchorNode &&
++						activeElement.contains( selection.anchorNode )
++					) {
++						node.focus();
++					}
++				}
++			} else if (
++				node.getAttribute( 'contenteditable' ) === 'true' &&
++				! hasMultiSelection() &&
++				! isMultiSelecting()
++			) {
++				node.setAttribute( 'contenteditable', 'false' );
++
++				// If the wrapper held focus, return focus to the editable
++				// element containing the selection, which is focusable again
++				// now that the wrapper is no longer an editing host. Only do
++				// so if that element belongs to the selected block: when the
++				// selection moved to another block through the store, the
++				// stale DOM selection must not reclaim block selection
++				// through its focus handler.
++				if ( node.ownerDocument.activeElement === node ) {
++					const selection =
++						node.ownerDocument.defaultView.getSelection();
++					const editable = getSelectionEditableElement(
++						selection,
++						node
++					);
++					if (
++						editable &&
++						getBlockClientId( editable ) === selectedClientId
++					) {
++						editable.focus();
++					}
++				}
++			}
++		},
++		[ supportsEditableRoot, selectedClientId ]
++	);
++}
+diff --git a/packages/block-editor/src/components/writing-flow/use-home-end.js b/packages/block-editor/src/components/writing-flow/use-home-end.js
+new file mode 100644
+index 00000000000000..a3641dcccc4967
+--- /dev/null
++++ b/packages/block-editor/src/components/writing-flow/use-home-end.js
+@@ -0,0 +1,63 @@
++/**
++ * WordPress dependencies
++ */
++import { HOME, END } from '@wordpress/keycodes';
++import { useSelect } from '@wordpress/data';
++import { useRefEffect } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import { getSelectionEditableElement } from '../../utils/dom';
++import { store as blockEditorStore } from '../../store';
++
++/**
++ * While the wrapper is the contentEditable editing host (a selected block
++ * supports `editableRoot`), browsers don't perform the default caret
++ * movement for Home and End. Perform the equivalent movement with
++ * `Selection.modify()`.
++ */
++export default function useHomeEnd() {
++	const { hasMultiSelection } = useSelect( blockEditorStore );
++	return useRefEffect( ( node ) => {
++		function onKeyDown( event ) {
++			if ( event.defaultPrevented ) {
++				return;
++			}
++
++			if ( event.keyCode !== HOME && event.keyCode !== END ) {
++				return;
++			}
++
++			if ( event.metaKey || event.ctrlKey || event.altKey ) {
++				return;
++			}
++
++			if (
++				node.contentEditable !== 'true' ||
++				node.ownerDocument.activeElement !== node ||
++				hasMultiSelection()
++			) {
++				return;
++			}
++
++			const selection = node.ownerDocument.defaultView.getSelection();
++
++			if ( ! getSelectionEditableElement( selection, node ) ) {
++				return;
++			}
++
++			event.preventDefault();
++			selection.modify(
++				event.shiftKey ? 'extend' : 'move',
++				event.keyCode === HOME ? 'backward' : 'forward',
++				'lineboundary'
++			);
++		}
++
++		node.addEventListener( 'keydown', onKeyDown );
++		return () => {
++			node.removeEventListener( 'keydown', onKeyDown );
++		};
++	}, [] );
++}
+diff --git a/packages/block-editor/src/components/writing-flow/use-input.js b/packages/block-editor/src/components/writing-flow/use-input.js
+index 14e812b3d865ed..da526cc300cf1a 100644
+--- a/packages/block-editor/src/components/writing-flow/use-input.js
++++ b/packages/block-editor/src/components/writing-flow/use-input.js
+@@ -16,6 +16,7 @@ import {
+  * Internal dependencies
+  */
+ import { store as blockEditorStore } from '../../store';
++import { getSelectionEditableElement } from '../../utils/dom';
+ 
+ /**
+  * Handles input for selections across blocks.
+@@ -45,10 +46,25 @@ export default function useInput() {
+ 
+ 	return useRefEffect( ( node ) => {
+ 		function onBeforeInput( event ) {
+-			// If writing flow is editable, NEVER allow the browser to alter the
+-			// DOM. This will cause React errors (and the DOM should only be
+-			// altered in a controlled fashion).
+-			if ( node.contentEditable === 'true' ) {
++			// If writing flow is editable, never allow the browser to alter
++			// the DOM outside of an editable element within a block. This
++			// will cause React errors (and the DOM should only be altered in
++			// a controlled fashion). The wrapper can be contentEditable with
++			// a single selection when the selected block supports
++			// `editableRoot`; in that case edits within the block's editable
++			// element are handled by its rich text instance.
++			if ( node.contentEditable !== 'true' ) {
++				return;
++			}
++
++			if ( hasMultiSelection() ) {
++				event.preventDefault();
++				return;
++			}
++
++			const selection = node.ownerDocument.defaultView.getSelection();
++
++			if ( ! getSelectionEditableElement( selection, node ) ) {
+ 				event.preventDefault();
+ 			}
+ 		}
+diff --git a/packages/block-editor/src/components/writing-flow/use-select-all.js b/packages/block-editor/src/components/writing-flow/use-select-all.js
+index 1ef4cbbd33bc1e..11926957e3a522 100644
+--- a/packages/block-editor/src/components/writing-flow/use-select-all.js
++++ b/packages/block-editor/src/components/writing-flow/use-select-all.js
+@@ -10,7 +10,11 @@ import { useRefEffect } from '@wordpress/compose';
+  * Internal dependencies
+  */
+ import { store as blockEditorStore } from '../../store';
+-import { isInsideRootBlock, getBlockClientId } from '../../utils/dom';
++import {
++	isInsideRootBlock,
++	getBlockClientId,
++	getSelectionEditableElement,
++} from '../../utils/dom';
+ 
+ export default function useSelectAll() {
+ 	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
+@@ -25,17 +29,43 @@ export default function useSelectAll() {
+ 			}
+ 
+ 			const selectedClientIds = getSelectedBlockClientIds();
++			const { ownerDocument } = node;
++			const selection = ownerDocument.defaultView.getSelection();
++			// When the wrapper is contentEditable and holds focus (the
++			// selected block supports `editableRoot`), the event targets the
++			// wrapper; resolve the editable element containing the selection.
++			const editable =
++				( event.target === node &&
++					getSelectionEditableElement( selection, node ) ) ||
++				event.target;
+ 
+ 			if (
+ 				selectedClientIds.length < 2 &&
+-				! isEntirelySelected( event.target )
++				! isEntirelySelected( editable )
+ 			) {
++				// While the wrapper is contentEditable, the browser default
++				// would select the entire canvas. Select the contents of the
++				// editable element instead, like the default does when the
++				// element itself holds focus.
++				if ( event.target === node && editable !== node ) {
++					event.preventDefault();
++					const range = ownerDocument.createRange();
++					range.selectNodeContents( editable );
++					selection.removeAllRanges();
++					selection.addRange( range );
++					// The native `selectionchange` event is asynchronous;
++					// dispatch it synchronously so that listeners depending
++					// on it (e.g. the rich text internal record sync) run
++					// before any event following this one.
++					ownerDocument.dispatchEvent(
++						new Event( 'selectionchange' )
++					);
++				}
+ 				return;
+ 			}
+ 
+ 			event.preventDefault();
+ 
+-			const { ownerDocument } = event.target;
+ 			const [ firstSelectedClientId ] = selectedClientIds;
+ 			const activeClientId = getBlockClientId(
+ 				ownerDocument.activeElement
+diff --git a/packages/block-editor/src/components/writing-flow/use-selection-observer.js b/packages/block-editor/src/components/writing-flow/use-selection-observer.js
+index a0efc8c6f158e6..4c7ec507cd60cb 100644
+--- a/packages/block-editor/src/components/writing-flow/use-selection-observer.js
++++ b/packages/block-editor/src/components/writing-flow/use-selection-observer.js
+@@ -3,14 +3,21 @@
+  */
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { useRefEffect } from '@wordpress/compose';
+-import { create } from '@wordpress/rich-text';
++import {
++	create,
++	privateApis as richTextPrivateApis,
++} from '@wordpress/rich-text';
+ import { isSelectionForward } from '@wordpress/dom';
++import { hasBlockSupport } from '@wordpress/blocks';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { store as blockEditorStore } from '../../store';
+ import { getBlockClientId } from '../../utils/dom';
++import { unlock } from '../../lock-unlock';
++
++const { ownsSelection } = unlock( richTextPrivateApis );
+ 
+ /**
+  * Extract the selection start node from the selection. When the anchor node is
+@@ -40,10 +47,11 @@ function extractSelectionStartNode( selection ) {
+  * reaches up to but excluding that child node.
+  *
+  * @param {Selection} selection The selection.
++ * @param {boolean}   isMouse   Whether the selection is mouse driven.
+  *
+  * @return {Element} The selection start node.
+  */
+-function extractSelectionEndNode( selection ) {
++function extractSelectionEndNode( selection, isMouse ) {
+ 	const { focusNode, focusOffset } = selection;
+ 
+ 	if ( focusNode.nodeType === focusNode.TEXT_NODE ) {
+@@ -54,11 +62,15 @@ function extractSelectionEndNode( selection ) {
+ 		return focusNode;
+ 	}
+ 
+-	// When the selection is forward (the selection ends with the focus node),
+-	// the selection may extend into the next element with an offset of 0. This
+-	// may trigger multi selection even though the selection does not visually
+-	// end in the next block.
+-	if ( focusOffset === 0 && isSelectionForward( selection ) ) {
++	// When a mouse driven selection is forward (the selection ends with the
++	// focus node), the selection may extend into the next element with an
++	// offset of 0 (e.g. on triple click). This may trigger multi selection
++	// even though the selection does not visually end in the next block.
++	// Keyboard driven selections extending to the same position (e.g.
++	// Shift+ArrowDown) do mean to include the next block: when the element
++	// is focusable, the browser reports the boundary at the element instead
++	// of descending into its first text position.
++	if ( focusOffset === 0 && isSelectionForward( selection ) && isMouse ) {
+ 		return focusNode.previousSibling ?? focusNode.parentElement;
+ 	}
+ 
+@@ -88,8 +100,17 @@ function setContentEditableWrapper( node, value ) {
+ 	if ( node.contentEditable !== String( value ) ) {
+ 		node.contentEditable = value;
+ 
+-		// Firefox doesn't automatically move focus.
+ 		if ( value ) {
++			// Only move focus to the wrapper once it is actually an editing
++			// host. If it did not become one (e.g. JSDOM does not implement
++			// contentEditable), it must not claim focus from the block's
++			// editable element.
++			if ( ! node.isContentEditable ) {
++				node.contentEditable = false;
++				return;
++			}
++
++			// Firefox doesn't automatically move focus.
+ 			node.focus();
+ 		}
+ 	}
+@@ -107,13 +128,31 @@ function getRichTextElement( node ) {
+ export default function useSelectionObserver() {
+ 	const { multiSelect, selectBlock, selectionChange } =
+ 		useDispatch( blockEditorStore );
+-	const { getBlockParents, getBlockSelectionStart, isMultiSelecting } =
+-		useSelect( blockEditorStore );
++	const {
++		getBlockParents,
++		getBlockSelectionStart,
++		isMultiSelecting,
++		getBlockName,
++		getBlockMode,
++		getSelectionStart,
++		getSelectionEnd,
++		getSelectedBlockClientId,
++	} = useSelect( blockEditorStore );
+ 	return useRefEffect(
+ 		( node ) => {
+ 			const { ownerDocument } = node;
+ 			const { defaultView } = ownerDocument;
+ 
++			let isMouse = false;
++
++			function onMouseDown() {
++				isMouse = true;
++			}
++
++			function onKeyDown() {
++				isMouse = false;
++			}
++
+ 			function onSelectionChange( event ) {
+ 				const selection = defaultView.getSelection();
+ 
+@@ -122,7 +161,7 @@ export default function useSelectionObserver() {
+ 				}
+ 
+ 				const startNode = extractSelectionStartNode( selection );
+-				const endNode = extractSelectionEndNode( selection );
++				const endNode = extractSelectionEndNode( selection, isMouse );
+ 
+ 				if (
+ 					! node.contains( startNode ) ||
+@@ -139,6 +178,54 @@ export default function useSelectionObserver() {
+ 				// For now we check if the event is a `mouse` event.
+ 				const isClickShift = event.shiftKey && event.type === 'mouseup';
+ 				if ( selection.isCollapsed && ! isClickShift ) {
++					const collapsedClientId = getBlockClientId( startNode );
++
++					// If the block supports an editable root, keep (or make)
++					// the wrapper contentEditable so the native selection can
++					// extend across blocks. The wrapper holds focus, so rich
++					// text instances don't sync the selection; do it here.
++					if (
++						! isMultiSelecting() &&
++						collapsedClientId &&
++						// Only keep the wrapper editable when the collapsed
++						// selection is in the block that is actually selected.
++						// A stale native selection may linger in a previously
++						// selected editable root block (e.g. Firefox does not
++						// always move it), which must not re-enable the wrapper
++						// after another block has been selected.
++						collapsedClientId === getSelectedBlockClientId() &&
++						// Not while the block is edited as HTML: its content is
++						// a textarea, not rich text, which the editing host
++						// would interfere with.
++						getBlockMode( collapsedClientId ) === 'visual' &&
++						hasBlockSupport(
++							getBlockName( collapsedClientId ),
++							'editableRoot',
++							false
++						)
++					) {
++						setContentEditableWrapper( node, true );
++
++						// While the wrapper is editable it must hold focus: a
++						// nested editable element cannot retain it (the first
++						// DOM mutation moves focus to the host, inconsistently
++						// across browsers). Don't steal focus from UI elements
++						// (e.g. buttons) or editables outside the block (e.g.
++						// the post title). The rich text instance owning the
++						// selection syncs it to the store itself.
++						const { activeElement } = ownerDocument;
++						if (
++							activeElement !== node &&
++							activeElement?.isContentEditable &&
++							node.contains( activeElement ) &&
++							getBlockClientId( activeElement ) ===
++								collapsedClientId
++						) {
++							node.focus();
++						}
++						return;
++					}
++
+ 					if (
+ 						node.contentEditable === 'true' &&
+ 						! isMultiSelecting()
+@@ -210,7 +297,6 @@ export default function useSelectionObserver() {
+ 						return;
+ 					}
+ 				}
+-
+ 				const isSingularSelection = startClientId === endClientId;
+ 				if ( isSingularSelection ) {
+ 					if ( ! isMultiSelecting() ) {
+@@ -226,7 +312,16 @@ export default function useSelectionObserver() {
+ 
+ 						if (
+ 							richTextElement &&
+-							ownerDocument.activeElement !== richTextElement
++							// The rich text instance syncs the selection
++							// itself when its element is editable and owns the
++							// selection (also through a focused editing host).
++							// It may be temporarily non-editable while a drag
++							// that started outside it is in progress (see
++							// rich-text's preventFocusCapture).
++							( richTextElement.contentEditable !== 'true' ||
++								( ownerDocument.activeElement !==
++									richTextElement &&
++									! ownsSelection( richTextElement ) ) )
+ 						) {
+ 							const range = selection.getRangeAt( 0 );
+ 							const richTextData = create( {
+@@ -234,20 +329,33 @@ export default function useSelectionObserver() {
+ 								range,
+ 								__unstableIsEditableTree: true,
+ 							} );
++							const attributeKey =
++								richTextElement.dataset.wpBlockAttributeKey;
++							const startOffset = richTextData.start ?? 0;
++							const endOffset = richTextData.end;
++							const selectionStart = getSelectionStart();
++							const selectionEnd = getSelectionEnd();
++
++							if (
++								selectionStart.clientId === startClientId &&
++								selectionEnd.clientId === startClientId &&
++								selectionStart.attributeKey === attributeKey &&
++								selectionStart.offset === startOffset &&
++								selectionEnd.offset === endOffset
++							) {
++								return;
++							}
++
+ 							selectionChange( {
+ 								start: {
+ 									clientId: startClientId,
+-									attributeKey:
+-										richTextElement.dataset
+-											.wpBlockAttributeKey,
+-									offset: richTextData.start ?? 0,
++									attributeKey,
++									offset: startOffset,
+ 								},
+ 								end: {
+ 									clientId: startClientId,
+-									attributeKey:
+-										richTextElement.dataset
+-											.wpBlockAttributeKey,
+-									offset: richTextData.end,
++									attributeKey,
++									offset: endOffset,
+ 								},
+ 							} );
+ 						} else {
+@@ -318,17 +426,76 @@ export default function useSelectionObserver() {
+ 				}
+ 			}
+ 
++			// Native `selectionchange` events are asynchronous: a clipboard
++			// event may fire before the store has been updated with a cross
++			// block selection that was just made. Sync it before the clipboard
++			// handlers (bubble phase) read the store.
++			function ensureMultiBlockSelectionSync( event ) {
++				const selection = defaultView.getSelection();
++
++				if ( ! selection.rangeCount || selection.isCollapsed ) {
++					return;
++				}
++
++				// Only a selection across different blocks needs to be synced
++				// here; rich text owns selections within a single block.
++				const startClientId = getBlockClientId(
++					extractSelectionStartNode( selection )
++				);
++				const endClientId = getBlockClientId(
++					extractSelectionEndNode( selection, isMouse )
++				);
++
++				if ( startClientId !== endClientId ) {
++					onSelectionChange( event );
++				}
++			}
++
+ 			ownerDocument.addEventListener(
+ 				'selectionchange',
+ 				onSelectionChange
+ 			);
+ 			defaultView.addEventListener( 'mouseup', onSelectionChange );
++			node.addEventListener( 'mousedown', onMouseDown );
++			node.addEventListener( 'keydown', onKeyDown );
++			ownerDocument.addEventListener(
++				'copy',
++				ensureMultiBlockSelectionSync,
++				true
++			);
++			ownerDocument.addEventListener(
++				'cut',
++				ensureMultiBlockSelectionSync,
++				true
++			);
++			ownerDocument.addEventListener(
++				'paste',
++				ensureMultiBlockSelectionSync,
++				true
++			);
+ 			return () => {
+ 				ownerDocument.removeEventListener(
+ 					'selectionchange',
+ 					onSelectionChange
+ 				);
+ 				defaultView.removeEventListener( 'mouseup', onSelectionChange );
++				node.removeEventListener( 'mousedown', onMouseDown );
++				node.removeEventListener( 'keydown', onKeyDown );
++				ownerDocument.removeEventListener(
++					'copy',
++					ensureMultiBlockSelectionSync,
++					true
++				);
++				ownerDocument.removeEventListener(
++					'cut',
++					ensureMultiBlockSelectionSync,
++					true
++				);
++				ownerDocument.removeEventListener(
++					'paste',
++					ensureMultiBlockSelectionSync,
++					true
++				);
+ 			};
+ 		},
+ 		[ multiSelect, selectBlock, selectionChange, getBlockParents ]
+diff --git a/packages/block-editor/src/utils/dom.js b/packages/block-editor/src/utils/dom.js
+index e07efd6f2e0df2..9c7f2551468299 100644
+--- a/packages/block-editor/src/utils/dom.js
++++ b/packages/block-editor/src/utils/dom.js
+@@ -31,6 +31,36 @@ export function isInsideRootBlock( blockElement, element ) {
+ 	return parentBlock === blockElement;
+ }
+ 
++/**
++ * Returns the editable element containing the selection, if the selection is
++ * fully contained within one. The root element (an editable wrapper) does not
++ * count as a containing editable element.
++ *
++ * @param {Selection} selection The selection.
++ * @param {Element}   root      The editable wrapper element.
++ *
++ * @return {Element|undefined} The editable element containing the selection.
++ */
++export function getSelectionEditableElement( selection, root ) {
++	const { anchorNode, focusNode } = selection;
++
++	if ( ! anchorNode || ! focusNode ) {
++		return;
++	}
++
++	const element =
++		anchorNode.nodeType === anchorNode.ELEMENT_NODE
++			? /** @type {Element} */ ( anchorNode )
++			: anchorNode.parentElement;
++	const editable = element?.closest( '[contenteditable="true"]' );
++
++	if ( ! editable || editable === root || ! editable.contains( focusNode ) ) {
++		return;
++	}
++
++	return editable;
++}
++
+ /**
+  * Finds the block client ID given any DOM node inside the block.
+  *
+diff --git a/packages/block-library/src/list-item/hooks/use-enter.js b/packages/block-library/src/list-item/hooks/use-enter.js
+index 3dd1f25c209336..4c3c8d62ecd146 100644
+--- a/packages/block-library/src/list-item/hooks/use-enter.js
++++ b/packages/block-library/src/list-item/hooks/use-enter.js
+@@ -7,10 +7,8 @@ import {
+ 	cloneBlock,
+ } from '@wordpress/blocks';
+ import { useRef } from '@wordpress/element';
+-import {
+-	useRefEffect,
+-	privateApis as composePrivateApis,
+-} from '@wordpress/compose';
++import { useRefEffect } from '@wordpress/compose';
++import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+ import { ENTER } from '@wordpress/keycodes';
+ import { useSelect, useDispatch } from '@wordpress/data';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+@@ -21,7 +19,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
+ import useOutdentListItem from './use-outdent-list-item';
+ import { unlock } from '../../lock-unlock';
+ 
+-const { subscribeDelegatedListener } = unlock( composePrivateApis );
++const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+ 
+ export default function useEnter( props ) {
+ 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
+@@ -90,11 +88,6 @@ export default function useEnter( props ) {
+ 
+ 		// Capture phase so we run before writing-flow's ancestor-bubble
+ 		// keydown handlers that gate on `event.defaultPrevented`.
+-		return subscribeDelegatedListener(
+-			element,
+-			'keydown',
+-			onKeyDown,
+-			true
+-		);
++		return subscribeOwnedListener( element, 'keydown', onKeyDown, true );
+ 	}, [] );
+ }
+diff --git a/packages/block-library/src/list-item/hooks/use-space.js b/packages/block-library/src/list-item/hooks/use-space.js
+index 25ed715b372d71..cc334441b4ae9c 100644
+--- a/packages/block-library/src/list-item/hooks/use-space.js
++++ b/packages/block-library/src/list-item/hooks/use-space.js
+@@ -1,10 +1,8 @@
+ /**
+  * WordPress dependencies
+  */
+-import {
+-	useRefEffect,
+-	privateApis as composePrivateApis,
+-} from '@wordpress/compose';
++import { useRefEffect } from '@wordpress/compose';
++import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+ import { SPACE, TAB } from '@wordpress/keycodes';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+ import { useSelect } from '@wordpress/data';
+@@ -16,7 +14,7 @@ import useIndentListItem from './use-indent-list-item';
+ import useOutdentListItem from './use-outdent-list-item';
+ import { unlock } from '../../lock-unlock';
+ 
+-const { subscribeDelegatedListener } = unlock( composePrivateApis );
++const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+ 
+ export default function useSpace( clientId ) {
+ 	const { getSelectionStart, getSelectionEnd, getBlockIndex } =
+@@ -63,7 +61,7 @@ export default function useSpace( clientId ) {
+ 
+ 			// Capture phase so we run before writing-flow's ancestor-bubble
+ 			// keydown handlers that gate on `event.defaultPrevented`.
+-			return subscribeDelegatedListener(
++			return subscribeOwnedListener(
+ 				element,
+ 				'keydown',
+ 				onKeyDown,
+diff --git a/packages/block-library/src/paragraph/README.md b/packages/block-library/src/paragraph/README.md
+index b791e280958da1..d8408f91488ced 100644
+--- a/packages/block-library/src/paragraph/README.md
++++ b/packages/block-library/src/paragraph/README.md
+@@ -26,6 +26,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
+ 
+ - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
+ - [`splitting`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#splitting): `true`
++- [`editableRoot`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#editableroot): `true`
+ - [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+ - [`className`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#classname): `false`
+ - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
+diff --git a/packages/block-library/src/paragraph/block.json b/packages/block-library/src/paragraph/block.json
+index 556c2870557f7c..1b6ad873c6b66b 100644
+--- a/packages/block-library/src/paragraph/block.json
++++ b/packages/block-library/src/paragraph/block.json
+@@ -29,6 +29,7 @@
+ 	"supports": {
+ 		"align": [ "wide", "full" ],
+ 		"splitting": true,
++		"editableRoot": true,
+ 		"anchor": true,
+ 		"className": false,
+ 		"__experimentalBorder": {
+diff --git a/packages/block-library/src/paragraph/use-enter.js b/packages/block-library/src/paragraph/use-enter.js
+index 496299911be1f3..7619f704f9dbfd 100644
+--- a/packages/block-library/src/paragraph/use-enter.js
++++ b/packages/block-library/src/paragraph/use-enter.js
+@@ -2,10 +2,8 @@
+  * WordPress dependencies
+  */
+ import { useRef } from '@wordpress/element';
+-import {
+-	useRefEffect,
+-	privateApis as composePrivateApis,
+-} from '@wordpress/compose';
++import { useRefEffect } from '@wordpress/compose';
++import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
+ import { ENTER } from '@wordpress/keycodes';
+ import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+ import { store as blockEditorStore } from '@wordpress/block-editor';
+@@ -21,7 +19,7 @@ import {
+  */
+ import { unlock } from '../lock-unlock';
+ 
+-const { subscribeDelegatedListener } = unlock( composePrivateApis );
++const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+ 
+ export function useOnEnter( props ) {
+ 	const { batch } = useRegistry();
+@@ -131,11 +129,6 @@ export function useOnEnter( props ) {
+ 
+ 		// Capture phase so we run before writing-flow's ancestor-bubble
+ 		// keydown handlers that gate on `event.defaultPrevented`.
+-		return subscribeDelegatedListener(
+-			element,
+-			'keydown',
+-			onKeyDown,
+-			true
+-		);
++		return subscribeOwnedListener( element, 'keydown', onKeyDown, true );
+ 	}, [] );
+ }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index fe66bb6eca9958..9e8c373da25a57 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -15,6 +15,10 @@
+ 
+ -   Move `@types/react` from `dependencies` to an optional peer dependency so consumers' React type version is used [#79095](https://github.com/WordPress/gutenberg/pull/79095).
+ 
++### Internal
++
++-   `Autocomplete`: subscribe the keyboard listener through the rich text selection owner, so it also handles events targeting a focused editing host ([#79105](https://github.com/WordPress/gutenberg/pull/79105)).
++
+ ## 35.0.1 (2026-06-16)
+ 
+ ## 35.0.0 (2026-06-10)
+diff --git a/packages/components/src/autocomplete/index.tsx b/packages/components/src/autocomplete/index.tsx
+index cfeeb0f58f426c..f875b41ddc1189 100644
+--- a/packages/components/src/autocomplete/index.tsx
++++ b/packages/components/src/autocomplete/index.tsx
+@@ -8,18 +8,14 @@ import {
+ 	useReducer,
+ 	useRef,
+ } from '@wordpress/element';
+-import {
+-	useInstanceId,
+-	useMergeRefs,
+-	useRefEffect,
+-	privateApis as composePrivateApis,
+-} from '@wordpress/compose';
++import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
+ import {
+ 	create,
+ 	slice,
+ 	insert,
+ 	isCollapsed,
+ 	getTextContent,
++	privateApis as richTextPrivateApis,
+ } from '@wordpress/rich-text';
+ import { speak } from '@wordpress/a11y';
+ import { isAppleOS } from '@wordpress/keycodes';
+@@ -43,7 +39,7 @@ import type {
+ import getNodeText from '../utils/get-node-text';
+ import { unlock } from '../lock-unlock';
+ 
+-const { subscribeDelegatedListener } = unlock( composePrivateApis );
++const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+ 
+ const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
+ 
+@@ -409,7 +405,7 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
+ 			// fire at bubble phase and gate on `event.defaultPrevented`,
+ 			// so firing in capture lets us preventDefault first when the
+ 			// popover is active.
+-			return subscribeDelegatedListener(
++			return subscribeOwnedListener(
+ 				element,
+ 				'keydown',
+ 				_onKeyDown,
+diff --git a/packages/dom/CHANGELOG.md b/packages/dom/CHANGELOG.md
+index 2eef92177d5652..05530e71eb8fd4 100644
+--- a/packages/dom/CHANGELOG.md
++++ b/packages/dom/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `placeCaretAtEdge`: only place a caret when the container is itself an editable element, not when it merely inherits content editability from an editing host ancestor ([#79105](https://github.com/WordPress/gutenberg/pull/79105)).
++
+ ## 4.48.1 (2026-06-16)
+ 
+ ## 4.48.0 (2026-06-10)
+diff --git a/packages/dom/src/dom/place-caret-at-edge.js b/packages/dom/src/dom/place-caret-at-edge.js
+index 4075fc7c439586..46c191fd6c528a 100644
+--- a/packages/dom/src/dom/place-caret-at-edge.js
++++ b/packages/dom/src/dom/place-caret-at-edge.js
+@@ -67,7 +67,11 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
+ 		return;
+ 	}
+ 
+-	if ( ! container.isContentEditable ) {
++	// Only place a caret if the container is itself an editable element.
++	// It may also be content editable by inheriting it from an editing
++	// host ancestor (e.g. an editable canvas wrapper), but placing a caret
++	// for e.g. a focusable block element is then not intended.
++	if ( container.contentEditable !== 'true' ) {
+ 		return;
+ 	}
+ 
+diff --git a/packages/e2e-test-utils-playwright/src/editor/index.ts b/packages/e2e-test-utils-playwright/src/editor/index.ts
+index 4ed32134f0979a..1200fc3d0bb368 100644
+--- a/packages/e2e-test-utils-playwright/src/editor/index.ts
++++ b/packages/e2e-test-utils-playwright/src/editor/index.ts
+@@ -18,6 +18,7 @@ import { getEditedPostContent } from './get-edited-post-content';
+ import { insertBlock } from './insert-block';
+ import { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
+ import { openPreviewPage } from './preview';
++import { ownsSelection } from './owns-selection';
+ import { publishPost } from './publish-post';
+ import { saveDraft } from './save-draft';
+ import { selectBlocks } from './select-blocks';
+@@ -67,6 +68,8 @@ export class Editor {
+ 		openDocumentSettingsSidebar.bind( this );
+ 	/** @borrows openPreviewPage as this.openPreviewPage */
+ 	openPreviewPage: typeof openPreviewPage = openPreviewPage.bind( this );
++	/** @borrows ownsSelection as this.ownsSelection */
++	ownsSelection: typeof ownsSelection = ownsSelection.bind( this );
+ 	/** @borrows publishPost as this.publishPost */
+ 	publishPost: typeof publishPost = publishPost.bind( this );
+ 	/** @borrows saveDraft as this.saveDraft */
+diff --git a/packages/e2e-test-utils-playwright/src/editor/owns-selection.ts b/packages/e2e-test-utils-playwright/src/editor/owns-selection.ts
+new file mode 100644
+index 00000000000000..92089fe68bccb3
+--- /dev/null
++++ b/packages/e2e-test-utils-playwright/src/editor/owns-selection.ts
+@@ -0,0 +1,36 @@
++/**
++ * External dependencies
++ */
++import type { Locator } from '@playwright/test';
++
++/**
++ * Internal dependencies
++ */
++import type { Editor } from './index';
++
++/**
++ * Returns whether the given element owns the document selection: either the
++ * element itself has focus, or a focused editing host contains both the
++ * element and the selection. Useful for asserting that a block holds the
++ * selection regardless of whether the block element or an editable canvas
++ * wrapper has focus.
++ *
++ * @param this
++ * @param locator The element that should own the selection.
++ */
++export async function ownsSelection( this: Editor, locator: Locator ) {
++	return locator.evaluate( ( element ) => {
++		const activeElement = element.ownerDocument
++			.activeElement as HTMLElement | null;
++		if ( element === activeElement ) {
++			return true;
++		}
++		const selection = element.ownerDocument.defaultView?.getSelection();
++		return (
++			!! activeElement?.isContentEditable &&
++			activeElement.contains( element ) &&
++			!! selection?.anchorNode &&
++			element.contains( selection.anchorNode )
++		);
++	} );
++}
+diff --git a/packages/rich-text/src/hook/event-listeners/copy-handler.js b/packages/rich-text/src/hook/event-listeners/copy-handler.js
+index 3e279788dbc043..ad582cfabe4933 100644
+--- a/packages/rich-text/src/hook/event-listeners/copy-handler.js
++++ b/packages/rich-text/src/hook/event-listeners/copy-handler.js
+@@ -9,7 +9,9 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
+ import { toHTMLString } from '../../to-html-string';
+ import { isCollapsed } from '../../is-collapsed';
+ import { slice } from '../../slice';
++import { remove } from '../../remove';
+ import { getTextContent } from '../../get-text-content';
++import { ownsSelection } from '../../owns-selection';
+ import { unlock } from '../../lock-unlock';
+ 
+ const { subscribeDelegatedListener } = unlock( composePrivateApis );
+@@ -20,7 +22,8 @@ export default ( props ) => ( element ) => {
+ 		const { ownerDocument } = element;
+ 		if (
+ 			isCollapsed( record.current ) ||
+-			! element.contains( ownerDocument.activeElement )
++			( ! element.contains( ownerDocument.activeElement ) &&
++				! ownsSelection( element ) )
+ 		) {
+ 			return;
+ 		}
+@@ -34,7 +37,16 @@ export default ( props ) => ( element ) => {
+ 		event.preventDefault();
+ 
+ 		if ( event.type === 'cut' ) {
+-			ownerDocument.execCommand( 'delete' );
++			if ( ownerDocument.activeElement === element ) {
++				ownerDocument.execCommand( 'delete' );
++			} else {
++				// `execCommand( 'delete' )` is not reliable when the element
++				// doesn't hold focus itself (a focused editing host owns the
++				// selection): it may remove the element entirely. Remove the
++				// selected content through the record instead.
++				const { handleChange } = props.current;
++				handleChange( remove( record.current ) );
++			}
+ 		}
+ 	}
+ 
+diff --git a/packages/rich-text/src/hook/event-listeners/delete.js b/packages/rich-text/src/hook/event-listeners/delete.js
+index fffa80750f2fa2..a9464b3c98adfa 100644
+--- a/packages/rich-text/src/hook/event-listeners/delete.js
++++ b/packages/rich-text/src/hook/event-listeners/delete.js
+@@ -2,15 +2,12 @@
+  * WordPress dependencies
+  */
+ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+-import { privateApis as composePrivateApis } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { remove } from '../../remove';
+-import { unlock } from '../../lock-unlock';
+-
+-const { subscribeDelegatedListener } = unlock( composePrivateApis );
++import { subscribeOwnedListener } from '../../subscribe-owned-listener';
+ 
+ export default ( props ) => ( element ) => {
+ 	function onKeyDown( event ) {
+@@ -35,5 +32,5 @@ export default ( props ) => ( element ) => {
+ 		}
+ 	}
+ 
+-	return subscribeDelegatedListener( element, 'keydown', onKeyDown );
++	return subscribeOwnedListener( element, 'keydown', onKeyDown );
+ };
+diff --git a/packages/rich-text/src/hook/event-listeners/format-boundaries.js b/packages/rich-text/src/hook/event-listeners/format-boundaries.js
+index f0be497fc33fcf..42bc5d08ce03a1 100644
+--- a/packages/rich-text/src/hook/event-listeners/format-boundaries.js
++++ b/packages/rich-text/src/hook/event-listeners/format-boundaries.js
+@@ -2,15 +2,12 @@
+  * WordPress dependencies
+  */
+ import { LEFT, RIGHT } from '@wordpress/keycodes';
+-import { privateApis as composePrivateApis } from '@wordpress/compose';
+ 
+ /**
+  * Internal dependencies
+  */
+ import { isCollapsed } from '../../is-collapsed';
+-import { unlock } from '../../lock-unlock';
+-
+-const { subscribeDelegatedListener } = unlock( composePrivateApis );
++import { subscribeOwnedListener } from '../../subscribe-owned-listener';
+ 
+ const EMPTY_ACTIVE_FORMATS = [];
+ 
+@@ -99,5 +96,5 @@ export default ( props ) => ( element ) => {
+ 		forceRender();
+ 	}
+ 
+-	return subscribeDelegatedListener( element, 'keydown', onKeyDown, true );
++	return subscribeOwnedListener( element, 'keydown', onKeyDown, true );
+ };
+diff --git a/packages/rich-text/src/hook/event-listeners/index.js b/packages/rich-text/src/hook/event-listeners/index.js
+index d4f760abdc735a..409bfe35bcaef3 100644
+--- a/packages/rich-text/src/hook/event-listeners/index.js
++++ b/packages/rich-text/src/hook/event-listeners/index.js
+@@ -15,12 +15,15 @@ import inputAndSelection from './input-and-selection';
+ import selectionChangeCompat from './selection-change-compat';
+ import { preventFocusCapture } from './prevent-focus-capture';
+ 
++// `inputAndSelection` must come first: it subscribes the listener that
++// synchronizes the internal record with a pending selection change at the
++// start of any keydown, which the other keydown listeners depend on.
+ const allEventListeners = [
++	inputAndSelection,
+ 	copyHandler,
+ 	selectObject,
+ 	formatBoundaries,
+ 	deleteHandler,
+-	inputAndSelection,
+ 	selectionChangeCompat,
+ 	preventFocusCapture,
+ ];
+diff --git a/packages/rich-text/src/hook/event-listeners/input-and-selection.js b/packages/rich-text/src/hook/event-listeners/input-and-selection.js
+index afa9b920a434bd..418357510544cc 100644
+--- a/packages/rich-text/src/hook/event-listeners/input-and-selection.js
++++ b/packages/rich-text/src/hook/event-listeners/input-and-selection.js
+@@ -9,6 +9,8 @@ import { privateApis as composePrivateApis } from '@wordpress/compose';
+ import { getActiveFormats } from '../../get-active-formats';
+ import { isCollapsed } from '../../is-collapsed';
+ import { updateFormats } from '../../update-formats';
++import { ownsSelection } from '../../owns-selection';
++import { subscribeOwnedListener } from '../../subscribe-owned-listener';
+ import { unlock } from '../../lock-unlock';
+ 
+ const { subscribeDelegatedListener } = unlock( composePrivateApis );
+@@ -129,14 +131,13 @@ export default ( props ) => ( element ) => {
+ 			return;
+ 		}
+ 
+-		// Ensure the active element is the rich text element.
+-		if ( ownerDocument.activeElement !== element ) {
+-			// If it is not, we can stop listening for selection changes. We
+-			// resume listening when the element is focused.
+-			ownerDocument.removeEventListener(
+-				'selectionchange',
+-				handleSelectionChange
+-			);
++		// Ensure the active element is the rich text element, or that the
++		// element owns the selection through a focused editing host (the
++		// editable block editor canvas wrapper).
++		if (
++			ownerDocument.activeElement !== element &&
++			! ownsSelection( element )
++		) {
+ 			return;
+ 		}
+ 
+@@ -194,14 +195,11 @@ export default ( props ) => ( element ) => {
+ 	}
+ 
+ 	function onCompositionStart() {
+-		isComposing = true;
+ 		// Do not update the selection when characters are being composed as
+ 		// this rerenders the component and might destroy internal browser
+-		// editing state.
+-		ownerDocument.removeEventListener(
+-			'selectionchange',
+-			handleSelectionChange
+-		);
++		// editing state. `handleSelectionChange` returns early while
++		// composing.
++		isComposing = true;
+ 		// Remove the placeholder. Since the rich text value doesn't update
+ 		// during composition, the placeholder doesn't get removed. There's no
+ 		// need to re-add it, when the value is updated on compositionend it
+@@ -214,11 +212,6 @@ export default ( props ) => ( element ) => {
+ 		// Ensure the value is up-to-date for browsers that don't emit a final
+ 		// input event after composition.
+ 		onInput( { inputType: 'insertText' } );
+-		// Tracking selection changes can be resumed.
+-		ownerDocument.addEventListener(
+-			'selectionchange',
+-			handleSelectionChange
+-		);
+ 	}
+ 
+ 	function onFocus( event ) {
+@@ -242,8 +235,24 @@ export default ( props ) => ( element ) => {
+ 			props.current;
+ 
+ 		// When the whole editor is editable, let writing flow handle
+-		// selection.
++		// selection state.
+ 		if ( element.parentElement.closest( '[contenteditable="true"]' ) ) {
++			// A nested editable element does not receive a caret from being
++			// focused, unlike an editing host. When the element does not
++			// contain the selection, restore the internal record's selection,
++			// or match the editing host behavior for programmatic focus and
++			// place the caret at the start.
++			const selection = defaultView.getSelection();
++			if (
++				! selection.anchorNode ||
++				! element.contains( selection.anchorNode )
++			) {
++				if ( isSelected && record.current.start !== undefined ) {
++					applyRecord( record.current );
++				} else {
++					selection.collapse( element, 0 );
++				}
++			}
+ 			return;
+ 		}
+ 
+@@ -269,29 +278,65 @@ export default ( props ) => ( element ) => {
+ 		// we need to manually trigger it. The selection is also not available
+ 		// yet in this call stack.
+ 		window.queueMicrotask( handleSelectionChange );
++	}
+ 
+-		ownerDocument.addEventListener(
+-			'selectionchange',
+-			handleSelectionChange
+-		);
++	/**
++	 * The native `selectionchange` event is asynchronous and may not have
++	 * been dispatched yet for a preceding selection change when the next
++	 * event arrives. Sync the record immediately so the handlers of the very
++	 * event being processed read a fresh record.
++	 */
++	function ensureSelectionSync() {
++		if ( ownerDocument.activeElement === element ) {
++			return;
++		}
++		if ( ! ownsSelection( element ) ) {
++			return;
++		}
++		handleSelectionChange();
+ 	}
+ 
+ 	// `input` and `compositionend` must run before block-editor's
+ 	// `input-rules.js` element-level listeners, which call `getValue()`
+ 	// reading `record.current` updated by our `onInput`. Use capture phase
+ 	// so we fire before any ancestor bubble handlers.
+-	const unsubscribeInput = subscribeDelegatedListener(
++	const unsubscribeInput = subscribeOwnedListener(
+ 		element,
+ 		'input',
+ 		onInput,
+ 		true
+ 	);
+-	const unsubscribeCompositionStart = subscribeDelegatedListener(
++	// Bound to the document with capture so it runs before any other
++	// listener of the event. Subscribed for every event type whose handlers
++	// read the internal record.
++	const unsubscribeEnsureSelection = [
++		'keydown',
++		'beforeinput',
++		'copy',
++		'cut',
++		'paste',
++	].map( ( eventType ) =>
++		subscribeDelegatedListener(
++			ownerDocument,
++			eventType,
++			ensureSelectionSync,
++			true
++		)
++	);
++	// Permanently subscribed: `handleSelectionChange` checks whether the
++	// element has focus or owns the selection itself. The shared underlying
++	// delegated listener keeps the number of native listeners constant.
++	const unsubscribeSelectionChange = subscribeDelegatedListener(
++		ownerDocument,
++		'selectionchange',
++		handleSelectionChange
++	);
++	const unsubscribeCompositionStart = subscribeOwnedListener(
+ 		element,
+ 		'compositionstart',
+ 		onCompositionStart
+ 	);
+-	const unsubscribeCompositionEnd = subscribeDelegatedListener(
++	const unsubscribeCompositionEnd = subscribeOwnedListener(
+ 		element,
+ 		'compositionend',
+ 		onCompositionEnd,
+@@ -305,6 +350,8 @@ export default ( props ) => ( element ) => {
+ 
+ 	return () => {
+ 		unsubscribeInput();
++		unsubscribeEnsureSelection.forEach( ( unsubscribe ) => unsubscribe() );
++		unsubscribeSelectionChange();
+ 		unsubscribeCompositionStart();
+ 		unsubscribeCompositionEnd();
+ 		unsubscribeFocus();
+diff --git a/packages/rich-text/src/hook/event-listeners/select-object.js b/packages/rich-text/src/hook/event-listeners/select-object.js
+index 27462467839608..b3aaac8337f556 100644
+--- a/packages/rich-text/src/hook/event-listeners/select-object.js
++++ b/packages/rich-text/src/hook/event-listeners/select-object.js
+@@ -47,11 +47,15 @@ export default () => ( element ) => {
+ 	}
+ 
+ 	function onFocusIn( event ) {
+-		// When there is incoming focus from a link, select the object.
++		// When focus moves into the element and lands on a nested
++		// non-editable child (e.g. fragment navigation to a footnote
++		// marker), select the object. The focus source may be a link, or
++		// an editing host in between (links are not mouse focusable within
++		// an editable context, so the source link never receives focus
++		// when the editor canvas is an editing host).
+ 		if (
+ 			event.relatedTarget &&
+-			! element.contains( event.relatedTarget ) &&
+-			event.relatedTarget.tagName === 'A'
++			! element.contains( event.relatedTarget )
+ 		) {
+ 			onClick( event );
+ 		}
+diff --git a/packages/rich-text/src/hook/index.js b/packages/rich-text/src/hook/index.js
+index c114af516d10c8..43127a5bc006ce 100644
+--- a/packages/rich-text/src/hook/index.js
++++ b/packages/rich-text/src/hook/index.js
+@@ -13,6 +13,7 @@ import { create, RichTextData } from '../create';
+ import { apply } from '../to-dom';
+ import { toHTMLString } from '../to-html-string';
+ import { removeFormat } from '../remove-format';
++import { ownsSelection } from '../owns-selection';
+ import { useDefaultStyle } from './use-default-style';
+ import { useBoundaryStyle } from './use-boundary-style';
+ import { useEventListeners } from './event-listeners';
+@@ -168,10 +169,11 @@ function useRichTextBase( {
+ 			typeof value === 'string' &&
+ 			previousValue.length !== value.length;
+ 
+-		// Check if focus is on this element
+-		const hasFocus = ref.current?.contains(
+-			ref.current.ownerDocument.activeElement
+-		);
++		// Check if focus is on this element, or if the element owns the
++		// selection through a focused editing host.
++		const hasFocus =
++			ref.current?.contains( ref.current.ownerDocument.activeElement ) ||
++			ownsSelection( ref.current );
+ 
+ 		// Skip re-applying the selection state when content changed from external source
+ 		// (e.g., typing in sidebar input changes canvas text)
+@@ -196,7 +198,13 @@ function useRichTextBase( {
+ 			return;
+ 		}
+ 
+-		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
++		// Do not steal focus from a focused editing host that contains the
++		// selection (the editable block editor canvas wrapper); the record
++		// can be applied while the host keeps focus.
++		if (
++			ref.current.ownerDocument.activeElement !== ref.current &&
++			! ownsSelection( ref.current )
++		) {
+ 			ref.current.focus();
+ 		}
+ 
+diff --git a/packages/rich-text/src/hook/use-anchor.ts b/packages/rich-text/src/hook/use-anchor.ts
+index 9c4ae3278203f7..847bdbdc018b72 100644
+--- a/packages/rich-text/src/hook/use-anchor.ts
++++ b/packages/rich-text/src/hook/use-anchor.ts
+@@ -9,6 +9,7 @@ import { getRectangleFromRange } from '@wordpress/dom';
+  * Internal dependencies
+  */
+ import type { WPFormat } from '../register-format-type';
++import { ownsSelection } from '../owns-selection';
+ 
+ /**
+  * Given a range and a format tag name and class name, returns the closest
+@@ -228,7 +229,7 @@ export function useAnchor( {
+ 		const { ownerDocument } = editableContentElement;
+ 
+ 		if (
+-			editableContentElement === ownerDocument.activeElement ||
++			ownsSelection( editableContentElement ) ||
+ 			// When a link is created, we need to attach the popover to the newly created anchor.
+ 			( ! wasActive && isActive ) ||
+ 			// Sometimes we're _removing_ an active anchor, such as the inline color popover.
+diff --git a/packages/rich-text/src/owns-selection.js b/packages/rich-text/src/owns-selection.js
+new file mode 100644
+index 00000000000000..741c9d8cde8cb2
+--- /dev/null
++++ b/packages/rich-text/src/owns-selection.js
+@@ -0,0 +1,37 @@
++/**
++ * Returns true when the element owns the document selection: either the
++ * element itself has focus, or its contentEditable editing host has focus
++ * (e.g. an editable block editor canvas wrapper) and the selection is fully
++ * contained within the element.
++ *
++ * @param {HTMLElement} element The editable element.
++ *
++ * @return {boolean} Whether the element owns the document selection.
++ */
++export function ownsSelection( element ) {
++	const { ownerDocument } = element;
++	const { activeElement } = ownerDocument;
++
++	if ( activeElement === element ) {
++		return true;
++	}
++
++	if (
++		! activeElement ||
++		! activeElement.isContentEditable ||
++		! element.isContentEditable ||
++		! activeElement.contains( element )
++	) {
++		return false;
++	}
++
++	const selection = ownerDocument.defaultView.getSelection();
++	const { anchorNode, focusNode } = selection;
++
++	return (
++		!! anchorNode &&
++		!! focusNode &&
++		element.contains( anchorNode ) &&
++		element.contains( focusNode )
++	);
++}
+diff --git a/packages/rich-text/src/private-apis.js b/packages/rich-text/src/private-apis.js
+index 8c8d2b9e66fe7a..a4b0624813fe03 100644
+--- a/packages/rich-text/src/private-apis.js
++++ b/packages/rich-text/src/private-apis.js
+@@ -3,6 +3,8 @@
+  */
+ import { lock } from './lock-unlock';
+ import { useRichText } from './hook';
++import { ownsSelection } from './owns-selection';
++import { subscribeOwnedListener } from './subscribe-owned-listener';
+ 
+ /**
+  * Private @wordpress/rich-text APIs.
+@@ -10,4 +12,6 @@ import { useRichText } from './hook';
+ export const privateApis = {};
+ lock( privateApis, {
+ 	useRichText,
++	ownsSelection,
++	subscribeOwnedListener,
+ } );
+diff --git a/packages/rich-text/src/subscribe-owned-listener.js b/packages/rich-text/src/subscribe-owned-listener.js
+new file mode 100644
+index 00000000000000..313a226470e63a
+--- /dev/null
++++ b/packages/rich-text/src/subscribe-owned-listener.js
+@@ -0,0 +1,48 @@
++/**
++ * WordPress dependencies
++ */
++import { privateApis as composePrivateApis } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import { ownsSelection } from './owns-selection';
++import { unlock } from './lock-unlock';
++
++const { subscribeDelegatedListener } = unlock( composePrivateApis );
++
++/**
++ * Subscribes a callback for events owned by the given editable element:
++ * events targeting the element or its descendants, and events targeting a
++ * focused editing host (e.g. an editable block editor canvas wrapper) while
++ * the element contains the selection. In the latter case events target the
++ * host, never the element, so an element-bound listener would not fire.
++ *
++ * @param {HTMLElement} element   The editable element.
++ * @param {string}      eventType DOM event name.
++ * @param {Function}    callback  Listener to be invoked with the event.
++ * @param {boolean}     capture   Use the capture phase. Defaults to `false`.
++ *
++ * @return {Function} Unsubscribe function.
++ */
++export function subscribeOwnedListener(
++	element,
++	eventType,
++	callback,
++	capture = false
++) {
++	return subscribeDelegatedListener(
++		element.ownerDocument,
++		eventType,
++		( event ) => {
++			if (
++				! element.contains( event.target ) &&
++				! ownsSelection( element )
++			) {
++				return;
++			}
++			callback( event );
++		},
++		capture
++	);
++}
+diff --git a/schemas/json/block.json b/schemas/json/block.json
+index c23938e249dba2..c8b4ac01d54f47 100644
+--- a/schemas/json/block.json
++++ b/schemas/json/block.json
+@@ -707,6 +707,11 @@
+ 					"description": "This property indicates whether the block can split when the Enter key is pressed or when blocks are pasted.",
+ 					"type": "boolean",
+ 					"default": false
++				},
++				"editableRoot": {
++					"description": "This property indicates that the block works when an ancestor element (the editor canvas) is the contenteditable editing host, with focus and native selection residing there instead of on the block's own elements. It enables native partial selection across blocks.",
++					"type": "boolean",
++					"default": false
+ 				}
+ 			},
+ 			"additionalProperties": true
+diff --git a/test/e2e/specs/editor/blocks/details.spec.js b/test/e2e/specs/editor/blocks/details.spec.js
+index da54e99f3d063f..94b140baa49122 100644
+--- a/test/e2e/specs/editor/blocks/details.spec.js
++++ b/test/e2e/specs/editor/blocks/details.spec.js
+@@ -136,10 +136,17 @@ test.describe( 'Details', () => {
+ 			} )
+ 		).toBeFocused();
+ 
+-		// Verify the first inner block in the editor canvas is focused.
++		// Verify the first inner block in the editor canvas holds the
++		// selection.
+ 		await page.keyboard.press( 'Enter' );
+-		await expect(
+-			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+-		).toBeFocused();
++		await expect
++			.poll( () =>
++				editor.ownsSelection(
++					editor.canvas.getByRole( 'document', {
++						name: 'Block: Paragraph',
++					} )
++				)
++			)
++			.toBe( true );
+ 	} );
+ } );
+diff --git a/test/e2e/specs/editor/blocks/links.spec.js b/test/e2e/specs/editor/blocks/links.spec.js
+index ae125727e19b37..0b8b54970bd4ee 100644
+--- a/test/e2e/specs/editor/blocks/links.spec.js
++++ b/test/e2e/specs/editor/blocks/links.spec.js
+@@ -969,12 +969,16 @@ test.describe( 'Links', () => {
+ 
+ 			await richTextLink.click();
+ 
+-			// Check focus remains in the RichText.
+-			await expect(
+-				editor.canvas.getByRole( 'document', {
+-					name: 'Block: Paragraph',
+-				} )
+-			).toBeFocused();
++			// Check the selection remains in the RichText.
++			await expect
++				.poll( () =>
++					editor.ownsSelection(
++						editor.canvas.getByRole( 'document', {
++							name: 'Block: Paragraph',
++						} )
++					)
++				)
++				.toBe( true );
+ 
+ 			// Type to modify the link text.
+ 			await page.keyboard.type( ' is awesome' );
+diff --git a/test/e2e/specs/editor/blocks/paragraph.spec.js b/test/e2e/specs/editor/blocks/paragraph.spec.js
+index f43c84ef65fd7c..50705980072386 100644
+--- a/test/e2e/specs/editor/blocks/paragraph.spec.js
++++ b/test/e2e/specs/editor/blocks/paragraph.spec.js
+@@ -96,7 +96,11 @@ test.describe( 'Paragraph', () => {
+ 				attributes: { content: 'My Heading' },
+ 			} );
+ 			await editor.insertBlock( { name: 'core/paragraph' } );
+-			await editor.canvas.locator( 'text=My Heading' ).focus();
++			// Select the heading by clicking it. Focusing it programmatically
++			// does not move focus when the empty paragraph is selected and its
++			// editable root wrapper holds focus (a nested editable element
++			// cannot take focus from an editing host ancestor).
++			await editor.canvas.locator( 'text=My Heading' ).click();
+ 			await editor.showBlockToolbar();
+ 
+ 			const dragHandle = page.locator(
+diff --git a/test/e2e/specs/editor/various/a11y-region-navigation.spec.js b/test/e2e/specs/editor/various/a11y-region-navigation.spec.js
+index d8dda0cabdf843..09e503c743dca2 100644
+--- a/test/e2e/specs/editor/various/a11y-region-navigation.spec.js
++++ b/test/e2e/specs/editor/various/a11y-region-navigation.spec.js
+@@ -28,7 +28,9 @@ test.describe( 'Region navigation (@firefox, @webkit)', () => {
+ 			} )
+ 			.filter( { hasText: 'Dummy text' } );
+ 
+-		await expect( dummyParagraph ).toBeFocused();
++		await expect
++			.poll( () => editor.ownsSelection( dummyParagraph ) )
++			.toBe( true );
+ 
+ 		// Navigate to first region and check that we made it. Must navigate forward 4 times as initial focus is placed in post title field.
+ 		await page.keyboard.press( 'Control+`' );
+diff --git a/test/e2e/specs/editor/various/block-deletion.spec.js b/test/e2e/specs/editor/various/block-deletion.spec.js
+index b491103b709f1a..16785690e9a119 100644
+--- a/test/e2e/specs/editor/various/block-deletion.spec.js
++++ b/test/e2e/specs/editor/various/block-deletion.spec.js
+@@ -26,14 +26,16 @@ test.describe( 'Block deletion', () => {
+ 			attributes: { content: 'Third' },
+ 		} );
+ 
+-		// Ensure the last paragraph is focused.
+-		await expect(
+-			editor.canvas
+-				.getByRole( 'document', {
+-					name: 'Block: Paragraph',
+-				} )
+-				.last()
+-		).toBeFocused();
++		// Ensure the last paragraph holds the selection.
++		await expect
++			.poll( () =>
++				editor.ownsSelection(
++					editor.canvas
++						.getByRole( 'document', { name: 'Block: Paragraph' } )
++						.last()
++				)
++			)
++			.toBe( true );
+ 
+ 		// Remove the current paragraph via the Block Toolbar options menu.
+ 		await editor.showBlockToolbar();
+@@ -124,14 +126,16 @@ test.describe( 'Block deletion', () => {
+ 			attributes: { content: 'Third' },
+ 		} );
+ 
+-		// Ensure the last paragraph is focused.
+-		await expect(
+-			editor.canvas
+-				.getByRole( 'document', {
+-					name: 'Block: Paragraph',
+-				} )
+-				.last()
+-		).toBeFocused();
++		// Ensure the last paragraph holds the selection.
++		await expect
++			.poll( () =>
++				editor.ownsSelection(
++					editor.canvas
++						.getByRole( 'document', { name: 'Block: Paragraph' } )
++						.last()
++				)
++			)
++			.toBe( true );
+ 
+ 		// Remove the current paragraph via dedicated keyboard shortcut.
+ 		await pageUtils.pressKeys( 'access+z' );
+@@ -171,9 +175,15 @@ test.describe( 'Block deletion', () => {
+ 		await editor.insertBlock( {
+ 			name: 'core/paragraph',
+ 		} );
+-		await expect(
+-			editor.canvas.getByRole( 'document', { name: 'Empty block' } )
+-		).toBeFocused();
++		await expect
++			.poll( () =>
++				editor.ownsSelection(
++					editor.canvas.getByRole( 'document', {
++						name: 'Empty block',
++					} )
++				)
++			)
++			.toBe( true );
+ 
+ 		// Hit backspace to remove the empty paragraph.
+ 		await page.keyboard.press( 'Backspace' );
+@@ -262,12 +272,16 @@ test.describe( 'Block deletion', () => {
+ 			name: 'core/paragraph',
+ 		} );
+ 
+-		// Ensure the empty paragraph is focused.
+-		await expect(
+-			editor.canvas.getByRole( 'document', {
+-				name: 'Empty block',
+-			} )
+-		).toBeFocused();
++		// Ensure the empty paragraph holds the selection.
++		await expect
++			.poll( () =>
++				editor.ownsSelection(
++					editor.canvas.getByRole( 'document', {
++						name: 'Empty block',
++					} )
++				)
++			)
++			.toBe( true );
+ 
+ 		// Select the last two paragraphs.
+ 		await pageUtils.pressKeys( 'shift+ArrowUp' );
+@@ -290,13 +304,17 @@ test.describe( 'Block deletion', () => {
+ 			{ name: 'core/paragraph', attributes: { content: '' } },
+ 		] );
+ 
+-		// Ensure that the newly created empty block is focused.
++		// Ensure that the newly created empty block holds the selection.
+ 		await expect.poll( editor.getBlocks ).toHaveLength( 3 );
+-		await expect(
+-			editor.canvas.getByRole( 'document', {
+-				name: 'Empty block',
+-			} )
+-		).toBeFocused();
++		await expect
++			.poll( () =>
++				editor.ownsSelection(
++					editor.canvas.getByRole( 'document', {
++						name: 'Empty block',
++					} )
++				)
++			)
++			.toBe( true );
+ 	} );
+ 
+ 	test( 'deleting all blocks', async ( { editor, page } ) => {
+@@ -305,11 +323,15 @@ test.describe( 'Block deletion', () => {
+ 			name: 'core/paragraph',
+ 			attributes: { content: 'Test' },
+ 		} );
+-		await expect(
+-			editor.canvas.getByRole( 'document', {
+-				name: 'Block: Paragraph',
+-			} )
+-		).toBeFocused();
++		await expect
++			.poll( () =>
++				editor.ownsSelection(
++					editor.canvas.getByRole( 'document', {
++						name: 'Block: Paragraph',
++					} )
++				)
++			)
++			.toBe( true );
+ 
+ 		// Remove that paragraph via its options menu.
+ 		await editor.showBlockToolbar();
+@@ -319,12 +341,16 @@ test.describe( 'Block deletion', () => {
+ 			.click();
+ 		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+ 
+-		// Ensure an empty block was created and focused.
+-		await expect(
+-			editor.canvas.getByRole( 'document', {
+-				name: 'Empty block',
+-			} )
+-		).toBeFocused();
++		// Ensure an empty block was created and holds the selection.
++		await expect
++			.poll( () =>
++				editor.ownsSelection(
++					editor.canvas.getByRole( 'document', {
++						name: 'Empty block',
++					} )
++				)
++			)
++			.toBe( true );
+ 		await expect.poll( editor.getBlocks ).toEqual( [] );
+ 	} );
+ 
+diff --git a/test/e2e/specs/editor/various/block-notes.spec.js b/test/e2e/specs/editor/various/block-notes.spec.js
+index 0298da8de4a20d..b9b4e70fdfce20 100644
+--- a/test/e2e/specs/editor/various/block-notes.spec.js
++++ b/test/e2e/specs/editor/various/block-notes.spec.js
+@@ -661,10 +661,12 @@ test.describe( 'Block Notes', () => {
+ 					name: 'Block: Paragraph',
+ 				} )
+ 				.nth( 1 );
+-			await expect(
+-				secondBlock,
+-				"focus should move to the block if there isn't a next or previous note"
+-			).toBeFocused();
++			await expect
++				.poll(
++					() => editor.ownsSelection( secondBlock ),
++					"focus should move to the block if there isn't a next or previous note"
++				)
++				.toBe( true );
+ 		} );
+ 
+ 		test( 'should focus note thread when reply is deleted', async ( {
+diff --git a/test/e2e/specs/editor/various/draggable-blocks.spec.js b/test/e2e/specs/editor/various/draggable-blocks.spec.js
+index e09d119084860a..8ea38bbdac9bbb 100644
+--- a/test/e2e/specs/editor/various/draggable-blocks.spec.js
++++ b/test/e2e/specs/editor/various/draggable-blocks.spec.js
+@@ -110,9 +110,13 @@ test.describe( 'Draggable block', () => {
+ <p>2</p>
+ <!-- /wp:paragraph -->` );
+ 
++		// Select the first paragraph by clicking it. Focusing it
++		// programmatically does not move focus while the second, editable
++		// root paragraph is selected and its wrapper holds focus (a nested
++		// editable element cannot take focus from an editing host ancestor).
+ 		await editor.canvas
+ 			.locator( 'role=document[name="Block: Paragraph"i] >> text=1' )
+-			.focus();
++			.click();
+ 		await editor.showBlockToolbar();
+ 
+ 		const dragHandle = page.locator(
+diff --git a/test/e2e/specs/editor/various/inserting-blocks.spec.js b/test/e2e/specs/editor/various/inserting-blocks.spec.js
+index a8c2d4d4d5f0d5..bb11669f18188b 100644
+--- a/test/e2e/specs/editor/various/inserting-blocks.spec.js
++++ b/test/e2e/specs/editor/various/inserting-blocks.spec.js
+@@ -43,9 +43,13 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
+ 				{ name: 'core/paragraph' },
+ 			] );
+ 
+-		await expect(
+-			editor.canvas.locator( '[data-type="core/paragraph"]' )
+-		).toBeFocused();
++		await expect
++			.poll( () =>
++				editor.ownsSelection(
++					editor.canvas.locator( '[data-type="core/paragraph"]' )
++				)
++			)
++			.toBe( true );
+ 
+ 		// Clear block selection.
+ 		await editor.canvas
+@@ -58,10 +62,18 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
+ 			},
+ 		} );
+ 
+-		await expect(
+-			editor.canvas.locator( '[data-type="core/paragraph"]' ),
+-			'should select and focus the newly inserted paragraph block on second click'
+-		).toBeFocused();
++		await expect
++			.poll(
++				() =>
++					editor.ownsSelection(
++						editor.canvas.locator( '[data-type="core/paragraph"]' )
++					),
++				{
++					message:
++						'should select the newly inserted paragraph block on second click',
++				}
++			)
++			.toBe( true );
+ 	} );
+ 
+ 	test( 'inserts blocks by dragging and dropping from the global inserter', async ( {
+diff --git a/test/e2e/specs/editor/various/keyboard-navigable-blocks.spec.js b/test/e2e/specs/editor/various/keyboard-navigable-blocks.spec.js
+index 102caf2a7bd6fa..c653a3f7c581c4 100644
+--- a/test/e2e/specs/editor/various/keyboard-navigable-blocks.spec.js
++++ b/test/e2e/specs/editor/various/keyboard-navigable-blocks.spec.js
+@@ -114,16 +114,41 @@ class KeyboardNavigableBlocks {
+ 	}
+ 
+ 	async expectLabelToHaveFocus( label ) {
+-		const ariaLabel = await this.page.evaluate( () => {
+-			const { activeElement } =
+-				document.activeElement.contentDocument ?? document;
+-			return (
+-				activeElement.getAttribute( 'aria-label' ) ||
+-				activeElement.innerText
+-			);
+-		} );
+-
+-		expect( ariaLabel ).toBe( label );
++		// Poll: the focused element and its label may settle asynchronously
++		// (selection changes sync to the store on `selectionchange`).
++		const readActiveLabel = () =>
++			this.page.evaluate( () => {
++				const doc = document.activeElement.contentDocument ?? document;
++				let { activeElement } = doc;
++				// When a focused editing host owns the selection, the editable
++				// element containing the selection owns the focus.
++				const { anchorNode, focusNode } =
++					doc.defaultView.getSelection();
++				if (
++					activeElement.isContentEditable &&
++					anchorNode &&
++					activeElement.contains( anchorNode )
++				) {
++					const editable = (
++						anchorNode.nodeType === anchorNode.ELEMENT_NODE
++							? anchorNode
++							: anchorNode.parentElement
++					).closest( '[contenteditable="true"]' );
++					if (
++						editable &&
++						editable !== activeElement &&
++						editable.contains( focusNode )
++					) {
++						activeElement = editable;
++					}
++				}
++				return (
++					activeElement.getAttribute( 'aria-label' ) ||
++					activeElement.innerText
++				);
++			} );
++
++		await expect.poll( readActiveLabel ).toBe( label );
+ 	}
+ 
+ 	async navigateThroughBlockToolbar() {
+diff --git a/test/e2e/specs/editor/various/navigable-toolbar.spec.js b/test/e2e/specs/editor/various/navigable-toolbar.spec.js
+index 1c18cbbf47d75a..b77f3260e71c03 100644
+--- a/test/e2e/specs/editor/various/navigable-toolbar.spec.js
++++ b/test/e2e/specs/editor/various/navigable-toolbar.spec.js
+@@ -97,11 +97,15 @@ test.describe( 'Block Toolbar', () => {
+ 			).toBeFocused();
+ 
+ 			await BlockToolbarUtils.focusBlock();
+-			await expect(
+-				editor.canvas.getByRole( 'document', {
+-					name: 'Block: Paragraph',
+-				} )
+-			).toBeFocused();
++			await expect
++				.poll( () =>
++					editor.ownsSelection(
++						editor.canvas.getByRole( 'document', {
++							name: 'Block: Paragraph',
++						} )
++					)
++				)
++				.toBe( true );
+ 
+ 			await BlockToolbarUtils.focusBlockToolbar();
+ 			await expect(
+@@ -328,16 +332,41 @@ class BlockToolbarUtils {
+ 	}
+ 
+ 	async expectLabelToHaveFocus( label ) {
+-		const ariaLabel = await this.page.evaluate( () => {
+-			const { activeElement } =
+-				document.activeElement.contentDocument ?? document;
+-			return (
+-				activeElement.getAttribute( 'aria-label' ) ||
+-				activeElement.innerText
+-			);
+-		} );
++		// Poll: the focused element and its label may settle asynchronously
++		// (selection changes sync to the store on `selectionchange`). When a
++		// focused editing host owns the selection, the editable element
++		// containing the selection owns the focus.
++		const readActiveLabel = () =>
++			this.page.evaluate( () => {
++				const doc = document.activeElement.contentDocument ?? document;
++				let { activeElement } = doc;
++				const { anchorNode, focusNode } =
++					doc.defaultView.getSelection();
++				if (
++					activeElement.isContentEditable &&
++					anchorNode &&
++					activeElement.contains( anchorNode )
++				) {
++					const editable = (
++						anchorNode.nodeType === anchorNode.ELEMENT_NODE
++							? anchorNode
++							: anchorNode.parentElement
++					).closest( '[contenteditable="true"]' );
++					if (
++						editable &&
++						editable !== activeElement &&
++						editable.contains( focusNode )
++					) {
++						activeElement = editable;
++					}
++				}
++				return (
++					activeElement.getAttribute( 'aria-label' ) ||
++					activeElement.innerText
++				);
++			} );
+ 
+-		expect( ariaLabel ).toBe( label );
++		await expect.poll( readActiveLabel ).toBe( label );
+ 	}
+ 
+ 	async testScrollable( scrollableElement, elementToTest ) {
+diff --git a/test/e2e/specs/editor/various/pattern-overrides.spec.js b/test/e2e/specs/editor/various/pattern-overrides.spec.js
+index 174305f1a11f0f..a40a484921a81c 100644
+--- a/test/e2e/specs/editor/various/pattern-overrides.spec.js
++++ b/test/e2e/specs/editor/various/pattern-overrides.spec.js
+@@ -65,10 +65,15 @@ test.describe( 'Pattern Overrides', () => {
+ 			await page.keyboard.press( 'Enter' );
+ 			await page.keyboard.type( "This one can't" );
+ 
++			// Select the paragraph by clicking it. Focusing it
++			// programmatically does not move focus while the second editable
++			// root paragraph is selected and its wrapper holds focus (a nested
++			// editable element cannot take focus from an editing host
++			// ancestor).
+ 			await editor.canvas
+ 				.getByRole( 'document', { name: 'Block: Paragraph' } )
+ 				.filter( { hasText: 'This paragraph can be edited' } )
+-				.focus();
++				.click();
+ 
+ 			await editor.clickBlockOptionsMenuItem( 'Rename' );
+ 			await page
+diff --git a/test/e2e/specs/editor/various/post-title.spec.js b/test/e2e/specs/editor/various/post-title.spec.js
+index 74500fcd4d9b32..689db6a65c8150 100644
+--- a/test/e2e/specs/editor/various/post-title.spec.js
++++ b/test/e2e/specs/editor/various/post-title.spec.js
+@@ -18,12 +18,20 @@ test.describe( 'Post title', () => {
+ 
+ 			await expect( pageTitleField ).toBeFocused();
+ 			await page.keyboard.press( 'Enter' );
+-			await expect(
+-				editor.canvas.getByRole( 'document', {
+-					name: 'Empty block',
+-				} ),
+-				'should move focus to an empty paragraph block when the Enter key is pressed'
+-			).toBeFocused();
++			await expect
++				.poll(
++					() =>
++						editor.ownsSelection(
++							editor.canvas.getByRole( 'document', {
++								name: 'Empty block',
++							} )
++						),
++					{
++						message:
++							'should move the selection to an empty paragraph block when the Enter key is pressed',
++					}
++				)
++				.toBe( true );
+ 		} );
+ 
+ 		test( 'should focus on the post title field when creating a new post in code editor mode', async ( {
+diff --git a/test/e2e/specs/editor/various/rich-text.spec.js b/test/e2e/specs/editor/various/rich-text.spec.js
+index 66d6c2143bf855..d0de2941c95874 100644
+--- a/test/e2e/specs/editor/various/rich-text.spec.js
++++ b/test/e2e/specs/editor/various/rich-text.spec.js
+@@ -793,17 +793,23 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
+ 		// firing `compositionend`.
+ 		// See https://github.com/puppeteer/puppeteer/issues/4981.
+ 		await editor.canvas.locator( ':root' ).evaluate( async () => {
+-			document.activeElement.textContent = '`a`';
++			// Composition happens at the caret, which may be inside an
++			// editable element while a wrapper editing host holds focus.
+ 			const selection = window.getSelection();
++			const { anchorNode } = selection;
++			const editable = (
++				anchorNode.nodeType === anchorNode.ELEMENT_NODE
++					? anchorNode
++					: anchorNode.parentElement
++			).closest( '[contenteditable="true"]' );
++			editable.textContent = '`a`';
+ 			// The `selectionchange` and `compositionend` events should run in separate event
+ 			// loop ticks to process all data store updates in time. Native events would be
+ 			// scheduled the same way.
+-			selection.selectAllChildren( document.activeElement );
++			selection.selectAllChildren( editable );
+ 			selection.collapseToEnd();
+ 			await new Promise( ( r ) => setTimeout( r, 0 ) );
+-			document.activeElement.dispatchEvent(
+-				new CompositionEvent( 'compositionend' )
+-			);
++			editable.dispatchEvent( new CompositionEvent( 'compositionend' ) );
+ 		} );
+ 
+ 		expect( await editor.getBlocks() ).toMatchObject( [
+diff --git a/test/e2e/specs/editor/various/splitting-merging.spec.js b/test/e2e/specs/editor/various/splitting-merging.spec.js
+index 1b9c999b3b55a2..0135af6dfa5589 100644
+--- a/test/e2e/specs/editor/various/splitting-merging.spec.js
++++ b/test/e2e/specs/editor/various/splitting-merging.spec.js
+@@ -319,10 +319,16 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
+ 		// But the effective saved content is still empty:
+ 		expect( await editor.getEditedPostContent() ).toBe( '' );
+ 
+-		// And focus is retained:
+-		await expect(
+-			editor.canvas.locator( 'role=document[name=/Empty block/i]' )
+-		).toBeFocused();
++		// And the selection is retained:
++		await expect
++			.poll( () =>
++				editor.ownsSelection(
++					editor.canvas.locator(
++						'role=document[name=/Empty block/i]'
++					)
++				)
++			)
++			.toBe( true );
+ 	} );
+ 
+ 	test( 'should undo split in one go', async ( {
+diff --git a/test/e2e/specs/editor/various/toolbar-roving-tabindex.spec.js b/test/e2e/specs/editor/various/toolbar-roving-tabindex.spec.js
+index 12f2e488c3be18..b061f341cdde73 100644
+--- a/test/e2e/specs/editor/various/toolbar-roving-tabindex.spec.js
++++ b/test/e2e/specs/editor/various/toolbar-roving-tabindex.spec.js
+@@ -162,19 +162,35 @@ class ToolbarRovingTabindexUtils {
+ 	}
+ 
+ 	async expectLabelToHaveFocus( label ) {
+-		let ariaLabel = await this.page.evaluate( () => {
+-			const { activeElement } =
+-				document.activeElement.contentDocument ?? document;
++		// Resolves the element owning the focus: the active element, or,
++		// when a focused editing host owns the selection, the editable
++		// element containing the selection.
++		const getFocusOwnerLabel = () => {
++			const doc = document.activeElement.contentDocument ?? document;
++			let { activeElement } = doc;
++			const selection = doc.defaultView.getSelection();
++			const { anchorNode } = selection;
++			if (
++				activeElement.isContentEditable &&
++				anchorNode &&
++				activeElement.contains( anchorNode )
++			) {
++				const editable = (
++					anchorNode.nodeType === anchorNode.ELEMENT_NODE
++						? anchorNode
++						: anchorNode.parentElement
++				).closest( '[contenteditable="true"]' );
++				if ( editable && editable !== activeElement ) {
++					activeElement = editable;
++				}
++			}
+ 			return activeElement.getAttribute( 'aria-label' );
+-		} );
++		};
++		let ariaLabel = await this.page.evaluate( getFocusOwnerLabel );
+ 		// If the labels don't match, try pressing Up Arrow to focus the block wrapper in non-content editable block.
+ 		if ( ariaLabel !== label ) {
+ 			await this.page.keyboard.press( 'ArrowUp' );
+-			ariaLabel = await this.page.evaluate( () => {
+-				const { activeElement } =
+-					document.activeElement.contentDocument ?? document;
+-				return activeElement.getAttribute( 'aria-label' );
+-			} );
++			ariaLabel = await this.page.evaluate( getFocusOwnerLabel );
+ 		}
+ 		expect( ariaLabel ).toBe( label );
+ 	}
+diff --git a/test/e2e/specs/editor/various/writing-flow.spec.js b/test/e2e/specs/editor/various/writing-flow.spec.js
+index 711566a002db88..7a351ae26dbcc3 100644
+--- a/test/e2e/specs/editor/various/writing-flow.spec.js
++++ b/test/e2e/specs/editor/various/writing-flow.spec.js
+@@ -32,14 +32,18 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
+ 		// See: https://github.com/WordPress/gutenberg/issues/18928
+ 		await writingFlowUtils.addDemoContent();
+ 
+-		const activeElementLocator = editor.canvas.locator( ':focus' );
++		// The element owning the caret: the focused element, or the selected
++		// block while a focused editing host owns the selection.
++		const activeElementLocator = editor.canvas.locator(
++			'body:not(:focus) :focus, body:focus .is-selected'
++		);
+ 
+ 		// Arrow up into nested context focuses last text input.
+ 		await page.keyboard.press( 'ArrowUp' );
+ 		await expect
+ 			.poll( writingFlowUtils.getActiveBlockName )
+ 			.toBe( 'core/paragraph' );
+-		await expect( activeElementLocator ).toBeFocused();
++		await expect( activeElementLocator ).toHaveCount( 1 );
+ 		await expect( activeElementLocator ).toHaveText( '2nd col' );
+ 
+ 		// Arrow up skips non-empty blocks and column/columns wrappers,
+@@ -50,7 +54,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
+ 		await expect
+ 			.poll( writingFlowUtils.getActiveBlockName )
+ 			.toBe( 'core/paragraph' );
+-		await expect( activeElementLocator ).toBeFocused();
++		await expect( activeElementLocator ).toHaveCount( 1 );
+ 		await expect( activeElementLocator ).toHaveText( 'First paragraph' );
+ 
+ 		expect( await editor.getBlocks() ).toMatchObject( [
+@@ -115,8 +119,10 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
+ 			.poll( writingFlowUtils.getActiveBlockName )
+ 			.toBe( 'core/paragraph' );
+ 
+-		// Verify the focused element has the paragraph content.
+-		const activeElementLocator = editor.canvas.locator( ':focus' );
++		// Verify the element owning the caret has the paragraph content.
++		const activeElementLocator = editor.canvas.locator(
++			'body:not(:focus) :focus, body:focus .is-selected'
++		);
+ 		await expect( activeElementLocator ).toHaveText( 'First paragraph' );
+ 	} );
+ 
+@@ -827,6 +833,34 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
+ 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
+ 	} );
+ 
++	test( 'should place the caret at the click position when clicking a block that is not selected', async ( {
++		editor,
++		page,
++	} ) => {
++		await editor.canvas
++			.locator( 'role=button[name="Add default block"i]' )
++			.click();
++		await page.keyboard.type( 'First' );
++		await page.keyboard.press( 'Enter' );
++		await page.keyboard.type( 'Second' );
++
++		await expect.poll( editor.getBlocks ).toMatchObject( [
++			{ name: 'core/paragraph', attributes: { content: 'First' } },
++			{ name: 'core/paragraph', attributes: { content: 'Second' } },
++		] );
++
++		// Click the first paragraph. The click lands at the center of the
++		// paragraph element, past the end of the short text, so the caret
++		// must be placed at the end of the text.
++		await editor.canvas.locator( 'p:text("First")' ).click();
++		await page.keyboard.type( '!' );
++
++		await expect.poll( editor.getBlocks ).toMatchObject( [
++			{ name: 'core/paragraph', attributes: { content: 'First!' } },
++			{ name: 'core/paragraph', attributes: { content: 'Second' } },
++		] );
++	} );
++
+ 	test( 'should not have a dead zone between blocks (lower)', async ( {
+ 		editor,
+ 		page,
+@@ -1264,8 +1298,11 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
+ 		// not skip over it to the third.
+ 		await page.keyboard.press( 'ArrowDown' );
+ 
+-		// The focused element should be the second paragraph, which contains a link.
+-		const focusedElement = editor.canvas.locator( ':focus' );
++		// The element owning the caret should be the second paragraph, which
++		// contains a link.
++		const focusedElement = editor.canvas.locator(
++			'body:not(:focus) :focus, body:focus .is-selected'
++		);
+ 		await expect( focusedElement.locator( 'a[href="#"]' ) ).toBeVisible();
+ 	} );
+ } );
+diff --git a/test/e2e/specs/widgets/customizing-widgets.spec.js b/test/e2e/specs/widgets/customizing-widgets.spec.js
+index ed0f4b4a95748b..4e85101fcd44cd 100644
+--- a/test/e2e/specs/widgets/customizing-widgets.spec.js
++++ b/test/e2e/specs/widgets/customizing-widgets.spec.js
+@@ -235,6 +235,7 @@ test.describe( 'Widgets Customizer', () => {
+ 
+ 	test( 'should move focus to the block', async ( {
+ 		page,
++		editor,
+ 		requestUtils,
+ 		widgetsCustomizerPage,
+ 	} ) => {
+@@ -267,12 +268,16 @@ test.describe( 'Widgets Customizer', () => {
+ 		const firstParagraphBlock = page.locator(
+ 			'role=document[name="Block: Paragraph"i] >> text="First Paragraph"'
+ 		);
+-		await expect( firstParagraphBlock ).toBeFocused();
++		await expect
++			.poll( () => editor.ownsSelection( firstParagraphBlock ) )
++			.toBe( true );
+ 
+ 		// Expect to focus on a already focused widget.
+ 		await paragraphWidget.click(); // noop click on the widget text to unfocus the editor and hide toolbar
+ 		await editParagraphWidget.click();
+-		await expect( firstParagraphBlock ).toBeFocused();
++		await expect
++			.poll( () => editor.ownsSelection( firstParagraphBlock ) )
++			.toBe( true );
+ 
+ 		const headingWidget = previewFrame.locator(
+ 			'.widget:has-text("First Heading")'
+@@ -505,7 +510,9 @@ test.describe( 'Widgets Customizer', () => {
+ 			'*role=document[name="Block: Paragraph"i] >> text="First Paragraph"'
+ 		);
+ 		await expect( movedParagraphBlock ).toBeVisible();
+-		await expect( movedParagraphBlock ).toBeFocused();
++		await expect
++			.poll( () => editor.ownsSelection( movedParagraphBlock ) )
++			.toBe( true );
+ 	} );
+ 
+ 	test( 'should not render Block Settings sections', async ( {
+diff --git a/test/e2e/specs/widgets/editing-widgets.spec.js b/test/e2e/specs/widgets/editing-widgets.spec.js
+index af32854ed6dba1..b562b247de090f 100644
+--- a/test/e2e/specs/widgets/editing-widgets.spec.js
++++ b/test/e2e/specs/widgets/editing-widgets.spec.js
+@@ -51,6 +51,8 @@ test.describe( 'Widgets screen', () => {
+ 			'Update button should start out disabled'
+ 		).toBeDisabled();
+ 
++		// Wait for the widget areas to render before taking the snapshot.
++		await expect( widgetsScreen.widgetAreas.first() ).toBeVisible();
+ 		const [ firstWidgetArea, secondWidgetArea ] =
+ 			await widgetsScreen.widgetAreas.all();
+ 
+@@ -633,6 +635,8 @@ test.describe( 'Widgets screen', () => {
+ 		await pageUtils.setBrowserViewport( 'small' );
+ 
+ 		const firstWidgetArea = widgetsScreen.widgetAreas.first();
++		// Wait for the widget areas to render before inserting.
++		await expect( firstWidgetArea ).toBeVisible();
+ 
+ 		const addParagraphBlock =
+ 			await widgetsScreen.getBlockInGlobalInserter( 'Paragraph' );

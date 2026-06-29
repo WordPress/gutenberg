@@ -1,0 +1,52 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d71f6ba7ce142f..78a75de29a9da0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Bug Fixes
+ 
+ -   `ColorPalette`: prevent overflow of custom color button background ([#66152](https://github.com/WordPress/gutenberg/pull/66152)).
++-   `Tabs` and `TabPanel`: Fix arrow key navigation in RTL ([#66201](https://github.com/WordPress/gutenberg/pull/66201)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/tab-panel/index.tsx b/packages/components/src/tab-panel/index.tsx
+index 9e180c30321b93..f9db745b424260 100644
+--- a/packages/components/src/tab-panel/index.tsx
++++ b/packages/components/src/tab-panel/index.tsx
+@@ -16,6 +16,7 @@ import {
+ 	useCallback,
+ } from '@wordpress/element';
+ import { useInstanceId, usePrevious } from '@wordpress/compose';
++import { isRTL } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+@@ -120,6 +121,7 @@ const UnforwardedTabPanel = (
+ 		orientation,
+ 		selectOnMove,
+ 		defaultSelectedId: prependInstanceId( initialTabName ),
++		rtl: isRTL(),
+ 	} );
+ 
+ 	const selectedTabName = extractTabName(
+diff --git a/packages/components/src/tabs/index.tsx b/packages/components/src/tabs/index.tsx
+index ca8c5b19bcd622..09225c0cce9b8d 100644
+--- a/packages/components/src/tabs/index.tsx
++++ b/packages/components/src/tabs/index.tsx
+@@ -14,6 +14,7 @@ import {
+ 	useMemo,
+ 	useRef,
+ } from '@wordpress/element';
++import { isRTL } from '@wordpress/i18n';
+ 
+ /**
+  * Internal dependencies
+@@ -45,6 +46,7 @@ function Tabs( {
+ 			onSelect?.( strippedDownId );
+ 		},
+ 		selectedId: selectedTabId && `${ instanceId }-${ selectedTabId }`,
++		rtl: isRTL(),
+ 	} );
+ 
+ 	const isControlled = selectedTabId !== undefined;

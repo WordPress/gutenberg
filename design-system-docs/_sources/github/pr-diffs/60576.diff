@@ -1,0 +1,44 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 84cd741f5eb749..2b67511fedc7f0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,10 @@
+ -   `ProgressBar`: Move the indicator width styles from emotion to a CSS variable ([#60388](https://github.com/WordPress/gutenberg/pull/60388)).
+ -   `Text`: Add `text-wrap: pretty;` to improve wrapping. ([#60164](https://github.com/WordPress/gutenberg/pull/60164)).
+ 
++### Bug Fix
++
++-   `ProgressBar`: Fix CSS variable with invalid value ([#60576](https://github.com/WordPress/gutenberg/pull/60576)).
++
+ ## 27.3.0 (2024-04-03)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/progress-bar/index.tsx b/packages/components/src/progress-bar/index.tsx
+index 924d993d66c8c8..ed13c036e99162 100644
+--- a/packages/components/src/progress-bar/index.tsx
++++ b/packages/components/src/progress-bar/index.tsx
+@@ -28,7 +28,9 @@ function UnforwardedProgressBar(
+ 			<ProgressBarStyled.Indicator
+ 				style={
+ 					{
+-						'--indicator-width': `${ value }%`,
++						'--indicator-width': ! isIndeterminate
++							? `${ value }%`
++							: undefined,
+ 					} as CSSProperties
+ 				}
+ 				isIndeterminate={ isIndeterminate }
+diff --git a/packages/components/src/progress-bar/test/index.tsx b/packages/components/src/progress-bar/test/index.tsx
+index de83d22ee20ba6..c3984318cc618a 100644
+--- a/packages/components/src/progress-bar/test/index.tsx
++++ b/packages/components/src/progress-bar/test/index.tsx
+@@ -43,6 +43,9 @@ describe( 'ProgressBar', () => {
+ 		expect( indicator ).toHaveStyle( {
+ 			width: `${ INDETERMINATE_TRACK_WIDTH }%`,
+ 		} );
++		expect( indicator ).not.toHaveStyle( {
++			'--indicator-width': expect.any( String ),
++		} );
+ 	} );
+ 
+ 	it( 'should use `value`% as width for determinate progress bar', () => {

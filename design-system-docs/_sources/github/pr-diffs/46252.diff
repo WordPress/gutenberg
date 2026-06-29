@@ -1,0 +1,193 @@
+diff --git a/packages/base-styles/CHANGELOG.md b/packages/base-styles/CHANGELOG.md
+index 85fc4cb684b63f..a532f63be70066 100644
+--- a/packages/base-styles/CHANGELOG.md
++++ b/packages/base-styles/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   Lighten the border color in the `input-style__neutral` mixin ([#46252](https://github.com/WordPress/gutenberg/pull/46252)).
++
+ ## 4.13.0 (2022-11-16)
+ 
+ ## 4.12.0 (2022-11-02)
+diff --git a/packages/base-styles/_mixins.scss b/packages/base-styles/_mixins.scss
+index 50af0938bccdb8..fae5488e5e3d0c 100644
+--- a/packages/base-styles/_mixins.scss
++++ b/packages/base-styles/_mixins.scss
+@@ -131,7 +131,7 @@
+ 	box-shadow: 0 0 0 transparent;
+ 	transition: box-shadow 0.1s linear;
+ 	border-radius: $radius-block-ui;
+-	border: $border-width solid $gray-700;
++	border: $border-width solid $gray-600;
+ 	@include reduce-motion("transition");
+ }
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 833519075ccba7..d8636c9b53f3cc 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -25,6 +25,7 @@
+ -   `ResizableBox`: Prevent unnecessary paint on resize handles ([#46196](https://github.com/WordPress/gutenberg/pull/46196)).
+ -   `Popover`: Prevent unnecessary paint caused by using outline ([#46201](https://github.com/WordPress/gutenberg/pull/46201)).
+ -   `PaletteEdit`: Global styles: add onChange actions to color palette items [#45681](https://github.com/WordPress/gutenberg/pull/45681).
++-   Lighten the border color on control components ([#46252](https://github.com/WordPress/gutenberg/pull/46252)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/base-field/styles.ts b/packages/components/src/base-field/styles.ts
+index 30bd93cd41aa4b..2f357d90c14b2d 100644
+--- a/packages/components/src/base-field/styles.ts
++++ b/packages/components/src/base-field/styles.ts
+@@ -13,7 +13,7 @@ export const BaseField = css`
+ 	background: ${ CONFIG.controlBackgroundColor };
+ 	border-radius: ${ CONFIG.controlBorderRadius };
+ 	border: 1px solid;
+-	border-color: ${ CONFIG.controlBorderColor };
++	border-color: ${ COLORS.ui.border };
+ 	box-shadow: ${ CONFIG.controlBoxShadow };
+ 	display: flex;
+ 	flex: 1;
+@@ -30,7 +30,7 @@ export const BaseField = css`
+ 	}
+ 
+ 	&:hover {
+-		border-color: ${ CONFIG.controlBorderColorHover };
++		border-color: ${ COLORS.ui.borderHover };
+ 	}
+ 
+ 	&:focus,
+diff --git a/packages/components/src/base-field/test/__snapshots__/index.tsx.snap b/packages/components/src/base-field/test/__snapshots__/index.tsx.snap
+index 99582f8d40879f..2e42b498e8093d 100644
+--- a/packages/components/src/base-field/test/__snapshots__/index.tsx.snap
++++ b/packages/components/src/base-field/test/__snapshots__/index.tsx.snap
+@@ -12,7 +12,7 @@ Snapshot Diff:
+       "background": "#fff",
+       "border": "1px solid",
+ -     "border-color": "#d94f4f",
+-+     "border-color": "#757575",
+++     "border-color": "#949494",
+       "border-radius": "2px",
+       "box-shadow": "transparent",
+       "display": "flex",
+@@ -28,7 +28,7 @@ Snapshot Diff:
+ @@ -14,19 +14,18 @@
+       "background": "#fff",
+       "border": "1px solid",
+-      "border-color": "#757575",
++      "border-color": "#949494",
+       "border-radius": "2px",
+       "box-shadow": "transparent",
+ -     "display": "inline-flex",
+@@ -62,7 +62,7 @@ Snapshot Diff:
+       "background": "#fff",
+ -     "background-color": "transparent",
+       "border": "1px solid",
+-      "border-color": "#757575",
++      "border-color": "#949494",
+       "border-radius": "2px",
+       "box-shadow": "transparent",
+       "display": "flex",
+@@ -89,7 +89,7 @@ exports[`base field should render correctly 1`] = `
+   background: #fff;
+   border-radius: 2px;
+   border: 1px solid;
+-  border-color: #757575;
++  border-color: #949494;
+   box-shadow: transparent;
+   display: -webkit-box;
+   display: -webkit-flex;
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index 9bfbc7e01ed4cc..56e9a4ffffe6d9 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -174,7 +174,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   position: absolute;
+   right: 0;
+   top: 0;
+-  border-color: #757575;
++  border-color: #949494;
+   border-style: solid;
+   border-width: 1px;
+   padding-left: 2px;
+@@ -445,7 +445,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   position: absolute;
+   right: 0;
+   top: 0;
+-  border-color: #757575;
++  border-color: #949494;
+   border-style: solid;
+   border-width: 1px;
+   padding-left: 2px;
+@@ -726,7 +726,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   position: absolute;
+   right: 0;
+   top: 0;
+-  border-color: #757575;
++  border-color: #949494;
+   border-style: solid;
+   border-width: 1px;
+   padding-left: 2px;
+@@ -1019,7 +1019,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   position: absolute;
+   right: 0;
+   top: 0;
+-  border-color: #757575;
++  border-color: #949494;
+   border-style: solid;
+   border-width: 1px;
+   padding-left: 2px;
+diff --git a/packages/components/src/form-token-field/style.scss b/packages/components/src/form-token-field/style.scss
+index a4d5320296bc8f..52d118d5d99bdc 100644
+--- a/packages/components/src/form-token-field/style.scss
++++ b/packages/components/src/form-token-field/style.scss
+@@ -169,7 +169,7 @@
+ 	transition: all 0.15s ease-in-out;
+ 	@include reduce-motion("transition");
+ 	list-style: none;
+-	border-top: $border-width solid $gray-700;
++	border-top: $border-width solid $components-color-border;
+ 	margin: 0;
+ 	padding: 0;
+ }
+diff --git a/packages/components/src/utils/colors-values.js b/packages/components/src/utils/colors-values.js
+index 0055168a003fb1..06dc62b881c652 100644
+--- a/packages/components/src/utils/colors-values.js
++++ b/packages/components/src/utils/colors-values.js
+@@ -41,7 +41,7 @@ const UI = {
+ 	themeDark10: ADMIN.themeDark10,
+ 	background: white,
+ 	backgroundDisabled: GRAY[ 100 ],
+-	border: GRAY[ 700 ],
++	border: GRAY[ 600 ],
+ 	borderHover: GRAY[ 700 ],
+ 	borderFocus: ADMIN.themeDark10,
+ 	borderDisabled: GRAY[ 400 ],
+diff --git a/packages/components/src/utils/config-values.js b/packages/components/src/utils/config-values.js
+index ca8c4ee8941761..40c15a22ec17e3 100644
+--- a/packages/components/src/utils/config-values.js
++++ b/packages/components/src/utils/config-values.js
+@@ -15,9 +15,7 @@ const CONTROL_PROPS = {
+ 	controlPaddingXSmall: `calc(${ CONTROL_PADDING_X } / 1.3334)`,
+ 	controlBackgroundColor: COLORS.white,
+ 	controlBorderRadius: '2px',
+-	controlBorderColor: COLORS.gray[ 700 ],
+ 	controlBoxShadow: 'transparent',
+-	controlBorderColorHover: COLORS.gray[ 700 ],
+ 	controlBoxShadowFocus: `0 0 0 0.5px ${ COLORS.ui.theme }`,
+ 	controlDestructiveBorderColor: COLORS.alert.red,
+ 	controlHeight: CONTROL_HEIGHT,
+diff --git a/packages/components/src/utils/theme-variables.scss b/packages/components/src/utils/theme-variables.scss
+index 872b42c84368a7..0b664b8cd72e31 100644
+--- a/packages/components/src/utils/theme-variables.scss
++++ b/packages/components/src/utils/theme-variables.scss
+@@ -23,3 +23,6 @@ $components-color-gray-400: var(--wp-components-color-gray-400, $gray-400);
+ $components-color-gray-600: var(--wp-components-color-gray-600, $gray-600);
+ $components-color-gray-700: var(--wp-components-color-gray-700, $gray-700);
+ $components-color-gray-800: var(--wp-components-color-gray-800, $gray-800);
++
++// Semantic aliases (prefer these over raw gray values when applicable).
++$components-color-border: #{ $components-color-gray-600 };

@@ -1,0 +1,459 @@
+diff --git a/packages/block-editor/src/components/block-switcher/test/index.js b/packages/block-editor/src/components/block-switcher/test/index.js
+index 0a5ae2342a39b7..8882a5369ca014 100644
+--- a/packages/block-editor/src/components/block-switcher/test/index.js
++++ b/packages/block-editor/src/components/block-switcher/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { act, render, screen, within } from '@testing-library/react';
++import { render, screen, within, waitFor } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+ /**
+@@ -16,8 +16,6 @@ import { copy } from '@wordpress/icons';
+  */
+ import { BlockSwitcher, BlockSwitcherDropdownMenu } from '../';
+ 
+-jest.useFakeTimers();
+-
+ jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+ jest.mock( '../../block-title/use-block-display-title', () =>
+ 	jest.fn().mockReturnValue( 'Block Name' )
+@@ -185,9 +183,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
+ 		} );
+ 
+ 		test( 'should simulate a keydown event, which should open transform toggle.', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
+@@ -212,26 +208,27 @@ describe( 'BlockSwitcherDropdownMenu', () => {
+ 				} ),
+ 				'[ArrowDown]'
+ 			);
+-			await act( () => Promise.resolve() );
+ 
+-			expect(
+-				screen.getByRole( 'button', {
+-					name: 'Block Name',
+-					expanded: true,
+-				} )
+-			).toBeVisible();
++			await waitFor( () =>
++				expect(
++					screen.getByRole( 'button', {
++						name: 'Block Name',
++						expanded: true,
++					} )
++				).toBeVisible()
++			);
+ 
+-			const menu = screen.getByRole( 'menu', {
+-				name: 'Block Name',
+-			} );
+-			expect( menu ).toBeInTheDocument();
+-			expect( menu ).not.toBeVisible();
++			await waitFor( () =>
++				expect(
++					screen.getByRole( 'menu', {
++						name: 'Block Name',
++					} )
++				).toBeVisible()
++			);
+ 		} );
+ 
+ 		test( 'should simulate a click event, which should call onToggle.', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
+@@ -255,26 +252,27 @@ describe( 'BlockSwitcherDropdownMenu', () => {
+ 					expanded: false,
+ 				} )
+ 			);
+-			await act( () => Promise.resolve() );
+ 
+-			expect(
+-				screen.getByRole( 'button', {
+-					name: 'Block Name',
+-					expanded: true,
+-				} )
+-			).toBeVisible();
++			await waitFor( () =>
++				expect(
++					screen.getByRole( 'button', {
++						name: 'Block Name',
++						expanded: true,
++					} )
++				).toBeVisible()
++			);
+ 
+-			const menu = screen.getByRole( 'menu', {
+-				name: 'Block Name',
+-			} );
+-			expect( menu ).toBeInTheDocument();
+-			expect( menu ).not.toBeVisible();
++			await waitFor( () =>
++				expect(
++					screen.getByRole( 'menu', {
++						name: 'Block Name',
++					} )
++				).toBeVisible()
++			);
+ 		} );
+ 
+ 		test( 'should create the transform items for the chosen block.', async () => {
+-			const user = userEvent.setup( {
+-				advanceTimers: jest.advanceTimersByTime,
+-			} );
++			const user = userEvent.setup();
+ 
+ 			render(
+ 				<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
+@@ -286,15 +284,16 @@ describe( 'BlockSwitcherDropdownMenu', () => {
+ 					expanded: false,
+ 				} )
+ 			);
+-			await act( () => Promise.resolve() );
+ 
+-			expect(
+-				within(
+-					screen.getByRole( 'menu', {
+-						name: 'Block Name',
+-					} )
+-				).getByRole( 'menuitem' )
+-			).toBeInTheDocument();
++			await waitFor( () =>
++				expect(
++					within(
++						screen.getByRole( 'menu', {
++							name: 'Block Name',
++						} )
++					).getByRole( 'menuitem' )
++				).toBeInTheDocument()
++			);
+ 		} );
+ 	} );
+ } );
+diff --git a/packages/components/src/higher-order/with-filters/test/index.js b/packages/components/src/higher-order/with-filters/test/index.js
+index 839640dcf7c595..b7aacb1584079c 100644
+--- a/packages/components/src/higher-order/with-filters/test/index.js
++++ b/packages/components/src/higher-order/with-filters/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { act, render } from '@testing-library/react';
++import { render, waitFor } from '@testing-library/react';
+ 
+ /**
+  * WordPress dependencies
+@@ -13,8 +13,6 @@ import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
+  */
+ import withFilters from '..';
+ 
+-jest.useFakeTimers();
+-
+ describe( 'withFilters', () => {
+ 	const hookName = 'EnhancedComponent';
+ 	const MyComponent = () => <div>My component</div>;
+@@ -65,7 +63,7 @@ describe( 'withFilters', () => {
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ 
+-	it( 'should not re-render component when new filter added before component was mounted', () => {
++	it( 'should not re-render component when new filter added before component was mounted', async () => {
+ 		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
+ 		addFilter(
+ 			hookName,
+@@ -81,13 +79,13 @@ describe( 'withFilters', () => {
+ 
+ 		const { container } = render( <EnhancedComponent /> );
+ 
+-		act( () => jest.runAllTimers() );
+-
+-		expect( SpiedComponent ).toHaveBeenCalledTimes( 1 );
++		await waitFor( () =>
++			expect( SpiedComponent ).toHaveBeenCalledTimes( 1 )
++		);
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ 
+-	it( 'should re-render component once when new filter added after component was mounted', () => {
++	it( 'should re-render component once when new filter added after component was mounted', async () => {
+ 		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
+ 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
+ 
+@@ -106,13 +104,13 @@ describe( 'withFilters', () => {
+ 				)
+ 		);
+ 
+-		act( () => jest.runAllTimers() );
+-
+-		expect( SpiedComponent ).toHaveBeenCalledTimes( 1 );
++		await waitFor( () =>
++			expect( SpiedComponent ).toHaveBeenCalledTimes( 1 )
++		);
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ 
+-	it( 'should re-render component once when two filters added in the same animation frame', () => {
++	it( 'should re-render component once when two filters added in the same animation frame', async () => {
+ 		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
+ 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
+ 
+@@ -141,13 +139,13 @@ describe( 'withFilters', () => {
+ 				)
+ 		);
+ 
+-		act( () => jest.runAllTimers() );
+-
+-		expect( SpiedComponent ).toHaveBeenCalledTimes( 1 );
++		await waitFor( () =>
++			expect( SpiedComponent ).toHaveBeenCalledTimes( 1 )
++		);
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ 
+-	it( 'should re-render component twice when new filter added and removed in two different animation frames', () => {
++	it( 'should re-render component twice when new filter added and removed in two different animation frames', async () => {
+ 		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
+ 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
+ 		const { container } = render( <EnhancedComponent /> );
+@@ -165,17 +163,19 @@ describe( 'withFilters', () => {
+ 				)
+ 		);
+ 
+-		act( () => jest.runAllTimers() );
++		await waitFor( () =>
++			expect( SpiedComponent ).toHaveBeenCalledTimes( 1 )
++		);
+ 
+ 		removeFilter( hookName, 'test/enhanced-component-spy' );
+ 
+-		act( () => jest.runAllTimers() );
+-
+-		expect( SpiedComponent ).toHaveBeenCalledTimes( 2 );
++		await waitFor( () =>
++			expect( SpiedComponent ).toHaveBeenCalledTimes( 2 )
++		);
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ 
+-	it( 'should re-render both components once each when one filter added', () => {
++	it( 'should re-render both components once each when one filter added', async () => {
+ 		const SpiedComponent = jest.fn( () => <div>Spied component</div> );
+ 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
+ 
+@@ -200,9 +200,9 @@ describe( 'withFilters', () => {
+ 				)
+ 		);
+ 
+-		act( () => jest.runAllTimers() );
+-
+-		expect( SpiedComponent ).toHaveBeenCalledTimes( 2 );
++		await waitFor( () =>
++			expect( SpiedComponent ).toHaveBeenCalledTimes( 2 )
++		);
+ 		expect( container ).toMatchSnapshot();
+ 	} );
+ } );
+diff --git a/packages/components/src/higher-order/with-focus-outside/test/index.js b/packages/components/src/higher-order/with-focus-outside/test/index.js
+index 8223679279738c..ed0e70f2ec37a6 100644
+--- a/packages/components/src/higher-order/with-focus-outside/test/index.js
++++ b/packages/components/src/higher-order/with-focus-outside/test/index.js
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { render, screen } from '@testing-library/react';
++import { render, screen, waitFor } from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+ /**
+@@ -14,8 +14,6 @@ import { Component } from '@wordpress/element';
+  */
+ import withFocusOutside from '../';
+ 
+-jest.useFakeTimers();
+-
+ let onFocusOutside;
+ 
+ describe( 'withFocusOutside', () => {
+@@ -57,7 +55,7 @@ describe( 'withFocusOutside', () => {
+ 		document.hasFocus = origHasFocus;
+ 	} );
+ 
+-	it( 'should not call handler if focus shifts to element within component', () => {
++	it( 'should not call handler if focus shifts to element within component', async () => {
+ 		render( <TestComponent onFocusOutside={ onFocusOutside } /> );
+ 
+ 		const input = screen.getByRole( 'textbox' );
+@@ -67,15 +65,11 @@ describe( 'withFocusOutside', () => {
+ 		input.blur();
+ 		button.focus();
+ 
+-		jest.runAllTimers();
+-
+-		expect( onFocusOutside ).not.toHaveBeenCalled();
++		await waitFor( () => expect( onFocusOutside ).not.toHaveBeenCalled() );
+ 	} );
+ 
+ 	it( 'should not call handler if focus transitions via click to button', async () => {
+-		const user = userEvent.setup( {
+-			advanceTimers: jest.advanceTimersByTime,
+-		} );
++		const user = userEvent.setup();
+ 		render( <TestComponent onFocusOutside={ onFocusOutside } /> );
+ 
+ 		const input = screen.getByRole( 'textbox' );
+@@ -84,24 +78,20 @@ describe( 'withFocusOutside', () => {
+ 		input.focus();
+ 		await user.click( button );
+ 
+-		jest.runAllTimers();
+-
+-		expect( onFocusOutside ).not.toHaveBeenCalled();
++		await waitFor( () => expect( onFocusOutside ).not.toHaveBeenCalled() );
+ 	} );
+ 
+-	it( 'should call handler if focus doesn’t shift to element within component', () => {
++	it( 'should call handler if focus doesn’t shift to element within component', async () => {
+ 		render( <TestComponent onFocusOutside={ onFocusOutside } /> );
+ 
+ 		const input = screen.getByRole( 'textbox' );
+ 		input.focus();
+ 		input.blur();
+ 
+-		jest.runAllTimers();
+-
+-		expect( onFocusOutside ).toHaveBeenCalled();
++		await waitFor( () => expect( onFocusOutside ).toHaveBeenCalled() );
+ 	} );
+ 
+-	it( 'should not call handler if focus shifts outside the component when the document does not have focus', () => {
++	it( 'should not call handler if focus shifts outside the component when the document does not have focus', async () => {
+ 		render( <TestComponent onFocusOutside={ onFocusOutside } /> );
+ 
+ 		// Force document.hasFocus() to return false to simulate the window/document losing focus
+@@ -112,12 +102,10 @@ describe( 'withFocusOutside', () => {
+ 		input.focus();
+ 		input.blur();
+ 
+-		jest.runAllTimers();
+-
+-		expect( onFocusOutside ).not.toHaveBeenCalled();
++		await waitFor( () => expect( onFocusOutside ).not.toHaveBeenCalled() );
+ 	} );
+ 
+-	it( 'should cancel check when unmounting while queued', () => {
++	it( 'should cancel check when unmounting while queued', async () => {
+ 		const { rerender } = render(
+ 			<TestComponent onFocusOutside={ onFocusOutside } />
+ 		);
+@@ -128,8 +116,6 @@ describe( 'withFocusOutside', () => {
+ 
+ 		rerender( <div /> );
+ 
+-		jest.runAllTimers();
+-
+-		expect( onFocusOutside ).not.toHaveBeenCalled();
++		await waitFor( () => expect( onFocusOutside ).not.toHaveBeenCalled() );
+ 	} );
+ } );
+diff --git a/packages/components/src/utils/hooks/test/use-latest-ref.js b/packages/components/src/utils/hooks/test/use-latest-ref.js
+index 3e2969a1000c9a..0c424a62390332 100644
+--- a/packages/components/src/utils/hooks/test/use-latest-ref.js
++++ b/packages/components/src/utils/hooks/test/use-latest-ref.js
+@@ -13,8 +13,6 @@ import { useState } from '@wordpress/element';
+  */
+ import { useLatestRef } from '..';
+ 
+-jest.useFakeTimers();
+-
+ function debounce( callback, timeout = 0 ) {
+ 	let timeoutId = 0;
+ 	return ( ...args ) => {
+@@ -47,12 +45,6 @@ function Example() {
+ 	);
+ }
+ 
+-function sleep( milliseconds ) {
+-	return new Promise( ( resolve ) =>
+-		window.setTimeout( resolve, milliseconds )
+-	);
+-}
+-
+ function getCount() {
+ 	return screen.getByText( /Count:/ ).innerHTML;
+ }
+@@ -76,47 +68,52 @@ describe( 'useLatestRef', () => {
+ 		// Prove the example works as expected.
+ 		it( 'should start at 0', () => {
+ 			render( <Example /> );
++
+ 			expect( getCount() ).toEqual( 'Count: 0' );
+ 		} );
+ 
+ 		it( 'should increment immediately', () => {
+ 			render( <Example /> );
++
+ 			incrementCount();
++
+ 			expect( getCount() ).toEqual( 'Count: 1' );
+ 		} );
+ 
+ 		it( 'should increment after debouncing', async () => {
+ 			render( <Example /> );
++
+ 			incrementCountDebounced();
+-			expect( getCount() ).toEqual( 'Count: 0' );
+ 
+-			await waitFor( () => sleep( 0 ) );
+-			expect( getCount() ).toEqual( 'Count: 1' );
++			expect( getCount() ).toEqual( 'Count: 0' );
++			await waitFor( () => expect( getCount() ).toEqual( 'Count: 1' ) );
+ 		} );
+ 
+ 		it( 'should increment after debouncing with latest ref', async () => {
+ 			render( <Example /> );
++
+ 			incrementCountDebouncedRef();
+-			expect( getCount() ).toEqual( 'Count: 0' );
+ 
+-			await waitFor( () => sleep( 0 ) );
+-			expect( getCount() ).toEqual( 'Count: 1' );
++			expect( getCount() ).toEqual( 'Count: 0' );
++			await waitFor( () => expect( getCount() ).toEqual( 'Count: 1' ) );
+ 		} );
+ 	} );
+ 
+ 	it( 'should increment to one', async () => {
+ 		render( <Example /> );
++
+ 		incrementCountDebounced();
+ 		incrementCount();
+-		await waitFor( () => sleep( 0 ) );
+-		expect( getCount() ).toEqual( 'Count: 1' );
++
++		await waitFor( () => expect( getCount() ).toEqual( 'Count: 1' ) );
+ 	} );
+ 
+ 	it( 'should increment to two', async () => {
+ 		render( <Example /> );
++
+ 		incrementCountDebouncedRef();
+ 		incrementCount();
+-		await waitFor( () => sleep( 0 ) );
+-		expect( getCount() ).toEqual( 'Count: 2' );
++
++		await waitFor( () => expect( getCount() ).toEqual( 'Count: 2' ) );
+ 	} );
+ } );

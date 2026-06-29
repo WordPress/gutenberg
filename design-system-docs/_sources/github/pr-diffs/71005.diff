@@ -1,0 +1,133 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 900ff90ccd0af9..6230082254db6a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ 
+ -   `TextareaControl`: Add missing component CSS classname ([#70930](https://github.com/WordPress/gutenberg/pull/70930)).
+ -   `PaletteEdit`: Fill available space with input field ([#70935](https://github.com/WordPress/gutenberg/pull/70935)).
++-   `DatePicker`: Fix day label alignment for start and end of week ([#71005](https://github.com/WordPress/gutenberg/pull/71005)).
+ 
+ ### Enhancement
+ 
+@@ -17,8 +18,8 @@
+ 
+ ### Internal
+ 
+--	`RangeControl`: Add placement prop to replace position ([#70326](https://github.com/WordPress/gutenberg/pull/70326)).
+-- Expose `ValidatedNumberControl`, `ValidatedTextControl`, and `ValidatedToggleControl` via privateAPIs. ([#70901](https://github.com/WordPress/gutenberg/pull/70901)).
++-   `RangeControl`: Add placement prop to replace position ([#70326](https://github.com/WordPress/gutenberg/pull/70326)).
++-   Expose `ValidatedNumberControl`, `ValidatedTextControl`, and `ValidatedToggleControl` via privateAPIs. ([#70901](https://github.com/WordPress/gutenberg/pull/70901)).
+ 
+ ## 30.0.0 (2025-07-23)
+ 
+@@ -37,7 +38,6 @@
+ -   `SelectControl`: Move classnames to the root ([#70643](https://github.com/WordPress/gutenberg/pull/70643)).
+ -   `Autocomplete`: Prevent text cursor position loss when clicking to insert an item ([#70660](https://github.com/WordPress/gutenberg/pull/70660)).
+ 
+-
+ ### Internal
+ 
+ -   Add new private `DateCalendar` and `DateRangeCalendar` components ([#70578](https://github.com/WordPress/gutenberg/pull/70578), [#70681](https://github.com/WordPress/gutenberg/pull/70681)).
+diff --git a/packages/components/src/date-time/date/index.tsx b/packages/components/src/date-time/date/index.tsx
+index a1b74349b35378..6dbff94b76e4aa 100644
+--- a/packages/components/src/date-time/date/index.tsx
++++ b/packages/components/src/date-time/date/index.tsx
+@@ -33,13 +33,14 @@ import type { DatePickerProps } from '../types';
+ import {
+ 	Wrapper,
+ 	Navigator,
++	ViewPreviousMonthButton,
++	ViewNextMonthButton,
+ 	NavigatorHeading,
+ 	Calendar,
+ 	DayOfWeek,
+ 	DayButton,
+ } from './styles';
+ import { inputToDate } from '../utils';
+-import Button from '../../button';
+ import { TIMEZONELESS_FORMAT } from '../constants';
+ 
+ /**
+@@ -111,7 +112,7 @@ export function DatePicker( {
+ 			aria-label={ __( 'Calendar' ) }
+ 		>
+ 			<Navigator>
+-				<Button
++				<ViewPreviousMonthButton
+ 					icon={ isRTL() ? arrowRight : arrowLeft }
+ 					variant="tertiary"
+ 					aria-label={ __( 'View previous month' ) }
+@@ -137,7 +138,7 @@ export function DatePicker( {
+ 					</strong>{ ' ' }
+ 					{ dateI18n( 'Y', viewing, -viewing.getTimezoneOffset() ) }
+ 				</NavigatorHeading>
+-				<Button
++				<ViewNextMonthButton
+ 					icon={ isRTL() ? arrowLeft : arrowRight }
+ 					variant="tertiary"
+ 					aria-label={ __( 'View next month' ) }
+diff --git a/packages/components/src/date-time/date/styles.ts b/packages/components/src/date-time/date/styles.ts
+index 84405854827ec9..852a08813dfeda 100644
+--- a/packages/components/src/date-time/date/styles.ts
++++ b/packages/components/src/date-time/date/styles.ts
+@@ -17,12 +17,25 @@ export const Wrapper = styled.div`
+ `;
+ 
+ export const Navigator = styled( HStack )`
++	column-gap: ${ space( 2 ) };
++	display: grid;
++	grid-template-columns: 0.5fr repeat( 5, 1fr ) 0.5fr;
++	justify-items: center;
+ 	margin-bottom: ${ space( 4 ) };
+ `;
+ 
++export const ViewPreviousMonthButton = styled( Button )`
++	grid-column: 1 / 2;
++`;
++
++export const ViewNextMonthButton = styled( Button )`
++	grid-column: 7 / 8;
++`;
++
+ export const NavigatorHeading = styled( Heading )`
+ 	font-size: ${ CONFIG.fontSize };
+ 	font-weight: ${ CONFIG.fontWeight };
++	grid-column: 2 / 7;
+ 
+ 	strong {
+ 		font-weight: ${ CONFIG.fontWeightHeading };
+@@ -41,14 +54,6 @@ export const DayOfWeek = styled.div`
+ 	color: ${ COLORS.theme.gray[ 700 ] };
+ 	font-size: ${ CONFIG.fontSize };
+ 	line-height: ${ CONFIG.fontLineHeightBase };
+-
+-	&:nth-of-type( 1 ) {
+-		justify-self: start;
+-	}
+-
+-	&:nth-of-type( 7 ) {
+-		justify-self: end;
+-	}
+ `;
+ 
+ export const DayButton = styled( Button, {
+@@ -64,18 +69,6 @@ export const DayButton = styled( Button, {
+ 	position: relative;
+ 	justify-content: center;
+ 
+-	${ ( props ) =>
+-		props.column === 1 &&
+-		`
+-		justify-self: start;
+-		` }
+-
+-	${ ( props ) =>
+-		props.column === 7 &&
+-		`
+-		justify-self: end;
+-		` }
+-
+ 	${ ( props ) =>
+ 		props.disabled &&
+ 		`

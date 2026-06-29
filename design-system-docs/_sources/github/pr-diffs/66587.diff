@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9603d9656d5069..bc8730257c70f0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -16,6 +16,7 @@
+ ### Enhancements
+ 
+ -   `PaletteEdit`: use `Item` internally instead of custom styles ([#66164](https://github.com/WordPress/gutenberg/pull/66164)).
++-   `Popover`: Use small size variant for close button when `expandOnMobile` prop is enabled ([#66587](https://github.com/WordPress/gutenberg/pull/66587)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index 3005f13c952ec0..1b7fb31539c6d0 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -419,6 +419,7 @@ const UnforwardedPopover = (
+ 					</span>
+ 					<Button
+ 						className="components-popover__close"
++						size="small"
+ 						icon={ close }
+ 						onClick={ onClose }
+ 					/>

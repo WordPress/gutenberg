@@ -1,0 +1,834 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 166e18acb6c354..774f6d29811c34 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,7 @@
+ -   `CustomSelectControlV2`: fix popover styles. ([#62821](https://github.com/WordPress/gutenberg/pull/62821))
+ -   `CustomSelectControlV2`: fix trigger text alignment in RTL languages ([#62869](https://github.com/WordPress/gutenberg/pull/62869)).
+ -   `CustomSelectControlV2`: fix select popover content overflow. ([#62844](https://github.com/WordPress/gutenberg/pull/62844))
++-   Extract `TimeInput` component from `TimePicker` ([#60613](https://github.com/WordPress/gutenberg/pull/60613)).
+ 
+ ## 28.2.0 (2024-06-26)
+ 
+diff --git a/packages/components/src/date-time/index.ts b/packages/components/src/date-time/index.ts
+index a103bac0d30efb..8335366bcbb73b 100644
+--- a/packages/components/src/date-time/index.ts
++++ b/packages/components/src/date-time/index.ts
+@@ -3,7 +3,8 @@
+  */
+ import { default as DatePicker } from './date';
+ import { default as TimePicker } from './time';
++import { default as TimeInput } from './time-input';
+ import { default as DateTimePicker } from './date-time';
+ 
+-export { DatePicker, TimePicker };
++export { DatePicker, TimePicker, TimeInput };
+ export default DateTimePicker;
+diff --git a/packages/components/src/date-time/stories/time-input.story.tsx b/packages/components/src/date-time/stories/time-input.story.tsx
+new file mode 100644
+index 00000000000000..1cccbf329f2873
+--- /dev/null
++++ b/packages/components/src/date-time/stories/time-input.story.tsx
+@@ -0,0 +1,33 @@
++/**
++ * External dependencies
++ */
++import type { Meta, StoryFn } from '@storybook/react';
++import { action } from '@storybook/addon-actions';
++
++/**
++ * Internal dependencies
++ */
++import { TimeInput } from '../time-input';
++
++const meta: Meta< typeof TimeInput > = {
++	title: 'Components/TimeInput',
++	component: TimeInput,
++	argTypes: {
++		onChange: { action: 'onChange', control: { type: null } },
++	},
++	tags: [ 'status-wip' ],
++	parameters: {
++		controls: { expanded: true },
++		docs: { canvas: { sourceState: 'shown' } },
++	},
++	args: {
++		onChange: action( 'onChange' ),
++	},
++};
++export default meta;
++
++const Template: StoryFn< typeof TimeInput > = ( args ) => {
++	return <TimeInput { ...args } />;
++};
++
++export const Default: StoryFn< typeof TimeInput > = Template.bind( {} );
+diff --git a/packages/components/src/date-time/time-input/index.tsx b/packages/components/src/date-time/time-input/index.tsx
+new file mode 100644
+index 00000000000000..e4a54eb374deaa
+--- /dev/null
++++ b/packages/components/src/date-time/time-input/index.tsx
+@@ -0,0 +1,174 @@
++/**
++ * External dependencies
++ */
++import clsx from 'clsx';
++
++/**
++ * WordPress dependencies
++ */
++import { __ } from '@wordpress/i18n';
++
++/**
++ * Internal dependencies
++ */
++import {
++	TimeWrapper,
++	TimeSeparator,
++	HoursInput,
++	MinutesInput,
++} from '../time/styles';
++import { HStack } from '../../h-stack';
++import Button from '../../button';
++import ButtonGroup from '../../button-group';
++import {
++	from12hTo24h,
++	from24hTo12h,
++	buildPadInputStateReducer,
++	validateInputElementTarget,
++} from '../utils';
++import type { TimeInputProps } from '../types';
++import type { InputChangeCallback } from '../../input-control/types';
++import { useControlledValue } from '../../utils';
++
++export function TimeInput( {
++	value: valueProp,
++	defaultValue,
++	is12Hour,
++	minutesProps,
++	onChange,
++}: TimeInputProps ) {
++	const [
++		value = {
++			hours: new Date().getHours(),
++			minutes: new Date().getMinutes(),
++		},
++		setValue,
++	] = useControlledValue( {
++		value: valueProp,
++		onChange,
++		defaultValue,
++	} );
++	const dayPeriod = parseDayPeriod( value.hours );
++	const hours12Format = from24hTo12h( value.hours );
++
++	const buildNumberControlChangeCallback = (
++		method: 'hours' | 'minutes'
++	): InputChangeCallback => {
++		return ( _value, { event } ) => {
++			if ( ! validateInputElementTarget( event ) ) {
++				return;
++			}
++
++			// We can safely assume value is a number if target is valid.
++			const numberValue = Number( _value );
++
++			setValue( {
++				...value,
++				[ method ]:
++					method === 'hours' && is12Hour
++						? from12hTo24h( numberValue, dayPeriod === 'PM' )
++						: numberValue,
++			} );
++		};
++	};
++
++	const buildAmPmChangeCallback = ( _value: 'AM' | 'PM' ) => {
++		return () => {
++			if ( dayPeriod === _value ) {
++				return;
++			}
++
++			setValue( {
++				...value,
++				hours: from12hTo24h( hours12Format, _value === 'PM' ),
++			} );
++		};
++	};
++
++	function parseDayPeriod( _hours: number ) {
++		return _hours < 12 ? 'AM' : 'PM';
++	}
++
++	return (
++		<HStack alignment="left">
++			<TimeWrapper
++				className="components-datetime__time-field components-datetime__time-field-time" // Unused, for backwards compatibility.
++			>
++				<HoursInput
++					className="components-datetime__time-field-hours-input" // Unused, for backwards compatibility.
++					label={ __( 'Hours' ) }
++					hideLabelFromVision
++					__next40pxDefaultSize
++					value={ String(
++						is12Hour ? hours12Format : value.hours
++					).padStart( 2, '0' ) }
++					step={ 1 }
++					min={ is12Hour ? 1 : 0 }
++					max={ is12Hour ? 12 : 23 }
++					required
++					spinControls="none"
++					isPressEnterToChange
++					isDragEnabled={ false }
++					isShiftStepEnabled={ false }
++					onChange={ buildNumberControlChangeCallback( 'hours' ) }
++					__unstableStateReducer={ buildPadInputStateReducer( 2 ) }
++				/>
++				<TimeSeparator
++					className="components-datetime__time-separator" // Unused, for backwards compatibility.
++					aria-hidden="true"
++				>
++					:
++				</TimeSeparator>
++				<MinutesInput
++					className={ clsx(
++						'components-datetime__time-field-minutes-input', // Unused, for backwards compatibility.
++						minutesProps?.className
++					) }
++					label={ __( 'Minutes' ) }
++					hideLabelFromVision
++					__next40pxDefaultSize
++					value={ String( value.minutes ).padStart( 2, '0' ) }
++					step={ 1 }
++					min={ 0 }
++					max={ 59 }
++					required
++					spinControls="none"
++					isPressEnterToChange
++					isDragEnabled={ false }
++					isShiftStepEnabled={ false }
++					onChange={ ( ...args ) => {
++						buildNumberControlChangeCallback( 'minutes' )(
++							...args
++						);
++						minutesProps?.onChange?.( ...args );
++					} }
++					__unstableStateReducer={ buildPadInputStateReducer( 2 ) }
++					{ ...minutesProps }
++				/>
++			</TimeWrapper>
++			{ is12Hour && (
++				<ButtonGroup
++					className="components-datetime__time-field components-datetime__time-field-am-pm" // Unused, for backwards compatibility.
++				>
++					<Button
++						className="components-datetime__time-am-button" // Unused, for backwards compatibility.
++						variant={ dayPeriod === 'AM' ? 'primary' : 'secondary' }
++						__next40pxDefaultSize
++						onClick={ buildAmPmChangeCallback( 'AM' ) }
++					>
++						{ __( 'AM' ) }
++					</Button>
++					<Button
++						className="components-datetime__time-pm-button" // Unused, for backwards compatibility.
++						variant={ dayPeriod === 'PM' ? 'primary' : 'secondary' }
++						__next40pxDefaultSize
++						onClick={ buildAmPmChangeCallback( 'PM' ) }
++					>
++						{ __( 'PM' ) }
++					</Button>
++				</ButtonGroup>
++			) }
++		</HStack>
++	);
++}
++export default TimeInput;
+diff --git a/packages/components/src/date-time/time-input/test/index.tsx b/packages/components/src/date-time/time-input/test/index.tsx
+new file mode 100644
+index 00000000000000..c107cd2c9d79b6
+--- /dev/null
++++ b/packages/components/src/date-time/time-input/test/index.tsx
+@@ -0,0 +1,171 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++
++/**
++ * Internal dependencies
++ */
++import TimeInput from '..';
++
++describe( 'TimeInput', () => {
++	it( 'should call onChange with updated values | 24-hours format', async () => {
++		const user = userEvent.setup();
++
++		const timeInputValue = { hours: 0, minutes: 0 };
++		const onChangeSpy = jest.fn();
++
++		render(
++			<TimeInput
++				defaultValue={ timeInputValue }
++				onChange={ onChangeSpy }
++			/>
++		);
++
++		const hoursInput = screen.getByRole( 'spinbutton', { name: 'Hours' } );
++		const minutesInput = screen.getByRole( 'spinbutton', {
++			name: 'Minutes',
++		} );
++
++		await user.clear( minutesInput );
++		await user.type( minutesInput, '35' );
++		await user.keyboard( '{Tab}' );
++
++		expect( onChangeSpy ).toHaveBeenCalledWith( { hours: 0, minutes: 35 } );
++		onChangeSpy.mockClear();
++
++		await user.clear( hoursInput );
++		await user.type( hoursInput, '12' );
++		await user.keyboard( '{Tab}' );
++
++		expect( onChangeSpy ).toHaveBeenCalledWith( {
++			hours: 12,
++			minutes: 35,
++		} );
++		onChangeSpy.mockClear();
++
++		await user.clear( hoursInput );
++		await user.type( hoursInput, '23' );
++		await user.keyboard( '{Tab}' );
++
++		expect( onChangeSpy ).toHaveBeenCalledWith( {
++			hours: 23,
++			minutes: 35,
++		} );
++		onChangeSpy.mockClear();
++
++		await user.clear( minutesInput );
++		await user.type( minutesInput, '0' );
++		await user.keyboard( '{Tab}' );
++
++		expect( onChangeSpy ).toHaveBeenCalledWith( { hours: 23, minutes: 0 } );
++	} );
++
++	it( 'should call onChange with updated values | 12-hours format', async () => {
++		const user = userEvent.setup();
++
++		const timeInputValue = { hours: 0, minutes: 0 };
++		const onChangeSpy = jest.fn();
++
++		render(
++			<TimeInput
++				is12Hour
++				defaultValue={ timeInputValue }
++				onChange={ onChangeSpy }
++			/>
++		);
++
++		const hoursInput = screen.getByRole( 'spinbutton', { name: 'Hours' } );
++		const minutesInput = screen.getByRole( 'spinbutton', {
++			name: 'Minutes',
++		} );
++		const amButton = screen.getByRole( 'button', { name: 'AM' } );
++		const pmButton = screen.getByRole( 'button', { name: 'PM' } );
++
++		// TODO: Update assert these states through the accessibility tree rather than through styles, see: https://github.com/WordPress/gutenberg/issues/61163
++		expect( amButton ).toHaveClass( 'is-primary' );
++		expect( pmButton ).not.toHaveClass( 'is-primary' );
++		expect( hoursInput ).not.toHaveValue( 0 );
++		expect( hoursInput ).toHaveValue( 12 );
++
++		await user.clear( minutesInput );
++		await user.type( minutesInput, '35' );
++		await user.keyboard( '{Tab}' );
++
++		expect( onChangeSpy ).toHaveBeenCalledWith( { hours: 0, minutes: 35 } );
++		expect( amButton ).toHaveClass( 'is-primary' );
++
++		await user.clear( hoursInput );
++		await user.type( hoursInput, '12' );
++		await user.keyboard( '{Tab}' );
++
++		expect( onChangeSpy ).toHaveBeenCalledWith( { hours: 0, minutes: 35 } );
++
++		await user.click( pmButton );
++		expect( onChangeSpy ).toHaveBeenCalledWith( {
++			hours: 12,
++			minutes: 35,
++		} );
++		expect( pmButton ).toHaveClass( 'is-primary' );
++	} );
++
++	it( 'should call onChange with defined minutes steps', async () => {
++		const user = userEvent.setup();
++
++		const timeInputValue = { hours: 0, minutes: 0 };
++		const onChangeSpy = jest.fn();
++
++		render(
++			<TimeInput
++				defaultValue={ timeInputValue }
++				minutesProps={ { step: 5 } }
++				onChange={ onChangeSpy }
++			/>
++		);
++
++		const minutesInput = screen.getByRole( 'spinbutton', {
++			name: 'Minutes',
++		} );
++
++		await user.clear( minutesInput );
++		await user.keyboard( '{ArrowUp}' );
++
++		expect( minutesInput ).toHaveValue( 5 );
++
++		await user.keyboard( '{ArrowUp}' );
++		await user.keyboard( '{ArrowUp}' );
++
++		expect( minutesInput ).toHaveValue( 15 );
++
++		await user.keyboard( '{ArrowDown}' );
++
++		expect( minutesInput ).toHaveValue( 10 );
++
++		await user.clear( minutesInput );
++		await user.type( minutesInput, '44' );
++		await user.keyboard( '{Tab}' );
++
++		expect( minutesInput ).toHaveValue( 45 );
++
++		await user.clear( minutesInput );
++		await user.type( minutesInput, '51' );
++		await user.keyboard( '{Tab}' );
++
++		expect( minutesInput ).toHaveValue( 50 );
++	} );
++
++	it( 'should reflect changes to the value prop', () => {
++		const { rerender } = render(
++			<TimeInput value={ { hours: 0, minutes: 0 } } />
++		);
++		rerender( <TimeInput value={ { hours: 1, minutes: 2 } } /> );
++
++		expect(
++			screen.getByRole( 'spinbutton', { name: 'Hours' } )
++		).toHaveValue( 1 );
++		expect(
++			screen.getByRole( 'spinbutton', { name: 'Minutes' } )
++		).toHaveValue( 2 );
++	} );
++} );
+diff --git a/packages/components/src/date-time/time/index.tsx b/packages/components/src/date-time/time/index.tsx
+index b0d8c20be74ac6..f3039a2154d7eb 100644
+--- a/packages/components/src/date-time/time/index.tsx
++++ b/packages/components/src/date-time/time/index.tsx
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import { startOfMinute, format, set, setHours, setMonth } from 'date-fns';
++import { startOfMinute, format, set, setMonth } from 'date-fns';
+ 
+ /**
+  * WordPress dependencies
+@@ -13,63 +13,26 @@ import { __ } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import BaseControl from '../../base-control';
+-import Button from '../../button';
+-import ButtonGroup from '../../button-group';
+ import SelectControl from '../../select-control';
+ import TimeZone from './timezone';
+-import type { TimePickerProps } from '../types';
++import type { TimeInputValue, TimePickerProps } from '../types';
+ import {
+ 	Wrapper,
+ 	Fieldset,
+-	HoursInput,
+-	TimeSeparator,
+-	MinutesInput,
+ 	MonthSelectWrapper,
+ 	DayInput,
+ 	YearInput,
+-	TimeWrapper,
+ } from './styles';
+ import { HStack } from '../../h-stack';
+ import { Spacer } from '../../spacer';
+ import type { InputChangeCallback } from '../../input-control/types';
+-import type { InputState } from '../../input-control/reducer/state';
+-import type { InputAction } from '../../input-control/reducer/actions';
+ import {
+-	COMMIT,
+-	PRESS_DOWN,
+-	PRESS_UP,
+-} from '../../input-control/reducer/actions';
+-import { inputToDate } from '../utils';
++	inputToDate,
++	buildPadInputStateReducer,
++	validateInputElementTarget,
++} from '../utils';
+ import { TIMEZONELESS_FORMAT } from '../constants';
+-
+-function from12hTo24h( hours: number, isPm: boolean ) {
+-	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
+-}
+-
+-/**
+- * Creates an InputControl reducer used to pad an input so that it is always a
+- * given width. For example, the hours and minutes inputs are padded to 2 so
+- * that '4' appears as '04'.
+- *
+- * @param pad How many digits the value should be.
+- */
+-function buildPadInputStateReducer( pad: number ) {
+-	return ( state: InputState, action: InputAction ) => {
+-		const nextState = { ...state };
+-		if (
+-			action.type === COMMIT ||
+-			action.type === PRESS_UP ||
+-			action.type === PRESS_DOWN
+-		) {
+-			if ( nextState.value !== undefined ) {
+-				nextState.value = nextState.value
+-					.toString()
+-					.padStart( pad, '0' );
+-			}
+-		}
+-		return nextState;
+-	};
+-}
++import { TimeInput } from '../time-input';
+ 
+ /**
+  * TimePicker is a React component that renders a clock for time selection.
+@@ -111,46 +74,26 @@ export function TimePicker( {
+ 		);
+ 	}, [ currentTime ] );
+ 
+-	const { day, month, year, minutes, hours, am } = useMemo(
++	const { day, month, year, minutes, hours } = useMemo(
+ 		() => ( {
+ 			day: format( date, 'dd' ),
+ 			month: format( date, 'MM' ),
+ 			year: format( date, 'yyyy' ),
+ 			minutes: format( date, 'mm' ),
+-			hours: format( date, is12Hour ? 'hh' : 'HH' ),
++			hours: format( date, 'HH' ),
+ 			am: format( date, 'a' ),
+ 		} ),
+-		[ date, is12Hour ]
++		[ date ]
+ 	);
+ 
+-	const buildNumberControlChangeCallback = (
+-		method: 'hours' | 'minutes' | 'date' | 'year'
+-	) => {
++	const buildNumberControlChangeCallback = ( method: 'date' | 'year' ) => {
+ 		const callback: InputChangeCallback = ( value, { event } ) => {
+-			// `instanceof` checks need to get the instance definition from the
+-			// corresponding window object — therefore, the following logic makes
+-			// the component work correctly even when rendered inside an iframe.
+-			const HTMLInputElementInstance =
+-				( event.target as HTMLInputElement )?.ownerDocument.defaultView
+-					?.HTMLInputElement ?? HTMLInputElement;
+-
+-			if ( ! ( event.target instanceof HTMLInputElementInstance ) ) {
+-				return;
+-			}
+-
+-			if ( ! event.target.validity.valid ) {
++			if ( ! validateInputElementTarget( event ) ) {
+ 				return;
+ 			}
+ 
+ 			// We can safely assume value is a number if target is valid.
+-			let numberValue = Number( value );
+-
+-			// If the 12-hour format is being used and the 'PM' period is
+-			// selected, then the incoming value (which ranges 1-12) should be
+-			// increased by 12 to match the expected 24-hour format.
+-			if ( method === 'hours' && is12Hour ) {
+-				numberValue = from12hTo24h( numberValue, am === 'PM' );
+-			}
++			const numberValue = Number( value );
+ 
+ 			const newDate = set( date, { [ method ]: numberValue } );
+ 			setDate( newDate );
+@@ -159,22 +102,17 @@ export function TimePicker( {
+ 		return callback;
+ 	};
+ 
+-	function buildAmPmChangeCallback( value: 'AM' | 'PM' ) {
+-		return () => {
+-			if ( am === value ) {
+-				return;
+-			}
+-
+-			const parsedHours = parseInt( hours, 10 );
+-
+-			const newDate = setHours(
+-				date,
+-				from12hTo24h( parsedHours, value === 'PM' )
+-			);
+-			setDate( newDate );
+-			onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
+-		};
+-	}
++	const onTimeInputChangeCallback = ( {
++		hours: newHours,
++		minutes: newMinutes,
++	}: TimeInputValue ) => {
++		const newDate = set( date, {
++			hours: newHours,
++			minutes: newMinutes,
++		} );
++		setDate( newDate );
++		onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
++	};
+ 
+ 	const dayField = (
+ 		<DayInput
+@@ -241,84 +179,14 @@ export function TimePicker( {
+ 				<HStack
+ 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
+ 				>
+-					<TimeWrapper
+-						className="components-datetime__time-field components-datetime__time-field-time" // Unused, for backwards compatibility.
+-					>
+-						<HoursInput
+-							className="components-datetime__time-field-hours-input" // Unused, for backwards compatibility.
+-							label={ __( 'Hours' ) }
+-							hideLabelFromVision
+-							__next40pxDefaultSize
+-							value={ hours }
+-							step={ 1 }
+-							min={ is12Hour ? 1 : 0 }
+-							max={ is12Hour ? 12 : 23 }
+-							required
+-							spinControls="none"
+-							isPressEnterToChange
+-							isDragEnabled={ false }
+-							isShiftStepEnabled={ false }
+-							onChange={ buildNumberControlChangeCallback(
+-								'hours'
+-							) }
+-							__unstableStateReducer={ buildPadInputStateReducer(
+-								2
+-							) }
+-						/>
+-						<TimeSeparator
+-							className="components-datetime__time-separator" // Unused, for backwards compatibility.
+-							aria-hidden="true"
+-						>
+-							:
+-						</TimeSeparator>
+-						<MinutesInput
+-							className="components-datetime__time-field-minutes-input" // Unused, for backwards compatibility.
+-							label={ __( 'Minutes' ) }
+-							hideLabelFromVision
+-							__next40pxDefaultSize
+-							value={ minutes }
+-							step={ 1 }
+-							min={ 0 }
+-							max={ 59 }
+-							required
+-							spinControls="none"
+-							isPressEnterToChange
+-							isDragEnabled={ false }
+-							isShiftStepEnabled={ false }
+-							onChange={ buildNumberControlChangeCallback(
+-								'minutes'
+-							) }
+-							__unstableStateReducer={ buildPadInputStateReducer(
+-								2
+-							) }
+-						/>
+-					</TimeWrapper>
+-					{ is12Hour && (
+-						<ButtonGroup
+-							className="components-datetime__time-field components-datetime__time-field-am-pm" // Unused, for backwards compatibility.
+-						>
+-							<Button
+-								className="components-datetime__time-am-button" // Unused, for backwards compatibility.
+-								variant={
+-									am === 'AM' ? 'primary' : 'secondary'
+-								}
+-								__next40pxDefaultSize
+-								onClick={ buildAmPmChangeCallback( 'AM' ) }
+-							>
+-								{ __( 'AM' ) }
+-							</Button>
+-							<Button
+-								className="components-datetime__time-pm-button" // Unused, for backwards compatibility.
+-								variant={
+-									am === 'PM' ? 'primary' : 'secondary'
+-								}
+-								__next40pxDefaultSize
+-								onClick={ buildAmPmChangeCallback( 'PM' ) }
+-							>
+-								{ __( 'PM' ) }
+-							</Button>
+-						</ButtonGroup>
+-					) }
++					<TimeInput
++						value={ {
++							hours: Number( hours ),
++							minutes: Number( minutes ),
++						} }
++						is12Hour={ is12Hour }
++						onChange={ onTimeInputChangeCallback }
++					/>
+ 					<Spacer />
+ 					<TimeZone />
+ 				</HStack>
+diff --git a/packages/components/src/date-time/types.ts b/packages/components/src/date-time/types.ts
+index 02df096a866b9c..fb1b2b96d0ed31 100644
+--- a/packages/components/src/date-time/types.ts
++++ b/packages/components/src/date-time/types.ts
+@@ -1,3 +1,8 @@
++/**
++ * Internal dependencies
++ */
++import type { MinutesInput } from './time/styles';
++
+ export type TimePickerProps = {
+ 	/**
+ 	 * The initial current time the time picker should render.
+@@ -18,6 +23,51 @@ export type TimePickerProps = {
+ 	onChange?: ( time: string ) => void;
+ };
+ 
++export type TimeInputValue = {
++	/**
++	 * The hours value in 24-hour format.
++	 */
++	hours: number;
++
++	/**
++	 * The minutes value.
++	 */
++	minutes: number;
++};
++
++export type TimeInputProps = {
++	/**
++	 * Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is
++	 * displayed
++	 */
++	is12Hour?: boolean;
++
++	/**
++	 * The time input object with hours and minutes values.
++	 *
++	 * - hours: number (24-hour format)
++	 * - minutes: number
++	 */
++	value?: TimeInputValue;
++
++	/**
++	 * An optional default value for the control when used in uncontrolled mode.
++	 * If left `undefined`, the current time will be used.
++	 */
++	defaultValue?: TimeInputValue;
++
++	/**
++	 * The props to pass down to the minutes input.
++	 */
++	minutesProps?: React.ComponentProps< typeof MinutesInput >;
++
++	/**
++	 * The function is called when a new time has been selected.
++	 * Passing hours and minutes as an object properties.
++	 */
++	onChange?: ( time: TimeInputValue ) => void;
++};
++
+ export type DatePickerEvent = {
+ 	/**
+ 	 * The date of the event.
+diff --git a/packages/components/src/date-time/utils.ts b/packages/components/src/date-time/utils.ts
+index ab60179421cb4e..76250edc1959cd 100644
+--- a/packages/components/src/date-time/utils.ts
++++ b/packages/components/src/date-time/utils.ts
+@@ -3,6 +3,13 @@
+  */
+ import { toDate } from 'date-fns';
+ 
++/**
++ * Internal dependencies
++ */
++import type { InputState } from '../input-control/reducer/state';
++import type { InputAction } from '../input-control/reducer/actions';
++import { COMMIT, PRESS_DOWN, PRESS_UP } from '../input-control/reducer/actions';
++
+ /**
+  * Like date-fn's toDate, but tries to guess the format when a string is
+  * given.
+@@ -15,3 +22,65 @@ export function inputToDate( input: Date | string | number ): Date {
+ 	}
+ 	return toDate( input );
+ }
++
++/**
++ * Converts a 12-hour time to a 24-hour time.
++ * @param hours
++ * @param isPm
++ */
++export function from12hTo24h( hours: number, isPm: boolean ) {
++	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
++}
++
++/**
++ * Converts a 24-hour time to a 12-hour time.
++ * @param hours
++ */
++export function from24hTo12h( hours: number ) {
++	return hours % 12 || 12;
++}
++
++/**
++ * Creates an InputControl reducer used to pad an input so that it is always a
++ * given width. For example, the hours and minutes inputs are padded to 2 so
++ * that '4' appears as '04'.
++ *
++ * @param pad How many digits the value should be.
++ */
++export function buildPadInputStateReducer( pad: number ) {
++	return ( state: InputState, action: InputAction ) => {
++		const nextState = { ...state };
++		if (
++			action.type === COMMIT ||
++			action.type === PRESS_UP ||
++			action.type === PRESS_DOWN
++		) {
++			if ( nextState.value !== undefined ) {
++				nextState.value = nextState.value
++					.toString()
++					.padStart( pad, '0' );
++			}
++		}
++		return nextState;
++	};
++}
++
++/**
++ * Validates the target of a React event to ensure it is an input element and
++ * that the input is valid.
++ * @param event
++ */
++export function validateInputElementTarget( event: React.SyntheticEvent ) {
++	// `instanceof` checks need to get the instance definition from the
++	// corresponding window object — therefore, the following logic makes
++	// the component work correctly even when rendered inside an iframe.
++	const HTMLInputElementInstance =
++		( event.target as HTMLInputElement )?.ownerDocument.defaultView
++			?.HTMLInputElement ?? HTMLInputElement;
++
++	if ( ! ( event.target instanceof HTMLInputElementInstance ) ) {
++		return false;
++	}
++
++	return event.target.validity.valid;
++}

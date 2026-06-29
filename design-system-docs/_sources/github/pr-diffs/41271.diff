@@ -1,0 +1,26 @@
+diff --git a/packages/components/src/navigator/navigator-provider/component.tsx b/packages/components/src/navigator/navigator-provider/component.tsx
+index 634c6f8204b10e..b86e7631cc37dc 100644
+--- a/packages/components/src/navigator/navigator-provider/component.tsx
++++ b/packages/components/src/navigator/navigator-provider/component.tsx
+@@ -82,7 +82,7 @@ function NavigatorProvider(
+ 	const cx = useCx();
+ 	const classes = useMemo(
+ 		// Prevents horizontal overflow while animating screen transitions.
+-		() => cx( css( { overflowX: 'hidden' } ), className ),
++		() => cx( css( { overflowX: 'visible' } ), className ),
+ 		[ className, cx ]
+ 	);
+ 
+diff --git a/packages/components/src/navigator/navigator-screen/component.tsx b/packages/components/src/navigator/navigator-screen/component.tsx
+index c864349d67af77..5755bc410bc899 100644
+--- a/packages/components/src/navigator/navigator-screen/component.tsx
++++ b/packages/components/src/navigator/navigator-screen/component.tsx
+@@ -63,7 +63,7 @@ function NavigatorScreen( props: Props, forwardedRef: ForwardedRef< any > ) {
+ 			cx(
+ 				css( {
+ 					// Ensures horizontal overflow is visually accessible.
+-					overflowX: 'auto',
++					overflowX: 'visible',
+ 					// In case the root has a height, it should not be exceeded.
+ 					maxHeight: '100%',
+ 				} ),

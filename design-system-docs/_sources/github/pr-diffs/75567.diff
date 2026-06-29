@@ -1,0 +1,173 @@
+diff --git a/packages/boot/src/components/navigation/navigation-screen/index.tsx b/packages/boot/src/components/navigation/navigation-screen/index.tsx
+index 4ad79fa253fcfc..d7add9654ed024 100644
+--- a/packages/boot/src/components/navigation/navigation-screen/index.tsx
++++ b/packages/boot/src/components/navigation/navigation-screen/index.tsx
+@@ -56,7 +56,7 @@ export default function NavigationScreen( {
+ 	content: ReactNode;
+ 	description?: ReactNode;
+ 	backMenuItem?: string;
+-	backButtonRef?: RefObject< HTMLButtonElement >;
++	backButtonRef?: RefObject< HTMLButtonElement | null >;
+ 	animationDirection?: 'forward' | 'backward';
+ 	navigationKey?: string;
+ 	onNavigate: ( {
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a29ebe6b85195e..f8ba3e4bb535e2 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -25,6 +25,7 @@
+ -   Update Testing Library packages used in unit tests ([#75340](https://github.com/WordPress/gutenberg/pull/75340)).
+ -   Clean up type declarations using the `React` namespace ([#75499](https://github.com/WordPress/gutenberg/pull/75499) and ([#75508](https://github.com/WordPress/gutenberg/pull/75508))).
+ -   Always specify initial values for `useRef` calls ([#75513](https://github.com/WordPress/gutenberg/pull/75513)).
++-   Update `RefObject` type usage for React 19 compatibility ([#75567](https://github.com/WordPress/gutenberg/pull/75567)).
+ 
+ ## 32.1.0 (2026-01-29)
+ 
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.tsx b/packages/components/src/autocomplete/autocompleter-ui.tsx
+index 6960042a6834b1..2c2e1cd22afcf5 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.tsx
++++ b/packages/components/src/autocomplete/autocompleter-ui.tsx
+@@ -216,7 +216,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
+ }
+ 
+ function useOnClickOutside(
+-	ref: React.RefObject< HTMLElement >,
++	ref: React.RefObject< HTMLElement | null >,
+ 	handler: AutocompleterUIProps[ 'reset' ]
+ ) {
+ 	useEffect( () => {
+diff --git a/packages/components/src/autocomplete/types.ts b/packages/components/src/autocomplete/types.ts
+index 46f4a33d1401d3..991c50f87456d1 100644
+--- a/packages/components/src/autocomplete/types.ts
++++ b/packages/components/src/autocomplete/types.ts
+@@ -106,7 +106,7 @@ export type WPCompleter< TCompleterOption = any > = {
+ 	className?: string;
+ };
+ 
+-type ContentRef = React.RefObject< HTMLElement >;
++type ContentRef = React.RefObject< HTMLElement | null >;
+ 
+ export type AutocompleterUIProps = {
+ 	/**
+diff --git a/packages/components/src/custom-gradient-picker/types.ts b/packages/components/src/custom-gradient-picker/types.ts
+index 17702c74ef527a..1020ba660ce8af 100644
+--- a/packages/components/src/custom-gradient-picker/types.ts
++++ b/packages/components/src/custom-gradient-picker/types.ts
+@@ -100,7 +100,7 @@ export type ControlPointButtonProps = {
+ export type ControlPointsProps = {
+ 	disableRemove: boolean;
+ 	disableAlpha: boolean;
+-	gradientPickerDomRef: React.RefObject< HTMLDivElement >;
++	gradientPickerDomRef: React.RefObject< HTMLDivElement | null >;
+ 	ignoreMarkerPosition?: number;
+ 	value: ControlPoint[];
+ 	onChange: ( controlPoints: ControlPoint[] ) => void;
+diff --git a/packages/components/src/palette-edit/types.ts b/packages/components/src/palette-edit/types.ts
+index 71cd0ac1d8cf52..fbe9f363a5b24e 100644
+--- a/packages/components/src/palette-edit/types.ts
++++ b/packages/components/src/palette-edit/types.ts
+@@ -127,7 +127,7 @@ export type PaletteEditListViewProps< T extends Color | Gradient > = {
+ 	onChange: ( newElements?: T[] ) => void;
+ 	isGradient: T extends Gradient ? true : false;
+ 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
+-	addColorRef: React.RefObject< HTMLButtonElement >;
++	addColorRef: React.RefObject< HTMLButtonElement | null >;
+ 	editingElement?: EditingElement;
+ 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
+ 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
+diff --git a/packages/components/src/search-control/types.ts b/packages/components/src/search-control/types.ts
+index 3fa7b715afe18b..e3ca8da718f3e1 100644
+--- a/packages/components/src/search-control/types.ts
++++ b/packages/components/src/search-control/types.ts
+@@ -72,5 +72,5 @@ export type SuffixItemProps = Pick<
+ 	SearchControlProps,
+ 	'value' | 'onChange' | 'onClose'
+ > & {
+-	searchRef: React.RefObject< HTMLInputElement >;
++	searchRef: React.RefObject< HTMLInputElement | null >;
+ };
+diff --git a/packages/components/src/slot-fill/types.ts b/packages/components/src/slot-fill/types.ts
+index fb76fcbf53af47..3051c706190d7a 100644
+--- a/packages/components/src/slot-fill/types.ts
++++ b/packages/components/src/slot-fill/types.ts
+@@ -113,7 +113,7 @@ export type SlotFillProviderProps = {
+ };
+ 
+ export type SlotFillInstance = {};
+-export type SlotRef = RefObject< HTMLElement >;
++export type SlotRef = RefObject< HTMLElement | null >;
+ export type SlotRecord = { instance: SlotFillInstance } & (
+ 	| { type: 'children' }
+ 	| { type: 'portal'; ref: SlotRef; fillProps: FillProps }
+diff --git a/packages/compose/src/hooks/use-keyboard-shortcut/index.js b/packages/compose/src/hooks/use-keyboard-shortcut/index.js
+index 2659a0335a8de8..f06b618f3486c8 100644
+--- a/packages/compose/src/hooks/use-keyboard-shortcut/index.js
++++ b/packages/compose/src/hooks/use-keyboard-shortcut/index.js
+@@ -15,10 +15,10 @@ import { isAppleOS } from '@wordpress/keycodes';
+  *
+  * @typedef {Object} WPKeyboardShortcutConfig
+  *
+- * @property {boolean}                      [bindGlobal] Handle keyboard events anywhere including inside textarea/input fields.
+- * @property {string}                       [eventName]  Event name used to trigger the handler, defaults to keydown.
+- * @property {boolean}                      [isDisabled] Disables the keyboard handler if the value is true.
+- * @property {React.RefObject<HTMLElement>} [target]     React reference to the DOM element used to catch the keyboard event.
++ * @property {boolean}                             [bindGlobal] Handle keyboard events anywhere including inside textarea/input fields.
++ * @property {string}                              [eventName]  Event name used to trigger the handler, defaults to keydown.
++ * @property {boolean}                             [isDisabled] Disables the keyboard handler if the value is true.
++ * @property {React.RefObject<HTMLElement | null>} [target]     React reference to the DOM element used to catch the keyboard event.
+  */
+ 
+ /**
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 82432ae989c60b..37acea9c81f86a 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -34,6 +34,7 @@
+ - Update Testing Library packages used in unit tests. [#75340](https://github.com/WordPress/gutenberg/pull/75340)
+ - Always specify initial values for `useRef` calls. [#75513](https://github.com/WordPress/gutenberg/pull/75513)
+ - Clean up type declarations using the `React` namespace. ([#75508](https://github.com/WordPress/gutenberg/pull/75508)
++- Update `RefObject` type usage for React 19 compatibility. [#75567](https://github.com/WordPress/gutenberg/pull/75567)
+ 
+ ## 11.3.0 (2026-01-29)
+ 
+diff --git a/packages/dataviews/src/components/dataform-controls/date.tsx b/packages/dataviews/src/components/dataform-controls/date.tsx
+index 70d543fac20243..2a6eddc01de393 100644
+--- a/packages/dataviews/src/components/dataform-controls/date.tsx
++++ b/packages/dataviews/src/components/dataform-controls/date.tsx
+@@ -161,8 +161,8 @@ function ValidatedDateControl< Item >( {
+ 	field: NormalizedField< Item >;
+ 	validity?: FieldValidity;
+ 	inputRefs:
+-		| React.RefObject< HTMLInputElement >
+-		| React.RefObject< HTMLInputElement >[];
++		| React.RefObject< HTMLInputElement | null >
++		| React.RefObject< HTMLInputElement | null >[];
+ 	isTouched: boolean;
+ 	setIsTouched: ( touched: boolean ) => void;
+ 	children: React.ReactNode;
+diff --git a/packages/dataviews/src/components/dataviews-filters/filter.tsx b/packages/dataviews/src/components/dataviews-filters/filter.tsx
+index 0b1dc129e4f6d7..72a2d991812321 100644
+--- a/packages/dataviews/src/components/dataviews-filters/filter.tsx
++++ b/packages/dataviews/src/components/dataviews-filters/filter.tsx
+@@ -51,7 +51,7 @@ interface OperatorSelectorProps {
+ }
+ 
+ interface FilterProps extends OperatorSelectorProps {
+-	addFilterRef: RefObject< HTMLButtonElement >;
++	addFilterRef: RefObject< HTMLButtonElement | null >;
+ 	openedFilter: string | null;
+ 	fields: NormalizedField< any >[];
+ }
+diff --git a/packages/dataviews/src/components/dataviews-filters/toggle.tsx b/packages/dataviews/src/components/dataviews-filters/toggle.tsx
+index 5a013358267dce..7daf7967cb3a43 100644
+--- a/packages/dataviews/src/components/dataviews-filters/toggle.tsx
++++ b/packages/dataviews/src/components/dataviews-filters/toggle.tsx
+@@ -92,7 +92,7 @@ function FilterVisibilityToggle( {
+ 	filtersCount,
+ 	children,
+ }: {
+-	buttonRef: React.RefObject< HTMLButtonElement >;
++	buttonRef: React.RefObject< HTMLButtonElement | null >;
+ 	filtersCount?: number;
+ 	children: React.ReactNode;
+ } ) {

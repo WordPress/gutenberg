@@ -1,0 +1,208 @@
+diff --git a/packages/block-library/src/cover/test/edit.js b/packages/block-library/src/cover/test/edit.js
+index 74db754ff16969..8a391baa5f01d7 100644
+--- a/packages/block-library/src/cover/test/edit.js
++++ b/packages/block-library/src/cover/test/edit.js
+@@ -64,9 +64,9 @@ describe( 'Cover block', () => {
+ 			await setup();
+ 
+ 			expect(
+-				screen.getByRole( 'group', {
+-					name: 'To edit this block, you need permission to upload media.',
+-				} )
++				within( screen.getByLabelText( 'Block: Cover' ) ).getByText(
++					'To edit this block, you need permission to upload media.'
++				)
+ 			).toBeInTheDocument();
+ 		} );
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bfa095a9d32bba..b0102ecc3ca176 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,8 +2,9 @@
+ 
+ ## Unreleased
+ 
+-### Bug fix
++### Bug Fix
+ 
++-   `Placeholder`: Improved DOM structure and screen reader announcements ([#45801](https://github.com/WordPress/gutenberg/pull/45801)).
+ -   `DateTimePicker`: fix onChange callback check so that it also works inside iframes ([#54669](https://github.com/WordPress/gutenberg/pull/54669)).
+ 
+ ## 25.8.0 (2023-09-20)
+diff --git a/packages/components/src/placeholder/index.tsx b/packages/components/src/placeholder/index.tsx
+index 13634f6710d945..cdb845710251dc 100644
+--- a/packages/components/src/placeholder/index.tsx
++++ b/packages/components/src/placeholder/index.tsx
+@@ -8,6 +8,8 @@ import classnames from 'classnames';
+  */
+ import { useResizeObserver } from '@wordpress/compose';
+ import { SVG, Path } from '@wordpress/primitives';
++import { useEffect } from '@wordpress/element';
++import { speak } from '@wordpress/a11y';
+ 
+ /**
+  * Internal dependencies
+@@ -72,10 +74,17 @@ export function Placeholder(
+ 		modifierClassNames,
+ 		withIllustration ? 'has-illustration' : null
+ 	);
++
+ 	const fieldsetClasses = classnames( 'components-placeholder__fieldset', {
+ 		'is-column-layout': isColumnLayout,
+ 	} );
+ 
++	useEffect( () => {
++		if ( instructions ) {
++			speak( instructions );
++		}
++	}, [ instructions ] );
++
+ 	return (
+ 		<div { ...additionalProps } className={ classes }>
+ 			{ withIllustration ? PlaceholderIllustration : null }
+@@ -90,14 +99,12 @@ export function Placeholder(
+ 				<Icon icon={ icon } />
+ 				{ label }
+ 			</div>
+-			<fieldset className={ fieldsetClasses }>
+-				{ !! instructions && (
+-					<legend className="components-placeholder__instructions">
+-						{ instructions }
+-					</legend>
+-				) }
+-				{ children }
+-			</fieldset>
++			{ !! instructions && (
++				<div className="components-placeholder__instructions">
++					{ instructions }
++				</div>
++			) }
++			<div className={ fieldsetClasses }>{ children }</div>
+ 		</div>
+ 	);
+ }
+diff --git a/packages/components/src/placeholder/style.scss b/packages/components/src/placeholder/style.scss
+index 1cb3edfcfdbba7..ce98350b767353 100644
+--- a/packages/components/src/placeholder/style.scss
++++ b/packages/components/src/placeholder/style.scss
+@@ -72,18 +72,6 @@
+ 	}
+ }
+ 
+-// Overrides for browser and editor fieldset styles.
+-.components-placeholder__fieldset.components-placeholder__fieldset {
+-	border: none;
+-	padding: 0;
+-
+-	.components-placeholder__instructions {
+-		padding: 0;
+-		font-weight: normal;
+-		font-size: 1em;
+-	}
+-}
+-
+ .components-placeholder__fieldset.is-column-layout,
+ .components-placeholder__fieldset.is-column-layout form {
+ 	flex-direction: column;
+diff --git a/packages/components/src/placeholder/test/index.tsx b/packages/components/src/placeholder/test/index.tsx
+index c01de24eb2b055..dbb88a48826348 100644
+--- a/packages/components/src/placeholder/test/index.tsx
++++ b/packages/components/src/placeholder/test/index.tsx
+@@ -8,6 +8,7 @@ import { render, screen, within } from '@testing-library/react';
+  */
+ import { useResizeObserver } from '@wordpress/compose';
+ import { SVG, Path } from '@wordpress/primitives';
++import { speak } from '@wordpress/a11y';
+ 
+ /**
+  * Internal dependencies
+@@ -41,6 +42,9 @@ const Placeholder = (
+ 
+ const getPlaceholder = () => screen.getByTestId( 'placeholder' );
+ 
++jest.mock( '@wordpress/a11y', () => ( { speak: jest.fn() } ) );
++const mockedSpeak = jest.mocked( speak );
++
+ describe( 'Placeholder', () => {
+ 	beforeEach( () => {
+ 		// @ts-ignore
+@@ -48,10 +52,11 @@ describe( 'Placeholder', () => {
+ 			<div key="1" />,
+ 			{ width: 320 },
+ 		] );
++		mockedSpeak.mockReset();
+ 	} );
+ 
+ 	describe( 'basic rendering', () => {
+-		it( 'should by default render label section and fieldset.', () => {
++		it( 'should by default render label section and content section.', () => {
+ 			render( <Placeholder /> );
+ 			const placeholder = getPlaceholder();
+ 
+@@ -74,9 +79,12 @@ describe( 'Placeholder', () => {
+ 			);
+ 			expect( placeholderInstructions ).not.toBeInTheDocument();
+ 
+-			// Test for empty fieldset.
+-			const placeholderFieldset =
+-				within( placeholder ).getByRole( 'group' );
++			// Test for empty content. When the content is empty,
++			// the only way to query the div is with `querySelector`
++			// eslint-disable-next-line testing-library/no-node-access
++			const placeholderFieldset = placeholder.querySelector(
++				'.components-placeholder__fieldset'
++			);
+ 			expect( placeholderFieldset ).toBeInTheDocument();
+ 			expect( placeholderFieldset ).toBeEmptyDOMElement();
+ 		} );
+@@ -104,27 +112,38 @@ describe( 'Placeholder', () => {
+ 			expect( placeholderLabel ).toBeInTheDocument();
+ 		} );
+ 
+-		it( 'should display a fieldset from the children property', () => {
+-			const content = 'Fieldset';
++		it( 'should display content from the children property', () => {
++			const content = 'Placeholder content';
+ 			render( <Placeholder>{ content }</Placeholder> );
+-			const placeholderFieldset = screen.getByRole( 'group' );
++			const placeholder = screen.getByText( content );
+ 
+-			expect( placeholderFieldset ).toBeInTheDocument();
+-			expect( placeholderFieldset ).toHaveTextContent( content );
++			expect( placeholder ).toBeInTheDocument();
++			expect( placeholder ).toHaveTextContent( content );
+ 		} );
+ 
+-		it( 'should display a legend if instructions are passed', () => {
++		it( 'should display instructions when provided', () => {
+ 			const instructions = 'Choose an option.';
+ 			render(
+ 				<Placeholder instructions={ instructions }>
+-					<div>Fieldset</div>
++					<div>Placeholder content</div>
++				</Placeholder>
++			);
++			const placeholder = getPlaceholder();
++			const instructionsContainer =
++				within( placeholder ).getByText( instructions );
++
++			expect( instructionsContainer ).toBeInTheDocument();
++		} );
++
++		it( 'should announce instructions to screen readers', () => {
++			const instructions = 'Awesome block placeholder instructions.';
++			render(
++				<Placeholder instructions={ instructions }>
++					<div>Placeholder content</div>
+ 				</Placeholder>
+ 			);
+-			const captionedFieldset = screen.getByRole( 'group', {
+-				name: instructions,
+-			} );
+ 
+-			expect( captionedFieldset ).toBeInTheDocument();
++			expect( speak ).toHaveBeenCalledWith( instructions );
+ 		} );
+ 
+ 		it( 'should add an additional className to the top container', () => {

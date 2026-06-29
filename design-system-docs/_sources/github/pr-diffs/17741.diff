@@ -1,0 +1,44 @@
+diff --git a/packages/components/src/dashicon/icon-class.js b/packages/components/src/dashicon/icon-class.js
+deleted file mode 100644
+index d3ce7279e81e44..00000000000000
+--- a/packages/components/src/dashicon/icon-class.js
++++ /dev/null
+@@ -1,3 +0,0 @@
+-export const getIconClassName = ( icon, className ) => {
+-	return [ 'dashicon', 'dashicons-' + icon, className ].filter( Boolean ).join( ' ' );
+-};
+diff --git a/packages/components/src/dashicon/icon-class.native.js b/packages/components/src/dashicon/icon-class.native.js
+deleted file mode 100644
+index 3353a9a3652381..00000000000000
+--- a/packages/components/src/dashicon/icon-class.native.js
++++ /dev/null
+@@ -1,3 +0,0 @@
+-export const getIconClassName = ( icon, className, ariaPressed ) => {
+-	return [ ariaPressed ? 'dashicon-active' : 'dashicon', 'dashicons-' + icon, className ].filter( Boolean ).join( ' ' );
+-};
+diff --git a/packages/components/src/dashicon/index.js b/packages/components/src/dashicon/index.js
+index cd7ecdd622245c..5a44b56126378b 100644
+--- a/packages/components/src/dashicon/index.js
++++ b/packages/components/src/dashicon/index.js
+@@ -14,11 +14,10 @@ import { Component } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { Path, SVG } from '../primitives';
+-import { getIconClassName } from './icon-class';
+ 
+ export default class Dashicon extends Component {
+ 	render() {
+-		const { icon, size = 20, className, ariaPressed, ...extraProps } = this.props;
++		const { icon, size = 20, className, ...extraProps } = this.props;
+ 		let path;
+ 
+ 		switch ( icon ) {
+@@ -892,7 +891,7 @@ export default class Dashicon extends Component {
+ 			return null;
+ 		}
+ 
+-		const iconClass = getIconClassName( icon, className, ariaPressed );
++		const iconClass = [ 'dashicon', 'dashicons-' + icon, className ].filter( Boolean ).join( ' ' );
+ 
+ 		return (
+ 			<SVG

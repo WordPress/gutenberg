@@ -1,0 +1,930 @@
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index cb12eeb436699f..78a3891a6d569a 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -73,6 +73,7 @@ export { default as ToggleControl } from './toggle-control';
+ export { default as Toolbar } from './toolbar';
+ export { default as ToolbarButton } from './toolbar-button';
+ export { default as ToolbarGroup } from './toolbar-group';
++export { default as __experimentalToolbarItem } from './toolbar-item';
+ export { default as Tooltip } from './tooltip';
+ export { default as TreeSelect } from './tree-select';
+ export { default as VisuallyHidden } from './visually-hidden';
+diff --git a/packages/components/src/index.native.js b/packages/components/src/index.native.js
+index 7663cf7f8a74e4..087a7acd658319 100644
+--- a/packages/components/src/index.native.js
++++ b/packages/components/src/index.native.js
+@@ -7,6 +7,7 @@ export { default as Dropdown } from './dropdown';
+ export { default as Toolbar } from './toolbar';
+ export { default as ToolbarButton } from './toolbar-button';
+ export { default as ToolbarGroup } from './toolbar-group';
++export { default as __experimentalToolbarItem } from './toolbar-item';
+ export { default as Icon } from './icon';
+ export { default as IconButton } from './button/deprecated';
+ export { default as Spinner } from './spinner';
+diff --git a/packages/components/src/toolbar-button/accessible-toolbar-button-container.js b/packages/components/src/toolbar-button/accessible-toolbar-button-container.js
+deleted file mode 100644
+index 5d026c4b83e8c9..00000000000000
+--- a/packages/components/src/toolbar-button/accessible-toolbar-button-container.js
++++ /dev/null
+@@ -1,26 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { useToolbarItem } from 'reakit/Toolbar';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { Children, cloneElement, useContext } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import ToolbarContext from '../toolbar-context';
+-
+-function AccessibleToolbarButtonContainer( props ) {
+-	const accessibleToolbarState = useContext( ToolbarContext );
+-	const childButton = Children.only( props.children );
+-
+-	// https://reakit.io/docs/composition/#props-hooks
+-	const itemHTMLProps = useToolbarItem( accessibleToolbarState, childButton.props );
+-
+-	return <div { ...props }>{ cloneElement( childButton, itemHTMLProps ) }</div>;
+-}
+-
+-export default AccessibleToolbarButtonContainer;
+diff --git a/packages/components/src/toolbar-button/accessible-toolbar-button-container.native.js b/packages/components/src/toolbar-button/accessible-toolbar-button-container.native.js
+deleted file mode 100644
+index 7fe5e6657bcd10..00000000000000
+--- a/packages/components/src/toolbar-button/accessible-toolbar-button-container.native.js
++++ /dev/null
+@@ -1,6 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import ToolbarButtonContainer from './toolbar-button-container';
+-
+-export default ToolbarButtonContainer;
+diff --git a/packages/components/src/toolbar-button/index.js b/packages/components/src/toolbar-button/index.js
+index 665e7bc49fd6cf..5ffa9ad2f39536 100644
+--- a/packages/components/src/toolbar-button/index.js
++++ b/packages/components/src/toolbar-button/index.js
+@@ -12,63 +12,55 @@ import { useContext } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Button from '../button';
++import ToolbarItem from '../toolbar-item';
+ import ToolbarContext from '../toolbar-context';
+-import AccessibleToolbarButtonContainer from './accessible-toolbar-button-container';
+ import ToolbarButtonContainer from './toolbar-button-container';
+ 
+ function ToolbarButton( {
+ 	containerClassName,
+-	icon,
+-	title,
+-	shortcut,
+-	subscript,
+-	onClick,
+ 	className,
+-	isActive,
+-	isDisabled,
+ 	extraProps,
+ 	children,
++	...props
+ } ) {
+-	// It'll contain state if `ToolbarButton` is being used within
+-	// `<Toolbar __experimentalAccessibilityLabel="label" />`
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+ 
+-	const button = (
+-		<Button
+-			icon={ icon }
+-			label={ title }
+-			shortcut={ shortcut }
+-			data-subscript={ subscript }
+-			onClick={ ( event ) => {
+-				event.stopPropagation();
+-				if ( onClick ) {
+-					onClick( event );
+-				}
+-			} }
+-			className={ classnames(
+-				'components-toolbar__control',
+-				className,
+-			) }
+-			isPressed={ isActive }
+-			disabled={ isDisabled }
+-			{ ...extraProps }
+-		/>
+-	);
+-
+-	if ( accessibleToolbarState ) {
++	if ( ! accessibleToolbarState ) {
++		// This should be deprecated when <Toolbar __experimentalAccessibilityLabel="label">
++		// becomes stable.
+ 		return (
+-			<AccessibleToolbarButtonContainer className={ containerClassName }>
+-				{ button }
+-			</AccessibleToolbarButtonContainer>
++			<ToolbarButtonContainer className={ containerClassName }>
++				<Button
++					icon={ props.icon }
++					label={ props.title }
++					shortcut={ props.shortcut }
++					data-subscript={ props.subscript }
++					onClick={ ( event ) => {
++						event.stopPropagation();
++						if ( props.onClick ) {
++							props.onClick( event );
++						}
++					} }
++					className={ classnames( 'components-toolbar__control', className ) }
++					isPressed={ props.isActive }
++					disabled={ props.isDisabled }
++					{ ...extraProps }
++				/>
++				{ children }
++			</ToolbarButtonContainer>
+ 		);
+ 	}
+ 
+-	// ToolbarButton is being used outside of the accessible Toolbar
++	// ToobarItem will pass all props to the render prop child, which will pass
++	// all props to Button. This means that ToolbarButton has the same API as
++	// Button.
+ 	return (
+-		<ToolbarButtonContainer className={ containerClassName }>
+-			{ button }
+-			{ children }
+-		</ToolbarButtonContainer>
++		<ToolbarItem
++			className={ classnames( 'components-toolbar-button', className ) }
++			{ ...props }
++		>
++			{ ( toolbarItemProps ) => <Button { ...toolbarItemProps }>{ children }</Button> }
++		</ToolbarItem>
+ 	);
+ }
+ 
+diff --git a/packages/components/src/toolbar-group/index.js b/packages/components/src/toolbar-group/index.js
+index 866a671875c18e..769df54be8af9a 100644
+--- a/packages/components/src/toolbar-group/index.js
++++ b/packages/components/src/toolbar-group/index.js
+@@ -53,9 +53,8 @@ function ToolbarGroup( {
+ 	children,
+ 	className,
+ 	isCollapsed,
+-	icon,
+ 	title,
+-	...otherProps
++	...props
+ } ) {
+ 	// It'll contain state if `ToolbarGroup` is being used within
+ 	// `<Toolbar accessibilityLabel="label" />`
+@@ -81,18 +80,17 @@ function ToolbarGroup( {
+ 	if ( isCollapsed ) {
+ 		return (
+ 			<ToolbarGroupCollapsed
+-				icon={ icon }
+ 				label={ title }
+ 				controls={ controlSets }
+ 				className={ finalClassName }
+ 				children={ children }
+-				{ ...otherProps }
++				{ ...props }
+ 			/>
+ 		);
+ 	}
+ 
+ 	return (
+-		<ToolbarGroupContainer className={ finalClassName } { ...otherProps }>
++		<ToolbarGroupContainer className={ finalClassName } { ...props }>
+ 			{ flatMap( controlSets, ( controlSet, indexOfSet ) =>
+ 				controlSet.map( ( control, indexOfControl ) => (
+ 					<ToolbarButton
+diff --git a/packages/components/src/toolbar-group/toolbar-group-collapsed.js b/packages/components/src/toolbar-group/toolbar-group-collapsed.js
+index 8e684a7cae72ac..32d2fb47f19e64 100644
+--- a/packages/components/src/toolbar-group/toolbar-group-collapsed.js
++++ b/packages/components/src/toolbar-group/toolbar-group-collapsed.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { ToolbarItem } from 'reakit/Toolbar';
+-
+ /**
+  * WordPress dependencies
+  */
+@@ -13,14 +8,9 @@ import { useContext } from '@wordpress/element';
+  */
+ import DropdownMenu from '../dropdown-menu';
+ import ToolbarContext from '../toolbar-context';
++import ToolbarItem from '../toolbar-item';
+ 
+-function ToolbarGroupCollapsed( {
+-	controls = [],
+-	className,
+-	icon,
+-	label,
+-	...props
+-} ) {
++function ToolbarGroupCollapsed( { controls = [], ...props } ) {
+ 	// It'll contain state if `ToolbarGroup` is being used within
+ 	// `<Toolbar __experimentalAccessibilityLabel="label" />`
+ 	const accessibleToolbarState = useContext( ToolbarContext );
+@@ -28,22 +18,14 @@ function ToolbarGroupCollapsed( {
+ 	const renderDropdownMenu = ( toggleProps ) => (
+ 		<DropdownMenu
+ 			hasArrowIndicator
+-			icon={ icon }
+-			label={ label }
+ 			controls={ controls }
+-			className={ className }
+ 			toggleProps={ toggleProps }
+ 			{ ...props }
+ 		/>
+ 	);
+ 
+ 	if ( accessibleToolbarState ) {
+-		return (
+-			// https://reakit.io/docs/composition/#render-props
+-			<ToolbarItem { ...accessibleToolbarState }>
+-				{ ( toolbarItemHTMLProps ) => renderDropdownMenu( toolbarItemHTMLProps ) }
+-			</ToolbarItem>
+-		);
++		return <ToolbarItem>{ renderDropdownMenu }</ToolbarItem>;
+ 	}
+ 
+ 	return renderDropdownMenu();
+diff --git a/packages/components/src/toolbar-group/toolbar-group-collapsed.native.js b/packages/components/src/toolbar-group/toolbar-group-collapsed.native.js
+index 718e1238792c43..b688d842ff5966 100644
+--- a/packages/components/src/toolbar-group/toolbar-group-collapsed.native.js
++++ b/packages/components/src/toolbar-group/toolbar-group-collapsed.native.js
+@@ -3,16 +3,8 @@
+  */
+ import DropdownMenu from '../dropdown-menu';
+ 
+-function ToolbarGroupCollapsed( { controls = [], className, icon, label } ) {
+-	return (
+-		<DropdownMenu
+-			hasArrowIndicator
+-			icon={ icon }
+-			label={ label }
+-			controls={ controls }
+-			className={ className }
+-		/>
+-	);
++function ToolbarGroupCollapsed( { controls = [], ...props } ) {
++	return <DropdownMenu hasArrowIndicator controls={ controls } { ...props } />;
+ }
+ 
+ export default ToolbarGroupCollapsed;
+diff --git a/packages/components/src/toolbar-item/index.js b/packages/components/src/toolbar-item/index.js
+new file mode 100644
+index 00000000000000..00170174387bd4
+--- /dev/null
++++ b/packages/components/src/toolbar-item/index.js
+@@ -0,0 +1,36 @@
++/**
++ * External dependencies
++ */
++import { useToolbarItem } from 'reakit/Toolbar';
++
++/**
++ * WordPress dependencies
++ */
++import { forwardRef, useContext } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import ToolbarContext from '../toolbar-context';
++
++function ToolbarItem( { children, ...props }, ref ) {
++	const accessibleToolbarState = useContext( ToolbarContext );
++	// https://reakit.io/docs/composition/#props-hooks
++	const itemProps = useToolbarItem( accessibleToolbarState, { ...props, ref } );
++
++	if ( typeof children !== 'function' ) {
++		// eslint-disable-next-line no-console
++		console.warn( '`ToolbarItem` is a generic headless component that accepts only function children props' );
++		return null;
++	}
++
++	if ( ! accessibleToolbarState ) {
++		// eslint-disable-next-line no-console
++		console.warn( '`ToolbarItem` should be rendered within `<Toolbar __experimentalAccessibilityLabel="label">`' );
++		return null;
++	}
++
++	return children( itemProps );
++}
++
++export default forwardRef( ToolbarItem );
+diff --git a/packages/components/src/toolbar-item/index.native.js b/packages/components/src/toolbar-item/index.native.js
+new file mode 100644
+index 00000000000000..9819d0ed02d83b
+--- /dev/null
++++ b/packages/components/src/toolbar-item/index.native.js
+@@ -0,0 +1,16 @@
++/**
++ * WordPress dependencies
++ */
++import { forwardRef } from '@wordpress/element';
++
++function ToolbarItem( { children, ...props }, ref ) {
++	if ( typeof children !== 'function' ) {
++		// eslint-disable-next-line no-console
++		console.warn( '`ToolbarItem` is a generic headless component that accepts only function children props' );
++		return null;
++	}
++
++	return children( { ...props, ref } );
++}
++
++export default forwardRef( ToolbarItem );
+diff --git a/packages/components/src/toolbar/stories/index.js b/packages/components/src/toolbar/stories/index.js
+index 102f924f5a1a07..e817eca75e4722 100644
+--- a/packages/components/src/toolbar/stories/index.js
++++ b/packages/components/src/toolbar/stories/index.js
+@@ -2,7 +2,14 @@
+  * Internal dependencies
+  */
+ import Toolbar from '../';
+-import { SVG, Path, ToolbarButton, ToolbarGroup } from '../../';
++import {
++	SVG,
++	Path,
++	ToolbarButton,
++	ToolbarGroup,
++	__experimentalToolbarItem as ToolbarItem,
++	DropdownMenu,
++} from '../../';
+ 
+ export default { title: 'Components|Toolbar', component: Toolbar };
+ 
+@@ -20,22 +27,30 @@ export const _default = () => {
+ 		// id is required for server side rendering
+ 		<Toolbar __experimentalAccessibilityLabel="Options" id="options-toolbar">
+ 			<ToolbarGroup>
+-				<ToolbarButton icon="editor-paragraph" title="Paragraph" />
++				<ToolbarButton icon="editor-paragraph" label="Paragraph" />
++			</ToolbarGroup>
++			<ToolbarGroup>
++				<ToolbarItem>
++					{ ( toggleProps ) => (
++						<DropdownMenu
++							hasArrowIndicator
++							icon="editor-alignleft"
++							label="Change text alignment"
++							controls={ [
++								{ icon: 'editor-alignleft', title: 'Align left', isActive: true },
++								{ icon: 'editor-aligncenter', title: 'Align center' },
++								{ icon: 'editor-alignright', title: 'Align right' },
++							] }
++							toggleProps={ toggleProps }
++						/>
++					) }
++				</ToolbarItem>
+ 			</ToolbarGroup>
+-			<ToolbarGroup
+-				icon="editor-alignleft"
+-				label="Change text alignment"
+-				isCollapsed
+-				controls={ [
+-					{ icon: 'editor-alignleft', title: 'Align left', isActive: true },
+-					{ icon: 'editor-aligncenter', title: 'Align center' },
+-					{ icon: 'editor-alignright', title: 'Align right' },
+-				] }
+-			/>
+ 			<ToolbarGroup>
+-				<ToolbarButton icon="editor-bold" title="Bold" />
+-				<ToolbarButton icon="editor-italic" title="Italic" />
+-				<ToolbarButton icon="admin-links" title="Link" />
++				<ToolbarButton>Text</ToolbarButton>
++				<ToolbarButton icon="editor-bold" label="Bold" isPressed />
++				<ToolbarButton icon="editor-italic" label="Italic" />
++				<ToolbarButton icon="admin-links" label="Link" />
+ 				<ToolbarGroup
+ 					isCollapsed
+ 					icon={ false }
+@@ -65,10 +80,13 @@ export const _default = () => {
+ export const withoutGroup = () => {
+ 	return (
+ 		// id is required for server side rendering
+-		<Toolbar __experimentalAccessibilityLabel="Options" id="options-toolbar-without-group">
+-			<ToolbarButton icon="editor-bold" title="Bold" />
+-			<ToolbarButton icon="editor-italic" title="Italic" />
+-			<ToolbarButton icon="admin-links" title="Link" />
++		<Toolbar
++			__experimentalAccessibilityLabel="Options"
++			id="options-toolbar-without-group"
++		>
++			<ToolbarButton icon="editor-bold" label="Bold" isPressed />
++			<ToolbarButton icon="editor-italic" label="Italic" />
++			<ToolbarButton icon="admin-links" label="Link" />
+ 		</Toolbar>
+ 	);
+ };
+diff --git a/packages/components/src/toolbar/test/index.js b/packages/components/src/toolbar/test/index.js
+index 2d454d1a8bff38..6a89be423647e8 100644
+--- a/packages/components/src/toolbar/test/index.js
++++ b/packages/components/src/toolbar/test/index.js
+@@ -14,8 +14,8 @@ describe( 'Toolbar', () => {
+ 		it( 'should render a toolbar with toolbar buttons', () => {
+ 			const wrapper = mount(
+ 				<Toolbar __experimentalAccessibilityLabel="blocks">
+-					<ToolbarButton title="control1" />
+-					<ToolbarButton title="control2" />
++					<ToolbarButton label="control1" />
++					<ToolbarButton label="control2" />
+ 				</Toolbar>
+ 			);
+ 			const control1 = wrapper.find( 'button[aria-label="control1"]' );
+diff --git a/storybook/test/__snapshots__/index.js.snap b/storybook/test/__snapshots__/index.js.snap
+index d24d251f7f9c6c..f972025eaf13b2 100644
+--- a/storybook/test/__snapshots__/index.js.snap
++++ b/storybook/test/__snapshots__/index.js.snap
+@@ -3687,48 +3687,11 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
+ >
+   <div
+     className="components-toolbar-group"
+-  >
+-    <div>
+-      <button
+-        aria-label="Paragraph"
+-        className="components-button components-toolbar__control has-icon"
+-        id="options-toolbar-1"
+-        onBlur={[Function]}
+-        onClick={[Function]}
+-        onFocus={[Function]}
+-        onKeyDown={[Function]}
+-        onMouseDown={[Function]}
+-        onMouseEnter={[Function]}
+-        onMouseLeave={[Function]}
+-        tabIndex={-1}
+-        type="button"
+-      >
+-        <svg
+-          aria-hidden="true"
+-          className="dashicon dashicons-editor-paragraph"
+-          focusable="false"
+-          height={20}
+-          role="img"
+-          viewBox="0 0 20 20"
+-          width={20}
+-          xmlns="http://www.w3.org/2000/svg"
+-        >
+-          <path
+-            d="M15 2H7.54c-.83 0-1.59.2-2.28.6-.7.41-1.25.96-1.65 1.65C3.2 4.94 3 5.7 3 6.52s.2 1.58.61 2.27c.4.69.95 1.24 1.65 1.64.69.41 1.45.61 2.28.61h.43V17c0 .27.1.51.29.71.2.19.44.29.71.29.28 0 .51-.1.71-.29.2-.2.3-.44.3-.71V5c0-.27.09-.51.29-.71.2-.19.44-.29.71-.29s.51.1.71.29c.19.2.29.44.29.71v12c0 .27.1.51.3.71.2.19.43.29.71.29.27 0 .51-.1.71-.29.19-.2.29-.44.29-.71V4H15c.27 0 .5-.1.7-.3.2-.19.3-.43.3-.7s-.1-.51-.3-.71C15.5 2.1 15.27 2 15 2z"
+-          />
+-        </svg>
+-      </button>
+-    </div>
+-  </div>
+-  <div
+-    className="components-dropdown components-dropdown-menu components-toolbar-group"
+   >
+     <button
+-      aria-expanded={false}
+-      aria-haspopup="true"
+-      aria-label="Change text alignment"
+-      className="components-button components-dropdown-menu__toggle has-text has-icon"
+-      id="options-toolbar-2"
++      aria-label="Paragraph"
++      className="components-button components-toolbar-button has-icon"
++      id="options-toolbar-1"
+       onBlur={[Function]}
+       onClick={[Function]}
+       onFocus={[Function]}
+@@ -3741,7 +3704,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
+     >
+       <svg
+         aria-hidden="true"
+-        className="dashicon dashicons-editor-alignleft"
++        className="dashicon dashicons-editor-paragraph"
+         focusable="false"
+         height={20}
+         role="img"
+@@ -3750,84 +3713,23 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
+         xmlns="http://www.w3.org/2000/svg"
+       >
+         <path
+-          d="M12 5V3H3v2h9zm5 4V7H3v2h14zm-5 4v-2H3v2h9zm5 4v-2H3v2h14z"
++          d="M15 2H7.54c-.83 0-1.59.2-2.28.6-.7.41-1.25.96-1.65 1.65C3.2 4.94 3 5.7 3 6.52s.2 1.58.61 2.27c.4.69.95 1.24 1.65 1.64.69.41 1.45.61 2.28.61h.43V17c0 .27.1.51.29.71.2.19.44.29.71.29.28 0 .51-.1.71-.29.2-.2.3-.44.3-.71V5c0-.27.09-.51.29-.71.2-.19.44-.29.71-.29s.51.1.71.29c.19.2.29.44.29.71v12c0 .27.1.51.3.71.2.19.43.29.71.29.27 0 .51-.1.71-.29.19-.2.29-.44.29-.71V4H15c.27 0 .5-.1.7-.3.2-.19.3-.43.3-.7s-.1-.51-.3-.71C15.5 2.1 15.27 2 15 2z"
+         />
+       </svg>
+-      <span
+-        className="components-dropdown-menu__indicator"
+-      />
+     </button>
+   </div>
+   <div
+     className="components-toolbar-group"
+   >
+-    <div>
+-      <button
+-        aria-label="Bold"
+-        className="components-button components-toolbar__control has-icon"
+-        id="options-toolbar-3"
+-        onBlur={[Function]}
+-        onClick={[Function]}
+-        onFocus={[Function]}
+-        onKeyDown={[Function]}
+-        onMouseDown={[Function]}
+-        onMouseEnter={[Function]}
+-        onMouseLeave={[Function]}
+-        tabIndex={-1}
+-        type="button"
+-      >
+-        <svg
+-          aria-hidden="true"
+-          className="dashicon dashicons-editor-bold"
+-          focusable="false"
+-          height={20}
+-          role="img"
+-          viewBox="0 0 20 20"
+-          width={20}
+-          xmlns="http://www.w3.org/2000/svg"
+-        >
+-          <path
+-            d="M6 4v13h4.54c1.37 0 2.46-.33 3.26-1 .8-.66 1.2-1.58 1.2-2.77 0-.84-.17-1.51-.51-2.01s-.9-.85-1.67-1.03v-.09c.57-.1 1.02-.4 1.36-.9s.51-1.13.51-1.91c0-1.14-.39-1.98-1.17-2.5C12.75 4.26 11.5 4 9.78 4H6zm2.57 5.15V6.26h1.36c.73 0 1.27.11 1.61.32.34.22.51.58.51 1.07 0 .54-.16.92-.47 1.15s-.82.35-1.51.35h-1.5zm0 2.19h1.6c1.44 0 2.16.53 2.16 1.61 0 .6-.17 1.05-.51 1.34s-.86.43-1.57.43H8.57v-3.38z"
+-          />
+-        </svg>
+-      </button>
+-    </div>
+-    <div>
+-      <button
+-        aria-label="Italic"
+-        className="components-button components-toolbar__control has-icon"
+-        id="options-toolbar-4"
+-        onBlur={[Function]}
+-        onClick={[Function]}
+-        onFocus={[Function]}
+-        onKeyDown={[Function]}
+-        onMouseDown={[Function]}
+-        onMouseEnter={[Function]}
+-        onMouseLeave={[Function]}
+-        tabIndex={-1}
+-        type="button"
+-      >
+-        <svg
+-          aria-hidden="true"
+-          className="dashicon dashicons-editor-italic"
+-          focusable="false"
+-          height={20}
+-          role="img"
+-          viewBox="0 0 20 20"
+-          width={20}
+-          xmlns="http://www.w3.org/2000/svg"
+-        >
+-          <path
+-            d="M14.78 6h-2.13l-2.8 9h2.12l-.62 2H4.6l.62-2h2.14l2.8-9H8.03l.62-2h6.75z"
+-          />
+-        </svg>
+-      </button>
+-    </div>
+-    <div>
++    <div
++      className="components-dropdown components-dropdown-menu"
++    >
+       <button
+-        aria-label="Link"
+-        className="components-button components-toolbar__control has-icon"
+-        id="options-toolbar-5"
++        aria-expanded={false}
++        aria-haspopup="true"
++        aria-label="Change text alignment"
++        className="components-button components-dropdown-menu__toggle has-text has-icon"
++        id="options-toolbar-2"
+         onBlur={[Function]}
+         onClick={[Function]}
+         onFocus={[Function]}
+@@ -3840,7 +3742,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
+       >
+         <svg
+           aria-hidden="true"
+-          className="dashicon dashicons-admin-links"
++          className="dashicon dashicons-editor-alignleft"
+           focusable="false"
+           height={20}
+           role="img"
+@@ -3849,30 +3751,9 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
+           xmlns="http://www.w3.org/2000/svg"
+         >
+           <path
+-            d="M17.74 2.76c1.68 1.69 1.68 4.41 0 6.1l-1.53 1.52c-1.12 1.12-2.7 1.47-4.14 1.09l2.62-2.61.76-.77.76-.76c.84-.84.84-2.2 0-3.04-.84-.85-2.2-.85-3.04 0l-.77.76-3.38 3.38c-.37-1.44-.02-3.02 1.1-4.14l1.52-1.53c1.69-1.68 4.42-1.68 6.1 0zM8.59 13.43l5.34-5.34c.42-.42.42-1.1 0-1.52-.44-.43-1.13-.39-1.53 0l-5.33 5.34c-.42.42-.42 1.1 0 1.52.44.43 1.13.39 1.52 0zm-.76 2.29l4.14-4.15c.38 1.44.03 3.02-1.09 4.14l-1.52 1.53c-1.69 1.68-4.41 1.68-6.1 0-1.68-1.68-1.68-4.42 0-6.1l1.53-1.52c1.12-1.12 2.7-1.47 4.14-1.1l-4.14 4.15c-.85.84-.85 2.2 0 3.05.84.84 2.2.84 3.04 0z"
++            d="M12 5V3H3v2h9zm5 4V7H3v2h14zm-5 4v-2H3v2h9zm5 4v-2H3v2h14z"
+           />
+         </svg>
+-      </button>
+-    </div>
+-    <div
+-      className="components-dropdown components-dropdown-menu components-toolbar-group"
+-    >
+-      <button
+-        aria-expanded={false}
+-        aria-haspopup="true"
+-        aria-label="More rich text controls"
+-        className="components-button components-dropdown-menu__toggle"
+-        id="options-toolbar-6"
+-        onBlur={[Function]}
+-        onClick={[Function]}
+-        onFocus={[Function]}
+-        onKeyDown={[Function]}
+-        onMouseDown={[Function]}
+-        onMouseEnter={[Function]}
+-        onMouseLeave={[Function]}
+-        tabIndex={-1}
+-        type="button"
+-      >
+         <span
+           className="components-dropdown-menu__indicator"
+         />
+@@ -3880,14 +3761,25 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
+     </div>
+   </div>
+   <div
+-    className="components-dropdown components-dropdown-menu components-toolbar-group"
++    className="components-toolbar-group"
+   >
+     <button
+-      aria-expanded={false}
+-      aria-haspopup="true"
+-      aria-label="Change text alignment"
+-      className="components-button components-dropdown-menu__toggle has-icon"
+-      id="options-toolbar-7"
++      className="components-button components-toolbar-button"
++      id="options-toolbar-3"
++      onClick={[Function]}
++      onFocus={[Function]}
++      onKeyDown={[Function]}
++      onMouseDown={[Function]}
++      tabIndex={-1}
++      type="button"
++    >
++      Text
++    </button>
++    <button
++      aria-label="Bold"
++      aria-pressed={true}
++      className="components-button components-toolbar-button is-pressed has-icon"
++      id="options-toolbar-4"
+       onBlur={[Function]}
+       onClick={[Function]}
+       onFocus={[Function]}
+@@ -3900,7 +3792,7 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
+     >
+       <svg
+         aria-hidden="true"
+-        className="dashicon dashicons-ellipsis"
++        className="dashicon dashicons-editor-bold"
+         focusable="false"
+         height={20}
+         role="img"
+@@ -3909,27 +3801,14 @@ exports[`Storyshots Components|Toolbar Default 1`] = `
+         xmlns="http://www.w3.org/2000/svg"
+       >
+         <path
+-          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
++          d="M6 4v13h4.54c1.37 0 2.46-.33 3.26-1 .8-.66 1.2-1.58 1.2-2.77 0-.84-.17-1.51-.51-2.01s-.9-.85-1.67-1.03v-.09c.57-.1 1.02-.4 1.36-.9s.51-1.13.51-1.91c0-1.14-.39-1.98-1.17-2.5C12.75 4.26 11.5 4 9.78 4H6zm2.57 5.15V6.26h1.36c.73 0 1.27.11 1.61.32.34.22.51.58.51 1.07 0 .54-.16.92-.47 1.15s-.82.35-1.51.35h-1.5zm0 2.19h1.6c1.44 0 2.16.53 2.16 1.61 0 .6-.17 1.05-.51 1.34s-.86.43-1.57.43H8.57v-3.38z"
+         />
+       </svg>
+     </button>
+-  </div>
+-</div>
+-`;
+-
+-exports[`Storyshots Components|Toolbar Without Group 1`] = `
+-<div
+-  aria-label="Options"
+-  aria-orientation="horizontal"
+-  className="components-accessible-toolbar"
+-  id="options-toolbar-without-group"
+-  role="toolbar"
+->
+-  <div>
+     <button
+-      aria-label="Bold"
+-      className="components-button components-toolbar__control has-icon"
+-      id="options-toolbar-without-group-1"
++      aria-label="Italic"
++      className="components-button components-toolbar-button has-icon"
++      id="options-toolbar-5"
+       onBlur={[Function]}
+       onClick={[Function]}
+       onFocus={[Function]}
+@@ -3942,7 +3821,7 @@ exports[`Storyshots Components|Toolbar Without Group 1`] = `
+     >
+       <svg
+         aria-hidden="true"
+-        className="dashicon dashicons-editor-bold"
++        className="dashicon dashicons-editor-italic"
+         focusable="false"
+         height={20}
+         role="img"
+@@ -3951,16 +3830,14 @@ exports[`Storyshots Components|Toolbar Without Group 1`] = `
+         xmlns="http://www.w3.org/2000/svg"
+       >
+         <path
+-          d="M6 4v13h4.54c1.37 0 2.46-.33 3.26-1 .8-.66 1.2-1.58 1.2-2.77 0-.84-.17-1.51-.51-2.01s-.9-.85-1.67-1.03v-.09c.57-.1 1.02-.4 1.36-.9s.51-1.13.51-1.91c0-1.14-.39-1.98-1.17-2.5C12.75 4.26 11.5 4 9.78 4H6zm2.57 5.15V6.26h1.36c.73 0 1.27.11 1.61.32.34.22.51.58.51 1.07 0 .54-.16.92-.47 1.15s-.82.35-1.51.35h-1.5zm0 2.19h1.6c1.44 0 2.16.53 2.16 1.61 0 .6-.17 1.05-.51 1.34s-.86.43-1.57.43H8.57v-3.38z"
++          d="M14.78 6h-2.13l-2.8 9h2.12l-.62 2H4.6l.62-2h2.14l2.8-9H8.03l.62-2h6.75z"
+         />
+       </svg>
+     </button>
+-  </div>
+-  <div>
+     <button
+-      aria-label="Italic"
+-      className="components-button components-toolbar__control has-icon"
+-      id="options-toolbar-without-group-2"
++      aria-label="Link"
++      className="components-button components-toolbar-button has-icon"
++      id="options-toolbar-6"
+       onBlur={[Function]}
+       onClick={[Function]}
+       onFocus={[Function]}
+@@ -3973,7 +3850,7 @@ exports[`Storyshots Components|Toolbar Without Group 1`] = `
+     >
+       <svg
+         aria-hidden="true"
+-        className="dashicon dashicons-editor-italic"
++        className="dashicon dashicons-admin-links"
+         focusable="false"
+         height={20}
+         role="img"
+@@ -3982,16 +3859,44 @@ exports[`Storyshots Components|Toolbar Without Group 1`] = `
+         xmlns="http://www.w3.org/2000/svg"
+       >
+         <path
+-          d="M14.78 6h-2.13l-2.8 9h2.12l-.62 2H4.6l.62-2h2.14l2.8-9H8.03l.62-2h6.75z"
++          d="M17.74 2.76c1.68 1.69 1.68 4.41 0 6.1l-1.53 1.52c-1.12 1.12-2.7 1.47-4.14 1.09l2.62-2.61.76-.77.76-.76c.84-.84.84-2.2 0-3.04-.84-.85-2.2-.85-3.04 0l-.77.76-3.38 3.38c-.37-1.44-.02-3.02 1.1-4.14l1.52-1.53c1.69-1.68 4.42-1.68 6.1 0zM8.59 13.43l5.34-5.34c.42-.42.42-1.1 0-1.52-.44-.43-1.13-.39-1.53 0l-5.33 5.34c-.42.42-.42 1.1 0 1.52.44.43 1.13.39 1.52 0zm-.76 2.29l4.14-4.15c.38 1.44.03 3.02-1.09 4.14l-1.52 1.53c-1.69 1.68-4.41 1.68-6.1 0-1.68-1.68-1.68-4.42 0-6.1l1.53-1.52c1.12-1.12 2.7-1.47 4.14-1.1l-4.14 4.15c-.85.84-.85 2.2 0 3.05.84.84 2.2.84 3.04 0z"
+         />
+       </svg>
+     </button>
++    <div
++      className="components-dropdown components-dropdown-menu components-toolbar-group"
++    >
++      <button
++        aria-expanded={false}
++        aria-haspopup="true"
++        aria-label="More rich text controls"
++        className="components-button components-dropdown-menu__toggle"
++        id="options-toolbar-7"
++        onBlur={[Function]}
++        onClick={[Function]}
++        onFocus={[Function]}
++        onKeyDown={[Function]}
++        onMouseDown={[Function]}
++        onMouseEnter={[Function]}
++        onMouseLeave={[Function]}
++        tabIndex={-1}
++        type="button"
++      >
++        <span
++          className="components-dropdown-menu__indicator"
++        />
++      </button>
++    </div>
+   </div>
+-  <div>
++  <div
++    className="components-dropdown components-dropdown-menu components-toolbar-group"
++  >
+     <button
+-      aria-label="Link"
+-      className="components-button components-toolbar__control has-icon"
+-      id="options-toolbar-without-group-3"
++      aria-expanded={false}
++      aria-haspopup="true"
++      aria-label="Change text alignment"
++      className="components-button components-dropdown-menu__toggle has-icon"
++      id="options-toolbar-8"
+       onBlur={[Function]}
+       onClick={[Function]}
+       onFocus={[Function]}
+@@ -4004,7 +3909,7 @@ exports[`Storyshots Components|Toolbar Without Group 1`] = `
+     >
+       <svg
+         aria-hidden="true"
+-        className="dashicon dashicons-admin-links"
++        className="dashicon dashicons-ellipsis"
+         focusable="false"
+         height={20}
+         role="img"
+@@ -4013,7 +3918,7 @@ exports[`Storyshots Components|Toolbar Without Group 1`] = `
+         xmlns="http://www.w3.org/2000/svg"
+       >
+         <path
+-          d="M17.74 2.76c1.68 1.69 1.68 4.41 0 6.1l-1.53 1.52c-1.12 1.12-2.7 1.47-4.14 1.09l2.62-2.61.76-.77.76-.76c.84-.84.84-2.2 0-3.04-.84-.85-2.2-.85-3.04 0l-.77.76-3.38 3.38c-.37-1.44-.02-3.02 1.1-4.14l1.52-1.53c1.69-1.68 4.42-1.68 6.1 0zM8.59 13.43l5.34-5.34c.42-.42.42-1.1 0-1.52-.44-.43-1.13-.39-1.53 0l-5.33 5.34c-.42.42-.42 1.1 0 1.52.44.43 1.13.39 1.52 0zm-.76 2.29l4.14-4.15c.38 1.44.03 3.02-1.09 4.14l-1.52 1.53c-1.69 1.68-4.41 1.68-6.1 0-1.68-1.68-1.68-4.42 0-6.1l1.53-1.52c1.12-1.12 2.7-1.47 4.14-1.1l-4.14 4.15c-.85.84-.85 2.2 0 3.05.84.84 2.2.84 3.04 0z"
++          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+         />
+       </svg>
+     </button>
+@@ -4021,6 +3926,105 @@ exports[`Storyshots Components|Toolbar Without Group 1`] = `
+ </div>
+ `;
+ 
++exports[`Storyshots Components|Toolbar Without Group 1`] = `
++<div
++  aria-label="Options"
++  aria-orientation="horizontal"
++  className="components-accessible-toolbar"
++  id="options-toolbar-without-group"
++  role="toolbar"
++>
++  <button
++    aria-label="Bold"
++    aria-pressed={true}
++    className="components-button components-toolbar-button is-pressed has-icon"
++    id="options-toolbar-without-group-1"
++    onBlur={[Function]}
++    onClick={[Function]}
++    onFocus={[Function]}
++    onKeyDown={[Function]}
++    onMouseDown={[Function]}
++    onMouseEnter={[Function]}
++    onMouseLeave={[Function]}
++    tabIndex={-1}
++    type="button"
++  >
++    <svg
++      aria-hidden="true"
++      className="dashicon dashicons-editor-bold"
++      focusable="false"
++      height={20}
++      role="img"
++      viewBox="0 0 20 20"
++      width={20}
++      xmlns="http://www.w3.org/2000/svg"
++    >
++      <path
++        d="M6 4v13h4.54c1.37 0 2.46-.33 3.26-1 .8-.66 1.2-1.58 1.2-2.77 0-.84-.17-1.51-.51-2.01s-.9-.85-1.67-1.03v-.09c.57-.1 1.02-.4 1.36-.9s.51-1.13.51-1.91c0-1.14-.39-1.98-1.17-2.5C12.75 4.26 11.5 4 9.78 4H6zm2.57 5.15V6.26h1.36c.73 0 1.27.11 1.61.32.34.22.51.58.51 1.07 0 .54-.16.92-.47 1.15s-.82.35-1.51.35h-1.5zm0 2.19h1.6c1.44 0 2.16.53 2.16 1.61 0 .6-.17 1.05-.51 1.34s-.86.43-1.57.43H8.57v-3.38z"
++      />
++    </svg>
++  </button>
++  <button
++    aria-label="Italic"
++    className="components-button components-toolbar-button has-icon"
++    id="options-toolbar-without-group-2"
++    onBlur={[Function]}
++    onClick={[Function]}
++    onFocus={[Function]}
++    onKeyDown={[Function]}
++    onMouseDown={[Function]}
++    onMouseEnter={[Function]}
++    onMouseLeave={[Function]}
++    tabIndex={-1}
++    type="button"
++  >
++    <svg
++      aria-hidden="true"
++      className="dashicon dashicons-editor-italic"
++      focusable="false"
++      height={20}
++      role="img"
++      viewBox="0 0 20 20"
++      width={20}
++      xmlns="http://www.w3.org/2000/svg"
++    >
++      <path
++        d="M14.78 6h-2.13l-2.8 9h2.12l-.62 2H4.6l.62-2h2.14l2.8-9H8.03l.62-2h6.75z"
++      />
++    </svg>
++  </button>
++  <button
++    aria-label="Link"
++    className="components-button components-toolbar-button has-icon"
++    id="options-toolbar-without-group-3"
++    onBlur={[Function]}
++    onClick={[Function]}
++    onFocus={[Function]}
++    onKeyDown={[Function]}
++    onMouseDown={[Function]}
++    onMouseEnter={[Function]}
++    onMouseLeave={[Function]}
++    tabIndex={-1}
++    type="button"
++  >
++    <svg
++      aria-hidden="true"
++      className="dashicon dashicons-admin-links"
++      focusable="false"
++      height={20}
++      role="img"
++      viewBox="0 0 20 20"
++      width={20}
++      xmlns="http://www.w3.org/2000/svg"
++    >
++      <path
++        d="M17.74 2.76c1.68 1.69 1.68 4.41 0 6.1l-1.53 1.52c-1.12 1.12-2.7 1.47-4.14 1.09l2.62-2.61.76-.77.76-.76c.84-.84.84-2.2 0-3.04-.84-.85-2.2-.85-3.04 0l-.77.76-3.38 3.38c-.37-1.44-.02-3.02 1.1-4.14l1.52-1.53c1.69-1.68 4.42-1.68 6.1 0zM8.59 13.43l5.34-5.34c.42-.42.42-1.1 0-1.52-.44-.43-1.13-.39-1.53 0l-5.33 5.34c-.42.42-.42 1.1 0 1.52.44.43 1.13.39 1.52 0zm-.76 2.29l4.14-4.15c.38 1.44.03 3.02-1.09 4.14l-1.52 1.53c-1.69 1.68-4.41 1.68-6.1 0-1.68-1.68-1.68-4.42 0-6.1l1.53-1.52c1.12-1.12 2.7-1.47 4.14-1.1l-4.14 4.15c-.85.84-.85 2.2 0 3.05.84.84 2.2.84 3.04 0z"
++      />
++    </svg>
++  </button>
++</div>
++`;
++
+ exports[`Storyshots Components|ToolbarGroup Default 1`] = `
+ <div
+   className="components-toolbar"

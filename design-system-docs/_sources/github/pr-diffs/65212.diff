@@ -1,0 +1,50 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8c656f4adb48bb..b036c7f8816ba7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ ### Enhancements
+ 
+ -   `Modal`: Decrease close button size and remove horizontal offset ([#65131](https://github.com/WordPress/gutenberg/pull/65131)).
++-   `CheckboxControl`: Add background transition ([#65212](https://github.com/WordPress/gutenberg/pull/65212)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/checkbox-control/style.scss b/packages/components/src/checkbox-control/style.scss
+index 25394ba645ee80..5716301ada0e54 100644
+--- a/packages/components/src/checkbox-control/style.scss
++++ b/packages/components/src/checkbox-control/style.scss
+@@ -32,7 +32,7 @@
+ 	height: var(--checkbox-input-size);
+ 
+ 	appearance: none;
+-	transition: 0.1s border-color ease-in-out;
++	transition: 0.1s border-color ease-in-out, 0.1s background ease-in-out;
+ 	@include reduce-motion("transition");
+ 
+ 	&:focus {
+@@ -84,9 +84,24 @@ svg.components-checkbox-control__indeterminate {
+ 	@include break-small() {
+ 		--checkmark-size: calc(var(--checkbox-input-size) + 4px);
+ 	}
++
++
++	animation: components-checkbox__appear-animation 0.1s ease-in-out;
+ }
+ 
+ .components-checkbox-control__help {
+ 	display: inline-block;
+ 	margin-inline-start: calc(var(--checkbox-input-size) + var(--checkbox-input-margin));
+ }
++
++
++@keyframes components-checkbox__appear-animation {
++	from {
++		opacity: 0;
++		transform: translate(-50%, -50%) scale(0);
++	}
++	to {
++		opacity: 1;
++		transform: translate(-50%, -50%) scale(1);
++	}
++}

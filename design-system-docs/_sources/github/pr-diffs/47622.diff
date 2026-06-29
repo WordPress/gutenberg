@@ -1,0 +1,1075 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 739fc1a160db68..9b252adb68a586 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -22,6 +22,7 @@
+ -   `ColorPalette`, `BorderControl`, `GradientPicker`: refine types and logic around single vs multiple palettes
+  ([#47384](https://github.com/WordPress/gutenberg/pull/47384)).
+ -   `Button`: Convert to TypeScript ([#46997](https://github.com/WordPress/gutenberg/pull/46997)).
++-   `BoxControl`: Convert to TypeScript ([#47622](https://github.com/WordPress/gutenberg/pull/47622)).
+ -   `QueryControls`: Convert to TypeScript ([#46721](https://github.com/WordPress/gutenberg/pull/46721)).
+ -   `Notice`: refactor to TypeScript ([47118](https://github.com/WordPress/gutenberg/pull/47118)).
+ 
+diff --git a/packages/components/src/box-control/README.md b/packages/components/src/box-control/README.md
+index edf3993679033f..83ccd50a6f1ffc 100644
+--- a/packages/components/src/box-control/README.md
++++ b/packages/components/src/box-control/README.md
+@@ -30,82 +30,73 @@ const Example = () => {
+ ```
+ 
+ ## Props
+-### allowReset
++### `allowReset`: `boolean`
+ 
+ If this property is true, a button to reset the box control is rendered.
+ 
+-- Type: `Boolean`
+ - Required: No
+ - Default: `true`
+ 
+-### splitOnAxis
++### `splitOnAxis`: `boolean`
+ 
+ If this property is true, when the box control is unlinked, vertical and horizontal controls can be used instead of updating individual sides.
+ 
+-- Type: `Boolean`
+ - Required: No
+ - Default: `false`
+ 
+-### inputProps
++### `inputProps`: `object`
+ 
+-Props for the internal [InputControl](../input-control) components.
++Props for the internal [UnitControl](../unit-control) components.
+ 
+--   Type: `Object`
+ -   Required: No
++-   Default: `{ min: 0 }`
+ 
+-### label
++### `label`: `string`
+ 
+-Heading label for BoxControl.
++Heading label for the control.
+ 
+--   Type: `String`
+ -   Required: No
+--   Default: `Box Control`
++-   Default: `__( 'Box Control' )`
+ 
+-### onChange
++### `onChange`: `(next: BoxControlValue) => void`
+ 
+ A callback function when an input value changes.
+ 
+--   Type: `Function`
+ -   Required: Yes
+ 
+-### resetValues
++### `resetValues`: `object`
+ 
+ The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
+ 
+--   Type: `Object`
+ -   Required: No
++-   Default: `{ top: undefined, right: undefined, bottom: undefined, left: undefined }`
+ 
+-### sides
++### `sides`: `string[]`
+ 
+-Collection of sides to allow control of. If omitted or empty, all sides will be available.
++Collection of sides to allow control of. If omitted or empty, all sides will be available. Allowed values are "top", "right", "bottom", "left", "vertical", and "horizontal".
+ 
+--   Type: `Array<Object>`
+ -   Required: No
+ 
+-### units
++### `units`: `WPUnitControlUnit[]`
+ 
+ Collection of available units which are compatible with [UnitControl](../unit-control).
+ 
+--   Type: `Array<Object>`
+ -   Required: No
+ 
+-### values
++### `values`: `object`
+ 
+ The `top`, `right`, `bottom`, and `left` box dimension values.
+ 
+--   Type: `Object`
+ -   Required: No
+ 
+-### onMouseOver
++### `onMouseOver`: `function`
+ 
+ A handler for onMouseOver events.
+ 
+--   Type: `Function`
+ -   Required: No
+ 
+-### onMouseOut
++### `onMouseOut`: `function`
+ 
+ A handler for onMouseOut events.
+ 
+--   Type: `Function`
+ -   Required: No
+diff --git a/packages/components/src/box-control/all-input-control.js b/packages/components/src/box-control/all-input-control.tsx
+similarity index 74%
+rename from packages/components/src/box-control/all-input-control.js
+rename to packages/components/src/box-control/all-input-control.tsx
+index fcde202fd7de8f..b66e10fdb4ce3f 100644
+--- a/packages/components/src/box-control/all-input-control.js
++++ b/packages/components/src/box-control/all-input-control.tsx
+@@ -1,6 +1,8 @@
+ /**
+  * Internal dependencies
+  */
++import type { UnitControlProps } from '../unit-control/types';
++import type { BoxControlInputControlProps } from './types';
+ import UnitControl from './unit-control';
+ import {
+ 	LABELS,
+@@ -22,18 +24,20 @@ export default function AllInputControl( {
+ 	selectedUnits,
+ 	setSelectedUnits,
+ 	...props
+-} ) {
++}: BoxControlInputControlProps ) {
+ 	const allValue = getAllValue( values, selectedUnits, sides );
+ 	const hasValues = isValuesDefined( values );
+ 	const isMixed = hasValues && isValuesMixed( values, selectedUnits, sides );
+-	const allPlaceholder = isMixed ? LABELS.mixed : null;
++	const allPlaceholder = isMixed ? LABELS.mixed : undefined;
+ 
+-	const handleOnFocus = ( event ) => {
++	const handleOnFocus: React.FocusEventHandler< HTMLInputElement > = (
++		event
++	) => {
+ 		onFocus( event, { side: 'all' } );
+ 	};
+ 
+-	const handleOnChange = ( next ) => {
+-		const isNumeric = ! isNaN( parseFloat( next ) );
++	const handleOnChange: UnitControlProps[ 'onChange' ] = ( next ) => {
++		const isNumeric = next !== undefined && ! isNaN( parseFloat( next ) );
+ 		const nextValue = isNumeric ? next : undefined;
+ 		const nextValues = applyValueToSides( values, nextValue, sides );
+ 
+@@ -42,7 +46,7 @@ export default function AllInputControl( {
+ 
+ 	// Set selected unit so it can be used as fallback by unlinked controls
+ 	// when individual sides do not have a value containing a unit.
+-	const handleOnUnitChange = ( unit ) => {
++	const handleOnUnitChange: UnitControlProps[ 'onUnitChange' ] = ( unit ) => {
+ 		const newUnits = applyValueToSides( selectedUnits, unit, sides );
+ 		setSelectedUnits( newUnits );
+ 	};
+diff --git a/packages/components/src/box-control/axial-input-controls.js b/packages/components/src/box-control/axial-input-controls.tsx
+similarity index 71%
+rename from packages/components/src/box-control/axial-input-controls.js
+rename to packages/components/src/box-control/axial-input-controls.tsx
+index 99a09d4ba366c7..627cfce408583a 100644
+--- a/packages/components/src/box-control/axial-input-controls.js
++++ b/packages/components/src/box-control/axial-input-controls.tsx
+@@ -5,8 +5,10 @@ import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
+ import UnitControl from './unit-control';
+ import { LABELS } from './utils';
+ import { Layout } from './styles/box-control-styles';
++import type { BoxControlInputControlProps } from './types';
+ 
+-const groupedSides = [ 'vertical', 'horizontal' ];
++const groupedSides = [ 'vertical', 'horizontal' ] as const;
++type GroupedSide = typeof groupedSides[ number ];
+ 
+ export default function AxialInputControls( {
+ 	onChange,
+@@ -18,15 +20,17 @@ export default function AxialInputControls( {
+ 	setSelectedUnits,
+ 	sides,
+ 	...props
+-} ) {
+-	const createHandleOnFocus = ( side ) => ( event ) => {
+-		if ( ! onFocus ) {
+-			return;
+-		}
+-		onFocus( event, { side } );
+-	};
++}: BoxControlInputControlProps ) {
++	const createHandleOnFocus =
++		( side: GroupedSide ) =>
++		( event: React.FocusEvent< HTMLInputElement > ) => {
++			if ( ! onFocus ) {
++				return;
++			}
++			onFocus( event, { side } );
++		};
+ 
+-	const createHandleOnHoverOn = ( side ) => () => {
++	const createHandleOnHoverOn = ( side: GroupedSide ) => () => {
+ 		if ( ! onHoverOn ) {
+ 			return;
+ 		}
+@@ -44,7 +48,7 @@ export default function AxialInputControls( {
+ 		}
+ 	};
+ 
+-	const createHandleOnHoverOff = ( side ) => () => {
++	const createHandleOnHoverOff = ( side: GroupedSide ) => () => {
+ 		if ( ! onHoverOff ) {
+ 			return;
+ 		}
+@@ -62,12 +66,12 @@ export default function AxialInputControls( {
+ 		}
+ 	};
+ 
+-	const createHandleOnChange = ( side ) => ( next ) => {
++	const createHandleOnChange = ( side: GroupedSide ) => ( next?: string ) => {
+ 		if ( ! onChange ) {
+ 			return;
+ 		}
+ 		const nextValues = { ...values };
+-		const isNumeric = ! isNaN( parseFloat( next ) );
++		const isNumeric = next !== undefined && ! isNaN( parseFloat( next ) );
+ 		const nextValue = isNumeric ? next : undefined;
+ 
+ 		if ( side === 'vertical' ) {
+@@ -83,21 +87,22 @@ export default function AxialInputControls( {
+ 		onChange( nextValues );
+ 	};
+ 
+-	const createHandleOnUnitChange = ( side ) => ( next ) => {
+-		const newUnits = { ...selectedUnits };
++	const createHandleOnUnitChange =
++		( side: GroupedSide ) => ( next?: string ) => {
++			const newUnits = { ...selectedUnits };
+ 
+-		if ( side === 'vertical' ) {
+-			newUnits.top = next;
+-			newUnits.bottom = next;
+-		}
++			if ( side === 'vertical' ) {
++				newUnits.top = next;
++				newUnits.bottom = next;
++			}
+ 
+-		if ( side === 'horizontal' ) {
+-			newUnits.left = next;
+-			newUnits.right = next;
+-		}
++			if ( side === 'horizontal' ) {
++				newUnits.left = next;
++				newUnits.right = next;
++			}
+ 
+-		setSelectedUnits( newUnits );
+-	};
++			setSelectedUnits( newUnits );
++		};
+ 
+ 	// Filter sides if custom configuration provided, maintaining default order.
+ 	const filteredSides = sides?.length
+diff --git a/packages/components/src/box-control/icon.js b/packages/components/src/box-control/icon.tsx
+similarity index 69%
+rename from packages/components/src/box-control/icon.js
+rename to packages/components/src/box-control/icon.tsx
+index 2a7db9972c5b13..6cb893648d68ab 100644
+--- a/packages/components/src/box-control/icon.js
++++ b/packages/components/src/box-control/icon.tsx
+@@ -1,6 +1,7 @@
+ /**
+  * Internal dependencies
+  */
++import type { WordPressComponentProps } from '../ui/context';
+ import {
+ 	Root,
+ 	Viewbox,
+@@ -9,6 +10,7 @@ import {
+ 	BottomStroke,
+ 	LeftStroke,
+ } from './styles/box-control-icon-styles';
++import type { BoxControlIconProps, BoxControlProps } from './types';
+ 
+ const BASE_ICON_SIZE = 24;
+ 
+@@ -17,11 +19,14 @@ export default function BoxControlIcon( {
+ 	side = 'all',
+ 	sides,
+ 	...props
+-} ) {
+-	const isSideDisabled = ( value ) =>
+-		sides?.length && ! sides.includes( value );
++}: WordPressComponentProps< BoxControlIconProps, 'span' > ) {
++	const isSideDisabled = (
++		value: NonNullable< BoxControlProps[ 'sides' ] >[ number ]
++	) => sides?.length && ! sides.includes( value );
+ 
+-	const hasSide = ( value ) => {
++	const hasSide = (
++		value: NonNullable< BoxControlProps[ 'sides' ] >[ number ]
++	) => {
+ 		if ( isSideDisabled( value ) ) {
+ 			return false;
+ 		}
+diff --git a/packages/components/src/box-control/index.js b/packages/components/src/box-control/index.tsx
+similarity index 78%
+rename from packages/components/src/box-control/index.js
+rename to packages/components/src/box-control/index.tsx
+index d8a0fdf4c67483..cf267aff44352e 100644
+--- a/packages/components/src/box-control/index.js
++++ b/packages/components/src/box-control/index.tsx
+@@ -29,6 +29,11 @@ import {
+ 	isValuesDefined,
+ } from './utils';
+ import { useControlledState } from '../utils/hooks';
++import type {
++	BoxControlIconProps,
++	BoxControlProps,
++	BoxControlValue,
++} from './types';
+ 
+ const defaultInputProps = {
+ 	min: 0,
+@@ -36,12 +41,38 @@ const defaultInputProps = {
+ 
+ const noop = () => {};
+ 
+-function useUniqueId( idProp ) {
++function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( BoxControl, 'inspector-box-control' );
+ 
+ 	return idProp || instanceId;
+ }
+-export default function BoxControl( {
++
++/**
++ * BoxControl components let users set values for Top, Right, Bottom, and Left.
++ * This can be used as an input control for values like `padding` or `margin`.
++ *
++ * ```jsx
++ * import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const Example = () => {
++ * 	const [ values, setValues ] = useState( {
++ * 		top: '50px',
++ * 		left: '10%',
++ * 		right: '10%',
++ * 		bottom: '50px',
++ * 	} );
++ *
++ * 	return (
++ * 		<BoxControl
++ * 			values={ values }
++ * 			onChange={ ( nextValues ) => setValues( nextValues ) }
++ * 		/>
++ * 	);
++ * };
++ * ```
++ */
++function BoxControl( {
+ 	id: idProp,
+ 	inputProps = defaultInputProps,
+ 	onChange = noop,
+@@ -54,7 +85,7 @@ export default function BoxControl( {
+ 	resetValues = DEFAULT_VALUES,
+ 	onMouseOver,
+ 	onMouseOut,
+-} ) {
++}: BoxControlProps ) {
+ 	const [ values, setValues ] = useControlledState( valuesProp, {
+ 		fallback: DEFAULT_VALUES,
+ 	} );
+@@ -67,14 +98,14 @@ export default function BoxControl( {
+ 		! hasInitialValue || ! isValuesMixed( inputValues ) || hasOneSide
+ 	);
+ 
+-	const [ side, setSide ] = useState(
++	const [ side, setSide ] = useState< BoxControlIconProps[ 'side' ] >(
+ 		getInitialSide( isLinked, splitOnAxis )
+ 	);
+ 
+ 	// Tracking selected units via internal state allows filtering of CSS unit
+ 	// only values from being saved while maintaining preexisting unit selection
+ 	// behaviour. Filtering CSS only values prevents invalid style values.
+-	const [ selectedUnits, setSelectedUnits ] = useState( {
++	const [ selectedUnits, setSelectedUnits ] = useState< BoxControlValue >( {
+ 		top: parseQuantityAndUnitFromRawValue( valuesProp?.top )[ 1 ],
+ 		right: parseQuantityAndUnitFromRawValue( valuesProp?.right )[ 1 ],
+ 		bottom: parseQuantityAndUnitFromRawValue( valuesProp?.bottom )[ 1 ],
+@@ -89,11 +120,14 @@ export default function BoxControl( {
+ 		setSide( getInitialSide( ! isLinked, splitOnAxis ) );
+ 	};
+ 
+-	const handleOnFocus = ( event, { side: nextSide } ) => {
++	const handleOnFocus = (
++		_event: React.FocusEvent< HTMLInputElement >,
++		{ side: nextSide }: { side: typeof side }
++	) => {
+ 		setSide( nextSide );
+ 	};
+ 
+-	const handleOnChange = ( nextValues ) => {
++	const handleOnChange = ( nextValues: BoxControlValue ) => {
+ 		onChange( nextValues );
+ 		setValues( nextValues );
+ 		setIsDirty( true );
+@@ -132,7 +166,7 @@ export default function BoxControl( {
+ 					<FlexItem>
+ 						<Button
+ 							className="component-box-control__reset-button"
+-							isSecondary
++							variant="secondary"
+ 							isSmall
+ 							onClick={ handleOnReset }
+ 							disabled={ ! isDirty }
+@@ -176,3 +210,4 @@ export default function BoxControl( {
+ }
+ 
+ export { applyValueToSides } from './utils';
++export default BoxControl;
+diff --git a/packages/components/src/box-control/input-controls.js b/packages/components/src/box-control/input-controls.tsx
+similarity index 69%
+rename from packages/components/src/box-control/input-controls.js
+rename to packages/components/src/box-control/input-controls.tsx
+index 244488c70046ac..f72179f0d18c10 100644
+--- a/packages/components/src/box-control/input-controls.js
++++ b/packages/components/src/box-control/input-controls.tsx
+@@ -5,6 +5,8 @@ import UnitControl from './unit-control';
+ import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
+ import { ALL_SIDES, LABELS } from './utils';
+ import { LayoutContainer, Layout } from './styles/box-control-styles';
++import type { BoxControlInputControlProps, BoxControlValue } from './types';
++import type { UnitControlProps } from '../unit-control/types';
+ 
+ const noop = () => {};
+ 
+@@ -18,29 +20,33 @@ export default function BoxInputControls( {
+ 	setSelectedUnits,
+ 	sides,
+ 	...props
+-} ) {
+-	const createHandleOnFocus = ( side ) => ( event ) => {
+-		onFocus( event, { side } );
+-	};
++}: BoxControlInputControlProps ) {
++	const createHandleOnFocus =
++		( side: keyof BoxControlValue ) =>
++		( event: React.FocusEvent< HTMLInputElement > ) => {
++			onFocus( event, { side } );
++		};
+ 
+-	const createHandleOnHoverOn = ( side ) => () => {
++	const createHandleOnHoverOn = ( side: keyof BoxControlValue ) => () => {
+ 		onHoverOn( { [ side ]: true } );
+ 	};
+ 
+-	const createHandleOnHoverOff = ( side ) => () => {
++	const createHandleOnHoverOff = ( side: keyof BoxControlValue ) => () => {
+ 		onHoverOff( { [ side ]: false } );
+ 	};
+ 
+-	const handleOnChange = ( nextValues ) => {
++	const handleOnChange = ( nextValues: BoxControlValue ) => {
+ 		onChange( nextValues );
+ 	};
+ 
+-	const createHandleOnChange =
++	const createHandleOnChange: (
++		side: keyof BoxControlValue
++	) => UnitControlProps[ 'onChange' ] =
+ 		( side ) =>
+ 		( next, { event } ) => {
+-			const { altKey } = event;
+ 			const nextValues = { ...values };
+-			const isNumeric = ! isNaN( parseFloat( next ) );
++			const isNumeric =
++				next !== undefined && ! isNaN( parseFloat( next ) );
+ 			const nextValue = isNumeric ? next : undefined;
+ 
+ 			nextValues[ side ] = nextValue;
+@@ -49,7 +55,10 @@ export default function BoxInputControls( {
+ 			 * Supports changing pair sides. For example, holding the ALT key
+ 			 * when changing the TOP will also update BOTTOM.
+ 			 */
+-			if ( altKey ) {
++			// @ts-expect-error - TODO: event.altKey is only present when the change event was
++			// triggered by a keyboard event. Should this feature be implemented differently so
++			// it also works with drag events?
++			if ( event.altKey ) {
+ 				switch ( side ) {
+ 					case 'top':
+ 						nextValues.bottom = nextValue;
+@@ -69,11 +78,12 @@ export default function BoxInputControls( {
+ 			handleOnChange( nextValues );
+ 		};
+ 
+-	const createHandleOnUnitChange = ( side ) => ( next ) => {
+-		const newUnits = { ...selectedUnits };
+-		newUnits[ side ] = next;
+-		setSelectedUnits( newUnits );
+-	};
++	const createHandleOnUnitChange =
++		( side: keyof BoxControlValue ) => ( next?: string ) => {
++			const newUnits = { ...selectedUnits };
++			newUnits[ side ] = next;
++			setSelectedUnits( newUnits );
++		};
+ 
+ 	// Filter sides if custom configuration provided, maintaining default order.
+ 	const filteredSides = sides?.length
+diff --git a/packages/components/src/box-control/linked-button.js b/packages/components/src/box-control/linked-button.tsx
+similarity index 80%
+rename from packages/components/src/box-control/linked-button.js
+rename to packages/components/src/box-control/linked-button.tsx
+index 67fb1cebf7b091..600261379d5675 100644
+--- a/packages/components/src/box-control/linked-button.js
++++ b/packages/components/src/box-control/linked-button.tsx
+@@ -10,7 +10,10 @@ import { __ } from '@wordpress/i18n';
+ import Button from '../button';
+ import Tooltip from '../tooltip';
+ 
+-export default function LinkedButton( { isLinked, ...props } ) {
++export default function LinkedButton( {
++	isLinked,
++	...props
++}: { isLinked?: boolean } & React.ComponentProps< typeof Button > ) {
+ 	const label = isLinked ? __( 'Unlink sides' ) : __( 'Link sides' );
+ 
+ 	return (
+diff --git a/packages/components/src/box-control/styles/box-control-icon-styles.js b/packages/components/src/box-control/styles/box-control-icon-styles.ts
+similarity index 94%
+rename from packages/components/src/box-control/styles/box-control-icon-styles.js
+rename to packages/components/src/box-control/styles/box-control-icon-styles.ts
+index e3222968f0ed70..2ce7a540d5c363 100644
+--- a/packages/components/src/box-control/styles/box-control-icon-styles.js
++++ b/packages/components/src/box-control/styles/box-control-icon-styles.ts
+@@ -21,7 +21,7 @@ export const Viewbox = styled.span`
+ 	height: 100%;
+ `;
+ 
+-const strokeFocus = ( { isFocused } ) => {
++const strokeFocus = ( { isFocused }: { isFocused: boolean } ) => {
+ 	return css( {
+ 		backgroundColor: 'currentColor',
+ 		opacity: isFocused ? 1 : 0.3,
+diff --git a/packages/components/src/box-control/styles/box-control-styles.js b/packages/components/src/box-control/styles/box-control-styles.ts
+similarity index 81%
+rename from packages/components/src/box-control/styles/box-control-styles.js
+rename to packages/components/src/box-control/styles/box-control-styles.ts
+index 1aa2c995a8235d..d961d4322ba5ac 100644
+--- a/packages/components/src/box-control/styles/box-control-styles.js
++++ b/packages/components/src/box-control/styles/box-control-styles.ts
+@@ -9,6 +9,7 @@ import styled from '@emotion/styled';
+ import { Flex } from '../../flex';
+ import BaseUnitControl from '../../unit-control';
+ import { rtl } from '../../utils';
++import type { BoxUnitControlProps } from '../types';
+ 
+ export const Root = styled.div`
+ 	box-sizing: border-box;
+@@ -43,7 +44,11 @@ export const Layout = styled( Flex )`
+ 	justify-content: flex-start;
+ `;
+ 
+-const unitControlBorderRadiusStyles = ( { isFirst, isLast, isOnly } ) => {
++const unitControlBorderRadiusStyles = ( {
++	isFirst,
++	isLast,
++	isOnly,
++}: Pick< BoxUnitControlProps, 'isFirst' | 'isLast' | 'isOnly' > ) => {
+ 	if ( isFirst ) {
+ 		return rtl( { borderTopRightRadius: 0, borderBottomRightRadius: 0 } )();
+ 	}
+@@ -59,7 +64,10 @@ const unitControlBorderRadiusStyles = ( { isFirst, isLast, isOnly } ) => {
+ 	} );
+ };
+ 
+-const unitControlMarginStyles = ( { isFirst, isOnly } ) => {
++const unitControlMarginStyles = ( {
++	isFirst,
++	isOnly,
++}: Pick< BoxUnitControlProps, 'isFirst' | 'isOnly' > ) => {
+ 	const marginLeft = isFirst || isOnly ? 0 : -1;
+ 
+ 	return rtl( { marginLeft } )();
+diff --git a/packages/components/src/box-control/styles/box-control-visualizer-styles.js b/packages/components/src/box-control/styles/box-control-visualizer-styles.ts
+similarity index 87%
+rename from packages/components/src/box-control/styles/box-control-visualizer-styles.js
+rename to packages/components/src/box-control/styles/box-control-visualizer-styles.ts
+index 2a5c4fc8ec4702..4c6bfdf18a2f9d 100644
+--- a/packages/components/src/box-control/styles/box-control-visualizer-styles.js
++++ b/packages/components/src/box-control/styles/box-control-visualizer-styles.ts
+@@ -9,7 +9,11 @@ import styled from '@emotion/styled';
+  */
+ import { COLORS, rtl } from '../../utils';
+ 
+-const containerPositionStyles = ( { isPositionAbsolute } ) => {
++const containerPositionStyles = ( {
++	isPositionAbsolute,
++}: {
++	isPositionAbsolute: boolean;
++} ) => {
+ 	if ( ! isPositionAbsolute ) return '';
+ 
+ 	return css`
+@@ -39,7 +43,7 @@ export const Side = styled.div`
+ 	transition: opacity 120ms linear;
+ 	z-index: 1;
+ 
+-	${ ( { isActive } ) =>
++	${ ( { isActive }: { isActive: boolean } ) =>
+ 		isActive &&
+ 		`
+ 		opacity: 0.3;
+diff --git a/packages/components/src/box-control/test/index.js b/packages/components/src/box-control/test/index.tsx
+similarity index 93%
+rename from packages/components/src/box-control/test/index.js
+rename to packages/components/src/box-control/test/index.tsx
+index a15853443fe848..acd09b26ba8abd 100644
+--- a/packages/components/src/box-control/test/index.js
++++ b/packages/components/src/box-control/test/index.tsx
+@@ -12,10 +12,11 @@ import { useState } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import BoxControl from '../';
++import BoxControl from '..';
++import type { BoxControlProps, BoxControlValue } from '../types';
+ 
+-const Example = ( extraProps ) => {
+-	const [ state, setState ] = useState();
++const Example = ( extraProps: Omit< BoxControlProps, 'onChange' > ) => {
++	const [ state, setState ] = useState< BoxControlValue >();
+ 
+ 	return (
+ 		<BoxControl
+@@ -29,7 +30,7 @@ const Example = ( extraProps ) => {
+ describe( 'BoxControl', () => {
+ 	describe( 'Basic rendering', () => {
+ 		it( 'should render a box control input', () => {
+-			render( <BoxControl /> );
++			render( <BoxControl onChange={ () => {} } /> );
+ 
+ 			expect(
+ 				screen.getByRole( 'textbox', { name: 'Box Control' } )
+@@ -39,7 +40,7 @@ describe( 'BoxControl', () => {
+ 		it( 'should update values when interacting with input', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <BoxControl /> );
++			render( <BoxControl onChange={ () => {} } /> );
+ 
+ 			const input = screen.getByRole( 'textbox', {
+ 				name: 'Box Control',
+@@ -61,7 +62,7 @@ describe( 'BoxControl', () => {
+ 		it( 'should reset values when clicking Reset', async () => {
+ 			const user = userEvent.setup();
+ 
+-			render( <BoxControl /> );
++			render( <BoxControl onChange={ () => {} } /> );
+ 
+ 			const input = screen.getByRole( 'textbox', {
+ 				name: 'Box Control',
+@@ -238,7 +239,7 @@ describe( 'BoxControl', () => {
+ 			const user = userEvent.setup();
+ 
+ 			// Render control.
+-			render( <BoxControl /> );
++			render( <BoxControl onChange={ () => {} } /> );
+ 
+ 			// Make unit selection on all input control.
+ 			await user.selectOptions(
+@@ -270,7 +271,7 @@ describe( 'BoxControl', () => {
+ 			const user = userEvent.setup();
+ 
+ 			// Render control.
+-			const { rerender } = render( <BoxControl /> );
++			const { rerender } = render( <BoxControl onChange={ () => {} } /> );
+ 
+ 			// Make unit selection on all input control.
+ 			await user.selectOptions(
+@@ -298,7 +299,9 @@ describe( 'BoxControl', () => {
+ 			} );
+ 
+ 			// Rerender with individual side value & confirm unit is selected.
+-			rerender( <BoxControl values={ { top: '2.5em' } } /> );
++			rerender(
++				<BoxControl values={ { top: '2.5em' } } onChange={ () => {} } />
++			);
+ 
+ 			const rerenderedControls = screen.getAllByRole( 'combobox', {
+ 				name: 'Select unit',
+diff --git a/packages/components/src/box-control/types.ts b/packages/components/src/box-control/types.ts
+new file mode 100644
+index 00000000000000..0eba0e58fd33cc
+--- /dev/null
++++ b/packages/components/src/box-control/types.ts
+@@ -0,0 +1,121 @@
++/**
++ * External dependencies
++ */
++import type { useHover } from '@use-gesture/react';
++
++/**
++ * Internal dependencies
++ */
++import type { UnitControlProps } from '../unit-control/types';
++import type { LABELS } from './utils';
++
++export type BoxControlValue = {
++	top?: string;
++	right?: string;
++	bottom?: string;
++	left?: string;
++};
++
++type UnitControlPassthroughProps = Omit<
++	UnitControlProps,
++	'label' | 'onChange' | 'onFocus' | 'onMouseOver' | 'onMouseOut' | 'units'
++>;
++
++export type BoxControlProps = Pick<
++	UnitControlProps,
++	'onMouseOver' | 'onMouseOut' | 'units'
++> & {
++	/**
++	 * If this property is true, a button to reset the box control is rendered.
++	 *
++	 * @default true
++	 */
++	allowReset?: boolean;
++	/**
++	 * The id to use as a base for the unique HTML id attribute of the control.
++	 */
++	id?: string;
++	/**
++	 * Props for the internal `UnitControl` components.
++	 *
++	 * @default `{ min: 0 }`
++	 */
++	inputProps?: UnitControlPassthroughProps;
++	/**
++	 * Heading label for the control.
++	 *
++	 * @default `__( 'Box Control' )`
++	 */
++	label?: string;
++	/**
++	 * A callback function when an input value changes.
++	 */
++	onChange: ( next: BoxControlValue ) => void;
++	/**
++	 * The `top`, `right`, `bottom`, and `left` box dimension values to use when the control is reset.
++	 *
++	 * @default `{ top: undefined, right: undefined, bottom: undefined, left: undefined }`
++	 */
++	resetValues?: BoxControlValue;
++	/**
++	 * Collection of sides to allow control of. If omitted or empty, all sides will be available.
++	 */
++	sides?: readonly ( keyof BoxControlValue | 'horizontal' | 'vertical' )[];
++	/**
++	 * If this property is true, when the box control is unlinked, vertical and horizontal controls
++	 * can be used instead of updating individual sides.
++	 *
++	 * @default false
++	 */
++	splitOnAxis?: boolean;
++	/**
++	 * The current values of the control, expressed as an object of `top`, `right`, `bottom`, and `left` values.
++	 */
++	values?: BoxControlValue;
++};
++
++export type BoxControlInputControlProps = UnitControlPassthroughProps & {
++	onChange?: ( nextValues: BoxControlValue ) => void;
++	onFocus?: (
++		_event: React.FocusEvent< HTMLInputElement >,
++		{ side }: { side: keyof typeof LABELS }
++	) => void;
++	onHoverOff?: (
++		sides: Partial< Record< keyof BoxControlValue, boolean > >
++	) => void;
++	onHoverOn?: (
++		sides: Partial< Record< keyof BoxControlValue, boolean > >
++	) => void;
++	selectedUnits: BoxControlValue;
++	setSelectedUnits: React.Dispatch< React.SetStateAction< BoxControlValue > >;
++	sides: BoxControlProps[ 'sides' ];
++	values: BoxControlValue;
++};
++
++export type BoxUnitControlProps = UnitControlPassthroughProps &
++	Pick< UnitControlProps, 'onChange' | 'onFocus' > & {
++		isFirst?: boolean;
++		isLast?: boolean;
++		isOnly?: boolean;
++		label?: string;
++		onHoverOff?: (
++			event: ReturnType< typeof useHover >[ 'event' ],
++			state: Omit< ReturnType< typeof useHover >, 'event' >
++		) => void;
++		onHoverOn?: (
++			event: ReturnType< typeof useHover >[ 'event' ],
++			state: Omit< ReturnType< typeof useHover >, 'event' >
++		) => void;
++	};
++
++export type BoxControlIconProps = {
++	/**
++	 * @default 24
++	 */
++	size?: number;
++	/**
++	 * @default 'all'
++	 */
++	side?: keyof typeof LABELS;
++	sides?: BoxControlProps[ 'sides' ];
++};
+diff --git a/packages/components/src/box-control/unit-control.js b/packages/components/src/box-control/unit-control.tsx
+similarity index 89%
+rename from packages/components/src/box-control/unit-control.js
+rename to packages/components/src/box-control/unit-control.tsx
+index 1355b39fb6de13..ea724e9a82a19c 100644
+--- a/packages/components/src/box-control/unit-control.js
++++ b/packages/components/src/box-control/unit-control.tsx
+@@ -8,6 +8,7 @@ import { useHover } from '@use-gesture/react';
+  */
+ import BaseTooltip from '../tooltip';
+ import { UnitControlWrapper, UnitControl } from './styles/box-control-styles';
++import type { BoxUnitControlProps } from './types';
+ 
+ const noop = () => {};
+ 
+@@ -20,7 +21,7 @@ export default function BoxUnitControl( {
+ 	label,
+ 	value,
+ 	...props
+-} ) {
++}: BoxUnitControlProps ) {
+ 	const bindHoverGesture = useHover( ( { event, ...state } ) => {
+ 		if ( state.hovering ) {
+ 			onHoverOn( event, state );
+@@ -48,7 +49,13 @@ export default function BoxUnitControl( {
+ 	);
+ }
+ 
+-function Tooltip( { children, text } ) {
++function Tooltip( {
++	children,
++	text,
++}: {
++	children: JSX.Element;
++	text?: string;
++} ) {
+ 	if ( ! text ) return children;
+ 
+ 	/**
+diff --git a/packages/components/src/box-control/utils.js b/packages/components/src/box-control/utils.ts
+similarity index 66%
+rename from packages/components/src/box-control/utils.js
+rename to packages/components/src/box-control/utils.ts
+index 1053e8ff81998a..6614342d3da6d3 100644
+--- a/packages/components/src/box-control/utils.js
++++ b/packages/components/src/box-control/utils.ts
+@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
+  * Internal dependencies
+  */
+ import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
++import type { BoxControlProps, BoxControlValue } from './types';
+ 
+ export const LABELS = {
+ 	all: __( 'All' ),
+@@ -26,16 +27,16 @@ export const DEFAULT_VALUES = {
+ 	left: undefined,
+ };
+ 
+-export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
++export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ] as const;
+ 
+ /**
+  * Gets an items with the most occurrence within an array
+  * https://stackoverflow.com/a/20762713
+  *
+- * @param {Array<any>} arr Array of items to check.
+- * @return {any} The item with the most occurrences.
++ * @param arr Array of items to check.
++ * @return The item with the most occurrences.
+  */
+-function mode( arr ) {
++function mode< T >( arr: T[] ) {
+ 	return arr
+ 		.sort(
+ 			( a, b ) =>
+@@ -48,16 +49,16 @@ function mode( arr ) {
+ /**
+  * Gets the 'all' input value and unit from values data.
+  *
+- * @param {Object} values         Box values.
+- * @param {Object} selectedUnits  Box units.
+- * @param {Array}  availableSides Available box sides to evaluate.
++ * @param values         Box values.
++ * @param selectedUnits  Box units.
++ * @param availableSides Available box sides to evaluate.
+  *
+- * @return {string} A value + unit for the 'all' input.
++ * @return A value + unit for the 'all' input.
+  */
+ export function getAllValue(
+-	values = {},
+-	selectedUnits,
+-	availableSides = ALL_SIDES
++	values: BoxControlValue = {},
++	selectedUnits?: BoxControlValue,
++	availableSides: BoxControlProps[ 'sides' ] = ALL_SIDES
+ ) {
+ 	const sides = normalizeSides( availableSides );
+ 	const parsedQuantitiesAndUnits = sides.map( ( side ) =>
+@@ -101,10 +102,10 @@ export function getAllValue(
+ /**
+  * Determine the most common unit selection to use as a fallback option.
+  *
+- * @param {Object} selectedUnits Current unit selections for individual sides.
+- * @return {string} Most common unit selection.
++ * @param selectedUnits Current unit selections for individual sides.
++ * @return  Most common unit selection.
+  */
+-export function getAllUnitFallback( selectedUnits ) {
++export function getAllUnitFallback( selectedUnits?: BoxControlValue ) {
+ 	if ( ! selectedUnits || typeof selectedUnits !== 'object' ) {
+ 		return undefined;
+ 	}
+@@ -117,13 +118,17 @@ export function getAllUnitFallback( selectedUnits ) {
+ /**
+  * Checks to determine if values are mixed.
+  *
+- * @param {Object} values        Box values.
+- * @param {Object} selectedUnits Box units.
+- * @param {Array}  sides         Available box sides to evaluate.
++ * @param values        Box values.
++ * @param selectedUnits Box units.
++ * @param sides         Available box sides to evaluate.
+  *
+- * @return {boolean} Whether values are mixed.
++ * @return Whether values are mixed.
+  */
+-export function isValuesMixed( values = {}, selectedUnits, sides = ALL_SIDES ) {
++export function isValuesMixed(
++	values: BoxControlValue = {},
++	selectedUnits?: BoxControlValue,
++	sides: BoxControlProps[ 'sides' ] = ALL_SIDES
++) {
+ 	const allValue = getAllValue( values, selectedUnits, sides );
+ 	const isMixed = isNaN( parseFloat( allValue ) );
+ 
+@@ -133,11 +138,11 @@ export function isValuesMixed( values = {}, selectedUnits, sides = ALL_SIDES ) {
+ /**
+  * Checks to determine if values are defined.
+  *
+- * @param {Object} values Box values.
++ * @param values Box values.
+  *
+- * @return {boolean} Whether values are mixed.
++ * @return  Whether values are mixed.
+  */
+-export function isValuesDefined( values ) {
++export function isValuesDefined( values?: BoxControlValue ) {
+ 	return (
+ 		values !== undefined &&
+ 		Object.values( values ).filter(
+@@ -153,12 +158,12 @@ export function isValuesDefined( values ) {
+  * Get initial selected side, factoring in whether the sides are linked,
+  * and whether the vertical / horizontal directions are grouped via splitOnAxis.
+  *
+- * @param {boolean} isLinked    Whether the box control's fields are linked.
+- * @param {boolean} splitOnAxis Whether splitting by horizontal or vertical axis.
+- * @return {string} The initial side.
++ * @param isLinked    Whether the box control's fields are linked.
++ * @param splitOnAxis Whether splitting by horizontal or vertical axis.
++ * @return The initial side.
+  */
+-export function getInitialSide( isLinked, splitOnAxis ) {
+-	let initialSide = 'all';
++export function getInitialSide( isLinked: boolean, splitOnAxis: boolean ) {
++	let initialSide: keyof typeof LABELS = 'all';
+ 
+ 	if ( ! isLinked ) {
+ 		initialSide = splitOnAxis ? 'vertical' : 'top';
+@@ -173,20 +178,20 @@ export function getInitialSide( isLinked, splitOnAxis ) {
+  * to their appropriate sides to facilitate correctly determining value for
+  * all input control.
+  *
+- * @param {Array} sides Available sides for box control.
+- * @return {Array} Normalized sides configuration.
++ * @param sides Available sides for box control.
++ * @return Normalized sides configuration.
+  */
+-export function normalizeSides( sides ) {
+-	const filteredSides = [];
++export function normalizeSides( sides: BoxControlProps[ 'sides' ] ) {
++	const filteredSides: ( keyof BoxControlValue )[] = [];
+ 
+ 	if ( ! sides?.length ) {
+ 		return ALL_SIDES;
+ 	}
+ 
+ 	if ( sides.includes( 'vertical' ) ) {
+-		filteredSides.push( ...[ 'top', 'bottom' ] );
++		filteredSides.push( ...( [ 'top', 'bottom' ] as const ) );
+ 	} else if ( sides.includes( 'horizontal' ) ) {
+-		filteredSides.push( ...[ 'left', 'right' ] );
++		filteredSides.push( ...( [ 'left', 'right' ] as const ) );
+ 	} else {
+ 		const newSides = ALL_SIDES.filter( ( side ) => sides.includes( side ) );
+ 		filteredSides.push( ...newSides );
+@@ -199,13 +204,17 @@ export function normalizeSides( sides ) {
+  * Applies a value to an object representing top, right, bottom and left sides
+  * while taking into account any custom side configuration.
+  *
+- * @param {Object}        currentValues The current values for each side.
+- * @param {string|number} newValue      The value to apply to the sides object.
+- * @param {string[]}      sides         Array defining valid sides.
++ * @param currentValues The current values for each side.
++ * @param newValue      The value to apply to the sides object.
++ * @param sides         Array defining valid sides.
+  *
+- * @return {Object} Object containing the updated values for each side.
++ * @return Object containing the updated values for each side.
+  */
+-export function applyValueToSides( currentValues, newValue, sides ) {
++export function applyValueToSides(
++	currentValues: BoxControlValue,
++	newValue?: string,
++	sides?: BoxControlProps[ 'sides' ]
++): BoxControlValue {
+ 	const newValues = { ...currentValues };
+ 
+ 	if ( sides?.length ) {
+diff --git a/packages/components/src/utils/hooks/use-controlled-state.js b/packages/components/src/utils/hooks/use-controlled-state.js
+index 6075ad73d463ed..d3e78f112d91e5 100644
+--- a/packages/components/src/utils/hooks/use-controlled-state.js
++++ b/packages/components/src/utils/hooks/use-controlled-state.js
+@@ -11,8 +11,8 @@ import { isValueDefined, getDefinedValue } from '../values';
+ /**
+  * @template T
+  * @typedef Options
+- * @property {T | undefined} initial  Initial value
+- * @property {T | ""}        fallback Fallback value
++ * @property {T}      [initial] Initial value
++ * @property {T | ""} fallback  Fallback value
+  */
+ 
+ /** @type {Readonly<{ initial: undefined, fallback: '' }>} */
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 85525c25b6d1e9..6be80b08716e85 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -43,7 +43,6 @@
+ 		"src/index.js",
+ 		"src/angle-picker-control",
+ 		"src/autocomplete",
+-		"src/box-control",
+ 		"src/combobox-control",
+ 		"src/custom-gradient-picker",
+ 		"src/dimension-control",

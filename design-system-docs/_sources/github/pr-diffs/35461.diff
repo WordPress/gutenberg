@@ -1,0 +1,46 @@
+diff --git a/packages/block-editor/src/components/font-appearance-control/index.js b/packages/block-editor/src/components/font-appearance-control/index.js
+index 67204ddc560674..f238cd54d9aa89 100644
+--- a/packages/block-editor/src/components/font-appearance-control/index.js
++++ b/packages/block-editor/src/components/font-appearance-control/index.js
+@@ -195,19 +195,17 @@ export default function FontAppearanceControl( props ) {
+ 	};
+ 
+ 	return (
+-		<fieldset className="components-font-appearance-control">
+-			{ hasStylesOrWeights && (
+-				<CustomSelectControl
+-					className="components-font-appearance-control__select"
+-					label={ getLabel() }
+-					describedBy={ getDescribedBy() }
+-					options={ selectOptions }
+-					value={ currentSelection }
+-					onChange={ ( { selectedItem } ) =>
+-						onChange( selectedItem.style )
+-					}
+-				/>
+-			) }
+-		</fieldset>
++		hasStylesOrWeights && (
++			<CustomSelectControl
++				className="components-font-appearance-control"
++				label={ getLabel() }
++				describedBy={ getDescribedBy() }
++				options={ selectOptions }
++				value={ currentSelection }
++				onChange={ ( { selectedItem } ) =>
++					onChange( selectedItem.style )
++				}
++			/>
++		)
+ 	);
+ }
+diff --git a/packages/block-editor/src/components/font-appearance-control/style.scss b/packages/block-editor/src/components/font-appearance-control/style.scss
+index 6669d2c452d1a4..d99a54cd24e079 100644
+--- a/packages/block-editor/src/components/font-appearance-control/style.scss
++++ b/packages/block-editor/src/components/font-appearance-control/style.scss
+@@ -1,4 +1,4 @@
+-.components-font-appearance-control__select {
++.components-font-appearance-control {
+ 	margin-bottom: 24px;
+ 
+ 	ul {

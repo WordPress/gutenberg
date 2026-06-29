@@ -1,0 +1,361 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 526822758678e0..4706c2c84c6722 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ -   `DropdownMenu`: migrate Storybook to controls ([47149](https://github.com/WordPress/gutenberg/pull/47149)).
+ -   Removed deprecated `@storybook/addon-knobs` dependency from the package ([47152](https://github.com/WordPress/gutenberg/pull/47152)).
+ -   `ColorListPicker`: Convert to TypeScript ([#46358](https://github.com/WordPress/gutenberg/pull/46358)).
++-   `KeyboardShortcuts`: Convert to TypeScript ([#47429](https://github.com/WordPress/gutenberg/pull/47429)).
+ -   `ColorPalette`, `BorderControl`, `GradientPicker`: refine types and logic around single vs multiple palettes
+  ([#47384](https://github.com/WordPress/gutenberg/pull/47384)).
+ -   `Button`: Convert to TypeScript ([#46997](https://github.com/WordPress/gutenberg/pull/46997)).
+diff --git a/packages/components/src/keyboard-shortcuts/README.md b/packages/components/src/keyboard-shortcuts/README.md
+index f78abbbd03260d..081e5519582595 100644
+--- a/packages/components/src/keyboard-shortcuts/README.md
++++ b/packages/components/src/keyboard-shortcuts/README.md
+@@ -41,7 +41,7 @@ The component accepts the following props:
+ 
+ Elements to render, upon whom key events are to be monitored.
+ 
+--   Type: `Element` | `Element[]`
++-   Type: `ReactNode`
+ -   Required: No
+ 
+ ### shortcuts
+diff --git a/packages/components/src/keyboard-shortcuts/index.js b/packages/components/src/keyboard-shortcuts/index.js
+deleted file mode 100644
+index b7538b95197939..00000000000000
+--- a/packages/components/src/keyboard-shortcuts/index.js
++++ /dev/null
+@@ -1,53 +0,0 @@
+-/**
+- * WordPress dependencies
+- */
+-import { useRef, Children } from '@wordpress/element';
+-import { useKeyboardShortcut } from '@wordpress/compose';
+-
+-function KeyboardShortcut( {
+-	target,
+-	callback,
+-	shortcut,
+-	bindGlobal,
+-	eventName,
+-} ) {
+-	useKeyboardShortcut( shortcut, callback, {
+-		bindGlobal,
+-		target,
+-		eventName,
+-	} );
+-
+-	return null;
+-}
+-
+-function KeyboardShortcuts( { children, shortcuts, bindGlobal, eventName } ) {
+-	const target = useRef();
+-
+-	const element = Object.entries( shortcuts ?? {} ).map(
+-		( [ shortcut, callback ] ) => (
+-			<KeyboardShortcut
+-				key={ shortcut }
+-				shortcut={ shortcut }
+-				callback={ callback }
+-				bindGlobal={ bindGlobal }
+-				eventName={ eventName }
+-				target={ target }
+-			/>
+-		)
+-	);
+-
+-	// Render as non-visual if there are no children pressed. Keyboard
+-	// events will be bound to the document instead.
+-	if ( ! Children.count( children ) ) {
+-		return element;
+-	}
+-
+-	return (
+-		<div ref={ target }>
+-			{ element }
+-			{ children }
+-		</div>
+-	);
+-}
+-
+-export default KeyboardShortcuts;
+diff --git a/packages/components/src/keyboard-shortcuts/index.tsx b/packages/components/src/keyboard-shortcuts/index.tsx
+new file mode 100644
+index 00000000000000..cc6835c56666d8
+--- /dev/null
++++ b/packages/components/src/keyboard-shortcuts/index.tsx
+@@ -0,0 +1,93 @@
++/**
++ * WordPress dependencies
++ */
++import { useRef, Children } from '@wordpress/element';
++import { useKeyboardShortcut } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import type { KeyboardShortcutProps, KeyboardShortcutsProps } from './types';
++
++function KeyboardShortcut( {
++	target,
++	callback,
++	shortcut,
++	bindGlobal,
++	eventName,
++}: KeyboardShortcutProps ) {
++	useKeyboardShortcut( shortcut, callback, {
++		bindGlobal,
++		target,
++		eventName,
++	} );
++
++	return null;
++}
++
++/**
++ * `KeyboardShortcuts` is a component which handles keyboard sequences during the lifetime of the rendering element.
++ *
++ * When passed children, it will capture key events which occur on or within the children. If no children are passed, events are captured on the document.
++ *
++ * It uses the [Mousetrap](https://craig.is/killing/mice) library to implement keyboard sequence bindings.
++ *
++ * ```jsx
++ * import { KeyboardShortcuts } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyKeyboardShortcuts = () => {
++ * 	const [ isAllSelected, setIsAllSelected ] = useState( false );
++ * 	const selectAll = () => {
++ * 		setIsAllSelected( true );
++ * 	};
++ *
++ * 	return (
++ * 		<div>
++ * 			<KeyboardShortcuts
++ * 				shortcuts={ {
++ * 					'mod+a': selectAll,
++ * 				} }
++ * 			/>
++ * 			[cmd/ctrl + A] Combination pressed? { isAllSelected ? 'Yes' : 'No' }
++ * 		</div>
++ * 	);
++ * };
++ * ```
++ */
++function KeyboardShortcuts( {
++	children,
++	shortcuts,
++	bindGlobal,
++	eventName,
++}: KeyboardShortcutsProps ) {
++	const target = useRef( null );
++
++	const element = Object.entries( shortcuts ?? {} ).map(
++		( [ shortcut, callback ] ) => (
++			<KeyboardShortcut
++				key={ shortcut }
++				shortcut={ shortcut }
++				callback={ callback }
++				bindGlobal={ bindGlobal }
++				eventName={ eventName }
++				target={ target }
++			/>
++		)
++	);
++
++	// Render as non-visual if there are no children pressed. Keyboard
++	// events will be bound to the document instead.
++	if ( ! Children.count( children ) ) {
++		return <>{ element }</>;
++	}
++
++	return (
++		<div ref={ target }>
++			{ element }
++			{ children }
++		</div>
++	);
++}
++
++export default KeyboardShortcuts;
+diff --git a/packages/components/src/keyboard-shortcuts/stories/index.tsx b/packages/components/src/keyboard-shortcuts/stories/index.tsx
+new file mode 100644
+index 00000000000000..9a66bacce91087
+--- /dev/null
++++ b/packages/components/src/keyboard-shortcuts/stories/index.tsx
+@@ -0,0 +1,60 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * Internal dependencies
++ */
++import KeyboardShortcuts from '..';
++
++const meta: ComponentMeta< typeof KeyboardShortcuts > = {
++	component: KeyboardShortcuts,
++	title: 'Components/KeyboardShortcuts',
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof KeyboardShortcuts > = ( props ) => (
++	<KeyboardShortcuts { ...props } />
++);
++
++export const Default = Template.bind( {} );
++Default.args = {
++	shortcuts: {
++		// eslint-disable-next-line no-alert
++		a: () => window.alert( 'You hit "a"!' ),
++		// eslint-disable-next-line no-alert
++		b: () => window.alert( 'You hit "b"!' ),
++	},
++	children: (
++		<div>
++			<p>{ `Hit the "a" or "b" key in this textarea:` }</p>
++			<textarea />
++		</div>
++	),
++};
++Default.parameters = {
++	docs: {
++		source: {
++			code: `
++<KeyboardShortcuts
++  shortcuts={{
++    a: () => window.alert('You hit "a"!'),
++    b: () => window.alert('You hit "b"!'),
++  }}
++>
++  <div>
++    <p>
++      Hit the "a" or "b" key in this textarea:
++    </p>
++    <textarea />
++  </div>
++</KeyboardShortcuts>
++			`,
++		},
++	},
++};
+diff --git a/packages/components/src/keyboard-shortcuts/test/index.js b/packages/components/src/keyboard-shortcuts/test/index.tsx
+similarity index 80%
+rename from packages/components/src/keyboard-shortcuts/test/index.js
+rename to packages/components/src/keyboard-shortcuts/test/index.tsx
+index bb63535f36c41e..e7aa78a03210be 100644
+--- a/packages/components/src/keyboard-shortcuts/test/index.js
++++ b/packages/components/src/keyboard-shortcuts/test/index.tsx
+@@ -1,19 +1,29 @@
+ /**
+  * External dependencies
+  */
+-import { fireEvent, render, screen } from '@testing-library/react';
++import { createEvent, fireEvent, render, screen } from '@testing-library/react';
+ 
+ /**
+  * Internal dependencies
+  */
+-import KeyboardShortcuts from '../';
++import KeyboardShortcuts from '..';
+ 
+ describe( 'KeyboardShortcuts', () => {
+-	function keyPress( which, target ) {
++	function keyPress(
++		which: KeyboardEvent[ 'which' ],
++		target: Parameters< typeof fireEvent >[ 0 ]
++	) {
+ 		[ 'keydown', 'keypress', 'keyup' ].forEach( ( eventName ) => {
+-			const event = new window.Event( eventName, { bubbles: true } );
+-			event.keyCode = which;
+-			event.which = which;
++			const event = createEvent(
++				eventName,
++				target,
++				{
++					bubbles: true,
++					keyCode: which,
++					which,
++				},
++				{ EventType: 'KeyboardEvent' }
++			);
+ 			fireEvent( target, event );
+ 		} );
+ 	}
+diff --git a/packages/components/src/keyboard-shortcuts/types.ts b/packages/components/src/keyboard-shortcuts/types.ts
+new file mode 100644
+index 00000000000000..c9d7ad71c71f80
+--- /dev/null
++++ b/packages/components/src/keyboard-shortcuts/types.ts
+@@ -0,0 +1,51 @@
++/**
++ * WordPress dependencies
++ */
++import type { useKeyboardShortcut } from '@wordpress/compose';
++
++// TODO: We wouldn't have to do this if this type was exported from `@wordpress/compose`.
++type WPKeyboardShortcutConfig = NonNullable<
++	Parameters< typeof useKeyboardShortcut >[ 2 ]
++>;
++
++export type KeyboardShortcutProps = {
++	shortcut: string | string[];
++	/**
++	 * @see {@link https://craig.is/killing/mice Mousetrap documentation}
++	 */
++	callback: ( event: Mousetrap.ExtendedKeyboardEvent, combo: string ) => void;
++} & Pick< WPKeyboardShortcutConfig, 'bindGlobal' | 'eventName' | 'target' >;
++
++export type KeyboardShortcutsProps = {
++	/**
++	 * Elements to render, upon whom key events are to be monitored.
++	 */
++	children?: React.ReactNode;
++	/**
++	 * An object of shortcut bindings, where each key is a keyboard combination,
++	 * the value of which is the callback to be invoked when the key combination is pressed.
++	 *
++	 * The value of each shortcut should be a consistent function reference, not an anonymous function.
++	 * Otherwise, the callback will not be correctly unbound when the component unmounts.
++	 *
++	 * The `KeyboardShortcuts` component will not update to reflect a changed `shortcuts` prop.
++	 * If you need to change shortcuts, mount a separate `KeyboardShortcuts` element,
++	 * which can be achieved by assigning a unique `key` prop.
++	 *
++	 * @see {@link https://craig.is/killing/mice Mousetrap documentation}
++	 */
++	shortcuts: Record< string, KeyboardShortcutProps[ 'callback' ] >;
++	/**
++	 * By default, a callback will not be invoked if the key combination occurs in an editable field.
++	 * Pass `bindGlobal` as `true` if the key events should be observed globally, including within editable fields.
++	 *
++	 * Tip: If you need some but not all keyboard events to be observed globally,
++	 * simply render two distinct `KeyboardShortcuts` elements, one with and one without the `bindGlobal` prop.
++	 */
++	bindGlobal?: KeyboardShortcutProps[ 'bindGlobal' ];
++	/**
++	 * By default, a callback is invoked in response to the `keydown` event.
++	 * To override this, pass `eventName` with the name of a specific keyboard event.
++	 */
++	eventName?: KeyboardShortcutProps[ 'eventName' ];
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 83d8d6251b94d6..8774377ea8cecc 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -54,7 +54,6 @@
+ 		"src/higher-order/with-filters",
+ 		"src/higher-order/with-focus-return",
+ 		"src/higher-order/with-notices",
+-		"src/keyboard-shortcuts",
+ 		"src/menu-items-choice",
+ 		"src/navigation",
+ 		"src/notice",

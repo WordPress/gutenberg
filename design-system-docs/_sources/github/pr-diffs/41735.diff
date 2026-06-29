@@ -1,0 +1,148 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 37e8abb8a3efbd..a3179227cbc5c2 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -79,6 +79,7 @@ module.exports = {
+ 					{
+ 						name: 'lodash',
+ 						importNames: [
++							'clamp',
+ 							'concat',
+ 							'defaultTo',
+ 							'differenceWith',
+diff --git a/packages/components/src/focal-point-picker/index.native.js b/packages/components/src/focal-point-picker/index.native.js
+index 61f9c48c218f44..cfb01eebf1404b 100644
+--- a/packages/components/src/focal-point-picker/index.native.js
++++ b/packages/components/src/focal-point-picker/index.native.js
+@@ -3,7 +3,6 @@
+  */
+ import { Animated, PanResponder, View } from 'react-native';
+ import Video from 'react-native-video';
+-import { clamp } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -24,6 +23,7 @@ import FocalPoint from './focal-point';
+ import Tooltip from './tooltip';
+ import styles from './style.scss';
+ import { isVideoType } from './utils';
++import { clamp } from '../utils/math';
+ 
+ const MIN_POSITION_VALUE = 0;
+ const MAX_POSITION_VALUE = 100;
+diff --git a/packages/components/src/range-control/index.js b/packages/components/src/range-control/index.js
+index 8ed2f5666feb89..d0464fd8788669 100644
+--- a/packages/components/src/range-control/index.js
++++ b/packages/components/src/range-control/index.js
+@@ -3,7 +3,6 @@
+  * External dependencies
+  */
+ import classnames from 'classnames';
+-import { clamp } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -20,6 +19,7 @@ import Button from '../button';
+ import Icon from '../icon';
+ import { COLORS } from '../utils';
+ import { floatClamp, useControlledRangeValue } from './utils';
++import { clamp } from '../utils/math';
+ import InputRange from './input-range';
+ import RangeRail from './rail';
+ import SimpleTooltip from './tooltip';
+diff --git a/packages/components/src/range-control/utils.js b/packages/components/src/range-control/utils.js
+index dfbbdd08ab37bd..d4bd5cdf0901a9 100644
+--- a/packages/components/src/range-control/utils.js
++++ b/packages/components/src/range-control/utils.js
+@@ -1,8 +1,4 @@
+ // @ts-nocheck
+-/**
+- * External dependencies
+- */
+-import { clamp } from 'lodash';
+ 
+ /**
+  * WordPress dependencies
+@@ -13,6 +9,7 @@ import { useCallback, useRef, useEffect, useState } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { useControlledState } from '../utils/hooks';
++import { clamp } from '../utils/math';
+ 
+ const noop = () => {};
+ 
+diff --git a/packages/components/src/utils/math.js b/packages/components/src/utils/math.js
+index 76a3d66ed88ec0..7ae59df819acc5 100644
+--- a/packages/components/src/utils/math.js
++++ b/packages/components/src/utils/math.js
+@@ -1,8 +1,3 @@
+-/**
+- * External dependencies
+- */
+-import { clamp } from 'lodash';
+-
+ /**
+  * Parses and retrieves a number value.
+  *
+@@ -61,6 +56,20 @@ function getPrecision( value ) {
+ 	return split[ 1 ] !== undefined ? split[ 1 ].length : 0;
+ }
+ 
++/**
++ * Clamps a value based on a min/max range.
++ *
++ * @param {number} value The value.
++ * @param {number} min   The minimum range.
++ * @param {number} max   The maximum range.
++ *
++ * @return {number} The clamped value.
++ */
++export function clamp( value, min, max ) {
++	const baseValue = getNumber( value );
++	return Math.max( min, Math.min( baseValue, max ) );
++}
++
+ /**
+  * Clamps a value based on a min/max range with rounding
+  *
+diff --git a/packages/components/src/utils/test/math.js b/packages/components/src/utils/test/math.js
+index 70007ad5ebedff..6f8467ce7931b6 100644
+--- a/packages/components/src/utils/test/math.js
++++ b/packages/components/src/utils/test/math.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { add, subtract, roundClamp } from '../math';
++import { add, clamp, subtract, roundClamp } from '../math';
+ 
+ describe( 'add', () => {
+ 	it( 'should add string and number values', () => {
+@@ -37,6 +37,27 @@ describe( 'subtract', () => {
+ 	} );
+ } );
+ 
++describe( 'clamp', () => {
++	it( 'should clamp a value between min and max', () => {
++		expect( clamp( 10, 1, 10 ) ).toBe( 10 );
++		expect( clamp( 1, 1, 10 ) ).toBe( 1 );
++		expect( clamp( 0, 1, 10 ) ).toBe( 1 );
++
++		expect( clamp( 50, 1, 10 ) ).toBe( 10 );
++		expect( clamp( 50, -10, 10 ) ).toBe( 10 );
++		expect( clamp( -50, -10, 10 ) ).toBe( -10 );
++
++		expect( clamp( Infinity, -10, 10 ) ).toBe( 10 );
++		expect( clamp( -Infinity, -10, 10 ) ).toBe( -10 );
++	} );
++
++	it( 'should clamp number or string values', () => {
++		expect( clamp( '50', 1, 10 ) ).toBe( 10 );
++		expect( clamp( '50', -10, 10 ) ).toBe( 10 );
++		expect( clamp( -50, -10, '10' ) ).toBe( -10 );
++	} );
++} );
++
+ describe( 'roundClamp', () => {
+ 	it( 'should clamp a value between min and max', () => {
+ 		expect( roundClamp( 10, 1, 10 ) ).toBe( 10 );

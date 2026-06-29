@@ -1,0 +1,61 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index bd6f7e8c81f98e..dd780a5254a283 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -18,6 +18,7 @@
+ 
+ -   `IconButton`: Default `focusableWhenDisabled` to `true`, matching `Button` ([#78526](https://github.com/WordPress/gutenberg/pull/78526)).
+ -   `Button`: Do not show the interactive cursor when disabled ([#78479](https://github.com/WordPress/gutenberg/pull/78479)).
++-   `Button`: Fix disabled and hover styles for neutral minimal buttons with `aria-pressed="true"` ([#78635](https://github.com/WordPress/gutenberg/pull/78635)).
+ -   `Autocomplete`: Fix the TypeScript prop types for the `Root` and `Value` primitives ([#78450](https://github.com/WordPress/gutenberg/pull/78450)).
+ -   `Autocomplete`: Disable the clear button when the autocomplete is disabled, and hide it from assistive technologies ([#78520](https://github.com/WordPress/gutenberg/pull/78520)).
+ -   Apply shared item popup typography to inline lists and empty states ([#78403](https://github.com/WordPress/gutenberg/pull/78403)).
+diff --git a/packages/ui/src/button/style.module.css b/packages/ui/src/button/style.module.css
+index d62e57bd43eb9a..c098782a123ad8 100644
+--- a/packages/ui/src/button/style.module.css
++++ b/packages/ui/src/button/style.module.css
+@@ -173,7 +173,9 @@
+ 	}
+ 
+ 	.is-neutral {
+-		&.is-solid {
++		/* Solid and pressed minimal share the strong appearance */
++		&.is-solid,
++		&.is-minimal[aria-pressed="true"] {
+ 			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-strong);
+ 			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-strong-active);
+ 			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
+@@ -182,9 +184,9 @@
+ 			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
+ 		}
+ 
+-		/* Outline and minimal buttons use the same foreground color */
++		/* Outline and unpressed minimal buttons use the same foreground color */
+ 		&.is-outline,
+-		&.is-minimal {
++		&.is-minimal:not([aria-pressed="true"]) {
+ 			--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral);
+ 			--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-active);
+ 			--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-disabled);
+@@ -199,7 +201,7 @@
+ 			--wp-ui-button-border-color-disabled: var(--wpds-color-stroke-interactive-neutral-disabled);
+ 		}
+ 
+-		&.is-minimal {
++		&.is-minimal:not([aria-pressed="true"]) {
+ 			--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-weak);
+ 			--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-weak-active);
+ 			--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+@@ -239,12 +241,6 @@
+ 		}
+ 	}
+ 
+-	[aria-pressed="true"].is-minimal.is-neutral {
+-		--wp-ui-button-background-color: var(--wpds-color-bg-interactive-neutral-strong);
+-		--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-neutral-strong);
+-		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-neutral-strong);
+-		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-neutral-strong);
+-	}
+ }
+ 
+ @keyframes loading-animation {

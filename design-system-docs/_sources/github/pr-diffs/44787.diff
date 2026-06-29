@@ -1,0 +1,28 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2d821ce834e0d4..de3fb83df5c651 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -6,6 +6,10 @@
+ 
+ -   `BoxControl` & `CustomSelectControl`: Add `onMouseOver` and `onMouseOut` callback props to allow handling of these events by parent components ([#44955](https://github.com/WordPress/gutenberg/pull/44955))
+ 
++### Bug Fix
++
++-   `Button`: Fix RTL alignment for buttons containing an icon and text ([#44787](https://github.com/WordPress/gutenberg/pull/44787)).
++
+ ## 21.3.0 (2022-10-19)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/button/style.scss b/packages/components/src/button/style.scss
+index 78edbb6463f647..ab7cd4f3c2511b 100644
+--- a/packages/components/src/button/style.scss
++++ b/packages/components/src/button/style.scss
+@@ -315,7 +315,7 @@
+ 		}
+ 
+ 		&.has-text {
+-			justify-content: left;
++			justify-content: start;
+ 		}
+ 
+ 		&.has-text svg {

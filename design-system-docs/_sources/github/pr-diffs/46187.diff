@@ -1,0 +1,320 @@
+diff --git a/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap b/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap
+index 12c09f2c7c98ab..c7ecbc209a2417 100644
+--- a/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap
++++ b/packages/block-editor/src/components/url-popover/test/__snapshots__/index.js.snap
+@@ -5,7 +5,7 @@ exports[`URLPopover matches the snapshot in its default state 1`] = `
+   <span>
+     <div
+       class="components-popover block-editor-url-popover is-positioned"
+-      style="position: absolute; left: 0px; top: 0px;"
++      style="position: absolute; top: 0px; left: 0px; transform: none;"
+       tabindex="-1"
+     >
+       <div
+@@ -53,7 +53,7 @@ exports[`URLPopover matches the snapshot when the settings are toggled open 1`]
+   <span>
+     <div
+       class="components-popover block-editor-url-popover is-positioned"
+-      style="position: absolute; left: 0px; top: 0px;"
++      style="position: absolute; top: 0px; left: 0px; transform: none;"
+       tabindex="-1"
+     >
+       <div
+@@ -108,7 +108,7 @@ exports[`URLPopover matches the snapshot when there are no settings 1`] = `
+   <span>
+     <div
+       class="components-popover block-editor-url-popover is-positioned"
+-      style="position: absolute; left: 0px; top: 0px;"
++      style="position: absolute; top: 0px; left: 0px; transform: none;"
+       tabindex="-1"
+     >
+       <div
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index bcb1b610267188..21d968568374b4 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -28,6 +28,8 @@
+ -   `Popover`: Prevent unnecessary paint caused by using outline ([#46201](https://github.com/WordPress/gutenberg/pull/46201)).
+ -   `PaletteEdit`: Global styles: add onChange actions to color palette items [#45681](https://github.com/WordPress/gutenberg/pull/45681).
+ -   Lighten the border color on control components ([#46252](https://github.com/WordPress/gutenberg/pull/46252)).
++-   `Popover`: Prevent unnecessary paint when scrolling by using transform instead of top/left positionning ([#46187](https://github.com/WordPress/gutenberg/pull/46187)).
++-   `CircularOptionPicker`: Prevent unecessary paint on hover ([#46197](https://github.com/WordPress/gutenberg/pull/46197)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/popover/index.tsx b/packages/components/src/popover/index.tsx
+index c56d1f8475315a..14f1ddd8bab967 100644
+--- a/packages/components/src/popover/index.tsx
++++ b/packages/components/src/popover/index.tsx
+@@ -489,8 +489,15 @@ const UnforwardedPopover = (
+ 					? undefined
+ 					: {
+ 							position: strategy,
+-							left: Number.isNaN( x ) ? 0 : x ?? undefined,
+-							top: Number.isNaN( y ) ? 0 : y ?? undefined,
++							top: 0,
++							left: 0,
++							// `x` and `y` are framer-motion specific props and are shorthands
++							// for `translateX` and `translateY`. Currently it is not possible
++							// to use `translateX` and `translateY` because those values would
++							// be overridden by the return value of the
++							// `placementToMotionAnimationProps` function in `AnimatedWrapper`
++							x: Math.round( x ?? 0 ) || undefined,
++							y: Math.round( y ?? 0 ) || undefined,
+ 					  }
+ 			}
+ 		>
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index d595c23ae274a9..790b840e6a648b 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -7,6 +7,7 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
+ 
+ .components-popover {
+ 	z-index: z-index(".components-popover");
++	will-change: transform;
+ 
+ 	&.is-expanded {
+ 		position: fixed;
+diff --git a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+index 876bae4b690887..a453da0254b487 100644
+--- a/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
++++ b/packages/nux/src/components/dot-tip/test/__snapshots__/index.js.snap
+@@ -5,7 +5,7 @@ exports[`DotTip should render correctly 1`] = `
+   aria-label="Editor tips"
+   class="components-popover nux-dot-tip is-positioned"
+   role="dialog"
+-  style="position: absolute; opacity: 0; transform: translateX(-2em) scale(0) translateZ(0); transform-origin: 0% 50% 0; left: 0px; top: 0px;"
++  style="position: absolute; top: 0px; left: 0px; opacity: 0; transform: translateX(-2em) scale(0) translateZ(0); transform-origin: 0% 50% 0;"
+   tabindex="-1"
+ >
+   <div
+diff --git a/test/e2e/specs/editor/blocks/paragraph.spec.js b/test/e2e/specs/editor/blocks/paragraph.spec.js
+index c713379569b90c..19c386cce457d9 100644
+--- a/test/e2e/specs/editor/blocks/paragraph.spec.js
++++ b/test/e2e/specs/editor/blocks/paragraph.spec.js
+@@ -195,8 +195,12 @@ test.describe( 'Paragraph', () => {
+ 					);
+ 					await expect( draggingUtils.dropZone ).toBeVisible();
+ 					await expect
+-						.poll( () => draggingUtils.dropZone.boundingBox() )
+-						.toEqual( firstBlockBox );
++						.poll( () =>
++							draggingUtils.confirmValidDropZonePosition(
++								firstBlockBox
++							)
++						)
++						.toBeTruthy();
+ 				}
+ 
+ 				{
+@@ -207,8 +211,12 @@ test.describe( 'Paragraph', () => {
+ 					);
+ 					await expect( draggingUtils.dropZone ).toBeVisible();
+ 					await expect
+-						.poll( () => draggingUtils.dropZone.boundingBox() )
+-						.toEqual( firstBlockBox );
++						.poll( () =>
++							draggingUtils.confirmValidDropZonePosition(
++								firstBlockBox
++							)
++						)
++						.toBeTruthy();
+ 				}
+ 
+ 				{
+@@ -219,8 +227,12 @@ test.describe( 'Paragraph', () => {
+ 					);
+ 					await expect( draggingUtils.dropZone ).toBeVisible();
+ 					await expect
+-						.poll( () => draggingUtils.dropZone.boundingBox() )
+-						.toEqual( firstBlockBox );
++						.poll( () =>
++							draggingUtils.confirmValidDropZonePosition(
++								firstBlockBox
++							)
++						)
++						.toBeTruthy();
+ 				}
+ 
+ 				{
+@@ -231,8 +243,12 @@ test.describe( 'Paragraph', () => {
+ 					);
+ 					await expect( draggingUtils.dropZone ).toBeVisible();
+ 					await expect
+-						.poll( () => draggingUtils.dropZone.boundingBox() )
+-						.toEqual( firstBlockBox );
++						.poll( () =>
++							draggingUtils.confirmValidDropZonePosition(
++								firstBlockBox
++							)
++						)
++						.toBeTruthy();
+ 				}
+ 
+ 				{
+@@ -309,8 +325,12 @@ test.describe( 'Paragraph', () => {
+ 					);
+ 					await expect( draggingUtils.dropZone ).toBeVisible();
+ 					await expect
+-						.poll( () => draggingUtils.dropZone.boundingBox() )
+-						.toEqual( secondBlockBox );
++						.poll( () =>
++							draggingUtils.confirmValidDropZonePosition(
++								secondBlockBox
++							)
++						)
++						.toBeTruthy();
+ 				}
+ 
+ 				{
+@@ -321,8 +341,12 @@ test.describe( 'Paragraph', () => {
+ 					);
+ 					await expect( draggingUtils.dropZone ).toBeVisible();
+ 					await expect
+-						.poll( () => draggingUtils.dropZone.boundingBox() )
+-						.toEqual( secondBlockBox );
++						.poll( () =>
++							draggingUtils.confirmValidDropZonePosition(
++								secondBlockBox
++							)
++						)
++						.toBeTruthy();
+ 				}
+ 
+ 				{
+@@ -333,8 +357,12 @@ test.describe( 'Paragraph', () => {
+ 					);
+ 					await expect( draggingUtils.dropZone ).toBeVisible();
+ 					await expect
+-						.poll( () => draggingUtils.dropZone.boundingBox() )
+-						.toEqual( secondBlockBox );
++						.poll( () =>
++							draggingUtils.confirmValidDropZonePosition(
++								secondBlockBox
++							)
++						)
++						.toBeTruthy();
+ 				}
+ 
+ 				{
+@@ -345,8 +373,12 @@ test.describe( 'Paragraph', () => {
+ 					);
+ 					await expect( draggingUtils.dropZone ).toBeVisible();
+ 					await expect
+-						.poll( () => draggingUtils.dropZone.boundingBox() )
+-						.toEqual( secondBlockBox );
++						.poll( () =>
++							draggingUtils.confirmValidDropZonePosition(
++								secondBlockBox
++							)
++						)
++						.toBeTruthy();
+ 				}
+ 			} );
+ 
+@@ -387,8 +419,12 @@ test.describe( 'Paragraph', () => {
+ 					);
+ 					await expect( draggingUtils.dropZone ).toBeVisible();
+ 					await expect
+-						.poll( () => draggingUtils.dropZone.boundingBox() )
+-						.toEqual( firstBlockBox );
++						.poll( () =>
++							draggingUtils.confirmValidDropZonePosition(
++								firstBlockBox
++							)
++						)
++						.toBeTruthy();
+ 				}
+ 
+ 				{
+@@ -399,8 +435,12 @@ test.describe( 'Paragraph', () => {
+ 					);
+ 					await expect( draggingUtils.dropZone ).toBeVisible();
+ 					await expect
+-						.poll( () => draggingUtils.dropZone.boundingBox() )
+-						.toEqual( firstBlockBox );
++						.poll( () =>
++							draggingUtils.confirmValidDropZonePosition(
++								firstBlockBox
++							)
++						)
++						.toBeTruthy();
+ 				}
+ 
+ 				{
+@@ -411,8 +451,12 @@ test.describe( 'Paragraph', () => {
+ 					);
+ 					await expect( draggingUtils.dropZone ).toBeVisible();
+ 					await expect
+-						.poll( () => draggingUtils.dropZone.boundingBox() )
+-						.toEqual( firstBlockBox );
++						.poll( () =>
++							draggingUtils.confirmValidDropZonePosition(
++								firstBlockBox
++							)
++						)
++						.toBeTruthy();
+ 				}
+ 
+ 				{
+@@ -423,8 +467,12 @@ test.describe( 'Paragraph', () => {
+ 					);
+ 					await expect( draggingUtils.dropZone ).toBeVisible();
+ 					await expect
+-						.poll( () => draggingUtils.dropZone.boundingBox() )
+-						.toEqual( secondBlockBox );
++						.poll( () =>
++							draggingUtils.confirmValidDropZonePosition(
++								secondBlockBox
++							)
++						)
++						.toBeTruthy();
+ 				}
+ 
+ 				{
+@@ -435,8 +483,12 @@ test.describe( 'Paragraph', () => {
+ 					);
+ 					await expect( draggingUtils.dropZone ).toBeVisible();
+ 					await expect
+-						.poll( () => draggingUtils.dropZone.boundingBox() )
+-						.toEqual( secondBlockBox );
++						.poll( () =>
++							draggingUtils.confirmValidDropZonePosition(
++								secondBlockBox
++							)
++						)
++						.toBeTruthy();
+ 				}
+ 
+ 				{
+@@ -447,8 +499,12 @@ test.describe( 'Paragraph', () => {
+ 					);
+ 					await expect( draggingUtils.dropZone ).toBeVisible();
+ 					await expect
+-						.poll( () => draggingUtils.dropZone.boundingBox() )
+-						.toEqual( secondBlockBox );
++						.poll( () =>
++							draggingUtils.confirmValidDropZonePosition(
++								secondBlockBox
++							)
++						)
++						.toBeTruthy();
+ 				}
+ 			} );
+ 		} );
+@@ -508,4 +564,14 @@ class DraggingUtils {
+ 		await this.page.mouse.move( 0, 0 );
+ 		await this.page.mouse.down();
+ 	}
++
++	async confirmValidDropZonePosition( element ) {
++		// Check that both x and y axis of the dropzone
++		// have a less than 1 difference with a given target element
++		const box = await this.dropZone.boundingBox();
++		return (
++			Math.abs( element.x - box.x ) < 1 &&
++			Math.abs( element.y - box.y ) < 1
++		);
++	}
+ }

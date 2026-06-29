@@ -1,0 +1,1495 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 2f6f1b801aa10d..afefa65cf06e1d 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -282,7 +282,6 @@ module.exports = {
+ 						'RangeControl',
+ 						'SearchControl',
+ 						'SelectControl',
+-						'ToggleControl',
+ 					].map( ( componentName ) => ( {
+ 						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
+ 						message:
+diff --git a/packages/block-editor/src/components/background-image-control/index.js b/packages/block-editor/src/components/background-image-control/index.js
+index 789e388bd77368..b0c8cb10b96b2f 100644
+--- a/packages/block-editor/src/components/background-image-control/index.js
++++ b/packages/block-editor/src/components/background-image-control/index.js
+@@ -585,7 +585,6 @@ function BackgroundSizeControls( {
+ 				onChange={ updateBackgroundPosition }
+ 			/>
+ 			<ToggleControl
+-				__nextHasNoMarginBottom
+ 				label={ __( 'Fixed background' ) }
+ 				checked={ attachmentValue === 'fixed' }
+ 				onChange={ toggleScrollWithPage }
+@@ -640,7 +639,6 @@ function BackgroundSizeControls( {
+ 					}
+ 				/>
+ 				<ToggleControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Repeat' ) }
+ 					checked={ repeatCheckedValue }
+ 					onChange={ toggleIsRepeated }
+diff --git a/packages/block-editor/src/components/block-lock/modal.js b/packages/block-editor/src/components/block-lock/modal.js
+index 9d5c5f03b88c04..4c455c1f61b92f 100644
+--- a/packages/block-editor/src/components/block-lock/modal.js
++++ b/packages/block-editor/src/components/block-lock/modal.js
+@@ -196,7 +196,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
+ 					{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+ 					{ hasTemplateLock && (
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							className="block-editor-block-lock-modal__template-lock"
+ 							label={ __( 'Apply to all blocks inside' ) }
+ 							checked={ applyTemplateLock }
+diff --git a/packages/block-editor/src/components/date-format-picker/index.js b/packages/block-editor/src/components/date-format-picker/index.js
+index 686b6e7adc41da..bb8f475587549a 100644
+--- a/packages/block-editor/src/components/date-format-picker/index.js
++++ b/packages/block-editor/src/components/date-format-picker/index.js
+@@ -47,7 +47,6 @@ export default function DateFormatPicker( {
+ 		>
+ 			<VisuallyHidden as="legend">{ __( 'Date format' ) }</VisuallyHidden>
+ 			<ToggleControl
+-				__nextHasNoMarginBottom
+ 				label={ __( 'Default format' ) }
+ 				help={ `${ __( 'Example:' ) }  ${ dateI18n(
+ 					defaultFormat,
+diff --git a/packages/block-editor/src/components/global-styles/image-settings-panel.js b/packages/block-editor/src/components/global-styles/image-settings-panel.js
+index e6fa7a4414f6c8..c4e7ec18cb5af1 100644
+--- a/packages/block-editor/src/components/global-styles/image-settings-panel.js
++++ b/packages/block-editor/src/components/global-styles/image-settings-panel.js
+@@ -67,7 +67,6 @@ export default function ImageSettingsPanel( {
+ 					panelId={ panelId }
+ 				>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Enlarge on click' ) }
+ 						checked={ lightboxChecked }
+ 						onChange={ onChangeLightbox }
+diff --git a/packages/block-editor/src/components/inspector-controls/README.md b/packages/block-editor/src/components/inspector-controls/README.md
+index 87d45470a09565..2b5da040b65ef9 100644
+--- a/packages/block-editor/src/components/inspector-controls/README.md
++++ b/packages/block-editor/src/components/inspector-controls/README.md
+@@ -122,7 +122,6 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
+ 						/>
+ 
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label="Toggle Field"
+ 							checked={ toggleField }
+ 							onChange={ onChangeToggleField }
+diff --git a/packages/block-editor/src/components/responsive-block-control/index.js b/packages/block-editor/src/components/responsive-block-control/index.js
+index 388e7ec543693a..e09d9be14d4fef 100644
+--- a/packages/block-editor/src/components/responsive-block-control/index.js
++++ b/packages/block-editor/src/components/responsive-block-control/index.js
+@@ -90,7 +90,6 @@ function ResponsiveBlockControl( props ) {
+ 
+ 			<div className="block-editor-responsive-block-control__inner">
+ 				<ToggleControl
+-					__nextHasNoMarginBottom
+ 					className="block-editor-responsive-block-control__toggle"
+ 					label={ toggleControlLabel }
+ 					checked={ ! isResponsive }
+diff --git a/packages/block-editor/src/components/url-popover/image-url-input-ui.js b/packages/block-editor/src/components/url-popover/image-url-input-ui.js
+index 725082fd42fbcf..dbb53d209661f8 100644
+--- a/packages/block-editor/src/components/url-popover/image-url-input-ui.js
++++ b/packages/block-editor/src/components/url-popover/image-url-input-ui.js
+@@ -228,7 +228,6 @@ const ImageURLInputUI = ( {
+ 	const advancedOptions = (
+ 		<VStack spacing="3">
+ 			<ToggleControl
+-				__nextHasNoMarginBottom
+ 				label={ __( 'Open in new tab' ) }
+ 				onChange={ onSetNewTab }
+ 				checked={ linkTarget === '_blank' }
+diff --git a/packages/block-editor/src/components/url-popover/stories/index.story.jsx b/packages/block-editor/src/components/url-popover/stories/index.story.jsx
+index aa5628fd5db71b..1cb95bc5e1f40e 100644
+--- a/packages/block-editor/src/components/url-popover/stories/index.story.jsx
++++ b/packages/block-editor/src/components/url-popover/stories/index.story.jsx
+@@ -37,7 +37,6 @@ const TestURLPopover = () => {
+ 					onClose={ close }
+ 					renderSettings={ () => (
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Open in new tab' ) }
+ 							onChange={ setTarget }
+ 						/>
+diff --git a/packages/block-editor/src/hooks/block-hooks.js b/packages/block-editor/src/hooks/block-hooks.js
+index 04a2313b629ba7..1fd04f43c30a7a 100644
+--- a/packages/block-editor/src/hooks/block-hooks.js
++++ b/packages/block-editor/src/hooks/block-hooks.js
+@@ -197,7 +197,6 @@ function BlockHooksControlPure( {
+ 
+ 								return (
+ 									<ToggleControl
+-										__nextHasNoMarginBottom
+ 										checked={ checked }
+ 										key={ block.title }
+ 										label={ block.title }
+diff --git a/packages/block-editor/src/hooks/layout.js b/packages/block-editor/src/hooks/layout.js
+index cf109dec31b30f..58a662dfa8aaab 100644
+--- a/packages/block-editor/src/hooks/layout.js
++++ b/packages/block-editor/src/hooks/layout.js
+@@ -236,7 +236,6 @@ function LayoutPanelPure( {
+ 					{ showInheritToggle && (
+ 						<>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Inner blocks use content width' ) }
+ 								checked={
+ 									layoutType?.name === 'constrained' ||
+diff --git a/packages/block-editor/src/layouts/flex.js b/packages/block-editor/src/layouts/flex.js
+index 2c3f2f67121b0f..e4a05fef045a6b 100644
+--- a/packages/block-editor/src/layouts/flex.js
++++ b/packages/block-editor/src/layouts/flex.js
+@@ -321,7 +321,6 @@ function FlexWrapControl( { layout, onChange } ) {
+ 	const { flexWrap = 'wrap' } = layout;
+ 	return (
+ 		<ToggleControl
+-			__nextHasNoMarginBottom
+ 			label={ __( 'Allow to wrap to multiple lines' ) }
+ 			onChange={ ( value ) => {
+ 				onChange( {
+diff --git a/packages/block-library/src/accordion-item/edit.js b/packages/block-library/src/accordion-item/edit.js
+index 6fa4b9dac41fee..85df48f067bd61 100644
+--- a/packages/block-library/src/accordion-item/edit.js
++++ b/packages/block-library/src/accordion-item/edit.js
+@@ -125,7 +125,6 @@ export default function Edit( {
+ 					>
+ 						<ToggleControl
+ 							label={ __( 'Open by default' ) }
+-							__nextHasNoMarginBottom
+ 							onChange={ ( value ) => {
+ 								setAttributes( {
+ 									openByDefault: value,
+diff --git a/packages/block-library/src/accordion/edit.js b/packages/block-library/src/accordion/edit.js
+index 972073134496bb..2832567c1433ef 100644
+--- a/packages/block-library/src/accordion/edit.js
++++ b/packages/block-library/src/accordion/edit.js
+@@ -141,7 +141,6 @@ export default function Edit( {
+ 					>
+ 						<ToggleControl
+ 							isBlock
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Auto-close' ) }
+ 							onChange={ ( value ) => {
+ 								setAttributes( {
+@@ -162,7 +161,6 @@ export default function Edit( {
+ 					>
+ 						<ToggleControl
+ 							isBlock
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Show icon' ) }
+ 							onChange={ ( value ) => {
+ 								setAttributes( {
+diff --git a/packages/block-library/src/archives/edit.js b/packages/block-library/src/archives/edit.js
+index 12e3e6dc25e78d..fb164e2ef3f2a0 100644
+--- a/packages/block-library/src/archives/edit.js
++++ b/packages/block-library/src/archives/edit.js
+@@ -46,7 +46,6 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Display as dropdown' ) }
+ 							checked={ displayAsDropdown }
+ 							onChange={ () =>
+@@ -67,7 +66,6 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
+ 							}
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Show label' ) }
+ 								checked={ showLabel }
+ 								onChange={ () =>
+@@ -88,7 +86,6 @@ export default function ArchivesEdit( { attributes, setAttributes } ) {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Show post counts' ) }
+ 							checked={ showPostCounts }
+ 							onChange={ () =>
+diff --git a/packages/block-library/src/audio/edit.js b/packages/block-library/src/audio/edit.js
+index 2c36f2272571b6..91054ea18c4a84 100644
+--- a/packages/block-library/src/audio/edit.js
++++ b/packages/block-library/src/audio/edit.js
+@@ -190,7 +190,6 @@ function AudioEdit( {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Autoplay' ) }
+ 							onChange={ toggleAttribute( 'autoplay' ) }
+ 							checked={ !! autoplay }
+@@ -208,7 +207,6 @@ function AudioEdit( {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Loop' ) }
+ 							onChange={ toggleAttribute( 'loop' ) }
+ 							checked={ !! loop }
+diff --git a/packages/block-library/src/avatar/edit.js b/packages/block-library/src/avatar/edit.js
+index a51be42bf7e037..6f44addb4e4eab 100644
+--- a/packages/block-library/src/avatar/edit.js
++++ b/packages/block-library/src/avatar/edit.js
+@@ -77,7 +77,6 @@ const AvatarInspectorControls = ( {
+ 					onDeselect={ () => setAttributes( { isLink: false } ) }
+ 				>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Link to user profile' ) }
+ 						onChange={ () =>
+ 							setAttributes( { isLink: ! attributes.isLink } )
+@@ -95,7 +94,6 @@ const AvatarInspectorControls = ( {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Open in new tab' ) }
+ 							onChange={ ( value ) =>
+ 								setAttributes( {
+diff --git a/packages/block-library/src/breadcrumbs/edit.js b/packages/block-library/src/breadcrumbs/edit.js
+index 5f18ccb451518a..772472d3f22069 100644
+--- a/packages/block-library/src/breadcrumbs/edit.js
++++ b/packages/block-library/src/breadcrumbs/edit.js
+@@ -202,7 +202,6 @@ export default function BreadcrumbEdit( {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Show home breadcrumb' ) }
+ 							onChange={ ( value ) =>
+ 								setAttributes( { showHomeItem: value } )
+@@ -221,7 +220,6 @@ export default function BreadcrumbEdit( {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Show current breadcrumb' ) }
+ 							onChange={ ( value ) =>
+ 								setAttributes( { showCurrentItem: value } )
+diff --git a/packages/block-library/src/categories/edit.js b/packages/block-library/src/categories/edit.js
+index e2d9bf695fe1d3..434d95caae8814 100644
+--- a/packages/block-library/src/categories/edit.js
++++ b/packages/block-library/src/categories/edit.js
+@@ -260,7 +260,6 @@ export default function CategoriesEdit( {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Display as dropdown' ) }
+ 							checked={ displayAsDropdown }
+ 							onChange={ toggleAttribute( 'displayAsDropdown' ) }
+@@ -276,7 +275,6 @@ export default function CategoriesEdit( {
+ 							isShownByDefault
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								className="wp-block-categories__indentation"
+ 								label={ __( 'Show label' ) }
+ 								checked={ showLabel }
+@@ -293,7 +291,6 @@ export default function CategoriesEdit( {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Show post counts' ) }
+ 							checked={ showPostCounts }
+ 							onChange={ toggleAttribute( 'showPostCounts' ) }
+@@ -309,7 +306,6 @@ export default function CategoriesEdit( {
+ 							isShownByDefault
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Show only top level terms' ) }
+ 								checked={ showOnlyTopLevel }
+ 								onChange={ toggleAttribute(
+@@ -327,7 +323,6 @@ export default function CategoriesEdit( {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Show empty terms' ) }
+ 							checked={ showEmpty }
+ 							onChange={ toggleAttribute( 'showEmpty' ) }
+@@ -343,7 +338,6 @@ export default function CategoriesEdit( {
+ 							isShownByDefault
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Show hierarchy' ) }
+ 								checked={ showHierarchy }
+ 								onChange={ toggleAttribute( 'showHierarchy' ) }
+diff --git a/packages/block-library/src/columns/edit.js b/packages/block-library/src/columns/edit.js
+index 452a4e1ecae9fb..3cbb90a97d2c07 100644
+--- a/packages/block-library/src/columns/edit.js
++++ b/packages/block-library/src/columns/edit.js
+@@ -192,7 +192,6 @@ function ColumnInspectorControls( {
+ 				}
+ 			>
+ 				<ToggleControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Stack on mobile' ) }
+ 					checked={ isStackedOnMobile }
+ 					onChange={ () =>
+diff --git a/packages/block-library/src/comment-author-name/edit.js b/packages/block-library/src/comment-author-name/edit.js
+index 0d5ae2bb9cdaa0..a8f3fa0d323b65 100644
+--- a/packages/block-library/src/comment-author-name/edit.js
++++ b/packages/block-library/src/comment-author-name/edit.js
+@@ -101,7 +101,6 @@ export default function Edit( {
+ 					}
+ 				>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Link to authors URL' ) }
+ 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+ 						checked={ isLink }
+@@ -119,7 +118,6 @@ export default function Edit( {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Open in new tab' ) }
+ 							onChange={ ( value ) =>
+ 								setAttributes( {
+diff --git a/packages/block-library/src/comment-date/edit.js b/packages/block-library/src/comment-date/edit.js
+index 76411b03d70ed0..a7bcb8d9788bb4 100644
+--- a/packages/block-library/src/comment-date/edit.js
++++ b/packages/block-library/src/comment-date/edit.js
+@@ -86,7 +86,6 @@ export default function Edit( {
+ 					isShownByDefault
+ 				>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Link to comment' ) }
+ 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+ 						checked={ isLink }
+diff --git a/packages/block-library/src/comment-edit-link/edit.js b/packages/block-library/src/comment-edit-link/edit.js
+index bece4cff90839e..17292e5e55dfc5 100644
+--- a/packages/block-library/src/comment-edit-link/edit.js
++++ b/packages/block-library/src/comment-edit-link/edit.js
+@@ -66,7 +66,6 @@ export default function Edit( {
+ 					}
+ 				>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Open in new tab' ) }
+ 						onChange={ ( value ) =>
+ 							setAttributes( {
+diff --git a/packages/block-library/src/comments-title/edit.js b/packages/block-library/src/comments-title/edit.js
+index 6a35e6e3f1ddff..6413fea60ed47c 100644
+--- a/packages/block-library/src/comments-title/edit.js
++++ b/packages/block-library/src/comments-title/edit.js
+@@ -141,7 +141,6 @@ export default function Edit( {
+ 					}
+ 				>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Show post title' ) }
+ 						checked={ showPostTitle }
+ 						onChange={ ( value ) =>
+@@ -158,7 +157,6 @@ export default function Edit( {
+ 					}
+ 				>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Show comments count' ) }
+ 						checked={ showCommentsCount }
+ 						onChange={ ( value ) =>
+diff --git a/packages/block-library/src/cover/edit/inspector-controls.js b/packages/block-library/src/cover/edit/inspector-controls.js
+index 2d3c5b7341a796..cbb0ef2d94a9fe 100644
+--- a/packages/block-library/src/cover/edit/inspector-controls.js
++++ b/packages/block-library/src/cover/edit/inspector-controls.js
+@@ -225,7 +225,6 @@ export default function CoverInspectorControls( {
+ 									}
+ 								>
+ 									<ToggleControl
+-										__nextHasNoMarginBottom
+ 										label={ __( 'Fixed background' ) }
+ 										checked={ !! hasParallax }
+ 										onChange={ toggleParallax }
+@@ -243,7 +242,6 @@ export default function CoverInspectorControls( {
+ 									}
+ 								>
+ 									<ToggleControl
+-										__nextHasNoMarginBottom
+ 										label={ __( 'Repeated background' ) }
+ 										checked={ isRepeated }
+ 										onChange={ toggleIsRepeated }
+diff --git a/packages/block-library/src/details/edit.js b/packages/block-library/src/details/edit.js
+index 726ce37d0b4b28..095c4d4a0cbc39 100644
+--- a/packages/block-library/src/details/edit.js
++++ b/packages/block-library/src/details/edit.js
+@@ -92,7 +92,6 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
+ 						} }
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Open by default' ) }
+ 							checked={ showContent }
+ 							onChange={ () =>
+diff --git a/packages/block-library/src/embed/embed-controls.js b/packages/block-library/src/embed/embed-controls.js
+index e2ff4fb9b623b5..05a20ecb6393b0 100644
+--- a/packages/block-library/src/embed/embed-controls.js
++++ b/packages/block-library/src/embed/embed-controls.js
+@@ -69,7 +69,6 @@ const EmbedControls = ( {
+ 							} }
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Resize for smaller devices' ) }
+ 								checked={ allowResponsive }
+ 								help={ getResponsiveHelp }
+diff --git a/packages/block-library/src/file/inspector.js b/packages/block-library/src/file/inspector.js
+index f75d7f5042d177..7d743a0dcba8ae 100644
+--- a/packages/block-library/src/file/inspector.js
++++ b/packages/block-library/src/file/inspector.js
+@@ -59,7 +59,6 @@ export default function FileBlockInspector( {
+ 							onDeselect={ () => changeDisplayPreview( true ) }
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Show inline embed' ) }
+ 								help={
+ 									displayPreview
+@@ -127,7 +126,6 @@ export default function FileBlockInspector( {
+ 						onDeselect={ () => changeOpenInNewWindow( false ) }
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Open in new tab' ) }
+ 							checked={ openInNewWindow }
+ 							onChange={ changeOpenInNewWindow }
+@@ -140,7 +138,6 @@ export default function FileBlockInspector( {
+ 						onDeselect={ () => changeShowDownloadButton( true ) }
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Show download button' ) }
+ 							checked={ showDownloadButton }
+ 							onChange={ changeShowDownloadButton }
+diff --git a/packages/block-library/src/gallery/edit.js b/packages/block-library/src/gallery/edit.js
+index e4a917651b804e..3046731b541bbb 100644
+--- a/packages/block-library/src/gallery/edit.js
++++ b/packages/block-library/src/gallery/edit.js
+@@ -727,7 +727,6 @@ export default function GalleryEdit( props ) {
+ 							}
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Crop images to fit' ) }
+ 								checked={ !! imageCrop }
+ 								onChange={ toggleImageCrop }
+@@ -742,7 +741,6 @@ export default function GalleryEdit( props ) {
+ 							}
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Randomize order' ) }
+ 								checked={ !! randomOrder }
+ 								onChange={ toggleRandomOrder }
+@@ -756,7 +754,6 @@ export default function GalleryEdit( props ) {
+ 								onDeselect={ () => toggleOpenInNewTab( false ) }
+ 							>
+ 								<ToggleControl
+-									__nextHasNoMarginBottom
+ 									label={ __( 'Open images in new tab' ) }
+ 									checked={ linkTarget === '_blank' }
+ 									onChange={ toggleOpenInNewTab }
+@@ -830,20 +827,17 @@ export default function GalleryEdit( props ) {
+ 							size="__unstable-large"
+ 						/>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Crop images to fit' ) }
+ 							checked={ !! imageCrop }
+ 							onChange={ toggleImageCrop }
+ 						/>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Randomize order' ) }
+ 							checked={ !! randomOrder }
+ 							onChange={ toggleRandomOrder }
+ 						/>
+ 						{ hasLinkTo && (
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Open images in new tab' ) }
+ 								checked={ linkTarget === '_blank' }
+ 								onChange={ toggleOpenInNewTab }
+diff --git a/packages/block-library/src/latest-comments/edit.js b/packages/block-library/src/latest-comments/edit.js
+index f256006ca12c62..d0d1f438972e83 100644
+--- a/packages/block-library/src/latest-comments/edit.js
++++ b/packages/block-library/src/latest-comments/edit.js
+@@ -69,7 +69,6 @@ export default function LatestComments( { attributes, setAttributes } ) {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Display avatar' ) }
+ 							checked={ displayAvatar }
+ 							onChange={ () =>
+@@ -89,7 +88,6 @@ export default function LatestComments( { attributes, setAttributes } ) {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Display date' ) }
+ 							checked={ displayDate }
+ 							onChange={ () =>
+diff --git a/packages/block-library/src/latest-posts/edit.js b/packages/block-library/src/latest-posts/edit.js
+index 29050cdc4a0cc0..d6a49fbb1e708f 100644
+--- a/packages/block-library/src/latest-posts/edit.js
++++ b/packages/block-library/src/latest-posts/edit.js
+@@ -217,7 +217,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
+ 					isShownByDefault
+ 				>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Display post content' ) }
+ 						checked={ displayPostContent }
+ 						onChange={ ( value ) =>
+@@ -301,7 +300,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
+ 					isShownByDefault
+ 				>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Display author name' ) }
+ 						checked={ displayAuthor }
+ 						onChange={ ( value ) =>
+@@ -318,7 +316,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
+ 					isShownByDefault
+ 				>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Display post date' ) }
+ 						checked={ displayPostDate }
+ 						onChange={ ( value ) =>
+@@ -350,7 +347,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
+ 					isShownByDefault
+ 				>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Display featured image' ) }
+ 						checked={ displayFeaturedImage }
+ 						onChange={ ( value ) =>
+@@ -456,7 +452,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
+ 							isShownByDefault
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Add link to featured image' ) }
+ 								checked={ addLinkToFeaturedImage }
+ 								onChange={ ( value ) =>
+diff --git a/packages/block-library/src/list/ordered-list-settings.js b/packages/block-library/src/list/ordered-list-settings.js
+index a06fac0848ff1d..a014a7ca05ed01 100644
+--- a/packages/block-library/src/list/ordered-list-settings.js
++++ b/packages/block-library/src/list/ordered-list-settings.js
+@@ -79,7 +79,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
+ 						step="1"
+ 					/>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Reverse order' ) }
+ 						checked={ reversed || false }
+ 						onChange={ ( value ) => {
+@@ -165,7 +164,6 @@ const OrderedListSettings = ( { setAttributes, reversed, start, type } ) => {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Reverse order' ) }
+ 							checked={ reversed || false }
+ 							onChange={ ( value ) => {
+diff --git a/packages/block-library/src/loginout/edit.js b/packages/block-library/src/loginout/edit.js
+index 9af634c87371cf..5ee05a8ec44299 100644
+--- a/packages/block-library/src/loginout/edit.js
++++ b/packages/block-library/src/loginout/edit.js
+@@ -39,7 +39,6 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Display login as form' ) }
+ 							checked={ displayLoginAsForm }
+ 							onChange={ () =>
+@@ -58,7 +57,6 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Redirect to current URL' ) }
+ 							checked={ redirectToCurrent }
+ 							onChange={ () =>
+diff --git a/packages/block-library/src/media-text/edit.js b/packages/block-library/src/media-text/edit.js
+index 4f0dc74aa48eef..cddba39629f746 100644
+--- a/packages/block-library/src/media-text/edit.js
++++ b/packages/block-library/src/media-text/edit.js
+@@ -355,7 +355,6 @@ function MediaTextEdit( {
+ 				}
+ 			>
+ 				<ToggleControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Stack on mobile' ) }
+ 					checked={ isStackedOnMobile }
+ 					onChange={ () =>
+@@ -373,7 +372,6 @@ function MediaTextEdit( {
+ 					onDeselect={ () => setAttributes( { imageFill: false } ) }
+ 				>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Crop image to fill' ) }
+ 						checked={ !! imageFill }
+ 						onChange={ () =>
+diff --git a/packages/block-library/src/more/edit.js b/packages/block-library/src/more/edit.js
+index 256412951c2992..bbf4dab173d325 100644
+--- a/packages/block-library/src/more/edit.js
++++ b/packages/block-library/src/more/edit.js
+@@ -49,7 +49,6 @@ export default function MoreEdit( {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __(
+ 								'Hide the excerpt on the full content page'
+ 							) }
+diff --git a/packages/block-library/src/navigation/edit/index.js b/packages/block-library/src/navigation/edit/index.js
+index 141159324cc497..c332d96c51f542 100644
+--- a/packages/block-library/src/navigation/edit/index.js
++++ b/packages/block-library/src/navigation/edit/index.js
+@@ -730,7 +730,6 @@ function Navigation( {
+ 									isShownByDefault
+ 								>
+ 									<ToggleControl
+-										__nextHasNoMarginBottom
+ 										checked={ openSubmenusOnClick }
+ 										onChange={ ( value ) => {
+ 											setAttributes( {
+@@ -758,7 +757,6 @@ function Navigation( {
+ 									isShownByDefault
+ 								>
+ 									<ToggleControl
+-										__nextHasNoMarginBottom
+ 										checked={ showSubmenuIcon }
+ 										onChange={ ( value ) => {
+ 											setAttributes( {
+diff --git a/packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js b/packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js
+index 015dcad86ff81b..069f74edc90f4e 100644
+--- a/packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js
++++ b/packages/block-library/src/navigation/edit/overlay-menu-preview-controls.js
+@@ -32,7 +32,6 @@ export default function OverlayMenuPreviewControls( {
+ 	return (
+ 		<VStack spacing={ 4 }>
+ 			<ToggleControl
+-				__nextHasNoMarginBottom
+ 				label={ __( 'Show icon button' ) }
+ 				help={ __(
+ 					'Configure the visual appearance of the button that toggles the overlay menu.'
+diff --git a/packages/block-library/src/navigation/edit/overlay-menu-preview.js b/packages/block-library/src/navigation/edit/overlay-menu-preview.js
+index 2adaa6e6c11d89..c7d57e64885651 100644
+--- a/packages/block-library/src/navigation/edit/overlay-menu-preview.js
++++ b/packages/block-library/src/navigation/edit/overlay-menu-preview.js
+@@ -24,7 +24,6 @@ export default function OverlayMenuPreview( { setAttributes, hasIcon, icon } ) {
+ 				onDeselect={ () => setAttributes( { hasIcon: true } ) }
+ 			>
+ 				<ToggleControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Show icon button' ) }
+ 					help={ __(
+ 						'Configure the visual appearance of the button that toggles the overlay menu.'
+diff --git a/packages/block-library/src/paragraph/edit.js b/packages/block-library/src/paragraph/edit.js
+index 1fafae3ad4ffee..135f09dca63e0e 100644
+--- a/packages/block-library/src/paragraph/edit.js
++++ b/packages/block-library/src/paragraph/edit.js
+@@ -87,7 +87,6 @@ function DropCapControl( { clientId, attributes, setAttributes, name } ) {
+ 				panelId={ clientId }
+ 			>
+ 				<ToggleControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Drop cap' ) }
+ 					checked={ !! dropCap }
+ 					onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
+diff --git a/packages/block-library/src/post-author-name/edit.js b/packages/block-library/src/post-author-name/edit.js
+index 5df47e447195b4..87526dca267734 100644
+--- a/packages/block-library/src/post-author-name/edit.js
++++ b/packages/block-library/src/post-author-name/edit.js
+@@ -100,7 +100,6 @@ function PostAuthorNameEdit( {
+ 						onDeselect={ () => setAttributes( { isLink: false } ) }
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Link to author archive' ) }
+ 							onChange={ () =>
+ 								setAttributes( { isLink: ! isLink } )
+@@ -118,7 +117,6 @@ function PostAuthorNameEdit( {
+ 							}
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Open in new tab' ) }
+ 								onChange={ ( value ) =>
+ 									setAttributes( {
+diff --git a/packages/block-library/src/post-author/edit.js b/packages/block-library/src/post-author/edit.js
+index aa36d348830521..8a1aebca02f784 100644
+--- a/packages/block-library/src/post-author/edit.js
++++ b/packages/block-library/src/post-author/edit.js
+@@ -228,7 +228,6 @@ function PostAuthorEdit( {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Show avatar' ) }
+ 							checked={ showAvatar }
+ 							onChange={ () =>
+@@ -270,7 +269,6 @@ function PostAuthorEdit( {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Show bio' ) }
+ 							checked={ !! showBio }
+ 							onChange={ () =>
+@@ -285,7 +283,6 @@ function PostAuthorEdit( {
+ 						onDeselect={ () => setAttributes( { isLink: false } ) }
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Link author name to author page' ) }
+ 							checked={ isLink }
+ 							onChange={ () =>
+@@ -303,7 +300,6 @@ function PostAuthorEdit( {
+ 							}
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Open in new tab' ) }
+ 								onChange={ ( value ) =>
+ 									setAttributes( {
+diff --git a/packages/block-library/src/post-date/edit.js b/packages/block-library/src/post-date/edit.js
+index fb95a3264010a9..ce8f1d6e12a371 100644
+--- a/packages/block-library/src/post-date/edit.js
++++ b/packages/block-library/src/post-date/edit.js
+@@ -235,7 +235,6 @@ export default function PostDateEdit( {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={
+ 								postType?.labels.singular_name
+ 									? sprintf(
+diff --git a/packages/block-library/src/post-excerpt/edit.js b/packages/block-library/src/post-excerpt/edit.js
+index 3462a0b901b15a..1104d53a592302 100644
+--- a/packages/block-library/src/post-excerpt/edit.js
++++ b/packages/block-library/src/post-excerpt/edit.js
+@@ -253,7 +253,6 @@ export default function PostExcerptEditor( {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Show link on new line' ) }
+ 							checked={ showMoreOnNewLine }
+ 							onChange={ ( newShowMoreOnNewLine ) =>
+diff --git a/packages/block-library/src/post-featured-image/edit.js b/packages/block-library/src/post-featured-image/edit.js
+index 7f0691ecbc5ec1..b7d5ade794ac1b 100644
+--- a/packages/block-library/src/post-featured-image/edit.js
++++ b/packages/block-library/src/post-featured-image/edit.js
+@@ -278,7 +278,6 @@ export default function PostFeaturedImageEdit( {
+ 							}
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={
+ 									postType?.labels.singular_name
+ 										? sprintf(
+@@ -307,7 +306,6 @@ export default function PostFeaturedImageEdit( {
+ 								}
+ 							>
+ 								<ToggleControl
+-									__nextHasNoMarginBottom
+ 									label={ __( 'Open in new tab' ) }
+ 									onChange={ ( value ) =>
+ 										setAttributes( {
+diff --git a/packages/block-library/src/post-navigation-link/edit.js b/packages/block-library/src/post-navigation-link/edit.js
+index 1052c02ff71c73..291245147305b0 100644
+--- a/packages/block-library/src/post-navigation-link/edit.js
++++ b/packages/block-library/src/post-navigation-link/edit.js
+@@ -125,7 +125,6 @@ export default function PostNavigationLinkEdit( {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Display the title as a link' ) }
+ 							help={ __(
+ 								'If you have entered a custom label, it will be prepended before the title.'
+@@ -150,7 +149,6 @@ export default function PostNavigationLinkEdit( {
+ 							}
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __(
+ 									'Include the label as part of the link'
+ 								) }
+diff --git a/packages/block-library/src/post-time-to-read/edit.js b/packages/block-library/src/post-time-to-read/edit.js
+index 6025d4bab43509..07618bc6ecbe96 100644
+--- a/packages/block-library/src/post-time-to-read/edit.js
++++ b/packages/block-library/src/post-time-to-read/edit.js
+@@ -169,7 +169,6 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
+ 							} }
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Display as range' ) }
+ 								checked={ !! displayAsRange }
+ 								onChange={ () =>
+diff --git a/packages/block-library/src/post-title/edit.js b/packages/block-library/src/post-title/edit.js
+index 50cecea8c3d859..53fd38423f6673 100644
+--- a/packages/block-library/src/post-title/edit.js
++++ b/packages/block-library/src/post-title/edit.js
+@@ -175,7 +175,6 @@ export default function PostTitleEdit( {
+ 								}
+ 							>
+ 								<ToggleControl
+-									__nextHasNoMarginBottom
+ 									label={ __( 'Make title a link' ) }
+ 									onChange={ () =>
+ 										setAttributes( { isLink: ! isLink } )
+@@ -198,7 +197,6 @@ export default function PostTitleEdit( {
+ 										}
+ 									>
+ 										<ToggleControl
+-											__nextHasNoMarginBottom
+ 											label={ __( 'Open in new tab' ) }
+ 											onChange={ ( value ) =>
+ 												setAttributes( {
+diff --git a/packages/block-library/src/query-pagination/query-pagination-label-control.js b/packages/block-library/src/query-pagination/query-pagination-label-control.js
+index 16766c19bef086..bc48b48968ab4c 100644
+--- a/packages/block-library/src/query-pagination/query-pagination-label-control.js
++++ b/packages/block-library/src/query-pagination/query-pagination-label-control.js
+@@ -7,7 +7,6 @@ import { ToggleControl } from '@wordpress/components';
+ export function QueryPaginationLabelControl( { value, onChange } ) {
+ 	return (
+ 		<ToggleControl
+-			__nextHasNoMarginBottom
+ 			label={ __( 'Show label text' ) }
+ 			help={ __( 'Make label text visible, e.g. "Next Page".' ) }
+ 			onChange={ onChange }
+diff --git a/packages/block-library/src/query-title/edit.js b/packages/block-library/src/query-title/edit.js
+index c25ac16c59ab88..06dd69475e3192 100644
+--- a/packages/block-library/src/query-title/edit.js
++++ b/packages/block-library/src/query-title/edit.js
+@@ -117,7 +117,6 @@ export default function QueryTitleEdit( {
+ 							isShownByDefault
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Show archive type in title' ) }
+ 								onChange={ () =>
+ 									setAttributes( {
+@@ -156,7 +155,6 @@ export default function QueryTitleEdit( {
+ 							isShownByDefault
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Show search term in title' ) }
+ 								onChange={ () =>
+ 									setAttributes( {
+@@ -215,7 +213,6 @@ export default function QueryTitleEdit( {
+ 							isShownByDefault
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Show post type label' ) }
+ 								onChange={ () =>
+ 									setAttributes( {
+diff --git a/packages/block-library/src/query/edit/inspector-controls/enhanced-pagination-control.js b/packages/block-library/src/query/edit/inspector-controls/enhanced-pagination-control.js
+index 3154859fddf271..378b6e1bc2eb85 100644
+--- a/packages/block-library/src/query/edit/inspector-controls/enhanced-pagination-control.js
++++ b/packages/block-library/src/query/edit/inspector-controls/enhanced-pagination-control.js
+@@ -28,7 +28,6 @@ export default function EnhancedPaginationControl( {
+ 	return (
+ 		<>
+ 			<ToggleControl
+-				__nextHasNoMarginBottom
+ 				label={ __( 'Reload full page' ) }
+ 				help={ help }
+ 				checked={ ! enhancedPagination }
+diff --git a/packages/block-library/src/read-more/edit.js b/packages/block-library/src/read-more/edit.js
+index 8482d40d037916..c979f459e4f187 100644
+--- a/packages/block-library/src/read-more/edit.js
++++ b/packages/block-library/src/read-more/edit.js
+@@ -44,7 +44,6 @@ export default function ReadMore( {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Open in new tab' ) }
+ 							onChange={ ( value ) =>
+ 								setAttributes( {
+diff --git a/packages/block-library/src/rss/edit.js b/packages/block-library/src/rss/edit.js
+index 1f3c8ab71946a5..0d1472f88fb5bb 100644
+--- a/packages/block-library/src/rss/edit.js
++++ b/packages/block-library/src/rss/edit.js
+@@ -194,7 +194,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Display author' ) }
+ 							checked={ displayAuthor }
+ 							onChange={ toggleAttribute( 'displayAuthor' ) }
+@@ -210,7 +209,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Display date' ) }
+ 							checked={ displayDate }
+ 							onChange={ toggleAttribute( 'displayDate' ) }
+@@ -226,7 +224,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Display excerpt' ) }
+ 							checked={ displayExcerpt }
+ 							onChange={ toggleAttribute( 'displayExcerpt' ) }
+@@ -288,7 +285,6 @@ export default function RSSEdit( { attributes, setAttributes } ) {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Open links in new tab' ) }
+ 							checked={ openInNewTab }
+ 							onChange={ ( value ) =>
+diff --git a/packages/block-library/src/search/edit.js b/packages/block-library/src/search/edit.js
+index df8e7c5a00cae6..9886aa8d1b4188 100644
+--- a/packages/block-library/src/search/edit.js
++++ b/packages/block-library/src/search/edit.js
+@@ -367,7 +367,6 @@ export default function SearchEdit( {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							checked={ showLabel }
+ 							label={ __( 'Show label' ) }
+ 							onChange={ ( value ) =>
+@@ -415,7 +414,6 @@ export default function SearchEdit( {
+ 							isShownByDefault
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								checked={ buttonUseIcon }
+ 								label={ __( 'Use button with icon' ) }
+ 								onChange={ ( value ) =>
+diff --git a/packages/block-library/src/site-logo/edit.js b/packages/block-library/src/site-logo/edit.js
+index b4f4448d79fb33..d5793615c382c4 100644
+--- a/packages/block-library/src/site-logo/edit.js
++++ b/packages/block-library/src/site-logo/edit.js
+@@ -325,7 +325,6 @@ const SiteLogo = ( {
+ 						onDeselect={ () => setAttributes( { isLink: true } ) }
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Link image to home' ) }
+ 							onChange={ () =>
+ 								setAttributes( { isLink: ! isLink } )
+@@ -344,7 +343,6 @@ const SiteLogo = ( {
+ 							}
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Open in new tab' ) }
+ 								onChange={ ( value ) =>
+ 									setAttributes( {
+@@ -367,7 +365,6 @@ const SiteLogo = ( {
+ 							} }
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Use as Site Icon' ) }
+ 								onChange={ ( value ) => {
+ 									setAttributes( { shouldSyncIcon: value } );
+diff --git a/packages/block-library/src/site-title/edit.js b/packages/block-library/src/site-title/edit.js
+index 99ca6d64e21dfb..73084000a69d8b 100644
+--- a/packages/block-library/src/site-title/edit.js
++++ b/packages/block-library/src/site-title/edit.js
+@@ -140,7 +140,6 @@ export default function SiteTitleEdit( {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Make title link to home' ) }
+ 							onChange={ () =>
+ 								setAttributes( { isLink: ! isLink } )
+@@ -158,7 +157,6 @@ export default function SiteTitleEdit( {
+ 							isShownByDefault
+ 						>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ __( 'Open in new tab' ) }
+ 								onChange={ ( value ) =>
+ 									setAttributes( {
+diff --git a/packages/block-library/src/social-links/edit.js b/packages/block-library/src/social-links/edit.js
+index bbd61d768809e6..c0a2ee97005a35 100644
+--- a/packages/block-library/src/social-links/edit.js
++++ b/packages/block-library/src/social-links/edit.js
+@@ -202,7 +202,6 @@ export function SocialLinksEdit( props ) {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Show text' ) }
+ 							checked={ showLabels }
+ 							onChange={ () =>
+@@ -219,7 +218,6 @@ export function SocialLinksEdit( props ) {
+ 						}
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Open links in new tab' ) }
+ 							checked={ openInNewTab }
+ 							onChange={ () =>
+diff --git a/packages/block-library/src/tab/controls.js b/packages/block-library/src/tab/controls.js
+index 87c82de7a6c637..5f033d414db12d 100644
+--- a/packages/block-library/src/tab/controls.js
++++ b/packages/block-library/src/tab/controls.js
+@@ -58,7 +58,6 @@ export default function Controls( {
+ 						help={ __(
+ 							'If toggled, this tab will be selected when the page loads.'
+ 						) }
+-						__nextHasNoMarginBottom
+ 					/>
+ 				</PanelBody>
+ 			</InspectorControls>
+diff --git a/packages/block-library/src/table-of-contents/edit.js b/packages/block-library/src/table-of-contents/edit.js
+index 9d89c8641a022e..24531dea30c92a 100644
+--- a/packages/block-library/src/table-of-contents/edit.js
++++ b/packages/block-library/src/table-of-contents/edit.js
+@@ -165,7 +165,6 @@ export default function TableOfContentsEdit( {
+ 					isShownByDefault
+ 				>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Only include current page' ) }
+ 						checked={ onlyIncludeCurrentPage }
+ 						onChange={ ( value ) =>
+diff --git a/packages/block-library/src/table/edit.js b/packages/block-library/src/table/edit.js
+index d991e408ce9a4c..0fbcdb0a31a3a4 100644
+--- a/packages/block-library/src/table/edit.js
++++ b/packages/block-library/src/table/edit.js
+@@ -499,7 +499,6 @@ function TableEdit( {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Fixed width table cells' ) }
+ 							checked={ !! hasFixedLayout }
+ 							onChange={ onChangeFixedLayout }
+@@ -516,7 +515,6 @@ function TableEdit( {
+ 								isShownByDefault
+ 							>
+ 								<ToggleControl
+-									__nextHasNoMarginBottom
+ 									label={ __( 'Header section' ) }
+ 									checked={ !! ( head && head.length ) }
+ 									onChange={ onToggleHeaderSection }
+@@ -531,7 +529,6 @@ function TableEdit( {
+ 								isShownByDefault
+ 							>
+ 								<ToggleControl
+-									__nextHasNoMarginBottom
+ 									label={ __( 'Footer section' ) }
+ 									checked={ !! ( foot && foot.length ) }
+ 									onChange={ onToggleFooterSection }
+diff --git a/packages/block-library/src/tabs/controls.js b/packages/block-library/src/tabs/controls.js
+index 9947e115207088..b198f342c1661b 100644
+--- a/packages/block-library/src/tabs/controls.js
++++ b/packages/block-library/src/tabs/controls.js
+@@ -156,7 +156,6 @@ export default function Controls( {
+ 										: 'vertical',
+ 							} )
+ 						}
+-						__nextHasNoMarginBottom
+ 					/>
+ 					<TextControl
+ 						label={ __( 'Tabs Title' ) }
+diff --git a/packages/block-library/src/tag-cloud/edit.js b/packages/block-library/src/tag-cloud/edit.js
+index 7e544d2474f049..3fd14b823c5915 100644
+--- a/packages/block-library/src/tag-cloud/edit.js
++++ b/packages/block-library/src/tag-cloud/edit.js
+@@ -232,7 +232,6 @@ function TagCloudEdit( { attributes, setAttributes } ) {
+ 					isShownByDefault
+ 				>
+ 					<ToggleControl
+-						__nextHasNoMarginBottom
+ 						label={ __( 'Show tag counts' ) }
+ 						checked={ showTagCounts }
+ 						onChange={ () =>
+diff --git a/packages/block-library/src/term-name/edit.js b/packages/block-library/src/term-name/edit.js
+index b4381b23df8cee..92d60fa3547127 100644
+--- a/packages/block-library/src/term-name/edit.js
++++ b/packages/block-library/src/term-name/edit.js
+@@ -95,7 +95,6 @@ export default function TermNameEdit( {
+ 						isShownByDefault
+ 					>
+ 						<ToggleControl
+-							__nextHasNoMarginBottom
+ 							label={ __( 'Make term name a link' ) }
+ 							onChange={ () =>
+ 								setAttributes( { isLink: ! isLink } )
+diff --git a/packages/block-library/src/terms-query/edit/inspector-controls/empty-terms-control.js b/packages/block-library/src/terms-query/edit/inspector-controls/empty-terms-control.js
+index 2a499674ccb870..37d26ceee0bbca 100644
+--- a/packages/block-library/src/terms-query/edit/inspector-controls/empty-terms-control.js
++++ b/packages/block-library/src/terms-query/edit/inspector-controls/empty-terms-control.js
+@@ -6,7 +6,6 @@ import { ToggleControl } from '@wordpress/components';
+ export default function EmptyTermsControl( { value, onChange, ...props } ) {
+ 	return (
+ 		<ToggleControl
+-			__nextHasNoMarginBottom
+ 			checked={ ! value }
+ 			onChange={ ( showEmpty ) => onChange( ! showEmpty ) }
+ 			{ ...props }
+diff --git a/packages/block-library/src/terms-query/edit/inspector-controls/nested-terms-control.js b/packages/block-library/src/terms-query/edit/inspector-controls/nested-terms-control.js
+index f8778cdbcdb1f4..ebdb95620c7475 100644
+--- a/packages/block-library/src/terms-query/edit/inspector-controls/nested-terms-control.js
++++ b/packages/block-library/src/terms-query/edit/inspector-controls/nested-terms-control.js
+@@ -5,11 +5,6 @@ import { ToggleControl } from '@wordpress/components';
+ 
+ export default function NestedTermsControl( { value, onChange, ...props } ) {
+ 	return (
+-		<ToggleControl
+-			__nextHasNoMarginBottom
+-			checked={ value }
+-			onChange={ onChange }
+-			{ ...props }
+-		/>
++		<ToggleControl checked={ value } onChange={ onChange } { ...props } />
+ 	);
+ }
+diff --git a/packages/block-library/src/video/edit-common-settings.js b/packages/block-library/src/video/edit-common-settings.js
+index 07924f692c6fd5..acb1ba7d8816bf 100644
+--- a/packages/block-library/src/video/edit-common-settings.js
++++ b/packages/block-library/src/video/edit-common-settings.js
+@@ -69,7 +69,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
+ 				} }
+ 			>
+ 				<ToggleControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Autoplay' ) }
+ 					onChange={ toggleFactory.autoplay }
+ 					checked={ !! autoplay }
+@@ -85,7 +84,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
+ 				} }
+ 			>
+ 				<ToggleControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Loop' ) }
+ 					onChange={ toggleFactory.loop }
+ 					checked={ !! loop }
+@@ -100,7 +98,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
+ 				} }
+ 			>
+ 				<ToggleControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Muted' ) }
+ 					onChange={ toggleFactory.muted }
+ 					checked={ !! muted }
+@@ -119,7 +116,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
+ 				} }
+ 			>
+ 				<ToggleControl
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Playback controls' ) }
+ 					onChange={ toggleFactory.controls }
+ 					checked={ !! controls }
+@@ -134,7 +130,6 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
+ 				} }
+ 			>
+ 				<ToggleControl
+-					__nextHasNoMarginBottom
+ 					/* translators: Setting to play videos within the webpage on mobile browsers rather than opening in a fullscreen player. */
+ 					label={ __( 'Play inline' ) }
+ 					onChange={ toggleFactory.playsInline }
+diff --git a/packages/block-library/src/video/tracks-editor.js b/packages/block-library/src/video/tracks-editor.js
+index 1236d00f2f0726..fb0bb078f3b285 100644
+--- a/packages/block-library/src/video/tracks-editor.js
++++ b/packages/block-library/src/video/tracks-editor.js
+@@ -161,7 +161,6 @@ function SingleTrackEditor( {
+ 				/>
+ 				<ToggleControl
+ 					__next40pxDefaultSize
+-					__nextHasNoMarginBottom
+ 					label={ __( 'Set as default track' ) }
+ 					checked={ isDefaultTrack }
+ 					disabled={ ! allowSettingDefault }
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c30d3bb8376919..72a54fdbc5db69 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -11,6 +11,7 @@
+ -   `FocalPointPicker`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73980](https://github.com/WordPress/gutenberg/pull/73980)).
+ -   `TextareaControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#73970](https://github.com/WordPress/gutenberg/pull/73970)).
+ -   `ToggleGroupControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74004](https://github.com/WordPress/gutenberg/pull/74004)).
++-   `ToggleControl`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74012](https://github.com/WordPress/gutenberg/pull/74012)).
+ -   `TreeSelect`: The `__nextHasNoMarginBottom` prop is now true by default. The prop can be safely removed ([#74014](https://github.com/WordPress/gutenberg/pull/74014)).
+ -   `DimensionControl`: Completely remove deprecated component ([#73944](https://github.com/WordPress/gutenberg/pull/73944)).
+ 
+diff --git a/packages/components/src/toggle-control/README.md b/packages/components/src/toggle-control/README.md
+index cf480360265ed4..3a77ef6942d2e5 100644
+--- a/packages/components/src/toggle-control/README.md
++++ b/packages/components/src/toggle-control/README.md
+@@ -15,7 +15,6 @@ const MyToggleControl = () => {
+ 
+ 	return (
+ 		<ToggleControl
+-			__nextHasNoMarginBottom
+ 			label="Fixed Background"
+ 			help={
+ 				hasFixedBackground
+@@ -79,11 +78,3 @@ The class that will be added with `components-base-control` and `components-togg
+ 
+ -		Type: `String`
+ -		Required: No
+-
+-### `__nextHasNoMarginBottom`
+-
+-Start opting into the new margin-free styles that will become the default in a future version.
+-
+--   Type: `Boolean`
+--   Required: No
+--   Default: `false`
+diff --git a/packages/components/src/toggle-control/index.tsx b/packages/components/src/toggle-control/index.tsx
+index d2ee234a9695f8..f2f068edbfeb5a 100644
+--- a/packages/components/src/toggle-control/index.tsx
++++ b/packages/components/src/toggle-control/index.tsx
+@@ -2,7 +2,6 @@
+  * External dependencies
+  */
+ import type { ChangeEvent, ForwardedRef } from 'react';
+-import { css } from '@emotion/react';
+ import clsx from 'clsx';
+ 
+ /**
+@@ -10,7 +9,6 @@ import clsx from 'clsx';
+  */
+ import { forwardRef } from '@wordpress/element';
+ import { useInstanceId } from '@wordpress/compose';
+-import deprecated from '@wordpress/deprecated';
+ 
+ /**
+  * Internal dependencies
+@@ -21,12 +19,9 @@ import BaseControl from '../base-control';
+ import type { WordPressComponentProps } from '../context/wordpress-component';
+ import type { ToggleControlProps } from './types';
+ import { HStack } from '../h-stack';
+-import { useCx } from '../utils';
+-import { space } from '../utils/space';
+ 
+ function UnforwardedToggleControl(
+ 	{
+-		__nextHasNoMarginBottom,
+ 		label,
+ 		checked,
+ 		help,
+@@ -42,21 +37,6 @@ function UnforwardedToggleControl(
+ 	const instanceId = useInstanceId( ToggleControl );
+ 	const id = `inspector-toggle-control-${ instanceId }`;
+ 
+-	const cx = useCx();
+-	const classes = cx(
+-		'components-toggle-control',
+-		className,
+-		! __nextHasNoMarginBottom && css( { marginBottom: space( 3 ) } )
+-	);
+-
+-	if ( ! __nextHasNoMarginBottom ) {
+-		deprecated( 'Bottom margin styles for wp.components.ToggleControl', {
+-			since: '6.7',
+-			version: '7.0',
+-			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+-		} );
+-	}
+-
+ 	let describedBy, helpLabel;
+ 	if ( help ) {
+ 		if ( typeof help === 'function' ) {
+@@ -84,7 +64,7 @@ function UnforwardedToggleControl(
+ 					</span>
+ 				)
+ 			}
+-			className={ classes }
++			className={ clsx( 'components-toggle-control', className ) }
+ 			__nextHasNoMarginBottom
+ 		>
+ 			<HStack justify="flex-start" spacing={ 2 }>
+@@ -122,7 +102,6 @@ function UnforwardedToggleControl(
+  *
+  *   return (
+  *     <ToggleControl
+- *       __nextHasNoMarginBottom
+  *       label="Fixed Background"
+  *       checked={ value }
+  *       onChange={ () => setValue( ( state ) => ! state ) }
+diff --git a/packages/components/src/toggle-control/stories/index.story.tsx b/packages/components/src/toggle-control/stories/index.story.tsx
+index 6511655810066f..c82b5972392c7e 100644
+--- a/packages/components/src/toggle-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-control/stories/index.story.tsx
+@@ -49,7 +49,6 @@ const Template: StoryFn< typeof ToggleControl > = ( {
+ 
+ export const Default = Template.bind( {} );
+ Default.args = {
+-	__nextHasNoMarginBottom: true,
+ 	label: 'Enable something',
+ };
+ 
+diff --git a/packages/components/src/toggle-control/test/index.tsx b/packages/components/src/toggle-control/test/index.tsx
+index b0eec2aca6663d..cc89031d9affa3 100644
+--- a/packages/components/src/toggle-control/test/index.tsx
++++ b/packages/components/src/toggle-control/test/index.tsx
+@@ -6,13 +6,7 @@ import { render, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import _ToggleControl from '..';
+-
+-const ToggleControl = (
+-	props: React.ComponentProps< typeof _ToggleControl >
+-) => {
+-	return <_ToggleControl { ...props } __nextHasNoMarginBottom />;
+-};
++import ToggleControl from '..';
+ 
+ describe( 'ToggleControl', () => {
+ 	it( 'should label the toggle', () => {
+diff --git a/packages/components/src/toggle-control/types.ts b/packages/components/src/toggle-control/types.ts
+index 568c44fb64af07..7db6ec63d9ac02 100644
+--- a/packages/components/src/toggle-control/types.ts
++++ b/packages/components/src/toggle-control/types.ts
+@@ -13,7 +13,14 @@ export type ToggleControlProps = Pick<
+ 	FormToggleProps,
+ 	'checked' | 'disabled'
+ > &
+-	Pick< BaseControlProps, '__nextHasNoMarginBottom' | 'className' > & {
++	Pick< BaseControlProps, 'className' > & {
++		/**
++		 * Start opting into the new margin-free styles that will become the default in a future version.
++		 *
++		 * @deprecated Default behavior since WordPress 7.0. Prop can be safely removed.
++		 * @ignore
++		 */
++		__nextHasNoMarginBottom?: boolean;
+ 		help?: ReactNode | ( ( checked: boolean ) => ReactNode );
+ 		/**
+ 		 * The label for the toggle.
+diff --git a/packages/components/src/validated-form-controls/components/toggle-control.tsx b/packages/components/src/validated-form-controls/components/toggle-control.tsx
+index 96dd87f8c95d8b..05589943baa2a8 100644
+--- a/packages/components/src/validated-form-controls/components/toggle-control.tsx
++++ b/packages/components/src/validated-form-controls/components/toggle-control.tsx
+@@ -19,11 +19,7 @@ const UnforwardedValidatedToggleControl = (
+ 		customValidity,
+ 		markWhenOptional,
+ 		...restProps
+-	}: Omit<
+-		React.ComponentProps< typeof ToggleControl >,
+-		'__nextHasNoMarginBottom'
+-	> &
+-		ValidatedControlProps,
++	}: React.ComponentProps< typeof ToggleControl > & ValidatedControlProps,
+ 	forwardedRef: React.ForwardedRef< HTMLInputElement >
+ ) => {
+ 	const validityTargetRef = useRef< HTMLInputElement >( null );
+@@ -44,11 +40,7 @@ const UnforwardedValidatedToggleControl = (
+ 			customValidity={ customValidity }
+ 			getValidityTarget={ () => validityTargetRef.current }
+ 		>
+-			<ToggleControl
+-				__nextHasNoMarginBottom
+-				ref={ mergedRefs }
+-				{ ...restProps }
+-			/>
++			<ToggleControl ref={ mergedRefs } { ...restProps } />
+ 		</ControlWithError>
+ 	);
+ };
+diff --git a/packages/dataviews/src/components/dataviews-view-config/infinite-scroll-toggle.tsx b/packages/dataviews/src/components/dataviews-view-config/infinite-scroll-toggle.tsx
+index 94ad8abb84f568..3331b54f499d65 100644
+--- a/packages/dataviews/src/components/dataviews-view-config/infinite-scroll-toggle.tsx
++++ b/packages/dataviews/src/components/dataviews-view-config/infinite-scroll-toggle.tsx
+@@ -22,7 +22,6 @@ export default function InfiniteScrollToggle() {
+ 
+ 	return (
+ 		<ToggleControl
+-			__nextHasNoMarginBottom
+ 			label={ __( 'Enable infinite scroll' ) }
+ 			help={ __(
+ 				'Automatically load more content as you scroll, instead of showing pagination links.'
+diff --git a/packages/edit-post/src/components/init-pattern-modal/index.js b/packages/edit-post/src/components/init-pattern-modal/index.js
+index 0a5ea10b204610..92da00f6a4a75d 100644
+--- a/packages/edit-post/src/components/init-pattern-modal/index.js
++++ b/packages/edit-post/src/components/init-pattern-modal/index.js
+@@ -62,7 +62,6 @@ export default function InitPatternModal() {
+ 								__next40pxDefaultSize
+ 							/>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ _x( 'Synced', 'pattern (singular)' ) }
+ 								help={ __(
+ 									'Sync this pattern across multiple locations.'
+diff --git a/packages/global-styles-ui/src/font-sizes/font-size.tsx b/packages/global-styles-ui/src/font-sizes/font-size.tsx
+index 73b3fdbd35a34d..c73505f882e408 100644
+--- a/packages/global-styles-ui/src/font-sizes/font-size.tsx
++++ b/packages/global-styles-ui/src/font-sizes/font-size.tsx
+@@ -241,7 +241,6 @@ function FontSize() {
+ 								) }
+ 								checked={ isFluid }
+ 								onChange={ handleFluidChange }
+-								__nextHasNoMarginBottom
+ 							/>
+ 
+ 							{ isFluid && (
+@@ -252,7 +251,6 @@ function FontSize() {
+ 									) }
+ 									checked={ isCustomFluid }
+ 									onChange={ handleCustomFluidValues }
+-									__nextHasNoMarginBottom
+ 								/>
+ 							) }
+ 
+diff --git a/packages/patterns/src/components/create-pattern-modal.js b/packages/patterns/src/components/create-pattern-modal.js
+index c388adb7ffb023..cfe8bd70b2a307 100644
+--- a/packages/patterns/src/components/create-pattern-modal.js
++++ b/packages/patterns/src/components/create-pattern-modal.js
+@@ -130,7 +130,6 @@ export function CreatePatternModalContents( {
+ 					categoryMap={ categoryMap }
+ 				/>
+ 				<ToggleControl
+-					__nextHasNoMarginBottom
+ 					label={ _x( 'Synced', 'pattern (singular)' ) }
+ 					help={ __(
+ 						'Sync this pattern across multiple locations.'
+diff --git a/packages/preferences/src/components/preference-base-option/index.tsx b/packages/preferences/src/components/preference-base-option/index.tsx
+index 75edd5b88682f9..e5b74c6eefc95d 100644
+--- a/packages/preferences/src/components/preference-base-option/index.tsx
++++ b/packages/preferences/src/components/preference-base-option/index.tsx
+@@ -17,7 +17,6 @@ function BaseOption( {
+ 	return (
+ 		<div className="preference-base-option">
+ 			<ToggleControl
+-				__nextHasNoMarginBottom
+ 				help={ help }
+ 				label={ label }
+ 				checked={ isChecked }
+diff --git a/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js b/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
+index 09af854eb8fd09..eda2378ede8438 100644
+--- a/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
++++ b/packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js
+@@ -176,7 +176,6 @@ export default function ReusableBlockConvertButton( {
+ 								placeholder={ __( 'My pattern' ) }
+ 							/>
+ 							<ToggleControl
+-								__nextHasNoMarginBottom
+ 								label={ _x( 'Synced', 'pattern (singular)' ) }
+ 								help={ __(
+ 									'Sync this pattern across multiple locations.'

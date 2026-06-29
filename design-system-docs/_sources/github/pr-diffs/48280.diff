@@ -1,0 +1,134 @@
+diff --git a/packages/components/src/button/README.md b/packages/components/src/button/README.md
+index 66bbae67ebcd57..1d4c90f515b2a1 100644
+--- a/packages/components/src/button/README.md
++++ b/packages/components/src/button/README.md
+@@ -6,9 +6,18 @@ Buttons let users take actions and make choices with a single click or tap.
+ 
+ ## Table of contents
+ 
+-1. [Design guidelines](#design-guidelines)
+-2. [Development guidelines](#development-guidelines)
+-3. [Related components](#related-components)
++1. [Storybook tool](#storybook-tool)
++2. [Design guidelines](#design-guidelines)
++3. [Development guidelines](#development-guidelines)
++4. [Related components](#related-components)
++
++## Storybook tool
++
++Try out the Button component interactively.
++
++The Gutenberg [Storybook tool](https://wordpress.github.io/gutenberg/) enables you to interactively set various options for individual components and then copy the code for use in your project.
++
++[View the Button component on Storybook](https://wordpress.github.io/gutenberg/?path=/story/components-button--default).
+ 
+ ## Design guidelines
+ 
+diff --git a/packages/components/src/card/card/README.md b/packages/components/src/card/card/README.md
+index b640b7159c33db..f9af45729e23b2 100644
+--- a/packages/components/src/card/card/README.md
++++ b/packages/components/src/card/card/README.md
+@@ -2,6 +2,14 @@
+ 
+ `Card` provides a flexible and extensible content container.
+ 
++## Storybook tool
++
++Try out the Card component interactively.
++
++The Gutenberg [Storybook tool](https://wordpress.github.io/gutenberg/) enables you to interactively set various options for individual components and then copy the code for use in your project.
++
++[View the Card component on Storybook](https://wordpress.github.io/gutenberg/?path=/story/components-card--default).
++
+ ## Usage
+ 
+ `Card` also provides a convenient set of [sub-components](#sub-components) such as `CardBody`, `CardHeader`, `CardFooter`, and more (see below).
+diff --git a/packages/components/src/duotone-picker/README.md b/packages/components/src/duotone-picker/README.md
+index 7b272e38dd8412..fc53f63684741c 100644
+--- a/packages/components/src/duotone-picker/README.md
++++ b/packages/components/src/duotone-picker/README.md
+@@ -1,5 +1,13 @@
+ # DuotonePicker & DuotoneSwatch
+ 
++## Storybook tool
++
++Try out the DuotonePicker component interactively.
++
++The Gutenberg [Storybook tool](https://wordpress.github.io/gutenberg/) enables you to interactively set various options for individual components and then copy the code for use in your project.
++
++[View the DuotonePicker component on Storybook](https://wordpress.github.io/gutenberg/?path=/story/components-duotonepicker--default).
++
+ ## Usage
+ 
+ ```jsx
+diff --git a/packages/components/src/font-size-picker/README.md b/packages/components/src/font-size-picker/README.md
+index 5f74dd09a28193..73c5843a17c4fd 100644
+--- a/packages/components/src/font-size-picker/README.md
++++ b/packages/components/src/font-size-picker/README.md
+@@ -3,6 +3,14 @@
+ FontSizePicker is a React component that renders a UI that allows users to select a font size.
+ The component renders a user interface that allows the user to select predefined (common) font sizes and contains an option that allows users to select custom font sizes (by choosing the value) if that functionality is enabled.
+ 
++## Storybook tool
++
++Try out the FontSizePicker component interactively.
++
++The Gutenberg [Storybook tool](https://wordpress.github.io/gutenberg/) enables you to interactively set various options for individual components and then copy the code for use in your project.
++
++[View the FontSizePicker component on Storybook](https://wordpress.github.io/gutenberg/?path=/docs/components-fontsizepicker--default).
++
+ ## Usage
+ 
+ ```jsx
+diff --git a/packages/components/src/range-control/README.md b/packages/components/src/range-control/README.md
+index 2a8f7ae7a05ab1..c1368be1e55f85 100644
+--- a/packages/components/src/range-control/README.md
++++ b/packages/components/src/range-control/README.md
+@@ -8,9 +8,18 @@ A RangeControl for volume
+ 
+ ## Table of contents
+ 
+-1. [Design guidelines](#design-guidelines)
+-2. [Development guidelines](#development-guidelines)
+-3. [Related components](#related-components)
++1. [Storybook tool](#storybook-tool)
++2. [Design guidelines](#design-guidelines)
++3. [Development guidelines](#development-guidelines)
++4. [Related components](#related-components)
++
++## Storybook tool
++
++Try out the RangeControl component interactively.
++
++The Gutenberg [Storybook tool](https://wordpress.github.io/gutenberg/) enables you to interactively set various options for individual components and then copy the code for use in your project.
++
++[View the RangeControl component on Storybook](https://wordpress.github.io/gutenberg/?path=/story/components-rangecontrol--default).
+ 
+ ## Design guidelines
+ 
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index dc6e884a5e12be..343ff28b91a031 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -6,10 +6,18 @@ SelectControl allow users to select from a single or multiple option menu. It fu
+ 
+ ## Table of contents
+ 
+-1. [Design guidelines](#design-guidelines)
+-2. [Development guidelines](#development-guidelines)
+-3. [Related components](#related-components)
++1. [Storybook tool](#storybook-tool)
++2. [Design guidelines](#design-guidelines)
++3. [Development guidelines](#development-guidelines)
++4. [Related components](#related-components)
+ 
++## Storybook tool
++
++Try out the SelectControl component interactively.
++
++The Gutenberg [Storybook tool](https://wordpress.github.io/gutenberg/) enables you to interactively set various options for individual components and then copy the code for use in your project.
++
++[View the SelectControl component on Storybook](https://wordpress.github.io/gutenberg/?path=/story/components-selectcontrol--default).
+ ## Design guidelines
+ 
+ ### Usage

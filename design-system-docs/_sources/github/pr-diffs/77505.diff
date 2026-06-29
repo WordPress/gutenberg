@@ -1,0 +1,394 @@
+diff --git a/packages/components/src/external-link/stories/index.story.tsx b/packages/components/src/external-link/stories/index.story.tsx
+index 18826d88042c85..e75ad39067a329 100644
+--- a/packages/components/src/external-link/stories/index.story.tsx
++++ b/packages/components/src/external-link/stories/index.story.tsx
+@@ -9,7 +9,6 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
+ import ExternalLink from '..';
+ 
+ const meta: Meta< typeof ExternalLink > = {
+-	tags: [ 'manifest' ],
+ 	component: ExternalLink,
+ 	title: 'Components/Navigation/ExternalLink',
+ 	id: 'components-externallink',
+@@ -22,8 +21,9 @@ const meta: Meta< typeof ExternalLink > = {
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 		componentStatus: {
+-			status: 'stable',
++			status: 'not-recommended',
+ 			whereUsed: 'global',
++			notes: 'Use `Link` from `@wordpress/ui` instead, with the `openInNewTab` prop set.',
+ 		},
+ 	},
+ };
+diff --git a/packages/eslint-plugin/rules/use-recommended-components.js b/packages/eslint-plugin/rules/use-recommended-components.js
+index 784d00c10ed1e2..d03cabb3f6b571 100644
+--- a/packages/eslint-plugin/rules/use-recommended-components.js
++++ b/packages/eslint-plugin/rules/use-recommended-components.js
+@@ -34,6 +34,8 @@ const ALLOWLIST = {
+  */
+ const DENYLIST = {
+ 	'@wordpress/components': {
++		ExternalLink:
++			'Use `Link` from `@wordpress/ui` with the `openInNewTab` prop instead.',
+ 		__experimentalHeading: 'Use `Text` from `@wordpress/ui` instead.',
+ 		__experimentalHStack: 'Use `Stack` from `@wordpress/ui` instead.',
+ 		__experimentalText: 'Use `Text` from `@wordpress/ui` instead.',
+diff --git a/packages/ui/src/link/stories/index.story.tsx b/packages/ui/src/link/stories/index.story.tsx
+index a23077d28698eb..b48358e0033cfa 100644
+--- a/packages/ui/src/link/stories/index.story.tsx
++++ b/packages/ui/src/link/stories/index.story.tsx
+@@ -6,6 +6,7 @@ import { Text } from '../../text';
+ const meta: Meta< typeof Link > = {
+ 	title: 'Design System/Components/Link',
+ 	component: Link,
++	tags: [ 'manifest' ],
+ };
+ export default meta;
+ 
+diff --git a/tools/eslint/suppressions.json b/tools/eslint/suppressions.json
+index ab55aa0fc94882..024cd9198872d9 100644
+--- a/tools/eslint/suppressions.json
++++ b/tools/eslint/suppressions.json
+@@ -1,4 +1,9 @@
+ {
++	"packages/block-directory/src/components/downloadable-blocks-panel/no-results.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/block-editor/src/components/background-image-control/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
+@@ -96,7 +101,7 @@
+ 	},
+ 	"packages/block-editor/src/components/date-format-picker/index.js": {
+ 		"@wordpress/use-recommended-components": {
+-			"count": 1
++			"count": 2
+ 		}
+ 	},
+ 	"packages/block-editor/src/components/global-styles/advanced-panel.js": {
+@@ -139,6 +144,11 @@
+ 			"count": 4
+ 		}
+ 	},
++	"packages/block-editor/src/components/inserter/block-patterns-tab/patterns-filter.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/block-editor/src/components/inserter/media-tab/media-preview.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -161,7 +171,7 @@
+ 	},
+ 	"packages/block-editor/src/components/link-control/link-preview.js": {
+ 		"@wordpress/use-recommended-components": {
+-			"count": 1
++			"count": 2
+ 		}
+ 	},
+ 	"packages/block-editor/src/components/link-picker/link-preview.js": {
+@@ -195,6 +205,16 @@
+ 		}
+ 	},
+ 	"packages/block-editor/src/components/url-popover/image-url-input-ui.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 2
++		}
++	},
++	"packages/block-editor/src/components/url-popover/link-viewer-url.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
++	"packages/block-editor/src/hooks/anchor.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+ 		}
+@@ -219,6 +239,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/block-library/src/button/edit.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/block-library/src/columns/edit.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -229,9 +254,14 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/block-library/src/cover/edit/inspector-controls.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/block-library/src/embed/embed-placeholder.js": {
+ 		"@wordpress/use-recommended-components": {
+-			"count": 2
++			"count": 3
+ 		}
+ 	},
+ 	"packages/block-library/src/html/edit.js": {
+@@ -244,11 +274,21 @@
+ 			"count": 2
+ 		}
+ 	},
++	"packages/block-library/src/image/image.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/block-library/src/math/edit.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+ 		}
+ 	},
++	"packages/block-library/src/media-text/edit.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/block-library/src/navigation-link/link-ui/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -289,6 +329,16 @@
+ 			"count": 2
+ 		}
+ 	},
++	"packages/block-library/src/post-featured-image/edit.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
++	"packages/block-library/src/post-title/edit.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/block-library/src/query/edit/enhanced-pagination-modal.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -304,11 +354,21 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/block-library/src/rss/edit.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/block-library/src/search/edit.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+ 		}
+ 	},
++	"packages/block-library/src/social-link/edit.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/block-library/src/template-part/edit/import-controls.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -361,7 +421,7 @@
+ 	},
+ 	"packages/boot/src/components/site-hub/index.tsx": {
+ 		"@wordpress/use-recommended-components": {
+-			"count": 1
++			"count": 2
+ 		}
+ 	},
+ 	"packages/commands/src/components/command-menu.js": {
+@@ -371,7 +431,12 @@
+ 	},
+ 	"packages/connectors/src/connector-item.tsx": {
+ 		"@wordpress/use-recommended-components": {
+-			"count": 3
++			"count": 4
++		}
++	},
++	"packages/customize-widgets/src/components/welcome-guide/index.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
+ 		}
+ 	},
+ 	"packages/dataviews/src/components/dataform-layouts/panel/dropdown.tsx": {
+@@ -419,6 +484,11 @@
+ 			"count": 2
+ 		}
+ 	},
++	"packages/edit-post/src/components/welcome-guide/default.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/edit-site/src/components/add-new-post/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
+@@ -509,6 +579,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/edit-widgets/src/components/welcome-guide/index.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/editor/src/components/document-bar/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+@@ -519,6 +594,11 @@
+ 			"count": 2
+ 		}
+ 	},
++	"packages/editor/src/components/global-styles-sidebar/welcome-guide.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/editor/src/components/global-styles/header.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 3
+@@ -529,6 +609,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/editor/src/components/page-attributes/parent.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/editor/src/components/post-actions/set-as-homepage.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 3
+@@ -559,6 +644,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/editor/src/components/post-excerpt/index.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/editor/src/components/post-excerpt/panel.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
+@@ -576,7 +666,7 @@
+ 	},
+ 	"packages/editor/src/components/post-locked-modal/index.js": {
+ 		"@wordpress/use-recommended-components": {
+-			"count": 1
++			"count": 2
+ 		}
+ 	},
+ 	"packages/editor/src/components/post-panel-row/index.js": {
+@@ -589,6 +679,16 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/editor/src/components/post-pingbacks/index.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
++	"packages/editor/src/components/post-publish-panel/postpublish.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/editor/src/components/post-revisions-panel/index.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
+@@ -610,6 +710,11 @@
+ 		}
+ 	},
+ 	"packages/editor/src/components/post-url/index.js": {
++		"@wordpress/use-recommended-components": {
++			"count": 2
++		}
++	},
++	"packages/editor/src/components/post-url/panel.js": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+ 		}
+@@ -631,7 +736,7 @@
+ 	},
+ 	"packages/editor/src/components/sidebar/post-revision-summary.js": {
+ 		"@wordpress/use-recommended-components": {
+-			"count": 1
++			"count": 2
+ 		}
+ 	},
+ 	"packages/editor/src/components/sidebar/post-summary.js": {
+@@ -710,6 +815,11 @@
+ 		}
+ 	},
+ 	"packages/fields/src/fields/excerpt/index.tsx": {
++		"@wordpress/use-recommended-components": {
++			"count": 2
++		}
++	},
++	"packages/fields/src/fields/parent/parent-edit.tsx": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1
+ 		}
+@@ -719,6 +829,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/fields/src/fields/ping-status/index.tsx": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/fields/src/fields/post-content-info/post-content-info-view.tsx": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 2
+@@ -726,7 +841,7 @@
+ 	},
+ 	"packages/fields/src/fields/slug/slug-edit.tsx": {
+ 		"@wordpress/use-recommended-components": {
+-			"count": 1
++			"count": 2
+ 		}
+ 	},
+ 	"packages/fields/src/fields/status/status-view.tsx": {
+@@ -741,7 +856,7 @@
+ 	},
+ 	"packages/format-library/src/image/index.js": {
+ 		"@wordpress/use-recommended-components": {
+-			"count": 2
++			"count": 3
+ 		}
+ 	},
+ 	"packages/format-library/src/language/index.js": {
+@@ -889,6 +1004,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"packages/global-styles-ui/src/screen-css.tsx": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"packages/global-styles-ui/src/screen-header.tsx": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 4
+@@ -999,6 +1119,11 @@
+ 			"count": 1
+ 		}
+ 	},
++	"routes/connectors-home/ai-plugin-callout.tsx": {
++		"@wordpress/use-recommended-components": {
++			"count": 1
++		}
++	},
+ 	"routes/connectors-home/default-connectors.tsx": {
+ 		"@wordpress/use-recommended-components": {
+ 			"count": 1

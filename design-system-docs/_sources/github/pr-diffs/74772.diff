@@ -1,0 +1,201 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7fb454e250df42..2a2a87f5347b50 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,7 @@
+ -   `ToggleControl`: Prevent `__nextHasNoMarginBottom` from logging a console warning ([#75296](https://github.com/WordPress/gutenberg/pull/75296)).
+ -   `createSlotFill`: fix ref forwarding ([#75274](https://github.com/WordPress/gutenberg/pull/75274)).
+ -   `Button`: Fix native outline showing when focused and active ([#75346](https://github.com/WordPress/gutenberg/pull/75346)).
++-   FormTokenField: Match label instead of key in suggestions. [#74772](https://github.com/WordPress/gutenberg/pull/74772)
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/form-token-field/index.tsx b/packages/components/src/form-token-field/index.tsx
+index cd1f46117e362b..4416f0c6ee130e 100644
+--- a/packages/components/src/form-token-field/index.tsx
++++ b/packages/components/src/form-token-field/index.tsx
+@@ -516,7 +516,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
+ 			match = match.normalize( 'NFKC' ).toLocaleLowerCase();
+ 
+ 			_suggestions.forEach( ( suggestion ) => {
+-				const index = suggestion
++				// Match against the displayed label (i.e. the result of
++				// `displayTransform`), not the raw suggestion value.
++				const index = displayTransform( suggestion )
+ 					.normalize( 'NFKC' )
+ 					.toLocaleLowerCase()
+ 					.indexOf( match );
+diff --git a/packages/components/src/form-token-field/stories/index.story.tsx b/packages/components/src/form-token-field/stories/index.story.tsx
+index c0a8d4374cc3dd..81ca31f53c63af 100644
+--- a/packages/components/src/form-token-field/stories/index.story.tsx
++++ b/packages/components/src/form-token-field/stories/index.story.tsx
+@@ -48,6 +48,12 @@ const continents = [
+ 	'Oceania',
+ ];
+ 
++const countryLabelMap: Record< string, string > = {
++	us: 'United States',
++	uk: 'United Kingdom',
++	es: 'Spain',
++};
++
+ const DefaultTemplate: StoryFn< typeof FormTokenField > = ( { ...args } ) => {
+ 	const [ selectedContinents, setSelectedContinents ] = useState<
+ 		ComponentProps< typeof FormTokenField >[ 'value' ]
+@@ -153,3 +159,17 @@ ValidateNewTokens.args = {
+ 		continents.includes( input ),
+ 	__experimentalExpandOnFocus: true,
+ };
++
++/**
++ * This demonstrates matching suggestions by their display labels.
++ */
++export const DisplayLabelMatching: StoryFn< typeof FormTokenField > =
++	DefaultTemplate.bind( {} );
++DisplayLabelMatching.args = {
++	label: 'Countries',
++	suggestions: Object.keys( countryLabelMap ),
++	displayTransform: ( token ) => countryLabelMap[ token ] ?? token,
++	placeholder: 'Type by label, e.g. "United"...',
++	__experimentalExpandOnFocus: true,
++};
++DisplayLabelMatching.storyName = 'Label and value matching';
+diff --git a/packages/components/src/form-token-field/test/index.tsx b/packages/components/src/form-token-field/test/index.tsx
+index 0c685e42ec6eb5..81edf8a16cd0b5 100644
+--- a/packages/components/src/form-token-field/test/index.tsx
++++ b/packages/components/src/form-token-field/test/index.tsx
+@@ -1749,7 +1749,7 @@ describe( 'FormTokenField', () => {
+ 			] );
+ 		} );
+ 
+-		it( "is applied to each suggestions, but doesn't influence the matching against the search value", async () => {
++		it( 'is applied to each suggestion and influences the matching against the search value', async () => {
+ 			const user = userEvent.setup();
+ 
+ 			const onChangeSpy = jest.fn();
+@@ -1768,15 +1768,26 @@ describe( 'FormTokenField', () => {
+ 
+ 			const input = screen.getByRole( 'combobox' );
+ 
+-			// The `displayTransform` function is only applied to the value
+-			// rendered in the DOM, while the data behind is not modified.
++			// Matching is done against the displayed label (the result of
++			// `displayTransform`), not the raw suggestion value. Since
++			// `displayTransform` replaces "hot" with "cold", typing "hot"
++			// will not match any suggestion.
+ 			await user.type( input, 'hot' );
+ 
++			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
++
++			// Typing "cold" matches the displayed labels "cold coffee" and
++			// "cold tea".
++			await user.clear( input );
++			await user.type( input, 'cold' );
++
+ 			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
+ 				'cold coffee',
+ 				'cold tea',
+ 			] );
+ 
++			// Selecting a suggestion still passes the original (untransformed)
++			// value to `onChange`.
+ 			await user.keyboard( '[ArrowDown][Enter]' );
+ 
+ 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+diff --git a/packages/dataviews/CHANGELOG.md b/packages/dataviews/CHANGELOG.md
+index 4b2cc6e22c6216..1a2053abefe331 100644
+--- a/packages/dataviews/CHANGELOG.md
++++ b/packages/dataviews/CHANGELOG.md
+@@ -23,6 +23,7 @@
+ - DataViews: Add details form layout validation. [#74996](https://github.com/WordPress/gutenberg/pull/74996)
+ - Add new `adaptiveSelect` DataForm control. [#74937](https://github.com/WordPress/gutenberg/pull/74937)
+ - DataViews: Consistent rendering of selection checkbox and actions in grid layout. [#75056](https://github.com/WordPress/gutenberg/pull/75056)
++- DataViews: Use labels when rendering a list of options. [#74772](https://github.com/WordPress/gutenberg/pull/74772)
+ 
+ ### Code Quality
+ - DataForm: Style SummaryButton in panel layout with `is-disabled` classname. [#75470](https://github.com/WordPress/gutenberg/pull/75470)
+diff --git a/packages/dataviews/src/field-types/array.tsx b/packages/dataviews/src/field-types/array.tsx
+index b045ecf0135f26..4363e4e444ee9f 100644
+--- a/packages/dataviews/src/field-types/array.tsx
++++ b/packages/dataviews/src/field-types/array.tsx
+@@ -6,11 +6,7 @@ import { __ } from '@wordpress/i18n';
+ /**
+  * Internal dependencies
+  */
+-import type {
+-	DataViewRenderFieldProps,
+-	NormalizedField,
+-	SortDirection,
+-} from '../types';
++import type { NormalizedField, SortDirection } from '../types';
+ import type { FieldType } from '../types/private';
+ import {
+ 	OPERATOR_IS_ALL,
+@@ -20,6 +16,7 @@ import {
+ } from '../constants';
+ import isValidRequiredForArray from './utils/is-valid-required-for-array';
+ import isValidElements from './utils/is-valid-elements';
++import render from './utils/render-default';
+ 
+ function getValueFormatted< Item >( {
+ 	item,
+@@ -33,10 +30,6 @@ function getValueFormatted< Item >( {
+ 	return arr.join( ', ' );
+ }
+ 
+-function render( { item, field }: DataViewRenderFieldProps< any > ) {
+-	return getValueFormatted( { item, field } );
+-}
+-
+ function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
+ 	const value = field.getValue( { item } );
+ 
+diff --git a/packages/dataviews/src/field-types/stories/index.story.tsx b/packages/dataviews/src/field-types/stories/index.story.tsx
+index 66fd434aa65207..49189f2a42146a 100644
+--- a/packages/dataviews/src/field-types/stories/index.story.tsx
++++ b/packages/dataviews/src/field-types/stories/index.story.tsx
+@@ -166,8 +166,8 @@ const data: DataType[] = [
+ 		media: 'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
+ 		mediaWithElements:
+ 			'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
+-		array: [ 'item1', 'item2', 'item3' ],
+-		arrayWithElements: [ 'item1', 'item2', 'item3' ],
++		array: [ 'United States', 'United Kingdom', 'Spain' ],
++		arrayWithElements: [ 'us', 'uk', 'es' ],
+ 		notype: 'No type',
+ 		notypeWithElements: 'No type',
+ 		priceWithPrefix: '25.99',
+@@ -487,9 +487,9 @@ const fields: Field< DataType >[] = [
+ 		label: 'Array (with elements)',
+ 		description: 'Help for array with elements.',
+ 		elements: [
+-			{ value: 'item1', label: 'Item 1' },
+-			{ value: 'item2', label: 'Item 2' },
+-			{ value: 'item3', label: 'Item 3' },
++			{ value: 'us', label: 'United States' },
++			{ value: 'uk', label: 'United Kingdom' },
++			{ value: 'es', label: 'Spain' },
+ 		],
+ 	},
+ 	{
+diff --git a/packages/dataviews/src/field-types/utils/render-from-elements.tsx b/packages/dataviews/src/field-types/utils/render-from-elements.tsx
+index 949a792fe46335..2d0fc4f9f13792 100644
+--- a/packages/dataviews/src/field-types/utils/render-from-elements.tsx
++++ b/packages/dataviews/src/field-types/utils/render-from-elements.tsx
+@@ -22,6 +22,16 @@ export default function RenderFromElements< Item >( {
+ 		return value;
+ 	}
+ 
++	if ( Array.isArray( value ) ) {
++		return value
++			.map(
++				( entry ) =>
++					elements?.find( ( element ) => element.value === entry )
++						?.label ?? entry
++			)
++			.join( ', ' );
++	}
++
+ 	return (
+ 		elements?.find( ( element ) => element.value === value )?.label ||
+ 		field.getValue( { item } )

@@ -1,0 +1,212 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 248802890e46d6..beee58ba8dd240 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,7 @@
+ -   `Popover`: make sure offset middleware always applies the latest frame offset values ([#43329](https://github.com/WordPress/gutenberg/pull/43329/)).
+ -   `Dropdown`: anchor popover to the dropdown wrapper (instead of the toggle) ([#43377](https://github.com/WordPress/gutenberg/pull/43377/)).
+ -   `Guide`: Fix error when rendering with no pages ([#43380](https://github.com/WordPress/gutenberg/pull/43380/)).
++-   `Popover`: Ensure position is correct when a nested popover's parent references an element in an iframe and the iframe is scrolled ([#43544](https://github.com/WordPress/gutenberg/pull/43544/)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index c40804e1164e23..3b90de04928f40 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -48,6 +48,10 @@ import {
+ 	positionToPlacement,
+ 	placementToMotionAnimationProps,
+ } from './utils';
++import {
++	useRootReferenceDocument,
++	RootReferenceDocumentProvider,
++} from './root-reference-document-context';
+ 
+ /**
+  * Name of slot in which popover should fill.
+@@ -430,74 +434,108 @@ const Popover = (
+ 		};
+ 	}, [ referenceOwnerDocument, update ] );
+ 
++	// If the root document is scrolled trigger an update of the popover
++	// position. This covers cases where a popover is a child of another
++	// popover, and the first popover in the chain references an element
++	// in an iframe.
++	const rootReferenceDocument = useRootReferenceDocument();
++	useLayoutEffect( () => {
++		// Return early if the root document is the same as the owner document,
++		// as the scroll event will be listened to in other code.
++		const isSameDocument = rootReferenceDocument === referenceOwnerDocument;
++
++		// Return early if this isn't an iframe document.
++		const isNotIframeDocument = rootReferenceDocument === document;
++
++		if (
++			! rootReferenceDocument ||
++			isSameDocument ||
++			isNotIframeDocument
++		) {
++			return;
++		}
++
++		rootReferenceDocument.addEventListener( 'scroll', update );
++		return () =>
++			rootReferenceDocument?.removeEventListener( 'scroll', update );
++	}, [ referenceOwnerDocument, rootReferenceDocument, update ] );
++
+ 	const mergedFloatingRef = useMergeRefs( [
+ 		floating,
+ 		dialogRef,
+ 		forwardedRef,
+ 	] );
+ 
+-	// Disable reason: We care to capture the _bubbled_ events from inputs
+-	// within popover as inferring close intent.
+-
+ 	let content = (
+-		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+-		<MaybeAnimatedWrapper
+-			shouldAnimate={ animate && ! isExpanded }
+-			placement={ computedPlacement }
+-			className={ classnames( 'components-popover', className, {
+-				'is-expanded': isExpanded,
+-				'is-alternate': isAlternate,
+-			} ) }
+-			{ ...contentProps }
+-			ref={ mergedFloatingRef }
+-			{ ...dialogProps }
+-			tabIndex="-1"
+-			style={
+-				isExpanded
+-					? undefined
+-					: {
+-							position: strategy,
+-							left: Number.isNaN( x ) ? 0 : x,
+-							top: Number.isNaN( y ) ? 0 : y,
+-					  }
+-			}
++		<RootReferenceDocumentProvider
++			// Don't overwrite the root document if it's already set.
++			// This ensures only the reference document from the very
++			// root popover is provided.
++			value={ rootReferenceDocument ?? referenceOwnerDocument }
+ 		>
+-			{ /* Prevents scroll on the document */ }
+-			{ isExpanded && <ScrollLock /> }
+-			{ isExpanded && (
+-				<div className="components-popover__header">
+-					<span className="components-popover__header-title">
+-						{ headerTitle }
+-					</span>
+-					<Button
+-						className="components-popover__close"
+-						icon={ close }
+-						onClick={ onClose }
+-					/>
+-				</div>
+-			) }
+-			<div className="components-popover__content">{ children }</div>
+-			{ hasArrow && (
+-				<div
+-					ref={ arrowRef }
+-					className={ [
+-						'components-popover__arrow',
+-						`is-${ computedPlacement.split( '-' )[ 0 ] }`,
+-					].join( ' ' ) }
+-					style={ {
+-						left: Number.isFinite( arrowData?.x )
+-							? `${ arrowData.x }px`
+-							: '',
+-						top: Number.isFinite( arrowData?.y )
+-							? `${ arrowData.y }px`
+-							: '',
+-					} }
+-				>
+-					<ArrowTriangle />
+-				</div>
+-			) }
+-		</MaybeAnimatedWrapper>
++			{
++				// Disable reason: We care to capture the _bubbled_ events from inputs
++				// within popover as inferring close intent.
++				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
++				// eslint-disable-next-line jsx-a11y/no-static-element-interactions
++			 }
++			<MaybeAnimatedWrapper
++				shouldAnimate={ animate && ! isExpanded }
++				placement={ computedPlacement }
++				className={ classnames( 'components-popover', className, {
++					'is-expanded': isExpanded,
++					'is-alternate': isAlternate,
++				} ) }
++				{ ...contentProps }
++				ref={ mergedFloatingRef }
++				{ ...dialogProps }
++				tabIndex="-1"
++				style={
++					isExpanded
++						? undefined
++						: {
++								position: strategy,
++								left: Number.isNaN( x ) ? 0 : x,
++								top: Number.isNaN( y ) ? 0 : y,
++						  }
++				}
++			>
++				{ /* Prevents scroll on the document */ }
++				{ isExpanded && <ScrollLock /> }
++				{ isExpanded && (
++					<div className="components-popover__header">
++						<span className="components-popover__header-title">
++							{ headerTitle }
++						</span>
++						<Button
++							className="components-popover__close"
++							icon={ close }
++							onClick={ onClose }
++						/>
++					</div>
++				) }
++				<div className="components-popover__content">{ children }</div>
++				{ hasArrow && (
++					<div
++						ref={ arrowRef }
++						className={ [
++							'components-popover__arrow',
++							`is-${ computedPlacement.split( '-' )[ 0 ] }`,
++						].join( ' ' ) }
++						style={ {
++							left: Number.isFinite( arrowData?.x )
++								? `${ arrowData.x }px`
++								: '',
++							top: Number.isFinite( arrowData?.y )
++								? `${ arrowData.y }px`
++								: '',
++						} }
++					>
++						<ArrowTriangle />
++					</div>
++				) }
++			</MaybeAnimatedWrapper>
++		</RootReferenceDocumentProvider>
+ 	);
+ 
+ 	if ( slot.ref ) {
+diff --git a/packages/components/src/popover/root-reference-document-context.js b/packages/components/src/popover/root-reference-document-context.js
+new file mode 100644
+index 00000000000000..855954a83f667f
+--- /dev/null
++++ b/packages/components/src/popover/root-reference-document-context.js
+@@ -0,0 +1,10 @@
++/**
++ * WordPress dependencies
++ */
++import { createContext, useContext } from '@wordpress/element';
++
++const RootReferenceDocumentContext = createContext( undefined );
++export const useRootReferenceDocument = () =>
++	useContext( RootReferenceDocumentContext );
++export const RootReferenceDocumentProvider =
++	RootReferenceDocumentContext.Provider;

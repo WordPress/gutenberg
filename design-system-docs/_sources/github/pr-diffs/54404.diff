@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5426a4d6d6dda0..735e3910b0520f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,7 @@
+ 
+ ## Unreleased
+ -   `BorderControl`: Apply proper metrics and simpler text ([#53998](https://github.com/WordPress/gutenberg/pull/53998)).
++-   `ProgressBar`: Export component to allow it to be used ([#54404](https://github.com/WordPress/gutenberg/pull/54404)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..85ce7b14fffaec 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -132,6 +132,7 @@ export { default as PanelHeader } from './panel/header';
+ export { default as PanelRow } from './panel/row';
+ export { default as Placeholder } from './placeholder';
+ export { default as Popover } from './popover';
++export { default as __experimentalProgressBar } from './progress-bar';
+ export { default as QueryControls } from './query-controls';
+ export { default as __experimentalRadio } from './radio-group/radio';
+ export { default as __experimentalRadioGroup } from './radio-group';

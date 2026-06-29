@@ -1,0 +1,606 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 14196a221304bc..3d082a14a92bff 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -217,7 +217,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+                         class="components-circular-option-picker__option-wrapper"
+                       >
+                         <button
+-                          aria-label="Color: red"
++                          aria-label="red"
+                           aria-selected="true"
+                           class="components-button components-circular-option-picker__option is-next-40px-default-size"
+                           data-active-item="true"
+diff --git a/packages/block-editor/src/components/colors-gradients/test/control.js b/packages/block-editor/src/components/colors-gradients/test/control.js
+index 19640d41daeb35..4c389acda11171 100644
+--- a/packages/block-editor/src/components/colors-gradients/test/control.js
++++ b/packages/block-editor/src/components/colors-gradients/test/control.js
+@@ -51,7 +51,7 @@ describe( 'ColorPaletteControl', () => {
+ 		).toBeInTheDocument();
+ 
+ 		// Is showing the two predefined Colors.
+-		expect( screen.getAllByLabelText( /^Color:/ ) ).toHaveLength( 2 );
++		expect( screen.getAllByRole( 'option' ) ).toHaveLength( 2 );
+ 	} );
+ 
+ 	it( 'renders the color picker and does not render tabs if it is only possible to select a color', async () => {
+@@ -80,7 +80,7 @@ describe( 'ColorPaletteControl', () => {
+ 		).not.toBeInTheDocument();
+ 
+ 		// Is showing the two predefined Colors.
+-		expect( screen.getAllByLabelText( /^Color:/ ) ).toHaveLength( 2 );
++		expect( screen.getAllByRole( 'option' ) ).toHaveLength( 2 );
+ 	} );
+ 
+ 	it( 'renders the gradient picker and does not render tabs if it is only possible to select a gradient', async () => {
+diff --git a/packages/block-library/src/cover/test/edit.js b/packages/block-library/src/cover/test/edit.js
+index 72f51150c27443..0a18d2cf3f9f8e 100644
+--- a/packages/block-library/src/cover/test/edit.js
++++ b/packages/block-library/src/cover/test/edit.js
+@@ -48,7 +48,7 @@ async function setup( attributes, useCoreBlocks, customSettings ) {
+ async function createAndSelectBlock() {
+ 	await userEvent.click(
+ 		screen.getByRole( 'option', {
+-			name: 'Color: Black',
++			name: 'Black',
+ 		} )
+ 	);
+ 	await userEvent.click(
+@@ -73,7 +73,7 @@ describe( 'Cover block', () => {
+ 		test( 'can set overlay color using color picker on block placeholder', async () => {
+ 			const { container } = await setup();
+ 			const colorPicker = screen.getByRole( 'option', {
+-				name: 'Color: Black',
++				name: 'Black',
+ 			} );
+ 			await userEvent.click( colorPicker );
+ 			const color = colorPicker.style.backgroundColor;
+@@ -97,7 +97,7 @@ describe( 'Cover block', () => {
+ 
+ 			await userEvent.click(
+ 				screen.getByRole( 'option', {
+-					name: 'Color: Black',
++					name: 'Black',
+ 				} )
+ 			);
+ 
+@@ -390,7 +390,7 @@ describe( 'Cover block', () => {
+ 		test( 'should toggle is-light class if background changed from light to dark', async () => {
+ 			await setup();
+ 			const colorPicker = screen.getByRole( 'option', {
+-				name: 'Color: White',
++				name: 'White',
+ 			} );
+ 			await userEvent.click( colorPicker );
+ 
+@@ -406,7 +406,7 @@ describe( 'Cover block', () => {
+ 			);
+ 			await userEvent.click( screen.getByText( 'Overlay' ) );
+ 			const popupColorPicker = screen.getByRole( 'option', {
+-				name: 'Color: Black',
++				name: 'Black',
+ 			} );
+ 			await userEvent.click( popupColorPicker );
+ 			expect( coverBlock ).not.toHaveClass( 'is-light' );
+@@ -414,7 +414,7 @@ describe( 'Cover block', () => {
+ 		test( 'should remove is-light class if overlay color is removed', async () => {
+ 			await setup();
+ 			const colorPicker = screen.getByRole( 'option', {
+-				name: 'Color: White',
++				name: 'White',
+ 			} );
+ 			await userEvent.click( colorPicker );
+ 			const coverBlock = screen.getByLabelText( 'Block: Cover' );
+@@ -429,7 +429,7 @@ describe( 'Cover block', () => {
+ 			// The default color is black, so clicking the black color option will remove the background color,
+ 			// which should remove the isDark setting and assign the is-light class.
+ 			const popupColorPicker = screen.getByRole( 'option', {
+-				name: 'Color: White',
++				name: 'White',
+ 			} );
+ 			await userEvent.click( popupColorPicker );
+ 			expect( coverBlock ).not.toHaveClass( 'is-light' );
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4d702ee0ead17c..2965d261eabc21 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `CircularOptionPicker`, `ColorPalette`: Fix usage of tooltip in the Circular option picker. ([#68602](https://github.com/WordPress/gutenberg/pull/68602)).
+ -   `InputControl`: Ensures email and url inputs have consistent LTR alignment in RTL languages ([#68188](https://github.com/WordPress/gutenberg/pull/68188)).
+ 
+ ## 29.1.0 (2025-01-02)
+diff --git a/packages/components/src/border-control/test/index.js b/packages/components/src/border-control/test/index.js
+index ec7fb18837f97d..ff9007be28f1a2 100644
+--- a/packages/components/src/border-control/test/index.js
++++ b/packages/components/src/border-control/test/index.js
+@@ -1,7 +1,13 @@
+ /**
+  * External dependencies
+  */
+-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
++import {
++	fireEvent,
++	render,
++	screen,
++	waitFor,
++	within,
++} from '@testing-library/react';
+ import userEvent from '@testing-library/user-event';
+ 
+ /**
+@@ -56,7 +62,7 @@ const getButton = ( name ) => {
+ };
+ 
+ const getColorOption = ( color ) => {
+-	return screen.getByRole( 'option', { name: `Color: ${ color }` } );
++	return screen.getByRole( 'option', { name: `${ color }` } );
+ };
+ 
+ const queryButton = ( name ) => {
+@@ -131,9 +137,11 @@ describe( 'BorderControl', () => {
+ 			await openPopover( user );
+ 
+ 			const customColorPicker = getButton( /Custom color picker/ );
+-			const colorSwatchButtons = screen.getAllByRole( 'option', {
+-				name: /^Color:/,
++			const circularOptionPicker = screen.getByRole( 'listbox', {
++				name: 'Custom color picker.',
+ 			} );
++			const colorSwatchButtons =
++				within( circularOptionPicker ).getAllByRole( 'option' );
+ 			const styleLabel = screen.getByText( 'Style' );
+ 			const solidButton = getButton( 'Solid' );
+ 			const dashedButton = getButton( 'Dashed' );
+diff --git a/packages/components/src/circular-option-picker/README.md b/packages/components/src/circular-option-picker/README.md
+index 1dc230686cae17..b6db6f06daf456 100644
+--- a/packages/components/src/circular-option-picker/README.md
++++ b/packages/components/src/circular-option-picker/README.md
+@@ -29,7 +29,6 @@ const Example = () => {
+ 						style={ { backgroundColor: color, color } }
+ 						isSelected={ index === currentColor }
+ 						onClick={ () => setCurrentColor( index ) }
+-						aria-label={ name }
+ 					/>
+ 				);
+ 			} ) }
+@@ -150,6 +149,6 @@ Inherits all of the [`Dropdown` props](/packages/components/src/dropdown/README.
+ 
+ Props for the underlying `Button` component.
+ 
+-Inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`, `target`, and `children`. 
++Inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`, `target`, and `children`.
+ 
+ - Required: No
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+index c5b2edb260d159..8b01bae9173e64 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker-option.tsx
+@@ -17,7 +17,6 @@ import { Icon, check } from '@wordpress/icons';
+ import { CircularOptionPickerContext } from './circular-option-picker-context';
+ import Button from '../button';
+ import { Composite } from '../composite';
+-import Tooltip from '../tooltip';
+ import type { OptionProps } from './types';
+ 
+ function UnforwardedOptionAsButton(
+@@ -25,15 +24,17 @@ function UnforwardedOptionAsButton(
+ 		id?: string;
+ 		className?: string;
+ 		isPressed?: boolean;
++		label?: string;
+ 	},
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+-	const { isPressed, ...additionalProps } = props;
++	const { isPressed, label, ...additionalProps } = props;
+ 	return (
+ 		<Button
+ 			{ ...additionalProps }
+ 			aria-pressed={ isPressed }
+ 			ref={ forwardedRef }
++			label={ label }
+ 		/>
+ 	);
+ }
+@@ -45,10 +46,11 @@ function UnforwardedOptionAsOption(
+ 		id: string;
+ 		className?: string;
+ 		isSelected?: boolean;
++		label?: string;
+ 	},
+ 	forwardedRef: ForwardedRef< any >
+ ) {
+-	const { id, isSelected, ...additionalProps } = props;
++	const { id, isSelected, label, ...additionalProps } = props;
+ 
+ 	const { setActiveId, activeId } = useContext( CircularOptionPickerContext );
+ 
+@@ -69,6 +71,7 @@ function UnforwardedOptionAsOption(
+ 					role="option"
+ 					aria-selected={ !! isSelected }
+ 					ref={ forwardedRef }
++					label={ label }
+ 				/>
+ 			}
+ 			id={ id }
+@@ -100,9 +103,17 @@ export function Option( {
+ 
+ 	const isListbox = setActiveId !== undefined;
+ 	const optionControl = isListbox ? (
+-		<OptionAsOption { ...commonProps } isSelected={ isSelected } />
++		<OptionAsOption
++			{ ...commonProps }
++			label={ tooltipText }
++			isSelected={ isSelected }
++		/>
+ 	) : (
+-		<OptionAsButton { ...commonProps } isPressed={ isSelected } />
++		<OptionAsButton
++			{ ...commonProps }
++			label={ tooltipText }
++			isPressed={ isSelected }
++		/>
+ 	);
+ 
+ 	return (
+@@ -112,11 +123,7 @@ export function Option( {
+ 				'components-circular-option-picker__option-wrapper'
+ 			) }
+ 		>
+-			{ tooltipText ? (
+-				<Tooltip text={ tooltipText }>{ optionControl }</Tooltip>
+-			) : (
+-				optionControl
+-			) }
++			{ optionControl }
+ 			{ isSelected && <Icon icon={ check } { ...selectedIconProps } /> }
+ 		</div>
+ 	);
+diff --git a/packages/components/src/circular-option-picker/circular-option-picker.tsx b/packages/components/src/circular-option-picker/circular-option-picker.tsx
+index adf2b386e5cbec..8b6be8cd2215f0 100644
+--- a/packages/components/src/circular-option-picker/circular-option-picker.tsx
++++ b/packages/components/src/circular-option-picker/circular-option-picker.tsx
+@@ -51,7 +51,6 @@ import {
+  * 						style={ { backgroundColor: color, color } }
+  * 						isSelected={ index === currentColor }
+  * 						onClick={ () => setCurrentColor( index ) }
+- * 						aria-label={ name }
+  * 					/>
+  * 				);
+  * 			} ) }
+diff --git a/packages/components/src/circular-option-picker/stories/index.story.tsx b/packages/components/src/circular-option-picker/stories/index.story.tsx
+index 84165bf24bff6c..9d45c9bb92f7d0 100644
+--- a/packages/components/src/circular-option-picker/stories/index.story.tsx
++++ b/packages/components/src/circular-option-picker/stories/index.story.tsx
+@@ -87,7 +87,6 @@ const DefaultOptions = () => {
+ 						onClick={ () => {
+ 							setCurrentColor?.( color );
+ 						} }
+-						aria-label={ name }
+ 					/>
+ 				);
+ 			} ) }
+diff --git a/packages/components/src/color-palette/index.tsx b/packages/components/src/color-palette/index.tsx
+index ed3e9039704179..de4e4f4206fe3a 100644
+--- a/packages/components/src/color-palette/index.tsx
++++ b/packages/components/src/color-palette/index.tsx
+@@ -79,13 +79,6 @@ function SinglePalette( {
+ 					onClick={
+ 						isSelected ? clearColor : () => onChange( color, index )
+ 					}
+-					aria-label={
+-						name
+-							? // translators: %s: The name of the color e.g: "vivid red".
+-							  sprintf( __( 'Color: %s' ), name )
+-							: // translators: %s: color hex code e.g: "#f00".
+-							  sprintf( __( 'Color code: %s' ), color )
+-					}
+ 				/>
+ 			);
+ 		} );
+diff --git a/packages/components/src/color-palette/test/index.tsx b/packages/components/src/color-palette/test/index.tsx
+index 8d108469fba3a8..dcdd16e53ee836 100644
+--- a/packages/components/src/color-palette/test/index.tsx
++++ b/packages/components/src/color-palette/test/index.tsx
+@@ -50,9 +50,7 @@ describe( 'ColorPalette', () => {
+ 			/>
+ 		);
+ 
+-		expect(
+-			screen.getAllByRole( 'option', { name: /^Color:/ } )
+-		).toHaveLength( 3 );
++		expect( screen.getAllByRole( 'option' ) ).toHaveLength( 3 );
+ 	} );
+ 
+ 	it( 'should call onClick on an active button with undefined', async () => {
+@@ -67,9 +65,7 @@ describe( 'ColorPalette', () => {
+ 			/>
+ 		);
+ 
+-		await user.click(
+-			screen.getByRole( 'option', { name: /^Color:/, selected: true } )
+-		);
++		await user.click( screen.getByRole( 'option', { selected: true } ) );
+ 
+ 		expect( onChange ).toHaveBeenCalledTimes( 1 );
+ 		expect( onChange ).toHaveBeenCalledWith( undefined );
+@@ -91,7 +87,6 @@ describe( 'ColorPalette', () => {
+ 		// (i.e. a button representing a color that is not the current color)
+ 		await user.click(
+ 			screen.getAllByRole( 'option', {
+-				name: /^Color:/,
+ 				selected: false,
+ 			} )[ 0 ]
+ 		);
+@@ -230,7 +225,6 @@ describe( 'ColorPalette', () => {
+ 		// Click the first unpressed button
+ 		await user.click(
+ 			screen.getAllByRole( 'option', {
+-				name: /^Color:/,
+ 				selected: false,
+ 			} )[ 0 ]
+ 		);
+diff --git a/packages/components/src/palette-edit/test/index.tsx b/packages/components/src/palette-edit/test/index.tsx
+index 7dc00dbba22042..7f3a0335eb6814 100644
+--- a/packages/components/src/palette-edit/test/index.tsx
++++ b/packages/components/src/palette-edit/test/index.tsx
+@@ -416,7 +416,7 @@ describe( 'PaletteEdit', () => {
+ 			/>
+ 		);
+ 
+-		await click( screen.getByLabelText( 'Color: Primary' ) );
++		await click( screen.getByLabelText( 'Primary' ) );
+ 		const hexInput = screen.getByRole( 'textbox', {
+ 			name: 'Hex color',
+ 		} );
+diff --git a/test/e2e/specs/editor/blocks/buttons.spec.js b/test/e2e/specs/editor/blocks/buttons.spec.js
+index ad19af747238db..554bd8947f0bf5 100644
+--- a/test/e2e/specs/editor/blocks/buttons.spec.js
++++ b/test/e2e/specs/editor/blocks/buttons.spec.js
+@@ -295,11 +295,11 @@ test.describe( 'Buttons', () => {
+ 		await page.click(
+ 			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
+ 		);
+-		await page.click( 'role=option[name="Color: Cyan bluish gray"i]' );
++		await page.click( 'role=option[name="Cyan bluish gray"i]' );
+ 		await page.click(
+ 			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
+ 		);
+-		await page.click( 'role=option[name="Color: Vivid red"i]' );
++		await page.click( 'role=option[name="Vivid red"i]' );
+ 
+ 		// Check the content.
+ 		const content = await editor.getEditedPostContent();
+diff --git a/test/e2e/specs/editor/blocks/cover.spec.js b/test/e2e/specs/editor/blocks/cover.spec.js
+index cc686892a10754..87c244a7306dc6 100644
+--- a/test/e2e/specs/editor/blocks/cover.spec.js
++++ b/test/e2e/specs/editor/blocks/cover.spec.js
+@@ -34,7 +34,7 @@ test.describe( 'Cover', () => {
+ 
+ 		// Locate the Black color swatch.
+ 		const blackColorSwatch = coverBlock.getByRole( 'option', {
+-			name: 'Color: Black',
++			name: 'Black',
+ 		} );
+ 		await expect( blackColorSwatch ).toBeVisible();
+ 
+@@ -106,7 +106,7 @@ test.describe( 'Cover', () => {
+ 		// a functioning block.
+ 		await coverBlock
+ 			.getByRole( 'option', {
+-				name: 'Color: Black',
++				name: 'Black',
+ 			} )
+ 			.click();
+ 
+@@ -129,7 +129,7 @@ test.describe( 'Cover', () => {
+ 		} );
+ 		await coverBlock
+ 			.getByRole( 'option', {
+-				name: 'Color: Black',
++				name: 'Black',
+ 			} )
+ 			.click();
+ 
+@@ -241,7 +241,7 @@ test.describe( 'Cover', () => {
+ 		// a functioning block.
+ 		await coverBlock
+ 			.getByRole( 'option', {
+-				name: 'Color: Black',
++				name: 'Black',
+ 			} )
+ 			.click();
+ 
+@@ -267,7 +267,7 @@ test.describe( 'Cover', () => {
+ 		// a functioning block.
+ 		await secondCoverBlock
+ 			.getByRole( 'option', {
+-				name: 'Color: Black',
++				name: 'Black',
+ 			} )
+ 			.click();
+ 
+diff --git a/test/e2e/specs/editor/blocks/heading.spec.js b/test/e2e/specs/editor/blocks/heading.spec.js
+index c4259cf5b6d2fe..906095cad9d080 100644
+--- a/test/e2e/specs/editor/blocks/heading.spec.js
++++ b/test/e2e/specs/editor/blocks/heading.spec.js
+@@ -220,7 +220,7 @@ test.describe( 'Heading', () => {
+ 
+ 		await page
+ 			.getByRole( 'option', {
+-				name: 'Color: Luminous vivid orange',
++				name: 'Luminous vivid orange',
+ 			} )
+ 			.click();
+ 
+diff --git a/test/e2e/specs/editor/blocks/navigation-colors.spec.js b/test/e2e/specs/editor/blocks/navigation-colors.spec.js
+index 8692b184fb13f9..80b36d54980b1e 100644
+--- a/test/e2e/specs/editor/blocks/navigation-colors.spec.js
++++ b/test/e2e/specs/editor/blocks/navigation-colors.spec.js
+@@ -93,14 +93,14 @@ test.describe( 'Navigation colors', () => {
+ 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
+ 		await page.getByRole( 'button', { name: 'Text' } ).click();
+ 		await page
+-			.getByRole( 'option', { name: 'Color: White' } )
++			.getByRole( 'option', { name: 'White' } )
+ 			.click( { force: true } );
+ 
+ 		await page
+ 			.getByRole( 'button', { name: 'Background', exact: true } )
+ 			.click();
+ 		await page
+-			.getByRole( 'option', { name: 'Color: Black' } )
++			.getByRole( 'option', { name: 'Black' } )
+ 			.click( { force: true } );
+ 
+ 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
+@@ -151,12 +151,12 @@ test.describe( 'Navigation colors', () => {
+ 		await page.getByRole( 'button', { name: 'Link', exact: true } ).click();
+ 		// rga(207, 46 ,46) is the color of the "vivid red" color preset.
+ 		await page
+-			.getByRole( 'option', { name: 'Color: Vivid red' } )
++			.getByRole( 'option', { name: 'Vivid red' } )
+ 			.click( { force: true } );
+ 		await page.getByRole( 'tab', { name: 'Hover' } ).click();
+ 		// rgb(155, 81, 224) is the color of the "vivid purple" color preset.
+ 		await page
+-			.getByRole( 'option', { name: 'Color: Vivid purple' } )
++			.getByRole( 'option', { name: 'Vivid purple' } )
+ 			.click( { force: true } );
+ 
+ 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
+@@ -198,7 +198,7 @@ test.describe( 'Navigation colors', () => {
+ 		// 247, 141, 167 is the color of the "Pale pink" color preset.
+ 		const palePink = 'rgb(247, 141, 167)';
+ 		await page
+-			.getByRole( 'option', { name: 'Color: Pale pink' } )
++			.getByRole( 'option', { name: 'Pale pink' } )
+ 			.click( { force: true } );
+ 
+ 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
+@@ -242,7 +242,7 @@ test.describe( 'Navigation colors', () => {
+ 		// 142, 209, 252 is the color of the "Pale cyan blue" color preset.
+ 		const paleCyan = 'rgb(142, 209, 252)';
+ 		await page
+-			.getByRole( 'option', { name: 'Color: Pale cyan blue' } )
++			.getByRole( 'option', { name: 'Pale cyan blue' } )
+ 			.click( { force: true } );
+ 
+ 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
+@@ -285,7 +285,7 @@ test.describe( 'Navigation colors', () => {
+ 		// 247, 141, 167 is the color of the "Pale pink" color preset.
+ 		const palePink = 'rgb(247, 141, 167)';
+ 		await page
+-			.getByRole( 'option', { name: 'Color: Pale pink' } )
++			.getByRole( 'option', { name: 'Pale pink' } )
+ 			.click( { force: true } );
+ 		// Pale cyan blue for the background color.
+ 		await page
+@@ -294,7 +294,7 @@ test.describe( 'Navigation colors', () => {
+ 		// 142, 209, 252 is the color of the "Pale cyan blue" color preset.
+ 		const paleCyan = 'rgb(142, 209, 252)';
+ 		await page
+-			.getByRole( 'option', { name: 'Color: Pale cyan blue' } )
++			.getByRole( 'option', { name: 'Pale cyan blue' } )
+ 			.click( { force: true } );
+ 		// Cyan bluish gray for the submenu and overlay text color.
+ 		await page
+@@ -303,7 +303,7 @@ test.describe( 'Navigation colors', () => {
+ 		// 171, 184, 195 is the color of the "Cyan bluish gray" color preset.
+ 		const cyanBluishGray = 'rgb(171, 184, 195)';
+ 		await page
+-			.getByRole( 'option', { name: 'Color: Cyan bluish gray' } )
++			.getByRole( 'option', { name: 'Cyan bluish gray' } )
+ 			.click( { force: true } );
+ 		// Luminous vivid amber for the submenu and overlay background color.
+ 		await page
+@@ -312,7 +312,7 @@ test.describe( 'Navigation colors', () => {
+ 		// 252, 185, 0 is the color of the "Luminous vivid amber" color preset.
+ 		const vividAmber = 'rgb(252, 185, 0)';
+ 		await page
+-			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
++			.getByRole( 'option', { name: 'Luminous vivid amber' } )
+ 			.click( { force: true } );
+ 
+ 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
+diff --git a/test/e2e/specs/editor/various/format-library/text-color.spec.js b/test/e2e/specs/editor/various/format-library/text-color.spec.js
+index aba77251e38336..3e3b2147e0a4f7 100644
+--- a/test/e2e/specs/editor/various/format-library/text-color.spec.js
++++ b/test/e2e/specs/editor/various/format-library/text-color.spec.js
+@@ -28,7 +28,7 @@ test.describe( 'Format Library - Text color', () => {
+ 		// active. Previously we had a broken regular expression.
+ 		const color = page
+ 			.getByRole( 'listbox', { name: 'Custom color picker' } )
+-			.getByRole( 'option', { name: 'Color: Cyan bluish gray' } );
++			.getByRole( 'option', { name: 'Cyan bluish gray' } );
+ 
+ 		await color.click();
+ 		await expect.poll( editor.getBlocks ).toMatchObject( [
+diff --git a/test/e2e/specs/editor/various/keep-styles-on-block-transforms.spec.js b/test/e2e/specs/editor/various/keep-styles-on-block-transforms.spec.js
+index 32e3def9154ed1..074db6e1bac685 100644
+--- a/test/e2e/specs/editor/various/keep-styles-on-block-transforms.spec.js
++++ b/test/e2e/specs/editor/various/keep-styles-on-block-transforms.spec.js
+@@ -18,7 +18,7 @@ test.describe( 'Keep styles on block transforms', () => {
+ 			.click();
+ 		await page.keyboard.type( '## Heading' );
+ 		await page.click( 'role=button[name="Text"i]' );
+-		await page.click( 'role=option[name="Color: Luminous vivid orange"i]' );
++		await page.click( 'role=option[name="Luminous vivid orange"i]' );
+ 
+ 		await page.click( 'role=button[name="Heading"i]' );
+ 		await page.click( 'role=menuitem[name="Paragraph"i]' );
+diff --git a/test/e2e/specs/editor/various/list-view.spec.js b/test/e2e/specs/editor/various/list-view.spec.js
+index 6bf1689a400499..17f82ce1b76e36 100644
+--- a/test/e2e/specs/editor/various/list-view.spec.js
++++ b/test/e2e/specs/editor/various/list-view.spec.js
+@@ -162,7 +162,10 @@ test.describe( 'List View', () => {
+ 		// make the inner blocks appear.
+ 		await editor.canvas
+ 			.getByRole( 'document', { name: 'Block: Cover' } )
+-			.getByRole( 'option', { name: /Color: /i } )
++			.getByRole( 'listbox', {
++				name: 'Custom color picker.',
++			} )
++			.getByRole( 'option' )
+ 			.first()
+ 			.click();
+ 
+diff --git a/test/e2e/specs/site-editor/style-variations.spec.js b/test/e2e/specs/site-editor/style-variations.spec.js
+index 9c4243b0d171f6..8ec92ff657391b 100644
+--- a/test/e2e/specs/site-editor/style-variations.spec.js
++++ b/test/e2e/specs/site-editor/style-variations.spec.js
+@@ -160,15 +160,15 @@ test.describe( 'Global styles variations', () => {
+ 		await page.click( 'role=button[name="Edit palette"i]' );
+ 
+ 		await expect(
+-			page.locator( 'role=option[name="Color: Foreground"i]' )
++			page.locator( 'role=option[name="Foreground"i]' )
+ 		).toHaveCSS( 'background-color', 'rgb(74, 7, 74)' );
+ 
+ 		await expect(
+-			page.locator( 'role=option[name="Color: Background"i]' )
++			page.locator( 'role=option[name="Background"i]' )
+ 		).toHaveCSS( 'background-color', 'rgb(202, 105, 211)' );
+ 
+ 		await expect(
+-			page.locator( 'role=option[name="Color: Awesome pink"i]' )
++			page.locator( 'role=option[name="Awesome pink"i]' )
+ 		).toHaveCSS( 'background-color', 'rgba(204, 0, 255, 0.77)' );
+ 	} );
+ 
+diff --git a/test/e2e/specs/site-editor/user-global-styles-revisions.spec.js b/test/e2e/specs/site-editor/user-global-styles-revisions.spec.js
+index 917bf1e0c9c69e..1b5ab7b6cd557d 100644
+--- a/test/e2e/specs/site-editor/user-global-styles-revisions.spec.js
++++ b/test/e2e/specs/site-editor/user-global-styles-revisions.spec.js
+@@ -80,7 +80,7 @@ test.describe( 'Style Revisions', () => {
+ 			.getByRole( 'button', { name: 'Background', exact: true } )
+ 			.click();
+ 		await page
+-			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
++			.getByRole( 'option', { name: 'Luminous vivid amber' } )
+ 			.click( { force: true } );
+ 
+ 		await page.getByRole( 'button', { name: 'Revisions' } ).click();

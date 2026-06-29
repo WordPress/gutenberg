@@ -1,0 +1,311 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6ea0eff17d5800..7cab43979de8d6 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -29,6 +29,7 @@
+ -   `AlignmentMatrixControl`: Refactor away from `_.flattenDeep()` in utils ([#41814](https://github.com/WordPress/gutenberg/pull/41814/)).
+ -   `AutoComplete`: Revert recent `exhaustive-deps` refactor ([#41820](https://github.com/WordPress/gutenberg/pull/41820)).
+ -   `Spacer`: Convert knobs to controls in Storybook ([#41851](https://github.com/WordPress/gutenberg/pull/41851)).
++-   `Heading`: Complete TypeScript migration ([#41921](https://github.com/WordPress/gutenberg/pull/41921)).
+ -   `Navigation`: Refactor away from Lodash functions ([#41865](https://github.com/WordPress/gutenberg/pull/41865/)).
+ -   `CustomGradientPicker`: Refactor away from Lodash ([#41901](https://github.com/WordPress/gutenberg/pull/41901/)).
+ -   `SegmentedControl`: Refactor away from `_.values()` ([#41905](https://github.com/WordPress/gutenberg/pull/41905/)).
+diff --git a/packages/components/src/heading/README.md b/packages/components/src/heading/README.md
+index f96fe871add758..2989f4b25fbf46 100644
+--- a/packages/components/src/heading/README.md
++++ b/packages/components/src/heading/README.md
+@@ -20,8 +20,9 @@ function Example() {
+ 
+ `Heading` uses `Text` underneath, so we have access to all of `Text`'s props except for `size` which is replaced by `level`. For a complete list of those props, check out [`Text`](/packages/components/src/text/README.md#props).
+ 
+-##### level
+-
+-**Type**: `1 | 2 | 3 | 4 | 5 | 6`
++##### `level`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
+ 
+ Passing any of the heading levels to `level` will both render the correct typographic text size as well as the semantic element corresponding to the level (`h1` for `1` for example).
++
++-   Required: No
++-   Default: `2`
+diff --git a/packages/components/src/heading/component.tsx b/packages/components/src/heading/component.tsx
+index 75a9f4a1d7f4fa..7eb48be16b8a7f 100644
+--- a/packages/components/src/heading/component.tsx
++++ b/packages/components/src/heading/component.tsx
+@@ -8,7 +8,8 @@ import type { ForwardedRef } from 'react';
+  */
+ import { contextConnect, WordPressComponentProps } from '../ui/context';
+ import { View } from '../view';
+-import { useHeading, HeadingProps } from './hook';
++import { useHeading } from './hook';
++import type { HeadingProps } from './types';
+ 
+ function UnconnectedHeading(
+ 	props: WordPressComponentProps< HeadingProps, 'h1' >,
+@@ -22,7 +23,6 @@ function UnconnectedHeading(
+ /**
+  * `Heading` renders headings and titles using the library's typography system.
+  *
+- * @example
+  * ```jsx
+  * import { __experimentalHeading as Heading } from "@wordpress/components";
+  *
+diff --git a/packages/components/src/heading/hook.ts b/packages/components/src/heading/hook.ts
+index 2f1ec50a916b69..3a92fffca7500d 100644
+--- a/packages/components/src/heading/hook.ts
++++ b/packages/components/src/heading/hook.ts
+@@ -2,51 +2,10 @@
+  * Internal dependencies
+  */
+ import { useContextSystem, WordPressComponentProps } from '../ui/context';
+-import type { Props as TextProps } from '../text/types';
+ import { useText } from '../text';
+ import { getHeadingFontSize } from '../ui/utils/font-size';
+ import { CONFIG, COLORS } from '../utils';
+-
+-export type HeadingSize =
+-	| 1
+-	| 2
+-	| 3
+-	| 4
+-	| 5
+-	| 6
+-	| '1'
+-	| '2'
+-	| '3'
+-	| '4'
+-	| '5'
+-	| '6';
+-
+-export interface HeadingProps extends Omit< TextProps, 'size' > {
+-	/**
+-	 * `Heading` will typically render the sizes `1`, `2`, `3`, `4`, `5`, or `6`, which map to `h1`-`h6`.
+-	 *
+-	 * @default 2
+-	 *
+-	 * @example
+-	 * ```jsx
+-	 * import { __experimentalHeading as Heading } from `@wordpress/components`
+-	 *
+-	 * function Example() {
+-	 *   return (
+-	 *     <div>
+-	 *       <Heading level="1">Code is Poetry</Heading>
+-	 *       <Heading level="2">Code is Poetry</Heading>
+-	 *       <Heading level="3">Code is Poetry</Heading>
+-	 *       <Heading level="4">Code is Poetry</Heading>
+-	 *       <Heading level="5">Code is Poetry</Heading>
+-	 *       <Heading level="6">Code is Poetry</Heading>
+-	 *     </div>
+-	 *   );
+-	 * }
+-	 * ```
+-	 */
+-	level: HeadingSize;
+-}
++import type { HeadingProps } from './types';
+ 
+ export function useHeading(
+ 	props: WordPressComponentProps< HeadingProps, 'h1' >
+diff --git a/packages/components/src/heading/stories/index.tsx b/packages/components/src/heading/stories/index.tsx
+index f25b21728e9a6e..8382504d05b604 100644
+--- a/packages/components/src/heading/stories/index.tsx
++++ b/packages/components/src/heading/stories/index.tsx
+@@ -19,7 +19,11 @@ const meta: ComponentMeta< typeof Heading > = {
+ 		letterSpacing: { control: { type: 'text' } },
+ 		lineHeight: { control: { type: 'text' } },
+ 		optimizeReadabilityFor: { control: { type: 'color' } },
+-		variant: { control: { type: 'radio' }, options: [ 'muted' ] },
++		variant: {
++			control: { type: 'radio' },
++			options: [ 'undefined', 'muted' ],
++			mapping: { undefined, muted: 'muted' },
++		},
+ 		weight: { control: { type: 'text' } },
+ 	},
+ 	parameters: {
+diff --git a/packages/components/src/heading/test/__snapshots__/index.js.snap b/packages/components/src/heading/test/__snapshots__/index.tsx.snap
+similarity index 100%
+rename from packages/components/src/heading/test/__snapshots__/index.js.snap
+rename to packages/components/src/heading/test/__snapshots__/index.tsx.snap
+diff --git a/packages/components/src/heading/test/index.js b/packages/components/src/heading/test/index.js
+deleted file mode 100644
+index edf9b0dbc7e717..00000000000000
+--- a/packages/components/src/heading/test/index.js
++++ /dev/null
+@@ -1,67 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { render } from '@testing-library/react';
+-
+-/**
+- * Internal dependencies
+- */
+-import { Heading } from '../';
+-
+-describe( 'props', () => {
+-	let base;
+-	beforeEach( () => {
+-		base = render( <Heading>Code is Poetry</Heading> );
+-	} );
+-
+-	test( 'should render correctly', () => {
+-		expect( base.container.firstChild ).toMatchSnapshot();
+-	} );
+-
+-	test( 'should render level as a number', () => {
+-		const { container } = render(
+-			<Heading level={ 4 }>Code is Poetry</Heading>
+-		);
+-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-			base.container.firstChild
+-		);
+-	} );
+-
+-	test( 'should render level as a string', () => {
+-		const { container } = render(
+-			<Heading level="4">Code is Poetry</Heading>
+-		);
+-		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+-			base.container.firstChild
+-		);
+-	} );
+-
+-	test( 'should allow as prop', () => {
+-		const { container } = render(
+-			<Heading level="1" as="span">
+-				Code is Poetry
+-			</Heading>
+-		);
+-		expect( container.firstChild.tagName ).toBe( 'SPAN' );
+-	} );
+-
+-	test( 'should render a11y props when not using a semantic element', () => {
+-		const { container } = render(
+-			<Heading level="3" as="div">
+-				Code is Poetry
+-			</Heading>
+-		);
+-		expect( container.firstChild.getAttribute( 'role' ) ).toBe( 'heading' );
+-		expect( container.firstChild.getAttribute( 'aria-level' ) ).toBe( '3' );
+-	} );
+-
+-	test( 'should not render a11y props when using a semantic element', () => {
+-		const { container } = render(
+-			<Heading level="1" as="h4">
+-				Code is Poetry
+-			</Heading>
+-		);
+-		expect( container.firstChild.getAttribute( 'role' ) ).toBeNull();
+-		expect( container.firstChild.getAttribute( 'aria-level' ) ).toBeNull();
+-	} );
+-} );
+diff --git a/packages/components/src/heading/test/index.tsx b/packages/components/src/heading/test/index.tsx
+new file mode 100644
+index 00000000000000..510fb254a4e99f
+--- /dev/null
++++ b/packages/components/src/heading/test/index.tsx
+@@ -0,0 +1,68 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { Heading } from '../';
++
++describe( 'props', () => {
++	test( 'should render correctly', () => {
++		render( <Heading>Code is Poetry</Heading> );
++		expect( screen.getByRole( 'heading' ) ).toMatchSnapshot();
++	} );
++
++	test( 'should render level as a number', () => {
++		render( <Heading>Code is Poetry</Heading> );
++		render( <Heading level={ 4 }>Code is Poetry</Heading> );
++		expect(
++			screen.getByRole( 'heading', { level: 4 } )
++		).toMatchStyleDiffSnapshot(
++			screen.getByRole( 'heading', { level: 2 } )
++		);
++	} );
++
++	test( 'should render level as a string', () => {
++		render( <Heading>Code is Poetry</Heading> );
++		render( <Heading level="4">Code is Poetry</Heading> );
++		expect(
++			screen.getByRole( 'heading', { level: 4 } )
++		).toMatchStyleDiffSnapshot(
++			screen.getByRole( 'heading', { level: 2 } )
++		);
++	} );
++
++	test( 'should allow as prop', () => {
++		render(
++			<Heading level="1" as="span">
++				Code is Poetry
++			</Heading>
++		);
++		expect( screen.getByRole( 'heading' ).tagName ).toBe( 'SPAN' );
++	} );
++
++	test( 'should render a11y props when not using a semantic element', () => {
++		render(
++			<Heading level="3" as="div">
++				Code is Poetry
++			</Heading>
++		);
++		expect(
++			screen.getByRole( 'heading', { level: 3 } )
++		).toBeInTheDocument();
++	} );
++
++	test( 'should not render a11y props when using a semantic element', () => {
++		render(
++			<Heading level="1" as="h4">
++				Code is Poetry
++			</Heading>
++		);
++		expect( screen.getByRole( 'heading' ) ).not.toHaveAttribute( 'role' );
++		expect( screen.getByRole( 'heading' ) ).not.toHaveAttribute(
++			'aria-level'
++		);
++	} );
++} );
+diff --git a/packages/components/src/heading/types.ts b/packages/components/src/heading/types.ts
+new file mode 100644
+index 00000000000000..a7cac0d5b1f16b
+--- /dev/null
++++ b/packages/components/src/heading/types.ts
+@@ -0,0 +1,29 @@
++/**
++ * Internal dependencies
++ */
++import type { Props as TextProps } from '../text/types';
++
++export type HeadingSize =
++	| 1
++	| 2
++	| 3
++	| 4
++	| 5
++	| 6
++	| '1'
++	| '2'
++	| '3'
++	| '4'
++	| '5'
++	| '6';
++
++export type HeadingProps = Omit< TextProps, 'size' > & {
++	/**
++	 * Passing any of the heading levels to `level` will both render the correct
++	 * typographic text size as well as the semantic element corresponding to
++	 * the level (`h1` for `1` for example).
++	 *
++	 * @default 2
++	 */
++	level?: HeadingSize;
++};

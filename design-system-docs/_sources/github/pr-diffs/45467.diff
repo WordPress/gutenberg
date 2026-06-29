@@ -1,0 +1,29 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index a9b7b625857135..09572393d726d8 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,6 +10,10 @@
+ 
+ -   `Autocomplete`: Fix unexpected block insertion during IME composition ([#45510](https://github.com/WordPress/gutenberg/pull/45510)).
+ 
++### Internal
++
++-   `PaletteEditListView`: Update to ignore `exhaustive-deps` eslint rule ([#45467](https://github.com/WordPress/gutenberg/pull/45467)).
++
+ ## 22.0.0 (2022-11-02)
+ 
+ ### Breaking Changes
+diff --git a/packages/components/src/palette-edit/index.js b/packages/components/src/palette-edit/index.js
+index ec38edcc72a586..0b52d309c03fa7 100644
+--- a/packages/components/src/palette-edit/index.js
++++ b/packages/components/src/palette-edit/index.js
+@@ -229,6 +229,9 @@ function PaletteEditListView( {
+ 				onChange( newElements.length ? newElements : undefined );
+ 			}
+ 		};
++		// Disable reason: adding the missing dependency here would cause breaking changes that will require
++		// a heavier refactor to avoid. See https://github.com/WordPress/gutenberg/pull/43911
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [] );
+ 
+ 	const debounceOnChange = useDebounce( onChange, 100 );

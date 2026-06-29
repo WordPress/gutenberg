@@ -1,0 +1,219 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 0c0fab401d02a8..570b7ac308c5fe 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `TimeInput`: Expose as subcomponent of `TimePicker` ([#63145](https://github.com/WordPress/gutenberg/pull/63145)).
+ -   `RadioControl`: add support for option help text ([#63751](https://github.com/WordPress/gutenberg/pull/63751)).
+ -   `Guide`: Add `__next40pxDefaultSize` to buttons ([#64181](https://github.com/WordPress/gutenberg/pull/64181)).
++-   `SelectControl`: Pass through `options` props ([#64211](https://github.com/WordPress/gutenberg/pull/64211)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/select-control/README.md b/packages/components/src/select-control/README.md
+index bc37942231091b..464ee180b38639 100644
+--- a/packages/components/src/select-control/README.md
++++ b/packages/components/src/select-control/README.md
+@@ -190,7 +190,7 @@ In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl`
+ 
+ #### options
+ 
+-An array of objects containing the following properties:
++An array of objects containing the following properties, as well as any other `option` element attributes:
+ 
+ -   `label`: (string) The label to be shown to the user.
+ -   `value`: (string) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
+@@ -214,6 +214,13 @@ If multiple is false the value received is a single value with the new selected
+ -   Type: `function`
+ -   Required: Yes
+ 
++#### value
++
++The value of the selected option. If `multiple` is true, the `value` should be an array with the values of the selected options.
++
++-   Type: `String|String[]`
++-   Required: No
++
+ #### variant
+ 
+ The style variant of the control.
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 5db0316d02b129..874b6ace1ea949 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -26,6 +26,22 @@ function useUniqueId( idProp?: string ) {
+ 	return idProp || id;
+ }
+ 
++function SelectOptions( {
++	options,
++}: {
++	options: NonNullable< SelectControlProps[ 'options' ] >;
++} ) {
++	return options.map( ( { id, label, value, ...optionProps }, index ) => {
++		const key = id || `${ label }-${ value }-${ index }`;
++
++		return (
++			<option key={ key } value={ value } { ...optionProps }>
++				{ label }
++			</option>
++		);
++	} );
++}
++
+ function UnforwardedSelectControl(
+ 	props: WordPressComponentProps< SelectControlProps, 'select', false >,
+ 	ref: React.ForwardedRef< HTMLSelectElement >
+@@ -115,23 +131,7 @@ function UnforwardedSelectControl(
+ 					value={ valueProp }
+ 					variant={ variant }
+ 				>
+-					{ children ||
+-						options.map( ( option, index ) => {
+-							const key =
+-								option.id ||
+-								`${ option.label }-${ option.value }-${ index }`;
+-
+-							return (
+-								<option
+-									key={ key }
+-									value={ option.value }
+-									disabled={ option.disabled }
+-									hidden={ option.hidden }
+-								>
+-									{ option.label }
+-								</option>
+-							);
+-						} ) }
++					{ children || <SelectOptions options={ options } /> }
+ 				</Select>
+ 			</StyledInputBase>
+ 		</BaseControl>
+diff --git a/packages/components/src/select-control/test/select-control.tsx b/packages/components/src/select-control/test/select-control.tsx
+index 03e3acbf1f7325..f2da74d9a6e911 100644
+--- a/packages/components/src/select-control/test/select-control.tsx
++++ b/packages/components/src/select-control/test/select-control.tsx
+@@ -17,8 +17,8 @@ describe( 'SelectControl', () => {
+ 		expect( screen.queryByRole( 'combobox' ) ).not.toBeInTheDocument();
+ 	} );
+ 
+-	it( 'should not render its children', async () => {
+-		const user = await userEvent.setup();
++	it( 'should render its children', async () => {
++		const user = userEvent.setup();
+ 		const handleChangeMock = jest.fn();
+ 
+ 		render(
+@@ -46,8 +46,8 @@ describe( 'SelectControl', () => {
+ 		);
+ 	} );
+ 
+-	it( 'should not render its options', async () => {
+-		const user = await userEvent.setup();
++	it( 'should render its options', async () => {
++		const user = userEvent.setup();
+ 		const handleChangeMock = jest.fn();
+ 
+ 		render(
+@@ -81,4 +81,23 @@ describe( 'SelectControl', () => {
+ 			expect.anything()
+ 		);
+ 	} );
++
++	it( 'should pass through options props', () => {
++		render(
++			<SelectControl
++				label="Select"
++				options={ [
++					{
++						value: 'value',
++						label: 'label',
++						'aria-label': 'Aria label',
++					},
++				] }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'option', { name: 'Aria label' } )
++		).toBeInTheDocument();
++	} );
+ } );
+diff --git a/packages/components/src/select-control/types.ts b/packages/components/src/select-control/types.ts
+index a1d02d444c1474..a5d0d740c593cc 100644
+--- a/packages/components/src/select-control/types.ts
++++ b/packages/components/src/select-control/types.ts
+@@ -1,7 +1,7 @@
+ /**
+  * External dependencies
+  */
+-import type { ChangeEvent, FocusEvent, ReactNode } from 'react';
++import type { ChangeEvent, ReactNode } from 'react';
+ 
+ /**
+  * Internal dependencies
+@@ -22,9 +22,12 @@ type SelectControlBaseProps = Pick<
+ 	| 'suffix'
+ > &
+ 	Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > & {
+-		onBlur?: ( event: FocusEvent< HTMLSelectElement > ) => void;
+-		onFocus?: ( event: FocusEvent< HTMLSelectElement > ) => void;
+-		options?: {
++		/**
++		 * An array of option property objects to be rendered,
++		 * each with a `label` and `value` property, as well as any other
++		 * `<option>` attributes.
++		 */
++		options?: ( {
+ 			/**
+ 			 * The label to be shown to the user.
+ 			 */
+@@ -34,20 +37,10 @@ type SelectControlBaseProps = Pick<
+ 			 * This is also the value passed to `onChange` when the option is selected.
+ 			 */
+ 			value: string;
+-			id?: string;
+-			/**
+-			 * Whether or not the option should have the disabled attribute.
+-			 *
+-			 * @default false
+-			 */
+-			disabled?: boolean;
+-			/**
+-			 * Whether or not the option should be hidden.
+-			 *
+-			 * @default false
+-			 */
+-			hidden?: boolean;
+-		}[];
++		} & Omit<
++			React.OptionHTMLAttributes< HTMLOptionElement >,
++			'label' | 'value'
++		> )[];
+ 		/**
+ 		 * As an alternative to the `options` prop, `optgroup`s and `options` can be
+ 		 * passed in as `children` for more customizability.
+@@ -70,6 +63,11 @@ export type SelectControlSingleSelectionProps = SelectControlBaseProps & {
+ 	 * @default false
+ 	 */
+ 	multiple?: false;
++	/**
++	 * The value of the selected option.
++	 *
++	 * If `multiple` is true, the `value` should be an array with the values of the selected options.
++	 */
+ 	value?: string;
+ 	/**
+ 	 * A function that receives the value of the new option that is being selected as input.
+@@ -92,6 +90,11 @@ export type SelectControlMultipleSelectionProps = SelectControlBaseProps & {
+ 	 * @default false
+ 	 */
+ 	multiple: true;
++	/**
++	 * The value of the selected option.
++	 *
++	 * If `multiple` is true, the `value` should be an array with the values of the selected options.
++	 */
+ 	value?: string[];
+ 	/**
+ 	 * A function that receives the value of the new option that is being selected as input.

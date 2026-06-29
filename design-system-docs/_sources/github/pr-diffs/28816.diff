@@ -1,0 +1,27 @@
+diff --git a/packages/components/src/range-control/styles/range-control-styles.js b/packages/components/src/range-control/styles/range-control-styles.js
+index 2b4d0f94633670..18b96e6d469b61 100644
+--- a/packages/components/src/range-control/styles/range-control-styles.js
++++ b/packages/components/src/range-control/styles/range-control-styles.js
+@@ -271,18 +271,20 @@ export const Tooltip = styled.span`
+ 	) }
+ `;
+ 
++// @todo: Refactor RangeControl with latest HStack configuration
++// @wordpress/components/ui/hstack
+ export const InputNumber = styled( NumberControl )`
+ 	box-sizing: border-box;
+ 	display: inline-block;
+ 	font-size: 13px;
+ 	margin-top: 0;
+-	width: ${ space( 8 ) };
++	width: ${ space( 8 ) } !important;
+ 
+ 	input[type='number']& {
+ 		${ rangeHeight };
+ 	}
+ 
+-	${ rtl( { marginLeft: space( 2 ) } ) }
++	${ rtl( { marginLeft: `${ space( 2 ) } !important` } ) }
+ `;
+ 
+ export const ActionRightWrapper = styled.span`

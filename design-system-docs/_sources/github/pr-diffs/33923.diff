@@ -1,0 +1,48 @@
+diff --git a/packages/components/src/box-control/styles/box-control-styles.js b/packages/components/src/box-control/styles/box-control-styles.js
+index ffec57a3ba82c7..309046d0e3a391 100644
+--- a/packages/components/src/box-control/styles/box-control-styles.js
++++ b/packages/components/src/box-control/styles/box-control-styles.js
+@@ -46,10 +46,10 @@ export const Layout = styled( Flex )`
+ 
+ const unitControlBorderRadiusStyles = ( { isFirst, isLast, isOnly } ) => {
+ 	if ( isFirst ) {
+-		return rtl( { borderTopRightRadius: 0, borderBottomRightRadius: 0 } )();
++		return rtl( { borderTopRightRadius: 0, borderBottomRightRadius: 0 } );
+ 	}
+ 	if ( isLast ) {
+-		return rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )();
++		return rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } );
+ 	}
+ 	if ( isOnly ) {
+ 		return css( { borderRadius: 2 } );
+@@ -63,7 +63,7 @@ const unitControlBorderRadiusStyles = ( { isFirst, isLast, isOnly } ) => {
+ const unitControlMarginStyles = ( { isFirst, isOnly } ) => {
+ 	const marginLeft = isFirst || isOnly ? 0 : -1;
+ 
+-	return rtl( { marginLeft } )();
++	return rtl( { marginLeft } );
+ };
+ 
+ export const UnitControl = styled( BaseUnitControl )`
+diff --git a/packages/components/src/select-control/styles/select-control-styles.js b/packages/components/src/select-control/styles/select-control-styles.js
+index ddcb7cbab42b69..3127893fddc20d 100644
+--- a/packages/components/src/select-control/styles/select-control-styles.js
++++ b/packages/components/src/select-control/styles/select-control-styles.js
+@@ -75,7 +75,7 @@ export const Select = styled.select`
+ 		${ fontSizeStyles };
+ 		${ sizeStyles };
+ 
+-		${ rtl( { paddingLeft: 8, paddingRight: 24 } )() }
++		${ rtl( { paddingLeft: 8, paddingRight: 24 } ) }
+ 	}
+ `;
+ 
+@@ -89,7 +89,7 @@ export const DownArrowWrapper = styled.div`
+ 	position: absolute;
+ 	top: 0;
+ 
+-	${ rtl( { right: 0 } )() }
++	${ rtl( { right: 0 } ) }
+ 
+ 	svg {
+ 		display: block;

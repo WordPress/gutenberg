@@ -1,0 +1,49 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f4e84bd26ca55f..747c432be50261 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -27,6 +27,7 @@
+ -   `PaletteEdit`: Fix palette item accessibility in details view ([#58214](https://github.com/WordPress/gutenberg/pull/58214)).
+ -   `Snackbar`: Fix the auto-dismissal timers ([#58604](https://github.com/WordPress/gutenberg/pull/58604)).
+ -   `Tabs`: Fix infinite loop in `useEffect` ([#58861](https://github.com/WordPress/gutenberg/pull/58861)).
++-   `Popover`: Add `box-sizing` reset style ([#58871](https://github.com/WordPress/gutenberg/pull/58871)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index 2e8a766829f3a6..72d1d16eca2d12 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -6,6 +6,7 @@ $shadow-popover-border-top-only: 0 #{-$border-width} 0 0 $gray-400;
+ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
+ 
+ .components-popover {
++	@include reset;
+ 	z-index: z-index(".components-popover");
+ 	will-change: transform;
+ 
+diff --git a/packages/customize-widgets/src/style.scss b/packages/customize-widgets/src/style.scss
+index 3bf341c34c0eb1..c3679470e5c98f 100644
+--- a/packages/customize-widgets/src/style.scss
++++ b/packages/customize-widgets/src/style.scss
+@@ -13,7 +13,6 @@
+ 
+ // Include reset CSS for the customizer.
+ .customize-control-sidebar_block_editor,
+-.customize-widgets-layout__inspector,
+-.customize-widgets-popover {
++.customize-widgets-layout__inspector {
+ 	@include reset;
+ }
+diff --git a/packages/edit-post/src/style.scss b/packages/edit-post/src/style.scss
+index adb5e08da5e840..83903e7773e5fc 100644
+--- a/packages/edit-post/src/style.scss
++++ b/packages/edit-post/src/style.scss
+@@ -47,7 +47,6 @@ body.js.block-editor-page {
+ .edit-post-text-editor,
+ .edit-post-sidebar,
+ .editor-post-publish-panel,
+-.components-popover,
+ .components-modal__frame {
+ 	@include reset;
+ }

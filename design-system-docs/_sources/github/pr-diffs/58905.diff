@@ -1,0 +1,80 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 39015157a5025d..14d1109562e563 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fix
++
++-   `Modal`: Add `box-sizing` reset style ([#58905](https://github.com/WordPress/gutenberg/pull/58905)).
++
+ ### Experimental
+ 
+ -   `CustomSelectControlV2`: Adapt component for legacy usage ([#57902](https://github.com/WordPress/gutenberg/pull/57902)).
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index 352f8dc8ba1091..e563b29070bef2 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -15,6 +15,7 @@
+ 
+ // The modal window element.
+ .components-modal__frame {
++	@include reset;
+ 	// Use the entire viewport on smaller screens.
+ 	margin: $grid-unit-50 0 0 0;
+ 	width: 100%;
+diff --git a/packages/edit-post/src/style.scss b/packages/edit-post/src/style.scss
+index 83903e7773e5fc..3e774b3d0ec2ed 100644
+--- a/packages/edit-post/src/style.scss
++++ b/packages/edit-post/src/style.scss
+@@ -46,8 +46,7 @@ body.js.block-editor-page {
+ .edit-post-header,
+ .edit-post-text-editor,
+ .edit-post-sidebar,
+-.editor-post-publish-panel,
+-.components-modal__frame {
++.editor-post-publish-panel {
+ 	@include reset;
+ }
+ 
+diff --git a/packages/edit-site/src/style.scss b/packages/edit-site/src/style.scss
+index e6cb953b0b1861..c86efc10eafb3c 100644
+--- a/packages/edit-site/src/style.scss
++++ b/packages/edit-site/src/style.scss
+@@ -67,13 +67,8 @@ body.js.site-editor-php {
+ 	background: $gray-900;
+ }
+ 
+-.edit-site,
+-// The modals are shown outside the .edit-site wrapper, they need these styles.
+-.components-modal__frame {
+-	@include reset;
+-}
+-
+ .edit-site {
++	@include reset;
+ 	height: 100vh;
+ 
+ 	// On mobile the main content area has to scroll, otherwise you can invoke
+diff --git a/packages/edit-widgets/src/style.scss b/packages/edit-widgets/src/style.scss
+index 72e68e06cfa7e8..ef92cd914a4fca 100644
+--- a/packages/edit-widgets/src/style.scss
++++ b/packages/edit-widgets/src/style.scss
+@@ -16,14 +16,8 @@ body.js.widgets-php {
+ 	@include wp-admin-reset( ".blocks-widgets-container" );
+ }
+ 
+-.blocks-widgets-container,
+-// The modals are shown outside the .blocks-widgets-container wrapper, they need these styles
+-.components-modal__frame {
+-	@include reset;
+-
+-}
+-
+ .blocks-widgets-container {
++	@include reset;
+ 	// On mobile the main content area has to scroll, otherwise you can invoke
+ 	// the overscroll bounce on the non-scrolling container, for a bad experience.
+ 	@include break-small {

@@ -1,0 +1,122 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index b107535fbd457f..57659cb0427e9a 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   `Scrollable`: Convert to TypeScript ([#42016](https://github.com/WordPress/gutenberg/pull/42016)).
+ -   `Spacer`: Complete TypeScript migration ([#42013](https://github.com/WordPress/gutenberg/pull/42013)).
+ -   `TreeSelect`: Refactor away from `_.repeat()` ([#42070](https://github.com/WordPress/gutenberg/pull/42070/)).
++-   `FocalPointPicker` updated to satisfy `react/exhuastive-deps` eslint rule ([#41520](https://github.com/WordPress/gutenberg/pull/41520)).
+ 
+ ## 19.14.0 (2022-06-29)
+ 
+diff --git a/packages/components/src/focal-point-picker/index.native.js b/packages/components/src/focal-point-picker/index.native.js
+index cfb01eebf1404b..127f66ac65ab72 100644
+--- a/packages/components/src/focal-point-picker/index.native.js
++++ b/packages/components/src/focal-point-picker/index.native.js
+@@ -40,8 +40,8 @@ function FocalPointPicker( props ) {
+ 	const [ videoNaturalSize, setVideoNaturalSize ] = useState( null );
+ 	const [ tooltipVisible, setTooltipVisible ] = useState( false );
+ 
+-	let locationPageOffsetX = useRef().current;
+-	let locationPageOffsetY = useRef().current;
++	const locationPageOffsetX = useRef();
++	const locationPageOffsetY = useRef();
+ 	const videoRef = useRef( null );
+ 
+ 	useEffect( () => {
+@@ -67,7 +67,7 @@ function FocalPointPicker( props ) {
+ 				y: focalPoint.y * containerSize.height,
+ 			} );
+ 		}
+-	}, [ focalPoint, containerSize ] );
++	}, [ focalPoint, containerSize, pan ] );
+ 
+ 	// Pan responder to manage drag handle interactivity.
+ 	const panResponder = useMemo(
+@@ -86,8 +86,8 @@ function FocalPointPicker( props ) {
+ 						pageX,
+ 						pageY,
+ 					} = event.nativeEvent;
+-					locationPageOffsetX = pageX - x;
+-					locationPageOffsetY = pageY - y;
++					locationPageOffsetX.current = pageX - x;
++					locationPageOffsetY.current = pageY - y;
+ 					pan.setValue( { x, y } ); // Set cursor to tap location.
+ 					pan.extractOffset(); // Set offset to current value.
+ 				},
+@@ -106,8 +106,8 @@ function FocalPointPicker( props ) {
+ 					// Specifically, dragging the handle outside the bounds of the image
+ 					// results in inaccurate locationX and locationY coordinates to be
+ 					// reported. https://github.com/facebook/react-native/issues/15290#issuecomment-435494944
+-					const x = pageX - locationPageOffsetX;
+-					const y = pageY - locationPageOffsetY;
++					const x = pageX - locationPageOffsetX.current;
++					const y = pageY - locationPageOffsetY.current;
+ 					onChange( {
+ 						x: clamp( x / containerSize?.width, 0, 1 ).toFixed( 2 ),
+ 						y: clamp( y / containerSize?.height, 0, 1 ).toFixed(
+@@ -120,7 +120,7 @@ function FocalPointPicker( props ) {
+ 					setSliderKey( ( prevState ) => prevState + 1 );
+ 				},
+ 			} ),
+-		[ containerSize ]
++		[ containerSize, pan, onChange, shouldEnableBottomSheetScroll ]
+ 	);
+ 
+ 	const mediaBackground = usePreferredColorSchemeStyle(
+diff --git a/packages/components/src/focal-point-picker/tooltip/index.native.js b/packages/components/src/focal-point-picker/tooltip/index.native.js
+index d2d9aa194b6eb7..626fb130c43dce 100644
+--- a/packages/components/src/focal-point-picker/tooltip/index.native.js
++++ b/packages/components/src/focal-point-picker/tooltip/index.native.js
+@@ -66,18 +66,17 @@ function Label( { align, text, xOffset, yOffset } ) {
+ 	}
+ 
+ 	useEffect( () => {
++		const startAnimation = () => {
++			Animated.timing( animationValue, {
++				toValue: visible ? 1 : 0,
++				duration: visible ? 300 : 150,
++				useNativeDriver: true,
++				delay: visible ? 500 : 0,
++				easing: Easing.out( Easing.quad ),
++			} ).start();
++		};
+ 		startAnimation();
+-	}, [ visible ] );
+-
+-	const startAnimation = () => {
+-		Animated.timing( animationValue, {
+-			toValue: visible ? 1 : 0,
+-			duration: visible ? 300 : 150,
+-			useNativeDriver: true,
+-			delay: visible ? 500 : 0,
+-			easing: Easing.out( Easing.quad ),
+-		} ).start();
+-	};
++	}, [ animationValue, visible ] );
+ 
+ 	// Transforms rely upon onLayout to enable custom offsets additions.
+ 	let tooltipTransforms;
+diff --git a/packages/components/src/mobile/focal-point-settings-panel/index.native.js b/packages/components/src/mobile/focal-point-settings-panel/index.native.js
+index 879f6c2c4e7d6b..c9b87a4793cdb4 100644
+--- a/packages/components/src/mobile/focal-point-settings-panel/index.native.js
++++ b/packages/components/src/mobile/focal-point-settings-panel/index.native.js
+@@ -8,7 +8,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
+  * WordPress dependencies
+  */
+ import { __ } from '@wordpress/i18n';
+-import { memo, useContext, useState } from '@wordpress/element';
++import { memo, useContext, useState, useCallback } from '@wordpress/element';
+ import { BottomSheetContext, FocalPointPicker } from '@wordpress/components';
+ 
+ /**
+@@ -56,7 +56,7 @@ const FocalPointSettingsPanelMemo = memo(
+ 				</NavBar>
+ 				<FocalPointPicker
+ 					focalPoint={ draftFocalPoint }
+-					onChange={ setPosition }
++					onChange={ useCallback( setPosition, [] ) }
+ 					shouldEnableBottomSheetScroll={
+ 						shouldEnableBottomSheetScroll
+ 					}

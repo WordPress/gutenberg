@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 4ddda08be97ebb..34d1a328671a89 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -27,6 +27,7 @@
+ 
+ -   Remove CSS hack for Internet Explorer 11 ([#60727](https://github.com/WordPress/gutenberg/pull/60727)).
+ -   `CheckboxControl`: Streamline size styles ([#60475](https://github.com/WordPress/gutenberg/pull/60475)).
++-   Deprecate `reduceMotion` util ([#60839](https://github.com/WordPress/gutenberg/pull/60839)).
+ -   `InputBase`: Simplify management of focus styles. Affects all components based on `InputControl` (e.g. `SearchControl`, `NumberControl`, `UnitControl`), as well as `SelectControl`, `CustomSelectControl`, and `TreeSelect` ([#60226](https://github.com/WordPress/gutenberg/pull/60226)).
+ 
+ ## 27.3.0 (2024-04-03)
+diff --git a/packages/components/src/utils/reduce-motion.js b/packages/components/src/utils/reduce-motion.js
+index 761656f5881da0..68089e019e50eb 100644
+--- a/packages/components/src/utils/reduce-motion.js
++++ b/packages/components/src/utils/reduce-motion.js
+@@ -3,6 +3,10 @@
+  *
+  * @param {'transition' | 'animation' | string} [prop='transition'] CSS Property name
+  * @return {string} Generated CSS code for the reduced style
++ *
++ * @deprecated Write your own media query instead,
++ * e.g. `@media not ( prefers-reduced-motion ) { ...some animation... }` or
++ * `@media ( prefers-reduced-motion ) { ...reduced animation... }`.
+  */
+ export function reduceMotion( prop = 'transition' ) {
+ 	let style;

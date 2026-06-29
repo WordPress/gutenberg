@@ -1,0 +1,289 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1b25ebd6ccac0b..e1168279bd4717 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -31,6 +31,7 @@
+ -   `RadioControl`: Clean up styles to use less custom CSS ([#43868](https://github.com/WordPress/gutenberg/pull/43868)).
+ -   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
+ -   `SearchControl`: Convert to TypeScript ([#43871](https://github.com/WordPress/gutenberg/pull/43871)).
++-   `DropZone`: Convert to TypeScript ([#43962](https://github.com/WordPress/gutenberg/pull/43962)).
+ -   `ToggleGroupControl`: Rename `__experimentalIsIconGroup` prop to `__experimentalIsBorderless` ([#43771](https://github.com/WordPress/gutenberg/pull/43771/)).
+ -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
+ -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
+diff --git a/packages/components/src/drop-zone/README.md b/packages/components/src/drop-zone/README.md
+index d267e547b4086e..b06d278c5d1e5d 100644
+--- a/packages/components/src/drop-zone/README.md
++++ b/packages/components/src/drop-zone/README.md
+@@ -1,6 +1,6 @@
+ # DropZone
+ 
+-`DropZone` is a Component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event.
++`DropZone` is a component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event.
+ 
+ ## Usage
+ 
+@@ -30,7 +30,7 @@ The component accepts the following props:
+ 
+ ### className
+ 
+-A CSS `class` to be _appended_ after the default `components-drop-zone` class.
++A CSS `class` to give to the wrapper element.
+ 
+ -   Type: `String`
+ -   Default: `undefined`
+@@ -52,7 +52,7 @@ The function is called when dropping a file into the `DropZone`. It receives an
+ 
+ ### onHTMLDrop
+ 
+-The function is called when dropping a file into the `DropZone`. It receives the HTML being dropped as an argument.
++The function is called when dropping HTML into the `DropZone`. It receives the HTML being dropped as an argument.
+ 
+ -   Type: `Function`
+ -   Required: No
+diff --git a/packages/components/src/drop-zone/index.js b/packages/components/src/drop-zone/index.tsx
+similarity index 65%
+rename from packages/components/src/drop-zone/index.js
+rename to packages/components/src/drop-zone/index.tsx
+index 53faa01bb1adea..f7f5f78d6901cf 100644
+--- a/packages/components/src/drop-zone/index.js
++++ b/packages/components/src/drop-zone/index.tsx
+@@ -22,21 +22,51 @@ import {
+ 	__unstableMotion as motion,
+ 	__unstableAnimatePresence as AnimatePresence,
+ } from '../animation';
++import type { DropType, DropZoneProps } from './types';
++import type { WordPressComponentProps } from '../ui/context';
+ 
+-export default function DropZoneComponent( {
++/**
++ * `DropZone` is a component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event.
++ *
++ * ```jsx
++ * import { DropZone } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyDropZone = () => {
++ *   const [ hasDropped, setHasDropped ] = useState( false );
++ *
++ *   return (
++ *     <div>
++ *       { hasDropped ? 'Dropped!' : 'Drop something here' }
++ *       <DropZone
++ *         onFilesDrop={ () => setHasDropped( true ) }
++ *         onHTMLDrop={ () => setHasDropped( true ) }
++ *         onDrop={ () => setHasDropped( true ) }
++ *       />
++ *     </div>
++ *   );
++ * }
++ * ```
++ */
++export function DropZoneComponent( {
+ 	className,
+ 	label,
+ 	onFilesDrop,
+ 	onHTMLDrop,
+ 	onDrop,
+-} ) {
+-	const [ isDraggingOverDocument, setIsDraggingOverDocument ] = useState();
+-	const [ isDraggingOverElement, setIsDraggingOverElement ] = useState();
+-	const [ type, setType ] = useState();
++	...restProps
++}: WordPressComponentProps< DropZoneProps, 'div', false > ) {
++	const [ isDraggingOverDocument, setIsDraggingOverDocument ] =
++		useState< boolean >();
++	const [ isDraggingOverElement, setIsDraggingOverElement ] =
++		useState< boolean >();
++	const [ type, setType ] = useState< DropType >();
+ 	const ref = useDropZone( {
+ 		onDrop( event ) {
+-			const files = getFilesFromDataTransfer( event.dataTransfer );
+-			const html = event.dataTransfer.getData( 'text/html' );
++			const files = event.dataTransfer
++				? getFilesFromDataTransfer( event.dataTransfer )
++				: [];
++			const html = event.dataTransfer?.getData( 'text/html' );
+ 
+ 			/**
+ 			 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
+@@ -53,19 +83,22 @@ export default function DropZoneComponent( {
+ 		onDragStart( event ) {
+ 			setIsDraggingOverDocument( true );
+ 
+-			let _type = 'default';
++			let _type: DropType = 'default';
+ 
+ 			/**
+ 			 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
+ 			 * The order of the checks is important to recognise the HTML drop.
+ 			 */
+-			if ( event.dataTransfer.types.includes( 'text/html' ) ) {
++			if ( event.dataTransfer?.types.includes( 'text/html' ) ) {
+ 				_type = 'html';
+ 			} else if (
+ 				// Check for the types because sometimes the files themselves
+ 				// are only available on drop.
+-				event.dataTransfer.types.includes( 'Files' ) ||
+-				getFilesFromDataTransfer( event.dataTransfer ).length > 0
++				event.dataTransfer?.types.includes( 'Files' ) ||
++				( event.dataTransfer
++					? getFilesFromDataTransfer( event.dataTransfer )
++					: []
++				).length > 0
+ 			) {
+ 				_type = 'file';
+ 			}
+@@ -74,7 +107,7 @@ export default function DropZoneComponent( {
+ 		},
+ 		onDragEnd() {
+ 			setIsDraggingOverDocument( false );
+-			setType();
++			setType( undefined );
+ 		},
+ 		onDragEnter() {
+ 			setIsDraggingOverElement( true );
+@@ -149,7 +182,7 @@ export default function DropZoneComponent( {
+ 	} );
+ 
+ 	return (
+-		<div ref={ ref } className={ classes }>
++		<div { ...restProps } ref={ ref } className={ classes }>
+ 			{ disableMotion ? (
+ 				children
+ 			) : (
+@@ -158,3 +191,5 @@ export default function DropZoneComponent( {
+ 		</div>
+ 	);
+ }
++
++export default DropZoneComponent;
+diff --git a/packages/components/src/drop-zone/provider.js b/packages/components/src/drop-zone/provider.ts
+similarity index 76%
+rename from packages/components/src/drop-zone/provider.js
+rename to packages/components/src/drop-zone/provider.ts
+index e9924489315f76..97109d845434b6 100644
+--- a/packages/components/src/drop-zone/provider.js
++++ b/packages/components/src/drop-zone/provider.ts
+@@ -3,7 +3,11 @@
+  */
+ import deprecated from '@wordpress/deprecated';
+ 
+-export default function DropZoneProvider( { children } ) {
++export default function DropZoneProvider( {
++	children,
++}: {
++	children: React.ReactNode;
++} ) {
+ 	deprecated( 'wp.components.DropZoneProvider', {
+ 		since: '5.8',
+ 		hint: 'wp.component.DropZone no longer needs a provider. wp.components.DropZoneProvider is safe to remove from your code.',
+diff --git a/packages/components/src/drop-zone/stories/index.tsx b/packages/components/src/drop-zone/stories/index.tsx
+new file mode 100644
+index 00000000000000..de94c98e4be031
+--- /dev/null
++++ b/packages/components/src/drop-zone/stories/index.tsx
+@@ -0,0 +1,30 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++/**
++ * Internal dependencies
++ */
++import DropZone from '..';
++
++const meta: ComponentMeta< typeof DropZone > = {
++	component: DropZone,
++	title: 'Components/DropZone',
++	parameters: {
++		actions: { argTypesRegex: '^on.*' },
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof DropZone > = ( props ) => {
++	return (
++		<div style={ { background: 'lightgray', padding: 16 } }>
++			Drop something here
++			<DropZone { ...props } />
++		</div>
++	);
++};
++
++export const Default = Template.bind( {} );
+diff --git a/packages/components/src/drop-zone/types.ts b/packages/components/src/drop-zone/types.ts
+new file mode 100644
+index 00000000000000..3982889a4f3eac
+--- /dev/null
++++ b/packages/components/src/drop-zone/types.ts
+@@ -0,0 +1,29 @@
++export type DropType = 'file' | 'html' | 'default';
++
++export type DropZoneProps = {
++	/**
++	 * A CSS `class` to give to the wrapper element.
++	 */
++	className?: string;
++	/**
++	 * A string to be shown within the drop zone area.
++	 *
++	 * @default `__( 'Drop files to upload' )`
++	 */
++	label?: string;
++	/**
++	 * The function is generic drop handler called if the `onFilesDrop` or `onHTMLDrop` are not called.
++	 * It receives the drop `event` object as an argument.
++	 */
++	onDrop?: ( event: DragEvent ) => void;
++	/**
++	 * The function is called when dropping a file into the `DropZone`.
++	 * It receives an array of dropped files as an argument.
++	 */
++	onFilesDrop?: ( files: File[] ) => void;
++	/**
++	 * The function is called when dropping HTML into the `DropZone`.
++	 * It receives the HTML being dropped as an argument.
++	 */
++	onHTMLDrop?: ( html: string ) => void;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index a896453cb3a56f..451f607ea0b8e9 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -48,7 +48,6 @@
+ 		"src/custom-gradient-picker",
+ 		"src/custom-select-control",
+ 		"src/dimension-control",
+-		"src/drop-zone",
+ 		"src/duotone-picker",
+ 		"src/focal-point-picker",
+ 		"src/font-size-picker",
+diff --git a/packages/compose/src/hooks/use-drop-zone/index.js b/packages/compose/src/hooks/use-drop-zone/index.js
+index 73f1e9eb03b35c..1d30c92a16ff3c 100644
+--- a/packages/compose/src/hooks/use-drop-zone/index.js
++++ b/packages/compose/src/hooks/use-drop-zone/index.js
+@@ -33,14 +33,14 @@ function useFreshRef( value ) {
+ /**
+  * A hook to facilitate drag and drop handling.
+  *
+- * @param {Object}                  props             Named parameters.
+- * @param {boolean}                 props.isDisabled  Whether or not to disable the drop zone.
+- * @param {(e: DragEvent) => void}  props.onDragStart Called when dragging has started.
+- * @param {(e: DragEvent) => void}  props.onDragEnter Called when the zone is entered.
+- * @param {(e: DragEvent) => void}  props.onDragOver  Called when the zone is moved within.
+- * @param {(e: DragEvent) => void}  props.onDragLeave Called when the zone is left.
+- * @param {(e: MouseEvent) => void} props.onDragEnd   Called when dragging has ended.
+- * @param {(e: DragEvent) => void}  props.onDrop      Called when dropping in the zone.
++ * @param {Object}                  props               Named parameters.
++ * @param {boolean}                 [props.isDisabled]  Whether or not to disable the drop zone.
++ * @param {(e: DragEvent) => void}  [props.onDragStart] Called when dragging has started.
++ * @param {(e: DragEvent) => void}  [props.onDragEnter] Called when the zone is entered.
++ * @param {(e: DragEvent) => void}  [props.onDragOver]  Called when the zone is moved within.
++ * @param {(e: DragEvent) => void}  [props.onDragLeave] Called when the zone is left.
++ * @param {(e: MouseEvent) => void} [props.onDragEnd]   Called when dragging has ended.
++ * @param {(e: DragEvent) => void}  [props.onDrop]      Called when dropping in the zone.
+  *
+  * @return {import('react').RefCallback<HTMLElement>} Ref callback to be passed to the drop zone element.
+  */

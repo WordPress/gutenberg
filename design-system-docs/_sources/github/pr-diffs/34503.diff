@@ -1,0 +1,61 @@
+diff --git a/packages/components/src/guide/index.js b/packages/components/src/guide/index.js
+index dc0a4f22613e51..bc29f5ad274f4e 100644
+--- a/packages/components/src/guide/index.js
++++ b/packages/components/src/guide/index.js
+@@ -9,12 +9,12 @@ import classnames from 'classnames';
+ import { useState, useEffect, Children } from '@wordpress/element';
+ import deprecated from '@wordpress/deprecated';
+ import { __ } from '@wordpress/i18n';
++import { LEFT, RIGHT } from '@wordpress/keycodes';
+ 
+ /**
+  * Internal dependencies
+  */
+ import Modal from '../modal';
+-import KeyboardShortcuts from '../keyboard-shortcuts';
+ import Button from '../button';
+ import PageControl from './page-control';
+ import FinishButton from './finish-button';
+@@ -66,15 +66,14 @@ export default function Guide( {
+ 			className={ classnames( 'components-guide', className ) }
+ 			contentLabel={ contentLabel }
+ 			onRequestClose={ onFinish }
++			onKeyDown={ ( event ) => {
++				if ( event.keyCode === LEFT ) {
++					goBack();
++				} else if ( event.keyCode === RIGHT ) {
++					goForward();
++				}
++			} }
+ 		>
+-			<KeyboardShortcuts
+-				key={ currentPage }
+-				shortcuts={ {
+-					left: goBack,
+-					right: goForward,
+-				} }
+-			/>
+-
+ 			<div className="components-guide__container">
+ 				<div className="components-guide__page">
+ 					{ pages[ currentPage ].image }
+diff --git a/packages/components/src/modal/index.js b/packages/components/src/modal/index.js
+index 0d4ec5de58f048..fe57b88409c94b 100644
+--- a/packages/components/src/modal/index.js
++++ b/packages/components/src/modal/index.js
+@@ -51,6 +51,7 @@ export default function Modal( {
+ 	overlayClassName,
+ 	className,
+ 	contentLabel,
++	onKeyDown,
+ } ) {
+ 	const ref = useRef();
+ 	const instanceId = useInstanceId( Modal );
+@@ -124,6 +125,7 @@ export default function Modal( {
+ 				aria-describedby={ aria.describedby }
+ 				tabIndex="-1"
+ 				{ ...( shouldCloseOnClickOutside ? focusOutsideProps : {} ) }
++				onKeyDown={ onKeyDown }
+ 			>
+ 				<div className={ 'components-modal__content' } role="document">
+ 					<div className="components-modal__header">

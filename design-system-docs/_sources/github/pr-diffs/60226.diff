@@ -1,0 +1,772 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 9378ab8d342e30..4ddda08be97ebb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -27,6 +27,7 @@
+ 
+ -   Remove CSS hack for Internet Explorer 11 ([#60727](https://github.com/WordPress/gutenberg/pull/60727)).
+ -   `CheckboxControl`: Streamline size styles ([#60475](https://github.com/WordPress/gutenberg/pull/60475)).
++-   `InputBase`: Simplify management of focus styles. Affects all components based on `InputControl` (e.g. `SearchControl`, `NumberControl`, `UnitControl`), as well as `SelectControl`, `CustomSelectControl`, and `TreeSelect` ([#60226](https://github.com/WordPress/gutenberg/pull/60226)).
+ 
+ ## 27.3.0 (2024-04-03)
+ 
+diff --git a/packages/components/src/custom-select-control/index.js b/packages/components/src/custom-select-control/index.js
+index 5805e18b98dd41..ec43ec5d8aeeb5 100644
+--- a/packages/components/src/custom-select-control/index.js
++++ b/packages/components/src/custom-select-control/index.js
+@@ -10,7 +10,7 @@ import classnames from 'classnames';
+  */
+ import { Icon, check } from '@wordpress/icons';
+ import { __, sprintf } from '@wordpress/i18n';
+-import { useCallback, useState } from '@wordpress/element';
++import { useCallback } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -101,18 +101,6 @@ export default function CustomSelectControl( props ) {
+ 		stateReducer,
+ 	} );
+ 
+-	const [ isFocused, setIsFocused ] = useState( false );
+-
+-	function handleOnFocus( e ) {
+-		setIsFocused( true );
+-		onFocus?.( e );
+-	}
+-
+-	function handleOnBlur( e ) {
+-		setIsFocused( false );
+-		onBlur?.( e );
+-	}
+-
+ 	function getDescribedBy() {
+ 		if ( describedBy ) {
+ 			return describedBy;
+@@ -168,7 +156,6 @@ export default function CustomSelectControl( props ) {
+ 			) }
+ 			<InputBase
+ 				__next40pxDefaultSize={ __next40pxDefaultSize }
+-				isFocused={ isOpen || isFocused }
+ 				size={ size }
+ 				suffix={ <SelectControlChevronDown /> }
+ 			>
+@@ -176,8 +163,8 @@ export default function CustomSelectControl( props ) {
+ 					onMouseOver={ onMouseOver }
+ 					onMouseOut={ onMouseOut }
+ 					as="button"
+-					onFocus={ handleOnFocus }
+-					onBlur={ handleOnBlur }
++					onFocus={ onFocus }
++					onBlur={ onBlur }
+ 					selectSize={ size }
+ 					__next40pxDefaultSize={ __next40pxDefaultSize }
+ 					{ ...getToggleButtonProps( {
+@@ -196,46 +183,49 @@ export default function CustomSelectControl( props ) {
+ 							</span>
+ 						) }
+ 				</SelectControlSelect>
++				<div className="components-custom-select-control__menu-wrapper">
++					{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
++					<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
++						{ isOpen &&
++							items.map( ( item, index ) => (
++								// eslint-disable-next-line react/jsx-key
++								<li
++									{ ...getItemProps( {
++										item,
++										index,
++										key: item.key,
++										className: classnames(
++											item.className,
++											'components-custom-select-control__item',
++											{
++												'is-highlighted':
++													index === highlightedIndex,
++												'has-hint':
++													!! item.__experimentalHint,
++												'is-next-40px-default-size':
++													__next40pxDefaultSize,
++											}
++										),
++										style: item.style,
++									} ) }
++								>
++									{ item.name }
++									{ item.__experimentalHint && (
++										<span className="components-custom-select-control__item-hint">
++											{ item.__experimentalHint }
++										</span>
++									) }
++									{ item === selectedItem && (
++										<Icon
++											icon={ check }
++											className="components-custom-select-control__item-icon"
++										/>
++									) }
++								</li>
++							) ) }
++					</ul>
++				</div>
+ 			</InputBase>
+-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+-			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
+-				{ isOpen &&
+-					items.map( ( item, index ) => (
+-						// eslint-disable-next-line react/jsx-key
+-						<li
+-							{ ...getItemProps( {
+-								item,
+-								index,
+-								key: item.key,
+-								className: classnames(
+-									item.className,
+-									'components-custom-select-control__item',
+-									{
+-										'is-highlighted':
+-											index === highlightedIndex,
+-										'has-hint': !! item.__experimentalHint,
+-										'is-next-40px-default-size':
+-											__next40pxDefaultSize,
+-									}
+-								),
+-								style: item.style,
+-							} ) }
+-						>
+-							{ item.name }
+-							{ item.__experimentalHint && (
+-								<span className="components-custom-select-control__item-hint">
+-									{ item.__experimentalHint }
+-								</span>
+-							) }
+-							{ item === selectedItem && (
+-								<Icon
+-									icon={ check }
+-									className="components-custom-select-control__item-icon"
+-								/>
+-							) }
+-						</li>
+-					) ) }
+-			</ul>
+ 		</div>
+ 	);
+ }
+diff --git a/packages/components/src/custom-select-control/style.scss b/packages/components/src/custom-select-control/style.scss
+index 06c912cd510f91..8fcfe8e5ce2f0c 100644
+--- a/packages/components/src/custom-select-control/style.scss
++++ b/packages/components/src/custom-select-control/style.scss
+@@ -14,6 +14,12 @@
+ 	margin-left: 10px;
+ }
+ 
++.components-custom-select-control__menu-wrapper {
++	position: absolute;
++	min-width: 100%;
++	bottom: 0;
++}
++
+ .components-custom-select-control__menu {
+ 	// Hide when collapsed.
+ 	&[aria-hidden="true"] {
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index b267fef6fb7147..ab4e87ef5a99f4 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -47,6 +47,17 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   min-height: 0;
+ }
+ 
++.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) {
++  z-index: 1;
++}
++
++.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) .emotion-25 {
++  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  outline: 2px solid transparent;
++  outline-offset: -2px;
++}
++
+ .emotion-8 {
+   display: block;
+   max-height: 100%;
+@@ -166,7 +177,10 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+ 
+ .emotion-24.emotion-24.emotion-24 {
+   box-sizing: border-box;
++  border-color: var(--wp-components-color-gray-600, #949494);
+   border-radius: inherit;
++  border-style: solid;
++  border-width: 1px;
+   bottom: 0;
+   left: 0;
+   margin: 0;
+@@ -175,9 +189,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+   position: absolute;
+   right: 0;
+   top: 0;
+-  border-color: var(--wp-components-color-gray-600, #949494);
+-  border-style: solid;
+-  border-width: 1px;
+   padding-left: 2px;
+ }
+ 
+@@ -319,6 +330,17 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   min-height: 0;
+ }
+ 
++.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) {
++  z-index: 1;
++}
++
++.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) .emotion-25 {
++  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  outline: 2px solid transparent;
++  outline-offset: -2px;
++}
++
+ .emotion-8 {
+   display: block;
+   max-height: 100%;
+@@ -438,7 +460,10 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+ 
+ .emotion-24.emotion-24.emotion-24 {
+   box-sizing: border-box;
++  border-color: var(--wp-components-color-gray-600, #949494);
+   border-radius: inherit;
++  border-style: solid;
++  border-width: 1px;
+   bottom: 0;
+   left: 0;
+   margin: 0;
+@@ -447,9 +472,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+   position: absolute;
+   right: 0;
+   top: 0;
+-  border-color: var(--wp-components-color-gray-600, #949494);
+-  border-style: solid;
+-  border-width: 1px;
+   padding-left: 2px;
+ }
+ 
+@@ -601,6 +623,17 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   min-height: 0;
+ }
+ 
++.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) {
++  z-index: 1;
++}
++
++.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) .emotion-25 {
++  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  outline: 2px solid transparent;
++  outline-offset: -2px;
++}
++
+ .emotion-8 {
+   display: block;
+   max-height: 100%;
+@@ -720,7 +753,10 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+ 
+ .emotion-24.emotion-24.emotion-24 {
+   box-sizing: border-box;
++  border-color: var(--wp-components-color-gray-600, #949494);
+   border-radius: inherit;
++  border-style: solid;
++  border-width: 1px;
+   bottom: 0;
+   left: 0;
+   margin: 0;
+@@ -729,9 +765,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+   position: absolute;
+   right: 0;
+   top: 0;
+-  border-color: var(--wp-components-color-gray-600, #949494);
+-  border-style: solid;
+-  border-width: 1px;
+   padding-left: 2px;
+ }
+ 
+@@ -895,6 +928,17 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   min-height: 0;
+ }
+ 
++.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) {
++  z-index: 1;
++}
++
++.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) .emotion-25 {
++  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
++  outline: 2px solid transparent;
++  outline-offset: -2px;
++}
++
+ .emotion-8 {
+   display: block;
+   max-height: 100%;
+@@ -1014,7 +1058,10 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+ 
+ .emotion-24.emotion-24.emotion-24 {
+   box-sizing: border-box;
++  border-color: var(--wp-components-color-gray-600, #949494);
+   border-radius: inherit;
++  border-style: solid;
++  border-width: 1px;
+   bottom: 0;
+   left: 0;
+   margin: 0;
+@@ -1023,9 +1070,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+   position: absolute;
+   right: 0;
+   top: 0;
+-  border-color: var(--wp-components-color-gray-600, #949494);
+-  border-style: solid;
+-  border-width: 1px;
+   padding-left: 2px;
+ }
+ 
+diff --git a/packages/components/src/input-control/backdrop.tsx b/packages/components/src/input-control/backdrop.tsx
+index 9ef9138f196528..4fe0bb9097c62e 100644
+--- a/packages/components/src/input-control/backdrop.tsx
++++ b/packages/components/src/input-control/backdrop.tsx
+@@ -7,18 +7,13 @@ import { memo } from '@wordpress/element';
+  */
+ import { BackdropUI } from './styles/input-control-styles';
+ 
+-function Backdrop( {
+-	disabled = false,
+-	isBorderless = false,
+-	isFocused = false,
+-} ) {
++function Backdrop( { disabled = false, isBorderless = false } ) {
+ 	return (
+ 		<BackdropUI
+ 			aria-hidden="true"
+ 			className="components-input-control__backdrop"
+ 			disabled={ disabled }
+ 			isBorderless={ isBorderless }
+-			isFocused={ isFocused }
+ 		/>
+ 	);
+ }
+diff --git a/packages/components/src/input-control/index.tsx b/packages/components/src/input-control/index.tsx
+index be05b6d0d49b8b..1cf9000a467dd7 100644
+--- a/packages/components/src/input-control/index.tsx
++++ b/packages/components/src/input-control/index.tsx
+@@ -8,7 +8,7 @@ import type { ForwardedRef } from 'react';
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { useState, forwardRef } from '@wordpress/element';
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -57,8 +57,6 @@ export function UnforwardedInputControl(
+ 		...restProps
+ 	} = useDeprecated36pxDefaultSizeProp< InputControlProps >( props );
+ 
+-	const [ isFocused, setIsFocused ] = useState( false );
+-
+ 	const id = useUniqueId( idProp );
+ 	const classes = classNames( 'components-input-control', className );
+ 
+@@ -87,7 +85,6 @@ export function UnforwardedInputControl(
+ 				gap={ 3 }
+ 				hideLabelFromVision={ hideLabelFromVision }
+ 				id={ id }
+-				isFocused={ isFocused }
+ 				justify="left"
+ 				label={ label }
+ 				labelPosition={ labelPosition }
+@@ -103,14 +100,12 @@ export function UnforwardedInputControl(
+ 					className="components-input-control__input"
+ 					disabled={ disabled }
+ 					id={ id }
+-					isFocused={ isFocused }
+ 					isPressEnterToChange={ isPressEnterToChange }
+ 					onKeyDown={ onKeyDown }
+ 					onValidate={ onValidate }
+ 					paddingInlineStart={ prefix ? space( 2 ) : undefined }
+ 					paddingInlineEnd={ suffix ? space( 2 ) : undefined }
+ 					ref={ ref }
+-					setIsFocused={ setIsFocused }
+ 					size={ size }
+ 					stateReducer={ stateReducer }
+ 					{ ...draftHookProps }
+diff --git a/packages/components/src/input-control/input-base.tsx b/packages/components/src/input-control/input-base.tsx
+index 75d3154a940017..9e34139f3e54b5 100644
+--- a/packages/components/src/input-control/input-base.tsx
++++ b/packages/components/src/input-control/input-base.tsx
+@@ -78,7 +78,6 @@ export function InputBase(
+ 		labelPosition,
+ 		id: idProp,
+ 		isBorderless = false,
+-		isFocused = false,
+ 		label,
+ 		prefix,
+ 		size = 'default',
+@@ -109,8 +108,6 @@ export function InputBase(
+ 			{ ...getUIFlexProps( labelPosition ) }
+ 			className={ className }
+ 			gap={ 2 }
+-			isFocused={ isFocused }
+-			labelPosition={ labelPosition }
+ 			ref={ ref }
+ 		>
+ 			<Label
+@@ -141,11 +138,7 @@ export function InputBase(
+ 						</Suffix>
+ 					) }
+ 				</ContextSystemProvider>
+-				<Backdrop
+-					disabled={ disabled }
+-					isBorderless={ isBorderless }
+-					isFocused={ isFocused }
+-				/>
++				<Backdrop disabled={ disabled } isBorderless={ isBorderless } />
+ 			</Container>
+ 		</Root>
+ 	);
+diff --git a/packages/components/src/input-control/input-field.tsx b/packages/components/src/input-control/input-field.tsx
+index 23a229800e371e..a7ff4a6e6aeae6 100644
+--- a/packages/components/src/input-control/input-field.tsx
++++ b/packages/components/src/input-control/input-field.tsx
+@@ -35,18 +35,15 @@ function InputField(
+ 		dragThreshold = 10,
+ 		id,
+ 		isDragEnabled = false,
+-		isFocused,
+ 		isPressEnterToChange = false,
+ 		onBlur = noop,
+ 		onChange = noop,
+ 		onDrag = noop,
+ 		onDragEnd = noop,
+ 		onDragStart = noop,
+-		onFocus = noop,
+ 		onKeyDown = noop,
+ 		onValidate = noop,
+ 		size = 'default',
+-		setIsFocused,
+ 		stateReducer = ( state: any ) => state,
+ 		value: valueProp,
+ 		type,
+@@ -85,7 +82,6 @@ function InputField(
+ 
+ 	const handleOnBlur = ( event: FocusEvent< HTMLInputElement > ) => {
+ 		onBlur( event );
+-		setIsFocused?.( false );
+ 
+ 		/**
+ 		 * If isPressEnterToChange is set, this commits the value to
+@@ -97,11 +93,6 @@ function InputField(
+ 		}
+ 	};
+ 
+-	const handleOnFocus = ( event: FocusEvent< HTMLInputElement > ) => {
+-		onFocus( event );
+-		setIsFocused?.( true );
+-	};
+-
+ 	const handleOnChange = ( event: ChangeEvent< HTMLInputElement > ) => {
+ 		const nextValue = event.target.value;
+ 		change( nextValue, event );
+@@ -222,7 +213,6 @@ function InputField(
+ 			id={ id }
+ 			onBlur={ handleOnBlur }
+ 			onChange={ handleOnChange }
+-			onFocus={ handleOnFocus }
+ 			onKeyDown={ withIgnoreIMEEvents( handleOnKeyDown ) }
+ 			onMouseDown={ handleOnMouseDown }
+ 			ref={ ref }
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 90f4ab92e3f704..c52078223e36f2 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -23,23 +23,76 @@ type ContainerProps = {
+ 	labelPosition?: LabelPosition;
+ };
+ 
+-type RootProps = {
+-	isFocused?: boolean;
+-	labelPosition?: LabelPosition;
++export const Prefix = styled.span`
++	box-sizing: border-box;
++	display: block;
++`;
++
++export const Suffix = styled.span`
++	align-items: center;
++	align-self: stretch;
++	box-sizing: border-box;
++	display: flex;
++`;
++
++type BackdropProps = {
++	disabled?: boolean;
++	isBorderless?: boolean;
+ };
+ 
+-const rootFocusedStyles = ( { isFocused }: RootProps ) => {
+-	if ( ! isFocused ) return '';
++const backdropBorderColor = ( {
++	disabled,
++	isBorderless,
++}: BackdropProps ): CSSProperties[ 'borderColor' ] => {
++	if ( isBorderless ) {
++		return 'transparent';
++	}
+ 
+-	return css( { zIndex: 1 } );
++	if ( disabled ) {
++		return COLORS.ui.borderDisabled;
++	}
++
++	return COLORS.ui.border;
+ };
+ 
+-export const Root = styled( Flex )< RootProps >`
++export const BackdropUI = styled.div< BackdropProps >`
++	&&& {
++		box-sizing: border-box;
++		border-color: ${ backdropBorderColor };
++		border-radius: inherit;
++		border-style: solid;
++		border-width: 1px;
++		bottom: 0;
++		left: 0;
++		margin: 0;
++		padding: 0;
++		pointer-events: none;
++		position: absolute;
++		right: 0;
++		top: 0;
++
++		${ rtl( { paddingLeft: 2 } ) }
++	}
++`;
++
++export const Root = styled( Flex )`
+ 	box-sizing: border-box;
+ 	position: relative;
+ 	border-radius: 2px;
+ 	padding-top: 0;
+-	${ rootFocusedStyles }
++
++	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
++	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
++		z-index: 1;
++
++		${ BackdropUI } {
++			border-color: ${ COLORS.ui.borderFocus };
++			box-shadow: ${ CONFIG.controlBoxShadowFocus };
++			// Windows High Contrast mode will show this outline, but not the box-shadow.
++			outline: 2px solid transparent;
++			outline-offset: -2px;
++		}
++	}
+ `;
+ 
+ const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
+@@ -260,72 +313,3 @@ export const Label = (
+ export const LabelWrapper = styled( FlexItem )`
+ 	max-width: calc( 100% - 10px );
+ `;
+-
+-type BackdropProps = {
+-	disabled?: boolean;
+-	isBorderless?: boolean;
+-	isFocused?: boolean;
+-};
+-
+-const backdropFocusedStyles = ( {
+-	disabled,
+-	isBorderless,
+-	isFocused,
+-}: BackdropProps ): SerializedStyles => {
+-	let borderColor = isBorderless ? 'transparent' : COLORS.ui.border;
+-
+-	let boxShadow;
+-	let outline;
+-	let outlineOffset;
+-
+-	if ( isFocused ) {
+-		borderColor = COLORS.ui.borderFocus;
+-		boxShadow = CONFIG.controlBoxShadowFocus;
+-		// Windows High Contrast mode will show this outline, but not the box-shadow.
+-		outline = `2px solid transparent`;
+-		outlineOffset = `-2px`;
+-	}
+-
+-	if ( disabled ) {
+-		borderColor = isBorderless ? 'transparent' : COLORS.ui.borderDisabled;
+-	}
+-
+-	return css( {
+-		boxShadow,
+-		borderColor,
+-		borderStyle: 'solid',
+-		borderWidth: 1,
+-		outline,
+-		outlineOffset,
+-	} );
+-};
+-
+-export const BackdropUI = styled.div< BackdropProps >`
+-	&&& {
+-		box-sizing: border-box;
+-		border-radius: inherit;
+-		bottom: 0;
+-		left: 0;
+-		margin: 0;
+-		padding: 0;
+-		pointer-events: none;
+-		position: absolute;
+-		right: 0;
+-		top: 0;
+-
+-		${ backdropFocusedStyles }
+-		${ rtl( { paddingLeft: 2 } ) }
+-	}
+-`;
+-
+-export const Prefix = styled.span`
+-	box-sizing: border-box;
+-	display: block;
+-`;
+-
+-export const Suffix = styled.span`
+-	align-items: center;
+-	align-self: stretch;
+-	box-sizing: border-box;
+-	display: flex;
+-`;
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index c6b02f6d0212d9..ef01a9fe3db00a 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -46,14 +46,6 @@ interface BaseProps {
+ 	 * @default false
+ 	 */
+ 	hideLabelFromVision?: boolean;
+-	/**
+-	 * Whether the component should be in a focused state.
+-	 * Used to coordinate focus states when the actual focused element and the component handling
+-	 * visual focus are separate.
+-	 *
+-	 * @default false
+-	 */
+-	isFocused: boolean;
+ 	/**
+ 	 * The position of the label.
+ 	 *
+@@ -111,7 +103,6 @@ export interface InputFieldProps
+ 	) => void;
+ 	paddingInlineStart?: CSSProperties[ 'paddingInlineStart' ];
+ 	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
+-	setIsFocused: ( isFocused: boolean ) => void;
+ 	stateReducer?: StateReducer;
+ 	/**
+ 	 * The current value of the input.
+@@ -187,7 +178,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
+ export interface InputControlProps
+ 	extends Omit<
+ 			InputBaseProps,
+-			'children' | 'isBorderless' | 'isFocused' | keyof FlexProps
++			'children' | 'isBorderless' | keyof FlexProps
+ 		>,
+ 		Pick< BaseControlProps, 'help' >,
+ 		/**
+@@ -197,15 +188,13 @@ export interface InputControlProps
+ 		 * be the only prefix prop. Otherwise it tries to do a union of the two prefix properties and you end up
+ 		 * with an unresolvable type.
+ 		 *
+-		 * `isFocused`, `setIsFocused`, `paddingInlineStart`, and `paddingInlineEnd` are managed internally by
++		 * `paddingInlineStart`, and `paddingInlineEnd` are managed internally by
+ 		 * the InputControl, but the rest of the props for InputField are passed through.
+ 		 */
+ 		Omit<
+ 			WordPressComponentProps< InputFieldProps, 'input', false >,
+ 			| 'stateReducer'
+ 			| 'prefix'
+-			| 'isFocused'
+-			| 'setIsFocused'
+ 			| 'paddingInlineStart'
+ 			| 'paddingInlineEnd'
+ 		> {
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index 3a550be7daa333..4d93c5c870a013 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -7,7 +7,7 @@ import classNames from 'classnames';
+  * WordPress dependencies
+  */
+ import { useInstanceId } from '@wordpress/compose';
+-import { useState, forwardRef } from '@wordpress/element';
++import { forwardRef } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -20,8 +20,6 @@ import type { SelectControlProps } from './types';
+ import SelectControlChevronDown from './chevron-down';
+ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+ 
+-const noop = () => {};
+-
+ function useUniqueId( idProp?: string ) {
+ 	const instanceId = useInstanceId( SelectControl );
+ 	const id = `inspector-select-control-${ instanceId }`;
+@@ -41,9 +39,7 @@ function UnforwardedSelectControl(
+ 		id: idProp,
+ 		label,
+ 		multiple = false,
+-		onBlur = noop,
+ 		onChange,
+-		onFocus = noop,
+ 		options = [],
+ 		size = 'default',
+ 		value: valueProp,
+@@ -55,23 +51,12 @@ function UnforwardedSelectControl(
+ 		__nextHasNoMarginBottom = false,
+ 		...restProps
+ 	} = useDeprecated36pxDefaultSizeProp( props );
+-	const [ isFocused, setIsFocused ] = useState( false );
+ 	const id = useUniqueId( idProp );
+ 	const helpId = help ? `${ id }__help` : undefined;
+ 
+ 	// Disable reason: A select with an onchange throws a warning.
+ 	if ( ! options?.length && ! children ) return null;
+ 
+-	const handleOnBlur = ( event: React.FocusEvent< HTMLSelectElement > ) => {
+-		onBlur( event );
+-		setIsFocused( false );
+-	};
+-
+-	const handleOnFocus = ( event: React.FocusEvent< HTMLSelectElement > ) => {
+-		onFocus( event );
+-		setIsFocused( true );
+-	};
+-
+ 	const handleOnChange = (
+ 		event: React.ChangeEvent< HTMLSelectElement >
+ 	) => {
+@@ -100,7 +85,6 @@ function UnforwardedSelectControl(
+ 				disabled={ disabled }
+ 				hideLabelFromVision={ hideLabelFromVision }
+ 				id={ id }
+-				isFocused={ isFocused }
+ 				label={ label }
+ 				size={ size }
+ 				suffix={
+@@ -118,9 +102,7 @@ function UnforwardedSelectControl(
+ 					disabled={ disabled }
+ 					id={ id }
+ 					multiple={ multiple }
+-					onBlur={ handleOnBlur }
+ 					onChange={ handleOnChange }
+-					onFocus={ handleOnFocus }
+ 					ref={ ref }
+ 					selectSize={ size }
+ 					value={ valueProp }

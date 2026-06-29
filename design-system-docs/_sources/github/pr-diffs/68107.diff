@@ -1,0 +1,109 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index dbd1d09fbe690f..45b392c1e8aa00 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -21,6 +21,7 @@
+ 
+ -   Add new `Badge` component ([#66555](https://github.com/WordPress/gutenberg/pull/66555)).
+ -   `Menu`: refactor to more granular sub-components ([#67422](https://github.com/WordPress/gutenberg/pull/67422)).
++-   `Badge`: Support text truncation ([#68107](https://github.com/WordPress/gutenberg/pull/68107)).
+ 
+ ### Internal
+ 
+diff --git a/packages/components/src/badge/index.tsx b/packages/components/src/badge/index.tsx
+index 8a55f3881215f3..ee08003c3911dc 100644
+--- a/packages/components/src/badge/index.tsx
++++ b/packages/components/src/badge/index.tsx
+@@ -56,9 +56,10 @@ function Badge( {
+ 					icon={ contextBasedIcon() }
+ 					size={ 16 }
+ 					fill="currentColor"
++					className="components-badge__icon"
+ 				/>
+ 			) }
+-			{ children }
++			<span className="components-badge__content">{ children }</span>
+ 		</span>
+ 	);
+ }
+diff --git a/packages/components/src/badge/styles.scss b/packages/components/src/badge/styles.scss
+index e1e9cd5312d11a..d3f82482cf7743 100644
+--- a/packages/components/src/badge/styles.scss
++++ b/packages/components/src/badge/styles.scss
+@@ -6,17 +6,18 @@ $badge-colors: (
+ );
+ 
+ .components-badge {
++	@include reset;
++
+ 	background-color: color-mix(in srgb, $white 90%, var(--base-color));
+ 	color: color-mix(in srgb, $black 50%, var(--base-color));
+ 	padding: 0 $grid-unit-10;
+ 	min-height: $grid-unit-30;
++	max-width: 100%;
+ 	border-radius: $radius-small;
+ 	font-size: $font-size-small;
+ 	font-weight: 400;
+-	flex-shrink: 0;
+ 	line-height: $font-line-height-small;
+-	width: fit-content;
+-	display: flex;
++	display: inline-flex;
+ 	align-items: center;
+ 	gap: 2px;
+ 
+@@ -36,3 +37,13 @@ $badge-colors: (
+ 		}
+ 	}
+ }
++
++.components-badge__icon {
++	flex-shrink: 0;
++}
++
++.components-badge__content {
++	overflow: hidden;
++	white-space: nowrap;
++	text-overflow: ellipsis;
++}
+diff --git a/packages/components/src/badge/test/index.tsx b/packages/components/src/badge/test/index.tsx
+index 47c832eb3c8300..114a8f426c7afd 100644
+--- a/packages/components/src/badge/test/index.tsx
++++ b/packages/components/src/badge/test/index.tsx
+@@ -6,12 +6,17 @@ import { render, screen } from '@testing-library/react';
+ /**
+  * Internal dependencies
+  */
+-import Badge from '..';
++import _Badge from '..';
++
++const testid = 'my-badge';
++const Badge = ( props: React.ComponentProps< typeof _Badge > ) => (
++	<_Badge data-testid={ testid } { ...props } />
++);
+ 
+ describe( 'Badge', () => {
+ 	it( 'should render correctly with default props', () => {
+ 		render( <Badge>Code is Poetry</Badge> );
+-		const badge = screen.getByText( 'Code is Poetry' );
++		const badge = screen.getByTestId( testid );
+ 		expect( badge ).toBeInTheDocument();
+ 		expect( badge.tagName ).toBe( 'SPAN' );
+ 		expect( badge ).toHaveClass( 'components-badge' );
+@@ -19,14 +24,14 @@ describe( 'Badge', () => {
+ 
+ 	it( 'should render as per its intent and contain an icon', () => {
+ 		render( <Badge intent="error">Code is Poetry</Badge> );
+-		const badge = screen.getByText( 'Code is Poetry' );
++		const badge = screen.getByTestId( testid );
+ 		expect( badge ).toHaveClass( 'components-badge', 'is-error' );
+ 		expect( badge ).toHaveClass( 'has-icon' );
+ 	} );
+ 
+ 	it( 'should combine custom className with default class', () => {
+ 		render( <Badge className="custom-class">Code is Poetry</Badge> );
+-		const badge = screen.getByText( 'Code is Poetry' );
++		const badge = screen.getByTestId( testid );
+ 		expect( badge ).toHaveClass( 'components-badge' );
+ 		expect( badge ).toHaveClass( 'custom-class' );
+ 	} );

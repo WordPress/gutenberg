@@ -1,0 +1,25 @@
+diff --git a/packages/components/src/icon/test/index.js b/packages/components/src/icon/test/index.tsx
+similarity index 96%
+rename from packages/components/src/icon/test/index.js
+rename to packages/components/src/icon/test/index.tsx
+index 9faff9e74116df..fd9c1650fb3b5b 100644
+--- a/packages/components/src/icon/test/index.js
++++ b/packages/components/src/icon/test/index.tsx
+@@ -3,11 +3,15 @@
+  */
+ import { render, screen } from '@testing-library/react';
+ 
++/**
++ * WordPress dependencies
++ */
++import { Path, SVG } from '@wordpress/primitives';
++
+ /**
+  * Internal dependencies
+  */
+-import Icon from '../';
+-import { Path, SVG } from '../../';
++import Icon from '..';
+ 
+ describe( 'Icon', () => {
+ 	const testId = 'icon';

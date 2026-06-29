@@ -1,0 +1,442 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 1e9fdbe07c94e7..ffa67b39200282 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Bug Fixes
++
++-   `Tabs`: fix skipping indication animation glitch ([#65878](https://github.com/WordPress/gutenberg/pull/65878)).
++
+ ## 28.9.0 (2024-10-03)
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index 283d6421f5b768..4f6b4a4c7c8dcb 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -30,16 +30,16 @@ export const TabListWrapper = styled.div`
+ 	--direction-factor: 1;
+ 	--direction-start: left;
+ 	--direction-end: right;
+-	--indicator-start: var( --indicator-left );
++	--selected-start: var( --selected-left, 0 );
+ 	&:dir( rtl ) {
+ 		--direction-factor: -1;
+ 		--direction-start: right;
+ 		--direction-end: left;
+-		--indicator-start: var( --indicator-right );
++		--selected-start: var( --selected-right, 0 );
+ 	}
+ 
+ 	@media not ( prefers-reduced-motion ) {
+-		&.is-animation-enabled::before {
++		&[data-indicator-animated]::before {
+ 			transition-property: transform;
+ 			transition-duration: 0.2s;
+ 			transition-timing-function: ease-out;
+@@ -90,13 +90,14 @@ export const TabListWrapper = styled.div`
+ 			width: calc( var( --antialiasing-factor ) * 1px );
+ 			transform: translateX(
+ 					calc(
+-						var( --indicator-start ) * var( --direction-factor ) *
++						var( --selected-start ) * var( --direction-factor ) *
+ 							1px
+ 					)
+ 				)
+ 				scaleX(
+ 					calc(
+-						var( --indicator-width ) / var( --antialiasing-factor )
++						var( --selected-width, 0 ) /
++							var( --antialiasing-factor )
+ 					)
+ 				);
+ 			border-bottom: var( --wp-admin-border-width-focus ) solid
+@@ -108,9 +109,11 @@ export const TabListWrapper = styled.div`
+ 		left: 0;
+ 		width: 100%;
+ 		height: calc( var( --antialiasing-factor ) * 1px );
+-		transform: translateY( calc( var( --indicator-top ) * 1px ) )
++		transform: translateY( calc( var( --selected-top, 0 ) * 1px ) )
+ 			scaleY(
+-				calc( var( --indicator-height ) / var( --antialiasing-factor ) )
++				calc(
++					var( --selected-height, 0 ) / var( --antialiasing-factor )
++				)
+ 			);
+ 		background-color: ${ COLORS.theme.gray[ 100 ] };
+ 	}
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index ae8daf60fc237c..a861d3294aae66 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -19,11 +19,43 @@ import { useTabsContext } from './context';
+ import { TabListWrapper } from './styles';
+ import type { WordPressComponentProps } from '../context';
+ import clsx from 'clsx';
++import type { ElementOffsetRect } from '../utils/element-rect';
+ import { useTrackElementOffsetRect } from '../utils/element-rect';
+-import { useOnValueUpdate } from '../utils/hooks/use-on-value-update';
+ import { useTrackOverflow } from './use-track-overflow';
++import { useAnimatedOffsetRect } from '../utils/hooks/use-animated-offset-rect';
+ 
+-const SCROLL_MARGIN = 24;
++const DEFAULT_SCROLL_MARGIN = 24;
++
++/**
++ * Scrolls a given parent element so that a given rect is visible.
++ *
++ * The scroll is updated initially and whenever the rect changes.
++ */
++function useScrollRectIntoView(
++	parent: HTMLElement | undefined,
++	rect: ElementOffsetRect,
++	{ margin = DEFAULT_SCROLL_MARGIN } = {}
++) {
++	useLayoutEffect( () => {
++		if ( ! parent || ! rect ) {
++			return;
++		}
++
++		const { scrollLeft: parentScroll } = parent;
++		const parentWidth = parent.getBoundingClientRect().width;
++		const { left: childLeft, width: childWidth } = rect;
++
++		const parentRightEdge = parentScroll + parentWidth;
++		const childRightEdge = childLeft + childWidth;
++		const rightOverflow = childRightEdge + margin - parentRightEdge;
++		const leftOverflow = parentScroll - ( childLeft - margin );
++		if ( leftOverflow > 0 ) {
++			parent.scrollLeft = parentScroll - leftOverflow;
++		} else if ( rightOverflow > 0 ) {
++			parent.scrollLeft = parentScroll + rightOverflow;
++		}
++	}, [ margin, parent, rect ] );
++}
+ 
+ export const TabList = forwardRef<
+ 	HTMLDivElement,
+@@ -35,44 +67,27 @@ export const TabList = forwardRef<
+ 	const activeId = useStoreState( store, 'activeId' );
+ 	const selectOnMove = useStoreState( store, 'selectOnMove' );
+ 	const items = useStoreState( store, 'items' );
+-	const [ parent, setParent ] = useState< HTMLElement | null >();
++	const [ parent, setParent ] = useState< HTMLElement >();
+ 	const refs = useMergeRefs( [ ref, setParent ] );
++	const selectedRect = useTrackElementOffsetRect(
++		store?.item( selectedId )?.element
++	);
++
++	// Track overflow to show scroll hints.
+ 	const overflow = useTrackOverflow( parent, {
+ 		first: items?.at( 0 )?.element,
+ 		last: items?.at( -1 )?.element,
+ 	} );
+ 
+-	const selectedTabPosition = useTrackElementOffsetRect(
+-		store?.item( selectedId )?.element
+-	);
+-
+-	const [ animationEnabled, setAnimationEnabled ] = useState( false );
+-	useOnValueUpdate( selectedId, ( { previousValue } ) => {
+-		if ( previousValue ) {
+-			setAnimationEnabled( true );
+-		}
++	// Size, position, and animate the indicator.
++	useAnimatedOffsetRect( parent, selectedRect, {
++		prefix: 'selected',
++		dataAttribute: 'indicator-animated',
++		transitionEndFilter: ( event ) => event.pseudoElement === '::before',
+ 	} );
+ 
+ 	// Make sure selected tab is scrolled into view.
+-	useLayoutEffect( () => {
+-		if ( ! parent || ! selectedTabPosition ) {
+-			return;
+-		}
+-
+-		const { scrollLeft: parentScroll } = parent;
+-		const parentWidth = parent.getBoundingClientRect().width;
+-		const { left: childLeft, width: childWidth } = selectedTabPosition;
+-
+-		const parentRightEdge = parentScroll + parentWidth;
+-		const childRightEdge = childLeft + childWidth;
+-		const rightOverflow = childRightEdge + SCROLL_MARGIN - parentRightEdge;
+-		const leftOverflow = parentScroll - ( childLeft - SCROLL_MARGIN );
+-		if ( leftOverflow > 0 ) {
+-			parent.scrollLeft = parentScroll - leftOverflow;
+-		} else if ( rightOverflow > 0 ) {
+-			parent.scrollLeft = parentScroll + rightOverflow;
+-		}
+-	}, [ parent, selectedTabPosition ] );
++	useScrollRectIntoView( parent, selectedRect );
+ 
+ 	const onBlur = () => {
+ 		if ( ! selectOnMove ) {
+@@ -97,30 +112,13 @@ export const TabList = forwardRef<
+ 		<Ariakit.TabList
+ 			ref={ refs }
+ 			store={ store }
+-			render={
+-				<TabListWrapper
+-					onTransitionEnd={ ( event ) => {
+-						if ( event.pseudoElement === '::before' ) {
+-							setAnimationEnabled( false );
+-						}
+-					} }
+-				/>
+-			}
++			render={ <TabListWrapper /> }
+ 			onBlur={ onBlur }
+ 			tabIndex={ -1 }
+ 			{ ...otherProps }
+-			style={ {
+-				'--indicator-top': selectedTabPosition.top,
+-				'--indicator-right': selectedTabPosition.right,
+-				'--indicator-left': selectedTabPosition.left,
+-				'--indicator-width': selectedTabPosition.width,
+-				'--indicator-height': selectedTabPosition.height,
+-				...otherProps.style,
+-			} }
+ 			className={ clsx(
+ 				overflow.first && 'is-overflowing-first',
+ 				overflow.last && 'is-overflowing-last',
+-				animationEnabled && 'is-animation-enabled',
+ 				otherProps.className
+ 			) }
+ 		>
+diff --git a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+index cdf8a2c04eb0b8..0b4c22d7df9298 100644
+--- a/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
++++ b/packages/components/src/toggle-group-control/toggle-group-control/component.tsx
+@@ -6,7 +6,7 @@ import type { ForwardedRef } from 'react';
+ /**
+  * WordPress dependencies
+  */
+-import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
++import { useMemo, useState } from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -20,104 +20,9 @@ import { VisualLabelWrapper } from './styles';
+ import * as styles from './styles';
+ import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
+ import { ToggleGroupControlAsButtonGroup } from './as-button-group';
+-import type { ElementOffsetRect } from '../../utils/element-rect';
+ import { useTrackElementOffsetRect } from '../../utils/element-rect';
+-import { useOnValueUpdate } from '../../utils/hooks/use-on-value-update';
+-import { useEvent, useMergeRefs } from '@wordpress/compose';
+-
+-/**
+- * A utility used to animate something in a container component based on the "offset
+- * rect" (position relative to the container and size) of a subelement. For example,
+- * this is useful to render an indicator for the selected option of a component, and
+- * to animate it when the selected option changes.
+- *
+- * Takes in a container element and the up-to-date "offset rect" of the target
+- * subelement, obtained with `useTrackElementOffsetRect`. Then it does the following:
+- *
+- * - Adds CSS variables with rect information to the container, so that the indicator
+- *   can be rendered and animated with them. These are kept up-to-date, enabling CSS
+- *   transitions on change.
+- * - Sets an attribute (`data-subelement-animated` by default) when the tracked
+- *   element changes, so that the target (e.g. the indicator) can be animated to its
+- *   new size and position.
+- * - Removes the attribute when the animation is done.
+- *
+- * The need for the attribute is due to the fact that the rect might update in
+- * situations other than when the tracked element changes, e.g. the tracked element
+- * might be resized. In such cases, there is no need to animate the indicator, and
+- * the change in size or position of the indicator needs to be reflected immediately.
+- */
+-function useAnimatedOffsetRect(
+-	/**
+-	 * The container element.
+-	 */
+-	container: HTMLElement | undefined,
+-	/**
+-	 * The rect of the tracked element.
+-	 */
+-	rect: ElementOffsetRect,
+-	{
+-		prefix = 'subelement',
+-		dataAttribute = `${ prefix }-animated`,
+-		transitionEndFilter = () => true,
+-	}: {
+-		/**
+-		 * The prefix used for the CSS variables, e.g. if `prefix` is `selected`, the
+-		 * CSS variables will be `--selected-top`, `--selected-left`, etc.
+-		 * @default 'subelement'
+-		 */
+-		prefix?: string;
+-		/**
+-		 * The name of the data attribute used to indicate that the animation is in
+-		 * progress. The `data-` prefix is added automatically.
+-		 *
+-		 * For example, if `dataAttribute` is `indicator-animated`, the attribute will
+-		 * be `data-indicator-animated`.
+-		 * @default `${ prefix }-animated`
+-		 */
+-		dataAttribute?: string;
+-		/**
+-		 * A function that is called with the transition event and returns a boolean
+-		 * indicating whether the animation should be stopped. The default is a function
+-		 * that always returns `true`.
+-		 *
+-		 * For example, if the animated element is the `::before` pseudo-element, the
+-		 * function can be written as `( event ) => event.pseudoElement === '::before'`.
+-		 * @default () => true
+-		 */
+-		transitionEndFilter?: ( event: TransitionEvent ) => boolean;
+-	} = {}
+-) {
+-	const setProperties = useEvent( () => {
+-		( Object.keys( rect ) as Array< keyof typeof rect > ).forEach(
+-			( property ) =>
+-				property !== 'element' &&
+-				container?.style.setProperty(
+-					`--${ prefix }-${ property }`,
+-					String( rect[ property ] )
+-				)
+-		);
+-	} );
+-	useLayoutEffect( () => {
+-		setProperties();
+-	}, [ rect, setProperties ] );
+-	useOnValueUpdate( rect.element, ( { previousValue } ) => {
+-		// Only enable the animation when moving from one element to another.
+-		if ( rect.element && previousValue ) {
+-			container?.setAttribute( `data-${ dataAttribute }`, '' );
+-		}
+-	} );
+-	useLayoutEffect( () => {
+-		function onTransitionEnd( event: TransitionEvent ) {
+-			if ( transitionEndFilter( event ) ) {
+-				container?.removeAttribute( `data-${ dataAttribute }` );
+-			}
+-		}
+-		container?.addEventListener( 'transitionend', onTransitionEnd );
+-		return () =>
+-			container?.removeEventListener( 'transitionend', onTransitionEnd );
+-	}, [ dataAttribute, container, transitionEndFilter ] );
+-}
++import { useMergeRefs } from '@wordpress/compose';
++import { useAnimatedOffsetRect } from '../../utils/hooks/use-animated-offset-rect';
+ 
+ function UnconnectedToggleGroupControl(
+ 	props: WordPressComponentProps< ToggleGroupControlProps, 'div', false >,
+diff --git a/packages/components/src/utils/hooks/use-animated-offset-rect.ts b/packages/components/src/utils/hooks/use-animated-offset-rect.ts
+new file mode 100644
+index 00000000000000..4056089738fe99
+--- /dev/null
++++ b/packages/components/src/utils/hooks/use-animated-offset-rect.ts
+@@ -0,0 +1,107 @@
++/* eslint-disable jsdoc/require-param */
++
++/**
++ * WordPress dependencies
++ */
++import { useEvent } from '@wordpress/compose';
++import { useLayoutEffect } from '@wordpress/element';
++/**
++ * Internal dependencies
++ */
++import type { ElementOffsetRect } from '../element-rect';
++import { useOnValueUpdate } from './use-on-value-update';
++
++/**
++ * A utility used to animate something in a container component based on the "offset
++ * rect" (position relative to the container and size) of a subelement. For example,
++ * this is useful to render an indicator for the selected option of a component, and
++ * to animate it when the selected option changes.
++ *
++ * Takes in a container element and the up-to-date "offset rect" of the target
++ * subelement, obtained with `useTrackElementOffsetRect`. Then it does the following:
++ *
++ * - Adds CSS variables with rect information to the container, so that the indicator
++ *   can be rendered and animated with them. These are kept up-to-date, enabling CSS
++ *   transitions on change.
++ * - Sets an attribute (`data-subelement-animated` by default) when the tracked
++ *   element changes, so that the target (e.g. the indicator) can be animated to its
++ *   new size and position.
++ * - Removes the attribute when the animation is done.
++ *
++ * The need for the attribute is due to the fact that the rect might update in
++ * situations other than when the tracked element changes, e.g. the tracked element
++ * might be resized. In such cases, there is no need to animate the indicator, and
++ * the change in size or position of the indicator needs to be reflected immediately.
++ */
++export function useAnimatedOffsetRect(
++	/**
++	 * The container element.
++	 */
++	container: HTMLElement | undefined,
++	/**
++	 * The rect of the tracked element.
++	 */
++	rect: ElementOffsetRect,
++	{
++		prefix = 'subelement',
++		dataAttribute = `${ prefix }-animated`,
++		transitionEndFilter = () => true,
++	}: {
++		/**
++		 * The prefix used for the CSS variables, e.g. if `prefix` is `selected`, the
++		 * CSS variables will be `--selected-top`, `--selected-left`, etc.
++		 * @default 'subelement'
++		 */
++		prefix?: string;
++		/**
++		 * The name of the data attribute used to indicate that the animation is in
++		 * progress. The `data-` prefix is added automatically.
++		 *
++		 * For example, if `dataAttribute` is `indicator-animated`, the attribute will
++		 * be `data-indicator-animated`.
++		 * @default `${ prefix }-animated`
++		 */
++		dataAttribute?: string;
++		/**
++		 * A function that is called with the transition event and returns a boolean
++		 * indicating whether the animation should be stopped. The default is a function
++		 * that always returns `true`.
++		 *
++		 * For example, if the animated element is the `::before` pseudo-element, the
++		 * function can be written as `( event ) => event.pseudoElement === '::before'`.
++		 * @default () => true
++		 */
++		transitionEndFilter?: ( event: TransitionEvent ) => boolean;
++	} = {}
++) {
++	const setProperties = useEvent( () => {
++		( Object.keys( rect ) as Array< keyof typeof rect > ).forEach(
++			( property ) =>
++				property !== 'element' &&
++				container?.style.setProperty(
++					`--${ prefix }-${ property }`,
++					String( rect[ property ] )
++				)
++		);
++	} );
++	useLayoutEffect( () => {
++		setProperties();
++	}, [ rect, setProperties ] );
++	useOnValueUpdate( rect.element, ( { previousValue } ) => {
++		// Only enable the animation when moving from one element to another.
++		if ( rect.element && previousValue ) {
++			container?.setAttribute( `data-${ dataAttribute }`, '' );
++		}
++	} );
++	useLayoutEffect( () => {
++		function onTransitionEnd( event: TransitionEvent ) {
++			if ( transitionEndFilter( event ) ) {
++				container?.removeAttribute( `data-${ dataAttribute }` );
++			}
++		}
++		container?.addEventListener( 'transitionend', onTransitionEnd );
++		return () =>
++			container?.removeEventListener( 'transitionend', onTransitionEnd );
++	}, [ dataAttribute, container, transitionEndFilter ] );
++}
++/* eslint-enable jsdoc/require-param */

@@ -1,0 +1,294 @@
+diff --git a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+index 594247831109d1..172121132b2436 100644
+--- a/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
++++ b/packages/block-editor/src/components/color-palette/test/__snapshots__/control.js.snap
+@@ -152,100 +152,104 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
+           </div>
+         </legend>
+         <div
+-          className="components-flex components-h-stack components-v-stack emotion-8 emotion-5"
+-          data-wp-c16t={true}
+-          data-wp-component="VStack"
++          className="block-editor-color-gradient-control__panel"
+         >
+           <div
+-            className="components-dropdown"
+-            tabIndex="-1"
++            className="components-flex components-h-stack components-v-stack emotion-8 emotion-5"
++            data-wp-c16t={true}
++            data-wp-component="VStack"
+           >
+-            <button
+-              aria-expanded={false}
+-              aria-haspopup="true"
+-              aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
+-              className="components-flex components-color-palette__custom-color emotion-10 emotion-5"
+-              data-wp-c16t={true}
+-              data-wp-component="Flex"
+-              onClick={[Function]}
+-              style={
+-                Object {
+-                  "background": "#f00",
+-                  "color": "#000",
+-                }
+-              }
++            <div
++              className="components-dropdown"
++              tabIndex="-1"
+             >
+-              <span
+-                className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-13 emotion-5"
+-                data-wp-c16t={true}
+-                data-wp-component="FlexItem"
+-              >
+-                red
+-              </span>
+-              <span
+-                className="components-flex-item components-color-palette__custom-color-value emotion-15 emotion-5"
++              <button
++                aria-expanded={false}
++                aria-haspopup="true"
++                aria-label="Custom color picker. The currently selected color is called \\"red\\" and has a value of \\"f00\\"."
++                className="components-flex components-color-palette__custom-color emotion-10 emotion-5"
+                 data-wp-c16t={true}
+-                data-wp-component="FlexItem"
++                data-wp-component="Flex"
++                onClick={[Function]}
++                style={
++                  Object {
++                    "background": "#f00",
++                    "color": "#000",
++                  }
++                }
+               >
+-                f00
+-              </span>
+-            </button>
+-          </div>
+-          <div
+-            className="components-circular-option-picker"
+-          >
++                <span
++                  className="components-truncate components-flex-item components-color-palette__custom-color-name emotion-5 emotion-13 emotion-5"
++                  data-wp-c16t={true}
++                  data-wp-component="FlexItem"
++                >
++                  red
++                </span>
++                <span
++                  className="components-flex-item components-color-palette__custom-color-value emotion-15 emotion-5"
++                  data-wp-c16t={true}
++                  data-wp-component="FlexItem"
++                >
++                  f00
++                </span>
++              </button>
++            </div>
+             <div
+-              className="components-circular-option-picker__swatches"
++              className="components-circular-option-picker"
+             >
+               <div
+-                className="components-circular-option-picker__option-wrapper"
++                className="components-circular-option-picker__swatches"
++              >
++                <div
++                  className="components-circular-option-picker__option-wrapper"
++                >
++                  <button
++                    aria-describedby={null}
++                    aria-label="Color: red"
++                    aria-pressed={true}
++                    className="components-button components-circular-option-picker__option is-pressed"
++                    onBlur={[Function]}
++                    onClick={[Function]}
++                    onFocus={[Function]}
++                    onMouseDown={[Function]}
++                    onMouseEnter={[Function]}
++                    onMouseLeave={[Function]}
++                    style={
++                      Object {
++                        "backgroundColor": "#f00",
++                        "color": "#f00",
++                      }
++                    }
++                    type="button"
++                  />
++                  <svg
++                    aria-hidden={true}
++                    fill="#000"
++                    focusable={false}
++                    height={24}
++                    viewBox="0 0 24 24"
++                    width={24}
++                    xmlns="http://www.w3.org/2000/svg"
++                  >
++                    <path
++                      d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
++                    />
++                  </svg>
++                </div>
++              </div>
++              <div
++                className="components-circular-option-picker__custom-clear-wrapper"
+               >
+                 <button
+                   aria-describedby={null}
+-                  aria-label="Color: red"
+-                  aria-pressed={true}
+-                  className="components-button components-circular-option-picker__option is-pressed"
+-                  onBlur={[Function]}
++                  className="components-button components-circular-option-picker__clear is-tertiary"
+                   onClick={[Function]}
+-                  onFocus={[Function]}
+-                  onMouseDown={[Function]}
+-                  onMouseEnter={[Function]}
+-                  onMouseLeave={[Function]}
+-                  style={
+-                    Object {
+-                      "backgroundColor": "#f00",
+-                      "color": "#f00",
+-                    }
+-                  }
+                   type="button"
+-                />
+-                <svg
+-                  aria-hidden={true}
+-                  fill="#000"
+-                  focusable={false}
+-                  height={24}
+-                  viewBox="0 0 24 24"
+-                  width={24}
+-                  xmlns="http://www.w3.org/2000/svg"
+                 >
+-                  <path
+-                    d="M16.7 7.1l-6.3 8.5-3.3-2.5-.9 1.2 4.5 3.4L17.9 8z"
+-                  />
+-                </svg>
++                  Clear
++                </button>
+               </div>
+             </div>
+-            <div
+-              className="components-circular-option-picker__custom-clear-wrapper"
+-            >
+-              <button
+-                aria-describedby={null}
+-                className="components-button components-circular-option-picker__clear is-tertiary"
+-                onClick={[Function]}
+-                type="button"
+-              >
+-                Clear
+-              </button>
+-            </div>
+           </div>
+         </div>
+       </div>
+diff --git a/packages/block-editor/src/components/colors-gradients/control.js b/packages/block-editor/src/components/colors-gradients/control.js
+index 85c49d88d9d521..241da40d5aa3a0 100644
+--- a/packages/block-editor/src/components/colors-gradients/control.js
++++ b/packages/block-editor/src/components/colors-gradients/control.js
+@@ -113,6 +113,12 @@ function ColorGradientControlInner( {
+ 		),
+ 	};
+ 
++	const renderPanelType = ( type ) => (
++		<div className="block-editor-color-gradient-control__panel">
++			{ tabPanels[ type ] }
++		</div>
++	);
++
+ 	return (
+ 		<BaseControl
+ 			__nextHasNoMarginBottom
+@@ -142,15 +148,13 @@ function ColorGradientControlInner( {
+ 									: !! canChooseAColor && TAB_COLOR.value
+ 							}
+ 						>
+-							{ ( tab ) => (
+-								<div className="block-editor-color-gradient-control__tab-panel">
+-									{ tabPanels[ tab.value ] }
+-								</div>
+-							) }
++							{ ( tab ) => renderPanelType( tab.value ) }
+ 						</TabPanel>
+ 					) }
+-					{ ! canChooseAGradient && tabPanels[ TAB_COLOR.value ] }
+-					{ ! canChooseAColor && tabPanels[ TAB_GRADIENT.value ] }
++					{ ! canChooseAGradient &&
++						renderPanelType( TAB_COLOR.value ) }
++					{ ! canChooseAColor &&
++						renderPanelType( TAB_GRADIENT.value ) }
+ 				</VStack>
+ 			</fieldset>
+ 		</BaseControl>
+diff --git a/packages/block-editor/src/components/colors-gradients/dropdown.js b/packages/block-editor/src/components/colors-gradients/dropdown.js
+index 4349cbb6f49cae..4de8891a97be9d 100644
+--- a/packages/block-editor/src/components/colors-gradients/dropdown.js
++++ b/packages/block-editor/src/components/colors-gradients/dropdown.js
+@@ -163,7 +163,7 @@ export default function ColorGradientSettingsDropdown( {
+ 								className="block-editor-tools-panel-color-gradient-settings__dropdown"
+ 								renderToggle={ renderToggle( toggleSettings ) }
+ 								renderContent={ () => (
+-									<DropdownContentWrapper paddingSize="medium">
++									<DropdownContentWrapper paddingSize="none">
+ 										<div className="block-editor-panel-color-gradient-settings__dropdown-content">
+ 											<ColorGradientControl
+ 												{ ...controlProps }
+diff --git a/packages/block-editor/src/components/colors-gradients/style.scss b/packages/block-editor/src/components/colors-gradients/style.scss
+index fcbdaef266107a..5d86252105acfe 100644
+--- a/packages/block-editor/src/components/colors-gradients/style.scss
++++ b/packages/block-editor/src/components/colors-gradients/style.scss
+@@ -15,6 +15,12 @@ $swatch-gap: 12px;
+ 	min-width: 0;
+ }
+ 
++.block-editor-color-gradient-control__tabs {
++	.block-editor-color-gradient-control__panel {
++		padding: $grid-unit-20;
++	}
++}
++
+ .block-editor-panel-color-gradient-settings.block-editor-panel-color-gradient-settings {
+ 	&,
+ 	& > div:not(:first-of-type) {
+@@ -41,7 +47,13 @@ $swatch-gap: 12px;
+ }
+ 
+ .block-editor-panel-color-gradient-settings__dropdown-content {
+-	width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ); // Ensure the popover perfectly wraps the swatches.
++	.block-editor-color-gradient-control__panel {
++		$panelPadding: $grid-unit-20;
++
++		// Ensure the popover perfectly wraps the swatches.
++		width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ) + ( $panelPadding * 2 );
++		padding: $panelPadding;
++	}
+ }
+ 
+ .block-editor-panel-color-gradient-settings__color-indicator {
+@@ -113,7 +125,3 @@ $swatch-gap: 12px;
+ 		flex-shrink: 0;
+ 	}
+ }
+-
+-.block-editor-color-gradient-control__tab-panel {
+-	padding-top: $grid-unit-10;
+-}
+diff --git a/packages/edit-site/src/components/global-styles/style.scss b/packages/edit-site/src/components/global-styles/style.scss
+index ea455143e2c428..3453c7566ace29 100644
+--- a/packages/edit-site/src/components/global-styles/style.scss
++++ b/packages/edit-site/src/components/global-styles/style.scss
+@@ -74,12 +74,6 @@
+ 	padding: $grid-unit-20;
+ }
+ 
+-.edit-site-screen-background-color__control {
+-	.block-editor-color-gradient-control__tab-panel {
+-		padding: $grid-unit-20;
+-	}
+-}
+-
+ .edit-site-global-styles-variations_item {
+ 	box-sizing: border-box;
+ 

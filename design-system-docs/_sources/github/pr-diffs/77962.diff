@@ -1,0 +1,325 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 06d5a1bcd5567b..d4048e686593b4 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ -   `Select`: `Select.Trigger` now renders a default `"Select"` placeholder when no value is selected, where it previously rendered empty ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
+ -   `Select`: `Select.Item` no longer renders its `value` as fallback item content. Pass item content explicitly as `children`. Migrate `<Select.Item value="Foo" />` to `<Select.Item value="Foo">Foo</Select.Item>` ([#77861](https://github.com/WordPress/gutenberg/pull/77861)).
+ -   `Tooltip`: **`Popup` positioner API** ([#78089](https://github.com/WordPress/gutenberg/pull/78089)). Add a `Tooltip.Positioner` subcomponent and an optional `positioner` prop on `Tooltip.Popup` (when omitted, the default `Tooltip.Positioner` is used). Remove `side`, `align`, and `sideOffset` from `Tooltip.Popup`; pass `positioner={ <Tooltip.Positioner side="…" align="…" sideOffset={ … } /> }` instead. The new subcomponent exposes the full positioner surface (`alignOffset`, `anchor`, `collisionAvoidance`, `collisionBoundary`, `collisionPadding`, `sticky`, etc.) and mirrors the existing `portal` slot pattern.
++-   `CollapsibleCard.Header`: Now renders an outer `<div>` wrapper around the trigger. Forwarded props (`className`, `aria-*`, `data-*`) and `ref` land on this outer wrapper instead of the inner click-target div ([#77962](https://github.com/WordPress/gutenberg/pull/77962)).
+ 
+ ### New Features
+ 
+@@ -28,6 +29,7 @@
+ -   `Drawer`: Fade the popup elevation shadow alongside the slide ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+ -   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+ -   `IconButton`: Add a `positioner` prop, accepting a `<Tooltip.Positioner />` element, to customize how the tooltip is positioned relative to the button ([#78089](https://github.com/WordPress/gutenberg/pull/78089)).
++-   `CollapsibleCard.Header`: Pass `render={ <h2 /> }` (or any of `<h1>`–`<h6>`) to wrap the trigger in a heading and contribute to the document outline, following the W3C APG accordion pattern (heading wraps button) ([#77962](https://github.com/WordPress/gutenberg/pull/77962)).
+ 
+ ### Internal
+ 
+diff --git a/packages/ui/src/collapsible-card/header.tsx b/packages/ui/src/collapsible-card/header.tsx
+index 8bbc249eb2d04e..04eb20edec7a76 100644
+--- a/packages/ui/src/collapsible-card/header.tsx
++++ b/packages/ui/src/collapsible-card/header.tsx
+@@ -1,3 +1,4 @@
++import { mergeProps, useRender } from '@base-ui/react';
+ import clsx from 'clsx';
+ import { forwardRef, useMemo, useState } from '@wordpress/element';
+ import { chevronDown } from '@wordpress/icons';
+@@ -15,6 +16,12 @@ import type { HeaderProps } from './types';
+  * toggle trigger — clicking anywhere on it expands or collapses the
+  * card's content.
+  *
++ * Defaults to a `<div>` wrapper around the trigger. Since the right heading
++ * level depends on the surrounding document outline, the consumer is
++ * expected to opt in to heading semantics. Pass `render` to wrap the
++ * trigger in a heading (e.g. `render={ <h2 /> }`), following the W3C APG
++ * accordion pattern (heading wraps button).
++ *
+  * Avoid placing interactive elements (buttons, links, inputs) inside the
+  * header, since the entire area is clickable and their events will bubble
+  * to trigger the collapse toggle.
+@@ -31,48 +38,54 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
+ 			[ setDescriptionId ]
+ 		);
+ 
+-		return (
+-			<HeaderDescriptionIdContext.Provider value={ contextValue }>
+-				<Collapsible.Trigger
+-					className={ clsx( styles.header, className ) }
+-					render={
+-						<Card.Header
+-							ref={ ref }
+-							render={ render }
+-							{ ...restProps }
+-						/>
+-					}
+-					nativeButton={ false }
+-					aria-describedby={ descriptionId }
+-				>
+-					<div className={ styles[ 'header-content' ] }>
+-						{ children }
+-					</div>
+-					<div
+-						className={ clsx(
+-							styles[ 'header-trigger-positioner' ]
+-						) }
+-					>
+-						<div
+-							className={ clsx(
+-								styles[ 'header-trigger-wrapper' ],
+-								defenseStyles.div,
+-								// While the interactive trigger element is the whole header,
+-								// the focus ring will be displayed only on the icon to visually
+-								// emulate it being the button.
+-								focusStyles[
+-									'outset-ring--focus-parent-visible'
+-								]
+-							) }
++		return useRender( {
++			defaultTagName: 'div',
++			render,
++			ref,
++			props: mergeProps< 'div' >( restProps, {
++				className: clsx(
++					defenseStyles.heading,
++					styles[ 'heading-wrapper' ],
++					className
++				),
++				children: (
++					<HeaderDescriptionIdContext.Provider value={ contextValue }>
++						<Collapsible.Trigger
++							className={ styles.header }
++							render={ <Card.Header /> }
++							nativeButton={ false }
++							aria-describedby={ descriptionId }
+ 						>
+-							<Icon
+-								icon={ chevronDown }
+-								className={ styles[ 'header-trigger' ] }
+-							/>
+-						</div>
+-					</div>
+-				</Collapsible.Trigger>
+-			</HeaderDescriptionIdContext.Provider>
+-		);
++							<div className={ styles[ 'header-content' ] }>
++								{ children }
++							</div>
++							<div
++								className={ clsx(
++									styles[ 'header-trigger-positioner' ]
++								) }
++							>
++								<div
++									className={ clsx(
++										styles[ 'header-trigger-wrapper' ],
++										defenseStyles.div,
++										// While the interactive trigger element is the whole header,
++										// the focus ring will be displayed only on the icon to visually
++										// emulate it being the button.
++										focusStyles[
++											'outset-ring--focus-parent-visible'
++										]
++									) }
++								>
++									<Icon
++										icon={ chevronDown }
++										className={ styles[ 'header-trigger' ] }
++									/>
++								</div>
++							</div>
++						</Collapsible.Trigger>
++					</HeaderDescriptionIdContext.Provider>
++				),
++			} ),
++		} );
+ 	}
+ );
+diff --git a/packages/ui/src/collapsible-card/stories/index.story.tsx b/packages/ui/src/collapsible-card/stories/index.story.tsx
+index 141e29a616a9e9..880ef83431905a 100644
+--- a/packages/ui/src/collapsible-card/stories/index.story.tsx
++++ b/packages/ui/src/collapsible-card/stories/index.story.tsx
+@@ -165,6 +165,61 @@ export const Stacked: Story = {
+ 	),
+ };
+ 
++/**
++ * `CollapsibleCard.Header` renders a `<div>` wrapper by default. Pass an
++ * `<h1>`–`<h6>` React element to the `render` prop to wrap the trigger in
++ * a heading and contribute to the document outline. The right level
++ * depends on the surrounding outline, so the consumer is expected to opt
++ * in.
++ */
++export const WithHeadingElement: Story = {
++	parameters: { controls: { disable: true } },
++	render: () => (
++		<div
++			style={ {
++				display: 'flex',
++				flexDirection: 'column',
++				gap: 'var(--wpds-dimension-gap-lg)',
++			} }
++		>
++			<CollapsibleCard.Root>
++				<CollapsibleCard.Header render={ <h2 /> }>
++					<Card.Title>Heading level 2</Card.Title>
++				</CollapsibleCard.Header>
++				<CollapsibleCard.Content>
++					<Text>
++						The wrapper renders as an h2 element when the consumer
++						passes an h2 React element to the render prop.
++					</Text>
++				</CollapsibleCard.Content>
++			</CollapsibleCard.Root>
++			<CollapsibleCard.Root>
++				<CollapsibleCard.Header render={ <h3 /> }>
++					<Card.Title>Heading level 3</Card.Title>
++				</CollapsibleCard.Header>
++				<CollapsibleCard.Content>
++					<Text>
++						Pass any of h1–h6 to choose the level that fits the
++						surrounding document outline.
++					</Text>
++				</CollapsibleCard.Content>
++			</CollapsibleCard.Root>
++			<CollapsibleCard.Root>
++				<CollapsibleCard.Header>
++					<Card.Title>No heading (default)</Card.Title>
++				</CollapsibleCard.Header>
++				<CollapsibleCard.Content>
++					<Text>
++						Without a render prop, the header wraps the trigger in a
++						plain div and does not contribute to the document
++						outline.
++					</Text>
++				</CollapsibleCard.Content>
++			</CollapsibleCard.Root>
++		</div>
++	),
++};
++
+ /**
+  * A collapsible card with a `HeaderDescription` that provides supplementary
+  * information (e.g. status, summary) as an `aria-describedby` relationship.
+diff --git a/packages/ui/src/collapsible-card/style.module.css b/packages/ui/src/collapsible-card/style.module.css
+index d52e78ad85c8ee..b61f7ddcc1e199 100644
+--- a/packages/ui/src/collapsible-card/style.module.css
++++ b/packages/ui/src/collapsible-card/style.module.css
+@@ -1,6 +1,26 @@
+ @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+ 
+ @layer wp-ui-components {
++	/*
++	 * Style overrides for the outer wrapper rendered by `CollapsibleCard.Header`
++	 * (defaults to `<div>`, but consumers can opt into a heading level via
++	 * `render={ <h2 /> }` etc.). Combined with `defenseStyles.heading` so that,
++	 * when the wrapper renders as an h1–h6, the unlayered defense class beats
++	 * wp-admin's bare `h2`/`h3`/etc. selectors. Keeps the wrapper visually
++	 * transparent so UA and host stylesheets don't bleed into the inner
++	 * trigger.
++	 */
++	.heading-wrapper {
++		--_gcd-heading-color: inherit;
++		--_gcd-heading-font-size: inherit;
++		--_gcd-heading-font-weight: inherit;
++		--_gcd-heading-margin: 0;
++
++		/* Properties not covered by the defense file. */
++		font-family: inherit;
++		line-height: inherit;
++	}
++
+ 	.header-content {
+ 		flex: 1;
+ 		min-width: 0;
+diff --git a/packages/ui/src/collapsible-card/test/index.test.tsx b/packages/ui/src/collapsible-card/test/index.test.tsx
+index 5ce044713dd492..719697bb9f56c9 100644
+--- a/packages/ui/src/collapsible-card/test/index.test.tsx
++++ b/packages/ui/src/collapsible-card/test/index.test.tsx
+@@ -1,4 +1,4 @@
+-import { render, screen } from '@testing-library/react';
++import { render, screen, within } from '@testing-library/react';
+ import { userEvent } from '@testing-library/user-event';
+ import { createRef } from '@wordpress/element';
+ import * as Card from '../../card';
+@@ -179,6 +179,65 @@ describe( 'CollapsibleCard', () => {
+ 		} );
+ 	} );
+ 
++	describe( 'header wrapper', () => {
++		it( 'does not contribute a heading to the document outline by default', () => {
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header>
++						<Card.Title>Title</Card.Title>
++					</CollapsibleCard.Header>
++				</CollapsibleCard.Root>
++			);
++
++			expect(
++				screen.queryByRole( 'heading', { name: 'Title' } )
++			).not.toBeInTheDocument();
++			expect(
++				screen.getByRole( 'button', { name: 'Title' } )
++			).toBeVisible();
++		} );
++
++		it( 'wraps the trigger in a heading via `render`', () => {
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header render={ <h2 /> }>
++						<Card.Title>Title</Card.Title>
++					</CollapsibleCard.Header>
++				</CollapsibleCard.Root>
++			);
++
++			const heading = screen.getByRole( 'heading', {
++				level: 2,
++				name: 'Title',
++			} );
++			expect( heading ).toBeVisible();
++			expect(
++				within( heading ).getByRole( 'button', { name: 'Title' } )
++			).toBeVisible();
++		} );
++
++		it( 'forwards `className` and other props to the outer wrapper', () => {
++			render(
++				<CollapsibleCard.Root>
++					<CollapsibleCard.Header
++						className="custom-header"
++						data-testid="header"
++					>
++						<Card.Title>Title</Card.Title>
++					</CollapsibleCard.Header>
++				</CollapsibleCard.Root>
++			);
++
++			const wrapper = screen.getByTestId( 'header' );
++			expect( wrapper ).toHaveClass( 'custom-header' );
++			// The forwarded attributes land on the outer wrapper, not the
++			// inner button trigger.
++			expect(
++				within( wrapper ).getByRole( 'button', { name: 'Title' } )
++			).not.toHaveAttribute( 'data-testid' );
++		} );
++	} );
++
+ 	describe( 'HeaderDescription', () => {
+ 		it( 'sets aria-describedby on the trigger pointing to the description', () => {
+ 			render(
+diff --git a/routes/guidelines/components/guideline-accordion.tsx b/routes/guidelines/components/guideline-accordion.tsx
+index fd78f4047c75fb..03ade326df657d 100644
+--- a/routes/guidelines/components/guideline-accordion.tsx
++++ b/routes/guidelines/components/guideline-accordion.tsx
+@@ -19,7 +19,7 @@ export default function GuidelineAccordion( {
+ }: GuidelineAccordionProps ) {
+ 	return (
+ 		<CollapsibleCard.Root>
+-			<CollapsibleCard.Header>
++			<CollapsibleCard.Header render={ <h2 /> }>
+ 				<VStack spacing={ 1 }>
+ 					<Card.Title>{ title }</Card.Title>
+ 					<CollapsibleCard.HeaderDescription>

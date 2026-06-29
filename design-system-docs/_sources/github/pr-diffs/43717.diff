@@ -1,0 +1,962 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3ec19b12191d77..b681d3938f4aa0 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -9,6 +9,7 @@
+ 
+ ### Enhancements
+ 
++-   `ToggleControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43717](https://github.com/WordPress/gutenberg/pull/43717)). 
+ -   `CheckboxControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43720](https://github.com/WordPress/gutenberg/pull/43720)).
+ 
+ ### Internal
+@@ -16,6 +17,7 @@
+ -   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
+ -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
+ -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
++-   `ToggleControl`: Convert to TypeScript and streamline CSS ([#43717](https://github.com/WordPress/gutenberg/pull/43717)). 
+ -   `Navigation`: use `code` instead of `keyCode` for keyboard events ([#43644](https://github.com/WordPress/gutenberg/pull/43644/)).
+ -   `ComboboxControl`: Add unit tests ([#42403](https://github.com/WordPress/gutenberg/pull/42403)).
+ -   `ComboboxControl`: updated to satisfy `react/exhuastive-deps` eslint rule ([#41417](https://github.com/WordPress/gutenberg/pull/41417))
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index 54c8da4286c0e1..2052a40b66f8f7 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -41,7 +41,6 @@
+ @import "./tab-panel/style.scss";
+ @import "./text-control/style.scss";
+ @import "./tip/style.scss";
+-@import "./toggle-control/style.scss";
+ @import "./toolbar/style.scss";
+ @import "./toolbar-button/style.scss";
+ @import "./toolbar-group/style.scss";
+diff --git a/packages/components/src/toggle-control/index.js b/packages/components/src/toggle-control/index.js
+deleted file mode 100644
+index 67e8ba5c25bb61..00000000000000
+--- a/packages/components/src/toggle-control/index.js
++++ /dev/null
+@@ -1,55 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import classnames from 'classnames';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useInstanceId } from '@wordpress/compose';
+-
+-/**
+- * Internal dependencies
+- */
+-import FormToggle from '../form-toggle';
+-import BaseControl from '../base-control';
+-
+-export default function ToggleControl( {
+-	label,
+-	checked,
+-	help,
+-	className,
+-	onChange,
+-	disabled,
+-} ) {
+-	function onChangeToggle( event ) {
+-		onChange( event.target.checked );
+-	}
+-	const instanceId = useInstanceId( ToggleControl );
+-	const id = `inspector-toggle-control-${ instanceId }`;
+-
+-	let describedBy, helpLabel;
+-	if ( help ) {
+-		describedBy = id + '__help';
+-		helpLabel = typeof help === 'function' ? help( checked ) : help;
+-	}
+-
+-	return (
+-		<BaseControl
+-			id={ id }
+-			help={ helpLabel }
+-			className={ classnames( 'components-toggle-control', className ) }
+-		>
+-			<FormToggle
+-				id={ id }
+-				checked={ checked }
+-				onChange={ onChangeToggle }
+-				aria-describedby={ describedBy }
+-				disabled={ disabled }
+-			/>
+-			<label htmlFor={ id } className="components-toggle-control__label">
+-				{ label }
+-			</label>
+-		</BaseControl>
+-	);
+-}
+diff --git a/packages/components/src/toggle-control/index.tsx b/packages/components/src/toggle-control/index.tsx
+new file mode 100644
+index 00000000000000..cb31677a356ec1
+--- /dev/null
++++ b/packages/components/src/toggle-control/index.tsx
+@@ -0,0 +1,97 @@
++/**
++ * External dependencies
++ */
++import type { ChangeEvent } from 'react';
++import { css } from '@emotion/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useInstanceId } from '@wordpress/compose';
++
++/**
++ * Internal dependencies
++ */
++import FormToggle from '../form-toggle';
++import BaseControl from '../base-control';
++import type { WordPressComponentProps } from '../ui/context/wordpress-component';
++import type { ToggleControlProps } from './types';
++import { HStack } from '../h-stack';
++import { useCx } from '../utils';
++import { space } from '../ui/utils/space';
++
++/**
++ * ToggleControl is used to generate a toggle user interface.
++ *
++ * ```jsx
++ * import { ToggleControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * const MyToggleControl = () => {
++ *   const [ value, setValue ] = useState( false );
++ *
++ *   return (
++ *     <ToggleControl
++ *       label="Fixed Background"
++ *       checked={ value }
++ *       onChange={ () => setValue( ( state ) => ! state ) }
++ *     />
++ *   );
++ * };
++ * ```
++ */
++export function ToggleControl( {
++	__nextHasNoMarginBottom,
++	label,
++	checked,
++	help,
++	className,
++	onChange,
++	disabled,
++}: WordPressComponentProps< ToggleControlProps, 'input', false > ) {
++	function onChangeToggle( event: ChangeEvent< HTMLInputElement > ) {
++		onChange( event.target.checked );
++	}
++	const instanceId = useInstanceId( ToggleControl );
++	const id = `inspector-toggle-control-${ instanceId }`;
++
++	const cx = useCx();
++	const classes = cx(
++		'components-toggle-control',
++		className,
++		! __nextHasNoMarginBottom && css( { marginBottom: space( 3 ) } )
++	);
++
++	let describedBy, helpLabel;
++	if ( help ) {
++		describedBy = id + '__help';
++		helpLabel = typeof help === 'function' ? help( checked ) : help;
++	}
++
++	return (
++		<BaseControl
++			id={ id }
++			help={ helpLabel }
++			className={ classes }
++			__nextHasNoMarginBottom
++		>
++			<HStack justify="flex-start" spacing={ 3 }>
++				<FormToggle
++					id={ id }
++					checked={ checked }
++					onChange={ onChangeToggle }
++					aria-describedby={ describedBy }
++					disabled={ disabled }
++				/>
++				<label
++					htmlFor={ id }
++					className="components-toggle-control__label"
++				>
++					{ label }
++				</label>
++			</HStack>
++		</BaseControl>
++	);
++}
++
++export default ToggleControl;
+diff --git a/packages/components/src/toggle-control/stories/index.js b/packages/components/src/toggle-control/stories/index.js
+deleted file mode 100644
+index bae3cd19832f8b..00000000000000
+--- a/packages/components/src/toggle-control/stories/index.js
++++ /dev/null
+@@ -1,64 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { text } from '@storybook/addon-knobs';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import ToggleControl from '../';
+-
+-export default {
+-	title: 'Components/ToggleControl',
+-	component: ToggleControl,
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-const ToggleControlWithState = ( {
+-	helpTextChecked,
+-	helpTextUnchecked,
+-	...props
+-} ) => {
+-	const [ hasFixedBackground, setHasFixedBackground ] = useState( true );
+-	return (
+-		<ToggleControl
+-			{ ...props }
+-			help={ hasFixedBackground ? helpTextChecked : helpTextUnchecked }
+-			checked={ hasFixedBackground }
+-			onChange={ setHasFixedBackground }
+-		/>
+-	);
+-};
+-
+-export const _default = () => {
+-	const label = text( 'Label', 'Does this have a fixed background?' );
+-
+-	return <ToggleControlWithState label={ label } />;
+-};
+-
+-export const withHelpText = () => {
+-	const label = text( 'Label', 'Does this have a fixed background?' );
+-	const helpTextChecked = text(
+-		'Help When Checked',
+-		'Has fixed background.'
+-	);
+-	const helpTextUnchecked = text(
+-		'Help When Unchecked',
+-		'No fixed background.'
+-	);
+-
+-	return (
+-		<ToggleControlWithState
+-			label={ label }
+-			helpTextChecked={ helpTextChecked }
+-			helpTextUnchecked={ helpTextUnchecked }
+-		/>
+-	);
+-};
+diff --git a/packages/components/src/toggle-control/stories/index.tsx b/packages/components/src/toggle-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..07cb9303dcba76
+--- /dev/null
++++ b/packages/components/src/toggle-control/stories/index.tsx
+@@ -0,0 +1,58 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import ToggleControl from '..';
++
++const meta: ComponentMeta< typeof ToggleControl > = {
++	title: 'Components/ToggleControl',
++	component: ToggleControl,
++	argTypes: {
++		checked: { control: { type: null } },
++		help: { control: { type: 'text' } },
++		label: { control: { type: 'text' } },
++		onChange: { action: 'onChange' },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof ToggleControl > = ( {
++	onChange,
++	...props
++} ) => {
++	const [ checked, setChecked ] = useState( true );
++	return (
++		<ToggleControl
++			{ ...props }
++			checked={ checked }
++			onChange={ ( ...changeArgs ) => {
++				setChecked( ...changeArgs );
++				onChange( ...changeArgs );
++			} }
++		/>
++	);
++};
++
++export const Default = Template.bind( {} );
++Default.args = {
++	label: 'Enable something',
++};
++
++export const WithHelpText = Template.bind( {} );
++WithHelpText.args = {
++	...Default.args,
++	help: 'This is some help text.',
++};
+diff --git a/packages/components/src/toggle-control/style.scss b/packages/components/src/toggle-control/style.scss
+deleted file mode 100644
+index d051eba00e91f7..00000000000000
+--- a/packages/components/src/toggle-control/style.scss
++++ /dev/null
+@@ -1,14 +0,0 @@
+-.components-toggle-control .components-base-control__field {
+-	display: flex;
+-	margin-bottom: $grid-unit-05 * 3;
+-	line-height: initial;
+-	align-items: center;
+-
+-	.components-form-toggle {
+-		margin-right: $grid-unit-15;
+-	}
+-
+-	.components-toggle-control__label {
+-		display: block;
+-	}
+-}
+diff --git a/packages/components/src/toggle-control/test/index.js b/packages/components/src/toggle-control/test/index.js
+deleted file mode 100644
+index 1420779d8bf170..00000000000000
+--- a/packages/components/src/toggle-control/test/index.js
++++ /dev/null
+@@ -1,52 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import renderer from 'react-test-renderer';
+-
+-/**
+- * Internal dependencies
+- */
+-import ToggleControl from '../';
+-
+-describe( 'ToggleControl', () => {
+-	it( 'triggers change callback with numeric value', () => {
+-		// Mount: With shallow, cannot find input child of BaseControl.
+-		const onChange = jest.fn();
+-		const wrapper = renderer.create(
+-			<ToggleControl onChange={ onChange } />
+-		);
+-		wrapper.root
+-			.findByType( 'input' )
+-			.props.onChange( { target: { checked: true } } );
+-
+-		expect( onChange ).toHaveBeenCalledWith( true );
+-	} );
+-
+-	describe( 'help', () => {
+-		it( 'does not render input with describedby if no help prop', () => {
+-			// Mount: With shallow, cannot find input child of BaseControl.
+-			const onChange = jest.fn();
+-			const wrapper = renderer.create(
+-				<ToggleControl onChange={ onChange } />
+-			);
+-
+-			const input = wrapper.root.findByType( 'input' );
+-
+-			expect( input.props[ 'aria-describedby' ] ).toBeUndefined();
+-		} );
+-
+-		it( 'renders input with describedby if help prop', () => {
+-			// Mount: With shallow, cannot find input child of BaseControl.
+-			const onChange = jest.fn();
+-			const wrapper = renderer.create(
+-				<ToggleControl onChange={ onChange } help={ true } />
+-			);
+-
+-			const input = wrapper.root.findByType( 'input' );
+-
+-			expect( input.props[ 'aria-describedby' ] ).toMatch(
+-				/^inspector-toggle-control-.*__help$/
+-			);
+-		} );
+-	} );
+-} );
+diff --git a/packages/components/src/toggle-control/test/index.tsx b/packages/components/src/toggle-control/test/index.tsx
+new file mode 100644
+index 00000000000000..cc89031d9affa3
+--- /dev/null
++++ b/packages/components/src/toggle-control/test/index.tsx
+@@ -0,0 +1,53 @@
++/**
++ * External dependencies
++ */
++import { render, screen } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import ToggleControl from '..';
++
++describe( 'ToggleControl', () => {
++	it( 'should label the toggle', () => {
++		render( <ToggleControl label="My toggle" onChange={ () => {} } /> );
++
++		expect(
++			screen.getByRole( 'checkbox', { name: 'My toggle' } )
++		).toBeInTheDocument();
++	} );
++
++	it( 'triggers change callback with boolean', () => {
++		const onChange = jest.fn();
++
++		render( <ToggleControl label="My toggle" onChange={ onChange } /> );
++
++		screen.getByRole( 'checkbox' ).click();
++		expect( onChange ).toHaveBeenLastCalledWith( true );
++
++		screen.getByRole( 'checkbox' ).click();
++		expect( onChange ).toHaveBeenLastCalledWith( false );
++	} );
++
++	describe( 'help', () => {
++		it( 'should not give the input a description if no `help` prop', () => {
++			render( <ToggleControl label="My toggle" onChange={ () => {} } /> );
++			expect(
++				screen.getByRole( 'checkbox' )
++			).not.toHaveAccessibleDescription();
++		} );
++
++		it( "should associate `help` as the input's description", () => {
++			render(
++				<ToggleControl
++					help="My help text"
++					label="My toggle"
++					onChange={ () => {} }
++				/>
++			);
++			expect(
++				screen.getByRole( 'checkbox', { description: 'My help text' } )
++			).toBeInTheDocument();
++		} );
++	} );
++} );
+diff --git a/packages/components/src/toggle-control/types.ts b/packages/components/src/toggle-control/types.ts
+new file mode 100644
+index 00000000000000..3ad8d815f39d9e
+--- /dev/null
++++ b/packages/components/src/toggle-control/types.ts
+@@ -0,0 +1,28 @@
++/**
++ * External dependencies
++ */
++import type { ReactNode } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { BaseControlProps } from '../base-control/types';
++import type { FormToggleProps } from '../form-toggle/types';
++
++export type ToggleControlProps = Pick<
++	FormToggleProps,
++	'checked' | 'disabled'
++> &
++	Pick<
++		BaseControlProps,
++		'__nextHasNoMarginBottom' | 'help' | 'className'
++	> & {
++		/**
++		 * The label for the toggle.
++		 */
++		label: ReactNode;
++		/**
++		 * A callback function invoked when the toggle is clicked.
++		 */
++		onChange: ( value: boolean ) => void;
++	};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 61b3f00f12a227..51d57599ccfbdf 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -74,7 +74,6 @@
+ 		"src/search-control",
+ 		"src/snackbar",
+ 		"src/tab-panel",
+-		"src/toggle-control",
+ 		"src/toolbar",
+ 		"src/toolbar-button",
+ 		"src/toolbar-context",
+diff --git a/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap b/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
+index 9b012529df837a..5a0769cd1ee337 100644
+--- a/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
++++ b/packages/edit-post/src/components/preferences-modal/options/test/__snapshots__/enable-custom-fields.js.snap
+@@ -13,14 +13,37 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+   box-sizing: inherit;
+ }
+ 
+-.emotion-2 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+ 
++.emotion-4 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: start;
++  -ms-flex-pack: start;
++  -webkit-justify-content: flex-start;
++  justify-content: flex-start;
++  width: 100%;
++}
++
++.emotion-4>*+*:not( marquee ) {
++  margin-left: calc(4px * 3);
++}
++
++.emotion-4>* {
++  min-width: 0;
++}
++
+ <div
+   className="interface-preferences-modal__option"
+ >
+@@ -30,27 +53,33 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation
+     <div
+       className="components-base-control__field emotion-2 emotion-3"
+     >
+-      <span
+-        className="components-form-toggle is-checked"
++      <div
++        className="components-flex components-h-stack emotion-4 emotion-5"
++        data-wp-c16t={true}
++        data-wp-component="HStack"
+       >
+-        <input
+-          checked={true}
+-          className="components-form-toggle__input"
+-          id="inspector-toggle-control-3"
+-          onChange={[Function]}
+-          type="checkbox"
+-        />
+-        <span
+-          className="components-form-toggle__track"
+-        />
+         <span
+-          className="components-form-toggle__thumb"
++          className="components-form-toggle is-checked"
++        >
++          <input
++            checked={true}
++            className="components-form-toggle__input"
++            id="inspector-toggle-control-3"
++            onChange={[Function]}
++            type="checkbox"
++          />
++          <span
++            className="components-form-toggle__track"
++          />
++          <span
++            className="components-form-toggle__thumb"
++          />
++        </span>
++        <label
++          className="components-toggle-control__label"
++          htmlFor="inspector-toggle-control-3"
+         />
+-      </span>
+-      <label
+-        className="components-toggle-control__label"
+-        htmlFor="inspector-toggle-control-3"
+-      />
++      </div>
+     </div>
+   </div>
+   <p
+@@ -83,14 +112,37 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+   box-sizing: inherit;
+ }
+ 
+-.emotion-2 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+ 
++.emotion-4 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: start;
++  -ms-flex-pack: start;
++  -webkit-justify-content: flex-start;
++  justify-content: flex-start;
++  width: 100%;
++}
++
++.emotion-4>*+*:not( marquee ) {
++  margin-left: calc(4px * 3);
++}
++
++.emotion-4>* {
++  min-width: 0;
++}
++
+ <div
+   className="interface-preferences-modal__option"
+ >
+@@ -100,27 +152,33 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields
+     <div
+       className="components-base-control__field emotion-2 emotion-3"
+     >
+-      <span
+-        className="components-form-toggle is-checked"
++      <div
++        className="components-flex components-h-stack emotion-4 emotion-5"
++        data-wp-c16t={true}
++        data-wp-component="HStack"
+       >
+-        <input
+-          checked={true}
+-          className="components-form-toggle__input"
+-          id="inspector-toggle-control-0"
+-          onChange={[Function]}
+-          type="checkbox"
+-        />
+-        <span
+-          className="components-form-toggle__track"
+-        />
+         <span
+-          className="components-form-toggle__thumb"
++          className="components-form-toggle is-checked"
++        >
++          <input
++            checked={true}
++            className="components-form-toggle__input"
++            id="inspector-toggle-control-0"
++            onChange={[Function]}
++            type="checkbox"
++          />
++          <span
++            className="components-form-toggle__track"
++          />
++          <span
++            className="components-form-toggle__thumb"
++          />
++        </span>
++        <label
++          className="components-toggle-control__label"
++          htmlFor="inspector-toggle-control-0"
+         />
+-      </span>
+-      <label
+-        className="components-toggle-control__label"
+-        htmlFor="inspector-toggle-control-0"
+-      />
++      </div>
+     </div>
+   </div>
+ </div>
+@@ -139,14 +197,37 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+   box-sizing: inherit;
+ }
+ 
+-.emotion-2 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+ 
++.emotion-4 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: start;
++  -ms-flex-pack: start;
++  -webkit-justify-content: flex-start;
++  justify-content: flex-start;
++  width: 100%;
++}
++
++.emotion-4>*+*:not( marquee ) {
++  margin-left: calc(4px * 3);
++}
++
++.emotion-4>* {
++  min-width: 0;
++}
++
+ <div
+   className="interface-preferences-modal__option"
+ >
+@@ -156,27 +237,33 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
+     <div
+       className="components-base-control__field emotion-2 emotion-3"
+     >
+-      <span
+-        className="components-form-toggle"
++      <div
++        className="components-flex components-h-stack emotion-4 emotion-5"
++        data-wp-c16t={true}
++        data-wp-component="HStack"
+       >
+-        <input
+-          checked={false}
+-          className="components-form-toggle__input"
+-          id="inspector-toggle-control-2"
+-          onChange={[Function]}
+-          type="checkbox"
+-        />
+-        <span
+-          className="components-form-toggle__track"
+-        />
+         <span
+-          className="components-form-toggle__thumb"
++          className="components-form-toggle"
++        >
++          <input
++            checked={false}
++            className="components-form-toggle__input"
++            id="inspector-toggle-control-2"
++            onChange={[Function]}
++            type="checkbox"
++          />
++          <span
++            className="components-form-toggle__track"
++          />
++          <span
++            className="components-form-toggle__thumb"
++          />
++        </span>
++        <label
++          className="components-toggle-control__label"
++          htmlFor="inspector-toggle-control-2"
+         />
+-      </span>
+-      <label
+-        className="components-toggle-control__label"
+-        htmlFor="inspector-toggle-control-2"
+-      />
++      </div>
+     </div>
+   </div>
+   <p
+@@ -209,14 +296,37 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
+   box-sizing: inherit;
+ }
+ 
+-.emotion-2 {
+-  margin-bottom: calc(4px * 2);
+-}
+-
+ .components-panel__row .emotion-2 {
+   margin-bottom: inherit;
+ }
+ 
++.emotion-4 {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  -webkit-flex-direction: row;
++  -ms-flex-direction: row;
++  flex-direction: row;
++  -webkit-box-pack: start;
++  -ms-flex-pack: start;
++  -webkit-justify-content: flex-start;
++  justify-content: flex-start;
++  width: 100%;
++}
++
++.emotion-4>*+*:not( marquee ) {
++  margin-left: calc(4px * 3);
++}
++
++.emotion-4>* {
++  min-width: 0;
++}
++
+ <div
+   className="interface-preferences-modal__option"
+ >
+@@ -226,27 +336,33 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
+     <div
+       className="components-base-control__field emotion-2 emotion-3"
+     >
+-      <span
+-        className="components-form-toggle"
++      <div
++        className="components-flex components-h-stack emotion-4 emotion-5"
++        data-wp-c16t={true}
++        data-wp-component="HStack"
+       >
+-        <input
+-          checked={false}
+-          className="components-form-toggle__input"
+-          id="inspector-toggle-control-1"
+-          onChange={[Function]}
+-          type="checkbox"
+-        />
+-        <span
+-          className="components-form-toggle__track"
+-        />
+         <span
+-          className="components-form-toggle__thumb"
++          className="components-form-toggle"
++        >
++          <input
++            checked={false}
++            className="components-form-toggle__input"
++            id="inspector-toggle-control-1"
++            onChange={[Function]}
++            type="checkbox"
++          />
++          <span
++            className="components-form-toggle__track"
++          />
++          <span
++            className="components-form-toggle__thumb"
++          />
++        </span>
++        <label
++          className="components-toggle-control__label"
++          htmlFor="inspector-toggle-control-1"
+         />
+-      </span>
+-      <label
+-        className="components-toggle-control__label"
+-        htmlFor="inspector-toggle-control-1"
+-      />
++      </div>
+     </div>
+   </div>
+ </div>
+diff --git a/packages/interface/src/components/preferences-modal-base-option/index.js b/packages/interface/src/components/preferences-modal-base-option/index.js
+index bf027b17354a26..92346630d98aa2 100644
+--- a/packages/interface/src/components/preferences-modal-base-option/index.js
++++ b/packages/interface/src/components/preferences-modal-base-option/index.js
+@@ -7,6 +7,7 @@ function BaseOption( { help, label, isChecked, onChange, children } ) {
+ 	return (
+ 		<div className="interface-preferences-modal__option">
+ 			<ToggleControl
++				__nextHasNoMarginBottom
+ 				help={ help }
+ 				label={ label }
+ 				checked={ isChecked }
+diff --git a/packages/interface/src/components/preferences-modal-base-option/style.scss b/packages/interface/src/components/preferences-modal-base-option/style.scss
+index 88143354a497be..99587847193d38 100644
+--- a/packages/interface/src/components/preferences-modal-base-option/style.scss
++++ b/packages/interface/src/components/preferences-modal-base-option/style.scss
+@@ -1,21 +1,10 @@
+ .interface-preferences-modal__option {
+-	.components-base-control {
+-		.components-base-control__field {
+-			align-items: center;
+-			display: flex;
+-			margin-bottom: 0;
+-
+-			& > label {
+-				flex-grow: 1;
+-				padding: 0.6rem 0 0.6rem 10px;
+-			}
+-		}
++	& + & {
++		margin-top: $grid-unit-20;
+ 	}
+ 
+ 	.components-base-control__help {
+-		margin: -$grid-unit-10 0 $grid-unit-10 58px;
+-		font-size: $helptext-font-size;
+-		font-style: normal;
+-		color: $gray-700;
++		margin-top: 0;
++		margin-left: 48px;
+ 	}
+ }
+diff --git a/packages/interface/src/components/preferences-modal-section/index.js b/packages/interface/src/components/preferences-modal-section/index.js
+index 3ad08b557ff85f..ea164128ea54cb 100644
+--- a/packages/interface/src/components/preferences-modal-section/index.js
++++ b/packages/interface/src/components/preferences-modal-section/index.js
+@@ -1,6 +1,6 @@
+ const Section = ( { description, title, children } ) => (
+ 	<fieldset className="interface-preferences-modal__section">
+-		<legend>
++		<legend className="interface-preferences-modal__section-legend">
+ 			<h2 className="interface-preferences-modal__section-title">
+ 				{ title }
+ 			</h2>
+diff --git a/packages/interface/src/components/preferences-modal-section/style.scss b/packages/interface/src/components/preferences-modal-section/style.scss
+index 135545986836ad..1a45642a8b7af9 100644
+--- a/packages/interface/src/components/preferences-modal-section/style.scss
++++ b/packages/interface/src/components/preferences-modal-section/style.scss
+@@ -6,6 +6,10 @@
+ 	}
+ }
+ 
++.interface-preferences-modal__section-legend {
++	margin-bottom: $grid-unit-10;
++}
++
+ .interface-preferences-modal__section-title {
+ 	font-size: 0.9rem;
+ 	font-weight: 600;

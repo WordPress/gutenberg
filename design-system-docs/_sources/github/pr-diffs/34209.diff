@@ -1,0 +1,13 @@
+diff --git a/packages/components/src/focal-point-picker/controls.js b/packages/components/src/focal-point-picker/controls.js
+index ae375a1bc32ceb..36991e05604139 100644
+--- a/packages/components/src/focal-point-picker/controls.js
++++ b/packages/components/src/focal-point-picker/controls.js
+@@ -60,7 +60,7 @@ function UnitControl( props ) {
+ 	return (
+ 		<BaseUnitControl
+ 			className="focal-point-picker__controls-position-unit-control"
+-			labelPosition="side"
++			labelPosition="top"
+ 			max={ TEXTCONTROL_MAX }
+ 			min={ TEXTCONTROL_MIN }
+ 			unit="%"

@@ -1,0 +1,338 @@
+diff --git a/packages/components/src/button/stories/e2e/index.story.tsx b/packages/components/src/button/stories/e2e/index.story.tsx
+index 9a03245bc2ef08..a37624db1700b2 100644
+--- a/packages/components/src/button/stories/e2e/index.story.tsx
++++ b/packages/components/src/button/stories/e2e/index.story.tsx
+@@ -147,6 +147,17 @@ Icon.args = {
+ 	icon: wordpress,
+ };
+ 
++export const TextOverflow: StoryFn< typeof Button > = ( props ) => {
++	return <Button __next40pxDefaultSize { ...props } />;
++};
++TextOverflow.args = {
++	children:
++		'This is an extremely long label thatshoulddemonstratetextoverflow behavior',
++};
++TextOverflow.parameters = {
++	textOverflowContainers: true,
++};
++
+ export const Dashicons: StoryFn< typeof Button > = ( props ) => {
+ 	return (
+ 		<div style={ { display: 'flex', gap: 8 } }>
+diff --git a/packages/ui/src/badge/stories/e2e/index.story.tsx b/packages/ui/src/badge/stories/e2e/index.story.tsx
+new file mode 100644
+index 00000000000000..33e836f31e179d
+--- /dev/null
++++ b/packages/ui/src/badge/stories/e2e/index.story.tsx
+@@ -0,0 +1,20 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { Badge } from '../..';
++
++const meta: Meta< typeof Badge > = {
++	title: 'Design System/Components/Badge',
++	component: Badge,
++};
++export default meta;
++
++type Story = StoryObj< typeof Badge >;
++
++export const TextOverflow: Story = {
++	args: {
++		children:
++			'This is an extremely long label thatshoulddemonstratetextoverflow behavior',
++	},
++	parameters: {
++		textOverflowContainers: true,
++	},
++};
+diff --git a/packages/ui/src/button/stories/e2e/index.story.tsx b/packages/ui/src/button/stories/e2e/index.story.tsx
+new file mode 100644
+index 00000000000000..214dd8246b580e
+--- /dev/null
++++ b/packages/ui/src/button/stories/e2e/index.story.tsx
+@@ -0,0 +1,20 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { Button } from '../..';
++
++const meta: Meta< typeof Button > = {
++	title: 'Design System/Components/Button',
++	component: Button,
++};
++export default meta;
++
++type Story = StoryObj< typeof Button >;
++
++export const TextOverflow: Story = {
++	args: {
++		children:
++			'This is an extremely long label thatshoulddemonstratetextoverflow behavior',
++	},
++	parameters: {
++		textOverflowContainers: true,
++	},
++};
+diff --git a/storybook/decorators/with-text-overflow-containers.tsx b/storybook/decorators/with-text-overflow-containers.tsx
+new file mode 100644
+index 00000000000000..7e5ddd52f65ce8
+--- /dev/null
++++ b/storybook/decorators/with-text-overflow-containers.tsx
+@@ -0,0 +1,227 @@
++import type { Decorator } from '@storybook/react-vite';
++import type { CSSProperties, ReactNode } from 'react';
++
++const DEFAULT_WIDTH = 160;
++const DEFAULT_HEIGHT = 60;
++
++const labelStyles: CSSProperties = {
++	fontSize: 'var(--wpds-typography-font-size-xs)',
++	fontWeight: 'var(--wpds-typography-font-weight-medium)',
++	color: 'var(--wpds-color-fg-content-neutral-weak)',
++	textTransform: 'uppercase',
++	marginBlockEnd: 'var(--wpds-dimension-gap-xs)',
++};
++
++const cssStyles: CSSProperties = {
++	fontSize: 'var(--wpds-typography-font-size-xs)',
++	fontFamily: 'monospace',
++	color: 'var(--wpds-color-fg-content-neutral-weak)',
++	marginBlockEnd: 'var(--wpds-dimension-gap-sm)',
++};
++
++const constraintOutline: CSSProperties = {
++	outline: '1px dashed var(--wpds-color-stroke-surface-neutral-weak)',
++};
++
++type Scenario = {
++	name: string;
++	css: string;
++	fullWidth?: boolean;
++	render: ( story: ReactNode, width: number, height: number ) => ReactNode;
++};
++
++const scenarios: Scenario[] = [
++	{
++		name: 'Unconstrained',
++		css: 'No width constraint',
++		fullWidth: true,
++		render: ( story ) => story,
++	},
++	{
++		name: 'Fixed width',
++		css: 'width: {w}px',
++		render: ( story, w ) => (
++			<div style={ { ...constraintOutline, width: w } }>{ story }</div>
++		),
++	},
++	{
++		name: 'Max-width',
++		css: 'max-width: {w}px',
++		render: ( story, w ) => (
++			<div style={ { ...constraintOutline, maxWidth: w } }>{ story }</div>
++		),
++	},
++	{
++		name: 'Fit-content',
++		css: 'width: fit-content',
++		render: ( story ) => (
++			<div style={ { ...constraintOutline, width: 'fit-content' } }>
++				{ story }
++			</div>
++		),
++	},
++	{
++		name: 'Flex child (default)',
++		css: 'Flex parent width: {w}px',
++		render: ( story, w ) => (
++			<div
++				style={ {
++					...constraintOutline,
++					display: 'flex',
++					width: w,
++				} }
++			>
++				{ story }
++			</div>
++		),
++	},
++	{
++		name: 'Flex child (min-width: 0)',
++		css: 'Flex parent width: {w}px; child min-width: 0',
++		render: ( story, w ) => (
++			<div
++				style={ {
++					...constraintOutline,
++					display: 'flex',
++					width: w,
++				} }
++			>
++				<div style={ { minWidth: 0 } }>{ story }</div>
++			</div>
++		),
++	},
++	{
++		name: 'Flex child with siblings',
++		css: 'Children: flex: 1; min-width: 0',
++		render: ( story ) => (
++			<div
++				style={ {
++					...constraintOutline,
++					display: 'flex',
++					gap: 8,
++				} }
++			>
++				<div style={ { flex: '1 1 0', minWidth: 0 } }>{ story }</div>
++				<div
++					style={ {
++						flex: '1 1 0',
++						minWidth: 0,
++						background: '#f0f0f0',
++						borderRadius: 2,
++					} }
++				/>
++			</div>
++		),
++	},
++	{
++		name: 'Grid (fixed column)',
++		css: 'grid-template-columns: {w}px',
++		render: ( story, w ) => (
++			<div
++				style={ {
++					...constraintOutline,
++					display: 'grid',
++					gridTemplateColumns: `${ w }px`,
++				} }
++			>
++				{ story }
++			</div>
++		),
++	},
++	{
++		name: 'Grid (min-content column)',
++		css: 'width: {w}px; grid-template-columns: min-content 1fr',
++		render: ( story, w ) => (
++			<div
++				style={ {
++					...constraintOutline,
++					display: 'grid',
++					gridTemplateColumns: 'min-content 1fr',
++					gap: 8,
++					width: w,
++				} }
++			>
++				{ story }
++				<div
++					style={ {
++						background: '#f0f0f0',
++						borderRadius: 2,
++					} }
++				/>
++			</div>
++		),
++	},
++	{
++		name: 'Fixed width + height',
++		css: 'width: {w}px; height: {h}px',
++		render: ( story, w, h ) => (
++			<div style={ { ...constraintOutline, width: w, height: h } }>
++				{ story }
++			</div>
++		),
++	},
++	{
++		name: 'overflow: hidden',
++		css: 'width: {w}px; overflow: hidden',
++		render: ( story, w ) => (
++			<div
++				style={ {
++					...constraintOutline,
++					width: w,
++					overflow: 'hidden',
++				} }
++			>
++				{ story }
++			</div>
++		),
++	},
++];
++
++export const WithTextOverflowContainers: Decorator = ( Story, context ) => {
++	const param = context.parameters?.textOverflowContainers;
++
++	if ( ! param ) {
++		return <Story { ...context } />;
++	}
++
++	const width =
++		( typeof param === 'object' ? param.width : undefined ) ??
++		DEFAULT_WIDTH;
++	const height =
++		( typeof param === 'object' ? param.height : undefined ) ??
++		DEFAULT_HEIGHT;
++
++	const formatCss = ( css: string ) =>
++		css
++			.replace( /\{w\}/g, String( width ) )
++			.replace( /\{h\}/g, String( height ) );
++
++	return (
++		<div
++			style={ {
++				display: 'grid',
++				gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
++				gap: 24,
++			} }
++		>
++			{ scenarios.map( ( scenario ) => (
++				<div
++					key={ scenario.name }
++					style={
++						scenario.fullWidth
++							? { gridColumn: '1 / -1' }
++							: undefined
++					}
++				>
++					<div style={ labelStyles }>{ scenario.name }</div>
++					<div style={ cssStyles }>{ formatCss( scenario.css ) }</div>
++					{ scenario.render(
++						<Story { ...context } />,
++						width,
++						height
++					) }
++				</div>
++			) ) }
++		</div>
++	);
++};
+diff --git a/test/storybook-playwright/storybook/main.ts b/test/storybook-playwright/storybook/main.ts
+index 60918702746096..53f2621cbf09a6 100644
+--- a/test/storybook-playwright/storybook/main.ts
++++ b/test/storybook-playwright/storybook/main.ts
+@@ -7,5 +7,6 @@ export default {
+ 	staticDirs: undefined,
+ 	stories: [
+ 		'../../../packages/components/src/**/stories/e2e/*.story.@(js|tsx|mdx)',
++		'../../../packages/ui/src/**/stories/e2e/*.story.@(ts|tsx|mdx)',
+ 	],
+ } satisfies StorybookConfig;
+diff --git a/test/storybook-playwright/storybook/preview.js b/test/storybook-playwright/storybook/preview.js
+index ef4407d9bfab14..5630445f024d5d 100644
+--- a/test/storybook-playwright/storybook/preview.js
++++ b/test/storybook-playwright/storybook/preview.js
+@@ -3,6 +3,7 @@
+  */
+ 
+ import * as basePreviewConfig from '@wordpress/storybook/preview';
++import { WithTextOverflowContainers } from '../../../storybook/decorators/with-text-overflow-containers';
+ import { WithCustomControls } from './decorators/with-custom-controls';
+ 
+ export const globalTypes = {
+@@ -23,6 +24,7 @@ export const globalTypes = {
+ };
+ export const decorators = [
+ 	...basePreviewConfig.decorators,
++	WithTextOverflowContainers,
+ 	WithCustomControls,
+ ];
+ export const parameters = { ...basePreviewConfig.parameters };

@@ -1,0 +1,84 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5742b652a58a66..17975b105967fa 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `InputControl`: Add `__next36pxDefaultSize` flag for larger default size ([#40622](https://github.com/WordPress/gutenberg/pull/40622)).
++
+ ## 19.9.0 (2022-04-21)
+ 
+ ### Bug Fix
+diff --git a/packages/components/src/input-control/styles/input-control-styles.tsx b/packages/components/src/input-control/styles/input-control-styles.tsx
+index 62127e2dcf9f71..1c8463675b39f2 100644
+--- a/packages/components/src/input-control/styles/input-control-styles.tsx
++++ b/packages/components/src/input-control/styles/input-control-styles.tsx
+@@ -105,6 +105,7 @@ export const Container = styled.div< ContainerProps >`
+ `;
+ 
+ type InputProps = {
++	__next36pxDefaultSize?: boolean;
+ 	disabled?: boolean;
+ 	inputSize?: Size;
+ 	isDragging?: boolean;
+@@ -140,14 +141,17 @@ const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
+ 	`;
+ };
+ 
+-const sizeStyles = ( { inputSize: size }: InputProps ) => {
++const sizeStyles = ( {
++	inputSize: size,
++	__next36pxDefaultSize,
++}: InputProps ) => {
+ 	const sizes = {
+ 		default: {
+-			height: 30,
++			height: 36,
+ 			lineHeight: 1,
+-			minHeight: 30,
+-			paddingLeft: 8,
+-			paddingRight: 8,
++			minHeight: 36,
++			paddingLeft: 16,
++			paddingRight: 16,
+ 		},
+ 		small: {
+ 			height: 24,
+@@ -165,6 +169,16 @@ const sizeStyles = ( { inputSize: size }: InputProps ) => {
+ 		},
+ 	};
+ 
++	if ( ! __next36pxDefaultSize ) {
++		sizes.default = {
++			height: 30,
++			lineHeight: 1,
++			minHeight: 30,
++			paddingLeft: 8,
++			paddingRight: 8,
++		};
++	}
++
+ 	const style = sizes[ size as Size ] || sizes.default;
+ 
+ 	return css( style );
+diff --git a/packages/components/src/input-control/types.ts b/packages/components/src/input-control/types.ts
+index 4f4ed844d2ef51..bdf0c33dfadf71 100644
+--- a/packages/components/src/input-control/types.ts
++++ b/packages/components/src/input-control/types.ts
+@@ -27,6 +27,12 @@ export type DragProps = Parameters< Parameters< typeof useDrag >[ 0 ] >[ 0 ];
+ export type Size = 'default' | 'small' | '__unstable-large';
+ 
+ interface BaseProps {
++	/**
++	 * Start opting into the larger default height that will become the default size in a future version.
++	 *
++	 * @default false
++	 */
++	__next36pxDefaultSize?: boolean;
+ 	__unstableInputWidth?: CSSProperties[ 'width' ];
+ 	/**
+ 	 * If true, the label will only be visible to screen readers.

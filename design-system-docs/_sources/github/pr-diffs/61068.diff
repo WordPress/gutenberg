@@ -1,0 +1,106 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 12277f793d2d92..314cbe56f89318 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,8 @@
+ 
+ ## Unreleased
+ 
++- `ToolsPanel`: Remove "experimental" designation ([#61068](https://github.com/WordPress/gutenberg/pull/61068)).
++
+ ### Enhancements
+ 
+ -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
+diff --git a/packages/components/src/index.ts b/packages/components/src/index.ts
+index a824162cb24129..bc34e0ca84aa52 100644
+--- a/packages/components/src/index.ts
++++ b/packages/components/src/index.ts
+@@ -169,9 +169,21 @@ export {
+ 	ToolbarItem,
+ } from './toolbar';
+ export {
++	/**
++	 * @deprecated Import `ToolsPanel` instead.
++	 */
+ 	ToolsPanel as __experimentalToolsPanel,
++	/**
++	 * @deprecated Import `ToolsPanelItem` instead.
++	 */
+ 	ToolsPanelItem as __experimentalToolsPanelItem,
++	/**
++	 * @deprecated Import `ToolsPanelContext` instead.
++	 */
+ 	ToolsPanelContext as __experimentalToolsPanelContext,
++	ToolsPanel,
++	ToolsPanelItem,
++	ToolsPanelContext,
+ } from './tools-panel';
+ export { default as Tooltip } from './tooltip';
+ export {
+diff --git a/packages/components/src/tools-panel/stories/index.story.tsx b/packages/components/src/tools-panel/stories/index.story.tsx
+index cd6f61c6e921bd..855177a0ea4b67 100644
+--- a/packages/components/src/tools-panel/stories/index.story.tsx
++++ b/packages/components/src/tools-panel/stories/index.story.tsx
+@@ -26,7 +26,7 @@ import UnitControl from '../../unit-control';
+ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
+ 
+ const meta: Meta< typeof ToolsPanel > = {
+-	title: 'Components (Experimental)/ToolsPanel',
++	title: 'Components/ToolsPanel',
+ 	component: ToolsPanel,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { ToolsPanelItem },
+diff --git a/packages/components/src/tools-panel/tools-panel/README.md b/packages/components/src/tools-panel/tools-panel/README.md
+index df41b623eefb6c..afba8bba00c522 100644
+--- a/packages/components/src/tools-panel/tools-panel/README.md
++++ b/packages/components/src/tools-panel/tools-panel/README.md
+@@ -1,10 +1,5 @@
+ # ToolsPanel
+ 
+-<div class="callout callout-alert">
+-This feature is still experimental. “Experimental” means this is an early
+-implementation subject to drastic and breaking changes.
+-</div>
+-<br />
+ These panels provide progressive discovery options for their children. For
+ example the controls provided via block supports.
+ 
+@@ -61,7 +56,7 @@ import styled from '@emotion/styled';
+  */
+ import {
+ 	__experimentalBoxControl as BoxControl,
+-	__experimentalToolsPanel as ToolsPanel,
++	ToolsPanel,
+ 	__experimentalToolsPanelItem as ToolsPanelItem,
+ 	__experimentalUnitControl as UnitControl,
+ } from '@wordpress/components';
+diff --git a/packages/components/src/tools-panel/tools-panel/component.tsx b/packages/components/src/tools-panel/tools-panel/component.tsx
+index 4e01e39ffffb43..4698f6b2a3ac75 100644
+--- a/packages/components/src/tools-panel/tools-panel/component.tsx
++++ b/packages/components/src/tools-panel/tools-panel/component.tsx
+@@ -53,8 +53,8 @@ const UnconnectedToolsPanel = (
+  * ```jsx
+  * import { __ } from '@wordpress/i18n';
+  * import {
+- *   __experimentalToolsPanel as ToolsPanel,
+- *   __experimentalToolsPanelItem as ToolsPanelItem,
++ *   ToolsPanel,
++ *   ToolsPanelItem,
+  *   __experimentalUnitControl as UnitControl
+  * } from '@wordpress/components';
+  *
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 629f06bf98edf9..79ca29986b8dba 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -1,6 +1,9 @@
+ <script>
+ 	( function redirectIfStoryMoved() {
+-		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
++		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
++			'navigation',
++			'toolspanel',
++		];
+ 		const REDIRECTS = [
+ 			{
+ 				from: /\/components-deprecated-/,

@@ -1,0 +1,234 @@
+diff --git a/packages/block-library/src/button/edit.js b/packages/block-library/src/button/edit.js
+index b0fcc297d6b9ed..2e540f55b03c61 100644
+--- a/packages/block-library/src/button/edit.js
++++ b/packages/block-library/src/button/edit.js
+@@ -107,11 +107,12 @@ function URLPicker( {
+ 	onToggleOpenInNewTab,
+ 	anchorRef,
+ } ) {
++	const linkToolbarButtonRef = useRef();
+ 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
+ 	const urlIsSet = !! url;
+ 	const urlIsSetandSelected = urlIsSet && isSelected;
+-	const openLinkControl = () => {
+-		setIsURLPickerOpen( true );
++	const toggleLinkControl = () => {
++		setIsURLPickerOpen( ( isOpen ) => ! isOpen );
+ 		return false; // prevents default behaviour for event
+ 	};
+ 	const unlinkButton = () => {
+@@ -127,6 +128,7 @@ function URLPicker( {
+ 			position="bottom center"
+ 			onClose={ () => setIsURLPickerOpen( false ) }
+ 			anchorRef={ anchorRef?.current }
++			__experimentalToggleRef={ linkToolbarButtonRef.current }
+ 		>
+ 			<LinkControl
+ 				className="wp-block-navigation-link__inline-link-input"
+@@ -153,7 +155,8 @@ function URLPicker( {
+ 						icon={ link }
+ 						title={ __( 'Link' ) }
+ 						shortcut={ displayShortcut.primary( 'k' ) }
+-						onClick={ openLinkControl }
++						onClick={ toggleLinkControl }
++						ref={ linkToolbarButtonRef }
+ 					/>
+ 				) }
+ 				{ urlIsSetandSelected && (
+@@ -164,6 +167,7 @@ function URLPicker( {
+ 						shortcut={ displayShortcut.primaryShift( 'k' ) }
+ 						onClick={ unlinkButton }
+ 						isActive={ true }
++						ref={ linkToolbarButtonRef }
+ 					/>
+ 				) }
+ 			</BlockControls>
+@@ -171,7 +175,7 @@ function URLPicker( {
+ 				<KeyboardShortcuts
+ 					bindGlobal
+ 					shortcuts={ {
+-						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
++						[ rawShortcut.primary( 'k' ) ]: toggleLinkControl,
+ 						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
+ 					} }
+ 				/>
+diff --git a/packages/block-library/src/navigation-link/edit.js b/packages/block-library/src/navigation-link/edit.js
+index 96bb68eff378ba..757a5857b23b71 100644
+--- a/packages/block-library/src/navigation-link/edit.js
++++ b/packages/block-library/src/navigation-link/edit.js
+@@ -157,6 +157,7 @@ export default function NavigationLinkEdit( {
+ 	const { insertBlock } = useDispatch( blockEditorStore );
+ 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+ 	const listItemRef = useRef( null );
++	const linkToggleRef = useRef();
+ 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
+ 	const itemLabelPlaceholder = __( 'Add link…' );
+ 	const ref = useRef();
+@@ -370,7 +371,7 @@ export default function NavigationLinkEdit( {
+ 						bindGlobal
+ 						shortcuts={ {
+ 							[ rawShortcut.primary( 'k' ) ]: () =>
+-								setIsLinkOpen( true ),
++								setIsLinkOpen( ( isOpen ) => ! isOpen ),
+ 						} }
+ 					/>
+ 					<ToolbarButton
+@@ -378,7 +379,10 @@ export default function NavigationLinkEdit( {
+ 						icon={ linkIcon }
+ 						title={ __( 'Link' ) }
+ 						shortcut={ displayShortcut.primary( 'k' ) }
+-						onClick={ () => setIsLinkOpen( true ) }
++						onClick={ () =>
++							setIsLinkOpen( ( isOpen ) => ! isOpen )
++						}
++						ref={ linkToggleRef }
+ 					/>
+ 					<ToolbarButton
+ 						name="submenu"
+@@ -470,6 +474,7 @@ export default function NavigationLinkEdit( {
+ 							position="bottom center"
+ 							onClose={ () => setIsLinkOpen( false ) }
+ 							anchorRef={ listItemRef.current }
++							__experimentalToggleRef={ linkToggleRef.current }
+ 						>
+ 							<KeyboardShortcuts
+ 								bindGlobal
+diff --git a/packages/block-library/src/post-date/edit.js b/packages/block-library/src/post-date/edit.js
+index 4b75b93a648d31..38d9dc296804dc 100644
+--- a/packages/block-library/src/post-date/edit.js
++++ b/packages/block-library/src/post-date/edit.js
+@@ -7,7 +7,7 @@ import classnames from 'classnames';
+  * WordPress dependencies
+  */
+ import { useEntityProp } from '@wordpress/core-data';
+-import { useState } from '@wordpress/element';
++import { useRef, useState } from '@wordpress/element';
+ import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
+ import {
+ 	AlignmentToolbar,
+@@ -37,6 +37,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
+ 		'date',
+ 		postId
+ 	);
++	const dateToggleRef = useRef();
+ 	const [ isPickerOpen, setIsPickerOpen ] = useState( false );
+ 	const settings = __experimentalGetSettings();
+ 	// To know if the current time format is a 12 hour time, look for "a".
+@@ -82,6 +83,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
+ 									( _isPickerOpen ) => ! _isPickerOpen
+ 								)
+ 							}
++							ref={ dateToggleRef }
+ 						/>
+ 					</ToolbarGroup>
+ 				) }
+@@ -113,6 +115,9 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
+ 						{ isPickerOpen && (
+ 							<Popover
+ 								onClose={ setIsPickerOpen.bind( null, false ) }
++								__experimentalToggleRef={
++									dateToggleRef.current
++								}
+ 							>
+ 								<DateTimePicker
+ 									currentDate={ date }
+diff --git a/packages/components/src/popover/README.md b/packages/components/src/popover/README.md
+index f31c90a56ca262..1635e7679bd0ad 100644
+--- a/packages/components/src/popover/README.md
++++ b/packages/components/src/popover/README.md
+@@ -143,6 +143,13 @@ If you need the `DOMRect` object i.e., the position of popover to be calculated
+ - Type: `Function`
+ - Required: No
+ 
++### __experimentalToggleRef
++
++Reference to the element that's used to toggle this popover. Used to prevent `onClose` firing if focus moves to the toggle. Which usually means we clicked on the toggle. Without this, popover would reopen everytime we click on the toggle.
++
++- Type: `wp.element.Ref`
++- Required: No
++
+ ## Methods
+ 
+ ### refresh
+diff --git a/packages/components/src/popover/index.js b/packages/components/src/popover/index.js
+index 0cb8a975344fad..7528f788553b88 100644
+--- a/packages/components/src/popover/index.js
++++ b/packages/components/src/popover/index.js
+@@ -6,7 +6,13 @@ import classnames from 'classnames';
+ /**
+  * WordPress dependencies
+  */
+-import { useRef, useState, useLayoutEffect } from '@wordpress/element';
++import {
++	useRef,
++	useState,
++	useLayoutEffect,
++	useEffect,
++	useCallback,
++} from '@wordpress/element';
+ import { getRectangleFromRange } from '@wordpress/dom';
+ import { ESCAPE } from '@wordpress/keycodes';
+ import deprecated from '@wordpress/deprecated';
+@@ -242,6 +248,7 @@ const Popover = ( {
+ 	getAnchorRect,
+ 	expandOnMobile,
+ 	animate = true,
++	__experimentalToggleRef,
+ 	onClickOutside,
+ 	onFocusOutside,
+ 	__unstableStickyBoundaryElement,
+@@ -493,6 +500,39 @@ const Popover = ( {
+ 		}
+ 	};
+ 
++	const toggleFocusOutsideDelay = 50;
++	const toggleFocusOutsideTimeoutRef = useRef( null );
++	useEffect(
++		() => () => clearTimeout( toggleFocusOutsideTimeoutRef.current ),
++		[]
++	);
++	/**
++	 * We are using onFocusOutside to ensure we aren't
++	 * closing the popover here when clicking on the toggle button.
++	 * Using onClose would result in closing and reopening the popover.
++	 */
++	const handleToggleOnFocusOutside = useCallback( () => {
++		clearTimeout( toggleFocusOutsideTimeoutRef.current );
++		/**
++		 * Timeout is required to avoid bug in Firefox.
++		 * Without timeout the focused element in Firefox is the
++		 * popover content element. It takes a little bit of time
++		 * for the focus to move that's why we need timeout.
++		 */
++		toggleFocusOutsideTimeoutRef.current = setTimeout( () => {
++			const { ownerDocument } = __experimentalToggleRef;
++			if (
++				ownerDocument &&
++				! __experimentalToggleRef.contains(
++					ownerDocument.activeElement
++				) &&
++				! ownerDocument.activeElement.closest( '[role="dialog"]' )
++			) {
++				onClose();
++			}
++		}, toggleFocusOutsideDelay );
++	}, [ toggleFocusOutsideDelay, onClose ] );
++
+ 	/**
+ 	 * Shims an onFocusOutside callback to be compatible with a deprecated
+ 	 * onClickOutside prop function, if provided.
+@@ -500,6 +540,14 @@ const Popover = ( {
+ 	 * @param {FocusEvent} event Focus event from onFocusOutside.
+ 	 */
+ 	function handleOnFocusOutside( event ) {
++		if ( __experimentalToggleRef ) {
++			handleToggleOnFocusOutside( event );
++			if ( onFocusOutside ) {
++				onFocusOutside( event );
++			}
++			return;
++		}
++
+ 		// Defer to given `onFocusOutside` if specified. Call `onClose` only if
+ 		// both `onFocusOutside` and `onClickOutside` are unspecified. Doing so
+ 		// assures backwards-compatibility for prior `onClickOutside` default.

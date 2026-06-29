@@ -1,0 +1,30 @@
+diff --git a/packages/components/src/button/test/index.tsx b/packages/components/src/button/test/index.tsx
+index 7f65337508bd89..d70b8b075aa1eb 100644
+--- a/packages/components/src/button/test/index.tsx
++++ b/packages/components/src/button/test/index.tsx
+@@ -242,6 +242,8 @@ describe( 'Button', () => {
+ 		} );
+ 
+ 		it( 'should populate tooltip with description content for buttons with visible labels (buttons with children)', async () => {
++			const user = userEvent.setup();
++
+ 			render(
+ 				<Button
+ 					label="Label"
+@@ -258,6 +260,16 @@ describe( 'Button', () => {
+ 					description: 'Description text',
+ 				} )
+ 			).toBeVisible();
++
++			await user.tab();
++
++			expect(
++				screen.getByRole( 'tooltip', {
++					name: 'Description text',
++				} )
++			).toBeVisible();
++
++			await cleanupTooltip( user );
+ 		} );
+ 
+ 		it( 'should allow tooltip disable', async () => {

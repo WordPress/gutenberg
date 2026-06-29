@@ -1,0 +1,357 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 8f0bb757903979..d957e31ed5fefe 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -8,6 +8,7 @@
+ 
+ ### Enhancements
+ 
++-   `Tabs`: Animate indicator ([#60560](https://github.com/WordPress/gutenberg/pull/60560)).
+ -   `ComboboxControl`: Introduce Combobox expandOnFocus prop ([#61705](https://github.com/WordPress/gutenberg/pull/61705)).
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/tabs/stories/index.story.tsx b/packages/components/src/tabs/stories/index.story.tsx
+index 558daf9143c25a..16f8ac956ccf75 100644
+--- a/packages/components/src/tabs/stories/index.story.tsx
++++ b/packages/components/src/tabs/stories/index.story.tsx
+@@ -68,6 +68,20 @@ const Template: StoryFn< typeof Tabs > = ( props ) => {
+ 
+ export const Default = Template.bind( {} );
+ 
++const VerticalTemplate: StoryFn< typeof Tabs > = ( props ) => {
++	return (
++		<Tabs orientation="vertical" { ...props }>
++			<Tabs.TabList style={ { maxWidth: '10rem' } }>
++				<Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab>
++				<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
++				<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
++			</Tabs.TabList>
++		</Tabs>
++	);
++};
++
++export const Vertical = VerticalTemplate.bind( {} );
++
+ const DisabledTabTemplate: StoryFn< typeof Tabs > = ( props ) => {
+ 	return (
+ 		<Tabs { ...props }>
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index 6abca79aa51aed..ce575c9f317794 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -10,15 +10,49 @@ import * as Ariakit from '@ariakit/react';
+  */
+ import { COLORS } from '../utils';
+ import { space } from '../utils/space';
+-import { reduceMotion } from '../utils/reduce-motion';
+ 
+ export const TabListWrapper = styled.div`
++	position: relative;
+ 	display: flex;
+ 	align-items: stretch;
+ 	flex-direction: row;
+ 	&[aria-orientation='vertical'] {
+ 		flex-direction: column;
+ 	}
++	@media not ( prefers-reduced-motion: reduce ) {
++		&.is-animation-enabled::after {
++			transition-property: left, top, width, height;
++			transition-duration: 0.2s;
++			transition-timing-function: ease-out;
++		}
++	}
++	&::after {
++		content: '';
++		position: absolute;
++		pointer-events: none;
++
++		// Windows high contrast mode.
++		outline: 2px solid transparent;
++		outline-offset: -1px;
++	}
++	&:not( [aria-orientation='vertical'] )::after {
++		left: var( --indicator-left );
++		bottom: 0;
++		width: var( --indicator-width );
++		height: 0;
++		border-bottom: var( --wp-admin-border-width-focus ) solid
++			${ COLORS.theme.accent };
++	}
++	&[aria-orientation='vertical']::after {
++		/* Temporarily hidden, context: https://github.com/WordPress/gutenberg/pull/60560#issuecomment-2126670072 */
++		opacity: 0;
++
++		right: 0;
++		top: var( --indicator-top );
++		height: var( --indicator-height );
++		border-right: var( --wp-admin-border-width-focus ) solid
++			${ COLORS.theme.accent };
++	}
+ `;
+ 
+ export const Tab = styled( Ariakit.Tab )`
+@@ -51,34 +85,6 @@ export const Tab = styled( Ariakit.Tab )`
+ 			outline: none;
+ 		}
+ 
+-		// Tab indicator
+-		&::after {
+-			content: '';
+-			position: absolute;
+-			right: 0;
+-			bottom: 0;
+-			left: 0;
+-			pointer-events: none;
+-
+-			// Draw the indicator.
+-			background: ${ COLORS.theme.accent };
+-			height: calc( 0 * var( --wp-admin-border-width-focus ) );
+-			border-radius: 0;
+-
+-			// Animation
+-			transition: all 0.1s linear;
+-			${ reduceMotion( 'transition' ) };
+-		}
+-
+-		// Active.
+-		&[aria-selected='true']::after {
+-			height: calc( 1 * var( --wp-admin-border-width-focus ) );
+-
+-			// Windows high contrast mode.
+-			outline: 2px solid transparent;
+-			outline-offset: -1px;
+-		}
+-
+ 		// Focus.
+ 		&::before {
+ 			content: '';
+@@ -90,17 +96,20 @@ export const Tab = styled( Ariakit.Tab )`
+ 			pointer-events: none;
+ 
+ 			// Draw the indicator.
+-			box-shadow: 0 0 0 0 transparent;
++			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
++				${ COLORS.theme.accent };
+ 			border-radius: 2px;
+ 
+ 			// Animation
+-			transition: all 0.1s linear;
+-			${ reduceMotion( 'transition' ) };
++			opacity: 0;
++
++			@media not ( prefers-reduced-motion ) {
++				transition: opacity 0.1s linear;
++			}
+ 		}
+ 
+ 		&:focus-visible::before {
+-			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+-				${ COLORS.theme.accent };
++			opacity: 1;
+ 
+ 			// Windows high contrast mode.
+ 			outline: 2px solid transparent;
+diff --git a/packages/components/src/tabs/tablist.tsx b/packages/components/src/tabs/tablist.tsx
+index afa2d8283e6d6c..cbd4290f06bff2 100644
+--- a/packages/components/src/tabs/tablist.tsx
++++ b/packages/components/src/tabs/tablist.tsx
+@@ -8,7 +8,13 @@ import * as Ariakit from '@ariakit/react';
+  * WordPress dependencies
+  */
+ import warning from '@wordpress/warning';
+-import { forwardRef } from '@wordpress/element';
++import {
++	forwardRef,
++	useEffect,
++	useLayoutEffect,
++	useRef,
++	useState,
++} from '@wordpress/element';
+ 
+ /**
+  * Internal dependencies
+@@ -17,19 +23,121 @@ import type { TabListProps } from './types';
+ import { useTabsContext } from './context';
+ import { TabListWrapper } from './styles';
+ import type { WordPressComponentProps } from '../context';
++import clsx from 'clsx';
++
++function useTrackElementOffset(
++	targetElement?: HTMLElement | null,
++	onUpdate?: () => void
++) {
++	const [ indicatorPosition, setIndicatorPosition ] = useState( {
++		left: 0,
++		top: 0,
++		width: 0,
++		height: 0,
++	} );
++
++	// TODO: replace with useEventCallback or similar when officially available.
++	const updateCallbackRef = useRef( onUpdate );
++	useLayoutEffect( () => {
++		updateCallbackRef.current = onUpdate;
++	} );
++
++	const observedElementRef = useRef< HTMLElement >();
++	const resizeObserverRef = useRef< ResizeObserver >();
++	useEffect( () => {
++		if ( targetElement === observedElementRef.current ) {
++			return;
++		}
++
++		observedElementRef.current = targetElement ?? undefined;
++
++		function updateIndicator( element: HTMLElement ) {
++			setIndicatorPosition( {
++				left: element.offsetLeft,
++				top: element.offsetTop,
++				width: element.offsetWidth,
++				height: element.offsetHeight,
++			} );
++			updateCallbackRef.current?.();
++		}
++
++		// Set up a ResizeObserver.
++		if ( ! resizeObserverRef.current ) {
++			resizeObserverRef.current = new ResizeObserver( () => {
++				if ( observedElementRef.current ) {
++					updateIndicator( observedElementRef.current );
++				}
++			} );
++		}
++		const { current: resizeObserver } = resizeObserverRef;
++
++		// Observe new element.
++		if ( targetElement ) {
++			updateIndicator( targetElement );
++			resizeObserver.observe( targetElement );
++		}
++
++		return () => {
++			// Unobserve previous element.
++			if ( observedElementRef.current ) {
++				resizeObserver.unobserve( observedElementRef.current );
++			}
++		};
++	}, [ targetElement ] );
++
++	return indicatorPosition;
++}
++
++type ValueUpdateContext< T > = {
++	previousValue: T;
++};
++
++function useOnValueUpdate< T >(
++	value: T,
++	onUpdate: ( context: ValueUpdateContext< T > ) => void
++) {
++	const previousValueRef = useRef( value );
++
++	// TODO: replace with useEventCallback or similar when officially available.
++	const updateCallbackRef = useRef( onUpdate );
++	useLayoutEffect( () => {
++		updateCallbackRef.current = onUpdate;
++	} );
++
++	useEffect( () => {
++		if ( previousValueRef.current !== value ) {
++			updateCallbackRef.current( {
++				previousValue: previousValueRef.current,
++			} );
++			previousValueRef.current = value;
++		}
++	}, [ value ] );
++}
+ 
+ export const TabList = forwardRef<
+ 	HTMLDivElement,
+ 	WordPressComponentProps< TabListProps, 'div', false >
+ >( function TabList( { children, ...otherProps }, ref ) {
+ 	const context = useTabsContext();
++
++	const selectedId = context?.store.useState( 'selectedId' );
++	const indicatorPosition = useTrackElementOffset(
++		context?.store.item( selectedId )?.element
++	);
++
++	const [ animationEnabled, setAnimationEnabled ] = useState( false );
++	useOnValueUpdate(
++		selectedId,
++		( { previousValue } ) => previousValue && setAnimationEnabled( true )
++	);
++
+ 	if ( ! context ) {
+ 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
+ 		return null;
+ 	}
+ 	const { store } = context;
+ 
+-	const { selectedId, activeId, selectOnMove } = store.useState();
++	const { activeId, selectOnMove } = store.useState();
+ 	const { setActiveId } = store;
+ 
+ 	const onBlur = () => {
+@@ -50,9 +158,28 @@ export const TabList = forwardRef<
+ 		<Ariakit.TabList
+ 			ref={ ref }
+ 			store={ store }
+-			render={ <TabListWrapper /> }
++			render={
++				<TabListWrapper
++					onTransitionEnd={ ( event ) => {
++						if ( event.pseudoElement === '::after' ) {
++							setAnimationEnabled( false );
++						}
++					} }
++				/>
++			}
+ 			onBlur={ onBlur }
+ 			{ ...otherProps }
++			style={ {
++				'--indicator-left': `${ indicatorPosition.left }px`,
++				'--indicator-top': `${ indicatorPosition.top }px`,
++				'--indicator-width': `${ indicatorPosition.width }px`,
++				'--indicator-height': `${ indicatorPosition.height }px`,
++				...otherProps.style,
++			} }
++			className={ clsx(
++				animationEnabled ? 'is-animation-enabled' : '',
++				otherProps.className
++			) }
+ 		>
+ 			{ children }
+ 		</Ariakit.TabList>
+diff --git a/packages/preferences/src/components/preferences-modal-tabs/style.scss b/packages/preferences/src/components/preferences-modal-tabs/style.scss
+index d3afd4174cd0cb..e20b9aa9064ed6 100644
+--- a/packages/preferences/src/components/preferences-modal-tabs/style.scss
++++ b/packages/preferences/src/components/preferences-modal-tabs/style.scss
+@@ -1,12 +1,15 @@
+ $vertical-tabs-width: 160px;
+ 
+ .preferences__tabs-tablist {
+-	position: absolute;
++	position: absolute !important;
+ 	top: $header-height + $grid-unit-30;
+ 	// Aligns button text instead of button box.
+ 	left: $grid-unit-20;
+ 	width: $vertical-tabs-width;
+ 
++	&::after {
++		content: none !important;
++	}
+ }
+ 
+ .preferences__tabs-tab {
+@@ -19,10 +22,6 @@ $vertical-tabs-width: 160px;
+ 		font-weight: 500;
+ 	}
+ 
+-	&[aria-selected="true"]::after {
+-		content: none;
+-	}
+-
+ 	&[role="tab"]:focus:not(:disabled) {
+ 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+ 		// Windows high contrast mode.

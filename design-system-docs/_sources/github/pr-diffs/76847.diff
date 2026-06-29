@@ -1,0 +1,1191 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 99c6d22b7bcd64..630cd8ff0384e6 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### New Features
+ 
++-   Add `AlertDialog` primitive ([#76847](https://github.com/WordPress/gutenberg/pull/76847)).
+ -   Add `InputControl` component ([#76653](https://github.com/WordPress/gutenberg/pull/76653)).
+ -   `Dialog`: Expose `initialFocus` and `finalFocus` props on `Dialog.Popup` for custom focus management ([#76860](https://github.com/WordPress/gutenberg/pull/76860)).
+ 
+@@ -12,6 +13,10 @@
+ -   `Card`: Add `overflow: clip` to `Card.Root` to prevent child content from overflowing rounded corners ([#76678](https://github.com/WordPress/gutenberg/pull/76678)).
+ -   `CollapsibleCard`: do not animate the focus ring when expanding/collapsing the card ([#76459](https://github.com/WordPress/gutenberg/pull/76459)).
+ 
++### Enhancements
++
++-   `Dialog.Root`: expose `disablePointerDismissal` prop ([#76847](https://github.com/WordPress/gutenberg/pull/76847)).
++
+ ### Internal
+ 
+ -   `Tabs`: Add development-mode validation for Tab/Panel count matching ([#75170](https://github.com/WordPress/gutenberg/pull/75170)).
+diff --git a/packages/ui/src/alert-dialog/context.tsx b/packages/ui/src/alert-dialog/context.tsx
+new file mode 100644
+index 00000000000000..e9928b6de400dd
+--- /dev/null
++++ b/packages/ui/src/alert-dialog/context.tsx
+@@ -0,0 +1,14 @@
++import { createContext } from '@wordpress/element';
++import type { RootProps } from './types';
++
++type Intent = NonNullable< RootProps[ 'intent' ] >;
++
++interface AlertDialogContextValue {
++	intent: Intent;
++}
++
++const AlertDialogContext = createContext< AlertDialogContextValue >( {
++	intent: 'default',
++} );
++
++export { AlertDialogContext };
+diff --git a/packages/ui/src/alert-dialog/index.ts b/packages/ui/src/alert-dialog/index.ts
+new file mode 100644
+index 00000000000000..ec1477d0fd6c64
+--- /dev/null
++++ b/packages/ui/src/alert-dialog/index.ts
+@@ -0,0 +1,3 @@
++export { Root } from './root';
++export { Trigger } from './trigger';
++export { Popup } from './popup';
+diff --git a/packages/ui/src/alert-dialog/popup.tsx b/packages/ui/src/alert-dialog/popup.tsx
+new file mode 100644
+index 00000000000000..3a677676079f82
+--- /dev/null
++++ b/packages/ui/src/alert-dialog/popup.tsx
+@@ -0,0 +1,58 @@
++import { forwardRef, useContext } from '@wordpress/element';
++import { __ } from '@wordpress/i18n';
++import { Button } from '../button';
++import * as Dialog from '../dialog';
++import { AlertDialogContext } from './context';
++import styles from './style.module.css';
++import type { PopupProps } from './types';
++
++const Popup = forwardRef< HTMLDivElement, PopupProps >(
++	function AlertDialogPopup(
++		{
++			title,
++			children,
++			onConfirm,
++			confirmButtonText = __( 'OK' ),
++			cancelButtonText = __( 'Cancel' ),
++			loading,
++		},
++		ref
++	) {
++		const { intent } = useContext( AlertDialogContext );
++
++		// When `loading` is provided, the consumer controls when the dialog
++		// closes (async flow). Use a plain Button so clicking confirm doesn't
++		// auto-close — the consumer sets `open={false}` after their operation.
++		const ConfirmButton = loading !== undefined ? Button : Dialog.Action;
++
++		return (
++			<Dialog.Popup ref={ ref }>
++				<Dialog.Header>
++					<Dialog.Title>{ title }</Dialog.Title>
++				</Dialog.Header>
++				{ children }
++				<Dialog.Footer>
++					<Dialog.Action
++						variant="minimal"
++						disabled={ loading || undefined }
++					>
++						{ cancelButtonText }
++					</Dialog.Action>
++					<ConfirmButton
++						className={
++							intent === 'irreversible'
++								? styles[ 'irreversible-action' ]
++								: undefined
++						}
++						onClick={ onConfirm }
++						loading={ loading }
++					>
++						{ confirmButtonText }
++					</ConfirmButton>
++				</Dialog.Footer>
++			</Dialog.Popup>
++		);
++	}
++);
++
++export { Popup };
+diff --git a/packages/ui/src/alert-dialog/root.tsx b/packages/ui/src/alert-dialog/root.tsx
+new file mode 100644
+index 00000000000000..150d26b4c757e7
+--- /dev/null
++++ b/packages/ui/src/alert-dialog/root.tsx
+@@ -0,0 +1,48 @@
++import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
++import { useMemo } from '@wordpress/element';
++import { AlertDialogContext } from './context';
++import type { RootProps } from './types';
++
++/**
++ * A dialog that requires a user response to proceed.
++ *
++ * Use `AlertDialog.Trigger` to render a button that opens the dialog.
++ * Use `AlertDialog.Popup` to render the dialog content.
++ * The `AlertDialog.Trigger` is optional — the dialog can also be controlled
++ * via `open` / `onOpenChange` props.
++ *
++ * ## Use cases
++ *
++ * - **Default intent**: Standard confirmation dialog for reversible actions.
++ * - **Irreversible intent**: Confirmation dialog for irreversible actions that
++ *   cannot be undone. The confirm button uses error/danger coloring.
++ *
++ * For use cases outside the standard confirm/cancel pattern, use the lower-level
++ * `Dialog` component directly.
++ *
++ * See the [Destructive Actions guidelines](?path=/docs/design-system-patterns-destructive-actions--docs)
++ * for more details on when to use each pattern.
++ */
++function Root( {
++	intent = 'default',
++	children,
++	open,
++	onOpenChange,
++	defaultOpen,
++}: RootProps ) {
++	const contextValue = useMemo( () => ( { intent } ), [ intent ] );
++
++	return (
++		<_AlertDialog.Root
++			open={ open }
++			onOpenChange={ onOpenChange }
++			defaultOpen={ defaultOpen }
++		>
++			<AlertDialogContext.Provider value={ contextValue }>
++				{ children }
++			</AlertDialogContext.Provider>
++		</_AlertDialog.Root>
++	);
++}
++
++export { Root };
+diff --git a/packages/ui/src/alert-dialog/stories/index.story.tsx b/packages/ui/src/alert-dialog/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..7082cfc37303d5
+--- /dev/null
++++ b/packages/ui/src/alert-dialog/stories/index.story.tsx
+@@ -0,0 +1,254 @@
++import { Menu } from '@base-ui/react/menu';
++import { useState } from '@wordpress/element';
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { action } from 'storybook/actions';
++import { fn } from 'storybook/test';
++
++import { AlertDialog } from '../..';
++
++const meta: Meta< typeof AlertDialog.Root > = {
++	title: 'Design System/Components/AlertDialog',
++	component: AlertDialog.Root,
++	subcomponents: {
++		'AlertDialog.Trigger': AlertDialog.Trigger,
++		'AlertDialog.Popup': AlertDialog.Popup,
++	},
++	argTypes: {
++		onOpenChange: { action: fn() },
++	},
++};
++export default meta;
++
++type Story = StoryObj< typeof AlertDialog.Root >;
++
++/**
++ * Standard confirmation dialog for reversible actions. The dialog can be
++ * dismissed via Escape key or the cancel/confirm buttons. Backdrop click
++ * is blocked.
++ */
++export const Default: Story = {
++	args: {
++		children: (
++			<>
++				<AlertDialog.Trigger>Move to trash</AlertDialog.Trigger>
++				<AlertDialog.Popup
++					title="Move to trash?"
++					onConfirm={ action( 'onConfirm' ) }
++				>
++					This post will be moved to trash. You can restore it later.
++				</AlertDialog.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * Confirmation dialog for irreversible actions that cannot be undone.
++ * The confirm button uses error/danger coloring.
++ */
++export const Irreversible: Story = {
++	args: {
++		intent: 'irreversible',
++		children: (
++			<>
++				<AlertDialog.Trigger>Delete permanently</AlertDialog.Trigger>
++				<AlertDialog.Popup
++					title="Delete permanently?"
++					onConfirm={ action( 'onConfirm' ) }
++					confirmButtonText="Delete permanently"
++				>
++					This action cannot be undone. All data will be lost.
++				</AlertDialog.Popup>
++			</>
++		),
++	},
++};
++
++/**
++ * Example with custom button text for both confirm and cancel buttons.
++ */
++export const CustomButtonText: Story = {
++	args: {
++		children: (
++			<>
++				<AlertDialog.Trigger>Send feedback</AlertDialog.Trigger>
++				<AlertDialog.Popup
++					title="Send feedback?"
++					onConfirm={ action( 'onConfirm' ) }
++					confirmButtonText="Send feedback"
++					cancelButtonText="Not now"
++				>
++					Your feedback helps us improve. Would you like to send it
++					now?
++				</AlertDialog.Popup>
++			</>
++		),
++	},
++};
++
++const menuPopupStyles: React.CSSProperties = {
++	background: 'var(--wpds-color-bg-surface-neutral-strong)',
++	border: '1px solid var(--wpds-color-stroke-surface-neutral)',
++	borderRadius: '8px',
++	padding: '4px',
++	minWidth: '160px',
++	boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
++};
++
++const menuItemStyles: React.CSSProperties = {
++	display: 'block',
++	width: '100%',
++	padding: '8px 12px',
++	borderRadius: '4px',
++	border: 'none',
++	background: 'none',
++	textAlign: 'start',
++	fontSize: 'inherit',
++	userSelect: 'none',
++};
++
++/**
++ * Example showing composition with a menu. The `AlertDialog.Trigger` is
++ * composed with Base UI's `Menu.Item` using the `render` prop, allowing the
++ * menu item to directly trigger the alert dialog.
++ *
++ * Note: the example currently uses the `Menu` component from BaseUI, although
++ * consumers should not use BaseUI directly and instead use the DS `Menu`
++ * component (not ready yet).
++ */
++export const MenuTrigger: Story = {
++	args: {
++		intent: 'irreversible',
++	},
++	render: ( args ) => {
++		const [ menuOpen, setMenuOpen ] = useState( false );
++		return (
++			<>
++				<Menu.Root onOpenChange={ setMenuOpen } open={ menuOpen }>
++					<Menu.Trigger>Actions ▾</Menu.Trigger>
++					<Menu.Portal>
++						<Menu.Positioner>
++							<Menu.Popup style={ menuPopupStyles }>
++								<Menu.Item style={ menuItemStyles }>
++									Edit
++								</Menu.Item>
++								<AlertDialog.Root { ...args }>
++									<Menu.Item
++										render={
++											<AlertDialog.Trigger
++												// Quick fix to remove `button`-specific styles.
++												// This shouldn't be an issue once we use the DS `Menu`
++												// component, which will come with item styles.
++												render={ <div /> }
++											/>
++										}
++										style={ menuItemStyles }
++										closeOnClick={ false }
++									>
++										Delete...
++										<AlertDialog.Popup
++											title="Delete permanently?"
++											onConfirm={ () => {
++												setMenuOpen( false );
++												action( 'onConfirm' )();
++											} }
++											confirmButtonText="Delete permanently"
++										>
++											This action cannot be undone. All
++											data will be lost.
++										</AlertDialog.Popup>
++									</Menu.Item>
++								</AlertDialog.Root>
++							</Menu.Popup>
++						</Menu.Positioner>
++					</Menu.Portal>
++				</Menu.Root>
++			</>
++		);
++	},
++};
++
++/**
++ * Consumer-driven async confirm flow. The consumer uses controlled mode to
++ * keep the dialog open while the async operation is in progress, and passes
++ * `loading` to show a spinner on the confirm button and disable the cancel
++ * button.
++ */
++export const AsyncConfirm: Story = {
++	render: function AsyncConfirm( args ) {
++		const [ isOpen, setIsOpen ] = useState( false );
++		const [ isLoading, setIsLoading ] = useState( false );
++
++		return (
++			<>
++				<button onClick={ () => setIsOpen( true ) }>
++					Delete permanently
++				</button>
++				<AlertDialog.Root
++					{ ...args }
++					open={ isOpen }
++					onOpenChange={ ( open, eventDetails ) => {
++						if ( ! isLoading ) {
++							setIsOpen( open );
++						}
++						args.onOpenChange?.( open, eventDetails );
++					} }
++				>
++					<AlertDialog.Popup
++						title="Delete permanently?"
++						loading={ isLoading }
++						onConfirm={ () => {
++							action( 'onConfirm' )();
++							setIsLoading( true );
++							new Promise< void >( ( resolve ) =>
++								setTimeout( resolve, 2000 )
++							).then( () => {
++								setIsLoading( false );
++								setIsOpen( false );
++							} );
++						} }
++						confirmButtonText="Delete permanently"
++					>
++						This action cannot be undone. All data will be lost.
++					</AlertDialog.Popup>
++				</AlertDialog.Root>
++			</>
++		);
++	},
++	args: {
++		intent: 'irreversible',
++	},
++};
++
++/**
++ * The `AlertDialog.Trigger` element is not necessary when the open state is
++ * controlled externally. This is useful when the dialog needs to be opened
++ * from code or from a non-standard trigger element.
++ */
++export const Controlled: Story = {
++	render: function Controlled( args ) {
++		const [ isOpen, setIsOpen ] = useState( false );
++
++		return (
++			<>
++				<button onClick={ () => setIsOpen( true ) }>Open Dialog</button>
++				<AlertDialog.Root
++					{ ...args }
++					open={ isOpen }
++					onOpenChange={ ( open, eventDetails ) => {
++						setIsOpen( open );
++						args.onOpenChange?.( open, eventDetails );
++					} }
++				>
++					<AlertDialog.Popup
++						title="Move to trash?"
++						onConfirm={ action( 'onConfirm' ) }
++					>
++						This post will be moved to trash. You can restore it
++						later.
++					</AlertDialog.Popup>
++				</AlertDialog.Root>
++			</>
++		);
++	},
++};
+diff --git a/packages/ui/src/alert-dialog/style.module.css b/packages/ui/src/alert-dialog/style.module.css
+new file mode 100644
+index 00000000000000..d2231198eb0a18
+--- /dev/null
++++ b/packages/ui/src/alert-dialog/style.module.css
+@@ -0,0 +1,10 @@
++@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
++
++@layer wp-ui-compositions {
++	.irreversible-action {
++		--wp-ui-button-background-color: var(--wpds-color-bg-interactive-error-strong);
++		--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-error-strong-active);
++		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-error-strong);
++		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-error-strong-active);
++	}
++}
+diff --git a/packages/ui/src/alert-dialog/test/index.test.tsx b/packages/ui/src/alert-dialog/test/index.test.tsx
+new file mode 100644
+index 00000000000000..b922e9f3d0fee6
+--- /dev/null
++++ b/packages/ui/src/alert-dialog/test/index.test.tsx
+@@ -0,0 +1,537 @@
++import { render, screen, waitFor } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { createRef, useState } from '@wordpress/element';
++
++import * as AlertDialog from '..';
++
++describe( 'AlertDialog', () => {
++	it( 'forwards ref', () => {
++		const triggerRef = createRef< HTMLButtonElement >();
++		const popupRef = createRef< HTMLDivElement >();
++
++		render(
++			<AlertDialog.Root defaultOpen>
++				<AlertDialog.Trigger ref={ triggerRef }>
++					Open
++				</AlertDialog.Trigger>
++				<AlertDialog.Popup
++					ref={ popupRef }
++					title="Test Title"
++					onConfirm={ jest.fn() }
++				>
++					Test message content
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		expect( triggerRef.current ).toBeInstanceOf( HTMLButtonElement );
++		expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
++	} );
++
++	it( 'renders with title, message, and default buttons', async () => {
++		render(
++			<AlertDialog.Root open onOpenChange={ jest.fn() }>
++				<AlertDialog.Popup title="Test Title" onConfirm={ jest.fn() }>
++					Test message content
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Test Title' ) ).toBeVisible();
++		} );
++
++		expect( screen.getByText( 'Test message content' ) ).toBeVisible();
++		expect(
++			screen.queryByRole( 'button', { name: 'Close' } )
++		).not.toBeInTheDocument();
++		expect( screen.getByRole( 'button', { name: 'OK' } ) ).toBeVisible();
++		expect(
++			screen.getByRole( 'button', { name: 'Cancel' } )
++		).toBeVisible();
++	} );
++
++	it( 'renders with role="alertdialog" for default intent', async () => {
++		render(
++			<AlertDialog.Root open onOpenChange={ jest.fn() }>
++				<AlertDialog.Popup
++					title="Default Dialog"
++					onConfirm={ jest.fn() }
++				>
++					Content
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect( screen.getByRole( 'alertdialog' ) ).toBeVisible();
++		} );
++	} );
++
++	it( 'renders with role="alertdialog" for irreversible intent', async () => {
++		render(
++			<AlertDialog.Root
++				intent="irreversible"
++				open
++				onOpenChange={ jest.fn() }
++			>
++				<AlertDialog.Popup
++					title="Irreversible Dialog"
++					onConfirm={ jest.fn() }
++				>
++					Content
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect( screen.getByRole( 'alertdialog' ) ).toBeVisible();
++		} );
++	} );
++
++	it( 'calls onConfirm and onOpenChange when confirm button is clicked', async () => {
++		const onConfirm = jest.fn();
++		const onOpenChange = jest.fn();
++
++		render(
++			<AlertDialog.Root open onOpenChange={ onOpenChange }>
++				<AlertDialog.Popup
++					title="Confirm Action"
++					onConfirm={ onConfirm }
++				>
++					Are you sure?
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect(
++				screen.getByRole( 'button', { name: 'OK' } )
++			).toBeVisible();
++		} );
++
++		await userEvent.click( screen.getByRole( 'button', { name: 'OK' } ) );
++
++		expect( onConfirm ).toHaveBeenCalledTimes( 1 );
++		expect( onOpenChange ).toHaveBeenCalledWith(
++			false,
++			expect.objectContaining( { reason: 'close-press' } )
++		);
++	} );
++
++	it( 'calls onOpenChange when cancel button is clicked', async () => {
++		const onConfirm = jest.fn();
++		const onOpenChange = jest.fn();
++
++		render(
++			<AlertDialog.Root open onOpenChange={ onOpenChange }>
++				<AlertDialog.Popup
++					title="Confirm Action"
++					onConfirm={ onConfirm }
++				>
++					Are you sure?
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect(
++				screen.getByRole( 'button', { name: 'Cancel' } )
++			).toBeVisible();
++		} );
++
++		await userEvent.click(
++			screen.getByRole( 'button', { name: 'Cancel' } )
++		);
++
++		expect( onOpenChange ).toHaveBeenCalledWith(
++			false,
++			expect.objectContaining( { reason: 'close-press' } )
++		);
++		expect( onConfirm ).not.toHaveBeenCalled();
++	} );
++
++	it( 'calls onOpenChange on escape key for default intent', async () => {
++		const onOpenChange = jest.fn();
++
++		render(
++			<AlertDialog.Root open onOpenChange={ onOpenChange }>
++				<AlertDialog.Popup
++					title="Default Dialog"
++					onConfirm={ jest.fn() }
++				>
++					Content
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Default Dialog' ) ).toBeVisible();
++		} );
++
++		await userEvent.keyboard( '{Escape}' );
++
++		expect( onOpenChange ).toHaveBeenCalledWith(
++			false,
++			expect.objectContaining( { reason: 'escape-key' } )
++		);
++	} );
++
++	it( 'does not call onOpenChange on backdrop click for default intent', async () => {
++		const onOpenChange = jest.fn();
++
++		render(
++			<AlertDialog.Root open onOpenChange={ onOpenChange }>
++				<AlertDialog.Popup
++					title="Default Dialog"
++					onConfirm={ jest.fn() }
++				>
++					Content
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Default Dialog' ) ).toBeVisible();
++		} );
++
++		await userEvent.click( document.body );
++
++		expect( onOpenChange ).not.toHaveBeenCalled();
++	} );
++
++	it( 'renders with title, message, and default buttons for irreversible intent', async () => {
++		render(
++			<AlertDialog.Root
++				intent="irreversible"
++				open
++				onOpenChange={ jest.fn() }
++			>
++				<AlertDialog.Popup
++					title="Irreversible Dialog"
++					onConfirm={ jest.fn() }
++				>
++					Irreversible message content
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Irreversible Dialog' ) ).toBeVisible();
++		} );
++
++		expect(
++			screen.getByText( 'Irreversible message content' )
++		).toBeVisible();
++		expect(
++			screen.queryByRole( 'button', { name: 'Close' } )
++		).not.toBeInTheDocument();
++		expect( screen.getByRole( 'button', { name: 'OK' } ) ).toBeVisible();
++		expect(
++			screen.getByRole( 'button', { name: 'Cancel' } )
++		).toBeVisible();
++	} );
++
++	it( 'calls onOpenChange on escape key for irreversible intent', async () => {
++		const onOpenChange = jest.fn();
++
++		render(
++			<AlertDialog.Root
++				intent="irreversible"
++				open
++				onOpenChange={ onOpenChange }
++			>
++				<AlertDialog.Popup
++					title="Irreversible Dialog"
++					onConfirm={ jest.fn() }
++				>
++					Content
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Irreversible Dialog' ) ).toBeVisible();
++		} );
++
++		await userEvent.keyboard( '{Escape}' );
++
++		expect( onOpenChange ).toHaveBeenCalledWith(
++			false,
++			expect.objectContaining( { reason: 'escape-key' } )
++		);
++	} );
++
++	it( 'does not call onOpenChange on backdrop click for irreversible intent', async () => {
++		const onOpenChange = jest.fn();
++
++		render(
++			<AlertDialog.Root
++				intent="irreversible"
++				open
++				onOpenChange={ onOpenChange }
++			>
++				<AlertDialog.Popup
++					title="Irreversible Dialog"
++					onConfirm={ jest.fn() }
++				>
++					Content
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Irreversible Dialog' ) ).toBeVisible();
++		} );
++
++		await userEvent.click( document.body );
++
++		expect( onOpenChange ).not.toHaveBeenCalled();
++	} );
++
++	it( 'calls onOpenChange on cancel button click for irreversible intent', async () => {
++		const onOpenChange = jest.fn();
++		const onConfirm = jest.fn();
++
++		render(
++			<AlertDialog.Root
++				intent="irreversible"
++				open
++				onOpenChange={ onOpenChange }
++			>
++				<AlertDialog.Popup
++					title="Irreversible Dialog"
++					onConfirm={ onConfirm }
++				>
++					Content
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect(
++				screen.getByRole( 'button', { name: 'Cancel' } )
++			).toBeVisible();
++		} );
++
++		await userEvent.click(
++			screen.getByRole( 'button', { name: 'Cancel' } )
++		);
++
++		expect( onOpenChange ).toHaveBeenCalledWith(
++			false,
++			expect.objectContaining( { reason: 'close-press' } )
++		);
++		expect( onConfirm ).not.toHaveBeenCalled();
++	} );
++
++	it( 'calls onConfirm and onOpenChange on confirm button click for irreversible intent', async () => {
++		const onOpenChange = jest.fn();
++		const onConfirm = jest.fn();
++
++		render(
++			<AlertDialog.Root
++				intent="irreversible"
++				open
++				onOpenChange={ onOpenChange }
++			>
++				<AlertDialog.Popup
++					title="Irreversible Dialog"
++					onConfirm={ onConfirm }
++				>
++					Content
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect(
++				screen.getByRole( 'button', { name: 'OK' } )
++			).toBeVisible();
++		} );
++
++		await userEvent.click( screen.getByRole( 'button', { name: 'OK' } ) );
++
++		expect( onConfirm ).toHaveBeenCalledTimes( 1 );
++		expect( onOpenChange ).toHaveBeenCalledWith(
++			false,
++			expect.objectContaining( { reason: 'close-press' } )
++		);
++	} );
++
++	it( 'disables both buttons when loading', async () => {
++		render(
++			<AlertDialog.Root open onOpenChange={ jest.fn() }>
++				<AlertDialog.Popup
++					title="Loading Test"
++					onConfirm={ jest.fn() }
++					loading
++				>
++					Content
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect(
++				screen.getByRole( 'button', { name: 'OK' } )
++			).toBeVisible();
++		} );
++
++		expect( screen.getByRole( 'button', { name: 'OK' } ) ).toHaveAttribute(
++			'aria-disabled',
++			'true'
++		);
++
++		expect(
++			screen.getByRole( 'button', { name: 'Cancel' } )
++		).toHaveAttribute( 'aria-disabled', 'true' );
++	} );
++
++	it( 'does not disable buttons when loading is false', async () => {
++		render(
++			<AlertDialog.Root open onOpenChange={ jest.fn() }>
++				<AlertDialog.Popup
++					title="No Loading"
++					onConfirm={ jest.fn() }
++					loading={ false }
++				>
++					Content
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect(
++				screen.getByRole( 'button', { name: 'OK' } )
++			).toBeVisible();
++		} );
++
++		expect(
++			screen.getByRole( 'button', { name: 'OK' } )
++		).not.toHaveAttribute( 'aria-disabled', 'true' );
++
++		expect(
++			screen.getByRole( 'button', { name: 'Cancel' } )
++		).not.toHaveAttribute( 'aria-disabled', 'true' );
++	} );
++
++	it( 'uses custom button text when provided', async () => {
++		render(
++			<AlertDialog.Root open onOpenChange={ jest.fn() }>
++				<AlertDialog.Popup
++					title="Custom Text"
++					onConfirm={ jest.fn() }
++					confirmButtonText="Yes, do it"
++					cancelButtonText="No, go back"
++				>
++					Custom message
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		await waitFor( () => {
++			expect(
++				screen.getByRole( 'button', { name: 'Yes, do it' } )
++			).toBeVisible();
++		} );
++
++		expect(
++			screen.getByRole( 'button', { name: 'No, go back' } )
++		).toBeVisible();
++	} );
++
++	it( 'keeps dialog open when confirm is clicked with loading prop (async flow)', async () => {
++		function AsyncDialog() {
++			const [ isOpen, setIsOpen ] = useState( true );
++			const [ isLoading, setIsLoading ] = useState( false );
++
++			return (
++				<AlertDialog.Root
++					open={ isOpen }
++					onOpenChange={ ( open ) => {
++						if ( ! isLoading ) {
++							setIsOpen( open );
++						}
++					} }
++				>
++					<AlertDialog.Popup
++						title="Async Test"
++						loading={ isLoading }
++						onConfirm={ () => setIsLoading( true ) }
++					>
++						Content
++					</AlertDialog.Popup>
++				</AlertDialog.Root>
++			);
++		}
++
++		render( <AsyncDialog /> );
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Async Test' ) ).toBeVisible();
++		} );
++
++		await userEvent.click( screen.getByRole( 'button', { name: 'OK' } ) );
++
++		expect( screen.getByText( 'Async Test' ) ).toBeVisible();
++		expect( screen.getByRole( 'button', { name: 'OK' } ) ).toHaveAttribute(
++			'aria-disabled',
++			'true'
++		);
++	} );
++
++	it( 'does not auto-close on confirm click when loading is false (manual-close mode)', async () => {
++		function ManualCloseDialog() {
++			const [ isOpen, setIsOpen ] = useState( true );
++
++			return (
++				<AlertDialog.Root
++					open={ isOpen }
++					onOpenChange={ ( open ) => setIsOpen( open ) }
++				>
++					<AlertDialog.Popup
++						title="Manual Close"
++						loading={ false }
++						onConfirm={ jest.fn() }
++					>
++						Content
++					</AlertDialog.Popup>
++				</AlertDialog.Root>
++			);
++		}
++
++		render( <ManualCloseDialog /> );
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Manual Close' ) ).toBeVisible();
++		} );
++
++		await userEvent.click( screen.getByRole( 'button', { name: 'OK' } ) );
++
++		expect( screen.getByText( 'Manual Close' ) ).toBeVisible();
++	} );
++
++	it( 'opens dialog when Trigger is clicked', async () => {
++		render(
++			<AlertDialog.Root>
++				<AlertDialog.Trigger>Open</AlertDialog.Trigger>
++				<AlertDialog.Popup title="Trigger Test" onConfirm={ jest.fn() }>
++					Dialog content
++				</AlertDialog.Popup>
++			</AlertDialog.Root>
++		);
++
++		expect(
++			screen.queryByText( 'Dialog content' )
++		).not.toBeInTheDocument();
++
++		await userEvent.click( screen.getByRole( 'button', { name: 'Open' } ) );
++
++		await waitFor( () => {
++			expect( screen.getByText( 'Trigger Test' ) ).toBeVisible();
++		} );
++
++		expect( screen.getByText( 'Dialog content' ) ).toBeVisible();
++	} );
++} );
+diff --git a/packages/ui/src/alert-dialog/trigger.tsx b/packages/ui/src/alert-dialog/trigger.tsx
+new file mode 100644
+index 00000000000000..9459ce29836cb3
+--- /dev/null
++++ b/packages/ui/src/alert-dialog/trigger.tsx
+@@ -0,0 +1,15 @@
++import { forwardRef } from '@wordpress/element';
++
++import * as Dialog from '../dialog';
++import type { TriggerProps } from './types';
++
++/**
++ * Renders a button that opens the alert dialog when clicked.
++ */
++const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
++	function AlertDialogTrigger( props, ref ) {
++		return <Dialog.Trigger ref={ ref } { ...props } />;
++	}
++);
++
++export { Trigger };
+diff --git a/packages/ui/src/alert-dialog/types.ts b/packages/ui/src/alert-dialog/types.ts
+new file mode 100644
+index 00000000000000..7cdfb9b5a3071c
+--- /dev/null
++++ b/packages/ui/src/alert-dialog/types.ts
+@@ -0,0 +1,83 @@
++import type { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
++import type { ReactNode } from 'react';
++
++import type { TriggerProps as DialogTriggerProps } from '../dialog/types';
++
++export interface RootProps
++	extends Pick<
++		_AlertDialog.Root.Props,
++		'open' | 'onOpenChange' | 'defaultOpen'
++	> {
++	/**
++	 * The content to be rendered inside the component. Typically includes
++	 * `AlertDialog.Trigger` and `AlertDialog.Popup`.
++	 */
++	children: ReactNode;
++
++	/**
++	 * The semantic intent of the dialog, which determines its styling.
++	 *
++	 * All intents use `role="alertdialog"`, are always modal, and block
++	 * backdrop click dismissal. Escape key and the cancel/confirm buttons
++	 * still dismiss the dialog.
++	 *
++	 * - `'default'`: Standard confirmation dialog for reversible actions.
++	 * - `'irreversible'`: Confirmation dialog for irreversible actions that
++	 *   cannot be undone. The confirm button uses error/danger coloring.
++	 *
++	 * @default 'default'
++	 */
++	intent?: 'default' | 'irreversible';
++}
++
++export type TriggerProps = DialogTriggerProps;
++
++export interface PopupProps {
++	/**
++	 * The title displayed in the dialog header. This serves as both the
++	 * visible heading and the accessible label for the dialog.
++	 */
++	title: string;
++
++	/**
++	 * The message content displayed in the dialog body.
++	 */
++	children: ReactNode;
++
++	/**
++	 * Callback fired when the user confirms the action.
++	 */
++	onConfirm: () => void;
++
++	/**
++	 * Custom text for the confirm button.
++	 *
++	 * @default 'OK'
++	 */
++	confirmButtonText?: string;
++
++	/**
++	 * Custom text for the cancel button.
++	 *
++	 * @default 'Cancel'
++	 */
++	cancelButtonText?: string;
++
++	/**
++	 * Whether the confirm action is in a loading state (e.g. an async
++	 * operation is in progress). When `true`, the confirm button shows a
++	 * spinner and the cancel button is disabled.
++	 *
++	 * **Important:** Passing this prop — even as `false` — opts into
++	 * manual-close mode: the confirm button will no longer auto-close the
++	 * dialog. The consumer is responsible for setting `open={false}` when
++	 * the operation completes. Omit the prop entirely for the default
++	 * auto-close-on-confirm behavior.
++	 *
++	 * To implement an async confirm flow, use controlled mode
++	 * (`open` / `onOpenChange`) and manage the loading state externally:
++	 * prevent closing in `onOpenChange` while loading, and set
++	 * `open={false}` once the operation completes.
++	 */
++	loading?: boolean;
++}
+diff --git a/packages/ui/src/dialog/action.tsx b/packages/ui/src/dialog/action.tsx
+index f3ee2698f8e2b2..cc06b4199400b1 100644
+--- a/packages/ui/src/dialog/action.tsx
++++ b/packages/ui/src/dialog/action.tsx
+@@ -8,11 +8,17 @@ import type { ActionProps } from './types';
+  * Accepts all Button component props for styling.
+  */
+ const Action = forwardRef< HTMLButtonElement, ActionProps >(
+-	function DialogAction( { render, ...props }, ref ) {
++	function DialogAction( { render, disabled, loading, ...props }, ref ) {
++		// Resolve `disabled` the same way Button does so that
++		// _Dialog.Close's internal useButton (which controls
++		// aria-disabled) stays in sync with the rendered Button.
++		const resolvedDisabled = disabled ?? loading;
++
+ 		return (
+ 			<_Dialog.Close
+ 				ref={ ref }
+-				render={ <Button render={ render } /> }
++				render={ <Button render={ render } loading={ loading } /> }
++				disabled={ resolvedDisabled }
+ 				{ ...props }
+ 			/>
+ 		);
+diff --git a/packages/ui/src/dialog/stories/index.story.tsx b/packages/ui/src/dialog/stories/index.story.tsx
+index e70362f0241b77..086af1fa06170b 100644
+--- a/packages/ui/src/dialog/stories/index.story.tsx
++++ b/packages/ui/src/dialog/stories/index.story.tsx
+@@ -73,34 +73,6 @@ export const _Default: Story = {
+ 	},
+ };
+ 
+-/**
+- * A confirmation dialog that intentionally omits the close icon. The user
+- * must explicitly choose "Cancel" or "Confirm" to make their intent clear,
+- * since it is not obvious what would happen when clicking a close icon.
+- */
+-export const ConfirmDialog: Story = {
+-	args: {
+-		children: (
+-			<>
+-				<Dialog.Trigger>Confirm Action</Dialog.Trigger>
+-				<Dialog.Popup>
+-					<Dialog.Header>
+-						<Dialog.Title>Confirm Action</Dialog.Title>
+-					</Dialog.Header>
+-					<p>
+-						Are you sure you want to proceed? This action cannot be
+-						undone.
+-					</p>
+-					<Dialog.Footer>
+-						<Dialog.Action variant="outline">Cancel</Dialog.Action>
+-						<Dialog.Action>Confirm</Dialog.Action>
+-					</Dialog.Footer>
+-				</Dialog.Popup>
+-			</>
+-		),
+-	},
+-};
+-
+ const ALL_SIZES = [ 'small', 'medium', 'large', 'stretch', 'full' ] as const;
+ 
+ function SizeSelector( {
+diff --git a/packages/ui/src/dialog/types.ts b/packages/ui/src/dialog/types.ts
+index f83fc21cedad3c..28db2a69988a2c 100644
+--- a/packages/ui/src/dialog/types.ts
++++ b/packages/ui/src/dialog/types.ts
+@@ -7,7 +7,11 @@ import type { ComponentProps } from '../utils/types';
+ export interface RootProps
+ 	extends Pick<
+ 		_Dialog.Root.Props,
+-		'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
++		| 'open'
++		| 'onOpenChange'
++		| 'defaultOpen'
++		| 'modal'
++		| 'disablePointerDismissal'
+ 	> {
+ 	/**
+ 	 * The content to be rendered inside the component.
+diff --git a/packages/ui/src/index.ts b/packages/ui/src/index.ts
+index 3908b6d34b9c13..b3cbb03c72067f 100644
+--- a/packages/ui/src/index.ts
++++ b/packages/ui/src/index.ts
+@@ -3,6 +3,7 @@ export * from './button';
+ export * as Card from './card';
+ export * as Collapsible from './collapsible';
+ export * as CollapsibleCard from './collapsible-card';
++export * as AlertDialog from './alert-dialog';
+ export * as Dialog from './dialog';
+ export * as EmptyState from './empty-state';
+ export * from './form';

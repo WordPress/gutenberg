@@ -1,0 +1,27 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 79085e0a337afd..626223889dbe03 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++### Enhancements
++
++-   `Field.Description`: Apply `text-wrap: pretty` to description text to avoid typographic widows ([#79143](https://github.com/WordPress/gutenberg/pull/79143)).
++
+ ## 0.15.0 (2026-06-10)
+ 
+ ### Breaking Changes
+diff --git a/packages/ui/src/utils/css/field.module.css b/packages/ui/src/utils/css/field.module.css
+index efbfaff540465c..01219829403a3e 100644
+--- a/packages/ui/src/utils/css/field.module.css
++++ b/packages/ui/src/utils/css/field.module.css
+@@ -27,6 +27,7 @@
+ 			font-size: var(--wpds-typography-font-size-sm);
+ 			line-height: var(--wpds-typography-line-height-xs);
+ 			color: var(--wpds-color-foreground-content-neutral-weak);
++			text-wrap: pretty;
+ 		}
+ 	}
+ }

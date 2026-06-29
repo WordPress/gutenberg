@@ -1,0 +1,29 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 34d1a328671a89..b78f6cdd3d78c7 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -17,6 +17,8 @@
+ 
+ ### Bug Fix
+ 
++-   `Truncate`: Fix link control link preview when it displays long URLs ([#60890](https://github.com/WordPress/gutenberg/pull/60890)).
++
+ -   `ProgressBar`: Fix CSS variable with invalid value ([#60576](https://github.com/WordPress/gutenberg/pull/60576)).
+ 
+ ### Experimental
+diff --git a/packages/components/src/truncate/hook.ts b/packages/components/src/truncate/hook.ts
+index 16406a4e51bb9a..440865a5964324 100644
+--- a/packages/components/src/truncate/hook.ts
++++ b/packages/components/src/truncate/hook.ts
+@@ -53,7 +53,11 @@ export default function useTruncate(
+ 		!! childrenAsText && ellipsizeMode === TRUNCATE_TYPE.auto;
+ 
+ 	const classes = useMemo( () => {
++		// The `word-break: break-all` property first makes sure a text line
++		// breaks even when it contains 'unbreakable' content such as long URLs.
++		// See https://github.com/WordPress/gutenberg/issues/60860.
+ 		const truncateLines = css`
++			word-break: break-all;
+ 			-webkit-box-orient: vertical;
+ 			-webkit-line-clamp: ${ numberOfLines };
+ 			display: -webkit-box;

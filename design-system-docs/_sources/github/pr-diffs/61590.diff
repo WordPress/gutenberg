@@ -1,0 +1,60 @@
+diff --git a/packages/block-library/src/rss/editor.scss b/packages/block-library/src/rss/editor.scss
+index 095da46973509d..c5e79d6254460b 100644
+--- a/packages/block-library/src/rss/editor.scss
++++ b/packages/block-library/src/rss/editor.scss
+@@ -2,20 +2,6 @@
+ 	display: inline;
+ }
+ 
+-.wp-block-rss__placeholder-form {
+-	> * {
+-		margin-bottom: $grid-unit-10;
+-	}
+-
+-	@include break-medium() {
+-		> * {
+-			margin-bottom: 0;
+-		}
+-	}
+-
+-	.wp-block-rss__placeholder-input {
+-		margin: 0 8px 0 0;
+-		flex: 1 1 auto;
+-	}
++.wp-block-rss__placeholder-form .wp-block-rss__placeholder-input {
++	flex: 1 1 auto;
+ }
+-
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d37feca516b83e..7282ed869bc1f3 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `PaletteEdit`: Use consistent spacing and metrics. ([#61368](https://github.com/WordPress/gutenberg/pull/61368)).
+ -   `FormTokenField`: Hide label when not defined ([#61336](https://github.com/WordPress/gutenberg/pull/61336)).
+ -   Upgraded the @types/react and @types/react-dom packages ([#60796](https://github.com/WordPress/gutenberg/pull/60796)).
++-   `Placeholder`: Tweak placeholder style ([#61590](https://github.com/WordPress/gutenberg/pull/61590)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/placeholder/style.scss b/packages/components/src/placeholder/style.scss
+index cc107da0a93899..0e9bfa0f86a0ce 100644
+--- a/packages/components/src/placeholder/style.scss
++++ b/packages/components/src/placeholder/style.scss
+@@ -67,7 +67,7 @@
+ 	flex-direction: row;
+ 	width: 100%;
+ 	flex-wrap: wrap;
+-	gap: $grid-unit-15;
++	gap: $grid-unit-20;
+ 	justify-content: flex-start;
+ 
+ 	p {
+@@ -83,7 +83,6 @@
+ 
+ .components-placeholder__input[type="url"] {
+ 	@include input-control;
+-	margin: 0 8px 0 0;
+ 	flex: 1 1 auto;
+ }
+ 

@@ -1,0 +1,53 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index c97e25862addec..72bfc1c2f24819 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -56,6 +56,9 @@
+ -   `UnitControl`: Adopt radius scale ([#64368](https://github.com/WordPress/gutenberg/pull/64368)).
+ -   `Popover`: allow `style` prop usage ([#64489](https://github.com/WordPress/gutenberg/pull/64489)).
+ -   `ToolsPanel`: sets column-gap to 16px for ToolsPanel grid ([#64497](https://github.com/WordPress/gutenberg/pull/64497)).
++-   `Modal`: Replace references to deprecated styling variables ([#64655](https://github.com/WordPress/gutenberg/pull/64655)).
++-   `Popover`: Replace references to deprecated styling variables ([#64655](https://github.com/WordPress/gutenberg/pull/64655)).
++-   `Snackbar`: Replace references to deprecated styling variables ([#64655](https://github.com/WordPress/gutenberg/pull/64655)).
+ -   `TextareaControl`: Update styles ([#64586](https://github.com/WordPress/gutenberg/pull/64586)).
+ 
+ ### Bug Fixes
+diff --git a/packages/components/src/modal/style.scss b/packages/components/src/modal/style.scss
+index c862363a0d3c81..75ba7e1384e4c1 100644
+--- a/packages/components/src/modal/style.scss
++++ b/packages/components/src/modal/style.scss
+@@ -20,7 +20,7 @@
+ 	margin: $grid-unit-50 0 0 0;
+ 	width: 100%;
+ 	background: $white;
+-	box-shadow: $shadow-modal;
++	box-shadow: $elevation-large;
+ 	border-radius: $radius-large $radius-large 0 0;
+ 	overflow: hidden;
+ 	// Have the content element fill the vertical space yet not overflow.
+diff --git a/packages/components/src/popover/style.scss b/packages/components/src/popover/style.scss
+index f9f43870a6b927..01b0eb91161422 100644
+--- a/packages/components/src/popover/style.scss
++++ b/packages/components/src/popover/style.scss
+@@ -22,7 +22,7 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
+ 
+ .components-popover__content {
+ 	background: $white;
+-	box-shadow: $shadow-popover-border-default, $shadow-popover;
++	box-shadow: $shadow-popover-border-default, $elevation-x-small;
+ 	border-radius: $radius-medium;
+ 	box-sizing: border-box;
+ 	width: min-content;
+diff --git a/packages/components/src/snackbar/style.scss b/packages/components/src/snackbar/style.scss
+index 5bea7076599b56..e7f29267d6f6db 100644
+--- a/packages/components/src/snackbar/style.scss
++++ b/packages/components/src/snackbar/style.scss
+@@ -4,7 +4,7 @@
+ 	background: rgba($black, 0.85); // Emulates #1e1e1e closely.
+ 	backdrop-filter: blur($grid-unit-20) saturate(180%);
+ 	border-radius: $radius-medium;
+-	box-shadow: $shadow-popover;
++	box-shadow: $elevation-x-small;
+ 	color: $white;
+ 	padding: $grid-unit-15 ($grid-unit-05 * 5);
+ 	width: 100%;

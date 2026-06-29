@@ -1,0 +1,156 @@
+diff --git a/package-lock.json b/package-lock.json
+index 8d925d7c4c7203..e442fff8f0c507 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -55649,7 +55649,6 @@
+ 			"version": "0.4.0",
+ 			"license": "GPL-2.0-or-later",
+ 			"dependencies": {
+-				"@ariakit/react": "^0.4.15",
+ 				"@base-ui/react": "^1.0.0",
+ 				"@wordpress/a11y": "file:../a11y",
+ 				"@wordpress/element": "file:../element",
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 54c6462ace7f00..b222973e4844b8 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -13,4 +13,4 @@
+ -   Add `Field` primitives ([#74190](https://github.com/WordPress/gutenberg/pull/74190)).
+ -   Add `Fieldset` primitives ([#74296](https://github.com/WordPress/gutenberg/pull/74296)).
+ -   Add `Icon` component ([#74311](https://github.com/WordPress/gutenberg/pull/74311)).
+--   Add `Button` component ([#74415](https://github.com/WordPress/gutenberg/pull/74415)).
++-   Add `Button` component ([#74415](https://github.com/WordPress/gutenberg/pull/74415), [#74416](https://github.com/WordPress/gutenberg/pull/74416) ).
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 5e7d16ac178003..f35f30b3644a45 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -43,7 +43,6 @@
+ 	"types": "build-types",
+ 	"sideEffects": false,
+ 	"dependencies": {
+-		"@ariakit/react": "^0.4.15",
+ 		"@base-ui/react": "^1.0.0",
+ 		"@wordpress/a11y": "file:../a11y",
+ 		"@wordpress/element": "file:../element",
+diff --git a/packages/ui/src/button/button.tsx b/packages/ui/src/button/button.tsx
+index 61cd897d54503b..c5a53b20ab1ba5 100644
+--- a/packages/ui/src/button/button.tsx
++++ b/packages/ui/src/button/button.tsx
+@@ -1,4 +1,4 @@
+-import { Button as AriakitButton } from '@ariakit/react';
++import { Button as _Button } from '@base-ui/react/button';
+ import clsx from 'clsx';
+ import { speak } from '@wordpress/a11y';
+ import { forwardRef, useEffect } from '@wordpress/element';
+@@ -15,7 +15,7 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
+ 			variant = 'solid',
+ 			size = 'default',
+ 			className,
+-			accessibleWhenDisabled = true,
++			focusableWhenDisabled = true,
+ 			disabled,
+ 			loading,
+ 			loadingAnnouncement = __( 'Loading' ),
+@@ -43,15 +43,15 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
+ 		}, [ loading, loadingAnnouncement ] );
+ 
+ 		return (
+-			<AriakitButton
++			<_Button
+ 				ref={ ref }
+ 				className={ mergedClassName }
+-				accessibleWhenDisabled={ accessibleWhenDisabled }
++				focusableWhenDisabled={ focusableWhenDisabled }
+ 				disabled={ disabled ?? loading }
+ 				{ ...props }
+ 			>
+ 				{ children }
+-			</AriakitButton>
++			</_Button>
+ 		);
+ 	}
+ );
+diff --git a/packages/ui/src/button/stories/index.story.tsx b/packages/ui/src/button/stories/index.story.tsx
+index 49c37adfd9f88d..63db203480a34f 100644
+--- a/packages/ui/src/button/stories/index.story.tsx
++++ b/packages/ui/src/button/stories/index.story.tsx
+@@ -157,17 +157,6 @@ export const AllTonesAndVariants: Story = {
+ 	),
+ };
+ 
+-export const LinkStyledAsButton: Story = {
+-	...Default,
+-	args: {
+-		...Default.args,
+-		// Link content passed through `children`
+-		// eslint-disable-next-line jsx-a11y/anchor-has-content
+-		render: <a href="https://example.com" />,
+-		children: 'Link',
+-	},
+-};
+-
+ export const WithIcon: Story = {
+ 	...Default,
+ 	args: {
+diff --git a/packages/ui/src/button/test/button.test.tsx b/packages/ui/src/button/test/button.test.tsx
+index 8e93e485d03e28..9b44211e97c1cf 100644
+--- a/packages/ui/src/button/test/button.test.tsx
++++ b/packages/ui/src/button/test/button.test.tsx
+@@ -74,14 +74,18 @@ describe( 'Button', () => {
+ 		expect( button ).not.toHaveAttribute( 'aria-disabled', 'true' );
+ 	} );
+ 
+-	it( 'supports custom render prop while retaining the default accessible when disabled behavior', () => {
++	it( 'supports custom render prop while retaining the default focusable when disabled behavior', () => {
+ 		render(
++			// Disabling because this lint rule was meant for the
++			// `@wordpress/components` Button, but is being applied here.
++			// TODO: rework the lint rule so that it checks the package
++			// where the Button comes from.
+ 			// eslint-disable-next-line jsx-a11y/anchor-has-content, no-restricted-syntax
+-			<Button render={ <a href="/" /> } disabled>
++			<Button render={ <a href="/" /> } nativeButton={ false } disabled>
+ 				Click me
+ 			</Button>
+ 		);
+-		const button = screen.getByRole( 'link', { name: 'Click me' } );
++		const button = screen.getByRole( 'button', { name: 'Click me' } );
+ 
+ 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
+ 	} );
+@@ -93,7 +97,6 @@ describe( 'Button', () => {
+ 				Click me
+ 			</Button>
+ 		);
+-
+ 		expect(
+ 			screen.getByRole( 'button', { name: 'Click me' } )
+ 		).toHaveClass( customClass );
+diff --git a/packages/ui/src/button/types.ts b/packages/ui/src/button/types.ts
+index 232f1d39bfd285..93a5805b4b0fd8 100644
+--- a/packages/ui/src/button/types.ts
++++ b/packages/ui/src/button/types.ts
+@@ -1,9 +1,11 @@
+ import { type ReactNode, type HTMLAttributes } from 'react';
+-import { type ButtonProps as AriakitButtonProps } from '@ariakit/react';
+-import { type ComponentProps } from '../utils/types';
++import type { Button as _Button } from '@base-ui/react/button';
++import type { ComponentProps } from '../utils/types';
++
++type _ButtonProps = ComponentProps< typeof _Button >;
+ 
+ export interface ButtonProps
+-	extends Omit< ComponentProps< 'button' >, 'disabled' | 'aria-pressed' > {
++	extends Omit< _ButtonProps, 'disabled' | 'aria-pressed' > {
+ 	/**
+ 	 * The variant of the button. Variants describe the visual style treatment
+ 	 * of the button.
+@@ -43,7 +45,7 @@ export interface ButtonProps
+ 	 *
+ 	 * @default true
+ 	 */
+-	accessibleWhenDisabled?: AriakitButtonProps[ 'accessibleWhenDisabled' ];
++	focusableWhenDisabled?: _ButtonProps[ 'focusableWhenDisabled' ];
+ 
+ 	/**
+ 	 * Indicates the current "pressed" state of toggle buttons. This should only

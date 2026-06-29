@@ -1,0 +1,316 @@
+diff --git a/packages/components/src/ui/divider/README.md b/packages/components/src/ui/divider/README.md
+new file mode 100644
+index 00000000000000..a793646650ee1d
+--- /dev/null
++++ b/packages/components/src/ui/divider/README.md
+@@ -0,0 +1,19 @@
++# Divider
++
++`Divider` is a layout component that separates groups of related content.
++
++## Usage
++
++```jsx
++import { Divider, FormGroup, ListGroup } from '@wordpress/components/ui';
++
++function Example() {
++	return (
++		<ListGroup>
++			<FormGroup>...</FormGroup>
++			<Divider />
++			<FormGroup>...</FormGroup>
++		</ListGroup>
++	);
++}
++```
+diff --git a/packages/components/src/ui/divider/component.tsx b/packages/components/src/ui/divider/component.tsx
+new file mode 100644
+index 00000000000000..fc920d7494d001
+--- /dev/null
++++ b/packages/components/src/ui/divider/component.tsx
+@@ -0,0 +1,103 @@
++/**
++ * External dependencies
++ */
++import { contextConnect, useContextSystem } from '@wp-g2/context';
++import { css, cx, ui } from '@wp-g2/styles';
++// eslint-disable-next-line no-restricted-imports
++import { Separator } from 'reakit';
++// eslint-disable-next-line no-restricted-imports, no-duplicate-imports
++import type { SeparatorProps } from 'reakit';
++import type { ViewOwnProps } from '@wp-g2/create-styles';
++// eslint-disable-next-line no-restricted-imports
++import type { Ref } from 'react';
++
++/**
++ * WordPress dependencies
++ */
++import { useMemo } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import * as styles from './styles';
++
++export interface DividerProps extends SeparatorProps {
++	/**
++	 * Adjusts all margins.
++	 */
++	m?: number;
++	/**
++	 * Adjusts top margins.
++	 */
++	mt?: number;
++	/**
++	 * Adjusts bottom margins.
++	 */
++	mb?: number;
++}
++
++function Divider(
++	props: ViewOwnProps< DividerProps, 'hr' >,
++	forwardedRef: Ref< any >
++) {
++	const { className, m, mb, mt, ...otherProps } = useContextSystem(
++		props,
++		'Divider'
++	);
++
++	const classes = useMemo( () => {
++		const sx: Record< string, string > = {};
++
++		if ( typeof m !== 'undefined' ) {
++			sx.m = css`
++				margin-bottom: ${ ui.space( m ) };
++				margin-top: ${ ui.space( m ) };
++			`;
++		} else {
++			if ( typeof mt !== 'undefined' ) {
++				sx.mt = css`
++					margin-top: ${ ui.space( mt ) };
++				`;
++			}
++
++			if ( typeof mb !== 'undefined' ) {
++				sx.mb = css`
++					margin-bottom: ${ ui.space( mb ) };
++				`;
++			}
++		}
++
++		return cx( styles.Divider, sx.mb, sx.mt, sx.m, className );
++	}, [ className, m, mb, mt ] );
++
++	return (
++		<Separator
++			as="hr"
++			{ ...otherProps }
++			className={ classes }
++			ref={ forwardedRef }
++		/>
++	);
++}
++
++/**
++ * `Divider` is a layout component that separates groups of related content.
++ *
++ * @example
++ * ```js
++ * import { Divider, FormGroup, ListGroup } from `@wordpress/components/ui`;
++ *
++ * function Example() {
++ * 	return (
++ * 		<ListGroup>
++ * 			<FormGroup>...</FormGroup>
++ * 			<Divider />
++ * 			<FormGroup>...</FormGroup>
++ * 		</ListGroup>
++ * 	);
++ * }
++ * ```
++ */
++const ConnectedDivider = contextConnect( Divider, 'Divider' );
++
++export default ConnectedDivider;
+diff --git a/packages/components/src/ui/divider/index.ts b/packages/components/src/ui/divider/index.ts
+new file mode 100644
+index 00000000000000..28ffb25e49af6f
+--- /dev/null
++++ b/packages/components/src/ui/divider/index.ts
+@@ -0,0 +1,2 @@
++export { default as Divider } from './component';
++export type { DividerProps } from './component';
+diff --git a/packages/components/src/ui/divider/stories/index.js b/packages/components/src/ui/divider/stories/index.js
+new file mode 100644
+index 00000000000000..eec21d97ea5f79
+--- /dev/null
++++ b/packages/components/src/ui/divider/stories/index.js
+@@ -0,0 +1,13 @@
++/**
++ * Internal dependencies
++ */
++import { Divider } from '..';
++
++export default {
++	component: Divider,
++	title: 'G2 Components (Experimental)/Divider',
++};
++
++export const _default = () => {
++	return <Divider />;
++};
+diff --git a/packages/components/src/ui/divider/styles.ts b/packages/components/src/ui/divider/styles.ts
+new file mode 100644
+index 00000000000000..bfb8ca218b5bc4
+--- /dev/null
++++ b/packages/components/src/ui/divider/styles.ts
+@@ -0,0 +1,12 @@
++/**
++ * External dependencies
++ */
++import { css, ui } from '@wp-g2/styles';
++
++export const Divider = css`
++	border-color: ${ ui.get( 'colorDivider' ) };
++	border-width: 0 0 1px 0;
++	height: 0;
++	margin: 0;
++	width: auto;
++`;
+diff --git a/packages/components/src/ui/divider/test/__snapshots__/index.js.snap b/packages/components/src/ui/divider/test/__snapshots__/index.js.snap
+new file mode 100644
+index 00000000000000..b1f8239dc123ff
+--- /dev/null
++++ b/packages/components/src/ui/divider/test/__snapshots__/index.js.snap
+@@ -0,0 +1,72 @@
++// Jest Snapshot v1, https://goo.gl/fbAQLP
++
++exports[`props should render correctly 1`] = `
++.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
++  border-color: rgba(0, 0, 0, 0.1);
++  border-color: var(--wp-g2-color-divider);
++  border-width: 0 0 1px 0;
++  height: 0;
++  margin: 0;
++  width: auto;
++}
++
++<hr
++  aria-orientation="horizontal"
++  class="emotion-0 components-divider wp-components-divider ic-d9awm7"
++  data-g2-c16t="true"
++  data-g2-component="Divider"
++  role="separator"
++/>
++`;
++
++exports[`props should render margin 1`] = `
++Snapshot Diff:
++- Received styles
+++ Base styles
++
++@@ -2,10 +2,8 @@
++    Object {
++      "border-color": "var(--wp-g2-color-divider)",
++      "border-width": "0 0 1px 0",
++      "height": "0",
++      "margin": "0",
++-     "margin-bottom": "calc(var(--wp-g2-grid-base) * 7)",
++-     "margin-top": "calc(var(--wp-g2-grid-base) * 7)",
++      "width": "auto",
++    },
++  ]
++`;
++
++exports[`props should render marginBottom 1`] = `
++Snapshot Diff:
++- Received styles
+++ Base styles
++
++@@ -2,9 +2,8 @@
++    Object {
++      "border-color": "var(--wp-g2-color-divider)",
++      "border-width": "0 0 1px 0",
++      "height": "0",
++      "margin": "0",
++-     "margin-bottom": "calc(var(--wp-g2-grid-base) * 5)",
++      "width": "auto",
++    },
++  ]
++`;
++
++exports[`props should render marginTop 1`] = `
++Snapshot Diff:
++- Received styles
+++ Base styles
++
++@@ -2,9 +2,8 @@
++    Object {
++      "border-color": "var(--wp-g2-color-divider)",
++      "border-width": "0 0 1px 0",
++      "height": "0",
++      "margin": "0",
++-     "margin-top": "calc(var(--wp-g2-grid-base) * 5)",
++      "width": "auto",
++    },
++  ]
++`;
+diff --git a/packages/components/src/ui/divider/test/index.js b/packages/components/src/ui/divider/test/index.js
+new file mode 100644
+index 00000000000000..dfcfc9c4fcd498
+--- /dev/null
++++ b/packages/components/src/ui/divider/test/index.js
+@@ -0,0 +1,41 @@
++/**
++ * External dependencies
++ */
++import { render } from '@testing-library/react';
++
++/**
++ * Internal dependencies
++ */
++import { Divider } from '../index';
++
++describe( 'props', () => {
++	let base;
++	beforeEach( () => {
++		base = render( <Divider /> );
++	} );
++
++	test( 'should render correctly', () => {
++		expect( base.container.firstChild ).toMatchSnapshot();
++	} );
++
++	test( 'should render marginTop', () => {
++		const { container } = render( <Divider mt={ 5 } /> );
++		expect( container.firstChild ).toMatchStyleDiffSnapshot(
++			base.container.firstChild
++		);
++	} );
++
++	test( 'should render marginBottom', () => {
++		const { container } = render( <Divider mb={ 5 } /> );
++		expect( container.firstChild ).toMatchStyleDiffSnapshot(
++			base.container.firstChild
++		);
++	} );
++
++	test( 'should render margin', () => {
++		const { container } = render( <Divider m={ 7 } /> );
++		expect( container.firstChild ).toMatchStyleDiffSnapshot(
++			base.container.firstChild
++		);
++	} );
++} );
+diff --git a/packages/components/src/ui/index.js b/packages/components/src/ui/index.js
+index 27c505f247c936..716f72a624dd4b 100644
+--- a/packages/components/src/ui/index.js
++++ b/packages/components/src/ui/index.js
+@@ -1,6 +1,7 @@
+ export * from './card';
+ export * from './control-group';
+ export * from './control-label';
++export * from './divider';
+ export * from './elevation';
+ export * from './flex';
+ export * from './form-group';

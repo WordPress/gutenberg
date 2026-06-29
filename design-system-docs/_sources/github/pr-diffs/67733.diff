@@ -1,0 +1,30 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6a7b2545c2e68c..2dc35bd54b3eeb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -45,6 +45,7 @@
+ ### Bug Fixes
+ 
+ -   `ResizableBox`: Make drag handles focusable ([#67305](https://github.com/WordPress/gutenberg/pull/67305)).
++-   `CustomSelectControl`: Update correctly when `showSelectedHint` is enabled ([#67733](https://github.com/WordPress/gutenberg/pull/67733)).
+ 
+ ## 28.13.0 (2024-11-27)
+ 
+diff --git a/packages/components/src/custom-select-control/index.tsx b/packages/components/src/custom-select-control/index.tsx
+index 74da8a5c741060..339944f4198722 100644
+--- a/packages/components/src/custom-select-control/index.tsx
++++ b/packages/components/src/custom-select-control/index.tsx
+@@ -154,11 +154,11 @@ function CustomSelectControl< T extends CustomSelectOption >(
+ 	const renderSelectedValueHint = () => {
+ 		const selectedOptionHint = options
+ 			?.map( applyOptionDeprecations )
+-			?.find( ( { name } ) => currentValue === name )?.hint;
++			?.find( ( { name } ) => store.getState().value === name )?.hint;
+ 
+ 		return (
+ 			<Styled.SelectedExperimentalHintWrapper>
+-				{ currentValue }
++				{ store.getState().value }
+ 				{ selectedOptionHint && (
+ 					<Styled.SelectedExperimentalHintItem
+ 						// Keeping the classname for legacy reasons

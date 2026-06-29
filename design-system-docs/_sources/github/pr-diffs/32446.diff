@@ -1,0 +1,291 @@
+diff --git a/docs/manifest.json b/docs/manifest.json
+index ac735f7c9e4b47..1615e2e80101ad 100644
+--- a/docs/manifest.json
++++ b/docs/manifest.json
+@@ -1103,6 +1103,12 @@
+ 		"markdown_source": "../packages/components/src/scroll-lock/README.md",
+ 		"parent": "components"
+ 	},
++	{
++		"title": "Scrollable",
++		"slug": "scrollable",
++		"markdown_source": "../packages/components/src/scrollable/README.md",
++		"parent": "components"
++	},
+ 	{
+ 		"title": "SelectControl",
+ 		"slug": "select-control",
+diff --git a/packages/components/src/index.js b/packages/components/src/index.js
+index 7a62e76d3cc4e2..e2f72587dc60ae 100644
+--- a/packages/components/src/index.js
++++ b/packages/components/src/index.js
+@@ -109,6 +109,7 @@ export { default as SelectControl } from './select-control';
+ export { default as Snackbar } from './snackbar';
+ export { default as SnackbarList } from './snackbar/list';
+ export { Spacer as __experimentalSpacer } from './spacer';
++export { Scrollable as __experimentalScrollable } from './scrollable';
+ export { default as Spinner } from './spinner';
+ export { default as TabPanel } from './tab-panel';
+ export { Text as __experimentalText } from './text';
+diff --git a/packages/components/src/ui/scrollable/README.md b/packages/components/src/scrollable/README.md
+similarity index 63%
+rename from packages/components/src/ui/scrollable/README.md
+rename to packages/components/src/scrollable/README.md
+index e098a2683d7c4f..6e78dd5544f961 100644
+--- a/packages/components/src/ui/scrollable/README.md
++++ b/packages/components/src/scrollable/README.md
+@@ -9,12 +9,12 @@ This feature is still experimental. “Experimental” means this is an early im
+ ## Usage
+ 
+ ```jsx
+-import { Scrollable, View } from '@wordpress/components/ui';
++import {__experimentalScrollable as Scrollable } from '@wordpress/components/ui';
+ 
+ function Example() {
+ 	return (
+ 		<Scrollable style={ { maxHeight: 200 } }>
+-			<View style={ { height: 500 } }>...</View>
++			<div style={ { height: 500 } }>...</div>
+ 		</Scrollable>
+ 	);
+ }
+@@ -22,14 +22,17 @@ function Example() {
+ 
+ ## Props
+ 
+-##### scrollDirection
++### `scrollDirection`: `string`
+ 
+-**Type**: `x` | `y` | `auto`
++- Required: No
++- Default: `y`
++- Allowed values: `x`, `y`, `auto`
+ 
+ Renders a scrollbar for a specific axis when content overflows.
+ 
+-##### smoothScroll
++### `smoothScroll`: `boolean`
+ 
+-**Type**: `boolean`
++- Required: No
++- Default: `false`
+ 
+ Enables (CSS) smooth scrolling.
+diff --git a/packages/components/src/ui/scrollable/component.js b/packages/components/src/scrollable/component.js
+similarity index 78%
+rename from packages/components/src/ui/scrollable/component.js
+rename to packages/components/src/scrollable/component.js
+index 842521cb6d28ef..7b3bee64827698 100644
+--- a/packages/components/src/ui/scrollable/component.js
++++ b/packages/components/src/scrollable/component.js
+@@ -1,7 +1,7 @@
+ /**
+  * Internal dependencies
+  */
+-import { createComponent } from '../utils';
++import { createComponent } from '../ui/utils';
+ import { useScrollable } from './hook';
+ 
+ /**
+@@ -9,7 +9,7 @@ import { useScrollable } from './hook';
+  *
+  * @example
+  * ```jsx
+- * import { Scrollable } from `@wordpress/components/ui`;
++ * import { __experimentalScrollable as Scrollable } from `@wordpress/components/ui`;
+  
+  * function Example() {
+  * 	return (
+diff --git a/packages/components/src/ui/scrollable/hook.js b/packages/components/src/scrollable/hook.js
+similarity index 85%
+rename from packages/components/src/ui/scrollable/hook.js
+rename to packages/components/src/scrollable/hook.js
+index ca95f237dbd6aa..9b075014981e3a 100644
+--- a/packages/components/src/ui/scrollable/hook.js
++++ b/packages/components/src/scrollable/hook.js
+@@ -11,12 +11,12 @@ import { useMemo } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { useContextSystem } from '../context';
++import { useContextSystem } from '../ui/context';
+ import * as styles from './styles';
+ 
+ /* eslint-disable jsdoc/valid-types */
+ /**
+- * @param {import('../context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
++ * @param {import('../ui/context').PolymorphicComponentProps<import('./types').Props, 'div'>} props
+  */
+ /* eslint-enable jsdoc/valid-types */
+ export function useScrollable( props ) {
+diff --git a/packages/components/src/ui/scrollable/index.js b/packages/components/src/scrollable/index.js
+similarity index 100%
+rename from packages/components/src/ui/scrollable/index.js
+rename to packages/components/src/scrollable/index.js
+diff --git a/packages/components/src/scrollable/stories/index.js b/packages/components/src/scrollable/stories/index.js
+new file mode 100644
+index 00000000000000..d04c37b516d472
+--- /dev/null
++++ b/packages/components/src/scrollable/stories/index.js
+@@ -0,0 +1,82 @@
++/**
++ * External dependencies
++ */
++import { boolean, select } from '@storybook/addon-knobs';
++/* eslint-disable-next-line no-restricted-imports */
++import React from 'react';
++
++/**
++ * Internal dependencies
++ */
++import { View } from '../../view';
++import { Scrollable } from '../';
++
++export default {
++	component: Scrollable,
++	title: 'Components (Experimental)/Scrollable',
++};
++
++export const _default = () => {
++	const targetRef = React.useRef( null );
++
++	const onButtonClick = () => {
++		targetRef.current?.focus();
++	};
++
++	const otherProps = {
++		smoothScroll: boolean(
++			'Scrollable: smoothScroll (hint: move focus in the scrollable container)',
++			false
++		),
++		scrollDirection: select(
++			'Scrollable: scrollDirection',
++			{
++				x: 'x',
++				y: 'y',
++				auto: 'auto',
++			},
++			'y'
++		),
++	};
++
++	const containerWidth = 300;
++	const containerHeight = 400;
++
++	return (
++		<Scrollable
++			style={ { height: containerHeight, width: containerWidth } }
++			{ ...otherProps }
++		>
++			<View
++				style={ {
++					backgroundColor: '#eee',
++					height:
++						otherProps.scrollDirection === 'x'
++							? containerHeight
++							: 1000,
++					width:
++						otherProps.scrollDirection === 'y'
++							? containerWidth
++							: 1000,
++					position: 'relative',
++				} }
++			>
++				<button onClick={ onButtonClick }>
++					Move focus to an element out of view
++				</button>
++				<input
++					ref={ targetRef }
++					style={ {
++						position: 'absolute',
++						bottom:
++							otherProps.scrollDirection === 'x' ? 'initial' : 0,
++						right:
++							otherProps.scrollDirection === 'y' ? 'initial' : 0,
++					} }
++					type="text"
++					value="Focus me"
++				/>
++			</View>
++		</Scrollable>
++	);
++};
+diff --git a/packages/components/src/ui/scrollable/styles.js b/packages/components/src/scrollable/styles.js
+similarity index 95%
+rename from packages/components/src/ui/scrollable/styles.js
+rename to packages/components/src/scrollable/styles.js
+index bed0a02fd02d2e..fa4e4c18cd7058 100644
+--- a/packages/components/src/ui/scrollable/styles.js
++++ b/packages/components/src/scrollable/styles.js
+@@ -5,7 +5,7 @@ import { css } from 'emotion';
+ /**
+  * Internal dependencies
+  */
+-import CONFIG from '../../utils/config-values';
++import { CONFIG } from '../utils';
+ 
+ export const scrollableScrollbar = css`
+ 	@media only screen and ( min-device-width: 40em ) {
+diff --git a/packages/components/src/ui/scrollable/test/__snapshots__/index.js.snap b/packages/components/src/scrollable/test/__snapshots__/index.js.snap
+similarity index 100%
+rename from packages/components/src/ui/scrollable/test/__snapshots__/index.js.snap
+rename to packages/components/src/scrollable/test/__snapshots__/index.js.snap
+diff --git a/packages/components/src/ui/scrollable/test/index.js b/packages/components/src/scrollable/test/index.js
+similarity index 100%
+rename from packages/components/src/ui/scrollable/test/index.js
+rename to packages/components/src/scrollable/test/index.js
+diff --git a/packages/components/src/ui/scrollable/types.ts b/packages/components/src/scrollable/types.ts
+similarity index 100%
+rename from packages/components/src/ui/scrollable/types.ts
+rename to packages/components/src/scrollable/types.ts
+diff --git a/packages/components/src/ui/card/body.js b/packages/components/src/ui/card/body.js
+index 99b624ba8cab7f..359876c3a7de26 100644
+--- a/packages/components/src/ui/card/body.js
++++ b/packages/components/src/ui/card/body.js
+@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import { contextConnect, useContextSystem } from '../context';
+-import { Scrollable } from '../scrollable';
++import { Scrollable } from '../../scrollable';
+ import { View } from '../../view';
+ import * as styles from './styles';
+ 
+diff --git a/packages/components/src/ui/scrollable/stories/index.js b/packages/components/src/ui/scrollable/stories/index.js
+deleted file mode 100644
+index c7559489ff95a5..00000000000000
+--- a/packages/components/src/ui/scrollable/stories/index.js
++++ /dev/null
+@@ -1,18 +0,0 @@
+-/**
+- * Internal dependencies
+- */
+-import { View } from '../../../view';
+-import { Scrollable } from '../index';
+-
+-export default {
+-	component: Scrollable,
+-	title: 'G2 Components (Experimental)/Scrollable',
+-};
+-
+-export const _default = () => {
+-	return (
+-		<Scrollable style={ { height: 400, width: 300 } }>
+-			<View style={ { backgroundColor: '#eee', height: 1000 } } />
+-		</Scrollable>
+-	);
+-};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 188a594d270baf..9a14a339ec039c 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -44,7 +44,8 @@
+ 		"src/h-stack/**/*",
+ 		"src/v-stack/**/*",
+ 		"src/z-stack/**/*",
+-		"src/view/**/*"
++		"src/view/**/*",
++		"src/scrollable/**/*"
+ 	],
+ 	"exclude": [
+ 		"src/**/*.android.js",

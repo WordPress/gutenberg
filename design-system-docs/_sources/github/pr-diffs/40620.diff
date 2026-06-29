@@ -1,0 +1,12 @@
+diff --git a/packages/components/src/color-palette/README.md b/packages/components/src/color-palette/README.md
+index de195ca1fa3954..2c9fafb0e97363 100644
+--- a/packages/components/src/color-palette/README.md
++++ b/packages/components/src/color-palette/README.md
+@@ -41,7 +41,6 @@ classes to be applied to the container.
+ 
+ -   Type: `String`
+ -   Required: No
+--   Default: `Select or Upload Media`
+ 
+ ### clearable
+ 

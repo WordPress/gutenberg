@@ -1,0 +1,39 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 3587221fb8bbae..7dc115caf2f7bb 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -12,6 +12,10 @@
+ 
+ -   Document the safe `clsx` pattern for conditional CSS Module classes ([#79490](https://github.com/WordPress/gutenberg/pull/79490)).
+ 
++### Bug Fixes
++
++-   `Divider`: Restore lower-specificity border styles so custom border colors can override the default divider color. ([#79534](https://github.com/WordPress/gutenberg/pull/79534))
++
+ ### Internal
+ 
+ -   `Surface`: Migrate styles from Emotion to SCSS Modules and use WPDS tokens for migrated visual values ([#79445](https://github.com/WordPress/gutenberg/pull/79445)).
+diff --git a/packages/components/src/divider/style.module.scss b/packages/components/src/divider/style.module.scss
+index 33e6b5a77fc427..bb4deb0b56ebf9 100644
+--- a/packages/components/src/divider/style.module.scss
++++ b/packages/components/src/divider/style.module.scss
+@@ -2,7 +2,9 @@
+ 	border: 0;
+ 	margin: 0;
+ 
+-	&[aria-orientation="horizontal"] {
++	// Keep the orientation selectors at the pre-#79444 specificity so existing
++	// border overrides continue to win.
++	&:where([aria-orientation="horizontal"]) {
+ 		border-block-end: 1px solid currentColor;
+ 		block-size: 0;
+ 		inline-size: auto;
+@@ -10,7 +12,7 @@
+ 		margin-block-end: var(--wp-components-divider-margin-end, 0);
+ 	}
+ 
+-	&[aria-orientation="vertical"] {
++	&:where([aria-orientation="vertical"]) {
+ 		display: inline;
+ 		border-inline-end: 1px solid currentColor;
+ 		block-size: auto;

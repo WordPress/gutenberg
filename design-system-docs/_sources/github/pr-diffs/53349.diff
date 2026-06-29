@@ -1,0 +1,27 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 899b69170c488d..10e1d6d37d60ac 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -13,6 +13,7 @@
+ -   `TabPanel`: Introduce a new version of `TabPanel` with updated internals and improved adherence to ARIA guidance on `tabpanel` focus behavior while maintaining the same functionality and API surface.([#52133](https://github.com/WordPress/gutenberg/pull/52133)).
+ -   `Theme`: Expose via private APIs ([#53262](https://github.com/WordPress/gutenberg/pull/53262)).
+ -   `ProgressBar`: Use the theme system accent for indicator color ([#53347](https://github.com/WordPress/gutenberg/pull/53347)).
++-   `ProgressBar`: Use gray 300 for track color ([#53349](https://github.com/WordPress/gutenberg/pull/53349)).
+ 
+ ### Bug Fix
+ 
+diff --git a/packages/components/src/progress-bar/styles.ts b/packages/components/src/progress-bar/styles.ts
+index dc8e573f377769..62f4a65bfccffa 100644
+--- a/packages/components/src/progress-bar/styles.ts
++++ b/packages/components/src/progress-bar/styles.ts
+@@ -28,8 +28,8 @@ export const Track = styled.div`
+ 	max-width: 160px;
+ 	height: ${ CONFIG.borderWidthFocus };
+ 	background-color: var(
+-		--wp-components-color-gray-100,
+-		${ COLORS.gray[ 100 ] }
++		--wp-components-color-gray-300,
++		${ COLORS.gray[ 300 ] }
+ 	);
+ 	border-radius: ${ CONFIG.radiusBlockUi };
+ `;

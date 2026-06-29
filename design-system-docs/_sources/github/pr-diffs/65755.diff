@@ -1,0 +1,102 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 71e51bc9741b50..a9f1286bdc4167 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -5,6 +5,7 @@
+ ### Deprecations
+ 
+ -   `BorderBoxControl`: Deprecate 36px default size ([#65752](https://github.com/WordPress/gutenberg/pull/65752)).
++-   `BorderControl`: Deprecate 36px default size ([#65755](https://github.com/WordPress/gutenberg/pull/65755)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/components/src/border-control/border-control/README.md b/packages/components/src/border-control/border-control/README.md
+index fbd0c10e418d5a..0afda1ee31ae81 100644
+--- a/packages/components/src/border-control/border-control/README.md
++++ b/packages/components/src/border-control/border-control/README.md
+@@ -30,6 +30,7 @@ const MyBorderControl = () => {
+ 
+ 	return (
+ 		<BorderControl
++			__next40pxDefaultSize
+ 			colors={ colors }
+ 			label={ __( 'Border' ) }
+ 			onChange={ setBorder }
+diff --git a/packages/components/src/border-control/border-control/component.tsx b/packages/components/src/border-control/border-control/component.tsx
+index 21be22c9dd55d8..31eeb166a2d60f 100644
+--- a/packages/components/src/border-control/border-control/component.tsx
++++ b/packages/components/src/border-control/border-control/component.tsx
+@@ -154,6 +154,7 @@ const UnconnectedBorderControl = (
+  *
+  * 	return (
+  * 		<BorderControl
++ * 			__next40pxDefaultSize
+  * 			colors={ colors }
+  * 			label={ __( 'Border' ) }
+  * 			onChange={ onChange }
+diff --git a/packages/components/src/border-control/border-control/hook.ts b/packages/components/src/border-control/border-control/hook.ts
+index 676ff9ea2cc6ed..67af7ce42416c3 100644
+--- a/packages/components/src/border-control/border-control/hook.ts
++++ b/packages/components/src/border-control/border-control/hook.ts
+@@ -11,8 +11,8 @@ import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
+ import type { WordPressComponentProps } from '../../context';
+ import { useContextSystem } from '../../context';
+ import { useCx } from '../../utils/hooks/use-cx';
+-
+ import type { Border, BorderControlProps } from '../types';
++import { maybeWarnDeprecated36pxSize } from '../../utils/deprecated-36px-size';
+ 
+ // If either width or color are defined, the border is considered valid
+ // and a border style can be set as well.
+@@ -41,6 +41,12 @@ export function useBorderControl(
+ 		...otherProps
+ 	} = useContextSystem( props, 'BorderControl' );
+ 
++	maybeWarnDeprecated36pxSize( {
++		componentName: 'BorderControl',
++		__next40pxDefaultSize,
++		size,
++	} );
++
+ 	const computedSize =
+ 		size === 'default' && __next40pxDefaultSize ? '__unstable-large' : size;
+ 
+diff --git a/packages/components/src/border-control/stories/index.story.tsx b/packages/components/src/border-control/stories/index.story.tsx
+index 0756a18ac5c0e5..3b5fa740d092d6 100644
+--- a/packages/components/src/border-control/stories/index.story.tsx
++++ b/packages/components/src/border-control/stories/index.story.tsx
+@@ -93,6 +93,7 @@ export const Default = Template.bind( {} );
+ Default.args = {
+ 	colors,
+ 	label: 'Border',
++	__next40pxDefaultSize: true,
+ 	enableAlpha: true,
+ 	enableStyle: true,
+ 	shouldSanitizeBorder: true,
+diff --git a/packages/components/src/border-control/test/index.js b/packages/components/src/border-control/test/index.js
+index 000a89e14a40b3..ec7fb18837f97d 100644
+--- a/packages/components/src/border-control/test/index.js
++++ b/packages/components/src/border-control/test/index.js
+@@ -31,6 +31,7 @@ function createProps( customProps ) {
+ 			props.value = newValue;
+ 		} ),
+ 		value: defaultBorder,
++		__next40pxDefaultSize: true,
+ 		...customProps,
+ 	};
+ 	return props;
+diff --git a/packages/components/src/utils/deprecated-36px-size.ts b/packages/components/src/utils/deprecated-36px-size.ts
+index 92b2cd8ddce274..e28e9eebb31a99 100644
+--- a/packages/components/src/utils/deprecated-36px-size.ts
++++ b/packages/components/src/utils/deprecated-36px-size.ts
+@@ -17,8 +17,8 @@ export function maybeWarnDeprecated36pxSize( {
+ 	}
+ 
+ 	deprecated( `36px default size for wp.components.${ componentName }`, {
+-		since: '6.7',
+-		version: '7.0',
++		since: '6.8',
++		version: '7.1',
+ 		hint: 'Set the `__next40pxDefaultSize` prop to true to start opting into the new default size, which will become the default in a future version.',
+ 	} );
+ }

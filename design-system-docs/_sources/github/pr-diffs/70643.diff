@@ -1,0 +1,138 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 5a6cdcf5781ef7..eef80dbddf52fd 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -10,7 +10,7 @@
+ 
+ -   `FormTokenField`: Fix focus lost on tab when `__experimentalExpandOnFocus` is set ([#70591](https://github.com/WordPress/gutenberg/pull/70591)).
+ -   `SelectControl`: Fix font-size for medium screens to ensure consistency with other inputs ([#70619](https://github.com/WordPress/gutenberg/pull/70619)).
+-
++-   `SelectControl`: Move classnames to the root ([#70643](https://github.com/WordPress/gutenberg/pull/70643)).
+ 
+ ## 29.12.0 (2025-06-25)
+ 
+diff --git a/packages/components/src/dimension-control/style.scss b/packages/components/src/dimension-control/style.scss
+deleted file mode 100644
+index 7f1481747dfe1a..00000000000000
+--- a/packages/components/src/dimension-control/style.scss
++++ /dev/null
+@@ -1,22 +0,0 @@
+-.block-editor-dimension-control {
+-
+-	.components-base-control__field {
+-		display: flex;
+-		align-items: center;
+-	}
+-
+-	.components-base-control__label {
+-		display: flex;
+-		align-items: center;
+-		margin-right: 1em;
+-		margin-bottom: 0;
+-
+-		.dashicon {
+-			margin-right: 0.5em;
+-		}
+-	}
+-
+-	&.is-manual .components-base-control__label {
+-		width: 10em;
+-	}
+-}
+diff --git a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+index b1adfd5d9221ab..2d806859ac6757 100644
+--- a/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
++++ b/packages/components/src/dimension-control/test/__snapshots__/index.test.js.snap
+@@ -193,13 +193,13 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
+ 
+ <div>
+   <div
+-    class="components-base-control emotion-0 emotion-1"
++    class="components-base-control components-select-control block-editor-dimension-control emotion-0 emotion-1"
+   >
+     <div
+       class="components-base-control__field emotion-2 emotion-3"
+     >
+       <div
+-        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6 emotion-7"
++        class="components-flex components-input-base emotion-4 emotion-5 emotion-6 emotion-7"
+         data-wp-c16t="true"
+         data-wp-component="InputBase"
+       >
+@@ -475,13 +475,13 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
+ 
+ <div>
+   <div
+-    class="components-base-control emotion-0 emotion-1"
++    class="components-base-control components-select-control block-editor-dimension-control emotion-0 emotion-1"
+   >
+     <div
+       class="components-base-control__field emotion-2 emotion-3"
+     >
+       <div
+-        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6 emotion-7"
++        class="components-flex components-input-base emotion-4 emotion-5 emotion-6 emotion-7"
+         data-wp-c16t="true"
+         data-wp-component="InputBase"
+       >
+@@ -767,13 +767,13 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`]
+ 
+ <div>
+   <div
+-    class="components-base-control emotion-0 emotion-1"
++    class="components-base-control components-select-control block-editor-dimension-control emotion-0 emotion-1"
+   >
+     <div
+       class="components-base-control__field emotion-2 emotion-3"
+     >
+       <div
+-        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6 emotion-7"
++        class="components-flex components-input-base emotion-4 emotion-5 emotion-6 emotion-7"
+         data-wp-c16t="true"
+         data-wp-component="InputBase"
+       >
+@@ -1071,13 +1071,13 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
+ 
+ <div>
+   <div
+-    class="components-base-control emotion-0 emotion-1"
++    class="components-base-control components-select-control block-editor-dimension-control emotion-0 emotion-1"
+   >
+     <div
+       class="components-base-control__field emotion-2 emotion-3"
+     >
+       <div
+-        class="components-flex components-input-base components-select-control block-editor-dimension-control emotion-4 emotion-5 emotion-6 emotion-7"
++        class="components-flex components-input-base emotion-4 emotion-5 emotion-6 emotion-7"
+         data-wp-c16t="true"
+         data-wp-component="InputBase"
+       >
+diff --git a/packages/components/src/select-control/index.tsx b/packages/components/src/select-control/index.tsx
+index e93e9385a9c23b..d82c5c19178910 100644
+--- a/packages/components/src/select-control/index.tsx
++++ b/packages/components/src/select-control/index.tsx
+@@ -107,11 +107,11 @@ function UnforwardedSelectControl< V extends string >(
+ 		<BaseControl
+ 			help={ help }
+ 			id={ id }
++			className={ classes }
+ 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 			__associatedWPComponentName="SelectControl"
+ 		>
+ 			<StyledInputBase
+-				className={ classes }
+ 				disabled={ disabled }
+ 				hideLabelFromVision={ hideLabelFromVision }
+ 				id={ id }
+diff --git a/packages/components/src/style.scss b/packages/components/src/style.scss
+index c782190c1eaaa6..1f7b17a1eb8a08 100644
+--- a/packages/components/src/style.scss
++++ b/packages/components/src/style.scss
+@@ -21,7 +21,6 @@
+ @import "./combobox-control/style.scss";
+ @import "./color-palette/style.scss";
+ @import "./custom-gradient-picker/style.scss";
+-@import "./dimension-control/style.scss";
+ @import "./draggable/style.scss";
+ @import "./drop-zone/style.scss";
+ @import "./dropdown/style.scss";

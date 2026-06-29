@@ -1,0 +1,492 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index ef6376d8c1bc20..629c674e6ab9f6 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   `InputControl`: Narrow the TypeScript type of the `label` prop to plain strings ([#77860](https://github.com/WordPress/gutenberg/pull/77860)).
+ -   `Select`: `Select.Item` values that are empty strings no longer render with placeholder styling on the trigger. Use the new `placeholder` prop on `Select.Trigger`, or a `null` item value, instead ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
+ -   `Select`: `Select.Trigger` now renders a default `"Select"` placeholder when no value is selected, where it previously rendered empty ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
++-   `Select`: `Select.Item` no longer renders its `value` as fallback item content. Pass item content explicitly as `children`. Migrate `<Select.Item value="Foo" />` to `<Select.Item value="Foo">Foo</Select.Item>` ([#77861](https://github.com/WordPress/gutenberg/pull/77861)).
+ 
+ ### Bug Fixes
+ 
+diff --git a/packages/ui/src/form/primitives/select/item.tsx b/packages/ui/src/form/primitives/select/item.tsx
+index 294e4130d0c637..7772c471079026 100644
+--- a/packages/ui/src/form/primitives/select/item.tsx
++++ b/packages/ui/src/form/primitives/select/item.tsx
+@@ -9,7 +9,7 @@ import type { SelectItemProps } from './types';
+ 
+ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
+ 	function Item(
+-		{ className, value, size = 'default', children = value, ...restProps },
++		{ className, value, size = 'default', children, ...restProps },
+ 		ref
+ 	) {
+ 		return (
+diff --git a/packages/ui/src/form/primitives/select/root.tsx b/packages/ui/src/form/primitives/select/root.tsx
+index 7d430741bd7948..8d68d531bed75c 100644
+--- a/packages/ui/src/form/primitives/select/root.tsx
++++ b/packages/ui/src/form/primitives/select/root.tsx
+@@ -1,6 +1,17 @@
+ import { Select as _Select } from '@base-ui/react/select';
+ import type { SelectRootProps } from './types';
+ 
+-export function Root( props: SelectRootProps ) {
+-	return <_Select.Root< string, false > { ...props } />;
++/**
++ * A component that lets users choose one option from a list.
++ *
++ * When using object values, pass an `items` array so `Select.Trigger` can
++ * auto-resolve the selected item's label. By default, items should use a
++ * `{ value, label }` shape, or provide `itemToStringLabel` for a custom shape.
++ *
++ * Object values are compared with `Object.is` by default, so use the same
++ * object references for `value` / `defaultValue` and `Select.Item` values, or
++ * provide `isItemEqualToValue`.
++ */
++export function Root< Value = unknown >( props: SelectRootProps< Value > ) {
++	return <_Select.Root< Value, false > { ...props } />;
+ }
+diff --git a/packages/ui/src/form/primitives/select/stories/index.story.tsx b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+index df2168088aee3a..f48a3b376a2f6d 100644
+--- a/packages/ui/src/form/primitives/select/stories/index.story.tsx
++++ b/packages/ui/src/form/primitives/select/stories/index.story.tsx
+@@ -14,17 +14,22 @@ export default meta;
+ 
+ type Story = StoryObj< typeof Select.Root >;
+ 
++const defaultItems = Array.from( { length: 6 }, ( _, index ) => ( {
++	value: `item-${ index + 1 }`,
++	label: `Item ${ index + 1 }`,
++} ) );
++
+ export const Default: Story = {
+ 	args: {
++		items: defaultItems,
+ 		children: (
+ 			<>
+ 				<Select.Trigger />
+ 				<Select.Popup>
+-					{ Array.from( { length: 6 }, ( _, index ) => (
+-						<Select.Item
+-							key={ index }
+-							value={ `Item ${ index + 1 }` }
+-						/>
++					{ defaultItems.map( ( item ) => (
++						<Select.Item key={ item.value } value={ item }>
++							{ item.label }
++						</Select.Item>
+ 					) ) }
+ 				</Select.Popup>
+ 			</>
+@@ -34,21 +39,23 @@ export const Default: Story = {
+ 
+ export const Compact: Story = {
+ 	args: {
++		...Default.args,
+ 		children: (
+ 			<>
+ 				<Select.Trigger size="compact" />
+ 				<Select.Popup>
+-					{ Array.from( { length: 6 }, ( _, index ) => (
++					{ defaultItems.map( ( item ) => (
+ 						<Select.Item
+-							key={ index }
+-							value={ `Item ${ index + 1 }` }
++							key={ item.value }
++							value={ item }
+ 							size="compact"
+-						/>
++						>
++							{ item.label }
++						</Select.Item>
+ 					) ) }
+ 				</Select.Popup>
+ 			</>
+ 		),
+-		defaultValue: 'Item 1',
+ 	},
+ };
+ 
+@@ -71,7 +78,9 @@ export const Minimal: Story = {
+ 							key={ index }
+ 							value={ `${ index + 1 }` }
+ 							size="small"
+-						/>
++						>
++							{ `${ index + 1 }` }
++						</Select.Item>
+ 					) ) }
+ 				</Select.Popup>
+ 			</>
+@@ -80,21 +89,20 @@ export const Minimal: Story = {
+ 	},
+ };
+ 
+-const placeholderItems = [ 'Item 1', 'Item 2' ];
+-
+ /**
+  * Use the `placeholder` prop on `Select.Trigger` to show text when no
+  * value is selected. The default placeholder is `"Select"`.
+  */
+ export const WithCustomPlaceholder: Story = {
+ 	args: {
++		items: defaultItems,
+ 		children: (
+ 			<>
+ 				<Select.Trigger placeholder="Choose an item" />
+ 				<Select.Popup>
+-					{ placeholderItems.map( ( item ) => (
+-						<Select.Item key={ item } value={ item }>
+-							{ item }
++					{ defaultItems.map( ( item ) => (
++						<Select.Item key={ item.value } value={ item }>
++							{ item.label }
+ 						</Select.Item>
+ 					) ) }
+ 				</Select.Popup>
+@@ -144,75 +152,117 @@ export const WithNullValueOption: Story = {
+  */
+ export const Labeling: Story = {
+ 	args: {
++		...Default.args,
+ 		children: (
+ 			<>
+ 				<Select.Trigger aria-label="User role" />
+ 				<Select.Popup>
+-					<Select.Item value="Administrator" />
+-					<Select.Item value="Editor" />
++					{ defaultItems.map( ( item ) => (
++						<Select.Item key={ item.value } value={ item }>
++							{ item.label }
++						</Select.Item>
++					) ) }
+ 				</Select.Popup>
+ 			</>
+ 		),
+-		defaultValue: 'Administrator',
+ 	},
+ };
+ 
+ const longItemValue =
+ 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.';
+ 
++const overflowItems = [
++	{
++		value: 'long-item',
++		label: longItemValue,
++	},
++	{
++		value: 'item-2',
++		label: 'Item 2',
++	},
++];
++
+ export const WithOverflow: Story = {
+ 	args: {
++		items: overflowItems,
+ 		children: (
+ 			<>
+ 				<Select.Trigger />
+ 				<Select.Popup>
+-					<Select.Item value={ longItemValue } />
+-					<Select.Item value="Item 2" />
++					{ overflowItems.map( ( item ) => (
++						<Select.Item key={ item.value } value={ item }>
++							{ item.label }
++						</Select.Item>
++					) ) }
+ 				</Select.Popup>
+ 			</>
+ 		),
+-		defaultValue: longItemValue,
++		defaultValue: overflowItems[ 0 ],
+ 	},
+ };
+ 
+ export const Disabled: Story = {
+ 	args: {
++		...Default.args,
+ 		children: (
+ 			<>
+ 				<Select.Trigger />
+ 				<Select.Popup>
+-					<Select.Item value="Item 1" />
+-					<Select.Item value="Item 2" />
++					{ defaultItems.map( ( item ) => (
++						<Select.Item key={ item.value } value={ item }>
++							{ item.label }
++						</Select.Item>
++					) ) }
+ 				</Select.Popup>
+ 			</>
+ 		),
+-		defaultValue: 'Item 1',
++		defaultValue: defaultItems[ 0 ],
+ 		disabled: true,
+ 	},
+ };
+ 
++const disabledItemItems = [
++	{
++		value: 'item-1',
++		label: 'Item 1',
++	},
++	{
++		value: 'item-2',
++		label: 'Item 2',
++		disabled: true,
++	},
++];
++
+ export const WithDisabledItem: Story = {
+ 	args: {
++		items: disabledItemItems,
+ 		children: (
+ 			<>
+ 				<Select.Trigger />
+ 				<Select.Popup>
+-					<Select.Item value="Item 1" />
+-					<Select.Item value="Item 2" disabled />
++					{ disabledItemItems.map( ( item ) => (
++						<Select.Item
++							key={ item.value }
++							value={ item }
++							disabled={ item.disabled }
++						>
++							{ item.label }
++						</Select.Item>
++					) ) }
+ 				</Select.Popup>
+ 			</>
+ 		),
+-		defaultValue: 'Item 1',
++		defaultValue: disabledItemItems[ 0 ],
+ 	},
+ };
+ 
+ const customOptions = [
+ 	{
+-		value: 'User 1',
++		value: 'user-1',
+ 		label: 'User 1 (Admin)',
+ 	},
+ 	{
+-		value: 'User 2',
++		value: 'user-2',
+ 		label: 'User 2 (Editor)',
+ 	},
+ ];
+@@ -223,10 +273,11 @@ const customOptions = [
+  */
+ export const WithCustomTriggerAndItem: Story = {
+ 	args: {
++		items: customOptions,
+ 		children: (
+ 			<>
+ 				<Select.Trigger>
+-					{ ( value ) => (
++					{ ( item ) => (
+ 						<span
+ 							style={ {
+ 								display: 'flex',
+@@ -235,31 +286,27 @@ export const WithCustomTriggerAndItem: Story = {
+ 							} }
+ 						>
+ 							<img
+-								src={ `https://gravatar.com/avatar/?d=initials&name=${ value }` }
++								src={ `https://gravatar.com/avatar/?d=initials&name=${ item.value }` }
+ 								alt=""
+ 								width="20"
+ 								style={ {
+ 									borderRadius: '50%',
+ 								} }
+ 							/>
+-							{ value }
++							{ item.label }
+ 						</span>
+ 					) }
+ 				</Select.Trigger>
+ 				<Select.Popup>
+ 					{ customOptions.map( ( item ) => (
+-						<Select.Item
+-							key={ item.value }
+-							value={ item.value }
+-							label={ item.label }
+-						>
++						<Select.Item key={ item.value } value={ item }>
+ 							{ item.label }
+ 						</Select.Item>
+ 					) ) }
+ 				</Select.Popup>
+ 			</>
+ 		),
+-		defaultValue: 'User 1',
++		defaultValue: customOptions[ 0 ],
+ 	},
+ };
+ 
+@@ -282,6 +329,7 @@ export const WithCustomTriggerAndItem: Story = {
+ export const WithCustomZIndex: Story = {
+ 	name: 'With Custom z-index',
+ 	args: {
++		...Default.args,
+ 		children: (
+ 			<>
+ 				<Select.Trigger />
+@@ -292,11 +340,13 @@ export const WithCustomZIndex: Story = {
+ 						/>
+ 					}
+ 				>
+-					<Select.Item value="Item 1" />
+-					<Select.Item value="Item 2" />
++					{ defaultItems.map( ( item ) => (
++						<Select.Item key={ item.value } value={ item }>
++							{ item.label }
++						</Select.Item>
++					) ) }
+ 				</Select.Popup>
+ 			</>
+ 		),
+-		defaultValue: 'Item 1',
+ 	},
+ };
+diff --git a/packages/ui/src/form/primitives/select/test/index.test.tsx b/packages/ui/src/form/primitives/select/test/index.test.tsx
+index 0a7338f4ca8165..1f6894d9668590 100644
+--- a/packages/ui/src/form/primitives/select/test/index.test.tsx
++++ b/packages/ui/src/form/primitives/select/test/index.test.tsx
+@@ -4,6 +4,70 @@ import { createRef } from '@wordpress/element';
+ import * as Select from '../index';
+ 
+ describe( 'Select', () => {
++	it( 'supports object item values', async () => {
++		const user = userEvent.setup();
++		const onValueChange = jest.fn();
++		const users = [
++			{ value: '1', label: 'User 1' },
++			{ value: '2', label: 'User 2' },
++		];
++
++		render(
++			<Select.Root
++				defaultValue={ users[ 0 ] }
++				items={ users }
++				onValueChange={ onValueChange }
++			>
++				<Select.Trigger>{ ( value ) => value?.label }</Select.Trigger>
++				<Select.Popup>
++					{ users.map( ( option ) => (
++						<Select.Item key={ option.value } value={ option }>
++							{ option.label }
++						</Select.Item>
++					) ) }
++				</Select.Popup>
++			</Select.Root>
++		);
++
++		const trigger = screen.getByRole( 'combobox' );
++
++		expect( trigger ).toHaveTextContent( 'User 1' );
++
++		await user.click( trigger );
++		await user.click(
++			await screen.findByRole( 'option', { name: 'User 2' } )
++		);
++
++		expect( trigger ).toHaveTextContent( 'User 2' );
++		expect( onValueChange ).toHaveBeenCalledTimes( 1 );
++		expect( onValueChange ).toHaveBeenLastCalledWith(
++			users[ 1 ],
++			expect.objectContaining( { reason: expect.any( String ) } )
++		);
++	} );
++
++	it( 'auto-resolves trigger label from items when value is an object', () => {
++		const users = [
++			{ value: '1', label: 'User 1' },
++			{ value: '2', label: 'User 2' },
++		];
++
++		render(
++			<Select.Root defaultValue={ users[ 0 ] } items={ users }>
++				<Select.Trigger />
++				<Select.Popup>
++					{ users.map( ( option ) => (
++						<Select.Item key={ option.value } value={ option }>
++							{ option.label }
++						</Select.Item>
++					) ) }
++				</Select.Popup>
++			</Select.Root>
++		);
++
++		expect( screen.getByRole( 'combobox' ) ).toHaveTextContent( 'User 1' );
++	} );
++
+ 	it( 'renders a default placeholder when no value is selected', () => {
+ 		render(
+ 			<Select.Root>
+@@ -66,8 +130,10 @@ describe( 'Select', () => {
+ 			<Select.Root>
+ 				<Select.Trigger ref={ triggerRef } />
+ 				<Select.Popup ref={ popupRef }>
+-					<Select.Item ref={ itemRef } value="Item 1" />
+-					<Select.Item value="Item 2" />
++					<Select.Item ref={ itemRef } value="Item 1">
++						Item 1
++					</Select.Item>
++					<Select.Item value="Item 2">Item 2</Select.Item>
+ 				</Select.Popup>
+ 			</Select.Root>
+ 		);
+@@ -101,7 +167,7 @@ describe( 'Select', () => {
+ 								<Select.Portal container={ containerRef } />
+ 							}
+ 						>
+-							<Select.Item value="Item 1" />
++							<Select.Item value="Item 1">Item 1</Select.Item>
+ 						</Select.Popup>
+ 					</Select.Root>
+ 				</div>
+@@ -127,7 +193,7 @@ describe( 'Select', () => {
+ 					<Select.Root>
+ 						<Select.Trigger />
+ 						<Select.Popup>
+-							<Select.Item value="Item 1" />
++							<Select.Item value="Item 1">Item 1</Select.Item>
+ 						</Select.Popup>
+ 					</Select.Root>
+ 				</div>
+diff --git a/packages/ui/src/form/primitives/select/types.ts b/packages/ui/src/form/primitives/select/types.ts
+index 0969069360bbe8..cf46a244e3d146 100644
+--- a/packages/ui/src/form/primitives/select/types.ts
++++ b/packages/ui/src/form/primitives/select/types.ts
+@@ -7,8 +7,8 @@ import type { InputLayoutProps } from '../input-layout/types';
+ export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
+ 
+ // The second type parameter is the `multiple` flag (currently disabled).
+-export type SelectRootProps = Omit<
+-	_Select.Root.Props< string, false >,
++export type SelectRootProps< Value = unknown > = Omit<
++	_Select.Root.Props< Value, false >,
+ 	'multiple'
+ >;
+ 
+@@ -63,7 +63,7 @@ export type SelectItemProps = Omit<
+ 	/**
+ 	 * A unique value that identifies this select item.
+ 	 */
+-	value?: string | null;
++	value?: unknown;
+ 	/**
+ 	 * The size of the item.
+ 	 *
+@@ -72,8 +72,6 @@ export type SelectItemProps = Omit<
+ 	size?: InputLayoutProps[ 'size' ];
+ 	/**
+ 	 * The content of the item.
+-	 *
+-	 * @default `value`
+ 	 */
+ 	children?: _Select.Item.Props[ 'children' ];
+ };

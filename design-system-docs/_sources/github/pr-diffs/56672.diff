@@ -1,0 +1,40 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6a818780d9dc1e..106863c020c5d9 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Enhancements
+ 
++-   `FormToggle`: fix sass deprecation warning ([#56672](https://github.com/WordPress/gutenberg/pull/56672)).
+ -   `QueryControls`: Add opt-in prop for 40px default size ([#56576](https://github.com/WordPress/gutenberg/pull/56576)).
+ 
+ ## 25.13.0 (2023-11-29)
+diff --git a/packages/components/src/form-toggle/style.scss b/packages/components/src/form-toggle/style.scss
+index 314f6fa36d12f2..d04ad4c651f862 100644
+--- a/packages/components/src/form-toggle/style.scss
++++ b/packages/components/src/form-toggle/style.scss
+@@ -1,3 +1,5 @@
++@use "sass:math";
++
+ $toggle-width: 36px;
+ $toggle-height: 18px;
+ $toggle-border-width: 1px;
+@@ -20,7 +22,7 @@ $transition-duration: 0.2s;
+ 		border: $toggle-border-width solid $gray-900;
+ 		width: $toggle-width;
+ 		height: $toggle-height;
+-		border-radius: $toggle-height * 0.5;
++		border-radius: math.div($toggle-height, 2);
+ 		transition:
+ 			$transition-duration background-color ease,
+ 			$transition-duration border-color ease;
+@@ -59,7 +61,7 @@ $transition-duration: 0.2s;
+ 		background-color: $gray-900;
+ 
+ 		// Transparent border acts as a fill in Windows High Contrast Mode.
+-		border: $thumb-size / 2 solid transparent;
++		border: math.div($thumb-size, 2) solid transparent;
+ 	}
+ 
+ 	// Checked state.

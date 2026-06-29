@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d7741f4caa9886..0e740d3542fcce 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -26,6 +26,7 @@
+ ### Enhancements
+ 
+ -   `ColorPicker`: Update sizes of color format select and copy button ([#67093](https://github.com/WordPress/gutenberg/pull/67093)).
++-   `Autocomplete`: Increase option height ([#67214](https://github.com/WordPress/gutenberg/pull/67214)).
+ 
+ ### Experimental
+ 
+diff --git a/packages/components/src/autocomplete/autocompleter-ui.tsx b/packages/components/src/autocomplete/autocompleter-ui.tsx
+index 69105f6c9d3b44..dbbbe724113d7c 100644
+--- a/packages/components/src/autocomplete/autocompleter-ui.tsx
++++ b/packages/components/src/autocomplete/autocompleter-ui.tsx
+@@ -57,6 +57,7 @@ function ListBox( {
+ 					key={ option.key }
+ 					id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
+ 					role="option"
++					__next40pxDefaultSize
+ 					aria-selected={ index === selectedIndex }
+ 					accessibleWhenDisabled
+ 					disabled={ option.isDisabled }

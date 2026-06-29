@@ -1,0 +1,368 @@
+diff --git a/packages/components/src/card/test/__snapshots__/index.js.snap b/packages/components/src/card/test/__snapshots__/index.js.snap
+index 82fa34348ba3b3..eb44001d513d37 100644
+--- a/packages/components/src/card/test/__snapshots__/index.js.snap
++++ b/packages/components/src/card/test/__snapshots__/index.js.snap
+@@ -366,6 +366,12 @@ Object {
+   border-radius: 2px;
+ }
+ 
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-18 {
++    transition-duration: 0ms;
++  }
++}
++
+ <body>
+     <div>
+       <div
+@@ -616,6 +622,12 @@ Object {
+   border-radius: 2px;
+ }
+ 
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-18 {
++    transition-duration: 0ms;
++  }
++}
++
+ <div>
+     <div
+       class="components-surface components-card components-card emotion-0 emotion-1"
+@@ -757,15 +769,15 @@ Snapshot Diff:
+     </div>
+     <div
+       aria-hidden="true"
+--     class="components-elevation css-180mfx7-View-Elevation-sx-Base-elevationClassName em57xhy0"
+-+     class="components-elevation css-19ozpqv-View-Elevation-sx-Base-elevationClassName em57xhy0"
++-     class="components-elevation css-1b4rkmt-View-Elevation-sx-Base-elevationClassName em57xhy0"
+++     class="components-elevation css-91yjwm-View-Elevation-sx-Base-elevationClassName em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+     <div
+       aria-hidden="true"
+--     class="components-elevation css-179ju9e-View-Elevation-sx-Base-elevationClassName em57xhy0"
+-+     class="components-elevation css-19ozpqv-View-Elevation-sx-Base-elevationClassName em57xhy0"
++-     class="components-elevation css-o8otup-View-Elevation-sx-Base-elevationClassName em57xhy0"
+++     class="components-elevation css-91yjwm-View-Elevation-sx-Base-elevationClassName em57xhy0"
+       data-wp-c16t="true"
+       data-wp-component="Elevation"
+     />
+@@ -805,6 +817,12 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`]
+   border-radius: 2px;
+ }
+ 
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-4 {
++    transition-duration: 0ms;
++  }
++}
++
+ .emotion-6 {
+   background: transparent;
+   display: block;
+@@ -824,6 +842,12 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`]
+   border-radius: 2px;
+ }
+ 
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-6 {
++    transition-duration: 0ms;
++  }
++}
++
+ <div>
+   <div
+     class="components-surface components-card components-card emotion-0 emotion-1"
+diff --git a/packages/components/src/elevation/README.md b/packages/components/src/elevation/README.md
+index 0e61fe7db0a750..357ef947854e95 100644
+--- a/packages/components/src/elevation/README.md
++++ b/packages/components/src/elevation/README.md
+@@ -29,43 +29,46 @@ function Example() {
+ 
+ ## Props
+ 
+-##### active
++### `active`: `number`
+ 
+-**Type**: `boolean`
++Size of the shadow value when active (see the `value` and `isInteractive` props).
+ 
+-Renders the active (interaction) shadow value.
++- Required: No
+ 
+-##### borderRadius
+-
+-**Type**: `string`,`number`
++### `borderRadius`: `CSSProperties[ 'borderRadius' ]`
+ 
+ Renders the border-radius of the shadow.
+ 
+-##### focus
++- Required: No
++- Default: `inherit`
+ 
+-**Type**: `boolean`
++### `focus`: `number`
+ 
+-Renders the focus (interaction) shadow value.
++Size of the shadow value when focused (see the `value` and `isInteractive` props).
+ 
+-##### hover
++- Required: No
+ 
+-**Type**: `boolean`
++### `hover`: `number`
+ 
+-Renders the hover (interaction) shadow value.
++Size of the shadow value when hovered  (see the `value` and `isInteractive` props).
+ 
+-##### isInteractive
++- Required: No
+ 
+-**Type**: `boolean`
++### `isInteractive`: `boolean`
+ 
+-Determines if hover, active, and focus shadow values should be automatically calculated and rendered.
++Determines if `hover`, `active`, and `focus` shadow values should be automatically calculated and rendered.
+ 
+-##### offset
++- Required: No
++- Default: `false`
+ 
+-**Type**: `number`
++### `offset`: `number`
+ 
+ Dimensional offsets (margin) for the shadow.
+ 
+-##### value
++- Required: No
++- Default: `0`
++
++### `value`
+ 
+ **Type**: `number`
+ 
+diff --git a/packages/components/src/elevation/hook.js b/packages/components/src/elevation/hook.js
+index d65c3f545721b7..24f31fef0f7535 100644
+--- a/packages/components/src/elevation/hook.js
++++ b/packages/components/src/elevation/hook.js
+@@ -14,7 +14,7 @@ import { useMemo } from '@wordpress/element';
+  */
+ import { useContextSystem } from '../ui/context';
+ import * as styles from './styles';
+-import CONFIG from '../utils/config-values';
++import { CONFIG, reduceMotion } from '../utils';
+ import { useCx } from '../utils/hooks/use-cx';
+ 
+ /**
+@@ -62,16 +62,19 @@ export function useElevation( props ) {
+ 
+ 		const sx = {};
+ 
+-		sx.Base = css( {
+-			borderRadius,
+-			bottom: offset,
+-			boxShadow: getBoxShadow( value ),
+-			opacity: CONFIG.elevationIntensity,
+-			left: offset,
+-			right: offset,
+-			top: offset,
+-			transition,
+-		} );
++		sx.Base = css(
++			{
++				borderRadius,
++				bottom: offset,
++				boxShadow: getBoxShadow( value ),
++				opacity: CONFIG.elevationIntensity,
++				left: offset,
++				right: offset,
++				top: offset,
++				transition,
++			},
++			reduceMotion( 'transition' )
++		);
+ 
+ 		if ( ! isNil( hoverValue ) ) {
+ 			sx.hover = css`
+diff --git a/packages/components/src/elevation/test/__snapshots__/index.js.snap b/packages/components/src/elevation/test/__snapshots__/index.js.snap
+index ef08d989ad7bab..2571252ea0f028 100644
+--- a/packages/components/src/elevation/test/__snapshots__/index.js.snap
++++ b/packages/components/src/elevation/test/__snapshots__/index.js.snap
+@@ -19,6 +19,12 @@ exports[`props should render active 1`] = `
+   transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+ }
+ 
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-0 {
++    transition-duration: 0ms;
++  }
++}
++
+ *:hover>.emotion-0 {
+   box-shadow: 0 14px 28px 0 rgba(0 ,0, 0, 0.7);
+ }
+@@ -54,6 +60,12 @@ exports[`props should render correctly 1`] = `
+   transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+ }
+ 
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-0 {
++    transition-duration: 0ms;
++  }
++}
++
+ <div
+   aria-hidden="true"
+   class="components-elevation emotion-0 emotion-1"
+@@ -81,6 +93,12 @@ exports[`props should render hover 1`] = `
+   transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+ }
+ 
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-0 {
++    transition-duration: 0ms;
++  }
++}
++
+ *:hover>.emotion-0 {
+   box-shadow: 0 14px 28px 0 rgba(0 ,0, 0, 0.7);
+ }
+@@ -112,6 +130,12 @@ exports[`props should render isInteractive 1`] = `
+   transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+ }
+ 
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-0 {
++    transition-duration: 0ms;
++  }
++}
++
+ *:hover>.emotion-0 {
+   box-shadow: 0 0px 0px 0 rgba(0 ,0, 0, 0);
+ }
+@@ -147,6 +171,12 @@ exports[`props should render offset 1`] = `
+   transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+ }
+ 
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-0 {
++    transition-duration: 0ms;
++  }
++}
++
+ *:hover>.emotion-0 {
+   box-shadow: 0 14px 28px 0 rgba(0 ,0, 0, 0.7);
+ }
+@@ -182,6 +212,12 @@ exports[`props should render value 1`] = `
+   transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+ }
+ 
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-0 {
++    transition-duration: 0ms;
++  }
++}
++
+ <div
+   aria-hidden="true"
+   class="components-elevation emotion-0 emotion-1"
+diff --git a/packages/components/src/elevation/types.ts b/packages/components/src/elevation/types.ts
+index dee387b07aa368..fb07d3349803eb 100644
+--- a/packages/components/src/elevation/types.ts
++++ b/packages/components/src/elevation/types.ts
+@@ -6,32 +6,52 @@ import type { CSSProperties } from 'react';
+ 
+ export type Props = {
+ 	/**
+-	 * Renders the active (interaction) shadow value.
++	 * Size of the shadow value when active (see the `value` and `isInteractive` props).
+ 	 */
+ 	active?: number;
+ 	/**
+ 	 * Renders the border-radius of the shadow.
++	 *
++	 * @default 'inherit'
+ 	 */
+ 	borderRadius?: CSSProperties[ 'borderRadius' ];
+ 	/**
+-	 * Renders the focus (interaction) shadow value.
++	 * Size of the shadow value when focused (see the `value` and `isInteractive` props).
+ 	 */
+ 	focus?: number;
+ 	/**
+-	 * Renders the hover (interaction) shadow value.
++	 * Size of the shadow value when hovered  (see the `value` and `isInteractive` props).
+ 	 */
+ 	hover?: number;
+ 	/**
+ 	 * Determines if hover, active, and focus shadow values should be automatically calculated and rendered.
++	 *
++	 * @default false
+ 	 */
+ 	isInteractive?: boolean;
+ 	/**
+ 	 * Dimensional offsets (margin) for the shadow.
++	 *
++	 * @default 0
+ 	 */
+ 	offset?: number;
+ 	/**
+ 	 * Size of the shadow, based on the Style system's elevation system. The `value` determines the strength of the shadow, which sense of depth.
+ 	 * In the example below, `isInteractive` is activated to give a better sense of depth.
++	 *
++	 * @example
++	 * ```jsx
++	 * import { __experimentalElevation as Elevation } from '@wordpress/components';
++	 * 	* function Example() {
++	 * 	return (
++	 * 		<div>
++	 * 			<Elevation isInteractive value={ 200 } />
++	 * 		</div>
++	 * 	);
++	 * }
++	 * ```
++	 *
++	 * @default 0
+ 	 */
+ 	value?: number;
+ };
+diff --git a/packages/components/src/flyout/test/__snapshots__/index.js.snap b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+index 1d9e3fffaeed3a..1a03000beb4167 100644
+--- a/packages/components/src/flyout/test/__snapshots__/index.js.snap
++++ b/packages/components/src/flyout/test/__snapshots__/index.js.snap
+@@ -54,6 +54,12 @@ exports[`props should render correctly 1`] = `
+   border-radius: 2px;
+ }
+ 
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-7 {
++    transition-duration: 0ms;
++  }
++}
++
+ .emotion-9 {
+   background: transparent;
+   display: block;
+@@ -73,6 +79,12 @@ exports[`props should render correctly 1`] = `
+   border-radius: 2px;
+ }
+ 
++@media ( prefers-reduced-motion: reduce ) {
++  .emotion-9 {
++    transition-duration: 0ms;
++  }
++}
++
+ <div
+   class="components-surface components-card components-card emotion-0 emotion-1 emotion-2"
+   data-wp-c16t="true"
+@@ -169,6 +181,6 @@ Snapshot Diff:
+       </div>
+       <div
+         aria-hidden="true"
+-        class="components-elevation css-180mfx7-View-Elevation-sx-Base-elevationClassName em57xhy0"
++        class="components-elevation css-1b4rkmt-View-Elevation-sx-Base-elevationClassName em57xhy0"
+         data-wp-c16t="true"
+ `;

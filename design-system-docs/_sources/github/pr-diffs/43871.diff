@@ -1,0 +1,320 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 7a4540b391deb3..eed3ad45d93ba1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -20,6 +20,7 @@
+ -   `TextControl`, `TextareaControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43782](https://github.com/WordPress/gutenberg/pull/43782)).
+ -   `RangeControl`: Tweak dark gray marking color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
+ -   `UnitControl`: Tweak unit dropdown color to be consistent with the grays in `@wordpress/base-styles` ([#43773](https://github.com/WordPress/gutenberg/pull/43773)).
++-   `SearchControl`: Add `__nextHasNoMargin` prop for opting into the new margin-free styles ([#43871](https://github.com/WordPress/gutenberg/pull/43871)).
+ -   `CardHeader`, `CardBody`, `CardFooter`: Tweak `isShady` background colors to be consistent with the grays in `@wordpress/base-styles` ([#43719](https://github.com/WordPress/gutenberg/pull/43719)).
+ -   `InputControl`, `SelectControl`: Tweak `disabled` colors to be consistent with the grays in `@wordpress/base-styles` ([#43719](https://github.com/WordPress/gutenberg/pull/43719)).
+ -   `Popover`: stabilize `__unstableShift` to `shift` ([#43845](https://github.com/WordPress/gutenberg/pull/43845)).
+@@ -28,6 +29,7 @@
+ 
+ -   `RadioControl`: Clean up styles to use less custom CSS ([#43868](https://github.com/WordPress/gutenberg/pull/43868)).
+ -   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
++-   `SearchControl`: Convert to TypeScript ([#43871](https://github.com/WordPress/gutenberg/pull/43871)).
+ -   `ToggleGroupControl`: Rename `__experimentalIsIconGroup` prop to `__experimentalIsBorderless` ([#43771](https://github.com/WordPress/gutenberg/pull/43771/)).
+ -   Refactor `FocalPointPicker` to function component ([#39168](https://github.com/WordPress/gutenberg/pull/39168)).
+ -   `Guide`: use `code` instead of `keyCode` for keyboard events ([#43604](https://github.com/WordPress/gutenberg/pull/43604/)).
+diff --git a/packages/components/src/search-control/README.md b/packages/components/src/search-control/README.md
+index da70164dfad85c..49d28a4e623e58 100644
+--- a/packages/components/src/search-control/README.md
++++ b/packages/components/src/search-control/README.md
+@@ -14,7 +14,7 @@ SearchControl components let users display a search control.
+ 
+ Render a user interface to input the name of an additional css class.
+ 
+-```js
++```jsx
+ import { SearchControl } from '@wordpress/components';
+ import { useState } from '@wordpress/element';
+ 
+@@ -48,12 +48,14 @@ If this property is added, a specific placeholder will be used for the input.
+ 
+ -   Type: `String`
+ -   Required: No
++-   Default: `__( 'Search' )`
++
+ #### value
+ 
+ The current value of the input.
+ 
+--   Type: `String | Number`
+--   Required: Yes
++-   Type: `String`
++-   Required: No
+ 
+ #### className
+ 
+diff --git a/packages/components/src/search-control/index.js b/packages/components/src/search-control/index.tsx
+similarity index 61%
+rename from packages/components/src/search-control/index.js
+rename to packages/components/src/search-control/index.tsx
+index 09ff733918f3a2..528ae52b26bbc8 100644
+--- a/packages/components/src/search-control/index.js
++++ b/packages/components/src/search-control/index.tsx
+@@ -14,11 +14,15 @@ import { forwardRef, useRef } from '@wordpress/element';
+ /**
+  * Internal dependencies
+  */
+-import { Button } from '../';
++import Button from '../button';
+ import BaseControl from '../base-control';
++import type { WordPressComponentProps } from '../ui/context/wordpress-component';
++import type { SearchControlProps } from './types';
++import type { ForwardedRef } from 'react';
+ 
+-function SearchControl(
++function UnforwardedSearchControl(
+ 	{
++		__nextHasNoMarginBottom,
+ 		className,
+ 		onChange,
+ 		onKeyDown,
+@@ -28,10 +32,11 @@ function SearchControl(
+ 		hideLabelFromVision = true,
+ 		help,
+ 		onClose,
+-	},
+-	forwardedRef
++		...restProps
++	}: WordPressComponentProps< SearchControlProps, 'input', false >,
++	forwardedRef: ForwardedRef< HTMLInputElement >
+ ) {
+-	const searchRef = useRef();
++	const searchRef = useRef< HTMLInputElement >();
+ 	const instanceId = useInstanceId( SearchControl );
+ 	const id = `components-search-control-${ instanceId }`;
+ 
+@@ -53,7 +58,7 @@ function SearchControl(
+ 					label={ __( 'Reset search' ) }
+ 					onClick={ () => {
+ 						onChange( '' );
+-						searchRef.current.focus();
++						searchRef.current?.focus();
+ 					} }
+ 				/>
+ 			);
+@@ -64,6 +69,7 @@ function SearchControl(
+ 
+ 	return (
+ 		<BaseControl
++			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+ 			label={ label }
+ 			id={ id }
+ 			hideLabelFromVision={ hideLabelFromVision }
+@@ -72,6 +78,7 @@ function SearchControl(
+ 		>
+ 			<div className="components-search-control__input-wrapper">
+ 				<input
++					{ ...restProps }
+ 					ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
+ 					className="components-search-control__input"
+ 					id={ id }
+@@ -90,4 +97,25 @@ function SearchControl(
+ 	);
+ }
+ 
+-export default forwardRef( SearchControl );
++/**
++ * SearchControl components let users display a search control.
++ *
++ * ```jsx
++ * import { SearchControl } from '@wordpress/components';
++ * import { useState } from '@wordpress/element';
++ *
++ * function MySearchControl( { className, setState } ) {
++ *   const [ searchInput, setSearchInput ] = useState( '' );
++ *
++ *   return (
++ *     <SearchControl
++ *       value={ searchInput }
++ *       onChange={ setSearchInput }
++ *     />
++ *   );
++ * }
++ * ```
++ */
++export const SearchControl = forwardRef( UnforwardedSearchControl );
++
++export default SearchControl;
+diff --git a/packages/components/src/search-control/stories/index.js b/packages/components/src/search-control/stories/index.js
+deleted file mode 100644
+index c012b5965e8254..00000000000000
+--- a/packages/components/src/search-control/stories/index.js
++++ /dev/null
+@@ -1,39 +0,0 @@
+-/**
+- * External dependencies
+- */
+-import { boolean, text } from '@storybook/addon-knobs';
+-
+-/**
+- * WordPress dependencies
+- */
+-import { useState } from '@wordpress/element';
+-
+-/**
+- * Internal dependencies
+- */
+-import SearchControl from '../';
+-
+-export default {
+-	title: 'Components/SearchControl',
+-	component: SearchControl,
+-	parameters: {
+-		knobs: { disable: false },
+-	},
+-};
+-
+-export const _default = () => {
+-	const [ value, setValue ] = useState();
+-	const label = text( 'Label', 'Label Text' );
+-	const hideLabelFromVision = boolean( 'Hide Label From Vision', true );
+-	const help = text( 'Help Text', 'Help text to explain the input.' );
+-
+-	return (
+-		<SearchControl
+-			label={ label }
+-			hideLabelFromVision={ hideLabelFromVision }
+-			help={ help }
+-			value={ value }
+-			onChange={ setValue }
+-		/>
+-	);
+-};
+diff --git a/packages/components/src/search-control/stories/index.tsx b/packages/components/src/search-control/stories/index.tsx
+new file mode 100644
+index 00000000000000..fc04b670e86eaa
+--- /dev/null
++++ b/packages/components/src/search-control/stories/index.tsx
+@@ -0,0 +1,66 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { useState } from '@wordpress/element';
++
++/**
++ * Internal dependencies
++ */
++import SearchControl from '..';
++
++const meta: ComponentMeta< typeof SearchControl > = {
++	title: 'Components/SearchControl',
++	component: SearchControl,
++	argTypes: {
++		onChange: { action: 'onChange' },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof SearchControl > = ( {
++	onChange,
++	...props
++} ) => {
++	const [ value, setValue ] = useState< string >();
++
++	return (
++		<SearchControl
++			{ ...props }
++			value={ value }
++			onChange={ ( ...changeArgs ) => {
++				setValue( ...changeArgs );
++				onChange( ...changeArgs );
++			} }
++		/>
++	);
++};
++
++export const Default = Template.bind( {} );
++Default.args = {
++	label: 'Label Text',
++	help: 'Help text to explain the input.',
++};
++
++/**
++ * When an `onClose` callback is provided, the search control will render a close button
++ * that will trigger the given callback.
++ *
++ * Use this if you want the button to trigger your own logic to close the search field entirely,
++ * rather than just clearing the input value.
++ */
++export const WithOnClose = Template.bind( {} );
++WithOnClose.args = {
++	...Default.args,
++};
++WithOnClose.argTypes = {
++	onClose: { action: 'onClose' },
++};
+diff --git a/packages/components/src/search-control/types.ts b/packages/components/src/search-control/types.ts
+new file mode 100644
+index 00000000000000..dbaf16ad2feff0
+--- /dev/null
++++ b/packages/components/src/search-control/types.ts
+@@ -0,0 +1,43 @@
++/**
++ * External dependencies
++ */
++import type { HTMLAttributes } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type { BaseControlProps } from '../base-control/types';
++
++export type SearchControlProps = Pick<
++	BaseControlProps,
++	'__nextHasNoMarginBottom' | 'help' | 'label'
++> & {
++	/**
++	 * If true, the label will only be visible to screen readers.
++	 *
++	 * @default true
++	 */
++	hideLabelFromVision?: boolean;
++	/**
++	 * A function that receives the value of the input when the value is changed.
++	 */
++	onChange: ( value: string ) => void;
++	/**
++	 * When an `onClose` callback is provided, the search control will render a close button
++	 * that will trigger the given callback.
++	 *
++	 * Use this if you want the button to trigger your own logic to close the search field entirely,
++	 * rather than just clearing the input value.
++	 */
++	onClose?: () => void;
++	/**
++	 * A placeholder for the input.
++	 *
++	 * @default 'Search'
++	 */
++	placeholder?: HTMLAttributes< HTMLInputElement >[ 'placeholder' ];
++	/**
++	 * The current value of the input.
++	 */
++	value?: string;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 8b726b6efc6d7d..a896453cb3a56f 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -71,7 +71,6 @@
+ 		"src/radio-group",
+ 		"src/responsive-wrapper",
+ 		"src/sandbox",
+-		"src/search-control",
+ 		"src/snackbar",
+ 		"src/toolbar",
+ 		"src/toolbar-button",

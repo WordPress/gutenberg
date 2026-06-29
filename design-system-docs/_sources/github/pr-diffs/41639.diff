@@ -1,0 +1,24 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 6ea0eff17d5800..dbfa0be3f65883 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -33,6 +33,7 @@
+ -   `CustomGradientPicker`: Refactor away from Lodash ([#41901](https://github.com/WordPress/gutenberg/pull/41901/)).
+ -   `SegmentedControl`: Refactor away from `_.values()` ([#41905](https://github.com/WordPress/gutenberg/pull/41905/)).
+ -   `DimensionControl`: Refactor docs away from `_.partialRight()` ([#41909](https://github.com/WordPress/gutenberg/pull/41909/)).
++-   `NavigationItem` updated to ignore `react/exhuastive-deps` eslint rule ([#41639](https://github.com/WordPress/gutenberg/pull/41639)).
+ 
+ ## 19.13.0 (2022-06-15)
+ 
+diff --git a/packages/components/src/navigation/item/use-navigation-tree-item.js b/packages/components/src/navigation/item/use-navigation-tree-item.js
+index 109c7a38bf9246..28db2e526e1b4a 100644
+--- a/packages/components/src/navigation/item/use-navigation-tree-item.js
++++ b/packages/components/src/navigation/item/use-navigation-tree-item.js
+@@ -34,5 +34,7 @@ export const useNavigationTreeItem = ( itemId, props ) => {
+ 		return () => {
+ 			removeItem( itemId );
+ 		};
++		// Ignore exhaustive-deps rule for now. See https://github.com/WordPress/gutenberg/pull/41639
++		// eslint-disable-next-line react-hooks/exhaustive-deps
+ 	}, [ activeMenu, search ] );
+ };

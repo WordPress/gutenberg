@@ -1,0 +1,127 @@
+diff --git a/packages/components/src/button/stories/index.story.tsx b/packages/components/src/button/stories/index.story.tsx
+index 2981319cfb3233..808914893de610 100644
+--- a/packages/components/src/button/stories/index.story.tsx
++++ b/packages/components/src/button/stories/index.story.tsx
+@@ -22,7 +22,8 @@ import './style.css';
+ import Button from '..';
+ 
+ const meta: Meta< typeof Button > = {
+-	title: 'Components/Button',
++	title: 'Components/Actions/Button',
++	id: 'components-button',
+ 	component: Button,
+ 	argTypes: {
+ 		// Overrides a limitation of the docgen interpreting our TS types for this as required.
+diff --git a/packages/components/src/card/stories/index.story.tsx b/packages/components/src/card/stories/index.story.tsx
+index 1d75c044f1e270..03726abbe754ee 100644
+--- a/packages/components/src/card/stories/index.story.tsx
++++ b/packages/components/src/card/stories/index.story.tsx
+@@ -22,7 +22,8 @@ const meta: Meta< typeof Card > = {
+ 	component: Card,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
+-	title: 'Components/Card',
++	title: 'Components/Containers/Card',
++	id: 'components-card',
+ 	argTypes: {
+ 		as: {
+ 			control: { type: null },
+diff --git a/packages/components/src/navigable-container/stories/navigable-menu.story.tsx b/packages/components/src/navigable-container/stories/navigable-menu.story.tsx
+index 9e5f3eedff5289..2ad7e028d6faf1 100644
+--- a/packages/components/src/navigable-container/stories/navigable-menu.story.tsx
++++ b/packages/components/src/navigable-container/stories/navigable-menu.story.tsx
+@@ -9,7 +9,8 @@ import type { Meta, StoryFn } from '@storybook/react';
+ import { NavigableMenu } from '..';
+ 
+ const meta: Meta< typeof NavigableMenu > = {
+-	title: 'Components/NavigableMenu',
++	title: 'Components/Containers/NavigableMenu',
++	id: 'components-navigablemenu',
+ 	component: NavigableMenu,
+ 	argTypes: {
+ 		children: { control: { type: null } },
+diff --git a/packages/components/src/navigable-container/stories/tabbable-container.story.tsx b/packages/components/src/navigable-container/stories/tabbable-container.story.tsx
+index 3dd090f0b05859..07c87a0c20f1bf 100644
+--- a/packages/components/src/navigable-container/stories/tabbable-container.story.tsx
++++ b/packages/components/src/navigable-container/stories/tabbable-container.story.tsx
+@@ -9,7 +9,8 @@ import type { Meta, StoryFn } from '@storybook/react';
+ import { TabbableContainer } from '..';
+ 
+ const meta: Meta< typeof TabbableContainer > = {
+-	title: 'Components/TabbableContainer',
++	title: 'Components/Containers/TabbableContainer',
++	id: 'components-tabbablecontainer',
+ 	component: TabbableContainer,
+ 	argTypes: {
+ 		children: { control: { type: null } },
+diff --git a/packages/components/src/panel/stories/index.story.tsx b/packages/components/src/panel/stories/index.story.tsx
+index 7f69f766603ebb..af9cf626f8eecd 100644
+--- a/packages/components/src/panel/stories/index.story.tsx
++++ b/packages/components/src/panel/stories/index.story.tsx
+@@ -17,7 +17,8 @@ import InputControl from '../../input-control';
+ import { wordpress } from '@wordpress/icons';
+ 
+ const meta: Meta< typeof Panel > = {
+-	title: 'Components/Panel',
++	title: 'Components/Containers/Panel',
++	id: 'components-panel',
+ 	component: Panel,
+ 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+ 	subcomponents: { PanelRow, PanelBody },
+diff --git a/packages/components/src/tab-panel/stories/index.story.tsx b/packages/components/src/tab-panel/stories/index.story.tsx
+index e2f146d55865cb..57a3cc311f863c 100644
+--- a/packages/components/src/tab-panel/stories/index.story.tsx
++++ b/packages/components/src/tab-panel/stories/index.story.tsx
+@@ -14,7 +14,8 @@ import { link, more, wordpress } from '@wordpress/icons';
+ import TabPanel from '..';
+ 
+ const meta: Meta< typeof TabPanel > = {
+-	title: 'Components/TabPanel',
++	title: 'Components/Containers/TabPanel',
++	id: 'components-tabpanel',
+ 	component: TabPanel,
+ 	parameters: {
+ 		actions: { argTypesRegex: '^on.*' },
+diff --git a/packages/components/src/tabs/stories/index.story.tsx b/packages/components/src/tabs/stories/index.story.tsx
+index 0f7e0d2c6ac75f..5141a48a899502 100644
+--- a/packages/components/src/tabs/stories/index.story.tsx
++++ b/packages/components/src/tabs/stories/index.story.tsx
+@@ -20,7 +20,8 @@ import Tooltip from '../../tooltip';
+ import Icon from '../../icon';
+ 
+ const meta: Meta< typeof Tabs > = {
+-	title: 'Components (Experimental)/Tabs',
++	title: 'Components/Containers/Tabs',
++	id: 'components-tabs',
+ 	component: Tabs,
+ 	subcomponents: {
+ 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index dcafe36caefa72..d3f156a6eb788b 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -10,6 +10,7 @@
+ 			'navigation',
+ 			'navigator',
+ 			'progressbar',
++			'tabs',
+ 			'theme',
+ 		];
+ 		const REDIRECTS = [
+diff --git a/storybook/preview.js b/storybook/preview.js
+index a426faa41c2d71..97be7205349100 100644
+--- a/storybook/preview.js
++++ b/storybook/preview.js
+@@ -127,6 +127,12 @@ export const parameters = {
+ 				'Playground',
+ 				'BlockEditor',
+ 				'Components',
++				[
++					'Introduction',
++					'Contributing Guidelines',
++					'Actions',
++					'Containers',
++				],
+ 				'Components (Experimental)',
+ 				'Icons',
+ 			],

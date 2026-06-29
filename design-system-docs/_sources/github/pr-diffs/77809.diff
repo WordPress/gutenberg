@@ -1,0 +1,633 @@
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index 621fa40b027ab8..7353352f2ec8b8 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -9,6 +9,10 @@
+ -   `Select`: `Select.Trigger` now renders a default `"Select"` placeholder when no value is selected, where it previously rendered empty ([#78076](https://github.com/WordPress/gutenberg/pull/78076)).
+ -   `Select`: `Select.Item` no longer renders its `value` as fallback item content. Pass item content explicitly as `children`. Migrate `<Select.Item value="Foo" />` to `<Select.Item value="Foo">Foo</Select.Item>` ([#77861](https://github.com/WordPress/gutenberg/pull/77861)).
+ 
++### New Features
++
++-   Add `SelectControl` component ([#77809](https://github.com/WordPress/gutenberg/pull/77809)).
++
+ ### Bug Fixes
+ 
+ -   `Text`: Provide CSS defense values for every variant when rendered as either a paragraph or heading element ([#78172](https://github.com/WordPress/gutenberg/pull/78172)).
+diff --git a/packages/ui/src/form/index.ts b/packages/ui/src/form/index.ts
+index 419ec6230db808..500b83f687719e 100644
+--- a/packages/ui/src/form/index.ts
++++ b/packages/ui/src/form/index.ts
+@@ -1,3 +1,4 @@
+ export * from './primitives';
+ 
+ export * from './input-control';
++export * from './select-control';
+diff --git a/packages/ui/src/form/select-control/context.tsx b/packages/ui/src/form/select-control/context.tsx
+new file mode 100644
+index 00000000000000..424f883852fc11
+--- /dev/null
++++ b/packages/ui/src/form/select-control/context.tsx
+@@ -0,0 +1,9 @@
++import { createContext, useContext } from '@wordpress/element';
++import type { SelectTriggerProps } from '../primitives/select/types';
++
++export const SelectControlSizeContext =
++	createContext< SelectTriggerProps[ 'size' ] >( undefined );
++
++export const useSelectControlSizeContext = () => {
++	return useContext( SelectControlSizeContext );
++};
+diff --git a/packages/ui/src/form/select-control/index.ts b/packages/ui/src/form/select-control/index.ts
+new file mode 100644
+index 00000000000000..a5fa597aa21ed4
+--- /dev/null
++++ b/packages/ui/src/form/select-control/index.ts
+@@ -0,0 +1,14 @@
++import { SelectControl as _SelectControl } from './select-control';
++import { Item } from './item';
++
++Item.displayName = 'SelectControl.Item';
++
++/**
++ * A complete select field with integrated label and description.
++ */
++export const SelectControl = Object.assign( _SelectControl, {
++	/**
++	 * An item rendered inside a `SelectControl` popup.
++	 */
++	Item,
++} );
+diff --git a/packages/ui/src/form/select-control/item.tsx b/packages/ui/src/form/select-control/item.tsx
+new file mode 100644
+index 00000000000000..eadb7bf3b5b7b0
+--- /dev/null
++++ b/packages/ui/src/form/select-control/item.tsx
+@@ -0,0 +1,13 @@
++import { forwardRef } from '@wordpress/element';
++import { Select } from '../primitives';
++import { useSelectControlSizeContext } from './context';
++import type { SelectItemProps } from '../primitives/select/types';
++
++export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
++	function Item( { size: sizeProp, ...restProps }, ref ) {
++		const contextSize = useSelectControlSizeContext();
++		const size = sizeProp ?? contextSize;
++
++		return <Select.Item size={ size } ref={ ref } { ...restProps } />;
++	}
++);
+diff --git a/packages/ui/src/form/select-control/select-control.tsx b/packages/ui/src/form/select-control/select-control.tsx
+new file mode 100644
+index 00000000000000..7703a678d6e5b9
+--- /dev/null
++++ b/packages/ui/src/form/select-control/select-control.tsx
+@@ -0,0 +1,65 @@
++import { forwardRef } from '@wordpress/element';
++import { Field, Select } from '../primitives';
++import { SelectControlSizeContext } from './context';
++import { Item } from './item';
++import type { SelectControlProps } from './types';
++
++/**
++ * A complete select field with integrated label and description.
++ */
++export const SelectControl = forwardRef<
++	HTMLButtonElement,
++	SelectControlProps
++>( function SelectControl(
++	{
++		className,
++		children,
++		items,
++		label,
++		description,
++		details,
++		hideLabelFromVision,
++		placeholder,
++		size = 'default',
++		triggerContent,
++		...restProps
++	},
++	ref
++) {
++	return (
++		<Field.Root className={ className }>
++			<Field.Label hideFromVision={ hideLabelFromVision }>
++				{ label }
++			</Field.Label>
++			<Select.Root items={ items } { ...restProps }>
++				<Select.Trigger
++					ref={ ref }
++					placeholder={ placeholder }
++					size={ size }
++				>
++					{ triggerContent }
++				</Select.Trigger>
++				<Select.Popup>
++					<SelectControlSizeContext.Provider value={ size }>
++						{ children !== undefined
++							? children
++							: items?.map( ( item ) => (
++									<Item
++										key={ item.value ?? 'null' }
++										value={ item }
++										label={ item.label }
++										disabled={ item.disabled }
++									>
++										{ item.label }
++									</Item>
++							  ) ) }
++					</SelectControlSizeContext.Provider>
++				</Select.Popup>
++			</Select.Root>
++			{ description && (
++				<Field.Description>{ description }</Field.Description>
++			) }
++			{ details && <Field.Details>{ details }</Field.Details> }
++		</Field.Root>
++	);
++} );
+diff --git a/packages/ui/src/form/select-control/stories/index.story.tsx b/packages/ui/src/form/select-control/stories/index.story.tsx
+new file mode 100644
+index 00000000000000..652a769b0a4c07
+--- /dev/null
++++ b/packages/ui/src/form/select-control/stories/index.story.tsx
+@@ -0,0 +1,220 @@
++import type { Meta, StoryObj } from '@storybook/react-vite';
++import { SelectControl } from '../';
++import {
++	WITH_DETAILS_DESCRIPTION,
++	DETAILS_EXAMPLE,
++} from '../../stories/shared';
++
++const meta: Meta< typeof SelectControl > = {
++	title: 'Design System/Components/Form/SelectControl',
++	component: SelectControl,
++	subcomponents: {
++		Item: SelectControl.Item,
++	},
++	argTypes: {
++		onValueChange: { action: 'onValueChange' },
++	},
++};
++
++export default meta;
++
++type Story = StoryObj< typeof SelectControl >;
++
++const defaultItems = [
++	{
++		value: '1',
++		label: 'Item 1',
++	},
++	{
++		value: '2',
++		label: 'Item 2',
++	},
++];
++
++export const Default: Story = {
++	args: {
++		items: defaultItems,
++		label: 'Label',
++		description: 'This is the description.',
++	},
++};
++
++/**
++ * When no value is selected, the trigger shows the default placeholder text.
++ *
++ * Use the `placeholder` prop to customize text shown.
++ * Prefer a concise label without a trailing ellipsis.
++ */
++export const WithCustomPlaceholder: Story = {
++	args: {
++		...Default.args,
++		placeholder: 'Choose an item',
++	},
++};
++
++const nullValueOptionItems = [
++	{
++		value: null,
++		label: 'Select theme',
++	},
++	{
++		value: 'system',
++		label: 'System default',
++	},
++	{
++		value: 'light',
++		label: 'Light',
++	},
++	{
++		value: 'dark',
++		label: 'Dark',
++	},
++];
++
++/**
++ * Use a `null` item value when users should be able to clear the selected value
++ * from the popup.
++ */
++export const WithNullValueOption: Story = {
++	args: {
++		items: nullValueOptionItems,
++		label: 'Theme',
++		description: 'Choose a theme preference.',
++		defaultValue: nullValueOptionItems[ 0 ],
++	},
++};
++
++export const VisuallyHiddenLabel: Story = {
++	args: {
++		...Default.args,
++		hideLabelFromVision: true,
++	},
++};
++
++export const WithDetails: Story = {
++	parameters: {
++		docs: { description: { story: WITH_DETAILS_DESCRIPTION } },
++	},
++	args: {
++		...Default.args,
++		description: undefined,
++		details: DETAILS_EXAMPLE,
++	},
++};
++
++const disabledOptionItems = [
++	{
++		value: '1',
++		label: 'Item 1',
++	},
++	{
++		value: '2',
++		label: 'Item 2',
++		disabled: true,
++	},
++];
++
++export const WithDisabledOption: Story = {
++	args: {
++		items: disabledOptionItems,
++		label: 'Label',
++		description: 'This is the description.',
++		defaultValue: disabledOptionItems[ 0 ],
++	},
++};
++
++const userOptions: React.ComponentProps< typeof SelectControl >[ 'items' ] = [
++	{
++		value: '1',
++		label: 'User 1 (Admin)',
++	},
++	{
++		value: '2',
++		label: 'User 2 (Editor)',
++	},
++	{
++		value: '3',
++		label: 'User 3 (Author)',
++	},
++];
++
++const User = ( { user }: { user: ( typeof userOptions )[ number ] } ) => (
++	<span
++		style={ {
++			display: 'flex',
++			alignItems: 'center',
++			gap: 8,
++		} }
++	>
++		<img
++			src={ `https://gravatar.com/avatar/?d=initials&name=${
++				user.value ?? 'null'
++			}` }
++			alt=""
++			width="20"
++			style={ {
++				borderRadius: '50%',
++			} }
++		/>
++		{ user.label }
++	</span>
++);
++
++/**
++ * To customize what is rendered inside the trigger element, pass a
++ * render function to the `triggerContent` prop.
++ *
++ * The item list can be customized by passing an array of
++ * `SelectControl.Item` as children. Note that the `label` prop of a `SelectControl.Item`
++ * is used as the string to match against in the typeahead functionality, while the
++ * item content is determined by `children`.
++ */
++export const WithCustomTriggerAndItems: Story = {
++	args: {
++		items: userOptions,
++		label: 'Label',
++		description: 'This is the description.',
++		triggerContent: ( item ) => <User user={ item } />,
++		children: (
++			<>
++				{ userOptions.map( ( item ) => (
++					<SelectControl.Item
++						key={ item.value }
++						value={ item }
++						label={ item.label }
++					>
++						<User user={ item } />
++					</SelectControl.Item>
++				) ) }
++			</>
++		),
++		defaultValue: userOptions[ 0 ],
++	},
++};
++
++/**
++ * By default, the `items` array is used to render both the Trigger
++ * and the Item list. Passing a custom `triggerContent` or `children` in addition
++ * to `items` will override that particular aspect of the behavior.
++ * In other words, if you pass both an `items` array and a custom `triggerContent`,
++ * the Item list in the popover will still be rendered based on the `items` array.
++ */
++export const WithItemsArrayAndPartialCustomization: Story = {
++	args: {
++		...Default.args,
++		children: (
++			<>
++				{ Default.args?.items?.map( ( item ) => (
++					<SelectControl.Item
++						key={ item.value ?? 'null' }
++						value={ item }
++						label={ item.label }
++						disabled={ item.disabled }
++					>
++						✨ { item.label }
++					</SelectControl.Item>
++				) ) }
++			</>
++		),
++	},
++};
+diff --git a/packages/ui/src/form/select-control/test/index.test.tsx b/packages/ui/src/form/select-control/test/index.test.tsx
+new file mode 100644
+index 00000000000000..850d685c4ca726
+--- /dev/null
++++ b/packages/ui/src/form/select-control/test/index.test.tsx
+@@ -0,0 +1,196 @@
++import { act, render, screen } from '@testing-library/react';
++import userEvent from '@testing-library/user-event';
++import { createRef } from '@wordpress/element';
++import { SelectControl } from '../index';
++
++describe( 'SelectControl', () => {
++	const mockItems = [
++		{ value: '', label: 'Select' },
++		{ value: 'option1', label: 'Option 1' },
++		{ value: 'option2', label: 'Option 2' },
++		{ value: 'option3', label: 'Option 3' },
++	];
++
++	it( 'forwards ref to the visible trigger', () => {
++		const ref = createRef< HTMLButtonElement >();
++
++		render(
++			<SelectControl ref={ ref } label="Country" items={ mockItems } />
++		);
++
++		const trigger = screen.getByRole( 'combobox', { name: 'Country' } );
++
++		expect( ref.current ).toBe( trigger );
++		act( () => {
++			ref.current?.focus();
++		} );
++		expect( trigger ).toHaveFocus();
++	} );
++
++	it( 'renders accessible label and description', () => {
++		render(
++			<SelectControl
++				label="Country"
++				description="Choose your country"
++				items={ mockItems }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'combobox', {
++				name: 'Country',
++				description: 'Choose your country',
++			} )
++		).toBeVisible();
++	} );
++
++	it( 'renders custom placeholder text when no value is selected', () => {
++		render(
++			<SelectControl
++				label="Country"
++				items={ mockItems }
++				placeholder="Choose a country"
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'combobox', {
++				name: 'Country',
++			} )
++		).toHaveTextContent( 'Choose a country' );
++	} );
++
++	it( 'renders with a visually hidden label', () => {
++		render(
++			<SelectControl
++				label="Country"
++				hideLabelFromVision
++				items={ mockItems }
++			/>
++		);
++
++		expect(
++			screen.getByRole( 'combobox', { name: 'Country' } )
++		).toBeVisible();
++	} );
++
++	it( 'renders with details', () => {
++		render(
++			<SelectControl
++				label="Country"
++				items={ mockItems }
++				details={
++					<span>
++						Select the country where your store is registered.
++					</span>
++				}
++			/>
++		);
++
++		expect(
++			screen.getByText( /where your store is registered/ )
++		).toBeVisible();
++	} );
++
++	it( 'passes the current value to custom trigger content', async () => {
++		const user = userEvent.setup();
++
++		render(
++			<SelectControl
++				label="Country"
++				items={ mockItems }
++				defaultValue={ mockItems[ 1 ] }
++				triggerContent={ ( item ) => `Selected ${ item.label }` }
++			/>
++		);
++
++		const trigger = screen.getByRole( 'combobox', {
++			name: 'Country',
++		} );
++
++		expect( trigger ).toHaveTextContent( 'Selected Option 1' );
++
++		await user.click( trigger );
++		await user.click(
++			await screen.findByRole( 'option', {
++				name: 'Option 2',
++			} )
++		);
++
++		expect( trigger ).toHaveTextContent( 'Selected Option 2' );
++	} );
++
++	describe( 'Form data behavior', () => {
++		it( 'submits correct form data when option is selected with custom name', async () => {
++			const user = userEvent.setup();
++			const handleSubmit = jest.fn(
++				( event: React.FormEvent< HTMLFormElement > ) => {
++					event.preventDefault();
++					return new FormData( event.currentTarget );
++				}
++			);
++
++			render(
++				<form onSubmit={ handleSubmit }>
++					<SelectControl
++						label="Country"
++						name="country"
++						items={ mockItems }
++					/>
++					<button type="submit">Submit</button>
++				</form>
++			);
++
++			await user.click(
++				screen.getByRole( 'combobox', {
++					name: 'Country',
++				} )
++			);
++
++			const optionToSelect = await screen.findByRole( 'option', {
++				name: /Option 2/i,
++			} );
++			await user.click( optionToSelect );
++
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Submit',
++				} )
++			);
++
++			const formData = handleSubmit.mock.results[ 0 ].value;
++			expect( formData.get( 'country' ) ).toBe( 'option2' );
++		} );
++
++		it( 'submits form data with default value when no selection is made', async () => {
++			const user = userEvent.setup();
++			const handleSubmit = jest.fn(
++				( event: React.FormEvent< HTMLFormElement > ) => {
++					event.preventDefault();
++					return new FormData( event.currentTarget );
++				}
++			);
++
++			render(
++				<form onSubmit={ handleSubmit }>
++					<SelectControl
++						label="Country"
++						name="country"
++						items={ mockItems }
++						defaultValue={ mockItems[ 0 ] }
++					/>
++					<button type="submit">Submit</button>
++				</form>
++			);
++
++			await user.click(
++				screen.getByRole( 'button', {
++					name: 'Submit',
++				} )
++			);
++
++			const formData = handleSubmit.mock.results[ 0 ].value;
++			expect( formData.get( 'country' ) ).toBe( '' );
++		} );
++	} );
++} );
+diff --git a/packages/ui/src/form/select-control/types.ts b/packages/ui/src/form/select-control/types.ts
+new file mode 100644
+index 00000000000000..0d016d0f2b1686
+--- /dev/null
++++ b/packages/ui/src/form/select-control/types.ts
+@@ -0,0 +1,50 @@
++import type React from 'react';
++import type { ControlProps } from '../types';
++import type {
++	SelectRootProps,
++	SelectTriggerProps,
++} from '../primitives/select/types';
++
++export type SelectItem = {
++	label: string;
++	value: string | null;
++	disabled?: boolean;
++};
++
++export type SelectControlProps = Omit<
++	SelectRootProps< SelectItem >,
++	'items' | 'inputRef'
++> &
++	ControlProps & {
++		/**
++		 * CSS class to apply.
++		 */
++		className?: string;
++		/**
++		 * The array of option items to render in the select.
++		 */
++		items?: SelectItem[];
++		/**
++		 * Text to show when no value is selected. This is overridden by `triggerContent`
++		 * if specified, or by a null item's label in `items`.
++		 *
++		 * @default __( 'Select' )
++		 */
++		placeholder?: SelectTriggerProps[ 'placeholder' ];
++		/**
++		 * The custom trigger content to use instead of the default.
++		 *
++		 * ```jsx
++		 * triggerContent={ ( item ) => item.label }
++		 * ```
++		 */
++		triggerContent?:
++			| ( ( item: SelectItem ) => React.ReactNode )
++			| React.ReactNode;
++		/**
++		 * The size of the control.
++		 *
++		 * @default 'default'
++		 */
++		size?: Exclude< SelectTriggerProps[ 'size' ], 'small' >;
++	};

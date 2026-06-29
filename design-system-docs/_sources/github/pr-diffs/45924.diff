@@ -1,0 +1,69 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 2291ecb8ae8b2f..5d3c902a657281 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -32,6 +32,7 @@
+ -   `LinkedButton`: remove unnecessary `span` tag ([#46063](https://github.com/WordPress/gutenberg/pull/46063))
+ -   NumberControl: refactor styles/tests/stories to TypeScript, replace fireEvent with user-event ([#45990](https://github.com/WordPress/gutenberg/pull/45990)).
+ -   `useBaseField`: Convert to TypeScript ([#45712](https://github.com/WordPress/gutenberg/pull/45712)).
++-  `Dashicon`: Convert to TypeScript ([#45924](https://github.com/WordPress/gutenberg/pull/45924)).
+ 
+ ### Documentation
+ 
+diff --git a/packages/components/src/dashicon/index.js b/packages/components/src/dashicon/index.tsx
+similarity index 76%
+rename from packages/components/src/dashicon/index.js
+rename to packages/components/src/dashicon/index.tsx
+index 7bf76771f97038..ab56548108fa83 100644
+--- a/packages/components/src/dashicon/index.js
++++ b/packages/components/src/dashicon/index.tsx
+@@ -5,14 +5,20 @@
+  * @property {string}                    [className] Class name
+  * @property {number}                    [size]      Size of the icon
+  */
+-/** @typedef {import('react').ComponentPropsWithoutRef<'span'> & OwnProps} Props */
+ 
+ /**
+- * @param {Props} props
+- * @return {JSX.Element} Element
++ * Internal dependencies
+  */
++import type { WordPressComponentProps } from '../ui/context';
++import type { DashiconProps } from './types';
+ 
+-function Dashicon( { icon, className, size = 20, style = {}, ...extraProps } ) {
++function Dashicon( {
++	icon,
++	className,
++	size = 20,
++	style = {},
++	...extraProps
++}: WordPressComponentProps< DashiconProps, 'span', false > ) {
+ 	const iconClass = [
+ 		'dashicon',
+ 		'dashicons',
+diff --git a/packages/components/src/dashicon/types.ts b/packages/components/src/dashicon/types.ts
+index a8be986a606a3a..a53f9f275da42e 100644
+--- a/packages/components/src/dashicon/types.ts
++++ b/packages/components/src/dashicon/types.ts
+@@ -1,3 +1,20 @@
++export type DashiconProps = {
++	/**
++	 * The icon name
++	 */
++	icon: IconKey;
++
++	/**
++	 * Class name
++	 */
++	className?: string;
++
++	/**
++	 * Size of the icon
++	 */
++	size?: number;
++};
++
+ export type IconKey =
+ 	| 'admin-appearance'
+ 	| 'admin-collapse'

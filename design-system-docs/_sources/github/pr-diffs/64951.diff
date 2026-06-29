@@ -1,0 +1,172 @@
+diff --git a/packages/block-editor/src/components/responsive-block-control/README.md b/packages/block-editor/src/components/responsive-block-control/README.md
+index 379e245f03ff37..16183ccd6314f5 100644
+--- a/packages/block-editor/src/components/responsive-block-control/README.md
++++ b/packages/block-editor/src/components/responsive-block-control/README.md
+@@ -27,9 +27,6 @@ import {
+ 	InspectorControls,
+ 	__experimentalResponsiveBlockControl as ResponsiveBlockControl,
+ } from '@wordpress/block-editor';
+-import {
+-	DimensionControl,
+-} from '@wordpress/components';
+ 
+ registerBlockType( 'my-plugin/my-block', {
+ 	// ...
+@@ -37,34 +34,13 @@ registerBlockType( 'my-plugin/my-block', {
+ 	edit( { attributes, setAttributes } ) {
+ 
+ 		const [ isResponsive, setIsResponsive ] = useState( false );
+-
+-		// Used for example purposes only
+-		const sizeOptions = [
+-			{
+-				label: 'Small',
+-				value: 'small',
+-			},
+-			{
+-				label: 'Medium',
+-				value: 'medium',
+-			},
+-			{
+-				label: 'Large',
+-				value: 'large',
+-			},
+-		];
+-
+ 		const { paddingSize } = attributes;
+ 
+-
+ 		// Your custom control can be anything you'd like to use.
+-		// You are not restricted to `DimensionControl`s, but this
+-		// makes life easier if dealing with standard CSS values.
+-		// see `packages/components/src/dimension-control/README.md`
+ 		const paddingControl = ( labelComponent, viewport ) => {
+ 			return (
+-				<DimensionControl
+-					__nextHasNoMarginBottom
++				<input
++					type="number"
+ 					label={ viewport.label }
+ 					onChange={ // handle update to padding value here  }
+ 					value={ paddingSize }
+@@ -155,7 +131,7 @@ const renderDefaultControl = ( labelComponent, viewport ) => {
+ 	// 	id: 'small',
+ 	// 	label: 'All'
+ 	// }
+-	return <DimensionControl label={ labelComponent } />;
++	return <SelectControl label={ labelComponent } />;
+ };
+ ```
+ 
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 00204111a1efd6..4702c5910e6a0f 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -7,6 +7,7 @@
+ -   Deprecate `replace` from the options accepted by `useNavigator().goTo()` ([#64675](https://github.com/WordPress/gutenberg/pull/64675)).
+ -   Soft deprecate `size` prop on `AlignmentMatrixControl.Icon` ([#64827](https://github.com/WordPress/gutenberg/pull/64827)).
+ -   `__experimentalAlignmentMatrixControl` can now be imported as a stable `AlignmentMatrixControl` ([#60913](https://github.com/WordPress/gutenberg/pull/60913)).
++-   Deprecate `DimensionControl`, scheduled to be removed in WordPress 7.0 ([#64951](https://github.com/WordPress/gutenberg/pull/64951)).
+ 
+ ### Enhancements
+ 
+diff --git a/packages/components/src/dimension-control/README.md b/packages/components/src/dimension-control/README.md
+index 3cd0191a046068..78c1a60275c13a 100644
+--- a/packages/components/src/dimension-control/README.md
++++ b/packages/components/src/dimension-control/README.md
+@@ -1,5 +1,9 @@
+ # DimensionControl
+ 
++<div class="callout callout-alert">
++This component is deprecated.
++</div>
++
+ <div class="callout callout-alert">
+ This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+ </div>
+diff --git a/packages/components/src/dimension-control/index.tsx b/packages/components/src/dimension-control/index.tsx
+index 52662f31c3f24c..25880f9b4fdb38 100644
+--- a/packages/components/src/dimension-control/index.tsx
++++ b/packages/components/src/dimension-control/index.tsx
+@@ -17,6 +17,7 @@ import sizesTable, { findSizeBySlug } from './sizes';
+ import type { DimensionControlProps, Size } from './types';
+ import type { SelectControlSingleSelectionProps } from '../select-control/types';
+ import { ContextSystemProvider } from '../context';
++import deprecated from '@wordpress/deprecated';
+ 
+ const CONTEXT_VALUE = {
+ 	BaseControl: {
+@@ -29,7 +30,7 @@ const CONTEXT_VALUE = {
+ /**
+  * `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
+  *
+- * This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
++ * @deprecated
+  *
+  * ```jsx
+  * import { __experimentalDimensionControl as DimensionControl } from '@wordpress/components';
+@@ -62,6 +63,11 @@ export function DimensionControl( props: DimensionControlProps ) {
+ 		className = '',
+ 	} = props;
+ 
++	deprecated( 'wp.components.DimensionControl', {
++		since: '6.7',
++		version: '7.0',
++	} );
++
+ 	const onChangeSpacingSize: SelectControlSingleSelectionProps[ 'onChange' ] =
+ 		( val ) => {
+ 			const theSize = findSizeBySlug( sizes, val );
+diff --git a/packages/components/src/dimension-control/stories/index.story.tsx b/packages/components/src/dimension-control/stories/index.story.tsx
+index 3a6da44f461164..15a63fcf6ccf6c 100644
+--- a/packages/components/src/dimension-control/stories/index.story.tsx
++++ b/packages/components/src/dimension-control/stories/index.story.tsx
+@@ -13,9 +13,15 @@ import sizes from '../sizes';
+  */
+ import { desktop, tablet, mobile } from '@wordpress/icons';
+ 
++/**
++ * `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
++ *
++ * This component is deprecated.
++ */
+ const meta: Meta< typeof DimensionControl > = {
+ 	component: DimensionControl,
+-	title: 'Components (Experimental)/DimensionControl',
++	title: 'Components (Deprecated)/DimensionControl',
++	id: 'components-dimensioncontrol',
+ 	argTypes: {
+ 		onChange: { action: 'onChange' },
+ 		value: { control: { type: null } },
+@@ -42,7 +48,6 @@ const Template: StoryFn< typeof DimensionControl > = ( args ) => (
+ );
+ 
+ export const Default = Template.bind( {} );
+-
+ Default.args = {
+ 	__nextHasNoMarginBottom: true,
+ 	label: 'Please select a size',
+diff --git a/packages/components/src/dimension-control/test/index.test.js b/packages/components/src/dimension-control/test/index.test.js
+index 1b34d2983ad0f1..14f1c509f70cf9 100644
+--- a/packages/components/src/dimension-control/test/index.test.js
++++ b/packages/components/src/dimension-control/test/index.test.js
+@@ -31,6 +31,7 @@ describe( 'DimensionControl', () => {
+ 			const { container } = render(
+ 				<DimensionControl instanceId={ instanceId } label="Padding" />
+ 			);
++			expect( console ).toHaveWarned();
+ 			expect( container ).toMatchSnapshot();
+ 		} );
+ 
+diff --git a/storybook/manager-head.html b/storybook/manager-head.html
+index 174433776e27c9..ebf2d6891ba0bb 100644
+--- a/storybook/manager-head.html
++++ b/storybook/manager-head.html
+@@ -3,6 +3,7 @@
+ 		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [
+ 			'alignmentmatrixcontrol',
+ 			'customselectcontrol-v2',
++			'dimensioncontrol',
+ 			'navigation',
+ 			'progressbar',
+ 			'theme',

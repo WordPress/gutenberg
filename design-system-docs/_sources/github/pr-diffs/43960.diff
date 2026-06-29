@@ -1,0 +1,298 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index 680546828bcf1d..1dd7c4d7e5d158 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -40,6 +40,7 @@
+ -   `RadioControl`: Clean up styles to use less custom CSS ([#43868](https://github.com/WordPress/gutenberg/pull/43868)).
+ -   Remove unused `normalizeArrowKey` utility function ([#43640](https://github.com/WordPress/gutenberg/pull/43640/)).
+ -   `SearchControl`: Convert to TypeScript ([#43871](https://github.com/WordPress/gutenberg/pull/43871)).
++-   `FormFileUpload`: Convert to TypeScript ([#43960](https://github.com/WordPress/gutenberg/pull/43960)).
+ -   `DropZone`: Convert to TypeScript ([#43962](https://github.com/WordPress/gutenberg/pull/43962)).
+ -   `ToggleGroupControl`: Rename `__experimentalIsIconGroup` prop to `__experimentalIsBorderless` ([#43771](https://github.com/WordPress/gutenberg/pull/43771/)).
+ -   `NumberControl`: Add TypeScript types ([#43791](https://github.com/WordPress/gutenberg/pull/43791/)).
+diff --git a/packages/components/src/form-file-upload/README.md b/packages/components/src/form-file-upload/README.md
+index b834bd3f364216..ca3f356fade0f8 100644
+--- a/packages/components/src/form-file-upload/README.md
++++ b/packages/components/src/form-file-upload/README.md
+@@ -1,5 +1,7 @@
+ # FormFileUpload
+ 
++FormFileUpload is a component that allows users to select files from their local device.
++
+ ## Usage
+ 
+ ```jsx
+@@ -8,7 +10,7 @@ import { FormFileUpload } from '@wordpress/components';
+ const MyFormFileUpload = () => (
+ 	<FormFileUpload
+ 		accept="image/*"
+-		onChange={ ( event ) => console.log( event.target.files ) }
++		onChange={ ( event ) => console.log( event.currentTarget.files ) }
+ 	>
+ 		Upload
+ 	</FormFileUpload>
+@@ -54,6 +56,8 @@ Whether to allow multiple selection of files or not.
+ 
+ Callback function passed directly to the `input` file element.
+ 
++Select files will be available in `event.currentTarget.files`.
++
+ -   Type: `Function`
+ -   Required: Yes
+ 
+@@ -78,6 +82,7 @@ This can be useful when you want to force a `change` event to fire when the user
+ ### render
+ 
+ Optional callback function used to render the UI. If passed the component does not render any UI and calls this function to render it.
++
+ This function receives an object with the property `openFileDialog`. The property is a function that when called opens the browser window to upload files.
+ 
+ -   Type: `Function`
+diff --git a/packages/components/src/form-file-upload/index.js b/packages/components/src/form-file-upload/index.tsx
+similarity index 52%
+rename from packages/components/src/form-file-upload/index.js
+rename to packages/components/src/form-file-upload/index.tsx
+index 0628b5149e0882..ce2392365fe1af 100644
+--- a/packages/components/src/form-file-upload/index.js
++++ b/packages/components/src/form-file-upload/index.tsx
+@@ -7,8 +7,26 @@ import { useRef } from '@wordpress/element';
+  * Internal dependencies
+  */
+ import Button from '../button';
++import type { WordPressComponentProps } from '../ui/context';
++import type { FormFileUploadProps } from './types';
+ 
+-function FormFileUpload( {
++/**
++ * FormFileUpload is a component that allows users to select files from their local device.
++ *
++ * ```jsx
++ * import { FormFileUpload } from '@wordpress/components';
++ *
++ * const MyFormFileUpload = () => (
++ *   <FormFileUpload
++ *     accept="image/*"
++ *     onChange={ ( event ) => console.log( event.currentTarget.files ) }
++ *   >
++ *     Upload
++ *   </FormFileUpload>
++ * );
++ * ```
++ */
++export function FormFileUpload( {
+ 	accept,
+ 	children,
+ 	multiple = false,
+@@ -16,10 +34,10 @@ function FormFileUpload( {
+ 	onClick,
+ 	render,
+ 	...props
+-} ) {
+-	const ref = useRef();
++}: WordPressComponentProps< FormFileUploadProps, 'button', false > ) {
++	const ref = useRef< HTMLInputElement >( null );
+ 	const openFileDialog = () => {
+-		ref.current.click();
++		ref.current?.click();
+ 	};
+ 
+ 	const ui = render ? (
+diff --git a/packages/components/src/form-file-upload/stories/index.tsx b/packages/components/src/form-file-upload/stories/index.tsx
+new file mode 100644
+index 00000000000000..dfdaf0fb14d88a
+--- /dev/null
++++ b/packages/components/src/form-file-upload/stories/index.tsx
+@@ -0,0 +1,74 @@
++/**
++ * External dependencies
++ */
++import type { ComponentMeta, ComponentStory } from '@storybook/react';
++
++/**
++ * WordPress dependencies
++ */
++import { upload as uploadIcon } from '@wordpress/icons';
++
++/**
++ * Internal dependencies
++ */
++import FormFileUpload from '..';
++
++const meta: ComponentMeta< typeof FormFileUpload > = {
++	title: 'Components/FormFileUpload',
++	component: FormFileUpload,
++	argTypes: {
++		icon: { control: { type: null } },
++		onChange: { action: 'onChange', control: { type: null } },
++		onClick: { control: { type: null } },
++	},
++	parameters: {
++		controls: { expanded: true },
++		docs: { source: { state: 'open' } },
++	},
++};
++export default meta;
++
++const Template: ComponentStory< typeof FormFileUpload > = ( props ) => {
++	return <FormFileUpload { ...props } />;
++};
++
++export const Default = Template.bind( {} );
++Default.args = {
++	children: 'Select file',
++};
++
++export const RestrictFileTypes = Template.bind( {} );
++RestrictFileTypes.args = {
++	...Default.args,
++	accept: 'image/*',
++	children: 'Select image',
++};
++
++export const AllowMultipleFiles = Template.bind( {} );
++AllowMultipleFiles.args = {
++	...Default.args,
++	children: 'Select files',
++	multiple: true,
++};
++
++export const WithIcon = Template.bind( {} );
++WithIcon.args = {
++	...Default.args,
++	children: 'Upload',
++	icon: uploadIcon,
++};
++
++/**
++ * Render a custom trigger button by passing a render function to the `render` prop.
++ *
++ * ```jsx
++ * ( { openFileDialog } ) => <button onClick={ openFileDialog }>Custom Upload Button</button>
++ * ```
++ */
++export const WithCustomRender = Template.bind( {} );
++WithCustomRender.args = {
++	...Default.args,
++	render: ( { openFileDialog } ) => (
++		<button onClick={ openFileDialog }>Custom Upload Button</button>
++	),
++};
+diff --git a/packages/components/src/form-file-upload/test/index.js b/packages/components/src/form-file-upload/test/index.tsx
+similarity index 92%
+rename from packages/components/src/form-file-upload/test/index.js
+rename to packages/components/src/form-file-upload/test/index.tsx
+index e8b47b914fcfe5..3942038f19bee7 100644
+--- a/packages/components/src/form-file-upload/test/index.js
++++ b/packages/components/src/form-file-upload/test/index.tsx
+@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
+ /**
+  * Internal dependencies
+  */
+-import FormFileUpload from '../';
++import FormFileUpload from '..';
+ 
+ /**
+  * Browser dependencies
+@@ -32,7 +32,11 @@ describe( 'FormFileUpload', () => {
+ 	} );
+ 
+ 	it( 'should show an Icon Button and a hidden input', () => {
+-		render( <FormFileUpload>My Upload Button</FormFileUpload> );
++		render(
++			<FormFileUpload onChange={ () => {} }>
++				My Upload Button
++			</FormFileUpload>
++		);
+ 
+ 		const button = screen.getByText( 'My Upload Button' );
+ 		const input = screen.getByTestId( 'form-file-upload-input' );
+@@ -76,7 +80,7 @@ describe( 'FormFileUpload', () => {
+ 
+ 		render(
+ 			<FormFileUpload
+-				onClick={ jest.fn( ( e ) => ( e.target.value = '' ) ) }
++				onClick={ jest.fn( ( e ) => ( e.currentTarget.value = '' ) ) }
+ 				onChange={ onChange }
+ 			>
+ 				My Upload Button
+diff --git a/packages/components/src/form-file-upload/types.ts b/packages/components/src/form-file-upload/types.ts
+new file mode 100644
+index 00000000000000..4e4281383d0879
+--- /dev/null
++++ b/packages/components/src/form-file-upload/types.ts
+@@ -0,0 +1,63 @@
++/**
++ * External dependencies
++ */
++import type { ComponentProps, InputHTMLAttributes, ReactNode } from 'react';
++
++/**
++ * Internal dependencies
++ */
++import type Icon from '../icon';
++
++// TODO: Replace `children` and `icon` types with props from Button once Button is typed.
++export type FormFileUploadProps = {
++	/**
++	 * A string passed to `input` element that tells the browser which file types can be
++	 * upload to the upload by the user use. e.g: `image/*,video/*`.
++	 *
++	 * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#Unique_file_type_specifiers.
++	 */
++	accept?: InputHTMLAttributes< HTMLInputElement >[ 'accept' ];
++	/**
++	 * Children are passed as children of `Button`.
++	 */
++	children?: ReactNode;
++	/**
++	 * The icon to render in the `Button`.
++	 */
++	icon?: ComponentProps< typeof Icon >[ 'icon' ];
++	/**
++	 * Whether to allow multiple selection of files or not.
++	 */
++	multiple?: InputHTMLAttributes< HTMLInputElement >[ 'multiple' ];
++	/**
++	 * Callback function passed directly to the `input` file element.
++	 *
++	 * Select files will be available in `event.currentTarget.files`.
++	 */
++	onChange: InputHTMLAttributes< HTMLInputElement >[ 'onChange' ];
++	/**
++	 * Callback function passed directly to the `input` file element.
++	 *
++	 * This can be useful when you want to force a `change` event to fire when
++	 * the user chooses the same file again. To do this, set the target value to
++	 * an empty string in the `onClick` function.
++	 *
++	 * ```jsx
++	 * <FormFileUpload
++	 * 	onClick={ ( event ) => ( event.target.value = '' ) }
++	 * 	onChange={ onChange }
++	 * >
++	 * 	Upload
++	 * </FormFileUpload>
++	 * ```
++	 */
++	onClick?: InputHTMLAttributes< HTMLInputElement >[ 'onClick' ];
++	/**
++	 * Optional callback function used to render the UI.
++	 *
++	 * If passed, the component does not render any UI and calls this function to render it.
++	 * This function receives an object with the property `openFileDialog`.
++	 * The property is a function that when called opens the browser window to upload files.
++	 */
++	render?: ( arg: { openFileDialog: () => void } ) => void;
++};
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 6ce780534ba641..87003dbf568927 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -50,7 +50,6 @@
+ 		"src/dimension-control",
+ 		"src/duotone-picker",
+ 		"src/font-size-picker",
+-		"src/form-file-upload",
+ 		"src/gradient-picker",
+ 		"src/guide",
+ 		"src/higher-order/navigate-regions",

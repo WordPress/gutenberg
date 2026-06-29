@@ -1,0 +1,1857 @@
+diff --git a/packages/components/AGENTS.md b/packages/components/AGENTS.md
+new file mode 100644
+index 00000000000000..5382aea390969f
+--- /dev/null
++++ b/packages/components/AGENTS.md
+@@ -0,0 +1,17 @@
++## Status
++
++This package contains UI components that are intended to be used anywhere in a general way (global), or specifically in the block editor.
++
++We are currently in the process of rewriting the global components to be in the new `@wordpress/ui` package. However, this is a work in progress and `@wordpress/components` should continue to be used until further notice.
++
++Due to the nature of the transition, some components may be deprecated or removed in the future. Check the component status documentation in each Storybook file for up-to-date usage guidance on each component. The component status given in the Storybook file should be considered the most accurate signal, above the `experimental` tag or component prefix.
++
++## Forms
++
++Is the form going to edit items of a dataset, rather than simply submitting data somewhere? If so, consider using `DataForm` from the `@wordpress/dataviews` package.
++
++For adding validation, consider using the [Validated Form Components](./src/validated-form-controls).
++
++## Storybook
++
++Don't forget to check a components's Storybook documentation for additional usage guidance. The Storybook links ([public base URL](https://wordpress.github.io/gutenberg/)) are also useful to present to a human when they are asking for help with a component.
+diff --git a/packages/components/src/alignment-matrix-control/stories/index.story.tsx b/packages/components/src/alignment-matrix-control/stories/index.story.tsx
+index 2f2b8e2b6bd189..6d22dae6adc2a5 100644
+--- a/packages/components/src/alignment-matrix-control/stories/index.story.tsx
++++ b/packages/components/src/alignment-matrix-control/stories/index.story.tsx
+@@ -33,6 +33,10 @@ const meta: Meta< typeof AlignmentMatrixControl > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'editor',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/angle-picker-control/stories/index.story.tsx b/packages/components/src/angle-picker-control/stories/index.story.tsx
+index 8f64699213e844..070168963e35ee 100644
+--- a/packages/components/src/angle-picker-control/stories/index.story.tsx
++++ b/packages/components/src/angle-picker-control/stories/index.story.tsx
+@@ -29,6 +29,10 @@ const meta: Meta< typeof AnglePickerControl > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'editor',
++		},
+ 	},
+ };
+ 
+diff --git a/packages/components/src/animate/stories/index.story.tsx b/packages/components/src/animate/stories/index.story.tsx
+index 97934c439fa6ae..7e929ce380fdf6 100644
+--- a/packages/components/src/animate/stories/index.story.tsx
++++ b/packages/components/src/animate/stories/index.story.tsx
+@@ -16,6 +16,11 @@ const meta: Meta< typeof Animate > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Planned for deprecation.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/badge/stories/index.story.tsx b/packages/components/src/badge/stories/index.story.tsx
+index da8bf21f386fd6..5115c5f96d4615 100644
+--- a/packages/components/src/badge/stories/index.story.tsx
++++ b/packages/components/src/badge/stories/index.story.tsx
+@@ -13,6 +13,13 @@ const meta: Meta< typeof Badge > = {
+ 	title: 'Components/Containers/Badge',
+ 	id: 'components-badge',
+ 	tags: [ 'status-private' ],
++	parameters: {
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `Badge` in `@wordpress/ui`, but continue using for now.',
++		},
++	},
+ };
+ 
+ export default meta;
+diff --git a/packages/components/src/base-control/README.md b/packages/components/src/base-control/README.md
+index f53ae9a8b929ec..cea1e87991a5f0 100644
+--- a/packages/components/src/base-control/README.md
++++ b/packages/components/src/base-control/README.md
+@@ -4,7 +4,7 @@
+ 
+ <p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-basecontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
+ 
+-`BaseControl` is a component used to generate labels and help text for components handling user inputs.
++`BaseControl` is a low-level component used to generate labels and help text for components handling user inputs.
+ 
+ ```jsx
+ import { BaseControl, useBaseControlProps } from '@wordpress/components';
+diff --git a/packages/components/src/base-control/index.tsx b/packages/components/src/base-control/index.tsx
+index df28960c8e7f52..db95c2e4724b49 100644
+--- a/packages/components/src/base-control/index.tsx
++++ b/packages/components/src/base-control/index.tsx
+@@ -96,7 +96,7 @@ const UnforwardedVisualLabel = (
+ export const VisualLabel = forwardRef( UnforwardedVisualLabel );
+ 
+ /**
+- * `BaseControl` is a component used to generate labels and help text for components handling user inputs.
++ * `BaseControl` is a low-level component used to generate labels and help text for components handling user inputs.
+  *
+  * ```jsx
+  * import { BaseControl, useBaseControlProps } from '@wordpress/components';
+diff --git a/packages/components/src/base-control/stories/index.story.tsx b/packages/components/src/base-control/stories/index.story.tsx
+index e0772550a1390f..0d43b7b85f7b4c 100644
+--- a/packages/components/src/base-control/stories/index.story.tsx
++++ b/packages/components/src/base-control/stories/index.story.tsx
+@@ -24,6 +24,11 @@ const meta: Meta< typeof BaseControl > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `Field` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/border-box-control/stories/index.story.tsx b/packages/components/src/border-box-control/stories/index.story.tsx
+index 113c8b352603df..b77fdfe2502573 100644
+--- a/packages/components/src/border-box-control/stories/index.story.tsx
++++ b/packages/components/src/border-box-control/stories/index.story.tsx
+@@ -25,6 +25,10 @@ const meta: Meta< typeof BorderBoxControl > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'editor',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/border-control/stories/index.story.tsx b/packages/components/src/border-control/stories/index.story.tsx
+index 28406cdc7623d8..24fa61333f52aa 100644
+--- a/packages/components/src/border-control/stories/index.story.tsx
++++ b/packages/components/src/border-control/stories/index.story.tsx
+@@ -28,6 +28,10 @@ const meta: Meta< typeof BorderControl > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'editor',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/box-control/stories/index.story.tsx b/packages/components/src/box-control/stories/index.story.tsx
+index 387e5604af7877..6ea7e63fd01d99 100644
+--- a/packages/components/src/box-control/stories/index.story.tsx
++++ b/packages/components/src/box-control/stories/index.story.tsx
+@@ -26,6 +26,11 @@ const meta: Meta< typeof BoxControl > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'editor',
++			notes: 'This component is a fallback for themes that do not supply spacing presets. Most of the time `SpacingSizesControl` from `@wordpress/block-editor` is used instead.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/button/stories/index.story.tsx b/packages/components/src/button/stories/index.story.tsx
+index b491d64508891d..0a0152fac8e93e 100644
+--- a/packages/components/src/button/stories/index.story.tsx
++++ b/packages/components/src/button/stories/index.story.tsx
+@@ -52,6 +52,11 @@ const meta: Meta< typeof Button > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `Button` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/card/stories/index.story.tsx b/packages/components/src/card/stories/index.story.tsx
+index 9ff67298205fbf..6f350b2d3c3d8a 100644
+--- a/packages/components/src/card/stories/index.story.tsx
++++ b/packages/components/src/card/stories/index.story.tsx
+@@ -36,6 +36,11 @@ const meta: Meta< typeof Card > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'Design is in flux, and may differ from the version used in `@wordpress/dataviews`.',
++		},
+ 	},
+ };
+ 
+diff --git a/packages/components/src/checkbox-control/stories/index.story.tsx b/packages/components/src/checkbox-control/stories/index.story.tsx
+index a106dc478d03aa..69607d71cc8a96 100644
+--- a/packages/components/src/checkbox-control/stories/index.story.tsx
++++ b/packages/components/src/checkbox-control/stories/index.story.tsx
+@@ -34,6 +34,11 @@ const meta: Meta< typeof CheckboxControl > = {
+ 			exclude: [ 'heading' ],
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `CheckboxControl` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/circular-option-picker/stories/index.story.tsx b/packages/components/src/circular-option-picker/stories/index.story.tsx
+index 28e0736615ffca..11ca9e22a8decb 100644
+--- a/packages/components/src/circular-option-picker/stories/index.story.tsx
++++ b/packages/components/src/circular-option-picker/stories/index.story.tsx
+@@ -38,6 +38,11 @@ const meta: Meta< typeof CircularOptionPicker > = {
+ 			canvas: { sourceState: 'shown' },
+ 			source: { excludeDecorators: true },
+ 		},
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'Mostly intended for internal use.',
++		},
+ 	},
+ 	decorators: [
+ 		// Share current color state between main component, `actions` and `options`
+diff --git a/packages/components/src/color-indicator/stories/index.story.tsx b/packages/components/src/color-indicator/stories/index.story.tsx
+index b9d6e857e245f4..2aca2f7c7f44d4 100644
+--- a/packages/components/src/color-indicator/stories/index.story.tsx
++++ b/packages/components/src/color-indicator/stories/index.story.tsx
+@@ -22,6 +22,10 @@ const meta: Meta< typeof ColorIndicator > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/color-palette/stories/index.story.tsx b/packages/components/src/color-palette/stories/index.story.tsx
+index a594264ba266ee..e129ac9f53f2e3 100644
+--- a/packages/components/src/color-palette/stories/index.story.tsx
++++ b/packages/components/src/color-palette/stories/index.story.tsx
+@@ -25,6 +25,10 @@ const meta: Meta< typeof ColorPalette > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/color-picker/stories/index.story.tsx b/packages/components/src/color-picker/stories/index.story.tsx
+index 85b6c0c9bf7b16..b3b53ef328b42e 100644
+--- a/packages/components/src/color-picker/stories/index.story.tsx
++++ b/packages/components/src/color-picker/stories/index.story.tsx
+@@ -25,6 +25,10 @@ const meta: Meta< typeof ColorPicker > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/combobox-control/stories/index.story.tsx b/packages/components/src/combobox-control/stories/index.story.tsx
+index 20986552270d09..d3c8b0eebc5a5a 100644
+--- a/packages/components/src/combobox-control/stories/index.story.tsx
++++ b/packages/components/src/combobox-control/stories/index.story.tsx
+@@ -48,6 +48,11 @@ const meta: Meta< typeof ComboboxControl > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `SearchableSelectControl` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/composite/stories/index.story.tsx b/packages/components/src/composite/stories/index.story.tsx
+index f4809f61895137..14e7894832167b 100644
+--- a/packages/components/src/composite/stories/index.story.tsx
++++ b/packages/components/src/composite/stories/index.story.tsx
+@@ -47,6 +47,10 @@ const meta: Meta< typeof Composite > = {
+ 		docs: {
+ 			canvas: { sourceState: 'shown' },
+ 		},
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ 	decorators: [
+ 		( Story ) => {
+diff --git a/packages/components/src/confirm-dialog/stories/index.story.tsx b/packages/components/src/confirm-dialog/stories/index.story.tsx
+index 9c0ef4d1df88d3..fc0d97cf9abfe2 100644
+--- a/packages/components/src/confirm-dialog/stories/index.story.tsx
++++ b/packages/components/src/confirm-dialog/stories/index.story.tsx
+@@ -33,6 +33,10 @@ const meta: Meta< typeof ConfirmDialog > = {
+ 		controls: {
+ 			expanded: true,
+ 		},
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 		docs: { canvas: { sourceState: 'shown' } },
+ 	},
+ };
+diff --git a/packages/components/src/custom-gradient-picker/stories/index.story.tsx b/packages/components/src/custom-gradient-picker/stories/index.story.tsx
+index 3ecc69866e8f85..94b1be9a505c79 100644
+--- a/packages/components/src/custom-gradient-picker/stories/index.story.tsx
++++ b/packages/components/src/custom-gradient-picker/stories/index.story.tsx
+@@ -23,6 +23,11 @@ const meta: Meta< typeof CustomGradientPicker > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Mostly an internal component. Use `GradientPicker` instead.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/custom-select-control-v2/stories/index.story.tsx b/packages/components/src/custom-select-control-v2/stories/index.story.tsx
+index 5e6ee9e4942a62..370abdba637c06 100644
+--- a/packages/components/src/custom-select-control-v2/stories/index.story.tsx
++++ b/packages/components/src/custom-select-control-v2/stories/index.story.tsx
+@@ -31,6 +31,11 @@ const meta: Meta< typeof CustomSelectControlV2 > = {
+ 		docs: {
+ 			source: { excludeDecorators: true },
+ 		},
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `SelectControl` in `@wordpress/ui`. Continue using `CustomSelectControl` (v1) for now.',
++		},
+ 	},
+ 	decorators: [
+ 		( Story ) => (
+diff --git a/packages/components/src/custom-select-control/stories/index.story.tsx b/packages/components/src/custom-select-control/stories/index.story.tsx
+index 05df59bf362a42..0bfd5c06d11040 100644
+--- a/packages/components/src/custom-select-control/stories/index.story.tsx
++++ b/packages/components/src/custom-select-control/stories/index.story.tsx
+@@ -30,6 +30,11 @@ const meta: Meta< typeof CustomSelectControl > = {
+ 		docs: {
+ 			source: { excludeDecorators: true },
+ 		},
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `SelectControl` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ 	decorators: [
+ 		( Story ) => (
+diff --git a/packages/components/src/date-time/stories/date-time.story.tsx b/packages/components/src/date-time/stories/date-time.story.tsx
+index 35f17bc98dd266..b636c5cbb02481 100644
+--- a/packages/components/src/date-time/stories/date-time.story.tsx
++++ b/packages/components/src/date-time/stories/date-time.story.tsx
+@@ -25,6 +25,11 @@ const meta: Meta< typeof DateTimePicker > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'Consider using a `TextControl` with `type="date"` or `type="datetime-local"` instead.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/date-time/stories/date.story.tsx b/packages/components/src/date-time/stories/date.story.tsx
+index 694d25120c4989..8344e870e75aa0 100644
+--- a/packages/components/src/date-time/stories/date.story.tsx
++++ b/packages/components/src/date-time/stories/date.story.tsx
+@@ -25,6 +25,11 @@ const meta: Meta< typeof DatePicker > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'Consider using a `TextControl` with `type="date"` or `type="datetime-local"` instead.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/date-time/stories/time.story.tsx b/packages/components/src/date-time/stories/time.story.tsx
+index e0d0a9d633f251..e0673c2a4cd24b 100644
+--- a/packages/components/src/date-time/stories/time.story.tsx
++++ b/packages/components/src/date-time/stories/time.story.tsx
+@@ -25,6 +25,11 @@ const meta: Meta< typeof TimePicker > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'Consider using a `TextControl` with `type="date"` or `type="datetime-local"` instead.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/disabled/stories/index.story.tsx b/packages/components/src/disabled/stories/index.story.tsx
+index e1eccf2ea260ba..fb3fc92758fd67 100644
+--- a/packages/components/src/disabled/stories/index.story.tsx
++++ b/packages/components/src/disabled/stories/index.story.tsx
+@@ -30,6 +30,10 @@ const meta: Meta< typeof Disabled > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ 
+diff --git a/packages/components/src/divider/stories/index.story.tsx b/packages/components/src/divider/stories/index.story.tsx
+index ff8bf127a11b4d..124387f9f74217 100644
+--- a/packages/components/src/divider/stories/index.story.tsx
++++ b/packages/components/src/divider/stories/index.story.tsx
+@@ -36,6 +36,11 @@ const meta: Meta< typeof Divider > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Planned for deprecation.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/draggable/stories/index.story.tsx b/packages/components/src/draggable/stories/index.story.tsx
+index e6acf092bb95ed..f6b6b5cf7d46bd 100644
+--- a/packages/components/src/draggable/stories/index.story.tsx
++++ b/packages/components/src/draggable/stories/index.story.tsx
+@@ -33,6 +33,11 @@ const meta: Meta< typeof Draggable > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { source: { code: '' } },
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'May be deprecated.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/drop-zone/stories/index.story.tsx b/packages/components/src/drop-zone/stories/index.story.tsx
+index 887c0afff6d000..4c96f56225d9f8 100644
+--- a/packages/components/src/drop-zone/stories/index.story.tsx
++++ b/packages/components/src/drop-zone/stories/index.story.tsx
+@@ -35,6 +35,10 @@ const meta: Meta< typeof DropZone > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/dropdown-menu/stories/index.story.tsx b/packages/components/src/dropdown-menu/stories/index.story.tsx
+index 160a6942e93f28..59bf900e987710 100644
+--- a/packages/components/src/dropdown-menu/stories/index.story.tsx
++++ b/packages/components/src/dropdown-menu/stories/index.story.tsx
+@@ -30,6 +30,11 @@ const meta: Meta< typeof DropdownMenu > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'When building for the Gutenberg repo, use `Menu` instead. Otherwise, continue using for now.',
++		},
+ 	},
+ 	args: {
+ 		onToggle: fn(),
+diff --git a/packages/components/src/dropdown/stories/index.story.tsx b/packages/components/src/dropdown/stories/index.story.tsx
+index bed896fd09416f..d478bb9fe25282 100644
+--- a/packages/components/src/dropdown/stories/index.story.tsx
++++ b/packages/components/src/dropdown/stories/index.story.tsx
+@@ -41,6 +41,10 @@ const meta: Meta< typeof Dropdown > = {
+ 		controls: {
+ 			expanded: true,
+ 		},
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/duotone-picker/stories/duotone-picker.story.tsx b/packages/components/src/duotone-picker/stories/duotone-picker.story.tsx
+index 097d8538c94de8..97e588910cc5f3 100644
+--- a/packages/components/src/duotone-picker/stories/duotone-picker.story.tsx
++++ b/packages/components/src/duotone-picker/stories/duotone-picker.story.tsx
+@@ -24,6 +24,10 @@ const meta: Meta< typeof DuotonePicker > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'editor',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/duotone-picker/stories/duotone-swatch.story.tsx b/packages/components/src/duotone-picker/stories/duotone-swatch.story.tsx
+index 3444a36aaf132b..e91c9a20e627b4 100644
+--- a/packages/components/src/duotone-picker/stories/duotone-swatch.story.tsx
++++ b/packages/components/src/duotone-picker/stories/duotone-swatch.story.tsx
+@@ -14,6 +14,10 @@ const meta: Meta< typeof DuotoneSwatch > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'editor',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/elevation/stories/index.story.tsx b/packages/components/src/elevation/stories/index.story.tsx
+index b306873dcf42f7..d07ad0875bd680 100644
+--- a/packages/components/src/elevation/stories/index.story.tsx
++++ b/packages/components/src/elevation/stories/index.story.tsx
+@@ -21,6 +21,11 @@ const meta: Meta< typeof Elevation > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Planned for deprecation. Use [elevation tokens](?path=/docs/foundations-design-language-elevation--page) from `@wordpress/base-styles` instead.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/external-link/stories/index.story.tsx b/packages/components/src/external-link/stories/index.story.tsx
+index 38d0d402690be3..75fd4e9c1a0457 100644
+--- a/packages/components/src/external-link/stories/index.story.tsx
++++ b/packages/components/src/external-link/stories/index.story.tsx
+@@ -20,6 +20,10 @@ const meta: Meta< typeof ExternalLink > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/flex/stories/index.story.tsx b/packages/components/src/flex/stories/index.story.tsx
+index c03db0053a7104..c76d269834b97b 100644
+--- a/packages/components/src/flex/stories/index.story.tsx
++++ b/packages/components/src/flex/stories/index.story.tsx
+@@ -31,6 +31,11 @@ const meta: Meta< typeof Flex > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Planned for deprecation. For use cases not covered by `HStack` and `VStack`, write your own CSS.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/focal-point-picker/stories/index.story.tsx b/packages/components/src/focal-point-picker/stories/index.story.tsx
+index 7ece7076b64464..1827293359f387 100644
+--- a/packages/components/src/focal-point-picker/stories/index.story.tsx
++++ b/packages/components/src/focal-point-picker/stories/index.story.tsx
+@@ -29,6 +29,10 @@ const meta: Meta< typeof FocalPointPicker > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'editor',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/font-size-picker/stories/index.story.tsx b/packages/components/src/font-size-picker/stories/index.story.tsx
+index e283ca6b01fd68..ece55aba30ee0b 100644
+--- a/packages/components/src/font-size-picker/stories/index.story.tsx
++++ b/packages/components/src/font-size-picker/stories/index.story.tsx
+@@ -30,6 +30,10 @@ const meta: Meta< typeof FontSizePicker > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'editor',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/form-file-upload/stories/index.story.tsx b/packages/components/src/form-file-upload/stories/index.story.tsx
+index b16bba9aeddd5d..f35b57b820a2cb 100644
+--- a/packages/components/src/form-file-upload/stories/index.story.tsx
++++ b/packages/components/src/form-file-upload/stories/index.story.tsx
+@@ -25,6 +25,10 @@ const meta: Meta< typeof FormFileUpload > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/form-toggle/stories/index.story.tsx b/packages/components/src/form-toggle/stories/index.story.tsx
+index a7089c8d2aebfd..abb0ae5a61b103 100644
+--- a/packages/components/src/form-toggle/stories/index.story.tsx
++++ b/packages/components/src/form-toggle/stories/index.story.tsx
+@@ -26,6 +26,11 @@ const meta: Meta< typeof FormToggle > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'For standard toggles with labels, use `ToggleControl` instead.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/form-token-field/stories/index.story.tsx b/packages/components/src/form-token-field/stories/index.story.tsx
+index 1b28d63ec7aa6e..c0a8d4374cc3dd 100644
+--- a/packages/components/src/form-token-field/stories/index.story.tsx
++++ b/packages/components/src/form-token-field/stories/index.story.tsx
+@@ -30,6 +30,11 @@ const meta: Meta< typeof FormTokenField > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `SearchableChipSelect` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/gradient-picker/stories/index.story.tsx b/packages/components/src/gradient-picker/stories/index.story.tsx
+index 1dad40b17902a2..0b6d7a170f1d0a 100644
+--- a/packages/components/src/gradient-picker/stories/index.story.tsx
++++ b/packages/components/src/gradient-picker/stories/index.story.tsx
+@@ -21,6 +21,10 @@ const meta: Meta< typeof GradientPicker > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ 	args: {
+ 		onChange: fn(),
+diff --git a/packages/components/src/grid/stories/index.story.tsx b/packages/components/src/grid/stories/index.story.tsx
+index fb9477f96d7f7e..de3b88c99f1d19 100644
+--- a/packages/components/src/grid/stories/index.story.tsx
++++ b/packages/components/src/grid/stories/index.story.tsx
+@@ -36,6 +36,11 @@ const meta: Meta< typeof Grid > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Planned for deprecation. Write your own CSS instead.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/guide/stories/index.story.tsx b/packages/components/src/guide/stories/index.story.tsx
+index 910a7a47988f29..6418aec13ab70e 100644
+--- a/packages/components/src/guide/stories/index.story.tsx
++++ b/packages/components/src/guide/stories/index.story.tsx
+@@ -24,6 +24,12 @@ const meta: Meta< typeof Guide > = {
+ 		previousButtonText: { control: 'text' },
+ 		onFinish: { action: 'onFinish' },
+ 	},
++	parameters: {
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'editor',
++		},
++	},
+ };
+ export default meta;
+ 
+diff --git a/packages/components/src/h-stack/stories/index.story.tsx b/packages/components/src/h-stack/stories/index.story.tsx
+index 4655da94ac04fb..6f64e4af096a4d 100644
+--- a/packages/components/src/h-stack/stories/index.story.tsx
++++ b/packages/components/src/h-stack/stories/index.story.tsx
+@@ -74,6 +74,11 @@ const meta: Meta< typeof HStack > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `Stack` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/heading/stories/index.story.tsx b/packages/components/src/heading/stories/index.story.tsx
+index 37562b4ab38d29..bbac5776b54284 100644
+--- a/packages/components/src/heading/stories/index.story.tsx
++++ b/packages/components/src/heading/stories/index.story.tsx
+@@ -29,6 +29,11 @@ const meta: Meta< typeof Heading > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Values are not aligned with the current design system. Use [typography tokens](?path=/docs/tokens-typography--page) from `@wordpress/base-styles` instead.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/icon/stories/index.story.tsx b/packages/components/src/icon/stories/index.story.tsx
+index 61c24da6f75558..02eaa89443a9d9 100644
+--- a/packages/components/src/icon/stories/index.story.tsx
++++ b/packages/components/src/icon/stories/index.story.tsx
+@@ -21,6 +21,11 @@ const meta: Meta< typeof Icon > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Prefer this component over the `Icon` component from `@wordpress/icons`.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/input-control/stories/index.story.tsx b/packages/components/src/input-control/stories/index.story.tsx
+index ed535b1c4b0ad0..0f05135d076f50 100644
+--- a/packages/components/src/input-control/stories/index.story.tsx
++++ b/packages/components/src/input-control/stories/index.story.tsx
+@@ -40,6 +40,11 @@ const meta: Meta< typeof InputControl > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `InputControl` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/item-group/stories/index.story.tsx b/packages/components/src/item-group/stories/index.story.tsx
+index 8fcf5e6c4862c5..374dd292e009bf 100644
+--- a/packages/components/src/item-group/stories/index.story.tsx
++++ b/packages/components/src/item-group/stories/index.story.tsx
+@@ -23,6 +23,10 @@ const meta: Meta< typeof ItemGroup > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/keyboard-shortcuts/stories/index.story.tsx b/packages/components/src/keyboard-shortcuts/stories/index.story.tsx
+index 69ac9df4e53d07..102a7264f7b0d9 100644
+--- a/packages/components/src/keyboard-shortcuts/stories/index.story.tsx
++++ b/packages/components/src/keyboard-shortcuts/stories/index.story.tsx
+@@ -15,6 +15,10 @@ const meta: Meta< typeof KeyboardShortcuts > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/menu-group/stories/index.story.tsx b/packages/components/src/menu-group/stories/index.story.tsx
+index 83065efff86094..989354a579ffe9 100644
+--- a/packages/components/src/menu-group/stories/index.story.tsx
++++ b/packages/components/src/menu-group/stories/index.story.tsx
+@@ -25,6 +25,11 @@ const meta: Meta< typeof MenuGroup > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Subcomponent of `DropdownMenu`.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/menu-item/stories/index.story.tsx b/packages/components/src/menu-item/stories/index.story.tsx
+index 29a4730d1b43de..f1d61e58f47d93 100644
+--- a/packages/components/src/menu-item/stories/index.story.tsx
++++ b/packages/components/src/menu-item/stories/index.story.tsx
+@@ -36,6 +36,11 @@ const meta: Meta< typeof MenuItem > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Subcomponent of `DropdownMenu`.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/menu-items-choice/stories/index.story.tsx b/packages/components/src/menu-items-choice/stories/index.story.tsx
+index 8d8fce2fe25ce3..55d9f12450afe9 100644
+--- a/packages/components/src/menu-items-choice/stories/index.story.tsx
++++ b/packages/components/src/menu-items-choice/stories/index.story.tsx
+@@ -28,6 +28,11 @@ const meta: Meta< typeof MenuItemsChoice > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Subcomponent of `DropdownMenu`.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/menu/stories/index.story.tsx b/packages/components/src/menu/stories/index.story.tsx
+index d53b8e436a4aab..bb2df1e7a9f36c 100644
+--- a/packages/components/src/menu/stories/index.story.tsx
++++ b/packages/components/src/menu/stories/index.story.tsx
+@@ -55,6 +55,11 @@ const meta: Meta< typeof Menu > = {
+ 			canvas: { sourceState: 'shown' },
+ 			source: { excludeDecorators: true },
+ 		},
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'When building for the Gutenberg repo, use this component instead of `DropdownMenu`. Otherwise, continue using `DropdownMenu` for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/modal/stories/index.story.tsx b/packages/components/src/modal/stories/index.story.tsx
+index dcfd8debd28b28..615c8fb3ebb626 100644
+--- a/packages/components/src/modal/stories/index.story.tsx
++++ b/packages/components/src/modal/stories/index.story.tsx
+@@ -44,6 +44,11 @@ const meta: Meta< typeof Modal > = {
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `Dialog` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/navigable-container/stories/navigable-menu.story.tsx b/packages/components/src/navigable-container/stories/navigable-menu.story.tsx
+index 8badbb0bff12a1..fe0a3057b39f00 100644
+--- a/packages/components/src/navigable-container/stories/navigable-menu.story.tsx
++++ b/packages/components/src/navigable-container/stories/navigable-menu.story.tsx
+@@ -25,6 +25,10 @@ const meta: Meta< typeof NavigableMenu > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'unaudited',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/navigable-container/stories/tabbable-container.story.tsx b/packages/components/src/navigable-container/stories/tabbable-container.story.tsx
+index 641033a8545ab7..3469c40647d53f 100644
+--- a/packages/components/src/navigable-container/stories/tabbable-container.story.tsx
++++ b/packages/components/src/navigable-container/stories/tabbable-container.story.tsx
+@@ -25,6 +25,11 @@ const meta: Meta< typeof TabbableContainer > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Planned for deprecation.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/navigator/stories/index.story.tsx b/packages/components/src/navigator/stories/index.story.tsx
+index 0ca352a2febaf9..8ecdfd6a8ee1f3 100644
+--- a/packages/components/src/navigator/stories/index.story.tsx
++++ b/packages/components/src/navigator/stories/index.story.tsx
+@@ -28,6 +28,10 @@ const meta: Meta< typeof Navigator > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ 	decorators: [
+ 		( Story ) => {
+diff --git a/packages/components/src/notice/stories/index.story.tsx b/packages/components/src/notice/stories/index.story.tsx
+index 9504f88013f7b5..ea401e9b447fdc 100644
+--- a/packages/components/src/notice/stories/index.story.tsx
++++ b/packages/components/src/notice/stories/index.story.tsx
+@@ -29,6 +29,11 @@ const meta: Meta< typeof Notice > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `Notice` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/number-control/stories/index.story.tsx b/packages/components/src/number-control/stories/index.story.tsx
+index 8a62b2114ad439..50946a302dc1dc 100644
+--- a/packages/components/src/number-control/stories/index.story.tsx
++++ b/packages/components/src/number-control/stories/index.story.tsx
+@@ -29,6 +29,11 @@ const meta: Meta< typeof NumberControl > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `InputControl` with `type="number"` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ 
+diff --git a/packages/components/src/palette-edit/stories/index.story.tsx b/packages/components/src/palette-edit/stories/index.story.tsx
+index 0d19372c7502b5..e162167ef3dc1d 100644
+--- a/packages/components/src/palette-edit/stories/index.story.tsx
++++ b/packages/components/src/palette-edit/stories/index.story.tsx
+@@ -24,6 +24,10 @@ const meta: Meta< typeof PaletteEdit > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'editor',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/panel/stories/index.story.tsx b/packages/components/src/panel/stories/index.story.tsx
+index 64be64d8dab4c5..3fd746ab6b2c56 100644
+--- a/packages/components/src/panel/stories/index.story.tsx
++++ b/packages/components/src/panel/stories/index.story.tsx
+@@ -27,6 +27,10 @@ const meta: Meta< typeof Panel > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/placeholder/stories/index.story.tsx b/packages/components/src/placeholder/stories/index.story.tsx
+index d61efc4a3c11f1..f813999037b599 100644
+--- a/packages/components/src/placeholder/stories/index.story.tsx
++++ b/packages/components/src/placeholder/stories/index.story.tsx
+@@ -33,6 +33,10 @@ const meta: Meta< typeof Placeholder > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'editor',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/popover/stories/index.story.tsx b/packages/components/src/popover/stories/index.story.tsx
+index 6933dfc997d800..92499e05e09eee 100644
+--- a/packages/components/src/popover/stories/index.story.tsx
++++ b/packages/components/src/popover/stories/index.story.tsx
+@@ -55,6 +55,10 @@ const meta: Meta< typeof Popover > = {
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ 
+diff --git a/packages/components/src/progress-bar/stories/index.story.tsx b/packages/components/src/progress-bar/stories/index.story.tsx
+index c7f845549d5a45..c57fa4b43bae80 100644
+--- a/packages/components/src/progress-bar/stories/index.story.tsx
++++ b/packages/components/src/progress-bar/stories/index.story.tsx
+@@ -20,6 +20,10 @@ const meta: Meta< typeof ProgressBar > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/query-controls/stories/index.story.tsx b/packages/components/src/query-controls/stories/index.story.tsx
+index 193290cd7a7800..d6281ee82b62a0 100644
+--- a/packages/components/src/query-controls/stories/index.story.tsx
++++ b/packages/components/src/query-controls/stories/index.story.tsx
+@@ -40,6 +40,10 @@ const meta: Meta< typeof QueryControls > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'editor',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/radio-control/stories/index.story.tsx b/packages/components/src/radio-control/stories/index.story.tsx
+index 778d8ad55e71fe..e30c377f0b6760 100644
+--- a/packages/components/src/radio-control/stories/index.story.tsx
++++ b/packages/components/src/radio-control/stories/index.story.tsx
+@@ -36,6 +36,11 @@ const meta: Meta< typeof RadioControl > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `RadioGroupControl` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/range-control/stories/index.story.tsx b/packages/components/src/range-control/stories/index.story.tsx
+index 9dc659856aa4cc..e6c415e2e4237c 100644
+--- a/packages/components/src/range-control/stories/index.story.tsx
++++ b/packages/components/src/range-control/stories/index.story.tsx
+@@ -57,6 +57,11 @@ const meta: Meta< typeof RangeControl > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `SliderControl` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/resizable-box/stories/index.story.tsx b/packages/components/src/resizable-box/stories/index.story.tsx
+index e5f80ca6fd22c7..a8723b6e1509dc 100644
+--- a/packages/components/src/resizable-box/stories/index.story.tsx
++++ b/packages/components/src/resizable-box/stories/index.story.tsx
+@@ -25,6 +25,10 @@ const meta: Meta< typeof ResizableBox > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/responsive-wrapper/stories/index.story.tsx b/packages/components/src/responsive-wrapper/stories/index.story.tsx
+index 50ff53c3810cf3..a3e4099ad23e7c 100644
+--- a/packages/components/src/responsive-wrapper/stories/index.story.tsx
++++ b/packages/components/src/responsive-wrapper/stories/index.story.tsx
+@@ -18,6 +18,11 @@ const meta: Meta< typeof ResponsiveWrapper > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Planned for deprecation.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/sandbox/stories/index.story.tsx b/packages/components/src/sandbox/stories/index.story.tsx
+index ed3098fcdea42f..c33ca8a43d1cc3 100644
+--- a/packages/components/src/sandbox/stories/index.story.tsx
++++ b/packages/components/src/sandbox/stories/index.story.tsx
+@@ -22,6 +22,10 @@ const meta: Meta< typeof SandBox > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/scroll-lock/stories/index.story.tsx b/packages/components/src/scroll-lock/stories/index.story.tsx
+index a77f5a9dd71127..7176c6b9705318 100644
+--- a/packages/components/src/scroll-lock/stories/index.story.tsx
++++ b/packages/components/src/scroll-lock/stories/index.story.tsx
+@@ -22,6 +22,10 @@ const meta: Meta< typeof ScrollLock > = {
+ 	parameters: {
+ 		controls: { hideNoControlsWarning: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/scrollable/stories/index.story.tsx b/packages/components/src/scrollable/stories/index.story.tsx
+index 784bf5ad7f0b7d..b3caeef6ad3f98 100644
+--- a/packages/components/src/scrollable/stories/index.story.tsx
++++ b/packages/components/src/scrollable/stories/index.story.tsx
+@@ -31,6 +31,11 @@ const meta: Meta< typeof Scrollable > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Planned for deprecation.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/search-control/stories/index.story.tsx b/packages/components/src/search-control/stories/index.story.tsx
+index 42c33af080eb7c..e18ec6f2e74492 100644
+--- a/packages/components/src/search-control/stories/index.story.tsx
++++ b/packages/components/src/search-control/stories/index.story.tsx
+@@ -24,6 +24,11 @@ const meta: Meta< typeof SearchControl > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `SearchControl` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/select-control/stories/index.story.tsx b/packages/components/src/select-control/stories/index.story.tsx
+index 9190c489791f77..89b459be9d3021 100644
+--- a/packages/components/src/select-control/stories/index.story.tsx
++++ b/packages/components/src/select-control/stories/index.story.tsx
+@@ -32,6 +32,11 @@ const meta: Meta< typeof SelectControl > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `SelectControl` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/shortcut/stories/index.story.tsx b/packages/components/src/shortcut/stories/index.story.tsx
+index 2eda8208c8808e..4dc8b8e551f490 100644
+--- a/packages/components/src/shortcut/stories/index.story.tsx
++++ b/packages/components/src/shortcut/stories/index.story.tsx
+@@ -17,6 +17,10 @@ const meta: Meta< typeof Shortcut > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/slot-fill/stories/index.story.tsx b/packages/components/src/slot-fill/stories/index.story.tsx
+index 335804c35e2b21..c916933171fe97 100644
+--- a/packages/components/src/slot-fill/stories/index.story.tsx
++++ b/packages/components/src/slot-fill/stories/index.story.tsx
+@@ -26,6 +26,10 @@ const meta: Meta< typeof Slot > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { source: { state: 'open' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ 
+diff --git a/packages/components/src/snackbar/stories/index.story.tsx b/packages/components/src/snackbar/stories/index.story.tsx
+index 9bc718d76b5acc..2c0726bfa6ce44 100644
+--- a/packages/components/src/snackbar/stories/index.story.tsx
++++ b/packages/components/src/snackbar/stories/index.story.tsx
+@@ -37,6 +37,10 @@ const meta: Meta< typeof Snackbar > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/spacer/stories/index.story.tsx b/packages/components/src/spacer/stories/index.story.tsx
+index 88b6b8ab05574c..267b2260d6f1a6 100644
+--- a/packages/components/src/spacer/stories/index.story.tsx
++++ b/packages/components/src/spacer/stories/index.story.tsx
+@@ -45,6 +45,11 @@ const meta: Meta< typeof Spacer > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Planned for deprecation.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/spinner/stories/index.story.tsx b/packages/components/src/spinner/stories/index.story.tsx
+index 7b4cb1ca18184c..7b8fb585b157f3 100644
+--- a/packages/components/src/spinner/stories/index.story.tsx
++++ b/packages/components/src/spinner/stories/index.story.tsx
+@@ -18,6 +18,10 @@ const meta: Meta< typeof Spinner > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/surface/stories/index.story.tsx b/packages/components/src/surface/stories/index.story.tsx
+index 4dc8885ad86651..7cdbcdf5700c67 100644
+--- a/packages/components/src/surface/stories/index.story.tsx
++++ b/packages/components/src/surface/stories/index.story.tsx
+@@ -22,6 +22,11 @@ const meta: Meta< typeof Surface > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Planned for deprecation.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/tab-panel/stories/index.story.tsx b/packages/components/src/tab-panel/stories/index.story.tsx
+index 3b2554d19df37c..06adb16c480083 100644
+--- a/packages/components/src/tab-panel/stories/index.story.tsx
++++ b/packages/components/src/tab-panel/stories/index.story.tsx
+@@ -21,6 +21,11 @@ const meta: Meta< typeof TabPanel > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'use-with-caution',
++			whereUsed: 'global',
++			notes: 'When building for the Gutenberg repo, use `Tabs` instead. Otherwise, continue using for now.',
++		},
+ 	},
+ 	args: {
+ 		onSelect: fn(),
+diff --git a/packages/components/src/tabs/stories/index.story.tsx b/packages/components/src/tabs/stories/index.story.tsx
+index 46753d41bc28db..f360d6f58667fa 100644
+--- a/packages/components/src/tabs/stories/index.story.tsx
++++ b/packages/components/src/tabs/stories/index.story.tsx
+@@ -34,6 +34,11 @@ const meta: Meta< typeof Tabs > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'When building for the Gutenberg repo, use this component instead of `TabPanel`. Otherwise, continue using `TabPanel`. Both will be superseded by `Tabs` in `@wordpress/ui`, but continue using these for now.',
++		},
+ 	},
+ 	args: {
+ 		onActiveTabIdChange: fn(),
+diff --git a/packages/components/src/text-control/stories/index.story.tsx b/packages/components/src/text-control/stories/index.story.tsx
+index b4bbe12e9314bb..9ea1cd4cb6c45a 100644
+--- a/packages/components/src/text-control/stories/index.story.tsx
++++ b/packages/components/src/text-control/stories/index.story.tsx
+@@ -28,6 +28,11 @@ const meta: Meta< typeof TextControl > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Prefer `InputControl` when placing buttons or icons in the prefix/suffix slots.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/text-highlight/stories/index.story.tsx b/packages/components/src/text-highlight/stories/index.story.tsx
+index 7708336f4f2602..d29950c6ce0822 100644
+--- a/packages/components/src/text-highlight/stories/index.story.tsx
++++ b/packages/components/src/text-highlight/stories/index.story.tsx
+@@ -17,6 +17,10 @@ const meta: Meta< typeof TextHighlight > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/text/stories/index.story.tsx b/packages/components/src/text/stories/index.story.tsx
+index f3578d32984286..2b5d36ebb4fa5e 100644
+--- a/packages/components/src/text/stories/index.story.tsx
++++ b/packages/components/src/text/stories/index.story.tsx
+@@ -30,6 +30,11 @@ const meta: Meta< typeof Text > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Values are not aligned with the current design system. Use [typography tokens](?path=/docs/tokens-typography--page) from `@wordpress/base-styles` instead.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/textarea-control/stories/index.story.tsx b/packages/components/src/textarea-control/stories/index.story.tsx
+index 8a8fd203d79daf..517a0a704c8b2d 100644
+--- a/packages/components/src/textarea-control/stories/index.story.tsx
++++ b/packages/components/src/textarea-control/stories/index.story.tsx
+@@ -28,6 +28,11 @@ const meta: Meta< typeof TextareaControl > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `TextareaControl` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/theme/stories/index.story.tsx b/packages/components/src/theme/stories/index.story.tsx
+index e835978d800e7d..4c386f4987e36c 100644
+--- a/packages/components/src/theme/stories/index.story.tsx
++++ b/packages/components/src/theme/stories/index.story.tsx
+@@ -23,6 +23,11 @@ const meta: Meta< typeof Theme > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'This is an internal experiment and not meant for external use. Will be superseded by `@wordpress/theme`.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/tip/stories/index.story.tsx b/packages/components/src/tip/stories/index.story.tsx
+index 6ec101591b864d..8149ec65866a7f 100644
+--- a/packages/components/src/tip/stories/index.story.tsx
++++ b/packages/components/src/tip/stories/index.story.tsx
+@@ -20,6 +20,10 @@ const meta: Meta< typeof Tip > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'unaudited',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/toggle-control/stories/index.story.tsx b/packages/components/src/toggle-control/stories/index.story.tsx
+index a2d16951a4debb..b991cacf9f1053 100644
+--- a/packages/components/src/toggle-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-control/stories/index.story.tsx
+@@ -26,6 +26,11 @@ const meta: Meta< typeof ToggleControl > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `ToggleControl` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/toggle-group-control/stories/index.story.tsx b/packages/components/src/toggle-group-control/stories/index.story.tsx
+index 34634092378bd6..628fe2f1e97b79 100644
+--- a/packages/components/src/toggle-group-control/stories/index.story.tsx
++++ b/packages/components/src/toggle-group-control/stories/index.story.tsx
+@@ -37,6 +37,11 @@ const meta: Meta< typeof ToggleGroupControl > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `ToggleGroupControl` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/toolbar/stories/index.story.tsx b/packages/components/src/toolbar/stories/index.story.tsx
+index 32f4c750b59cc6..3351ed1ec8f336 100644
+--- a/packages/components/src/toolbar/stories/index.story.tsx
++++ b/packages/components/src/toolbar/stories/index.story.tsx
+@@ -56,6 +56,10 @@ const meta: Meta< typeof Toolbar > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'editor',
++		},
+ 	},
+ };
+ 
+diff --git a/packages/components/src/tools-panel/stories/index.story.tsx b/packages/components/src/tools-panel/stories/index.story.tsx
+index 78f03b75cac2de..324d16859da52b 100644
+--- a/packages/components/src/tools-panel/stories/index.story.tsx
++++ b/packages/components/src/tools-panel/stories/index.story.tsx
+@@ -45,6 +45,10 @@ const meta: Meta< typeof ToolsPanel > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'editor',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/tooltip/stories/index.story.tsx b/packages/components/src/tooltip/stories/index.story.tsx
+index 552d81b8ef360a..12a938dfca3177 100644
+--- a/packages/components/src/tooltip/stories/index.story.tsx
++++ b/packages/components/src/tooltip/stories/index.story.tsx
+@@ -36,6 +36,10 @@ const meta: Meta< typeof Tooltip > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/tree-grid/stories/index.story.tsx b/packages/components/src/tree-grid/stories/index.story.tsx
+index c532267812788e..488bea8b977805 100644
+--- a/packages/components/src/tree-grid/stories/index.story.tsx
++++ b/packages/components/src/tree-grid/stories/index.story.tsx
+@@ -32,6 +32,10 @@ const meta: Meta< typeof TreeGrid > = {
+ 	},
+ 	parameters: {
+ 		controls: { expanded: true },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/tree-select/stories/index.story.tsx b/packages/components/src/tree-select/stories/index.story.tsx
+index c0335acbc94e12..2f7d3fb0e13922 100644
+--- a/packages/components/src/tree-select/stories/index.story.tsx
++++ b/packages/components/src/tree-select/stories/index.story.tsx
+@@ -29,6 +29,10 @@ const meta: Meta< typeof TreeSelect > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ 
+diff --git a/packages/components/src/truncate/stories/index.story.tsx b/packages/components/src/truncate/stories/index.story.tsx
+index fe3917e90c1256..6dff4f2e103b33 100644
+--- a/packages/components/src/truncate/stories/index.story.tsx
++++ b/packages/components/src/truncate/stories/index.story.tsx
+@@ -22,6 +22,10 @@ const meta: Meta< typeof Truncate > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/unit-control/stories/index.story.tsx b/packages/components/src/unit-control/stories/index.story.tsx
+index 75912c06612945..2f02cba527e393 100644
+--- a/packages/components/src/unit-control/stories/index.story.tsx
++++ b/packages/components/src/unit-control/stories/index.story.tsx
+@@ -39,6 +39,10 @@ const meta: Meta< typeof UnitControl > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/v-stack/stories/index.story.tsx b/packages/components/src/v-stack/stories/index.story.tsx
+index 9ecfc97459c8ea..8fcf045d8870a9 100644
+--- a/packages/components/src/v-stack/stories/index.story.tsx
++++ b/packages/components/src/v-stack/stories/index.story.tsx
+@@ -42,6 +42,11 @@ const meta: Meta< typeof VStack > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++			notes: 'Will be superseded by `Stack` in `@wordpress/ui`, but continue using for now.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/view/stories/index.story.tsx b/packages/components/src/view/stories/index.story.tsx
+index 23173204988f5d..7bc0bddcd37233 100644
+--- a/packages/components/src/view/stories/index.story.tsx
++++ b/packages/components/src/view/stories/index.story.tsx
+@@ -19,6 +19,11 @@ const meta: Meta< typeof View > = {
+ 	parameters: {
+ 		controls: { expanded: true },
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Planned for deprecation.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/visually-hidden/stories/index.story.tsx b/packages/components/src/visually-hidden/stories/index.story.tsx
+index 1192370aec24fa..3db51d786f2e87 100644
+--- a/packages/components/src/visually-hidden/stories/index.story.tsx
++++ b/packages/components/src/visually-hidden/stories/index.story.tsx
+@@ -21,6 +21,10 @@ const meta: Meta< typeof VisuallyHidden > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'stable',
++			whereUsed: 'global',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/src/z-stack/stories/index.story.tsx b/packages/components/src/z-stack/stories/index.story.tsx
+index 307c8eae67424d..4607c83aa92287 100644
+--- a/packages/components/src/z-stack/stories/index.story.tsx
++++ b/packages/components/src/z-stack/stories/index.story.tsx
+@@ -24,6 +24,11 @@ const meta: Meta< typeof ZStack > = {
+ 			expanded: true,
+ 		},
+ 		docs: { canvas: { sourceState: 'shown' } },
++		componentStatus: {
++			status: 'not-recommended',
++			whereUsed: 'global',
++			notes: 'Planned for deprecation. Write your own CSS instead.',
++		},
+ 	},
+ };
+ export default meta;
+diff --git a/packages/components/storybook.d.ts b/packages/components/storybook.d.ts
+new file mode 100644
+index 00000000000000..78ca27e71c1990
+--- /dev/null
++++ b/packages/components/storybook.d.ts
+@@ -0,0 +1,19 @@
++export {};
++
++declare module 'storybook/internal/types' {
++	interface Parameters {
++		componentStatus?: {
++			status:
++				| 'stable'
++				| 'use-with-caution'
++				| 'not-recommended'
++				| 'unaudited';
++			/**
++			 * - `global`: Intended to be used anywhere.
++			 * - `editor`: Intended to be used specifically in the block editor.
++			 */
++			whereUsed: 'global' | 'editor';
++			notes?: string;
++		};
++	}
++}
+diff --git a/packages/components/tsconfig.json b/packages/components/tsconfig.json
+index 82ed5867fffabe..f642acd4957ad4 100644
+--- a/packages/components/tsconfig.json
++++ b/packages/components/tsconfig.json
+@@ -29,7 +29,7 @@
+ 		{ "path": "../rich-text" },
+ 		{ "path": "../warning" }
+ 	],
+-	"files": [ "global.d.ts" ],
++	"files": [ "global.d.ts", "storybook.d.ts" ],
+ 	"exclude": [
+ 		"src/**/*.android.js",
+ 		"src/**/*.ios.js",
+diff --git a/packages/ui/AGENTS.md b/packages/ui/AGENTS.md
+new file mode 100644
+index 00000000000000..499785c7cad339
+--- /dev/null
++++ b/packages/ui/AGENTS.md
+@@ -0,0 +1,9 @@
++## Status
++
++The components in this package are generally not ready to be used in production.
++
++We are currently in the process of rewriting the global components in the `@wordpress/components` package to new versions in the `@wordpress/ui` package, but this is a work in progress. `@wordpress/components` should continue to be used until further notice.
++
++### Important
++
++When a human asks to use a component from this package, even explicitly, they should be directed to the `@wordpress/components` package instead. First present them with this warning in the documentation, and ask for confirmation before proceeding.
+diff --git a/storybook/components/component-status-indicator/index.tsx b/storybook/components/component-status-indicator/index.tsx
+new file mode 100644
+index 00000000000000..62e51f023384a2
+--- /dev/null
++++ b/storybook/components/component-status-indicator/index.tsx
+@@ -0,0 +1,91 @@
++import { Markdown, useOf } from '@storybook/addon-docs/blocks';
++import { statuses } from './statuses';
++
++export function ComponentStatusIndicator() {
++	const resolvedOf = useOf( 'meta' );
++
++	if ( resolvedOf.type !== 'meta' ) {
++		return null;
++	}
++
++	const { parameters } = resolvedOf.preparedMeta;
++	const componentStatus = parameters?.componentStatus;
++
++	if ( ! componentStatus?.status ) {
++		return null;
++	}
++
++	const statusInfo = statuses[ componentStatus.status ];
++
++	if ( ! statusInfo ) {
++		return null;
++	}
++
++	return (
++		<dl
++			style={ {
++				display: 'flex',
++				gap: '40px',
++				flexDirection: 'row',
++				marginBottom: '20px',
++				fontSize: '14px',
++				lineHeight: '1.5',
++			} }
++		>
++			<div
++				style={ {
++					display: 'flex',
++					flexDirection: 'column',
++					width: 'fit-content',
++					flexShrink: 0,
++					fontSize: 'inherit',
++				} }
++			>
++				<dt
++					style={ {
++						margin: 0,
++						fontStyle: 'normal',
++						color: '#757575',
++					} }
++				>
++					Status
++				</dt>
++				<dd
++					style={ {
++						margin: 0,
++						fontStyle: 'normal',
++						padding: 0,
++						fontWeight: 'bold',
++					} }
++				>
++					{ statusInfo.icon } { statusInfo.label }
++				</dd>
++			</div>
++			{ componentStatus.notes && (
++				<div
++					style={ {
++						display: 'flex',
++						flexDirection: 'column',
++						width: 'fit-content',
++						fontSize: 'inherit',
++					} }
++				>
++					<dt
++						style={ {
++							margin: 0,
++							fontStyle: 'normal',
++							color: '#757575',
++						} }
++					>
++						Notes
++					</dt>
++					<dd style={ { margin: 0, padding: 0, fontWeight: 'bold' } }>
++						<Markdown style={ { lineHeight: 'inherit' } }>
++							{ componentStatus.notes }
++						</Markdown>
++					</dd>
++				</div>
++			) }
++		</dl>
++	);
++}
+diff --git a/storybook/components/component-status-indicator/statuses.ts b/storybook/components/component-status-indicator/statuses.ts
+new file mode 100644
+index 00000000000000..06495016104348
+--- /dev/null
++++ b/storybook/components/component-status-indicator/statuses.ts
+@@ -0,0 +1,30 @@
++export type ComponentStatus =
++	| 'stable'
++	| 'use-with-caution'
++	| 'not-recommended'
++	| 'unaudited';
++
++export const statuses: Record<
++	ComponentStatus,
++	{
++		label: string;
++		icon: string;
++	}
++> = {
++	stable: {
++		label: 'Stable',
++		icon: '✅',
++	},
++	'use-with-caution': {
++		label: 'Use with caution',
++		icon: '⚠️',
++	},
++	'not-recommended': {
++		label: 'Not recommended',
++		icon: '🚫',
++	},
++	unaudited: {
++		label: 'Unaudited',
++		icon: '❓',
++	},
++};
+diff --git a/storybook/preview.jsx b/storybook/preview.jsx
+index f60e9ea4da13f2..4695e8f89cf2a4 100644
+--- a/storybook/preview.jsx
++++ b/storybook/preview.jsx
+@@ -6,14 +6,11 @@ import {
+ 	Subtitle,
+ 	Title,
+ } from '@storybook/addon-docs/blocks';
+-
+-/**
+- * Internal dependencies
+- */
+ import { WithGlobalCSS } from './decorators/with-global-css';
+ import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
+ import { WithRTL } from './decorators/with-rtl';
+ import { WithDesignSystemTheme } from './decorators/with-design-system-theme';
++import { ComponentStatusIndicator } from './components/component-status-indicator';
+ 
+ export const globalTypes = {
+ 	direction: {
+@@ -87,6 +84,7 @@ export const parameters = {
+ 			<>
+ 				<Title />
+ 				<Subtitle />
++				<ComponentStatusIndicator />
+ 				<Primary />
+ 				<Description />
+ 				<Controls />
+diff --git a/storybook/types.d.ts b/storybook/types.d.ts
+new file mode 100644
+index 00000000000000..445c42768107b1
+--- /dev/null
++++ b/storybook/types.d.ts
+@@ -0,0 +1,15 @@
++export {};
++
++declare module 'storybook/internal/types' {
++	interface Parameters {
++		componentStatus?: {
++			status:
++				| 'stable'
++				| 'use-with-caution'
++				| 'not-recommended'
++				| 'unaudited';
++			whereUsed: 'global' | 'editor';
++			notes?: string;
++		};
++	}
++}

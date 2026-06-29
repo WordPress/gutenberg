@@ -1,0 +1,53 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index f8ba3e4bb535e2..eb9f715ebf04f1 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -4,6 +4,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Tabs`: Set explicit `font-family` on tab buttons to prevent inheriting unintended fonts ([#75537](https://github.com/WordPress/gutenberg/pull/75537)).
+ -   `ExternalLink`: Add `wp-exclude-emoji` class to prevent Twemoji from replacing the arrow icon ([#75538](https://github.com/WordPress/gutenberg/pull/75538)).
+ -   `TimePicker`: Fix date parsing for years below 1000 by implementing ISO 8601 compliant year formatting with zero-padding ([#75343](https://github.com/WordPress/gutenberg/pull/75343)).
+ -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
+diff --git a/packages/components/src/tabs/styles.ts b/packages/components/src/tabs/styles.ts
+index 6a5a7e34906d52..0255d22e6ae378 100644
+--- a/packages/components/src/tabs/styles.ts
++++ b/packages/components/src/tabs/styles.ts
+@@ -162,6 +162,7 @@ export const Tab = styled( Ariakit.Tab )`
+ 		align-items: center;
+ 		cursor: pointer;
+ 		line-height: 1.2; // Characters in some languages (e.g. Japanese) may have a native higher line-height.
++		font-family: ${ font( 'default.fontFamily' ) };
+ 		font-weight: 400;
+ 		font-size: ${ font( 'default.fontSize' ) };
+ 		color: ${ COLORS.theme.foreground };
+diff --git a/packages/ui/CHANGELOG.md b/packages/ui/CHANGELOG.md
+index e3c829453c9926..40d271cc869b63 100644
+--- a/packages/ui/CHANGELOG.md
++++ b/packages/ui/CHANGELOG.md
+@@ -14,6 +14,7 @@
+ 
+ ### Bug Fixes
+ 
++-   `Tabs`: Replace hardcoded font values with design tokens on tab buttons ([#75537](https://github.com/WordPress/gutenberg/pull/75537)).
+ -   `Field`: Fix default gap spacing ([#75446](https://github.com/WordPress/gutenberg/pull/75446)).
+ -   `Button`: Fix disabled styles while `focusableWhenDisabled={false}` ([#75568](https://github.com/WordPress/gutenberg/pull/75568)).
+ 
+diff --git a/packages/ui/src/tabs/style.module.css b/packages/ui/src/tabs/style.module.css
+index a759fc5fbb8e8b..8036c693e8dcb3 100644
+--- a/packages/ui/src/tabs/style.module.css
++++ b/packages/ui/src/tabs/style.module.css
+@@ -121,9 +121,9 @@
+ 		/* Appearance */
+ 		cursor: pointer;
+ 
+-		/* Typography (TODO: replace with theme tokens when available) */
+-		font-family: sans-serif;
+-		font-size: 13px;
++		/* Typography */
++		font-family: var(--wpds-font-family-body);
++		font-size: var(--wpds-font-size-md);
+ 		white-space: nowrap;
+ 
+ 		/* Characters in some languages (e.g. Japanese) may have a native higher line-height. */

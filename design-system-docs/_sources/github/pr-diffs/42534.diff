@@ -1,0 +1,36 @@
+diff --git a/packages/components/CHANGELOG.md b/packages/components/CHANGELOG.md
+index d6cf16d4d5e81a..aef34edab39109 100644
+--- a/packages/components/CHANGELOG.md
++++ b/packages/components/CHANGELOG.md
+@@ -2,6 +2,10 @@
+ 
+ ## Unreleased
+ 
++## Bug Fix
++
++-   `AnglePickerControl`: Fix gap between elements in RTL mode ([#42534](https://github.com/WordPress/gutenberg/pull/42534)).
++
+ ### Enhancements
+ 
+ -   `BorderControl`: Improve labelling, tooltips and DOM structure ([#42348](https://github.com/WordPress/gutenberg/pull/42348/)).
+diff --git a/packages/components/src/angle-picker-control/index.js b/packages/components/src/angle-picker-control/index.js
+index 4fb51adc47f857..1417bfd6a845c3 100644
+--- a/packages/components/src/angle-picker-control/index.js
++++ b/packages/components/src/angle-picker-control/index.js
+@@ -34,7 +34,7 @@ export default function AnglePickerControl( {
+ 	const classes = classnames( 'components-angle-picker-control', className );
+ 
+ 	return (
+-		<Root className={ classes }>
++		<Root className={ classes } gap={ 4 }>
+ 			<FlexBlock>
+ 				<NumberControl
+ 					label={ label }
+@@ -62,7 +62,6 @@ export default function AnglePickerControl( {
+ 			</FlexBlock>
+ 			<FlexItem
+ 				style={ {
+-					marginLeft: space( 4 ),
+ 					marginBottom: space( 1 ),
+ 					marginTop: 'auto',
+ 				} }
